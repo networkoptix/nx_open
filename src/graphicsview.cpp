@@ -159,7 +159,7 @@ void GraphicsView::updateTransform()
 	else
 		f = m_zoom/200.0 + 1;
 	tr.scale(f, f);
-	tr.rotate(m_yRotate, Qt::YAxis);
+	tr.rotate(m_yRotate, Qt::ZAxis);
 	tr.rotate(m_xRotate, Qt::XAxis);
 	tr.translate(m_shift.x(), m_shift.y());
 	setTransform(tr);

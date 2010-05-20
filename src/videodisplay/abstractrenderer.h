@@ -12,7 +12,7 @@ public:
 
 	}
 
-	virtual void draw(CLVideoDecoderOutput& image)=0;
+	virtual void draw(CLVideoDecoderOutput& image, unsigned int channel)=0;
 	virtual void before_destroy() = 0;
 	virtual float aspectRatio() const = 0;
 

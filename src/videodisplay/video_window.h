@@ -21,17 +21,13 @@ class CLVideoWindow : public QObject, public QGraphicsItem, public CLAbstractRen
 	Q_OBJECT
 public:
 
-	static bool m_show_smt_butvideo;
 
 	CLVideoWindow (const CLDeviceVideoLayout* layout);
 	virtual ~CLVideoWindow ();
-	void draw(CLVideoDecoderOutput& image);
+	void draw(CLVideoDecoderOutput& image, unsigned int channel);
 	virtual void before_destroy();
 	void applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation);
-	virtual float aspectRatio() const
-	{
-		return m_gldraw.aspectRatio();
-	}
+	virtual float aspectRatio() const;
 
 	void showFPS(bool show);
 	void setStatistics(CLStatistics * st, unsigned int channel);
@@ -65,10 +61,7 @@ public:
 		m_needUpdate = val;
 	}
 
-	virtual void copyVideoDataBeforePainting(bool copy)
-	{
-		m_gldraw.copyVideoDataBeforePainting(copy);
-	}
+	void copyVideoDataBeforePainting(bool copy);
 
 signals:
 
@@ -89,8 +82,10 @@ protected:
 
 	void focusInEvent ( QFocusEvent * event );
 	void mousePressEvent ( QGraphicsSceneMouseEvent * event );
+
+	QRect getSubChannelRect(unsigned int channel) const;
 protected:
-	CLGLRenderer m_gldraw;
+	CLGLRenderer* m_gldraw[CL_MAX_CHANNELS];
 	bool m_first_draw;
 	CLStatistics* m_stat[CL_MAX_CHANNELS];
 
@@ -115,6 +110,7 @@ protected:
 	int m_opacity;
 
 	const CLDeviceVideoLayout* m_videolayout;
+	unsigned int m_videonum;
 	
 };
 

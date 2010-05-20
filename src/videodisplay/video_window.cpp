@@ -5,11 +5,9 @@
 #include <QStyleOptionGraphicsItem>
 #include <QGraphicsSceneMouseEvent>
 
-bool CLVideoWindow::m_show_smt_butvideo = true;
 
 CLVideoWindow::CLVideoWindow(const CLDeviceVideoLayout* layout):
 m_videolayout(layout),
-m_gldraw(this),
 m_first_draw(true),
 m_showfps(true),
 m_showinfotext(true),
@@ -19,7 +17,8 @@ m_Info_Font("times", 11),
 m_max_width(650),
 m_imageWidth(0),
 m_imageHeight(0),
-m_opacity(0)
+m_opacity(0),
+m_videonum(layout->numberOfChannels())
 
 {
 	m_max_heght = m_max_width*3/4;
@@ -34,30 +33,44 @@ m_opacity(0)
 	setAcceptHoverEvents(true);
 
 	setFlag(QGraphicsItem::ItemIsFocusable);
+
+
+	for (int i = 0; i  < m_videonum; ++i)
+		m_gldraw[i] = new CLGLRenderer(this);
+	
 	
 }
 
 
 CLVideoWindow::~CLVideoWindow()
 {
-	
+	for (int i = 0; i  < m_videonum; ++i)
+		delete m_gldraw[i];
 }
 
 
 void CLVideoWindow::before_destroy()
 {
-	m_gldraw.before_destroy();
+	for (int i = 0; i  < m_videonum; ++i)
+		m_gldraw[i]->before_destroy();;
 }
 
-void CLVideoWindow::draw(CLVideoDecoderOutput& image)
+void CLVideoWindow::draw(CLVideoDecoderOutput& image, unsigned int channel)
 {
 	m_first_draw = false;
-	m_gldraw.draw(image); // this function will wait m_gldraw.paintEvent(0);
+	m_gldraw[channel]->draw(image, channel); // this function will wait m_gldraw.paintEvent(0);
 	QMutexLocker locker(&m_mutex);
 	m_imageWidth = image.width;
 	m_imageHeight = image.height;
 
 }
+
+void CLVideoWindow::copyVideoDataBeforePainting(bool copy)
+{
+	for (int i = 0; i  < m_videonum; ++i)
+		m_gldraw[i]->copyVideoDataBeforePainting(copy);
+}
+
 
 int CLVideoWindow::imageWidth() const
 {
@@ -93,6 +106,11 @@ void CLVideoWindow::setOpacity(int opacity)
 	m_opacity = opacity;
 }
 
+QRect CLVideoWindow::getSubChannelRect(unsigned int channel) const
+{
+	return QRect(0,0,width(),height());
+}
+
 void CLVideoWindow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
 	
@@ -112,7 +130,8 @@ void CLVideoWindow::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
 	// save the GL state set for QPainter
 	saveGLState();
 
-	m_gldraw.paintEvent(0);
+	for (int i = 0; i  < m_videonum; ++i)
+			m_gldraw[i]->paintEvent(getSubChannelRect(i));
 
 	// restore the GL state that QPainter expects
 	restoreGLState();
@@ -125,8 +144,8 @@ void CLVideoWindow::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
 	}
 
 
-	if (m_show_smt_butvideo)
-		drawStuff(painter);
+	
+	drawStuff(painter);
 
 	if (m_stat[0]->isConnectioLost())
 		drawLostConnection(painter);
@@ -139,7 +158,8 @@ void CLVideoWindow::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
 
 void CLVideoWindow::applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation)
 {
-	m_gldraw.applyMixerSettings(brightness, contrast, hue, saturation);
+	for (int i = 0; i  < m_videonum; ++i)
+		m_gldraw[i]->applyMixerSettings(brightness, contrast, hue, saturation);
 }
 
 void CLVideoWindow::drawStuff(QPainter* painter)
@@ -270,6 +290,11 @@ int CLVideoWindow::width() const
 int CLVideoWindow::height() const
 {
 	return width()/aspectRatio();
+}
+
+float CLVideoWindow::aspectRatio() const
+{
+	return m_gldraw[0]->aspectRatio();
 }
 
 void CLVideoWindow::focusInEvent( QFocusEvent * event )

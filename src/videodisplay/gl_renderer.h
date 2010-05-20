@@ -21,11 +21,11 @@ public:
 
 	CLGLRenderer(CLVideoWindow *vw);
 	~CLGLRenderer();
-	void draw(CLVideoDecoderOutput& image);
+	void draw(CLVideoDecoderOutput& image, unsigned int channel);
 
 	virtual float aspectRatio() const;
 
-	void paintEvent(QPaintEvent *event);
+	void paintEvent(const QRect& r);
 
 	virtual void before_destroy();
 
@@ -39,6 +39,7 @@ public:
 	}
 
 	void copyVideoDataBeforePainting(bool copy);
+
 
 private:
 

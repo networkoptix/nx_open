@@ -360,7 +360,7 @@ void CLGLRenderer::copyVideoDataBeforePainting(bool copy)
 	
 }
 
-void CLGLRenderer::draw(CLVideoDecoderOutput& img)
+void CLGLRenderer::draw(CLVideoDecoderOutput& img, unsigned int channel)
 {
 	QMutexLocker locker(&m_mutex);
 
@@ -413,8 +413,6 @@ void CLGLRenderer::draw(CLVideoDecoderOutput& img)
 	if (!m_videowindow->isVisible())
 		return;
 
-	
-	
 	
 	m_videowindow->needUpdate(true); // sending piant event
 	//m_videowindow->update();
@@ -694,8 +692,9 @@ void CLGLRenderer::drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const
 }
 
 
-void CLGLRenderer::paintEvent(QPaintEvent *event)
+void CLGLRenderer::paintEvent(const QRect& r)
 {
+
 	if (m_abort_drawing)
 		return;
 
@@ -726,7 +725,7 @@ void CLGLRenderer::paintEvent(QPaintEvent *event)
 	
 	m_painterOpacity = 1.0;
 	QRect temp;
-	QRect r(0,0,m_videowindow->width(),m_videowindow->height());
+	//QRect r(0,0,m_videowindow->width(),m_videowindow->height());
 	float sar = 1.0f;
 
 	getTextureRect(temp, m_stride, m_height, r.width(), r.height(), sar);
@@ -734,6 +733,7 @@ void CLGLRenderer::paintEvent(QPaintEvent *event)
 	drawVideoTexture(m_texture[0], m_texture[1], m_texture[2], v_array);
 	/**/
 
+	
 	m_waitCon.wakeOne();
 
 }
