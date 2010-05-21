@@ -33,7 +33,7 @@ void CLCamDisplay::processData(CLAbstractData* data)
 
 	int channel = vd->channel_num;
 
-	if (m_display[channel])
+	if (m_display[channel])	
 		m_display[channel]->dispay(vd);
 
 }

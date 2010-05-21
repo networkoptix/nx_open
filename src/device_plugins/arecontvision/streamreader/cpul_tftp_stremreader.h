@@ -21,7 +21,7 @@ public:
 
 protected:
 	virtual CLAbstractMediaData* getNextData();
-	virtual unsigned int getChannelNumber(){return 0;}; // single sensor camera has only one sensor
+	
 	
 protected:
 

@@ -253,7 +253,8 @@ void MainWnd::onNewDevice(CLDevice* device)
 	int x,y;
 
 	getXY_by_position(position, CL_VIDEO_ROWS, x, y);
-	video_wnd->setPos(x * rect.width()* 1.1, y * rect.height() * 1.1);
+	//video_wnd->setPos(x * rect.width()* 1.1, y * rect.height() * 1.1);
+	video_wnd->setPos(x * 640* 1.1, y * 640*3/4 * 1.1);
 	video_wnd->setPosition(position);
 	m_scene.addItem(video_wnd);
 	m_position_busy[position] = true;

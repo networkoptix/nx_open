@@ -15,7 +15,7 @@ class CLSingleShotFileStreamreader : public CLSingleShotStreamreader
 public:
 	CLSingleShotFileStreamreader(CLDevice* dev );
 	~CLSingleShotFileStreamreader(){stop();}
-	virtual unsigned int getChannelNumber();
+	
 protected:
 	virtual CLAbstractMediaData* getData();
 private:

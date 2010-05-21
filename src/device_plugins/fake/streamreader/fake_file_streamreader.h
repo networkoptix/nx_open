@@ -4,27 +4,31 @@
 
 #include "../../../streamreader/cpull_stremreader.h"
 #include "../../../base/adaptivesleep.h"
+#include "../../../device/device_video_layout.h"
 
 class FakeStreamReader : public CLClientPullStreamreader
 {
 public:
-	explicit FakeStreamReader(CLDevice* dev );
+	explicit FakeStreamReader(CLDevice* dev, int channels);
 	
 
 	~FakeStreamReader();
 
 protected:
 	virtual CLAbstractMediaData* getNextData();
-	virtual unsigned int getChannelNumber(){return 0;}; // single sensor camera has only one sensor
+	
 	
 protected:
 
 private:
 
+	int m_channels;
+	int m_curr_channel;
+
 	static unsigned char* data;
 	static unsigned char* descr;
-	unsigned char* pdata;
-	int* pdescr;
+	unsigned char* pdata[CL_MAX_CHANNELS];
+	int* pdescr[CL_MAX_CHANNELS];
 
 	static int data_len;
 	static int descr_data_len;

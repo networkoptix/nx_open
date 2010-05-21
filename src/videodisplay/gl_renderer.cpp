@@ -728,7 +728,14 @@ void CLGLRenderer::paintEvent(const QRect& r)
 	//QRect r(0,0,m_videowindow->width(),m_videowindow->height());
 	float sar = 1.0f;
 
-	getTextureRect(temp, m_stride, m_height, r.width(), r.height(), sar);
+	temp.setLeft(r.left());	temp.setTop(r.top());
+	temp.setWidth(r.width());
+	temp.setHeight(r.height());
+
+	//getTextureRect(temp, m_stride, m_height, r.width(), r.height(), sar);
+
+	
+
 	const float v_array[] = { temp.left(), temp.top(), temp.right()+1, temp.top(), temp.right()+1, temp.bottom()+1, temp.left(), temp.bottom()+1 };
 	drawVideoTexture(m_texture[0], m_texture[1], m_texture[2], v_array);
 	/**/

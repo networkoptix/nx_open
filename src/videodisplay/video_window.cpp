@@ -20,13 +20,14 @@ m_imageHeight(0),
 m_opacity(0),
 m_videonum(layout->numberOfChannels())
 
+
 {
 	m_max_heght = m_max_width*3/4;
 	//we never cache the video
 	//setCacheMode(DeviceCoordinateCache);
 	//setCacheMode(ItemCoordinateCache);
 
-	//setFlag(QGraphicsItem::ItemIsMovable);
+	setFlag(QGraphicsItem::ItemIsMovable);
 
 	setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);
 	m_Info_Font.setWeight(QFont::Bold);
@@ -108,7 +109,31 @@ void CLVideoWindow::setOpacity(int opacity)
 
 QRect CLVideoWindow::getSubChannelRect(unsigned int channel) const
 {
-	return QRect(0,0,width(),height());
+	if (m_videonum==1) // most case scenario 
+		return QRect(0,0,width(),height());
+		//return QRect(width()/2,height()/2,width()/2,height()/2);
+
+	/*
+
+	*----*----*
+	|	 |	  |
+	|	 |	  |
+	*----*----*
+	|	 |	  |
+	|	 |	  |
+	*----*----*
+
+	/**/
+
+
+	int cel_x = m_videolayout->h_position(channel);
+	int cel_y = m_videolayout->v_position(channel);
+
+	int w = width()/m_videolayout->width();
+	int h = height()/m_videolayout->height();
+
+	return QRect(cel_x*w, cel_y*h, w,h);
+
 }
 
 void CLVideoWindow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -132,6 +157,8 @@ void CLVideoWindow::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
 
 	for (int i = 0; i  < m_videonum; ++i)
 			m_gldraw[i]->paintEvent(getSubChannelRect(i));
+
+	
 
 	// restore the GL state that QPainter expects
 	restoreGLState();
@@ -294,7 +321,13 @@ int CLVideoWindow::height() const
 
 float CLVideoWindow::aspectRatio() const
 {
-	return m_gldraw[0]->aspectRatio();
+	if (m_videonum==1) // most case scenario; for optimization
+		return m_gldraw[0]->aspectRatio();
+
+	//=============================
+	//m_videonum >1
+	// at this point we assume that all channels have the same aspect ratio; 
+	return m_gldraw[0]->aspectRatio()*m_videolayout->width()/m_videolayout->height();
 }
 
 void CLVideoWindow::focusInEvent( QFocusEvent * event )

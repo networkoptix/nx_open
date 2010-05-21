@@ -369,6 +369,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 	videoData->width = size.width;
 	videoData->height = size.height;
 
+	videoData->channel_num = 0;
 	
 	return videoData;
 

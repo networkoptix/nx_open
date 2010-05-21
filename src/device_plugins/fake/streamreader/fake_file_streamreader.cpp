@@ -12,8 +12,10 @@ int FakeStreamReader::descr_data_len = 0;
 
 //=========================================================
 
-FakeStreamReader::FakeStreamReader (CLDevice* dev):
-CLClientPullStreamreader(dev)
+FakeStreamReader::FakeStreamReader (CLDevice* dev, int channels):
+CLClientPullStreamreader(dev),
+m_channels(channels),
+m_curr_channel(0)
 {
 	const int max_data_size = 10*1024*1024;
 
@@ -35,10 +37,11 @@ CLClientPullStreamreader(dev)
 	}
 
 
-	pdata = data;
-	pdescr = (int*)descr;
-
-
+	for (int i = 0; i < m_channels; ++i)
+	{
+		pdata[i] = data;
+		pdescr[i] = (int*)descr;
+	}
 
 }
 
@@ -51,28 +54,28 @@ FakeStreamReader::~FakeStreamReader()
 CLAbstractMediaData* FakeStreamReader::getNextData()
 {
 
-	m_sleep.sleep(500);// 33 fps
+	m_sleep.sleep(100);// 33 fps
 
 
 	
 	CLCompressedVideoData* videoData = new CLCompressedVideoData(8,400*1024);
 	CLByteArray& img = videoData->data;
 
-	int descr_len = *pdescr; pdescr++;
-	if ((unsigned char*)pdescr - descr >= descr_data_len)
+	int descr_len = *(pdescr[m_curr_channel]); (pdescr[m_curr_channel])++;
+	if ((unsigned char*)(pdescr[m_curr_channel]) - descr >= descr_data_len)
 	{
 		// from very beginin
-		pdata = data;
-		pdescr = (int*)descr;
-		descr_len = *pdescr; pdescr++;
+		pdata[m_curr_channel] = data;
+		pdescr[m_curr_channel] = (int*)descr;
+		descr_len = *(pdescr[m_curr_channel]); (pdescr[m_curr_channel])++;
 	}
 
 	//len*=2;
 
 
 
-	img.write((char*)pdata, descr_len);
-	pdata+=descr_len;
+	img.write((char*)(pdata[m_curr_channel]), descr_len);
+	pdata[m_curr_channel]+=descr_len;
 
 
 	
@@ -80,9 +83,15 @@ CLAbstractMediaData* FakeStreamReader::getNextData()
 	videoData->compressionType = CLAbstractMediaData::H264;
 	videoData->width = 1600;
 	videoData->height = 1184;
-	videoData->channel_num = 0;
+	videoData->channel_num = m_curr_channel;
+
+	m_curr_channel++;
+
+	if (m_curr_channel==m_channels)
+		m_curr_channel=0;
 
 	
+
 	return videoData;
 
 }

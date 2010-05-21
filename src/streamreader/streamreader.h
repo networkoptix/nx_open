@@ -45,8 +45,6 @@ public:
 	void setDeviceRestartHadler(CLDeviceRestartHadler* restartHandler);
 
 protected:
-	// returns number of channel related to last data arrived 
-	virtual unsigned int getChannelNumber()= 0;
 
 	void putData(CLAbstractData* data);
 

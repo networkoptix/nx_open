@@ -17,8 +17,8 @@ public:
 	// returns maximum height ( in terms of channels 4x1 2x2 1x1 ans so on  )
 	virtual unsigned int height() const = 0; 
 
-	virtual unsigned int h_position(unsigned int channel) = 0; //returns horizontal position of the channel
-	virtual unsigned int v_position(unsigned int channel) = 0; //returns vertical position of the channel
+	virtual unsigned int h_position(unsigned int channel) const = 0; //returns horizontal position of the channel
+	virtual unsigned int v_position(unsigned int channel) const = 0; //returns vertical position of the channel
 
 };
 
@@ -46,12 +46,12 @@ public:
 		return 1;
 	}
 
-	virtual unsigned int h_position(unsigned int channel)
+	virtual unsigned int h_position(unsigned int channel) const
 	{
 		return 0;
 	}
 
-	virtual unsigned int v_position(unsigned int channel)
+	virtual unsigned int v_position(unsigned int channel) const
 	{
 		return 0;
 	}

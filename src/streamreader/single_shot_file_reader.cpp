@@ -11,10 +11,6 @@ CLSingleShotStreamreader(dev)
 	m_fileName = device->getFileName();
 }
 
-unsigned int CLSingleShotFileStreamreader::getChannelNumber()
-{
-	return 0;
-}
 
 CLAbstractMediaData* CLSingleShotFileStreamreader::getData()
 {
@@ -50,7 +46,7 @@ CLAbstractMediaData* CLSingleShotFileStreamreader::getData()
 	outData->height = 0; //does not really meter (this is single shot)
 	outData->keyFrame = true;
 
-
+	outData->channel_num = 0;
 
 	return outData;
 }

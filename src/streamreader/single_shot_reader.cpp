@@ -21,10 +21,6 @@ void CLSingleShotStreamreader::run()
 		
 
 
-	unsigned int channel_num = getChannelNumber();
-	data->channel_num = channel_num;
-
-
 	putData(data);
 
 	CL_LOG(cl_logINFO) cl_log.log("single shot stream reader stopped.", cl_logINFO);

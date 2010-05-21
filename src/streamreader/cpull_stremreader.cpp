@@ -73,8 +73,8 @@ void CLClientPullStreamreader::run()
 			frames_lost = 0;
 		}
 
-		unsigned int channel_num = getChannelNumber();
-		data->channel_num = channel_num;
+		
+		
 
 		if (m_needKeyData)
 		{
@@ -90,7 +90,7 @@ void CLClientPullStreamreader::run()
 		// put it in queue
 		//m_dataqueue[channel_num]->push(data);
 
-		m_stat[channel_num].onData(data->data.size());
+		m_stat[data->channel_num].onData(data->data.size());
 
 	}
 

@@ -23,6 +23,7 @@ public:
 	~CLGLRenderer();
 	void draw(CLVideoDecoderOutput& image, unsigned int channel);
 
+	// width/height
 	virtual float aspectRatio() const;
 
 	void paintEvent(const QRect& r);

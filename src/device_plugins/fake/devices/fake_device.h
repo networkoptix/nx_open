@@ -28,4 +28,24 @@ public:
 
 };
 
+class FakeDevice4_180 : public FakeDevice
+{
+public:
+	FakeDevice4_180();
+	virtual CLStreamreader* getDeviceStreamConnection();
+protected:
+	
+};
+
+
+class FakeDevice4_360 : public FakeDevice
+{
+public:
+	FakeDevice4_360();
+	virtual CLStreamreader* getDeviceStreamConnection();
+protected:
+	
+};
+
+
 #endif // fake_ss_device_h_2110

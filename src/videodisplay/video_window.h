@@ -111,6 +111,8 @@ protected:
 
 	const CLDeviceVideoLayout* m_videolayout;
 	unsigned int m_videonum;
+
+	
 	
 };
 
