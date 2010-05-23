@@ -57,6 +57,27 @@ void VideoCamerasLayout::getXY(unsigned int pos, int& x, int& y) const
 	y = pos/m_width;
 }
 
+int VideoCamerasLayout::getPos(const CLVideoCamera* cam) const
+{
+	for (int i = 0; i <m_slots; ++i)
+		if (m_cams[i] == cam)
+		{
+			return i;
+		}
+
+	return -1;
+}
+
+bool VideoCamerasLayout::getXY(const CLVideoCamera* cam, int& x, int& y) const
+{
+	int pos = getPos(cam);
+	if (pos<0)
+		return false;
+
+	getXY(pos, x, y);
+	return true;
+}
+
 void VideoCamerasLayout::addCamera(int position, CLVideoCamera* cam)
 {
 	int width = cam->getDevice()->getVideoLayout()->width();

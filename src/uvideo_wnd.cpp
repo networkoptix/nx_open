@@ -10,15 +10,6 @@ m_selected(false)
 
 }
 
-void VideoWindow::setPosition(int pos)
-{
-	m_position = pos;
-}
-
-int VideoWindow::getPosition() const
-{
-	return m_position;
-}
 
 void VideoWindow::setSelected(bool sel)
 {

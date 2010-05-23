@@ -16,6 +16,12 @@ public:
 
 	void getXY(unsigned int pos, int& x, int& y) const;
 
+
+	int getPos(const CLVideoCamera* cam) const;
+
+	// return true if succedded 
+	bool getXY(const CLVideoCamera* cam, int& x, int& y) const;
+
 	void addCamera(int position, CLVideoCamera* cam);
 	void removeCamera(CLVideoCamera* cam);
 

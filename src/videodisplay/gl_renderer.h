@@ -23,9 +23,6 @@ public:
 	~CLGLRenderer();
 	void draw(CLVideoDecoderOutput& image, unsigned int channel);
 
-	// width/height
-	virtual float aspectRatio() const;
-
 	void paintEvent(const QRect& r);
 
 	virtual void before_destroy();
@@ -101,9 +98,6 @@ private:
 
 		m_stride_old,
 		m_height_old;
-
-	mutable QMutex m_mutex_aspect;
-	float m_aspectratio;
 
 	unsigned char*  m_arrayPixels[3];
 

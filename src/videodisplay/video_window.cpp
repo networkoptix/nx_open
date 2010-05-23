@@ -18,6 +18,8 @@ m_max_width(max_width),
 m_max_heght(max_height),
 m_imageWidth(0),
 m_imageHeight(0),
+m_imageWidth_old(0),
+m_imageHeight_old(0),
 m_opacity(0),
 m_videonum(layout->numberOfChannels())
 
@@ -63,6 +65,17 @@ void CLVideoWindow::draw(CLVideoDecoderOutput& image, unsigned int channel)
 	QMutexLocker locker(&m_mutex);
 	m_imageWidth = image.width;
 	m_imageHeight = image.height;
+
+	if (m_imageWidth!=m_imageWidth_old || m_imageHeight!=m_imageHeight_old)
+	{
+		QMutexLocker  locker(&m_mutex_aspect);
+		m_aspectratio = (static_cast<float>(m_imageWidth))/m_imageHeight;
+		
+		m_imageWidth_old = m_imageWidth;
+		m_imageHeight_old = m_imageHeight;
+
+		emit onAspectRatioChanged(this);
+	}
 
 }
 
@@ -330,13 +343,15 @@ int CLVideoWindow::height() const
 
 float CLVideoWindow::aspectRatio() const
 {
+	QMutexLocker  locker(&m_mutex_aspect);
+
 	if (m_videonum==1) // most case scenario; for optimization
-		return m_gldraw[0]->aspectRatio();
+		return m_aspectratio;
 
 	//=============================
 	//m_videonum >1
 	// at this point we assume that all channels have the same aspect ratio; 
-	return m_gldraw[0]->aspectRatio()*m_videolayout->width()/m_videolayout->height();
+	return m_aspectratio*m_videolayout->width()/m_videolayout->height();
 }
 
 void CLVideoWindow::focusInEvent( QFocusEvent * event )

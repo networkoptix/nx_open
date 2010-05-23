@@ -8,8 +8,7 @@ class VideoWindow : public CLVideoWindow
 public:
 	VideoWindow(const CLDeviceVideoLayout* layout, int max_width, int max_height);
 
-	void setPosition(int pos) ;
-	int getPosition() const;
+
 
 	void setSelected(bool sel);
 
@@ -22,8 +21,6 @@ private:
 
 
 private:
-
-	int m_position;
 	bool m_selected;
 	
 };

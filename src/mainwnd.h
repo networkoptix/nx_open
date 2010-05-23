@@ -57,6 +57,8 @@ private:
 private slots:
 	void onTimer();
 	void onVideoTimer();
+
+	void onAspectRatioChanged(CLVideoWindow* wnd);
 private:
 
 
@@ -67,6 +69,10 @@ private:
 
 	CLVideoCamera* getCamByWnd(CLVideoWindow* wnd);
 	bool isSelectedCamStillExists() const;
+
+	void getMaxWndSize(const CLDeviceVideoLayout* layout, int& max_width, int& max_height);
+
+	void getCamPosition_helper(CLVideoCamera* cam, int position, int& x_pos, int& y_pos);
 
 
 };

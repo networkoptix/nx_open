@@ -73,6 +73,8 @@ signals:
 	void onVideoItemSelected(CLVideoWindow*);
 	void onVideoItemMouseRightClick(CLVideoWindow*);
 
+	void onAspectRatioChanged(CLVideoWindow*);
+
 protected:
 	
 	virtual void drawStuff(QPainter* painter);
@@ -108,6 +110,10 @@ protected:
 	mutable QMutex m_mutex;
 	int m_imageWidth;
 	int m_imageHeight;
+
+	int m_imageWidth_old;
+	int m_imageHeight_old;
+
 
 
 	bool m_needUpdate;

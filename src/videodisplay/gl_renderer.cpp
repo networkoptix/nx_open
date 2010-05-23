@@ -140,7 +140,6 @@ m_height(0),
 m_stride_old(0),
 m_height_old(0),
 m_needwait(true),
-m_aspectratio(4.0f/3),
 m_inited(false)
 {
 	applyMixerSettings(m_brightness, m_contrast, m_hue, m_saturation);
@@ -746,8 +745,3 @@ void CLGLRenderer::paintEvent(const QRect& r)
 }
 
 
-float CLGLRenderer::aspectRatio() const
-{
-	QMutexLocker  locker(&m_mutex_aspect);	
-	return m_aspectratio;
-}

@@ -215,13 +215,14 @@ void MainWnd::onNewDevice(CLDevice* device)
 		return;
 	}
 
-	int dlw = device->getVideoLayout()->width();
-	int dlh = device->getVideoLayout()->height();
-	int width  = SLOT_WIDTH*(dlw + SLOT_DISTANCE*(dlw-1));
-	int heigh = SLOT_HEIGHT*(dlh + SLOT_DISTANCE*(dlh-1));
+	int width_max, heigh_max;
+	getMaxWndSize(device->getVideoLayout(), width_max, heigh_max);
 
-	VideoWindow* video_wnd =  new VideoWindow(device->getVideoLayout(), width, heigh);
+	VideoWindow* video_wnd =  new VideoWindow(device->getVideoLayout(), width_max, heigh_max);
 	CLVideoCamera* cam = new VideoCamera(device, video_wnd);
+
+	m_camlayout.addCamera(position, cam);
+
 
 	if (device->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT)) // do not show fps if it's still shot
 		video_wnd->showFPS(false);
@@ -232,6 +233,8 @@ void MainWnd::onNewDevice(CLDevice* device)
 
 	connect(video_wnd, SIGNAL(onVideoItemSelected(CLVideoWindow*)), this, SLOT(onVideoItemSelected(CLVideoWindow*)));
 	connect(video_wnd, SIGNAL(onVideoItemMouseRightClick(CLVideoWindow*)), this, SLOT(onVideoItemMouseRightClick(CLVideoWindow*)));
+	connect(video_wnd, SIGNAL(onAspectRatioChanged(CLVideoWindow*)), this, SLOT(onAspectRatioChanged(CLVideoWindow*)));
+
 
 
 	m_videoWindows.push_back(video_wnd);
@@ -254,20 +257,13 @@ void MainWnd::onNewDevice(CLDevice* device)
 	onDeviceRestarted(reader, cam);
 
 
-
-
-	QRectF rect = video_wnd->boundingRect();
 	int x,y;
 
-	m_camlayout.getXY(position, x, y);
-	m_camlayout.addCamera(position, cam);
+	getCamPosition_helper(cam, position, x, y);
+	video_wnd->setPos(x , y );
 
-	//video_wnd->setPos(x * rect.width()* 1.1, y * rect.height() * 1.1);
-	video_wnd->setPos(x * SLOT_WIDTH* (1+SLOT_DISTANCE), y * SLOT_HEIGHT * (1+SLOT_DISTANCE));
-	video_wnd->setPosition(position);
+
 	m_scene.addItem(video_wnd);
-
-
 	cam->startDispay();
 
 }
@@ -380,5 +376,55 @@ bool MainWnd::isSelectedCamStillExists() const
 	}
 
 	return false;
+
+}
+
+void MainWnd::onAspectRatioChanged(CLVideoWindow* wnd)
+{
+	
+	CLVideoCamera* cam = getCamByWnd(wnd);
+	if (!cam) return;
+
+	int x,y;
+
+	getCamPosition_helper(cam, m_camlayout.getPos(cam), x, y);
+
+	wnd->setPos(x , y );
+	
+
+}
+
+void MainWnd::getMaxWndSize(const CLDeviceVideoLayout* layout, int& max_width, int& max_height)
+{
+	int dlw = layout->width();
+	int dlh = layout->height();
+	max_width = SLOT_WIDTH*(dlw + SLOT_DISTANCE*(dlw-1));
+	max_height = SLOT_HEIGHT*(dlh + SLOT_DISTANCE*(dlh-1));
+}
+
+void MainWnd::getCamPosition_helper(CLVideoCamera* cam, int position, int& x_pos, int& y_pos)
+{
+	CLVideoWindow* wnd = cam->getVideoWindow();
+
+
+	float aspect = wnd->aspectRatio();
+
+
+	int width_max, height_max;
+	getMaxWndSize(cam->getDevice()->getVideoLayout(), width_max, height_max);
+
+
+	int width = wnd->width();
+	int height = wnd->height();
+
+	int dx = (width_max - width)/2;
+	int dy = (height_max - height)/2;
+
+	int x,y;
+	m_camlayout.getXY(position, x, y);
+
+	x_pos = x * SLOT_WIDTH* (1+SLOT_DISTANCE) + dx;
+	y_pos = y * SLOT_HEIGHT * (1+SLOT_DISTANCE) + dy;
+
 
 }
