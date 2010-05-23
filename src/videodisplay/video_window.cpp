@@ -210,9 +210,18 @@ void CLVideoWindow::drawFPS(QPainter* painter)
 	painter->setPen(QColor(0,255,0,170));
 	
 	char fps[100];
-	sprintf(fps, "%6.2f fps %6.2f Mbps", m_stat[0]->getFrameRate(), m_stat[0]->getBitrate());
-	QFontMetrics fm(painter->font());
-	painter->drawText(0,17 + fm.height()/2, fps);
+
+	for (int i = 0; i < m_videonum; ++i)
+	{
+
+		QRect rect = getSubChannelRect(i);
+
+		sprintf(fps, "%6.2f fps %6.2f Mbps", m_stat[i]->getFrameRate(), m_stat[i]->getBitrate());
+		QFontMetrics fm(painter->font());
+		painter->drawText(rect.left(),rect.top()+17 + fm.height()/2, fps);
+
+	}
+
 }
 
 void CLVideoWindow::drawLostConnection(QPainter* painter)
