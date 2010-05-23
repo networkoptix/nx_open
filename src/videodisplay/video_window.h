@@ -22,7 +22,7 @@ class CLVideoWindow : public QObject, public QGraphicsItem, public CLAbstractRen
 public:
 
 
-	CLVideoWindow (const CLDeviceVideoLayout* layout);
+	CLVideoWindow (const CLDeviceVideoLayout* layout, int max_width, int max_height);
 	virtual ~CLVideoWindow ();
 	void draw(CLVideoDecoderOutput& image, unsigned int channel);
 	virtual void before_destroy();
@@ -49,6 +49,11 @@ public:
 	void setShowImagesize(bool show);
 
 	void setOpacity(int opacity);
+
+	const CLDeviceVideoLayout* getVideoLayout() const 
+	{
+		return m_videolayout;
+	}
 
 
 	bool needUpdate() const

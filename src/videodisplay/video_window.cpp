@@ -6,7 +6,7 @@
 #include <QGraphicsSceneMouseEvent>
 
 
-CLVideoWindow::CLVideoWindow(const CLDeviceVideoLayout* layout):
+CLVideoWindow::CLVideoWindow(const CLDeviceVideoLayout* layout, int max_width, int max_height):
 m_videolayout(layout),
 m_first_draw(true),
 m_showfps(true),
@@ -14,7 +14,8 @@ m_showinfotext(true),
 m_showimagesize(true),
 m_FPS_Font("arial black", 25),
 m_Info_Font("times", 11),
-m_max_width(650),
+m_max_width(max_width),
+m_max_heght(max_height),
 m_imageWidth(0),
 m_imageHeight(0),
 m_opacity(0),
@@ -22,7 +23,6 @@ m_videonum(layout->numberOfChannels())
 
 
 {
-	m_max_heght = m_max_width*3/4;
 	//we never cache the video
 	//setCacheMode(DeviceCoordinateCache);
 	//setCacheMode(ItemCoordinateCache);

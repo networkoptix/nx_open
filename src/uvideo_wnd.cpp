@@ -3,8 +3,8 @@
 
 #include <QPainter>
 
-VideoWindow::VideoWindow(const CLDeviceVideoLayout* layout):
-CLVideoWindow(layout),
+VideoWindow::VideoWindow(const CLDeviceVideoLayout* layout, int max_width, int max_height):
+CLVideoWindow(layout, max_width, max_height),
 m_selected(false)
 {
 

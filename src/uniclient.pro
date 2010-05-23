@@ -35,7 +35,6 @@ HEADERS += streamreader/cpull_stremreader.h streamreader/streamreader.h streamre
 HEADERS += videodisplay/abstractrenderer.h videodisplay/camdisplay.h videodisplay/gl_renderer.h videodisplay/video_window.h videodisplay/videostreamdisplay.h
 
 
-
 SOURCES += device_plugins/arecontvision/devices/av_device.cpp device_plugins/arecontvision/devices/av_device_server.cpp device_plugins/arecontvision/devices/av_panoramic.cpp device_plugins/arecontvision/devices/av_singesensor.cpp
 SOURCES += device_plugins/arecontvision/streamreader/cpul_file_test.cpp device_plugins/arecontvision/streamreader/cpul_httpstremreader.cpp device_plugins/arecontvision/streamreader/cpul_tftp_stremreader.cpp
 SOURCES += device_plugins/arecontvision/tools/AVJpegHeader.cpp device_plugins/arecontvision/tools/nalconstructor.cpp device_plugins/arecontvision/tools/simple_tftp_client.cpp
@@ -49,6 +48,10 @@ SOURCES += device_plugins/fake/streamreader/fake_file_streamreader.cpp
 
 HEADERS += device_plugins/fake/devices/fake_device_server.h device_plugins/fake/devices/fake_device.h
 HEADERS += device_plugins/fake/streamreader/fake_file_streamreader.h
+
+HEADERS += videodisplay/video_cam_layout/videocamlayout.h
+SOURCES += videodisplay/video_cam_layout/videocamlayout.cpp
+
 
 
 RESOURCES += mainwnd.qrc

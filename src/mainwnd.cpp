@@ -24,7 +24,11 @@
 
 QColor bkr_color(0,5,15);
 
-#define CL_VIDEO_ROWS 5
+#define CL_VIDEO_ROWS 4
+
+#define SLOT_WIDTH 640
+#define SLOT_HEIGHT (SLOT_WIDTH*3/4)
+#define SLOT_DISTANCE (0.3)
 
 
 extern CLDiviceSeracher dev_searcher;
@@ -32,12 +36,10 @@ extern CLDiviceSeracher dev_searcher;
 
 MainWnd::MainWnd(QWidget *parent, Qt::WFlags flags):
 //QMainWindow(parent, flags),
-m_selectedcCam(0)
+m_selectedcCam(0),
+m_camlayout(CL_VIDEO_ROWS, CL_MAX_CAM_SUPPORTED)
 {
 	//ui.setupUi(this);
-
-	for (int i = 0; i < CL_MAX_CAM_SUPPORTED; ++i)
-		m_position_busy[i] = false;
 
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -203,7 +205,7 @@ void MainWnd::onVideoTimer()
 void MainWnd::onNewDevice(CLDevice* device)
 {
 
-	int position = next_available_pos();
+	int position = m_camlayout.getNextAvailablePos(device->getVideoLayout());
 	if (position==-1)
 	{
 		// max reached
@@ -213,7 +215,12 @@ void MainWnd::onNewDevice(CLDevice* device)
 		return;
 	}
 
-	VideoWindow* video_wnd =  new VideoWindow(device->getVideoLayout());
+	int dlw = device->getVideoLayout()->width();
+	int dlh = device->getVideoLayout()->height();
+	int width  = SLOT_WIDTH*(dlw + SLOT_DISTANCE*(dlw-1));
+	int heigh = SLOT_HEIGHT*(dlh + SLOT_DISTANCE*(dlh-1));
+
+	VideoWindow* video_wnd =  new VideoWindow(device->getVideoLayout(), width, heigh);
 	CLVideoCamera* cam = new VideoCamera(device, video_wnd);
 
 	if (device->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT)) // do not show fps if it's still shot
@@ -252,12 +259,13 @@ void MainWnd::onNewDevice(CLDevice* device)
 	QRectF rect = video_wnd->boundingRect();
 	int x,y;
 
-	getXY_by_position(position, CL_VIDEO_ROWS, x, y);
+	m_camlayout.getXY(position, x, y);
+	m_camlayout.addCamera(position, cam);
+
 	//video_wnd->setPos(x * rect.width()* 1.1, y * rect.height() * 1.1);
-	video_wnd->setPos(x * 640* 1.1, y * 640*3/4 * 1.1);
+	video_wnd->setPos(x * SLOT_WIDTH* (1+SLOT_DISTANCE), y * SLOT_HEIGHT * (1+SLOT_DISTANCE));
 	video_wnd->setPosition(position);
 	m_scene.addItem(video_wnd);
-	m_position_busy[position] = true;
 
 
 	cam->startDispay();
@@ -344,59 +352,6 @@ void MainWnd::onDeviceRestarted(CLStreamreader* reader, CLRestartHadlerInfo info
 
 //====================================================================
 //====================================================================
-void MainWnd::getXY_by_position(int position, int unit_size, int&x, int& y)
-{
-
-	if (position==0)
-	{
-		x = 0;
-		y = 0;
-		return;
-	}
-
-	int unitsize2 = unit_size*unit_size;
-
-	int unit_num = position/unitsize2;
-	int in_unit_position = position%unitsize2;
-
-	if (unit_num==0) // very first cell
-	{
-		if (position >= unit_size*(unit_size-1)) // last_row
-		{
-			y = unit_size-1;
-			x = position%unit_size;
-			return;
-		}
-
-		getXY_by_position(position, unit_size-1 , x,y);
-
-		return;
-	}
-	else
-	{
-		x = unit_num*unit_size + in_unit_position/unit_size;
-		y = in_unit_position%unit_size;
-	}
-
-
-}
-
-int MainWnd::next_available_pos() const
-{
-	int index = 0;
-	while(1)
-	{
-		if (index==CL_MAX_CAM_SUPPORTED)
-			return -1;
-
-		if (!m_position_busy[index])
-			return index;
-
-		++index;
-	}
-
-}
-
 
 CLVideoCamera* MainWnd::getCamByWnd(CLVideoWindow* wnd)
 {

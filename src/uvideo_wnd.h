@@ -6,7 +6,7 @@
 class VideoWindow : public CLVideoWindow
 {
 public:
-	VideoWindow(const CLDeviceVideoLayout* layout);
+	VideoWindow(const CLDeviceVideoLayout* layout, int max_width, int max_height);
 
 	void setPosition(int pos) ;
 	int getPosition() const;

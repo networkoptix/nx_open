@@ -7,10 +7,11 @@
 #include <QList>
 #include "streamreader/streamreader.h"
 #include "device/device.h"
+#include "videodisplay/video_cam_layout/videocamlayout.h"
 
 
 
-#define CL_MAX_CAM_SUPPORTED 500
+#define CL_MAX_CAM_SUPPORTED 400
 
 class QTimer;
 class CLVideoCamera;
@@ -43,12 +44,13 @@ private:
 	QTimer *m_videotimer;
 
 
-	bool m_position_busy[CL_MAX_CAM_SUPPORTED];
 
 	CLVideoCamera* m_selectedcCam;
 
 	CLVideoWindowsList m_videoWindows;
 	CLVideoCamsList m_cams;
+
+	VideoCamerasLayout m_camlayout;
 
 
 
@@ -59,9 +61,6 @@ private:
 
 
 	void onDeviceRestarted(CLStreamreader* reader, CLRestartHadlerInfo info);
-
-	void getXY_by_position(int position, int unit_size, int&x, int& y);
-	int next_available_pos() const;
 
 	void onNewDevices_helper(CLDeviceList devices);
 	void onNewDevice(CLDevice* device);
