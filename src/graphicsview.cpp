@@ -121,6 +121,7 @@ struct GraphicsView::GraphicsViewPriv
 	qreal moveDy;
 	QQueue<QPair<QPoint, QTime> > mouseTrackQueue;
 };
+//==============================================================================
 
 GraphicsView::GraphicsView():
 QGraphicsView(),
@@ -152,17 +153,28 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
 
 void GraphicsView::updateTransform()
 {
+	/**/
 	QTransform tr;
+
+	//tr.translate(4000, 1000);
+	//translate(4000,1000);
+
+
+
 	float f;
 	if (m_zoom>=0)
 		f = m_zoom*m_zoom/10000.0 + 1;
 	else
 		f = m_zoom/200.0 + 1;
 	tr.scale(f, f);
-	tr.rotate(m_yRotate, Qt::ZAxis);
-	tr.rotate(m_xRotate, Qt::XAxis);
-	tr.translate(m_shift.x(), m_shift.y());
+	tr.rotate(m_yRotate/1.0, Qt::YAxis);
+	tr.rotate(m_xRotate/1.0, Qt::XAxis);
+	//tr.translate(m_shift.x(), m_shift.y());
+	
 	setTransform(tr);
+	/**/
+
+	
 }
 
 void GraphicsView::mousePressEvent ( QMouseEvent * event)
@@ -176,6 +188,7 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 	{
 		// Left-button press in scroll hand mode initiates hand scrolling.
 		d->mouseTrackQueue.clear();
+		d->mouseMoveEventHandler(event);
         event->accept();
         d->handScrolling = true;
 		d->mousePressPos = event->pos();
@@ -186,7 +199,8 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 
 void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
-	if (d->handScrolling) {
+	if (d->handScrolling) 
+	{
 	   QPoint delta = event->pos() - d->lastMouseEvent.pos();
 		QScrollBar *hBar = horizontalScrollBar();
 		QScrollBar *vBar = verticalScrollBar();
@@ -215,10 +229,10 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 	if (d->mouseSpeed > 10.0) 
 	{
 		d->startAnimationCoordinate = QPoint(horizontalScrollBar()->value(), verticalScrollBar()->value());
-		int dur = 500.0 * sqrt(log(d->mouseSpeed)) ;
+		int dur = 200.0 * log(d->mouseSpeed) ;
 		d->timeline = new QTimeLine(dur);
 		d->timeline->setCurveShape(QTimeLine::EaseOutCurve);
-		d->timeline->setUpdateInterval(17); // 60fps
+		d->timeline->setUpdateInterval(20); // 60fps
 		connect(d->timeline, SIGNAL(valueChanged(qreal)), this, SLOT(onDragMoveAnimation(qreal)));
 		//d->timeline->setDuration(1200);
 		d->timeline->start();
@@ -250,12 +264,15 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 void GraphicsView::onDragMoveAnimation(qreal value) 
 {
-	qreal range = d->mouseSpeed / 5  * value;
+	qreal range = d->mouseSpeed / 5  * value*5;
 	QPoint delta(range * d->moveDx, range * d->moveDy);
 	QScrollBar *hBar = horizontalScrollBar();
 	QScrollBar *vBar = verticalScrollBar();
 	hBar->setValue(d->startAnimationCoordinate.x() + (isRightToLeft() ? delta.x() : -delta.x()));
 	vBar->setValue(d->startAnimationCoordinate.y() - delta.y());
+
+	//centerOn(d->startAnimationCoordinate.x() + (isRightToLeft() ? delta.x() : -delta.x()), d->startAnimationCoordinate.y() - delta.y());
+
 	qDebug() << "animation. dx=" << delta.x() << "dy=" << delta.y();
 }
 
