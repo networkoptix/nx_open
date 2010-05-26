@@ -177,7 +177,7 @@ void GraphicsView::updateTransform()
 	
 }
 
-/*
+
 void GraphicsView::mousePressEvent ( QMouseEvent * event)
 {
 	if (d->timeline) {
@@ -211,6 +211,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 		d->mouseMoveEventHandler(event);
 		// update mouse speed (depends from (x,y)' and move length)
 	}	
+	QGraphicsView::mouseMoveEvent(event);
 }
 
 void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
@@ -261,7 +262,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
         d->_q_unsetViewportCursor();
     }
 	*/
-//}
+}
 /**/
 void GraphicsView::onDragMoveAnimation(qreal value) 
 {

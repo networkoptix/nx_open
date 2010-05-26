@@ -11,8 +11,8 @@ m_zoomTimeLine(CLAnimationTimeLine::CLAnimationCurve::SLOW_END)
 {
 	setAcceptsHoverEvents(true);
 
-	m_zoomTimeLine.setDuration(600);
-	m_zoomTimeLine.setFrameRange(0, 700);
+	m_zoomTimeLine.setDuration(300);
+	m_zoomTimeLine.setFrameRange(0, 900);
 	//m_zoomTimeLine.setCurveShape(QTimeLine::EaseOutCurve);
 
 	connect(&m_zoomTimeLine, SIGNAL(frameChanged(int)), this, SLOT(setMouseMoveZoom(int)));

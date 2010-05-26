@@ -29,7 +29,7 @@ protected:
 
 	void updateTransform();
 
-	/*
+	
 	void mouseReleaseEvent ( QMouseEvent * e);
 	void mousePressEvent ( QMouseEvent * e);
 	void mouseMoveEvent ( QMouseEvent * e);
