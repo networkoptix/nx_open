@@ -84,6 +84,8 @@ protected:
 	virtual void drawInfoText(QPainter* painter);
 
 
+
+
 	void saveGLState();
 	void restoreGLState();
 

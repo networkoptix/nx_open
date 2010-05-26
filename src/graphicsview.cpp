@@ -177,6 +177,7 @@ void GraphicsView::updateTransform()
 	
 }
 
+/*
 void GraphicsView::mousePressEvent ( QMouseEvent * event)
 {
 	if (d->timeline) {
@@ -260,8 +261,8 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
         d->_q_unsetViewportCursor();
     }
 	*/
-}
-
+//}
+/**/
 void GraphicsView::onDragMoveAnimation(qreal value) 
 {
 	qreal range = d->mouseSpeed / 5  * value*5;

@@ -29,7 +29,7 @@ m_videonum(layout->numberOfChannels())
 	//setCacheMode(DeviceCoordinateCache);
 	//setCacheMode(ItemCoordinateCache);
 
-	setFlag(QGraphicsItem::ItemIsMovable);
+	//setFlag(QGraphicsItem::ItemIsMovable);
 
 	setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);
 	m_Info_Font.setWeight(QFont::Bold);
@@ -40,6 +40,7 @@ m_videonum(layout->numberOfChannels())
 
 	for (int i = 0; i  < m_videonum; ++i)
 		m_gldraw[i] = new CLGLRenderer(this);
+	
 	
 	
 }
