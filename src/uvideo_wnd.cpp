@@ -11,8 +11,9 @@ m_zoomTimeLine(CLAnimationTimeLine::CLAnimationCurve::SLOW_END)
 {
 	setAcceptsHoverEvents(true);
 
-	m_zoomTimeLine.setDuration(300);
+	m_zoomTimeLine.setDuration(400);
 	m_zoomTimeLine.setFrameRange(0, 900);
+	m_zoomTimeLine.setUpdateInterval(17); // 60 fps
 	//m_zoomTimeLine.setCurveShape(QTimeLine::EaseOutCurve);
 
 	connect(&m_zoomTimeLine, SIGNAL(frameChanged(int)), this, SLOT(setMouseMoveZoom(int)));
@@ -49,13 +50,18 @@ void VideoWindow::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
 	m_zoomTimeLine.setDirection(QTimeLine::Forward);
 
-	if (m_z != 1) {
+	if (m_z != 1) 
+	{
 		m_z = 1;
 		updateZvalue();
 	}
 
 	if (m_zoomTimeLine.state() == QTimeLine::NotRunning)
+	{
+		m_zoomTimeLine.setCurve(CLAnimationTimeLine::CLAnimationCurve::SLOW_END);
+		//m_zoomTimeLine.setCurve(CLAnimationTimeLine::CLAnimationCurve::SLOW_START);
 		m_zoomTimeLine.start();
+	}
 
 }
 
@@ -65,27 +71,27 @@ void VideoWindow::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 	if (m_z != 0)
 	{
 		m_z = 0;
-		updateZvalue();
+		//updateZvalue();
 	}
 
 	if (m_zoomTimeLine.state() == QTimeLine::NotRunning)
+	{
+		m_zoomTimeLine.setCurve(CLAnimationTimeLine::CLAnimationCurve::SLOW_START);
 		m_zoomTimeLine.start();
+	}
 
 }
 
 
 void VideoWindow::setMouseMoveZoom(int zoom)
 {
-	QMatrix matrix;
-	//matrix.scale(width()/ boundingRect().width(), height()/ boundingRect().height());
-	matrix.scale(1,1);
-	setMatrix(matrix);
-	
 	QPointF center = boundingRect().center();
 
-	translate(center.x(), center.y());
-	scale(1 + zoom/ 3300.0, 1 + zoom/ 3300.0);
-	translate(-center.x(), -center.y());
+	QTransform trans;
+	trans.translate(center.x(), center.y());
+	trans.scale(1 + zoom/ 3300.0, 1 + zoom/ 3300.0);
+	trans.translate(-center.x(), -center.y());
+	setTransform(trans);
 
 }
 

@@ -127,7 +127,8 @@ GraphicsView::GraphicsView():
 QGraphicsView(),
 m_zoom(0),
 m_xRotate(0), m_yRotate(0),
-m_dragStarted(false)
+m_dragStarted(false),
+m_movement(this)
 {
 	d = new GraphicsViewPriv(this);
 }
@@ -156,25 +157,30 @@ void GraphicsView::updateTransform()
 	/**/
 	QTransform tr;
 
-	//tr.translate(4000, 1000);
-	//translate(4000,1000);
-
-
 
 	float f;
 	if (m_zoom>=0)
 		f = m_zoom*m_zoom/10000.0 + 1;
 	else
 		f = m_zoom/200.0 + 1;
+
+	QPoint center = QPoint(horizontalScrollBar()->value(), verticalScrollBar()->value());
+
+	tr.translate(center.x(), center.y());
 	tr.scale(f, f);
 	tr.rotate(m_yRotate/1.0, Qt::YAxis);
 	tr.rotate(m_xRotate/1.0, Qt::XAxis);
-	//tr.translate(m_shift.x(), m_shift.y());
-	
+	tr.translate(-center.x(), -center.y());
+
 	setTransform(tr);
 	/**/
 
-	
+
+	/*
+	QTransform tr;
+	tr.translate(10,10);
+	setTransform(tr,true);
+	/**/
 }
 
 
@@ -187,6 +193,9 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 	}
 	if (event->button() == Qt::LeftButton) 
 	{
+
+		m_movement.move(mapToScene(event->pos()));
+
 		// Left-button press in scroll hand mode initiates hand scrolling.
 		d->mouseTrackQueue.clear();
 		d->mouseMoveEventHandler(event);
@@ -195,6 +204,8 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 		d->mousePressPos = event->pos();
         d->handScrollMotions = 0;
 		viewport()->setCursor(Qt::ClosedHandCursor);
+
+		
 	}
 }
 
@@ -228,7 +239,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 	QPoint dragRange = d->mousePressPos - event->pos();
 	d->calcMouseSpeed();
 
-	if (d->mouseSpeed > 10.0) 
+	if (d->mouseSpeed > 50.0) 
 	{
 		d->startAnimationCoordinate = QPoint(horizontalScrollBar()->value(), verticalScrollBar()->value());
 		int dur = 200.0 * log(d->mouseSpeed) ;

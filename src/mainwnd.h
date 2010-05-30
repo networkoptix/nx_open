@@ -52,6 +52,8 @@ private:
 
 	VideoCamerasLayout m_camlayout;
 
+	int m_scene_right;
+	int m_scene_bottom;
 
 
 private slots:

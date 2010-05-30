@@ -9,17 +9,29 @@ public:
 	enum CLAnimationCurve 
 	{
 		INHERITED,// derived from QTimeLine
-		SLOW_END // slow end
-//		SLOW_START 
+		SLOW_END, // slow end
+		SLOW_START 
 	};
 	CLAnimationTimeLine(CLAnimationCurve curve = INHERITED, int duration = 1000, QObject *parent = 0);
 	virtual ~CLAnimationTimeLine();
 
+	void setCurve(CLAnimationCurve curve);
 	virtual qreal valueForTime ( int msec ) const;
+
+	//======================
+	static void setAnimationSpeed(qreal speed);
+	static qreal getAnimationSpeed();
+
+
 protected:
 	CLAnimationCurve m_curve;
+
+
+	static qreal m_animation_speed;
+
 private:
 	qreal slow_end( int msec ) const;
+	qreal slow_start( int msec ) const;
 	
 };
 

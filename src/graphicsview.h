@@ -2,6 +2,7 @@
 #define PH_graphicsview_h328
 
 #include <QGraphicsView>
+#include "./videodisplay/animation/scene_movement.h"
 
 class GraphicsView: public QGraphicsView
 {
@@ -37,6 +38,8 @@ protected:
 
 	struct GraphicsViewPriv;
 	GraphicsViewPriv* d;
+
+	CLSceneMovement m_movement;
 	
 };
 

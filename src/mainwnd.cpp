@@ -24,11 +24,14 @@
 
 QColor bkr_color(0,5,15);
 
-#define CL_VIDEO_ROWS 3
+#define CL_VIDEO_ROWS 4
 
 #define SLOT_WIDTH 640
 #define SLOT_HEIGHT (SLOT_WIDTH*3/4)
 #define SLOT_DISTANCE (0.40)
+
+#define SCENE_LEFT (1*1000)
+#define SCENE_TOP (0.7*1000)
 
 
 extern CLDiviceSeracher dev_searcher;
@@ -37,7 +40,9 @@ extern CLDiviceSeracher dev_searcher;
 MainWnd::MainWnd(QWidget *parent, Qt::WFlags flags):
 //QMainWindow(parent, flags),
 m_selectedcCam(0),
-m_camlayout(CL_VIDEO_ROWS, CL_MAX_CAM_SUPPORTED)
+m_camlayout(CL_VIDEO_ROWS, CL_MAX_CAM_SUPPORTED),
+m_scene_right(0),
+m_scene_bottom(0)
 {
 	//ui.setupUi(this);
 
@@ -55,6 +60,7 @@ m_camlayout(CL_VIDEO_ROWS, CL_MAX_CAM_SUPPORTED)
 	//m_videoView.setViewport(new QGLWidget());
 	m_videoView.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform	| QPainter::TextAntialiasing); //Antialiasing
 
+	//m_videoView.setSceneRect(0,0,2*SCENE_LEFT, 2*SCENE_TOP);
 
 	m_videoView.setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);
 	//m_videoView.setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
@@ -70,8 +76,8 @@ m_camlayout(CL_VIDEO_ROWS, CL_MAX_CAM_SUPPORTED)
 	m_videoView.setOptimizationFlag(QGraphicsView::DontSavePainterState);
 	m_videoView.setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing); // Antialiasing?
 
-	//m_videoView.setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	//m_videoView.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	m_videoView.setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	m_videoView.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
 	m_videoView.setScene(&m_scene);
 
@@ -105,33 +111,14 @@ m_camlayout(CL_VIDEO_ROWS, CL_MAX_CAM_SUPPORTED)
 	setMinimumWidth(min_wisth);
 	setMinimumHeight(min_wisth*3/4);
 
-	/**/
-	QPen pen;
-	pen.setBrush(Qt::green);
-	pen.setColor(Qt::green);
 
-	int x_tar = 4000;
-	int y_tar = 1000;
+	
+	//m_videoView.setTransformationAnchor(QGraphicsView::NoAnchor);
+	//m_videoView.setResizeAnchor(QGraphicsView::NoAnchor);
+	//m_videoView.setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 
-	QGraphicsItem* rect = m_scene.addLine(0,0,2000,0, pen);
-	rect->setPos(x_tar - 1000,y_tar);
-
-	rect = m_scene.addLine(0,0,0,2000, pen);
-
-	rect->setPos(x_tar,0);
-
-	/**/
-
-	//m_videoView.setSceneRect(0,0, 10000,10000);
-
-	//m_videoView.translate(2000,1000);
-
-	m_videoView.setTransformationAnchor(QGraphicsView::NoAnchor);
-	m_videoView.setResizeAnchor(QGraphicsView::NoAnchor);
-	m_videoView.setAlignment(Qt::AlignVCenter);
-	m_videoView.setAlignment(0);
-	//m_videoView.centerOn(4000,1000);
-
+	//m_videoView.setAlignment(Qt::AlignVCenter);
+	
 
 
 }
@@ -184,7 +171,7 @@ MainWnd::~MainWnd()
 
 void MainWnd::onTimer()
 {
-	static const int interval = 1000;
+	static const int interval = 1000000;
 	static bool first_time = true;
 	if (first_time)
 	{
@@ -292,9 +279,18 @@ void MainWnd::onNewDevice(CLDevice* device)
 	getCamPosition_helper(cam, position, x, y);
 	video_wnd->setPos(x , y );
 
+	if (x>m_scene_right)
+		m_scene_right = x;
+
+	if (y>m_scene_bottom)
+		m_scene_bottom = y;
+
+	m_videoView.setSceneRect(0,0,2*SCENE_LEFT + m_scene_right + 4*SLOT_WIDTH, 2*SCENE_TOP + m_scene_bottom + 4*SLOT_HEIGHT);
+
 
 	m_scene.addItem(video_wnd);
 	cam->startDispay();
+
 
 }
 
@@ -453,8 +449,8 @@ void MainWnd::getCamPosition_helper(CLVideoCamera* cam, int position, int& x_pos
 	int x,y;
 	m_camlayout.getXY(position, x, y);
 
-	x_pos = x * SLOT_WIDTH* (1+SLOT_DISTANCE) + dx ;
-	y_pos = y * SLOT_HEIGHT * (1+SLOT_DISTANCE) + dy ;
+	x_pos = x * SLOT_WIDTH* (1+SLOT_DISTANCE) + dx  + SCENE_LEFT;
+	y_pos = y * SLOT_HEIGHT * (1+SLOT_DISTANCE) + dy + SCENE_TOP;
 
 
 }
