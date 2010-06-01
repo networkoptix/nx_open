@@ -10,7 +10,6 @@ static const qreal max_zoom = 20000;
 
 CLSceneZoom::CLSceneZoom(QGraphicsView* gview):
 m_view(gview),
-m_timeline(CLAnimationTimeLine::CLAnimationCurve::SLOW_END),
 m_zoom(0),
 m_targetzoom(0),
 m_diff(0)
@@ -18,12 +17,6 @@ m_diff(0)
 	//m_timeline.setCurveShape(QTimeLine::CurveShape::LinearCurve);
 	m_timeline.setDuration(2000);
 	m_timeline.setFrameRange(0, 20000);
-	m_timeline.setUpdateInterval(17); // 60 fps
-
-	connect(&m_timeline, SIGNAL(frameChanged(int)), this, SLOT(onNewPos(int)));
-
-	
-
 }
 
 CLSceneZoom::~CLSceneZoom()
@@ -31,16 +24,8 @@ CLSceneZoom::~CLSceneZoom()
 	stop();
 }
 
-void CLSceneZoom::stop()
-{
-	m_timeline.stop();
-	//m_targetzoom = m_zoom;
-	
-}
-
 void CLSceneZoom::zoom(int delta)
 {
-	
 
 	if (abs(m_targetzoom - m_zoom)>5000)return;
 
@@ -69,7 +54,7 @@ int CLSceneZoom::getZoom() const
 	return m_zoom;
 }
 
-void CLSceneZoom::onNewPos(int frame)
+void CLSceneZoom::onNewFrame(int frame)
 {
 	qreal dpos = qreal(frame)/m_timeline.endFrame();
 	int start_point = m_targetzoom - m_diff;

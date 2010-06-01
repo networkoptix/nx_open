@@ -50,10 +50,10 @@ HEADERS += device_plugins/fake/devices/fake_device_server.h device_plugins/fake/
 HEADERS += device_plugins/fake/streamreader/fake_file_streamreader.h
 
 HEADERS += videodisplay/video_cam_layout/videocamlayout.h  videodisplay/animation/animation_timeline.h videodisplay/animation/mouse_state.h
-HEADERS += videodisplay/animation/scene_movement.h videodisplay/animation/scene_zoom.h
+HEADERS += videodisplay/animation/scene_movement.h videodisplay/animation/scene_zoom.h videodisplay/animation/abstract_animation.h
 
 SOURCES += videodisplay/video_cam_layout/videocamlayout.cpp videodisplay/animation/animation_timeline.cpp videodisplay/animation/mouse_state.cpp
-SOURCES += videodisplay/animation/scene_movement.cpp videodisplay/animation/scene_zoom.cpp
+SOURCES += videodisplay/animation/scene_movement.cpp videodisplay/animation/scene_zoom.cpp videodisplay/animation/abstract_animation.cpp
 
 
 
