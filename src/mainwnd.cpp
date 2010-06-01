@@ -28,10 +28,10 @@ QColor bkr_color(0,5,15);
 
 #define SLOT_WIDTH 640
 #define SLOT_HEIGHT (SLOT_WIDTH*3/4)
-#define SLOT_DISTANCE (0.40)
+#define SLOT_DISTANCE (0.30)
 
 #define SCENE_LEFT (1*1000)
-#define SCENE_TOP (0.7*1000)
+#define SCENE_TOP (1*1000)
 
 
 extern CLDiviceSeracher dev_searcher;
@@ -114,11 +114,14 @@ m_scene_bottom(0)
 
 	
 	//m_videoView.setTransformationAnchor(QGraphicsView::NoAnchor);
+	//m_videoView.setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 	//m_videoView.setResizeAnchor(QGraphicsView::NoAnchor);
 	//m_videoView.setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 
 	//m_videoView.setAlignment(Qt::AlignVCenter);
 	
+	m_videoView.centerOn(SCENE_LEFT + 1000, SCENE_TOP + 1000);
+	m_videoView.update();
 
 
 }
@@ -285,7 +288,7 @@ void MainWnd::onNewDevice(CLDevice* device)
 	if (y>m_scene_bottom)
 		m_scene_bottom = y;
 
-	m_videoView.setSceneRect(0,0,2*SCENE_LEFT + m_scene_right + 4*SLOT_WIDTH, 2*SCENE_TOP + m_scene_bottom + 4*SLOT_HEIGHT);
+	m_videoView.setSceneRect(0,0,2*SCENE_LEFT + m_scene_right + 4*SLOT_WIDTH, 2*SCENE_TOP + m_scene_bottom );
 
 
 	m_scene.addItem(video_wnd);

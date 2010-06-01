@@ -12,7 +12,7 @@ m_zoomTimeLine(CLAnimationTimeLine::CLAnimationCurve::SLOW_END)
 	setAcceptsHoverEvents(true);
 
 	m_zoomTimeLine.setDuration(400);
-	m_zoomTimeLine.setFrameRange(0, 900);
+	m_zoomTimeLine.setFrameRange(0, 600);
 	m_zoomTimeLine.setUpdateInterval(17); // 60 fps
 	//m_zoomTimeLine.setCurveShape(QTimeLine::EaseOutCurve);
 

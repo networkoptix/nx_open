@@ -13,8 +13,6 @@ m_timeline(CLAnimationTimeLine::CLAnimationCurve::SLOW_END)
 
 	connect(&m_timeline, SIGNAL(frameChanged(int)), this, SLOT(onNewPos(int)));
 
-	cl_log.log("=========new=========",  cl_logDEBUG1);
-
 }
 
 CLSceneMovement::~CLSceneMovement()
@@ -33,11 +31,16 @@ void CLSceneMovement::move (QPointF dest)
 
 	m_timeline.start();
 
+	//cl_log.log("==============", cl_logDEBUG1);
+	m_timeline.setCurrentTime(0);
+
 }
 
 void CLSceneMovement::stop()
 {
 	m_timeline.stop();
+	//m_timeline.setCurrentTime(0);
+
 }
 
 void CLSceneMovement::onNewPos(int pos)
@@ -51,7 +54,7 @@ void CLSceneMovement::onNewPos(int pos)
 	m_view->centerOn(result);
 
 	
-	//cl_log.log("x=", (int)result.x(), cl_logDEBUG1);
+	//cl_log.log("x=", (int)pos, cl_logDEBUG1);
 
 	
 }

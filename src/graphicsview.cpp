@@ -128,7 +128,9 @@ QGraphicsView(),
 m_zoom(0),
 m_xRotate(0), m_yRotate(0),
 m_dragStarted(false),
-m_movement(this)
+m_movement(this),
+m_scenezoom(this)
+
 {
 	d = new GraphicsViewPriv(this);
 }
@@ -146,10 +148,7 @@ int GraphicsView::zoom() const
 void GraphicsView::wheelEvent ( QWheelEvent * e )
 {
 	int numDegrees = e->delta() / 8;
-	m_zoom+=numDegrees;
-	if (m_zoom > 520) m_zoom = 520;
-	if (m_zoom < -170) m_zoom=-170;
-	updateTransform();
+	m_scenezoom.zoom(numDegrees*8);
 }
 
 void GraphicsView::updateTransform()
@@ -194,7 +193,16 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 	if (event->button() == Qt::LeftButton) 
 	{
 
-		m_movement.move(mapToScene(event->pos()));
+		QGraphicsItem *item = itemAt(event->pos());
+
+		if (item)
+		{
+			//QPointF point = item->pos() + item->boundingRect().center();
+			QPointF point = item->mapToScene(item->boundingRect().center());
+			m_movement.move(point);
+		}
+		else
+			m_movement.move(mapToScene(event->pos()));
 
 		// Left-button press in scroll hand mode initiates hand scrolling.
 		d->mouseTrackQueue.clear();

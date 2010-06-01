@@ -3,6 +3,7 @@
 
 #include <QGraphicsView>
 #include "./videodisplay/animation/scene_movement.h"
+#include "./videodisplay/animation/scene_zoom.h"
 
 class GraphicsView: public QGraphicsView
 {
@@ -40,6 +41,7 @@ protected:
 	GraphicsViewPriv* d;
 
 	CLSceneMovement m_movement;
+	CLSceneZoom m_scenezoom;
 	
 };
 
