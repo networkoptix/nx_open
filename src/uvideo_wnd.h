@@ -2,7 +2,7 @@
 #define uvideo_wnd_h_1951
 
 #include "videodisplay/video_window.h"
-#include "./videodisplay/animation/animation_timeline.h"
+#include "./videodisplay/animation/item_zoom.h"
 
 class VideoWindow :  public CLVideoWindow
 {
@@ -25,16 +25,13 @@ private:
 
 	void drawSelection(QPainter* painter);
 
-private slots:
-	void setMouseMoveZoom(int zoom);
-	void updateZvalue();
-
-
 private:
 	bool m_selected;
 	int m_z;
 
-	CLAnimationTimeLine m_zoomTimeLine;
+	CLItemZoom m_zoom;
+
+	
 };
 
 

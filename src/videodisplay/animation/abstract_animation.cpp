@@ -12,11 +12,18 @@ m_timeline(CLAnimationTimeLine::CLAnimationCurve::SLOW_END)
 	m_timeline.setUpdateInterval(17); // 60 fps
 
 	connect(&m_timeline, SIGNAL(frameChanged(int)), this, SLOT(onNewFrame(int)));
+	connect(&m_timeline, SIGNAL(finished()), this, SLOT(onFinished()));
 }
+
 
 CLAbstractAnimation::~CLAbstractAnimation()
 {
 	stop();
+}
+
+bool CLAbstractAnimation::isRuning() const
+{
+	return (m_timeline.state() == QTimeLine::Running);
 }
 
 void CLAbstractAnimation::stop()
@@ -24,3 +31,7 @@ void CLAbstractAnimation::stop()
 	m_timeline.stop();
 }
 
+void CLAbstractAnimation::setDuration(int ms)
+{
+	m_timeline.setDuration(ms);
+}

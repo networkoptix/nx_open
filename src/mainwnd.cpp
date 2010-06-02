@@ -30,8 +30,8 @@ QColor bkr_color(0,5,15);
 #define SLOT_HEIGHT (SLOT_WIDTH*3/4)
 #define SLOT_DISTANCE (0.30)
 
-#define SCENE_LEFT (1*1000)
-#define SCENE_TOP (1*1000)
+#define SCENE_LEFT (2000*1000)
+#define SCENE_TOP (2000*1000)
 
 
 extern CLDiviceSeracher dev_searcher;

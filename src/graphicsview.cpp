@@ -33,23 +33,6 @@ struct GraphicsView::GraphicsViewPriv
 									 event->button(), event->buttons(), event->modifiers());
 	}
 
-	void _q_unsetViewportCursor()
-	{
-		foreach (QGraphicsItem *item, q->items(lastMouseEvent.pos())) {
-			if (item->hasCursor()) {
-				_q_setViewportCursor(item->cursor());
-				return;
-			}
-		}
-
-		// Restore the original viewport cursor.
-		q->viewport()->setCursor(Qt::OpenHandCursor);
-	}
-	void _q_setViewportCursor(const QCursor &cursor)
-	{
-		QWidget *viewport = q->viewport();
-		viewport->setCursor(cursor);
-	}
 
 	void mouseMoveEventHandler(QMouseEvent *event)
 	{

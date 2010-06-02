@@ -13,9 +13,12 @@ public:
 	virtual ~CLAbstractAnimation();
 
 	void stop();
+	void setDuration(int ms);
+	bool isRuning() const;
 
 protected slots:
 		virtual void onNewFrame(int frame)=0;
+		virtual void onFinished(){};
 	
 protected:
 	CLAnimationTimeLine m_timeline;
