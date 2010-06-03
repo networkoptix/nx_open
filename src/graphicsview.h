@@ -4,6 +4,7 @@
 #include <QGraphicsView>
 #include "./videodisplay/animation/scene_movement.h"
 #include "./videodisplay/animation/scene_zoom.h"
+#include "./videodisplay/animation/mouse_state.h"
 
 class GraphicsView: public QGraphicsView
 {
@@ -12,23 +13,17 @@ public:
 	GraphicsView();
 	virtual ~GraphicsView();
 
-	int zoom() const;
 
 protected:
 	virtual void wheelEvent ( QWheelEvent * e );
 	virtual void keyPressEvent( QKeyEvent * e );
 private slots:
-	void onDragMoveAnimation(qreal value);
+
 protected:
-	int m_zoom;
+	
 	int m_xRotate;
 	int m_yRotate;
-	bool m_dragStarted;
-	QPoint m_prevPos;
-	QPoint m_centerPos;
-	QPoint m_shift;
-	QPoint m_firstPos;
-
+	
 	void updateTransform();
 
 	
@@ -37,11 +32,12 @@ protected:
 	void mouseMoveEvent ( QMouseEvent * e);
 	/**/
 
-	struct GraphicsViewPriv;
-	GraphicsViewPriv* d;
 
 	CLSceneMovement m_movement;
 	CLSceneZoom m_scenezoom;
+	CLMouseState m_mousestate;
+
+	bool m_handScrolling;
 	
 };
 

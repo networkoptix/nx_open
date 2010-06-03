@@ -14,6 +14,7 @@ public:
 	virtual ~CLSceneMovement();
 
 	void move (QPointF dest);
+	void move (int dx, int dy);
 
 
 private slots:

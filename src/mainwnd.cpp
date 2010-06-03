@@ -251,8 +251,8 @@ void MainWnd::onNewDevice(CLDevice* device)
 
 	video_wnd->setInfoText(cam->getDevice()->toString());
 
-	connect(video_wnd, SIGNAL(onVideoItemSelected(CLVideoWindow*)), this, SLOT(onVideoItemSelected(CLVideoWindow*)));
-	connect(video_wnd, SIGNAL(onVideoItemMouseRightClick(CLVideoWindow*)), this, SLOT(onVideoItemMouseRightClick(CLVideoWindow*)));
+	//connect(video_wnd, SIGNAL(onVideoItemSelected(CLVideoWindow*)), this, SLOT(onVideoItemSelected(CLVideoWindow*)));
+	//connect(video_wnd, SIGNAL(onVideoItemMouseRightClick(CLVideoWindow*)), this, SLOT(onVideoItemMouseRightClick(CLVideoWindow*)));
 	connect(video_wnd, SIGNAL(onAspectRatioChanged(CLVideoWindow*)), this, SLOT(onAspectRatioChanged(CLVideoWindow*)));
 
 	

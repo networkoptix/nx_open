@@ -15,6 +15,16 @@ CLSceneMovement::~CLSceneMovement()
 	stop();
 }
 
+
+void CLSceneMovement::move (int dx, int dy)
+{
+	QPointF curr = m_view->mapToScene(m_view->viewport()->rect().center());
+	curr.rx()+=dx;
+	curr.ry()+=dy;
+
+	move(curr);
+}
+
 void CLSceneMovement::move (QPointF dest)
 {
 	stop();
