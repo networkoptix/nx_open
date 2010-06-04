@@ -43,11 +43,7 @@ CLAnimationTimeLine::CLAnimationTimeLine(CLAnimationCurve curve , int duration ,
 QTimeLine(duration/m_animation_speed, parent ),
 m_curve(curve)
 {
-	for (qreal i = 0; i < 1.1; i+=0.1)
-	{
-		qreal val = exp_normal(i);
-		i = i;
-	}
+	
 }
 
 CLAnimationTimeLine::~CLAnimationTimeLine()
@@ -64,10 +60,17 @@ qreal CLAnimationTimeLine::valueForTime ( int msec ) const
 {
 	switch(m_curve)
 	{
-	case CLAnimationCurve::SLOW_END:
+	case SLOW_END:
 		return slow_end(msec);
 
-	case CLAnimationCurve::SLOW_START:
+	case SLOW_END_POW_35:
+		return slow_end_pow(msec, 0.35);
+
+	case SLOW_END_POW_40:
+		return slow_end_pow(msec, 0.40);
+
+
+	case SLOW_START:
 		return slow_start(msec);
 		
 	case INHERITED:
@@ -95,6 +98,12 @@ qreal CLAnimationTimeLine::slow_start( int msec ) const
 	const qreal linearProgress = value;
 	const qreal mix = qt_smoothBeginEndMixFactor(value);
 	return   expprogress * mix + linearProgress* (1-mix) ;
+}
+
+qreal CLAnimationTimeLine::slow_end_pow( int msec, qreal pw ) const
+{
+	qreal value = msec / qreal(duration());
+	return pow(value, pw);
 }
 
 //=================================================================

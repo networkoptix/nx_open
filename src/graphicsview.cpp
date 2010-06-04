@@ -2,6 +2,7 @@
 #include <QWheelEvent>
 #include <QScrollBar>
 #include "./base/log.h"
+#include <math.h>
 
 
 
@@ -29,6 +30,11 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
 {
 	int numDegrees = e->delta() / 8;
 	m_scenezoom.zoom(numDegrees*8);
+}
+
+void GraphicsView::zoom(int z)
+{
+	m_scenezoom.zoom(z);
 }
 
 void GraphicsView::updateTransform()
@@ -101,7 +107,8 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 
 void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 {
-    viewport()->setCursor(Qt::OpenHandCursor);
+	
+	viewport()->setCursor(Qt::OpenHandCursor);
     m_handScrolling = false;
 
 	qreal mouse_spped, mouse_spped_h, mouse_spped_v;
@@ -119,8 +126,8 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 	bool sdx = (mouse_spped_h<0);
 	bool sdy = (mouse_spped_v<0);
 
-	int dx = mouse_spped_h*mouse_spped_h/5000;
-	int dy = mouse_spped_v*mouse_spped_v/5000;
+	int dx = pow( abs(mouse_spped_h), 1.9 )/2000;
+	int dy = pow( abs(mouse_spped_v), 1.9 )/2000;;
 
 	if (sdx) dx =-dx;
 	if (sdy) dy =-dy;

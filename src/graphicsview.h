@@ -13,6 +13,7 @@ public:
 	GraphicsView();
 	virtual ~GraphicsView();
 
+	void zoom(int );
 
 protected:
 	virtual void wheelEvent ( QWheelEvent * e );

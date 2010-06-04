@@ -121,7 +121,7 @@ m_scene_bottom(0)
 	//m_videoView.setAlignment(Qt::AlignVCenter);
 	
 	m_videoView.centerOn(SCENE_LEFT + 1000, SCENE_TOP + 1000);
-	m_videoView.update();
+	m_videoView.zoom(-500);
 
 
 }

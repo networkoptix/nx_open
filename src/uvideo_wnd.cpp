@@ -42,8 +42,8 @@ void VideoWindow::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 	if (m_z != 1) 
 	{
 		m_z = 1;
-		setZValue(1.0);
-		m_zoom.zoom(500);
+		setZValue(m_z);
+		m_zoom.zoom(400);
 
 	}
 }
@@ -53,7 +53,7 @@ void VideoWindow::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 	if (m_z != 0)
 	{
 		m_z = 0;
-		setZValue(1.0);
+		setZValue(m_z);
 		m_zoom.zoom(0);
 	}
 

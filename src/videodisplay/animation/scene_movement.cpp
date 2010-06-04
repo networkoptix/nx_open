@@ -6,8 +6,11 @@
 CLSceneMovement::CLSceneMovement(QGraphicsView* gview):
 m_view(gview)
 {
-	m_timeline.setDuration(1000);
-	m_timeline.setFrameRange(0, 10000);
+	
+
+	m_timeline.setCurve(CLAnimationTimeLine::CLAnimationCurve::SLOW_END_POW_40);
+	m_timeline.setDuration(3000);
+	m_timeline.setFrameRange(0, 20000);
 }
 
 CLSceneMovement::~CLSceneMovement()
@@ -18,11 +21,12 @@ CLSceneMovement::~CLSceneMovement()
 
 void CLSceneMovement::move (int dx, int dy)
 {
-	QPointF curr = m_view->mapToScene(m_view->viewport()->rect().center());
+	QPoint curr = m_view->viewport()->rect().center();
 	curr.rx()+=dx;
 	curr.ry()+=dy;
 
-	move(curr);
+
+	move(m_view->mapToScene(curr));
 }
 
 void CLSceneMovement::move (QPointF dest)

@@ -15,7 +15,7 @@ m_targetzoom(0),
 m_diff(0)
 {
 	//m_timeline.setCurveShape(QTimeLine::CurveShape::LinearCurve);
-	m_timeline.setDuration(2000);
+	m_timeline.setDuration(2500);
 	m_timeline.setFrameRange(0, 20000);
 }
 
@@ -27,9 +27,7 @@ CLSceneZoom::~CLSceneZoom()
 void CLSceneZoom::zoom(int delta)
 {
 
-	if (abs(m_targetzoom - m_zoom)>5000)return;
-
-	stop();
+	if (abs(m_targetzoom - m_zoom)>3000)return;
 
 	m_targetzoom += delta*10;
 
@@ -41,11 +39,12 @@ void CLSceneZoom::zoom(int delta)
 
 
 	m_diff = m_targetzoom - m_zoom;
-
 	
-	//cl_log.log("m_targetzoom2=", m_targetzoom, cl_logDEBUG1);
+	//cl_log.log("m_diff =", m_diff , cl_logDEBUG1);
 
-	m_timeline.start();
+	if (!isRuning())
+		m_timeline.start();
+
 	m_timeline.setCurrentTime(0);
 }
 

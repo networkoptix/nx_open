@@ -10,6 +10,8 @@ public:
 	{
 		INHERITED,// derived from QTimeLine
 		SLOW_END, // slow end
+		SLOW_END_POW_35,
+		SLOW_END_POW_40,
 		SLOW_START 
 	};
 	CLAnimationTimeLine(CLAnimationCurve curve = INHERITED, int duration = 1000, QObject *parent = 0);
@@ -31,6 +33,9 @@ protected:
 
 private:
 	qreal slow_end( int msec ) const;
+
+	qreal slow_end_pow( int msec, qreal pw ) const;
+
 	qreal slow_start( int msec ) const;
 	
 };
