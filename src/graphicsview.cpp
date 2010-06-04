@@ -111,6 +111,8 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 	viewport()->setCursor(Qt::OpenHandCursor);
     m_handScrolling = false;
 
+	m_mousestate.mouseMoveEventHandler(event);
+
 	qreal mouse_spped, mouse_spped_h, mouse_spped_v;
 
 	m_mousestate.getMouseSpeed(mouse_spped, mouse_spped_h, mouse_spped_v);

@@ -178,6 +178,9 @@ void MainWnd::onTimer()
 	static bool first_time = true;
 	if (first_time)
 	{
+
+		QThread::currentThread()->setPriority(QThread::HighPriority); // Priority more tnan decoders have
+
 		dev_searcher.start();
 		
 

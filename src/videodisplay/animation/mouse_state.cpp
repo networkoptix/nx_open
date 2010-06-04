@@ -47,11 +47,19 @@ void CLMouseState::getMouseSpeed(qreal& speed, qreal& h_speed, qreal& v_speed)
 	qreal dst = sqrt((qreal)dx*dx + (qreal)dy*dy);
 
 	speed = dst / dt;
-	if (speed<0)
-		speed = speed;
 
 	h_speed = dx / dt;
 	v_speed = dy / dt;
+
+	const qreal max_speed = 4000.0;
+	if (speed>max_speed)
+	{
+		qreal factor = speed/max_speed;
+
+		speed/=factor;
+		h_speed/=factor;
+		v_speed/=factor;
+	}
 
 
 }
