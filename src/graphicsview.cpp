@@ -128,8 +128,8 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 	bool sdx = (mouse_spped_h<0);
 	bool sdy = (mouse_spped_v<0);
 
-	int dx = pow( abs(mouse_spped_h), 1.9 )/2000;
-	int dy = pow( abs(mouse_spped_v), 1.9 )/2000;;
+	int dx = pow( abs(mouse_spped_h), 2.0)/1900;
+	int dy = pow( abs(mouse_spped_v), 2.0)/1900;;
 
 	if (sdx) dx =-dx;
 	if (sdy) dy =-dy;

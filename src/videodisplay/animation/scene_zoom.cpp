@@ -27,7 +27,7 @@ CLSceneZoom::~CLSceneZoom()
 void CLSceneZoom::zoom(int delta)
 {
 
-	if (abs(m_targetzoom - m_zoom)>4500)return;
+	if (abs(m_targetzoom - m_zoom)>1300*4)return;
 
 	m_targetzoom += delta*10;
 
