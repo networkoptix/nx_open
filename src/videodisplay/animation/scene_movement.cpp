@@ -8,7 +8,7 @@ m_view(gview)
 {
 	
 
-	m_timeline.setCurve(CLAnimationTimeLine::CLAnimationCurve::SLOW_END_POW_40);
+	//m_timeline.setCurve(CLAnimationTimeLine::CLAnimationCurve::SLOW_END_POW_40);
 	m_timeline.setDuration(3000);
 	m_timeline.setFrameRange(0, 20000);
 }
