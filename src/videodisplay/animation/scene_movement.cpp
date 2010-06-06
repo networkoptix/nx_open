@@ -35,6 +35,7 @@ void CLSceneMovement::move (int dx, int dy)
 
 void CLSceneMovement::move (QPointF dest)
 {
+	//cl_log.log("CLSceneMovement::move() ", cl_logDEBUG1);
 
 	m_startpoint = m_view->mapToScene(m_view->viewport()->rect().center());
 	m_delta = dest - m_startpoint;
@@ -46,7 +47,7 @@ void CLSceneMovement::move (QPointF dest)
 		m_timeline.start();
 	}
 
-	//cl_log.log("==============", cl_logDEBUG1);
+	
 	m_timeline.setCurrentTime(0);
 
 }
@@ -62,7 +63,5 @@ void CLSceneMovement::onNewFrame(int pos)
 	QPointF result = m_startpoint + move;
 	m_view->centerOn(result);
 
-	
-	//cl_log.log("x=", (int)pos, cl_logDEBUG1);
 	
 }

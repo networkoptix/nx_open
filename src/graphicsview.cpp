@@ -18,7 +18,7 @@ m_xRotate(0), m_yRotate(0),
 m_movement(this),
 m_scenezoom(this),
 m_handScrolling(false),
-m_handMoving(false),
+m_handMoving(0),
 m_selectedWnd(0)
 {
 
@@ -98,7 +98,9 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 		hBar->setValue(hBar->value() + (isRightToLeft() ? delta.x() : -delta.x()));
 		vBar->setValue(vBar->value() - delta.y());
 		
-		m_handMoving = true;
+		//cl_log.log("==m_handMoving!!!=====", cl_logDEBUG1);
+
+		++m_handMoving;
 
 		m_mousestate.mouseMoveEventHandler(event);
 
@@ -110,8 +112,11 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 {
 	
+	//cl_log.log("====mouseReleaseEvent===", cl_logDEBUG1);
+
 	bool left_button = event->button() == Qt::LeftButton;
 	bool right_button = event->button() == Qt::RightButton;
+	bool handMoving = m_handMoving>2;
 
 	m_scenezoom.restoreDefaultDuration();
 	m_movement.restoreDefaultDuration();
@@ -123,7 +128,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 	}
 
 
-	if (m_handMoving && left_button) // if scene moved and left button released
+	if (handMoving && left_button) // if scene moved and left button released
 	{
 		// need to continue movement(animation)
 
@@ -150,7 +155,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 	}
 
 
-	if (!m_handMoving) // if left button released and we did not move the scene, so may bee need to zoom on the item
+	if (!handMoving) // if left button released and we did not move the scene, so may bee need to zoom on the item
 	{
 
 			QGraphicsItem *item = itemAt(event->pos());
@@ -170,8 +175,9 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 			}
 			
 
-			if (wnd && wnd!=m_selectedWnd && event->button() == Qt::LeftButton ) // item and left button
+			if (wnd && wnd!=m_selectedWnd && left_button ) // item and left button
 			{
+
 
 				if (m_selectedWnd) 
 					m_selectedWnd->setSelected(false);
@@ -196,7 +202,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 	}
 
 	if (left_button)
-		m_handMoving = false;
+		m_handMoving = 0;
 }
 
 

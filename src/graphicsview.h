@@ -41,7 +41,7 @@ protected:
 	CLMouseState m_mousestate;
 
 	bool m_handScrolling;
-	bool m_handMoving;
+	int m_handMoving;
 
 	VideoWindow* m_selectedWnd;
 	

@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 
 	//============================
 	dev_searcher.addDeviceServer(&AVDeviceServer::instance());
-	dev_searcher.addDeviceServer(&FakeDeviceServer::instance());
+	//dev_searcher.addDeviceServer(&FakeDeviceServer::instance());
 	//============================
 
 	MainWnd w;
