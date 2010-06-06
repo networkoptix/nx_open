@@ -14,14 +14,19 @@ public:
 	virtual ~CLSceneZoom();
 
 
-	void zoom(int delta);
+	void zoom_delta(int delta);
+	void zoom_abs(int z);
+	void zoom_default();
+
+
+
 	int getZoom() const;
 private slots:
 	void onNewFrame(int frame);
 	
 
 protected:
-	
+	void zoom_helper();
 
 protected:
 

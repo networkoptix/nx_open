@@ -14,14 +14,20 @@ public:
 
 	void stop();
 	void setDuration(int ms);
+
+	void setDefaultDuration(int val);
+	void restoreDefaultDuration();
+
 	bool isRuning() const;
 
 protected slots:
 		virtual void onNewFrame(int frame)=0;
-		virtual void onFinished(){};
+		virtual void onFinished();
 	
 protected:
 	CLAnimationTimeLine m_timeline;
+
+	int m_defaultduration;
 
 
 };

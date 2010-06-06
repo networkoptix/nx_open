@@ -105,7 +105,7 @@ m_scene_bottom(0)
 	m_videotimer->start(1000/40); 
 
 
-	QThread::currentThread()->setPriority(QThread::HighPriority); // Priority more tnan decoders have
+	//QThread::currentThread()->setPriority(QThread::HighPriority); // Priority more tnan decoders have
 
 	const int min_wisth = 1200;
 	setMinimumWidth(min_wisth);
@@ -121,7 +121,7 @@ m_scene_bottom(0)
 	//m_videoView.setAlignment(Qt::AlignVCenter);
 	
 	m_videoView.centerOn(SCENE_LEFT + 1000, SCENE_TOP + 1000);
-	m_videoView.zoom(-500);
+	m_videoView.zoomDefault();
 
 
 }

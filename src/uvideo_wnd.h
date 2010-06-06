@@ -13,6 +13,9 @@ public:
 
 
 	void setSelected(bool sel);
+	bool isSelected() const;
+
+	void zoom_abs(int z);
 
 
 protected:

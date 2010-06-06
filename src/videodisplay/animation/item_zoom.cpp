@@ -9,7 +9,11 @@ m_zoom(0),
 m_diff(0)
 {
 	//m_timeline.setCurveShape(QTimeLine::CurveShape::LinearCurve);
-	m_timeline.setDuration(300);
+
+	const int dur = 300;
+
+	m_timeline.setDuration(dur);
+	setDefaultDuration(dur);
 	m_timeline.setFrameRange(0, 6000);
 }
 
@@ -20,12 +24,15 @@ CLItemZoom::~CLItemZoom()
 
 void CLItemZoom::zoom(int target_zoom)
 {
-	stop();
-
 	m_start_point = m_zoom;
 	m_diff = target_zoom - m_zoom;
 
-	m_timeline.start();
+	if (!isRuning())
+	{
+		m_timeline.start();
+		m_timeline.start();
+	}
+
 	m_timeline.setCurrentTime(0);
 }
 

@@ -11,6 +11,8 @@ m_timeline(CLAnimationTimeLine::CLAnimationCurve::SLOW_END_POW_40)
 	m_timeline.setFrameRange(0, 20000);
 	m_timeline.setUpdateInterval(17); // 60 fps
 
+	setDefaultDuration(2000);
+
 	connect(&m_timeline, SIGNAL(frameChanged(int)), this, SLOT(onNewFrame(int)));
 	connect(&m_timeline, SIGNAL(finished()), this, SLOT(onFinished()));
 }
@@ -34,4 +36,19 @@ void CLAbstractAnimation::stop()
 void CLAbstractAnimation::setDuration(int ms)
 {
 	m_timeline.setDuration(ms);
+}
+
+void CLAbstractAnimation::onFinished()
+{
+	//restoreDefaultDuration();
+}
+
+void CLAbstractAnimation::setDefaultDuration(int val)
+{
+	m_defaultduration = val;
+}
+
+void CLAbstractAnimation::restoreDefaultDuration()
+{
+	m_timeline.setDuration(m_defaultduration );
 }

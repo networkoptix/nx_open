@@ -16,8 +16,25 @@ m_zoom(this)
 void VideoWindow::setSelected(bool sel)
 {
 	m_selected = sel;
+
+	if (m_selected)
+	{
+		m_zoom.setDuration(800);
+		m_zoom.zoom(2500);
+		setZValue(1);
+	}
+	else
+	{
+		m_zoom.restoreDefaultDuration();
+		m_zoom.zoom(0);
+		setZValue(0);
+	}
 }
 
+bool VideoWindow::isSelected() const
+{
+	return m_selected;
+}
 
 void VideoWindow::drawStuff(QPainter* painter)
 {
@@ -34,6 +51,10 @@ void VideoWindow::drawSelection(QPainter* painter)
 
 }
 
+void VideoWindow::zoom_abs(int z)
+{
+	m_zoom.zoom(z);
+}
 
 //===========================================
 
@@ -42,8 +63,8 @@ void VideoWindow::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 	if (m_z != 1) 
 	{
 		m_z = 1;
-		setZValue(m_z);
-		m_zoom.zoom(400);
+		//setZValue(m_z);
+		//m_zoom.zoom(400);
 
 	}
 }
@@ -53,8 +74,8 @@ void VideoWindow::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 	if (m_z != 0)
 	{
 		m_z = 0;
-		setZValue(m_z);
-		m_zoom.zoom(0);
+		//setZValue(m_z);
+		//m_zoom.zoom(0);
 	}
 
 }

@@ -3,6 +3,8 @@
 #include <QScrollBar>
 #include "./base/log.h"
 #include <math.h>
+#include "../src/gui/graphicsview/qgraphicsitem.h"
+#include "uvideo_wnd.h"
 
 
 
@@ -15,7 +17,9 @@ QGraphicsView(),
 m_xRotate(0), m_yRotate(0),
 m_movement(this),
 m_scenezoom(this),
-m_handScrolling(false)
+m_handScrolling(false),
+m_handMoving(false),
+m_selectedWnd(0)
 {
 
 }
@@ -28,13 +32,22 @@ GraphicsView::~GraphicsView()
 
 void GraphicsView::wheelEvent ( QWheelEvent * e )
 {
-	int numDegrees = e->delta() / 8;
-	m_scenezoom.zoom(numDegrees*8);
+	m_scenezoom.restoreDefaultDuration();
+	int numDegrees = e->delta() ;
+	m_scenezoom.zoom_delta(numDegrees*10);
+
+	if (m_scenezoom.getZoom()<-500)
+	{
+		if (m_selectedWnd)
+			m_selectedWnd->setSelected(false);
+
+		m_selectedWnd  = 0;
+	}
 }
 
-void GraphicsView::zoom(int z)
+void GraphicsView::zoomDefault()
 {
-	m_scenezoom.zoom(z);
+	m_scenezoom.zoom_default();
 }
 
 void GraphicsView::updateTransform()
@@ -61,18 +74,6 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 
 	if (event->button() == Qt::LeftButton) 
 	{
-		/*
-		QGraphicsItem *item = itemAt(event->pos());
-
-		if (item)
-		{
-			//QPointF point = item->pos() + item->boundingRect().center();
-			QPointF point = item->mapToScene(item->boundingRect().center());
-			m_movement.move(point);
-		}
-		else
-			m_movement.move(mapToScene(event->pos()));
-			/**/
 
 		// Left-button press in scroll hand mode initiates hand scrolling.
 
@@ -97,6 +98,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 		hBar->setValue(hBar->value() + (isRightToLeft() ? delta.x() : -delta.x()));
 		vBar->setValue(vBar->value() - delta.y());
 		
+		m_handMoving = true;
 
 		m_mousestate.mouseMoveEventHandler(event);
 
@@ -108,36 +110,93 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 {
 	
-	viewport()->setCursor(Qt::OpenHandCursor);
-    m_handScrolling = false;
+	bool left_button = event->button() == Qt::LeftButton;
+	bool right_button = event->button() == Qt::RightButton;
 
-	m_mousestate.mouseMoveEventHandler(event);
+	m_scenezoom.restoreDefaultDuration();
+	m_movement.restoreDefaultDuration();
 
-	qreal mouse_spped, mouse_spped_h, mouse_spped_v;
+	if (left_button) // if left button released
+	{
+		viewport()->setCursor(Qt::OpenHandCursor);
+		m_handScrolling = false;
+	}
 
-	m_mousestate.getMouseSpeed(mouse_spped, mouse_spped_h, mouse_spped_v);
 
-	cl_log.log("====== ", cl_logDEBUG1);
-	cl_log.log("mouse_spped = ", (int)mouse_spped, cl_logDEBUG1);
-	cl_log.log("mouse_spped_h = ", (int)mouse_spped_h, cl_logDEBUG1);
-	cl_log.log("mouse_spped_v = ", (int)mouse_spped_v, cl_logDEBUG1);
+	if (m_handMoving && left_button) // if scene moved and left button released
+	{
+		// need to continue movement(animation)
 
-	if (mouse_spped<100)
-		return;
+		m_mousestate.mouseMoveEventHandler(event);
 
-	bool sdx = (mouse_spped_h<0);
-	bool sdy = (mouse_spped_v<0);
+		qreal mouse_spped, mouse_spped_h, mouse_spped_v;
 
-	int dx = pow( abs(mouse_spped_h), 2.0)/1900;
-	int dy = pow( abs(mouse_spped_v), 2.0)/1900;;
+		m_mousestate.getMouseSpeed(mouse_spped, mouse_spped_h, mouse_spped_v);
 
-	if (sdx) dx =-dx;
-	if (sdy) dy =-dy;
 
-	cl_log.log("dx = ", dx, cl_logDEBUG1);
-	cl_log.log("dy = ", dy, cl_logDEBUG1);
+		if (mouse_spped>150)
+		{
+			bool sdx = (mouse_spped_h<0);
+			bool sdy = (mouse_spped_v<0);
 
-	m_movement.move(-dx,-dy);
+			int dx = pow( abs(mouse_spped_h), 2.0)/1900;
+			int dy = pow( abs(mouse_spped_v), 2.0)/1900;;
+
+			if (sdx) dx =-dx;
+			if (sdy) dy =-dy;
+
+			m_movement.move(-dx,-dy);
+		}
+	}
+
+
+	if (!m_handMoving) // if left button released and we did not move the scene, so may bee need to zoom on the item
+	{
+
+			QGraphicsItem *item = itemAt(event->pos());
+			VideoWindow* wnd = static_cast<VideoWindow*>(item);
+
+			if(!wnd) // not item and any button
+			{
+				if (right_button)
+					m_movement.move(mapToScene(event->pos()));
+
+
+				m_scenezoom.zoom_default();
+
+				if (m_selectedWnd) 
+					m_selectedWnd->setSelected(false);
+				m_selectedWnd = 0;
+			}
+			
+
+			if (wnd && wnd!=m_selectedWnd && event->button() == Qt::LeftButton ) // item and left button
+			{
+
+				if (m_selectedWnd) 
+					m_selectedWnd->setSelected(false);
+
+				m_selectedWnd = wnd;
+
+
+				QPointF point = item->mapToScene(item->boundingRect().center());
+
+				const int dur = 800;
+				m_movement.setDuration(dur);
+				m_movement.move(point);
+
+				m_scenezoom.setDuration(dur);
+				m_scenezoom.zoom_abs(0);
+
+				
+				m_selectedWnd->setSelected(true);
+
+			}
+
+	}
+
+	if (left_button)
+		m_handMoving = false;
 }
 
 

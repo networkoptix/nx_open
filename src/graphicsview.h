@@ -6,6 +6,8 @@
 #include "./videodisplay/animation/scene_zoom.h"
 #include "./videodisplay/animation/mouse_state.h"
 
+class VideoWindow;
+
 class GraphicsView: public QGraphicsView
 {
 	Q_OBJECT
@@ -13,7 +15,7 @@ public:
 	GraphicsView();
 	virtual ~GraphicsView();
 
-	void zoom(int );
+	void zoomDefault();
 
 protected:
 	virtual void wheelEvent ( QWheelEvent * e );
@@ -39,6 +41,9 @@ protected:
 	CLMouseState m_mousestate;
 
 	bool m_handScrolling;
+	bool m_handMoving;
+
+	VideoWindow* m_selectedWnd;
 	
 };
 

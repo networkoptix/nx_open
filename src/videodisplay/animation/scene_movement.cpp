@@ -9,7 +9,11 @@ m_view(gview)
 	
 
 	//m_timeline.setCurve(CLAnimationTimeLine::CLAnimationCurve::SLOW_END_POW_40);
-	m_timeline.setDuration(3000);
+
+	const int dur = 3000;
+
+	m_timeline.setDuration(dur);
+	setDefaultDuration(dur);
 	m_timeline.setFrameRange(0, 20000);
 }
 
@@ -31,14 +35,16 @@ void CLSceneMovement::move (int dx, int dy)
 
 void CLSceneMovement::move (QPointF dest)
 {
-	stop();
-
 
 	m_startpoint = m_view->mapToScene(m_view->viewport()->rect().center());
 	m_delta = dest - m_startpoint;
 	
 
-	m_timeline.start();
+	if (!isRuning())
+	{
+		m_timeline.start();
+		m_timeline.start();
+	}
 
 	//cl_log.log("==============", cl_logDEBUG1);
 	m_timeline.setCurrentTime(0);
