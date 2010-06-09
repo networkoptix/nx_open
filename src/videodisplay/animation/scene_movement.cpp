@@ -1,9 +1,9 @@
 #include "scene_movement.h"
-#include <QGraphicsView>
 #include <QScrollBar>
 #include "../../base/log.h"
+#include "graphicsview.h"
 
-CLSceneMovement::CLSceneMovement(QGraphicsView* gview):
+CLSceneMovement::CLSceneMovement(GraphicsView* gview):
 m_view(gview)
 {
 	
@@ -61,6 +61,19 @@ void CLSceneMovement::onNewFrame(int pos)
 
 
 	QPointF result = m_startpoint + move;
+
+	
+	QRect rsr = m_view->getRealSceneRect();
+
+	/*
+	if (result.x() > rsr.left())
+	{
+		
+		result.rx() = 2*rsr.left() - result.x();
+	}
+	/**/
+
+	
 	m_view->centerOn(result);
 
 	

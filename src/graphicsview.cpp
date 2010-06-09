@@ -29,6 +29,16 @@ GraphicsView::~GraphicsView()
 	
 }
 
+void GraphicsView::setRealSceneRect(QRect rect)
+{
+	m_realSceneRect = rect;
+}
+
+QRect GraphicsView::getRealSceneRect() const
+{
+	return m_realSceneRect;
+}
+
 
 void GraphicsView::wheelEvent ( QWheelEvent * e )
 {
@@ -36,7 +46,7 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
 	int numDegrees = e->delta() ;
 	m_scenezoom.zoom_delta(numDegrees*10);
 
-	if (m_scenezoom.getZoom()<-500)
+	if (m_scenezoom.getZoom()<-500 && numDegrees<0)
 	{
 		if (m_selectedWnd)
 			m_selectedWnd->setSelected(false);
@@ -58,7 +68,7 @@ void GraphicsView::updateTransform()
 	QPoint center = QPoint(horizontalScrollBar()->value(), verticalScrollBar()->value());
 
 	tr.translate(center.x(), center.y());
-	tr.rotate(m_yRotate/1.0, Qt::YAxis);
+	tr.rotate(m_yRotate/1.0, Qt::ZAxis);
 	tr.rotate(m_xRotate/1.0, Qt::XAxis);
 	tr.translate(-center.x(), -center.y());
 

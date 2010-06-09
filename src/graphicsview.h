@@ -17,6 +17,10 @@ public:
 
 	void zoomDefault();
 
+	void setRealSceneRect(QRect rect);
+	QRect getRealSceneRect() const;
+	
+
 protected:
 	virtual void wheelEvent ( QWheelEvent * e );
 	virtual void keyPressEvent( QKeyEvent * e );
@@ -44,6 +48,8 @@ protected:
 	int m_handMoving;
 
 	VideoWindow* m_selectedWnd;
+
+	QRect m_realSceneRect;
 	
 };
 

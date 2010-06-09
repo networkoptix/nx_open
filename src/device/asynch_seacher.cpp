@@ -212,7 +212,10 @@ CLDeviceList CLDiviceSeracher::findNewDevices(bool allow_to_change_ip, bool& ip_
 		{
 			CLNetworkDevice* device = static_cast<CLNetworkDevice*>(it.value());
 
-			busy_list.insert(device->getIP().toIPv4Address());
+			if (device->checkDeviceTypeFlag(CLDevice::NETWORK))
+				busy_list.insert(device->getIP().toIPv4Address());
+
+
 			++it;
 		}
 

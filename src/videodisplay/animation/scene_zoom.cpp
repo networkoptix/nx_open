@@ -5,7 +5,7 @@
 #include "../../base/log.h"
 
 static const qreal zoom_factor = 100.0;
-static const qreal min_zoom = -9000;
+static const qreal min_zoom = -8000;
 static const qreal max_zoom = 20000;
 
 CLSceneZoom::CLSceneZoom(QGraphicsView* gview):

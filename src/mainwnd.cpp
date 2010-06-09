@@ -28,10 +28,10 @@ QColor bkr_color(0,5,15);
 
 #define SLOT_WIDTH 640
 #define SLOT_HEIGHT (SLOT_WIDTH*3/4)
-#define SLOT_DISTANCE (0.30)
+#define SLOT_DISTANCE (0.40)
 
-#define SCENE_LEFT (2000*1000)
-#define SCENE_TOP (2000*1000)
+#define SCENE_LEFT (20*1000)
+#define SCENE_TOP (20*1000)
 
 
 extern CLDiviceSeracher dev_searcher;
@@ -174,7 +174,7 @@ MainWnd::~MainWnd()
 
 void MainWnd::onTimer()
 {
-	static const int interval = 1000000;
+	static const int interval = 1000;
 	static bool first_time = true;
 	if (first_time)
 	{
@@ -292,6 +292,13 @@ void MainWnd::onNewDevice(CLDevice* device)
 		m_scene_bottom = y;
 
 	m_videoView.setSceneRect(0,0,2*SCENE_LEFT + m_scene_right + 4*SLOT_WIDTH, 2*SCENE_TOP + m_scene_bottom );
+
+	int rs_width = (m_scene_right - SCENE_LEFT)*2;
+	int rs_height = (m_scene_bottom - SCENE_TOP)*2;
+	QRect rect(SCENE_LEFT - rs_width/4, SCENE_TOP - rs_height/4, rs_width, rs_height);
+
+	m_videoView.setRealSceneRect(rect);
+	
 
 
 	m_scene.addItem(video_wnd);

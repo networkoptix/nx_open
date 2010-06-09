@@ -19,7 +19,7 @@ void VideoWindow::setSelected(bool sel)
 
 	if (m_selected)
 	{
-		m_zoom.setDuration(800);
+		m_zoom.setDuration(900);
 		m_zoom.zoom(2500);
 		setZValue(1);
 	}

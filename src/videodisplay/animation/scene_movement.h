@@ -4,13 +4,13 @@
 #include "abstract_animation.h"
 #include <QPoint>
 
-class QGraphicsView;
+class GraphicsView;
 
 class CLSceneMovement : public CLAbstractAnimation
 {
 	Q_OBJECT
 public:
-	CLSceneMovement(QGraphicsView* gview);
+	CLSceneMovement(GraphicsView* gview);
 	virtual ~CLSceneMovement();
 
 	void move (QPointF dest);
@@ -22,7 +22,7 @@ private slots:
 
 protected:
 
-	QGraphicsView* m_view;
+	GraphicsView* m_view;
 
 	QPointF m_startpoint;
 	QPointF m_delta;
