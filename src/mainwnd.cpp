@@ -123,6 +123,8 @@ m_scene_bottom(0)
 	m_videoView.centerOn(SCENE_LEFT + 1000, SCENE_TOP + 1000);
 	m_videoView.zoomDefault();
 
+	//showFullScreen();
+
 
 }
 
@@ -174,7 +176,7 @@ MainWnd::~MainWnd()
 
 void MainWnd::onTimer()
 {
-	static const int interval = 100000;
+	static const int interval = 1000000;
 	static bool first_time = true;
 	if (first_time)
 	{

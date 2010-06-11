@@ -3,6 +3,59 @@
 #include "../../base/log.h"
 #include "graphicsview.h"
 
+
+int limit_val(int val, int min_val, int max_val, bool mirror)
+{
+
+	if (!mirror)
+	{
+		if (val > max_val)
+			return max_val;
+
+		if (val < min_val)
+			return min_val;
+	}
+
+
+	int width = max_val - min_val;
+
+	if (val > max_val)
+	{
+		int x = val - min_val;
+
+		x = (x%(2*width));// now x cannot be more than 2*width
+		x+=min_val;
+
+		if (x > max_val)
+		{
+			int diff = x - max_val; // so many bigger 
+			x = max_val - diff; // now x cannot be more than 2*width
+		}
+
+		return x;
+	}
+
+	if (val < min_val)
+	{
+
+		int x = max_val - val;
+		x = x%(2*width);
+		x = max_val - x;
+
+		if (x < min_val)
+		{
+			int diff = min_val - x; // so many smaller 
+			x = min_val + diff; 
+		}
+
+		return x;
+
+	}
+
+}
+
+//========================================================================================
+
 CLSceneMovement::CLSceneMovement(GraphicsView* gview):
 m_view(gview)
 {
@@ -65,13 +118,10 @@ void CLSceneMovement::onNewFrame(int pos)
 	
 	QRect rsr = m_view->getRealSceneRect();
 
-	/*
-	if (result.x() > rsr.left())
-	{
-		
-		result.rx() = 2*rsr.left() - result.x();
-	}
-	/**/
+
+	result.rx() = limit_val(result.x(), rsr.left(), rsr.right(), true);
+	result.ry() = limit_val(result.y(), rsr.top(), rsr.bottom(), true);
+	
 
 	
 	m_view->centerOn(result);
