@@ -24,7 +24,7 @@
 
 QColor bkr_color(0,5,15);
 
-#define CL_VIDEO_ROWS 4
+#define CL_VIDEO_ROWS 3
 
 #define SLOT_WIDTH 640
 #define SLOT_HEIGHT (SLOT_WIDTH*3/4)
@@ -174,7 +174,7 @@ MainWnd::~MainWnd()
 
 void MainWnd::onTimer()
 {
-	static const int interval = 1000;
+	static const int interval = 100000;
 	static bool first_time = true;
 	if (first_time)
 	{
@@ -285,17 +285,31 @@ void MainWnd::onNewDevice(CLDevice* device)
 	getCamPosition_helper(cam, position, x, y);
 	video_wnd->setPos(x , y );
 
-	if (x>m_scene_right)
-		m_scene_right = x;
+	if (x + width_max>m_scene_right)
+		m_scene_right = x + width_max;
 
-	if (y>m_scene_bottom)
-		m_scene_bottom = y;
+	if (y + heigh_max>m_scene_bottom)
+		m_scene_bottom = y + heigh_max;
 
 	m_videoView.setSceneRect(0,0,2*SCENE_LEFT + m_scene_right + 4*SLOT_WIDTH, 2*SCENE_TOP + m_scene_bottom );
 
 	int rs_width = (m_scene_right - SCENE_LEFT)*2;
 	int rs_height = (m_scene_bottom - SCENE_TOP)*2;
 	QRect rect(SCENE_LEFT - rs_width/4, SCENE_TOP - rs_height/4, rs_width, rs_height);
+
+	//======================================
+	/*
+	static int i = 0;
+	i++;
+
+	if (i==4)
+	{
+		QPen pen(Qt::green);
+		m_scene.addRect(rect, pen);
+	}
+	/**/
+	//======================================
+
 
 	m_videoView.setRealSceneRect(rect);
 	

@@ -256,6 +256,10 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 		case PIX_FMT_YUVJ422P:
 			data.out_frame.out_type = CL_DECODER_YUV422;
 			break;
+		case PIX_FMT_YUVJ444P:
+			data.out_frame.out_type = CL_DECODER_YUV444;
+			break;
+
 		default:
 			data.out_frame.out_type = CL_DECODER_YUV420;
 			break;

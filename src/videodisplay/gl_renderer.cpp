@@ -399,8 +399,18 @@ void CLGLRenderer::draw(CLVideoDecoderOutput& img, unsigned int channel)
 	int luma_shift = (m_stride - m_width)>>1;
 
 	m_arrayPixels[0] = image.C1 - luma_shift;
-	m_arrayPixels[1] = image.C2 - luma_shift/2;
-	m_arrayPixels[2] = image.C3 - luma_shift/2;
+
+	if (m_color != CL_DECODER_YUV444)
+	{
+		m_arrayPixels[1] = image.C2 - luma_shift/2;
+		m_arrayPixels[2] = image.C3 - luma_shift/2;
+	}
+	else
+	{
+		m_arrayPixels[1] = image.C2 - luma_shift;
+		m_arrayPixels[2] = image.C3 - luma_shift;
+	}
+
 
 
 	m_gotnewimage = true;
@@ -437,12 +447,19 @@ void CLGLRenderer::updateTexture()
 {
 	//image.saveToFile("test.yuv");
 
-	const int w[3] = { m_stride, m_stride / 2, m_stride / 2 };
-	const int r_w[3] = { m_width, m_width / 2, m_width / 2 }; // real_width / visable
+	int w[3] = { m_stride, m_stride / 2, m_stride / 2 };
+	int r_w[3] = { m_width, m_width / 2, m_width / 2 }; // real_width / visable
 	int h[3] = { m_height, m_height / 2, m_height / 2 };
 	
 	if (m_color == CL_DECODER_YUV422)
 		h[1] = h[2] = m_height;
+
+	if (m_color == CL_DECODER_YUV444)
+	{
+		h[1] = h[2] = m_height;
+		w[1] = w[2] = m_stride;
+		r_w[1] = r_w[2] = m_width;
+	}
 
 
 
