@@ -17,7 +17,7 @@ m_diff(0)
 	//m_timeline.setCurveShape(QTimeLine::CurveShape::LinearCurve);
 	m_timeline.setDuration(2500);
 	setDefaultDuration(2500);
-	m_timeline.setFrameRange(0, 20000);
+
 }
 
 CLSceneZoom::~CLSceneZoom()

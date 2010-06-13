@@ -15,6 +15,7 @@ public:
 	void stop();
 	void setDuration(int ms);
 
+	int getDefaultDuration() const;
 	void setDefaultDuration(int val);
 	void restoreDefaultDuration();
 

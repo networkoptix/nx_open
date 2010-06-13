@@ -14,7 +14,7 @@ m_diff(0)
 
 	m_timeline.setDuration(dur);
 	setDefaultDuration(dur);
-	m_timeline.setFrameRange(0, 6000);
+
 }
 
 CLItemZoom::~CLItemZoom()

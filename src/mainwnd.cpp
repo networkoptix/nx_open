@@ -295,9 +295,10 @@ void MainWnd::onNewDevice(CLDevice* device)
 
 	m_videoView.setSceneRect(0,0,2*SCENE_LEFT + m_scene_right + 4*SLOT_WIDTH, 2*SCENE_TOP + m_scene_bottom );
 
-	int rs_width = (m_scene_right - SCENE_LEFT)*2;
-	int rs_height = (m_scene_bottom - SCENE_TOP)*2;
-	QRect rect(SCENE_LEFT - rs_width/4, SCENE_TOP - rs_height/4, rs_width, rs_height);
+	qreal per = 30.0; // 100% means that width is 2 times more than scene_width
+	int scene_width = m_scene_right - SCENE_LEFT;
+	int scene_height = m_scene_bottom - SCENE_TOP;
+	QRect rect(SCENE_LEFT - scene_width*per/200, SCENE_TOP - scene_height*per/200, scene_width*(1+per/100), scene_height*(1+per/100));
 
 	//======================================
 	/*

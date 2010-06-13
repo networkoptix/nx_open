@@ -8,7 +8,7 @@ m_timeline(CLAnimationTimeLine::CLAnimationCurve::SLOW_END_POW_40)
 {
 	//m_timeline.setCurveShape(QTimeLine::CurveShape::LinearCurve);
 	m_timeline.setDuration(2000);
-	m_timeline.setFrameRange(0, 20000);
+	m_timeline.setFrameRange(0, 200000);
 	m_timeline.setUpdateInterval(17); // 60 fps
 
 	setDefaultDuration(2000);
@@ -51,4 +51,9 @@ void CLAbstractAnimation::setDefaultDuration(int val)
 void CLAbstractAnimation::restoreDefaultDuration()
 {
 	m_timeline.setDuration(m_defaultduration );
+}
+
+int CLAbstractAnimation::getDefaultDuration() const
+{
+	return m_defaultduration;
 }

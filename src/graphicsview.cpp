@@ -160,6 +160,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 			if (sdx) dx =-dx;
 			if (sdy) dy =-dy;
 
+			//m_movement.setDuration(m_movement.getDefaultDuration() + mouse_spped/2);
 			m_movement.move(-dx,-dy);
 		}
 	}
