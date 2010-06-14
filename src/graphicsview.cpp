@@ -5,6 +5,8 @@
 #include <math.h>
 #include "../src/gui/graphicsview/qgraphicsitem.h"
 #include "uvideo_wnd.h"
+#include "videodisplay/video_cam_layout/videocamlayout.h"
+#include "camera/camera.h"
 
 
 int item_select_duration = 800;
@@ -18,7 +20,8 @@ m_movement(this),
 m_scenezoom(this),
 m_handScrolling(false),
 m_handMoving(0),
-m_selectedWnd(0)
+m_selectedWnd(0),
+m_camLayout(0)
 {
 
 }
@@ -26,6 +29,11 @@ m_selectedWnd(0)
 GraphicsView::~GraphicsView()
 {
 	
+}
+
+void GraphicsView::setCamLayOut(const VideoCamerasLayout* lo)
+{
+	m_camLayout = lo;
 }
 
 void GraphicsView::setRealSceneRect(QRect rect)
@@ -69,6 +77,7 @@ void GraphicsView::updateTransform()
 	tr.translate(center.x(), center.y());
 	tr.rotate(m_yRotate/1.0, Qt::ZAxis);
 	tr.rotate(m_xRotate/1.0, Qt::XAxis);
+	tr.scale(0.05, 0.05);
 	tr.translate(-center.x(), -center.y());
 
 	setTransform(tr);
@@ -210,25 +219,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 			if (wnd && wnd!=m_selectedWnd && left_button ) // item and left button
 			{
 				// new item selected 
-
-				if (m_selectedWnd) 
-					m_selectedWnd->setSelected(false);
-
-				m_selectedWnd = wnd;
-
-
-				QPointF point = item->mapToScene(item->boundingRect().center());
-
-				
-				m_movement.setDuration(item_select_duration);
-				m_movement.move(point);
-
-				m_scenezoom.setDuration(item_select_duration);
-				m_scenezoom.zoom_abs(0.30);
-
-				
-				m_selectedWnd->setSelected(true);
-
+				onNewItemSelected_helper(wnd);
 			}
 
 	}
@@ -240,26 +231,72 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 void GraphicsView::keyPressEvent( QKeyEvent * e )
 {
-	QTransform tr = transform();
-	switch (e->key()) {
+	
+	switch (e->key()) 
+	{
 		case Qt::Key_W:
-			centerOn(QPoint(0,0));
-			break;
-		case Qt::Key_Left:
 			m_yRotate -= 1;
 			updateTransform();
 			break;
+	}
+
+
+	if (m_selectedWnd)
+	{
+		
+		CLVideoCamera* cam = m_selectedWnd->getVideoCam();
+		CLVideoCamera* next_cam = 0;
+
+		switch (e->key()) 
+		{
+		case Qt::Key_Left:
+			next_cam = m_camLayout->getNextLeftCam(cam);
+			break;
 		case Qt::Key_Right:
-			m_yRotate += 1;
-			updateTransform();
+			next_cam = m_camLayout->getNextRightCam(cam);
 			break;
 		case Qt::Key_Up:
-			m_xRotate += 1;
-			updateTransform();
+			next_cam = m_camLayout->getNextTopCam(cam);
 			break;
 		case Qt::Key_Down:
-			m_xRotate -= 1;
-			updateTransform();
+			next_cam = m_camLayout->getNextBottomCam(cam);
 			break;
+		}
+
+		if (next_cam)
+		{
+			CLVideoWindow* wnd = (next_cam->getVideoWindow());
+
+			if (wnd)
+				onNewItemSelected_helper(static_cast<VideoWindow*>(wnd));
+		}
+		
+
 	}
+
+
+}
+
+//=====================================================
+
+void GraphicsView::onNewItemSelected_helper(VideoWindow* new_wnd)
+{
+	if (m_selectedWnd) 
+		m_selectedWnd->setSelected(false);
+
+	m_selectedWnd = new_wnd;
+
+
+	QPointF point = m_selectedWnd->mapToScene(m_selectedWnd->boundingRect().center());
+
+
+	m_movement.setDuration(item_select_duration);
+	m_movement.move(point);
+
+	m_scenezoom.setDuration(item_select_duration);
+	m_scenezoom.zoom_abs(0.30);
+
+
+	m_selectedWnd->setSelected(true);
+
 }

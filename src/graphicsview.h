@@ -7,6 +7,7 @@
 #include "./videodisplay/animation/mouse_state.h"
 
 class VideoWindow;
+class VideoCamerasLayout;
 
 class GraphicsView: public QGraphicsView
 {
@@ -19,11 +20,17 @@ public:
 
 	void setRealSceneRect(QRect rect);
 	QRect getRealSceneRect() const;
-	
+
+	void setCamLayOut(const VideoCamerasLayout *);
+
 
 protected:
 	virtual void wheelEvent ( QWheelEvent * e );
 	virtual void keyPressEvent( QKeyEvent * e );
+
+
+	void onNewItemSelected_helper(VideoWindow* new_wnd);
+
 private slots:
 
 protected:
@@ -50,6 +57,7 @@ protected:
 	VideoWindow* m_selectedWnd;
 
 	QRect m_realSceneRect;
+	const VideoCamerasLayout* m_camLayout;
 	
 };
 

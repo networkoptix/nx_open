@@ -14,6 +14,7 @@ class QPainter;
 class MainWnd;
 class CLAbstractVideoHolder;
 class CLDeviceVideoLayout;
+class CLVideoCamera;
 
 
 class CLVideoWindow : public QObject, public QGraphicsItem, public CLAbstractRenderer
@@ -25,6 +26,10 @@ public:
 	CLVideoWindow (const CLDeviceVideoLayout* layout, int max_width, int max_height);
 	virtual ~CLVideoWindow ();
 	void draw(CLVideoDecoderOutput& image, unsigned int channel);
+
+	void setVideoCam(CLVideoCamera* cam);
+	CLVideoCamera* getVideoCam() const;
+
 	virtual void before_destroy();
 	void applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation);
 	virtual float aspectRatio() const;
@@ -124,7 +129,7 @@ protected:
 
 	const CLDeviceVideoLayout* m_videolayout;
 	unsigned int m_videonum;
-
+	CLVideoCamera* m_cam;
 	
 	
 };

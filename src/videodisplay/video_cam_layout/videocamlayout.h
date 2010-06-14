@@ -25,6 +25,11 @@ public:
 	void addCamera(int position, CLVideoCamera* cam);
 	void removeCamera(CLVideoCamera* cam);
 
+	CLVideoCamera* getNextLeftCam(const CLVideoCamera* curr) const;
+	CLVideoCamera* getNextRightCam(const CLVideoCamera* curr) const;
+	CLVideoCamera* getNextTopCam(const CLVideoCamera* curr) const;
+	CLVideoCamera* getNextBottomCam(const CLVideoCamera* curr) const;
+
 
 private:
 	// return -1 if not found

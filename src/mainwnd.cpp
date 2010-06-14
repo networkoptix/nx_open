@@ -55,7 +55,7 @@ m_scene_bottom(0)
 
 	
 	
-	
+	m_videoView.setCamLayOut(&m_camlayout);
 	m_videoView.setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers))); //Antialiasing
 	//m_videoView.setViewport(new QGLWidget());
 	m_videoView.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform	| QPainter::TextAntialiasing); //Antialiasing
@@ -120,9 +120,6 @@ m_scene_bottom(0)
 
 	//m_videoView.setAlignment(Qt::AlignVCenter);
 	
-	m_videoView.centerOn(SCENE_LEFT + 1000, SCENE_TOP + 1000);
-	m_videoView.zoomDefault();
-
 	//showFullScreen();
 
 
@@ -174,27 +171,28 @@ MainWnd::~MainWnd()
 }
 
 
+
 void MainWnd::onTimer()
 {
-	static const int interval = 1000000;
+	static const int interval = 1000;
 	static bool first_time = true;
-	if (first_time)
-	{
-
-		QThread::currentThread()->setPriority(QThread::HighPriority); // Priority more tnan decoders have
-
-		dev_searcher.start();
-		
-
-		CLDirectoryBrowserDeviceServer dirbrowsr("c:/Photo");
-		onNewDevices_helper(dirbrowsr.findDevices());
-		
-
-		first_time = false;
-	}
 
 	if (!dev_searcher.isRunning() )
 	{
+		onNewDevices_helper(dev_searcher.result());
+
+		dev_searcher.start(); // run searcher again ...
+	}
+
+	if (first_time && m_scene.items().size()==0) 
+	{
+		CLDirectoryBrowserDeviceServer dirbrowsr("c:/Photo");
+		onNewDevices_helper(dirbrowsr.findDevices());
+	}
+
+	if (first_time && m_scene.items().size()) // at least something is found
+	{
+
 		// at least we once found smth => can increase interval
 		if (m_timer->interval()!=interval)
 		{
@@ -203,11 +201,22 @@ void MainWnd::onTimer()
 
 		}
 
-		
-		onNewDevices_helper(dev_searcher.result());
 
-		dev_searcher.start(); // run searcher again ...
+		QThread::currentThread()->setPriority(QThread::HighPriority); // Priority more tnan decoders have
+
+		dev_searcher.start();
+
+
+
+		onFirstSceneAppearance();
+
+		first_time = false;
 	}
+
+
+
+
+	
 
 
 }
@@ -245,6 +254,7 @@ void MainWnd::onNewDevice(CLDevice* device)
 
 	VideoWindow* video_wnd =  new VideoWindow(device->getVideoLayout(), width_max, heigh_max);
 	CLVideoCamera* cam = new VideoCamera(device, video_wnd);
+	video_wnd->setVideoCam(cam);
 
 	m_camlayout.addCamera(position, cam);
 
@@ -355,6 +365,12 @@ void MainWnd::onNewDevices_helper(CLDeviceList devices)
 
 }
 
+void MainWnd::onFirstSceneAppearance()
+{
+	m_videoView.centerOn(m_videoView.getRealSceneRect().center());
+	m_videoView.zoomDefault();
+}
+
 void MainWnd::onDeviceRestarted(CLStreamreader* reader, CLRestartHadlerInfo info)
 {
 	// if this is called be reader => reader&cam&device still existing
@@ -405,20 +421,6 @@ void MainWnd::onDeviceRestarted(CLStreamreader* reader, CLRestartHadlerInfo info
 //====================================================================
 //====================================================================
 
-CLVideoCamera* MainWnd::getCamByWnd(CLVideoWindow* wnd)
-{
-
-	for (int i = 0; i < m_cams.size();++i)
-	{
-		CLVideoCamera* cam = m_cams.at(i);
-			if (cam->getVideoWindow() == wnd)
-				return cam;
-	}
-
-	return 0;
-
-}
-
 bool MainWnd::isSelectedCamStillExists() const
 {
 	if (m_selectedcCam==0)
@@ -438,8 +440,9 @@ bool MainWnd::isSelectedCamStillExists() const
 void MainWnd::onAspectRatioChanged(CLVideoWindow* wnd)
 {
 	
-	CLVideoCamera* cam = getCamByWnd(wnd);
-	if (!cam) return;
+	CLVideoCamera* cam = wnd->getVideoCam();
+	if (cam==0)
+		return;
 
 	int x,y;
 

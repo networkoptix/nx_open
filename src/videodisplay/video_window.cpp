@@ -21,7 +21,8 @@ m_imageHeight(0),
 m_imageWidth_old(0),
 m_imageHeight_old(0),
 m_opacity(0),
-m_videonum(layout->numberOfChannels())
+m_videonum(layout->numberOfChannels()),
+m_cam(0)
 
 
 {
@@ -50,6 +51,16 @@ CLVideoWindow::~CLVideoWindow()
 {
 	for (int i = 0; i  < m_videonum; ++i)
 		delete m_gldraw[i];
+}
+
+void CLVideoWindow::setVideoCam(CLVideoCamera* cam)
+{
+	m_cam = cam;
+}
+
+CLVideoCamera* CLVideoWindow::getVideoCam() const
+{
+	return m_cam;
 }
 
 

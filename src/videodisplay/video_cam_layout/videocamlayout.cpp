@@ -102,6 +102,109 @@ void VideoCamerasLayout::removeCamera(CLVideoCamera* cam)
 			m_cams[i] = 0;
 }
 
+CLVideoCamera* VideoCamerasLayout::getNextLeftCam(const CLVideoCamera* curr) const
+{
+	int original_pos = getPos(curr);
+	if (original_pos<0)
+		return 0;
+
+	int pos = original_pos;
+
+	while(1)
+	{
+		--pos;
+		if (pos<0)
+			pos = m_slots-1;
+
+		if (m_cams[pos]!=0 && m_cams[pos]!=curr)
+			return m_cams[pos];
+
+		if (pos == original_pos)
+			return 0;
+	}
+
+}
+
+CLVideoCamera* VideoCamerasLayout::getNextRightCam(const CLVideoCamera* curr) const
+{
+	int original_pos = getPos(curr);
+	if (original_pos<0)
+		return 0;
+
+	int pos = original_pos;
+
+	while(1)
+	{
+		++pos;
+		if (pos>m_slots-1)
+			pos = 0;
+
+		if (m_cams[pos]!=0 && m_cams[pos]!=curr)
+			return m_cams[pos];
+
+		if (pos == original_pos)
+			return 0;
+	}
+
+}
+
+CLVideoCamera* VideoCamerasLayout::getNextTopCam(const CLVideoCamera* curr) const
+{
+	int original_pos = getPos(curr);
+	if (original_pos<0)
+		return 0;
+
+	int pos = original_pos;
+
+	while(1)
+	{
+		if (pos==0)
+			pos = m_slots - 1;
+		else
+			pos-=m_width;
+
+
+		if (pos<0)
+			pos += (m_width*m_height - 1);
+
+		if (m_cams[pos]!=0 && m_cams[pos]!=curr)
+			return m_cams[pos];
+
+		if (pos == original_pos)
+			return 0;
+	}
+
+}
+
+CLVideoCamera* VideoCamerasLayout::getNextBottomCam(const CLVideoCamera* curr) const
+{
+	int original_pos = getPos(curr);
+	if (original_pos<0)
+		return 0;
+
+	int pos = original_pos;
+
+	while(1)
+	{
+		if (pos == m_slots-1 ) // very last one 
+			pos = 0;
+		else
+			pos+=m_width;
+
+	
+		if (pos>m_slots-1)
+			pos -= (m_width*m_height - 1);
+
+		if (m_cams[pos]!=0 && m_cams[pos]!=curr)
+			return m_cams[pos];
+
+		if (pos == original_pos)
+			return 0;
+	}
+
+}
+
+
 //==========================================================================================
 int VideoCamerasLayout::getNextAvalableSlot(unsigned int start_point, unsigned long min_energy)const
 {

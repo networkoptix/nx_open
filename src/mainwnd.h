@@ -63,13 +63,14 @@ private slots:
 	void onAspectRatioChanged(CLVideoWindow* wnd);
 private:
 
+	void onFirstSceneAppearance();
 
 	void onDeviceRestarted(CLStreamreader* reader, CLRestartHadlerInfo info);
 
 	void onNewDevices_helper(CLDeviceList devices);
 	void onNewDevice(CLDevice* device);
 
-	CLVideoCamera* getCamByWnd(CLVideoWindow* wnd);
+	
 	bool isSelectedCamStillExists() const;
 
 	void getMaxWndSize(const CLDeviceVideoLayout* layout, int& max_width, int& max_height);
