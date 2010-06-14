@@ -14,13 +14,13 @@ public:
 	virtual ~CLSceneZoom();
 
 
-	void zoom_delta(int delta);
-	void zoom_abs(int z);
+	void zoom_delta(qreal delta);
+	void zoom_abs(qreal z);
 	void zoom_default();
 
 
 
-	int getZoom() const;
+	qreal getZoom() const;
 private slots:
 	void onNewFrame(int frame);
 	
@@ -31,8 +31,7 @@ protected:
 protected:
 
 	QGraphicsView* m_view;
-	int m_zoom;
-	int m_targetzoom, m_diff, m_start_point;
+	qreal m_zoom,  m_targetzoom, m_diff, m_start_point;
 
 };
 

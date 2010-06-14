@@ -1,7 +1,7 @@
 #include "uvideo_wnd.h"
-
-
 #include <QPainter>
+
+extern int item_select_duration;
 
 VideoWindow::VideoWindow(const CLDeviceVideoLayout* layout, int max_width, int max_height):
 CLVideoWindow(layout, max_width, max_height),
@@ -19,7 +19,7 @@ void VideoWindow::setSelected(bool sel)
 
 	if (m_selected)
 	{
-		m_zoom.setDuration(900);
+		m_zoom.setDuration(item_select_duration + 100);
 		m_zoom.zoom(2500);
 		setZValue(1);
 	}

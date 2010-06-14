@@ -25,7 +25,7 @@ CLAbstractAnimation::~CLAbstractAnimation()
 
 bool CLAbstractAnimation::isRuning() const
 {
-	return (m_timeline.state() == QTimeLine::Running);
+	return (m_timeline.state() & QTimeLine::Running);
 }
 
 void CLAbstractAnimation::stop()

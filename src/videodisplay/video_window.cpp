@@ -12,8 +12,8 @@ m_first_draw(true),
 m_showfps(true),
 m_showinfotext(true),
 m_showimagesize(true),
-m_FPS_Font("arial black", 25),
-m_Info_Font("times", 11),
+m_FPS_Font("arial black", 250),
+m_Info_Font("times", 110),
 m_max_width(max_width),
 m_max_heght(max_height),
 m_imageWidth(0),
@@ -232,7 +232,7 @@ void CLVideoWindow::drawFPS(QPainter* painter)
 
 		sprintf(fps, "%6.2f fps %6.2f Mbps", m_stat[i]->getFrameRate(), m_stat[i]->getBitrate());
 		QFontMetrics fm(painter->font());
-		painter->drawText(rect.left(),rect.top()+17 + fm.height()/2, fps);
+		painter->drawText(rect.left(),rect.top()+170 + fm.height()/2, fps);
 
 	}
 

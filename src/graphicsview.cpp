@@ -7,8 +7,7 @@
 #include "uvideo_wnd.h"
 
 
-
-
+int item_select_duration = 800;
 
 //==============================================================================
 
@@ -44,9 +43,9 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
 {
 	m_scenezoom.restoreDefaultDuration();
 	int numDegrees = e->delta() ;
-	m_scenezoom.zoom_delta(numDegrees*10);
+	m_scenezoom.zoom_delta(numDegrees/3000.0);
 
-	if (m_scenezoom.getZoom()<-500 && numDegrees<0)
+	if (m_scenezoom.getZoom()<0.285 && numDegrees<0)
 	{
 		if (m_selectedWnd)
 			m_selectedWnd->setSelected(false);
@@ -122,6 +121,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 {
 	
+
 	//cl_log.log("====mouseReleaseEvent===", cl_logDEBUG1);
 
 	bool left_button = event->button() == Qt::LeftButton;
@@ -160,7 +160,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 			if (sdx) dx =-dx;
 			if (sdy) dy =-dy;
 
-			//m_movement.setDuration(m_movement.getDefaultDuration() + mouse_spped/2);
+			m_movement.setDuration(m_movement.getDefaultDuration() + mouse_spped);
 			m_movement.move(-dx,-dy);
 		}
 	}
@@ -174,12 +174,33 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 			if(!wnd) // not item and any button
 			{
-				if (right_button)
-					m_movement.move(mapToScene(event->pos()));
 
+				// zero item selected 
+				if (m_movement.isRuning() || m_scenezoom.isRuning())
+				{
+					// if something moves => stop moving 
+					m_movement.stop();
+					m_scenezoom.stop();
+				}
 
-				m_scenezoom.zoom_default();
+				else
+				{
+					// move to the new point
 
+					//if (right_button)
+					{
+						if (m_selectedWnd)
+							m_movement.setDuration(item_select_duration);
+
+						m_movement.move(mapToScene(event->pos()));
+					}
+
+					if (m_selectedWnd)
+						m_scenezoom.setDuration(item_select_duration);
+					m_scenezoom.zoom_default();
+				}
+
+				// selection should be zerro anyway
 				if (m_selectedWnd) 
 					m_selectedWnd->setSelected(false);
 				m_selectedWnd = 0;
@@ -188,7 +209,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 			if (wnd && wnd!=m_selectedWnd && left_button ) // item and left button
 			{
-
+				// new item selected 
 
 				if (m_selectedWnd) 
 					m_selectedWnd->setSelected(false);
@@ -198,12 +219,12 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 				QPointF point = item->mapToScene(item->boundingRect().center());
 
-				const int dur = 800;
-				m_movement.setDuration(dur);
+				
+				m_movement.setDuration(item_select_duration);
 				m_movement.move(point);
 
-				m_scenezoom.setDuration(dur);
-				m_scenezoom.zoom_abs(0);
+				m_scenezoom.setDuration(item_select_duration);
+				m_scenezoom.zoom_abs(0.30);
 
 				
 				m_selectedWnd->setSelected(true);

@@ -4,13 +4,14 @@
 #include <math.h>
 #include "../../base/log.h"
 
-static const qreal zoom_factor = 100.0;
-static const qreal min_zoom = -8000;
-static const qreal max_zoom = 20000;
+
+static const qreal min_zoom = 0.16;
+static const qreal max_zoom = 1.2;
+static const qreal def_zoom = 0.22;
 
 CLSceneZoom::CLSceneZoom(QGraphicsView* gview):
 m_view(gview),
-m_zoom(0),
+m_zoom(def_zoom+0.1),
 m_targetzoom(0),
 m_diff(0)
 {
@@ -25,7 +26,7 @@ CLSceneZoom::~CLSceneZoom()
 	stop();
 }
 
-void CLSceneZoom::zoom_abs(int z)
+void CLSceneZoom::zoom_abs(qreal z)
 {
 	m_targetzoom = z;
 
@@ -34,13 +35,13 @@ void CLSceneZoom::zoom_abs(int z)
 
 void CLSceneZoom::zoom_default()
 {
-	zoom_abs(-6500);
+	zoom_abs(def_zoom);
 }
 
-void CLSceneZoom::zoom_delta(int delta)
+void CLSceneZoom::zoom_delta(qreal delta)
 {
 
-	if (abs(m_targetzoom - m_zoom)>1300*4)return;
+	//if (abs(m_targetzoom - m_zoom)>1300*4)return;
 
 	m_targetzoom += delta;
 
@@ -70,7 +71,7 @@ void CLSceneZoom::zoom_helper()
 
 }
 
-int CLSceneZoom::getZoom() const
+qreal CLSceneZoom::getZoom() const
 {
 	return m_zoom;
 }
@@ -78,21 +79,14 @@ int CLSceneZoom::getZoom() const
 void CLSceneZoom::onNewFrame(int frame)
 {
 	qreal dpos = qreal(frame)/m_timeline.endFrame();
-	int start_point = m_targetzoom - m_diff;
+	qreal start_point = m_targetzoom - m_diff;
 
 	m_zoom = start_point + m_diff*dpos;
 
-	//cl_log.log("zoom_delta=", m_zoom, cl_logDEBUG1);
+	//cl_log.log("m_zoom =", (float)m_zoom, cl_logDEBUG1);
 
+	qreal scl = m_zoom*m_zoom;
 
-	qreal scl;
-
-	if (m_zoom<=0)
-		scl = 1 + m_zoom/10000.0;
-	else if (m_zoom>0)
-		scl = 1 + pow(m_zoom,1.25)/10000;
-
-		
 
 	QTransform tr;
 	tr.scale(scl, scl);

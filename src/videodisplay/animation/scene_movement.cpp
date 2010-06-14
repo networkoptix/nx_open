@@ -52,6 +52,7 @@ int limit_val(int val, int min_val, int max_val, bool mirror)
 
 	}
 
+	return val;
 }
 
 //========================================================================================
@@ -118,11 +119,9 @@ void CLSceneMovement::onNewFrame(int pos)
 	
 	QRect rsr = m_view->getRealSceneRect();
 
-
 	result.rx() = limit_val(result.x(), rsr.left(), rsr.right(), true);
 	result.ry() = limit_val(result.y(), rsr.top(), rsr.bottom(), true);
 	
-
 	
 	m_view->centerOn(result);
 
