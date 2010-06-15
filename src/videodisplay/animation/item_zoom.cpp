@@ -50,6 +50,9 @@ void CLItemZoom::onNewFrame(int frame)
 	QTransform trans;
 	trans.translate(center.x(), center.y());
 	trans.scale(1 + m_zoom/ 3300.0, 1 + m_zoom/ 3300.0);
+	//trans.rotate(m_zoom/6.95); // specef
+	//trans.rotate(m_zoom/6.95, Qt::YAxis); // specef
+	//trans.rotate(m_zoom/6.95, Qt::XAxis); // specef
 	trans.translate(-center.x(), -center.y());
 	m_item->setTransform(trans);
 

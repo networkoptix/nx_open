@@ -127,6 +127,15 @@ void CLSceneMovement::onNewFrame(int pos)
 	
 	m_view->centerOn(result);
 
+	/*
+	QTransform tr;
+	tr.translate(result.x(), result.y());
+	tr.rotate(-1.0, Qt::YAxis);
+	tr.translate(-result.x(), -result.y());
+	m_view->setTransform(tr);
+	/**/
+
+
 	//=======================================
 	if (m_view->getSelectedWnd())
 	{
