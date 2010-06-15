@@ -46,6 +46,19 @@ QRect GraphicsView::getRealSceneRect() const
 	return m_realSceneRect;
 }
 
+VideoWindow* GraphicsView::getSelectedWnd() const
+{
+	return m_selectedWnd;
+}
+
+void GraphicsView::setZeroSelection()
+{
+	if (m_selectedWnd)
+		m_selectedWnd->setSelected(false);
+
+	m_selectedWnd  = 0;
+}
+//================================================================
 
 void GraphicsView::wheelEvent ( QWheelEvent * e )
 {
@@ -53,13 +66,6 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
 	int numDegrees = e->delta() ;
 	m_scenezoom.zoom_delta(numDegrees/3000.0);
 
-	if (m_scenezoom.getZoom()<0.285 && numDegrees<0)
-	{
-		if (m_selectedWnd)
-			m_selectedWnd->setSelected(false);
-
-		m_selectedWnd  = 0;
-	}
 }
 
 void GraphicsView::zoomDefault()
@@ -210,9 +216,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 				}
 
 				// selection should be zerro anyway
-				if (m_selectedWnd) 
-					m_selectedWnd->setSelected(false);
-				m_selectedWnd = 0;
+				setZeroSelection();
 			}
 			
 
@@ -281,13 +285,14 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 
 void GraphicsView::onNewItemSelected_helper(VideoWindow* new_wnd)
 {
-	if (m_selectedWnd) 
-		m_selectedWnd->setSelected(false);
+	setZeroSelection();
 
 	m_selectedWnd = new_wnd;
 
 
 	QPointF point = m_selectedWnd->mapToScene(m_selectedWnd->boundingRect().center());
+
+	m_selectedWnd->setSelected(true);
 
 
 	m_movement.setDuration(item_select_duration);
@@ -297,6 +302,6 @@ void GraphicsView::onNewItemSelected_helper(VideoWindow* new_wnd)
 	m_scenezoom.zoom_abs(0.30);
 
 
-	m_selectedWnd->setSelected(true);
+	
 
 }

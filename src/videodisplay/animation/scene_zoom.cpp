@@ -1,15 +1,15 @@
 #include "scene_zoom.h"
-#include <QGraphicsView>
 #include <QScrollBar>
 #include <math.h>
 #include "../../base/log.h"
+#include "../graphicsview.h"
 
 
 static const qreal min_zoom = 0.16;
 static const qreal max_zoom = 1.2;
 static const qreal def_zoom = 0.22;
 
-CLSceneZoom::CLSceneZoom(QGraphicsView* gview):
+CLSceneZoom::CLSceneZoom(GraphicsView* gview):
 m_view(gview),
 m_zoom(def_zoom+0.1),
 m_targetzoom(0),
@@ -87,10 +87,15 @@ void CLSceneZoom::onNewFrame(int frame)
 
 	qreal scl = m_zoom*m_zoom;
 
-
 	QTransform tr;
 	tr.scale(scl, scl);
 	m_view->setTransform(tr);
+
+
+	//=======================================
+	if (m_view->getSelectedWnd() &&  m_targetzoom < getZoom() && getZoom()<0.280) // if zooming out only
+		m_view->setZeroSelection();
+
 
 }
 

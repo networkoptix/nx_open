@@ -17,11 +17,14 @@ public:
 	virtual ~GraphicsView();
 
 	void zoomDefault();
-
 	void setRealSceneRect(QRect rect);
 	QRect getRealSceneRect() const;
 
 	void setCamLayOut(const VideoCamerasLayout *);
+
+	VideoWindow* getSelectedWnd() const;
+
+	void setZeroSelection(); 
 
 
 protected:

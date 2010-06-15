@@ -4,13 +4,13 @@
 #include "abstract_animation.h"
 #include <QPoint>
 
-class QGraphicsView;
+class GraphicsView;
 
 class CLSceneZoom : public CLAbstractAnimation
 {
 	Q_OBJECT
 public:
-	CLSceneZoom(QGraphicsView* gview);
+	CLSceneZoom(GraphicsView* gview);
 	virtual ~CLSceneZoom();
 
 
@@ -30,7 +30,7 @@ protected:
 
 protected:
 
-	QGraphicsView* m_view;
+	GraphicsView* m_view;
 	qreal m_zoom,  m_targetzoom, m_diff, m_start_point;
 
 };

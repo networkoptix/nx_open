@@ -2,6 +2,8 @@
 #include <QScrollBar>
 #include "../../base/log.h"
 #include "graphicsview.h"
+#include "uvideo_wnd.h"
+
 
 
 int limit_val(int val, int min_val, int max_val, bool mirror)
@@ -124,6 +126,32 @@ void CLSceneMovement::onNewFrame(int pos)
 	
 	
 	m_view->centerOn(result);
+
+	//=======================================
+	if (m_view->getSelectedWnd())
+	{
+		VideoWindow* wnd = m_view->getSelectedWnd();
+
+		QPointF selected_center = wnd->mapToScene(wnd->boundingRect().center());
+		QPointF dest = m_startpoint + m_delta;
+		
+
+		QPointF diff = selected_center - dest;
+
+		if ( abs(diff.x())< 1.0 &&  abs(diff.y())< 1.0 )
+			return; // moving to the selection => do not need to unselect
+
+		// else
+		diff = selected_center - result;
+
+		
+		int height = wnd->height();
+
+
+		if ( abs(diff.x()) > wnd->width()*1.2 || abs(diff.y()) > wnd->height()*1.2)
+			m_view->setZeroSelection();
+
+	}
 
 	
 }
