@@ -51,6 +51,11 @@ VideoWindow* GraphicsView::getSelectedWnd() const
 	return m_selectedWnd;
 }
 
+qreal GraphicsView::getZoom() const
+{
+	return m_scenezoom.getZoom();
+}
+
 void GraphicsView::setZeroSelection()
 {
 	if (m_selectedWnd)

@@ -252,7 +252,7 @@ void MainWnd::onNewDevice(CLDevice* device)
 	int width_max, heigh_max;
 	getMaxWndSize(device->getVideoLayout(), width_max, heigh_max);
 
-	VideoWindow* video_wnd =  new VideoWindow(device->getVideoLayout(), width_max, heigh_max);
+	VideoWindow* video_wnd =  new VideoWindow(&m_videoView, device->getVideoLayout(), width_max, heigh_max);
 	CLVideoCamera* cam = new VideoCamera(device, video_wnd);
 	video_wnd->setVideoCam(cam);
 

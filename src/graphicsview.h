@@ -26,6 +26,7 @@ public:
 
 	void setZeroSelection(); 
 
+	qreal getZoom() const;
 
 protected:
 	virtual void wheelEvent ( QWheelEvent * e );

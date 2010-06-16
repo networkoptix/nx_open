@@ -1,13 +1,15 @@
 #include "uvideo_wnd.h"
 #include <QPainter>
+#include "graphicsview.h"
 
 extern int item_select_duration;
 
-VideoWindow::VideoWindow(const CLDeviceVideoLayout* layout, int max_width, int max_height):
+VideoWindow::VideoWindow(GraphicsView* view, const CLDeviceVideoLayout* layout, int max_width, int max_height):
 CLVideoWindow(layout, max_width, max_height),
 m_selected(false),
 m_z(0),
-m_zoom(this)
+m_zoom(this),
+m_view(view)
 {
 	setAcceptsHoverEvents(true);
 }
@@ -60,22 +62,29 @@ void VideoWindow::zoom_abs(int z)
 
 void VideoWindow::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
-	if (m_z != 1) 
+	if (m_view->getZoom() < 0.25)
 	{
-		m_z = 1;
-		//setZValue(m_z);
-		//m_zoom.zoom(400);
+		if (m_z != 1) 
+		{
+			m_z = 1;
+			setZValue(m_z);
+			m_zoom.zoom(400);
 
+		}
 	}
+
 }
 
 void VideoWindow::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
-	if (m_z != 0)
+	if (m_view->getSelectedWnd()!=this)
 	{
-		m_z = 0;
-		//setZValue(m_z);
-		//m_zoom.zoom(0);
+		if (m_z != 0)
+		{
+			m_z = 0;
+			setZValue(m_z);
+			m_zoom.zoom(0);
+		}
 	}
 
 }

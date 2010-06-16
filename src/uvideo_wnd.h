@@ -4,11 +4,13 @@
 #include "videodisplay/video_window.h"
 #include "./videodisplay/animation/item_zoom.h"
 
+class GraphicsView;
+
 class VideoWindow :  public CLVideoWindow
 {
 	Q_OBJECT
 public:
-	VideoWindow(const CLDeviceVideoLayout* layout, int max_width, int max_height);
+	VideoWindow(GraphicsView* view, const CLDeviceVideoLayout* layout, int max_width, int max_height);
 
 
 
@@ -34,6 +36,7 @@ private:
 
 	CLItemZoom m_zoom;
 
+	GraphicsView* m_view;
 	
 };
 
