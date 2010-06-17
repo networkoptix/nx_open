@@ -21,7 +21,8 @@ m_scenezoom(this),
 m_handScrolling(false),
 m_handMoving(0),
 m_selectedWnd(0),
-m_camLayout(0)
+m_camLayout(0),
+m_ignore_release_event(false)
 {
 
 }
@@ -140,7 +141,11 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 
 void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 {
-	
+	if (m_ignore_release_event)
+	{
+		m_ignore_release_event = false;
+		return;
+	}
 
 	//cl_log.log("====mouseReleaseEvent===", cl_logDEBUG1);
 
@@ -238,6 +243,20 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 }
 
 
+void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
+{
+	VideoWindow*item = static_cast<VideoWindow*>(itemAt(e->pos()));
+	
+	if (item!=m_selectedWnd)
+		return;
+
+	onItemFullScreen_helper(item);
+	
+	m_ignore_release_event  = true;
+}
+
+
+
 void GraphicsView::keyPressEvent( QKeyEvent * e )
 {
 	
@@ -287,7 +306,6 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 }
 
 //=====================================================
-
 void GraphicsView::onNewItemSelected_helper(VideoWindow* new_wnd)
 {
 	setZeroSelection();
@@ -297,7 +315,8 @@ void GraphicsView::onNewItemSelected_helper(VideoWindow* new_wnd)
 
 	QPointF point = m_selectedWnd->mapToScene(m_selectedWnd->boundingRect().center());
 
-	m_selectedWnd->setSelected(true);
+
+	//m_selectedWnd->setSelected(true);
 
 
 	m_movement.setDuration(item_select_duration);
@@ -308,5 +327,52 @@ void GraphicsView::onNewItemSelected_helper(VideoWindow* new_wnd)
 
 
 	
+
+}
+
+//=====================================================
+void GraphicsView::onItemFullScreen_helper(VideoWindow* wnd)
+{
+	//fitInView(wnd, Qt::KeepAspectRatio);
+
+	viewport()->showFullScreen();
+
+
+
+	QRectF item_rect = wnd->sceneBoundingRect();
+	QRectF viewRect = viewport()->rect();
+
+	QRectF sceneRect = matrix().mapRect(item_rect);
+
+
+	qreal xratio = viewRect.width() / sceneRect.width();
+	qreal yratio = viewRect.height() / sceneRect.height();
+
+	qreal scl = qMin(xratio, yratio);
+
+	
+	QRectF unity = matrix().mapRect(QRectF(0, 0, 1, 1));
+	scale(1 / unity.width(), 1 / unity.height());
+
+
+	scl*=( unity.width());
+
+	
+	
+	
+	m_movement.setDuration(item_select_duration/2);
+	m_movement.move(item_rect.center());
+
+
+	qreal zoom = m_scenezoom.scaleTozoom(scl);
+	
+	//scale(scl, scl);
+	
+	m_scenezoom.setDuration(item_select_duration/2);
+	m_scenezoom.zoom_abs(zoom);
+	
+
+	
+
 
 }

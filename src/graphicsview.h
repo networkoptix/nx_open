@@ -34,6 +34,7 @@ protected:
 
 
 	void onNewItemSelected_helper(VideoWindow* new_wnd);
+	void onItemFullScreen_helper(VideoWindow* wnd);
 
 private slots:
 
@@ -48,6 +49,7 @@ protected:
 	void mouseReleaseEvent ( QMouseEvent * e);
 	void mousePressEvent ( QMouseEvent * e);
 	void mouseMoveEvent ( QMouseEvent * e);
+	void mouseDoubleClickEvent ( QMouseEvent * e );
 	/**/
 
 
@@ -62,6 +64,8 @@ protected:
 
 	QRect m_realSceneRect;
 	const VideoCamerasLayout* m_camLayout;
+
+	bool m_ignore_release_event;
 	
 };
 

@@ -18,9 +18,12 @@ public:
 	void zoom_abs(qreal z);
 	void zoom_default();
 
-
-
 	qreal getZoom() const;
+
+	qreal zoomToscale(qreal zoom) const;
+	qreal scaleTozoom(qreal scale) const;
+
+
 private slots:
 	void onNewFrame(int frame);
 	

@@ -26,6 +26,22 @@ CLSceneZoom::~CLSceneZoom()
 	stop();
 }
 
+qreal CLSceneZoom::zoomToscale(qreal zoom) const
+{
+	return zoom*zoom;
+}
+
+qreal CLSceneZoom::scaleTozoom(qreal scale) const
+{
+	return sqrt(scale);
+}
+
+qreal CLSceneZoom::getZoom() const
+{
+	return m_zoom;
+}
+
+
 void CLSceneZoom::zoom_abs(qreal z)
 {
 	m_targetzoom = z;
@@ -71,10 +87,6 @@ void CLSceneZoom::zoom_helper()
 
 }
 
-qreal CLSceneZoom::getZoom() const
-{
-	return m_zoom;
-}
 
 void CLSceneZoom::onNewFrame(int frame)
 {
@@ -85,7 +97,7 @@ void CLSceneZoom::onNewFrame(int frame)
 
 	//cl_log.log("m_zoom =", (float)m_zoom, cl_logDEBUG1);
 
-	qreal scl = m_zoom*m_zoom;
+	qreal scl = zoomToscale(m_zoom);
 
 	QTransform tr;
 	tr.scale(scl, scl);
@@ -95,7 +107,6 @@ void CLSceneZoom::onNewFrame(int frame)
 	//=======================================
 	if (m_view->getSelectedWnd() &&  m_targetzoom < getZoom() && getZoom()<0.280) // if zooming out only
 		m_view->setZeroSelection();
-
 
 }
 
