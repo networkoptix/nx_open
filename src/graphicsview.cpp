@@ -247,7 +247,7 @@ void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
 {
 	VideoWindow*item = static_cast<VideoWindow*>(itemAt(e->pos()));
 	
-	if (item!=m_selectedWnd)
+	if (!item || item!=m_selectedWnd)
 		return;
 
 	onItemFullScreen_helper(item);
