@@ -370,7 +370,7 @@ void GraphicsView::onItemFullScreen_helper(VideoWindow* wnd)
 	
 	
 	
-	m_movement.setDuration(item_select_duration/2);
+	m_movement.setDuration(item_select_duration/2 + 100);
 	m_movement.move(item_rect.center());
 
 
@@ -378,7 +378,7 @@ void GraphicsView::onItemFullScreen_helper(VideoWindow* wnd)
 	
 	//scale(scl, scl);
 	
-	m_scenezoom.setDuration(item_select_duration/2);
+	m_scenezoom.setDuration(item_select_duration/2 + 100);
 	m_scenezoom.zoom_abs(zoom);
 	
 
