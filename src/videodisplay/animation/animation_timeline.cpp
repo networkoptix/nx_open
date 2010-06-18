@@ -63,6 +63,17 @@ qreal CLAnimationTimeLine::valueForTime ( int msec ) const
 	case SLOW_END:
 		return slow_end(msec);
 
+	case SLOW_END_POW_20:
+		return slow_end_pow(msec, 0.20);
+
+	case SLOW_END_POW_22:
+		return slow_end_pow(msec, 0.22);
+
+	case SLOW_END_POW_25:
+		return slow_end_pow(msec, 0.25);
+	case SLOW_END_POW_30:
+		return slow_end_pow(msec, 0.30);
+
 	case SLOW_END_POW_35:
 		return slow_end_pow(msec, 0.35);
 

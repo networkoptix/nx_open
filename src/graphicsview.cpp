@@ -9,7 +9,8 @@
 #include "camera/camera.h"
 
 
-int item_select_duration = 800;
+int item_select_duration = 700;
+qreal selected_item_zoom = 1.28;
 
 //==============================================================================
 
@@ -289,6 +290,12 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 		case Qt::Key_Down:
 			next_cam = m_camLayout->getNextBottomCam(cam);
 			break;
+
+		case Qt::Key_Enter:
+		case Qt::Key_Return:
+			onItemFullScreen_helper(m_selectedWnd);
+			break;
+
 		}
 
 		if (next_cam)
@@ -316,7 +323,7 @@ void GraphicsView::onNewItemSelected_helper(VideoWindow* new_wnd)
 	QPointF point = m_selectedWnd->mapToScene(m_selectedWnd->boundingRect().center());
 
 
-	//m_selectedWnd->setSelected(true);
+	m_selectedWnd->setSelected(true);
 
 
 	m_movement.setDuration(item_select_duration);
@@ -334,6 +341,9 @@ void GraphicsView::onNewItemSelected_helper(VideoWindow* new_wnd)
 void GraphicsView::onItemFullScreen_helper(VideoWindow* wnd)
 {
 	//fitInView(wnd, Qt::KeepAspectRatio);
+
+	//wnd->zoom_abs(selected_item_zoom, true);
+	wnd->zoom_abs(1.0, true);
 
 	viewport()->showFullScreen();
 

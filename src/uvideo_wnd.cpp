@@ -3,6 +3,7 @@
 #include "graphicsview.h"
 
 extern int item_select_duration;
+extern qreal selected_item_zoom;
 
 VideoWindow::VideoWindow(GraphicsView* view, const CLDeviceVideoLayout* layout, int max_width, int max_height):
 CLVideoWindow(layout, max_width, max_height),
@@ -21,14 +22,14 @@ void VideoWindow::setSelected(bool sel)
 
 	if (m_selected)
 	{
-		m_zoom.setDuration(item_select_duration + 100);
-		m_zoom.zoom(2500);
+		m_zoom.setDuration(item_select_duration - 25);
+		m_zoom.zoom(selected_item_zoom);
 		setZValue(1);
 	}
 	else
 	{
 		m_zoom.restoreDefaultDuration();
-		m_zoom.zoom(0);
+		m_zoom.zoom(1.0);
 		setZValue(0);
 	}
 }
@@ -53,10 +54,12 @@ void VideoWindow::drawSelection(QPainter* painter)
 
 }
 
-void VideoWindow::zoom_abs(int z)
+
+void VideoWindow::zoom_abs(qreal z, bool instantly)
 {
-	m_zoom.zoom(z);
+	m_zoom.zoom(z, instantly);
 }
+
 
 //===========================================
 
@@ -68,7 +71,7 @@ void VideoWindow::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 		{
 			m_z = 1;
 			setZValue(m_z);
-			m_zoom.zoom(400);
+			m_zoom.zoom(1.05);
 
 		}
 	}
@@ -83,7 +86,7 @@ void VideoWindow::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 		{
 			m_z = 0;
 			setZValue(m_z);
-			m_zoom.zoom(0);
+			m_zoom.zoom(1.0);
 		}
 	}
 

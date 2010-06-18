@@ -11,18 +11,27 @@ public:
 	CLItemZoom(QGraphicsItem* item);
 	virtual ~CLItemZoom();
 
-	void zoom(int target_zoom);
+	qreal zoomToscale(qreal zoom) const;
+	qreal scaleTozoom(qreal scale) const;
+
+	void zoom(qreal target_zoom, bool instatntly = false);
+	
+
+private:
+
+	void zoom_helper();
 
 private slots:
 	void onNewFrame(int frame);
 	//virtual void onFinished();
 
 protected:
+
 	
 	QGraphicsItem* m_item;
-	int m_zoom, m_start_point;
+	qreal m_zoom, m_start_point;
 
-	int m_diff;
+	qreal m_diff;
 
 
 

@@ -17,7 +17,7 @@ public:
 	void setSelected(bool sel);
 	bool isSelected() const;
 
-	void zoom_abs(int z);
+	void zoom_abs(qreal z, bool instantly);
 
 
 protected:

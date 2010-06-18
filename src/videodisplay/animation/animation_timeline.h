@@ -10,6 +10,10 @@ public:
 	{
 		INHERITED,// derived from QTimeLine
 		SLOW_END, // slow end
+		SLOW_END_POW_20,
+		SLOW_END_POW_22,
+		SLOW_END_POW_25,
+		SLOW_END_POW_30,
 		SLOW_END_POW_35,
 		SLOW_END_POW_40,
 		SLOW_START 
