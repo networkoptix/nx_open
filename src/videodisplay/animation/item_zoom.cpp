@@ -10,7 +10,7 @@ m_zoom(1.0),
 m_diff(0)
 {
 	//m_timeline.setCurveShape(QTimeLine::CurveShape::LinearCurve);
-	m_timeline.setCurve(CLAnimationTimeLine::CLAnimationCurve::SLOW_END_POW_22);
+	m_timeline.setCurve(CLAnimationTimeLine::CLAnimationCurve::SLOW_END_POW_30);
 	const int dur = 300;
 	m_timeline.setDuration(dur);
 	setDefaultDuration(dur);
@@ -23,12 +23,12 @@ CLItemZoom::~CLItemZoom()
 
 qreal CLItemZoom::zoomToscale(qreal zoom) const
 {
-	return zoom*zoom;
+	return zoom;
 }
 
 qreal CLItemZoom::scaleTozoom(qreal scale) const
 {
-	return sqrt(scale);
+	return scale;
 }
 
 void CLItemZoom::zoom(qreal target_zoom, bool instatntly)

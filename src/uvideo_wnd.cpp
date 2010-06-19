@@ -34,6 +34,17 @@ void VideoWindow::setSelected(bool sel)
 	}
 }
 
+void VideoWindow::setFullScreen(bool full)
+{
+	m_fullscreen = full;
+}
+
+bool VideoWindow::getFullScreen() const
+{
+	return m_fullscreen;
+}
+
+
 bool VideoWindow::isSelected() const
 {
 	return m_selected;
@@ -71,7 +82,7 @@ void VideoWindow::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 		{
 			m_z = 1;
 			setZValue(m_z);
-			m_zoom.zoom(1.05);
+			m_zoom.zoom(1.11);
 
 		}
 	}

@@ -17,6 +17,9 @@ public:
 	void setSelected(bool sel);
 	bool isSelected() const;
 
+	void setFullScreen(bool full);
+	bool getFullScreen() const;
+
 	void zoom_abs(qreal z, bool instantly);
 
 
@@ -32,12 +35,14 @@ private:
 
 private:
 	bool m_selected;
+	bool m_fullscreen; // could be only if m_selected
+
 	int m_z;
 
 	CLItemZoom m_zoom;
-
 	GraphicsView* m_view;
-	
+
+
 };
 
 

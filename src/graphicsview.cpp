@@ -10,7 +10,7 @@
 
 
 int item_select_duration = 700;
-qreal selected_item_zoom = 1.28;
+qreal selected_item_zoom = 1.63;
 
 //==============================================================================
 
