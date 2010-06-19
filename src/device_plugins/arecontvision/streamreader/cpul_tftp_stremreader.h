@@ -2,14 +2,14 @@
 #define cpull_httpreader_1119
 
 
-#include "../../../streamreader/cpull_stremreader.h"
+#include "av_client_pull.h"
 #include "../data/mediadata.h"
 
 
 //single sensor TFTP reader
 // arecont vision TFTP stack is faster (for JPEG image; for H.264 they are almost equal )( you can get more fps with it )
 // so if it's possible to use TFP ( local networks ) it's btter be TFTP but HTTP
-class AVClientPullSSTFTPStreamreader : public CLClientPullStreamreader
+class AVClientPullSSTFTPStreamreader : public CLAVClinetPullStreamReader
 {
 public:
 	explicit AVClientPullSSTFTPStreamreader (CLDevice* dev );

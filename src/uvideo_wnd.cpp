@@ -1,6 +1,8 @@
 #include "uvideo_wnd.h"
 #include <QPainter>
 #include "graphicsview.h"
+#include "camera\camera.h"
+
 
 extern int item_select_duration;
 extern qreal selected_item_zoom;
@@ -14,6 +16,7 @@ m_zoom(this),
 m_view(view)
 {
 	setAcceptsHoverEvents(true);
+
 }
 
 
@@ -23,6 +26,12 @@ void VideoWindow::setSelected(bool sel, bool animate )
 
 	if (!m_selected)
 		m_fullscreen = false;
+
+	
+	if (m_selected)
+		getVideoCam()->setQuality(CLStreamreader::CLSHigh);
+	else
+		getVideoCam()->setQuality(CLStreamreader::CLSNormal);
 
 	if (!animate)
 		return;

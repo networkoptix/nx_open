@@ -26,6 +26,8 @@ struct CLDeviceRestartHadler
 class CLStreamreader : public CLLongRunnable
 {
 public:
+	enum StreamQuality {CLSLowest, CLSLow, CLSNormal, CLSHigh, CLSHighest};
+
 	explicit CLStreamreader(CLDevice* dev);
 	virtual ~CLStreamreader();
 
@@ -43,6 +45,8 @@ public:
 
 	void setDeviceRestartHadlerInfo(CLRestartHadlerInfo);
 	void setDeviceRestartHadler(CLDeviceRestartHadler* restartHandler);
+
+	virtual void setQuality(StreamQuality q){};
 
 protected:
 

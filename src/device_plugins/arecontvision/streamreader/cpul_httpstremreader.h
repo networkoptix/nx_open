@@ -2,11 +2,11 @@
 #define cpull_httpreader_1119
 
 
-#include "../../../streamreader/cpull_stremreader.h"
+#include "av_client_pull.h"
 
 
 //single sensor HTTP reader
-class AVClientPullSSHTTPStreamreader : public CLClientPullStreamreader
+class AVClientPullSSHTTPStreamreader : public CLAVClinetPullStreamReader
 {
 public:
 	explicit AVClientPullSSHTTPStreamreader(CLDevice* dev);

@@ -7,7 +7,7 @@
 
 
 AVClientPullSSHTTPStreamreader::AVClientPullSSHTTPStreamreader(CLDevice* dev):
-CLClientPullStreamreader(dev)
+CLAVClinetPullStreamReader(dev)
 {
 
 	CLAreconVisionDevice* device = static_cast<CLAreconVisionDevice*>(dev);

@@ -5,9 +5,9 @@
 #include "../videodisplay/video_window.h"
 #include "../videodisplay/camdisplay.h"
 #include "../statistics/statistics.h"
+#include "../streamreader/streamreader.h"
 
 class CLDevice;
-class CLStreamreader;
 
 class CLVideoCamera
 {
@@ -29,6 +29,9 @@ public:
 	CLVideoWindow* getVideoWindow();
 	CLStatistics* getStatistics();
 	CLCamDisplay* getCamCamDisplay();
+
+
+	void setQuality(CLStreamreader::StreamQuality q);
 
 private:
 	CLDevice* m_device;

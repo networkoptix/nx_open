@@ -36,7 +36,7 @@ Size ExtractSize(const unsigned char* arr)
 //=========================================================
 
 AVClientPullSSTFTPStreamreader::AVClientPullSSTFTPStreamreader (CLDevice* dev ):
-CLClientPullStreamreader(dev)
+CLAVClinetPullStreamReader(dev)
 {
 	CLAreconVisionDevice* device = static_cast<CLAreconVisionDevice*>(dev);
 	

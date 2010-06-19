@@ -2,7 +2,7 @@
 
 //#include "../oem/arecontvision/streamreader/cpul_file_test.h"
 
-#include "../streamreader/streamreader.h"
+
 #include "../base/log.h"
 #include "../base/sleep.h"
 #include "../device/device.h"
@@ -99,4 +99,10 @@ void CLVideoCamera::setLightCPUMode(bool val)
 void CLVideoCamera::coppyImage(bool copy)
 {
 	m_camdispay.coppyImage(copy);
+}
+
+
+void CLVideoCamera::setQuality(CLStreamreader::StreamQuality q)
+{
+	m_reader->setQuality(q);
 }
