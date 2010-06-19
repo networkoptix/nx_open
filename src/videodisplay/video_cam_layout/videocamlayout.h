@@ -16,6 +16,7 @@ public:
 
 	void getXY(unsigned int pos, int& x, int& y) const;
 
+	CLVideoCamera*  getFirstCam() const;
 
 	int getPos(const CLVideoCamera* cam) const;
 

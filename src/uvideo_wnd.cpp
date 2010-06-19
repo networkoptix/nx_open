@@ -17,9 +17,15 @@ m_view(view)
 }
 
 
-void VideoWindow::setSelected(bool sel)
+void VideoWindow::setSelected(bool sel, bool animate )
 {
 	m_selected = sel;
+
+	if (!m_selected)
+		m_fullscreen = false;
+
+	if (!animate)
+		return;
 
 	if (m_selected)
 	{
@@ -32,7 +38,7 @@ void VideoWindow::setSelected(bool sel)
 		m_zoom.restoreDefaultDuration();
 		m_zoom.zoom(1.0);
 		setZValue(0);
-		m_fullscreen = false;
+		
 	}
 }
 

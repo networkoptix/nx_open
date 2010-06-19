@@ -205,6 +205,15 @@ CLVideoCamera* VideoCamerasLayout::getNextBottomCam(const CLVideoCamera* curr) c
 }
 
 
+CLVideoCamera*  VideoCamerasLayout::getFirstCam() const
+{
+	for (int i = 0; i < m_slots; ++i)
+		if (m_cams[i])
+			return m_cams[i];
+
+	return 0;
+}
+
 //==========================================================================================
 int VideoCamerasLayout::getNextAvalableSlot(unsigned int start_point, unsigned long min_energy)const
 {

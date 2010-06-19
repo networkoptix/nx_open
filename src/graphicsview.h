@@ -44,6 +44,8 @@ protected:
 
 	void onItemFullScreen_helper(VideoWindow* wnd);
 
+	VideoWindow* getLastSelectedWnd();
+
 private slots:
 
 protected:
@@ -65,6 +67,7 @@ protected:
 	int m_handMoving;
 
 	VideoWindow* m_selectedWnd;
+	VideoWindow* m_last_selectedWnd;
 
 	QRect m_realSceneRect;
 	const VideoCamerasLayout* m_camLayout;

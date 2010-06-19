@@ -14,7 +14,7 @@ public:
 
 
 
-	void setSelected(bool sel);
+	void setSelected(bool sel, bool animate = true);
 	bool isSelected() const;
 
 	void setFullScreen(bool full);
