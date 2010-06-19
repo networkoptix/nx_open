@@ -239,8 +239,12 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 				onNewItemSelected_helper(wnd);
 			}
 
+			// if we zoomed more that just FS
 			if (wnd && wnd==m_selectedWnd && wnd->isFullScreen() && m_scenezoom.getZoom() > m_fullScreenZoom + 1e-6)
 			{
+				m_movement.setDuration(2000);
+				m_scenezoom.setDuration(2000);
+
 				m_movement.move(mapToScene(event->pos()));
 				if (left_button)
 					m_scenezoom.zoom_delta(0.1);
