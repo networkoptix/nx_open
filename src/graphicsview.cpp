@@ -251,8 +251,9 @@ void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
 	if (!item || item!=m_selectedWnd)
 		return;
 
-	onItemFullScreen_helper(item);
-	
+
+	toggleFullScreen_helper(item);
+
 	m_ignore_release_event  = true;
 }
 
@@ -260,7 +261,14 @@ void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
 
 void GraphicsView::keyPressEvent( QKeyEvent * e )
 {
-	
+
+	int key = e->key();
+	int nm = e->nativeModifiers();
+
+
+
+
+	//===transform=========
 	switch (e->key()) 
 	{
 		case Qt::Key_W:
@@ -269,8 +277,8 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 			break;
 	}
 
-
-	if (m_selectedWnd)
+	// ===========new item selection 
+	if (e->nativeModifiers() && m_selectedWnd)
 	{
 		
 		CLVideoCamera* cam = m_selectedWnd->getVideoCam();
@@ -291,11 +299,6 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 			next_cam = m_camLayout->getNextBottomCam(cam);
 			break;
 
-		case Qt::Key_Enter:
-		case Qt::Key_Return:
-			onItemFullScreen_helper(m_selectedWnd);
-			break;
-
 		}
 
 		if (next_cam)
@@ -305,14 +308,77 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 			if (wnd)
 				onNewItemSelected_helper(static_cast<VideoWindow*>(wnd));
 		}
-		
 
 	}
+
+	// ===========full screen
+	if (m_selectedWnd)
+	{
+		CLVideoCamera* cam = m_selectedWnd->getVideoCam();
+
+		switch (e->key()) 
+		{
+			case Qt::Key_Enter:
+			case Qt::Key_Return:
+				toggleFullScreen_helper(m_selectedWnd);
+				break;
+		}
+	}
+
+
+
+	//===movement============
+	if (!e->nativeModifiers())
+	{
+		int step = 100;
+		switch (e->key()) 
+		{
+		case Qt::Key_Left:
+			m_movement.move(-step,0);
+			break;
+		case Qt::Key_Right:
+			m_movement.move(step,0);
+			break;
+		case Qt::Key_Up:
+			m_movement.move(0,-step);
+			break;
+		case Qt::Key_Down:
+			m_movement.move(0,step);
+			break;
+		}
+
+	}
+
+
+	//QGraphicsView::keyPressEvent(e);
+
+
+}
+
+void GraphicsView::resizeEvent( QResizeEvent * event )
+{
+	if (m_selectedWnd && m_selectedWnd->isFullScreen())
+		onItemFullScreen_helper(m_selectedWnd);
 
 
 }
 
 //=====================================================
+void GraphicsView::toggleFullScreen_helper(VideoWindow* wnd)
+{
+	if (!wnd->isFullScreen() || m_scenezoom.getZoom()>m_fullScreenZoom) // if item is not in full screen mode or if it's in FS and zoomed more
+		onItemFullScreen_helper(wnd);
+	else
+	{
+		// escape FS MODE
+		setZeroSelection();
+		wnd->setFullScreen(false);
+		m_scenezoom.setDuration(item_select_duration*1.3);
+		zoomDefault();
+	}
+}
+
+
 void GraphicsView::onNewItemSelected_helper(VideoWindow* new_wnd)
 {
 	setZeroSelection();
@@ -337,7 +403,7 @@ void GraphicsView::onNewItemSelected_helper(VideoWindow* new_wnd)
 
 }
 
-//=====================================================
+
 void GraphicsView::onItemFullScreen_helper(VideoWindow* wnd)
 {
 	//fitInView(wnd, Qt::KeepAspectRatio);
@@ -381,8 +447,7 @@ void GraphicsView::onItemFullScreen_helper(VideoWindow* wnd)
 	m_scenezoom.setDuration(item_select_duration/2 + 100);
 	m_scenezoom.zoom_abs(zoom);
 	
-
-	
-
+	m_fullScreenZoom = zoom; // memorize full screen zoom
+	wnd->setFullScreen(true);
 
 }

@@ -30,10 +30,18 @@ public:
 
 protected:
 	virtual void wheelEvent ( QWheelEvent * e );
+	void mouseReleaseEvent ( QMouseEvent * e);
+	void mousePressEvent ( QMouseEvent * e);
+	void mouseMoveEvent ( QMouseEvent * e);
+	void mouseDoubleClickEvent ( QMouseEvent * e );
+
 	virtual void keyPressEvent( QKeyEvent * e );
 
+	void resizeEvent ( QResizeEvent * event );
 
 	void onNewItemSelected_helper(VideoWindow* new_wnd);
+	void toggleFullScreen_helper(VideoWindow* new_wnd);
+
 	void onItemFullScreen_helper(VideoWindow* wnd);
 
 private slots:
@@ -46,10 +54,6 @@ protected:
 	void updateTransform();
 
 	
-	void mouseReleaseEvent ( QMouseEvent * e);
-	void mousePressEvent ( QMouseEvent * e);
-	void mouseMoveEvent ( QMouseEvent * e);
-	void mouseDoubleClickEvent ( QMouseEvent * e );
 	/**/
 
 
@@ -66,6 +70,8 @@ protected:
 	const VideoCamerasLayout* m_camLayout;
 
 	bool m_ignore_release_event;
+
+	qreal m_fullScreenZoom;
 	
 };
 

@@ -8,6 +8,7 @@ extern qreal selected_item_zoom;
 VideoWindow::VideoWindow(GraphicsView* view, const CLDeviceVideoLayout* layout, int max_width, int max_height):
 CLVideoWindow(layout, max_width, max_height),
 m_selected(false),
+m_fullscreen(false),
 m_z(0),
 m_zoom(this),
 m_view(view)
@@ -31,6 +32,7 @@ void VideoWindow::setSelected(bool sel)
 		m_zoom.restoreDefaultDuration();
 		m_zoom.zoom(1.0);
 		setZValue(0);
+		m_fullscreen = false;
 	}
 }
 
@@ -39,7 +41,7 @@ void VideoWindow::setFullScreen(bool full)
 	m_fullscreen = full;
 }
 
-bool VideoWindow::getFullScreen() const
+bool VideoWindow::isFullScreen() const
 {
 	return m_fullscreen;
 }

@@ -18,7 +18,7 @@ public:
 	bool isSelected() const;
 
 	void setFullScreen(bool full);
-	bool getFullScreen() const;
+	bool isFullScreen() const;
 
 	void zoom_abs(qreal z, bool instantly);
 
