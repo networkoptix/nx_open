@@ -39,7 +39,7 @@ private:
 
 	int m_z;
 
-	CLItemZoom m_zoom;
+	CLItemTransform m_animationTransform;
 	GraphicsView* m_view;
 
 

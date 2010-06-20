@@ -4,12 +4,12 @@
 #include "abstract_animation.h"
 class QGraphicsItem;
 
-class CLItemZoom : public CLAbstractAnimation
+class CLItemTransform : public CLAbstractAnimation
 {
 	Q_OBJECT
 public:
-	CLItemZoom(QGraphicsItem* item);
-	virtual ~CLItemZoom();
+	CLItemTransform(QGraphicsItem* item);
+	virtual ~CLItemTransform();
 
 	qreal zoomToscale(qreal zoom) const;
 	qreal scaleTozoom(qreal scale) const;

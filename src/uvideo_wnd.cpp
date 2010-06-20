@@ -12,7 +12,7 @@ CLVideoWindow(layout, max_width, max_height),
 m_selected(false),
 m_fullscreen(false),
 m_z(0),
-m_zoom(this),
+m_animationTransform(this),
 m_view(view)
 {
 	setAcceptsHoverEvents(true);
@@ -38,14 +38,14 @@ void VideoWindow::setSelected(bool sel, bool animate )
 
 	if (m_selected)
 	{
-		m_zoom.setDuration(item_select_duration - 25);
-		m_zoom.zoom(selected_item_zoom);
+		m_animationTransform.setDuration(item_select_duration - 25);
+		m_animationTransform.zoom(selected_item_zoom);
 		setZValue(1);
 	}
 	else
 	{
-		m_zoom.restoreDefaultDuration();
-		m_zoom.zoom(1.0);
+		m_animationTransform.restoreDefaultDuration();
+		m_animationTransform.zoom(1.0);
 		setZValue(0);
 		
 	}
@@ -85,7 +85,7 @@ void VideoWindow::drawSelection(QPainter* painter)
 
 void VideoWindow::zoom_abs(qreal z, bool instantly)
 {
-	m_zoom.zoom(z, instantly);
+	m_animationTransform.zoom(z, instantly);
 }
 
 
@@ -99,7 +99,7 @@ void VideoWindow::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 		{
 			m_z = 1;
 			setZValue(m_z);
-			m_zoom.zoom(1.11);
+			m_animationTransform.zoom(1.11);
 
 		}
 	}
@@ -114,7 +114,7 @@ void VideoWindow::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 		{
 			m_z = 0;
 			setZValue(m_z);
-			m_zoom.zoom(1.0);
+			m_animationTransform.zoom(1.0);
 		}
 	}
 

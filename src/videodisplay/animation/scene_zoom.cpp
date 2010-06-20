@@ -108,5 +108,6 @@ void CLSceneZoom::onNewFrame(int frame)
 	if (m_view->getSelectedWnd() &&  m_targetzoom < getZoom() && getZoom()<0.280) // if zooming out only
 		m_view->setZeroSelection();
 
+
 }
 

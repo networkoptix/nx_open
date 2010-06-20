@@ -4,7 +4,7 @@
 #include <math.h>
 
 
-CLItemZoom::CLItemZoom(QGraphicsItem* item):
+CLItemTransform::CLItemTransform(QGraphicsItem* item):
 m_item(item),
 m_zoom(1.0),
 m_diff(0)
@@ -16,22 +16,22 @@ m_diff(0)
 	setDefaultDuration(dur);
 }
 
-CLItemZoom::~CLItemZoom()
+CLItemTransform::~CLItemTransform()
 {
 	stop();
 }
 
-qreal CLItemZoom::zoomToscale(qreal zoom) const
+qreal CLItemTransform::zoomToscale(qreal zoom) const
 {
 	return zoom;
 }
 
-qreal CLItemZoom::scaleTozoom(qreal scale) const
+qreal CLItemTransform::scaleTozoom(qreal scale) const
 {
 	return scale;
 }
 
-void CLItemZoom::zoom(qreal target_zoom, bool instatntly)
+void CLItemTransform::zoom(qreal target_zoom, bool instatntly)
 {
 	if (instatntly)
 	{
@@ -58,7 +58,7 @@ void CLItemZoom::zoom(qreal target_zoom, bool instatntly)
 }
 
 
-void CLItemZoom::onNewFrame(int frame)
+void CLItemTransform::onNewFrame(int frame)
 {
 	
 	qreal pos = qreal(frame)/m_timeline.endFrame();
@@ -67,7 +67,7 @@ void CLItemZoom::onNewFrame(int frame)
 
 }
 
-void CLItemZoom::zoom_helper()
+void CLItemTransform::zoom_helper()
 {
 	QPointF center = m_item->boundingRect().center();
 
