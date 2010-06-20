@@ -239,6 +239,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 				onNewItemSelected_helper(wnd);
 			}
 
+			/*
 			// if we zoomed more that just FS
 			if (wnd && wnd==m_selectedWnd && wnd->isFullScreen() && m_scenezoom.getZoom() > m_fullScreenZoom + 1e-6)
 			{
@@ -253,6 +254,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 					m_scenezoom.zoom_delta(-0.1);
 
 			}
+			/**/
 
 	}
 
@@ -263,6 +265,9 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
 {
+	if (e->button() != Qt::LeftButton)
+		return;
+
 	VideoWindow*item = static_cast<VideoWindow*>(itemAt(e->pos()));
 	
 	if (!item || item!=m_selectedWnd)

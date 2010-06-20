@@ -79,6 +79,8 @@ m_scene_bottom(0)
 	m_videoView.setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_videoView.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
+	//m_videoView.setBackgroundBrush(QPixmap("c:/photo/32.jpg"));
+
 	m_videoView.setScene(&m_scene);
 
 	palette.setColor(backgroundRole(), bkr_color);

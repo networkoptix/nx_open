@@ -6,7 +6,7 @@
 
 
 static const qreal min_zoom = 0.16;
-static const qreal max_zoom = 1.2;
+static const qreal max_zoom = 4.0;
 static const qreal def_zoom = 0.22;
 
 CLSceneZoom::CLSceneZoom(GraphicsView* gview):
