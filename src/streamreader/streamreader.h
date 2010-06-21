@@ -46,7 +46,8 @@ public:
 	void setDeviceRestartHadlerInfo(CLRestartHadlerInfo);
 	void setDeviceRestartHadler(CLDeviceRestartHadler* restartHandler);
 
-	virtual void setQuality(StreamQuality q){};
+	virtual void setQuality(StreamQuality q);
+	StreamQuality getQuality() const;
 
 protected:
 
@@ -73,6 +74,8 @@ protected:
 	CLDeviceRestartHadler* m_restartHandler;
 
 	CLDevice* m_device; // reader reads data from this device.
+
+	StreamQuality m_qulity;
 
 };
 

@@ -5,7 +5,8 @@
 CLStreamreader::CLStreamreader(CLDevice* dev):
 m_restartInfo(0),
 m_restartHandler(0),
-m_device(dev)
+m_device(dev),
+m_qulity(StreamQuality::CLSNormal)
 {
 
 }
@@ -19,6 +20,17 @@ void CLStreamreader::setStatistics(CLStatistics* stat)
 {
 	m_stat = stat;
 }
+
+void CLStreamreader::setQuality(StreamQuality q)
+{
+	m_qulity = q;
+}
+
+CLStreamreader::StreamQuality CLStreamreader::getQuality() const
+{
+	return m_qulity;
+}
+
 
 void CLStreamreader::setStreamParams(CLParamList newParam)
 {

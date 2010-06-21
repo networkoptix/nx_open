@@ -102,6 +102,16 @@ void VideoCamerasLayout::removeCamera(CLVideoCamera* cam)
 			m_cams[i] = 0;
 }
 
+QSet<CLVideoCamera*> VideoCamerasLayout::getCamList() const
+{
+	QSet<CLVideoCamera*> result;
+	for (int i = 0; i < m_slots; ++i)
+		if (m_cams[i]!=0)
+			result.insert(m_cams[i]);
+
+	return result;
+}
+
 CLVideoCamera* VideoCamerasLayout::getNextLeftCam(const CLVideoCamera* curr) const
 {
 	int original_pos = getPos(curr);

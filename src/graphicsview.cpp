@@ -67,6 +67,23 @@ void GraphicsView::setZeroSelection()
 	m_last_selectedWnd = m_selectedWnd;
 	m_selectedWnd  = 0;
 }
+
+void GraphicsView::setAllItemsQuality(CLStreamreader::StreamQuality q, bool increase)
+{
+	cl_log.log("new quality", q, cl_logDEBUG1);
+	
+	QSet<CLVideoCamera*> camlst = m_camLayout->getCamList();
+
+	QSetIterator<CLVideoCamera*> it(camlst);
+	while (it.hasNext())
+	{
+		CLVideoCamera* cam = it.next();
+
+		cam->setQuality(q, increase);
+	}
+	
+}
+
 //================================================================
 
 void GraphicsView::wheelEvent ( QWheelEvent * e )

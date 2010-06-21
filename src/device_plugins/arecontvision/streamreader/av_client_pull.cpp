@@ -16,6 +16,9 @@ CLAVClinetPullStreamReader::~CLAVClinetPullStreamReader()
 void CLAVClinetPullStreamReader::setQuality(StreamQuality q)
 {
 
+	CLClientPullStreamreader::setQuality(q);
+
+
 	CLParamList pl = getStreamParam();
 
 	switch(q)
@@ -33,7 +36,7 @@ void CLAVClinetPullStreamReader::setQuality(StreamQuality q)
 	case CLSNormal:
 
 		pl.get("resolution").value.value = "half";
-		pl.get("quality").value.value = "14";
+		pl.get("quality").value.value = "12";
 
 	    break;
 
@@ -42,7 +45,7 @@ void CLAVClinetPullStreamReader::setQuality(StreamQuality q)
 	case CLSLowest:
 
 		pl.get("resolution").value.value = "half";
-		pl.get("quality").value.value = "5";
+		pl.get("quality").value.value = "2";
 
 	    break;
 	}

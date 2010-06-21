@@ -326,7 +326,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 				if (diff>0)
 					img.prepareToWrite(diff);
 
-				cl_log.log("moving data!!", cl_logWARNING);
+				//cl_log.log("moving data!!", cl_logWARNING);
 
 				memmove(img.data() + 5 + header_size, img.data() + 5 + expectable_header_size, img.size() - (5 + expectable_header_size));
 				img.done(diff);

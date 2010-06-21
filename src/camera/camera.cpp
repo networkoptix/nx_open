@@ -102,7 +102,15 @@ void CLVideoCamera::coppyImage(bool copy)
 }
 
 
-void CLVideoCamera::setQuality(CLStreamreader::StreamQuality q)
+void CLVideoCamera::setQuality(CLStreamreader::StreamQuality q, bool increase)
 {
+	if (increase && m_reader->getQuality() >= q)
+		return;
+
+	if (!increase && m_reader->getQuality() <= q)
+		return;
+
+
 	m_reader->setQuality(q);
+
 }

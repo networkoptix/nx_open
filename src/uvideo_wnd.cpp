@@ -29,9 +29,9 @@ void VideoWindow::setSelected(bool sel, bool animate )
 
 	
 	if (m_selected)
-		getVideoCam()->setQuality(CLStreamreader::CLSHigh);
+		getVideoCam()->setQuality(CLStreamreader::CLSHigh, true);
 	else
-		getVideoCam()->setQuality(CLStreamreader::CLSNormal);
+		getVideoCam()->setQuality(CLStreamreader::CLSNormal, false);
 
 	if (!animate)
 		return;

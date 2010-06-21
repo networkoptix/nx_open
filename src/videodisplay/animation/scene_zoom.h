@@ -3,6 +3,7 @@
 
 #include "abstract_animation.h"
 #include <QPoint>
+#include "streamreader\streamreader.h"
 
 class GraphicsView;
 
@@ -31,10 +32,14 @@ private slots:
 protected:
 	void zoom_helper();
 
+	void set_qulity_helper();
+
 protected:
 
 	GraphicsView* m_view;
 	qreal m_zoom,  m_targetzoom, m_diff, m_start_point;
+
+	CLStreamreader::StreamQuality m_quality;
 
 };
 

@@ -1,3 +1,4 @@
+#include <qset>
 #ifndef video_wnd_layout_h1750
 #define video_wnd_layout_h1750
 
@@ -25,6 +26,8 @@ public:
 
 	void addCamera(int position, CLVideoCamera* cam);
 	void removeCamera(CLVideoCamera* cam);
+
+	QSet<CLVideoCamera*> getCamList() const;
 
 	CLVideoCamera* getNextLeftCam(const CLVideoCamera* curr) const;
 	CLVideoCamera* getNextRightCam(const CLVideoCamera* curr) const;

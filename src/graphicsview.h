@@ -28,6 +28,8 @@ public:
 
 	qreal getZoom() const;
 
+	void setAllItemsQuality(CLStreamreader::StreamQuality q, bool increase);
+
 protected:
 	virtual void wheelEvent ( QWheelEvent * e );
 	void mouseReleaseEvent ( QMouseEvent * e);

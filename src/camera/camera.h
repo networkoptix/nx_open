@@ -31,7 +31,7 @@ public:
 	CLCamDisplay* getCamCamDisplay();
 
 
-	void setQuality(CLStreamreader::StreamQuality q);
+	void setQuality(CLStreamreader::StreamQuality q, bool increase);
 
 private:
 	CLDevice* m_device;
