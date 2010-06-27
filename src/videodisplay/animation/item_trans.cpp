@@ -47,7 +47,10 @@ void CLItemTransform::zoom(qreal target_zoom, int duration)
 {
 
 	if (m_rotating)
-		duration = 0; // do it instant 
+	{
+		duration = 0; // do it instantly
+		m_Zrotation.curent = m_Zrotation.start_point + m_Zrotation.diff;
+	}
 
 	if (duration==0)
 	{
@@ -75,6 +78,7 @@ void CLItemTransform::z_rotate_abs(QPointF center, qreal angle, int duration)
 {
 	if (m_zooming)
 		duration = 0; // do it instantly
+	
 
 
 	if (duration==0)
