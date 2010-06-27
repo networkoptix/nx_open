@@ -12,14 +12,14 @@ public:
 	CLItemTransform(QGraphicsItem* item);
 	virtual ~CLItemTransform();
 
+	void stop();
+
 	qreal zoomToscale(qreal zoom) const;
 	qreal scaleTozoom(qreal scale) const;
 
-	void zoom(qreal target_zoom, bool instantly = false);
-
-
-	void z_rotate_delta(QPointF center, qreal angle, bool instantly = false);
-	void z_rotate_abs(QPointF center, qreal angle, bool instantly = false);
+	void zoom(qreal target_zoom, int duration);
+	void z_rotate_delta(QPointF center, qreal angle, int duration);
+	void z_rotate_abs(QPointF center, qreal angle, int duration);
 	
 
 private:

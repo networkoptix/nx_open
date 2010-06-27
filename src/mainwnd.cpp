@@ -35,6 +35,7 @@ QColor bkr_color(0,5,15);
 
 
 extern CLDiviceSeracher dev_searcher;
+extern int scene_zoom_duration;
 
 
 MainWnd::MainWnd(QWidget *parent, Qt::WFlags flags):
@@ -370,7 +371,7 @@ void MainWnd::onNewDevices_helper(CLDeviceList devices)
 void MainWnd::onFirstSceneAppearance()
 {
 	m_videoView.centerOn(m_videoView.getRealSceneRect().center());
-	m_videoView.zoomDefault();
+	m_videoView.zoomDefault(scene_zoom_duration);
 }
 
 void MainWnd::onDeviceRestarted(CLStreamreader* reader, CLRestartHadlerInfo info)

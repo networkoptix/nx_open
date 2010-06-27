@@ -13,8 +13,8 @@ public:
 	CLSceneMovement(GraphicsView* gview);
 	virtual ~CLSceneMovement();
 
-	void move (QPointF dest);
-	void move (int dx, int dy);
+	void move (QPointF dest, int duration);
+	void move (int dx, int dy, int duration);
 
 
 private slots:

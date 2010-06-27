@@ -19,10 +19,6 @@ m_targetzoom(0),
 m_diff(0),
 m_quality(CLStreamreader::CLSNormal)
 {
-	//m_timeline.setCurveShape(QTimeLine::CurveShape::LinearCurve);
-	m_timeline.setDuration(2500);
-	setDefaultDuration(2500);
-
 }
 
 CLSceneZoom::~CLSceneZoom()
@@ -46,26 +42,22 @@ qreal CLSceneZoom::getZoom() const
 }
 
 
-void CLSceneZoom::zoom_abs(qreal z)
+void CLSceneZoom::zoom_abs(qreal z, int duration)
 {
 	m_targetzoom = z;
 
-	zoom_helper();
+	zoom_helper(duration);
 }
 
-void CLSceneZoom::zoom_default()
+void CLSceneZoom::zoom_default(int duration)
 {
-	zoom_abs(def_zoom);
+	zoom_abs(def_zoom, duration);
 }
 
-void CLSceneZoom::zoom_delta(qreal delta)
+void CLSceneZoom::zoom_delta(qreal delta, int duration)
 {
-
-	//if (abs(m_targetzoom - m_zoom)>1300*4)return;
-
 	m_targetzoom += delta;
-
-	zoom_helper();
+	zoom_helper(duration);
 }
 
 void CLSceneZoom::onNewFrame(int frame)
@@ -133,7 +125,7 @@ void CLSceneZoom::set_qulity_helper()
 }
 
 
-void CLSceneZoom::zoom_helper()
+void CLSceneZoom::zoom_helper(int duration)
 {
 	if (m_targetzoom>max_zoom)
 		m_targetzoom = max_zoom;
@@ -146,12 +138,5 @@ void CLSceneZoom::zoom_helper()
 
 	//cl_log.log("m_diff =", m_diff , cl_logDEBUG1);
 
-	if (!isRuning())
-	{
-		m_timeline.start();
-		m_timeline.start();
-	}
-
-	m_timeline.setCurrentTime(0);
-
+	start_helper(duration);
 }

@@ -6,6 +6,7 @@
 
 extern int item_select_duration;
 extern qreal selected_item_zoom;
+extern int item_hoverevent_duration;
 
 VideoWindow::VideoWindow(GraphicsView* view, const CLDeviceVideoLayout* layout, int max_width, int max_height):
 CLVideoWindow(layout, max_width, max_height),
@@ -38,16 +39,14 @@ void VideoWindow::setSelected(bool sel, bool animate )
 
 	if (m_selected)
 	{
-		m_animationTransform.setDuration(item_select_duration - 25);
-		m_animationTransform.zoom(selected_item_zoom);
+		
+		m_animationTransform.zoom(selected_item_zoom, item_select_duration - 25);
 		setZValue(1);
 	}
 	else
 	{
-		m_animationTransform.restoreDefaultDuration();
-		m_animationTransform.zoom(1.0);
+		m_animationTransform.zoom(1.0, item_hoverevent_duration);
 		setZValue(0);
-		
 	}
 }
 
@@ -83,14 +82,24 @@ void VideoWindow::drawSelection(QPainter* painter)
 }
 
 
-void VideoWindow::zoom_abs(qreal z, bool instantly)
+void VideoWindow::zoom_abs(qreal z, int duration)
 {
-	m_animationTransform.zoom(z, instantly);
+	m_animationTransform.zoom(z, duration);
 }
 
-void VideoWindow::z_rotate_delta(QPointF center, qreal angle, bool instantly)
+void VideoWindow::z_rotate_delta(QPointF center, qreal angle, int duration)
 {
-	m_animationTransform.z_rotate_delta(center, angle, instantly);
+	m_animationTransform.z_rotate_delta(center, angle, duration);
+}
+
+void VideoWindow::z_rotate_abs(QPointF center, qreal angle, int duration)
+{
+	m_animationTransform.z_rotate_abs(center, angle, duration);
+}
+
+void VideoWindow::stop_animation()
+{
+	m_animationTransform.stop();
 }
 
 //===========================================
@@ -103,7 +112,7 @@ void VideoWindow::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 		{
 			m_z = 1;
 			setZValue(m_z);
-			m_animationTransform.zoom(1.11);
+			m_animationTransform.zoom(1.11, item_hoverevent_duration);
 
 		}
 	}
@@ -118,7 +127,7 @@ void VideoWindow::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 		{
 			m_z = 0;
 			setZValue(m_z);
-			m_animationTransform.zoom(1.0);
+			m_animationTransform.zoom(1.0, item_hoverevent_duration);
 		}
 	}
 

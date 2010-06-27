@@ -63,14 +63,6 @@ CLSceneMovement::CLSceneMovement(GraphicsView* gview):
 m_view(gview)
 {
 	
-
-	//m_timeline.setCurve(CLAnimationTimeLine::CLAnimationCurve::SLOW_END_POW_35);
-
-	const int dur = 3000;
-
-	m_timeline.setDuration(dur);
-	setDefaultDuration(dur);
-
 }
 
 CLSceneMovement::~CLSceneMovement()
@@ -79,33 +71,24 @@ CLSceneMovement::~CLSceneMovement()
 }
 
 
-void CLSceneMovement::move (int dx, int dy)
+void CLSceneMovement::move (int dx, int dy, int duration)
 {
 	QPoint curr = m_view->viewport()->rect().center();
 	curr.rx()+=dx;
 	curr.ry()+=dy;
 
 
-	move(m_view->mapToScene(curr));
+	move(m_view->mapToScene(curr), duration);
 }
 
-void CLSceneMovement::move (QPointF dest)
+void CLSceneMovement::move (QPointF dest, int duration)
 {
 	//cl_log.log("CLSceneMovement::move() ", cl_logDEBUG1);
 
 	m_startpoint = m_view->mapToScene(m_view->viewport()->rect().center());
 	m_delta = dest - m_startpoint;
 	
-
-	if (!isRuning())
-	{
-		m_timeline.start();
-		m_timeline.start();
-	}
-
-	
-	m_timeline.setCurrentTime(0);
-
+	start_helper(duration);
 }
 
 

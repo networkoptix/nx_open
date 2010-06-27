@@ -20,8 +20,11 @@ public:
 	void setFullScreen(bool full);
 	bool isFullScreen() const;
 
-	void zoom_abs(qreal z, bool instantly);
-	void z_rotate_delta(QPointF center, qreal angle, bool instantly = false);
+	void zoom_abs(qreal z, int duration);
+	void z_rotate_delta(QPointF center, qreal angle, int diration);
+	void z_rotate_abs(QPointF center, qreal angle, int duration);
+
+	void stop_animation();
 
 
 protected:

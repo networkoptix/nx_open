@@ -15,9 +15,9 @@ public:
 	virtual ~CLSceneZoom();
 
 
-	void zoom_delta(qreal delta);
-	void zoom_abs(qreal z);
-	void zoom_default();
+	void zoom_delta(qreal delta, int duration);
+	void zoom_abs(qreal z, int duration);
+	void zoom_default(int duration);
 
 	qreal getZoom() const;
 
@@ -30,7 +30,7 @@ private slots:
 	
 
 protected:
-	void zoom_helper();
+	void zoom_helper(int duration);
 
 	void set_qulity_helper();
 

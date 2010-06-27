@@ -11,16 +11,19 @@ m_Zrotation(0.0),
 m_zooming(false),
 m_rotating(false)
 {
-	//m_timeline.setCurveShape(QTimeLine::CurveShape::LinearCurve);
 	m_timeline.setCurve(CLAnimationTimeLine::CLAnimationCurve::SLOW_END_POW_30);
-	const int dur = 300;
-	m_timeline.setDuration(dur);
-	setDefaultDuration(dur);
 }
 
 CLItemTransform::~CLItemTransform()
 {
 	stop();
+}
+
+void CLItemTransform::stop()
+{
+	CLAbstractAnimation::stop();
+	m_rotating = false;
+	m_zooming = false;
 }
 
 void CLItemTransform::onFinished()
@@ -40,11 +43,15 @@ qreal CLItemTransform::scaleTozoom(qreal scale) const
 	return scale;
 }
 
-void CLItemTransform::zoom(qreal target_zoom, bool instantly)
+void CLItemTransform::zoom(qreal target_zoom, int duration)
 {
-	if (instantly)
+
+	if (m_rotating)
+		duration = 0; // do it instant 
+
+	if (duration==0)
 	{
-		m_timeline.stop();
+		stop();
 
 		m_zoom.curent = target_zoom;
 		transform_helper();
@@ -54,27 +61,57 @@ void CLItemTransform::zoom(qreal target_zoom, bool instantly)
 		m_zoom.start_point = m_zoom.curent;
 		m_zoom.diff = target_zoom - m_zoom.curent;
 
-		if (!isRuning())
-		{
-			m_timeline.start();
-			m_timeline.start();
-		}
+		start_helper(duration);
 
 		m_zooming = true;
 
-		m_timeline.setCurrentTime(0);
+
 	}
 
 
 }
 
-void CLItemTransform::z_rotate_delta(QPointF center, qreal angle, bool instantly)
+void CLItemTransform::z_rotate_abs(QPointF center, qreal angle, int duration)
 {
-	if (instantly)
+	if (m_zooming)
+		duration = 0; // do it instantly
+
+
+	if (duration==0)
+	{
+		m_rotatePoint = center;
+		m_Zrotation.curent = angle;
+		m_Zrotation.curent = m_Zrotation.curent - ((int)m_Zrotation.curent/360)*360;
+		transform_helper();
+	}
+	else
+	{
+		m_Zrotation.start_point = m_Zrotation.curent;
+
+		if (m_Zrotation.start_point>180 && angle==0.)
+			angle = 360.;
+
+		m_Zrotation.diff = angle - m_Zrotation.start_point;
+
+		start_helper(duration);
+		m_rotating = true;
+
+		
+
+	}
+}
+
+void CLItemTransform::z_rotate_delta(QPointF center, qreal angle, int duration)
+{
+	if (m_zooming)
+		duration = 0; // do it instantly
+
+
+	if (duration==0)
 	{
 		m_rotatePoint = center;
 		m_Zrotation.curent += angle;
-		//m_Zrotation.curent = m_Zrotation.curent - ((int)m_Zrotation.curent/360)*360;
+		m_Zrotation.curent = m_Zrotation.curent - ((int)m_Zrotation.curent/360)*360;
 		transform_helper();
 	}
 	else
@@ -82,15 +119,11 @@ void CLItemTransform::z_rotate_delta(QPointF center, qreal angle, bool instantly
 		m_Zrotation.start_point = m_Zrotation.curent;
 		m_Zrotation.diff = angle;
 
-		if (!isRuning())
-		{
-			m_timeline.start();
-			m_timeline.start();
-		}
+		start_helper(duration);
 
 		m_rotating = true;
 
-		m_timeline.setCurrentTime(0);
+		
 
 	}
 

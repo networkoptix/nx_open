@@ -12,18 +12,14 @@ public:
 	CLAbstractAnimation();
 	virtual ~CLAbstractAnimation();
 
-	void stop();
-	void setDuration(int ms);
-
-	int getDefaultDuration() const;
-	void setDefaultDuration(int val);
-	void restoreDefaultDuration();
-
+	virtual void stop();
 	bool isRuning() const;
 
 protected slots:
 		virtual void onNewFrame(int frame)=0;
 		virtual void onFinished();
+protected:
+		void start_helper(int duration);
 protected:
 	CLAnimationTimeLine m_timeline;
 	int m_defaultduration;
