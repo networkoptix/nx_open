@@ -41,12 +41,14 @@ protected:
 
 	void resizeEvent ( QResizeEvent * event );
 
+	//=========================
 	void onNewItemSelected_helper(VideoWindow* new_wnd);
 	void toggleFullScreen_helper(VideoWindow* new_wnd);
-
 	void onItemFullScreen_helper(VideoWindow* wnd);
-
 	VideoWindow* getLastSelectedWnd();
+	void mouseSpeed_helper(qreal& mouse_speed,  int& dx, int&dy, int min_spped, int speed_factor);
+	bool isWndStillExists(const VideoWindow* wnd) const;
+
 
 private slots:
 
@@ -65,11 +67,17 @@ protected:
 	CLSceneZoom m_scenezoom;
 	CLMouseState m_mousestate;
 
+	
+	int m_rotationCounter;
+
 	bool m_handScrolling;
 	int m_handMoving;
 
+
+
 	VideoWindow* m_selectedWnd;
 	VideoWindow* m_last_selectedWnd;
+	VideoWindow* m_rotatingWnd;
 
 	QRect m_realSceneRect;
 	const VideoCamerasLayout* m_camLayout;

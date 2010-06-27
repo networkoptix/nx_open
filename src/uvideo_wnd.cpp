@@ -88,6 +88,10 @@ void VideoWindow::zoom_abs(qreal z, bool instantly)
 	m_animationTransform.zoom(z, instantly);
 }
 
+void VideoWindow::z_rotate_delta(QPointF center, qreal angle, bool instantly)
+{
+	m_animationTransform.z_rotate_delta(center, angle, instantly);
+}
 
 //===========================================
 

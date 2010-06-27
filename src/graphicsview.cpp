@@ -21,10 +21,12 @@ m_movement(this),
 m_scenezoom(this),
 m_handScrolling(false),
 m_handMoving(0),
+m_rotationCounter(0),
 m_selectedWnd(0),
 m_last_selectedWnd(0),
 m_camLayout(0),
-m_ignore_release_event(false)
+m_ignore_release_event(false),
+m_rotatingWnd(0)
 {
 
 }
@@ -127,18 +129,27 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 
 		// Left-button press in scroll hand mode initiates hand scrolling.
 
-
-		m_mousestate.clearEvents();
-		m_mousestate.mouseMoveEventHandler(event);
-        event->accept();
         m_handScrolling = true;
 		viewport()->setCursor(Qt::ClosedHandCursor);
 	}
+	else if (event->button() == Qt::RightButton) 
+	{
+		QGraphicsItem *item = itemAt(event->pos());
+		m_rotatingWnd = static_cast<VideoWindow*>(item);
+	}
+
+	m_mousestate.clearEvents();
+	m_mousestate.mouseMoveEventHandler(event);
+
+
 }
 
 void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
-	if (m_handScrolling) 
+	bool left_button = event->buttons() & Qt::LeftButton;
+	bool right_button = event->buttons() & Qt::RightButton;
+
+	if (m_handScrolling && left_button) 
 	{
 		QPoint delta = event->pos() - m_mousestate.getLastEventPoint();
 
@@ -155,7 +166,48 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 		m_mousestate.mouseMoveEventHandler(event);
 
 		
-	}	
+	}
+
+	if (m_rotatingWnd && right_button)
+	{
+
+		if (isWndStillExists(m_rotatingWnd))
+		{
+
+			/*
+			center---------old
+			|
+			|
+			|
+			new
+
+			*/
+
+			QPointF center_point = m_rotatingWnd->boundingRect().center(); // by default center is the center of the item
+
+			//if (wnd->isFullScreen()) // if wnd is in full scree mode center must be changed to the cetre of the viewport
+			//	center_point = item->mapFromScene(mapToScene(viewport()->rect().center()));
+
+			QPointF old_point = m_rotatingWnd->mapFromScene(mapToScene(m_mousestate.getLastEventPoint()));
+			QPointF new_point = m_rotatingWnd->mapFromScene(mapToScene(event->pos()));
+
+			QLineF old_line(center_point, old_point);
+			QLineF new_line(center_point, new_point);
+
+
+			qreal angle = new_line.angleTo(old_line);
+
+			m_rotatingWnd->z_rotate_delta(center_point, angle, true);
+
+			++m_rotationCounter;
+		}
+
+		
+		
+		m_mousestate.mouseMoveEventHandler(event);
+	}
+
+
 	QGraphicsView::mouseMoveEvent(event);
 }
 
@@ -172,6 +224,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 	bool left_button = event->button() == Qt::LeftButton;
 	bool right_button = event->button() == Qt::RightButton;
 	bool handMoving = m_handMoving>2;
+	bool rotating = m_rotationCounter>2;
 
 	m_scenezoom.restoreDefaultDuration();
 	m_movement.restoreDefaultDuration();
@@ -182,34 +235,64 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 		m_handScrolling = false;
 	}
 
-
+	//====================================================
 	if (handMoving && left_button) // if scene moved and left button released
 	{
 		// need to continue movement(animation)
 
 		m_mousestate.mouseMoveEventHandler(event);
 
-		qreal mouse_spped, mouse_spped_h, mouse_spped_v;
+		int dx = 0;
+		int dy = 0;
+		qreal mouse_speed = 0;
 
-		m_mousestate.getMouseSpeed(mouse_spped, mouse_spped_h, mouse_spped_v);
+		mouseSpeed_helper(mouse_speed,dx,dy,150,1900);
 
-
-		if (mouse_spped>150)
+		if (dx!=0 || dy!=0)
 		{
-			bool sdx = (mouse_spped_h<0);
-			bool sdy = (mouse_spped_v<0);
-
-			int dx = pow( abs(mouse_spped_h), 2.0)/1900;
-			int dy = pow( abs(mouse_spped_v), 2.0)/1900;;
-
-			if (sdx) dx =-dx;
-			if (sdy) dy =-dy;
-
-			m_movement.setDuration(m_movement.getDefaultDuration() + mouse_spped);
+			m_movement.setDuration(m_movement.getDefaultDuration() + mouse_speed);
 			m_movement.move(-dx,-dy);
 		}
+
 	}
 
+	if (rotating && right_button)
+	{
+		
+		if (isWndStillExists(m_rotatingWnd))
+		{
+
+			int dx = 0;
+			int dy = 0;
+			qreal mouse_speed = 0;
+
+			mouseSpeed_helper(mouse_speed,dx,dy,150,1900);
+
+			if (dx!=0 || dy!=0)
+			{
+				
+				QPointF center_point = m_rotatingWnd->boundingRect().center(); // by default center is the center of the item
+
+				//if (wnd->isFullScreen()) // if wnd is in full scree mode center must be changed to the cetre of the viewport
+				//	center_point = item->mapFromScene(mapToScene(viewport()->rect().center()));
+
+				QPointF old_point = m_rotatingWnd->mapFromScene(mapToScene(event->pos()));
+				QPointF new_point = m_rotatingWnd->mapFromScene(mapToScene(event->pos() + QPoint(dx,dy)));
+
+				QLineF old_line(center_point, old_point);
+				QLineF new_line(center_point, new_point);
+
+
+				qreal angle = new_line.angleTo(old_line);
+
+				m_rotatingWnd->z_rotate_delta(center_point, angle, false);
+				
+			}
+		}
+		
+	}
+
+	//====================================================
 
 	if (!handMoving) // if left button released and we did not move the scene, so may bee need to zoom on the item
 	{
@@ -277,6 +360,12 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 	if (left_button)
 		m_handMoving = 0;
+
+	if (right_button)
+	{
+		m_rotationCounter = 0;
+		m_rotatingWnd = 0;
+	}
 }
 
 
@@ -465,8 +554,7 @@ VideoWindow* GraphicsView::getLastSelectedWnd()
 {
 	if (m_last_selectedWnd)
 	{
-		CLVideoCamera* cam = m_last_selectedWnd->getVideoCam();
-		if ( m_camLayout->getPos(cam) >0 )// if still exists ( in layout)
+		if (isWndStillExists(m_last_selectedWnd))
 			return m_last_selectedWnd;
 
 		m_last_selectedWnd = 0;
@@ -482,6 +570,14 @@ VideoWindow* GraphicsView::getLastSelectedWnd()
 }
 
 //=====================================================
+
+bool GraphicsView::isWndStillExists(const VideoWindow* wnd) const
+{
+	CLVideoCamera* cam = wnd->getVideoCam();
+	if ( m_camLayout->getPos(cam) >=0 )// if still exists ( in layout)
+		return true;
+}
+
 void GraphicsView::toggleFullScreen_helper(VideoWindow* wnd)
 {
 	if (!wnd->isFullScreen() || m_scenezoom.getZoom() > m_fullScreenZoom + 1e-6) // if item is not in full screen mode or if it's in FS and zoomed more
@@ -530,7 +626,7 @@ void GraphicsView::onItemFullScreen_helper(VideoWindow* wnd)
 	//wnd->zoom_abs(selected_item_zoom, true);
 	wnd->zoom_abs(1.0, true);
 
-	viewport()->showFullScreen();
+	//viewport()->showFullScreen();
 
 
 
@@ -572,5 +668,28 @@ void GraphicsView::onItemFullScreen_helper(VideoWindow* wnd)
 	m_last_selectedWnd = wnd;
 
 	wnd->setFullScreen(true);
+
+}
+
+void GraphicsView::mouseSpeed_helper(qreal& mouse_speed,  int& dx, int&dy, int min_speed, int speed_factor)
+{
+	dx = 0; dy = 0;
+
+	qreal  mouse_speed_h, mouse_speed_v;
+
+	m_mousestate.getMouseSpeed(mouse_speed, mouse_speed_h, mouse_speed_v);
+
+
+	if (mouse_speed>min_speed)
+	{
+		bool sdx = (mouse_speed_h<0);
+		bool sdy = (mouse_speed_v<0);
+
+		dx = pow( abs(mouse_speed_h), 2.0)/speed_factor;
+		dy = pow( abs(mouse_speed_v), 2.0)/speed_factor;
+
+		if (sdx) dx =-dx;
+		if (sdy) dy =-dy;
+	}
 
 }

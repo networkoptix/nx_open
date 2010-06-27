@@ -1,6 +1,7 @@
 #ifndef item_zoom_h2118
 #define item_zoom_h2118
 
+#include <QPointF>
 #include "abstract_animation.h"
 class QGraphicsItem;
 
@@ -14,26 +15,35 @@ public:
 	qreal zoomToscale(qreal zoom) const;
 	qreal scaleTozoom(qreal scale) const;
 
-	void zoom(qreal target_zoom, bool instatntly = false);
+	void zoom(qreal target_zoom, bool instantly = false);
+
+
+	void z_rotate_delta(QPointF center, qreal angle, bool instantly = false);
+	void z_rotate_abs(QPointF center, qreal angle, bool instantly = false);
 	
 
 private:
 
-	void zoom_helper();
+	void transform_helper();
 
 private slots:
 	void onNewFrame(int frame);
-	//virtual void onFinished();
+
+
+
+	virtual void onFinished();
 
 protected:
 
+	QPointF m_rotatePoint;
+
 	
 	QGraphicsItem* m_item;
-	qreal m_zoom, m_start_point;
 
-	qreal m_diff;
+	CLAnimationUnit m_zoom;
+	CLAnimationUnit m_Zrotation;
 
-
+	bool m_zooming, m_rotating;
 
 };
 

@@ -24,11 +24,23 @@ public:
 protected slots:
 		virtual void onNewFrame(int frame)=0;
 		virtual void onFinished();
-	
 protected:
 	CLAnimationTimeLine m_timeline;
-
 	int m_defaultduration;
+
+protected:
+	struct CLAnimationUnit
+	{
+		CLAnimationUnit(qreal val)
+		{
+			diff = 0;
+			curent = val;
+			start_point = val;
+		}
+		qreal curent;
+		qreal start_point;
+		qreal diff;
+	};
 
 
 };

@@ -21,6 +21,7 @@ public:
 	bool isFullScreen() const;
 
 	void zoom_abs(qreal z, bool instantly);
+	void z_rotate_delta(QPointF center, qreal angle, bool instantly = false);
 
 
 protected:
