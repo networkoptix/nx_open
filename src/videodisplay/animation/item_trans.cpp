@@ -4,6 +4,24 @@
 #include <math.h>
 
 
+qreal round_angle(qreal angle, qreal min_diff)
+{
+	qreal result = angle;
+	
+	int angle_int_90 = (int)angle/90.0;
+
+	qreal angle_mod_90 = abs(angle - angle_int_90*90);
+
+	if (angle_mod_90 < min_diff)
+		result = angle_int_90*90;	
+
+	 if( abs(angle_mod_90 - 90) < min_diff)
+		 result = angle_int_90*90 + (angle_mod_90>0 ? 90 : -90);	
+
+	return result;
+}
+
+//=========================================================
 CLItemTransform::CLItemTransform(QGraphicsItem* item):
 m_item(item),
 m_zoom(1.0),
@@ -79,8 +97,6 @@ void CLItemTransform::z_rotate_abs(QPointF center, qreal angle, int duration)
 	if (m_zooming)
 		duration = 0; // do it instantly
 	
-
-
 	if (duration==0)
 	{
 		m_rotatePoint = center;
@@ -109,7 +125,16 @@ void CLItemTransform::z_rotate_delta(QPointF center, qreal angle, int duration)
 {
 	if (m_zooming)
 		duration = 0; // do it instantly
+	
+	//=============
 
+	if (duration!=0) // if animation
+	{
+		qreal final = round_angle(m_Zrotation.curent + angle, 2);
+		angle = final - m_Zrotation.curent;
+	}
+
+	//=============
 
 	if (duration==0)
 	{
