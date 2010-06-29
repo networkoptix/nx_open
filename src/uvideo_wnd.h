@@ -26,6 +26,11 @@ public:
 
 	void stop_animation();
 
+	//====rotation=======
+	void drawRotationHelper(bool val);
+	void setRotationPoint(QPointF point1, QPointF point2);
+
+
 
 protected:
 	virtual void drawStuff(QPainter* painter);
@@ -36,15 +41,19 @@ protected:
 private:
 
 	void drawSelection(QPainter* painter);
+	void drawRotationHelper(QPainter* painter);
 
 private:
 	bool m_selected;
 	bool m_fullscreen; // could be only if m_selected
-
 	int m_z;
-
 	CLItemTransform m_animationTransform;
 	GraphicsView* m_view;
+
+	//rotattion
+	bool m_draw_rotation_helper;
+	QPointF m_rotation_center;
+	QPointF m_rotation_hand;
 
 
 };

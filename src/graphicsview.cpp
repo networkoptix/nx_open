@@ -209,6 +209,10 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 				QLineF old_line(center_point, old_point);
 				QLineF new_line(center_point, new_point);
 
+				m_rotatingWnd->setRotationPoint(center_point, new_point);
+				m_rotatingWnd->drawRotationHelper(true);
+
+
 
 				qreal angle = new_line.angleTo(old_line);
 
@@ -269,8 +273,12 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 	if (rotating && right_button)
 	{
 		
+
 		if (isWndStillExists(m_rotatingWnd))
 		{
+
+			m_rotatingWnd->drawRotationHelper(false);
+			
 
 			int dx = 0;
 			int dy = 0;
@@ -302,6 +310,8 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 				m_rotatingWnd->z_rotate_delta(center_point, angle, item_rotation_duration);
 				
 			}
+			else
+				m_rotatingWnd->update();
 		}
 		
 	}
