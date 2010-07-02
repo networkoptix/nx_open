@@ -22,7 +22,8 @@
 
 #include <QTransform>
 
-QColor bkr_color(0,5,15);
+//QColor bkr_color(0,5,15);
+QColor bkr_color(9/1.5,54/1.5,81/1.5);
 
 #define CL_VIDEO_ROWS 4
 
@@ -49,7 +50,7 @@ m_scene_bottom(0)
 
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
-	QPalette palette;
+	
 	//=======================================================
 
 	setAutoFillBackground(false);
@@ -81,11 +82,15 @@ m_scene_bottom(0)
 	m_videoView.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
 	//m_videoView.setBackgroundBrush(QPixmap("c:/photo/32.jpg"));
+	//m_scene.setItemIndexMethod(QGraphicsScene::NoIndex);
 
 	m_videoView.setScene(&m_scene);
 
+	QPalette palette;
 	palette.setColor(backgroundRole(), bkr_color);
 	setPalette(palette);
+	
+
 
 
 	palette.setColor(m_videoView.backgroundRole(), bkr_color);

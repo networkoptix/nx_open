@@ -27,7 +27,7 @@ private:
 	void transform_helper();
 
 private slots:
-	void onNewFrame(int frame);
+	void valueChanged ( qreal pos );
 
 
 

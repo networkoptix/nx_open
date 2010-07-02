@@ -18,7 +18,7 @@ public:
 
 
 private slots:
-	virtual void onNewFrame(int frame);
+	void valueChanged ( qreal pos );
 
 protected:
 

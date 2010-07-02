@@ -16,7 +16,7 @@ public:
 	bool isRuning() const;
 
 protected slots:
-		virtual void onNewFrame(int frame)=0;
+		virtual void valueChanged ( qreal pos ) = 0;
 		virtual void onFinished();
 protected:
 		void start_helper(int duration);

@@ -91,11 +91,8 @@ void CLSceneMovement::move (QPointF dest, int duration)
 	start_helper(duration);
 }
 
-
-void CLSceneMovement::onNewFrame(int pos)
+void CLSceneMovement::valueChanged ( qreal dpos )
 {
-	qreal dpos = qreal(pos)/m_timeline.endFrame();
-
 	QPointF move(m_delta.x()*dpos, m_delta.y()*dpos);
 
 

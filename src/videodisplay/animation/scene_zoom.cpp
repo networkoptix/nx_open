@@ -60,11 +60,10 @@ void CLSceneZoom::zoom_delta(qreal delta, int duration)
 	zoom_helper(duration);
 }
 
-void CLSceneZoom::onNewFrame(int frame)
-{
-	qreal dpos = qreal(frame)/m_timeline.endFrame();
-	qreal start_point = m_targetzoom - m_diff;
 
+void CLSceneZoom::valueChanged( qreal dpos )
+{
+	qreal start_point = m_targetzoom - m_diff;
 	m_zoom = start_point + m_diff*dpos;
 
 	//cl_log.log("m_zoom =", (float)m_zoom, cl_logDEBUG1);

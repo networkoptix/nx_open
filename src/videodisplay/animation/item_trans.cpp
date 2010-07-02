@@ -159,11 +159,8 @@ void CLItemTransform::z_rotate_delta(QPointF center, qreal angle, int duration)
 	
 }
 
-void CLItemTransform::onNewFrame(int frame)
+void CLItemTransform::valueChanged( qreal pos )
 {
-	
-	qreal pos = qreal(frame)/m_timeline.endFrame();
-
 	if (m_zooming)
 		m_zoom.curent = m_zoom.start_point + pos*m_zoom.diff;
 

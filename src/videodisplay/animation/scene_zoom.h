@@ -26,7 +26,7 @@ public:
 
 
 private slots:
-	void onNewFrame(int frame);
+	void valueChanged( qreal dpos );
 	
 
 protected:

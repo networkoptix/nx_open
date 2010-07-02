@@ -12,7 +12,7 @@ m_timeline(CLAnimationTimeLine::CLAnimationCurve::SLOW_END_POW_40)
 	m_timeline.setUpdateInterval(5); // 60 fps
 
 
-	connect(&m_timeline, SIGNAL(frameChanged(int)), this, SLOT(onNewFrame(int)));
+	connect(&m_timeline, SIGNAL(valueChanged(qreal)), this, SLOT(valueChanged(qreal)));
 	connect(&m_timeline, SIGNAL(finished()), this, SLOT(onFinished()));
 }
 
