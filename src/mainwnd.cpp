@@ -38,7 +38,7 @@ extern int scene_zoom_duration;
 MainWnd::MainWnd(QWidget *parent, Qt::WFlags flags):
 //QMainWindow(parent, flags),
 m_selectedcCam(0),
-m_camlayout(CL_VIDEO_ROWS, CL_MAX_CAM_SUPPORTED),
+m_camlayout(&m_videoView, &m_scene, CL_VIDEO_ROWS, 40),
 m_scene_right(0),
 m_scene_bottom(0)
 {
@@ -242,9 +242,7 @@ void MainWnd::onVideoTimer()
 
 void MainWnd::onNewDevice(CLDevice* device)
 {
-
-	int position = m_camlayout.getNextAvailablePos(device->getVideoLayout());
-	if (position==-1)
+	if (!m_camlayout.isSpaceAvalable())
 	{
 		// max reached
 		cl_log.log("Cannot support so many devicees ", cl_logWARNING);
@@ -253,14 +251,14 @@ void MainWnd::onNewDevice(CLDevice* device)
 		return;
 	}
 
-	int width_max, heigh_max;
-	getMaxWndSize(device->getVideoLayout(), width_max, heigh_max);
+	QSize wnd_size = m_camlayout.getMaxWndSize(device->getVideoLayout());
+	
 
-	VideoWindow* video_wnd =  new VideoWindow(&m_videoView, device->getVideoLayout(), width_max, heigh_max);
+	VideoWindow* video_wnd =  new VideoWindow(&m_videoView, device->getVideoLayout(), wnd_size.width() , wnd_size.height());
 	CLVideoCamera* cam = new VideoCamera(device, video_wnd);
 	video_wnd->setVideoCam(cam);
 
-	m_camlayout.addCamera(position, cam);
+	m_camlayout.addWnd(video_wnd);
 
 
 	if (device->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT)) // do not show fps if it's still shot
@@ -272,7 +270,6 @@ void MainWnd::onNewDevice(CLDevice* device)
 
 	//connect(video_wnd, SIGNAL(onVideoItemSelected(CLVideoWindow*)), this, SLOT(onVideoItemSelected(CLVideoWindow*)));
 	//connect(video_wnd, SIGNAL(onVideoItemMouseRightClick(CLVideoWindow*)), this, SLOT(onVideoItemMouseRightClick(CLVideoWindow*)));
-	connect(video_wnd, SIGNAL(onAspectRatioChanged(CLVideoWindow*)), this, SLOT(onAspectRatioChanged(CLVideoWindow*)));
 
 	
 
@@ -296,43 +293,6 @@ void MainWnd::onNewDevice(CLDevice* device)
 	onDeviceRestarted(reader, cam);
 
 
-	int x,y;
-
-	getCamPosition_helper(cam, position, x, y);
-	video_wnd->setPos(x , y );
-
-	if (x + width_max>m_scene_right)
-		m_scene_right = x + width_max;
-
-	if (y + heigh_max>m_scene_bottom)
-		m_scene_bottom = y + heigh_max;
-
-	m_videoView.setSceneRect(0,0,2*SCENE_LEFT + m_scene_right + 4*SLOT_WIDTH, 2*SCENE_TOP + m_scene_bottom );
-
-	qreal per = 10.0; // 100% means that width is 2 times more than scene_width
-	int scene_width = m_scene_right - SCENE_LEFT;
-	int scene_height = m_scene_bottom - SCENE_TOP;
-	QRect rect(SCENE_LEFT - scene_width*per/200, SCENE_TOP - scene_height*per/200, scene_width*(1+per/100), scene_height*(1+per/100));
-
-	//======================================
-	/*
-	static int i = 0;
-	i++;
-
-	if (i==4)
-	{
-		QPen pen(Qt::green);
-		m_scene.addRect(rect, pen);
-	}
-	/**/
-	//======================================
-
-
-	m_videoView.setRealSceneRect(rect);
-	
-
-
-	m_scene.addItem(video_wnd);
 	cam->startDispay();
 
 
@@ -441,53 +401,3 @@ bool MainWnd::isSelectedCamStillExists() const
 
 }
 
-void MainWnd::onAspectRatioChanged(CLVideoWindow* wnd)
-{
-	
-	CLVideoCamera* cam = wnd->getVideoCam();
-	if (cam==0)
-		return;
-
-	int x,y;
-
-	getCamPosition_helper(cam, m_camlayout.getPos(cam), x, y);
-
-	wnd->setPos(x , y );
-	
-
-}
-
-void MainWnd::getMaxWndSize(const CLDeviceVideoLayout* layout, int& max_width, int& max_height)
-{
-	int dlw = layout->width();
-	int dlh = layout->height();
-	max_width = SLOT_WIDTH*(dlw + SLOT_DISTANCE*(dlw-1));
-	max_height = SLOT_HEIGHT*(dlh + SLOT_DISTANCE*(dlh-1));
-}
-
-void MainWnd::getCamPosition_helper(CLVideoCamera* cam, int position, int& x_pos, int& y_pos)
-{
-	CLVideoWindow* wnd = cam->getVideoWindow();
-
-
-	float aspect = wnd->aspectRatio();
-
-
-	int width_max, height_max;
-	getMaxWndSize(cam->getDevice()->getVideoLayout(), width_max, height_max);
-
-
-	int width = wnd->width();
-	int height = wnd->height();
-
-	int dx = (width_max - width)/2;
-	int dy = (height_max - height)/2;
-
-	int x,y;
-	m_camlayout.getXY(position, x, y);
-
-	x_pos = x * SLOT_WIDTH* (1+SLOT_DISTANCE) + dx  + SCENE_LEFT;
-	y_pos = y * SLOT_HEIGHT * (1+SLOT_DISTANCE) + dy + SCENE_TOP;
-
-
-}

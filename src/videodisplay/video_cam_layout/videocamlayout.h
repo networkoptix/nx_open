@@ -27,7 +27,12 @@ public:
 	VideoCamerasLayout(GraphicsView* view, QGraphicsScene* scene, unsigned int max_rows, int item_distance); // item distance is preferable distance between windows in % of wnd size
 	~VideoCamerasLayout();
 
+	// means that at least one wnd can be added 
+	bool isSpaceAvalable() const;
+
 	QSize getMaxWndSize(const CLDeviceVideoLayout* layout) const;
+
+	void adjustWnd(CLVideoWindow* wnd) const;
 
 	QRect getLayoutRect() const; // scene rect 
 
@@ -53,8 +58,8 @@ public:
 	QSet<CLVideoWindow*> getWndList() const;
 
 
-	bool hasSuchWnd(CLVideoWindow*) const;
-	bool hasSuchCam(CLVideoCamera*) const;
+	bool hasSuchWnd(const CLVideoWindow*) const;
+	bool hasSuchCam(const CLVideoCamera*) const;
 
 
 	// return wnd on the center of the lay out;

@@ -49,6 +49,9 @@ public:
 	int imageWidth() const;
 	int imageHeight() const;
 
+	void setArranged(bool arr);
+	bool isArranged() const;
+
 	void setShowFps(bool show);
 	void setShowInfoText(bool show);
 	void setShowImagesize(bool show);
@@ -78,7 +81,6 @@ signals:
 	void onVideoItemSelected(CLVideoWindow*);
 	void onVideoItemMouseRightClick(CLVideoWindow*);
 
-	void onAspectRatioChanged(CLVideoWindow*);
 
 protected:
 	
@@ -88,6 +90,7 @@ protected:
 	virtual void drawLostConnection(QPainter* painter);
 	virtual void drawInfoText(QPainter* painter);
 
+	virtual void onAspectRatioChanged()=0;
 
 
 
@@ -120,6 +123,8 @@ protected:
 
 	int m_imageWidth_old;
 	int m_imageHeight_old;
+
+	bool m_arranged;
 
 
 

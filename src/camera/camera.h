@@ -25,8 +25,11 @@ public:
 	void coppyImage(bool copy);
 
 	CLDevice* getDevice() const;
+
 	CLStreamreader* getStreamreader();
 	CLVideoWindow* getVideoWindow();
+	const CLVideoWindow* getVideoWindow() const;
+
 	CLStatistics* getStatistics();
 	CLCamDisplay* getCamCamDisplay();
 

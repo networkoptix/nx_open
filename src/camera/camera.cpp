@@ -85,6 +85,12 @@ CLVideoWindow* CLVideoCamera::getVideoWindow()
 	return m_videovindow;
 }
 
+const CLVideoWindow* CLVideoCamera::getVideoWindow() const
+{
+	return m_videovindow;
+}
+
+
 CLStatistics* CLVideoCamera::getStatistics()
 {
 	return m_stat;

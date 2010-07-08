@@ -7,6 +7,7 @@
 #include "uvideo_wnd.h"
 #include "videodisplay/video_cam_layout/videocamlayout.h"
 #include "camera/camera.h"
+#include <QSet>
 
 
 
@@ -81,12 +82,12 @@ void GraphicsView::setAllItemsQuality(CLStreamreader::StreamQuality q, bool incr
 {
 	cl_log.log("new quality", q, cl_logDEBUG1);
 	
-	QSet<CLVideoCamera*> camlst = m_camLayout->getCamList();
+	QSet<CLVideoWindow*> wndlst = m_camLayout->getWndList();
 
-	QSetIterator<CLVideoCamera*> it(camlst);
-	while (it.hasNext())
+	
+	foreach (CLVideoWindow* wnd, wndlst)
 	{
-		CLVideoCamera* cam = it.next();
+		CLVideoCamera* cam = wnd->getVideoCam();
 
 		cam->setQuality(q, increase);
 	}
@@ -435,32 +436,28 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 	if (e->nativeModifiers() && last_sel_wnd)
 	{
 		
-		CLVideoCamera* cam = last_sel_wnd->getVideoCam();
-		CLVideoCamera* next_cam = 0;
+		CLVideoWindow* next_wnd = 0;
 
 		switch (e->key()) 
 		{
 		case Qt::Key_Left:
-			next_cam = m_camLayout->getNextLeftCam(cam);
+			next_wnd = m_camLayout->getNextLeftWnd(last_sel_wnd);
 			break;
 		case Qt::Key_Right:
-			next_cam = m_camLayout->getNextRightCam(cam);
+			next_wnd = m_camLayout->getNextLeftWnd(last_sel_wnd);
 			break;
 		case Qt::Key_Up:
-			next_cam = m_camLayout->getNextTopCam(cam);
+			next_wnd = m_camLayout->getNextLeftWnd(last_sel_wnd);
 			break;
 		case Qt::Key_Down:
-			next_cam = m_camLayout->getNextBottomCam(cam);
+			next_wnd = m_camLayout->getNextLeftWnd(last_sel_wnd);
 			break;
 
 		}
 
-		if (next_cam)
+		if (next_wnd)
 		{
-			CLVideoWindow* wnd = (next_cam->getVideoWindow());
-
-			if (wnd)
-				onNewItemSelected_helper(static_cast<VideoWindow*>(wnd));
+			onNewItemSelected_helper(static_cast<VideoWindow*>(next_wnd));
 		}
 
 	}
@@ -574,11 +571,11 @@ VideoWindow* GraphicsView::getLastSelectedWnd()
 	}
 		
 	
-	CLVideoCamera* cam = m_camLayout->getFirstCam();
-	if (!cam)
+	CLVideoWindow* wnd = m_camLayout->getCenterWnd();
+	if (!wnd)
 		return 0;
 
-	return static_cast<VideoWindow*>(cam->getVideoWindow());
+	return static_cast<VideoWindow*>(wnd);
 	
 }
 
@@ -586,8 +583,7 @@ VideoWindow* GraphicsView::getLastSelectedWnd()
 
 bool GraphicsView::isWndStillExists(const VideoWindow* wnd) const
 {
-	CLVideoCamera* cam = wnd->getVideoCam();
-	if ( m_camLayout->getPos(cam) >=0 )// if still exists ( in layout)
+	if ( m_camLayout->hasSuchWnd(wnd) )// if still exists ( in layout)
 		return true;
 }
 

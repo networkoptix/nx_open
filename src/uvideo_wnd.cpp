@@ -117,10 +117,12 @@ void VideoWindow::drawStuff(QPainter* painter)
 
 
 }
-
-
-
 //===========================================
+
+void VideoWindow::onAspectRatioChanged()
+{
+	
+}
 
 void VideoWindow::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {

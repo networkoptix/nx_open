@@ -43,6 +43,8 @@ private:
 	void drawSelection(QPainter* painter);
 	void drawRotationHelper(QPainter* painter);
 
+	virtual void onAspectRatioChanged();
+
 private:
 	bool m_selected;
 	bool m_fullscreen; // could be only if m_selected

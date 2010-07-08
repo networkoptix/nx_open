@@ -21,7 +21,7 @@ VideoCamerasLayout::VideoCamerasLayout(GraphicsView* view, QGraphicsScene* scene
 m_view(view),
 m_scene(scene),
 m_height(max_rows),
-m_item_distance(item_distance/100),
+m_item_distance(item_distance/100.0),
 m_max_items(max_items),
 m_slots(max_items*4)
 {
@@ -69,7 +69,7 @@ QRect VideoCamerasLayout::getLayoutRect() const
 bool VideoCamerasLayout::getNextAvailablePos(const CLDeviceVideoLayout* layout, int &x, int &y) const
 {
 	// new item should always be adjusted 
-	if (m_wnds.size()==m_max_items)
+	if (!isSpaceAvalable())
 		return false;
 
 	QPoint mass_cnt = getMassCenter();
@@ -81,7 +81,7 @@ bool VideoCamerasLayout::getNextAvailablePos(const CLDeviceVideoLayout* layout, 
 	for (int i = 0; i < m_total_potential_elemnts; ++i)
 	{
 		int candidate_x = center_slot_x + m_potantial_x[i];
-		int candidate_y = center_slot_y + m_potantial_x[i];
+		int candidate_y = center_slot_y + m_potantial_y[i];
 
 		if (candidate_x < 0 || candidate_x > m_width-1 || candidate_y < 0 ||  candidate_y > m_height-1) 
 			continue;
@@ -101,11 +101,15 @@ bool VideoCamerasLayout::getNextAvailablePos(const CLDeviceVideoLayout* layout, 
 
 }
 
+bool VideoCamerasLayout::isSpaceAvalable() const
+{
+	return (m_wnds.size()<m_max_items);
+}
 
 bool VideoCamerasLayout::addWnd(CLVideoWindow* wnd, int x, int y, int z_order, bool update_scene_rect)
 {
 	// new item should always be adjusted 
-	if (m_wnds.size()==m_max_items)
+	if (!isSpaceAvalable())
 		return false;
 
 	if (!wnd)
@@ -130,10 +134,8 @@ bool VideoCamerasLayout::addWnd(CLVideoWindow* wnd,  int z_order, bool update_sc
 	if (!getNextAvailablePos(wnd->getVideoLayout(), x, y))
 		return false;
 
-	addWnd(wnd, x, y, z_order);
-
-	if (update_scene_rect)
-		updateSceneRect();
+	addWnd(wnd, x, y, z_order, update_scene_rect);
+	wnd->setArranged(true);
 
 }
 
@@ -168,16 +170,18 @@ QSet<CLVideoWindow*> VideoCamerasLayout::getWndList() const
 
 
 
-bool VideoCamerasLayout::hasSuchWnd(CLVideoWindow* wnd) const
+bool VideoCamerasLayout::hasSuchWnd(const CLVideoWindow* wnd) const
 {
-	return m_wnds.contains(wnd);
+	CLVideoWindow* wnd_t = const_cast<CLVideoWindow*>(wnd);
+	return m_wnds.contains(wnd_t);
 }
 
-bool VideoCamerasLayout::hasSuchCam(CLVideoCamera* cam) const
+bool VideoCamerasLayout::hasSuchCam(const CLVideoCamera* cam) const
 {
-	CLVideoWindow* wnd = cam->getVideoWindow();
+	const CLVideoWindow* wnd = cam->getVideoWindow();
+	CLVideoWindow* wnd_t = const_cast<CLVideoWindow*>(wnd);
 
-	return m_wnds.contains(wnd);
+	return m_wnds.contains(wnd_t);
 }
 
 
@@ -409,7 +413,7 @@ QPoint VideoCamerasLayout::getNextCloserstAvailableForWndSlot_butFrom_list___hel
 
 	// this function search for next available nearest slot for this wnd
 	// if slot already in lst; we ignore such slot 
-	QPointF pf = wnd->mapToScene(wnd->boundingRect().center());
+	QPointF pf = wnd->mapToScene(wnd->boundingRect().topLeft());
 
 	int center_slot = slotFromPos(QPoint(pf.x(), pf.y()));
 	int center_slot_x = center_slot%m_width;
@@ -462,6 +466,17 @@ QList<CLIdealWndPos> VideoCamerasLayout::calcArrangedPos() const
 		pos.wnd = wnd;
 		pos.pos = getNextCloserstAvailableForWndSlot_butFrom_list___helper(wnd, result);
 
+		int width = wnd->width();
+		int height = wnd->height();
+
+		QSize max_size = getMaxWndSize(wnd->getVideoLayout());
+
+		pos.pos.rx() += (max_size.width() - width)/2;
+		pos.pos.ry() += (max_size.height() - height)/2;
+
+		
+
+
 		result.push_back(pos);
 	}
 
@@ -470,7 +485,25 @@ QList<CLIdealWndPos> VideoCamerasLayout::calcArrangedPos() const
 
 
 //===============================================================
+void VideoCamerasLayout::adjustWnd(CLVideoWindow* wnd) const
+{
+	QPointF p = wnd->mapToScene(wnd->boundingRect().topLeft());
 
+	QPoint new_p  = posFromSlot(slotFromPos( QPoint(p.x(),p.y()) ));
+
+	int width = wnd->width();
+	int height = wnd->height();
+
+	QSize max_size = getMaxWndSize(wnd->getVideoLayout());
+
+	new_p.rx() += (max_size.width() - width)/2;
+	new_p.ry() += (max_size.height() - height)/2;
+
+	wnd->setPos(new_p);
+
+}
+
+//===============================================================
 CLVideoWindow* VideoCamerasLayout::getVeryLeftWnd() const
 {
 	CLVideoWindow* result = 0;

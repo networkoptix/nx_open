@@ -22,9 +22,8 @@ m_imageWidth_old(0),
 m_imageHeight_old(0),
 m_opacity(0.0),
 m_videonum(layout->numberOfChannels()),
-m_cam(0)
-
-
+m_cam(0),
+m_arranged(true)
 {
 	//we never cache the video
 	//setCacheMode(DeviceCoordinateCache);
@@ -86,7 +85,7 @@ void CLVideoWindow::draw(CLVideoDecoderOutput& image, unsigned int channel)
 		m_imageWidth_old = m_imageWidth;
 		m_imageHeight_old = m_imageHeight;
 
-		emit onAspectRatioChanged(this);
+		onAspectRatioChanged();
 	}
 
 }
@@ -95,6 +94,16 @@ void CLVideoWindow::copyVideoDataBeforePainting(bool copy)
 {
 	for (int i = 0; i  < m_videonum; ++i)
 		m_gldraw[i]->copyVideoDataBeforePainting(copy);
+}
+
+void CLVideoWindow::setArranged(bool arr)
+{
+	m_arranged = arr;
+}
+
+bool CLVideoWindow::isArranged() const
+{
+	return m_arranged;
 }
 
 
