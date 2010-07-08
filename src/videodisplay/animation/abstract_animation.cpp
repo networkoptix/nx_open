@@ -9,7 +9,7 @@ m_timeline(CLAnimationTimeLine::CLAnimationCurve::SLOW_END_POW_40)
 	//m_timeline.setCurveShape(QTimeLine::CurveShape::LinearCurve);
 	m_timeline.setDuration(2000);
 	m_timeline.setFrameRange(0, 200000);
-	m_timeline.setUpdateInterval(5); // 60 fps
+	m_timeline.setUpdateInterval(1000/120); // 60 fps
 
 
 	connect(&m_timeline, SIGNAL(valueChanged(qreal)), this, SLOT(valueChanged(qreal)));

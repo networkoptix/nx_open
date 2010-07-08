@@ -20,7 +20,7 @@ m_imageWidth(0),
 m_imageHeight(0),
 m_imageWidth_old(0),
 m_imageHeight_old(0),
-m_opacity(0),
+m_opacity(0.0),
 m_videonum(layout->numberOfChannels()),
 m_cam(0)
 
@@ -189,11 +189,13 @@ void CLVideoWindow::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
 	restoreGLState();
 
 
+	/*
 	if (m_opacity>0)
 	{
 		painter->fillRect(QRect(0, 0, width(), height()),
 			QColor(0, 0, 50, m_opacity));
 	}
+	/**/
 
 
 	

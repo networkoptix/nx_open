@@ -27,12 +27,8 @@ QColor bkr_color(9/1.5,54/1.5,81/1.5);
 
 #define CL_VIDEO_ROWS 4
 
-#define SLOT_WIDTH 640*10
-#define SLOT_HEIGHT (SLOT_WIDTH*3/4)
-#define SLOT_DISTANCE (0.40)
 
-#define SCENE_LEFT (200*1000)
-#define SCENE_TOP (200*1000)
+
 
 
 extern CLDiviceSeracher dev_searcher;
