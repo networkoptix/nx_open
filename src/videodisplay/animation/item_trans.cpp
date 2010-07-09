@@ -191,4 +191,8 @@ void CLItemTransform::transform_helper()
 
 	m_item->setTransform(trans);
 
+	//QPointF pf = m_item->mapToScene(m_item->boundingRect().topLeft());
+	//cl_log.log("left = ",  (int)pf.x(), cl_logDEBUG1 );
+
+
 }

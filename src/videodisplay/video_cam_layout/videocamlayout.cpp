@@ -496,9 +496,10 @@ QList<CLIdealWndPos> VideoCamerasLayout::calcArrangedPos() const
 //===============================================================
 void VideoCamerasLayout::adjustWnd(CLVideoWindow* wnd) const
 {
+	
 	QPointF p = wnd->mapToScene(wnd->boundingRect().topLeft());
 
-	QPoint new_p  = posFromSlot(slotFromPos( QPoint(p.x(),p.y()) ));
+	QPoint new_p  = posFromSlot(slotFromPos( QPoint(p.x() + SLOT_WIDTH/2,p.y() + SLOT_HEIGHT/2) )); // this addition as not good at all; due to item zoom topLeft pos might be shifted to diff slot
 
 	int width = wnd->width();
 	int height = wnd->height();
