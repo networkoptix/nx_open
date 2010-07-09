@@ -81,7 +81,7 @@ signals:
 	void onVideoItemSelected(CLVideoWindow*);
 	void onVideoItemMouseRightClick(CLVideoWindow*);
 
-
+	void onAspectRatioChanged(CLVideoWindow* wnd);
 protected:
 	
 	virtual void drawStuff(QPainter* painter);
@@ -90,7 +90,7 @@ protected:
 	virtual void drawLostConnection(QPainter* painter);
 	virtual void drawInfoText(QPainter* painter);
 
-	virtual void onAspectRatioChanged()=0;
+	
 
 
 

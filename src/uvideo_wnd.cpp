@@ -119,11 +119,6 @@ void VideoWindow::drawStuff(QPainter* painter)
 }
 //===========================================
 
-void VideoWindow::onAspectRatioChanged()
-{
-	
-}
-
 void VideoWindow::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
 	if (m_view->getZoom() < 0.25)

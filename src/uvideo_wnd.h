@@ -5,6 +5,7 @@
 #include "./videodisplay/animation/item_trans.h"
 
 class GraphicsView;
+class VideoCamerasLayout;
 
 class VideoWindow :  public CLVideoWindow
 {
@@ -43,7 +44,6 @@ private:
 	void drawSelection(QPainter* painter);
 	void drawRotationHelper(QPainter* painter);
 
-	virtual void onAspectRatioChanged();
 
 private:
 	bool m_selected;
@@ -52,11 +52,10 @@ private:
 	CLItemTransform m_animationTransform;
 	GraphicsView* m_view;
 
-	//rotattion
+	//rotation
 	bool m_draw_rotation_helper;
 	QPointF m_rotation_center;
 	QPointF m_rotation_hand;
-
 
 };
 

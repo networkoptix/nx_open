@@ -72,7 +72,8 @@ bool VideoCamerasLayout::getNextAvailablePos(const CLDeviceVideoLayout* layout, 
 	if (!isSpaceAvalable())
 		return false;
 
-	QPoint mass_cnt = getMassCenter();
+	//QPoint mass_cnt = getMassCenter();
+	QPoint mass_cnt = QPoint(SCENE_LEFT,SCENE_TOP); 
 
 	int center_slot = slotFromPos(mass_cnt);
 	int center_slot_x = center_slot%m_width;
@@ -124,6 +125,8 @@ bool VideoCamerasLayout::addWnd(CLVideoWindow* wnd, int x, int y, int z_order, b
 
 	if (update_scene_rect)
 		updateSceneRect();
+
+	connect(wnd, SIGNAL(onAspectRatioChanged(CLVideoWindow*)), this, SLOT(onAspectRatioChanged(CLVideoWindow*)));
 
 }
 
@@ -345,6 +348,12 @@ CLVideoWindow* VideoCamerasLayout::next_wnd_helper(const CLVideoWindow* curr, in
 
 	return const_cast<CLVideoWindow*>(curr);
 
+}
+
+void VideoCamerasLayout::onAspectRatioChanged(CLVideoWindow* wnd)
+{
+	if (wnd->isArranged())
+		adjustWnd(wnd);
 }
 
 CLVideoWindow* VideoCamerasLayout::getNextLeftWnd(const CLVideoWindow* curr) const
@@ -609,7 +618,7 @@ int VideoCamerasLayout::slotFromPos(QPoint p) const
 	x = x/( SLOT_WIDTH*(1+m_item_distance) );
 	y = y/( SLOT_HEIGHT*(1+m_item_distance) );
 
-	return y*m_height + x;
+	return y*m_width + x;
 }
 
 QPoint VideoCamerasLayout::posFromSlot(int slot) const
@@ -687,7 +696,7 @@ void VideoCamerasLayout::buildPotantial()
 		int dx = abs(curr_x - center_x);
 		int dy = abs(curr_y - center_y);
 
-		potential_energy[i] = dx*dx + dy*dy*4/3;
+		potential_energy[i] = 4*dx*dx + 4*dy*dy*4/3;
 	}
 
 	for (int i = 0; i < m_total_potential_elemnts; ++i)

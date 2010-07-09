@@ -85,7 +85,7 @@ void CLVideoWindow::draw(CLVideoDecoderOutput& image, unsigned int channel)
 		m_imageWidth_old = m_imageWidth;
 		m_imageHeight_old = m_imageHeight;
 
-		onAspectRatioChanged();
+		emit onAspectRatioChanged(this);
 	}
 
 }

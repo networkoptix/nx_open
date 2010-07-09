@@ -21,8 +21,9 @@ struct CLIdealWndPos
 
 // class provides just helper tool to navigate layouts 
 // takes in account that one cam can have few wnd
-class VideoCamerasLayout
+class VideoCamerasLayout : public QObject
 {
+	Q_OBJECT
 public:
 	VideoCamerasLayout(GraphicsView* view, QGraphicsScene* scene, unsigned int max_rows, int item_distance); // item distance is preferable distance between windows in % of wnd size
 	~VideoCamerasLayout();
@@ -75,8 +76,11 @@ public:
 
 	QList<CLIdealWndPos> calcArrangedPos() const;
 
-
+protected slots:
+	void onAspectRatioChanged(CLVideoWindow* wnd);
 private:
+
+	
 
 	int next_wnd_helper_get_quarter(const QPointF& current, const QPointF& other) const;
 	CLVideoWindow* next_wnd_helper(const CLVideoWindow* curr, int dir_c, int dir_f) const;
