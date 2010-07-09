@@ -237,10 +237,10 @@ int VideoCamerasLayout::next_wnd_helper_get_quarter(const QPointF& current, cons
 	/**/
 
 
-	int dx = current.x() - other.x();
-	int dy = current.y() - other.y();
+	int dx = other.x() - current.x();
+	int dy = other.y() - current.y();
 	
-	if (dx*dx + dy*dy<8)
+	if ((qreal)dx*dx + dy*dy<8)
 		return -1; // if distance is so small we should
 
 	qreal dir;
@@ -295,7 +295,8 @@ CLVideoWindow* VideoCamerasLayout::next_wnd_helper(const CLVideoWindow* curr, in
 	QPointF cP = curr->mapToScene(curr->boundingRect().center());
 
 	//looking for closest left wnd 
-	int dx, dy, distance, min_distance = 0xffffff, max_distance = 0;
+	int dx, dy;
+	qreal min_distance = 1e+20, max_distance = 0, distance;
 
 	CLVideoWindow* result = 0;
 
@@ -310,7 +311,7 @@ CLVideoWindow* VideoCamerasLayout::next_wnd_helper(const CLVideoWindow* curr, in
 		dx = cP.x() - p.x();
 		dy = cP.y() - p.y();
 
-		distance = dx*dx + dy*dy;
+		distance = (qreal)dx*dx + dy*dy;
 
 		if (distance < min_distance)
 		{

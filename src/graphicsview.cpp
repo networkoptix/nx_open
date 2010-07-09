@@ -444,13 +444,13 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 			next_wnd = m_camLayout->getNextLeftWnd(last_sel_wnd);
 			break;
 		case Qt::Key_Right:
-			next_wnd = m_camLayout->getNextLeftWnd(last_sel_wnd);
+			next_wnd = m_camLayout->getNextRightWnd(last_sel_wnd);
 			break;
 		case Qt::Key_Up:
-			next_wnd = m_camLayout->getNextLeftWnd(last_sel_wnd);
+			next_wnd = m_camLayout->getNextTopWnd(last_sel_wnd);
 			break;
 		case Qt::Key_Down:
-			next_wnd = m_camLayout->getNextLeftWnd(last_sel_wnd);
+			next_wnd = m_camLayout->getNextBottomWnd(last_sel_wnd);
 			break;
 
 		}
