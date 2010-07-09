@@ -49,6 +49,7 @@ protected:
 	void mouseSpeed_helper(qreal& mouse_speed,  int& dx, int&dy, int min_spped, int speed_factor);
 	bool isWndStillExists(const VideoWindow* wnd) const;
 
+	void scene_movement_limit_helper(VideoWindow* wnd, int& dx, int &dy);
 
 private slots:
 

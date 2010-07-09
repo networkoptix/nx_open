@@ -241,6 +241,10 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 	//cl_log.log("====mouseReleaseEvent===", cl_logDEBUG1);
 
+	QGraphicsItem *item = itemAt(event->pos());
+	VideoWindow* wnd = static_cast<VideoWindow*>(item);
+
+
 	bool left_button = event->button() == Qt::LeftButton;
 	bool right_button = event->button() == Qt::RightButton;
 	bool handMoving = m_handMoving>2;
@@ -267,7 +271,17 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 		mouseSpeed_helper(mouse_speed,dx,dy,150,1900);
 
 		if (dx!=0 || dy!=0)
+		{
+			if (wnd && (wnd->isFullScreen() || m_scenezoom.getZoom() >= m_fullScreenZoom) )
+			{
+				// we are looking at full screen zoomed item
+				// in this case we should not move to the naxt item
+				scene_movement_limit_helper(wnd,dx,dy);
+
+			}
+			 
 			m_movement.move(-dx,-dy, scene_move_duration + mouse_speed);
+		}
 
 	}
 
@@ -322,9 +336,6 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 	if (!handMoving && left_button) // if left button released and we did not move the scene, so may bee need to zoom on the item
 	{
 
-			QGraphicsItem *item = itemAt(event->pos());
-			VideoWindow* wnd = static_cast<VideoWindow*>(item);
-
 			if(!wnd) // not item and any button
 			{
 
@@ -353,12 +364,21 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 				setZeroSelection();
 			}
 			
-
-			if (wnd && wnd!=m_selectedWnd && left_button ) // item and left button
+			if (wnd && wnd!=m_selectedWnd) // item and left button
 			{
 				// new item selected 
 				onNewItemSelected_helper(wnd);
 			}
+
+			/*
+			else if (wnd && wnd==m_selectedWnd) // selected item and left button
+			{
+				// new item selected 
+				setZeroSelection();
+				m_scenezoom.zoom_default(scene_zoom_duration);
+			}
+			/**/
+
 
 			/*
 			// if we zoomed more that just FS
@@ -556,7 +576,9 @@ void GraphicsView::resizeEvent( QResizeEvent * event )
 {
 	if (m_selectedWnd && m_selectedWnd->isFullScreen())
 		onItemFullScreen_helper(m_selectedWnd);
-
+	else
+		//fitInView(getRealSceneRect(),Qt::KeepAspectRatio);
+		centerOn(getRealSceneRect().center());
 
 }
 
@@ -580,6 +602,18 @@ VideoWindow* GraphicsView::getLastSelectedWnd()
 }
 
 //=====================================================
+void GraphicsView::scene_movement_limit_helper(VideoWindow* wnd, int& dx, int &dy)
+{
+	QPointF startP_scene = mapToScene(viewport()->rect().center());
+	
+	QPoint dest = viewport()->rect().center();
+	dest.rx()+=dx;
+	dest.ry()+=dy;
+
+
+	
+
+}
 
 bool GraphicsView::isWndStillExists(const VideoWindow* wnd) const
 {
