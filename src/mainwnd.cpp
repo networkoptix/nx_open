@@ -22,8 +22,8 @@
 
 #include <QTransform>
 
-//QColor bkr_color(0,5,15);
-QColor bkr_color(9/1.5,54/1.5,81/1.5);
+QColor bkr_color(0,5,25);
+//QColor bkr_color(9/1.5,54/1.5,81/1.5);
 
 #define CL_VIDEO_ROWS 4
 

@@ -272,15 +272,43 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 		if (dx!=0 || dy!=0)
 		{
-			if (wnd && (wnd->isFullScreen() || m_scenezoom.getZoom() >= m_fullScreenZoom) )
+			bool fullscreen = false;
+
+			if (wnd)
 			{
-				// we are looking at full screen zoomed item
-				// in this case we should not move to the naxt item
-				scene_movement_limit_helper(wnd,dx,dy);
+				// we released button on some wnd; 
+				// we need to find out is it a "fullscreen mode", and if so restrict the motion
+				// coz we are looking at full screen zoomed item
+				// in this case we should not move to the next item
+
+
+				if (wnd->isFullScreen())
+					fullscreen = true;
+
+				if (!fullscreen)
+				{
+					// still we might zoomed in a lot manually and will deal with this window as with new full screen one
+					QRectF wnd_rect =  wnd->sceneBoundingRect();
+					QRectF viewport_rec = mapToScene(viewport()->rect()).boundingRect();
+
+					if (wnd_rect.width() >= 0.999*viewport_rec.width() || wnd_rect.height() >= 0.999*viewport_rec.height())
+					{
+						// size of wnd is bigger than the size of view_port
+						if (wnd != m_selectedWnd) 
+							setZeroSelection();
+
+						fullscreen = true;
+						m_selectedWnd = wnd;
+						m_last_selectedWnd = wnd;
+					}
+
+				}
+
+		
 
 			}
 			 
-			m_movement.move(-dx,-dy, scene_move_duration + mouse_speed);
+			m_movement.move(-dx,-dy, scene_move_duration + mouse_speed, fullscreen);
 		}
 
 	}
@@ -602,19 +630,6 @@ VideoWindow* GraphicsView::getLastSelectedWnd()
 }
 
 //=====================================================
-void GraphicsView::scene_movement_limit_helper(VideoWindow* wnd, int& dx, int &dy)
-{
-	QPointF startP_scene = mapToScene(viewport()->rect().center());
-	
-	QPoint dest = viewport()->rect().center();
-	dest.rx()+=dx;
-	dest.ry()+=dy;
-
-
-	
-
-}
-
 bool GraphicsView::isWndStillExists(const VideoWindow* wnd) const
 {
 	if ( m_camLayout->hasSuchWnd(wnd) )// if still exists ( in layout)

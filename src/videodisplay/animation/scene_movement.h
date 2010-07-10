@@ -14,7 +14,7 @@ public:
 	virtual ~CLSceneMovement();
 
 	void move (QPointF dest, int duration);
-	void move (int dx, int dy, int duration);
+	void move (int dx, int dy, int duration, bool limited = false);
 
 
 private slots:
@@ -27,6 +27,7 @@ protected:
 	QPointF m_startpoint;
 	QPointF m_delta;
 
+	bool m_limited;
 
 };
 

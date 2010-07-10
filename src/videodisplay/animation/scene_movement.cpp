@@ -60,7 +60,8 @@ int limit_val(int val, int min_val, int max_val, bool mirror)
 //========================================================================================
 
 CLSceneMovement::CLSceneMovement(GraphicsView* gview):
-m_view(gview)
+m_view(gview),
+m_limited(false)
 {
 	
 }
@@ -71,19 +72,22 @@ CLSceneMovement::~CLSceneMovement()
 }
 
 
-void CLSceneMovement::move (int dx, int dy, int duration)
+void CLSceneMovement::move(int dx, int dy, int duration, bool limited)
 {
 	QPoint curr = m_view->viewport()->rect().center();
 	curr.rx()+=dx;
 	curr.ry()+=dy;
 
-
 	move(m_view->mapToScene(curr), duration);
+
+	m_limited = limited; // this will overwrite false value set inside move_abs function above
 }
 
 void CLSceneMovement::move (QPointF dest, int duration)
 {
 	//cl_log.log("CLSceneMovement::move() ", cl_logDEBUG1);
+
+	m_limited = false;
 
 	m_startpoint = m_view->mapToScene(m_view->viewport()->rect().center());
 	m_delta = dest - m_startpoint;
@@ -117,7 +121,25 @@ void CLSceneMovement::valueChanged ( qreal dpos )
 
 
 	//=======================================
-	if (m_view->getSelectedWnd())
+	if (m_limited && m_view->getSelectedWnd())
+	{
+		VideoWindow* wnd = m_view->getSelectedWnd();
+
+		QPointF wnd_center = wnd->mapToScene(wnd->boundingRect().center());
+		QPointF final_dest = m_startpoint + m_delta;
+		QPointF curr = m_view->mapToScene(m_view->viewport()->rect().center());
+
+		if (QLineF(final_dest, wnd_center).length() > QLineF(curr, wnd_center).length()   ) 
+		{
+			// if difference between final point and wnd center is more than curr and wnd center => moving out of wnd center
+
+			int n = 0;
+			stop();
+		}
+
+
+	}
+	else if (m_view->getSelectedWnd())
 	{
 		VideoWindow* wnd = m_view->getSelectedWnd();
 
@@ -133,13 +155,9 @@ void CLSceneMovement::valueChanged ( qreal dpos )
 		// else
 		diff = selected_center - result;
 
-		
-		int height = wnd->height();
-
 
 		if ( abs(diff.x()) > wnd->width()*1.2 || abs(diff.y()) > wnd->height()*1.2)
 			m_view->setZeroSelection();
-
 	}
 
 	
