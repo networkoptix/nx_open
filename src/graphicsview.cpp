@@ -638,7 +638,7 @@ bool GraphicsView::isWndStillExists(const VideoWindow* wnd) const
 
 void GraphicsView::toggleFullScreen_helper(VideoWindow* wnd)
 {
-	if (!wnd->isFullScreen() || m_scenezoom.getZoom() > m_fullScreenZoom + 1e-6) // if item is not in full screen mode or if it's in FS and zoomed more
+	if (!wnd->isFullScreen() || m_scenezoom.getZoom() > m_fullScreenZoom + 1e-8) // if item is not in full screen mode or if it's in FS and zoomed more
 		onItemFullScreen_helper(wnd);
 	else
 	{

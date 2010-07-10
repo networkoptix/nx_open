@@ -132,9 +132,40 @@ void CLSceneMovement::valueChanged ( qreal dpos )
 		if (QLineF(final_dest, wnd_center).length() > QLineF(curr, wnd_center).length()   ) 
 		{
 			// if difference between final point and wnd center is more than curr and wnd center => moving out of wnd center
+			int dx = curr.x() - wnd_center.x();
+			int dy = curr.y() - wnd_center.y();
 
-			int n = 0;
-			stop();
+			qreal percent = 0.05;
+
+			QRectF wnd_rect =  wnd->sceneBoundingRect();
+			QRectF viewport_rec = m_view->mapToScene(m_view->viewport()->rect()).boundingRect();
+
+
+			if (dx<0)
+			{
+				if ( (wnd_rect.topLeft().x() -  viewport_rec.topLeft().x()) >  percent*wnd_rect.width())
+					stop();
+			}
+
+			if (dx>0)
+			{
+				if ( (viewport_rec.topRight().x() - wnd_rect.topRight().x()) >  percent*wnd_rect.width())
+					stop();
+			}
+
+			if (dy<0)
+			{
+				if ( (wnd_rect.topLeft().y() - viewport_rec.topLeft().y()) >  percent*wnd_rect.height())
+					stop();
+			}
+
+			if (dy>0)
+			{
+				if ( (viewport_rec.bottomLeft().y()- wnd_rect.bottomRight().y()) >  percent*wnd_rect.height())
+					stop();
+			}
+			
+			
 		}
 
 
