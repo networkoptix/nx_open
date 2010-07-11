@@ -12,7 +12,8 @@ m_first_draw(true),
 m_showfps(true),
 m_showinfotext(true),
 m_showimagesize(true),
-m_FPS_Font("arial black", 250),
+//m_FPS_Font("arial black", 250),
+m_FPS_Font("Courier New", 250),
 m_Info_Font("times", 110),
 m_max_width(max_width),
 m_max_heght(max_height),
@@ -243,7 +244,8 @@ void CLVideoWindow::drawFPS(QPainter* painter)
 {
 	painter->setFont(m_FPS_Font);
 
-	painter->setPen(QColor(0,255,0,170));
+	//painter->setPen(QColor(0,255,0,170));
+	painter->setPen(QColor(0,240,240,170));
 	
 	char fps[100];
 
@@ -252,7 +254,7 @@ void CLVideoWindow::drawFPS(QPainter* painter)
 
 		QRect rect = getSubChannelRect(i);
 
-		sprintf(fps, "%6.2f fps %6.2f Mbps", m_stat[i]->getFrameRate(), m_stat[i]->getBitrate());
+		sprintf(fps, "%6.2ffps %6.2fMbps", m_stat[i]->getFrameRate(), m_stat[i]->getBitrate());
 		QFontMetrics fm(painter->font());
 		painter->drawText(rect.left(),rect.top()+170 + fm.height()/2, fps);
 
