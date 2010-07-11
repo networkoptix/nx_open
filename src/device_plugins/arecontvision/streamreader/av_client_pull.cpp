@@ -28,7 +28,7 @@ void CLAVClinetPullStreamReader::setQuality(StreamQuality q)
 
 		pl.get("resolution").value.value = "full";
 
-		pl.get("quality").value.value = "16";
+		pl.get("quality").value.value = "15";
 
 		break;
 

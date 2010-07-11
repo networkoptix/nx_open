@@ -256,13 +256,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 	Size size;
 	
 
-	if(AV8365 == m_model || AV8185 == m_model || AV8180 == m_model || AV8360 == m_model)
-	{
-		const unsigned char* arr = last_packet + 0x0C;
-		arr[0] & 4 ? resolutionFULL = true : false;
-		size = ExtractSize(&arr[2]);
-	}
-	else if(AV3135 == m_model || AV3130 == m_model)
+	if(AV3135 == m_model || AV3130 == m_model)
 	{
 		size = ExtractSize(last_packet + 12);
 	}

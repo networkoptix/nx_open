@@ -49,115 +49,50 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 	QTextStream os(&request);
 
 	int forecast_size = 0;
-	int left;
-	int top;
-	int right;
-	int bottom;
-
-
-	int width;
-	int height;
-
-	int quality;
-
-	bool resolutionFULL;
-	int streamID;
-
-	int bitrate;
 
 	bool h264;
+	int streamID = 0;
+
+	int width = 1600;
+	int height = 1200;
+	bool resolutionFULL = true;
+
+	int quality = 15;
 
 	{
-			QMutexLocker mutex(&m_params_CS);
+		QMutexLocker mutex(&m_params_CS);
 
-			h264 = false;
+		h264 = false;
 
-			if (m_streamParam.exists("codec")) // cam is not jpeg only
-			{
-				CLParam codec = m_streamParam.get("codec");
-				if (codec.value.value != QString("JPEG"))
-					h264 = true;
-			}
-			
-			if (!m_streamParam.exists("quality") || !m_streamParam.exists("resolution") || 
-				!m_streamParam.exists("image_left") || !m_streamParam.exists("image_top") ||
-				!m_streamParam.exists("image_right") || !m_streamParam.exists("image_bottom") ||
-				(h264 && !m_streamParam.exists("streamID")) || (h264 && !m_streamParam.exists("bitrate")))
+		if (m_streamParam.exists("codec")) // cam is not jpeg only
+		{
+			CLParam codec = m_streamParam.get("codec");
+			if (codec.value.value != QString("JPEG"))
+				h264 = true;
+
+			if (!m_streamParam.exists("streamID"))
 			{
 				cl_log.log("Erorr!!! parameter is missing in stream params.", cl_logERROR);
 				return 0;
 			}
 
-			//=========
-			left = m_streamParam.get("image_left").value.value;
-			top = m_streamParam.get("image_top").value.value;
-			right = m_streamParam.get("image_right").value.value;
-			bottom = m_streamParam.get("image_bottom").value.value;
-
-			//right/=2;
-			//bottom/=2;
-
-
-			width = right - left;
-			height = bottom - top;
-
-
-			quality = m_streamParam.get("quality").value.value;
-
-			resolutionFULL = (m_streamParam.get("resolution").value.value == QString("full"));
-
-			streamID = 0;
 			if (h264)
-			{
-				if (width!=m_last_width || height!=m_last_height || m_last_resolution!=resolutionFULL)
-				{
-					// if this is H.264 and if we changed image size, we need to request I frame.
-					// camera itself shoud end I frame. but just in case.. to be on the save side...
-
-					m_last_resolution = resolutionFULL;
-					m_last_width = width;
-					m_last_height = height;
-
-					m_needKeyData = true;
-				}
-
-
 				streamID = m_streamParam.get("streamID").value.value;
-				bitrate = m_streamParam.get("bitrate").value.value;
-			}
-			//=========
+			
+
+			
+
+		}
 
 	}
 
-	if (h264)
-		quality=37-quality; // for H.264 it's not quality; it's qp 
-
-	
 
 	if (!h264)
 		os <<"image";
 	else
-		os<<"h264";
-
-	os<<"?res=";
-
-	if(resolutionFULL)
-		os<<"full";
-	else
-		os<<"half";
-
-	os<<";x0=" << left << ";y0=" << top << ";x1=" << right << ";y1=" << bottom;
-
-	if (!h264)
-		os<<";quality=";
-	else
-		os<<";qp=";
-
-	os<< quality << ";doublescan=0" << ";ssn=" << streamID;
-
-	//h264?res=full;x0=0;y0=0;x1=1600;y1=1184;qp=27;doublescan=0;iframe=0;ssn=574;netasciiblksize1450
-	//image?res=full;x0=0;y0=0;x1=1600;y1=1184;quality=10;doublescan=0;ssn=4184;
-
+	{
+		os<<"h264?ssn="<< streamID;
+	}
 
 	
 	if (h264)
@@ -167,15 +102,10 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 		else
 			os <<";iframe=0;";
 
-
-		//os <<"&iframe=" << *Ifarme;
-
-		if (bitrate)
-			os <<"bitrate=" << bitrate << ";";
 	}
-	/**/
+	
 
-	forecast_size = resolutionFULL ? (width*height)/2  : (width*height)/4; // 0.5 meg per megapixel as maximum 
+	forecast_size = (width*height)/2; // 0.5 meg per megapixel as maximum 
 			
 	
 	
@@ -252,29 +182,16 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 		const unsigned char* arr = last_packet + 0x0C;
 		arr[0] & 4 ? resolutionFULL = true : false;
 		size = ExtractSize(&arr[2]);
+
+		videoData->channel_num = arr[0] & 3;
+
+		//multisensor_is_zoomed = arr[0] & 8;
+		//IMAGE_RESOLUTION res;
+		//arr[0] & 4 ? res = imFULL : res = imHALF;
+
+
+		quality = arr[1];
 	}
-	else if(AV3135 == m_model || AV3130 == m_model)
-	{
-		size = ExtractSize(last_packet + 12);
-	}
-	else
-	{
-		const unsigned char* arr = last_packet + 0x0C + 4 + 64;
-		
-		arr[0] & 4 ? resolutionFULL = true: false;
-		size = ExtractSize(&arr[2]);
-
-		if(!size.width && 3100 == m_model)
-			size.width = 2048;
-
-		if(!resolutionFULL)
-		{
-			size.width /= 2;
-			size.height /= 2;
-		}
-	}
-
-
 
 
 	if (h264 && (lp_size < iframe_index))
@@ -360,7 +277,7 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 	videoData->width = size.width;
 	videoData->height = size.height;
 
-	videoData->channel_num = 0;
+	
 	
 	return videoData;
 
