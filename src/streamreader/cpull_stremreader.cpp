@@ -2,7 +2,36 @@
 #include "../base/sleep.h"
 #include "../base/log.h"
 #include "../data/mediadata.h"
+#include "device/device.h"
+#include "device/device_video_layout.h"
 
+CLClientPullStreamreader::CLClientPullStreamreader(CLDevice* dev ):
+CLStreamreader(dev)
+{
+	for (int i = 0; i < CL_MAX_CHANNEL_NUMBER; ++i)
+		m_key_farme_helper[i] = false;
+
+	m_channel_number = dev->getVideoLayout()->numberOfChannels();
+
+}
+
+void CLClientPullStreamreader::needKeyData()
+{
+	m_needKeyData = true;
+	for (int i = 0; i < m_channel_number; ++i)
+		m_key_farme_helper[i] = false;
+
+}
+
+bool CLClientPullStreamreader::isKeyDataReceived() const
+{
+	for (int i = 0; i < m_channel_number; ++i)
+		if (!m_key_farme_helper[i])
+			return false;
+
+	return true;
+
+}
 
 bool CLClientPullStreamreader::needToRead() const
 {
@@ -81,7 +110,12 @@ void CLClientPullStreamreader::run()
 			// I do not like; need to do smth with it 
 			CLCompressedVideoData *comp_data = static_cast<CLCompressedVideoData *>(data);
 			if (comp_data->keyFrame)
-				m_needKeyData = false;
+			{
+				m_key_farme_helper[data->channel_num] = true;
+
+				if (isKeyDataReceived())
+					m_needKeyData = false;
+			}
 		}
 
 

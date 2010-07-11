@@ -23,6 +23,7 @@ struct CLDeviceRestartHadler
 
 #define CL_MAX_DATASIZE (20*1024*1024) // assume we can never get compressed data with  size greater than this
 
+
 class CLStreamreader : public CLLongRunnable
 {
 public:
@@ -41,7 +42,7 @@ public:
 	void removeDataProcessor(CLAbstractDataProcessor* dp);
 
 
-	void NeedKeyData();
+	virtual void needKeyData();
 
 	void setDeviceRestartHadlerInfo(CLRestartHadlerInfo);
 	void setDeviceRestartHadler(CLDeviceRestartHadler* restartHandler);
@@ -76,6 +77,7 @@ protected:
 	CLDevice* m_device; // reader reads data from this device.
 
 	StreamQuality m_qulity;
+
 
 };
 

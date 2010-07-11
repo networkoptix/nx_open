@@ -2,13 +2,13 @@
 #include "../base/log.h"
 
 
+
 CLStreamreader::CLStreamreader(CLDevice* dev):
 m_restartInfo(0),
 m_restartHandler(0),
 m_device(dev),
 m_qulity(StreamQuality::CLSNormal)
 {
-
 }
 
 CLStreamreader::~CLStreamreader()
@@ -57,7 +57,7 @@ void CLStreamreader::removeDataProcessor(CLAbstractDataProcessor* dp)
 	m_dataprocessors.removeOne(dp);
 }
 
-void CLStreamreader::NeedKeyData()
+void CLStreamreader::needKeyData()
 {
 	m_needKeyData = true;
 }
