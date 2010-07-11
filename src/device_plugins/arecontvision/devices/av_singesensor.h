@@ -4,9 +4,6 @@
 
 #include "av_device.h"
 
-
-
-
 class CLArecontSingleSensorDevice : public CLAreconVisionDevice
 {
 public:

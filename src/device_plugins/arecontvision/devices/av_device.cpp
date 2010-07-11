@@ -6,6 +6,7 @@
 
 
 #include "av_singesensor.h"
+#include "av_panoramic.h"
 
 #include <QFile>
 #include <QDomDocument>
@@ -711,8 +712,10 @@ CLAreconVisionDevice* CLAreconVisionDevice::deviceByID(QString id, int model)
 		return 0;
 	}
 	
-
-	return new CLArecontSingleSensorDevice(model);
+	if (isPanoramic(model))
+		return new  CLArecontPanoramicDevice(model);
+	else
+		return new CLArecontSingleSensorDevice(model);
 }
 
 
@@ -753,3 +756,7 @@ QString CLAreconVisionDevice::toString() const
 
 }
 
+bool CLAreconVisionDevice::isPanoramic(int model)
+{
+	return (model==AV8180 || model==AV8185 || model==AV8360 || model==AV8365);
+}

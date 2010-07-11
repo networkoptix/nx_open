@@ -77,7 +77,12 @@ private:
 	static bool parseDevice(const QDomElement &element, QString& error );
 	static bool parseParam(const QDomElement &element, QString& error, CLParamList& paramlist);
 	static CLAreconVisionDevice* deviceByID(QString id, int model);
+
+	static bool isPanoramic(int model);
+
 	CLAreconVisionDevice(){};
+
+
 
 };
 

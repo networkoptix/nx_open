@@ -1,23 +1,26 @@
-#ifndef av_singlesensor_h_1252
-#define av_singlesensor_h_1252
+#ifndef av_panoramic_device_1820
+#define av_panoramic_device_1820
 
 
 #include "av_device.h"
-#include "av_http_client.h"
 
 
-
-class CLAreconPanoramicDevice : public CLAreconVisionDevice
+class CLArecontPanoramicDevice : public CLAreconVisionDevice
 {
 public:
+	CLArecontPanoramicDevice(int model);
+	bool getDescription();
+	virtual CLStreamreader* getDeviceStreamConnection();
 
-	bool getDescription()
-	{
-		return true;
-	};
+	bool getBaseInfo();
+	QString getFullName() ;
 
+	virtual bool hasTestPattern() const;
 
+protected:
+	bool m_hastestPattern;
 
 };
 
-#endif // av_singlesensor_h_1252
+
+#endif //av_panoramic_device_1820
