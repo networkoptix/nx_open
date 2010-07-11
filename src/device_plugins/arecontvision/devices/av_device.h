@@ -8,14 +8,16 @@ class QDomElement;
 
 
 enum 
-{	AV1300 = 1300, AV1305 = 1305,
+{	
+	AVUNKNOWN = 2000,
+	AV1300 = 1300, AV1305 = 1305,
 	AV2100 = 2100, AV2105 = 2105, 
 	AV3100 = 3100, AV3105 = 3105, 
 	AV3130 = 3130, AV3135 = 3135, 
 	AV5100 = 5100, AV5105 = 5105, 
 	AV8180 = 8180, AV8185 = 8185, 
 	AV8360 = 8360, AV8365 = 8365,
-	AV10005 = 10005
+	AV10005 = 10005, AV2805 = 2805
 };
 
 
@@ -38,11 +40,18 @@ public:
 	QString toString() const;
 
 	
-	virtual bool getDescription() = 0;
+	virtual bool getDescription() {return true;};
 	
 	CLHttpStatus getRegister(int page, int num, int& val);
 	CLHttpStatus setRegister(int page, int num, int val);
 	CLHttpStatus setRegister_asynch(int page, int num, int val);
+
+	CLStreamreader* getDeviceStreamConnection();
+
+	//========
+	virtual bool unknownDevice() const;
+	virtual CLNetworkDevice* updateDevice();
+	//========
 
 	
 	int getModel() const;

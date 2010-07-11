@@ -59,6 +59,37 @@ CLHttpStatus CLAreconVisionDevice::getRegister(int page, int num, int& val)
 	
 }
 
+CLStreamreader* CLAreconVisionDevice::getDeviceStreamConnection()
+{
+	return 0;
+}
+
+bool CLAreconVisionDevice::unknownDevice() const
+{
+	return (getModel()==AVUNKNOWN);
+}
+
+CLNetworkDevice* CLAreconVisionDevice::updateDevice() 
+{
+	CLValue model;
+	if (!getParam("Model", model))
+		return 0;
+	
+	CLNetworkDevice* result = deviceByID(model, model);
+
+	if (!result)
+		return 0;
+
+	result->setName(model);
+	result->setIP(getIP(), false);
+	result->setMAC(getMAC());
+	result->setUniqueId(getMAC());
+	result->setLocalAddr(m_local_adssr);
+	result->setStatus(getStatus());
+
+	return result;
+}
+
 
 int CLAreconVisionDevice::getModel() const
 {
@@ -316,6 +347,8 @@ CLDeviceList CLAreconVisionDevice::findDevices()
 
 				int shift = 32;
 
+				CLAreconVisionDevice* device = 0;
+
 				if (datagram.size() > shift + 5)
 				{
 					model = (unsigned char)data[shift+2] * 256 + (unsigned char)data[shift+3]; //4
@@ -323,21 +356,27 @@ CLDeviceList CLAreconVisionDevice::findDevices()
 					smodel.setNum(model);
 					smodel = smodel;
 					id = smodel; // this is not final version of the ID; it might/must be updated later 
+					device = deviceByID(id, model);
+
+					if (device)
+						device->setName(id);
 				}
 				else
 				{
 					// very old cam; in future need to request model seporatly 
-					id = "hfskjdfh";
+					device = new CLAreconVisionDevice(AVUNKNOWN);
+					device->setName("AVUNKNOWN");
+					
 				}
 
-				CLAreconVisionDevice* device = deviceByID(id, model);
+				
 				if (device==0)
 					continue;
 
 				device->setIP(sender, false);
 				device->setMAC(smac);
 				device->setUniqueId(smac);
-				device->setName(id);
+				
 
 				
 				CLDeviceStatus dh;

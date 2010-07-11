@@ -275,6 +275,10 @@ CLDeviceList CLDiviceSeracher::findNewDevices(bool allow_to_change_ip, bool& ip_
 
 END:
 
+	// ok. at this point devices contains only network devices. and some of them have unknownDevice==true;
+	// we need to resolve such devices 
+	devices = resolveUnknown_helper(devices);
+
 	CLDevice::mergeLists(devices, not_network_devices); // move everything to result list
 
 	return devices;
@@ -372,5 +376,51 @@ void CLDiviceSeracher::markConflictingDevices(CLDeviceList& lst, int threads)
 	for (int i = 0; i < threads; ++i )global->reserveThread();
 
 
+
+}
+
+CLDeviceList CLDiviceSeracher::resolveUnknown_helper(CLDeviceList& lst)
+{
+
+	CLDeviceList result;
+
+	CLDeviceList::iterator it = lst.begin();
+	while (it!=lst.end())
+	{
+		CLNetworkDevice* device = static_cast<CLNetworkDevice*>(it.value());
+
+		if (!device->unknownDevice() || 
+			device->getStatus().checkFlag(CLDeviceStatus::CONFLICTING) ||
+			device->getStatus().checkFlag(CLDeviceStatus::NOT_IN_SUBNET))
+		{
+			// if this is not unknown device or if we cannot access it anyway
+			result[device->getUniqueId()] = device;
+			++it;
+			continue;
+		}
+
+		// device is unknown and not conflicting 
+		CLNetworkDevice* new_device = device->updateDevice();
+
+		if (new_device)
+		{
+			// device updated
+			result[new_device->getUniqueId()] = new_device;
+			device->releaseRef();
+		}
+		else
+		{
+			// must be we still can not access to this device
+			device->getStatus().setFlag(CLDeviceStatus::CONFLICTING);
+			result[device->getUniqueId()] = device;
+		}
+
+
+		++it;
+	}
+
+	
+
+	return result;
 
 }

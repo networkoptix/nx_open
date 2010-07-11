@@ -23,6 +23,8 @@ public:
 	// always return true if net = false
 	virtual bool setIP(const QHostAddress& ip, bool net = true);
 
+	void setLocalAddr(QHostAddress addr);
+
 	QString getMAC() const;
 	void  setMAC(const QString& mac);
 	
@@ -38,6 +40,15 @@ public:
 
 	virtual QString toString() const;
 
+	//=============
+	// some time we can find device, but cannot request additional information from it ( device has bad ip for example )
+	// in this case we need to request additional information later.
+	// unknownDevice - tels if we need that additional information 
+	virtual bool unknownDevice() const = 0;
+
+	// updateDevice requests the additional  information and return device with the same mac, ip but ready to use...
+	virtual CLNetworkDevice* updateDevice()  = 0;
+	//=============
 	
 
 protected:

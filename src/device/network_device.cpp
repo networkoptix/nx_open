@@ -29,6 +29,11 @@ bool CLNetworkDevice::setIP(const QHostAddress& ip, bool net )
 	return true;
 }
 
+void CLNetworkDevice::setLocalAddr(QHostAddress addr)
+{
+	m_local_adssr = addr;
+}
+
 QString CLNetworkDevice::getMAC() const
 {
 	return m_mac;

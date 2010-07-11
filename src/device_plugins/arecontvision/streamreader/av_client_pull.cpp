@@ -28,7 +28,7 @@ void CLAVClinetPullStreamReader::setQuality(StreamQuality q)
 
 		pl.get("resolution").value.value = "full";
 
-		pl.get("quality").value.value = "19";
+		pl.get("quality").value.value = "16";
 
 		break;
 
@@ -36,7 +36,7 @@ void CLAVClinetPullStreamReader::setQuality(StreamQuality q)
 	case CLSNormal:
 
 		pl.get("resolution").value.value = "half";
-		pl.get("quality").value.value = "12";
+		pl.get("quality").value.value = "10";
 
 	    break;
 

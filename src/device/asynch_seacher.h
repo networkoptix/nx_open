@@ -55,6 +55,8 @@ private:
 
 private:
 
+	CLDeviceList resolveUnknown_helper(CLDeviceList& lst);
+
 	CLDeviceList m_result;
 	bool m_allow_change_ip;
 
