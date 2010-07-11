@@ -190,8 +190,8 @@ void MainWnd::onTimer()
 
 	if (first_time && m_scene.items().size()==0) 
 	{
-		CLDirectoryBrowserDeviceServer dirbrowsr("c:/Photo");
-		onNewDevices_helper(dirbrowsr.findDevices());
+		//CLDirectoryBrowserDeviceServer dirbrowsr("c:/Photo");
+		//onNewDevices_helper(dirbrowsr.findDevices());
 	}
 
 	if (first_time && m_scene.items().size()) // at least something is found

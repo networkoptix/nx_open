@@ -65,6 +65,9 @@ protected:
 	{
 	}
 	
+	// some AV devices are really challenging to integrate with
+	// so this function will do really dirty work about some special cam params
+	virtual bool setParam_special(const QString& name, const CLValue& val);
 
 public:
 	static CLDeviceList findDevices();

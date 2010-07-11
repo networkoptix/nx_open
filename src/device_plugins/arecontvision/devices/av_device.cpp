@@ -211,6 +211,10 @@ bool CLAreconVisionDevice::getParam(const QString& name, CLValue& val, bool resy
 
 }
 
+bool CLAreconVisionDevice::setParam_special(const QString& name, const CLValue& val)
+{
+	return false;
+}
 
 bool CLAreconVisionDevice::setParam(const QString& name, const CLValue& val )
 {
@@ -221,6 +225,9 @@ bool CLAreconVisionDevice::setParam(const QString& name, const CLValue& val )
 
 	if (!CLDevice::setParam(name, val))
 		return false;
+
+	if (setParam_special(name, val)) // try special first 
+		return true;
 
 	CLParamType& value = getDevicePramList().get(name).value;
 

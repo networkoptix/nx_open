@@ -41,6 +41,10 @@ QSize VideoCamerasLayout::getMaxWndSize(const CLDeviceVideoLayout* layout) const
 	int dlw = layout->width();
 	int dlh = layout->height();
 
+	//dlw = 1;
+	//dlh = 1;
+
+
 	return QSize(SLOT_WIDTH*(dlw + m_item_distance*(dlw-1)), SLOT_HEIGHT*(dlh + m_item_distance*(dlh-1)));
 }
 

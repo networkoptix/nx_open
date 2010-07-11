@@ -136,3 +136,50 @@ bool CLArecontPanoramicDevice::hasTestPattern() const
 {
 	return m_hastestPattern;
 }
+
+bool CLArecontPanoramicDevice::setParam_special(const QString& name, const CLValue& val)
+{
+	if (name=="resolution")
+	{
+		if (val==(QString)("half"))
+			return setResolution(false);
+		else if (val==(QString)("full"))
+			return setResolution(true);
+
+		return false;
+	}
+	else if (name=="quality")
+	{
+		int q = val;
+		if (q<1 || q>21)
+			return false;
+
+		return setQulity(q);
+		
+	}
+
+
+	return false;
+}
+
+//=======================================================================
+bool CLArecontPanoramicDevice::setResolution(bool full)
+{
+	int value = full ? 15 : 0; // all sensors to full/half resolution
+
+	if (CL_HTTP_SUCCESS!=setRegister(3, 0xD1, value)) // FULL RES QULITY
+		return false;
+	
+	return true;
+}
+
+bool CLArecontPanoramicDevice::setQulity(int q)
+{
+	if (CL_HTTP_SUCCESS!=setRegister(3, 0xED, q)) // FULL RES QULITY
+		return false;
+
+
+	if (CL_HTTP_SUCCESS!=setRegister(3, 0xEE, q)) // HALF RES QULITY
+		return false;
+
+}
