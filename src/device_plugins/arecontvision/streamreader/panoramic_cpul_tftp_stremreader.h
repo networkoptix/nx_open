@@ -25,7 +25,7 @@ protected:
 	
 protected:
 
-	int m_last_width;
+	int m_last_width; // to avoid frequent moving data!!
 	int m_last_height;
 	bool m_last_resolution;
 

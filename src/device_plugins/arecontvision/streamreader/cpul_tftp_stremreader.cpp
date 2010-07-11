@@ -16,15 +16,10 @@ extern int create_sps_pps(
 
 
 
-struct Size
-{
-	int x0, y0, width, height;
-};
-
-Size ExtractSize(const unsigned char* arr)
+AVLastPacketSize ExtractSize(const unsigned char* arr)
 {
 	const int fc = 256;
-	Size size;
+	AVLastPacketSize size;
 	size.x0 = static_cast<unsigned char>(arr[0]) * fc + static_cast<unsigned char>(arr[1]),
 		size.y0 = static_cast<unsigned char>(arr[2]) * fc + static_cast<unsigned char>(arr[3]);
 	size.width = static_cast<unsigned char>(arr[4]) * fc + static_cast<unsigned char>(arr[5]) - size.x0,
@@ -47,6 +42,10 @@ CLAVClinetPullStreamReader(dev)
 	
 	m_last_width = 0;
 	m_last_height = 0;
+
+	m_last_cam_width = 0;
+	m_last_cam_height = 0;
+
 }
 
 
@@ -109,6 +108,14 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 
 			width = right - left;
 			height = bottom - top;
+
+			if (m_last_cam_width==0)
+				m_last_cam_width = width;
+
+			if (m_last_cam_height==0)
+				m_last_cam_height= height;
+
+
 
 
 			quality = m_streamParam.get("quality").value.value;
@@ -205,7 +212,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 		// 3) we do not nees to put SPS and PPS in before each, but we can.
 
 		unsigned char h264header[50];
-		expectable_header_size = create_sps_pps(resolutionFULL ? width : width/2, resolutionFULL ? height: height/2, 0, h264header, sizeof(h264header));
+		expectable_header_size = create_sps_pps(m_last_cam_width , m_last_cam_height, 0, h264header, sizeof(h264header));
 		img.prepareToWrite(expectable_header_size + 5 ); // 5: from cam in tftp mode we receive data starts from second byte of slice header; so we need to put start code and first byte
 		img.done(expectable_header_size + 5 ); 
 
@@ -253,7 +260,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 		iframe_index = 93;
 	}
 
-	Size size;
+	AVLastPacketSize size;
 	
 
 	if(AV3135 == m_model || AV3130 == m_model)
@@ -275,6 +282,10 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 			size.width /= 2;
 			size.height /= 2;
 		}
+
+		m_last_cam_width = size.width;
+		m_last_cam_height = size.height;
+
 	}
 
 
@@ -320,7 +331,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 				if (diff>0)
 					img.prepareToWrite(diff);
 
-				//cl_log.log("moving data!!", cl_logWARNING);
+				cl_log.log("moving data!!", cl_logWARNING);
 
 				memmove(img.data() + 5 + header_size, img.data() + 5 + expectable_header_size, img.size() - (5 + expectable_header_size));
 				img.done(diff);

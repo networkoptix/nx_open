@@ -27,6 +27,11 @@ protected:
 
 	int m_last_width;
 	int m_last_height;
+
+	int m_last_cam_width;
+	int m_last_cam_height;
+
+
 	bool m_last_resolution;
 
 	QHostAddress m_ip;

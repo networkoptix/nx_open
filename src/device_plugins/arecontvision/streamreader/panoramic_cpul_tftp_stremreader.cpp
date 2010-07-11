@@ -14,14 +14,8 @@ extern int create_sps_pps(
 				   int deblock_filter,
 				   unsigned char* data, int max_datalen);
 
-struct Size
-{
-	int x0, y0, width, height;
-};
 
-
-
-extern Size ExtractSize(const unsigned char* arr);
+extern AVLastPacketSize ExtractSize(const unsigned char* arr);
 
 
 //=========================================================
@@ -36,8 +30,10 @@ CLAVClinetPullStreamReader(dev)
 	m_ip = device->getIP();
 	m_timeout = 500;
 	
-	m_last_width = 0;
-	m_last_height = 0;
+	m_last_width = 1600;
+	m_last_height = 1200;
+
+
 }
 
 
@@ -53,8 +49,8 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 	bool h264;
 	int streamID = 0;
 
-	int width = 1600;
-	int height = 1200;
+	int width = m_last_width;
+	int height = m_last_height;
 	bool resolutionFULL = true;
 
 	int quality = 15;
@@ -174,7 +170,7 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 		iframe_index = 93;
 	}
 
-	Size size;
+	AVLastPacketSize size;
 	
 
 	if(AV8365 == m_model || AV8185 == m_model || AV8180 == m_model || AV8360 == m_model)
@@ -182,6 +178,10 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 		const unsigned char* arr = last_packet + 0x0C;
 		arr[0] & 4 ? resolutionFULL = true : false;
 		size = ExtractSize(&arr[2]);
+
+		m_last_width = size.width;
+		m_last_height = size.height;
+
 
 		videoData->channel_num = arr[0] & 3;
 
@@ -234,7 +234,7 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 				if (diff>0)
 					img.prepareToWrite(diff);
 
-				//cl_log.log("moving data!!", cl_logWARNING);
+				cl_log.log("moving data!!", cl_logWARNING);
 
 				memmove(img.data() + 5 + header_size, img.data() + 5 + expectable_header_size, img.size() - (5 + expectable_header_size));
 				img.done(diff);

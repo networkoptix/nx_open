@@ -3,6 +3,12 @@
 
 #include "../../../streamreader/cpull_stremreader.h"
 
+struct AVLastPacketSize
+{
+	int x0, y0, width, height;
+};
+
+
 class CLAVClinetPullStreamReader : public CLClientPullStreamreader
 {
 public:
