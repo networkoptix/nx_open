@@ -37,7 +37,7 @@ void CLAVClinetPullStreamReader::setQuality(StreamQuality q)
 		if (pl.exists("quality"))
 			pl.get("quality").value.value = "15";
 		else
-			m_device->setParam_asynch("quality", "21"); // panoramic
+			m_device->setParam_asynch("quality", "15"); // panoramic
 
 	
 

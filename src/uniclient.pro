@@ -44,7 +44,7 @@ SOURCES += device_plugins/arecontvision/streamreader/panoramic_cpul_tftp_stremre
 HEADERS += device_plugins/arecontvision/devices/av_device.h device_plugins/arecontvision/devices/av_device_server.h device_plugins/arecontvision/devices/av_panoramic.h device_plugins/arecontvision/devices/av_singesensor.h
 HEADERS += device_plugins/arecontvision/streamreader/cpul_file_test.h device_plugins/arecontvision/streamreader/cpul_httpstremreader.h device_plugins/arecontvision/streamreader/cpul_tftp_stremreader.h device_plugins/arecontvision/streamreader/av_client_pull.h
 HEADERS += device_plugins/arecontvision/tools/AVJpegHeader.h device_plugins/arecontvision/tools/simple_tftp_client.h
-SOURCES += device_plugins/arecontvision/streamreader/panoramic_cpul_tftp_stremreader.h
+HEADERS += device_plugins/arecontvision/streamreader/panoramic_cpul_tftp_stremreader.h
 
 SOURCES += device_plugins/fake/devices/fake_device_server.cpp device_plugins/fake/devices/fake_device.cpp
 SOURCES += device_plugins/fake/streamreader/fake_file_streamreader.cpp

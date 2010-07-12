@@ -38,6 +38,7 @@ protected:
 	void mouseDoubleClickEvent ( QMouseEvent * e );
 
 	virtual void keyPressEvent( QKeyEvent * e );
+	virtual void keyReleaseEvent( QKeyEvent * e );
 
 	void resizeEvent ( QResizeEvent * event );
 
@@ -49,6 +50,7 @@ protected:
 	void mouseSpeed_helper(qreal& mouse_speed,  int& dx, int&dy, int min_spped, int speed_factor);
 	bool isWndStillExists(const VideoWindow* wnd) const;
 
+	void reAdjustSceneRect();
 	
 
 private slots:
@@ -79,6 +81,7 @@ protected:
 	VideoWindow* m_selectedWnd;
 	VideoWindow* m_last_selectedWnd;
 	VideoWindow* m_rotatingWnd;
+	VideoWindow* m_movingWnd;
 
 	QRect m_realSceneRect;
 	const VideoCamerasLayout* m_camLayout;
@@ -86,6 +89,9 @@ protected:
 	bool m_ignore_release_event;
 
 	qreal m_fullScreenZoom;
+
+	bool m_CTRL_pressed;
+
 	
 };
 

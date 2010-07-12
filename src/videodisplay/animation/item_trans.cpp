@@ -26,8 +26,10 @@ CLItemTransform::CLItemTransform(QGraphicsItem* item):
 m_item(item),
 m_zoom(1.0),
 m_Zrotation(0.0),
+m_movment(QPointF(0,0)),
 m_zooming(false),
-m_rotating(false)
+m_rotating(false),
+m_moving(false)
 {
 	m_timeline.setCurve(CLAnimationTimeLine::CLAnimationCurve::SLOW_END_POW_30);
 }
@@ -42,6 +44,7 @@ void CLItemTransform::stop()
 	CLAbstractAnimation::stop();
 	m_rotating = false;
 	m_zooming = false;
+	m_moving = false;
 }
 
 void CLItemTransform::onFinished()
@@ -49,6 +52,7 @@ void CLItemTransform::onFinished()
 	CLAbstractAnimation::onFinished();
 	m_zooming = false;
 	m_rotating = false;
+	m_moving = false;
 }
 
 qreal CLItemTransform::zoomToscale(qreal zoom) const
@@ -61,7 +65,12 @@ qreal CLItemTransform::scaleTozoom(qreal scale) const
 	return scale;
 }
 
-void CLItemTransform::zoom(qreal target_zoom, int duration)
+void CLItemTransform::move_abs(QPointF pos, int duration)
+{
+	//m_moving.start_point = m_item->scenePos()
+}
+
+void CLItemTransform::zoom_abs(qreal target_zoom, int duration)
 {
 
 	if (m_rotating)

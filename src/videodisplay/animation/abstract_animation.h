@@ -25,17 +25,20 @@ protected:
 	int m_defaultduration;
 
 protected:
+	template< typename T>
 	struct CLAnimationUnit
 	{
-		CLAnimationUnit(qreal val)
+		CLAnimationUnit(T val)
 		{
-			diff = 0;
+			diff = T();
 			curent = val;
 			start_point = val;
+			target = val;
 		}
-		qreal curent;
-		qreal start_point;
-		qreal diff;
+		T curent;
+		T start_point;
+		T diff;
+		T target;
 	};
 
 

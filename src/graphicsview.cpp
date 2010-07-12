@@ -34,7 +34,9 @@ m_selectedWnd(0),
 m_last_selectedWnd(0),
 m_camLayout(0),
 m_ignore_release_event(false),
-m_rotatingWnd(0)
+m_rotatingWnd(0),
+m_movingWnd(0),
+m_CTRL_pressed(false)
 {
 
 }
@@ -136,15 +138,18 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 	if (wnd)
 		wnd->stop_animation();
 
-
-	if (event->button() == Qt::LeftButton) 
+	if (event->button() == Qt::LeftButton && m_CTRL_pressed)
+	{
+		m_movingWnd = wnd;
+	}
+	else if (event->button() == Qt::LeftButton && !m_CTRL_pressed) 
 	{
 		// Left-button press in scroll hand mode initiates hand scrolling.
 
         m_handScrolling = true;
 		viewport()->setCursor(Qt::ClosedHandCursor);
 	}
-	else if (event->button() == Qt::RightButton) 
+	else if (event->button() == Qt::RightButton && !m_CTRL_pressed) 
 	{
 		m_rotatingWnd = wnd;
 
@@ -161,6 +166,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 	bool left_button = event->buttons() & Qt::LeftButton;
 	bool right_button = event->buttons() & Qt::RightButton;
 
+	// scene movement 
 	if (m_handScrolling && left_button) 
 	{
 		QPoint delta = event->pos() - m_mousestate.getLastEventPoint();
@@ -174,11 +180,23 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 		//cl_log.log("==m_handMoving!!!=====", cl_logDEBUG1);
 
 		++m_handMoving;
-
-		m_mousestate.mouseMoveEventHandler(event);
-
-		
 	}
+
+	//item movement 
+	if (m_movingWnd && left_button)
+	{
+		if (isWndStillExists(m_movingWnd))
+		{
+			QPointF delta = mapToScene(event->pos()) - mapToScene(m_mousestate.getLastEventPoint());
+			//QPointF wnd_pos = m_movingWnd->scenePos(); <---- this does not work coz item zoom ;case1
+
+			QPointF wnd_pos = m_movingWnd->sceneBoundingRect().center();
+			wnd_pos-=QPointF(m_movingWnd->width()/2, m_movingWnd->height()/2);
+			m_movingWnd->setPos(wnd_pos+delta);
+			m_movingWnd->setArranged(false);
+		}
+	}
+
 
 	if (m_rotatingWnd && right_button)
 	{
@@ -221,13 +239,11 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 			}
 			
 		}
-
 		
-		
-		m_mousestate.mouseMoveEventHandler(event);
 	}
 
 
+	m_mousestate.mouseMoveEventHandler(event);
 	QGraphicsView::mouseMoveEvent(event);
 }
 
@@ -361,7 +377,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 	//====================================================
 
-	if (!handMoving && left_button) // if left button released and we did not move the scene, so may bee need to zoom on the item
+	if (!handMoving && left_button && !m_CTRL_pressed) // if left button released and we did not move the scene, so may bee need to zoom on the item
 	{
 
 			if(!wnd) // not item and any button
@@ -428,7 +444,14 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 	}
 
 	if (left_button)
+	{
 		m_handMoving = 0;
+		if (m_movingWnd)
+		{
+			reAdjustSceneRect();
+			m_movingWnd =0;
+		}
+	}
 
 	if (right_button)
 	{
@@ -464,6 +487,23 @@ void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
 
 
 
+void GraphicsView::keyReleaseEvent( QKeyEvent * e )
+{
+	switch (e->key()) 
+	{
+	case Qt::Key_Control:
+		m_CTRL_pressed = false;
+		if (m_movingWnd)
+		{
+			reAdjustSceneRect();
+			m_movingWnd =0;
+		}
+		break;
+
+	}
+
+}
+
 void GraphicsView::keyPressEvent( QKeyEvent * e )
 {
 
@@ -478,6 +518,11 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 			m_yRotate -= 1;
 			updateTransform();
 			break;
+
+		case Qt::Key_Control:
+			m_CTRL_pressed = true;
+			break;
+
 	}
 
 	// ===========new item selection 
@@ -606,7 +651,11 @@ void GraphicsView::resizeEvent( QResizeEvent * event )
 		onItemFullScreen_helper(m_selectedWnd);
 	else
 		//fitInView(getRealSceneRect(),Qt::KeepAspectRatio);
+	{
 		centerOn(getRealSceneRect().center());
+		//updateSceneRect();
+		invalidateScene();
+	}
 
 }
 
@@ -627,6 +676,13 @@ VideoWindow* GraphicsView::getLastSelectedWnd()
 
 	return static_cast<VideoWindow*>(wnd);
 	
+}
+
+void GraphicsView::reAdjustSceneRect()
+{
+	QRect r = m_camLayout->getLayoutRect();
+	setSceneRect(0,0, 2*r.right(), 2*r.bottom());
+	setRealSceneRect(r);
 }
 
 //=====================================================
@@ -664,7 +720,7 @@ void GraphicsView::onNewItemSelected_helper(VideoWindow* new_wnd)
 	m_selectedWnd->setSelected(true);
 
 	m_movement.move(point, item_select_duration);
-	m_scenezoom.zoom_abs(0.30, item_select_duration);
+	m_scenezoom.zoom_abs(0.278, item_select_duration);
 
 
 	

@@ -17,10 +17,10 @@ public:
 	qreal zoomToscale(qreal zoom) const;
 	qreal scaleTozoom(qreal scale) const;
 
-	void zoom(qreal target_zoom, int duration);
+	void zoom_abs(qreal target_zoom, int duration);
 	void z_rotate_delta(QPointF center, qreal angle, int duration);
 	void z_rotate_abs(QPointF center, qreal angle, int duration);
-	
+	void move_abs(QPointF pos, int duration);
 
 private:
 
@@ -40,10 +40,11 @@ protected:
 	
 	QGraphicsItem* m_item;
 
-	CLAnimationUnit m_zoom;
-	CLAnimationUnit m_Zrotation;
+	CLAnimationUnit<qreal> m_zoom;
+	CLAnimationUnit<qreal> m_Zrotation;
+	CLAnimationUnit<QPointF> m_movment;
 
-	bool m_zooming, m_rotating;
+	bool m_zooming, m_rotating, m_moving;
 
 };
 

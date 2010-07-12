@@ -29,7 +29,22 @@ public:
 
 	virtual unsigned int h_position(unsigned int channel) const
 	{
-		return channel;
+		switch(channel)
+		{
+		case 0:
+			return 0;
+
+		case 1:
+			return 2;
+
+		case 2:
+		    return 3;
+
+		case 3:
+		    return 1;
+		default:
+		    return 0;
+		}
 	}
 
 	virtual unsigned int v_position(unsigned int channel) const

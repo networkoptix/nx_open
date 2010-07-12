@@ -45,12 +45,12 @@ void VideoWindow::setSelected(bool sel, bool animate )
 	if (m_selected)
 	{
 		
-		m_animationTransform.zoom(selected_item_zoom, item_select_duration - 25);
+		m_animationTransform.zoom_abs(selected_item_zoom, item_select_duration - 25);
 		setZValue(1);
 	}
 	else
 	{
-		m_animationTransform.zoom(1.0, item_hoverevent_duration);
+		m_animationTransform.zoom_abs(1.0, item_hoverevent_duration);
 		setZValue(0);
 	}
 }
@@ -73,7 +73,7 @@ bool VideoWindow::isSelected() const
 
 void VideoWindow::zoom_abs(qreal z, int duration)
 {
-	m_animationTransform.zoom(z, duration);
+	m_animationTransform.zoom_abs(z, duration);
 }
 
 void VideoWindow::z_rotate_delta(QPointF center, qreal angle, int duration)
@@ -127,7 +127,7 @@ void VideoWindow::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 		{
 			m_z = 1;
 			setZValue(m_z);
-			m_animationTransform.zoom(1.11, item_hoverevent_duration);
+			m_animationTransform.zoom_abs(1.11, item_hoverevent_duration);
 
 		}
 	}
@@ -142,7 +142,7 @@ void VideoWindow::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 		{
 			m_z = 0;
 			setZValue(m_z);
-			m_animationTransform.zoom(1.0, item_hoverevent_duration);
+			m_animationTransform.zoom_abs(1.0, item_hoverevent_duration);
 		}
 	}
 
