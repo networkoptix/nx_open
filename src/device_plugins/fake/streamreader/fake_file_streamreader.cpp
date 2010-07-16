@@ -17,21 +17,36 @@ CLClientPullStreamreader(dev),
 m_channels(channels),
 m_curr_channel(0)
 {
-	const int max_data_size = 10*1024*1024;
+	const int max_data_size = 200*1024*1024;
 
 	if (data == 0) // very first time
 	{
 		data = new unsigned char [max_data_size];
-		descr = new unsigned char [max_data_size];
+		descr = new unsigned char [max_data_size/10];
 
-		FILE *fdata = fopen("test.264", "rb");
-		FILE *fdescr = fopen("test.264.desc", "rb");
+		data_len = 0;
+		descr_data_len = 0;
 
-		data_len = fread(data,1,max_data_size,fdata);
-		descr_data_len = fread(descr,1,max_data_size,fdescr);
+		FILE *fdata = fopen("c:/photo/test.264", "rb");
+		FILE *fdescr = fopen("c:/photo/test.264.desc", "rb");
 
-		fclose(fdata);
-		fclose(fdescr);
+		if (fdata && fdescr)
+		{
+			data_len = fread(data,1,max_data_size,fdata);
+			descr_data_len = fread(descr,1,max_data_size/10,fdescr);
+
+			fclose(fdata);
+			fclose(fdescr);
+		}
+		else
+		{
+			if (fdata)
+				fclose(fdata);
+
+			if (fdescr)
+				fclose(fdescr);
+		}
+
 
 
 	}
@@ -56,8 +71,10 @@ CLAbstractMediaData* FakeStreamReader::getNextData()
 
 	//m_sleep.sleep(1000/8);// 33 fps
 
-	CLSleep::msleep(1000/8);
+	CLSleep::msleep(1000/6.5);
 
+	if (data_len==0 || descr_data_len == 0)
+		return 0;
 
 	
 	CLCompressedVideoData* videoData = new CLCompressedVideoData(8,400*1024);

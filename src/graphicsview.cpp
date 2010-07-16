@@ -117,8 +117,8 @@ void GraphicsView::updateTransform()
 	QPoint center = QPoint(horizontalScrollBar()->value(), verticalScrollBar()->value());
 
 	tr.translate(center.x(), center.y());
-	tr.rotate(m_yRotate/1.0, Qt::ZAxis);
-	tr.rotate(m_xRotate/1.0, Qt::XAxis);
+	tr.rotate(m_yRotate/10.0, Qt::YAxis);
+	tr.rotate(m_xRotate/10.0, Qt::XAxis);
 	tr.scale(0.05, 0.05);
 	tr.translate(-center.x(), -center.y());
 
@@ -129,6 +129,9 @@ void GraphicsView::updateTransform()
 
 void GraphicsView::mousePressEvent ( QMouseEvent * event)
 {
+
+	m_yRotate = 0;
+
 	m_scenezoom.stop();
 	m_movement.stop();
 	
@@ -137,6 +140,12 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 
 	if (wnd)
 		wnd->stop_animation();
+
+	if (event->button() == Qt::MidButton)
+	{
+		QGraphicsView::mousePressEvent(event);
+	}
+
 
 	if (event->button() == Qt::LeftButton && m_CTRL_pressed)
 	{
@@ -298,27 +307,23 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 				// in this case we should not move to the next item
 
 
-				if (wnd->isFullScreen())
-					fullscreen = true;
 
-				if (!fullscreen)
+				// still we might zoomed in a lot manually and will deal with this window as with new full screen one
+				QRectF wnd_rect =  wnd->sceneBoundingRect();
+				QRectF viewport_rec = mapToScene(viewport()->rect()).boundingRect();
+
+				if (wnd_rect.width() >= 1.5*viewport_rec.width() && wnd_rect.height() >= 1.5*viewport_rec.height())
 				{
-					// still we might zoomed in a lot manually and will deal with this window as with new full screen one
-					QRectF wnd_rect =  wnd->sceneBoundingRect();
-					QRectF viewport_rec = mapToScene(viewport()->rect()).boundingRect();
+					// size of wnd is bigger than the size of view_port
+					if (wnd != m_selectedWnd) 
+						setZeroSelection();
 
-					if (wnd_rect.width() >= 0.999*viewport_rec.width() || wnd_rect.height() >= 0.999*viewport_rec.height())
-					{
-						// size of wnd is bigger than the size of view_port
-						if (wnd != m_selectedWnd) 
-							setZeroSelection();
-
-						fullscreen = true;
-						m_selectedWnd = wnd;
-						m_last_selectedWnd = wnd;
-					}
-
+					fullscreen = true;
+					m_selectedWnd = wnd;
+					m_last_selectedWnd = wnd;
 				}
+
+
 
 		
 

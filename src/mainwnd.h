@@ -62,6 +62,8 @@ private slots:
 
 private:
 
+	void mousePressEvent ( QMouseEvent * event);
+
 	void onFirstSceneAppearance();
 
 	void onDeviceRestarted(CLStreamreader* reader, CLRestartHadlerInfo info);
@@ -71,6 +73,8 @@ private:
 
 	
 	bool isSelectedCamStillExists() const;
+
+	
 
 
 };

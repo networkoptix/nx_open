@@ -21,8 +21,9 @@
 #include "device/directory_browser.h"
 
 #include <QTransform>
+#include "../src/gui/kernel/qevent.h"
 
-QColor bkr_color(0,5,25);
+QColor bkr_color(0,5,5,125);
 //QColor bkr_color(9/1.5,54/1.5,81/1.5);
 
 #define CL_VIDEO_ROWS 4
@@ -125,9 +126,9 @@ m_scene_bottom(0)
 	//m_videoView.setAlignment(Qt::AlignVCenter);
 	
 	//showFullScreen();
-
-
 }
+
+
 
 MainWnd::~MainWnd()
 {
@@ -174,7 +175,17 @@ MainWnd::~MainWnd()
 
 }
 
+void MainWnd::mousePressEvent ( QMouseEvent * event)
+{
+	if (event->button() == Qt::MidButton)
+	{
+		if (!isFullScreen())
+			showFullScreen();
+		else
+			showNormal();
 
+	}
+}
 
 void MainWnd::onTimer()
 {

@@ -10,8 +10,8 @@
 #define SLOT_WIDTH 640*10
 #define SLOT_HEIGHT (SLOT_WIDTH*3/4)
 
-#define SCENE_LEFT (200*1000)
-#define SCENE_TOP (200*1000)
+#define SCENE_LEFT (800*1000)
+#define SCENE_TOP (800*1000)
 
 static const int max_items = 256;
 
@@ -80,6 +80,7 @@ QRect VideoCamerasLayout::getLayoutRect() const
 	int bottom = wnd->mapToScene(wnd->boundingRect().bottomRight()).y();
 
 	QRect video_rect(QPoint(left, top), QPoint(right, bottom) );
+	video_rect.adjust(-SLOT_WIDTH, - SLOT_HEIGHT*2, SLOT_WIDTH, SLOT_HEIGHT*2);
 
 	return video_rect;
 }
