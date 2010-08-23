@@ -179,7 +179,7 @@ void CLVideoWindow::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
 		return;
 	}
 
-	if (painter->paintEngine()->type()	!= QPaintEngine::OpenGL) 
+	if (painter->paintEngine()->type()	!= QPaintEngine::OpenGL && painter->paintEngine()->type()!= QPaintEngine::OpenGL2) 
 	{
 		return;
 	}
@@ -188,8 +188,8 @@ void CLVideoWindow::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
 	painter->setClipRect( option->exposedRect );
 	
 	// save the GL state set for QPainter
+	painter->beginNativePainting();
 	saveGLState();
-
 	for (int i = 0; i  < m_videonum; ++i)
 			m_gldraw[i]->paintEvent(getSubChannelRect(i));
 
@@ -197,6 +197,7 @@ void CLVideoWindow::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
 
 	// restore the GL state that QPainter expects
 	restoreGLState();
+	painter->endNativePainting();
 
 
 	/*
