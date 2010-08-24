@@ -403,7 +403,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 					//if (right_button)
 					{
 
-						m_movement.move(mapToScene(event->pos()), m_selectedWnd ? item_select_duration : scene_move_duration);
+						//m_movement.move(mapToScene(event->pos()), m_selectedWnd ? item_select_duration : scene_move_duration);
 					}
 
 					m_scenezoom.zoom_default(m_selectedWnd ? item_select_duration : scene_zoom_duration);
