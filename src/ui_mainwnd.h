@@ -1,10 +1,10 @@
 /********************************************************************************
-** Form generated from reading ui file 'mainwnd.ui'
+** Form generated from reading UI file 'mainwnd.ui'
 **
-** Created: Mon Jul 12 22:58:22 2010
-**      by: Qt User Interface Compiler version 4.5.2
+** Created: Wed Aug 25 20:05:36 2010
+**      by: Qt User Interface Compiler version 4.6.3
 **
-** WARNING! All changes made in this file will be lost when recompiling ui file!
+** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
 
 #ifndef UI_MAINWND_H
@@ -57,7 +57,6 @@ public:
     void retranslateUi(QMainWindow *MainWndClass)
     {
         MainWndClass->setWindowTitle(QApplication::translate("MainWndClass", "MainWnd", 0, QApplication::UnicodeUTF8));
-        Q_UNUSED(MainWndClass);
     } // retranslateUi
 
 };

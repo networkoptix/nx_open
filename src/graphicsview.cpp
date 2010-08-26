@@ -8,6 +8,7 @@
 #include "videodisplay/video_cam_layout/videocamlayout.h"
 #include "camera/camera.h"
 #include <QSet>
+#include <QContextMenuEvent>
 
 
 
@@ -36,14 +37,21 @@ m_camLayout(0),
 m_ignore_release_event(false),
 m_rotatingWnd(0),
 m_movingWnd(0),
-m_CTRL_pressed(false)
+m_CTRL_pressed(false),
+mVoidMenu(0,0,this)
 {
-
 }
 
 GraphicsView::~GraphicsView()
 {
 	
+}
+
+void GraphicsView::init()
+{
+	mVoidMenu.addItem("test!");
+	mVoidMenu.addItem("it works!");
+
 }
 
 void GraphicsView::setCamLayOut(const VideoCamerasLayout* lo)
@@ -465,6 +473,10 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 	}
 }
 
+void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
+{
+	mVoidMenu.show(mapToScene(event->pos()));
+}
 
 void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
 {
@@ -695,6 +707,8 @@ bool GraphicsView::isWndStillExists(const VideoWindow* wnd) const
 {
 	if ( m_camLayout->hasSuchWnd(wnd) )// if still exists ( in layout)
 		return true;
+
+	return false;
 }
 
 void GraphicsView::toggleFullScreen_helper(VideoWindow* wnd)

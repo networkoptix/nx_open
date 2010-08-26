@@ -3,7 +3,6 @@ TEMPLATE = app
 VERSION = 0.0.1
 
 
-
 TARGET = uniclient
 
 DESTDIR = ../bin
@@ -58,7 +57,8 @@ HEADERS += videodisplay/animation/scene_movement.h videodisplay/animation/scene_
 SOURCES += videodisplay/video_cam_layout/videocamlayout.cpp videodisplay/animation/animation_timeline.cpp videodisplay/animation/mouse_state.cpp
 SOURCES += videodisplay/animation/scene_movement.cpp videodisplay/animation/scene_zoom.cpp videodisplay/animation/abstract_animation.cpp videodisplay/animation/item_trans.cpp
 
-
+SOURCES += videodisplay/menu/menu_button.cpp videodisplay/menu/grapicsview_context_menu.cpp
+HEADERS += videodisplay/menu/menu_button.h videodisplay/menu/grapicsview_context_menu.h
 
 RESOURCES += mainwnd.qrc
 FORMS += mainwnd.ui

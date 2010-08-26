@@ -82,6 +82,7 @@ m_scene_bottom(0)
 	//m_scene.setItemIndexMethod(QGraphicsScene::NoIndex);
 
 	m_videoView.setScene(&m_scene);
+	m_videoView.init();
 
 	QPalette palette;
 	palette.setColor(backgroundRole(), bkr_color);

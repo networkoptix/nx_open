@@ -5,6 +5,7 @@
 #include "./videodisplay/animation/scene_movement.h"
 #include "./videodisplay/animation/scene_zoom.h"
 #include "./videodisplay/animation/mouse_state.h"
+#include "./videodisplay/menu/grapicsview_context_menu.h"
 
 class VideoWindow;
 class VideoCamerasLayout;
@@ -15,6 +16,9 @@ class GraphicsView: public QGraphicsView
 public:
 	GraphicsView();
 	virtual ~GraphicsView();
+
+	// this function must be called after view gets it's scene
+	void init();
 
 	void zoomDefault(int duration);
 	void setRealSceneRect(QRect rect);
@@ -36,6 +40,7 @@ protected:
 	void mousePressEvent ( QMouseEvent * e);
 	void mouseMoveEvent ( QMouseEvent * e);
 	void mouseDoubleClickEvent ( QMouseEvent * e );
+	void contextMenuEvent ( QContextMenuEvent * event );
 
 	virtual void keyPressEvent( QKeyEvent * e );
 	virtual void keyReleaseEvent( QKeyEvent * e );
@@ -91,6 +96,8 @@ protected:
 	qreal m_fullScreenZoom;
 
 	bool m_CTRL_pressed;
+
+	QViewMenu mVoidMenu;
 
 	
 };
