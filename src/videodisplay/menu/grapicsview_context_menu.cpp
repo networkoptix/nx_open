@@ -12,6 +12,7 @@ mView(view)
 
 QViewMenu::~QViewMenu()
 {
+	//hide();
 	for(int i = 0; i < mItems.size(); ++i)
 	{
 		TextButton* btn = mItems.at(i);
@@ -26,10 +27,8 @@ void QViewMenu::addSeparator()
 
 void QViewMenu::addItem(const QString& text)
 {
-	TextButton* btn = new TextButton(text, TextButton::LEFT, TextButton::PANEL, mView->scene());
-	
-
-	mItems.push_back(btn);
+	TextButton* item = new TextButton(text);
+	mItems.push_back(item);
 }
 
 void QViewMenu::show(QPointF p)
@@ -37,10 +36,11 @@ void QViewMenu::show(QPointF p)
 	for (int i = 0; i < mItems.size(); ++i)
 	{
 		TextButton* item = mItems.at(i);
-		//item->setPos(p.x(), p.y() + i*item->boundingRect().height());
-		item->setPos(p.x(), p.y() + i*200);
-		item->setVisible(true);
+		
+		mView->scene()->addItem(item);
+		item->setPos(p.x(), p.y() + i*(item->boundingRect().height()+5));
 	}
+	
 }
 
 void QViewMenu::hide()
@@ -48,7 +48,7 @@ void QViewMenu::hide()
 	for (int i = 0; i < mItems.size(); ++i)
 	{
 		TextButton* item = mItems.at(i);
-		item->setVisible(false);
+		mView->scene()->removeItem(item);
 	}
 	
 }

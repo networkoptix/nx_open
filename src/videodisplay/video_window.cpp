@@ -38,6 +38,7 @@ m_arranged(true)
 
 	setFlag(QGraphicsItem::ItemIsFocusable);
 
+	setZValue(1.0);
 
 	for (int i = 0; i  < m_videonum; ++i)
 		m_gldraw[i] = new CLGLRenderer(this);
@@ -72,6 +73,7 @@ void CLVideoWindow::before_destroy()
 
 void CLVideoWindow::draw(CLVideoDecoderOutput& image, unsigned int channel)
 {
+	
 	m_first_draw = false;
 	m_gldraw[channel]->draw(image, channel); // this function will wait m_gldraw.paintEvent(0);
 	QMutexLocker locker(&m_mutex);
@@ -184,8 +186,8 @@ void CLVideoWindow::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
 		return;
 	}
 
-	painter->setClipping(true);
-	painter->setClipRect( option->exposedRect );
+	//painter->setClipping(true);
+	//painter->setClipRect( option->exposedRect );
 	
 	// save the GL state set for QPainter
 	painter->beginNativePainting();

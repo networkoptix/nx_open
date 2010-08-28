@@ -254,6 +254,7 @@ void MainWnd::onVideoTimer()
 
 void MainWnd::onNewDevice(CLDevice* device)
 {
+	//return;
 	if (!m_camlayout.isSpaceAvalable())
 	{
 		// max reached

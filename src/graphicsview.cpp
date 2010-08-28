@@ -146,6 +146,9 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 	QGraphicsItem *item = itemAt(event->pos());
 	VideoWindow* wnd = static_cast<VideoWindow*>(item);
 
+	if (!isWndStillExists(wnd))
+		wnd = 0;
+
 	if (wnd)
 		wnd->stop_animation();
 
@@ -276,6 +279,8 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 	QGraphicsItem *item = itemAt(event->pos());
 	VideoWindow* wnd = static_cast<VideoWindow*>(item);
+	if (!isWndStillExists(wnd))
+		wnd = 0;
 
 
 	bool left_button = event->button() == Qt::LeftButton;
@@ -475,6 +480,12 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 {
+	/*
+	mVoidMenu = new QViewMenu(0,0,this);
+	mVoidMenu->addItem("Item1");
+	mVoidMenu->addItem("Item2");
+	/**/
+
 	mVoidMenu.show(mapToScene(event->pos()));
 }
 
@@ -482,6 +493,9 @@ void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
 {
 	
 	VideoWindow*item = static_cast<VideoWindow*>(itemAt(e->pos()));
+	if(!isWndStillExists(item))
+		item = 0;
+
 	if (!item)
 		return;
 
