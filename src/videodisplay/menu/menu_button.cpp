@@ -2,8 +2,6 @@
 #include <QtGui>
 #include <QFont>
 
-#define BUTTON_WIDTH 180*20
-#define BUTTON_HEIGHT 19*20
 
 //=========================================================
 QFont buttonFont()
@@ -14,13 +12,13 @@ QFont buttonFont()
 	font.setPixelSize(11);
 	font.setFamily("Silom");
 #else
-	font.setPixelSize(11);
+	font.setPixelSize(15);
 	font.setFamily("Verdana");
 #endif
 	return font;
 }
 
-QColor buttonText(QColor(255, 255, 255));
+QColor buttonTextColor(QColor(255, 255, 255));
 //=========================================================
 
 
@@ -30,7 +28,10 @@ TextButton::TextButton(const QString &text)
 	this->state = NORMAL;
 	setZValue(256*256); // always on top
 	this->setAcceptsHoverEvents(true);
-	//setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
+	setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
+
+	mWidth = 180*20;
+	mHight = 19*20;
 
 }
 
@@ -41,13 +42,24 @@ TextButton::~TextButton()
 
 QRectF TextButton::boundingRect() const
 {
-	return QRectF(0,0,BUTTON_WIDTH,BUTTON_HEIGHT);
+	return QRectF(0,0,mWidth,mHight);
 }
 
 QString TextButton::getText() const
 {
 	return this->text;
 }
+
+void TextButton::setWidth(int width)
+{
+	mWidth = width;
+}
+
+void TextButton::setHeight(int height)
+{
+	mHight = height;
+}
+
 
 void TextButton::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
@@ -62,16 +74,17 @@ void TextButton::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWid
 	QLinearGradient brush(0, 0, 0, boundingRect().height());
 
 	brush.setSpread(QLinearGradient::PadSpread);
-	QColor highlight(255, 255, 255, 70);
-	QColor shadow(0, 0, 0, 70);
-	QColor sunken(220, 220, 220, 30);
-	QColor normal1(255, 255, 245, 60);
-	QColor normal2(255, 255, 235, 10);
+	qreal k = 4.0;
+	QColor highlight(255, 255, 255, 70*k);
+	QColor shadow(0, 0, 0, 70*k);
+	QColor sunken(220, 220, 220, 30*k);
+	QColor normal1(255, 255, 245, 60*k);
+	QColor normal2(255, 255, 235, 10*k);
 
 	//if (this->buttonType == TextButton::PANEL)
 	{
-		normal1 = QColor(200, 170, 160, 50);
-		normal2 = QColor(50, 10, 0, 50);
+		//normal1 = QColor(200, 170, 160, 50*k);
+		//normal2 = QColor(50, 10, 0, 50*k);
 	}
 
 	if (state == PRESSED || state == DISABLED) 
@@ -97,6 +110,21 @@ void TextButton::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWid
 		painter->drawRect(0, 0, boundingRect().width(), boundingRect().height());
 	//else
 		//painter->drawRoundedRect(0, 0, boundingRect().width(), boundingRect().height(), 10, 90, Qt::RelativeSize);
+
+	//==================================================
+
+	QGraphicsTextItem textItem(0, 0);
+	textItem.setHtml(this->text);
+	textItem.setTextWidth(boundingRect().width());
+	textItem.setFont(buttonFont());
+	textItem.setDefaultTextColor(buttonTextColor);
+	textItem.document()->setDocumentMargin(2);
+
+	float w = textItem.boundingRect().width();
+	float h = textItem.boundingRect().height();
+	QStyleOptionGraphicsItem style;
+	textItem.paint(painter, &style, 0);
+
 
 }
 

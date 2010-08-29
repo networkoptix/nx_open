@@ -5,9 +5,12 @@
 #include <QList>
 #include <QPointF>
 
+
+class QState;
 class QObject;
 class TextButton;
 class QGraphicsView;
+class QStateMachine;
 
 struct QViewMenuHandler
 {
@@ -30,8 +33,18 @@ public:
 	void hide();
 
 private:
+	void init_state_machine(QPointF p);
+	void destory_state_machine();
+
 	QList<TextButton*> mItems;
 	QGraphicsView *mView;
+	bool mVisible;
+
+	QStateMachine* mStates;
+	QState *mRootState;
+	QState *mNnormalState;
+	QState *mOriginalState;
+
 
 };
 

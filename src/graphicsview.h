@@ -54,6 +54,7 @@ protected:
 	VideoWindow* getLastSelectedWnd();
 	void mouseSpeed_helper(qreal& mouse_speed,  int& dx, int&dy, int min_spped, int speed_factor);
 	bool isWndStillExists(const VideoWindow* wnd) const;
+	void befor_scene_zoom_chaged();
 
 	void reAdjustSceneRect();
 	

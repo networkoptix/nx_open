@@ -49,8 +49,10 @@ GraphicsView::~GraphicsView()
 
 void GraphicsView::init()
 {
-	mVoidMenu.addItem("test!");
-	mVoidMenu.addItem("it works!");
+	mVoidMenu.addItem("Fit In View");
+	mVoidMenu.addItem("Arrange");
+	mVoidMenu.addItem("FullScreen");
+	mVoidMenu.addItem("Options...");
 
 }
 
@@ -108,12 +110,14 @@ void GraphicsView::setAllItemsQuality(CLStreamreader::StreamQuality q, bool incr
 
 void GraphicsView::wheelEvent ( QWheelEvent * e )
 {
+	befor_scene_zoom_chaged();
 	int numDegrees = e->delta() ;
 	m_scenezoom.zoom_delta(numDegrees/3000.0, scene_zoom_duration);
 }
 
 void GraphicsView::zoomDefault(int duration)
 {
+	befor_scene_zoom_chaged();
 	m_scenezoom.zoom_default(duration);
 }
 
@@ -418,7 +422,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 						//m_movement.move(mapToScene(event->pos()), m_selectedWnd ? item_select_duration : scene_move_duration);
 					}
-
+					befor_scene_zoom_chaged();
 					m_scenezoom.zoom_default(m_selectedWnd ? item_select_duration : scene_zoom_duration);
 				}
 
@@ -480,13 +484,9 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 {
-	/*
-	mVoidMenu = new QViewMenu(0,0,this);
-	mVoidMenu->addItem("Item1");
-	mVoidMenu->addItem("Item2");
-	/**/
-
-	mVoidMenu.show(mapToScene(event->pos()));
+	mVoidMenu.hide();
+	//mVoidMenu.show(mapToScene(event->pos()));
+	mVoidMenu.show(event->pos());
 }
 
 void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
@@ -647,9 +647,11 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 	{
 	case Qt::Key_Equal: // plus
 	case Qt::Key_Plus: // plus
+		befor_scene_zoom_chaged();
 		m_scenezoom.zoom_delta(0.05, 2000);
 		break;
 	case Qt::Key_Minus:
+		befor_scene_zoom_chaged();
 		m_scenezoom.zoom_delta(-0.05, 2000);
 
 
@@ -660,10 +662,12 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 		switch (e->key()) 
 		{
 		case Qt::Key_End: // plus
+			befor_scene_zoom_chaged();
 			m_scenezoom.zoom_delta(0.05, 2000);
 			break;
 
 		case Qt::Key_Home:
+			befor_scene_zoom_chaged();
 			m_scenezoom.zoom_abs(-100, 2000); // absolute zoom out
 			break;
 		}
@@ -725,6 +729,11 @@ bool GraphicsView::isWndStillExists(const VideoWindow* wnd) const
 	return false;
 }
 
+void GraphicsView::befor_scene_zoom_chaged()
+{
+	mVoidMenu.hide();
+}
+
 void GraphicsView::toggleFullScreen_helper(VideoWindow* wnd)
 {
 	if (!wnd->isFullScreen() || m_scenezoom.getZoom() > m_fullScreenZoom + 1e-8) // if item is not in full screen mode or if it's in FS and zoomed more
@@ -753,6 +762,7 @@ void GraphicsView::onNewItemSelected_helper(VideoWindow* new_wnd)
 	m_selectedWnd->setSelected(true);
 
 	m_movement.move(point, item_select_duration);
+	befor_scene_zoom_chaged();
 	m_scenezoom.zoom_abs(0.278, item_select_duration);
 
 
@@ -799,6 +809,7 @@ void GraphicsView::onItemFullScreen_helper(VideoWindow* wnd)
 	
 	//scale(scl, scl);
 	
+	befor_scene_zoom_chaged();
 	m_scenezoom.zoom_abs(zoom, item_select_duration/2 + 100);
 	
 	m_fullScreenZoom = zoom; // memorize full screen zoom

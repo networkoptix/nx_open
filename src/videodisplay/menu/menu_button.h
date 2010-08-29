@@ -3,8 +3,10 @@
 class ButtonBackground;
 
 
-class TextButton : public QGraphicsItem
+class TextButton : public QObject, public QGraphicsItem
 {
+	Q_OBJECT
+	Q_PROPERTY(QPointF pos READ pos WRITE setPos)
 public:
 	enum STATE {NORMAL, HIGHLIGHT, PRESSED, DISABLED};
 
@@ -13,7 +15,13 @@ public:
 	virtual ~TextButton();
 
 	virtual QRectF boundingRect() const;
-protected:
+
+	void setWidth(int width);
+	void setHeight(int height);
+
+	QString getText() const;
+
+protected: 
 	// overidden methods:
 
 	virtual void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget * = 0);
@@ -24,9 +32,11 @@ protected:
 
 	
 	void setState(STATE state);
-	QString getText() const;
+
 
 private:
 	QString text;
 	STATE state;
+
+	volatile int mWidth, mHight;
 };
