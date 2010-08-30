@@ -81,7 +81,7 @@ QRect VideoCamerasLayout::getSmallLayoutRect() const // scene rect
 
 	QRect video_rect(QPoint(left, top), QPoint(right, bottom) );
 
-	video_rect.adjust(-SLOT_WIDTH/10, - SLOT_HEIGHT/10, SLOT_WIDTH/10, SLOT_HEIGHT/10);
+	video_rect.adjust(-SLOT_WIDTH/4, - SLOT_HEIGHT/4, SLOT_WIDTH/4, SLOT_HEIGHT/4);
 
 	return video_rect;
 
@@ -412,7 +412,9 @@ bool VideoCamerasLayout::isSlotAvailable_advance_helper(int slot, const CLVideoW
 	// we need to ignore wnds from lst and current one 
 
 	QPoint slPos = posFromSlot(slot);
-	QRectF new_wnd_rect(slPos, QSize(curr->width(), curr->height()));
+	//QRectF new_wnd_rect(slPos, QSize(curr->width(), curr->height()));
+	QSize T_size = getMaxWndSize(curr->getVideoLayout());
+	QRectF new_wnd_rect(slPos, T_size);
 
 	foreach (CLVideoWindow* wnd, m_wnds)
 	{
@@ -454,13 +456,13 @@ QPoint VideoCamerasLayout::getNextCloserstAvailableForWndSlot_butFrom_list___hel
 	QPointF pf = wnd->mapToScene(wnd->boundingRect().topLeft());
 
 	int center_slot = slotFromPos(QPoint(pf.x(), pf.y()));
-	int center_slot_x = center_slot%m_width;
-	int center_slot_y = center_slot/m_width;
+	int center_slot_x = 0;//center_slot%m_width;
+	int center_slot_y = 0;//center_slot/m_width;
 
 	for (int i = 0; i < m_total_potential_elemnts; ++i)
 	{
 		int candidate_x = center_slot_x + m_potantial_x[i];
-		int candidate_y = center_slot_y + m_potantial_x[i];
+		int candidate_y = center_slot_y + m_potantial_y[i];
 
 		if (candidate_x < 0 || candidate_x > m_width-1 || candidate_y < 0 ||  candidate_y > m_height-1) 
 			continue;

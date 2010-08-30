@@ -55,7 +55,7 @@ protected:
 	void toggleFullScreen_helper(VideoWindow* new_wnd);
 
 	void onItemFullScreen_helper(VideoWindow* wnd);
-	void onFitInView_helper();
+	
 	void onArrange_helper();
 	void onShuffle_helper();
 	
@@ -68,7 +68,7 @@ protected:
 	
 
 private slots:
-
+	void onFitInView_helper();
 protected:
 	
 	int m_xRotate;

@@ -867,12 +867,27 @@ void GraphicsView::onShuffle_helper()
 		anim->setStartValue(item->getRotation());
 		anim->setEndValue(cl_get_random_val(0, 360));
 
-		anim->setDuration(1000 + cl_get_random_val(0, 300));
+		anim->setDuration(1500 + cl_get_random_val(0, 300));
 
 		anim->setEasingCurve(QEasingCurve::InOutBack);
 
 		group->addAnimation(anim);
+	
+		//=========================
+
+		QPropertyAnimation *anim2 = new QPropertyAnimation(item, "pos");
+
+		anim2->setStartValue(item->pos());
+
+		int r = 5000;
+		anim2->setEndValue( QPointF(item->pos().x() - r/2 + cl_get_random_val(0,r),   item->pos().y() - r/2 + cl_get_random_val(0,r)) );
+
+		anim2->setDuration(1500 + cl_get_random_val(0, 300));
+		anim2->setEasingCurve(QEasingCurve::InOutBack);
+
+		group->addAnimation(anim2);
 	}
+
 
 	group->start(QAbstractAnimation::DeleteWhenStopped);
 
@@ -925,6 +940,7 @@ void GraphicsView::onArrange_helper()
 		group->addAnimation(anim2);
 	}
 
+	connect(group, SIGNAL(finished ()), this, SLOT(onFitInView_helper()) )	;
 
 
 	group->start(QAbstractAnimation::DeleteWhenStopped);
