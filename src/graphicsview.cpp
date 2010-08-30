@@ -6,14 +6,19 @@
 #include "../src/gui/graphicsview/qgraphicsitem.h"
 #include "uvideo_wnd.h"
 #include "videodisplay/video_cam_layout/videocamlayout.h"
+#include "../base/rand.h"
 #include "camera/camera.h"
 #include <QSet>
 #include <QContextMenuEvent>
 #include <QCoreApplication>
 #include "mainwnd.h"
+#include <QParallelAnimationGroup>
+#include <QPropertyAnimation>
+
 
 QString cm_exit("Exit");
 QString cm_fitinview("Fit in View");
+QString cm_shuffle("Shuffle");
 QString cm_arrange("Arrange");
 QString cm_options("Options...");
 QString cm_togglefs("Toggle fullscreen");
@@ -58,6 +63,7 @@ GraphicsView::~GraphicsView()
 void GraphicsView::init()
 {
 	mVoidMenu.addItem(cm_fitinview);
+	mVoidMenu.addItem(cm_shuffle);
 	mVoidMenu.addItem(cm_arrange);
 	mVoidMenu.addItem(cm_togglefs);
 	mVoidMenu.addItem(cm_options);
@@ -589,6 +595,16 @@ void GraphicsView::OnMenuButton(QObject* owner, QString text)
 	{
 		onFitInView_helper();
 	}
+	else if (text == cm_shuffle)
+	{
+		onShuffle_helper();
+	}
+	else if (text == cm_arrange)
+	{
+		onArrange_helper();
+	}
+
+	
 	
 }
 
@@ -830,6 +846,90 @@ void GraphicsView::onNewItemSelected_helper(VideoWindow* new_wnd)
 
 	
 
+}
+
+void GraphicsView::onShuffle_helper()
+{
+	QSet<CLVideoWindow*> wndlst = m_camLayout->getWndList();
+	if (wndlst.empty())
+		return;
+
+	QParallelAnimationGroup *group = new QParallelAnimationGroup;
+
+
+
+	foreach (CLVideoWindow* wnd, wndlst)
+	{
+		VideoWindow* item = static_cast<VideoWindow*>(wnd);
+
+		QPropertyAnimation *anim = new QPropertyAnimation(item, "rotation");
+
+		anim->setStartValue(item->getRotation());
+		anim->setEndValue(cl_get_random_val(0, 360));
+
+		anim->setDuration(1000 + cl_get_random_val(0, 300));
+
+		anim->setEasingCurve(QEasingCurve::InOutBack);
+
+		group->addAnimation(anim);
+	}
+
+	group->start(QAbstractAnimation::DeleteWhenStopped);
+
+}
+
+void GraphicsView::onArrange_helper()
+{
+
+	QSet<CLVideoWindow*> wndlst = m_camLayout->getWndList();
+	if (wndlst.empty())
+		return;
+
+	QParallelAnimationGroup *group = new QParallelAnimationGroup;
+	
+
+
+	foreach (CLVideoWindow* wnd, wndlst)
+	{
+		VideoWindow* item = static_cast<VideoWindow*>(wnd);
+		
+		QPropertyAnimation *anim1 = new QPropertyAnimation(item, "rotation");
+
+		anim1->setStartValue(item->getRotation());
+		anim1->setEndValue(0);
+
+		anim1->setDuration(1000 + cl_get_random_val(0, 300));
+		anim1->setEasingCurve(QEasingCurve::InOutBack);
+
+		group->addAnimation(anim1);
+
+		//=============
+
+	}
+	/**/
+
+	QList<CLIdealWndPos> newPosLst = m_camLayout->calcArrangedPos();
+	for (int i = 0; i < newPosLst.count();++i)
+	{
+		VideoWindow* item = static_cast<VideoWindow*>(newPosLst.at(i).wnd);
+
+		QPropertyAnimation *anim2 = new QPropertyAnimation(item, "pos");
+	
+		anim2->setStartValue(item->pos());
+
+		anim2->setEndValue(newPosLst.at(i).pos);
+
+		anim2->setDuration(1000 + cl_get_random_val(0, 300));
+		anim2->setEasingCurve(QEasingCurve::InOutBack);
+
+		group->addAnimation(anim2);
+	}
+
+
+
+	group->start(QAbstractAnimation::DeleteWhenStopped);
+	
+	
 }
 
 void GraphicsView::onFitInView_helper()

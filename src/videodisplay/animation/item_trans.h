@@ -22,6 +22,9 @@ public:
 	void z_rotate_abs(QPointF center, qreal angle, int duration);
 	void move_abs(QPointF pos, int duration);
 
+	qreal current_zrotation() const;
+
+
 private:
 
 	void transform_helper();

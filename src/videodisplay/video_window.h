@@ -20,6 +20,7 @@ class CLVideoCamera;
 class CLVideoWindow : public QObject, public QGraphicsItem, public CLAbstractRenderer
 {
 	Q_OBJECT
+	Q_PROPERTY(QPointF pos READ pos WRITE setPos)
 public:
 
 

@@ -10,6 +10,9 @@ class VideoCamerasLayout;
 class VideoWindow :  public CLVideoWindow
 {
 	Q_OBJECT
+
+	Q_PROPERTY(qreal rotation	READ getRotation WRITE setRotation)
+
 public:
 	VideoWindow(GraphicsView* view, const CLDeviceVideoLayout* layout, int max_width, int max_height);
 
@@ -24,6 +27,9 @@ public:
 	void zoom_abs(qreal z, int duration);
 	void z_rotate_delta(QPointF center, qreal angle, int diration);
 	void z_rotate_abs(QPointF center, qreal angle, int duration);
+
+	qreal getRotation() const;
+	void setRotation(qreal angle);
 
 	void stop_animation();
 

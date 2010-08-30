@@ -76,6 +76,17 @@ void VideoWindow::zoom_abs(qreal z, int duration)
 	m_animationTransform.zoom_abs(z, duration);
 }
 
+qreal VideoWindow::getRotation() const
+{
+	return m_animationTransform.current_zrotation();
+}
+
+void VideoWindow::setRotation(qreal angle)
+{
+	m_animationTransform.z_rotate_abs(QPointF(), angle, 0);
+}
+
+
 void VideoWindow::z_rotate_delta(QPointF center, qreal angle, int duration)
 {
 	m_animationTransform.z_rotate_delta(center, angle, duration);

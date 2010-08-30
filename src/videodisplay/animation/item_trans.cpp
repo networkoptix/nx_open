@@ -70,6 +70,11 @@ void CLItemTransform::move_abs(QPointF pos, int duration)
 	//m_moving.start_point = m_item->scenePos()
 }
 
+qreal CLItemTransform::current_zrotation() const
+{
+	return m_Zrotation.curent;
+}
+
 void CLItemTransform::zoom_abs(qreal target_zoom, int duration)
 {
 

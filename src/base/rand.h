@@ -4,7 +4,7 @@
 #include <time.h>
 
 
-unsigned int cl_get_random_val(unsigned int minVal, unsigned int maxVal)
+static unsigned int cl_get_random_val(unsigned int minVal, unsigned int maxVal)
 {
 	static bool first = true;
 	if (first)

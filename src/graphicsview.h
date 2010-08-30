@@ -56,6 +56,8 @@ protected:
 
 	void onItemFullScreen_helper(VideoWindow* wnd);
 	void onFitInView_helper();
+	void onArrange_helper();
+	void onShuffle_helper();
 	
 	VideoWindow* getLastSelectedWnd();
 	void mouseSpeed_helper(qreal& mouse_speed,  int& dx, int&dy, int min_spped, int speed_factor);
