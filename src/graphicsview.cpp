@@ -9,8 +9,14 @@
 #include "camera/camera.h"
 #include <QSet>
 #include <QContextMenuEvent>
+#include <QCoreApplication>
+#include "mainwnd.h"
 
-
+QString cm_exit("Exit");
+QString cm_fitinview("Fit in View");
+QString cm_arrange("Arrange");
+QString cm_options("Options...");
+QString cm_togglefs("Toggle fullscreen");
 
 int item_select_duration = 700;
 int item_hoverevent_duration = 300;
@@ -23,7 +29,7 @@ qreal selected_item_zoom = 1.63;
 
 //==============================================================================
 
-GraphicsView::GraphicsView():
+GraphicsView::GraphicsView(MainWnd* mainWnd):
 QGraphicsView(),
 m_xRotate(0), m_yRotate(0),
 m_movement(this),
@@ -35,10 +41,12 @@ m_selectedWnd(0),
 m_last_selectedWnd(0),
 m_camLayout(0),
 m_ignore_release_event(false),
+m_ignore_conext_menu_event(false),
 m_rotatingWnd(0),
 m_movingWnd(0),
 m_CTRL_pressed(false),
-mVoidMenu(0,0,this)
+mVoidMenu(0,this,this),
+mMainWnd(mainWnd)
 {
 }
 
@@ -49,10 +57,11 @@ GraphicsView::~GraphicsView()
 
 void GraphicsView::init()
 {
-	mVoidMenu.addItem("Fit In View");
-	mVoidMenu.addItem("Arrange");
-	mVoidMenu.addItem("FullScreen");
-	mVoidMenu.addItem("Options...");
+	mVoidMenu.addItem(cm_fitinview);
+	mVoidMenu.addItem(cm_arrange);
+	mVoidMenu.addItem(cm_togglefs);
+	mVoidMenu.addItem(cm_options);
+	mVoidMenu.addItem(cm_exit);
 
 }
 
@@ -141,13 +150,23 @@ void GraphicsView::updateTransform()
 
 void GraphicsView::mousePressEvent ( QMouseEvent * event)
 {
-
 	m_yRotate = 0;
 
 	m_scenezoom.stop();
 	m_movement.stop();
 	
 	QGraphicsItem *item = itemAt(event->pos());
+
+	if (mVoidMenu.hasSuchItem(item))
+	{
+		QGraphicsView::mousePressEvent(event);
+		m_ignore_release_event = true; // menu button just pressed. so neeed to ignore release event
+		return;
+	}
+
+	mVoidMenu.hide();
+
+
 	VideoWindow* wnd = static_cast<VideoWindow*>(item);
 
 	if (!isWndStillExists(wnd))
@@ -182,6 +201,8 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 	m_mousestate.clearEvents();
 	m_mousestate.mouseMoveEventHandler(event);
 
+
+	QGraphicsView::mousePressEvent(event);
 
 }
 
@@ -282,6 +303,15 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 	//cl_log.log("====mouseReleaseEvent===", cl_logDEBUG1);
 
 	QGraphicsItem *item = itemAt(event->pos());
+
+	if (mVoidMenu.hasSuchItem(item))
+	{
+		QGraphicsView::mouseReleaseEvent(event);
+		return;
+	}
+
+	mVoidMenu.hide();
+
 	VideoWindow* wnd = static_cast<VideoWindow*>(item);
 	if (!isWndStillExists(wnd))
 		wnd = 0;
@@ -354,6 +384,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 	if (rotating && right_button)
 	{
 		
+		m_ignore_conext_menu_event = true;
 
 		if (isWndStillExists(m_rotatingWnd))
 		{
@@ -480,10 +511,18 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 		m_rotationCounter = 0;
 		m_rotatingWnd = 0;
 	}
+
+	QGraphicsView::mouseReleaseEvent(event);
 }
 
 void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 {
+	if (m_ignore_conext_menu_event)
+	{
+		m_ignore_conext_menu_event = false;
+		return;
+	}
+
 	mVoidMenu.hide();
 	//mVoidMenu.show(mapToScene(event->pos()));
 	mVoidMenu.show(event->pos());
@@ -491,7 +530,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
 void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
 {
-	
+	mVoidMenu.hide();
 	VideoWindow*item = static_cast<VideoWindow*>(itemAt(e->pos()));
 	if(!isWndStillExists(item))
 		item = 0;
@@ -520,6 +559,7 @@ void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
 
 void GraphicsView::keyReleaseEvent( QKeyEvent * e )
 {
+	mVoidMenu.hide();
 	switch (e->key()) 
 	{
 	case Qt::Key_Control:
@@ -535,11 +575,29 @@ void GraphicsView::keyReleaseEvent( QKeyEvent * e )
 
 }
 
+void GraphicsView::OnMenuButton(QObject* owner, QString text)
+{
+	if (text == cm_exit)
+	{
+		QCoreApplication::instance()->exit();
+	}
+	else if (text == cm_togglefs)
+	{
+		mMainWnd->toggleFullScreen();
+	}
+	else if (text == cm_fitinview)
+	{
+		onFitInView_helper();
+	}
+	
+}
+
 void GraphicsView::keyPressEvent( QKeyEvent * e )
 {
 
+	mVoidMenu.hide();
 	VideoWindow* last_sel_wnd = getLastSelectedWnd();
-
+	
 
 
 	//===transform=========
@@ -680,6 +738,8 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 
 }
 
+
+
 void GraphicsView::resizeEvent( QResizeEvent * event )
 {
 	if (m_selectedWnd && m_selectedWnd->isFullScreen())
@@ -734,6 +794,8 @@ void GraphicsView::befor_scene_zoom_chaged()
 	mVoidMenu.hide();
 }
 
+
+
 void GraphicsView::toggleFullScreen_helper(VideoWindow* wnd)
 {
 	if (!wnd->isFullScreen() || m_scenezoom.getZoom() > m_fullScreenZoom + 1e-8) // if item is not in full screen mode or if it's in FS and zoomed more
@@ -770,6 +832,51 @@ void GraphicsView::onNewItemSelected_helper(VideoWindow* new_wnd)
 
 }
 
+void GraphicsView::onFitInView_helper()
+{
+	if (m_selectedWnd && isWndStillExists(m_selectedWnd) && m_selectedWnd->isFullScreen())
+	{
+		m_selectedWnd->setFullScreen(false);
+		m_selectedWnd->zoom_abs(1.0, 0);
+		update();
+	}
+
+	
+	QRectF item_rect = m_camLayout->getSmallLayoutRect();
+
+	m_movement.move(item_rect.center(), 500);
+
+	
+	QRectF viewRect = viewport()->rect();
+
+	QRectF sceneRect = matrix().mapRect(item_rect);
+
+
+	qreal xratio = viewRect.width() / sceneRect.width();
+	qreal yratio = viewRect.height() / sceneRect.height();
+
+	qreal scl = qMin(xratio, yratio);
+
+
+	QRectF unity = matrix().mapRect(QRectF(0, 0, 1, 1));
+	scale(1 / unity.width(), 1 / unity.height());
+
+
+	scl*=( unity.width());
+
+
+
+	m_movement.move(item_rect.center(), item_select_duration/2 + 100);
+
+
+	qreal zoom = m_scenezoom.scaleTozoom(scl);
+
+	//scale(scl, scl);
+
+	befor_scene_zoom_chaged();
+	m_scenezoom.zoom_abs(zoom, item_select_duration/2 + 100);
+
+}
 
 void GraphicsView::onItemFullScreen_helper(VideoWindow* wnd)
 {

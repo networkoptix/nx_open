@@ -36,6 +36,7 @@ public:
 	void adjustWnd(CLVideoWindow* wnd) const;
 
 	QRect getLayoutRect() const; // scene rect 
+	QRect getSmallLayoutRect() const; // scene rect 
 
 	// returns next best available position; returns -1 if not found(all positions are busy);
 	// returns false if everything is busy

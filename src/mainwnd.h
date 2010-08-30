@@ -33,6 +33,8 @@ public:
 	MainWnd(QWidget *parent = 0, Qt::WFlags flags = 0);
 	~MainWnd();
 
+	void toggleFullScreen();
+
 private:
 	Ui::MainWndClass ui;
 

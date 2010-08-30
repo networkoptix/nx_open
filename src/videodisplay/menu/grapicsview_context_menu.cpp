@@ -1,13 +1,9 @@
 #include "grapicsview_context_menu.h"
 #include "menu_button.h"
 #include <QGraphicsView>
-#include <QState>
-#include <QStateMachine>
 #include <QParallelAnimationGroup>
 #include <QPropertyAnimation>
-#include <QAbstractTransition>
-#include <QTimer>
-#include <QSignalTransition>
+
 
 extern QFont buttonFont();
 
@@ -15,7 +11,9 @@ extern QFont buttonFont();
 
 QViewMenu::QViewMenu(QObject* owner, QViewMenuHandler* handler, QGraphicsView *view):
 mView(view),
-mVisible(false)
+mVisible(false),
+mOwner(owner),
+mHandler(handler)
 {
 
 }
@@ -30,6 +28,14 @@ QViewMenu::~QViewMenu()
 	}
 }
 
+void QViewMenu::OnMenuButton(QObject* owner, QString text)
+{
+	hide();	
+	if (mHandler)
+		mHandler->OnMenuButton(mOwner, text);
+
+}
+
 void QViewMenu::addSeparator()
 {
 
@@ -37,61 +43,54 @@ void QViewMenu::addSeparator()
 
 void QViewMenu::addItem(const QString& text)
 {
-	TextButton* item = new TextButton(text);
+	TextButton* item = new TextButton(text, mOwner, this);
 	mItems.push_back(item);
 }
 
-void QViewMenu::init_state_machine(QPointF p)
+void QViewMenu::init_animatiom(QPointF p)
 {
-	mStates = new QStateMachine;
-	mRootState = new QState;
-	mNnormalState = new QState(mRootState);
-	mOriginalState = new QState(mRootState);
-
-	mStates->addState(mRootState);
-	mStates->setInitialState(mRootState);
-	mRootState->setInitialState(mOriginalState);
-
+	
+	QParallelAnimationGroup *mAnim = new QParallelAnimationGroup;
+	
 	for (int i = 0; i < mItems.count(); ++i)
 	{
 		TextButton* item = mItems.at(i);
 
 		qreal x = p.x();
 		qreal y = p.y() + i*(item->boundingRect().height());
-		//item->setPos(mView->mapToScene(x,y));
 
-		mNnormalState->assignProperty(item, "pos",	mView->mapToScene(x,y));
-
-		mOriginalState->assignProperty(item, "pos",	mView->mapToScene(x,p.y()));
-	}
-
-	QParallelAnimationGroup *group = new QParallelAnimationGroup;
-
-	for (int i = 0; i < mItems.count(); ++i) 
-	{
 		QPropertyAnimation *anim = new QPropertyAnimation(mItems[i], "pos");
-		anim->setDuration(550 + i * 25);
+
+		anim->setStartValue(QPointF(mView->mapToScene(x,p.y())));
+		anim->setEndValue(QPointF(mView->mapToScene(x,y)));
+
+		anim->setDuration(300 + i * 25);
+		//anim->setUpdateInterval(17);
 		anim->setEasingCurve(QEasingCurve::InOutBack);
-		group->addAnimation(anim);
+		mAnim->addAnimation(anim);
+
 	}
 
-	QTimer* timer = new QTimer;
-	timer->start(50);
-	timer->setSingleShot(true);
-	QSignalTransition *trans = mRootState->addTransition(timer, SIGNAL(timeout()), mNnormalState);
-	trans->addAnimation(group);
-
-	mStates->start();
-
-
-
+	mAnim->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
-void QViewMenu::destory_state_machine()
+void QViewMenu::destroy_animation()
 {
-
+	//mAnim->stop();
 }
 
+
+bool QViewMenu::hasSuchItem(QGraphicsItem* item) const
+{
+	for (int i = 0; i < mItems.size(); ++i)
+	{
+		TextButton* it = mItems.at(i);
+		if (it==item)
+			return true;
+	}
+
+	return false;
+}
 
 void QViewMenu::show(QPointF p)
 {
@@ -137,13 +136,13 @@ void QViewMenu::show(QPointF p)
 
 	mVisible = true;
 
-	init_state_machine(p);
+	init_animatiom(p);
 	
 }
 
 void QViewMenu::hide()
 {
-
+	destroy_animation();
 	if(!mVisible)
 		return;
 
@@ -151,6 +150,7 @@ void QViewMenu::hide()
 	{
 		TextButton* item = mItems.at(i);
 		mView->scene()->removeItem(item);
+		item->setState(TextButton::NORMAL, false);
 	}
 	
 

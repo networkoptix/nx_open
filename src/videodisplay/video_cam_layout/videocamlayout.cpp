@@ -62,7 +62,7 @@ QSize VideoCamerasLayout::getMaxWndSize(const CLDeviceVideoLayout* layout) const
 	return QSize(SLOT_WIDTH*(dlw + m_item_distance*(dlw-1)), SLOT_HEIGHT*(dlh + m_item_distance*(dlh-1)));
 }
 
-QRect VideoCamerasLayout::getLayoutRect() const
+QRect VideoCamerasLayout::getSmallLayoutRect() const // scene rect 
 {
 	CLVideoWindow* wnd =  getVeryLeftWnd();
 
@@ -80,8 +80,17 @@ QRect VideoCamerasLayout::getLayoutRect() const
 	int bottom = wnd->mapToScene(wnd->boundingRect().bottomRight()).y();
 
 	QRect video_rect(QPoint(left, top), QPoint(right, bottom) );
-	video_rect.adjust(-SLOT_WIDTH, - SLOT_HEIGHT*2, SLOT_WIDTH, SLOT_HEIGHT*2);
 
+	video_rect.adjust(-SLOT_WIDTH/10, - SLOT_HEIGHT/10, SLOT_WIDTH/10, SLOT_HEIGHT/10);
+
+	return video_rect;
+
+}
+
+QRect VideoCamerasLayout::getLayoutRect() const
+{
+	QRect video_rect = getSmallLayoutRect();
+	video_rect.adjust(-SLOT_WIDTH, - SLOT_HEIGHT*2, SLOT_WIDTH, SLOT_HEIGHT*2);
 	return video_rect;
 }
 

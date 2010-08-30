@@ -10,16 +10,17 @@ class QState;
 class QObject;
 class TextButton;
 class QGraphicsView;
-class QStateMachine;
+class QParallelAnimationGroup;
+class QGraphicsItem;
 
 struct QViewMenuHandler
 {
-	virtual void OnMenuButton(QObject* owner, QString* text) = 0;
+	virtual void OnMenuButton(QObject* owner, QString text) = 0;
 };
 
 
 
-class QViewMenu
+class QViewMenu : public QViewMenuHandler
 {
 public:
 	QViewMenu(QObject* owner, QViewMenuHandler* handler, QGraphicsView *view);
@@ -28,24 +29,25 @@ public:
 	void addMenu(QViewMenu*);
 
 	void addItem(const QString& text);
+	bool hasSuchItem(QGraphicsItem* item) const;
 
 	void show(QPointF p);
 	void hide();
 
 private:
-	void init_state_machine(QPointF p);
-	void destory_state_machine();
+	void init_animatiom(QPointF p);
+	void destroy_animation();
+
+	void OnMenuButton(QObject* owner, QString text);
 
 	QList<TextButton*> mItems;
 	QGraphicsView *mView;
 	bool mVisible;
 
-	QStateMachine* mStates;
-	QState *mRootState;
-	QState *mNnormalState;
-	QState *mOriginalState;
+	QParallelAnimationGroup *mAnim;
 
-
+	QObject* mOwner;
+	QViewMenuHandler* mHandler;
 };
 
 #endif // graphview_context_menu_1846

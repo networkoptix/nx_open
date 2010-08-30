@@ -1,7 +1,8 @@
 #include "menu_button.h"
 #include <QtGui>
 #include <QFont>
-
+#include <QMouseEvent>
+#include "grapicsview_context_menu.h"
 
 //=========================================================
 QFont buttonFont()
@@ -22,7 +23,9 @@ QColor buttonTextColor(QColor(255, 255, 255));
 //=========================================================
 
 
-TextButton::TextButton(const QString &text)		   
+TextButton::TextButton(const QString &text, QObject* owner, QViewMenuHandler* handler):
+mOwner(owner),
+mHandler(handler)
 {
 	this->text = text;
 	this->state = NORMAL;
@@ -148,16 +151,26 @@ void TextButton::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 
 }
 
-void TextButton::mousePressEvent(QGraphicsSceneMouseEvent *)
+void TextButton::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
 	if (this->state == DISABLED)
 		return;
 
-	if (this->state == HIGHLIGHT || this->state == NORMAL)
-		this->setState(PRESSED);
+	if (event->button() == Qt::LeftButton && this->state == HIGHLIGHT || this->state == NORMAL)
+	{
+		//this->setState(PRESSED);
+		this->setState(NORMAL);
+		//event->ignore();
+		mHandler->OnMenuButton(mOwner, getText());
+	}
 }
 
 void TextButton::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+
+}
+
+void TextButton::mouseReleaseEvent(QMouseEvent *)
 {
 	if (this->state == PRESSED)
 		this->setState(NORMAL);
@@ -165,9 +178,10 @@ void TextButton::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 
 
-void TextButton::setState(STATE state)
+void TextButton::setState(STATE state, bool upd)
 {
 	this->state = state;
-	update();
+	if (upd)
+		update();
 }
 

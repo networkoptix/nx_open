@@ -1,6 +1,11 @@
+#ifndef menu_button_h_1746
+#define menu_button_h_1746
+
 #include <QGraphicsItem>
 
 class ButtonBackground;
+class QMouseEvent;
+class QViewMenuHandler;
 
 
 class TextButton : public QObject, public QGraphicsItem
@@ -10,7 +15,7 @@ class TextButton : public QObject, public QGraphicsItem
 public:
 	enum STATE {NORMAL, HIGHLIGHT, PRESSED, DISABLED};
 
-	TextButton(const QString &text);
+	TextButton(const QString &text, QObject* owner, QViewMenuHandler* handler);
 		
 	virtual ~TextButton();
 
@@ -21,6 +26,8 @@ public:
 
 	QString getText() const;
 
+	void setState(STATE state, bool update = true);
+
 protected: 
 	// overidden methods:
 
@@ -28,10 +35,13 @@ protected:
 	virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
 	virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
 	virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
+
 	virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
+	virtual void mouseReleaseEvent(QMouseEvent *event);
+
 	
-	void setState(STATE state);
+	
 
 
 private:
@@ -39,4 +49,9 @@ private:
 	STATE state;
 
 	volatile int mWidth, mHight;
+
+	QObject* mOwner;
+	QViewMenuHandler* mHandler;
 };
+
+#endif //menu_button_h_1746

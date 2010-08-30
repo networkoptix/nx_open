@@ -9,12 +9,13 @@
 
 class VideoWindow;
 class VideoCamerasLayout;
+class MainWnd;
 
-class GraphicsView: public QGraphicsView
+class GraphicsView: public QGraphicsView , public QViewMenuHandler
 {
 	Q_OBJECT
 public:
-	GraphicsView();
+	GraphicsView(MainWnd* mainWnd);
 	virtual ~GraphicsView();
 
 	// this function must be called after view gets it's scene
@@ -47,10 +48,15 @@ protected:
 
 	void resizeEvent ( QResizeEvent * event );
 
+	void OnMenuButton(QObject* owner, QString text);
+
 	//=========================
 	void onNewItemSelected_helper(VideoWindow* new_wnd);
 	void toggleFullScreen_helper(VideoWindow* new_wnd);
+
 	void onItemFullScreen_helper(VideoWindow* wnd);
+	void onFitInView_helper();
+	
 	VideoWindow* getLastSelectedWnd();
 	void mouseSpeed_helper(qreal& mouse_speed,  int& dx, int&dy, int min_spped, int speed_factor);
 	bool isWndStillExists(const VideoWindow* wnd) const;
@@ -92,13 +98,14 @@ protected:
 	QRect m_realSceneRect;
 	const VideoCamerasLayout* m_camLayout;
 
-	bool m_ignore_release_event;
+	bool m_ignore_release_event, m_ignore_conext_menu_event;
 
 	qreal m_fullScreenZoom;
 
 	bool m_CTRL_pressed;
 
 	QViewMenu mVoidMenu;
+	MainWnd* mMainWnd;
 
 	
 };
