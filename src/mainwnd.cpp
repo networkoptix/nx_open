@@ -45,7 +45,7 @@ m_scene_bottom(0),
 m_videoView(this)
 {
 	//ui.setupUi(this);
-
+	setWindowTitle("HDWitness");
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	
@@ -67,7 +67,7 @@ m_videoView(this)
 	//m_videoView.setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
 
 
-	//m_videoView.setCacheMode(QGraphicsView::CacheBackground);
+	//m_videoView.setCacheMode(QGraphicsView::CacheBackground);// slows down scene drawing a lot!!!
 
 
 	//m_videoView.setDragMode(QGraphicsView::ScrollHandDrag);
@@ -94,6 +94,14 @@ m_videoView(this)
 
 	palette.setColor(m_videoView.backgroundRole(), bkr_color);
 	m_videoView.setPalette(palette);
+
+	/*
+	QRadialGradient radialGrad(500, 0, 1000);
+	radialGrad.setColorAt(0, Qt::red);
+	radialGrad.setColorAt(0.5, Qt::blue);
+	radialGrad.setColorAt(1, Qt::green);
+	m_videoView.setBackgroundBrush(radialGrad);
+	/**/
 
 	//=======================================================
 
@@ -188,7 +196,7 @@ void MainWnd::mousePressEvent ( QMouseEvent * event)
 {
 	if (event->button() == Qt::MidButton)
 	{
-		toggleFullScreen();
+		//toggleFullScreen();
 	}
 
 }

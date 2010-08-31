@@ -10,8 +10,8 @@
 #define SLOT_WIDTH 640*10
 #define SLOT_HEIGHT (SLOT_WIDTH*3/4)
 
-#define SCENE_LEFT (800*1000)
-#define SCENE_TOP (800*1000)
+#define SCENE_LEFT (400*1000)
+#define SCENE_TOP (400*1000)
 
 static const int max_items = 256;
 

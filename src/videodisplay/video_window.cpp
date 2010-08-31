@@ -311,7 +311,7 @@ void CLVideoWindow::drawInfoText(QPainter* painter)
 		str << m_infoText;
 
 
-	painter->drawText(2,2 + fm.height()/2, text);
+	painter->drawText(2,20 + fm.height()/2, text);
 	
 }
 

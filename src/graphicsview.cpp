@@ -18,7 +18,7 @@
 
 QString cm_exit("Exit");
 QString cm_fitinview("Fit in View");
-QString cm_shuffle("Shuffle");
+QString cm_circle("Circle");
 QString cm_arrange("Arrange");
 QString cm_options("Options...");
 QString cm_togglefs("Toggle fullscreen");
@@ -53,6 +53,7 @@ m_CTRL_pressed(false),
 mVoidMenu(0,this,this),
 mMainWnd(mainWnd)
 {
+
 }
 
 GraphicsView::~GraphicsView()
@@ -63,13 +64,14 @@ GraphicsView::~GraphicsView()
 void GraphicsView::init()
 {
 	mVoidMenu.addItem(cm_fitinview);
-	mVoidMenu.addItem(cm_shuffle);
+	mVoidMenu.addItem(cm_circle);
 	mVoidMenu.addItem(cm_arrange);
 	mVoidMenu.addItem(cm_togglefs);
 	mVoidMenu.addItem(cm_options);
 	mVoidMenu.addItem(cm_exit);
 
 }
+
 
 void GraphicsView::setCamLayOut(const VideoCamerasLayout* lo)
 {
@@ -590,14 +592,15 @@ void GraphicsView::OnMenuButton(QObject* owner, QString text)
 	else if (text == cm_togglefs)
 	{
 		mMainWnd->toggleFullScreen();
+		m_scenezoom.zoom_delta(0.001,1)	;
 	}
 	else if (text == cm_fitinview)
 	{
 		onFitInView_helper();
 	}
-	else if (text == cm_shuffle)
+	else if (text == cm_circle)
 	{
-		onShuffle_helper();
+		onCircle_helper();
 	}
 	else if (text == cm_arrange)
 	{
@@ -754,10 +757,37 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 
 }
 
+void GraphicsView::drawBackground ( QPainter * painter, const QRectF & rect )
+{
+	const QRectF r = getRealSceneRect();
 
+
+	QColor bl(10,10,110);
+
+	//
+	QRadialGradient radialGrad(r.center(), min(r.width(), r.height())/2);
+	//radialGrad.setColorAt(0, Qt::blue);
+	radialGrad.setColorAt(0, bl);
+	radialGrad.setColorAt(1, Qt::black);
+	painter->fillRect(r, radialGrad);
+	/**/
+
+
+	/*/
+
+	QRectF r1 = r;//QRectF( r.left() + r.width()/3, r.top() , r.width() - r.width()/3 , r.height() - r.height()/3 );
+
+	QLinearGradient linearGrad1(r1.bottomLeft(), r1.topRight());
+	linearGrad1.setColorAt(0, bl);
+	linearGrad1.setColorAt(1, Qt::black);
+	painter->fillRect(r1, linearGrad1);
+	/**/
+
+}
 
 void GraphicsView::resizeEvent( QResizeEvent * event )
 {
+	
 	if (m_selectedWnd && m_selectedWnd->isFullScreen())
 		onItemFullScreen_helper(m_selectedWnd);
 	else
@@ -794,6 +824,7 @@ void GraphicsView::reAdjustSceneRect()
 	QRect r = m_camLayout->getLayoutRect();
 	setSceneRect(0,0, 2*r.right(), 2*r.bottom());
 	setRealSceneRect(r);
+	update();
 }
 
 //=====================================================
@@ -848,7 +879,7 @@ void GraphicsView::onNewItemSelected_helper(VideoWindow* new_wnd)
 
 }
 
-void GraphicsView::onShuffle_helper()
+void GraphicsView::onCircle_helper()
 {
 	QSet<CLVideoWindow*> wndlst = m_camLayout->getWndList();
 	if (wndlst.empty())
@@ -857,6 +888,18 @@ void GraphicsView::onShuffle_helper()
 	QParallelAnimationGroup *group = new QParallelAnimationGroup;
 
 
+	qreal total = wndlst.size();
+	if (total<2) 
+		return;
+
+	
+	reAdjustSceneRect();
+	QRectF item_rect = m_camLayout->getSmallLayoutRect();
+
+	int radius = min(item_rect.width(), item_rect.height())/2.2;
+	QPointF center = item_rect.center();
+
+	int i = 0;
 
 	foreach (CLVideoWindow* wnd, wndlst)
 	{
@@ -865,7 +908,7 @@ void GraphicsView::onShuffle_helper()
 		QPropertyAnimation *anim = new QPropertyAnimation(item, "rotation");
 
 		anim->setStartValue(item->getRotation());
-		anim->setEndValue(cl_get_random_val(0, 360));
+		anim->setEndValue(cl_get_random_val(0, 30));
 
 		anim->setDuration(1500 + cl_get_random_val(0, 300));
 
@@ -879,15 +922,23 @@ void GraphicsView::onShuffle_helper()
 
 		anim2->setStartValue(item->pos());
 
-		int r = 5000;
-		anim2->setEndValue( QPointF(item->pos().x() - r/2 + cl_get_random_val(0,r),   item->pos().y() - r/2 + cl_get_random_val(0,r)) );
+		//int r = 5000;
+		//anim2->setEndValue( QPointF(item->pos().x() - r/2 + cl_get_random_val(0,r),   item->pos().y() - r/2 + cl_get_random_val(0,r)) );
+
+		//QPointF(cos((i / 63.0) * 6.28) * 250,
+		//	sin((i / 63.0) * 6.28) * 250));
+		anim2->setEndValue( QPointF ( center.x() + cos((i / total) * 6.28) * radius , center.y() + sin((i / total) * 6.28) * radius) );
+
 
 		anim2->setDuration(1500 + cl_get_random_val(0, 300));
 		anim2->setEasingCurve(QEasingCurve::InOutBack);
 
 		group->addAnimation(anim2);
+
+		++i;
 	}
 
+	connect(group, SIGNAL(finished ()), this, SLOT(onFitInView_helper()));
 
 	group->start(QAbstractAnimation::DeleteWhenStopped);
 
@@ -940,7 +991,9 @@ void GraphicsView::onArrange_helper()
 		group->addAnimation(anim2);
 	}
 
-	connect(group, SIGNAL(finished ()), this, SLOT(onFitInView_helper()) )	;
+	//connect(group, SIGNAL(finished ()), this, SLOT(reAdjustSceneRect()));
+	connect(group, SIGNAL(finished ()), this, SLOT(onFitInView_helper()));
+
 
 
 	group->start(QAbstractAnimation::DeleteWhenStopped);
@@ -950,6 +1003,9 @@ void GraphicsView::onArrange_helper()
 
 void GraphicsView::onFitInView_helper()
 {
+	mVoidMenu.hide();
+
+
 	if (m_selectedWnd && isWndStillExists(m_selectedWnd) && m_selectedWnd->isFullScreen())
 	{
 		m_selectedWnd->setFullScreen(false);
@@ -957,10 +1013,10 @@ void GraphicsView::onFitInView_helper()
 		update();
 	}
 
-	
+	reAdjustSceneRect();
 	QRectF item_rect = m_camLayout->getSmallLayoutRect();
 
-	m_movement.move(item_rect.center(), 500);
+	m_movement.move(item_rect.center(), 600);
 
 	
 	QRectF viewRect = viewport()->rect();
@@ -982,7 +1038,7 @@ void GraphicsView::onFitInView_helper()
 
 
 
-	m_movement.move(item_rect.center(), item_select_duration/2 + 100);
+	m_movement.move(item_rect.center(), 500);
 
 
 	qreal zoom = m_scenezoom.scaleTozoom(scl);
@@ -990,7 +1046,7 @@ void GraphicsView::onFitInView_helper()
 	//scale(scl, scl);
 
 	befor_scene_zoom_chaged();
-	m_scenezoom.zoom_abs(zoom, item_select_duration/2 + 100);
+	m_scenezoom.zoom_abs(zoom, 500);
 
 }
 

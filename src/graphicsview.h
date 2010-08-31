@@ -57,18 +57,21 @@ protected:
 	void onItemFullScreen_helper(VideoWindow* wnd);
 	
 	void onArrange_helper();
-	void onShuffle_helper();
+	void onCircle_helper();
 	
 	VideoWindow* getLastSelectedWnd();
 	void mouseSpeed_helper(qreal& mouse_speed,  int& dx, int&dy, int min_spped, int speed_factor);
 	bool isWndStillExists(const VideoWindow* wnd) const;
 	void befor_scene_zoom_chaged();
 
-	void reAdjustSceneRect();
 	
+
+	void drawBackground ( QPainter * painter, const QRectF & rect );
+
 
 private slots:
 	void onFitInView_helper();
+	void reAdjustSceneRect();
 protected:
 	
 	int m_xRotate;
@@ -109,7 +112,7 @@ protected:
 	QViewMenu mVoidMenu;
 	MainWnd* mMainWnd;
 
-	
+
 };
 
 #endif //PH_graphicsview_h328
