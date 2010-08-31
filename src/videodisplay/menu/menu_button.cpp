@@ -19,7 +19,9 @@ QFont buttonFont()
 	return font;
 }
 
-QColor buttonTextColor(QColor(255, 255, 255));
+//QColor buttonTextColor(QColor(255, 255, 255));
+//QColor buttonTextColor(QColor(92, 113, 129));
+QColor buttonTextColor(QColor(0, 39, 198));
 //=========================================================
 
 
@@ -78,11 +80,21 @@ void TextButton::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWid
 
 	brush.setSpread(QLinearGradient::PadSpread);
 	qreal k = 4.0;
+	//
 	QColor highlight(255, 255, 255, 70*k);
 	QColor shadow(0, 0, 0, 70*k);
 	QColor sunken(220, 220, 220, 30*k);
 	QColor normal1(255, 255, 245, 60*k);
-	QColor normal2(255, 255, 235, 10*k);
+	QColor normal2(255, 255, 235, 30*k);
+	/**/
+
+	/*/
+	QColor highlight(255, 255, 255, 200);
+	QColor shadow(0, 0, 0, 200);
+	QColor sunken(220, 220, 220, 30*k);
+	QColor normal1(255, 255, 245, 200);
+	QColor normal2(255, 255, 235, 50);
+	/**/
 
 	//if (this->buttonType == TextButton::PANEL)
 	{
