@@ -462,8 +462,8 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 						//m_movement.move(mapToScene(event->pos()), m_selectedWnd ? item_select_duration : scene_move_duration);
 					}
-					befor_scene_zoom_chaged();
-					m_scenezoom.zoom_default(m_selectedWnd ? item_select_duration : scene_zoom_duration);
+					//befor_scene_zoom_chaged();
+					//m_scenezoom.zoom_default(m_selectedWnd ? item_select_duration : scene_zoom_duration);
 				}
 
 				// selection should be zerro anyway

@@ -21,7 +21,8 @@ QFont buttonFont()
 
 //QColor buttonTextColor(QColor(255, 255, 255));
 //QColor buttonTextColor(QColor(92, 113, 129));
-QColor buttonTextColor(QColor(0, 39, 198));
+//QColor buttonTextColor(QColor(0, 39, 198));
+QColor buttonTextColor(QColor(60, 99, 255));
 //=========================================================
 
 
