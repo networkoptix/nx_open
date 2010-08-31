@@ -327,6 +327,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 	bool left_button = event->button() == Qt::LeftButton;
 	bool right_button = event->button() == Qt::RightButton;
+	bool mid_button = event->button() == Qt::MidButton;
 	bool handMoving = m_handMoving>2;
 	bool rotating = m_rotationCounter>2;
 
@@ -504,6 +505,11 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 	}
 
+	if (mid_button && wnd)
+	{
+		wnd->z_rotate_abs(QPointF(0,0), 0, item_hoverevent_duration);
+	}
+
 	if (left_button)
 	{
 		m_handMoving = 0;
@@ -555,7 +561,7 @@ void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
 	}
 	else if (e->button() == Qt::RightButton)
 	{
-		item->z_rotate_abs(QPointF(0,0), 0, item_hoverevent_duration);
+		//item->z_rotate_abs(QPointF(0,0), 0, item_hoverevent_duration);
 	}
 
 	
@@ -922,11 +928,6 @@ void GraphicsView::onCircle_helper()
 
 		anim2->setStartValue(item->pos());
 
-		//int r = 5000;
-		//anim2->setEndValue( QPointF(item->pos().x() - r/2 + cl_get_random_val(0,r),   item->pos().y() - r/2 + cl_get_random_val(0,r)) );
-
-		//QPointF(cos((i / 63.0) * 6.28) * 250,
-		//	sin((i / 63.0) * 6.28) * 250));
 		anim2->setEndValue( QPointF ( center.x() + cos((i / total) * 6.28) * radius , center.y() + sin((i / total) * 6.28) * radius) );
 
 

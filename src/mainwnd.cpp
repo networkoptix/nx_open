@@ -288,7 +288,17 @@ void MainWnd::onNewDevice(CLDevice* device)
 
 
 	if (device->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT)) // do not show fps if it's still shot
+	{
 		video_wnd->showFPS(false);
+		video_wnd->setShowInfoText(false);
+		video_wnd->setShowImagesize(false);
+	}
+
+	if (device->checkDeviceTypeFlag(CLDevice::ARCHIVE)) // do not show fps if it's still shot
+	{
+		video_wnd->setShowInfoText(false);
+	}
+
 
 
 

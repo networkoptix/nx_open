@@ -46,7 +46,7 @@ void VideoWindow::setSelected(bool sel, bool animate )
 	{
 		
 		m_animationTransform.zoom_abs(selected_item_zoom, item_select_duration - 25);
-		setZValue(1);
+		setZValue(2);
 	}
 	else
 	{

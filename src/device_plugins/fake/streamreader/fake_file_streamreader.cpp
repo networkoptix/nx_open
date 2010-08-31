@@ -2,6 +2,7 @@
 #include <QTextStream>
 #include "../../../base/log.h"
 #include "../../../data/mediadata.h"
+#include "device/device.h"
 
 
 
@@ -17,6 +18,9 @@ CLClientPullStreamreader(dev),
 m_channels(channels),
 m_curr_channel(0)
 {
+
+	dev->addDeviceTypeFlag(CLDevice::ARCHIVE);
+
 	const int max_data_size = 200*1024*1024;
 
 	if (data == 0) // very first time
