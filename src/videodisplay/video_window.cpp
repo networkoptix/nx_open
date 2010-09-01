@@ -357,8 +357,13 @@ QRectF CLVideoWindow::boundingRect() const
 
 int CLVideoWindow::width() const
 {
-	if (aspectRatio()>1) // width > hight; normal scenario
+	qreal ar = aspectRatio();
+	qreal ar_f = (qreal)m_max_width/m_max_heght;
+
+	if (ar>ar_f) // width > hight; normal scenario; ar = w/h
+	{
 		return m_max_width;
+	}
 	else 
 		return m_max_heght*aspectRatio();
 }

@@ -406,56 +406,15 @@ CLVideoWindow* VideoCamerasLayout::getNextBottomWnd(const CLVideoWindow* curr) c
 }
 
 //===============================================================
-bool VideoCamerasLayout::isSlotAvailable_advance_helper(int slot, const CLVideoWindow* curr, QList<CLIdealWndPos>& lst) const
-{
-
-	// we need to ignore wnds from lst and current one 
-
-	QPoint slPos = posFromSlot(slot);
-	//QRectF new_wnd_rect(slPos, QSize(curr->width(), curr->height()));
-	QSize T_size = getMaxWndSize(curr->getVideoLayout());
-	QRectF new_wnd_rect(slPos, T_size);
-
-	foreach (CLVideoWindow* wnd, m_wnds)
-	{
-		if (wnd == curr)
-			continue;
-
-		bool need_continue = false;
-		for (int it = 0; it < lst.size(); ++it)
-		{
-			CLIdealWndPos pos = lst.at(it);
-			
-			if (pos.wnd==wnd)
-			{
-				// this wnd will be in diff pos
-				need_continue = true;
-				break;
-			}
-		}
-
-		if (need_continue)
-			continue;
-
-
-		QRectF wnd_rect = wnd->mapToScene(wnd->boundingRect()).boundingRect();
-
-		if (new_wnd_rect.intersects(wnd_rect))
-			return false;		
-	}
-
-	return true;
-
-}
 
 QPoint VideoCamerasLayout::getNextCloserstAvailableForWndSlot_butFrom_list___helper(const CLVideoWindow* wnd, QList<CLIdealWndPos>& lst) const
 {
 
 	// this function search for next available nearest slot for this wnd
 	// if slot already in lst; we ignore such slot 
-	QPointF pf = wnd->mapToScene(wnd->boundingRect().topLeft());
+	//QPointF pf = wnd->mapToScene(wnd->boundingRect().topLeft());
 
-	int center_slot = slotFromPos(QPoint(pf.x(), pf.y()));
+	//int center_slot = slotFromPos(QPoint(pf.x(), pf.y()));
 	int center_slot_x = 0;//center_slot%m_width;
 	int center_slot_y = 0;//center_slot/m_width;
 
@@ -474,12 +433,20 @@ QPoint VideoCamerasLayout::getNextCloserstAvailableForWndSlot_butFrom_list___hel
 		{
 			CLIdealWndPos pos = lst.at(it);
 			int lst_slot = slotFromPos(pos.pos);
-			if (lst_slot==slot_cand)
-			{
-				// this slot is already taken 
-				need_continue = true;
-				break;
-			}
+
+			int sl_w = pos.wnd->getVideoLayout()->width();
+			int sl_h = pos.wnd->getVideoLayout()->height();
+
+			for (int x = 0; x < sl_w; ++x)
+				for (int y = 0; y < sl_h; ++y)
+				{
+					if ((lst_slot + y*m_width + x) == slot_cand)
+					{
+						// this slot is already taken 
+						need_continue = true;
+						break;
+					}
+				}
 		}
 
 		if (need_continue)
@@ -487,8 +454,7 @@ QPoint VideoCamerasLayout::getNextCloserstAvailableForWndSlot_butFrom_list___hel
 
 		// check if slot is available;
 		// we need to ignore wnds from lst and current one 
-		if (isSlotAvailable_advance_helper(slot_cand, wnd, lst))
-			return posFromSlot(slot_cand);
+		return posFromSlot(slot_cand);
 
 	}
 
@@ -504,7 +470,11 @@ QList<CLIdealWndPos> VideoCamerasLayout::calcArrangedPos() const
 	{
 		CLIdealWndPos pos;
 		pos.wnd = wnd;
+
+
 		pos.pos = getNextCloserstAvailableForWndSlot_butFrom_list___helper(wnd, result);
+
+		int slot1 = slotFromPos(pos.pos);
 
 		int width = wnd->width();
 		int height = wnd->height();
@@ -514,6 +484,10 @@ QList<CLIdealWndPos> VideoCamerasLayout::calcArrangedPos() const
 		pos.pos.rx() += (max_size.width() - width)/2;
 		pos.pos.ry() += (max_size.height() - height)/2;
 
+		int slot2 = slotFromPos(pos.pos);
+
+		if (slot1!=slot2)
+			slot1 = slot1;
 		
 
 
@@ -741,7 +715,7 @@ void VideoCamerasLayout::buildPotantial()
 		int dx = abs(curr_x - center_x);
 		int dy = abs(curr_y - center_y);
 
-		potential_energy[i] = 4*dx*dx + 4*dy*dy*4/3;
+		potential_energy[i] = 4*dx*dx + 4*dy*dy*(10.0/7);
 	}
 
 	for (int i = 0; i < m_total_potential_elemnts; ++i)

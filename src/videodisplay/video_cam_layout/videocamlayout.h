@@ -87,7 +87,7 @@ private:
 	CLVideoWindow* next_wnd_helper(const CLVideoWindow* curr, int dir_c, int dir_f) const;
 
 	QPoint getNextCloserstAvailableForWndSlot_butFrom_list___helper(const CLVideoWindow* wnd, QList<CLIdealWndPos>& lst) const;
-	bool isSlotAvailable_advance_helper(int slot, const CLVideoWindow* curr, QList<CLIdealWndPos>& lst) const;
+	
 
 
 
