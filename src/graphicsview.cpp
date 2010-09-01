@@ -936,6 +936,8 @@ void GraphicsView::onCircle_helper()
 
 		group->addAnimation(anim2);
 
+		item->setArranged(false);
+
 		++i;
 	}
 
@@ -990,6 +992,8 @@ void GraphicsView::onArrange_helper()
 		anim2->setEasingCurve(QEasingCurve::InOutBack);
 
 		group->addAnimation(anim2);
+
+		item->setArranged(true);
 	}
 
 	//connect(group, SIGNAL(finished ()), this, SLOT(reAdjustSceneRect()));
