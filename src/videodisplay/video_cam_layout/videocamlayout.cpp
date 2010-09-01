@@ -529,11 +529,21 @@ void VideoCamerasLayout::adjustWnd(CLVideoWindow* wnd) const
 {
 	
 	QPointF p = wnd->mapToScene(wnd->boundingRect().center());
-	p-=QPointF(wnd->width()/2, wnd->height()/2); // this addition as not good at all; due to item zoom topLeft pos might be shifted to diff slot; case1
+	//p-=QPointF(wnd->width()/2, wnd->height()/2); // this addition as not good at all; due to item zoom topLeft pos might be shifted to diff slot; case1
 
 
-	
-	QPoint new_p  = posFromSlot(slotFromPos( QPoint(p.x(),p.y()) )); 
+	int slot = slotFromPos( QPoint(p.x(),p.y()) );
+	slot-=(wnd->getVideoLayout()->width()-1)/2 ;
+	slot-=(wnd->getVideoLayout()->height()-1)/2* m_width;
+
+	if (slot<0)
+	{
+		Q_ASSERT(false);
+		return;
+	}
+
+
+	QPoint new_p  = posFromSlot( slot ); 
 
 	int width = wnd->width();
 	int height = wnd->height();
