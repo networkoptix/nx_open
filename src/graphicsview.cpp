@@ -22,6 +22,7 @@ QString cm_circle("Circle");
 QString cm_arrange("Arrange");
 QString cm_options("Options...");
 QString cm_togglefs("Toggle fullscreen");
+QString cm_togglbkg("Toggle background");
 
 int item_select_duration = 700;
 int item_hoverevent_duration = 300;
@@ -51,7 +52,8 @@ m_rotatingWnd(0),
 m_movingWnd(0),
 m_CTRL_pressed(false),
 mVoidMenu(0,this,this),
-mMainWnd(mainWnd)
+mMainWnd(mainWnd),
+m_drawBkg(true)
 {
 
 }
@@ -67,6 +69,7 @@ void GraphicsView::init()
 	mVoidMenu.addItem(cm_circle);
 	mVoidMenu.addItem(cm_arrange);
 	mVoidMenu.addItem(cm_togglefs);
+	mVoidMenu.addItem(cm_togglbkg);
 	mVoidMenu.addItem(cm_options);
 	mVoidMenu.addItem(cm_exit);
 
@@ -600,6 +603,10 @@ void GraphicsView::OnMenuButton(QObject* owner, QString text)
 		mMainWnd->toggleFullScreen();
 		m_scenezoom.zoom_delta(0.001,1)	;
 	}
+	else if (text == cm_togglbkg)
+	{
+		m_drawBkg= !m_drawBkg;
+	}
 	else if (text == cm_fitinview)
 	{
 		onFitInView_helper();
@@ -765,6 +772,11 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 
 void GraphicsView::drawBackground ( QPainter * painter, const QRectF & rect )
 {
+	//return;
+
+	if (!m_drawBkg)
+		return;
+
 	const QRectF r = getRealSceneRect();
 
 

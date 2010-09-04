@@ -112,6 +112,8 @@ protected:
 	QViewMenu mVoidMenu;
 	MainWnd* mMainWnd;
 
+	bool m_drawBkg;
+
 
 };
 

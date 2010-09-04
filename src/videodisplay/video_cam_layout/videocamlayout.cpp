@@ -7,7 +7,7 @@
 #include "graphicsview.h"
 #include <QGraphicsScene>
 
-#define SLOT_WIDTH 640*10
+#define SLOT_WIDTH (640*10)
 #define SLOT_HEIGHT (SLOT_WIDTH*3/4)
 
 #define SCENE_LEFT (400*1000)
@@ -61,6 +61,20 @@ QSize VideoCamerasLayout::getMaxWndSize(const CLDeviceVideoLayout* layout) const
 
 	return QSize(SLOT_WIDTH*(dlw + m_item_distance*(dlw-1)), SLOT_HEIGHT*(dlh + m_item_distance*(dlh-1)));
 }
+
+int VideoCamerasLayout::slotsW(CLVideoWindow* wnd) const
+{
+	qreal t = qreal(wnd->width())/SLOT_WIDTH;
+	qreal t1 = (qreal(wnd->width())/SLOT_WIDTH + m_item_distance)/(1+m_item_distance);
+
+	 return ceil( (qreal(wnd->width())/SLOT_WIDTH + m_item_distance)/(1+m_item_distance) - 1e-5);
+}
+
+int VideoCamerasLayout::slotsH(CLVideoWindow* wnd) const
+{
+	return ceil( (qreal(wnd->height())/SLOT_HEIGHT+ m_item_distance)/(1+m_item_distance) - 1e-5);
+}
+
 
 QRect VideoCamerasLayout::getSmallLayoutRect() const // scene rect 
 {
@@ -434,8 +448,9 @@ QPoint VideoCamerasLayout::getNextCloserstAvailableForWndSlot_butFrom_list___hel
 			CLIdealWndPos pos = lst.at(it);
 			int lst_slot = slotFromPos(pos.pos);
 
-			int sl_w = pos.wnd->getVideoLayout()->width();
-			int sl_h = pos.wnd->getVideoLayout()->height();
+			int sl_w = slotsW(pos.wnd);
+			int sl_h = slotsH(pos.wnd);
+
 
 			for (int x = 0; x < sl_w; ++x)
 				for (int y = 0; y < sl_h; ++y)
@@ -507,8 +522,8 @@ void VideoCamerasLayout::adjustWnd(CLVideoWindow* wnd) const
 
 
 	int slot = slotFromPos( QPoint(p.x(),p.y()) );
-	slot-=(wnd->getVideoLayout()->width()-1)/2 ;
-	slot-=(wnd->getVideoLayout()->height()-1)/2* m_width;
+	slot-=(slotsW(wnd)-1)/2 ;
+	slot-=(slotsH(wnd)-1)/2* m_width;
 
 	if (slot<0)
 	{
