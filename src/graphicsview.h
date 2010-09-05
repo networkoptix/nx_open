@@ -10,6 +10,8 @@
 class VideoWindow;
 class VideoCamerasLayout;
 class MainWnd;
+class QGraphicsPixmapItem;
+class CLAnimatedBackGround;
 
 class GraphicsView: public QGraphicsView , public QViewMenuHandler
 {
@@ -42,6 +44,7 @@ protected:
 	void mouseMoveEvent ( QMouseEvent * e);
 	void mouseDoubleClickEvent ( QMouseEvent * e );
 	void contextMenuEvent ( QContextMenuEvent * event );
+	
 
 	virtual void keyPressEvent( QKeyEvent * e );
 	virtual void keyReleaseEvent( QKeyEvent * e );
@@ -113,6 +116,8 @@ protected:
 	MainWnd* mMainWnd;
 
 	bool m_drawBkg;
+	CLAnimatedBackGround* m_animated_bckg;
+	QGraphicsPixmapItem* m_logo;
 
 
 };

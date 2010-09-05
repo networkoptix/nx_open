@@ -51,7 +51,7 @@ m_videoView(this)
 	
 	//=======================================================
 
-	setAutoFillBackground(false);
+	
 
 	
 	
@@ -59,6 +59,9 @@ m_videoView(this)
 	m_videoView.setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers))); //Antialiasing
 	//m_videoView.setViewport(new QGLWidget());
 	m_videoView.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform	| QPainter::TextAntialiasing); //Antialiasing
+	setAutoFillBackground(false);
+	//m_videoView.viewport()->setAutoFillBackground(false);
+
 
 	//m_videoView.setSceneRect(0,0,2*SCENE_LEFT, 2*SCENE_TOP);
 
@@ -83,7 +86,7 @@ m_videoView(this)
 	//m_scene.setItemIndexMethod(QGraphicsScene::NoIndex);
 
 	m_videoView.setScene(&m_scene);
-	m_videoView.init();
+	
 
 	QPalette palette;
 	palette.setColor(backgroundRole(), bkr_color);
@@ -117,7 +120,7 @@ m_videoView(this)
 
 	m_videotimer = new QTimer(this);
 	connect(m_videotimer, SIGNAL(timeout()), this, SLOT(onVideoTimer()));
-	m_videotimer->start(1000/40); 
+	m_videotimer->start(1000/35); 
 
 
 	//QThread::currentThread()->setPriority(QThread::HighPriority); // Priority more tnan decoders have
@@ -213,6 +216,11 @@ void MainWnd::onTimer()
 		dev_searcher.start(); // run searcher again ...
 	}
 
+	if (first_time)
+	{
+		//m_videoView.init();
+	}
+
 	if (first_time && m_scene.items().size()==0) 
 	{
 		CLDirectoryBrowserDeviceServer dirbrowsr("c:/Photo");
@@ -221,6 +229,8 @@ void MainWnd::onTimer()
 
 	if (first_time && m_scene.items().size()) // at least something is found
 	{
+
+		m_videoView.init();
 
 		// at least we once found smth => can increase interval
 		if (m_timer->interval()!=interval)

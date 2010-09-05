@@ -14,6 +14,7 @@
 #include "mainwnd.h"
 #include <QParallelAnimationGroup>
 #include <QPropertyAnimation>
+#include "videodisplay/animation/animated_bgr.h"
 
 
 QString cm_exit("Exit");
@@ -53,14 +54,16 @@ m_movingWnd(0),
 m_CTRL_pressed(false),
 mVoidMenu(0,this,this),
 mMainWnd(mainWnd),
-m_drawBkg(true)
+m_drawBkg(true),
+m_logo(0),
+m_animated_bckg(new CLBlueBackGround(100))
 {
-
+	
 }
 
 GraphicsView::~GraphicsView()
 {
-	
+	delete m_animated_bckg;
 }
 
 void GraphicsView::init()
@@ -73,6 +76,15 @@ void GraphicsView::init()
 	mVoidMenu.addItem(cm_options);
 	mVoidMenu.addItem(cm_exit);
 
+
+	/*
+	m_logo = new QGraphicsPixmapItem(QPixmap("./skin/logo.jpg"));
+	m_logo->setZValue(-1.0);
+	m_logo->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
+	scene()->addItem(m_logo);
+	/**/
+
+	
 }
 
 
@@ -543,6 +555,16 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 	mVoidMenu.hide();
 	//mVoidMenu.show(mapToScene(event->pos()));
 	mVoidMenu.show(event->pos());
+
+	/*
+	QGraphicsPixmapItem* item = new QGraphicsPixmapItem(QPixmap("./skin/logo.jpg"));
+	item->scale(0.2, 0.2);
+	item->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
+	item->setZValue(256*256);
+	item->setPos(mapToScene(event->pos()));
+	scene()->addItem(item);
+	/**/
+
 }
 
 void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
@@ -772,34 +794,33 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 
 void GraphicsView::drawBackground ( QPainter * painter, const QRectF & rect )
 {
-	//return;
+
+	//=================
+	static int frames = 0;
+	frames++;
+	static QTime time;
+
+	int diff = time.msecsTo(QTime::currentTime());
+	if (diff>1500)
+	{
+		int fps = frames*1000/diff;
+		mMainWnd->setWindowTitle(QString::number(fps));
+		frames = 0;
+		time.restart();
+	}
+	
+	//==================
+	
+
 
 	if (!m_drawBkg)
 		return;
-
-	const QRectF r = getRealSceneRect();
-
-
-	QColor bl(10,10,110);
-
-	//
-	QRadialGradient radialGrad(r.center(), min(r.width(), r.height())/2);
-	//radialGrad.setColorAt(0, Qt::blue);
-	radialGrad.setColorAt(0, bl);
-	radialGrad.setColorAt(1, Qt::black);
-	painter->fillRect(r, radialGrad);
-	/**/
+	
+	m_animated_bckg->drawBackground(painter, rect);
 
 
-	/*/
+	if (m_logo) m_logo->setPos(rect.topLeft());
 
-	QRectF r1 = r;//QRectF( r.left() + r.width()/3, r.top() , r.width() - r.width()/3 , r.height() - r.height()/3 );
-
-	QLinearGradient linearGrad1(r1.bottomLeft(), r1.topRight());
-	linearGrad1.setColorAt(0, bl);
-	linearGrad1.setColorAt(1, Qt::black);
-	painter->fillRect(r1, linearGrad1);
-	/**/
 
 }
 
@@ -914,7 +935,7 @@ void GraphicsView::onCircle_helper()
 	reAdjustSceneRect();
 	QRectF item_rect = m_camLayout->getSmallLayoutRect();
 
-	int radius = min(item_rect.width(), item_rect.height())/2.2;
+	int radius = min(item_rect.width(), item_rect.height())/2;
 	QPointF center = item_rect.center();
 
 	int i = 0;
