@@ -120,6 +120,20 @@ void QViewMenu::show(QPointF p)
 	max_hight+=10;
 
 	//==============================
+	qreal x = p.x();
+	qreal y = p.y();
+
+	int menu_width = max_width;
+	int menu_height = max_hight*mItems.size();
+	QRect viewRect = mView->viewport()->rect();
+
+	if (p.x()+menu_width > viewRect.right())
+		p.rx() = p.x()-menu_width;
+
+	if (p.y()+menu_height> viewRect.bottom())
+		p.ry() = p.y()-menu_height;
+
+	//==============================
 
 	for (int i = 0; i < mItems.size(); ++i)
 	{
@@ -129,8 +143,6 @@ void QViewMenu::show(QPointF p)
 		
 		mView->scene()->addItem(item);
 
-		qreal x = p.x();
-		qreal y = p.y();
 		item->setPos(mView->mapToScene(x,y));
 	}
 

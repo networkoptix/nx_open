@@ -553,7 +553,6 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 	}
 
 	mVoidMenu.hide();
-	//mVoidMenu.show(mapToScene(event->pos()));
 	mVoidMenu.show(event->pos());
 
 	/*
