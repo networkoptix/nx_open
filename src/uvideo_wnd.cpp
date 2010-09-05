@@ -15,7 +15,6 @@ static double TwoPi = 2.0 * Pi;
 VideoWindow::VideoWindow(GraphicsView* view, const CLDeviceVideoLayout* layout, int max_width, int max_height):
 CLVideoWindow(layout, max_width, max_height),
 m_selected(false),
-m_fullscreen(false),
 m_z(0),
 m_animationTransform(this),
 m_view(view),
@@ -31,7 +30,7 @@ void VideoWindow::setSelected(bool sel, bool animate )
 	m_selected = sel;
 
 	if (!m_selected)
-		m_fullscreen = false;
+		setFullScreen(false);
 
 	
 	if (m_selected)
@@ -53,16 +52,6 @@ void VideoWindow::setSelected(bool sel, bool animate )
 		m_animationTransform.zoom_abs(1.0, item_hoverevent_duration);
 		setZValue(0);
 	}
-}
-
-void VideoWindow::setFullScreen(bool full)
-{
-	m_fullscreen = full;
-}
-
-bool VideoWindow::isFullScreen() const
-{
-	return m_fullscreen;
 }
 
 

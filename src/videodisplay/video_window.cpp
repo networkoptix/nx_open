@@ -5,6 +5,7 @@
 #include <QStyleOptionGraphicsItem>
 #include <QGraphicsSceneMouseEvent>
 
+#define SHADOW_SIZE 100
 
 CLVideoWindow::CLVideoWindow(const CLDeviceVideoLayout* layout, int max_width, int max_height):
 m_videolayout(layout),
@@ -24,6 +25,7 @@ m_imageHeight_old(0),
 m_opacity(0.0),
 m_videonum(layout->numberOfChannels()),
 m_cam(0),
+m_fullscreen(false),
 m_arranged(true)
 {
 	//we never cache the video
@@ -109,6 +111,15 @@ bool CLVideoWindow::isArranged() const
 	return m_arranged;
 }
 
+void CLVideoWindow::setFullScreen(bool full)
+{
+	m_fullscreen = full;
+}
+
+bool CLVideoWindow::isFullScreen() const
+{
+	return m_fullscreen;
+}
 
 int CLVideoWindow::imageWidth() const
 {
@@ -148,7 +159,6 @@ QRect CLVideoWindow::getSubChannelRect(unsigned int channel) const
 {
 	if (m_videonum==1) // most case scenario 
 		return QRect(0,0,width(),height());
-		//return QRect(width()/2,height()/2,width()/2,height()/2);
 
 	/*
 
@@ -237,10 +247,9 @@ void CLVideoWindow::drawStuff(QPainter* painter)
 	if (m_showfps)
 	{
 		drawFPS(painter);
-
 	}
 
-	
+	if (!m_fullscreen)	drawShadow(painter);
 	
 }
 void CLVideoWindow::drawFPS(QPainter* painter)
@@ -263,6 +272,15 @@ void CLVideoWindow::drawFPS(QPainter* painter)
 
 	}
 
+}
+
+void CLVideoWindow::drawShadow(QPainter* painter)
+{
+	QColor shadow_color(0, 0, 0, 128);
+	QRect rect1(width(), SHADOW_SIZE, SHADOW_SIZE, height());
+	QRect rect2(SHADOW_SIZE, height(), width()-SHADOW_SIZE, SHADOW_SIZE);
+	painter->fillRect(rect1, shadow_color);
+	painter->fillRect(rect2, shadow_color);
 }
 
 void CLVideoWindow::drawLostConnection(QPainter* painter)
@@ -352,7 +370,10 @@ void CLVideoWindow::setInfoText(QString text)
 
 QRectF CLVideoWindow::boundingRect() const
 {
-	return QRectF(0,0,width(),height());
+	if(m_fullscreen)
+		return QRectF(0,0,width(),height()); // do not want shadow in case of fullscreen
+	else
+		return QRectF(0, 0, width() + SHADOW_SIZE,  height() + SHADOW_SIZE); // do not want shadow in case of fullscreen
 }
 
 int CLVideoWindow::width() const

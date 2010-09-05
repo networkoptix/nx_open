@@ -259,7 +259,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 			//QPointF wnd_pos = m_movingWnd->scenePos(); <---- this does not work coz item zoom ;case1
 
 			QPointF wnd_pos = m_movingWnd->sceneBoundingRect().center();
-			wnd_pos-=QPointF(m_movingWnd->width()/2, m_movingWnd->height()/2);
+			wnd_pos-=QPointF(m_movingWnd->boundingRect().width()/2, m_movingWnd->boundingRect().height()/2);
 			m_movingWnd->setPos(wnd_pos+delta);
 			m_movingWnd->setArranged(false);
 		}
@@ -1096,7 +1096,7 @@ void GraphicsView::onItemFullScreen_helper(VideoWindow* wnd)
 
 	//viewport()->showFullScreen();
 
-
+	wnd->setFullScreen(true); // must be called at very beginning of the function coz it will change boundingRect of the item (shadows removed)
 
 	QRectF item_rect = wnd->sceneBoundingRect();
 	QRectF viewRect = viewport()->rect();
@@ -1134,7 +1134,7 @@ void GraphicsView::onItemFullScreen_helper(VideoWindow* wnd)
 	m_selectedWnd = wnd;
 	m_last_selectedWnd = wnd;
 
-	wnd->setFullScreen(true);
+	
 
 }
 

@@ -31,6 +31,10 @@ public:
 	void setVideoCam(CLVideoCamera* cam);
 	CLVideoCamera* getVideoCam() const;
 
+	void setFullScreen(bool full);
+	bool isFullScreen() const;
+
+
 	virtual void before_destroy();
 	void applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation);
 	virtual float aspectRatio() const;
@@ -90,6 +94,7 @@ protected:
 	virtual void drawFPS(QPainter* painter);
 	virtual void drawLostConnection(QPainter* painter);
 	virtual void drawInfoText(QPainter* painter);
+	virtual void drawShadow(QPainter* painter);
 
 	
 
@@ -106,6 +111,8 @@ protected:
 	CLGLRenderer* m_gldraw[CL_MAX_CHANNELS];
 	bool m_first_draw;
 	CLStatistics* m_stat[CL_MAX_CHANNELS];
+
+	bool m_fullscreen; // could be only if m_selected
 
 	bool m_showfps;
 	bool m_showinfotext;

@@ -187,7 +187,7 @@ void CLSceneMovement::valueChanged ( qreal dpos )
 		diff = selected_center - result;
 
 
-		if ( abs(diff.x()) > wnd->width()*1.2 || abs(diff.y()) > wnd->height()*1.2)
+		if ( abs(diff.x()) > wnd->boundingRect().width()*1.2 || abs(diff.y()) > wnd->boundingRect().height()*1.2)
 			m_view->setZeroSelection();
 	}
 

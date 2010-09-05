@@ -39,6 +39,7 @@ mHandler(handler)
 	mWidth = 180*20;
 	mHight = 19*20;
 
+	setCursor(Qt::ArrowCursor);
 }
 
 TextButton::~TextButton()

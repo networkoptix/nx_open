@@ -64,9 +64,6 @@ QSize VideoCamerasLayout::getMaxWndSize(const CLDeviceVideoLayout* layout) const
 
 int VideoCamerasLayout::slotsW(CLVideoWindow* wnd) const
 {
-	qreal t = qreal(wnd->width())/SLOT_WIDTH;
-	qreal t1 = (qreal(wnd->width())/SLOT_WIDTH + m_item_distance)/(1+m_item_distance);
-
 	 return ceil( (qreal(wnd->width())/SLOT_WIDTH + m_item_distance)/(1+m_item_distance) - 1e-5);
 }
 

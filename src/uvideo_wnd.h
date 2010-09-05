@@ -21,9 +21,6 @@ public:
 	void setSelected(bool sel, bool animate = true);
 	bool isSelected() const;
 
-	void setFullScreen(bool full);
-	bool isFullScreen() const;
-
 	void zoom_abs(qreal z, int duration);
 	void z_rotate_delta(QPointF center, qreal angle, int diration);
 	void z_rotate_abs(QPointF center, qreal angle, int duration);
@@ -53,7 +50,7 @@ private:
 
 private:
 	bool m_selected;
-	bool m_fullscreen; // could be only if m_selected
+	
 	int m_z;
 	CLItemTransform m_animationTransform;
 	GraphicsView* m_view;
