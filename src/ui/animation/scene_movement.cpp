@@ -1,8 +1,8 @@
 #include "scene_movement.h"
 #include <QScrollBar>
 #include "../../base/log.h"
-#include "graphicsview.h"
-#include "uvideo_wnd.h"
+#include "../graphicsview.h"
+#include "../uvideo_wnd.h"
 
 
 

@@ -4,7 +4,7 @@
 #include "../../device/device.h"
 
 #include <QPointF>
-#include "graphicsview.h"
+#include "./../graphicsview.h"
 #include <QGraphicsScene>
 
 #define SLOT_WIDTH (640*10)

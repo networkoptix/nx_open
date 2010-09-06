@@ -10,7 +10,7 @@ DESTDIR = ../bin
 
 INCLUDEPATH += ../contrib
 
-SOURCES = graphicsview.cpp main.cpp mainwnd.cpp uvideo_wnd.cpp video_camera.cpp 
+SOURCES = main.cpp mainwnd.cpp video_camera.cpp 
 
 SOURCES += base/log.cpp base/bytearray.cpp
 SOURCES += camera/camera.cpp
@@ -22,7 +22,7 @@ SOURCES += statistics/statistics.cpp
 SOURCES += streamreader/cpull_stremreader.cpp streamreader/streamreader.cpp streamreader/single_shot_reader.cpp streamreader/single_shot_file_reader.cpp
 SOURCES += videodisplay/camdisplay.cpp videodisplay/gl_renderer.cpp videodisplay/video_window.cpp videodisplay/videostreamdisplay.cpp
 
-HEADERS = graphicsview.h mainwnd.h uvideo_wnd.h video_camera.h
+HEADERS = mainwnd.h video_camera.h
 HEADERS += base/threadqueue.h base/log.h base/associativearray.h base/expensiveobject.h base/bytearray.h base/longrunnable.h base/rand.h base/adaptivesleep.h base/base.h base/sleep.h
 HEADERS += camera/camera.h
 HEADERS += data/dataprocessor.h data/data.h data/mediadata.h
@@ -51,14 +51,18 @@ SOURCES += device_plugins/fake/streamreader/fake_file_streamreader.cpp
 HEADERS += device_plugins/fake/devices/fake_device_server.h device_plugins/fake/devices/fake_device.h
 HEADERS += device_plugins/fake/streamreader/fake_file_streamreader.h
 
-HEADERS += videodisplay/video_cam_layout/videocamlayout.h  videodisplay/animation/animation_timeline.h videodisplay/animation/mouse_state.h
-HEADERS += videodisplay/animation/scene_movement.h videodisplay/animation/scene_zoom.h videodisplay/animation/abstract_animation.h videodisplay/animation/item_trans.h videodisplay/animation/animated_bgr.h
+SOURCES +=ui/graphicsview.cpp ui/uvideo_wnd.cpp
+HEADERS +=ui/graphicsview.h ui/uvideo_wnd.h
 
-SOURCES += videodisplay/video_cam_layout/videocamlayout.cpp videodisplay/animation/animation_timeline.cpp videodisplay/animation/mouse_state.cpp
-SOURCES += videodisplay/animation/scene_movement.cpp videodisplay/animation/scene_zoom.cpp videodisplay/animation/abstract_animation.cpp videodisplay/animation/item_trans.cpp videodisplay/animation/animated_bgr.cpp
+HEADERS += ui/video_cam_layout/videocamlayout.h  ui/animation/animation_timeline.h ui/animation/mouse_state.h
+HEADERS += ui/animation/scene_movement.h ui/animation/scene_zoom.h ui/animation/abstract_animation.h ui/animation/item_trans.h ui/animation/animated_bgr.h
 
-SOURCES += videodisplay/menu/menu_button.cpp videodisplay/menu/grapicsview_context_menu.cpp
-HEADERS += videodisplay/menu/menu_button.h videodisplay/menu/grapicsview_context_menu.h
+SOURCES += ui/video_cam_layout/videocamlayout.cpp ui/animation/animation_timeline.cpp ui/animation/mouse_state.cpp
+SOURCES += ui/animation/scene_movement.cpp ui/animation/scene_zoom.cpp ui/animation/abstract_animation.cpp ui/animation/item_trans.cpp ui/animation/animated_bgr.cpp
+
+SOURCES += ui/menu/menu_button.cpp ui/menu/grapicsview_context_menu.cpp
+HEADERS += ui/menu/menu_button.h ui/menu/grapicsview_context_menu.h
+
 
 RESOURCES += mainwnd.qrc
 FORMS += mainwnd.ui

@@ -5,7 +5,7 @@
 #include <math.h>
 #include "../src/gui/graphicsview/qgraphicsitem.h"
 #include "uvideo_wnd.h"
-#include "videodisplay/video_cam_layout/videocamlayout.h"
+#include "./video_cam_layout/videocamlayout.h"
 #include "../base/rand.h"
 #include "camera/camera.h"
 #include <QSet>
@@ -14,7 +14,7 @@
 #include "mainwnd.h"
 #include <QParallelAnimationGroup>
 #include <QPropertyAnimation>
-#include "videodisplay/animation/animated_bgr.h"
+#include "./animation/animated_bgr.h"
 
 
 QString cm_exit("Exit");

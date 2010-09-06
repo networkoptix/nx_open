@@ -3,11 +3,11 @@
 
 #include <QtGui/QMainWindow>
 #include "ui_mainwnd.h"
-#include "graphicsview.h"
+#include "./ui/graphicsview.h"
 #include <QList>
 #include "streamreader/streamreader.h"
 #include "device/device.h"
-#include "videodisplay/video_cam_layout/videocamlayout.h"
+#include "ui/video_cam_layout/videocamlayout.h"
 
 
 

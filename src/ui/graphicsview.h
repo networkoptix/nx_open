@@ -2,10 +2,10 @@
 #define PH_graphicsview_h328
 
 #include <QGraphicsView>
-#include "./videodisplay/animation/scene_movement.h"
-#include "./videodisplay/animation/scene_zoom.h"
-#include "./videodisplay/animation/mouse_state.h"
-#include "./videodisplay/menu/grapicsview_context_menu.h"
+#include "./animation/scene_movement.h"
+#include "./animation/scene_zoom.h"
+#include "./animation/mouse_state.h"
+#include "./menu/grapicsview_context_menu.h"
 
 class VideoWindow;
 class VideoCamerasLayout;

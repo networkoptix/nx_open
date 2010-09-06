@@ -2,7 +2,7 @@
 #define uvideo_wnd_h_1951
 
 #include "videodisplay/video_window.h"
-#include "./videodisplay/animation/item_trans.h"
+#include "./animation/item_trans.h"
 
 class GraphicsView;
 class VideoCamerasLayout;
