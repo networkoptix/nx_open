@@ -2,7 +2,7 @@
 #include <QScrollBar>
 #include "../../base/log.h"
 #include "../graphicsview.h"
-#include "../uvideo_wnd.h"
+#include "../videoitem/uvideo_wnd.h"
 
 
 

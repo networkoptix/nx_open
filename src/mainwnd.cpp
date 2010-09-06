@@ -16,7 +16,7 @@
 #include "device/asynch_seacher.h"
 #include "camera/camera.h"
 #include "streamreader/streamreader.h"
-#include "./ui/uvideo_wnd.h"
+#include "./ui/videoitem/uvideo_wnd.h"
 #include "video_camera.h"
 #include "device/directory_browser.h"
 

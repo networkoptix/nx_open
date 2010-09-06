@@ -4,7 +4,7 @@
 #include "./base/log.h"
 #include <math.h>
 #include "../src/gui/graphicsview/qgraphicsitem.h"
-#include "uvideo_wnd.h"
+#include "./videoitem/uvideo_wnd.h"
 #include "./video_cam_layout/videocamlayout.h"
 #include "../base/rand.h"
 #include "camera/camera.h"
