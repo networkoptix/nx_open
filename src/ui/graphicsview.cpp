@@ -77,7 +77,7 @@ void GraphicsView::init()
 	mVoidMenu.addItem(cm_exit);
 
 
-	/*
+	/*/
 	m_logo = new QGraphicsPixmapItem(QPixmap("./skin/logo.jpg"));
 	m_logo->setZValue(-1.0);
 	m_logo->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);

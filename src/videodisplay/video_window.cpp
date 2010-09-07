@@ -28,6 +28,8 @@ m_cam(0),
 m_fullscreen(false),
 m_arranged(true)
 {
+
+	memset(m_stat, 0 , sizeof(m_stat));
 	//we never cache the video
 	//setCacheMode(DeviceCoordinateCache);
 	//setCacheMode(ItemCoordinateCache);
@@ -224,7 +226,7 @@ void CLVideoWindow::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
 	
 	drawStuff(painter);
 
-	if (m_stat[0]->isConnectioLost())
+	if (m_stat[0] && m_stat[0]->isConnectioLost())
 		drawLostConnection(painter);
 
 	
@@ -264,6 +266,9 @@ void CLVideoWindow::drawFPS(QPainter* painter)
 	for (int i = 0; i < m_videonum; ++i)
 	{
 
+		if (m_stat[i]==0)
+			continue;
+
 		QRect rect = getSubChannelRect(i);
 
 		sprintf(fps, "%6.2ffps %6.2fMbps", m_stat[i]->getFrameRate(), m_stat[i]->getBitrate());
@@ -281,6 +286,9 @@ void CLVideoWindow::drawShadow(QPainter* painter)
 	QRect rect2(SHADOW_SIZE, height(), width()-SHADOW_SIZE, SHADOW_SIZE);
 	painter->fillRect(rect1, shadow_color);
 	painter->fillRect(rect2, shadow_color);
+
+	painter->setPen(QPen(QColor(150,150,150,200),  20, Qt::SolidLine));
+	painter->drawRect(0,0,width(),height());
 }
 
 void CLVideoWindow::drawLostConnection(QPainter* painter)

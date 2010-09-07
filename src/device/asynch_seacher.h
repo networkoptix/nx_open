@@ -44,7 +44,7 @@ private:
 	// this function will modify CLDeviceList( conflict flag)
 	// it only checks obvious conflicts 
 	// obvious - means that there are more than one device this such IP;
-	static bool checkObviousConflicts(CLDeviceList& lst);
+	bool checkObviousConflicts(CLDeviceList& lst);
 
 	// moves devices from from to to with status&mask = value
 	// to move all devices use mask = 0 value = 0

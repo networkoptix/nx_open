@@ -203,7 +203,7 @@ CLDeviceList CLDiviceSeracher::findNewDevices(bool allow_to_change_ip, bool& ip_
 		goto END;
 
 
-
+	// put ip of all devices into busy_list
 	{
 		QMutexLocker lock(&all_devices_mtx);
 
@@ -293,6 +293,24 @@ bool CLDiviceSeracher::checkObviousConflicts(CLDeviceList& lst)
 
 	QMap<QString,  CLDevice*> ips;
 	QMap<QString,  CLDevice*>::iterator ip_it;
+
+	/**/
+	{
+		// put in already busy ip, ip from all_devices
+		QMutexLocker lock(&all_devices_mtx);
+
+		CLDeviceList::iterator it = all_devices.begin();
+		while (it!=all_devices.end())
+		{
+			CLNetworkDevice* device = static_cast<CLNetworkDevice*>(it.value());
+			if (device->checkDeviceTypeFlag(CLDevice::NETWORK))
+				ips[device->getIP().toString()] = device;
+
+			++it;
+		}
+	}
+	/**/
+
 
 
 	CLDeviceList::iterator it = lst.begin();
