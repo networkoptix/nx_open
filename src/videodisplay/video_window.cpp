@@ -10,11 +10,12 @@
 CLVideoWindow::CLVideoWindow(const CLDeviceVideoLayout* layout, int max_width, int max_height):
 m_videolayout(layout),
 m_first_draw(true),
-m_showfps(true),
-m_showinfotext(true),
-m_showimagesize(true),
-//m_FPS_Font("arial black", 250),
+m_showfps(false),
+m_showinfotext(false),
+m_showimagesize(false),
+//m_FPS_Font("arial black", 20),
 m_FPS_Font("Courier New", 250),
+//m_Info_Font("times", 10),
 m_Info_Font("times", 110),
 m_max_width(max_width),
 m_max_heght(max_height),
@@ -80,6 +81,7 @@ void CLVideoWindow::draw(CLVideoDecoderOutput& image, unsigned int channel)
 	
 	m_first_draw = false;
 	m_gldraw[channel]->draw(image, channel); // this function will wait m_gldraw.paintEvent(0);
+	//needUpdate(true);
 	QMutexLocker locker(&m_mutex);
 	m_imageWidth = image.width;
 	m_imageHeight = image.height;
@@ -137,10 +139,6 @@ int CLVideoWindow::imageHeight() const
 }
 
 
-void CLVideoWindow::setShowFps(bool show)
-{
-	m_showfps = show;
-}
 
 void CLVideoWindow::setShowInfoText(bool show)
 {
@@ -204,13 +202,16 @@ void CLVideoWindow::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
 	// save the GL state set for QPainter
 	painter->beginNativePainting();
 	saveGLState();
-	for (int i = 0; i  < m_videonum; ++i)
-			m_gldraw[i]->paintEvent(getSubChannelRect(i));
-
-	
+	for (int i = 0; i  < m_videonum; ++i)	m_gldraw[i]->paintEvent(getSubChannelRect(i));
 
 	// restore the GL state that QPainter expects
+
+	
+	drawStuff(painter);
 	restoreGLState();
+
+	
+	
 	painter->endNativePainting();
 
 
@@ -222,9 +223,8 @@ void CLVideoWindow::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
 	}
 	/**/
 
-
 	
-	drawStuff(painter);
+	
 
 	if (m_stat[0] && m_stat[0]->isConnectioLost())
 		drawLostConnection(painter);
@@ -243,15 +243,20 @@ void CLVideoWindow::applyMixerSettings(qreal brightness, qreal contrast, qreal h
 
 void CLVideoWindow::drawStuff(QPainter* painter)
 {
+
+	
 	if (m_showinfotext || m_showimagesize)
+	{
 		drawInfoText(painter);
+	}
 	
 	if (m_showfps)
 	{
 		drawFPS(painter);
 	}
 
-	if (!m_fullscreen)	drawShadow(painter);
+	//if (!m_fullscreen)	
+		drawShadow(painter);
 	
 }
 void CLVideoWindow::drawFPS(QPainter* painter)
@@ -287,8 +292,9 @@ void CLVideoWindow::drawShadow(QPainter* painter)
 	painter->fillRect(rect1, shadow_color);
 	painter->fillRect(rect2, shadow_color);
 
-	painter->setPen(QPen(QColor(150,150,150,200),  20, Qt::SolidLine));
-	painter->drawRect(0,0,width(),height());
+	const int fr_w = 20;
+	painter->setPen(QPen(QColor(150,150,150,200),  fr_w, Qt::SolidLine));
+	painter->drawRect(-fr_w/2,-fr_w/2,width()+fr_w,height()+fr_w);
 }
 
 void CLVideoWindow::drawLostConnection(QPainter* painter)
@@ -318,8 +324,8 @@ void CLVideoWindow::drawLostConnection(QPainter* painter)
 
 void CLVideoWindow::drawInfoText(QPainter* painter)
 {
+	
 	painter->setFont(m_Info_Font);
-
 	//painter->setPen(QColor(255,0,0,220));
 	painter->setPen(QColor(30,55,255));
 
@@ -338,7 +344,7 @@ void CLVideoWindow::drawInfoText(QPainter* painter)
 
 
 	painter->drawText(2,20 + fm.height()/2, text);
-	
+	//painter->drawText(2,20 + 100, text);
 }
 
 
@@ -378,10 +384,7 @@ void CLVideoWindow::setInfoText(QString text)
 
 QRectF CLVideoWindow::boundingRect() const
 {
-	if(m_fullscreen)
-		return QRectF(0,0,width(),height()); // do not want shadow in case of fullscreen
-	else
-		return QRectF(0, 0, width() + SHADOW_SIZE,  height() + SHADOW_SIZE); // do not want shadow in case of fullscreen
+	return QRectF(0,0,width(),height()); // do not want shadow in case of fullscreen
 }
 
 int CLVideoWindow::width() const

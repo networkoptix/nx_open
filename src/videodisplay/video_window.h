@@ -57,7 +57,6 @@ public:
 	void setArranged(bool arr);
 	bool isArranged() const;
 
-	void setShowFps(bool show);
 	void setShowInfoText(bool show);
 	void setShowImagesize(bool show);
 

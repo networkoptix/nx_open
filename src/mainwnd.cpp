@@ -39,7 +39,7 @@ extern int scene_zoom_duration;
 MainWnd::MainWnd(QWidget *parent, Qt::WFlags flags):
 //QMainWindow(parent, flags),
 m_selectedcCam(0),
-m_camlayout(&m_videoView, &m_scene, CL_VIDEO_ROWS, 40),
+m_camlayout(&m_videoView, &m_scene, CL_VIDEO_ROWS, 35),
 m_scene_right(0),
 m_scene_bottom(0),
 m_videoView(this)

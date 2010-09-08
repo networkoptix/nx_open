@@ -14,7 +14,7 @@ QFont buttonFont()
 	font.setFamily("Silom");
 #else
 	font.setPixelSize(15);
-	font.setFamily("Verdana");
+	font.setFamily("Bodoni MT");
 #endif
 	return font;
 }
@@ -22,7 +22,7 @@ QFont buttonFont()
 //QColor buttonTextColor(QColor(255, 255, 255));
 //QColor buttonTextColor(QColor(92, 113, 129));
 //QColor buttonTextColor(QColor(0, 39, 198));
-QColor buttonTextColor(QColor(60, 99, 255));
+QColor buttonTextColor(QColor(255, 255, 255));
 //=========================================================
 
 
@@ -45,6 +45,12 @@ mHandler(handler)
 TextButton::~TextButton()
 {
 
+}
+
+void TextButton::setTopBottom(bool top, bool bottom)
+{
+	mTop = top;
+	mBottom = bottom;
 }
 
 QRectF TextButton::boundingRect() const
@@ -74,59 +80,40 @@ void TextButton::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWid
 	painter->setRenderHint(QPainter::SmoothPixmapTransform);
 	painter->setRenderHint(QPainter::Antialiasing);
 
-	painter->setPen(Qt::NoPen);
 
+	
 
-	QLinearGradient outlinebrush(0, 0, 0, boundingRect().height());
-	QLinearGradient brush(0, 0, 0, boundingRect().height());
+	unsigned char transp = 210;
 
-	brush.setSpread(QLinearGradient::PadSpread);
-	qreal k = 4.0;
-	//
-	QColor highlight(255, 255, 255, 70*k);
-	QColor shadow(0, 0, 0, 70*k);
-	QColor sunken(220, 220, 220, 30*k);
-	QColor normal1(255, 255, 245, 60*k);
-	QColor normal2(255, 255, 235, 30*k);
-	/**/
-
-	/*/
-	QColor highlight(255, 255, 255, 200);
-	QColor shadow(0, 0, 0, 200);
-	QColor sunken(220, 220, 220, 30*k);
-	QColor normal1(255, 255, 245, 200);
-	QColor normal2(255, 255, 235, 50);
-	/**/
-
-	//if (this->buttonType == TextButton::PANEL)
+	if (state == PRESSED)
 	{
-		//normal1 = QColor(200, 170, 160, 50*k);
-		//normal2 = QColor(50, 10, 0, 50*k);
-	}
-
-	if (state == PRESSED || state == DISABLED) 
-	{
-		outlinebrush.setColorAt(0.0f, shadow);
-		outlinebrush.setColorAt(1.0f, highlight);
-		brush.setColorAt(0.0f, sunken);
-		painter->setPen(Qt::NoPen);
+		
 	} 
-	else 
+	if (state == HIGHLIGHT)
 	{
-		outlinebrush.setColorAt(1.0f, shadow);
-		outlinebrush.setColorAt(0.0f, highlight);
-		brush.setColorAt(0.0f, normal1);
-		if (state!=HIGHLIGHT)
-			brush.setColorAt(1.0f, normal2);
-		painter->setPen(QPen(outlinebrush, 1));
+		
+		painter->fillRect(boundingRect(), QColor(100,0,0,transp));
+		//painter->fillRect(boundingRect(), QColor(25,25,25,transp));
 	}
-	painter->setBrush(brush);
+	else if (state == DISABLED) 
+	{
 
+	}
+	else if (state == NORMAL) 
+	{
+		painter->fillRect(boundingRect(), QColor(0,0,0,transp));
+	}
 
-	//if (this->buttonType== TextButton::PANEL)
-		painter->drawRect(0, 0, boundingRect().width(), boundingRect().height());
-	//else
-		//painter->drawRoundedRect(0, 0, boundingRect().width(), boundingRect().height(), 10, 90, Qt::RelativeSize);
+	painter->setPen(QPen(QColor(100,100,100,230),  1, Qt::SolidLine));
+	painter->drawLine(boundingRect().topLeft(), boundingRect().bottomLeft());
+	painter->drawLine(boundingRect().topRight(), boundingRect().bottomRight());
+
+	if (mTop)
+		painter->drawLine(boundingRect().topLeft(), boundingRect().topRight());
+
+	if (mBottom)
+		painter->drawLine(boundingRect().bottomLeft(), boundingRect().bottomRight());
+
 
 	//==================================================
 

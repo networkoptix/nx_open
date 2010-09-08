@@ -11,6 +11,7 @@ static const qreal def_zoom = 0.22;
 
 static const qreal low_normal_qulity_zoom = 0.22;
 static const qreal normal_hight_qulity_zoom = 0.30;
+static const qreal hight_highest_qulity_zoom = 0.32;
 
 CLSceneZoom::CLSceneZoom(GraphicsView* gview):
 m_view(gview),
@@ -84,6 +85,13 @@ void CLSceneZoom::valueChanged( qreal dpos )
 
 	if (zooming_out)
 	{
+		if (m_quality==CLStreamreader::CLSHighest && getZoom() <= hight_highest_qulity_zoom)
+		{
+			m_view->setAllItemsQuality(CLStreamreader::CLSHigh, false);
+			m_quality = CLStreamreader::CLSHigh;
+		}
+
+
 		if (m_quality==CLStreamreader::CLSHigh && getZoom() <= normal_hight_qulity_zoom)
 		{
 			m_view->setAllItemsQuality(CLStreamreader::CLSNormal, false);
@@ -109,6 +117,13 @@ void CLSceneZoom::valueChanged( qreal dpos )
 			m_view->setAllItemsQuality(CLStreamreader::CLSHigh, true);
 			m_quality = CLStreamreader::CLSHigh;
 		}
+
+		else if (m_quality==CLStreamreader::CLSHigh && getZoom() > hight_highest_qulity_zoom)
+		{
+			m_view->setAllItemsQuality(CLStreamreader::CLSHighest, true);
+			m_quality = CLStreamreader::CLSHighest;
+		}
+
 
 	}
 

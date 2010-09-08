@@ -73,7 +73,7 @@ protected:
 
 
 private slots:
-	void onFitInView_helper();
+	void onFitInView_helper(int duration = 600);
 	void reAdjustSceneRect();
 protected:
 	

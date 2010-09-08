@@ -120,9 +120,6 @@ void QViewMenu::show(QPointF p)
 	max_hight+=10;
 
 	//==============================
-	qreal x = p.x();
-	qreal y = p.y();
-
 	int menu_width = max_width;
 	int menu_height = max_hight*mItems.size();
 	QRect viewRect = mView->viewport()->rect();
@@ -133,22 +130,41 @@ void QViewMenu::show(QPointF p)
 	if (p.y()+menu_height> viewRect.bottom())
 		p.ry() = p.y()-menu_height;
 
+
+
 	//==============================
 
-	for (int i = 0; i < mItems.size(); ++i)
+	for (int i = 0; i < mItems.count(); ++i)
 	{
 		TextButton* item = mItems.at(i);
+
+		item->setTopBottom(false, false);
+
+		if (i==0)
+			item->setTopBottom(true, false);
+
+		if (i==mItems.count()-1)
+			item->setTopBottom(false, true);
+
+
+		if (mItems.count()==1) // if it's the only item
+			item->setTopBottom(true, true);
+
+
 		item->setWidth(max_width);
 		item->setHeight(max_hight);
 		
 		mView->scene()->addItem(item);
+
+		qreal x = p.x();
+		qreal y = p.y() + i*(item->boundingRect().height());
 
 		item->setPos(mView->mapToScene(x,y));
 	}
 
 	mVisible = true;
 
-	init_animatiom(p);
+	//init_animatiom(p);
 	
 }
 

@@ -890,7 +890,8 @@ void GraphicsView::toggleFullScreen_helper(VideoWindow* wnd)
 		// escape FS MODE
 		setZeroSelection();
 		wnd->setFullScreen(false);
-		zoomDefault(item_select_duration*1.3);
+		//zoomDefault(item_select_duration*1.3);
+		onFitInView_helper(800);
 	}
 }
 
@@ -1038,7 +1039,7 @@ void GraphicsView::onArrange_helper()
 	
 }
 
-void GraphicsView::onFitInView_helper()
+void GraphicsView::onFitInView_helper(int duration )
 {
 	mVoidMenu.hide();
 
@@ -1053,7 +1054,7 @@ void GraphicsView::onFitInView_helper()
 	reAdjustSceneRect();
 	QRectF item_rect = m_camLayout->getSmallLayoutRect();
 
-	m_movement.move(item_rect.center(), 600);
+	m_movement.move(item_rect.center(), duration);
 
 	
 	QRectF viewRect = viewport()->rect();
@@ -1075,7 +1076,6 @@ void GraphicsView::onFitInView_helper()
 
 
 
-	m_movement.move(item_rect.center(), 500);
 
 
 	qreal zoom = m_scenezoom.scaleTozoom(scl);
@@ -1083,7 +1083,7 @@ void GraphicsView::onFitInView_helper()
 	//scale(scl, scl);
 
 	befor_scene_zoom_chaged();
-	m_scenezoom.zoom_abs(zoom, 500);
+	m_scenezoom.zoom_abs(zoom, duration);
 
 }
 

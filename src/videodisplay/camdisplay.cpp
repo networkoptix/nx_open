@@ -2,7 +2,7 @@
 #include "../data/mediadata.h"
 #include "../device/device_video_layout.h"
 
-#define CL_MAX_DISPLAY_QUEUE_SIZE 5
+#define CL_MAX_DISPLAY_QUEUE_SIZE 3
 
 
 

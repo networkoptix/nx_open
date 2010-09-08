@@ -28,6 +28,8 @@ public:
 
 	void setState(STATE state, bool update = true);
 
+	void setTopBottom(bool top, bool bottom);
+
 protected: 
 	// overidden methods:
 
@@ -52,6 +54,9 @@ private:
 
 	QObject* mOwner;
 	QViewMenuHandler* mHandler;
+
+	bool mTop;
+	bool mBottom;
 };
 
 #endif //menu_button_h_1746

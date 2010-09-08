@@ -710,7 +710,7 @@ void CLGLRenderer::drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const
 
 void CLGLRenderer::paintEvent(const QRect& r)
 {
-
+	
 	if (m_abort_drawing)
 		return;
 
@@ -736,8 +736,7 @@ void CLGLRenderer::paintEvent(const QRect& r)
 	
 	
 	
-	if (m_gotnewimage)	
-		updateTexture();
+	if (m_gotnewimage)	updateTexture();
 	
 	m_painterOpacity = 1.0;
 	QRect temp;

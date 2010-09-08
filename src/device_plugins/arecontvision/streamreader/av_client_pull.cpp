@@ -26,10 +26,27 @@ void CLAVClinetPullStreamReader::setQuality(StreamQuality q)
 	switch(q)
 	{
 	case CLSHighest:
-	case CLSHigh:
+
 
 		if (pl.exists("resolution"))
 			pl.get("resolution").value.value = "full";
+		else
+			m_device->setParam_asynch("resolution", "full");
+
+
+		if (pl.exists("quality"))
+			pl.get("quality").value.value = "15";
+		else
+			m_device->setParam_asynch("quality", "15"); // panoramic
+
+
+
+		break;
+
+	case CLSHigh:
+
+		if (pl.exists("resolution"))
+			pl.get("resolution").value.value = "half";
 		else
 			m_device->setParam_asynch("resolution", "full");
 		
@@ -53,9 +70,9 @@ void CLAVClinetPullStreamReader::setQuality(StreamQuality q)
 
 
 		if (pl.exists("quality"))
-			pl.get("quality").value.value = "10";
+			pl.get("quality").value.value = "7";
 		else
-			m_device->setParam_asynch("quality", "10");
+			m_device->setParam_asynch("quality", "7");
 
 	    break;
 
@@ -70,9 +87,9 @@ void CLAVClinetPullStreamReader::setQuality(StreamQuality q)
 
 
 		if (pl.exists("quality"))
-			pl.get("quality").value.value = "2";
+			pl.get("quality").value.value = "1";
 		else
-			m_device->setParam_asynch("quality", "2");
+			m_device->setParam_asynch("quality", "1");
 
 	    break;
 	}
