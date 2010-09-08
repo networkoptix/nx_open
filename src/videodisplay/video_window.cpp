@@ -205,15 +205,10 @@ void CLVideoWindow::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
 	for (int i = 0; i  < m_videonum; ++i)	m_gldraw[i]->paintEvent(getSubChannelRect(i));
 
 	// restore the GL state that QPainter expects
-
-	
-	drawStuff(painter);
 	restoreGLState();
-
-	
 	
 	painter->endNativePainting();
-
+	drawStuff(painter);
 
 	/*
 	if (m_opacity>0)

@@ -188,10 +188,12 @@ void VideoWindow::drawRotationHelper(QPainter* painter)
 	gradient.setColorAt(0, color1);
 	gradient.setColorAt(1, color2);
 
+	painter->save();
 
 	painter->setPen(QPen(color2, 0, Qt::SolidLine));
 
 
+	
 	painter->setBrush(gradient);
 	painter->drawEllipse(m_rotation_center, r, r);
 
@@ -206,6 +208,7 @@ void VideoWindow::drawRotationHelper(QPainter* painter)
 	line_p = QLineF(line_p.p2(),line_p.p1());
 	line_p.setLength(p_line_len);
 
+	
 
 	painter->drawLine(line_p);
 
@@ -231,5 +234,7 @@ void VideoWindow::drawRotationHelper(QPainter* painter)
 	painter->drawPolygon(QPolygonF() << line_p.p1() << sourceArrowP1 << sourceArrowP2);
 	painter->drawPolygon(QPolygonF() << line_p.p2() << destArrowP1 << destArrowP2);        
 
+	painter->restore();
+	/**/
 
 }
