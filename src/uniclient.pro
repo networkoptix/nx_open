@@ -10,7 +10,7 @@ DESTDIR = ../bin
 
 INCLUDEPATH += ../contrib
 
-SOURCES = main.cpp mainwnd.cpp video_camera.cpp 
+SOURCES = main.cpp mainwnd.cpp video_camera.cpp settings.cpp
 
 SOURCES += base/log.cpp base/bytearray.cpp
 SOURCES += camera/camera.cpp
@@ -22,7 +22,7 @@ SOURCES += statistics/statistics.cpp
 SOURCES += streamreader/cpull_stremreader.cpp streamreader/streamreader.cpp streamreader/single_shot_reader.cpp streamreader/single_shot_file_reader.cpp
 SOURCES += videodisplay/camdisplay.cpp videodisplay/gl_renderer.cpp videodisplay/video_window.cpp videodisplay/videostreamdisplay.cpp
 
-HEADERS = mainwnd.h video_camera.h
+HEADERS = mainwnd.h video_camera.h settings.h
 HEADERS += base/threadqueue.h base/log.h base/associativearray.h base/expensiveobject.h base/bytearray.h base/longrunnable.h base/rand.h base/adaptivesleep.h base/base.h base/sleep.h
 HEADERS += camera/camera.h
 HEADERS += data/dataprocessor.h data/data.h data/mediadata.h

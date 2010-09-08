@@ -15,6 +15,7 @@
 #include <QParallelAnimationGroup>
 #include <QPropertyAnimation>
 #include "./animation/animated_bgr.h"
+#include "settings.h"
 
 
 QString cm_exit("Exit");
@@ -115,8 +116,17 @@ qreal GraphicsView::getZoom() const
 
 void GraphicsView::setZeroSelection()
 {
-	if (m_selectedWnd)
+
+	
+
+	if (m_selectedWnd && m_camLayout->hasSuchWnd(m_selectedWnd))
+	{
 		m_selectedWnd->setSelected(false);
+		m_selectedWnd->showFPS(false);
+		m_selectedWnd->setShowImagesize(false);
+		m_selectedWnd->setShowInfoText(false);
+		
+	}
 
 	m_last_selectedWnd = m_selectedWnd;
 	m_selectedWnd  = 0;
@@ -133,7 +143,8 @@ void GraphicsView::setAllItemsQuality(CLStreamreader::StreamQuality q, bool incr
 	{
 		CLVideoCamera* cam = wnd->getVideoCam();
 
-		cam->setQuality(q, increase);
+		if (increase || m_selectedWnd!=wnd) // can not decrease quality on selected wnd
+			cam->setQuality(q, increase);
 	}
 	
 }
@@ -908,6 +919,25 @@ void GraphicsView::onNewItemSelected_helper(VideoWindow* new_wnd)
 
 
 	m_selectedWnd->setSelected(true);
+
+	
+	if (global_show_item_text)
+	{
+		CLDevice* dev = m_selectedWnd->getVideoCam()->getDevice();
+
+		if (!dev->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT))
+		{
+			m_selectedWnd->setShowImagesize(true);
+		}
+
+		if (!dev->checkDeviceTypeFlag(CLDevice::ARCHIVE) && !dev->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT))
+		{
+			m_selectedWnd->showFPS(true);
+			m_selectedWnd->setShowInfoText(true);
+		}
+
+	}
+
 
 	m_movement.move(point, item_select_duration);
 	befor_scene_zoom_chaged();

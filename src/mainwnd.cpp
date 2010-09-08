@@ -297,19 +297,7 @@ void MainWnd::onNewDevice(CLDevice* device)
 	m_camlayout.addWnd(video_wnd);
 
 
-	if (device->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT)) // do not show fps if it's still shot
-	{
-		video_wnd->showFPS(false);
-		video_wnd->setShowInfoText(false);
-		video_wnd->setShowImagesize(false);
-	}
-
-	if (device->checkDeviceTypeFlag(CLDevice::ARCHIVE)) // do not show fps if it's still shot
-	{
-		video_wnd->setShowInfoText(false);
-	}
-
-
+	
 
 
 	video_wnd->setInfoText(cam->getDevice()->toString());
@@ -335,6 +323,8 @@ void MainWnd::onNewDevice(CLDevice* device)
 
 	CLParamList& pl = device->getStreamPramList();
 	reader->setStreamParams(pl);
+
+	cam->setQuality(CLStreamreader::CLSLow, true);
 
 	onDeviceRestarted(reader, cam);
 

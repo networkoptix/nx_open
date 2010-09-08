@@ -5,7 +5,7 @@
 CLAVClinetPullStreamReader::CLAVClinetPullStreamReader(CLDevice* dev ):
 CLClientPullStreamreader(dev)
 {
-
+	setQuality(m_qulity);
 }
 
 
@@ -46,15 +46,15 @@ void CLAVClinetPullStreamReader::setQuality(StreamQuality q)
 	case CLSHigh:
 
 		if (pl.exists("resolution"))
-			pl.get("resolution").value.value = "half";
+			pl.get("resolution").value.value = "full";
 		else
 			m_device->setParam_asynch("resolution", "full");
 		
 
 		if (pl.exists("quality"))
-			pl.get("quality").value.value = "15";
+			pl.get("quality").value.value = "7";
 		else
-			m_device->setParam_asynch("quality", "15"); // panoramic
+			m_device->setParam_asynch("quality", "7"); // panoramic
 
 	
 
@@ -66,7 +66,7 @@ void CLAVClinetPullStreamReader::setQuality(StreamQuality q)
 		if (pl.exists("resolution"))
 			pl.get("resolution").value.value = "half";
 		else
-			m_device->setParam_asynch("resolution", "full");
+			m_device->setParam_asynch("resolution", "half");
 
 
 		if (pl.exists("quality"))

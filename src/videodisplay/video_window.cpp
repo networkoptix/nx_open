@@ -244,15 +244,16 @@ void CLVideoWindow::applyMixerSettings(qreal brightness, qreal contrast, qreal h
 void CLVideoWindow::drawStuff(QPainter* painter)
 {
 
+	//m_showinfotext  = m_showimagesize = m_showfps = false;
 	
 	if (m_showinfotext || m_showimagesize)
 	{
-		drawInfoText(painter);
+		drawInfoText(painter); // ahtung! drawText takes huge(!) ammount of cpu
 	}
 	
 	if (m_showfps)
 	{
-		drawFPS(painter);
+		drawFPS(painter);	// ahtung! drawText takes huge(!) ammount of cpu
 	}
 
 	//if (!m_fullscreen)	

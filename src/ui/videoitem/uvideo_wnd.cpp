@@ -2,6 +2,7 @@
 #include <QPainter>
 #include "../graphicsview.h"
 #include "camera\camera.h"
+#include "device/device.h"
 
 
 extern int item_select_duration;
@@ -132,6 +133,20 @@ void VideoWindow::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 		}
 	}
 
+
+	CLDevice* dev = getVideoCam()->getDevice();
+	if (!dev->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT))
+	{
+		setShowImagesize(true);
+	}
+
+	if (!dev->checkDeviceTypeFlag(CLDevice::ARCHIVE) && !dev->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT))
+	{
+		showFPS(true);
+		setShowInfoText(true);
+	}
+
+
 }
 
 void VideoWindow::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
@@ -144,6 +159,10 @@ void VideoWindow::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 			setZValue(m_z);
 			m_animationTransform.zoom_abs(1.0, item_hoverevent_duration);
 		}
+
+			setShowImagesize(false);
+			showFPS(false);
+			setShowInfoText(false);
 	}
 
 }

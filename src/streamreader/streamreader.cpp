@@ -7,7 +7,7 @@ CLStreamreader::CLStreamreader(CLDevice* dev):
 m_restartInfo(0),
 m_restartHandler(0),
 m_device(dev),
-m_qulity(StreamQuality::CLSNormal)
+m_qulity(StreamQuality::CLSLowest)
 {
 }
 
