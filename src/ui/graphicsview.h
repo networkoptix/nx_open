@@ -51,7 +51,7 @@ protected:
 
 	void resizeEvent ( QResizeEvent * event );
 
-	void OnMenuButton(QObject* owner, QString text);
+	void OnMenuButton(void* owner, QString text);
 
 	//=========================
 	void onNewItemSelected_helper(VideoWindow* new_wnd);
@@ -113,6 +113,8 @@ protected:
 	bool m_CTRL_pressed;
 
 	QViewMenu mVoidMenu;
+	QViewMenu mItemdMenu;
+
 	MainWnd* mMainWnd;
 
 	bool m_drawBkg;

@@ -9,7 +9,7 @@ extern QFont buttonFont();
 
 //======================================================
 
-QViewMenu::QViewMenu(QObject* owner, QViewMenuHandler* handler, QGraphicsView *view):
+QViewMenu::QViewMenu(void* owner, QViewMenuHandler* handler, QGraphicsView *view):
 mView(view),
 mVisible(false),
 mOwner(owner),
@@ -28,7 +28,12 @@ QViewMenu::~QViewMenu()
 	}
 }
 
-void QViewMenu::OnMenuButton(QObject* owner, QString text)
+void QViewMenu::setOwner(void* owner)
+{
+	mOwner = owner;
+}
+
+void QViewMenu::OnMenuButton(void* owner, QString text)
 {
 	hide();	
 	if (mHandler)
@@ -43,7 +48,7 @@ void QViewMenu::addSeparator()
 
 void QViewMenu::addItem(const QString& text)
 {
-	TextButton* item = new TextButton(text, mOwner, this);
+	TextButton* item = new TextButton(text,  this);
 	mItems.push_back(item);
 }
 

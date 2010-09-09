@@ -26,8 +26,7 @@ QColor buttonTextColor(QColor(255, 255, 255));
 //=========================================================
 
 
-TextButton::TextButton(const QString &text, QObject* owner, QViewMenuHandler* handler):
-mOwner(owner),
+TextButton::TextButton(const QString &text, QViewMenuHandler* handler):
 mHandler(handler)
 {
 	this->text = text;
@@ -162,7 +161,7 @@ void TextButton::mousePressEvent(QGraphicsSceneMouseEvent *event)
 		//this->setState(PRESSED);
 		this->setState(NORMAL);
 		//event->ignore();
-		mHandler->OnMenuButton(mOwner, getText());
+		mHandler->OnMenuButton(0, getText());
 	}
 }
 

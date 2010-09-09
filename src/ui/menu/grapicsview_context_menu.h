@@ -15,7 +15,7 @@ class QGraphicsItem;
 
 struct QViewMenuHandler
 {
-	virtual void OnMenuButton(QObject* owner, QString text) = 0;
+	virtual void OnMenuButton(void* owner, QString text) = 0;
 };
 
 
@@ -23,8 +23,11 @@ struct QViewMenuHandler
 class QViewMenu : public QViewMenuHandler
 {
 public:
-	QViewMenu(QObject* owner, QViewMenuHandler* handler, QGraphicsView *view);
+	QViewMenu(void* owner, QViewMenuHandler* handler, QGraphicsView *view);
 	virtual ~QViewMenu();
+
+	void setOwner(void* owner);
+
 	void addSeparator();
 	void addMenu(QViewMenu*);
 
@@ -38,7 +41,7 @@ private:
 	void init_animatiom(QPointF p);
 	void destroy_animation();
 
-	void OnMenuButton(QObject* owner, QString text);
+	void OnMenuButton(void* owner, QString text);
 
 	QList<TextButton*> mItems;
 	QGraphicsView *mView;
@@ -46,7 +49,7 @@ private:
 
 	QParallelAnimationGroup *mAnim;
 
-	QObject* mOwner;
+	void* mOwner;
 	QViewMenuHandler* mHandler;
 };
 

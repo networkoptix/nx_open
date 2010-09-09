@@ -15,7 +15,7 @@ class TextButton : public QObject, public QGraphicsItem
 public:
 	enum STATE {NORMAL, HIGHLIGHT, PRESSED, DISABLED};
 
-	TextButton(const QString &text, QObject* owner, QViewMenuHandler* handler);
+	TextButton(const QString &text,  QViewMenuHandler* handler);
 		
 	virtual ~TextButton();
 
@@ -52,7 +52,7 @@ private:
 
 	volatile int mWidth, mHight;
 
-	QObject* mOwner;
+	
 	QViewMenuHandler* mHandler;
 
 	bool mTop;
