@@ -16,17 +16,10 @@
 #include <QPropertyAnimation>
 #include "./animation/animated_bgr.h"
 #include "settings.h"
+#include <QGraphicsProxyWidget>
+#include "device_settings/device_settings_dlg.h"
 
 
-QString cm_exit("Exit");
-QString cm_fitinview("Fit in View");
-QString cm_circle("Circle");
-QString cm_arrange("Arrange");
-QString cm_options("Options...");
-QString cm_togglefs("Toggle fullscreen");
-
-QString cm_fullscren("Fullscreen");
-QString cm_settings("Settings...");
 
 
 int item_select_duration = 700;
@@ -56,8 +49,6 @@ m_ignore_conext_menu_event(false),
 m_rotatingWnd(0),
 m_movingWnd(0),
 m_CTRL_pressed(false),
-mVoidMenu(0,this,this),
-mItemdMenu(0, this, this),
 mMainWnd(mainWnd),
 m_drawBkg(true),
 m_logo(0),
@@ -73,6 +64,7 @@ GraphicsView::~GraphicsView()
 
 void GraphicsView::init()
 {
+	/*
 	mVoidMenu.addItem(cm_fitinview);
 	mVoidMenu.addItem(cm_circle);
 	mVoidMenu.addItem(cm_arrange);
@@ -83,6 +75,7 @@ void GraphicsView::init()
 	mItemdMenu.addItem(cm_fullscren);
 	mItemdMenu.addItem(cm_settings);
 	mItemdMenu.addItem(cm_exit);
+	/**/
 
 
 	/*/
@@ -157,14 +150,14 @@ void GraphicsView::setAllItemsQuality(CLStreamreader::StreamQuality q, bool incr
 
 void GraphicsView::wheelEvent ( QWheelEvent * e )
 {
-	befor_scene_zoom_chaged();
+	
 	int numDegrees = e->delta() ;
 	m_scenezoom.zoom_delta(numDegrees/3000.0, scene_zoom_duration);
 }
 
 void GraphicsView::zoomDefault(int duration)
 {
-	befor_scene_zoom_chaged();
+	
 	m_scenezoom.zoom_default(duration);
 }
 
@@ -194,16 +187,6 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 	m_movement.stop();
 	
 	QGraphicsItem *item = itemAt(event->pos());
-
-	if (mVoidMenu.hasSuchItem(item) || mItemdMenu.hasSuchItem(item))
-	{
-		QGraphicsView::mousePressEvent(event);
-		m_ignore_release_event = true; // menu button just pressed. so neeed to ignore release event
-		return;
-	}
-
-	mVoidMenu.hide();
-	mItemdMenu.hide();
 
 
 	VideoWindow* wnd = static_cast<VideoWindow*>(item);
@@ -343,14 +326,6 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 	QGraphicsItem *item = itemAt(event->pos());
 
-	if (mVoidMenu.hasSuchItem(item) || mItemdMenu.hasSuchItem(item))
-	{
-		QGraphicsView::mouseReleaseEvent(event);
-		return;
-	}
-
-	mVoidMenu.hide();
-	mItemdMenu.hide();
 
 	VideoWindow* wnd = static_cast<VideoWindow*>(item);
 	if (!isWndStillExists(wnd))
@@ -494,7 +469,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 						//m_movement.move(mapToScene(event->pos()), m_selectedWnd ? item_select_duration : scene_move_duration);
 					}
-					//befor_scene_zoom_chaged();
+					
 					//m_scenezoom.zoom_default(m_selectedWnd ? item_select_duration : scene_zoom_duration);
 				}
 
@@ -569,26 +544,91 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 		return;
 	}
 
-	mVoidMenu.hide();
-	mItemdMenu.hide();
+	VideoWindow * wnd = static_cast<VideoWindow*>(itemAt(event->pos()));
 
-	VideoWindow*item = static_cast<VideoWindow*>(itemAt(event->pos()));
+	QAction cm_exit("Exit",0);
+	QAction cm_fitinview("Fit in View",0);
+	QAction cm_circle("Circle",0);
+	QAction cm_arrange("Arrange",0);
+	QAction cm_options("Options...",0);
+	QAction cm_togglefs("Toggle fullscreen",0);
 
-	if (item)
+	QAction cm_fullscren("Fullscreen",0);
+	QAction cm_settings("Settings...",0);
+
+	QMenu menu;
+	menu.setWindowOpacity(0.8);
+
+	if (wnd) // video wnd
 	{
-		mItemdMenu.setOwner(item);
-		mItemdMenu.show(event->pos());
-		
+		menu.addAction(&cm_fullscren);
+		menu.addAction(&cm_settings);
+		menu.addAction(&cm_exit);
 	}
 	else
-		mVoidMenu.show(event->pos());
+	{
+		menu.addAction(&cm_fitinview);
+		menu.addAction(&cm_arrange);
+		menu.addAction(&cm_circle);
+		menu.addAction(&cm_togglefs);
+		menu.addAction(&cm_options);
+		menu.addAction(&cm_exit);
+
+	}
+
+	QAction* act = menu.exec(QCursor::pos());
+
+	if (act==&cm_exit)
+		QCoreApplication::instance()->exit();
+
+
+	if (wnd==0) // on void menu
+	{
+		if (act== &cm_togglefs)
+		{
+			mMainWnd->toggleFullScreen();
+			m_scenezoom.zoom_delta(0.001,1)	;
+		}
+		else if (act== &cm_fitinview)
+		{
+			onFitInView_helper();
+		}
+		else if (act== &cm_circle)
+		{
+			onCircle_helper();
+		}
+		else if (act== &cm_arrange)
+		{
+			onArrange_helper();
+		}
+	}
+	else // video item menu?
+	{
+		if (!m_camLayout->hasSuchWnd(wnd))
+			return;
+
+		if (act==&cm_fullscren)
+		{
+			toggleFullScreen_helper(wnd);
+		}
+		else if (act==&cm_settings)
+		{
+
+			QDialog* dlg = new CLAbstractDeviceSettingsDlg(wnd->getVideoCam()->getDevice());
+			dlg->show();
+
+
+		}
+
+	}
+
+
+	/**/
 
 }
 
 void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
 {
-	mVoidMenu.hide();
-	mItemdMenu.hide();
 	VideoWindow*item = static_cast<VideoWindow*>(itemAt(e->pos()));
 	if(!isWndStillExists(item))
 		item = 0;
@@ -617,9 +657,6 @@ void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
 
 void GraphicsView::keyReleaseEvent( QKeyEvent * e )
 {
-	mVoidMenu.hide();
-	mItemdMenu.hide();
-
 	switch (e->key()) 
 	{
 	case Qt::Key_Control:
@@ -638,48 +675,6 @@ void GraphicsView::keyReleaseEvent( QKeyEvent * e )
 void GraphicsView::OnMenuButton(void* owner, QString text)
 {
 
-	if (text == cm_exit)
-	{
-		QCoreApplication::instance()->exit();
-	}
-
-
-	if (owner==0) // on void menu
-	{
-		if (text == cm_togglefs)
-		{
-			mMainWnd->toggleFullScreen();
-			m_scenezoom.zoom_delta(0.001,1)	;
-		}
-		else if (text == cm_fitinview)
-		{
-			onFitInView_helper();
-		}
-		else if (text == cm_circle)
-		{
-			onCircle_helper();
-		}
-		else if (text == cm_arrange)
-		{
-			onArrange_helper();
-		}
-	}
-	else // video item menu?
-	{
-
-		VideoWindow* wnd = reinterpret_cast<VideoWindow*>(owner);
-		if (!m_camLayout->hasSuchWnd(wnd))
-			return;
-
-		if (text == cm_fullscren)
-		{
-			toggleFullScreen_helper(wnd);
-		}
-		else if (text == cm_fitinview)
-		{
-		}
-
-	}
 
 
 	
@@ -688,9 +683,6 @@ void GraphicsView::OnMenuButton(void* owner, QString text)
 
 void GraphicsView::keyPressEvent( QKeyEvent * e )
 {
-
-	mVoidMenu.hide();
-	mItemdMenu.hide();
 
 	VideoWindow* last_sel_wnd = getLastSelectedWnd();
 	
@@ -801,11 +793,10 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 	{
 	case Qt::Key_Equal: // plus
 	case Qt::Key_Plus: // plus
-		befor_scene_zoom_chaged();
 		m_scenezoom.zoom_delta(0.05, 2000);
 		break;
 	case Qt::Key_Minus:
-		befor_scene_zoom_chaged();
+		
 		m_scenezoom.zoom_delta(-0.05, 2000);
 
 
@@ -816,12 +807,10 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 		switch (e->key()) 
 		{
 		case Qt::Key_End: // plus
-			befor_scene_zoom_chaged();
 			m_scenezoom.zoom_delta(0.05, 2000);
 			break;
 
 		case Qt::Key_Home:
-			befor_scene_zoom_chaged();
 			m_scenezoom.zoom_abs(-100, 2000); // absolute zoom out
 			break;
 		}
@@ -917,13 +906,6 @@ bool GraphicsView::isWndStillExists(const VideoWindow* wnd) const
 	return false;
 }
 
-void GraphicsView::befor_scene_zoom_chaged()
-{
-	mVoidMenu.hide();
-	mItemdMenu.hide();
-}
-
-
 
 void GraphicsView::toggleFullScreen_helper(VideoWindow* wnd)
 {
@@ -973,7 +955,7 @@ void GraphicsView::onNewItemSelected_helper(VideoWindow* new_wnd)
 
 
 	m_movement.move(point, item_select_duration);
-	befor_scene_zoom_chaged();
+
 	m_scenezoom.zoom_abs(0.278, item_select_duration);
 
 
@@ -1104,10 +1086,6 @@ void GraphicsView::onArrange_helper()
 
 void GraphicsView::onFitInView_helper(int duration )
 {
-	mVoidMenu.hide();
-	mItemdMenu.hide();
-
-
 	if (m_selectedWnd && isWndStillExists(m_selectedWnd) && m_selectedWnd->isFullScreen())
 	{
 		m_selectedWnd->setFullScreen(false);
@@ -1146,7 +1124,7 @@ void GraphicsView::onFitInView_helper(int duration )
 
 	//scale(scl, scl);
 
-	befor_scene_zoom_chaged();
+	
 	m_scenezoom.zoom_abs(zoom, duration);
 
 }
@@ -1189,7 +1167,7 @@ void GraphicsView::onItemFullScreen_helper(VideoWindow* wnd)
 	
 	//scale(scl, scl);
 	
-	befor_scene_zoom_chaged();
+	
 	m_scenezoom.zoom_abs(zoom, item_select_duration/2 + 100);
 	
 	m_fullScreenZoom = zoom; // memorize full screen zoom

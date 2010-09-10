@@ -60,8 +60,9 @@ HEADERS += ui/animation/scene_movement.h ui/animation/scene_zoom.h ui/animation/
 SOURCES += ui/video_cam_layout/videocamlayout.cpp ui/animation/animation_timeline.cpp ui/animation/mouse_state.cpp
 SOURCES += ui/animation/scene_movement.cpp ui/animation/scene_zoom.cpp ui/animation/abstract_animation.cpp ui/animation/item_trans.cpp ui/animation/animated_bgr.cpp
 
-SOURCES += ui/menu/menu_button.cpp ui/menu/grapicsview_context_menu.cpp
-HEADERS += ui/menu/menu_button.h ui/menu/grapicsview_context_menu.h
+
+SOURCES += ui/device_settings/device_settings_dlg.cpp ui/device_settings/device_settings_tab.cpp
+HEADERS += ui/device_settings/device_settings_dlg.h ui/device_settings/device_settings_tab.h
 
 
 RESOURCES += mainwnd.qrc

@@ -5,7 +5,7 @@
 #include "./animation/scene_movement.h"
 #include "./animation/scene_zoom.h"
 #include "./animation/mouse_state.h"
-#include "./menu/grapicsview_context_menu.h"
+
 
 class VideoWindow;
 class VideoCamerasLayout;
@@ -13,7 +13,7 @@ class MainWnd;
 class QGraphicsPixmapItem;
 class CLAnimatedBackGround;
 
-class GraphicsView: public QGraphicsView , public QViewMenuHandler
+class GraphicsView: public QGraphicsView 
 {
 	Q_OBJECT
 public:
@@ -65,7 +65,7 @@ protected:
 	VideoWindow* getLastSelectedWnd();
 	void mouseSpeed_helper(qreal& mouse_speed,  int& dx, int&dy, int min_spped, int speed_factor);
 	bool isWndStillExists(const VideoWindow* wnd) const;
-	void befor_scene_zoom_chaged();
+
 
 	
 
@@ -111,9 +111,6 @@ protected:
 	qreal m_fullScreenZoom;
 
 	bool m_CTRL_pressed;
-
-	QViewMenu mVoidMenu;
-	QViewMenu mItemdMenu;
 
 	MainWnd* mMainWnd;
 

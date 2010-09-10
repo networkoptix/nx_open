@@ -60,6 +60,33 @@ int main(int argc, char *argv[])
 	dev_searcher.addDeviceServer(&FakeDeviceServer::instance());
 	//============================
 
+	//=========================================================
+	//qApp->setStyleSheet("QPushButton { color: white }");
+	//qApp->setStyleSheet("QMenu {background-color:  rgba(0, 0, 0, 210); border: 1px solid gray;	}");
+	//qApp->setStyleSheet(" QMenu::item:selected {border-color: transparent; background: rgba(100, 0, 0, 210);}");
+	
+	qApp->setStyleSheet("\
+		QMenu {\
+		background-color: black;\
+		color: white;\
+		font-family: Bodoni MT;\
+		font-size: 16px;\
+		border: 1px solid rgb(110, 110, 110);\
+		}\
+		QMenu::item{\
+		padding-top: 4px;\
+		padding-left: 5px;\
+		padding-right: 15px;\
+		padding-bottom: 4px;\
+		}\
+		QMenu::item:selected {\
+		background: rgb(100, 0, 0);\
+		}");
+
+
+	//=========================================================
+
+
 	MainWnd w;
 	w.show();
 	return a.exec();
