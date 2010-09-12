@@ -3,7 +3,7 @@
 #include <QTabWidget>
 #include <QDialogButtonBox>
 #include <QVBoxLayout>
-#include "..\src\gui\widgets\qtabbar.h"
+#include "../../device/device.h"
 
 CLAbstractDeviceSettingsDlg::CLAbstractDeviceSettingsDlg(CLDevice* dev):
 QDialog(0, Qt::CustomizeWindowHint | Qt::WindowTitleHint | 
@@ -24,25 +24,16 @@ mDevice(dev)
 	palette.setColor(backgroundRole(), Qt::black);
 	setPalette(palette);
 
-	setStyleSheet("QPushButton {border-style: solid;		border-color: green;	background-color: blue;}");
-	setStyleSheet("QTabBar::tab {		border-width: 10px;		border-style: solid;		border-color: green;	background-color: pink;}");
-
 	mTabWidget = new QTabWidget;
-	mTabWidget->setPalette(palette);
-	mTabWidget->setAutoFillBackground(true);
-	//mTabWidget->tabBar();
-	//mTabWidget->setStyleSheet("QTabBar { color: red }");
-	//mTabWidget->setStyleSheet("* { color: red }");
 
-	mTabWidget->setStyleSheet("QTabBar::tab {		border-width: 1px;		border-style: solid;		border-color: green;	background-color: pink;}");
-	
-	QTabBar* bar = new QTabBar;
-	bar->addTab("ttt");
+	QList<QString> groups = mDevice->getDevicePramList().groupList();
 
+	for (int i = 0; i < groups.count(); ++i)
+	{
+		QString group = groups.at(i);
+		mTabWidget->addTab(new CLDeviceSettingsTab(mDevice, group), group);
+	}
 
-	mTabWidget->addTab(new CLDeviceSettingsTab(), tr("General"));
-	mTabWidget->addTab(new CLDeviceSettingsTab(), tr("Image"));
-	
 
 	mButtonBox = new QDialogButtonBox(QDialogButtonBox::Close);
 

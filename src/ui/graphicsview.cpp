@@ -62,32 +62,6 @@ GraphicsView::~GraphicsView()
 	delete m_animated_bckg;
 }
 
-void GraphicsView::init()
-{
-	/*
-	mVoidMenu.addItem(cm_fitinview);
-	mVoidMenu.addItem(cm_circle);
-	mVoidMenu.addItem(cm_arrange);
-	mVoidMenu.addItem(cm_togglefs);
-	mVoidMenu.addItem(cm_options);
-	mVoidMenu.addItem(cm_exit);
-
-	mItemdMenu.addItem(cm_fullscren);
-	mItemdMenu.addItem(cm_settings);
-	mItemdMenu.addItem(cm_exit);
-	/**/
-
-
-	/*/
-	m_logo = new QGraphicsPixmapItem(QPixmap("./skin/logo.jpg"));
-	m_logo->setZValue(-1.0);
-	m_logo->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
-	scene()->addItem(m_logo);
-	/**/
-
-	
-}
-
 
 void GraphicsView::setCamLayOut(const VideoCamerasLayout* lo)
 {

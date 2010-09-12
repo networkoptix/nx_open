@@ -8,14 +8,9 @@
 
 struct CLParamType
 {
-	enum {None, Value, Boolen, MinMaxStep, Enumeration };	
+	enum {None, Value, OnOff, Boolen, MinMaxStep, Enumeration };	
 
-	CLParamType()
-	{
-		type = None;
-		synchronized = false;
-		readonly = false;
-	}
+	CLParamType();
 
 	int type;
 
@@ -39,56 +34,9 @@ struct CLParamType
 
 
 
-	bool setValue(CLValue val, bool set = true) // safe way to set value
-	{
-		switch(type)
-		{
-		case MinMaxStep:
-			if (val>max_val) return false;
-			if (val<min_val) return false;
-			break;
-
-		case None:
-			return true;
-
-
-		case Enumeration:
-			if (!possible_values.contains(val))
-				return false;
-			break;
-
-		}
-
-		if (set)
-			value = val;
-
-
-		return true;
-	}
-
-	bool setDefVal(CLValue val) // safe way to set value
-	{
-		switch(type)
-		{
-		case MinMaxStep:
-			if (val>max_val) return false;
-			if (val<min_val) return false;
-			break;
-
-		case None:
-			return false;
-
-
-		case Enumeration:
-			if (!possible_values.contains(val))
-				return false;
-			break;
-
-		}
-
-		default_value = val;
-		return true;
-	}
+	bool setValue(CLValue val, bool set = true); // safe way to set value
+	bool setDefVal(CLValue val); // safe way to set value
+	
 
 
 };
@@ -100,56 +48,29 @@ struct CLParam
 {
 	QString name;
 	CLParamType value;
-	//QString description;
-	//QString group;
-	//QString subgroup;
 };
 
 
 class CLParamList
 {
-	typedef QMap<QString, CLParam> MAP;
 	
-
-	MAP m_params;
 public:
-	void inheritedFrom(const CLParamList& other)
-	{
-		MAP::const_iterator it = other.m_params.constBegin();
-		for (;it!=other.m_params.constEnd(); ++it)
-			m_params[it.key()] = it.value();
+	typedef QMap<QString, CLParam> MAP;
 
-	}
+	void inheritedFrom(const CLParamList& other);
+	bool exists(const QString& name) const;
+	CLParam& get(const QString& name);
+	const CLParam& get(const QString& name) const;
+	void put(const CLParam& param);
+	bool empty() const;
+	MAP& list();
+	
+	QList<QString> groupList() const;
+	QList<QString> subGroupList(QString group) const;
 
-	bool exists(const QString& name) const
-	{
-		MAP::const_iterator it = m_params.find(name);
-		if (it == m_params.end())
-			return false;
-
-		return true;
-	}
-
-	CLParam& get(const QString& name) 
-	{
-		return m_params[name];
-	}
-
-	const CLParam& get(const QString& name) const 
-	{
-		return m_params[name];
-	}
-
-	void put(const CLParam& param) 
-	{
-		m_params[param.name] = param;
-	}
-
-	bool empty() const
-	{
-		return m_params.empty();
-	}
-
+	CLParamList paramList(QString group, QString subgroup) const;
+private:
+	MAP m_params;
 };
 
 

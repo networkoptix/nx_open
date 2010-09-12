@@ -640,6 +640,8 @@ bool CLAreconVisionDevice::parseParam(const QDomElement &element, QString& error
 			param.value.type = CLParamType::MinMaxStep;
 		else if (type=="boolen")
 			param.value.type = CLParamType::Boolen;
+		else if (type=="onoff")
+			param.value.type = CLParamType::OnOff;
 		else if (type=="enumeration")
 			param.value.type = CLParamType::Enumeration;
 		else

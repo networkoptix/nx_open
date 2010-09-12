@@ -16,7 +16,7 @@ SOURCES += base/log.cpp base/bytearray.cpp
 SOURCES += camera/camera.cpp
 SOURCES += data/dataprocessor.cpp
 SOURCES += decoders/video/frame_info.cpp decoders/video/ffmpeg.cpp decoders/video/abstractdecoder.cpp decoders/video/ipp_h264_decoder.cpp
-SOURCES += device/device.cpp device/network_device.cpp device/file_device.cpp device/asynch_seacher.cpp device/deviceserver.cpp device/device_command_processor.cpp device/directory_browser.cpp
+SOURCES += device/device.cpp device/network_device.cpp device/file_device.cpp device/asynch_seacher.cpp device/deviceserver.cpp device/param.cpp device/device_command_processor.cpp device/directory_browser.cpp
 SOURCES += network/nettools.cpp network/socket.cpp network/simple_http_client.cpp network/ping.cpp network/netstate.cpp
 SOURCES += statistics/statistics.cpp
 SOURCES += streamreader/cpull_stremreader.cpp streamreader/streamreader.cpp streamreader/single_shot_reader.cpp streamreader/single_shot_file_reader.cpp
@@ -61,8 +61,8 @@ SOURCES += ui/video_cam_layout/videocamlayout.cpp ui/animation/animation_timelin
 SOURCES += ui/animation/scene_movement.cpp ui/animation/scene_zoom.cpp ui/animation/abstract_animation.cpp ui/animation/item_trans.cpp ui/animation/animated_bgr.cpp
 
 
-SOURCES += ui/device_settings/device_settings_dlg.cpp ui/device_settings/device_settings_tab.cpp
-HEADERS += ui/device_settings/device_settings_dlg.h ui/device_settings/device_settings_tab.h
+SOURCES += ui/device_settings/device_settings_dlg.cpp ui/device_settings/device_settings_tab.cpp ui/device_settings/settigs_widget_factory.cpp
+HEADERS += ui/device_settings/device_settings_dlg.h ui/device_settings/device_settings_tab.h ui/device_settings/settigs_widget_factory.h
 
 
 RESOURCES += mainwnd.qrc

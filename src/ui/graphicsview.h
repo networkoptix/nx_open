@@ -20,9 +20,6 @@ public:
 	GraphicsView(MainWnd* mainWnd);
 	virtual ~GraphicsView();
 
-	// this function must be called after view gets it's scene
-	void init();
-
 	void zoomDefault(int duration);
 	void setRealSceneRect(QRect rect);
 	QRect getRealSceneRect() const;

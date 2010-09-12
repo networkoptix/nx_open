@@ -61,16 +61,13 @@ int main(int argc, char *argv[])
 	//============================
 
 	//=========================================================
-	//qApp->setStyleSheet("QPushButton { color: white }");
-	//qApp->setStyleSheet("QMenu {background-color:  rgba(0, 0, 0, 210); border: 1px solid gray;	}");
-	//qApp->setStyleSheet(" QMenu::item:selected {border-color: transparent; background: rgba(100, 0, 0, 210);}");
 	
 	qApp->setStyleSheet("\
 		QMenu {\
 		background-color: black;\
 		color: white;\
 		font-family: Bodoni MT;\
-		font-size: 16px;\
+		font-size: 15px;\
 		border: 1px solid rgb(110, 110, 110);\
 		}\
 		QMenu::item{\
@@ -83,7 +80,7 @@ int main(int argc, char *argv[])
 		background: rgb(100, 0, 0);\
 		}");
 
-
+	/**/
 	//=========================================================
 
 
