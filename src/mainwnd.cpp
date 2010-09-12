@@ -51,7 +51,7 @@ m_videoView(this)
 	
 	//=======================================================
 
-	//setWindowOpacity(.90);
+	//setWindowOpacity(.80);
 
 	
 	
@@ -230,8 +230,6 @@ void MainWnd::onTimer()
 	if (first_time && m_scene.items().size()) // at least something is found
 	{
 
-		m_videoView.init();
-
 		// at least we once found smth => can increase interval
 		if (m_timer->interval()!=interval)
 		{
@@ -241,7 +239,7 @@ void MainWnd::onTimer()
 		}
 
 
-		QThread::currentThread()->setPriority(QThread::HighPriority); // Priority more tnan decoders have
+		QThread::currentThread()->setPriority(QThread::IdlePriority); // Priority more tnan decoders have
 
 		dev_searcher.start();
 
