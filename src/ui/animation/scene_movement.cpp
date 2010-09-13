@@ -72,18 +72,18 @@ CLSceneMovement::~CLSceneMovement()
 }
 
 
-void CLSceneMovement::move(int dx, int dy, int duration, bool limited)
+void CLSceneMovement::move(int dx, int dy, int duration, bool limited, int delay )
 {
 	QPoint curr = m_view->viewport()->rect().center();
 	curr.rx()+=dx;
 	curr.ry()+=dy;
 
-	move(m_view->mapToScene(curr), duration);
+	move(m_view->mapToScene(curr), duration, delay);
 
 	m_limited = limited; // this will overwrite false value set inside move_abs function above
 }
 
-void CLSceneMovement::move (QPointF dest, int duration)
+void CLSceneMovement::move (QPointF dest, int duration, int delay)
 {
 	//cl_log.log("CLSceneMovement::move() ", cl_logDEBUG1);
 
@@ -92,7 +92,7 @@ void CLSceneMovement::move (QPointF dest, int duration)
 	m_startpoint = m_view->mapToScene(m_view->viewport()->rect().center());
 	m_delta = dest - m_startpoint;
 	
-	start_helper(duration);
+	start_helper(duration, delay);
 }
 
 void CLSceneMovement::valueChanged ( qreal dpos )

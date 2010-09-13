@@ -65,7 +65,7 @@ qreal CLItemTransform::scaleTozoom(qreal scale) const
 	return scale;
 }
 
-void CLItemTransform::move_abs(QPointF pos, int duration)
+void CLItemTransform::move_abs(QPointF pos, int duration, int delay )
 {
 	//m_moving.start_point = m_item->scenePos()
 }
@@ -75,7 +75,12 @@ qreal CLItemTransform::current_zrotation() const
 	return m_Zrotation.curent;
 }
 
-void CLItemTransform::zoom_abs(qreal target_zoom, int duration)
+qreal CLItemTransform::current_zoom() const
+{
+	return m_zoom.curent;
+}
+
+void CLItemTransform::zoom_abs(qreal target_zoom, int duration, int delay)
 {
 
 	if (m_rotating)
@@ -96,7 +101,7 @@ void CLItemTransform::zoom_abs(qreal target_zoom, int duration)
 		m_zoom.start_point = m_zoom.curent;
 		m_zoom.diff = target_zoom - m_zoom.curent;
 
-		start_helper(duration);
+		start_helper(duration, delay);
 
 		m_zooming = true;
 
@@ -106,7 +111,7 @@ void CLItemTransform::zoom_abs(qreal target_zoom, int duration)
 
 }
 
-void CLItemTransform::z_rotate_abs(QPointF center, qreal angle, int duration)
+void CLItemTransform::z_rotate_abs(QPointF center, qreal angle, int duration, int delay)
 {
 	if (m_zooming)
 		duration = 0; // do it instantly
@@ -127,7 +132,7 @@ void CLItemTransform::z_rotate_abs(QPointF center, qreal angle, int duration)
 
 		m_Zrotation.diff = angle - m_Zrotation.start_point;
 
-		start_helper(duration);
+		start_helper(duration, delay);
 		m_rotating = true;
 
 		
@@ -135,7 +140,7 @@ void CLItemTransform::z_rotate_abs(QPointF center, qreal angle, int duration)
 	}
 }
 
-void CLItemTransform::z_rotate_delta(QPointF center, qreal angle, int duration)
+void CLItemTransform::z_rotate_delta(QPointF center, qreal angle, int duration, int delay)
 {
 	if (m_zooming)
 		duration = 0; // do it instantly
@@ -162,7 +167,7 @@ void CLItemTransform::z_rotate_delta(QPointF center, qreal angle, int duration)
 		m_Zrotation.start_point = m_Zrotation.curent;
 		m_Zrotation.diff = angle;
 
-		start_helper(duration);
+		start_helper(duration, delay);
 
 		m_rotating = true;
 

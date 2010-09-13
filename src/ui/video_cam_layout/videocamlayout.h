@@ -28,6 +28,8 @@ public:
 	VideoCamerasLayout(GraphicsView* view, QGraphicsScene* scene, unsigned int max_rows, int item_distance); // item distance is preferable distance between windows in % of wnd size
 	~VideoCamerasLayout();
 
+	void setItemDistance(qreal distance);
+
 	// means that at least one wnd can be added 
 	bool isSpaceAvalable() const;
 

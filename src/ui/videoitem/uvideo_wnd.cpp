@@ -26,7 +26,7 @@ m_draw_rotation_helper(false)
 }
 
 
-void VideoWindow::setSelected(bool sel, bool animate )
+void VideoWindow::setSelected(bool sel, bool animate, int delay)
 {
 	m_selected = sel;
 
@@ -45,12 +45,12 @@ void VideoWindow::setSelected(bool sel, bool animate )
 	if (m_selected)
 	{
 		
-		m_animationTransform.zoom_abs(selected_item_zoom, item_select_duration - 25);
+		m_animationTransform.zoom_abs(selected_item_zoom, item_select_duration - 25, delay);
 		setZValue(2);
 	}
 	else
 	{
-		m_animationTransform.zoom_abs(1.0, item_hoverevent_duration);
+		m_animationTransform.zoom_abs(1.0, item_hoverevent_duration, delay);
 		setZValue(0);
 	}
 }
@@ -61,9 +61,14 @@ bool VideoWindow::isSelected() const
 	return m_selected;
 }
 
-void VideoWindow::zoom_abs(qreal z, int duration)
+void VideoWindow::zoom_abs(qreal z, int duration, int delay )
 {
 	m_animationTransform.zoom_abs(z, duration);
+}
+
+qreal VideoWindow::getZoom() const
+{
+	return m_animationTransform.current_zoom();
 }
 
 qreal VideoWindow::getRotation() const

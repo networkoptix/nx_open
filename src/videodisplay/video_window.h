@@ -117,6 +117,10 @@ protected:
 	bool m_showinfotext;
 	bool m_showimagesize;
 
+	bool m_showing_text; // showing text now
+	QTime m_textTime; // draw text is very very very expensive. so want to delay it a bit
+	bool m_timeStarted;
+
 	QFont m_FPS_Font;
 	QFont m_Info_Font;
 	

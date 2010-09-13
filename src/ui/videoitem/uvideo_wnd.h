@@ -18,12 +18,14 @@ public:
 
 
 
-	void setSelected(bool sel, bool animate = true);
+	void setSelected(bool sel, bool animate = true, int delay = 0);
 	bool isSelected() const;
 
-	void zoom_abs(qreal z, int duration);
+	void zoom_abs(qreal z, int duration, int delay = 0);
 	void z_rotate_delta(QPointF center, qreal angle, int diration);
 	void z_rotate_abs(QPointF center, qreal angle, int duration);
+
+	qreal getZoom() const;
 
 	qreal getRotation() const;
 	void setRotation(qreal angle);

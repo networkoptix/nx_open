@@ -1,6 +1,6 @@
 #include "animated_bgr.h"
 
-#define MAX_STEP 100
+#define MAX_STEP 600
 #include <QColor>
 #include <QRadialGradient>
 #include <QPainter>
@@ -69,7 +69,8 @@ void CLBlueBackGround::drawBackground(QPainter * painter, const QRectF & rect )
 		rpos = rpos;
 
 
-	QColor bl(10,10,120+50*rpos,255);
+	QColor bl(10,10,140+50*rpos,255);
+	//QColor bl(10,100+50*rpos,10,255);
 
 
 	QPointF center1( rect.center().x() - rpos*rect.width()/2, rect.center().y() );

@@ -27,9 +27,13 @@ m_opacity(0.0),
 m_videonum(layout->numberOfChannels()),
 m_cam(0),
 m_fullscreen(false),
-m_arranged(true)
+m_arranged(true),
+m_showing_text(false),
+m_timeStarted(false)
 {
 
+	m_textTime.restart();
+	
 	memset(m_stat, 0 , sizeof(m_stat));
 	//we never cache the video
 	//setCacheMode(DeviceCoordinateCache);
@@ -240,15 +244,45 @@ void CLVideoWindow::drawStuff(QPainter* painter)
 {
 
 	//m_showinfotext  = m_showimagesize = m_showfps = false;
-	
-	if (m_showinfotext || m_showimagesize)
+	//============
+	bool want_text = m_showinfotext || m_showimagesize || m_showfps;
+
+	if (!want_text)
 	{
-		drawInfoText(painter); // ahtung! drawText takes huge(!) ammount of cpu
+		m_showing_text = false;
+		m_timeStarted = false;
+	}
+
+	if (!m_showing_text && want_text)
+	{
+		if (m_timeStarted)
+		{
+			int ms = m_textTime.msecsTo(QTime::currentTime());
+			if (ms>350)
+				m_showing_text = true;
+
+		}
+		else
+		{
+			m_textTime.restart();
+			m_timeStarted = true;
+		}
 	}
 	
-	if (m_showfps)
+
+	//============
+	if (m_showing_text)
 	{
-		drawFPS(painter);	// ahtung! drawText takes huge(!) ammount of cpu
+		if (m_showinfotext || m_showimagesize)
+		{
+			drawInfoText(painter); // ahtung! drawText takes huge(!) ammount of cpu
+		}
+
+		if (m_showfps)
+		{
+			drawFPS(painter);	// ahtung! drawText takes huge(!) ammount of cpu
+		}
+
 	}
 
 	//if (!m_fullscreen)	

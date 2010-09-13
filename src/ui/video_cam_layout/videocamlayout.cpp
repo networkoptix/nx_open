@@ -36,6 +36,11 @@ VideoCamerasLayout::~VideoCamerasLayout()
 
 }
 
+void VideoCamerasLayout::setItemDistance(qreal distance)
+{
+	m_item_distance = distance;
+}
+
 QSize VideoCamerasLayout::getMaxWndSize(const CLDeviceVideoLayout* layout) const
 {
 	qreal dlw = layout->width();

@@ -52,7 +52,7 @@ m_CTRL_pressed(false),
 mMainWnd(mainWnd),
 m_drawBkg(true),
 m_logo(0),
-m_animated_bckg(new CLBlueBackGround(100))
+m_animated_bckg(new CLBlueBackGround(50))
 {
 	
 }
@@ -63,7 +63,7 @@ GraphicsView::~GraphicsView()
 }
 
 
-void GraphicsView::setCamLayOut(const VideoCamerasLayout* lo)
+void GraphicsView::setCamLayOut(VideoCamerasLayout* lo)
 {
 	m_camLayout = lo;
 }
@@ -454,7 +454,8 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 			if (wnd && wnd!=m_selectedWnd) // item and left button
 			{
 				// new item selected 
-				onNewItemSelected_helper(wnd);
+				
+				onNewItemSelected_helper(wnd, qApp->doubleClickInterval()/2);
 			}
 
 			/*
@@ -701,7 +702,7 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 
 		if (next_wnd)
 		{
-			onNewItemSelected_helper(static_cast<VideoWindow*>(next_wnd));
+			onNewItemSelected_helper(static_cast<VideoWindow*>(next_wnd), 0);
 		}
 
 	}
@@ -896,8 +897,9 @@ void GraphicsView::toggleFullScreen_helper(VideoWindow* wnd)
 }
 
 
-void GraphicsView::onNewItemSelected_helper(VideoWindow* new_wnd)
+void GraphicsView::onNewItemSelected_helper(VideoWindow* new_wnd, int delay)
 {
+	
 	setZeroSelection();
 
 	m_selectedWnd = new_wnd;
@@ -906,8 +908,7 @@ void GraphicsView::onNewItemSelected_helper(VideoWindow* new_wnd)
 
 	QPointF point = m_selectedWnd->mapToScene(m_selectedWnd->boundingRect().center());
 
-
-	m_selectedWnd->setSelected(true);
+	m_selectedWnd->setSelected(true, true, delay);
 
 	
 	if (global_show_item_text)
@@ -928,9 +929,9 @@ void GraphicsView::onNewItemSelected_helper(VideoWindow* new_wnd)
 	}
 
 
-	m_movement.move(point, item_select_duration);
+	m_movement.move(point, item_select_duration, delay);
 
-	m_scenezoom.zoom_abs(0.278, item_select_duration);
+	m_scenezoom.zoom_abs(0.278, item_select_duration, delay);
 
 
 	
@@ -1029,6 +1030,10 @@ void GraphicsView::onArrange_helper()
 	}
 	/**/
 
+	//static bool big = true;
+	//big = !big;
+	//m_camLayout->setItemDistance(0 + 0.35*big);
+
 	QList<CLIdealWndPos> newPosLst = m_camLayout->calcArrangedPos();
 	for (int i = 0; i < newPosLst.count();++i)
 	{
@@ -1105,12 +1110,12 @@ void GraphicsView::onFitInView_helper(int duration )
 
 void GraphicsView::onItemFullScreen_helper(VideoWindow* wnd)
 {
-	//fitInView(wnd, Qt::KeepAspectRatio);
 
 	//wnd->zoom_abs(selected_item_zoom, true);
+
+	qreal wnd_zoom = wnd->getZoom();
 	wnd->zoom_abs(1.0, 0);
 
-	//viewport()->showFullScreen();
 
 	wnd->setFullScreen(true); // must be called at very beginning of the function coz it will change boundingRect of the item (shadows removed)
 
@@ -1127,14 +1132,13 @@ void GraphicsView::onItemFullScreen_helper(VideoWindow* wnd)
 
 	
 	QRectF unity = matrix().mapRect(QRectF(0, 0, 1, 1));
-	scale(1 / unity.width(), 1 / unity.height());
+	//scale(1 / unity.width(), 1 / unity.height());
 
 
 	scl*=( unity.width());
 
-
-	
-	m_movement.move(item_rect.center(), item_select_duration/2 + 100);
+	int duration = item_select_duration/2 + 100;
+	m_movement.move(item_rect.center(), duration);
 
 
 	qreal zoom = m_scenezoom.scaleTozoom(scl);
@@ -1142,7 +1146,14 @@ void GraphicsView::onItemFullScreen_helper(VideoWindow* wnd)
 	//scale(scl, scl);
 	
 	
-	m_scenezoom.zoom_abs(zoom, item_select_duration/2 + 100);
+	m_scenezoom.zoom_abs(zoom, duration);
+
+
+	
+	wnd->zoom_abs(wnd_zoom , 0);
+	wnd->zoom_abs(1.0 , duration);
+
+
 	
 	m_fullScreenZoom = zoom; // memorize full screen zoom
 

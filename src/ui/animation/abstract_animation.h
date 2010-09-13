@@ -2,6 +2,7 @@
 #define abstactanimation_h2344
 
 #include "animation_timeline.h"
+#include <QTimer>
 
 
 
@@ -18,11 +19,13 @@ public:
 protected slots:
 		virtual void valueChanged ( qreal pos ) = 0;
 		virtual void onFinished();
+		virtual void Start();
 protected:
-		void start_helper(int duration);
+		void start_helper(int duration, int delay);
 protected:
 	CLAnimationTimeLine m_timeline;
 	int m_defaultduration;
+	QTimer m_delay_timer;
 
 protected:
 	template< typename T>

@@ -24,7 +24,7 @@ public:
 	void setRealSceneRect(QRect rect);
 	QRect getRealSceneRect() const;
 
-	void setCamLayOut(const VideoCamerasLayout *);
+	void setCamLayOut(VideoCamerasLayout *);
 
 	VideoWindow* getSelectedWnd() const;
 
@@ -51,7 +51,7 @@ protected:
 	void OnMenuButton(void* owner, QString text);
 
 	//=========================
-	void onNewItemSelected_helper(VideoWindow* new_wnd);
+	void onNewItemSelected_helper(VideoWindow* new_wnd, int delay);
 	void toggleFullScreen_helper(VideoWindow* new_wnd);
 
 	void onItemFullScreen_helper(VideoWindow* wnd);
@@ -101,7 +101,8 @@ protected:
 	VideoWindow* m_movingWnd;
 
 	QRect m_realSceneRect;
-	const VideoCamerasLayout* m_camLayout;
+	VideoCamerasLayout* m_camLayout;
+
 
 	bool m_ignore_release_event, m_ignore_conext_menu_event;
 
