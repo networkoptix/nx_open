@@ -31,7 +31,7 @@ mDevice(dev)
 	for (int i = 0; i < groups.count(); ++i)
 	{
 		QString group = groups.at(i);
-		mTabWidget->addTab(new CLDeviceSettingsTab(mDevice, group), group);
+		mTabWidget->addTab(new CLDeviceSettingsTab(this, mDevice, group), group);
 	}
 
 
@@ -53,4 +53,10 @@ mDevice(dev)
 CLAbstractDeviceSettingsDlg::~CLAbstractDeviceSettingsDlg()
 {
 
+}
+
+bool CLAbstractDeviceSettingsDlg::setParam(const QString& name, const CLValue& val, bool applayToAll)
+{
+	mDevice->setParam_asynch(name,val);
+	return true;
 }

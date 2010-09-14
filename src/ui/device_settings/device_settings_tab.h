@@ -3,23 +3,27 @@
 
 #include <QWidget>
 #include <QMap>
+#include "../../device/param.h"
+
 
 class CLDevice;
+class CLAbstractDeviceSettingsDlg;
 
 class CLDeviceSettingsTab : public QWidget
 {
 	Q_OBJECT
 public:
-	CLDeviceSettingsTab(CLDevice* dev, QString group);
+	CLDeviceSettingsTab(CLAbstractDeviceSettingsDlg* dlg, CLDevice* dev, QString group);
 	~CLDeviceSettingsTab();
 public slots:
 	void onOnOffStateChanged(int state);
-
+	void onMinMaxStepChanged();
 protected:
-	
+	const CLParam& param_helper() const;
 
 	CLDevice* mDevice;
 	QString mGroup;
+	CLAbstractDeviceSettingsDlg* mDlg;
 	
 	
 };

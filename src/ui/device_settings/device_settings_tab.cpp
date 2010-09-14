@@ -2,13 +2,17 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QGroupBox>
+#include <QSlider>
 #include "../../device/device.h"
 #include "../base/rand.h"
 #include "settigs_widget_factory.h"
+#include "base/log.h"
+#include "device_settings_dlg.h"
 
-CLDeviceSettingsTab::CLDeviceSettingsTab(CLDevice* dev, QString group):
+CLDeviceSettingsTab::CLDeviceSettingsTab(CLAbstractDeviceSettingsDlg* dlg, CLDevice* dev, QString group):
 mDevice(dev),
-mGroup(group)
+mGroup(group),
+mDlg(dlg)
 {
 	setAutoFillBackground(true);
 	QPalette palette;
@@ -86,13 +90,23 @@ CLDeviceSettingsTab::~CLDeviceSettingsTab()
 
 }
 
-
-
-void CLDeviceSettingsTab::onOnOffStateChanged(int state)
+const CLParam& CLDeviceSettingsTab::param_helper() const
 {
 	QObject* obg = QObject::sender();
 	QString param_name = obg->objectName();
-	const CLParam param = mDevice->getDevicePramList().get(param_name);
+	return mDevice->getDevicePramList().get(param_name);
+	
+}
+
+void CLDeviceSettingsTab::onOnOffStateChanged(int state)
+{
+	const CLParam& param = param_helper();
+
+	if (param.value.possible_values.count()<2)
+	{
+		cl_log.log("param.value.possible_values.count()<2 !!!!", cl_logERROR);
+		return;
+	}
 
 	QString val;
 
@@ -105,5 +119,15 @@ void CLDeviceSettingsTab::onOnOffStateChanged(int state)
 		val = param.value.possible_values.back();
 	}
 
-	mDevice->setParam_asynch(param_name,val);
+	mDlg->setParam(param.name,val);
+}
+
+void CLDeviceSettingsTab::onMinMaxStepChanged()
+{
+	const CLParam& param = param_helper();
+
+	QObject* obg = QObject::sender();
+	QSlider* slider = static_cast<QSlider*>(obg);
+
+	mDlg->setParam(param.name,slider->value());
 }

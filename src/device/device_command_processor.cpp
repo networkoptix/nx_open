@@ -14,7 +14,7 @@ CLDeviceCommand::~CLDeviceCommand()
 
 
 CLDeviceCommandProcessor::CLDeviceCommandProcessor():
-CLAbstractDataProcessor(2000)
+CLAbstractDataProcessor(1000)
 {
 	//start(); This is static singleton and run() uses log (another singleton). Jusst in case I will start it with first device created.
 }
