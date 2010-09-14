@@ -16,6 +16,8 @@ public:
 
 	virtual ~CLAbstractDeviceSettingsDlg();
 
+	CLDevice* getDevice() const;
+
 	virtual bool setParam(const QString& name, const CLValue& val, bool applayToAll = false);
 protected:
 	virtual void init() {};

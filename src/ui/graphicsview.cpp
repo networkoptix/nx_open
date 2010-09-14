@@ -52,7 +52,8 @@ m_CTRL_pressed(false),
 mMainWnd(mainWnd),
 m_drawBkg(true),
 m_logo(0),
-m_animated_bckg(new CLBlueBackGround(50))
+m_animated_bckg(new CLBlueBackGround(50)),
+mDeviceDlg(0)
 {
 	
 }
@@ -62,6 +63,15 @@ GraphicsView::~GraphicsView()
 	delete m_animated_bckg;
 }
 
+
+void GraphicsView::closeAllDlg()
+{
+	if (mDeviceDlg)
+	{
+		mDeviceDlg->close();
+		delete mDeviceDlg;
+	}
+}
 
 void GraphicsView::setCamLayOut(VideoCamerasLayout* lo)
 {
@@ -170,6 +180,12 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 
 	if (wnd)
 		wnd->stop_animation();
+
+	if (wnd && event->button() == Qt::LeftButton && mDeviceDlg && mDeviceDlg->isVisible())
+	{
+			show_device_settings_helper(wnd->getVideoCam()->getDevice());
+	}
+
 
 	if (event->button() == Qt::MidButton)
 	{
@@ -588,11 +604,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 		}
 		else if (act==&cm_settings)
 		{
-
-			QDialog* dlg = new CLAbstractDeviceSettingsDlg(wnd->getVideoCam()->getDevice());
-			dlg->show();
-
-
+			show_device_settings_helper(wnd->getVideoCam()->getDevice());
 		}
 
 	}
@@ -1185,5 +1197,36 @@ void GraphicsView::mouseSpeed_helper(qreal& mouse_speed,  int& dx, int&dy, int m
 		if (sdx) dx =-dx;
 		if (sdy) dy =-dy;
 	}
+
+}
+
+void GraphicsView::show_device_settings_helper(CLDevice* dev)
+{
+	bool open = false;
+	QPoint p;
+
+	if (mDeviceDlg && (static_cast<CLAbstractDeviceSettingsDlg*>(mDeviceDlg))->getDevice()!=dev) // need to delete only if exists and not for this device
+	{
+		// already opened ( may be for another device )
+		p = mDeviceDlg->pos();
+		mDeviceDlg->hide();
+		delete mDeviceDlg;
+		mDeviceDlg = 0;
+		open = true;
+	}
+
+	if (!mDeviceDlg)
+	{
+		mDeviceDlg = new CLAbstractDeviceSettingsDlg(dev);
+
+		if (open) // was open before
+			mDeviceDlg->move(p);
+		
+		
+	}
+
+	mDeviceDlg->show();
+
+	
 
 }

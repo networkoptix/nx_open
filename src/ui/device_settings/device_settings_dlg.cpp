@@ -11,8 +11,11 @@ QDialog(0, Qt::CustomizeWindowHint | Qt::WindowTitleHint |
 		Qt::MSWindowsFixedSizeDialogHint),
 mDevice(dev)
 {
-	
-	setWindowTitle(tr("Camera settings."));
+	QString str = tr("Camera settings");
+	str+=": ";
+	str+=mDevice->toString();
+
+	setWindowTitle(str);
 	setWindowOpacity(0.85);
 
 	int width = 640;
@@ -35,13 +38,13 @@ mDevice(dev)
 	}
 
 
-	mButtonBox = new QDialogButtonBox(QDialogButtonBox::Close);
+	//mButtonBox = new QDialogButtonBox(QDialogButtonBox::Close);
 
 
 	//! [4]
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->addWidget(mTabWidget);
-	mainLayout->addWidget(mButtonBox);
+	///mainLayout->addWidget(mButtonBox);
 	setLayout(mainLayout);
 
 
@@ -53,6 +56,11 @@ mDevice(dev)
 CLAbstractDeviceSettingsDlg::~CLAbstractDeviceSettingsDlg()
 {
 
+}
+
+CLDevice* CLAbstractDeviceSettingsDlg::getDevice() const
+{
+	return mDevice;
 }
 
 bool CLAbstractDeviceSettingsDlg::setParam(const QString& name, const CLValue& val, bool applayToAll)

@@ -34,6 +34,8 @@ public:
 
 	void setAllItemsQuality(CLStreamreader::StreamQuality q, bool increase);
 
+	void closeAllDlg();
+
 protected:
 	virtual void wheelEvent ( QWheelEvent * e );
 	void mouseReleaseEvent ( QMouseEvent * e);
@@ -46,6 +48,7 @@ protected:
 	virtual void keyPressEvent( QKeyEvent * e );
 	virtual void keyReleaseEvent( QKeyEvent * e );
 
+	
 	void resizeEvent ( QResizeEvent * event );
 
 	void OnMenuButton(void* owner, QString text);
@@ -58,6 +61,8 @@ protected:
 	
 	void onArrange_helper();
 	void onCircle_helper();
+
+	void show_device_settings_helper(CLDevice* dev);
 	
 	VideoWindow* getLastSelectedWnd();
 	void mouseSpeed_helper(qreal& mouse_speed,  int& dx, int&dy, int min_spped, int speed_factor);
@@ -111,6 +116,8 @@ protected:
 	bool m_CTRL_pressed;
 
 	MainWnd* mMainWnd;
+
+	QDialog* mDeviceDlg;
 
 	bool m_drawBkg;
 	CLAnimatedBackGround* m_animated_bckg;
