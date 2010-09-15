@@ -409,9 +409,9 @@ void MainWnd::onDeviceRestarted(CLStreamreader* reader, CLRestartHadlerInfo info
 	pl.get("image_bottom").value.value = bottom;
 	//===================
 
-	if (pl.exists("codec")) // if cam supports H.264
-		pl.get("codec").value.value = "H.264";// : "JPEG";
-		//pl.get("codec").value.value = "JPEG";// : "JPEG";
+	if (pl.exists("Codec")) // if cam supports H.264
+		pl.get("Codec").value.value = "H.264";// : "JPEG";
+		//pl.get("Codec").value.value = "JPEG";// : "JPEG";
 
 
 

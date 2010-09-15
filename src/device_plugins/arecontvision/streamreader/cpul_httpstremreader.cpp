@@ -51,9 +51,9 @@ CLAbstractMediaData* AVClientPullSSHTTPStreamreader::getNextData()
 
 			h264 = false;
 
-			if (m_streamParam.exists("codec")) // cam is not jpeg only
+			if (m_streamParam.exists("Codec")) // cam is not jpeg only
 			{
-				CLParam codec = m_streamParam.get("codec");
+				CLParam codec = m_streamParam.get("Codec");
 				if (codec.value.value != QString("JPEG"))
 					h264 = true;
 			}
@@ -84,7 +84,7 @@ CLAbstractMediaData* AVClientPullSSHTTPStreamreader::getNextData()
 			if (h264)
 			{
 				streamID = m_streamParam.get("streamID").value.value;
-				bitrate = m_streamParam.get("bitrate").value.value;
+				bitrate = m_streamParam.get("Bitrate").value.value;
 			}
 			//=========
 

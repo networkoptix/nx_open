@@ -4,6 +4,7 @@
 #include <QSlider>
 #include "device\param.h"
 class CLDevice;
+class QGroupBox;
 
 class SettingsSlider : public QSlider
 {
@@ -50,7 +51,7 @@ public:
 private slots:
 	void stateChanged (int state);
 };
-
+//==============================================
 class SettingsMinMaxStepWidget : public CLAbstractSettingsWidget
 {
 	Q_OBJECT
@@ -58,9 +59,14 @@ public:
 	SettingsMinMaxStepWidget(QObject* handler, CLDevice*dev, QString paramname);
 private slots:
 	void onValChanged();
+	void onValChanged(int val);
 
 private:
 	SettingsSlider* slider;
+	QGroupBox* groupBox;
 };
+//==============================================
 
+
+//==============================================
 #endif //settings_widgets_h_1820

@@ -99,16 +99,21 @@ void SettingsOnOffWidget::stateChanged(int state)
 SettingsMinMaxStepWidget::SettingsMinMaxStepWidget(QObject* handler, CLDevice*dev, QString paramname):
 CLAbstractSettingsWidget(handler, dev, paramname)
 {
-	QGroupBox* groupBox = new QGroupBox();
+	groupBox = new QGroupBox();
 
 
 	slider = new SettingsSlider(Qt::Horizontal, groupBox);
-	slider->setMinimumWidth(150);
+	slider->setMinimumWidth(110);
 	slider->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
 	groupBox->setTitle(mParam.name);
 	slider->setRange(mParam.value.min_val, mParam.value.max_val);
 	slider->setValue(mParam.value.default_value);
+
+	QString str;
+	QTextStream(&str) << mParam.name<< "(" << (QString)mParam.value.default_value<< ")";
+	groupBox->setTitle(str);
+
 
 	QVBoxLayout *layout = new QVBoxLayout(groupBox);
 	layout->addWidget(slider);
@@ -117,9 +122,18 @@ CLAbstractSettingsWidget(handler, dev, paramname)
 
 	QObject::connect(slider, SIGNAL(sliderReleased()), this, SLOT(onValChanged()));
 	QObject::connect(slider, SIGNAL(onKeyReleased()), this, SLOT(onValChanged()));
+	QObject::connect(slider, SIGNAL(valueChanged(int)), this, SLOT(onValChanged(int)) );
+
 
 	mWidget = groupBox;
 
+}
+
+void SettingsMinMaxStepWidget::onValChanged(int val)
+{
+	QString str;
+	QTextStream(&str) << mParam.name<< "(" << val << ")";
+	groupBox->setTitle(str);
 }
 
 void SettingsMinMaxStepWidget::onValChanged()

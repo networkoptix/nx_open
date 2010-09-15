@@ -27,6 +27,7 @@ struct CLParamType
 	QString group;
 	QString subgroup;
 	QString description;
+	bool ui;
 
 	bool readonly;
 

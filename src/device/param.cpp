@@ -6,6 +6,7 @@ CLParamType::CLParamType()
 	type = None;
 	synchronized = false;
 	readonly = false;
+	ui = false;
 }
 
 

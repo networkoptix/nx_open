@@ -80,9 +80,9 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 
 			h264 = false;
 
-			if (m_streamParam.exists("codec")) // cam is not jpeg only
+			if (m_streamParam.exists("Codec")) // cam is not jpeg only
 			{
-				CLParam codec = m_streamParam.get("codec");
+				CLParam codec = m_streamParam.get("Codec");
 				if (codec.value.value != QString("JPEG"))
 					h264 = true;
 			}
@@ -90,7 +90,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 			if (!m_streamParam.exists("quality") || !m_streamParam.exists("resolution") || 
 				!m_streamParam.exists("image_left") || !m_streamParam.exists("image_top") ||
 				!m_streamParam.exists("image_right") || !m_streamParam.exists("image_bottom") ||
-				(h264 && !m_streamParam.exists("streamID")) || (h264 && !m_streamParam.exists("bitrate")))
+				(h264 && !m_streamParam.exists("streamID")) || (h264 && !m_streamParam.exists("Bitrate")))
 			{
 				cl_log.log("Erorr!!! parameter is missing in stream params.", cl_logERROR);
 				return 0;
@@ -139,7 +139,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 
 
 				streamID = m_streamParam.get("streamID").value.value;
-				bitrate = m_streamParam.get("bitrate").value.value;
+				bitrate = m_streamParam.get("Bitrate").value.value;
 			}
 			//=========
 

@@ -676,6 +676,10 @@ bool CLAreconVisionDevice::parseParam(const QDomElement &element, QString& error
 	if (element.hasAttribute("http"))
 		param.value.http = element.attribute("http");
 
+	if (element.hasAttribute("ui"))
+		param.value.ui = element.attribute("ui").toInt();
+
+
 	if (element.hasAttribute("readonly"))
 	{
 		if (element.attribute("readonly")=="true")

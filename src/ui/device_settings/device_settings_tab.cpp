@@ -21,7 +21,7 @@ mHandler(handler)
 
 	QList<QString> sub_groups = mDevice->getDevicePramList().subGroupList(mGroup);
 
-	int size = 200;
+	int size = 155;
 
 	QRect parent_rect = rect();
 
@@ -37,14 +37,14 @@ mHandler(handler)
 		{
 			QGroupBox *subgroupBox = new QGroupBox(this);
 			subgroupBox->setFixedWidth(size);
-			subgroupBox->setFixedHeight(300);
+			subgroupBox->setFixedHeight(420);
 			subgroupBox->setTitle(sub_group);
 			subgroupBox->setObjectName(group+sub_group);
 			subgroupBox->move(10+x, 10);
 
 			parent = subgroupBox;
 
-			x+=210;
+			x+=170;
 		}
 
 		CLParamList::MAP paramLst = mDevice->getDevicePramList().paramList(group, sub_group).list();
@@ -52,7 +52,7 @@ mHandler(handler)
 		int y = 0;
 		foreach (CLParam param, paramLst)
 		{
-			if (param.value.http=="")
+			if (!param.value.ui)	
 				continue;
 
 			QWidget* widget = 0;
