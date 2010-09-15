@@ -63,6 +63,12 @@ CLVideoWindow::~CLVideoWindow()
 		delete m_gldraw[i];
 }
 
+void CLVideoWindow::setMaxSize(QSize size)
+{
+	m_max_width = size.width();
+	m_max_heght = size.height();
+}
+
 void CLVideoWindow::setVideoCam(CLVideoCamera* cam)
 {
 	m_cam = cam;

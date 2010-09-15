@@ -547,6 +547,32 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 	QAction cm_fullscren("Fullscreen",0);
 	QAction cm_settings("Settings...",0);
 
+
+	QMenu distance_menu;
+	distance_menu.setWindowOpacity(0.8);
+	distance_menu.setTitle("Item distance");
+
+	QAction dis_0("0%",0);
+	QAction dis_5("5%",0);
+	QAction dis_10("10%",0);
+	QAction dis_15("15%",0);
+	QAction dis_20("20%",0);
+	QAction dis_25("25%",0);
+	QAction dis_30("30%",0);
+	QAction dis_35("35%",0);
+	//QAction dis_40("40%",0);
+	
+	distance_menu.addAction(&dis_0);
+	distance_menu.addAction(&dis_5);
+	distance_menu.addAction(&dis_10);
+	distance_menu.addAction(&dis_15);
+	distance_menu.addAction(&dis_20);
+	distance_menu.addAction(&dis_25);
+	distance_menu.addAction(&dis_30);
+	distance_menu.addAction(&dis_35);
+	//distance_menu.addAction(&dis_40);
+
+
 	QMenu menu;
 	menu.setWindowOpacity(0.8);
 
@@ -561,6 +587,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 		menu.addAction(&cm_fitinview);
 		menu.addAction(&cm_arrange);
 		menu.addAction(&cm_circle);
+		menu.addMenu(&distance_menu);
 		menu.addAction(&cm_togglefs);
 		menu.addAction(&cm_options);
 		menu.addAction(&cm_exit);
@@ -592,6 +619,48 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 		{
 			onArrange_helper();
 		}
+		else if (act== &dis_0)
+		{
+			m_camLayout->setItemDistance(0.01 + 0);
+			onArrange_helper();
+		}
+		else if (act== &dis_5)
+		{
+			m_camLayout->setItemDistance(0.01 + 0.05);
+			onArrange_helper();
+		}
+		else if (act== &dis_10)
+		{
+			m_camLayout->setItemDistance(0.01 + 0.10);
+			onArrange_helper();
+		}
+		else if (act== &dis_15)
+		{
+			m_camLayout->setItemDistance(0.01 + 0.15);
+			onArrange_helper();
+		}
+		else if (act== &dis_20)
+		{
+			m_camLayout->setItemDistance(0.01 + 0.20);
+			onArrange_helper();
+		}
+		else if (act== &dis_25)
+		{
+			m_camLayout->setItemDistance(0.01 + 0.25);
+			onArrange_helper();
+		}
+		else if (act== &dis_30)
+		{
+			m_camLayout->setItemDistance(0.01 + 0.30);
+			onArrange_helper();
+		}
+		else if (act== &dis_35)
+		{
+			m_camLayout->setItemDistance(0.01 + 0.35);
+			onArrange_helper();
+		}
+
+
 	}
 	else // video item menu?
 	{
@@ -1041,10 +1110,6 @@ void GraphicsView::onArrange_helper()
 
 	}
 	/**/
-
-	//static bool big = true;
-	//big = !big;
-	//m_camLayout->setItemDistance(0 + 0.35*big);
 
 	QList<CLIdealWndPos> newPosLst = m_camLayout->calcArrangedPos();
 	for (int i = 0; i < newPosLst.count();++i)

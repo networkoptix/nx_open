@@ -39,6 +39,12 @@ VideoCamerasLayout::~VideoCamerasLayout()
 void VideoCamerasLayout::setItemDistance(qreal distance)
 {
 	m_item_distance = distance;
+
+	foreach (CLVideoWindow* wnd, m_wnds)
+	{
+		wnd->setMaxSize(getMaxWndSize (wnd->getVideoCam()->getDevice()->getVideoLayout())  );
+	}
+
 }
 
 QSize VideoCamerasLayout::getMaxWndSize(const CLDeviceVideoLayout* layout) const
@@ -97,7 +103,7 @@ QRect VideoCamerasLayout::getSmallLayoutRect() const // scene rect
 
 	QRect video_rect(QPoint(left, top), QPoint(right, bottom) );
 
-	video_rect.adjust(-SLOT_WIDTH/4, - SLOT_HEIGHT/4, SLOT_WIDTH/4, SLOT_HEIGHT/4);
+	video_rect.adjust(-m_item_distance*SLOT_WIDTH/2, - m_item_distance*SLOT_HEIGHT/2, m_item_distance*SLOT_WIDTH/2, m_item_distance*SLOT_HEIGHT/2);
 
 	return video_rect;
 
@@ -506,6 +512,8 @@ QList<CLIdealWndPos> VideoCamerasLayout::calcArrangedPos() const
 		if (slot1!=slot2)
 			slot1 = slot1;
 		
+		slot2 = slotFromPos(pos.pos);
+		width = wnd->width();
 
 
 		result.push_back(pos);
@@ -651,8 +659,8 @@ int VideoCamerasLayout::slotFromPos(QPoint p) const
 	int x = p.x() - SCENE_LEFT;
 	int y = p.y() - SCENE_TOP;
 
-	x = x/( SLOT_WIDTH*(1+m_item_distance) );
-	y = y/( SLOT_HEIGHT*(1+m_item_distance) );
+	x = x/( SLOT_WIDTH*(1+m_item_distance - 1e-10) );
+	y = y/( SLOT_HEIGHT*(1+m_item_distance- 1e-10) );
 
 	return y*m_width + x;
 }

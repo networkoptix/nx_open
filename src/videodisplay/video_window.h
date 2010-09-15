@@ -28,6 +28,8 @@ public:
 	virtual ~CLVideoWindow ();
 	void draw(CLVideoDecoderOutput& image, unsigned int channel);
 
+	void setMaxSize(QSize size);
+
 	void setVideoCam(CLVideoCamera* cam);
 	CLVideoCamera* getVideoCam() const;
 
