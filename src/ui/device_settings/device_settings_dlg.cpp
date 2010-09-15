@@ -4,6 +4,7 @@
 #include <QDialogButtonBox>
 #include <QVBoxLayout>
 #include "../../device/device.h"
+#include "style.h"
 
 CLAbstractDeviceSettingsDlg::CLAbstractDeviceSettingsDlg(CLDevice* dev):
 QDialog(0, Qt::CustomizeWindowHint | Qt::WindowTitleHint | 
@@ -26,6 +27,9 @@ mDevice(dev)
 	QPalette palette;
 	palette.setColor(backgroundRole(), Qt::black);
 	setPalette(palette);
+
+	QStyle *arthurStyle = new ArthurStyle();
+	setStyle(arthurStyle);
 
 	mTabWidget = new QTabWidget;
 
@@ -63,8 +67,7 @@ CLDevice* CLAbstractDeviceSettingsDlg::getDevice() const
 	return mDevice;
 }
 
-bool CLAbstractDeviceSettingsDlg::setParam(const QString& name, const CLValue& val, bool applayToAll)
+void CLAbstractDeviceSettingsDlg::setParam(const QString& name, const CLValue& val)
 {
 	mDevice->setParam_asynch(name,val);
-	return true;
 }

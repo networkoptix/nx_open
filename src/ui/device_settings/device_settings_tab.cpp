@@ -2,17 +2,15 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QGroupBox>
-#include <QSlider>
 #include "../../device/device.h"
-#include "../base/rand.h"
-#include "settigs_widget_factory.h"
 #include "base/log.h"
-#include "device_settings_dlg.h"
+#include "widgets.h"
 
-CLDeviceSettingsTab::CLDeviceSettingsTab(CLAbstractDeviceSettingsDlg* dlg, CLDevice* dev, QString group):
+
+CLDeviceSettingsTab::CLDeviceSettingsTab(QObject* handler, CLDevice* dev, QString group):
 mDevice(dev),
 mGroup(group),
-mDlg(dlg)
+mHandler(handler)
 {
 	setAutoFillBackground(true);
 	QPalette palette;
@@ -57,7 +55,21 @@ mDlg(dlg)
 			if (param.value.http=="")
 				continue;
 
-			QWidget* widget = CLSettingsWidgetFactory::getWidget(param, this);
+			QWidget* widget = 0;
+
+
+			switch(param.value.type)
+			{
+			case CLParamType::OnOff:
+				widget =  (new SettingsOnOffWidget(handler, dev, param.name))->toWidget();
+				break;
+
+			case CLParamType::MinMaxStep:
+				widget =  (new SettingsMinMaxStepWidget(handler, dev, param.name))->toWidget();
+				break;
+			}
+
+
 			if (widget==0)
 				continue;
 
@@ -67,9 +79,6 @@ mDlg(dlg)
 			widget->setParent(parent);
 			widget->move(10, 20 + y);
 			y+=50;
-
-			
-			widget->setObjectName(param.name);
 
 
 		}
@@ -88,46 +97,4 @@ mDlg(dlg)
 CLDeviceSettingsTab::~CLDeviceSettingsTab()
 {
 
-}
-
-const CLParam& CLDeviceSettingsTab::param_helper() const
-{
-	QObject* obg = QObject::sender();
-	QString param_name = obg->objectName();
-	return mDevice->getDevicePramList().get(param_name);
-	
-}
-
-void CLDeviceSettingsTab::onOnOffStateChanged(int state)
-{
-	const CLParam& param = param_helper();
-
-	if (param.value.possible_values.count()<2)
-	{
-		cl_log.log("param.value.possible_values.count()<2 !!!!", cl_logERROR);
-		return;
-	}
-
-	QString val;
-
-	if (state == Qt::Checked)
-	{
-		val = param.value.possible_values.front();
-	}
-	else
-	{
-		val = param.value.possible_values.back();
-	}
-
-	mDlg->setParam(param.name,val);
-}
-
-void CLDeviceSettingsTab::onMinMaxStepChanged()
-{
-	const CLParam& param = param_helper();
-
-	QObject* obg = QObject::sender();
-	QSlider* slider = static_cast<QSlider*>(obg);
-
-	mDlg->setParam(param.name,slider->value());
 }

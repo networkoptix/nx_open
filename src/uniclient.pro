@@ -61,8 +61,8 @@ SOURCES += ui/video_cam_layout/videocamlayout.cpp ui/animation/animation_timelin
 SOURCES += ui/animation/scene_movement.cpp ui/animation/scene_zoom.cpp ui/animation/abstract_animation.cpp ui/animation/item_trans.cpp ui/animation/animated_bgr.cpp
 
 
-SOURCES += ui/device_settings/device_settings_dlg.cpp ui/device_settings/device_settings_tab.cpp ui/device_settings/settigs_widget_factory.cpp ui/device_settings/widgets.cpp
-HEADERS += ui/device_settings/device_settings_dlg.h ui/device_settings/device_settings_tab.h ui/device_settings/settigs_widget_factory.h ui/device_settings/widgets.h
+SOURCES += ui/device_settings/device_settings_dlg.cpp ui/device_settings/device_settings_tab.cpp ui/device_settings/widgets.cpp ui/device_settings/style.cpp
+HEADERS += ui/device_settings/device_settings_dlg.h ui/device_settings/device_settings_tab.h ui/device_settings/widgets.h ui/device_settings/style.h
 
 
 RESOURCES += mainwnd.qrc

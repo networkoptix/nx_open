@@ -10,6 +10,7 @@ class QDialogButtonBox;
 
 class CLAbstractDeviceSettingsDlg : public QDialog
 {
+	Q_OBJECT
 public:
 
 	CLAbstractDeviceSettingsDlg(CLDevice* dev);
@@ -17,8 +18,10 @@ public:
 	virtual ~CLAbstractDeviceSettingsDlg();
 
 	CLDevice* getDevice() const;
+public slots:
+	virtual void setParam(const QString& name, const CLValue& val);
 
-	virtual bool setParam(const QString& name, const CLValue& val, bool applayToAll = false);
+
 protected:
 	virtual void init() {};
 	
