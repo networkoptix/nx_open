@@ -61,13 +61,13 @@ int main(int argc, char *argv[])
 	//============================
 
 	//=========================================================
-	
+
 	qApp->setStyleSheet("\
 		QMenu {\
 		background-color: black;\
 		color: white;\
 		font-family: Bodoni MT;\
-		font-size: 15px;\
+		font-size: 18px;\
 		border: 1px solid rgb(110, 110, 110);\
 		}\
 		QMenu::item{\
@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
 		padding-bottom: 4px;\
 		}\
 		QMenu::item:selected {\
-		background: rgb(100, 0, 0);\
+		background: rgb(40, 40, 40);\
 		}");
 
 	/**/
