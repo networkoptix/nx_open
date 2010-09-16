@@ -67,6 +67,11 @@ mHandler(handler)
 			case CLParamType::MinMaxStep:
 				widget =  (new SettingsMinMaxStepWidget(handler, dev, param.name))->toWidget();
 				break;
+
+			case CLParamType::Enumeration:
+				widget =  (new SettingsEnumerationWidget(handler, dev, param.name))->toWidget();
+				break;
+
 			}
 
 
@@ -78,7 +83,7 @@ mHandler(handler)
 
 			widget->setParent(parent);
 			widget->move(10, 20 + y);
-			y+=50;
+			y+=80;
 
 
 		}

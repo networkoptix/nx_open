@@ -19,6 +19,7 @@ struct CLParamType
 	CLValue step;
 
 	QList<CLValue> possible_values;
+	QList<CLValue> ui_possible_values;
 
 	CLValue value;
 	CLValue default_value;

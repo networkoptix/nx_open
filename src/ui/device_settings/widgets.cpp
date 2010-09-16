@@ -4,6 +4,7 @@
 #include <QCheckBox>
 #include <QGroupBox>
 #include <QSlider>
+#include <QRadioButton>
 #include "base/log.h"
 
 
@@ -95,7 +96,6 @@ void SettingsOnOffWidget::stateChanged(int state)
 }
 
 //==============================================
-
 SettingsMinMaxStepWidget::SettingsMinMaxStepWidget(QObject* handler, CLDevice*dev, QString paramname):
 CLAbstractSettingsWidget(handler, dev, paramname)
 {
@@ -124,9 +124,7 @@ CLAbstractSettingsWidget(handler, dev, paramname)
 	QObject::connect(slider, SIGNAL(onKeyReleased()), this, SLOT(onValChanged()));
 	QObject::connect(slider, SIGNAL(valueChanged(int)), this, SLOT(onValChanged(int)) );
 
-
 	mWidget = groupBox;
-
 }
 
 void SettingsMinMaxStepWidget::onValChanged(int val)
@@ -142,3 +140,36 @@ void SettingsMinMaxStepWidget::onValChanged()
 }
 
 //==============================================
+SettingsEnumerationWidget::SettingsEnumerationWidget(QObject* handler, CLDevice*dev, QString paramname):
+CLAbstractSettingsWidget(handler, dev, paramname)
+{
+	QGroupBox* groupBox  = new QGroupBox();
+	mWidget = groupBox;
+	groupBox->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+	groupBox->setTitle(mParam.name);
+	groupBox->setMinimumWidth(110);
+
+	QVBoxLayout *layout = new QVBoxLayout(groupBox);
+	
+	for (int i = 0; i < mParam.value.ui_possible_values.count();++i)
+	{
+		QRadioButton *btn = new QRadioButton(mParam.value.ui_possible_values.at(i), groupBox);
+		layout->addWidget(btn);
+
+		QString val = mParam.value.possible_values.at(i);
+		if (val == mParam.value.default_value)
+			btn->setChecked(true);
+
+		btn->setObjectName(val);
+
+		connect(btn , SIGNAL(clicked()), this, SLOT(onClicked()));
+	}
+	
+}
+
+void SettingsEnumerationWidget::onClicked()
+{
+	QString val = QObject::sender()->objectName();
+
+	emit setParam(mParam.name, val);
+}

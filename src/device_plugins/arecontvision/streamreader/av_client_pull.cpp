@@ -87,9 +87,9 @@ void CLAVClinetPullStreamReader::setQuality(StreamQuality q)
 
 
 		if (pl.exists("quality"))
-			pl.get("quality").value.value = "1";
+			pl.get("quality").value.value = "6";
 		else
-			m_device->setParam_asynch("quality", "1");
+			m_device->setParam_asynch("quality", "6");
 
 	    break;
 	}

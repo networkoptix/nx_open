@@ -703,6 +703,20 @@ bool CLAreconVisionDevice::parseParam(const QDomElement &element, QString& error
 
 	}
 
+	if (element.hasAttribute("ui_values"))
+	{
+		QString values = element.attribute("ui_values");
+		QStringList lst = values.split(",");
+		QStringListIterator lst_iter(lst);
+		while(lst_iter.hasNext())
+		{
+			QString val = lst_iter.next().trimmed();
+			param.value.ui_possible_values.push_back(val);
+		}
+
+	}
+
+
 	if (element.hasAttribute("value"))
 		param.value.value = element.attribute("value");
 	else

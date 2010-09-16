@@ -66,6 +66,15 @@ private:
 	QGroupBox* groupBox;
 };
 //==============================================
+class SettingsEnumerationWidget : public CLAbstractSettingsWidget
+{
+	Q_OBJECT
+public:
+	SettingsEnumerationWidget(QObject* handler, CLDevice*dev, QString paramname);
+private slots:
+	void onClicked();
+
+};
 
 
 //==============================================
