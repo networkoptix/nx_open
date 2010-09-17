@@ -75,12 +75,12 @@ QSize VideoCamerasLayout::getMaxWndSize(const CLDeviceVideoLayout* layout) const
 
 int VideoCamerasLayout::slotsW(CLVideoWindow* wnd) const
 {
-	 return ceil( (qreal(wnd->width())/SLOT_WIDTH + m_item_distance)/(1+m_item_distance) - 1e-5);
+	 return ceil( (qreal(wnd->width())/SLOT_WIDTH + m_item_distance)/(1+m_item_distance) - 1e-7);
 }
 
 int VideoCamerasLayout::slotsH(CLVideoWindow* wnd) const
 {
-	return ceil( (qreal(wnd->height())/SLOT_HEIGHT+ m_item_distance)/(1+m_item_distance) - 1e-5);
+	return ceil( (qreal(wnd->height())/SLOT_HEIGHT+ m_item_distance)/(1+m_item_distance) - 1e-7);
 }
 
 
@@ -528,12 +528,10 @@ void VideoCamerasLayout::adjustWnd(CLVideoWindow* wnd) const
 {
 	
 	QPointF p = wnd->mapToScene(wnd->boundingRect().center());
-	//p-=QPointF(wnd->width()/2, wnd->height()/2); // this addition as not good at all; due to item zoom topLeft pos might be shifted to diff slot; case1
+	p-=QPointF(wnd->width()/2, wnd->height()/2); // this addition as not good at all; due to item zoom topLeft pos might be shifted to diff slot; case1
 
 
 	int slot = slotFromPos( QPoint(p.x(),p.y()) );
-	slot-=(slotsW(wnd)-1)/2 ;
-	slot-=(slotsH(wnd)-1)/2* m_width;
 
 	if (slot<0)
 	{
