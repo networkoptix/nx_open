@@ -8,7 +8,7 @@ CLDeviceList FakeDevice::findDevices()
 {
 	CLDeviceList result;
 
-	for (int i = 0; i < 10; ++i)
+	for (int i = 0; i < 1; ++i)
 	{
 		CLDevice* dev = new FakeDevice();
 		dev->setUniqueId(QString("prerecorded ") + QString::number(i));

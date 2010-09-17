@@ -69,7 +69,7 @@ void CLBlueBackGround::drawBackground(QPainter * painter, const QRectF & rect )
 		rpos = rpos;
 
 
-	QColor bl(10,10,140+50*rpos,255);
+	QColor bl(10,10,110+50*rpos,255);
 	//QColor bl(10,100+50*rpos,10,255);
 
 
