@@ -143,6 +143,7 @@ public:
 	static void startCommandProc() {m_commanproc.start();};
 	static void stopCommandProc() {m_commanproc.stop();};
 	static int commandProcQueSize() {return m_commanproc.queSize();}
+	static bool commandProchasSuchDeviceInQueue(CLDevice* dev) {return m_commanproc.hasSuchDeviceInQueue(dev);}
 
 
 protected:

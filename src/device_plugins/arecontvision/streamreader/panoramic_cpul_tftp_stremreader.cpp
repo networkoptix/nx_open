@@ -93,7 +93,7 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 	
 	if (h264)
 	{
-		if (m_needKeyData)
+		if (needKeyData())
 			os <<";iframe=1;";
 		else
 			os <<";iframe=0;";
@@ -164,7 +164,7 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 		iframe_index = 89;
 		break;
 	case AV3135:
-		iframe_index = 98;
+		iframe_index = 88;
 		break;
 	default:
 		iframe_index = 93;
@@ -206,7 +206,6 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 	if (h264)
 	{
 		videoData->keyFrame = last_packet[iframe_index-1];
-
 		//==========================================
 		//put unit delimetr at the end of the frame
 
@@ -283,3 +282,12 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 
 }
 
+bool AVPanoramicClientPullSSTFTPStreamreader::needKeyData() const
+{
+	for (int i = 0; i < m_channel_number; ++i)
+		if (m_gotKeyFrame[i]<2)  // due to bug of AV panoramic H.264 cam. cam do not send frame with diff resolution of resolution changed. first I frame comes with old resolution
+			return true;
+
+	return false;
+
+}

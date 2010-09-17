@@ -20,6 +20,8 @@ void CLAVClinetPullStreamReader::setQuality(StreamQuality q)
 
 	CLClientPullStreamreader::setQuality(q);
 
+	setNeedKeyData();
+
 
 	CLParamList pl = getStreamParam();
 
@@ -37,7 +39,7 @@ void CLAVClinetPullStreamReader::setQuality(StreamQuality q)
 		if (pl.exists("quality"))
 			pl.get("quality").value.value = "15";
 		else
-			m_device->setParam_asynch("quality", "15"); // panoramic
+			m_device->setParam_asynch("quality", "17"); // panoramic
 
 
 
@@ -54,7 +56,7 @@ void CLAVClinetPullStreamReader::setQuality(StreamQuality q)
 		if (pl.exists("quality"))
 			pl.get("quality").value.value = "7";
 		else
-			m_device->setParam_asynch("quality", "7"); // panoramic
+			m_device->setParam_asynch("quality", "11"); // panoramic
 
 	
 
@@ -72,7 +74,7 @@ void CLAVClinetPullStreamReader::setQuality(StreamQuality q)
 		if (pl.exists("quality"))
 			pl.get("quality").value.value = "7";
 		else
-			m_device->setParam_asynch("quality", "7");
+			m_device->setParam_asynch("quality", "11");
 
 	    break;
 
@@ -83,18 +85,18 @@ void CLAVClinetPullStreamReader::setQuality(StreamQuality q)
 		if (pl.exists("resolution"))
 			pl.get("resolution").value.value = "half";
 		else
-			m_device->setParam_asynch("resolution", "full");
+			m_device->setParam_asynch("resolution", "half");
 
 
 		if (pl.exists("quality"))
 			pl.get("quality").value.value = "6";
 		else
-			m_device->setParam_asynch("quality", "6");
+			m_device->setParam_asynch("quality", "11");
 
 	    break;
 	}
 
-	needKeyData();
+	setNeedKeyData();
 
 	setStreamParams(pl);
 

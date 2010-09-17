@@ -21,7 +21,8 @@ public:
 
 protected:
 	virtual CLAbstractMediaData* getNextData();
-	
+
+	virtual bool needKeyData() const;
 	
 protected:
 

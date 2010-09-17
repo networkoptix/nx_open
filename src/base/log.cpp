@@ -78,6 +78,18 @@ void CLLog::log(const QString& msg1, int val, const QString& msg2, CLLogLevel lo
 
 }
 
+void CLLog::log(const QString& msg1, int val, const QString& msg2, int val2, CLLogLevel loglevel)
+{
+	if (loglevel > m_loglevel)
+		return;
+
+	QString str;
+	QTextStream(&str) << msg1 << val << msg2 << val2;
+
+	log(str, loglevel);
+
+}
+
 void CLLog::log(const QString& msg, float val, CLLogLevel loglevel)
 {
 	if (loglevel > m_loglevel)
@@ -92,7 +104,7 @@ void CLLog::log(const QString& msg, float val, CLLogLevel loglevel)
 
 void CLLog::log(const QString& msg, CLLogLevel loglevel)
 {
-	return;
+//	return;
 
 	if (loglevel > m_loglevel)
 		return;

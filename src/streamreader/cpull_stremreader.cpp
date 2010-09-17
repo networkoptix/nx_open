@@ -8,30 +8,9 @@
 CLClientPullStreamreader::CLClientPullStreamreader(CLDevice* dev ):
 CLStreamreader(dev)
 {
-	for (int i = 0; i < CL_MAX_CHANNEL_NUMBER; ++i)
-		m_key_farme_helper[i] = false;
-
-	m_channel_number = dev->getVideoLayout()->numberOfChannels();
 
 }
 
-void CLClientPullStreamreader::needKeyData()
-{
-	m_needKeyData = true;
-	for (int i = 0; i < m_channel_number; ++i)
-		m_key_farme_helper[i] = false;
-
-}
-
-bool CLClientPullStreamreader::isKeyDataReceived() const
-{
-	for (int i = 0; i < m_channel_number; ++i)
-		if (!m_key_farme_helper[i])
-			return false;
-
-	return true;
-
-}
 
 bool CLClientPullStreamreader::needToRead() const
 {
@@ -55,7 +34,7 @@ void CLClientPullStreamreader::run()
 
 	CL_LOG(cl_logINFO) cl_log.log("stream reader started.", cl_logINFO);
 
-	m_needKeyData = true;
+	setNeedKeyData();
 	int frames_lost = 0;
 
 	while(!needToStop())
@@ -68,6 +47,11 @@ void CLClientPullStreamreader::run()
 			continue;
 		}
 
+		if (CLDevice::commandProchasSuchDeviceInQueue(m_device)) // if command processor has something in the queue for this device let it go first
+		{
+			CLSleep::msleep(5);
+			continue;
+		}
 
 		CLAbstractMediaData *data = 0;
 		data = getNextData();
@@ -76,7 +60,7 @@ void CLClientPullStreamreader::run()
 		
 		if (data==0)
 		{
-			m_needKeyData = true;
+			setNeedKeyData();
 			frames_lost++;
 			m_stat[0].onData(0);
 			m_stat[0].onEvent(CL_STAT_FRAME_LOST);
@@ -88,6 +72,7 @@ void CLClientPullStreamreader::run()
 			
 			continue;
 		}
+
 
 		if (frames_lost>0) // we are alive again
 		{
@@ -105,16 +90,29 @@ void CLClientPullStreamreader::run()
 		
 		
 
-		if (m_needKeyData)
+		if (needKeyData())
 		{
 			// I do not like; need to do smth with it 
 			CLCompressedVideoData *comp_data = static_cast<CLCompressedVideoData *>(data);
 			if (comp_data->keyFrame)
 			{
-				m_key_farme_helper[data->channel_num] = true;
+				if (data->channel_num>CL_MAX_CHANNEL_NUMBER-1)
+				{
+					Q_ASSERT(false);
+					data->releaseRef();
+					continue;
+				}
 
-				if (isKeyDataReceived())
-					m_needKeyData = false;
+
+
+				m_gotKeyFrame[data->channel_num]++;
+
+			}
+			else
+			{
+				// need key data but got not key data
+				data->releaseRef();
+				continue;
 			}
 		}
 

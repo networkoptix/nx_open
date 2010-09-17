@@ -2,6 +2,7 @@
 #define CLDeveceCommandProcessor_h_1207
 
 #include "../data/dataprocessor.h"
+#include <QMap>
 
 class CLDevice;
 
@@ -10,6 +11,7 @@ class CLDeviceCommand : public CLAbstractData
 public:
 	CLDeviceCommand(CLDevice* device);
 	virtual ~CLDeviceCommand();
+	CLDevice* getDevice() const;
 	virtual void execute() = 0;
 protected:
 	CLDevice* m_device;
@@ -23,12 +25,17 @@ public:
 	CLDeviceCommandProcessor();
 	~CLDeviceCommandProcessor();
 
-	virtual void processData(CLAbstractData* data);
-	
+	virtual void putData(CLAbstractData* data);
+
+	virtual void clearUnProcessedData();
+
+	bool hasSuchDeviceInQueue(CLDevice* dev) const;
 
 protected:
-	
+	virtual void processData(CLAbstractData* data);
 private:
+	QMap<CLDevice*, unsigned int> mDevicesQue;
+	mutable QMutex m_cs;
 };
 
 

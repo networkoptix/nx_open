@@ -22,6 +22,7 @@ struct CLDeviceRestartHadler
 };
 
 #define CL_MAX_DATASIZE (20*1024*1024) // assume we can never get compressed data with  size greater than this
+#define CL_MAX_CHANNEL_NUMBER (10) 
 
 
 class CLStreamreader : public CLLongRunnable
@@ -42,7 +43,8 @@ public:
 	void removeDataProcessor(CLAbstractDataProcessor* dp);
 
 
-	virtual void needKeyData();
+	virtual void setNeedKeyData();
+	virtual bool needKeyData() const;
 
 	void setDeviceRestartHadlerInfo(CLRestartHadlerInfo);
 	void setDeviceRestartHadler(CLDeviceRestartHadler* restartHandler);
@@ -69,7 +71,9 @@ protected:
 
 	CLStatistics* m_stat;
 
-	volatile bool m_needKeyData;
+	int m_gotKeyFrame[CL_MAX_CHANNEL_NUMBER];
+	int m_channel_number;
+
 
 	CLRestartHadlerInfo m_restartInfo;
 	CLDeviceRestartHadler* m_restartHandler;

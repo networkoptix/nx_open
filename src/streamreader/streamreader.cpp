@@ -1,5 +1,7 @@
 #include "streamreader.h"
 #include "../base/log.h"
+#include "device/device.h"
+#include "device/device_video_layout.h"
 
 
 
@@ -9,6 +11,9 @@ m_restartHandler(0),
 m_device(dev),
 m_qulity(StreamQuality::CLSLowest)
 {
+	memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame));
+	m_channel_number = dev->getVideoLayout()->numberOfChannels();
+	
 }
 
 CLStreamreader::~CLStreamreader()
@@ -57,9 +62,20 @@ void CLStreamreader::removeDataProcessor(CLAbstractDataProcessor* dp)
 	m_dataprocessors.removeOne(dp);
 }
 
-void CLStreamreader::needKeyData()
+void CLStreamreader::setNeedKeyData()
 {
-	m_needKeyData = true;
+	for (int i = 0; i < m_channel_number; ++i)
+		m_gotKeyFrame[i] = 0;
+}
+
+bool CLStreamreader::needKeyData() const
+{
+	for (int i = 0; i < m_channel_number; ++i)
+		if (m_gotKeyFrame[i]==0)
+			return true;
+
+	return false;
+
 }
 
 void CLStreamreader::setDeviceRestartHadlerInfo(CLRestartHadlerInfo hinfo)

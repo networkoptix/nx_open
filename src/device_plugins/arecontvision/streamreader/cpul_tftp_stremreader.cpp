@@ -134,7 +134,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 					m_last_width = width;
 					m_last_height = height;
 
-					m_needKeyData = true;
+					setNeedKeyData();
 				}
 
 
@@ -178,7 +178,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 	
 	if (h264)
 	{
-		if (m_needKeyData)
+		if (needKeyData())
 			os <<";iframe=1;";
 		else
 			os <<";iframe=0;";
@@ -254,7 +254,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 		iframe_index = 89;
 		break;
 	case AV3135:
-		iframe_index = 98;
+		iframe_index = 88;
 		break;
 	default:
 		iframe_index = 93;

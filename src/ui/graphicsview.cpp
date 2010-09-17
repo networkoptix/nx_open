@@ -594,6 +594,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
 	}
 
+
 	QAction* act = menu.exec(QCursor::pos());
 
 	if (act==&cm_exit)

@@ -118,7 +118,7 @@ CLAbstractMediaData* AVClientPullSSHTTPStreamreader::getNextData()
 			if (h264)
 			{
 				//os <<"&iframe=" << *Ifarme;
-				if (m_needKeyData)
+				if (needKeyData())
 					os <<"&iframe=1";
 
 

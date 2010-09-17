@@ -203,7 +203,7 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 
 	
 	/*
-	if ((width!=m_width)||(height!=m_height))
+	if ((data.!=m_width)||(height!=m_height))
 	{
 		m_width = width;
 		m_height = height;

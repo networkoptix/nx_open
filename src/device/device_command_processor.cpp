@@ -12,6 +12,14 @@ CLDeviceCommand::~CLDeviceCommand()
 	m_device->releaseRef();
 };
 
+CLDevice* CLDeviceCommand::getDevice() const
+{
+	return m_device;
+}
+
+
+
+
 
 CLDeviceCommandProcessor::CLDeviceCommandProcessor():
 CLAbstractDataProcessor(1000)
@@ -29,4 +37,48 @@ void CLDeviceCommandProcessor::processData(CLAbstractData* data)
 {
 	CLDeviceCommand* command = static_cast<CLDeviceCommand*>(data);
 	command->execute();
+
+	CLDevice* dev = command->getDevice();
+	QMutexLocker mutex(&m_cs);
+	Q_ASSERT(mDevicesQue.contains(dev));
+	Q_ASSERT(mDevicesQue[dev]>0);
+
+	mDevicesQue[dev]--;
 }
+
+bool CLDeviceCommandProcessor::hasSuchDeviceInQueue(CLDevice* dev) const
+{
+	QMutexLocker mutex(&m_cs);
+	if (!mDevicesQue.contains(dev))
+		return false;
+
+	return (mDevicesQue[dev]>0);
+}
+
+void CLDeviceCommandProcessor::putData(CLAbstractData* data)
+{
+	CLDeviceCommand* command = static_cast<CLDeviceCommand*>(data);
+	CLDevice* dev = command->getDevice();
+
+	QMutexLocker mutex(&m_cs);
+	if (!mDevicesQue.contains(dev))
+	{
+		mDevicesQue[dev] = 1;
+	}
+	else
+	{
+		mDevicesQue[dev]++;
+	}
+
+	CLAbstractDataProcessor::putData(data);
+
+}
+
+void CLDeviceCommandProcessor::clearUnProcessedData()
+{
+	CLAbstractDataProcessor::clearUnProcessedData();
+	QMutexLocker mutex(&m_cs);
+	mDevicesQue.clear();
+}
+
+

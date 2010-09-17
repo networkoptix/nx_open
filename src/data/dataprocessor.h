@@ -17,7 +17,7 @@ public:
 
 	virtual void putData(CLAbstractData* data);
 	
-	void clearUnProcessedData();
+	virtual void clearUnProcessedData();
 	
 	int queSize() const;
 
