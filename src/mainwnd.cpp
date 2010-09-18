@@ -192,6 +192,7 @@ void MainWnd::closeEvent ( QCloseEvent * event )
 	m_videoView.closeAllDlg();
 }
 
+
 void MainWnd::toggleFullScreen()
 {
 	if (!isFullScreen())

@@ -29,6 +29,7 @@ public:
 	~VideoCamerasLayout();
 
 	void setItemDistance(qreal distance);
+	qreal getItemDistance() const;
 
 	// means that at least one wnd can be added 
 	bool isSpaceAvalable() const;

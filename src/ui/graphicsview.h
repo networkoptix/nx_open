@@ -127,6 +127,9 @@ protected:
 	QGraphicsPixmapItem* m_logo;
 
 	Show_helper mShow;
+
+	bool mZerroDistance;
+	qreal m_old_distance;
 	
 
 

@@ -53,7 +53,8 @@ mMainWnd(mainWnd),
 m_drawBkg(true),
 m_logo(0),
 m_animated_bckg(new CLBlueBackGround(50)),
-mDeviceDlg(0)
+mDeviceDlg(0),
+mZerroDistance(true)
 {
 	connect(&mShow.mTimer, SIGNAL(timeout ()), this , SLOT(onShowTimer()) );
 	mShow.mTimer.setInterval(1000);
@@ -769,8 +770,32 @@ void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
 	if(!isWndStillExists(item))
 		item = 0;
 
-	if (!item)
+	if (!item) // clicked on void space 
+	{
+		if (!mMainWnd->isFullScreen())
+		{
+			mMainWnd->toggleFullScreen();
+			m_scenezoom.zoom_delta(0.001,1)	;
+		}
+
+
+		if (mZerroDistance)
+		{
+			m_old_distance = m_camLayout->getItemDistance();
+			m_camLayout->setItemDistance(0.01);
+			mZerroDistance = false;
+		}
+		else
+		{
+			m_camLayout->setItemDistance(m_old_distance);
+			mZerroDistance = true;
+		}
+
+		
+		onArrange_helper();
+		
 		return;
+	}
 
 	if (e->button() == Qt::LeftButton)
 	{
