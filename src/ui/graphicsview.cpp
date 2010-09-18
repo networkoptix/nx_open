@@ -55,7 +55,11 @@ m_logo(0),
 m_animated_bckg(new CLBlueBackGround(50)),
 mDeviceDlg(0)
 {
-	
+	connect(&mShow.mTimer, SIGNAL(timeout ()), this , SLOT(onShowTimer()) );
+	mShow.mTimer.setInterval(1000);
+	mShow.mTimer.start();
+
+
 }
 
 GraphicsView::~GraphicsView()
@@ -162,6 +166,65 @@ void GraphicsView::updateTransform()
 
 }
 
+void GraphicsView::onShowTimer()
+{
+	if (!mShow.showTime)
+	{
+		mShow.mTimer.setInterval(1000);
+		mShow.counrer++;
+		
+		if (mShow.counrer>60)
+		{
+			QSet<CLVideoWindow*> wndlst = m_camLayout->getWndList();
+			qreal total = wndlst.size();
+			if (total<2)
+			{
+				mShow.counrer = 0;
+				return;
+			}
+
+			mShow.mTimer.stop();
+			onCircle_helper(true);
+			mShow.showTime = true;
+			
+		}
+			
+	}
+	else // show time
+	{
+		mShow.value++;
+		QSet<CLVideoWindow*> wndlst = m_camLayout->getWndList();
+		qreal total = wndlst.size();
+
+		int i = 0;
+
+		foreach (CLVideoWindow* wnd, wndlst)
+		{
+			VideoWindow* item = static_cast<VideoWindow*>(wnd);
+
+			QPointF pos ( mShow.center.x() + cos((i / total) * 6.28 + mShow.value/100.0) * mShow.radius , mShow.center.y() + sin((i / total) * 6.28 + mShow.value/100.0) * mShow.radius ) ;
+
+			item->setPos(pos);
+
+			item->setRotation(item->getRotation() - 4.0/cl_get_random_val(7,10));
+
+			++i;
+		}
+
+	}
+
+}
+
+void GraphicsView::onShowStart()
+{
+	if (mShow.showTime)
+	{
+		mShow.mTimer.setInterval(1000/60);
+		mShow.value = 0;
+	}
+	mShow.mTimer.start();
+
+}
 
 void GraphicsView::mousePressEvent ( QMouseEvent * event)
 {
@@ -215,6 +278,16 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 
 
 	QGraphicsView::mousePressEvent(event);
+
+	mShow.counrer = 0;
+	if (mShow.showTime)
+	{
+		mShow.showTime = 0;
+		mShow.mTimer.setInterval(1000);
+		onArrange_helper();
+		mShow.mTimer.start();
+	}
+
 
 }
 
@@ -302,6 +375,15 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 
 	m_mousestate.mouseMoveEventHandler(event);
 	QGraphicsView::mouseMoveEvent(event);
+
+	mShow.counrer = 0;
+	if (mShow.showTime)
+	{
+		mShow.showTime = 0;
+		mShow.mTimer.setInterval(1000);
+		onArrange_helper();
+		mShow.mTimer.start();
+	}
 }
 
 void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
@@ -1017,7 +1099,7 @@ void GraphicsView::onNewItemSelected_helper(VideoWindow* new_wnd, int delay)
 
 }
 
-void GraphicsView::onCircle_helper()
+void GraphicsView::onCircle_helper(bool show)
 {
 	QSet<CLVideoWindow*> wndlst = m_camLayout->getWndList();
 	if (wndlst.empty())
@@ -1033,9 +1115,10 @@ void GraphicsView::onCircle_helper()
 	
 	reAdjustSceneRect();
 	QRectF item_rect = m_camLayout->getSmallLayoutRect();
+	mShow.center = item_rect.center();
 
-	int radius = min(item_rect.width(), item_rect.height())/2;
-	QPointF center = item_rect.center();
+	mShow.radius = max(item_rect.width(), item_rect.height())/2.5;
+	
 
 	int i = 0;
 
@@ -1060,7 +1143,7 @@ void GraphicsView::onCircle_helper()
 
 		anim2->setStartValue(item->pos());
 
-		anim2->setEndValue( QPointF ( center.x() + cos((i / total) * 6.28) * radius , center.y() + sin((i / total) * 6.28) * radius) );
+		anim2->setEndValue( QPointF ( mShow.center.x() + cos((i / total) * 6.28) * mShow.radius , mShow.center.y() + sin((i / total) * 6.28) * mShow.radius ) );
 
 
 		anim2->setDuration(1500 + cl_get_random_val(0, 300));
@@ -1074,6 +1157,10 @@ void GraphicsView::onCircle_helper()
 	}
 
 	connect(group, SIGNAL(finished ()), this, SLOT(onFitInView_helper()));
+
+	if (show)
+		connect(group, SIGNAL(finished ()), this, SLOT(onShowStart()));
+
 
 	group->start(QAbstractAnimation::DeleteWhenStopped);
 

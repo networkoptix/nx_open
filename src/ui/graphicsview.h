@@ -5,6 +5,7 @@
 #include "./animation/scene_movement.h"
 #include "./animation/scene_zoom.h"
 #include "./animation/mouse_state.h"
+#include "./animation/animated_show.h"
 
 
 class VideoWindow;
@@ -60,7 +61,7 @@ protected:
 	void onItemFullScreen_helper(VideoWindow* wnd);
 	
 	void onArrange_helper();
-	void onCircle_helper();
+	void onCircle_helper(bool show=false);
 
 	void show_device_settings_helper(CLDevice* dev);
 	
@@ -77,6 +78,8 @@ protected:
 private slots:
 	void onFitInView_helper(int duration = 600);
 	void reAdjustSceneRect();
+	void onShowTimer();
+	void onShowStart();
 protected:
 	
 	int m_xRotate;
@@ -122,6 +125,9 @@ protected:
 	bool m_drawBkg;
 	CLAnimatedBackGround* m_animated_bckg;
 	QGraphicsPixmapItem* m_logo;
+
+	Show_helper mShow;
+	
 
 
 };

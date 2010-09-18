@@ -54,11 +54,11 @@ HEADERS += device_plugins/fake/streamreader/fake_file_streamreader.h
 SOURCES +=ui/graphicsview.cpp ui/videoitem/uvideo_wnd.cpp ui/videoitem/loup_wnd.cpp
 HEADERS +=ui/graphicsview.h ui/videoitem/uvideo_wnd.h ui/videoitem/loup_wnd.h
 
-HEADERS += ui/video_cam_layout/videocamlayout.h  ui/animation/animation_timeline.h ui/animation/mouse_state.h
+HEADERS += ui/video_cam_layout/videocamlayout.h  ui/animation/animation_timeline.h ui/animation/mouse_state.h ui/animation/animated_show.h
 HEADERS += ui/animation/scene_movement.h ui/animation/scene_zoom.h ui/animation/abstract_animation.h ui/animation/item_trans.h ui/animation/animated_bgr.h
 
-SOURCES += ui/video_cam_layout/videocamlayout.cpp ui/animation/animation_timeline.cpp ui/animation/mouse_state.cpp
-SOURCES += ui/animation/scene_movement.cpp ui/animation/scene_zoom.cpp ui/animation/abstract_animation.cpp ui/animation/item_trans.cpp ui/animation/animated_bgr.cpp
+SOURCES += ui/video_cam_layout/videocamlayout.cpp ui/animation/animation_timeline.cpp ui/animation/mouse_state.cpp ui/animation/animated_show.cpp
+SOURCES += ui/animation/scene_movement.cpp ui/animation/scene_zoom.cpp ui/animation/abstract_animation.cpp ui/animation/item_trans.cpp ui/animation/animated_bgr.cpp 
 
 
 SOURCES += ui/device_settings/device_settings_dlg.cpp ui/device_settings/device_settings_tab.cpp ui/device_settings/widgets.cpp ui/device_settings/style.cpp
