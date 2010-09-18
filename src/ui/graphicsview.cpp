@@ -377,9 +377,6 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 				}
 
 
-
-		
-
 			}
 			 
 			m_movement.move(-dx,-dy, scene_move_duration + mouse_speed, fullscreen);
@@ -436,7 +433,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 	//====================================================
 
-	if (!handMoving && left_button && !m_CTRL_pressed) // if left button released and we did not move the scene, so may bee need to zoom on the item
+	if (!handMoving && left_button && !m_CTRL_pressed && !m_movingWnd) // if left button released and we did not move the scene, so may bee need to zoom on the item
 	{
 
 			if(!wnd) // not item and any button
@@ -721,7 +718,7 @@ void GraphicsView::keyReleaseEvent( QKeyEvent * e )
 		if (m_movingWnd)
 		{
 			reAdjustSceneRect();
-			m_movingWnd =0;
+			//m_movingWnd =0;
 		}
 		break;
 
