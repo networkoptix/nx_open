@@ -1380,7 +1380,7 @@ void GraphicsView::show_device_settings_helper(CLDevice* dev)
 	bool open = false;
 	QPoint p;
 
-	if (mDeviceDlg && (static_cast<CLAbstractDeviceSettingsDlg*>(mDeviceDlg))->getDevice()!=dev) // need to delete only if exists and not for this device
+	if (mDeviceDlg && mDeviceDlg->getDevice()!=dev) // need to delete only if exists and not for this device
 	{
 		// already opened ( may be for another device )
 		p = mDeviceDlg->pos();

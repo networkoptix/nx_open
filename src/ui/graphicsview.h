@@ -13,6 +13,7 @@ class VideoCamerasLayout;
 class MainWnd;
 class QGraphicsPixmapItem;
 class CLAnimatedBackGround;
+class CLAbstractDeviceSettingsDlg;
 
 class GraphicsView: public QGraphicsView 
 {
@@ -120,7 +121,7 @@ protected:
 
 	MainWnd* mMainWnd;
 
-	QDialog* mDeviceDlg;
+	CLAbstractDeviceSettingsDlg* mDeviceDlg;
 
 	bool m_drawBkg;
 	CLAnimatedBackGround* m_animated_bckg;

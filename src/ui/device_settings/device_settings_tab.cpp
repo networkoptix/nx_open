@@ -5,12 +5,14 @@
 #include "../../device/device.h"
 #include "base/log.h"
 #include "widgets.h"
+#include "device_settings_dlg.h"
 
 
-CLDeviceSettingsTab::CLDeviceSettingsTab(QObject* handler, CLDevice* dev, QString group):
+CLDeviceSettingsTab::CLDeviceSettingsTab(CLAbstractDeviceSettingsDlg* dlg, QObject* handler, CLDevice* dev, QString group):
 mDevice(dev),
 mGroup(group),
-mHandler(handler)
+mHandler(handler),
+mDlg(dlg)
 {
 	setAutoFillBackground(true);
 	QPalette palette;
@@ -55,28 +57,30 @@ mHandler(handler)
 			if (!param.value.ui)	
 				continue;
 
-			QWidget* widget = 0;
-
+			CLAbstractSettingsWidget* awidget = 0;
+			
 
 			switch(param.value.type)
 			{
 			case CLParamType::OnOff:
-				widget =  (new SettingsOnOffWidget(handler, dev, param.name))->toWidget();
+				awidget =  new SettingsOnOffWidget(handler, dev, param.name);
 				break;
 
 			case CLParamType::MinMaxStep:
-				widget =  (new SettingsMinMaxStepWidget(handler, dev, param.name))->toWidget();
+				awidget =  new SettingsMinMaxStepWidget(handler, dev, param.name);
 				break;
 
 			case CLParamType::Enumeration:
-				widget =  (new SettingsEnumerationWidget(handler, dev, param.name))->toWidget();
+				awidget =  new SettingsEnumerationWidget(handler, dev, param.name);
 				break;
 
 			}
 
 
-			if (widget==0)
+			if (awidget==0)
 				continue;
+
+			QWidget* widget = awidget->toWidget();
 
 			if (param.value.description!="")
 				widget->setToolTip(param.value.description);
@@ -85,6 +89,7 @@ mHandler(handler)
 			widget->move(10, 20 + y);
 			y+=80;
 
+			mDlg->putWidget(awidget);
 
 		}
 
@@ -102,4 +107,9 @@ mHandler(handler)
 CLDeviceSettingsTab::~CLDeviceSettingsTab()
 {
 
+}
+
+QString CLDeviceSettingsTab::name() const
+{
+	return mGroup;
 }

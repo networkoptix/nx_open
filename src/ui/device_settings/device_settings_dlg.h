@@ -3,10 +3,15 @@
 
 #include <QDialog>
 #include "../../device/param.h"
+#include <QList>
 
 class CLDevice;
 class QTabWidget;
 class QDialogButtonBox;
+class CLAbstractSettingsWidget;
+class QGroupBox;
+class CLDeviceSettingsTab;
+
 
 class CLAbstractDeviceSettingsDlg : public QDialog
 {
@@ -18,11 +23,21 @@ public:
 	virtual ~CLAbstractDeviceSettingsDlg();
 
 	CLDevice* getDevice() const;
+	void putWidget(CLAbstractSettingsWidget* wgt);
+	void putGroup(QGroupBox* group);
+
+	void addTab(CLDeviceSettingsTab* tab);
+
 public slots:
 	virtual void setParam(const QString& name, const CLValue& val);
 
 
 protected:
+	CLAbstractSettingsWidget* getWidgetByName(QString name) const;
+	QGroupBox* getGroupByName(QString name) const;
+	CLDeviceSettingsTab* tabByName(QString name) const;
+
+
 	virtual void init() {};
 	
 
@@ -31,6 +46,10 @@ protected:
 
 	QTabWidget* mTabWidget;
 	QDialogButtonBox* mButtonBox;
+
+	QList<CLAbstractSettingsWidget*> mWgtsLst;
+	QList<QGroupBox*> mGroups;
+	QList<CLDeviceSettingsTab*> mTabs;
 };
 
 #endif //abstract_device_settings_dlg_h_1652

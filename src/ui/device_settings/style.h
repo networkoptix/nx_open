@@ -1,5 +1,5 @@
-#ifndef settings_widgets_h_1820
-#define settings_widgets_h_1820
+#ifndef settings_style_h_1447
+#define settings_style_h_1447
 
 
 #include <QWindowsStyle>
@@ -35,4 +35,4 @@ public:
 	void unpolish(QWidget *widget);
 };
 
-#endif //settings_widgets_h_1820
+#endif //settings_style_h_1447

@@ -5,6 +5,8 @@
 #include <QVBoxLayout>
 #include "../../device/device.h"
 #include "style.h"
+#include "widgets.h"
+#include <QGroupBox>
 
 CLAbstractDeviceSettingsDlg::CLAbstractDeviceSettingsDlg(CLDevice* dev):
 QDialog(0, Qt::CustomizeWindowHint | Qt::WindowTitleHint | 
@@ -31,6 +33,8 @@ mDevice(dev)
 	QStyle *arthurStyle = new ArthurStyle();
 	setStyle(arthurStyle);
 
+	QVBoxLayout *mainLayout = new QVBoxLayout;
+
 	mTabWidget = new QTabWidget;
 
 	QList<QString> groups = mDevice->getDevicePramList().groupList();
@@ -38,7 +42,8 @@ mDevice(dev)
 	for (int i = 0; i < groups.count(); ++i)
 	{
 		QString group = groups.at(i);
-		mTabWidget->addTab(new CLDeviceSettingsTab(this, mDevice, group), group);
+		mTabWidget->addTab(new CLDeviceSettingsTab(this, this, mDevice, group), group);
+		mTabs.push_back(new CLDeviceSettingsTab(this, this, mDevice, group));
 	}
 
 
@@ -46,12 +51,12 @@ mDevice(dev)
 
 
 	//! [4]
-	QVBoxLayout *mainLayout = new QVBoxLayout;
+	
 	mainLayout->addWidget(mTabWidget);
 	///mainLayout->addWidget(mButtonBox);
 	setLayout(mainLayout);
 
-
+	mDevice->addRef();
 
 	init();
 
@@ -59,7 +64,13 @@ mDevice(dev)
 
 CLAbstractDeviceSettingsDlg::~CLAbstractDeviceSettingsDlg()
 {
+	for (int i = 0; i < mWgtsLst.count(); ++i)
+	{
+		CLAbstractSettingsWidget* wgt = mWgtsLst.at(i);
+		delete wgt;
+	}
 
+	mDevice->releaseRef();
 }
 
 CLDevice* CLAbstractDeviceSettingsDlg::getDevice() const
@@ -70,4 +81,56 @@ CLDevice* CLAbstractDeviceSettingsDlg::getDevice() const
 void CLAbstractDeviceSettingsDlg::setParam(const QString& name, const CLValue& val)
 {
 	mDevice->setParam_asynch(name,val);
+}
+
+void CLAbstractDeviceSettingsDlg::addTab(CLDeviceSettingsTab* tab)
+{
+	mTabWidget->addTab(tab, tab->name());
+}
+
+CLDeviceSettingsTab* CLAbstractDeviceSettingsDlg::tabByName(QString name) const
+{
+	for (int i = 0; i < mTabs.count(); ++i)
+	{
+		CLDeviceSettingsTab* tab = mTabs.at(i);
+		if (name == tab->name())
+			return tab;
+	}
+
+	return 0;
+}
+
+void CLAbstractDeviceSettingsDlg::putWidget(CLAbstractSettingsWidget* wgt)
+{
+	mWgtsLst.push_back(wgt);
+}
+
+CLAbstractSettingsWidget* CLAbstractDeviceSettingsDlg::getWidgetByName(QString name) const
+{
+	for (int i = 0; i < mWgtsLst.count(); ++i)
+	{
+		CLAbstractSettingsWidget* wgt = mWgtsLst.at(i);
+		if (name == wgt->param().name)
+			return wgt;
+	}
+
+	return 0;
+}
+
+
+void CLAbstractDeviceSettingsDlg::putGroup(QGroupBox* group)
+{
+	mGroups.push_back(group);
+}
+
+
+QGroupBox* CLAbstractDeviceSettingsDlg::getGroupByName(QString name) const
+{
+	for (int i = 0; i < mGroups.count(); ++i)
+	{
+		QGroupBox* wgt = mGroups.at(i);
+		if (name == wgt->windowTitle())
+			return wgt;
+	}
+	return 0;
 }
