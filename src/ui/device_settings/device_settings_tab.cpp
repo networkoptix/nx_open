@@ -6,6 +6,7 @@
 #include "base/log.h"
 #include "widgets.h"
 #include "device_settings_dlg.h"
+#include "settings.h"
 
 
 CLDeviceSettingsTab::CLDeviceSettingsTab(CLAbstractDeviceSettingsDlg* dlg, QObject* handler, CLDevice* dev, QString group):
@@ -23,7 +24,7 @@ mDlg(dlg)
 
 	QList<QString> sub_groups = mDevice->getDevicePramList().subGroupList(mGroup);
 
-	int size = 155;
+	int size = 175;
 
 	QRect parent_rect = rect();
 
@@ -43,10 +44,11 @@ mDlg(dlg)
 			subgroupBox->setTitle(sub_group);
 			subgroupBox->setObjectName(group+sub_group);
 			subgroupBox->move(10+x, 10);
+			subgroupBox->setFont(settings_font);
 
 			parent = subgroupBox;
 
-			x+=170;
+			x+=(size+15);
 		}
 
 		CLParamList::MAP paramLst = mDevice->getDevicePramList().paramList(group, sub_group).list();
@@ -81,6 +83,7 @@ mDlg(dlg)
 				continue;
 
 			QWidget* widget = awidget->toWidget();
+			widget->setFont(settings_font);
 
 			if (param.value.description!="")
 				widget->setToolTip(param.value.description);

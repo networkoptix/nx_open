@@ -6,6 +6,7 @@
 #include <QSlider>
 #include <QRadioButton>
 #include "base/log.h"
+#include "settings.h"
 
 
 
@@ -103,13 +104,13 @@ CLAbstractSettingsWidget(handler, dev, paramname)
 
 
 	slider = new SettingsSlider(Qt::Horizontal, groupBox);
-	slider->setMinimumWidth(110);
+	slider->setMinimumWidth(130);
 	slider->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
 	groupBox->setTitle(mParam.name);
 
-	QFont font;
-	groupBox->setFont();
+	//QFont font("Courier New", 11);
+	//groupBox->setFont(font);
 
 	slider->setRange(mParam.value.min_val, mParam.value.max_val);
 	slider->setValue(mParam.value.default_value);
@@ -151,7 +152,7 @@ CLAbstractSettingsWidget(handler, dev, paramname)
 	mWidget = groupBox;
 	groupBox->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 	groupBox->setTitle(mParam.name);
-	groupBox->setMinimumWidth(110);
+	groupBox->setMinimumWidth(140);
 
 	QVBoxLayout *layout = new QVBoxLayout(groupBox);
 	
@@ -165,6 +166,7 @@ CLAbstractSettingsWidget(handler, dev, paramname)
 			btn->setChecked(true);
 
 		btn->setObjectName(val);
+		btn->setFont(settings_font);
 
 		connect(btn , SIGNAL(clicked()), this, SLOT(onClicked()));
 	}
