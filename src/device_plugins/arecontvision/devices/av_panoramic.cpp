@@ -163,7 +163,7 @@ bool CLArecontPanoramicDevice::setParam_special(const QString& name, const CLVal
 
 		return false;
 	}
-	else if (name=="quality")
+	else if (name=="Quality")
 	{
 		int q = val;
 		if (q<1 || q>21)

@@ -20,6 +20,7 @@ public:
 protected:
 	int getQuality() const;
 	int getBitrate() const;
+	bool isH264() const;
 
 };
 

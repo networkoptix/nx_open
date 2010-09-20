@@ -78,16 +78,18 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 	{
 			QMutexLocker mutex(&m_params_CS);
 
-			h264 = false;
-
+			h264 = isH264();//false;
+			
+			/*
 			if (m_streamParam.exists("Codec")) // cam is not jpeg only
 			{
 				CLParam codec = m_streamParam.get("Codec");
 				if (codec.value.value != QString("JPEG"))
 					h264 = true;
 			}
+			/**/
 			
-			if (!m_streamParam.exists("quality") || !m_streamParam.exists("resolution") || 
+			if (!m_streamParam.exists("Quality") || !m_streamParam.exists("resolution") || 
 				!m_streamParam.exists("image_left") || !m_streamParam.exists("image_top") ||
 				!m_streamParam.exists("image_right") || !m_streamParam.exists("image_bottom") ||
 				(h264 && !m_streamParam.exists("streamID")) || (h264 && !m_streamParam.exists("Bitrate")))
@@ -118,7 +120,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 
 
 
-			//quality = m_streamParam.get("quality").value.value;
+			//quality = m_streamParam.get("Quality").value.value;
 			quality = getQuality();
 
 			resolutionFULL = (m_streamParam.get("resolution").value.value == QString("full"));

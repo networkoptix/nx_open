@@ -36,10 +36,10 @@ void CLAVClinetPullStreamReader::setQuality(StreamQuality q)
 			m_device->setParam_asynch("resolution", "full");
 
 
-		if (pl.exists("quality"))
-			pl.get("quality").value.value = "15";
+		if (pl.exists("Quality"))
+			pl.get("Quality").value.value = "15";
 		else
-			m_device->setParam_asynch("quality", "17"); // panoramic
+			m_device->setParam_asynch("Quality", "17"); // panoramic
 
 
 
@@ -53,10 +53,10 @@ void CLAVClinetPullStreamReader::setQuality(StreamQuality q)
 			m_device->setParam_asynch("resolution", "full");
 		
 
-		if (pl.exists("quality"))
-			pl.get("quality").value.value = "7";
+		if (pl.exists("Quality"))
+			pl.get("Quality").value.value = "7";
 		else
-			m_device->setParam_asynch("quality", "11"); // panoramic
+			m_device->setParam_asynch("Quality", "11"); // panoramic
 
 	
 
@@ -71,10 +71,10 @@ void CLAVClinetPullStreamReader::setQuality(StreamQuality q)
 			m_device->setParam_asynch("resolution", "half");
 
 
-		if (pl.exists("quality"))
-			pl.get("quality").value.value = "7";
+		if (pl.exists("Quality"))
+			pl.get("Quality").value.value = "7";
 		else
-			m_device->setParam_asynch("quality", "11");
+			m_device->setParam_asynch("Quality", "11");
 
 	    break;
 
@@ -88,10 +88,10 @@ void CLAVClinetPullStreamReader::setQuality(StreamQuality q)
 			m_device->setParam_asynch("resolution", "half");
 
 
-		if (pl.exists("quality"))
-			pl.get("quality").value.value = "6";
+		if (pl.exists("Quality"))
+			pl.get("Quality").value.value = "6";
 		else
-			m_device->setParam_asynch("quality", "11");
+			m_device->setParam_asynch("Quality", "11");
 
 	    break;
 	}
@@ -105,34 +105,53 @@ void CLAVClinetPullStreamReader::setQuality(StreamQuality q)
 
 int CLAVClinetPullStreamReader::getQuality() const
 {
+	if (!m_streamParam.exists("Quality"))
+		return 10;
+
 	if (m_qulity!=CLSHighest)
 	{
-		if (m_streamParam.exists("quality"))
-			return m_streamParam.get("quality").value.value;
-
-		return 10;
+		return m_streamParam.get("Quality").value.value;
 	}
 	else
 	{
-		//m_device->getParam()
-		return 10;
+		CLValue val;
+		m_device->getParam("Quality", val);
+		return val;
 	}
 
 }
 
 int CLAVClinetPullStreamReader::getBitrate() const
 {
+	if (!m_streamParam.exists("Bitrate"))
+		return 0;
+
 	if (m_qulity!=CLSHighest)
 	{
-		if (m_streamParam.exists("Bitrate"))
-			return m_streamParam.get("Bitrate").value.value;
-
-		return 10;
+		return m_streamParam.get("Bitrate").value.value;
 	}
 	else
 	{
-		//m_device->getParam()
-		return 13*1027;
+		CLValue val;
+		m_device->getParam("Bitrate", val);
+		return val;
 	}
 
+}
+
+bool CLAVClinetPullStreamReader::isH264() const
+{
+	if (!m_streamParam.exists("Codec")) // cam is jpeg only
+		return false;
+
+	if (m_qulity!=CLSHighest)
+	{
+		return (m_streamParam.get("Codec").value.value == QString("H.264"));
+	}
+	else
+	{
+		CLValue val;
+		m_device->getParam("Codec", val);
+		return val==QString("H.264");
+	}
 }
