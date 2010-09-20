@@ -87,10 +87,12 @@ CLParam& CLParamList::get(const QString& name)
 	return m_params[name];
 }
 
-const CLParam& CLParamList::get(const QString& name) const 
+
+const CLParam CLParamList::get(const QString& name) const 
 {
 	return m_params[name];
 }
+
 
 void CLParamList::put(const CLParam& param) 
 {

@@ -17,6 +17,10 @@ public:
 
 	virtual void setQuality(StreamQuality q);
 
+protected:
+	int getQuality() const;
+	int getBitrate() const;
+
 };
 
 #endif //cl_av_clien_pull1529

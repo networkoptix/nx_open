@@ -77,14 +77,16 @@ CLAbstractMediaData* AVClientPullSSHTTPStreamreader::getNextData()
 			height = bottom - top;
 
 
-			quality = m_streamParam.get("quality").value.value;
+			//quality = m_streamParam.get("quality").value.value;
+			quality = getQuality();
 
 			resolutionFULL = (m_streamParam.get("resolution").value.value == QString("full"));
 			streamID = 0;
 			if (h264)
 			{
 				streamID = m_streamParam.get("streamID").value.value;
-				bitrate = m_streamParam.get("Bitrate").value.value;
+				//bitrate = m_streamParam.get("Bitrate").value.value;
+				bitrate = getBitrate();
 			}
 			//=========
 

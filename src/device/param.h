@@ -62,7 +62,7 @@ public:
 	void inheritedFrom(const CLParamList& other);
 	bool exists(const QString& name) const;
 	CLParam& get(const QString& name);
-	const CLParam& get(const QString& name) const;
+	const CLParam get(const QString& name) const;
 	void put(const CLParam& param);
 	bool empty() const;
 	MAP& list();

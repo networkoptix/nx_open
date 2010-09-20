@@ -102,3 +102,37 @@ void CLAVClinetPullStreamReader::setQuality(StreamQuality q)
 
 
 }
+
+int CLAVClinetPullStreamReader::getQuality() const
+{
+	if (m_qulity!=CLSHighest)
+	{
+		if (m_streamParam.exists("quality"))
+			return m_streamParam.get("quality").value.value;
+
+		return 10;
+	}
+	else
+	{
+		//m_device->getParam()
+		return 10;
+	}
+
+}
+
+int CLAVClinetPullStreamReader::getBitrate() const
+{
+	if (m_qulity!=CLSHighest)
+	{
+		if (m_streamParam.exists("Bitrate"))
+			return m_streamParam.get("Bitrate").value.value;
+
+		return 10;
+	}
+	else
+	{
+		//m_device->getParam()
+		return 13*1027;
+	}
+
+}
