@@ -107,6 +107,10 @@ CLAbstractSettingsWidget(handler, dev, paramname)
 	slider->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
 	groupBox->setTitle(mParam.name);
+
+	QFont font;
+	groupBox->setFont();
+
 	slider->setRange(mParam.value.min_val, mParam.value.max_val);
 	slider->setValue(mParam.value.default_value);
 

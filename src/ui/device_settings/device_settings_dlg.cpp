@@ -42,7 +42,7 @@ mDevice(dev)
 	for (int i = 0; i < groups.count(); ++i)
 	{
 		QString group = groups.at(i);
-		mTabWidget->addTab(new CLDeviceSettingsTab(this, this, mDevice, group), group);
+		//mTabWidget->addTab(new CLDeviceSettingsTab(this, this, mDevice, group), group);
 		mTabs.push_back(new CLDeviceSettingsTab(this, this, mDevice, group));
 	}
 

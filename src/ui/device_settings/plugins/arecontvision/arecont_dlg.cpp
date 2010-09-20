@@ -121,12 +121,12 @@ AreconVisionDlgManufacture& AreconVisionDlgManufacture::instance()
 	return inst;
 }
 
-CLAbstractDeviceSettingsDlg* AreconVisionDlgManufacture::getDlg(CLDevice* dev)
+CLAbstractDeviceSettingsDlg* AreconVisionDlgManufacture::createDlg(CLDevice* dev)
 {
 	return new AVSettingsDlg(dev);
 }
 
-bool AreconVisionDlgManufacture::canProduce(CLDevice* dev) const
+bool AreconVisionDlgManufacture::canProduceDlg(CLDevice* dev) const
 {
 	return mPossibleNames.contains(dev->getFullName());
 }
@@ -135,5 +135,41 @@ bool AreconVisionDlgManufacture::canProduce(CLDevice* dev) const
 AVSettingsDlg::AVSettingsDlg(CLDevice* dev):
 CLAbstractDeviceSettingsDlg(dev)
 {
+	initTabsOrder();
+}
+
+void AVSettingsDlg::initTabsOrder()
+{
+	//return;
+
+	CLDeviceSettingsTab* tab = 0;
+
+	if (tab=tabByName(tr("Image quality")))
+		addTab(tab);
+
+	if (tab=tabByName(tr("Exposure")))
+		addTab(tab);
+
+	if (tab=tabByName(tr("AutoIris")))
+		addTab(tab);
+
+	if (tab=tabByName(tr("Day/Night")))
+		addTab(tab);
+
+	if (tab=tabByName(tr("Binning")))
+		addTab(tab);
+
+	if (tab=tabByName(tr("Motion detection")))
+		addTab(tab);
+
+
+	if (tab=tabByName(tr("Network")))
+		addTab(tab);
+
+	if (tab=tabByName(tr("Administration")))
+		addTab(tab);
+
+	if (tab=tabByName(tr("Camera Info")))
+		addTab(tab);
 
 }

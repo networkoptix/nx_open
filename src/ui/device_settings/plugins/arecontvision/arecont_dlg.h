@@ -11,8 +11,8 @@ private:
 public:
 	static AreconVisionDlgManufacture& instance();
 public:
-	CLAbstractDeviceSettingsDlg* getDlg(CLDevice* dev);
-	bool canProduce(CLDevice* dev) const;
+	CLAbstractDeviceSettingsDlg* createDlg(CLDevice* dev);
+	bool canProduceDlg(CLDevice* dev) const;
 private:
 	QList<QString> mPossibleNames;
 
@@ -22,6 +22,8 @@ class AVSettingsDlg : public CLAbstractDeviceSettingsDlg
 {
 public:
 	AVSettingsDlg(CLDevice* dev);
+private:
+	void initTabsOrder();
 };
 
 #endif //arecon_dlg_factory_h1733

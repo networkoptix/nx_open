@@ -1393,7 +1393,7 @@ void GraphicsView::show_device_settings_helper(CLDevice* dev)
 
 	if (!mDeviceDlg)
 	{
-		mDeviceDlg = CLDeviceSettingsDlgFactory::instance().getDlg(dev);
+		mDeviceDlg = CLDeviceSettingsDlgFactory::instance().createDlg(dev);
 		if (!mDeviceDlg)
 			return ;
 

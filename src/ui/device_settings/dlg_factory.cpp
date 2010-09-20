@@ -6,13 +6,13 @@ CLDeviceSettingsDlgFactory& CLDeviceSettingsDlgFactory::instance()
 	return inst;
 }
 
-CLAbstractDeviceSettingsDlg* CLDeviceSettingsDlgFactory::getDlg(CLDevice* dev)
+CLAbstractDeviceSettingsDlg* CLDeviceSettingsDlgFactory::createDlg(CLDevice* dev)
 {
 	for (int i = 0; i < mMaunufactures.count();++i)
 	{
 		CLAbstractDlgManufacture* man = mMaunufactures.at(i);
-		if (man->canProduce(dev))
-			return man->getDlg(dev);
+		if (man->canProduceDlg(dev))
+			return man->createDlg(dev);
 	}
 
 	return 0;
