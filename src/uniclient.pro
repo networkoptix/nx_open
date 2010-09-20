@@ -61,9 +61,11 @@ SOURCES += ui/video_cam_layout/videocamlayout.cpp ui/animation/animation_timelin
 SOURCES += ui/animation/scene_movement.cpp ui/animation/scene_zoom.cpp ui/animation/abstract_animation.cpp ui/animation/item_trans.cpp ui/animation/animated_bgr.cpp 
 
 
-SOURCES += ui/device_settings/device_settings_dlg.cpp ui/device_settings/device_settings_tab.cpp ui/device_settings/widgets.cpp ui/device_settings/style.cpp
-HEADERS += ui/device_settings/device_settings_dlg.h ui/device_settings/device_settings_tab.h ui/device_settings/widgets.h ui/device_settings/style.h
+SOURCES += ui/device_settings/device_settings_dlg.cpp ui/device_settings/device_settings_tab.cpp ui/device_settings/widgets.cpp ui/device_settings/style.cpp ui/device_settings/dlg_factory.cpp
+HEADERS += ui/device_settings/device_settings_dlg.h ui/device_settings/device_settings_tab.h ui/device_settings/widgets.h ui/device_settings/style.h ui/device_settings/dlg_factory.h
 
+SOURCES += ui/device_settings/plugins/arecontvision/arecont_dlg.cpp
+HEADERS += ui/device_settings/plugins/arecontvision/arecont_dlg.h
 
 RESOURCES += mainwnd.qrc
 FORMS += mainwnd.ui

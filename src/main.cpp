@@ -8,6 +8,9 @@
 #include "decoders/video/ffmpeg.h"
 #include "device_plugins/arecontvision/devices/av_device_server.h"
 #include "device_plugins/fake/devices/fake_device_server.h"
+
+#include "ui/device_settings/dlg_factory.h"
+#include "ui/device_settings/plugins/arecontvision/arecont_dlg.h"
 #include <QMessageBox>
 
 
@@ -59,6 +62,8 @@ int main(int argc, char *argv[])
 	//============================
 	dev_searcher.addDeviceServer(&AVDeviceServer::instance());
 	dev_searcher.addDeviceServer(&FakeDeviceServer::instance());
+
+	CLDeviceSettingsDlgFactory::instance().registerDlgManufacture(&AreconVisionDlgManufacture::instance());
 	//============================
 
 	//=========================================================

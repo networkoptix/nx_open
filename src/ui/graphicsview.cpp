@@ -17,6 +17,7 @@
 #include "./animation/animated_bgr.h"
 #include "settings.h"
 #include <QGraphicsProxyWidget>
+#include "device_settings/dlg_factory.h"
 #include "device_settings/device_settings_dlg.h"
 
 
@@ -1392,7 +1393,9 @@ void GraphicsView::show_device_settings_helper(CLDevice* dev)
 
 	if (!mDeviceDlg)
 	{
-		mDeviceDlg = new CLAbstractDeviceSettingsDlg(dev);
+		mDeviceDlg = CLDeviceSettingsDlgFactory::instance().getDlg(dev);
+		if (!mDeviceDlg)
+			return ;
 
 		if (open) // was open before
 			mDeviceDlg->move(p);

@@ -58,7 +58,6 @@ mDevice(dev)
 
 	mDevice->addRef();
 
-	init();
 
 }
 

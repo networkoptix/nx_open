@@ -37,10 +37,6 @@ protected:
 	QGroupBox* getGroupByName(QString name) const;
 	CLDeviceSettingsTab* tabByName(QString name) const;
 
-
-	virtual void init() {};
-	
-
 protected:
 	CLDevice* mDevice;
 
