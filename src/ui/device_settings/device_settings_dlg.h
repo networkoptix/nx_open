@@ -31,6 +31,7 @@ public:
 public slots:
 	virtual void setParam(const QString& name, const CLValue& val);
 	virtual void onClose();
+	virtual void onSuggestions();
 
 protected:
 	CLAbstractSettingsWidget* getWidgetByName(QString name) const;

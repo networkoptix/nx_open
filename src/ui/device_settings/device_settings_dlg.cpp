@@ -50,10 +50,23 @@ mDevice(dev)
 
 	mButtonBox = new QDialogButtonBox();
 	mButtonBox->setFocusPolicy(Qt::NoFocus);
-	QPushButton* closeBtn = new QPushButton("Ok");
+
+	QPushButton* suggestionsBtn = new QPushButton("Suggestions...");
+	connect(suggestionsBtn, SIGNAL(released()), this, SLOT(onSuggestions()));
+	mButtonBox->addButton(suggestionsBtn, QDialogButtonBox::ActionRole);
+	suggestionsBtn->setFocusPolicy(Qt::NoFocus);
+
+
+	QPushButton* closeBtn = new QPushButton("Close");
 	connect(closeBtn, SIGNAL(released()), this, SLOT(onClose()));
-	mButtonBox->addButton(closeBtn, QDialogButtonBox::ActionRole);
+	mButtonBox->addButton(closeBtn, QDialogButtonBox::RejectRole);
 	closeBtn->setFocusPolicy(Qt::NoFocus);
+
+
+
+
+	
+
 
 
 	//! [4]
@@ -61,6 +74,8 @@ mDevice(dev)
 	mainLayout->addWidget(mTabWidget);
 	mainLayout->addWidget(mButtonBox);
 	setLayout(mainLayout);
+
+	//suggestionsBtn->move(30,30);
 
 	mDevice->addRef();
 
@@ -143,4 +158,9 @@ QGroupBox* CLAbstractDeviceSettingsDlg::getGroupByName(QString name) const
 void CLAbstractDeviceSettingsDlg::onClose()
 {
 	close();
+}
+
+void CLAbstractDeviceSettingsDlg::onSuggestions()
+{
+
 }

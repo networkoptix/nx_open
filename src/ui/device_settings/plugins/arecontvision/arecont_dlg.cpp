@@ -2,6 +2,7 @@
 #include "device\device.h"
 #include <QGroupBox>
 #include "..\..\widgets.h"
+#include <QMessageBox>
 
 
 AreconVisionDlgManufacture::AreconVisionDlgManufacture()
@@ -366,6 +367,18 @@ void AVSettingsDlg::initAdmin()
 
 	if (wgt = getWidgetByName("Factory defaults"))
 		wgt->toWidget()->move(230,150);
+
+
+}
+
+
+void AVSettingsDlg::onSuggestions()
+{
+	QString text = tr("To reduce the bandwidth try to set Light Mode on Exposure tab to HightSpeed and set Short Exposure to 30ms.");
+	QMessageBox mbox ( QMessageBox::Information, tr("Suggestion"), text, QMessageBox::Ok, this, Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint );
+	mbox.setWindowOpacity(0.9);
+
+	mbox.exec();
 
 
 }

@@ -20,8 +20,11 @@ private:
 
 class AVSettingsDlg : public CLAbstractDeviceSettingsDlg
 {
+	Q_OBJECT
 public:
 	AVSettingsDlg(CLDevice* dev);
+protected slots:
+	virtual void onSuggestions();
 private:
 	void initTabsOrder();
 	void initImageQuality();
