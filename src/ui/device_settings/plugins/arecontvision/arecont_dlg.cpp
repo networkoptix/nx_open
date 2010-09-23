@@ -1,5 +1,7 @@
 #include "arecont_dlg.h"
 #include "device\device.h"
+#include <QGroupBox>
+#include "..\..\widgets.h"
 
 
 AreconVisionDlgManufacture::AreconVisionDlgManufacture()
@@ -136,6 +138,11 @@ AVSettingsDlg::AVSettingsDlg(CLDevice* dev):
 CLAbstractDeviceSettingsDlg(dev)
 {
 	initTabsOrder();
+	initImageQuality();
+	initExposure();
+	initAI();
+	initDN();
+
 }
 
 void AVSettingsDlg::initTabsOrder()
@@ -171,5 +178,140 @@ void AVSettingsDlg::initTabsOrder()
 
 	if (tab=tabByName(tr("Camera Info")))
 		addTab(tab);
+
+}
+
+
+void AVSettingsDlg::initImageQuality()
+{
+	QGroupBox* group;
+	CLAbstractSettingsWidget* wgt;
+
+	if (group=getGroupByName("Quality"))
+	{
+		group->move(10,10);
+		group->setFixedWidth(350);
+		group->setFixedHeight(205);
+
+		bool h264 = (getWidgetByName("Codec")!=0);
+
+		if (wgt = getWidgetByName("Quality"))
+		{
+			if (h264)
+				wgt->toWidget()->move(10,35);
+			else
+			{
+				wgt->toWidget()->move(10,73);
+				wgt->toWidget()->setFixedWidth(330);
+			}
+
+		}
+
+		if (wgt = getWidgetByName("Codec"))
+			wgt->toWidget()->move(200,25);
+
+		if (wgt = getWidgetByName("Bitrate"))
+		{
+			wgt->toWidget()->move(10,125);
+			wgt->toWidget()->setFixedWidth(330);
+		}
+
+	}
+
+	if (group=getGroupByName("Color"))
+	{
+		group->move(385,10);
+		group->setFixedWidth(180);
+		group->setFixedHeight(205);
+
+
+		if (wgt = getWidgetByName("Red"))
+			wgt->toWidget()->move(10,30);
+
+		if (wgt = getWidgetByName("Blue"))
+			wgt->toWidget()->move(10,120);
+
+
+	}
+
+
+	if (group=getGroupByName("Adjustment"))
+	{
+		group->move(10,240);
+		group->setFixedWidth(555);
+		group->setFixedHeight(110);
+
+		if (wgt = getWidgetByName("Brightness"))
+			wgt->toWidget()->move(10,30);
+
+		if (wgt = getWidgetByName("Sharpness"))
+			wgt->toWidget()->move(200,30);
+
+		if (wgt = getWidgetByName("Saturation"))
+			wgt->toWidget()->move(380,30);
+
+
+
+	}
+
+
+	if (wgt = getWidgetByName("Rotate 180"))
+		wgt->toWidget()->move(255,360);
+
+	//
+
+}
+
+void AVSettingsDlg::initExposure()
+{
+	
+
+	QGroupBox* group;
+	CLAbstractSettingsWidget* wgt;
+
+	if (wgt = getWidgetByName("Illumination"))
+		wgt->toWidget()->move(420,60);
+
+	if (wgt = getWidgetByName("Lighting"))
+		wgt->toWidget()->move(420,210);
+
+	if (group=getGroupByName("Low Light Mode"))
+	{
+		group->move(10,60);
+		group->setFixedWidth(380);
+		group->setFixedHeight(240);
+
+		if (wgt = getWidgetByName("Light Mode"))
+			wgt->toWidget()->move(30,30);
+
+		if (wgt = getWidgetByName("Short Exposure"))
+			wgt->toWidget()->move(200,75);
+
+		if (wgt = getWidgetByName("Auto exposure On/Off"))
+			wgt->toWidget()->move(30,200);
+
+	}
+
+}
+
+void AVSettingsDlg::initAI()
+{
+	QGroupBox* group;
+	CLAbstractSettingsWidget* wgt;
+
+	if (wgt = getWidgetByName("AutoIris enable"))
+		wgt->toWidget()->move(200,200);
+
+	
+}
+
+void AVSettingsDlg::initDN()
+{
+	QGroupBox* group;
+	CLAbstractSettingsWidget* wgt;
+
+	if (wgt = getWidgetByName("Day/Night Mode"))
+		wgt->toWidget()->move(200,200);
+
 
 }

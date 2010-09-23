@@ -24,6 +24,11 @@ public:
 	AVSettingsDlg(CLDevice* dev);
 private:
 	void initTabsOrder();
+	void initImageQuality();
+	void initExposure();
+	void initAI();
+	void initDN();
+	
 };
 
 #endif //arecon_dlg_factory_h1733

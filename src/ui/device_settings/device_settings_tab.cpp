@@ -18,7 +18,7 @@ mDlg(dlg)
 	setAutoFillBackground(true);
 	QPalette palette;
 	palette.setColor(backgroundRole(), Qt::black);
-	//setPalette(palette);
+	//setPalette(palette); //black
 
 	//QVBoxLayout *mainLayout = new QVBoxLayout;
 
@@ -45,6 +45,8 @@ mDlg(dlg)
 			subgroupBox->setObjectName(group+sub_group);
 			subgroupBox->move(10+x, 10);
 			subgroupBox->setFont(settings_font);
+
+			mDlg->putGroup(subgroupBox);
 
 			parent = subgroupBox;
 

@@ -75,6 +75,8 @@ protected:
 
 	void drawBackground ( QPainter * painter, const QRectF & rect );
 
+	void showStop_helper();
+
 
 private slots:
 	void onFitInView_helper(int duration = 600);
@@ -84,9 +86,9 @@ private slots:
 protected:
 	
 	int m_xRotate;
-	int m_yRotate;
+	qreal m_yRotate;
 	
-	void updateTransform();
+	void updateTransform(qreal angle);
 
 	
 	/**/

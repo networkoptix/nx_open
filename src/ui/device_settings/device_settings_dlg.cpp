@@ -19,10 +19,10 @@ mDevice(dev)
 	str+=mDevice->toString();
 
 	setWindowTitle(str);
-	setWindowOpacity(0.85);
+	setWindowOpacity(0.90);
 
-	int width = 640;
-	int height = width*3/4;
+	int width = 610;
+	int height = 450;
 
 	resize(width, height);
 
@@ -128,7 +128,7 @@ QGroupBox* CLAbstractDeviceSettingsDlg::getGroupByName(QString name) const
 	for (int i = 0; i < mGroups.count(); ++i)
 	{
 		QGroupBox* wgt = mGroups.at(i);
-		if (name == wgt->windowTitle())
+		if (name == wgt->title())
 			return wgt;
 	}
 	return 0;

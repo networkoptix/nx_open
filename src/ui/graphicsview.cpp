@@ -140,7 +140,7 @@ void GraphicsView::setAllItemsQuality(CLStreamreader::StreamQuality q, bool incr
 
 void GraphicsView::wheelEvent ( QWheelEvent * e )
 {
-	
+	showStop_helper();
 	int numDegrees = e->delta() ;
 	m_scenezoom.zoom_delta(numDegrees/3000.0, scene_zoom_duration);
 }
@@ -151,11 +151,10 @@ void GraphicsView::zoomDefault(int duration)
 	m_scenezoom.zoom_default(duration);
 }
 
-void GraphicsView::updateTransform()
+void GraphicsView::updateTransform(qreal angle)
 {
+	/*
 	QTransform tr;
-
-
 	QPoint center = QPoint(horizontalScrollBar()->value(), verticalScrollBar()->value());
 
 	tr.translate(center.x(), center.y());
@@ -163,8 +162,14 @@ void GraphicsView::updateTransform()
 	tr.rotate(m_xRotate/10.0, Qt::XAxis);
 	tr.scale(0.05, 0.05);
 	tr.translate(-center.x(), -center.y());
-
 	setTransform(tr);
+	/**/
+
+	QTransform tr = transform();
+	tr.rotate(angle/10.0, Qt::YAxis);
+	//tr.rotate(angle/10.0, Qt::XAxis);
+	setTransform(tr);
+	
 
 }
 
@@ -175,7 +180,7 @@ void GraphicsView::onShowTimer()
 		mShow.mTimer.setInterval(1000);
 		mShow.counrer++;
 		
-		if (mShow.counrer>60)
+		if (mShow.counrer>5*60)
 		{
 			QSet<CLVideoWindow*> wndlst = m_camLayout->getWndList();
 			qreal total = wndlst.size();
@@ -210,8 +215,32 @@ void GraphicsView::onShowTimer()
 
 			item->setRotation(item->getRotation() - 4.0/cl_get_random_val(7,10));
 
+
 			++i;
 		}
+
+		// scene rotation===========
+		{
+			const int max_val = 800;
+
+			if (mShow.value<max_val/2)
+				updateTransform(-0.001);
+			else
+			{
+				static bool positive_dir = false;
+
+				int mod = (mShow.value - max_val/2)%max_val;
+				if (mod==0)	positive_dir = !positive_dir;
+
+			
+				if (positive_dir)
+					updateTransform(0.001);
+				else
+					updateTransform(-0.001);
+			}
+		}
+		// scene rotation===========
+
 
 	}
 
@@ -225,6 +254,19 @@ void GraphicsView::onShowStart()
 		mShow.value = 0;
 	}
 	mShow.mTimer.start();
+
+}
+
+void GraphicsView::showStop_helper()
+{
+	mShow.counrer = 0;
+	if (mShow.showTime)
+	{
+		mShow.showTime = 0;
+		mShow.mTimer.setInterval(1000);
+		onArrange_helper();
+		mShow.mTimer.start();
+	}
 
 }
 
@@ -281,14 +323,8 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 
 	QGraphicsView::mousePressEvent(event);
 
-	mShow.counrer = 0;
-	if (mShow.showTime)
-	{
-		mShow.showTime = 0;
-		mShow.mTimer.setInterval(1000);
-		onArrange_helper();
-		mShow.mTimer.start();
-	}
+
+	showStop_helper();
 
 
 }
@@ -378,14 +414,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 	m_mousestate.mouseMoveEventHandler(event);
 	QGraphicsView::mouseMoveEvent(event);
 
-	mShow.counrer = 0;
-	if (mShow.showTime)
-	{
-		mShow.showTime = 0;
-		mShow.mTimer.setInterval(1000);
-		onArrange_helper();
-		mShow.mTimer.start();
-	}
+	showStop_helper();
 }
 
 void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
@@ -855,12 +884,17 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 	{
 		case Qt::Key_W:
 			m_yRotate -= 1;
-			updateTransform();
+			updateTransform(-0.01);
 			break;
 
 		case Qt::Key_Control:
 			m_CTRL_pressed = true;
 			break;
+
+		case Qt::Key_X:
+			mShow.counrer+=10*60;
+			break;
+
 
 	}
 

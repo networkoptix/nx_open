@@ -58,13 +58,10 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 	{
 		QMutexLocker mutex(&m_params_CS);
 
-		h264 = false;
+		h264 = isH264();;
 
-		if (m_streamParam.exists("Codec")) // cam is not jpeg only
+		if (h264) // cam is not jpeg only
 		{
-			CLParam codec = m_streamParam.get("Codec");
-			if (codec.value.value != QString("JPEG"))
-				h264 = true;
 
 			if (!m_streamParam.exists("streamID"))
 			{
@@ -72,10 +69,7 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 				return 0;
 			}
 
-			if (h264)
-				streamID = m_streamParam.get("streamID").value.value;
-			
-
+			streamID = m_streamParam.get("streamID").value.value;
 			
 
 		}
