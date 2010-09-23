@@ -254,7 +254,8 @@ bool CLAreconVisionDevice::setParam(const QString& name, const CLValue& val )
 
 	QTextStream str(&request);
 	str << "set?" << value.http;
-	if (value.type!=CLParamType::None) str << "=" << (QString)val;
+	if (value.type!=CLParamType::None && value.type!=CLParamType::Button) 
+		str << "=" << (QString)val;
 
 	connection.setRequestLine(request);
 
@@ -640,6 +641,8 @@ bool CLAreconVisionDevice::parseParam(const QDomElement &element, QString& error
 			param.value.type = CLParamType::OnOff;
 		else if (type=="enumeration")
 			param.value.type = CLParamType::Enumeration;
+		else if (type=="button")
+			param.value.type = CLParamType::Button;
 		else
 		{
 			error = "Unsupported param type fund";

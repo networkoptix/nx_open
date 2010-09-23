@@ -173,11 +173,9 @@ void AVSettingsDlg::initTabsOrder()
 	if (tab=tabByName(tr("Network")))
 		addTab(tab);
 
-	if (tab=tabByName(tr("Administration")))
+	if (tab=tabByName(tr("Administration/Info")))
 		addTab(tab);
 
-	if (tab=tabByName(tr("Camera Info")))
-		addTab(tab);
 
 }
 

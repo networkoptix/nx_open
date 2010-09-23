@@ -181,14 +181,13 @@ bool CLArecontPanoramicDevice::setParam(const QString& name, const CLValue& val 
 	}
 
 
-	for (int i = 1; i <=4 ; ++i)
+	if (value.type==CLParamType::None || value.type==CLParamType::Button) 
 	{
 		CLSimpleHTTPClient connection(m_ip, 80, getHttpTimeout(), getAuth());
 		QString request;
 
 		QTextStream str(&request);
-		str << "set" << i << "?" << value.http;
-		if (value.type!=CLParamType::None) str << "=" << (QString)val;
+		str << "set?" << value.http;
 
 		connection.setRequestLine(request);
 
@@ -196,6 +195,27 @@ bool CLArecontPanoramicDevice::setParam(const QString& name, const CLValue& val 
 			if (connection.openStream()!=CL_HTTP_SUCCESS) // try twice.
 				return false;
 	}
+	else
+	{
+		for (int i = 1; i <=4 ; ++i)
+		{
+			CLSimpleHTTPClient connection(m_ip, 80, getHttpTimeout(), getAuth());
+			QString request;
+
+			QTextStream str(&request);
+			str << "set" << i << "?" << value.http;
+			str << "=" << (QString)val;
+
+			connection.setRequestLine(request);
+
+			if (connection.openStream()!=CL_HTTP_SUCCESS)
+				if (connection.openStream()!=CL_HTTP_SUCCESS) // try twice.
+					return false;
+		}
+
+	}
+
+
 
 
 
@@ -208,6 +228,11 @@ bool CLArecontPanoramicDevice::setParam(const QString& name, const CLValue& val 
 
 bool CLArecontPanoramicDevice::setParam_special(const QString& name, const CLValue& val)
 {
+
+	if (CLAreconVisionDevice::setParam_special(name, val))
+		return true;
+
+
 	if (name=="resolution")
 	{
 		if (val==(QString)("half"))

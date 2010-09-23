@@ -5,6 +5,7 @@
 #include <QGroupBox>
 #include <QSlider>
 #include <QRadioButton>
+#include <QPushButton>
 #include "base/log.h"
 #include "settings.h"
 
@@ -174,6 +175,12 @@ CLAbstractSettingsWidget(handler, dev, paramname)
 
 		connect(btn , SIGNAL(clicked()), this, SLOT(onClicked()));
 	}
+
+	//QPushButton* btnt = new QPushButton("test");
+	//btnt->select
+	//layout->addWidget(btnt);
+
+	
 	
 }
 
@@ -182,4 +189,20 @@ void SettingsEnumerationWidget::onClicked()
 	QString val = QObject::sender()->objectName();
 
 	emit setParam(mParam.name, val);
+}
+//==================================================
+SettingsButtonWidget::SettingsButtonWidget(QObject* handler, CLDevice*dev, QString paramname):
+CLAbstractSettingsWidget(handler, dev, paramname)
+{
+	QPushButton* btn = new QPushButton(mParam.name);
+
+	QObject::connect(btn, SIGNAL(released()), this, SLOT(onClicked()));
+
+	mWidget = btn;
+
+}
+
+void SettingsButtonWidget::onClicked()
+{
+	emit setParam(mParam.name, "");
 }

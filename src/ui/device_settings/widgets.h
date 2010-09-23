@@ -78,4 +78,14 @@ private slots:
 
 
 //==============================================
+class SettingsButtonWidget : public CLAbstractSettingsWidget
+{
+	Q_OBJECT
+public:
+	SettingsButtonWidget(QObject* handler, CLDevice*dev, QString paramname);
+private slots:
+		void onClicked();
+
+};
+
 #endif //settings_widgets_h_1820

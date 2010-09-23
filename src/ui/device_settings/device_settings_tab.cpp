@@ -78,6 +78,11 @@ mDlg(dlg)
 				awidget =  new SettingsEnumerationWidget(handler, dev, param.name);
 				break;
 
+			case CLParamType::Button:
+				awidget =  new SettingsButtonWidget(handler, dev, param.name);
+				break;
+
+
 			}
 
 

@@ -8,7 +8,7 @@
 
 struct CLParamType
 {
-	enum {None, Value, OnOff, Boolen, MinMaxStep, Enumeration };	
+	enum {None, Value, OnOff, Boolen, MinMaxStep, Enumeration, Button };	
 
 	CLParamType();
 
