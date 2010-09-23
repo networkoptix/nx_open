@@ -198,6 +198,8 @@ CLAbstractSettingsWidget(handler, dev, paramname)
 
 	QObject::connect(btn, SIGNAL(released()), this, SLOT(onClicked()));
 
+	btn->setFocusPolicy(Qt::NoFocus);
+
 	mWidget = btn;
 
 }

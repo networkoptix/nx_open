@@ -7,6 +7,7 @@
 #include "style.h"
 #include "widgets.h"
 #include <QGroupBox>
+#include <QPushButton>
 
 CLAbstractDeviceSettingsDlg::CLAbstractDeviceSettingsDlg(CLDevice* dev):
 QDialog(0, Qt::CustomizeWindowHint | Qt::WindowTitleHint | 
@@ -22,7 +23,7 @@ mDevice(dev)
 	setWindowOpacity(0.90);
 
 	int width = 610;
-	int height = 450;
+	int height = 490;
 
 	resize(width, height);
 
@@ -47,13 +48,18 @@ mDevice(dev)
 	}
 
 
-	//mButtonBox = new QDialogButtonBox(QDialogButtonBox::Close);
+	mButtonBox = new QDialogButtonBox();
+	mButtonBox->setFocusPolicy(Qt::NoFocus);
+	QPushButton* closeBtn = new QPushButton("Ok");
+	connect(closeBtn, SIGNAL(released()), this, SLOT(onClose()));
+	mButtonBox->addButton(closeBtn, QDialogButtonBox::ActionRole);
+	closeBtn->setFocusPolicy(Qt::NoFocus);
 
 
 	//! [4]
 	
 	mainLayout->addWidget(mTabWidget);
-	///mainLayout->addWidget(mButtonBox);
+	mainLayout->addWidget(mButtonBox);
 	setLayout(mainLayout);
 
 	mDevice->addRef();
@@ -132,4 +138,9 @@ QGroupBox* CLAbstractDeviceSettingsDlg::getGroupByName(QString name) const
 			return wgt;
 	}
 	return 0;
+}
+
+void CLAbstractDeviceSettingsDlg::onClose()
+{
+	close();
 }

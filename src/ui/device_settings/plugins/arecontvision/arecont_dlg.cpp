@@ -143,6 +143,7 @@ CLAbstractDeviceSettingsDlg(dev)
 	initAI();
 	initDN();
 	initMD();
+	initAdmin();
 }
 
 void AVSettingsDlg::initTabsOrder()
@@ -253,8 +254,26 @@ void AVSettingsDlg::initImageQuality()
 	}
 
 
-	if (wgt = getWidgetByName("Rotate 180"))
-		wgt->toWidget()->move(255,360);
+	if (wgt = getWidgetByName("Equalize Brightness"))
+	{
+		wgt->toWidget()->move(135,360);
+
+		if (wgt = getWidgetByName("Equalize Color"))
+			wgt->toWidget()->move(340,360);
+
+
+
+		if (wgt = getWidgetByName("Rotate 180"))
+			wgt->toWidget()->hide(); // for now
+
+	}
+	else
+	{
+		if (wgt = getWidgetByName("Rotate 180"))
+			wgt->toWidget()->move(255,360);
+	}
+
+
 
 	//
 
@@ -337,5 +356,16 @@ void AVSettingsDlg::initMD()
 
 	if (wgt = getWidgetByName("Md detail"))
 		wgt->toWidget()->move(320,210);
+
+}
+
+void AVSettingsDlg::initAdmin()
+{
+	QGroupBox* group;
+	CLAbstractSettingsWidget* wgt;
+
+	if (wgt = getWidgetByName("Factory defaults"))
+		wgt->toWidget()->move(230,150);
+
 
 }

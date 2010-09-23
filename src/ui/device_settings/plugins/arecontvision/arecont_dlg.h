@@ -29,6 +29,7 @@ private:
 	void initAI();
 	void initDN();
 	void initMD();
+	void initAdmin();
 	
 };
 

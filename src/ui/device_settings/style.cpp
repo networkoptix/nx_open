@@ -196,6 +196,7 @@ void ArthurStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *op
 		}
 		break;
 
+
 	default:
 		QWindowsStyle::drawPrimitive(element, option, painter, widget);
 		break;
