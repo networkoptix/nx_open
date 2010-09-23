@@ -65,7 +65,7 @@ CLAbstractSettingsWidget(handler, dev, paramname)
 
 	QObject::connect(checkBox, SIGNAL(stateChanged ( int )), this, SLOT(stateChanged(int)));
 
-	//QPalette plt;	plt.setColor(QPalette::WindowText, Qt::white);	checkBox->setPalette(plt);
+	//QPalette plt;	plt.setColor(QPalette::WindowText, Qt::white);	checkBox->setPalette(plt);//black
 	
 
 	mWidget = checkBox;
