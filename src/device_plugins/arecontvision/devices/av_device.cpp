@@ -219,10 +219,6 @@ bool CLAreconVisionDevice::setParam_special(const QString& name, const CLValue& 
 bool CLAreconVisionDevice::setParam(const QString& name, const CLValue& val )
 {
 
-//	if (name=="lowlight")
-//		int n = 0;
-
-
 	if (!CLDevice::setParam(name, val))
 		return false;
 

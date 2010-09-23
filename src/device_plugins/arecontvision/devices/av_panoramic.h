@@ -18,7 +18,10 @@ public:
 	virtual bool hasTestPattern() const;
 
 protected:
+	virtual bool setParam(const QString& name, const CLValue& val);
+
 	virtual bool setParam_special(const QString& name, const CLValue& val);
+	
 private:
 	bool setResolution(bool full);
 	bool setQulity(int q);

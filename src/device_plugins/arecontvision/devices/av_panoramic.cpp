@@ -152,6 +152,60 @@ bool CLArecontPanoramicDevice::hasTestPattern() const
 	return m_hastestPattern;
 }
 
+bool CLArecontPanoramicDevice::setParam(const QString& name, const CLValue& val )
+{
+	if (!CLDevice::setParam(name, val))
+		return false;
+
+	if (setParam_special(name, val)) // try special first 
+		return true;
+
+	CLParamType& value = getDevicePramList().get(name).value;
+
+	//if (value.synchronized && value.value==val) // the same value
+	//	return true;
+
+
+
+
+	if (!value.setValue(val, false))
+	{
+		cl_log.log("cannot set such value!", cl_logWARNING);
+		return false;
+	}
+
+	if (value.http=="") // check if we have http command for this param
+	{
+		value.setValue(val);
+		return true;
+	}
+
+
+	for (int i = 1; i <=4 ; ++i)
+	{
+		CLSimpleHTTPClient connection(m_ip, 80, getHttpTimeout(), getAuth());
+		QString request;
+
+		QTextStream str(&request);
+		str << "set" << i << "?" << value.http;
+		if (value.type!=CLParamType::None) str << "=" << (QString)val;
+
+		connection.setRequestLine(request);
+
+		if (connection.openStream()!=CL_HTTP_SUCCESS)
+			if (connection.openStream()!=CL_HTTP_SUCCESS) // try twice.
+				return false;
+	}
+
+
+
+	value.setValue(val);
+	value.synchronized = true;
+
+	return true;
+
+}
+
 bool CLArecontPanoramicDevice::setParam_special(const QString& name, const CLValue& val)
 {
 	if (name=="resolution")

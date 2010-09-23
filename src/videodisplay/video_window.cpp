@@ -40,6 +40,7 @@ m_timeStarted(false)
 	//setCacheMode(ItemCoordinateCache);
 
 	//setFlag(QGraphicsItem::ItemIsMovable);
+	
 
 	setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);
 	m_Info_Font.setWeight(QFont::Bold);

@@ -142,7 +142,7 @@ CLAbstractDeviceSettingsDlg(dev)
 	initExposure();
 	initAI();
 	initDN();
-
+	initMD();
 }
 
 void AVSettingsDlg::initTabsOrder()
@@ -300,7 +300,7 @@ void AVSettingsDlg::initAI()
 	CLAbstractSettingsWidget* wgt;
 
 	if (wgt = getWidgetByName("AutoIris enable"))
-		wgt->toWidget()->move(200,200);
+		wgt->toWidget()->move(200,180);
 
 	
 }
@@ -311,7 +311,33 @@ void AVSettingsDlg::initDN()
 	CLAbstractSettingsWidget* wgt;
 
 	if (wgt = getWidgetByName("Day/Night Mode"))
-		wgt->toWidget()->move(200,200);
+		wgt->toWidget()->move(215,130);
+}
 
+void AVSettingsDlg::initMD()
+{
+	QGroupBox* group;
+	CLAbstractSettingsWidget* wgt;
+
+	//Enable motion detection
+	//Zone size
+	//Threshold
+	//Sensitivity
+	//Md detail
+
+	if (wgt = getWidgetByName("Enable motion detection"))
+		wgt->toWidget()->move(175,30);
+
+	if (wgt = getWidgetByName("Zone size"))
+		wgt->toWidget()->move(80,80);
+
+	if (wgt = getWidgetByName("Threshold"))
+		wgt->toWidget()->move(320,80);
+
+	if (wgt = getWidgetByName("Sensitivity"))
+		wgt->toWidget()->move(80,210);
+
+	if (wgt = getWidgetByName("Md detail"))
+		wgt->toWidget()->move(320,210);
 
 }

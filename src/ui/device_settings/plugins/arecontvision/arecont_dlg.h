@@ -28,6 +28,7 @@ private:
 	void initExposure();
 	void initAI();
 	void initDN();
+	void initMD();
 	
 };
 
