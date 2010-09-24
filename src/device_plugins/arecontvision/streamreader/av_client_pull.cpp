@@ -1,11 +1,37 @@
 #include "av_client_pull.h"
 #include "streamreader\streamreader.h"
 #include "device\device.h"
+#include "base\rand.h"
 
 CLAVClinetPullStreamReader::CLAVClinetPullStreamReader(CLDevice* dev ):
 CLClientPullStreamreader(dev)
 {
 	setQuality(m_qulity);
+
+	if (m_streamParam.exists("streamID"))
+		m_streamParam.get("streamID").value.value = (int)cl_get_random_val(1, 32000);
+	
+
+	//========this is due to bug in AV firmware;
+	// you cannot set up maxSensorWidth with HTTP. ( you can do it in tftp if you are really want to ). 
+	// for now(13 December 2009) if we use HTTP => right should be divisible by 64; bottom - by 32
+	// may be while you are looking at this comments bug already fixed.
+	if (m_streamParam.exists("image_right"))
+	{
+		int right  = m_streamParam.get("image_right").value.value;
+		right = right/64*64;
+		m_streamParam.get("image_right").value.value = right;
+	}
+
+
+	if (m_streamParam.exists("image_bottom"))
+	{
+		int bottom = m_streamParam.get("image_bottom").value.value;
+		bottom = bottom/32*32;
+		m_streamParam.get("image_bottom").value.value = bottom;
+	}
+	//===================
+
 }
 
 
