@@ -325,9 +325,6 @@ void MainWnd::onNewDevice(CLDevice* device)
 	reader->setDeviceRestartHadlerInfo(cam);
 	reader->setDeviceRestartHadler(this);
 
-	CLParamList& pl = device->getStreamPramList();
-	reader->setStreamParams(pl);
-
 	cam->setQuality(CLStreamreader::CLSLow, true);
 
 	onDeviceRestarted(reader, cam);
@@ -425,20 +422,4 @@ void MainWnd::onDeviceRestarted(CLStreamreader* reader, CLRestartHadlerInfo info
 
 //====================================================================
 //====================================================================
-
-bool MainWnd::isSelectedCamStillExists() const
-{
-	if (m_selectedcCam==0)
-		return false;
-
-	for (int i = 0; i < m_cams.size();++i)
-	{
-		CLVideoCamera* cam = m_cams.at(i);
-		if (cam==m_selectedcCam)
-			return true;
-	}
-
-	return false;
-
-}
 

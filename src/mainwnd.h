@@ -76,11 +76,6 @@ private:
 	void onNewDevice(CLDevice* device);
 
 	
-	bool isSelectedCamStillExists() const;
-
-	
-
-
 };
 
 #endif // MAINWND_H

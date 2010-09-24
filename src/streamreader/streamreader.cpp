@@ -13,6 +13,9 @@ m_qulity(StreamQuality::CLSLowest)
 {
 	memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame));
 	m_channel_number = dev->getVideoLayout()->numberOfChannels();
+
+	setStreamParams(m_device->getStreamPramList());
+
 	
 }
 
