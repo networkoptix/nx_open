@@ -33,7 +33,8 @@ public:
 	const CLParam& param() const;
 signals:
 	void setParam(const QString& name, const CLValue& val);
-
+protected:
+	virtual void setParam_helper(const QString& name, const CLValue& val);
 protected:
 	CLDevice* mDevice;
 	CLParam mParam;

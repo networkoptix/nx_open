@@ -145,6 +145,8 @@ CLAbstractDeviceSettingsDlg(dev)
 	initDN();
 	initMD();
 	initAdmin();
+
+	correctWgtsState();
 }
 
 void AVSettingsDlg::initTabsOrder()
@@ -371,6 +373,13 @@ void AVSettingsDlg::initAdmin()
 
 }
 
+//=========================================================================
+void AVSettingsDlg::setParam(const QString& name, const CLValue& val)
+{
+	CLAbstractDeviceSettingsDlg::setParam(name, val);
+	correctWgtsState();
+
+}
 
 void AVSettingsDlg::onSuggestions()
 {
@@ -380,5 +389,45 @@ void AVSettingsDlg::onSuggestions()
 
 	mbox.exec();
 
+}
+
+void AVSettingsDlg::correctWgtsState()
+{
+	CLAbstractSettingsWidget* wgt;
+	QString val;
+
+	if (wgt = getWidgetByName("Light Mode"))
+	{
+		val  = wgt->param().value.value;
+
+		if (val==QString("highspeed"))
+		{
+			if (wgt = getWidgetByName("Short Exposure"))
+				wgt->toWidget()->show();
+		}
+		else
+		{
+			if (wgt = getWidgetByName("Short Exposure"))
+				wgt->toWidget()->hide();
+		}
+	}
+
+
+	//=================================================
+	if (wgt = getWidgetByName("Codec"))
+	{
+		val  = wgt->param().value.value;
+
+		if (val==QString("H.264"))
+		{
+			if (wgt = getWidgetByName("Bitrate"))
+				wgt->toWidget()->show();
+		}
+		else
+		{
+			if (wgt = getWidgetByName("Bitrate"))
+				wgt->toWidget()->hide();
+		}
+	}
 
 }

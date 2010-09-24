@@ -55,12 +55,18 @@ QWidget* CLAbstractSettingsWidget::toWidget()
 	return mWidget;
 }
 
+void CLAbstractSettingsWidget::setParam_helper(const QString& name, const CLValue& val)
+{
+	mParam.value.value = val;
+	emit setParam(mParam.name,val);
+}
+
 //==============================================
 SettingsOnOffWidget::SettingsOnOffWidget(QObject* handler, CLDevice*dev, QString paramname):
 CLAbstractSettingsWidget(handler, dev, paramname)
 {
 	QCheckBox * checkBox = new QCheckBox(mParam.name);
-	if (mParam.value.default_value==mParam.value.possible_values.front())
+	if (mParam.value.value==mParam.value.possible_values.front())
 		checkBox->setCheckState(Qt::Checked);
 
 	QObject::connect(checkBox, SIGNAL(stateChanged ( int )), this, SLOT(stateChanged(int)));
@@ -97,7 +103,7 @@ void SettingsOnOffWidget::stateChanged(int state)
 		val = mParam.value.possible_values.back();
 	}
 
-	emit setParam(mParam.name,val);
+	setParam_helper(mParam.name,val);
 
 }
 
@@ -118,10 +124,10 @@ CLAbstractSettingsWidget(handler, dev, paramname)
 	//groupBox->setFont(font);
 
 	slider->setRange(mParam.value.min_val, mParam.value.max_val);
-	slider->setValue(mParam.value.default_value);
+	slider->setValue(mParam.value.value);
 
 	QString str;
-	QTextStream(&str) << mParam.name<< "(" << (QString)mParam.value.default_value<< ")";
+	QTextStream(&str) << mParam.name<< "(" << (QString)mParam.value.value<< ")";
 	groupBox->setTitle(str);
 
 
@@ -146,7 +152,7 @@ void SettingsMinMaxStepWidget::onValChanged(int val)
 
 void SettingsMinMaxStepWidget::onValChanged()
 {
-	emit setParam(mParam.name,slider->value());
+	setParam_helper(mParam.name,slider->value());
 }
 
 //==============================================
@@ -167,7 +173,7 @@ CLAbstractSettingsWidget(handler, dev, paramname)
 		layout->addWidget(btn);
 
 		QString val = mParam.value.possible_values.at(i);
-		if (val == mParam.value.default_value)
+		if (val == mParam.value.value)
 			btn->setChecked(true);
 
 		btn->setObjectName(val);
@@ -188,7 +194,7 @@ void SettingsEnumerationWidget::onClicked()
 {
 	QString val = QObject::sender()->objectName();
 
-	emit setParam(mParam.name, val);
+	setParam_helper(mParam.name, val);
 }
 //==================================================
 SettingsButtonWidget::SettingsButtonWidget(QObject* handler, CLDevice*dev, QString paramname):
@@ -206,5 +212,5 @@ CLAbstractSettingsWidget(handler, dev, paramname)
 
 void SettingsButtonWidget::onClicked()
 {
-	emit setParam(mParam.name, "");
+	setParam_helper(mParam.name, "");
 }

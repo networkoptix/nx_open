@@ -25,7 +25,9 @@ public:
 	AVSettingsDlg(CLDevice* dev);
 protected slots:
 	virtual void onSuggestions();
+	virtual void setParam(const QString& name, const CLValue& val);
 private:
+	
 	void initTabsOrder();
 	void initImageQuality();
 	void initExposure();
@@ -33,6 +35,8 @@ private:
 	void initDN();
 	void initMD();
 	void initAdmin();
+	//==========
+	void correctWgtsState();
 	
 };
 
