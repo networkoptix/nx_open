@@ -144,6 +144,19 @@ CLHttpStatus CLAreconVisionDevice::setRegister_asynch(int page, int num, int val
 
 }
 
+void CLAreconVisionDevice::onBeforeStart()
+{
+	CLValue maxSensorWidth;
+	CLValue maxSensorHight;
+	getParam("MaxSensorWidth", maxSensorWidth);
+	getParam("MaxSensorHeight", maxSensorHight);
+
+	setParam_asynch("sensorleft", 0);
+	setParam_asynch("sensortop", 0);
+	setParam_asynch("sensorwidth", maxSensorWidth);
+	setParam_asynch("sensorheight", maxSensorHight);
+
+}
 
 
 bool CLAreconVisionDevice::getParam(const QString& name, CLValue& val, bool resynch )

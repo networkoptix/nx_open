@@ -300,16 +300,8 @@ void MainWnd::onNewDevice(CLDevice* device)
 
 	m_camlayout.addWnd(video_wnd);
 
-
-	
-
-
 	video_wnd->setInfoText(cam->getDevice()->toString());
 
-	//connect(video_wnd, SIGNAL(onVideoItemSelected(CLVideoWindow*)), this, SLOT(onVideoItemSelected(CLVideoWindow*)));
-	//connect(video_wnd, SIGNAL(onVideoItemMouseRightClick(CLVideoWindow*)), this, SLOT(onVideoItemMouseRightClick(CLVideoWindow*)));
-
-	
 
 	m_videoWindows.push_back(video_wnd);
 	m_cams.push_back(cam);
@@ -320,19 +312,8 @@ void MainWnd::onNewDevice(CLDevice* device)
 	}
 
 
-
-	CLStreamreader*  reader = cam->getStreamreader();
-	reader->setDeviceRestartHadlerInfo(cam);
-	reader->setDeviceRestartHadler(this);
-
 	cam->setQuality(CLStreamreader::CLSLow, true);
-
-	onDeviceRestarted(reader, cam);
-
-
 	cam->startDispay();
-
-
 }
 
 
@@ -372,24 +353,6 @@ void MainWnd::onFirstSceneAppearance()
 	m_videoView.zoomDefault(scene_zoom_duration);
 }
 
-void MainWnd::onDeviceRestarted(CLStreamreader* reader, CLRestartHadlerInfo info)
-{
-	// if this is called be reader => reader&cam&device still existing
-	CLVideoCamera* cam = reinterpret_cast<CLVideoCamera*>(info);
-	CLDevice *device = cam->getDevice();
-
-
-	CLValue maxSensorWidth;
-	CLValue maxSensorHight;
-	device->getParam("MaxSensorWidth", maxSensorWidth);
-	device->getParam("MaxSensorHeight", maxSensorHight);
-
-	device->setParam_asynch("sensorleft", 0);
-	device->setParam_asynch("sensortop", 0);
-	device->setParam_asynch("sensorwidth", maxSensorWidth);
-	device->setParam_asynch("sensorheight", maxSensorHight);
-
-}
 
 //====================================================================
 //====================================================================

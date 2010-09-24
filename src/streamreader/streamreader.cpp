@@ -6,8 +6,6 @@
 
 
 CLStreamreader::CLStreamreader(CLDevice* dev):
-m_restartInfo(0),
-m_restartHandler(0),
 m_device(dev),
 m_qulity(StreamQuality::CLSLowest)
 {
@@ -81,15 +79,6 @@ bool CLStreamreader::needKeyData() const
 
 }
 
-void CLStreamreader::setDeviceRestartHadlerInfo(CLRestartHadlerInfo hinfo)
-{
-	m_restartInfo = hinfo;
-}
-
-void CLStreamreader::setDeviceRestartHadler(CLDeviceRestartHadler* restartHandler)
-{
-	m_restartHandler = restartHandler;
-}
 
 void CLStreamreader::putData(CLAbstractData* data)
 {

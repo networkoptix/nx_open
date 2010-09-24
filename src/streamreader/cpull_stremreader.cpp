@@ -35,6 +35,8 @@ void CLClientPullStreamreader::run()
 	CL_LOG(cl_logINFO) cl_log.log("stream reader started.", cl_logINFO);
 
 	setNeedKeyData();
+	m_device->onBeforeStart();
+
 	int frames_lost = 0;
 
 	while(!needToStop())
@@ -80,8 +82,7 @@ void CLClientPullStreamreader::run()
 			{
 				m_stat[0].onEvent(CL_STAT_CAMRESETED);
 
-				if (m_restartHandler) // if we have handler
-					m_restartHandler->onDeviceRestarted(this, m_restartInfo);
+				m_device->onBeforeStart();
 			}
 
 			frames_lost = 0;

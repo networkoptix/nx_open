@@ -53,6 +53,7 @@ public:
 	virtual CLNetworkDevice* updateDevice();
 	//========
 
+	virtual void onBeforeStart();
 	
 	int getModel() const;
 

@@ -24,8 +24,8 @@ typedef QList<CLVideoCamera*> CLVideoCamsList;
 
 
 
-//class MainWnd : public QMainWindow, public CLDeviceRestartHadler
-class MainWnd : public QWidget, public CLDeviceRestartHadler
+//class MainWnd : public QMainWindow
+class MainWnd : public QWidget
 {
 	Q_OBJECT
 
@@ -69,8 +69,6 @@ private:
 	void mousePressEvent ( QMouseEvent * event);
 
 	void onFirstSceneAppearance();
-
-	void onDeviceRestarted(CLStreamreader* reader, CLRestartHadlerInfo info);
 
 	void onNewDevices_helper(CLDeviceList devices);
 	void onNewDevice(CLDevice* device);

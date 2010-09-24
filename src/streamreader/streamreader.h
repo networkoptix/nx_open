@@ -11,15 +11,9 @@
 #include <QAuthenticator>
 #include <QList>
 
-typedef void* CLRestartHadlerInfo;
 class CLStreamreader;
 class CLDevice;
 
-// onDeviceRestarted will be called if reader detects divec restart
-struct CLDeviceRestartHadler
-{
-	virtual void onDeviceRestarted(CLStreamreader* reader, CLRestartHadlerInfo info) = 0;
-};
 
 #define CL_MAX_DATASIZE (20*1024*1024) // assume we can never get compressed data with  size greater than this
 #define CL_MAX_CHANNEL_NUMBER (10) 
@@ -46,9 +40,6 @@ public:
 	virtual void setNeedKeyData();
 	virtual bool needKeyData() const;
 
-	void setDeviceRestartHadlerInfo(CLRestartHadlerInfo);
-	void setDeviceRestartHadler(CLDeviceRestartHadler* restartHandler);
-
 	virtual void setQuality(StreamQuality q);
 	StreamQuality getQuality() const;
 
@@ -74,9 +65,6 @@ protected:
 	int m_gotKeyFrame[CL_MAX_CHANNEL_NUMBER];
 	int m_channel_number;
 
-
-	CLRestartHadlerInfo m_restartInfo;
-	CLDeviceRestartHadler* m_restartHandler;
 
 	CLDevice* m_device; // reader reads data from this device.
 

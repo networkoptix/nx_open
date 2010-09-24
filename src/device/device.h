@@ -103,6 +103,10 @@ public:
 	// return false if not accessible 
 	virtual bool getBaseInfo(){return true;};
 
+	// this function is called by stream reader before start read;
+	// on in case of connection lost and restored 
+	virtual void onBeforeStart(){};
+
 	// executing command 
 	virtual bool executeCommand(CLDeviceCommand* command){return true;};
 
