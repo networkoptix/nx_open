@@ -22,7 +22,7 @@ public:
 	bool isSelected() const;
 
 	void zoom_abs(qreal z, int duration, int delay = 0);
-	void z_rotate_delta(QPointF center, qreal angle, int diration);
+	void z_rotate_delta(QPointF center, qreal angle, int duration);
 	void z_rotate_abs(QPointF center, qreal angle, int duration);
 
 	qreal getZoom() const;
