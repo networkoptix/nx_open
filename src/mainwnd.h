@@ -66,7 +66,6 @@ private:
 
 	void closeEvent ( QCloseEvent * event );
 
-	void mousePressEvent ( QMouseEvent * event);
 
 	void onFirstSceneAppearance();
 

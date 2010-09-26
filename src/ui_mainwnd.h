@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwnd.ui'
 **
-** Created: Thu Sep 23 23:39:55 2010
+** Created: Sat Sep 25 20:45:22 2010
 **      by: Qt User Interface Compiler version 4.6.3
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!

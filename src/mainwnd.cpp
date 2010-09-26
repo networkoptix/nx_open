@@ -201,14 +201,6 @@ void MainWnd::toggleFullScreen()
 		showMaximized();
 }
 
-void MainWnd::mousePressEvent ( QMouseEvent * event)
-{
-	if (event->button() == Qt::MidButton)
-	{
-		//toggleFullScreen();
-	}
-
-}
 
 void MainWnd::onTimer()
 {
@@ -255,12 +247,6 @@ void MainWnd::onTimer()
 
 		first_time = false;
 	}
-
-
-
-
-	
-
 
 }
 
