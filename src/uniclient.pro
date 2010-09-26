@@ -20,7 +20,7 @@ SOURCES += device/device.cpp device/network_device.cpp device/file_device.cpp de
 SOURCES += network/nettools.cpp network/socket.cpp network/simple_http_client.cpp network/ping.cpp network/netstate.cpp
 SOURCES += statistics/statistics.cpp
 SOURCES += streamreader/cpull_stremreader.cpp streamreader/streamreader.cpp streamreader/single_shot_reader.cpp streamreader/single_shot_file_reader.cpp
-SOURCES += videodisplay/camdisplay.cpp videodisplay/gl_renderer.cpp videodisplay/video_window.cpp videodisplay/videostreamdisplay.cpp
+SOURCES += videodisplay/camdisplay.cpp videodisplay/gl_renderer.cpp videodisplay/videostreamdisplay.cpp
 
 HEADERS = mainwnd.h video_camera.h settings.h
 HEADERS += base/threadqueue.h base/log.h base/associativearray.h base/expensiveobject.h base/bytearray.h base/longrunnable.h base/rand.h base/adaptivesleep.h base/base.h base/sleep.h
@@ -31,7 +31,7 @@ HEADERS += device/deviceserver.h device/device.h device/network_device.h device/
 HEADERS += network/simple_http_client.h network/netstate.h network/ping.h network/socket.h network/nettools.h
 HEADERS += statistics/statistics.h
 HEADERS += streamreader/cpull_stremreader.h streamreader/streamreader.h streamreader/single_shot_reader.h streamreader/single_shot_file_reader.h
-HEADERS += videodisplay/abstractrenderer.h videodisplay/camdisplay.h videodisplay/gl_renderer.h videodisplay/video_window.h videodisplay/videostreamdisplay.h
+HEADERS += videodisplay/abstractrenderer.h videodisplay/camdisplay.h videodisplay/gl_renderer.h videodisplay/videostreamdisplay.h
 
 
 
@@ -51,8 +51,8 @@ SOURCES += device_plugins/fake/streamreader/fake_file_streamreader.cpp
 HEADERS += device_plugins/fake/devices/fake_device_server.h device_plugins/fake/devices/fake_device.h
 HEADERS += device_plugins/fake/streamreader/fake_file_streamreader.h
 
-SOURCES +=ui/graphicsview.cpp ui/videoitem/uvideo_wnd.cpp ui/videoitem/loup_wnd.cpp ui/videoitem/abstract_scene_item.cpp  ui/videoitem/static_image_item.cpp ui/videoitem/custom_draw_button.cpp ui/videoitem/img_item.cpp
-HEADERS +=ui/graphicsview.h ui/videoitem/uvideo_wnd.h ui/videoitem/loup_wnd.h  ui/videoitem/abstract_scene_item.h  ui/videoitem/static_image_item.h ui/videoitem/custom_draw_button.h ui/videoitem/img_item.h
+SOURCES +=ui/graphicsview.cpp ui/videoitem/loup_wnd.cpp ui/videoitem/abstract_scene_item.cpp  ui/videoitem/static_image_item.cpp ui/videoitem/custom_draw_button.cpp ui/videoitem/img_item.cpp ui/videoitem/video_wnd_item.cpp
+HEADERS +=ui/graphicsview.h  ui/videoitem/loup_wnd.h  ui/videoitem/abstract_scene_item.h  ui/videoitem/static_image_item.h ui/videoitem/custom_draw_button.h ui/videoitem/img_item.h ui/videoitem/video_wnd_item.h
 
 HEADERS += ui/video_cam_layout/videocamlayout.h  ui/animation/animation_timeline.h ui/animation/mouse_state.h ui/animation/animated_show.h
 HEADERS += ui/animation/scene_movement.h ui/animation/scene_zoom.h ui/animation/abstract_animation.h ui/animation/item_trans.h ui/animation/animated_bgr.h

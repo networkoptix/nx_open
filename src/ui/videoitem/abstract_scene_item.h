@@ -11,6 +11,7 @@ class GraphicsView;
 class CLAbstractSceneItem : public QObject, public QGraphicsItem
 {
 	Q_OBJECT
+	Q_PROPERTY(QPointF pos READ pos WRITE setPos)
 public:
 
 	enum CLSceneItemType {IMAGE, BUTTON};
@@ -24,14 +25,13 @@ public:
 	void setType(CLSceneItemType t);
 
 	void setMaxSize(QSize size);
-	virtual void before_destroy();
 
 	virtual QRectF boundingRect() const;
 
 	virtual int height() const;
 	virtual int width() const;
 
-	void setSelected(bool sel, bool animate = true, int delay = 0);
+	virtual void setSelected(bool sel, bool animate = true, int delay = 0);
 	bool isSelected() const;
 
 	void zoom_abs(qreal z, int duration, int delay = 0);

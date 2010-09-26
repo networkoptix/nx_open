@@ -1,4 +1,3 @@
-#include "video_window.h"
 #include "gl_renderer.h"
 #include "../base/log.h"
 #include "../base/sleep.h"
@@ -8,6 +7,7 @@
 #include <QtGui/QPainter>
 #include <QtGui/QApplication>
 #include <QTime>
+#include "ui/videoitem/video_wnd_item.h"
 
 
 
@@ -123,7 +123,7 @@ static const char yuy2ToRgb[] =
 
 int CLGLRenderer::gl_status = CLGLRenderer::CL_GL_NOT_TESTED;
 
-CLGLRenderer::CLGLRenderer(CLVideoWindow *vw):
+CLGLRenderer::CLGLRenderer(CLVideoWindowItem *vw):
 m_videowindow(vw),
 clampConstant(GL_CLAMP),
 isSoftYuv2Rgb(false),
@@ -387,11 +387,6 @@ void CLGLRenderer::draw(CLVideoDecoderOutput& img, unsigned int channel)
 		m_stride_old = m_stride;
 		m_height_old = m_height;
 		m_color_old = m_color;
-
-		{
-			QMutexLocker  locker(&m_mutex_aspect);
-			m_aspectratio = (static_cast<float>(m_width))/m_height;
-		}
 
 	}
 

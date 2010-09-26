@@ -16,12 +16,12 @@
 #include "device/asynch_seacher.h"
 #include "camera/camera.h"
 #include "streamreader/streamreader.h"
-#include "./ui/videoitem/uvideo_wnd.h"
 #include "video_camera.h"
 #include "device/directory_browser.h"
 
 #include <QTransform>
 #include "../src/gui/kernel/qevent.h"
+#include "ui/videoitem/video_wnd_item.h"
 
 QColor bkr_color(0,5,5,125);
 //QColor bkr_color(9/1.5,54/1.5,81/1.5);
@@ -157,7 +157,7 @@ MainWnd::~MainWnd()
 
 	for (int i = 0; i < m_videoWindows.size();++i)
 	{
-		VideoWindow* wnd = m_videoWindows.at(i);
+		CLVideoWindowItem* wnd = m_videoWindows.at(i);
 		wnd->before_destroy();
 	}
 
@@ -254,7 +254,7 @@ void MainWnd::onVideoTimer()
 {
 	for (int i = 0; i < m_videoWindows.size();++i)
 	{
-		VideoWindow* wnd = m_videoWindows.at(i);
+		CLVideoWindowItem* wnd = m_videoWindows.at(i);
 		if (wnd->needUpdate())
 		{
 			wnd->update();
@@ -280,7 +280,7 @@ void MainWnd::onNewDevice(CLDevice* device)
 	QSize wnd_size = m_camlayout.getMaxWndSize(device->getVideoLayout());
 	
 
-	VideoWindow* video_wnd =  new VideoWindow(&m_videoView, device->getVideoLayout(), wnd_size.width() , wnd_size.height());
+	CLVideoWindowItem* video_wnd =  new CLVideoWindowItem(&m_videoView, device->getVideoLayout(), wnd_size.width() , wnd_size.height());
 	CLVideoCamera* cam = new VideoCamera(device, video_wnd);
 	video_wnd->setVideoCam(cam);
 

@@ -8,7 +8,7 @@
 #include "./animation/animated_show.h"
 
 
-class VideoWindow;
+class CLVideoWindowItem;
 class VideoCamerasLayout;
 class MainWnd;
 class QGraphicsPixmapItem;
@@ -28,7 +28,7 @@ public:
 
 	void setCamLayOut(VideoCamerasLayout *);
 
-	VideoWindow* getSelectedWnd() const;
+	CLVideoWindowItem* getSelectedWnd() const;
 
 	void setZeroSelection(); 
 
@@ -56,19 +56,19 @@ protected:
 	void OnMenuButton(void* owner, QString text);
 
 	//=========================
-	void onNewItemSelected_helper(VideoWindow* new_wnd, int delay);
-	void toggleFullScreen_helper(VideoWindow* new_wnd);
+	void onNewItemSelected_helper(CLVideoWindowItem* new_wnd, int delay);
+	void toggleFullScreen_helper(CLVideoWindowItem* new_wnd);
 
-	void onItemFullScreen_helper(VideoWindow* wnd);
+	void onItemFullScreen_helper(CLVideoWindowItem* wnd);
 	
 	void onArrange_helper();
 	void onCircle_helper(bool show=false);
 
 	void show_device_settings_helper(CLDevice* dev);
 	
-	VideoWindow* getLastSelectedWnd();
+	CLVideoWindowItem* getLastSelectedWnd();
 	void mouseSpeed_helper(qreal& mouse_speed,  int& dx, int&dy, int min_spped, int speed_factor);
-	bool isWndStillExists(const VideoWindow* wnd) const;
+	bool isWndStillExists(const CLVideoWindowItem* wnd) const;
 
 
 	
@@ -106,10 +106,10 @@ protected:
 
 
 
-	VideoWindow* m_selectedWnd;
-	VideoWindow* m_last_selectedWnd;
-	VideoWindow* m_rotatingWnd;
-	VideoWindow* m_movingWnd;
+	CLVideoWindowItem* m_selectedWnd;
+	CLVideoWindowItem* m_last_selectedWnd;
+	CLVideoWindowItem* m_rotatingWnd;
+	CLVideoWindowItem* m_movingWnd;
 
 	QRect m_realSceneRect;
 	VideoCamerasLayout* m_camLayout;

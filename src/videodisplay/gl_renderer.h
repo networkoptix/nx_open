@@ -6,7 +6,7 @@
 #include <QMutex>
 #include <QWaitCondition>
 
-class CLVideoWindow;
+class CLVideoWindowItem;
 
 class CLGLRenderer : public CLAbstractRenderer
 {
@@ -19,7 +19,7 @@ public:
 		CL_GL_NOT_SUPPORTED
 	};
 
-	CLGLRenderer(CLVideoWindow *vw);
+	CLGLRenderer(CLVideoWindowItem *vw);
 	~CLGLRenderer();
 	void draw(CLVideoDecoderOutput& image, unsigned int channel);
 
@@ -130,7 +130,7 @@ private:
 
 	bool m_needwait;
 
-	CLVideoWindow* m_videowindow;
+	CLVideoWindowItem* m_videowindow;
 
 	bool m_inited;
 

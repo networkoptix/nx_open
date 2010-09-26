@@ -6,8 +6,9 @@
 #include "../base/log.h"
 #include "../base/sleep.h"
 #include "../device/device.h"
+#include "ui/videoitem/video_wnd_item.h"
 
-CLVideoCamera::CLVideoCamera(CLDevice* device, CLVideoWindow* videovindow):
+CLVideoCamera::CLVideoCamera(CLDevice* device, CLVideoWindowItem* videovindow):
 m_device(device),
 m_videovindow(videovindow)
 {
@@ -80,12 +81,12 @@ CLCamDisplay* CLVideoCamera::getCamCamDisplay()
 	return &m_camdispay;
 }
 
-CLVideoWindow* CLVideoCamera::getVideoWindow()
+CLVideoWindowItem* CLVideoCamera::getVideoWindow()
 {
 	return m_videovindow;
 }
 
-const CLVideoWindow* CLVideoCamera::getVideoWindow() const
+const CLVideoWindowItem* CLVideoCamera::getVideoWindow() const
 {
 	return m_videovindow;
 }

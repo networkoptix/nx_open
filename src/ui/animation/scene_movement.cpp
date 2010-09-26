@@ -2,7 +2,7 @@
 #include <QScrollBar>
 #include "../../base/log.h"
 #include "../graphicsview.h"
-#include "../videoitem/uvideo_wnd.h"
+#include "ui/videoitem/video_wnd_item.h"
 
 
 
@@ -123,7 +123,7 @@ void CLSceneMovement::valueChanged ( qreal dpos )
 	//=======================================
 	if (m_limited && m_view->getSelectedWnd())
 	{
-		VideoWindow* wnd = m_view->getSelectedWnd();
+		CLVideoWindowItem* wnd = m_view->getSelectedWnd();
 
 		QPointF wnd_center = wnd->mapToScene(wnd->boundingRect().center());
 		QPointF final_dest = m_startpoint + m_delta;
@@ -172,7 +172,7 @@ void CLSceneMovement::valueChanged ( qreal dpos )
 	}
 	else if (m_view->getSelectedWnd())
 	{
-		VideoWindow* wnd = m_view->getSelectedWnd();
+		CLVideoWindowItem* wnd = m_view->getSelectedWnd();
 
 		QPointF selected_center = wnd->mapToScene(wnd->boundingRect().center());
 		QPointF dest = m_startpoint + m_delta;

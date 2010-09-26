@@ -16,10 +16,10 @@
 class QTimer;
 class CLVideoCamera;
 class CLVideoWindow;
-class VideoWindow;
+class CLVideoWindowItem;
 class CLDevice;
 
-typedef QList<VideoWindow*> CLVideoWindowsList;
+typedef QList<CLVideoWindowItem*> CLVideoWindowsList;
 typedef QList<CLVideoCamera*> CLVideoCamsList;
 
 

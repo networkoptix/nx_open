@@ -1,7 +1,7 @@
 #include "loup_wnd.h"
 
 LoupeWnd::LoupeWnd(int width, int height):
-CLVideoWindow(0, width, height)
+CLVideoWindowItem(0, 0, width, height)
 {
 	m_videolayout = new CLDefaultDeviceVideoLayout();
 }

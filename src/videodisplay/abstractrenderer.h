@@ -9,8 +9,7 @@ class CLAbstractRenderer
 {
 public:
 	CLAbstractRenderer():
-	m_copydata(false),
-	m_aspectratio(4.0f/3)
+	m_copydata(false)
 	{
 
 	}
@@ -23,17 +22,8 @@ public:
 		m_copydata = copy;
 	}
 
-	virtual float aspectRatio() const
-	{
-		QMutexLocker  locker(&m_mutex_aspect);	
-		return m_aspectratio;
-	}
-
 protected:
 	bool m_copydata;
-
-	mutable QMutex m_mutex_aspect;
-	float m_aspectratio;
 
 };
 

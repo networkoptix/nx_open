@@ -6,7 +6,7 @@
 class VideoCamera : public CLVideoCamera
 {
 public:
-	VideoCamera(CLDevice* device, CLVideoWindow* videovindow);
+	VideoCamera(CLDevice* device, CLVideoWindowItem* videovindow);
 	
 
 	~VideoCamera();

@@ -64,7 +64,7 @@ protected:
 	bool m_timeStarted;
 
 	
-	int m_max_width, m_max_height;
+
 	QString m_infoText;
 
 	//rotation

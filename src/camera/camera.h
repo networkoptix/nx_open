@@ -2,19 +2,19 @@
 #define clcamera_h_1451
 
 
-#include "../videodisplay/video_window.h"
 #include "../videodisplay/camdisplay.h"
 #include "../statistics/statistics.h"
 #include "../streamreader/streamreader.h"
 
 class CLDevice;
+class CLVideoWindowItem;
 
 class CLVideoCamera
 {
 public:
 	// number of videovindows in array must be the same as device->getNumberOfVideoChannels
 	CLVideoCamera(){}
-	CLVideoCamera(CLDevice* device, CLVideoWindow* videovindow);
+	CLVideoCamera(CLDevice* device, CLVideoWindowItem* videovindow);
 	virtual ~CLVideoCamera();
 
 	void startDispay();
@@ -27,8 +27,8 @@ public:
 	CLDevice* getDevice() const;
 
 	CLStreamreader* getStreamreader();
-	CLVideoWindow* getVideoWindow();
-	const CLVideoWindow* getVideoWindow() const;
+	CLVideoWindowItem* getVideoWindow();
+	const CLVideoWindowItem* getVideoWindow() const;
 
 	CLStatistics* getStatistics();
 	CLCamDisplay* getCamCamDisplay();
@@ -38,7 +38,7 @@ public:
 
 private:
 	CLDevice* m_device;
-	CLVideoWindow* m_videovindow;
+	CLVideoWindowItem* m_videovindow;
 	CLCamDisplay m_camdispay;
 	CLStreamreader* m_reader;
 

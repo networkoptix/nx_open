@@ -6,7 +6,7 @@
 #include <QRect>
 
 
-class CLVideoWindow;
+class CLVideoWindowItem;
 class CLVideoCamera;
 class CLDeviceVideoLayout;
 class GraphicsView;
@@ -14,7 +14,7 @@ class QGraphicsScene;
 
 struct CLIdealWndPos
 {
-	CLVideoWindow* wnd;
+	CLVideoWindowItem* wnd;
 	QPoint pos;
 };
 
@@ -36,7 +36,7 @@ public:
 
 	QSize getMaxWndSize(const CLDeviceVideoLayout* layout) const;
 
-	void adjustWnd(CLVideoWindow* wnd) const;
+	void adjustWnd(CLVideoWindowItem* wnd) const;
 
 	QRect getLayoutRect() const; // scene rect 
 	QRect getSmallLayoutRect() const; // scene rect 
@@ -47,61 +47,61 @@ public:
 
 	// position of window( if any ) will be changed
 	// return false if there are no available slots
-	bool addWnd(CLVideoWindow* wnd, int x, int y, int z_order = 0, bool update_scene_rect = true);
+	bool addWnd(CLVideoWindowItem* wnd, int x, int y, int z_order = 0, bool update_scene_rect = true);
 
 	//does same as bool addCamera(CLVideoCamera* cam, int x, int y, int z_order = 0);
 	//but function peeks up position by it self 
-	bool addWnd(CLVideoWindow* wnd,  int z_order = 0, bool update_scene_rect = true);
+	bool addWnd(CLVideoWindowItem* wnd,  int z_order = 0, bool update_scene_rect = true);
 
 		
 	// remove wnd from lay out
-	void removeWnd(CLVideoWindow* wnd, bool update_scene_rect = true);
+	void removeWnd(CLVideoWindowItem* wnd, bool update_scene_rect = true);
 
 	void updateSceneRect();
 
 
-	QSet<CLVideoWindow*> getWndList() const;
+	QSet<CLVideoWindowItem*> getWndList() const;
 
 
-	bool hasSuchWnd(const CLVideoWindow*) const;
+	bool hasSuchWnd(const CLVideoWindowItem*) const;
 	bool hasSuchCam(const CLVideoCamera*) const;
 
 
 	// return wnd on the center of the lay out;
 	// returns 0 if there is no wnd at all
-	CLVideoWindow*  getCenterWnd() const;
+	CLVideoWindowItem*  getCenterWnd() const;
 
 
-	CLVideoWindow* getNextLeftWnd(const CLVideoWindow* curr) const;
-	CLVideoWindow* getNextRightWnd(const CLVideoWindow* curr) const;
-	CLVideoWindow* getNextTopWnd(const CLVideoWindow* curr) const;
-	CLVideoWindow* getNextBottomWnd(const CLVideoWindow* curr) const;
+	CLVideoWindowItem* getNextLeftWnd(const CLVideoWindowItem* curr) const;
+	CLVideoWindowItem* getNextRightWnd(const CLVideoWindowItem* curr) const;
+	CLVideoWindowItem* getNextTopWnd(const CLVideoWindowItem* curr) const;
+	CLVideoWindowItem* getNextBottomWnd(const CLVideoWindowItem* curr) const;
 	
 
 	QList<CLIdealWndPos> calcArrangedPos() const;
 
 protected slots:
-	void onAspectRatioChanged(CLVideoWindow* wnd);
+	void onAspectRatioChanged(CLVideoWindowItem* wnd);
 private:
 
 	
 
 	int next_wnd_helper_get_quarter(const QPointF& current, const QPointF& other) const;
-	CLVideoWindow* next_wnd_helper(const CLVideoWindow* curr, int dir_c, int dir_f) const;
+	CLVideoWindowItem* next_wnd_helper(const CLVideoWindowItem* curr, int dir_c, int dir_f) const;
 
-	QPoint getNextCloserstAvailableForWndSlot_butFrom_list___helper(const CLVideoWindow* wnd, QList<CLIdealWndPos>& lst) const;
+	QPoint getNextCloserstAvailableForWndSlot_butFrom_list___helper(const CLVideoWindowItem* wnd, QList<CLIdealWndPos>& lst) const;
 
 	// how many slots window occupies 
-	int slotsW(CLVideoWindow* wnd) const;
-	int slotsH(CLVideoWindow* wnd) const;
+	int slotsW(CLVideoWindowItem* wnd) const;
+	int slotsH(CLVideoWindowItem* wnd) const;
 	
 
 
 
-	CLVideoWindow* getVeryLeftWnd() const;
-	CLVideoWindow* getVeryRightWnd() const;
-	CLVideoWindow* getVeryTopWnd() const;
-	CLVideoWindow* getVeryBottomWnd() const;
+	CLVideoWindowItem* getVeryLeftWnd() const;
+	CLVideoWindowItem* getVeryRightWnd() const;
+	CLVideoWindowItem* getVeryTopWnd() const;
+	CLVideoWindowItem* getVeryBottomWnd() const;
 
 	QPoint getMassCenter() const;
 
@@ -117,7 +117,7 @@ private:
 
 private:
 
-	QSet<CLVideoWindow*> m_wnds;
+	QSet<CLVideoWindowItem*> m_wnds;
 	int m_height;
 	int m_width;
 	qreal m_item_distance;

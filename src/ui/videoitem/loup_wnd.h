@@ -1,10 +1,9 @@
 #ifndef loupe_wnd_h_1841
 #define loupe_wnd_h_1841
 
-#include "videodisplay\video_window.h"
+#include "video_wnd_item.h"
 
-
-class LoupeWnd : public CLVideoWindow
+class LoupeWnd : public CLVideoWindowItem
 {
 public:
 	LoupeWnd(int width, int height); // width and height in viewport coordinate system
