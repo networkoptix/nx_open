@@ -3,10 +3,13 @@
 #include <QPainter>
 #include <QPaintEngine>
 #include <QTextStream>
+#include <math.h>
+
+static const double Pi = 3.14159265358979323846264338327950288419717;
+static double TwoPi = 2.0 * Pi;
 
 
 
-QFont Info_Font("times", 110);
 
 
 CLImageItem::CLImageItem(GraphicsView* view, int max_width, int max_height,
@@ -20,9 +23,11 @@ m_aspectratio((qreal)m_imageWidth/m_imageHeight),
 m_showinfotext(false),
 m_showimagesize(false),
 m_showing_text(false),
-m_timeStarted(false)
+m_timeStarted(false),
+m_draw_rotation_helper(false),
+m_Info_Font("times", 110)
 {
-
+	m_Info_Font.setWeight(QFont::Bold);
 }
 
 int CLImageItem::height() const
@@ -118,6 +123,10 @@ void CLImageItem::drawStuff(QPainter* painter)
 		}
 	}
 
+	if (m_draw_rotation_helper)
+		drawRotationHelper(painter);
+
+
 	drawShadow(painter);
 
 
@@ -125,7 +134,7 @@ void CLImageItem::drawStuff(QPainter* painter)
 
 void CLImageItem::drawInfoText(QPainter* painter)
 {
-	painter->setFont(Info_Font);
+	painter->setFont(m_Info_Font);
 	//painter->setPen(QColor(255,0,0,220));
 	painter->setPen(QColor(30,55,255));
 
@@ -145,5 +154,83 @@ void CLImageItem::drawInfoText(QPainter* painter)
 
 	painter->drawText(2,20 + fm.height()/2, text);
 	//painter->drawText(2,20 + 100, text);
+
+}
+
+void CLImageItem::drawRotationHelper(bool val)
+{
+	m_draw_rotation_helper = val;
+}
+
+void CLImageItem::setRotationPoint(QPointF point1, QPointF point2)
+{
+	m_rotation_center = point1;
+	m_rotation_hand = point2;
+}
+
+void CLImageItem::drawRotationHelper(QPainter* painter)
+{
+	static QColor color1(255, 0, 0, 250);
+	static QColor color2(255, 0, 0, 100);
+
+	static const int r = 30;
+	static const int penWidth = 6;
+	static const int p_line_len = 220;
+	static const int arrowSize = 30;
+
+
+
+	QRadialGradient gradient(m_rotation_center, r);
+	gradient.setColorAt(0, color1);
+	gradient.setColorAt(1, color2);
+
+	painter->save();
+
+	painter->setPen(QPen(color2, 0, Qt::SolidLine));
+
+
+
+	painter->setBrush(gradient);
+	painter->drawEllipse(m_rotation_center, r, r);
+
+	painter->setPen(QPen(color2, penWidth, Qt::SolidLine));
+	painter->drawLine(m_rotation_center,m_rotation_hand);
+
+	// building new line
+	QLineF line(m_rotation_hand, m_rotation_center);
+	QLineF line_p = line.unitVector().normalVector();
+	line_p.setLength(p_line_len/2);
+
+	line_p = QLineF(line_p.p2(),line_p.p1());
+	line_p.setLength(p_line_len);
+
+
+
+	painter->drawLine(line_p);
+
+
+
+
+	double angle = ::acos(line_p.dx() / line_p.length());
+	if (line_p.dy() >= 0)
+		angle = TwoPi - angle;
+
+	qreal s = 2.5;
+
+	QPointF sourceArrowP1 = line_p.p1() + QPointF(sin(angle + Pi / s) * arrowSize,
+		cos(angle + Pi / s) * arrowSize);
+	QPointF sourceArrowP2 = line_p.p1() + QPointF(sin(angle + Pi - Pi / s) * arrowSize,
+		cos(angle + Pi - Pi / s) * arrowSize);   
+	QPointF destArrowP1 = line_p.p2() + QPointF(sin(angle - Pi / s) * arrowSize,
+		cos(angle - Pi / s) * arrowSize);
+	QPointF destArrowP2 = line_p.p2() + QPointF(sin(angle - Pi + Pi / s) * arrowSize,
+		cos(angle - Pi + Pi / s) * arrowSize);
+
+	painter->setBrush(color2);
+	painter->drawPolygon(QPolygonF() << line_p.p1() << sourceArrowP1 << sourceArrowP2);
+	painter->drawPolygon(QPolygonF() << line_p.p2() << destArrowP1 << destArrowP2);        
+
+	painter->restore();
+	/**/
 
 }

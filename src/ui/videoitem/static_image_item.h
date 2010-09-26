@@ -17,6 +17,7 @@ protected:
 	QPixmap m_img2;
 
 	bool m_img2_loaded;
+	bool m_img1_loaded;
 
 };
 

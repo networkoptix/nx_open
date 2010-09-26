@@ -5,12 +5,17 @@
 CLStaticImageItem::CLStaticImageItem(GraphicsView* view, int max_width, int max_height,
 				   QString img1filename, QString img2filename,
 				   QString name, QObject* handler):
-CLImageItem(view, max_width,max_height,name,handler)
+CLImageItem(view, max_width,max_height,name,handler),
+m_img1_loaded(false),
+m_img2_loaded(false)
 {
+
+
 	if (img1filename!="")
 	{
 		if (m_img1.load(img1filename))
 		{
+				m_img1_loaded = true;
 				m_imageWidth_old = m_imageWidth = m_img1.width();
 				m_imageHeight_old = m_imageHeight = m_img1.height();
 
@@ -20,7 +25,7 @@ CLImageItem(view, max_width,max_height,name,handler)
 	}
 
 	if (img2filename!="")
-		m_img1.load(img2filename);
+		m_img2_loaded = m_img2.load(img2filename);
 
 
 }
@@ -30,8 +35,8 @@ void CLStaticImageItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
 
 	if (m_img2_loaded && m_mouse_over)
 		painter->drawPixmap(boundingRect(), m_img2, m_img2.rect());
-	else
-		painter->drawPixmap(boundingRect(), m_img1, m_img1.rect());
+	else 
+		if (m_img1_loaded)	painter->drawPixmap(boundingRect(), m_img1, m_img1.rect());
 
 	drawStuff(painter);
 }

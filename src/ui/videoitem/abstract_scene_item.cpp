@@ -22,6 +22,14 @@ m_fullscreen(false),
 m_arranged(true),
 m_mouse_over(false)
 {
+	setAcceptsHoverEvents(true);
+
+	setZValue(1.0);
+
+	setFlag(QGraphicsItem::ItemIsFocusable);
+
+	setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);
+
 	if (handler)
 		connect(this, SIGNAL(onPressed(QString)), handler, SLOT(onItemPressed(QString)));
 }
@@ -199,7 +207,10 @@ void CLAbstractSceneItem::drawShadow(QPainter* painter)
 	painter->fillRect(rect1, shadow_color);
 	painter->fillRect(rect2, shadow_color);
 
-	const int fr_w = 20;
-	painter->setPen(QPen(QColor(150,150,150,200),  fr_w, Qt::SolidLine));
-	painter->drawRect(-fr_w/2,-fr_w/2,width()+fr_w,height()+fr_w);
+	if (getType()==IMAGE)
+	{
+		const int fr_w = 20;
+		painter->setPen(QPen(QColor(150,150,150,200),  fr_w, Qt::SolidLine));
+		painter->drawRect(-fr_w/2,-fr_w/2,width()+fr_w,height()+fr_w);
+	}
 }

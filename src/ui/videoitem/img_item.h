@@ -4,6 +4,7 @@
 #include "abstract_scene_item.h"
 #include <QMutex>
 #include <QTime>
+#include <QFont>
 
 class CLImageItem : public CLAbstractSceneItem
 {
@@ -25,6 +26,9 @@ public:
 	void setShowInfoText(bool show);
 	void setShowImagesize(bool show);
 
+	//====rotation=======
+	void drawRotationHelper(bool val);
+	void setRotationPoint(QPointF point1, QPointF point2);
 
 
 
@@ -34,6 +38,8 @@ signals:
 protected:
 	virtual void drawStuff(QPainter* painter);
 	virtual void drawInfoText(QPainter* painter);
+
+	void drawRotationHelper(QPainter* painter);
 
 	virtual bool wantText() const;
 
@@ -60,6 +66,13 @@ protected:
 	
 	int m_max_width, m_max_height;
 	QString m_infoText;
+
+	//rotation
+	bool m_draw_rotation_helper;
+	QPointF m_rotation_center;
+	QPointF m_rotation_hand;
+
+	QFont m_Info_Font;
 
 
 };
