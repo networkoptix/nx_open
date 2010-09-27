@@ -21,7 +21,7 @@ m_videonum(layout->numberOfChannels()),
 m_cam(0)
 {
 
-	m_type = IMAGE;
+	m_type = VIDEO;
 	m_arranged = false;
 	
 	memset(m_stat, 0 , sizeof(m_stat));
@@ -98,7 +98,7 @@ void CLVideoWindowItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
 	CLImageItem::hoverLeaveEvent(event);
 
-	if (m_view->getSelectedWnd()!=this)
+	if (m_view->getSelectedItem()!=this)
 	{
 		setShowImagesize(false);
 		showFPS(false);

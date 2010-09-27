@@ -121,23 +121,23 @@ void CLSceneMovement::valueChanged ( qreal dpos )
 
 
 	//=======================================
-	if (m_limited && m_view->getSelectedWnd())
+	if (m_limited && m_view->getSelectedItem())
 	{
-		CLVideoWindowItem* wnd = m_view->getSelectedWnd();
+		CLAbstractSceneItem* item = m_view->getSelectedItem();
 
-		QPointF wnd_center = wnd->mapToScene(wnd->boundingRect().center());
+		QPointF wnd_center = item->mapToScene(item->boundingRect().center());
 		QPointF final_dest = m_startpoint + m_delta;
 		QPointF curr = m_view->mapToScene(m_view->viewport()->rect().center());
 
 		if (QLineF(final_dest, wnd_center).length() > QLineF(curr, wnd_center).length()   ) 
 		{
-			// if difference between final point and wnd center is more than curr and wnd center => moving out of wnd center
+			// if difference between final point and item center is more than curr and item center => moving out of item center
 			int dx = curr.x() - wnd_center.x();
 			int dy = curr.y() - wnd_center.y();
 
 			qreal percent = 0.05;
 
-			QRectF wnd_rect =  wnd->sceneBoundingRect();
+			QRectF wnd_rect =  item->sceneBoundingRect();
 			QRectF viewport_rec = m_view->mapToScene(m_view->viewport()->rect()).boundingRect();
 
 
@@ -170,11 +170,11 @@ void CLSceneMovement::valueChanged ( qreal dpos )
 
 
 	}
-	else if (m_view->getSelectedWnd())
+	else if (m_view->getSelectedItem())
 	{
-		CLVideoWindowItem* wnd = m_view->getSelectedWnd();
+		CLAbstractSceneItem* item = m_view->getSelectedItem();
 
-		QPointF selected_center = wnd->mapToScene(wnd->boundingRect().center());
+		QPointF selected_center = item->mapToScene(item->boundingRect().center());
 		QPointF dest = m_startpoint + m_delta;
 		
 
@@ -187,7 +187,7 @@ void CLSceneMovement::valueChanged ( qreal dpos )
 		diff = selected_center - result;
 
 
-		if ( abs(diff.x()) > wnd->boundingRect().width()*1.2 || abs(diff.y()) > wnd->boundingRect().height()*1.2)
+		if ( abs(diff.x()) > item->boundingRect().width()*1.2 || abs(diff.y()) > item->boundingRect().height()*1.2)
 			m_view->setZeroSelection();
 	}
 

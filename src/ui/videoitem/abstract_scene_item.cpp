@@ -1,5 +1,12 @@
 #include "abstract_scene_item.h"
 #include "ui\graphicsview.h"
+#include "video_wnd_item.h"
+
+#include <math.h>
+
+static const double Pi = 3.14159265358979323846264338327950288419717;
+static double TwoPi = 2.0 * Pi;
+
 
 
 extern int item_select_duration;
@@ -20,7 +27,8 @@ mName(name),
 m_selected(false),
 m_fullscreen(false),
 m_arranged(true),
-m_mouse_over(false)
+m_mouse_over(false),
+m_draw_rotation_helper(false)
 {
 	setAcceptsHoverEvents(true);
 
@@ -37,6 +45,14 @@ m_mouse_over(false)
 CLAbstractSceneItem::~CLAbstractSceneItem()
 {
 
+}
+
+CLVideoWindowItem* CLAbstractSceneItem::toVideoItem() const
+{
+	if (m_type!=VIDEO)
+		return 0;
+
+	return static_cast<CLVideoWindowItem*>(   const_cast<CLAbstractSceneItem*>(this)  );
 }
 
 CLAbstractSceneItem::CLSceneItemType CLAbstractSceneItem::getType() const
@@ -179,7 +195,7 @@ void CLAbstractSceneItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 
 	m_mouse_over = false;
 
-	//if (m_view->getSelectedWnd()!=this) //todo
+	if (m_view->getSelectedItem()!=this) 
 	{
 		if (m_z != 0)
 		{
@@ -203,10 +219,88 @@ void CLAbstractSceneItem::drawShadow(QPainter* painter)
 	painter->fillRect(rect1, shadow_color);
 	painter->fillRect(rect2, shadow_color);
 
-	if (getType()==IMAGE)
+	if (getType()==IMAGE || getType()==VIDEO)
 	{
 		const int fr_w = 20;
 		painter->setPen(QPen(QColor(150,150,150,200),  fr_w, Qt::SolidLine));
 		painter->drawRect(-fr_w/2,-fr_w/2,width()+fr_w,height()+fr_w);
 	}
+}
+
+void CLAbstractSceneItem::drawRotationHelper(bool val)
+{
+	m_draw_rotation_helper = val;
+}
+
+void CLAbstractSceneItem::setRotationPoint(QPointF point1, QPointF point2)
+{
+	m_rotation_center = point1;
+	m_rotation_hand = point2;
+}
+
+void CLAbstractSceneItem::drawRotationHelper(QPainter* painter)
+{
+	static QColor color1(255, 0, 0, 250);
+	static QColor color2(255, 0, 0, 100);
+
+	static const int r = 30;
+	static const int penWidth = 6;
+	static const int p_line_len = 220;
+	static const int arrowSize = 30;
+
+
+
+	QRadialGradient gradient(m_rotation_center, r);
+	gradient.setColorAt(0, color1);
+	gradient.setColorAt(1, color2);
+
+	painter->save();
+
+	painter->setPen(QPen(color2, 0, Qt::SolidLine));
+
+
+
+	painter->setBrush(gradient);
+	painter->drawEllipse(m_rotation_center, r, r);
+
+	painter->setPen(QPen(color2, penWidth, Qt::SolidLine));
+	painter->drawLine(m_rotation_center,m_rotation_hand);
+
+	// building new line
+	QLineF line(m_rotation_hand, m_rotation_center);
+	QLineF line_p = line.unitVector().normalVector();
+	line_p.setLength(p_line_len/2);
+
+	line_p = QLineF(line_p.p2(),line_p.p1());
+	line_p.setLength(p_line_len);
+
+
+
+	painter->drawLine(line_p);
+
+
+
+
+	double angle = ::acos(line_p.dx() / line_p.length());
+	if (line_p.dy() >= 0)
+		angle = TwoPi - angle;
+
+	qreal s = 2.5;
+
+	QPointF sourceArrowP1 = line_p.p1() + QPointF(sin(angle + Pi / s) * arrowSize,
+		cos(angle + Pi / s) * arrowSize);
+	QPointF sourceArrowP2 = line_p.p1() + QPointF(sin(angle + Pi - Pi / s) * arrowSize,
+		cos(angle + Pi - Pi / s) * arrowSize);   
+	QPointF destArrowP1 = line_p.p2() + QPointF(sin(angle - Pi / s) * arrowSize,
+		cos(angle - Pi / s) * arrowSize);
+	QPointF destArrowP2 = line_p.p2() + QPointF(sin(angle - Pi + Pi / s) * arrowSize,
+		cos(angle - Pi + Pi / s) * arrowSize);
+
+	painter->setBrush(color2);
+	painter->drawPolygon(QPolygonF() << line_p.p1() << sourceArrowP1 << sourceArrowP2);
+	painter->drawPolygon(QPolygonF() << line_p.p2() << destArrowP1 << destArrowP2);        
+
+	painter->restore();
+	/**/
+
 }

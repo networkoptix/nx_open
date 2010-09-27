@@ -80,7 +80,7 @@ void CLSceneZoom::valueChanged( qreal dpos )
 	bool zooming_out = m_targetzoom < getZoom();
 
 
-	if (m_view->getSelectedWnd() &&  zooming_out  && getZoom()<0.260) // if zooming out only
+	if (m_view->getSelectedItem() &&  zooming_out  && getZoom()<0.260) // if zooming out only
 		m_view->setZeroSelection();
 
 	if (zooming_out)

@@ -26,11 +26,6 @@ public:
 	void setShowInfoText(bool show);
 	void setShowImagesize(bool show);
 
-	//====rotation=======
-	void drawRotationHelper(bool val);
-	void setRotationPoint(QPointF point1, QPointF point2);
-
-
 
 signals:
 	void onAspectRatioChanged(CLImageItem* item);
@@ -39,7 +34,7 @@ protected:
 	virtual void drawStuff(QPainter* painter);
 	virtual void drawInfoText(QPainter* painter);
 
-	void drawRotationHelper(QPainter* painter);
+	
 
 	virtual bool wantText() const;
 
@@ -67,10 +62,6 @@ protected:
 
 	QString m_infoText;
 
-	//rotation
-	bool m_draw_rotation_helper;
-	QPointF m_rotation_center;
-	QPointF m_rotation_hand;
 
 	QFont m_Info_Font;
 

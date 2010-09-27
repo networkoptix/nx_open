@@ -8,6 +8,7 @@
 #include "./animation/animated_show.h"
 
 
+class CLAbstractSceneItem;
 class CLVideoWindowItem;
 class SceneLayout;
 class MainWnd;
@@ -28,7 +29,7 @@ public:
 
 	void setCamLayOut(SceneLayout *);
 
-	CLVideoWindowItem* getSelectedWnd() const;
+	CLAbstractSceneItem* getSelectedItem() const;
 
 	void setZeroSelection(); 
 
@@ -53,22 +54,20 @@ protected:
 	
 	void resizeEvent ( QResizeEvent * event );
 
-	void OnMenuButton(void* owner, QString text);
-
 	//=========================
-	void onNewItemSelected_helper(CLVideoWindowItem* new_wnd, int delay);
-	void toggleFullScreen_helper(CLVideoWindowItem* new_wnd);
+	void onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int delay);
+	void toggleFullScreen_helper(CLAbstractSceneItem* new_wnd);
 
-	void onItemFullScreen_helper(CLVideoWindowItem* wnd);
+	void onItemFullScreen_helper(CLAbstractSceneItem* wnd);
 	
 	void onArrange_helper();
 	void onCircle_helper(bool show=false);
 
 	void show_device_settings_helper(CLDevice* dev);
 	
-	CLVideoWindowItem* getLastSelectedWnd();
+	CLAbstractSceneItem* getLastSelectedItem();
 	void mouseSpeed_helper(qreal& mouse_speed,  int& dx, int&dy, int min_spped, int speed_factor);
-	bool isWndStillExists(const CLVideoWindowItem* wnd) const;
+	bool isItemStillExists(const CLAbstractSceneItem* wnd) const;
 
 
 	
@@ -106,10 +105,10 @@ protected:
 
 
 
-	CLVideoWindowItem* m_selectedWnd;
-	CLVideoWindowItem* m_last_selectedWnd;
-	CLVideoWindowItem* m_rotatingWnd;
-	CLVideoWindowItem* m_movingWnd;
+	CLAbstractSceneItem* m_selectedWnd;
+	CLAbstractSceneItem* m_last_selectedWnd;
+	CLAbstractSceneItem* m_rotatingWnd;
+	CLAbstractSceneItem* m_movingWnd;
 
 	QRect m_realSceneRect;
 	SceneLayout* m_camLayout;

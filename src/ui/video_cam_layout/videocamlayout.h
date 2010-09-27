@@ -2,10 +2,11 @@
 #define video_wnd_layout_h1750
 
 #include <QList>
-#include <QSet>
 #include <QRect>
+#include <QObject>
 
 
+class CLAbstractSceneItem;
 class CLVideoWindowItem;
 class CLVideoCamera;
 class CLDeviceVideoLayout;
@@ -14,13 +15,13 @@ class QGraphicsScene;
 
 struct CLIdealWndPos
 {
-	CLVideoWindowItem* wnd;
+	CLVideoWindowItem* item;
 	QPoint pos;
 };
 
 
 // class provides just helper tool to navigate layouts 
-// takes in account that one cam can have few wnd
+// takes in account that one cam can have few items
 class SceneLayout : public QObject
 {
 	Q_OBJECT
@@ -31,7 +32,7 @@ public:
 	void setItemDistance(qreal distance);
 	qreal getItemDistance() const;
 
-	// means that at least one wnd can be added 
+	// means that at least one item can be added 
 	bool isSpaceAvalable() const;
 
 	QSize getMaxWndSize(const CLDeviceVideoLayout* layout) const;
@@ -54,28 +55,27 @@ public:
 	bool addWnd(CLVideoWindowItem* wnd,  int z_order = 0, bool update_scene_rect = true);
 
 		
-	// remove wnd from lay out
-	void removeWnd(CLVideoWindowItem* wnd, bool update_scene_rect = true);
+	// remove item from lay out
+	void removeWnd(CLAbstractSceneItem* wnd, bool update_scene_rect = true);
 
 	void updateSceneRect();
 
 
-	QSet<CLVideoWindowItem*> getWndList() const;
+	QList<CLAbstractSceneItem*> getItemList() const;
 
 
-	bool hasSuchWnd(const CLVideoWindowItem*) const;
-	bool hasSuchCam(const CLVideoCamera*) const;
+	bool hasSuchItem(const CLAbstractSceneItem* item) const;
 
 
 	// return wnd on the center of the lay out;
 	// returns 0 if there is no wnd at all
-	CLVideoWindowItem*  getCenterWnd() const;
+	CLAbstractSceneItem*  getCenterWnd() const;
 
 
-	CLVideoWindowItem* getNextLeftWnd(const CLVideoWindowItem* curr) const;
-	CLVideoWindowItem* getNextRightWnd(const CLVideoWindowItem* curr) const;
-	CLVideoWindowItem* getNextTopWnd(const CLVideoWindowItem* curr) const;
-	CLVideoWindowItem* getNextBottomWnd(const CLVideoWindowItem* curr) const;
+	CLAbstractSceneItem* getNextLeftWnd(const CLAbstractSceneItem* curr) const;
+	CLAbstractSceneItem* getNextRightWnd(const CLAbstractSceneItem* curr) const;
+	CLAbstractSceneItem* getNextTopWnd(const CLAbstractSceneItem* curr) const;
+	CLAbstractSceneItem* getNextBottomWnd(const CLAbstractSceneItem* curr) const;
 	
 
 	QList<CLIdealWndPos> calcArrangedPos() const;
@@ -86,8 +86,8 @@ private:
 
 	
 
-	int next_wnd_helper_get_quarter(const QPointF& current, const QPointF& other) const;
-	CLVideoWindowItem* next_wnd_helper(const CLVideoWindowItem* curr, int dir_c, int dir_f) const;
+	int next_item_helper_get_quarter(const QPointF& current, const QPointF& other) const;
+	CLAbstractSceneItem* next_item_helper(const CLAbstractSceneItem* curr, int dir_c, int dir_f) const;
 
 	QPoint getNextCloserstAvailableForWndSlot_butFrom_list___helper(const CLVideoWindowItem* wnd, QList<CLIdealWndPos>& lst) const;
 
@@ -98,10 +98,10 @@ private:
 
 
 
-	CLVideoWindowItem* getVeryLeftWnd() const;
-	CLVideoWindowItem* getVeryRightWnd() const;
-	CLVideoWindowItem* getVeryTopWnd() const;
-	CLVideoWindowItem* getVeryBottomWnd() const;
+	CLAbstractSceneItem* getVeryLeftWnd() const;
+	CLAbstractSceneItem* getVeryRightWnd() const;
+	CLAbstractSceneItem* getVeryTopWnd() const;
+	CLAbstractSceneItem* getVeryBottomWnd() const;
 
 	QPoint getMassCenter() const;
 
@@ -117,7 +117,7 @@ private:
 
 private:
 
-	QSet<CLVideoWindowItem*> m_wnds;
+	QList<CLAbstractSceneItem*> m_items;
 	int m_height;
 	int m_width;
 	qreal m_item_distance;

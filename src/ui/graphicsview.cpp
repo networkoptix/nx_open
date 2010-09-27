@@ -7,7 +7,6 @@
 #include "./video_cam_layout/videocamlayout.h"
 #include "../base/rand.h"
 #include "camera/camera.h"
-#include <QSet>
 #include <QContextMenuEvent>
 #include <QCoreApplication>
 #include "mainwnd.h"
@@ -94,7 +93,7 @@ QRect GraphicsView::getRealSceneRect() const
 	return m_realSceneRect;
 }
 
-CLVideoWindowItem* GraphicsView::getSelectedWnd() const
+CLAbstractSceneItem* GraphicsView::getSelectedItem() const
 {
 	return m_selectedWnd;
 }
@@ -106,12 +105,18 @@ qreal GraphicsView::getZoom() const
 
 void GraphicsView::setZeroSelection()
 {
-	if (m_selectedWnd && m_camLayout->hasSuchWnd(m_selectedWnd))
+	if (m_selectedWnd && m_camLayout->hasSuchItem(m_selectedWnd))
 	{
 		m_selectedWnd->setSelected(false);
-		m_selectedWnd->showFPS(false);
-		m_selectedWnd->setShowImagesize(false);
-		m_selectedWnd->setShowInfoText(false);
+
+		CLVideoWindowItem* videoItem = 0;
+		if (videoItem = m_selectedWnd->toVideoItem())
+		{
+			videoItem->showFPS(false);
+			videoItem->setShowImagesize(false);
+			videoItem->setShowInfoText(false);
+		}
+	
 		
 	}
 
@@ -123,14 +128,18 @@ void GraphicsView::setAllItemsQuality(CLStreamreader::StreamQuality q, bool incr
 {
 	cl_log.log("new quality", q, cl_logDEBUG1);
 	
-	QSet<CLVideoWindowItem*> wndlst = m_camLayout->getWndList();
+	QList<CLAbstractSceneItem*> wndlst = m_camLayout->getItemList();
 
 	
-	foreach (CLVideoWindowItem* wnd, wndlst)
+	foreach (CLAbstractSceneItem* item, wndlst)
 	{
-		CLVideoCamera* cam = wnd->getVideoCam();
+		CLVideoWindowItem* videoItem = 0;
+		if (!(videoItem=item->toVideoItem()))
+			continue;
 
-		if (increase || m_selectedWnd!=wnd) // can not decrease quality on selected wnd
+		CLVideoCamera* cam = videoItem->getVideoCam();
+
+		if (increase || m_selectedWnd!=item) // can not decrease quality on selected wnd
 			cam->setQuality(q, increase);
 	}
 	
@@ -147,7 +156,6 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
 
 void GraphicsView::zoomDefault(int duration)
 {
-	
 	m_scenezoom.zoom_default(duration);
 }
 
@@ -182,7 +190,7 @@ void GraphicsView::onShowTimer()
 		
 		if (mShow.counrer>5*60)
 		{
-			QSet<CLVideoWindowItem*> wndlst = m_camLayout->getWndList();
+			QList<CLAbstractSceneItem*> wndlst = m_camLayout->getItemList();
 			qreal total = wndlst.size();
 			if (total<2)
 			{
@@ -200,15 +208,13 @@ void GraphicsView::onShowTimer()
 	else // show time
 	{
 		mShow.value++;
-		QSet<CLVideoWindowItem*> wndlst = m_camLayout->getWndList();
+		QList<CLAbstractSceneItem*> wndlst = m_camLayout->getItemList();
 		qreal total = wndlst.size();
 
 		int i = 0;
 
-		foreach (CLVideoWindowItem* wnd, wndlst)
+		foreach (CLAbstractSceneItem* item, wndlst)
 		{
-			CLVideoWindowItem* item = static_cast<CLVideoWindowItem*>(wnd);
-
 			QPointF pos ( mShow.center.x() + cos((i / total) * 6.28 + mShow.value/100.0) * mShow.radius , mShow.center.y() + sin((i / total) * 6.28 + mShow.value/100.0) * mShow.radius ) ;
 
 			item->setPos(pos);
@@ -280,9 +286,9 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 	QGraphicsItem *item = itemAt(event->pos());
 
 
-	CLVideoWindowItem* wnd = static_cast<CLVideoWindowItem*>(item);
+	CLAbstractSceneItem* wnd = static_cast<CLAbstractSceneItem*>(item);
 
-	if (!isWndStillExists(wnd))
+	if (!isItemStillExists(wnd))
 		wnd = 0;
 
 	if (wnd)
@@ -290,7 +296,8 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 
 	if (wnd && event->button() == Qt::LeftButton && mDeviceDlg && mDeviceDlg->isVisible())
 	{
-			show_device_settings_helper(wnd->getVideoCam()->getDevice());
+		if (wnd->toVideoItem())
+			show_device_settings_helper(wnd->toVideoItem()->getVideoCam()->getDevice());
 	}
 
 
@@ -353,7 +360,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 	//item movement 
 	if (m_movingWnd && left_button)
 	{
-		if (isWndStillExists(m_movingWnd))
+		if (isItemStillExists(m_movingWnd))
 		{
 			QPointF delta = mapToScene(event->pos()) - mapToScene(m_mousestate.getLastEventPoint());
 			//QPointF wnd_pos = m_movingWnd->scenePos(); <---- this does not work coz item zoom ;case1
@@ -369,7 +376,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 	if (m_rotatingWnd && right_button)
 	{
 
-		if (isWndStillExists(m_rotatingWnd))
+		if (isItemStillExists(m_rotatingWnd))
 		{
 
 			/*
@@ -430,8 +437,8 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 	QGraphicsItem *item = itemAt(event->pos());
 
 
-	CLVideoWindowItem* wnd = static_cast<CLVideoWindowItem*>(item);
-	if (!isWndStillExists(wnd))
+	CLAbstractSceneItem* wnd = static_cast<CLAbstractSceneItem*>(item);
+	if (!isItemStillExists(wnd))
 		wnd = 0;
 
 
@@ -502,7 +509,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 		
 		m_ignore_conext_menu_event = true;
 
-		if (isWndStillExists(m_rotatingWnd))
+		if (isItemStillExists(m_rotatingWnd))
 		{
 
 			m_rotatingWnd->drawRotationHelper(false);
@@ -775,7 +782,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 	}
 	else // video item menu?
 	{
-		if (!m_camLayout->hasSuchWnd(wnd))
+		if (!m_camLayout->hasSuchItem(wnd))
 			return;
 
 		if (act==&cm_fullscren)
@@ -796,8 +803,8 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
 void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
 {
-	CLVideoWindowItem*item = static_cast<CLVideoWindowItem*>(itemAt(e->pos()));
-	if(!isWndStillExists(item))
+	CLAbstractSceneItem*item = static_cast<CLAbstractSceneItem*>(itemAt(e->pos()));
+	if(!isItemStillExists(item))
 		item = 0;
 
 	if (!item) // clicked on void space 
@@ -863,19 +870,10 @@ void GraphicsView::keyReleaseEvent( QKeyEvent * e )
 
 }
 
-void GraphicsView::OnMenuButton(void* owner, QString text)
-{
-
-
-
-	
-	
-}
-
 void GraphicsView::keyPressEvent( QKeyEvent * e )
 {
 
-	CLVideoWindowItem* last_sel_wnd = getLastSelectedWnd();
+	CLAbstractSceneItem* last_sel_item = getLastSelectedItem();
 	
 
 
@@ -899,45 +897,44 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 	}
 
 	// ===========new item selection 
-	if (e->nativeModifiers() && last_sel_wnd)
+	if (e->nativeModifiers() && last_sel_item)
 	{
 		
-		CLVideoWindowItem* next_wnd = 0;
+		CLAbstractSceneItem* next_item = 0;
 
 		switch (e->key()) 
 		{
 		case Qt::Key_Left:
-			next_wnd = m_camLayout->getNextLeftWnd(last_sel_wnd);
+			next_item = m_camLayout->getNextLeftWnd(last_sel_item);
 			break;
 		case Qt::Key_Right:
-			next_wnd = m_camLayout->getNextRightWnd(last_sel_wnd);
+			next_item = m_camLayout->getNextRightWnd(last_sel_item);
 			break;
 		case Qt::Key_Up:
-			next_wnd = m_camLayout->getNextTopWnd(last_sel_wnd);
+			next_item = m_camLayout->getNextTopWnd(last_sel_item);
 			break;
 		case Qt::Key_Down:
-			next_wnd = m_camLayout->getNextBottomWnd(last_sel_wnd);
+			next_item = m_camLayout->getNextBottomWnd(last_sel_item);
 			break;
 
 		}
 
-		if (next_wnd)
+		if (next_item)
 		{
-			onNewItemSelected_helper(static_cast<CLVideoWindowItem*>(next_wnd), 0);
+			onNewItemSelected_helper(next_item, 0);
 		}
 
 	}
 
 	// ===========full screen
-	if (last_sel_wnd)
+	if (last_sel_item)
 	{
-		CLVideoCamera* cam = last_sel_wnd->getVideoCam();
 
 		switch (e->key()) 
 		{
 			case Qt::Key_Enter:
 			case Qt::Key_Return:
-				toggleFullScreen_helper(last_sel_wnd);
+				toggleFullScreen_helper(last_sel_item);
 				break;
 		}
 	}
@@ -1066,22 +1063,18 @@ void GraphicsView::resizeEvent( QResizeEvent * event )
 
 }
 
-CLVideoWindowItem* GraphicsView::getLastSelectedWnd() 
+CLAbstractSceneItem* GraphicsView::getLastSelectedItem() 
 {
 	if (m_last_selectedWnd)
 	{
-		if (isWndStillExists(m_last_selectedWnd))
+		if (isItemStillExists(m_last_selectedWnd))
 			return m_last_selectedWnd;
 
 		m_last_selectedWnd = 0;
 	}
 		
 	
-	CLVideoWindowItem* wnd = m_camLayout->getCenterWnd();
-	if (!wnd)
-		return 0;
-
-	return static_cast<CLVideoWindowItem*>(wnd);
+	return m_camLayout->getCenterWnd();
 	
 }
 
@@ -1094,16 +1087,16 @@ void GraphicsView::reAdjustSceneRect()
 }
 
 //=====================================================
-bool GraphicsView::isWndStillExists(const CLVideoWindowItem* wnd) const
+bool GraphicsView::isItemStillExists(const CLAbstractSceneItem* wnd) const
 {
-	if ( m_camLayout->hasSuchWnd(wnd) )// if still exists ( in layout)
+	if ( m_camLayout->hasSuchItem(wnd) )// if still exists ( in layout)
 		return true;
 
 	return false;
 }
 
 
-void GraphicsView::toggleFullScreen_helper(CLVideoWindowItem* wnd)
+void GraphicsView::toggleFullScreen_helper(CLAbstractSceneItem* wnd)
 {
 	if (!wnd->isFullScreen() || m_scenezoom.getZoom() > m_fullScreenZoom + 1e-8) // if item is not in full screen mode or if it's in FS and zoomed more
 		onItemFullScreen_helper(wnd);
@@ -1118,7 +1111,7 @@ void GraphicsView::toggleFullScreen_helper(CLVideoWindowItem* wnd)
 }
 
 
-void GraphicsView::onNewItemSelected_helper(CLVideoWindowItem* new_wnd, int delay)
+void GraphicsView::onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int delay)
 {
 	
 	setZeroSelection();
@@ -1132,19 +1125,20 @@ void GraphicsView::onNewItemSelected_helper(CLVideoWindowItem* new_wnd, int dela
 	m_selectedWnd->setSelected(true, true, delay);
 
 	
-	if (global_show_item_text)
+	if (global_show_item_text && m_selectedWnd->toVideoItem())
 	{
-		CLDevice* dev = m_selectedWnd->getVideoCam()->getDevice();
+		
+		CLDevice* dev = m_selectedWnd->toVideoItem()->getVideoCam()->getDevice();
 
 		if (!dev->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT))
 		{
-			m_selectedWnd->setShowImagesize(true);
+			m_selectedWnd->toVideoItem()->setShowImagesize(true);
 		}
 
 		if (!dev->checkDeviceTypeFlag(CLDevice::ARCHIVE) && !dev->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT))
 		{
-			m_selectedWnd->showFPS(true);
-			m_selectedWnd->setShowInfoText(true);
+			m_selectedWnd->toVideoItem()->showFPS(true);
+			m_selectedWnd->toVideoItem()->setShowInfoText(true);
 		}
 
 	}
@@ -1161,7 +1155,7 @@ void GraphicsView::onNewItemSelected_helper(CLVideoWindowItem* new_wnd, int dela
 
 void GraphicsView::onCircle_helper(bool show)
 {
-	QSet<CLVideoWindowItem*> wndlst = m_camLayout->getWndList();
+	QList<CLAbstractSceneItem*> wndlst = m_camLayout->getItemList();
 	if (wndlst.empty())
 		return;
 
@@ -1182,10 +1176,8 @@ void GraphicsView::onCircle_helper(bool show)
 
 	int i = 0;
 
-	foreach (CLVideoWindowItem* wnd, wndlst)
+	foreach (CLAbstractSceneItem* item, wndlst)
 	{
-		CLVideoWindowItem* item = static_cast<CLVideoWindowItem*>(wnd);
-
 		QPropertyAnimation *anim = new QPropertyAnimation(item, "rotation");
 
 		anim->setStartValue(item->getRotation());
@@ -1229,7 +1221,7 @@ void GraphicsView::onCircle_helper(bool show)
 void GraphicsView::onArrange_helper()
 {
 
-	QSet<CLVideoWindowItem*> wndlst = m_camLayout->getWndList();
+	QList<CLAbstractSceneItem*> wndlst = m_camLayout->getItemList();
 	if (wndlst.empty())
 		return;
 
@@ -1237,9 +1229,8 @@ void GraphicsView::onArrange_helper()
 	
 
 
-	foreach (CLVideoWindowItem* wnd, wndlst)
+	foreach (CLAbstractSceneItem* item, wndlst)
 	{
-		CLVideoWindowItem* item = static_cast<CLVideoWindowItem*>(wnd);
 		
 		QPropertyAnimation *anim1 = new QPropertyAnimation(item, "rotation");
 
@@ -1259,7 +1250,7 @@ void GraphicsView::onArrange_helper()
 	QList<CLIdealWndPos> newPosLst = m_camLayout->calcArrangedPos();
 	for (int i = 0; i < newPosLst.count();++i)
 	{
-		CLVideoWindowItem* item = static_cast<CLVideoWindowItem*>(newPosLst.at(i).wnd);
+		CLVideoWindowItem* item = static_cast<CLVideoWindowItem*>(newPosLst.at(i).item);
 
 		QPropertyAnimation *anim2 = new QPropertyAnimation(item, "pos");
 	
@@ -1287,7 +1278,7 @@ void GraphicsView::onArrange_helper()
 
 void GraphicsView::onFitInView_helper(int duration )
 {
-	if (m_selectedWnd && isWndStillExists(m_selectedWnd) && m_selectedWnd->isFullScreen())
+	if (m_selectedWnd && isItemStillExists(m_selectedWnd) && m_selectedWnd->isFullScreen())
 	{
 		m_selectedWnd->setFullScreen(false);
 		m_selectedWnd->zoom_abs(1.0, 0);
@@ -1330,7 +1321,7 @@ void GraphicsView::onFitInView_helper(int duration )
 
 }
 
-void GraphicsView::onItemFullScreen_helper(CLVideoWindowItem* wnd)
+void GraphicsView::onItemFullScreen_helper(CLAbstractSceneItem* wnd)
 {
 
 	//wnd->zoom_abs(selected_item_zoom, true);

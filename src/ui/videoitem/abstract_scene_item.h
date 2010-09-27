@@ -7,6 +7,7 @@
 
 
 class GraphicsView;
+class CLVideoWindowItem;
 
 class CLAbstractSceneItem : public QObject, public QGraphicsItem
 {
@@ -14,12 +15,14 @@ class CLAbstractSceneItem : public QObject, public QGraphicsItem
 	Q_PROPERTY(QPointF pos READ pos WRITE setPos)
 public:
 
-	enum CLSceneItemType {IMAGE, BUTTON};
+	enum CLSceneItemType {VIDEO, IMAGE, BUTTON};
 
 	CLAbstractSceneItem(GraphicsView* view, int max_width, int max_height,
 						QString name="", QObject* handler=0);
 
 	virtual ~CLAbstractSceneItem();
+
+	CLVideoWindowItem* toVideoItem() const;
 
 	CLSceneItemType getType() const;
 	void setType(CLSceneItemType t);
@@ -51,6 +54,11 @@ public:
 	void setArranged(bool arr);
 	bool isArranged() const;
 
+	//====rotation=======
+	void drawRotationHelper(bool val);
+	void setRotationPoint(QPointF point1, QPointF point2);
+
+
 signals:
 	void onPressed(QString);
 	
@@ -58,6 +66,8 @@ signals:
 
 protected:
 	void drawShadow(QPainter* painter);
+
+	void drawRotationHelper(QPainter* painter);
 
 	virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
 	virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
@@ -78,6 +88,12 @@ protected:
 
 	CLSceneItemType m_type;
 	QString mName;
+
+	//rotation
+	bool m_draw_rotation_helper;
+	QPointF m_rotation_center;
+	QPointF m_rotation_hand;
+
 
 };
 

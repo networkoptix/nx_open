@@ -41,9 +41,14 @@ void SceneLayout::setItemDistance(qreal distance)
 {
 	m_item_distance = distance;
 
-	foreach (CLVideoWindowItem* wnd, m_wnds)
+	foreach (CLAbstractSceneItem* item, m_items)
 	{
-		wnd->setMaxSize(getMaxWndSize (wnd->getVideoCam()->getDevice()->getVideoLayout())  );
+		CLVideoWindowItem* videoItem;
+		if (videoItem = item->toVideoItem())
+		{
+			videoItem->setMaxSize(getMaxWndSize (videoItem->getVideoCam()->getDevice()->getVideoLayout()));
+		}
+		
 	}
 
 }
@@ -77,7 +82,7 @@ int SceneLayout::slotsH(CLVideoWindowItem* wnd) const
 
 QRect SceneLayout::getSmallLayoutRect() const // scene rect 
 {
-	CLVideoWindowItem* wnd =  getVeryLeftWnd();
+	CLAbstractSceneItem* wnd =  getVeryLeftWnd();
 
 	if (!wnd) // nos single video on this lay out
 		return QRect(SCENE_LEFT, SCENE_TOP, 1, 1 );
@@ -145,7 +150,7 @@ bool SceneLayout::getNextAvailablePos(const CLDeviceVideoLayout* layout, int &x,
 
 bool SceneLayout::isSpaceAvalable() const
 {
-	return (m_wnds.size()<m_max_items);
+	return (m_items.size()<m_max_items);
 }
 
 bool SceneLayout::addWnd(CLVideoWindowItem* wnd, int x, int y, int z_order, bool update_scene_rect)
@@ -157,7 +162,7 @@ bool SceneLayout::addWnd(CLVideoWindowItem* wnd, int x, int y, int z_order, bool
 	if (!wnd)
 		return false;
 
-	m_wnds.insert(wnd);
+	m_items.push_back(wnd);
 
 	m_scene->addItem(wnd);
 	wnd->setPos(x, y);
@@ -184,14 +189,14 @@ bool SceneLayout::addWnd(CLVideoWindowItem* wnd,  int z_order, bool update_scene
 }
 
 
-// remove wnd from lay out
-void SceneLayout::removeWnd(CLVideoWindowItem* wnd, bool update_scene_rect )
+// remove item from lay out
+void SceneLayout::removeWnd(CLAbstractSceneItem* item, bool update_scene_rect )
 {
-	if (!wnd)
+	if (!item)
 		return;
 
-	m_wnds.remove(wnd);
-	m_scene->removeItem(wnd);
+	m_items.removeOne(item);
+	m_scene->removeItem(item);
 
 	if (update_scene_rect)
 		updateSceneRect();
@@ -207,41 +212,32 @@ void SceneLayout::updateSceneRect()
 
 }
 
-QSet<CLVideoWindowItem*> SceneLayout::getWndList() const
+QList<CLAbstractSceneItem*> SceneLayout::getItemList() const
 {
-	return m_wnds;
+	return m_items;
 }
 
 
 
-bool SceneLayout::hasSuchWnd(const CLVideoWindowItem* wnd) const
+bool SceneLayout::hasSuchItem(const CLAbstractSceneItem* item) const
 {
-	CLVideoWindowItem* wnd_t = const_cast<CLVideoWindowItem*>(wnd);
-	return m_wnds.contains(wnd_t);
-}
-
-bool SceneLayout::hasSuchCam(const CLVideoCamera* cam) const
-{
-	const CLVideoWindowItem* wnd = cam->getVideoWindow();
-	CLVideoWindowItem* wnd_t = const_cast<CLVideoWindowItem*>(wnd);
-
-	return m_wnds.contains(wnd_t);
+	return m_items.contains(const_cast<CLAbstractSceneItem*>(item));
 }
 
 
 // return wnd on the center of the lay out;
 // returns 0 if there is no wnd at all
-CLVideoWindowItem*  SceneLayout::getCenterWnd() const
+CLAbstractSceneItem*  SceneLayout::getCenterWnd() const
 {
 	QPoint mass_cnt = getMassCenter();
 
 	unsigned int min_distance = 0xffffffff;
 
-	CLVideoWindowItem* result = 0;
+	CLAbstractSceneItem* result = 0;
 
-	foreach (CLVideoWindowItem* wnd, m_wnds)
+	foreach (CLAbstractSceneItem* item, m_items)
 	{
-		QPointF p = wnd->mapToScene(wnd->boundingRect().center());
+		QPointF p = item->mapToScene(item->boundingRect().center());
 		int dx = mass_cnt.x() - p.x();
 		int dy = mass_cnt.y() - p.y();
 		
@@ -250,7 +246,7 @@ CLVideoWindowItem*  SceneLayout::getCenterWnd() const
 		if (d < min_distance)
 		{
 			min_distance = d;
-			result = wnd;
+			result = item;
 		}
 
 	}
@@ -259,7 +255,7 @@ CLVideoWindowItem*  SceneLayout::getCenterWnd() const
 }
 
 //===============================================================
-int SceneLayout::next_wnd_helper_get_quarter(const QPointF& current, const QPointF& other) const
+int SceneLayout::next_item_helper_get_quarter(const QPointF& current, const QPointF& other) const
 {
 
 	/*
@@ -324,13 +320,13 @@ int SceneLayout::next_wnd_helper_get_quarter(const QPointF& current, const QPoin
 	return -1;
 }
 
-CLVideoWindowItem* SceneLayout::next_wnd_helper(const CLVideoWindowItem* curr, int dir_c, int dir_f) const
+CLAbstractSceneItem* SceneLayout::next_item_helper(const CLAbstractSceneItem* curr, int dir_c, int dir_f) const
 {
 	if (!curr)
 		return 0;
 
-	if (m_wnds.size()==1)
-		return const_cast<CLVideoWindowItem*>(curr);
+	if (m_items.size()==1)
+		return const_cast<CLAbstractSceneItem*>(curr);
 
 
 	QPointF cP = curr->mapToScene(curr->boundingRect().center());
@@ -339,13 +335,13 @@ CLVideoWindowItem* SceneLayout::next_wnd_helper(const CLVideoWindowItem* curr, i
 	int dx, dy;
 	qreal min_distance = 1e+20, max_distance = 0, distance;
 
-	CLVideoWindowItem* result = 0;
+	CLAbstractSceneItem* result = 0;
 
-	foreach (CLVideoWindowItem* wnd, m_wnds)
+	foreach (CLAbstractSceneItem* item, m_items)
 	{
-		QPointF p = wnd->mapToScene(wnd->boundingRect().center());
+		QPointF p = item->mapToScene(item->boundingRect().center());
 
-		if (next_wnd_helper_get_quarter(cP, p)!=dir_c)
+		if (next_item_helper_get_quarter(cP, p)!=dir_c)
 			continue;
 
 
@@ -357,7 +353,7 @@ CLVideoWindowItem* SceneLayout::next_wnd_helper(const CLVideoWindowItem* curr, i
 		if (distance < min_distance)
 		{
 			min_distance = distance;
-			result = wnd;
+			result = item;
 		}
 	}
 
@@ -366,11 +362,11 @@ CLVideoWindowItem* SceneLayout::next_wnd_helper(const CLVideoWindowItem* curr, i
 
 	// need to find very right wnd
 
-	foreach (CLVideoWindowItem* wnd, m_wnds)
+	foreach (CLAbstractSceneItem* item, m_items)
 	{
-		QPointF p = wnd->mapToScene(wnd->boundingRect().center());
+		QPointF p = item->mapToScene(item->boundingRect().center());
 
-		if (next_wnd_helper_get_quarter(cP, p)!=dir_f)
+		if (next_item_helper_get_quarter(cP, p)!=dir_f)
 			continue;
 
 		dx = cP.x() - p.x();
@@ -381,14 +377,14 @@ CLVideoWindowItem* SceneLayout::next_wnd_helper(const CLVideoWindowItem* curr, i
 		if (distance > max_distance)
 		{
 			max_distance = distance;
-			result = wnd;
+			result = item;
 		}
 	}
 
 	if (result)
 		return result;
 
-	return const_cast<CLVideoWindowItem*>(curr);
+	return const_cast<CLAbstractSceneItem*>(curr);
 
 }
 
@@ -398,24 +394,24 @@ void SceneLayout::onAspectRatioChanged(CLVideoWindowItem* wnd)
 		adjustWnd(wnd);
 }
 
-CLVideoWindowItem* SceneLayout::getNextLeftWnd(const CLVideoWindowItem* curr) const
+CLAbstractSceneItem* SceneLayout::getNextLeftWnd(const CLAbstractSceneItem* curr) const
 {
-	return next_wnd_helper(curr, 3, 1);
+	return next_item_helper(curr, 3, 1);
 }
 
-CLVideoWindowItem* SceneLayout::getNextRightWnd(const CLVideoWindowItem* curr) const
+CLAbstractSceneItem* SceneLayout::getNextRightWnd(const CLAbstractSceneItem* curr) const
 {
-	return next_wnd_helper(curr, 1, 3);
+	return next_item_helper(curr, 1, 3);
 }
 
-CLVideoWindowItem* SceneLayout::getNextTopWnd(const CLVideoWindowItem* curr) const
+CLAbstractSceneItem* SceneLayout::getNextTopWnd(const CLAbstractSceneItem* curr) const
 {
-	return next_wnd_helper(curr, 0, 2);
+	return next_item_helper(curr, 0, 2);
 }
 
-CLVideoWindowItem* SceneLayout::getNextBottomWnd(const CLVideoWindowItem* curr) const
+CLAbstractSceneItem* SceneLayout::getNextBottomWnd(const CLAbstractSceneItem* curr) const
 {
-	return next_wnd_helper(curr, 2, 0);
+	return next_item_helper(curr, 2, 0);
 }
 
 //===============================================================
@@ -423,9 +419,9 @@ CLVideoWindowItem* SceneLayout::getNextBottomWnd(const CLVideoWindowItem* curr) 
 QPoint SceneLayout::getNextCloserstAvailableForWndSlot_butFrom_list___helper(const CLVideoWindowItem* wnd, QList<CLIdealWndPos>& lst) const
 {
 
-	// this function search for next available nearest slot for this wnd
+	// this function search for next available nearest slot for this item
 	// if slot already in lst; we ignore such slot 
-	//QPointF pf = wnd->mapToScene(wnd->boundingRect().topLeft());
+	//QPointF pf = item->mapToScene(item->boundingRect().topLeft());
 
 	//int center_slot = slotFromPos(QPoint(pf.x(), pf.y()));
 	int center_slot_x = 0;//center_slot%m_width;
@@ -447,8 +443,8 @@ QPoint SceneLayout::getNextCloserstAvailableForWndSlot_butFrom_list___helper(con
 			CLIdealWndPos pos = lst.at(it);
 			int lst_slot = slotFromPos(pos.pos);
 
-			int sl_w = slotsW(pos.wnd);
-			int sl_h = slotsH(pos.wnd);
+			int sl_w = slotsW(pos.item);
+			int sl_h = slotsH(pos.item);
 
 
 			for (int x = 0; x < sl_w; ++x)
@@ -480,20 +476,26 @@ QList<CLIdealWndPos> SceneLayout::calcArrangedPos() const
 {
 	QList<CLIdealWndPos> result;
 
-	foreach (CLVideoWindowItem* wnd, m_wnds)
+	foreach (CLAbstractSceneItem* item, m_items)
 	{
+
+		CLVideoWindowItem* videoItem = 0;
+		if (!(videoItem = item->toVideoItem()))
+			continue;
+
+
 		CLIdealWndPos pos;
-		pos.wnd = wnd;
+		pos.item = videoItem;
 
 
-		pos.pos = getNextCloserstAvailableForWndSlot_butFrom_list___helper(wnd, result);
+		pos.pos = getNextCloserstAvailableForWndSlot_butFrom_list___helper(videoItem, result);
 
 		int slot1 = slotFromPos(pos.pos);
 
-		int width = wnd->width();
-		int height = wnd->height();
+		int width = videoItem->width();
+		int height = videoItem->height();
 
-		QSize max_size = getMaxWndSize(wnd->getVideoLayout());
+		QSize max_size = getMaxWndSize(videoItem->getVideoLayout());
 
 		pos.pos.rx() += (max_size.width() - width)/2;
 		pos.pos.ry() += (max_size.height() - height)/2;
@@ -504,7 +506,7 @@ QList<CLIdealWndPos> SceneLayout::calcArrangedPos() const
 			slot1 = slot1;
 		
 		slot2 = slotFromPos(pos.pos);
-		width = wnd->width();
+		width = videoItem->width();
 
 
 		result.push_back(pos);
@@ -546,38 +548,38 @@ void SceneLayout::adjustWnd(CLVideoWindowItem* wnd) const
 }
 
 //===============================================================
-CLVideoWindowItem* SceneLayout::getVeryLeftWnd() const
+CLAbstractSceneItem* SceneLayout::getVeryLeftWnd() const
 {
-	CLVideoWindowItem* result = 0;
+	CLAbstractSceneItem* result = 0;
 
 	unsigned int min_val = 0xffffffff; // very big value
 
-	foreach (CLVideoWindowItem* wnd, m_wnds)
+	foreach (CLAbstractSceneItem* item, m_items)
 	{
-		QPointF p = wnd->mapToScene(wnd->boundingRect().topLeft());
+		QPointF p = item->mapToScene(item->boundingRect().topLeft());
 		if (p.x() < min_val)
 		{
 			min_val = p.x();
-			result = wnd;
+			result = item;
 		}
 	}
 
 	return result;
 }
 
-CLVideoWindowItem* SceneLayout::getVeryTopWnd() const
+CLAbstractSceneItem* SceneLayout::getVeryTopWnd() const
 {
-	CLVideoWindowItem* result = 0;
+	CLAbstractSceneItem* result = 0;
 
 	unsigned int min_val = 0xffffffff; // very big value
 
-	foreach (CLVideoWindowItem* wnd, m_wnds)
+	foreach (CLAbstractSceneItem* item, m_items)
 	{
-		QPointF p = wnd->mapToScene(wnd->boundingRect().topLeft());
+		QPointF p = item->mapToScene(item->boundingRect().topLeft());
 		if (p.y() < min_val)
 		{
 			min_val = p.y();
-			result = wnd;
+			result = item;
 		}
 	}
 
@@ -586,38 +588,38 @@ CLVideoWindowItem* SceneLayout::getVeryTopWnd() const
 
 
 
-CLVideoWindowItem* SceneLayout::getVeryRightWnd() const
+CLAbstractSceneItem* SceneLayout::getVeryRightWnd() const
 {
-	CLVideoWindowItem* result = 0;
+	CLAbstractSceneItem* result = 0;
 
 	unsigned int max_val = 0;
 
-	foreach (CLVideoWindowItem* wnd, m_wnds)
+	foreach (CLAbstractSceneItem* item, m_items)
 	{
-		QPointF p = wnd->mapToScene(wnd->boundingRect().bottomRight());
+		QPointF p = item->mapToScene(item->boundingRect().bottomRight());
 		if (p.x() >= max_val)
 		{
 			max_val = p.x();
-			result = wnd;
+			result = item;
 		}
 	}
 
 	return result;
 }
 
-CLVideoWindowItem* SceneLayout::getVeryBottomWnd() const
+CLAbstractSceneItem* SceneLayout::getVeryBottomWnd() const
 {
-	CLVideoWindowItem* result = 0;
+	CLAbstractSceneItem* result = 0;
 
 	unsigned int max_val = 0;
 
-	foreach (CLVideoWindowItem* wnd, m_wnds)
+	foreach (CLAbstractSceneItem* item, m_items)
 	{
-		QPointF p  = wnd->mapToScene(wnd->boundingRect().bottomRight());
+		QPointF p  = item->mapToScene(item->boundingRect().bottomRight());
 		if (p.y() >= max_val)
 		{
 			max_val = p.y();
-			result = wnd;
+			result = item;
 		}
 	}
 
@@ -627,18 +629,18 @@ CLVideoWindowItem* SceneLayout::getVeryBottomWnd() const
 
 QPoint SceneLayout::getMassCenter() const
 {
-	if (m_wnds.size()==0)
+	if (m_items.size()==0)
 		return QPoint(SCENE_LEFT, SCENE_TOP);
 
 	QPointF result(0.0,0.0);
 
-	foreach (CLVideoWindowItem* wnd, m_wnds)
+	foreach (CLAbstractSceneItem* item, m_items)
 	{
-		QPointF p  = wnd->mapToScene(wnd->boundingRect().center());
+		QPointF p  = item->mapToScene(item->boundingRect().center());
 		result+=p;
 	}
 
-	return QPoint(result.x()/m_wnds.size(), result.y()/m_wnds.size());
+	return QPoint(result.x()/m_items.size(), result.y()/m_items.size());
 
 
 }
@@ -667,9 +669,9 @@ bool SceneLayout::isSlotAvailable(int slot, QSize size) const
 	QPoint slPos = posFromSlot(slot);
 	QRectF new_wnd_rect(slPos, size);
 
-	foreach (CLVideoWindowItem* wnd, m_wnds)
+	foreach (CLAbstractSceneItem* item, m_items)
 	{
-		QRectF wnd_rect = wnd->mapToScene(wnd->boundingRect()).boundingRect();
+		QRectF wnd_rect = item->mapToScene(item->boundingRect()).boundingRect();
 
 		if (new_wnd_rect.intersects(wnd_rect))
 			return false;		
