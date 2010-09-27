@@ -21,12 +21,12 @@ struct CLIdealWndPos
 
 // class provides just helper tool to navigate layouts 
 // takes in account that one cam can have few wnd
-class VideoCamerasLayout : public QObject
+class SceneLayout : public QObject
 {
 	Q_OBJECT
 public:
-	VideoCamerasLayout(GraphicsView* view, QGraphicsScene* scene, unsigned int max_rows, int item_distance); // item distance is preferable distance between windows in % of wnd size
-	~VideoCamerasLayout();
+	SceneLayout(GraphicsView* view, QGraphicsScene* scene, unsigned int max_rows, int item_distance); // item distance is preferable distance between windows in % of wnd size
+	~SceneLayout();
 
 	void setItemDistance(qreal distance);
 	qreal getItemDistance() const;

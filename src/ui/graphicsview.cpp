@@ -79,7 +79,7 @@ void GraphicsView::closeAllDlg()
 	}
 }
 
-void GraphicsView::setCamLayOut(VideoCamerasLayout* lo)
+void GraphicsView::setCamLayOut(SceneLayout* lo)
 {
 	m_camLayout = lo;
 }

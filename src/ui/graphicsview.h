@@ -9,7 +9,7 @@
 
 
 class CLVideoWindowItem;
-class VideoCamerasLayout;
+class SceneLayout;
 class MainWnd;
 class QGraphicsPixmapItem;
 class CLAnimatedBackGround;
@@ -26,7 +26,7 @@ public:
 	void setRealSceneRect(QRect rect);
 	QRect getRealSceneRect() const;
 
-	void setCamLayOut(VideoCamerasLayout *);
+	void setCamLayOut(SceneLayout *);
 
 	CLVideoWindowItem* getSelectedWnd() const;
 
@@ -112,7 +112,7 @@ protected:
 	CLVideoWindowItem* m_movingWnd;
 
 	QRect m_realSceneRect;
-	VideoCamerasLayout* m_camLayout;
+	SceneLayout* m_camLayout;
 
 
 	bool m_ignore_release_event, m_ignore_conext_menu_event;

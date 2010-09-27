@@ -8,7 +8,6 @@
 #include "device/device.h"
 #include "ui/graphicsview.h"
 
-#define SHADOW_SIZE 100
 
 CLVideoWindowItem::CLVideoWindowItem(GraphicsView* view, const CLDeviceVideoLayout* layout, int max_width, int max_height,
 									 QString name, QObject* handler):

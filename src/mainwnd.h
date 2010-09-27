@@ -52,7 +52,7 @@ private:
 	CLVideoWindowsList m_videoWindows;
 	CLVideoCamsList m_cams;
 
-	VideoCamerasLayout m_camlayout;
+	SceneLayout m_camlayout;
 
 	int m_scene_right;
 	int m_scene_bottom;
