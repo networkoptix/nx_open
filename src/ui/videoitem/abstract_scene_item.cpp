@@ -153,7 +153,7 @@ void CLAbstractSceneItem::setArranged(bool arr)
 
 bool CLAbstractSceneItem::isArranged() const
 {
-	return m_selected;
+	return m_arranged;
 }
 
 

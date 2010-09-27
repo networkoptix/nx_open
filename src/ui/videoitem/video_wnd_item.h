@@ -62,6 +62,10 @@ public:
 
 	virtual void setSelected(bool sel, bool animate = true, int delay = 0);
 
+signals:
+	void onAspectRatioChanged(CLVideoWindowItem* item);
+
+
 protected:
 
 	

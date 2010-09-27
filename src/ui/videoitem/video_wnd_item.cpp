@@ -23,6 +23,7 @@ m_cam(0)
 {
 
 	m_type = IMAGE;
+	m_arranged = false;
 	
 	memset(m_stat, 0 , sizeof(m_stat));
 	//we never cache the video
@@ -188,10 +189,11 @@ void CLVideoWindowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
 	for (int i = 0; i  < m_videonum; ++i)	m_gldraw[i]->paintEvent(getSubChannelRect(i));
 
 	// restore the GL state that QPainter expects
+	drawStuff(painter);
 	restoreGLState();
 	
 	painter->endNativePainting();
-	drawStuff(painter);
+	
 
 
 	/**/
