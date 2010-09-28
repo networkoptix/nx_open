@@ -13,6 +13,7 @@ class CLAbstractSceneItem : public QObject, public QGraphicsItem
 {
 	Q_OBJECT
 	Q_PROPERTY(QPointF pos READ pos WRITE setPos)
+	Q_PROPERTY(qreal rotation	READ getRotation WRITE setRotation)
 public:
 
 	enum CLSceneItemType {VIDEO, IMAGE, BUTTON};
