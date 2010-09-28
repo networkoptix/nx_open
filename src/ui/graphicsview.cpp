@@ -652,7 +652,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 		return;
 	}
 
-	CLVideoWindowItem * wnd = static_cast<CLVideoWindowItem*>(itemAt(event->pos()));
+	CLAbstractSceneItem* wnd = static_cast<CLAbstractSceneItem*>(itemAt(event->pos()));
 
 	QAction cm_exit("Exit",0);
 	QAction cm_fitinview("Fit in View",0);
@@ -791,7 +791,8 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 		}
 		else if (act==&cm_settings)
 		{
-			show_device_settings_helper(wnd->getVideoCam()->getDevice());
+			if (wnd->toVideoItem())
+				show_device_settings_helper(wnd->toVideoItem()->getVideoCam()->getDevice());
 		}
 
 	}
@@ -1250,7 +1251,7 @@ void GraphicsView::onArrange_helper()
 	QList<CLIdealWndPos> newPosLst = m_camLayout->calcArrangedPos();
 	for (int i = 0; i < newPosLst.count();++i)
 	{
-		CLVideoWindowItem* item = static_cast<CLVideoWindowItem*>(newPosLst.at(i).item);
+		CLAbstractSceneItem* item = static_cast<CLAbstractSceneItem*>(newPosLst.at(i).item);
 
 		QPropertyAnimation *anim2 = new QPropertyAnimation(item, "pos");
 	
