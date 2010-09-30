@@ -891,10 +891,16 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 			global_show_item_text=!global_show_item_text;
 			break;
 
+		case Qt::Key_Q:
+			m_yRotate += 1;
+			global_rotation_angel+=(0.01)/10;
+			updateTransform(0.01);
+			break;
 		
 
 		case Qt::Key_W:
 			m_yRotate -= 1;
+			global_rotation_angel+=(-0.01)/10;
 			updateTransform(-0.01);
 			break;
 

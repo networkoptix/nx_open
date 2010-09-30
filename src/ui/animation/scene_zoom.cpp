@@ -3,6 +3,7 @@
 #include <math.h>
 #include "../../base/log.h"
 #include "../graphicsview.h"
+#include "settings.h"
 
 
 static const qreal min_zoom = 0.07;
@@ -78,6 +79,7 @@ void CLSceneZoom::valueChanged( qreal dpos )
 
 	QTransform tr;
 	tr.scale(scl, scl);
+	tr.rotate(global_rotation_angel, Qt::YAxis);
 	m_view->setTransform(tr);
 
 

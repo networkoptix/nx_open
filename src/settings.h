@@ -3,6 +3,7 @@
 
 #include <QFont>
 
+extern qreal global_rotation_angel;
 extern bool global_show_item_text;
 extern QFont settings_font;
 
