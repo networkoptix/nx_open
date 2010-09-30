@@ -70,6 +70,11 @@ HEADERS += ui/device_settings/plugins/arecontvision/arecont_dlg.h
 SOURCES += device/device_managmen/device_manager.cpp
 HEADERS += device/device_managmen/device_manager.h
 
+
+SOURCES += ui/video_cam_layout/layout_manager.cpp ui/video_cam_layout/layout_content.cpp  ui/video_cam_layout/start_screen_content.cpp
+HEADERS += ui/video_cam_layout/layout_manager.h ui/video_cam_layout/layout_content.h  ui/video_cam_layout/start_screen_content.h
+
+
 RESOURCES += mainwnd.qrc
 FORMS += mainwnd.ui
 #LIBS += ../contrib/ffmpeg/libs

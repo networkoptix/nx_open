@@ -20,6 +20,7 @@ m_firstTime(true)
 
 CLDeviceManager::~CLDeviceManager()
 {
+	m_timer.stop();
 	m_dev_searcher.wait();
 
 	{

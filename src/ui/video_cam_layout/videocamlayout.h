@@ -5,6 +5,7 @@
 #include <QRect>
 #include <QObject>
 #include <QTimer>
+#include "layout_content.h"
 
 
 class CLAbstractSceneItem;
@@ -26,8 +27,18 @@ class SceneLayout : public QObject
 {
 	Q_OBJECT
 public:
-	SceneLayout(GraphicsView* view, QGraphicsScene* scene, unsigned int max_rows, int item_distance); // item distance is preferable distance between windows in % of wnd size
+	SceneLayout(); // item distance is preferable distance between windows in % of wnd size
 	~SceneLayout();
+
+	//================================================
+	void setView(GraphicsView* view);
+	void setScene(QGraphicsScene* scene);
+	void setEventHandler(QObject* eventhandler);
+	void setName(const QString& name);
+	QString getName() const;
+	void setContent(const LayoutContent& cont);
+
+	//================================================
 
 	//start should be called only after Layout putted on the scene, but before first item is added
 	// lunches timer
@@ -96,6 +107,10 @@ public:
 
 	QList<CLIdealWndPos> calcArrangedPos() const;
 
+	//========================================================
+	void loadContent();
+	void saveContent();
+	//========================================================
 protected slots:
 	void onAspectRatioChanged(CLAbstractSceneItem* wnd);
 	void onTimer();
@@ -152,8 +167,11 @@ private:
 	int *m_potantial_y;
 	int m_total_potential_elemnts;
 
+
 	GraphicsView* m_view;
 	QGraphicsScene* m_scene;
+	QObject* m_EventHandler;
+	QString m_Name;
 
 	QTimer m_videotimer;
 	QTimer m_timer;
@@ -161,6 +179,7 @@ private:
 
 	bool m_isRunning;
 
+	LayoutContent m_content;
 	
 
 };

@@ -11,12 +11,13 @@
 #include "device/device_managmen/device_manager.h"
 #include "video_camera.h"
 #include "base/log.h"
+#include "ui/videoitem/static_image_item.h"
 
 #define SLOT_WIDTH (640*10)
 #define SLOT_HEIGHT (SLOT_WIDTH*3/4)
 
-#define SCENE_LEFT (400*1000)
-#define SCENE_TOP (400*1000)
+int SCENE_LEFT = (400*1000);
+int SCENE_TOP  = (400*1000);
 
 
 static const int max_items = 256;
@@ -25,11 +26,11 @@ extern int scene_zoom_duration;
 
 
 
-SceneLayout::SceneLayout(GraphicsView* view, QGraphicsScene* scene, unsigned int max_rows, int item_distance):
-m_view(view),
-m_scene(scene),
-m_height(max_rows),
-m_item_distance(item_distance/100.0),
+SceneLayout::SceneLayout():
+m_view(0),
+m_scene(0),
+m_height(4),
+m_item_distance(35/100.0),
 m_max_items(max_items),
 m_slots(max_items*4),
 m_firstTime(true),
@@ -54,6 +55,11 @@ SceneLayout::~SceneLayout()
 	delete[] m_potantial_x;
 	delete[] m_potantial_y;
 
+}
+
+void SceneLayout::setContent(const LayoutContent& cont)
+{
+	m_content = cont;
 }
 
 void SceneLayout::start()
@@ -113,6 +119,11 @@ void SceneLayout::stop()
 
 void SceneLayout::onTimer()
 {
+	if (m_firstTime)
+	{
+		loadContent();
+	}
+
 	if (m_firstTime && (m_items.count()>0) )
 	{
 		m_firstTime =  false;
@@ -121,8 +132,8 @@ void SceneLayout::onTimer()
 		onFirstSceneAppearance();
 	}
 
-	CLDeviceCriteria cr; cr.mCriteria = CLDeviceCriteria::ALL;
-	CLDeviceList all_devs =  CLDeviceManager::instance().getDeviceList(cr);
+	
+	CLDeviceList all_devs =  CLDeviceManager::instance().getDeviceList(m_content.getDeviceCriteria());
 
 	foreach(CLDevice* dev, all_devs)
 	{
@@ -221,6 +232,32 @@ void SceneLayout::setItemDistance(qreal distance)
 	}
 
 }
+
+void SceneLayout::setView(GraphicsView* view)
+{
+	m_view = view;
+}
+
+void SceneLayout::setScene(QGraphicsScene* scene)
+{
+	m_scene = scene;
+}
+
+void SceneLayout::setEventHandler(QObject* eventhandler)
+{
+	m_EventHandler = eventhandler;
+}
+
+void SceneLayout::setName(const QString& name)
+{
+	m_Name = name;
+}
+
+QString SceneLayout::getName() const
+{
+	return m_Name;
+}
+
 
 qreal SceneLayout::getItemDistance() const
 {
@@ -682,6 +719,35 @@ QList<CLIdealWndPos> SceneLayout::calcArrangedPos() const
 	}
 
 	return result;
+}
+
+void SceneLayout::loadContent()
+{
+	QList<LayoutImage> img_list = m_content.getImages();
+	QList<LayoutButton> btns_list = m_content.getButtons();
+
+	foreach(LayoutImage img, img_list)
+	{
+		CLStaticImageItem* item = new CLStaticImageItem(m_view, img.width(), img.height(), img.getImage1());
+		item->setOpacity(0.2);
+		
+		addItem(item, img.getX(), img.getY());
+	}
+
+	foreach(LayoutImage img, img_list)
+	{
+		CLStaticImageItem* item = new CLStaticImageItem(m_view, img.width(), img.height(), img.getImage1());
+		item->setOpacity(0.2);
+
+		addItem(item, img.getX(), img.getY());
+	}
+
+
+}
+
+void SceneLayout::saveContent()
+{
+
 }
 
 

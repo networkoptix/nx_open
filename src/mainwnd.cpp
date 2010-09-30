@@ -22,17 +22,15 @@
 #include <QTransform>
 #include "../src/gui/kernel/qevent.h"
 #include "ui/videoitem/video_wnd_item.h"
+#include "ui/video_cam_layout/start_screen_content.h"
 
 QColor bkr_color(0,5,5,125);
 //QColor bkr_color(9/1.5,54/1.5,81/1.5);
-
-#define CL_VIDEO_ROWS 4
 
 
 
 MainWnd::MainWnd(QWidget *parent, Qt::WFlags flags):
 //QMainWindow(parent, flags),
-m_camlayout(&m_videoView, &m_scene, CL_VIDEO_ROWS, 35),
 m_videoView(this)
 {
 	//ui.setupUi(this);
@@ -122,6 +120,13 @@ m_videoView(this)
 	
 	//showFullScreen();
 
+	m_camlayout.setEventHandler(this);
+	m_camlayout.setView(&m_videoView);
+	m_camlayout.setScene(&m_scene);
+
+
+	m_camlayout.setContent(startscreen_content());
+
 	m_camlayout.start();
 }
 
@@ -129,6 +134,7 @@ m_videoView(this)
 
 MainWnd::~MainWnd()
 {
+	CLDeviceManager::instance().getDiveceSercher().wait();
 	m_camlayout.stop();
 }
 
