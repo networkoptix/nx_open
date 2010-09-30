@@ -129,7 +129,7 @@ m_videoView(this)
 
 MainWnd::~MainWnd()
 {
-
+	m_camlayout.stop();
 }
 
 void MainWnd::closeEvent ( QCloseEvent * event )

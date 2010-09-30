@@ -32,7 +32,8 @@ m_height(max_rows),
 m_item_distance(item_distance/100.0),
 m_max_items(max_items),
 m_slots(max_items*4),
-m_firstTime(true)
+m_firstTime(true),
+m_isRunning(false)
 {
 	m_width = m_slots/m_height;
 	buildPotantial();
@@ -57,13 +58,23 @@ SceneLayout::~SceneLayout()
 
 void SceneLayout::start()
 {
+	if (m_isRunning)
+		return;
+
 	m_firstTime = true;
 	m_timer.start(100);
 	m_videotimer.start(1000/MAX_FPS); 
+	m_isRunning = true;
 }
 
 void SceneLayout::stop()
 {
+
+	if (!m_isRunning)
+		return;
+
+	m_isRunning = false;
+
 	cl_log.log("SceneLayout::stop......\r\n ", cl_logDEBUG1);
 	
 	m_timer.stop();
@@ -181,6 +192,7 @@ bool SceneLayout::addDevice(CLDevice* device)
 	m_cams.push_back(cam);
 
 	cam->setQuality(CLStreamreader::CLSLow, true);
+
 	cam->startDispay();
 
 }

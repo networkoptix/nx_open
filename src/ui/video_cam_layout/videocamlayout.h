@@ -159,6 +159,8 @@ private:
 	QTimer m_timer;
 	bool m_firstTime;
 
+	bool m_isRunning;
+
 	
 
 };
