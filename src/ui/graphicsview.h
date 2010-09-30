@@ -23,6 +23,7 @@ public:
 	GraphicsView(MainWnd* mainWnd);
 	virtual ~GraphicsView();
 
+	void zoomMin(int duration);
 	void zoomDefault(int duration);
 	void setRealSceneRect(QRect rect);
 	QRect getRealSceneRect() const;

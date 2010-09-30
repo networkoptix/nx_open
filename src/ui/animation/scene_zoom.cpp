@@ -50,6 +50,11 @@ void CLSceneZoom::zoom_abs(qreal z, int duration, int delay)
 	zoom_helper(duration, delay);
 }
 
+void CLSceneZoom::zoom_minimum(int duration, int delay)
+{
+	zoom_abs(min_zoom , duration, delay);
+}
+
 void CLSceneZoom::zoom_default(int duration, int delay )
 {
 	zoom_abs(def_zoom, duration, delay);
@@ -147,10 +152,16 @@ void CLSceneZoom::zoom_helper(int duration, int delay)
 	if (m_targetzoom < min_zoom)
 		m_targetzoom = min_zoom;
 
+	if (duration==0)
+	{
+		m_zoom = m_targetzoom;
+		m_diff = 0;
+		valueChanged(1.0);
+	}
+	else
+	{
+		m_diff = m_targetzoom - m_zoom;
+		start_helper(duration, delay);
+	}
 
-	m_diff = m_targetzoom - m_zoom;
-
-	//cl_log.log("m_diff =", m_diff , cl_logDEBUG1);
-
-	start_helper(duration, delay);
 }

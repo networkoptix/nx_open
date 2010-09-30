@@ -18,6 +18,7 @@ public:
 	void zoom_delta(qreal delta, int duration, int delay = 0);
 	void zoom_abs(qreal z, int duration, int delay = 0);
 	void zoom_default(int duration, int delay = 0);
+	void zoom_minimum(int duration, int delay = 0);
 
 	qreal getZoom() const;
 

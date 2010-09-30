@@ -113,7 +113,7 @@ void SceneLayout::stop()
 
 void SceneLayout::onTimer()
 {
-	if (m_firstTime)
+	if (m_firstTime && (m_items.count()>0) )
 	{
 		m_firstTime =  false;
 		m_timer.setInterval(devices_update_interval);
@@ -169,7 +169,9 @@ void SceneLayout::onVideoTimer()
 
 void SceneLayout::onFirstSceneAppearance()
 {
-	m_view->zoomDefault(scene_zoom_duration);
+	m_view->centerOn(m_view->getRealSceneRect().center());
+	m_view->zoomMin(0);
+	m_view->zoomDefault(2000);
 }
 
 

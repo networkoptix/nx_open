@@ -155,6 +155,11 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
 	m_scenezoom.zoom_delta(numDegrees/3000.0, scene_zoom_duration);
 }
 
+void GraphicsView::zoomMin(int duration)
+{
+	m_scenezoom.zoom_minimum(duration);
+}
+
 void GraphicsView::zoomDefault(int duration)
 {
 	m_scenezoom.zoom_default(duration);
