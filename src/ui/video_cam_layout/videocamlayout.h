@@ -4,6 +4,7 @@
 #include <QList>
 #include <QRect>
 #include <QObject>
+#include <QTimer>
 
 
 class CLAbstractSceneItem;
@@ -12,6 +13,7 @@ class CLVideoCamera;
 class CLDeviceVideoLayout;
 class GraphicsView;
 class QGraphicsScene;
+class CLDevice;
 
 struct CLIdealWndPos
 {
@@ -20,14 +22,40 @@ struct CLIdealWndPos
 };
 
 
-// class provides just helper tool to navigate layouts 
-// takes in account that one cam can have few items
 class SceneLayout : public QObject
 {
 	Q_OBJECT
 public:
 	SceneLayout(GraphicsView* view, QGraphicsScene* scene, unsigned int max_rows, int item_distance); // item distance is preferable distance between windows in % of wnd size
 	~SceneLayout();
+
+	//start should be called only after Layout putted on the scene, but before first item is added
+	// lunches timer
+	void start();
+
+	// stop must be called before remove layout from the scene, but after animation I  think
+	// stops all cams, removes all Items from, the scene
+	void stop();
+
+	//================================================
+	// position of window( if any ) will be changed
+	// return false if there are no available slots
+	bool addItem(CLAbstractSceneItem* item, int x, int y, bool update_scene_rect = true);
+
+	//does same as bool addCamera(CLVideoCamera* cam, int x, int y, int z_order = 0);
+	//but function peeks up position by it self 
+	bool addItem(CLAbstractSceneItem* item,  bool update_scene_rect = true);
+
+	// remove item from lay out
+	void removeItem(CLAbstractSceneItem* item, bool update_scene_rect = true);
+
+	// creates video item for device, if needed, camera and so on...
+	bool addDevice(CLDevice* dev);
+
+	// removes device; does the opposite to addDevice
+	bool removeDevice(CLDevice* dev); 
+
+	//================================================
 
 	void setItemDistance(qreal distance);
 	qreal getItemDistance() const;
@@ -37,27 +65,15 @@ public:
 
 	QSize getMaxWndSize(const CLDeviceVideoLayout* layout) const;
 
-	void adjustWnd(CLVideoWindowItem* wnd) const;
+	void adjustItem(CLAbstractSceneItem* item) const;
 
 	QRect getLayoutRect() const; // scene rect 
 	QRect getSmallLayoutRect() const; // scene rect 
 
 	// returns next best available position; returns -1 if not found(all positions are busy);
 	// returns false if everything is busy
-	bool getNextAvailablePos(const CLDeviceVideoLayout* layout, int &x, int &y) const;
-
-	// position of window( if any ) will be changed
-	// return false if there are no available slots
-	bool addWnd(CLVideoWindowItem* wnd, int x, int y, int z_order = 0, bool update_scene_rect = true);
-
-	//does same as bool addCamera(CLVideoCamera* cam, int x, int y, int z_order = 0);
-	//but function peeks up position by it self 
-	bool addWnd(CLVideoWindowItem* wnd,  int z_order = 0, bool update_scene_rect = true);
-
-		
-	// remove item from lay out
-	void removeWnd(CLAbstractSceneItem* wnd, bool update_scene_rect = true);
-
+	bool getNextAvailablePos(QSize size, int &x, int &y) const;
+	
 	void updateSceneRect();
 
 
@@ -81,7 +97,9 @@ public:
 	QList<CLIdealWndPos> calcArrangedPos() const;
 
 protected slots:
-	void onAspectRatioChanged(CLVideoWindowItem* wnd);
+	void onAspectRatioChanged(CLAbstractSceneItem* wnd);
+	void onTimer();
+	void onVideoTimer();
 private:
 
 	
@@ -106,7 +124,7 @@ private:
 	QPoint getMassCenter() const;
 
 	bool isSlotAvailable(int slot, QSize size) const;
-	bool isSlotAvailable(int slot, const CLDeviceVideoLayout* layout) const;
+	
 
 	void buildPotantial();
 	int bPh_findNext(int *energy, int elemnts);
@@ -114,10 +132,16 @@ private:
 	int slotFromPos(QPoint p) const;
 	QPoint posFromSlot(int slot) const;
 
+	void onFirstSceneAppearance();
+
 
 private:
 
 	QList<CLAbstractSceneItem*> m_items;
+
+	QList<CLVideoCamera*> m_cams; 
+
+
 	int m_height;
 	int m_width;
 	qreal m_item_distance;
@@ -130,6 +154,12 @@ private:
 
 	GraphicsView* m_view;
 	QGraphicsScene* m_scene;
+
+	QTimer m_videotimer;
+	QTimer m_timer;
+	bool m_firstTime;
+
+	
 
 };
 

@@ -93,6 +93,7 @@ QRect GraphicsView::getRealSceneRect() const
 	return m_realSceneRect;
 }
 
+
 CLAbstractSceneItem* GraphicsView::getSelectedItem() const
 {
 	return m_selectedWnd;

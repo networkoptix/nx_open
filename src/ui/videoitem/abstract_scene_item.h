@@ -28,7 +28,9 @@ public:
 	CLSceneItemType getType() const;
 	void setType(CLSceneItemType t);
 
+	
 	void setMaxSize(QSize size);
+	QSize getMaxSize() const;
 
 	virtual QRectF boundingRect() const;
 

@@ -2,8 +2,8 @@
 #include "..\asynch_seacher.h"
 #include "..\src\corelib\thread\qmutex.h"
 #include "..\directory_browser.h"
+#include "settings.h"
 
-#define TIMER_INTERVAL (1*1000)
 
 CLDeviceManager& CLDeviceManager::instance()
 {
@@ -21,6 +21,13 @@ m_firstTime(true)
 CLDeviceManager::~CLDeviceManager()
 {
 	m_dev_searcher.wait();
+
+	{
+		QMutexLocker lock(&m_dev_searcher.all_devices_mtx);
+		CLDeviceList& list = m_dev_searcher.getAllDevices();
+		CLDevice::deleteDevices(list);
+	}
+
 }
 
 CLDiviceSeracher& CLDeviceManager::getDiveceSercher()
@@ -38,9 +45,8 @@ void CLDeviceManager::onTimer()
 		CLDirectoryBrowserDeviceServer dirbrowsr("c:/Photo");
 		onNewDevices_helper(dirbrowsr.findDevices());
 
-		m_timer.setInterval(TIMER_INTERVAL);
+		m_timer.setInterval(devices_update_interval);
 
-		QThread::currentThread()->setPriority(QThread::IdlePriority); // surprised. if gui thread has low priority => things looks smoother 
 	}
 
 
@@ -71,8 +77,8 @@ CLDeviceList CLDeviceManager::getDeviceList(CLDeviceCriteria& cr)
 		CLDeviceList& devices =  m_dev_searcher.getAllDevices();
 		foreach (CLDevice* device, devices)
 		{
-			result.insert(device->getUniqueId(),device);
 			device->addRef();
+			result.insert(device->getUniqueId(),device);
 		}
 
 		return result;

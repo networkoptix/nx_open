@@ -10,7 +10,9 @@
 class CLDeviceServer;
 
 
-
+// this class just searches for new devices
+// it uses others proxy
+// it will be moved to recorder I guess 
 class CLDiviceSeracher : public QThread
 {
 	typedef QList<CLDeviceServer*> ServerList;

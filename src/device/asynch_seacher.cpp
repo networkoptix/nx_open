@@ -84,8 +84,8 @@ CLDeviceList CLDiviceSeracher::findNewDevices(bool allow_to_change_ip, bool& ip_
 		it = devices.begin(); 
 		while (it!=devices.end())
 		{
-			const QString& mac = it.key();
-			CLDeviceList::iterator all_it = all_devices.find(mac);
+			const QString& unique = it.key();
+			CLDeviceList::iterator all_it = all_devices.find(unique);
 
 			if (all_it == all_devices.end())
 			{

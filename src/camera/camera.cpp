@@ -12,10 +12,14 @@ CLVideoCamera::CLVideoCamera(CLDevice* device, CLVideoWindowItem* videovindow):
 m_device(device),
 m_videovindow(videovindow)
 {
-
 	m_device->getBaseInfo();
 
 	cl_log.log("Creating camera for ", m_device->toString(), cl_logDEBUG1);
+
+
+	m_videovindow->setVideoCam(this);
+	m_videovindow->setInfoText(m_device->toString());
+
 
 
 	int videonum = m_device->getVideoLayout()->numberOfChannels();// how many sensors camera has

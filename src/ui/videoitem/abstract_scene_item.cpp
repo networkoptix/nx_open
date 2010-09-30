@@ -72,6 +72,11 @@ void CLAbstractSceneItem::setMaxSize(QSize size)
 	m_max_height = size.height();
 }
 
+QSize CLAbstractSceneItem::getMaxSize() const
+{
+	return QSize(m_max_width, m_max_height);
+}
+
 
 QRectF CLAbstractSceneItem::boundingRect() const
 {

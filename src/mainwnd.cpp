@@ -30,18 +30,9 @@ QColor bkr_color(0,5,5,125);
 
 
 
-
-
-extern CLDiviceSeracher dev_searcher;
-extern int scene_zoom_duration;
-
-
 MainWnd::MainWnd(QWidget *parent, Qt::WFlags flags):
 //QMainWindow(parent, flags),
-m_selectedcCam(0),
 m_camlayout(&m_videoView, &m_scene, CL_VIDEO_ROWS, 35),
-m_scene_right(0),
-m_scene_bottom(0),
 m_videoView(this)
 {
 	//ui.setupUi(this);
@@ -113,15 +104,6 @@ m_videoView(this)
 
 	//=======================================================
 
-	m_timer = new QTimer(this);
-	connect(m_timer, SIGNAL(timeout()), this, SLOT(onTimer()));
-	m_timer->start(100); // first time should come fast
-
-
-	m_videotimer = new QTimer(this);
-	connect(m_videotimer, SIGNAL(timeout()), this, SLOT(onVideoTimer()));
-	m_videotimer->start(1000/35); 
-
 
 	//QThread::currentThread()->setPriority(QThread::HighPriority); // Priority more tnan decoders have
 
@@ -139,51 +121,14 @@ m_videoView(this)
 	//m_videoView.setAlignment(Qt::AlignVCenter);
 	
 	//showFullScreen();
+
+	m_camlayout.start();
 }
 
 
 
 MainWnd::~MainWnd()
 {
-	cl_log.log("Destructor of main window in progress......\r\n ", cl_logDEBUG1);
-	
-	m_timer->stop();
-	delete m_timer;
-
-	m_videotimer->stop();
-	delete m_videotimer;
-
-	dev_searcher.wait();
-
-	for (int i = 0; i < m_videoWindows.size();++i)
-	{
-		CLVideoWindowItem* wnd = m_videoWindows.at(i);
-		wnd->before_destroy();
-	}
-
-	// firs of all lets ask all threads to stop;
-	// we do not need to do it sequentially
-	for (int i = 0; i < m_cams.size();++i)
-	{
-		CLVideoCamera* cam = m_cams.at(i);
-		cam->getStreamreader()->pleaseStop();
-		cam->getCamCamDisplay()->pleaseStop();
-	}
-
-	// after we can wait for each thread to stop
-	for (int i = 0; i < m_cams.size();++i)
-	{
-		cl_log.log("About to shut down camera ", i,"\r\n", cl_logDEBUG1);
-		CLVideoCamera* cam = m_cams.at(i);
-		cam->stopDispay();
-		delete cam;
-	}
-
-	{
-		QMutexLocker lock(&dev_searcher.all_devices_mtx);
-		CLDeviceList& list = dev_searcher.getAllDevices();
-		CLDevice::deleteDevices(list);
-	}
 
 }
 
@@ -199,144 +144,6 @@ void MainWnd::toggleFullScreen()
 		showFullScreen();
 	else
 		showMaximized();
-}
-
-
-void MainWnd::onTimer()
-{
-	static const int interval = 1000;
-	static bool first_time = true;
-
-	if (!dev_searcher.isRunning() )
-	{
-		onNewDevices_helper(dev_searcher.result());
-
-		dev_searcher.start(); // run searcher again ...
-	}
-
-	if (first_time)
-	{
-		//m_videoView.init();
-	}
-
-	if (first_time && m_scene.items().size()==0) 
-	{
-		CLDirectoryBrowserDeviceServer dirbrowsr("c:/Photo");
-		onNewDevices_helper(dirbrowsr.findDevices());
-	}
-
-	if (first_time && m_scene.items().size()) // at least something is found
-	{
-
-		// at least we once found smth => can increase interval
-		if (m_timer->interval()!=interval)
-		{
-			//m_timer->stop();
-			m_timer->setInterval(interval);
-
-		}
-
-
-		QThread::currentThread()->setPriority(QThread::IdlePriority); // Priority more tnan decoders have
-
-		dev_searcher.start();
-
-
-
-		onFirstSceneAppearance();
-
-		first_time = false;
-	}
-
-}
-
-void MainWnd::onVideoTimer()
-{
-	for (int i = 0; i < m_videoWindows.size();++i)
-	{
-		CLVideoWindowItem* wnd = m_videoWindows.at(i);
-		if (wnd->needUpdate())
-		{
-			wnd->update();
-			wnd->needUpdate(false);
-		}
-	}
-
-}
-
-
-void MainWnd::onNewDevice(CLDevice* device)
-{
-	//return;
-	if (!m_camlayout.isSpaceAvalable())
-	{
-		// max reached
-		cl_log.log("Cannot support so many devicees ", cl_logWARNING);
-		//delete device; //here+
-		device->releaseRef();
-		return;
-	}
-
-	QSize wnd_size = m_camlayout.getMaxWndSize(device->getVideoLayout());
-	
-
-	CLVideoWindowItem* video_wnd =  new CLVideoWindowItem(&m_videoView, device->getVideoLayout(), wnd_size.width() , wnd_size.height());
-	CLVideoCamera* cam = new VideoCamera(device, video_wnd);
-	video_wnd->setVideoCam(cam);
-
-	m_camlayout.addWnd(video_wnd);
-
-	video_wnd->setInfoText(cam->getDevice()->toString());
-
-
-	m_videoWindows.push_back(video_wnd);
-	m_cams.push_back(cam);
-
-	{
-		QMutexLocker lock(&dev_searcher.all_devices_mtx);
-		dev_searcher.getAllDevices().insert(device->getUniqueId(),device);
-	}
-
-
-	cam->setQuality(CLStreamreader::CLSLow, true);
-	cam->startDispay();
-}
-
-
-
-void MainWnd::onNewDevices_helper(CLDeviceList devices)
-{
-	
-	CLDeviceList::iterator it = devices.begin(); 
-
-
-	while (it!=devices.end())
-	{
-		CLDevice* device = it.value();
-
-		if (device->getStatus().checkFlag(CLDeviceStatus::ALL) == 0  ) //&&  device->getMAC()=="00-1A-07-00-12-DB")
-		{
-			device->getStatus().setFlag(CLDeviceStatus::READY);
-			onNewDevice(device);
-
-
-		}
-		else
-		{
-			//delete device; //here+
-			device->releaseRef();
-		}
-
-		++it;
-
-	}
-
-}
-
-void MainWnd::onFirstSceneAppearance()
-{
-	m_videoView.centerOn(m_videoView.getRealSceneRect().center());
-	m_videoView.zoomDefault(scene_zoom_duration);
 }
 
 

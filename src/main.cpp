@@ -12,9 +12,9 @@
 #include "ui/device_settings/dlg_factory.h"
 #include "ui/device_settings/plugins/arecontvision/arecont_dlg.h"
 #include <QMessageBox>
+#include "device/device_managmen/device_manager.h"
 
 
-CLDiviceSeracher dev_searcher;
 
 int main(int argc, char *argv[])
 {
@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 
 	CLDevice::startCommandProc();
 
-	cl_log.log(dev_searcher.getNetState().toString(), cl_logALWAYS);
+	cl_log.log(CLDeviceManager::instance().getDiveceSercher().getNetState().toString(), cl_logALWAYS);
 
 	//===========================================================================
 	//IPPH264Decoder::dll.init();
@@ -60,8 +60,8 @@ int main(int argc, char *argv[])
 	CLDecoderFactory::setCodecManufacture(CLDecoderFactory::FFMPEG);
 
 	//============================
-	dev_searcher.addDeviceServer(&AVDeviceServer::instance());
-	dev_searcher.addDeviceServer(&FakeDeviceServer::instance());
+	CLDeviceManager::instance().getDiveceSercher().addDeviceServer(&AVDeviceServer::instance());
+	CLDeviceManager::instance().getDiveceSercher().addDeviceServer(&FakeDeviceServer::instance());
 
 	CLDeviceSettingsDlgFactory::instance().registerDlgManufacture(&AreconVisionDlgManufacture::instance());
 	//============================

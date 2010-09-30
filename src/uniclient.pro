@@ -67,6 +67,9 @@ HEADERS += ui/device_settings/device_settings_dlg.h ui/device_settings/device_se
 SOURCES += ui/device_settings/plugins/arecontvision/arecont_dlg.cpp
 HEADERS += ui/device_settings/plugins/arecontvision/arecont_dlg.h
 
+SOURCES += device/device_managmen/device_manager.cpp
+HEADERS += device/device_managmen/device_manager.h
+
 RESOURCES += mainwnd.qrc
 FORMS += mainwnd.ui
 #LIBS += ../contrib/ffmpeg/libs

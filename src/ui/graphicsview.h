@@ -110,6 +110,7 @@ protected:
 	CLAbstractSceneItem* m_rotatingWnd;
 	CLAbstractSceneItem* m_movingWnd;
 
+
 	QRect m_realSceneRect;
 	SceneLayout* m_camLayout;
 

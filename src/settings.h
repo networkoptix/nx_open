@@ -6,4 +6,6 @@
 extern bool global_show_item_text;
 extern QFont settings_font;
 
+extern int devices_update_interval;
+
 #endif //global_settings_h1933

@@ -7,6 +7,10 @@
 #include "./../graphicsview.h"
 #include <QGraphicsScene>
 #include "ui/videoitem/video_wnd_item.h"
+#include "settings.h"
+#include "device/device_managmen/device_manager.h"
+#include "video_camera.h"
+#include "base/log.h"
 
 #define SLOT_WIDTH (640*10)
 #define SLOT_HEIGHT (SLOT_WIDTH*3/4)
@@ -14,7 +18,10 @@
 #define SCENE_LEFT (400*1000)
 #define SCENE_TOP (400*1000)
 
+
 static const int max_items = 256;
+#define MAX_FPS (35.0)
+extern int scene_zoom_duration;
 
 
 
@@ -24,18 +31,166 @@ m_scene(scene),
 m_height(max_rows),
 m_item_distance(item_distance/100.0),
 m_max_items(max_items),
-m_slots(max_items*4)
+m_slots(max_items*4),
+m_firstTime(true)
 {
 	m_width = m_slots/m_height;
 	buildPotantial();
+
+	connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimer()));
+
+	connect(&m_videotimer, SIGNAL(timeout()), this, SLOT(onVideoTimer()));
+	
+
+
+	
 }
 
 SceneLayout::~SceneLayout()
 {
+	stop();
+
 	delete[] m_potantial_x;
 	delete[] m_potantial_y;
 
 }
+
+void SceneLayout::start()
+{
+	m_firstTime = true;
+	m_timer.start(100);
+	m_videotimer.start(1000/MAX_FPS); 
+}
+
+void SceneLayout::stop()
+{
+	cl_log.log("SceneLayout::stop......\r\n ", cl_logDEBUG1);
+	
+	m_timer.stop();
+	m_videotimer.stop();
+
+	foreach(CLVideoCamera* cam, m_cams)
+	{
+		// firs of all lets ask all threads to stop;
+		// we do not need to do it sequentially
+		cam->getStreamreader()->pleaseStop();
+		cam->getCamCamDisplay()->pleaseStop();
+	}
+
+	foreach(CLVideoCamera* cam, m_cams)
+	{
+		cam->getVideoWindow()->before_destroy(); // without it CamDisplay may not stoped
+	}
+	
+	foreach(CLVideoCamera* cam, m_cams)
+	{
+		// after we can wait for each thread to stop
+		cl_log.log("About to shut down camera ", (int)cam ,"\r\n", cl_logDEBUG1);
+		cam->stopDispay();
+		delete cam;
+	}
+
+
+	foreach(CLAbstractSceneItem* item, m_items)
+	{
+		m_scene->removeItem(item);
+		delete item;
+	}
+
+}
+
+
+void SceneLayout::onTimer()
+{
+	if (m_firstTime)
+	{
+		m_firstTime =  false;
+		m_timer.setInterval(devices_update_interval);
+		QThread::currentThread()->setPriority(QThread::IdlePriority); // surprised. if gui thread has low priority => things looks smoother 
+		onFirstSceneAppearance();
+	}
+
+	CLDeviceCriteria cr; cr.mCriteria = CLDeviceCriteria::ALL;
+	CLDeviceList all_devs =  CLDeviceManager::instance().getDeviceList(cr);
+
+	foreach(CLDevice* dev, all_devs)
+	{
+		bool contains = false;
+
+		foreach(CLVideoCamera* cam, m_cams)
+		{
+			if (cam->getDevice()->getUniqueId() == dev->getUniqueId())
+			{
+				contains = true;
+				break;
+			}
+		}
+
+		
+		if (contains) // if such device already here we do not need it
+		{
+			dev->releaseRef();
+		}
+		else
+		{
+			// the ref counter for device already increased in getDeviceList; 
+			// must not do it again
+			if (!addDevice(dev))
+				dev->releaseRef();
+		}
+	}
+
+	//====================================
+}
+
+void SceneLayout::onVideoTimer()
+{
+	foreach(CLVideoCamera* cam, m_cams)
+	{
+		CLVideoWindowItem* wnd = cam->getVideoWindow();
+		if (wnd->needUpdate())
+		{
+			wnd->update();
+			wnd->needUpdate(false);
+		}
+	}
+}
+
+void SceneLayout::onFirstSceneAppearance()
+{
+	m_view->zoomDefault(scene_zoom_duration);
+}
+
+
+
+bool SceneLayout::addDevice(CLDevice* device)
+{
+	if (!isSpaceAvalable())
+	{
+		cl_log.log("Cannot support so many devices ", cl_logWARNING);
+		return false;
+	}
+
+	QSize wnd_size = getMaxWndSize(device->getVideoLayout());
+
+
+	CLVideoWindowItem* video_wnd =  new CLVideoWindowItem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height());
+	CLVideoCamera* cam = new VideoCamera(device, video_wnd);
+	addItem(video_wnd);
+
+	m_cams.push_back(cam);
+
+	cam->setQuality(CLStreamreader::CLSLow, true);
+	cam->startDispay();
+
+}
+
+
+bool SceneLayout::removeDevice(CLDevice* dev)
+{
+	return true;
+}
+
 
 void SceneLayout::setItemDistance(qreal distance)
 {
@@ -112,7 +267,7 @@ QRect SceneLayout::getLayoutRect() const
 	return video_rect;
 }
 
-bool SceneLayout::getNextAvailablePos(const CLDeviceVideoLayout* layout, int &x, int &y) const
+bool SceneLayout::getNextAvailablePos(QSize size, int &x, int &y) const
 {
 	// new item should always be adjusted 
 	if (!isSpaceAvalable())
@@ -135,7 +290,7 @@ bool SceneLayout::getNextAvailablePos(const CLDeviceVideoLayout* layout, int &x,
 		
 		int slot_cand = candidate_y*m_width + candidate_x;
 
-		if (isSlotAvailable(slot_cand, layout))
+		if (isSlotAvailable(slot_cand, size))
 		{
 			x = posFromSlot(slot_cand).x();
 			y = posFromSlot(slot_cand).y();
@@ -153,44 +308,44 @@ bool SceneLayout::isSpaceAvalable() const
 	return (m_items.size()<m_max_items);
 }
 
-bool SceneLayout::addWnd(CLVideoWindowItem* wnd, int x, int y, int z_order, bool update_scene_rect)
+bool SceneLayout::addItem(CLAbstractSceneItem* item, int x, int y, bool update_scene_rect)
 {
 	// new item should always be adjusted 
 	if (!isSpaceAvalable())
 		return false;
 
-	if (!wnd)
+	if (!item)
 		return false;
 
-	m_items.push_back(wnd);
+	m_items.push_back(item);
 
-	m_scene->addItem(wnd);
-	wnd->setPos(x, y);
+	m_scene->addItem(item);
+	item->setPos(x, y);
 
 	//=========
 
 	if (update_scene_rect)
 		updateSceneRect();
 
-	connect(wnd, SIGNAL(onAspectRatioChanged(CLVideoWindowItem*)), this, SLOT(onAspectRatioChanged(CLVideoWindowItem*)));
+	connect(item, SIGNAL(onAspectRatioChanged(CLAbstractSceneItem*)), this, SLOT(onAspectRatioChanged(CLAbstractSceneItem*)));
 
 }
 
-bool SceneLayout::addWnd(CLVideoWindowItem* wnd,  int z_order, bool update_scene_rect )
+bool SceneLayout::addItem(CLAbstractSceneItem* wnd, bool update_scene_rect )
 {
 	int x, y;
 
-	if (!getNextAvailablePos(wnd->getVideoLayout(), x, y))
+	if (!getNextAvailablePos(wnd->getMaxSize(), x, y))
 		return false;
 
-	addWnd(wnd, x, y, z_order, update_scene_rect);
+	addItem(wnd, x, y, update_scene_rect);
 	wnd->setArranged(true);
 
 }
 
 
 // remove item from lay out
-void SceneLayout::removeWnd(CLAbstractSceneItem* item, bool update_scene_rect )
+void SceneLayout::removeItem(CLAbstractSceneItem* item, bool update_scene_rect )
 {
 	if (!item)
 		return;
@@ -388,10 +543,10 @@ CLAbstractSceneItem* SceneLayout::next_item_helper(const CLAbstractSceneItem* cu
 
 }
 
-void SceneLayout::onAspectRatioChanged(CLVideoWindowItem* wnd)
+void SceneLayout::onAspectRatioChanged(CLAbstractSceneItem* item)
 {
-	if (wnd->isArranged())
-		adjustWnd(wnd);
+	if (item->isArranged())
+		adjustItem(item);
 }
 
 CLAbstractSceneItem* SceneLayout::getNextLeftWnd(const CLAbstractSceneItem* curr) const
@@ -517,11 +672,11 @@ QList<CLIdealWndPos> SceneLayout::calcArrangedPos() const
 
 
 //===============================================================
-void SceneLayout::adjustWnd(CLVideoWindowItem* wnd) const
+void SceneLayout::adjustItem(CLAbstractSceneItem* item) const
 {
 	
-	QPointF p = wnd->mapToScene(wnd->boundingRect().center());
-	p-=QPointF(wnd->width()/2, wnd->height()/2); // this addition as not good at all; due to item zoom topLeft pos might be shifted to diff slot; case1
+	QPointF p = item->mapToScene(item->boundingRect().center());
+	p-=QPointF(item->width()/2, item->height()/2); // this addition as not good at all; due to item zoom topLeft pos might be shifted to diff slot; case1
 
 
 	int slot = slotFromPos( QPoint(p.x(),p.y()) );
@@ -535,15 +690,15 @@ void SceneLayout::adjustWnd(CLVideoWindowItem* wnd) const
 
 	QPoint new_p  = posFromSlot( slot ); 
 
-	int width = wnd->width();
-	int height = wnd->height();
+	int width = item->width();
+	int height = item->height();
 
-	QSize max_size = getMaxWndSize(wnd->getVideoLayout());
+	QSize max_size = item->getMaxSize();
 
 	new_p.rx() += (max_size.width() - width)/2;
 	new_p.ry() += (max_size.height() - height)/2;
 
-	wnd->setPos(new_p);
+	item->setPos(new_p);
 
 }
 
@@ -681,11 +836,6 @@ bool SceneLayout::isSlotAvailable(int slot, QSize size) const
 
 }
 
-bool SceneLayout::isSlotAvailable(int slot, const CLDeviceVideoLayout* layout) const
-{
-	QSize size = getMaxWndSize(layout);
-	return isSlotAvailable(slot, size);
-}
 
 int SceneLayout::bPh_findNext(int *energy, int elemnts)
 {

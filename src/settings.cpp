@@ -1,5 +1,7 @@
 #include "settings.h"
 
 bool global_show_item_text = true;
-
 QFont settings_font("Bodoni MT", 12);
+
+// how often we run new device search and how often layout synchronizes with device manager 
+int devices_update_interval = 1000;
