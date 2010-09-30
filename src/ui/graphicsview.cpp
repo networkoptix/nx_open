@@ -882,6 +882,12 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 	//===transform=========
 	switch (e->key()) 
 	{
+		case Qt::Key_S:
+			global_show_item_text=!global_show_item_text;
+			break;
+
+		
+
 		case Qt::Key_W:
 			m_yRotate -= 1;
 			updateTransform(-0.01);

@@ -7,6 +7,7 @@
 #include "camera/camera.h"
 #include "device/device.h"
 #include "ui/graphicsview.h"
+#include "settings.h"
 
 
 CLVideoWindowItem::CLVideoWindowItem(GraphicsView* view, const CLDeviceVideoLayout* layout, int max_width, int max_height,
@@ -81,12 +82,12 @@ void CLVideoWindowItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 	CLImageItem::hoverEnterEvent(event);
 
 	CLDevice* dev = getVideoCam()->getDevice();
-	if (!dev->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT))
+	if (global_show_item_text && !dev->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT))
 	{
 		setShowImagesize(true);
 	}
 
-	if (!dev->checkDeviceTypeFlag(CLDevice::ARCHIVE) && !dev->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT))
+	if (global_show_item_text && !dev->checkDeviceTypeFlag(CLDevice::ARCHIVE) && !dev->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT) )
 	{
 		showFPS(true);
 		setShowInfoText(true);
