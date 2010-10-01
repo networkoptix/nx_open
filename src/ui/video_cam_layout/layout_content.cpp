@@ -1,14 +1,12 @@
 #include "layout_content.h"
 
 
-LayoutContentItem::LayoutContentItem(int x_, int y_, int slotx, int sloty, int width_, int height_, int angle_):
+LayoutContentItem::LayoutContentItem(int x_, int y_, int width_, int height_, int angle_):
 x(x_),
 y(y_),
 w(width_),
 h(height_),
-angl(angle_),
-slotX(slotx),
-slotY(sloty)
+angl(angle_)
 {
 
 }
@@ -17,16 +15,6 @@ slotY(sloty)
 LayoutContentItem::~LayoutContentItem()
 {
 
-}
-
-int LayoutContentItem::getSlotX() const
-{
-	return slotX;
-}
-
-int LayoutContentItem::getSlotY() const
-{
-	return slotY;
 }
 
 
@@ -69,8 +57,8 @@ int LayoutContentItem::angle() const
 
 //=======
 
-LayoutDevice::LayoutDevice(const QString& uniqueId, int x_, int y_, int slotx, int sloty, int width_, int height_, int angle_):
-LayoutContentItem(x_, y_, slotx, sloty, width_, height_,  angle_),
+LayoutDevice::LayoutDevice(const QString& uniqueId, int x_, int y_, int width_, int height_, int angle_):
+LayoutContentItem(x_, y_, width_, height_,  angle_),
 id(uniqueId)
 {
 
@@ -87,8 +75,8 @@ QString LayoutDevice::getId() const
 }
 
 //=======
-LayoutButton::LayoutButton(const QString& name_, int x_, int y_, int slotx, int sloty, int width_, int height_, int angle_):
-LayoutContentItem(x_, y_, slotx, sloty, width_, height_,  angle_),
+LayoutButton::LayoutButton(const QString& name_, int x_, int y_, int width_, int height_, int angle_):
+LayoutContentItem(x_, y_, width_, height_,  angle_),
 name(name_)
 {
 
@@ -106,8 +94,8 @@ QString LayoutButton::getName() const
 }
 //=======
 
-LayoutImage::LayoutImage(const QString& img1, const QString& img2, int x_, int y_, int slotx, int sloty, int width_, int height_, int angle_):
-LayoutContentItem(x_, y_, slotx, sloty, width_, height_,  angle_),
+LayoutImage::LayoutImage(const QString& img1, const QString& img2, int x_, int y_, int width_, int height_, int angle_):
+LayoutContentItem(x_, y_, width_, height_,  angle_),
 image1(img1),
 image2(img2)
 {
@@ -134,7 +122,7 @@ QString LayoutImage::getImage2() const
 
 LayoutContent::LayoutContent()
 {
-	m_cr.mCriteria = CLDeviceCriteria::NONE;
+	m_cr.mCriteria = CLDeviceCriteria::ALL;
 }
 
 LayoutContent::~LayoutContent()
@@ -142,9 +130,9 @@ LayoutContent::~LayoutContent()
 
 }
 
-void LayoutContent::addButton(const QString& name, int x, int y, int slotx, int sloty, int width, int height, int angle)
+void LayoutContent::addButton(const QString& name, int x, int y, int width, int height, int angle)
 {
-	m_btns.push_back(LayoutButton(name, x, y, slotx, sloty, width, height, angle) );
+	m_btns.push_back(LayoutButton(name, x, y, width, height, angle) );
 }
 
 void LayoutContent::addButton(const CLCustomBtnItem* item)
@@ -152,9 +140,9 @@ void LayoutContent::addButton(const CLCustomBtnItem* item)
 
 }
 
-void LayoutContent::addImage(const QString& img1, const QString& img2, int slotx, int sloty, int x, int y, int width, int height, int angle)
+void LayoutContent::addImage(const QString& img1, const QString& img2, int x, int y, int width, int height, int angle)
 {
-	m_imgs.push_back(LayoutImage(img1, img2, x, y, slotx, sloty, width, height, angle));
+	m_imgs.push_back(LayoutImage(img1, img2, x, y, width, height, angle));
 }
 
 void LayoutContent::addImage(const CLStaticImageItem* item)

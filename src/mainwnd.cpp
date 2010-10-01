@@ -124,6 +124,8 @@ m_videoView(this)
 	m_camlayout.setView(&m_videoView);
 	m_camlayout.setScene(&m_scene);
 
+	toggleFullScreen();
+
 
 	m_camlayout.setContent(startscreen_content());
 
@@ -152,6 +154,19 @@ void MainWnd::toggleFullScreen()
 		showMaximized();
 }
 
+void MainWnd::onItemPressed(QString name)
+{
+
+	if (name=="Recorders")
+	{
+		m_camlayout.stop();
+
+		m_camlayout.setContent(LayoutContent());
+
+		m_camlayout.start();
+	}
+
+}
 
 //====================================================================
 //====================================================================

@@ -211,6 +211,11 @@ void CLAbstractSceneItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 	}
 }
 
+void CLAbstractSceneItem::mousePressEvent ( QGraphicsSceneMouseEvent * event )
+{
+
+}
+
 void CLAbstractSceneItem::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 {
 	emit onPressed(mName);

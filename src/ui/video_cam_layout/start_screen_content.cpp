@@ -14,8 +14,27 @@ LayoutContent& startscreen_content()
 	{
 		frist_time = false;
 
-		instance.addImage("./skin/logo.jpg","", 0,0, SCENE_LEFT + 1000, SCENE_TOP + 1000, 6400, 4800);
-		instance.addButton("View Video", 0,0, SCENE_LEFT + 1000, SCENE_TOP + 1000, 6400/2, 4800/2);
+		int logo_width = 6400;
+		int logo_heih = 4800;
+
+		int btn_width = 6400/2;
+		int btn_height = btn_width*3/4;
+		int item_distance = 2000;
+
+		int logo_left = SCENE_LEFT + btn_width + item_distance;
+		int logo_top = SCENE_TOP + btn_height + item_distance;
+
+		int delta_w = (logo_width-btn_width)/2;
+		int delta_h = (logo_heih-btn_height)/4;
+
+		instance.addImage("./skin/logo.jpg","", logo_left , logo_top , logo_width, logo_heih);
+
+		instance.addButton("Settings", logo_left + delta_w, SCENE_TOP, btn_width, btn_height);
+
+		instance.addButton("Custom layouts", logo_left + delta_w, logo_top + logo_heih + item_distance - 1200, btn_width, btn_height);
+
+		instance.addButton("Recorders", SCENE_LEFT, logo_top + delta_h, btn_width, btn_height);
+		instance.addButton("Statistics", logo_left + logo_width + item_distance, logo_top + delta_h, btn_width, btn_height);
 
 		CLDeviceCriteria cr;
 		cr.mCriteria = CLDeviceCriteria::NONE;

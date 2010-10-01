@@ -40,6 +40,8 @@ public:
 
 	void closeAllDlg();
 
+	void stopAnimation();
+
 protected:
 	virtual void wheelEvent ( QWheelEvent * e );
 	void mouseReleaseEvent ( QMouseEvent * e);

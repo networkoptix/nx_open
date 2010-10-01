@@ -25,7 +25,10 @@ public:
 
 	void toggleFullScreen();
 
+protected slots:
+	void onItemPressed(QString name);
 private:
+
 	Ui::MainWndClass ui;
 
 	GraphicsView m_videoView;

@@ -75,6 +75,7 @@ protected:
 	virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
 	virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
 	void mouseReleaseEvent( QGraphicsSceneMouseEvent * event );
+	void mousePressEvent ( QGraphicsSceneMouseEvent * event );
 
 protected:
 	bool m_selected;

@@ -282,6 +282,12 @@ void GraphicsView::showStop_helper()
 
 }
 
+void GraphicsView::stopAnimation()
+{
+	m_scenezoom.stop();
+	m_movement.stop();
+}
+
 void GraphicsView::mousePressEvent ( QMouseEvent * event)
 {
 	m_yRotate = 0;

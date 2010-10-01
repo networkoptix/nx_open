@@ -12,6 +12,7 @@
 #include "video_camera.h"
 #include "base/log.h"
 #include "ui/videoitem/static_image_item.h"
+#include "ui/videoitem/custom_draw_button.h"
 
 #define SLOT_WIDTH (640*10)
 #define SLOT_HEIGHT (SLOT_WIDTH*3/4)
@@ -82,6 +83,9 @@ void SceneLayout::stop()
 	m_isRunning = false;
 
 	cl_log.log("SceneLayout::stop......\r\n ", cl_logDEBUG1);
+
+	m_view->stopAnimation(); // stops animation 
+	m_view->setZeroSelection(); 
 	
 	m_timer.stop();
 	m_videotimer.stop();
@@ -107,12 +111,15 @@ void SceneLayout::stop()
 		delete cam;
 	}
 
+	m_cams.clear();
 
 	foreach(CLAbstractSceneItem* item, m_items)
 	{
 		m_scene->removeItem(item);
 		delete item;
 	}
+
+	m_items.clear();
 
 }
 
@@ -121,6 +128,7 @@ void SceneLayout::onTimer()
 {
 	if (m_firstTime)
 	{
+		m_view->zoomMin(0);
 		loadContent();
 	}
 
@@ -207,6 +215,8 @@ bool SceneLayout::addDevice(CLDevice* device)
 	cam->setQuality(CLStreamreader::CLSLow, true);
 
 	cam->startDispay();
+
+	return true;
 
 }
 
@@ -380,6 +390,8 @@ bool SceneLayout::addItem(CLAbstractSceneItem* item, int x, int y, bool update_s
 
 	connect(item, SIGNAL(onAspectRatioChanged(CLAbstractSceneItem*)), this, SLOT(onAspectRatioChanged(CLAbstractSceneItem*)));
 
+	return true;
+
 }
 
 bool SceneLayout::addItem(CLAbstractSceneItem* wnd, bool update_scene_rect )
@@ -391,6 +403,7 @@ bool SceneLayout::addItem(CLAbstractSceneItem* wnd, bool update_scene_rect )
 
 	addItem(wnd, x, y, update_scene_rect);
 	wnd->setArranged(true);
+	return true;
 
 }
 
@@ -734,12 +747,13 @@ void SceneLayout::loadContent()
 		addItem(item, img.getX(), img.getY());
 	}
 
-	foreach(LayoutImage img, img_list)
+	foreach(LayoutButton btn, btns_list)
 	{
-		CLStaticImageItem* item = new CLStaticImageItem(m_view, img.width(), img.height(), img.getImage1());
-		item->setOpacity(0.2);
+		
+		CLCustomBtnItem* item = new CLCustomBtnItem(m_view, btn.width(), btn.height(), btn.getName(),m_EventHandler,btn.getName(), "tiiktip text");
+		
 
-		addItem(item, img.getX(), img.getY());
+		addItem(item, btn.getX(), btn.getY());
 	}
 
 

@@ -14,12 +14,9 @@ class LayoutContentItem
 {
 public:
 	enum Type {DEVICE, BUTTON, SHORTCUT, IMAGE, BACKGROUND};
-	LayoutContentItem(int x, int y, int slotx, int sloty,  int width, int height, int angle = 0);
+	LayoutContentItem(int x, int y, int width, int height, int angle = 0);
 	virtual ~LayoutContentItem();
 	virtual Type type() const = 0;
-
-	int getSlotX() const;
-	int getSlotY() const;
 
 	int getX() const;
 	int getY() const;
@@ -35,16 +32,13 @@ protected:
 	int x, y;
 	int w, h;
 	int angl;
-
-	int slotX, slotY;
-
 };
 //=======
 
 class LayoutDevice : public LayoutContentItem
 {
 public:
-	LayoutDevice(const QString& uniqueId, int x, int y, int slotx, int sloty, int width, int height, int angle = 0);
+	LayoutDevice(const QString& uniqueId, int x, int y, int width, int height, int angle = 0);
 
 	virtual Type type() const;
 	
@@ -57,7 +51,7 @@ protected:
 class LayoutButton: public LayoutContentItem
 {
 public:
-	LayoutButton(const QString& name, int x, int y, int slotx, int sloty, int width, int height, int angle = 0);
+	LayoutButton(const QString& name, int x, int y, int width, int height, int angle = 0);
 
 	virtual Type type() const;
 
@@ -70,7 +64,7 @@ protected:
 class LayoutImage: public LayoutContentItem
 {
 public:
-	LayoutImage(const QString& img1, const QString& img2, int slotx, int sloty, int x, int y, int width, int height, int angle = 0);
+	LayoutImage(const QString& img1, const QString& img2, int x, int y, int width, int height, int angle = 0);
 
 	virtual Type type() const ;
 
@@ -90,10 +84,10 @@ public:
 	LayoutContent();
 	virtual ~LayoutContent();
 
-	void addButton(const QString& name, int x, int y, int slotx, int sloty, int width, int height, int angle = 0);
+	void addButton(const QString& name, int x, int y, int width, int height, int angle = 0);
 	void addButton(const CLCustomBtnItem* item);
 
-	void addImage(const QString& img1, const QString& img2, int slotx, int sloty, int x, int y, int width, int height, int angle = 0);
+	void addImage(const QString& img1, const QString& img2, int x, int y, int width, int height, int angle = 0);
 	void addImage(const CLStaticImageItem* item);
 
 	void setDeviceCriteria(const CLDeviceCriteria& cr);

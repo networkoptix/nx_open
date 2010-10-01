@@ -2,6 +2,7 @@
 
 #include <QtGui>
 #include <QFont>
+#include <QFontmetrics>
 
 QFont buttonFont()
 {
@@ -22,7 +23,7 @@ QColor buttonTextColor(QColor(255, 255, 255));
 CLCustomBtnItem::CLCustomBtnItem(GraphicsView* view, int max_width, int max_height, 
 								 QString name, QObject* handler,
 								 QString text, QString tooltipText):
-CLAbstractSceneItem(view,m_max_width,max_height, name, handler),
+CLAbstractSceneItem(view,max_width,max_height, name, handler),
 mText(text)
 {
 	setToolTip(tooltipText);
@@ -46,29 +47,29 @@ void CLCustomBtnItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
 	if (m_mouse_over)
 	{
 
-		painter->fillRect(boundingRect(), QColor(100,0,0,transp));
+		painter->fillRect(boundingRect(), QColor(0,0,255,transp));
 		//painter->fillRect(boundingRect(), QColor(25,25,25,transp));
 	}
 	else
 	{
-		painter->fillRect(boundingRect(), QColor(0,0,0,transp));
+		painter->fillRect(boundingRect(), QColor(0,0,155,transp));
 	}
 
 	painter->setPen(QPen(QColor(100,100,100,230),  1, Qt::SolidLine));
 	painter->drawRect(boundingRect());
 	
 	//==================================================
+	QFont  m_FPS_Font("Courier New", 350);
+	painter->setFont(m_FPS_Font);
 
-	QGraphicsTextItem textItem(0, 0);
-	textItem.setHtml(mText);
-	textItem.setTextWidth(boundingRect().width());
-	textItem.setFont(buttonFont());
-	textItem.setDefaultTextColor(buttonTextColor);
-	textItem.document()->setDocumentMargin(2);
+	QFontMetrics metrics = QFontMetrics(m_FPS_Font);
+	int border = qMax(4, metrics.leading());
 
-	float w = textItem.boundingRect().width();
-	float h = textItem.boundingRect().height();
-	QStyleOptionGraphicsItem style;
-	textItem.paint(painter, &style, 0);
+	QRect rect(0, 0, width() , height());
+	painter->setPen(QColor(255, 255, 255, 110));
+
+	painter->drawText((width() - rect.width())/2, border,
+		rect.width(), rect.height(),
+		Qt::AlignCenter | Qt::TextWordWrap, mText);
 }
 
