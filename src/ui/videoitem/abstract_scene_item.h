@@ -83,6 +83,7 @@ protected:
 	bool m_fullscreen; // could be only if m_selected
 
 	bool m_mouse_over;
+	bool m_zoomOnhover;
 
 	int m_z;
 	CLItemTransform m_animationTransform;

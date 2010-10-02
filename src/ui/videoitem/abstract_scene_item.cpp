@@ -28,7 +28,8 @@ m_selected(false),
 m_fullscreen(false),
 m_arranged(true),
 m_mouse_over(false),
-m_draw_rotation_helper(false)
+m_draw_rotation_helper(false),
+m_zoomOnhover(true)
 {
 	setAcceptsHoverEvents(true);
 
@@ -182,7 +183,7 @@ void CLAbstractSceneItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
 	m_mouse_over = true;
 
-	if (m_view->getZoom() < 0.25)
+	if (m_view->getZoom() < 0.25 || m_zoomOnhover)
 	{
 		if (m_z != 1) 
 		{

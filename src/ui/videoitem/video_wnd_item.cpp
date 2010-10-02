@@ -22,6 +22,8 @@ m_videonum(layout->numberOfChannels()),
 m_cam(0)
 {
 
+	m_zoomOnhover = false;
+
 	m_type = VIDEO;
 	m_arranged = false;
 	
