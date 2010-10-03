@@ -14,8 +14,11 @@ protected:
 
 
 protected:
+	QPainterPath createRoundRectpath(int width, int height, int radius);
+protected:
+
 	QString mText;
-	QPainterPath mRoundRectPath;
+	QPainterPath mRoundRectPath, mSmallRectPath;
 	QPainterPath mShadowRectPath;
 };
 

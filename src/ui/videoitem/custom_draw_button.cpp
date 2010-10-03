@@ -32,17 +32,10 @@ mText(text)
 
 	setToolTip(tooltipText);
 
-	int radius = width()/4;
-	mRoundRectPath.moveTo(width(), radius);
-	mRoundRectPath.arcTo(width() - radius, 0, radius, radius, 0.0, 90.0);
-	mRoundRectPath.lineTo(radius, 0);
-	mRoundRectPath.arcTo(0, 0, radius, radius, 90.0, 90.0);
-	mRoundRectPath.lineTo(0, height()-radius);
-	mRoundRectPath.arcTo(0, height() - radius, radius, radius, 180.0, 90.0);
-	mRoundRectPath.lineTo(width()-radius, height());
-	mRoundRectPath.arcTo(width()-radius, height() -  radius, radius, radius, 270.0, 90.0);
-	mRoundRectPath.closeSubpath();
+	mSmallRectPath = createRoundRectpath(width()*0.94,height()*0.94, width()/4);
+	mSmallRectPath.translate(width()*0.03, height()*0.03);
 
+	mRoundRectPath = createRoundRectpath(width(),height(), width()/4);
 	mShadowRectPath = mRoundRectPath.translated(100,100);
 	
 
@@ -55,6 +48,23 @@ CLCustomBtnItem::~CLCustomBtnItem()
 
 }
 
+QPainterPath CLCustomBtnItem::createRoundRectpath(int width, int height, int radius)
+{
+	QPainterPath result;
+
+	result.moveTo(width, radius);
+	result.arcTo(width - radius, 0, radius, radius, 0.0, 90.0);
+	result.lineTo(radius, 0);
+	result.arcTo(0, 0, radius, radius, 90.0, 90.0);
+	result.lineTo(0, height-radius);
+	result.arcTo(0, height - radius, radius, radius, 180.0, 90.0);
+	result.lineTo(width-radius, height);
+	result.arcTo(width-radius, height -  radius, radius, radius, 270.0, 90.0);
+	result.closeSubpath();
+
+	return result;
+
+}
 
 void CLCustomBtnItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
@@ -65,19 +75,24 @@ void CLCustomBtnItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
 
 
 
-	unsigned char transp = 210;
+
 
 
 	painter->fillPath(mShadowRectPath, global_shadow_color);
 	
 
-	QColor btn_color(40,40,200,transp);
-
+	QColor border_color(40,40,215);
 	if (m_mouse_over)
-		btn_color = QColor(40,40,230,transp);
+		border_color = QColor(40,40,245);
 
 
-	painter->fillPath(mRoundRectPath, btn_color);
+	painter->fillPath(mRoundRectPath, border_color );
+
+	QColor btn_color(40,40,200);
+	if (m_mouse_over)
+		btn_color = QColor(40,40,230);
+
+	painter->fillPath(mSmallRectPath, btn_color);
 
 
 	//painter->setPen(QPen(QColor(100,100,100,230),  1, Qt::SolidLine));
