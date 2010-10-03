@@ -32,10 +32,10 @@ mText(text)
 
 	setToolTip(tooltipText);
 
-	mSmallRectPath = createRoundRectpath(width()*0.94,height()*0.94, width()/4);
+	mSmallRectPath = createRoundRectpath(width()*0.94,height()*0.94, width()/3);
 	mSmallRectPath.translate(width()*0.03, height()*0.03);
 
-	mRoundRectPath = createRoundRectpath(width(),height(), width()/4);
+	mRoundRectPath = createRoundRectpath(width(),height(), width()/3);
 	mShadowRectPath = mRoundRectPath.translated(100,100);
 	
 
@@ -81,16 +81,16 @@ void CLCustomBtnItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
 	painter->fillPath(mShadowRectPath, global_shadow_color);
 	
 
-	QColor border_color(40,40,215);
+	QColor border_color(20,20,160);
 	if (m_mouse_over)
-		border_color = QColor(40,40,245);
+		border_color = QColor(20,20,190);
 
 
 	painter->fillPath(mRoundRectPath, border_color );
 
-	QColor btn_color(40,40,200);
+	QColor btn_color(25,25,200);
 	if (m_mouse_over)
-		btn_color = QColor(40,40,230);
+		btn_color = QColor(25,25,230);
 
 	painter->fillPath(mSmallRectPath, btn_color);
 
@@ -107,7 +107,12 @@ void CLCustomBtnItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
 	int border = qMax(4, metrics.leading());
 
 	QRect rect(0, 0, width() , height());
-	painter->setPen(QColor(255, 255, 255, 110));
+
+	if (m_mouse_over)
+		painter->setPen(QColor(190, 190, 190));
+	else
+		painter->setPen(QColor(150, 150, 150));
+
 
 	painter->drawText((width() - rect.width())/2, border,
 		rect.width(), rect.height(),

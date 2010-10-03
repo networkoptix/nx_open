@@ -21,6 +21,7 @@ m_opacity(0.0),
 m_videonum(layout->numberOfChannels()),
 m_cam(0)
 {
+	m_FPS_Font.setWeight(QFont::Bold);
 
 	m_zoomOnhover = false;
 
