@@ -3,6 +3,7 @@
 #include <QtGui>
 #include <QFont>
 #include <QFontmetrics>
+#include "settings.h"
 
 QFont buttonFont()
 {
@@ -26,7 +27,27 @@ CLCustomBtnItem::CLCustomBtnItem(GraphicsView* view, int max_width, int max_heig
 CLAbstractSceneItem(view,max_width,max_height, name, handler),
 mText(text)
 {
+
+	//setFocusPolicy(Qt::NoFocus);
+
 	setToolTip(tooltipText);
+
+	int radius = width()/4;
+	mRoundRectPath.moveTo(width(), radius);
+	mRoundRectPath.arcTo(width() - radius, 0, radius, radius, 0.0, 90.0);
+	mRoundRectPath.lineTo(radius, 0);
+	mRoundRectPath.arcTo(0, 0, radius, radius, 90.0, 90.0);
+	mRoundRectPath.lineTo(0, height()-radius);
+	mRoundRectPath.arcTo(0, height() - radius, radius, radius, 180.0, 90.0);
+	mRoundRectPath.lineTo(width()-radius, height());
+	mRoundRectPath.arcTo(width()-radius, height() -  radius, radius, radius, 270.0, 90.0);
+	mRoundRectPath.closeSubpath();
+
+	mShadowRectPath = mRoundRectPath.translated(100,100);
+	
+
+
+
 }
 
 CLCustomBtnItem::~CLCustomBtnItem()
@@ -42,27 +63,32 @@ void CLCustomBtnItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
 	//painter->setRenderHint(QPainter::Antialiasing);
 
 
+
+
 	unsigned char transp = 210;
 
+
+	painter->fillPath(mShadowRectPath, global_shadow_color);
+	
+
+	QColor btn_color(40,40,200,transp);
+
 	if (m_mouse_over)
-	{
+		btn_color = QColor(40,40,230,transp);
 
-		painter->fillRect(boundingRect(), QColor(0,0,255,transp));
-		//painter->fillRect(boundingRect(), QColor(25,25,25,transp));
-	}
-	else
-	{
-		painter->fillRect(boundingRect(), QColor(0,0,155,transp));
-	}
 
-	painter->setPen(QPen(QColor(100,100,100,230),  1, Qt::SolidLine));
-	painter->drawRect(boundingRect());
+	painter->fillPath(mRoundRectPath, btn_color);
+
+
+	//painter->setPen(QPen(QColor(100,100,100,230),  1, Qt::SolidLine));
+	//painter->drawRect(boundingRect());
 	
 	//==================================================
-	QFont  m_FPS_Font("Courier New", 350);
-	painter->setFont(m_FPS_Font);
+	QFont  font("Courier New", 350);
+	font.setWeight(QFont::Bold);
+	painter->setFont(font);
 
-	QFontMetrics metrics = QFontMetrics(m_FPS_Font);
+	QFontMetrics metrics = QFontMetrics(font);
 	int border = qMax(4, metrics.leading());
 
 	QRect rect(0, 0, width() , height());

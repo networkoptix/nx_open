@@ -190,7 +190,8 @@ void SceneLayout::onFirstSceneAppearance()
 {
 	m_view->centerOn(m_view->getRealSceneRect().center());
 	m_view->zoomMin(0);
-	m_view->zoomDefault(2000);
+	m_view->fitInView(3000);
+	//m_view->zoomDefault(2000);
 }
 
 
@@ -742,7 +743,7 @@ void SceneLayout::loadContent()
 	foreach(LayoutImage img, img_list)
 	{
 		CLStaticImageItem* item = new CLStaticImageItem(m_view, img.width(), img.height(), img.getImage1());
-		item->setOpacity(0.2);
+		item->setOpacity(0.8);
 		
 		addItem(item, img.getX(), img.getY());
 	}

@@ -3,6 +3,7 @@
 #include "video_wnd_item.h"
 
 #include <math.h>
+#include "settings.h"
 
 static const double Pi = 3.14159265358979323846264338327950288419717;
 static double TwoPi = 2.0 * Pi;
@@ -224,11 +225,10 @@ void CLAbstractSceneItem::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 
 void CLAbstractSceneItem::drawShadow(QPainter* painter)
 {
-	QColor shadow_color(0, 0, 0, 128);
 	QRect rect1(width(), SHADOW_SIZE, SHADOW_SIZE, height());
 	QRect rect2(SHADOW_SIZE, height(), width()-SHADOW_SIZE, SHADOW_SIZE);
-	painter->fillRect(rect1, shadow_color);
-	painter->fillRect(rect2, shadow_color);
+	painter->fillRect(rect1, global_shadow_color);
+	painter->fillRect(rect2, global_shadow_color);
 
 	if (getType()==IMAGE || getType()==VIDEO)
 	{

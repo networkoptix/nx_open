@@ -2,11 +2,12 @@
 #define global_settings_h1933
 
 #include <QFont>
+#include <QColor>
 
 extern qreal global_rotation_angel;
 extern bool global_show_item_text;
 extern QFont settings_font;
-
 extern int devices_update_interval;
+extern QColor global_shadow_color;
 
 #endif //global_settings_h1933

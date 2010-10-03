@@ -79,9 +79,10 @@ protected:
 
 	void showStop_helper();
 
-
+public slots:
+	void fitInView(int duration = 600);
 private slots:
-	void onFitInView_helper(int duration = 600);
+	
 	void reAdjustSceneRect();
 	void onShowTimer();
 	void onShowStart();

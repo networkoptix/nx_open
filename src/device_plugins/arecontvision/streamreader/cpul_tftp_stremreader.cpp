@@ -104,6 +104,9 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 			right = m_streamParam.get("image_right").value.value;
 			bottom = m_streamParam.get("image_bottom").value.value;
 
+			//right = 1280;
+			//bottom = 1024;
+
 			//right/=2;
 			//bottom/=2;
 
@@ -258,11 +261,20 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 		iframe_index = 89;
 		break;
 	case AV3135:
-		iframe_index = 88;
+		iframe_index = 98;
 		break;
 	default:
 		iframe_index = 93;
 	}
+
+	if (h264 && (lp_size < iframe_index))
+	{
+		cl_log.log("last packet is too short!", cl_logERROR);
+		//delete videoData;
+		videoData->releaseRef();
+		return 0;
+	}
+
 
 	AVLastPacketSize size;
 	
@@ -295,13 +307,6 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 
 
 
-	if (h264 && (lp_size < iframe_index))
-	{
-		cl_log.log("last packet is too short!", cl_logERROR);
-		//delete videoData;
-		videoData->releaseRef();
-		return 0;
-	}
 
 	videoData->keyFrame = true;
 	if (h264)

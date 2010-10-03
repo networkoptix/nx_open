@@ -250,6 +250,8 @@ void CLVideoWindowItem::drawFPS(QPainter* painter)
 void CLVideoWindowItem::drawLostConnection(QPainter* painter)
 {
 
+	painter->setFont(m_FPS_Font);
+
 	QString text = tr("Connection Lost");
 	
 

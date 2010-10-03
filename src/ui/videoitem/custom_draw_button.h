@@ -15,6 +15,8 @@ protected:
 
 protected:
 	QString mText;
+	QPainterPath mRoundRectPath;
+	QPainterPath mShadowRectPath;
 };
 
 #endif //custom_button_h_2001

@@ -29,12 +29,12 @@ LayoutContent& startscreen_content()
 
 		instance.addImage("./skin/logo.jpg","", logo_left , logo_top , logo_width, logo_heih);
 
-		instance.addButton("Settings", logo_left + delta_w, SCENE_TOP, btn_width, btn_height);
+		instance.addButton("Wizard", logo_left + delta_w, SCENE_TOP, btn_width, btn_height);
 
-		instance.addButton("Custom layouts", logo_left + delta_w, logo_top + logo_heih + item_distance - 1200, btn_width, btn_height);
+		instance.addButton("Layouts editor", logo_left + delta_w, logo_top + logo_heih + item_distance - 1200, btn_width, btn_height);
 
-		instance.addButton("Recorders", SCENE_LEFT, logo_top + delta_h, btn_width, btn_height);
-		instance.addButton("Statistics", logo_left + logo_width + item_distance, logo_top + delta_h, btn_width, btn_height);
+		instance.addButton("Servers", SCENE_LEFT, logo_top + delta_h, btn_width, btn_height);
+		instance.addButton("Layouts", logo_left + logo_width + item_distance, logo_top + delta_h, btn_width, btn_height);
 
 		CLDeviceCriteria cr;
 		cr.mCriteria = CLDeviceCriteria::NONE;

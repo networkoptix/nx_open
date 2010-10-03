@@ -739,7 +739,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 		}
 		else if (act== &cm_fitinview)
 		{
-			onFitInView_helper();
+			fitInView();
 		}
 		else if (act== &cm_circle)
 		{
@@ -1131,7 +1131,7 @@ void GraphicsView::toggleFullScreen_helper(CLAbstractSceneItem* wnd)
 		setZeroSelection();
 		wnd->setFullScreen(false);
 		//zoomDefault(item_select_duration*1.3);
-		onFitInView_helper(800);
+		fitInView(800);
 	}
 }
 
@@ -1233,7 +1233,7 @@ void GraphicsView::onCircle_helper(bool show)
 		++i;
 	}
 
-	connect(group, SIGNAL(finished ()), this, SLOT(onFitInView_helper()));
+	connect(group, SIGNAL(finished ()), this, SLOT(fitInView()));
 
 	if (show)
 		connect(group, SIGNAL(finished ()), this, SLOT(onShowStart()));
@@ -1292,7 +1292,7 @@ void GraphicsView::onArrange_helper()
 	}
 
 	//connect(group, SIGNAL(finished ()), this, SLOT(reAdjustSceneRect()));
-	connect(group, SIGNAL(finished ()), this, SLOT(onFitInView_helper()));
+	connect(group, SIGNAL(finished ()), this, SLOT(fitInView()));
 
 
 
@@ -1301,7 +1301,7 @@ void GraphicsView::onArrange_helper()
 	
 }
 
-void GraphicsView::onFitInView_helper(int duration )
+void GraphicsView::fitInView(int duration )
 {
 	if (m_selectedWnd && isItemStillExists(m_selectedWnd) && m_selectedWnd->isFullScreen())
 	{
@@ -1328,7 +1328,7 @@ void GraphicsView::onFitInView_helper(int duration )
 
 
 	QRectF unity = matrix().mapRect(QRectF(0, 0, 1, 1));
-	scale(1 / unity.width(), 1 / unity.height());
+	//scale(1 / unity.width(), 1 / unity.height());
 
 
 	scl*=( unity.width());
