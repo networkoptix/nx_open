@@ -930,16 +930,16 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 		switch (e->key()) 
 		{
 		case Qt::Key_Left:
-			next_item = m_camLayout->getNextLeftWnd(last_sel_item);
+			next_item = m_camLayout->getNextLeftItem(last_sel_item);
 			break;
 		case Qt::Key_Right:
-			next_item = m_camLayout->getNextRightWnd(last_sel_item);
+			next_item = m_camLayout->getNextRightItem(last_sel_item);
 			break;
 		case Qt::Key_Up:
-			next_item = m_camLayout->getNextTopWnd(last_sel_item);
+			next_item = m_camLayout->getNextTopItem(last_sel_item);
 			break;
 		case Qt::Key_Down:
-			next_item = m_camLayout->getNextBottomWnd(last_sel_item);
+			next_item = m_camLayout->getNextBottomItem(last_sel_item);
 			break;
 
 		}

@@ -99,10 +99,10 @@ public:
 	CLAbstractSceneItem*  getCenterWnd() const;
 
 
-	CLAbstractSceneItem* getNextLeftWnd(const CLAbstractSceneItem* curr) const;
-	CLAbstractSceneItem* getNextRightWnd(const CLAbstractSceneItem* curr) const;
-	CLAbstractSceneItem* getNextTopWnd(const CLAbstractSceneItem* curr) const;
-	CLAbstractSceneItem* getNextBottomWnd(const CLAbstractSceneItem* curr) const;
+	CLAbstractSceneItem* getNextLeftItem(const CLAbstractSceneItem* curr) const;
+	CLAbstractSceneItem* getNextRightItem(const CLAbstractSceneItem* curr) const;
+	CLAbstractSceneItem* getNextTopItem(const CLAbstractSceneItem* curr) const;
+	CLAbstractSceneItem* getNextBottomItem(const CLAbstractSceneItem* curr) const;
 	
 
 	QList<CLIdealWndPos> calcArrangedPos() const;
@@ -131,10 +131,10 @@ private:
 
 
 
-	CLAbstractSceneItem* getVeryLeftWnd() const;
-	CLAbstractSceneItem* getVeryRightWnd() const;
-	CLAbstractSceneItem* getVeryTopWnd() const;
-	CLAbstractSceneItem* getVeryBottomWnd() const;
+	CLAbstractSceneItem* getVeryLeftItem() const;
+	CLAbstractSceneItem* getVeryRightItem() const;
+	CLAbstractSceneItem* getVeryTopItem() const;
+	CLAbstractSceneItem* getVeryBottomItem() const;
 
 	QPoint getMassCenter() const;
 

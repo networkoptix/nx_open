@@ -143,6 +143,8 @@ void SceneLayout::onTimer()
 	
 	CLDeviceList all_devs =  CLDeviceManager::instance().getDeviceList(m_content.getDeviceCriteria());
 
+	bool added = false;
+
 	foreach(CLDevice* dev, all_devs)
 	{
 		bool contains = false;
@@ -167,8 +169,14 @@ void SceneLayout::onTimer()
 			// must not do it again
 			if (!addDevice(dev))
 				dev->releaseRef();
+			else
+				added = true;
+
 		}
 	}
+
+	if (added && !m_firstTime)
+		m_view->fitInView(2000);
 
 	//====================================
 }
@@ -299,20 +307,20 @@ int SceneLayout::slotsH(CLVideoWindowItem* wnd) const
 
 QRect SceneLayout::getSmallLayoutRect() const // scene rect 
 {
-	CLAbstractSceneItem* wnd =  getVeryLeftWnd();
+	CLAbstractSceneItem* item =  getVeryLeftItem();
 
-	if (!wnd) // nos single video on this lay out
+	if (!item) // nos single video on this lay out
 		return QRect(SCENE_LEFT, SCENE_TOP, 1, 1 );
-	int left = wnd->mapToScene(wnd->boundingRect().topLeft()).x();
+	int left = item->mapToScene(item->boundingRect().topLeft()).x();
 
-	wnd =  getVeryTopWnd();
-	int top = wnd->mapToScene(wnd->boundingRect().topLeft()).y();
+	item =  getVeryTopItem();
+	int top = item->mapToScene(item->boundingRect().topLeft()).y();
 
-	wnd =  getVeryRightWnd();
-	int right = wnd->mapToScene(wnd->boundingRect().bottomRight()).x();
+	item =  getVeryRightItem();
+	int right = item->mapToScene(item->boundingRect().bottomRight()).x();
 
-	wnd =  getVeryBottomWnd();
-	int bottom = wnd->mapToScene(wnd->boundingRect().bottomRight()).y();
+	item =  getVeryBottomItem();
+	int bottom = item->mapToScene(item->boundingRect().bottomRight()).y();
 
 	QRect video_rect(QPoint(left, top), QPoint(right, bottom) );
 
@@ -614,22 +622,22 @@ void SceneLayout::onAspectRatioChanged(CLAbstractSceneItem* item)
 		adjustItem(item);
 }
 
-CLAbstractSceneItem* SceneLayout::getNextLeftWnd(const CLAbstractSceneItem* curr) const
+CLAbstractSceneItem* SceneLayout::getNextLeftItem(const CLAbstractSceneItem* curr) const
 {
 	return next_item_helper(curr, 3, 1);
 }
 
-CLAbstractSceneItem* SceneLayout::getNextRightWnd(const CLAbstractSceneItem* curr) const
+CLAbstractSceneItem* SceneLayout::getNextRightItem(const CLAbstractSceneItem* curr) const
 {
 	return next_item_helper(curr, 1, 3);
 }
 
-CLAbstractSceneItem* SceneLayout::getNextTopWnd(const CLAbstractSceneItem* curr) const
+CLAbstractSceneItem* SceneLayout::getNextTopItem(const CLAbstractSceneItem* curr) const
 {
 	return next_item_helper(curr, 0, 2);
 }
 
-CLAbstractSceneItem* SceneLayout::getNextBottomWnd(const CLAbstractSceneItem* curr) const
+CLAbstractSceneItem* SceneLayout::getNextBottomItem(const CLAbstractSceneItem* curr) const
 {
 	return next_item_helper(curr, 2, 0);
 }
@@ -798,7 +806,7 @@ void SceneLayout::adjustItem(CLAbstractSceneItem* item) const
 }
 
 //===============================================================
-CLAbstractSceneItem* SceneLayout::getVeryLeftWnd() const
+CLAbstractSceneItem* SceneLayout::getVeryLeftItem() const
 {
 	CLAbstractSceneItem* result = 0;
 
@@ -817,7 +825,7 @@ CLAbstractSceneItem* SceneLayout::getVeryLeftWnd() const
 	return result;
 }
 
-CLAbstractSceneItem* SceneLayout::getVeryTopWnd() const
+CLAbstractSceneItem* SceneLayout::getVeryTopItem() const
 {
 	CLAbstractSceneItem* result = 0;
 
@@ -838,7 +846,7 @@ CLAbstractSceneItem* SceneLayout::getVeryTopWnd() const
 
 
 
-CLAbstractSceneItem* SceneLayout::getVeryRightWnd() const
+CLAbstractSceneItem* SceneLayout::getVeryRightItem() const
 {
 	CLAbstractSceneItem* result = 0;
 
@@ -857,7 +865,7 @@ CLAbstractSceneItem* SceneLayout::getVeryRightWnd() const
 	return result;
 }
 
-CLAbstractSceneItem* SceneLayout::getVeryBottomWnd() const
+CLAbstractSceneItem* SceneLayout::getVeryBottomItem() const
 {
 	CLAbstractSceneItem* result = 0;
 
