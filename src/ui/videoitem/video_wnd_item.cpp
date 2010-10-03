@@ -213,6 +213,8 @@ void CLVideoWindowItem::drawStuff(QPainter* painter)
 
 	CLImageItem::drawStuff(painter);
 
+	drawShadow(painter);
+
 	//============
 	if (m_showing_text && m_showfps)
 	{

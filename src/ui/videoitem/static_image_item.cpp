@@ -21,6 +21,8 @@ m_img2_loaded(false)
 
 				m_aspectratio = qreal(m_imageWidth)/m_imageHeight;
 
+				m_img1.setMask(m_img1.createHeuristicMask());
+
 		}
 	}
 

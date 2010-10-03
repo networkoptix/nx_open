@@ -121,9 +121,6 @@ void CLImageItem::drawStuff(QPainter* painter)
 		drawRotationHelper(painter);
 
 
-	drawShadow(painter);
-
-
 }
 
 void CLImageItem::drawInfoText(QPainter* painter)

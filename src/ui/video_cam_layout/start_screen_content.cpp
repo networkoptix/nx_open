@@ -28,6 +28,8 @@ LayoutContent& startscreen_content()
 		int delta_h = (logo_heih-btn_height)/4;
 
 		instance.addImage("./skin/logo.jpg","", logo_left , logo_top , logo_width, logo_heih);
+		//instance.addImage("./skin/back_button.png","", logo_left , logo_top , logo_width, logo_heih);
+		
 
 		instance.addButton("Wizard", logo_left + delta_w, SCENE_TOP, btn_width, btn_height);
 
