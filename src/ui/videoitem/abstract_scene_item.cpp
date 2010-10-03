@@ -4,6 +4,7 @@
 
 #include <math.h>
 #include "settings.h"
+#include <qgraphicssceneevent>
 
 static const double Pi = 3.14159265358979323846264338327950288419717;
 static double TwoPi = 2.0 * Pi;
@@ -184,7 +185,7 @@ void CLAbstractSceneItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
 	m_mouse_over = true;
 
-	if (m_view->getZoom() < 0.25 || m_zoomOnhover)
+	if (m_view->getSelectedItem()!=this &&(m_view->getZoom() < 0.25 || m_zoomOnhover))
 	{
 		if (m_z != 1) 
 		{
@@ -220,7 +221,8 @@ void CLAbstractSceneItem::mousePressEvent ( QGraphicsSceneMouseEvent * event )
 
 void CLAbstractSceneItem::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 {
-	emit onPressed(mName);
+	if (event->button()==Qt::LeftButton)
+		emit onPressed(mName);
 }
 
 void CLAbstractSceneItem::drawShadow(QPainter* painter)

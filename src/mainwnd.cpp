@@ -157,7 +157,7 @@ void MainWnd::toggleFullScreen()
 void MainWnd::onItemPressed(QString name)
 {
 
-	if (name=="Recorders")
+	if (name=="Servers")
 	{
 		m_camlayout.stop();
 
