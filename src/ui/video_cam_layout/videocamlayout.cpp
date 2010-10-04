@@ -125,11 +125,17 @@ void SceneLayout::stop(bool animation)
 
 	cl_log.log("SceneLayout::stop......\r\n ", cl_logDEBUG1);
 
+	m_view->setAcceptInput(false);
 	m_view->stopAnimation(); // stops animation 
 	m_view->setZeroSelection(); 
 	
+
+	m_view->closeAllDlg();
+	
 	m_timer.stop();
 	m_videotimer.stop();
+
+	
 
 	
 
@@ -158,6 +164,7 @@ void SceneLayout::onTimer()
 		m_timer.setInterval(devices_update_interval);
 		QThread::currentThread()->setPriority(QThread::IdlePriority); // surprised. if gui thread has low priority => things looks smoother 
 		onFirstSceneAppearance();
+		m_view->setAcceptInput(true);
 	}
 
 	

@@ -54,7 +54,8 @@ m_drawBkg(true),
 m_logo(0),
 m_animated_bckg(new CLBlueBackGround(50)),
 mDeviceDlg(0),
-mZerroDistance(true)
+mZerroDistance(true),
+mAcceptInput(false)
 {
 	connect(&mShow.mTimer, SIGNAL(timeout ()), this , SLOT(onShowTimer()) );
 
@@ -154,6 +155,9 @@ void GraphicsView::setAllItemsQuality(CLStreamreader::StreamQuality q, bool incr
 
 void GraphicsView::wheelEvent ( QWheelEvent * e )
 {
+	if (!mAcceptInput)
+		return;
+
 	showStop_helper();
 	int numDegrees = e->delta() ;
 	m_scenezoom.zoom_delta(numDegrees/3000.0, scene_zoom_duration);
@@ -286,6 +290,11 @@ void GraphicsView::showStop_helper()
 
 }
 
+void GraphicsView::setAcceptInput(bool accept)
+{
+	mAcceptInput = accept;
+}
+
 void GraphicsView::stopAnimation()
 {
 	m_scenezoom.stop();
@@ -294,6 +303,9 @@ void GraphicsView::stopAnimation()
 
 void GraphicsView::mousePressEvent ( QMouseEvent * event)
 {
+	if (!mAcceptInput)
+		return;
+
 	m_yRotate = 0;
 
 	m_scenezoom.stop();
@@ -354,6 +366,9 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 
 void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
+	if (!mAcceptInput)
+		return;
+
 	bool left_button = event->buttons() & Qt::LeftButton;
 	bool right_button = event->buttons() & Qt::RightButton;
 
@@ -442,6 +457,9 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 
 void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 {
+	if (!mAcceptInput)
+		return;
+
 	if (m_ignore_release_event)
 	{
 		m_ignore_release_event = false;
@@ -662,6 +680,9 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 {
+	if (!mAcceptInput)
+		return;
+
 	if (m_ignore_conext_menu_event)
 	{
 		m_ignore_conext_menu_event = false;
@@ -820,6 +841,10 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
 void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
 {
+	if (!mAcceptInput)
+		return;
+
+
 	CLAbstractSceneItem*item = static_cast<CLAbstractSceneItem*>(itemAt(e->pos()));
 	if(!isItemStillExists(item))
 		item = 0;
@@ -872,6 +897,9 @@ void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
 
 void GraphicsView::keyReleaseEvent( QKeyEvent * e )
 {
+	if (!mAcceptInput)
+		return;
+
 	switch (e->key()) 
 	{
 	case Qt::Key_Control:
@@ -889,6 +917,9 @@ void GraphicsView::keyReleaseEvent( QKeyEvent * e )
 
 void GraphicsView::keyPressEvent( QKeyEvent * e )
 {
+	if (!mAcceptInput)
+		return;
+
 
 	CLAbstractSceneItem* last_sel_item = getLastSelectedItem();
 	
@@ -1079,7 +1110,10 @@ void GraphicsView::drawBackground ( QPainter * painter, const QRectF & rect )
 
 void GraphicsView::resizeEvent( QResizeEvent * event )
 {
-	
+	if (!mAcceptInput)
+		return;
+
+
 	if (m_selectedWnd && m_selectedWnd->isFullScreen())
 		onItemFullScreen_helper(m_selectedWnd);
 	else

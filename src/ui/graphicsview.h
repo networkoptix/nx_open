@@ -37,10 +37,10 @@ public:
 	qreal getZoom() const;
 
 	void setAllItemsQuality(CLStreamreader::StreamQuality q, bool increase);
-
 	void closeAllDlg();
-
 	void stopAnimation();
+	
+	void setAcceptInput(bool accept); 
 
 signals:
 	void scneZoomFinished();
@@ -141,6 +141,8 @@ protected:
 
 	bool mZerroDistance;
 	qreal m_old_distance;
+
+	bool mAcceptInput;
 	
 
 
