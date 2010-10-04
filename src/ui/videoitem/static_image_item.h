@@ -8,16 +8,11 @@ class CLStaticImageItem : public CLImageItem
 {
 public:
 	CLStaticImageItem (GraphicsView* view, int max_width, int max_height,
-		QString img1filename, QString img2filename="",
-		QString name="", QObject* handler=0);
+		QString imgfilename, QString name="", QObject* handler=0);
 protected:
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 protected:
-	QPixmap m_img1;
-	QPixmap m_img2;
-
-	bool m_img2_loaded;
-	bool m_img1_loaded;
+	QPixmap m_img;
 
 };
 

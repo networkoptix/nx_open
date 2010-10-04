@@ -57,6 +57,10 @@ mDeviceDlg(0),
 mZerroDistance(true)
 {
 	connect(&mShow.mTimer, SIGNAL(timeout ()), this , SLOT(onShowTimer()) );
+
+	connect(&m_scenezoom, SIGNAL(finished()), this , SLOT(onScneZoomFinished()) );
+	
+
 	mShow.mTimer.setInterval(1000);
 	mShow.mTimer.start();
 
@@ -1101,6 +1105,11 @@ CLAbstractSceneItem* GraphicsView::getLastSelectedItem()
 	
 	return m_camLayout->getCenterWnd();
 	
+}
+
+void GraphicsView::onScneZoomFinished()
+{
+	emit scneZoomFinished();
 }
 
 void GraphicsView::reAdjustSceneRect()

@@ -65,6 +65,6 @@ void CLAbstractAnimation::start_helper(int duration, int delay)
 
 void CLAbstractAnimation::onFinished()
 {
-	//restoreDefaultDuration();
+	emit finished();
 }
 

@@ -6,6 +6,8 @@
 #include <QTime>
 #include <QFont>
 
+// this is abstract class 
+// I assume that it inherits by video and static_image item 
 class CLImageItem : public CLAbstractSceneItem
 {
 	Q_OBJECT

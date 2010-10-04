@@ -74,21 +74,10 @@ void SceneLayout::start()
 	m_isRunning = true;
 }
 
-void SceneLayout::stop()
+void SceneLayout::stop_helper()
 {
 
-	if (!m_isRunning)
-		return;
-
-	m_isRunning = false;
-
-	cl_log.log("SceneLayout::stop......\r\n ", cl_logDEBUG1);
-
-	m_view->stopAnimation(); // stops animation 
-	m_view->setZeroSelection(); 
-	
-	m_timer.stop();
-	m_videotimer.stop();
+	disconnect(m_view, SIGNAL(scneZoomFinished()), this, SLOT(stop_helper()));
 
 	foreach(CLVideoCamera* cam, m_cams)
 	{
@@ -102,7 +91,7 @@ void SceneLayout::stop()
 	{
 		cam->getVideoWindow()->before_destroy(); // without it CamDisplay may not stoped
 	}
-	
+
 	foreach(CLVideoCamera* cam, m_cams)
 	{
 		// after we can wait for each thread to stop
@@ -120,6 +109,36 @@ void SceneLayout::stop()
 	}
 
 	m_items.clear();
+
+	emit stoped();
+
+}
+
+void SceneLayout::stop(bool animation)
+{
+
+	if (!m_isRunning)
+		return;
+
+	m_isRunning = false;
+
+	cl_log.log("SceneLayout::stop......\r\n ", cl_logDEBUG1);
+
+	m_view->stopAnimation(); // stops animation 
+	m_view->setZeroSelection(); 
+	
+	m_timer.stop();
+	m_videotimer.stop();
+
+	
+
+	if (animation)
+	{
+		connect(m_view, SIGNAL(scneZoomFinished()), this, SLOT(stop_helper()));
+		m_view->zoomMin(400);
+	}
+	else
+		stop_helper();
 
 }
 
@@ -333,7 +352,7 @@ QRect SceneLayout::getSmallLayoutRect() const // scene rect
 QRect SceneLayout::getLayoutRect() const
 {
 	QRect video_rect = getSmallLayoutRect();
-	video_rect.adjust(-SLOT_WIDTH, - SLOT_HEIGHT*2, SLOT_WIDTH, SLOT_HEIGHT*2);
+	//video_rect.adjust(-SLOT_WIDTH, - SLOT_HEIGHT*2, SLOT_WIDTH, SLOT_HEIGHT*2); // issue wuth 8180 rotation?
 	return video_rect;
 }
 
@@ -750,7 +769,7 @@ void SceneLayout::loadContent()
 
 	foreach(LayoutImage img, img_list)
 	{
-		CLStaticImageItem* item = new CLStaticImageItem(m_view, img.width(), img.height(), img.getImage1());
+		CLStaticImageItem* item = new CLStaticImageItem(m_view, img.width(), img.height(), img.getImage(), img.getName(), m_EventHandler);
 		item->setOpacity(0.8);
 		
 		addItem(item, img.getX(), img.getY());

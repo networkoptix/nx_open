@@ -126,9 +126,9 @@ m_videoView(this)
 
 	toggleFullScreen();
 
+	connect(&m_camlayout, SIGNAL(stoped()), this, SLOT(onLayOutStoped()));
 
 	m_camlayout.setContent(startscreen_content());
-
 	m_camlayout.start();
 }
 
@@ -157,17 +157,26 @@ void MainWnd::toggleFullScreen()
 void MainWnd::onItemPressed(QString name)
 {
 
-	if (name=="Servers")
+	m_lastCommand = name;
+
+	if (name=="logo")
 	{
-		m_camlayout.stop();
-
-		m_camlayout.setContent(LayoutContent());
-
-		m_camlayout.start();
+		m_camlayout.stop(true);
 	}
 
 }
 
+void MainWnd::onLayOutStoped()
+{
+	if (m_lastCommand=="logo")
+	{
+		m_camlayout.setContent(LayoutContent());
+		m_camlayout.start();
+	}
+
+	m_lastCommand = "";
+
+}
 //====================================================================
 //====================================================================
 

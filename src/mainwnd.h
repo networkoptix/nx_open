@@ -27,18 +27,22 @@ public:
 
 protected slots:
 	void onItemPressed(QString name);
+	void onLayOutStoped();
 private:
 
 	Ui::MainWndClass ui;
 
 	GraphicsView m_videoView;
 	QGraphicsScene m_scene;
-
 	SceneLayout m_camlayout;
 
 private:
 
 	void closeEvent ( QCloseEvent * event );
+
+	QString m_lastCommand;
+	QString m_lastLayoutName;
+
 
 	
 };

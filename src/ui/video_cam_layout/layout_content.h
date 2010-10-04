@@ -28,10 +28,14 @@ public:
 
 	int angle() const;
 
+	void setName(const QString& name);
+	QString getName() const;
+
 protected:
 	int x, y;
 	int w, h;
 	int angl;
+	QString name;
 };
 //=======
 
@@ -52,27 +56,21 @@ class LayoutButton: public LayoutContentItem
 {
 public:
 	LayoutButton(const QString& name, int x, int y, int width, int height, int angle = 0);
-
 	virtual Type type() const;
 
-	QString getName() const;
-protected:
-	QString name;
 };
 //=======
 
 class LayoutImage: public LayoutContentItem
 {
 public:
-	LayoutImage(const QString& img1, const QString& img2, int x, int y, int width, int height, int angle = 0);
+	LayoutImage(const QString& img, const QString& name, int x, int y, int width, int height, int angle = 0);
 
 	virtual Type type() const ;
-
-	QString getImage1() const;
-	QString getImage2() const;
+	QString getImage() const;
 protected:
-	QString image1;
-	QString image2;
+	QString image;
+
 };
 
 //=======================================================================================================
@@ -87,7 +85,7 @@ public:
 	void addButton(const QString& name, int x, int y, int width, int height, int angle = 0);
 	void addButton(const CLCustomBtnItem* item);
 
-	void addImage(const QString& img1, const QString& img2, int x, int y, int width, int height, int angle = 0);
+	void addImage(const QString& img, const QString& name, int x, int y, int width, int height, int angle = 0);
 	void addImage(const CLStaticImageItem* item);
 
 	void setDeviceCriteria(const CLDeviceCriteria& cr);

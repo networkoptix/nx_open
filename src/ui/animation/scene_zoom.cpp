@@ -6,7 +6,7 @@
 #include "settings.h"
 
 
-static const qreal min_zoom = 0.07;
+static const qreal min_zoom = 0.06;
 static const qreal max_zoom = 4.0;
 static const qreal def_zoom = 0.22;
 

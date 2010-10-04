@@ -17,6 +17,17 @@ LayoutContentItem::~LayoutContentItem()
 
 }
 
+void LayoutContentItem::setName(const QString& name)
+{
+	this->name = name;
+}
+
+QString LayoutContentItem::getName() const
+{
+	return name;
+}
+
+
 
 int LayoutContentItem::getX() const
 {
@@ -76,10 +87,9 @@ QString LayoutDevice::getId() const
 
 //=======
 LayoutButton::LayoutButton(const QString& name_, int x_, int y_, int width_, int height_, int angle_):
-LayoutContentItem(x_, y_, width_, height_,  angle_),
-name(name_)
+LayoutContentItem(x_, y_, width_, height_,  angle_)
 {
-
+	setName(name_);
 }
 
 LayoutContentItem::Type LayoutButton::type() const
@@ -87,19 +97,13 @@ LayoutContentItem::Type LayoutButton::type() const
 	return BUTTON;
 }
 
-
-QString LayoutButton::getName() const
-{
-	return name;
-}
 //=======
 
-LayoutImage::LayoutImage(const QString& img1, const QString& img2, int x_, int y_, int width_, int height_, int angle_):
+LayoutImage::LayoutImage(const QString& img, const QString& name, int x_, int y_, int width_, int height_, int angle_):
 LayoutContentItem(x_, y_, width_, height_,  angle_),
-image1(img1),
-image2(img2)
+image(img)
 {
-
+	setName(name);
 }
 
 LayoutContentItem::Type LayoutImage::type() const
@@ -108,14 +112,9 @@ LayoutContentItem::Type LayoutImage::type() const
 }
 
 
-QString LayoutImage::getImage1() const
+QString LayoutImage::getImage() const
 {
-	return image1;
-}
-
-QString LayoutImage::getImage2() const
-{
-	return image2;
+	return image;
 }
 
 //=======================================================================================================
@@ -140,9 +139,9 @@ void LayoutContent::addButton(const CLCustomBtnItem* item)
 
 }
 
-void LayoutContent::addImage(const QString& img1, const QString& img2, int x, int y, int width, int height, int angle)
+void LayoutContent::addImage(const QString& img, const QString& name, int x, int y, int width, int height, int angle)
 {
-	m_imgs.push_back(LayoutImage(img1, img2, x, y, width, height, angle));
+	m_imgs.push_back(LayoutImage(img, name, x, y, width, height, angle));
 }
 
 void LayoutContent::addImage(const CLStaticImageItem* item)

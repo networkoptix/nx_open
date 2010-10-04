@@ -16,6 +16,8 @@ public:
 	virtual void stop();
 	bool isRuning() const;
 
+signals:
+	void finished();
 protected slots:
 		virtual void valueChanged ( qreal pos ) = 0;
 		virtual void onFinished();

@@ -42,6 +42,9 @@ public:
 
 	void stopAnimation();
 
+signals:
+	void scneZoomFinished();
+
 protected:
 	virtual void wheelEvent ( QWheelEvent * e );
 	void mouseReleaseEvent ( QMouseEvent * e);
@@ -80,9 +83,10 @@ protected:
 	void showStop_helper();
 
 public slots:
+	
 	void fitInView(int duration = 600);
 private slots:
-	
+	void onScneZoomFinished();
 	void reAdjustSceneRect();
 	void onShowTimer();
 	void onShowStart();

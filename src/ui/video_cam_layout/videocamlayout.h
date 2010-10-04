@@ -46,7 +46,7 @@ public:
 
 	// stop must be called before remove layout from the scene, but after animation I  think
 	// stops all cams, removes all Items from, the scene
-	void stop();
+	void stop(bool animation = false);
 
 	//================================================
 	// position of window( if any ) will be changed
@@ -111,10 +111,15 @@ public:
 	void loadContent();
 	void saveContent();
 	//========================================================
+
+signals:
+	void stoped();
 protected slots:
 	void onAspectRatioChanged(CLAbstractSceneItem* wnd);
 	void onTimer();
 	void onVideoTimer();
+
+	void stop_helper();
 private:
 
 	
