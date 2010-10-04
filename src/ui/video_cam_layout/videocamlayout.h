@@ -114,7 +114,9 @@ public:
 
 signals:
 	void stoped();
+	void onItemPressed(QString lyouname, QString itemname);
 protected slots:
+	void onItemPressed(QString name);
 	void onAspectRatioChanged(CLAbstractSceneItem* wnd);
 	void onTimer();
 	void onVideoTimer();

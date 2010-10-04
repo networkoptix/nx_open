@@ -120,6 +120,7 @@ m_videoView(this)
 	
 	//showFullScreen();
 
+	
 	m_camlayout.setEventHandler(this);
 	m_camlayout.setView(&m_videoView);
 	m_camlayout.setScene(&m_scene);
@@ -129,6 +130,7 @@ m_videoView(this)
 	connect(&m_camlayout, SIGNAL(stoped()), this, SLOT(onLayOutStoped()));
 
 	m_camlayout.setContent(startscreen_content());
+	m_camlayout.setName("start screen");
 	m_camlayout.start();
 }
 
@@ -154,24 +156,30 @@ void MainWnd::toggleFullScreen()
 		showMaximized();
 }
 
-void MainWnd::onItemPressed(QString name)
+void MainWnd::onItemPressed(QString layoutname, QString itemname)
 {
 
-	m_lastCommand = name;
+	m_lastCommand = itemname;
+	m_lastLayoutName = layoutname;
 
-	if (name=="logo")
+	if (m_lastLayoutName == "start screen")
 	{
-		m_camlayout.stop(true);
+		if (m_lastCommand=="logo")
+			m_camlayout.stop(true);
 	}
+
 
 }
 
 void MainWnd::onLayOutStoped()
 {
-	if (m_lastCommand=="logo")
+	if (m_lastLayoutName == "start screen")
 	{
-		m_camlayout.setContent(LayoutContent());
-		m_camlayout.start();
+		if (m_lastCommand=="logo")
+		{
+			m_camlayout.setContent(LayoutContent());
+			m_camlayout.start();
+		}
 	}
 
 	m_lastCommand = "";

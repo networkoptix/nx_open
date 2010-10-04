@@ -26,7 +26,7 @@ public:
 	void toggleFullScreen();
 
 protected slots:
-	void onItemPressed(QString name);
+	void onItemPressed(QString layoutname, QString itemname);
 	void onLayOutStoped();
 private:
 

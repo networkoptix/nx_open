@@ -35,7 +35,8 @@ m_item_distance(35/100.0),
 m_max_items(max_items),
 m_slots(max_items*4),
 m_firstTime(true),
-m_isRunning(false)
+m_isRunning(false),
+m_EventHandler(0)
 {
 	m_width = m_slots/m_height;
 	buildPotantial();
@@ -283,7 +284,10 @@ void SceneLayout::setScene(QGraphicsScene* scene)
 
 void SceneLayout::setEventHandler(QObject* eventhandler)
 {
+	if (m_EventHandler)
+		disconnect(this, SIGNAL(onItemPressed(QString , QString )), m_EventHandler, SLOT(onItemPressed(QString , QString )));
 	m_EventHandler = eventhandler;
+	connect(this, SIGNAL(onItemPressed(QString , QString )), m_EventHandler, SLOT(onItemPressed(QString , QString )));
 }
 
 void SceneLayout::setName(const QString& name)
@@ -635,6 +639,11 @@ CLAbstractSceneItem* SceneLayout::next_item_helper(const CLAbstractSceneItem* cu
 
 }
 
+void SceneLayout::onItemPressed(QString name)
+{
+	emit onItemPressed(m_Name, name);
+}
+
 void SceneLayout::onAspectRatioChanged(CLAbstractSceneItem* item)
 {
 	if (item->isArranged())
@@ -769,7 +778,7 @@ void SceneLayout::loadContent()
 
 	foreach(LayoutImage img, img_list)
 	{
-		CLStaticImageItem* item = new CLStaticImageItem(m_view, img.width(), img.height(), img.getImage(), img.getName(), m_EventHandler);
+		CLStaticImageItem* item = new CLStaticImageItem(m_view, img.width(), img.height(), img.getImage(), img.getName(), this);
 		item->setOpacity(0.8);
 		
 		addItem(item, img.getX(), img.getY());
@@ -778,7 +787,7 @@ void SceneLayout::loadContent()
 	foreach(LayoutButton btn, btns_list)
 	{
 		
-		CLCustomBtnItem* item = new CLCustomBtnItem(m_view, btn.width(), btn.height(), btn.getName(),m_EventHandler,btn.getName(), "tiiktip text");
+		CLCustomBtnItem* item = new CLCustomBtnItem(m_view, btn.width(), btn.height(), btn.getName(),this,btn.getName(), "tiiktip text");
 		
 
 		addItem(item, btn.getX(), btn.getY());
