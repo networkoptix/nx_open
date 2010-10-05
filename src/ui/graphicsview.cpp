@@ -18,6 +18,7 @@
 #include "device_settings/dlg_factory.h"
 #include "device_settings/device_settings_dlg.h"
 #include "videoitem/video_wnd_item.h"
+#include "videoitem/static_image_widget.h"
 
 
 
@@ -65,6 +66,11 @@ mAcceptInput(false)
 	mShow.mTimer.setInterval(1000);
 	mShow.mTimer.start();
 
+	/*
+	CLStaticImageWidget * wgt = new CLStaticImageWidget(this->viewport(), "./skin/home.bmp", "home", 300);
+	wgt->move(0,0);
+	wgt->show();
+	/**/
 
 }
 
@@ -830,6 +836,13 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 		{
 			if (wnd->toVideoItem())
 				show_device_settings_helper(wnd->toVideoItem()->getVideoCam()->getDevice());
+
+			/*
+			CLStaticImageWidget * wgt = new CLStaticImageWidget(this, "./skin/home.bmp", "home", 100);
+			wgt->move(1,1);
+			wgt->show();
+			/**/
+
 		}
 
 	}
@@ -1078,7 +1091,7 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 
 void GraphicsView::drawBackground ( QPainter * painter, const QRectF & rect )
 {
-
+	//QGraphicsView::drawBackground ( painter, rect );
 	//=================
 	static int frames = 0;
 	frames++;

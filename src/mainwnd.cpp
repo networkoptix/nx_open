@@ -71,7 +71,7 @@ m_videoView(this)
 	m_videoView.setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_videoView.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-	//m_videoView.setBackgroundBrush(QPixmap("c:/photo/32.jpg"));
+	//m_videoView.setBackgroundBrush(QPixmap("c:/photo/73.jpg"));
 	//m_scene.setItemIndexMethod(QGraphicsScene::NoIndex);
 
 	m_videoView.setScene(&m_scene);

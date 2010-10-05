@@ -51,8 +51,8 @@ SOURCES += device_plugins/fake/streamreader/fake_file_streamreader.cpp
 HEADERS += device_plugins/fake/devices/fake_device_server.h device_plugins/fake/devices/fake_device.h
 HEADERS += device_plugins/fake/streamreader/fake_file_streamreader.h
 
-SOURCES +=ui/graphicsview.cpp ui/videoitem/loup_wnd.cpp ui/videoitem/abstract_scene_item.cpp  ui/videoitem/static_image_item.cpp ui/videoitem/custom_draw_button.cpp ui/videoitem/img_item.cpp ui/videoitem/video_wnd_item.cpp
-HEADERS +=ui/graphicsview.h  ui/videoitem/loup_wnd.h  ui/videoitem/abstract_scene_item.h  ui/videoitem/static_image_item.h ui/videoitem/custom_draw_button.h ui/videoitem/img_item.h ui/videoitem/video_wnd_item.h
+SOURCES +=ui/graphicsview.cpp ui/videoitem/loup_wnd.cpp ui/videoitem/abstract_scene_item.cpp  ui/videoitem/static_image_item.cpp ui/videoitem/static_image_widget.cpp ui/videoitem/custom_draw_button.cpp ui/videoitem/img_item.cpp ui/videoitem/video_wnd_item.cpp
+HEADERS +=ui/graphicsview.h  ui/videoitem/loup_wnd.h  ui/videoitem/abstract_scene_item.h  ui/videoitem/static_image_item.h ui/videoitem/static_image_widget.h ui/videoitem/custom_draw_button.h ui/videoitem/img_item.h ui/videoitem/video_wnd_item.h
 
 HEADERS += ui/video_cam_layout/videocamlayout.h  ui/animation/animation_timeline.h ui/animation/mouse_state.h ui/animation/animated_show.h
 HEADERS += ui/animation/scene_movement.h ui/animation/scene_zoom.h ui/animation/abstract_animation.h ui/animation/item_trans.h ui/animation/animated_bgr.h
