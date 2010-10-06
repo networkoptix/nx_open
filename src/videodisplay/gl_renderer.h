@@ -92,6 +92,8 @@ private:
 	GLuint m_program[2];
 	GLuint m_texture[3];
 
+	bool m_textureUploaded;
+
 	int m_stride, // in memorry 
 		m_width, // visible width
 		m_height,

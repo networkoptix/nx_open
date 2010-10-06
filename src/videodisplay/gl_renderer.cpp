@@ -140,7 +140,8 @@ m_height(0),
 m_stride_old(0),
 m_height_old(0),
 m_needwait(true),
-m_inited(false)
+m_inited(false),
+m_textureUploaded(false)
 {
 	applyMixerSettings(m_brightness, m_contrast, m_hue, m_saturation);
 
@@ -162,7 +163,8 @@ int CLGLRenderer::checkOpenGLError() const
 
 CLGLRenderer::~CLGLRenderer()
 {
-	
+	if (m_textureUploaded)
+		glDeleteTextures(3, m_texture);
 }
 
 
@@ -519,6 +521,7 @@ void CLGLRenderer::updateTexture()
 				OGL_CHECK_ERROR("glPixelStorei");
 			}
 
+			m_textureUploaded = true;
 
 
 
