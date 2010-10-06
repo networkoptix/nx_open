@@ -37,6 +37,7 @@ public:
 	void setName(const QString& name);
 	QString getName() const;
 	void setContent(const LayoutContent& cont);
+	void setDecoration(int dec);
 
 	//================================================
 
@@ -188,6 +189,7 @@ private:
 
 	LayoutContent m_content;
 	
+	int m_decoration;
 
 };
 

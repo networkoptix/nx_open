@@ -1,3 +1,4 @@
+//#include <vld.h>
 #include "mainwnd.h"
 #include <QtGui/QApplication>
 
@@ -15,9 +16,9 @@
 #include "device/device_managmen/device_manager.h"
 
 
-
 int main(int argc, char *argv[])
 {
+
 	QApplication a(argc, argv);
 	QDir::setCurrent(QFileInfo(argv[0]).absolutePath());
 

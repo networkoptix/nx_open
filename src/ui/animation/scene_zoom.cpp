@@ -81,6 +81,7 @@ void CLSceneZoom::valueChanged( qreal dpos )
 	tr.scale(scl, scl);
 	tr.rotate(global_rotation_angel, Qt::YAxis);
 	m_view->setTransform(tr);
+	m_view->addjustAllStaticItems();
 
 
 	//=======================================

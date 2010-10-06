@@ -7,4 +7,4 @@ QFont settings_font("Bodoni MT", 12);
 QColor global_shadow_color(0, 0, 0, 128);
 
 // how often we run new device search and how often layout synchronizes with device manager 
-int devices_update_interval = 1000;
+int devices_update_interval = 2000;

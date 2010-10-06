@@ -180,7 +180,7 @@ CLDeviceList CLDiviceSeracher::findNewDevices(bool allow_to_change_ip, bool& ip_
 	time.restart();
 
 	cl_log.log("Checking for real conflicts ", devices.size(), " devices.", cl_logDEBUG1);
-	markConflictingDevices(devices,10);
+	markConflictingDevices(devices,5);
 	fromListToList(devices, bad_ip_list, CLDeviceStatus::CONFLICTING, CLDeviceStatus::CONFLICTING);
 	cl_log.log("Time elapsed ", time.restart(), cl_logDEBUG1);
 	cl_log.log(" ", devices.size(), " new(!) devices not conflicting .", cl_logDEBUG1);

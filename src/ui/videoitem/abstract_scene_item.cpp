@@ -37,9 +37,9 @@ m_zoomOnhover(true)
 
 	setZValue(1.0);
 
-	setFlag(QGraphicsItem::ItemIsFocusable);
+	//setFlag(QGraphicsItem::ItemIsFocusable);
 
-	setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);
+	//setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);
 
 	if (handler)
 		connect(this, SIGNAL(onPressed(QString)), handler, SLOT(onItemPressed(QString)));

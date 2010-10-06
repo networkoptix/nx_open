@@ -15,11 +15,15 @@ class MainWnd;
 class QGraphicsPixmapItem;
 class CLAnimatedBackGround;
 class CLAbstractDeviceSettingsDlg;
+class CLAbstractUnmovedItem;
 
 class GraphicsView: public QGraphicsView 
 {
 	Q_OBJECT
 public:
+
+	enum Decoration{NONE, VIDEO};
+
 	GraphicsView(MainWnd* mainWnd);
 	virtual ~GraphicsView();
 
@@ -42,9 +46,14 @@ public:
 	
 	void setAcceptInput(bool accept); 
 
+
+	void addjustAllStaticItems();
+	void setDecoration(Decoration dec);
+	void centerOn(const QPointF &pos);
+
 signals:
 	void scneZoomFinished();
-
+	void onPressed(QString, QString);
 protected:
 	virtual void wheelEvent ( QWheelEvent * e );
 	void mouseReleaseEvent ( QMouseEvent * e);
@@ -82,6 +91,13 @@ protected:
 
 	void showStop_helper();
 
+
+	//========decorations=====
+	void addStaticItem(CLAbstractUnmovedItem* item);
+	void removeAllStaticItems();
+
+
+
 public slots:
 	
 	void fitInView(int duration = 600);
@@ -90,6 +106,7 @@ private slots:
 	void reAdjustSceneRect();
 	void onShowTimer();
 	void onShowStart();
+	void onStaticItemPressed(QString);
 protected:
 	
 	int m_xRotate;
@@ -144,6 +161,8 @@ protected:
 
 	bool mAcceptInput;
 	
+	//====decoration======
+	QList<CLAbstractUnmovedItem*> m_staticItems;
 
 
 };

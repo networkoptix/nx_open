@@ -64,6 +64,11 @@ void SceneLayout::setContent(const LayoutContent& cont)
 	m_content = cont;
 }
 
+void SceneLayout::setDecoration(int dec)
+{
+	m_decoration =  dec;
+}
+
 void SceneLayout::start()
 {
 	if (m_isRunning)
@@ -98,6 +103,7 @@ void SceneLayout::stop_helper()
 		// after we can wait for each thread to stop
 		cl_log.log("About to shut down camera ", (int)cam ,"\r\n", cl_logDEBUG1);
 		cam->stopDispay();
+		cam->getDevice()->releaseRef();
 		delete cam;
 	}
 
@@ -163,6 +169,8 @@ void SceneLayout::onTimer()
 		m_firstTime =  false;
 		m_timer.setInterval(devices_update_interval);
 		QThread::currentThread()->setPriority(QThread::IdlePriority); // surprised. if gui thread has low priority => things looks smoother 
+		//QThread::currentThread()->setPriority(QThread::HighestPriority); // surprised. if gui thread has low priority => things looks smoother 
+		m_view->setDecoration((GraphicsView::Decoration)m_decoration);
 		onFirstSceneAppearance();
 		m_view->setAcceptInput(true);
 	}

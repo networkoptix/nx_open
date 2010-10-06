@@ -71,7 +71,7 @@ m_videoView(this)
 	m_videoView.setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_videoView.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-	//m_videoView.setBackgroundBrush(QPixmap("c:/photo/73.jpg"));
+	//m_videoView.setBackgroundBrush(QPixmap("./skin/logo.png"));
 	//m_scene.setItemIndexMethod(QGraphicsScene::NoIndex);
 
 	m_videoView.setScene(&m_scene);
@@ -129,8 +129,13 @@ m_videoView(this)
 
 	connect(&m_camlayout, SIGNAL(stoped()), this, SLOT(onLayOutStoped()));
 
+
+	connect(&m_videoView, SIGNAL(onPressed(QString, QString)), this, SLOT(onItemPressed(QString, QString)));
+
 	m_camlayout.setContent(startscreen_content());
+	m_camlayout.setDecoration(int(GraphicsView::NONE));
 	m_camlayout.setName("start screen");
+	
 	m_camlayout.start();
 }
 
@@ -167,6 +172,11 @@ void MainWnd::onItemPressed(QString layoutname, QString itemname)
 		if (m_lastCommand=="logo")
 			m_camlayout.stop(true);
 	}
+	else if (m_lastLayoutName == "video")
+	{
+		if (m_lastCommand=="home")
+			m_camlayout.stop(true);
+	}
 
 
 }
@@ -177,10 +187,33 @@ void MainWnd::onLayOutStoped()
 	{
 		if (m_lastCommand=="logo")
 		{
+			
 			m_camlayout.setContent(LayoutContent());
+			m_camlayout.setDecoration(int(GraphicsView::VIDEO));
+			m_camlayout.setName("video");
+			m_camlayout.start();
+			/**/
+
+			/*
+			m_camlayout.setContent(startscreen_content());
+			m_camlayout.setDecoration(int(GraphicsView::NONE));
+			m_camlayout.setName("start screen");
+			m_camlayout.start();
+			/**/
+
+		}
+	}
+	else if (m_lastLayoutName == "video")
+	{
+		if (m_lastCommand=="home")
+		{
+			m_camlayout.setContent(startscreen_content());
+			m_camlayout.setDecoration(int(GraphicsView::NONE));
+			m_camlayout.setName("start screen");
 			m_camlayout.start();
 		}
 	}
+
 
 	m_lastCommand = "";
 

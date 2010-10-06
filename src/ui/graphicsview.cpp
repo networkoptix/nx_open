@@ -19,6 +19,8 @@
 #include "device_settings/device_settings_dlg.h"
 #include "videoitem/video_wnd_item.h"
 #include "videoitem/static_image_widget.h"
+#include "videoitem/abstract_unmoved_item.h"
+#include "videoitem/unmoved_pixture_button.h"
 
 
 
@@ -197,6 +199,7 @@ void GraphicsView::updateTransform(qreal angle)
 	tr.rotate(angle/10.0, Qt::YAxis);
 	//tr.rotate(angle/10.0, Qt::XAxis);
 	setTransform(tr);
+	addjustAllStaticItems();
 	
 
 }
@@ -296,6 +299,55 @@ void GraphicsView::showStop_helper()
 
 }
 
+void GraphicsView::centerOn(const QPointF &pos)
+{
+	QGraphicsView::centerOn(pos);	
+	addjustAllStaticItems();
+}
+
+void GraphicsView::setDecoration(GraphicsView::Decoration dec)
+{
+	removeAllStaticItems();
+	if (dec == NONE)
+		return;
+
+	if (dec == VIDEO)
+	{
+		CLUnMovedPixture* item = new CLUnMovedPixtureButton(this, "home", "./skin/logo.png", 100, 100, 255, 0.2);
+		item->setStaticPos(QPoint(1,1));
+		addStaticItem(item);
+	}
+}
+
+void GraphicsView::addjustAllStaticItems()
+{
+	foreach(CLAbstractUnmovedItem* item, m_staticItems)
+	{
+		item->adjust();
+	}
+}
+
+void GraphicsView::addStaticItem(CLAbstractUnmovedItem* item)
+{
+	m_staticItems.push_back(item);
+	item->adjust();
+	scene()->addItem(item);
+	connect(item, SIGNAL(onPressed(QString)), this, SLOT(onStaticItemPressed(QString)));
+}
+
+void GraphicsView::removeAllStaticItems()
+{
+	foreach(CLAbstractUnmovedItem* item, m_staticItems)
+	{
+		scene()->removeItem(item);
+		disconnect(item, SIGNAL(onPressed(QString)), this, SLOT(onStaticItemPressed(QString)));
+		delete item;
+	}
+
+	m_staticItems.clear();
+}
+
+
 void GraphicsView::setAcceptInput(bool accept)
 {
 	mAcceptInput = accept;
@@ -388,6 +440,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 		QScrollBar *vBar = verticalScrollBar();
 		hBar->setValue(hBar->value() + (isRightToLeft() ? delta.x() : -delta.x()));
 		vBar->setValue(vBar->value() - delta.y());
+		addjustAllStaticItems();
 		
 		//cl_log.log("==m_handMoving!!!=====", cl_logDEBUG1);
 
@@ -1152,6 +1205,12 @@ CLAbstractSceneItem* GraphicsView::getLastSelectedItem()
 	
 	return m_camLayout->getCenterWnd();
 	
+}
+
+
+void GraphicsView::onStaticItemPressed(QString name)
+{
+	emit onPressed(m_camLayout->getName(), name);
 }
 
 void GraphicsView::onScneZoomFinished()

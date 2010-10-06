@@ -17,7 +17,7 @@ CLImageItem(view, max_width,max_height,name,handler)
 
 	m_aspectratio = qreal(m_imageWidth)/m_imageHeight;
 
-	m_img.setMask(m_img.createHeuristicMask());
+	//m_img.setMask(m_img.createHeuristicMask());
 
 }
 
