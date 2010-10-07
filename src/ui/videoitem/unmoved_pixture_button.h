@@ -3,6 +3,7 @@
 
 #include "abstract_unmoved_item.h"
 #include <QTimer>
+class QPropertyAnimation;
 
 class CLUnMovedPixture : public CLAbstractUnmovedItem
 {
@@ -25,6 +26,7 @@ protected:
 class CLUnMovedPixtureButton : public CLUnMovedPixture
 {
 	Q_OBJECT
+	Q_PROPERTY(qreal opacity  READ opacity   WRITE setOpacity)
 public:
 	CLUnMovedPixtureButton(QGraphicsView* view, QString name, QString img, int max_width, int max_height, qreal z, qreal opacity);
 signals:
@@ -34,14 +36,10 @@ protected:
 	virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
 	void mouseReleaseEvent( QGraphicsSceneMouseEvent * event );
 	void mousePressEvent ( QGraphicsSceneMouseEvent * event );
+protected slots:
+	void stopAnimation();
 protected:
-	QTimer m_timer;
-	bool m_runing;
-
-	qreal m_cuur_opacity;
-	qreal m_step;
-	int m_period;
-
+	QPropertyAnimation* m_animation;
 
 };
 

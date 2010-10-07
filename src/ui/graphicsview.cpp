@@ -313,9 +313,16 @@ void GraphicsView::setDecoration(GraphicsView::Decoration dec)
 
 	if (dec == VIDEO)
 	{
-		CLUnMovedPixture* item = new CLUnMovedPixtureButton(this, "home", "./skin/logo.png", 100, 100, 255, 0.2);
+		CLAbstractUnmovedItem* item;
+
+		item = new CLUnMovedPixtureButton(this, "home", "./skin/logo.png", 100, 100, 255, 0.45);
 		item->setStaticPos(QPoint(1,1));
 		addStaticItem(item);
+
+		item = new CLUnMovedPixture(this, "background", "./skin/logo.png", viewport()->width(), viewport()->height(), -1, 0.08);
+		item->setStaticPos(QPoint(1,1));
+		addStaticItem(item);
+
 	}
 }
 
@@ -749,6 +756,8 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 	}
 
 	CLAbstractSceneItem* wnd = static_cast<CLAbstractSceneItem*>(itemAt(event->pos()));
+	if (!m_camLayout->hasSuchItem(wnd)) // this is decoration somthing
+		wnd = 0;
 
 	QAction cm_exit("Exit",0);
 	QAction cm_fitinview("Fit in View",0);
@@ -996,6 +1005,7 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 	{
 		case Qt::Key_S:
 			global_show_item_text=!global_show_item_text;
+			removeAllStaticItems();
 			break;
 
 		case Qt::Key_Q:
