@@ -12,6 +12,7 @@ CLVideoCamera::CLVideoCamera(CLDevice* device, CLVideoWindowItem* videovindow):
 m_device(device),
 m_videovindow(videovindow)
 {
+
 	m_device->getBaseInfo();
 
 	cl_log.log("Creating camera for ", m_device->toString(), cl_logDEBUG1);

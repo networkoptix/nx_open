@@ -16,6 +16,7 @@ class QGraphicsPixmapItem;
 class CLAnimatedBackGround;
 class CLAbstractDeviceSettingsDlg;
 class CLAbstractUnmovedItem;
+class QParallelAnimationGroup;
 
 class GraphicsView: public QGraphicsView 
 {
@@ -84,18 +85,16 @@ protected:
 	void mouseSpeed_helper(qreal& mouse_speed,  int& dx, int&dy, int min_spped, int speed_factor);
 	bool isItemStillExists(const CLAbstractSceneItem* wnd) const;
 
-
-	
-
 	void drawBackground ( QPainter * painter, const QRectF & rect );
 
 	void showStop_helper();
+	void stopGroupAnimation();
 
 
 	//========decorations=====
 	void addStaticItem(CLAbstractUnmovedItem* item);
 	void removeAllStaticItems();
-
+	
 
 
 public slots:
@@ -164,6 +163,7 @@ protected:
 	//====decoration======
 	QList<CLAbstractUnmovedItem*> m_staticItems;
 
+	QParallelAnimationGroup *m_groupAnimation;
 
 };
 

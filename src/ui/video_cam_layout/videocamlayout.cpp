@@ -132,8 +132,8 @@ void SceneLayout::stop(bool animation)
 	cl_log.log("SceneLayout::stop......\r\n ", cl_logDEBUG1);
 
 	m_view->setAcceptInput(false);
-	m_view->stopAnimation(); // stops animation 
 	m_view->setZeroSelection(); 
+	m_view->stopAnimation(); // stops animation 
 	
 
 	m_view->closeAllDlg();

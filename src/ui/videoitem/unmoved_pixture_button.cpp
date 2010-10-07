@@ -63,6 +63,11 @@ m_animation(0)
 	setAcceptsHoverEvents(true);
 }
 
+CLUnMovedPixtureButton::~CLUnMovedPixtureButton()
+{
+	stopAnimation();
+}
+
 void CLUnMovedPixtureButton::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
 	stopAnimation();

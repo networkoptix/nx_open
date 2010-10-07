@@ -29,6 +29,7 @@ class CLUnMovedPixtureButton : public CLUnMovedPixture
 	Q_PROPERTY(qreal opacity  READ opacity   WRITE setOpacity)
 public:
 	CLUnMovedPixtureButton(QGraphicsView* view, QString name, QString img, int max_width, int max_height, qreal z, qreal opacity);
+	~CLUnMovedPixtureButton();
 signals:
 	void onPressed(QString);
 protected:

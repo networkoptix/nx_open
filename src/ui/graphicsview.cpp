@@ -59,7 +59,8 @@ m_logo(0),
 m_animated_bckg(new CLBlueBackGround(50)),
 mDeviceDlg(0),
 mZerroDistance(true),
-mAcceptInput(false)
+mAcceptInput(false),
+m_groupAnimation(0)
 {
 	connect(&mShow.mTimer, SIGNAL(timeout ()), this , SLOT(onShowTimer()) );
 
@@ -202,12 +203,15 @@ void GraphicsView::updateTransform(qreal angle)
 
 void GraphicsView::onShowTimer()
 {
+	if (!mAcceptInput) // we are about to stop this view
+		return;
+
 	if (!mShow.showTime)
 	{
 		mShow.mTimer.setInterval(1000);
 		mShow.counrer++;
 		
-		if (mShow.counrer>5*60)
+		if (mShow.counrer>4*60)
 		{
 			QList<CLAbstractSceneItem*> wndlst = m_camLayout->getItemList();
 			qreal total = wndlst.size();
@@ -273,6 +277,8 @@ void GraphicsView::onShowTimer()
 
 void GraphicsView::onShowStart()
 {
+	stopGroupAnimation();
+
 	if (mShow.showTime)
 	{
 		mShow.mTimer.setInterval(1000/60);
@@ -289,7 +295,8 @@ void GraphicsView::showStop_helper()
 	{
 		mShow.showTime = 0;
 		mShow.mTimer.setInterval(1000);
-		onArrange_helper();
+		if (mAcceptInput) // if we are not about to stop this view
+			onArrange_helper();
 		mShow.mTimer.start();
 	}
 
@@ -360,6 +367,8 @@ void GraphicsView::stopAnimation()
 {
 	m_scenezoom.stop();
 	m_movement.stop();
+	stopGroupAnimation();
+	showStop_helper();
 }
 
 void GraphicsView::mousePressEvent ( QMouseEvent * event)
@@ -1293,13 +1302,30 @@ void GraphicsView::onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int de
 
 }
 
+void GraphicsView::stopGroupAnimation()
+{
+	if (m_groupAnimation)
+	{
+		m_groupAnimation->stop();
+		delete m_groupAnimation;
+		m_groupAnimation = 0;
+	}
+
+}
+
 void GraphicsView::onCircle_helper(bool show)
 {
+	if (!mAcceptInput)
+		return;
+
+
+	stopGroupAnimation();
+
 	QList<CLAbstractSceneItem*> wndlst = m_camLayout->getItemList();
 	if (wndlst.empty())
 		return;
 
-	QParallelAnimationGroup *group = new QParallelAnimationGroup;
+	m_groupAnimation = new QParallelAnimationGroup;
 
 
 	qreal total = wndlst.size();
@@ -1327,7 +1353,7 @@ void GraphicsView::onCircle_helper(bool show)
 
 		anim->setEasingCurve(QEasingCurve::InOutBack);
 
-		group->addAnimation(anim);
+		m_groupAnimation->addAnimation(anim);
 	
 		//=========================
 
@@ -1341,31 +1367,37 @@ void GraphicsView::onCircle_helper(bool show)
 		anim2->setDuration(1500 + cl_get_random_val(0, 300));
 		anim2->setEasingCurve(QEasingCurve::InOutBack);
 
-		group->addAnimation(anim2);
+		m_groupAnimation->addAnimation(anim2);
 
 		item->setArranged(false);
 
 		++i;
 	}
 
-	connect(group, SIGNAL(finished ()), this, SLOT(fitInView()));
+	
 
 	if (show)
-		connect(group, SIGNAL(finished ()), this, SLOT(onShowStart()));
+		connect(m_groupAnimation, SIGNAL(finished ()), this, SLOT(onShowStart()));
+
+	connect(m_groupAnimation, SIGNAL(finished ()), this, SLOT(fitInView()));
 
 
-	group->start(QAbstractAnimation::DeleteWhenStopped);
+	m_groupAnimation->start();
 
 }
 
 void GraphicsView::onArrange_helper()
 {
+	if (!mAcceptInput)
+		return;
+
+	stopGroupAnimation();
 
 	QList<CLAbstractSceneItem*> wndlst = m_camLayout->getItemList();
 	if (wndlst.empty())
 		return;
 
-	QParallelAnimationGroup *group = new QParallelAnimationGroup;
+	m_groupAnimation = new QParallelAnimationGroup;
 	
 
 
@@ -1380,7 +1412,7 @@ void GraphicsView::onArrange_helper()
 		anim1->setDuration(1000 + cl_get_random_val(0, 300));
 		anim1->setEasingCurve(QEasingCurve::InOutBack);
 
-		group->addAnimation(anim1);
+		m_groupAnimation->addAnimation(anim1);
 
 		//=============
 
@@ -1401,23 +1433,25 @@ void GraphicsView::onArrange_helper()
 		anim2->setDuration(1000 + cl_get_random_val(0, 300));
 		anim2->setEasingCurve(QEasingCurve::InOutBack);
 
-		group->addAnimation(anim2);
+		m_groupAnimation->addAnimation(anim2);
 
 		item->setArranged(true);
 	}
 
 	//connect(group, SIGNAL(finished ()), this, SLOT(reAdjustSceneRect()));
-	connect(group, SIGNAL(finished ()), this, SLOT(fitInView()));
+	connect(m_groupAnimation, SIGNAL(finished ()), this, SLOT(fitInView()));
 
 
 
-	group->start(QAbstractAnimation::DeleteWhenStopped);
+	m_groupAnimation->start();
 	
 	
 }
 
 void GraphicsView::fitInView(int duration )
 {
+	stopGroupAnimation();
+
 	if (m_selectedWnd && isItemStillExists(m_selectedWnd) && m_selectedWnd->isFullScreen())
 	{
 		m_selectedWnd->setFullScreen(false);

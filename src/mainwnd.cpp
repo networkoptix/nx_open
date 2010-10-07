@@ -198,15 +198,7 @@ void MainWnd::onLayOutStoped()
 			m_camlayout.setDecoration(int(GraphicsView::VIDEO));
 			m_camlayout.setName(video_layout);
 			m_camlayout.start();
-			/**/
-
-			/*
-			m_camlayout.setContent(startscreen_content());
-			m_camlayout.setDecoration(int(GraphicsView::NONE));
-			m_camlayout.setName("start_screen");
-			m_camlayout.start();
-			/**/
-
+		
 		}
 	}
 	else if (m_lastLayoutName == video_layout)
