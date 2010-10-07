@@ -34,6 +34,7 @@ int item_rotation_duration = 2000;
 
 qreal selected_item_zoom = 1.63;
 
+extern QString button_home;
 //==============================================================================
 
 GraphicsView::GraphicsView(MainWnd* mainWnd):
@@ -68,11 +69,6 @@ mAcceptInput(false)
 	mShow.mTimer.setInterval(1000);
 	mShow.mTimer.start();
 
-	/*
-	CLStaticImageWidget * wgt = new CLStaticImageWidget(this->viewport(), "./skin/home.bmp", "home", 300);
-	wgt->move(0,0);
-	wgt->show();
-	/**/
 
 }
 
@@ -315,11 +311,11 @@ void GraphicsView::setDecoration(GraphicsView::Decoration dec)
 	{
 		CLAbstractUnmovedItem* item;
 
-		item = new CLUnMovedPixtureButton(this, "home", "./skin/logo.png", 100, 100, 255, 0.45);
+		item = new CLUnMovedPixtureButton(this, button_home, "./skin/logo.png", 100, 100, 255, 0.35);
 		item->setStaticPos(QPoint(1,1));
 		addStaticItem(item);
 
-		item = new CLUnMovedPixture(this, "background", "./skin/logo.png", viewport()->width(), viewport()->height(), -1, 0.08);
+		item = new CLUnMovedPixture(this, "background", "./skin/logo.png", viewport()->width(), viewport()->height(), -1, 0.03);
 		item->setStaticPos(QPoint(1,1));
 		addStaticItem(item);
 
@@ -898,12 +894,6 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 		{
 			if (wnd->toVideoItem())
 				show_device_settings_helper(wnd->toVideoItem()->getVideoCam()->getDevice());
-
-			/*
-			CLStaticImageWidget * wgt = new CLStaticImageWidget(this, "./skin/home.bmp", "home", 100);
-			wgt->move(1,1);
-			wgt->show();
-			/**/
 
 		}
 

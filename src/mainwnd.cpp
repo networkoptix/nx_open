@@ -28,6 +28,12 @@ QColor bkr_color(0,5,5,125);
 //QColor bkr_color(9/1.5,54/1.5,81/1.5);
 
 
+QString start_screen = "start screen";
+QString video_layout = "video layout";
+
+QString button_logo = "logo";
+QString button_home = "home";
+
 
 MainWnd::MainWnd(QWidget *parent, Qt::WFlags flags):
 //QMainWindow(parent, flags),
@@ -134,7 +140,7 @@ m_videoView(this)
 
 	m_camlayout.setContent(startscreen_content());
 	m_camlayout.setDecoration(int(GraphicsView::NONE));
-	m_camlayout.setName("start screen");
+	m_camlayout.setName(start_screen);
 	
 	m_camlayout.start();
 }
@@ -167,14 +173,14 @@ void MainWnd::onItemPressed(QString layoutname, QString itemname)
 	m_lastCommand = itemname;
 	m_lastLayoutName = layoutname;
 
-	if (m_lastLayoutName == "start screen")
+	if (m_lastLayoutName == start_screen)
 	{
-		if (m_lastCommand=="logo")
+		if (m_lastCommand==button_logo)
 			m_camlayout.stop(true);
 	}
-	else if (m_lastLayoutName == "video")
+	else if (m_lastLayoutName == video_layout)
 	{
-		if (m_lastCommand=="home")
+		if (m_lastCommand==button_home)
 			m_camlayout.stop(true);
 	}
 
@@ -183,33 +189,33 @@ void MainWnd::onItemPressed(QString layoutname, QString itemname)
 
 void MainWnd::onLayOutStoped()
 {
-	if (m_lastLayoutName == "start screen")
+	if (m_lastLayoutName == start_screen)
 	{
-		if (m_lastCommand=="logo")
+		if (m_lastCommand==button_logo)
 		{
 			
 			m_camlayout.setContent(LayoutContent());
 			m_camlayout.setDecoration(int(GraphicsView::VIDEO));
-			m_camlayout.setName("video");
+			m_camlayout.setName(video_layout);
 			m_camlayout.start();
 			/**/
 
 			/*
 			m_camlayout.setContent(startscreen_content());
 			m_camlayout.setDecoration(int(GraphicsView::NONE));
-			m_camlayout.setName("start screen");
+			m_camlayout.setName("start_screen");
 			m_camlayout.start();
 			/**/
 
 		}
 	}
-	else if (m_lastLayoutName == "video")
+	else if (m_lastLayoutName == video_layout)
 	{
-		if (m_lastCommand=="home")
+		if (m_lastCommand==button_home)
 		{
 			m_camlayout.setContent(startscreen_content());
 			m_camlayout.setDecoration(int(GraphicsView::NONE));
-			m_camlayout.setName("start screen");
+			m_camlayout.setName(start_screen);
 			m_camlayout.start();
 		}
 	}
