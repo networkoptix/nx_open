@@ -6,11 +6,11 @@
 #include "./animation/scene_zoom.h"
 #include "./animation/mouse_state.h"
 #include "./animation/animated_show.h"
+#include "video_cam_layout/videocamlayout.h"
 
 
 class CLAbstractSceneItem;
 class CLVideoWindowItem;
-class SceneLayout;
 class MainWnd;
 class QGraphicsPixmapItem;
 class CLAnimatedBackGround;
@@ -33,7 +33,7 @@ public:
 	void setRealSceneRect(QRect rect);
 	QRect getRealSceneRect() const;
 
-	void setCamLayOut(SceneLayout *);
+	SceneLayout& getCamLayOut();
 
 	CLAbstractSceneItem* getSelectedItem() const;
 
@@ -108,6 +108,9 @@ private slots:
 	void onStaticItemPressed(QString);
 protected:
 	
+	QGraphicsScene m_scene;
+	SceneLayout m_camLayout;
+
 	int m_xRotate;
 	qreal m_yRotate;
 	
@@ -136,7 +139,7 @@ protected:
 
 
 	QRect m_realSceneRect;
-	SceneLayout* m_camLayout;
+	
 
 
 	bool m_ignore_release_event, m_ignore_conext_menu_event;

@@ -62,7 +62,7 @@ public:
 	void removeItem(CLAbstractSceneItem* item, bool update_scene_rect = true);
 
 	// creates video item for device, if needed, camera and so on...
-	bool addDevice(CLDevice* dev);
+	bool addDevice(CLDevice* dev, bool update_scene_rect = true);
 
 	// removes device; does the opposite to addDevice
 	bool removeDevice(CLDevice* dev); 
@@ -114,7 +114,7 @@ public:
 	//========================================================
 
 signals:
-	void stoped();
+	void stoped(QString name);
 	void onItemPressed(QString lyouname, QString itemname);
 protected slots:
 	void onItemPressed(QString name);

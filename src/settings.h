@@ -9,5 +9,6 @@ extern bool global_show_item_text;
 extern QFont settings_font;
 extern int devices_update_interval;
 extern QColor global_shadow_color;
+extern QColor app_bkr_color;
 
 #endif //global_settings_h1933

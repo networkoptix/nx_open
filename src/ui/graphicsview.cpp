@@ -47,7 +47,6 @@ m_handMoving(0),
 m_rotationCounter(0),
 m_selectedWnd(0),
 m_last_selectedWnd(0),
-m_camLayout(0),
 m_ignore_release_event(false),
 m_ignore_conext_menu_event(false),
 m_rotatingWnd(0),
@@ -62,10 +61,56 @@ mZerroDistance(true),
 mAcceptInput(false),
 m_groupAnimation(0)
 {
-	connect(&mShow.mTimer, SIGNAL(timeout ()), this , SLOT(onShowTimer()) );
 
-	connect(&m_scenezoom, SIGNAL(finished()), this , SLOT(onScneZoomFinished()) );
+	setScene(&m_scene);
+
+	m_camLayout.setView(this);
+	m_camLayout.setScene(&m_scene);
+
+
+	setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers))); //Antialiasing
+	//setViewport(new QGLWidget());
+	setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform	| QPainter::TextAntialiasing); //Antialiasing
 	
+	//viewport()->setAutoFillBackground(false);
+
+
+	setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);
+	//setViewportUpdateMode(QGraphicsView::NoViewportUpdate);
+	//setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
+	//setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
+
+
+	//setCacheMode(QGraphicsView::CacheBackground);// slows down scene drawing a lot!!!
+
+
+	setOptimizationFlag(QGraphicsView::DontClipPainter);
+	setOptimizationFlag(QGraphicsView::DontSavePainterState);
+	setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing); // Antialiasing?
+
+	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+	//setBackgroundBrush(QPixmap("./skin/logo.png"));
+	//m_scene.setItemIndexMethod(QGraphicsScene::NoIndex);
+
+
+	//setTransformationAnchor(QGraphicsView::NoAnchor);
+	//setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+	//setResizeAnchor(QGraphicsView::NoAnchor);
+	//setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+
+	//setAlignment(Qt::AlignVCenter);
+
+
+	QPalette palette;
+	palette.setColor(backgroundRole(), app_bkr_color);
+	setPalette(palette);
+
+
+
+	connect(&mShow.mTimer, SIGNAL(timeout ()), this , SLOT(onShowTimer()) );
+	connect(&m_scenezoom, SIGNAL(finished()), this , SLOT(onScneZoomFinished()) );
 
 	mShow.mTimer.setInterval(1000);
 	mShow.mTimer.start();
@@ -75,6 +120,9 @@ m_groupAnimation(0)
 
 GraphicsView::~GraphicsView()
 {
+	setZeroSelection(); 
+	stopAnimation();
+	stopGroupAnimation();
 	delete m_animated_bckg;
 }
 
@@ -88,9 +136,9 @@ void GraphicsView::closeAllDlg()
 	}
 }
 
-void GraphicsView::setCamLayOut(SceneLayout* lo)
+SceneLayout& GraphicsView::getCamLayOut()
 {
-	m_camLayout = lo;
+	return m_camLayout;
 }
 
 void GraphicsView::setRealSceneRect(QRect rect)
@@ -116,7 +164,7 @@ qreal GraphicsView::getZoom() const
 
 void GraphicsView::setZeroSelection()
 {
-	if (m_selectedWnd && m_camLayout->hasSuchItem(m_selectedWnd))
+	if (m_selectedWnd && m_camLayout.hasSuchItem(m_selectedWnd))
 	{
 		m_selectedWnd->setSelected(false);
 
@@ -139,7 +187,7 @@ void GraphicsView::setAllItemsQuality(CLStreamreader::StreamQuality q, bool incr
 {
 	cl_log.log("new quality", q, cl_logDEBUG1);
 	
-	QList<CLAbstractSceneItem*> wndlst = m_camLayout->getItemList();
+	QList<CLAbstractSceneItem*> wndlst = m_camLayout.getItemList();
 
 	
 	foreach (CLAbstractSceneItem* item, wndlst)
@@ -213,7 +261,7 @@ void GraphicsView::onShowTimer()
 		
 		if (mShow.counrer>4*60)
 		{
-			QList<CLAbstractSceneItem*> wndlst = m_camLayout->getItemList();
+			QList<CLAbstractSceneItem*> wndlst = m_camLayout.getItemList();
 			qreal total = wndlst.size();
 			if (total<2)
 			{
@@ -231,7 +279,7 @@ void GraphicsView::onShowTimer()
 	else // show time
 	{
 		mShow.value++;
-		QList<CLAbstractSceneItem*> wndlst = m_camLayout->getItemList();
+		QList<CLAbstractSceneItem*> wndlst = m_camLayout.getItemList();
 		qreal total = wndlst.size();
 
 		int i = 0;
@@ -277,7 +325,7 @@ void GraphicsView::onShowTimer()
 
 void GraphicsView::onShowStart()
 {
-	stopGroupAnimation();
+	//stopGroupAnimation();
 
 	if (mShow.showTime)
 	{
@@ -306,6 +354,7 @@ void GraphicsView::centerOn(const QPointF &pos)
 {
 	QGraphicsView::centerOn(pos);	
 	addjustAllStaticItems();
+	//viewport()->update();
 }
 
 void GraphicsView::setDecoration(GraphicsView::Decoration dec)
@@ -761,7 +810,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 	}
 
 	CLAbstractSceneItem* wnd = static_cast<CLAbstractSceneItem*>(itemAt(event->pos()));
-	if (!m_camLayout->hasSuchItem(wnd)) // this is decoration somthing
+	if (!m_camLayout.hasSuchItem(wnd)) // this is decoration somthing
 		wnd = 0;
 
 	QAction cm_exit("Exit",0);
@@ -849,42 +898,42 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 		}
 		else if (act== &dis_0)
 		{
-			m_camLayout->setItemDistance(0.01 + 0);
+			m_camLayout.setItemDistance(0.01 + 0);
 			onArrange_helper();
 		}
 		else if (act== &dis_5)
 		{
-			m_camLayout->setItemDistance(0.01 + 0.05);
+			m_camLayout.setItemDistance(0.01 + 0.05);
 			onArrange_helper();
 		}
 		else if (act== &dis_10)
 		{
-			m_camLayout->setItemDistance(0.01 + 0.10);
+			m_camLayout.setItemDistance(0.01 + 0.10);
 			onArrange_helper();
 		}
 		else if (act== &dis_15)
 		{
-			m_camLayout->setItemDistance(0.01 + 0.15);
+			m_camLayout.setItemDistance(0.01 + 0.15);
 			onArrange_helper();
 		}
 		else if (act== &dis_20)
 		{
-			m_camLayout->setItemDistance(0.01 + 0.20);
+			m_camLayout.setItemDistance(0.01 + 0.20);
 			onArrange_helper();
 		}
 		else if (act== &dis_25)
 		{
-			m_camLayout->setItemDistance(0.01 + 0.25);
+			m_camLayout.setItemDistance(0.01 + 0.25);
 			onArrange_helper();
 		}
 		else if (act== &dis_30)
 		{
-			m_camLayout->setItemDistance(0.01 + 0.30);
+			m_camLayout.setItemDistance(0.01 + 0.30);
 			onArrange_helper();
 		}
 		else if (act== &dis_35)
 		{
-			m_camLayout->setItemDistance(0.01 + 0.35);
+			m_camLayout.setItemDistance(0.01 + 0.35);
 			onArrange_helper();
 		}
 
@@ -892,7 +941,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 	}
 	else // video item menu?
 	{
-		if (!m_camLayout->hasSuchItem(wnd))
+		if (!m_camLayout.hasSuchItem(wnd))
 			return;
 
 		if (act==&cm_fullscren)
@@ -934,13 +983,13 @@ void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
 
 		if (mZerroDistance)
 		{
-			m_old_distance = m_camLayout->getItemDistance();
-			m_camLayout->setItemDistance(0.01);
+			m_old_distance = m_camLayout.getItemDistance();
+			m_camLayout.setItemDistance(0.01);
 			mZerroDistance = false;
 		}
 		else
 		{
-			m_camLayout->setItemDistance(m_old_distance);
+			m_camLayout.setItemDistance(m_old_distance);
 			mZerroDistance = true;
 		}
 
@@ -1040,16 +1089,16 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 		switch (e->key()) 
 		{
 		case Qt::Key_Left:
-			next_item = m_camLayout->getNextLeftItem(last_sel_item);
+			next_item = m_camLayout.getNextLeftItem(last_sel_item);
 			break;
 		case Qt::Key_Right:
-			next_item = m_camLayout->getNextRightItem(last_sel_item);
+			next_item = m_camLayout.getNextRightItem(last_sel_item);
 			break;
 		case Qt::Key_Up:
-			next_item = m_camLayout->getNextTopItem(last_sel_item);
+			next_item = m_camLayout.getNextTopItem(last_sel_item);
 			break;
 		case Qt::Key_Down:
-			next_item = m_camLayout->getNextBottomItem(last_sel_item);
+			next_item = m_camLayout.getNextBottomItem(last_sel_item);
 			break;
 
 		}
@@ -1212,14 +1261,14 @@ CLAbstractSceneItem* GraphicsView::getLastSelectedItem()
 	}
 		
 	
-	return m_camLayout->getCenterWnd();
+	return m_camLayout.getCenterWnd();
 	
 }
 
 
 void GraphicsView::onStaticItemPressed(QString name)
 {
-	emit onPressed(m_camLayout->getName(), name);
+	emit onPressed(m_camLayout.getName(), name);
 }
 
 void GraphicsView::onScneZoomFinished()
@@ -1229,7 +1278,7 @@ void GraphicsView::onScneZoomFinished()
 
 void GraphicsView::reAdjustSceneRect()
 {
-	QRect r = m_camLayout->getLayoutRect();
+	QRect r = m_camLayout.getLayoutRect();
 	setSceneRect(0,0, 2*r.right(), 2*r.bottom());
 	setRealSceneRect(r);
 	update();
@@ -1238,7 +1287,7 @@ void GraphicsView::reAdjustSceneRect()
 //=====================================================
 bool GraphicsView::isItemStillExists(const CLAbstractSceneItem* wnd) const
 {
-	if ( m_camLayout->hasSuchItem(wnd) )// if still exists ( in layout)
+	if ( m_camLayout.hasSuchItem(wnd) )// if still exists ( in layout)
 		return true;
 
 	return false;
@@ -1321,10 +1370,11 @@ void GraphicsView::onCircle_helper(bool show)
 
 	stopGroupAnimation();
 
-	QList<CLAbstractSceneItem*> wndlst = m_camLayout->getItemList();
+	QList<CLAbstractSceneItem*> wndlst = m_camLayout.getItemList();
 	if (wndlst.empty())
 		return;
 
+	
 	m_groupAnimation = new QParallelAnimationGroup;
 
 
@@ -1334,7 +1384,7 @@ void GraphicsView::onCircle_helper(bool show)
 
 	
 	reAdjustSceneRect();
-	QRectF item_rect = m_camLayout->getSmallLayoutRect();
+	QRectF item_rect = m_camLayout.getSmallLayoutRect();
 	mShow.center = item_rect.center();
 
 	mShow.radius = max(item_rect.width(), item_rect.height())/2.5;
@@ -1393,7 +1443,7 @@ void GraphicsView::onArrange_helper()
 
 	stopGroupAnimation();
 
-	QList<CLAbstractSceneItem*> wndlst = m_camLayout->getItemList();
+	QList<CLAbstractSceneItem*> wndlst = m_camLayout.getItemList();
 	if (wndlst.empty())
 		return;
 
@@ -1419,7 +1469,7 @@ void GraphicsView::onArrange_helper()
 	}
 	/**/
 
-	QList<CLIdealWndPos> newPosLst = m_camLayout->calcArrangedPos();
+	QList<CLIdealWndPos> newPosLst = m_camLayout.calcArrangedPos();
 	for (int i = 0; i < newPosLst.count();++i)
 	{
 		CLAbstractSceneItem* item = static_cast<CLAbstractSceneItem*>(newPosLst.at(i).item);
@@ -1460,7 +1510,7 @@ void GraphicsView::fitInView(int duration )
 	}
 
 	reAdjustSceneRect();
-	QRectF item_rect = m_camLayout->getSmallLayoutRect();
+	QRectF item_rect = m_camLayout.getSmallLayoutRect();
 
 	m_movement.move(item_rect.center(), duration);
 

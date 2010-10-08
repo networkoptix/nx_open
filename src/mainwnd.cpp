@@ -23,9 +23,10 @@
 #include "../src/gui/kernel/qevent.h"
 #include "ui/videoitem/video_wnd_item.h"
 #include "ui/video_cam_layout/start_screen_content.h"
+#include "settings.h"
 
-QColor bkr_color(0,5,5,125);
-//QColor bkr_color(9/1.5,54/1.5,81/1.5);
+
+
 
 
 QString start_screen = "start screen";
@@ -42,107 +43,45 @@ m_videoView(this)
 	//ui.setupUi(this);
 	setWindowTitle("HDWitness");
 
-	QVBoxLayout *mainLayout = new QVBoxLayout;
-	
-	//=======================================================
+	setAutoFillBackground(false);
+
+	QPalette palette;
+	palette.setColor(backgroundRole(), app_bkr_color);
+	setPalette(palette);
 
 	//setWindowOpacity(.80);
 
-	
-	
-	m_videoView.setCamLayOut(&m_camlayout);
-	m_videoView.setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers))); //Antialiasing
-	//m_videoView.setViewport(new QGLWidget());
-	m_videoView.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform	| QPainter::TextAntialiasing); //Antialiasing
-	setAutoFillBackground(false);
-	//m_videoView.viewport()->setAutoFillBackground(false);
-
-
-	//m_videoView.setSceneRect(0,0,2*SCENE_LEFT, 2*SCENE_TOP);
-
-	m_videoView.setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);
-	//m_videoView.setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
-	//m_videoView.setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
-
-
-	//m_videoView.setCacheMode(QGraphicsView::CacheBackground);// slows down scene drawing a lot!!!
-
-
-	//m_videoView.setDragMode(QGraphicsView::ScrollHandDrag);
-
-	m_videoView.setOptimizationFlag(QGraphicsView::DontClipPainter);
-	m_videoView.setOptimizationFlag(QGraphicsView::DontSavePainterState);
-	m_videoView.setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing); // Antialiasing?
-
-	m_videoView.setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	m_videoView.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
-	//m_videoView.setBackgroundBrush(QPixmap("./skin/logo.png"));
-	//m_scene.setItemIndexMethod(QGraphicsScene::NoIndex);
-
-	m_videoView.setScene(&m_scene);
-	
-
-	QPalette palette;
-	palette.setColor(backgroundRole(), bkr_color);
-	setPalette(palette);
-	
-
-
-
-	palette.setColor(m_videoView.backgroundRole(), bkr_color);
-	m_videoView.setPalette(palette);
-
-	/*
-	QRadialGradient radialGrad(500, 0, 1000);
-	radialGrad.setColorAt(0, Qt::red);
-	radialGrad.setColorAt(0.5, Qt::blue);
-	radialGrad.setColorAt(1, Qt::green);
-	m_videoView.setBackgroundBrush(radialGrad);
-	/**/
-
 	//=======================================================
 
+	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->addWidget(&m_videoView);
 	setLayout(mainLayout);
 
 	//=======================================================
 
 
-	//QThread::currentThread()->setPriority(QThread::HighPriority); // Priority more tnan decoders have
-
-	const int min_wisth = 1200;
+	const int min_wisth = 400;
 	setMinimumWidth(min_wisth);
 	setMinimumHeight(min_wisth*3/4);
 
-
-	
-	//m_videoView.setTransformationAnchor(QGraphicsView::NoAnchor);
-	//m_videoView.setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
-	//m_videoView.setResizeAnchor(QGraphicsView::NoAnchor);
-	//m_videoView.setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
-
-	//m_videoView.setAlignment(Qt::AlignVCenter);
 	
 	//showFullScreen();
 
 	
-	m_camlayout.setEventHandler(this);
-	m_camlayout.setView(&m_videoView);
-	m_camlayout.setScene(&m_scene);
+	m_videoView.getCamLayOut().setEventHandler(this);
 
 	toggleFullScreen();
 
-	connect(&m_camlayout, SIGNAL(stoped()), this, SLOT(onLayOutStoped()));
+	connect(&m_videoView.getCamLayOut(), SIGNAL(stoped(QString)), this, SLOT(onLayOutStoped(QString)));
 
 
 	connect(&m_videoView, SIGNAL(onPressed(QString, QString)), this, SLOT(onItemPressed(QString, QString)));
 
-	m_camlayout.setContent(startscreen_content());
-	m_camlayout.setDecoration(int(GraphicsView::NONE));
-	m_camlayout.setName(start_screen);
+	m_videoView.getCamLayOut().setContent(startscreen_content());
+	m_videoView.getCamLayOut().setDecoration(int(GraphicsView::NONE));
+	m_videoView.getCamLayOut().setName(start_screen);
 	
-	m_camlayout.start();
+	m_videoView.getCamLayOut().start();
 }
 
 
@@ -150,7 +89,7 @@ m_videoView(this)
 MainWnd::~MainWnd()
 {
 	CLDeviceManager::instance().getDiveceSercher().wait();
-	m_camlayout.stop();
+	m_videoView.getCamLayOut().stop();
 }
 
 void MainWnd::closeEvent ( QCloseEvent * event )
@@ -176,39 +115,40 @@ void MainWnd::onItemPressed(QString layoutname, QString itemname)
 	if (m_lastLayoutName == start_screen)
 	{
 		if (m_lastCommand==button_logo)
-			m_camlayout.stop(true);
+			m_videoView.getCamLayOut().stop(true);
 	}
 	else if (m_lastLayoutName == video_layout)
 	{
 		if (m_lastCommand==button_home)
-			m_camlayout.stop(true);
+			m_videoView.getCamLayOut().stop(true);
 	}
 
 
 }
 
-void MainWnd::onLayOutStoped()
+void MainWnd::onLayOutStoped(QString layoutname)
 {
-	if (m_lastLayoutName == start_screen)
+
+	if (layoutname == start_screen)
 	{
 		if (m_lastCommand==button_logo)
 		{
 			
-			m_camlayout.setContent(LayoutContent());
-			m_camlayout.setDecoration(int(GraphicsView::VIDEO));
-			m_camlayout.setName(video_layout);
-			m_camlayout.start();
+			m_videoView.getCamLayOut().setContent(LayoutContent());
+			m_videoView.getCamLayOut().setDecoration(int(GraphicsView::VIDEO));
+			m_videoView.getCamLayOut().setName(video_layout);
+			m_videoView.getCamLayOut().start();
 		
 		}
 	}
-	else if (m_lastLayoutName == video_layout)
+	else if (layoutname == video_layout)
 	{
 		if (m_lastCommand==button_home)
 		{
-			m_camlayout.setContent(startscreen_content());
-			m_camlayout.setDecoration(int(GraphicsView::NONE));
-			m_camlayout.setName(start_screen);
-			m_camlayout.start();
+			m_videoView.getCamLayOut().setContent(startscreen_content());
+			m_videoView.getCamLayOut().setDecoration(int(GraphicsView::NONE));
+			m_videoView.getCamLayOut().setName(start_screen);
+			m_videoView.getCamLayOut().start();
 		}
 	}
 

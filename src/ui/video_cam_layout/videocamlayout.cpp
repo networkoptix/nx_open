@@ -117,7 +117,7 @@ void SceneLayout::stop_helper()
 
 	m_items.clear();
 
-	emit stoped();
+	emit stoped(m_Name);
 
 }
 
@@ -168,7 +168,8 @@ void SceneLayout::onTimer()
 	{
 		m_firstTime =  false;
 		m_timer.setInterval(devices_update_interval);
-		QThread::currentThread()->setPriority(QThread::IdlePriority); // surprised. if gui thread has low priority => things looks smoother 
+		//QThread::currentThread()->setPriority(QThread::IdlePriority); // surprised. if gui thread has low priority => things looks smoother 
+		QThread::currentThread()->setPriority(QThread::LowPriority); // surprised. if gui thread has low priority => things looks smoother 
 		//QThread::currentThread()->setPriority(QThread::HighestPriority); // surprised. if gui thread has low priority => things looks smoother 
 		m_view->setDecoration((GraphicsView::Decoration)m_decoration);
 		onFirstSceneAppearance();
@@ -202,7 +203,7 @@ void SceneLayout::onTimer()
 		{
 			// the ref counter for device already increased in getDeviceList; 
 			// must not do it again
-			if (!addDevice(dev))
+			if (!addDevice(dev, false))
 				dev->releaseRef();
 			else
 				added = true;
@@ -239,7 +240,7 @@ void SceneLayout::onFirstSceneAppearance()
 
 
 
-bool SceneLayout::addDevice(CLDevice* device)
+bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect)
 {
 	if (!isSpaceAvalable())
 	{
@@ -252,7 +253,7 @@ bool SceneLayout::addDevice(CLDevice* device)
 
 	CLVideoWindowItem* video_wnd =  new CLVideoWindowItem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height());
 	CLVideoCamera* cam = new VideoCamera(device, video_wnd);
-	addItem(video_wnd);
+	addItem(video_wnd, update_scene_rect);
 
 	m_cams.push_back(cam);
 

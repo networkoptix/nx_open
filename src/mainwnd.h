@@ -27,14 +27,13 @@ public:
 
 protected slots:
 	void onItemPressed(QString layoutname, QString itemname);
-	void onLayOutStoped();
+	void onLayOutStoped(QString layoutname);
 private:
 
 	Ui::MainWndClass ui;
 
 	GraphicsView m_videoView;
-	QGraphicsScene m_scene;
-	SceneLayout m_camlayout;
+	
 
 private:
 
