@@ -56,10 +56,6 @@ void CLSceneZoom::zoom_minimum(int duration, int delay)
 	zoom_abs(min_zoom , duration, delay);
 }
 
-void CLSceneZoom::zoom_default(int duration, int delay )
-{
-	zoom_abs(def_zoom, duration, delay);
-}
 
 void CLSceneZoom::zoom_delta(qreal delta, int duration, int delay )
 {

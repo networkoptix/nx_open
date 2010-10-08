@@ -29,7 +29,6 @@ public:
 	virtual ~GraphicsView();
 
 	void zoomMin(int duration);
-	void zoomDefault(int duration);
 	void setRealSceneRect(QRect rect);
 	QRect getRealSceneRect() const;
 
@@ -94,6 +93,8 @@ protected:
 	//========decorations=====
 	void addStaticItem(CLAbstractUnmovedItem* item);
 	void removeAllStaticItems();
+	void updateDecorations();
+	void recalcSomeParams();
 	
 
 

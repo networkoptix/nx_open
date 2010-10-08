@@ -235,7 +235,6 @@ void SceneLayout::onFirstSceneAppearance()
 	m_view->centerOn(m_view->getRealSceneRect().center());
 	m_view->zoomMin(0);
 	m_view->fitInView(3000);
-	//m_view->zoomDefault(2000);
 }
 
 

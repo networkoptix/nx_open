@@ -222,10 +222,6 @@ void GraphicsView::zoomMin(int duration)
 	m_scenezoom.zoom_minimum(duration);
 }
 
-void GraphicsView::zoomDefault(int duration)
-{
-	m_scenezoom.zoom_default(duration);
-}
 
 void GraphicsView::updateTransform(qreal angle)
 {
@@ -724,13 +720,6 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 				{
 					// move to the new point
 
-					//if (right_button)
-					{
-
-						//m_movement.move(mapToScene(event->pos()), m_selectedWnd ? item_select_duration : scene_move_duration);
-					}
-					
-					//m_scenezoom.zoom_default(m_selectedWnd ? item_select_duration : scene_zoom_duration);
 				}
 
 				// selection should be zerro anyway
@@ -744,32 +733,6 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 				onNewItemSelected_helper(wnd, qApp->doubleClickInterval()/2);
 			}
 
-			/*
-			else if (wnd && wnd==m_selectedWnd) // selected item and left button
-			{
-				// new item selected 
-				setZeroSelection();
-				m_scenezoom.zoom_default(scene_zoom_duration);
-			}
-			/**/
-
-
-			/*
-			// if we zoomed more that just FS
-			if (wnd && wnd==m_selectedWnd && wnd->isFullScreen() && m_scenezoom.getZoom() > m_fullScreenZoom + 1e-6)
-			{
-				m_movement.setDuration(2000);
-				m_scenezoom.setDuration(2000);
-
-				m_movement.move(mapToScene(event->pos()));
-				if (left_button)
-					m_scenezoom.zoom_delta(0.1);
-
-				if (right_button)
-					m_scenezoom.zoom_delta(-0.1);
-
-			}
-			/**/
 
 	}
 
@@ -1229,10 +1192,24 @@ void GraphicsView::drawBackground ( QPainter * painter, const QRectF & rect )
 
 }
 
+void GraphicsView::updateDecorations()
+{
+	// to do 
+}
+
+void GraphicsView::recalcSomeParams()
+{
+
+}
+
+
 void GraphicsView::resizeEvent( QResizeEvent * event )
 {
 	if (!mAcceptInput)
 		return;
+
+	updateDecorations();
+	recalcSomeParams();
 
 
 	if (m_selectedWnd && m_selectedWnd->isFullScreen())
@@ -1300,7 +1277,6 @@ void GraphicsView::toggleFullScreen_helper(CLAbstractSceneItem* wnd)
 		// escape FS MODE
 		setZeroSelection();
 		wnd->setFullScreen(false);
-		//zoomDefault(item_select_duration*1.3);
 		fitInView(800);
 	}
 }
@@ -1341,7 +1317,14 @@ void GraphicsView::onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int de
 
 	m_movement.move(point, item_select_duration, delay);
 
-	m_scenezoom.zoom_abs(0.278, item_select_duration, delay);
+	//===================	
+	// width 1900 => zoom 0.278 => scale 0.07728
+	int width = viewport()->width();
+	qreal scale = 0.07728*width/1900.0;
+	qreal zoom = m_scenezoom.scaleTozoom(scale) ;
+
+
+	m_scenezoom.zoom_abs(zoom, item_select_duration, delay);
 
 
 	
