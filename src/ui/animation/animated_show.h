@@ -16,6 +16,7 @@ struct Show_helper
 	int radius;
 
 	unsigned int value;
+	bool positive_dir;
 };
 
 #endif //animated_show_h1223

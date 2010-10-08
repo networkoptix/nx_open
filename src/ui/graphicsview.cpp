@@ -59,7 +59,8 @@ m_animated_bckg(new CLBlueBackGround(50)),
 mDeviceDlg(0),
 mZerroDistance(true),
 mAcceptInput(false),
-m_groupAnimation(0)
+m_groupAnimation(0),
+m_fps_frames(0)
 {
 
 	setScene(&m_scene);
@@ -276,7 +277,7 @@ void GraphicsView::onShowTimer()
 		}
 			
 	}
-	else // show time
+	else // show m_fps_time
 	{
 		mShow.value++;
 		QList<CLAbstractSceneItem*> wndlst = m_camLayout.getItemList();
@@ -304,13 +305,11 @@ void GraphicsView::onShowTimer()
 				updateTransform(-0.001);
 			else
 			{
-				static bool positive_dir = false;
-
 				int mod = (mShow.value - max_val/2)%max_val;
-				if (mod==0)	positive_dir = !positive_dir;
+				if (mod==0)	mShow.positive_dir = !mShow.positive_dir;
 
 			
-				if (positive_dir)
+				if (mShow.positive_dir)
 					updateTransform(0.001);
 				else
 					updateTransform(-0.001);
@@ -1204,17 +1203,15 @@ void GraphicsView::drawBackground ( QPainter * painter, const QRectF & rect )
 {
 	//QGraphicsView::drawBackground ( painter, rect );
 	//=================
-	static int frames = 0;
-	frames++;
-	static QTime time;
+	m_fps_frames++;
 
-	int diff = time.msecsTo(QTime::currentTime());
+	int diff = m_fps_time.msecsTo(QTime::currentTime());
 	if (diff>1500)
 	{
-		int fps = frames*1000/diff;
+		int fps = m_fps_frames*1000/diff;
 		mMainWnd->setWindowTitle(QString::number(fps));
-		frames = 0;
-		time.restart();
+		m_fps_frames = 0;
+		m_fps_time.restart();
 	}
 	
 	//==================

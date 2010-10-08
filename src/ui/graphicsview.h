@@ -165,8 +165,11 @@ protected:
 	
 	//====decoration======
 	QList<CLAbstractUnmovedItem*> m_staticItems;
-
 	QParallelAnimationGroup *m_groupAnimation;
+
+	//======fps
+	int m_fps_frames;
+	QTime m_fps_time;
 
 };
 
