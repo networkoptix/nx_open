@@ -6,7 +6,7 @@
 class CLCustomBtnItem : public CLAbstractSceneItem
 {
 public:
-	CLCustomBtnItem(GraphicsView* view, int max_width, int max_height, QString name, QObject* handler, QString text, QString tooltipText);
+	CLCustomBtnItem(GraphicsView* view, int max_width, int max_height, QString name, QString text, QString tooltipText);
 	~CLCustomBtnItem();
 
 protected:

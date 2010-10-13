@@ -68,17 +68,17 @@ m_videoView(this)
 	//showFullScreen();
 
 	
-	m_videoView.getCamLayOut().setEventHandler(this);
+	//m_videoView.getCamLayOut().setEventHandler(this);
 
 	toggleFullScreen();
 
 	connect(&m_videoView.getCamLayOut(), SIGNAL(stoped(QString)), this, SLOT(onLayOutStoped(QString)));
+	connect(&m_videoView.getCamLayOut(), SIGNAL(onItemPressed(QString , QString)), this, SLOT(onButtonItem(QString, QString)));
 
 
-	connect(&m_videoView, SIGNAL(onPressed(QString, QString)), this, SLOT(onItemPressed(QString, QString)));
+	connect(&m_videoView, SIGNAL(onDecorationPressed(QString, QString)), this, SLOT(onDecorationPressed(QString, QString)));
 
 	m_videoView.getCamLayOut().setContent(startscreen_content());
-	m_videoView.getCamLayOut().setDecoration(int(GraphicsView::NONE));
 	m_videoView.getCamLayOut().setName(start_screen);
 	
 	m_videoView.getCamLayOut().start();
@@ -106,9 +106,21 @@ void MainWnd::toggleFullScreen()
 		showMaximized();
 }
 
-void MainWnd::onItemPressed(QString layoutname, QString itemname)
+void MainWnd::onDecorationPressed(QString layoutname, QString itemname)
 {
 
+	m_lastCommand = itemname;
+	m_lastLayoutName = layoutname;
+
+	if (m_lastLayoutName == video_layout)
+	{
+		if (m_lastCommand==button_home)
+			m_videoView.getCamLayOut().stop(true);
+	}
+}
+
+void MainWnd::onButtonItem(QString layoutname, QString itemname)
+{
 	m_lastCommand = itemname;
 	m_lastLayoutName = layoutname;
 
@@ -117,13 +129,6 @@ void MainWnd::onItemPressed(QString layoutname, QString itemname)
 		if (m_lastCommand==button_logo)
 			m_videoView.getCamLayOut().stop(true);
 	}
-	else if (m_lastLayoutName == video_layout)
-	{
-		if (m_lastCommand==button_home)
-			m_videoView.getCamLayOut().stop(true);
-	}
-
-
 }
 
 void MainWnd::onLayOutStoped(QString layoutname)
@@ -133,9 +138,16 @@ void MainWnd::onLayOutStoped(QString layoutname)
 	{
 		if (m_lastCommand==button_logo)
 		{
+			LayoutContent cont;
+			cont.addDecorationFlag(LayoutContent::HomeButton | LayoutContent::BackGroundLogo);
+
+			CLDeviceCriteria cr(CLDeviceCriteria::ALL);
+			cr.setRecorderId("*");
+			cont.setDeviceCriteria(cr);
 			
-			m_videoView.getCamLayOut().setContent(LayoutContent());
-			m_videoView.getCamLayOut().setDecoration(int(GraphicsView::VIDEO));
+
+			
+			m_videoView.getCamLayOut().setContent(cont);
 			m_videoView.getCamLayOut().setName(video_layout);
 			m_videoView.getCamLayOut().start();
 		
@@ -146,7 +158,6 @@ void MainWnd::onLayOutStoped(QString layoutname)
 		if (m_lastCommand==button_home)
 		{
 			m_videoView.getCamLayOut().setContent(startscreen_content());
-			m_videoView.getCamLayOut().setDecoration(int(GraphicsView::NONE));
 			m_videoView.getCamLayOut().setName(start_screen);
 			m_videoView.getCamLayOut().start();
 		}

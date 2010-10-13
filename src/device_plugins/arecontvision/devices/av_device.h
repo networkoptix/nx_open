@@ -27,6 +27,11 @@ class CLAreconVisionDevice : public CLNetworkDevice
 {
 public:
 
+	DeviceType getDeviceType() const
+	{
+		return VIDEODEVICE;
+	}
+
 	// return true if no error
 	virtual bool getParam(const QString& name, CLValue& val, bool resynch = false);
 

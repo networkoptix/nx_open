@@ -13,6 +13,12 @@ public:
 
 	virtual CLStreamreader* getDeviceStreamConnection();
 
+	DeviceType getDeviceType() const
+	{
+		return VIDEODEVICE;
+	}
+
+
 protected:
 
 	FakeDevice()

@@ -28,17 +28,17 @@ LayoutContent& startscreen_content()
 		int delta_w = (logo_width-btn_width)/2;
 		int delta_h = (logo_heih-btn_height)/4;
 
-		instance.addImage("./skin/logo.png", button_logo, logo_left - 600 , logo_top+200 , logo_width, logo_heih);
+		instance.addImage("./skin/logo.png", button_logo, "","", logo_left - 600 , logo_top+200 , logo_width, logo_heih);
 
-		instance.addImage("./skin/startscreen/Control Room.png", "control" , logo_left + delta_w, SCENE_TOP, btn_width, btn_height);
+		instance.addImage("./skin/startscreen/Control Room.png", "control" ,"","", logo_left + delta_w, SCENE_TOP, btn_width, btn_height);
 
-		instance.addImage("./skin/startscreen/Achive.png","archive", logo_left + delta_w, logo_top + logo_heih + item_distance - 500, btn_width, btn_height);
+		instance.addImage("./skin/startscreen/Achive.png","archive", "","",logo_left + delta_w, logo_top + logo_heih + item_distance - 500, btn_width, btn_height);
 
-		instance.addImage("./skin/startscreen/System.png", "system", SCENE_LEFT, logo_top + delta_h, btn_width, btn_height);
-		instance.addImage("./skin/startscreen/Layouts.png", "layouts", logo_left + logo_width + item_distance, logo_top + delta_h, btn_width, btn_height);
+		instance.addImage("./skin/startscreen/System.png", "system", "","",SCENE_LEFT, logo_top + delta_h, btn_width, btn_height);
+		instance.addImage("./skin/startscreen/Layouts.png", "layouts", "","",logo_left + logo_width + item_distance, logo_top + delta_h, btn_width, btn_height);
 
-		CLDeviceCriteria cr;
-		cr.mCriteria = CLDeviceCriteria::NONE;
+		CLDeviceCriteria cr(CLDeviceCriteria::NONE);
+		
 
 		instance.setDeviceCriteria(cr);
 

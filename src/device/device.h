@@ -58,10 +58,17 @@ public:
 
 	enum {NETWORK = 0x00000001, NVR = 0x00000002, SINGLE_SHOT = 0x00000004, ARCHIVE = 0x00000008};
 
+	enum DeviceType {RECORDER, VIDEODEVICE};
+
 	CLDevice();
 
 
 	virtual ~CLDevice();
+
+	virtual DeviceType getDeviceType() const = 0;
+
+	void setParentId(QString parent);
+	QString getParentId() const;
 
 	// each device has unique( over the world) ID; 
 	// good example for network device could be MAC address
@@ -69,7 +76,7 @@ public:
 	void setUniqueId(const QString& id);
 
 	//Name is class of the devices. like AV2105; => arecontvision 2 megapixel H.264 camera; or "exacq nvr divece"
-	QString getName() const;
+	virtual QString getName() const;
 	void setName(const QString& name);
 
 	// full name of the device; taking into account some properties( like AV2105DN - day/night camera)
@@ -177,7 +184,8 @@ protected:
 	unsigned long m_deviceTypeFlags;
 
 	mutable CLDeviceVideoLayout* m_videolayout;
-	
+
+	QString mParentId;
 
 };
 

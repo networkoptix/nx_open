@@ -18,7 +18,6 @@
 #include "device_settings/dlg_factory.h"
 #include "device_settings/device_settings_dlg.h"
 #include "videoitem/video_wnd_item.h"
-#include "videoitem/static_image_widget.h"
 #include "videoitem/abstract_unmoved_item.h"
 #include "videoitem/unmoved_pixture_button.h"
 
@@ -352,19 +351,22 @@ void GraphicsView::centerOn(const QPointF &pos)
 	//viewport()->update();
 }
 
-void GraphicsView::setDecoration(GraphicsView::Decoration dec)
+void GraphicsView::initDecoration()
 {
 	removeAllStaticItems();
-	if (dec == NONE)
-		return;
 
-	if (dec == VIDEO)
+	LayoutContent& cont = m_camLayout.getContent();
+	CLAbstractUnmovedItem* item;
+
+	if (cont.checkDecorationFlag(LayoutContent::HomeButton))
 	{
-		CLAbstractUnmovedItem* item;
-
-		item = new CLUnMovedPixtureButton(this, button_home, "./skin/logo.png", 100, 100, 255, 0.35);
+		item = new CLUnMovedPixtureButton(this, button_home, "./skin/home.png", 100, 100, 255, 0.2);
 		item->setStaticPos(QPoint(1,1));
 		addStaticItem(item);
+	}
+
+	if (cont.checkDecorationFlag(LayoutContent::BackGroundLogo))
+	{
 
 		item = new CLUnMovedPixture(this, "background", "./skin/logo.png", viewport()->width(), viewport()->height(), -1, 0.03);
 		item->setStaticPos(QPoint(1,1));
@@ -386,7 +388,7 @@ void GraphicsView::addStaticItem(CLAbstractUnmovedItem* item)
 	m_staticItems.push_back(item);
 	item->adjust();
 	scene()->addItem(item);
-	connect(item, SIGNAL(onPressed(QString)), this, SLOT(onStaticItemPressed(QString)));
+	connect(item, SIGNAL(onPressed(QString)), this, SLOT(onDecorationItemPressed(QString)));
 }
 
 void GraphicsView::removeAllStaticItems()
@@ -394,7 +396,7 @@ void GraphicsView::removeAllStaticItems()
 	foreach(CLAbstractUnmovedItem* item, m_staticItems)
 	{
 		scene()->removeItem(item);
-		disconnect(item, SIGNAL(onPressed(QString)), this, SLOT(onStaticItemPressed(QString)));
+		disconnect(item, SIGNAL(onPressed(QString)), this, SLOT(onDecorationItemPressed(QString)));
 		delete item;
 	}
 
@@ -1240,9 +1242,9 @@ CLAbstractSceneItem* GraphicsView::getLastSelectedItem()
 }
 
 
-void GraphicsView::onStaticItemPressed(QString name)
+void GraphicsView::onDecorationItemPressed(QString name)
 {
-	emit onPressed(m_camLayout.getName(), name);
+	emit onDecorationPressed(m_camLayout.getName(), name);
 }
 
 void GraphicsView::onScneZoomFinished()

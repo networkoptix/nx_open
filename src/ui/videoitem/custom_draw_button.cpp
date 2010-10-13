@@ -22,9 +22,9 @@ QFont buttonFont()
 QColor buttonTextColor(QColor(255, 255, 255));
 
 CLCustomBtnItem::CLCustomBtnItem(GraphicsView* view, int max_width, int max_height, 
-								 QString name, QObject* handler,
+								 QString name, 
 								 QString text, QString tooltipText):
-CLAbstractSceneItem(view,max_width,max_height, name, handler),
+CLAbstractSceneItem(view,max_width,max_height, name),
 mText(text)
 {
 

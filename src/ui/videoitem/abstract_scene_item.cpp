@@ -19,7 +19,7 @@ extern int item_hoverevent_duration;
 
 
 CLAbstractSceneItem::CLAbstractSceneItem(GraphicsView* view, int max_width, int max_height, 
-										 QString name, QObject* handler):
+										 QString name):
 m_max_width(max_width),
 m_max_height(max_height),
 m_animationTransform(this),
@@ -40,14 +40,16 @@ m_zoomOnhover(true)
 	//setFlag(QGraphicsItem::ItemIsFocusable);
 
 	//setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);
-
-	if (handler)
-		connect(this, SIGNAL(onPressed(QString)), handler, SLOT(onItemPressed(QString)));
 }
 
 CLAbstractSceneItem::~CLAbstractSceneItem()
 {
 
+}
+
+QString CLAbstractSceneItem::getName() const
+{
+	return mName;
 }
 
 CLVideoWindowItem* CLAbstractSceneItem::toVideoItem() const
@@ -222,7 +224,7 @@ void CLAbstractSceneItem::mousePressEvent ( QGraphicsSceneMouseEvent * event )
 void CLAbstractSceneItem::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 {
 	if (event->button()==Qt::LeftButton)
-		emit onPressed(mName);
+		emit onPressed(this);
 }
 
 void CLAbstractSceneItem::drawShadow(QPainter* painter)

@@ -1,7 +1,12 @@
 #include "layout_content.h"
 
 
-LayoutContentItem::LayoutContentItem(int x_, int y_, int width_, int height_, int angle_):
+LayoutItem::LayoutItem()
+{
+
+}
+
+LayoutItem::LayoutItem(int x_, int y_, int width_, int height_, int angle_):
 x(x_),
 y(y_),
 w(width_),
@@ -12,56 +17,56 @@ angl(angle_)
 }
 
 
-LayoutContentItem::~LayoutContentItem()
+LayoutItem::~LayoutItem()
 {
 
 }
 
-void LayoutContentItem::setName(const QString& name)
+void LayoutItem::setName(const QString& name)
 {
 	this->name = name;
 }
 
-QString LayoutContentItem::getName() const
+QString LayoutItem::getName() const
 {
 	return name;
 }
 
 
 
-int LayoutContentItem::getX() const
+int LayoutItem::getX() const
 {
 	return x;
 }
 
 
-int LayoutContentItem::getY() const
+int LayoutItem::getY() const
 {
 	return y;
 }
 
-QPointF LayoutContentItem::pos() const
+QPointF LayoutItem::pos() const
 {
 	return QPointF(x,y);
 }
 
 
-int LayoutContentItem::width() const
+int LayoutItem::width() const
 {
 	return w;
 }
 
-int LayoutContentItem::height() const
+int LayoutItem::height() const
 {
 	return h;
 }
 
-QSize LayoutContentItem::size() const
+QSize LayoutItem::size() const
 {
 	return QSize(x,y);
 }
 
-int LayoutContentItem::angle() const
+int LayoutItem::angle() const
 {
 	return angl;
 }
@@ -69,13 +74,13 @@ int LayoutContentItem::angle() const
 //=======
 
 LayoutDevice::LayoutDevice(const QString& uniqueId, int x_, int y_, int width_, int height_, int angle_):
-LayoutContentItem(x_, y_, width_, height_,  angle_),
+LayoutItem(x_, y_, width_, height_,  angle_),
 id(uniqueId)
 {
 
 }
 
-LayoutContentItem::Type LayoutDevice::type() const
+LayoutItem::Type LayoutDevice::type() const
 {
 	return DEVICE;
 }
@@ -86,27 +91,29 @@ QString LayoutDevice::getId() const
 }
 
 //=======
-LayoutButton::LayoutButton(const QString& name_, int x_, int y_, int width_, int height_, int angle_):
-LayoutContentItem(x_, y_, width_, height_,  angle_)
+LayoutButton::LayoutButton(const QString& name_, const QString& text, const QString& tooltip, int x_, int y_, int width_, int height_, int angle_):
+LayoutItem(x_, y_, width_, height_,  angle_),
+m_text(text),
+m_tooltip(tooltip)
 {
 	setName(name_);
 }
 
-LayoutContentItem::Type LayoutButton::type() const
+LayoutItem::Type LayoutButton::type() const
 {
 	return BUTTON;
 }
 
 //=======
 
-LayoutImage::LayoutImage(const QString& img, const QString& name, int x_, int y_, int width_, int height_, int angle_):
-LayoutContentItem(x_, y_, width_, height_,  angle_),
+LayoutImage::LayoutImage(const QString& img, const QString& name, const QString& text, const QString& tooltip, int x_, int y_, int width_, int height_, int angle_):
+LayoutButton(name, text, tooltip, x_, y_, width_, height_,  angle_),
 image(img)
 {
-	setName(name);
+	
 }
 
-LayoutContentItem::Type LayoutImage::type() const
+LayoutItem::Type LayoutImage::type() const
 {
 	return BUTTON;
 }
@@ -119,9 +126,11 @@ QString LayoutImage::getImage() const
 
 //=======================================================================================================
 
-LayoutContent::LayoutContent()
+LayoutContent::LayoutContent():
+m_cr(CLDeviceCriteria::NONE),
+mDecoration(0)
 {
-	m_cr.mCriteria = CLDeviceCriteria::ALL;
+	
 }
 
 LayoutContent::~LayoutContent()
@@ -129,25 +138,43 @@ LayoutContent::~LayoutContent()
 
 }
 
-void LayoutContent::addButton(const QString& name, int x, int y, int width, int height, int angle)
+LayoutItem::Type LayoutContent::type() const
 {
-	m_btns.push_back(LayoutButton(name, x, y, width, height, angle) );
+	return LAYOUT;
 }
 
-void LayoutContent::addButton(const CLCustomBtnItem* item)
+bool LayoutContent::checkDecorationFlag(unsigned int flag) const
 {
-
+	return mDecoration & flag;
 }
 
-void LayoutContent::addImage(const QString& img, const QString& name, int x, int y, int width, int height, int angle)
+void LayoutContent::addDecorationFlag(unsigned int flag)
 {
-	m_imgs.push_back(LayoutImage(img, name, x, y, width, height, angle));
+	mDecoration |= flag;
 }
 
-void LayoutContent::addImage(const CLStaticImageItem* item)
+
+void LayoutContent::setParent(LayoutContent* parent)
 {
-	
+	m_parent = parent;
 }
+
+void LayoutContent::addButton(const QString& name, const QString& text, const QString& tooltip, int x, int y, int width, int height, int angle)
+{
+	m_btns.push_back(LayoutButton(name, text, tooltip, x, y, width, height, angle) );
+}
+
+void LayoutContent::addImage(const QString& img, const QString& name, const QString& text, const QString& tooltip, int x, int y, int width, int height, int angle)
+{
+	m_imgs.push_back(LayoutImage(img, name, text, tooltip, x, y, width, height, angle));
+}
+
+void LayoutContent::addLayout(const LayoutContent& l)
+{
+	m_childlist.push_back(l);
+	m_childlist.back().setParent(this);
+}
+
 
 void LayoutContent::setDeviceCriteria(const CLDeviceCriteria& cr)
 {
@@ -160,12 +187,17 @@ CLDeviceCriteria LayoutContent::getDeviceCriteria() const
 }
 
 
-QList<LayoutImage> LayoutContent::getImages() const
+QList<LayoutImage>& LayoutContent::getImages() 
 {
 	return m_imgs;
 }
 
-QList<LayoutButton> LayoutContent::getButtons() const
+QList<LayoutButton>& LayoutContent::getButtons() 
 {
 	return m_btns;
+}
+
+QList<LayoutContent>& LayoutContent::childrenList() 
+{
+	return m_childlist;
 }

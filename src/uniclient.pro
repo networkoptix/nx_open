@@ -51,11 +51,11 @@ SOURCES += device_plugins/fake/streamreader/fake_file_streamreader.cpp
 HEADERS += device_plugins/fake/devices/fake_device_server.h device_plugins/fake/devices/fake_device.h
 HEADERS += device_plugins/fake/streamreader/fake_file_streamreader.h
 
-SOURCES +=ui/graphicsview.cpp ui/videoitem/loup_wnd.cpp 
-HEADERS +=ui/graphicsview.h  ui/videoitem/loup_wnd.h  
+SOURCES +=ui/graphicsview.cpp ui/videoitem/loup_wnd.cpp ui/layout_navigator.cpp
+HEADERS +=ui/graphicsview.h  ui/videoitem/loup_wnd.h  ui/layout_navigator.h
 
-HEADERS +=ui/videoitem/abstract_scene_item.h  ui/videoitem/static_image_item.h ui/videoitem/static_image_widget.h ui/videoitem/custom_draw_button.h ui/videoitem/img_item.h ui/videoitem/video_wnd_item.h 
-SOURCES +=ui/videoitem/abstract_scene_item.cpp  ui/videoitem/static_image_item.cpp ui/videoitem/static_image_widget.cpp ui/videoitem/custom_draw_button.cpp ui/videoitem/img_item.cpp ui/videoitem/video_wnd_item.cpp
+HEADERS +=ui/videoitem/abstract_scene_item.h  ui/videoitem/static_image_item.h  ui/videoitem/custom_draw_button.h ui/videoitem/img_item.h ui/videoitem/video_wnd_item.h 
+SOURCES +=ui/videoitem/abstract_scene_item.cpp  ui/videoitem/static_image_item.cpp ui/videoitem/custom_draw_button.cpp ui/videoitem/img_item.cpp ui/videoitem/video_wnd_item.cpp
 
 HEADERS +=ui/videoitem/abstract_unmoved_item.h ui/videoitem/unmoved_pixture_button.h
 SOURCES +=ui/videoitem/abstract_unmoved_item.cpp ui/videoitem/unmoved_pixture_button.cpp
@@ -79,6 +79,12 @@ HEADERS += device/device_managmen/device_manager.h
 
 SOURCES += ui/video_cam_layout/layout_manager.cpp ui/video_cam_layout/layout_content.cpp  ui/video_cam_layout/start_screen_content.cpp
 HEADERS += ui/video_cam_layout/layout_manager.h ui/video_cam_layout/layout_content.h  ui/video_cam_layout/start_screen_content.h
+
+HEADERS += recorder/recorder_device.h  recorder/fake_recorder_device.h  recorder/recorder_display.h
+SOURCES += recorder/recorder_device.cpp  recorder/fake_recorder_device.cpp recorder/recorder_display.cpp
+
+HEADERS += ui/videoitem/recorder_item.h
+SOURCES += ui/videoitem/recorder_item.cpp
 
 
 RESOURCES += mainwnd.qrc

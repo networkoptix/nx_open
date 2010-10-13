@@ -33,6 +33,17 @@ CLDevice::~CLDevice()
 	cl_log.log("inst", inst, cl_logDEBUG1);
 };
 
+void CLDevice::setParentId(QString parentid)
+{
+	mParentId = parentid;
+}
+
+QString CLDevice::getParentId() const
+{
+	return mParentId;
+}
+
+
 
 QString CLDevice::getUniqueId() const
 {

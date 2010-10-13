@@ -23,7 +23,7 @@ class CLVideoWindowItem : public CLImageItem, public CLAbstractRenderer
 	Q_OBJECT
 public:
 	CLVideoWindowItem (GraphicsView* view, const CLDeviceVideoLayout* layout, int max_width, int max_height,
-						QString name="", QObject* handler=0);
+						QString name="");
 
 	virtual ~CLVideoWindowItem ();
 

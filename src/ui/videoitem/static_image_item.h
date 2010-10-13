@@ -8,7 +8,7 @@ class CLStaticImageItem : public CLImageItem
 {
 public:
 	CLStaticImageItem (GraphicsView* view, int max_width, int max_height,
-		QString imgfilename, QString name="", QObject* handler=0);
+		QString imgfilename, QString name="");
 protected:
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 protected:

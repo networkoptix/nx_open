@@ -19,11 +19,13 @@ public:
 	enum CLSceneItemType {VIDEO, IMAGE, BUTTON};
 
 	CLAbstractSceneItem(GraphicsView* view, int max_width, int max_height,
-						QString name="", QObject* handler=0);
+						QString name="");
 
 	virtual ~CLAbstractSceneItem();
 
 	CLVideoWindowItem* toVideoItem() const;
+
+	QString getName() const;
 
 	CLSceneItemType getType() const;
 	void setType(CLSceneItemType t);
@@ -63,7 +65,7 @@ public:
 
 
 signals:
-	void onPressed(QString);
+	void onPressed(CLAbstractSceneItem*);
 	
 
 

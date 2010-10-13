@@ -6,8 +6,8 @@ extern QPixmap cached(const QString &img);
 
 CLStaticImageItem::CLStaticImageItem(GraphicsView* view, int max_width, int max_height,
 				   QString imgfilename, 
-				   QString name, QObject* handler):
-CLImageItem(view, max_width,max_height,name,handler)
+				   QString name):
+CLImageItem(view, max_width,max_height,name)
 {
 
 	m_img = cached(imgfilename);

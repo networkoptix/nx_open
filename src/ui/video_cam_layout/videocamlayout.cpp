@@ -35,8 +35,7 @@ m_item_distance(35/100.0),
 m_max_items(max_items),
 m_slots(max_items*4),
 m_firstTime(true),
-m_isRunning(false),
-m_EventHandler(0)
+m_isRunning(false)
 {
 	m_width = m_slots/m_height;
 	buildPotantial();
@@ -64,9 +63,9 @@ void SceneLayout::setContent(const LayoutContent& cont)
 	m_content = cont;
 }
 
-void SceneLayout::setDecoration(int dec)
+LayoutContent& SceneLayout::getContent()
 {
-	m_decoration =  dec;
+	return m_content;
 }
 
 void SceneLayout::start()
@@ -75,6 +74,7 @@ void SceneLayout::start()
 		return;
 
 	m_firstTime = true;
+
 	m_timer.start(100);
 	m_videotimer.start(1000/MAX_FPS); 
 	m_isRunning = true;
@@ -161,19 +161,24 @@ void SceneLayout::onTimer()
 	if (m_firstTime)
 	{
 		m_view->zoomMin(0);
+		m_view->initDecoration();
 		loadContent();
 	}
 
-	if (m_firstTime && (m_items.count()>0) )
+	if (m_firstTime)
 	{
 		m_firstTime =  false;
-		m_timer.setInterval(devices_update_interval);
+		
 		//QThread::currentThread()->setPriority(QThread::IdlePriority); // surprised. if gui thread has low priority => things looks smoother 
 		QThread::currentThread()->setPriority(QThread::LowPriority); // surprised. if gui thread has low priority => things looks smoother 
 		//QThread::currentThread()->setPriority(QThread::HighestPriority); // surprised. if gui thread has low priority => things looks smoother 
-		m_view->setDecoration((GraphicsView::Decoration)m_decoration);
 		onFirstSceneAppearance();
 		m_view->setAcceptInput(true);
+	}
+
+	if (m_items.count()>0 && m_timer.interval()!=devices_update_interval)
+	{
+		m_timer.setInterval(devices_update_interval);
 	}
 
 	
@@ -297,13 +302,6 @@ void SceneLayout::setScene(QGraphicsScene* scene)
 	m_scene = scene;
 }
 
-void SceneLayout::setEventHandler(QObject* eventhandler)
-{
-	if (m_EventHandler)
-		disconnect(this, SIGNAL(onItemPressed(QString , QString )), m_EventHandler, SLOT(onItemPressed(QString , QString )));
-	m_EventHandler = eventhandler;
-	connect(this, SIGNAL(onItemPressed(QString , QString )), m_EventHandler, SLOT(onItemPressed(QString , QString )));
-}
 
 void SceneLayout::setName(const QString& name)
 {
@@ -348,7 +346,7 @@ QRect SceneLayout::getSmallLayoutRect() const // scene rect
 	CLAbstractSceneItem* item =  getVeryLeftItem();
 
 	if (!item) // nos single video on this lay out
-		return QRect(SCENE_LEFT, SCENE_TOP, 1, 1 );
+		return QRect(SCENE_LEFT, SCENE_TOP, 10, 10 );
 	int left = item->mapToScene(item->boundingRect().topLeft()).x();
 
 	item =  getVeryTopItem();
@@ -436,6 +434,8 @@ bool SceneLayout::addItem(CLAbstractSceneItem* item, int x, int y, bool update_s
 		updateSceneRect();
 
 	connect(item, SIGNAL(onAspectRatioChanged(CLAbstractSceneItem*)), this, SLOT(onAspectRatioChanged(CLAbstractSceneItem*)));
+
+	connect(item, SIGNAL(onPressed(CLAbstractSceneItem*)), this, SLOT(onItemPressed(CLAbstractSceneItem*)));
 
 	return true;
 
@@ -654,9 +654,12 @@ CLAbstractSceneItem* SceneLayout::next_item_helper(const CLAbstractSceneItem* cu
 
 }
 
-void SceneLayout::onItemPressed(QString name)
+void SceneLayout::onItemPressed(CLAbstractSceneItem* item)
 {
-	emit onItemPressed(m_Name, name);
+	if (item->getType() == CLAbstractSceneItem::IMAGE || item->getType() == CLAbstractSceneItem::BUTTON)
+	{
+		emit onItemPressed(m_Name, item->getName());
+	}
 }
 
 void SceneLayout::onAspectRatioChanged(CLAbstractSceneItem* item)
@@ -793,18 +796,15 @@ void SceneLayout::loadContent()
 
 	foreach(LayoutImage img, img_list)
 	{
-		CLStaticImageItem* item = new CLStaticImageItem(m_view, img.width(), img.height(), img.getImage(), img.getName(), this);
+		CLStaticImageItem* item = new CLStaticImageItem(m_view, img.width(), img.height(), img.getImage(), img.getName());
 		item->setOpacity(0.8);
-		
 		addItem(item, img.getX(), img.getY());
 	}
 
 	foreach(LayoutButton btn, btns_list)
 	{
 		
-		CLCustomBtnItem* item = new CLCustomBtnItem(m_view, btn.width(), btn.height(), btn.getName(),this,btn.getName(), "tiiktip text");
-		
-
+		CLCustomBtnItem* item = new CLCustomBtnItem(m_view, btn.width(), btn.height(), btn.getName(), btn.getName(), "tiiktip text");
 		addItem(item, btn.getX(), btn.getY());
 	}
 

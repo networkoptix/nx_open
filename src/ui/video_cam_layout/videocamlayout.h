@@ -33,11 +33,10 @@ public:
 	//================================================
 	void setView(GraphicsView* view);
 	void setScene(QGraphicsScene* scene);
-	void setEventHandler(QObject* eventhandler);
 	void setName(const QString& name);
 	QString getName() const;
 	void setContent(const LayoutContent& cont);
-	void setDecoration(int dec);
+	LayoutContent& getContent();
 
 	//================================================
 
@@ -117,7 +116,9 @@ signals:
 	void stoped(QString name);
 	void onItemPressed(QString lyouname, QString itemname);
 protected slots:
-	void onItemPressed(QString name);
+
+	void onItemPressed(CLAbstractSceneItem* item);
+
 	void onAspectRatioChanged(CLAbstractSceneItem* wnd);
 	void onTimer();
 	void onVideoTimer();
@@ -178,19 +179,17 @@ private:
 
 	GraphicsView* m_view;
 	QGraphicsScene* m_scene;
-	QObject* m_EventHandler;
 	QString m_Name;
 
 	QTimer m_videotimer;
 	QTimer m_timer;
 	bool m_firstTime;
 
+
 	bool m_isRunning;
 
 	LayoutContent m_content;
 	
-	int m_decoration;
-
 };
 
 //===================================================================

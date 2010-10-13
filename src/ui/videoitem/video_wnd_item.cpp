@@ -11,8 +11,8 @@
 
 
 CLVideoWindowItem::CLVideoWindowItem(GraphicsView* view, const CLDeviceVideoLayout* layout, int max_width, int max_height,
-									 QString name, QObject* handler):
-CLImageItem(view, max_width, max_height, name, handler),
+									 QString name):
+CLImageItem(view, max_width, max_height, name),
 m_videolayout(layout),
 m_first_draw(true),
 m_showfps(false),
@@ -242,7 +242,7 @@ void CLVideoWindowItem::drawFPS(QPainter* painter)
 
 		QRect rect = getSubChannelRect(i);
 
-		sprintf(fps, "%6.2ffps %6.2fMbps", m_stat[i]->getFrameRate(), m_stat[i]->getBitrate());
+		sprintf_s(fps, "%6.2ffps %6.2fMbps", m_stat[i]->getFrameRate(), m_stat[i]->getBitrate());
 		QFontMetrics fm(painter->font());
 		painter->drawText(rect.left(),rect.top()+170 + fm.height()/2, fps);
 

@@ -7,8 +7,8 @@
 
 
 CLImageItem::CLImageItem(GraphicsView* view, int max_width, int max_height,
-						 QString name, QObject* handler):
-CLAbstractSceneItem(view, max_width, max_height,name,handler),
+						 QString name):
+CLAbstractSceneItem(view, max_width, max_height,name),
 m_imageWidth(m_max_width),
 m_imageHeight(m_max_height),
 m_imageWidth_old(m_max_width),

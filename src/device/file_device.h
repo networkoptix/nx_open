@@ -11,6 +11,13 @@ class CLFileDevice : public CLDevice
 	
 public:
 	CLFileDevice(QString filename);
+
+	DeviceType getDeviceType() const
+	{
+		return VIDEODEVICE;
+	}
+
+
 	virtual QString toString() const;
 	QString getFileName() const;
 

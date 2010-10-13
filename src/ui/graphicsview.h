@@ -23,8 +23,6 @@ class GraphicsView: public QGraphicsView
 	Q_OBJECT
 public:
 
-	enum Decoration{NONE, VIDEO};
-
 	GraphicsView(MainWnd* mainWnd);
 	virtual ~GraphicsView();
 
@@ -48,12 +46,13 @@ public:
 
 
 	void addjustAllStaticItems();
-	void setDecoration(Decoration dec);
 	void centerOn(const QPointF &pos);
+
+	void initDecoration();
 
 signals:
 	void scneZoomFinished();
-	void onPressed(QString, QString);
+	void onDecorationPressed(QString, QString);
 protected:
 	virtual void wheelEvent ( QWheelEvent * e );
 	void mouseReleaseEvent ( QMouseEvent * e);
@@ -106,7 +105,7 @@ private slots:
 	void reAdjustSceneRect();
 	void onShowTimer();
 	void onShowStart();
-	void onStaticItemPressed(QString);
+	void onDecorationItemPressed(QString);
 protected:
 	
 	QGraphicsScene m_scene;

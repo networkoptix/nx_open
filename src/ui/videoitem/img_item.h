@@ -13,7 +13,7 @@ class CLImageItem : public CLAbstractSceneItem
 	Q_OBJECT
 public:
 	CLImageItem(GraphicsView* view, int max_width, int max_height,
-		QString name="", QObject* handler=0);
+		QString name="");
 
 	virtual int height() const;
 	virtual int width() const;

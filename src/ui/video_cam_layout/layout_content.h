@@ -10,12 +10,15 @@
 class CLCustomBtnItem;
 class CLStaticImageItem;
 
-class LayoutContentItem
+
+
+class LayoutItem
 {
 public:
-	enum Type {DEVICE, BUTTON, SHORTCUT, IMAGE, BACKGROUND};
-	LayoutContentItem(int x, int y, int width, int height, int angle = 0);
-	virtual ~LayoutContentItem();
+	enum Type {DEVICE, BUTTON, LAYOUT, IMAGE, BACKGROUND};
+	LayoutItem();
+	LayoutItem(int x, int y, int width, int height, int angle = 0);
+	virtual ~LayoutItem();
 	virtual Type type() const = 0;
 
 	int getX() const;
@@ -39,32 +42,32 @@ protected:
 };
 //=======
 
-class LayoutDevice : public LayoutContentItem
+class LayoutDevice : public LayoutItem
 {
 public:
 	LayoutDevice(const QString& uniqueId, int x, int y, int width, int height, int angle = 0);
-
 	virtual Type type() const;
-	
 	QString getId() const;
 protected:
 	QString id;
 };
 
 //=======
-class LayoutButton: public LayoutContentItem
+class LayoutButton: public LayoutItem
 {
 public:
-	LayoutButton(const QString& name, int x, int y, int width, int height, int angle = 0);
+	LayoutButton(const QString& name, const QString& text, const QString& tooltip, int x, int y, int width, int height, int angle = 0);
 	virtual Type type() const;
-
+protected:
+	QString m_text;
+	QString m_tooltip;
 };
 //=======
 
-class LayoutImage: public LayoutContentItem
+class LayoutImage: public LayoutButton
 {
 public:
-	LayoutImage(const QString& img, const QString& name, int x, int y, int width, int height, int angle = 0);
+	LayoutImage(const QString& img, const QString& name, const QString& text, const QString& tooltip, int x, int y, int width, int height, int angle = 0);
 
 	virtual Type type() const ;
 	QString getImage() const;
@@ -76,27 +79,45 @@ protected:
 //=======================================================================================================
 
 
-class LayoutContent
+class LayoutContent : public LayoutItem
 {
 public:
+
+	enum {HomeButton = 0x01, LevelUp = 0x02, BackGroundLogo = 0x04};
+
 	LayoutContent();
 	virtual ~LayoutContent();
 
-	void addButton(const QString& name, int x, int y, int width, int height, int angle = 0);
-	void addButton(const CLCustomBtnItem* item);
+	virtual Type type() const;
 
-	void addImage(const QString& img, const QString& name, int x, int y, int width, int height, int angle = 0);
-	void addImage(const CLStaticImageItem* item);
+	bool checkDecorationFlag(unsigned int flag) const;
+	void addDecorationFlag(unsigned int flag);
+
+
+	void setParent(LayoutContent* parent);
+
+	void addButton(const QString& name, const QString& text, const QString& tooltip, int x, int y, int width, int height, int angle = 0);
+	void addImage(const QString& img, const QString& name, const QString& text, const QString& tooltip, int x, int y, int width, int height, int angle = 0);
+	void addLayout(const LayoutContent& l);
 
 	void setDeviceCriteria(const CLDeviceCriteria& cr);
 	CLDeviceCriteria getDeviceCriteria() const;
 
-	QList<LayoutImage> getImages() const;
-	QList<LayoutButton> getButtons() const;
+	QList<LayoutImage>& getImages();
+	QList<LayoutButton>& getButtons();
+	QList<LayoutContent>& childrenList();
+	
 protected:
 	QList<LayoutImage> m_imgs;
 	QList<LayoutButton> m_btns;
+	QList<LayoutContent> m_childlist;
+
+
 	CLDeviceCriteria m_cr;
+
+	LayoutContent* m_parent;
+
+	unsigned int mDecoration;
 
 };
 #endif //layout_content_h_2210

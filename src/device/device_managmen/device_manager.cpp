@@ -3,8 +3,32 @@
 #include "..\src\corelib\thread\qmutex.h"
 #include "..\directory_browser.h"
 #include "settings.h"
+#include "recorder\fake_recorder_device.h"
+
+//=============================================================
+CLDeviceCriteria::CLDeviceCriteria(CriteriaType cr):
+mCriteria(cr)
+{
+
+}
+
+CLDeviceCriteria::CriteriaType CLDeviceCriteria::getCriteria() const
+{
+	return mCriteria;
+}
+
+void CLDeviceCriteria::setRecorderId(QString id)
+{
+	mRecorderId = id;
+}
+
+QString CLDeviceCriteria::getRecorderId() const
+{
+	return mRecorderId;
+}
 
 
+//=============================================================
 CLDeviceManager& CLDeviceManager::instance()
 {
 	static CLDeviceManager inst ;
@@ -16,6 +40,10 @@ m_firstTime(true)
 {
 	connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimer()));
 	m_timer.start(100); // first time should come fast
+
+	mRecDevice = new CLFakeRecorderDevice();
+	mRecDevice->setUniqueId("Archiver 1");
+
 }
 
 CLDeviceManager::~CLDeviceManager()
@@ -28,6 +56,8 @@ CLDeviceManager::~CLDeviceManager()
 		CLDeviceList& list = m_dev_searcher.getAllDevices();
 		CLDevice::deleteDevices(list);
 	}
+
+	mRecDevice->releaseRef();
 
 }
 
@@ -68,18 +98,21 @@ CLDeviceList CLDeviceManager::getDeviceList(CLDeviceCriteria& cr)
 {
 	CLDeviceList result;
 
-	if (cr.mCriteria == CLDeviceCriteria::NONE)
+	if (cr.getCriteria() == CLDeviceCriteria::NONE)
 	{
 		return result; // empty
 	}
-	else if (cr.mCriteria == CLDeviceCriteria::ALL)
+	else
 	{
 		QMutexLocker lock(&m_dev_searcher.all_devices_mtx);
 		CLDeviceList& devices =  m_dev_searcher.getAllDevices();
 		foreach (CLDevice* device, devices)
 		{
-			device->addRef();
-			result.insert(device->getUniqueId(),device);
+			if (isDeviceMeetCriteria(cr, device))
+			{
+				device->addRef();
+				result.insert(device->getUniqueId(),device);
+			}
 		}
 
 		return result;
@@ -89,6 +122,14 @@ CLDeviceList CLDeviceManager::getDeviceList(CLDeviceCriteria& cr)
 
 	// first implementation is very simple; returns all dev
 	
+}
+
+CLDeviceList CLDeviceManager::getRecorderList()
+{
+	CLDeviceList result;
+	mRecDevice->addRef();
+	result.insert(mRecDevice->getUniqueId(), mRecDevice);
+	return result;
 }
 
 
@@ -102,6 +143,8 @@ void CLDeviceManager::onNewDevices_helper(CLDeviceList devices)
 		{
 			device->getStatus().setFlag(CLDeviceStatus::READY);
 
+			device->setParentId(mRecDevice->getUniqueId());
+
 			QMutexLocker lock(&m_dev_searcher.all_devices_mtx);
 			m_dev_searcher.getAllDevices().insert(device->getUniqueId(),device);
 
@@ -112,4 +155,32 @@ void CLDeviceManager::onNewDevices_helper(CLDeviceList devices)
 		}
 	}
 
+}
+
+
+bool CLDeviceManager::isDeviceMeetCriteria(CLDeviceCriteria& cr, CLDevice* dev) const
+{
+	if (dev==0)
+		return false;
+
+	if (cr.getCriteria()== CLDeviceCriteria::NONE)
+		return false;
+
+	if (cr.getCriteria()== CLDeviceCriteria::ALL)
+	{
+		if (cr.getRecorderId()=="*")
+			return true;
+
+		if (dev->getParentId() == "")
+			return false;
+
+
+
+		if (dev->getParentId()!=cr.getRecorderId())
+			return false;
+	}
+
+
+	return true;
+	
 }
