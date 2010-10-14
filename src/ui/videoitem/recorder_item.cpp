@@ -21,6 +21,7 @@ void CLRecorderItem::setText(QString text)
 {
 	QMutexLocker locker(&m_mutex);
 	mText = text;
+	m_needUpdate = true;
 }
 
 void CLRecorderItem::setRecorderDisplay(CLRecorderDisplay* rec)
@@ -62,7 +63,7 @@ void CLRecorderItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 	//painter->drawRect(boundingRect());
 
 	//==================================================
-	QFont  font("Courier New", 350);
+	QFont  font("Courier New", 250);
 	font.setWeight(QFont::Bold);
 	painter->setFont(font);
 
@@ -76,7 +77,7 @@ void CLRecorderItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 	else
 		painter->setPen(QColor(150, 150, 150));
 
-	QMutexLocker locker(&m_mutex);
+	
 	painter->drawText((width() - rect.width())/2, border,
 		rect.width(), rect.height(),
 		Qt::AlignCenter | Qt::TextWordWrap, text());

@@ -1,6 +1,8 @@
 #include "start_screen_content.h"
 
 
+QString start_screen = "start screen";
+
 extern int SCENE_LEFT;
 extern int SCENE_TOP;
 extern QString button_logo;
@@ -13,6 +15,9 @@ LayoutContent& startscreen_content()
 
 	if (frist_time)
 	{
+
+		instance.setName(start_screen);
+
 		frist_time = false;
 
 		int logo_width = 6400;

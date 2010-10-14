@@ -42,7 +42,9 @@ public:
 
 
 	CLDeviceList getDeviceList(CLDeviceCriteria& cr);
+
 	CLDeviceList getRecorderList();
+	CLDevice* getRecorderById(QString id); 
 
 protected:
 

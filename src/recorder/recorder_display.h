@@ -3,18 +3,22 @@
 
 #include "base\longrunnable.h"
 
-class CLRecorderDevice;
+class CLDevice;
 class CLRecorderItem;
 
 class CLRecorderDisplay : public CLLongRunnable
 {
 public:
-	CLRecorderDisplay(CLRecorderDevice* dev, CLRecorderItem* recitem);
+	CLRecorderDisplay(CLDevice* dev, CLRecorderItem* recitem);
 	~CLRecorderDisplay();
+
+	CLDevice* getDevice() const;
+	CLRecorderItem* getRecorderItem() const;
+
 protected:
 	void run();
 private:
-	CLRecorderDevice* mDev;
+	CLDevice* mDev;
 	CLRecorderItem* mRecitem;
 };
 

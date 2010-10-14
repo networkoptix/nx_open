@@ -23,12 +23,14 @@ public:
 		return m_needUpdate;
 	}
 
-protected:
-
 	void needUpdate(bool val)
 	{
 		m_needUpdate = val;
 	}
+
+
+protected:
+
 
 
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);

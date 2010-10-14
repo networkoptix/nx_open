@@ -5,7 +5,7 @@
 #include <QRect>
 #include <QObject>
 #include <QTimer>
-#include "layout_content.h"
+
 
 
 class CLAbstractSceneItem;
@@ -15,6 +15,8 @@ class CLDeviceVideoLayout;
 class GraphicsView;
 class QGraphicsScene;
 class CLDevice;
+class LayoutContent;
+class CLRecorderDisplay;
 
 struct CLIdealWndPos
 {
@@ -33,10 +35,8 @@ public:
 	//================================================
 	void setView(GraphicsView* view);
 	void setScene(QGraphicsScene* scene);
-	void setName(const QString& name);
-	QString getName() const;
-	void setContent(const LayoutContent& cont);
-	LayoutContent& getContent();
+	void setContent(LayoutContent* cont);
+	LayoutContent* getContent();
 
 	//================================================
 
@@ -113,8 +113,8 @@ public:
 	//========================================================
 
 signals:
-	void stoped(QString name);
-	void onItemPressed(QString lyouname, QString itemname);
+	void stoped(LayoutContent* l);
+	void onItemPressed(LayoutContent* l, QString itemname);
 protected slots:
 
 	void onItemPressed(CLAbstractSceneItem* item);
@@ -123,7 +123,7 @@ protected slots:
 	void onTimer();
 	void onVideoTimer();
 
-	void stop_helper();
+	void stop_helper(bool emt = true);
 private:
 
 	
@@ -164,6 +164,7 @@ private:
 	QList<CLAbstractSceneItem*> m_items;
 
 	QList<CLVideoCamera*> m_cams; 
+	QList<CLRecorderDisplay*> m_recorders; 
 
 
 	int m_height;
@@ -179,7 +180,7 @@ private:
 
 	GraphicsView* m_view;
 	QGraphicsScene* m_scene;
-	QString m_Name;
+
 
 	QTimer m_videotimer;
 	QTimer m_timer;
@@ -188,7 +189,7 @@ private:
 
 	bool m_isRunning;
 
-	LayoutContent m_content;
+	LayoutContent* m_content;
 	
 };
 

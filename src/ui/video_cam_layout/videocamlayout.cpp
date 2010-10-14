@@ -13,6 +13,9 @@
 #include "base/log.h"
 #include "ui/videoitem/static_image_item.h"
 #include "ui/videoitem/custom_draw_button.h"
+#include "layout_content.h"
+#include "recorder/recorder_display.h"
+#include "ui/videoitem/recorder_item.h"
 
 #define SLOT_WIDTH (640*10)
 #define SLOT_HEIGHT (SLOT_WIDTH*3/4)
@@ -58,12 +61,12 @@ SceneLayout::~SceneLayout()
 
 }
 
-void SceneLayout::setContent(const LayoutContent& cont)
+void SceneLayout::setContent(LayoutContent* cont)
 {
 	m_content = cont;
 }
 
-LayoutContent& SceneLayout::getContent()
+LayoutContent* SceneLayout::getContent()
 {
 	return m_content;
 }
@@ -80,7 +83,7 @@ void SceneLayout::start()
 	m_isRunning = true;
 }
 
-void SceneLayout::stop_helper()
+void SceneLayout::stop_helper(bool emt)
 {
 
 	disconnect(m_view, SIGNAL(scneZoomFinished()), this, SLOT(stop_helper()));
@@ -92,6 +95,12 @@ void SceneLayout::stop_helper()
 		cam->getStreamreader()->pleaseStop();
 		cam->getCamCamDisplay()->pleaseStop();
 	}
+
+	foreach(CLRecorderDisplay* rec, m_recorders)
+	{
+		rec->pleaseStop();
+	}
+	//===============
 
 	foreach(CLVideoCamera* cam, m_cams)
 	{
@@ -109,6 +118,17 @@ void SceneLayout::stop_helper()
 
 	m_cams.clear();
 
+	//======================
+	foreach(CLRecorderDisplay* rec, m_recorders)
+	{
+		rec->stop();
+		rec->getDevice()->releaseRef();
+		delete rec;
+	}
+
+	m_recorders.clear();
+
+	//===================
 	foreach(CLAbstractSceneItem* item, m_items)
 	{
 		m_scene->removeItem(item);
@@ -117,7 +137,8 @@ void SceneLayout::stop_helper()
 
 	m_items.clear();
 
-	emit stoped(m_Name);
+	if (emt)
+		emit stoped(m_content);
 
 }
 
@@ -151,7 +172,9 @@ void SceneLayout::stop(bool animation)
 		m_view->zoomMin(400);
 	}
 	else
-		stop_helper();
+	{
+		stop_helper(animation);
+	}
 
 }
 
@@ -182,9 +205,10 @@ void SceneLayout::onTimer()
 	}
 
 	
-	CLDeviceList all_devs =  CLDeviceManager::instance().getDeviceList(m_content.getDeviceCriteria());
-
 	bool added = false;
+
+	//===================video devices=======================
+	CLDeviceList all_devs =  CLDeviceManager::instance().getDeviceList(m_content->getDeviceCriteria());
 
 	foreach(CLDevice* dev, all_devs)
 	{
@@ -212,9 +236,48 @@ void SceneLayout::onTimer()
 				dev->releaseRef();
 			else
 				added = true;
-
 		}
 	}
+	//==============recorders ================================
+	QList<LayoutContent*> children_lst =  m_content->childrenList();
+	foreach(LayoutContent* child, children_lst)
+	{
+		if(!child->isRecorder())
+			continue;
+
+		CLDevice* dev = CLDeviceManager::instance().getRecorderById(child->getName());
+		if (dev==0)
+			continue;
+
+		bool contains = false;
+		foreach(CLRecorderDisplay* rec, m_recorders)
+		{
+			if (rec->getDevice()->getUniqueId() == dev->getUniqueId())
+			{
+				contains = true;
+				break;
+			}
+		}
+
+		if (contains) // if such device already here we do not need it
+		{
+			dev->releaseRef();
+		}
+		else
+		{
+			// the ref counter for device already increased in getDeviceList; 
+			// must not do it again
+			if (!addDevice(dev, false))
+				dev->releaseRef();
+			else
+				added = true;
+		}
+
+		
+	}
+
+
+
 
 	if (added && !m_firstTime)
 		m_view->fitInView(2000);
@@ -233,6 +296,18 @@ void SceneLayout::onVideoTimer()
 			wnd->needUpdate(false);
 		}
 	}
+
+	foreach(CLRecorderDisplay* rec, m_recorders)
+	{
+		CLRecorderItem* item = rec->getRecorderItem();
+		if (item->needUpdate())
+		{
+			item->update();
+			item->needUpdate(false);
+		}
+	}
+
+
 }
 
 void SceneLayout::onFirstSceneAppearance()
@@ -252,20 +327,38 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect)
 		return false;
 	}
 
-	QSize wnd_size = getMaxWndSize(device->getVideoLayout());
+
+	CLDevice::DeviceType type = device->getDeviceType();
+
+	if (type==CLDevice::VIDEODEVICE)
+	{
+		QSize wnd_size = getMaxWndSize(device->getVideoLayout());
 
 
-	CLVideoWindowItem* video_wnd =  new CLVideoWindowItem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height());
-	CLVideoCamera* cam = new VideoCamera(device, video_wnd);
-	addItem(video_wnd, update_scene_rect);
+		CLVideoWindowItem* video_wnd =  new CLVideoWindowItem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height());
+		CLVideoCamera* cam = new VideoCamera(device, video_wnd);
+		addItem(video_wnd, update_scene_rect);
 
-	m_cams.push_back(cam);
+		m_cams.push_back(cam);
+		cam->setQuality(CLStreamreader::CLSLow, true);
+		cam->startDispay();
 
-	cam->setQuality(CLStreamreader::CLSLow, true);
+		return true;
+	}
 
-	cam->startDispay();
+	if (type==CLDevice::RECORDER)
+	{
+		CLRecorderItem* item = new CLRecorderItem(m_view, SLOT_WIDTH, SLOT_HEIGHT, device->getUniqueId(), device->getUniqueId());
+		CLRecorderDisplay* recd = new CLRecorderDisplay(device, item);
+		addItem(item, update_scene_rect);
 
-	return true;
+		m_recorders.push_back(recd);
+		recd->start();
+
+		return true;
+	}
+
+	
 
 }
 
@@ -300,17 +393,6 @@ void SceneLayout::setView(GraphicsView* view)
 void SceneLayout::setScene(QGraphicsScene* scene)
 {
 	m_scene = scene;
-}
-
-
-void SceneLayout::setName(const QString& name)
-{
-	m_Name = name;
-}
-
-QString SceneLayout::getName() const
-{
-	return m_Name;
 }
 
 
@@ -658,7 +740,7 @@ void SceneLayout::onItemPressed(CLAbstractSceneItem* item)
 {
 	if (item->getType() == CLAbstractSceneItem::IMAGE || item->getType() == CLAbstractSceneItem::BUTTON)
 	{
-		emit onItemPressed(m_Name, item->getName());
+		emit onItemPressed(m_content, item->getName());
 	}
 }
 
@@ -791,21 +873,21 @@ QList<CLIdealWndPos> SceneLayout::calcArrangedPos() const
 
 void SceneLayout::loadContent()
 {
-	QList<LayoutImage> img_list = m_content.getImages();
-	QList<LayoutButton> btns_list = m_content.getButtons();
+	QList<LayoutImage*> img_list = m_content->getImages();
+	QList<LayoutButton*> btns_list = m_content->getButtons();
 
-	foreach(LayoutImage img, img_list)
+	foreach(LayoutImage* img, img_list)
 	{
-		CLStaticImageItem* item = new CLStaticImageItem(m_view, img.width(), img.height(), img.getImage(), img.getName());
+		CLStaticImageItem* item = new CLStaticImageItem(m_view, img->width(), img->height(), img->getImage(), img->getName());
 		item->setOpacity(0.8);
-		addItem(item, img.getX(), img.getY());
+		addItem(item, img->getX(), img->getY());
 	}
 
-	foreach(LayoutButton btn, btns_list)
+	foreach(LayoutButton* btn, btns_list)
 	{
 		
-		CLCustomBtnItem* item = new CLCustomBtnItem(m_view, btn.width(), btn.height(), btn.getName(), btn.getName(), "tiiktip text");
-		addItem(item, btn.getX(), btn.getY());
+		CLCustomBtnItem* item = new CLCustomBtnItem(m_view, btn->width(), btn->height(), btn->getName(), btn->getName(), "tiiktip text");
+		addItem(item, btn->getX(), btn->getY());
 	}
 
 

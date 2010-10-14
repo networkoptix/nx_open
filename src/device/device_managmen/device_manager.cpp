@@ -126,12 +126,23 @@ CLDeviceList CLDeviceManager::getDeviceList(CLDeviceCriteria& cr)
 
 CLDeviceList CLDeviceManager::getRecorderList()
 {
+	// gonna be different if we have server
 	CLDeviceList result;
 	mRecDevice->addRef();
 	result.insert(mRecDevice->getUniqueId(), mRecDevice);
 	return result;
 }
 
+CLDevice* CLDeviceManager::getRecorderById(QString id)
+{
+	// gonna be different if we have server
+	if (mRecDevice->getUniqueId()!=id)
+		return 0;
+
+	mRecDevice->addRef();
+
+	return mRecDevice;
+}
 
 
 void CLDeviceManager::onNewDevices_helper(CLDeviceList devices)

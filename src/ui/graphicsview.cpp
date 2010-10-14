@@ -20,6 +20,7 @@
 #include "videoitem/video_wnd_item.h"
 #include "videoitem/abstract_unmoved_item.h"
 #include "videoitem/unmoved_pixture_button.h"
+#include "video_cam_layout/layout_content.h"
 
 
 
@@ -133,6 +134,7 @@ void GraphicsView::closeAllDlg()
 	{
 		mDeviceDlg->close();
 		delete mDeviceDlg;
+		mDeviceDlg = 0;
 	}
 }
 
@@ -355,17 +357,17 @@ void GraphicsView::initDecoration()
 {
 	removeAllStaticItems();
 
-	LayoutContent& cont = m_camLayout.getContent();
+	LayoutContent* cont = m_camLayout.getContent();
 	CLAbstractUnmovedItem* item;
 
-	if (cont.checkDecorationFlag(LayoutContent::HomeButton))
+	if (cont->checkDecorationFlag(LayoutContent::HomeButton))
 	{
 		item = new CLUnMovedPixtureButton(this, button_home, "./skin/home.png", 100, 100, 255, 0.2);
 		item->setStaticPos(QPoint(1,1));
 		addStaticItem(item);
 	}
 
-	if (cont.checkDecorationFlag(LayoutContent::BackGroundLogo))
+	if (cont->checkDecorationFlag(LayoutContent::BackGroundLogo))
 	{
 
 		item = new CLUnMovedPixture(this, "background", "./skin/logo.png", viewport()->width(), viewport()->height(), -1, 0.03);
@@ -1244,7 +1246,7 @@ CLAbstractSceneItem* GraphicsView::getLastSelectedItem()
 
 void GraphicsView::onDecorationItemPressed(QString name)
 {
-	emit onDecorationPressed(m_camLayout.getName(), name);
+	emit onDecorationPressed(m_camLayout.getContent(), name);
 }
 
 void GraphicsView::onScneZoomFinished()

@@ -3,7 +3,7 @@
 #include "ui\videoitem\recorder_item.h"
 #include "base\sleep.h"
 
-CLRecorderDisplay::CLRecorderDisplay(CLRecorderDevice* dev, CLRecorderItem* recitem):
+CLRecorderDisplay::CLRecorderDisplay(CLDevice* dev, CLRecorderItem* recitem):
 mDev(dev),
 mRecitem(recitem)
 {
@@ -15,6 +15,17 @@ CLRecorderDisplay::~CLRecorderDisplay()
 	stop();
 }
 
+CLDevice* CLRecorderDisplay::getDevice() const
+{
+	return mDev;
+}
+
+CLRecorderItem* CLRecorderDisplay::getRecorderItem() const
+{
+	return mRecitem;
+}
+
+
 void CLRecorderDisplay::run()
 {
 	while(!needToStop())
@@ -23,8 +34,8 @@ void CLRecorderDisplay::run()
 		mRecitem->setText(text);
 
 
-		//=== 2 sec delay===
-		for (int i = 0; i < 20; ++i)
+		//=== 0.5 sec delay===
+		for (int i = 0; i < 5; ++i)
 		{
 			if (needToStop())
 				break;

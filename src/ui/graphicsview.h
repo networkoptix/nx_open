@@ -52,7 +52,7 @@ public:
 
 signals:
 	void scneZoomFinished();
-	void onDecorationPressed(QString, QString);
+	void onDecorationPressed(LayoutContent*, QString);
 protected:
 	virtual void wheelEvent ( QWheelEvent * e );
 	void mouseReleaseEvent ( QMouseEvent * e);

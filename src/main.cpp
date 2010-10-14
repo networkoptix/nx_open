@@ -14,6 +14,7 @@
 #include "ui/device_settings/plugins/arecontvision/arecont_dlg.h"
 #include <QMessageBox>
 #include "device/device_managmen/device_manager.h"
+#include "ui/video_cam_layout/layout_manager.h"
 
 
 int main(int argc, char *argv[])
@@ -88,6 +89,16 @@ int main(int argc, char *argv[])
 		}");
 
 	/**/
+	//=========================================================
+
+	CLDeviceList recorders = CLDeviceManager::instance().getRecorderList();
+	foreach(CLDevice* dev, recorders)
+	{
+		QString id = dev->getUniqueId();
+		CLSceneLayoutManager::instance().addRecorderLayoutContent(id);
+		dev->releaseRef();
+	}
+
 	//=========================================================
 
 

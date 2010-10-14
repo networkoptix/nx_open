@@ -91,6 +91,11 @@ QString LayoutDevice::getId() const
 }
 
 //=======
+LayoutButton::LayoutButton()
+{
+
+}
+
 LayoutButton::LayoutButton(const QString& name_, const QString& text, const QString& tooltip, int x_, int y_, int width_, int height_, int angle_):
 LayoutItem(x_, y_, width_, height_,  angle_),
 m_text(text),
@@ -128,7 +133,8 @@ QString LayoutImage::getImage() const
 
 LayoutContent::LayoutContent():
 m_cr(CLDeviceCriteria::NONE),
-mDecoration(0)
+mDecoration(0),
+m_recorder(false)
 {
 	
 }
@@ -142,6 +148,17 @@ LayoutItem::Type LayoutContent::type() const
 {
 	return LAYOUT;
 }
+
+bool LayoutContent::isRecorder() const
+{
+	return m_recorder;
+}
+
+void LayoutContent::setRecorder()
+{
+	m_recorder = true;
+}
+
 
 bool LayoutContent::checkDecorationFlag(unsigned int flag) const
 {
@@ -161,18 +178,18 @@ void LayoutContent::setParent(LayoutContent* parent)
 
 void LayoutContent::addButton(const QString& name, const QString& text, const QString& tooltip, int x, int y, int width, int height, int angle)
 {
-	m_btns.push_back(LayoutButton(name, text, tooltip, x, y, width, height, angle) );
+	m_btns.push_back(new LayoutButton(name, text, tooltip, x, y, width, height, angle) );
 }
 
 void LayoutContent::addImage(const QString& img, const QString& name, const QString& text, const QString& tooltip, int x, int y, int width, int height, int angle)
 {
-	m_imgs.push_back(LayoutImage(img, name, text, tooltip, x, y, width, height, angle));
+	m_imgs.push_back(new LayoutImage(img, name, text, tooltip, x, y, width, height, angle));
 }
 
-void LayoutContent::addLayout(const LayoutContent& l)
+void LayoutContent::addLayout(LayoutContent* l)
 {
 	m_childlist.push_back(l);
-	m_childlist.back().setParent(this);
+	m_childlist.back()->setParent(this);
 }
 
 
@@ -187,17 +204,17 @@ CLDeviceCriteria LayoutContent::getDeviceCriteria() const
 }
 
 
-QList<LayoutImage>& LayoutContent::getImages() 
+QList<LayoutImage*>& LayoutContent::getImages() 
 {
 	return m_imgs;
 }
 
-QList<LayoutButton>& LayoutContent::getButtons() 
+QList<LayoutButton*>& LayoutContent::getButtons() 
 {
 	return m_btns;
 }
 
-QList<LayoutContent>& LayoutContent::childrenList() 
+QList<LayoutContent*>& LayoutContent::childrenList() 
 {
 	return m_childlist;
 }

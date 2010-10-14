@@ -56,6 +56,7 @@ protected:
 class LayoutButton: public LayoutItem
 {
 public:
+	LayoutButton();
 	LayoutButton(const QString& name, const QString& text, const QString& tooltip, int x, int y, int width, int height, int angle = 0);
 	virtual Type type() const;
 protected:
@@ -79,7 +80,7 @@ protected:
 //=======================================================================================================
 
 
-class LayoutContent : public LayoutItem
+class LayoutContent : public LayoutButton
 {
 public:
 
@@ -90,6 +91,9 @@ public:
 
 	virtual Type type() const;
 
+	bool isRecorder() const;
+	void setRecorder();
+
 	bool checkDecorationFlag(unsigned int flag) const;
 	void addDecorationFlag(unsigned int flag);
 
@@ -98,19 +102,19 @@ public:
 
 	void addButton(const QString& name, const QString& text, const QString& tooltip, int x, int y, int width, int height, int angle = 0);
 	void addImage(const QString& img, const QString& name, const QString& text, const QString& tooltip, int x, int y, int width, int height, int angle = 0);
-	void addLayout(const LayoutContent& l);
+	void addLayout(LayoutContent* l);
 
 	void setDeviceCriteria(const CLDeviceCriteria& cr);
 	CLDeviceCriteria getDeviceCriteria() const;
 
-	QList<LayoutImage>& getImages();
-	QList<LayoutButton>& getButtons();
-	QList<LayoutContent>& childrenList();
+	QList<LayoutImage*>& getImages();
+	QList<LayoutButton*>& getButtons();
+	QList<LayoutContent*>& childrenList();
 	
 protected:
-	QList<LayoutImage> m_imgs;
-	QList<LayoutButton> m_btns;
-	QList<LayoutContent> m_childlist;
+	QList<LayoutImage*> m_imgs;
+	QList<LayoutButton*> m_btns;
+	QList<LayoutContent*> m_childlist;
 
 
 	CLDeviceCriteria m_cr;
@@ -118,6 +122,8 @@ protected:
 	LayoutContent* m_parent;
 
 	unsigned int mDecoration;
+
+	bool m_recorder;
 
 };
 #endif //layout_content_h_2210

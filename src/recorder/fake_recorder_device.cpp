@@ -20,7 +20,8 @@ QString CLFakeRecorderDevice::toString() const
 	int cpu_temp = cl_get_random_val(50, 53);
 
 	QString result;
-	QTextStream(&result) << getFullName() << ":  " <<  getUniqueId()<< "(127.0.0.1)\r\n" << "CPU USAGE: " << cpu_usage << "\r\n CPU temperature: ";
+	QTextStream(&result) << getFullName() << ":  " <<  getUniqueId()<< "(127.0.0.1)\r\n" << "CPU USAGE: " \
+		<< cpu_usage << "\r\n CPU temperature: " << cpu_temp << " \r\nOverAll Status: OK";
 	return result;
 }
 
