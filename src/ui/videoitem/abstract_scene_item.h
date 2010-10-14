@@ -16,7 +16,7 @@ class CLAbstractSceneItem : public QObject, public QGraphicsItem
 	Q_PROPERTY(qreal rotation	READ getRotation WRITE setRotation)
 public:
 
-	enum CLSceneItemType {VIDEO, IMAGE, BUTTON};
+	enum CLSceneItemType {VIDEO, IMAGE, BUTTON, RECORDER};
 
 	CLAbstractSceneItem(GraphicsView* view, int max_width, int max_height,
 						QString name="");
@@ -66,8 +66,7 @@ public:
 
 signals:
 	void onPressed(CLAbstractSceneItem*);
-	
-
+	void onDoubleClick(CLAbstractSceneItem*);
 
 protected:
 	void drawShadow(QPainter* painter);
@@ -76,8 +75,10 @@ protected:
 
 	virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
 	virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
-	void mouseReleaseEvent( QGraphicsSceneMouseEvent * event );
-	void mousePressEvent ( QGraphicsSceneMouseEvent * event );
+	virtual void mouseReleaseEvent( QGraphicsSceneMouseEvent * event );
+	virtual void mousePressEvent ( QGraphicsSceneMouseEvent * event );
+	virtual void mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * event );
+
 
 protected:
 	bool m_selected;

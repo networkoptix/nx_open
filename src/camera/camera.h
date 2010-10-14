@@ -2,7 +2,7 @@
 #define clcamera_h_1451
 
 
-#include "../videodisplay/camdisplay.h"
+#include "camdisplay.h"
 #include "../statistics/statistics.h"
 #include "../streamreader/streamreader.h"
 

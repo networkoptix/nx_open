@@ -7,6 +7,7 @@ CLRecorderItem::CLRecorderItem(GraphicsView* view, int max_width, int max_height
 CLCustomBtnItem(view,max_width,max_height, name, "", tooltip),
 m_needUpdate(false)
 {
+	m_type = RECORDER;
 }
 
 

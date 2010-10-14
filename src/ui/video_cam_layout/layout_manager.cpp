@@ -7,7 +7,7 @@
 CLSceneLayoutManager::CLSceneLayoutManager()
 {
 	mRootContent = new LayoutContent();
-	mRootContent->addDecorationFlag(LayoutContent::HomeButton | LayoutContent::BackGroundLogo);
+	mRootContent->addDecorationFlag(LayoutContent::HomeButton | LayoutContent::BackGroundLogo );
 	load();
 }
 

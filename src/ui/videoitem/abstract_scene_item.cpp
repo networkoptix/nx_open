@@ -221,6 +221,11 @@ void CLAbstractSceneItem::mousePressEvent ( QGraphicsSceneMouseEvent * event )
 
 }
 
+void CLAbstractSceneItem::mouseDoubleClickEvent( QGraphicsSceneMouseEvent * event )
+{
+	emit onDoubleClick(this);
+}
+
 void CLAbstractSceneItem::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 {
 	if (event->button()==Qt::LeftButton)

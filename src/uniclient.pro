@@ -20,7 +20,7 @@ SOURCES += device/device.cpp device/network_device.cpp device/file_device.cpp de
 SOURCES += network/nettools.cpp network/socket.cpp network/simple_http_client.cpp network/ping.cpp network/netstate.cpp
 SOURCES += statistics/statistics.cpp
 SOURCES += streamreader/cpull_stremreader.cpp streamreader/streamreader.cpp streamreader/single_shot_reader.cpp streamreader/single_shot_file_reader.cpp
-SOURCES += videodisplay/camdisplay.cpp videodisplay/gl_renderer.cpp videodisplay/videostreamdisplay.cpp
+SOURCES += camera/camdisplay.cpp camera/gl_renderer.cpp camera/videostreamdisplay.cpp
 
 HEADERS = mainwnd.h video_camera.h settings.h
 HEADERS += base/threadqueue.h base/log.h base/associativearray.h base/expensiveobject.h base/bytearray.h base/longrunnable.h base/rand.h base/adaptivesleep.h base/base.h base/sleep.h
@@ -31,7 +31,7 @@ HEADERS += device/deviceserver.h device/device.h device/network_device.h device/
 HEADERS += network/simple_http_client.h network/netstate.h network/ping.h network/socket.h network/nettools.h
 HEADERS += statistics/statistics.h
 HEADERS += streamreader/cpull_stremreader.h streamreader/streamreader.h streamreader/single_shot_reader.h streamreader/single_shot_file_reader.h
-HEADERS += videodisplay/abstractrenderer.h videodisplay/camdisplay.h videodisplay/gl_renderer.h videodisplay/videostreamdisplay.h
+HEADERS += camera/abstractrenderer.h camera/camdisplay.h camera/gl_renderer.h camera/videostreamdisplay.h
 
 
 

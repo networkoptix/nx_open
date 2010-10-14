@@ -8,6 +8,7 @@ QString video_layout = "video layout";
 
 QString button_logo = "logo";
 QString button_home = "home";
+QString button_level_up = "level_up";
 
 
 CLLayoutNavigator::CLLayoutNavigator(MainWnd* mainWnd, LayoutContent* content):

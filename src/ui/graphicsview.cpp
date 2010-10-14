@@ -35,6 +35,7 @@ int item_rotation_duration = 2000;
 qreal selected_item_zoom = 1.63;
 
 extern QString button_home;
+extern QString button_level_up;
 //==============================================================================
 
 GraphicsView::GraphicsView(MainWnd* mainWnd):
@@ -366,6 +367,14 @@ void GraphicsView::initDecoration()
 		item->setStaticPos(QPoint(1,1));
 		addStaticItem(item);
 	}
+
+	if (cont->checkDecorationFlag(LayoutContent::LevelUp))
+	{
+		item = new CLUnMovedPixtureButton(this, button_level_up, "./skin/up.png", 100, 100, 255, 0.2);
+		item->setStaticPos(QPoint(100+10,1));
+		addStaticItem(item);
+	}
+
 
 	if (cont->checkDecorationFlag(LayoutContent::BackGroundLogo))
 	{
@@ -980,6 +989,8 @@ void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
 	
 
 	m_ignore_release_event  = true;
+
+	QGraphicsView::mouseDoubleClickEvent (e);
 }
 
 

@@ -8,8 +8,8 @@
 #include "../statistics/statistics.h"
 #include "../device/device_video_layout.h"
 #include "img_item.h"
-#include "videodisplay/abstractrenderer.h"
-#include "videodisplay/gl_renderer.h"
+#include "camera/abstractrenderer.h"
+#include "camera/gl_renderer.h"
 
 class QPainter;
 class MainWnd;

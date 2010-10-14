@@ -519,6 +519,9 @@ bool SceneLayout::addItem(CLAbstractSceneItem* item, int x, int y, bool update_s
 
 	connect(item, SIGNAL(onPressed(CLAbstractSceneItem*)), this, SLOT(onItemPressed(CLAbstractSceneItem*)));
 
+	connect(item, SIGNAL(onDoubleClick(CLAbstractSceneItem*)), this, SLOT(onItemPressed(CLAbstractSceneItem*)));
+	
+
 	return true;
 
 }
@@ -733,6 +736,11 @@ CLAbstractSceneItem* SceneLayout::next_item_helper(const CLAbstractSceneItem* cu
 		return result;
 
 	return const_cast<CLAbstractSceneItem*>(curr);
+
+}
+
+void SceneLayout::onItemDoubleClick(CLAbstractSceneItem* item)
+{
 
 }
 
