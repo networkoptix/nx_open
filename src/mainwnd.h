@@ -3,12 +3,18 @@
 
 #include <QtGui/QMainWindow>
 #include "ui_mainwnd.h"
-#include "ui/layout_navigator.h"
+
+class CLLayoutNavigator;
+class QHBoxLayout;
+class QVBoxLayout;
 
 //class MainWnd : public QMainWindow
 class MainWnd : public QWidget
 {
 	Q_OBJECT
+
+	enum ViewMode {ZERRO, NORMAL, LAYOUTEDITOR};
+
 public:
 	MainWnd(QWidget *parent = 0, Qt::WFlags flags = 0);
 	~MainWnd();
@@ -18,8 +24,24 @@ private:
 	Ui::MainWndClass ui;
 private:
 	void closeEvent ( QCloseEvent * event );
+
+	void goToNomalLayout();
+	void goToLayouteditor();
+
+
+	void destroyNavigator(CLLayoutNavigator*& nav);
 private:
-	CLLayoutNavigator m_layout;
+
+	QHBoxLayout *mMainLayout;
+	QVBoxLayout *mVLayout;
+
+	CLLayoutNavigator* m_normalView;
+
+	CLLayoutNavigator* m_topView;
+	CLLayoutNavigator* m_bottomView;
+	CLLayoutNavigator* m_editedView;
+
+	ViewMode mMode;
 
 };
 

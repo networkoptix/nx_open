@@ -139,6 +139,8 @@ private:
 	CLVideoDecoderOutput m_image;
 	bool m_abort_drawing;
 
+	bool m_do_not_need_to_wait_any_more;
+
 };
 
 

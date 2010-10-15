@@ -121,6 +121,7 @@ protected slots:
 
 	void onItemPressed(CLAbstractSceneItem* item);
 	void onItemDoubleClick(CLAbstractSceneItem* item);
+	void onItemFullScreen(CLAbstractSceneItem* item);
 
 	void onAspectRatioChanged(CLAbstractSceneItem* wnd);
 	void onTimer();
@@ -159,7 +160,6 @@ private:
 	int slotFromPos(QPoint p) const;
 	QPoint posFromSlot(int slot) const;
 
-	void onFirstSceneAppearance();
 
 	//this function checks if some dev from lst needs to be added
 	// return true if at least one is added

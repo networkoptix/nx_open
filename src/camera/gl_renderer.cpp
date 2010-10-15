@@ -363,6 +363,7 @@ void CLGLRenderer::copyVideoDataBeforePainting(bool copy)
 
 void CLGLRenderer::draw(CLVideoDecoderOutput& img, unsigned int channel)
 {
+	
 	QMutexLocker locker(&m_mutex);
 
 	m_abort_drawing = false;
@@ -423,12 +424,19 @@ void CLGLRenderer::draw(CLVideoDecoderOutput& img, unsigned int channel)
 	m_videowindow->needUpdate(true); // sending piant event
 	//m_videowindow->update();
 	
+	
 	if (m_needwait)
 	{
-		while (!m_waitCon.wait(&m_mutex,100)) // unlock the mutex 
+		m_do_not_need_to_wait_any_more = false;
+
+		while (!m_waitCon.wait(&m_mutex,50)) // unlock the mutex 
 		{
+			
 			if (!m_videowindow->isVisible() || !m_needwait)
-				return;
+				break;
+
+			if (m_do_not_need_to_wait_any_more)
+				break; // some times It does not wake up after wakeone is called ; is it a bug?
 		}
 	}
 
@@ -708,7 +716,8 @@ void CLGLRenderer::drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const
 
 void CLGLRenderer::paintEvent(const QRect& r)
 {
-	
+
+
 	if (m_abort_drawing)
 		return;
 
@@ -718,8 +727,9 @@ void CLGLRenderer::paintEvent(const QRect& r)
 		m_inited = true;
 	}
 
-
+	
 	//cl_log.log("begin of paint event", cl_logDEBUG1);
+	
 	
 	
 	QMutexLocker locker(&m_mutex);
@@ -730,9 +740,6 @@ void CLGLRenderer::paintEvent(const QRect& r)
 		//cl_log.log("end(0) of paint event", cl_logDEBUG1);
 		return;
 	}
-	
-	
-	
 	
 	if (m_gotnewimage)	updateTexture();
 	
@@ -755,7 +762,7 @@ void CLGLRenderer::paintEvent(const QRect& r)
 
 	
 	m_waitCon.wakeOne();
-
+	m_do_not_need_to_wait_any_more = true;
 }
 
 

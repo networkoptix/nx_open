@@ -166,6 +166,9 @@ void CLAbstractSceneItem::stop_animation()
 void CLAbstractSceneItem::setFullScreen(bool full)
 {
 	m_fullscreen = full;
+
+	if (m_fullscreen )
+		emit onFullScreen(this);
 }
 
 bool CLAbstractSceneItem::isFullScreen() const

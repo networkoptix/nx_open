@@ -78,7 +78,7 @@ public:
 signals:
 	void onPressed(CLAbstractSceneItem*);
 	void onDoubleClick(CLAbstractSceneItem*);
-
+	void onFullScreen(CLAbstractSceneItem*);
 protected:
 	void drawShadow(QPainter* painter);
 

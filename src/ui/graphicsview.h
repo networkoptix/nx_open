@@ -26,6 +26,9 @@ public:
 	GraphicsView(MainWnd* mainWnd);
 	virtual ~GraphicsView();
 
+	void start();
+	void stop();
+
 	void zoomMin(int duration);
 	void setRealSceneRect(QRect rect);
 	QRect getRealSceneRect() const;
@@ -40,10 +43,7 @@ public:
 
 	void setAllItemsQuality(CLStreamreader::StreamQuality q, bool increase);
 	void closeAllDlg();
-	void stopAnimation();
-	
-	void setAcceptInput(bool accept); 
-
+		
 
 	void addjustAllStaticItems();
 	void centerOn(const QPointF &pos);
@@ -95,7 +95,7 @@ protected:
 	void updateDecorations();
 	void recalcSomeParams();
 	
-
+	void stopAnimation();
 
 public slots:
 	
@@ -161,7 +161,7 @@ protected:
 	bool mZerroDistance;
 	qreal m_old_distance;
 
-	bool mAcceptInput;
+	bool mViewStarted;
 	
 	//====decoration======
 	QList<CLAbstractUnmovedItem*> m_staticItems;

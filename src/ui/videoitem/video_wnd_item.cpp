@@ -116,7 +116,9 @@ void CLVideoWindowItem::draw(CLVideoDecoderOutput& image, unsigned int channel)
 {
 	
 	m_first_draw = false;
+
 	m_gldraw[channel]->draw(image, channel); // this function will wait m_gldraw.paintEvent(0);
+
 	//needUpdate(true);
 	QMutexLocker locker(&m_mutex);
 	m_imageWidth = image.width;
@@ -173,6 +175,7 @@ QRect CLVideoWindowItem::getSubChannelRect(unsigned int channel) const
 void CLVideoWindowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
 	
+	
 	if (m_first_draw)
 	{
 		return;
@@ -189,6 +192,7 @@ void CLVideoWindowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
 	// save the GL state set for QPainter
 	painter->beginNativePainting();
 	saveGLState();
+
 	for (int i = 0; i  < m_videonum; ++i)	m_gldraw[i]->paintEvent(getSubChannelRect(i));
 
 	// restore the GL state that QPainter expects

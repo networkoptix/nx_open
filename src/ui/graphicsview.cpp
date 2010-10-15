@@ -59,7 +59,7 @@ m_logo(0),
 m_animated_bckg(new CLBlueBackGround(50)),
 mDeviceDlg(0),
 mZerroDistance(true),
-mAcceptInput(false),
+mViewStarted(false),
 m_groupAnimation(0),
 m_fps_frames(0)
 {
@@ -126,6 +126,24 @@ GraphicsView::~GraphicsView()
 	stopAnimation();
 	stopGroupAnimation();
 	delete m_animated_bckg;
+}
+
+void GraphicsView::start()
+{
+	centerOn(getRealSceneRect().center());
+	zoomMin(0);
+	fitInView(3000);
+	mViewStarted = true;
+	m_ignore_release_event = false;
+
+}
+
+void GraphicsView::stop()
+{
+	stopAnimation(); // stops animation 
+	mViewStarted = false;
+	setZeroSelection(); 
+	closeAllDlg();
 }
 
 
@@ -211,7 +229,7 @@ void GraphicsView::setAllItemsQuality(CLStreamreader::StreamQuality q, bool incr
 
 void GraphicsView::wheelEvent ( QWheelEvent * e )
 {
-	if (!mAcceptInput)
+	if (!mViewStarted)
 		return;
 
 	showStop_helper();
@@ -250,7 +268,7 @@ void GraphicsView::updateTransform(qreal angle)
 
 void GraphicsView::onShowTimer()
 {
-	if (!mAcceptInput) // we are about to stop this view
+	if (!mViewStarted) // we are about to stop this view
 		return;
 
 	if (!mShow.showTime)
@@ -340,7 +358,7 @@ void GraphicsView::showStop_helper()
 	{
 		mShow.showTime = 0;
 		mShow.mTimer.setInterval(1000);
-		if (mAcceptInput) // if we are not about to stop this view
+		if (mViewStarted) // if we are not about to stop this view
 			onArrange_helper();
 		mShow.mTimer.start();
 	}
@@ -414,14 +432,6 @@ void GraphicsView::removeAllStaticItems()
 	m_staticItems.clear();
 }
 
-
-void GraphicsView::setAcceptInput(bool accept)
-{
-	mAcceptInput = accept;
-	if (mAcceptInput)
-		m_ignore_release_event = false;
-}
-
 void GraphicsView::stopAnimation()
 {
 	m_scenezoom.stop();
@@ -432,7 +442,7 @@ void GraphicsView::stopAnimation()
 
 void GraphicsView::mousePressEvent ( QMouseEvent * event)
 {
-	if (!mAcceptInput)
+	if (!mViewStarted)
 		return;
 
 	m_yRotate = 0;
@@ -495,7 +505,7 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 
 void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
-	if (!mAcceptInput)
+	if (!mViewStarted)
 		return;
 
 	bool left_button = event->buttons() & Qt::LeftButton;
@@ -587,7 +597,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 
 void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 {
-	if (!mAcceptInput)
+	if (!mViewStarted)
 		return;
 
 	if (m_ignore_release_event)
@@ -777,7 +787,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 {
-	if (!mAcceptInput)
+	if (!mViewStarted)
 		return;
 
 	if (m_ignore_conext_menu_event)
@@ -941,7 +951,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
 void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
 {
-	if (!mAcceptInput)
+	if (!mViewStarted)
 		return;
 
 
@@ -999,7 +1009,7 @@ void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
 
 void GraphicsView::keyReleaseEvent( QKeyEvent * e )
 {
-	if (!mAcceptInput)
+	if (!mViewStarted)
 		return;
 
 	switch (e->key()) 
@@ -1019,7 +1029,7 @@ void GraphicsView::keyReleaseEvent( QKeyEvent * e )
 
 void GraphicsView::keyPressEvent( QKeyEvent * e )
 {
-	if (!mAcceptInput)
+	if (!mViewStarted)
 		return;
 
 
@@ -1222,7 +1232,7 @@ void GraphicsView::recalcSomeParams()
 
 void GraphicsView::resizeEvent( QResizeEvent * event )
 {
-	if (!mAcceptInput)
+	if (!mViewStarted)
 		return;
 
 	updateDecorations();
@@ -1361,7 +1371,7 @@ void GraphicsView::stopGroupAnimation()
 
 void GraphicsView::onCircle_helper(bool show)
 {
-	if (!mAcceptInput)
+	if (!mViewStarted)
 		return;
 
 
@@ -1435,7 +1445,7 @@ void GraphicsView::onCircle_helper(bool show)
 
 void GraphicsView::onArrange_helper()
 {
-	if (!mAcceptInput)
+	if (!mViewStarted)
 		return;
 
 	stopGroupAnimation();
@@ -1552,6 +1562,11 @@ void GraphicsView::onItemFullScreen_helper(CLAbstractSceneItem* wnd)
 
 
 	wnd->setFullScreen(true); // must be called at very beginning of the function coz it will change boundingRect of the item (shadows removed)
+
+	// inside setFullScreen signal can be send to stop the view.
+	// so at this point view might be stoped already 
+	if (!mViewStarted)
+		return;
 
 	QRectF item_rect = wnd->sceneBoundingRect();
 	QRectF viewRect = viewport()->rect();

@@ -95,8 +95,12 @@ void CLLayoutNavigator::onButtonItemPressed(LayoutContent* l, QString itemname )
 
 void CLLayoutNavigator::onNewLayoutSelected(LayoutContent* oldl, LayoutContent* newl)
 {
-	mNewContent = newl;
-	goToNewLayoutContent();
+	if (newl != mNewContent)
+	{
+		mNewContent = newl;
+		goToNewLayoutContent();
+	}
+
 }
 
 void CLLayoutNavigator::onLayOutStoped(LayoutContent* l)

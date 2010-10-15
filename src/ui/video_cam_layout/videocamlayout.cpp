@@ -25,7 +25,7 @@ int SCENE_TOP  = (400*1000);
 
 
 static const int max_items = 256;
-#define MAX_FPS (35.0)
+#define MAX_FPS (5.0)
 extern int scene_zoom_duration;
 
 
@@ -133,12 +133,7 @@ void SceneLayout::stop(bool animation)
 
 	cl_log.log("SceneLayout::stop......\r\n ", cl_logDEBUG1);
 
-	m_view->setAcceptInput(false);
-	m_view->setZeroSelection(); 
-	m_view->stopAnimation(); // stops animation 
-	
-
-	m_view->closeAllDlg();
+	m_view->stop();
 	
 	m_timer.stop();
 	m_videotimer.stop();
@@ -176,8 +171,7 @@ void SceneLayout::onTimer()
 		//QThread::currentThread()->setPriority(QThread::IdlePriority); // surprised. if gui thread has low priority => things looks smoother 
 		QThread::currentThread()->setPriority(QThread::LowPriority); // surprised. if gui thread has low priority => things looks smoother 
 		//QThread::currentThread()->setPriority(QThread::HighestPriority); // surprised. if gui thread has low priority => things looks smoother 
-		onFirstSceneAppearance();
-		m_view->setAcceptInput(true);
+		m_view->start();
 	}
 
 	if (m_items.count()>0 && m_timer.interval()!=devices_update_interval)
@@ -263,20 +257,11 @@ void SceneLayout::onVideoTimer()
 		CLAbstractSceneItem* itm = devitem->getSceneItem();
 		if (itm->needUpdate())
 		{
-			itm->update();
 			itm->needUpdate(false);
+			itm->update();
 		}
 	}
 }
-
-void SceneLayout::onFirstSceneAppearance()
-{
-	m_view->centerOn(m_view->getRealSceneRect().center());
-	m_view->zoomMin(0);
-	m_view->fitInView(3000);
-}
-
-
 
 bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect)
 {
@@ -500,6 +485,9 @@ bool SceneLayout::addItem(CLAbstractSceneItem* item, int x, int y, bool update_s
 
 	connect(item, SIGNAL(onDoubleClick(CLAbstractSceneItem*)), this, SLOT(onItemDoubleClick(CLAbstractSceneItem*)));
 	
+	connect(item, SIGNAL(onFullScreen(CLAbstractSceneItem*)), this, SLOT(onItemFullScreen(CLAbstractSceneItem*)));
+
+	
 
 	return true;
 
@@ -716,6 +704,15 @@ CLAbstractSceneItem* SceneLayout::next_item_helper(const CLAbstractSceneItem* cu
 
 	return const_cast<CLAbstractSceneItem*>(curr);
 
+}
+
+void SceneLayout::onItemFullScreen(CLAbstractSceneItem* item)
+{
+	if (item->getType() == CLAbstractSceneItem::RECORDER)
+	{
+		CLRecorderItem* ritem = static_cast<CLRecorderItem*>(item);
+		emit onNewLayoutSelected(m_content, ritem->getRefContent());
+	}
 }
 
 void SceneLayout::onItemDoubleClick(CLAbstractSceneItem* item)
