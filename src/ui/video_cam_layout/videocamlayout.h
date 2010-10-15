@@ -17,6 +17,7 @@ class QGraphicsScene;
 class CLDevice;
 class LayoutContent;
 class CLRecorderDisplay;
+class CLAbstractComplicatedItem;
 
 struct CLIdealWndPos
 {
@@ -165,8 +166,8 @@ private:
 
 	QList<CLAbstractSceneItem*> m_items;
 
-	QList<CLVideoCamera*> m_cams; 
-	QList<CLRecorderDisplay*> m_recorders; 
+	QList<CLAbstractComplicatedItem*> m_deviceitems; 
+	
 
 
 	int m_height;

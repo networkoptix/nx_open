@@ -18,20 +18,7 @@ public:
 	void setRecorderDisplay(CLRecorderDisplay* rec);
 	CLRecorderDisplay* getRecorderDisplay() const;
 
-	bool needUpdate() const
-	{
-		return m_needUpdate;
-	}
-
-	void needUpdate(bool val)
-	{
-		m_needUpdate = val;
-	}
-
-
 protected:
-
-
 
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 
@@ -39,7 +26,6 @@ protected:
 protected:
 
 	CLRecorderDisplay* mRecorder;
-	bool m_needUpdate;
 	mutable QMutex m_mutex;
 
 };

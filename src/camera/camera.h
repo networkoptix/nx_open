@@ -5,11 +5,13 @@
 #include "camdisplay.h"
 #include "../statistics/statistics.h"
 #include "../streamreader/streamreader.h"
+#include "videodisplay/complicated_item.h"
 
 class CLDevice;
 class CLVideoWindowItem;
+class CLAbstractSceneItem;
 
-class CLVideoCamera
+class CLVideoCamera : public CLAbstractComplicatedItem
 {
 public:
 	// number of videovindows in array must be the same as device->getNumberOfVideoChannels
@@ -17,18 +19,22 @@ public:
 	CLVideoCamera(CLDevice* device, CLVideoWindowItem* videovindow);
 	virtual ~CLVideoCamera();
 
-	void startDispay();
-	void stopDispay();
+	virtual void startDispay();
+	virtual void stopDispay();
+
+	virtual void beforestopDispay();
 	
 	
 	void setLightCPUMode(bool val);
 	void coppyImage(bool copy);
 
-	CLDevice* getDevice() const;
+	virtual CLDevice* getDevice() const;
 
 	CLStreamreader* getStreamreader();
 	CLVideoWindowItem* getVideoWindow();
 	const CLVideoWindowItem* getVideoWindow() const;
+
+	virtual CLAbstractSceneItem* getSceneItem() const;
 
 	CLStatistics* getStatistics();
 	CLCamDisplay* getCamCamDisplay();

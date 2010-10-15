@@ -36,6 +36,17 @@ public:
 
 	virtual QRectF boundingRect() const;
 
+	bool needUpdate() const
+	{
+		return m_needUpdate;
+	}
+
+	void needUpdate(bool val)
+	{
+		m_needUpdate = val;
+	}
+
+
 	virtual int height() const;
 	virtual int width() const;
 
@@ -102,6 +113,7 @@ protected:
 	QPointF m_rotation_center;
 	QPointF m_rotation_hand;
 
+	bool m_needUpdate;
 
 };
 

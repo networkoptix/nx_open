@@ -86,6 +86,8 @@ SOURCES += recorder/recorder_device.cpp  recorder/fake_recorder_device.cpp recor
 HEADERS += ui/videoitem/recorder_item.h
 SOURCES += ui/videoitem/recorder_item.cpp
 
+HEADERS += videodisplay/complicated_item.h
+SOURCES += videodisplay/complicated_item.cpp
 
 RESOURCES += mainwnd.qrc
 FORMS += mainwnd.ui

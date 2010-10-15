@@ -4,8 +4,7 @@
 #include <QMutexLocker>
 
 CLRecorderItem::CLRecorderItem(GraphicsView* view, int max_width, int max_height, QString name, QString tooltip):
-CLCustomBtnItem(view,max_width,max_height, name, "", tooltip),
-m_needUpdate(false)
+CLCustomBtnItem(view,max_width,max_height, name, "", tooltip)
 {
 	m_type = RECORDER;
 }
@@ -16,13 +15,11 @@ CLRecorderItem::~CLRecorderItem()
 
 }
 
-
-
 void CLRecorderItem::setText(QString text)
 {
 	QMutexLocker locker(&m_mutex);
 	mText = text;
-	m_needUpdate = true;
+	needUpdate(true);
 }
 
 void CLRecorderItem::setRecorderDisplay(CLRecorderDisplay* rec)

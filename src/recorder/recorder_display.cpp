@@ -20,6 +20,27 @@ CLDevice* CLRecorderDisplay::getDevice() const
 	return mDev;
 }
 
+void CLRecorderDisplay::startDispay()
+{
+	start();
+}
+
+void CLRecorderDisplay::beforestopDispay()
+{
+	pleaseStop();
+}
+
+void CLRecorderDisplay::stopDispay()
+{
+	stop();
+}
+
+CLAbstractSceneItem* CLRecorderDisplay::getSceneItem() const
+{
+	return mRecitem;
+}
+
+
 CLRecorderItem* CLRecorderDisplay::getRecorderItem() const
 {
 	return mRecitem;

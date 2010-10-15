@@ -48,16 +48,6 @@ public:
 	}
 
 
-	bool needUpdate() const
-	{
-		return m_needUpdate;
-	}
-
-	void needUpdate(bool val)
-	{
-		m_needUpdate = val;
-	}
-
 	void copyVideoDataBeforePainting(bool copy);
 
 	virtual void setSelected(bool sel, bool animate = true, int delay = 0);
@@ -95,8 +85,6 @@ protected:
 
 	QFont m_FPS_Font;
 	
-	bool m_needUpdate;
-
 	int m_opacity;
 
 	const CLDeviceVideoLayout* m_videolayout;

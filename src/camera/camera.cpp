@@ -71,6 +71,14 @@ void CLVideoCamera::stopDispay()
 	
 }
 
+void CLVideoCamera::beforestopDispay()
+{
+	m_reader->pleaseStop();
+	m_camdispay.pleaseStop();
+	m_videovindow->before_destroy();
+
+}
+
 CLDevice* CLVideoCamera::getDevice() const
 {
 	return m_device;
@@ -87,6 +95,11 @@ CLCamDisplay* CLVideoCamera::getCamCamDisplay()
 }
 
 CLVideoWindowItem* CLVideoCamera::getVideoWindow()
+{
+	return m_videovindow;
+}
+
+CLAbstractSceneItem* CLVideoCamera::getSceneItem() const
 {
 	return m_videovindow;
 }

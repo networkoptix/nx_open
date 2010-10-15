@@ -88,47 +88,28 @@ void SceneLayout::stop_helper(bool emt)
 
 	disconnect(m_view, SIGNAL(scneZoomFinished()), this, SLOT(stop_helper()));
 
-	foreach(CLVideoCamera* cam, m_cams)
+	foreach(CLAbstractComplicatedItem* devitem, m_deviceitems)
 	{
 		// firs of all lets ask all threads to stop;
 		// we do not need to do it sequentially
-		cam->getStreamreader()->pleaseStop();
-		cam->getCamCamDisplay()->pleaseStop();
+		devitem->beforestopDispay();
 	}
 
-	foreach(CLRecorderDisplay* rec, m_recorders)
-	{
-		rec->pleaseStop();
-	}
 	//===============
 
-	foreach(CLVideoCamera* cam, m_cams)
-	{
-		cam->getVideoWindow()->before_destroy(); // without it CamDisplay may not stoped
-	}
-
-	foreach(CLVideoCamera* cam, m_cams)
+	foreach(CLAbstractComplicatedItem* devitem, m_deviceitems)
 	{
 		// after we can wait for each thread to stop
-		cl_log.log("About to shut down camera ", (int)cam ,"\r\n", cl_logDEBUG1);
-		cam->stopDispay();
-		cam->getDevice()->releaseRef();
-		delete cam;
+		cl_log.log("About to shutdown device ", (int)devitem ,"\r\n", cl_logDEBUG1);
+		devitem->stopDispay();
+		devitem->getDevice()->releaseRef();
+		delete devitem;
 	}
 
-	m_cams.clear();
-
-	//======================
-	foreach(CLRecorderDisplay* rec, m_recorders)
-	{
-		rec->stop();
-		rec->getDevice()->releaseRef();
-		delete rec;
-	}
-
-	m_recorders.clear();
+	m_deviceitems.clear();
 
 	//===================
+
 	foreach(CLAbstractSceneItem* item, m_items)
 	{
 		m_scene->removeItem(item);
@@ -214,9 +195,9 @@ void SceneLayout::onTimer()
 	{
 		bool contains = false;
 
-		foreach(CLVideoCamera* cam, m_cams)
+		foreach(CLAbstractComplicatedItem* devitem, m_deviceitems)
 		{
-			if (cam->getDevice()->getUniqueId() == dev->getUniqueId())
+			if (devitem->getDevice()->getUniqueId() == dev->getUniqueId())
 			{
 				contains = true;
 				break;
@@ -250,9 +231,9 @@ void SceneLayout::onTimer()
 			continue;
 
 		bool contains = false;
-		foreach(CLRecorderDisplay* rec, m_recorders)
+		foreach(CLAbstractComplicatedItem* devitem, m_deviceitems)
 		{
-			if (rec->getDevice()->getUniqueId() == dev->getUniqueId())
+			if (devitem->getDevice()->getUniqueId() == dev->getUniqueId())
 			{
 				contains = true;
 				break;
@@ -287,25 +268,17 @@ void SceneLayout::onTimer()
 
 void SceneLayout::onVideoTimer()
 {
-	foreach(CLVideoCamera* cam, m_cams)
+	foreach(CLAbstractComplicatedItem* devitem, m_deviceitems)
 	{
-		CLVideoWindowItem* wnd = cam->getVideoWindow();
-		if (wnd->needUpdate())
+		CLAbstractSceneItem* itm = devitem->getSceneItem();
+		if (itm->needUpdate())
 		{
-			wnd->update();
-			wnd->needUpdate(false);
+			itm->update();
+			itm->needUpdate(false);
 		}
 	}
 
-	foreach(CLRecorderDisplay* rec, m_recorders)
-	{
-		CLRecorderItem* item = rec->getRecorderItem();
-		if (item->needUpdate())
-		{
-			item->update();
-			item->needUpdate(false);
-		}
-	}
+
 
 
 }
@@ -339,7 +312,7 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect)
 		CLVideoCamera* cam = new VideoCamera(device, video_wnd);
 		addItem(video_wnd, update_scene_rect);
 
-		m_cams.push_back(cam);
+		m_deviceitems.push_back(cam);
 		cam->setQuality(CLStreamreader::CLSLow, true);
 		cam->startDispay();
 
@@ -352,7 +325,7 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect)
 		CLRecorderDisplay* recd = new CLRecorderDisplay(device, item);
 		addItem(item, update_scene_rect);
 
-		m_recorders.push_back(recd);
+		m_deviceitems.push_back(recd);
 		recd->start();
 
 		return true;

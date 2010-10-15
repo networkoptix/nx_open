@@ -31,7 +31,8 @@ m_fullscreen(false),
 m_arranged(true),
 m_mouse_over(false),
 m_draw_rotation_helper(false),
-m_zoomOnhover(true)
+m_zoomOnhover(true),
+m_needUpdate(false)
 {
 	setAcceptsHoverEvents(true);
 
