@@ -418,6 +418,8 @@ void GraphicsView::removeAllStaticItems()
 void GraphicsView::setAcceptInput(bool accept)
 {
 	mAcceptInput = accept;
+	if (mAcceptInput)
+		m_ignore_release_event = false;
 }
 
 void GraphicsView::stopAnimation()
