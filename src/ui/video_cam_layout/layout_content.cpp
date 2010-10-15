@@ -176,6 +176,11 @@ void LayoutContent::setParent(LayoutContent* parent)
 	m_parent = parent;
 }
 
+LayoutContent* LayoutContent::getParent() const
+{
+	return m_parent;
+}
+
 void LayoutContent::addButton(const QString& name, const QString& text, const QString& tooltip, int x, int y, int width, int height, int angle)
 {
 	m_btns.push_back(new LayoutButton(name, text, tooltip, x, y, width, height, angle) );

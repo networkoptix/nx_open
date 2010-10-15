@@ -99,6 +99,7 @@ public:
 
 
 	void setParent(LayoutContent* parent);
+	LayoutContent* getParent() const;
 
 	void addButton(const QString& name, const QString& text, const QString& tooltip, int x, int y, int width, int height, int angle = 0);
 	void addImage(const QString& img, const QString& name, const QString& text, const QString& tooltip, int x, int y, int width, int height, int angle = 0);

@@ -267,10 +267,6 @@ void SceneLayout::onVideoTimer()
 			itm->needUpdate(false);
 		}
 	}
-
-
-
-
 }
 
 void SceneLayout::onFirstSceneAppearance()
@@ -312,6 +308,26 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect)
 	if (type==CLDevice::RECORDER)
 	{
 		CLRecorderItem* item = new CLRecorderItem(m_view, SLOT_WIDTH, SLOT_HEIGHT, device->getUniqueId(), device->getUniqueId());
+
+		// need to assign reference layout content
+		QList<LayoutContent*> children_lst =  m_content->childrenList();
+		foreach(LayoutContent* child, children_lst)
+		{
+			// form list of recorders
+
+			if(!child->isRecorder())
+				continue;
+
+			if (child->getName() == device->getUniqueId())
+			{
+				item->setRefContent(child);
+				break;
+			}
+		}
+
+
+
+
 		CLRecorderDisplay* recd = new CLRecorderDisplay(device, item);
 		addItem(item, update_scene_rect);
 
@@ -321,7 +337,7 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect)
 		return true;
 	}
 
-	
+	return false;
 
 }
 
@@ -482,7 +498,7 @@ bool SceneLayout::addItem(CLAbstractSceneItem* item, int x, int y, bool update_s
 
 	connect(item, SIGNAL(onPressed(CLAbstractSceneItem*)), this, SLOT(onItemPressed(CLAbstractSceneItem*)));
 
-	connect(item, SIGNAL(onDoubleClick(CLAbstractSceneItem*)), this, SLOT(onItemPressed(CLAbstractSceneItem*)));
+	connect(item, SIGNAL(onDoubleClick(CLAbstractSceneItem*)), this, SLOT(onItemDoubleClick(CLAbstractSceneItem*)));
 	
 
 	return true;
@@ -704,7 +720,12 @@ CLAbstractSceneItem* SceneLayout::next_item_helper(const CLAbstractSceneItem* cu
 
 void SceneLayout::onItemDoubleClick(CLAbstractSceneItem* item)
 {
-
+	if (item->getType() == CLAbstractSceneItem::RECORDER)
+	{
+		CLRecorderItem* ritem = static_cast<CLRecorderItem*>(item);
+		emit onNewLayoutSelected(m_content, ritem->getRefContent());
+	}
+	
 }
 
 void SceneLayout::onItemPressed(CLAbstractSceneItem* item)

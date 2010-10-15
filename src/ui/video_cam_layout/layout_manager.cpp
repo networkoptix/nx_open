@@ -50,7 +50,7 @@ LayoutContent* CLSceneLayoutManager::getDefaultLayoutContent()
 void CLSceneLayoutManager::addRecorderLayoutContent( QString id )
 {
 	LayoutContent* cont = new LayoutContent();
-	cont->addDecorationFlag(LayoutContent::HomeButton | LayoutContent::BackGroundLogo);
+	cont->addDecorationFlag(LayoutContent::HomeButton | LayoutContent::BackGroundLogo | LayoutContent::LevelUp);
 
 	CLDeviceCriteria cr(CLDeviceCriteria::ALL);
 	cr.setRecorderId(id);

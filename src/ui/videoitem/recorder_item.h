@@ -5,7 +5,7 @@
 #include "custom_draw_button.h"
 
 class CLRecorderDisplay;
-
+class LayoutContent;
 
 class CLRecorderItem : public CLCustomBtnItem
 {
@@ -13,6 +13,9 @@ class CLRecorderItem : public CLCustomBtnItem
 public:
 	CLRecorderItem(GraphicsView* view, int max_width, int max_height, QString name, QString tooltip);
 	~CLRecorderItem();
+
+	void setRefContent(LayoutContent* cont);
+	LayoutContent* getRefContent() const;
 
 	void setText(QString text);
 	void setRecorderDisplay(CLRecorderDisplay* rec);
@@ -24,6 +27,9 @@ protected:
 
 	QString text() const;
 protected:
+
+	
+	LayoutContent* mContent; //this item references to this content
 
 	CLRecorderDisplay* mRecorder;
 	mutable QMutex m_mutex;

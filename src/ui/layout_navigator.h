@@ -20,6 +20,8 @@ protected slots:
 	void onButtonItemPressed(LayoutContent* l, QString itemname);
 	void onLayOutStoped(LayoutContent* l);
 
+	void onNewLayoutSelected(LayoutContent* oldl, LayoutContent* newl);
+
 protected:
 	void goToNewLayoutContent();
 
