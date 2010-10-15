@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 		cl_log.log(argv[0], cl_logALWAYS);
 	}
 
-	//CLDevice::startCommandProc();
+	CLDevice::startCommandProc();
 
 	cl_log.log(CLDeviceManager::instance().getDiveceSercher().getNetState().toString(), cl_logALWAYS);
 
