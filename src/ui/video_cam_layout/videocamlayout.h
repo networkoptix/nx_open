@@ -5,6 +5,7 @@
 #include <QRect>
 #include <QObject>
 #include <QTimer>
+#include "device\device.h"
 
 
 
@@ -16,7 +17,6 @@ class GraphicsView;
 class QGraphicsScene;
 class CLDevice;
 class LayoutContent;
-class CLRecorderDisplay;
 class CLAbstractComplicatedItem;
 
 struct CLIdealWndPos
@@ -160,6 +160,11 @@ private:
 	QPoint posFromSlot(int slot) const;
 
 	void onFirstSceneAppearance();
+
+	//this function checks if some dev from lst needs to be added
+	// return true if at least one is added
+	bool addDevices_helper(CLDeviceList& lst);
+	 
 
 
 private:

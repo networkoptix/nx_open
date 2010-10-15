@@ -186,77 +186,30 @@ void SceneLayout::onTimer()
 	}
 
 	
-	bool added = false;
 
 	//===================video devices=======================
 	CLDeviceList all_devs =  CLDeviceManager::instance().getDeviceList(m_content->getDeviceCriteria());
+	bool added = addDevices_helper(all_devs);
 
-	foreach(CLDevice* dev, all_devs)
-	{
-		bool contains = false;
-
-		foreach(CLAbstractComplicatedItem* devitem, m_deviceitems)
-		{
-			if (devitem->getDevice()->getUniqueId() == dev->getUniqueId())
-			{
-				contains = true;
-				break;
-			}
-		}
-
-		
-		if (contains) // if such device already here we do not need it
-		{
-			dev->releaseRef();
-		}
-		else
-		{
-			// the ref counter for device already increased in getDeviceList; 
-			// must not do it again
-			if (!addDevice(dev, false))
-				dev->releaseRef();
-			else
-				added = true;
-		}
-	}
 	//==============recorders ================================
+	CLDeviceList recorders;
 	QList<LayoutContent*> children_lst =  m_content->childrenList();
 	foreach(LayoutContent* child, children_lst)
 	{
+		// form list of recorders
+
 		if(!child->isRecorder())
 			continue;
 
 		CLDevice* dev = CLDeviceManager::instance().getRecorderById(child->getName());
+
 		if (dev==0)
 			continue;
 
-		bool contains = false;
-		foreach(CLAbstractComplicatedItem* devitem, m_deviceitems)
-		{
-			if (devitem->getDevice()->getUniqueId() == dev->getUniqueId())
-			{
-				contains = true;
-				break;
-			}
-		}
-
-		if (contains) // if such device already here we do not need it
-		{
-			dev->releaseRef();
-		}
-		else
-		{
-			// the ref counter for device already increased in getDeviceList; 
-			// must not do it again
-			if (!addDevice(dev, false))
-				dev->releaseRef();
-			else
-				added = true;
-		}
-
-		
+		recorders[dev->getUniqueId()] = dev;
 	}
 
+	added = addDevices_helper(recorders) || added;
 
 
 
@@ -264,6 +217,43 @@ void SceneLayout::onTimer()
 		m_view->fitInView(2000);
 
 	//====================================
+}
+
+bool SceneLayout::addDevices_helper(CLDeviceList& lst)
+{
+	bool added = false;
+
+	foreach(CLDevice* dev, lst)
+	{
+		bool contains = false;
+
+		foreach(CLAbstractComplicatedItem* devitem, m_deviceitems)
+		{
+			if (devitem->getDevice()->getUniqueId() == dev->getUniqueId())
+			{
+				contains = true;
+				break;
+			}
+		}
+
+
+		if (contains) // if such device already here we do not need it
+		{
+			dev->releaseRef();
+		}
+		else
+		{
+			// the ref counter for device already increased in getDeviceList; 
+			// must not do it again
+			if (!addDevice(dev, false))
+				dev->releaseRef();
+			else
+				added = true;
+		}
+	}
+
+	return added;
+
 }
 
 void SceneLayout::onVideoTimer()
