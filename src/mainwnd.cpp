@@ -27,15 +27,13 @@ m_editedView(0)
 
 	//=======================================================
 
-	mMainLayout = new QHBoxLayout;
-	
-	//goToLayouteditor();
-	//setLayout(mMainLayout);
-
 	goToLayouteditor();
+	//goToNomalLayout();
 
-	setLayout(mMainLayout);
+	
 	//=======================================================
+
+	
 
 
 	const int min_wisth = 400;
@@ -64,16 +62,27 @@ void MainWnd::goToNomalLayout()
 	if (mMode==NORMAL) // already there
 		return;
 
+	
+	
+
 	//=======remove====
 	if (true)
 	{
+		destroyNavigator(m_topView);
+		destroyNavigator(m_bottomView);
+		destroyNavigator(m_editedView);
+
+		QLayout* mainl = layout();
+		delete mainl;
 	}
 
 
 	//=======add====
 	m_normalView = new CLLayoutNavigator(this);
-	mMainLayout->addWidget(&(m_normalView->getView()));
+	QLayout* l = new QHBoxLayout();
+	l->addWidget(&(m_normalView->getView()));
 	mMode=NORMAL;
+	setLayout(l);
 
 }
 
@@ -85,7 +94,11 @@ void MainWnd::goToLayouteditor()
 	//=======remove====
 	if (m_normalView)
 	{
-		mMainLayout->removeWidget(&(m_normalView->getView()));
+		QLayout* mainl = layout();
+
+		//mMainLayout->removeWidget(&(m_normalView->getView()));
+
+		delete mainl;
 		destroyNavigator(m_normalView);
 	}
 
@@ -95,12 +108,15 @@ void MainWnd::goToLayouteditor()
 	m_bottomView = new CLLayoutNavigator(this); m_bottomView->getView().setMaximumWidth(600);
 	m_editedView = new CLLayoutNavigator(this);
 
-	mVLayout = new QVBoxLayout;
-	mVLayout->addWidget(&(m_topView->getView()));
-	mVLayout->addWidget(&(m_bottomView->getView()));
+	QLayout* ml = new QHBoxLayout();
 
-	mMainLayout->addItem(mVLayout);
-	mMainLayout->addWidget(&(m_editedView->getView()));
+	QLayout* VLayout = new QVBoxLayout;
+	VLayout->addWidget(&(m_topView->getView()));
+	VLayout->addWidget(&(m_bottomView->getView()));
+
+	ml->addItem(VLayout);
+	ml->addWidget(&(m_editedView->getView()));
+	setLayout(ml);
 
 	mMode = LAYOUTEDITOR;
 

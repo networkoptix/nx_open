@@ -32,9 +32,6 @@ private:
 	void destroyNavigator(CLLayoutNavigator*& nav);
 private:
 
-	QHBoxLayout *mMainLayout;
-	QVBoxLayout *mVLayout;
-
 	CLLayoutNavigator* m_normalView;
 
 	CLLayoutNavigator* m_topView;

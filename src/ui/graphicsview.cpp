@@ -130,11 +130,13 @@ GraphicsView::~GraphicsView()
 
 void GraphicsView::start()
 {
+	m_ignore_release_event = false;
+	mViewStarted = true;
 	centerOn(getRealSceneRect().center());
 	zoomMin(0);
 	fitInView(3000);
-	mViewStarted = true;
-	m_ignore_release_event = false;
+	
+	
 
 }
 
@@ -1191,6 +1193,7 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 
 void GraphicsView::drawBackground ( QPainter * painter, const QRectF & rect )
 {
+	
 	//QGraphicsView::drawBackground ( painter, rect );
 	//=================
 	m_fps_frames++;

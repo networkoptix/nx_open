@@ -10,7 +10,7 @@ m_timeline(CLAnimationTimeLine::CLAnimationCurve::SLOW_END_POW_40)
 	//m_timeline.setCurveShape(QTimeLine::CurveShape::LinearCurve);
 	m_timeline.setDuration(2000);
 	m_timeline.setFrameRange(0, 200000);
-	m_timeline.setUpdateInterval(1000/200); // 60 fps
+	m_timeline.setUpdateInterval(1000/120.0); // 60 fps
 
 	m_delay_timer.setSingleShot(true);
 
