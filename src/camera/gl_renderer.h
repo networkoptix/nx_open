@@ -19,6 +19,8 @@ public:
 		CL_GL_NOT_SUPPORTED
 	};
 
+	static void clearGarbage();
+
 	CLGLRenderer(CLVideoWindowItem *vw);
 	~CLGLRenderer();
 	void draw(CLVideoDecoderOutput& image, unsigned int channel);
@@ -140,6 +142,8 @@ private:
 	bool m_abort_drawing;
 
 	bool m_do_not_need_to_wait_any_more;
+
+	static QList<GLuint*> mGarbage;
 
 };
 

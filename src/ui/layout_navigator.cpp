@@ -1,13 +1,16 @@
 #include "layout_navigator.h"
 #include "video_cam_layout\start_screen_content.h"
 #include "video_cam_layout\layout_manager.h"
+#include "camera\gl_renderer.h"
 
 extern QString start_screen;
 
 QString video_layout = "video layout";
 
+QString button_layout = "layout";
 QString button_logo = "logo";
 QString button_home = "home";
+QString button_system = "system";
 QString button_level_up = "level_up";
 
 
@@ -46,6 +49,17 @@ void CLLayoutNavigator::destroy()
 {
 	m_videoView.getCamLayOut().stop();
 	m_videoView.closeAllDlg();
+	CLGLRenderer::clearGarbage();
+}
+
+void CLLayoutNavigator::setMode(MainWnd::ViewMode mode)
+{
+	m_mode = mode;
+}
+
+MainWnd::ViewMode CLLayoutNavigator::getMode() const 
+{
+	return m_mode;
 }
 
 GraphicsView& CLLayoutNavigator::getView()
@@ -63,7 +77,10 @@ void CLLayoutNavigator::onDecorationPressed(LayoutContent* layout, QString itemn
 	if (itemname==button_home)
 	{
 		mNewContent = CLSceneLayoutManager::instance().startScreenLayoutContent();
-		goToNewLayoutContent();
+		if (m_mode==MainWnd::NORMAL)
+			goToNewLayoutContent();
+		else
+			emit onItemPressed(button_home);
 	}
 	else if (itemname==button_level_up)
 	{
@@ -72,10 +89,7 @@ void CLLayoutNavigator::onDecorationPressed(LayoutContent* layout, QString itemn
 			mNewContent = layout->getParent();
 			goToNewLayoutContent();
 		}
-
 	}
-
-
 }
 
 void CLLayoutNavigator::onButtonItemPressed(LayoutContent* l, QString itemname )
@@ -89,6 +103,18 @@ void CLLayoutNavigator::onButtonItemPressed(LayoutContent* l, QString itemname )
 				mNewContent = CLSceneLayoutManager::instance().getAllLayoutsContent();
 
 			goToNewLayoutContent();
+		}
+
+		if (itemname==button_system)
+		{
+			mNewContent = CLSceneLayoutManager::instance().getAllLayoutsContent();
+			goToNewLayoutContent();
+		}
+		
+
+		if (itemname==button_layout)
+		{
+			emit onItemPressed(button_layout);
 		}
 	}
 }
@@ -105,6 +131,10 @@ void CLLayoutNavigator::onNewLayoutSelected(LayoutContent* oldl, LayoutContent* 
 
 void CLLayoutNavigator::onLayOutStoped(LayoutContent* l)
 {
+	if (m_mode==MainWnd::NORMAL)
+		CLGLRenderer::clearGarbage();
+
 	m_videoView.getCamLayOut().setContent(mNewContent);
 	m_videoView.getCamLayOut().start();
+
 }

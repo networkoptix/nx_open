@@ -3,8 +3,10 @@
 #include "ui/video_cam_layout/start_screen_content.h"
 #include "settings.h"
 #include "ui/layout_navigator.h"
+#include "ui/video_cam_layout/layout_manager.h"
 
-
+extern QString button_layout;
+extern QString button_home;
 
 MainWnd::MainWnd(QWidget *parent, Qt::WFlags flags):
 //QMainWindow(parent, flags),
@@ -27,8 +29,8 @@ m_editedView(0)
 
 	//=======================================================
 
-	goToLayouteditor();
-	//goToNomalLayout();
+	//goToLayouteditor();
+	goToNomalLayout();
 
 	
 	//=======================================================
@@ -81,7 +83,12 @@ void MainWnd::goToNomalLayout()
 	m_normalView = new CLLayoutNavigator(this);
 	QLayout* l = new QHBoxLayout();
 	l->addWidget(&(m_normalView->getView()));
+
+	m_normalView->setMode(NORMAL);
 	mMode=NORMAL;
+
+	connect(m_normalView, SIGNAL(onItemPressed(QString)), this, SLOT(onItemPressed(QString)));
+
 	setLayout(l);
 
 }
@@ -104,9 +111,18 @@ void MainWnd::goToLayouteditor()
 
 
 	//=======add====
-	m_topView = new CLLayoutNavigator(this); m_topView->getView().setMaximumWidth(600);
+	m_topView = new CLLayoutNavigator(this,  CLSceneLayoutManager::instance().getAllLayoutsContent()); m_topView->getView().setMaximumWidth(600);
 	m_bottomView = new CLLayoutNavigator(this); m_bottomView->getView().setMaximumWidth(600);
-	m_editedView = new CLLayoutNavigator(this);
+	m_editedView = new CLLayoutNavigator(this, CLSceneLayoutManager::instance().getAllLayoutsContent());
+
+	connect(m_topView, SIGNAL(onItemPressed(QString)), this, SLOT(onItemPressed(QString)));
+	connect(m_bottomView, SIGNAL(onItemPressed(QString)), this, SLOT(onItemPressed(QString)));
+	connect(m_editedView, SIGNAL(onItemPressed(QString)), this, SLOT(onItemPressed(QString)));
+
+	m_topView->setMode(LAYOUTEDITOR);
+	m_bottomView->setMode(LAYOUTEDITOR);
+	m_editedView->setMode(LAYOUTEDITOR);
+
 
 	QLayout* ml = new QHBoxLayout();
 
@@ -148,6 +164,20 @@ void MainWnd::destroyNavigator(CLLayoutNavigator*& nav)
 		nav->destroy();
 		delete nav;
 		nav = 0;
+	}
+
+}
+
+void MainWnd::onItemPressed(QString itemname)
+{
+	if (itemname==button_layout && mMode==NORMAL)
+	{
+		QTimer::singleShot(20, this, SLOT(goToLayouteditor()));
+	}
+
+	if (itemname==button_home && mMode==LAYOUTEDITOR)
+	{
+		QTimer::singleShot(20, this, SLOT(goToNomalLayout()));
 	}
 
 }

@@ -181,9 +181,11 @@ private:
 	int m_max_items;
 	int m_slots;
 
-	int *m_potantial_x;
-	int *m_potantial_y;
-	int m_total_potential_elemnts;
+	static int *m_potantial_x;
+	static int *m_potantial_y;
+	static bool m_potantial_builded;
+
+	static int m_total_potential_elemnts;
 
 
 	GraphicsView* m_view;

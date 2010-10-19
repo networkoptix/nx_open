@@ -43,7 +43,6 @@
 
 #define OGL_CHECK_ERROR(str);// if (checkOpenGLError() != GL_NO_ERROR) {cl_log.log(str, __LINE__ , cl_logERROR); }
 
-
 // arbfp1 fragment program for converting yuv (YV12) to rgb
 static const char yv12ToRgb[] =
 "!!ARBfp1.0"
@@ -122,6 +121,7 @@ static const char yuy2ToRgb[] =
 
 
 int CLGLRenderer::gl_status = CLGLRenderer::CL_GL_NOT_TESTED;
+QList<GLuint*> CLGLRenderer::mGarbage;
 
 CLGLRenderer::CLGLRenderer(CLVideoWindowItem *vw):
 m_videowindow(vw),
@@ -164,9 +164,31 @@ int CLGLRenderer::checkOpenGLError() const
 CLGLRenderer::~CLGLRenderer()
 {
 	if (m_textureUploaded)
-		glDeleteTextures(3, m_texture);
+	{
+		//glDeleteTextures(3, m_texture);
+
+		// I do not know why but if I glDeleteTextures here some items on the other view might become green( especially if we animate them a lot )
+		// not sure I i do something wrong with opengl or it's bug of QT. for now can not spend much time on it. but it needs to be fixed.
+		
+		GLuint* heap = new GLuint[3];
+		memcpy(heap,m_texture,sizeof(m_texture));
+		mGarbage.push_back(heap); // to delete later
+	}
 }
 
+void CLGLRenderer::clearGarbage()
+{
+	//return;
+
+	foreach(GLuint* heap, mGarbage)
+	{
+		glDeleteTextures(3, heap);
+		delete[] heap;
+	}
+
+	mGarbage.clear();
+
+}
 
 void CLGLRenderer::getTextureRect(QRect& drawRect, 
 					float textureWidth, float textureHeight,
@@ -762,7 +784,7 @@ void CLGLRenderer::paintEvent(const QRect& r)
 
 	
 	m_waitCon.wakeOne();
-	m_do_not_need_to_wait_any_more = true;
+	//m_do_not_need_to_wait_any_more = true;
 }
 
 

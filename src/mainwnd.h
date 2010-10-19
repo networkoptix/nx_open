@@ -13,20 +13,24 @@ class MainWnd : public QWidget
 {
 	Q_OBJECT
 
-	enum ViewMode {ZERRO, NORMAL, LAYOUTEDITOR};
+	
 
 public:
+	enum ViewMode {ZERRO, NORMAL, LAYOUTEDITOR};
 	MainWnd(QWidget *parent = 0, Qt::WFlags flags = 0);
 	~MainWnd();
 	void toggleFullScreen();
 private:
 
 	Ui::MainWndClass ui;
-private:
-	void closeEvent ( QCloseEvent * event );
 
+private slots:
+	void onItemPressed(QString);
 	void goToNomalLayout();
 	void goToLayouteditor();
+
+private:
+	void closeEvent ( QCloseEvent * event );
 
 
 	void destroyNavigator(CLLayoutNavigator*& nav);

@@ -6,7 +6,8 @@ QString start_screen = "start screen";
 extern int SCENE_LEFT;
 extern int SCENE_TOP;
 extern QString button_logo;
-
+extern QString button_layout;
+extern QString button_system;
 
 LayoutContent& startscreen_content()
 {
@@ -39,8 +40,8 @@ LayoutContent& startscreen_content()
 
 		instance.addImage("./skin/startscreen/Achive.png","archive", "","",logo_left + delta_w, logo_top + logo_heih + item_distance - 500, btn_width, btn_height);
 
-		instance.addImage("./skin/startscreen/System.png", "system", "","",SCENE_LEFT, logo_top + delta_h, btn_width, btn_height);
-		instance.addImage("./skin/startscreen/Layouts.png", "layouts", "","",logo_left + logo_width + item_distance, logo_top + delta_h, btn_width, btn_height);
+		instance.addImage("./skin/startscreen/System.png", button_system, "","",SCENE_LEFT, logo_top + delta_h, btn_width, btn_height);
+		instance.addImage("./skin/startscreen/Layouts.png", button_layout , "","",logo_left + logo_width + item_distance, logo_top + delta_h, btn_width, btn_height);
 
 		CLDeviceCriteria cr(CLDeviceCriteria::NONE);
 		

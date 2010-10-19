@@ -29,6 +29,11 @@ static const int max_items = 256;
 extern int scene_zoom_duration;
 
 
+bool SceneLayout::m_potantial_builded = false;
+int* SceneLayout::m_potantial_x = 0;
+int* SceneLayout::m_potantial_y = 0;
+int SceneLayout::m_total_potential_elemnts = 0;
+
 
 SceneLayout::SceneLayout():
 m_view(0),
@@ -41,7 +46,13 @@ m_firstTime(true),
 m_isRunning(false)
 {
 	m_width = m_slots/m_height;
-	buildPotantial();
+
+	if (!m_potantial_builded)
+	{
+		buildPotantial();
+		m_potantial_builded = true;
+	}
+	
 
 	connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimer()));
 
@@ -56,8 +67,8 @@ SceneLayout::~SceneLayout()
 {
 	stop();
 
-	delete[] m_potantial_x;
-	delete[] m_potantial_y;
+	//delete[] m_potantial_x;
+	//delete[] m_potantial_y;
 
 }
 
@@ -208,8 +219,13 @@ void SceneLayout::onTimer()
 
 
 	if (added && !m_firstTime)
+	{
+		m_view->centerOn(m_view->getRealSceneRect().center());
 		m_view->fitInView(2000);
+	}
 
+
+	
 	//====================================
 }
 

@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include "graphicsview.h"
+#include "mainwnd.h"
 class LayoutContent;
 
 class CLLayoutNavigator : public QObject
@@ -14,6 +15,12 @@ public:
 
 	GraphicsView& getView();
 	void destroy();
+
+	void setMode(MainWnd::ViewMode mode);
+	MainWnd::ViewMode getMode() const ;
+
+signals:
+	void onItemPressed(QString);
 
 protected slots:
 	void onDecorationPressed(LayoutContent* layout, QString itemname);
@@ -30,6 +37,8 @@ protected:
 
 	LayoutContent* mCurrentContent;
 	LayoutContent* mNewContent;
+
+	MainWnd::ViewMode m_mode;
 };
 
 #endif //layout_navigator_h_1340
