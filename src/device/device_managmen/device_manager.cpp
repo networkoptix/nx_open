@@ -1,9 +1,11 @@
 #include "device_manager.h"
 #include "..\asynch_seacher.h"
-#include "..\src\corelib\thread\qmutex.h"
+#include <QMutex>
 #include "..\directory_browser.h"
 #include "settings.h"
 #include "recorder\fake_recorder_device.h"
+#include <QDir>
+#include <QFileInfoList>
 
 //=============================================================
 CLDeviceCriteria::CLDeviceCriteria(CriteriaType cr):
@@ -41,8 +43,18 @@ m_firstTime(true)
 	connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimer()));
 	m_timer.start(100); // first time should come fast
 
-	mRecDevice = new CLFakeRecorderDevice();
-	mRecDevice->setUniqueId("Archiver 1");
+	addArchiver("General Archiver");
+
+	QString rootDir("c:/Photo/");
+
+	QStringList subdirList = subDirList(rootDir);
+
+	foreach(QString subdir, subdirList)
+	{
+		CLDirectoryBrowserDeviceServer dirbrowsr(rootDir + subdir);
+		onNewDevices_helper(dirbrowsr.findDevices(), subdir);
+		addArchiver(subdir);
+	}
 
 }
 
@@ -57,7 +69,12 @@ CLDeviceManager::~CLDeviceManager()
 		CLDevice::deleteDevices(list);
 	}
 
-	mRecDevice->releaseRef();
+	foreach(CLDevice* dev, mRecDevices)
+	{
+		dev->releaseRef();
+	}
+
+	
 
 }
 
@@ -73,8 +90,7 @@ void CLDeviceManager::onTimer()
 		m_dev_searcher.start(); // first of all start fevice searcher
 		m_firstTime = false;
 
-		CLDirectoryBrowserDeviceServer dirbrowsr("c:/Photo");
-		onNewDevices_helper(dirbrowsr.findDevices());
+
 
 		m_timer.setInterval(devices_update_interval);
 
@@ -83,16 +99,13 @@ void CLDeviceManager::onTimer()
 
 	if (!m_dev_searcher.isRunning() )
 	{
-		onNewDevices_helper(m_dev_searcher.result());
+		onNewDevices_helper(m_dev_searcher.result(), "General Archiver");
 
 		m_dev_searcher.start(); // run searcher again ...
 	}
-
-
-
-
-
 }
+
+
 
 CLDeviceList CLDeviceManager::getDeviceList(CLDeviceCriteria& cr)
 {
@@ -127,25 +140,30 @@ CLDeviceList CLDeviceManager::getDeviceList(CLDeviceCriteria& cr)
 CLDeviceList CLDeviceManager::getRecorderList()
 {
 	// gonna be different if we have server
-	CLDeviceList result;
-	mRecDevice->addRef();
-	result.insert(mRecDevice->getUniqueId(), mRecDevice);
-	return result;
+	foreach(CLDevice* dev, mRecDevices)
+	{
+		dev->addRef();
+	}
+
+	return mRecDevices;
+
 }
 
 CLDevice* CLDeviceManager::getRecorderById(QString id)
 {
 	// gonna be different if we have server
-	if (mRecDevice->getUniqueId()!=id)
+
+	if (!mRecDevices.contains(id))
 		return 0;
 
-	mRecDevice->addRef();
+	CLDevice* dev = mRecDevices[id];
+	dev->addRef();
 
-	return mRecDevice;
+	return dev;
 }
 
 
-void CLDeviceManager::onNewDevices_helper(CLDeviceList devices)
+void CLDeviceManager::onNewDevices_helper(CLDeviceList devices, QString parentId)
 {
 	
 	foreach (CLDevice* device, devices)
@@ -154,7 +172,7 @@ void CLDeviceManager::onNewDevices_helper(CLDeviceList devices)
 		{
 			device->getStatus().setFlag(CLDeviceStatus::READY);
 
-			device->setParentId(mRecDevice->getUniqueId());
+			device->setParentId(parentId);
 
 			QMutexLocker lock(&m_dev_searcher.all_devices_mtx);
 			m_dev_searcher.getAllDevices().insert(device->getUniqueId(),device);
@@ -194,4 +212,33 @@ bool CLDeviceManager::isDeviceMeetCriteria(CLDeviceCriteria& cr, CLDevice* dev) 
 
 	return true;
 	
+}
+
+QStringList CLDeviceManager::subDirList(const QString& abspath) const
+{
+
+	QStringList result;
+
+	QDir dir(abspath);
+	if (!dir.exists())
+		return result;
+
+	QFileInfoList list = dir.entryInfoList();
+
+	foreach(QFileInfo info, list)
+	{
+		if (info.isDir() && info.fileName()!="." && info.fileName()!="..")
+			result.push_back(info.fileName());
+	}
+
+
+	return result;
+
+}
+
+void CLDeviceManager::addArchiver(QString id)
+{
+	CLDevice* rec = new CLFakeRecorderDevice();
+	rec->setUniqueId(id);
+	mRecDevices[rec->getUniqueId()] = rec;
 }

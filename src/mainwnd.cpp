@@ -111,8 +111,13 @@ void MainWnd::goToLayouteditor()
 
 
 	//=======add====
-	m_topView = new CLLayoutNavigator(this,  CLSceneLayoutManager::instance().getAllLayoutsContent()); m_topView->getView().setMaximumWidth(600);
-	m_bottomView = new CLLayoutNavigator(this); m_bottomView->getView().setMaximumWidth(600);
+	m_topView = new CLLayoutNavigator(this,  CLSceneLayoutManager::instance().getAllLayoutsContent()); 
+	m_topView->getView().setMaximumWidth(600);
+	m_topView->getView().setMaximumHeight(500);
+
+	m_bottomView = new CLLayoutNavigator(this); 
+	m_bottomView->getView().setMaximumWidth(600);
+
 	m_editedView = new CLLayoutNavigator(this, CLSceneLayoutManager::instance().getAllLayoutsContent());
 
 	connect(m_topView, SIGNAL(onItemPressed(QString)), this, SLOT(onItemPressed(QString)));

@@ -17,13 +17,21 @@ public:
 	void save();
 
 
-
+	// start screen 
 	LayoutContent* startScreenLayoutContent();
+
+	// return true if we have at least one custome layout
 	bool hasCustomLayoutsContent() const;
+
+	// if we have custom layouts and one of them default
 	LayoutContent* getDefaultLayoutContent();
 
 	void addRecorderLayoutContent(QString id);
+
+	// returns layout with recorders only
 	LayoutContent* getRecorderLyoutContent(QString id);
+
+	// returns layout with recorders and top level custom layouts
 	LayoutContent* getAllLayoutsContent();
 
 private:

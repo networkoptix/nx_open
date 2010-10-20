@@ -8,6 +8,8 @@
 #include <QTimer>
 #include "..\asynch_seacher.h"
 #include "..\device.h"
+ #include <QStringList>
+
 class CLDevice;
 class CLRecorderDevice;
 
@@ -47,11 +49,13 @@ public:
 	CLDevice* getRecorderById(QString id); 
 
 protected:
-
 	CLDeviceManager();
-	void onNewDevices_helper(CLDeviceList devices);
+	void onNewDevices_helper(CLDeviceList devices, QString parentId);
 
 	bool isDeviceMeetCriteria(CLDeviceCriteria& cr, CLDevice* dev) const;
+
+	QStringList subDirList(const QString& abspath) const;
+	void addArchiver(QString id);
 
 protected slots:
 	void onTimer();
@@ -61,7 +65,7 @@ protected:
 	CLDiviceSeracher m_dev_searcher;
 	bool m_firstTime;
 
-	CLRecorderDevice* mRecDevice;
+	CLDeviceList mRecDevices;
 };
 
 
