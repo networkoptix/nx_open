@@ -87,7 +87,7 @@ void CLRecorderItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 	else
 		painter->setPen(QColor(150, 150, 150));
 
-	
+
 	painter->drawText((width() - rect.width())/2, border,
 		rect.width(), rect.height(),
 		Qt::AlignCenter | Qt::TextWordWrap, text());

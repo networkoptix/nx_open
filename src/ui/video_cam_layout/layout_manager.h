@@ -28,19 +28,33 @@ public:
 
 	void addRecorderLayoutContent(QString id);
 
-	// returns layout with recorders only
-	LayoutContent* getRecorderLyoutContent(QString id);
+	// returns layout with recorders 
+	LayoutContent* getAllRecordersContent();
+
 
 	// returns layout with recorders and top level custom layouts
 	LayoutContent* getAllLayoutsContent();
 
+
+	// creates new blank lay out content
+	// client responsible for deleting this one 
+	LayoutContent* getNewEmptyLayoutContent();
+
+	// returns empty content. does not create new one. this content used for layout editor as start one 
+	LayoutContent* getEmptyLayoutContent();
+
+
+private:
+	LayoutContent* createRecorderContent_helper(QString id);
 private:
 	typedef QMap<QString, LayoutContent*> ContantsList;
 
-	ContantsList mRecordersContents;
 	ContantsList mCustomContents;
 
 	LayoutContent* mRootContent;
+	LayoutContent* mAllRecorders;
+
+	LayoutContent* mEmptyLayout;
 	
 
 };

@@ -107,7 +107,7 @@ void CLLayoutNavigator::onButtonItemPressed(LayoutContent* l, QString itemname )
 
 		if (itemname==button_system)
 		{
-			mNewContent = CLSceneLayoutManager::instance().getAllLayoutsContent();
+			mNewContent = CLSceneLayoutManager::instance().getAllRecordersContent();
 			goToNewLayoutContent();
 		}
 		
