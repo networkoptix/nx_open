@@ -101,6 +101,9 @@ int CLAbstractSceneItem::width() const
 
 void CLAbstractSceneItem::setSelected(bool sel, bool animate , int delay )
 {
+	if (!m_selected && sel)
+		emit onSelected(this);
+	
 	m_selected = sel;
 
 	if (!m_selected)

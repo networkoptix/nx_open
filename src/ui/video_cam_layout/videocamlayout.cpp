@@ -503,6 +503,10 @@ bool SceneLayout::addItem(CLAbstractSceneItem* item, int x, int y, bool update_s
 	
 	connect(item, SIGNAL(onFullScreen(CLAbstractSceneItem*)), this, SLOT(onItemFullScreen(CLAbstractSceneItem*)));
 
+	connect(item, SIGNAL(onSelected(CLAbstractSceneItem*)), this, SLOT(onItemSelected(CLAbstractSceneItem* )));
+
+	
+
 	
 
 	return true;
@@ -720,6 +724,15 @@ CLAbstractSceneItem* SceneLayout::next_item_helper(const CLAbstractSceneItem* cu
 
 	return const_cast<CLAbstractSceneItem*>(curr);
 
+}
+
+void SceneLayout::onItemSelected(CLAbstractSceneItem* item)
+{
+	if (item->getType() == CLAbstractSceneItem::RECORDER)
+	{
+		CLRecorderItem* ritem = static_cast<CLRecorderItem*>(item);
+		//emit onNewLayoutSelected(m_content, ritem->getRefContent());
+	}
 }
 
 void SceneLayout::onItemFullScreen(CLAbstractSceneItem* item)

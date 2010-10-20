@@ -122,6 +122,7 @@ protected slots:
 	void onItemPressed(CLAbstractSceneItem* item);
 	void onItemDoubleClick(CLAbstractSceneItem* item);
 	void onItemFullScreen(CLAbstractSceneItem* item);
+	void onItemSelected(CLAbstractSceneItem* item);
 
 	void onAspectRatioChanged(CLAbstractSceneItem* wnd);
 	void onTimer();
