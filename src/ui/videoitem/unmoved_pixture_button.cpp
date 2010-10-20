@@ -11,6 +11,21 @@ CLAbstractUnmovedItem(view, name),
 m_opacity(opacity)
 {
 	m_img = cached(img);
+
+	setMaxSize(max_width, max_height);
+
+	setZValue(z);
+	setOpacity(m_opacity);
+
+}
+
+CLUnMovedPixture::~CLUnMovedPixture()
+{
+
+}
+
+void CLUnMovedPixture::setMaxSize(int max_width, int max_height)
+{
 	m_width = m_img.width();
 	m_height = m_img.height();
 
@@ -28,16 +43,11 @@ m_opacity(opacity)
 		m_width = max_height*aspect;
 		m_height = max_height;
 	}
-
-
-	setZValue(z);
-	setOpacity(m_opacity);
-
 }
 
-CLUnMovedPixture::~CLUnMovedPixture()
+QSize CLUnMovedPixture::getSize() const
 {
-
+	return QSize(m_width, m_height);
 }
 
 QRectF CLUnMovedPixture::boundingRect() const

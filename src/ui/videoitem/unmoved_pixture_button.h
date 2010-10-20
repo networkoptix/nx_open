@@ -12,8 +12,14 @@ public:
 	CLUnMovedPixture(QGraphicsView* view, QString name, QString img, int max_width, int max_height, qreal z, qreal opacity);
 	~CLUnMovedPixture();
 	QRectF boundingRect() const;
+
+	void setMaxSize(int max_width, int max_height);
+
+	QSize getSize() const;
+
 protected:
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+
 protected:
 	QPixmap m_img;
 	int m_width;

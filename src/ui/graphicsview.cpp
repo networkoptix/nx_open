@@ -404,6 +404,8 @@ void GraphicsView::initDecoration()
 		addStaticItem(item);
 
 	}
+
+	updateDecorations();
 }
 
 void GraphicsView::addjustAllStaticItems()
@@ -1222,9 +1224,29 @@ void GraphicsView::drawBackground ( QPainter * painter, const QRectF & rect )
 
 }
 
+CLAbstractUnmovedItem* GraphicsView::staticItemByName(QString name) const
+{
+	foreach(CLAbstractUnmovedItem* item, m_staticItems)
+	{
+		if(item->getName()==name)
+			return item;
+	}
+
+	return 0;
+}
+
+
 void GraphicsView::updateDecorations()
 {
-	// to do 
+	CLUnMovedPixture* pic = static_cast<CLUnMovedPixture*>(staticItemByName("background"));
+
+	if (pic)
+	{
+		pic->setMaxSize(viewport()->width(), viewport()->height());
+		QSize size = pic->getSize();
+
+		pic->setStaticPos( QPoint( (viewport()->width() - size.width())/2, (viewport()->height() - size.height())/2) );
+	}
 }
 
 void GraphicsView::recalcSomeParams()

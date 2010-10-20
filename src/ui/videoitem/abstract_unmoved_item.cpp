@@ -26,3 +26,8 @@ void CLAbstractUnmovedItem::adjust()
 {
 	setPos(m_view->mapToScene(m_pos));
 }
+
+QString CLAbstractUnmovedItem::getName() const
+{
+	return m_name;
+}

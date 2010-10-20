@@ -14,6 +14,8 @@ public:
 	void setStaticPos(QPoint p); // sets pos in term of point view coordinates 
 	void adjust(); // adjusts position and size of the item on the scene after scene transformation is done
 
+	QString getName() const;
+
 protected:
 	QString m_name;
 	QGraphicsView* m_view;

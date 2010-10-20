@@ -93,6 +93,7 @@ protected:
 	void addStaticItem(CLAbstractUnmovedItem* item);
 	void removeAllStaticItems();
 	void updateDecorations();
+	CLAbstractUnmovedItem* staticItemByName(QString name) const;
 	void recalcSomeParams();
 	
 	void stopAnimation();
