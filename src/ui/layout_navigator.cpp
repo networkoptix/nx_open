@@ -33,6 +33,11 @@ mCurrentContent(content)
 	// some layout ref pressed
 	connect(&m_videoView.getCamLayOut(), SIGNAL(onNewLayoutSelected(LayoutContent*, LayoutContent*)), this, SLOT(onNewLayoutSelected(LayoutContent*, LayoutContent*)));
 
+	// for layout editor	
+	connect(&m_videoView.getCamLayOut(), SIGNAL(onNewLayoutItemSelected(LayoutContent*)), this, SLOT(onNewLayoutItemSelected(LayoutContent*)));
+
+
+
 	if (mCurrentContent==0)
 		mCurrentContent = CLSceneLayoutManager::instance().startScreenLayoutContent();
 
@@ -65,6 +70,12 @@ MainWnd::ViewMode CLLayoutNavigator::getMode() const
 GraphicsView& CLLayoutNavigator::getView()
 {
 	return m_videoView;
+}
+
+void CLLayoutNavigator::goToNewLayoutContent(LayoutContent* newl)
+{
+	mNewContent = newl;
+	goToNewLayoutContent();
 }
 
 void CLLayoutNavigator::goToNewLayoutContent()
@@ -137,4 +148,10 @@ void CLLayoutNavigator::onLayOutStoped(LayoutContent* l)
 	m_videoView.getCamLayOut().setContent(mNewContent);
 	m_videoView.getCamLayOut().start();
 
+}
+
+void CLLayoutNavigator::onNewLayoutItemSelected(LayoutContent* newl)
+{
+	if (m_mode==MainWnd::LAYOUTEDITOR)
+		emit onNewLayoutItemSelected(this, newl);
 }

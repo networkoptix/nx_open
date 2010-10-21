@@ -19,15 +19,18 @@ public:
 	void setMode(MainWnd::ViewMode mode);
 	MainWnd::ViewMode getMode() const ;
 
+	void goToNewLayoutContent(LayoutContent* newl);
+
 signals:
 	void onItemPressed(QString);
+	void onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*);
 
 protected slots:
 	void onDecorationPressed(LayoutContent* layout, QString itemname);
 	void onButtonItemPressed(LayoutContent* l, QString itemname);
 	void onLayOutStoped(LayoutContent* l);
-
 	void onNewLayoutSelected(LayoutContent* oldl, LayoutContent* newl);
+	void onNewLayoutItemSelected(LayoutContent* newl);
 
 protected:
 	void goToNewLayoutContent();

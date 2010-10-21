@@ -117,6 +117,7 @@ signals:
 	void stoped(LayoutContent* l);
 	void onItemPressed(LayoutContent* l, QString itemname);
 	void onNewLayoutSelected(LayoutContent* curr, LayoutContent* newl);
+	void onNewLayoutItemSelected(LayoutContent* newl);
 protected slots:
 
 	void onItemPressed(CLAbstractSceneItem* item);

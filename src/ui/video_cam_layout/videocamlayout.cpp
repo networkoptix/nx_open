@@ -731,7 +731,7 @@ void SceneLayout::onItemSelected(CLAbstractSceneItem* item)
 	if (item->getType() == CLAbstractSceneItem::RECORDER)
 	{
 		CLRecorderItem* ritem = static_cast<CLRecorderItem*>(item);
-		//emit onNewLayoutSelected(m_content, ritem->getRefContent());
+		emit onNewLayoutItemSelected(ritem->getRefContent());
 	}
 }
 

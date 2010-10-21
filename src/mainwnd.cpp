@@ -124,6 +124,10 @@ void MainWnd::goToLayouteditor()
 	connect(m_bottomView, SIGNAL(onItemPressed(QString)), this, SLOT(onItemPressed(QString)));
 	connect(m_editedView, SIGNAL(onItemPressed(QString)), this, SLOT(onItemPressed(QString)));
 
+
+	connect(m_topView, SIGNAL(onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*)), this, SLOT(onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*)));
+	connect(m_bottomView, SIGNAL(onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*)), this, SLOT(onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*)));
+
 	m_topView->setMode(LAYOUTEDITOR);
 	m_bottomView->setMode(LAYOUTEDITOR);
 	m_editedView->setMode(LAYOUTEDITOR);
@@ -185,4 +189,15 @@ void MainWnd::onItemPressed(QString itemname)
 		QTimer::singleShot(20, this, SLOT(goToNomalLayout()));
 	}
 
+}
+
+void MainWnd::onNewLayoutItemSelected(CLLayoutNavigator* ln, LayoutContent* newl)
+{
+	if (mMode!=LAYOUTEDITOR)
+		return;
+
+	if (ln==m_topView)
+	{
+		m_bottomView->goToNewLayoutContent(newl);
+	}
 }
