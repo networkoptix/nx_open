@@ -50,7 +50,7 @@ public:
 
 	void copyVideoDataBeforePainting(bool copy);
 
-	virtual void setSelected(bool sel, bool animate = true, int delay = 0);
+	virtual void setItemSelected(bool sel, bool animate = true, int delay = 0);
 
 signals:
 	void onAspectRatioChanged(CLAbstractSceneItem* item);

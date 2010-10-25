@@ -83,11 +83,12 @@ HEADERS += ui/video_cam_layout/layout_manager.h ui/video_cam_layout/layout_conte
 HEADERS += recorder/recorder_device.h  recorder/fake_recorder_device.h  recorder/recorder_display.h
 SOURCES += recorder/recorder_device.cpp  recorder/fake_recorder_device.cpp recorder/recorder_display.cpp
 
-HEADERS += ui/videoitem/recorder_item.h
+HEADERS += ui/videoitem/recorder_item.h ui/ui_common.h
 SOURCES += ui/videoitem/recorder_item.cpp
 
 HEADERS += videodisplay/complicated_item.h
 SOURCES += videodisplay/complicated_item.cpp
+
 
 RESOURCES += mainwnd.qrc
 FORMS += mainwnd.ui

@@ -50,8 +50,8 @@ public:
 	virtual int height() const;
 	virtual int width() const;
 
-	virtual void setSelected(bool sel, bool animate = true, int delay = 0);
-	bool isSelected() const;
+	virtual void setItemSelected(bool sel, bool animate = true, int delay = 0);
+	bool isItemSelected() const;
 
 	void zoom_abs(qreal z, int duration, int delay = 0);
 	void z_rotate_delta(QPointF center, qreal angle, int duration);

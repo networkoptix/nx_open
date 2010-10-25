@@ -117,6 +117,8 @@ m_fps_frames(0)
 	mShow.mTimer.setInterval(1000);
 	mShow.mTimer.start();
 
+	
+	
 
 }
 
@@ -126,6 +128,11 @@ GraphicsView::~GraphicsView()
 	stopAnimation();
 	stopGroupAnimation();
 	delete m_animated_bckg;
+}
+
+void GraphicsView::setViewMode(ViewMode mode)
+{
+	m_viewMode = mode;
 }
 
 void GraphicsView::start()
@@ -146,6 +153,10 @@ void GraphicsView::stop()
 	mViewStarted = false;
 	setZeroSelection(); 
 	closeAllDlg();
+
+	m_CTRL_pressed = false;
+	setDragMode(QGraphicsView::NoDrag);
+
 }
 
 
@@ -189,7 +200,7 @@ void GraphicsView::setZeroSelection()
 {
 	if (m_selectedWnd && m_camLayout.hasSuchItem(m_selectedWnd))
 	{
-		m_selectedWnd->setSelected(false);
+		m_selectedWnd->setItemSelected(false);
 
 		CLVideoWindowItem* videoItem = 0;
 		if (videoItem = m_selectedWnd->toVideoItem())
@@ -481,6 +492,8 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 	if (event->button() == Qt::LeftButton && m_CTRL_pressed)
 	{
 		m_movingWnd = wnd;
+		if (m_movingWnd)
+			m_movingWnd->setSelected(true);
 	}
 	else if (event->button() == Qt::LeftButton && !m_CTRL_pressed) 
 	{
@@ -949,6 +962,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 	}
 
 
+	QGraphicsView::contextMenuEvent(event);
 	/**/
 
 }
@@ -1025,6 +1039,7 @@ void GraphicsView::keyReleaseEvent( QKeyEvent * e )
 			reAdjustSceneRect();
 			//m_movingWnd =0;
 		}
+		setDragMode(QGraphicsView::NoDrag);
 		break;
 
 	}
@@ -1064,6 +1079,7 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 
 		case Qt::Key_Control:
 			m_CTRL_pressed = true;
+			setDragMode(QGraphicsView::RubberBandDrag);
 			break;
 
 		case Qt::Key_X:
@@ -1345,7 +1361,7 @@ void GraphicsView::onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int de
 
 	QPointF point = m_selectedWnd->mapToScene(m_selectedWnd->boundingRect().center());
 
-	m_selectedWnd->setSelected(true, true, delay);
+	m_selectedWnd->setItemSelected(true, true, delay);
 
 	
 	if (global_show_item_text && m_selectedWnd->toVideoItem())
@@ -1631,7 +1647,7 @@ void GraphicsView::onItemFullScreen_helper(CLAbstractSceneItem* wnd)
 	
 	m_fullScreenZoom = zoom; // memorize full screen zoom
 
-	wnd->setSelected(true,false); // do not animate
+	wnd->setItemSelected(true,false); // do not animate
 	m_selectedWnd = wnd;
 	m_last_selectedWnd = wnd;
 

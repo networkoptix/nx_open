@@ -68,9 +68,9 @@ void CLVideoWindowItem::before_destroy()
 }
 
 
-void CLVideoWindowItem::setSelected(bool sel, bool animate, int delay )
+void CLVideoWindowItem::setItemSelected(bool sel, bool animate, int delay )
 {
-	CLImageItem::setSelected(sel, animate, delay);
+	CLImageItem::setItemSelected(sel, animate, delay);
 
 	if (m_selected)
 		getVideoCam()->setQuality(CLStreamreader::CLSHighest, true);
@@ -201,6 +201,13 @@ void CLVideoWindowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
 	
 	painter->endNativePainting();
 	drawStuff(painter);
+
+
+	if (option->state & QStyle::State_Selected)
+	{
+		painter->fillRect(QRect(0, 0, width(), height()),
+			QColor(255, 0, 0, 85));
+	}
 
 
 	/**/

@@ -10,7 +10,7 @@ extern QString button_home;
 
 MainWnd::MainWnd(QWidget *parent, Qt::WFlags flags):
 //QMainWindow(parent, flags),
-mMode(ZERRO),
+mMode(UNDEFINED_ViewMode),
 m_normalView(0),
 m_topView(0),
 m_bottomView(0),
@@ -61,7 +61,7 @@ MainWnd::~MainWnd()
 
 void MainWnd::goToNomalLayout()
 {
-	if (mMode==NORMAL) // already there
+	if (mMode==NORMAL_ViewMode) // already there
 		return;
 
 	
@@ -84,8 +84,8 @@ void MainWnd::goToNomalLayout()
 	QLayout* l = new QHBoxLayout();
 	l->addWidget(&(m_normalView->getView()));
 
-	m_normalView->setMode(NORMAL);
-	mMode=NORMAL;
+	m_normalView->setMode(NORMAL_ViewMode);
+	mMode=NORMAL_ViewMode;
 
 	connect(m_normalView, SIGNAL(onItemPressed(QString)), this, SLOT(onItemPressed(QString)));
 
@@ -95,7 +95,7 @@ void MainWnd::goToNomalLayout()
 
 void MainWnd::goToLayouteditor()
 {
-	if (mMode==LAYOUTEDITOR) // already there
+	if (mMode==LAYOUTEDITOR_ViewMode) // already there
 		return;
 
 	//=======remove====
@@ -128,9 +128,9 @@ void MainWnd::goToLayouteditor()
 	connect(m_topView, SIGNAL(onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*)), this, SLOT(onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*)));
 	connect(m_bottomView, SIGNAL(onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*)), this, SLOT(onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*)));
 
-	m_topView->setMode(LAYOUTEDITOR);
-	m_bottomView->setMode(LAYOUTEDITOR);
-	m_editedView->setMode(LAYOUTEDITOR);
+	m_topView->setMode(LAYOUTEDITOR_ViewMode);
+	m_bottomView->setMode(LAYOUTEDITOR_ViewMode);
+	m_editedView->setMode(LAYOUTEDITOR_ViewMode);
 
 
 	QLayout* ml = new QHBoxLayout();
@@ -143,7 +143,7 @@ void MainWnd::goToLayouteditor()
 	ml->addWidget(&(m_editedView->getView()));
 	setLayout(ml);
 
-	mMode = LAYOUTEDITOR;
+	mMode = LAYOUTEDITOR_ViewMode;
 
 }
 
@@ -179,12 +179,12 @@ void MainWnd::destroyNavigator(CLLayoutNavigator*& nav)
 
 void MainWnd::onItemPressed(QString itemname)
 {
-	if (itemname==button_layout && mMode==NORMAL)
+	if (itemname==button_layout && mMode==NORMAL_ViewMode)
 	{
 		QTimer::singleShot(20, this, SLOT(goToLayouteditor()));
 	}
 
-	if (itemname==button_home && mMode==LAYOUTEDITOR)
+	if (itemname==button_home && mMode==LAYOUTEDITOR_ViewMode)
 	{
 		QTimer::singleShot(20, this, SLOT(goToNomalLayout()));
 	}
@@ -193,7 +193,7 @@ void MainWnd::onItemPressed(QString itemname)
 
 void MainWnd::onNewLayoutItemSelected(CLLayoutNavigator* ln, LayoutContent* newl)
 {
-	if (mMode!=LAYOUTEDITOR)
+	if (mMode!=LAYOUTEDITOR_ViewMode)
 		return;
 
 	if (ln==m_topView)

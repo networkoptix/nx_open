@@ -41,6 +41,8 @@ m_needUpdate(false)
 	//setFlag(QGraphicsItem::ItemIsFocusable);
 
 	//setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);
+
+	setFlags(ItemIsSelectable);
 }
 
 CLAbstractSceneItem::~CLAbstractSceneItem()
@@ -99,7 +101,7 @@ int CLAbstractSceneItem::width() const
 	return m_max_width;
 }
 
-void CLAbstractSceneItem::setSelected(bool sel, bool animate , int delay )
+void CLAbstractSceneItem::setItemSelected(bool sel, bool animate , int delay )
 {
 	if (!m_selected && sel)
 		emit onSelected(this);
@@ -126,7 +128,7 @@ void CLAbstractSceneItem::setSelected(bool sel, bool animate , int delay )
 
 }
 
-bool CLAbstractSceneItem::isSelected() const
+bool CLAbstractSceneItem::isItemSelected() const
 {
 	return m_selected;
 }
@@ -225,6 +227,8 @@ void CLAbstractSceneItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 
 void CLAbstractSceneItem::mousePressEvent ( QGraphicsSceneMouseEvent * event )
 {
+	if (!isSelected()) // to avoid unselect all; see the code of QT
+		QGraphicsItem::mousePressEvent(event);
 
 }
 
@@ -237,6 +241,9 @@ void CLAbstractSceneItem::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 {
 	if (event->button()==Qt::LeftButton)
 		emit onPressed(this);
+
+	if (!isSelected())
+		QGraphicsItem::mouseReleaseEvent(event);
 }
 
 void CLAbstractSceneItem::drawShadow(QPainter* painter)
@@ -252,6 +259,7 @@ void CLAbstractSceneItem::drawShadow(QPainter* painter)
 		painter->setPen(QPen(QColor(150,150,150,200),  fr_w, Qt::SolidLine));
 		painter->drawRect(-fr_w/2,-fr_w/2,width()+fr_w,height()+fr_w);
 	}
+
 }
 
 void CLAbstractSceneItem::drawRotationHelper(bool val)

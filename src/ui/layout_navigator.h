@@ -16,8 +16,8 @@ public:
 	GraphicsView& getView();
 	void destroy();
 
-	void setMode(MainWnd::ViewMode mode);
-	MainWnd::ViewMode getMode() const ;
+	void setMode(ViewMode mode);
+	ViewMode getMode() const ;
 
 	void goToNewLayoutContent(LayoutContent* newl);
 
@@ -41,7 +41,7 @@ protected:
 	LayoutContent* mCurrentContent;
 	LayoutContent* mNewContent;
 
-	MainWnd::ViewMode m_mode;
+	ViewMode m_mode;
 };
 
 #endif //layout_navigator_h_1340

@@ -7,6 +7,7 @@
 #include "./animation/mouse_state.h"
 #include "./animation/animated_show.h"
 #include "video_cam_layout/videocamlayout.h"
+#include "ui_common.h"
 
 
 class CLAbstractSceneItem;
@@ -49,6 +50,9 @@ public:
 	void centerOn(const QPointF &pos);
 
 	void initDecoration();
+
+	void setViewMode(ViewMode mode);
+
 
 signals:
 	void scneZoomFinished();
@@ -171,6 +175,9 @@ protected:
 	//======fps
 	int m_fps_frames;
 	QTime m_fps_time;
+
+
+	ViewMode m_viewMode;
 
 };
 

@@ -57,12 +57,12 @@ void CLLayoutNavigator::destroy()
 	CLGLRenderer::clearGarbage();
 }
 
-void CLLayoutNavigator::setMode(MainWnd::ViewMode mode)
+void CLLayoutNavigator::setMode(ViewMode mode)
 {
 	m_mode = mode;
 }
 
-MainWnd::ViewMode CLLayoutNavigator::getMode() const 
+ViewMode CLLayoutNavigator::getMode() const 
 {
 	return m_mode;
 }
@@ -88,7 +88,7 @@ void CLLayoutNavigator::onDecorationPressed(LayoutContent* layout, QString itemn
 	if (itemname==button_home)
 	{
 		mNewContent = CLSceneLayoutManager::instance().startScreenLayoutContent();
-		if (m_mode==MainWnd::NORMAL)
+		if (m_mode==NORMAL_ViewMode)
 			goToNewLayoutContent();
 		else
 			emit onItemPressed(button_home);
@@ -142,7 +142,7 @@ void CLLayoutNavigator::onNewLayoutSelected(LayoutContent* oldl, LayoutContent* 
 
 void CLLayoutNavigator::onLayOutStoped(LayoutContent* l)
 {
-	if (m_mode==MainWnd::NORMAL)
+	if (m_mode==NORMAL_ViewMode)
 		CLGLRenderer::clearGarbage();
 
 	m_videoView.getCamLayOut().setContent(mNewContent);
@@ -152,6 +152,6 @@ void CLLayoutNavigator::onLayOutStoped(LayoutContent* l)
 
 void CLLayoutNavigator::onNewLayoutItemSelected(LayoutContent* newl)
 {
-	if (m_mode==MainWnd::LAYOUTEDITOR)
+	if (m_mode==LAYOUTEDITOR_ViewMode)
 		emit onNewLayoutItemSelected(this, newl);
 }

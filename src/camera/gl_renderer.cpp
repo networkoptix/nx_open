@@ -351,7 +351,21 @@ void CLGLRenderer::init(bool msgbox)
 
 	}
 
-	glGenTextures(3, m_texture);
+	//if (mGarbage.count()<80)
+	{
+		glGenTextures(3, m_texture);
+	}
+	/*
+	else
+	{
+		GLuint* heap = mGarbage.takeFirst();
+		memcpy(m_texture, heap, sizeof(m_texture));
+		delete heap;
+	}
+	/**/
+
+
+
 	OGL_CHECK_ERROR("glGenTextures");
 	
 	glEnable(GL_TEXTURE_2D);

@@ -3,6 +3,7 @@
 
 #include <QtGui/QMainWindow>
 #include "ui_mainwnd.h"
+#include "ui/ui_common.h"
 
 class CLLayoutNavigator;
 class QHBoxLayout;
@@ -17,7 +18,6 @@ class MainWnd : public QWidget
 	
 
 public:
-	enum ViewMode {ZERRO, NORMAL, LAYOUTEDITOR};
 	MainWnd(QWidget *parent = 0, Qt::WFlags flags = 0);
 	~MainWnd();
 	void toggleFullScreen();
