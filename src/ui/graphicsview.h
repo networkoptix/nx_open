@@ -18,6 +18,7 @@ class CLAnimatedBackGround;
 class CLAbstractDeviceSettingsDlg;
 class CLAbstractUnmovedItem;
 class QParallelAnimationGroup;
+class QInputEvent;
 
 class GraphicsView: public QGraphicsView 
 {
@@ -102,6 +103,9 @@ protected:
 	
 	void stopAnimation();
 
+	void enableMultipleSelection(bool enable, bool unselect = true); 
+	bool isCTRLPressed(const QInputEvent* event) const;
+
 public slots:
 	
 	void fitInView(int duration = 600);
@@ -150,8 +154,6 @@ protected:
 	bool m_ignore_release_event, m_ignore_conext_menu_event;
 
 	qreal m_fullScreenZoom;
-
-	bool m_CTRL_pressed;
 
 	MainWnd* mMainWnd;
 

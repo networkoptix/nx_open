@@ -52,7 +52,6 @@ m_ignore_release_event(false),
 m_ignore_conext_menu_event(false),
 m_rotatingWnd(0),
 m_movingWnd(0),
-m_CTRL_pressed(false),
 mMainWnd(mainWnd),
 m_drawBkg(true),
 m_logo(0),
@@ -143,10 +142,9 @@ void GraphicsView::start()
 	zoomMin(0);
 	fitInView(3000);
 
-	m_camLayout.makeAllItemsSelectable(false);
-	m_CTRL_pressed = false;
-	setDragMode(QGraphicsView::NoDrag);
+	enableMultipleSelection(false, true);
 
+	//The Mind Expander - mixed by DJ River & Espe
 }
 
 void GraphicsView::stop()
@@ -460,6 +458,7 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 	if (!mViewStarted)
 		return;
 
+
 	m_yRotate = 0;
 
 	m_scenezoom.stop();
@@ -482,6 +481,11 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 			show_device_settings_helper(wnd->toVideoItem()->getVideoCam()->getDevice());
 	}
 
+	if (!wnd) // click on void
+	{
+		if (!isCTRLPressed(event))
+			enableMultipleSelection(false);
+	}
 
 	if (event->button() == Qt::MidButton)
 	{
@@ -489,20 +493,18 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 	}
 
 
-	if (event->button() == Qt::LeftButton && m_CTRL_pressed)
+	if (event->button() == Qt::LeftButton && isCTRLPressed(event))
 	{
 		m_movingWnd = wnd;
-		if (m_movingWnd)
+		if (m_movingWnd)	
 			m_movingWnd->setSelected(true);
 	}
-	else if (event->button() == Qt::LeftButton && !m_CTRL_pressed) 
+	else if (event->button() == Qt::LeftButton && !isCTRLPressed(event)) 
 	{
-		// Left-button press in scroll hand mode initiates hand scrolling.
-
         m_handScrolling = true;
 		viewport()->setCursor(Qt::ClosedHandCursor);
 	}
-	else if (event->button() == Qt::RightButton && !m_CTRL_pressed) 
+	else if (event->button() == Qt::RightButton && !isCTRLPressed(event)) 
 	{
 		m_rotatingWnd = wnd;
 
@@ -744,7 +746,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 	//====================================================
 
-	if (!handMoving && left_button && !m_CTRL_pressed && !m_movingWnd) // if left button released and we did not move the scene, so may bee need to zoom on the item
+	if (!handMoving && left_button && !isCTRLPressed(event) && !m_movingWnd) // if left button released and we did not move the scene, so may bee need to zoom on the item
 	{
 
 			if(!wnd) // not item and any button
@@ -961,8 +963,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
 	}
 
-	m_CTRL_pressed = false;
-	setDragMode(QGraphicsView::NoDrag);
+	enableMultipleSelection(false, true);
 	QGraphicsView::contextMenuEvent(event);
 	/**/
 
@@ -1024,6 +1025,21 @@ void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
 	QGraphicsView::mouseDoubleClickEvent (e);
 }
 
+void GraphicsView::enableMultipleSelection(bool enable, bool unselect)
+{
+	if (enable)
+	{
+		setDragMode(QGraphicsView::RubberBandDrag);
+		m_camLayout.makeAllItemsSelectable(true);
+	}
+	else
+	{
+		setDragMode(QGraphicsView::NoDrag);
+		if (unselect)
+			m_camLayout.makeAllItemsSelectable(false);
+	}
+}
+
 
 
 void GraphicsView::keyReleaseEvent( QKeyEvent * e )
@@ -1034,14 +1050,13 @@ void GraphicsView::keyReleaseEvent( QKeyEvent * e )
 	switch (e->key()) 
 	{
 	case Qt::Key_Control:
-		m_CTRL_pressed = false;
+		
 		if (m_movingWnd)
 		{
 			reAdjustSceneRect();
 			//m_movingWnd =0;
 		}
-		setDragMode(QGraphicsView::NoDrag);
-		m_camLayout.makeAllItemsSelectable(false);
+		enableMultipleSelection(false, false);
 		break;
 
 	}
@@ -1080,9 +1095,7 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 			break;
 
 		case Qt::Key_Control:
-			m_CTRL_pressed = true;
-			setDragMode(QGraphicsView::RubberBandDrag);
-			m_camLayout.makeAllItemsSelectable(true);
+			enableMultipleSelection(true);
 			break;
 
 		case Qt::Key_X:
@@ -1210,6 +1223,11 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 	//QGraphicsView::keyPressEvent(e);
 
 
+}
+
+bool GraphicsView::isCTRLPressed(const QInputEvent* event) const
+{
+	return event->modifiers() & Qt::ControlModifier;
 }
 
 void GraphicsView::drawBackground ( QPainter * painter, const QRectF & rect )
