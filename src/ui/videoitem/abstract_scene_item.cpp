@@ -42,7 +42,9 @@ m_needUpdate(false)
 
 	//setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);
 
-	setFlags(ItemIsSelectable);
+	//setFlag(ItemIsSelectable, true);
+	
+
 }
 
 CLAbstractSceneItem::~CLAbstractSceneItem()
@@ -230,6 +232,7 @@ void CLAbstractSceneItem::mousePressEvent ( QGraphicsSceneMouseEvent * event )
 	if (!isSelected()) // to avoid unselect all; see the code of QT
 		QGraphicsItem::mousePressEvent(event);
 
+	event->accept();
 }
 
 void CLAbstractSceneItem::mouseDoubleClickEvent( QGraphicsSceneMouseEvent * event )

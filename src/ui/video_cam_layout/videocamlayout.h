@@ -94,6 +94,8 @@ public:
 
 	bool hasSuchItem(const CLAbstractSceneItem* item) const;
 
+	void makeAllItemsSelectable(bool selectable);
+
 
 	// return wnd on the center of the lay out;
 	// returns 0 if there is no wnd at all

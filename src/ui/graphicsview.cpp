@@ -142,8 +142,10 @@ void GraphicsView::start()
 	centerOn(getRealSceneRect().center());
 	zoomMin(0);
 	fitInView(3000);
-	
-	
+
+	m_camLayout.makeAllItemsSelectable(false);
+	m_CTRL_pressed = false;
+	setDragMode(QGraphicsView::NoDrag);
 
 }
 
@@ -154,8 +156,6 @@ void GraphicsView::stop()
 	setZeroSelection(); 
 	closeAllDlg();
 
-	m_CTRL_pressed = false;
-	setDragMode(QGraphicsView::NoDrag);
 
 }
 
@@ -961,7 +961,8 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
 	}
 
-
+	m_CTRL_pressed = false;
+	setDragMode(QGraphicsView::NoDrag);
 	QGraphicsView::contextMenuEvent(event);
 	/**/
 
@@ -1040,6 +1041,7 @@ void GraphicsView::keyReleaseEvent( QKeyEvent * e )
 			//m_movingWnd =0;
 		}
 		setDragMode(QGraphicsView::NoDrag);
+		m_camLayout.makeAllItemsSelectable(false);
 		break;
 
 	}
@@ -1080,6 +1082,7 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 		case Qt::Key_Control:
 			m_CTRL_pressed = true;
 			setDragMode(QGraphicsView::RubberBandDrag);
+			m_camLayout.makeAllItemsSelectable(true);
 			break;
 
 		case Qt::Key_X:

@@ -562,6 +562,13 @@ bool SceneLayout::hasSuchItem(const CLAbstractSceneItem* item) const
 	return m_items.contains(const_cast<CLAbstractSceneItem*>(item));
 }
 
+void SceneLayout::makeAllItemsSelectable(bool selectable)
+{
+	foreach(CLAbstractSceneItem* item, m_items)
+	{
+		item->setFlag(QGraphicsItem::ItemIsSelectable, selectable);
+	}
+}
 
 // return wnd on the center of the lay out;
 // returns 0 if there is no wnd at all
