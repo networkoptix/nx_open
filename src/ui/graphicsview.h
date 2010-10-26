@@ -144,7 +144,7 @@ protected:
 	CLAbstractSceneItem* m_selectedWnd;
 	CLAbstractSceneItem* m_last_selectedWnd;
 	CLAbstractSceneItem* m_rotatingWnd;
-	CLAbstractSceneItem* m_movingWnd;
+	bool m_movingWnd;
 
 
 	QRect m_realSceneRect;

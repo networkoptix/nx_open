@@ -74,10 +74,6 @@ void CLCustomBtnItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
 
 
 
-
-
-
-
 	painter->fillPath(mShadowRectPath, global_shadow_color);
 	
 
