@@ -21,6 +21,7 @@
 #include "videoitem/abstract_unmoved_item.h"
 #include "videoitem/unmoved_pixture_button.h"
 #include "video_cam_layout/layout_content.h"
+#include "context_menu_helper.h"
 
 
 
@@ -856,29 +857,12 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 	if (!m_camLayout.hasSuchItem(wnd)) // this is decoration somthing
 		wnd = 0;
 
-	QAction cm_exit("Exit",0);
-	QAction cm_fitinview("Fit in View",0);
-	QAction cm_arrange("Arrange",0);
-	QAction cm_togglefs("Toggle fullscreen",0);
-
-	QAction cm_fullscren("Fullscreen",0);
-	QAction cm_settings("Settings...",0);
-
-
+	// distance menu 
 	QMenu distance_menu;
+
 	distance_menu.setWindowOpacity(0.8);
 	distance_menu.setTitle("Item distance");
 
-	QAction dis_0("0%",0);
-	QAction dis_5("5%",0);
-	QAction dis_10("10%",0);
-	QAction dis_15("15%",0);
-	QAction dis_20("20%",0);
-	QAction dis_25("25%",0);
-	QAction dis_30("30%",0);
-	QAction dis_35("35%",0);
-	//QAction dis_40("40%",0);
-	
 	distance_menu.addAction(&dis_0);
 	distance_menu.addAction(&dis_5);
 	distance_menu.addAction(&dis_10);
@@ -887,9 +871,11 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 	distance_menu.addAction(&dis_25);
 	distance_menu.addAction(&dis_30);
 	distance_menu.addAction(&dis_35);
-	//distance_menu.addAction(&dis_40);
 
 
+
+
+	//===== final menu=====
 	QMenu menu;
 	menu.setWindowOpacity(0.8);
 
@@ -912,12 +898,15 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
 	QAction* act = menu.exec(QCursor::pos());
 
+	//=========results===============================
+
 	if (act==&cm_exit)
 		QCoreApplication::instance()->exit();
 
 
 	if (wnd==0) // on void menu
 	{
+		
 		if (act== &cm_togglefs)
 		{
 			mMainWnd->toggleFullScreen();
@@ -931,47 +920,11 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 		{
 			onArrange_helper();
 		}
-		else if (act== &dis_0)
+		else if (act== &dis_0 || act== &dis_5 || act == &dis_10 || act== &dis_15 || act== &dis_20 || act== &dis_25 || act== &dis_30 || act== &dis_35)
 		{
-			m_camLayout.setItemDistance(0.01 + 0);
+			m_camLayout.setItemDistance(0.01 + (act->data()).toDouble() );
 			onArrange_helper();
 		}
-		else if (act== &dis_5)
-		{
-			m_camLayout.setItemDistance(0.01 + 0.05);
-			onArrange_helper();
-		}
-		else if (act== &dis_10)
-		{
-			m_camLayout.setItemDistance(0.01 + 0.10);
-			onArrange_helper();
-		}
-		else if (act== &dis_15)
-		{
-			m_camLayout.setItemDistance(0.01 + 0.15);
-			onArrange_helper();
-		}
-		else if (act== &dis_20)
-		{
-			m_camLayout.setItemDistance(0.01 + 0.20);
-			onArrange_helper();
-		}
-		else if (act== &dis_25)
-		{
-			m_camLayout.setItemDistance(0.01 + 0.25);
-			onArrange_helper();
-		}
-		else if (act== &dis_30)
-		{
-			m_camLayout.setItemDistance(0.01 + 0.30);
-			onArrange_helper();
-		}
-		else if (act== &dis_35)
-		{
-			m_camLayout.setItemDistance(0.01 + 0.35);
-			onArrange_helper();
-		}
-
 
 	}
 	else // video item menu?
@@ -987,9 +940,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 		{
 			if (wnd->toVideoItem())
 				show_device_settings_helper(wnd->toVideoItem()->getVideoCam()->getDevice());
-
 		}
-
 	}
 
 	QGraphicsView::contextMenuEvent(event);

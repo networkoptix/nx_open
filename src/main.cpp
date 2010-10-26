@@ -15,6 +15,7 @@
 #include <QMessageBox>
 #include "device/device_managmen/device_manager.h"
 #include "ui/video_cam_layout/layout_manager.h"
+#include "ui/context_menu_helper.h"
 
 
 int main(int argc, char *argv[])
@@ -101,6 +102,7 @@ int main(int argc, char *argv[])
 
 	//=========================================================
 
+	initContextMenu();
 
 	MainWnd w;
 	w.show();

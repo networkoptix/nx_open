@@ -85,6 +85,7 @@ void MainWnd::goToNomalLayout()
 	l->addWidget(&(m_normalView->getView()));
 
 	m_normalView->setMode(NORMAL_ViewMode);
+	m_normalView->getView().setViewMode(GraphicsView::NormalView);
 	mMode=NORMAL_ViewMode;
 
 	connect(m_normalView, SIGNAL(onItemPressed(QString)), this, SLOT(onItemPressed(QString)));
@@ -128,9 +129,9 @@ void MainWnd::goToLayouteditor()
 	connect(m_topView, SIGNAL(onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*)), this, SLOT(onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*)));
 	connect(m_bottomView, SIGNAL(onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*)), this, SLOT(onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*)));
 
-	m_topView->setMode(LAYOUTEDITOR_ViewMode);
-	m_bottomView->setMode(LAYOUTEDITOR_ViewMode);
-	m_editedView->setMode(NORMAL_ViewMode);
+	m_topView->setMode(LAYOUTEDITOR_ViewMode); m_topView->getView().setViewMode(GraphicsView::ItemsDonor);
+	m_bottomView->setMode(LAYOUTEDITOR_ViewMode); m_bottomView->getView().setViewMode(GraphicsView::ItemsDonor);
+	m_editedView->setMode(NORMAL_ViewMode); m_editedView->getView().setViewMode(GraphicsView::ItemsAcceptor);
 
 
 	QLayout* ml = new QHBoxLayout();

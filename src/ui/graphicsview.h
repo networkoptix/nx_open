@@ -24,6 +24,7 @@ class GraphicsView: public QGraphicsView
 {
 	Q_OBJECT
 public:
+	enum ViewMode{NormalView, ItemsDonor, ItemsAcceptor};
 
 	GraphicsView(MainWnd* mainWnd);
 	virtual ~GraphicsView();
