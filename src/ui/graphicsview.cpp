@@ -52,7 +52,7 @@ m_ignore_release_event(false),
 m_ignore_conext_menu_event(false),
 m_rotatingWnd(0),
 mMainWnd(mainWnd),
-m_movingWnd(false),
+m_movingWnd(0),
 m_drawBkg(true),
 m_logo(0),
 m_animated_bckg(new CLBlueBackGround(50)),
@@ -490,7 +490,7 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 	if (!isCTRLPressed(event))
 	{
 		// key might be pressed on diff view, so we do not get keypressevent here 
-		enableMultipleSelection(false, false);
+		enableMultipleSelection(false, (wnd && !wnd->isSelected()) );
 	}
 
 
@@ -512,7 +512,7 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 		if(wnd)
 		{
 			wnd->setSelected(true);
-			m_movingWnd = true;
+			m_movingWnd = 1;
 		}
 	}
 	else if (event->button() == Qt::LeftButton && !isCTRLPressed(event)) 
@@ -575,6 +575,8 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 	//item movement 
 	if (left_button && isCTRLPressed(event) && m_scene.selectedItems().count() && m_movingWnd)
 	{
+		m_movingWnd++;
+
 		m_handScrolling = false; // if we pressed CTRL after already moved the scene => stop move the scene and just move items
 
 		QPointF delta = mapToScene(event->pos()) - mapToScene(m_mousestate.getLastEventPoint());
@@ -807,7 +809,11 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 				onNewItemSelected_helper(wnd, qApp->doubleClickInterval()/2);
 			}
 
+	}
 
+	if (left_button && m_movingWnd>3) // if we did move selected wnds => unselect it
+	{
+		m_scene.clearSelection();
 	}
 
 	if (mid_button && wnd)
@@ -818,9 +824,9 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 	if (left_button)
 	{
 		m_handMoving = 0;
-		m_movingWnd = false;
-		if (m_scene.selectedItems().count())
+		if (m_movingWnd)
 		{
+			m_movingWnd = false;
 			reAdjustSceneRect();
 		}
 	}
@@ -832,6 +838,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 	}
 
 	QGraphicsView::mouseReleaseEvent(event);
+
 }
 
 void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
@@ -1064,8 +1071,11 @@ void GraphicsView::enableMultipleSelection(bool enable, bool unselect)
 	}
 	else
 	{
+		QMouseEvent fake(QEvent::None, QPoint(), Qt::NoButton, Qt::NoButton, Qt::NoModifier);
+		QGraphicsView::mouseReleaseEvent(&fake); //some how need to update RubberBand area
+
 		setDragMode(QGraphicsView::NoDrag); 
-		//2do some how need to update RubberBand area
+		
 		if (unselect)
 			m_camLayout.makeAllItemsSelectable(false);
 	}
