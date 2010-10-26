@@ -858,9 +858,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
 	QAction cm_exit("Exit",0);
 	QAction cm_fitinview("Fit in View",0);
-	QAction cm_circle("Circle",0);
 	QAction cm_arrange("Arrange",0);
-	QAction cm_options("Options...",0);
 	QAction cm_togglefs("Toggle fullscreen",0);
 
 	QAction cm_fullscren("Fullscreen",0);
@@ -905,10 +903,8 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 	{
 		menu.addAction(&cm_fitinview);
 		menu.addAction(&cm_arrange);
-		menu.addAction(&cm_circle);
 		menu.addMenu(&distance_menu);
 		menu.addAction(&cm_togglefs);
-		menu.addAction(&cm_options);
 		menu.addAction(&cm_exit);
 
 	}
@@ -930,10 +926,6 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 		else if (act== &cm_fitinview)
 		{
 			fitInView();
-		}
-		else if (act== &cm_circle)
-		{
-			onCircle_helper();
 		}
 		else if (act== &cm_arrange)
 		{
