@@ -1129,6 +1129,13 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 			updateTransform(-0.01);
 			break;
 
+		case Qt::Key_E:
+			m_yRotate -= 1;
+			updateTransform(-global_rotation_angel*10);
+			global_rotation_angel = 0;
+			break;
+
+
 		case Qt::Key_Control:
 			enableMultipleSelection(true);
 			break;

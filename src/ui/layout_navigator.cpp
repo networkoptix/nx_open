@@ -60,6 +60,7 @@ void CLLayoutNavigator::destroy()
 void CLLayoutNavigator::setMode(ViewMode mode)
 {
 	m_mode = mode;
+	m_videoView.setViewMode(mode);
 }
 
 ViewMode CLLayoutNavigator::getMode() const 

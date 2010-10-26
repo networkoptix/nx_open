@@ -2,6 +2,7 @@
 #include <QPainter>
 #include "settings.h"
 #include <QMutexLocker>
+#include <QStyleOptionGraphicsItem>
 
 CLRecorderItem::CLRecorderItem(GraphicsView* view, int max_width, int max_height, QString name, QString tooltip):
 CLCustomBtnItem(view,max_width,max_height, name, "", tooltip),
@@ -91,5 +92,11 @@ void CLRecorderItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 	painter->drawText((width() - rect.width())/2, border,
 		rect.width(), rect.height(),
 		Qt::AlignCenter | Qt::TextWordWrap, text());
+
+	if (option->state & QStyle::State_Selected)
+	{
+		painter->fillPath(mRoundRectPath, global_selection_color );
+	}
+
 
 }

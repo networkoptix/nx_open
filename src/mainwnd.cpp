@@ -130,7 +130,7 @@ void MainWnd::goToLayouteditor()
 
 	m_topView->setMode(LAYOUTEDITOR_ViewMode);
 	m_bottomView->setMode(LAYOUTEDITOR_ViewMode);
-	m_editedView->setMode(LAYOUTEDITOR_ViewMode);
+	m_editedView->setMode(NORMAL_ViewMode);
 
 
 	QLayout* ml = new QHBoxLayout();

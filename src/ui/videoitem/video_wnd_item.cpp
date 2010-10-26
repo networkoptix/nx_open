@@ -206,7 +206,7 @@ void CLVideoWindowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
 	if (option->state & QStyle::State_Selected)
 	{
 		painter->fillRect(QRect(0, 0, width(), height()),
-			QColor(255, 0, 0, 85));
+			global_selection_color);
 	}
 
 
