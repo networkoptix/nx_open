@@ -20,6 +20,8 @@ public:
 	bool isRecorder() const;
 	void setRecorder();
 
+	bool hasSuchSublayoutName(const QString& name) const;
+
 	bool checkDecorationFlag(unsigned int flag) const;
 	void addDecorationFlag(unsigned int flag);
 

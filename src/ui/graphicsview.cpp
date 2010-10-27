@@ -943,18 +943,30 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 		else if (act == &cm_layout_editor_add_l)
 		{
 			bool ok;
+			QString name;
 			while(true)
 			{
-				QString name = UIgetText(this, tr("New layout"), tr("Layout title:"), "", ok).trimmed();
+				name = UIgetText(this, tr("New layout"), tr("Layout title:"), "", ok).trimmed();
 				if (!ok)
 					break;
 
 				if (name.isEmpty())
+				{
 					UIOKMessage(this, "", "Empty tittle cannot be used.");
-			}
-			
-			
+					continue;
+				}
 
+				if (!m_camLayout.getContent()->hasSuchSublayoutName(name))
+					break;
+
+				UIOKMessage(this, "", "Such title layout already exists.");
+
+			}
+
+			if (ok)
+			{
+
+			}
 		}
 
 	}

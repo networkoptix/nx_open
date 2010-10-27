@@ -59,6 +59,17 @@ void LayoutContent::setEditable(bool editable)
 	m_editable = editable;
 }
 
+bool LayoutContent::hasSuchSublayoutName(const QString& name) const
+{
+	foreach (LayoutContent* cont, m_childlist)
+	{
+		if (cont->getName()==name)
+			return true;
+	}
+
+	return false;
+}
+
 
 bool LayoutContent::checkDecorationFlag(unsigned int flag) const
 {
