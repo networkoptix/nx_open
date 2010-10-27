@@ -202,7 +202,7 @@ void LayoutContent::addImage(const QString& img, const QString& name, const QStr
 	m_imgs.push_back(new LayoutImage(img, name, text, tooltip, x, y, width, height, angle));
 }
 
-void LayoutContent::addDevice(const QString& uniqueId, int x, int y, int width, int height, int angle = 0)
+void LayoutContent::addDevice(const QString& uniqueId, int x, int y, int width, int height, int angle )
 {
 	m_devices.push_back(new LayoutDevice(uniqueId, x, y, width, height, angle));
 }
@@ -248,5 +248,5 @@ LayoutContent* LayoutContent::coppyLayout(LayoutContent* l)
 	*result = *l; // this copy everything including lists of pointers; we do not need that;
 
 	
-
+	return result;
 }
