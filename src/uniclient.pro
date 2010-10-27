@@ -77,8 +77,8 @@ SOURCES += device/device_managmen/device_manager.cpp
 HEADERS += device/device_managmen/device_manager.h
 
 
-SOURCES += ui/video_cam_layout/layout_manager.cpp ui/video_cam_layout/layout_content.cpp  ui/video_cam_layout/start_screen_content.cpp
-HEADERS += ui/video_cam_layout/layout_manager.h ui/video_cam_layout/layout_content.h  ui/video_cam_layout/start_screen_content.h
+SOURCES += ui/video_cam_layout/layout_manager.cpp ui/video_cam_layout/layout_content.cpp  ui/video_cam_layout/layout_items.cpp  ui/video_cam_layout/start_screen_content.cpp
+HEADERS += ui/video_cam_layout/layout_manager.h ui/video_cam_layout/layout_content.h  ui/video_cam_layout/layout_items.h ui/video_cam_layout/start_screen_content.h
 
 HEADERS += recorder/recorder_device.h  recorder/fake_recorder_device.h  recorder/recorder_display.h
 SOURCES += recorder/recorder_device.cpp  recorder/fake_recorder_device.cpp recorder/recorder_display.cpp
