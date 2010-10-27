@@ -822,7 +822,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 		if (m_movingWnd)
 		{
 			m_movingWnd = false;
-			reAdjustSceneRect();
+			m_camLayout.updateSceneRect();
 		}
 	}
 
@@ -1335,7 +1335,6 @@ void GraphicsView::resizeEvent( QResizeEvent * event )
 		//fitInView(getRealSceneRect(),Qt::KeepAspectRatio);
 	{
 		centerOn(getRealSceneRect().center());
-		//updateSceneRect();
 		invalidateScene();
 	}
 
@@ -1367,13 +1366,6 @@ void GraphicsView::onScneZoomFinished()
 	emit scneZoomFinished();
 }
 
-void GraphicsView::reAdjustSceneRect()
-{
-	QRect r = m_camLayout.getLayoutRect();
-	setSceneRect(0,0, 2*r.right(), 2*r.bottom());
-	setRealSceneRect(r);
-	update();
-}
 
 //=====================================================
 bool GraphicsView::isItemStillExists(const CLAbstractSceneItem* wnd) const
@@ -1480,7 +1472,7 @@ void GraphicsView::onCircle_helper(bool show)
 		return;
 
 	
-	reAdjustSceneRect();
+	m_camLayout.updateSceneRect();
 	QRectF item_rect = m_camLayout.getSmallLayoutRect();
 	mShow.center = item_rect.center();
 
@@ -1585,7 +1577,7 @@ void GraphicsView::onArrange_helper()
 		item->setArranged(true);
 	}
 
-	//connect(group, SIGNAL(finished ()), this, SLOT(reAdjustSceneRect()));
+
 	connect(m_groupAnimation, SIGNAL(finished ()), this, SLOT(fitInView()));
 
 
@@ -1606,7 +1598,7 @@ void GraphicsView::fitInView(int duration )
 		update();
 	}
 
-	reAdjustSceneRect();
+	m_camLayout.updateSceneRect();
 	QRectF item_rect = m_camLayout.getSmallLayoutRect();
 
 	m_movement.move(item_rect.center(), duration);

@@ -56,42 +56,18 @@ public:
 	void stop(bool animation = false);
 
 	//================================================
-	// position of window( if any ) will be changed
-	// return false if there are no available slots
-	bool addItem(CLAbstractSceneItem* item, int x, int y, bool update_scene_rect = true);
 
-	//does same as bool addCamera(CLVideoCamera* cam, int x, int y, int z_order = 0);
-	//but function peeks up position by it self 
-	bool addItem(CLAbstractSceneItem* item,  bool update_scene_rect = true);
-
-	// remove item from lay out
-	void removeItem(CLAbstractSceneItem* item, bool update_scene_rect = true);
-
-	// creates video item for device, if needed, camera and so on...
-	bool addDevice(CLDevice* dev, bool update_scene_rect = true);
-
-	// removes device; does the opposite to addDevice
-	bool removeDevice(CLDevice* dev); 
+	bool addDevice(QString uniqueid, bool update_scene_rect = true);
 
 	//================================================
 
 	void setItemDistance(qreal distance);
 	qreal getItemDistance() const;
 
-	// means that at least one item can be added 
-	bool isSpaceAvalable() const;
-
-	QSize getMaxWndSize(const CLDeviceVideoLayout* layout) const;
-
-	void adjustItem(CLAbstractSceneItem* item) const;
 
 	QRect getLayoutRect() const; // scene rect 
 	QRect getSmallLayoutRect() const; // scene rect 
 
-	// returns next best available position; returns -1 if not found(all positions are busy);
-	// returns false if everything is busy
-	bool getNextAvailablePos(QSize size, int &x, int &y) const;
-	
 	void updateSceneRect();
 
 
@@ -140,6 +116,37 @@ protected slots:
 	void stop_helper(bool emt = true);
 private:
 
+	// position of window( if any ) will be changed
+	// return false if there are no available slots
+	bool addItem(CLAbstractSceneItem* item, int x, int y, bool update_scene_rect = true);
+
+	//does same as bool addCamera(CLVideoCamera* cam, int x, int y, int z_order = 0);
+	//but function peeks up position by it self 
+	bool addItem(CLAbstractSceneItem* item,  bool update_scene_rect = true);
+
+	// remove item from lay out
+	void removeItem(CLAbstractSceneItem* item, bool update_scene_rect = true);
+
+	// creates video item for device, if needed, camera and so on...
+	bool addDevice(CLDevice* dev, bool update_scene_rect = true);
+
+	// removes device; does the opposite to addDevice
+	bool removeDevice(CLDevice* dev); 
+
+	//================================================
+	// means that at least one item can be added 
+	bool isSpaceAvalable() const;
+
+	QSize getMaxWndSize(const CLDeviceVideoLayout* layout) const;
+
+	void adjustItem(CLAbstractSceneItem* item) const;
+
+	// returns next best available position; returns -1 if not found(all positions are busy);
+	// returns false if everything is busy
+	bool getNextAvailablePos(QSize size, int &x, int &y) const;
+
+
+	//================================================
 	
 
 	int next_item_helper_get_quarter(const QPointF& current, const QPointF& other) const;
@@ -169,13 +176,6 @@ private:
 
 	int slotFromPos(QPoint p) const;
 	QPoint posFromSlot(int slot) const;
-
-
-	//this function checks if some dev from lst needs to be added
-	// return true if at least one is added
-	bool addDevices_helper(CLDeviceList& lst);
-	 
-
 
 private:
 

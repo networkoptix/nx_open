@@ -131,10 +131,22 @@ CLDeviceList CLDeviceManager::getDeviceList(CLDeviceCriteria& cr)
 		return result;
 	}
 
-
-
 	// first implementation is very simple; returns all dev
-	
+}
+
+CLDevice* CLDeviceManager::getDeviceById(QString id)
+{
+	QMutexLocker lock(&m_dev_searcher.all_devices_mtx);
+	CLDeviceList& devices =  m_dev_searcher.getAllDevices();
+	if (devices.contains(id))
+	{
+		CLDevice* dev = devices[id];
+		dev->addRef();
+
+		return dev;
+	}
+
+	return 0;
 }
 
 CLDeviceList CLDeviceManager::getRecorderList()

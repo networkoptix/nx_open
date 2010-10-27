@@ -218,10 +218,20 @@ void SceneLayout::onTimer()
 
 	//===================video devices=======================
 	CLDeviceList all_devs =  CLDeviceManager::instance().getDeviceList(m_content->getDeviceCriteria());
-	bool added = addDevices_helper(all_devs);
+	bool added = false;
+
+	foreach(CLDevice* dev, all_devs)
+	{
+		// the ref counter for device already increased in getDeviceList; 
+		// must not do it again
+		if (!addDevice(dev, false))
+			dev->releaseRef();
+		else
+			added = true;
+	}
+
 
 	//==============recorders ================================
-	CLDeviceList recorders;
 	QList<LayoutContent*> children_lst =  m_content->childrenList();
 	foreach(LayoutContent* child, children_lst)
 	{
@@ -230,15 +240,13 @@ void SceneLayout::onTimer()
 		if(!child->isRecorder())
 			continue;
 
-		CLDevice* dev = CLDeviceManager::instance().getRecorderById(child->getName());
+		if (addDevice(child->getName(), false))
+			added = true;
 
-		if (dev==0)
-			continue;
-
-		recorders[dev->getUniqueId()] = dev;
 	}
 
-	added = addDevices_helper(recorders) || added;
+
+	//================================
 
 
 
@@ -251,43 +259,6 @@ void SceneLayout::onTimer()
 
 	
 	//====================================
-}
-
-bool SceneLayout::addDevices_helper(CLDeviceList& lst)
-{
-	bool added = false;
-
-	foreach(CLDevice* dev, lst)
-	{
-		bool contains = false;
-
-		foreach(CLAbstractComplicatedItem* devitem, m_deviceitems)
-		{
-			if (devitem->getDevice()->getUniqueId() == dev->getUniqueId())
-			{
-				contains = true;
-				break;
-			}
-		}
-
-
-		if (contains) // if such device already here we do not need it
-		{
-			dev->releaseRef();
-		}
-		else
-		{
-			// the ref counter for device already increased in getDeviceList; 
-			// must not do it again
-			if (!addDevice(dev, false))
-				dev->releaseRef();
-			else
-				added = true;
-		}
-	}
-
-	return added;
-
 }
 
 void SceneLayout::onVideoTimer()
@@ -303,6 +274,26 @@ void SceneLayout::onVideoTimer()
 	}
 }
 
+bool SceneLayout::addDevice(QString uniqueid, bool update_scene_rect)
+{
+	//Mind Vibes - mixed by Kick Bong
+
+	CLDevice* dev = CLDeviceManager::instance().getDeviceById(uniqueid);
+	if (dev==0)
+	{
+		dev = CLDeviceManager::instance().getRecorderById(uniqueid);
+
+		if (dev==0)
+			return false;
+	}
+
+	if (!addDevice(dev, false))
+		dev->releaseRef();
+
+
+	return true;
+}
+
 bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect)
 {
 	if (!isSpaceAvalable())
@@ -310,6 +301,13 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect)
 		cl_log.log("Cannot support so many devices ", cl_logWARNING);
 		return false;
 	}
+
+	foreach(CLAbstractComplicatedItem* devitem, m_deviceitems)
+	{
+		if (devitem->getDevice()->getUniqueId() == device->getUniqueId())
+			return false; // already have such device here 
+	}
+
 
 
 	CLDevice::DeviceType type = device->getDeviceType();

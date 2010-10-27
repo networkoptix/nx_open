@@ -112,7 +112,6 @@ public slots:
 	void fitInView(int duration = 600);
 private slots:
 	void onScneZoomFinished();
-	void reAdjustSceneRect();
 	void onShowTimer();
 	void onShowStart();
 	void onDecorationItemPressed(QString);
