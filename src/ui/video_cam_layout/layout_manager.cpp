@@ -67,10 +67,10 @@ LayoutContent* CLSceneLayoutManager::getDefaultLayoutContent()
 void CLSceneLayoutManager::addRecorderLayoutContent( QString id )
 {
 	LayoutContent* cont1 = createRecorderContent_helper(id);
-	mRootContent->addLayout(cont1);
+	mRootContent->addLayout(cont1, false);
 
 	LayoutContent* cont2 = createRecorderContent_helper(id);
-	mAllRecorders->addLayout(cont2);
+	mAllRecorders->addLayout(cont2, false);
 
 }
 

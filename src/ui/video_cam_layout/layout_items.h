@@ -45,6 +45,7 @@ protected:
 class LayoutDevice : public LayoutItem
 {
 public:
+	LayoutDevice();
 	LayoutDevice(const QString& uniqueId, int x, int y, int width, int height, int angle = 0);
 	virtual Type type() const;
 	QString getId() const;
@@ -68,6 +69,7 @@ protected:
 class LayoutImage: public LayoutButton
 {
 public:
+	LayoutImage();
 	LayoutImage(const QString& img, const QString& name, const QString& text, const QString& tooltip, int x, int y, int width, int height, int angle = 0);
 
 	virtual Type type() const ;

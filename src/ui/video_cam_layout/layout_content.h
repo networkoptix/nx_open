@@ -29,7 +29,7 @@ public:
 	void addButton(const QString& name, const QString& text, const QString& tooltip, int x, int y, int width, int height, int angle = 0);
 	void addImage(const QString& img, const QString& name, const QString& text, const QString& tooltip, int x, int y, int width, int height, int angle = 0);
 	void addDevice(const QString& uniqueId, int x, int y, int width, int height, int angle = 0);
-	void addLayout(LayoutContent* l);
+	void addLayout(LayoutContent* l, bool copy);
 
 
 	void setDeviceCriteria(const CLDeviceCriteria& cr);
@@ -37,6 +37,8 @@ public:
 
 	QList<LayoutImage*>& getImages();
 	QList<LayoutButton*>& getButtons();
+	QList<LayoutDevice*>& getDevices();
+
 	QList<LayoutContent*>& childrenList();
 	
 protected:
@@ -44,8 +46,10 @@ protected:
 protected:
 	QList<LayoutImage*> m_imgs;
 	QList<LayoutButton*> m_btns;
-	QList<LayoutContent*> m_childlist;
 	QList<LayoutDevice*> m_devices;
+
+	QList<LayoutContent*> m_childlist;
+	
 
 
 	CLDeviceCriteria m_cr;

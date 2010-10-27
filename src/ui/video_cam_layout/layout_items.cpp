@@ -72,6 +72,10 @@ int LayoutItem::angle() const
 }
 
 //=======
+LayoutDevice::LayoutDevice()
+{
+
+}
 
 LayoutDevice::LayoutDevice(const QString& uniqueId, int x_, int y_, int width_, int height_, int angle_):
 LayoutItem(x_, y_, width_, height_,  angle_),
@@ -110,6 +114,10 @@ LayoutItem::Type LayoutButton::type() const
 }
 
 //=======
+LayoutImage::LayoutImage()
+{
+
+}
 
 LayoutImage::LayoutImage(const QString& img, const QString& name, const QString& text, const QString& tooltip, int x_, int y_, int width_, int height_, int angle_):
 LayoutButton(name, text, tooltip, x_, y_, width_, height_,  angle_),
