@@ -8,6 +8,7 @@
 #include "widgets.h"
 #include <QGroupBox>
 #include <QPushButton>
+#include "settings.h"
 
 CLAbstractDeviceSettingsDlg::CLAbstractDeviceSettingsDlg(CLDevice* dev):
 QDialog(0, Qt::CustomizeWindowHint | Qt::WindowTitleHint | 
@@ -20,7 +21,7 @@ mDevice(dev)
 	str+=mDevice->toString();
 
 	setWindowTitle(str);
-	setWindowOpacity(0.90);
+	setWindowOpacity(global_dlg_opacity);
 
 	int width = 610;
 	int height = 490;

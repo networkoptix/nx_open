@@ -276,4 +276,6 @@ bool CLArecontPanoramicDevice::setQulity(int q)
 	if (CL_HTTP_SUCCESS!=setRegister(3, 0xEE, q)) // HALF RES QULITY
 		return false;
 
+	return false;
+
 }

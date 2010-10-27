@@ -119,7 +119,7 @@ void MainWnd::goToLayouteditor()
 	m_bottomView = new CLLayoutNavigator(this, CLSceneLayoutManager::instance().getEmptyLayoutContent()); 
 	m_bottomView->getView().setMaximumWidth(600);
 
-	m_editedView = new CLLayoutNavigator(this, CLSceneLayoutManager::instance().getEmptyLayoutContent());
+	m_editedView = new CLLayoutNavigator(this, CLSceneLayoutManager::instance().getNewEmptyLayoutContent());
 
 	connect(m_topView, SIGNAL(onItemPressed(QString)), this, SLOT(onItemPressed(QString)));
 	connect(m_bottomView, SIGNAL(onItemPressed(QString)), this, SLOT(onItemPressed(QString)));
@@ -129,9 +129,14 @@ void MainWnd::goToLayouteditor()
 	connect(m_topView, SIGNAL(onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*)), this, SLOT(onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*)));
 	connect(m_bottomView, SIGNAL(onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*)), this, SLOT(onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*)));
 
-	m_topView->setMode(LAYOUTEDITOR_ViewMode); m_topView->getView().setViewMode(GraphicsView::ItemsDonor);
-	m_bottomView->setMode(LAYOUTEDITOR_ViewMode); m_bottomView->getView().setViewMode(GraphicsView::ItemsDonor);
-	m_editedView->setMode(NORMAL_ViewMode); m_editedView->getView().setViewMode(GraphicsView::ItemsAcceptor);
+	m_topView->setMode(LAYOUTEDITOR_ViewMode); 
+	m_topView->getView().setViewMode(GraphicsView::ItemsDonor);
+
+	m_bottomView->setMode(LAYOUTEDITOR_ViewMode); 
+	m_bottomView->getView().setViewMode(GraphicsView::ItemsDonor);
+
+	m_editedView->setMode(LAYOUTEDITOR_ViewMode); 
+	m_editedView->getView().setViewMode(GraphicsView::ItemsAcceptor);
 
 
 	QLayout* ml = new QHBoxLayout();

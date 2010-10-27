@@ -43,7 +43,8 @@ m_item_distance(35/100.0),
 m_max_items(max_items),
 m_slots(max_items*4),
 m_firstTime(true),
-m_isRunning(false)
+m_isRunning(false),
+m_editable(false)
 {
 	m_width = m_slots/m_height;
 
@@ -82,6 +83,28 @@ LayoutContent* SceneLayout::getContent()
 	return m_content;
 }
 
+bool SceneLayout::isEditable() const
+{
+	return m_editable && m_content->isEditable();
+}
+
+void SceneLayout::setEditable(bool editable)
+{
+	m_editable = editable;
+}
+
+bool SceneLayout::isContentChanged() const
+{
+	return m_contentchanged;
+}
+
+void SceneLayout::setContentChanged(bool changed)
+{
+	m_contentchanged = changed;
+}
+
+
+
 void SceneLayout::start()
 {
 	if (m_isRunning)
@@ -89,6 +112,7 @@ void SceneLayout::start()
 
 	m_firstTime = true;
 
+	m_contentchanged = false;
 	m_timer.start(100);
 	m_videotimer.start(1000/MAX_FPS); 
 	m_isRunning = true;

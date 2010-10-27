@@ -3,26 +3,22 @@
 #include <QScrollBar>
 #include "./base/log.h"
 #include <math.h>
-#include "../src/gui/graphicsview/qgraphicsitem.h"
+#include <QGraphicsitem>
 #include "./video_cam_layout/videocamlayout.h"
 #include "../base/rand.h"
 #include "camera/camera.h"
-#include <QContextMenuEvent>
-#include <QCoreApplication>
 #include "mainwnd.h"
 #include <QParallelAnimationGroup>
 #include <QPropertyAnimation>
 #include "./animation/animated_bgr.h"
 #include "settings.h"
-#include <QGraphicsProxyWidget>
 #include "device_settings/dlg_factory.h"
 #include "device_settings/device_settings_dlg.h"
 #include "videoitem/video_wnd_item.h"
-#include "videoitem/abstract_unmoved_item.h"
 #include "videoitem/unmoved_pixture_button.h"
 #include "video_cam_layout/layout_content.h"
 #include "context_menu_helper.h"
-
+#include <QInputDialog>
 
 
 
@@ -117,9 +113,6 @@ m_fps_frames(0)
 	mShow.mTimer.setInterval(1000);
 	mShow.mTimer.start();
 
-	
-	
-
 }
 
 GraphicsView::~GraphicsView()
@@ -133,6 +126,7 @@ GraphicsView::~GraphicsView()
 void GraphicsView::setViewMode(ViewMode mode)
 {
 	m_viewMode = mode;
+	m_camLayout.setEditable(mode == NormalView || mode == ItemsAcceptor);
 }
 
 void GraphicsView::start()
@@ -860,7 +854,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 	// distance menu 
 	QMenu distance_menu;
 
-	distance_menu.setWindowOpacity(0.8);
+	distance_menu.setWindowOpacity(global_menu_opacity);
 	distance_menu.setTitle("Item distance");
 
 	distance_menu.addAction(&dis_0);
@@ -873,11 +867,30 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 	distance_menu.addAction(&dis_35);
 
 
+	// layout editor
+	QMenu layout_editor_menu;
+	layout_editor_menu.setWindowOpacity(global_menu_opacity);
+	layout_editor_menu.setTitle("Layout Editor");
+
+	if (m_camLayout.isContentChanged())
+	{
+		layout_editor_menu.addAction(&cm_layout_editor_save);
+		layout_editor_menu.addAction(&cm_layout_editor_save_as);
+
+	}
+
+	if (m_viewMode==ItemsAcceptor)
+		layout_editor_menu.addAction(&cm_layout_editor_add_l);
+
+
+	layout_editor_menu.addAction(&cm_layout_editor_bgp);
+	layout_editor_menu.addAction(&cm_layout_editor_bgp_sz);
+
 
 
 	//===== final menu=====
 	QMenu menu;
-	menu.setWindowOpacity(0.8);
+	menu.setWindowOpacity(global_menu_opacity);
 
 	if (wnd) // video wnd
 	{
@@ -890,6 +903,8 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 		menu.addAction(&cm_fitinview);
 		menu.addAction(&cm_arrange);
 		menu.addMenu(&distance_menu);
+		if (m_camLayout.isEditable())
+			menu.addMenu(&layout_editor_menu);
 		menu.addAction(&cm_togglefs);
 		menu.addAction(&cm_exit);
 
@@ -924,6 +939,22 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 		{
 			m_camLayout.setItemDistance(0.01 + (act->data()).toDouble() );
 			onArrange_helper();
+		}
+		else if (act == &cm_layout_editor_add_l)
+		{
+			bool ok;
+			while(true)
+			{
+				QString name = UIgetText(this, tr("New layout"), tr("Layout title:"), "", ok).trimmed();
+				if (!ok)
+					break;
+
+				if (name.isEmpty())
+					UIOKMessage(this, "", "Empty tittle cannot be used.");
+			}
+			
+			
+
 		}
 
 	}

@@ -134,7 +134,8 @@ QString LayoutImage::getImage() const
 LayoutContent::LayoutContent():
 m_cr(CLDeviceCriteria::NONE),
 mDecoration(0),
-m_recorder(false)
+m_recorder(false),
+m_editable(false)
 {
 	
 }
@@ -157,6 +158,16 @@ bool LayoutContent::isRecorder() const
 void LayoutContent::setRecorder()
 {
 	m_recorder = true;
+}
+
+bool LayoutContent::isEditable() const
+{
+	return m_editable;
+}
+
+void LayoutContent::setEditable(bool editable) 
+{
+	m_editable = editable;
 }
 
 
@@ -191,6 +202,11 @@ void LayoutContent::addImage(const QString& img, const QString& name, const QStr
 	m_imgs.push_back(new LayoutImage(img, name, text, tooltip, x, y, width, height, angle));
 }
 
+void LayoutContent::addDevice(const QString& uniqueId, int x, int y, int width, int height, int angle = 0)
+{
+	m_devices.push_back(new LayoutDevice(uniqueId, x, y, width, height, angle));
+}
+
 void LayoutContent::addLayout(LayoutContent* l)
 {
 	m_childlist.push_back(l);
@@ -222,4 +238,15 @@ QList<LayoutButton*>& LayoutContent::getButtons()
 QList<LayoutContent*>& LayoutContent::childrenList() 
 {
 	return m_childlist;
+}
+
+//=========================================================================
+
+LayoutContent* LayoutContent::coppyLayout(LayoutContent* l)
+{
+	LayoutContent* result = new LayoutContent();
+	*result = *l; // this copy everything including lists of pointers; we do not need that;
+
+	
+
 }

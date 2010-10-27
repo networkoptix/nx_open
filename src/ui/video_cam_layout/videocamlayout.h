@@ -39,6 +39,12 @@ public:
 	void setContent(LayoutContent* cont);
 	LayoutContent* getContent();
 
+	bool isEditable() const;
+	void setEditable(bool editable) ;
+
+	bool isContentChanged() const;
+	void setContentChanged(bool changed);
+
 	//================================================
 
 	//start should be called only after Layout putted on the scene, but before first item is added
@@ -204,7 +210,8 @@ private:
 	bool m_isRunning;
 
 	LayoutContent* m_content;
-	
+	bool m_editable;
+	bool m_contentchanged;
 };
 
 //===================================================================

@@ -14,7 +14,6 @@ CLSceneLayoutManager::CLSceneLayoutManager()
 	mAllRecorders->addDecorationFlag(LayoutContent::HomeButton | LayoutContent::BackGroundLogo );
 
 	mEmptyLayout = getNewEmptyLayoutContent();
-	
 
 }
 
@@ -93,6 +92,7 @@ LayoutContent* CLSceneLayoutManager::getNewEmptyLayoutContent()
 	CLDeviceCriteria cr(CLDeviceCriteria::NONE);
 	cont->setDeviceCriteria(cr);
 
+	cont->setEditable(true);
 
 	return cont;
 }

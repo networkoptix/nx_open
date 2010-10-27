@@ -26,5 +26,12 @@ extern QAction dis_30;
 extern QAction dis_35;
 
 
+extern QAction cm_layout_editor_bgp;
+extern QAction cm_layout_editor_bgp_sz;
+extern QAction cm_layout_editor_save;
+extern QAction cm_layout_editor_save_as;
+extern QAction cm_layout_editor_add_l;
+
+
 
 #endif //context_menu_helper_h_1250

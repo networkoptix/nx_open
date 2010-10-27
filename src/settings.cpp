@@ -13,3 +13,7 @@ int devices_update_interval = 2000;
 
 
 QColor app_bkr_color(0,5,5,125);
+
+
+qreal global_menu_opacity =  0.8;
+qreal global_dlg_opacity  = 0.9;

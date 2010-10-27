@@ -12,4 +12,7 @@ extern QColor global_shadow_color;
 extern QColor app_bkr_color;
 extern QColor global_selection_color;
 
+extern qreal global_menu_opacity;
+extern qreal global_dlg_opacity;
+
 #endif //global_settings_h1933

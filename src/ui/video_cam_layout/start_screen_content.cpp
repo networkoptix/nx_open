@@ -48,6 +48,8 @@ LayoutContent& startscreen_content()
 
 		instance.setDeviceCriteria(cr);
 
+		instance.setEditable(false);
+
 	}
 
 	return instance;

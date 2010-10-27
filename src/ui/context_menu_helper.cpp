@@ -19,6 +19,12 @@ QAction dis_30("30%",0);
 QAction dis_35("35%",0);
 
 
+QAction cm_layout_editor_bgp("Change BackGround picture...",0);
+QAction cm_layout_editor_bgp_sz("Change BackGround picture size...",0);
+QAction cm_layout_editor_save("Save layout",0);
+QAction cm_layout_editor_save_as("Save layout as...",0);
+QAction cm_layout_editor_add_l("Add new layout...",0);
+
 void initContextMenu()
 {
 	dis_0.setData(0.0);

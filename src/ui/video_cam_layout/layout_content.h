@@ -91,19 +91,23 @@ public:
 
 	virtual Type type() const;
 
+	bool isEditable() const;
+	void setEditable(bool editable) ;
+
 	bool isRecorder() const;
 	void setRecorder();
 
 	bool checkDecorationFlag(unsigned int flag) const;
 	void addDecorationFlag(unsigned int flag);
 
-
 	void setParent(LayoutContent* parent);
 	LayoutContent* getParent() const;
 
 	void addButton(const QString& name, const QString& text, const QString& tooltip, int x, int y, int width, int height, int angle = 0);
 	void addImage(const QString& img, const QString& name, const QString& text, const QString& tooltip, int x, int y, int width, int height, int angle = 0);
+	void addDevice(const QString& uniqueId, int x, int y, int width, int height, int angle = 0);
 	void addLayout(LayoutContent* l);
+
 
 	void setDeviceCriteria(const CLDeviceCriteria& cr);
 	CLDeviceCriteria getDeviceCriteria() const;
@@ -113,9 +117,12 @@ public:
 	QList<LayoutContent*>& childrenList();
 	
 protected:
+	LayoutContent* coppyLayout(LayoutContent* l);
+protected:
 	QList<LayoutImage*> m_imgs;
 	QList<LayoutButton*> m_btns;
 	QList<LayoutContent*> m_childlist;
+	QList<LayoutDevice*> m_devices;
 
 
 	CLDeviceCriteria m_cr;
@@ -125,6 +132,7 @@ protected:
 	unsigned int mDecoration;
 
 	bool m_recorder;
+	bool m_editable;
 
 };
 #endif //layout_content_h_2210
