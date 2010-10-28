@@ -7,7 +7,7 @@ mDecoration(0),
 m_recorder(false),
 m_editable(false)
 {
-	
+	setName("Layout:unnamed");
 }
 
 LayoutContent::~LayoutContent()

@@ -251,6 +251,6 @@ QStringList CLDeviceManager::subDirList(const QString& abspath) const
 void CLDeviceManager::addArchiver(QString id)
 {
 	CLDevice* rec = new CLFakeRecorderDevice();
-	rec->setUniqueId(id);
+	rec->setUniqueId(QString("Recoreder:") + id);
 	mRecDevices[rec->getUniqueId()] = rec;
 }

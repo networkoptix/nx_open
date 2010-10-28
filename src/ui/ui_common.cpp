@@ -37,5 +37,13 @@ void UIOKMessage(QWidget* parent, const QString& title, const QString& text)
 	msgBox.setStyle(arthurStyle);
 
 	msgBox.exec();
+}
 
+QString UIDisplayName(const QString& fullname)
+{
+	int index = fullname.indexOf(":");
+	if (index<0)
+		return QString();
+
+	return fullname.mid(index+1);
 }

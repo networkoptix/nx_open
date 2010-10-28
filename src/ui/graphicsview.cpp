@@ -139,7 +139,7 @@ void GraphicsView::start()
 
 	enableMultipleSelection(false, true);
 
-	//The Mind Expander - mixed by DJ River & Espe
+	
 }
 
 void GraphicsView::stop()

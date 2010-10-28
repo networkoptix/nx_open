@@ -277,6 +277,8 @@ void SceneLayout::onVideoTimer()
 bool SceneLayout::addDevice(QString uniqueid, bool update_scene_rect)
 {
 	//Mind Vibes - mixed by Kick Bong
+	//Go To Bed World (Vol. 2) - mixed by Xerxes
+	//The Mind Expander - mixed by DJ River & Espe
 
 	CLDevice* dev = CLDeviceManager::instance().getDeviceById(uniqueid);
 	if (dev==0)

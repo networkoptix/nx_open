@@ -3,6 +3,7 @@
 #include "settings.h"
 #include <QMutexLocker>
 #include <QStyleOptionGraphicsItem>
+#include "ui\ui_common.h"
 
 CLRecorderItem::CLRecorderItem(GraphicsView* view, int max_width, int max_height, QString name, QString tooltip):
 CLCustomBtnItem(view,max_width,max_height, name, "", tooltip),
