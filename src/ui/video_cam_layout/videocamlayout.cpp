@@ -288,7 +288,10 @@ bool SceneLayout::addDevice(QString uniqueid, bool update_scene_rect)
 	}
 
 	if (!addDevice(dev, false))
+	{
 		dev->releaseRef();
+		return false;
+	}
 
 
 	return true;
