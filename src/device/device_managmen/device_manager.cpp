@@ -43,7 +43,7 @@ m_firstTime(true)
 	connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimer()));
 	m_timer.start(100); // first time should come fast
 
-	addArchiver("General Archiver");
+	addArchiver("Recorder:General Archiver");
 
 	QString rootDir("c:/Photo/");
 
@@ -52,6 +52,9 @@ m_firstTime(true)
 	foreach(QString subdir, subdirList)
 	{
 		CLDirectoryBrowserDeviceServer dirbrowsr(rootDir + subdir);
+
+		subdir = QString("Recorder:") + subdir;
+
 		onNewDevices_helper(dirbrowsr.findDevices(), subdir);
 		addArchiver(subdir);
 	}
@@ -251,6 +254,6 @@ QStringList CLDeviceManager::subDirList(const QString& abspath) const
 void CLDeviceManager::addArchiver(QString id)
 {
 	CLDevice* rec = new CLFakeRecorderDevice();
-	rec->setUniqueId(QString("Recoreder:") + id);
+	rec->setUniqueId(id);
 	mRecDevices[rec->getUniqueId()] = rec;
 }

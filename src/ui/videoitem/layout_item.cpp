@@ -3,6 +3,7 @@
 #include <QMutexLocker>
 #include <QStyleOptionGraphicsItem>
 #include "layout_item.h"
+#include "ui\ui_common.h"
 
 CLLayoutItem::CLLayoutItem(GraphicsView* view, int max_width, int max_height, QString name, QString tooltip):
 CLCustomBtnItem(view,max_width,max_height, name, "", tooltip),
@@ -70,7 +71,7 @@ void CLLayoutItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 
 	painter->drawText((width() - rect.width())/2, border,
 		rect.width(), rect.height(),
-		Qt::AlignCenter | Qt::TextWordWrap, getName());
+		Qt::AlignCenter | Qt::TextWordWrap, UIDisplayName(getName()));
 
 	if (option->state & QStyle::State_Selected)
 	{
