@@ -56,9 +56,9 @@ public:
 	void stop(bool animation = false);
 
 	//================================================
+	bool addLayoutItem(QString name, LayoutContent* lc, bool update_scene_rect = true);
 
 	bool addDevice(QString uniqueid, bool update_scene_rect = true);
-
 	//================================================
 
 	void setItemDistance(qreal distance);

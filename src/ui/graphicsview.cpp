@@ -19,6 +19,7 @@
 #include "video_cam_layout/layout_content.h"
 #include "context_menu_helper.h"
 #include <QInputDialog>
+#include "video_cam_layout/layout_manager.h"
 
 
 
@@ -956,6 +957,8 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 					continue;
 				}
 
+				name = QString("Layout:") + name;
+
 				if (!m_camLayout.getContent()->hasSuchSublayoutName(name))
 					break;
 
@@ -965,7 +968,13 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
 			if (ok)
 			{
+				LayoutContent* lc = CLSceneLayoutManager::instance().getNewEmptyLayoutContent(LayoutContent::LevelUp);
+				lc->setName(name);
 
+				m_camLayout.getContent()->addLayout(lc, false);
+				m_camLayout.addLayoutItem(name, lc);
+				m_camLayout.setContentChanged(true);
+				
 			}
 		}
 

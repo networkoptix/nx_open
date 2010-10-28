@@ -38,7 +38,7 @@ public:
 
 	// creates new blank lay out content
 	// client responsible for deleting this one 
-	LayoutContent* getNewEmptyLayoutContent();
+	LayoutContent* getNewEmptyLayoutContent(unsigned int flags = 0);
 
 	// returns empty content. does not create new one. this content used for layout editor as start one 
 	LayoutContent* getEmptyLayoutContent();

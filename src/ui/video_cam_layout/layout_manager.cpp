@@ -84,10 +84,10 @@ LayoutContent* CLSceneLayoutManager::getAllLayoutsContent()
 	return mRootContent;
 }
 
-LayoutContent* CLSceneLayoutManager::getNewEmptyLayoutContent()
+LayoutContent* CLSceneLayoutManager::getNewEmptyLayoutContent(unsigned int flags )
 {
 	LayoutContent* cont = new LayoutContent();
-	cont->addDecorationFlag(LayoutContent::HomeButton | LayoutContent::BackGroundLogo);
+	cont->addDecorationFlag(LayoutContent::HomeButton | LayoutContent::BackGroundLogo | flags);
 
 	CLDeviceCriteria cr(CLDeviceCriteria::NONE);
 	cont->setDeviceCriteria(cr);

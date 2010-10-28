@@ -10,6 +10,8 @@ CLCustomBtnItem(view,max_width,max_height, name, "", tooltip),
 mContent(0)
 {
 	m_type = RECORDER;
+
+	createPaths(width()/3);
 }
 
 

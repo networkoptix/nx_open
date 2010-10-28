@@ -16,6 +16,7 @@
 #include "layout_content.h"
 #include "recorder/recorder_display.h"
 #include "ui/videoitem/recorder_item.h"
+#include "ui/videoitem/layout_item.h"
 
 #define SLOT_WIDTH (640*10)
 #define SLOT_HEIGHT (SLOT_WIDTH*3/4)
@@ -173,9 +174,6 @@ void SceneLayout::stop(bool animation)
 	m_timer.stop();
 	m_videotimer.stop();
 
-	
-
-	
 
 	if (animation)
 	{
@@ -375,6 +373,87 @@ bool SceneLayout::removeDevice(CLDevice* dev)
 	return true;
 }
 
+bool SceneLayout::addLayoutItem(QString name, LayoutContent* lc, bool update_scene_rect)
+{
+	// new item should always be adjusted 
+	if (!isSpaceAvalable())
+		return false;
+
+	CLLayoutItem* item = new CLLayoutItem(m_view, SLOT_WIDTH, SLOT_HEIGHT, name, name);
+	item->setRefContent(lc);
+
+	addItem(item, update_scene_rect);
+
+	if (update_scene_rect)
+	{
+		m_view->centerOn(m_view->getRealSceneRect().center());
+		m_view->fitInView(2000);
+	}
+
+	return true;
+}
+
+bool SceneLayout::addItem(CLAbstractSceneItem* item, int x, int y, bool update_scene_rect)
+{
+	// new item should always be adjusted 
+	if (!isSpaceAvalable())
+		return false;
+
+	if (!item)
+		return false;
+
+	m_items.push_back(item);
+
+	m_scene->addItem(item);
+	item->setPos(x, y);
+
+	//=========
+
+	if (update_scene_rect)
+		updateSceneRect();
+
+	connect(item, SIGNAL(onAspectRatioChanged(CLAbstractSceneItem*)), this, SLOT(onAspectRatioChanged(CLAbstractSceneItem*)));
+
+	connect(item, SIGNAL(onPressed(CLAbstractSceneItem*)), this, SLOT(onItemPressed(CLAbstractSceneItem*)));
+
+	connect(item, SIGNAL(onDoubleClick(CLAbstractSceneItem*)), this, SLOT(onItemDoubleClick(CLAbstractSceneItem*)));
+
+	connect(item, SIGNAL(onFullScreen(CLAbstractSceneItem*)), this, SLOT(onItemFullScreen(CLAbstractSceneItem*)));
+
+	connect(item, SIGNAL(onSelected(CLAbstractSceneItem*)), this, SLOT(onItemSelected(CLAbstractSceneItem* )));
+
+	return true;
+}
+
+bool SceneLayout::addItem(CLAbstractSceneItem* wnd, bool update_scene_rect )
+{
+	int x, y;
+
+	if (!getNextAvailablePos(wnd->getMaxSize(), x, y))
+		return false;
+
+	addItem(wnd, x, y, update_scene_rect);
+	wnd->setArranged(true);
+	return true;
+
+}
+
+
+// remove item from lay out
+void SceneLayout::removeItem(CLAbstractSceneItem* item, bool update_scene_rect )
+{
+	if (!item)
+		return;
+
+	m_items.removeOne(item);
+	m_scene->removeItem(item);
+
+	if (update_scene_rect)
+		updateSceneRect();
+
+
+}
+
 
 void SceneLayout::setItemDistance(qreal distance)
 {
@@ -503,71 +582,6 @@ bool SceneLayout::isSpaceAvalable() const
 	return (m_items.size()<m_max_items);
 }
 
-bool SceneLayout::addItem(CLAbstractSceneItem* item, int x, int y, bool update_scene_rect)
-{
-	// new item should always be adjusted 
-	if (!isSpaceAvalable())
-		return false;
-
-	if (!item)
-		return false;
-
-	m_items.push_back(item);
-
-	m_scene->addItem(item);
-	item->setPos(x, y);
-
-	//=========
-
-	if (update_scene_rect)
-		updateSceneRect();
-
-	connect(item, SIGNAL(onAspectRatioChanged(CLAbstractSceneItem*)), this, SLOT(onAspectRatioChanged(CLAbstractSceneItem*)));
-
-	connect(item, SIGNAL(onPressed(CLAbstractSceneItem*)), this, SLOT(onItemPressed(CLAbstractSceneItem*)));
-
-	connect(item, SIGNAL(onDoubleClick(CLAbstractSceneItem*)), this, SLOT(onItemDoubleClick(CLAbstractSceneItem*)));
-	
-	connect(item, SIGNAL(onFullScreen(CLAbstractSceneItem*)), this, SLOT(onItemFullScreen(CLAbstractSceneItem*)));
-
-	connect(item, SIGNAL(onSelected(CLAbstractSceneItem*)), this, SLOT(onItemSelected(CLAbstractSceneItem* )));
-
-	
-
-	
-
-	return true;
-
-}
-
-bool SceneLayout::addItem(CLAbstractSceneItem* wnd, bool update_scene_rect )
-{
-	int x, y;
-
-	if (!getNextAvailablePos(wnd->getMaxSize(), x, y))
-		return false;
-
-	addItem(wnd, x, y, update_scene_rect);
-	wnd->setArranged(true);
-	return true;
-
-}
-
-
-// remove item from lay out
-void SceneLayout::removeItem(CLAbstractSceneItem* item, bool update_scene_rect )
-{
-	if (!item)
-		return;
-
-	m_items.removeOne(item);
-	m_scene->removeItem(item);
-
-	if (update_scene_rect)
-		updateSceneRect();
-
-
-}
 
 void SceneLayout::updateSceneRect()
 {
@@ -762,7 +776,7 @@ CLAbstractSceneItem* SceneLayout::next_item_helper(const CLAbstractSceneItem* cu
 
 void SceneLayout::onItemSelected(CLAbstractSceneItem* item)
 {
-	if (item->getType() == CLAbstractSceneItem::RECORDER)
+	if (item->getType() == CLAbstractSceneItem::RECORDER || item->getType() == CLAbstractSceneItem::LAYOUT)
 	{
 		CLRecorderItem* ritem = static_cast<CLRecorderItem*>(item);
 		emit onNewLayoutItemSelected(ritem->getRefContent());
@@ -771,7 +785,7 @@ void SceneLayout::onItemSelected(CLAbstractSceneItem* item)
 
 void SceneLayout::onItemFullScreen(CLAbstractSceneItem* item)
 {
-	if (item->getType() == CLAbstractSceneItem::RECORDER)
+	if (item->getType() == CLAbstractSceneItem::RECORDER || item->getType() == CLAbstractSceneItem::LAYOUT)
 	{
 		CLRecorderItem* ritem = static_cast<CLRecorderItem*>(item);
 		emit onNewLayoutSelected(m_content, ritem->getRefContent());
@@ -780,7 +794,7 @@ void SceneLayout::onItemFullScreen(CLAbstractSceneItem* item)
 
 void SceneLayout::onItemDoubleClick(CLAbstractSceneItem* item)
 {
-	if (item->getType() == CLAbstractSceneItem::RECORDER)
+	if (item->getType() == CLAbstractSceneItem::RECORDER || item->getType() == CLAbstractSceneItem::LAYOUT)
 	{
 		CLRecorderItem* ritem = static_cast<CLRecorderItem*>(item);
 		emit onNewLayoutSelected(m_content, ritem->getRefContent());
@@ -925,8 +939,9 @@ QList<CLIdealWndPos> SceneLayout::calcArrangedPos() const
 
 void SceneLayout::loadContent()
 {
-	QList<LayoutImage*> img_list = m_content->getImages();
-	QList<LayoutButton*> btns_list = m_content->getButtons();
+	QList<LayoutImage*>& img_list = m_content->getImages();
+	QList<LayoutButton*>& btns_list = m_content->getButtons();
+	QList<LayoutContent*>& children_list = m_content->childrenList();
 
 	foreach(LayoutImage* img, img_list)
 	{
@@ -940,6 +955,12 @@ void SceneLayout::loadContent()
 		
 		CLCustomBtnItem* item = new CLCustomBtnItem(m_view, btn->width(), btn->height(), btn->getName(), btn->getName(), "tiiktip text");
 		addItem(item, btn->getX(), btn->getY());
+	}
+
+	foreach(LayoutContent* children, children_list)
+	{
+		if (!children->isRecorder())
+			addLayoutItem(children->getName(), children, false);
 	}
 
 

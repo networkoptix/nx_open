@@ -9,6 +9,9 @@ CLLayoutItem::CLLayoutItem(GraphicsView* view, int max_width, int max_height, QS
 CLCustomBtnItem(view,max_width,max_height, name, "", tooltip),
 mContent(0)
 {
+
+	createPaths(width()/9);
+
 	m_type = LAYOUT;
 }
 

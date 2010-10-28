@@ -32,20 +32,21 @@ mText(text)
 
 	setToolTip(tooltipText);
 
-	mSmallRectPath = createRoundRectpath(width()*0.94,height()*0.94, width()/3);
-	mSmallRectPath.translate(width()*0.03, height()*0.03);
-
-	mRoundRectPath = createRoundRectpath(width(),height(), width()/3);
-	mShadowRectPath = mRoundRectPath.translated(100,100);
-	
-
-
 
 }
 
 CLCustomBtnItem::~CLCustomBtnItem()
 {
 
+}
+
+void CLCustomBtnItem::createPaths(int radius)
+{
+	mSmallRectPath = createRoundRectpath(width()*0.94,height()*0.94, radius);
+	mSmallRectPath.translate(width()*0.03, height()*0.03);
+
+	mRoundRectPath = createRoundRectpath(width(),height(), radius);
+	mShadowRectPath = mRoundRectPath.translated(100,100);
 }
 
 QPainterPath CLCustomBtnItem::createRoundRectpath(int width, int height, int radius)
