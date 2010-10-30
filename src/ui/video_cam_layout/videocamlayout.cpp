@@ -386,8 +386,8 @@ bool SceneLayout::addLayoutItem(QString name, LayoutContent* lc, bool update_sce
 
 	if (update_scene_rect)
 	{
-		m_view->centerOn(m_view->getRealSceneRect().center());
-		m_view->fitInView(2000);
+		//m_view->centerOn(m_view->getRealSceneRect().center());
+		m_view->fitInView(1000);
 	}
 
 	return true;
@@ -942,6 +942,7 @@ void SceneLayout::loadContent()
 	QList<LayoutImage*>& img_list = m_content->getImages();
 	QList<LayoutButton*>& btns_list = m_content->getButtons();
 	QList<LayoutContent*>& children_list = m_content->childrenList();
+	QList<LayoutDevice*>& devices_list = m_content->getDevices();
 
 	foreach(LayoutImage* img, img_list)
 	{
@@ -952,7 +953,6 @@ void SceneLayout::loadContent()
 
 	foreach(LayoutButton* btn, btns_list)
 	{
-		
 		CLCustomBtnItem* item = new CLCustomBtnItem(m_view, btn->width(), btn->height(), btn->getName(), btn->getName(), "tiiktip text");
 		addItem(item, btn->getX(), btn->getY());
 	}
@@ -961,6 +961,12 @@ void SceneLayout::loadContent()
 	{
 		if (!children->isRecorder())
 			addLayoutItem(children->getName(), children, false);
+	}
+
+	foreach(LayoutDevice* dev, devices_list)
+	{
+
+		addDevice(dev->getId(), false);
 	}
 
 

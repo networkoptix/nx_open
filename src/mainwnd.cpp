@@ -137,6 +137,7 @@ void MainWnd::goToLayouteditor()
 
 	m_editedView->setMode(LAYOUTEDITOR_ViewMode); 
 	m_editedView->getView().setViewMode(GraphicsView::ItemsAcceptor);
+	
 
 
 	QLayout* ml = new QHBoxLayout();

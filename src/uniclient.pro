@@ -83,8 +83,8 @@ HEADERS += ui/video_cam_layout/layout_manager.h ui/video_cam_layout/layout_conte
 HEADERS += recorder/recorder_device.h  recorder/fake_recorder_device.h  recorder/recorder_display.h
 SOURCES += recorder/recorder_device.cpp  recorder/fake_recorder_device.cpp recorder/recorder_display.cpp
 
-HEADERS += ui/videoitem/recorder_item.h ui/videoitem/layout_item.h ui/ui_common.h ui/context_menu_helper.h
-SOURCES += ui/videoitem/recorder_item.cpp ui/videoitem/layout_item.cpp ui/ui_common.cpp ui/context_menu_helper.cpp
+HEADERS += ui/videoitem/recorder_item.h ui/videoitem/layout_item.h ui/ui_common.h ui/context_menu_helper.h ui/view_drag_and_drop.h
+SOURCES += ui/videoitem/recorder_item.cpp ui/videoitem/layout_item.cpp ui/ui_common.cpp ui/context_menu_helper.cpp ui/view_drag_and_drop.cpp
 
 HEADERS += videodisplay/complicated_item.h
 SOURCES += videodisplay/complicated_item.cpp

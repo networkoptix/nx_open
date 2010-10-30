@@ -30,7 +30,7 @@ public:
 
 	void addButton(const QString& name, const QString& text, const QString& tooltip, int x, int y, int width, int height, int angle = 0);
 	void addImage(const QString& img, const QString& name, const QString& text, const QString& tooltip, int x, int y, int width, int height, int angle = 0);
-	void addDevice(const QString& uniqueId, int x, int y, int width, int height, int angle = 0);
+	void addDevice(const QString& uniqueId, int x=0, int y=0, int width=0, int height=0, int angle = 0);
 	void addLayout(LayoutContent* l, bool copy);
 
 

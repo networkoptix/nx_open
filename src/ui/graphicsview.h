@@ -66,6 +66,10 @@ protected:
 	void mouseMoveEvent ( QMouseEvent * e);
 	void mouseDoubleClickEvent ( QMouseEvent * e );
 	void contextMenuEvent ( QContextMenuEvent * event );
+
+	void dragEnterEvent ( QDragEnterEvent * event );
+	void dragMoveEvent ( QDragMoveEvent * event );
+	void dropEvent ( QDropEvent * event );
 	
 
 	virtual void keyPressEvent( QKeyEvent * e );

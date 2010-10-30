@@ -102,7 +102,7 @@ void CLDeviceManager::onTimer()
 
 	if (!m_dev_searcher.isRunning() )
 	{
-		onNewDevices_helper(m_dev_searcher.result(), "General Archiver");
+		onNewDevices_helper(m_dev_searcher.result(), "Recorder:General Archiver");
 
 		m_dev_searcher.start(); // run searcher again ...
 	}

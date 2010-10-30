@@ -20,6 +20,7 @@
 #include "context_menu_helper.h"
 #include <QInputDialog>
 #include "video_cam_layout/layout_manager.h"
+#include "view_drag_and_drop.h"
 
 
 
@@ -34,6 +35,7 @@ qreal selected_item_zoom = 1.63;
 
 extern QString button_home;
 extern QString button_level_up;
+extern QPixmap cached(const QString &img);
 //==============================================================================
 
 GraphicsView::GraphicsView(MainWnd* mainWnd):
@@ -114,6 +116,8 @@ m_fps_frames(0)
 	mShow.mTimer.setInterval(1000);
 	mShow.mTimer.start();
 
+	setAcceptDrops(true);
+
 }
 
 GraphicsView::~GraphicsView()
@@ -136,7 +140,10 @@ void GraphicsView::start()
 	mViewStarted = true;
 	centerOn(getRealSceneRect().center());
 	zoomMin(0);
+
+	
 	fitInView(3000);
+
 
 	enableMultipleSelection(false, true);
 
@@ -571,22 +578,44 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 	//item movement 
 	if (left_button && isCTRLPressed(event) && m_scene.selectedItems().count() && m_movingWnd)
 	{
-		m_movingWnd++;
-
-		m_handScrolling = false; // if we pressed CTRL after already moved the scene => stop move the scene and just move items
-
-		QPointF delta = mapToScene(event->pos()) - mapToScene(m_mousestate.getLastEventPoint());
-
-		foreach(QGraphicsItem* itm, m_scene.selectedItems())
+		if (m_viewMode!=ItemsDonor)
 		{
-			CLAbstractSceneItem* item = static_cast<CLAbstractSceneItem*>(itm);
-			//QPointF wnd_pos = item->scenePos(); <---- this does not work coz item zoom ;case1
-			QPointF wnd_pos = item->sceneBoundingRect().center();
+			m_movingWnd++;
+			m_handScrolling = false; // if we pressed CTRL after already moved the scene => stop move the scene and just move items
 
-			wnd_pos-=QPointF(item->boundingRect().width()/2, item->boundingRect().height()/2);
-			item->setPos(wnd_pos+delta);
-			item->setArranged(false);
+			QPointF delta = mapToScene(event->pos()) - mapToScene(m_mousestate.getLastEventPoint());
+
+			foreach(QGraphicsItem* itm, m_scene.selectedItems())
+			{
+				CLAbstractSceneItem* item = static_cast<CLAbstractSceneItem*>(itm);
+				//QPointF wnd_pos = item->scenePos(); <---- this does not work coz item zoom ;case1
+				QPointF wnd_pos = item->sceneBoundingRect().center();
+
+				wnd_pos-=QPointF(item->boundingRect().width()/2, item->boundingRect().height()/2);
+				item->setPos(wnd_pos+delta);
+				item->setArranged(false);
+			}
 		}
+		else
+		{
+			QByteArray itemData;
+			QDataStream dataStream(&itemData, QIODevice::WriteOnly);
+			items2DDstream(m_scene.selectedItems(), dataStream);
+
+			QMimeData *mimeData = new QMimeData;
+			mimeData->setData("hdwitness/layout-items", itemData);
+
+			QDrag *drag = new QDrag(this);
+			drag->setMimeData(mimeData);
+			drag->setPixmap(cached("./skin/camera_dd_icon.png"));
+			//drag->setPixmap(cached("./skin/logo.png"));
+
+			
+			drag->exec(Qt::CopyAction);
+			m_scene.clearSelection();
+			m_movingWnd = 0;
+		}
+
 	}
 
 
@@ -903,9 +932,11 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 	{
 		menu.addAction(&cm_fitinview);
 		menu.addAction(&cm_arrange);
-		menu.addMenu(&distance_menu);
+
 		if (m_camLayout.isEditable())
 			menu.addMenu(&layout_editor_menu);
+
+		menu.addMenu(&distance_menu);
 		menu.addAction(&cm_togglefs);
 		menu.addAction(&cm_exit);
 
@@ -1055,6 +1086,69 @@ void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
 
 	QGraphicsView::mouseDoubleClickEvent (e);
 }
+
+void GraphicsView::dragEnterEvent ( QDragEnterEvent * event )
+{
+
+	if (m_viewMode!=ItemsAcceptor)	
+	{
+		event->ignore();
+		return;
+	}
+
+	if (event->mimeData()->hasFormat("hdwitness/layout-items")) 
+	{
+		event->accept();
+	}
+}
+
+
+void GraphicsView::dragMoveEvent ( QDragMoveEvent * event )
+{
+	if (m_viewMode!=ItemsAcceptor)	
+	{
+		event->ignore();
+		return;
+	}
+
+	if (event->mimeData()->hasFormat("hdwitness/layout-items")) 
+	{
+		event->accept();
+	}
+}
+
+void GraphicsView::dropEvent ( QDropEvent * event )
+{
+	if (m_viewMode!=ItemsAcceptor || !event->mimeData()->hasFormat("hdwitness/layout-items"))
+	{
+		event->ignore();
+		return;
+	}
+
+	QByteArray itemData = event->mimeData()->data("hdwitness/layout-items");
+	QDataStream dataStream(&itemData, QIODevice::ReadOnly);
+
+	CLDragAndDropItems items;
+	DDstream2items(dataStream, items);
+
+	foreach(QString id, items.videodevices)
+	{
+		m_camLayout.getContent()->addDevice(id);
+		m_camLayout.addDevice(id);
+	}
+
+	foreach(QString id, items.recorders)
+	{
+		LayoutContent* lc =  CLSceneLayoutManager::instance().createRecorderContent(id);
+		m_camLayout.getContent()->addLayout(lc, false);
+		m_camLayout.addDevice(id);
+	}
+
+
+	if (!items.isEmpty())
+		fitInView(2000);
+}
+
 
 void GraphicsView::enableMultipleSelection(bool enable, bool unselect)
 {

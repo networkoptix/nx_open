@@ -31,6 +31,9 @@ public:
 	// returns layout with recorders 
 	LayoutContent* getAllRecordersContent();
 
+	// generates layout for this recorder
+	LayoutContent* createRecorderContent(QString id);
+
 
 	// returns layout with recorders and top level custom layouts
 	LayoutContent* getAllLayoutsContent();
@@ -45,7 +48,7 @@ public:
 
 
 private:
-	LayoutContent* createRecorderContent_helper(QString id);
+	
 private:
 	typedef QMap<QString, LayoutContent*> ContantsList;
 

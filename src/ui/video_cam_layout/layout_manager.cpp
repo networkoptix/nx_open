@@ -66,10 +66,10 @@ LayoutContent* CLSceneLayoutManager::getDefaultLayoutContent()
 
 void CLSceneLayoutManager::addRecorderLayoutContent( QString id )
 {
-	LayoutContent* cont1 = createRecorderContent_helper(id);
+	LayoutContent* cont1 = createRecorderContent(id);
 	mRootContent->addLayout(cont1, false);
 
-	LayoutContent* cont2 = createRecorderContent_helper(id);
+	LayoutContent* cont2 = createRecorderContent(id);
 	mAllRecorders->addLayout(cont2, false);
 
 }
@@ -103,7 +103,7 @@ LayoutContent* CLSceneLayoutManager::getEmptyLayoutContent()
 }
 
 //===============================================================================
-LayoutContent* CLSceneLayoutManager::createRecorderContent_helper(QString id)
+LayoutContent* CLSceneLayoutManager::createRecorderContent(QString id)
 {
 	LayoutContent* cont = new LayoutContent();
 	cont->addDecorationFlag(LayoutContent::HomeButton | LayoutContent::BackGroundLogo | LayoutContent::LevelUp);
