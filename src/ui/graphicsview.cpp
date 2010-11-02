@@ -152,6 +152,19 @@ void GraphicsView::start()
 
 void GraphicsView::stop()
 {
+	if (m_viewMode == ItemsAcceptor)
+	{
+		LayoutContent* root = CLSceneLayoutManager::instance().getAllLayoutsContent();
+
+
+		if (m_camLayout.getContent()->getParent()==0 && !root->hasSuchSublayout(m_camLayout.getContent()))
+		{
+			root->addLayout(m_camLayout.getContent(), false);
+			m_camLayout.getContent()->addDecorationFlag(LayoutContent::LevelUp);
+		}
+
+	}
+
 	stopAnimation(); // stops animation 
 	mViewStarted = false;
 	setZeroSelection(); 
@@ -910,7 +923,10 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 	}
 
 	if (m_viewMode==ItemsAcceptor)
+	{
 		layout_editor_menu.addAction(&cm_layout_editor_add_l);
+		layout_editor_menu.addAction(&cm_layout_editor_change_t);
+	}
 
 
 	layout_editor_menu.addAction(&cm_layout_editor_bgp);
@@ -1007,6 +1023,41 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 				m_camLayout.setContentChanged(true);
 				
 			}
+		}
+		else if (act == &cm_layout_editor_change_t)
+		{
+
+			bool ok;
+			QString name;
+			while(true)
+			{
+					name = UIgetText(this, tr("Rename current layout"), tr("Layout title:"), UIDisplayName(m_camLayout.getContent()->getName()), ok).trimmed();
+					if (!ok)
+						break;
+
+					if (name.isEmpty())
+					{
+						UIOKMessage(this, "", "Empty tittle cannot be used.");
+						continue;
+					}
+
+					name = QString("Layout:") + name;
+
+					LayoutContent* parent = m_camLayout.getContent()->getParent();
+					if (!parent)
+						parent = CLSceneLayoutManager::instance().getAllLayoutsContent();
+
+					if (!parent->hasSuchSublayoutName(name))
+						break;
+
+					UIOKMessage(this, "", "Such title layout already exists.");
+			}
+
+			if (ok)
+			{
+				m_camLayout.getContent()->setName(name);
+			}
+
 		}
 
 	}
@@ -1119,6 +1170,8 @@ void GraphicsView::dragMoveEvent ( QDragMoveEvent * event )
 
 void GraphicsView::dropEvent ( QDropEvent * event )
 {
+	bool empty_scene = m_camLayout.getItemList().count() == 0;
+
 	if (m_viewMode!=ItemsAcceptor || !event->mimeData()->hasFormat("hdwitness/layout-items"))
 	{
 		event->ignore();
@@ -1144,9 +1197,23 @@ void GraphicsView::dropEvent ( QDropEvent * event )
 		m_camLayout.addDevice(id);
 	}
 
+	foreach(int lcp, items.layoutlinks)
+	{
+		LayoutContent* lc = reinterpret_cast<LayoutContent*>(lcp);
+		m_camLayout.getContent()->addLayout(lc, true);
+		m_camLayout.addLayoutItem(lc->getName(), lc, false);
+	}
+
 
 	if (!items.isEmpty())
-		fitInView(2000);
+	{
+		m_camLayout.updateSceneRect();
+
+		if (empty_scene)
+			centerOn(getRealSceneRect().center());
+
+		fitInView(empty_scene ? 0 : 2000);
+	}
 }
 
 

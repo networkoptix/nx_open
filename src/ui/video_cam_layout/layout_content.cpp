@@ -5,7 +5,8 @@ LayoutContent::LayoutContent():
 m_cr(CLDeviceCriteria::NONE),
 mDecoration(0),
 m_recorder(false),
-m_editable(false)
+m_editable(false),
+m_parent(0)
 {
 	setName("Layout:unnamed");
 }
@@ -70,6 +71,17 @@ bool LayoutContent::hasSuchSublayoutName(const QString& name) const
 	return false;
 }
 
+bool LayoutContent::hasSuchSublayout(LayoutContent* p) const
+{
+	foreach (LayoutContent* cont, m_childlist)
+	{
+		if (cont==p)
+			return true;
+	}
+
+	return false;
+
+}
 
 bool LayoutContent::checkDecorationFlag(unsigned int flag) const
 {

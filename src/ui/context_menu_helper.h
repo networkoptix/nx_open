@@ -31,6 +31,7 @@ extern QAction cm_layout_editor_bgp_sz;
 extern QAction cm_layout_editor_save;
 extern QAction cm_layout_editor_save_as;
 extern QAction cm_layout_editor_add_l;
+extern QAction cm_layout_editor_change_t;
 
 
 

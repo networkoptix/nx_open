@@ -21,6 +21,7 @@ public:
 	void setRecorder();
 
 	bool hasSuchSublayoutName(const QString& name) const;
+	bool hasSuchSublayout(LayoutContent* p) const;
 
 	bool checkDecorationFlag(unsigned int flag) const;
 	void addDecorationFlag(unsigned int flag);
