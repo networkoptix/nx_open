@@ -34,7 +34,7 @@ private slots:
 
 private:
 	void closeEvent ( QCloseEvent * event );
-
+	void resizeEvent ( QResizeEvent * event);
 
 	void destroyNavigator(CLLayoutNavigator*& nav);
 private:

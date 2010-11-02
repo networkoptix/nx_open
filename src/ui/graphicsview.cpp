@@ -159,8 +159,6 @@ void GraphicsView::stop()
 	if (m_viewMode == ItemsAcceptor)
 	{
 		LayoutContent* root = CLSceneLayoutManager::instance().getAllLayoutsContent();
-
-
 		if (m_camLayout.getContent()->getParent()==0 && !root->hasSuchSublayout(m_camLayout.getContent()))
 		{
 			root->addLayout(m_camLayout.getContent(), false);
@@ -1021,9 +1019,19 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 				LayoutContent* lc = CLSceneLayoutManager::instance().getNewEmptyLayoutContent(LayoutContent::LevelUp);
 				lc->setName(name);
 
+				bool empty_layout = m_camLayout.getItemList().count() == 0;
+
 				m_camLayout.getContent()->addLayout(lc, false);
 				m_camLayout.addLayoutItem(name, lc);
 				m_camLayout.setContentChanged(true);
+
+				if (empty_layout)
+				{
+					m_camLayout.updateSceneRect();
+					centerOn(getRealSceneRect().center());
+					fitInView(0);
+				}
+
 				
 			}
 		}
@@ -1508,7 +1516,7 @@ void GraphicsView::resizeEvent( QResizeEvent * event )
 		//fitInView(getRealSceneRect(),Qt::KeepAspectRatio);
 	{
 		centerOn(getRealSceneRect().center());
-		invalidateScene();
+		fitInView(1000);
 	}
 
 }

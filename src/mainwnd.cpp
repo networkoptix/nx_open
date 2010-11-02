@@ -113,11 +113,8 @@ void MainWnd::goToLayouteditor()
 
 	//=======add====
 	m_topView = new CLLayoutNavigator(this,  CLSceneLayoutManager::instance().getAllLayoutsContent()); 
-	m_topView->getView().setMaximumWidth(600);
-	m_topView->getView().setMaximumHeight(500);
 
 	m_bottomView = new CLLayoutNavigator(this, CLSceneLayoutManager::instance().getEmptyLayoutContent()); 
-	m_bottomView->getView().setMaximumWidth(600);
 
 	m_editedView = new CLLayoutNavigator(this, CLSceneLayoutManager::instance().getNewEmptyLayoutContent());
 
@@ -152,6 +149,8 @@ void MainWnd::goToLayouteditor()
 
 	mMode = LAYOUTEDITOR_ViewMode;
 
+	resizeEvent(0);
+
 }
 
 
@@ -162,6 +161,26 @@ void MainWnd::closeEvent ( QCloseEvent * event )
 	destroyNavigator(m_bottomView);
 	destroyNavigator(m_editedView);
 
+}
+
+void MainWnd::resizeEvent ( QResizeEvent * event)
+{
+	if (mMode == LAYOUTEDITOR_ViewMode)
+	{
+		QSize sz = this->size();
+		m_topView->getView().setMaximumWidth(sz.width()/3);
+		m_bottomView->getView().setMaximumWidth(sz.width()/3);
+
+		m_topView->getView().setMaximumHeight(sz.height()/2);
+		m_bottomView->getView().setMaximumHeight(sz.height()/2);
+
+		if (event)
+		{
+			//m_topView->getView().fitInView(1000);
+			//m_bottomView->getView().fitInView(1000);
+			//m_editedView->getView().fitInView(1000);
+		}
+	}
 }
 
 

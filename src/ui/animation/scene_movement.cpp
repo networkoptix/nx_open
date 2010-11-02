@@ -92,7 +92,12 @@ void CLSceneMovement::move (QPointF dest, int duration, int delay)
 	m_startpoint = m_view->mapToScene(m_view->viewport()->rect().center());
 	m_delta = dest - m_startpoint;
 	
-	start_helper(duration, delay);
+	if (duration==0)
+	{
+		valueChanged(1.0);
+	}
+	else
+		start_helper(duration, delay);
 }
 
 void CLSceneMovement::valueChanged ( qreal dpos )
