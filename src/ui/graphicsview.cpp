@@ -134,6 +134,11 @@ void GraphicsView::setViewMode(ViewMode mode)
 	m_camLayout.setEditable(mode == NormalView || mode == ItemsAcceptor);
 }
 
+GraphicsView::ViewMode GraphicsView::getViewMode() const
+{
+	return m_viewMode;
+}
+
 void GraphicsView::start()
 {
 	m_ignore_release_event = false;
@@ -147,7 +152,6 @@ void GraphicsView::start()
 
 	enableMultipleSelection(false, true);
 
-	
 }
 
 void GraphicsView::stop()
@@ -160,7 +164,6 @@ void GraphicsView::stop()
 		if (m_camLayout.getContent()->getParent()==0 && !root->hasSuchSublayout(m_camLayout.getContent()))
 		{
 			root->addLayout(m_camLayout.getContent(), false);
-			m_camLayout.getContent()->addDecorationFlag(LayoutContent::LevelUp);
 		}
 
 	}

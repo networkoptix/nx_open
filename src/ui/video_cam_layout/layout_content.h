@@ -25,6 +25,7 @@ public:
 
 	bool checkDecorationFlag(unsigned int flag) const;
 	void addDecorationFlag(unsigned int flag);
+	void removeDecorationFlag(unsigned int flag);
 
 	void setParent(LayoutContent* parent);
 	LayoutContent* getParent() const;

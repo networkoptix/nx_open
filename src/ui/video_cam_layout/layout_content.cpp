@@ -93,6 +93,11 @@ void LayoutContent::addDecorationFlag(unsigned int flag)
 	mDecoration |= flag;
 }
 
+void LayoutContent::removeDecorationFlag(unsigned int flag)
+{
+	mDecoration &= ~flag;
+}
+
 
 void LayoutContent::setParent(LayoutContent* parent)
 {

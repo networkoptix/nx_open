@@ -54,6 +54,7 @@ public:
 	void initDecoration();
 
 	void setViewMode(ViewMode mode);
+	ViewMode getViewMode() const;
 
 
 signals:

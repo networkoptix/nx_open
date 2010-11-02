@@ -17,6 +17,7 @@
 #include "recorder/recorder_display.h"
 #include "ui/videoitem/recorder_item.h"
 #include "ui/videoitem/layout_item.h"
+#include "layout_manager.h"
 
 #define SLOT_WIDTH (640*10)
 #define SLOT_HEIGHT (SLOT_WIDTH*3/4)
@@ -117,6 +118,8 @@ void SceneLayout::start()
 	m_timer.start(100);
 	m_videotimer.start(1000/MAX_FPS); 
 	m_isRunning = true;
+
+
 }
 
 void SceneLayout::stop_helper(bool emt)
@@ -193,6 +196,15 @@ void SceneLayout::onTimer()
 	if (m_firstTime)
 	{
 		m_view->zoomMin(0);
+
+		if (getContent()->getParent()) // if layout has parent add LevelUp decoration
+			getContent()->addDecorationFlag(LayoutContent::LevelUp);
+
+		// if this is ItemsAcceptor( the layout we are editing now ) and parent is roor we should not go to the root
+		if (m_view->getViewMode()==GraphicsView::ItemsAcceptor && getContent()->getParent() == CLSceneLayoutManager::instance().getAllLayoutsContent())
+			getContent()->removeDecorationFlag(LayoutContent::LevelUp);
+
+
 		m_view->initDecoration();
 		loadContent();
 	}
