@@ -174,37 +174,38 @@ LayoutContent* LayoutContent::coppyLayout(LayoutContent* l)
 	LayoutContent* result = new LayoutContent();
 	*result = *l; // this copy everything including lists of pointers; we do not need that;
 
-	m_imgs.clear();
-	m_btns.clear();
-	m_devices.clear();
-	m_childlist.clear();
+	result->m_imgs.clear();
+	result->m_btns.clear();
+	result->m_devices.clear();
+	result->m_childlist.clear();
 
 	foreach (LayoutImage* item, l->m_imgs)
 	{
 		LayoutImage* iteml = new LayoutImage();
 		*iteml = *item;
-		m_imgs.push_back(iteml);
+		result->m_imgs.push_back(iteml);
 	}
 
 	foreach (LayoutButton* item, l->m_btns)
 	{
 		LayoutButton* iteml = new LayoutButton();
 		*iteml = *item;
-		m_btns.push_back(iteml);
+		result->m_btns.push_back(iteml);
 	}
 
 	foreach (LayoutDevice* item, l->m_devices)
 	{
 		LayoutDevice* iteml = new LayoutDevice();
 		*iteml = *item;
-		m_devices.push_back(iteml);
+		result->m_devices.push_back(iteml);
 	}
 
 
 	foreach (LayoutContent* cont, l->m_childlist)
 	{
 		LayoutContent* contl = coppyLayout(cont);
-		m_childlist.push_back(contl);
+		contl->setParent(result);
+		result->m_childlist.push_back(contl);
 	}
 
 

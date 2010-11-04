@@ -156,11 +156,16 @@ void GraphicsView::start()
 
 void GraphicsView::stop()
 {
+
 	if (m_viewMode == ItemsAcceptor)
 	{
+
+		//&& m_camLayout.isContentChanged()
+
 		LayoutContent* root = CLSceneLayoutManager::instance().getAllLayoutsContent();
 		if (m_camLayout.getContent()->getParent()==0 && !root->hasSuchSublayout(m_camLayout.getContent()))
 		{
+
 			root->addLayout(m_camLayout.getContent(), false);
 		}
 
@@ -1208,12 +1213,14 @@ void GraphicsView::dropEvent ( QDropEvent * event )
 		m_camLayout.addDevice(id);
 	}
 
+	
 	foreach(int lcp, items.layoutlinks)
 	{
 		LayoutContent* lc = reinterpret_cast<LayoutContent*>(lcp);
 		m_camLayout.getContent()->addLayout(lc, true);
 		m_camLayout.addLayoutItem(lc->getName(), lc, false);
 	}
+	/**/
 
 
 	if (!items.isEmpty())
@@ -1224,6 +1231,8 @@ void GraphicsView::dropEvent ( QDropEvent * event )
 			centerOn(getRealSceneRect().center());
 
 		fitInView(empty_scene ? 0 : 2000);
+
+		m_camLayout.setContentChanged(true);
 	}
 }
 

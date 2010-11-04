@@ -46,7 +46,7 @@ public:
 	QList<LayoutContent*>& childrenList();
 	
 protected:
-	LayoutContent* coppyLayout(LayoutContent* l);
+	static LayoutContent* coppyLayout(LayoutContent* l);
 protected:
 	QList<LayoutImage*> m_imgs;
 	QList<LayoutButton*> m_btns;
