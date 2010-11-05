@@ -4,10 +4,11 @@
 
 
 
-CLSceneLayoutManager::CLSceneLayoutManager()
+CLSceneLayoutManager::CLSceneLayoutManager():
+mRecordersAndLayouts(0)
 {
-	mRootContent = new LayoutContent();
-	mRootContent->addDecorationFlag(LayoutContent::HomeButton | LayoutContent::BackGroundLogo );
+	mAllCustomLayouts = new LayoutContent();
+	mAllCustomLayouts->addDecorationFlag(LayoutContent::HomeButton | LayoutContent::BackGroundLogo );
 	load();
 
 	mAllRecorders = new LayoutContent();
@@ -19,13 +20,8 @@ CLSceneLayoutManager::CLSceneLayoutManager()
 
 CLSceneLayoutManager::~CLSceneLayoutManager()
 {
-	foreach(LayoutContent* cont, mCustomContents)
-	{
-		delete cont;
-	}
-	
 
-	delete mRootContent;
+	delete mAllCustomLayouts;
 	delete mAllRecorders;
 	delete mEmptyLayout;
 
@@ -54,10 +50,6 @@ LayoutContent* CLSceneLayoutManager::startScreenLayoutContent()
 	return &(startscreen_content());
 }
 
-bool CLSceneLayoutManager::hasCustomLayoutsContent() const
-{
-	return (mCustomContents.count()>0);
-}
 
 LayoutContent* CLSceneLayoutManager::getDefaultLayoutContent()
 {
@@ -66,12 +58,8 @@ LayoutContent* CLSceneLayoutManager::getDefaultLayoutContent()
 
 void CLSceneLayoutManager::addRecorderLayoutContent( QString id )
 {
-	LayoutContent* cont1 = createRecorderContent(id);
-	mRootContent->addLayout(cont1, false);
-
-	LayoutContent* cont2 = createRecorderContent(id);
-	mAllRecorders->addLayout(cont2, false);
-
+	LayoutContent* cont = createRecorderContent(id);
+	mAllRecorders->addLayout(cont, false);
 }
 
 LayoutContent* CLSceneLayoutManager::getAllRecordersContent()
@@ -81,7 +69,31 @@ LayoutContent* CLSceneLayoutManager::getAllRecordersContent()
 
 LayoutContent* CLSceneLayoutManager::getAllLayoutsContent()
 {
-	return mRootContent;
+	return mAllCustomLayouts;
+}
+
+LayoutContent* CLSceneLayoutManager::generateAllRecordersAndLayouts()
+{
+	delete mRecordersAndLayouts;
+
+	mRecordersAndLayouts = new LayoutContent();
+	CLDeviceCriteria cr(CLDeviceCriteria::NONE);
+	mRecordersAndLayouts->setDeviceCriteria(cr);
+
+
+	QList<LayoutContent*>& childrenlst1 = mAllCustomLayouts->childrenList();
+	foreach(LayoutContent* cont,  childrenlst1)
+	{
+		mRecordersAndLayouts->addLayout(cont, true);
+	}
+
+	QList<LayoutContent*>& childrenlst2 = mAllRecorders->childrenList();
+	foreach(LayoutContent* cont,  childrenlst2)
+	{
+		mRecordersAndLayouts->addLayout(cont, true);
+	}
+
+	return mRecordersAndLayouts;
 }
 
 LayoutContent* CLSceneLayoutManager::getNewEmptyLayoutContent(unsigned int flags )

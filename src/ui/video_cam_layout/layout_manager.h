@@ -20,24 +20,26 @@ public:
 	// start screen 
 	LayoutContent* startScreenLayoutContent();
 
-	// return true if we have at least one custome layout
-	bool hasCustomLayoutsContent() const;
-
 	// if we have custom layouts and one of them default
 	LayoutContent* getDefaultLayoutContent();
 
+	// if new recorder in the system, this functioun should be called 
 	void addRecorderLayoutContent(QString id);
-
-	// returns layout with recorders 
-	LayoutContent* getAllRecordersContent();
 
 	// generates layout for this recorder
 	LayoutContent* createRecorderContent(QString id);
+
+	// returns layout with recorders 
+	LayoutContent* getAllRecordersContent();
 
 
 	// returns layout with recorders and top level custom layouts
 	LayoutContent* getAllLayoutsContent();
 
+	
+	// old one will be deleted 
+	// such layout mostly will be used for layout editor
+	LayoutContent* generateAllRecordersAndLayouts();
 
 	// creates new blank lay out content
 	// client responsible for deleting this one 
@@ -50,14 +52,12 @@ public:
 private:
 	
 private:
-	typedef QMap<QString, LayoutContent*> ContantsList;
-
-	ContantsList mCustomContents;
-
-	LayoutContent* mRootContent;
+	LayoutContent* mAllCustomLayouts;
 	LayoutContent* mAllRecorders;
 
 	LayoutContent* mEmptyLayout;
+
+	LayoutContent* mRecordersAndLayouts;
 	
 
 };

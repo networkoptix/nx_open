@@ -112,7 +112,7 @@ void MainWnd::goToLayouteditor()
 
 
 	//=======add====
-	m_topView = new CLLayoutNavigator(this,  CLSceneLayoutManager::instance().getAllLayoutsContent()); 
+	m_topView = new CLLayoutNavigator(this,  CLSceneLayoutManager::instance().generateAllRecordersAndLayouts()); 
 
 	m_bottomView = new CLLayoutNavigator(this, CLSceneLayoutManager::instance().getEmptyLayoutContent()); 
 
@@ -173,13 +173,6 @@ void MainWnd::resizeEvent ( QResizeEvent * event)
 
 		m_topView->getView().setMaximumHeight(sz.height()/2);
 		m_bottomView->getView().setMaximumHeight(sz.height()/2);
-
-		if (event)
-		{
-			//m_topView->getView().fitInView(1000);
-			//m_bottomView->getView().fitInView(1000);
-			//m_editedView->getView().fitInView(1000);
-		}
 	}
 }
 
