@@ -24,6 +24,7 @@ CLSceneLayoutManager::~CLSceneLayoutManager()
 	delete mAllCustomLayouts;
 	delete mAllRecorders;
 	delete mEmptyLayout;
+	delete mRecordersAndLayouts;
 
 
 	save();
