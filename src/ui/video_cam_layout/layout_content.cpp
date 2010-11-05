@@ -124,7 +124,7 @@ void LayoutContent::addDevice(const QString& uniqueId, int x, int y, int width, 
 	m_devices.push_back(new LayoutDevice(uniqueId, x, y, width, height, angle));
 }
 
-void LayoutContent::addLayout(LayoutContent* l, bool copy)
+LayoutContent* LayoutContent::addLayout(LayoutContent* l, bool copy)
 {
 	if (copy)
 		m_childlist.push_back(coppyLayout(l));
@@ -132,6 +132,8 @@ void LayoutContent::addLayout(LayoutContent* l, bool copy)
 		m_childlist.push_back(l);
 
 	m_childlist.back()->setParent(this);
+
+	return m_childlist.back();
 
 }
 

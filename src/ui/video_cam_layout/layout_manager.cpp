@@ -20,14 +20,12 @@ mRecordersAndLayouts(0)
 
 CLSceneLayoutManager::~CLSceneLayoutManager()
 {
+	save();
 
 	delete mAllCustomLayouts;
 	delete mAllRecorders;
 	delete mEmptyLayout;
 	delete mRecordersAndLayouts;
-
-
-	save();
 }
 
 CLSceneLayoutManager& CLSceneLayoutManager::instance()

@@ -1217,8 +1217,8 @@ void GraphicsView::dropEvent ( QDropEvent * event )
 	foreach(int lcp, items.layoutlinks)
 	{
 		LayoutContent* lc = reinterpret_cast<LayoutContent*>(lcp);
-		m_camLayout.getContent()->addLayout(lc, true);
-		m_camLayout.addLayoutItem(lc->getName(), lc, false);
+		LayoutContent* t = m_camLayout.getContent()->addLayout(lc, true);
+		m_camLayout.addLayoutItem(lc->getName(), t, false);
 	}
 	/**/
 
