@@ -69,6 +69,7 @@ protected:
 
 	virtual void drawFPS(QPainter* painter);
 	virtual void drawLostConnection(QPainter* painter);
+	virtual void drawGLfailaure(QPainter* painter);
 
 	
 	void saveGLState();

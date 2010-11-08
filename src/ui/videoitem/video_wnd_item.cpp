@@ -193,7 +193,11 @@ void CLVideoWindowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
 	painter->beginNativePainting();
 	saveGLState();
 
-	for (int i = 0; i  < m_videonum; ++i)	m_gldraw[i]->paintEvent(getSubChannelRect(i));
+	for (int i = 0; i  < m_videonum; ++i)
+	{
+		if (!m_gldraw[i]->paintEvent(getSubChannelRect(i)))
+			drawGLfailaure(painter);
+	}
 
 	// restore the GL state that QPainter expects
 	
@@ -258,6 +262,34 @@ void CLVideoWindowItem::drawFPS(QPainter* painter)
 		painter->drawText(rect.left(),rect.top()+170 + fm.height()/2, fps);
 
 	}
+
+}
+
+void CLVideoWindowItem::drawGLfailaure(QPainter* painter)
+{
+	painter->setFont(m_FPS_Font);
+
+	QString text;
+	QTextStream(&text) << tr("Image size is bigger than MAXGlTixtureSize(") << m_gldraw[0]->getMaxTextureSize() << ") on this video hardware. Such images cannot be displayed in this version." ;
+
+	
+
+
+	QFontMetrics metrics = QFontMetrics(m_FPS_Font);
+	int border = qMax(4, metrics.leading());
+
+	QRect rect(0, 0, width() , height());
+
+
+
+	painter->fillRect(QRect(0, 0, width(), height()),
+		QColor(255, 0, 0, 85));
+
+	painter->setPen(QColor(255, 0, 0, 110));
+
+	painter->drawText((width() - rect.width())/2, border,
+		rect.width(), rect.height(),
+		Qt::AlignCenter | Qt::TextWordWrap, text);
 
 }
 

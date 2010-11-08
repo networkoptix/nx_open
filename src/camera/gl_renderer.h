@@ -23,9 +23,13 @@ public:
 
 	CLGLRenderer(CLVideoWindowItem *vw);
 	~CLGLRenderer();
+
+	int getMaxTextureSize() const;
+
+
 	void draw(CLVideoDecoderOutput& image, unsigned int channel);
 
-	void paintEvent(const QRect& r);
+	bool paintEvent(const QRect& r);
 
 	virtual void before_destroy();
 
@@ -144,6 +148,8 @@ private:
 	bool m_do_not_need_to_wait_any_more;
 
 	static QList<GLuint*> mGarbage;
+
+	GLint mTexSize;
 
 };
 

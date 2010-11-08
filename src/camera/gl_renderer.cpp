@@ -41,7 +41,7 @@
 #endif
 
 
-#define OGL_CHECK_ERROR(str);// if (checkOpenGLError() != GL_NO_ERROR) {cl_log.log(str, __LINE__ , cl_logERROR); }
+#define OGL_CHECK_ERROR(str)// if (checkOpenGLError() != GL_NO_ERROR) {cl_log.log(str, __LINE__ , cl_logERROR); }
 
 // arbfp1 fragment program for converting yuv (YV12) to rgb
 static const char yv12ToRgb[] =
@@ -145,6 +145,10 @@ m_textureUploaded(false)
 {
 	applyMixerSettings(m_brightness, m_contrast, m_hue, m_saturation);
 
+	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &mTexSize); 
+	cl_log.log("Max Texture size: ", mTexSize,cl_logALWAYS);
+
+
 }
 
 int CLGLRenderer::checkOpenGLError() const
@@ -231,24 +235,20 @@ void CLGLRenderer::init(bool msgbox)
 	if (version) 
 	{
 		//CL_LOG(cl_logWARNING) cl_log.log(,cl_logWARNING);
-		CL_LOG(cl_logWARNING) cl_log.log("OpenGL version: ", version, cl_logINFO);
+		CL_LOG(cl_logWARNING) cl_log.log("OpenGL version: ", version, cl_logALWAYS);
 	}
 
 	const uchar* renderer = glGetString(GL_RENDERER);
 	if (renderer) 
 	{
-		CL_LOG(cl_logWARNING) cl_log.log("Renderer: ", reinterpret_cast<const char *>(renderer),cl_logINFO);
+		CL_LOG(cl_logWARNING) cl_log.log("Renderer: ", reinterpret_cast<const char *>(renderer),cl_logALWAYS);
 	}
 
 	const uchar* vendor = glGetString(GL_VENDOR);
 	if (vendor) 
 	{
-		CL_LOG(cl_logWARNING) cl_log.log("Vendor: ", reinterpret_cast<const char *>(vendor),cl_logINFO);
+		CL_LOG(cl_logWARNING) cl_log.log("Vendor: ", reinterpret_cast<const char *>(vendor),cl_logALWAYS);
 	}
-
-	GLint texSize; 
-	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &texSize); 
-	cl_log.log("Max Texture size: ", texSize,cl_logINFO);
 
 
 	//version = "1.0.7";
@@ -373,6 +373,11 @@ void CLGLRenderer::init(bool msgbox)
 
 	gl_status = CL_GL_SUPPORTED;
 
+}
+
+int CLGLRenderer::getMaxTextureSize() const
+{
+	return mTexSize;
 }
 
 void CLGLRenderer::before_destroy()
@@ -750,12 +755,11 @@ void CLGLRenderer::drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const
 }
 
 
-void CLGLRenderer::paintEvent(const QRect& r)
+bool CLGLRenderer::paintEvent(const QRect& r)
 {
 
-
 	if (m_abort_drawing)
-		return;
+		return true;
 
 	if (!m_inited)
 	{
@@ -764,41 +768,41 @@ void CLGLRenderer::paintEvent(const QRect& r)
 	}
 
 	
-	//cl_log.log("begin of paint event", cl_logDEBUG1);
-	
-	
 	
 	QMutexLocker locker(&m_mutex);
 
 	if (m_stride == 0)
+		return true;
+
+
+	bool draw = (m_width < mTexSize) && (m_height < mTexSize);
+
+	if (draw)
 	{
-		//QGLWidget::paintEvent(event);
-		//cl_log.log("end(0) of paint event", cl_logDEBUG1);
-		return;
+			if (m_gotnewimage)	updateTexture();
+
+			m_painterOpacity = 1.0;
+			QRect temp;
+			//QRect r(0,0,m_videowindow->width(),m_videowindow->height());
+			float sar = 1.0f;
+
+			temp.setLeft(r.left());	temp.setTop(r.top());
+			temp.setWidth(r.width());
+			temp.setHeight(r.height());
+
+			//getTextureRect(temp, m_stride, m_height, r.width(), r.height(), sar);
+
+
+
+			const float v_array[] = { temp.left(), temp.top(), temp.right()+1, temp.top(), temp.right()+1, temp.bottom()+1, temp.left(), temp.bottom()+1 };
+			drawVideoTexture(m_texture[0], m_texture[1], m_texture[2], v_array);
+			/**/
 	}
 	
-	if (m_gotnewimage)	updateTexture();
-	
-	m_painterOpacity = 1.0;
-	QRect temp;
-	//QRect r(0,0,m_videowindow->width(),m_videowindow->height());
-	float sar = 1.0f;
-
-	temp.setLeft(r.left());	temp.setTop(r.top());
-	temp.setWidth(r.width());
-	temp.setHeight(r.height());
-
-	//getTextureRect(temp, m_stride, m_height, r.width(), r.height(), sar);
-
-	
-
-	const float v_array[] = { temp.left(), temp.top(), temp.right()+1, temp.top(), temp.right()+1, temp.bottom()+1, temp.left(), temp.bottom()+1 };
-	drawVideoTexture(m_texture[0], m_texture[1], m_texture[2], v_array);
-	/**/
-
-	
 	m_waitCon.wakeOne();
-	//m_do_not_need_to_wait_any_more = true;
+	m_do_not_need_to_wait_any_more = true;
+
+	return draw;
 }
 
 
