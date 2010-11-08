@@ -147,7 +147,7 @@ void GraphicsView::start()
 	zoomMin(0);
 
 	
-	fitInView(3000);
+	fitInView(3000, 0);
 
 
 	enableMultipleSelection(false, true);
@@ -850,7 +850,19 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 			{
 				// new item selected 
 				
-				onNewItemSelected_helper(wnd, qApp->doubleClickInterval()/2);
+				onNewItemSelected_helper(wnd, qApp->doubleClickInterval()*0.6);
+			}
+			else if (wnd && wnd==m_selectedWnd && !m_selectedWnd->isFullScreen()) // else must be here coz onNewItemSelected_helper change things 
+			{
+				// clicked on the same already selected item, fit in view ?
+				
+
+				if (!isItemFullScreenZoomed(wnd)) // check if wnd is manually zoomed; without double click
+					fitInView(item_select_duration, qApp->doubleClickInterval()*0.6);
+				else
+					wnd->setFullScreen(true);
+
+
 			}
 
 	}
@@ -983,7 +995,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 		}
 		else if (act== &cm_fitinview)
 		{
-			fitInView();
+			fitInView(600, 0);
 		}
 		else if (act== &cm_arrange)
 		{
@@ -1034,7 +1046,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 				{
 					m_camLayout.updateSceneRect();
 					centerOn(getRealSceneRect().center());
-					fitInView(0);
+					fitInView(0, 0);
 				}
 
 				
@@ -1230,7 +1242,7 @@ void GraphicsView::dropEvent ( QDropEvent * event )
 		if (empty_scene)
 			centerOn(getRealSceneRect().center());
 
-		fitInView(empty_scene ? 0 : 2000);
+		fitInView(empty_scene ? 0 : 2000, 0);
 
 		m_camLayout.setContentChanged(true);
 	}
@@ -1448,6 +1460,19 @@ bool GraphicsView::isCTRLPressed(const QInputEvent* event) const
 	return event->modifiers() & Qt::ControlModifier;
 }
 
+bool GraphicsView::isItemFullScreenZoomed(QGraphicsItem* item)
+{
+	QRectF scene_rect =  item->sceneBoundingRect();
+	QRect item_view_rect = mapFromScene(scene_rect).boundingRect();
+
+	if (item_view_rect.width() > viewport()->width()*1.01 || item_view_rect.height() > viewport()->height()*1.01)
+		return true;
+
+	
+	return false;
+
+}
+
 void GraphicsView::drawBackground ( QPainter * painter, const QRectF & rect )
 {
 	
@@ -1525,7 +1550,7 @@ void GraphicsView::resizeEvent( QResizeEvent * event )
 		//fitInView(getRealSceneRect(),Qt::KeepAspectRatio);
 	{
 		centerOn(getRealSceneRect().center());
-		fitInView(1000);
+		fitInView(1000, 0);
 	}
 
 }
@@ -1569,14 +1594,14 @@ bool GraphicsView::isItemStillExists(const CLAbstractSceneItem* wnd) const
 
 void GraphicsView::toggleFullScreen_helper(CLAbstractSceneItem* wnd)
 {
-	if (!wnd->isFullScreen() || m_scenezoom.getZoom() > m_fullScreenZoom + 1e-8) // if item is not in full screen mode or if it's in FS and zoomed more
+	if (!wnd->isFullScreen() || isItemFullScreenZoomed(wnd) ) // if item is not in full screen mode or if it's in FS and zoomed more
 		onItemFullScreen_helper(wnd);
 	else
 	{
 		// escape FS MODE
 		setZeroSelection();
 		wnd->setFullScreen(false);
-		fitInView(800);
+		fitInView(800, 0);
 	}
 }
 
@@ -1777,7 +1802,7 @@ void GraphicsView::onArrange_helper()
 	
 }
 
-void GraphicsView::fitInView(int duration )
+void GraphicsView::fitInView(int duration, int delay )
 {
 	stopGroupAnimation();
 
@@ -1791,7 +1816,7 @@ void GraphicsView::fitInView(int duration )
 	m_camLayout.updateSceneRect();
 	QRectF item_rect = m_camLayout.getSmallLayoutRect();
 
-	m_movement.move(item_rect.center(), duration);
+	m_movement.move(item_rect.center(), duration, delay);
 
 	
 	QRectF viewRect = viewport()->rect();
@@ -1820,7 +1845,7 @@ void GraphicsView::fitInView(int duration )
 	//scale(scl, scl);
 
 	
-	m_scenezoom.zoom_abs(zoom, duration);
+	m_scenezoom.zoom_abs(zoom, duration, delay);
 
 }
 
@@ -1876,7 +1901,6 @@ void GraphicsView::onItemFullScreen_helper(CLAbstractSceneItem* wnd)
 
 
 	
-	m_fullScreenZoom = zoom; // memorize full screen zoom
 
 	wnd->setItemSelected(true,false); // do not animate
 	m_selectedWnd = wnd;

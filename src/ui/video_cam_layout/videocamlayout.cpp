@@ -263,7 +263,7 @@ void SceneLayout::onTimer()
 	if (added && !m_firstTime)
 	{
 		m_view->centerOn(m_view->getRealSceneRect().center());
-		m_view->fitInView(2000);
+		m_view->fitInView(2000, 0);
 	}
 
 
@@ -399,7 +399,7 @@ bool SceneLayout::addLayoutItem(QString name, LayoutContent* lc, bool update_sce
 	if (update_scene_rect)
 	{
 		//m_view->centerOn(m_view->getRealSceneRect().center());
-		m_view->fitInView(1000);
+		m_view->fitInView(1000, 0);
 	}
 
 	return true;

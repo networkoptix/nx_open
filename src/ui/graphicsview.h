@@ -112,9 +112,11 @@ protected:
 	void enableMultipleSelection(bool enable, bool unselect = true); 
 	bool isCTRLPressed(const QInputEvent* event) const;
 
+	bool isItemFullScreenZoomed(QGraphicsItem* item);
+
 public slots:
 	
-	void fitInView(int duration = 600);
+	void fitInView(int duration = 600 , int delay = 0);
 private slots:
 	void onScneZoomFinished();
 	void onShowTimer();
@@ -157,8 +159,6 @@ protected:
 
 
 	bool m_ignore_release_event, m_ignore_conext_menu_event;
-
-	qreal m_fullScreenZoom;
 
 	MainWnd* mMainWnd;
 
