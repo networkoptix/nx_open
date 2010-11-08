@@ -51,8 +51,8 @@ SOURCES += device_plugins/fake/streamreader/fake_file_streamreader.cpp
 HEADERS += device_plugins/fake/devices/fake_device_server.h device_plugins/fake/devices/fake_device.h
 HEADERS += device_plugins/fake/streamreader/fake_file_streamreader.h
 
-SOURCES +=ui/graphicsview.cpp ui/videoitem/loup_wnd.cpp ui/layout_navigator.cpp
-HEADERS +=ui/graphicsview.h  ui/videoitem/loup_wnd.h  ui/layout_navigator.h
+SOURCES +=ui/graphicsview.cpp ui/videoitem/loup_wnd.cpp ui/layout_navigator.cpp ui/layout_editor_wnd.cpp
+HEADERS +=ui/graphicsview.h  ui/videoitem/loup_wnd.h  ui/layout_navigator.h  ui/layout_editor_wnd.h
 
 HEADERS +=ui/videoitem/abstract_scene_item.h  ui/videoitem/static_image_item.h  ui/videoitem/custom_draw_button.h ui/videoitem/img_item.h ui/videoitem/video_wnd_item.h 
 SOURCES +=ui/videoitem/abstract_scene_item.cpp  ui/videoitem/static_image_item.cpp ui/videoitem/custom_draw_button.cpp ui/videoitem/img_item.cpp ui/videoitem/video_wnd_item.cpp

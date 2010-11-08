@@ -10,7 +10,7 @@ class QHBoxLayout;
 class QVBoxLayout;
 class LayoutContent;
 
-//class MainWnd : public QMainWindow
+//class MainWnd : public QDialog
 class MainWnd : public QWidget
 {
 	Q_OBJECT
