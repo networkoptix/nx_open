@@ -948,31 +948,40 @@ void SceneLayout::loadContent()
 	QList<LayoutContent*>& children_list = m_content->childrenList();
 	QList<LayoutDevice*>& devices_list = m_content->getDevices();
 
+	bool added = false;
+
 	foreach(LayoutImage* img, img_list)
 	{
 		CLStaticImageItem* item = new CLStaticImageItem(m_view, img->width(), img->height(), img->getImage(), img->getName());
 		item->setOpacity(0.8);
 		addItem(item, img->getX(), img->getY());
+		added = true;
 	}
 
 	foreach(LayoutButton* btn, btns_list)
 	{
 		CLCustomBtnItem* item = new CLCustomBtnItem(m_view, btn->width(), btn->height(), btn->getName(), btn->getName(), "tiiktip text");
 		addItem(item, btn->getX(), btn->getY());
+		added = true;
 	}
 
 	foreach(LayoutContent* children, children_list)
 	{
 		if (!children->isRecorder())
+		{
 			addLayoutItem(children->getName(), children, false);
+			added = true;
+		}
 	}
 
 	foreach(LayoutDevice* dev, devices_list)
 	{
-
 		addDevice(dev->getId(), false);
+		added = true;
 	}
 
+	if (added)
+		updateSceneRect();
 
 }
 
