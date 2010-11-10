@@ -54,7 +54,9 @@ void CLLayoutNavigator::destroy()
 {
 	m_videoView.getCamLayOut().stop();
 	m_videoView.closeAllDlg();
-	CLGLRenderer::clearGarbage();
+
+	//if (m_mode==NORMAL_ViewMode)
+		CLGLRenderer::clearGarbage();
 }
 
 void CLLayoutNavigator::setMode(ViewMode mode)

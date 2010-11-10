@@ -184,6 +184,11 @@ void CLGLRenderer::clearGarbage()
 {
 	//return;
 
+	if (mGarbage.count())
+	{
+		int n = 0;
+	}
+
 	foreach(GLuint* heap, mGarbage)
 	{
 		glDeleteTextures(3, heap);
