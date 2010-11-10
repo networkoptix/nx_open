@@ -21,7 +21,7 @@ public:
 	void setRecorder();
 
 	bool hasSuchSublayoutName(const QString& name) const;
-	bool hasSuchSublayout(LayoutContent* p) const;
+	
 
 	bool checkDecorationFlag(unsigned int flag) const;
 	void addDecorationFlag(unsigned int flag);
@@ -37,6 +37,8 @@ public:
 	// return l if copy is false, else returns copy of l
 	LayoutContent* addLayout(LayoutContent* l, bool copy);
 
+	// removes such layout if exists. if del then delete it 
+	void removeLayout(LayoutContent* l, bool del);
 
 	void setDeviceCriteria(const CLDeviceCriteria& cr);
 	CLDeviceCriteria getDeviceCriteria() const;
@@ -47,8 +49,9 @@ public:
 
 	QList<LayoutContent*>& childrenList();
 	
-protected:
 	static LayoutContent* coppyLayout(LayoutContent* l);
+
+	
 protected:
 	QList<LayoutImage*> m_imgs;
 	QList<LayoutButton*> m_btns;

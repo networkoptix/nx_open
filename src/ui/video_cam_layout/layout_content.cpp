@@ -71,17 +71,6 @@ bool LayoutContent::hasSuchSublayoutName(const QString& name) const
 	return false;
 }
 
-bool LayoutContent::hasSuchSublayout(LayoutContent* p) const
-{
-	foreach (LayoutContent* cont, m_childlist)
-	{
-		if (cont==p)
-			return true;
-	}
-
-	return false;
-
-}
 
 bool LayoutContent::checkDecorationFlag(unsigned int flag) const
 {
@@ -135,6 +124,13 @@ LayoutContent* LayoutContent::addLayout(LayoutContent* l, bool copy)
 
 	return m_childlist.back();
 
+}
+
+void LayoutContent::removeLayout(LayoutContent* l, bool del)
+{
+	m_childlist.removeOne(l);
+	if (del) 
+		delete l;
 }
 
 

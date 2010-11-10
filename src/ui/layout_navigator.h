@@ -10,7 +10,7 @@ class CLLayoutNavigator : public QObject
 {
 	Q_OBJECT
 public:
-	CLLayoutNavigator(MainWnd* mainWnd, LayoutContent* content = 0);
+	CLLayoutNavigator(QWidget* mainWnd, LayoutContent* content = 0);
 	~CLLayoutNavigator();
 
 	GraphicsView& getView();
@@ -22,7 +22,6 @@ public:
 	void goToNewLayoutContent(LayoutContent* newl);
 
 signals:
-	void onItemPressed(QString);
 	void onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*);
 
 protected slots:

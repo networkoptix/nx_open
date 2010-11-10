@@ -3,6 +3,7 @@
 QAction cm_exit("Exit",0);
 QAction cm_fitinview("Fit in View",0);
 QAction cm_arrange("Arrange",0);
+QAction cm_add_layout("Add new layout...",0);
 QAction cm_togglefs("Toggle fullscreen",0);
 QAction cm_fullscren("Fullscreen",0);
 QAction cm_settings("Settings...",0);
@@ -18,13 +19,11 @@ QAction dis_25("25%",0);
 QAction dis_30("30%",0);
 QAction dis_35("35%",0);
 
-
+QAction cm_layout_editor_editlayout("Edit Layout...",0);
 QAction cm_layout_editor_bgp("Change BackGround picture...",0);
 QAction cm_layout_editor_bgp_sz("Change BackGround picture size...",0);
-QAction cm_layout_editor_save("Save layout",0);
-QAction cm_layout_editor_save_as("Save layout as...",0);
 QAction cm_layout_editor_change_t("Change layout title...",0);
-QAction cm_layout_editor_add_l("Add new layout...",0);
+
 
 void initContextMenu()
 {

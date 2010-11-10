@@ -21,6 +21,8 @@
 #include <QInputDialog>
 #include "video_cam_layout/layout_manager.h"
 #include "view_drag_and_drop.h"
+#include "layout_editor_wnd.h"
+#include "videoitem/layout_item.h"
 
 
 
@@ -38,7 +40,7 @@ extern QString button_level_up;
 extern QPixmap cached(const QString &img);
 //==============================================================================
 
-GraphicsView::GraphicsView(MainWnd* mainWnd):
+GraphicsView::GraphicsView(QWidget* mainWnd):
 QGraphicsView(),
 m_xRotate(0), m_yRotate(0),
 m_movement(this),
@@ -156,27 +158,10 @@ void GraphicsView::start()
 
 void GraphicsView::stop()
 {
-
-	if (m_viewMode == ItemsAcceptor)
-	{
-
-		//&& m_camLayout.isContentChanged()
-
-		LayoutContent* root = CLSceneLayoutManager::instance().getAllLayoutsContent();
-		if (m_camLayout.getContent()->getParent()==0 && !root->hasSuchSublayout(m_camLayout.getContent()))
-		{
-
-			root->addLayout(m_camLayout.getContent(), false);
-		}
-
-	}
-
 	stopAnimation(); // stops animation 
 	mViewStarted = false;
 	setZeroSelection(); 
 	closeAllDlg();
-
-
 }
 
 
@@ -407,22 +392,42 @@ void GraphicsView::centerOn(const QPointF &pos)
 
 void GraphicsView::initDecoration()
 {
+
+	//http://lisenok-kate.livejournal.com/7740.html
+
+	bool level_up = false;
+
+
+	if (m_camLayout.getContent()->getParent()) // if layout has parent add LevelUp decoration
+		level_up = true;
+		
+
+	// if this is ItemsAcceptor( the layout we are editing now ) and parent is root we should not go to the root
+	if (getViewMode()==GraphicsView::ItemsAcceptor && m_camLayout.getContent()->getParent() == CLSceneLayoutManager::instance().getAllLayoutsContent())
+		level_up = false;
+
+	bool home = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::HomeButton);
+	if (m_viewMode!=NormalView)
+		home = false;
+
+
+
 	removeAllStaticItems();
 
 	LayoutContent* cont = m_camLayout.getContent();
 	CLAbstractUnmovedItem* item;
 
-	if (cont->checkDecorationFlag(LayoutContent::HomeButton))
+	if (home)
 	{
 		item = new CLUnMovedPixtureButton(this, button_home, "./skin/home.png", 100, 100, 255, 0.2);
 		item->setStaticPos(QPoint(1,1));
 		addStaticItem(item);
 	}
 
-	if (cont->checkDecorationFlag(LayoutContent::LevelUp))
+	if (level_up)
 	{
 		item = new CLUnMovedPixtureButton(this, button_level_up, "./skin/up.png", 100, 100, 255, 0.2);
-		item->setStaticPos(QPoint(100+10,1));
+		item->setStaticPos(QPoint((100+10)*home+1,1));
 		addStaticItem(item);
 	}
 
@@ -909,7 +914,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 	}
 
 	CLAbstractSceneItem* wnd = static_cast<CLAbstractSceneItem*>(itemAt(event->pos()));
-	if (!m_camLayout.hasSuchItem(wnd)) // this is decoration somthing
+	if (!m_camLayout.hasSuchItem(wnd)) // this is decoration something
 		wnd = 0;
 
 	// distance menu 
@@ -933,20 +938,10 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 	layout_editor_menu.setWindowOpacity(global_menu_opacity);
 	layout_editor_menu.setTitle("Layout Editor");
 
-	if (m_camLayout.isContentChanged())
-	{
-		layout_editor_menu.addAction(&cm_layout_editor_save);
-		layout_editor_menu.addAction(&cm_layout_editor_save_as);
+	if (m_viewMode==NormalView)
+		layout_editor_menu.addAction(&cm_layout_editor_editlayout);
 
-	}
-
-	if (m_viewMode==ItemsAcceptor)
-	{
-		layout_editor_menu.addAction(&cm_layout_editor_add_l);
-		layout_editor_menu.addAction(&cm_layout_editor_change_t);
-	}
-
-
+	layout_editor_menu.addAction(&cm_layout_editor_change_t);
 	layout_editor_menu.addAction(&cm_layout_editor_bgp);
 	layout_editor_menu.addAction(&cm_layout_editor_bgp_sz);
 
@@ -959,6 +954,12 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 	if (wnd) // video wnd
 	{
 		menu.addAction(&cm_fullscren);
+
+		if (wnd->getType()==CLAbstractSceneItem::LAYOUT && m_viewMode!=ItemsDonor)
+		{
+			menu.addMenu(&layout_editor_menu);
+		}
+
 		menu.addAction(&cm_settings);
 		menu.addAction(&cm_exit);
 	}
@@ -967,8 +968,11 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 		menu.addAction(&cm_fitinview);
 		menu.addAction(&cm_arrange);
 
-		if (m_camLayout.isEditable())
-			menu.addMenu(&layout_editor_menu);
+		if (m_camLayout.isEditable() && m_viewMode!=ItemsDonor)
+		{
+			menu.addAction(&cm_add_layout);
+			//menu.addMenu(&layout_editor_menu);
+		}
 
 		menu.addMenu(&distance_menu);
 		menu.addAction(&cm_togglefs);
@@ -990,8 +994,11 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 		
 		if (act== &cm_togglefs)
 		{
-			mMainWnd->toggleFullScreen();
-			m_scenezoom.zoom_delta(0.001,1)	;
+			if (!mMainWnd->isFullScreen())
+				mMainWnd->showFullScreen();
+			else
+				mMainWnd->showMaximized();
+			
 		}
 		else if (act== &cm_fitinview)
 		{
@@ -1006,86 +1013,9 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 			m_camLayout.setItemDistance(0.01 + (act->data()).toDouble() );
 			onArrange_helper();
 		}
-		else if (act == &cm_layout_editor_add_l)
+		else if (act == &cm_add_layout) 
 		{
-			bool ok;
-			QString name;
-			while(true)
-			{
-				name = UIgetText(this, tr("New layout"), tr("Layout title:"), "", ok).trimmed();
-				if (!ok)
-					break;
-
-				if (name.isEmpty())
-				{
-					UIOKMessage(this, "", "Empty tittle cannot be used.");
-					continue;
-				}
-
-				name = QString("Layout:") + name;
-
-				if (!m_camLayout.getContent()->hasSuchSublayoutName(name))
-					break;
-
-				UIOKMessage(this, "", "Such title layout already exists.");
-
-			}
-
-			if (ok)
-			{
-				LayoutContent* lc = CLSceneLayoutManager::instance().getNewEmptyLayoutContent(LayoutContent::LevelUp);
-				lc->setName(name);
-
-				bool empty_layout = m_camLayout.getItemList().count() == 0;
-
-				m_camLayout.getContent()->addLayout(lc, false);
-				m_camLayout.addLayoutItem(name, lc);
-				m_camLayout.setContentChanged(true);
-
-				if (empty_layout)
-				{
-					m_camLayout.updateSceneRect();
-					centerOn(getRealSceneRect().center());
-					fitInView(0, 0);
-				}
-
-				
-			}
-		}
-		else if (act == &cm_layout_editor_change_t)
-		{
-
-			bool ok;
-			QString name;
-			while(true)
-			{
-					name = UIgetText(this, tr("Rename current layout"), tr("Layout title:"), UIDisplayName(m_camLayout.getContent()->getName()), ok).trimmed();
-					if (!ok)
-						break;
-
-					if (name.isEmpty())
-					{
-						UIOKMessage(this, "", "Empty tittle cannot be used.");
-						continue;
-					}
-
-					name = QString("Layout:") + name;
-
-					LayoutContent* parent = m_camLayout.getContent()->getParent();
-					if (!parent)
-						parent = CLSceneLayoutManager::instance().getAllLayoutsContent();
-
-					if (!parent->hasSuchSublayoutName(name))
-						break;
-
-					UIOKMessage(this, "", "Such title layout already exists.");
-			}
-
-			if (ok)
-			{
-				m_camLayout.getContent()->setName(name);
-			}
-
+			contextMenuHelper_addNewLayout();
 		}
 
 	}
@@ -1103,6 +1033,15 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 			if (wnd->toVideoItem())
 				show_device_settings_helper(wnd->toVideoItem()->getVideoCam()->getDevice());
 		}
+		else if (act == &cm_layout_editor_change_t)
+		{
+			contextMenuHelper_chngeLayoutTitle(wnd);
+		}
+		else if (act == &cm_layout_editor_editlayout)
+		{
+			contextMenuHelper_editLayout(wnd);
+		}
+
 	}
 
 	QGraphicsView::contextMenuEvent(event);
@@ -1124,8 +1063,10 @@ void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
 	{
 		if (!mMainWnd->isFullScreen())
 		{
-			mMainWnd->toggleFullScreen();
-			m_scenezoom.zoom_delta(0.001,1)	;
+			if (!mMainWnd->isFullScreen())
+				mMainWnd->showFullScreen();
+			else
+				mMainWnd->showMaximized();
 		}
 
 
@@ -1484,7 +1425,8 @@ void GraphicsView::drawBackground ( QPainter * painter, const QRectF & rect )
 	if (diff>1500)
 	{
 		int fps = m_fps_frames*1000/diff;
-		mMainWnd->setWindowTitle(QString::number(fps));
+		if (m_viewMode==NormalView) 
+			mMainWnd->setWindowTitle(QString::number(fps));
 		m_fps_frames = 0;
 		m_fps_time.restart();
 	}
@@ -1964,4 +1906,159 @@ void GraphicsView::show_device_settings_helper(CLDevice* dev)
 
 	
 
+}
+
+void GraphicsView::contextMenuHelper_addNewLayout()
+{
+	// add new layout
+	bool ok;
+	QString name;
+	while(true)
+	{
+		name = UIgetText(this, tr("New layout"), tr("Layout title:"), "", ok).trimmed();
+		if (!ok)
+			break;
+
+		if (name.isEmpty())
+		{
+			UIOKMessage(this, "", "Empty tittle cannot be used.");
+			continue;
+		}
+
+		name = QString("Layout:") + name;
+
+		if (!m_camLayout.getContent()->hasSuchSublayoutName(name))
+			break;
+
+		UIOKMessage(this, "", "Such title layout already exists.");
+
+	}
+
+	if (ok)
+	{
+		LayoutContent* lc = CLSceneLayoutManager::instance().getNewEmptyLayoutContent(LayoutContent::LevelUp);
+		lc->setName(name);
+
+		if (m_viewMode==ItemsAcceptor) // if this is in layout editor
+		{
+			bool empty_layout = m_camLayout.getItemList().count() == 0;
+
+			m_camLayout.getContent()->addLayout(lc, false);
+			m_camLayout.addLayoutItem(name, lc);
+			m_camLayout.setContentChanged(true);
+
+			if (empty_layout)
+			{
+				m_camLayout.updateSceneRect();
+				centerOn(getRealSceneRect().center());
+				fitInView(0, 0);
+			}
+		}
+		else if (m_viewMode==NormalView)
+		{
+			//=======
+			CLLayoutEditorWnd* editor = new CLLayoutEditorWnd(lc);
+			editor->setWindowModality(Qt::ApplicationModal);
+			editor->exec();
+			int result = editor->result();
+			delete editor;
+
+			if (result == QMessageBox::No)
+			{
+				delete lc;
+			}
+			else
+			{
+				bool empty_layout = m_camLayout.getItemList().count() == 0;
+
+				m_camLayout.getContent()->addLayout(lc, false);
+				m_camLayout.addLayoutItem(name, lc);
+				m_camLayout.setContentChanged(true);
+
+				if (empty_layout)
+				{
+					m_camLayout.updateSceneRect();
+					centerOn(getRealSceneRect().center());
+					fitInView(0, 0);
+				}
+			}
+
+			//=======
+
+		}
+
+	}
+
+}
+
+void GraphicsView::contextMenuHelper_chngeLayoutTitle(CLAbstractSceneItem* wnd)
+{
+	if (wnd->getType()!=CLAbstractSceneItem::LAYOUT)
+		return;
+
+	CLLayoutItem* litem = static_cast<CLLayoutItem*>(wnd);
+	LayoutContent* content = litem->getRefContent();
+
+	bool ok;
+	QString name;
+	while(true)
+	{
+		name = UIgetText(this, tr("Rename current layout"), tr("Layout title:"), UIDisplayName(content->getName()), ok).trimmed();
+		if (!ok)
+			break;
+
+		if (name.isEmpty())
+		{
+			UIOKMessage(this, "", "Empty tittle cannot be used.");
+			continue;
+		}
+
+		name = QString("Layout:") + name;
+
+		LayoutContent* parent = content->getParent();
+		if (!parent)
+			parent = CLSceneLayoutManager::instance().getAllLayoutsContent();
+
+		if (!parent->hasSuchSublayoutName(name))
+			break;
+
+		UIOKMessage(this, "", "Such title layout already exists.");
+	}
+
+	if (ok)
+	{
+		content->setName(name);
+		litem->setName(content->getName());
+	}
+
+}
+
+void GraphicsView::contextMenuHelper_editLayout(CLAbstractSceneItem* wnd)
+{
+	if (wnd->getType()!=CLAbstractSceneItem::LAYOUT)
+		return;
+
+	CLLayoutItem* litem = static_cast<CLLayoutItem*>(wnd);
+	LayoutContent* content = litem->getRefContent();
+
+	LayoutContent* content_copy = LayoutContent::coppyLayout(content);
+
+
+	CLLayoutEditorWnd* editor = new CLLayoutEditorWnd(content);
+	editor->setWindowModality(Qt::ApplicationModal);
+	editor->exec();
+	int result = editor->result();
+	delete editor;
+
+	if (result == QMessageBox::No)
+	{
+		m_camLayout.getContent()->removeLayout(content, true);
+		m_camLayout.getContent()->addLayout(content_copy, false);
+		litem->setRefContent(content_copy);
+
+	}
+	else
+	{
+		delete content_copy;
+	}
 }

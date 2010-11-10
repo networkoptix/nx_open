@@ -29,6 +29,19 @@ QString UIgetText(QWidget* parent, const QString& title, const QString& labletex
 
 }
 
+QMessageBox::StandardButton YesNoCancel(QWidget *parent, const QString &title, const QString& text)
+{
+	QMessageBox msgBox(QMessageBox::Information, title, text, QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, parent);
+	msgBox.setWindowOpacity(global_dlg_opacity);
+	QStyle *arthurStyle = new ArthurStyle();
+	msgBox.setStyle(arthurStyle);
+
+	if (msgBox.exec() == -1)
+		return QMessageBox::Cancel;
+
+	return msgBox.standardButton(msgBox.clickedButton());
+}
+
 void UIOKMessage(QWidget* parent, const QString& title, const QString& text)
 {
 	QMessageBox msgBox(QMessageBox::Information, title, text, QMessageBox::Ok, parent);

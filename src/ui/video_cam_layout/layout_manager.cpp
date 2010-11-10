@@ -9,6 +9,7 @@ mRecordersAndLayouts(0)
 {
 	mAllCustomLayouts = new LayoutContent();
 	mAllCustomLayouts->addDecorationFlag(LayoutContent::HomeButton | LayoutContent::BackGroundLogo );
+	mAllCustomLayouts->setEditable(true);
 	load();
 
 	mAllRecorders = new LayoutContent();

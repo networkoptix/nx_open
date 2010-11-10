@@ -14,7 +14,7 @@ QString button_system = "system";
 QString button_level_up = "level_up";
 
 
-CLLayoutNavigator::CLLayoutNavigator(MainWnd* mainWnd, LayoutContent* content):
+CLLayoutNavigator::CLLayoutNavigator(QWidget* mainWnd, LayoutContent* content):
 m_videoView(mainWnd),
 mCurrentContent(content)
 {
@@ -90,8 +90,6 @@ void CLLayoutNavigator::onDecorationPressed(LayoutContent* layout, QString itemn
 		mNewContent = CLSceneLayoutManager::instance().startScreenLayoutContent();
 		if (m_mode==NORMAL_ViewMode)
 			goToNewLayoutContent();
-		else
-			emit onItemPressed(button_home);
 	}
 	else if (itemname==button_level_up)
 	{
@@ -125,7 +123,8 @@ void CLLayoutNavigator::onButtonItemPressed(LayoutContent* l, QString itemname )
 
 		if (itemname==button_layout)
 		{
-			emit onItemPressed(button_layout);
+			mNewContent = CLSceneLayoutManager::instance().getAllLayoutsContent();
+			goToNewLayoutContent();
 		}
 	}
 }

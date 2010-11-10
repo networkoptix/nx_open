@@ -57,6 +57,11 @@ QString CLAbstractSceneItem::getName() const
 	return mName;
 }
 
+void CLAbstractSceneItem::setName(const QString& name)
+{
+	mName = name;
+}
+
 CLVideoWindowItem* CLAbstractSceneItem::toVideoItem() const
 {
 	if (m_type!=VIDEO)

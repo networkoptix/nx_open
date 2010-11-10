@@ -197,14 +197,6 @@ void SceneLayout::onTimer()
 	{
 		m_view->zoomMin(0);
 
-		if (getContent()->getParent()) // if layout has parent add LevelUp decoration
-			getContent()->addDecorationFlag(LayoutContent::LevelUp);
-
-		// if this is ItemsAcceptor( the layout we are editing now ) and parent is roor we should not go to the root
-		if (m_view->getViewMode()==GraphicsView::ItemsAcceptor && getContent()->getParent() == CLSceneLayoutManager::instance().getAllLayoutsContent())
-			getContent()->removeDecorationFlag(LayoutContent::LevelUp);
-
-
 		m_view->initDecoration();
 		loadContent();
 	}

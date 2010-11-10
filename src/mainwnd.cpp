@@ -10,11 +10,7 @@ extern QString button_home;
 
 MainWnd::MainWnd(QWidget *parent, Qt::WFlags flags):
 //QMainWindow(parent, flags),
-mMode(UNDEFINED_ViewMode),
-m_normalView(0),
-m_topView(0),
-m_bottomView(0),
-m_editedView(0)
+m_normalView(0)
 {
 	//ui.setupUi(this);
 	setWindowTitle("HDWitness");
@@ -29,55 +25,9 @@ m_editedView(0)
 
 	//=======================================================
 
-	//goToLayouteditor();
-	goToNomalLayout();
-
-	
-	//=======================================================
-
-	
-
-
 	const int min_wisth = 400;
 	setMinimumWidth(min_wisth);
 	setMinimumHeight(min_wisth*3/4);
-
-	
-	toggleFullScreen();
-
-}
-
-
-
-MainWnd::~MainWnd()
-{
-	destroyNavigator(m_normalView);
-	destroyNavigator(m_topView);
-	destroyNavigator(m_bottomView);
-	destroyNavigator(m_editedView);
-
-	CLDeviceManager::instance().getDiveceSercher().wait();
-}
-
-void MainWnd::goToNomalLayout()
-{
-	if (mMode==NORMAL_ViewMode) // already there
-		return;
-
-	
-	
-
-	//=======remove====
-	if (true)
-	{
-		destroyNavigator(m_topView);
-		destroyNavigator(m_bottomView);
-		destroyNavigator(m_editedView);
-
-		QLayout* mainl = layout();
-		delete mainl;
-	}
-
 
 	//=======add====
 	m_normalView = new CLLayoutNavigator(this);
@@ -86,104 +36,25 @@ void MainWnd::goToNomalLayout()
 
 	m_normalView->setMode(NORMAL_ViewMode);
 	m_normalView->getView().setViewMode(GraphicsView::NormalView);
-	mMode=NORMAL_ViewMode;
-
-	connect(m_normalView, SIGNAL(onItemPressed(QString)), this, SLOT(onItemPressed(QString)));
 
 	setLayout(l);
-
+	showFullScreen();
 }
 
-void MainWnd::goToLayouteditor()
+
+
+MainWnd::~MainWnd()
 {
-	if (mMode==LAYOUTEDITOR_ViewMode) // already there
-		return;
-
-	//=======remove====
-	if (m_normalView)
-	{
-		QLayout* mainl = layout();
-
-		//mMainLayout->removeWidget(&(m_normalView->getView()));
-
-		delete mainl;
-		destroyNavigator(m_normalView);
-	}
-
-
-	//=======add====
-	m_topView = new CLLayoutNavigator(this,  CLSceneLayoutManager::instance().generateAllRecordersAndLayouts()); 
-
-	m_bottomView = new CLLayoutNavigator(this, CLSceneLayoutManager::instance().getEmptyLayoutContent()); 
-
-	m_editedView = new CLLayoutNavigator(this, CLSceneLayoutManager::instance().getNewEmptyLayoutContent());
-
-	connect(m_topView, SIGNAL(onItemPressed(QString)), this, SLOT(onItemPressed(QString)));
-	connect(m_bottomView, SIGNAL(onItemPressed(QString)), this, SLOT(onItemPressed(QString)));
-	connect(m_editedView, SIGNAL(onItemPressed(QString)), this, SLOT(onItemPressed(QString)));
-
-
-	connect(m_topView, SIGNAL(onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*)), this, SLOT(onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*)));
-	connect(m_bottomView, SIGNAL(onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*)), this, SLOT(onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*)));
-
-	m_topView->setMode(LAYOUTEDITOR_ViewMode); 
-	m_topView->getView().setViewMode(GraphicsView::ItemsDonor);
-
-	m_bottomView->setMode(LAYOUTEDITOR_ViewMode); 
-	m_bottomView->getView().setViewMode(GraphicsView::ItemsDonor);
-
-	m_editedView->setMode(LAYOUTEDITOR_ViewMode); 
-	m_editedView->getView().setViewMode(GraphicsView::ItemsAcceptor);
-	
-
-
-	QLayout* ml = new QHBoxLayout();
-
-	QLayout* VLayout = new QVBoxLayout;
-	VLayout->addWidget(&(m_topView->getView()));
-	VLayout->addWidget(&(m_bottomView->getView()));
-
-	ml->addItem(VLayout);
-	ml->addWidget(&(m_editedView->getView()));
-	setLayout(ml);
-
-	mMode = LAYOUTEDITOR_ViewMode;
-
-	resizeEvent(0);
-
+	destroyNavigator(m_normalView);
+	CLDeviceManager::instance().getDiveceSercher().wait();
 }
 
 
 void MainWnd::closeEvent ( QCloseEvent * event )
 {
 	destroyNavigator(m_normalView);
-	destroyNavigator(m_topView);
-	destroyNavigator(m_bottomView);
-	destroyNavigator(m_editedView);
-
 }
 
-void MainWnd::resizeEvent ( QResizeEvent * event)
-{
-	if (mMode == LAYOUTEDITOR_ViewMode)
-	{
-		QSize sz = this->size();
-		m_topView->getView().setMaximumWidth(sz.width()/3);
-		m_bottomView->getView().setMaximumWidth(sz.width()/3);
-
-		m_topView->getView().setMaximumHeight(sz.height()/2);
-		m_bottomView->getView().setMaximumHeight(sz.height()/2);
-	}
-}
-
-
-void MainWnd::toggleFullScreen()
-{
-	if (!isFullScreen())
-		showFullScreen();
-	else
-		showMaximized();
-}
 
 void MainWnd::destroyNavigator(CLLayoutNavigator*& nav)
 {
@@ -194,29 +65,4 @@ void MainWnd::destroyNavigator(CLLayoutNavigator*& nav)
 		nav = 0;
 	}
 
-}
-
-void MainWnd::onItemPressed(QString itemname)
-{
-	if (itemname==button_layout && mMode==NORMAL_ViewMode)
-	{
-		QTimer::singleShot(20, this, SLOT(goToLayouteditor()));
-	}
-
-	if (itemname==button_home && mMode==LAYOUTEDITOR_ViewMode)
-	{
-		QTimer::singleShot(20, this, SLOT(goToNomalLayout()));
-	}
-
-}
-
-void MainWnd::onNewLayoutItemSelected(CLLayoutNavigator* ln, LayoutContent* newl)
-{
-	if (mMode!=LAYOUTEDITOR_ViewMode)
-		return;
-
-	if (ln==m_topView)
-	{
-		m_bottomView->goToNewLayoutContent(newl);
-	}
 }

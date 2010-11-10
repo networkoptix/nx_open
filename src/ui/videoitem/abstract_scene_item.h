@@ -26,6 +26,7 @@ public:
 	CLVideoWindowItem* toVideoItem() const;
 
 	QString getName() const;
+	void setName(const QString& name);
 
 	CLSceneItemType getType() const;
 	void setType(CLSceneItemType t);

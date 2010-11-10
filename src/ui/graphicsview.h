@@ -12,7 +12,6 @@
 
 class CLAbstractSceneItem;
 class CLVideoWindowItem;
-class MainWnd;
 class QGraphicsPixmapItem;
 class CLAnimatedBackGround;
 class CLAbstractDeviceSettingsDlg;
@@ -26,7 +25,7 @@ class GraphicsView: public QGraphicsView
 public:
 	enum ViewMode{NormalView, ItemsDonor, ItemsAcceptor};
 
-	GraphicsView(MainWnd* mainWnd);
+	GraphicsView(QWidget* mainWnd);
 	virtual ~GraphicsView();
 
 	void start();
@@ -114,6 +113,11 @@ protected:
 
 	bool isItemFullScreenZoomed(QGraphicsItem* item);
 
+	//=========================
+	void contextMenuHelper_addNewLayout();
+	void contextMenuHelper_chngeLayoutTitle(CLAbstractSceneItem* wnd);
+	void contextMenuHelper_editLayout(CLAbstractSceneItem* wnd);
+
 public slots:
 	
 	void fitInView(int duration = 600 , int delay = 0);
@@ -160,7 +164,7 @@ protected:
 
 	bool m_ignore_release_event, m_ignore_conext_menu_event;
 
-	MainWnd* mMainWnd;
+	QWidget* mMainWnd;
 
 	CLAbstractDeviceSettingsDlg* mDeviceDlg;
 
