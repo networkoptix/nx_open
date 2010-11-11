@@ -8,6 +8,7 @@
 
 class GraphicsView;
 class CLVideoWindowItem;
+class CLAbstractSubItem;
 
 class CLAbstractSceneItem : public QObject, public QGraphicsItem
 {
@@ -92,7 +93,8 @@ protected:
 	virtual void mousePressEvent ( QGraphicsSceneMouseEvent * event );
 	virtual void mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * event );
 
-
+protected slots:
+	virtual void onSubItemPressed(CLAbstractSubItem* subitem);
 protected:
 	bool m_selected;
 	bool m_arranged;

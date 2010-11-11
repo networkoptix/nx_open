@@ -254,6 +254,11 @@ void CLAbstractSceneItem::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 		QGraphicsItem::mouseReleaseEvent(event);
 }
 
+void CLAbstractSceneItem::onSubItemPressed(CLAbstractSubItem* subitem)
+{
+
+}
+
 void CLAbstractSceneItem::drawShadow(QPainter* painter)
 {
 	QRect rect1(width(), SHADOW_SIZE, SHADOW_SIZE, height());

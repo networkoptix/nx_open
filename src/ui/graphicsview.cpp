@@ -739,7 +739,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 		int dy = 0;
 		qreal mouse_speed = 0;
 
-		mouseSpeed_helper(mouse_speed,dx,dy,150,1900);
+		mouseSpeed_helper(mouse_speed,dx,dy,150,5900);
 
 		if (dx!=0 || dy!=0)
 		{
@@ -772,7 +772,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 			}
 			 
-			m_movement.move(-dx,-dy, scene_move_duration + mouse_speed, fullscreen);
+			m_movement.move(-dx,-dy, scene_move_duration + mouse_speed/1.5, fullscreen);
 		}
 
 	}
