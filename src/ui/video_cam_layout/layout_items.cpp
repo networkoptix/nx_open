@@ -50,6 +50,28 @@ QString LayoutItem::Type2String(Type t)
 	return "NONE";
 }
 
+
+LayoutItem::Type LayoutItem::String2Type(const QString& str)
+{
+	if (str=="DEVICE")
+		return DEVICE;
+
+	if (str=="BUTTON")
+		return BUTTON;
+
+	if (str=="LAYOUT")
+		return LAYOUT;
+
+	if (str=="IMAGE")
+		return IMAGE;
+
+	if (str=="BACKGROUND")
+		return BACKGROUND;
+
+	return IMAGE;
+
+}
+
 void LayoutItem::toXml(QDomDocument& doc, QDomElement& parent) 
 {
 	QDomElement element = doc.createElement("item");

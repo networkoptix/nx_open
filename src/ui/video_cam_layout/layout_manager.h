@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QMap>
+#include <QDomElement>
 
 class LayoutContent;
 
@@ -50,7 +51,7 @@ public:
 
 
 private:
-	
+	bool load_parseLyout(const QDomElement& layout, LayoutContent* parent);
 private:
 	LayoutContent* mAllCustomLayouts;
 	LayoutContent* mAllRecorders;

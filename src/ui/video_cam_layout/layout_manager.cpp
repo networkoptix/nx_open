@@ -4,6 +4,7 @@
 
 #include <QDomDocument>
 #include <QFile>
+#include "base\log.h"
 
 CLSceneLayoutManager::CLSceneLayoutManager():
 mRecordersAndLayouts(0)
@@ -38,6 +39,93 @@ CLSceneLayoutManager& CLSceneLayoutManager::instance()
 
 bool CLSceneLayoutManager::load()
 {
+	QFile file("custom_layouts.xml");
+
+	if (!file.exists())
+	{
+		return false;
+	}
+
+	QString errorStr;
+	int errorLine;
+	int errorColumn;
+	QString error;
+	QDomDocument doc;
+
+	if (!doc.setContent(&file, &errorStr, &errorLine,&errorColumn)) 
+	{
+		QTextStream str(&error);
+		str << "File custom_layouts.xml" << "; Parse error at line " << errorLine << " column " << errorColumn << " : " << errorStr;
+		cl_log.log(error, cl_logERROR);
+		return false;
+	}
+
+	QDomElement root = doc.documentElement();
+	if (root.tagName() != "CustomLayouts")
+		return false;
+
+
+	QDomNode node = root.firstChild();
+
+	while (!node.isNull()) 
+	{
+		if (node.toElement().tagName() == "Layout")
+		{
+			if (!load_parseLyout(node.toElement(), mAllCustomLayouts))
+				return false;
+		}
+
+		node = node.nextSibling();
+	}
+
+
+	return true;
+}
+
+bool CLSceneLayoutManager::load_parseLyout(const QDomElement& layout, LayoutContent* parent)
+{
+	LayoutContent* lc = 0;
+	QString name = layout.attribute("name");
+
+	QString recorder = layout.attribute("recorder");
+	if (recorder=="1") 
+	{
+		lc = createRecorderContent(name);
+	}
+	else
+	{
+		lc = getNewEmptyLayoutContent();
+		lc->setName(name);
+	}
+
+	parent->addLayout(lc, false);
+
+	//=========
+	QDomNode node = layout.firstChild();
+
+	while (!node.isNull()) 
+	{
+		if (node.toElement().tagName() == "Layout")
+		{
+			if (!load_parseLyout(node.toElement(), lc))
+				return false;
+		}
+
+		if (node.toElement().tagName() == "item")
+		{
+			QString type = node.toElement().attribute("type");
+			QString name = node.toElement().attribute("name");
+			if (type=="DEVICE")
+			{
+				lc->addDevice(name);
+			}
+		}
+
+
+		node = node.nextSibling();
+	}
+
+
 	return true;
 }
 

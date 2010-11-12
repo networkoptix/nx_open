@@ -20,7 +20,8 @@ public:
 	LayoutItem();
 	LayoutItem(int x, int y, int width, int height, int angle = 0);
 
-	static QString Type2String(Type t) ;
+	static QString Type2String(Type t);
+	static Type String2Type(const QString& str);
 
 	virtual void toXml(QDomDocument& doc, QDomElement& parent)  = 0;
 
