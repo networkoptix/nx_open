@@ -13,7 +13,7 @@ m_animation(0)
 	setAcceptsHoverEvents(true);
 	//setZValue(parent->zvalue() + 1);
 
-	connect(this, SIGNAL(onPressed(CLAbstractSubItem*)), static_cast<QObject*>(parent), SLOT(onSubItemPressed(CLAbstractSubItem* subitem)) );
+	connect(this, SIGNAL(onPressed(CLAbstractSubItem*)), static_cast<QObject*>(parent), SLOT(onSubItemPressed(CLAbstractSubItem*)) );
 	//onSubItemPressed
 	setOpacity(m_opacity);
 }
