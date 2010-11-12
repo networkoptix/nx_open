@@ -5,6 +5,7 @@
 #include <math.h>
 #include "settings.h"
 #include <qgraphicssceneevent>
+#include "subitem\close_sub_item.h"
 
 static const double Pi = 3.14159265358979323846264338327950288419717;
 static double TwoPi = 2.0 * Pi;
@@ -69,6 +70,38 @@ CLVideoWindowItem* CLAbstractSceneItem::toVideoItem() const
 
 	return static_cast<CLVideoWindowItem*>(   const_cast<CLAbstractSceneItem*>(this)  );
 }
+
+bool CLAbstractSceneItem::addSubItem(CLAbstractSubItem::ItemType type)
+{
+	QPointF pos = getBestSubItemPos(type);
+	if (pos.x()<-1000 && pos.y()<-1000)//position undefined 
+		return false;
+
+	CLAbstractSubItem* item = 0;
+
+	switch(type)
+	{
+	case CLAbstractSubItem::Close:
+		item = new CLCloseSubItem(this, global_decoration_opacity, 250, 250);
+		break;
+
+	default:
+		return false;
+	}
+
+	item->setPos(pos);
+}
+
+void CLAbstractSceneItem::removeSubItem(CLAbstractSubItem::ItemType type)
+{
+
+}
+
+QPointF CLAbstractSceneItem::getBestSubItemPos(CLAbstractSubItem::ItemType type)
+{
+	return QPointF(-1001,-1001);
+}
+
 
 CLAbstractSceneItem::CLSceneItemType CLAbstractSceneItem::getType() const
 {

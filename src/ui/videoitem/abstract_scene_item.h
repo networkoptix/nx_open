@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QGraphicsItem>
 #include "../animation/item_trans.h"
+#include "subitem/abstract_sub_item.h"
 
 
 class GraphicsView;
@@ -25,6 +26,11 @@ public:
 	virtual ~CLAbstractSceneItem();
 
 	CLVideoWindowItem* toVideoItem() const;
+
+	// returns true of added
+	bool addSubItem(CLAbstractSubItem::ItemType type);
+	virtual void removeSubItem(CLAbstractSubItem::ItemType type);
+	virtual QPointF getBestSubItemPos(CLAbstractSubItem::ItemType type);
 
 	QString getName() const;
 	void setName(const QString& name);

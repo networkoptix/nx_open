@@ -8,6 +8,7 @@ class CLCloseSubItem : public CLAbstractImgSubItem
 {
 	Q_OBJECT
 public:
+
 	CLCloseSubItem(CLAbstractSceneItem* parent, qreal opacity, int max_width, int max_height);
 	~CLCloseSubItem();
 	virtual ItemType getType() const;

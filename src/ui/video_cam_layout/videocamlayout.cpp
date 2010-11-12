@@ -412,6 +412,9 @@ bool SceneLayout::addItem(CLAbstractSceneItem* item, int x, int y, bool update_s
 	item->setPos(x, y);
 
 	//=========
+	if (isEditable())	
+		item->addSubItem(CLAbstractSubItem::Close);
+	//=========
 
 	if (update_scene_rect)
 		updateSceneRect();

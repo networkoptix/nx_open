@@ -126,15 +126,43 @@ void CLVideoWindowItem::draw(CLVideoDecoderOutput& image, unsigned int channel)
 
 	if (m_imageWidth!=m_imageWidth_old || m_imageHeight!=m_imageHeight_old)
 	{
-		QMutexLocker  locker(&m_mutex_aspect);
-		m_aspectratio = qreal(m_imageWidth)/m_imageHeight;
-		
-		m_imageWidth_old = m_imageWidth;
-		m_imageHeight_old = m_imageHeight;
+		{
+			QMutexLocker  locker(&m_mutex_aspect);
+			m_aspectratio = qreal(m_imageWidth)/m_imageHeight;
+			
+			m_imageWidth_old = m_imageWidth;
+			m_imageHeight_old = m_imageHeight;
+		}
 
+		onResize();
 		emit onAspectRatioChanged(this);
 	}
 
+}
+
+QPointF CLVideoWindowItem::getBestSubItemPos(CLAbstractSubItem::ItemType type)
+{
+	switch(type)
+	{
+	case CLAbstractSubItem::Close:
+		return QPointF(width()-270, 20);
+		break;
+
+	default:
+		return QPointF(-1001, -1001);
+	    break;
+	}
+}
+
+void CLVideoWindowItem::onResize()
+{
+	QList<QGraphicsItem *> childrenLst = childItems();
+	foreach(QGraphicsItem * item, childrenLst)
+	{
+		CLAbstractSubItem* sub_item = static_cast<CLAbstractSubItem*>(item);
+		QPointF pos = getBestSubItemPos(sub_item->getType());
+		sub_item->setPos(pos);
+	}
 }
 
 void CLVideoWindowItem::copyVideoDataBeforePainting(bool copy)

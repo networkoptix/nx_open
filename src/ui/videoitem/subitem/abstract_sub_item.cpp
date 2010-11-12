@@ -15,6 +15,7 @@ m_animation(0)
 
 	connect(this, SIGNAL(onPressed(CLAbstractSubItem*)), static_cast<QObject*>(parent), SLOT(onSubItemPressed(CLAbstractSubItem* subitem)) );
 	//onSubItemPressed
+	setOpacity(m_opacity);
 }
 
 CLAbstractSubItem::~CLAbstractSubItem()

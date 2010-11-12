@@ -58,6 +58,8 @@ signals:
 
 protected:
 
+	QPointF getBestSubItemPos(CLAbstractSubItem::ItemType type);
+	void onResize();
 	
 	void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
 	void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);

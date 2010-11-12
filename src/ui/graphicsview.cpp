@@ -419,14 +419,14 @@ void GraphicsView::initDecoration()
 
 	if (home)
 	{
-		item = new CLUnMovedPixtureButton(this, button_home, "./skin/home.png", 100, 100, 255, 0.2);
+		item = new CLUnMovedPixtureButton(this, button_home, "./skin/home.png", 100, 100, 255, global_decoration_opacity);
 		item->setStaticPos(QPoint(1,1));
 		addStaticItem(item);
 	}
 
 	if (level_up)
 	{
-		item = new CLUnMovedPixtureButton(this, button_level_up, "./skin/up.png", 100, 100, 255, 0.2);
+		item = new CLUnMovedPixtureButton(this, button_level_up, "./skin/up.png", 100, 100, 255, global_decoration_opacity);
 		item->setStaticPos(QPoint((100+10)*home+1,1));
 		addStaticItem(item);
 	}
@@ -492,6 +492,13 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 	m_movement.stop();
 	
 	QGraphicsItem *item = itemAt(event->pos());
+
+	if (item)
+	{
+		while(item->parentItem())
+			item = item->parentItem();
+	}
+
 
 
 	CLAbstractSceneItem* wnd = static_cast<CLAbstractSceneItem*>(item);
@@ -708,6 +715,12 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 	//cl_log.log("====mouseReleaseEvent===", cl_logDEBUG1);
 
 	QGraphicsItem *item = itemAt(event->pos());
+
+	if (item)
+	{
+		while(item->parentItem())
+			item = item->parentItem();
+	}
 
 
 	CLAbstractSceneItem* wnd = static_cast<CLAbstractSceneItem*>(item);
@@ -1242,7 +1255,7 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 	{
 		case Qt::Key_S:
 			global_show_item_text=!global_show_item_text;
-			removeAllStaticItems();
+			//removeAllStaticItems();
 			break;
 
 		case Qt::Key_Q:
