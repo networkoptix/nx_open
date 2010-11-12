@@ -429,6 +429,10 @@ bool SceneLayout::addItem(CLAbstractSceneItem* item, int x, int y, bool update_s
 
 	connect(item, SIGNAL(onSelected(CLAbstractSceneItem*)), this, SLOT(onItemSelected(CLAbstractSceneItem* )));
 
+	//===========
+	connect(item, SIGNAL(onClose(CLAbstractSceneItem*)), this, SLOT(onItemClose(CLAbstractSceneItem*)));
+	
+
 	return true;
 }
 
@@ -778,6 +782,80 @@ CLAbstractSceneItem* SceneLayout::next_item_helper(const CLAbstractSceneItem* cu
 		return result;
 
 	return const_cast<CLAbstractSceneItem*>(curr);
+
+}
+
+void SceneLayout::onItemClose(CLAbstractSceneItem* item)
+{
+	 //Markus Schulz Feat Justine Suissa - Perception (Vocal Mix)
+	if (!isEditable())
+		return; // assert is better 
+
+	bool removed = false;
+
+	m_view->setZeroSelection();
+	item->stop_animation();
+
+
+	CLAbstractSceneItem::CLSceneItemType type = item->getType();
+	if (type==CLAbstractSceneItem::LAYOUT)
+	{
+
+		CLLayoutItem* litem = static_cast<CLLayoutItem*>(item);
+		LayoutContent* lc = litem->getRefContent();
+		getContent()->removeLayout(lc, true);
+
+
+		removed = true;
+	
+	}
+	
+	if (type==CLAbstractSceneItem::RECORDER)
+	{
+		CLRecorderItem* ritem = static_cast<CLRecorderItem*>(item);
+		LayoutContent* lc = ritem->getRefContent();
+		getContent()->removeLayout(lc, true);
+
+		CLAbstractComplicatedItem* devitem = ritem->getRecorderDisplay();
+
+		devitem->beforestopDispay();
+		devitem->stopDispay();
+		devitem->getDevice()->releaseRef();
+		m_deviceitems.removeOne(devitem);
+		delete devitem;
+
+		removed = true;
+
+	}
+
+	if (type==CLAbstractSceneItem::VIDEO)
+	{
+		CLVideoWindowItem* vitem = static_cast<CLVideoWindowItem*>(item);
+
+		CLAbstractComplicatedItem* devitem = vitem ->getVideoCam();
+
+		devitem->beforestopDispay();
+		devitem->stopDispay();
+		devitem->getDevice()->releaseRef();
+		m_deviceitems.removeOne(devitem);
+		delete devitem;
+
+		removed = true;
+
+	}
+
+
+	//===============
+
+	if (removed)
+	{
+		m_items.removeOne(item);
+		m_scene->removeItem(item);
+		delete item;
+
+		updateSceneRect();
+		m_view->fitInView(600, 3000);
+	}
 
 }
 

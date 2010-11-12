@@ -50,7 +50,7 @@ m_needUpdate(false)
 
 CLAbstractSceneItem::~CLAbstractSceneItem()
 {
-
+	stop_animation();
 }
 
 QString CLAbstractSceneItem::getName() const
@@ -100,6 +100,21 @@ void CLAbstractSceneItem::removeSubItem(CLAbstractSubItem::ItemType type)
 QPointF CLAbstractSceneItem::getBestSubItemPos(CLAbstractSubItem::ItemType type)
 {
 	return QPointF(-1001,-1001);
+}
+
+void CLAbstractSceneItem::onSubItemPressed(CLAbstractSubItem* subitem)
+{
+	CLAbstractSubItem::ItemType type = subitem->getType();
+
+	switch(type)
+	{
+	case CLAbstractSubItem::Close:
+		emit onClose(this);
+		break;
+
+	default:
+	    break;
+	}
 }
 
 
@@ -285,11 +300,6 @@ void CLAbstractSceneItem::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 
 	if (!isSelected())
 		QGraphicsItem::mouseReleaseEvent(event);
-}
-
-void CLAbstractSceneItem::onSubItemPressed(CLAbstractSubItem* subitem)
-{
-
 }
 
 void CLAbstractSceneItem::drawShadow(QPainter* painter)

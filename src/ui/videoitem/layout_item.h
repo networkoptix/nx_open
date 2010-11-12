@@ -18,6 +18,7 @@ public:
 	LayoutContent* getRefContent() const;
 
 protected:
+	QPointF getBestSubItemPos(CLAbstractSubItem::ItemType type);
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 protected:
 

@@ -34,6 +34,22 @@ LayoutContent* CLLayoutItem::getRefContent() const
 }
 
 
+QPointF CLLayoutItem::getBestSubItemPos(CLAbstractSubItem::ItemType type)
+{
+	switch(type)
+	{
+	case CLAbstractSubItem::Close:
+		return QPointF(width()-600, 200);
+		break;
+
+	default:
+		return QPointF(-1001, -1001);
+		break;
+	}
+
+}
+
+
 void CLLayoutItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
 	painter->fillPath(mShadowRectPath, global_shadow_color);

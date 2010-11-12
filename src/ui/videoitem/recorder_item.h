@@ -22,7 +22,7 @@ public:
 	CLRecorderDisplay* getRecorderDisplay() const;
 
 protected:
-
+	QPointF getBestSubItemPos(CLAbstractSubItem::ItemType type);
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 
 	QString text() const;

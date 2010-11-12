@@ -88,6 +88,7 @@ signals:
 	void onDoubleClick(CLAbstractSceneItem*);
 	void onFullScreen(CLAbstractSceneItem*);
 	void onSelected(CLAbstractSceneItem*);
+	void onClose(CLAbstractSceneItem*);
 protected:
 	void drawShadow(QPainter* painter);
 

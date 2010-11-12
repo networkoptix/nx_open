@@ -53,6 +53,20 @@ LayoutContent* CLRecorderItem::getRefContent() const
 	return mContent;
 }
 
+QPointF CLRecorderItem::getBestSubItemPos(CLAbstractSubItem::ItemType type)
+{
+	switch(type)
+	{
+	case CLAbstractSubItem::Close:
+		return QPointF(width()-1000, 200);
+		break;
+
+	default:
+		return QPointF(-1001, -1001);
+		break;
+	}
+
+}
 
 void CLRecorderItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {

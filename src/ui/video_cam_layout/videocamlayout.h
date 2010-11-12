@@ -113,6 +113,8 @@ protected slots:
 	void onTimer();
 	void onVideoTimer();
 
+	void onItemClose(CLAbstractSceneItem* item);
+
 	void stop_helper(bool emt = true);
 private:
 

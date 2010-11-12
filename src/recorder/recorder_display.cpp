@@ -7,7 +7,7 @@ CLRecorderDisplay::CLRecorderDisplay(CLDevice* dev, CLRecorderItem* recitem):
 mDev(dev),
 mRecitem(recitem)
 {
-
+	recitem->setRecorderDisplay(this);
 }
 
 CLRecorderDisplay::~CLRecorderDisplay()
