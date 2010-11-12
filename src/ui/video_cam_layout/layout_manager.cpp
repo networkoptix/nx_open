@@ -2,7 +2,8 @@
 #include "start_screen_content.h"
 #include "layout_content.h"
 
-
+#include <QDomDocument>
+#include <QFile>
 
 CLSceneLayoutManager::CLSceneLayoutManager():
 mRecordersAndLayouts(0)
@@ -42,6 +43,28 @@ bool CLSceneLayoutManager::load()
 
 void CLSceneLayoutManager::save()
 {
+	QDomDocument doc("");
+	QDomElement root = doc.createElement("CustomLayouts");
+	doc.appendChild(root);
+
+
+	QList<LayoutContent*>& custom_layots_list = mAllCustomLayouts->childrenList();
+	foreach(LayoutContent* cl, custom_layots_list)
+	{
+		cl->toXml(doc, root);
+	}
+
+
+	QString xml = doc.toString();
+
+
+
+	QFile file("custom_layouts.xml");
+	file.open(QIODevice::WriteOnly);
+
+	QTextStream fstr(&file);
+	fstr<< xml;
+	fstr.flush();
 
 }
 

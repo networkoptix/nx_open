@@ -113,6 +113,19 @@ void LayoutContent::addDevice(const QString& uniqueId, int x, int y, int width, 
 	m_devices.push_back(new LayoutDevice(uniqueId, x, y, width, height, angle));
 }
 
+void LayoutContent::removeDevice(const QString& uniqueId)
+{
+	foreach(LayoutDevice* device, m_devices)
+	{
+		if (device->getId()==uniqueId)
+		{
+			m_devices.removeOne(device);
+			return;
+		}
+
+	}
+}
+
 LayoutContent* LayoutContent::addLayout(LayoutContent* l, bool copy)
 {
 	if (copy)
@@ -163,6 +176,29 @@ QList<LayoutDevice*>& LayoutContent::getDevices()
 QList<LayoutContent*>& LayoutContent::childrenList() 
 {
 	return m_childlist;
+}
+
+
+void LayoutContent::toXml(QDomDocument& doc, QDomElement& parent) 
+{
+	QDomElement element = doc.createElement("Layout");
+	element.setAttribute("type", Type2String(type()));
+	element.setAttribute("name", getName());
+	element.setAttribute("recorder", (int)isRecorder());
+	parent.appendChild(element);
+
+	QList<LayoutDevice*>& dev_lst = getDevices();
+	foreach(LayoutDevice* dev, dev_lst)
+	{
+		dev->toXml(doc, element);
+	}
+
+	QList<LayoutContent*>& l_lst = childrenList();
+	foreach(LayoutContent* l, l_lst)
+	{
+		l->toXml(doc, element);
+	}
+
 }
 
 //=========================================================================

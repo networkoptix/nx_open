@@ -6,6 +6,7 @@
 #include <QString>
 #include <QList>
 #include "device\device_managmen\device_manager.h"
+#include <QDomDocument>
 
 class CLCustomBtnItem;
 class CLStaticImageItem;
@@ -18,8 +19,14 @@ public:
 	enum Type {DEVICE, BUTTON, LAYOUT, IMAGE, BACKGROUND};
 	LayoutItem();
 	LayoutItem(int x, int y, int width, int height, int angle = 0);
+
+	static QString Type2String(Type t) ;
+
+	virtual void toXml(QDomDocument& doc, QDomElement& parent)  = 0;
+
 	virtual ~LayoutItem();
 	virtual Type type() const = 0;
+
 
 	int getX() const;
 	int getY() const;
@@ -49,6 +56,7 @@ public:
 	LayoutDevice(const QString& uniqueId, int x, int y, int width, int height, int angle = 0);
 	virtual Type type() const;
 	QString getId() const;
+	virtual void toXml(QDomDocument& doc, QDomElement& parent) ;
 protected:
 	QString id;
 };
@@ -60,6 +68,7 @@ public:
 	LayoutButton();
 	LayoutButton(const QString& name, const QString& text, const QString& tooltip, int x, int y, int width, int height, int angle = 0);
 	virtual Type type() const;
+	virtual void toXml(QDomDocument& doc, QDomElement& parent) ;
 protected:
 	QString m_text;
 	QString m_tooltip;
@@ -74,6 +83,7 @@ public:
 
 	virtual Type type() const ;
 	QString getImage() const;
+	virtual void toXml(QDomDocument& doc, QDomElement& parent) ;
 protected:
 	QString image;
 

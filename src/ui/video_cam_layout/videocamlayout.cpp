@@ -834,6 +834,8 @@ void SceneLayout::onItemClose(CLAbstractSceneItem* item)
 
 		CLAbstractComplicatedItem* devitem = vitem ->getVideoCam();
 
+		getContent()->removeDevice(vitem ->getVideoCam()->getDevice()->getUniqueId());
+
 		devitem->beforestopDispay();
 		devitem->stopDispay();
 		devitem->getDevice()->releaseRef();

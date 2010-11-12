@@ -22,6 +22,43 @@ LayoutItem::~LayoutItem()
 
 }
 
+QString LayoutItem::Type2String(Type t)
+{
+	enum Type {DEVICE, BUTTON, LAYOUT, IMAGE, BACKGROUND};
+
+	switch(t)
+	{
+	case DEVICE:
+		return "DEVICE";
+
+	case BUTTON:
+		return "BUTTON";
+
+	case LAYOUT:
+	    return "LAYOUT";
+
+	case IMAGE:
+	    return "IMAGE";
+
+	case BACKGROUND:
+		return "BACKGROUND";
+
+	default:
+		return "NONE";
+	    
+	}
+	return "NONE";
+}
+
+void LayoutItem::toXml(QDomDocument& doc, QDomElement& parent) 
+{
+	QDomElement element = doc.createElement("item");
+	element.setAttribute("type", Type2String(type()));
+	element.setAttribute("name", getName());
+	parent.appendChild(element);
+
+}
+
 void LayoutItem::setName(const QString& name)
 {
 	this->name = name;
@@ -81,7 +118,7 @@ LayoutDevice::LayoutDevice(const QString& uniqueId, int x_, int y_, int width_, 
 LayoutItem(x_, y_, width_, height_,  angle_),
 id(uniqueId)
 {
-
+	setName(uniqueId);
 }
 
 LayoutItem::Type LayoutDevice::type() const
@@ -92,6 +129,11 @@ LayoutItem::Type LayoutDevice::type() const
 QString LayoutDevice::getId() const
 {
 	return id;
+}
+
+void LayoutDevice::toXml(QDomDocument& doc, QDomElement& parent) 
+{
+	LayoutItem::toXml(doc, parent);
 }
 
 //=======
@@ -111,6 +153,11 @@ m_tooltip(tooltip)
 LayoutItem::Type LayoutButton::type() const
 {
 	return BUTTON;
+}
+
+void LayoutButton::toXml(QDomDocument& doc, QDomElement& parent) 
+{
+	LayoutItem::toXml(doc, parent);
 }
 
 //=======
@@ -136,5 +183,11 @@ QString LayoutImage::getImage() const
 {
 	return image;
 }
+
+void LayoutImage::toXml(QDomDocument& doc, QDomElement& parent) 
+{
+	LayoutItem::toXml(doc, parent);
+}
+
 
 //=======================================================================================================

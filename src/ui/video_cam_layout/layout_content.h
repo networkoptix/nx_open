@@ -2,6 +2,9 @@
 #define layout_content_h_2210
 
 #include "layout_items.h"
+#include <QDomDocument>
+
+class QDomElement;
 
 class LayoutContent : public LayoutButton
 {
@@ -33,6 +36,7 @@ public:
 	void addButton(const QString& name, const QString& text, const QString& tooltip, int x, int y, int width, int height, int angle = 0);
 	void addImage(const QString& img, const QString& name, const QString& text, const QString& tooltip, int x, int y, int width, int height, int angle = 0);
 	void addDevice(const QString& uniqueId, int x=0, int y=0, int width=0, int height=0, int angle = 0);
+	void removeDevice(const QString& uniqueId);
 
 	// return l if copy is false, else returns copy of l
 	LayoutContent* addLayout(LayoutContent* l, bool copy);
@@ -51,6 +55,7 @@ public:
 	
 	static LayoutContent* coppyLayout(LayoutContent* l);
 
+	void toXml(QDomDocument& doc, QDomElement& parent) ;
 	
 protected:
 	QList<LayoutImage*> m_imgs;
