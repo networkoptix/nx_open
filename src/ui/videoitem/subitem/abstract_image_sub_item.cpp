@@ -1,19 +1,23 @@
 #include "abstract_image_sub_item.h"
 #include <QPainter>
 
-CLAbstractImgSubItem::CLAbstractImgSubItem(CLAbstractSceneItem* parent, qreal opacity, int max_width, int max_height):
+extern QPixmap cached(const QString &img);
+
+CLImgSubItem::CLImgSubItem(CLAbstractSceneItem* parent, const QString& img, CLAbstractSubItem::ItemType type, qreal opacity, int max_width, int max_height):
 CLAbstractSubItem(parent, opacity)
 {
-
+	m_img = cached(img);
+	mType = type;
+	setMaxSize(max_width, max_height);
 }
 
-CLAbstractImgSubItem::~CLAbstractImgSubItem()
+CLImgSubItem::~CLImgSubItem()
 {
 
 }
 
 
-void CLAbstractImgSubItem::setMaxSize(int max_width, int max_height)
+void CLImgSubItem::setMaxSize(int max_width, int max_height)
 {
 	m_width = m_img.width();
 	m_height = m_img.height();
@@ -35,12 +39,12 @@ void CLAbstractImgSubItem::setMaxSize(int max_width, int max_height)
 }
 
 
-QRectF CLAbstractImgSubItem::boundingRect() const
+QRectF CLImgSubItem::boundingRect() const
 {
 	return QRectF(0,0,m_width, m_height);
 }
 
-void CLAbstractImgSubItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void CLImgSubItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
 	painter->setRenderHint(QPainter::SmoothPixmapTransform);
 	painter->setRenderHint(QPainter::Antialiasing);

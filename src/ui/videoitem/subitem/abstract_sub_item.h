@@ -15,7 +15,7 @@ public:
 	CLAbstractSubItem(CLAbstractSceneItem* parent, qreal opacity);
 	virtual ~CLAbstractSubItem();
 
-	virtual ItemType getType() const = 0;
+	virtual ItemType getType() const;
 
 signals:
 	void onPressed(CLAbstractSubItem*);
@@ -30,6 +30,7 @@ protected slots:
 protected:
 	qreal m_opacity;
 	QPropertyAnimation* m_animation;
+	ItemType mType;
 
 };
 

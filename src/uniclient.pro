@@ -89,8 +89,8 @@ SOURCES += ui/videoitem/recorder_item.cpp ui/videoitem/layout_item.cpp ui/ui_com
 HEADERS += videodisplay/complicated_item.h
 SOURCES += videodisplay/complicated_item.cpp
 
-HEADERS += ui/videoitem/subitem/abstract_sub_item.h  ui/videoitem/subitem/close_sub_item.h  ui/videoitem/subitem/abstract_image_sub_item.h
-SOURCES += ui/videoitem/subitem/abstract_sub_item.cpp  ui/videoitem/subitem/close_sub_item.cpp ui/videoitem/subitem/abstract_image_sub_item.cpp
+HEADERS += ui/videoitem/subitem/abstract_sub_item.h  ui/videoitem/subitem/abstract_image_sub_item.h
+SOURCES += ui/videoitem/subitem/abstract_sub_item.cpp  ui/videoitem/subitem/abstract_image_sub_item.cpp
 
 
 RESOURCES += mainwnd.qrc

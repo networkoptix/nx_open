@@ -3,11 +3,11 @@
 
 #include "abstract_sub_item.h"
 
-class CLAbstractImgSubItem : public CLAbstractSubItem
+class CLImgSubItem : public CLAbstractSubItem
 {
 public:
-	CLAbstractImgSubItem(CLAbstractSceneItem* parent, qreal opacity, int max_width, int max_height);
-	~CLAbstractImgSubItem();
+	CLImgSubItem(CLAbstractSceneItem* parent, const QString& img, CLAbstractSubItem::ItemType type, qreal opacity, int max_width, int max_height);
+	~CLImgSubItem();
 protected:
 	void setMaxSize(int max_width, int max_height);
 	QRectF boundingRect() const;

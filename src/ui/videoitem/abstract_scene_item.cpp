@@ -5,7 +5,8 @@
 #include <math.h>
 #include "settings.h"
 #include <qgraphicssceneevent>
-#include "subitem\close_sub_item.h"
+#include "subitem\abstract_image_sub_item.h"
+
 
 static const double Pi = 3.14159265358979323846264338327950288419717;
 static double TwoPi = 2.0 * Pi;
@@ -82,7 +83,7 @@ bool CLAbstractSceneItem::addSubItem(CLAbstractSubItem::ItemType type)
 	switch(type)
 	{
 	case CLAbstractSubItem::Close:
-		item = new CLCloseSubItem(this, global_decoration_opacity, 250, 250);
+		item = new CLImgSubItem(this, "./skin/close2.png" ,CLAbstractSubItem::Close, global_decoration_opacity, 250, 250);
 		break;
 
 	default:

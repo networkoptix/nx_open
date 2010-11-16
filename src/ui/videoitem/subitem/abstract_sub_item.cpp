@@ -24,6 +24,11 @@ CLAbstractSubItem::~CLAbstractSubItem()
 }
 
 
+CLAbstractSubItem::ItemType CLAbstractSubItem::getType() const
+{
+	return mType;
+}
+
 void CLAbstractSubItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
 	stopAnimation();
