@@ -6,6 +6,7 @@
 #include "../statistics/statistics.h"
 #include "../streamreader/streamreader.h"
 #include "videodisplay/complicated_item.h"
+#include "stream_recorder.h"
 
 class CLDevice;
 class CLVideoWindowItem;
@@ -15,12 +16,14 @@ class CLVideoCamera : public CLAbstractComplicatedItem
 {
 public:
 	// number of videovindows in array must be the same as device->getNumberOfVideoChannels
-	CLVideoCamera(){}
 	CLVideoCamera(CLDevice* device, CLVideoWindowItem* videovindow);
 	virtual ~CLVideoCamera();
 
 	virtual void startDispay();
 	virtual void stopDispay();
+
+	virtual void startRecording();
+	virtual void stopRecording();
 
 	virtual void beforestopDispay();
 	
@@ -46,6 +49,8 @@ private:
 	CLDevice* m_device;
 	CLVideoWindowItem* m_videovindow;
 	CLCamDisplay m_camdispay;
+	CLStreamRecorder m_recorder;
+
 	CLStreamreader* m_reader;
 
 	CLStatistics* m_stat;

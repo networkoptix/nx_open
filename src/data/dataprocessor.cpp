@@ -25,6 +25,11 @@ void CLAbstractDataProcessor::clearUnProcessedData()
 	m_dataQueue.clear();
 }
 
+void CLAbstractDataProcessor::endOfRun()
+{
+
+}
+
 void CLAbstractDataProcessor::run()
 {
 	CL_LOG(cl_logINFO) cl_log.log("data processor started.", cl_logINFO);
@@ -47,6 +52,8 @@ void CLAbstractDataProcessor::run()
 		data->releaseRef();
 
 	}
+
+	endOfRun();
 
 	CL_LOG(cl_logINFO) cl_log.log("data processor stopped.", cl_logINFO);
 }

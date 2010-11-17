@@ -52,6 +52,7 @@ public:
 
 	virtual void setItemSelected(bool sel, bool animate = true, int delay = 0);
 
+	
 signals:
 	void onAspectRatioChanged(CLAbstractSceneItem* item);
 

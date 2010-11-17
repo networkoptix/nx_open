@@ -24,6 +24,7 @@ public:
 protected:
 	void run();
 	virtual void processData(CLAbstractData* data)=0;
+	virtual void endOfRun();
 
 protected:
 

@@ -15,5 +15,6 @@ extern QColor global_selection_color;
 extern qreal global_menu_opacity;
 extern qreal global_dlg_opacity;
 extern qreal global_decoration_opacity;
+extern qreal global_decoration_max_opacity;
 
 #endif //global_settings_h1933

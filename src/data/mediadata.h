@@ -30,7 +30,7 @@ struct CLAbstractMediaData : public CLAbstractData
 
 
 	quint32 channel_num;
-	QTime time;
+	//QTime time;
 
 
 	quint32 source_id;

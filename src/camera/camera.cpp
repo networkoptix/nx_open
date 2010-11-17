@@ -10,7 +10,8 @@
 
 CLVideoCamera::CLVideoCamera(CLDevice* device, CLVideoWindowItem* videovindow):
 m_device(device),
-m_videovindow(videovindow)
+m_videovindow(videovindow),
+m_recorder(device)
 {
 
 	m_device->getBaseInfo();
@@ -64,6 +65,9 @@ void CLVideoCamera::stopDispay()
 	CL_LOG(cl_logDEBUG1) cl_log.log("CLVideoCamera::stopDispay", m_device->getUniqueId(), cl_logDEBUG1);
 
 	CL_LOG(cl_logDEBUG1) cl_log.log("CLVideoCamera::stopDispay reader is about to pleases stop ", QString::number((int)m_reader,16), cl_logDEBUG1);
+
+	stopRecording();
+
 	m_reader->stop();
 	m_camdispay.stop();
 	m_camdispay.clearUnProcessedData();
@@ -75,9 +79,23 @@ void CLVideoCamera::beforestopDispay()
 {
 	m_reader->pleaseStop();
 	m_camdispay.pleaseStop();
+	m_recorder.pleaseStop();
 	m_videovindow->before_destroy();
 
 }
+
+void CLVideoCamera::startRecording()
+{
+	m_reader->addDataProcessor(&m_recorder);
+	m_recorder.start();
+}
+
+void CLVideoCamera::stopRecording()
+{
+	m_recorder.stop();
+	m_reader->removeDataProcessor(&m_recorder);
+}
+
 
 CLDevice* CLVideoCamera::getDevice() const
 {

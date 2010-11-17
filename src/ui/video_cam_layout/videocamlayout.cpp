@@ -413,7 +413,10 @@ bool SceneLayout::addItem(CLAbstractSceneItem* item, int x, int y, bool update_s
 
 	//=========
 	if (isEditable())	
+	{
 		item->addSubItem(CLAbstractSubItem::Close);
+		item->addSubItem(CLAbstractSubItem::ArchiveNavigator);
+	}
 	//=========
 
 	if (update_scene_rect)

@@ -6,6 +6,7 @@
 #include "settings.h"
 #include <qgraphicssceneevent>
 #include "subitem\abstract_image_sub_item.h"
+#include "subitem\archive_navifation\archive_navigator_item.h"
 
 
 static const double Pi = 3.14159265358979323846264338327950288419717;
@@ -83,8 +84,13 @@ bool CLAbstractSceneItem::addSubItem(CLAbstractSubItem::ItemType type)
 	switch(type)
 	{
 	case CLAbstractSubItem::Close:
-		item = new CLImgSubItem(this, "./skin/close2.png" ,CLAbstractSubItem::Close, global_decoration_opacity, 250, 250);
+		item = new CLImgSubItem(this, "./skin/close2.png" ,CLAbstractSubItem::Close, global_decoration_opacity, global_decoration_max_opacity, 250, 250);
 		break;
+
+	case CLAbstractSubItem::ArchiveNavigator:
+		item = new CLArchiveNavigatorItem(this);
+		break;
+
 
 	default:
 		return false;

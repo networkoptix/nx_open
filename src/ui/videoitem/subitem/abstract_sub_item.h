@@ -11,11 +11,13 @@ class CLAbstractSubItem : public QObject, public QGraphicsItem
 	Q_OBJECT
 	Q_PROPERTY(qreal opacity  READ opacity   WRITE setOpacity)
 public:
-	enum ItemType {Close};
-	CLAbstractSubItem(CLAbstractSceneItem* parent, qreal opacity);
+	enum ItemType {Close, ArchiveNavigator};
+	CLAbstractSubItem(CLAbstractSceneItem* parent, qreal opacity, qreal max_opacity);
 	virtual ~CLAbstractSubItem();
 
 	virtual ItemType getType() const;
+
+	virtual void onResize() = 0;
 
 signals:
 	void onPressed(CLAbstractSubItem*);
@@ -26,11 +28,12 @@ protected:
 	void mousePressEvent ( QGraphicsSceneMouseEvent * event );
 protected slots:
 	void stopAnimation();
-
+	bool needAnimation() const;
 protected:
-	qreal m_opacity;
+	qreal m_opacity, m_maxopacity;
 	QPropertyAnimation* m_animation;
 	ItemType mType;
+	CLAbstractSceneItem* mParent;
 
 };
 

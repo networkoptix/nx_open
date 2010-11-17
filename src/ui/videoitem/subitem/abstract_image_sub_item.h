@@ -6,8 +6,11 @@
 class CLImgSubItem : public CLAbstractSubItem
 {
 public:
-	CLImgSubItem(CLAbstractSceneItem* parent, const QString& img, CLAbstractSubItem::ItemType type, qreal opacity, int max_width, int max_height);
+	CLImgSubItem(CLAbstractSceneItem* parent, const QString& img, CLAbstractSubItem::ItemType type, 
+		qreal opacity, qreal max_opacity, int max_width, int max_height);
 	~CLImgSubItem();
+
+	void onResize();
 protected:
 	void setMaxSize(int max_width, int max_height);
 	QRectF boundingRect() const;

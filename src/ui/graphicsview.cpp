@@ -71,11 +71,13 @@ m_fps_frames(0)
 	m_camLayout.setScene(&m_scene);
 
 
+
 	setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers))); //Antialiasing
 	//setViewport(new QGLWidget());
 	setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform	| QPainter::TextAntialiasing); //Antialiasing
 	
 	//viewport()->setAutoFillBackground(false);
+
 
 
 	setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);

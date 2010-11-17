@@ -24,6 +24,8 @@ public:
 
 	  }
 
+	virtual ~CLLongRunnable(){};
+
     virtual void pleaseStop()
 	{
 		m_needStop = true;
