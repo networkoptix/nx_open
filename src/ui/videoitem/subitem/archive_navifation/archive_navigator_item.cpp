@@ -15,6 +15,7 @@ CLAbstractSubItem(parent, 0.2, 0.8)
 	m_width = parent->boundingRect().width();
 	mType = ArchiveNavigator;
 
+	/*/
 	mPlayItem = new CLImgSubItem(this, "./skin/try/play2.png", CLAbstractSubItem::Play, 0.7, 1.0, NavigatorItemHeight, NavigatorItemHeight);
 	mPauseItem = new CLImgSubItem(this, "./skin/try/pause2.png", CLAbstractSubItem::Pause, 0.7, 1.0, NavigatorItemHeight, NavigatorItemHeight);
 	mPauseItem->setVisible(false);
@@ -22,36 +23,49 @@ CLAbstractSubItem(parent, 0.2, 0.8)
 	mSlider_item = new QGraphicsProxyWidget(this);
 	mSlider = new QSlider(Qt::Horizontal);
 	mSlider->setRange(0,2000);
-	//mSlider_item->scale(1.0, 5);
 
-	/*
-	mSlider->setStyleSheet("QSlider { height: 30px}"
+
+	mSlider->setStyleSheet("QSlider { height: 120px}"
+	"QSlider::groove:horizontal {"
+	"border: 8px solid #0f50af;"
+	"background: qlineargradient(x1:0, y1:0, x2:0, y2:4, stop:0 #000030, stop:1 #0000af);"
+	"top: 90px;"
+	"height: 104px;"
+	"margin: 0 0 0 0;}"
+	"QSlider::handle:horizontal {"
+	"background: qlineargradient(x1:0, y1:0, x2:4, y2:4, stop:0 #0000a0, stop:1 #3358e0);"
+	"border: 10px solid #007eff;" // border of handle 
+	"width: 120px;"
+	"margin: -8px 0 -8px 0;"
+	"border-radius: 30px;}");
+	/**/
+
+
+	/**/
+	mPlayItem = new CLImgSubItem(this, "./skin/try/play1.png", CLAbstractSubItem::Play, 0.7, 1.0, NavigatorItemHeight, NavigatorItemHeight);
+	mPauseItem = new CLImgSubItem(this, "./skin/try/pause1.png", CLAbstractSubItem::Pause, 0.7, 1.0, NavigatorItemHeight, NavigatorItemHeight);
+	mPauseItem->setVisible(false);
+
+	mSlider_item = new QGraphicsProxyWidget(this);
+	mSlider = new QSlider(Qt::Horizontal);
+	mSlider->setRange(0,2000);
+
+
+	mSlider->setStyleSheet("QSlider { height: 120px}"
 		"QSlider::groove:horizontal {"
-		"border: 1px solid #999999;"
-		"background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #B1B1B1, stop:1 #c4c4c4);"
-		"height: 26px;"
+		"border: 8px solid #6a6a6a;"
+		"background: qlineargradient(x1:0, y1:0, x2:0, y2:4, stop:0 #6a6a7a, stop:1 #6a6afa);"
+		"top: 90px;"
+		"height: 104px;"
 		"margin: 0 0 0 0;}"
 		"QSlider::handle:horizontal {"
-		"background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #b4b4b4, stop:1 #8f8f8f);"
-		"border: 1px solid #5c5c5c;"
-		"width: 30px;"
-		"margin: -2px 0 -2px 0;"
-		"border-radius: 3px;}");
-		/**/
+		"background: qlineargradient(x1:0, y1:0, x2:4, y2:4, stop:0 #567ecd, stop:1 #567eff);"
+		"border: 10px solid #205eff;" // border of handle 
+		"width: 120px;"
+		"margin: -8px 0 -8px 0;"
+		"border-radius: 30px;}");
 
-
-	mSlider->setStyleSheet("QSlider { height: 150px}"
-		"QSlider::groove:horizontal {"
-		"border: 5px solid #999999;"
-		"background: qlineargradient(x1:0, y1:0, x2:0, y2:5, stop:0 #B1B1B1, stop:1 #c4c4c4);"
-		"height: 130px;"
-		"margin: 0 0 0 0;}"
-		"QSlider::handle:horizontal {"
-		"background: qlineargradient(x1:0, y1:0, x2:5, y2:5, stop:0 #b4b4b4, stop:1 #8f8f8f);"
-		"border: 5px solid #5c5c5c;"
-		"width: 150px;"
-		"margin: -5px 0 -5px 0;"
-		"border-radius: 15px;}");
+	/**/
 
 	
 	mSlider_item->setWidget(mSlider);
