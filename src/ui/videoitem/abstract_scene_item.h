@@ -11,7 +11,15 @@ class GraphicsView;
 class CLVideoWindowItem;
 class CLAbstractSubItem;
 
-class CLAbstractSceneItem : public QObject, public QGraphicsItem
+class CLAbstractSubItemContainer : public QObject, public QGraphicsItem
+{
+	Q_OBJECT
+protected slots:
+	virtual void onSubItemPressed(CLAbstractSubItem* subitem) = 0;
+
+};
+
+class CLAbstractSceneItem : public CLAbstractSubItemContainer
 {
 	Q_OBJECT
 	Q_PROPERTY(QPointF pos READ pos WRITE setPos)

@@ -5,6 +5,7 @@
 
 class CLAbstractSceneItem;
 class QPropertyAnimation;
+class CLAbstractSubItemContainer;
 
 class CLAbstractSubItem : public QObject, public QGraphicsItem
 {
@@ -12,7 +13,7 @@ class CLAbstractSubItem : public QObject, public QGraphicsItem
 	Q_PROPERTY(qreal opacity  READ opacity   WRITE setOpacity)
 public:
 	enum ItemType {Close, ArchiveNavigator, Recording};
-	CLAbstractSubItem(CLAbstractSceneItem* parent, qreal opacity, qreal max_opacity);
+	CLAbstractSubItem(CLAbstractSubItemContainer* parent, qreal opacity, qreal max_opacity);
 	virtual ~CLAbstractSubItem();
 
 	virtual ItemType getType() const;
@@ -33,7 +34,7 @@ protected:
 	qreal m_opacity, m_maxopacity;
 	QPropertyAnimation* m_animation;
 	ItemType mType;
-	CLAbstractSceneItem* mParent;
+	CLAbstractSubItemContainer* mParent;
 
 };
 

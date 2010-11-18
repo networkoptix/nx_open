@@ -6,7 +6,7 @@
 class CLImgSubItem : public CLAbstractSubItem
 {
 public:
-	CLImgSubItem(CLAbstractSceneItem* parent, const QString& img, CLAbstractSubItem::ItemType type, 
+	CLImgSubItem(CLAbstractSubItemContainer* parent, const QString& img, CLAbstractSubItem::ItemType type, 
 		qreal opacity, qreal max_opacity, int max_width, int max_height);
 	~CLImgSubItem();
 

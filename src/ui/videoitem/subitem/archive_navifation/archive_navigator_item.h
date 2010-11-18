@@ -9,7 +9,7 @@ class CLArchiveNavigatorItem : public CLAbstractSubItem
 {
 	Q_OBJECT
 public:
-	CLArchiveNavigatorItem(CLAbstractSceneItem* parent);
+	CLArchiveNavigatorItem(CLAbstractSubItemContainer* parent);
 	~CLArchiveNavigatorItem();
 
 	// this function uses parent width

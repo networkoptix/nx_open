@@ -4,7 +4,7 @@
 
 int NavigatorItemHeight = 200;
 
-CLArchiveNavigatorItem::CLArchiveNavigatorItem(CLAbstractSceneItem* parent):
+CLArchiveNavigatorItem::CLArchiveNavigatorItem(CLAbstractSubItemContainer* parent):
 CLAbstractSubItem(parent, 0.2, 0.8)
 {
 	m_height = NavigatorItemHeight;

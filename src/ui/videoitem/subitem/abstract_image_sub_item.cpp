@@ -3,7 +3,7 @@
 
 extern QPixmap cached(const QString &img);
 
-CLImgSubItem::CLImgSubItem(CLAbstractSceneItem* parent, const QString& img, CLAbstractSubItem::ItemType type, 
+CLImgSubItem::CLImgSubItem(CLAbstractSubItemContainer* parent, const QString& img, CLAbstractSubItem::ItemType type, 
 						   qreal opacity, qreal max_opacity, int max_width, int max_height):
 CLAbstractSubItem(parent, opacity, max_opacity)
 {

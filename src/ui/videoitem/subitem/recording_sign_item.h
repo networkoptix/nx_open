@@ -8,7 +8,7 @@ class CLRecordingSignItem : public CLImgSubItem
 {
 	Q_OBJECT
 public:
-	CLRecordingSignItem(CLAbstractSceneItem* parent);
+	CLRecordingSignItem(CLAbstractSubItemContainer* parent);
 	~CLRecordingSignItem();
 protected slots:
 	void onTimer();

@@ -2,7 +2,7 @@
 
 QTimer CLRecordingSignItem::mTimer;
 
-CLRecordingSignItem::CLRecordingSignItem(CLAbstractSceneItem* parent):
+CLRecordingSignItem::CLRecordingSignItem(CLAbstractSubItemContainer* parent):
 CLImgSubItem(parent, "./skin/try/recording2.png", CLAbstractSubItem::Recording, 0.6, 0.6, 400, 400)
 {
 	if (!mTimer.isActive()) // just for the first instance 
