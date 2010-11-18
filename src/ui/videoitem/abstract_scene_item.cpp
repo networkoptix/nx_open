@@ -24,6 +24,7 @@ extern int item_hoverevent_duration;
 
 CLAbstractSceneItem::CLAbstractSceneItem(GraphicsView* view, int max_width, int max_height, 
 										 QString name):
+CLAbstractSubItemContainer(0),
 m_max_width(max_width),
 m_max_height(max_height),
 m_animationTransform(this),

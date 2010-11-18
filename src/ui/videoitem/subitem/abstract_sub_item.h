@@ -5,9 +5,27 @@
 
 class CLAbstractSceneItem;
 class QPropertyAnimation;
-class CLAbstractSubItemContainer;
+class CLAbstractSubItem;
 
-class CLAbstractSubItem : public QObject, public QGraphicsItem
+class CLAbstractSubItemContainer : public QObject, public QGraphicsItem
+{
+	Q_OBJECT
+public:
+	CLAbstractSubItemContainer(QGraphicsItem* parent):
+	QGraphicsItem(parent)
+	{
+
+	}
+
+	~CLAbstractSubItemContainer(){}
+
+protected slots:
+	virtual void onSubItemPressed(CLAbstractSubItem* subitem){};
+
+};
+
+
+class CLAbstractSubItem : public CLAbstractSubItemContainer
 {
 	Q_OBJECT
 	Q_PROPERTY(qreal opacity  READ opacity   WRITE setOpacity)

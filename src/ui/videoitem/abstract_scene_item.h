@@ -11,13 +11,6 @@ class GraphicsView;
 class CLVideoWindowItem;
 class CLAbstractSubItem;
 
-class CLAbstractSubItemContainer : public QObject, public QGraphicsItem
-{
-	Q_OBJECT
-protected slots:
-	virtual void onSubItemPressed(CLAbstractSubItem* subitem) = 0;
-
-};
 
 class CLAbstractSceneItem : public CLAbstractSubItemContainer
 {

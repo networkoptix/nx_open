@@ -7,7 +7,7 @@
 #define OPACITY_TIME 500
 
 CLAbstractSubItem::CLAbstractSubItem(CLAbstractSubItemContainer* parent, qreal opacity, qreal max_opacity):
-QGraphicsItem(static_cast<QGraphicsItem*>(parent)),
+CLAbstractSubItemContainer(static_cast<QGraphicsItem*>(parent)),
 m_opacity(opacity),
 m_maxopacity(max_opacity),
 m_animation(0),
