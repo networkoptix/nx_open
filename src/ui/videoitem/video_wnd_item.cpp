@@ -147,11 +147,17 @@ QPointF CLVideoWindowItem::getBestSubItemPos(CLAbstractSubItem::ItemType type)
 	{
 	case CLAbstractSubItem::Close:
 		return QPointF(width()-270, 20);
-		break;
+		
 
 	case CLAbstractSubItem::ArchiveNavigator:
 		return QPointF(0, height() - NavigatorItemHeight);
-		break;
+		
+
+	case CLAbstractSubItem::Recording:
+		return QPointF(-30, 100);
+		
+		
+
 
 
 	default:
@@ -294,7 +300,7 @@ void CLVideoWindowItem::drawFPS(QPainter* painter)
 
 		sprintf_s(fps, "%6.2ffps %6.2fMbps", m_stat[i]->getFrameRate(), m_stat[i]->getBitrate());
 		QFontMetrics fm(painter->font());
-		painter->drawText(rect.left(),rect.top()+170 + fm.height()/2, fps);
+		painter->drawText(rect.left()+150,rect.top()+170 + fm.height()/2, fps);
 
 	}
 

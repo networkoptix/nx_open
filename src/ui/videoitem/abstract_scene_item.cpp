@@ -7,6 +7,7 @@
 #include <qgraphicssceneevent>
 #include "subitem\abstract_image_sub_item.h"
 #include "subitem\archive_navifation\archive_navigator_item.h"
+#include "subitem\recording_sign_item.h"
 
 
 static const double Pi = 3.14159265358979323846264338327950288419717;
@@ -73,6 +74,7 @@ CLVideoWindowItem* CLAbstractSceneItem::toVideoItem() const
 	return static_cast<CLVideoWindowItem*>(   const_cast<CLAbstractSceneItem*>(this)  );
 }
 
+
 bool CLAbstractSceneItem::addSubItem(CLAbstractSubItem::ItemType type)
 {
 	QPointF pos = getBestSubItemPos(type);
@@ -91,6 +93,10 @@ bool CLAbstractSceneItem::addSubItem(CLAbstractSubItem::ItemType type)
 		item = new CLArchiveNavigatorItem(this);
 		break;
 
+	case CLAbstractSubItem::Recording:
+		item = new CLRecordingSignItem(this);
+		break;
+
 
 	default:
 		return false;
@@ -101,7 +107,17 @@ bool CLAbstractSceneItem::addSubItem(CLAbstractSubItem::ItemType type)
 
 void CLAbstractSceneItem::removeSubItem(CLAbstractSubItem::ItemType type)
 {
+	QList<QGraphicsItem *> childrenLst = childItems();
+	foreach(QGraphicsItem * item, childrenLst)
+	{
+		CLAbstractSubItem* sub_item = static_cast<CLAbstractSubItem*>(item);
+		if (sub_item->getType())
+		{
+			scene()->removeItem(sub_item);
+			delete sub_item;
+		}
 
+	}
 }
 
 QPointF CLAbstractSceneItem::getBestSubItemPos(CLAbstractSubItem::ItemType type)

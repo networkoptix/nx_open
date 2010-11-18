@@ -166,9 +166,13 @@ void CLStreamRecorder::flush_channel(int channel)
 
 	fwrite(mDescr[channel]->data(),1,mDescr[channel]->size(),mDescrFile[channel]);
 	fflush(mDescrFile[channel]);
+	mDescr[channel]->clear();
 
 	fwrite(mData[channel]->data(),1,mData[channel]->size(),mDataFile[channel]);
 	fflush(mDataFile[channel]);
+	mData[channel]->clear();
+
+
 
 }
 

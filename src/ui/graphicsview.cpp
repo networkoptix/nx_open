@@ -928,6 +928,11 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 		return;
 	}
 
+	CLVideoWindowItem* video_wnd = 0;
+	CLVideoCamera* cam = 0;
+	CLDevice* dev  = 0;
+
+
 	CLAbstractSceneItem* wnd = static_cast<CLAbstractSceneItem*>(itemAt(event->pos()));
 	if (!m_camLayout.hasSuchItem(wnd)) // this is decoration something
 		wnd = 0;
@@ -968,11 +973,42 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
 	if (wnd) // video wnd
 	{
-		menu.addAction(&cm_fullscren);
-
-		if (wnd->getType()==CLAbstractSceneItem::LAYOUT && m_viewMode!=ItemsDonor)
+		if (wnd->getType() == CLAbstractSceneItem::VIDEO)
 		{
-			menu.addMenu(&layout_editor_menu);
+			// video item
+			menu.addAction(&cm_fullscren);
+
+			video_wnd = static_cast<CLVideoWindowItem*>(wnd);
+			cam = video_wnd->getVideoCam();
+			dev = cam->getDevice();
+
+			if (dev->checkDeviceTypeFlag(CLDevice::NETWORK))
+			{
+				if (cam->isRecording())
+				{
+					menu.addAction(&cm_stop_recording);
+					menu.addAction(&cm_view_recorded);
+				}
+				else
+				{
+					menu.addAction(&cm_start_recording);
+				}
+
+			}
+
+			
+		}
+
+		if (wnd->getType()==CLAbstractSceneItem::LAYOUT )
+		{
+			//layout button
+			if (m_viewMode!=ItemsDonor)
+				menu.addMenu(&layout_editor_menu);
+		}
+
+		if (wnd->getType()==CLAbstractSceneItem::RECORDER)
+		{
+			
 		}
 
 		menu.addAction(&cm_settings);
@@ -980,6 +1016,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 	}
 	else
 	{
+		// on void menu...
 		menu.addAction(&cm_fitinview);
 		menu.addAction(&cm_arrange);
 
@@ -1039,23 +1076,34 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 		if (!m_camLayout.hasSuchItem(wnd))
 			return;
 
-		if (act==&cm_fullscren)
+		if (wnd->getType() == CLAbstractSceneItem::VIDEO)
 		{
-			toggleFullScreen_helper(wnd);
+			if (act==&cm_fullscren)
+				toggleFullScreen_helper(wnd);
+
+			
+			if (act==&cm_settings && dev)
+				show_device_settings_helper(dev);
+
+			if (act == &cm_start_recording && cam)
+				cam->startRecording();
+
+			if (act == &cm_stop_recording && cam)
+				cam->stopRecording();
+
+
+			
 		}
-		else if (act==&cm_settings)
+
+		if (wnd->getType() == CLAbstractSceneItem::LAYOUT)
 		{
-			if (wnd->toVideoItem())
-				show_device_settings_helper(wnd->toVideoItem()->getVideoCam()->getDevice());
+			if (act == &cm_layout_editor_change_t)
+				contextMenuHelper_chngeLayoutTitle(wnd);
+
+			if (act == &cm_layout_editor_editlayout)
+				contextMenuHelper_editLayout(wnd);
 		}
-		else if (act == &cm_layout_editor_change_t)
-		{
-			contextMenuHelper_chngeLayoutTitle(wnd);
-		}
-		else if (act == &cm_layout_editor_editlayout)
-		{
-			contextMenuHelper_editLayout(wnd);
-		}
+
 
 	}
 

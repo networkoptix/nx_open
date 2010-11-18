@@ -22,8 +22,9 @@ public:
 	virtual void startDispay();
 	virtual void stopDispay();
 
-	virtual void startRecording();
-	virtual void stopRecording();
+	void startRecording();
+	void stopRecording();
+	bool isRecording();
 
 	virtual void beforestopDispay();
 	

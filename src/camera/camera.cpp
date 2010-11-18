@@ -86,16 +86,24 @@ void CLVideoCamera::beforestopDispay()
 
 void CLVideoCamera::startRecording()
 {
+	m_reader->setQuality(CLStreamreader::CLSHighest);
 	m_reader->addDataProcessor(&m_recorder);
+	m_reader->needKeyData();
 	m_recorder.start();
+	m_videovindow->addSubItem(CLAbstractSubItem::Recording);
 }
 
 void CLVideoCamera::stopRecording()
 {
 	m_recorder.stop();
 	m_reader->removeDataProcessor(&m_recorder);
+	m_videovindow->removeSubItem(CLAbstractSubItem::Recording);
 }
 
+bool CLVideoCamera::isRecording()
+{
+	return m_recorder.isRunning();
+}
 
 CLDevice* CLVideoCamera::getDevice() const
 {
@@ -153,7 +161,9 @@ void CLVideoCamera::setQuality(CLStreamreader::StreamQuality q, bool increase)
 	if (!increase && m_reader->getQuality() <= q)
 		return;
 
-
-	m_reader->setQuality(q);
+	if (isRecording())
+		m_reader->setQuality(CLStreamreader::CLSHighest);
+	else
+		m_reader->setQuality(q);
 
 }

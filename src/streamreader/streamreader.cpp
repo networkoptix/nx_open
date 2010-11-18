@@ -54,7 +54,9 @@ CLParamList CLStreamreader::getStreamParam() const
 void CLStreamreader::addDataProcessor(CLAbstractDataProcessor* dp)
 {
 	QMutexLocker mutex(&m_proc_CS);
-	m_dataprocessors.push_back(dp);
+
+	if (!m_dataprocessors.contains(dp))
+		m_dataprocessors.push_back(dp);
 }
 
 void CLStreamreader::removeDataProcessor(CLAbstractDataProcessor* dp)

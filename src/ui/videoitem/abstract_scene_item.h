@@ -28,6 +28,7 @@ public:
 	CLVideoWindowItem* toVideoItem() const;
 
 	// returns true of added
+	
 	bool addSubItem(CLAbstractSubItem::ItemType type);
 	virtual void removeSubItem(CLAbstractSubItem::ItemType type);
 	virtual QPointF getBestSubItemPos(CLAbstractSubItem::ItemType type);

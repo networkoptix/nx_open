@@ -11,7 +11,7 @@ class CLAbstractSubItem : public QObject, public QGraphicsItem
 	Q_OBJECT
 	Q_PROPERTY(qreal opacity  READ opacity   WRITE setOpacity)
 public:
-	enum ItemType {Close, ArchiveNavigator};
+	enum ItemType {Close, ArchiveNavigator, Recording};
 	CLAbstractSubItem(CLAbstractSceneItem* parent, qreal opacity, qreal max_opacity);
 	virtual ~CLAbstractSubItem();
 

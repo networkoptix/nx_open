@@ -13,6 +13,9 @@ extern QAction cm_add_layout;
 extern QAction cm_togglefs;
 extern QAction cm_fullscren;
 extern QAction cm_settings;
+extern QAction cm_start_recording;
+extern QAction cm_stop_recording;
+extern QAction cm_view_recorded;
 
 
 
