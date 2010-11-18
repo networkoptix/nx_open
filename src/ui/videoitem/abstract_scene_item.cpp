@@ -87,7 +87,7 @@ bool CLAbstractSceneItem::addSubItem(CLAbstractSubItem::ItemType type)
 	switch(type)
 	{
 	case CLAbstractSubItem::Close:
-		item = new CLImgSubItem(this, "./skin/close2.png" ,CLAbstractSubItem::Close, global_decoration_opacity, global_decoration_max_opacity, 250, 250);
+		item = new CLImgSubItem(this, "./skin/close3.png" ,CLAbstractSubItem::Close, global_decoration_opacity, global_decoration_max_opacity, 256, 256);
 		break;
 
 	case CLAbstractSubItem::ArchiveNavigator:
@@ -112,7 +112,7 @@ void CLAbstractSceneItem::removeSubItem(CLAbstractSubItem::ItemType type)
 	foreach(QGraphicsItem * item, childrenLst)
 	{
 		CLAbstractSubItem* sub_item = static_cast<CLAbstractSubItem*>(item);
-		if (sub_item->getType())
+		if (sub_item->getType()==type)
 		{
 			scene()->removeItem(sub_item);
 			delete sub_item;

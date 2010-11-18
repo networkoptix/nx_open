@@ -149,6 +149,7 @@ protected:
 
 	bool m_handScrolling;
 	int m_handMoving;
+	bool mSubItemMoving;
 
 
 

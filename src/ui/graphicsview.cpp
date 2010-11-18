@@ -47,6 +47,7 @@ m_movement(this),
 m_scenezoom(this),
 m_handScrolling(false),
 m_handMoving(0),
+mSubItemMoving(false),
 m_rotationCounter(0),
 m_selectedWnd(0),
 m_last_selectedWnd(0),
@@ -495,13 +496,13 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 	
 	QGraphicsItem *item = itemAt(event->pos());
 
-	if (item)
+	if (item && item->parentItem())
 	{
-		while(item->parentItem())
-			item = item->parentItem();
+		QGraphicsView::mousePressEvent(event);
+		return;
 	}
 
-
+	mSubItemMoving = false;
 
 	CLAbstractSceneItem* wnd = static_cast<CLAbstractSceneItem*>(item);
 
@@ -579,6 +580,15 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
 	if (!mViewStarted)
 		return;
+
+	QGraphicsItem *item = itemAt(event->pos());
+	if ((item && item->parentItem()) || mSubItemMoving)
+	{
+		QGraphicsView::mouseMoveEvent(event);
+		mSubItemMoving = true;
+		return;
+	}
+
 
 	bool left_button = event->buttons() & Qt::LeftButton;
 	bool right_button = event->buttons() & Qt::RightButton;
@@ -718,11 +728,14 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 	QGraphicsItem *item = itemAt(event->pos());
 
-	if (item)
+	if (item && item->parentItem())
 	{
-		while(item->parentItem())
-			item = item->parentItem();
+		// not top level item 
+		QGraphicsView::mouseReleaseEvent(event);
+		return;
 	}
+
+	mSubItemMoving = false;
 
 
 	CLAbstractSceneItem* wnd = static_cast<CLAbstractSceneItem*>(item);
@@ -1117,10 +1130,18 @@ void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
 	if (!mViewStarted)
 		return;
 
-
 	CLAbstractSceneItem*item = static_cast<CLAbstractSceneItem*>(itemAt(e->pos()));
+	if (item && item->parentItem())
+	{
+		// not top level item 
+		QGraphicsView::mouseDoubleClickEvent(e);
+		return;
+	}
+
+
 	if(!isItemStillExists(item))
 		item = 0;
+
 
 	if (!item) // clicked on void space 
 	{
