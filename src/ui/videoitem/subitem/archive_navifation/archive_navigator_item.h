@@ -22,6 +22,7 @@ protected:
 
 protected slots:
 	virtual void onSubItemPressed(CLAbstractSubItem* subitem);
+	void onSliderValueChanged(int val);
 
 protected:
 	int m_width;

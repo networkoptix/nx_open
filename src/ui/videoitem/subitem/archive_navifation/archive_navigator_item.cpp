@@ -5,6 +5,7 @@
 #include <QPainter>
 #include <QGraphicsProxyWidget>
 #include "slider_item.h"
+#include "base\log.h"
 
 
 int NavigatorItemHeight = 200;
@@ -70,8 +71,10 @@ CLAbstractSubItem(parent, 0.2, 0.8)
 
 	
 	mSlider_item->setWidget(mSlider);
-	
 	onResize();
+
+	connect(mSlider, SIGNAL(valueChanged(int)), this, SLOT(onSliderValueChanged(int)));
+	
 }
 
 CLArchiveNavigatorItem::~CLArchiveNavigatorItem()
@@ -93,6 +96,11 @@ void CLArchiveNavigatorItem::onResize()
 	mSlider_item->setPos(m_width - slider_width - 50, 50);
 	
 
+}
+
+void CLArchiveNavigatorItem::onSliderValueChanged(int val)
+{
+	//cl_log.log("val changed ", val, cl_logALWAYS);
 }
 
 void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
@@ -127,3 +135,5 @@ QRectF CLArchiveNavigatorItem::boundingRect() const
 {
 	return QRectF(0,0,m_width, m_height);
 }
+
+

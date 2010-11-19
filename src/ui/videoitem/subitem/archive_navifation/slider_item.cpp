@@ -17,6 +17,13 @@ CLDirectJumpSlider::~CLDirectJumpSlider()
 
 void CLDirectJumpSlider::mousePressEvent( QMouseEvent * event)
 {
-	setValue(QStyle::sliderValueFromPosition(minimum(),maximum(),event->x(),width(),invertedAppearance()));
+
+	int new_pos = QStyle::sliderValueFromPosition(minimum(),maximum(),event->x(),width(),invertedAppearance());
+
+	int diff = abs(value() - new_pos);
+
+	if (diff > (maximum()-minimum())*0.03 )
+		setValue(new_pos);
+
 	QSlider::mousePressEvent(event);
 }
