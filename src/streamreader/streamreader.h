@@ -38,6 +38,7 @@ public:
 
 
 	virtual void setNeedKeyData();
+	virtual bool needKeyData(int channel) const;
 	virtual bool needKeyData() const;
 
 	virtual void setQuality(StreamQuality q);

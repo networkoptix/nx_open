@@ -71,6 +71,11 @@ void CLStreamreader::setNeedKeyData()
 		m_gotKeyFrame[i] = 0;
 }
 
+bool CLStreamreader::needKeyData(int channel) const
+{
+	return m_gotKeyFrame[channel]==0;
+}
+
 bool CLStreamreader::needKeyData() const
 {
 	for (int i = 0; i < m_channel_number; ++i)

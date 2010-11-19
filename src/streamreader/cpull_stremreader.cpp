@@ -41,6 +41,11 @@ void CLClientPullStreamreader::run()
 
 	while(!needToStop())
 	{
+
+		pause_delay(); // pause if needed;
+		if (needToStop()) // extra check after pause
+			break;
+
 		// check queue sizes
 
 		if (!needToRead())

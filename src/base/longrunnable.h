@@ -2,6 +2,7 @@
 #define cl_long_runnable_146
 
 #include <QThread>
+#include <QSemaphore>
 
 class CLLongRunnable : public QThread
 {
@@ -19,7 +20,8 @@ public slots:
 public:
 
 	CLLongRunnable():
-	  m_runing(false)
+	  m_runing(false),
+	  m_onpause(false)
 	  {
 
 	  }
@@ -29,6 +31,8 @@ public:
     virtual void pleaseStop()
 	{
 		m_needStop = true;
+		if (m_onpause)
+			resume();
 	}
 
 	virtual bool needToStop() const
@@ -38,14 +42,36 @@ public:
 
 	virtual void stop()
 	{
-		m_needStop = true;
+		pleaseStop();
 		wait();
 		m_runing = false;
+	}
+
+	void pause()
+	{
+		m_sem.tryAcquire(m_sem.available());
+		m_onpause = true;
+		
+	}
+
+	void resume()
+	{
+		m_onpause = false;
+		m_sem.release();
+	}
+
+	void pause_delay()
+	{
+		while(m_onpause && !needToStop())
+			m_sem.tryAcquire(1,30);
 	}
 
 protected:
 	bool m_runing;
 	volatile bool m_needStop;
+
+	bool m_onpause;
+	QSemaphore m_sem;
 };
 
 #endif //cl_long_runnable_146
