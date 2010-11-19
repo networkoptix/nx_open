@@ -9,7 +9,6 @@
 #include "ui/graphicsview.h"
 #include "settings.h"
 
-extern int NavigatorItemHeight;
 
 CLVideoWindowItem::CLVideoWindowItem(GraphicsView* view, const CLDeviceVideoLayout* layout, int max_width, int max_height,
 									 QString name):
@@ -149,17 +148,9 @@ QPointF CLVideoWindowItem::getBestSubItemPos(CLAbstractSubItem::ItemType type)
 		return QPointF(width()-270, 20);
 		
 
-	case CLAbstractSubItem::ArchiveNavigator:
-		return QPointF(0, height() - NavigatorItemHeight);
-		
-
 	case CLAbstractSubItem::Recording:
 		return QPointF(-30, 100);
 		
-		
-
-
-
 	default:
 		return QPointF(-1001, -1001);
 	    break;

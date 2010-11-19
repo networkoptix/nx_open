@@ -54,8 +54,8 @@ HEADERS += device_plugins/fake/streamreader/fake_file_streamreader.h
 SOURCES +=ui/graphicsview.cpp ui/videoitem/loup_wnd.cpp ui/layout_navigator.cpp ui/layout_editor_wnd.cpp
 HEADERS +=ui/graphicsview.h  ui/videoitem/loup_wnd.h  ui/layout_navigator.h  ui/layout_editor_wnd.h
 
-HEADERS +=ui/videoitem/abstract_scene_item.h  ui/videoitem/static_image_item.h  ui/videoitem/custom_draw_button.h ui/videoitem/img_item.h ui/videoitem/video_wnd_item.h 
-SOURCES +=ui/videoitem/abstract_scene_item.cpp  ui/videoitem/static_image_item.cpp ui/videoitem/custom_draw_button.cpp ui/videoitem/img_item.cpp ui/videoitem/video_wnd_item.cpp
+HEADERS +=ui/videoitem/abstract_scene_item.h  ui/videoitem/static_image_item.h  ui/videoitem/custom_draw_button.h ui/videoitem/img_item.h ui/videoitem/video_wnd_item.h  ui/videoitem/video_wnd_archive_item.h
+SOURCES +=ui/videoitem/abstract_scene_item.cpp  ui/videoitem/static_image_item.cpp ui/videoitem/custom_draw_button.cpp ui/videoitem/img_item.cpp ui/videoitem/video_wnd_item.cpp ui/videoitem/video_wnd_archive_item.cpp
 
 HEADERS +=ui/videoitem/abstract_unmoved_item.h ui/videoitem/unmoved_pixture_button.h
 SOURCES +=ui/videoitem/abstract_unmoved_item.cpp ui/videoitem/unmoved_pixture_button.cpp
@@ -94,6 +94,15 @@ SOURCES += ui/videoitem/subitem/abstract_sub_item.cpp  ui/videoitem/subitem/abst
 
 HEADERS += ui/videoitem/subitem/archive_navifation/archive_navigator_item.h ui/videoitem/subitem/archive_navifation/slider_item.h
 SOURCES += ui/videoitem/subitem/archive_navifation/archive_navigator_item.cpp ui/videoitem/subitem/archive_navifation/slider_item.cpp
+
+HEADERS += device_plugins/archive/abstract_archive_device.h device_plugins/archive/abstract_archive_stream_reader.h
+SOURCES += device_plugins/archive/abstract_archive_device.cpp device_plugins/archive/abstract_archive_stream_reader.cpp
+
+HEADERS += device_plugins/archive/archive/archive_stream_reader.h  device_plugins/archive/archive/archive_device.h
+SOURCES += device_plugins/archive/archive/archive_stream_reader.cpp device_plugins/archive/archive/archive_device.cpp
+
+HEADERS += device_plugins/archive/avi_files/avi_parser.h  device_plugins/archive/avi_files/avi_strem_reader.h device_plugins/archive/avi_files/avi_device.h
+SOURCES += device_plugins/archive/avi_files/avi_parser.cpp  device_plugins/archive/avi_files/avi_strem_reader.cpp device_plugins/archive/avi_files/avi_device.cpp
 
 RESOURCES += mainwnd.qrc
 FORMS += mainwnd.ui

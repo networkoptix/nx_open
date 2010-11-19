@@ -6,7 +6,6 @@
 #include "settings.h"
 #include <qgraphicssceneevent>
 #include "subitem\abstract_image_sub_item.h"
-#include "subitem\archive_navifation\archive_navigator_item.h"
 #include "subitem\recording_sign_item.h"
 
 
@@ -88,10 +87,6 @@ bool CLAbstractSceneItem::addSubItem(CLAbstractSubItem::ItemType type)
 	{
 	case CLAbstractSubItem::Close:
 		item = new CLImgSubItem(this, "./skin/close3.png" ,CLAbstractSubItem::Close, global_decoration_opacity, global_decoration_max_opacity, 256, 256);
-		break;
-
-	case CLAbstractSubItem::ArchiveNavigator:
-		item = new CLArchiveNavigatorItem(this);
 		break;
 
 	case CLAbstractSubItem::Recording:
