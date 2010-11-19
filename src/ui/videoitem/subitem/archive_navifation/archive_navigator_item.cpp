@@ -4,7 +4,8 @@
 
 #include <QPainter>
 #include <QGraphicsProxyWidget>
-#include <QSlider>
+#include "slider_item.h"
+
 
 int NavigatorItemHeight = 200;
 
@@ -21,7 +22,7 @@ CLAbstractSubItem(parent, 0.2, 0.8)
 	mPauseItem->setVisible(false);
 
 	mSlider_item = new QGraphicsProxyWidget(this);
-	mSlider = new QSlider(Qt::Horizontal);
+	mSlider = new CLDirectJumpSlider(Qt::Horizontal);
 	mSlider->setRange(0,2000);
 
 
@@ -47,7 +48,7 @@ CLAbstractSubItem(parent, 0.2, 0.8)
 	mPauseItem->setVisible(false);
 
 	mSlider_item = new QGraphicsProxyWidget(this);
-	mSlider = new QSlider(Qt::Horizontal);
+	mSlider = new CLDirectJumpSlider(Qt::Horizontal);
 	mSlider->setRange(0,2000);
 
 
