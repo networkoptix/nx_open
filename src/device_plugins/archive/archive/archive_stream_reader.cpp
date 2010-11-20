@@ -2,6 +2,7 @@
 #include "device\device.h"
 #include "base\bytearray.h"
 #include "data\mediadata.h"
+#include <QDateTime>
 
 CLArchiveStreamReader::CLArchiveStreamReader(CLDevice* dev):
 CLAbstractArchiveReader(dev),
@@ -56,7 +57,45 @@ void CLArchiveStreamReader::init_data()
 		parse_channel_data(channel ,ver, data.data()+4, data.size()-4);
 	}
 
+
+	//=====choosing min time
+	QDateTime min_date_time;
+	bool first = true;
+	for (int channel = 0; channel < m_channel_number; ++channel)
+	{	
+		if (mMovie[channel].count()==0)
+			continue;
+
+		if (first)
+		{
+			min_date_time = QDateTime::fromMSecsSinceEpoch(mMovie[channel].at(0).abs_time);
+			first = false;
+		}
+
+		QDateTime time = QDateTime::fromMSecsSinceEpoch(mMovie[channel].at(0).abs_time);
+
+		if (time<min_date_time)
+			min_date_time = time;
+	}
 	
+	//===========time_ms===================
+	
+	for (int channel = 0; channel < m_channel_number; ++channel)
+	{
+		for(int i = 0; i < mMovie[channel].count();++i)
+		{
+			ArchiveFrameInfo& info = mMovie[channel][i];
+
+			QDateTime time = QDateTime::fromMSecsSinceEpoch(info.abs_time);
+
+			unsigned long time_ms = min_date_time.msecsTo(time);
+			info.time_ms = time_ms;
+
+			if (time_ms>m_len_msec)
+				m_len_msec = m_len_msec;
+		}
+	}
+
 
 }
 
@@ -80,7 +119,7 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
 		mAdaptiveSleep.sleep(m_need_tosleep);
 
 
-
+	// will return next channel ( if channel is finished it will not be selected
 	int channel = slowest_channel(); 
 
 	if (channel<0)
@@ -164,7 +203,7 @@ void CLArchiveStreamReader::parse_channel_data(int channel, int data_version, ch
 	{
 		ArchiveFrameInfo finfo;
 
-			finfo.size = *((unsigned int*)data); data+=4;
+		finfo.size = *((unsigned int*)data); data+=4;
 		finfo.abs_time = *((quint64*)data); data+=8;
 		finfo.codec = *((unsigned int*)data); data+=4;
 		finfo.keyFrame = *((unsigned char*)data); data+=1;

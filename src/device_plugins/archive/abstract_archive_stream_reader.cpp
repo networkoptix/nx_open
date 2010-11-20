@@ -22,7 +22,9 @@ CLAbstractArchiveReader::~CLAbstractArchiveReader()
 
 void CLAbstractArchiveReader::setSingleShotMode(bool single)
 {
-	mSingleShot = true;
+	mSingleShot = single;
+	if (!mSingleShot)
+		mAdaptiveSleep.afterdelay();
 }
 
 bool CLAbstractArchiveReader::isSingleShotMode() const
