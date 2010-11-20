@@ -5,6 +5,7 @@
 class CLImgSubItem;
 class QGraphicsProxyWidget;
 class QSlider;
+class CLAbstractArchiveReader;
 
 class CLArchiveNavigatorItem : public CLAbstractSubItem
 {
@@ -23,6 +24,7 @@ protected:
 protected slots:
 	virtual void onSubItemPressed(CLAbstractSubItem* subitem);
 	void onSliderValueChanged(int val);
+	CLAbstractArchiveReader* reader();
 
 protected:
 	int m_width;
@@ -32,6 +34,7 @@ protected:
 	CLImgSubItem* mPauseItem;
 	QSlider* mSlider;
 	QGraphicsProxyWidget* mSlider_item;
+	CLAbstractArchiveReader* mStreamReader;
 
 
 };

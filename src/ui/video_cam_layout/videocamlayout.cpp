@@ -874,7 +874,8 @@ void SceneLayout::onItemClose(CLAbstractSceneItem* item)
 		delete item;
 
 		updateSceneRect();
-		m_view->fitInView(600, 3000);
+		//m_view->centerOn(m_view->getRealSceneRect().center());
+		m_view->fitInView(600, 0);
 	}
 
 }

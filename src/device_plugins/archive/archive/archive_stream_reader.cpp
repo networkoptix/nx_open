@@ -9,6 +9,7 @@ CLAbstractArchiveReader(dev),
 m_firsttime(true)
 
 {
+	init_data();
 }
 
 CLArchiveStreamReader::~CLArchiveStreamReader()
@@ -92,7 +93,7 @@ void CLArchiveStreamReader::init_data()
 			info.time_ms = time_ms;
 
 			if (time_ms>m_len_msec)
-				m_len_msec = m_len_msec;
+				m_len_msec = time_ms;
 		}
 	}
 
@@ -111,7 +112,7 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
 {
 	if (m_firsttime)
 	{
-		init_data();
+		//init_data();
 		m_firsttime = false;
 	}
 
@@ -179,7 +180,6 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
 		unsigned long next_time = mMovie[channel].at(mCurrIndex[next_channel]).time_ms;
 
 		m_need_tosleep = labs(next_time - this_time);
-
 		
 	}
 

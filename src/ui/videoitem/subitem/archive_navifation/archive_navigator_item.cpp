@@ -6,12 +6,16 @@
 #include <QGraphicsProxyWidget>
 #include "slider_item.h"
 #include "base\log.h"
+#include "..\..\video_wnd_archive_item.h"
+#include "camera\camera.h"
+#include "device_plugins\archive\abstract_archive_stream_reader.h"
 
 
 int NavigatorItemHeight = 200;
 
 CLArchiveNavigatorItem::CLArchiveNavigatorItem(CLAbstractSubItemContainer* parent):
-CLAbstractSubItem(parent, 0.2, 0.8)
+CLAbstractSubItem(parent, 0.2, 0.8),
+mStreamReader(0)
 {
 	m_height = NavigatorItemHeight;
 	m_width = parent->boundingRect().width();
@@ -46,7 +50,7 @@ CLAbstractSubItem(parent, 0.2, 0.8)
 	/**/
 	mPlayItem = new CLImgSubItem(this, "./skin/try/play1.png", CLAbstractSubItem::Play, 0.7, 1.0, NavigatorItemHeight, NavigatorItemHeight);
 	mPauseItem = new CLImgSubItem(this, "./skin/try/pause1.png", CLAbstractSubItem::Pause, 0.7, 1.0, NavigatorItemHeight, NavigatorItemHeight);
-	mPauseItem->setVisible(false);
+	mPlayItem->setVisible(false);
 
 	mSlider_item = new QGraphicsProxyWidget(this);
 	mSlider = new CLDirectJumpSlider(Qt::Horizontal);
@@ -74,11 +78,24 @@ CLAbstractSubItem(parent, 0.2, 0.8)
 	onResize();
 
 	connect(mSlider, SIGNAL(valueChanged(int)), this, SLOT(onSliderValueChanged(int)));
-	
+
 }
 
 CLArchiveNavigatorItem::~CLArchiveNavigatorItem()
 {
+
+}
+
+
+CLAbstractArchiveReader* CLArchiveNavigatorItem::reader()
+{
+	if (!mStreamReader)
+	{
+		CLVideoWindowArchiveItem* wnd = static_cast<CLVideoWindowArchiveItem*>(mParent);
+		mStreamReader = static_cast<CLAbstractArchiveReader*>(wnd->getVideoCam()->getStreamreader());
+	}
+
+	return mStreamReader;
 
 }
 
@@ -112,11 +129,15 @@ void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
 	case CLAbstractSubItem::Play:
 		mPlayItem->setVisible(false);
 		mPauseItem->setVisible(true);
+
+		//reader()->setSingleShotMode(false);
+		reader()->resume();
 		break;
 
 	case CLAbstractSubItem::Pause:
 		mPlayItem->setVisible(true);
 		mPauseItem->setVisible(false);
+		reader()->pause();
 		break;
 
 
@@ -128,6 +149,13 @@ void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
 
 void CLArchiveNavigatorItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+	unsigned long time = reader()->currTime();
+	unsigned long total = reader()->len_msec();
+
+	unsigned long pos = time*(2000.0/total);
+	mSlider->setValue(pos);
+
+
 	painter->fillRect(boundingRect(),QColor(0, 0, 0));
 }
 
