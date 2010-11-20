@@ -6,6 +6,7 @@
 #include "recorder\fake_recorder_device.h"
 #include <QDir>
 #include <QFileInfoList>
+#include "device_plugins\archive\archive\archive_device.h"
 
 //=============================================================
 CLDeviceCriteria::CLDeviceCriteria(CriteriaType cr):
@@ -174,6 +175,17 @@ CLDevice* CLDeviceManager::getRecorderById(QString id)
 	CLDevice* dev = mRecDevices[id];
 	dev->addRef();
 
+	return dev;
+}
+
+
+CLDevice* CLDeviceManager::getArchiveDevice(QString id)
+{
+	QDir dir(id);
+	if (!dir.exists())
+		return 0;
+
+	CLDevice* dev = new CLArchiveDevice(id);
 	return dev;
 }
 

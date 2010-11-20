@@ -7,7 +7,7 @@ class CLVideoWindowArchiveItem : public CLVideoWindowItem
 {
 public:
 	CLVideoWindowArchiveItem (GraphicsView* view, const CLDeviceVideoLayout* layout, int max_width, int max_height,
-		QString name);
+		QString name="");
 	virtual ~CLVideoWindowArchiveItem();
 
 	QPointF getBestSubItemPos(CLAbstractSubItem::ItemType type);

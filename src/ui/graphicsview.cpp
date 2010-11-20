@@ -1000,12 +1000,13 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 				if (cam->isRecording())
 				{
 					menu.addAction(&cm_stop_recording);
-					menu.addAction(&cm_view_recorded);
 				}
 				else
 				{
 					menu.addAction(&cm_start_recording);
 				}
+
+				menu.addAction(&cm_view_recorded);
 
 			}
 
@@ -1103,6 +1104,9 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
 			if (act == &cm_stop_recording && cam)
 				cam->stopRecording();
+
+			if (act == &cm_view_recorded&& cam)
+				contextMenuHelper_viewRecordedVideo(cam);
 
 
 			
@@ -2145,4 +2149,15 @@ void GraphicsView::contextMenuHelper_editLayout(CLAbstractSceneItem* wnd)
 	{
 		delete content_copy;
 	}
+}
+
+void GraphicsView::contextMenuHelper_viewRecordedVideo(CLVideoCamera* cam)
+{
+	cam->stopRecording();
+
+	QString id = cam->getDevice()->getUniqueId();
+	id = QString("./archive/") + id;
+
+	m_camLayout.addDevice(id, true);
+	fitInView(600, 100);
 }

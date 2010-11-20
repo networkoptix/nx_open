@@ -3,7 +3,7 @@
 
 CLAbstractArchiveReader::CLAbstractArchiveReader(CLDevice* dev ):
 CLClientPullStreamreader(dev),
-mSingleShot(true),
+mSingleShot(false),
 mForward(true),
 m_len_msec(0),
 m_need_tosleep(0)
@@ -88,7 +88,7 @@ void CLAbstractArchiveReader::jumpTo(unsigned long msec, int channel)
 		return;
 
 	mCurrIndex[channel] = nextFrameIndex(true, channel, new_index, true, mForward);
-	mFinished[channel] = (mCurrIndex[channel]!=-1);
+	mFinished[channel] = (mCurrIndex[channel]==-1);
 	
 }
 

@@ -18,6 +18,7 @@
 #include "ui/videoitem/recorder_item.h"
 #include "ui/videoitem/layout_item.h"
 #include "layout_manager.h"
+#include "ui/videoitem/video_wnd_archive_item.h"
 
 #define SLOT_WIDTH (640*10)
 #define SLOT_HEIGHT (SLOT_WIDTH*3/4)
@@ -288,10 +289,16 @@ bool SceneLayout::addDevice(QString uniqueid, bool update_scene_rect)
 		dev = CLDeviceManager::instance().getRecorderById(uniqueid);
 
 		if (dev==0)
-			return false;
+		{
+			dev = CLDeviceManager::instance().getArchiveDevice(uniqueid);
+
+			if (dev==0)
+				return false;
+		}
+
 	}
 
-	if (!addDevice(dev, false))
+	if (!addDevice(dev, update_scene_rect))
 	{
 		dev->releaseRef();
 		return false;
@@ -323,8 +330,13 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect)
 	{
 		QSize wnd_size = getMaxWndSize(device->getVideoLayout());
 
+		CLVideoWindowItem* video_wnd = 0;
 
-		CLVideoWindowItem* video_wnd =  new CLVideoWindowItem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height());
+		if (device->checkDeviceTypeFlag(CLDevice::ARCHIVE))
+			video_wnd = new CLVideoWindowArchiveItem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height());
+		else
+			video_wnd = new CLVideoWindowItem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height());
+
 		CLVideoCamera* cam = new VideoCamera(device, video_wnd);
 		addItem(video_wnd, update_scene_rect);
 
@@ -840,9 +852,12 @@ void SceneLayout::onItemClose(CLAbstractSceneItem* item)
 
 		devitem->beforestopDispay();
 		devitem->stopDispay();
-		devitem->getDevice()->releaseRef();
+		CLDevice* dev =  devitem->getDevice();
 		m_deviceitems.removeOne(devitem);
-		delete devitem;
+		delete devitem; // here dev might be used 
+
+		// so need to release it here 
+		dev->releaseRef();
 
 		removed = true;
 

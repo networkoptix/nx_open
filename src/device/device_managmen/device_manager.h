@@ -49,6 +49,8 @@ public:
 	CLDeviceList getRecorderList();
 	CLDevice* getRecorderById(QString id); 
 
+	CLDevice* getArchiveDevice(QString id); 
+
 protected:
 	CLDeviceManager();
 	void onNewDevices_helper(CLDeviceList devices, QString parentId);

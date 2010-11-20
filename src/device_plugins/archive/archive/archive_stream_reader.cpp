@@ -22,7 +22,7 @@ void CLArchiveStreamReader::init_data()
 	{
 		QString fn;
 		QTextStream stream(&fn);
-		stream << m_device->getUniqueId() << "/channel_";
+		stream << m_device->getUniqueId() << "/channel_" << channel;
 		QString descr_file_name = fn + ".descr";
 		QString data_file_name = fn + ".data";
 
@@ -143,42 +143,46 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
 	videoData->keyFrame = finfo.keyFrame;
 	videoData->channel_num = channel;
 
+
+	if (videoData->keyFrame)
+		m_gotKeyFrame[channel] = true;
+
 	//=================
 	
 	m_need_tosleep = 0;
 
-	if (reachedTheEnd())
+	// changing current index of this channel
+	int new_index = nextFrameIndex(false, channel, mCurrIndex[channel], needKeyData(channel), mForward);
+	if (new_index<0)
 	{
-		if (mForward)
-			jumpTo(0, false);
-		else
-			jumpTo(len_msec(), false);
+		mFinished[channel]=true; // slowest_channel will not return this channel any more 
+		if (reachedTheEnd())
+		{
+			if (mForward)
+				jumpTo(0, false);
+			else
+				jumpTo(len_msec(), false);
+		}
 	}
 	else
 	{
-		// changing current index of this channel
-		int new_index = nextFrameIndex(false, channel, mCurrIndex[channel], needKeyData(channel), mForward);
-		if (new_index<0)
-			mFinished[channel]=true; // slowest_channel will not return this channel any more 
-		else
+		if (new_index - mCurrIndex[channel] !=1 )
 		{
-			if (new_index - mCurrIndex[channel] !=1 )
-			{
-				int shift = mMovie[channel].at(new_index).shift;
-				m_data_file[channel].seek(shift);
-			}
-
-			unsigned long this_time = mMovie[channel].at(mCurrIndex[channel]).time_ms;
-			mCurrIndex[channel] = new_index;
-
-			int next_channel = slowest_channel();
-			unsigned long next_time = mMovie[channel].at(mCurrIndex[next_channel]).time_ms;
-
-			m_need_tosleep = labs(next_time - this_time);
-
-			
+			int shift = mMovie[channel].at(new_index).shift;
+			m_data_file[channel].seek(shift);
 		}
+
+		unsigned long this_time = mMovie[channel].at(mCurrIndex[channel]).time_ms;
+		mCurrIndex[channel] = new_index;
+
+		int next_channel = slowest_channel();
+		unsigned long next_time = mMovie[channel].at(mCurrIndex[next_channel]).time_ms;
+
+		m_need_tosleep = labs(next_time - this_time);
+
+		
 	}
+
 
 	//=================
 	if (isSingleShotMode())
