@@ -99,7 +99,7 @@ void CLStreamRecorder::processData(CLAbstractData* data)
 	if (mDescr[channel]==0)
 	{
 		mDescr[channel] = new CLByteArray(0, 1024);
-		mDescr[channel]->write((char*)(&mVersion), 4);
+		mDescr[channel]->write((char*)(&mVersion), 4); // version
 	}
 
 	QDateTime time = QDateTime::currentDateTime();

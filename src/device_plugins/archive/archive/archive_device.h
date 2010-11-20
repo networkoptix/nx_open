@@ -10,6 +10,7 @@ public:
 	CLArchiveDevice(const QString arch_path);
 	~CLArchiveDevice();
 protected:
+
 	void readdescrfile();
 };
 
