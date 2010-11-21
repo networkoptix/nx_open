@@ -17,6 +17,12 @@ CLArchiveStreamReader::~CLArchiveStreamReader()
 
 }
 
+void CLArchiveStreamReader::resume()
+{
+	CLAbstractArchiveReader::resume();
+	mAdaptiveSleep.afterdelay();
+}
+
 void CLArchiveStreamReader::init_data()
 {
 	for (int channel = 0; channel < m_channel_number; ++channel)
@@ -100,9 +106,9 @@ void CLArchiveStreamReader::init_data()
 
 }
 
-void CLArchiveStreamReader::jumpTo(unsigned long msec, int channel)
+void CLArchiveStreamReader::channeljumpTo(unsigned long msec, int channel)
 {
-	CLAbstractArchiveReader::jumpTo(msec,channel);
+	CLAbstractArchiveReader::channeljumpTo(msec,channel);
 	unsigned long shift = mMovie[channel].at(mCurrIndex[channel]).shift;
 
 	m_data_file[channel].seek(shift);
@@ -121,7 +127,13 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
 
 
 	// will return next channel ( if channel is finished it will not be selected
-	int channel = slowest_channel(); 
+	int channel;
+
+	{
+		QMutexLocker mutex(&m_cs);
+		channel = slowest_channel(); 
+	}
+	
 
 	if (channel<0)
 	{
@@ -131,6 +143,9 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
 		return 0;
 	}
 	
+
+	QMutexLocker mutex(&m_cs);
+
 	const ArchiveFrameInfo &finfo = mMovie[channel].at(mCurrIndex[channel]);
 
 	CLCompressedVideoData* videoData = new CLCompressedVideoData(8,finfo.size);

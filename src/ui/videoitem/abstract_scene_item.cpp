@@ -36,7 +36,8 @@ m_arranged(true),
 m_mouse_over(false),
 m_draw_rotation_helper(false),
 m_zoomOnhover(true),
-m_needUpdate(false)
+m_needUpdate(false),
+mEditable(false)
 {
 	setAcceptsHoverEvents(true);
 
@@ -65,6 +66,17 @@ void CLAbstractSceneItem::setName(const QString& name)
 {
 	mName = name;
 }
+
+bool CLAbstractSceneItem::isEtitable() const
+{
+	return mEditable;
+}
+
+void CLAbstractSceneItem::setEditable(bool editable)
+{
+	mEditable = editable;
+}
+
 
 CLVideoWindowItem* CLAbstractSceneItem::toVideoItem() const
 {

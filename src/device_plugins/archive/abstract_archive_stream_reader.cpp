@@ -6,7 +6,8 @@ CLClientPullStreamreader(dev),
 mSingleShot(false),
 mForward(true),
 m_len_msec(0),
-m_need_tosleep(0)
+m_need_tosleep(0),
+m_cs(QMutex::Recursive)
 {
 	memset(mCurrIndex,0,sizeof(mCurrIndex));
 	for (int channel = 0; channel < m_channel_number; ++channel)
@@ -50,6 +51,7 @@ unsigned long CLAbstractArchiveReader::len_msec() const
 
 unsigned long CLAbstractArchiveReader::currTime() const
 {
+	QMutexLocker mutex(&m_cs);
 	int slowe_channel = slowest_channel();
 	return mMovie[slowe_channel].at(mCurrIndex[slowe_channel]).time_ms;
 }
@@ -69,9 +71,11 @@ bool CLAbstractArchiveReader::reachedTheEnd() const
 
 void CLAbstractArchiveReader::jumpTo(unsigned long msec, bool makeshot)
 {
+	QMutexLocker mutex(&m_cs);
+
 	for (int channel = 0; channel  < m_channel_number; ++channel)
 	{
-		jumpTo(msec, channel);
+		channeljumpTo(msec, channel);
 	}
 
 	
@@ -81,7 +85,7 @@ void CLAbstractArchiveReader::jumpTo(unsigned long msec, bool makeshot)
 }
 
 
-void CLAbstractArchiveReader::jumpTo(unsigned long msec, int channel)
+void CLAbstractArchiveReader::channeljumpTo(unsigned long msec, int channel)
 {
 	int new_index = findBestIndex(channel, msec);
 	if (new_index<0)

@@ -47,14 +47,14 @@ public:
 		m_runing = false;
 	}
 
-	void pause()
+	virtual void pause()
 	{
 		m_sem.tryAcquire(m_sem.available());
 		m_onpause = true;
 		
 	}
 
-	void resume()
+	virtual void resume()
 	{
 		m_onpause = false;
 		m_sem.release();
@@ -63,7 +63,7 @@ public:
 	void pause_delay()
 	{
 		while(m_onpause && !needToStop())
-			m_sem.tryAcquire(1,30);
+			m_sem.tryAcquire(1,50);
 	}
 
 protected:

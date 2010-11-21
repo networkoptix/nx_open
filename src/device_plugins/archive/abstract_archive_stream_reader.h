@@ -38,7 +38,7 @@ public:
 
 protected:
 
-	virtual void jumpTo(unsigned long msec, int channel);
+	virtual void channeljumpTo(unsigned long msec, int channel);
 
 	// if after_jump means we do not need to increase index 
 	int nextFrameIndex(bool after_jump, int channel, int curr_index, bool keyframe, bool forwarddirection) const;
@@ -61,6 +61,8 @@ protected:
 	bool mFinished[CL_MAX_CHANNELS];
 	CLAdaptiveSleep mAdaptiveSleep;
 	int m_need_tosleep;
+
+	mutable QMutex m_cs;
 
 };
 

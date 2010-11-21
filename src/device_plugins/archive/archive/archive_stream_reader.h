@@ -10,7 +10,10 @@ public:
 	CLArchiveStreamReader(CLDevice* dev);
 	~CLArchiveStreamReader();
 protected:
-	virtual void jumpTo(unsigned long msec, int channel);
+
+	virtual void resume();
+
+	virtual void channeljumpTo(unsigned long msec, int channel);
 	virtual CLAbstractMediaData* getNextData();
 
 	// i do not want to do it in constructor to unload gui thread 

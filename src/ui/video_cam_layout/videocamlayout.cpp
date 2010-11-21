@@ -334,7 +334,10 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect)
 		CLVideoWindowItem* video_wnd = 0;
 
 		if (device->checkDeviceTypeFlag(CLDevice::ARCHIVE))
+		{
 			video_wnd = new CLVideoWindowArchiveItem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height());
+			video_wnd->setEditable(true);
+		}
 		else
 			video_wnd = new CLVideoWindowItem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height());
 
@@ -425,7 +428,7 @@ bool SceneLayout::addItem(CLAbstractSceneItem* item, int x, int y, bool update_s
 	item->setPos(x, y);
 
 	//=========
-	if (isEditable())	
+	if (isEditable() || item->isEtitable())	
 	{
 		item->addSubItem(CLAbstractSubItem::Close);
 	}
@@ -802,9 +805,6 @@ CLAbstractSceneItem* SceneLayout::next_item_helper(const CLAbstractSceneItem* cu
 
 void SceneLayout::onItemClose(CLAbstractSceneItem* item)
 {
-	 //Markus Schulz Feat Justine Suissa - Perception (Vocal Mix)
-	if (!isEditable())
-		return; // assert is better 
 
 	bool removed = false;
 

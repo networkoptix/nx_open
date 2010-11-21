@@ -28,6 +28,9 @@ public:
 
 	CLVideoWindowItem* toVideoItem() const;
 
+	bool isEtitable() const;
+	void setEditable(bool editable);
+
 	// returns true of added
 	
 	bool addSubItem(CLAbstractSubItem::ItemType type);
@@ -127,6 +130,8 @@ protected:
 	QPointF m_rotation_hand;
 
 	bool m_needUpdate;
+
+	bool mEditable;
 
 };
 
