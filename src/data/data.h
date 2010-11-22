@@ -6,7 +6,7 @@
 
 struct CLAbstractData : public CLRefCounter
 {
-
+	void* dataProvider;
 };
 
 typedef CLThreadQueue<CLAbstractData*> CLDataQueue;

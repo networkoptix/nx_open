@@ -27,6 +27,8 @@ public:
 	explicit CLStreamreader(CLDevice* dev);
 	virtual ~CLStreamreader();
 
+	CLDevice* getDevice() const;
+
 	
 	void setStatistics(CLStatistics* stat);
 	virtual void setStreamParams(CLParamList newParam);

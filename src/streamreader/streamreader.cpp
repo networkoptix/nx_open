@@ -22,6 +22,11 @@ CLStreamreader::~CLStreamreader()
 	stop();
 }
 
+CLDevice* CLStreamreader::getDevice() const
+{
+	return m_device;
+}
+
 void CLStreamreader::setStatistics(CLStatistics* stat)
 {
 	m_stat = stat;

@@ -142,8 +142,15 @@ void SceneLayout::stop_helper(bool emt)
 		// after we can wait for each thread to stop
 		cl_log.log("About to shutdown device ", (int)devitem ,"\r\n", cl_logDEBUG1);
 		devitem->stopDispay();
+
 		CLDevice* dev = devitem->getDevice();
-		delete devitem;
+		CLAbstractSceneItem* item = devitem->getSceneItem();
+
+		m_scene->removeItem(item);
+		delete devitem; // here video item and dev might be used 
+		m_items.removeOne(item);
+		delete item;
+		
 		dev->releaseRef();
 	}
 
@@ -478,7 +485,10 @@ void SceneLayout::removeItem(CLAbstractSceneItem* item, bool update_scene_rect )
 	m_scene->removeItem(item);
 
 	if (update_scene_rect)
+	{
 		updateSceneRect();
+		m_view->fitInView(600, 0);
+	}
 
 
 }
@@ -806,8 +816,6 @@ CLAbstractSceneItem* SceneLayout::next_item_helper(const CLAbstractSceneItem* cu
 void SceneLayout::onItemClose(CLAbstractSceneItem* item)
 {
 
-	bool removed = false;
-
 	m_view->setZeroSelection();
 	item->stop_animation();
 
@@ -820,8 +828,10 @@ void SceneLayout::onItemClose(CLAbstractSceneItem* item)
 		LayoutContent* lc = litem->getRefContent();
 		getContent()->removeLayout(lc, true);
 
+		removeItem(item);
+		delete item;
 
-		removed = true;
+		
 	
 	}
 	
@@ -835,11 +845,15 @@ void SceneLayout::onItemClose(CLAbstractSceneItem* item)
 
 		devitem->beforestopDispay();
 		devitem->stopDispay();
+
+		removeItem(item); //here device is used ( layout in bounding rect )
+
 		devitem->getDevice()->releaseRef();
 		m_deviceitems.removeOne(devitem);
-		delete devitem;
+		delete devitem; // here item is used; can not delete it
+		delete item;
 
-		removed = true;
+		
 
 	}
 
@@ -855,28 +869,20 @@ void SceneLayout::onItemClose(CLAbstractSceneItem* item)
 		devitem->stopDispay();
 		CLDevice* dev =  devitem->getDevice();
 		m_deviceitems.removeOne(devitem);
-		delete devitem; // here dev might be used 
+		removeItem(item); // here device is used. ( bounding rect; layout );
+		delete devitem; // here dev and item might be used; can not delete item
+		delete item;
 
 		// so need to release it here 
 		dev->releaseRef();
 
-		removed = true;
+		//removed = true;
 
 	}
 
 
 	//===============
 
-	if (removed)
-	{
-		m_items.removeOne(item);
-		m_scene->removeItem(item);
-		delete item;
-
-		updateSceneRect();
-		//m_view->centerOn(m_view->getRealSceneRect().center());
-		m_view->fitInView(600, 0);
-	}
 
 }
 

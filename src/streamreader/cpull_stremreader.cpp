@@ -122,6 +122,7 @@ void CLClientPullStreamreader::run()
 			}
 		}
 
+		data->dataProvider = this;
 
 		putData(data);
 

@@ -5,6 +5,8 @@
 #include "base\bytearray.h"
 #include <QDir>
 #include "data\mediadata.h"
+#include "streamreader\streamreader.h"
+#include <QDomDocument>
 
 #define FLUSH_SIZE (512*1024)
 
@@ -76,7 +78,7 @@ void CLStreamRecorder::processData(CLAbstractData* data)
 	if (mFirsTime)
 	{
 		mFirsTime = false;
-		onFirstdata();
+		onFirstdata(data);
 	}
 
 	CLCompressedVideoData *vd= static_cast<CLCompressedVideoData*>(data);
@@ -125,10 +127,44 @@ void CLStreamRecorder::endOfRun()
 	cleanup();
 }
 
-void CLStreamRecorder::onFirstdata()
+void CLStreamRecorder::onFirstdata(CLAbstractData* data)
 {
 	QDir current_dir;
 	current_dir.mkpath(dir_helper());
+
+	CLStreamreader* reader = reinterpret_cast<CLStreamreader*>(data->dataProvider);
+	CLDevice* dev = reader->getDevice();
+
+	QDomDocument doc("");
+	QDomElement root = doc.createElement("layout");
+	doc.appendChild(root);
+
+
+	root.setAttribute("channels", dev->getVideoLayout()->numberOfChannels());
+	root.setAttribute("width", dev->getVideoLayout()->width());
+	root.setAttribute("height", dev->getVideoLayout()->height());
+
+
+	for (int i = 0; i < dev->getVideoLayout()->numberOfChannels(); ++i)
+	{
+		QDomElement channel = doc.createElement("channel");
+
+		channel.setAttribute("number", i);
+		channel.setAttribute("h_pos", dev->getVideoLayout()->h_position(i));
+		channel.setAttribute("v_pos", dev->getVideoLayout()->v_position(i));
+
+		root.appendChild(channel);
+	}
+
+
+	QString xml = doc.toString();
+
+	QFile file(dir_helper() + "/layout.xml");
+	file.open(QIODevice::WriteOnly);
+
+	QTextStream fstr(&file);
+	fstr<< xml;
+	fstr.flush();	
 }
 
 //=====================================

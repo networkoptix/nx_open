@@ -15,7 +15,7 @@ public:
 protected:
 	virtual void processData(CLAbstractData* data);
 	virtual void endOfRun();
-	void onFirstdata();
+	void onFirstdata(CLAbstractData* data);
 	void cleanup();
 
 
