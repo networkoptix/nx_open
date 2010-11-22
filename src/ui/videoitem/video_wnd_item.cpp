@@ -38,7 +38,7 @@ m_cam(0)
 	for (int i = 0; i  < m_videonum; ++i)
 		m_gldraw[i] = new CLGLRenderer(this);
 	
-	
+	connect( this, SIGNAL(onAspectRatioChanged(CLAbstractSceneItem*)), this, SLOT(onResize()));
 	
 }
 
@@ -134,7 +134,7 @@ void CLVideoWindowItem::draw(CLVideoDecoderOutput& image, unsigned int channel)
 			m_imageHeight_old = m_imageHeight;
 		}
 
-		onResize();
+		
 		emit onAspectRatioChanged(this);
 	}
 

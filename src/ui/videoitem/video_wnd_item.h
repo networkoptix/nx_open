@@ -56,11 +56,13 @@ public:
 signals:
 	void onAspectRatioChanged(CLAbstractSceneItem* item);
 
+protected slots:
+	void onResize();
 
 protected:
 
 	QPointF getBestSubItemPos(CLAbstractSubItem::ItemType type);
-	void onResize();
+	
 	
 	void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
 	void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
