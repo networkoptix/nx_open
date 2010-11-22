@@ -22,8 +22,11 @@ void CLDirectJumpSlider::mousePressEvent( QMouseEvent * event)
 
 	int diff = abs(value() - new_pos);
 
-	if (diff > (maximum()-minimum())*0.03 )
+	if (diff > (maximum()-minimum())*0.02 )
+	{
 		setValue(new_pos);
+		emit sliderMoved(new_pos);
+	}
 
 	QSlider::mousePressEvent(event);
 }

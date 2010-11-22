@@ -15,7 +15,9 @@ int NavigatorItemHeight = 200;
 
 CLArchiveNavigatorItem::CLArchiveNavigatorItem(CLAbstractSubItemContainer* parent):
 CLAbstractSubItem(parent, 0.2, 0.8),
-mStreamReader(0)
+mStreamReader(0),
+mPlayMode(true),
+mSliderIsmoving(false)
 {
 	m_height = NavigatorItemHeight;
 	m_width = parent->boundingRect().width();
@@ -77,7 +79,14 @@ mStreamReader(0)
 	mSlider_item->setWidget(mSlider);
 	onResize();
 
-	connect(mSlider, SIGNAL(valueChanged(int)), this, SLOT(onSliderValueChanged(int)));
+	//sliderMoved ( int value )
+	//connect(mSlider, SIGNAL(valueChanged(int)), this, SLOT(onSliderMoved(int)));
+	connect(mSlider, SIGNAL(sliderMoved (int)), this, SLOT(onSliderMoved(int)));
+
+
+	connect(mSlider, SIGNAL(sliderPressed()), this, SLOT(sliderPressed()));
+	connect(mSlider, SIGNAL(sliderReleased()), this, SLOT(sliderReleased()));
+
 
 }
 
@@ -115,9 +124,13 @@ void CLArchiveNavigatorItem::onResize()
 
 }
 
-void CLArchiveNavigatorItem::onSliderValueChanged(int val)
+void CLArchiveNavigatorItem::onSliderMoved(int val)
 {
-	//cl_log.log("val changed ", val, cl_logALWAYS);
+	qreal factor = (qreal)(val)/(mSlider->maximum() - mSlider->minimum());
+	unsigned long time = reader()->len_msec()*factor;
+
+
+	reader()->jumpTo(time, true);
 }
 
 void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
@@ -129,15 +142,17 @@ void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
 	case CLAbstractSubItem::Play:
 		mPlayItem->setVisible(false);
 		mPauseItem->setVisible(true);
-
-		//reader()->setSingleShotMode(false);
+		reader()->setSingleShotMode(false);
 		reader()->resume();
+		mPlayMode = true;
 		break;
 
 	case CLAbstractSubItem::Pause:
 		mPlayItem->setVisible(true);
 		mPauseItem->setVisible(false);
 		reader()->pause();
+		reader()->setSingleShotMode(true);
+		mPlayMode = false;
 		break;
 
 
@@ -149,13 +164,6 @@ void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
 
 void CLArchiveNavigatorItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-	unsigned long time = reader()->currTime();
-	unsigned long total = reader()->len_msec();
-
-	unsigned long pos = time*(2000.0/total);
-	mSlider->setValue(pos);
-
-
 	painter->fillRect(boundingRect(),QColor(0, 0, 0));
 }
 
@@ -165,3 +173,32 @@ QRectF CLArchiveNavigatorItem::boundingRect() const
 }
 
 
+void CLArchiveNavigatorItem::updateSliderPos()
+{
+	if (mSliderIsmoving)
+		return;
+
+	unsigned long time = reader()->currTime();
+	unsigned long total = reader()->len_msec();
+
+	qreal scale = mSlider->maximum() - mSlider->minimum();
+
+	unsigned long pos = time*(scale/total);
+	mSlider->setValue(pos);
+}
+
+void CLArchiveNavigatorItem::sliderPressed()
+{
+	//cl_log.log("PRESSDED ",  cl_logALWAYS);
+	reader()->setSingleShotMode(true);
+	mSliderIsmoving = true;
+}
+
+void CLArchiveNavigatorItem::sliderReleased()
+{
+	cl_log.log("RELEASED",  cl_logALWAYS);
+	mSliderIsmoving = false;
+
+	if (mPlayMode)
+		reader()->setSingleShotMode(false);
+}

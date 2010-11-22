@@ -25,7 +25,10 @@ void CLAbstractArchiveReader::setSingleShotMode(bool single)
 {
 	mSingleShot = single;
 	if (!mSingleShot)
+	{
 		mAdaptiveSleep.afterdelay();
+		resume();
+	}
 }
 
 bool CLAbstractArchiveReader::isSingleShotMode() const
@@ -78,8 +81,6 @@ void CLAbstractArchiveReader::jumpTo(unsigned long msec, bool makeshot)
 		channeljumpTo(msec, channel);
 	}
 
-	
-
 	if (makeshot && isSingleShotMode())
 		resume();
 }
@@ -92,6 +93,10 @@ void CLAbstractArchiveReader::channeljumpTo(unsigned long msec, int channel)
 		return;
 
 	mCurrIndex[channel] = nextFrameIndex(true, channel, new_index, true, mForward);
+
+	if (mCurrIndex[channel]==-1)
+		mCurrIndex[channel] = nextFrameIndex(true, channel, new_index, true, !mForward);
+
 	mFinished[channel] = (mCurrIndex[channel]==-1);
 	
 }
@@ -136,10 +141,10 @@ int CLAbstractArchiveReader::findBestIndex(int channel, unsigned long msec) cons
 		return index1;
 
 
-	while(index1!=index2)
+	while(index2 - index1 > 1)
 	{
 		int new_index = (index1+index2)/2;
-		unsigned long new_index_time = mMovie[channel].at(new_index_time).time_ms;
+		unsigned long new_index_time = mMovie[channel].at(new_index).time_ms;
 
 		if (new_index_time>=msec)
 			index2 = new_index;
@@ -148,7 +153,7 @@ int CLAbstractArchiveReader::findBestIndex(int channel, unsigned long msec) cons
 	}
 
 
-	return index1;
+	return mForward ? index1 : index2;
 }
 
 int CLAbstractArchiveReader::slowest_channel() const

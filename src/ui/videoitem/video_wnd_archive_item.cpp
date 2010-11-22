@@ -8,7 +8,7 @@ CLVideoWindowArchiveItem::CLVideoWindowArchiveItem (GraphicsView* view, const CL
 													int max_width, int max_height, QString name):
 CLVideoWindowItem(view, layout, max_width, max_height, name)
 {
-	CLArchiveNavigatorItem* item = new CLArchiveNavigatorItem(this);
+	mArchiveNavigator = new CLArchiveNavigatorItem(this);
 	onResize();
 }
 
@@ -26,4 +26,10 @@ QPointF CLVideoWindowArchiveItem::getBestSubItemPos(CLAbstractSubItem::ItemType 
 
 	if (type==CLAbstractSubItem::ArchiveNavigator)
 		return QPointF(0, height() - NavigatorItemHeight);
+}
+
+void CLVideoWindowArchiveItem::draw(CLVideoDecoderOutput& image, unsigned int channel)
+{
+	CLVideoWindowItem::draw(image, channel);
+	mArchiveNavigator->updateSliderPos();
 }

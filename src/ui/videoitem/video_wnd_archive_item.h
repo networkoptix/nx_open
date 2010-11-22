@@ -2,6 +2,7 @@
 #define video_wnd_archive_h1753
 
 #include "video_wnd_item.h"
+class CLArchiveNavigatorItem;
 
 class CLVideoWindowArchiveItem : public CLVideoWindowItem
 {
@@ -10,9 +11,12 @@ public:
 		QString name="");
 	virtual ~CLVideoWindowArchiveItem();
 
+	void draw(CLVideoDecoderOutput& image, unsigned int channel);
+
 	QPointF getBestSubItemPos(CLAbstractSubItem::ItemType type);
 
 protected:
+	CLArchiveNavigatorItem* mArchiveNavigator;
 };
 
 

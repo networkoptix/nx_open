@@ -17,14 +17,19 @@ public:
 	// this function uses parent width
 	void onResize();
 
+	void updateSliderPos();
+
 protected:
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	virtual QRectF boundingRect() const;
 
 protected slots:
 	virtual void onSubItemPressed(CLAbstractSubItem* subitem);
-	void onSliderValueChanged(int val);
+	void onSliderMoved(int val);
 	CLAbstractArchiveReader* reader();
+
+	void sliderPressed();
+	void sliderReleased();
 
 protected:
 	int m_width;
@@ -36,6 +41,9 @@ protected:
 	QGraphicsProxyWidget* mSlider_item;
 	CLAbstractArchiveReader* mStreamReader;
 
+
+	bool mPlayMode;
+	bool mSliderIsmoving;
 
 };
 

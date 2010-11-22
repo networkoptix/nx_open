@@ -109,8 +109,11 @@ void CLArchiveStreamReader::init_data()
 void CLArchiveStreamReader::channeljumpTo(unsigned long msec, int channel)
 {
 	CLAbstractArchiveReader::channeljumpTo(msec,channel);
-	unsigned long shift = mMovie[channel].at(mCurrIndex[channel]).shift;
 
+	if (mCurrIndex[channel]==-1)
+		return;
+
+	unsigned long shift = mMovie[channel].at(mCurrIndex[channel]).shift;
 	m_data_file[channel].seek(shift);
 }
 
