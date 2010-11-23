@@ -1,6 +1,7 @@
 #include "directory_browser.h"
 #include <QDir>
 #include "file_device.h"
+#include "device_plugins\archive\avi_files\avi_device.h"
 
 
 CLDirectoryBrowserDeviceServer::CLDirectoryBrowserDeviceServer(const QString dir)
@@ -33,17 +34,39 @@ CLDeviceList CLDirectoryBrowserDeviceServer::findDevices()
 	if (!dir.exists())
 		return result;
 
-	QStringList filter;
-	filter << "*.jpg" << "*.jpeg";
-	QStringList list = dir.entryList(filter);
-
-	for (int i = 0; i < list.size(); ++i)
 	{
-		QString file = list.at(i);
-		QString abs_file_name = m_directory + QString("/") + file;
-		CLDevice* dev = new CLFileDevice(abs_file_name);
-		result[file] = dev;
+		QStringList filter;
+		filter << "*.jpg" << "*.jpeg";
+		QStringList list = dir.entryList(filter);
+
+		for (int i = 0; i < list.size(); ++i)
+		{
+			QString file = list.at(i);
+			QString abs_file_name = m_directory + QString("/") + file;
+			CLDevice* dev = new CLFileDevice(abs_file_name);
+			result[file] = dev;
+		}
+
 	}
+
+
+
+	{
+		QStringList filter;
+		filter << "*.avi";
+		QStringList list = dir.entryList(filter);
+
+		for (int i = 0; i < list.size(); ++i)
+		{
+			QString file = list.at(i);
+			QString abs_file_name = m_directory + QString("/") + file;
+			CLDevice* dev = new CLAviDevice(abs_file_name);
+			result[file] = dev;
+		}
+
+	}
+
+
 
 	return result;
 

@@ -3,9 +3,9 @@
 
 
 
-#define CL_VARIOUSE_DECODERS 2   // jpeg, h264
+#define CL_VARIOUSE_DECODERS 4   // jpeg, h264
 
-enum CLCodecType {CL_JPEG = 0, CL_H264 = 1};
+enum CLCodecType {CL_JPEG = 0, CL_H264 = 1, CL_MPEG2=2, CL_MPEG4=3};
 enum CLColorSpace{CL_DECODER_YUV420 = 0, CL_DECODER_YUV422 = 1, CL_DECODER_YUV444 = 2 , CL_DECODER_RGB24 = 3};
 
 struct CLVideoDecoderOutput

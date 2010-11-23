@@ -1,6 +1,6 @@
 #include "avi_parser.h"
 
-
+CLAviFFMpegDLL avidll;
 
 CLAviFFMpegDLL::CLAviFFMpegDLL()
 {
@@ -39,8 +39,11 @@ bool CLAviFFMpegDLL::init()
 	if(!av_read_frame)
 		return false;
 
+	av_register_all  = reinterpret_cast<dll_av_register_all>(::GetProcAddress(m_dll, "av_register_all"));
+	if(!av_register_all)
+		return false;
 
-	dll_av_read_frame av_read_frame;
+
 
 
 
@@ -50,6 +53,10 @@ bool CLAviFFMpegDLL::init()
 	
 	av_init_packet = reinterpret_cast<dll_av_init_packet>(::GetProcAddress(m_dll2, "av_init_packet"));
 	if(!av_init_packet )
+		return false;
+
+	av_free_packet  = reinterpret_cast<dll_av_free_packet>(::GetProcAddress(m_dll2, "av_free_packet"));
+	if(!av_free_packet )
 		return false;
 
 

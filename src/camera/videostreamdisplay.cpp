@@ -43,6 +43,7 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data)
 
 		switch(data->compressionType)
 		{
+
 		case CLCompressedVideoData::JPEG:
 			if (m_decoder[CL_JPEG]==0)
 			{
@@ -53,9 +54,33 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data)
 			img.codec = CL_JPEG;
 
 			dec = m_decoder[CL_JPEG];
-
-
 			break;
+
+		case CLCompressedVideoData::MPEG2:
+			if (m_decoder[CL_MPEG2]==0)
+			{
+				m_decoder[CL_MPEG2] = CLDecoderFactory::createDecoder(CL_MPEG2);
+				m_decoder[CL_MPEG2]->setLightCpuMode(m_lightCPUmode);
+			}
+
+			img.codec = CL_MPEG2;
+			dec = m_decoder[CL_MPEG2];
+			break;
+
+
+		case CLCompressedVideoData::MPEG4:
+			if (m_decoder[CL_MPEG4]==0)
+			{
+				m_decoder[CL_MPEG4] = CLDecoderFactory::createDecoder(CL_MPEG4);
+				m_decoder[CL_MPEG4]->setLightCpuMode(m_lightCPUmode);
+			}
+
+			img.codec = CL_MPEG4;
+			dec = m_decoder[CL_MPEG4];
+			break;
+
+
+
 		case CLCompressedVideoData::H264:
 			if (m_decoder[CL_H264]==0)
 			{
@@ -65,8 +90,9 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data)
 
 			img.codec = CL_H264;
 			dec = m_decoder[CL_H264];
-
 			break;
+
+
 		default:
 			cl_log.log("CLVideoStreamDisplay::dispay: unknown codec type...", cl_logERROR);
 			return;

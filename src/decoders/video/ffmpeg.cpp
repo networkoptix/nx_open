@@ -117,9 +117,20 @@ m_lightModeFrameCounter(0)
 	case CL_JPEG:
 		codec = dll.avcodec_find_decoder(CODEC_ID_MJPEG);
 		break;
-	case CL_H264 :
+
+	case CL_MPEG2:
+		codec = dll.avcodec_find_decoder(CODEC_ID_MPEG2VIDEO);
+		break;
+
+
+	case CL_MPEG4:
+		codec = dll.avcodec_find_decoder(CODEC_ID_MPEG4);
+		break;
+
+	case CL_H264:
 		codec = dll.avcodec_find_decoder(CODEC_ID_H264);
 	    break;
+
 	}
 
 
@@ -127,8 +138,7 @@ m_lightModeFrameCounter(0)
 	c = dll.avcodec_alloc_context();
 	picture= dll.avcodec_alloc_frame();
 
-	if(codec->capabilities&CODEC_CAP_TRUNCATED)
-		c->flags|= CODEC_FLAG_TRUNCATED;
+	//if(codec->capabilities&CODEC_CAP_TRUNCATED)		c->flags|= CODEC_FLAG_TRUNCATED;
 
 	dll.avcodec_open(c, codec);
 
@@ -159,8 +169,7 @@ void CLFFmpegVideoDecoder::resart_decoder()
 	c = dll.avcodec_alloc_context();
 	picture= dll.avcodec_alloc_frame();
 
-	if(codec->capabilities&CODEC_CAP_TRUNCATED)	
-		c->flags|= CODEC_FLAG_TRUNCATED;
+	//if(codec->capabilities&CODEC_CAP_TRUNCATED)		c->flags|= CODEC_FLAG_TRUNCATED;
 
 	dll.avcodec_open(c, codec);
 

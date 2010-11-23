@@ -3,6 +3,8 @@
 
 #include "..\abstract_archive_stream_reader.h"
 #include "libavcodec/avcodec.h"
+#include "data/mediadata.h"
+
 
 
 struct AVFormatContext;
@@ -20,6 +22,9 @@ protected:
 	virtual CLAbstractMediaData* getNextData();
 	virtual void channeljumpTo(unsigned long msec, int channel);
 
+
+	bool getNextVideoPacket();
+
 	bool init();
 	void destroy();
 
@@ -28,8 +33,8 @@ protected:
 	AVFormatContext* m_formatContext;
 	int	m_videoStrmIndex;
 	AVPacket m_packet;
-
-	bool mInited;
+	CLAbstractMediaData::CompressionType m_codec_id;
+	
 	
 
 };

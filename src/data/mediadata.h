@@ -22,7 +22,7 @@ struct CLAbstractMediaData : public CLAbstractData
 	}
 
 	enum DataType {VIDEO, AUDIO};
-	enum CompressionType {JPEG, H264, RGB24, YUV420, YUV422};
+	enum CompressionType {JPEG, MPEG2, MPEG4, H264, RGB24, YUV420, YUV422};
 
 	CLByteArray data;
 	DataType dataType;

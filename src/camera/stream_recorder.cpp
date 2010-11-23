@@ -188,14 +188,14 @@ void CLStreamRecorder::flush_channel(int channel)
 		return;
 
 	if (mDescrFile[channel]==0)
-		mDescrFile[channel] = fopen(filname_descr(channel).toLatin1(), "wb");
+		mDescrFile[channel] = fopen(filname_descr(channel).toLatin1().data(), "wb");
 
 	if (mDescrFile[channel]==0)
 		return;
 
 
 	if (mDataFile[channel]==0)
-		mDataFile[channel] = fopen(filname_data(channel).toLatin1(), "wb");
+		mDataFile[channel] = fopen(filname_data(channel).toLatin1().data(), "wb");
 
 	if (mDataFile[channel]==0)
 		return;
