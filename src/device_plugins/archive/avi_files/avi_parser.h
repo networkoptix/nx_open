@@ -3,6 +3,7 @@
 
 #include <tchar.h>
 #include <windows.h>
+#include "stdint.h"
 
 struct AVFormatContext;
 struct AVInputFormat;
@@ -28,6 +29,7 @@ public:
 	typedef void (*dll_av_init_packet)(AVPacket*pkt);
 	typedef int (*dll_av_read_frame)(AVFormatContext *s, AVPacket *pkt);
 	typedef void (*dll_av_free_packet) (AVPacket *pkt);
+	typedef int  (*dll_avformat_seek_file) (AVFormatContext *s, int stream_index, int64_t min_ts, int64_t ts, int64_t max_ts, int flags);
 
 
 
@@ -40,6 +42,7 @@ public:
 	dll_av_read_frame av_read_frame;
 	dll_av_init_packet av_init_packet;
 	dll_av_free_packet av_free_packet;
+	dll_avformat_seek_file avformat_seek_file;
 	dll_av_free av_free;
 	/**/
 private:

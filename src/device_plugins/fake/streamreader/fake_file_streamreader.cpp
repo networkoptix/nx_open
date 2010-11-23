@@ -16,7 +16,8 @@ int FakeStreamReader::descr_data_len = 0;
 FakeStreamReader::FakeStreamReader (CLDevice* dev, int channels):
 CLClientPullStreamreader(dev),
 m_channels(channels),
-m_curr_channel(0)
+m_curr_channel(0),
+m_sleep(20)
 {
 
 	dev->addDeviceTypeFlag(CLDevice::ARCHIVE);

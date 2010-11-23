@@ -7,7 +7,8 @@ mSingleShot(false),
 mForward(true),
 m_len_msec(0),
 m_need_tosleep(0),
-m_cs(QMutex::Recursive)
+m_cs(QMutex::Recursive),
+mAdaptiveSleep(20)
 {
 }
 

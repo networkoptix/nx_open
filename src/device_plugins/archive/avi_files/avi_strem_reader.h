@@ -30,6 +30,8 @@ protected:
 
 protected:
 
+	unsigned long cuur_time;
+
 	AVFormatContext* m_formatContext;
 	int	m_videoStrmIndex;
 	AVPacket m_packet;

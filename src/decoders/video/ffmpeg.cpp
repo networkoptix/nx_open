@@ -4,6 +4,7 @@
 #include <tchar.h>
 #include <QMutexLocker>
 
+
 #define LIGHT_CPU_MODE_FRAME_PERIOD 30
 
 CLFFmpegVideoDecoder::CodecDll CLFFmpegVideoDecoder::dll;
@@ -16,6 +17,7 @@ CLFFmpegVideoDecoder::CodecDll::CodecDll()
 }
 bool CLFFmpegVideoDecoder::CodecDll::init()
 {
+
 
 	m_dll  = ::LoadLibrary(L"avcodec-52.dll");
 
@@ -71,6 +73,9 @@ bool CLFFmpegVideoDecoder::CodecDll::init()
 	if (!avcodec_decode_video)
 		return false;
 	//==================================================================================
+
+
+
 
 	return true;
 
@@ -130,6 +135,11 @@ m_lightModeFrameCounter(0)
 	case CL_H264:
 		codec = dll.avcodec_find_decoder(CODEC_ID_H264);
 	    break;
+
+	
+	default:
+		codec = 0;
+
 
 	}
 

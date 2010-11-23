@@ -9,7 +9,12 @@
 class CLAdaptiveSleep
 {
 public:
-	CLAdaptiveSleep():m_firstTime(true){};
+	CLAdaptiveSleep(int max_overdraft ):
+	  m_firstTime(true),
+	  m_max_overdraft(max_overdraft)
+	  {
+
+	  };
 
 	void sleep(unsigned long msecs)
 	{
@@ -27,7 +32,12 @@ public:
 		m_prevEndTime = m_prevEndTime.addMSecs(msecs);
 
 		if (havetowait<=0)
+		{
+			if (-havetowait > m_max_overdraft)
+				afterdelay();
+
 			return;
+		}
 
 		CLSleep::msleep(havetowait);
 
@@ -41,6 +51,7 @@ public:
 private:
 	QTime  m_prevEndTime;
 	bool m_firstTime;
+	int m_max_overdraft;
 
 
 

@@ -43,6 +43,12 @@ bool CLAviFFMpegDLL::init()
 	if(!av_register_all)
 		return false;
 
+	avformat_seek_file = reinterpret_cast<dll_avformat_seek_file>(::GetProcAddress(m_dll, "avformat_seek_file"));
+	if(!avformat_seek_file)
+		return false;
+
+
+	
 
 
 
