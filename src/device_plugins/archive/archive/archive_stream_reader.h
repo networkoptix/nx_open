@@ -6,15 +6,35 @@
 
 class CLArchiveStreamReader  : public CLAbstractArchiveReader 
 {
+
+protected:
+	struct ArchiveFrameInfo
+	{
+		unsigned int size;
+		quint64 abs_time;
+		unsigned int codec;
+		bool keyFrame;
+
+		// shift inside file ( may be in bytes or some over units depends on implementation of CLClientPullStreamreader
+		unsigned int shift;
+		unsigned long time_ms; // time in ms from beginning 
+	};
+
+
 public:
 	CLArchiveStreamReader(CLDevice* dev);
 	~CLArchiveStreamReader();
+
+	unsigned long currTime() const;
+	virtual void resume();
 protected:
 
-	virtual void resume();
+	
 
 	virtual void channeljumpTo(unsigned long msec, int channel);
 	virtual CLAbstractMediaData* getNextData();
+
+	
 
 	// i do not want to do it in constructor to unload gui thread 
 	// let reader thread do the work
@@ -22,8 +42,19 @@ protected:
 	void init_data();
 
 	void parse_channel_data(int channel, int data_version, char* data, unsigned int len);
+
+	bool reachedTheEnd() const;
+	int nextFrameIndex(bool after_jump, int channel, int curr_index, bool keyframe, bool forwarddirection) const;
+	int findBestIndex(int channel, unsigned long msec) const;
+	int slowest_channel() const;
+
 protected:
 	bool m_firsttime;
+
+
+	QList<ArchiveFrameInfo> mMovie[CL_MAX_CHANNELS];
+	unsigned int mCurrIndex[CL_MAX_CHANNELS];
+	bool mFinished[CL_MAX_CHANNELS];
 	
 	QFile m_data_file[CL_MAX_CHANNELS];
 	QDataStream m_data_stream[CL_MAX_CHANNELS];

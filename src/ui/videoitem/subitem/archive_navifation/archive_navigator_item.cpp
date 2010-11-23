@@ -11,21 +11,21 @@
 #include "device_plugins\archive\abstract_archive_stream_reader.h"
 
 
-int NavigatorItemHeight = 200;
+//int NavigatorItemHeight = 200;
 
-CLArchiveNavigatorItem::CLArchiveNavigatorItem(CLAbstractSubItemContainer* parent):
+CLArchiveNavigatorItem::CLArchiveNavigatorItem(CLAbstractSubItemContainer* parent, int height):
 CLAbstractSubItem(parent, 0.2, 0.8),
 mStreamReader(0),
 mPlayMode(true),
 mSliderIsmoving(false)
 {
-	m_height = NavigatorItemHeight;
+	m_height = height;
 	m_width = parent->boundingRect().width();
 	mType = ArchiveNavigator;
 
 	/*/
-	mPlayItem = new CLImgSubItem(this, "./skin/try/play2.png", CLAbstractSubItem::Play, 0.7, 1.0, NavigatorItemHeight, NavigatorItemHeight);
-	mPauseItem = new CLImgSubItem(this, "./skin/try/pause2.png", CLAbstractSubItem::Pause, 0.7, 1.0, NavigatorItemHeight, NavigatorItemHeight);
+	mPlayItem = new CLImgSubItem(this, "./skin/try/play2.png", CLAbstractSubItem::Play, 0.7, 1.0, m_height, m_height);
+	mPauseItem = new CLImgSubItem(this, "./skin/try/pause2.png", CLAbstractSubItem::Pause, 0.7, 1.0, m_height, m_height);
 	mPauseItem->setVisible(false);
 
 	mSlider_item = new QGraphicsProxyWidget(this);
@@ -50,28 +50,47 @@ mSliderIsmoving(false)
 
 
 	/**/
-	mPlayItem = new CLImgSubItem(this, "./skin/try/play1.png", CLAbstractSubItem::Play, 0.7, 1.0, NavigatorItemHeight, NavigatorItemHeight);
-	mPauseItem = new CLImgSubItem(this, "./skin/try/pause1.png", CLAbstractSubItem::Pause, 0.7, 1.0, NavigatorItemHeight, NavigatorItemHeight);
+	mPlayItem = new CLImgSubItem(this, "./skin/try/play1.png", CLAbstractSubItem::Play, 0.7, 1.0, m_height, m_height);
+	mPauseItem = new CLImgSubItem(this, "./skin/try/pause1.png", CLAbstractSubItem::Pause, 0.7, 1.0, m_height, m_height);
 	mPlayItem->setVisible(false);
 
 	mSlider_item = new QGraphicsProxyWidget(this);
 	mSlider = new CLDirectJumpSlider(Qt::Horizontal);
 	mSlider->setRange(0,2000);
 
+	if (m_height!=400)
+	{
+		mSlider->setStyleSheet("QSlider { height: 120px}"
+			"QSlider::groove:horizontal {"
+			"border: 8px solid #6a6a6a;"
+			"background: qlineargradient(x1:0, y1:0, x2:0, y2:4, stop:0 #6a6a7a, stop:1 #6a6afa);"
+			"top: 90px;"
+			"height: 104px;"
+			"margin: 0 0 0 0;}"
+			"QSlider::handle:horizontal {"
+			"background: qlineargradient(x1:0, y1:0, x2:4, y2:4, stop:0 #567ecd, stop:1 #567eff);"
+			"border: 10px solid #205eff;" // border of handle 
+			"width: 120px;"
+			"margin: -8px 0 -8px 0;"
+			"border-radius: 30px;}");
+	}
+	else
+	{
+		mSlider->setStyleSheet("QSlider { height: 240px}"
+			"QSlider::groove:horizontal {"
+			"border: 8px solid #6a6a6a;"
+			"background: qlineargradient(x1:0, y1:0, x2:0, y2:4, stop:0 #6a6a7a, stop:1 #6a6afa);"
+			"top: 210px;"
+			"height: 204px;"
+			"margin: 0 0 0 0;}"
+			"QSlider::handle:horizontal {"
+			"background: qlineargradient(x1:0, y1:0, x2:4, y2:4, stop:0 #567ecd, stop:1 #567eff);"
+			"border: 10px solid #205eff;" // border of handle 
+			"width: 240px;"
+			"margin: -8px 0 -8px 0;"
+			"border-radius: 30px;}");
+	}
 
-	mSlider->setStyleSheet("QSlider { height: 120px}"
-		"QSlider::groove:horizontal {"
-		"border: 8px solid #6a6a6a;"
-		"background: qlineargradient(x1:0, y1:0, x2:0, y2:4, stop:0 #6a6a7a, stop:1 #6a6afa);"
-		"top: 90px;"
-		"height: 104px;"
-		"margin: 0 0 0 0;}"
-		"QSlider::handle:horizontal {"
-		"background: qlineargradient(x1:0, y1:0, x2:4, y2:4, stop:0 #567ecd, stop:1 #567eff);"
-		"border: 10px solid #205eff;" // border of handle 
-		"width: 120px;"
-		"margin: -8px 0 -8px 0;"
-		"border-radius: 30px;}");
 
 	/**/
 
@@ -116,7 +135,7 @@ void CLArchiveNavigatorItem::onResize()
 	mPlayItem->setPos(5,0);
 
 
-	int slider_width = m_width - NavigatorItemHeight - 300;
+	int slider_width = m_width - m_height - 300;
 
 	mSlider->resize(slider_width, 30);
 	mSlider_item->setPos(m_width - slider_width - 50, 50);

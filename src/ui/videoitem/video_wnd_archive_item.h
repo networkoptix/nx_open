@@ -17,6 +17,8 @@ public:
 
 protected:
 	CLArchiveNavigatorItem* mArchiveNavigator;
+
+	int m_archNavigatorHeight;
 };
 
 
