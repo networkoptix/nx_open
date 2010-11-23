@@ -8,7 +8,7 @@ TARGET = uniclient
 DESTDIR = ../bin
 
 
-INCLUDEPATH += ../contrib
+INCLUDEPATH += ../contrib/ffmpeg24894/include
 
 SOURCES = main.cpp mainwnd.cpp video_camera.cpp settings.cpp
 

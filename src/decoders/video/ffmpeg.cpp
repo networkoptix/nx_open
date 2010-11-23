@@ -1,6 +1,6 @@
 #include "ffmpeg.h"
 
-#include "ffmpeg/include/avcodec.h"
+#include "libavcodec/avcodec.h"
 #include <tchar.h>
 #include <QMutexLocker>
 
@@ -57,7 +57,7 @@ bool CLFFmpegVideoDecoder::CodecDll::init()
 	if (!ff_print_debug_info)
 		return false;
 	
-	m_dll2 = ::LoadLibrary(L"avutil-49.dll");
+	m_dll2 = ::LoadLibrary(L"avutil-50.dll");
 	if(!m_dll2)
 		return false;
 
