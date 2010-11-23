@@ -16,6 +16,9 @@
 #include "device/device_managmen/device_manager.h"
 #include "ui/video_cam_layout/layout_manager.h"
 #include "ui/context_menu_helper.h"
+#include "device_plugins/archive/avi_files/avi_parser.h"
+
+
 
 
 int main(int argc, char *argv[])
@@ -46,7 +49,7 @@ int main(int argc, char *argv[])
 
 	//===========================================================================
 	//IPPH264Decoder::dll.init();
-	if (!CLFFmpegVideoDecoder::dll.init())
+	if (!CLFFmpegVideoDecoder::dll.init() || !avidll.init())
 	{
 		cl_log.log("Cannot load FFMPEG dlls", cl_logERROR);
 		QMessageBox msgBox;
@@ -58,6 +61,7 @@ int main(int argc, char *argv[])
 		msgBox.exec();
 		return a.quit();
 	}
+
 
 
 	CLDecoderFactory::setCodecManufacture(CLDecoderFactory::FFMPEG);

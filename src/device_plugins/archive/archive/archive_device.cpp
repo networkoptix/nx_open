@@ -3,7 +3,7 @@
 
 #include <QDomDocument>
 
-CLArchiveDevice::CLArchiveDevice(const QString arch_path)
+CLArchiveDevice::CLArchiveDevice(const QString& arch_path)
 {
 	m_uniqueid = arch_path;
 	m_name = arch_path;

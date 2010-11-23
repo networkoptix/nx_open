@@ -1,57 +1,46 @@
-#ifndef fake_ss_device_h_2110
-#define fake_ss_device_h_2110
+#ifndef claavi_parser_h1916
+#define claavi_parser_h1916
 
-#include "../../../device/device.h"
+#include <tchar.h>
+#include <windows.h>
 
+struct AVFormatContext;
+struct AVInputFormat;
+struct AVFormatParameters;
+struct AVPacket;
 
-// this class and inhereted must be very light to create 
-class FakeDevice : public CLDevice
+class CLAviFFMpegDLL
 {
 public:
-	// executing command 
-	virtual bool executeCommand(CLDeviceCommand* command);
+	CLAviFFMpegDLL();
+	bool  init();
+	~CLAviFFMpegDLL();
+	//============dll =======
 
-	virtual CLStreamreader* getDeviceStreamConnection();
-
-	DeviceType getDeviceType() const
-	{
-		return VIDEODEVICE;
-	}
-
-
-protected:
-
-	FakeDevice()
-	{
-
-	}
-
-
-public:
-	static CLDeviceList findDevices();
+	typedef unsigned (*dll_avformat_version)(void);
+	typedef AVFormatContext* (*dll_avformat_alloc_context)(void);
+	typedef int  (*dll_av_open_input_file)(AVFormatContext **ic_ptr, const char *filename, AVInputFormat *fmt, int buf_size, AVFormatParameters *ap);
+	typedef int  (*dll_av_find_stream_info)(AVFormatContext *ic) ;
+	typedef void (*dll_av_free)(void *ptr);
+	typedef void (*dll_av_init_packet)(AVPacket*pkt);
+	typedef int (*dll_av_read_frame)(AVFormatContext *s, AVPacket *pkt);
 
 
 
+
+	dll_avformat_version avformat_version;
+	dll_avformat_alloc_context avformat_alloc_context;
+	dll_av_open_input_file av_open_input_file;
+	dll_av_find_stream_info av_find_stream_info;
+	dll_av_read_frame av_read_frame;
+	dll_av_init_packet av_init_packet;
+	dll_av_free av_free;
+	/**/
+private:
+	HINSTANCE m_dll, m_dll2, m_dll3;
 };
 
-class FakeDevice4_180 : public FakeDevice
-{
-public:
-	FakeDevice4_180();
-	virtual CLStreamreader* getDeviceStreamConnection();
-protected:
-	
-};
+static CLAviFFMpegDLL avidll;
 
 
-class FakeDevice4_360 : public FakeDevice
-{
-public:
-	FakeDevice4_360();
-	virtual CLStreamreader* getDeviceStreamConnection();
-protected:
-	
-};
-
-
-#endif // fake_ss_device_h_2110
+#endif //claavi_parser_h1916

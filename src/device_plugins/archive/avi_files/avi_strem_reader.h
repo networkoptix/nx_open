@@ -1,57 +1,37 @@
-#ifndef fake_ss_device_h_2110
-#define fake_ss_device_h_2110
+#ifndef avi_stream_reader_h1901
+#define avi_stream_reader_h1901
 
-#include "../../../device/device.h"
+#include "..\abstract_archive_stream_reader.h"
+#include "libavcodec/avcodec.h"
 
 
-// this class and inhereted must be very light to create 
-class FakeDevice : public CLDevice
+struct AVFormatContext;
+
+class CLAVIStreamReader : public CLAbstractArchiveReader
 {
 public:
-	// executing command 
-	virtual bool executeCommand(CLDeviceCommand* command);
+	CLAVIStreamReader(CLDevice* dev );
+	~CLAVIStreamReader();
 
-	virtual CLStreamreader* getDeviceStreamConnection();
-
-	DeviceType getDeviceType() const
-	{
-		return VIDEODEVICE;
-	}
-
+	virtual unsigned long currTime() const;
 
 protected:
 
-	FakeDevice()
-	{
+	virtual CLAbstractMediaData* getNextData();
+	virtual void channeljumpTo(unsigned long msec, int channel);
 
-	}
+	bool init();
+	void destroy();
 
-
-public:
-	static CLDeviceList findDevices();
-
-
-
-};
-
-class FakeDevice4_180 : public FakeDevice
-{
-public:
-	FakeDevice4_180();
-	virtual CLStreamreader* getDeviceStreamConnection();
 protected:
+
+	AVFormatContext* m_formatContext;
+	int	m_videoStrmIndex;
+	AVPacket m_packet;
+
+	bool mInited;
 	
+
 };
 
-
-class FakeDevice4_360 : public FakeDevice
-{
-public:
-	FakeDevice4_360();
-	virtual CLStreamreader* getDeviceStreamConnection();
-protected:
-	
-};
-
-
-#endif // fake_ss_device_h_2110
+#endif //avi_stream_reader_h1901

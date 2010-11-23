@@ -7,7 +7,7 @@
 class CLArchiveDevice : public CLAbstractArchiveDevice
 {
 public:
-	CLArchiveDevice(const QString arch_path);
+	CLArchiveDevice(const QString& arch_path);
 	~CLArchiveDevice();
 
 	virtual CLStreamreader* getDeviceStreamConnection();
