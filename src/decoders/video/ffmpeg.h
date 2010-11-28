@@ -6,10 +6,10 @@
 
 #include <QMutex>
 
-class AVCodec;
-class AVCodecContext;
-class AVFrame;
-class MpegEncContext;
+struct AVCodec;
+struct AVCodecContext;
+struct AVFrame;
+struct MpegEncContext;
 
 // client of this class is responsible for encoded data buffer meet ffmpeg restrictions
 // ( see comment to decode functions for details ).
@@ -43,6 +43,7 @@ public:
 		typedef void (*dll_av_free)(void *ptr);
 		typedef int (*dll_avcodec_decode_video)(AVCodecContext *avctx, AVFrame *picture, int *got_picture_ptr, unsigned char *buf, int buf_size) ;
 		typedef void (*dll_ff_print_debug_info)(MpegEncContext *s, AVFrame *pict);
+		typedef void  (*dll_av_log_set_callback)(void(*callback)(void *, int, const char *, va_list)) ;
 
 
 
@@ -56,6 +57,7 @@ public:
 		dll_av_free av_free;
 		dll_avcodec_decode_video avcodec_decode_video;
 		dll_ff_print_debug_info ff_print_debug_info;
+		dll_av_log_set_callback av_log_set_callback;
 	private:
 		HINSTANCE m_dll, m_dll2;
 	};

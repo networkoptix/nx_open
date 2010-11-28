@@ -3,13 +3,40 @@
 #include "libavcodec/avcodec.h"
 #include <tchar.h>
 #include <QMutexLocker>
-
+#include <QDir>
+#include "base/log.h"
 
 #define LIGHT_CPU_MODE_FRAME_PERIOD 30
 
 CLFFmpegVideoDecoder::CodecDll CLFFmpegVideoDecoder::dll;
 bool CLFFmpegVideoDecoder::m_first_instance = true;
 QMutex CLFFmpegVideoDecoder::m_static_mutex;
+
+
+
+void decoderLogCallback(void* pParam, int i, const char* szFmt, va_list args)
+{
+	//USES_CONVERSION;
+
+	//Ignore debug and info (i == 2 || i == 1) messages
+	if(AV_LOG_ERROR != i)
+	{
+		//return;
+	}
+
+	AVCodecContext* pCtxt = (AVCodecContext*)pParam;
+
+
+
+	char szMsg[1024];
+	vsprintf(szMsg, szFmt, args);
+	//if(szMsg[strlen(szMsg)] == '\n')
+	{	
+		szMsg[strlen(szMsg)-1] = 0;
+	}
+
+	cl_log.log("FFMPEG ", szMsg, cl_logERROR);
+}
 
 CLFFmpegVideoDecoder::CodecDll::CodecDll()
 {
@@ -18,8 +45,10 @@ CLFFmpegVideoDecoder::CodecDll::CodecDll()
 bool CLFFmpegVideoDecoder::CodecDll::init()
 {
 
+	QDir::setCurrent("./old_ffmpeg");
 
-	m_dll  = ::LoadLibrary(L"avcodec-52.dll");
+	//m_dll  = ::LoadLibrary(L"avcodec-52.dll");
+	m_dll  = ::LoadLibrary(L"avcodec-51.dll");
 
 	if(!m_dll)
 		return false;
@@ -59,7 +88,8 @@ bool CLFFmpegVideoDecoder::CodecDll::init()
 	if (!ff_print_debug_info)
 		return false;
 	
-	m_dll2 = ::LoadLibrary(L"avutil-50.dll");
+	//m_dll2 = ::LoadLibrary(L"avutil-50.dll");
+	m_dll2 = ::LoadLibrary(L"avutil-49.dll");
 	if(!m_dll2)
 		return false;
 
@@ -68,13 +98,22 @@ bool CLFFmpegVideoDecoder::CodecDll::init()
 	if (!av_free)
 		return false;
 
+	av_log_set_callback = reinterpret_cast<dll_av_log_set_callback>(::GetProcAddress(m_dll2, "av_log_set_callback"));
+	if (!av_log_set_callback)
+		return false;
+	else
+	{
+		av_log_set_callback(decoderLogCallback);
+	}
+
+
 
 	avcodec_decode_video = reinterpret_cast<dll_avcodec_decode_video>(::GetProcAddress(m_dll, "avcodec_decode_video"));
 	if (!avcodec_decode_video)
 		return false;
 	//==================================================================================
 
-
+	QDir::setCurrent("../");
 
 
 	return true;
@@ -231,7 +270,7 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 	/**/
 
 	/*
-	FILE * f = fopen("test.264", "ab");
+	FILE * f = fopen("test.264_", "ab");
 	fwrite(data.inbuf,1,data.buff_len,f);
 	fclose(f);
 	/**/
