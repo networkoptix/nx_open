@@ -330,6 +330,19 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 		case PIX_FMT_YUVJ444P:
 			data.out_frame.out_type = CL_DECODER_YUV444;
 			break;
+		case PIX_FMT_YUV420P:
+			data.out_frame.out_type = CL_DECODER_YUV420;
+			break;
+		case PIX_FMT_UYVY422: //// must be romoved; just coz using all decoders witn new header
+			data.out_frame.out_type = CL_DECODER_YUV444;
+			break;
+
+
+		case PIX_FMT_XVMC_MPEG2_IDCT: // must be romoved; just coz using all decoders witn new header
+			data.out_frame.out_type = CL_DECODER_YUV422;
+			break;
+
+
 
 		default:
 			data.out_frame.out_type = CL_DECODER_YUV420;
