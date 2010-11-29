@@ -187,7 +187,7 @@ m_lightModeFrameCounter(0)
 	c = dll.avcodec_alloc_context();
 	picture= dll.avcodec_alloc_frame();
 
-	//if(codec->capabilities&CODEC_CAP_TRUNCATED)		c->flags|= CODEC_FLAG_TRUNCATED;
+	//if(codec->capabilities&CODEC_CAP_TRUNCATED)	c->flags|= CODEC_FLAG_TRUNCATED;
 
 	dll.avcodec_open(c, codec);
 
@@ -270,9 +270,22 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 	/**/
 
 	/*
+	
 	FILE * f = fopen("test.264_", "ab");
 	fwrite(data.inbuf,1,data.buff_len,f);
 	fclose(f);
+
+	static int fn = 0;
+	QString filename = "frame";
+	filename+=QString::number(fn);
+	filename+=".264";
+
+
+	FILE * f2 = fopen(filename.toLatin1(), "wb");
+	fwrite(data.inbuf,1,data.buff_len,f2);
+	fclose(f2);
+	fn++;
+
 	/**/
 
 	int got_picture = 0;

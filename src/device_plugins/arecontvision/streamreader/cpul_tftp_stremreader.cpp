@@ -204,7 +204,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 	
 	CLSimpleTFTPClient tftp_client(m_ip.toString().toLatin1().data(),  m_timeout, 3);
 
-	CLCompressedVideoData* videoData = new CLCompressedVideoData(8,forecast_size);
+	CLCompressedVideoData* videoData = new CLCompressedVideoData(16,forecast_size);
 	CLByteArray& img = videoData->data;
 
 
