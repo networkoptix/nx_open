@@ -128,7 +128,7 @@ CLFFmpegVideoDecoder::CodecDll::~CodecDll()
 //================================================
 
 
-CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CLCodecType codec_id):
+CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CLVideoCodecType codec_id):
 c(0),
 m_width(0),
 m_height(0),
@@ -175,6 +175,9 @@ m_lightModeFrameCounter(0)
 		codec = dll.avcodec_find_decoder(CODEC_ID_H264);
 	    break;
 
+	case CL_MSVIDEO1:
+		codec = dll.avcodec_find_decoder(CODEC_ID_MSVIDEO1);
+		break;
 	
 	default:
 		codec = 0;

@@ -41,63 +41,23 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data)
 
 		QMutexLocker mutex(&m_mtx);
 
-		switch(data->compressionType)
+
+		if (data->compressionType<0 || data->compressionType>CL_VARIOUSE_DECODERS-1)
 		{
-
-		case CLCompressedVideoData::JPEG:
-			if (m_decoder[CL_JPEG]==0)
-			{
-				m_decoder[CL_JPEG] = CLDecoderFactory::createDecoder(CL_JPEG);
-				m_decoder[CL_JPEG]->setLightCpuMode(m_lightCPUmode);
-			}
-
-			img.codec = CL_JPEG;
-
-			dec = m_decoder[CL_JPEG];
-			break;
-
-		case CLCompressedVideoData::MPEG2:
-			if (m_decoder[CL_MPEG2]==0)
-			{
-				m_decoder[CL_MPEG2] = CLDecoderFactory::createDecoder(CL_MPEG2);
-				m_decoder[CL_MPEG2]->setLightCpuMode(m_lightCPUmode);
-			}
-
-			img.codec = CL_MPEG2;
-			dec = m_decoder[CL_MPEG2];
-			break;
-
-
-		case CLCompressedVideoData::MPEG4:
-			if (m_decoder[CL_MPEG4]==0)
-			{
-				m_decoder[CL_MPEG4] = CLDecoderFactory::createDecoder(CL_MPEG4);
-				m_decoder[CL_MPEG4]->setLightCpuMode(m_lightCPUmode);
-			}
-
-			img.codec = CL_MPEG4;
-			dec = m_decoder[CL_MPEG4];
-			break;
-
-
-
-		case CLCompressedVideoData::H264:
-			if (m_decoder[CL_H264]==0)
-			{
-				m_decoder[CL_H264] = CLDecoderFactory::createDecoder(CL_H264);
-				m_decoder[CL_H264]->setLightCpuMode(m_lightCPUmode);
-			}
-
-			img.codec = CL_H264;
-			dec = m_decoder[CL_H264];
-			break;
-
-
-		default:
 			cl_log.log("CLVideoStreamDisplay::dispay: unknown codec type...", cl_logERROR);
 			return;
-			break;
 		}
+
+		if (m_decoder[data->compressionType]==0)
+		{
+			m_decoder[data->compressionType] = CLDecoderFactory::createDecoder(data->compressionType);
+			m_decoder[data->compressionType]->setLightCpuMode(m_lightCPUmode);
+		}
+
+		img.codec = data->compressionType;
+		dec = m_decoder[data->compressionType];
+
+
 	}
 
 

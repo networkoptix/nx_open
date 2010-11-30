@@ -140,8 +140,6 @@ void CLArchiveNavigatorItem::onResize()
 
 	mSlider->resize(slider_width, 30);
 	mSlider_item->setPos(m_width - slider_width - 50, 50);
-	
-
 }
 
 void CLArchiveNavigatorItem::onSliderMoved(int val)

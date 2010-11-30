@@ -4,7 +4,7 @@
 
 CLDecoderFactory::CLCodecManufacture CLDecoderFactory::m_codecManufacture = FFMPEG;
 
-CLAbstractVideoDecoder* CLDecoderFactory::createDecoder(CLCodecType codec)
+CLAbstractVideoDecoder* CLDecoderFactory::createDecoder(CLVideoCodecType codec)
 {
 
 	if (codec == CL_JPEG)

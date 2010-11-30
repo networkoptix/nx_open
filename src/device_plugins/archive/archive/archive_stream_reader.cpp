@@ -162,7 +162,7 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
 	int readed = m_data_stream[channel].readRawData(data.data(), finfo.size);
 	data.done(readed);
 
-	videoData->compressionType = CLAbstractMediaData::CompressionType(finfo.codec);
+	videoData->compressionType = CLVideoCodecType(finfo.codec);
 	videoData->keyFrame = finfo.keyFrame;
 	videoData->channel_num = channel;
 

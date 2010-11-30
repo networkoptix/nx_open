@@ -193,7 +193,7 @@ CLAbstractMediaData* AVClientPullSSHTTPStreamreader::getNextData()
 	}
 
 	//video/H.264I
-	videoData->compressionType = h264 ? CLAbstractMediaData::H264 : CLAbstractMediaData::JPEG;
+	videoData->compressionType = h264 ? CL_H264 : CL_JPEG;
 	videoData->width = resolutionFULL ? width : width>>1;
 	videoData->height = resolutionFULL ? height : height>>1;
 

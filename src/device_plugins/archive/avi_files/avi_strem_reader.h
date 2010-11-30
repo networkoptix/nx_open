@@ -35,7 +35,7 @@ protected:
 	AVFormatContext* m_formatContext;
 	int	m_videoStrmIndex;
 	AVPacket m_packet;
-	CLAbstractMediaData::CompressionType m_codec_id;
+	CLVideoCodecType m_codec_id;
 	
 	
 

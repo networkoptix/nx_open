@@ -58,7 +58,7 @@ CLAbstractMediaData* AVTestFileStreamreader::getNextData()
 
 	
 	
-	videoData->compressionType = CLAbstractMediaData::H264;
+	videoData->compressionType = CL_H264;
 	videoData->width = 1600;
 	videoData->height = 1184;
 	videoData->channel_num = 0;

@@ -5,6 +5,7 @@
 #include "../base/bytearray.h"
 #include <QString>
 #include <QTime>
+#include "decoders/video/frame_info.h"
 
 
 
@@ -22,11 +23,11 @@ struct CLAbstractMediaData : public CLAbstractData
 	}
 
 	enum DataType {VIDEO, AUDIO};
-	enum CompressionType {JPEG, MPEG2, MPEG4, H264, RGB24, YUV420, YUV422};
+	
 
 	CLByteArray data;
 	DataType dataType;
-	CompressionType compressionType;
+	CLVideoCodecType compressionType;
 
 
 	quint32 channel_num;

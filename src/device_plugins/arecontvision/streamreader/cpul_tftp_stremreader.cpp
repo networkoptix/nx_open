@@ -379,7 +379,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 
 	
 	
-	videoData->compressionType = h264 ? CLAbstractMediaData::H264 : CLAbstractMediaData::JPEG;
+	videoData->compressionType = h264 ? CL_H264 : CL_JPEG;
 	videoData->width = size.width;
 	videoData->height = size.height;
 

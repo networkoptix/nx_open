@@ -37,6 +37,7 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 
 	if (!isSingleShotMode())	
 		mAdaptiveSleep.sleep(m_need_tosleep);
+	
 
 
 	{
@@ -51,6 +52,9 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 
 		cuur_time =  qreal(m_len_msec)*m_packet.dts/duration;
 		m_need_tosleep = m_len_msec/duration;
+
+		int t = m_len_msec/m_formatContext->streams[m_videoStrmIndex]->nb_frames;
+		t=t;
 	}
 
 	
@@ -162,21 +166,26 @@ bool CLAVIStreamReader::init()
 
 	switch(ffmpeg_codec_id)
 	{
+	case CODEC_ID_MSVIDEO1:
+		m_codec_id =CL_MSVIDEO1;
+		break;
+
+
 	case CODEC_ID_MJPEG:
-		m_codec_id =CLAbstractMediaData::JPEG;
+		m_codec_id =CL_JPEG;
 		break;
 
 	case CODEC_ID_MPEG2VIDEO:
-		m_codec_id = CLAbstractMediaData::MPEG2;
+		m_codec_id = CL_MPEG2;
 		break;
 
 
 	case CODEC_ID_MPEG4:
-		m_codec_id = CLAbstractMediaData::MPEG4;
+		m_codec_id = CL_MPEG4;
 		break;
 
 	case CODEC_ID_H264:
-		m_codec_id = CLAbstractMediaData::H264;
+		m_codec_id = CL_H264;
 	    break;
 	default:
 		destroy();
