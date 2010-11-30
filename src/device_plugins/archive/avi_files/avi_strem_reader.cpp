@@ -26,7 +26,7 @@ CLAVIStreamReader::~CLAVIStreamReader()
 unsigned long CLAVIStreamReader::currTime() const
 {
 	QMutexLocker mutex(&m_cs);
-	return cuur_time;
+	return m_cuur_time;
 }
 
 bool CLAVIStreamReader::init()
@@ -41,7 +41,8 @@ bool CLAVIStreamReader::init()
 		avidll.av_register_all();
 	}
 
-	cuur_time = 0;
+	m_cuur_time = 0;
+	m_prev_time = -1;
 	m_need_tosleep = 0;
 
 	m_formatContext = avidll.avformat_alloc_context();
@@ -133,7 +134,7 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 		return 0;
 
 	if (!isSingleShotMode())	
-		mAdaptiveSleep.sleep(m_need_tosleep);
+		smart_sleep(m_need_tosleep);
 	
 
 
@@ -147,11 +148,18 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 		if (duration==0)
 			duration = 1;
 
-		cuur_time =  qreal(m_len_msec)*m_packet.dts/duration;
-		m_need_tosleep = m_len_msec/duration;
+		m_cuur_time =  qreal(m_len_msec)*m_packet.dts/duration;
+		//m_need_tosleep = m_len_msec/duration;
 
-		int t = m_len_msec/m_formatContext->streams[m_videoStrmIndex]->nb_frames;
-		t=t;
+		if (m_need_tosleep==0 && m_prev_time!=-1)
+		{
+			// we assume that we have constant frame rate 
+			m_need_tosleep = m_cuur_time-m_prev_time;
+
+		}
+
+		m_prev_time = m_cuur_time;
+
 	}
 
 	
@@ -204,6 +212,10 @@ void CLAVIStreamReader::channeljumpTo(unsigned long msec, int channel)
 		err = err;
 	}
 
+	m_need_tosleep = 0;
+	m_prev_time = -1;
+	m_wakeup = true;
+
 }
 
 
@@ -247,5 +259,25 @@ bool CLAVIStreamReader::getNextVideoPacket()
 	}
 
 	return true;
+
+}
+
+void CLAVIStreamReader::smart_sleep(int msec)
+{
+	m_wakeup = false;
+	int sleep_times = msec/32;
+
+	for (int i = 0; i < sleep_times; ++i)
+	{
+		if (m_wakeup || needToStop())
+			return;
+
+		mAdaptiveSleep.sleep(32);
+	}
+
+	if (m_wakeup || needToStop())
+		return;
+
+	mAdaptiveSleep.sleep(msec%32);
 
 }

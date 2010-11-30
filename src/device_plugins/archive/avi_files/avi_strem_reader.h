@@ -28,15 +28,21 @@ protected:
 	bool init();
 	void destroy();
 
+	void smart_sleep(int msec);
+
 protected:
 
-	unsigned long cuur_time;
+	unsigned long m_cuur_time;
+	int m_prev_time;
 
 	AVFormatContext* m_formatContext;
 	int	m_videoStrmIndex;
 	AVPacket m_packet;
 	CLVideoCodecType m_codec_id;
 	bool mFirstTime;
+
+
+	volatile bool m_wakeup;
 	
 
 };
