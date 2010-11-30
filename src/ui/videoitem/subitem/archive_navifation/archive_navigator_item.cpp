@@ -57,6 +57,7 @@ mSliderIsmoving(false)
 	mSlider_item = new QGraphicsProxyWidget(this);
 	mSlider = new CLDirectJumpSlider(Qt::Horizontal);
 	mSlider->setRange(0,2000);
+	mSlider->setUpdatesEnabled(false);
 
 	if (m_height!=400)
 	{
@@ -203,7 +204,10 @@ void CLArchiveNavigatorItem::updateSliderPos()
 	qreal scale = mSlider->maximum() - mSlider->minimum();
 
 	unsigned long pos = time*(scale/total);
+
+	
 	mSlider->setValue(pos);
+	
 }
 
 void CLArchiveNavigatorItem::sliderPressed()

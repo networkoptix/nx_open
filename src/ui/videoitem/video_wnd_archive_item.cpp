@@ -31,8 +31,14 @@ QPointF CLVideoWindowArchiveItem::getBestSubItemPos(CLAbstractSubItem::ItemType 
 		return QPointF(0, height() - m_archNavigatorHeight);
 }
 
+void CLVideoWindowArchiveItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+	mArchiveNavigator->updateSliderPos();
+	CLVideoWindowItem::paint(painter, option, widget);
+}
+
 void CLVideoWindowArchiveItem::draw(CLVideoDecoderOutput& image, unsigned int channel)
 {
 	CLVideoWindowItem::draw(image, channel);
-	mArchiveNavigator->updateSliderPos();
+	
 }

@@ -16,6 +16,8 @@ public:
 	QPointF getBestSubItemPos(CLAbstractSubItem::ItemType type);
 
 protected:
+	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
+protected:
 	CLArchiveNavigatorItem* mArchiveNavigator;
 
 	int m_archNavigatorHeight;
