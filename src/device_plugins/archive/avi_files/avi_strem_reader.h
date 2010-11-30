@@ -36,7 +36,7 @@ protected:
 	int	m_videoStrmIndex;
 	AVPacket m_packet;
 	CLVideoCodecType m_codec_id;
-	
+	bool mFirstTime;
 	
 
 };

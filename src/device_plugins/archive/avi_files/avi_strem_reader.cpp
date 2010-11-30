@@ -11,9 +11,10 @@
 
 CLAVIStreamReader::CLAVIStreamReader(CLDevice* dev ):
 CLAbstractArchiveReader(dev),
-m_videoStrmIndex(-1)
+m_videoStrmIndex(-1),
+mFirstTime(true)
 {
-	init();
+	//init();
 }
 
 CLAVIStreamReader::~CLAVIStreamReader()
@@ -28,10 +29,106 @@ unsigned long CLAVIStreamReader::currTime() const
 	return cuur_time;
 }
 
+bool CLAVIStreamReader::init()
+{
+	static bool firstInstance = true;
+
+	QMutexLocker mutex(&m_cs);
+
+	if (firstInstance)
+	{
+		firstInstance = false;
+		avidll.av_register_all();
+	}
+
+	cuur_time = 0;
+	m_need_tosleep = 0;
+
+	m_formatContext = avidll.avformat_alloc_context();
+
+
+	int err = avidll.av_open_input_file(&m_formatContext, m_device->getUniqueId().toLatin1().data(), NULL, 0, NULL);
+	if (err < 0)
+	{
+		destroy();
+		return false; 
+	}
+
+	err = avidll.av_find_stream_info(m_formatContext);
+	if (err < 0)
+	{
+		destroy();
+		return false; 
+	}
+
+	m_len_msec = m_formatContext->duration/1000;
+
+	for(unsigned i = 0; i < m_formatContext->nb_streams; i++) 
+	{
+		AVStream *strm= m_formatContext->streams[i];
+		AVCodecContext *codecContext = strm->codec;
+
+		if(codecContext->codec_type >= (unsigned)AVMEDIA_TYPE_NB)
+			continue;
+
+		switch(codecContext->codec_type) 
+		{
+		case AVMEDIA_TYPE_VIDEO:
+			if (m_videoStrmIndex == -1) // Take only first video stream
+				m_videoStrmIndex = i;
+			break;
+		default:
+			break;
+		}
+	}
+
+
+	int ffmpeg_codec_id = m_formatContext->streams[m_videoStrmIndex]->codec->codec_id;
+
+	switch(ffmpeg_codec_id)
+	{
+	case CODEC_ID_MSVIDEO1:
+		m_codec_id =CL_MSVIDEO1;
+		break;
+
+
+	case CODEC_ID_MJPEG:
+		m_codec_id =CL_JPEG;
+		break;
+
+	case CODEC_ID_MPEG2VIDEO:
+		m_codec_id = CL_MPEG2;
+		break;
+
+
+	case CODEC_ID_MPEG4:
+		m_codec_id = CL_MPEG4;
+		break;
+
+	case CODEC_ID_H264:
+		m_codec_id = CL_H264;
+		break;
+	default:
+		destroy();
+		return false;
+	}
+
+
+	// Alloc common resources
+
+	avidll.av_init_packet(&m_packet);
+	return true;
+}
 
 
 CLAbstractMediaData* CLAVIStreamReader::getNextData()
 {
+	if (mFirstTime)
+	{
+		init();
+		mFirstTime = false;
+	}
+
 	if (!m_formatContext || m_videoStrmIndex==-1)
 		return 0;
 
@@ -69,7 +166,7 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 	memset(data.data() + m_packet.size, 0, extra);
 	data.done(m_packet.size + extra);
 
-	/*
+	/**/
 	FILE* f = fopen("test.264_", "wb");
 	fwrite(data.data(), 1, data.size(), f);
 	fclose(f);
@@ -110,95 +207,6 @@ void CLAVIStreamReader::channeljumpTo(unsigned long msec, int channel)
 }
 
 
-bool CLAVIStreamReader::init()
-{
-	static bool firstInstance = true;
-
-	if (firstInstance)
-	{
-		firstInstance = false;
-		avidll.av_register_all();
-	}
-	
-	cuur_time = 0;
-	m_need_tosleep = 0;
-
-	m_formatContext = avidll.avformat_alloc_context();
-
-	
-	int err = avidll.av_open_input_file(&m_formatContext, m_device->getUniqueId().toLatin1().data(), NULL, 0, NULL);
-	if (err < 0)
-	{
-		destroy();
-		return false; 
-	}
-
-	err = avidll.av_find_stream_info(m_formatContext);
-	if (err < 0)
-	{
-		destroy();
-		return false; 
-	}
-
-	m_len_msec = m_formatContext->duration/1000;
-
-	for(unsigned i = 0; i < m_formatContext->nb_streams; i++) 
-	{
-		AVStream *strm= m_formatContext->streams[i];
-		AVCodecContext *codecContext = strm->codec;
-
-		if(codecContext->codec_type >= (unsigned)AVMEDIA_TYPE_NB)
-			continue;
-
-		switch(codecContext->codec_type) 
-		{
-			case AVMEDIA_TYPE_VIDEO:
-			if (m_videoStrmIndex == -1) // Take only first video stream
-				m_videoStrmIndex = i;
-			break;
-		default:
-			break;
-		}
-	}
-
-
-	int ffmpeg_codec_id = m_formatContext->streams[m_videoStrmIndex]->codec->codec_id;
-
-	switch(ffmpeg_codec_id)
-	{
-	case CODEC_ID_MSVIDEO1:
-		m_codec_id =CL_MSVIDEO1;
-		break;
-
-
-	case CODEC_ID_MJPEG:
-		m_codec_id =CL_JPEG;
-		break;
-
-	case CODEC_ID_MPEG2VIDEO:
-		m_codec_id = CL_MPEG2;
-		break;
-
-
-	case CODEC_ID_MPEG4:
-		m_codec_id = CL_MPEG4;
-		break;
-
-	case CODEC_ID_H264:
-		m_codec_id = CL_H264;
-	    break;
-	default:
-		destroy();
-		return false;
-	}
-	
-	
-
-	// Alloc common resources
-
-	avidll.av_init_packet(&m_packet);
-	return true;
-}
 
 void CLAVIStreamReader::destroy()
 {

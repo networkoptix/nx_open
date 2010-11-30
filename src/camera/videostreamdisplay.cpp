@@ -27,7 +27,6 @@ void CLVideoStreamDisplay::setDrawer(CLAbstractRenderer* draw)
 
 void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data)
 {
-	
 
 	CLVideoData img;
 

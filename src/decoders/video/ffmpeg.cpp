@@ -103,7 +103,7 @@ bool CLFFmpegVideoDecoder::CodecDll::init()
 		return false;
 	else
 	{
-		av_log_set_callback(decoderLogCallback);
+		//av_log_set_callback(decoderLogCallback);
 	}
 
 
@@ -294,7 +294,7 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 	int got_picture = 0;
 	dll.avcodec_decode_video(c, picture, &got_picture,(unsigned char*)data.inbuf, data.buff_len);
 
- //gotpicture:
+//gotpicture:
 
 	if (got_picture )
 	{
@@ -357,13 +357,11 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 	}
 	else
 	{
-		/*
+		/*	
 		// some times decoder wants to delay frame by one; we do not want that
 		dll.avcodec_decode_video(c, picture, &got_picture,0, 0);
 		if (got_picture)
 			goto gotpicture;
-		else
-			got_picture = got_picture;
 
 		/**/
 
