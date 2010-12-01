@@ -59,6 +59,7 @@ struct CLVideoData
 	//decoder just ignores this flag
 	// for user purpose only
 	int key_frame; 
+	bool use_twice; // some docoders delays frame by one 
 
 
 };

@@ -50,9 +50,24 @@ mSliderIsmoving(false)
 
 
 	/**/
+
 	mPlayItem = new CLImgSubItem(this, "./skin/try/play1.png", CLAbstractSubItem::Play, 0.7, 1.0, m_height, m_height);
 	mPauseItem = new CLImgSubItem(this, "./skin/try/pause1.png", CLAbstractSubItem::Pause, 0.7, 1.0, m_height, m_height);
 	mPlayItem->setVisible(false);
+
+	
+
+	mRewindBackward = new CLImgSubItem(this, "./skin/try/player_rew.png", CLAbstractSubItem::RewindBackward, 0.7, 1.0, m_height, m_height);
+	mRewindForward = new CLImgSubItem(this, "./skin/try/player_fwd.png", CLAbstractSubItem::RewindForward, 0.7, 1.0, m_height, m_height);
+
+	mStepForward = new CLImgSubItem(this, "./skin/try/player_end.png", CLAbstractSubItem::StepForward, 0.7, 1.0, m_height, m_height);
+	mStepForward->setVisible(false);
+
+	mStepBackward = new CLImgSubItem(this, "./skin/try/player_start.png", CLAbstractSubItem::StepBackward, 0.7, 1.0, m_height, m_height);
+	mStepBackward->setVisible(false);
+	
+	/**/
+
 
 	mSlider_item = new QGraphicsProxyWidget(this);
 	mSlider = new CLDirectJumpSlider(Qt::Horizontal);
@@ -132,14 +147,24 @@ CLAbstractArchiveReader* CLArchiveNavigatorItem::reader()
 void CLArchiveNavigatorItem::onResize()
 {
 	m_width = parentItem()->boundingRect().width();
-	mPauseItem->setPos(5,0);
-	mPlayItem->setPos(5,0);
+
+	const int shift0 = 5;
+	const int item_distance = 20;
+	const int item_size = item_distance + m_height;
+
+	mRewindBackward->setPos(shift0, 0);
+	mPauseItem->setPos(shift0 + item_size,0);
+	mPlayItem->setPos(shift0 + item_size,0);
+	mRewindForward->setPos(shift0 + 2*item_size, 0);
+
+	mStepForward->setPos(m_width - shift0 - item_size, 0);
+	mStepBackward->setPos(m_width - shift0 - 2*item_size, 0);
 
 
-	int slider_width = m_width - m_height - 300;
+	int slider_width = m_width - m_height*8.5;
 
 	mSlider->resize(slider_width, 30);
-	mSlider_item->setPos(m_width - slider_width - 50, 50);
+	mSlider_item->setPos(m_height*6, 50);
 }
 
 void CLArchiveNavigatorItem::onSliderMoved(int val)
@@ -154,24 +179,57 @@ void CLArchiveNavigatorItem::onSliderMoved(int val)
 void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
 {
 	CLAbstractSubItem::ItemType type = subitem->getType();
+	unsigned long curr_time;
 
 	switch(type)
 	{
 	case CLAbstractSubItem::Play:
 		mPlayItem->setVisible(false);
 		mPauseItem->setVisible(true);
+
+		mStepBackward->setVisible(false);
+		mStepForward->setVisible(false);
+
 		reader()->setSingleShotMode(false);
 		reader()->resume();
+
+
 		mPlayMode = true;
 		break;
 
 	case CLAbstractSubItem::Pause:
 		mPlayItem->setVisible(true);
 		mPauseItem->setVisible(false);
+
+		mStepBackward->setVisible(true);
+		mStepForward->setVisible(true);
+
+
 		reader()->pause();
 		reader()->setSingleShotMode(true);
 		mPlayMode = false;
 		break;
+
+	case CLAbstractSubItem::RewindBackward:
+		reader()->jumpTo(0, true);
+		break;
+
+	case CLAbstractSubItem::RewindForward:
+		reader()->jumpTo(reader()->len_msec(), true);
+		break;
+
+	case CLAbstractSubItem::StepForward:
+		
+		reader()->resume();
+		break;
+
+	case CLAbstractSubItem::StepBackward:
+		curr_time = reader()->currTime();
+		//reader()->setdirection(false);
+		reader()->jumpTo(curr_time-100, true);
+		//reader()->setdirection(true);
+		break;
+
 
 
 	default:

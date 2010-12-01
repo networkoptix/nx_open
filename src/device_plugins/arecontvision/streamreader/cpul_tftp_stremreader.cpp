@@ -198,7 +198,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 	}
 	/**/
 
-	forecast_size = resolutionFULL ? (width*height)/2  : (width*height)/4; // 0.5 meg per megapixel as maximum 
+	forecast_size = resolutionFULL ? (width*height)/4  : (width*height)/8; // 0.25 meg per megapixel as maximum 
 			
 	
 	

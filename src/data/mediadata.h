@@ -50,11 +50,13 @@ struct CLCompressedVideoData : public CLAbstractMediaData
 	
 	{
 		dataType = VIDEO;
+		use_twice = false;
 	}
 
 	int width;
 	int height;
 	bool keyFrame;
+	bool use_twice; // some decoders delay video frame by one;
 
 };
 

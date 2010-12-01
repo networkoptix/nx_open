@@ -174,7 +174,7 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 	memset(data.data() + m_packet.size, 0, extra);
 	data.done(m_packet.size + extra);
 
-	/**/
+	/*/
 	FILE* f = fopen("test.264_", "wb");
 	fwrite(data.data(), 1, data.size(), f);
 	fclose(f);
@@ -184,6 +184,10 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 	videoData->compressionType = m_codec_id;
 	videoData->keyFrame = 1;//m_formatContext->streams[m_videoStrmIndex]->codec->coded_frame->key_frame;
 	videoData->channel_num = 0;
+
+	videoData->use_twice = m_use_twice;
+	m_use_twice = false;
+
 
 
 	if (videoData->keyFrame)
@@ -205,7 +209,8 @@ void CLAVIStreamReader::channeljumpTo(unsigned long msec, int channel)
 {
 	QMutexLocker mutex(&m_cs);
 
-	int err = avidll.avformat_seek_file(m_formatContext, -1, 0, msec*1000, _I64_MAX, 0);
+	int err = avidll.avformat_seek_file(m_formatContext, -1, 0, msec*1000, _I64_MAX, AVSEEK_FLAG_BACKWARD);
+	
 
 	if (err < 0) 
 	{

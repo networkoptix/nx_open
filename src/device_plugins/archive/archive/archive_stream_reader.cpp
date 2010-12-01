@@ -165,6 +165,8 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
 	videoData->compressionType = CLVideoCodecType(finfo.codec);
 	videoData->keyFrame = finfo.keyFrame;
 	videoData->channel_num = channel;
+	videoData->use_twice = m_use_twice;
+	m_use_twice = false;
 
 
 	if (videoData->keyFrame)
@@ -258,10 +260,10 @@ void CLArchiveStreamReader::channeljumpTo(unsigned long msec, int channel)
 	if (new_index<0)
 		return;
 
-	mCurrIndex[channel] = nextFrameIndex(true, channel, new_index, true, mForward);
+	mCurrIndex[channel] = nextFrameIndex(true, channel, new_index, true, !mForward);
 
 	if (mCurrIndex[channel]==-1)
-		mCurrIndex[channel] = nextFrameIndex(true, channel, new_index, true, !mForward);
+		mCurrIndex[channel] = nextFrameIndex(true, channel, new_index, true, mForward);
 
 	mFinished[channel] = (mCurrIndex[channel]==-1);
 

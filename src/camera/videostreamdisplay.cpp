@@ -33,6 +33,7 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data)
 	img.inbuf = (unsigned char*)(data->data.data()); // :-)
 	img.buff_len = data->data.size();
 	img.key_frame = data->keyFrame;
+	img.use_twice = data->use_twice;
 	CLAbstractVideoDecoder* dec;
 
 

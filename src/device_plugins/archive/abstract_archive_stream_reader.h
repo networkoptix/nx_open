@@ -38,6 +38,8 @@ protected:
 
 	mutable QMutex m_cs;
 
+	bool m_use_twice;
+
 };
 
 

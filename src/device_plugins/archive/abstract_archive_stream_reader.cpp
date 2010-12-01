@@ -8,7 +8,8 @@ mForward(true),
 m_len_msec(0),
 m_need_tosleep(0),
 m_cs(QMutex::Recursive),
-mAdaptiveSleep(20)
+mAdaptiveSleep(20),
+m_use_twice(false)
 {
 }
 
@@ -57,6 +58,8 @@ void CLAbstractArchiveReader::jumpTo(unsigned long msec, bool makeshot)
 	{
 		channeljumpTo(msec, channel);
 	}
+
+	m_use_twice = true;
 
 	if (makeshot && isSingleShotMode())
 		resume();

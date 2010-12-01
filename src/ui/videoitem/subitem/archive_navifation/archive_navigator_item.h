@@ -37,6 +37,14 @@ protected:
 
 	CLImgSubItem* mPlayItem;
 	CLImgSubItem* mPauseItem;
+
+	CLImgSubItem* mRewindBackward;
+	CLImgSubItem* mRewindForward;
+
+	CLImgSubItem* mStepForward;
+	CLImgSubItem* mStepBackward;
+
+
 	QSlider* mSlider;
 	QGraphicsProxyWidget* mSlider_item;
 	CLAbstractArchiveReader* mStreamReader;
