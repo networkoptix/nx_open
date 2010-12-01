@@ -148,12 +148,16 @@ void GraphicsView::start()
 {
 	m_ignore_release_event = false;
 	mViewStarted = true;
+
+	m_camLayout.updateSceneRect();
 	centerOn(getRealSceneRect().center());
-	zoomMin(0);
-
-	
-	fitInView(3000, 0);
-
+	if (m_camLayout.getItemList().count())
+	{
+		
+		
+		zoomMin(0);
+		fitInView(3000, 0);
+	}
 
 	enableMultipleSelection(false, true);
 
@@ -1288,8 +1292,9 @@ void GraphicsView::enableMultipleSelection(bool enable, bool unselect)
 	}
 	else
 	{
-		QMouseEvent fake(QEvent::None, QPoint(), Qt::NoButton, Qt::NoButton, Qt::NoModifier);
-		QGraphicsView::mouseReleaseEvent(&fake); //some how need to update RubberBand area
+		// lead to cradhes
+		//QMouseEvent fake(QEvent::None, QPoint(), Qt::NoButton, Qt::NoButton, Qt::NoModifier);
+		//QGraphicsView::mouseReleaseEvent(&fake); //some how need to update RubberBand area
 
 		setDragMode(QGraphicsView::NoDrag); 
 		
@@ -1308,6 +1313,9 @@ void GraphicsView::keyReleaseEvent( QKeyEvent * e )
 	switch (e->key()) 
 	{
 	case Qt::Key_Control:
+		QMouseEvent fake(QEvent::None, QPoint(), Qt::NoButton, Qt::NoButton, Qt::NoModifier); // very dangerous!!!
+		QGraphicsView::mouseReleaseEvent(&fake); //some how need to update RubberBand area // very dangerous!!!
+
 		enableMultipleSelection(false, false);
 		break;
 
@@ -1579,6 +1587,7 @@ void GraphicsView::resizeEvent( QResizeEvent * event )
 	else
 		//fitInView(getRealSceneRect(),Qt::KeepAspectRatio);
 	{
+
 		centerOn(getRealSceneRect().center());
 		fitInView(1000, 0);
 	}

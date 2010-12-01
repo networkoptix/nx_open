@@ -263,6 +263,7 @@ void SceneLayout::onTimer()
 
 	if (added && !m_firstTime)
 	{
+		updateSceneRect();
 		m_view->centerOn(m_view->getRealSceneRect().center());
 		m_view->fitInView(2000, 0);
 	}
