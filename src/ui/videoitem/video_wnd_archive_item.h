@@ -11,6 +11,9 @@ public:
 		QString name="");
 	virtual ~CLVideoWindowArchiveItem();
 
+	virtual void setFullScreen(bool full);
+	
+
 	void draw(CLVideoDecoderOutput& image, unsigned int channel);
 
 	QPointF getBestSubItemPos(CLAbstractSubItem::ItemType type);

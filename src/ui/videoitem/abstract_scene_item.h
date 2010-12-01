@@ -77,7 +77,7 @@ public:
 
 	void stop_animation();
 
-	void setFullScreen(bool full);
+	virtual void setFullScreen(bool full);
 	bool isFullScreen() const;
 
 	void setArranged(bool arr);

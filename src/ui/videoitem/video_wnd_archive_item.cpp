@@ -1,5 +1,6 @@
 #include "video_wnd_archive_item.h"
 #include "subitem\archive_navifation\archive_navigator_item.h"
+#include "base\log.h"
 
 
 
@@ -41,4 +42,15 @@ void CLVideoWindowArchiveItem::draw(CLVideoDecoderOutput& image, unsigned int ch
 {
 	CLVideoWindowItem::draw(image, channel);
 	
+}
+
+void CLVideoWindowArchiveItem::setFullScreen(bool full)
+{
+	CLVideoWindowItem::setFullScreen(full);
+
+	if (full)
+		cl_log.log("setFullScreen TRUE", cl_logALWAYS);
+	else
+		cl_log.log("setFullScreen FALSE", cl_logALWAYS);
+
 }
