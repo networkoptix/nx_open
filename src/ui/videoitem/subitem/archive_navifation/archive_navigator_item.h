@@ -19,6 +19,8 @@ public:
 
 	void updateSliderPos();
 
+	void setArchiveStreamReader(CLAbstractArchiveReader* reader);
+
 protected:
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	virtual QRectF boundingRect() const;
@@ -26,7 +28,6 @@ protected:
 protected slots:
 	virtual void onSubItemPressed(CLAbstractSubItem* subitem);
 	void onSliderMoved(int val);
-	CLAbstractArchiveReader* reader();
 
 	void sliderPressed();
 	void sliderReleased();
@@ -52,6 +53,8 @@ protected:
 
 	bool mPlayMode;
 	bool mSliderIsmoving;
+
+	CLAbstractArchiveReader* mReader;
 
 };
 

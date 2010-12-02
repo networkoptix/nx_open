@@ -153,8 +153,6 @@ void GraphicsView::start()
 	centerOn(getRealSceneRect().center());
 	if (m_camLayout.getItemList().count())
 	{
-		
-		
 		zoomMin(0);
 		fitInView(3000, 0);
 	}

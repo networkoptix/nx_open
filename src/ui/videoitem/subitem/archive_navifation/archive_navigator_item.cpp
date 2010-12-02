@@ -7,7 +7,6 @@
 #include "slider_item.h"
 #include "base\log.h"
 #include "..\..\video_wnd_archive_item.h"
-#include "camera\camera.h"
 #include "device_plugins\archive\abstract_archive_stream_reader.h"
 
 
@@ -131,18 +130,6 @@ CLArchiveNavigatorItem::~CLArchiveNavigatorItem()
 }
 
 
-CLAbstractArchiveReader* CLArchiveNavigatorItem::reader()
-{
-	if (!mStreamReader)
-	{
-		CLVideoWindowArchiveItem* wnd = static_cast<CLVideoWindowArchiveItem*>(mParent);
-		mStreamReader = static_cast<CLAbstractArchiveReader*>(wnd->getVideoCam()->getStreamreader());
-	}
-
-	return mStreamReader;
-
-}
-
 // this function uses parent width
 void CLArchiveNavigatorItem::onResize()
 {
@@ -170,10 +157,10 @@ void CLArchiveNavigatorItem::onResize()
 void CLArchiveNavigatorItem::onSliderMoved(int val)
 {
 	qreal factor = (qreal)(val)/(mSlider->maximum() - mSlider->minimum());
-	unsigned long time = reader()->len_msec()*factor;
+	unsigned long time = mReader->len_msec()*factor;
 
 
-	reader()->jumpTo(time, true);
+	mReader->jumpTo(time, true);
 }
 
 void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
@@ -190,8 +177,8 @@ void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
 		mStepBackward->setVisible(false);
 		mStepForward->setVisible(false);
 
-		reader()->setSingleShotMode(false);
-		reader()->resume();
+		mReader->setSingleShotMode(false);
+		mReader->resume();
 
 
 		mPlayMode = true;
@@ -205,29 +192,29 @@ void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
 		mStepForward->setVisible(true);
 
 
-		reader()->pause();
-		reader()->setSingleShotMode(true);
+		mReader->pause();
+		mReader->setSingleShotMode(true);
 		mPlayMode = false;
 		break;
 
 	case CLAbstractSubItem::RewindBackward:
-		reader()->jumpTo(0, true);
+		mReader->jumpTo(0, true);
 		break;
 
 	case CLAbstractSubItem::RewindForward:
-		reader()->jumpTo(reader()->len_msec(), true);
+		mReader->jumpTo(mReader->len_msec(), true);
 		break;
 
 	case CLAbstractSubItem::StepForward:
 		
-		reader()->resume();
+		mReader->resume();
 		break;
 
 	case CLAbstractSubItem::StepBackward:
-		curr_time = reader()->currTime();
-		//reader()->setdirection(false);
-		reader()->jumpTo(curr_time-100, true);
-		//reader()->setdirection(true);
+		curr_time = mReader->currTime();
+		//mReader->setdirection(false);
+		mReader->jumpTo(curr_time-100, true);
+		//mReader->setdirection(true);
 		break;
 
 
@@ -254,8 +241,8 @@ void CLArchiveNavigatorItem::updateSliderPos()
 	if (mSliderIsmoving)
 		return;
 
-	unsigned long time = reader()->currTime();
-	unsigned long total = reader()->len_msec();
+	unsigned long time = mReader->currTime();
+	unsigned long total = mReader->len_msec();
 
 	qreal scale = mSlider->maximum() - mSlider->minimum();
 
@@ -269,7 +256,7 @@ void CLArchiveNavigatorItem::updateSliderPos()
 void CLArchiveNavigatorItem::sliderPressed()
 {
 	//cl_log.log("PRESSDED ",  cl_logALWAYS);
-	reader()->setSingleShotMode(true);
+	mReader->setSingleShotMode(true);
 	mSliderIsmoving = true;
 }
 
@@ -279,5 +266,10 @@ void CLArchiveNavigatorItem::sliderReleased()
 	mSliderIsmoving = false;
 
 	if (mPlayMode)
-		reader()->setSingleShotMode(false);
+		mReader->setSingleShotMode(false);
+}
+
+void CLArchiveNavigatorItem::setArchiveStreamReader(CLAbstractArchiveReader* reader)
+{
+	mReader = reader;
 }

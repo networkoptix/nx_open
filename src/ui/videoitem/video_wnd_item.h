@@ -29,7 +29,7 @@ public:
 
 	void draw(CLVideoDecoderOutput& image, unsigned int channel);
 
-	void setVideoCam(CLVideoCamera* cam);
+	virtual void setVideoCam(CLVideoCamera* cam);
 	CLVideoCamera* getVideoCam() const;
 
 	float aspectRatio() const;

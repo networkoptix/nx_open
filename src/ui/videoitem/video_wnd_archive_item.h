@@ -3,6 +3,7 @@
 
 #include "video_wnd_item.h"
 class CLArchiveNavigatorItem;
+class CLAbstractArchiveReader;
 
 class CLVideoWindowArchiveItem : public CLVideoWindowItem
 {
@@ -12,11 +13,10 @@ public:
 	virtual ~CLVideoWindowArchiveItem();
 
 	virtual void setFullScreen(bool full);
-	
-
 	void draw(CLVideoDecoderOutput& image, unsigned int channel);
-
 	QPointF getBestSubItemPos(CLAbstractSubItem::ItemType type);
+
+	virtual void setVideoCam(CLVideoCamera* cam);
 
 protected:
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);

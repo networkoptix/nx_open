@@ -10,8 +10,8 @@ CLAbstractSubItem::CLAbstractSubItem(CLAbstractSubItemContainer* parent, qreal o
 CLAbstractSubItemContainer(static_cast<QGraphicsItem*>(parent)),
 m_opacity(opacity),
 m_maxopacity(max_opacity),
-m_animation(0),
-mParent(parent)
+m_animation(0)
+
 {
 	setAcceptsHoverEvents(true);
 	//setZValue(parent->zvalue() + 1);

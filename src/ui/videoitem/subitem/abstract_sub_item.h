@@ -52,7 +52,7 @@ protected:
 	qreal m_opacity, m_maxopacity;
 	QPropertyAnimation* m_animation;
 	ItemType mType;
-	CLAbstractSubItemContainer* mParent;
+	
 
 };
 

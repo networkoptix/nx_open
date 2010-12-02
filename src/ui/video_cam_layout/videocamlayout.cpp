@@ -341,7 +341,7 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect)
 
 		CLVideoWindowItem* video_wnd = 0;
 
-		if (device->checkDeviceTypeFlag(CLDevice::ARCHIVE) && false)
+		if (device->checkDeviceTypeFlag(CLDevice::ARCHIVE))
 		{
 			video_wnd = new CLVideoWindowArchiveItem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height());
 			video_wnd->setEditable(true);

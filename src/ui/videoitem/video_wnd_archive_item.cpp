@@ -1,6 +1,8 @@
 #include "video_wnd_archive_item.h"
 #include "subitem\archive_navifation\archive_navigator_item.h"
 #include "base\log.h"
+#include "camera\camera.h"
+#include "device_plugins\archive\abstract_archive_stream_reader.h"
 
 
 
@@ -53,4 +55,10 @@ void CLVideoWindowArchiveItem::setFullScreen(bool full)
 	else
 		cl_log.log("setFullScreen FALSE", cl_logALWAYS);
 
+}
+
+void CLVideoWindowArchiveItem::setVideoCam(CLVideoCamera* cam)
+{
+	CLVideoWindowItem::setVideoCam(cam);
+	mArchiveNavigator->setArchiveStreamReader(static_cast<CLAbstractArchiveReader *>(cam->getStreamreader()));
 }

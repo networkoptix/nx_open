@@ -11,8 +11,10 @@ public:
 	~CLImgSubItem();
 
 	void onResize();
-protected:
+
 	void setMaxSize(int max_width, int max_height);
+protected:
+	
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
