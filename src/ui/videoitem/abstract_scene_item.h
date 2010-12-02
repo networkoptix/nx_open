@@ -107,6 +107,8 @@ protected:
 
 protected slots:
 	virtual void onSubItemPressed(CLAbstractSubItem* subitem);
+	void onResize();
+
 protected:
 	bool m_selected;
 	bool m_arranged;

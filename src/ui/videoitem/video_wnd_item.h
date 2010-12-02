@@ -56,9 +56,6 @@ public:
 signals:
 	void onAspectRatioChanged(CLAbstractSceneItem* item);
 
-protected slots:
-	void onResize();
-
 protected:
 
 	QPointF getBestSubItemPos(CLAbstractSubItem::ItemType type);

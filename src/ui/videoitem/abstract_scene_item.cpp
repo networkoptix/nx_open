@@ -86,6 +86,19 @@ CLVideoWindowItem* CLAbstractSceneItem::toVideoItem() const
 	return static_cast<CLVideoWindowItem*>(   const_cast<CLAbstractSceneItem*>(this)  );
 }
 
+void CLAbstractSceneItem::onResize()
+{
+	QList<QGraphicsItem *> childrenLst = childItems();
+	foreach(QGraphicsItem * item, childrenLst)
+	{
+		CLAbstractSubItem* sub_item = static_cast<CLAbstractSubItem*>(item);
+		QPointF pos = getBestSubItemPos(sub_item->getType());
+		sub_item->setPos(pos);
+		sub_item->onResize();
+	}
+}
+
+
 
 bool CLAbstractSceneItem::addSubItem(CLAbstractSubItem::ItemType type)
 {

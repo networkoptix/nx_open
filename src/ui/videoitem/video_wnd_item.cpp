@@ -157,18 +157,6 @@ QPointF CLVideoWindowItem::getBestSubItemPos(CLAbstractSubItem::ItemType type)
 	}
 }
 
-void CLVideoWindowItem::onResize()
-{
-	QList<QGraphicsItem *> childrenLst = childItems();
-	foreach(QGraphicsItem * item, childrenLst)
-	{
-		CLAbstractSubItem* sub_item = static_cast<CLAbstractSubItem*>(item);
-		QPointF pos = getBestSubItemPos(sub_item->getType());
-		sub_item->setPos(pos);
-		sub_item->onResize();
-	}
-}
-
 void CLVideoWindowItem::copyVideoDataBeforePainting(bool copy)
 {
 	for (int i = 0; i  < m_videonum; ++i)

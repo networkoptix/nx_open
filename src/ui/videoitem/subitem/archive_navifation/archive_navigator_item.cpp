@@ -8,6 +8,8 @@
 #include "base\log.h"
 #include "..\..\video_wnd_archive_item.h"
 #include "device_plugins\archive\abstract_archive_stream_reader.h"
+#include <QGraphicsScene>
+#include <QGraphicsView>
 
 
 //int NavigatorItemHeight = 200;
@@ -133,7 +135,17 @@ CLArchiveNavigatorItem::~CLArchiveNavigatorItem()
 // this function uses parent width
 void CLArchiveNavigatorItem::onResize()
 {
-	m_width = parentItem()->boundingRect().width();
+	QGraphicsItem* parent = parentItem();
+
+	
+
+	if (parent)	
+		m_width = parent->boundingRect().width();
+	else
+	{
+		m_width = scene()->views().at(0)->viewport()->width();
+		//setPos(m_view->mapToScene(m_pos)););
+	}
 
 	const int shift0 = 5;
 	const int item_distance = 20;
