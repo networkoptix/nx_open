@@ -19,11 +19,6 @@ m_recorder(device)
 	cl_log.log("Creating camera for ", m_device->toString(), cl_logDEBUG1);
 
 
-	m_videovindow->setVideoCam(this);
-	m_videovindow->setInfoText(m_device->toString());
-
-
-
 	int videonum = m_device->getVideoLayout()->numberOfChannels();// how many sensors camera has
 
 	m_stat = new CLStatistics[videonum]; // array of statistics
@@ -38,6 +33,10 @@ m_recorder(device)
 
 	m_reader->addDataProcessor(&m_camdispay);
 	m_reader->setStatistics(m_stat);
+
+	m_videovindow->setVideoCam(this);
+	m_videovindow->setInfoText(m_device->toString());
+
 }
 
 CLVideoCamera::~CLVideoCamera()

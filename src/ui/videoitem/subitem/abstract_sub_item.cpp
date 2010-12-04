@@ -7,12 +7,14 @@
 #define OPACITY_TIME 500
 
 CLAbstractSubItem::CLAbstractSubItem(CLAbstractSubItemContainer* parent, qreal opacity, qreal max_opacity):
-CLAbstractSubItemContainer(static_cast<QGraphicsItem*>(parent)),
+CLAbstractUnmovedItem("", static_cast<QGraphicsItem*>(parent)),
 m_opacity(opacity),
 m_maxopacity(max_opacity),
-m_animation(0)
-
+m_animation(0),
+m_parent(parent)
 {
+	setFlag(QGraphicsItem::ItemIgnoresTransformations, false); // at any momrnt this item can becom umoved; but by default disable this flag
+
 	setAcceptsHoverEvents(true);
 	//setZValue(parent->zvalue() + 1);
 

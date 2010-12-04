@@ -21,6 +21,8 @@ public:
 
 	void setArchiveStreamReader(CLAbstractArchiveReader* reader);
 
+	void goToFullScreenMode(bool fullscreen);
+
 protected:
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	virtual QRectF boundingRect() const;
@@ -31,6 +33,9 @@ protected slots:
 
 	void sliderPressed();
 	void sliderReleased();
+
+	// QT has bug about stile; after set one another one does not work well
+	void renewSlider();
 
 protected:
 	int m_width;
@@ -55,6 +60,8 @@ protected:
 	bool mSliderIsmoving;
 
 	CLAbstractArchiveReader* mReader;
+
+	bool mFullScreen;
 
 };
 

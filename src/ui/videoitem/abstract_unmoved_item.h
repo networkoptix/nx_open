@@ -2,13 +2,15 @@
 #define abstract_unmoved_item_h_1753
 
 #include <QGraphicsItem>
+#include "subitem\abstract_sub_item_container.h"
+
 class QGraphicsView;
 
-class CLAbstractUnmovedItem : public QObject, public QGraphicsItem
+class CLAbstractUnmovedItem : public CLAbstractSubItemContainer
 {
 	Q_OBJECT
 public:
-	CLAbstractUnmovedItem(QGraphicsView* view, QString name);
+	CLAbstractUnmovedItem(QString name="", QGraphicsItem* parent = 0);
 	virtual ~CLAbstractUnmovedItem();
 
 	void setStaticPos(QPoint p); // sets pos in term of point view coordinates 

@@ -424,14 +424,14 @@ void GraphicsView::initDecoration()
 
 	if (home)
 	{
-		item = new CLUnMovedPixtureButton(this, button_home, "./skin/home.png", 100, 100, 255, global_decoration_opacity);
+		item = new CLUnMovedPixtureButton(button_home, "./skin/home.png", 100, 100, 255, global_decoration_opacity);
 		item->setStaticPos(QPoint(1,1));
 		addStaticItem(item);
 	}
 
 	if (level_up)
 	{
-		item = new CLUnMovedPixtureButton(this, button_level_up, "./skin/up.png", 100, 100, 255, global_decoration_opacity);
+		item = new CLUnMovedPixtureButton(button_level_up, "./skin/up.png", 100, 100, 255, global_decoration_opacity);
 		item->setStaticPos(QPoint((100+10)*home+1,1));
 		addStaticItem(item);
 	}
@@ -440,7 +440,7 @@ void GraphicsView::initDecoration()
 	if (cont->checkDecorationFlag(LayoutContent::BackGroundLogo))
 	{
 
-		item = new CLUnMovedPixture(this, "background", "./skin/logo.png", viewport()->width(), viewport()->height(), -1, 0.03);
+		item = new CLUnMovedPixture("background", "./skin/logo.png", viewport()->width(), viewport()->height(), -1, 0.03);
 		item->setStaticPos(QPoint(1,1));
 		addStaticItem(item);
 
@@ -457,12 +457,24 @@ void GraphicsView::addjustAllStaticItems()
 	}
 }
 
-void GraphicsView::addStaticItem(CLAbstractUnmovedItem* item)
+void GraphicsView::addStaticItem(CLAbstractUnmovedItem* item, bool conn)
 {
 	m_staticItems.push_back(item);
-	item->adjust();
+	
 	scene()->addItem(item);
-	connect(item, SIGNAL(onPressed(QString)), this, SLOT(onDecorationItemPressed(QString)));
+	item->adjust();
+
+	if (conn)
+		connect(item, SIGNAL(onPressed(QString)), this, SLOT(onDecorationItemPressed(QString)));
+}
+
+void GraphicsView::removeStaticItem(CLAbstractUnmovedItem* item)
+{
+	m_staticItems.removeOne(item);
+	item->adjust();
+	scene()->removeItem(item);
+	disconnect(item, SIGNAL(onPressed(QString)), this, SLOT(onDecorationItemPressed(QString)));
+
 }
 
 void GraphicsView::removeAllStaticItems()
@@ -1588,6 +1600,11 @@ void GraphicsView::resizeEvent( QResizeEvent * event )
 
 		centerOn(getRealSceneRect().center());
 		fitInView(1000, 0);
+	}
+
+	foreach(CLAbstractSceneItem* item, m_camLayout.getItemList())
+	{
+		item->onResize();
 	}
 
 }

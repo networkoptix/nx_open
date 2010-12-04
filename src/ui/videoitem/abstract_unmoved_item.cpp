@@ -2,8 +2,9 @@
 #include <QGraphicsView>
 
 
-CLAbstractUnmovedItem::CLAbstractUnmovedItem(QGraphicsView* view, QString name):
-m_view(view),
+CLAbstractUnmovedItem::CLAbstractUnmovedItem(QString name, QGraphicsItem* parent):
+CLAbstractSubItemContainer(parent),
+m_view(0),
 m_name(name)
 {
 	setFlag(QGraphicsItem::ItemIgnoresTransformations);
@@ -24,6 +25,9 @@ void CLAbstractUnmovedItem::setStaticPos(QPoint p)
 
 void CLAbstractUnmovedItem::adjust()
 {
+	if (!m_view)
+		m_view = scene()->views().at(0);
+
 	setPos(m_view->mapToScene(m_pos));
 }
 

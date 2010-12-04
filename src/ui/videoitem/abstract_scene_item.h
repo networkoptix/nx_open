@@ -5,6 +5,7 @@
 #include <QGraphicsItem>
 #include "../animation/item_trans.h"
 #include "subitem/abstract_sub_item.h"
+#include "subitem/abstract_sub_item_container.h"
 
 
 class GraphicsView;
@@ -87,6 +88,8 @@ public:
 	void drawRotationHelper(bool val);
 	void setRotationPoint(QPointF point1, QPointF point2);
 
+public slots:
+	void onResize();
 
 signals:
 	void onPressed(CLAbstractSceneItem*);
@@ -107,7 +110,7 @@ protected:
 
 protected slots:
 	virtual void onSubItemPressed(CLAbstractSubItem* subitem);
-	void onResize();
+	
 
 protected:
 	bool m_selected;

@@ -56,6 +56,10 @@ public:
 	ViewMode getViewMode() const;
 
 
+	void addStaticItem(CLAbstractUnmovedItem* item, bool connect = true);
+	void removeStaticItem(CLAbstractUnmovedItem* item);
+
+
 signals:
 	void scneZoomFinished();
 	void onDecorationPressed(LayoutContent*, QString);
@@ -100,7 +104,6 @@ protected:
 
 
 	//========decorations=====
-	void addStaticItem(CLAbstractUnmovedItem* item);
 	void removeAllStaticItems();
 	void updateDecorations();
 	CLAbstractUnmovedItem* staticItemByName(QString name) const;

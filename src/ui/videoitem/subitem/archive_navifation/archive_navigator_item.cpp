@@ -10,15 +10,17 @@
 #include "device_plugins\archive\abstract_archive_stream_reader.h"
 #include <QGraphicsScene>
 #include <QGraphicsView>
+#include "ui\graphicsview.h"
 
 
 //int NavigatorItemHeight = 200;
 
 CLArchiveNavigatorItem::CLArchiveNavigatorItem(CLAbstractSubItemContainer* parent, int height):
-CLAbstractSubItem(parent, 0.2, 0.8),
+CLAbstractSubItem(parent, 0.4, 0.8),
 mStreamReader(0),
 mPlayMode(true),
-mSliderIsmoving(false)
+mSliderIsmoving(false),
+mFullScreen(false)
 {
 	m_height = height;
 	m_width = parent->boundingRect().width();
@@ -74,45 +76,8 @@ mSliderIsmoving(false)
 	mSlider = new CLDirectJumpSlider(Qt::Horizontal);
 	mSlider->setRange(0,2000);
 	mSlider->setUpdatesEnabled(false);
-
-	if (m_height!=400)
-	{
-		mSlider->setStyleSheet("QSlider { height: 120px}"
-			"QSlider::groove:horizontal {"
-			"border: 8px solid #6a6a6a;"
-			"background: qlineargradient(x1:0, y1:0, x2:0, y2:4, stop:0 #6a6a7a, stop:1 #6a6afa);"
-			"top: 90px;"
-			"height: 104px;"
-			"margin: 0 0 0 0;}"
-			"QSlider::handle:horizontal {"
-			"background: qlineargradient(x1:0, y1:0, x2:4, y2:4, stop:0 #567ecd, stop:1 #567eff);"
-			"border: 10px solid #205eff;" // border of handle 
-			"width: 120px;"
-			"margin: -8px 0 -8px 0;"
-			"border-radius: 30px;}");
-	}
-	else
-	{
-		mSlider->setStyleSheet("QSlider { height: 240px}"
-			"QSlider::groove:horizontal {"
-			"border: 8px solid #6a6a6a;"
-			"background: qlineargradient(x1:0, y1:0, x2:0, y2:4, stop:0 #6a6a7a, stop:1 #6a6afa);"
-			"top: 210px;"
-			"height: 204px;"
-			"margin: 0 0 0 0;}"
-			"QSlider::handle:horizontal {"
-			"background: qlineargradient(x1:0, y1:0, x2:4, y2:4, stop:0 #567ecd, stop:1 #567eff);"
-			"border: 10px solid #205eff;" // border of handle 
-			"width: 240px;"
-			"margin: -8px 0 -8px 0;"
-			"border-radius: 30px;}");
-	}
-
-
-	/**/
-
-	
 	mSlider_item->setWidget(mSlider);
+
 	onResize();
 
 	//sliderMoved ( int value )
@@ -128,27 +93,98 @@ mSliderIsmoving(false)
 
 CLArchiveNavigatorItem::~CLArchiveNavigatorItem()
 {
-
+	if (mFullScreen)
+		goToFullScreenMode(false);
 }
 
+void CLArchiveNavigatorItem::goToFullScreenMode(bool fullscreen)
+{
+	if (mFullScreen == fullscreen) // already in this mode
+		return;
+	mFullScreen = fullscreen;
+
+	if (mFullScreen)
+	{
+		QGraphicsView* view = scene()->views().at(0);
+		m_width = view->viewport()->width();
+		m_height = 50;
+
+	}
+	else
+	{
+		m_width = m_parent->boundingRect().width();
+		m_height = 400;
+	}
+
+
+
+	QGraphicsView* view = m_parent->scene()->views().at(0);
+	GraphicsView* clview = static_cast<GraphicsView*>(view);
+
+	if (mFullScreen)
+	{
+		setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
+		setParentItem(0);
+
+	
+		
+		m_width = view->viewport()->width();
+		QPoint pos (0, view->viewport()->height() - m_height);
+		setStaticPos(pos);
+
+		
+		clview->addStaticItem(this);
+		
+		setPos(view->mapToScene(pos));
+		setZValue(256); // on top
+	}
+	else
+	{
+		setFlag(QGraphicsItem::ItemIgnoresTransformations, false);
+		clview->removeStaticItem(this);
+		setParentItem(m_parent);
+		setPos((static_cast<CLAbstractSceneItem*>(m_parent))->getBestSubItemPos(mType));
+		setZValue(1.0); 
+	}
+
+
+	
+
+	onResize();
+}
 
 // this function uses parent width
 void CLArchiveNavigatorItem::onResize()
 {
-	QGraphicsItem* parent = parentItem();
-
+	renewSlider();
 	
-
-	if (parent)	
-		m_width = parent->boundingRect().width();
+	if (mFullScreen)
+	{
+		QGraphicsView* view = scene()->views().at(0);
+		m_width = view->viewport()->width();
+		m_height = 50;
+		
+	}
 	else
 	{
-		m_width = scene()->views().at(0)->viewport()->width();
-		//setPos(m_view->mapToScene(m_pos)););
+		m_width = m_parent->boundingRect().width();
+		m_height = 400;
 	}
 
+	
+	mRewindBackward->setMaxSize(m_height, m_height);
+	mPauseItem->setMaxSize(m_height, m_height);
+	mPlayItem->setMaxSize(m_height, m_height);
+	mRewindForward->setMaxSize(m_height, m_height);
+
+	mStepForward->setMaxSize(m_height, m_height);
+	mStepBackward->setMaxSize(m_height, m_height);
+	/**/
+
+
+
 	const int shift0 = 5;
-	const int item_distance = 20;
+	const int item_distance = 10;
 	const int item_size = item_distance + m_height;
 
 	mRewindBackward->setPos(shift0, 0);
@@ -160,10 +196,52 @@ void CLArchiveNavigatorItem::onResize()
 	mStepBackward->setPos(m_width - shift0 - 2*item_size, 0);
 
 
-	int slider_width = m_width - m_height*8.5;
+	int slider_width = m_width - m_height*(3+2+ (m_height==400 ? 2.5 : 3));
 
-	mSlider->resize(slider_width, 30);
-	mSlider_item->setPos(m_height*6, 50);
+	mSlider->resize(slider_width, m_height*2/3);
+	mSlider_item->setPos(m_height*(3+2), m_height/6);
+
+
+
+	if (m_height==50)
+	{
+
+		mSlider->setStyleSheet("QSlider { height: 33px}"
+			"QSlider::groove:horizontal {"
+			"border: 1px solid #6a6a6a;"
+			"background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #6a6a7a, stop:1 #6a6afa);"
+			"height: 29px;"
+			"margin: 0 0 0 0;}"
+			"QSlider::handle:horizontal {"
+			"background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #567ecd, stop:1 #567eff);"
+			"border: 2px solid #205eff;"
+			"width: 33px;"
+			"margin: -2px 0 -2px 0;"
+			"border-radius: 3px;}");    
+	}
+	else
+	{
+		
+		
+		mSlider->setStyleSheet("QSlider { height: 266px}"
+			"QSlider::groove:horizontal {"
+			"border: 8px solid #6a6a6a;"
+			"background: qlineargradient(x1:0, y1:0, x2:0, y2:4, stop:0 #6a6a7a, stop:1 #6a6afa);"
+			"height: 260px;"
+			"margin: 0 0 0 0;}"
+			"QSlider::handle:horizontal {"
+			"background: qlineargradient(x1:0, y1:0, x2:4, y2:4, stop:0 #567ecd, stop:1 #567eff);"
+			"border: 10px solid #205eff;" // border of handle 
+			"width: 266px;"
+			"margin: -8px 0 -8px 0;"
+			"border-radius: 30px;}");
+			/**/
+
+	}
+
+	/**/
+
+	
 }
 
 void CLArchiveNavigatorItem::onSliderMoved(int val)
@@ -284,4 +362,22 @@ void CLArchiveNavigatorItem::sliderReleased()
 void CLArchiveNavigatorItem::setArchiveStreamReader(CLAbstractArchiveReader* reader)
 {
 	mReader = reader;
+}
+
+void CLArchiveNavigatorItem::renewSlider()
+{
+	if (!m_parent->scene())
+		return;
+
+	m_parent->scene()->removeItem(mSlider_item);
+	delete mSlider_item;
+	//delete mSlider;
+
+
+	mSlider_item = new QGraphicsProxyWidget(this);
+	mSlider = new CLDirectJumpSlider(Qt::Horizontal);
+	mSlider->setRange(0,2000);
+	mSlider->setUpdatesEnabled(false);
+	mSlider_item->setWidget(mSlider);
+
 }

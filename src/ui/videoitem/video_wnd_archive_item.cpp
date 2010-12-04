@@ -3,7 +3,7 @@
 #include "base\log.h"
 #include "camera\camera.h"
 #include "device_plugins\archive\abstract_archive_stream_reader.h"
-
+#include <QGraphicsScene>
 
 
 
@@ -12,7 +12,7 @@ CLVideoWindowArchiveItem::CLVideoWindowArchiveItem (GraphicsView* view, const CL
 CLVideoWindowItem(view, layout, max_width, max_height, name)
 {
 
-	m_archNavigatorHeight = layout->width() > 1 ? 400 : 200;
+	m_archNavigatorHeight = 400 ;
 
 	mArchiveNavigator = new CLArchiveNavigatorItem(this, m_archNavigatorHeight);
 	onResize();
@@ -20,7 +20,7 @@ CLVideoWindowItem(view, layout, max_width, max_height, name)
 
 CLVideoWindowArchiveItem::~CLVideoWindowArchiveItem()
 {
-
+	mArchiveNavigator->goToFullScreenMode(false);
 }
 
 
@@ -50,10 +50,33 @@ void CLVideoWindowArchiveItem::setFullScreen(bool full)
 {
 	CLVideoWindowItem::setFullScreen(full);
 
+	
 	if (full)
+	{
+		/*
+		mArchiveNavigator->setParentItem(0);
+		scene()->addItem(mArchiveNavigator);
+		mArchiveNavigator->onResize();
+		/**/
+
+		mArchiveNavigator->goToFullScreenMode(true);
+
 		cl_log.log("setFullScreen TRUE", cl_logALWAYS);
+	}
 	else
+	{
+		/*
+		scene()->removeItem(mArchiveNavigator);
+		mArchiveNavigator->setParentItem(this);
+		mArchiveNavigator->onResize();
+		/**/
+
+		mArchiveNavigator->goToFullScreenMode(false);
+
 		cl_log.log("setFullScreen FALSE", cl_logALWAYS);
+	}
+
+	
 
 }
 

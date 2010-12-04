@@ -6,8 +6,8 @@
 
 extern QPixmap cached(const QString &img);
 
-CLUnMovedPixture::CLUnMovedPixture(QGraphicsView* view, QString name, QString img, int max_width, int max_height, qreal z, qreal opacity):
-CLAbstractUnmovedItem(view, name),
+CLUnMovedPixture::CLUnMovedPixture(QString name, QString img, int max_width, int max_height, qreal z, qreal opacity):
+CLAbstractUnmovedItem(name),
 m_opacity(opacity)
 {
 	m_img = cached(img);
@@ -66,8 +66,8 @@ void CLUnMovedPixture::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 //========================================================================================================
 
 
-CLUnMovedPixtureButton::CLUnMovedPixtureButton(QGraphicsView* view, QString name, QString img, int max_width, int max_height, qreal z, qreal opacity):
-CLUnMovedPixture(view, name, img, max_width, max_height, z, opacity),
+CLUnMovedPixtureButton::CLUnMovedPixtureButton(QString name, QString img, int max_width, int max_height, qreal z, qreal opacity):
+CLUnMovedPixture(name, img, max_width, max_height, z, opacity),
 m_animation(0)
 {
 	setAcceptsHoverEvents(true);

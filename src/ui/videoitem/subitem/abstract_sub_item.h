@@ -2,30 +2,15 @@
 #define abstract_sub_item_h1031
 
 #include <QGraphicsItem>
+#include "..\abstract_unmoved_item.h"
 
 class CLAbstractSceneItem;
 class QPropertyAnimation;
 class CLAbstractSubItem;
 
-class CLAbstractSubItemContainer : public QObject, public QGraphicsItem
-{
-	Q_OBJECT
-public:
-	CLAbstractSubItemContainer(QGraphicsItem* parent):
-	QGraphicsItem(parent)
-	{
-
-	}
-
-	~CLAbstractSubItemContainer(){}
-
-protected slots:
-	virtual void onSubItemPressed(CLAbstractSubItem* subitem){};
-
-};
 
 
-class CLAbstractSubItem : public CLAbstractSubItemContainer
+class CLAbstractSubItem : public CLAbstractUnmovedItem
 {
 	Q_OBJECT
 	Q_PROPERTY(qreal opacity  READ opacity   WRITE setOpacity)
@@ -52,6 +37,7 @@ protected:
 	qreal m_opacity, m_maxopacity;
 	QPropertyAnimation* m_animation;
 	ItemType mType;
+	CLAbstractSubItemContainer* m_parent;
 	
 
 };

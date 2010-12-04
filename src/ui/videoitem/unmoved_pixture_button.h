@@ -9,7 +9,7 @@ class CLUnMovedPixture : public CLAbstractUnmovedItem
 {
 	Q_OBJECT
 public:
-	CLUnMovedPixture(QGraphicsView* view, QString name, QString img, int max_width, int max_height, qreal z, qreal opacity);
+	CLUnMovedPixture(QString name, QString img, int max_width, int max_height, qreal z, qreal opacity);
 	~CLUnMovedPixture();
 	QRectF boundingRect() const;
 
@@ -34,7 +34,7 @@ class CLUnMovedPixtureButton : public CLUnMovedPixture
 	Q_OBJECT
 	Q_PROPERTY(qreal opacity  READ opacity   WRITE setOpacity)
 public:
-	CLUnMovedPixtureButton(QGraphicsView* view, QString name, QString img, int max_width, int max_height, qreal z, qreal opacity);
+	CLUnMovedPixtureButton(QString name, QString img, int max_width, int max_height, qreal z, qreal opacity);
 	~CLUnMovedPixtureButton();
 signals:
 	void onPressed(QString);
