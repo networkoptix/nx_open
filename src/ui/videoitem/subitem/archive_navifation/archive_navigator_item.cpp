@@ -77,16 +77,15 @@ mFullScreen(false)
 	mSlider->setRange(0,2000);
 	mSlider->setUpdatesEnabled(false);
 	mSlider_item->setWidget(mSlider);
+	connect(mSlider, SIGNAL(sliderMoved (int)), this, SLOT(onSliderMoved(int)));
+	connect(mSlider, SIGNAL(sliderPressed()), this, SLOT(sliderPressed()));
+	connect(mSlider, SIGNAL(sliderReleased()), this, SLOT(sliderReleased()));
+
 
 	onResize();
 
 	//sliderMoved ( int value )
 	//connect(mSlider, SIGNAL(valueChanged(int)), this, SLOT(onSliderMoved(int)));
-	connect(mSlider, SIGNAL(sliderMoved (int)), this, SLOT(onSliderMoved(int)));
-
-
-	connect(mSlider, SIGNAL(sliderPressed()), this, SLOT(sliderPressed()));
-	connect(mSlider, SIGNAL(sliderReleased()), this, SLOT(sliderReleased()));
 
 
 }
@@ -369,6 +368,11 @@ void CLArchiveNavigatorItem::renewSlider()
 	if (!m_parent->scene())
 		return;
 
+	disconnect(mSlider, SIGNAL(sliderMoved (int)), this, SLOT(onSliderMoved(int)));
+	disconnect(mSlider, SIGNAL(sliderPressed()), this, SLOT(sliderPressed()));
+	disconnect(mSlider, SIGNAL(sliderReleased()), this, SLOT(sliderReleased()));
+
+
 	m_parent->scene()->removeItem(mSlider_item);
 	delete mSlider_item;
 	//delete mSlider;
@@ -379,5 +383,10 @@ void CLArchiveNavigatorItem::renewSlider()
 	mSlider->setRange(0,2000);
 	mSlider->setUpdatesEnabled(false);
 	mSlider_item->setWidget(mSlider);
+
+	connect(mSlider, SIGNAL(sliderMoved (int)), this, SLOT(onSliderMoved(int)));
+	connect(mSlider, SIGNAL(sliderPressed()), this, SLOT(sliderPressed()));
+	connect(mSlider, SIGNAL(sliderReleased()), this, SLOT(sliderReleased()));
+
 
 }
