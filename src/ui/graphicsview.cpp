@@ -1302,10 +1302,6 @@ void GraphicsView::enableMultipleSelection(bool enable, bool unselect)
 	}
 	else
 	{
-		// lead to cradhes
-		//QMouseEvent fake(QEvent::None, QPoint(), Qt::NoButton, Qt::NoButton, Qt::NoModifier);
-		//QGraphicsView::mouseReleaseEvent(&fake); //some how need to update RubberBand area
-
 		setDragMode(QGraphicsView::NoDrag); 
 		
 		if (unselect)
@@ -1323,10 +1319,10 @@ void GraphicsView::keyReleaseEvent( QKeyEvent * e )
 	switch (e->key()) 
 	{
 	case Qt::Key_Control:
-		QMouseEvent fake(QEvent::None, QPoint(), Qt::NoButton, Qt::NoButton, Qt::NoModifier); // very dangerous!!!
-		QGraphicsView::mouseReleaseEvent(&fake); //some how need to update RubberBand area // very dangerous!!!
+		//QMouseEvent fake(QEvent::None, QPoint(), Qt::NoButton, Qt::NoButton, Qt::NoModifier); // very dangerous!!!
+		//QGraphicsView::mouseReleaseEvent(&fake); //some how need to update RubberBand area // very dangerous!!!
 
-		enableMultipleSelection(false, false);
+		//enableMultipleSelection(false, false);
 		break;
 
 	}
