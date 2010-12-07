@@ -10,12 +10,12 @@ CLSceneLayoutManager::CLSceneLayoutManager():
 mRecordersAndLayouts(0)
 {
 	mAllCustomLayouts = new LayoutContent();
-	mAllCustomLayouts->addDecorationFlag(LayoutContent::HomeButton | LayoutContent::BackGroundLogo );
+	mAllCustomLayouts->addDecorationFlag(LayoutContent::HomeButton | LayoutContent::BackGroundLogo | LayoutContent::MagnifyingGlass);
 	mAllCustomLayouts->setEditable(true);
 	load();
 
 	mAllRecorders = new LayoutContent();
-	mAllRecorders->addDecorationFlag(LayoutContent::HomeButton | LayoutContent::BackGroundLogo );
+	mAllRecorders->addDecorationFlag(LayoutContent::HomeButton | LayoutContent::BackGroundLogo | LayoutContent::MagnifyingGlass);
 
 	mEmptyLayout = getNewEmptyLayoutContent();
 
@@ -210,7 +210,7 @@ LayoutContent* CLSceneLayoutManager::generateAllRecordersAndLayouts()
 LayoutContent* CLSceneLayoutManager::getNewEmptyLayoutContent(unsigned int flags )
 {
 	LayoutContent* cont = new LayoutContent();
-	cont->addDecorationFlag(LayoutContent::HomeButton | LayoutContent::BackGroundLogo | flags);
+	cont->addDecorationFlag(LayoutContent::HomeButton | LayoutContent::BackGroundLogo | LayoutContent::MagnifyingGlass | flags);
 
 	CLDeviceCriteria cr(CLDeviceCriteria::NONE);
 	cont->setDeviceCriteria(cr);
@@ -229,7 +229,7 @@ LayoutContent* CLSceneLayoutManager::getEmptyLayoutContent()
 LayoutContent* CLSceneLayoutManager::createRecorderContent(QString id)
 {
 	LayoutContent* cont = new LayoutContent();
-	cont->addDecorationFlag(LayoutContent::HomeButton | LayoutContent::BackGroundLogo | LayoutContent::LevelUp);
+	cont->addDecorationFlag(LayoutContent::HomeButton | LayoutContent::BackGroundLogo | LayoutContent::MagnifyingGlass | LayoutContent::LevelUp);
 
 	CLDeviceCriteria cr(CLDeviceCriteria::ALL);
 	cr.setRecorderId(id);

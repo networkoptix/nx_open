@@ -73,8 +73,8 @@ HEADERS += ui/device_settings/device_settings_dlg.h ui/device_settings/device_se
 SOURCES += ui/device_settings/plugins/arecontvision/arecont_dlg.cpp
 HEADERS += ui/device_settings/plugins/arecontvision/arecont_dlg.h
 
-SOURCES += device/device_managmen/device_manager.cpp
-HEADERS += device/device_managmen/device_manager.h
+SOURCES += device/device_managmen/device_manager.cpp  device/device_managmen/device_criteria.cpp
+HEADERS += device/device_managmen/device_manager.h  device/device_managmen/device_criteria.h
 
 
 SOURCES += ui/video_cam_layout/layout_manager.cpp ui/video_cam_layout/layout_content.cpp  ui/video_cam_layout/layout_items.cpp  ui/video_cam_layout/start_screen_content.cpp
@@ -89,8 +89,8 @@ SOURCES += ui/videoitem/recorder_item.cpp ui/videoitem/layout_item.cpp ui/ui_com
 HEADERS += videodisplay/complicated_item.h
 SOURCES += videodisplay/complicated_item.cpp
 
-HEADERS += ui/videoitem/subitem/abstract_sub_item.h  ui/videoitem/subitem/abstract_image_sub_item.h ui/videoitem/subitem/recording_sign_item.h ui/videoitem/subitem/abstract_sub_item_container.h
-SOURCES += ui/videoitem/subitem/abstract_sub_item.cpp  ui/videoitem/subitem/abstract_image_sub_item.cpp ui/videoitem/subitem/recording_sign_item.cpp
+HEADERS += ui/videoitem/subitem/abstract_sub_item.h  ui/videoitem/subitem/abstract_image_sub_item.h ui/videoitem/subitem/recording_sign_item.h ui/videoitem/subitem/abstract_sub_item_container.h ui/videoitem/subitem/search_filter_item.h
+SOURCES += ui/videoitem/subitem/abstract_sub_item.cpp  ui/videoitem/subitem/abstract_image_sub_item.cpp ui/videoitem/subitem/recording_sign_item.cpp ui/videoitem/subitem/search_filter_item.cpp
 
 HEADERS += ui/videoitem/subitem/archive_navifation/archive_navigator_item.h ui/videoitem/subitem/archive_navifation/slider_item.h
 SOURCES += ui/videoitem/subitem/archive_navifation/archive_navigator_item.cpp ui/videoitem/subitem/archive_navifation/slider_item.cpp

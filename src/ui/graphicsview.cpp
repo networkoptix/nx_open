@@ -37,6 +37,8 @@ qreal selected_item_zoom = 1.63;
 
 extern QString button_home;
 extern QString button_level_up;
+extern QString button_magnifyingglass;
+
 extern QPixmap cached(const QString &img);
 //==============================================================================
 
@@ -416,6 +418,8 @@ void GraphicsView::initDecoration()
 		home = false;
 
 
+	bool magnifyingGlass = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::MagnifyingGlass);
+
 
 	removeAllStaticItems();
 
@@ -439,11 +443,17 @@ void GraphicsView::initDecoration()
 
 	if (cont->checkDecorationFlag(LayoutContent::BackGroundLogo))
 	{
-
 		item = new CLUnMovedPixture("background", "./skin/logo.png", viewport()->width(), viewport()->height(), -1, 0.03);
 		item->setStaticPos(QPoint(1,1));
 		addStaticItem(item);
+	}
 
+	
+	if (magnifyingGlass)
+	{
+		item = new CLUnMovedPixtureButton(button_magnifyingglass, "./skin/try/Search.png", 100, 100, 255, global_decoration_opacity);
+		item->setStaticPos(QPoint(viewport()->width() - 105,0));
+		addStaticItem(item);
 	}
 
 	updateDecorations();
@@ -1570,6 +1580,12 @@ void GraphicsView::updateDecorations()
 		QSize size = pic->getSize();
 
 		pic->setStaticPos( QPoint( (viewport()->width() - size.width())/2, (viewport()->height() - size.height())/2) );
+	}
+
+	CLUnMovedPixture* mg = static_cast<CLUnMovedPixture*>(staticItemByName(button_magnifyingglass));
+	if (mg)
+	{
+		mg->setStaticPos(QPoint(viewport()->width() - 105,0));
 	}
 }
 

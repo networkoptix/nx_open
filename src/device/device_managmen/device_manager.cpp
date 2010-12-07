@@ -9,29 +9,6 @@
 #include "device_plugins\archive\archive\archive_device.h"
 
 //=============================================================
-CLDeviceCriteria::CLDeviceCriteria(CriteriaType cr):
-mCriteria(cr)
-{
-
-}
-
-CLDeviceCriteria::CriteriaType CLDeviceCriteria::getCriteria() const
-{
-	return mCriteria;
-}
-
-void CLDeviceCriteria::setRecorderId(QString id)
-{
-	mRecorderId = id;
-}
-
-QString CLDeviceCriteria::getRecorderId() const
-{
-	return mRecorderId;
-}
-
-
-//=============================================================
 CLDeviceManager& CLDeviceManager::instance()
 {
 	static CLDeviceManager inst ;

@@ -9,26 +9,10 @@
 #include "..\asynch_seacher.h"
 #include "..\device.h"
  #include <QStringList>
+#include "device_criteria.h"
 
 class CLDevice;
 class CLRecorderDevice;
-
-struct CLDeviceCriteria // later
-{
-public:
-	enum CriteriaType {ALL, NONE};
-	CLDeviceCriteria(CriteriaType cr);
-
-	CriteriaType getCriteria() const;
-
-	void setRecorderId(QString id);
-	QString getRecorderId() const;
-
-
-protected:
-	CriteriaType mCriteria;
-	QString mRecorderId;
-};
 
 
 // this class is a buffer. makes searcher to serch cameras and puts it into buffer

@@ -12,6 +12,7 @@ QString button_logo = "logo";
 QString button_home = "home";
 QString button_system = "system";
 QString button_level_up = "level_up";
+QString button_magnifyingglass = "magnifyingglass";
 
 
 CLLayoutNavigator::CLLayoutNavigator(QWidget* mainWnd, LayoutContent* content):
