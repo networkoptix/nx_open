@@ -1,15 +1,16 @@
 #ifndef unmoved_pixture_button_h_1867
 #define unmoved_pixture_button_h_1867
 
-#include "abstract_unmoved_item.h"
+
 #include <QTimer>
+#include "abstract_animated_unmoved_item.h"
 class QPropertyAnimation;
 
-class CLUnMovedPixture : public CLAbstractUnmovedItem
+class CLUnMovedPixture : public CLUnMovedOpacityItem
 {
 	Q_OBJECT
 public:
-	CLUnMovedPixture(QString name, QString img, int max_width, int max_height, qreal z, qreal opacity);
+	CLUnMovedPixture(QString name, QGraphicsItem* parent, qreal normal_opacity, qreal active_opacity, QString img, int max_width, int max_height, qreal z);
 	~CLUnMovedPixture();
 	QRectF boundingRect() const;
 
@@ -32,21 +33,15 @@ protected:
 class CLUnMovedPixtureButton : public CLUnMovedPixture
 {
 	Q_OBJECT
-	Q_PROPERTY(qreal opacity  READ opacity   WRITE setOpacity)
 public:
-	CLUnMovedPixtureButton(QString name, QString img, int max_width, int max_height, qreal z, qreal opacity);
+	CLUnMovedPixtureButton(QString name, QGraphicsItem* parent, qreal normal_opacity, qreal active_opacity, QString img, int max_width, int max_height, qreal z);
 	~CLUnMovedPixtureButton();
 signals:
 	void onPressed(QString);
 protected:
-	virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
-	virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
 	void mouseReleaseEvent( QGraphicsSceneMouseEvent * event );
 	void mousePressEvent ( QGraphicsSceneMouseEvent * event );
-protected slots:
-	void stopAnimation();
-protected:
-	QPropertyAnimation* m_animation;
+
 
 };
 

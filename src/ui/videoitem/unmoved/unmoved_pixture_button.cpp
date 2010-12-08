@@ -6,16 +6,14 @@
 
 extern QPixmap cached(const QString &img);
 
-CLUnMovedPixture::CLUnMovedPixture(QString name, QString img, int max_width, int max_height, qreal z, qreal opacity):
-CLAbstractUnmovedItem(name),
-m_opacity(opacity)
+CLUnMovedPixture::CLUnMovedPixture(QString name, QGraphicsItem* parent, qreal normal_opacity, qreal active_opacity, QString img, int max_width, int max_height, qreal z):
+CLUnMovedOpacityItem(name, parent, normal_opacity, active_opacity)
 {
 	m_img = cached(img);
 
 	setMaxSize(max_width, max_height);
 
 	setZValue(z);
-	setOpacity(m_opacity);
 
 }
 
@@ -64,43 +62,15 @@ void CLUnMovedPixture::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 }
 
 //========================================================================================================
-
-
-CLUnMovedPixtureButton::CLUnMovedPixtureButton(QString name, QString img, int max_width, int max_height, qreal z, qreal opacity):
-CLUnMovedPixture(name, img, max_width, max_height, z, opacity),
-m_animation(0)
+CLUnMovedPixtureButton::CLUnMovedPixtureButton(QString name, QGraphicsItem* parent, qreal normal_opacity, qreal active_opacity, QString img, int max_width, int max_height, qreal z):
+CLUnMovedPixture(name, parent, normal_opacity, active_opacity, img, max_width, max_height,  z)
 {
-	setAcceptsHoverEvents(true);
+	
 }
 
 CLUnMovedPixtureButton::~CLUnMovedPixtureButton()
 {
-	stopAnimation();
-}
-
-void CLUnMovedPixtureButton::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
-{
-	stopAnimation();
-
-	m_animation = new QPropertyAnimation(this, "opacity");
-	m_animation->setDuration(OPACITY_TIME);
-	m_animation->setStartValue(opacity());
-	m_animation->setEndValue(1.0);
-	m_animation->start();	
-	connect(m_animation, SIGNAL(finished ()), this, SLOT(stopAnimation()));
-}
-
-void CLUnMovedPixtureButton::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
-{
-	stopAnimation();
-
-	m_animation = new QPropertyAnimation(this, "opacity");
-	m_animation->setDuration(OPACITY_TIME);
-	m_animation->setStartValue(opacity());
-	m_animation->setEndValue(m_opacity);
-	m_animation->start();	
-	connect(m_animation, SIGNAL(finished ()), this, SLOT(stopAnimation()));
-
+	
 }
 
 void CLUnMovedPixtureButton::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
@@ -112,15 +82,3 @@ void CLUnMovedPixtureButton::mousePressEvent( QGraphicsSceneMouseEvent * event )
 {
 
 }
-
-void CLUnMovedPixtureButton::stopAnimation()
-{
-	if (m_animation)
-	{
-		m_animation->stop();
-		delete m_animation;
-		m_animation = 0;
-	}
-}
-
-//

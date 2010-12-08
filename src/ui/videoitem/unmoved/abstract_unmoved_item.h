@@ -2,7 +2,8 @@
 #define abstract_unmoved_item_h_1753
 
 #include <QGraphicsItem>
-#include "subitem\abstract_sub_item_container.h"
+#include "..\subitem\abstract_sub_item_container.h"
+
 
 class QGraphicsView;
 
