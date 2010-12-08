@@ -10,7 +10,7 @@ class LayoutContent : public LayoutButton
 {
 public:
 
-	enum {HomeButton = 0x01, LevelUp = 0x02, BackGroundLogo = 0x04, MagnifyingGlass = 0x08};
+	enum {HomeButton = 0x01, LevelUp = 0x02, BackGroundLogo = 0x04, MagnifyingGlass = 0x08, SearchEdit = 0x10};
 
 	LayoutContent();
 	virtual ~LayoutContent();

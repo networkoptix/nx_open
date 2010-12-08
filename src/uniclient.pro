@@ -57,8 +57,8 @@ HEADERS +=ui/graphicsview.h  ui/videoitem/loup_wnd.h  ui/layout_navigator.h  ui/
 HEADERS +=ui/videoitem/abstract_scene_item.h  ui/videoitem/static_image_item.h  ui/videoitem/custom_draw_button.h ui/videoitem/img_item.h ui/videoitem/video_wnd_item.h  ui/videoitem/video_wnd_archive_item.h
 SOURCES +=ui/videoitem/abstract_scene_item.cpp  ui/videoitem/static_image_item.cpp ui/videoitem/custom_draw_button.cpp ui/videoitem/img_item.cpp ui/videoitem/video_wnd_item.cpp ui/videoitem/video_wnd_archive_item.cpp
 
-HEADERS +=ui/videoitem/abstract_unmoved_item.h ui/videoitem/unmoved_pixture_button.h
-SOURCES +=ui/videoitem/abstract_unmoved_item.cpp ui/videoitem/unmoved_pixture_button.cpp
+HEADERS +=ui/videoitem/unmoved/abstract_unmoved_item.h ui/videoitem/unmoved/unmoved_pixture_button.h ui/videoitem/unmoved/abstract_animated_unmoved_item.h
+SOURCES +=ui/videoitem/unmoved/abstract_unmoved_item.cpp ui/videoitem/unmoved/unmoved_pixture_button.cpp ui/videoitem/unmoved/abstract_animated_unmoved_item.cpp
 
 HEADERS += ui/video_cam_layout/videocamlayout.h  ui/animation/animation_timeline.h ui/animation/mouse_state.h ui/animation/animated_show.h
 HEADERS += ui/animation/scene_movement.h ui/animation/scene_zoom.h ui/animation/abstract_animation.h ui/animation/item_trans.h ui/animation/animated_bgr.h

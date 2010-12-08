@@ -15,7 +15,6 @@
 #include "device_settings/dlg_factory.h"
 #include "device_settings/device_settings_dlg.h"
 #include "videoitem/video_wnd_item.h"
-#include "videoitem/unmoved_pixture_button.h"
 #include "video_cam_layout/layout_content.h"
 #include "context_menu_helper.h"
 #include <QInputDialog>
@@ -23,6 +22,7 @@
 #include "view_drag_and_drop.h"
 #include "layout_editor_wnd.h"
 #include "videoitem/layout_item.h"
+#include "videoitem/unmoved/unmoved_pixture_button.h"
 
 
 
@@ -428,14 +428,14 @@ void GraphicsView::initDecoration()
 
 	if (home)
 	{
-		item = new CLUnMovedPixtureButton(button_home, "./skin/home.png", 100, 100, 255, global_decoration_opacity);
+		item = new CLUnMovedPixtureButton(button_home, 0,  global_decoration_opacity, 1.0, "./skin/home.png", 100, 100, 255);
 		item->setStaticPos(QPoint(1,1));
 		addStaticItem(item);
 	}
 
 	if (level_up)
 	{
-		item = new CLUnMovedPixtureButton(button_level_up, "./skin/up.png", 100, 100, 255, global_decoration_opacity);
+		item = new CLUnMovedPixtureButton(button_level_up, 0,  global_decoration_opacity, 1.0, "./skin/up.png", 100, 100, 255);
 		item->setStaticPos(QPoint((100+10)*home+1,1));
 		addStaticItem(item);
 	}
@@ -443,7 +443,7 @@ void GraphicsView::initDecoration()
 
 	if (cont->checkDecorationFlag(LayoutContent::BackGroundLogo))
 	{
-		item = new CLUnMovedPixture("background", "./skin/logo.png", viewport()->width(), viewport()->height(), -1, 0.03);
+		item = new CLUnMovedPixture("background", 0, 0.03, 0.03, "./skin/logo.png", viewport()->width(), viewport()->height(), -1);
 		item->setStaticPos(QPoint(1,1));
 		addStaticItem(item);
 	}
@@ -451,7 +451,7 @@ void GraphicsView::initDecoration()
 	
 	if (magnifyingGlass)
 	{
-		item = new CLUnMovedPixtureButton(button_magnifyingglass, "./skin/try/Search.png", 100, 100, 255, global_decoration_opacity);
+		item = new CLUnMovedPixtureButton(button_magnifyingglass, 0,  global_decoration_opacity, 1.0, "./skin/try/Search.png", 100, 100, 255);
 		item->setStaticPos(QPoint(viewport()->width() - 105,0));
 		addStaticItem(item);
 	}

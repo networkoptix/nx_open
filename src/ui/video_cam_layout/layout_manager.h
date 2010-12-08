@@ -50,6 +50,8 @@ public:
 	LayoutContent* getEmptyLayoutContent();
 
 
+	LayoutContent* getSearchLayout();
+
 private:
 	bool load_parseLyout(const QDomElement& layout, LayoutContent* parent);
 private:
@@ -57,6 +59,7 @@ private:
 	LayoutContent* mAllRecorders;
 
 	LayoutContent* mEmptyLayout;
+	LayoutContent* mSearchLayout;
 
 	LayoutContent* mRecordersAndLayouts;
 	

@@ -19,6 +19,10 @@ mRecordersAndLayouts(0)
 
 	mEmptyLayout = getNewEmptyLayoutContent();
 
+	mSearchLayout = getNewEmptyLayoutContent(LayoutContent::HomeButton | LayoutContent::BackGroundLogo);
+	mSearchLayout->removeDecorationFlag(LayoutContent::MagnifyingGlass);
+	mSearchLayout->addDecorationFlag(LayoutContent::SearchEdit);
+
 }
 
 CLSceneLayoutManager::~CLSceneLayoutManager()
@@ -223,6 +227,11 @@ LayoutContent* CLSceneLayoutManager::getNewEmptyLayoutContent(unsigned int flags
 LayoutContent* CLSceneLayoutManager::getEmptyLayoutContent()
 {
 	return mEmptyLayout;
+}
+
+LayoutContent* CLSceneLayoutManager::getSearchLayout()
+{
+	return mSearchLayout;
 }
 
 //===============================================================================
