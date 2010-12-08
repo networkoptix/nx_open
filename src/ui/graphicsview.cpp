@@ -23,6 +23,7 @@
 #include "layout_editor_wnd.h"
 #include "videoitem/layout_item.h"
 #include "videoitem/unmoved/unmoved_pixture_button.h"
+#include "videoitem/search/search_filter_item.h"
 
 
 
@@ -420,6 +421,7 @@ void GraphicsView::initDecoration()
 
 	bool magnifyingGlass = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::MagnifyingGlass);
 
+	bool serach = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::SearchEdit);
 
 	removeAllStaticItems();
 
@@ -453,6 +455,12 @@ void GraphicsView::initDecoration()
 	{
 		item = new CLUnMovedPixtureButton(button_magnifyingglass, 0,  global_decoration_opacity, 1.0, "./skin/try/Search.png", 100, 100, 255);
 		item->setStaticPos(QPoint(viewport()->width() - 105,0));
+		addStaticItem(item);
+	}
+
+	if (serach)
+	{
+		item = new CLSerachEditItem("search", 0,  0.4, 1.0);
 		addStaticItem(item);
 	}
 
@@ -1502,7 +1510,8 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 
 	}
 
-
+	
+	QApplication::sendEvent(scene(), e);
 	//QGraphicsView::keyPressEvent(e);
 
 
@@ -1587,6 +1596,13 @@ void GraphicsView::updateDecorations()
 	{
 		mg->setStaticPos(QPoint(viewport()->width() - 105,0));
 	}
+
+	CLSerachEditItem*  search = static_cast<CLSerachEditItem*>(staticItemByName("search"));
+	if (search)
+	{
+		search->resize();
+	}
+
 }
 
 void GraphicsView::recalcSomeParams()
