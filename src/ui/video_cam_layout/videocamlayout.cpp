@@ -970,6 +970,9 @@ void SceneLayout::onItemPressed(CLAbstractSceneItem* item)
 
 void SceneLayout::onAspectRatioChanged(CLAbstractSceneItem* item)
 {
+	if (!hasSuchItem(item))
+		return;
+
 	if (item->isArranged())
 		adjustItem(item);
 }
