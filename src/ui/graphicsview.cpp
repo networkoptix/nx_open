@@ -453,7 +453,7 @@ void GraphicsView::initDecoration()
 	
 	if (magnifyingGlass)
 	{
-		item = new CLUnMovedPixtureButton(button_magnifyingglass, 0,  global_decoration_opacity, 1.0, "./skin/try/Search.png", 100, 100, 255);
+		item = new CLUnMovedPixtureButton(button_magnifyingglass, 0,  0.4, 1.0, "./skin/try/Search.png", 100, 100, 255);
 		item->setStaticPos(QPoint(viewport()->width() - 105,0));
 		addStaticItem(item);
 	}

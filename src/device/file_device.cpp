@@ -1,9 +1,11 @@
 #include "file_device.h"
 #include "../streamreader/single_shot_file_reader.h"
+#include <QFileInfo>
 
 CLFileDevice::CLFileDevice(QString filename)
 {
 	setUniqueId(filename);
+	m_name = QFileInfo(filename).fileName();
 }
 
 QString CLFileDevice::getFileName() const
@@ -13,7 +15,7 @@ QString CLFileDevice::getFileName() const
 
 QString CLFileDevice::toString() const 
 {
-	return getUniqueId();
+	return m_name;
 }
 
 

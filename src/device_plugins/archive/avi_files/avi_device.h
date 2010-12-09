@@ -11,6 +11,11 @@ public:
 	~CLAviDevice();
 
 	virtual CLStreamreader* getDeviceStreamConnection();
+	virtual QString toString() const;
+
+
+protected:
+
 };
 
 

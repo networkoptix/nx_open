@@ -1,19 +1,24 @@
 #include "search_filter_item.h"
 
 #include <QLineEdit>
-#include <QComboBox>
 #include <QGraphicsProxyWidget>
 #include <QGraphicsView>
 #include <QCompleter>
-#include <QTableView>
+#include "search_edit.h"
+#include "ui\graphicsview.h"
+#include "device\device_managmen\device_criteria.h"
+#include "ui\video_cam_layout\layout_content.h"
+
 
 CLSerachEditItem::CLSerachEditItem(QString name, QGraphicsItem* parent, qreal normal_opacity, qreal active_opacity):
 CLUnMovedOpacityItem(name, parent, normal_opacity, active_opacity),
 m_width(100),
 m_height(100)
 {
-	m_lineEdit = new QComboBox(0);
+	m_lineEdit = new CLSearchComboBox(0);
 	m_lineEdit->setEditable(true);
+
+	connect(m_lineEdit, SIGNAL(onTextChanged(QString)), this, SLOT(onTextChanged(QString)) );
 
 
 	m_lineEditItem = new QGraphicsProxyWidget(this);
@@ -58,4 +63,40 @@ QRectF CLSerachEditItem::boundingRect() const
 void CLSerachEditItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
 	return;
+}
+
+void CLSerachEditItem::onTextChanged(QString text)
+{
+
+	GraphicsView * view = static_cast<GraphicsView*>(scene()->views().at(0));
+	CLDeviceCriteria cr = view->getCamLayOut().getContent()->getDeviceCriteria();
+	cr.setCriteria(CLDeviceCriteria::FILTER);
+	cr.setFilter(text);
+
+	QStringList result;
+	
+	CLDeviceList all_devs =  CLDeviceManager::instance().getDeviceList(cr);
+	foreach(CLDevice* dev, all_devs)
+	{
+		result << dev->toString();
+		dev->releaseRef();
+	}
+
+	
+	m_lineEdit->clear();
+
+
+	foreach(QString str, result)
+	{
+		m_lineEdit->addItem(str);
+	}
+
+	m_lineEdit->setEditText(text);
+	m_lineEdit->lineEdit()->setFocus();
+
+
+	//m_lineEdit->showPopup();
+
+	view->getCamLayOut().getContent()->setDeviceCriteria(cr);
+
 }

@@ -213,6 +213,19 @@ bool CLDeviceManager::isDeviceMeetCriteria(CLDeviceCriteria& cr, CLDevice* dev) 
 			return false;
 	}
 
+	if (cr.getCriteria()== CLDeviceCriteria::FILTER)
+	{
+		QStringList serach_list = cr.filter().split(" ", QString::SkipEmptyParts);
+		QString dev_string = dev->toString();
+
+		foreach(QString str, serach_list)
+		{
+			if (!dev_string.contains(str, Qt::CaseInsensitive))
+				return false;
+		}
+
+	}
+
 
 	return true;
 	

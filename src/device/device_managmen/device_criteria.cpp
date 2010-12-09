@@ -23,3 +23,19 @@ QString CLDeviceCriteria::getRecorderId() const
 	return mRecorderId;
 }
 
+
+void CLDeviceCriteria::setCriteria(CriteriaType cr)
+{
+	this->mCriteria = cr;
+}
+
+
+void CLDeviceCriteria::setFilter(const QString& filter)
+{
+	mFilter = filter;
+}
+
+QString CLDeviceCriteria::filter() const
+{
+	return mFilter;
+}

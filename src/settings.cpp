@@ -9,7 +9,7 @@ QColor global_shadow_color(0, 0, 0, 128);
 QColor global_selection_color(0, 150, 255, 110);
 
 // how often we run new device search and how often layout synchronizes with device manager 
-int devices_update_interval = 2000;
+int devices_update_interval = 1000;
 
 
 QColor app_bkr_color(0,5,5,125);

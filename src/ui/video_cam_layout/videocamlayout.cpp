@@ -27,7 +27,7 @@ int SCENE_LEFT = (400*1000);
 int SCENE_TOP  = (400*1000);
 
 
-static const int max_items = 256;
+static const int max_items = 64;
 #define MAX_FPS (35.0)
 extern int scene_zoom_duration;
 
@@ -231,6 +231,40 @@ void SceneLayout::onTimer()
 	CLDeviceList all_devs =  CLDeviceManager::instance().getDeviceList(m_content->getDeviceCriteria());
 	bool added = false;
 
+
+	
+	
+	if (m_content->getDeviceCriteria().getCriteria() != CLDeviceCriteria::NONE)
+	{
+			QList<CLAbstractComplicatedItem*> remove_lst;
+
+			foreach(CLAbstractComplicatedItem* devitem, m_deviceitems)
+			{
+				if (devitem->getDevice()->getDeviceType() == CLDevice::VIDEODEVICE) // if this is video device
+				{
+					bool need_to_remove = true;
+					foreach(CLDevice* dev, all_devs)
+					{
+						if (devitem->getDevice()->getUniqueId() == dev->getUniqueId())
+						{
+							need_to_remove = false;
+							break;
+						}
+					}
+
+					if (need_to_remove)
+						remove_lst.push_back(devitem);
+				}
+			}
+			
+			if (removeDevices(remove_lst))
+				added = true;
+
+			if (m_deviceitems.count()==0)	
+				CLGLRenderer::clearGarbage();
+	}
+
+
 	foreach(CLDevice* dev, all_devs)
 	{
 		// the ref counter for device already increased in getDeviceList; 
@@ -259,8 +293,6 @@ void SceneLayout::onTimer()
 
 	//================================
 
-
-
 	if (added && !m_firstTime)
 	{
 		updateSceneRect();
@@ -270,7 +302,7 @@ void SceneLayout::onTimer()
 
 
 	
-	//====================================
+	
 }
 
 void SceneLayout::onVideoTimer()
@@ -396,10 +428,6 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect)
 }
 
 
-bool SceneLayout::removeDevice(CLDevice* dev)
-{
-	return true;
-}
 
 bool SceneLayout::addLayoutItem(QString name, LayoutContent* lc, bool update_scene_rect)
 {
@@ -880,11 +908,28 @@ void SceneLayout::onItemClose(CLAbstractSceneItem* item)
 		//removed = true;
 
 	}
-
-
 	//===============
+}
 
+bool SceneLayout::removeDevices(QList<CLAbstractComplicatedItem*> lst)
+{
 
+	if (lst.count()==0)
+		return false;
+
+	foreach(CLAbstractComplicatedItem* devitem, lst)
+	{
+		// firs of all lets ask all threads to stop;
+		// we do not need to do it sequentially
+		devitem->beforestopDispay();
+	}
+
+	foreach(CLAbstractComplicatedItem* devitem, lst)
+	{
+		onItemClose(devitem->getSceneItem());
+	}
+	
+	return true;
 }
 
 void SceneLayout::onItemSelected(CLAbstractSceneItem* item)

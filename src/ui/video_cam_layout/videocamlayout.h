@@ -132,8 +132,8 @@ private:
 	// creates video item for device, if needed, camera and so on...
 	bool addDevice(CLDevice* dev, bool update_scene_rect = true);
 
-	// removes device; does the opposite to addDevice
-	bool removeDevice(CLDevice* dev); 
+	// removes devices;
+	bool removeDevices( QList<CLAbstractComplicatedItem*> lst); 
 
 	//================================================
 	// means that at least one item can be added 
