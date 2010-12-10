@@ -3,11 +3,10 @@
 
 #include <QWidget>
 #include <QTimer>
-
-class QLineEdit;
-class QCompleter;
 class LayoutContent;
-class QStringListModel;
+
+class CLSearchEdit;
+class CLSerchEditCompleter;
 
 class CLSerachEditItem : public QWidget
 {
@@ -30,10 +29,8 @@ protected:
 	int m_width;
 	int m_height;
 
-	QLineEdit* m_lineEdit;
-	QCompleter* m_completer;
-	QStringListModel *m_stringlst;
-
+	CLSearchEdit* m_lineEdit;
+	CLSerchEditCompleter* m_completer;
 	QTimer mTimer;
 
 	

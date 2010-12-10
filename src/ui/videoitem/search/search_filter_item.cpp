@@ -1,8 +1,5 @@
 #include "search_filter_item.h"
 
-#include <QLineEdit>
-#include <QCompleter>
-#include <QStringListModel>
 #include "search_edit.h"
 #include "device\device_managmen\device_criteria.h"
 #include "ui\video_cam_layout\layout_content.h"
@@ -14,11 +11,11 @@ m_sceneContent(sceneContent),
 m_width(100),
 m_height(100)
 {
-	m_lineEdit = new QLineEdit(this);
+	m_lineEdit = new CLSearchEdit(this);
 
 
-	m_stringlst = new QStringListModel();
-	m_completer = new QCompleter(m_stringlst, this);
+	
+	m_completer = new CLSerchEditCompleter(this);
 	m_completer->setCompletionMode(QCompleter::PopupCompletion);
 	m_completer->setCaseSensitivity(Qt::CaseInsensitive);
 	m_lineEdit->setCompleter(m_completer);
@@ -67,7 +64,7 @@ void CLSerachEditItem::onEditTextChanged (const QString & text)
 	mTimer.stop();
 	mTimer.start();
 
-	/*
+
 	CLDeviceCriteria cr = m_sceneContent->getDeviceCriteria();
 	cr.setCriteria(CLDeviceCriteria::FILTER);
 	cr.setFilter(m_lineEdit->text());
@@ -82,8 +79,8 @@ void CLSerachEditItem::onEditTextChanged (const QString & text)
 	}
 
 
-	m_stringlst->setStringList(result);
-	m_completer->complete()	;
+	
+	m_completer->updateStringLst(result);
 	/**/
 
 }
@@ -97,24 +94,8 @@ void CLSerachEditItem::onTimer()
 	cr.setCriteria(CLDeviceCriteria::FILTER);
 	cr.setFilter(m_lineEdit->text());
 
-	QStringList result;
-
-	CLDeviceList all_devs =  CLDeviceManager::instance().getDeviceList(cr);
-	foreach(CLDevice* dev, all_devs)
-	{
-		result << dev->toString();
-		dev->releaseRef();
-	}
-
-
-	m_stringlst->setStringList(result);
-	m_completer->complete()	;
-
-
-
-	if (m_lineEdit->text().length()<4)
+	if (m_lineEdit->text().length()<3)
 		cr.setFilter("39827fjhkdjfhurw98r7029r");
-
 
 	m_sceneContent->setDeviceCriteria(cr);
 

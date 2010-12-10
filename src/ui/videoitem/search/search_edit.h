@@ -1,26 +1,47 @@
-#ifndef serach_combobox_h2337
-#define serach_combobox_h2337
+#ifndef serach_edit_2215_h
+#define serach_edit_2215_h 
 
 #include <QLineEdit>
-#include <QTimer>
-class QCompleter;
+#include <QStringList>
+#include <QStringListModel>
+#include <QString>
+#include <QCompleter> 
 
-class CLSearchComboBox : public QLineEdit
+
+class CLSerchEditCompleter : public QCompleter
 {
-	Q_OBJECT
-public:
-	CLSearchComboBox( QWidget * parent = 0 );
-	~CLSearchComboBox();
+	Q_OBJECT 
+public:    
+	CLSerchEditCompleter(QObject * parent);
+	
 
-signals:
-	void onTextChanged(QString text) ;
+	void filter(QString filter);
 
-protected slots:
-	void onEditTextChanged (const QString & text);
-	void onTimer(); 
-protected:
-	QTimer mTimer;
-	QCompleter* m_completer;
-};
+	void updateStringLst(QStringList lst);
 
-#endif // serach_combobox_h2337
+private:    
+	QStringList m_list;    
+	QStringListModel m_model;    
+	QString m_word;
+}; 
+
+class CLSearchEdit : public QLineEdit
+{    
+	Q_OBJECT 
+public:    
+	CLSearchEdit(QWidget *parent = 0);    
+	~CLSearchEdit();     
+	void setCompleter(CLSerchEditCompleter *c);    
+	CLSerchEditCompleter *completer() const; 
+
+protected:    
+	void keyPressEvent(QKeyEvent *e); 
+
+	private slots:    
+		void insertCompletion(const QString &completion); 
+
+private:    
+	CLSerchEditCompleter *c;
+
+}; 
+#endif // serach_edit_2215_h

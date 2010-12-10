@@ -1,56 +1,107 @@
 #include "search_edit.h"
 
-#include <QCompleter>
-#include <QListView>
+#include <QKeyEvent>
 
-CLSearchComboBox::CLSearchComboBox( QWidget * parent ):
-QLineEdit(parent)
+
+CLSerchEditCompleter::CLSerchEditCompleter(QObject * parent) :
+QCompleter(parent)
 {
-	connect(this, SIGNAL( textChanged ( const QString &) ), this, SLOT(onEditTextChanged (const QString& )));
-	mTimer.setSingleShot(true);
-	mTimer.setInterval(600);
+	setModel(&m_model);
+}     
 
-	connect(&mTimer, SIGNAL(timeout()), this, SLOT(onTimer()) );
+void CLSerchEditCompleter::filter(QString filter)    
+{        
+	// Do any filtering you like.        
+	// Here we just include all items that contain word.        
+	QStringList filtered = m_list;//.filter(word, caseSensitivity());
 
+	QStringList words = filter.split(" ", QString::SkipEmptyParts);
 
-	QStringList wordList;
-	wordList << "alpha" << "omega" << "omicron" << "zeta";
-	m_completer = new QCompleter(wordList, this);
-	m_completer->setCompletionMode(QCompleter::PopupCompletion);
-	m_completer->setCaseSensitivity(Qt::CaseInsensitive);
-
-	//QListView* lst = new QListView(0);
-	//m_completer->setPopup(lst);
-
-
-	setCompleter(m_completer);
-
-	
-
-}
-
-CLSearchComboBox::~CLSearchComboBox()
-{
-
-}
-
-
-void CLSearchComboBox::onEditTextChanged (const QString & text)
-{
-	mTimer.stop();
-	mTimer.start();
-
-	m_completer->popup()->move(500,500);
-	m_completer->popup()->setVisible(true);
-
-}
-
-void CLSearchComboBox::onTimer()
-{
-	mTimer.stop();
-
-	if (text().length()>=4)
+	foreach(QString word, words)
 	{
-		emit onTextChanged(text());
+		filtered = filtered.filter(word, caseSensitivity());
 	}
+
+
+
+
+	m_model.setStringList(filtered);        
+	complete();    
+}     
+
+void CLSerchEditCompleter::updateStringLst(QStringList lst)
+{
+	m_list = lst;
+}
+
+//=======================================================
+
+CLSearchEdit::CLSearchEdit(QWidget *parent)
+: QLineEdit(parent), c(0)
+{
+}
+
+CLSearchEdit::~CLSearchEdit()
+{
+}
+
+void CLSearchEdit::setCompleter(CLSerchEditCompleter *completer)
+{
+	if (c)
+		QObject::disconnect(c, 0, this, 0);
+
+	c = completer;
+
+	if (!c)
+		return;
+
+	c->setWidget(this);
+	connect(completer, SIGNAL(activated(const QString&)), this, SLOT(insertCompletion(const QString&)));
+}
+
+CLSerchEditCompleter *CLSearchEdit::completer() const
+{
+	return c;
+}
+
+void CLSearchEdit::insertCompletion(const QString& completion)
+{
+	setText(completion);
+	selectAll();
+}
+
+
+void CLSearchEdit::keyPressEvent(QKeyEvent *e)
+{
+	if (c && c->popup()->isVisible())
+	{
+		// The following keys are forwarded by the completer to the widget
+		switch (e->key())
+		{
+		case Qt::Key_Enter:
+		case Qt::Key_Return:
+		case Qt::Key_Escape:
+		case Qt::Key_Tab:
+		case Qt::Key_Backtab:
+			e->ignore();
+			return; // Let the completer do default behavior
+		}
+	}
+
+	bool isShortcut = (e->modifiers() & Qt::ControlModifier) && e->key() == Qt::Key_E;
+	if (!isShortcut)
+		QLineEdit::keyPressEvent(e); // Don't send the shortcut (CTRL-E) to the text edit.
+
+	if (!c)
+		return;
+
+	bool ctrlOrShift = e->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier);
+	if (!isShortcut && !ctrlOrShift && e->modifiers() != Qt::NoModifier)
+	{
+		c->popup()->hide();
+		return;
+	}
+
+	c->filter(text());
+	c->popup()->setCurrentIndex(c->completionModel()->index(0, 0));
 }
