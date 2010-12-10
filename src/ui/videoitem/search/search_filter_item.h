@@ -1,33 +1,42 @@
 #ifndef serach_edit_item_h_2017
 #define serach_edit_item_h_2017
 
-#include "..\unmoved\abstract_animated_unmoved_item.h"
+#include <QWidget>
+#include <QTimer>
 
-class QCompleter;
 class QLineEdit;
-class CLSearchComboBox;
-class QGraphicsProxyWidget;
+class QCompleter;
+class LayoutContent;
+class QStringListModel;
 
-class CLSerachEditItem : public CLUnMovedOpacityItem
+class CLSerachEditItem : public QWidget
 {
 	Q_OBJECT
 public:
-	CLSerachEditItem(QString name, QGraphicsItem* parent, qreal normal_opacity, qreal active_opacity);
+	CLSerachEditItem(QWidget* parent, LayoutContent* sceneContent);
 	~CLSerachEditItem();
 	void resize();
-protected:
-	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-	virtual QRectF boundingRect() const;
+
+	
 protected slots:
-	void onTextChanged(QString text) ;
+	void onEditTextChanged (const QString & text);
+	void onTimer(); 
+
+
+	
 protected:
+	LayoutContent* m_sceneContent;
+
 	int m_width;
 	int m_height;
 
-	CLSearchComboBox* m_lineEdit;
-	
-	QGraphicsProxyWidget* m_lineEditItem;
+	QLineEdit* m_lineEdit;
+	QCompleter* m_completer;
+	QStringListModel *m_stringlst;
 
+	QTimer mTimer;
+
+	
 
 };
 

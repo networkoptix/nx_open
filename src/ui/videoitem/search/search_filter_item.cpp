@@ -1,32 +1,38 @@
 #include "search_filter_item.h"
 
 #include <QLineEdit>
-#include <QGraphicsProxyWidget>
-#include <QGraphicsView>
 #include <QCompleter>
+#include <QStringListModel>
 #include "search_edit.h"
-#include "ui\graphicsview.h"
 #include "device\device_managmen\device_criteria.h"
 #include "ui\video_cam_layout\layout_content.h"
 
 
-CLSerachEditItem::CLSerachEditItem(QString name, QGraphicsItem* parent, qreal normal_opacity, qreal active_opacity):
-CLUnMovedOpacityItem(name, parent, normal_opacity, active_opacity),
+CLSerachEditItem::CLSerachEditItem(QWidget* parent, LayoutContent* sceneContent):
+QWidget(parent),
+m_sceneContent(sceneContent),
 m_width(100),
 m_height(100)
 {
-	m_lineEdit = new CLSearchComboBox(0);
-	m_lineEdit->setEditable(true);
-
-	connect(m_lineEdit, SIGNAL(onTextChanged(QString)), this, SLOT(onTextChanged(QString)) );
+	m_lineEdit = new QLineEdit(this);
 
 
-	m_lineEditItem = new QGraphicsProxyWidget(this);
-	m_lineEditItem->setWidget(m_lineEdit);
-	m_lineEditItem->setPos(0,0);
+	m_stringlst = new QStringListModel();
+	m_completer = new QCompleter(m_stringlst, this);
+	m_completer->setCompletionMode(QCompleter::PopupCompletion);
+	m_completer->setCaseSensitivity(Qt::CaseInsensitive);
+	m_lineEdit->setCompleter(m_completer);
 
+	connect(m_lineEdit, SIGNAL( textChanged ( const QString &) ), this, SLOT(onEditTextChanged (const QString& )));
+
+
+	mTimer.setSingleShot(true);
+	mTimer.setInterval(600);
+	connect(&mTimer, SIGNAL(timeout()), this, SLOT(onTimer()) );
 
 	resize();
+
+	setVisible(true);
 }
 
 CLSerachEditItem::~CLSerachEditItem()
@@ -39,42 +45,35 @@ CLSerachEditItem::~CLSerachEditItem()
 void CLSerachEditItem::resize()
 {
 	int vpw = 800;
-	if (scene())
-		vpw = scene()->views().at(0)->viewport()->width();
+	if (parentWidget())
+		vpw = parentWidget()->size().width();
 
 	m_width = vpw/5;
 	if (m_width < 200)
 		m_width  = 200;
 
 	m_height = m_lineEdit->size().height();
-
-
 	m_lineEdit->resize(m_width, m_height);
 
-	setStaticPos(QPoint(vpw/2 - m_width/2, 0));
-}
-
-QRectF CLSerachEditItem::boundingRect() const
-{
-	return QRectF(0,0,m_width, m_height);
+	move(QPoint(vpw/2 - m_width/2, 0));
+	QWidget::resize(m_width, m_height);
+	
 }
 
 
-void CLSerachEditItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-	return;
-}
 
-void CLSerachEditItem::onTextChanged(QString text)
+void CLSerachEditItem::onEditTextChanged (const QString & text)
 {
+	mTimer.stop();
+	mTimer.start();
 
-	GraphicsView * view = static_cast<GraphicsView*>(scene()->views().at(0));
-	CLDeviceCriteria cr = view->getCamLayOut().getContent()->getDeviceCriteria();
+	/*
+	CLDeviceCriteria cr = m_sceneContent->getDeviceCriteria();
 	cr.setCriteria(CLDeviceCriteria::FILTER);
-	cr.setFilter(text);
+	cr.setFilter(m_lineEdit->text());
 
 	QStringList result;
-	
+
 	CLDeviceList all_devs =  CLDeviceManager::instance().getDeviceList(cr);
 	foreach(CLDevice* dev, all_devs)
 	{
@@ -82,21 +81,41 @@ void CLSerachEditItem::onTextChanged(QString text)
 		dev->releaseRef();
 	}
 
-	
-	m_lineEdit->clear();
+
+	m_stringlst->setStringList(result);
+	m_completer->complete()	;
+	/**/
+
+}
+
+void CLSerachEditItem::onTimer()
+{
+	mTimer.stop();
 
 
-	foreach(QString str, result)
+	CLDeviceCriteria cr = m_sceneContent->getDeviceCriteria();
+	cr.setCriteria(CLDeviceCriteria::FILTER);
+	cr.setFilter(m_lineEdit->text());
+
+	QStringList result;
+
+	CLDeviceList all_devs =  CLDeviceManager::instance().getDeviceList(cr);
+	foreach(CLDevice* dev, all_devs)
 	{
-		m_lineEdit->addItem(str);
+		result << dev->toString();
+		dev->releaseRef();
 	}
 
-	m_lineEdit->setEditText(text);
-	m_lineEdit->lineEdit()->setFocus();
+
+	m_stringlst->setStringList(result);
+	m_completer->complete()	;
 
 
-	//m_lineEdit->showPopup();
 
-	view->getCamLayOut().getContent()->setDeviceCriteria(cr);
+	if (m_lineEdit->text().length()<4)
+		cr.setFilter("39827fjhkdjfhurw98r7029r");
+
+
+	m_sceneContent->setDeviceCriteria(cr);
 
 }

@@ -66,7 +66,8 @@ mDeviceDlg(0),
 mZerroDistance(true),
 mViewStarted(false),
 m_groupAnimation(0),
-m_fps_frames(0)
+m_fps_frames(0),
+m_seachItem(0)
 {
 
 	setScene(&m_scene);
@@ -460,8 +461,12 @@ void GraphicsView::initDecoration()
 
 	if (serach)
 	{
-		item = new CLSerachEditItem("search", 0,  0.4, 1.0);
-		addStaticItem(item);
+		m_seachItem = new CLSerachEditItem(this, m_camLayout.getContent());
+	}
+	else
+	{
+		delete m_seachItem;
+		m_seachItem = 0;
 	}
 
 	updateDecorations();
@@ -1597,10 +1602,10 @@ void GraphicsView::updateDecorations()
 		mg->setStaticPos(QPoint(viewport()->width() - 105,0));
 	}
 
-	CLSerachEditItem*  search = static_cast<CLSerachEditItem*>(staticItemByName("search"));
-	if (search)
+	
+	if (m_seachItem)
 	{
-		search->resize();
+		m_seachItem->resize();
 	}
 
 }

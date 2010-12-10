@@ -18,6 +18,7 @@ class CLAbstractDeviceSettingsDlg;
 class CLAbstractUnmovedItem;
 class QParallelAnimationGroup;
 class QInputEvent;
+class CLSerachEditItem;
 
 class GraphicsView: public QGraphicsView 
 {
@@ -194,6 +195,8 @@ protected:
 
 
 	ViewMode m_viewMode;
+
+	CLSerachEditItem* m_seachItem;
 
 };
 

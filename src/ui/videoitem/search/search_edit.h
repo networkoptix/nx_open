@@ -1,10 +1,11 @@
 #ifndef serach_combobox_h2337
 #define serach_combobox_h2337
 
-#include <QComboBox>
+#include <QLineEdit>
 #include <QTimer>
+class QCompleter;
 
-class CLSearchComboBox : public QComboBox
+class CLSearchComboBox : public QLineEdit
 {
 	Q_OBJECT
 public:
@@ -19,6 +20,7 @@ protected slots:
 	void onTimer(); 
 protected:
 	QTimer mTimer;
+	QCompleter* m_completer;
 };
 
 #endif // serach_combobox_h2337
