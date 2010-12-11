@@ -3,6 +3,7 @@
 #include "search_edit.h"
 #include "device\device_managmen\device_criteria.h"
 #include "ui\video_cam_layout\layout_content.h"
+#include <QListView>
 
 
 CLSerachEditItem::CLSerachEditItem(QWidget* parent, LayoutContent* sceneContent):
@@ -13,13 +14,61 @@ m_height(100)
 {
 	m_lineEdit = new CLSearchEdit(this);
 
+	
+	QString style (
+
+		"QLineEdit{ border-width: 2px; \n"
+		"color: rgb(0, 240, 240); \n"
+		"background-color: rgb(0, 16, 72);\n"
+		"border-top-color: rgb(0, 240, 240); \n"
+		"border-left-color: rgb(0, 240, 240); \n"
+		"border-right-color: rgb(0, 240, 240); \n"
+		"border-bottom-color: rgb(0, 240, 240); \n"
+		"border-style: solid; \n"
+		//"spacing: 22px; \n"
+		//"margin-top: 3px; \n"
+		//"margin-bottom: 3px; \n"
+		//"padding: 16px; \n"
+		"font-size: 25px; \n"
+		"font-weight: normal; }\n"
+		"QLineEdit:focus{ \n"
+		"color: rgb(0, 240, 240);\n"
+		"border-top-color: rgb(0, 240, 240);\n"
+		"border-left-color: rgb(0, 240, 240); \n"
+		"border-right-color: rgb(0, 240, 240); \n"
+		"border-bottom-color: rgb(0, 240, 240);}"
+		);
+
+
+	m_lineEdit->setStyleSheet(style);
+	
+
+	m_height = 40;
 
 	
 	m_completer = new CLSerchEditCompleter(this);
+	m_completer->setMaxVisibleItems(10);
 	m_completer->setCompletionMode(QCompleter::PopupCompletion);
 	m_completer->setCaseSensitivity(Qt::CaseInsensitive);
-	m_lineEdit->setCompleter(m_completer);
 
+	QListView* lstview = new QListView();
+	lstview->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	lstview->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+
+
+	lstview->setStyleSheet(
+		"color: rgb(0, 240, 240);"
+		"background-color: rgb(0, 16, 72);"
+		"selection-color: yellow;"
+		"selection-background-color: blue;"
+		"font-size: 20px; \n");
+
+	m_completer->setPopup(lstview);
+
+
+
+	m_lineEdit->setCompleter(m_completer);
 	connect(m_lineEdit, SIGNAL( textChanged ( const QString &) ), this, SLOT(onEditTextChanged (const QString& )));
 
 
@@ -45,11 +94,11 @@ void CLSerachEditItem::resize()
 	if (parentWidget())
 		vpw = parentWidget()->size().width();
 
-	m_width = vpw/5;
-	if (m_width < 200)
-		m_width  = 200;
+	m_width = vpw/3;
+	if (m_width < 300)
+		m_width  = 300;
 
-	m_height = m_lineEdit->size().height();
+	//m_height = m_lineEdit->size().height();
 	m_lineEdit->resize(m_width, m_height);
 
 	move(QPoint(vpw/2 - m_width/2, 0));

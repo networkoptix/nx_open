@@ -12,7 +12,7 @@ QCompleter(parent)
 void CLSerchEditCompleter::filter(QString filter)    
 {        
 	// Do any filtering you like.        
-	// Here we just include all items that contain word.        
+	// Here we just include all items that contain all words.
 	QStringList filtered = m_list;//.filter(word, caseSensitivity());
 
 	QStringList words = filter.split(" ", QString::SkipEmptyParts);
