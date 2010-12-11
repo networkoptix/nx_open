@@ -60,6 +60,8 @@ public:
 	void addStaticItem(CLAbstractUnmovedItem* item, bool connect = true);
 	void removeStaticItem(CLAbstractUnmovedItem* item);
 
+	void stopAnimation();
+
 
 signals:
 	void scneZoomFinished();
@@ -110,7 +112,7 @@ protected:
 	CLAbstractUnmovedItem* staticItemByName(QString name) const;
 	void recalcSomeParams();
 	
-	void stopAnimation();
+	
 
 	void enableMultipleSelection(bool enable, bool unselect = true); 
 	bool isCTRLPressed(const QInputEvent* event) const;

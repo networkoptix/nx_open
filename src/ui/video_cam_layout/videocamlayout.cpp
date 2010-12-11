@@ -126,6 +126,8 @@ void SceneLayout::start()
 void SceneLayout::stop_helper(bool emt)
 {
 
+	m_view->stopAnimation();
+
 	disconnect(m_view, SIGNAL(scneZoomFinished()), this, SLOT(stop_helper()));
 
 	foreach(CLAbstractComplicatedItem* devitem, m_deviceitems)
@@ -844,7 +846,7 @@ CLAbstractSceneItem* SceneLayout::next_item_helper(const CLAbstractSceneItem* cu
 
 void SceneLayout::onItemClose(CLAbstractSceneItem* item)
 {
-
+	m_view->stopAnimation();
 	m_view->setZeroSelection();
 	item->stop_animation();
 

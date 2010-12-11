@@ -132,8 +132,7 @@ m_seachItem(0)
 GraphicsView::~GraphicsView()
 {
 	setZeroSelection(); 
-	stopAnimation();
-	stopGroupAnimation();
+	stop();
 	delete m_animated_bckg;
 }
 
@@ -167,8 +166,8 @@ void GraphicsView::start()
 
 void GraphicsView::stop()
 {
-	stopAnimation(); // stops animation 
 	mViewStarted = false;
+	stopAnimation(); // stops animation 
 	setZeroSelection(); 
 	closeAllDlg();
 }
@@ -516,8 +515,8 @@ void GraphicsView::stopAnimation()
 {
 	m_scenezoom.stop();
 	m_movement.stop();
-	stopGroupAnimation();
 	showStop_helper();
+	stopGroupAnimation();
 }
 
 void GraphicsView::mousePressEvent ( QMouseEvent * event)
@@ -1789,7 +1788,7 @@ void GraphicsView::onCircle_helper(bool show)
 	QRectF item_rect = m_camLayout.getSmallLayoutRect();
 	mShow.center = item_rect.center();
 
-	mShow.radius = max(item_rect.width(), item_rect.height())/2.5;
+	mShow.radius = max(item_rect.width(), item_rect.height())/8;
 	
 
 	int i = 0;
