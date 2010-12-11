@@ -197,15 +197,22 @@ void CLItemTransform::transform_helper()
 	qreal scl = zoomToscale(m_zoom.curent);
 
 	QTransform trans;
+	/*
 	trans.translate(center.x(), center.y());
 	trans.scale(scl, scl);
 	trans.rotate(m_Zrotation.curent); 
 	trans.translate(-center.x(), -center.y());
+	/**/
 
-	/*
+	
 	trans.translate(m_rotatePoint.x(), m_rotatePoint.y());
 	trans.rotate(m_Zrotation.curent); 
 	trans.translate(-m_rotatePoint.x(), -m_rotatePoint.y());
+
+	trans.translate(center.x(), center.y());
+	trans.scale(scl, scl);
+	trans.translate(-center.x(), -center.y());
+
 	/**/
 
 	m_item->setTransform(trans);

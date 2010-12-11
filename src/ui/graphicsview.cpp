@@ -718,10 +718,21 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 
 			if (m_rotationCounter>1)
 			{
-				QPointF center_point = m_rotatingWnd->boundingRect().center(); // by default center is the center of the item
+
+				if (m_rotationCounter==2)
+				{
+					// at very beginning of the rotation
+					QRectF view_scene = mapToScene(viewport()->rect()).boundingRect(); //viewport in the scene cord
+					QRectF view_item = m_rotatingWnd->mapFromScene(view_scene).boundingRect(); //viewport in the item cord
+					QPointF center_point_item = m_rotatingWnd->boundingRect().intersected(view_item).center(); // center of the intersection of the vewport and item
+					m_rotatingWnd->setRotationPointCenter(center_point_item);
+				}
+
 
 				//if (wnd->isFullScreen()) // if wnd is in full scree mode center must be changed to the cetre of the viewport
 				//	center_point = item->mapFromScene(mapToScene(viewport()->rect().center()));
+
+				QPointF center_point = m_rotatingWnd->getRotationPointCenter();
 
 				QPointF old_point = m_rotatingWnd->mapFromScene(mapToScene(m_mousestate.getLastEventPoint()));
 				QPointF new_point = m_rotatingWnd->mapFromScene(mapToScene(event->pos()));
@@ -729,9 +740,9 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 				QLineF old_line(center_point, old_point);
 				QLineF new_line(center_point, new_point);
 
-				m_rotatingWnd->setRotationPoint(center_point, new_point);
-				m_rotatingWnd->drawRotationHelper(true);
 
+				m_rotatingWnd->setRotationPointHand(new_point);
+				m_rotatingWnd->drawRotationHelper(true);
 
 
 				qreal angle = new_line.angleTo(old_line);

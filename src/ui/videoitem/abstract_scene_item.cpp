@@ -367,11 +367,26 @@ void CLAbstractSceneItem::drawRotationHelper(bool val)
 	m_draw_rotation_helper = val;
 }
 
-void CLAbstractSceneItem::setRotationPoint(QPointF point1, QPointF point2)
+
+
+
+void CLAbstractSceneItem::setRotationPointCenter(QPointF center)
 {
-	m_rotation_center = point1;
-	m_rotation_hand = point2;
+	
+	m_rotation_center  = center;
 }
+
+QPointF CLAbstractSceneItem::getRotationPointCenter() const
+{
+	return m_rotation_center;
+}
+
+void CLAbstractSceneItem::setRotationPointHand(QPointF point)
+{
+	
+	m_rotation_hand = point;
+}
+
 
 void CLAbstractSceneItem::drawRotationHelper(QPainter* painter)
 {

@@ -81,7 +81,7 @@ protected:
 	virtual void keyReleaseEvent( QKeyEvent * e );
 
 	
-	void resizeEvent ( QResizeEvent * event );
+	void resizeEvent(QResizeEvent * event);
 
 	//=========================
 	void onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int delay);

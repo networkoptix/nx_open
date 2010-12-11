@@ -86,7 +86,13 @@ public:
 
 	//====rotation=======
 	void drawRotationHelper(bool val);
-	void setRotationPoint(QPointF point1, QPointF point2);
+
+	
+	void setRotationPointCenter(QPointF center);
+	QPointF getRotationPointCenter() const;
+
+	
+	void setRotationPointHand(QPointF point);
 
 public slots:
 	void onResize();
@@ -131,7 +137,7 @@ protected:
 
 	//rotation
 	bool m_draw_rotation_helper;
-	QPointF m_rotation_center;
+	QPointF m_rotation_center; 
 	QPointF m_rotation_hand;
 
 	bool m_needUpdate;

@@ -90,7 +90,7 @@ void CLLog::log(const QString& msg1, int val, const QString& msg2, int val2, CLL
 
 }
 
-void CLLog::log(const QString& msg, float val, CLLogLevel loglevel)
+void CLLog::log(const QString& msg, qreal val, CLLogLevel loglevel)
 {
 	if (loglevel > m_loglevel)
 		return;
