@@ -91,6 +91,7 @@ void CLVideoWindowItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 	}
 
 	//if (global_show_item_text && !dev->checkDeviceTypeFlag(CLDevice::ARCHIVE) && !dev->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT) )
+	if (global_show_item_text && !dev->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT) )
 	{
 		showFPS(true);
 		setShowInfoText(true);

@@ -7,6 +7,7 @@
 #include <qgraphicssceneevent>
 #include "subitem\abstract_image_sub_item.h"
 #include "subitem\recording_sign_item.h"
+#include "base\log.h"
 
 
 static const double Pi = 3.14159265358979323846264338327950288419717;
@@ -259,7 +260,7 @@ qreal CLAbstractSceneItem::getRotation() const
 
 void CLAbstractSceneItem::setRotation(qreal angle)
 {
-	m_animationTransform.z_rotate_abs(QPointF(), angle, 0);
+	m_animationTransform.z_rotate_abs(m_rotation_center, angle, 0);
 }
 
 void CLAbstractSceneItem::stop_animation()
@@ -373,6 +374,30 @@ void CLAbstractSceneItem::drawRotationHelper(bool val)
 void CLAbstractSceneItem::setRotationPointCenter(QPointF center)
 {
 	
+	qreal angle = getRotation();
+
+	qreal cos_a = cos(angle*Pi/180);
+	qreal sin_a = sin(angle*Pi/180);
+
+	qreal x_old = (-m_rotation_center.x())*cos_a - (-m_rotation_center.y())*sin_a; // pos of the item after rotation in center of rotation coordinates 
+	qreal y_old = (-m_rotation_center.x())*sin_a +  (-m_rotation_center.y())*cos_a;
+	x_old += m_rotation_center.x(); // pos of the item after rotation in item coordinates 
+	y_old += m_rotation_center.y();
+
+	qreal x_new = (-center.x())*cos_a - (-center.y())*sin_a; // pos of the item after rotation in center of rotation coordinates ( around nex center )
+	qreal y_new = (-center.x())*sin_a +  (-center.y())*cos_a;
+	x_new += center.x(); // pos of the item after rotation in item coordinates ( around nex center )
+	y_new += center.y();
+
+
+
+
+	QPointF delta(x_old - x_new, y_old - y_new);
+
+
+	setPos(pos() + delta);
+	/**/
+
 	m_rotation_center  = center;
 }
 
