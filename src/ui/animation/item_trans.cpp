@@ -125,6 +125,7 @@ void CLItemTransform::z_rotate_abs(QPointF center, qreal angle, int duration, in
 	}
 	else
 	{
+		m_rotatePoint = center;
 		m_Zrotation.start_point = m_Zrotation.curent;
 
 		if (m_Zrotation.start_point>180 && angle==0.)
@@ -164,6 +165,7 @@ void CLItemTransform::z_rotate_delta(QPointF center, qreal angle, int duration, 
 	}
 	else
 	{
+		m_rotatePoint = center;
 		m_Zrotation.start_point = m_Zrotation.curent;
 		m_Zrotation.diff = angle;
 

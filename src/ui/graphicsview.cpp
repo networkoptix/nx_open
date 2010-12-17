@@ -954,7 +954,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 	if (mid_button && wnd)
 	{
-		wnd->z_rotate_abs(QPointF(0,0), 0, item_hoverevent_duration);
+		wnd->z_rotate_abs(wnd->getRotationPointCenter(), 0, item_hoverevent_duration);
 	}
 
 	if (left_button)
@@ -1026,6 +1026,13 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 	layout_editor_menu.addAction(&cm_layout_editor_bgp_sz);
 
 
+	QMenu rotation_manu;
+	rotation_manu.setTitle("Rotation");
+	rotation_manu.addAction(&cm_rotate_0);
+	rotation_manu.addAction(&cm_rotate_90);
+	rotation_manu.addAction(&cm_rotate_minus90);
+	rotation_manu.addAction(&cm_rotate_180);
+
 
 	//===== final menu=====
 	QMenu menu;
@@ -1037,6 +1044,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 		{
 			// video item
 			menu.addAction(&cm_fullscren);
+			menu.addMenu(&rotation_manu);
 
 			video_wnd = static_cast<CLVideoWindowItem*>(wnd);
 			cam = video_wnd->getVideoCam();
@@ -1155,6 +1163,30 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 			if (act == &cm_view_recorded&& cam)
 				contextMenuHelper_viewRecordedVideo(cam);
 
+
+			if (act == &cm_rotate_90)
+			{
+				if (m_camLayout.hasSuchItem(wnd))
+					contextMenuHelper_Rotation(wnd, 90);
+			}
+
+			if (act == &cm_rotate_minus90)
+			{
+				if (m_camLayout.hasSuchItem(wnd))
+					contextMenuHelper_Rotation(wnd, -90);
+			}
+
+			if (act == &cm_rotate_0)
+			{
+				if (m_camLayout.hasSuchItem(wnd))
+					contextMenuHelper_Rotation(wnd, 0);
+			}
+
+			if (act == &cm_rotate_180)
+			{
+				if (m_camLayout.hasSuchItem(wnd))
+					contextMenuHelper_Rotation(wnd, -180);
+			}
 
 			
 		}
@@ -2227,4 +2259,15 @@ void GraphicsView::contextMenuHelper_viewRecordedVideo(CLVideoCamera* cam)
 
 	m_camLayout.addDevice(id, true);
 	fitInView(600, 100);
+}
+
+void GraphicsView::contextMenuHelper_Rotation(CLAbstractSceneItem* wnd, qreal angle)
+{
+	QRectF view_scene = mapToScene(viewport()->rect()).boundingRect(); //viewport in the scene cord
+	QRectF view_item = wnd->mapFromScene(view_scene).boundingRect(); //viewport in the item cord
+	QPointF center_point_item = wnd->boundingRect().intersected(view_item).center(); // center of the intersection of the vewport and item
+	wnd->setRotationPointCenter(center_point_item);
+
+	wnd->z_rotate_abs(center_point_item, angle, 600);
+
 }

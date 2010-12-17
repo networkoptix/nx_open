@@ -35,5 +35,11 @@ extern QAction cm_layout_editor_bgp_sz;
 extern QAction cm_layout_editor_change_t;
 
 
+extern QAction cm_rotate_90;
+extern QAction cm_rotate_0;
+extern QAction cm_rotate_minus90;
+extern QAction cm_rotate_180;
+
+
 
 #endif //context_menu_helper_h_1250

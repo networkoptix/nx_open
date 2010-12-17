@@ -368,9 +368,6 @@ void CLAbstractSceneItem::drawRotationHelper(bool val)
 	m_draw_rotation_helper = val;
 }
 
-
-
-
 void CLAbstractSceneItem::setRotationPointCenter(QPointF center)
 {
 	
@@ -389,11 +386,7 @@ void CLAbstractSceneItem::setRotationPointCenter(QPointF center)
 	x_new += center.x(); // pos of the item after rotation in item coordinates ( around nex center )
 	y_new += center.y();
 
-
-
-
 	QPointF delta(x_old - x_new, y_old - y_new);
-
 
 	setPos(pos() + delta);
 	/**/

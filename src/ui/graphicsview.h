@@ -124,6 +124,7 @@ protected:
 	void contextMenuHelper_chngeLayoutTitle(CLAbstractSceneItem* wnd);
 	void contextMenuHelper_editLayout(CLAbstractSceneItem* wnd);
 	void contextMenuHelper_viewRecordedVideo(CLVideoCamera* cam);
+	void contextMenuHelper_Rotation(CLAbstractSceneItem* wnd, qreal angle);
 
 public slots:
 	
