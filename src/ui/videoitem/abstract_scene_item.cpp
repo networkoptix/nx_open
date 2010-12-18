@@ -38,7 +38,8 @@ m_mouse_over(false),
 m_draw_rotation_helper(false),
 m_zoomOnhover(true),
 m_needUpdate(false),
-mEditable(false)
+mEditable(false),
+m_rotation_center(0,0)
 {
 	setAcceptsHoverEvents(true);
 

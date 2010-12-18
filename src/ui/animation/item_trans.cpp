@@ -16,7 +16,7 @@ qreal round_angle(qreal angle, qreal min_diff)
 		result = angle_int_90*90;	
 
 	 if( abs(angle_mod_90 - 90) < min_diff)
-		 result = angle_int_90*90 + (angle_mod_90>0 ? 90 : -90);	
+		 result = angle_int_90*90 + (angle>0 ? 90 : -90);	
 
 	return result;
 }
@@ -206,7 +206,7 @@ void CLItemTransform::transform_helper()
 	trans.translate(-center.x(), -center.y());
 	/**/
 
-	qreal transform_ange = round_angle(m_Zrotation.curent, 5);
+	qreal transform_ange = round_angle(m_Zrotation.curent, 1);
 	
 	trans.translate(m_rotatePoint.x(), m_rotatePoint.y());
 	trans.rotate(transform_ange); 

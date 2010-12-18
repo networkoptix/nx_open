@@ -41,6 +41,7 @@ extern QString button_level_up;
 extern QString button_magnifyingglass;
 
 extern QPixmap cached(const QString &img);
+extern int limit_val(int val, int min_val, int max_val, bool mirror);
 //==============================================================================
 
 GraphicsView::GraphicsView(QWidget* mainWnd):
@@ -642,12 +643,19 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 	{
 		QPoint delta = event->pos() - m_mousestate.getLastEventPoint();
 
+		QPoint new_pos = viewport()->rect().center() - delta + QPoint(2,2); // rounding;
+		QPointF new_scene_pos = mapToScene(new_pos);
 
-		QScrollBar *hBar = horizontalScrollBar();
-		QScrollBar *vBar = verticalScrollBar();
-		hBar->setValue(hBar->value() + (isRightToLeft() ? delta.x() : -delta.x()));
-		vBar->setValue(vBar->value() - delta.y());
-		addjustAllStaticItems();
+		QRect rsr = getRealSceneRect();
+
+		new_scene_pos.rx() = limit_val(new_scene_pos.x(), rsr.left(), rsr.right(), false);
+		new_scene_pos.ry() = limit_val(new_scene_pos.y(), rsr.top(), rsr.bottom(), false);
+
+		centerOn(new_scene_pos);
+
+
+
+		//getRealSceneRect()
 		
 		//cl_log.log("==m_handMoving!!!=====", cl_logDEBUG1);
 
@@ -856,6 +864,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 	{
 		
 		m_ignore_conext_menu_event = true;
+		
 
 		if (isItemStillExists(m_rotatingWnd))
 		{

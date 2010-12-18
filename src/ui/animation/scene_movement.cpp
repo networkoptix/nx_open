@@ -110,20 +110,11 @@ void CLSceneMovement::valueChanged ( qreal dpos )
 	
 	QRect rsr = m_view->getRealSceneRect();
 
-	result.rx() = limit_val(result.x(), rsr.left(), rsr.right(), true);
-	result.ry() = limit_val(result.y(), rsr.top(), rsr.bottom(), true);
+	result.rx() = limit_val(result.x(), rsr.left(), rsr.right(), false);
+	result.ry() = limit_val(result.y(), rsr.top(), rsr.bottom(), false);
 	
 	
 	m_view->centerOn(result);
-
-	/*
-	QTransform tr;
-	tr.translate(result.x(), result.y());
-	tr.rotate(-1.0, Qt::YAxis);
-	tr.translate(-result.x(), -result.y());
-	m_view->setTransform(tr);
-	/**/
-
 
 	//=======================================
 	if (m_limited && m_view->getSelectedItem())
