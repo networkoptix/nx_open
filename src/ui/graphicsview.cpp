@@ -872,7 +872,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 			if (dx!=0 || dy!=0)
 			{
 				
-				QPointF center_point = m_rotatingWnd->boundingRect().center(); // by default center is the center of the item
+				QPointF center_point = m_rotatingWnd->getRotationPointCenter(); // by default center is the center of the item
 
 				//if (wnd->isFullScreen()) // if wnd is in full scree mode center must be changed to the cetre of the viewport
 				//	center_point = item->mapFromScene(mapToScene(viewport()->rect().center()));

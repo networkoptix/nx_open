@@ -150,7 +150,7 @@ void CLItemTransform::z_rotate_delta(QPointF center, qreal angle, int duration, 
 
 	if (duration!=0) // if animation
 	{
-		qreal final = round_angle(m_Zrotation.curent + angle, 2);
+		qreal final = m_Zrotation.curent + angle;
 		angle = final - m_Zrotation.curent;
 	}
 
@@ -206,9 +206,10 @@ void CLItemTransform::transform_helper()
 	trans.translate(-center.x(), -center.y());
 	/**/
 
+	qreal transform_ange = round_angle(m_Zrotation.curent, 5);
 	
 	trans.translate(m_rotatePoint.x(), m_rotatePoint.y());
-	trans.rotate(m_Zrotation.curent); 
+	trans.rotate(transform_ange); 
 	trans.translate(-m_rotatePoint.x(), -m_rotatePoint.y());
 
 	trans.translate(center.x(), center.y());
