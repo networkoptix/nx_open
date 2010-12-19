@@ -644,7 +644,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 		
 		/*/
 
-		// this code does not work well QPoint(2,2) depends on vewport border width or so.
+		// this code does not work well QPoint(2,2) depends on veiwport border width or so.
 
 		QPoint delta = event->pos() - m_mousestate.getLastEventPoint();
 		QPoint new_pos = viewport()->rect().center() - delta + QPoint(2,2); // rounding;

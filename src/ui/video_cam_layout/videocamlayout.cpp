@@ -242,7 +242,8 @@ void SceneLayout::onTimer()
 
 			foreach(CLAbstractComplicatedItem* devitem, m_deviceitems)
 			{
-				if (devitem->getDevice()->getDeviceType() == CLDevice::VIDEODEVICE) // if this is video device
+				if (devitem->getDevice()->getDeviceType() == CLDevice::VIDEODEVICE &&
+					!devitem->getDevice()->checkDeviceTypeFlag(CLDevice::ARCHIVE)) // if this is video device
 				{
 					bool need_to_remove = true;
 					foreach(CLDevice* dev, all_devs)
