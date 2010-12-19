@@ -641,21 +641,38 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 	// scene movement 
 	if (m_handScrolling && left_button) 
 	{
-		QPoint delta = event->pos() - m_mousestate.getLastEventPoint();
+		
+		/*/
 
+		// this code does not work well QPoint(2,2) depends on vewport border width or so.
+
+		QPoint delta = event->pos() - m_mousestate.getLastEventPoint();
 		QPoint new_pos = viewport()->rect().center() - delta + QPoint(2,2); // rounding;
 		QPointF new_scene_pos = mapToScene(new_pos);
-
 		QRect rsr = getRealSceneRect();
-
 		new_scene_pos.rx() = limit_val(new_scene_pos.x(), rsr.left(), rsr.right(), false);
 		new_scene_pos.ry() = limit_val(new_scene_pos.y(), rsr.top(), rsr.bottom(), false);
-
 		centerOn(new_scene_pos);
+		/**/
 
+		QPoint delta = event->pos() - m_mousestate.getLastEventPoint();
+		QScrollBar *hBar = horizontalScrollBar();
+		QScrollBar *vBar = verticalScrollBar();
 
+		QPointF new_pos = mapToScene( viewport()->rect().center() - delta + QPoint(2,2) ); // rounding;
+		QRect rsr = getRealSceneRect();
 
-		//getRealSceneRect()
+		if (new_pos.x() >= rsr.left() && new_pos.x() <= rsr.right())
+			hBar->setValue(hBar->value() + (isRightToLeft() ? delta.x() : -delta.x()));
+
+		if (new_pos.y() >= rsr.top() && new_pos.y() <= rsr.bottom())
+			vBar->setValue(vBar->value() - delta.y());
+		
+		
+		
+		addjustAllStaticItems();
+
+		
 		
 		//cl_log.log("==m_handMoving!!!=====", cl_logDEBUG1);
 
@@ -2068,6 +2085,7 @@ void GraphicsView::mouseSpeed_helper(qreal& mouse_speed,  int& dx, int&dy, int m
 		if (sdx) dx =-dx;
 		if (sdy) dy =-dy;
 	}
+	
 
 }
 
