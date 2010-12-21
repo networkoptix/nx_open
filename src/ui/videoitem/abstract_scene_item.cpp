@@ -236,17 +236,17 @@ bool CLAbstractSceneItem::isItemSelected() const
 
 void CLAbstractSceneItem::zoom_abs(qreal z, int duration, int delay)
 {
-	m_animationTransform.zoom_abs(z, duration);
+	m_animationTransform.zoom_abs(z, duration, 0);
 }
 
-void CLAbstractSceneItem::z_rotate_delta(QPointF center, qreal angle, int duration)
+void CLAbstractSceneItem::z_rotate_delta(QPointF center, qreal angle, int duration, int delay)
 {
-	m_animationTransform.z_rotate_delta(center, angle, duration);
+	m_animationTransform.z_rotate_delta(center, angle, duration, delay);
 }
 
-void CLAbstractSceneItem::z_rotate_abs(QPointF center, qreal angle, int duration)
+void CLAbstractSceneItem::z_rotate_abs(QPointF center, qreal angle, int duration, int delay)
 {
-	m_animationTransform.z_rotate_abs(center, angle, duration);
+	m_animationTransform.z_rotate_abs(center, angle, duration, delay);
 }
 
 qreal CLAbstractSceneItem::getZoom() const
@@ -261,7 +261,7 @@ qreal CLAbstractSceneItem::getRotation() const
 
 void CLAbstractSceneItem::setRotation(qreal angle)
 {
-	m_animationTransform.z_rotate_abs(m_rotation_center, angle, 0);
+	m_animationTransform.z_rotate_abs(m_rotation_center, angle, 0, 0);
 }
 
 void CLAbstractSceneItem::stop_animation()
@@ -303,7 +303,7 @@ void CLAbstractSceneItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 		{
 			m_z = 1;
 			setZValue(m_z);
-			m_animationTransform.zoom_abs(1.11, item_hoverevent_duration);
+			m_animationTransform.zoom_abs(1.11, item_hoverevent_duration, 0);
 
 		}
 	}
@@ -321,7 +321,7 @@ void CLAbstractSceneItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 		{
 			m_z = 0;
 			setZValue(m_z);
-			m_animationTransform.zoom_abs(1.0, item_hoverevent_duration);
+			m_animationTransform.zoom_abs(1.0, item_hoverevent_duration, 0);
 		}
 	}
 }

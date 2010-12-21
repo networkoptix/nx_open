@@ -15,10 +15,10 @@ public:
 	virtual ~CLSceneZoom();
 
 
-	void zoom_delta(qreal delta, int duration, int delay = 0);
-	void zoom_abs(qreal z, int duration, int delay = 0);
+	void zoom_delta(qreal delta, int duration, int delay, CLAnimationTimeLine::CLAnimationCurve curve =  CLAnimationTimeLine::SLOW_END_POW_40);
+	void zoom_abs(qreal z, int duration, int delay, CLAnimationTimeLine::CLAnimationCurve curve =  CLAnimationTimeLine::SLOW_END_POW_40);
 	
-	void zoom_minimum(int duration, int delay = 0);
+	void zoom_minimum(int duration, int delay, CLAnimationTimeLine::CLAnimationCurve curve =  CLAnimationTimeLine::SLOW_END_POW_40);
 
 	qreal getZoom() const;
 

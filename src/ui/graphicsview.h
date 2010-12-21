@@ -36,6 +36,9 @@ public:
 	void setRealSceneRect(QRect rect);
 	QRect getRealSceneRect() const;
 
+	qreal getMinSceneZoom() const;
+	void setMinSceneZoom(qreal z);
+
 	SceneLayout& getCamLayOut();
 
 	CLAbstractSceneItem* getSelectedItem() const;
@@ -90,6 +93,7 @@ protected:
 	void toggleFullScreen_helper(CLAbstractSceneItem* new_wnd);
 
 	void onItemFullScreen_helper(CLAbstractSceneItem* wnd);
+	qreal zoomForFullScreen_helper(QRectF rect) const;
 	
 	void onArrange_helper();
 	void onCircle_helper(bool show=false);
@@ -152,6 +156,7 @@ protected:
 	CLSceneZoom m_scenezoom;
 	CLMouseState m_mousestate;
 
+	qreal m_min_scene_zoom;
 	
 	int m_rotationCounter;
 

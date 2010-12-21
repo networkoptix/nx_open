@@ -1,5 +1,6 @@
 #include "animation_timeline.h"
 #include <QtCore/qmath.h>
+#include <QEasingCurve>
 
 qreal CLAnimationTimeLine::m_animation_speed = 1.0;
 
@@ -83,6 +84,10 @@ qreal CLAnimationTimeLine::valueForTime ( int msec ) const
 
 	case SLOW_START:
 		return slow_start(msec);
+
+	case SLOW_START_SLOW_END:
+		return slow_start_slow_end(msec);
+
 		
 	case INHERITED:
 	default:
@@ -109,6 +114,14 @@ qreal CLAnimationTimeLine::slow_start( int msec ) const
 	const qreal linearProgress = value;
 	const qreal mix = qt_smoothBeginEndMixFactor(value);
 	return   expprogress * mix + linearProgress* (1-mix) ;
+}
+
+qreal CLAnimationTimeLine::slow_start_slow_end( int msec ) const
+{
+	static QEasingCurve ec(QEasingCurve::InOutQuad);
+
+	qreal value = msec / qreal(duration());
+	return ec.valueForProgress(value);
 }
 
 qreal CLAnimationTimeLine::slow_end_pow( int msec, qreal pw ) const

@@ -4,9 +4,10 @@
 #include "../../base/log.h"
 #include "../graphicsview.h"
 #include "settings.h"
+#include "../src/corelib/global/qglobal.h"
 
 
-static const qreal min_zoom = 0.06;
+
 static const qreal max_zoom = 4.0;
 static const qreal def_zoom = 0.22;
 
@@ -21,6 +22,7 @@ m_targetzoom(0),
 m_diff(0),
 m_quality(CLStreamreader::CLSNormal)
 {
+	//m_timeline.setCurve(CLAnimationTimeLine::CLAnimationCurve::SLOW_START_SLOW_END);
 }
 
 CLSceneZoom::~CLSceneZoom()
@@ -44,21 +46,26 @@ qreal CLSceneZoom::getZoom() const
 }
 
 
-void CLSceneZoom::zoom_abs(qreal z, int duration, int delay)
+void CLSceneZoom::zoom_abs(qreal z, int duration, int delay, CLAnimationTimeLine::CLAnimationCurve curve)
 {
+
+	m_timeline.setCurve(curve);
+
 	m_targetzoom = z;
 
 	zoom_helper(duration, delay);
 }
 
-void CLSceneZoom::zoom_minimum(int duration, int delay)
+void CLSceneZoom::zoom_minimum(int duration, int delay, CLAnimationTimeLine::CLAnimationCurve curve)
 {
-	zoom_abs(min_zoom , duration, delay);
+	m_timeline.setCurve(curve);
+	zoom_abs(m_view->getMinSceneZoom() , duration, delay);
 }
 
 
-void CLSceneZoom::zoom_delta(qreal delta, int duration, int delay )
+void CLSceneZoom::zoom_delta(qreal delta, int duration, int delay, CLAnimationTimeLine::CLAnimationCurve curve)
 {
+	m_timeline.setCurve(curve);
 	m_targetzoom += delta;
 	zoom_helper(duration, delay);
 }
@@ -86,11 +93,11 @@ void CLSceneZoom::valueChanged( qreal dpos )
 	// width 1900 => zoom 0.278 => scale 0.07728
 	int width = m_view->viewport()->width();
 	qreal min_scale = 0.07728*width/1900.0;
-	qreal min_zoom = scaleTozoom(min_scale) ;
+	qreal min_sel_zoom = scaleTozoom(min_scale) ;
 
 
 	//if (m_view->getSelectedItem() &&  zooming_out  && getZoom()<0.260) // if zooming out only
-	if (m_view->getSelectedItem() &&  zooming_out  && getZoom()<min_zoom*0.9) // if zooming out only
+	if (m_view->getSelectedItem() &&  zooming_out  && getZoom()<min_sel_zoom*0.9) // if zooming out only
 		m_view->setZeroSelection();
 
 	if (zooming_out)
@@ -154,8 +161,8 @@ void CLSceneZoom::zoom_helper(int duration, int delay)
 	if (m_targetzoom>max_zoom)
 		m_targetzoom = max_zoom;
 
-	if (m_targetzoom < min_zoom)
-		m_targetzoom = min_zoom;
+	if (m_targetzoom < m_view->getMinSceneZoom())
+		m_targetzoom = m_view->getMinSceneZoom();
 
 	if (duration==0)
 	{

@@ -68,7 +68,8 @@ mZerroDistance(true),
 mViewStarted(false),
 m_groupAnimation(0),
 m_fps_frames(0),
-m_seachItem(0)
+m_seachItem(0),
+m_min_scene_zoom(0.06)
 {
 
 	setScene(&m_scene);
@@ -192,11 +193,23 @@ SceneLayout& GraphicsView::getCamLayOut()
 void GraphicsView::setRealSceneRect(QRect rect)
 {
 	m_realSceneRect = rect;
+	m_min_scene_zoom = zoomForFullScreen_helper(rect);
+	m_min_scene_zoom-=0.05;
 }
 
 QRect GraphicsView::getRealSceneRect() const
 {
 	return m_realSceneRect;
+}
+
+qreal GraphicsView::getMinSceneZoom() const
+{
+	return m_min_scene_zoom;
+}
+
+void GraphicsView::setMinSceneZoom(qreal z) 
+{
+	m_min_scene_zoom = z;
 }
 
 
@@ -261,12 +274,12 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
 
 	showStop_helper();
 	int numDegrees = e->delta() ;
-	m_scenezoom.zoom_delta(numDegrees/3000.0, scene_zoom_duration);
+	m_scenezoom.zoom_delta(numDegrees/3000.0, scene_zoom_duration, 0);
 }
 
 void GraphicsView::zoomMin(int duration)
 {
-	m_scenezoom.zoom_minimum(duration);
+	m_scenezoom.zoom_minimum(duration, 0);
 }
 
 
@@ -514,6 +527,12 @@ void GraphicsView::removeAllStaticItems()
 
 void GraphicsView::stopAnimation()
 {
+	foreach(CLAbstractSceneItem* itm, m_camLayout.getItemList())
+	{
+		itm->stop_animation();
+	}
+
+	
 	m_scenezoom.stop();
 	m_movement.stop();
 	showStop_helper();
@@ -771,7 +790,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 
 				qreal angle = new_line.angleTo(old_line);
 
-				m_rotatingWnd->z_rotate_delta(center_point, angle, 0);
+				m_rotatingWnd->z_rotate_delta(center_point, angle, 0, 0);
 			}
 			
 		}
@@ -872,7 +891,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 			}
 			 
-			m_movement.move(-dx,-dy, scene_move_duration + mouse_speed/1.5, fullscreen);
+			m_movement.move(-dx,-dy, scene_move_duration + mouse_speed/1.5, fullscreen, 0);
 		}
 
 	}
@@ -916,7 +935,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 					angle = angle - 360;
 
 
-				m_rotatingWnd->z_rotate_delta(center_point, angle, item_rotation_duration);
+				m_rotatingWnd->z_rotate_delta(center_point, angle, item_rotation_duration, 0);
 				
 			}
 			else
@@ -980,7 +999,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 	if (mid_button && wnd)
 	{
-		wnd->z_rotate_abs(wnd->getRotationPointCenter(), 0, item_hoverevent_duration);
+		wnd->z_rotate_abs(wnd->getRotationPointCenter(), 0, item_hoverevent_duration, 0);
 	}
 
 	if (left_button)
@@ -1522,32 +1541,32 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 		switch (e->key()) 
 		{
 		case Qt::Key_Left:
-			m_movement.move(-step,0, dur);
+			m_movement.move(-step,0, dur, false, 0);
 			break;
 		case Qt::Key_Right:
-			m_movement.move(step,0, dur);
+			m_movement.move(step,0, dur, false, 0);
 			break;
 		case Qt::Key_Up:
-			m_movement.move(0,-step, dur);
+			m_movement.move(0,-step, dur, false, 0);
 			break;
 		case Qt::Key_Down:
-			m_movement.move(0,step, dur);
+			m_movement.move(0,step, dur, false, 0);
 			break;
 
 		case Qt::Key_PageUp:
-			m_movement.move(step,-step, dur);
+			m_movement.move(step,-step, dur, false, 0);
 			break;
 
 		case Qt::Key_PageDown:
-			m_movement.move(step,step, dur);
+			m_movement.move(step,step, dur, false, 0);
 			break;
 
 		case Qt::Key_Home:
-			m_movement.move(-step,-step, dur);
+			m_movement.move(-step,-step, dur, false, 0);
 			break;
 
 		case Qt::Key_End:
-			m_movement.move(-step,step, dur);
+			m_movement.move(-step,step, dur, false, 0);
 			break;
 
 		}
@@ -1559,11 +1578,11 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 	{
 	case Qt::Key_Equal: // plus
 	case Qt::Key_Plus: // plus
-		m_scenezoom.zoom_delta(0.05, 2000);
+		m_scenezoom.zoom_delta(0.05, 2000, 0);
 		break;
 	case Qt::Key_Minus:
 		
-		m_scenezoom.zoom_delta(-0.05, 2000);
+		m_scenezoom.zoom_delta(-0.05, 2000, 0);
 
 
 	}
@@ -1573,11 +1592,11 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 		switch (e->key()) 
 		{
 		case Qt::Key_End: // plus
-			m_scenezoom.zoom_delta(0.05, 2000);
+			m_scenezoom.zoom_delta(0.05, 2000, 0);
 			break;
 
 		case Qt::Key_Home:
-			m_scenezoom.zoom_abs(-100, 2000); // absolute zoom out
+			m_scenezoom.zoom_abs(-100, 2000, 0); // absolute zoom out
 			break;
 		}
 
@@ -1912,6 +1931,7 @@ void GraphicsView::onArrange_helper()
 
 	foreach (CLAbstractSceneItem* item, wndlst)
 	{
+		item->stop_animation();
 		
 		QPropertyAnimation *anim1 = new QPropertyAnimation(item, "rotation");
 
@@ -1964,7 +1984,7 @@ void GraphicsView::fitInView(int duration, int delay )
 	if (m_selectedWnd && isItemStillExists(m_selectedWnd) && m_selectedWnd->isFullScreen())
 	{
 		m_selectedWnd->setFullScreen(false);
-		m_selectedWnd->zoom_abs(1.0, 0);
+		m_selectedWnd->zoom_abs(1.0, 0, 0);
 		update();
 	}
 
@@ -2004,13 +2024,36 @@ void GraphicsView::fitInView(int duration, int delay )
 
 }
 
+qreal GraphicsView::zoomForFullScreen_helper(QRectF rect) const
+{
+	QRectF viewRect = viewport()->rect();
+
+	QRectF sceneRect = matrix().mapRect(rect);
+
+
+	qreal xratio = viewRect.width() / sceneRect.width();
+	qreal yratio = viewRect.height() / sceneRect.height();
+
+	qreal scl = qMin(xratio, yratio);
+
+
+	QRectF unity = matrix().mapRect(QRectF(0, 0, 1, 1));
+
+	scl*=( unity.width());
+
+
+	return m_scenezoom.scaleTozoom(scl);
+
+}
+
+
 void GraphicsView::onItemFullScreen_helper(CLAbstractSceneItem* wnd)
 {
 
 	//wnd->zoom_abs(selected_item_zoom, true);
 
 	qreal wnd_zoom = wnd->getZoom();
-	wnd->zoom_abs(1.0, 0);
+	wnd->zoom_abs(1.0, 0, 0);
 
 
 	wnd->setFullScreen(true); // must be called at very beginning of the function coz it will change boundingRect of the item (shadows removed)
@@ -2021,38 +2064,21 @@ void GraphicsView::onItemFullScreen_helper(CLAbstractSceneItem* wnd)
 		return;
 
 	QRectF item_rect = wnd->sceneBoundingRect();
-	QRectF viewRect = viewport()->rect();
-
-	QRectF sceneRect = matrix().mapRect(item_rect);
-
-
-	qreal xratio = viewRect.width() / sceneRect.width();
-	qreal yratio = viewRect.height() / sceneRect.height();
-
-	qreal scl = qMin(xratio, yratio);
-
-	
-	QRectF unity = matrix().mapRect(QRectF(0, 0, 1, 1));
-	//scale(1 / unity.width(), 1 / unity.height());
-
-
-	scl*=( unity.width());
+	qreal zoom = zoomForFullScreen_helper(item_rect);
 
 	int duration = item_select_duration/2 + 100;
-	m_movement.move(item_rect.center(), duration);
+	m_movement.move(item_rect.center(), duration, 0);
 
 
-	qreal zoom = m_scenezoom.scaleTozoom(scl);
-	
 	//scale(scl, scl);
+
 	
-	
-	m_scenezoom.zoom_abs(zoom, duration);
+	m_scenezoom.zoom_abs(zoom, duration, 0);
 
 
 	
-	wnd->zoom_abs(wnd_zoom , 0);
-	wnd->zoom_abs(1.0 , duration);
+	wnd->zoom_abs(wnd_zoom , 0, 0);
+	wnd->zoom_abs(1.0 , duration, 0);
 
 
 	
@@ -2295,6 +2321,6 @@ void GraphicsView::contextMenuHelper_Rotation(CLAbstractSceneItem* wnd, qreal an
 	QPointF center_point_item = wnd->boundingRect().intersected(view_item).center(); // center of the intersection of the vewport and item
 	wnd->setRotationPointCenter(center_point_item);
 
-	wnd->z_rotate_abs(center_point_item, angle, 600);
+	wnd->z_rotate_abs(center_point_item, angle, 600, 0);
 
 }

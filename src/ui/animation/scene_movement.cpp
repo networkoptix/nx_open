@@ -72,8 +72,9 @@ CLSceneMovement::~CLSceneMovement()
 }
 
 
-void CLSceneMovement::move(int dx, int dy, int duration, bool limited, int delay )
+void CLSceneMovement::move(int dx, int dy, int duration, bool limited, int delay, CLAnimationTimeLine::CLAnimationCurve curve  )
 {
+	m_timeline.setCurve(curve);
 	QPoint curr = m_view->viewport()->rect().center();
 	curr.rx()+=dx;
 	curr.ry()+=dy;
@@ -83,9 +84,10 @@ void CLSceneMovement::move(int dx, int dy, int duration, bool limited, int delay
 	m_limited = limited; // this will overwrite false value set inside move_abs function above
 }
 
-void CLSceneMovement::move (QPointF dest, int duration, int delay)
+void CLSceneMovement::move (QPointF dest, int duration, int delay, CLAnimationTimeLine::CLAnimationCurve curve )
 {
 	//cl_log.log("CLSceneMovement::move() ", cl_logDEBUG1);
+	m_timeline.setCurve(curve);
 
 	m_limited = false;
 

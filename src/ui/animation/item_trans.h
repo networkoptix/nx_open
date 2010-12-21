@@ -17,10 +17,10 @@ public:
 	qreal zoomToscale(qreal zoom) const;
 	qreal scaleTozoom(qreal scale) const;
 
-	void zoom_abs(qreal target_zoom, int duration, int delay = 0);
-	void z_rotate_delta(QPointF center, qreal angle, int duration, int delay = 0);
-	void z_rotate_abs(QPointF center, qreal angle, int duration, int delay = 0);
-	void move_abs(QPointF pos, int duration, int delay = 0);
+	void zoom_abs(qreal target_zoom, int duration, int delay);
+	void z_rotate_delta(QPointF center, qreal angle, int duration, int delay);
+	void z_rotate_abs(QPointF center, qreal angle, int duration, int delay );
+	void move_abs(QPointF pos, int duration, int delay);
 
 	qreal current_zrotation() const;
 	qreal current_zoom() const;

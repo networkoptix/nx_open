@@ -13,8 +13,8 @@ public:
 	CLSceneMovement(GraphicsView* gview);
 	virtual ~CLSceneMovement();
 
-	void move (QPointF dest, int duration, int delay = 0);
-	void move (int dx, int dy, int duration, bool limited = false, int delay = 0);
+	void move (QPointF dest, int duration, int delay, CLAnimationTimeLine::CLAnimationCurve curve =  CLAnimationTimeLine::SLOW_END_POW_40 );
+	void move (int dx, int dy, int duration, bool limited , int delay, CLAnimationTimeLine::CLAnimationCurve curve =  CLAnimationTimeLine::SLOW_END_POW_40 );
 
 
 private slots:

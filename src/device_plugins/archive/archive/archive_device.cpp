@@ -5,6 +5,9 @@
 
 CLArchiveDevice::CLArchiveDevice(const QString& arch_path)
 {
+
+	addDeviceTypeFlag(CLDevice::RECORDED);
+
 	m_uniqueid = arch_path;
 	m_name = arch_path;
 
