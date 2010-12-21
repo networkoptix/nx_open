@@ -5,6 +5,7 @@
 #include "../graphicsview.h"
 #include "settings.h"
 #include "../src/corelib/global/qglobal.h"
+#include "ui/videoitem/abstract_scene_item.h"
 
 
 
@@ -88,17 +89,29 @@ void CLSceneZoom::valueChanged( qreal dpos )
 
 
 	//=======================================
+	
+
 	bool zooming_out = m_targetzoom < getZoom();
 
-	// width 1900 => zoom 0.278 => scale 0.07728
-	int width = m_view->viewport()->width();
-	qreal min_scale = 0.07728*width/1900.0;
-	qreal min_sel_zoom = scaleTozoom(min_scale) ;
-
-
 	//if (m_view->getSelectedItem() &&  zooming_out  && getZoom()<0.260) // if zooming out only
-	if (m_view->getSelectedItem() &&  zooming_out  && getZoom()<min_sel_zoom*0.9) // if zooming out only
-		m_view->setZeroSelection();
+	if (m_view->getSelectedItem() &&  zooming_out) // if zooming out only
+	{
+		QRectF item_rect = m_view->getSelectedItem()->sceneBoundingRect();
+		QRectF view_rect = m_view->mapToScene(m_view->viewport()->rect()).boundingRect();
+
+
+		
+
+		if ( item_rect.width() < view_rect.width()*0.95 && 
+			item_rect.height() < view_rect.height()*0.95)
+			m_view->getSelectedItem()->setFullScreen(false);
+
+		if ( view_rect.width()/item_rect.width() > 3.2  && 
+			view_rect.height()/item_rect.height() > 3.2)
+			m_view->setZeroSelection();
+		
+		
+	}
 
 	if (zooming_out)
 	{

@@ -26,7 +26,7 @@
 #include "videoitem/search/search_filter_item.h"
 
 
-
+int doubl_clk_delay = qApp->doubleClickInterval()*0.75;
 int item_select_duration = 700;
 int item_hoverevent_duration = 300;
 int scene_zoom_duration = 2500;
@@ -194,7 +194,7 @@ void GraphicsView::setRealSceneRect(QRect rect)
 {
 	m_realSceneRect = rect;
 	m_min_scene_zoom = zoomForFullScreen_helper(rect);
-	m_min_scene_zoom-=0.05;
+	m_min_scene_zoom-=m_min_scene_zoom/10;
 }
 
 QRect GraphicsView::getRealSceneRect() const
@@ -768,6 +768,8 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 					QRectF view_scene = mapToScene(viewport()->rect()).boundingRect(); //viewport in the scene cord
 					QRectF view_item = m_rotatingWnd->mapFromScene(view_scene).boundingRect(); //viewport in the item cord
 					QPointF center_point_item = m_rotatingWnd->boundingRect().intersected(view_item).center(); // center of the intersection of the vewport and item
+
+					
 					m_rotatingWnd->setRotationPointCenter(center_point_item);
 				}
 
@@ -974,8 +976,16 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 			if (wnd && wnd!=m_selectedWnd) // item and left button
 			{
 				// new item selected 
-				
-				onNewItemSelected_helper(wnd, qApp->doubleClickInterval()*0.6);
+				if (isItemFullScreenZoomed(wnd)) // check if wnd is manually zoomed; without double click
+				{
+					setZeroSelection();
+					m_selectedWnd = wnd;
+					m_last_selectedWnd = wnd;
+					wnd->setItemSelected(true, false);
+					wnd->setFullScreen(true);
+				}
+				else
+					onNewItemSelected_helper(wnd, doubl_clk_delay);
 			}
 			else if (wnd && wnd==m_selectedWnd && !m_selectedWnd->isFullScreen()) // else must be here coz onNewItemSelected_helper change things 
 			{
@@ -983,10 +993,23 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 				
 
 				if (!isItemFullScreenZoomed(wnd)) // check if wnd is manually zoomed; without double click
-					fitInView(item_select_duration, qApp->doubleClickInterval()*0.6);
+					fitInView(item_select_duration, doubl_clk_delay);
 				else
 					wnd->setFullScreen(true);
 
+			}
+			else if (wnd && wnd==m_selectedWnd && m_selectedWnd->isFullScreen()) // else must be here coz onNewItemSelected_helper change things 
+			{
+				QPointF scene_pos = mapToScene(event->pos());
+				int w = mapToScene(viewport()->rect()).boundingRect().width()/2;
+				int h = mapToScene(viewport()->rect()).boundingRect().height()/2;
+
+				// calc zoom for new rect 
+				qreal zoom = zoomForFullScreen_helper(QRectF(scene_pos.x() - w/2, scene_pos.y() - h/2, w, h));
+
+				int duration = 600;
+				m_movement.move(scene_pos, duration, doubl_clk_delay);
+				m_scenezoom.zoom_abs(zoom, duration, doubl_clk_delay);
 
 			}
 
@@ -1305,7 +1328,8 @@ void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
 		if(item!=m_selectedWnd)
 			return;
 
-		toggleFullScreen_helper(item);
+		toggleFullScreen_helper(item);			
+	
 	}
 	else if (e->button() == Qt::RightButton)
 	{
@@ -1981,12 +2005,13 @@ void GraphicsView::fitInView(int duration, int delay )
 {
 	stopGroupAnimation();
 
+	
 	if (m_selectedWnd && isItemStillExists(m_selectedWnd) && m_selectedWnd->isFullScreen())
 	{
 		m_selectedWnd->setFullScreen(false);
 		m_selectedWnd->zoom_abs(1.0, 0, 0);
 		update();
-	}
+	}	/**/
 
 	m_camLayout.updateSceneRect();
 	QRectF item_rect = m_camLayout.getSmallLayoutRect();
