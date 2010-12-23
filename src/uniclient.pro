@@ -13,102 +13,235 @@ FORMS += mainwnd.ui
 
 
 
-
-SOURCES = main.cpp mainwnd.cpp video_camera.cpp settings.cpp
-SOURCES += base/log.cpp base/bytearray.cpp
-SOURCES += camera/camera.cpp
-SOURCES += data/dataprocessor.cpp
-SOURCES += decoders/video/frame_info.cpp decoders/video/ffmpeg.cpp decoders/video/abstractdecoder.cpp decoders/video/ipp_h264_decoder.cpp
-SOURCES += device/device.cpp device/network_device.cpp device/file_device.cpp device/asynch_seacher.cpp device/deviceserver.cpp device/param.cpp device/device_command_processor.cpp device/directory_browser.cpp
-SOURCES += network/nettools.cpp network/socket.cpp network/simple_http_client.cpp network/ping.cpp network/netstate.cpp
-SOURCES += statistics/statistics.cpp
-SOURCES += streamreader/cpull_stremreader.cpp streamreader/streamreader.cpp streamreader/single_shot_reader.cpp streamreader/single_shot_file_reader.cpp
-SOURCES += camera/camdisplay.cpp camera/gl_renderer.cpp camera/videostreamdisplay.cpp camera/stream_recorder.cpp
-
-HEADERS = mainwnd.h video_camera.h settings.h
-HEADERS += base/threadqueue.h base/log.h base/associativearray.h base/expensiveobject.h base/bytearray.h base/longrunnable.h base/rand.h base/adaptivesleep.h base/base.h base/sleep.h
+HEADERS = 
+SOURCES = 
+HEADERS += mainwnd.h
+HEADERS += settings.h
+HEADERS += ui_mainwnd.h
+HEADERS += video_camera.h
+HEADERS += base/adaptivesleep.h
+HEADERS += base/associativearray.h
+HEADERS += base/base.h
+HEADERS += base/bytearray.h
+HEADERS += base/expensiveobject.h
+HEADERS += base/log.h
+HEADERS += base/longrunnable.h
+HEADERS += base/rand.h
+HEADERS += base/sleep.h
+HEADERS += base/threadqueue.h
+HEADERS += camera/abstractrenderer.h
+HEADERS += camera/camdisplay.h
 HEADERS += camera/camera.h
-HEADERS += data/dataprocessor.h data/data.h data/mediadata.h
-HEADERS += decoders/video/frame_info.h decoders/video/ffmpeg.h decoders/video/ipp_h264_decoder.h decoders/video/abstractdecoder.h
-HEADERS += device/deviceserver.h device/device.h device/network_device.h device/file_device.h device/asynch_seacher.h device/param.h device/device_command_processor.h device/directory_browser.h device/device_video_layout.h
-HEADERS += network/simple_http_client.h network/netstate.h network/ping.h network/socket.h network/nettools.h
-HEADERS += statistics/statistics.h
-HEADERS += streamreader/cpull_stremreader.h streamreader/streamreader.h streamreader/single_shot_reader.h streamreader/single_shot_file_reader.h
-HEADERS += camera/abstractrenderer.h camera/camdisplay.h camera/gl_renderer.h camera/videostreamdisplay.h camera/stream_recorder.h
-
-
-
-SOURCES += device_plugins/arecontvision/devices/av_device.cpp device_plugins/arecontvision/devices/av_device_server.cpp device_plugins/arecontvision/devices/av_panoramic.cpp device_plugins/arecontvision/devices/av_singesensor.cpp
-SOURCES += device_plugins/arecontvision/streamreader/cpul_file_test.cpp device_plugins/arecontvision/streamreader/cpul_httpstremreader.cpp device_plugins/arecontvision/streamreader/cpul_tftp_stremreader.cpp device_plugins/arecontvision/streamreader/av_client_pull.cpp
-SOURCES += device_plugins/arecontvision/tools/AVJpegHeader.cpp device_plugins/arecontvision/tools/nalconstructor.cpp device_plugins/arecontvision/tools/simple_tftp_client.cpp 
-SOURCES += device_plugins/arecontvision/streamreader/panoramic_cpul_tftp_stremreader.cpp
-
-HEADERS += device_plugins/arecontvision/devices/av_device.h device_plugins/arecontvision/devices/av_device_server.h device_plugins/arecontvision/devices/av_panoramic.h device_plugins/arecontvision/devices/av_singesensor.h
-HEADERS += device_plugins/arecontvision/streamreader/cpul_file_test.h device_plugins/arecontvision/streamreader/cpul_httpstremreader.h device_plugins/arecontvision/streamreader/cpul_tftp_stremreader.h device_plugins/arecontvision/streamreader/av_client_pull.h
-HEADERS += device_plugins/arecontvision/tools/AVJpegHeader.h device_plugins/arecontvision/tools/simple_tftp_client.h
+HEADERS += camera/gl_renderer.h
+HEADERS += camera/stream_recorder.h
+HEADERS += camera/videostreamdisplay.h
+HEADERS += camera/example/videorenderer_soft.h
+HEADERS += data/data.h
+HEADERS += data/dataprocessor.h
+HEADERS += data/mediadata.h
+HEADERS += decoders/video/abstractdecoder.h
+HEADERS += decoders/video/ffmpeg.h
+HEADERS += decoders/video/frame_info.h
+HEADERS += decoders/video/ipp_h264_decoder.h
+HEADERS += device/asynch_seacher.h
+HEADERS += device/device.h
+HEADERS += device/device_command_processor.h
+HEADERS += device/device_video_layout.h
+HEADERS += device/deviceserver.h
+HEADERS += device/directory_browser.h
+HEADERS += device/file_device.h
+HEADERS += device/network_device.h
+HEADERS += device/param.h
+HEADERS += device/device_managmen/device_criteria.h
+HEADERS += device/device_managmen/device_manager.h
+HEADERS += device_plugins/archive/abstract_archive_device.h
+HEADERS += device_plugins/archive/abstract_archive_stream_reader.h
+HEADERS += device_plugins/archive/archive/archive_device.h
+HEADERS += device_plugins/archive/archive/archive_stream_reader.h
+HEADERS += device_plugins/archive/avi_files/avi_device.h
+HEADERS += device_plugins/archive/avi_files/avi_parser.h
+HEADERS += device_plugins/archive/avi_files/avi_strem_reader.h
+HEADERS += device_plugins/arecontvision/devices/av_device.h
+HEADERS += device_plugins/arecontvision/devices/av_device_server.h
+HEADERS += device_plugins/arecontvision/devices/av_panoramic.h
+HEADERS += device_plugins/arecontvision/devices/av_singesensor.h
+HEADERS += device_plugins/arecontvision/streamreader/av_client_pull.h
+HEADERS += device_plugins/arecontvision/streamreader/cpul_file_test.h
+HEADERS += device_plugins/arecontvision/streamreader/cpul_httpstremreader.h
+HEADERS += device_plugins/arecontvision/streamreader/cpul_tftp_stremreader.h
 HEADERS += device_plugins/arecontvision/streamreader/panoramic_cpul_tftp_stremreader.h
-
-SOURCES += device_plugins/fake/devices/fake_device_server.cpp device_plugins/fake/devices/fake_device.cpp
-SOURCES += device_plugins/fake/streamreader/fake_file_streamreader.cpp
-
-HEADERS += device_plugins/fake/devices/fake_device_server.h device_plugins/fake/devices/fake_device.h
+HEADERS += device_plugins/arecontvision/tools/AVJpegHeader.h
+HEADERS += device_plugins/arecontvision/tools/simple_tftp_client.h
+HEADERS += device_plugins/fake/devices/fake_device.h
+HEADERS += device_plugins/fake/devices/fake_device_server.h
 HEADERS += device_plugins/fake/streamreader/fake_file_streamreader.h
-
-SOURCES +=ui/graphicsview.cpp ui/videoitem/loup_wnd.cpp ui/layout_navigator.cpp ui/layout_editor_wnd.cpp
-HEADERS +=ui/graphicsview.h  ui/videoitem/loup_wnd.h  ui/layout_navigator.h  ui/layout_editor_wnd.h
-
-HEADERS +=ui/videoitem/abstract_scene_item.h  ui/videoitem/static_image_item.h  ui/videoitem/custom_draw_button.h ui/videoitem/img_item.h ui/videoitem/video_wnd_item.h  ui/videoitem/video_wnd_archive_item.h
-SOURCES +=ui/videoitem/abstract_scene_item.cpp  ui/videoitem/static_image_item.cpp ui/videoitem/custom_draw_button.cpp ui/videoitem/img_item.cpp ui/videoitem/video_wnd_item.cpp ui/videoitem/video_wnd_archive_item.cpp
-
-HEADERS +=ui/videoitem/unmoved/abstract_unmoved_item.h ui/videoitem/unmoved/unmoved_pixture_button.h ui/videoitem/unmoved/abstract_animated_unmoved_item.h
-SOURCES +=ui/videoitem/unmoved/abstract_unmoved_item.cpp ui/videoitem/unmoved/unmoved_pixture_button.cpp ui/videoitem/unmoved/abstract_animated_unmoved_item.cpp
-
-HEADERS += ui/video_cam_layout/videocamlayout.h  ui/animation/animation_timeline.h ui/animation/mouse_state.h ui/animation/animated_show.h
-HEADERS += ui/animation/scene_movement.h ui/animation/scene_zoom.h ui/animation/abstract_animation.h ui/animation/item_trans.h ui/animation/animated_bgr.h
-
-SOURCES += ui/video_cam_layout/videocamlayout.cpp ui/animation/animation_timeline.cpp ui/animation/mouse_state.cpp ui/animation/animated_show.cpp
-SOURCES += ui/animation/scene_movement.cpp ui/animation/scene_zoom.cpp ui/animation/abstract_animation.cpp ui/animation/item_trans.cpp ui/animation/animated_bgr.cpp 
-
-
-SOURCES += ui/device_settings/device_settings_dlg.cpp ui/device_settings/device_settings_tab.cpp ui/device_settings/widgets.cpp ui/device_settings/style.cpp ui/device_settings/dlg_factory.cpp
-HEADERS += ui/device_settings/device_settings_dlg.h ui/device_settings/device_settings_tab.h ui/device_settings/widgets.h ui/device_settings/style.h ui/device_settings/dlg_factory.h
-
-SOURCES += ui/device_settings/plugins/arecontvision/arecont_dlg.cpp
+HEADERS += network/netstate.h
+HEADERS += network/nettools.h
+HEADERS += network/ping.h
+HEADERS += network/simple_http_client.h
+HEADERS += network/socket.h
+HEADERS += recorder/fake_recorder_device.h
+HEADERS += recorder/recorder_device.h
+HEADERS += recorder/recorder_display.h
+HEADERS += statistics/statistics.h
+HEADERS += streamreader/cpull_stremreader.h
+HEADERS += streamreader/single_shot_file_reader.h
+HEADERS += streamreader/single_shot_reader.h
+HEADERS += streamreader/streamreader.h
+HEADERS += ui/context_menu_helper.h
+HEADERS += ui/graphicsview.h
+HEADERS += ui/layout_editor_wnd.h
+HEADERS += ui/layout_navigator.h
+HEADERS += ui/ui_common.h
+HEADERS += ui/view_drag_and_drop.h
+HEADERS += ui/animation/abstract_animation.h
+HEADERS += ui/animation/animated_bgr.h
+HEADERS += ui/animation/animated_show.h
+HEADERS += ui/animation/animation_timeline.h
+HEADERS += ui/animation/item_trans.h
+HEADERS += ui/animation/mouse_state.h
+HEADERS += ui/animation/scene_movement.h
+HEADERS += ui/animation/scene_zoom.h
+HEADERS += ui/device_settings/device_settings_dlg.h
+HEADERS += ui/device_settings/device_settings_tab.h
+HEADERS += ui/device_settings/dlg_factory.h
+HEADERS += ui/device_settings/style.h
+HEADERS += ui/device_settings/widgets.h
 HEADERS += ui/device_settings/plugins/arecontvision/arecont_dlg.h
-
-SOURCES += device/device_managmen/device_manager.cpp  device/device_managmen/device_criteria.cpp
-HEADERS += device/device_managmen/device_manager.h  device/device_managmen/device_criteria.h
-
-
-SOURCES += ui/video_cam_layout/layout_manager.cpp ui/video_cam_layout/layout_content.cpp  ui/video_cam_layout/layout_items.cpp  ui/video_cam_layout/start_screen_content.cpp
-HEADERS += ui/video_cam_layout/layout_manager.h ui/video_cam_layout/layout_content.h  ui/video_cam_layout/layout_items.h ui/video_cam_layout/start_screen_content.h
-
-HEADERS += recorder/recorder_device.h  recorder/fake_recorder_device.h  recorder/recorder_display.h
-SOURCES += recorder/recorder_device.cpp  recorder/fake_recorder_device.cpp recorder/recorder_display.cpp
-
-HEADERS += ui/videoitem/recorder_item.h ui/videoitem/layout_item.h ui/ui_common.h ui/context_menu_helper.h ui/view_drag_and_drop.h
-SOURCES += ui/videoitem/recorder_item.cpp ui/videoitem/layout_item.cpp ui/ui_common.cpp ui/context_menu_helper.cpp ui/view_drag_and_drop.cpp
-
+HEADERS += ui/video_cam_layout/layout_content.h
+HEADERS += ui/video_cam_layout/layout_items.h
+HEADERS += ui/video_cam_layout/layout_manager.h
+HEADERS += ui/video_cam_layout/start_screen_content.h
+HEADERS += ui/video_cam_layout/videocamlayout.h
+HEADERS += ui/videoitem/abstract_scene_item.h
+HEADERS += ui/videoitem/custom_draw_button.h
+HEADERS += ui/videoitem/img_item.h
+HEADERS += ui/videoitem/layout_item.h
+HEADERS += ui/videoitem/loup_wnd.h
+HEADERS += ui/videoitem/recorder_item.h
+HEADERS += ui/videoitem/static_image_item.h
+HEADERS += ui/videoitem/video_wnd_archive_item.h
+HEADERS += ui/videoitem/video_wnd_item.h
+HEADERS += ui/videoitem/search/search_edit.h
+HEADERS += ui/videoitem/search/search_filter_item.h
+HEADERS += ui/videoitem/subitem/abstract_image_sub_item.h
+HEADERS += ui/videoitem/subitem/abstract_sub_item.h
+HEADERS += ui/videoitem/subitem/abstract_sub_item_container.h
+HEADERS += ui/videoitem/subitem/recording_sign_item.h
+HEADERS += ui/videoitem/subitem/archive_navifation/archive_navigator_item.h
+HEADERS += ui/videoitem/subitem/archive_navifation/slider_item.h
+HEADERS += ui/videoitem/unmoved/abstract_animated_unmoved_item.h
+HEADERS += ui/videoitem/unmoved/abstract_unmoved_item.h
+HEADERS += ui/videoitem/unmoved/unmoved_pixture_button.h
 HEADERS += videodisplay/complicated_item.h
+
+
+SOURCES += main.cpp
+SOURCES += mainwnd.cpp
+SOURCES += settings.cpp
+SOURCES += video_camera.cpp
+SOURCES += base/bytearray.cpp
+SOURCES += base/log.cpp
+SOURCES += camera/camdisplay.cpp
+SOURCES += camera/camera.cpp
+SOURCES += camera/gl_renderer.cpp
+SOURCES += camera/stream_recorder.cpp
+SOURCES += camera/videostreamdisplay.cpp
+SOURCES += camera/example/videorenderer_soft.cpp
+SOURCES += data/dataprocessor.cpp
+SOURCES += debug/qrc_mainwnd.cpp
+SOURCES += decoders/video/abstractdecoder.cpp
+SOURCES += decoders/video/ffmpeg.cpp
+SOURCES += decoders/video/frame_info.cpp
+SOURCES += decoders/video/ipp_h264_decoder.cpp
+SOURCES += device/asynch_seacher.cpp
+SOURCES += device/device.cpp
+SOURCES += device/device_command_processor.cpp
+SOURCES += device/deviceserver.cpp
+SOURCES += device/directory_browser.cpp
+SOURCES += device/file_device.cpp
+SOURCES += device/network_device.cpp
+SOURCES += device/param.cpp
+SOURCES += device/device_managmen/device_criteria.cpp
+SOURCES += device/device_managmen/device_manager.cpp
+SOURCES += device_plugins/archive/abstract_archive_device.cpp
+SOURCES += device_plugins/archive/abstract_archive_stream_reader.cpp
+SOURCES += device_plugins/archive/archive/archive_device.cpp
+SOURCES += device_plugins/archive/archive/archive_stream_reader.cpp
+SOURCES += device_plugins/archive/avi_files/avi_device.cpp
+SOURCES += device_plugins/archive/avi_files/avi_parser.cpp
+SOURCES += device_plugins/archive/avi_files/avi_strem_reader.cpp
+SOURCES += device_plugins/arecontvision/devices/av_device.cpp
+SOURCES += device_plugins/arecontvision/devices/av_device_server.cpp
+SOURCES += device_plugins/arecontvision/devices/av_panoramic.cpp
+SOURCES += device_plugins/arecontvision/devices/av_singesensor.cpp
+SOURCES += device_plugins/arecontvision/streamreader/av_client_pull.cpp
+SOURCES += device_plugins/arecontvision/streamreader/cpul_file_test.cpp
+SOURCES += device_plugins/arecontvision/streamreader/cpul_httpstremreader.cpp
+SOURCES += device_plugins/arecontvision/streamreader/cpul_tftp_stremreader.cpp
+SOURCES += device_plugins/arecontvision/streamreader/panoramic_cpul_tftp_stremreader.cpp
+SOURCES += device_plugins/arecontvision/tools/AVJpegHeader.cpp
+SOURCES += device_plugins/arecontvision/tools/nalconstructor.cpp
+SOURCES += device_plugins/arecontvision/tools/simple_tftp_client.cpp
+SOURCES += device_plugins/fake/devices/fake_device.cpp
+SOURCES += device_plugins/fake/devices/fake_device_server.cpp
+SOURCES += device_plugins/fake/streamreader/fake_file_streamreader.cpp
+SOURCES += network/netstate.cpp
+SOURCES += network/nettools.cpp
+SOURCES += network/ping.cpp
+SOURCES += network/simple_http_client.cpp
+SOURCES += network/socket.cpp
+SOURCES += recorder/fake_recorder_device.cpp
+SOURCES += recorder/recorder_device.cpp
+SOURCES += recorder/recorder_display.cpp
+SOURCES += release/qrc_mainwnd.cpp
+SOURCES += statistics/statistics.cpp
+SOURCES += streamreader/cpull_stremreader.cpp
+SOURCES += streamreader/single_shot_file_reader.cpp
+SOURCES += streamreader/single_shot_reader.cpp
+SOURCES += streamreader/streamreader.cpp
+SOURCES += ui/context_menu_helper.cpp
+SOURCES += ui/graphicsview.cpp
+SOURCES += ui/layout_editor_wnd.cpp
+SOURCES += ui/layout_navigator.cpp
+SOURCES += ui/ui_common.cpp
+SOURCES += ui/view_drag_and_drop.cpp
+SOURCES += ui/animation/abstract_animation.cpp
+SOURCES += ui/animation/animated_bgr.cpp
+SOURCES += ui/animation/animated_show.cpp
+SOURCES += ui/animation/animation_timeline.cpp
+SOURCES += ui/animation/item_trans.cpp
+SOURCES += ui/animation/mouse_state.cpp
+SOURCES += ui/animation/scene_movement.cpp
+SOURCES += ui/animation/scene_zoom.cpp
+SOURCES += ui/device_settings/device_settings_dlg.cpp
+SOURCES += ui/device_settings/device_settings_tab.cpp
+SOURCES += ui/device_settings/dlg_factory.cpp
+SOURCES += ui/device_settings/style.cpp
+SOURCES += ui/device_settings/widgets.cpp
+SOURCES += ui/device_settings/plugins/arecontvision/arecont_dlg.cpp
+SOURCES += ui/video_cam_layout/layout_content.cpp
+SOURCES += ui/video_cam_layout/layout_items.cpp
+SOURCES += ui/video_cam_layout/layout_manager.cpp
+SOURCES += ui/video_cam_layout/start_screen_content.cpp
+SOURCES += ui/video_cam_layout/videocamlayout.cpp
+SOURCES += ui/videoitem/abstract_scene_item.cpp
+SOURCES += ui/videoitem/custom_draw_button.cpp
+SOURCES += ui/videoitem/img_item.cpp
+SOURCES += ui/videoitem/layout_item.cpp
+SOURCES += ui/videoitem/loup_wnd.cpp
+SOURCES += ui/videoitem/recorder_item.cpp
+SOURCES += ui/videoitem/static_image_item.cpp
+SOURCES += ui/videoitem/video_wnd_archive_item.cpp
+SOURCES += ui/videoitem/video_wnd_item.cpp
+SOURCES += ui/videoitem/search/search_edit.cpp
+SOURCES += ui/videoitem/search/search_filter_item.cpp
+SOURCES += ui/videoitem/subitem/abstract_image_sub_item.cpp
+SOURCES += ui/videoitem/subitem/abstract_sub_item.cpp
+SOURCES += ui/videoitem/subitem/recording_sign_item.cpp
+SOURCES += ui/videoitem/subitem/archive_navifation/archive_navigator_item.cpp
+SOURCES += ui/videoitem/subitem/archive_navifation/slider_item.cpp
+SOURCES += ui/videoitem/unmoved/abstract_animated_unmoved_item.cpp
+SOURCES += ui/videoitem/unmoved/abstract_unmoved_item.cpp
+SOURCES += ui/videoitem/unmoved/unmoved_pixture_button.cpp
 SOURCES += videodisplay/complicated_item.cpp
-
-HEADERS += ui/videoitem/subitem/abstract_sub_item.h  ui/videoitem/subitem/abstract_image_sub_item.h ui/videoitem/subitem/recording_sign_item.h ui/videoitem/subitem/abstract_sub_item_container.h
-SOURCES += ui/videoitem/subitem/abstract_sub_item.cpp  ui/videoitem/subitem/abstract_image_sub_item.cpp ui/videoitem/subitem/recording_sign_item.cpp
-
-HEADERS += ui/videoitem/search/search_edit.h ui/videoitem/search/search_filter_item.h
-SOURCES += ui/videoitem/search/search_edit.cpp ui/videoitem/search/search_filter_item.cpp
-
-
-HEADERS += ui/videoitem/subitem/archive_navifation/archive_navigator_item.h ui/videoitem/subitem/archive_navifation/slider_item.h
-SOURCES += ui/videoitem/subitem/archive_navifation/archive_navigator_item.cpp ui/videoitem/subitem/archive_navifation/slider_item.cpp
-
-HEADERS += device_plugins/archive/abstract_archive_device.h device_plugins/archive/abstract_archive_stream_reader.h
-SOURCES += device_plugins/archive/abstract_archive_device.cpp device_plugins/archive/abstract_archive_stream_reader.cpp
-
-HEADERS += device_plugins/archive/archive/archive_stream_reader.h  device_plugins/archive/archive/archive_device.h
-SOURCES += device_plugins/archive/archive/archive_stream_reader.cpp device_plugins/archive/archive/archive_device.cpp
-
-HEADERS += device_plugins/archive/avi_files/avi_parser.h  device_plugins/archive/avi_files/avi_strem_reader.h device_plugins/archive/avi_files/avi_device.h
-SOURCES += device_plugins/archive/avi_files/avi_parser.cpp  device_plugins/archive/avi_files/avi_strem_reader.cpp device_plugins/archive/avi_files/avi_device.cpp
-
-
