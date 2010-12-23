@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
 
 
 
-	CLDecoderFactory::setCodecManufacture(CLDecoderFactory::FFMPEG);
+	CLVideoDecoderFactory::setCodecManufacture(CLVideoDecoderFactory::FFMPEG);
 
 	//============================
 	CLDeviceManager::instance().getDiveceSercher().addDeviceServer(&AVDeviceServer::instance());

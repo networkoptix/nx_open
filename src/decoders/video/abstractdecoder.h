@@ -21,7 +21,7 @@ private:
 
 };
 
-class CLDecoderFactory
+class CLVideoDecoderFactory
 {
 public:
 	enum CLCodecManufacture{FFMPEG, INTELIPP};

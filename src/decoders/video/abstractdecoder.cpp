@@ -2,9 +2,9 @@
 #include "ffmpeg.h"
 #include "ipp_h264_decoder.h"
 
-CLDecoderFactory::CLCodecManufacture CLDecoderFactory::m_codecManufacture = FFMPEG;
+CLVideoDecoderFactory::CLCodecManufacture CLVideoDecoderFactory::m_codecManufacture = FFMPEG;
 
-CLAbstractVideoDecoder* CLDecoderFactory::createDecoder(CLVideoCodecType codec)
+CLAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder(CLVideoCodecType codec)
 {
 
 	if (codec == CL_JPEG)

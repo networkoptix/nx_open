@@ -27,14 +27,13 @@ struct CLAbstractMediaData : public CLAbstractData
 
 	CLByteArray data;
 	DataType dataType;
-	CLVideoCodecType compressionType;
+	
 
 
 	quint32 channel_num;
 	//QTime time;
 
 
-	quint32 source_id;
 
 private:
 
@@ -57,8 +56,24 @@ struct CLCompressedVideoData : public CLAbstractMediaData
 	int height;
 	bool keyFrame;
 	bool use_twice; // some decoders delay video frame by one;
+	CLVideoCodecType compressionType;
 
 };
+
+
+struct CLCompressedAudioData : public CLAbstractMediaData
+{
+	CLCompressedAudioData (unsigned int alignment, unsigned int capacity):
+	CLAbstractMediaData(alignment, capacity)
+
+	{
+		dataType = AUDIO;
+	}
+
+	//CLAudioCodecType compressionType;
+
+};
+
 
 typedef CLThreadQueue<CLAbstractData*> CLDataQueue;
 

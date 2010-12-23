@@ -2,16 +2,19 @@ QT = core gui network xml opengl
 TEMPLATE = app
 VERSION = 0.0.1
 
-
 TARGET = uniclient
-
 DESTDIR = ../bin
-
 
 INCLUDEPATH += ../contrib/ffmpeg24894/include
 
-SOURCES = main.cpp mainwnd.cpp video_camera.cpp settings.cpp
+RESOURCES += mainwnd.qrc
+FORMS += mainwnd.ui
+#LIBS += ../contrib/ffmpeg/libs
 
+
+
+
+SOURCES = main.cpp mainwnd.cpp video_camera.cpp settings.cpp
 SOURCES += base/log.cpp base/bytearray.cpp
 SOURCES += camera/camera.cpp
 SOURCES += data/dataprocessor.cpp
@@ -108,7 +111,4 @@ SOURCES += device_plugins/archive/archive/archive_stream_reader.cpp device_plugi
 HEADERS += device_plugins/archive/avi_files/avi_parser.h  device_plugins/archive/avi_files/avi_strem_reader.h device_plugins/archive/avi_files/avi_device.h
 SOURCES += device_plugins/archive/avi_files/avi_parser.cpp  device_plugins/archive/avi_files/avi_strem_reader.cpp device_plugins/archive/avi_files/avi_device.cpp
 
-RESOURCES += mainwnd.qrc
-FORMS += mainwnd.ui
-#LIBS += ../contrib/ffmpeg/libs
 
