@@ -27,13 +27,8 @@ struct CLAbstractMediaData : public CLAbstractData
 
 	CLByteArray data;
 	DataType dataType;
-	
-
-
-	quint32 channel_num;
-	//QTime time;
-
-
+	CLCodecType compressionType;
+	quint64 timestamp; // milisec
 
 private:
 
@@ -56,7 +51,7 @@ struct CLCompressedVideoData : public CLAbstractMediaData
 	int height;
 	bool keyFrame;
 	bool use_twice; // some decoders delay video frame by one;
-	CLVideoCodecType compressionType;
+	quint32 channel_num; // video channel number; some devices might have more that one sensor.
 
 };
 
@@ -70,7 +65,8 @@ struct CLCompressedAudioData : public CLAbstractMediaData
 		dataType = AUDIO;
 	}
 
-	//CLAudioCodecType compressionType;
+	int freq;
+	int channels;
 
 };
 

@@ -24,6 +24,7 @@ private:
 
 	int m_channels;
 	int m_curr_channel;
+	quint64 m_time;
 
 	static unsigned char* data;
 	static unsigned char* descr;

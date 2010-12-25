@@ -12,7 +12,9 @@
 CLAVIStreamReader::CLAVIStreamReader(CLDevice* dev ):
 CLAbstractArchiveReader(dev),
 m_videoStrmIndex(-1),
-mFirstTime(true)
+m_audioStrmIndex(-1),
+mFirstTime(true),
+m_formatContext(0)
 {
 	//init();
 }
@@ -78,40 +80,64 @@ bool CLAVIStreamReader::init()
 			if (m_videoStrmIndex == -1) // Take only first video stream
 				m_videoStrmIndex = i;
 			break;
+
+		case AVMEDIA_TYPE_AUDIO:
+			if (m_audioStrmIndex == -1) // Take only first audio stream
+				m_audioStrmIndex = i;
+			break;
+
 		default:
 			break;
 		}
 	}
 
 
-	int ffmpeg_codec_id = m_formatContext->streams[m_videoStrmIndex]->codec->codec_id;
+	CodecID ffmpeg_video_codec_id = m_formatContext->streams[m_videoStrmIndex]->codec->codec_id;
 
-	switch(ffmpeg_codec_id)
+	switch(ffmpeg_video_codec_id)
 	{
 	case CODEC_ID_MSVIDEO1:
-		m_codec_id =CL_MSVIDEO1;
+		m_videocodec_id =CL_MSVIDEO1;
 		break;
 
 
 	case CODEC_ID_MJPEG:
-		m_codec_id =CL_JPEG;
+		m_videocodec_id =CL_JPEG;
 		break;
 
 	case CODEC_ID_MPEG2VIDEO:
-		m_codec_id = CL_MPEG2;
+		m_videocodec_id = CL_MPEG2;
 		break;
 
 
 	case CODEC_ID_MPEG4:
-		m_codec_id = CL_MPEG4;
+		m_videocodec_id = CL_MPEG4;
 		break;
 
 	case CODEC_ID_H264:
-		m_codec_id = CL_H264;
+		m_videocodec_id = CL_H264;
 		break;
 	default:
 		destroy();
 		return false;
+	}
+
+	if (m_audioStrmIndex!=-1)
+	{
+
+		AVCodecContext *aCodecCtx = m_formatContext->streams[m_audioStrmIndex]->codec;
+		CodecID ffmpeg_audio_codec_id = aCodecCtx->codec_id;
+		m_freq = aCodecCtx->sample_rate;
+		m_channels = aCodecCtx->channels;
+
+
+		switch(ffmpeg_audio_codec_id )
+		{
+		case CODEC_ID_MP3:
+			m_audiocodec_id =CL_MP3;
+			break;
+		}
+
 	}
 
 
@@ -181,9 +207,10 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 	/**/
 
 
-	videoData->compressionType = m_codec_id;
+	videoData->compressionType = m_videocodec_id;
 	videoData->keyFrame = 1;//m_formatContext->streams[m_videoStrmIndex]->codec->coded_frame->key_frame;
 	videoData->channel_num = 0;
+	videoData->timestamp = m_cuur_time;
 
 	videoData->use_twice = m_use_twice;
 	m_use_twice = false;

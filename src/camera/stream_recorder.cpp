@@ -81,6 +81,10 @@ void CLStreamRecorder::processData(CLAbstractData* data)
 		onFirstdata(data);
 	}
 
+	CLAbstractMediaData* md = static_cast<CLAbstractMediaData*>(data);
+	if (md->dataType != CLAbstractMediaData::VIDEO)
+		return;
+
 	CLCompressedVideoData *vd= static_cast<CLCompressedVideoData*>(data);
 	int channel = vd->channel_num;
 
@@ -104,8 +108,8 @@ void CLStreamRecorder::processData(CLAbstractData* data)
 		mDescr[channel]->write((char*)(&mVersion), 4); // version
 	}
 
-	QDateTime time = QDateTime::currentDateTime();
-	quint64 t64 = time.toMSecsSinceEpoch();
+	
+	quint64 t64 = vd->timestamp;
 
 	unsigned int data_size = vd->data.size();
 	unsigned int codec = (unsigned int)vd->compressionType;

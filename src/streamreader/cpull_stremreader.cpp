@@ -81,6 +81,9 @@ void CLClientPullStreamreader::run()
 		}
 
 
+		CLCompressedVideoData* videoData = ( data->dataType == CLAbstractMediaData::VIDEO) ? static_cast<CLCompressedVideoData *>(data) : 0;
+
+
 		if (frames_lost>0) // we are alive again
 		{
 			if (frames_lost>=2)
@@ -96,13 +99,12 @@ void CLClientPullStreamreader::run()
 		
 		
 
-		if (needKeyData())
+		if (videoData && needKeyData())
 		{
 			// I do not like; need to do smth with it 
-			CLCompressedVideoData *comp_data = static_cast<CLCompressedVideoData *>(data);
-			if (comp_data->keyFrame)
+			if (videoData->keyFrame)
 			{
-				if (data->channel_num>CL_MAX_CHANNEL_NUMBER-1)
+				if (videoData->channel_num>CL_MAX_CHANNEL_NUMBER-1)
 				{
 					Q_ASSERT(false);
 					data->releaseRef();
@@ -111,7 +113,7 @@ void CLClientPullStreamreader::run()
 
 
 
-				m_gotKeyFrame[data->channel_num]++;
+				m_gotKeyFrame[videoData->channel_num]++;
 
 			}
 			else
@@ -129,7 +131,8 @@ void CLClientPullStreamreader::run()
 		// put it in queue
 		//m_dataqueue[channel_num]->push(data);
 
-		m_stat[data->channel_num].onData(data->data.size());
+		if (videoData)
+			m_stat[videoData->channel_num].onData(data->data.size());
 
 	}
 

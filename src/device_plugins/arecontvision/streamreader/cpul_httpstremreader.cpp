@@ -213,6 +213,8 @@ CLAbstractMediaData* AVClientPullSSHTTPStreamreader::getNextData()
 
 	videoData->channel_num = 0;
 
+	videoData->timestamp = QDateTime::currentMSecsSinceEpoch();
+
 	return videoData;
 
 }

@@ -36,9 +36,18 @@ protected:
 	int m_prev_time;
 
 	AVFormatContext* m_formatContext;
+
 	int	m_videoStrmIndex;
+	int	m_audioStrmIndex;
+
 	AVPacket m_packet;
-	CLVideoCodecType m_codec_id;
+
+	CLCodecType m_videocodec_id;
+	CLCodecType m_audiocodec_id;
+
+	int m_freq;
+	int m_channels;
+
 	bool mFirstTime;
 
 

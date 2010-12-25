@@ -162,10 +162,12 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
 	int readed = m_data_stream[channel].readRawData(data.data(), finfo.size);
 	data.done(readed);
 
-	videoData->compressionType = CLVideoCodecType(finfo.codec);
+	videoData->compressionType = CLCodecType(finfo.codec);
 	videoData->keyFrame = finfo.keyFrame;
 	videoData->channel_num = channel;
 	videoData->use_twice = m_use_twice;
+	videoData->timestamp = finfo.time_ms;
+
 	m_use_twice = false;
 
 
@@ -191,7 +193,7 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
 	}
 	else
 	{
-		if (new_index - mCurrIndex[channel] !=1 )
+		if (new_index - mCurrIndex[channel] !=1 ) // if need to seek file 
 		{
 			int shift = mMovie[channel].at(new_index).shift;
 			m_data_file[channel].seek(shift);

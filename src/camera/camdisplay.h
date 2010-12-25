@@ -6,6 +6,7 @@
 #include "videostreamdisplay.h"
 #include "abstractrenderer.h"
 #include "../device/device_video_layout.h"
+#include "base/adaptivesleep.h"
 
 // stores CLVideoStreamDisplay for each channel/sensor
 class CLCamDisplay : public CLAbstractDataProcessor
@@ -22,7 +23,8 @@ public:
 
 private:
 	CLVideoStreamDisplay* m_display[CL_MAX_CHANNELS];
-
+	quint64 m_prev_time;
+	CLAdaptiveSleep m_delay;
 	
 
 };

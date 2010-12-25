@@ -5,7 +5,9 @@
 
 #define CL_VARIOUSE_DECODERS 5  // jpeg, h264
 
-enum CLVideoCodecType {CL_JPEG = 0, CL_H264 = 1, CL_MPEG2=2, CL_MPEG4=3, CL_MSVIDEO1=4};
+enum CLCodecType {CL_JPEG = 0, CL_H264 = 1, CL_MPEG2=2, CL_MPEG4=3, CL_MSVIDEO1=4, CL_MP3=5};
+
+
 enum CLColorSpace{CL_DECODER_YUV420 = 0, CL_DECODER_YUV422 = 1, CL_DECODER_YUV444 = 2 , CL_DECODER_RGB24 = 3};
 
 struct CLVideoDecoderOutput
@@ -45,7 +47,7 @@ bool m_needToclean;
 
 struct CLVideoData
 {
-	CLVideoCodecType codec; 
+	CLCodecType codec; 
 
 	//out frame info;
 	//client needs only define ColorSpace out_type; decoder will setup ather variables

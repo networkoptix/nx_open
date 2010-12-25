@@ -17,7 +17,7 @@ struct MpegEncContext;
 class CLFFmpegVideoDecoder : public CLAbstractVideoDecoder
 {
 public:
-	CLFFmpegVideoDecoder(CLVideoCodecType codec);
+	CLFFmpegVideoDecoder(CLCodecType codec);
 	bool decode(CLVideoData& data);
 	~CLFFmpegVideoDecoder();
 
@@ -81,7 +81,7 @@ private:
 
 
 	static bool m_first_instance;
-	CLVideoCodecType m_codec;
+	CLCodecType m_codec;
 	bool m_showmotion;
 	bool m_lightCPUMode;
 	bool m_wantEscapeFromLightCPUMode;

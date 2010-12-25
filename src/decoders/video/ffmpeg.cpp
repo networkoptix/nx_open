@@ -128,7 +128,7 @@ CLFFmpegVideoDecoder::CodecDll::~CodecDll()
 //================================================
 
 
-CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CLVideoCodecType codec_id):
+CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CLCodecType codec_id):
 c(0),
 m_width(0),
 m_height(0),
