@@ -52,6 +52,8 @@ protected:
 
 
 	volatile bool m_wakeup;
+
+	bool m_bsleep;
 	
 
 };

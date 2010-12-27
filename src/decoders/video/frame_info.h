@@ -4,8 +4,6 @@
 #include "data\mediadata.h"
 
 
-#define CL_VARIOUSE_DECODERS 5  // jpeg, h264
-
 
 enum CLColorSpace{CL_DECODER_YUV420 = 0, CL_DECODER_YUV422 = 1, CL_DECODER_YUV444 = 2 , CL_DECODER_RGB24 = 3};
 

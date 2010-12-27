@@ -60,8 +60,9 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data)
 
 	}
 
+	
 
-	if (dec->decode(img))
+	if (dec && dec->decode(img))
 	{
 		if (m_draw)	
 			m_draw->draw(img.out_frame, data->channel_num);

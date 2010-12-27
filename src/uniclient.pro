@@ -1,4 +1,4 @@
-QT = core gui network xml opengl
+QT = core gui network xml opengl multimedia
 TEMPLATE = app
 VERSION = 0.0.1
 
@@ -30,6 +30,7 @@ HEADERS += base/rand.h
 HEADERS += base/sleep.h
 HEADERS += base/threadqueue.h
 HEADERS += camera/abstractrenderer.h
+HEADERS += camera/audiostreamdisplay.h
 HEADERS += camera/camdisplay.h
 HEADERS += camera/camera.h
 HEADERS += camera/gl_renderer.h
@@ -144,6 +145,7 @@ SOURCES += settings.cpp
 SOURCES += video_camera.cpp
 SOURCES += base/bytearray.cpp
 SOURCES += base/log.cpp
+SOURCES += camera/audiostreamdisplay.cpp
 SOURCES += camera/camdisplay.cpp
 SOURCES += camera/camera.cpp
 SOURCES += camera/gl_renderer.cpp

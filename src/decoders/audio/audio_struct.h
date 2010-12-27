@@ -2,26 +2,22 @@
 #define audio_struct_h1530
 
 #include "data\mediadata.h"
-
-class CLAudioDecoderOutput
-{
-
-};
+#include <QAudioFormat>
 
 
 // input to the decoder 
 struct CLAudioData
 {
-
 	CLCodecType codec; 
 
-	//out frame info;
-	//client needs only define ColorSpace out_type; decoder will setup ather variables
-	CLAudioDecoderOutput uncompressed_audio_data; 
-
 	const unsigned char* inbuf; // pointer to compressed data
-	int buff_len; // compressed data len
+	int inbuf_len; // compressed data len
 
+
+	unsigned char* outbuf; // pointer where decoder puts decompressed data; user is responsable to provide big enought outbuf
+	int outbuf_len;
+
+	QAudioFormat format;
 };
 
 #endif //audio_struct_h1530

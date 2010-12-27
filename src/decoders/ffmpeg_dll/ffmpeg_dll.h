@@ -26,6 +26,7 @@ public:
 	typedef int (*dll_avcodec_decode_video)(AVCodecContext *avctx, AVFrame *picture, int *got_picture_ptr, unsigned char *buf, int buf_size) ;
 	typedef void (*dll_ff_print_debug_info)(MpegEncContext *s, AVFrame *pict);
 	typedef void  (*dll_av_log_set_callback)(void(*callback)(void *, int, const char *, va_list)) ;
+	typedef int (*dll_avcodec_decode_audio2)(AVCodecContext *avctx, int16_t *samples, int *frame_size_ptr, const uint8_t *buf, int buf_size);
 
 
 
@@ -38,8 +39,12 @@ public:
 	dll_avcodec_close avcodec_close;
 	dll_av_free av_free;
 	dll_avcodec_decode_video avcodec_decode_video;
+	dll_avcodec_decode_audio2 avcodec_decode_audio2;
+
 	dll_ff_print_debug_info ff_print_debug_info;
 	dll_av_log_set_callback av_log_set_callback;
+	
+	
 private:
 	HINSTANCE m_dll, m_dll2;
 };

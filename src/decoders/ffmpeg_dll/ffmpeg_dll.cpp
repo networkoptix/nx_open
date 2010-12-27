@@ -39,7 +39,7 @@ FFMPEGCodecDll::FFMPEGCodecDll()
 bool FFMPEGCodecDll::init()
 {
 
-	QDir::setCurrent("./old_ffmpeg");
+	QDir::setCurrent("./new_ffmpeg");
 
 	//m_dll  = ::LoadLibrary(L"avcodec-52.dll");
 	m_dll  = ::LoadLibrary(L"avcodec-51.dll");
@@ -105,6 +105,11 @@ bool FFMPEGCodecDll::init()
 	avcodec_decode_video = reinterpret_cast<dll_avcodec_decode_video>(::GetProcAddress(m_dll, "avcodec_decode_video"));
 	if (!avcodec_decode_video)
 		return false;
+
+	avcodec_decode_audio2 = reinterpret_cast<dll_avcodec_decode_audio2>(::GetProcAddress(m_dll, "avcodec_decode_audio2"));
+	if (!avcodec_decode_audio2)
+		return false;
+
 	//==================================================================================
 
 	QDir::setCurrent("../");

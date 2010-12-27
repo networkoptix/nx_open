@@ -1,6 +1,8 @@
 #include "camdisplay.h"
 #include "../data/mediadata.h"
 #include "../device/device_video_layout.h"
+#include "videostreamdisplay.h"
+#include "audiostreamdisplay.h"
 
 #define CL_MAX_DISPLAY_QUEUE_SIZE 10
 
@@ -14,12 +16,16 @@ m_palyaudio(false)
 {
 	for (int i = 0; i< CL_MAX_CHANNELS; ++i)
 		m_display[i] = 0;
+
+	m_aydio_display = new CLAudioStreamDisplay(500);
 }
 
 CLCamDisplay::~CLCamDisplay()
 {
 	for (int i = 0; i< CL_MAX_CHANNELS; ++i)
 		delete m_display[i];
+
+	delete m_aydio_display;
 }
 
 void CLCamDisplay::addVideoChannel(int index, CLAbstractRenderer* vw)
@@ -75,9 +81,9 @@ void CLCamDisplay::processData(CLAbstractData* data)
 		if (m_display[channel])	
 			m_display[channel]->dispay(vd);
 	}
-	else if (ad && m_palyaudio)
+	else if (ad )//&& m_palyaudio)
 	{
-
+		m_aydio_display->putdata(ad);
 	}
 
 

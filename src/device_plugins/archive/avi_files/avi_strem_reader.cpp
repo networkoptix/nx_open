@@ -14,7 +14,8 @@ CLAbstractArchiveReader(dev),
 m_videoStrmIndex(-1),
 m_audioStrmIndex(-1),
 mFirstTime(true),
-m_formatContext(0)
+m_formatContext(0),
+m_bsleep(false)
 {
 	//init();
 }
@@ -136,6 +137,15 @@ bool CLAVIStreamReader::init()
 		case CODEC_ID_MP3:
 			m_audiocodec_id =CL_MP3;
 			break;
+
+		case CODEC_ID_AC3:
+			m_audiocodec_id = CL_AC3;
+			break;
+
+		case CODEC_ID_WMAV2:
+			m_audiocodec_id =CL_WMAV2;
+			break;
+
 		}
 
 	}
@@ -159,7 +169,7 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 	if (!m_formatContext || m_videoStrmIndex==-1)
 		return 0;
 
-	if (!isSingleShotMode())			
+	if (m_bsleep && !isSingleShotMode())			
 		smart_sleep(m_need_tosleep);
 	
 
@@ -170,65 +180,110 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 		if (!getNextPacket())
 			return 0;
 
-		unsigned long duration = m_formatContext->streams[m_videoStrmIndex]->duration;
-		if (duration==0)
-			duration = 1;
-
-		m_cuur_time =  qreal(m_len_msec)*m_packet.dts/duration;
-		//m_need_tosleep = m_len_msec/duration;
-
-		if (m_need_tosleep==0 && m_prev_time!=-1)
+		if (m_packet.stream_index == m_videoStrmIndex) // in case of video packet 
 		{
-			// we assume that we have constant frame rate 
-			m_need_tosleep = m_cuur_time-m_prev_time;
+			unsigned long duration = m_formatContext->streams[m_videoStrmIndex]->duration;
+			if (duration==0)
+				duration = 1;
 
+			m_cuur_time =  qreal(m_len_msec)*m_packet.dts/duration;
+			//m_need_tosleep = m_len_msec/duration;
+
+			if (m_need_tosleep==0 && m_prev_time!=-1)
+			{
+				// we assume that we have constant frame rate 
+				m_need_tosleep = m_cuur_time-m_prev_time;
+
+			}
+
+			m_prev_time = m_cuur_time;
 		}
 
-		m_prev_time = m_cuur_time;
 
 	}
 
+
+	if (m_packet.stream_index == m_videoStrmIndex) // in case of video packet 
+	{
+		m_bsleep = true; // sleep only in case of video
+
+
+		//int extra = FF_INPUT_BUFFER_PADDING_SIZE;
+		int extra = 0;
+		CLCompressedVideoData* videoData = new CLCompressedVideoData(0,m_packet.size + extra);
+		CLByteArray& data = videoData->data;
+
+		data.prepareToWrite(m_packet.size + extra);
+		memcpy(data.data(), m_packet.data, m_packet.size);
+		memset(data.data() + m_packet.size, 0, extra);
+		data.done(m_packet.size + extra);
+
+		/*	
+		FILE* f = fopen("test.mp3", "ab");
+		fwrite(data.data(), 1, data.size(), f);
+		fclose(f);
+		/**/
+
+
+		videoData->compressionType = m_videocodec_id;
+		videoData->keyFrame = 1;//m_formatContext->streams[m_videoStrmIndex]->codec->coded_frame->key_frame;
+		videoData->channel_num = 0;
+		videoData->timestamp = m_cuur_time;
+
+		videoData->use_twice = m_use_twice;
+		m_use_twice = false;
+
+
+
+		if (videoData->keyFrame)
+			m_gotKeyFrame[0] = true;
+
+		//=================
+		if (isSingleShotMode())
+			pause();
+
+		avidll.av_free_packet(&m_packet);
+		return videoData;
+
+	}
 	
-	//int extra = FF_INPUT_BUFFER_PADDING_SIZE;
-	int extra = 0;
+	else if (m_packet.stream_index == m_audioStrmIndex) // in case of audio packet 
+	{
 
-	CLCompressedVideoData* videoData = new CLCompressedVideoData(0,m_packet.size + extra);
-	CLByteArray& data = videoData->data;
+		m_bsleep = false;
 
-	data.prepareToWrite(m_packet.size + extra);
-	memcpy(data.data(), m_packet.data, m_packet.size);
-	memset(data.data() + m_packet.size, 0, extra);
-	data.done(m_packet.size + extra);
+		int extra = 0;
+		CLCompressedAudioData* audioData = new CLCompressedAudioData(0,m_packet.size + extra);
+		CLByteArray& data = audioData->data;
 
-	/*	
-	FILE* f = fopen("test.mp3", "ab");
-	fwrite(data.data(), 1, data.size(), f);
-	fclose(f);
+		data.prepareToWrite(m_packet.size + extra);
+		memcpy(data.data(), m_packet.data, m_packet.size);
+		memset(data.data() + m_packet.size, 0, extra);
+		data.done(m_packet.size + extra);
+
+
+		//FILE* f = fopen("test.mp3", "ab");
+		//fwrite(data.data(), 1, data.size(), f);
+		//fclose(f);
+
+
+
+		audioData->compressionType = m_audiocodec_id;
+		audioData->channels = m_channels;
+
+		audioData->freq = m_freq;
+
+		//cl_log.log("avi parser: au ps = ", (int)audioData->data.size(), cl_logALWAYS);
+
+		avidll.av_free_packet(&m_packet);
+		return audioData;
+	}
 	/**/
 
-
-	videoData->compressionType = m_videocodec_id;
-	videoData->keyFrame = 1;//m_formatContext->streams[m_videoStrmIndex]->codec->coded_frame->key_frame;
-	videoData->channel_num = 0;
-	videoData->timestamp = m_cuur_time;
-
-	videoData->use_twice = m_use_twice;
-	m_use_twice = false;
-
-
-
-	if (videoData->keyFrame)
-		m_gotKeyFrame[0] = true;
-
-	//=================
-	if (isSingleShotMode())
-		pause();
-
 	
-
 	avidll.av_free_packet(&m_packet);
 
-	return videoData;
+	return 0;
 
 }
 
@@ -280,8 +335,7 @@ bool CLAVIStreamReader::getNextPacket()
 				return false;
 		}
 
-		if (m_packet.stream_index != m_videoStrmIndex)
-		//if (m_packet.stream_index != m_audioStrmIndex)
+		if (m_packet.stream_index != m_videoStrmIndex && m_packet.stream_index != m_audioStrmIndex)
 		{
 			avidll.av_free_packet(&m_packet);
 			continue;

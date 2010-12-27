@@ -21,4 +21,6 @@ CLAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder(CLCodecType codec)
 		return new CLFFmpegVideoDecoder(codec);
 	    break;
 	}
+
+	return 0;
 }
