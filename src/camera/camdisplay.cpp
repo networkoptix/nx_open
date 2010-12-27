@@ -9,7 +9,8 @@
 CLCamDisplay::CLCamDisplay():
 CLAbstractDataProcessor(CL_MAX_DISPLAY_QUEUE_SIZE),
 m_prev_time(0),
-m_delay(50) // do put a big value here to avoid cpu usage in case of zoom out 
+m_delay(50), // do put a big value here to avoid cpu usage in case of zoom out 
+m_palyaudio(false)
 {
 	for (int i = 0; i< CL_MAX_CHANNELS; ++i)
 		m_display[i] = 0;
@@ -44,8 +45,8 @@ void CLCamDisplay::processData(CLAbstractData* data)
 	if (vd)
 	{
 
-		// simple data provider/streamer/streamreader has the same delay, bu who cares ?
-		// to avoid cpu usage in case of a lot data in queue(zoomed out on the scene, lets add same dalays here )
+		// simple data provider/streamer/streamreader has the same delay, but who cares ?
+		// to avoid cpu usage in case of a lot data in queue(zoomed out on the scene, lets add same delays here )
 
 		quint64 curr_time = vd->timestamp;
 
@@ -56,12 +57,12 @@ void CLCamDisplay::processData(CLAbstractData* data)
 
 		m_prev_time = curr_time;
 
-		//===== to avoid unrelated strems / stop play delays 
+		//===== to avoid unrelated streams / stop play delays 
 		if (need_to_sleep<0)
 			need_to_sleep = 0;
 
-		if (need_to_sleep>1000)
-			need_to_sleep = 2;
+		if (need_to_sleep>500) // in case of key frame only and sliding archive slider forward - would not look good; need to do smth
+			need_to_sleep = 0;
 		//=========
 
 
@@ -74,7 +75,7 @@ void CLCamDisplay::processData(CLAbstractData* data)
 		if (m_display[channel])	
 			m_display[channel]->dispay(vd);
 	}
-	else if (ad)
+	else if (ad && m_palyaudio)
 	{
 
 	}
@@ -97,4 +98,9 @@ void CLCamDisplay::coppyImage(bool copy)
 	for (int i = 0; i< CL_MAX_CHANNELS; ++i)
 		if (m_display[i])
 			m_display[i]->coppyImage(copy);
+}
+
+void CLCamDisplay::playAudio(bool play)
+{
+	m_palyaudio = play;
 }

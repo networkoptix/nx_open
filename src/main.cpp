@@ -6,7 +6,6 @@
 #include "device/asynch_seacher.h"
 #include "base/log.h"
 #include "decoders/video/ipp_h264_decoder.h"
-#include "decoders/video/ffmpeg.h"
 #include "device_plugins/arecontvision/devices/av_device_server.h"
 #include "device_plugins/fake/devices/fake_device_server.h"
 
@@ -17,8 +16,9 @@
 #include "ui/video_cam_layout/layout_manager.h"
 #include "ui/context_menu_helper.h"
 #include "device_plugins/archive/avi_files/avi_parser.h"
+#include "decoders/ffmpeg_dll/ffmpeg_dll.h"
 
-
+extern FFMPEGCodecDll global_ffmpeg_dll;
 
 
 int main(int argc, char *argv[])
@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
 
 	//===========================================================================
 	//IPPH264Decoder::dll.init();
-	if (!CLFFmpegVideoDecoder::dll.init() || !avidll.init())
+	if (!global_ffmpeg_dll.init() || !avidll.init())
 	{
 		cl_log.log("Cannot load FFMPEG dlls", cl_logERROR);
 		QMessageBox msgBox;

@@ -351,7 +351,7 @@ void CLArchiveNavigatorItem::sliderPressed()
 
 void CLArchiveNavigatorItem::sliderReleased()
 {
-	cl_log.log("RELEASED",  cl_logALWAYS);
+	//cl_log.log("RELEASED",  cl_logALWAYS);
 	mSliderIsmoving = false;
 
 	if (mPlayMode)

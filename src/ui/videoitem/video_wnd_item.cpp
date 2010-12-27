@@ -73,9 +73,16 @@ void CLVideoWindowItem::setItemSelected(bool sel, bool animate, int delay )
 	CLImageItem::setItemSelected(sel, animate, delay);
 
 	if (m_selected)
+	{
 		getVideoCam()->setQuality(CLStreamreader::CLSHighest, true);
+		getVideoCam()->getCamCamDisplay()->playAudio(true);
+
+	}
 	else
+	{
 		getVideoCam()->setQuality(CLStreamreader::CLSNormal, false);
+		getVideoCam()->getCamCamDisplay()->playAudio(false);
+	}
 
 }
 

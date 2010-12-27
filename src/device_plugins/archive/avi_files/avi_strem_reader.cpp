@@ -159,7 +159,7 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 	if (!m_formatContext || m_videoStrmIndex==-1)
 		return 0;
 
-	if (!isSingleShotMode())	
+	if (!isSingleShotMode())			
 		smart_sleep(m_need_tosleep);
 	
 
@@ -167,7 +167,7 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 	{
 		QMutexLocker mutex(&m_cs);
 
-		if (!getNextVideoPacket())
+		if (!getNextPacket())
 			return 0;
 
 		unsigned long duration = m_formatContext->streams[m_videoStrmIndex]->duration;
@@ -200,8 +200,8 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 	memset(data.data() + m_packet.size, 0, extra);
 	data.done(m_packet.size + extra);
 
-	/*/
-	FILE* f = fopen("test.264_", "wb");
+	/*	
+	FILE* f = fopen("test.mp3", "ab");
 	fwrite(data.data(), 1, data.size(), f);
 	fclose(f);
 	/**/
@@ -259,7 +259,7 @@ void CLAVIStreamReader::destroy()
 }
 
 
-bool CLAVIStreamReader::getNextVideoPacket()
+bool CLAVIStreamReader::getNextPacket()
 {
 	while(1)
 	{
@@ -281,6 +281,7 @@ bool CLAVIStreamReader::getNextVideoPacket()
 		}
 
 		if (m_packet.stream_index != m_videoStrmIndex)
+		//if (m_packet.stream_index != m_audioStrmIndex)
 		{
 			avidll.av_free_packet(&m_packet);
 			continue;

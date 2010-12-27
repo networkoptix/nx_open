@@ -5,8 +5,8 @@
 #include "../base/bytearray.h"
 #include <QString>
 #include <QTime>
-#include "decoders/video/frame_info.h"
 
+enum CLCodecType {CL_JPEG = 0, CL_H264 = 1, CL_MPEG2=2, CL_MPEG4=3, CL_MSVIDEO1=4, CL_MP3=5};
 
 
 struct CLAbstractMediaData : public CLAbstractData

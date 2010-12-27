@@ -1,129 +1,18 @@
 #include "ffmpeg.h"
 
-#include "libavcodec/avcodec.h"
-#include <tchar.h>
+
+
 #include <QMutexLocker>
-#include <QDir>
-#include "base/log.h"
+#include "..\ffmpeg_dll\ffmpeg_dll.h"
+
+
+extern QMutex global_ffmpeg_mutex;
+extern FFMPEGCodecDll global_ffmpeg_dll;
+
 
 #define LIGHT_CPU_MODE_FRAME_PERIOD 30
-
-CLFFmpegVideoDecoder::CodecDll CLFFmpegVideoDecoder::dll;
 bool CLFFmpegVideoDecoder::m_first_instance = true;
-QMutex CLFFmpegVideoDecoder::m_static_mutex;
 
-
-
-void decoderLogCallback(void* pParam, int i, const char* szFmt, va_list args)
-{
-	//USES_CONVERSION;
-
-	//Ignore debug and info (i == 2 || i == 1) messages
-	if(AV_LOG_ERROR != i)
-	{
-		//return;
-	}
-
-	AVCodecContext* pCtxt = (AVCodecContext*)pParam;
-
-
-
-	char szMsg[1024];
-	vsprintf(szMsg, szFmt, args);
-	//if(szMsg[strlen(szMsg)] == '\n')
-	{	
-		szMsg[strlen(szMsg)-1] = 0;
-	}
-
-	cl_log.log("FFMPEG ", szMsg, cl_logERROR);
-}
-
-CLFFmpegVideoDecoder::CodecDll::CodecDll()
-{
-
-}
-bool CLFFmpegVideoDecoder::CodecDll::init()
-{
-
-	QDir::setCurrent("./old_ffmpeg");
-
-	//m_dll  = ::LoadLibrary(L"avcodec-52.dll");
-	m_dll  = ::LoadLibrary(L"avcodec-51.dll");
-
-	if(!m_dll)
-		return false;
-
-	avcodec_init = reinterpret_cast<dll_avcodec_init>(::GetProcAddress(m_dll, "avcodec_init"));
-	if(!avcodec_init)
-		return false;
-
-	avcodec_find_decoder = reinterpret_cast<dll_avcodec_find_decoder>(::GetProcAddress(m_dll, "avcodec_find_decoder"));
-	if(!avcodec_find_decoder)
-		return false;
-
-	avcodec_register_all = reinterpret_cast<dll_avcodec_register_all>(::GetProcAddress(m_dll, "avcodec_register_all"));
-	if (!avcodec_register_all)
-		return false;
-
-
-	avcodec_alloc_context  = reinterpret_cast<dll_avcodec_alloc_context>(::GetProcAddress(m_dll, "avcodec_alloc_context"));
-	if (!avcodec_register_all)
-		return false;
-
-	avcodec_alloc_frame  = reinterpret_cast<dll_avcodec_alloc_frame>(::GetProcAddress(m_dll, "avcodec_alloc_frame"));
-	if (!avcodec_alloc_frame)
-		return false;
-
-
-	avcodec_open  = reinterpret_cast<dll_avcodec_open>(::GetProcAddress(m_dll, "avcodec_open"));
-	if (!avcodec_open)
-		return false;
-
-
-	avcodec_close  = reinterpret_cast<dll_avcodec_close>(::GetProcAddress(m_dll, "avcodec_close"));
-	if (!avcodec_close)
-		return false;
-
-	ff_print_debug_info = reinterpret_cast<dll_ff_print_debug_info>(::GetProcAddress(m_dll, "ff_print_debug_info"));
-	if (!ff_print_debug_info)
-		return false;
-	
-	//m_dll2 = ::LoadLibrary(L"avutil-50.dll");
-	m_dll2 = ::LoadLibrary(L"avutil-49.dll");
-	if(!m_dll2)
-		return false;
-
-
-	av_free = reinterpret_cast<dll_av_free>(::GetProcAddress(m_dll2, "av_free"));
-	if (!av_free)
-		return false;
-
-	av_log_set_callback = reinterpret_cast<dll_av_log_set_callback>(::GetProcAddress(m_dll2, "av_log_set_callback"));
-	if (!av_log_set_callback)
-		return false;
-	else
-	{
-		//av_log_set_callback(decoderLogCallback);
-	}
-
-
-
-	avcodec_decode_video = reinterpret_cast<dll_avcodec_decode_video>(::GetProcAddress(m_dll, "avcodec_decode_video"));
-	if (!avcodec_decode_video)
-		return false;
-	//==================================================================================
-
-	QDir::setCurrent("../");
-
-
-	return true;
-
-}
-CLFFmpegVideoDecoder::CodecDll::~CodecDll()
-{
-	::FreeLibrary(m_dll);
-	::FreeLibrary(m_dll2);
-}
 
 //================================================
 
@@ -139,44 +28,44 @@ m_wantEscapeFromLightCPUMode(false),
 m_lightModeFrameCounter(0)
 {
 
-	QMutexLocker mutex(&m_static_mutex);
+	QMutexLocker mutex(&global_ffmpeg_mutex);
 
 	if (m_first_instance)
 	{
 		m_first_instance = false;
 
 		// must be called before using avcodec 
-		dll.avcodec_init();
+		global_ffmpeg_dll.avcodec_init();
 
 		// register all the codecs (you can also register only the codec you wish to have smaller code
-		dll.avcodec_register_all();
+		global_ffmpeg_dll.avcodec_register_all();
 
 	}
 
-	//codec = dll.avcodec_find_decoder(CODEC_ID_H264);
+	//codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_H264);
 
 
 	switch(m_codec)
 	{
 	case CL_JPEG:
-		codec = dll.avcodec_find_decoder(CODEC_ID_MJPEG);
+		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_MJPEG);
 		break;
 
 	case CL_MPEG2:
-		codec = dll.avcodec_find_decoder(CODEC_ID_MPEG2VIDEO);
+		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_MPEG2VIDEO);
 		break;
 
 
 	case CL_MPEG4:
-		codec = dll.avcodec_find_decoder(CODEC_ID_MPEG4);
+		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_MPEG4);
 		break;
 
 	case CL_H264:
-		codec = dll.avcodec_find_decoder(CODEC_ID_H264);
+		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_H264);
 	    break;
 
 	case CL_MSVIDEO1:
-		codec = dll.avcodec_find_decoder(CODEC_ID_MSVIDEO1);
+		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_MSVIDEO1);
 		break;
 	
 	default:
@@ -187,12 +76,12 @@ m_lightModeFrameCounter(0)
 
 
 
-	c = dll.avcodec_alloc_context();
-	picture= dll.avcodec_alloc_frame();
+	c = global_ffmpeg_dll.avcodec_alloc_context();
+	picture= global_ffmpeg_dll.avcodec_alloc_frame();
 
 	//if(codec->capabilities&CODEC_CAP_TRUNCATED)	c->flags|= CODEC_FLAG_TRUNCATED;
 
-	dll.avcodec_open(c, codec);
+	global_ffmpeg_dll.avcodec_open(c, codec);
 
 	c->debug_mv = 1;
 
@@ -200,30 +89,30 @@ m_lightModeFrameCounter(0)
 
 CLFFmpegVideoDecoder::~CLFFmpegVideoDecoder(void)
 {
-	QMutexLocker mutex(&m_static_mutex);
+	QMutexLocker mutex(&global_ffmpeg_mutex);
 
-	dll.avcodec_close(c);
-	dll.av_free(c);
-	dll.av_free(picture);
+	global_ffmpeg_dll.avcodec_close(c);
+	global_ffmpeg_dll.av_free(c);
+	global_ffmpeg_dll.av_free(picture);
 }
 
 void CLFFmpegVideoDecoder::resart_decoder()
 {
-	QMutexLocker mutex(&m_static_mutex);
+	QMutexLocker mutex(&global_ffmpeg_mutex);
 
 	if (c)
 	{
-		dll.avcodec_close(c);
-		dll.av_free(c);
-		dll.av_free(picture);
+		global_ffmpeg_dll.avcodec_close(c);
+		global_ffmpeg_dll.av_free(c);
+		global_ffmpeg_dll.av_free(picture);
 	}
 
-	c = dll.avcodec_alloc_context();
-	picture= dll.avcodec_alloc_frame();
+	c = global_ffmpeg_dll.avcodec_alloc_context();
+	picture= global_ffmpeg_dll.avcodec_alloc_frame();
 
 	//if(codec->capabilities&CODEC_CAP_TRUNCATED)		c->flags|= CODEC_FLAG_TRUNCATED;
 
-	dll.avcodec_open(c, codec);
+	global_ffmpeg_dll.avcodec_open(c, codec);
 
 }
 
@@ -292,9 +181,9 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 	/**/
 
 	int got_picture = 0;
-	dll.avcodec_decode_video(c, picture, &got_picture,(unsigned char*)data.inbuf, data.buff_len);
+	global_ffmpeg_dll.avcodec_decode_video(c, picture, &got_picture,(unsigned char*)data.inbuf, data.buff_len);
 	if (data.use_twice)
-		dll.avcodec_decode_video(c, picture, &got_picture,(unsigned char*)data.inbuf, data.buff_len);
+		global_ffmpeg_dll.avcodec_decode_video(c, picture, &got_picture,(unsigned char*)data.inbuf, data.buff_len);
 
 
 gotpicture:
@@ -314,7 +203,7 @@ gotpicture:
 
 
 		if (m_showmotion)
-			dll.ff_print_debug_info((MpegEncContext*)(c->priv_data), picture);
+			global_ffmpeg_dll.ff_print_debug_info((MpegEncContext*)(c->priv_data), picture);
 
 		data.out_frame.width = c->width;
 		data.out_frame.height = c->height;
@@ -362,7 +251,7 @@ gotpicture:
 	{
 		/*/			
 		// some times decoder wants to delay frame by one; we do not want that
-		dll.avcodec_decode_video(c, picture, &got_picture,0, 0);
+		global_ffmpeg_dll.avcodec_decode_video(c, picture, &got_picture,0, 0);
 		if (got_picture)
 			goto gotpicture;
 

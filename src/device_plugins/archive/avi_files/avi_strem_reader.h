@@ -23,7 +23,7 @@ protected:
 	virtual void channeljumpTo(unsigned long msec, int channel);
 
 
-	bool getNextVideoPacket();
+	bool getNextPacket();
 
 	bool init();
 	void destroy();

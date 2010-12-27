@@ -21,10 +21,13 @@ public:
 
 	void coppyImage(bool copy);
 
+	void playAudio(bool play);
+
 private:
 	CLVideoStreamDisplay* m_display[CL_MAX_CHANNELS];
 	quint64 m_prev_time;
 	CLAdaptiveSleep m_delay;
+	bool m_palyaudio;
 	
 
 };
