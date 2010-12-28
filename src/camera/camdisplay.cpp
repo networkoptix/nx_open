@@ -81,7 +81,7 @@ void CLCamDisplay::processData(CLAbstractData* data)
 		if (m_display[channel])	
 			m_display[channel]->dispay(vd);
 	}
-	else if (ad )//&& m_palyaudio)
+	else if (ad && m_palyaudio)
 	{
 		m_aydio_display->putdata(ad);
 	}

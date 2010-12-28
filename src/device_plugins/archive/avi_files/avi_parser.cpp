@@ -13,7 +13,6 @@ bool CLAviFFMpegDLL::init()
 {
 
 	m_dll  = ::LoadLibrary(L"avformat-52.dll");
-
 	if(!m_dll)
 		return false;
 
