@@ -8,116 +8,17 @@
 
 
 
-
-CLRingBuffer::CLRingBuffer( int capacity, QObject* parent):
-QIODevice(parent),
-m_capacity(capacity),
-m_mtx(QMutex::Recursive)
-{
-	m_buff = new char[m_capacity];
-	m_pw = m_buff;
-	m_pr = m_buff;
-
-	
-	open(QIODevice::ReadWrite);
-}
-
-CLRingBuffer::~CLRingBuffer()
-{
-	delete[] m_buff;
-}
-
-qint64 CLRingBuffer::bytesAvailable() const
-{
-	QMutexLocker mutex(&m_mtx);
-	return (m_pr <= m_pw) ? m_pw - m_pr : m_capacity - (m_pr - m_pw);
-}
-
-qint64 CLRingBuffer::avalable_to_write() const
-{
-	QMutexLocker mutex(&m_mtx);
-	return (m_pw >= m_pr) ? m_capacity - (m_pw - m_pr) : m_pr - m_pw;
-}
-
-
-qint64 CLRingBuffer::readData(char *data, qint64 maxlen)
-{
-	QMutexLocker mutex(&m_mtx);
-
-	qint64 can_read = bytesAvailable();
-
-	qint64 to_read = qMin(can_read, maxlen);
-
-
-	if (m_pr + to_read<= m_buff + m_capacity)
-	{
-		memcpy(data, m_pr, to_read);
-		m_pr+=to_read;
-
-	}
-	else
-	{
-		int first_read = m_buff + m_capacity - m_pr;
-		memcpy(data, m_pr, first_read);
-
-		int second_read = to_read - first_read;
-		memcpy(data + first_read, m_buff, second_read);
-		m_pr = m_buff + second_read;
-
-
-	}
-
-	return to_read;
-
-
-}
-
-qint64 CLRingBuffer::writeData(const char *data, qint64 len)
-{
-	QMutexLocker mutex(&m_mtx);
-
-	qint64 can_write = avalable_to_write();
-
-	
-	qint64 to_write = qMin(len, can_write);
-
-	if (m_pw + to_write <= m_buff + m_capacity)
-	{
-		memcpy(m_pw, data, to_write);
-		m_pw+=to_write;
-
-	}
-	else
-	{
-		int first_write = m_buff + m_capacity - m_pw;
-		memcpy(m_pw, data, first_write);
-
-		int second_write = to_write - first_write;
-		memcpy(m_buff, data + first_write, second_write);
-		m_pw = m_buff + second_write;
-
-
-	}
-
-	return to_write;
-
-}
-
-
-
-
-
 CLAudioStreamDisplay::CLAudioStreamDisplay(int buff_ms):
-m_recommended_buff_ms(buff_ms),
+m_buff_ms(buff_ms),
 m_audioOutput(0),
-m_ringbuff(200*1024, this)
+m_decodedaudio(16, MAX_AUDIO_FRAME_SIZE),
+m_audiobuff(0),
+m_ringbuff(0),
+m_freq_factor(1.0),
+m_can_adapt(0)
 {
 	for (int i = 0; i < CL_VARIOUSE_DECODERS;++i)
 		m_decoder[i] = 0;
-
-	m_decodedaudio = new unsigned char[MAX_AUDIO_FRAME_SIZE];
-
-	
 
 }
 
@@ -128,10 +29,7 @@ CLAudioStreamDisplay::~CLAudioStreamDisplay()
 	for (int i = 0; i < CL_VARIOUSE_DECODERS;++i)
 		delete m_decoder[i];
 
-
-	delete[] m_decodedaudio;
-
-
+	delete m_ringbuff;
 }
 
 void CLAudioStreamDisplay::putdata(CLCompressedAudioData* data)
@@ -143,11 +41,9 @@ void CLAudioStreamDisplay::putdata(CLCompressedAudioData* data)
 	audio.inbuf_len = data->data.size();
 	audio.outbuf = m_decodedaudio;
 	audio.outbuf_len = 0;
+	audio.format.setChannels(data->channels);
+	audio.format.setFrequency(data->freq);
 
-	if ((data->data.size()%2)!=0)
-	{
-		
-	}
 
 
 	CLAbstractAudioDecoder* dec = 0;
@@ -170,51 +66,79 @@ void CLAudioStreamDisplay::putdata(CLCompressedAudioData* data)
 
 	if (dec->decode(audio))
 	{
-
-		//m_ringbuff.writeData((char*)audio.outbuf, audio.outbuf_len);
+		
+		if (!m_ringbuff)
+			m_ringbuff = new CLRingBuffer(bytes_from_time(audio.format,m_buff_ms*1.5),this);
+		
 
 		if (!m_audioOutput)
+			recreatedevice(audio.format);
+
+		if (!m_audioOutput)
+			return;
+
+
+		if (m_can_adapt>30 && ms_from_size(audio.format, m_ringbuff->bytesAvailable()) > m_buff_ms) // if ring buffer is full
 		{
-			QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
+			//paying too slow; need to speedup
+			m_freq_factor+=0.005;
+			audio.format.setFrequency(audio.format.frequency()*m_freq_factor);
+			//recreatedevice(audio.format); // recreation does not work very well
+			m_ringbuff->claer();
+		}
 
-			if (!info.isFormatSupported(audio.format)) 
-			{
-				cl_log.log("audio format not supported by backend, cannot play audio.", cl_logERROR);
-				return;
-			}
-
-			m_audioOutput = new QAudioOutput(audio.format, this);
-			connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(stateChanged(QAudio::State)));
-
-			//m_audioOutput->setBufferSize(MAX_AUDIO_FRAME_SIZE);
-			//m_audioOutput->start(m_ringbuff);
+		if (m_can_adapt>30 && ms_from_size(audio.format, m_audioOutput->bytesFree()) > 0.8*m_buff_ms) // if audiobuffer is almost empty
+		{
+			//paying too fast; need to slowdown
+			m_freq_factor-=0.005;
+			audio.format.setFrequency(audio.format.frequency()*m_freq_factor);
+			//recreatedevice(audio.format); //recreation does not work very well
+		}
 
 			
-			m_audiobuff = m_audioOutput->start();
+
+		m_ringbuff->writeData((char*)audio.outbuf, audio.outbuf_len);
+
+		if (ms_from_size(audio.format, m_ringbuff->bytesAvailable()) > 0) // only if we have more than 100 ms in data in ring buffer
+		{
+
+			if (m_audioOutput && m_audioOutput->state() != QAudio::StoppedState) 
+			{
+
+				int period = m_audioOutput->periodSize();
+				int ring_avalable = m_ringbuff->bytesAvailable();
+				int output_avalable = m_audioOutput->bytesFree();
+
+
+				int chunks = qMin( ring_avalable, output_avalable)/period;
+				while (chunks) 
+				{
+					++m_can_adapt; // if few write occurred we can change the frequency if needed
+
+					m_ringbuff->readData(m_decodedaudio, period);
+					m_audiobuff->write(m_decodedaudio, period);
+					--chunks;
+				}
+			}
 
 		}
+
 
 		
 
 		qint64 bytesInBuffer = m_audioOutput->bufferSize() - m_audioOutput->bytesFree();
-		qint64 usInBuffer = (qint64)(1000000) * bytesInBuffer / ( audio.format.channels() * audio.format.sampleSize() / 8 ) / audio.format.frequency();
-		//cl_log.log("ms1 in buff = ", (int)usInBuffer/1000, cl_logALWAYS);
+		qint64 usInBuffer = ms_from_size(audio.format, bytesInBuffer);
+		//cl_log.log("ms in audio buff = ", (int)usInBuffer, cl_logALWAYS);
+		//cl_log.log("ms in ring buff = ", (int)ms_from_size(audio.format, m_ringbuff->bytesAvailable()), cl_logALWAYS);
 
-		m_audiobuff->write((char*)audio.outbuf, audio.outbuf_len);
+		//m_audiobuff->write((char*)audio.outbuf, audio.outbuf_len);
+		/**/
 
-		bytesInBuffer = m_audioOutput->bufferSize() - m_audioOutput->bytesFree();
-		usInBuffer = (qint64)(1000000) * bytesInBuffer / ( audio.format.channels() * audio.format.sampleSize() / 8 ) / audio.format.frequency();
-		//cl_log.log("ms2 in buff = ", (int)usInBuffer/1000, cl_logALWAYS);
-
+	
 
 	
 
 	}
-
-	
-
-
-
 }
 
 
@@ -228,33 +152,33 @@ void CLAudioStreamDisplay::stopaudio()
 	}
 }
 
-void CLAudioStreamDisplay::stateChanged(QAudio::State state)
+void CLAudioStreamDisplay::recreatedevice(QAudioFormat format)
 {
-	
-	switch(state)
+	stopaudio();
+
+	QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
+
+	if (!info.isFormatSupported(format)) 
 	{
-	case QAudio::ActiveState:
-		cl_log.log("audiostate=ActiveState", cl_logALWAYS);
-		break;
-
-	case QAudio::SuspendedState:
-		cl_log.log("audiostate=SuspendedState", cl_logALWAYS);
-		break;
-
-	case QAudio::StoppedState:
-		cl_log.log("audiostate=StoppedState", cl_logALWAYS);
-	    break;
-	case QAudio::IdleState:
-
-		cl_log.log("audiostate=IdleState ", cl_logALWAYS);
-	    break;
-	default:
-	    break;
+		cl_log.log("audio format not supported by backend, cannot play audio.", cl_logERROR);
+		return;
 	}
 
-	int bytesInBuffer = m_audioOutput->bufferSize() - m_audioOutput->bytesFree();
-	cl_log.log("kb2 in buff = ", bytesInBuffer/1024, cl_logALWAYS);
-	/**/
+	m_audioOutput = new QAudioOutput(format, this);
+	m_audioOutput->setBufferSize( bytes_from_time(format, m_buff_ms) ); // data for 1sec of audio
+	m_audiobuff = m_audioOutput->start();
+
+	m_can_adapt = 0;
+
+}
 
 
+unsigned int CLAudioStreamDisplay::ms_from_size(const QAudioFormat& format, unsigned long bytes)
+{
+	return (qint64)(1000) * bytes/ ( format.channels() * format.sampleSize() / 8 ) / format.frequency();
+}
+
+unsigned int CLAudioStreamDisplay::bytes_from_time(const QAudioFormat& format, unsigned long ms)
+{
+	return ( format.channels() * format.sampleSize() / 8 ) * format.frequency() * ms / 1000;
 }

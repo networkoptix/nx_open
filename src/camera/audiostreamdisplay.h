@@ -5,6 +5,8 @@
 #include "data\mediadata.h"
 #include <QAudio>
 #include "..\src\multimedia\audio\qaudioformat.h"
+#include "base\aligned_data.h"
+#include "base\ringbuffer.h"
 
 
 // display one video stream
@@ -13,31 +15,6 @@ class CLAbstractAudioDecoder;
 struct CLCompressedAudioData;
 class QAudioOutput;
 class QIODevice;
-
-
-class CLRingBuffer : public QIODevice
-{
-	Q_OBJECT
-public:
-	CLRingBuffer( int capacity, QObject* parent);
-	~CLRingBuffer();
-
-	qint64 readData(char *data, qint64 maxlen);
-	qint64 writeData(const char *data, qint64 len);
-	qint64 bytesAvailable() const;
-
-	qint64 avalable_to_write() const;
-
-private:
-	char *m_buff;
-	int m_capacity;
-
-	char* m_pw;
-	char* m_pr;
-
-	mutable QMutex m_mtx;
-
-};
 
 
 
@@ -52,16 +29,21 @@ public:
 private:
 
 	void stopaudio();
+	void recreatedevice(QAudioFormat format);
 
-private slots:
-	void stateChanged(QAudio::State state);
-
+	unsigned int ms_from_size(const QAudioFormat& format, unsigned long bytes);
+	unsigned int bytes_from_time(const QAudioFormat& format, unsigned long ms);
 
 private:
 	CLAbstractAudioDecoder* m_decoder[CL_VARIOUSE_DECODERS];
-	int m_recommended_buff_ms;
-	unsigned char* m_decodedaudio;
-	CLRingBuffer m_ringbuff;
+	int m_buff_ms;
+
+	int m_can_adapt; // can not adapt device frequency very often;
+	qreal m_freq_factor;
+
+	CLAlignedData m_decodedaudio;
+
+	CLRingBuffer* m_ringbuff;
 
 	QAudioOutput* m_audioOutput;
 	QIODevice* m_audiobuff; // not owned by this class 

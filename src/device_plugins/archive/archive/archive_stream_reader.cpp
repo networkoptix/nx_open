@@ -155,7 +155,7 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
 
 	const ArchiveFrameInfo &finfo = mMovie[channel].at(mCurrIndex[channel]);
 
-	CLCompressedVideoData* videoData = new CLCompressedVideoData(8,finfo.size);
+	CLCompressedVideoData* videoData = new CLCompressedVideoData(CL_MEDIA_ALIGNMENT,finfo.size);
 	CLByteArray& data = videoData->data;
 
 	data.prepareToWrite(finfo.size);

@@ -87,7 +87,7 @@ CLAbstractMediaData* FakeStreamReader::getNextData()
 		return 0;
 
 	
-	CLCompressedVideoData* videoData = new CLCompressedVideoData(8,400*1024);
+	CLCompressedVideoData* videoData = new CLCompressedVideoData(CL_MEDIA_ALIGNMENT,400*1024);
 	CLByteArray& img = videoData->data;
 
 	int descr_len = *(pdescr[m_curr_channel]); (pdescr[m_curr_channel])++;

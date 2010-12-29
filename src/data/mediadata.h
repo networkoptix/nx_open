@@ -7,7 +7,18 @@
 #include <QTime>
 
 
-enum CLCodecType {CL_JPEG = 0, CL_H264 = 1, CL_MPEG2=2, CL_MPEG4=3, CL_MSVIDEO1=4, CL_MP3=5, CL_AC3=6, CL_WMAV2, CL_VARIOUSE_DECODERS};
+enum CLCodecType 
+{
+	CL_JPEG = 0, 
+	CL_H264 = 1, 
+	CL_MPEG2=2, 
+	CL_MPEG4=3, 
+	CL_MSVIDEO1=4, 
+	CL_MP3=5, 
+	CL_AC3=6, 
+	CL_WMAV2=7, 
+	CL_ADPCM_MS = 8,
+	CL_VARIOUSE_DECODERS};
 
 
 

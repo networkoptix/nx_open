@@ -147,7 +147,7 @@ CLAbstractMediaData* AVClientPullSSHTTPStreamreader::getNextData()
 	if (!http_client.isOpened())
 		return 0;
 
-	videoData = new CLCompressedVideoData(8,forecast_size);
+	videoData = new CLCompressedVideoData(CL_MEDIA_ALIGNMENT,forecast_size);
 	CLByteArray& img = videoData->data;
 
 

@@ -146,6 +146,10 @@ bool CLAVIStreamReader::init()
 			m_audiocodec_id =CL_WMAV2;
 			break;
 
+		case CODEC_ID_ADPCM_MS:
+			m_audiocodec_id =CL_ADPCM_MS;
+			break;
+
 		}
 
 	}
@@ -210,7 +214,7 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 
 		//int extra = FF_INPUT_BUFFER_PADDING_SIZE;
 		int extra = 0;
-		CLCompressedVideoData* videoData = new CLCompressedVideoData(0,m_packet.size + extra);
+		CLCompressedVideoData* videoData = new CLCompressedVideoData(CL_MEDIA_ALIGNMENT,m_packet.size + extra);
 		CLByteArray& data = videoData->data;
 
 		data.prepareToWrite(m_packet.size + extra);
@@ -253,7 +257,7 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 		m_bsleep = false;
 
 		int extra = 0;
-		CLCompressedAudioData* audioData = new CLCompressedAudioData(0,m_packet.size + extra);
+		CLCompressedAudioData* audioData = new CLCompressedAudioData(CL_MEDIA_ALIGNMENT,m_packet.size + extra);
 		CLByteArray& data = audioData->data;
 
 		data.prepareToWrite(m_packet.size + extra);

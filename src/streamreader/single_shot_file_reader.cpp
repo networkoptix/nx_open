@@ -29,7 +29,7 @@ CLAbstractMediaData* CLSingleShotFileStreamreader::getData()
 
 	unsigned int file_size = file.size();
 
-	CLCompressedVideoData* outData = new CLCompressedVideoData(8,file_size);
+	CLCompressedVideoData* outData = new CLCompressedVideoData(CL_MEDIA_ALIGNMENT,file_size);
 	CLByteArray& data = outData->data;
 
 	data.prepareToWrite(file_size);

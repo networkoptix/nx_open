@@ -46,14 +46,21 @@ m_codec(codec_id)
 		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_AC3);
 		break;
 
+		/*/
 	case CL_WMAV2:
 		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_WMAV2);
 		break;
+
+	case CL_ADPCM_MS:
+		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_ADPCM_MS);
+		break;
+
 		/**/
 
 
 	default:
 		codec = 0;
+		c = 0;
 		return;
 
 
@@ -71,8 +78,11 @@ CLFFmpegAudioDecoder::~CLFFmpegAudioDecoder(void)
 {
 	QMutexLocker mutex(&global_ffmpeg_mutex);
 
-	global_ffmpeg_dll.avcodec_close(c);
-	global_ffmpeg_dll.av_free(c);
+	if (c)
+	{
+		global_ffmpeg_dll.avcodec_close(c);
+		global_ffmpeg_dll.av_free(c);
+	}
 
 }
 
@@ -95,16 +105,16 @@ bool CLFFmpegAudioDecoder::decode(CLAudioData& data)
 	while (size > 0) 
 	{
 
-		int out_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+		int out_size = AVCODEC_MAX_AUDIO_FRAME_SIZE*10;
 
 
-		cl_log.log("before dec",  cl_logALWAYS);
+		//cl_log.log("before dec",  cl_logALWAYS);
 
 		int len = global_ffmpeg_dll.avcodec_decode_audio2(c, (short *)outbuf, &out_size,
 				inbuf_ptr, size);
 
 
-		cl_log.log("after dec",  cl_logALWAYS);
+		//cl_log.log("after dec",  cl_logALWAYS);
 
 		if (len < 0) 
 			return false;
@@ -116,11 +126,14 @@ bool CLFFmpegAudioDecoder::decode(CLAudioData& data)
 	}
 
 
-	data.format.setFrequency(c->sample_rate);
-	data.format.setChannels(c->channels);
-	data.format.setCodec("audio/pcm");
-	data.format.setByteOrder(QAudioFormat::LittleEndian);
+	if (c->sample_rate)
+		data.format.setFrequency(c->sample_rate);
 
+	if (c->channels) 
+		data.format.setChannels(c->channels);
+
+	data.format.setCodec("audio/pcm");
+	data.format.setByteOrder(QAudioFormat::BigEndian);
 
 	switch(c->sample_fmt)
 	{

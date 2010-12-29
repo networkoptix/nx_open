@@ -5,7 +5,7 @@
 #include "audiostreamdisplay.h"
 
 #define CL_MAX_DISPLAY_QUEUE_SIZE 10
-
+#define AUDIO_BUFF_SIZE 300 // ms
 
 
 CLCamDisplay::CLCamDisplay():
@@ -17,7 +17,7 @@ m_palyaudio(false)
 	for (int i = 0; i< CL_MAX_CHANNELS; ++i)
 		m_display[i] = 0;
 
-	m_aydio_display = new CLAudioStreamDisplay(500);
+	m_aydio_display = new CLAudioStreamDisplay(AUDIO_BUFF_SIZE);
 }
 
 CLCamDisplay::~CLCamDisplay()
