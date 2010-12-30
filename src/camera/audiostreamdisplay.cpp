@@ -7,6 +7,56 @@
 #define MAX_AUDIO_FRAME_SIZE 192000
 
 
+static short clip_short(int v) 
+{
+	if (v < -32768)
+        v = -32768;
+    else if (v > 32767)
+        v = 32767;
+
+    return (short) v;
+}
+
+
+static void down_mix_6_2(short *data, int len) 
+{
+	
+	short* output = data;
+	short* input = data;
+
+	int steps = len/6;
+
+	
+
+	for(int i = 0; i < steps; ++i) 
+	{
+			/* 5.1 to stereo. l, c, r, ls, rs, sw */
+
+		
+		int fl,fr,c,rl,rr,lfe;
+
+		fl = input[0];
+		c = input[2];
+		fr = input[1];
+		rl = input[3];
+		rr = input[4];
+		//lfe = input[5]; //Postings on the Doom9 say that Dolby specifically says the LFE (.1) channel should usually be ignored during downmixing to Dolby ProLogic II, with quotes from official Dolby documentation.
+
+
+
+		output[0] = clip_short(fl + (0.5 * rl) + (0.7 * c));
+		output[1] = clip_short(fr + (0.5 * rr) + (0.7 * c));
+		
+
+		output+=2;
+		input+=6;
+	
+	}
+}
+
+
+
+
 
 CLAudioStreamDisplay::CLAudioStreamDisplay(int buff_ms):
 m_buff_ms(buff_ms),
@@ -15,7 +65,8 @@ m_decodedaudio(16, MAX_AUDIO_FRAME_SIZE),
 m_audiobuff(0),
 m_ringbuff(0),
 m_freq_factor(1.0),
-m_can_adapt(0)
+m_can_adapt(0),
+m_downmixing(false)
 {
 	for (int i = 0; i < CL_VARIOUSE_DECODERS;++i)
 		m_decoder[i] = 0;
@@ -67,12 +118,16 @@ void CLAudioStreamDisplay::putdata(CLCompressedAudioData* data)
 	if (dec->decode(audio))
 	{
 		
-		if (!m_ringbuff)
-			m_ringbuff = new CLRingBuffer(bytes_from_time(audio.format,m_buff_ms*1.5),this);
-		
-
 		if (!m_audioOutput)
 			recreatedevice(audio.format);
+
+		if (audio.format.channels()>2 && m_downmixing)
+			down_mix(audio);
+
+
+		if (!m_ringbuff)
+			m_ringbuff = new CLRingBuffer(bytes_from_time(audio.format,m_buff_ms*1.5),this);
+
 
 		if (!m_audioOutput)
 			return;
@@ -99,7 +154,7 @@ void CLAudioStreamDisplay::putdata(CLCompressedAudioData* data)
 
 		m_ringbuff->writeData((char*)audio.outbuf, audio.outbuf_len);
 
-		if (ms_from_size(audio.format, m_ringbuff->bytesAvailable()) > 0) // only if we have more than 100 ms in data in ring buffer
+		if (ms_from_size(audio.format, m_ringbuff->bytesAvailable()) > 100) // only if we have more than 100 ms in data in ring buffer
 		{
 
 			if (m_audioOutput && m_audioOutput->state() != QAudio::StoppedState) 
@@ -125,18 +180,14 @@ void CLAudioStreamDisplay::putdata(CLCompressedAudioData* data)
 
 
 		
-
+		
 		qint64 bytesInBuffer = m_audioOutput->bufferSize() - m_audioOutput->bytesFree();
 		qint64 usInBuffer = ms_from_size(audio.format, bytesInBuffer);
-		//cl_log.log("ms in audio buff = ", (int)usInBuffer, cl_logALWAYS);
-		//cl_log.log("ms in ring buff = ", (int)ms_from_size(audio.format, m_ringbuff->bytesAvailable()), cl_logALWAYS);
-
-		//m_audiobuff->write((char*)audio.outbuf, audio.outbuf_len);
+		cl_log.log("ms in audio buff = ", (int)usInBuffer, cl_logALWAYS);
+		cl_log.log("ms in ring buff = ", (int)ms_from_size(audio.format, m_ringbuff->bytesAvailable()), cl_logALWAYS);
 		/**/
 
-	
 
-	
 
 	}
 }
@@ -158,11 +209,26 @@ void CLAudioStreamDisplay::recreatedevice(QAudioFormat format)
 
 	QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
 
+	
 	if (!info.isFormatSupported(format)) 
 	{
-		cl_log.log("audio format not supported by backend, cannot play audio.", cl_logERROR);
-		return;
+		
+		if (format.channels()>2)
+		{
+			format.setChannels(2);
+			if (!info.isFormatSupported(format)) 
+			{
+				cl_log.log("audio format not supported by backend, cannot play audio.", cl_logERROR);
+				return;
+			}
+
+			m_downmixing = true;
+
+		}
+
+
 	}
+	/**/
 
 	m_audioOutput = new QAudioOutput(format, this);
 	m_audioOutput->setBufferSize( bytes_from_time(format, m_buff_ms) ); // data for 1sec of audio
@@ -181,4 +247,14 @@ unsigned int CLAudioStreamDisplay::ms_from_size(const QAudioFormat& format, unsi
 unsigned int CLAudioStreamDisplay::bytes_from_time(const QAudioFormat& format, unsigned long ms)
 {
 	return ( format.channels() * format.sampleSize() / 8 ) * format.frequency() * ms / 1000;
+}
+
+void CLAudioStreamDisplay::down_mix(CLAudioData& audio)
+{
+	if (audio.format.channels()==6)
+	{
+		down_mix_6_2((short*)audio.outbuf, audio.outbuf_len);
+		audio.outbuf_len/=3;
+		audio.format.setChannels(2);
+	}
 }

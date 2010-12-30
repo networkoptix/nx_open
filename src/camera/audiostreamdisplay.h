@@ -7,6 +7,7 @@
 #include "..\src\multimedia\audio\qaudioformat.h"
 #include "base\aligned_data.h"
 #include "base\ringbuffer.h"
+#include "decoders\audio\audio_struct.h"
 
 
 // display one video stream
@@ -34,6 +35,8 @@ private:
 	unsigned int ms_from_size(const QAudioFormat& format, unsigned long bytes);
 	unsigned int bytes_from_time(const QAudioFormat& format, unsigned long ms);
 
+	static void down_mix(CLAudioData& audio);
+
 private:
 	CLAbstractAudioDecoder* m_decoder[CL_VARIOUSE_DECODERS];
 	int m_buff_ms;
@@ -47,6 +50,8 @@ private:
 
 	QAudioOutput* m_audioOutput;
 	QIODevice* m_audiobuff; // not owned by this class 
+
+	bool m_downmixing;
 };
 
 #endif //audiostreamdisplay_h_1811

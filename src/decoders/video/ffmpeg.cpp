@@ -60,6 +60,11 @@ m_lightModeFrameCounter(0)
 		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_MPEG4);
 		break;
 
+	case CL_MSMPEG4V3:
+		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_MSMPEG4V3);
+		break;
+
+
 	case CL_H264:
 		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_H264);
 	    break;

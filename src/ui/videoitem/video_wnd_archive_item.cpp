@@ -61,7 +61,7 @@ void CLVideoWindowArchiveItem::setFullScreen(bool full)
 
 		mArchiveNavigator->goToFullScreenMode(true);
 
-		cl_log.log("setFullScreen TRUE", cl_logALWAYS);
+		//cl_log.log("setFullScreen TRUE", cl_logALWAYS);
 	}
 	else
 	{
@@ -73,7 +73,7 @@ void CLVideoWindowArchiveItem::setFullScreen(bool full)
 
 		mArchiveNavigator->goToFullScreenMode(false);
 
-		cl_log.log("setFullScreen FALSE", cl_logALWAYS);
+		//cl_log.log("setFullScreen FALSE", cl_logALWAYS);
 	}
 
 	
