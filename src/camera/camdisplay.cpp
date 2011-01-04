@@ -11,7 +11,7 @@
 CLCamDisplay::CLCamDisplay():
 CLAbstractDataProcessor(CL_MAX_DISPLAY_QUEUE_SIZE),
 m_prev_time(0),
-m_delay(50), // do put a big value here to avoid cpu usage in case of zoom out 
+m_delay(100), // do put a big value here to avoid cpu usage in case of zoom out 
 m_palyaudio(false)
 {
 	for (int i = 0; i< CL_MAX_CHANNELS; ++i)

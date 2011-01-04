@@ -1799,14 +1799,15 @@ void GraphicsView::toggleFullScreen_helper(CLAbstractSceneItem* wnd)
 		// escape FS MODE
 		setZeroSelection();
 		wnd->setFullScreen(false);
-		fitInView(800, 0);
+		fitInView(1000, 0, CLAnimationTimeLine::SLOW_START_SLOW_END);
+		
 	}
 }
 
 
 void GraphicsView::onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int delay)
 {
-	
+
 	setZeroSelection();
 
 	m_selectedWnd = new_wnd;
@@ -1837,7 +1838,7 @@ void GraphicsView::onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int de
 	}
 
 
-	m_movement.move(point, item_select_duration, delay);
+	m_movement.move(point, item_select_duration, delay, CLAnimationTimeLine::SLOW_START_SLOW_END);
 
 	//===================	
 	// width 1900 => zoom 0.278 => scale 0.07728
@@ -1846,7 +1847,7 @@ void GraphicsView::onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int de
 	qreal zoom = m_scenezoom.scaleTozoom(scale) ;
 
 
-	m_scenezoom.zoom_abs(zoom, item_select_duration, delay);
+	m_scenezoom.zoom_abs(zoom, item_select_duration, delay, CLAnimationTimeLine::SLOW_START_SLOW_END);
 
 
 	
@@ -2001,7 +2002,7 @@ void GraphicsView::onArrange_helper()
 	
 }
 
-void GraphicsView::fitInView(int duration, int delay )
+void GraphicsView::fitInView(int duration, int delay, CLAnimationTimeLine::CLAnimationCurve curve)
 {
 	stopGroupAnimation();
 
@@ -2016,7 +2017,7 @@ void GraphicsView::fitInView(int duration, int delay )
 	m_camLayout.updateSceneRect();
 	QRectF item_rect = m_camLayout.getSmallLayoutRect();
 
-	m_movement.move(item_rect.center(), duration, delay);
+	m_movement.move(item_rect.center(), duration, delay, curve);
 
 	
 	QRectF viewRect = viewport()->rect();
@@ -2045,7 +2046,7 @@ void GraphicsView::fitInView(int duration, int delay )
 	//scale(scl, scl);
 
 	
-	m_scenezoom.zoom_abs(zoom, duration, delay);
+	m_scenezoom.zoom_abs(zoom, duration, delay, curve);
 
 }
 
@@ -2091,14 +2092,14 @@ void GraphicsView::onItemFullScreen_helper(CLAbstractSceneItem* wnd)
 	QRectF item_rect = wnd->sceneBoundingRect();
 	qreal zoom = zoomForFullScreen_helper(item_rect);
 
-	int duration = item_select_duration/2 + 100;
-	m_movement.move(item_rect.center(), duration, 0);
+	int duration = 800;
+	m_movement.move(item_rect.center(), duration, 0, CLAnimationTimeLine::SLOW_START_SLOW_END);
 
 
 	//scale(scl, scl);
 
 	
-	m_scenezoom.zoom_abs(zoom, duration, 0);
+	m_scenezoom.zoom_abs(zoom, duration, 0, CLAnimationTimeLine::SLOW_START_SLOW_END);
 
 
 	

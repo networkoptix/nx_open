@@ -76,8 +76,8 @@ CLAbstractMediaData* FakeStreamReader::getNextData()
 {
 
 	//m_sleep.sleep(1000/8);// 33 fps
-	qreal fps = 30;
-	//qreal fps = 6.5;
+	//qreal fps = 30;
+	qreal fps = 6.5;
 	CLSleep::msleep(1000/fps);
 
 	m_time += 1000/fps;
