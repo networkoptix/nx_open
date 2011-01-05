@@ -13,6 +13,10 @@ public:
 	virtual ~CLVideoWindowArchiveItem();
 
 	virtual void setFullScreen(bool full);
+
+	virtual void setItemSelected(bool sel, bool animate = true, int delay = 0);
+
+
 	void draw(CLVideoDecoderOutput& image, unsigned int channel);
 	QPointF getBestSubItemPos(CLAbstractSubItem::ItemType type);
 

@@ -61,13 +61,12 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data)
 
 	}
 
-	
 
 	if (dec && dec->decode(img))
 	{
 		if (m_draw)
 		{
-			
+			/**/
 			QSize on_screen = m_draw->size_on_screen(data->channel_num);
 			if (on_screen.width()*4 <= img.out_frame.width  && on_screen.height()*4 <= img.out_frame.height)
 			{

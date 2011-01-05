@@ -16,6 +16,8 @@ CLVideoWindowItem(view, layout, max_width, max_height, name)
 
 	mArchiveNavigator = new CLArchiveNavigatorItem(this, m_archNavigatorHeight);
 	onResize();
+
+	mArchiveNavigator->setVisible(false);
 }
 
 CLVideoWindowArchiveItem::~CLVideoWindowArchiveItem()
@@ -45,6 +47,19 @@ void CLVideoWindowArchiveItem::draw(CLVideoDecoderOutput& image, unsigned int ch
 	CLVideoWindowItem::draw(image, channel);
 	
 }
+
+
+void CLVideoWindowArchiveItem::setItemSelected(bool sel, bool animate, int delay)
+{
+	CLVideoWindowItem::setItemSelected(sel, animate , delay );
+
+	
+	if (sel)
+		mArchiveNavigator->setVisible(true);
+	else
+		mArchiveNavigator->setVisible(false);
+}
+
 
 void CLVideoWindowArchiveItem::setFullScreen(bool full)
 {
