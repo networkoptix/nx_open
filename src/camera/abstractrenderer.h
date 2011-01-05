@@ -3,6 +3,7 @@
 
 #include "../decoders/video/frame_info.h"
 #include <QMutex>
+#include <QSize>
 //#include <QWaitCondition>
 
 class CLAbstractRenderer
@@ -16,6 +17,8 @@ public:
 
 	virtual void draw(CLVideoDecoderOutput& image, unsigned int channel)=0;
 	virtual void before_destroy() = 0;
+
+	virtual QSize size_on_screen(unsigned int channel) const = 0;
 
 	virtual void copyVideoDataBeforePainting(bool copy)
 	{

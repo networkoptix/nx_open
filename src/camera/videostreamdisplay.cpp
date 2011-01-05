@@ -6,6 +6,7 @@
 #include <QMutexLocker>
 
 
+
 CLVideoStreamDisplay::CLVideoStreamDisplay():
 m_lightCPUmode(false)
 {
