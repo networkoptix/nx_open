@@ -67,6 +67,11 @@ void CLVideoWindowItem::before_destroy()
 		m_gldraw[i]->before_destroy();;
 }
 
+QSize CLVideoWindowItem::size_on_screen(unsigned int channel) const
+{
+	return onScreenSize()/m_videonum;
+}
+
 
 void CLVideoWindowItem::setItemSelected(bool sel, bool animate, int delay )
 {
@@ -122,7 +127,7 @@ void CLVideoWindowItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 
 void CLVideoWindowItem::draw(CLVideoDecoderOutput& image, unsigned int channel)
 {
-	
+	// this is not ui thread
 	m_first_draw = false;
 
 	m_gldraw[channel]->draw(image, channel); // this function will wait m_gldraw.paintEvent(0);
@@ -298,7 +303,7 @@ void CLVideoWindowItem::drawGLfailaure(QPainter* painter)
 	painter->setFont(m_FPS_Font);
 
 	QString text;
-	QTextStream(&text) << tr("Image size is bigger than MAXGlTixtureSize(") << m_gldraw[0]->getMaxTextureSize() << ") on this video hardware. Such images cannot be displayed in this version." ;
+	QTextStream(&text) << tr("Image size is bigger than MAXGlTextureSize(") << m_gldraw[0]->getMaxTextureSize() << ") on this video hardware. Such images cannot be displayed in this version." ;
 
 	
 

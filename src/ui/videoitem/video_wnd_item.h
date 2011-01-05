@@ -34,6 +34,7 @@ public:
 
 	float aspectRatio() const;
 
+	virtual QSize size_on_screen(unsigned int channel) const;
 
 	virtual void before_destroy();
 

@@ -186,6 +186,11 @@ QSize CLAbstractSceneItem::getMaxSize() const
 	return QSize(m_max_width, m_max_height);
 }
 
+QSize CLAbstractSceneItem::onScreenSize() const
+{
+	return m_view->mapFromScene(sceneBoundingRect()).boundingRect().size();
+}
+
 
 QRectF CLAbstractSceneItem::boundingRect() const
 {

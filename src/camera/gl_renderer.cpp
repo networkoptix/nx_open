@@ -803,6 +803,10 @@ bool CLGLRenderer::paintEvent(const QRect& r)
 			drawVideoTexture(m_texture[0], m_texture[1], m_texture[2], v_array);
 			/**/
 	}
+	else
+	{
+		draw = draw;
+	}
 	
 	m_waitCon.wakeOne();
 	m_do_not_need_to_wait_any_more = true;
@@ -811,3 +815,7 @@ bool CLGLRenderer::paintEvent(const QRect& r)
 }
 
 
+QSize CLGLRenderer::size_on_screen(unsigned int channel) const
+{
+	return m_videowindow->size_on_screen(channel);
+}

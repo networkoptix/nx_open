@@ -33,6 +33,8 @@ public:
 
 	virtual void before_destroy();
 
+	QSize size_on_screen(unsigned int channel) const;
+
 	void applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation)
 	{
 		//let's normalize the values

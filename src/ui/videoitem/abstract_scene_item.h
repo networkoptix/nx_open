@@ -48,6 +48,8 @@ public:
 	void setMaxSize(QSize size);
 	QSize getMaxSize() const;
 
+	virtual QSize onScreenSize() const;
+
 	virtual QRectF boundingRect() const;
 
 	bool needUpdate() const

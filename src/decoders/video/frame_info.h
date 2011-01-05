@@ -28,12 +28,18 @@ struct CLVideoDecoderOutput
 
 
 	void needToCleanUP(bool val);
+
+	static void downscale_factor2(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst);
+	static void downscale_factor4(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst);
+
 	static void copy(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst);
 	static bool imagesAreEqual(const CLVideoDecoderOutput* img1, const CLVideoDecoderOutput* img2, unsigned int max_diff);
 	void saveToFile(const char* filename);
 	void clean();
 private:
-	
+	static void downscalePlate_factor2(unsigned char* dst, const unsigned char* src, int src_width, int src_stride, int src_height);
+	static void downscalePlate_factor4(unsigned char* dst, const unsigned char* src, int src_width, int src_stride, int src_height);
+
 	static void copyPlane(unsigned char* dst, const unsigned char* src, int width, int dst_stride, int src_stride, int height);
 	static bool equalPlanes(const unsigned char* plane1, const unsigned char* plane2, int width, int stride1, int stride2, int height, int max_diff);
 private:
