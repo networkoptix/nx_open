@@ -25,8 +25,8 @@ private:
 	CLAbstractVideoDecoder* m_decoder[CL_VARIOUSE_DECODERS];
 	CLAbstractRenderer* m_draw;
 
-	CLVideoDecoderOutput m_out_frame2; // to reduce image size for weak video cards 
-	CLVideoDecoderOutput m_out_frame4; // to reduce image size for weak video cards 
+	CLVideoDecoderOutput m_out_frame; // to reduce image size for weak video cards 
+	
 
 	bool m_lightCPUmode;
 	

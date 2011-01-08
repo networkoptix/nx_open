@@ -6,7 +6,7 @@
 #define q_abs(x) ((x) >= 0 ? (x) : (-x))
 
 CLVideoDecoderOutput::CLVideoDecoderOutput():
-m_needToclean(false),
+m_capacity(0),
 C1(0), C2(0), C3(0),
 stride1(0),
 width(0)
@@ -16,25 +16,19 @@ width(0)
 
 CLVideoDecoderOutput::~CLVideoDecoderOutput()
 {
-	if (m_needToclean)
+	if (m_capacity)
 		clean();
 }
 
 void CLVideoDecoderOutput::clean()
 {
-	delete[] C1;
-	C1 = 0;
-	m_needToclean = false;
-	stride1 = 0;
-	width = 0;
+	if (m_capacity)
+	{
+		delete[] C1;
+		C1 = 0;
+		m_capacity = 0;
+	}
 }
-
-
-void CLVideoDecoderOutput::needToCleanUP(bool val)
-{
-	m_needToclean = val;
-}
-
 
 void CLVideoDecoderOutput::copy(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst)
 {
@@ -53,11 +47,12 @@ void CLVideoDecoderOutput::copy(const CLVideoDecoderOutput* src, CLVideoDecoderO
 
 		int yu_h = dst->out_type == CL_DECODER_YUV420 ? dst->height/2 : dst->height;
 
-		dst->C1 = new unsigned char[dst->stride1*dst->height + (dst->stride2+dst->stride3)*yu_h];
+		dst->m_capacity = dst->stride1*dst->height + (dst->stride2+dst->stride3)*yu_h;
+
+		dst->C1 = new unsigned char[dst->m_capacity];
 		dst->C2 = dst->C1 + dst->stride1*dst->height;
 		dst->C3 = dst->C2 + dst->stride2*yu_h;
 
-		dst->needToCleanUP(true);
 	}
 
 	int yu_h = dst->out_type == CL_DECODER_YUV420 ? dst->height/2 : dst->height;
@@ -79,71 +74,70 @@ void CLVideoDecoderOutput::copyPlane(unsigned char* dst, const unsigned char* sr
 	}
 }
 
-void CLVideoDecoderOutput::downscale_factor2(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst)
+void CLVideoDecoderOutput::downscale(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst, downscale_factor factor)
 {
-	if (src->width != 2*dst->width || src->height != 2*dst->height)
+
+
+	int src_width = src->width;
+	int src_height = src->height;
+
+	const int chroma_h_factor = (src->out_type == CL_DECODER_YUV420 || src->out_type == CL_DECODER_YUV422) ? 2 : 1;
+	const int chroma_v_factor = (src->out_type == CL_DECODER_YUV420) ? 2 : 1;
+
+	// after downscale chroma_width must be divisible by 4 ( opengl requirements )
+	const int mod_w = chroma_h_factor*factor*4;
+	if ((src_width%mod_w) != 0)
+		src_width = src_width/mod_w*mod_w;
+
+
+
+	dst->stride1 = src_width/factor;
+	dst->stride2 = src_width/chroma_h_factor/factor;
+	dst->stride3 = dst->stride2;
+
+	dst->width = dst->stride1;
+
+	dst->height = src_height/factor;
+	dst->out_type = src->out_type;
+
+	int yu_h = dst->height/chroma_v_factor;
+
+	unsigned int new_min_capacity = dst->stride1*dst->height + (dst->stride2+dst->stride3)*yu_h;
+
+	if (dst->m_capacity<new_min_capacity)
 	{
-		// need to realocate dst memory 
 		dst->clean();
-		dst->stride1 = src->width/2;
-		dst->stride2 = src->width/2/2;
-		dst->stride3 = src->width/2/2;
+		dst->m_capacity = new_min_capacity;
+		dst->C1 = new unsigned char[dst->m_capacity];
+	}
+	
+	dst->C2 = dst->C1 + dst->stride1*dst->height;
+	dst->C3 = dst->C2 + dst->stride2*yu_h;
 
-		dst->width = src->width/2;
 
-		dst->height = src->height/2;
-		dst->out_type = src->out_type;
+	int src_yu_h = src_height/chroma_v_factor;
 
-		int yu_h = dst->out_type == CL_DECODER_YUV420 ? dst->height/2 : dst->height;
-
-		dst->C1 = new unsigned char[dst->stride1*dst->height + (dst->stride2+dst->stride3)*yu_h];
-		dst->C2 = dst->C1 + dst->stride1*dst->height;
-		dst->C3 = dst->C2 + dst->stride2*yu_h;
-
-		dst->needToCleanUP(true);
+	if (factor == factor_2)
+	{
+		downscalePlate_factor2(dst->C1, src->C1, src_width, src->stride1, src_height);
+		downscalePlate_factor2(dst->C2, src->C2, src_width/chroma_h_factor, src->stride2, src_yu_h);
+		downscalePlate_factor2(dst->C3, src->C3, src_width/chroma_h_factor, src->stride3, src_yu_h);
+	}
+	else if(factor == factor_4)
+	{
+		downscalePlate_factor4(dst->C1, src->C1, src_width, src->stride1, src->height);
+		downscalePlate_factor4(dst->C2, src->C2, src_width/chroma_h_factor, src->stride2, src_yu_h);
+		downscalePlate_factor4(dst->C3, src->C3, src_width/chroma_h_factor, src->stride3, src_yu_h);
+	}
+	else if(factor == factor_8)
+	{
+		downscalePlate_factor8(dst->C1, src->C1, src_width, src->stride1, src->height);
+		downscalePlate_factor8(dst->C2, src->C2, src_width/chroma_h_factor, src->stride2, src_yu_h);
+		downscalePlate_factor8(dst->C3, src->C3, src_width/chroma_h_factor, src->stride3, src_yu_h);
 	}
 
-	int src_yu_h = src->out_type == CL_DECODER_YUV420 ? src->height/2 : src->height;
-
-	downscalePlate_factor2(dst->C1, src->C1, src->width, src->stride1, src->height);
-	downscalePlate_factor2(dst->C2, src->C2, src->width/2, src->stride2, src_yu_h);
-	downscalePlate_factor2(dst->C3, src->C3, src->width/2, src->stride3, src_yu_h);
 
 }
-
-
-void CLVideoDecoderOutput::downscale_factor4(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst)
-{
-	if (src->width != 4*dst->width || src->height != 4*dst->height)
-	{
-		// need to realocate dst memory 
-		dst->clean();
-		dst->stride1 = src->width/4;
-		dst->stride2 = src->width/2/4;
-		dst->stride3 = src->width/2/4;
-
-		dst->width = src->width/4;
-
-		dst->height = src->height/4;
-		dst->out_type = src->out_type;
-
-		int yu_h = dst->out_type == CL_DECODER_YUV420 ? dst->height/2 : dst->height;
-
-		dst->C1 = new unsigned char[dst->stride1*dst->height + (dst->stride2+dst->stride3)*yu_h];
-		dst->C2 = dst->C1 + dst->stride1*dst->height;
-		dst->C3 = dst->C2 + dst->stride2*yu_h;
-
-		dst->needToCleanUP(true);
-	}
-
-	int src_yu_h = src->out_type == CL_DECODER_YUV420 ? src->height/2 : src->height;
-
-	downscalePlate_factor4(dst->C1, src->C1, src->width, src->stride1, src->height);
-	downscalePlate_factor4(dst->C2, src->C2, src->width/2, src->stride2, src_yu_h);
-	downscalePlate_factor4(dst->C3, src->C3, src->width/2, src->stride3, src_yu_h);
-
-}
-
 
 
 
@@ -192,6 +186,30 @@ void CLVideoDecoderOutput::downscalePlate_factor4(unsigned char* dst, const unsi
 
 		src_line2-= src_width;
 		src_line2+=(src_stride<<2);
+	}
+}
+
+void CLVideoDecoderOutput::downscalePlate_factor8(unsigned char* dst, const unsigned char* src, int src_width, int src_stride, int src_height)
+{
+	const unsigned char* src_line1 = src;
+	const unsigned char* src_line2 = src + 7*src_stride;
+
+	for (int y = 0; y < src_height/8; ++y)
+	{
+		for (int x = 0; x < src_width/8; ++x)
+		{
+			*dst = ( (unsigned int)*src_line1 + *(src_line1+7) + (unsigned int)*src_line2 + *(src_line2+7) + 2 ) >> 2;
+			src_line1+=8;
+			src_line2+=8;
+
+			++dst;
+		}
+
+		src_line1-= src_width;
+		src_line1+=(src_stride<<3);
+
+		src_line2-= src_width;
+		src_line2+=(src_stride<<3);
 	}
 }
 

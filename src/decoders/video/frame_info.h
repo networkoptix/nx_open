@@ -9,6 +9,8 @@ enum CLColorSpace{CL_DECODER_YUV420 = 0, CL_DECODER_YUV422 = 1, CL_DECODER_YUV44
 
 struct CLVideoDecoderOutput
 {
+	enum downscale_factor{factor_1 = 1, factor_2 = 2, factor_4 = 4, factor_8 = 8};
+
 	CLVideoDecoderOutput();
 	~CLVideoDecoderOutput();
 
@@ -27,10 +29,9 @@ struct CLVideoDecoderOutput
 	int stride3;
 
 
-	void needToCleanUP(bool val);
 
-	static void downscale_factor2(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst);
-	static void downscale_factor4(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst);
+	static void downscale(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst, downscale_factor factor);
+	
 
 	static void copy(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst);
 	static bool imagesAreEqual(const CLVideoDecoderOutput* img1, const CLVideoDecoderOutput* img2, unsigned int max_diff);
@@ -39,12 +40,14 @@ struct CLVideoDecoderOutput
 private:
 	static void downscalePlate_factor2(unsigned char* dst, const unsigned char* src, int src_width, int src_stride, int src_height);
 	static void downscalePlate_factor4(unsigned char* dst, const unsigned char* src, int src_width, int src_stride, int src_height);
+	static void downscalePlate_factor8(unsigned char* dst, const unsigned char* src, int src_width, int src_stride, int src_height);
 
 	static void copyPlane(unsigned char* dst, const unsigned char* src, int width, int dst_stride, int src_stride, int height);
 	static bool equalPlanes(const unsigned char* plane1, const unsigned char* plane2, int width, int stride1, int stride2, int height, int max_diff);
 private:
 
-bool m_needToclean;
+	unsigned long m_capacity; // how many bytes are allocated ( if any )
+
 };
 
 

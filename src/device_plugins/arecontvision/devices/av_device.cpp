@@ -788,7 +788,7 @@ QString CLAreconVisionDevice::toString() const
 	
 
 	QTextStream t(&result);
-	t<< CLDevice::toString() <<"  fw=" << firmware << " hw=" << hardware << " net=" << net;
+	t<< CLDevice::toString() <<" live fw=" << firmware << " hw=" << hardware << " net=" << net;
 	if (m_description!="")
 		t <<  " dsc=" << m_description;
 	return result;
