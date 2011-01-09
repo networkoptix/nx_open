@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 
 	CLDevice::startCommandProc();
 
-	cl_log.log(CLDeviceManager::instance().getDiveceSercher().getNetState().toString(), cl_logALWAYS);
+	CLDeviceManager::instance(); // to initialize net state;
 
 	//===========================================================================
 	//IPPH264Decoder::dll.init();

@@ -70,6 +70,12 @@ QHostAddress CLNetworkDevice::getDiscoveryAddr() const
 	return m_local_adssr;
 }
 
+void CLNetworkDevice::setDiscoveryAddr(QHostAddress addr)
+{
+	m_local_adssr = addr;
+}
+
+
 QString CLNetworkDevice::toString() const
 {
 	QString result;

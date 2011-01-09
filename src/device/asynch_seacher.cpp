@@ -38,7 +38,7 @@ void CLDiviceSeracher::run()
 	if (ip_finished)
 	{
 		static bool first_time = true;
-		const QString& message = QObject::trUtf8("Cannot get free IP address.");
+		const QString& message = QObject::trUtf8("Cannot get available IP address.");
 		CL_LOG(cl_logWARNING) cl_log.log(message ,cl_logWARNING);
 		if (first_time)
 		{
@@ -96,19 +96,39 @@ CLDeviceList CLDiviceSeracher::findNewDevices(bool allow_to_change_ip, bool& ip_
 			}
 
 			CLDevice* all_dev = all_it.value();
-			if (all_dev->getStatus().checkFlag(CLDeviceStatus::READY)) // such device already exists and in a good shape
+			if (all_dev->getStatus().checkFlag(CLDeviceStatus::READY)) // such device already exists
 			{
+				// however, ip address or mask may be changed( very unlikely but who knows )
+				// and this is why we need to check if old( already existing device) still is in our subnet 
+				if (all_dev->checkDeviceTypeFlag(CLDevice::NETWORK))
+				{
+					CLNetworkDevice* all_dev_net = static_cast<CLNetworkDevice*>(all_dev);
+					if (!m_netState.isInMachineSubnet(all_dev_net->getIP())) // not the same network
+					{
+						//[-1-]
+						// we do changed ip address or subnet musk or even removed old nic interface and likely this device has "lost connection status"
+						// ip address must be changed
+
+						CLNetworkDevice* new_dev_net = static_cast<CLNetworkDevice*>(it.value());
+						all_dev_net->setDiscoveryAddr(new_dev_net->getDiscoveryAddr()); // update DiscoveryAddr; it will help to find new available ip in subnet
+						all_dev_net->getStatus().setFlag(CLDeviceStatus::NOT_IN_SUBNET);
+					}
+
+				}
+
+
 				//delete it.value(); //here+
 				it.value()->releaseRef();
 				devices.erase(it++);
 			}
 			else
-				++it; // new device; must stay 
+				++it; // new device; must stay
+
 		}
 
 	}
 	//====================================
-	// at this point in devices we have all found devices
+	// at this point in devices we have all new found devices
 	CLDeviceList not_network_devices;
 
 	// remove all not network devices from list 
@@ -156,19 +176,16 @@ CLDeviceList CLDiviceSeracher::findNewDevices(bool allow_to_change_ip, bool& ip_
 	//====================================
 
 	// check if all in our subnet
-	it = devices.begin(); 
-	while (it!=devices.end())
+
+	foreach(CLDevice* dev, devices)
 	{
-		CLNetworkDevice* device = static_cast<CLNetworkDevice*>(it.value());
+		CLNetworkDevice* device = static_cast<CLNetworkDevice*>(dev);
 
 		if (!m_netState.isInMachineSubnet(device->getIP())) // not the same network
 			device->getStatus().setFlag(CLDeviceStatus::NOT_IN_SUBNET);
-
-		++it;
 	}
+	
 	//=====================================
-
-
 	
 
 	// move all conflicting cams and cams with bad ip to bad_ip_list
@@ -206,45 +223,77 @@ CLDeviceList CLDiviceSeracher::findNewDevices(bool allow_to_change_ip, bool& ip_
 	{
 		QMutexLocker lock(&all_devices_mtx);
 
-		it = all_devices.begin();
-		while (it!=all_devices.end())
+		foreach(CLDevice* dev, all_devices)
 		{
-			CLNetworkDevice* device = static_cast<CLNetworkDevice*>(it.value());
+			CLNetworkDevice* device = static_cast<CLNetworkDevice*>(dev);
 
 			if (device->checkDeviceTypeFlag(CLDevice::NETWORK))
 				busy_list.insert(device->getIP().toIPv4Address());
 
-
-			++it;
 		}
-
 	}
 
-	it = devices.begin();
-	while (it!=devices.end())
+	foreach(CLDevice* dev, devices)
 	{
-		CLNetworkDevice* device = static_cast<CLNetworkDevice*>(it.value());
+		CLNetworkDevice* device = static_cast<CLNetworkDevice*>(dev);
 		busy_list.insert(device->getIP().toIPv4Address());
-		++it;
 	}
+
+
 	//======================================
 
 	time.restart();
 	if (bad_ip_list.size())
 		cl_log.log("Changing IP addresses... ", cl_logDEBUG1);
 
-	it = bad_ip_list.begin();
-	while(it!=bad_ip_list.end())
+
+	resovle_conflicts(bad_ip_list, busy_list, ip_finished);
+
+	if (bad_ip_list.size())
+		cl_log.log("Done. Time elapsed: ", time.elapsed(), cl_logDEBUG1);
+
+	fromListToList(bad_ip_list,  devices, 0, 0); // move everything to result list
+
+END:
+
+
+	if (!ip_finished && allow_to_change_ip)
 	{
-		
-		CLNetworkDevice* device = static_cast<CLNetworkDevice*>(it.value());
-		
+		// also in case if in already existing devices some devices conflicts with something see [-1-]
+		// we need to resolve that conflicts
+
+		CLDeviceList bad_ip_list;
+
+		QMutexLocker lock(&all_devices_mtx);
+		fromListToList(all_devices, bad_ip_list, CLDeviceStatus::NOT_IN_SUBNET, CLDeviceStatus::NOT_IN_SUBNET);
+		resovle_conflicts(bad_ip_list, busy_list, ip_finished);
+		fromListToList(bad_ip_list, all_devices, 0, 0);
+
+
+	}
+
+
+	// ok. at this point devices contains only network devices. and some of them have unknownDevice==true;
+	// we need to resolve such devices 
+	devices = resolveUnknown_helper(devices);
+
+	CLDevice::mergeLists(devices, not_network_devices); // move everything to result list
+
+	return devices;
+
+}
+//====================================================================================
+
+void CLDiviceSeracher::resovle_conflicts(CLDeviceList& device_list, CLIPList& busy_list, bool& ip_finished)
+{
+	foreach(CLDevice* dev, device_list)
+	{
+		CLNetworkDevice* device = static_cast<CLNetworkDevice*>(dev);
+
 
 		if (!m_netState.existsSubnet(device->getDiscoveryAddr())) // very strange
-		{
-			++it;
 			continue;
-		}
+
 
 		CLSubNetState& subnet = m_netState.getSubNetState(device->getDiscoveryAddr());
 
@@ -263,26 +312,11 @@ CLDeviceList CLDiviceSeracher::findNewDevices(bool allow_to_change_ip, bool& ip_
 			device->getStatus().removeFlag(CLDeviceStatus::NOT_IN_SUBNET);
 		}
 
-		++it;
 	}
 
 
-	if (bad_ip_list.size())
-		cl_log.log("Done. Time elapsed: ", time.elapsed(), cl_logDEBUG1);
-
-	fromListToList(bad_ip_list,  devices, 0, 0); // move everything to result list
-
-END:
-
-	// ok. at this point devices contains only network devices. and some of them have unknownDevice==true;
-	// we need to resolve such devices 
-	devices = resolveUnknown_helper(devices);
-
-	CLDevice::mergeLists(devices, not_network_devices); // move everything to result list
-
-	return devices;
-
 }
+
 
 bool CLDiviceSeracher::checkObviousConflicts(CLDeviceList& lst)
 {

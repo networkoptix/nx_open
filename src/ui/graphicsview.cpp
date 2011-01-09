@@ -1819,7 +1819,7 @@ void GraphicsView::onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int de
 	m_selectedWnd->setItemSelected(true, true, delay);
 
 	
-	if (global_show_item_text && m_selectedWnd->toVideoItem())
+	if (m_selectedWnd->toVideoItem())
 	{
 		
 		CLDevice* dev = m_selectedWnd->toVideoItem()->getVideoCam()->getDevice();

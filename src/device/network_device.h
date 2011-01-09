@@ -33,6 +33,7 @@ public:
 
 	// address used to discover this divece ( in case if machine has more than one NIC/address)
 	QHostAddress getDiscoveryAddr() const;
+	void setDiscoveryAddr(QHostAddress);
 	
 	// return true if device conflicting with smth else ( IP coflict )
 	bool conflicting();

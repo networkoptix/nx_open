@@ -4,7 +4,7 @@
 #include <QPaintEngine>
 #include <QTextStream>
 
-
+extern bool global_show_item_text;
 
 CLImageItem::CLImageItem(GraphicsView* view, int max_width, int max_height,
 						 QString name):
@@ -125,6 +125,10 @@ void CLImageItem::drawStuff(QPainter* painter)
 
 void CLImageItem::drawInfoText(QPainter* painter)
 {
+
+	if (!global_show_item_text)
+		return;
+
 	painter->setFont(m_Info_Font);
 	//painter->setPen(QColor(255,0,0,220));
 	painter->setPen(QColor(30,55,255));

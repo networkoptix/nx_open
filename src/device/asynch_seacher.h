@@ -6,6 +6,7 @@
 #include <QList>
 #include <QMutex>
 #include "../network/netstate.h"
+#include "network/nettools.h"
 
 class CLDeviceServer;
 
@@ -57,7 +58,11 @@ private:
 
 private:
 
+	void resovle_conflicts(CLDeviceList& device_list, CLIPList& busy_list, bool& ip_finished);
+
 	CLDeviceList resolveUnknown_helper(CLDeviceList& lst);
+
+private:
 
 	CLDeviceList m_result;
 	bool m_allow_change_ip;

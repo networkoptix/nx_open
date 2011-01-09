@@ -97,13 +97,13 @@ void CLVideoWindowItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 	CLImageItem::hoverEnterEvent(event);
 
 	CLDevice* dev = getVideoCam()->getDevice();
-	if (global_show_item_text && !dev->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT))
+	if (!dev->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT))
 	{
 		setShowImagesize(true);
 	}
 
-	//if (global_show_item_text && !dev->checkDeviceTypeFlag(CLDevice::ARCHIVE) && !dev->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT) )
-	if (global_show_item_text && !dev->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT) )
+	//if (!dev->checkDeviceTypeFlag(CLDevice::ARCHIVE) && !dev->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT) )
+	if (!dev->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT) )
 	{
 		showFPS(true);
 		setShowInfoText(true);
@@ -264,7 +264,7 @@ void CLVideoWindowItem::drawStuff(QPainter* painter)
 	drawShadow(painter);
 
 	//============
-	if (m_showing_text && m_showfps)
+	if (m_showing_text && m_showfps && global_show_item_text)
 	{
 		drawFPS(painter);	// ahtung! drawText takes huge(!) ammount of cpu
 	}
