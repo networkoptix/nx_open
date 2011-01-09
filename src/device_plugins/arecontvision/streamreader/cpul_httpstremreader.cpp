@@ -12,7 +12,6 @@ CLAVClinetPullStreamReader(dev)
 
 	CLAreconVisionDevice* device = static_cast<CLAreconVisionDevice*>(dev);
 
-	m_ip = device->getIP();
 	m_port = 69;
 	m_timeout = 500;
 	m_auth = device->getAuth();
@@ -137,7 +136,7 @@ CLAbstractMediaData* AVClientPullSSHTTPStreamreader::getNextData()
 
 	
 	
-	CLSimpleHTTPClient http_client(m_ip, m_port, m_timeout, m_auth);
+	CLSimpleHTTPClient http_client((static_cast<CLAreconVisionDevice*>(m_device))->getIP(), m_port, m_timeout, m_auth);
 
 	http_client.setRequestLine(request);
 	http_client.openStream();

@@ -68,7 +68,7 @@ protected:
 
 private:
 	QAuthenticator m_auth;
-	mutable QMutex m_auth_cs;
+	mutable QMutex m_cs;
 
 };
 

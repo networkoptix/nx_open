@@ -37,7 +37,7 @@ CLAVClinetPullStreamReader(dev)
 	
 	m_model = device->getModel();
 	
-	m_ip = device->getIP();
+	
 	m_timeout = 500;
 	
 	m_last_width = 0;
@@ -202,7 +202,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 			
 	
 	
-	CLSimpleTFTPClient tftp_client(m_ip.toString().toLatin1().data(),  m_timeout, 3);
+	CLSimpleTFTPClient tftp_client((static_cast<CLAreconVisionDevice*>(m_device))->getIP().toString().toLatin1().data(),  m_timeout, 3);
 
 	CLCompressedVideoData* videoData = new CLCompressedVideoData(CL_MEDIA_ALIGNMENT,forecast_size);
 	CLByteArray& img = videoData->data;

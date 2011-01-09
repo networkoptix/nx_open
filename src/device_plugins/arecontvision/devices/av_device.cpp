@@ -424,7 +424,8 @@ bool CLAreconVisionDevice::setIP(const QHostAddress& ip, bool net )
 		QUdpSocket sock;
 
 		sock.bind(m_local_adssr , 0); // address usesd to find cam
-		QString m_local_adssr_srt = m_local_adssr.toString(); // dubug only
+		QString m_local_adssr_srt = m_local_adssr.toString(); // debug only
+		QString new_ip_srt = ip.toString(); // debug only
 
 		QByteArray basic_str = "Arecont_Vision-AV2000\2";
 
@@ -451,7 +452,7 @@ bool CLAreconVisionDevice::setIP(const QHostAddress& ip, bool net )
 
 	}
 
-	m_ip = ip;
+	CLNetworkDevice::setIP(ip);
 
 	return true;
 }

@@ -20,11 +20,13 @@ CLNetworkDevice::CLNetworkDevice()
 
 QHostAddress CLNetworkDevice::getIP() const
 {
+	QMutexLocker mutex(&m_cs);
 	return m_ip;
 }
 
 bool CLNetworkDevice::setIP(const QHostAddress& ip, bool net )
 {
+	QMutexLocker mutex(&m_cs);
 	m_ip = ip;
 	return true;
 }
@@ -46,14 +48,14 @@ void  CLNetworkDevice::setMAC(const QString& mac)
 
 void CLNetworkDevice::setAuth(const QString& user, QString password)
 {
-	QMutexLocker mutex(&m_auth_cs);
+	QMutexLocker mutex(&m_cs);
 	m_auth.setUser(user);
 	m_auth.setPassword(password);
 }
 
 QAuthenticator CLNetworkDevice::getAuth() const
 {
-	QMutexLocker mutex(&m_auth_cs);
+	QMutexLocker mutex(&m_cs);
 	return m_auth;
 }
 

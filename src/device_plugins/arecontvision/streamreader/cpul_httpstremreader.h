@@ -22,7 +22,7 @@ protected:
 	
 protected:
 
-	QHostAddress m_ip;
+
 	unsigned int m_port;
 	unsigned int m_timeout;
 	QAuthenticator m_auth;

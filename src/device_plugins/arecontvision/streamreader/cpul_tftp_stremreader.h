@@ -34,7 +34,7 @@ protected:
 
 	bool m_last_resolution;
 
-	QHostAddress m_ip;
+
 	unsigned int m_timeout;
 	int m_model;
 
