@@ -56,7 +56,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 	QString request;
 	QTextStream os(&request);
 
-	int forecast_size = 0;
+	unsigned int forecast_size = 0;
 	int left;
 	int top;
 	int right;

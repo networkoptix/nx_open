@@ -1,22 +1,32 @@
 #include "netstate.h"
 #include <QMutexLocker>
 #include "nettools.h"
+#include "base\log.h"
 
 
 CLNetState::CLNetState()
 {
-	init();
+	updateNetState();
 }
 
-void CLNetState::init()
+void CLNetState::updateNetState()
 {
-	m_net_entries = getAllIPv4AddressEntries(false);
-	for (int i = 0; i < m_net_entries.size(); ++i)
+	bool net_state_changed = false;
+
+	m_net_entries = getAllIPv4AddressEntries();
+
+	StateMAP new_netstate;
+
+	for (int i = 0; i < m_net_entries.count(); ++i)
 	{
 		const QNetworkAddressEntry& entry = m_net_entries.at(i);
 
 		quint32 ip = entry.ip().toIPv4Address();
 		quint32 mask = entry.netmask().toIPv4Address();
+
+		//QString ip_s = entry.ip().toString(); //debug
+		//QString mask_s = entry.netmask().toString(); //debug
+
 
 		quint32 minaddr = ip & mask;
 		quint32 maxaddr = ip | (~mask);
@@ -27,8 +37,38 @@ void CLNetState::init()
 		state.minHostAddress = QHostAddress(minaddr);
 		state.maxHostAddress = QHostAddress(maxaddr);
 
-		m_netstate[entry.ip().toString()] = state;
+		if ( existsSubnet(entry.ip()) )
+		{
+			CLSubNetState& existing_state = getSubNetState(entry.ip());
+
+			if (state.minHostAddress == existing_state.minHostAddress && state.maxHostAddress == existing_state.maxHostAddress)// same subnet, nothing changed
+				state.currHostAddress = existing_state.currHostAddress;
+			else// subnet mask changed 
+				net_state_changed = true;
+
+		}
+		else
+			net_state_changed = true; // ip changed or new subnet
+
+
+		new_netstate[entry.ip().toString()] = state;
 	}
+
+	
+	if (new_netstate.size()!=m_netstate.size())
+		net_state_changed = true;
+
+
+	m_netstate = new_netstate;
+
+
+	if (net_state_changed)
+	{
+		cl_log.log("Current Net state:", cl_logALWAYS);
+		cl_log.log(toString(), cl_logALWAYS);
+	}
+
+
 }
 
 QString CLNetState::toString() const
@@ -38,6 +78,7 @@ QString CLNetState::toString() const
 
 	QTextStream str(&result);
 
+	str << endl;
 	str << endl;
 
 	
@@ -57,9 +98,9 @@ QString CLNetState::toString() const
 }
 
 
-bool CLNetState::exists(const QHostAddress& machine_ip) const
+bool CLNetState::existsSubnet(const QHostAddress& machine_ip) const
 {
-	return (m_netstate.find(machine_ip.toString())!=m_netstate.end());
+	return (m_netstate.contains(machine_ip.toString()));
 }
 
 // return CLSubNetState for NIC ipv4 machine_ip 
@@ -68,34 +109,22 @@ CLSubNetState& CLNetState::getSubNetState(const QHostAddress& machine_ip)
 	return m_netstate[machine_ip.toString()];
 }
 
-void CLNetState::setSubNetState(const QHostAddress& machine_ip, const CLSubNetState& sn)
-{
-	m_netstate[machine_ip.toString()] = sn;
-}
-
 bool CLNetState::isInMachineSubnet(const QHostAddress& addr) const
 {
 	for (int i = 0; i < m_net_entries.size(); ++i)
 	{
 		const QNetworkAddressEntry& entr = m_net_entries.at(i);
+		
+
+		//QString addr_str = addr.toString();
+		//QString entr_ip_str = entr.ip().toString();
+		//QString entr_mask = entr.netmask().toString();
 		if (entr.ip().isInSubnet(addr, entr.prefixLength()))
+		//if (entr.ip().isInSubnet(addr, entr.netmask().toIPv4Address()))
 			return true;
 
 	}
 	return false;
 
-}
-
-const QList<QNetworkAddressEntry>&  CLNetState::getAllIPv4AddressEntries(bool from_memorry )
-{
-	//QMutexLocker lock(&m_mutex);
-
-	if (from_memorry)
-		return m_net_entries;
-
-
-	m_net_entries = ::getAllIPv4AddressEntries();
-
-	return m_net_entries;
 }
 

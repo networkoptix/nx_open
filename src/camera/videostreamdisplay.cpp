@@ -58,7 +58,6 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data)
 		img.codec = data->compressionType;
 		dec = m_decoder[data->compressionType];
 
-
 	}
 
 
@@ -79,7 +78,7 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data)
 				factor = CLVideoDecoderOutput::factor_2;
 			
 			/**/
-			//factor = CLVideoDecoderOutput::factor_8;
+			//factor = CLVideoDecoderOutput::factor_1;
 
 			if (factor == CLVideoDecoderOutput::factor_1)
 				m_draw->draw(img.out_frame, data->channel_num);

@@ -44,7 +44,7 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 	QString request;
 	QTextStream os(&request);
 
-	int forecast_size = 0;
+	unsigned int forecast_size = 0;
 
 	bool h264;
 	int streamID = 0;
@@ -173,9 +173,16 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 		arr[0] & 4 ? resolutionFULL = true : false;
 		size = ExtractSize(&arr[2]);
 
+		if (size.width>5000 || size.width<0 || size.height>5000 || size.height<0) // bug of arecontvision firmware 
+		{
+			videoData->releaseRef();
+			return 0;
+		}
+						
+
+
 		m_last_width = size.width;
 		m_last_height = size.height;
-
 
 		videoData->channel_num = arr[0] & 3;
 

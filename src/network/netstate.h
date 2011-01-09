@@ -22,29 +22,24 @@ public:
 	CLNetState();
 
 	// check if it has SubNetState with such NIC machine_ip
-	bool exists(const QHostAddress& machine_ip) const;
+	bool existsSubnet(const QHostAddress& machine_ip) const;
 
 	// return CLSubNetState for NIC ipv4 machine_ip 
 	CLSubNetState& getSubNetState(const QHostAddress& machine_ip);
 
-	void setSubNetState(const QHostAddress& machine_ip, const CLSubNetState& sn);
-
-	const QList<QNetworkAddressEntry>&  getAllIPv4AddressEntries(bool from_memorry = true);
-
 	// check if addr is in the same subnet as one of our IPV4 interface 
 	bool isInMachineSubnet(const QHostAddress& addr) const;
 
-
-	void init();
+	// this function updates all IPV4 subnets;
+	// if it gets new subnet => m_netstate gonna be increased
+	// if some subnet diapered since last call =>  m_netstate will be decreased
+	void updateNetState();
 
 	QString toString() const;
-private:
-
+private:	
 	
-
-	StateMAP m_netstate;
 	QList<QNetworkAddressEntry> m_net_entries;
-
+	StateMAP m_netstate; // net state for each subnet
 	//mutable QMutex m_mutex;
 
 };

@@ -55,7 +55,7 @@ private:
 struct CLCompressedVideoData : public CLAbstractMediaData
 {
 	CLCompressedVideoData(unsigned int alignment, unsigned int capacity):
-	CLAbstractMediaData(alignment, capacity)
+	CLAbstractMediaData(alignment, qMin(capacity, (unsigned int)10*1024*1024))
 	
 	{
 		dataType = VIDEO;

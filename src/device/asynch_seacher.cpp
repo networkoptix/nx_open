@@ -59,6 +59,8 @@ CLDeviceList CLDiviceSeracher::findNewDevices(bool allow_to_change_ip, bool& ip_
 	QTime time;
 	time.start();
 
+	m_netState.updateNetState(); // update net state before serach 
+
 	//====================================
 	CL_LOG(cl_logDEBUG1) cl_log.log("looking for devices...", cl_logDEBUG1);
 
@@ -133,9 +135,6 @@ CLDeviceList CLDiviceSeracher::findNewDevices(bool allow_to_change_ip, bool& ip_
 	CLIPList busy_list;
 
 	CLDeviceList bad_ip_list;
-
-
-	//return devices; //<- this line should be removed if you do not deal with fake devices. I'll fix it shortly
 
 	cl_log.log("Found ", devices.size() + not_network_devices.size(), " new(!) devices.", cl_logDEBUG1);
 
@@ -241,7 +240,7 @@ CLDeviceList CLDiviceSeracher::findNewDevices(bool allow_to_change_ip, bool& ip_
 		CLNetworkDevice* device = static_cast<CLNetworkDevice*>(it.value());
 		
 
-		if (!m_netState.exists(device->getDiscoveryAddr())) // very strange
+		if (!m_netState.existsSubnet(device->getDiscoveryAddr())) // very strange
 		{
 			++it;
 			continue;
