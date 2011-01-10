@@ -266,8 +266,11 @@ END:
 
 		QMutexLocker lock(&all_devices_mtx);
 		fromListToList(all_devices, bad_ip_list, CLDeviceStatus::NOT_IN_SUBNET, CLDeviceStatus::NOT_IN_SUBNET);
-		resovle_conflicts(bad_ip_list, busy_list, ip_finished);
-		fromListToList(bad_ip_list, all_devices, 0, 0);
+		if (bad_ip_list.size())
+		{
+			resovle_conflicts(bad_ip_list, busy_list, ip_finished);
+			fromListToList(bad_ip_list, all_devices, 0, 0);
+		}
 
 
 	}

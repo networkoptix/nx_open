@@ -25,10 +25,11 @@ m_recorder(device)
 
 	for (int i = 0; i < videonum; ++i)
 	{
-		m_camdispay.addVideoChannel(i, m_videovindow);
+		m_camdispay.addVideoChannel(i, m_videovindow, !m_device->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT));
 		m_videovindow->setStatistics(&m_stat[i], i);
 	}
-	
+
+
 	m_reader = m_device->getDeviceStreamConnection();
 
 	m_reader->addDataProcessor(&m_camdispay);

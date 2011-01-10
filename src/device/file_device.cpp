@@ -6,6 +6,7 @@ CLFileDevice::CLFileDevice(QString filename)
 {
 	setUniqueId(filename);
 	m_name = QFileInfo(filename).fileName();
+	addDeviceTypeFlag(CLDevice::SINGLE_SHOT);
 }
 
 QString CLFileDevice::getFileName() const

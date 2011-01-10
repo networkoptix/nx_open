@@ -39,7 +39,7 @@ bool CLArecontSingleSensorDevice::getDescription()
 
 CLStreamreader* CLArecontSingleSensorDevice::getDeviceStreamConnection()
 {
-	cl_log.log("Creating streamreader for ", m_ip.toString(), cl_logDEBUG1);
+	cl_log.log("Creating streamreader for ", getIP().toString(), cl_logDEBUG1);
 	return new AVClientPullSSTFTPStreamreader(this);
 }
 

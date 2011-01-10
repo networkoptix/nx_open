@@ -7,8 +7,9 @@
 
 
 
-CLVideoStreamDisplay::CLVideoStreamDisplay():
-m_lightCPUmode(false)
+CLVideoStreamDisplay::CLVideoStreamDisplay(bool can_downscale):
+m_lightCPUmode(false),
+m_can_downscale(can_downscale)
 {
 	for (int i = 0; i < CL_VARIOUSE_DECODERS;++i)
 		m_decoder[i] = 0;
@@ -65,28 +66,35 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data)
 	{
 		if (m_draw)
 		{
-			/**/
-			QSize on_screen = m_draw->size_on_screen(data->channel_num);
-
-			CLVideoDecoderOutput::downscale_factor factor = CLVideoDecoderOutput::factor_1;
-
-			if (on_screen.width()*8 <= img.out_frame.width  && on_screen.height()*8 <= img.out_frame.height)
-				factor = CLVideoDecoderOutput::factor_8;
-			else if (on_screen.width()*4 <= img.out_frame.width  && on_screen.height()*4 <= img.out_frame.height)
-				factor = CLVideoDecoderOutput::factor_4;
-			else if (on_screen.width()*2 <= img.out_frame.width  && on_screen.height()*2 <= img.out_frame.height)
-				factor = CLVideoDecoderOutput::factor_2;
-			
-			/**/
-			//factor = CLVideoDecoderOutput::factor_1;
-
-			if (factor == CLVideoDecoderOutput::factor_1)
-				m_draw->draw(img.out_frame, data->channel_num);
-			else
+			if (m_can_downscale)
 			{
-				CLVideoDecoderOutput::downscale(&img.out_frame, &m_out_frame, factor); // extra cpu work but less to display( for weak video cards )
-				m_draw->draw(m_out_frame, data->channel_num);
+				QSize on_screen = m_draw->size_on_screen(data->channel_num);
+				CLVideoDecoderOutput::downscale_factor factor = CLVideoDecoderOutput::factor_1;
+
+				if (on_screen.width()*8 <= img.out_frame.width  && on_screen.height()*8 <= img.out_frame.height)
+					factor = CLVideoDecoderOutput::factor_8;
+				else if (on_screen.width()*4 <= img.out_frame.width  && on_screen.height()*4 <= img.out_frame.height)
+					factor = CLVideoDecoderOutput::factor_4;
+				else if (on_screen.width()*2 <= img.out_frame.width  && on_screen.height()*2 <= img.out_frame.height)
+					factor = CLVideoDecoderOutput::factor_2;
+
+
+				//factor = CLVideoDecoderOutput::factor_1;
+
+				if (factor == CLVideoDecoderOutput::factor_1)
+				{
+					m_draw->draw(img.out_frame, data->channel_num);
+				}
+				else
+				{
+					CLVideoDecoderOutput::downscale(&img.out_frame, &m_out_frame, factor); // extra cpu work but less to display( for weak video cards )
+					m_draw->draw(m_out_frame, data->channel_num);
+				}
+
 			}
+			else
+				m_draw->draw(img.out_frame, data->channel_num);
+
 				
 		}
 	}

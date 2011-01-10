@@ -28,11 +28,11 @@ CLCamDisplay::~CLCamDisplay()
 	delete m_aydio_display;
 }
 
-void CLCamDisplay::addVideoChannel(int index, CLAbstractRenderer* vw)
+void CLCamDisplay::addVideoChannel(int index, CLAbstractRenderer* vw, bool can_downsacle)
 {
 	Q_ASSERT(index<CL_MAX_CHANNELS);
 
-	m_display[index] = new CLVideoStreamDisplay();
+	m_display[index] = new CLVideoStreamDisplay(can_downsacle);
 	m_display[index]->setDrawer(vw);
 }
 
@@ -59,7 +59,7 @@ void CLCamDisplay::processData(CLAbstractData* data)
 		// in ideal world data comes to queue at the same speed as it goes out 
 		// but timer on the sender side runs at a bit different rate in comparison to the timer here
 		// adaptive delay will not solve all problems => need to minus little appendix based on queue size
-		qint32 need_to_sleep = curr_time - m_prev_time - (m_dataQueue.size()+1)/2;
+		qint32 need_to_sleep = curr_time - m_prev_time - (m_dataQueue.size());
 
 		m_prev_time = curr_time;
 

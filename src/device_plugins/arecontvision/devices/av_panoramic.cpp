@@ -119,7 +119,7 @@ bool CLArecontPanoramicDevice::getDescription()
 
 CLStreamreader* CLArecontPanoramicDevice::getDeviceStreamConnection()
 {
-	cl_log.log("Creating streamreader for ", m_ip.toString(), cl_logDEBUG1);
+	cl_log.log("Creating streamreader for ", getIP().toString(), cl_logDEBUG1);
 	return new AVPanoramicClientPullSSTFTPStreamreader(this);
 }
 
@@ -183,7 +183,7 @@ bool CLArecontPanoramicDevice::setParam(const QString& name, const CLValue& val 
 
 	if (value.type==CLParamType::None || value.type==CLParamType::Button) 
 	{
-		CLSimpleHTTPClient connection(m_ip, 80, getHttpTimeout(), getAuth());
+		CLSimpleHTTPClient connection(getIP(), 80, getHttpTimeout(), getAuth());
 		QString request;
 
 		QTextStream str(&request);
@@ -199,7 +199,7 @@ bool CLArecontPanoramicDevice::setParam(const QString& name, const CLValue& val 
 	{
 		for (int i = 1; i <=4 ; ++i)
 		{
-			CLSimpleHTTPClient connection(m_ip, 80, getHttpTimeout(), getAuth());
+			CLSimpleHTTPClient connection(getIP(), 80, getHttpTimeout(), getAuth());
 			QString request;
 
 			QTextStream str(&request);

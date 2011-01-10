@@ -16,7 +16,7 @@ class CLCamDisplay : public CLAbstractDataProcessor
 public:
 	CLCamDisplay();
 	~CLCamDisplay();
-	void addVideoChannel(int index, CLAbstractRenderer* vw);
+	void addVideoChannel(int index, CLAbstractRenderer* vw, bool can_downsacle);
 	void processData(CLAbstractData* data);
 
 	void setLightCPUMode(bool val);

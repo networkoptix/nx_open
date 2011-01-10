@@ -92,7 +92,7 @@ bool CLNetworkDevice::conflicting()
 	CL_LOG(cl_logDEBUG2) cl_log.log("begining of CLNetworkDevice::conflicting() ",  cl_logDEBUG2);
 
 
-	QString mac = getMacByIP(m_ip);
+	QString mac = getMacByIP(getIP());
 
 	if (mac!=m_mac)// someone else has this IP
 	{
@@ -103,11 +103,11 @@ bool CLNetworkDevice::conflicting()
 	CLSleep::msleep(10);
 
 	CLPing ping;
-	if (!ping.ping(m_ip.toString(), 2, ping_timeout)) // I do know know how else to solve this problem. but getMacByIP do not creates any ARP record 
+	if (!ping.ping(getIP().toString(), 2, ping_timeout)) // I do know know how else to solve this problem. but getMacByIP do not creates any ARP record 
 		return true;
 
 	
-	mac = getMacByIP(m_ip, false); // just in case if ARP response from some else have delayed 
+	mac = getMacByIP(getIP(), false); // just in case if ARP response from some else have delayed 
 
 	if (mac!=m_mac)// someone else has this IP
 	{

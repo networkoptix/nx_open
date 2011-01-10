@@ -5,7 +5,7 @@
 #include "ping.h"
 #include "netstate.h"
 
-int ping_timeout = 60;
+int ping_timeout = 100;
 
 QList<QHostAddress> getAllIPv4Addresses()
 {

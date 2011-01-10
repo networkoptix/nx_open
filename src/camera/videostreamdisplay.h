@@ -13,7 +13,7 @@ class CLAbstractRenderer;
 class CLVideoStreamDisplay
 {
 public:
-	CLVideoStreamDisplay();
+	CLVideoStreamDisplay(bool can_downscale);
 	~CLVideoStreamDisplay();
 	void setDrawer(CLAbstractRenderer* draw);
 	void dispay(CLCompressedVideoData* data);
@@ -29,6 +29,8 @@ private:
 	
 
 	bool m_lightCPUmode;
+
+	bool m_can_downscale;
 	
 
 };

@@ -1,6 +1,7 @@
 #include "dataprocessor.h"
 #include "../base/sleep.h"
 #include "../base/log.h"
+#include <QTime>
 
 
 CLAbstractDataProcessor::CLAbstractDataProcessor(int max_que_size):
@@ -42,7 +43,7 @@ void CLAbstractDataProcessor::run()
 
 		if (!get)
 		{
-			CL_LOG(cl_logDEBUG2) cl_log.log("queue is empy ", (int)&m_dataQueue,cl_logDEBUG2);
+			CL_LOG(cl_logDEBUG2) cl_log.log("queue is empty ", (int)&m_dataQueue,cl_logDEBUG2);
 			CLSleep::msleep(10);
 			continue;
 		}

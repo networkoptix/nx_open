@@ -28,7 +28,7 @@ CLHttpStatus CLAreconVisionDevice::getRegister(int page, int num, int& val)
 	QString req;
 	QTextStream(&req) << "getreg?page=" << page << "&reg=" << num;
 
-	CLSimpleHTTPClient http(m_ip, 80,getHttpTimeout(), getAuth());
+	CLSimpleHTTPClient http(getIP(), 80,getHttpTimeout(), getAuth());
 	http.setRequestLine(req);
 
 	CLHttpStatus result = http.openStream();
@@ -102,7 +102,7 @@ CLHttpStatus CLAreconVisionDevice::setRegister(int page, int num, int val)
 	QString req;
 	QTextStream(&req) << "setreg?page=" << page << "&reg=" << num << "&val=" << val;
 
-	CLSimpleHTTPClient http(m_ip, 80,getHttpTimeout(), getAuth());
+	CLSimpleHTTPClient http(getIP(), 80,getHttpTimeout(), getAuth());
 	http.setRequestLine(req);
 
 	CLHttpStatus result = http.openStream();
@@ -183,7 +183,7 @@ bool CLAreconVisionDevice::getParam(const QString& name, CLValue& val, bool resy
 		//return false;
 	}
 
-	CLSimpleHTTPClient connection(m_ip, 80, getHttpTimeout(), getAuth());
+	CLSimpleHTTPClient connection(getIP(), 80, getHttpTimeout(), getAuth());
 
 	QString request;
 
@@ -260,7 +260,7 @@ bool CLAreconVisionDevice::setParam(const QString& name, const CLValue& val )
 
 
 
-	CLSimpleHTTPClient connection(m_ip, 80, getHttpTimeout(), getAuth());
+	CLSimpleHTTPClient connection(getIP(), 80, getHttpTimeout(), getAuth());
 
 
 	QString request;
@@ -444,17 +444,18 @@ bool CLAreconVisionDevice::setIP(const QHostAddress& ip, bool net )
 		sock.writeDatagram(data, shift + 10,QHostAddress::Broadcast, 69);
 
 		removeARPrecord(ip);
-		removeARPrecord(m_ip);
+		removeARPrecord(getIP());
 
-		CLPing ping;
-		if (!ping.ping(ip.toString(), 2, ping_timeout)) // check if ip really changed 
-			return false;
+
+		// after ip changed ping does not work ( this implementation ); I'll comment it for now
+		//CLPing ping;
+		//if (!ping.ping(ip.toString(), 2, ping_timeout)) // check if ip really changed 
+		//	return false; 
+		
 
 	}
 
-	CLNetworkDevice::setIP(ip);
-
-	return true;
+	return CLNetworkDevice::setIP(ip);
 }
 
 bool CLAreconVisionDevice::loadDevicesParam(const QString& file_name, QString& error)
