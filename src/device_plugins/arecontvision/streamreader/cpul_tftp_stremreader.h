@@ -38,6 +38,8 @@ protected:
 	unsigned int m_timeout;
 	int m_model;
 
+	bool m_black_white; // for dual sensor only 
+
 
 };
 

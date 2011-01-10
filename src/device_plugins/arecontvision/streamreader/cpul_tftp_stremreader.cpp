@@ -31,7 +31,8 @@ AVLastPacketSize ExtractSize(const unsigned char* arr)
 //=========================================================
 
 AVClientPullSSTFTPStreamreader::AVClientPullSSTFTPStreamreader (CLDevice* dev ):
-CLAVClinetPullStreamReader(dev)
+CLAVClinetPullStreamReader(dev),
+m_black_white(false)
 {
 	CLAreconVisionDevice* device = static_cast<CLAreconVisionDevice*>(dev);
 	
@@ -103,6 +104,19 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 			top = m_streamParam.get("image_top").value.value;
 			right = m_streamParam.get("image_right").value.value;
 			bottom = m_streamParam.get("image_bottom").value.value;
+
+			if ((m_model == AV3135 || m_model == AV3130) && m_black_white)
+			{
+				right = right/3*2;
+				bottom = bottom/3*2;
+
+				right = right/32*32;
+				bottom = bottom/16*16;
+
+				right = qMin(1280, right);
+				bottom = qMin(1024, bottom);
+
+			}
 
 			//right = 1280;
 			//bottom = 1024;
@@ -266,6 +280,21 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 	default:
 		iframe_index = 93;
 	}
+
+	if (m_model == AV3135 || m_model == AV3130)
+	{
+		if (lp_size<21)
+		{
+			cl_log.log("last packet is too short!", cl_logERROR);
+			//delete videoData;
+			videoData->releaseRef();
+			return 0;
+		}
+
+		m_black_white = last_packet[20];
+	}
+
+	
 
 	if (h264 && (lp_size < iframe_index))
 	{
