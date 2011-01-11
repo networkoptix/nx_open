@@ -16,7 +16,7 @@
 //int NavigatorItemHeight = 200;
 
 CLArchiveNavigatorItem::CLArchiveNavigatorItem(CLAbstractSubItemContainer* parent, int height):
-CLAbstractSubItem(parent, 0.4, 0.8),
+CLAbstractSubItem(parent, 0.2, 0.8),
 mStreamReader(0),
 mPlayMode(true),
 mSliderIsmoving(false),

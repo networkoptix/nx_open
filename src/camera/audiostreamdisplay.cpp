@@ -117,7 +117,7 @@ void CLAudioStreamDisplay::putdata(CLCompressedAudioData* data)
 
 	if (dec->decode(audio))
 	{
-		
+
 		if (!m_audioOutput)
 			recreatedevice(audio.format);
 
@@ -137,7 +137,7 @@ void CLAudioStreamDisplay::putdata(CLCompressedAudioData* data)
 		{
 			//paying too slow; need to speedup
 			m_freq_factor+=0.005;
-			audio.format.setFrequency(audio.format.frequency()*m_freq_factor);
+			//audio.format.setFrequency(audio.format.frequency()*m_freq_factor);
 			//recreatedevice(audio.format); // recreation does not work very well
 			m_ringbuff->claer();
 		}
@@ -146,7 +146,7 @@ void CLAudioStreamDisplay::putdata(CLCompressedAudioData* data)
 		{
 			//paying too fast; need to slowdown
 			m_freq_factor-=0.005;
-			audio.format.setFrequency(audio.format.frequency()*m_freq_factor);
+			//audio.format.setFrequency(audio.format.frequency()*m_freq_factor);
 			//recreatedevice(audio.format); //recreation does not work very well
 		}
 
@@ -209,7 +209,7 @@ void CLAudioStreamDisplay::recreatedevice(QAudioFormat format)
 
 	QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
 
-	
+
 	if (!info.isFormatSupported(format)) 
 	{
 		
@@ -230,7 +230,12 @@ void CLAudioStreamDisplay::recreatedevice(QAudioFormat format)
 	}
 	/**/
 
+	
+
 	m_audioOutput = new QAudioOutput(format, this);
+
+	
+
 	m_audioOutput->setBufferSize( bytes_from_time(format, m_buff_ms) ); // data for 1sec of audio
 	m_audiobuff = m_audioOutput->start();
 

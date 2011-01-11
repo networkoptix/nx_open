@@ -16,6 +16,7 @@ enum CLCodecType
 	CL_MSVIDEO1, 
 	CL_MSMPEG4V3,
 
+	CL_MP2,
 	CL_MP3, 
 	CL_AC3, 
 	CL_WMAV2, 

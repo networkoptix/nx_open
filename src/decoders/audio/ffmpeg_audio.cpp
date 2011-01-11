@@ -37,6 +37,11 @@ m_codec(codec_id)
 
 	switch(m_codec)
 	{
+
+	case CL_MP2:
+		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_MP2);
+		break;
+
 	case CL_MP3:
 		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_MP3);
 		break;
