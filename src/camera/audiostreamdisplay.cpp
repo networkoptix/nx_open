@@ -85,6 +85,8 @@ CLAudioStreamDisplay::~CLAudioStreamDisplay()
 
 void CLAudioStreamDisplay::putdata(CLCompressedAudioData* data)
 {
+	//return;// 777
+
 	CLAudioData audio;
 
 	audio.codec = data->compressionType;
