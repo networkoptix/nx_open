@@ -149,11 +149,13 @@ void SceneLayout::stop_helper(bool emt)
 		CLAbstractSceneItem* item = devitem->getSceneItem();
 
 		m_scene->removeItem(item);
+
 		delete devitem; // here video item and dev might be used 
 		m_items.removeOne(item);
+
 		delete item;
-		
 		dev->releaseRef();
+
 	}
 
 	m_deviceitems.clear();
@@ -204,6 +206,7 @@ void SceneLayout::stop(bool animation)
 
 void SceneLayout::onTimer()
 {
+
 	if (m_firstTime)
 	{
 		m_view->zoomMin(0);
@@ -260,11 +263,13 @@ void SceneLayout::onTimer()
 				}
 			}
 			
+			
 			if (removeDevices(remove_lst))
 				added = true;
 
 			if (m_deviceitems.count()==0)	
 				CLGLRenderer::clearGarbage();
+
 	}
 
 
@@ -303,8 +308,6 @@ void SceneLayout::onTimer()
 		m_view->fitInView(2000, 0);
 	}
 
-
-	
 	
 }
 

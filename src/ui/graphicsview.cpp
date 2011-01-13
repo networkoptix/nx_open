@@ -793,6 +793,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 				qreal angle = new_line.angleTo(old_line);
 
 				m_rotatingWnd->z_rotate_delta(center_point, angle, 0, 0);
+				m_rotatingWnd->setArranged(false);
 			}
 			
 		}
@@ -959,8 +960,8 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 				if (m_movement.isRuning() || m_scenezoom.isRuning())
 				{
 					// if something moves => stop moving 
-					m_movement.stop();
-					m_scenezoom.stop();
+					//m_movement.stop();
+					//m_scenezoom.stop();
 				}
 
 				else
@@ -1296,6 +1297,7 @@ void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
 
 	if (!item) // clicked on void space 
 	{
+		/*
 		if (!mMainWnd->isFullScreen())
 		{
 			if (!mMainWnd->isFullScreen())
@@ -1319,6 +1321,10 @@ void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
 
 		
 		onArrange_helper();
+		/**/
+
+		fitInView(1000, 0, CLAnimationTimeLine::SLOW_START_SLOW_END);
+		
 		
 		return;
 	}

@@ -206,6 +206,7 @@ protected:
 
 	CLSerachEditItem* m_seachItem;
 
+
 };
 
 #endif //PH_graphicsview_h328

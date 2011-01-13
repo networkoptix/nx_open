@@ -4,7 +4,7 @@
 #include "videostreamdisplay.h"
 #include "audiostreamdisplay.h"
 
-#define CL_MAX_DISPLAY_QUEUE_SIZE 5
+#define CL_MAX_DISPLAY_QUEUE_SIZE 8
 #define AUDIO_BUFF_SIZE 250 // ms
 
 
@@ -59,7 +59,7 @@ void CLCamDisplay::processData(CLAbstractData* data)
 		// in ideal world data comes to queue at the same speed as it goes out 
 		// but timer on the sender side runs at a bit different rate in comparison to the timer here
 		// adaptive delay will not solve all problems => need to minus little appendix based on queue size
-		qint32 need_to_sleep = curr_time - m_prev_time - (m_dataQueue.size());
+		qint32 need_to_sleep = curr_time - m_prev_time - (m_dataQueue.size())*2;
 
 		m_prev_time = curr_time;
 

@@ -72,7 +72,7 @@ void CLClientPullStreamreader::run()
 			m_stat[0].onData(0);
 			m_stat[0].onEvent(CL_STAT_FRAME_LOST);
 
-			if (frames_lost==3) // if we lost 2 frames => connection is lost for sure (2)
+			if (frames_lost==4) // if we lost 2 frames => connection is lost for sure (2)
 				m_stat[0].onLostConnection();
 
 			CLSleep::msleep(30);
@@ -86,7 +86,7 @@ void CLClientPullStreamreader::run()
 
 		if (frames_lost>0) // we are alive again
 		{
-			if (frames_lost>=2)
+			if (frames_lost>=4)
 			{
 				m_stat[0].onEvent(CL_STAT_CAMRESETED);
 
