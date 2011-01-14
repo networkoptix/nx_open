@@ -1,4 +1,4 @@
-QT = core gui network xml opengl multimedia
+QT = core gui network xml opengl multimedia webkit
 TEMPLATE = app
 VERSION = 0.0.1
 
@@ -127,6 +127,7 @@ HEADERS += ui/videoitem/recorder_item.h
 HEADERS += ui/videoitem/static_image_item.h
 HEADERS += ui/videoitem/video_wnd_archive_item.h
 HEADERS += ui/videoitem/video_wnd_item.h
+HEADERS += ui/videoitem/web_item.h
 HEADERS += ui/videoitem/search/search_edit.h
 HEADERS += ui/videoitem/search/search_filter_item.h
 HEADERS += ui/videoitem/subitem/abstract_image_sub_item.h
@@ -242,10 +243,12 @@ SOURCES += ui/videoitem/recorder_item.cpp
 SOURCES += ui/videoitem/static_image_item.cpp
 SOURCES += ui/videoitem/video_wnd_archive_item.cpp
 SOURCES += ui/videoitem/video_wnd_item.cpp
+SOURCES += ui/videoitem/web_item.cpp
 SOURCES += ui/videoitem/search/search_edit.cpp
 SOURCES += ui/videoitem/search/search_filter_item.cpp
 SOURCES += ui/videoitem/subitem/abstract_image_sub_item.cpp
 SOURCES += ui/videoitem/subitem/abstract_sub_item.cpp
+SOURCES += ui/videoitem/subitem/abstract_sub_item_container.cpp
 SOURCES += ui/videoitem/subitem/recording_sign_item.cpp
 SOURCES += ui/videoitem/subitem/archive_navifation/archive_navigator_item.cpp
 SOURCES += ui/videoitem/subitem/archive_navifation/slider_item.cpp

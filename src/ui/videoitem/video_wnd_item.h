@@ -48,6 +48,8 @@ public:
 		return m_videolayout;
 	}
 
+	virtual bool isZoomable() const;
+
 
 	void copyVideoDataBeforePainting(bool copy);
 
@@ -59,7 +61,7 @@ signals:
 
 protected:
 
-	QPointF getBestSubItemPos(CLAbstractSubItem::ItemType type);
+	QPointF getBestSubItemPos(CLSubItemType type);
 	
 	
 	void hoverEnterEvent(QGraphicsSceneHoverEvent *event);

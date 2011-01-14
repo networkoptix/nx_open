@@ -23,7 +23,7 @@ CLAbstractSubItem::~CLAbstractSubItem()
 }
 
 
-CLAbstractSubItem::ItemType CLAbstractSubItem::getType() const
+CLSubItemType CLAbstractSubItem::getType() const
 {
 	return mType;
 }

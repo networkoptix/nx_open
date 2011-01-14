@@ -34,11 +34,11 @@ LayoutContent* CLLayoutItem::getRefContent() const
 }
 
 
-QPointF CLLayoutItem::getBestSubItemPos(CLAbstractSubItem::ItemType type)
+QPointF CLLayoutItem::getBestSubItemPos(CLSubItemType type)
 {
 	switch(type)
 	{
-	case CLAbstractSubItem::Close:
+	case CloseSubItem:
 		return QPointF(width()-600, 200);
 		break;
 

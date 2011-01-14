@@ -11,11 +11,10 @@ class CLAbstractSubItem : public CLUnMovedOpacityItem
 {
 	Q_OBJECT
 public:
-	enum ItemType {Close, ArchiveNavigator, Recording, Play, Pause, StepForward, StepBackward, RewindBackward, RewindForward};
 	CLAbstractSubItem(CLAbstractSubItemContainer* parent, qreal normal_opacity, qreal active_opacity);
 	virtual ~CLAbstractSubItem();
 
-	virtual ItemType getType() const;
+	virtual CLSubItemType getType() const;
 
 	virtual void onResize() = 0;
 
@@ -26,7 +25,7 @@ protected:
 	void mousePressEvent ( QGraphicsSceneMouseEvent * event );
 protected slots:
 protected:
-	ItemType mType;
+	CLSubItemType mType;
 	CLAbstractSubItemContainer* m_parent;
 	
 

@@ -72,6 +72,10 @@ QSize CLVideoWindowItem::size_on_screen(unsigned int channel) const
 	return onScreenSize()/m_videonum;
 }
 
+bool CLVideoWindowItem::isZoomable() const
+{
+	return true;
+}
 
 void CLVideoWindowItem::setItemSelected(bool sel, bool animate, int delay )
 {
@@ -153,15 +157,15 @@ void CLVideoWindowItem::draw(CLVideoDecoderOutput& image, unsigned int channel)
 
 }
 
-QPointF CLVideoWindowItem::getBestSubItemPos(CLAbstractSubItem::ItemType type)
+QPointF CLVideoWindowItem::getBestSubItemPos(CLSubItemType type)
 {
 	switch(type)
 	{
-	case CLAbstractSubItem::Close:
+	case CloseSubItem:
 		return QPointF(width()-270, 20);
 		
 
-	case CLAbstractSubItem::Recording:
+	case RecordingSubItem:
 		return QPointF(-30, 100);
 		
 	default:

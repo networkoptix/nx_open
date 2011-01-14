@@ -24,7 +24,7 @@ mFullScreen(false)
 {
 	m_height = height;
 	m_width = parent->boundingRect().width();
-	mType = ArchiveNavigator;
+	mType = ArchiveNavigatorSubItem;
 
 	/*/
 	mPlayItem = new CLImgSubItem(this, "./skin/try/play2.png", CLAbstractSubItem::Play, 0.7, 1.0, m_height, m_height);
@@ -54,19 +54,19 @@ mFullScreen(false)
 
 	/**/
 
-	mPlayItem = new CLImgSubItem(this, "./skin/try/play1.png", CLAbstractSubItem::Play, 0.7, 1.0, m_height, m_height);
-	mPauseItem = new CLImgSubItem(this, "./skin/try/pause1.png", CLAbstractSubItem::Pause, 0.7, 1.0, m_height, m_height);
+	mPlayItem = new CLImgSubItem(this, "./skin/try/play1.png", PlaySubItem, 0.7, 1.0, m_height, m_height);
+	mPauseItem = new CLImgSubItem(this, "./skin/try/pause1.png", PauseSubItem, 0.7, 1.0, m_height, m_height);
 	mPlayItem->setVisible(false);
 
 	
 
-	mRewindBackward = new CLImgSubItem(this, "./skin/try/player_rew.png", CLAbstractSubItem::RewindBackward, 0.7, 1.0, m_height, m_height);
-	mRewindForward = new CLImgSubItem(this, "./skin/try/player_fwd.png", CLAbstractSubItem::RewindForward, 0.7, 1.0, m_height, m_height);
+	mRewindBackward = new CLImgSubItem(this, "./skin/try/player_rew.png", RewindBackwardSubItem, 0.7, 1.0, m_height, m_height);
+	mRewindForward = new CLImgSubItem(this, "./skin/try/player_fwd.png", RewindForwardSubItem, 0.7, 1.0, m_height, m_height);
 
-	mStepForward = new CLImgSubItem(this, "./skin/try/player_end.png", CLAbstractSubItem::StepForward, 0.7, 1.0, m_height, m_height);
+	mStepForward = new CLImgSubItem(this, "./skin/try/player_end.png", StepForwardSubItem, 0.7, 1.0, m_height, m_height);
 	mStepForward->setVisible(false);
 
-	mStepBackward = new CLImgSubItem(this, "./skin/try/player_start.png", CLAbstractSubItem::StepBackward, 0.7, 1.0, m_height, m_height);
+	mStepBackward = new CLImgSubItem(this, "./skin/try/player_start.png", StepBackwardSubItem, 0.7, 1.0, m_height, m_height);
 	mStepBackward->setVisible(false);
 	
 	/**/
@@ -254,12 +254,12 @@ void CLArchiveNavigatorItem::onSliderMoved(int val)
 
 void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
 {
-	CLAbstractSubItem::ItemType type = subitem->getType();
+	CLSubItemType type = subitem->getType();
 	unsigned long curr_time;
 
 	switch(type)
 	{
-	case CLAbstractSubItem::Play:
+	case PlaySubItem:
 		mPlayItem->setVisible(false);
 		mPauseItem->setVisible(true);
 
@@ -273,7 +273,7 @@ void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
 		mPlayMode = true;
 		break;
 
-	case CLAbstractSubItem::Pause:
+	case PauseSubItem:
 		mPlayItem->setVisible(true);
 		mPauseItem->setVisible(false);
 
@@ -286,20 +286,20 @@ void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
 		mPlayMode = false;
 		break;
 
-	case CLAbstractSubItem::RewindBackward:
+	case RewindBackwardSubItem:
 		mReader->jumpTo(0, true);
 		break;
 
-	case CLAbstractSubItem::RewindForward:
+	case RewindForwardSubItem:
 		mReader->jumpTo(mReader->len_msec(), true);
 		break;
 
-	case CLAbstractSubItem::StepForward:
+	case StepForwardSubItem:
 		
 		mReader->resume();
 		break;
 
-	case CLAbstractSubItem::StepBackward:
+	case StepBackwardSubItem:
 		curr_time = mReader->currTime();
 		//mReader->setdirection(false);
 		mReader->jumpTo(curr_time-100, true);

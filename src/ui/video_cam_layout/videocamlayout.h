@@ -18,6 +18,7 @@ class QGraphicsScene;
 class CLDevice;
 class LayoutContent;
 class CLAbstractComplicatedItem;
+class CLAbstractSubItemContainer;
 
 struct CLIdealWndPos
 {
@@ -59,6 +60,11 @@ public:
 	bool addLayoutItem(QString name, LayoutContent* lc, bool update_scene_rect = true);
 
 	bool addDevice(QString uniqueid, bool update_scene_rect = true);
+
+	//does same as bool addCamera(CLVideoCamera* cam, int x, int y, int z_order = 0);
+	//but function peeks up position by it self 
+	bool addItem(CLAbstractSceneItem* item,  bool update_scene_rect = true);
+
 	//================================================
 
 	void setItemDistance(qreal distance);
@@ -88,6 +94,8 @@ public:
 	CLAbstractSceneItem* getNextRightItem(const CLAbstractSceneItem* curr) const;
 	CLAbstractSceneItem* getNextTopItem(const CLAbstractSceneItem* curr) const;
 	CLAbstractSceneItem* getNextBottomItem(const CLAbstractSceneItem* curr) const;
+
+	QSize getDefaultWndSize() const;
 	
 
 	QList<CLIdealWndPos> calcArrangedPos() const;
@@ -113,7 +121,7 @@ protected slots:
 	void onTimer();
 	void onVideoTimer();
 
-	void onItemClose(CLAbstractSceneItem* item);
+	void onItemClose(CLAbstractSubItemContainer* item);
 
 	void stop_helper(bool emt = true);
 private:
@@ -122,9 +130,6 @@ private:
 	// return false if there are no available slots
 	bool addItem(CLAbstractSceneItem* item, int x, int y, bool update_scene_rect = true);
 
-	//does same as bool addCamera(CLVideoCamera* cam, int x, int y, int z_order = 0);
-	//but function peeks up position by it self 
-	bool addItem(CLAbstractSceneItem* item,  bool update_scene_rect = true);
 
 	// remove item from lay out
 	void removeItem(CLAbstractSceneItem* item, bool update_scene_rect = true);

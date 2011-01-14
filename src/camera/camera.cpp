@@ -90,14 +90,14 @@ void CLVideoCamera::startRecording()
 	m_reader->addDataProcessor(&m_recorder);
 	m_reader->needKeyData();
 	m_recorder.start();
-	m_videovindow->addSubItem(CLAbstractSubItem::Recording);
+	m_videovindow->addSubItem(RecordingSubItem);
 }
 
 void CLVideoCamera::stopRecording()
 {
 	m_recorder.stop();
 	m_reader->removeDataProcessor(&m_recorder);
-	m_videovindow->removeSubItem(CLAbstractSubItem::Recording);
+	m_videovindow->removeSubItem(RecordingSubItem);
 }
 
 bool CLVideoCamera::isRecording()

@@ -1,4 +1,4 @@
-QT = core gui network xml opengl multimedia
+QT = core gui network xml opengl multimedia webkit
 TEMPLATE = app
 VERSION = 0.0.1
 

@@ -18,7 +18,7 @@ public:
 
 
 	void draw(CLVideoDecoderOutput& image, unsigned int channel);
-	QPointF getBestSubItemPos(CLAbstractSubItem::ItemType type);
+	QPointF getBestSubItemPos(CLSubItemType  type);
 
 	virtual void setVideoCam(CLVideoCamera* cam);
 

@@ -24,6 +24,8 @@
 #include "videoitem/layout_item.h"
 #include "videoitem/unmoved/unmoved_pixture_button.h"
 #include "videoitem/search/search_filter_item.h"
+#include "device/network_device.h"
+#include "videoitem/web_item.h"
 
 
 int doubl_clk_delay = qApp->doubleClickInterval()*0.75;
@@ -1131,6 +1133,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 				}
 
 				menu.addAction(&cm_view_recorded);
+				menu.addAction(&cm_open_web_page);
 
 			}
 
@@ -1232,6 +1235,9 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 			if (act == &cm_view_recorded&& cam)
 				contextMenuHelper_viewRecordedVideo(cam);
 
+			if (act == &cm_open_web_page&& cam)
+				contextMenuHelper_openInWebBroser(cam);
+
 
 			if (act == &cm_rotate_90)
 			{
@@ -1283,6 +1289,7 @@ void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
 		return;
 
 	CLAbstractSceneItem*item = static_cast<CLAbstractSceneItem*>(itemAt(e->pos()));
+
 	if (item && item->parentItem())
 	{
 		// not top level item 
@@ -2343,8 +2350,24 @@ void GraphicsView::contextMenuHelper_viewRecordedVideo(CLVideoCamera* cam)
 	id = QString("./archive/") + id;
 
 	m_camLayout.addDevice(id, true);
-	fitInView(600, 100);
+	fitInView(600, 100, CLAnimationTimeLine::SLOW_START_SLOW_END);
 }
+
+void GraphicsView::contextMenuHelper_openInWebBroser(CLVideoCamera* cam)
+{
+	CLNetworkDevice* net_device = static_cast<CLNetworkDevice*>(cam->getDevice());
+
+	QString url;
+	QTextStream(&url) << "http://" << net_device->getIP().toString();
+
+	CLWebItem* wi = new CLWebItem(this, m_camLayout.getDefaultWndSize().width(), m_camLayout.getDefaultWndSize().height());
+	m_camLayout.addItem(wi);
+	wi->navigate(url);
+	
+	fitInView(600, 100, CLAnimationTimeLine::SLOW_START_SLOW_END);
+
+}
+
 
 void GraphicsView::contextMenuHelper_Rotation(CLAbstractSceneItem* wnd, qreal angle)
 {

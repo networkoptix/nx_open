@@ -34,9 +34,6 @@ public:
 
 	// returns true of added
 	
-	bool addSubItem(CLAbstractSubItem::ItemType type);
-	virtual void removeSubItem(CLAbstractSubItem::ItemType type);
-	virtual QPointF getBestSubItemPos(CLAbstractSubItem::ItemType type);
 
 	QString getName() const;
 	void setName(const QString& name);
@@ -47,6 +44,8 @@ public:
 	
 	void setMaxSize(QSize size);
 	QSize getMaxSize() const;
+
+	virtual bool isZoomable() const;
 
 	virtual QSize onScreenSize() const;
 
@@ -97,14 +96,14 @@ public:
 	void setRotationPointHand(QPointF point);
 
 public slots:
-	void onResize();
+	
 
 signals:
 	void onPressed(CLAbstractSceneItem*);
 	void onDoubleClick(CLAbstractSceneItem*);
 	void onFullScreen(CLAbstractSceneItem*);
 	void onSelected(CLAbstractSceneItem*);
-	void onClose(CLAbstractSceneItem*);
+	
 protected:
 	void drawShadow(QPainter* painter);
 
@@ -116,9 +115,7 @@ protected:
 	virtual void mousePressEvent ( QGraphicsSceneMouseEvent * event );
 	virtual void mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * event );
 
-protected slots:
-	virtual void onSubItemPressed(CLAbstractSubItem* subitem);
-	
+
 
 protected:
 	bool m_selected;

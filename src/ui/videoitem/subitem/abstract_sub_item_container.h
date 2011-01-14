@@ -6,20 +6,31 @@
 
 class CLAbstractSubItem;
 
+enum CLSubItemType {CloseSubItem, ArchiveNavigatorSubItem, RecordingSubItem, PlaySubItem, PauseSubItem, StepForwardSubItem, StepBackwardSubItem, RewindBackwardSubItem, RewindForwardSubItem};
+
 class CLAbstractSubItemContainer : public QObject, public QGraphicsItem
 {
 	Q_OBJECT
 public:
-	CLAbstractSubItemContainer(QGraphicsItem* parent):
-	QGraphicsItem(parent)
-	{
+	CLAbstractSubItemContainer(QGraphicsItem* parent);
 
-	}
+	~CLAbstractSubItemContainer();
 
-	~CLAbstractSubItemContainer(){}
 
-	protected slots:
-		virtual void onSubItemPressed(CLAbstractSubItem* subitem){};
+	bool addSubItem(CLSubItemType type);
+	virtual void removeSubItem(CLSubItemType type);
+	virtual QPointF getBestSubItemPos(CLSubItemType type);
+
+signals:
+	void onClose(CLAbstractSubItemContainer*);
+
+public slots:
+	void onResize();
+
+protected slots:
+	virtual void onSubItemPressed(CLAbstractSubItem* subitem);
+
+	
 
 };
 

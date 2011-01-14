@@ -16,6 +16,7 @@ extern QAction cm_settings;
 extern QAction cm_start_recording;
 extern QAction cm_stop_recording;
 extern QAction cm_view_recorded;
+extern QAction cm_open_web_page;
 
 
 

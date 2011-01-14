@@ -53,11 +53,11 @@ LayoutContent* CLRecorderItem::getRefContent() const
 	return mContent;
 }
 
-QPointF CLRecorderItem::getBestSubItemPos(CLAbstractSubItem::ItemType type)
+QPointF CLRecorderItem::getBestSubItemPos(CLSubItemType type)
 {
 	switch(type)
 	{
-	case CLAbstractSubItem::Close:
+	case CloseSubItem:
 		return QPointF(width()-1000, 200);
 		break;
 

@@ -79,6 +79,10 @@ void CLAbstractSceneItem::setEditable(bool editable)
 	mEditable = editable;
 }
 
+bool CLAbstractSceneItem::isZoomable() const
+{
+	return false;
+}
 
 CLVideoWindowItem* CLAbstractSceneItem::toVideoItem() const
 {
@@ -88,80 +92,7 @@ CLVideoWindowItem* CLAbstractSceneItem::toVideoItem() const
 	return static_cast<CLVideoWindowItem*>(   const_cast<CLAbstractSceneItem*>(this)  );
 }
 
-void CLAbstractSceneItem::onResize()
-{
-	QList<QGraphicsItem *> childrenLst = childItems();
-	foreach(QGraphicsItem * item, childrenLst)
-	{
-		CLAbstractSubItem* sub_item = static_cast<CLAbstractSubItem*>(item);
-		QPointF pos = getBestSubItemPos(sub_item->getType());
-		sub_item->setPos(pos);
-		sub_item->onResize();
-	}
-}
 
-
-
-bool CLAbstractSceneItem::addSubItem(CLAbstractSubItem::ItemType type)
-{
-	QPointF pos = getBestSubItemPos(type);
-	if (pos.x()<-1000 && pos.y()<-1000)//position undefined 
-		return false;
-
-	CLAbstractSubItem* item = 0;
-
-	switch(type)
-	{
-	case CLAbstractSubItem::Close:
-		item = new CLImgSubItem(this, "./skin/close3.png" ,CLAbstractSubItem::Close, global_decoration_opacity, global_decoration_max_opacity, 256, 256);
-		break;
-
-	case CLAbstractSubItem::Recording:
-		item = new CLRecordingSignItem(this);
-		break;
-
-
-	default:
-		return false;
-	}
-
-	item->setPos(pos);
-}
-
-void CLAbstractSceneItem::removeSubItem(CLAbstractSubItem::ItemType type)
-{
-	QList<QGraphicsItem *> childrenLst = childItems();
-	foreach(QGraphicsItem * item, childrenLst)
-	{
-		CLAbstractSubItem* sub_item = static_cast<CLAbstractSubItem*>(item);
-		if (sub_item->getType()==type)
-		{
-			scene()->removeItem(sub_item);
-			delete sub_item;
-		}
-
-	}
-}
-
-QPointF CLAbstractSceneItem::getBestSubItemPos(CLAbstractSubItem::ItemType type)
-{
-	return QPointF(-1001,-1001);
-}
-
-void CLAbstractSceneItem::onSubItemPressed(CLAbstractSubItem* subitem)
-{
-	CLAbstractSubItem::ItemType type = subitem->getType();
-
-	switch(type)
-	{
-	case CLAbstractSubItem::Close:
-		emit onClose(this);
-		break;
-
-	default:
-	    break;
-	}
-}
 
 
 CLAbstractSceneItem::CLSceneItemType CLAbstractSceneItem::getType() const
@@ -302,6 +233,7 @@ void CLAbstractSceneItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
 	m_mouse_over = true;
 
+	/*/
 	if (m_view->getSelectedItem()!=this &&(m_view->getZoom() < 0.25 || m_zoomOnhover))
 	{
 		if (m_z != 1) 
@@ -309,9 +241,9 @@ void CLAbstractSceneItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 			m_z = 1;
 			setZValue(m_z);
 			m_animationTransform.zoom_abs(1.11, item_hoverevent_duration, 0);
-
 		}
 	}
+	/**/
 
 }
 
@@ -320,6 +252,7 @@ void CLAbstractSceneItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 
 	m_mouse_over = false;
 
+	/*/
 	if (m_view->getSelectedItem()!=this) 
 	{
 		if (m_z != 0)
@@ -329,6 +262,7 @@ void CLAbstractSceneItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 			m_animationTransform.zoom_abs(1.0, item_hoverevent_duration, 0);
 		}
 	}
+	/**/
 }
 
 void CLAbstractSceneItem::mousePressEvent ( QGraphicsSceneMouseEvent * event )

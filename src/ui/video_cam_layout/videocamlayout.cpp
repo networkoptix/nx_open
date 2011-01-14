@@ -472,7 +472,7 @@ bool SceneLayout::addItem(CLAbstractSceneItem* item, int x, int y, bool update_s
 	//=========
 	if (isEditable() || item->isEtitable())	
 	{
-		item->addSubItem(CLAbstractSubItem::Close);
+		item->addSubItem(CloseSubItem);
 	}
 	//=========
 
@@ -490,7 +490,7 @@ bool SceneLayout::addItem(CLAbstractSceneItem* item, int x, int y, bool update_s
 	connect(item, SIGNAL(onSelected(CLAbstractSceneItem*)), this, SLOT(onItemSelected(CLAbstractSceneItem* )));
 
 	//===========
-	connect(item, SIGNAL(onClose(CLAbstractSceneItem*)), this, SLOT(onItemClose(CLAbstractSceneItem*)));
+	connect(item, SIGNAL(onClose(CLAbstractSubItemContainer*)), this, SLOT(onItemClose(CLAbstractSubItemContainer*)));
 	
 
 	return true;
@@ -559,6 +559,11 @@ void SceneLayout::setScene(QGraphicsScene* scene)
 qreal SceneLayout::getItemDistance() const
 {
 	return m_item_distance;
+}
+
+QSize SceneLayout::getDefaultWndSize() const
+{
+	return QSize(SLOT_WIDTH, SLOT_HEIGHT);
 }
 
 QSize SceneLayout::getMaxWndSize(const CLDeviceVideoLayout* layout) const
@@ -848,8 +853,12 @@ CLAbstractSceneItem* SceneLayout::next_item_helper(const CLAbstractSceneItem* cu
 
 }
 
-void SceneLayout::onItemClose(CLAbstractSceneItem* item)
+void SceneLayout::onItemClose(CLAbstractSubItemContainer* itm)
 {
+
+	CLAbstractSceneItem* item = static_cast<CLAbstractSceneItem*>(itm);
+	
+
 	m_view->stopAnimation();
 	m_view->setZeroSelection();
 	item->stop_animation();

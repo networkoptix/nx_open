@@ -26,13 +26,13 @@ CLVideoWindowArchiveItem::~CLVideoWindowArchiveItem()
 }
 
 
-QPointF CLVideoWindowArchiveItem::getBestSubItemPos(CLAbstractSubItem::ItemType type)
+QPointF CLVideoWindowArchiveItem::getBestSubItemPos(CLSubItemType type)
 {
 	QPointF result = CLVideoWindowItem::getBestSubItemPos(type);
 	if (result.x()>=-1000 || result.y()>=-1000)
 		return result;
 
-	if (type==CLAbstractSubItem::ArchiveNavigator)
+	if (type==ArchiveNavigatorSubItem)
 		return QPointF(0, height() - m_archNavigatorHeight);
 }
 
