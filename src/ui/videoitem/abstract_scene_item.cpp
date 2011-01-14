@@ -39,7 +39,8 @@ m_draw_rotation_helper(false),
 m_zoomOnhover(true),
 m_needUpdate(false),
 mEditable(false),
-m_rotation_center(0,0)
+m_rotation_center(0,0),
+m_complicatedItem(0)
 {
 	setAcceptsHoverEvents(true);
 
@@ -188,6 +189,16 @@ void CLAbstractSceneItem::z_rotate_abs(QPointF center, qreal angle, int duration
 qreal CLAbstractSceneItem::getZoom() const
 {
 	return m_animationTransform.current_zoom();
+}
+
+CLAbstractComplicatedItem* CLAbstractSceneItem::getComplicatedItem() const
+{
+	return m_complicatedItem;
+}
+
+void CLAbstractSceneItem::setComplicatedItem(CLAbstractComplicatedItem* complicatedItem)
+{
+	m_complicatedItem = complicatedItem;
 }
 
 qreal CLAbstractSceneItem::getRotation() const

@@ -11,6 +11,7 @@
 class GraphicsView;
 class CLVideoWindowItem;
 class CLAbstractSubItem;
+class CLAbstractComplicatedItem;
 
 
 class CLAbstractSceneItem : public CLAbstractSubItemContainer
@@ -40,6 +41,9 @@ public:
 
 	CLSceneItemType getType() const;
 	void setType(CLSceneItemType t);
+
+	CLAbstractComplicatedItem* getComplicatedItem() const;
+	virtual void setComplicatedItem(CLAbstractComplicatedItem* complicatedItem);
 
 	
 	void setMaxSize(QSize size);
@@ -142,6 +146,8 @@ protected:
 	bool m_needUpdate;
 
 	bool mEditable;
+
+	CLAbstractComplicatedItem* m_complicatedItem;
 
 };
 

@@ -573,7 +573,7 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 	if (wnd && event->button() == Qt::LeftButton && mDeviceDlg && mDeviceDlg->isVisible())
 	{
 		if (wnd->toVideoItem())
-			show_device_settings_helper(wnd->toVideoItem()->getVideoCam()->getDevice());
+			show_device_settings_helper(wnd->getComplicatedItem()->getDevice());
 	}
 
 	if (isCTRLPressed(event))
@@ -1835,7 +1835,7 @@ void GraphicsView::onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int de
 	if (m_selectedWnd->toVideoItem())
 	{
 		
-		CLDevice* dev = m_selectedWnd->toVideoItem()->getVideoCam()->getDevice();
+		CLDevice* dev = m_selectedWnd->getComplicatedItem()->getDevice();
 
 		if (!dev->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT))
 		{

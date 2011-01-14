@@ -4,6 +4,7 @@
 #include <QMutexLocker>
 #include <QStyleOptionGraphicsItem>
 #include "ui\ui_common.h"
+#include "recorder\recorder_display.h"
 
 CLRecorderItem::CLRecorderItem(GraphicsView* view, int max_width, int max_height, QString name, QString tooltip):
 CLCustomBtnItem(view,max_width,max_height, name, "", tooltip),
@@ -27,15 +28,12 @@ void CLRecorderItem::setText(QString text)
 	needUpdate(true);
 }
 
-void CLRecorderItem::setRecorderDisplay(CLRecorderDisplay* rec)
-{
-	mRecorder = rec;
-}
 
 CLRecorderDisplay* CLRecorderItem::getRecorderDisplay() const
 {
-	return mRecorder;
+	return static_cast<CLRecorderDisplay*>(m_complicatedItem);
 }
+
 
 QString CLRecorderItem::text() const
 {

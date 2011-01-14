@@ -18,8 +18,7 @@ m_first_draw(true),
 m_showfps(false),
 m_FPS_Font("Courier New", 250),
 m_opacity(0.0),
-m_videonum(layout->numberOfChannels()),
-m_cam(0)
+m_videonum(layout->numberOfChannels())
 {
 	m_FPS_Font.setWeight(QFont::Bold);
 
@@ -49,22 +48,15 @@ CLVideoWindowItem::~CLVideoWindowItem()
 		delete m_gldraw[i];
 }
 
-
-void CLVideoWindowItem::setVideoCam(CLVideoCamera* cam)
-{
-	m_cam = cam;
-}
-
-CLVideoCamera* CLVideoWindowItem::getVideoCam() const
-{
-	return m_cam;
-}
-
-
 void CLVideoWindowItem::before_destroy()
 {
 	for (int i = 0; i  < m_videonum; ++i)
 		m_gldraw[i]->before_destroy();;
+}
+
+CLVideoCamera* CLVideoWindowItem::getVideoCam() const
+{
+	return static_cast<CLVideoCamera*>(m_complicatedItem);
 }
 
 QSize CLVideoWindowItem::size_on_screen(unsigned int channel) const
@@ -100,7 +92,7 @@ void CLVideoWindowItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 
 	CLImageItem::hoverEnterEvent(event);
 
-	CLDevice* dev = getVideoCam()->getDevice();
+	CLDevice* dev = getComplicatedItem()->getDevice();
 	if (!dev->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT))
 	{
 		setShowImagesize(true);

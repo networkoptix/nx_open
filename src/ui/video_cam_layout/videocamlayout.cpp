@@ -522,7 +522,7 @@ void SceneLayout::removeItem(CLAbstractSceneItem* item, bool update_scene_rect )
 	if (update_scene_rect)
 	{
 		updateSceneRect();
-		m_view->fitInView(600, 0);
+		m_view->fitInView(600, 0, CLAnimationTimeLine::SLOW_START_SLOW_END);
 	}
 
 
@@ -538,7 +538,7 @@ void SceneLayout::setItemDistance(qreal distance)
 		CLVideoWindowItem* videoItem;
 		if (videoItem = item->toVideoItem())
 		{
-			videoItem->setMaxSize(getMaxWndSize (videoItem->getVideoCam()->getDevice()->getVideoLayout()));
+			videoItem->setMaxSize(getMaxWndSize (videoItem->getComplicatedItem()->getDevice()->getVideoLayout()));
 		}
 		
 	}
@@ -864,50 +864,35 @@ void SceneLayout::onItemClose(CLAbstractSubItemContainer* itm)
 	item->stop_animation();
 
 
+	
+
 	CLAbstractSceneItem::CLSceneItemType type = item->getType();
 	if (type==CLAbstractSceneItem::LAYOUT)
 	{
-
 		CLLayoutItem* litem = static_cast<CLLayoutItem*>(item);
 		LayoutContent* lc = litem->getRefContent();
 		getContent()->removeLayout(lc, true);
-
-		removeItem(item);
-		delete item;
-
-		
-	
 	}
-	
+
 	if (type==CLAbstractSceneItem::RECORDER)
 	{
 		CLRecorderItem* ritem = static_cast<CLRecorderItem*>(item);
 		LayoutContent* lc = ritem->getRefContent();
 		getContent()->removeLayout(lc, true);
-
-		CLAbstractComplicatedItem* devitem = ritem->getRecorderDisplay();
-
-		devitem->beforestopDispay();
-		devitem->stopDispay();
-
-		removeItem(item); //here device is used ( layout in bounding rect )
-
-		devitem->getDevice()->releaseRef();
-		m_deviceitems.removeOne(devitem);
-		delete devitem; // here item is used; can not delete it
-		delete item;
-
-		
-
 	}
 
 	if (type==CLAbstractSceneItem::VIDEO)
 	{
 		CLVideoWindowItem* vitem = static_cast<CLVideoWindowItem*>(item);
+		CLAbstractComplicatedItem* devitem = vitem->getVideoCam();
+		getContent()->removeDevice(vitem->getComplicatedItem()->getDevice()->getUniqueId());
+	}
+	//===============
 
-		CLAbstractComplicatedItem* devitem = vitem ->getVideoCam();
 
-		getContent()->removeDevice(vitem ->getVideoCam()->getDevice()->getUniqueId());
+	if (item->getComplicatedItem())
+	{
+		CLAbstractComplicatedItem* devitem = item->getComplicatedItem();
 
 		devitem->beforestopDispay();
 		devitem->stopDispay();
@@ -919,11 +904,15 @@ void SceneLayout::onItemClose(CLAbstractSubItemContainer* itm)
 
 		// so need to release it here 
 		dev->releaseRef();
-
-		//removed = true;
-
 	}
-	//===============
+	else
+	{
+		//simple item 
+		removeItem(item);
+		delete item;
+	}
+
+
 }
 
 bool SceneLayout::removeDevices(QList<CLAbstractComplicatedItem*> lst)

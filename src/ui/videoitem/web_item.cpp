@@ -15,6 +15,7 @@ CLAbstractSceneItem(view, max_width, max_height, name)
 
 	mWeb_item->scale(scale, scale);
 
+	addSubItem(CloseSubItem);
 }
 
 CLWebItem::~CLWebItem()
@@ -29,5 +30,19 @@ void CLWebItem::navigate(const QString& str)
 
 void CLWebItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+
+}
+
+QPointF CLWebItem::getBestSubItemPos(CLSubItemType type)
+{
+	switch(type)
+	{
+	case CloseSubItem:
+		return QPointF(width()-270, 20);
+
+	default:
+		return QPointF(-1001, -1001);
+		break;
+	}
 
 }

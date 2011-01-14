@@ -18,7 +18,6 @@ public:
 	LayoutContent* getRefContent() const;
 
 	void setText(QString text);
-	void setRecorderDisplay(CLRecorderDisplay* rec);
 	CLRecorderDisplay* getRecorderDisplay() const;
 
 protected:
@@ -30,8 +29,6 @@ protected:
 
 	
 	LayoutContent* mContent; //this item references to this content
-
-	CLRecorderDisplay* mRecorder;
 	mutable QMutex m_mutex;
 
 };

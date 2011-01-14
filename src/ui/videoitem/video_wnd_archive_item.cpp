@@ -95,8 +95,10 @@ void CLVideoWindowArchiveItem::setFullScreen(bool full)
 
 }
 
-void CLVideoWindowArchiveItem::setVideoCam(CLVideoCamera* cam)
+void CLVideoWindowArchiveItem::setComplicatedItem(CLAbstractComplicatedItem* complicatedItem)
 {
-	CLVideoWindowItem::setVideoCam(cam);
-	mArchiveNavigator->setArchiveStreamReader(static_cast<CLAbstractArchiveReader *>(cam->getStreamreader()));
+	CLVideoWindowItem::setComplicatedItem(complicatedItem);
+	mArchiveNavigator->setArchiveStreamReader(static_cast<CLAbstractArchiveReader *>(getVideoCam()->getStreamreader()));
+
 }
+

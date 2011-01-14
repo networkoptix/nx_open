@@ -26,7 +26,7 @@ void items2DDstream(QList<QGraphicsItem*> itemslst, QDataStream& dataStream)
 		if (type == CLAbstractSceneItem::VIDEO)
 		{
 			CLVideoWindowItem* it = static_cast<CLVideoWindowItem*>(item);
-			items.videodevices.push_back(it->getVideoCam()->getDevice()->getUniqueId());
+			items.videodevices.push_back(it->getComplicatedItem()->getDevice()->getUniqueId());
 		}
 		else if (type == CLAbstractSceneItem::RECORDER)
 		{

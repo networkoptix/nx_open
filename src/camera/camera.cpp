@@ -35,7 +35,7 @@ m_recorder(device)
 	m_reader->addDataProcessor(&m_camdispay);
 	m_reader->setStatistics(m_stat);
 
-	m_videovindow->setVideoCam(this);
+	m_videovindow->setComplicatedItem(this);
 	m_videovindow->setInfoText(m_device->toString());
 
 }

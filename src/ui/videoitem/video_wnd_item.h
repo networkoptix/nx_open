@@ -29,9 +29,7 @@ public:
 
 	void draw(CLVideoDecoderOutput& image, unsigned int channel);
 
-	virtual void setVideoCam(CLVideoCamera* cam);
 	CLVideoCamera* getVideoCam() const;
-
 	float aspectRatio() const;
 
 	virtual QSize size_on_screen(unsigned int channel) const;
@@ -95,8 +93,6 @@ protected:
 
 	const CLDeviceVideoLayout* m_videolayout;
 	unsigned int m_videonum;
-	CLVideoCamera* m_cam;
-
 	
 };
 

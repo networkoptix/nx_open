@@ -13,6 +13,8 @@ public:
 	void navigate(const QString& str);
 protected:
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+
+	QPointF getBestSubItemPos(CLSubItemType type);
 protected:
 
 	QGraphicsProxyWidget* mWeb_item;

@@ -20,7 +20,7 @@ public:
 	void draw(CLVideoDecoderOutput& image, unsigned int channel);
 	QPointF getBestSubItemPos(CLSubItemType  type);
 
-	virtual void setVideoCam(CLVideoCamera* cam);
+	virtual void setComplicatedItem(CLAbstractComplicatedItem* complicatedItem);
 
 protected:
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
