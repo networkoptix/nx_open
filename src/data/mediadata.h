@@ -18,9 +18,11 @@ enum CLCodecType
 
 	CL_MP2,
 	CL_MP3, 
-	CL_AC3, 
+	CL_AC3,
+	CL_AAC, 
 	CL_WMAV2, 
 	CL_ADPCM_MS,
+	CL_UNKNOWN, 
 	CL_VARIOUSE_DECODERS};
 
 

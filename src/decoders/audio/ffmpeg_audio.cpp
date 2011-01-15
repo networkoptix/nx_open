@@ -51,6 +51,11 @@ m_codec(codec_id)
 		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_AC3);
 		break;
 
+	case CL_AAC:
+		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_AAC);
+		break;
+
+
 		/*/
 	case CL_WMAV2:
 		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_WMAV2);

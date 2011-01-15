@@ -151,12 +151,21 @@ bool CLAVIStreamReader::init()
 			m_audiocodec_id = CL_AC3;
 			break;
 
+		//case CODEC_ID_AAC:
+		//	m_audiocodec_id = CL_AAC;  // crashes 
+		//	break;
+
+
 		case CODEC_ID_WMAV2:
 			m_audiocodec_id =CL_WMAV2;
 			break;
 
 		case CODEC_ID_ADPCM_MS:
 			m_audiocodec_id =CL_ADPCM_MS;
+			break;
+
+		default:
+			m_audiocodec_id = CL_UNKNOWN;
 			break;
 
 		}
