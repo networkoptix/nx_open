@@ -123,7 +123,7 @@ protected:
 
 	bool isItemFullScreenZoomed(QGraphicsItem* item);
 
-	bool shouldIgnoreSubItem(QGraphicsItem* item) const;
+	CLAbstractSceneItem* navigationItem(QGraphicsItem* item) const;
 
 	//=========================
 	void contextMenuHelper_addNewLayout();

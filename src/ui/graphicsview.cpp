@@ -546,34 +546,30 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 	if (!mViewStarted)
 		return;
 
-
 	m_yRotate = 0;
 
 	m_scenezoom.stop();
 	m_movement.stop();
 	
 	QGraphicsItem *item = itemAt(event->pos());
-
-	if (item && item->parentItem())
+	CLAbstractSceneItem* aitem = navigationItem(item);
+	
+	if (item && item->parentItem() && !aitem) // item has non navigational parent 
 	{
 		QGraphicsView::mousePressEvent(event);
 		return;
 	}
 
+
 	mSubItemMoving = false;
 
-	CLAbstractSceneItem* wnd = static_cast<CLAbstractSceneItem*>(item);
+	if (aitem)
+		aitem->stop_animation();
 
-	if (!isItemStillExists(wnd))
-		wnd = 0;
-
-	if (wnd)
-		wnd->stop_animation();
-
-	if (wnd && event->button() == Qt::LeftButton && mDeviceDlg && mDeviceDlg->isVisible())
+	if (aitem && event->button() == Qt::LeftButton && mDeviceDlg && mDeviceDlg->isVisible())
 	{
-		if (wnd->toVideoItem())
-			show_device_settings_helper(wnd->getComplicatedItem()->getDevice());
+		if (aitem->toVideoItem())
+			show_device_settings_helper(aitem->getComplicatedItem()->getDevice());
 	}
 
 	if (isCTRLPressed(event))
@@ -585,11 +581,11 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 	if (!isCTRLPressed(event))
 	{
 		// key might be pressed on diff view, so we do not get keypressevent here 
-		enableMultipleSelection(false, (wnd && !wnd->isSelected()) );
+		enableMultipleSelection(false, (aitem && !aitem->isSelected()) );
 	}
 
 
-	if (!wnd) // click on void
+	if (!aitem) // click on void
 	{
 		if (!isCTRLPressed(event))
 			enableMultipleSelection(false);
@@ -604,9 +600,9 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 	if (event->button() == Qt::LeftButton && isCTRLPressed(event)) 
 	{
 		// must mark window as selected( by default qt marks it om mouse release)
-		if(wnd)
+		if(aitem)
 		{
-			wnd->setSelected(true);
+			aitem->setSelected(true);
 			m_movingWnd = 1;
 		}
 	}
@@ -618,7 +614,7 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 	}
 	else if (event->button() == Qt::RightButton && !isCTRLPressed(event)) 
 	{
-		m_rotatingWnd = wnd;
+		m_rotatingWnd = aitem;
 
 	}
 
@@ -639,8 +635,11 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 	if (!mViewStarted)
 		return;
 
+
 	QGraphicsItem *item = itemAt(event->pos());
-	if ((item && item->parentItem()) || mSubItemMoving)
+	CLAbstractSceneItem* aitem = navigationItem(item);
+
+	if ((item && item->parentItem() && !aitem) || mSubItemMoving) // item has non navigational parent 
 	{
 		QGraphicsView::mouseMoveEvent(event);
 		mSubItemMoving = true;
@@ -823,20 +822,17 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 	//cl_log.log("====mouseReleaseEvent===", cl_logDEBUG1);
 
 	QGraphicsItem *item = itemAt(event->pos());
+	CLAbstractSceneItem* aitem = navigationItem(item);
 
-	if (item && item->parentItem())
+	if (item && item->parentItem() && !aitem) // item has non navigational parent 
 	{
-		// not top level item 
 		QGraphicsView::mouseReleaseEvent(event);
 		return;
 	}
 
+
 	mSubItemMoving = false;
 
-
-	CLAbstractSceneItem* wnd = static_cast<CLAbstractSceneItem*>(item);
-	if (!isItemStillExists(wnd))
-		wnd = 0;
 
 
 	bool left_button = event->button() == Qt::LeftButton;
@@ -869,7 +865,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 		{
 			bool fullscreen = false;
 
-			if (wnd)
+			if (aitem)
 			{
 				// we released button on some wnd; 
 				// we need to find out is it a "fullscreen mode", and if so restrict the motion
@@ -879,18 +875,18 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 
 				// still we might zoomed in a lot manually and will deal with this window as with new full screen one
-				QRectF wnd_rect =  wnd->sceneBoundingRect();
+				QRectF wnd_rect =  aitem->sceneBoundingRect();
 				QRectF viewport_rec = mapToScene(viewport()->rect()).boundingRect();
 
 				if (wnd_rect.width() >= 1.5*viewport_rec.width() && wnd_rect.height() >= 1.5*viewport_rec.height())
 				{
 					// size of wnd is bigger than the size of view_port
-					if (wnd != m_selectedWnd) 
+					if (aitem != m_selectedWnd) 
 						setZeroSelection();
 
 					fullscreen = true;
-					m_selectedWnd = wnd;
-					m_last_selectedWnd = wnd;
+					m_selectedWnd = aitem;
+					m_last_selectedWnd = aitem;
 				}
 
 
@@ -955,7 +951,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 	{
 		// if left button released and we did not move the scene, and we did not move selected windows, so may bee need to zoom on the item
 
-			if(!wnd) // not item and any button
+			if(!aitem) // not item and any button
 			{
 
 				// zero item selected 
@@ -976,32 +972,32 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 				setZeroSelection();
 			}
 			
-			if (wnd && wnd!=m_selectedWnd) // item and left button
+			if (aitem && aitem!=m_selectedWnd) // item and left button
 			{
 				// new item selected 
-				if (isItemFullScreenZoomed(wnd)) // check if wnd is manually zoomed; without double click
+				if (isItemFullScreenZoomed(aitem)) // check if wnd is manually zoomed; without double click
 				{
 					setZeroSelection();
-					m_selectedWnd = wnd;
-					m_last_selectedWnd = wnd;
-					wnd->setItemSelected(true, false);
-					wnd->setFullScreen(true);
+					m_selectedWnd = aitem;
+					m_last_selectedWnd = aitem;
+					aitem->setItemSelected(true, false);
+					aitem->setFullScreen(true);
 				}
 				else
-					onNewItemSelected_helper(wnd, doubl_clk_delay);
+					onNewItemSelected_helper(aitem, doubl_clk_delay);
 			}
-			else if (wnd && wnd==m_selectedWnd && !m_selectedWnd->isFullScreen()) // else must be here coz onNewItemSelected_helper change things 
+			else if (aitem && aitem==m_selectedWnd && !m_selectedWnd->isFullScreen()) // else must be here coz onNewItemSelected_helper change things 
 			{
 				// clicked on the same already selected item, fit in view ?
 				
 
-				if (!isItemFullScreenZoomed(wnd)) // check if wnd is manually zoomed; without double click
+				if (!isItemFullScreenZoomed(aitem)) // check if wnd is manually zoomed; without double click
 					fitInView(item_select_duration, doubl_clk_delay);
 				else
-					wnd->setFullScreen(true);
+					aitem->setFullScreen(true);
 
 			}
-			else if (wnd && wnd==m_selectedWnd && m_selectedWnd->isFullScreen()) // else must be here coz onNewItemSelected_helper change things 
+			else if (aitem && aitem==m_selectedWnd && m_selectedWnd->isFullScreen() && aitem->isZoomable()) // else must be here coz onNewItemSelected_helper change things 
 			{
 				QPointF scene_pos = mapToScene(event->pos());
 				int w = mapToScene(viewport()->rect()).boundingRect().width()/2;
@@ -1023,9 +1019,9 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 		m_scene.clearSelection();
 	}
 
-	if (mid_button && wnd)
+	if (mid_button && aitem)
 	{
-		wnd->z_rotate_abs(wnd->getRotationPointCenter(), 0, item_hoverevent_duration, 0);
+		aitem->z_rotate_abs(aitem->getRotationPointCenter(), 0, item_hoverevent_duration, 0);
 	}
 
 	if (left_button)
@@ -1283,26 +1279,22 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
 }
 
-void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
+void GraphicsView::mouseDoubleClickEvent( QMouseEvent * event )
 {
 	if (!mViewStarted)
 		return;
 
-	CLAbstractSceneItem*item = static_cast<CLAbstractSceneItem*>(itemAt(e->pos()));
+	QGraphicsItem *item = itemAt(event->pos());
+	CLAbstractSceneItem* aitem = navigationItem(item);
 
-	if (item && item->parentItem())
+	if (item && item->parentItem() && !aitem) // item has non navigational parent 
 	{
-		// not top level item 
-		QGraphicsView::mouseDoubleClickEvent(e);
+		QGraphicsView::mouseDoubleClickEvent(event);
 		return;
 	}
 
 
-	if(!isItemStillExists(item))
-		item = 0;
-
-
-	if (!item) // clicked on void space 
+	if (!aitem) // clicked on void space 
 	{
 		/*
 		if (!mMainWnd->isFullScreen())
@@ -1336,15 +1328,15 @@ void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
 		return;
 	}
 
-	if (e->button() == Qt::LeftButton)
+	if (event->button() == Qt::LeftButton)
 	{
-		if(item!=m_selectedWnd)
+		if(aitem!=m_selectedWnd)
 			return;
 
-		toggleFullScreen_helper(item);			
+		toggleFullScreen_helper(aitem);			
 	
 	}
-	else if (e->button() == Qt::RightButton)
+	else if (event->button() == Qt::RightButton)
 	{
 		//item->z_rotate_abs(QPointF(0,0), 0, item_hoverevent_duration);
 	}
@@ -1353,7 +1345,7 @@ void GraphicsView::mouseDoubleClickEvent ( QMouseEvent * e )
 
 	m_ignore_release_event  = true;
 
-	QGraphicsView::mouseDoubleClickEvent (e);
+	QGraphicsView::mouseDoubleClickEvent(event);
 }
 
 void GraphicsView::dragEnterEvent ( QDragEnterEvent * event )
@@ -1663,21 +1655,30 @@ bool GraphicsView::isItemFullScreenZoomed(QGraphicsItem* item)
 	return false;
 }
 
-bool GraphicsView::shouldIgnoreSubItem(QGraphicsItem* item) const
+CLAbstractSceneItem* GraphicsView::navigationItem(QGraphicsItem* item) const
 {
+
+	if (!item)
+		return 0;
+
 	QGraphicsItem* topParent = item;
 
+	bool top_item = true;
+
 	while(topParent->parentItem())
+	{
 		topParent = topParent->parentItem();
+		top_item = false;
+	}
 
-	CLAbstractSceneItem* aitem = static_cast<CLAbstractSceneItem*>(item);
+	CLAbstractSceneItem* aitem = static_cast<CLAbstractSceneItem*>(topParent);
 	if (!isItemStillExists(aitem))
-		return true;
+		return 0;
 
-	if (aitem->isInEventTransparetList(item))
-		return false;
+	if (!top_item && !aitem->isInEventTransparetList(item)) // if this is not top level item and not in trans list 
+		return 0;
 
-	return true;
+	return aitem;
 }
 
 
