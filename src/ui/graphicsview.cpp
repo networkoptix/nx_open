@@ -1661,8 +1661,25 @@ bool GraphicsView::isItemFullScreenZoomed(QGraphicsItem* item)
 
 	
 	return false;
-
 }
+
+bool GraphicsView::shouldIgnoreSubItem(QGraphicsItem* item) const
+{
+	QGraphicsItem* topParent = item;
+
+	while(topParent->parentItem())
+		topParent = topParent->parentItem();
+
+	CLAbstractSceneItem* aitem = static_cast<CLAbstractSceneItem*>(item);
+	if (!isItemStillExists(aitem))
+		return true;
+
+	if (aitem->isInEventTransparetList(item))
+		return false;
+
+	return true;
+}
+
 
 void GraphicsView::drawBackground ( QPainter * painter, const QRectF & rect )
 {

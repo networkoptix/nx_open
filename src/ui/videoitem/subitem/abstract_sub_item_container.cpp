@@ -41,6 +41,8 @@ bool CLAbstractSubItemContainer::addSubItem(CLSubItemType type)
 	}
 
 	item->setPos(pos);
+
+	return true;
 }
 
 void CLAbstractSubItemContainer::removeSubItem(CLSubItemType type)
@@ -89,4 +91,14 @@ void CLAbstractSubItemContainer::onSubItemPressed(CLAbstractSubItem* subitem)
 	default:
 		break;
 	}
+}
+
+void CLAbstractSubItemContainer::addToEevntTransparetList(QGraphicsItem* item)
+{
+	m_eventtransperent_list.push_back(item);
+}
+
+bool CLAbstractSubItemContainer::isInEventTransparetList(QGraphicsItem* item) const
+{
+	return m_eventtransperent_list.contains(item);
 }

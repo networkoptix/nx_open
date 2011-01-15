@@ -117,11 +117,13 @@ protected:
 	void recalcSomeParams();
 	
 	
-
+	//========navigation=======
 	void enableMultipleSelection(bool enable, bool unselect = true); 
 	bool isCTRLPressed(const QInputEvent* event) const;
 
 	bool isItemFullScreenZoomed(QGraphicsItem* item);
+
+	bool shouldIgnoreSubItem(QGraphicsItem* item) const;
 
 	//=========================
 	void contextMenuHelper_addNewLayout();

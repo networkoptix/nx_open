@@ -16,10 +16,12 @@ public:
 
 	~CLAbstractSubItemContainer();
 
-
 	bool addSubItem(CLSubItemType type);
 	virtual void removeSubItem(CLSubItemType type);
 	virtual QPointF getBestSubItemPos(CLSubItemType type);
+
+	void addToEevntTransparetList(QGraphicsItem* item);
+	bool isInEventTransparetList(QGraphicsItem* item) const;
 
 signals:
 	void onClose(CLAbstractSubItemContainer*);
@@ -30,7 +32,9 @@ public slots:
 protected slots:
 	virtual void onSubItemPressed(CLAbstractSubItem* subitem);
 
-	
+protected:
+
+	QList<QGraphicsItem*> m_eventtransperent_list;
 
 };
 

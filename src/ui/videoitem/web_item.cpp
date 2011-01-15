@@ -16,6 +16,8 @@ CLAbstractSceneItem(view, max_width, max_height, name)
 	mWeb_item->scale(scale, scale);
 
 	addSubItem(CloseSubItem);
+
+	addToEevntTransparetList(mWeb_item);
 }
 
 CLWebItem::~CLWebItem()
