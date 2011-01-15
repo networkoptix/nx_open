@@ -1061,9 +1061,9 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 	CLDevice* dev  = 0;
 
 
-	CLAbstractSceneItem* wnd = static_cast<CLAbstractSceneItem*>(itemAt(event->pos()));
-	if (!m_camLayout.hasSuchItem(wnd)) // this is decoration something
-		wnd = 0;
+	CLAbstractSceneItem* aitem = navigationItem(itemAt(event->pos()));
+	if (aitem)
+		aitem->drawRotationHelper(false);
 
 	// distance menu 
 	QMenu distance_menu;
@@ -1106,15 +1106,15 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 	QMenu menu;
 	menu.setWindowOpacity(global_menu_opacity);
 
-	if (wnd) // video wnd
+	if (aitem) // video wnd
 	{
-		if (wnd->getType() == CLAbstractSceneItem::VIDEO)
+		if (aitem->getType() == CLAbstractSceneItem::VIDEO)
 		{
 			// video item
 			menu.addAction(&cm_fullscren);
 			menu.addMenu(&rotation_manu);
 
-			video_wnd = static_cast<CLVideoWindowItem*>(wnd);
+			video_wnd = static_cast<CLVideoWindowItem*>(aitem);
 			cam = video_wnd->getVideoCam();
 			dev = cam->getDevice();
 
@@ -1137,14 +1137,14 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 			
 		}
 
-		if (wnd->getType()==CLAbstractSceneItem::LAYOUT )
+		if (aitem->getType()==CLAbstractSceneItem::LAYOUT )
 		{
 			//layout button
 			if (m_viewMode!=ItemsDonor)
 				menu.addMenu(&layout_editor_menu);
 		}
 
-		if (wnd->getType()==CLAbstractSceneItem::RECORDER)
+		if (aitem->getType()==CLAbstractSceneItem::RECORDER)
 		{
 			
 		}
@@ -1179,7 +1179,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 		QCoreApplication::instance()->exit();
 
 
-	if (wnd==0) // on void menu
+	if (aitem==0) // on void menu
 	{
 		
 		if (act== &cm_togglefs)
@@ -1211,13 +1211,13 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 	}
 	else // video item menu?
 	{
-		if (!m_camLayout.hasSuchItem(wnd))
+		if (!m_camLayout.hasSuchItem(aitem))
 			return;
 
-		if (wnd->getType() == CLAbstractSceneItem::VIDEO)
+		if (aitem->getType() == CLAbstractSceneItem::VIDEO)
 		{
 			if (act==&cm_fullscren)
-				toggleFullScreen_helper(wnd);
+				toggleFullScreen_helper(aitem);
 
 			
 			if (act==&cm_settings && dev)
@@ -1238,38 +1238,38 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
 			if (act == &cm_rotate_90)
 			{
-				if (m_camLayout.hasSuchItem(wnd))
-					contextMenuHelper_Rotation(wnd, 90);
+				if (m_camLayout.hasSuchItem(aitem))
+					contextMenuHelper_Rotation(aitem, 90);
 			}
 
 			if (act == &cm_rotate_minus90)
 			{
-				if (m_camLayout.hasSuchItem(wnd))
-					contextMenuHelper_Rotation(wnd, -90);
+				if (m_camLayout.hasSuchItem(aitem))
+					contextMenuHelper_Rotation(aitem, -90);
 			}
 
 			if (act == &cm_rotate_0)
 			{
-				if (m_camLayout.hasSuchItem(wnd))
-					contextMenuHelper_Rotation(wnd, 0);
+				if (m_camLayout.hasSuchItem(aitem))
+					contextMenuHelper_Rotation(aitem, 0);
 			}
 
 			if (act == &cm_rotate_180)
 			{
-				if (m_camLayout.hasSuchItem(wnd))
-					contextMenuHelper_Rotation(wnd, -180);
+				if (m_camLayout.hasSuchItem(aitem))
+					contextMenuHelper_Rotation(aitem, -180);
 			}
 
 			
 		}
 
-		if (wnd->getType() == CLAbstractSceneItem::LAYOUT)
+		if (aitem->getType() == CLAbstractSceneItem::LAYOUT)
 		{
 			if (act == &cm_layout_editor_change_t)
-				contextMenuHelper_chngeLayoutTitle(wnd);
+				contextMenuHelper_chngeLayoutTitle(aitem);
 
 			if (act == &cm_layout_editor_editlayout)
-				contextMenuHelper_editLayout(wnd);
+				contextMenuHelper_editLayout(aitem);
 		}
 
 
