@@ -968,8 +968,9 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 				}
 
-				// selection should be zerro anyway
-				setZeroSelection();
+				// selection should be zerro anyway, but not if we are in fullscreen mode
+				if (!m_selectedWnd || !m_selectedWnd->isFullScreen())
+					setZeroSelection();
 			}
 			
 			if (aitem && aitem!=m_selectedWnd) // item and left button
