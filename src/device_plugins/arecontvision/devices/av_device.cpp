@@ -447,10 +447,10 @@ bool CLAreconVisionDevice::setIP(const QHostAddress& ip, bool net )
 		removeARPrecord(getIP());
 
 
-		// after ip changed ping does not work ( this implementation ); I'll comment it for now
-		//CLPing ping;
-		//if (!ping.ping(ip.toString(), 2, ping_timeout)) // check if ip really changed 
-		//	return false; 
+		//
+		CLPing ping;
+		if (!ping.ping(ip.toString(), 2, ping_timeout)) // check if ip really changed 
+			return false; 
 		
 
 	}

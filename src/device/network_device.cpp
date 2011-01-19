@@ -104,7 +104,10 @@ bool CLNetworkDevice::conflicting()
 
 	CLPing ping;
 	if (!ping.ping(getIP().toString(), 2, ping_timeout)) // I do know know how else to solve this problem. but getMacByIP do not creates any ARP record 
+	{
+		getStatus().setFlag(CLDeviceStatus::CONFLICTING);
 		return true;
+	}
 
 	
 	mac = getMacByIP(getIP(), false); // just in case if ARP response from some else have delayed 

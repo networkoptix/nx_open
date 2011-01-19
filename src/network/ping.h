@@ -9,7 +9,7 @@ class CLPing
 {
 public:
 	CLPing();
-	bool ping(const QString& ip, int retry, int timeout, int pack_size = 32);
+	bool ping(const QString& ip, int retry, int timeout_per_retry, int pack_size = 32);
 private:
 
 	char icmp_data[CL_MAX_PING_PACKET];
