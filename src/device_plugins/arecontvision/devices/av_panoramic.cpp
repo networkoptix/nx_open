@@ -123,10 +123,6 @@ CLStreamreader* CLArecontPanoramicDevice::getDeviceStreamConnection()
 	return new AVPanoramicClientPullSSTFTPStreamreader(this);
 }
 
-bool CLArecontPanoramicDevice::getBaseInfo()
-{
-	return CLAreconVisionDevice::getBaseInfo();
-}
 
 QString CLArecontPanoramicDevice::getFullName() 
 {

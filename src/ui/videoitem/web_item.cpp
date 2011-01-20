@@ -27,8 +27,8 @@ CLWebItem::~CLWebItem()
 
 void CLWebItem::navigate(const QString& str)
 {
-	//m_web_widget.load(QUrl(str));
-	m_web_widget.load(QUrl("http://google.com"));
+	m_web_widget.load(QUrl(str));
+	//m_web_widget.load(QUrl("http://google.com"));
 }
 
 void CLWebItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)

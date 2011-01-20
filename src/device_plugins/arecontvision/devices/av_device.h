@@ -60,6 +60,7 @@ public:
 
 	virtual void onBeforeStart();
 	
+	// model is for internal use of any kind of AV plugin 
 	int getModel() const;
 
 	virtual bool executeCommand(CLDeviceCommand* command);

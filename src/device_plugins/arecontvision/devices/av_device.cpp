@@ -76,7 +76,7 @@ CLNetworkDevice* CLAreconVisionDevice::updateDevice()
 	if (!getParam("Model", model))
 		return 0;
 	
-	CLNetworkDevice* result = deviceByID(model, model);
+	CLNetworkDevice* result = deviceByID(model, atoi( QString(model).toLatin1().data() )); // atoi here coz av 8185dn returns "8185DN" string on the get?model request; and QString::toInt returns 0 on such str
 
 	if (!result)
 		return 0;
