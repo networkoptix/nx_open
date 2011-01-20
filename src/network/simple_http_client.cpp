@@ -26,6 +26,8 @@ CLHttpStatus CLSimpleHTTPClient::getNextLine()
 	QTextStream response(&m_line);
 	char prev = 0 , curr = 0;
 
+	int readed = 0;
+
 	while(1) 
 	{
 		if (m_sock.recv(&curr,1)<0)
@@ -36,8 +38,13 @@ CLHttpStatus CLSimpleHTTPClient::getNextLine()
 		if (prev=='\r' && curr == '\n')
 			break;
 
+		if (prev==0 && curr == 0 && readed>1)
+			break;
+
+
 		response << curr;
 		prev = curr;
+		++readed;
 	}
 
 	return CL_HTTP_SUCCESS;
