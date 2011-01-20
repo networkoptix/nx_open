@@ -48,72 +48,18 @@ AreconVisionDlgManufacture::AreconVisionDlgManufacture()
 	mPossibleNames.push_back("3135");
 
 
-	//=======dn===========================
-	mPossibleNames.push_back("1300DN");
-	mPossibleNames.push_back("2100DN");
-	mPossibleNames.push_back("3100DN");
-	mPossibleNames.push_back("5100DN");
+	QList<QString> base = mPossibleNames;
 
-	mPossibleNames.push_back("1310DN");
-	mPossibleNames.push_back("2110DN");
-	mPossibleNames.push_back("3110DN");
-	mPossibleNames.push_back("5110DN");
+	foreach(QString str, base)
+	{
+		QString mini = str + "M";
+		QString dn = str + "DN";
+		QString ai = str + "AI";
 
-
-	mPossibleNames.push_back("1305DN");
-	mPossibleNames.push_back("2105DN");
-	mPossibleNames.push_back("3105DN");
-	mPossibleNames.push_back("5105DN");
-	mPossibleNames.push_back("10005DN");
-
-	mPossibleNames.push_back("1355DN");
-	mPossibleNames.push_back("2155DN");
-	mPossibleNames.push_back("3155DN");
-	mPossibleNames.push_back("5155DN");
-
-	mPossibleNames.push_back("1315DN");
-	mPossibleNames.push_back("2115DN");
-	mPossibleNames.push_back("3115DN");
-	mPossibleNames.push_back("5115DN");
-
-	mPossibleNames.push_back("2805DN");
-	mPossibleNames.push_back("2815DN");
-
-
-	//=======ai===========================
-	mPossibleNames.push_back("1300AI");
-	mPossibleNames.push_back("2100AI");
-	mPossibleNames.push_back("3100AI");
-	mPossibleNames.push_back("5100AI");
-
-	mPossibleNames.push_back("1310AI");
-	mPossibleNames.push_back("2110AI");
-	mPossibleNames.push_back("3110AI");
-	mPossibleNames.push_back("5110AI");
-
-
-	mPossibleNames.push_back("1305AI");
-	mPossibleNames.push_back("2105AI");
-	mPossibleNames.push_back("3105AI");
-	mPossibleNames.push_back("5105AI");
-	mPossibleNames.push_back("10005AI");
-
-	mPossibleNames.push_back("1355AI");
-	mPossibleNames.push_back("2155AI");
-	mPossibleNames.push_back("3155AI");
-	mPossibleNames.push_back("5155AI");
-
-	mPossibleNames.push_back("1315AI");
-	mPossibleNames.push_back("2115AI");
-	mPossibleNames.push_back("3115AI");
-	mPossibleNames.push_back("5115AI");
-
-	mPossibleNames.push_back("2805AI");
-	mPossibleNames.push_back("2815AI");
-
-
-
-
+		mPossibleNames.push_back(mini);
+		mPossibleNames.push_back(dn);
+		mPossibleNames.push_back(ai);
+	}
 
 
 
@@ -132,7 +78,7 @@ CLAbstractDeviceSettingsDlg* AreconVisionDlgManufacture::createDlg(CLDevice* dev
 
 bool AreconVisionDlgManufacture::canProduceDlg(CLDevice* dev) const
 {
-	return mPossibleNames.contains(dev->getFullName());
+	return mPossibleNames.contains(dev->getName());
 }
 
 //=======================================================================================

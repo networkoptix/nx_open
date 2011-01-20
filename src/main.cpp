@@ -33,7 +33,11 @@ int main(int argc, char *argv[])
 	if (!cl_log.create("./log/log_file", 1024*1024*10, 5, cl_logDEBUG1))
 		return a.quit();
 
-	cl_log.setLogLevel(cl_logWARNING);
+#ifdef _DEBUG
+	cl_log.setLogLevel(cl_logDEBUG2);
+#else
+	cl_log.setLogLevel(cl_logALWAYS);
+#endif
 
 
 	CL_LOG(cl_logALWAYS)

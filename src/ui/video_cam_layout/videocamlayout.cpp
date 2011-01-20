@@ -28,7 +28,7 @@ int SCENE_TOP  = (400*1000);
 
 
 static const int max_items = 64;
-#define MAX_FPS (35.0)
+#define MAX_FPS (70.0)
 extern int scene_zoom_duration;
 
 

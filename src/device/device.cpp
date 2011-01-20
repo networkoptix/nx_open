@@ -67,10 +67,6 @@ void CLDevice::setName(const QString& name)
 }
 
 
-QString CLDevice::getFullName() const
-{
-	return getName();
-}
 
 
 CLDeviceStatus& CLDevice::getStatus()
@@ -161,7 +157,7 @@ const CLDeviceVideoLayout* CLDevice::getVideoLayout() const
 QString CLDevice::toString() const
 {
 	QString result;
-	QTextStream(&result) << getFullName() << "  " <<  getUniqueId();
+	QTextStream(&result) << getName() << "  " <<  getUniqueId();
 	return result;
 }
 

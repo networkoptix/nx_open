@@ -75,12 +75,9 @@ public:
 	QString getUniqueId() const;
 	void setUniqueId(const QString& id);
 
-	//Name is class of the devices. like AV2105; => arecontvision 2 megapixel H.264 camera; or "exacq nvr divece"
+	//Name is class of the devices. like 2105DN; => arecontvision 2 megapixel H.264 day night camera; or "exacq nvr divece"
 	virtual QString getName() const;
 	void setName(const QString& name);
-
-	// full name of the device; taking into account some properties( like AV2105DN - day/night camera)
-	virtual QString getFullName() const;
 
 	// each device has type; for example AV divece has NETWORK
 	bool checkDeviceTypeFlag(unsigned long flag) const;

@@ -12,8 +12,6 @@ public:
 	bool getDescription();
 	virtual CLStreamreader* getDeviceStreamConnection();
 
-	QString getFullName() ;
-
 	virtual bool hasTestPattern() const;
 
 protected:

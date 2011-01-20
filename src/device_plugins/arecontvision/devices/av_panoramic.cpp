@@ -124,24 +124,6 @@ CLStreamreader* CLArecontPanoramicDevice::getDeviceStreamConnection()
 }
 
 
-QString CLArecontPanoramicDevice::getFullName() 
-{
-	QString result;
-	QTextStream str(&result);
-
-
-	str << m_model;
-
-	CLValue dn;
-	getParam("Day/Night switcher enable", dn);
-
-	if (dn==1)// this is not 3135 and not 3130; need to check if IRswitcher_present
-		str<<"DN";
-
-
-	return result;
-
-}
 
 bool CLArecontPanoramicDevice::hasTestPattern() const
 {

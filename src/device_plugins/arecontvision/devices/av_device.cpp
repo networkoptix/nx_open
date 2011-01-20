@@ -73,13 +73,35 @@ bool CLAreconVisionDevice::unknownDevice() const
 CLNetworkDevice* CLAreconVisionDevice::updateDevice() 
 {
 	CLValue model;
+	CLValue model_relase;
+
 	if (!getParam("Model", model))
 		return 0;
+
+	
+	if (!getParam("ModelRelease", model_relase))
+		return 0;
+
+	if (model_relase!=model)
+	{
+		//this camera supports release name
+		model = model_relase;
+	}
+	else
+	{
+		//old camera; does not support relase name; but must support fullname
+		if (getParam("ModelFull", model_relase))
+			model = model_relase;
+	}
+
 	
 	CLNetworkDevice* result = deviceByID(model, atoi( QString(model).toLatin1().data() )); // atoi here coz av 8185dn returns "8185DN" string on the get?model request; and QString::toInt returns 0 on such str
 
 	if (!result)
+	{
+		cl_log.log("Found unknown device! ", QString(model), cl_logWARNING);
 		return 0;
+	}
 
 	result->setName(model);
 	result->setIP(getIP(), false);
@@ -362,11 +384,12 @@ CLDeviceList CLAreconVisionDevice::findDevices()
 				QString id = "AVUNKNOWN";
 				int model = 0;
 	
-
+				/*/
 				int shift = 32;
 
 				CLAreconVisionDevice* device = 0;
 
+				
 				if (datagram.size() > shift + 5)
 				{
 					model = (unsigned char)data[shift+2] * 256 + (unsigned char)data[shift+3]; //4
@@ -386,6 +409,12 @@ CLDeviceList CLAreconVisionDevice::findDevices()
 					device->setName("AVUNKNOWN");
 					
 				}
+				/**/
+
+
+				// in any case let's HTTP do it's job at very end of discovery 
+				CLAreconVisionDevice* device = new CLAreconVisionDevice(AVUNKNOWN);
+				device->setName("AVUNKNOWN");
 
 				
 				if (device==0)

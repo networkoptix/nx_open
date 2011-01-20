@@ -81,7 +81,7 @@ void CLNetworkDevice::setDiscoveryAddr(QHostAddress addr)
 QString CLNetworkDevice::toString() const
 {
 	QString result;
-	QTextStream(&result) << getFullName() << "  " << getIP().toString() << "  " << getMAC();
+	QTextStream(&result) << getName() << "  " << getIP().toString() << "  " << getMAC();
 	return result;
 }
 
