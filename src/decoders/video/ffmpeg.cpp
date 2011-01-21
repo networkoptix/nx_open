@@ -99,7 +99,7 @@ CLFFmpegVideoDecoder::~CLFFmpegVideoDecoder(void)
 	QMutexLocker mutex(&global_ffmpeg_mutex);
 
 	global_ffmpeg_dll.avcodec_close(c);
-	if (m_need_to_free_context)
+	//if (m_need_to_free_context)
 		global_ffmpeg_dll.av_free(c);
 	global_ffmpeg_dll.av_free(picture);
 }
