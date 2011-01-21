@@ -278,7 +278,12 @@ END:
 
 	// ok. at this point devices contains only network devices. and some of them have unknownDevice==true;
 	// we need to resolve such devices 
-	devices = resolveUnknown_helper(devices);
+	if (devices.count())
+	{
+		devices = resolveUnknown_helper(devices);
+		CLDevice::getDevicesBasicInfo(devices, 4);
+
+	}
 
 	CLDevice::mergeLists(devices, not_network_devices); // move everything to result list
 

@@ -14,8 +14,6 @@ m_videovindow(videovindow),
 m_recorder(device)
 {
 
-	m_device->getBaseInfo();
-
 	cl_log.log("Creating camera for ", m_device->toString(), cl_logDEBUG1);
 
 

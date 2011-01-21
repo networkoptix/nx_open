@@ -36,9 +36,8 @@ int main(int argc, char *argv[])
 #ifdef _DEBUG
 	cl_log.setLogLevel(cl_logDEBUG2);
 #else
-	cl_log.setLogLevel(cl_logALWAYS);
+	cl_log.setLogLevel(cl_logWARNING);
 #endif
-
 
 	CL_LOG(cl_logALWAYS)
 	{
