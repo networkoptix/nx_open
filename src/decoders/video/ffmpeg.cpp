@@ -16,8 +16,9 @@ bool CLFFmpegVideoDecoder::m_first_instance = true;
 //================================================
 
 
-CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CLCodecType codec_id):
-c(0),
+CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CLCodecType codec_id, AVCodecContext* codecContext):
+c(codecContext),
+m_need_to_free_context(codecContext==0),
 m_width(0),
 m_height(0),
 m_codec(codec_id),
@@ -79,8 +80,10 @@ m_lightModeFrameCounter(0)
 	}
 
 
+	if (c==0)
+		c = global_ffmpeg_dll.avcodec_alloc_context();
 
-	c = global_ffmpeg_dll.avcodec_alloc_context();
+
 	picture= global_ffmpeg_dll.avcodec_alloc_frame();
 
 	//if(codec->capabilities&CODEC_CAP_TRUNCATED)	c->flags|= CODEC_FLAG_TRUNCATED;
@@ -96,29 +99,11 @@ CLFFmpegVideoDecoder::~CLFFmpegVideoDecoder(void)
 	QMutexLocker mutex(&global_ffmpeg_mutex);
 
 	global_ffmpeg_dll.avcodec_close(c);
-	global_ffmpeg_dll.av_free(c);
+	if (m_need_to_free_context)
+		global_ffmpeg_dll.av_free(c);
 	global_ffmpeg_dll.av_free(picture);
 }
 
-void CLFFmpegVideoDecoder::resart_decoder()
-{
-	QMutexLocker mutex(&global_ffmpeg_mutex);
-
-	if (c)
-	{
-		global_ffmpeg_dll.avcodec_close(c);
-		global_ffmpeg_dll.av_free(c);
-		global_ffmpeg_dll.av_free(picture);
-	}
-
-	c = global_ffmpeg_dll.avcodec_alloc_context();
-	picture= global_ffmpeg_dll.avcodec_alloc_frame();
-
-	//if(codec->capabilities&CODEC_CAP_TRUNCATED)		c->flags|= CODEC_FLAG_TRUNCATED;
-
-	global_ffmpeg_dll.avcodec_open(c, codec);
-
-}
 
 //The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than the actual read bytes because some optimized bitstream readers read 32 or 64 bits at once and could read over the end.
 //The end of the input buffer buf should be set to 0 to ensure that no overreading happens for damaged MPEG streams.
@@ -161,7 +146,7 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 	{
 		m_width = width;
 		m_height = height;
-		resart_decoder();
+
 	}
 	/**/
 

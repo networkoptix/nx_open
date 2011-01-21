@@ -52,7 +52,7 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data)
 
 		if (m_decoder[data->compressionType]==0)
 		{
-			m_decoder[data->compressionType] = CLVideoDecoderFactory::createDecoder(data->compressionType);
+			m_decoder[data->compressionType] = CLVideoDecoderFactory::createDecoder(data->compressionType, data->context);
 			m_decoder[data->compressionType]->setLightCpuMode(m_lightCPUmode);
 		}
 

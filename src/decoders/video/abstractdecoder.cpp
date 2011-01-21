@@ -4,7 +4,7 @@
 
 CLVideoDecoderFactory::CLCodecManufacture CLVideoDecoderFactory::m_codecManufacture = FFMPEG;
 
-CLAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder(CLCodecType codec)
+CLAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder(CLCodecType codec, void* context)
 {
 
 	if (codec == CL_JPEG)
@@ -18,7 +18,7 @@ CLAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder(CLCodecType codec)
 	    break;
 	case FFMPEG:
 	default:
-		return new CLFFmpegVideoDecoder(codec);
+		return new CLFFmpegVideoDecoder(codec, (AVCodecContext*)context);
 	    break;
 	}
 

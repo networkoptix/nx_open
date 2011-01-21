@@ -230,9 +230,10 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 		m_bsleep = true; // sleep only in case of video
 
 
+		AVCodecContext* codecContext = m_formatContext->streams[m_videoStrmIndex]->codec;
 		//int extra = FF_INPUT_BUFFER_PADDING_SIZE;
 		int extra = 0;
-		CLCompressedVideoData* videoData = new CLCompressedVideoData(CL_MEDIA_ALIGNMENT,m_packet.size + extra);
+		CLCompressedVideoData* videoData = new CLCompressedVideoData(CL_MEDIA_ALIGNMENT,m_packet.size + extra, codecContext);
 		CLByteArray& data = videoData->data;
 
 		data.prepareToWrite(m_packet.size + extra);

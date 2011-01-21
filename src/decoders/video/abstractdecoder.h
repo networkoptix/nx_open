@@ -25,7 +25,7 @@ class CLVideoDecoderFactory
 {
 public:
 	enum CLCodecManufacture{FFMPEG, INTELIPP};
-	static CLAbstractVideoDecoder* createDecoder(CLCodecType codec);
+	static CLAbstractVideoDecoder* createDecoder(CLCodecType codec, void* context);
 	static void setCodecManufacture(CLCodecManufacture codecman)
 	{
 		m_codecManufacture = codecman;

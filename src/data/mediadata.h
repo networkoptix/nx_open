@@ -57,12 +57,12 @@ private:
 
 struct CLCompressedVideoData : public CLAbstractMediaData
 {
-	CLCompressedVideoData(unsigned int alignment, unsigned int capacity):
-	CLAbstractMediaData(alignment, qMin(capacity, (unsigned int)10*1024*1024))
-	
+	CLCompressedVideoData(unsigned int alignment, unsigned int capacity, void* ctx = 0):
+		CLAbstractMediaData(alignment, qMin(capacity, (unsigned int)10*1024*1024))
 	{
 		dataType = VIDEO;
 		use_twice = false;
+		context = ctx;
 	}
 
 	int width;
@@ -71,6 +71,7 @@ struct CLCompressedVideoData : public CLAbstractMediaData
 	bool use_twice; // some decoders delay video frame by one;
 	quint32 channel_num; // video channel number; some devices might have more that one sensor.
 
+	void* context;
 };
 
 
