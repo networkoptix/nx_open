@@ -328,12 +328,12 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 			size.height /= 2;
 		}
 
-		m_last_cam_width = size.width;
-		m_last_cam_height = size.height;
-
 	}
 
 
+
+	m_last_cam_width = size.width;
+	m_last_cam_height = size.height;
 
 
 
