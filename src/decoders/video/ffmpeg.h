@@ -1,6 +1,5 @@
-#ifndef cl_ffmpeg_h
-#define cl_ffmpeg_h
-
+#ifndef cl_ffmpeg_h2026
+#define cl_ffmpeg_h2026
 
 #include "abstractdecoder.h"
 
@@ -41,8 +40,6 @@ private:
 	bool m_showmotion;
 	bool m_lightCPUMode;
 	bool m_wantEscapeFromLightCPUMode;
-
-	bool m_need_to_free_context;
 
 	unsigned int m_lightModeFrameCounter;
 
