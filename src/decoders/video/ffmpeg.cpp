@@ -68,6 +68,11 @@ m_lightModeFrameCounter(0)
 		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_MSMPEG4V3);
 		break;
 
+	case CL_MPEG1VIDEO:
+		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_MPEG1VIDEO);
+		break;
+
+
 
 	case CL_H264:
 		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_H264);
@@ -79,6 +84,7 @@ m_lightModeFrameCounter(0)
 	
 	default:
 		codec = 0;
+		return;
 
 
 	}
@@ -116,6 +122,9 @@ CLFFmpegVideoDecoder::~CLFFmpegVideoDecoder(void)
 //The end of the input buffer buf should be set to 0 to ensure that no overreading happens for damaged MPEG streams.
 bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 {
+
+	if (codec==0)
+		return false;
 
 	if (m_wantEscapeFromLightCPUMode && data.key_frame)
 	{
