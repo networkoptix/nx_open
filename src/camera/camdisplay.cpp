@@ -4,7 +4,7 @@
 #include "videostreamdisplay.h"
 #include "audiostreamdisplay.h"
 
-#define CL_MAX_DISPLAY_QUEUE_SIZE 8
+#define CL_MAX_DISPLAY_QUEUE_SIZE 4
 #define AUDIO_BUFF_SIZE 250 // ms
 
 

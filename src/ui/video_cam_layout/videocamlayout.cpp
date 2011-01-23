@@ -27,7 +27,7 @@ int SCENE_LEFT = (400*1000);
 int SCENE_TOP  = (400*1000);
 
 
-static const int max_items = 64;
+static const int max_items = 40;
 #define MAX_FPS (35.0)
 extern int scene_zoom_duration;
 
@@ -41,7 +41,7 @@ int SceneLayout::m_total_potential_elemnts = 0;
 SceneLayout::SceneLayout():
 m_view(0),
 m_scene(0),
-m_height(4),
+m_height(5),
 m_item_distance(35/100.0),
 m_max_items(max_items),
 m_slots(max_items*4),
