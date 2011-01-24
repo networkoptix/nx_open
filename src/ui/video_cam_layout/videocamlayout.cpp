@@ -28,7 +28,10 @@ int SCENE_TOP  = (400*1000);
 
 
 static const int max_items = 40;
-#define MAX_FPS (35.0)
+
+int MAX_FPS_normal = 35;
+int MAX_FPS_selected = 60;
+
 extern int scene_zoom_duration;
 
 
@@ -107,6 +110,16 @@ void SceneLayout::setContentChanged(bool changed)
 }
 
 
+void SceneLayout::setMaxFps(int max_fps)
+{
+	CL_LOG(cl_logWARNING)
+	{
+		cl_log.log("max fps = ", max_fps, cl_logWARNING);
+	}
+	
+	m_videotimer.setInterval(1000/max_fps);
+}
+
 
 void SceneLayout::start()
 {
@@ -117,7 +130,7 @@ void SceneLayout::start()
 
 	m_contentchanged = false;
 	m_timer.start(100);
-	m_videotimer.start(1000/MAX_FPS); 
+	m_videotimer.start(1000/MAX_FPS_normal); 
 	m_isRunning = true;
 
 

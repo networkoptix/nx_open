@@ -42,6 +42,10 @@ extern QString button_home;
 extern QString button_level_up;
 extern QString button_magnifyingglass;
 
+extern int MAX_FPS_normal;
+extern int MAX_FPS_selected;
+
+
 extern QPixmap cached(const QString &img);
 extern int limit_val(int val, int min_val, int max_val, bool mirror);
 //==============================================================================
@@ -244,6 +248,8 @@ void GraphicsView::setZeroSelection()
 
 	m_last_selectedWnd = m_selectedWnd;
 	m_selectedWnd  = 0;
+
+	m_camLayout.setMaxFps(MAX_FPS_normal);
 }
 
 void GraphicsView::setAllItemsQuality(CLStreamreader::StreamQuality q, bool increase)
@@ -983,6 +989,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 					m_last_selectedWnd = aitem;
 					aitem->setItemSelected(true, false);
 					aitem->setFullScreen(true);
+					m_camLayout.setMaxFps(MAX_FPS_selected);
 				}
 				else
 					onNewItemSelected_helper(aitem, doubl_clk_delay);
@@ -1881,8 +1888,7 @@ void GraphicsView::onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int de
 
 	m_scenezoom.zoom_abs(zoom, item_select_duration, delay, CLAnimationTimeLine::SLOW_START_SLOW_END);
 
-
-	
+	m_camLayout.setMaxFps(MAX_FPS_selected);
 
 }
 
@@ -2144,6 +2150,8 @@ void GraphicsView::onItemFullScreen_helper(CLAbstractSceneItem* wnd)
 	wnd->setItemSelected(true,false); // do not animate
 	m_selectedWnd = wnd;
 	m_last_selectedWnd = wnd;
+
+	m_camLayout.setMaxFps(MAX_FPS_selected);
 
 	
 

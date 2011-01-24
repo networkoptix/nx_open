@@ -46,6 +46,8 @@ public:
 	bool isContentChanged() const;
 	void setContentChanged(bool changed);
 
+	void setMaxFps(int max_fps);
+
 	//================================================
 
 	//start should be called only after Layout putted on the scene, but before first item is added
