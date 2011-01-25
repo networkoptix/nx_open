@@ -19,6 +19,7 @@ public:
 
 	typedef void (*dll_avcodec_register_all)(void);
 	typedef AVCodecContext* (*dll_avcodec_alloc_context)(void) ;
+	typedef int (*dll_avcodec_copy_context)(AVCodecContext*, const AVCodecContext*);
 	typedef AVFrame*(*dll_avcodec_alloc_frame)(void);
 	typedef int (*dll_avcodec_open)(AVCodecContext *avctx, AVCodec *codec);
 	typedef int (*dll_avcodec_close)(AVCodecContext *avctx);
@@ -34,6 +35,7 @@ public:
 	dll_avcodec_find_decoder avcodec_find_decoder;
 	dll_avcodec_register_all avcodec_register_all;
 	dll_avcodec_alloc_context avcodec_alloc_context ;
+	dll_avcodec_copy_context avcodec_copy_context;
 	dll_avcodec_alloc_frame avcodec_alloc_frame;
 	dll_avcodec_open avcodec_open;
 	dll_avcodec_close avcodec_close;

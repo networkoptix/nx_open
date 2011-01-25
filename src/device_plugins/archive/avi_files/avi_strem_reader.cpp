@@ -7,6 +7,7 @@
 #include "stdint.h"
 
 
+extern QMutex global_ffmpeg_mutex;
 
 
 CLAVIStreamReader::CLAVIStreamReader(CLDevice* dev ):
@@ -41,6 +42,8 @@ bool CLAVIStreamReader::init()
 	if (firstInstance)
 	{
 		firstInstance = false;
+
+		QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
 		avidll.av_register_all();
 	}
 
@@ -58,11 +61,15 @@ bool CLAVIStreamReader::init()
 		return false; 
 	}
 
-	err = avidll.av_find_stream_info(m_formatContext);
-	if (err < 0)
 	{
-		destroy();
-		return false; 
+		QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
+
+		err = avidll.av_find_stream_info(m_formatContext);
+		if (err < 0)
+		{
+			destroy();
+			return false; 
+		}
 	}
 
 	m_len_msec = m_formatContext->duration/1000;
@@ -128,6 +135,10 @@ bool CLAVIStreamReader::init()
 	//	m_videocodec_id = CL_MSMPEG4V2;
 	//	break;
 
+
+	case CODEC_ID_WMV3:
+		m_videocodec_id = CL_WMV3;
+		break;
 
 	case CODEC_ID_H264:
 		m_videocodec_id = CL_H264;

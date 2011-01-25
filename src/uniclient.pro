@@ -5,7 +5,7 @@ VERSION = 0.0.1
 TARGET = uniclient
 DESTDIR = ../bin
 
-INCLUDEPATH += ../contrib/ffmpeg24894/include
+INCLUDEPATH += ../contrib/ffmpeg26404/include
 
 RESOURCES += mainwnd.qrc
 FORMS += mainwnd.ui

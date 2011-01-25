@@ -10,7 +10,8 @@
 enum CLCodecType 
 {
 	CL_JPEG, 
-	CL_H264, 
+	CL_H264,
+	CL_WMV3,
 	CL_MPEG2, 
 	CL_MPEG4, 
 	CL_MSVIDEO1, 

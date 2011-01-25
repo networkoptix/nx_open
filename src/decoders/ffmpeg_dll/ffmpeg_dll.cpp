@@ -39,10 +39,10 @@ FFMPEGCodecDll::FFMPEGCodecDll()
 bool FFMPEGCodecDll::init()
 {
 
-	QDir::setCurrent("./old_ffmpeg");
+	// QDir::setCurrent("./old_ffmpeg");
 
-	//m_dll  = ::LoadLibrary(L"avcodec-52.dll");
-	m_dll  = ::LoadLibrary(L"avcodec-51.dll");
+	m_dll  = ::LoadLibrary(L"avcodec-52.dll");
+	//m_dll  = ::LoadLibrary(L"avcodec-51.dll");
 
 	if(!m_dll)
 		return false;
@@ -61,7 +61,11 @@ bool FFMPEGCodecDll::init()
 
 
 	avcodec_alloc_context  = reinterpret_cast<dll_avcodec_alloc_context>(::GetProcAddress(m_dll, "avcodec_alloc_context"));
-	if (!avcodec_register_all)
+	if (!avcodec_alloc_context)
+		return false;
+
+	avcodec_copy_context  = reinterpret_cast<dll_avcodec_copy_context>(::GetProcAddress(m_dll, "avcodec_copy_context"));
+	if (!avcodec_copy_context)
 		return false;
 
 	avcodec_alloc_frame  = reinterpret_cast<dll_avcodec_alloc_frame>(::GetProcAddress(m_dll, "avcodec_alloc_frame"));
@@ -82,8 +86,8 @@ bool FFMPEGCodecDll::init()
 	if (!ff_print_debug_info)
 		return false;
 	
-	//m_dll2 = ::LoadLibrary(L"avutil-50.dll");
-	m_dll2 = ::LoadLibrary(L"avutil-49.dll");
+	m_dll2 = ::LoadLibrary(L"avutil-50.dll");
+	//m_dll2 = ::LoadLibrary(L"avutil-49.dll");
 	if(!m_dll2)
 		return false;
 
@@ -97,7 +101,7 @@ bool FFMPEGCodecDll::init()
 		return false;
 	else
 	{
-		//av_log_set_callback(decoderLogCallback);
+		// av_log_set_callback(decoderLogCallback);
 	}
 
 
@@ -112,7 +116,7 @@ bool FFMPEGCodecDll::init()
 
 	//==================================================================================
 
-	QDir::setCurrent("../");
+	// QDir::setCurrent("../");
 
 
 	return true;

@@ -55,7 +55,7 @@ CLDeviceList CLDirectoryBrowserDeviceServer::findDevices()
 		filter << "*.avi";
 		filter << "*.mp4";
 		filter << "*.mkv";
-		//filter << "*.wmv";
+		filter << "*.wmv";
 		filter << "*.mov";
 		filter << "*.vob";
 

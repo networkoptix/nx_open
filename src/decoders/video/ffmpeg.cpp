@@ -78,6 +78,10 @@ m_lightModeFrameCounter(0)
 		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_H264);
 	    break;
 
+	case CL_WMV3:
+		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_WMV3);
+		break;
+
 	case CL_MSVIDEO1:
 		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_MSVIDEO1);
 		break;
@@ -90,22 +94,22 @@ m_lightModeFrameCounter(0)
 	}
 
 	c = global_ffmpeg_dll.avcodec_alloc_context();
+
 	if (codecContext)	
 	{
-		c->extradata_size = codecContext->extradata_size;
-		c->extradata = codecContext->extradata;
+		global_ffmpeg_dll.avcodec_copy_context(c, codecContext);
 	}
 
-
-
-	picture= global_ffmpeg_dll.avcodec_alloc_frame();
+	picture = global_ffmpeg_dll.avcodec_alloc_frame();
 
 	//if(codec->capabilities&CODEC_CAP_TRUNCATED)	c->flags|= CODEC_FLAG_TRUNCATED;
 
-	global_ffmpeg_dll.avcodec_open(c, codec);
-
 	c->debug_mv = 1;
 
+	// TODO: check return value
+	if (global_ffmpeg_dll.avcodec_open(c, codec) < 0) {
+		codec = 0;
+	}
 }
 
 CLFFmpegVideoDecoder::~CLFFmpegVideoDecoder(void)
@@ -207,8 +211,8 @@ gotpicture:
 		}
 
 
-		if (m_showmotion)
-			global_ffmpeg_dll.ff_print_debug_info((MpegEncContext*)(c->priv_data), picture);
+		//if (m_showmotion)
+		//	global_ffmpeg_dll.ff_print_debug_info((MpegEncContext*)(c->priv_data), picture);
 
 		data.out_frame.width = c->width;
 		data.out_frame.height = c->height;
