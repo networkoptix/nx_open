@@ -6,7 +6,6 @@
 #include "data/mediadata.h"
 #include "stdint.h"
 
-
 extern QMutex global_ffmpeg_mutex;
 
 
@@ -352,7 +351,7 @@ void CLAVIStreamReader::channeljumpTo(unsigned long msec, int channel)
 
 void CLAVIStreamReader::destroy()
 {
-	avidll.av_free(m_formatContext);
+	avidll.av_close_input_file(m_formatContext);
 	m_formatContext = 0;
 }
 

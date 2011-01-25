@@ -29,6 +29,10 @@ bool CLAviFFMpegDLL::init()
 	if(!av_open_input_file)
 		return false;
 
+	av_close_input_file = reinterpret_cast<dll_av_close_input_file>(::GetProcAddress(m_dll, "av_close_input_file"));
+	if(!av_close_input_file)
+		return false;
+
 	av_find_stream_info  = reinterpret_cast<dll_av_find_stream_info>(::GetProcAddress(m_dll, "av_find_stream_info"));
 	if(!av_find_stream_info)
 		return false;

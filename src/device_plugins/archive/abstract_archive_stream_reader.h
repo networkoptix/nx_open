@@ -9,7 +9,7 @@ class CLAbstractArchiveReader : public CLClientPullStreamreader
 {
 public:
 	CLAbstractArchiveReader(CLDevice* dev );
-	~CLAbstractArchiveReader();
+	virtual ~CLAbstractArchiveReader();
 
 	void setSingleShotMode(bool single);
 	bool isSingleShotMode() const;

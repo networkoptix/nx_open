@@ -11,7 +11,7 @@ class CLClientPullStreamreader : public CLStreamreader
 {
 public:
 	CLClientPullStreamreader(CLDevice* dev );
-	~CLClientPullStreamreader(){stop();}
+	virtual ~CLClientPullStreamreader(){stop();}
 
 	
 protected:

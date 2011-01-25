@@ -13,7 +13,7 @@ class CLAVIStreamReader : public CLAbstractArchiveReader
 {
 public:
 	CLAVIStreamReader(CLDevice* dev );
-	~CLAVIStreamReader();
+	virtual ~CLAVIStreamReader();
 
 	virtual unsigned long currTime() const;
 
