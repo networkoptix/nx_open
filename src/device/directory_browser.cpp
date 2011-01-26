@@ -58,6 +58,7 @@ CLDeviceList CLDirectoryBrowserDeviceServer::findDevices()
 		filter << "*.wmv";
 		filter << "*.mov";
 		filter << "*.vob";
+		filter << "*.m4v";
 
 		QStringList list = dir.entryList(filter);
 

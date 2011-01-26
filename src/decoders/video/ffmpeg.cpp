@@ -98,18 +98,20 @@ m_lightModeFrameCounter(0)
 	if (codecContext)	
 	{
 		global_ffmpeg_dll.avcodec_copy_context(c, codecContext);
+		//c->extradata = codecContext->extradata;
+		//c->extradata_size = codecContext->extradata_size;
 	}
 
 	picture = global_ffmpeg_dll.avcodec_alloc_frame();
 
 	//if(codec->capabilities&CODEC_CAP_TRUNCATED)	c->flags|= CODEC_FLAG_TRUNCATED;
 
-	c->debug_mv = 1;
+	//c->debug_mv = 1;
 
 	// TODO: check return value
-	if (global_ffmpeg_dll.avcodec_open(c, codec) < 0) {
+	if (global_ffmpeg_dll.avcodec_open(c, codec) < 0) 
 		codec = 0;
-	}
+
 }
 
 CLFFmpegVideoDecoder::~CLFFmpegVideoDecoder(void)

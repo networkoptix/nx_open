@@ -103,9 +103,9 @@ bool CLAVIStreamReader::init()
 
 	switch(ffmpeg_video_codec_id)
 	{
-	case CODEC_ID_MSVIDEO1:
-		m_videocodec_id =CL_MSVIDEO1;
-		break;
+	//case CODEC_ID_MSVIDEO1: // crashes
+	//	m_videocodec_id =CL_MSVIDEO1;
+	//	break;
 
 
 	case CODEC_ID_MJPEG:
@@ -351,7 +351,9 @@ void CLAVIStreamReader::channeljumpTo(unsigned long msec, int channel)
 
 void CLAVIStreamReader::destroy()
 {
-	avidll.av_close_input_file(m_formatContext);
+	if (m_formatContext) // crashes without condition 
+		avidll.av_close_input_file(m_formatContext);
+
 	m_formatContext = 0;
 }
 
