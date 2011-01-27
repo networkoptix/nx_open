@@ -6,6 +6,7 @@
 #include <QObject>
 #include <QTimer>
 #include "device\device.h"
+#include "grid_engine.h"
 
 
 
@@ -20,12 +21,6 @@ class LayoutContent;
 class CLAbstractComplicatedItem;
 class CLAbstractSubItemContainer;
 
-struct CLIdealWndPos
-{
-	CLVideoWindowItem* item;
-	QPoint pos;
-};
-
 
 class SceneLayout : public QObject
 {
@@ -39,6 +34,7 @@ public:
 	void setScene(QGraphicsScene* scene);
 	void setContent(LayoutContent* cont);
 	LayoutContent* getContent();
+	CLGridEngine& getGridEngine();
 
 	bool isEditable() const;
 	void setEditable(bool editable) ;
@@ -70,37 +66,14 @@ public:
 	//================================================
 
 	void setItemDistance(qreal distance);
-	qreal getItemDistance() const;
-
-
-	QRect getLayoutRect() const; // scene rect 
-	QRect getSmallLayoutRect() const; // scene rect 
-
+	
 	void updateSceneRect();
 
 
 	QList<CLAbstractSceneItem*> getItemList() const;
-
-
 	bool hasSuchItem(const CLAbstractSceneItem* item) const;
 
 	void makeAllItemsSelectable(bool selectable);
-
-
-	// return wnd on the center of the lay out;
-	// returns 0 if there is no wnd at all
-	CLAbstractSceneItem*  getCenterWnd() const;
-
-
-	CLAbstractSceneItem* getNextLeftItem(const CLAbstractSceneItem* curr) const;
-	CLAbstractSceneItem* getNextRightItem(const CLAbstractSceneItem* curr) const;
-	CLAbstractSceneItem* getNextTopItem(const CLAbstractSceneItem* curr) const;
-	CLAbstractSceneItem* getNextBottomItem(const CLAbstractSceneItem* curr) const;
-
-	QSize getDefaultWndSize() const;
-	
-
-	QList<CLIdealWndPos> calcArrangedPos() const;
 
 	//========================================================
 	void loadContent();
@@ -143,69 +116,12 @@ private:
 	bool removeDevices( QList<CLAbstractComplicatedItem*> lst); 
 
 	//================================================
-	// means that at least one item can be added 
-	bool isSpaceAvalable() const;
-
-	QSize getMaxWndSize(const CLDeviceVideoLayout* layout) const;
-
-	void adjustItem(CLAbstractSceneItem* item) const;
-
-	// returns next best available position; returns -1 if not found(all positions are busy);
-	// returns false if everything is busy
-	bool getNextAvailablePos(QSize size, int &x, int &y) const;
-
-
-	//================================================
-	
-
-	int next_item_helper_get_quarter(const QPointF& current, const QPointF& other) const;
-	CLAbstractSceneItem* next_item_helper(const CLAbstractSceneItem* curr, int dir_c, int dir_f) const;
-
-	QPoint getNextCloserstAvailableForWndSlot_butFrom_list___helper(const CLVideoWindowItem* wnd, QList<CLIdealWndPos>& lst) const;
-
-	// how many slots window occupies 
-	int slotsW(CLVideoWindowItem* wnd) const;
-	int slotsH(CLVideoWindowItem* wnd) const;
-	
-
-
-
-	CLAbstractSceneItem* getVeryLeftItem() const;
-	CLAbstractSceneItem* getVeryRightItem() const;
-	CLAbstractSceneItem* getVeryTopItem() const;
-	CLAbstractSceneItem* getVeryBottomItem() const;
-
-	QPoint getMassCenter() const;
-
-	bool isSlotAvailable(int slot, QSize size) const;
-	
-
-	void buildPotantial();
-	int bPh_findNext(int *energy, int elemnts);
-
-	int slotFromPos(QPoint p) const;
-	QPoint posFromSlot(int slot) const;
-
 private:
 
 	QList<CLAbstractSceneItem*> m_items;
 
 	QList<CLAbstractComplicatedItem*> m_deviceitems; 
 	
-
-
-	int m_height;
-	int m_width;
-	qreal m_item_distance;
-	int m_max_items;
-	int m_slots;
-
-	static int *m_potantial_x;
-	static int *m_potantial_y;
-	static bool m_potantial_builded;
-
-	static int m_total_potential_elemnts;
-
 
 	GraphicsView* m_view;
 	QGraphicsScene* m_scene;
@@ -221,6 +137,9 @@ private:
 	LayoutContent* m_content;
 	bool m_editable;
 	bool m_contentchanged;
+
+
+	CLGridEngine m_grid;
 };
 
 //===================================================================

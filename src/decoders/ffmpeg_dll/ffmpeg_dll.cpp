@@ -39,7 +39,7 @@ FFMPEGCodecDll::FFMPEGCodecDll()
 bool FFMPEGCodecDll::init()
 {
 
-	// QDir::setCurrent("./old_ffmpeg");
+	//QDir::setCurrent("./old_ffmpeg");
 
 	m_dll  = ::LoadLibrary(L"avcodec-52.dll");
 	//m_dll  = ::LoadLibrary(L"avcodec-51.dll");
@@ -116,7 +116,7 @@ bool FFMPEGCodecDll::init()
 
 	//==================================================================================
 
-	// QDir::setCurrent("../");
+	//QDir::setCurrent("../");
 
 
 	return true;

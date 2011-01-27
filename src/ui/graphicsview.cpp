@@ -1534,16 +1534,16 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 		switch (e->key()) 
 		{
 		case Qt::Key_Left:
-			next_item = m_camLayout.getNextLeftItem(last_sel_item);
+			next_item = m_camLayout.getGridEngine().getNextLeftItem(last_sel_item);
 			break;
 		case Qt::Key_Right:
-			next_item = m_camLayout.getNextRightItem(last_sel_item);
+			next_item = m_camLayout.getGridEngine().getNextRightItem(last_sel_item);
 			break;
 		case Qt::Key_Up:
-			next_item = m_camLayout.getNextTopItem(last_sel_item);
+			next_item = m_camLayout.getGridEngine().getNextTopItem(last_sel_item);
 			break;
 		case Qt::Key_Down:
-			next_item = m_camLayout.getNextBottomItem(last_sel_item);
+			next_item = m_camLayout.getGridEngine().getNextBottomItem(last_sel_item);
 			break;
 
 		}
@@ -1803,7 +1803,7 @@ CLAbstractSceneItem* GraphicsView::getLastSelectedItem()
 	}
 		
 	
-	return m_camLayout.getCenterWnd();
+	return m_camLayout.getGridEngine().getCenterWnd();
 	
 }
 
@@ -1925,7 +1925,7 @@ void GraphicsView::onCircle_helper(bool show)
 
 	
 	m_camLayout.updateSceneRect();
-	QRectF item_rect = m_camLayout.getSmallLayoutRect();
+	QRectF item_rect = m_camLayout.getGridEngine().getGridRect();
 	mShow.center = item_rect.center();
 
 	mShow.radius = max(item_rect.width(), item_rect.height())/8;
@@ -2011,16 +2011,16 @@ void GraphicsView::onArrange_helper()
 	}
 	/**/
 
-	QList<CLIdealWndPos> newPosLst = m_camLayout.calcArrangedPos();
-	for (int i = 0; i < newPosLst.count();++i)
+	QList<CLIdealItemPos> newPosLst = m_camLayout.getGridEngine().calcArrangedPos();
+	foreach(CLIdealItemPos ipos, newPosLst)
 	{
-		CLAbstractSceneItem* item = static_cast<CLAbstractSceneItem*>(newPosLst.at(i).item);
+		CLAbstractSceneItem* item = ipos.item;
 
 		QPropertyAnimation *anim2 = new QPropertyAnimation(item, "pos");
-	
+
 		anim2->setStartValue(item->pos());
 
-		anim2->setEndValue(newPosLst.at(i).pos);
+		anim2->setEndValue(ipos.pos);
 
 		anim2->setDuration(1000 + cl_get_random_val(0, 300));
 		anim2->setEasingCurve(QEasingCurve::InOutBack);
@@ -2028,8 +2028,8 @@ void GraphicsView::onArrange_helper()
 		m_groupAnimation->addAnimation(anim2);
 
 		item->setArranged(true);
-	}
 
+	}
 
 	connect(m_groupAnimation, SIGNAL(finished ()), this, SLOT(fitInView()));
 
@@ -2053,7 +2053,7 @@ void GraphicsView::fitInView(int duration, int delay, CLAnimationTimeLine::CLAni
 	}	/**/
 
 	m_camLayout.updateSceneRect();
-	QRectF item_rect = m_camLayout.getSmallLayoutRect();
+	QRectF item_rect = m_camLayout.getGridEngine().getGridRect();
 
 	m_movement.move(item_rect.center(), duration, delay, curve);
 
@@ -2387,7 +2387,7 @@ void GraphicsView::contextMenuHelper_openInWebBroser(CLVideoCamera* cam)
 	QString url;
 	QTextStream(&url) << "http://" << net_device->getIP().toString();
 
-	CLWebItem* wi = new CLWebItem(this, m_camLayout.getDefaultWndSize().width(), m_camLayout.getDefaultWndSize().height());
+	CLWebItem* wi = new CLWebItem(this, m_camLayout.getGridEngine().calcDefaultMaxItemSize().width(), m_camLayout.getGridEngine().calcDefaultMaxItemSize().height());
 	m_camLayout.addItem(wi);
 	wi->navigate(url);
 	

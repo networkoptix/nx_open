@@ -186,14 +186,11 @@ bool CLAVIStreamReader::init()
 		default:
 			m_audiocodec_id = CL_UNKNOWN;
 			break;
-
 		}
 
 	}
 
-
 	// Alloc common resources
-
 	avidll.av_init_packet(&m_packet);
 	return true;
 }
