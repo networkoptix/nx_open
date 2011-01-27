@@ -35,8 +35,16 @@ AreconVisionDlgManufacture::AreconVisionDlgManufacture()
 	mPossibleNames.push_back("3115");
 	mPossibleNames.push_back("5115");
 
+	mPossibleNames.push_back("1325");
+	mPossibleNames.push_back("2125");
+	mPossibleNames.push_back("3125");
+	mPossibleNames.push_back("5125");
+	
+
+
 	mPossibleNames.push_back("2805");
 	mPossibleNames.push_back("2815");
+	mPossibleNames.push_back("2825");
 
 	mPossibleNames.push_back("8360");
 	mPossibleNames.push_back("8180");
@@ -55,10 +63,12 @@ AreconVisionDlgManufacture::AreconVisionDlgManufacture()
 		QString mini = str + "M";
 		QString dn = str + "DN";
 		QString ai = str + "AI";
+		QString ir = str + "IR";
 
 		mPossibleNames.push_back(mini);
 		mPossibleNames.push_back(dn);
 		mPossibleNames.push_back(ai);
+		mPossibleNames.push_back(ir);
 	}
 
 
