@@ -1977,6 +1977,22 @@ void GraphicsView::onCircle_helper(bool show)
 
 }
 
+void GraphicsView::instantArrange()
+{
+	QList<CLIdealItemPos> newPosLst = m_camLayout.getGridEngine().calcArrangedPos();
+	if (newPosLst.empty())
+		return;
+
+	foreach(CLIdealItemPos ipos, newPosLst)
+	{
+		ipos.item->setRotation(0);
+		ipos.item->setPos(ipos.pos);
+
+	}
+
+}
+
+
 void GraphicsView::onArrange_helper()
 {
 	if (!mViewStarted)
@@ -1984,15 +2000,15 @@ void GraphicsView::onArrange_helper()
 
 	stopGroupAnimation();
 
-	QList<CLAbstractSceneItem*> wndlst = m_camLayout.getItemList();
-	if (wndlst.empty())
+	QList<CLAbstractSceneItem*> itemlist = m_camLayout.getItemList();
+	if (itemlist.empty())
 		return;
 
 	m_groupAnimation = new QParallelAnimationGroup;
 	
 
 
-	foreach (CLAbstractSceneItem* item, wndlst)
+	foreach (CLAbstractSceneItem* item, itemlist)
 	{
 		item->stop_animation();
 		

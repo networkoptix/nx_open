@@ -65,6 +65,7 @@ public:
 
 	void stopAnimation();
 
+	void instantArrange();
 
 signals:
 	void scneZoomFinished();
