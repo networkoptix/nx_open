@@ -15,8 +15,8 @@ CLDeviceList FakeDevice::findDevices()
 		result[dev->getUniqueId()] = dev;
 	}
 
-	/*/
 	
+	/*/
 	CLDevice* dev = new FakeDevice4_180();
 	dev->setUniqueId(QString("fake180 ") + QString::number(1));
 	result[dev->getUniqueId()] = dev;

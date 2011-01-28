@@ -5,6 +5,8 @@
 #include <math.h>
 
 
+#define optimal_ratio (17.0/9)
+//#define optimal_ratio (4.0/3)
 
 CLGridEngine::CLGridEngine()
 {
@@ -133,7 +135,18 @@ QList<CLIdealItemPos> CLGridEngine::calcArrangedPos() const
 		int x, y;
 		getNextAvailablePos_helper(item_size, x,y, current_grid_width, current_grid_height, result);
 
+
 		CLIdealItemPos ipos;
+
+
+		int width = item->width();
+		int height = item->height();
+
+		x += (item_size.width() - width)/2;
+		y += (item_size.height() - height)/2;
+
+
+
 		ipos.pos = QPoint(x,y) ;
 		ipos.item = item;
 		result.push_back(ipos);
@@ -193,53 +206,78 @@ bool CLGridEngine::getNextAvailablePos(QSize size, int &x_pos, int &y_pos) const
 		return true;
 	}
 
+
+	// first of all lets check if we can add item without changing grid aspect ratio 
+	for (int y = 0; y <= max_row_to_try - item_slots_height; ++y)
+	{
+		for (int x = 0; x <= max_column_to_try - item_slots_width; ++x)
+		{
+			if (!isSlotAvailable(x,y,size))
+				continue;
+
+
+			QPoint pos = posFromSlot(x,y);
+			x_pos = pos.x();
+			y_pos = pos.y();
+			return true;
+
+		}
+	}
+
+
 	qreal best_ratio = 0xfffff;
 	int best_x_slot_pos = 0;
 	int best_y_slot_pos = 0;
 	
+	bool last_column_taken = false;
+	bool last_row_taken = false;
+
 
 	for (int y = 0; y <= max_row_to_try; ++y)
 	{
 		for (int x = 0; x <= max_column_to_try; ++x)
 		{
 
-			if ( x + item_slots_width <= max_row_to_try && y + item_slots_height <= max_row_to_try) 
-			{
-				//if addition will not change the aspect ratio of the grid;
 
-				if (isSlotAvailable(x,y,size))
-				{
-					QPoint pos = posFromSlot(x,y);
-					x_pos = pos.x();
-					y_pos = pos.y();
-					return true;
-				}
+			if (x <= max_column_to_try - item_slots_width && y <= max_row_to_try - item_slots_height)
+				continue; // already checked 
+
+
+			if (x==max_column_to_try && last_column_taken)
+				continue;
+
+			if (y==max_row_to_try && last_row_taken)
+				continue;
+
+
+			if (!isSlotAvailable(x,y,size))
+				continue;
+
+		
+
+			int new_grid_width = qMax(current_grid_width, x + item_slots_width);
+			int new_grid_height = qMax(current_grid_height, y + item_slots_height);
+
+			qreal new_aspect = (qreal)(new_grid_width)*m_settings.slot_width/(new_grid_height*m_settings.slot_height);
+			new_aspect = qAbs(new_aspect - optimal_ratio);
+
+			if (new_aspect < best_ratio - 1e-7)
+			{
+				best_ratio = new_aspect;
+				best_x_slot_pos = x;
+				best_y_slot_pos = y;
+
+				if (x==max_column_to_try) // to take fist posittion in the row 
+					last_column_taken = true;
+
+				if (y==max_row_to_try)
+					last_row_taken = true;
 
 
 			}
-			else // if new window will change grid aspect ratio
-			{
+				
 
-				if (y==max_row_to_try && x == max_column_to_try)
-					break; // we are not interested in such slot at all
-
-				if (isSlotAvailable(x,y,size))
-				{
-					int new_grid_width = qMax(current_grid_width, x + item_slots_width);
-					int new_grid_height = qMax(current_grid_height, y + item_slots_height);
-
-					qreal new_aspect = (qreal)(new_grid_width)/new_grid_height;
-					new_aspect = qAbs(new_aspect - 4.0/3);
-
-					if (new_aspect < best_ratio - 1e-7)
-					{
-						best_ratio = new_aspect;
-						best_x_slot_pos = x;
-						best_y_slot_pos = y;
-					}
-				}
-
-			}
+			
 		}
 	}
 	
@@ -651,6 +689,24 @@ bool CLGridEngine::getNextAvailablePos_helper(QSize size, int &x_pos, int &y_pos
 	max_row_to_try = qMin(current_grid_height, m_settings.max_rows - item_slots_height ); //+
 	max_column_to_try = current_grid_width;
 
+	// first of all lets check if we can add item without changing grid aspect ratio 
+	for (int y = 0; y <= max_row_to_try - item_slots_height; ++y)
+	{
+		for (int x = 0; x <= max_column_to_try - item_slots_width; ++x)
+		{
+			if (!isSlotAvailable_helper(x,y,size, arranged))
+				continue;
+
+
+			QPoint pos = posFromSlot(x,y);
+			x_pos = pos.x();
+			y_pos = pos.y();
+			return true;
+
+		}
+	}
+
+
 
 
 	qreal best_ratio = 0xfffff;
@@ -658,47 +714,53 @@ bool CLGridEngine::getNextAvailablePos_helper(QSize size, int &x_pos, int &y_pos
 	int best_y_slot_pos = 0;
 
 
+	bool last_column_taken = false;
+	bool last_row_taken = false;
+	
+
 	for (int y = 0; y <= max_row_to_try; ++y)
 	{
 		for (int x = 0; x <= max_column_to_try; ++x)
 		{
-			if ( x + item_slots_width <= max_row_to_try && y + item_slots_height <= max_row_to_try) 
-			{
-				//if addition will not change the aspect ratio of the grid;
 
-				if (isSlotAvailable_helper(x,y,size, arranged))
-				{
-					QPoint pos = posFromSlot(x,y);
-					x_pos = pos.x();
-					y_pos = pos.y();
-					return true;
-				}
+			if (x <= max_column_to_try - item_slots_width && y <= max_row_to_try - item_slots_height)
+				continue; // already checked 
+
+			if (x==max_column_to_try && last_column_taken)
+				continue;
+
+			if (y==max_row_to_try && last_row_taken)
+				continue;
+			
+
+			if (!isSlotAvailable_helper(x,y,size, arranged))
+				continue;
+
+
+	
+			int new_grid_width = qMax(current_grid_width, x + item_slots_width);
+			int new_grid_height = qMax(current_grid_height, y + item_slots_height);
+
+			qreal new_aspect = (qreal)(new_grid_width)*m_settings.slot_width/(new_grid_height*m_settings.slot_height);
+			new_aspect = qAbs(new_aspect - optimal_ratio);
+
+			if (new_aspect < best_ratio)
+			{
+				best_ratio = new_aspect;
+				best_x_slot_pos = x;
+				best_y_slot_pos = y;
+
+				if (x==max_column_to_try)
+					last_column_taken = true;
+
+				if (y==max_row_to_try)
+					last_row_taken = true;
 
 
 			}
-			else // if new window will change grid aspect ratio
-			{
-				if (y==max_row_to_try && x == max_column_to_try)
-					break; // we are not interested in such slot at all
+				
 
-
-				if (isSlotAvailable_helper(x,y,size, arranged))
-				{
-					int new_grid_width = x + item_slots_width;
-					int new_grid_height = y + item_slots_height;
-
-					qreal new_aspect = (qreal)(new_grid_width)/new_grid_height;
-					new_aspect = qAbs(new_aspect - 4.0/3);
-
-					if (new_aspect < best_ratio)
-					{
-						best_ratio = new_aspect;
-						best_x_slot_pos = x;
-						best_y_slot_pos = y;
-					}
-				}
-
-			}
+			
 		}
 	}
 
