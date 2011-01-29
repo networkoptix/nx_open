@@ -5,9 +5,6 @@
 #include <math.h>
 
 
-#define optimal_ratio (17.0/9)
-//#define optimal_ratio (4.0/3)
-
 CLGridEngine::CLGridEngine()
 {
 
@@ -259,7 +256,7 @@ bool CLGridEngine::getNextAvailablePos(QSize size, int &x_pos, int &y_pos) const
 			int new_grid_height = qMax(current_grid_height, y + item_slots_height);
 
 			qreal new_aspect = (qreal)(new_grid_width)*m_settings.slot_width/(new_grid_height*m_settings.slot_height);
-			new_aspect = qAbs(new_aspect - optimal_ratio);
+			new_aspect = qAbs(new_aspect - m_settings.optimal_ratio);
 
 			if (new_aspect < best_ratio - 1e-7)
 			{
@@ -742,7 +739,7 @@ bool CLGridEngine::getNextAvailablePos_helper(QSize size, int &x_pos, int &y_pos
 			int new_grid_height = qMax(current_grid_height, y + item_slots_height);
 
 			qreal new_aspect = (qreal)(new_grid_width)*m_settings.slot_width/(new_grid_height*m_settings.slot_height);
-			new_aspect = qAbs(new_aspect - optimal_ratio);
+			new_aspect = qAbs(new_aspect - m_settings.optimal_ratio);
 
 			if (new_aspect < best_ratio)
 			{

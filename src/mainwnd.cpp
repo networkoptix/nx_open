@@ -25,7 +25,7 @@ m_normalView(0)
 
 	//=======================================================
 
-	const int min_wisth = 400;
+	const int min_wisth = 800;
 	setMinimumWidth(min_wisth);
 	setMinimumHeight(min_wisth*3/4);
 

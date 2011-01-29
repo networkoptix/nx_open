@@ -26,11 +26,13 @@ const int  SLOT_HEIGHT = SLOT_WIDTH*3/4;
 int SCENE_LEFT = (400*1000);
 int SCENE_TOP  = (400*1000);
 
+qreal square_ratio = 17.0/9;
+qreal long_ratio = 3.0/1;
 
 static const int max_items = 40;
 
 int MAX_FPS_normal = 35;
-int MAX_FPS_selected = 60;
+int MAX_FPS_selected = 70;
 
 extern int scene_zoom_duration;
 
@@ -57,6 +59,7 @@ m_editable(false)
 	settings.max_rows = 5;
 	settings.slot_width = SLOT_WIDTH;
 	settings.slot_height= SLOT_HEIGHT;
+	settings.optimal_ratio = square_ratio;
 
 	m_grid.setSettings(settings);
 	

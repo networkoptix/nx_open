@@ -10,16 +10,16 @@ CLSceneLayoutManager::CLSceneLayoutManager():
 mRecordersAndLayouts(0)
 {
 	mAllCustomLayouts = new LayoutContent();
-	mAllCustomLayouts->addDecorationFlag(LayoutContent::HomeButton | LayoutContent::BackGroundLogo | LayoutContent::MagnifyingGlass);
+	mAllCustomLayouts->addDecorationFlag(LayoutContent::HomeButton | LayoutContent::BackGroundLogo | LayoutContent::MagnifyingGlass | LayoutContent::SquareLayout | LayoutContent::LongLayout);
 	mAllCustomLayouts->setEditable(true);
 	load();
 
 	mAllRecorders = new LayoutContent();
-	mAllRecorders->addDecorationFlag(LayoutContent::HomeButton | LayoutContent::BackGroundLogo | LayoutContent::MagnifyingGlass);
+	mAllRecorders->addDecorationFlag(LayoutContent::HomeButton | LayoutContent::BackGroundLogo | LayoutContent::MagnifyingGlass | LayoutContent::SquareLayout | LayoutContent::LongLayout);
 
 	mEmptyLayout = getNewEmptyLayoutContent();
 
-	mSearchLayout = getNewEmptyLayoutContent(LayoutContent::HomeButton | LayoutContent::BackGroundLogo);
+	mSearchLayout = getNewEmptyLayoutContent(LayoutContent::HomeButton | LayoutContent::BackGroundLogo | LayoutContent::SquareLayout | LayoutContent::LongLayout);
 	mSearchLayout->removeDecorationFlag(LayoutContent::MagnifyingGlass);
 	mSearchLayout->addDecorationFlag(LayoutContent::SearchEdit);
 
@@ -214,7 +214,7 @@ LayoutContent* CLSceneLayoutManager::generateAllRecordersAndLayouts()
 LayoutContent* CLSceneLayoutManager::getNewEmptyLayoutContent(unsigned int flags )
 {
 	LayoutContent* cont = new LayoutContent();
-	cont->addDecorationFlag(LayoutContent::HomeButton | LayoutContent::BackGroundLogo | LayoutContent::MagnifyingGlass | flags);
+	cont->addDecorationFlag(LayoutContent::HomeButton | LayoutContent::BackGroundLogo | LayoutContent::MagnifyingGlass | LayoutContent::SquareLayout | LayoutContent::LongLayout | flags);
 
 	CLDeviceCriteria cr(CLDeviceCriteria::NONE);
 	cont->setDeviceCriteria(cr);
@@ -238,7 +238,7 @@ LayoutContent* CLSceneLayoutManager::getSearchLayout()
 LayoutContent* CLSceneLayoutManager::createRecorderContent(QString id)
 {
 	LayoutContent* cont = new LayoutContent();
-	cont->addDecorationFlag(LayoutContent::HomeButton | LayoutContent::BackGroundLogo | LayoutContent::MagnifyingGlass | LayoutContent::LevelUp);
+	cont->addDecorationFlag(LayoutContent::HomeButton | LayoutContent::BackGroundLogo | LayoutContent::MagnifyingGlass | LayoutContent::SquareLayout | LayoutContent::LongLayout | LayoutContent::LevelUp);
 
 	CLDeviceCriteria cr(CLDeviceCriteria::ALL);
 	cr.setRecorderId(id);

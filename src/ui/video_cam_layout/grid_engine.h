@@ -31,6 +31,8 @@ struct CLGridSettings
 
 	int max_rows;
 
+	qreal optimal_ratio;
+
 	QList<CLAbstractSceneItem*>* items;
 };
 

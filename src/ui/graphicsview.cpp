@@ -41,9 +41,16 @@ qreal selected_item_zoom = 1.63;
 extern QString button_home;
 extern QString button_level_up;
 extern QString button_magnifyingglass;
+extern QString button_squarelayout;
+extern QString button_longlayout;
+
 
 extern int MAX_FPS_normal;
 extern int MAX_FPS_selected;
+
+extern qreal square_ratio;
+extern qreal long_ratio;
+
 
 
 extern QPixmap cached(const QString &img);
@@ -442,27 +449,34 @@ void GraphicsView::initDecoration()
 
 
 	bool magnifyingGlass = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::MagnifyingGlass);
-
 	bool serach = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::SearchEdit);
+	bool square_layout = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::SquareLayout);
+	bool long_layout = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::LongLayout);
 
 	removeAllStaticItems();
 
 	LayoutContent* cont = m_camLayout.getContent();
 	CLAbstractUnmovedItem* item;
 
+	int top_left = 0;
+
 	if (home)
 	{
 		item = new CLUnMovedPixtureButton(button_home, 0,  global_decoration_opacity, 1.0, "./skin/home.png", 100, 100, 255);
 		item->setStaticPos(QPoint(1,1));
 		addStaticItem(item);
+		top_left+= 105;
 	}
 
 	if (level_up)
 	{
 		item = new CLUnMovedPixtureButton(button_level_up, 0,  global_decoration_opacity, 1.0, "./skin/up.png", 100, 100, 255);
-		item->setStaticPos(QPoint((100+10)*home+1,1));
+		item->setStaticPos(QPoint(top_left,1));
 		addStaticItem(item);
+		top_left+=100;
 	}
+
+	
 
 
 	if (cont->checkDecorationFlag(LayoutContent::BackGroundLogo))
@@ -476,9 +490,27 @@ void GraphicsView::initDecoration()
 	if (magnifyingGlass)
 	{
 		item = new CLUnMovedPixtureButton(button_magnifyingglass, 0,  0.4, 1.0, "./skin/try/Search.png", 100, 100, 255);
-		item->setStaticPos(QPoint(viewport()->width() - 105,0));
+		item->setStaticPos(QPoint(viewport()->width()/2 - 50,0));
 		addStaticItem(item);
 	}
+
+	
+	if (square_layout)
+	{
+		item = new CLUnMovedPixtureButton(button_squarelayout, 0,  global_decoration_opacity, 1.0, "./skin/try/square_layout.png", 100, 100, 255);
+		item->setStaticPos(QPoint(viewport()->width() - 220,1));
+		addStaticItem(item);
+		top_left+=110;
+	}
+
+	if (long_layout)
+	{
+		item = new CLUnMovedPixtureButton(button_longlayout, 0,  global_decoration_opacity, 1.0, "./skin/try/long_layout.png", 100, 100, 255);
+		item->setStaticPos(QPoint(viewport()->width() - 110+1,1));
+		addStaticItem(item);
+	}
+	/**/
+
 
 	if (serach)
 	{
@@ -1736,21 +1768,32 @@ CLAbstractUnmovedItem* GraphicsView::staticItemByName(QString name) const
 
 void GraphicsView::updateDecorations()
 {
-	CLUnMovedPixture* pic = static_cast<CLUnMovedPixture*>(staticItemByName("background"));
+	CLUnMovedPixture* item = static_cast<CLUnMovedPixture*>(staticItemByName("background"));
 
-	if (pic)
+	if (item)
 	{
-		pic->setMaxSize(viewport()->width(), viewport()->height());
-		QSize size = pic->getSize();
-
-		pic->setStaticPos( QPoint( (viewport()->width() - size.width())/2, (viewport()->height() - size.height())/2) );
+		item->setMaxSize(viewport()->width(), viewport()->height());
+		QSize size = item->getSize();
+		item->setStaticPos( QPoint( (viewport()->width() - size.width())/2, (viewport()->height() - size.height())/2) );
 	}
 
-	CLUnMovedPixture* mg = static_cast<CLUnMovedPixture*>(staticItemByName(button_magnifyingglass));
-	if (mg)
-	{
-		mg->setStaticPos(QPoint(viewport()->width() - 105,0));
-	}
+	item = static_cast<CLUnMovedPixture*>(staticItemByName(button_magnifyingglass));
+	if (item)
+		item->setStaticPos(QPoint(viewport()->width()/2 - 50,0));
+
+
+
+	item = static_cast<CLUnMovedPixture*>(staticItemByName(button_squarelayout));
+	if (item)
+		item->setStaticPos(QPoint(viewport()->width() - 220,0));
+
+
+	item = static_cast<CLUnMovedPixture*>(staticItemByName(button_longlayout));
+	if (item)
+		item->setStaticPos(QPoint(viewport()->width() - 110,0));
+
+
+
 
 	
 	if (m_seachItem)
@@ -1810,7 +1853,21 @@ CLAbstractSceneItem* GraphicsView::getLastSelectedItem()
 
 void GraphicsView::onDecorationItemPressed(QString name)
 {
-	emit onDecorationPressed(m_camLayout.getContent(), name);
+
+	if (name == button_squarelayout)
+	{
+		m_camLayout.getGridEngine().getSettings().optimal_ratio = square_ratio;
+		m_camLayout.getGridEngine().getSettings().max_rows = 5;
+		onArrange_helper();
+	}
+	else if (name == button_longlayout)
+	{
+		m_camLayout.getGridEngine().getSettings().optimal_ratio = long_ratio;
+		m_camLayout.getGridEngine().getSettings().max_rows = 2;
+		onArrange_helper();
+	}
+	else
+		emit onDecorationPressed(m_camLayout.getContent(), name);
 }
 
 void GraphicsView::onScneZoomFinished()
