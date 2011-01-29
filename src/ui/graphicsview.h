@@ -142,6 +142,8 @@ private slots:
 	void onShowTimer();
 	void onShowStart();
 	void onDecorationItemPressed(QString);
+
+	void onArrange_helper_finished();
 protected:
 	
 	QGraphicsScene m_scene;

@@ -2100,17 +2100,29 @@ void GraphicsView::onArrange_helper()
 
 		m_groupAnimation->addAnimation(anim2);
 
-		item->setArranged(true);
+		item->setArranged(false);
 
 	}
 
 	connect(m_groupAnimation, SIGNAL(finished ()), this, SLOT(fitInView()));
+	connect(m_groupAnimation, SIGNAL(finished ()), this, SLOT(onArrange_helper_finished()));
 
 
 
 	m_groupAnimation->start();
 	
 	
+}
+
+void GraphicsView::onArrange_helper_finished()
+{
+	QList<CLIdealItemPos> newPosLst = m_camLayout.getGridEngine().calcArrangedPos();
+	foreach(CLIdealItemPos ipos, newPosLst)
+	{
+		CLAbstractSceneItem* item = ipos.item;
+		item->setArranged(true);
+	}
+
 }
 
 void GraphicsView::fitInView(int duration, int delay, CLAnimationTimeLine::CLAnimationCurve curve)
