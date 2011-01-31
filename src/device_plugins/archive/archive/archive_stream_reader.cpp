@@ -81,11 +81,11 @@ void CLArchiveStreamReader::init_data()
 
 		if (first)
 		{
-			min_date_time = QDateTime::fromMSecsSinceEpoch(mMovie[channel].at(0).abs_time);
+			min_date_time = QDateTime::fromMSecsSinceEpoch(mMovie[channel].at(0).abs_time/1000);
 			first = false;
 		}
 
-		QDateTime time = QDateTime::fromMSecsSinceEpoch(mMovie[channel].at(0).abs_time);
+		QDateTime time = QDateTime::fromMSecsSinceEpoch(mMovie[channel].at(0).abs_time/1000);
 
 		if (time<min_date_time)
 			min_date_time = time;
@@ -99,25 +99,24 @@ void CLArchiveStreamReader::init_data()
 		{
 			ArchiveFrameInfo& info = mMovie[channel][i];
 
-			QDateTime time = QDateTime::fromMSecsSinceEpoch(info.abs_time);
+			QDateTime time = QDateTime::fromMSecsSinceEpoch(info.abs_time/1000);
 
-			unsigned long time_ms = min_date_time.msecsTo(time);
-			info.time_ms = time_ms;
+			quint64 time_mks = min_date_time.msecsTo(time)*1000;
+			info.time = time_mks;
 
-			if (time_ms>m_len_msec)
-				m_len_msec = time_ms;
+			if (time_mks>m_len_mksec)
+				m_len_mksec = time_mks;
 		}
 	}
-
 
 }
 
 
-unsigned long CLArchiveStreamReader::currTime() const
+quint64 CLArchiveStreamReader::currTime() const
 {
 	QMutexLocker mutex(&m_cs);
 	int slowe_channel = slowest_channel();
-	return mMovie[slowe_channel].at(mCurrIndex[slowe_channel]).time_ms;
+	return mMovie[slowe_channel].at(mCurrIndex[slowe_channel]).time;
 }
 
 
@@ -144,7 +143,7 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
 
 	if (channel<0)
 	{
-		// shoud not get here;
+		// should not get here;
 		// if we here => some data file corrupted
 		msleep(20); // to avoid CPU load
 		return 0;
@@ -166,7 +165,7 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
 	videoData->keyFrame = finfo.keyFrame;
 	videoData->channel_num = channel;
 	videoData->use_twice = m_use_twice;
-	videoData->timestamp = finfo.time_ms;
+	videoData->timestamp = finfo.time;
 
 	m_use_twice = false;
 
@@ -188,7 +187,7 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
 			if (mForward)
 				jumpTo(0, false);
 			else
-				jumpTo(len_msec(), false);
+				jumpTo(len_mks(), false);
 		}
 	}
 	else
@@ -199,11 +198,11 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
 			m_data_file[channel].seek(shift);
 		}
 
-		unsigned long this_time = mMovie[channel].at(mCurrIndex[channel]).time_ms;
+		qint64 this_time = mMovie[channel].at(mCurrIndex[channel]).time;
 		mCurrIndex[channel] = new_index;
 
 		int next_channel = slowest_channel();
-		unsigned long next_time = mMovie[channel].at(mCurrIndex[next_channel]).time_ms;
+		qint64 next_time = mMovie[channel].at(mCurrIndex[next_channel]).time;
 
 		m_need_tosleep = labs(next_time - this_time);
 
@@ -255,10 +254,10 @@ int CLArchiveStreamReader::nextFrameIndex(bool after_jump, int channel, int curr
 }
 
 
-void CLArchiveStreamReader::channeljumpTo(unsigned long msec, int channel)
+void CLArchiveStreamReader::channeljumpTo(quint64 mksec, int channel)
 {
 	
-	int new_index = findBestIndex(channel, msec);
+	int new_index = findBestIndex(channel, mksec);
 	if (new_index<0)
 		return;
 
@@ -277,7 +276,7 @@ void CLArchiveStreamReader::channeljumpTo(unsigned long msec, int channel)
 	m_data_file[channel].seek(shift);
 }
 
-int CLArchiveStreamReader::findBestIndex(int channel, unsigned long msec) const
+int CLArchiveStreamReader::findBestIndex(int channel, quint64 mksec) const
 {
 
 	if (mMovie[channel].count()==0)
@@ -287,21 +286,21 @@ int CLArchiveStreamReader::findBestIndex(int channel, unsigned long msec) const
 	int index1 = 0;
 	int index2 = mMovie[channel].count()-1;
 
-	unsigned long index1_time = mMovie[channel].at(index1).time_ms;
-	unsigned long index2_time = mMovie[channel].at(index2).time_ms;
-	if (msec >= index2_time)
+	quint64 index1_time = mMovie[channel].at(index1).time;
+	quint64 index2_time = mMovie[channel].at(index2).time;
+	if (mksec >= index2_time)
 		return index2;
 
-	if (msec <= index1_time)
+	if (mksec <= index1_time)
 		return index1;
 
 
 	while(index2 - index1 > 1)
 	{
 		int new_index = (index1+index2)/2;
-		unsigned long new_index_time = mMovie[channel].at(new_index).time_ms;
+		quint64 new_index_time = mMovie[channel].at(new_index).time;
 
-		if (new_index_time>=msec)
+		if (new_index_time>=mksec)
 			index2 = new_index;
 		else
 			index1 = new_index;
@@ -315,7 +314,7 @@ int CLArchiveStreamReader::slowest_channel() const
 {
 	//=====find slowest channel ========
 	int slowest_channel = -1;
-	unsigned long best_slowest_time = mForward ? 0xffffffff : 0;
+	quint64 best_slowest_time = mForward ? 0xffffffff : 0;
 	for (int channel = 0; channel < m_channel_number; ++channel)
 	{
 
@@ -325,7 +324,7 @@ int CLArchiveStreamReader::slowest_channel() const
 		if (mMovie[channel].count()==0)
 			continue;
 
-		unsigned long curr_channel_time = mMovie[channel].at(mCurrIndex[channel]).time_ms;
+		quint64 curr_channel_time = mMovie[channel].at(mCurrIndex[channel]).time;
 
 		if ((mForward && curr_channel_time <= best_slowest_time) || (!mForward && curr_channel_time >= best_slowest_time))
 		{

@@ -246,7 +246,7 @@ void CLArchiveNavigatorItem::onResize()
 void CLArchiveNavigatorItem::onSliderMoved(int val)
 {
 	qreal factor = (qreal)(val)/(mSlider->maximum() - mSlider->minimum());
-	unsigned long time = mReader->len_msec()*factor;
+	quint64 time = mReader->len_mks()*factor;
 
 
 	mReader->jumpTo(time, true);
@@ -255,7 +255,7 @@ void CLArchiveNavigatorItem::onSliderMoved(int val)
 void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
 {
 	CLSubItemType type = subitem->getType();
-	unsigned long curr_time;
+	quint64 curr_time;
 
 	switch(type)
 	{
@@ -291,7 +291,7 @@ void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
 		break;
 
 	case RewindForwardSubItem:
-		mReader->jumpTo(mReader->len_msec(), true);
+		mReader->jumpTo(mReader->len_mks(), true);
 		break;
 
 	case StepForwardSubItem:
@@ -302,7 +302,7 @@ void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
 	case StepBackwardSubItem:
 		curr_time = mReader->currTime();
 		//mReader->setdirection(false);
-		mReader->jumpTo(curr_time-100, true);
+		mReader->jumpTo(curr_time-100*1000, true);
 		//mReader->setdirection(true);
 		break;
 
@@ -330,12 +330,12 @@ void CLArchiveNavigatorItem::updateSliderPos()
 	if (mSliderIsmoving)
 		return;
 
-	unsigned long time = mReader->currTime();
-	unsigned long total = mReader->len_msec();
+	quint64 time = mReader->currTime();
+	quint64 total = mReader->len_mks();
 
 	qreal scale = mSlider->maximum() - mSlider->minimum();
 
-	unsigned long pos = time*(scale/total);
+	quint64 pos = (double)time*scale/total;
 
 	
 	mSlider->setValue(pos);

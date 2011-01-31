@@ -17,24 +17,24 @@ public:
 	void setdirection(bool forward);
 	bool isForwardDirection() const;
 
-	virtual unsigned long currTime() const = 0;
+	virtual quint64 currTime() const = 0;
 
-	// returns len of archive in msec
-	unsigned long len_msec() const;
-	virtual void jumpTo(unsigned long msec, bool makeshot);
+	// returns len of archive in mksec
+	quint64 len_mks() const;
+	virtual void jumpTo(quint64 mksec, bool makeshot);
 	
 
 protected:
 
-	virtual void channeljumpTo(unsigned long msec, int channel) = 0;
+	virtual void channeljumpTo(quint64 mksec, int channel) = 0;
 
 protected:
 
-	unsigned long m_len_msec;
+	quint64 m_len_mksec;
 	bool mForward;
 	bool mSingleShot;
 	CLAdaptiveSleep mAdaptiveSleep;
-	int m_need_tosleep;
+	qint64 m_need_tosleep;
 
 	mutable QMutex m_cs;
 

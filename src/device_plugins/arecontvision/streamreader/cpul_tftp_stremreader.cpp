@@ -414,7 +414,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 
 	videoData->channel_num = 0;
 
-	videoData->timestamp = QDateTime::currentMSecsSinceEpoch();
+	videoData->timestamp = QDateTime::currentMSecsSinceEpoch()*1000;
 	
 	return videoData;
 

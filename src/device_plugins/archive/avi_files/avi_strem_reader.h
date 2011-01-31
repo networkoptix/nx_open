@@ -15,12 +15,12 @@ public:
 	CLAVIStreamReader(CLDevice* dev );
 	virtual ~CLAVIStreamReader();
 
-	virtual unsigned long currTime() const;
+	virtual quint64 currTime() const;
 
 protected:
 
 	virtual CLAbstractMediaData* getNextData();
-	virtual void channeljumpTo(unsigned long msec, int channel);
+	virtual void channeljumpTo(quint64 mksec, int channel);
 
 
 	bool getNextPacket();
@@ -28,11 +28,11 @@ protected:
 	bool init();
 	void destroy();
 
-	void smart_sleep(int msec);
+	void smart_sleep(quint64 mksec);
 
 protected:
 
-	unsigned long m_cuur_time;
+	quint64 m_cuur_time;
 	int m_prev_time;
 
 	AVFormatContext* m_formatContext;

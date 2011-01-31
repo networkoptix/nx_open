@@ -11,7 +11,7 @@
 CLCamDisplay::CLCamDisplay():
 CLAbstractDataProcessor(CL_MAX_DISPLAY_QUEUE_SIZE),
 m_prev_time(0),
-m_delay(100), // do put a big value here to avoid cpu usage in case of zoom out 
+m_delay(100*1000), // do put a big value here to avoid cpu usage in case of zoom out 
 m_palyaudio(false)
 {
 	for (int i = 0; i< CL_MAX_CHANNELS; ++i)
@@ -59,7 +59,7 @@ void CLCamDisplay::processData(CLAbstractData* data)
 		// in ideal world data comes to queue at the same speed as it goes out 
 		// but timer on the sender side runs at a bit different rate in comparison to the timer here
 		// adaptive delay will not solve all problems => need to minus little appendix based on queue size
-		qint32 need_to_sleep = curr_time - m_prev_time - (m_dataQueue.size())*2;
+		qint32 need_to_sleep = curr_time - m_prev_time - (m_dataQueue.size())*2*1000;
 
 		m_prev_time = curr_time;
 
@@ -67,7 +67,7 @@ void CLCamDisplay::processData(CLAbstractData* data)
 		if (need_to_sleep<0)
 			need_to_sleep = 0;
 
-		if (need_to_sleep>500) // in case of key frame only and sliding archive slider forward - would not look good; need to do smth
+		if (need_to_sleep>500*1000) // in case of key frame only and sliding archive slider forward - would not look good; need to do smth
 			need_to_sleep = 0;
 		//=========
 

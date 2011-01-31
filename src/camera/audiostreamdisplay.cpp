@@ -142,6 +142,7 @@ void CLAudioStreamDisplay::putdata(CLCompressedAudioData* data)
 			//audio.format.setFrequency(audio.format.frequency()*m_freq_factor);
 			//recreatedevice(audio.format); // recreation does not work very well
 			m_ringbuff->claer();
+
 		}
 
 		if (m_can_adapt>30 && ms_from_size(audio.format, m_audioOutput->bytesFree()) > 0.8*m_buff_ms) // if audiobuffer is almost empty

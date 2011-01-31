@@ -16,20 +16,31 @@ public:
 
 	  };
 
-	void sleep(unsigned long msecs)
+	void sleep(qint64 mksec)
 	{
+
 		if (m_firstTime)
 		{
 			m_firstTime = false;
 			m_prevEndTime.start();
+			m_mod = 0;
 		}
 
-		
-		int past = m_prevEndTime.elapsed();
+		m_mod += mksec%1000;
+		if (m_mod >= 1000)
+		{
+			mksec+=1000;
+			m_mod-=1000;
+		}
 
 
-		qint32 havetowait = msecs - past;
-		m_prevEndTime = m_prevEndTime.addMSecs(msecs);
+		qint64 past = (qint64)m_prevEndTime.elapsed()*1000;
+		//cl_log.log("past = ", (int)past,  cl_logALWAYS);
+		//past*=1000;
+
+
+		qint64 havetowait = mksec - past;
+		m_prevEndTime = m_prevEndTime.addMSecs(mksec/1000);
 
 		if (havetowait<=0)
 		{
@@ -39,7 +50,7 @@ public:
 			return;
 		}
 
-		CLSleep::msleep(havetowait);
+		CLSleep::msleep(havetowait/1000);
 
 	}
 
@@ -51,9 +62,9 @@ public:
 private:
 	QTime  m_prevEndTime;
 	bool m_firstTime;
-	int m_max_overdraft;
+	qint64 m_max_overdraft;
 
-
+	qint64 m_mod;
 
 };
 

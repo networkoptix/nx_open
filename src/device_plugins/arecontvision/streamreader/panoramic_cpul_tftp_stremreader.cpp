@@ -276,7 +276,7 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 	videoData->width = size.width;
 	videoData->height = size.height;
 
-	videoData->timestamp = QDateTime::currentMSecsSinceEpoch();
+	videoData->timestamp = QDateTime::currentMSecsSinceEpoch()*1000;
 	
 	return videoData;
 

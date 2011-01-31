@@ -17,7 +17,7 @@ FakeStreamReader::FakeStreamReader (CLDevice* dev, int channels):
 CLClientPullStreamreader(dev),
 m_channels(channels),
 m_curr_channel(0),
-m_sleep(20),
+m_sleep(20*1000),
 m_time(0)
 {
 
@@ -80,7 +80,7 @@ CLAbstractMediaData* FakeStreamReader::getNextData()
 	//qreal fps = 6.5;
 	CLSleep::msleep(1000/fps);
 
-	m_time += 1000/fps;
+	m_time += 1000000/fps;
 	//CLSleep::msleep(1000/1);
 
 	if (data_len==0 || descr_data_len == 0)

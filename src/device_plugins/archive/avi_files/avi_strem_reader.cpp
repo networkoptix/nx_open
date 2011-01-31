@@ -26,7 +26,7 @@ CLAVIStreamReader::~CLAVIStreamReader()
 }
 
 
-unsigned long CLAVIStreamReader::currTime() const
+quint64 CLAVIStreamReader::currTime() const
 {
 	QMutexLocker mutex(&m_cs);
 	return m_cuur_time;
@@ -67,11 +67,11 @@ bool CLAVIStreamReader::init()
 		if (err < 0)
 		{
 			destroy();
-			return false; 
+			return false;
 		}
 	}
 
-	m_len_msec = m_formatContext->duration/1000;
+	m_len_mksec = m_formatContext->duration;
 
 	for(unsigned i = 0; i < m_formatContext->nb_streams; i++) 
 	{
@@ -207,9 +207,11 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 	if (!m_formatContext || m_videoStrmIndex==-1)
 		return 0;
 
+
+	
+
 	if (m_bsleep && !isSingleShotMode())			
 		smart_sleep(m_need_tosleep);
-	
 
 
 	{
@@ -224,7 +226,7 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 			if (duration==0)
 				duration = 1;
 
-			m_cuur_time =  qreal(m_len_msec)*m_packet.dts/duration;
+			m_cuur_time =  qreal(m_len_mksec)*m_packet.dts/duration;
 			//m_need_tosleep = m_len_msec/duration;
 
 			if (m_need_tosleep==0 && m_prev_time!=-1)
@@ -326,11 +328,11 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 
 }
 
-void CLAVIStreamReader::channeljumpTo(unsigned long msec, int channel)
+void CLAVIStreamReader::channeljumpTo(quint64 mksec, int channel)
 {
 	QMutexLocker mutex(&m_cs);
 
-	int err = avidll.avformat_seek_file(m_formatContext, -1, 0, msec*1000, _I64_MAX, AVSEEK_FLAG_BACKWARD);
+	int err = avidll.avformat_seek_file(m_formatContext, -1, 0, mksec, _I64_MAX, AVSEEK_FLAG_BACKWARD);
 	
 
 	if (err < 0) 
@@ -390,22 +392,22 @@ bool CLAVIStreamReader::getNextPacket()
 
 }
 
-void CLAVIStreamReader::smart_sleep(int msec)
+void CLAVIStreamReader::smart_sleep(quint64 mksec)
 {
 	m_wakeup = false;
-	int sleep_times = msec/32;
+	int sleep_times = mksec/32000;
 
 	for (int i = 0; i < sleep_times; ++i)
 	{
 		if (m_wakeup || needToStop())
 			return;
 
-		mAdaptiveSleep.sleep(32);
+		mAdaptiveSleep.sleep(32000);
 	}
 
 	if (m_wakeup || needToStop())
 		return;
 
-	mAdaptiveSleep.sleep(msec%32);
+	mAdaptiveSleep.sleep(mksec%32000);
 
 }

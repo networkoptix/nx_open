@@ -17,7 +17,7 @@ protected:
 
 		// shift inside file ( may be in bytes or some over units depends on implementation of CLClientPullStreamreader
 		unsigned int shift;
-		unsigned long time_ms; // time in ms from beginning 
+		quint64 time; // time in mks from beginning 
 	};
 
 
@@ -25,13 +25,13 @@ public:
 	CLArchiveStreamReader(CLDevice* dev);
 	~CLArchiveStreamReader();
 
-	unsigned long currTime() const;
+	quint64 currTime() const;
 	virtual void resume();
 protected:
 
 	
 
-	virtual void channeljumpTo(unsigned long msec, int channel);
+	virtual void channeljumpTo(quint64 mksec, int channel);
 	virtual CLAbstractMediaData* getNextData();
 
 	
@@ -45,7 +45,7 @@ protected:
 
 	bool reachedTheEnd() const;
 	int nextFrameIndex(bool after_jump, int channel, int curr_index, bool keyframe, bool forwarddirection) const;
-	int findBestIndex(int channel, unsigned long msec) const;
+	int findBestIndex(int channel, quint64 mksec) const;
 	int slowest_channel() const;
 
 protected:
