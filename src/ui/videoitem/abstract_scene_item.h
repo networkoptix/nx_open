@@ -89,6 +89,16 @@ public:
 	void setArranged(bool arr);
 	bool isArranged() const;
 
+	//==========grid editing ==================
+	//flag is used to draw selection with different color. true if item is selected and can be drop on top of the other in case of mouse release 
+	void setCanDrop(bool val);
+	QPointF getOriginalPos() const;
+	void setOroginalPos(QPointF pos);
+	bool getOriginallyArranged() const;
+	void setOriginallyArranged(bool val);
+
+
+
 	//====rotation=======
 	void drawRotationHelper(bool val);
 
@@ -144,11 +154,13 @@ protected:
 	QPointF m_rotation_hand;
 
 	bool m_needUpdate;
-
 	bool mEditable;
-
 	CLAbstractComplicatedItem* m_complicatedItem;
 
+	bool m_can_be_droped; // flag is used to draw selection. true if item is selected and can be drop on top of the other in case of mouse release 
+
+	QPointF m_originalPos;
+	bool m_originallyArranged;
 };
 
 

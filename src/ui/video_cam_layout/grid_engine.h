@@ -80,6 +80,10 @@ public:
 	CLAbstractSceneItem* getNextTopItem(const CLAbstractSceneItem* curr) const;
 	CLAbstractSceneItem* getNextBottomItem(const CLAbstractSceneItem* curr) const;
 
+	// returns item on scene if it has same sizes as incoming item.
+	// and intersection of the items more than some threshold ( like 60%)
+	CLAbstractSceneItem* getItemToSwapWith(CLAbstractSceneItem* item) const;
+
 
 private:
 	CLAbstractSceneItem* next_item_helper(const CLAbstractSceneItem* curr, int dir_c, int dir_f) const;

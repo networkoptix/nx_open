@@ -239,7 +239,7 @@ void CLVideoWindowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
 	if (option->state & QStyle::State_Selected)
 	{
 		painter->fillRect(QRect(0, 0, width(), height()),
-			global_selection_color);
+			m_can_be_droped ? global_can_be_droped_color :  global_selection_color);
 	}
 
 

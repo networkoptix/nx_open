@@ -40,11 +40,12 @@ m_zoomOnhover(true),
 m_needUpdate(false),
 mEditable(false),
 m_rotation_center(0,0),
-m_complicatedItem(0)
+m_complicatedItem(0),
+m_can_be_droped(false)
 {
 	setAcceptsHoverEvents(true);
 
-	setZValue(1.0);
+	setZValue(global_base_scene_z_level);
 
 	//setFlag(QGraphicsItem::ItemIsFocusable);
 
@@ -156,12 +157,12 @@ void CLAbstractSceneItem::setItemSelected(bool sel, bool animate , int delay )
 	{
 
 		m_animationTransform.zoom_abs(selected_item_zoom, item_select_duration - 25, delay);
-		setZValue(2);
+		setZValue(global_base_scene_z_level+1);
 	}
 	else
 	{
 		m_animationTransform.zoom_abs(1.0, item_hoverevent_duration, delay);
-		setZValue(0);
+		setZValue(global_base_scene_z_level);
 	}
 
 }
@@ -238,6 +239,33 @@ bool CLAbstractSceneItem::isArranged() const
 {
 	return m_arranged;
 }
+
+void CLAbstractSceneItem::setCanDrop(bool val)
+{
+	m_can_be_droped = val;
+}
+
+QPointF CLAbstractSceneItem::getOriginalPos() const
+{
+	return m_originalPos;
+
+}
+
+void CLAbstractSceneItem::setOroginalPos(QPointF pos)
+{
+	m_originalPos = pos;
+}
+
+bool CLAbstractSceneItem::getOriginallyArranged() const
+{
+	return m_originallyArranged;
+}
+
+void CLAbstractSceneItem::setOriginallyArranged(bool val)
+{
+	m_originallyArranged = val;
+}
+
 
 
 void CLAbstractSceneItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)

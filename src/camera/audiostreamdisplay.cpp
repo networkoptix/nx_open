@@ -183,7 +183,7 @@ void CLAudioStreamDisplay::putdata(CLCompressedAudioData* data)
 
 
 		
-		
+		/*/
 		qint64 bytesInBuffer = m_audioOutput->bufferSize() - m_audioOutput->bytesFree();
 		qint64 usInBuffer = ms_from_size(audio.format, bytesInBuffer);
 		cl_log.log("ms in audio buff = ", (int)usInBuffer, cl_logALWAYS);

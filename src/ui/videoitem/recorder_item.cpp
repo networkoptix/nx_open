@@ -110,7 +110,7 @@ void CLRecorderItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
 	if (option->state & QStyle::State_Selected)
 	{
-		painter->fillPath(mRoundRectPath, global_selection_color );
+		painter->fillPath(mRoundRectPath, m_can_be_droped ? global_can_be_droped_color :  global_selection_color );
 	}
 
 

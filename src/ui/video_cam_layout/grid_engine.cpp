@@ -343,7 +343,43 @@ CLAbstractSceneItem*  CLGridEngine::getCenterWnd() const
 	}
 
 	return result;
+}
 
+CLAbstractSceneItem* CLGridEngine::getItemToSwapWith(CLAbstractSceneItem* item) const
+{
+
+	QRectF item_rect = item->sceneBoundingRect();
+
+	QSize item_max_size = getItemMaxSize(item);
+
+	foreach (CLAbstractSceneItem* swapitem, *(m_settings.items))
+	{
+		if (item == swapitem)
+			continue;
+
+		QSize swapitem_max_size = getItemMaxSize(swapitem);
+		if (swapitem_max_size!=item_max_size)
+			continue;
+
+		
+		QRectF swapitem_rect = swapitem->sceneBoundingRect();
+
+		if (!swapitem_rect.intersects(item_rect))
+			continue;
+
+
+		QRectF intersection = swapitem_rect.intersected(item_rect);
+
+		qreal intersection_square = intersection.width()*intersection.height();
+		qreal item_rect_square = item_rect.width()*item_rect.height();
+		qreal swapitem_rect_square = swapitem_rect.width()*swapitem_rect.height();
+
+		if (intersection_square  > 0.6* qMin(item_rect_square,swapitem_rect_square))
+			return swapitem;
+
+	}
+
+	return 0;
 }
 
 

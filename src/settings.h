@@ -11,10 +11,13 @@ extern int devices_update_interval;
 extern QColor global_shadow_color;
 extern QColor app_bkr_color;
 extern QColor global_selection_color;
+extern QColor global_can_be_droped_color;
 
 extern qreal global_menu_opacity;
 extern qreal global_dlg_opacity;
 extern qreal global_decoration_opacity;
 extern qreal global_decoration_max_opacity;
+
+extern qreal global_base_scene_z_level;
 
 #endif //global_settings_h1933

@@ -2,7 +2,6 @@
 #include <QWheelEvent>
 #include <QScrollBar>
 #include "./base/log.h"
-#include <math.h>
 #include <QGraphicsitem>
 #include "./video_cam_layout/videocamlayout.h"
 #include "../base/rand.h"
@@ -750,12 +749,28 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 			foreach(QGraphicsItem* itm, m_scene.selectedItems())
 			{
 				CLAbstractSceneItem* item = static_cast<CLAbstractSceneItem*>(itm);
-				//QPointF wnd_pos = item->scenePos(); <---- this does not work coz item zoom ;case1
+				//QPointF wnd_pos = item->scenePos(); //<---- this does not work coz item zoom ;case1
 				QPointF wnd_pos = item->sceneBoundingRect().center();
-
 				wnd_pos-=QPointF(item->boundingRect().width()/2, item->boundingRect().height()/2);
+
+				if (m_movingWnd==2) // if this is a first movement
+				{
+					item->setOriginallyArranged(item->isArranged());
+					item->setOroginalPos(wnd_pos);
+				}
+
+
 				item->setPos(wnd_pos+delta);
 				item->setArranged(false);
+
+				item->setZValue(global_base_scene_z_level + 1); // moving items should be on top
+
+				if (m_camLayout.getGridEngine().getItemToSwapWith(item))
+					item->setCanDrop(true);
+				else
+					item->setCanDrop(false);
+
+
 			}
 		}
 		else
@@ -1054,9 +1069,66 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 	}
 
-	if (left_button && m_movingWnd>3) // if we did move selected wnds => unselect it
+	if (left_button && m_movingWnd) 
 	{
-		m_scene.clearSelection();
+		if (m_movingWnd>3)// if we did move selected wnds => unselect it
+		{
+			bool first_animation = true;
+
+			foreach(QGraphicsItem* itm, m_scene.selectedItems())
+			{
+				CLAbstractSceneItem* item = static_cast<CLAbstractSceneItem*>(itm);
+				item->setZValue(global_base_scene_z_level+0.01); // should not be on top any more
+				item->setCanDrop(false);
+
+				CLAbstractSceneItem* item_to_swap_with = m_camLayout.getGridEngine().getItemToSwapWith(item);
+				if (!item_to_swap_with)
+					continue;
+
+				if (first_animation)
+				{
+					stopAnimation();
+					m_groupAnimation = new QParallelAnimationGroup;
+					first_animation = false;
+				}
+
+				QPointF item_to_swap_with_newPos = item->getOriginalPos();
+				QPointF item_newPos = item_to_swap_with->scenePos();
+
+				QPropertyAnimation *anim = new QPropertyAnimation(item, "pos");
+				anim->setStartValue(item->pos());
+				anim->setEndValue(item_newPos);
+				anim->setDuration(1000 + cl_get_random_val(0, 300));
+				anim->setEasingCurve(QEasingCurve::InOutBack);
+				m_groupAnimation->addAnimation(anim);
+				item->setArranged(false);
+
+				anim = new QPropertyAnimation(item_to_swap_with, "pos");
+				anim->setStartValue(item_to_swap_with->pos());
+				anim->setEndValue(item_to_swap_with_newPos);
+				anim->setDuration(1000 + cl_get_random_val(0, 300));
+				anim->setEasingCurve(QEasingCurve::InOutBack);
+				m_groupAnimation->addAnimation(anim);
+				item->setArranged(false);
+
+
+			}
+
+			m_scene.clearSelection();
+
+			if (!first_animation)
+				m_groupAnimation->start();
+
+
+			
+		}
+
+		if (m_movingWnd)
+		{
+			m_movingWnd = 0;
+			m_camLayout.updateSceneRect();
+		}
+
 	}
 
 	if (mid_button && aitem)
@@ -1067,11 +1139,6 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 	if (left_button)
 	{
 		m_handMoving = 0;
-		if (m_movingWnd)
-		{
-			m_movingWnd = false;
-			m_camLayout.updateSceneRect();
-		}
 	}
 
 	if (right_button)
