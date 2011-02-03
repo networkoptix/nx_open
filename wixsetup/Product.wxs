@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
+     xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
 	<Product Id="5b60f457-e05f-4cd0-b976-42acea61b981" Name="Universal Client" Language="1033" Version="1.0.0.0" Manufacturer="Network Optix" UpgradeCode="286227c5-25b4-4796-aa48-2d9822e10b0d">
 		<Package InstallerVersion="200" Compressed="yes" Keywords="Installer" Comments="Network Optix Universal Client Installer" Manufacturer="Network Optix"/>
 
@@ -13,6 +14,7 @@
           <Directory Id="INSTALLDIR" Name="Universal Client">
             <Component Id="MainExecutable" Guid="B9B60D1E-3B2C-47dd-9922-A1FC5F3818D4">
               <File Id="UniclientEXE" Name="uniclient.exe" Source="../bin/uniclient.exe" KeyPath="yes">
+                <fire:FirewallException Id="FirewallException" Name="Universal Client" Scope="any"/>
                 <Shortcut Id="startmenuUniclient" Directory="ProgramMenuDir" Name="Network Optix"
                                   WorkingDirectory='INSTALLDIR' Advertise="yes" />
                 <Shortcut Id="desktopUniclient" Directory="DesktopFolder" Name="Universal Client"
@@ -71,7 +73,7 @@
              ConfigurableDirectory="INSTALLDIR" >
 			 <ComponentRef Id="MainExecutable" />
        <ComponentRef Id="FFmpegLibraries"/>
-       <!--<ComponentRef Id="QTLibraries" />-->
+       <ComponentRef Id="QTLibraries" />
        <ComponentRef Id='ProgramMenuDir' />
        <ComponentRef Id='Settings'/>
        <ComponentGroupRef Id='group_skin'/>
