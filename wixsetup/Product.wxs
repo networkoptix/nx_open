@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="5b60f457-e05f-4cd0-b976-42acea61b981" Name="Universal Client" Language="1033" Version="1.0.0.0" Manufacturer="Network Optix" UpgradeCode="286227c5-25b4-4796-aa48-2d9822e10b0d">
+		<Package InstallerVersion="200" Compressed="yes" Keywords="Installer" Comments="Network Optix Universal Client Installer" Manufacturer="Network Optix"/>
+
+		<Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
+
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="NetworkOptix" Name="Network Optix">
+          <Directory Id="INSTALLDIR" Name="Universal Client">
+            <Component Id="MainExecutable" Guid="B9B60D1E-3B2C-47dd-9922-A1FC5F3818D4">
+              <File Id="UniclientEXE" Name="uniclient.exe" Source="../bin/uniclient.exe" KeyPath="yes">
+                <Shortcut Id="startmenuUniclient" Directory="ProgramMenuDir" Name="Network Optix"
+                                  WorkingDirectory='INSTALLDIR' Advertise="yes" />
+                <Shortcut Id="desktopUniclient" Directory="DesktopFolder" Name="Universal Client"
+                  WorkingDirectory='INSTALLDIR' Advertise="yes" />              
+              </File>
+            </Component>
+            <Component Id="FFmpegLibraries" Guid="AD81912C-85E7-4f23-9106-6CF2CA5A5993">
+              <File Id="avcodecDll" Name="avcodec-52.dll" Source="../bin/avcodec-52.dll"/>
+              <File Id="avcoreDll" Name="avcore-0.dll" Source="../bin/avcore-0.dll"/>
+              <File Id="avdeviceDll" Name="avdevice-52.dll" Source="../bin/avdevice-52.dll"/>
+              <File Id="avfilterDll" Name="avfilter-1.dll" Source="../bin/avfilter-1.dll"/>
+              <File Id="avformatDll" Name="avformat-52.dll" Source="../bin/avformat-52.dll"/>
+              <File Id="avutilDll" Name="avutil-50.dll" Source="../bin/avutil-50.dll"/>
+              <File Id="swscaleDll" Name="swscale-0.dll" Source="../bin/swscale-0.dll"/>
+            </Component>
+
+          </Directory>
+					<!-- TODO: Remove the comments around this Component element and the ComponentRef below in order to add resources to this installer. -->
+					<!-- <Component Id="ProductComponent" Guid="12bb7788-be4d-4d8d-be8a-1991515340a2"> -->
+						<!-- TODO: Insert files, registry keys, and other resources here. -->
+					<!-- </Component> -->
+				</Directory>
+			</Directory>
+
+      <Directory Id="ProgramMenuFolder" Name="Programs">
+        <Directory Id="ProgramMenuDir" Name="Universal Client">
+          <Component Id="ProgramMenuDir" Guid="2F76AF65-B091-45b1-88E8-B1954ED66626">
+            <RemoveFolder Id='ProgramMenuDir' On='uninstall' />
+            <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\[ProductName]' Type='string' Value='' KeyPath='yes' />
+          </Component>
+        </Directory>
+      </Directory>
+
+      <Directory Id="DesktopFolder" Name="Desktop" />
+    </Directory>
+
+    
+		<Feature Id="ProductFeature" Title="SetupProject1" Level="1"
+             ConfigurableDirectory="INSTALLDIR" >
+			<!-- TODO: Remove the comments around this ComponentRef element and the Component above in order to add resources to this installer. -->
+			 <ComponentRef Id="MainExecutable" />
+       <ComponentRef Id="FFmpegLibraries"/>
+       <ComponentRef Id='ProgramMenuDir' />
+       <ComponentGroupRef Id='group_skin'/>
+
+      <!-- Note: The following ComponentGroupRef is required to pull in generated authoring from project references. -->
+			<!--<ComponentGroupRef Id="Product.Generated" />-->
+		</Feature>
+
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+    
+    <UIRef Id="WixUI_InstallDir" />
+    <UIRef Id="WixUI_ErrorProgressText" />
+    
+	</Product>
+</Wix>
