@@ -7,6 +7,9 @@ DESTDIR = ../bin
 
 QMAKE_CXXFLAGS += -MP
 
+PRECOMPILED_HEADER = StdAfx.h
+PRECOMPILED_SOURCE = StdAfx.cpp
+
 INCLUDEPATH += ../contrib/ffmpeg26404/include
 DEFINES += __STDC_CONSTANT_MACROS
 
@@ -150,7 +153,7 @@ HEADERS += videodisplay/complicated_item.h
 SOURCES += main.cpp
 SOURCES += mainwnd.cpp
 SOURCES += settings.cpp
-SOURCES += StdAfx.h.cpp
+SOURCES += StdAfx.cpp
 SOURCES += video_camera.cpp
 SOURCES += base/bytearray.cpp
 SOURCES += base/log.cpp

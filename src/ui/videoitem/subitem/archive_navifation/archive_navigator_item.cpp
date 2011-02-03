@@ -2,14 +2,10 @@
 #include "..\..\abstract_scene_item.h"
 #include "..\abstract_image_sub_item.h"
 
-#include <QPainter>
-#include <QGraphicsProxyWidget>
 #include "slider_item.h"
 #include "base\log.h"
 #include "..\..\video_wnd_archive_item.h"
 #include "device_plugins\archive\abstract_archive_stream_reader.h"
-#include <QGraphicsScene>
-#include <QGraphicsView>
 #include "ui\graphicsview.h"
 
 

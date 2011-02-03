@@ -1,7 +1,6 @@
 #ifndef recorder_item_h1421_h
 #define recorder_item_h1421_h
 
-#include <QMutex>
 #include "custom_draw_button.h"
 
 class CLRecorderDisplay;

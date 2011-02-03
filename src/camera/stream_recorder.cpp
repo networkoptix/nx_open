@@ -1,12 +1,9 @@
 #include "stream_recorder.h"
 
-#include <QTextStream>
 #include "device\device.h"
 #include "base\bytearray.h"
-#include <QDir>
 #include "data\mediadata.h"
 #include "streamreader\streamreader.h"
-#include <QDomDocument>
 
 #define FLUSH_SIZE (512*1024)
 

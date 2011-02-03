@@ -1,5 +1,4 @@
 #include "mainwnd.h"
-#include <QVBoxLayout>
 #include "ui/video_cam_layout/start_screen_content.h"
 #include "settings.h"
 #include "ui/layout_navigator.h"

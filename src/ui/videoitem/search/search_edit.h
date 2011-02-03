@@ -1,11 +1,6 @@
 #ifndef serach_edit_2215_h
 #define serach_edit_2215_h 
 
-#include <QLineEdit>
-#include <QStringList>
-#include <QStringListModel>
-#include <QString>
-#include <QCompleter> 
 
 
 class CLSerchEditCompleter : public QCompleter

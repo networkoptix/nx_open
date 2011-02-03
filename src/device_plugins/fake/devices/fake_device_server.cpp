@@ -1,7 +1,6 @@
 #include "fake_device_server.h"
 #include "../../../base/log.h"
 #include "fake_device.h"
-#include <QStringList>
 
 FakeDeviceServer ::FakeDeviceServer ()
 {

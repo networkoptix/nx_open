@@ -1,5 +1,4 @@
 #include "statistics.h"
-#include <QMutexLocker>
 
 CLStatistics::CLStatistics()
 {

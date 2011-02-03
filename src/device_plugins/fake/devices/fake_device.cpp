@@ -1,5 +1,4 @@
 #include "fake_device.h"
-#include <QString>
 #include "../streamreader/fake_file_streamreader.h"
 #include "../device/device_video_layout.h"
 

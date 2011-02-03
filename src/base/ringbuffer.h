@@ -1,8 +1,6 @@
 #ifndef CL_ringbuffer_1842
 #define CL_ringbuffer_1842
 
-#include <QIODevice>
-#include <QMutex>
 
 class CLRingBuffer : public QIODevice
 {

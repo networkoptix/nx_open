@@ -1,8 +1,6 @@
 #ifndef animated_show_h1223
 #define animated_show_h1223
 
-#include <QTimer>
-#include <QPointF>
 
 struct Show_helper
 {

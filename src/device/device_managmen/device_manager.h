@@ -4,11 +4,8 @@
 
 // this class holds all devices in the system ( a least knows how to get the list )
 // it also can give list of devices based on some criteria
-#include <QObject>
-#include <QTimer>
 #include "..\asynch_seacher.h"
 #include "..\device.h"
-#include <QStringList>
 #include "device_criteria.h"
 
 class CLDevice;

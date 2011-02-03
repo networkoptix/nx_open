@@ -1,7 +1,6 @@
 #ifndef direct_jump_slider_h1607
 #define direct_jump_slider_h1607
 
-#include <QSlider>
 
 class CLDirectJumpSlider : public QSlider
 {

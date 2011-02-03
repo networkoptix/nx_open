@@ -1,7 +1,6 @@
 #ifndef PH_graphicsview_h328
 #define PH_graphicsview_h328
 
-#include <QGraphicsView>
 #include "./animation/scene_movement.h"
 #include "./animation/scene_zoom.h"
 #include "./animation/mouse_state.h"

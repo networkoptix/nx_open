@@ -2,9 +2,6 @@
 #define img_item_h_2211
 
 #include "abstract_scene_item.h"
-#include <QMutex>
-#include <QTime>
-#include <QFont>
 
 // this is abstract class 
 // I assume that it inherits by video and static_image item 

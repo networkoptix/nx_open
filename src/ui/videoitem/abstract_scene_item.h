@@ -1,8 +1,6 @@
 #ifndef _abstarct_scene_item_h_1641
 #define _abstarct_scene_item_h_1641
 
-#include <QObject>
-#include <QGraphicsItem>
 #include "../animation/item_trans.h"
 #include "subitem/abstract_sub_item.h"
 #include "subitem/abstract_sub_item_container.h"

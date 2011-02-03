@@ -2,7 +2,6 @@
 #define network_device_h_1249
 
 //#include "param.h"
-#include <QAuthenticator>
 #include "../network/netstate.h"
 #include "device.h"
 

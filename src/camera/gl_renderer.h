@@ -2,9 +2,6 @@
 #define clgl_renderer_12_29
 
 #include "abstractrenderer.h"
-#include <QtOpenGL/QGLWidget>
-#include <QMutex>
-#include <QWaitCondition>
 
 class CLVideoWindowItem;
 

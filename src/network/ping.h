@@ -2,7 +2,6 @@
 #define ping_1750
 
 #define CL_MAX_PING_PACKET       1024      // Max ICMP packet size
-#include <QString>
 
 
 class CLPing

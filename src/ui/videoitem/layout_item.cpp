@@ -1,7 +1,4 @@
-#include <QPainter>
 #include "settings.h"
-#include <QMutexLocker>
-#include <QStyleOptionGraphicsItem>
 #include "layout_item.h"
 #include "ui\ui_common.h"
 

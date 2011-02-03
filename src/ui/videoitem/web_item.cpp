@@ -1,5 +1,4 @@
 #include "web_item.h"
-#include <QGraphicsProxyWidget>
 
 CLWebItem::CLWebItem(GraphicsView* view, int max_width, int max_height, QString name):
 CLAbstractSceneItem(view, max_width, max_height, name)

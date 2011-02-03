@@ -1,5 +1,4 @@
 #include "cpul_httpstremreader.h"
-#include <QTextStream>
 #include "../../../base/log.h"
 #include "../../../network/simple_http_client.h"
 #include "../../../data/mediadata.h"

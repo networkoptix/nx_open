@@ -2,7 +2,6 @@
 #define unmoved_pixture_button_h_1867
 
 
-#include <QTimer>
 #include "abstract_animated_unmoved_item.h"
 class QPropertyAnimation;
 

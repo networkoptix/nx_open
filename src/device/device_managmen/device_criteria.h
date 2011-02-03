@@ -1,7 +1,6 @@
 #ifndef CLDeviceCriteria_h_2120
 #define CLDeviceCriteria_h_2120
 
-#include <QString>
 
 struct CLDeviceCriteria // later
 {

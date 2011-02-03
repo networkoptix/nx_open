@@ -1,7 +1,5 @@
 #include "nettools.h"
-#include <QString>
 #include "../base/log.h"
-#include <QTextStream>
 #include "ping.h"
 #include "netstate.h"
 
@@ -198,7 +196,6 @@ bool getNextAvailableAddr(CLSubNetState& state, const CLIPList& busy_lst)
 
 
 //{ windows
-#include <Winsock2.h>
 #include <iphlpapi.h>
 #pragma comment(lib, "Iphlpapi.lib")
 #pragma comment(lib,"Ws2_32.lib")

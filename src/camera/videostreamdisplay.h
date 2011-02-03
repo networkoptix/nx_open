@@ -1,7 +1,6 @@
 #ifndef videostreamdisplay_h_2044
 #define videostreamdisplay_h_2044
 
-#include <QMutex>
 #include "../decoders/video/frame_info.h"
 
 // display one video stream

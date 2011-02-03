@@ -1,8 +1,6 @@
 #ifndef serach_edit_item_h_2017
 #define serach_edit_item_h_2017
 
-#include <QWidget>
-#include <QTimer>
 class LayoutContent;
 
 class CLSearchEdit;

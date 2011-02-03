@@ -1,9 +1,7 @@
 #ifndef abstract_device_settings_dlg_h_1652
 #define abstract_device_settings_dlg_h_1652
 
-#include <QDialog>
 #include "../../device/param.h"
-#include <QList>
 
 class CLDevice;
 class QTabWidget;

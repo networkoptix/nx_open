@@ -1,7 +1,6 @@
 #include "archive_device.h"
 #include "archive_stream_reader.h"
 
-#include <QDomDocument>
 
 CLArchiveDevice::CLArchiveDevice(const QString& arch_path)
 {

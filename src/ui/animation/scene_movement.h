@@ -2,7 +2,6 @@
 #define scene_movement_h1123
 
 #include "animation.h"
-#include <QPoint>
 
 class GraphicsView;
 

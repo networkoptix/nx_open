@@ -2,7 +2,6 @@
 #define scene_zoom_h1907
 
 #include "animation.h"
-#include <QPoint>
 #include "streamreader\streamreader.h"
 
 class GraphicsView;

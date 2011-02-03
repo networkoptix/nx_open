@@ -8,16 +8,6 @@
 #include "av_singesensor.h"
 #include "av_panoramic.h"
 
-#include <QFile>
-#include <QDomDocument>
-#include <QTextStream>
-#include <QStringList>
-#include <QUdpSocket>
-#include <QTime>
-#include <QHttp>
-#include <QBuffer>
-
-#include <Winsock2.h>
 
 #define CL_BROAD_CAST_RETRY 3
 

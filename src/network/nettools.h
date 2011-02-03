@@ -1,9 +1,6 @@
 #ifndef cl_net_tools_1232
 #define cl_net_tools_1232
 
-#include <QNetworkInterface>
-#include <QNetworkAddressEntry>
-#include <QSet>
 
 
 struct CLSubNetState;

@@ -5,9 +5,6 @@
 #define CL_STATISTICS_UPDATE_PERIOD_MS 700
 #define CL_STATS_NUM  (CL_STATISTICS_WINDOW_MS/CL_STATISTICS_UPDATE_PERIOD_MS + 1)
 
-#include <QDateTime>
-#include <QTime>
-#include <QMutex>
 
 enum CLStatisticsEvent
 {

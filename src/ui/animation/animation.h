@@ -2,7 +2,6 @@
 #define abstactanimation_h2344
 
 #include "animation_timeline.h"
-#include <QTimer>
 
 
 

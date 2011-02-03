@@ -4,8 +4,6 @@
 #include "base.h"
 
 
-#include <QMap>
-#include <QString>
 #include <math.h>
 
 

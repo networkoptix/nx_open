@@ -1,6 +1,5 @@
 #include "static_image_item.h"
 
-#include <QtGui>
 
 extern QPixmap cached(const QString &img);
 

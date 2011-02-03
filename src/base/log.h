@@ -2,9 +2,6 @@
 #define log_h_109
 #include "base.h"
 
-#include <QFile>
-#include <QTextStream>
-#include <QMutex>
 
 
 enum CLLogLevel {cl_logALWAYS, cl_logERROR, cl_logWARNING, cl_logINFO, cl_logDEBUG1, cl_logDEBUG2 };

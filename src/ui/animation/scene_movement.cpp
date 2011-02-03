@@ -1,5 +1,4 @@
 #include "scene_movement.h"
-#include <QScrollBar>
 #include "../../base/log.h"
 #include "../graphicsview.h"
 #include "ui/videoitem/video_wnd_item.h"

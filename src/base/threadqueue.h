@@ -1,10 +1,6 @@
 #ifndef cl_ThreadQueue_h_2236
 #define cl_ThreadQueue_h_2236 
 
-#include <QMutex>
-#include <QMutexLocker>
-#include <QSemaphore>
-#include <QQueue>
 
 
 template< typename T>

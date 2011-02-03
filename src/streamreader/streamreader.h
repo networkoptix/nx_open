@@ -4,12 +4,7 @@
 #include "../base/longrunnable.h"
 #include "../data/dataprocessor.h"
 #include "../device/param.h"
-#include <QMutex>
-#include <QMutexLocker>
 #include "../statistics/statistics.h"
-#include <QHostAddress>
-#include <QAuthenticator>
-#include <QList>
 
 class CLStreamreader;
 class CLDevice;

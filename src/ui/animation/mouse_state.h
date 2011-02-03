@@ -1,10 +1,6 @@
 #ifndef mouse_state_h1958
 #define mouse_state_h1958
 
-#include <QQueue>
-#include <QTime>
-#include <QPoint>
-#include <QPair>
 
 
 class QMouseEvent;

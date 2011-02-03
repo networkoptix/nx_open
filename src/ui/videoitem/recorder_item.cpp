@@ -1,8 +1,5 @@
 #include "recorder_item.h"
-#include <QPainter>
 #include "settings.h"
-#include <QMutexLocker>
-#include <QStyleOptionGraphicsItem>
 #include "ui\ui_common.h"
 #include "recorder\recorder_display.h"
 

@@ -1,5 +1,4 @@
 #include "cpul_tftp_stremreader.h"
-#include <QTextStream>
 #include "../../../base/log.h"
 #include "../tools/simple_tftp_client.h"
 #include "../tools/AVJpegHeader.h"

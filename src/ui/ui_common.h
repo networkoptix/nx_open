@@ -1,8 +1,6 @@
 #ifndef ui_common_h_1340
 #define ui_common_h_1340
 
-#include <QString>
-#include <QMessageBox>
 
 class QWidget;
 

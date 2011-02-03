@@ -1,5 +1,4 @@
 #include "abstract_unmoved_item.h"
-#include <QGraphicsView>
 
 
 CLAbstractUnmovedItem::CLAbstractUnmovedItem(QString name, QGraphicsItem* parent):

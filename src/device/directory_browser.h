@@ -2,7 +2,6 @@
 #define directory_browser_h_1708
 
 #include "deviceserver.h"
-#include <QString>
 
 class CLDirectoryBrowserDeviceServer : public CLDeviceServer
 {

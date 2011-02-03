@@ -2,8 +2,6 @@
 #include "start_screen_content.h"
 #include "layout_content.h"
 
-#include <QDomDocument>
-#include <QFile>
 #include "base\log.h"
 
 CLSceneLayoutManager::CLSceneLayoutManager():

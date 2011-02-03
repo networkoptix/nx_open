@@ -2,8 +2,6 @@
 #define cl_divice_param_h_1020
 
 #include "../base/associativearray.h"
-#include <QList>
-#include <QString>
 
 
 struct CLParamType

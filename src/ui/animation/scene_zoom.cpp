@@ -1,5 +1,4 @@
 #include "scene_zoom.h"
-#include <QScrollBar>
 #include <math.h>
 #include "../../base/log.h"
 #include "../graphicsview.h"

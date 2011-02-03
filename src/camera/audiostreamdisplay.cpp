@@ -2,7 +2,6 @@
 #include "decoders\audio\audio_struct.h"
 #include "base\log.h"
 #include "decoders\audio\abstractaudiodecoder.h"
-#include <QAudioOutput>
 
 #define MAX_AUDIO_FRAME_SIZE 192000
 

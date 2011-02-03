@@ -2,9 +2,6 @@
 #define clgl_video_window
 
 
-#include <QtOpenGL/QGLWidget>
-#include <QMutex>
-#include <QWaitCondition>
 #include "../statistics/statistics.h"
 #include "../device/device_video_layout.h"
 #include "img_item.h"

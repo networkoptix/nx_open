@@ -1,15 +1,5 @@
 #include "style.h"
 
-#include <QLayout>
-#include <QPainter>
-#include <QPainterPath>
-#include <QPixmapCache>
-#include <QRadioButton>
-#include <QString>
-#include <QStyleOption>
-#include <QtDebug>
-#include <QPushButton>
-#include <QGroupBox>
 
 
 QPixmap cached(const QString &img)

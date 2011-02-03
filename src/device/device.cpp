@@ -1,9 +1,6 @@
 #include "device.h"
 
 #include "../base/log.h"
-#include <QtConcurrentmap>
-#include <QList>
-#include <QTime>
 #include "../network/nettools.h"
 #include "../network/ping.h"
 #include "../base/sleep.h"

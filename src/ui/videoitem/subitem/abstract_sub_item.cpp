@@ -1,6 +1,5 @@
 #include "abstract_sub_item.h"
 #include "..\abstract_scene_item.h"
-#include <QGraphicsSceneMouseEvent>
 
 
 

@@ -1,13 +1,8 @@
 #include "device_settings_dlg.h"
 #include "device_settings_tab.h"
-#include <QTabWidget>
-#include <QDialogButtonBox>
-#include <QVBoxLayout>
 #include "../../device/device.h"
 #include "style.h"
 #include "widgets.h"
-#include <QGroupBox>
-#include <QPushButton>
 #include "settings.h"
 
 CLAbstractDeviceSettingsDlg::CLAbstractDeviceSettingsDlg(CLDevice* dev):

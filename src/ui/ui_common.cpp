@@ -1,7 +1,5 @@
 #include "ui_common.h"
 
-#include <QInputDialog>
-#include <QMessageBox>
 #include "settings.h"
 #include "device_settings\style.h"
 

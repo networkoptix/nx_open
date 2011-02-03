@@ -1,6 +1,4 @@
 #include "unmoved_pixture_button.h"
-#include <QtGui>
-#include <QPropertyAnimation>
 
 #define OPACITY_TIME 500
 

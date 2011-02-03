@@ -1,5 +1,4 @@
 #include "abstract_image_sub_item.h"
-#include <QPainter>
 
 extern QPixmap cached(const QString &img);
 

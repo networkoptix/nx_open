@@ -2,7 +2,6 @@
 #define settings_style_h_1447
 
 
-#include <QWindowsStyle>
 
 
 class ArthurStyle : public QWindowsStyle

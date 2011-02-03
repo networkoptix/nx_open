@@ -2,7 +2,6 @@
 #include "av_device.h"
 #include "../tools/AVJpegHeader.h"
 #include "../../../base/log.h"
-#include <QStringList>
 
 AVDeviceServer::AVDeviceServer()
 {

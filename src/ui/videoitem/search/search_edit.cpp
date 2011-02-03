@@ -1,6 +1,5 @@
 #include "search_edit.h"
 
-#include <QKeyEvent>
 
 
 CLSerchEditCompleter::CLSerchEditCompleter(QObject * parent) :

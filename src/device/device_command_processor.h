@@ -2,7 +2,6 @@
 #define CLDeveceCommandProcessor_h_1207
 
 #include "../data/dataprocessor.h"
-#include <QMap>
 
 class CLDevice;
 

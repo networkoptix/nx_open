@@ -2,7 +2,6 @@
 #define web_item_h_1425
 
 #include "abstract_scene_item.h"
-#include <QWebView>
 
 
 class CLWebItem : public CLAbstractSceneItem

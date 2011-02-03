@@ -2,7 +2,6 @@
 #define archive_stream_reader_h1145
 
 #include "..\abstract_archive_stream_reader.h"
-#include <QFile>
 
 class CLArchiveStreamReader  : public CLAbstractArchiveReader 
 {

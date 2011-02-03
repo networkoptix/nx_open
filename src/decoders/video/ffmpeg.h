@@ -3,7 +3,6 @@
 
 #include "abstractdecoder.h"
 
-#include <QMutex>
 
 struct AVCodec;
 struct AVCodecContext;

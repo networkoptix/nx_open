@@ -1,7 +1,6 @@
 #include "avi_device.h"
 #include "avi_strem_reader.h"
 
-#include <QFileInfo>
 
 CLAviDevice::CLAviDevice(const QString& file)
 {

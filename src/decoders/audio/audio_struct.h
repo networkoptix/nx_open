@@ -2,7 +2,6 @@
 #define audio_struct_h1530
 
 #include "data\mediadata.h"
-#include <QAudioFormat>
 
 
 // input to the decoder 

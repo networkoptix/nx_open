@@ -1,7 +1,6 @@
 #ifndef cl_sleep_100
 #define cl_sleep_100
 
-#include <QThread>
 
 class CLSleep : public QThread
 {

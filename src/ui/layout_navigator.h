@@ -1,7 +1,6 @@
 #ifndef layout_navigator_h_1340
 #define layout_navigator_h_1340
 
-#include <QObject>
 #include "graphicsview.h"
 #include "mainwnd.h"
 class LayoutContent;

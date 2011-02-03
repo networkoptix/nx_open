@@ -1,8 +1,5 @@
 #include "custom_draw_button.h"
 
-#include <QtGui>
-#include <QFont>
-#include <QFontmetrics>
 #include "settings.h"
 
 QFont buttonFont()

@@ -1,6 +1,4 @@
 #include "animation_timeline.h"
-#include <QtCore/qmath.h>
-#include <QEasingCurve>
 
 qreal CLAnimationTimeLine::m_animation_speed = 1.0;
 

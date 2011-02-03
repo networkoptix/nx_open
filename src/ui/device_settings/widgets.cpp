@@ -1,11 +1,5 @@
 #include "widgets.h"
 #include "device\device.h"
-#include <QHBoxLayout>
-#include <QCheckBox>
-#include <QGroupBox>
-#include <QSlider>
-#include <QRadioButton>
-#include <QPushButton>
 #include "base/log.h"
 #include "settings.h"
 

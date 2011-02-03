@@ -3,9 +3,7 @@
 #include "../../device/device_video_layout.h"
 #include "../../device/device.h"
 
-#include <QPointF>
 #include "./../graphicsview.h"
-#include <QGraphicsScene>
 #include "ui/videoitem/video_wnd_item.h"
 #include "settings.h"
 #include "device/device_managmen/device_manager.h"

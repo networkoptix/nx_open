@@ -1,8 +1,4 @@
 #include "img_item.h"
-#include <QFont>
-#include <QPainter>
-#include <QPaintEngine>
-#include <QTextStream>
 
 extern bool global_show_item_text;
 

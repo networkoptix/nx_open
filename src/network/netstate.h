@@ -1,10 +1,6 @@
 #ifndef cl_net_state_439
 #define cl_net_state_439
 
-#include <QMap>
-#include <QMutex>
-#include <QList>
-#include <QNetworkAddressEntry>
 
 
 struct CLSubNetState

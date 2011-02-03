@@ -1,7 +1,6 @@
 #include "dataprocessor.h"
 #include "../base/sleep.h"
 #include "../base/log.h"
-#include <QTime>
 
 
 CLAbstractDataProcessor::CLAbstractDataProcessor(int max_que_size):

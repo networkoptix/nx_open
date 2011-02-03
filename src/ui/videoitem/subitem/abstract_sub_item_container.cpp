@@ -2,7 +2,6 @@
 #include "abstract_image_sub_item.h"
 #include "settings.h"
 #include "recording_sign_item.h"
-#include <QGraphicsScene>
 
 
 CLAbstractSubItemContainer::CLAbstractSubItemContainer(QGraphicsItem* parent):

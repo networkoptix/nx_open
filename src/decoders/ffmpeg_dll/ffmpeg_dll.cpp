@@ -1,6 +1,5 @@
 #include "ffmpeg_dll.h"
 #include "base\log.h"
-#include <QDir>
 
 
 // functions: avcodec_find_decoder, avcodec_find_decoder, avcodec_alloc_context, avcodec_open, avcodec_close are not thread safe

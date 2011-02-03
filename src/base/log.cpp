@@ -1,8 +1,5 @@
 #include "log.h"
 
-#include <QMutexLocker>
-#include <QDateTime>
-#include <QThread>
 
 CLLog cl_log;
 

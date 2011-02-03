@@ -1,5 +1,4 @@
 #include "fake_file_streamreader.h"
-#include <QTextStream>
 #include "../../../base/log.h"
 #include "../../../data/mediadata.h"
 #include "device/device.h"

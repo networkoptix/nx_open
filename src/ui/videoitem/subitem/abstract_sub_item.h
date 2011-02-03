@@ -1,7 +1,6 @@
 #ifndef abstract_sub_item_h1031
 #define abstract_sub_item_h1031
 
-#include <QGraphicsItem>
 #include "..\unmoved\abstract_animated_unmoved_item.h"
 
 class CLAbstractSceneItem;

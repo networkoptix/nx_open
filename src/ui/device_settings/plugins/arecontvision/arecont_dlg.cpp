@@ -1,8 +1,6 @@
 #include "arecont_dlg.h"
 #include "device\device.h"
-#include <QGroupBox>
 #include "..\..\widgets.h"
-#include <QMessageBox>
 #include "settings.h"
 
 

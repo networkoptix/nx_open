@@ -1,7 +1,6 @@
 #include "ffmpeg_audio.h"
 
 #include "libavcodec/avcodec.h"
-#include <QMutexLocker>
 #include "base/log.h"
 #include "../ffmpeg_dll/ffmpeg_dll.h"
 

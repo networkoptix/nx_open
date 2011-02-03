@@ -1,10 +1,7 @@
 #ifndef cl_asynch_device_sarcher_h_423
 #define cl_asynch_device_sarcher_h_423
 
-#include <QThread>
 #include "device.h"
-#include <QList>
-#include <QMutex>
 #include "../network/netstate.h"
 #include "network/nettools.h"
 

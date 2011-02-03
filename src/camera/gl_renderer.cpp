@@ -1,12 +1,7 @@
 #include "gl_renderer.h"
 #include "../base/log.h"
 #include "../base/sleep.h"
-#include <QMessageBox>
 #include <cmath> //for sin and cos
-#include <QtGui/QResizeEvent>
-#include <QtGui/QPainter>
-#include <QtGui/QApplication>
-#include <QTime>
 #include "ui/videoitem/video_wnd_item.h"
 
 

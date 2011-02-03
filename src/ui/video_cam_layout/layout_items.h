@@ -1,12 +1,7 @@
 #ifndef layout_items_h_2210
 #define layout_items_h_2210
 
-#include <QPointF>
-#include <QSize>
-#include <QString>
-#include <QList>
 #include "device\device_managmen\device_manager.h"
-#include <QDomDocument>
 
 class CLCustomBtnItem;
 class CLStaticImageItem;

@@ -1,7 +1,6 @@
 #include "ffmpeg.h"
 
 
-#include <QMutexLocker>
 #include "..\ffmpeg_dll\ffmpeg_dll.h"
 
 

@@ -1,10 +1,6 @@
 #ifndef grid_engine_h1754
 #define grid_engine_h1754
 
-#include <QPoint>
-#include <QList>
-#include <QSize>
-#include <QRect>
 
 
 class CLAbstractSceneItem;

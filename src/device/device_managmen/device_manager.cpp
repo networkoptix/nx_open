@@ -1,11 +1,8 @@
 #include "device_manager.h"
 #include "..\asynch_seacher.h"
-#include <QMutex>
 #include "..\directory_browser.h"
 #include "settings.h"
 #include "recorder\fake_recorder_device.h"
-#include <QDir>
-#include <QFileInfoList>
 #include "device_plugins\archive\archive\archive_device.h"
 
 // Init static variables

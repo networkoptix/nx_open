@@ -1,5 +1,4 @@
 #include "netstate.h"
-#include <QMutexLocker>
 #include "nettools.h"
 #include "base\log.h"
 

@@ -3,8 +3,6 @@
 
 #include "data.h"
 #include "../base/bytearray.h"
-#include <QString>
-#include <QTime>
 
 
 enum CLCodecType 

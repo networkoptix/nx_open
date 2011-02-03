@@ -3,7 +3,6 @@
 #include "base\log.h"
 #include "camera\camera.h"
 #include "device_plugins\archive\abstract_archive_stream_reader.h"
-#include <QGraphicsScene>
 
 
 

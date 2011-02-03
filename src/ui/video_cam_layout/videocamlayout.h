@@ -1,10 +1,6 @@
 #ifndef video_wnd_layout_h1750
 #define video_wnd_layout_h1750
 
-#include <QList>
-#include <QRect>
-#include <QObject>
-#include <QTimer>
 #include "device\device.h"
 #include "grid_engine.h"
 

@@ -1,6 +1,5 @@
 #include "file_device.h"
 #include "../streamreader/single_shot_file_reader.h"
-#include <QFileInfo>
 
 CLFileDevice::CLFileDevice(QString filename)
 {

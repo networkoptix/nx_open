@@ -2,10 +2,6 @@
 #define __SIMPLE_HTTP_CLIENT__
 
 #include "socket.h"
-#include <QTcpSocket>
-#include <QHostAddress>
-#include <QString>
-#include <QAuthenticator>
 #include "../base/associativearray.h"
 
 

@@ -1,8 +1,6 @@
 #ifndef context_menu_helper_h_1250
 #define context_menu_helper_h_1250
 
-#include <QMenu>
-#include <QAction>
 
 void initContextMenu();
 

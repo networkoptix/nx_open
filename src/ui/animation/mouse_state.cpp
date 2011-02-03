@@ -1,5 +1,4 @@
 #include "mouse_state.h"
-#include <QMouseEvent>
 #include <math.h>
 
 

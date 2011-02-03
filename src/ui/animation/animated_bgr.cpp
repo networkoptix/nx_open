@@ -1,9 +1,6 @@
 #include "animated_bgr.h"
 
 #define MAX_STEP 600
-#include <QColor>
-#include <QRadialGradient>
-#include <QPainter>
 
 CLAnimatedBackGround::CLAnimatedBackGround(int timestep):
 mTimeStep(timestep),

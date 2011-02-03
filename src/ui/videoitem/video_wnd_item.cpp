@@ -1,9 +1,5 @@
 #include "video_wnd_item.h"
 #include "../base/log.h"
-#include <QPainter>
-#include <QPaintEngine>
-#include <QStyleOptionGraphicsItem>
-#include <QGraphicsSceneMouseEvent>
 #include "camera/camera.h"
 #include "device/device.h"
 #include "ui/graphicsview.h"

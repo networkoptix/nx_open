@@ -3,7 +3,6 @@
 #include "../decoders/video/abstractdecoder.h"
 #include "../data/mediadata.h"
 #include "abstractrenderer.h"
-#include <QMutexLocker>
 
 
 

@@ -1,7 +1,6 @@
 #ifndef item_zoom_h2118
 #define item_zoom_h2118
 
-#include <QPointF>
 #include "animation.h"
 class QGraphicsItem;
 

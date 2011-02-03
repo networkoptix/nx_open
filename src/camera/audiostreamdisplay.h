@@ -1,9 +1,7 @@
 #ifndef audiostreamdisplay_h_1811
 #define audiostreamdisplay_h_1811
 
-#include <QMutex>
 #include "data\mediadata.h"
-#include <QAudio>
 #include "..\src\multimedia\audio\qaudioformat.h"
 #include "base\aligned_data.h"
 #include "base\ringbuffer.h"

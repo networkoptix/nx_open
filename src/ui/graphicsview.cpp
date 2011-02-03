@@ -1,14 +1,9 @@
 #include "graphicsview.h"
-#include <QWheelEvent>
-#include <QScrollBar>
 #include "./base/log.h"
-#include <QGraphicsitem>
 #include "./video_cam_layout/videocamlayout.h"
 #include "../base/rand.h"
 #include "camera/camera.h"
 #include "mainwnd.h"
-#include <QParallelAnimationGroup>
-#include <QPropertyAnimation>
 #include "./animation/animated_bgr.h"
 #include "settings.h"
 #include "device_settings/dlg_factory.h"
@@ -16,7 +11,6 @@
 #include "videoitem/video_wnd_item.h"
 #include "video_cam_layout/layout_content.h"
 #include "context_menu_helper.h"
-#include <QInputDialog>
 #include "video_cam_layout/layout_manager.h"
 #include "view_drag_and_drop.h"
 #include "layout_editor_wnd.h"

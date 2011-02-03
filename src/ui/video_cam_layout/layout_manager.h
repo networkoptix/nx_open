@@ -1,9 +1,6 @@
 #ifndef layout_manager_h_2058
 #define layout_manager_h_2058
 
-#include <QString>
-#include <QMap>
-#include <QDomElement>
 
 class LayoutContent;
 

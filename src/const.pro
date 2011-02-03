@@ -7,6 +7,9 @@ DESTDIR = ../bin
 
 QMAKE_CXXFLAGS += -MP
 
+PRECOMPILED_HEADER = StdAfx.h
+PRECOMPILED_SOURCE = StdAfx.cpp
+
 INCLUDEPATH += ../contrib/ffmpeg26404/include
 DEFINES += __STDC_CONSTANT_MACROS
 

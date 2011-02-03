@@ -1,5 +1,4 @@
 #include "abstract_animated_unmoved_item.h"
-#include <QPropertyAnimation>
 #include <math.h>
 
 #define OPACITY_TIME 500

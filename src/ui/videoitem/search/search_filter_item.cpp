@@ -3,7 +3,6 @@
 #include "search_edit.h"
 #include "device\device_managmen\device_criteria.h"
 #include "ui\video_cam_layout\layout_content.h"
-#include <QListView>
 
 
 CLSerachEditItem::CLSerachEditItem(QWidget* parent, LayoutContent* sceneContent):

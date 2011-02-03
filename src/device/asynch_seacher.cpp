@@ -1,11 +1,7 @@
 #include "asynch_seacher.h"
 #include "../base/log.h"
-#include <QMessageBox>
-#include <QTime>
 #include "deviceserver.h"
 #include "../network/nettools.h"
-#include <QThreadPool>
-#include <QtConcurrentmap>
 #include "network_device.h"
 
 CLDiviceSeracher::CLDiviceSeracher(bool allow_change_ip):

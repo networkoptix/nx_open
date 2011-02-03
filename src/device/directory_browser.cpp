@@ -1,5 +1,4 @@
 #include "directory_browser.h"
-#include <QDir>
 #include "file_device.h"
 #include "device_plugins\archive\avi_files\avi_device.h"
 

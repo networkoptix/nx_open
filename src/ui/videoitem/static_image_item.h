@@ -2,7 +2,6 @@
 #define static_image_item_h_0056
 
 #include "img_item.h"
-#include <QPixmap>
 
 class CLStaticImageItem : public CLImageItem
 {

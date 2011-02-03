@@ -1,7 +1,6 @@
 #ifndef settings_widgets_h_1820
 #define settings_widgets_h_1820
 
-#include <QSlider>
 #include "device\param.h"
 class CLDevice;
 class QGroupBox;

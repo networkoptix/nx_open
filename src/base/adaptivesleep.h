@@ -2,7 +2,6 @@
 #define cl_adaptive_sleep_137
 
 #include "sleep.h"
-#include <QTime>
 
 #include "log.h"
 

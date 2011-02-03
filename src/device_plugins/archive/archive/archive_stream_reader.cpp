@@ -2,7 +2,6 @@
 #include "device\device.h"
 #include "base\bytearray.h"
 #include "data\mediadata.h"
-#include <QDateTime>
 
 CLArchiveStreamReader::CLArchiveStreamReader(CLDevice* dev):
 CLAbstractArchiveReader(dev),

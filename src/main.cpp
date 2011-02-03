@@ -1,9 +1,6 @@
 //#include <vld.h>
 #include "mainwnd.h"
-#include <QtGui/QApplication>
-#include <QtXmlPatterns/QXmlQuery>
 
-#include <QDir>
 #include "device/asynch_seacher.h"
 #include "base/log.h"
 #include "decoders/video/ipp_h264_decoder.h"
@@ -12,7 +9,6 @@
 
 #include "ui/device_settings/dlg_factory.h"
 #include "ui/device_settings/plugins/arecontvision/arecont_dlg.h"
-#include <QMessageBox>
 #include "device/device_managmen/device_manager.h"
 #include "ui/video_cam_layout/layout_manager.h"
 #include "ui/context_menu_helper.h"

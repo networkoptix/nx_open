@@ -1,10 +1,8 @@
 #include "layout_editor_wnd.h"
-#include <QVBoxLayout>
 #include "ui/video_cam_layout/start_screen_content.h"
 #include "settings.h"
 #include "ui/layout_navigator.h"
 #include "ui/video_cam_layout/layout_manager.h"
-#include <QCloseEvent>
 #include "ui_common.h"
 
 extern QString button_layout;

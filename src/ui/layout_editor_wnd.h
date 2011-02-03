@@ -1,7 +1,6 @@
 #ifndef layout_editor_wnd_h1223
 #define layout_editor_wnd_h1223
 
-#include <QDialog>
 
 class CLLayoutNavigator;
 class LayoutContent;

@@ -1,8 +1,6 @@
 #ifndef abstract_sub_item_container_h1031
 #define abstract_sub_item_container_h1031
 
-#include <QGraphicsItem>
-#include <QObject>
 
 class CLAbstractSubItem;
 

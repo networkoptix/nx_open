@@ -1,8 +1,6 @@
 #include "./single_shot_file_reader.h"
 #include "../data/mediadata.h"
 #include "../device/file_device.h"
-#include <QFileInfo>
-#include <QFile>
 
 CLSingleShotFileStreamreader::CLSingleShotFileStreamreader(CLDevice* dev ):
 CLSingleShotStreamreader(dev)

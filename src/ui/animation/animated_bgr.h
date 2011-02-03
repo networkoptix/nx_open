@@ -1,8 +1,6 @@
 #ifndef animated_bgr_h_1600
 #define animated_bgr_h_1600
 
-#include <QRectF>
-#include <QTime>
 
 class QPainter;
 

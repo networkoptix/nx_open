@@ -1,7 +1,4 @@
 #include "device_settings_tab.h"
-#include <QVBoxLayout>
-#include <QPushButton>
-#include <QGroupBox>
 #include "../../device/device.h"
 #include "base/log.h"
 #include "widgets.h"

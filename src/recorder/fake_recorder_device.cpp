@@ -1,6 +1,5 @@
 #include "fake_recorder_device.h"
 #include "base\rand.h"
-#include <QTextStream>
 #include "ui\ui_common.h"
 
 

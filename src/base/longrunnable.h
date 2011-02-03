@@ -1,8 +1,6 @@
 #ifndef cl_long_runnable_146
 #define cl_long_runnable_146
 
-#include <QThread>
-#include <QSemaphore>
 
 class CLLongRunnable : public QThread
 {
