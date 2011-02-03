@@ -1,13 +1,13 @@
 #ifndef scene_zoom_h1907
 #define scene_zoom_h1907
 
-#include "abstract_animation.h"
+#include "animation.h"
 #include <QPoint>
 #include "streamreader\streamreader.h"
 
 class GraphicsView;
 
-class CLSceneZoom : public CLAbstractAnimation
+class CLSceneZoom : public CLAnimation
 {
 	Q_OBJECT
 public:

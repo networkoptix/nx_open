@@ -2,10 +2,10 @@
 #define item_zoom_h2118
 
 #include <QPointF>
-#include "abstract_animation.h"
+#include "animation.h"
 class QGraphicsItem;
 
-class CLItemTransform : public CLAbstractAnimation
+class CLItemTransform : public CLAnimation
 {
 	Q_OBJECT
 public:

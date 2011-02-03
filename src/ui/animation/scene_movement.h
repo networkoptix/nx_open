@@ -1,12 +1,12 @@
 #ifndef scene_movement_h1123
 #define scene_movement_h1123
 
-#include "abstract_animation.h"
+#include "animation.h"
 #include <QPoint>
 
 class GraphicsView;
 
-class CLSceneMovement : public CLAbstractAnimation
+class CLSceneMovement : public CLAnimation
 {
 	Q_OBJECT
 public:

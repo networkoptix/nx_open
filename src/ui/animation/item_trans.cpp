@@ -41,7 +41,7 @@ CLItemTransform::~CLItemTransform()
 
 void CLItemTransform::stop()
 {
-	CLAbstractAnimation::stop();
+	CLAnimation::stop();
 	m_rotating = false;
 	m_zooming = false;
 	m_moving = false;
@@ -49,7 +49,7 @@ void CLItemTransform::stop()
 
 void CLItemTransform::onFinished()
 {
-	CLAbstractAnimation::onFinished();
+	CLAnimation::onFinished();
 	m_zooming = false;
 	m_rotating = false;
 	m_moving = false;

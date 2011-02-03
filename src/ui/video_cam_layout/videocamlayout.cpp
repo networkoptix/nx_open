@@ -27,7 +27,7 @@ int SCENE_LEFT = (400*1000);
 int SCENE_TOP  = (400*1000);
 
 qreal square_ratio = 17.0/9;
-qreal long_ratio = 3.0/1;
+qreal long_ratio = 2.7/1;
 
 static const int max_items = 40;
 

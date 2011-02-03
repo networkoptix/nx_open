@@ -1,10 +1,9 @@
-#include "abstract_animation.h"
+#include "animation.h"
 #include "../../base/log.h"
 #include "../src/corelib/kernel/qtimer.h"
 
 
-
-CLAbstractAnimation::CLAbstractAnimation():
+CLAnimation::CLAnimation():
 m_timeline(CLAnimationTimeLine::CLAnimationCurve::SLOW_END_POW_40)
 //m_timeline(CLAnimationTimeLine::CLAnimationCurve::SLOW_START_SLOW_END)
 {
@@ -21,28 +20,28 @@ m_timeline(CLAnimationTimeLine::CLAnimationCurve::SLOW_END_POW_40)
 }
 
 
-CLAbstractAnimation::~CLAbstractAnimation()
+CLAnimation::~CLAnimation()
 {
 	stop();
 }
 
-bool CLAbstractAnimation::isRuning() const
+bool CLAnimation::isRuning() const
 {
 	return (m_timeline.state() & QTimeLine::Running);
 }
 
-void CLAbstractAnimation::stop()
+void CLAnimation::stop()
 {
 	m_timeline.stop();
 	m_delay_timer.stop();
 }
 
-void CLAbstractAnimation::Start()
+void CLAnimation::Start()
 {
 	m_timeline.start();
 }
 
-void CLAbstractAnimation::start_helper(int duration, int delay)
+void CLAnimation::start_helper(int duration, int delay)
 {
 	m_timeline.setDuration(duration);
 
@@ -64,7 +63,7 @@ void CLAbstractAnimation::start_helper(int duration, int delay)
 	m_timeline.setCurrentTime(0);
 }
 
-void CLAbstractAnimation::onFinished()
+void CLAnimation::onFinished()
 {
 	emit finished();
 }

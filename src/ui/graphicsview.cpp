@@ -966,7 +966,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 			int dy = 0;
 			qreal mouse_speed = 0;
 
-			mouseSpeed_helper(mouse_speed,dx,dy,150,1900);
+			mouseSpeed_helper(mouse_speed,dx,dy,150,5900);
 
 			if (dx!=0 || dy!=0)
 			{
@@ -1061,9 +1061,9 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 				// calc zoom for new rect 
 				qreal zoom = zoomForFullScreen_helper(QRectF(scene_pos.x() - w/2, scene_pos.y() - h/2, w, h));
 
-				int duration = 600;
-				m_movement.move(scene_pos, duration, doubl_clk_delay);
-				m_scenezoom.zoom_abs(zoom, duration, doubl_clk_delay);
+				int duration = 800;
+				m_movement.move(scene_pos, duration, doubl_clk_delay, CLAnimationTimeLine::SLOW_START_SLOW_END);
+				m_scenezoom.zoom_abs(zoom, duration, doubl_clk_delay,  CLAnimationTimeLine::SLOW_START_SLOW_END);
 
 			}
 

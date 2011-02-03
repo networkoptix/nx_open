@@ -6,12 +6,12 @@
 
 
 
-class CLAbstractAnimation: public QObject
+class CLAnimation: public QObject
 {
 	Q_OBJECT
 public:
-	CLAbstractAnimation();
-	virtual ~CLAbstractAnimation();
+	CLAnimation();
+	virtual ~CLAnimation();
 
 	virtual void stop();
 	bool isRuning() const;
