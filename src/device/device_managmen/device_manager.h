@@ -8,7 +8,7 @@
 #include <QTimer>
 #include "..\asynch_seacher.h"
 #include "..\device.h"
- #include <QStringList>
+#include <QStringList>
 #include "device_criteria.h"
 
 class CLDevice;
@@ -19,10 +19,16 @@ class CLRecorderDevice;
 class CLDeviceManager : public QObject
 {
 	Q_OBJECT
-		
-public:
-	static CLDeviceManager& instance();
+
+private:
 	~CLDeviceManager();
+
+	static CLDeviceManager* m_Instance;
+	static QString ms_RootDir;
+public:
+	static void setRootDir( QString rootDir );
+
+	static CLDeviceManager& instance();
 
 	CLDiviceSeracher& getDiveceSercher(); 
 

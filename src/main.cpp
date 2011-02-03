@@ -1,6 +1,7 @@
 //#include <vld.h>
 #include "mainwnd.h"
 #include <QtGui/QApplication>
+#include <QtXmlPatterns/QXmlQuery>
 
 #include <QDir>
 #include "device/asynch_seacher.h"
@@ -20,6 +21,29 @@
 
 extern FFMPEGCodecDll global_ffmpeg_dll;
 
+QString getRootDir() {
+	QString rootDir;
+
+	QXmlQuery query;
+
+	QFile settingsFile("settings.xml");
+	if (!settingsFile.exists()) {
+		return rootDir;
+	}
+
+	if (!settingsFile.open(QIODevice::ReadOnly | QIODevice::Text))
+		return rootDir;
+
+	query.setFocus(&settingsFile);
+	query.setQuery("settings/config/mediaRoot/text()");
+	if ( !query.isValid())
+		return rootDir;
+
+	query.evaluateTo(&rootDir);
+	settingsFile.close();
+
+	return QDir::fromNativeSeparators(rootDir.trimmed());
+}
 
 int main(int argc, char *argv[])
 {
@@ -47,6 +71,9 @@ int main(int argc, char *argv[])
 		cl_log.log("Software version 0.1", cl_logALWAYS);
 		cl_log.log(argv[0], cl_logALWAYS);
 	}
+
+	QString rootDir = getRootDir();
+	CLDeviceManager::setRootDir(rootDir);
 
 	CLDevice::startCommandProc();
 

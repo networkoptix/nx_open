@@ -1,4 +1,4 @@
-QT = core gui network xml opengl multimedia webkit
+QT = core gui network xml xmlpatterns opengl multimedia webkit 
 TEMPLATE = app
 VERSION = 0.0.1
 
@@ -20,6 +20,7 @@ HEADERS =
 SOURCES = 
 HEADERS += mainwnd.h
 HEADERS += settings.h
+HEADERS += StdAfx.h
 HEADERS += ui_mainwnd.h
 HEADERS += video_camera.h
 HEADERS += base/adaptivesleep.h
@@ -149,6 +150,7 @@ HEADERS += videodisplay/complicated_item.h
 SOURCES += main.cpp
 SOURCES += mainwnd.cpp
 SOURCES += settings.cpp
+SOURCES += StdAfx.h.cpp
 SOURCES += video_camera.cpp
 SOURCES += base/bytearray.cpp
 SOURCES += base/log.cpp

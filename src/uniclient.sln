@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "uniclient", "uniclient.vcproj", "{791D19D2-E9A3-330A-93B8-6DE32C0EFA72}"
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "WiXSetup", "..\wixsetup\WiXSetup.wixproj", "{1559FFD9-CC5D-4902-877B-6C9C3C58873B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{791D19D2-E9A3-330A-93B8-6DE32C0EFA72} = {791D19D2-E9A3-330A-93B8-6DE32C0EFA72}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

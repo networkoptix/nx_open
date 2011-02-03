@@ -8,11 +8,18 @@
 #include <QFileInfoList>
 #include "device_plugins\archive\archive\archive_device.h"
 
+// Init static variables
+CLDeviceManager* CLDeviceManager::m_Instance = 0;
+QString CLDeviceManager::ms_RootDir;
+
 //=============================================================
 CLDeviceManager& CLDeviceManager::instance()
 {
-	static CLDeviceManager inst ;
-	return inst;
+	if (m_Instance == 0) {
+		m_Instance = new CLDeviceManager();
+	}
+
+	return *m_Instance;
 }
 
 CLDeviceManager::CLDeviceManager():
@@ -23,7 +30,11 @@ m_firstTime(true)
 
 	addArchiver("Recorder:General Archiver");
 
-	QString rootDir("c:/Photo/");
+	if (ms_RootDir.isEmpty()) {
+		ms_RootDir = "c:/Photo/";
+	}
+
+	QString rootDir(ms_RootDir);
 
 	QStringList subdirList = subDirList(rootDir);
 
@@ -258,4 +269,9 @@ void CLDeviceManager::addArchiver(QString id)
 	CLDevice* rec = new CLFakeRecorderDevice();
 	rec->setUniqueId(id);
 	mRecDevices[rec->getUniqueId()] = rec;
+}
+
+void CLDeviceManager::setRootDir( QString rootDir )
+{
+	ms_RootDir = rootDir;
 }
