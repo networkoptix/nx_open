@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
 	<Product Id="5b60f457-e05f-4cd0-b976-42acea61b981" Name="Universal Client" Language="1033" Version="1.0.0.0" Manufacturer="Network Optix" UpgradeCode="286227c5-25b4-4796-aa48-2d9822e10b0d">
 		<Package InstallerVersion="200" Compressed="yes" Keywords="Installer" Comments="Network Optix Universal Client Installer" Manufacturer="Network Optix"/>
 
 		<Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
 
-		<Directory Id="TARGETDIR" Name="SourceDir">
-			<Directory Id="ProgramFilesFolder">
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="MEDIAFOLDER"/>
+      
+      <Directory Id="ProgramFilesFolder">
 				<Directory Id="NetworkOptix" Name="Network Optix">
           <Directory Id="INSTALLDIR" Name="Universal Client">
             <Component Id="MainExecutable" Guid="B9B60D1E-3B2C-47dd-9922-A1FC5F3818D4">
@@ -27,6 +29,23 @@
               <File Id="swscaleDll" Name="swscale-0.dll" Source="../bin/swscale-0.dll"/>
             </Component>
 
+            <Component Id="QTLibraries" Guid="3E273FF1-35A7-44da-864C-61EE9E9B7EA8">
+              <File Id="QtCored4" Name="QtCored4.dll" Source="C:\Qt\4.7.1\bin\QtCored4.dll"/>
+              <File Id="QtGuid4" Name="QtGuid4.dll" Source="C:\Qt\4.7.1\bin\QtGuid4.dll"/>
+              <File Id="QtMultimediad4" Name="QtMultimediad4.dll" Source="C:\Qt\4.7.1\bin\QtMultimediad4.dll"/>
+              <File Id="QtNetworkd4" Name="QtNetworkd4.dll" Source="C:\Qt\4.7.1\bin\QtNetworkd4.dll"/>
+              <File Id="QtOpenGLd4" Name="QtOpenGLd4.dll" Source="C:\Qt\4.7.1\bin\QtOpenGLd4.dll"/>
+              <File Id="QtWebKitd4" Name="QtWebKitd4.dll" Source="C:\Qt\4.7.1\bin\QtWebKitd4.dll"/>
+              <File Id="QtXmld4" Name="QtXmld4.dll" Source="C:\Qt\4.7.1\bin\QtXmld4.dll"/>
+            </Component>
+            
+            <Component Id='Settings' Guid='D5B8FC1A-6828-4e66-B1D1-13BD2FD6EDA8'>
+              <File Id='XmlSettings' Name='settings.xml' DiskId='1' Source='../bin/settings.xml' Vital='yes' />
+              <util:XmlFile Id='XmlSettings1' File='[INSTALLDIR]settings.xml'
+                Action='createElement' Name='config' ElementPath='//settings' Sequence='1' />
+              <util:XmlFile Id='XmlSettings2' File='[INSTALLDIR]settings.xml'
+                Action='createElement' Name='mediaRoot' ElementPath='//settings/config' Sequence='1' Value='[MEDIAFOLDER]'/>
+            </Component>
           </Directory>
 					<!-- TODO: Remove the comments around this Component element and the ComponentRef below in order to add resources to this installer. -->
 					<!-- <Component Id="ProductComponent" Guid="12bb7788-be4d-4d8d-be8a-1991515340a2"> -->
@@ -44,26 +63,81 @@
         </Directory>
       </Directory>
 
-      <Directory Id="DesktopFolder" Name="Desktop" />
+      <Directory Id="DesktopFolder" Name="Desktop"/>
     </Directory>
 
     
 		<Feature Id="ProductFeature" Title="SetupProject1" Level="1"
              ConfigurableDirectory="INSTALLDIR" >
-			<!-- TODO: Remove the comments around this ComponentRef element and the Component above in order to add resources to this installer. -->
 			 <ComponentRef Id="MainExecutable" />
        <ComponentRef Id="FFmpegLibraries"/>
+       <!--<ComponentRef Id="QTLibraries" />-->
        <ComponentRef Id='ProgramMenuDir' />
+       <ComponentRef Id='Settings'/>
        <ComponentGroupRef Id='group_skin'/>
 
       <!-- Note: The following ComponentGroupRef is required to pull in generated authoring from project references. -->
-			<!--<ComponentGroupRef Id="Product.Generated" />-->
+			<ComponentGroupRef Id="Product.Generated" />
 		</Feature>
 
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+    <Property Id="WIXUI_MEDIAFOLDER" Value="MEDIAFOLDER" />
+
+    <UIRef Id="WixUI_Common" />
     
-    <UIRef Id="WixUI_InstallDir" />
+    <!--<UIRef Id="WixUI_InstallDir" />-->
     <UIRef Id="WixUI_ErrorProgressText" />
-    
-	</Product>
+
+    <!--<UI>
+      <Publish Dialog="BrowseDlg" Control="PathEdit" Property="_BrowseProperty" Value="MediaDir"/>
+    </UI>-->
+
+    <UI>
+      <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+      <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
+      <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
+      <TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" />
+
+      <Property Id="ARPNOMODIFY" Value="1" />
+
+      <DialogRef Id="BrowseDlg" />
+      <DialogRef Id="DiskCostDlg" />
+      <DialogRef Id="ErrorDlg" />
+      <DialogRef Id="FatalError" />
+      <DialogRef Id="FilesInUse" />
+      <DialogRef Id="MsiRMFilesInUse" />
+      <DialogRef Id="PrepareDlg" />
+      <DialogRef Id="ProgressDlg" />
+      <DialogRef Id="ResumeDlg" />
+      <DialogRef Id="UserExit" />
+
+      <DialogRef Id="MediaDirDlg" />
+
+      <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
+      <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
+      <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg">LicenseAccepted = "1"</Publish>
+
+      <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="MediaDirDlg" Order="2">1</Publish>
+      <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Property="_BrowseProperty" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
+      <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
+
+      <Publish Dialog="MediaDirDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg">1</Publish>
+      <Publish Dialog="MediaDirDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_MEDIAFOLDER]" Order="1">1</Publish>
+      <Publish Dialog="MediaDirDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="2">1</Publish>
+      <Publish Dialog="MediaDirDlg" Control="ChangeFolder" Property="_BrowseProperty" Value="[WIXUI_MEDIAFOLDER]" Order="1">1</Publish>
+      <Publish Dialog="MediaDirDlg" Control="ChangeFolder" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
+
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaDirDlg" Order="1">NOT Installed</Publish>
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2">Installed</Publish>
+      
+      <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
+      <Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+      <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+      <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
+
+    </UI>
+  </Product>
 </Wix>
