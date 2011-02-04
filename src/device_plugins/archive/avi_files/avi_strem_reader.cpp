@@ -170,13 +170,17 @@ bool CLAVIStreamReader::init()
 			m_audiocodec_id = CL_AC3;
 			break;
 
-		//case CODEC_ID_AAC:
-		//	m_audiocodec_id = CL_AAC;  // crashes 
-		//	break;
+		case CODEC_ID_AAC:
+			m_audiocodec_id = CL_AAC;  // crashes 
+			break;
 
 
 		case CODEC_ID_WMAV2:
-			m_audiocodec_id =CL_WMAV2;
+			m_audiocodec_id = CL_WMAV2;
+			break;
+
+		case CODEC_ID_WMAPRO:
+			m_audiocodec_id = CL_WMAPRO;
 			break;
 
 		case CODEC_ID_ADPCM_MS:
@@ -290,11 +294,12 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 	
 	else if (m_packet.stream_index == m_audioStrmIndex) // in case of audio packet 
 	{
+		AVCodecContext* codecContext = m_formatContext->streams[m_audioStrmIndex]->codec;
 
 		m_bsleep = false;
 
 		int extra = 0;
-		CLCompressedAudioData* audioData = new CLCompressedAudioData(CL_MEDIA_ALIGNMENT,m_packet.size + extra);
+		CLCompressedAudioData* audioData = new CLCompressedAudioData(CL_MEDIA_ALIGNMENT,m_packet.size + extra, codecContext);
 		CLByteArray& data = audioData->data;
 
 		data.prepareToWrite(m_packet.size + extra);

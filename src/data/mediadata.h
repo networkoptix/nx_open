@@ -22,6 +22,7 @@ enum CLCodecType
 	CL_AC3,
 	CL_AAC, 
 	CL_WMAV2, 
+	CL_WMAPRO,
 	CL_ADPCM_MS,
 	CL_UNKNOWN, 
 	CL_VARIOUSE_DECODERS};
@@ -78,16 +79,18 @@ struct CLCompressedVideoData : public CLAbstractMediaData
 
 struct CLCompressedAudioData : public CLAbstractMediaData
 {
-	CLCompressedAudioData (unsigned int alignment, unsigned int capacity):
+	CLCompressedAudioData (unsigned int alignment, unsigned int capacity, void* ctx):
 	CLAbstractMediaData(alignment, capacity)
 
 	{
 		dataType = AUDIO;
+		context = ctx;
 	}
 
 	int freq;
 	int channels;
 
+	void* context;
 };
 
 

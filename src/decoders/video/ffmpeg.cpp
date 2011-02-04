@@ -94,11 +94,8 @@ m_lightModeFrameCounter(0)
 
 	c = global_ffmpeg_dll.avcodec_alloc_context();
 
-	if (codecContext)	
-	{
+	if (codecContext) {
 		global_ffmpeg_dll.avcodec_copy_context(c, codecContext);
-		//c->extradata = codecContext->extradata;
-		//c->extradata_size = codecContext->extradata_size;
 	}
 
 	picture = global_ffmpeg_dll.avcodec_alloc_frame();

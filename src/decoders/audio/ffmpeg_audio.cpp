@@ -4,6 +4,8 @@
 #include "base/log.h"
 #include "../ffmpeg_dll/ffmpeg_dll.h"
 
+struct AVCodecContext;
+
 #define INBUF_SIZE 4096
 
 extern QMutex global_ffmpeg_mutex;
@@ -13,7 +15,7 @@ extern FFMPEGCodecDll global_ffmpeg_dll;
 bool CLFFmpegAudioDecoder::m_first_instance = true;
 
 //================================================
-CLFFmpegAudioDecoder::CLFFmpegAudioDecoder(CLCodecType codec_id):
+CLFFmpegAudioDecoder::CLFFmpegAudioDecoder(CLCodecType codec_id, AVCodecContext* codecContext):
 c(0),
 m_codec(codec_id)
 {
@@ -55,11 +57,15 @@ m_codec(codec_id)
 		break;
 
 
-		/*/
+	//case CL_WMAPRO:
+	//	codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_WMAPRO);
+	//	break;
+
 	case CL_WMAV2:
 		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_WMAV2);
 		break;
 
+		/*/
 		
 
 	case CL_ADPCM_MS:
@@ -77,9 +83,11 @@ m_codec(codec_id)
 
 	}
 
-
-
 	c = global_ffmpeg_dll.avcodec_alloc_context();
+
+	if (codecContext) {
+		global_ffmpeg_dll.avcodec_copy_context(c, codecContext);
+	}
 	global_ffmpeg_dll.avcodec_open(c, codec);
 
 

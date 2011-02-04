@@ -3,8 +3,8 @@
 
 
 
-CLAbstractAudioDecoder* CLAudioDecoderFactory::createDecoder(CLCodecType codec)
+CLAbstractAudioDecoder* CLAudioDecoderFactory::createDecoder(CLCodecType codec, void* codecContext)
 {
-	return new CLFFmpegAudioDecoder(codec);
+	return new CLFFmpegAudioDecoder(codec, (AVCodecContext*)codecContext);
 }
 

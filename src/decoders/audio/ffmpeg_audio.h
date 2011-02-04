@@ -13,7 +13,7 @@
 class CLFFmpegAudioDecoder : public CLAbstractAudioDecoder
 {
 public:
-	CLFFmpegAudioDecoder(CLCodecType codec);
+	CLFFmpegAudioDecoder(CLCodecType codec, AVCodecContext* codecContext);
 	bool decode(CLAudioData& data);
 	~CLFFmpegAudioDecoder();
 

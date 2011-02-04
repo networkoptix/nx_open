@@ -39,6 +39,7 @@
               <File Id="QtOpenGLd4" Name="QtOpenGLd4.dll" Source="C:\Qt\4.7.1\bin\QtOpenGLd4.dll"/>
               <File Id="QtWebKitd4" Name="QtWebKitd4.dll" Source="C:\Qt\4.7.1\bin\QtWebKitd4.dll"/>
               <File Id="QtXmld4" Name="QtXmld4.dll" Source="C:\Qt\4.7.1\bin\QtXmld4.dll"/>
+              <File Id="QtXmlPatterns4" Name="QtXmlPatterns4.dll" Source="C:\Qt\4.7.1\bin\QtXmlPatterns4.dll"/>
             </Component>
             
             <Component Id='Settings' Guid='D5B8FC1A-6828-4e66-B1D1-13BD2FD6EDA8'>

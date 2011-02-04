@@ -108,7 +108,7 @@ void CLAudioStreamDisplay::putdata(CLCompressedAudioData* data)
 
 	if (m_decoder[data->compressionType]==0)
 	{
-		m_decoder[data->compressionType] = CLAudioDecoderFactory::createDecoder(data->compressionType);
+		m_decoder[data->compressionType] = CLAudioDecoderFactory::createDecoder(data->compressionType, data->context);
 		
 	}
 

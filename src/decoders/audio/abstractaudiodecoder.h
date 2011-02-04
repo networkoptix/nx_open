@@ -21,7 +21,7 @@ private:
 class CLAudioDecoderFactory
 {
 public:
-	static CLAbstractAudioDecoder* createDecoder(CLCodecType codec);
+	static CLAbstractAudioDecoder* createDecoder(CLCodecType codec, void* codecContext);
 };
 
 
