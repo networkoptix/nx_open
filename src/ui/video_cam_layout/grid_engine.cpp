@@ -28,6 +28,11 @@ CLGridSettings& CLGridEngine::getSettings()
 
 QSize CLGridEngine::calcDefaultMaxItemSize(const CLDeviceVideoLayout* layout) const
 {
+	if (layout==0)
+		return QSize(m_settings.slot_width, m_settings.slot_height);
+	
+	
+
 	qreal dlw = layout->width();
 	qreal dlh = layout->height();
 
