@@ -35,12 +35,12 @@ m_moving(false)
 
 CLItemTransform::~CLItemTransform()
 {
-	stop();
+	stopAnimation();
 }
 
-void CLItemTransform::stop()
+void CLItemTransform::stopAnimation()
 {
-	CLAnimation::stop();
+	CLAnimation::stopAnimation();
 	m_rotating = false;
 	m_zooming = false;
 	m_moving = false;
@@ -90,7 +90,7 @@ void CLItemTransform::zoom_abs(qreal target_zoom, int duration, int delay)
 
 	if (duration==0)
 	{
-		stop();
+		stopAnimation();
 
 		m_zoom.curent = target_zoom;
 		transform_helper();

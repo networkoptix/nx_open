@@ -7,6 +7,7 @@
 #include "./animation/animated_show.h"
 #include "video_cam_layout/videocamlayout.h"
 #include "ui_common.h"
+#include "animation/animation_manager.h"
 
 
 class CLAbstractSceneItem;
@@ -107,7 +108,7 @@ protected:
 	void drawBackground ( QPainter * painter, const QRectF & rect );
 
 	void showStop_helper();
-	void stopGroupAnimation();
+
 
 
 	//========decorations=====
@@ -200,7 +201,7 @@ protected:
 	
 	//====decoration======
 	QList<CLAbstractUnmovedItem*> m_staticItems;
-	QParallelAnimationGroup *m_groupAnimation;
+	
 
 	//======fps
 	int m_fps_frames;
@@ -211,6 +212,8 @@ protected:
 
 	CLSerachEditItem* m_seachItem;
 
+
+	CLAnimationManager m_animationManager;
 
 };
 

@@ -1,20 +1,23 @@
-#ifndef abstactanimation_h2344
-#define abstactanimation_h2344
+#ifndef animation_h2344
+#define animation_h2344
 
 #include "animation_timeline.h"
+#include "abstract_animation.h"
 
 
 
-class CLAnimation: public QObject
+class CLAnimation: public QObject, public CLAbstractAnimation
 {
 	Q_OBJECT
 public:
 	CLAnimation();
 	virtual ~CLAnimation();
 
-	virtual void stop();
+	
+	virtual void stopAnimation();
 	bool isRuning() const;
-
+	
+	QObject* object() ;
 signals:
 	void finished();
 protected slots:
@@ -48,4 +51,4 @@ protected:
 
 };
 
-#endif //abstactanimation_h2344
+#endif //animation_h2344

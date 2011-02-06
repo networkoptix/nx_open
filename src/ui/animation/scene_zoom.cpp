@@ -27,7 +27,7 @@ m_quality(CLStreamreader::CLSNormal)
 
 CLSceneZoom::~CLSceneZoom()
 {
-	stop();
+	stopAnimation();
 }
 
 qreal CLSceneZoom::zoomToscale(qreal zoom) const

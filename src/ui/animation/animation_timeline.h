@@ -1,8 +1,7 @@
 #ifndef cl_animation_timeline_h_0004
 #define cl_animation_timeline_h_0004
 
- #include <QTimeLine>
-
+ 
 class CLAnimationTimeLine : public QTimeLine
 {
 public:

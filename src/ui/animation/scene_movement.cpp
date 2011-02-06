@@ -67,7 +67,7 @@ m_limited(false)
 
 CLSceneMovement::~CLSceneMovement()
 {
-	stop();
+	stopAnimation();
 }
 
 
@@ -141,25 +141,25 @@ void CLSceneMovement::valueChanged ( qreal dpos )
 			if (dx<0)
 			{
 				if ( (wnd_rect.topLeft().x() -  viewport_rec.topLeft().x()) >  percent*wnd_rect.width())
-					stop();
+					stopAnimation();
 			}
 
 			if (dx>0)
 			{
 				if ( (viewport_rec.topRight().x() - wnd_rect.topRight().x()) >  percent*wnd_rect.width())
-					stop();
+					stopAnimation();
 			}
 
 			if (dy<0)
 			{
 				if ( (wnd_rect.topLeft().y() - viewport_rec.topLeft().y()) >  percent*wnd_rect.height())
-					stop();
+					stopAnimation();
 			}
 
 			if (dy>0)
 			{
 				if ( (viewport_rec.bottomLeft().y()- wnd_rect.bottomRight().y()) >  percent*wnd_rect.height())
-					stop();
+					stopAnimation();
 			}
 			
 			

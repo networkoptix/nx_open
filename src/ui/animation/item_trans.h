@@ -11,7 +11,7 @@ public:
 	CLItemTransform(QGraphicsItem* item);
 	virtual ~CLItemTransform();
 
-	void stop();
+	void stopAnimation();
 
 	qreal zoomToscale(qreal zoom) const;
 	qreal scaleTozoom(qreal scale) const;

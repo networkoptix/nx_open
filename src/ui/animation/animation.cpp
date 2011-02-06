@@ -22,7 +22,12 @@ m_timeline(CLAnimationTimeLine::CLAnimationCurve::SLOW_END_POW_40)
 
 CLAnimation::~CLAnimation()
 {
-	stop();
+	stopAnimation();
+}
+
+QObject* CLAnimation::object() 
+{
+	return this;
 }
 
 bool CLAnimation::isRuning() const
@@ -30,7 +35,7 @@ bool CLAnimation::isRuning() const
 	return (m_timeline.state() & QTimeLine::Running);
 }
 
-void CLAnimation::stop()
+void CLAnimation::stopAnimation()
 {
 	m_timeline.stop();
 	m_delay_timer.stop();

@@ -4,7 +4,6 @@
 
 #include <math.h>
 #include "settings.h"
-#include <qgraphicssceneevent>
 #include "subitem\abstract_image_sub_item.h"
 #include "subitem\recording_sign_item.h"
 #include "base\log.h"
@@ -214,7 +213,7 @@ void CLAbstractSceneItem::setRotation(qreal angle)
 
 void CLAbstractSceneItem::stop_animation()
 {
-	m_animationTransform.stop();
+	m_animationTransform.stopAnimation();
 }
 
 void CLAbstractSceneItem::setFullScreen(bool full)
