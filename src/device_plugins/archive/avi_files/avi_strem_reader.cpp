@@ -226,11 +226,11 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 
 		if (m_packet.stream_index == m_videoStrmIndex) // in case of video packet 
 		{
-			qint64 duration = m_formatContext->streams[m_videoStrmIndex]->duration;
+			qint64 duration = m_formatContext->streams[m_videoStrmIndex]->duration; // duration is in the frames
 			if (duration==0)
 				duration = 1;
 
-			m_cuur_time =  qreal(m_len_mksec)*m_packet.dts/duration;
+			m_cuur_time =  qint64(m_len_mksec)*m_packet.dts/duration;
 			//m_need_tosleep = m_len_msec/duration;
 
 			//if (m_need_tosleep==0 && m_prev_time!=-1)

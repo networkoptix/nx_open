@@ -32,8 +32,8 @@ protected:
 
 protected:
 
-	quint64 m_cuur_time;
-	int m_prev_time;
+	qint64 m_cuur_time;
+	qint64 m_prev_time;
 
 	AVFormatContext* m_formatContext;
 
