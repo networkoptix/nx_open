@@ -3,6 +3,7 @@
 #include "libavcodec/avcodec.h"
 #include "base/log.h"
 #include "../ffmpeg_dll/ffmpeg_dll.h"
+#include "base/aligned_data.h"
 
 struct AVCodecContext;
 
@@ -10,7 +11,7 @@ struct AVCodecContext;
 
 extern QMutex global_ffmpeg_mutex;
 extern FFMPEGCodecDll global_ffmpeg_dll;
-
+extern int MAX_AUDIO_FRAME_SIZE;
 
 bool CLFFmpegAudioDecoder::m_first_instance = true;
 
@@ -57,9 +58,9 @@ m_codec(codec_id)
 		break;
 
 
-	//case CL_WMAPRO:
-	//	codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_WMAPRO);
-	//	break;
+	case CL_WMAPRO:
+		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_WMAPRO);
+		break;
 
 	case CL_WMAV2:
 		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_WMAV2);
@@ -116,18 +117,38 @@ bool CLFFmpegAudioDecoder::decode(CLAudioData& data)
 
 	const unsigned char* inbuf_ptr = data.inbuf;
 	int size = data.inbuf_len;
-	unsigned char* outbuf = data.outbuf;
-
+	unsigned char* outbuf = (unsigned char*)data.outbuf->data();
+	
+	
 
 	data.outbuf_len = 0;
 
 	while (size > 0) 
 	{
 
-		int out_size = AVCODEC_MAX_AUDIO_FRAME_SIZE*10;
+		int out_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
 
 
 		//cl_log.log("before dec",  cl_logALWAYS);
+
+		if (data.outbuf_len + out_size > data.outbuf->capacity())
+		{
+			if (data.outbuf->capacity() >= MAX_AUDIO_FRAME_SIZE) // can not increase capacity any more
+			{
+				Q_ASSERT(false);
+				data.outbuf_len = 0;
+				outbuf = (unsigned char*)data.outbuf->data(); // start form beginning 
+			}
+			else
+			{
+				unsigned long new_capacity = qMin((unsigned long)MAX_AUDIO_FRAME_SIZE, (unsigned long)(data.outbuf->capacity()*1.5));
+				new_capacity = qMax(new_capacity, data.outbuf_len + out_size);
+				data.outbuf->change_capacity(new_capacity);
+				outbuf = (unsigned char*)data.outbuf->data() + data.outbuf_len;
+
+			}
+		}
+
 
 		int len = global_ffmpeg_dll.avcodec_decode_audio2(c, (short *)outbuf, &out_size,
 				inbuf_ptr, size);
@@ -138,10 +159,13 @@ bool CLFFmpegAudioDecoder::decode(CLAudioData& data)
 		if (len < 0) 
 			return false;
 
+
 		data.outbuf_len+=out_size;
 		outbuf+=out_size;
 		size -= len;
 		inbuf_ptr += len;
+
+		
 	}
 
 
@@ -170,7 +194,14 @@ bool CLFFmpegAudioDecoder::decode(CLAudioData& data)
 		data.format.setSampleSize(32);
 		data.format.setSampleType(QAudioFormat::SignedInt);
 	    break;
+
+	case AV_SAMPLE_FMT_FLT:
+		data.format.setSampleSize(32);
+		data.format.setSampleType(QAudioFormat::Float);
+		break;
+
 	}
+
 
 	return true;
 }

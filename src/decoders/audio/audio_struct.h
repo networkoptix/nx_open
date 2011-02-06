@@ -3,6 +3,7 @@
 
 #include "data\mediadata.h"
 
+class CLAlignedData;
 
 // input to the decoder 
 struct CLAudioData
@@ -13,8 +14,8 @@ struct CLAudioData
 	int inbuf_len; // compressed data len
 
 
-	unsigned char* outbuf; // pointer where decoder puts decompressed data; user is responsable to provide big enought outbuf
-	int outbuf_len;
+	CLAlignedData* outbuf; // pointer where decoder puts decompressed data;
+	unsigned long outbuf_len;
 
 	QAudioFormat format;
 };

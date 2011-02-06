@@ -34,6 +34,7 @@ private:
 	unsigned int bytes_from_time(const QAudioFormat& format, unsigned long ms);
 
 	static void down_mix(CLAudioData& audio);
+	static void float2int(CLAudioData& audio);
 
 private:
 	CLAbstractAudioDecoder* m_decoder[CL_VARIOUSE_DECODERS];

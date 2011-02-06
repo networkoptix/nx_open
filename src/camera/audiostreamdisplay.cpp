@@ -2,11 +2,13 @@
 #include "decoders\audio\audio_struct.h"
 #include "base\log.h"
 #include "decoders\audio\abstractaudiodecoder.h"
+#include "libavcodec\avcodec.h"
 
-#define MAX_AUDIO_FRAME_SIZE 192000
+#define DEFAULT_AUDIO_FRAME_SIZE (AVCODEC_MAX_AUDIO_FRAME_SIZE*2)
+int  MAX_AUDIO_FRAME_SIZE = DEFAULT_AUDIO_FRAME_SIZE*5;
 
 
-static short clip_short(int v) 
+static short clip_short(int v)
 {
 	if (v < -32768)
         v = -32768;
@@ -60,7 +62,7 @@ static void down_mix_6_2(short *data, int len)
 CLAudioStreamDisplay::CLAudioStreamDisplay(int buff_ms):
 m_buff_ms(buff_ms),
 m_audioOutput(0),
-m_decodedaudio(16, MAX_AUDIO_FRAME_SIZE),
+m_decodedaudio(16, DEFAULT_AUDIO_FRAME_SIZE),
 m_audiobuff(0),
 m_ringbuff(0),
 m_freq_factor(1.0),
@@ -91,7 +93,7 @@ void CLAudioStreamDisplay::putdata(CLCompressedAudioData* data)
 	audio.codec = data->compressionType;
 	audio.inbuf = (unsigned char*)data->data.data();
 	audio.inbuf_len = data->data.size();
-	audio.outbuf = m_decodedaudio;
+	audio.outbuf = &m_decodedaudio;
 	audio.outbuf_len = 0;
 	audio.format.setChannels(data->channels);
 	audio.format.setFrequency(data->freq);
@@ -125,38 +127,50 @@ void CLAudioStreamDisplay::putdata(CLCompressedAudioData* data)
 		if (audio.format.channels()>2 && m_downmixing)
 			down_mix(audio);
 
+		if (audio.format.sampleType() == QAudioFormat::Float)	
+			float2int(audio);
+
+
 
 		if (!m_ringbuff)
-			m_ringbuff = new CLRingBuffer(bytes_from_time(audio.format,m_buff_ms*1.5),this);
+			m_ringbuff = new CLRingBuffer(bytes_from_time(audio.format,m_buff_ms),this);
 
 
 		if (!m_audioOutput)
 			return;
 
 
-		if (m_can_adapt>30 && ms_from_size(audio.format, m_ringbuff->bytesAvailable()) > m_buff_ms) // if ring buffer is full
+		if (ms_from_size(audio.format, m_ringbuff->avalable_to_write()) < m_buff_ms/10) // if ring buffer is full
 		{
 			//paying too slow; need to speedup
 			m_freq_factor+=0.005;
 			//audio.format.setFrequency(audio.format.frequency()*m_freq_factor);
 			//recreatedevice(audio.format); // recreation does not work very well
+			//cl_log.log("to many data!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", cl_logALWAYS);
 			m_ringbuff->claer();
 
 		}
 
-		if (m_can_adapt>30 && ms_from_size(audio.format, m_audioOutput->bytesFree()) > 0.8*m_buff_ms) // if audiobuffer is almost empty
+		bool to_few_data_detected = false;
+
+
+		if (ms_from_size(audio.format, m_audioOutput->bufferSize() - m_audioOutput->bytesFree()) < m_buff_ms/10) // if audio buffer is almost empty
 		{
 			//paying too fast; need to slowdown
 			m_freq_factor-=0.005;
 			//audio.format.setFrequency(audio.format.frequency()*m_freq_factor);
 			//recreatedevice(audio.format); //recreation does not work very well
+			cl_log.log("to few data!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", cl_logWARNING);
+			to_few_data_detected = true;
 		}
 
 			
 
-		m_ringbuff->writeData((char*)audio.outbuf, audio.outbuf_len);
+		if (m_ringbuff->writeData(audio.outbuf->data(), audio.outbuf_len)<audio.outbuf_len)
+			cl_log.log("failed to write all data !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", cl_logWARNING);
 
-		if (ms_from_size(audio.format, m_ringbuff->bytesAvailable()) > 100) // only if we have more than 100 ms in data in ring buffer
+
+		if (ms_from_size(audio.format, m_ringbuff->bytesAvailable()) > to_few_data_detected*m_buff_ms/2) // only if we have more than m_buff_ms/5 ms in data in ring buffer
 		{
 
 			if (m_audioOutput && m_audioOutput->state() != QAudio::StoppedState) 
@@ -172,8 +186,12 @@ void CLAudioStreamDisplay::putdata(CLCompressedAudioData* data)
 				{
 					++m_can_adapt; // if few write occurred we can change the frequency if needed
 
-					m_ringbuff->readData(m_decodedaudio, period);
-					m_audiobuff->write(m_decodedaudio, period);
+					if (m_decodedaudio.capacity() < period)
+						m_decodedaudio.change_capacity(period);
+
+
+					m_ringbuff->readData(m_decodedaudio.data(), period);
+					m_audiobuff->write(m_decodedaudio.data(), period);
 					--chunks;
 				}
 			}
@@ -182,7 +200,7 @@ void CLAudioStreamDisplay::putdata(CLCompressedAudioData* data)
 
 
 		
-		/*/
+		/*
 		qint64 bytesInBuffer = m_audioOutput->bufferSize() - m_audioOutput->bytesFree();
 		qint64 usInBuffer = ms_from_size(audio.format, bytesInBuffer);
 		cl_log.log("ms in audio buff = ", (int)usInBuffer, cl_logALWAYS);
@@ -210,7 +228,6 @@ void CLAudioStreamDisplay::recreatedevice(QAudioFormat format)
 	stopaudio();
 
 	QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
-
 
 	if (!info.isFormatSupported(format)) 
 	{
@@ -253,15 +270,33 @@ unsigned int CLAudioStreamDisplay::ms_from_size(const QAudioFormat& format, unsi
 
 unsigned int CLAudioStreamDisplay::bytes_from_time(const QAudioFormat& format, unsigned long ms)
 {
-	return ( format.channels() * format.sampleSize() / 8 ) * format.frequency() * ms / 1000;
+	return ( (qint64)format.channels() * format.sampleSize() / 8 ) * format.frequency() * ms / 1000;
 }
 
 void CLAudioStreamDisplay::down_mix(CLAudioData& audio)
 {
 	if (audio.format.channels()==6)
 	{
-		down_mix_6_2((short*)audio.outbuf, audio.outbuf_len);
+		down_mix_6_2((short*)(audio.outbuf->data()), audio.outbuf_len);
 		audio.outbuf_len/=3;
 		audio.format.setChannels(2);
 	}
+}
+
+void CLAudioStreamDisplay::float2int(CLAudioData& audio)
+{
+	Q_ASSERT(sizeof(float)==4); // not sure about sizeof(float) in 64 bit version
+
+	qint32* p = (qint32*)(audio.outbuf->data());
+	int len = audio.outbuf_len/4;
+
+	for (int i = 0; i < len; ++i)
+	{
+		float f = *((float*)p); 
+		*p = (qint32)(f*(1<<31));
+		++p;
+	}
+
+	audio.format.setSampleType(QAudioFormat::SignedInt);
+	
 }

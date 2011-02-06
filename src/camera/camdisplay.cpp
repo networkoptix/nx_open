@@ -5,13 +5,13 @@
 #include "audiostreamdisplay.h"
 
 #define CL_MAX_DISPLAY_QUEUE_SIZE 7
-#define AUDIO_BUFF_SIZE 250 // ms
+#define AUDIO_BUFF_SIZE (750) // ms
 
 
 CLCamDisplay::CLCamDisplay():
 CLAbstractDataProcessor(CL_MAX_DISPLAY_QUEUE_SIZE),
 m_prev_time(0),
-m_delay(100*1000), // do put a big value here to avoid cpu usage in case of zoom out 
+m_delay(100*1000), // do not put a big value here to avoid cpu usage in case of zoom out 
 m_palyaudio(false)
 {
 	for (int i = 0; i< CL_MAX_CHANNELS; ++i)
@@ -78,7 +78,7 @@ void CLCamDisplay::processData(CLAbstractData* data)
 
 		int channel = vd->channel_num;
 
-		if (m_display[channel])	
+		if (m_display[channel])		
 			m_display[channel]->dispay(vd);
 	}
 	else if (ad && m_palyaudio)
