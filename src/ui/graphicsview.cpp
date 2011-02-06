@@ -24,7 +24,7 @@
 
 
 int doubl_clk_delay = qApp->doubleClickInterval()*0.75;
-int item_select_duration = 700;
+int item_select_duration = 800;
 int item_hoverevent_duration = 300;
 int scene_zoom_duration = 2500;
 int scene_move_duration = 3000;
@@ -170,7 +170,7 @@ void GraphicsView::start()
 	if (m_camLayout.getItemList().count())
 	{
 		zoomMin(0);
-		fitInView(3000, 0);
+		fitInView(3000, 0, CLAnimationTimeLine::SLOW_END_POW_40);
 	}
 
 	enableMultipleSelection(false, true);
@@ -1042,7 +1042,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 				
 
 				if (!isItemFullScreenZoomed(aitem)) // check if wnd is manually zoomed; without double click
-					fitInView(item_select_duration, doubl_clk_delay);
+					fitInView(item_select_duration + 100, doubl_clk_delay, CLAnimationTimeLine::SLOW_START_SLOW_END);
 				else
 					aitem->setFullScreen(true);
 
@@ -1299,7 +1299,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 		}
 		else if (act== &cm_fitinview)
 		{
-			fitInView(600, 0);
+			fitInView(700, 0, CLAnimationTimeLine::SLOW_START_SLOW_END);
 		}
 		else if (act== &cm_arrange)
 		{
@@ -1430,7 +1430,7 @@ void GraphicsView::mouseDoubleClickEvent( QMouseEvent * event )
 		onArrange_helper();
 		/**/
 
-		fitInView(1000, 0, CLAnimationTimeLine::SLOW_START_SLOW_END);
+		fitInView(2000, 0, CLAnimationTimeLine::INOUTBACK);
 		
 		
 		return;

@@ -136,7 +136,7 @@ protected:
 
 public slots:
 	
-	void fitInView(int duration = 600 , int delay = 0, CLAnimationTimeLine::CLAnimationCurve curve =  CLAnimationTimeLine::SLOW_END_POW_40 );
+	void fitInView(int duration = 700 , int delay = 0, CLAnimationTimeLine::CLAnimationCurve curve =  CLAnimationTimeLine::SLOW_END_POW_40);
 private slots:
 	void onScneZoomFinished();
 	void onShowTimer();

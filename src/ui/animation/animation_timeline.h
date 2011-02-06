@@ -16,6 +16,7 @@ public:
 		SLOW_END_POW_35,
 		SLOW_END_POW_40,
 		SLOW_START_SLOW_END,
+		INOUTBACK,
 		SLOW_START 
 	};
 	CLAnimationTimeLine(CLAnimationCurve curve = INHERITED, int duration = 1000, QObject *parent = 0);
@@ -42,6 +43,7 @@ private:
 
 	qreal slow_start( int msec ) const;
 	qreal slow_start_slow_end( int msec ) const;
+	qreal inOutBack( int msec ) const;
 	
 };
 

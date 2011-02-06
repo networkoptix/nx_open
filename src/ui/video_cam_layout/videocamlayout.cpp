@@ -30,7 +30,7 @@ qreal long_ratio = 2.7/1;
 static const int max_items = 40;
 
 int MAX_FPS_normal = 35;
-int MAX_FPS_selected = 70;
+int MAX_FPS_selected = 60;
 
 extern int scene_zoom_duration;
 

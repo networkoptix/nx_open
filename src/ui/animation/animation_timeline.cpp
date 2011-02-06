@@ -86,6 +86,9 @@ qreal CLAnimationTimeLine::valueForTime ( int msec ) const
 	case SLOW_START_SLOW_END:
 		return slow_start_slow_end(msec);
 
+	case INOUTBACK:
+		return inOutBack(msec);
+
 		
 	case INHERITED:
 	default:
@@ -117,6 +120,14 @@ qreal CLAnimationTimeLine::slow_start( int msec ) const
 qreal CLAnimationTimeLine::slow_start_slow_end( int msec ) const
 {
 	static QEasingCurve ec(QEasingCurve::InOutQuad);
+
+	qreal value = msec / qreal(duration());
+	return ec.valueForProgress(value);
+}
+
+qreal CLAnimationTimeLine::inOutBack( int msec ) const
+{
+	static QEasingCurve ec(QEasingCurve::InOutBack);
 
 	qreal value = msec / qreal(duration());
 	return ec.valueForProgress(value);

@@ -160,17 +160,17 @@ void CLAudioStreamDisplay::putdata(CLCompressedAudioData* data)
 			m_freq_factor-=0.005;
 			//audio.format.setFrequency(audio.format.frequency()*m_freq_factor);
 			//recreatedevice(audio.format); //recreation does not work very well
-			cl_log.log("to few data!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", cl_logWARNING);
+			cl_log.log("to few data in audio buffer!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", cl_logWARNING);
 			to_few_data_detected = true;
 		}
 
 			
 
 		if (m_ringbuff->writeData(audio.outbuf->data(), audio.outbuf_len)<audio.outbuf_len)
-			cl_log.log("failed to write all data !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", cl_logWARNING);
+			cl_log.log("failed to write all data into audio buffer!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", cl_logWARNING);
 
 
-		if (ms_from_size(audio.format, m_ringbuff->bytesAvailable()) > to_few_data_detected*m_buff_ms/2) // only if we have more than m_buff_ms/5 ms in data in ring buffer
+		if (ms_from_size(audio.format, m_ringbuff->bytesAvailable()) > to_few_data_detected*m_buff_ms/2) // only if we have more than m_buff_ms/2 ms in data in ring buffer
 		{
 
 			if (m_audioOutput && m_audioOutput->state() != QAudio::StoppedState) 
@@ -200,11 +200,11 @@ void CLAudioStreamDisplay::putdata(CLCompressedAudioData* data)
 
 
 		
-		/*
+		
 		qint64 bytesInBuffer = m_audioOutput->bufferSize() - m_audioOutput->bytesFree();
 		qint64 usInBuffer = ms_from_size(audio.format, bytesInBuffer);
 		cl_log.log("ms in audio buff = ", (int)usInBuffer, cl_logALWAYS);
-		cl_log.log("ms in ring buff = ", (int)ms_from_size(audio.format, m_ringbuff->bytesAvailable()), cl_logALWAYS);
+		//cl_log.log("ms in ring buff = ", (int)ms_from_size(audio.format, m_ringbuff->bytesAvailable()), cl_logALWAYS);
 		/**/
 
 

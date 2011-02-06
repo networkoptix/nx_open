@@ -5,7 +5,7 @@
 #include "audiostreamdisplay.h"
 
 #define CL_MAX_DISPLAY_QUEUE_SIZE 7
-#define AUDIO_BUFF_SIZE (750) // ms
+#define AUDIO_BUFF_SIZE (800) // ms
 
 
 CLCamDisplay::CLCamDisplay():
