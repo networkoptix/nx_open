@@ -1,9 +1,7 @@
 #ifndef cl_expensive_object1338_h
 #define cl_expensive_object1338_h
 
- #include <QAtomicInt>
-
-
+ 
 class CLRefCounter
 {
 public:

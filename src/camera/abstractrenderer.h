@@ -2,7 +2,7 @@
 #define clabstract_draw_h_20_57
 
 #include "../decoders/video/frame_info.h"
-//#include <QWaitCondition>
+
 
 class CLAbstractRenderer
 {
