@@ -3,8 +3,6 @@
 
 
 #include "abstractaudiodecoder.h"
-#include "libavcodec\avcodec.h"
-
 
 
 // client of this class is responsible for encoded data buffer meet ffmpeg restrictions

@@ -1,8 +1,6 @@
 #include "ffmpeg_audio.h"
 
-#include "libavcodec/avcodec.h"
 #include "base/log.h"
-#include "../ffmpeg_dll/ffmpeg_dll.h"
 #include "base/aligned_data.h"
 
 struct AVCodecContext;
@@ -10,7 +8,6 @@ struct AVCodecContext;
 #define INBUF_SIZE 4096
 
 extern QMutex global_ffmpeg_mutex;
-extern FFMPEGCodecDll global_ffmpeg_dll;
 extern int MAX_AUDIO_FRAME_SIZE;
 
 bool CLFFmpegAudioDecoder::m_first_instance = true;
@@ -28,10 +25,10 @@ m_codec(codec_id)
 		m_first_instance = false;
 
 		// must be called before using avcodec 
-		global_ffmpeg_dll.avcodec_init();
+		avcodec_init();
 
 		// register all the codecs (you can also register only the codec you wish to have smaller code
-		global_ffmpeg_dll.avcodec_register_all();
+		avcodec_register_all();
 
 	}
 
@@ -41,36 +38,36 @@ m_codec(codec_id)
 	{
 
 	case CL_MP2:
-		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_MP2);
+		codec = avcodec_find_decoder(CODEC_ID_MP2);
 		break;
 
 	case CL_MP3:
-		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_MP3);
+		codec = avcodec_find_decoder(CODEC_ID_MP3);
 		break;
 
 		
 	case CL_AC3:
-		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_AC3);
+		codec = avcodec_find_decoder(CODEC_ID_AC3);
 		break;
 
 	case CL_AAC:
-		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_AAC);
+		codec = avcodec_find_decoder(CODEC_ID_AAC);
 		break;
 
 
 	case CL_WMAPRO:
-		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_WMAPRO);
+		codec = avcodec_find_decoder(CODEC_ID_WMAPRO);
 		break;
 
 	case CL_WMAV2:
-		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_WMAV2);
+		codec = avcodec_find_decoder(CODEC_ID_WMAV2);
 		break;
 
 		/*/
 		
 
 	case CL_ADPCM_MS:
-		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_ADPCM_MS);
+		codec = avcodec_find_decoder(CODEC_ID_ADPCM_MS);
 		break;
 
 		/**/
@@ -84,12 +81,12 @@ m_codec(codec_id)
 
 	}
 
-	c = global_ffmpeg_dll.avcodec_alloc_context();
+	c = avcodec_alloc_context();
 
 	if (codecContext) {
-		global_ffmpeg_dll.avcodec_copy_context(c, codecContext);
+		avcodec_copy_context(c, codecContext);
 	}
-	global_ffmpeg_dll.avcodec_open(c, codec);
+	avcodec_open(c, codec);
 
 
 }
@@ -100,8 +97,8 @@ CLFFmpegAudioDecoder::~CLFFmpegAudioDecoder(void)
 
 	if (c)
 	{
-		global_ffmpeg_dll.avcodec_close(c);
-		global_ffmpeg_dll.av_free(c);
+		avcodec_close(c);
+		av_free(c);
 	}
 
 }
@@ -150,7 +147,7 @@ bool CLFFmpegAudioDecoder::decode(CLAudioData& data)
 		}
 
 
-		int len = global_ffmpeg_dll.avcodec_decode_audio2(c, (short *)outbuf, &out_size,
+		int len = avcodec_decode_audio2(c, (short *)outbuf, &out_size,
 				inbuf_ptr, size);
 
 

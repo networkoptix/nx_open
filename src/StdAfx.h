@@ -1,5 +1,9 @@
-#if defined __cplusplus
+extern "C" {
+	#include <libavcodec/avcodec.h>
+	#include <libavformat/avformat.h>
+};
 
+#if defined __cplusplus
 #include <QAction>
 #include <QAudio>
 #include <QAudioFormat>

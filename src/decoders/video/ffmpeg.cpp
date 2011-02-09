@@ -1,11 +1,7 @@
 #include "ffmpeg.h"
 
 
-#include "..\ffmpeg_dll\ffmpeg_dll.h"
-
-
 extern QMutex global_ffmpeg_mutex;
-extern FFMPEGCodecDll global_ffmpeg_dll;
 
 
 #define LIGHT_CPU_MODE_FRAME_PERIOD 30
@@ -33,56 +29,56 @@ m_lightModeFrameCounter(0)
 		m_first_instance = false;
 
 		// must be called before using avcodec 
-		global_ffmpeg_dll.avcodec_init();
+		avcodec_init();
 
 		// register all the codecs (you can also register only the codec you wish to have smaller code
-		global_ffmpeg_dll.avcodec_register_all();
+		avcodec_register_all();
 
 	}
 
-	//codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_H264);
+	//codec = avcodec_find_decoder(CODEC_ID_H264);
 
 
 	switch(m_codec)
 	{
 	case CL_JPEG:
-		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_MJPEG);
+		codec = avcodec_find_decoder(CODEC_ID_MJPEG);
 		break;
 
 	case CL_MPEG2:
-		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_MPEG2VIDEO);
+		codec = avcodec_find_decoder(CODEC_ID_MPEG2VIDEO);
 		break;
 
 
 	case CL_MPEG4:
-		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_MPEG4);
+		codec = avcodec_find_decoder(CODEC_ID_MPEG4);
 		break;
 
 	case CL_MSMPEG4V2:
-		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_MSMPEG4V2);
+		codec = avcodec_find_decoder(CODEC_ID_MSMPEG4V2);
 		break;
 
 
 	case CL_MSMPEG4V3:
-		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_MSMPEG4V3);
+		codec = avcodec_find_decoder(CODEC_ID_MSMPEG4V3);
 		break;
 
 	case CL_MPEG1VIDEO:
-		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_MPEG1VIDEO);
+		codec = avcodec_find_decoder(CODEC_ID_MPEG1VIDEO);
 		break;
 
 
 
 	case CL_H264:
-		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_H264);
+		codec = avcodec_find_decoder(CODEC_ID_H264);
 	    break;
 
 	case CL_WMV3:
-		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_WMV3);
+		codec = avcodec_find_decoder(CODEC_ID_WMV3);
 		break;
 
 	case CL_MSVIDEO1:
-		codec = global_ffmpeg_dll.avcodec_find_decoder(CODEC_ID_MSVIDEO1);
+		codec = avcodec_find_decoder(CODEC_ID_MSVIDEO1);
 		break;
 	
 	default:
@@ -92,20 +88,20 @@ m_lightModeFrameCounter(0)
 
 	}
 
-	c = global_ffmpeg_dll.avcodec_alloc_context();
+	c = avcodec_alloc_context();
 
 	if (codecContext) {
-		global_ffmpeg_dll.avcodec_copy_context(c, codecContext);
+		avcodec_copy_context(c, codecContext);
 	}
 
-	picture = global_ffmpeg_dll.avcodec_alloc_frame();
+	picture = avcodec_alloc_frame();
 
 	//if(codec->capabilities&CODEC_CAP_TRUNCATED)	c->flags|= CODEC_FLAG_TRUNCATED;
 
 	//c->debug_mv = 1;
 
 	// TODO: check return value
-	if (global_ffmpeg_dll.avcodec_open(c, codec) < 0) 
+	if (avcodec_open(c, codec) < 0) 
 		codec = 0;
 
 }
@@ -114,9 +110,9 @@ CLFFmpegVideoDecoder::~CLFFmpegVideoDecoder(void)
 {
 	QMutexLocker mutex(&global_ffmpeg_mutex);
 
-	global_ffmpeg_dll.av_free(picture);
-	global_ffmpeg_dll.avcodec_close(c);
-	global_ffmpeg_dll.av_free(c);
+	av_free(picture);
+	avcodec_close(c);
+	av_free(c);
 }
 
 
@@ -188,9 +184,9 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 	/**/
 
 	int got_picture = 0;
-	global_ffmpeg_dll.avcodec_decode_video(c, picture, &got_picture,(unsigned char*)data.inbuf, data.buff_len);
+	avcodec_decode_video(c, picture, &got_picture,(unsigned char*)data.inbuf, data.buff_len);
 	if (data.use_twice)
-		global_ffmpeg_dll.avcodec_decode_video(c, picture, &got_picture,(unsigned char*)data.inbuf, data.buff_len);
+		avcodec_decode_video(c, picture, &got_picture,(unsigned char*)data.inbuf, data.buff_len);
 
 
 gotpicture:
@@ -210,7 +206,7 @@ gotpicture:
 
 
 		//if (m_showmotion)
-		//	global_ffmpeg_dll.ff_print_debug_info((MpegEncContext*)(c->priv_data), picture);
+		//	ff_print_debug_info((MpegEncContext*)(c->priv_data), picture);
 
 		data.out_frame.width = c->width;
 		data.out_frame.height = c->height;
@@ -258,7 +254,7 @@ gotpicture:
 	{
 		/*/			
 		// some times decoder wants to delay frame by one; we do not want that
-		global_ffmpeg_dll.avcodec_decode_video(c, picture, &got_picture,0, 0);
+		avcodec_decode_video(c, picture, &got_picture,0, 0);
 		if (got_picture)
 			goto gotpicture;
 

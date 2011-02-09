@@ -1,8 +1,6 @@
 #include "avi_strem_reader.h"
 #include "device\device.h"
-#include "avi_parser.h"
 
-#include "libavformat/avformat.h"
 #include "data/mediadata.h"
 #include "stdint.h"
 
@@ -43,17 +41,17 @@ bool CLAVIStreamReader::init()
 		firstInstance = false;
 
 		QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
-		avidll.av_register_all();
+		av_register_all();
 	}
 
 	m_cuur_time = 0;
 	m_prev_time = -1;
 	m_need_tosleep = 0;
 
-	m_formatContext = avidll.avformat_alloc_context();
+	m_formatContext = avformat_alloc_context();
 
 
-	int err = avidll.av_open_input_file(&m_formatContext, m_device->getUniqueId().toLatin1().data(), NULL, 0, NULL);
+	int err = av_open_input_file(&m_formatContext, m_device->getUniqueId().toLatin1().data(), NULL, 0, NULL);
 	if (err < 0)
 	{
 		destroy();
@@ -63,7 +61,7 @@ bool CLAVIStreamReader::init()
 	{
 		QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
 
-		err = avidll.av_find_stream_info(m_formatContext);
+		err = av_find_stream_info(m_formatContext);
 		if (err < 0)
 		{
 			destroy();
@@ -195,7 +193,7 @@ bool CLAVIStreamReader::init()
 	}
 
 	// Alloc common resources
-	avidll.av_init_packet(&m_packet);
+	av_init_packet(&m_packet);
 	return true;
 }
 
@@ -288,7 +286,7 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 		if (isSingleShotMode())
 			pause();
 
-		avidll.av_free_packet(&m_packet);
+		av_free_packet(&m_packet);
 		return videoData;
 
 	}
@@ -322,13 +320,13 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 
 		//cl_log.log("avi parser: au ps = ", (int)audioData->data.size(), cl_logALWAYS);
 
-		avidll.av_free_packet(&m_packet);
+		av_free_packet(&m_packet);
 		return audioData;
 	}
 	/**/
 
 	
-	avidll.av_free_packet(&m_packet);
+	av_free_packet(&m_packet);
 
 	return 0;
 
@@ -338,7 +336,7 @@ void CLAVIStreamReader::channeljumpTo(quint64 mksec, int channel)
 {
 	QMutexLocker mutex(&m_cs);
 
-	int err = avidll.avformat_seek_file(m_formatContext, -1, 0, mksec, _I64_MAX, AVSEEK_FLAG_BACKWARD);
+	int err = avformat_seek_file(m_formatContext, -1, 0, mksec, _I64_MAX, AVSEEK_FLAG_BACKWARD);
 	
 
 	if (err < 0) 
@@ -357,7 +355,7 @@ void CLAVIStreamReader::channeljumpTo(quint64 mksec, int channel)
 void CLAVIStreamReader::destroy()
 {
 	if (m_formatContext) // crashes without condition 
-		avidll.av_close_input_file(m_formatContext);
+		av_close_input_file(m_formatContext);
 
 	m_formatContext = 0;
 }
@@ -367,7 +365,7 @@ bool CLAVIStreamReader::getNextPacket()
 {
 	while(1)
 	{
-		int err = avidll.av_read_frame(m_formatContext, &m_packet);
+		int err = av_read_frame(m_formatContext, &m_packet);
 		if (err < 0)
 		{
 			if (err == AVERROR_EOF)
@@ -375,7 +373,7 @@ bool CLAVIStreamReader::getNextPacket()
 				destroy();
 				init();
 
-				err = avidll.av_read_frame(m_formatContext, &m_packet);
+				err = av_read_frame(m_formatContext, &m_packet);
 				if (err<0)
 					return false;
 
@@ -386,7 +384,7 @@ bool CLAVIStreamReader::getNextPacket()
 
 		if (m_packet.stream_index != m_videoStrmIndex && m_packet.stream_index != m_audioStrmIndex)
 		{
-			avidll.av_free_packet(&m_packet);
+			av_free_packet(&m_packet);
 			continue;
 		}
 

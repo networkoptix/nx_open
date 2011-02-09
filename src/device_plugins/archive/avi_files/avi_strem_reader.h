@@ -2,7 +2,6 @@
 #define avi_stream_reader_h1901
 
 #include "..\abstract_archive_stream_reader.h"
-#include "libavcodec/avcodec.h"
 #include "data/mediadata.h"
 
 

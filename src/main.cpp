@@ -12,10 +12,8 @@
 #include "device/device_managmen/device_manager.h"
 #include "ui/video_cam_layout/layout_manager.h"
 #include "ui/context_menu_helper.h"
-#include "device_plugins/archive/avi_files/avi_parser.h"
-#include "decoders/ffmpeg_dll/ffmpeg_dll.h"
 
-extern FFMPEGCodecDll global_ffmpeg_dll;
+QMutex global_ffmpeg_mutex;
 
 QString getRootDir() {
 	QString rootDir;
@@ -41,8 +39,33 @@ QString getRootDir() {
 	return QDir::fromNativeSeparators(rootDir.trimmed());
 }
 
+void decoderLogCallback(void* pParam, int i, const char* szFmt, va_list args)
+{
+	//USES_CONVERSION;
+
+	//Ignore debug and info (i == 2 || i == 1) messages
+	if(AV_LOG_ERROR != i)
+	{
+		//return;
+	}
+
+	AVCodecContext* pCtxt = (AVCodecContext*)pParam;
+
+
+
+	char szMsg[1024];
+	vsprintf(szMsg, szFmt, args);
+	//if(szMsg[strlen(szMsg)] == '\n')
+	{	
+		szMsg[strlen(szMsg)-1] = 0;
+	}
+
+	cl_log.log("FFMPEG ", szMsg, cl_logERROR);
+}
+
 int main(int argc, char *argv[])
 {
+//	av_log_set_callback(decoderLogCallback);
 
 	QApplication a(argc, argv);
 	QDir::setCurrent(QFileInfo(argv[0]).absolutePath());
@@ -54,9 +77,9 @@ int main(int argc, char *argv[])
 		return a.quit();
 
 #ifdef _DEBUG
-	cl_log.setLogLevel(cl_logDEBUG2);
+	cl_log.setLogLevel(cl_logDEBUG1);
 
-	cl_log.setLogLevel(cl_logWARNING);
+	//cl_log.setLogLevel(cl_logWARNING);
 #else
 	cl_log.setLogLevel(cl_logWARNING);
 #endif
@@ -77,20 +100,6 @@ int main(int argc, char *argv[])
 
 	//===========================================================================
 	//IPPH264Decoder::dll.init();
-	if (!global_ffmpeg_dll.init() || !avidll.init())
-	{
-		cl_log.log("Cannot load FFMPEG dlls", cl_logERROR);
-		QMessageBox msgBox;
-		msgBox.setText("Error");
-		msgBox.setInformativeText("Cannot load FFMPEG dlls");
-		msgBox.setStandardButtons(QMessageBox::Ok);
-		msgBox.setDefaultButton(QMessageBox::Ok);
-		msgBox.setIcon(QMessageBox::Critical);
-		msgBox.exec();
-		return a.quit();
-	}
-
-
 
 	CLVideoDecoderFactory::setCodecManufacture(CLVideoDecoderFactory::FFMPEG);
 
