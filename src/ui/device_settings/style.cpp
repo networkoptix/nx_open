@@ -1,4 +1,5 @@
 #include "style.h"
+#include "base\log.h"
 
 
 
@@ -10,7 +11,19 @@ QPixmap cached(const QString &img)
 	QPixmap pm;
 	pm = QPixmap::fromImage(QImage(img), Qt::OrderedDither | Qt::OrderedAlphaDither);
 	if (pm.isNull())
+	{
+		cl_log.log("Cannot load image ", img, cl_logERROR);
+		QMessageBox msgBox;
+		msgBox.setText("Error");
+		msgBox.setInformativeText(QString("Cannot load image ") +  img);
+		msgBox.setStandardButtons(QMessageBox::Ok);
+		msgBox.setDefaultButton(QMessageBox::Ok);
+		msgBox.setIcon(QMessageBox::Warning);
+		msgBox.exec();
+
+
 		return QPixmap();
+	}
 
 	QPixmapCache::insert(img, pm);
 	return pm;

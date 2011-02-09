@@ -29,7 +29,16 @@ AVDeviceServer::AVDeviceServer()
 			log+=error;
 			cl_log.log(log, cl_logERROR);
 		}
-		
+
+		cl_log.log("Cannot load /arecontvision/devices.xml", cl_logERROR);
+		QMessageBox msgBox;
+		msgBox.setText("Error");
+		msgBox.setInformativeText("Cannot load /arecontvision/devices.xml");
+		msgBox.setStandardButtons(QMessageBox::Ok);
+		msgBox.setDefaultButton(QMessageBox::Ok);
+		msgBox.setIcon(QMessageBox::Warning);
+		msgBox.exec();
+	
 	}
 
 }
