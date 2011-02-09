@@ -67,6 +67,8 @@ public:
 
 	void instantArrange();
 
+	void updateTransform(qreal angle);
+
 signals:
 	void scneZoomFinished();
 	void onDecorationPressed(LayoutContent*, QString);
@@ -139,8 +141,7 @@ public slots:
 	void fitInView(int duration = 700 , int delay = 0, CLAnimationTimeLine::CLAnimationCurve curve =  CLAnimationTimeLine::SLOW_END_POW_40);
 private slots:
 	void onScneZoomFinished();
-	void onShowTimer();
-	void onShowStart();
+	void onSecTimer();
 	void onDecorationItemPressed(QString);
 
 	void onArrange_helper_finished();
@@ -152,9 +153,7 @@ protected:
 	int m_xRotate;
 	qreal m_yRotate;
 	
-	void updateTransform(qreal angle);
-
-	
+		
 	/**/
 
 
@@ -193,6 +192,8 @@ protected:
 	QGraphicsPixmapItem* m_logo;
 
 	Show_helper mShow;
+
+	QTimer m_secTimer;
 
 	bool mZerroDistance;
 	qreal m_old_distance;

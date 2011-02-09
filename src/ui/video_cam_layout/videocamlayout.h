@@ -67,6 +67,7 @@ public:
 
 
 	QList<CLAbstractSceneItem*> getItemList() const;
+	QList<CLAbstractSceneItem*>* getItemListPointer();
 	bool hasSuchItem(const CLAbstractSceneItem* item) const;
 
 	void makeAllItemsSelectable(bool selectable);

@@ -76,7 +76,8 @@ mZerroDistance(true),
 mViewStarted(false),
 m_fps_frames(0),
 m_seachItem(0),
-m_min_scene_zoom(0.06)
+m_min_scene_zoom(0.06),
+mShow(this)
 {
 
 	setScene(&m_scene);
@@ -127,12 +128,12 @@ m_min_scene_zoom(0.06)
 	setPalette(palette);
 
 
-
-	connect(&mShow.mTimer, SIGNAL(timeout ()), this , SLOT(onShowTimer()) );
+	
+	connect(&m_secTimer, SIGNAL(timeout ()), this , SLOT(onSecTimer()) );
 	connect(&m_scenezoom, SIGNAL(finished()), this , SLOT(onScneZoomFinished()) );
 
-	mShow.mTimer.setInterval(1000);
-	mShow.mTimer.start();
+	m_secTimer.setInterval(1000);
+	m_secTimer.start();
 
 	setAcceptDrops(true);
 
@@ -319,100 +320,47 @@ void GraphicsView::updateTransform(qreal angle)
 
 }
 
-void GraphicsView::onShowTimer()
+void GraphicsView::onSecTimer()
 {
 	if (!mViewStarted) // we are about to stop this view
 		return;
 
-	if (!mShow.showTime)
+	if (!mShow.isShowTime())
 	{
-		mShow.mTimer.setInterval(1000);
-		mShow.counrer++;
+
+		++mShow.m_counrer;
 		
-		if (mShow.counrer>4*60)
+		if (mShow.m_counrer>4*60)
 		{
-			QList<CLAbstractSceneItem*> wndlst = m_camLayout.getItemList();
-			qreal total = wndlst.size();
-			if (total<2)
+			if (m_camLayout.getItemList().count()<2)
 			{
-				mShow.counrer = 0;
+				mShow.m_counrer = 0;
 				return;
 			}
 
-			mShow.mTimer.stop();
+			mShow.setShowTime(true);
+
 			onCircle_helper(true);
-			mShow.showTime = true;
-			
+
 		}
 			
-	}
-	else // show m_fps_time
-	{
-		mShow.value++;
-		QList<CLAbstractSceneItem*> wndlst = m_camLayout.getItemList();
-		qreal total = wndlst.size();
-
-		int i = 0;
-
-		foreach (CLAbstractSceneItem* item, wndlst)
-		{
-			QPointF pos ( mShow.center.x() + cos((i / total) * 6.28 + mShow.value/100.0) * mShow.radius , mShow.center.y() + sin((i / total) * 6.28 + mShow.value/100.0) * mShow.radius ) ;
-
-			item->setPos(pos);
-
-			item->setRotation(item->getRotation() - 4.0/cl_get_random_val(7,10));
-
-
-			++i;
-		}
-
-		// scene rotation===========
-		{
-			const int max_val = 800;
-
-			if (mShow.value<max_val/2)
-				updateTransform(-0.001);
-			else
-			{
-				int mod = (mShow.value - max_val/2)%max_val;
-				if (mod==0)	mShow.positive_dir = !mShow.positive_dir;
-
-			
-				if (mShow.positive_dir)
-					updateTransform(0.001);
-				else
-					updateTransform(-0.001);
-			}
-		}
-		// scene rotation===========
-
-
 	}
 
 }
 
-void GraphicsView::onShowStart()
-{
-	if (mShow.showTime)
-	{
-		mShow.mTimer.setInterval(1000/60);
-		mShow.value = 0;
-	}
-	mShow.mTimer.start();
-
-}
 
 void GraphicsView::showStop_helper()
 {
-	mShow.counrer = 0;
-	if (mShow.showTime)
+	mShow.m_counrer = 0;
+	if (mShow.isShowTime())
 	{
-		mShow.showTime = 0;
-		mShow.mTimer.setInterval(1000);
+		mShow.stopAnimation();
+		mShow.setShowTime(false);
 		if (mViewStarted) // if we are not about to stop this view
 			onArrange_helper();
-		mShow.mTimer.start();
 	}
+
+
 
 }
 
@@ -1619,7 +1567,7 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 			break;
 
 		case Qt::Key_X:
-			mShow.counrer+=10*60;
+			mShow.m_counrer+=10*60;
 			break;
 
 
@@ -2041,9 +1989,10 @@ void GraphicsView::onCircle_helper(bool show)
 	
 	m_camLayout.updateSceneRect();
 	QRectF item_rect = m_camLayout.getGridEngine().getGridRect();
-	mShow.center = item_rect.center();
 
-	mShow.radius = max(item_rect.width(), item_rect.height())/8;
+	mShow.setCenterPoint(item_rect.center());
+	mShow.setRadius(max(item_rect.width(), item_rect.height())/8);
+	mShow.setItems(m_camLayout.getItemListPointer());
 	
 
 	int i = 0;
@@ -2067,7 +2016,7 @@ void GraphicsView::onCircle_helper(bool show)
 
 		anim2->setStartValue(item->pos());
 
-		anim2->setEndValue( QPointF ( mShow.center.x() + cos((i / total) * 6.28) * mShow.radius , mShow.center.y() + sin((i / total) * 6.28) * mShow.radius ) );
+		anim2->setEndValue( QPointF ( mShow.getCenter().x() + cos((i / total) * 6.28) * mShow.getRadius(), mShow.getCenter().y() + sin((i / total) * 6.28) * mShow.getRadius() ) );
 
 
 		anim2->setDuration(1500 + cl_get_random_val(0, 300));
@@ -2083,7 +2032,7 @@ void GraphicsView::onCircle_helper(bool show)
 	
 
 	if (show)
-		connect(groupAnimation, SIGNAL(finished ()), this, SLOT(onShowStart()));
+		connect(groupAnimation, SIGNAL(finished ()), &mShow, SLOT(start()));
 
 	connect(groupAnimation, SIGNAL(finished ()), this, SLOT(fitInView()));
 

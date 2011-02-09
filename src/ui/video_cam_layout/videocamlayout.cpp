@@ -583,6 +583,10 @@ QList<CLAbstractSceneItem*> SceneLayout::getItemList() const
 	return m_items;
 }
 
+QList<CLAbstractSceneItem*>* SceneLayout::getItemListPointer() 
+{
+	return &m_items;
+}
 
 
 bool SceneLayout::hasSuchItem(const CLAbstractSceneItem* item) const
