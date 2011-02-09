@@ -32,15 +32,22 @@
             </Component>
 
             <Component Id="QTLibraries" Guid="3E273FF1-35A7-44da-864C-61EE9E9B7EA8">
-              <File Id="QtCored4" Name="QtCored4.dll" Source="C:\Qt\4.7.1\bin\QtCored4.dll"/>
-              <File Id="QtGuid4" Name="QtGuid4.dll" Source="C:\Qt\4.7.1\bin\QtGuid4.dll"/>
-              <File Id="QtMultimediad4" Name="QtMultimediad4.dll" Source="C:\Qt\4.7.1\bin\QtMultimediad4.dll"/>
-              <File Id="QtNetworkd4" Name="QtNetworkd4.dll" Source="C:\Qt\4.7.1\bin\QtNetworkd4.dll"/>
-              <File Id="QtOpenGLd4" Name="QtOpenGLd4.dll" Source="C:\Qt\4.7.1\bin\QtOpenGLd4.dll"/>
-              <File Id="QtWebKitd4" Name="QtWebKitd4.dll" Source="C:\Qt\4.7.1\bin\QtWebKitd4.dll"/>
-              <File Id="QtXmld4" Name="QtXmld4.dll" Source="C:\Qt\4.7.1\bin\QtXmld4.dll"/>
+              <File Id="QtCore4" Name="QtCore4.dll" Source="C:\Qt\4.7.1\bin\QtCore4.dll"/>
+              <File Id="QtGui4" Name="QtGui4.dll" Source="C:\Qt\4.7.1\bin\QtGui4.dll"/>
+              <File Id="QtMultimedia4" Name="QtMultimedia4.dll" Source="C:\Qt\4.7.1\bin\QtMultimedia4.dll"/>
+              <File Id="QtNetwork4" Name="QtNetwork4.dll" Source="C:\Qt\4.7.1\bin\QtNetwork4.dll"/>
+              <File Id="QtOpenGL4" Name="QtOpenGL4.dll" Source="C:\Qt\4.7.1\bin\QtOpenGL4.dll"/>
+              <File Id="QtWebKit4" Name="QtWebKit4.dll" Source="C:\Qt\4.7.1\bin\QtWebKit4.dll"/>
+              <File Id="QtXml4" Name="QtXml4.dll" Source="C:\Qt\4.7.1\bin\QtXml4.dll"/>
               <File Id="QtXmlPatterns4" Name="QtXmlPatterns4.dll" Source="C:\Qt\4.7.1\bin\QtXmlPatterns4.dll"/>
+              <File Id="phonon4" Name="phonon4.dll" Source="C:\Qt\4.7.1\bin\phonon4.dll"/>
             </Component>
+
+            <Directory Id="arecontvision" Name="arecontvision">
+              <Component Id="arecontvision" Guid="3A62601C-9F6A-45b0-AEFB-8C5DD70437F0">
+                <File Id="devicesxml" Name="devices.xml" Source="../bin/arecontvision/devices.xml"/>
+              </Component>
+            </Directory>
             
             <Component Id='Settings' Guid='D5B8FC1A-6828-4e66-B1D1-13BD2FD6EDA8'>
               <File Id='XmlSettings' Name='settings.xml' DiskId='1' Source='../bin/settings.xml' Vital='yes' />
@@ -77,6 +84,7 @@
        <ComponentRef Id="QTLibraries" />
        <ComponentRef Id='ProgramMenuDir' />
        <ComponentRef Id='Settings'/>
+       <ComponentRef Id='arecontvision'/>
        <ComponentGroupRef Id='group_skin'/>
 
       <!-- Note: The following ComponentGroupRef is required to pull in generated authoring from project references. -->
