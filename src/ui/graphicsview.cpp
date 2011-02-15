@@ -21,6 +21,7 @@
 #include "videoitem/web_item.h"
 #include "../src/corelib/animation/qpropertyanimation.h"
 #include "animation/group_animation.h"
+#include "videoitem/grid_item.h"
 
 
 int doubl_clk_delay = qApp->doubleClickInterval()*0.75;
@@ -77,7 +78,8 @@ mViewStarted(false),
 m_fps_frames(0),
 m_seachItem(0),
 m_min_scene_zoom(0.06),
-mShow(this)
+mShow(this),
+m_gridItem(0)
 {
 
 	setScene(&m_scene);
@@ -140,6 +142,12 @@ mShow(this)
 	//=======animation====
 	m_animationManager.registerAnimation(&m_movement);
 	m_animationManager.registerAnimation(&m_scenezoom);
+
+
+	m_gridItem = new CLGridItem(this);
+	m_scene.addItem(m_gridItem);
+	m_gridItem->setPos(m_camLayout.getGridEngine().getSettings().left, m_camLayout.getGridEngine().getSettings().top);
+
 
 }
 
@@ -425,7 +433,7 @@ void GraphicsView::initDecoration()
 
 	if (cont->checkDecorationFlag(LayoutContent::BackGroundLogo))
 	{
-		item = new CLUnMovedPixture("background", 0, 0.03, 0.03, "./skin/logo.png", viewport()->width(), viewport()->height(), -1);
+		item = new CLUnMovedPixture("background", 0, 0.03, 0.03, "./skin/logo.png", viewport()->width(), viewport()->height(), -100);
 		item->setStaticPos(QPoint(1,1));
 		addStaticItem(item);
 	}
@@ -1518,6 +1526,8 @@ void GraphicsView::keyReleaseEvent( QKeyEvent * e )
 		//QGraphicsView::mouseReleaseEvent(&fake); //some how need to update RubberBand area // very dangerous!!!
 
 		//enableMultipleSelection(false, false);
+
+		m_gridItem->hide(2000);
 		break;
 
 	}
@@ -1564,6 +1574,7 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 
 		case Qt::Key_Control:
 			enableMultipleSelection(true);
+			m_gridItem->show(2000);
 			break;
 
 		case Qt::Key_X:

@@ -16,6 +16,32 @@ struct CLIdealItemPos
 
 struct CLGridSettings
 {
+	// returns slot width including distance between items
+	int totalSlotWidth() const
+	{
+		return slot_width*(1+item_distance);
+	}
+
+	// returns slot height including distance between items
+	int totalSlotHeight() const
+	{
+		return slot_height*(1+item_distance);
+	}
+
+	// returns Horizontal item shift inside slot based on item distance
+	int insideSlotShiftH() const
+	{
+		return slot_width*item_distance/2;
+	}
+
+	// returns Vertical item shift inside slot based on item distance
+	int insideSlotShiftV() const
+	{
+		return slot_height*item_distance/2;
+	}
+
+
+
 	int left;
 	int top;
 
@@ -55,6 +81,10 @@ public:
 
 	// returns grid rect in scene coordinates 
 	QRect getGridRect() const;
+
+	// returns grid rect in terms of slots 
+	QRect gridSlotRect() const;
+
 
 	QList<CLIdealItemPos> calcArrangedPos() const;
 

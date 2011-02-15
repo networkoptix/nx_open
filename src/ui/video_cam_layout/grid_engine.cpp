@@ -59,7 +59,37 @@ bool CLGridEngine::isSpaceAvalable() const
 	return m_settings.items->count() < m_settings.max_items;
 }
 
+QRect CLGridEngine::gridSlotRect() const
+{
+	CLAbstractSceneItem* item =  getVeryLeftItem();
 
+	if (!item) // nos single video on this lay out
+		return QRect(0,0,0,0);
+
+	int left = item->mapToScene(item->boundingRect().topLeft()).x();
+
+	item =  getVeryTopItem();
+	int top = item->mapToScene(item->boundingRect().topLeft()).y();
+
+	item =  getVeryRightItem();
+	int right = item->mapToScene(item->boundingRect().bottomRight()).x();
+
+	item =  getVeryBottomItem();
+	int bottom = item->mapToScene(item->boundingRect().bottomRight()).y();
+
+	
+	int slot_left_x, slot_top_y;
+	slotFromPos(QPoint(left, top), slot_left_x, slot_top_y);
+	
+	int slot_right_x, slot_bottom_y;
+	slotFromPos(QPoint(right, bottom), slot_right_x, slot_bottom_y);
+
+
+	return QRect(QPoint(slot_left_x, slot_top_y), QPoint(slot_right_x, slot_bottom_y));
+
+	//return QSize((right - left)/m_settings.totalSlotWidth() + 1,  (bottom - top)/m_settings.totalSlotHeight() + 1);
+	
+}
 
 QRect CLGridEngine::getGridRect() const
 {
@@ -645,13 +675,14 @@ void CLGridEngine::slotFromPos(QPoint p, int& slot_x, int& slot_y) const
 	int x = p.x() - m_settings.left;
 	int y = p.y() - m_settings.top;
 
-	slot_x = x/( m_settings.slot_width*(1+m_settings.item_distance - 1e-10) );
-	slot_y = y/( m_settings.slot_height*(1+m_settings.item_distance - 1e-10) );
+	slot_x = floor(x/( m_settings.slot_width*(1+m_settings.item_distance - 1e-10) ));
+	slot_y = floor(y/( m_settings.slot_height*(1+m_settings.item_distance - 1e-10) ));
 }
 
 QPoint CLGridEngine::posFromSlot(int slot_x, int slot_y) const
 {
-	return QPoint(m_settings.left + slot_x*m_settings.slot_width*(1+m_settings.item_distance), m_settings.top + slot_y*m_settings.slot_height*(1+m_settings.item_distance));
+	return QPoint(m_settings.left + slot_x*m_settings.slot_width*(1+m_settings.item_distance) + m_settings.insideSlotShiftH(), 
+				  m_settings.top + slot_y*m_settings.slot_height*(1+m_settings.item_distance) + m_settings.insideSlotShiftV());
 }
 
 bool CLGridEngine::isSlotAvailable(int slot_x, int slot_y, QSize size) const

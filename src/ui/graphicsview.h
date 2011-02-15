@@ -19,6 +19,7 @@ class CLAbstractUnmovedItem;
 class QParallelAnimationGroup;
 class QInputEvent;
 class CLSerachEditItem;
+class CLGridItem;
 
 class GraphicsView: public QGraphicsView 
 {
@@ -215,6 +216,8 @@ protected:
 
 
 	CLAnimationManager m_animationManager;
+
+	CLGridItem* m_gridItem;
 
 };
 
