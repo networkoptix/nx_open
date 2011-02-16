@@ -535,6 +535,10 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 	if (!mViewStarted)
 		return;
 
+	if (m_gridItem->isVisible() && !isCTRLPressed(event))
+		m_gridItem->hide();
+
+
 	m_yRotate = 0;
 
 	stopAnimation();
@@ -622,6 +626,10 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
 	if (!mViewStarted)
 		return;
+
+	if (m_gridItem->isVisible() && !isCTRLPressed(event))
+		m_gridItem->hide();
+
 
 
 	QGraphicsItem *item = itemAt(event->pos());
@@ -1527,7 +1535,7 @@ void GraphicsView::keyReleaseEvent( QKeyEvent * e )
 
 		//enableMultipleSelection(false, false);
 
-		m_gridItem->hide(2000);
+		m_gridItem->hide(global_grid_aparence_delay);
 		break;
 
 	}
@@ -1574,7 +1582,7 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 
 		case Qt::Key_Control:
 			enableMultipleSelection(true);
-			m_gridItem->show(2000);
+			m_gridItem->show(global_grid_aparence_delay);
 			break;
 
 		case Qt::Key_X:
