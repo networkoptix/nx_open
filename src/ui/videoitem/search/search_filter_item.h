@@ -14,7 +14,7 @@ public:
 	~CLSerachEditItem();
 	void resize();
 
-	
+
 protected slots:
 	void onEditTextChanged (const QString & text);
 	void onTimer(); 

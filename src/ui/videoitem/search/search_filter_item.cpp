@@ -12,6 +12,7 @@ m_width(100),
 m_height(100)
 {
 	m_lineEdit = new CLSearchEdit(this);
+	m_lineEdit->setFocus();
 
 	
 	QString style (
