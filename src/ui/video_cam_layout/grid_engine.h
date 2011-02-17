@@ -94,7 +94,14 @@ public:
 
 	void adjustItem(CLAbstractSceneItem* item) const;
 
+	// returns adjusted pos for this item
+	QPoint adjustedPosForItem(CLAbstractSceneItem* item) const;//+
 
+
+	// returns adjusted pos for this item if item will be putted on this slot
+	QPoint adjustedPosForSlot(CLAbstractSceneItem* item, int slot_x, int slot_y) const ;//+
+
+	void slotFromPos(QPoint p, int& slot_x, int& slot_y) const;
 
 	// return wnd on the center of the lay out;
 	// returns 0 if there is no wnd at all
@@ -110,6 +117,9 @@ public:
 	// and intersection of the items more than some threshold ( like 60%)
 	CLAbstractSceneItem* getItemToSwapWith(CLAbstractSceneItem* item) const;
 
+	// returns true if can be dropped inside empty slot(s); if slot is busy function returns false. this function complete getItemToSwapWith
+	bool canBeDropedHere(CLAbstractSceneItem* item) const;
+
 
 private:
 	CLAbstractSceneItem* next_item_helper(const CLAbstractSceneItem* curr, int dir_c, int dir_f) const;
@@ -124,9 +134,17 @@ private:
 	QPoint getMassCenter() const;
 
 
-	void slotFromPos(QPoint p, int& slot_x, int& slot_y) const;
+	// returns slot pos for item
+	void getItemSlotPos(CLAbstractSceneItem* item, int& slot_x, int& slot_y) const;
+
+
+	// returns position of the slot 
+	QPoint slotPos(int slot_x, int slot_y) const;
+
+
+	// returns position item inside the slot( not arranged )
 	QPoint posFromSlot(int slot_x, int slot_y) const;
-	bool isSlotAvailable(int slot_x, int slot_y, QSize size) const;
+	bool isSlotAvailable(int slot_x, int slot_y, QSize size, CLAbstractSceneItem* ignoreItem = 0) const;
 	
 
 	// how many slots window occupies 

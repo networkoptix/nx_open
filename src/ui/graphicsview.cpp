@@ -722,9 +722,9 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 				item->setPos(wnd_pos+delta);
 				item->setArranged(false);
 
-				item->setZValue(global_base_scene_z_level + 1); // moving items should be on top
+				item->setZValue(global_base_scene_z_level + 2); // moving items should be on top
 
-				if (m_camLayout.getGridEngine().getItemToSwapWith(item))
+				if (m_camLayout.getGridEngine().getItemToSwapWith(item) || m_camLayout.getGridEngine().canBeDropedHere(item))
 					item->setCanDrop(true);
 				else
 					item->setCanDrop(false);
@@ -1032,60 +1032,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 	{
 		if (m_movingWnd>3)// if we did move selected wnds => unselect it
 		{
-			bool first_animation = true;
-			CLParallelAnimationGroup*  groupAnimation;
-
-			foreach(QGraphicsItem* itm, m_scene.selectedItems())
-			{
-				CLAbstractSceneItem* item = static_cast<CLAbstractSceneItem*>(itm);
-				item->setZValue(global_base_scene_z_level+0.01); // should not be on top any more
-				item->setCanDrop(false);
-
-				CLAbstractSceneItem* item_to_swap_with = m_camLayout.getGridEngine().getItemToSwapWith(item);
-				if (!item_to_swap_with)
-					continue;
-
-				
-				if (first_animation)
-				{
-					stopAnimation();
-					groupAnimation = new CLParallelAnimationGroup;
-					first_animation = false;
-				}
-
-				QPointF item_to_swap_with_newPos = item->getOriginalPos();
-				QPointF item_newPos = item_to_swap_with->scenePos();
-
-				QPropertyAnimation *anim = new QPropertyAnimation(item, "pos");
-				anim->setStartValue(item->pos());
-				anim->setEndValue(item_newPos);
-				anim->setDuration(1000 + cl_get_random_val(0, 300));
-				anim->setEasingCurve(QEasingCurve::InOutBack);
-				groupAnimation->addAnimation(anim);
-				item->setArranged(false);
-
-				anim = new QPropertyAnimation(item_to_swap_with, "pos");
-				anim->setStartValue(item_to_swap_with->pos());
-				anim->setEndValue(item_to_swap_with_newPos);
-				anim->setDuration(1000 + cl_get_random_val(0, 300));
-				anim->setEasingCurve(QEasingCurve::InOutBack);
-				groupAnimation->addAnimation(anim);
-				item->setArranged(false);
-
-
-			}
-
-			m_scene.clearSelection();
-
-			if (!first_animation)
-			{
-				groupAnimation->setDeleteAfterFinished(true);
-				groupAnimation->start();
-				m_animationManager.registerAnimation(groupAnimation);
-			}
-
-
-			
+			navigation_grid_items_drop_helper();
 		}
 
 		if (m_movingWnd)
@@ -2518,4 +2465,106 @@ void GraphicsView::contextMenuHelper_Rotation(CLAbstractSceneItem* wnd, qreal an
 
 	wnd->z_rotate_abs(center_point_item, angle, 600, 0);
 
+}
+
+void GraphicsView::navigation_grid_items_drop_helper()
+{
+	bool first_animation = true;
+	CLParallelAnimationGroup*  groupAnimation;
+
+	CLGridEngine& ge = m_camLayout.getGridEngine();
+
+	foreach(QGraphicsItem* itm, m_scene.selectedItems())
+	{
+		CLAbstractSceneItem* item = static_cast<CLAbstractSceneItem*>(itm);
+		item->setCanDrop(false);
+
+		CLAbstractSceneItem* item_to_swap_with = m_camLayout.getGridEngine().getItemToSwapWith(item);
+
+		if (first_animation)
+		{
+			stopAnimation();
+			groupAnimation = new CLParallelAnimationGroup;
+			first_animation = false;
+		}
+
+
+		if (item_to_swap_with) // if we have smoothing to swap with
+		{
+			int original_slot_x, original_slot_y;
+			ge.slotFromPos(item->getOriginalPos().toPoint(), original_slot_x, original_slot_y);
+			QPointF item_to_swap_with_newPos = ge.adjustedPosForSlot(item_to_swap_with, original_slot_x, original_slot_y);
+
+
+			int new_slot_x, new_slot_y;
+			ge.slotFromPos(item_to_swap_with->scenePos().toPoint(), new_slot_x, new_slot_y);
+			QPointF item_newPos = ge.adjustedPosForSlot(item, new_slot_x, new_slot_y);
+
+			QPropertyAnimation *anim = new QPropertyAnimation(item, "pos");
+			anim->setStartValue(item->pos());
+			anim->setEndValue(item_newPos);
+			anim->setDuration(1000 + cl_get_random_val(0, 300));
+			anim->setEasingCurve(QEasingCurve::InOutBack);
+			groupAnimation->addAnimation(anim);
+			item->setArranged(false);
+
+
+			item_to_swap_with->setZValue(global_base_scene_z_level + 1); // this item 
+			anim = new QPropertyAnimation(item_to_swap_with, "pos");
+			anim->setStartValue(item_to_swap_with->pos());
+			anim->setEndValue(item_to_swap_with_newPos);
+			anim->setDuration(1000 + cl_get_random_val(0, 300));
+			anim->setEasingCurve(QEasingCurve::InOutBack);
+			groupAnimation->addAnimation(anim);
+			item_to_swap_with->setArranged(false);
+		}
+		else if (ge.canBeDropedHere(item)) // just adjust the item 
+		{
+			QPropertyAnimation *anim = new QPropertyAnimation(item, "pos");
+			anim->setStartValue(item->pos());
+			anim->setEndValue(ge.adjustedPosForItem(item));
+			anim->setDuration(1000 + cl_get_random_val(0, 300));
+			anim->setEasingCurve(QEasingCurve::InOutBack);
+			groupAnimation->addAnimation(anim);
+			item->setArranged(false);
+		}
+		else // item should be moved to original position, and adjust it 
+		{
+			int original_slot_x, original_slot_y;
+			ge.slotFromPos(item->getOriginalPos().toPoint(), original_slot_x, original_slot_y);
+			
+			QPropertyAnimation *anim = new QPropertyAnimation(item, "pos");
+			anim->setStartValue(item->pos());
+			anim->setEndValue(ge.adjustedPosForSlot(item, original_slot_x, original_slot_y));
+			anim->setDuration(1000 + cl_get_random_val(0, 300));
+			anim->setEasingCurve(QEasingCurve::InOutBack);
+			groupAnimation->addAnimation(anim);
+			item->setArranged(false);
+		}
+		
+
+
+	}
+
+	m_scene.clearSelection();
+
+	if (!first_animation)
+	{
+		groupAnimation->setDeleteAfterFinished(true);
+		groupAnimation->start();
+		connect(groupAnimation, SIGNAL(finished()), this, SLOT(on_grid_drop_animation_finished()));
+		m_animationManager.registerAnimation(groupAnimation);
+	}
+
+
+}
+
+void GraphicsView::on_grid_drop_animation_finished()
+{
+	foreach(CLAbstractSceneItem* itm, m_camLayout.getItemList())
+	{
+		itm->setZValue(global_base_scene_z_level);
+		itm->setArranged(true);
+	}
+	m_camLayout.updateSceneRect();
 }

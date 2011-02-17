@@ -136,6 +136,9 @@ protected:
 	void contextMenuHelper_viewRecordedVideo(CLVideoCamera* cam);
 	void contextMenuHelper_openInWebBroser(CLVideoCamera* cam);
 	void contextMenuHelper_Rotation(CLAbstractSceneItem* wnd, qreal angle);
+	//==========================
+
+	void navigation_grid_items_drop_helper();
 
 public slots:
 	
@@ -144,8 +147,9 @@ private slots:
 	void onScneZoomFinished();
 	void onSecTimer();
 	void onDecorationItemPressed(QString);
-
 	void onArrange_helper_finished();
+
+	void on_grid_drop_animation_finished();
 protected:
 	
 	QGraphicsScene m_scene;

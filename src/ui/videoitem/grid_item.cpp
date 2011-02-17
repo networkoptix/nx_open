@@ -32,6 +32,8 @@ void CLGridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 	int total_width = unit_width*grid_rect.width();
 	int total_height = unit_height*grid_rect.height();
 
+	int line_width = base_line_width + qMin( qMax(total_width, total_height)*4 ,100);
+
 	int left = grid_rect.left()*unit_width;
 	int top = grid_rect.top()*unit_height;
 

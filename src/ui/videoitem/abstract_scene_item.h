@@ -21,6 +21,7 @@ public:
 
 	enum CLSceneItemType {VIDEO, IMAGE, BUTTON, RECORDER, LAYOUT};
 
+
 	CLAbstractSceneItem(GraphicsView* view, int max_width, int max_height,
 						QString name="");
 

@@ -199,8 +199,6 @@ QRect CLVideoWindowItem::getSubChannelRect(unsigned int channel) const
 
 void CLVideoWindowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-	
-	
 	if (m_first_draw)
 	{
 		return;

@@ -18,4 +18,6 @@ extern qreal global_decoration_max_opacity;
 
 extern qreal global_base_scene_z_level;
 
+extern int global_grid_aparence_delay;
+
 #endif //global_settings_h1933

@@ -299,7 +299,7 @@ bool CLGridEngine::getNextAvailablePos(QSize size, int &x_pos, int &y_pos) const
 				best_x_slot_pos = x;
 				best_y_slot_pos = y;
 
-				if (x==max_column_to_try) // to take fist posittion in the row 
+				if (x==max_column_to_try) // to take fist position in the row 
 					last_column_taken = true;
 
 				if (y==max_row_to_try)
@@ -322,22 +322,18 @@ bool CLGridEngine::getNextAvailablePos(QSize size, int &x_pos, int &y_pos) const
 	
 }
 
-void CLGridEngine::adjustItem(CLAbstractSceneItem* item) const
+
+QPoint CLGridEngine::adjustedPosForItem(CLAbstractSceneItem* item) const 
 {
-	QPointF p = item->mapToScene(item->boundingRect().center());
-	p-=QPointF(item->width()/2 - 1e-7, item->height()/2 - 1e-7); // this addition as not good at all; due to item zoom topLeft pos might be shifted to diff slot; case1
-
-
 	int slot_x, slot_y;
-	slotFromPos( QPoint(p.x(),p.y()), slot_x,  slot_y);
-
-	if (slot_x<0 || slot_y<0)
-	{
-		Q_ASSERT(false);
-		return;
-	}
+	getItemSlotPos(item, slot_x, slot_y);
+	return adjustedPosForSlot(item, slot_x,  slot_y);
+}
 
 
+
+QPoint CLGridEngine::adjustedPosForSlot(CLAbstractSceneItem* item, int slot_x, int slot_y) const 
+{
 	QPoint new_p  = posFromSlot( slot_x , slot_y ); 
 
 	int width = item->width();
@@ -348,8 +344,22 @@ void CLGridEngine::adjustItem(CLAbstractSceneItem* item) const
 	new_p.rx() += (max_size.width() - width)/2;
 	new_p.ry() += (max_size.height() - height)/2;
 
-	item->setPos(new_p);
+	return new_p;
+}
 
+void CLGridEngine::getItemSlotPos(CLAbstractSceneItem* item, int& slot_x, int& slot_y) const
+{
+	QPointF p = item->mapToScene(item->boundingRect().center());
+	p-=QPointF(item->width()/2 - 1e-7, item->height()/2 - 1e-7); // this addition as not good at all; due to item zoom topLeft pos might be shifted to diff slot; case1
+
+	slotFromPos( QPoint(p.x(),p.y()), slot_x,  slot_y);
+}
+
+
+void CLGridEngine::adjustItem(CLAbstractSceneItem* item) const
+{
+	QPoint new_p = adjustedPosForItem(item);
+	item->setPos(new_p);
 }
 
 
@@ -415,6 +425,26 @@ CLAbstractSceneItem* CLGridEngine::getItemToSwapWith(CLAbstractSceneItem* item) 
 	}
 
 	return 0;
+}
+
+bool CLGridEngine::canBeDropedHere(CLAbstractSceneItem* item) const
+{
+	
+	int left_slot, top_slot;
+	getItemSlotPos(item, left_slot, top_slot);
+
+	QSize item_size(item->width(), item->height());
+
+	if (!isSlotAvailable(left_slot, top_slot, item_size, item))
+		return false;
+
+	int item_slots_width = slotsW(item_size.width());
+	int item_slots_height = slotsH(item_size.height());
+
+	QRect slots_rect( slotPos(left_slot, top_slot),  slotPos(left_slot + item_slots_width, top_slot + item_slots_height) );
+	QRectF item_rect = item->sceneBoundingRect();
+
+	return slots_rect.contains(item_rect.toAlignedRect(), true);
 }
 
 
@@ -679,19 +709,27 @@ void CLGridEngine::slotFromPos(QPoint p, int& slot_x, int& slot_y) const
 	slot_y = floor(y/( m_settings.slot_height*(1+m_settings.item_distance - 1e-10) ));
 }
 
-QPoint CLGridEngine::posFromSlot(int slot_x, int slot_y) const
+QPoint CLGridEngine::slotPos(int slot_x, int slot_y) const
 {
-	return QPoint(m_settings.left + slot_x*m_settings.slot_width*(1+m_settings.item_distance) + m_settings.insideSlotShiftH(), 
-				  m_settings.top + slot_y*m_settings.slot_height*(1+m_settings.item_distance) + m_settings.insideSlotShiftV());
+	return QPoint(m_settings.left + slot_x*m_settings.slot_width*(1+m_settings.item_distance), 
+				  m_settings.top + slot_y*m_settings.slot_height*(1+m_settings.item_distance));
 }
 
-bool CLGridEngine::isSlotAvailable(int slot_x, int slot_y, QSize size) const
+QPoint CLGridEngine::posFromSlot(int slot_x, int slot_y) const
+{
+	return slotPos(slot_x, slot_y) + QPoint(m_settings.insideSlotShiftH(), m_settings.insideSlotShiftV());
+}
+
+bool CLGridEngine::isSlotAvailable(int slot_x, int slot_y, QSize size, CLAbstractSceneItem* ignoreItem) const
 {
 	QPoint slPos = posFromSlot(slot_x, slot_y);
 	QRectF new_wnd_rect(slPos, size);
 
 	foreach (CLAbstractSceneItem* item, *(m_settings.items))
 	{
+		if (ignoreItem==item)
+			continue;
+
 		QRectF wnd_rect = item->mapToScene(item->boundingRect()).boundingRect();
 
 		if (new_wnd_rect.intersects(wnd_rect))
@@ -828,8 +866,6 @@ bool CLGridEngine::getNextAvailablePos_helper(QSize size, int &x_pos, int &y_pos
 
 			}
 				
-
-			
 		}
 	}
 
