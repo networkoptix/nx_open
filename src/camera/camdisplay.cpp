@@ -78,8 +78,15 @@ void CLCamDisplay::processData(CLAbstractData* data)
 
 		int channel = vd->channel_num;
 
+		CLVideoDecoderOutput::downscale_factor scale_factor = CLVideoDecoderOutput::factor_any;
+		if (channel>0) // if device has more than one channel 
+		{
+			// this here to avoid situation where dirrerent channels have different down scale factor; it might lead to diffrent size
+			scale_factor = m_display[0]->getCurrentDownScaleFactor(); // [0] - master channel
+		}
+
 		if (m_display[channel])		
-			m_display[channel]->dispay(vd);
+			m_display[channel]->dispay(vd, scale_factor);
 	}
 	else if (ad && m_palyaudio)
 	{

@@ -15,10 +15,13 @@ public:
 	CLVideoStreamDisplay(bool can_downscale);
 	~CLVideoStreamDisplay();
 	void setDrawer(CLAbstractRenderer* draw);
-	void dispay(CLCompressedVideoData* data);
+	void dispay(CLCompressedVideoData* data, CLVideoDecoderOutput::downscale_factor force_factor = CLVideoDecoderOutput::factor_any);
 
 	void setLightCPUMode(bool val);
 	void coppyImage(bool copy);
+
+	CLVideoDecoderOutput::downscale_factor getCurrentDownScaleFactor() const;
+
 private:
 	QMutex m_mtx;
 	CLAbstractVideoDecoder* m_decoder[CL_VARIOUSE_DECODERS];
@@ -31,6 +34,10 @@ private:
 
 	bool m_can_downscale;
 	
+
+	CLVideoDecoderOutput::downscale_factor m_prevFactor;
+	CLVideoDecoderOutput::downscale_factor m_scalefactor;
+	QSize m_prev_on_screen_size;
 
 };
 

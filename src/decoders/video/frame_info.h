@@ -9,7 +9,7 @@ enum CLColorSpace{CL_DECODER_YUV420 = 0, CL_DECODER_YUV422 = 1, CL_DECODER_YUV44
 
 struct CLVideoDecoderOutput
 {
-	enum downscale_factor{factor_1 = 1, factor_2 = 2, factor_4 = 4, factor_8 = 8};
+	enum downscale_factor{factor_any = 0, factor_1 = 1, factor_2 = 2, factor_4 = 4, factor_8 = 8};
 
 	CLVideoDecoderOutput();
 	~CLVideoDecoderOutput();
