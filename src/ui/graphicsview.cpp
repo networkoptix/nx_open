@@ -759,7 +759,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 	}
 
 
-	if (m_rotatingWnd && right_button && m_movingWnd && m_camLayout.getContent()->checkIntereactionFlag(LayoutContent::ItemRotatable))
+	if (m_rotatingWnd && right_button && m_camLayout.getContent()->checkIntereactionFlag(LayoutContent::ItemRotatable))
 	{
 
 		if (isItemStillExists(m_rotatingWnd))
@@ -1534,7 +1534,7 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 		case Qt::Key_Control:
 			enableMultipleSelection(true);
 
-			if (m_movingWnd && m_camLayout.getContent()->checkIntereactionFlag(LayoutContent::GridEnable))
+			if (m_camLayout.getContent()->checkIntereactionFlag(LayoutContent::GridEnable))
 				m_gridItem->show(global_grid_aparence_delay);
 
 			break;
