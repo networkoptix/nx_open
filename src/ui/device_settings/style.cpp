@@ -5,6 +5,14 @@
 
 QPixmap cached(const QString &img)
 {
+	static bool first = true;
+
+	if (first)
+	{
+		QPixmapCache::setCacheLimit(16*1024); // in kb
+	}
+
+
 	if (QPixmap *p = QPixmapCache::find(img))
 		return *p;
 
