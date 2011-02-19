@@ -344,7 +344,7 @@ void GraphicsView::onSecTimer()
 		
 		if (mShow.m_counrer>4*60)
 		{
-			if (m_camLayout.getItemList().count()<2 || !m_movingWnd && m_camLayout.getContent()->checkIntereactionFlag(LayoutContent::ShowAvalable))
+			if (m_camLayout.getItemList().count()<2 || !m_camLayout.getContent()->checkIntereactionFlag(LayoutContent::ShowAvalable))
 			{
 				mShow.m_counrer = 0;
 				return;
