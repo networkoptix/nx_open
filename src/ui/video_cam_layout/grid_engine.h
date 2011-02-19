@@ -5,6 +5,7 @@
 
 class CLAbstractSceneItem;
 class CLDeviceVideoLayout;
+class LayoutContent;
 
 struct CLIdealItemPos
 {
@@ -68,6 +69,8 @@ public:
 	void setSettings(const CLGridSettings& sett);
 
 	CLGridSettings& getSettings();
+
+	void setLayoutContent(LayoutContent* sl);
 
 	// returns recommended item size for such grid; ususally caled befor Item is created
 	QSize calcDefaultMaxItemSize(const CLDeviceVideoLayout* lo = 0) const;
@@ -159,6 +162,8 @@ private:
 private:
 
 	CLGridSettings m_settings;
+
+	LayoutContent* m_scene_layout;
 	
 };
 

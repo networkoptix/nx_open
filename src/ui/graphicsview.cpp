@@ -295,6 +295,10 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
 		return;
 
 	showStop_helper();
+
+	if (!m_camLayout.getContent()->checkIntereactionFlag(LayoutContent::Zoomable))
+		return;
+
 	int numDegrees = e->delta() ;
 	m_scenezoom.zoom_delta(numDegrees/3000.0, scene_zoom_duration, 0);
 }
@@ -340,7 +344,7 @@ void GraphicsView::onSecTimer()
 		
 		if (mShow.m_counrer>4*60)
 		{
-			if (m_camLayout.getItemList().count()<2)
+			if (m_camLayout.getItemList().count()<2 || !m_movingWnd && m_camLayout.getContent()->checkIntereactionFlag(LayoutContent::ShowAvalable))
 			{
 				mShow.m_counrer = 0;
 				return;
@@ -655,7 +659,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 
 
 	// scene movement 
-	if (m_handScrolling && left_button) 
+	if (m_handScrolling && left_button && 	m_camLayout.getContent()->checkIntereactionFlag(LayoutContent::SceneMovable))
 	{
 		
 		/*/
@@ -696,7 +700,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 	}
 
 	//item movement 
-	if (left_button && isCTRLPressed(event) && m_scene.selectedItems().count() && m_movingWnd)
+	if (left_button && isCTRLPressed(event) && m_scene.selectedItems().count() && m_movingWnd && m_camLayout.getContent()->checkIntereactionFlag(LayoutContent::ItemMovable))
 	{
 		if (m_viewMode!=ItemsDonor)
 		{
@@ -755,7 +759,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 	}
 
 
-	if (m_rotatingWnd && right_button)
+	if (m_rotatingWnd && right_button && m_movingWnd && m_camLayout.getContent()->checkIntereactionFlag(LayoutContent::ItemRotatable))
 	{
 
 		if (isItemStillExists(m_rotatingWnd))
@@ -1529,7 +1533,10 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 
 		case Qt::Key_Control:
 			enableMultipleSelection(true);
-			m_gridItem->show(global_grid_aparence_delay);
+
+			if (m_movingWnd && m_camLayout.getContent()->checkIntereactionFlag(LayoutContent::GridEnable))
+				m_gridItem->show(global_grid_aparence_delay);
+
 			break;
 
 		case Qt::Key_X:
@@ -1885,6 +1892,9 @@ void GraphicsView::toggleFullScreen_helper(CLAbstractSceneItem* wnd)
 
 void GraphicsView::onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int delay)
 {
+
+	if (!m_camLayout.getContent()->checkIntereactionFlag(LayoutContent::ItemSelectable))
+		return;
 
 	setZeroSelection();
 

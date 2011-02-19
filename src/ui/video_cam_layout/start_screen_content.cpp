@@ -21,32 +21,49 @@ LayoutContent& startscreen_content()
 
 		frist_time = false;
 
-		int logo_width = 6400;
-		int logo_heih = 4800;
+		int logo_width = 3000*9;
+		int logo_heih = 1315*9;
 
-		int btn_width = 6400/2;
-		int btn_height = btn_width*3/4;
-		int item_distance = 500;
+		int btn_width = 339*12;
+		int btn_height = 303*12;
+		int item_distance = 500*4;
 
-		int logo_left = SCENE_LEFT + btn_width + item_distance;
-		int logo_top = SCENE_TOP + btn_height + item_distance;
+		int logo_left = SCENE_LEFT + item_distance;
+		int logo_top = SCENE_TOP;
 
-		int delta_w = (logo_width-btn_width)/2;
-		int delta_h = (logo_heih-btn_height)/4;
+
+		int btn_left = SCENE_LEFT + 4000;
+		int btn_top = SCENE_TOP + logo_heih + 1000;
+
+
+		int btn2_left = btn_left + logo_width - 9350;
 
 		instance.addImage("./skin/logo.png", button_logo, "","", logo_left - 600 , logo_top+200 , logo_width, logo_heih);
 
-		instance.addImage("./skin/startscreen/Control Room.png", "control" ,"","", logo_left + delta_w, SCENE_TOP, btn_width, btn_height);
+		//instance.addImage("./skin/startscreen/Control Room.png", "control" ,"","", logo_left + delta_w, SCENE_TOP, btn_width, btn_height);
+		//instance.addImage("./skin/startscreen/Achive.png","archive", "","",logo_left + delta_w, logo_top + logo_heih + item_distance - 500, btn_width, btn_height);
 
-		instance.addImage("./skin/startscreen/Achive.png","archive", "","",logo_left + delta_w, logo_top + logo_heih + item_distance - 500, btn_width, btn_height);
-
-		instance.addImage("./skin/startscreen/System.png", button_system, "","",SCENE_LEFT, logo_top + delta_h, btn_width, btn_height);
-		instance.addImage("./skin/startscreen/Layouts.png", button_layout , "","",logo_left + logo_width + item_distance, logo_top + delta_h, btn_width, btn_height);
+		instance.addImage("./skin/startscreen/System.png", button_system, "","", btn_left, btn_top, btn_width, btn_height);
+		instance.addImage("./skin/startscreen/Layouts.png", button_layout , "","",btn2_left, btn_top, btn_width, btn_height);
 
 		CLDeviceCriteria cr(CLDeviceCriteria::NONE);
 		
+		CLRectAdjustment adj;
+		adj.x1 = 800;
+		adj.y1 = 4000;
+		adj.x2 = -1000;
+		adj.y2 = -1000;
+		instance.setRectAdjustment(adj);
 
 		instance.setDeviceCriteria(cr);
+		instance.removeIntereactionFlag(
+			LayoutContent::Zoomable | 
+			LayoutContent::SceneMovable | 
+			LayoutContent::ShowAvalable | 
+			LayoutContent::ItemMovable | 
+			LayoutContent::GridEnable | 
+			LayoutContent::ItemRotatable | 
+			LayoutContent::ItemSelectable );
 
 	}
 

@@ -3,6 +3,9 @@
 #include "ui\videoitem\abstract_scene_item.h"
 #include "ui\videoitem\video_wnd_item.h"
 #include <math.h>
+#include "layout_content.h"
+
+
 
 
 CLGridEngine::CLGridEngine()
@@ -25,6 +28,10 @@ CLGridSettings& CLGridEngine::getSettings()
 	return m_settings;
 }
 
+void CLGridEngine::setLayoutContent(LayoutContent* sl)
+{
+	m_scene_layout = sl;
+}
 
 QSize CLGridEngine::calcDefaultMaxItemSize(const CLDeviceVideoLayout* layout) const
 {
@@ -86,8 +93,6 @@ QRect CLGridEngine::gridSlotRect() const
 
 
 	return QRect(QPoint(slot_left_x, slot_top_y), QPoint(slot_right_x, slot_bottom_y));
-
-	//return QSize((right - left)/m_settings.totalSlotWidth() + 1,  (bottom - top)/m_settings.totalSlotHeight() + 1);
 	
 }
 
@@ -114,6 +119,9 @@ QRect CLGridEngine::getGridRect() const
 
 	video_rect.adjust(-m_settings.item_distance*m_settings.slot_width/2, -m_settings.item_distance*m_settings.slot_height, 
 						m_settings.item_distance*m_settings.slot_width/2, m_settings.item_distance*m_settings.slot_height);
+
+	CLRectAdjustment adjustment = m_scene_layout->getRectAdjustment();
+	video_rect.adjust(adjustment.x1, adjustment.y1, adjustment.x2, adjustment.y2);
 
 	return video_rect;
 }

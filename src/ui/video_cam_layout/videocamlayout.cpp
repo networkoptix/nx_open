@@ -743,6 +743,8 @@ void SceneLayout::loadContent()
 
 	bool added = false;
 
+	m_grid.setLayoutContent(m_content);
+
 	foreach(LayoutImage* img, img_list)
 	{
 		CLStaticImageItem* item = new CLStaticImageItem(m_view, img->width(), img->height(), img->getImage(), img->getName());

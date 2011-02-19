@@ -6,7 +6,8 @@ m_cr(CLDeviceCriteria::NONE),
 mDecoration(0),
 m_recorder(false),
 m_editable(false),
-m_parent(0)
+m_parent(0),
+m_interaction_flags(0xffffffff)
 {
 	setName("Layout:unnamed");
 }
@@ -199,6 +200,32 @@ void LayoutContent::toXml(QDomDocument& doc, QDomElement& parent)
 		l->toXml(doc, element);
 	}
 
+}
+
+CLRectAdjustment LayoutContent::getRectAdjustment() const
+{
+	return m_adjustment;
+}
+
+void LayoutContent::setRectAdjustment(const CLRectAdjustment& adjust)
+{
+	m_adjustment = adjust;
+}
+
+
+void LayoutContent::addIntereactionFlag(unsigned long flag)
+{
+	m_interaction_flags |= flag;
+}
+
+void LayoutContent::removeIntereactionFlag(unsigned long flag)
+{
+	m_interaction_flags &= (~flag);
+}
+
+bool LayoutContent::checkIntereactionFlag(unsigned long flag)
+{
+	return m_interaction_flags & flag;
 }
 
 //=========================================================================
