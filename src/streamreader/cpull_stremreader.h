@@ -21,7 +21,6 @@ protected:
 	
 private:
 	void run(); // in a loop: takes images from camera and put into queue
-
 };
 
 #endif //client_pull_stream_reader_h1226

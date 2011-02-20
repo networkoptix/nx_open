@@ -27,7 +27,7 @@ CLAVIStreamReader::~CLAVIStreamReader()
 quint64 CLAVIStreamReader::currTime() const
 {
 	QMutexLocker mutex(&m_cs);
-	return m_cuur_time;
+	return m_currentTime;
 }
 
 bool CLAVIStreamReader::init()
@@ -44,7 +44,7 @@ bool CLAVIStreamReader::init()
 		av_register_all();
 	}
 
-	m_cuur_time = 0;
+	m_currentTime = 0;
 	m_prev_time = -1;
 	m_need_tosleep = 0;
 
@@ -185,6 +185,10 @@ bool CLAVIStreamReader::init()
 			m_audiocodec_id =CL_ADPCM_MS;
 			break;
 
+		case CODEC_ID_AMR_NB:
+			m_audiocodec_id = CL_AMR_NB;
+			break;
+
 		default:
 			m_audiocodec_id = CL_UNKNOWN;
 			break;
@@ -210,10 +214,10 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 		return 0;
 
 
-	
-
-	if (m_bsleep && !isSingleShotMode())			
+	if (m_bsleep && !isSingleShotMode() && !m_skipSleep)
+	{
 		smart_sleep(m_need_tosleep);
+	}
 
 
 	{
@@ -228,18 +232,24 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 			if (duration==0)
 				duration = 1;
 
-			m_cuur_time =  qint64(m_len_mksec)*m_packet.dts/duration;
+			double ttm = av_q2d(m_formatContext->streams[m_videoStrmIndex]->time_base) * (m_packet.dts - m_formatContext->streams[m_videoStrmIndex]->first_dts);
+
+			m_currentTime =  qint64(1e+6 * ttm);
+
+			m_videoClock = m_currentTime / 1000;
+
+			// cl_log.log("ST: " + scurtime + ", " + sall, cl_logALWAYS);
 			//m_need_tosleep = m_len_msec/duration;
 
 			//if (m_need_tosleep==0 && m_prev_time!=-1)
 			if (m_prev_time!=-1)
 			{
 				// we assume that we have constant frame rate 
-				m_need_tosleep = m_cuur_time-m_prev_time;
+				m_need_tosleep = m_currentTime-m_prev_time;
 
 			}
 
-			m_prev_time = m_cuur_time;
+			m_prev_time = m_currentTime;
 		}
 
 
@@ -249,8 +259,7 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 	if (m_packet.stream_index == m_videoStrmIndex) // in case of video packet 
 	{
 		m_bsleep = true; // sleep only in case of video
-
-
+		
 		AVCodecContext* codecContext = m_formatContext->streams[m_videoStrmIndex]->codec;
 		//int extra = FF_INPUT_BUFFER_PADDING_SIZE;
 		int extra = 0;
@@ -270,13 +279,18 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 
 
 		videoData->compressionType = m_videocodec_id;
-		videoData->keyFrame = 1;//m_formatContext->streams[m_videoStrmIndex]->codec->coded_frame->key_frame;
+		videoData->keyFrame = m_packet.flags & PKT_FLAG_KEY;
 		videoData->channel_num = 0;
-		videoData->timestamp = m_cuur_time;
+		videoData->timestamp = m_currentTime;
+
+		double time_base = av_q2d(m_formatContext->streams[m_videoStrmIndex]->time_base);
+		double ttm = time_base * (m_packet.dts - m_formatContext->streams[m_videoStrmIndex]->first_dts);
 
 		videoData->use_twice = m_use_twice;
 		m_use_twice = false;
 
+		videoData->afterJump = m_afterJump;
+		m_afterJump = false;
 
 
 		if (videoData->keyFrame)
@@ -299,6 +313,11 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 
 		int extra = 0;
 		CLCompressedAudioData* audioData = new CLCompressedAudioData(CL_MEDIA_ALIGNMENT,m_packet.size + extra, codecContext);
+		double time_base = av_q2d(m_formatContext->streams[m_audioStrmIndex]->time_base);
+		double ttm = time_base * (m_packet.dts - m_formatContext->streams[m_audioStrmIndex]->first_dts);
+		audioData->timestamp = qint64(1e+6 * ttm);
+		m_audioClock = audioData->timestamp / 1000;
+
 		CLByteArray& data = audioData->data;
 
 		data.prepareToWrite(m_packet.size + extra);
@@ -338,19 +357,10 @@ void CLAVIStreamReader::channeljumpTo(quint64 mksec, int channel)
 
 	int err = avformat_seek_file(m_formatContext, -1, 0, mksec, _I64_MAX, AVSEEK_FLAG_BACKWARD);
 	
-
-	if (err < 0) 
-	{
-		err = err;
-	}
-
 	m_need_tosleep = 0;
 	m_prev_time = -1;
 	m_wakeup = true;
-
 }
-
-
 
 void CLAVIStreamReader::destroy()
 {
@@ -359,7 +369,6 @@ void CLAVIStreamReader::destroy()
 
 	m_formatContext = 0;
 }
-
 
 bool CLAVIStreamReader::getNextPacket()
 {
@@ -393,7 +402,6 @@ bool CLAVIStreamReader::getNextPacket()
 	}
 
 	return true;
-
 }
 
 void CLAVIStreamReader::smart_sleep(quint64 mksec)
@@ -415,3 +423,4 @@ void CLAVIStreamReader::smart_sleep(quint64 mksec)
 	mAdaptiveSleep.sleep(mksec%32000);
 
 }
+

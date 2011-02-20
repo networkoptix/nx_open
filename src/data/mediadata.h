@@ -24,6 +24,7 @@ enum CLCodecType
 	CL_WMAV2, 
 	CL_WMAPRO,
 	CL_ADPCM_MS,
+	CL_AMR_NB,
 	CL_UNKNOWN, 
 	CL_VARIOUSE_DECODERS};
 
@@ -65,12 +66,14 @@ struct CLCompressedVideoData : public CLAbstractMediaData
 		dataType = VIDEO;
 		use_twice = false;
 		context = ctx;
+		afterJump = false;
 	}
 
 	int width;
 	int height;
 	bool keyFrame;
 	bool use_twice; // some decoders delay video frame by one;
+	bool afterJump;
 	quint32 channel_num; // video channel number; some devices might have more that one sensor.
 
 	void* context;

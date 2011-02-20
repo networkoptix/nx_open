@@ -63,22 +63,18 @@ m_codec(codec_id)
 		codec = avcodec_find_decoder(CODEC_ID_WMAV2);
 		break;
 
-		/*/
-		
-
 	case CL_ADPCM_MS:
 		codec = avcodec_find_decoder(CODEC_ID_ADPCM_MS);
 		break;
 
-		/**/
-
+	case CL_AMR_NB:
+		codec = avcodec_find_decoder(CODEC_ID_AMR_NB);
+		break;
 
 	default:
 		codec = 0;
 		c = 0;
 		return;
-
-
 	}
 
 	c = avcodec_alloc_context();

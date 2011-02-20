@@ -19,7 +19,7 @@ CLRingBuffer::~CLRingBuffer()
 	delete[] m_buff;
 }
 
-void CLRingBuffer::claer()
+void CLRingBuffer::clear()
 {
 	m_pr = m_buff;
 	m_pw = m_buff;

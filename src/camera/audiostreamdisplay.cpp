@@ -2,6 +2,10 @@
 #include "decoders\audio\audio_struct.h"
 #include "base\log.h"
 #include "decoders\audio\abstractaudiodecoder.h"
+#include "base\sleep.h"
+
+// QT_BUFFER_SIZE should be smaller than m_buff_ms/10
+static const int QT_BUFFER_SIZE = 200;
 
 #define DEFAULT_AUDIO_FRAME_SIZE (AVCODEC_MAX_AUDIO_FRAME_SIZE*2)
 int  MAX_AUDIO_FRAME_SIZE = DEFAULT_AUDIO_FRAME_SIZE*5;
@@ -58,19 +62,22 @@ static void down_mix_6_2(short *data, int len)
 
 
 
-CLAudioStreamDisplay::CLAudioStreamDisplay(int buff_ms):
+CLAudioStreamDisplay::CLAudioStreamDisplay(int buff_ms, int buffAccMs):
 m_buff_ms(buff_ms),
+m_buffAccMs(buffAccMs),
+m_buffAccBytes(0),
 m_audioOutput(0),
 m_decodedaudio(16, DEFAULT_AUDIO_FRAME_SIZE),
 m_audiobuff(0),
 m_ringbuff(0),
 m_freq_factor(1.0),
 m_can_adapt(0),
-m_downmixing(false)
+m_downmixing(false),
+m_tooFewSet(false),
+m_too_few_data_detected(true)
 {
 	for (int i = 0; i < CL_VARIOUSE_DECODERS;++i)
 		m_decoder[i] = 0;
-
 }
 
 CLAudioStreamDisplay::~CLAudioStreamDisplay()
@@ -83,11 +90,38 @@ CLAudioStreamDisplay::~CLAudioStreamDisplay()
 	delete m_ringbuff;
 }
 
+int CLAudioStreamDisplay::msInAudio()
+{
+	int bytesInBuffer = m_audioOutput->bufferSize() - m_audioOutput->bytesFree();
+	return ms_from_size(m_audioOutput->format(), bytesInBuffer);
+}
+
+int CLAudioStreamDisplay::suspend()
+{
+	if (!m_audioOutput)
+		return 0;
+
+	m_audioOutput->suspend();
+
+	return 0;
+}
+
+void CLAudioStreamDisplay::resume()
+{
+	if (!m_audioOutput)
+		return;
+
+	m_audioOutput->resume();
+}
+
 void CLAudioStreamDisplay::putdata(CLCompressedAudioData* data)
 {
-	//return;// 777
-
 	CLAudioData audio;
+
+	if (data == 0)
+		goto fake_audio;
+
+	//return;// 777
 
 	audio.codec = data->compressionType;
 	audio.inbuf = (unsigned char*)data->data.data();
@@ -101,13 +135,13 @@ void CLAudioStreamDisplay::putdata(CLCompressedAudioData* data)
 
 	CLAbstractAudioDecoder* dec = 0;
 
-	if (data->compressionType<0 || data->compressionType>CL_VARIOUSE_DECODERS-1)
+	if (data->compressionType < 0 || data->compressionType > CL_VARIOUSE_DECODERS - 1)
 	{
 		cl_log.log("CLAudioStreamDisplay::putdata: unknown codec type...", cl_logERROR);
 		return;
 	}
 
-	if (m_decoder[data->compressionType]==0)
+	if (m_decoder[data->compressionType] == 0)
 	{
 		m_decoder[data->compressionType] = CLAudioDecoderFactory::createDecoder(data->compressionType, data->context);
 		
@@ -115,73 +149,89 @@ void CLAudioStreamDisplay::putdata(CLCompressedAudioData* data)
 
 	dec = m_decoder[data->compressionType];
 
-	
-
 	if (dec->decode(audio))
 	{
 
 		if (!m_audioOutput)
 			recreatedevice(audio.format);
 
-		if (audio.format.channels()>2 && m_downmixing)
+		if (audio.format.channels() > 2 && m_downmixing)
 			down_mix(audio);
 
 		if (audio.format.sampleType() == QAudioFormat::Float)	
 			float2int(audio);
 
-
-
-		if (!m_ringbuff)
+		if (!m_ringbuff) {
 			m_ringbuff = new CLRingBuffer(bytes_from_time(audio.format,m_buff_ms),this);
-
+			m_buffAccBytes = bytes_from_time(audio.format, m_buffAccMs);
+		}
 
 		if (!m_audioOutput)
 			return;
 
-
-		if (ms_from_size(audio.format, m_ringbuff->avalable_to_write()) < m_buff_ms/10) // if ring buffer is full
+		if (ms_from_size(audio.format, m_ringbuff->avalable_to_write()) < m_buff_ms / 10) // if ring buffer is full
 		{
 			//paying too slow; need to speedup
-			m_freq_factor+=0.005;
+			m_freq_factor += 0.005;
+
 			//audio.format.setFrequency(audio.format.frequency()*m_freq_factor);
 			//recreatedevice(audio.format); // recreation does not work very well
-			//cl_log.log("to many data!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", cl_logALWAYS);
-			m_ringbuff->claer();
-
+			cl_log.log("to many data!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", cl_logALWAYS);
+			m_ringbuff->clear();
 		}
 
-		bool to_few_data_detected = false;
-
-
-		if (ms_from_size(audio.format, m_audioOutput->bufferSize() - m_audioOutput->bytesFree()) < m_buff_ms/10) // if audio buffer is almost empty
+		if (ms_from_size(audio.format, m_ringbuff->bytesAvailable()) < m_buff_ms / 10) // if ring buffer is almost empty
 		{
 			//paying too fast; need to slowdown
 			m_freq_factor-=0.005;
+
 			//audio.format.setFrequency(audio.format.frequency()*m_freq_factor);
 			//recreatedevice(audio.format); //recreation does not work very well
-			cl_log.log("to few data in audio buffer!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", cl_logWARNING);
-			to_few_data_detected = true;
+			cl_log.log("to few data in ring buffer!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", cl_logWARNING);
+			m_too_few_data_detected = true;
+
+			m_audioOutput->suspend();
+
+			if (m_tooFewSet == false)
+			{
+				cl_log.log("HERE!", cl_logWARNING);
+				m_tooFewSet = true;
+			}
 		}
 
-			
 
-		if (m_ringbuff->writeData(audio.outbuf->data(), audio.outbuf_len)<audio.outbuf_len)
-			cl_log.log("failed to write all data into audio buffer!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", cl_logWARNING);
-
-
-		if (ms_from_size(audio.format, m_ringbuff->bytesAvailable()) > to_few_data_detected*m_buff_ms/2) // only if we have more than m_buff_ms/2 ms in data in ring buffer
+		qint64 dataWritten = m_ringbuff->writeData(audio.outbuf->data(), audio.outbuf_len);
+		if (dataWritten < audio.outbuf_len)
 		{
+			cl_log.log("?????????????????????????????????????????????????????????????", cl_logWARNING);
+		}
+
+		// cl_log.log("in ring buffer1 ms = ", (int)ms_from_size(audio.format, m_ringbuff->bytesAvailable()), cl_logWARNING);
+
+
+fake_audio:
+		if (m_ringbuff->bytesAvailable() > (m_too_few_data_detected ? m_buffAccBytes  : 0) ) // only if we have more than m_buff_ms/2 ms in data in ring buffer
+		{
+			m_audioOutput->resume();
+
+			m_too_few_data_detected = false;
+			m_tooFewSet = false;
 
 			if (m_audioOutput && m_audioOutput->state() != QAudio::StoppedState) 
 			{
-
 				int period = m_audioOutput->periodSize();
 				int ring_avalable = m_ringbuff->bytesAvailable();
 				int output_avalable = m_audioOutput->bytesFree();
 
+				//cl_log.log("in ring buffer bw ms = ", (int)ms_from_size(audio.format, m_ringbuff->bytesAvailable()), cl_logWARNING);
 
-				int chunks = qMin( ring_avalable, output_avalable)/period;
-				while (chunks) 
+
+				int chunks = qMin(ring_avalable, output_avalable) / period;
+
+				if (chunks == 0)
+					chunks = 0;
+
+				while (chunks)
 				{
 					++m_can_adapt; // if few write occurred we can change the frequency if needed
 
@@ -193,21 +243,17 @@ void CLAudioStreamDisplay::putdata(CLCompressedAudioData* data)
 					m_audiobuff->write(m_decodedaudio.data(), period);
 					--chunks;
 				}
+
+//				cl_log.log("in ring buffer aw ms = ", (int)ms_from_size(audio.format, m_ringbuff->bytesAvailable()), cl_logWARNING);
 			}
 
 		}
 
-
-		
-		
-		qint64 bytesInBuffer = m_audioOutput->bufferSize() - m_audioOutput->bytesFree();
-		qint64 usInBuffer = ms_from_size(audio.format, bytesInBuffer);
-		cl_log.log("ms in audio buff = ", (int)usInBuffer, cl_logALWAYS);
+//		qint64 bytesInBuffer = m_audioOutput->bufferSize() - m_audioOutput->bytesFree();
+//		qint64 usInBuffer = ms_from_size(audio.format, bytesInBuffer);
+//		cl_log.log("ms in audio buff = ", (int)usInBuffer, cl_logALWAYS);
 		//cl_log.log("ms in ring buff = ", (int)ms_from_size(audio.format, m_ringbuff->bytesAvailable()), cl_logALWAYS);
 		/**/
-
-
-
 	}
 }
 
@@ -243,24 +289,16 @@ void CLAudioStreamDisplay::recreatedevice(QAudioFormat format)
 			m_downmixing = true;
 
 		}
-
-
 	}
-	/**/
-
-	
 
 	m_audioOutput = new QAudioOutput(format, this);
 
-	
-
-	m_audioOutput->setBufferSize( bytes_from_time(format, m_buff_ms) ); // data for 1sec of audio
+	m_audioOutput->setBufferSize( bytes_from_time(format, QT_BUFFER_SIZE) ); // data for 1sec of audio
 	m_audiobuff = m_audioOutput->start();
 
 	m_can_adapt = 0;
 
 }
-
 
 unsigned int CLAudioStreamDisplay::ms_from_size(const QAudioFormat& format, unsigned long bytes)
 {
@@ -298,4 +336,21 @@ void CLAudioStreamDisplay::float2int(CLAudioData& audio)
 
 	audio.format.setSampleType(QAudioFormat::SignedInt);
 	
+}
+
+bool CLAudioStreamDisplay::is_initialized() const
+{
+	return m_ringbuff != 0;
+}
+
+void CLAudioStreamDisplay::clear()
+{
+	if (m_ringbuff) 
+		m_ringbuff->clear();
+
+	if (m_audioOutput)
+	{
+		m_audioOutput->reset();
+		m_audioOutput->start();
+	}
 }

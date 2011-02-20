@@ -55,7 +55,6 @@ void CLVideoCamera::startDispay()
 	m_camdispay.start();
 	//m_reader->start(QThread::HighestPriority);
 	m_reader->start(QThread::HighPriority);
-	
 }
 
 void CLVideoCamera::stopDispay()

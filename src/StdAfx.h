@@ -1,9 +1,13 @@
+// ffmpeg headers
 extern "C" {
 	#include <libavcodec/avcodec.h>
 	#include <libavformat/avformat.h>
 };
 
 #if defined __cplusplus
+// stl headers
+
+// QT headers
 #include <QAction>
 #include <QAudio>
 #include <QAudioFormat>

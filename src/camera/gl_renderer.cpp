@@ -462,7 +462,7 @@ void CLGLRenderer::draw(CLVideoDecoderOutput& img, unsigned int channel)
 		return;
 
 	
-	m_videowindow->needUpdate(true); // sending piant event
+	m_videowindow->needUpdate(true); // sending paint event
 	//m_videowindow->update();
 	
 	
@@ -492,6 +492,7 @@ void CLGLRenderer::draw(CLVideoDecoderOutput& img, unsigned int channel)
 void CLGLRenderer::updateTexture()
 {
 	//image.saveToFile("test.yuv");
+
 
 	int w[3] = { m_stride, m_stride / 2, m_stride / 2 };
 	int r_w[3] = { m_width, m_width / 2, m_width / 2 }; // real_width / visable

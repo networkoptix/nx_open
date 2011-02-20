@@ -15,8 +15,9 @@ public:
 
 	qint64 avalable_to_write() const;
 
-	void claer();
+	void clear();
 
+	int sizeBytes() const { return m_capacity; }
 private:
 	char *m_buff;
 	int m_capacity;

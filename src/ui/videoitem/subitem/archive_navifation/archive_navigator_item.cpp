@@ -264,7 +264,9 @@ void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
 
 		mReader->setSingleShotMode(false);
 		mReader->resume();
+		// mReader->resumeDataProcessors();
 
+		m_videoCamera->getCamCamDisplay()->playAudio(true);
 
 		mPlayMode = true;
 		break;
@@ -277,7 +279,10 @@ void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
 		mStepForward->setVisible(true);
 
 
+		// mReader->pauseDataProcessors();
 		mReader->pause();
+		m_videoCamera->getCamCamDisplay()->playAudio(false);
+		
 		mReader->setSingleShotMode(true);
 		mPlayMode = false;
 		break;
@@ -293,6 +298,7 @@ void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
 	case StepForwardSubItem:
 		
 		mReader->resume();
+		mReader->resumeDataProcessors();
 		break;
 
 	case StepBackwardSubItem:
@@ -300,6 +306,7 @@ void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
 		//mReader->setdirection(false);
 		mReader->jumpTo(curr_time-100*1000, true);
 		//mReader->setdirection(true);
+		mReader->resumeDataProcessors();
 		break;
 
 
@@ -333,7 +340,8 @@ void CLArchiveNavigatorItem::updateSliderPos()
 
 	quint64 pos = (double)time*scale/total;
 
-	
+	// cl_log.log("SLIDER: ", (int) mReader->currTime(), cl_logALWAYS);
+
 	mSlider->setValue(pos);
 	
 }
@@ -354,9 +362,10 @@ void CLArchiveNavigatorItem::sliderReleased()
 		mReader->setSingleShotMode(false);
 }
 
-void CLArchiveNavigatorItem::setArchiveStreamReader(CLAbstractArchiveReader* reader)
+void CLArchiveNavigatorItem::setVideoCamera(CLVideoCamera* camera)
 {
-	mReader = reader;
+	m_videoCamera = camera;
+	mReader = static_cast<CLAbstractArchiveReader*>(m_videoCamera->getStreamreader());
 }
 
 void CLArchiveNavigatorItem::renewSlider()

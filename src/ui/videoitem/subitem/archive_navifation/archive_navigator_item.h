@@ -2,6 +2,7 @@
 #define archive_navigator_item_h1756
 
 #include "..\abstract_sub_item.h"
+#include "camera\camera.h"
 class CLImgSubItem;
 class QGraphicsProxyWidget;
 class QSlider;
@@ -19,7 +20,7 @@ public:
 
 	void updateSliderPos();
 
-	void setArchiveStreamReader(CLAbstractArchiveReader* reader);
+	void setVideoCamera(CLVideoCamera* camera);
 
 	void goToFullScreenMode(bool fullscreen);
 
@@ -59,7 +60,8 @@ protected:
 	bool mPlayMode;
 	bool mSliderIsmoving;
 
-	CLAbstractArchiveReader* mReader;
+	CLVideoCamera* m_videoCamera;
+ 	CLAbstractArchiveReader* mReader;
 
 	bool mFullScreen;
 

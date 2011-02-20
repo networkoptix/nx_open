@@ -47,7 +47,6 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, CLVideoDecoderOut
 
 
 	{
-
 		QMutexLocker mutex(&m_mtx);
 
 

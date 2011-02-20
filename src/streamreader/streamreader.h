@@ -33,6 +33,19 @@ public:
 	void addDataProcessor(CLAbstractDataProcessor* dp);
 	void removeDataProcessor(CLAbstractDataProcessor* dp);
 
+	void pauseDataProcessors()
+	{
+		foreach(CLAbstractDataProcessor* dataProcessor, m_dataprocessors) {
+			dataProcessor->pause();
+		}
+	}
+
+	void resumeDataProcessors()
+	{
+		foreach(CLAbstractDataProcessor* dataProcessor, m_dataprocessors) {
+			dataProcessor->resume();
+		}
+	}
 
 	virtual void setNeedKeyData();
 	virtual bool needKeyData(int channel) const;
@@ -46,8 +59,6 @@ protected:
 	void putData(CLAbstractData* data);
 
 protected:
-
-
 
 	QList<CLAbstractDataProcessor*> m_dataprocessors;
 	QMutex m_proc_CS;
@@ -68,6 +79,7 @@ protected:
 
 	StreamQuality m_qulity;
 
+	bool m_skipSleep;
 
 };
 

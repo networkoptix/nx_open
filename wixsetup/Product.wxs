@@ -7,7 +7,7 @@
 		<Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
 
     <Directory Id="TARGETDIR" Name="SourceDir">
-      <Directory Id="MEDIAFOLDER"/>
+      <Directory Id="MEDIAFOLDER" Name="photo"/>
       
       <Directory Id="ProgramFilesFolder">
 				<Directory Id="NetworkOptix" Name="Network Optix">
