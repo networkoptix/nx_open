@@ -50,8 +50,6 @@ protected:
 
 	bool m_bsleep;
 
-	int m_audioClock;
-	int m_videoClock;
 };
 
 #endif //avi_stream_reader_h1901

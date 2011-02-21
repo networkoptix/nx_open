@@ -228,15 +228,11 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 
 		if (m_packet.stream_index == m_videoStrmIndex) // in case of video packet 
 		{
-			qint64 duration = m_formatContext->streams[m_videoStrmIndex]->duration; // duration is in the frames
-			if (duration==0)
-				duration = 1;
+            qint64 firstDts = (m_formatContext->streams[m_videoStrmIndex]->first_dts == AV_NOPTS_VALUE) ? 0 : m_formatContext->streams[m_videoStrmIndex]->first_dts;
+			double ttm = av_q2d(m_formatContext->streams[m_videoStrmIndex]->time_base) * (m_packet.dts - firstDts);
 
-			double ttm = av_q2d(m_formatContext->streams[m_videoStrmIndex]->time_base) * (m_packet.dts - m_formatContext->streams[m_videoStrmIndex]->first_dts);
 
 			m_currentTime =  qint64(1e+6 * ttm);
-
-			m_videoClock = m_currentTime / 1000;
 
 			// cl_log.log("ST: " + scurtime + ", " + sall, cl_logALWAYS);
 			//m_need_tosleep = m_len_msec/duration;
@@ -284,7 +280,8 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 		videoData->timestamp = m_currentTime;
 
 		double time_base = av_q2d(m_formatContext->streams[m_videoStrmIndex]->time_base);
-		double ttm = time_base * (m_packet.dts - m_formatContext->streams[m_videoStrmIndex]->first_dts);
+        qint64 firstDts = (m_formatContext->streams[m_videoStrmIndex]->first_dts == AV_NOPTS_VALUE) ? 0 : m_formatContext->streams[m_videoStrmIndex]->first_dts;
+		double ttm = time_base * (m_packet.dts - firstDts);
 
 		videoData->use_twice = m_use_twice;
 		m_use_twice = false;
@@ -314,9 +311,9 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 		int extra = 0;
 		CLCompressedAudioData* audioData = new CLCompressedAudioData(CL_MEDIA_ALIGNMENT,m_packet.size + extra, codecContext);
 		double time_base = av_q2d(m_formatContext->streams[m_audioStrmIndex]->time_base);
-		double ttm = time_base * (m_packet.dts - m_formatContext->streams[m_audioStrmIndex]->first_dts);
+        qint64 firstDts = (m_formatContext->streams[m_audioStrmIndex]->first_dts == AV_NOPTS_VALUE) ? 0 : m_formatContext->streams[m_audioStrmIndex]->first_dts;
+		double ttm = time_base * (m_packet.dts - firstDts);
 		audioData->timestamp = qint64(1e+6 * ttm);
-		m_audioClock = audioData->timestamp / 1000;
 
 		CLByteArray& data = audioData->data;
 
