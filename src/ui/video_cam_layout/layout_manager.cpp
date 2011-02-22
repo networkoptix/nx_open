@@ -1,3 +1,4 @@
+#include "util.h"
 #include "layout_manager.h"
 #include "start_screen_content.h"
 #include "layout_content.h"
@@ -41,7 +42,9 @@ CLSceneLayoutManager& CLSceneLayoutManager::instance()
 
 bool CLSceneLayoutManager::load()
 {
-	QFile file("custom_layouts.xml");
+    QString dataLocation = getDataDirectory();
+
+	QFile file(dataLocation + "/custom_layouts.xml");
 
 	if (!file.exists())
 	{
@@ -148,8 +151,8 @@ void CLSceneLayoutManager::save()
 	QString xml = doc.toString();
 
 
-
-	QFile file("custom_layouts.xml");
+    QString dataLocation = getDataDirectory();
+	QFile file(dataLocation + "/custom_layouts.xml");
 	file.open(QIODevice::WriteOnly);
 
 	QTextStream fstr(&file);

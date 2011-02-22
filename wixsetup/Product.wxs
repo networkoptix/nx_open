@@ -1,24 +1,91 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
-	<Product Id="5b60f457-e05f-4cd0-b976-42acea61b981" Name="Universal Client" Language="1033" Version="1.0.0.0" Manufacturer="Network Optix" UpgradeCode="286227c5-25b4-4796-aa48-2d9822e10b0d">
-		<Package InstallerVersion="200" Compressed="yes" Keywords="Installer" Comments="Network Optix Universal Client Installer" Manufacturer="Network Optix"/>
+  <Product Id="*" Name="$(env.APPLICATION_NAME)" Language="1033" Version="$(env.APPLICATION_VERSION)" Manufacturer="$(env.ORGANIZATION_NAME)" UpgradeCode="286227c5-25b4-4796-aa48-2d9822e10b0d">
+    <Package Id="*" InstallerVersion="200" Compressed="yes" Keywords="Installer" Comments="Network Optix Universal Client Installer" Manufacturer="$(env.ORGANIZATION_NAME)" InstallPrivileges="elevated"/>
 
-		<Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
+    <Property Id="NEWERFOUND" Secure="yes"/>
+    <Property Id="ALLUSERS" Secure="yes"/>
+    <Property Id="PREVIOUSVERSIONSINSTALLED" Secure="yes" />
+    <Property Id="LAUNCHAPPONEXIT" Secure="yes" />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch Universal Client when setup exits."  />
+
+    <!--[%LocalAppData]-->
+    <Property Id="XMLSETTINGS" Value="%LocalAppData%\$(env.ORGANIZATION_NAME)\$(env.APPLICATION_NAME)\settings.xml" />
+    
+    <Binary Id="SETPROPERTIES" SourceFile="SetProperties.vbs" />
+    <CustomAction Id="SetProperties" BinaryKey="SETPROPERTIES" VBScriptCall="SetProperties" Execute="firstSequence" />
+    <!--<InstallExecuteSequence>
+      <Custom Action="SetProperties" After="LaunchConditions" />
+    </InstallExecuteSequence>-->
+    
+    <Upgrade Id="286227c5-25b4-4796-aa48-2d9822e10b0d">
+      <UpgradeVersion
+         Minimum="0.1.0" Maximum="$(env.VERSION)"
+         Property="PREVIOUSVERSIONSINSTALLED"
+         IncludeMinimum="yes" IncludeMaximum="yes" />
+      <UpgradeVersion OnlyDetect='yes' Property='NEWERFOUND' Minimum='$(env.VERSION)' IncludeMinimum='no' />
+    </Upgrade>
+
+    <CustomAction Id="AssignMediaFolder" Property="MEDIAFOLDER" Value="[%SystemDrive]\photo" Execute="firstSequence"/>
+    <CustomAction Id="StartAppOnExit" FileKey="UniclientEXE" ExeCommand="" Execute="immediate" Impersonate="yes" Return="asyncNoWait"/>
+
+    <InstallUISequence>
+      <Custom Action="SetProperties" Before="AssignMediaFolder"/>
+      <Custom Action="AssignMediaFolder" Before="CostInitialize">MEDIAFOLDER=""</Custom>
+      <!--<Custom Action='DowngradeWarning' After='FindRelatedProducts'>NEWERFOUND</Custom>-->
+      <!--<Show Dialog="OsWarningDlg" Before="WelcomeDlg">NEWERFOUND</Show>-->
+      <!--<Show Dialog="DowngradeWarningDlg" Before="WelcomeDlg">NEWERFOUND</Show>-->
+    </InstallUISequence>
+
+    <InstallExecuteSequence>
+      <RemoveExistingProducts Before="InstallInitialize" />
+      <Custom Action="AssignMediaFolder" Before="CostInitialize">MEDIAFOLDER=""</Custom>
+    </InstallExecuteSequence>
+
+    <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
 
     <Directory Id="TARGETDIR" Name="SourceDir">
-      <Directory Id="MEDIAFOLDER" Name="photo"/>
-      
+
+      <Directory Id="MEDIAFOLDER" Name="photo">
+        <Component Id="MediaFolderComponent" Guid="2B72351D-264E-44a5-8E1F-B8C82BB80817" Permanent="yes">
+          <CreateFolder Directory="MEDIAFOLDER"/>
+          <Shortcut Id="mediaFolderShortcut" Directory="DesktopFolder" Name="Universal Client Media" Target="[MEDIAFOLDER]" />
+          <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\[ProductName]' Type='string' Value='' KeyPath='yes' />
+        </Component>
+      </Directory>
+
+      <Directory Id="LocalAppDataFolder" Name="LocalAppDataFolder">
+        <Directory Id="LocalNetworkOptix" Name="$(env.ORGANIZATION_NAME)">
+          <Directory Id="LocalUniversalClient" Name="$(env.APPLICATION_NAME)">
+            <Component Id='Settings' Guid='D5B8FC1A-6828-4e66-B1D1-13BD2FD6EDA8' Permanent='yes'>
+              <CreateFolder Directory='LocalUniversalClient'/>
+              <File Id='XmlSettings' Name='settings.xml' DiskId='1' Source='../bin/settings.xml.tmpl' Vital='yes'/>
+              <util:XmlConfig Id='XmlSettings1' Action='create' Value='[MEDIAFOLDER]' Node='value'
+                              ElementPath='//settings/config/mediaRoot' File='[LocalUniversalClient]/settings.xml' On='install' Sequence='1' />
+              <!--<RegistryKey  Action="none" Key="dummy" Root="HKCU">
+                <RegistryValue Type="integer"  Value="1" KeyPath="yes" />
+              </RegistryKey >-->
+              <!--              <util:XmlFile Id='XmlSettings1' File='[INSTALLDIR]settings.xml'
+                Action='createElement' Name='config' ElementPath='//settings' Sequence='1' />
+              <util:XmlFile Id='XmlSettings2' File='[INSTALLDIR]settings.xml' Action='deleteValue' ElementPath='//settings' Sequence='2'/>
+              <util:XmlFile Id='XmlSettings3' File='[INSTALLDIR]settings.xml'
+                Action='createElement' Name='mediaRoot' ElementPath='//settings/config' Sequence='3' Value='[MEDIAFOLDER]'/> -->
+            </Component>
+          </Directory>
+        </Directory>
+      </Directory>
+
       <Directory Id="ProgramFilesFolder">
-				<Directory Id="NetworkOptix" Name="Network Optix">
-          <Directory Id="INSTALLDIR" Name="Universal Client">
+        <Directory Id="NetworkOptix" Name="$(env.ORGANIZATION_NAME)">
+          <Directory Id="INSTALLDIR" Name="$(env.APPLICATION_NAME)">
             <Component Id="MainExecutable" Guid="B9B60D1E-3B2C-47dd-9922-A1FC5F3818D4">
               <File Id="UniclientEXE" Name="uniclient.exe" Source="../bin/uniclient.exe" KeyPath="yes">
-                <fire:FirewallException Id="FirewallException" Name="Universal Client" Scope="any"/>
+                <fire:FirewallException Id="FirewallException" Name="$(env.APPLICATION_NAME)" Scope="any"/>
                 <Shortcut Id="startmenuUniclient" Directory="ProgramMenuDir" Name="Network Optix"
                                   WorkingDirectory='INSTALLDIR' Advertise="yes" />
-                <Shortcut Id="desktopUniclient" Directory="DesktopFolder" Name="Universal Client"
-                  WorkingDirectory='INSTALLDIR' Advertise="yes" />              
+                <Shortcut Id="desktopUniclient" Directory="DesktopFolder" Name="$(env.APPLICATION_NAME)"
+                  WorkingDirectory='INSTALLDIR' Advertise="yes" />
               </File>
             </Component>
             <Component Id="FFmpegLibraries" Guid="AD81912C-85E7-4f23-9106-6CF2CA5A5993">
@@ -48,24 +115,16 @@
                 <File Id="devicesxml" Name="devices.xml" Source="../bin/arecontvision/devices.xml"/>
               </Component>
             </Directory>
-            
-            <Component Id='Settings' Guid='D5B8FC1A-6828-4e66-B1D1-13BD2FD6EDA8'>
-              <File Id='XmlSettings' Name='settings.xml' DiskId='1' Source='../bin/settings.xml' Vital='yes' />
-              <util:XmlFile Id='XmlSettings1' File='[INSTALLDIR]settings.xml'
-                Action='createElement' Name='config' ElementPath='//settings' Sequence='1' />
-              <util:XmlFile Id='XmlSettings2' File='[INSTALLDIR]settings.xml'
-                Action='createElement' Name='mediaRoot' ElementPath='//settings/config' Sequence='1' Value='[MEDIAFOLDER]'/>
-            </Component>
           </Directory>
-					<!-- TODO: Remove the comments around this Component element and the ComponentRef below in order to add resources to this installer. -->
-					<!-- <Component Id="ProductComponent" Guid="12bb7788-be4d-4d8d-be8a-1991515340a2"> -->
-						<!-- TODO: Insert files, registry keys, and other resources here. -->
-					<!-- </Component> -->
-				</Directory>
-			</Directory>
+          <!-- TODO: Remove the comments around this Component element and the ComponentRef below in order to add resources to this installer. -->
+          <!-- <Component Id="ProductComponent" Guid="12bb7788-be4d-4d8d-be8a-1991515340a2"> -->
+          <!-- TODO: Insert files, registry keys, and other resources here. -->
+          <!-- </Component> -->
+        </Directory>
+      </Directory>
 
       <Directory Id="ProgramMenuFolder" Name="Programs">
-        <Directory Id="ProgramMenuDir" Name="Universal Client">
+        <Directory Id="ProgramMenuDir" Name="$(env.APPLICATION_NAME)">
           <Component Id="ProgramMenuDir" Guid="2F76AF65-B091-45b1-88E8-B1954ED66626">
             <RemoveFolder Id='ProgramMenuDir' On='uninstall' />
             <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\[ProductName]' Type='string' Value='' KeyPath='yes' />
@@ -76,26 +135,27 @@
       <Directory Id="DesktopFolder" Name="Desktop"/>
     </Directory>
 
-    
-		<Feature Id="ProductFeature" Title="SetupProject1" Level="1"
+
+    <Feature Id="ProductFeature" Title="SetupProject1" Level="1"
              ConfigurableDirectory="INSTALLDIR" >
-			 <ComponentRef Id="MainExecutable" />
-       <ComponentRef Id="FFmpegLibraries"/>
-       <ComponentRef Id="QTLibraries" />
-       <ComponentRef Id='ProgramMenuDir' />
-       <ComponentRef Id='Settings'/>
-       <ComponentRef Id='arecontvision'/>
-       <ComponentGroupRef Id='group_skin'/>
+      <ComponentRef Id="MainExecutable" />
+      <ComponentRef Id="FFmpegLibraries"/>
+      <ComponentRef Id="QTLibraries" />
+      <ComponentRef Id='ProgramMenuDir' />
+      <ComponentRef Id='Settings'/>
+      <ComponentRef Id='arecontvision'/>
+      <ComponentRef Id='MediaFolderComponent'/>
+      <ComponentGroupRef Id='group_skin'/>
 
       <!-- Note: The following ComponentGroupRef is required to pull in generated authoring from project references. -->
-			<ComponentGroupRef Id="Product.Generated" />
-		</Feature>
+      <ComponentGroupRef Id="Product.Generated" />
+    </Feature>
 
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
     <Property Id="WIXUI_MEDIAFOLDER" Value="MEDIAFOLDER" />
 
     <UIRef Id="WixUI_Common" />
-    
+
     <!--<UIRef Id="WixUI_InstallDir" />-->
     <UIRef Id="WixUI_ErrorProgressText" />
 
@@ -121,12 +181,55 @@
       <DialogRef Id="ProgressDlg" />
       <DialogRef Id="ResumeDlg" />
       <DialogRef Id="UserExit" />
+      <!--Width="260" Height="85"-->
+      <Dialog Id="DowngradeWarningDlg" Width="370" Height="270" Title="[ProductName] Setup" NoMinimize="no">
+        <!--<Control Id="No" Type="PushButton" X="132" Y="57" Width="56" Height="17"
+          Default="yes" Text="No">
+          <Publish Event="EndDialog" Value="Exit">1</Publish>
+        </Control>
+        <Control Id="Yes" Type="PushButton" X="72" Y="57" Width="56" Height="17" Text="Yes" Cancel="yes">
+          <Publish Event="EndDialog" Value="Return">1</Publish>
+        </Control>-->
+
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)" >
+          <Publish Event="EndDialog" Value="Exit">1</Publish>
+        </Control>
+
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
+          <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+        </Control>
+
+        <!--<Control Id="Text" Type="Text" X="48" Y="15" Width="194" Height="30">
+          <Text>A later version of [ProductName] is already installed. Are you sure you want to continue installation?</Text>
+        </Control>-->
+
+        <!--<Control Id="Icon" Type="Icon" X="15" Y="15" Width="24" Height="24"
+          ToolTip="Warning" FixedSize="yes" IconSize="32" Text="Warning"/>-->
+
+        <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" Text="A later version of [ProductName] is already installed." />
+        <!--<Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="WARNING" />-->
+        <Control Id="BannerBitmap" Type="Icon" X="344" Y="10" TabSkip="no" Text="Warning" Width="24" Height="24"/>
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+      </Dialog>
+
+      <Binary Id="Warning" SourceFile="Binary\Exclam.ico" />
 
       <DialogRef Id="MediaDirDlg" />
 
       <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
-      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
-      <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
+      <Publish Dialog="ExitDialog" Control="Finish" Order="1" Event="DoAction" Value="StartAppOnExit">WIXUI_EXITDIALOGOPTIONALCHECKBOX</Publish>
+
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">NOT NEWERFOUND</Publish>
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="DowngradeWarningDlg">NEWERFOUND</Publish>
+
+      <Publish Dialog="DowngradeWarningDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
+      <Publish Dialog="DowngradeWarningDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
+
+      <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">NOT NEWERFOUND</Publish>
+      <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="DowngradeWarningDlg">NEWERFOUND</Publish>
+
       <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg">LicenseAccepted = "1"</Publish>
 
       <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
@@ -143,12 +246,11 @@
 
       <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaDirDlg" Order="1">NOT Installed</Publish>
       <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2">Installed</Publish>
-      
+
       <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
       <Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
       <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
       <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
-
     </UI>
   </Product>
 </Wix>

@@ -1,4 +1,6 @@
 //#include <vld.h>
+#include "version.h"
+#include "util.h"
 #include "mainwnd.h"
 
 #include "device/asynch_seacher.h"
@@ -14,30 +16,6 @@
 #include "ui/context_menu_helper.h"
 
 QMutex global_ffmpeg_mutex;
-
-QString getRootDir() {
-	QString rootDir;
-
-	QXmlQuery query;
-
-	QFile settingsFile("settings.xml");
-	if (!settingsFile.exists()) {
-		return rootDir;
-	}
-
-	if (!settingsFile.open(QIODevice::ReadOnly | QIODevice::Text))
-		return rootDir;
-
-	query.setFocus(&settingsFile);
-	query.setQuery("settings/config/mediaRoot/text()");
-	if ( !query.isValid())
-		return rootDir;
-
-	query.evaluateTo(&rootDir);
-	settingsFile.close();
-
-	return QDir::fromNativeSeparators(rootDir.trimmed());
-}
 
 void decoderLogCallback(void* pParam, int i, const char* szFmt, va_list args)
 {
@@ -67,13 +45,20 @@ int main(int argc, char *argv[])
 {
 //	av_log_set_callback(decoderLogCallback);
 
+    QApplication::setOrganizationName(ORGANIZATION_NAME);
+    QApplication::setApplicationName(APPLICATION_NAME);
+    QApplication::setApplicationVersion(APPLICATION_VERSION);
+
+    QString dataLocation = getDataDirectory();
+
 	QApplication a(argc, argv);
+
 	QDir::setCurrent(QFileInfo(argv[0]).absolutePath());
 
-	QDir current_dir;
-	current_dir.mkdir("log");
+	QDir dataDirectory;
+    dataDirectory.mkpath(dataLocation + "/log");
 
-	if (!cl_log.create("./log/log_file", 1024*1024*10, 5, cl_logDEBUG1))
+	if (!cl_log.create(dataLocation + "/log/log_file", 1024*1024*10, 5, cl_logDEBUG1))
 		return a.quit();
 
 #ifdef _DEBUG
@@ -90,7 +75,8 @@ int main(int argc, char *argv[])
 		cl_log.log(argv[0], cl_logALWAYS);
 	}
 
-	QString rootDir = getRootDir();
+	QString rootDir = getMediaRootDir();
+    cl_log.log("Using " + rootDir + " as media root directory", cl_logALWAYS);
 	CLDeviceManager::setRootDir(rootDir);
 
 	CLDevice::startCommandProc();

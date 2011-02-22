@@ -20,6 +20,7 @@ extern "C" {
 #include <QCompleter> 
 #include <QDataStream>
 #include <QDateTime>
+#include <QDesktopServices>
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QDir>

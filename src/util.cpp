@@ -1,0 +1,34 @@
+#include "util.h"
+
+static const QString DEFAULT_MEDIA_DIR = "c:/photo/";
+
+QString getDataDirectory()
+{
+    return QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+}
+
+QString getMediaRootDir()
+{
+    QFile settingsFile(getDataDirectory() + "/settings.xml");
+    if (!settingsFile.exists())
+        return DEFAULT_MEDIA_DIR;
+
+    if (!settingsFile.open(QIODevice::ReadOnly | QIODevice::Text))
+        return DEFAULT_MEDIA_DIR;
+
+    QXmlQuery query;
+    query.setFocus(&settingsFile);
+    query.setQuery("settings/config/mediaRoot/text()");
+    if (!query.isValid())
+        return DEFAULT_MEDIA_DIR;
+
+    QString rootDir;
+    query.evaluateTo(&rootDir);
+    settingsFile.close();
+
+    rootDir = QDir::fromNativeSeparators(rootDir.trimmed());
+    if (!QDir(rootDir).exists())
+        return DEFAULT_MEDIA_DIR;
+
+    return rootDir;
+}
