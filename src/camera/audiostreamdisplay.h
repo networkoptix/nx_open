@@ -4,7 +4,6 @@
 #include "data\mediadata.h"
 #include "..\src\multimedia\audio\qaudioformat.h"
 #include "base\aligned_data.h"
-#include "base\ringbuffer.h"
 #include "decoders\audio\audio_struct.h"
 
 
@@ -12,63 +11,58 @@
 // decodes the video and pass it to video window
 class CLAbstractAudioDecoder;
 struct CLCompressedAudioData;
-class QAudioOutput;
-class QIODevice;
-
+class CLAudioDevice;
 
 
 class CLAudioStreamDisplay : public QObject
 {
 	Q_OBJECT
 public:
-	CLAudioStreamDisplay(int buff_ms, int buffAccMs);
+	CLAudioStreamDisplay(int buff_ms);
 	~CLAudioStreamDisplay();
 
 	void putdata(CLCompressedAudioData* data);
-	int suspend();
+
+    void enqueData(CLCompressedAudioData* data);
+
+	void suspend();
+
 	void resume();
 
-	int msInAudio();
+	// removes all data from audio buffers
+	void clearAudioBuff();
 
-	void clear();
+    // clears only device buff, not packets queue
+    void clearDeviceBuff();
 
-	bool is_initialized() const;
-	int get_buf_size_ms() const { return m_buff_ms; }
+	// how many ms is buffered in audio buffers at this moment(!)
+	int msInBuffer() const;
 
-	int msBuffered() { return ms_from_size(m_audioOutput->format(), m_ringbuff->bytesAvailable()) + msInAudio(); }
-
-	QAudioOutput* m_audioOutput;
-	CLRingBuffer* m_ringbuff;
+	// returns true if audio is not playing, just accumulating 
+	bool isBuffring() const;
 
 private:
 
-	void stopaudio();
-	void recreatedevice(QAudioFormat format);
+    // returns amount of ms which buffered before start playing 
+    int playAfterMs() const;
+    int msInQueue() const;
 
-	unsigned int ms_from_size(const QAudioFormat& format, unsigned long bytes);
-	unsigned int bytes_from_time(const QAudioFormat& format, unsigned long ms);
 
 	static void down_mix(CLAudioData& audio);
 	static void float2int(CLAudioData& audio);
 private:
+
 	CLAbstractAudioDecoder* m_decoder[CL_VARIOUSE_DECODERS];
+
 	int m_buff_ms;
-
-	int m_buffAccMs;
-	int m_buffAccBytes;
-
-	int m_can_adapt; // can not adapt device frequency very often;
-	qreal m_freq_factor;
-
 	CLAlignedData m_decodedaudio;
-
-	QIODevice* m_audiobuff; // not owned by this class 
-
 	bool m_downmixing;
-
-	bool m_tooFewSet;
-
 	bool m_too_few_data_detected;
+    CLAudioDevice* m_audiodevice;
+
+    QQueue<CLCompressedAudioData*> m_audioQueue;
+
+    
 };
 
 #endif //audiostreamdisplay_h_1811

@@ -4,8 +4,7 @@
 
 
 CLAbstractDataProcessor::CLAbstractDataProcessor(int max_que_size):
-m_dataQueue(max_que_size),
-m_isBuffering(false)
+m_dataQueue(max_que_size)
 {
 
 }

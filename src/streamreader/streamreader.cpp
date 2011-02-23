@@ -8,7 +8,7 @@
 CLStreamreader::CLStreamreader(CLDevice* dev):
 m_device(dev),
 m_qulity(StreamQuality::CLSLowest),
-m_skipSleep(false)
+m_needSleep(true)
 {
 	memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame));
 	m_channel_number = dev->getVideoLayout()->numberOfChannels();
@@ -100,10 +100,12 @@ void CLStreamreader::putData(CLAbstractData* data)
 	{
 		CLAbstractDataProcessor* dp = m_dataprocessors.at(i);
 		dp->putData(data);
-
-		// Hack.
-		m_skipSleep = dp->isBuffering();
 	}
 
 	data->releaseRef(); // now data belongs only to processors;
+}
+
+void CLStreamreader::setNeedSleep(bool sleep)
+{
+    m_needSleep = sleep;   
 }

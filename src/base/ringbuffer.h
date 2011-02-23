@@ -6,21 +6,26 @@ class CLRingBuffer : public QIODevice
 {
 
 public:
-	CLRingBuffer( int capacity, QObject* parent);
+	CLRingBuffer( unsigned int capacity, QObject* parent = 0);
 	~CLRingBuffer();
 
 	qint64 readData(char *data, qint64 maxlen);
 	qint64 writeData(const char *data, qint64 len);
+
+    // reads data and puts it to IOdevice
+    qint64 readToIODevice(QIODevice* divce, qint64 maxlen);
+
 	qint64 bytesAvailable() const;
 
 	qint64 avalable_to_write() const;
 
 	void clear();
 
-	int sizeBytes() const { return m_capacity; }
+    unsigned int capacity() const;
+
 private:
 	char *m_buff;
-	int m_capacity;
+	unsigned int m_capacity;
 
 	char* m_pw;
 	char* m_pr;

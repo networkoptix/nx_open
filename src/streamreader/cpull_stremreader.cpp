@@ -126,14 +126,12 @@ void CLClientPullStreamreader::run()
 
 		data->dataProvider = this;
 
-		putData(data);
+        if (videoData)
+            m_stat[videoData->channel_num].onData(data->data.size());
 
-		// put it in queue
-		//m_dataqueue[channel_num]->push(data);
+        putData(data);
 
-		if (videoData)
-			m_stat[videoData->channel_num].onData(data->data.size());
-
+		
 	}
 
 	CL_LOG(cl_logINFO) cl_log.log("stream reader stopped.", cl_logINFO);

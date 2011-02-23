@@ -21,7 +21,6 @@ public:
 	
 	int queSize() const;
 
-	bool isBuffering() const { return m_isBuffering; }
 protected:
 	void run();
 	virtual void processData(CLAbstractData* data)=0;
@@ -29,8 +28,6 @@ protected:
 
 protected:
 	CLDataQueue m_dataQueue;
-
-	bool m_isBuffering;
 };
 
 #endif //abstract_data_processor_h_2111

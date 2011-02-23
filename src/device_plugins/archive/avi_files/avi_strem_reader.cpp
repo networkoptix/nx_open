@@ -214,7 +214,7 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 		return 0;
 
 
-	if (m_bsleep && !isSingleShotMode() && !m_skipSleep)
+	if (m_bsleep && !isSingleShotMode() && m_needSleep)
 	{
 		smart_sleep(m_need_tosleep);
 	}
@@ -286,10 +286,6 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 		videoData->use_twice = m_use_twice;
 		m_use_twice = false;
 
-		videoData->afterJump = m_afterJump;
-		m_afterJump = false;
-
-
 		if (videoData->keyFrame)
 			m_gotKeyFrame[0] = true;
 
@@ -314,6 +310,7 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
         qint64 firstDts = (m_formatContext->streams[m_audioStrmIndex]->first_dts == AV_NOPTS_VALUE) ? 0 : m_formatContext->streams[m_audioStrmIndex]->first_dts;
 		double ttm = time_base * (m_packet.dts - firstDts);
 		audioData->timestamp = qint64(1e+6 * ttm);
+        audioData->duration = qint64(1e+6 * time_base * m_packet.duration);
 
 		CLByteArray& data = audioData->data;
 

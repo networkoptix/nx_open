@@ -34,7 +34,7 @@ CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::getCurrentDownScale
 	return m_scalefactor;
 }
 
-void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, CLVideoDecoderOutput::downscale_factor force_factor)
+void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVideoDecoderOutput::downscale_factor force_factor)
 {
 
 	CLVideoData img;
@@ -67,14 +67,13 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, CLVideoDecoderOut
 
 	}
 
-
 	if (!dec || !dec->decode(img))
 	{
 		CL_LOG(cl_logDEBUG2) cl_log.log("CLVideoStreamDisplay::dispay: decoder cannot decode image...", cl_logDEBUG2);
 		return;
 	}
 
-	if (!m_draw)
+	if (!draw || !m_draw)
 		return;
 
 
@@ -94,12 +93,6 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, CLVideoDecoderOut
 					m_scalefactor = CLVideoDecoderOutput::factor_4;
 				else if (on_screen.width()*2 <= img.out_frame.width  && on_screen.height()*2 <= img.out_frame.height)
 					m_scalefactor = CLVideoDecoderOutput::factor_2;
-
-
-				if (m_scalefactor != m_prevFactor)
-				{
-					cl_log.log("factor changed to ", (int)m_scalefactor, cl_logALWAYS);
-				}
 
 
 

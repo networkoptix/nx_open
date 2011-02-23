@@ -15,7 +15,7 @@ public:
 	CLVideoStreamDisplay(bool can_downscale);
 	~CLVideoStreamDisplay();
 	void setDrawer(CLAbstractRenderer* draw);
-	void dispay(CLCompressedVideoData* data, CLVideoDecoderOutput::downscale_factor force_factor = CLVideoDecoderOutput::factor_any);
+	void dispay(CLCompressedVideoData* data, bool draw, CLVideoDecoderOutput::downscale_factor force_factor = CLVideoDecoderOutput::factor_any);
 
 	void setLightCPUMode(bool val);
 	void coppyImage(bool copy);

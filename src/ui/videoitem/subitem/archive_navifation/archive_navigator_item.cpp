@@ -245,7 +245,9 @@ void CLArchiveNavigatorItem::onSliderMoved(int val)
 	quint64 time = mReader->len_mks()*factor;
 
 
+    m_videoCamera->getCamCamDisplay()->jump();
 	mReader->jumpTo(time, true);
+    
 }
 
 void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
@@ -289,10 +291,12 @@ void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
 
 	case RewindBackwardSubItem:
 		mReader->jumpTo(0, true);
+        m_videoCamera->getCamCamDisplay()->jump();
 		break;
 
 	case RewindForwardSubItem:
 		mReader->jumpTo(mReader->len_mks(), true);
+        m_videoCamera->getCamCamDisplay()->jump();
 		break;
 
 	case StepForwardSubItem:
@@ -306,7 +310,9 @@ void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
 		//mReader->setdirection(false);
 		mReader->jumpTo(curr_time-100*1000, true);
 		//mReader->setdirection(true);
+        m_videoCamera->getCamCamDisplay()->jump();
 		mReader->resumeDataProcessors();
+        
 		break;
 
 

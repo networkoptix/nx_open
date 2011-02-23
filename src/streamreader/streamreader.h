@@ -47,6 +47,8 @@ public:
 		}
 	}
 
+    void setNeedSleep(bool sleep);
+
 	virtual void setNeedKeyData();
 	virtual bool needKeyData(int channel) const;
 	virtual bool needKeyData() const;
@@ -79,7 +81,7 @@ protected:
 
 	StreamQuality m_qulity;
 
-	bool m_skipSleep;
+	volatile bool m_needSleep;
 
 };
 

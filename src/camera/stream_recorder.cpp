@@ -133,7 +133,7 @@ void CLStreamRecorder::onFirstdata(CLAbstractData* data)
 	QDir current_dir;
 	current_dir.mkpath(dir_helper());
 
-	CLStreamreader* reader = reinterpret_cast<CLStreamreader*>(data->dataProvider);
+	CLStreamreader* reader = data->dataProvider;
 	CLDevice* dev = reader->getDevice();
 
 	QDomDocument doc("");

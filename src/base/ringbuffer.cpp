@@ -1,7 +1,7 @@
 #include "ringbuffer.h"
 
 
-CLRingBuffer::CLRingBuffer( int capacity, QObject* parent):
+CLRingBuffer::CLRingBuffer( unsigned int capacity, QObject* parent):
 QIODevice(parent),
 m_capacity(capacity),
 m_mtx(QMutex::Recursive)
@@ -101,3 +101,39 @@ qint64 CLRingBuffer::writeData(const char *data, qint64 len)
 
 }
 
+qint64 CLRingBuffer::readToIODevice(QIODevice* divce, qint64 maxlen)
+{
+    //maxlen = qMin(maxlen, divce->bytesToWrite());
+
+    QMutexLocker mutex(&m_mtx);
+
+    qint64 can_read = bytesAvailable();
+
+    qint64 to_read = qMin(can_read, maxlen);
+
+
+    if (m_pr + to_read<= m_buff + m_capacity)
+    {
+        divce->write(m_pr, to_read);
+        m_pr+=to_read;
+
+    }
+    else
+    {
+        int first_read = m_buff + m_capacity - m_pr;
+        divce->write(m_pr, first_read);
+
+        int second_read = to_read - first_read;
+        divce->write(m_buff, second_read);
+        m_pr = m_buff + second_read;
+
+    }
+
+    return to_read;
+
+}
+
+unsigned int CLRingBuffer::capacity() const
+{
+    return m_capacity;
+}

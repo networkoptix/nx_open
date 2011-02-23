@@ -4,9 +4,11 @@
 #include "../base/threadqueue.h"
 #include "../base/expensiveobject.h"
 
+class CLStreamreader;
+
 struct CLAbstractData : public CLRefCounter
 {
-	void* dataProvider;
+	CLStreamreader* dataProvider;
 };
 
 typedef CLThreadQueue<CLAbstractData*> CLDataQueue;
