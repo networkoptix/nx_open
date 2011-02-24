@@ -141,6 +141,7 @@ void CLAudioStreamDisplay::putdata(CLCompressedAudioData* data)
     // audio_device buffer is small, and we need to put data from packets audio device. to do it we call this function with 0 pinter
 
     //cl_log.log("AUDIO_QUUE = ", m_audioQueue.size(), cl_logALWAYS);
+    
 
     if (data!=0)
 	{

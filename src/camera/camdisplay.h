@@ -74,6 +74,8 @@ private:
 
     bool m_after_jump;
 
+
+    int m_display_lasts;
 };
 
 #endif //clcam_display_h_1211

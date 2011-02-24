@@ -76,7 +76,7 @@ bool CLAudioDevice::wantMoreData()
 
     //return (moreChunks>0);
 
-    return (m_ringbuff->bytesAvailable() < m_ringbuff->capacity()/4);
+    return (m_ringbuff->bytesAvailable() < m_ringbuff->capacity()/5);
 }
 
 

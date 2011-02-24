@@ -15,7 +15,8 @@ m_delay(100*1000), // do not put a big value here to avoid cpu usage in case of 
 m_playAudio(false),
 m_last_audio_packet_time(0),
 m_hadAudio(false),
-m_after_jump(false)
+m_after_jump(false),
+m_display_lasts(0)
 {
 	for (int i = 0; i< CL_MAX_CHANNELS; ++i)
 		m_display[i] = 0;
@@ -91,11 +92,26 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
 
 	if (m_display[channel])
     {
-        // sometimes draw + decoding takes a lot of time. so to be able always synch video and audio we MUST not draw
-		m_display[channel]->dispay(vd, true, scale_factor);
-        //m_display[channel]->dispay(vd, sleep, scale_factor);
+        // sometimes draw + decoding takes a lot of time. so to be able always sync video and audio we MUST not draw
+        QTime display_time;
+        display_time.restart();
 
-        //cl_log.log(" queue size = ", m_videoQueue[0].size(),  cl_logALWAYS);
+        bool draw = sleep || (m_display_lasts*1000 < need_to_sleep); // do not draw if computer is very slow and we still wanna sync with audio
+
+
+		m_display[channel]->dispay(vd, draw, scale_factor);
+
+        if (!draw)
+            cl_log.log("skip drawing frame!!", display_time.elapsed(), cl_logWARNING);
+
+
+        if (!sleep)
+            m_display_lasts = display_time.elapsed(); // this is how long would i take to draw frame.
+
+        
+
+        //m_display[channel]->dispay(vd, sleep, scale_factor);
+        //cl_log.log(" video queue size = ", m_videoQueue[0].size(),  cl_logALWAYS);
     }
 
 	vd->releaseRef();
@@ -228,13 +244,13 @@ void CLCamDisplay::processData(CLAbstractData* data)
 
                     bool lastFrameToDisplay = qAbs(diff) < 2*videoDuration; //factor 2 here is to avoid frequent switch between normal play and fast play
 
-                    QTime time; time.restart();
+
                     display(vd, lastFrameToDisplay);
 
                     if (!lastFrameToDisplay)
                     {
-                        cl_log.log("FAST PLAY, diff = ", (int)diff/1000, " diplay time = ", time.elapsed() ,cl_logWARNING);
-                        cl_log.log("ms audio buff = ", m_audioDisplay->msInBuffer(), cl_logWARNING);
+                        cl_log.log("FAST PLAY, diff = ", (int)diff/1000, cl_logWARNING);
+                        //cl_log.log("ms audio buff = ", m_audioDisplay->msInBuffer(), cl_logWARNING);
 
                         ++fast_frames;
 
