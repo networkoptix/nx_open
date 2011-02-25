@@ -27,6 +27,10 @@ public:
 	bool isRecording();
 
 	virtual void beforestopDispay();
+
+
+    // this function must be called if stream was interupted or so; to synch audio and video again 
+    void streamJump();
 	
 	
 	void setLightCPUMode(bool val);

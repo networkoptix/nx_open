@@ -37,8 +37,9 @@ void CLAbstractDataProcessor::run()
 	const int timeout_ms = 100;
 	while(!needToStop())
 	{
+        
 		pause_delay();
-
+        
 		CLAbstractData* data;
 		bool get = m_dataQueue.pop(data, 200);
 
@@ -50,6 +51,7 @@ void CLAbstractDataProcessor::run()
 		}
 
 		processData(data);
+
 
 //		cl_log.log("queue size = ", m_dataQueue.size(),cl_logALWAYS);
 

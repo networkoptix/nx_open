@@ -1,5 +1,6 @@
 #ifndef cl_ThreadQueue_h_2236
 #define cl_ThreadQueue_h_2236 
+#include "log.h"
 
 
 
@@ -49,13 +50,11 @@ public:
 
 	void clear()
 	{
-		QMutexLocker mutex(&m_cs);
+    	QMutexLocker mutex(&m_cs);
 		while (!m_queue.empty()) 
 		{
-			m_sem.acquire();
-			//delete m_queue.head();
-			m_queue.head()->releaseRef();
-			m_queue.dequeue();
+			m_sem.tryAcquire();
+			m_queue.dequeue()->releaseRef();;
 		}
 	}
 

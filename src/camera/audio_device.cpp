@@ -37,9 +37,9 @@ m_ringbuff(0)
     if (supported)
     {
         m_audioOutput = new QAudioOutput(format);
-        m_audioOutput->setBufferSize( bytes_from_time(format, QT_AUDIO_BUFFER_SIZE) ); // data for 1sec of audio
+        m_audioOutput->setBufferSize( bytes_from_time(format, QT_AUDIO_BUFFER_SIZE) );
 
-        m_ringbuff = new CLRingBuffer( bytes_from_time(format, 1000) ); // I assume one packet will never contain more than one second of decompressed sound
+        m_ringbuff = new CLRingBuffer( bytes_from_time(format, 1000) ); // I assume one packet will never contain more than one 700 ms of decompressed sound
 
         m_audiobuff = m_audioOutput->start();
     }
@@ -76,7 +76,7 @@ bool CLAudioDevice::wantMoreData()
 
     //return (moreChunks>0);
 
-    return (m_ringbuff->bytesAvailable() < m_ringbuff->capacity()/5);
+    return (m_ringbuff->bytesAvailable() < m_ringbuff->capacity()/4); // 7 is luky number
 }
 
 

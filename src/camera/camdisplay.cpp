@@ -14,6 +14,7 @@ m_prev_video_displayed_time(0),
 m_delay(100*1000), // do not put a big value here to avoid cpu usage in case of zoom out 
 m_playAudio(false),
 m_last_audio_packet_time(0),
+m_last_video_packet_time(0),
 m_hadAudio(false),
 m_after_jump(false),
 m_display_lasts(0)
@@ -78,8 +79,10 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
 		need_to_sleep = 0;
 	//=========
 
+    
 	if (sleep)
 		m_delay.sleep(need_to_sleep);
+    
 
 	int channel = vd->channel_num;
 
@@ -119,8 +122,8 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
 
 void CLCamDisplay::jump()
 {
-    clearUnProcessedData();
     m_after_jump = true;
+    clearUnProcessedData();
 }
 
 void CLCamDisplay::processData(CLAbstractData* data)
@@ -139,14 +142,15 @@ void CLCamDisplay::processData(CLAbstractData* data)
     {
         m_after_jump = false;
         // clear everything we can
-        m_last_audio_packet_time = 0;
-        m_prev_video_displayed_time = vd ? vd->timestamp : ad->timestamp;
-        clearVideoQueue();
-        m_audioDisplay->clearAudioBuff();
+        after_jump((vd? vd->timestamp : ad->timestamp));
     }
 
 	if (ad)
 	{
+        if (ad->timestamp < m_last_audio_packet_time)
+            after_jump(ad->timestamp);
+        m_last_audio_packet_time = ad->timestamp;
+
 		// we synch video to the audio; so just put audio in player with out thinking
 		if (m_playAudio)
 		{
@@ -158,19 +162,21 @@ void CLCamDisplay::processData(CLAbstractData* data)
             m_audioDisplay->enqueData(ad);
         }
 
-        m_last_audio_packet_time = ad->timestamp;
+        
 
 
 	}
 	else if (vd)
 	{
+        if (vd->timestamp < m_last_video_packet_time)
+            after_jump(vd->timestamp);
+        m_last_video_packet_time = vd->timestamp;
 
         if (haveAudio())
         {
             // to put data from ring buff to audio buff( if any )
             m_audioDisplay->putdata(0);
         }
-
 
 
 		int channel = vd->channel_num;
@@ -244,7 +250,6 @@ void CLCamDisplay::processData(CLAbstractData* data)
 
                     bool lastFrameToDisplay = qAbs(diff) < 2*videoDuration; //factor 2 here is to avoid frequent switch between normal play and fast play
 
-
                     display(vd, lastFrameToDisplay);
 
                     if (!lastFrameToDisplay)
@@ -268,6 +273,7 @@ void CLCamDisplay::processData(CLAbstractData* data)
 		}
 
 	}
+
 }
 
 void CLCamDisplay::setLightCPUMode(bool val)
@@ -346,15 +352,15 @@ void CLCamDisplay::clearVideoQueue()
 
 qint64 CLCamDisplay::diffBetweenVideoandAudio(CLCompressedVideoData* incoming, int channel, qint64& duration) const
 {
-    quint64 current_paying_audio_time = m_last_audio_packet_time - (quint64)m_audioDisplay->msInBuffer()*1000;
-    quint64 current_paying_video_time = nextVideoImageTime(incoming, channel);
+    qint64 current_paying_audio_time = m_last_audio_packet_time - (quint64)m_audioDisplay->msInBuffer()*1000;
+    qint64 current_paying_video_time = nextVideoImageTime(incoming, channel);
 
     // strongly saning this duration of prev frame; not exact, but I think its fine
     // let's assume this frame has same duration
-    duration = (qint64)current_paying_video_time - (qint64)m_prev_video_displayed_time;
+    duration = current_paying_video_time - m_prev_video_displayed_time;
 
     // difference between video and audio
-    return (qint64)current_paying_video_time - (qint64)(current_paying_audio_time + 150*1000); // sorry for the magic number
+    return current_paying_video_time - (current_paying_audio_time + 150*1000); // sorry for the magic number
 }
 
 
@@ -364,4 +370,14 @@ void CLCamDisplay::enqueueVideo(CLCompressedVideoData* vd)
         m_videoQueue[vd->channel_num].enqueue(vd);
     else
         vd->releaseRef();
+}
+
+void CLCamDisplay::after_jump(qint64 new_time)
+{
+    cl_log.log("after jump", cl_logWARNING);
+
+    m_last_audio_packet_time = new_time;
+    m_prev_video_displayed_time = new_time;
+    clearVideoQueue();
+    m_audioDisplay->clearAudioBuff();
 }

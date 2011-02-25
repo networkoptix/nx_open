@@ -48,6 +48,12 @@ CLVideoCamera::~CLVideoCamera()
 
 }
 
+
+void CLVideoCamera::streamJump()
+{
+    m_camdispay.jump();
+}
+
 void CLVideoCamera::startDispay()
 {
 	CL_LOG(cl_logDEBUG1) cl_log.log("CLVideoCamera::startDispay ", m_device->getUniqueId(), cl_logDEBUG1);

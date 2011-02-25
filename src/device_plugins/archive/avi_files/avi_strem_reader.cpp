@@ -228,8 +228,9 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 
 		if (m_packet.stream_index == m_videoStrmIndex) // in case of video packet 
 		{
+            double time_base = av_q2d(m_formatContext->streams[m_videoStrmIndex]->time_base);
             qint64 firstDts = (m_formatContext->streams[m_videoStrmIndex]->first_dts == AV_NOPTS_VALUE) ? 0 : m_formatContext->streams[m_videoStrmIndex]->first_dts;
-			double ttm = av_q2d(m_formatContext->streams[m_videoStrmIndex]->time_base) * (m_packet.dts - firstDts);
+            double ttm = time_base * (m_packet.dts - firstDts);
 
 
 			m_currentTime =  qint64(1e+6 * ttm);
@@ -279,9 +280,6 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 		videoData->channel_num = 0;
 		videoData->timestamp = m_currentTime;
 
-		double time_base = av_q2d(m_formatContext->streams[m_videoStrmIndex]->time_base);
-        qint64 firstDts = (m_formatContext->streams[m_videoStrmIndex]->first_dts == AV_NOPTS_VALUE) ? 0 : m_formatContext->streams[m_videoStrmIndex]->first_dts;
-		double ttm = time_base * (m_packet.dts - firstDts);
 
 		videoData->use_twice = m_use_twice;
 		m_use_twice = false;

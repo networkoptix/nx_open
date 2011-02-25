@@ -55,6 +55,8 @@ private:
 
     void enqueueVideo(CLCompressedVideoData* vd);
 
+    void after_jump(qint64 new_time);
+
 private:
 	QQueue<CLCompressedVideoData*> m_videoQueue[CL_MAX_CHANNELS];
 
@@ -69,6 +71,7 @@ private:
     bool m_hadAudio; // got at leat one audio packet
 
 	quint64 m_last_audio_packet_time;
+    quint64 m_last_video_packet_time;
 
     quint64 m_prev_video_displayed_time;
 
