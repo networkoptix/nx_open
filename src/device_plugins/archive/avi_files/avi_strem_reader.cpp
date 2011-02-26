@@ -128,9 +128,9 @@ bool CLAVIStreamReader::init()
 	//	break;
 
 
-	//case CODEC_ID_MSMPEG4V2:
-	//	m_videocodec_id = CL_MSMPEG4V2;
-	//	break;
+	case CODEC_ID_MSMPEG4V2:
+		m_videocodec_id = CL_MSMPEG4V2;
+		break;
 
 
 	case CODEC_ID_WMV3:
@@ -369,7 +369,7 @@ bool CLAVIStreamReader::getNextPacket()
 		int err = av_read_frame(m_formatContext, &m_packet);
 		if (err < 0)
 		{
-			if (err == AVERROR_EOF)
+			//if (err == AVERROR_EOF)
 			{
 				destroy();
 				init();
@@ -379,8 +379,8 @@ bool CLAVIStreamReader::getNextPacket()
 					return false;
 
 			}
-			else
-				return false;
+			//else
+			//	return false;
 		}
 
 		if (m_packet.stream_index != m_videoStrmIndex && m_packet.stream_index != m_audioStrmIndex)
