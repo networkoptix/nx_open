@@ -299,8 +299,14 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
 	if (!m_camLayout.getContent()->checkIntereactionFlag(LayoutContent::Zoomable))
 		return;
 
+    QPoint unmoved_point = mapToScene(e->pos()).toPoint();
+    if (!getRealSceneRect().contains(unmoved_point))
+    {
+        unmoved_point = QPoint(0,0);
+    }
+
 	int numDegrees = e->delta() ;
-	m_scenezoom.zoom_delta(numDegrees/3000.0, scene_zoom_duration, 0);
+    m_scenezoom.zoom_delta(numDegrees/4000.0, 1500, 0, unmoved_point, CLAnimationTimeLine::OUTCUBIC);
 }
 
 void GraphicsView::zoomMin(int duration)
@@ -373,6 +379,31 @@ void GraphicsView::showStop_helper()
 	}
 
 
+
+}
+
+void GraphicsView::viewMove(int dx, int dy)
+{
+    m_movement.stopAnimation();
+
+    QPoint delta(dx,dy);
+
+    QScrollBar *hBar = horizontalScrollBar();
+    QScrollBar *vBar = verticalScrollBar();
+
+    // this code does not work well QPoint(2,2) depends on veiwport border width or so.
+    QPointF new_pos = mapToScene( viewport()->rect().center() - delta + QPoint(2,2) ); // rounding;
+    QRect rsr = getRealSceneRect();
+
+    if (new_pos.x() >= rsr.left() && new_pos.x() <= rsr.right())
+        hBar->setValue(hBar->value() + (isRightToLeft() ? delta.x() : -delta.x()));
+
+    if (new_pos.y() >= rsr.top() && new_pos.y() <= rsr.bottom())
+        vBar->setValue(vBar->value() - delta.y());
+
+
+
+    addjustAllStaticItems();
 
 }
 
@@ -676,23 +707,8 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 		/**/
 
 		QPoint delta = event->pos() - m_mousestate.getLastEventPoint();
-		QScrollBar *hBar = horizontalScrollBar();
-		QScrollBar *vBar = verticalScrollBar();
-
-		QPointF new_pos = mapToScene( viewport()->rect().center() - delta + QPoint(2,2) ); // rounding;
-		QRect rsr = getRealSceneRect();
-
-		if (new_pos.x() >= rsr.left() && new_pos.x() <= rsr.right())
-			hBar->setValue(hBar->value() + (isRightToLeft() ? delta.x() : -delta.x()));
-
-		if (new_pos.y() >= rsr.top() && new_pos.y() <= rsr.bottom())
-			vBar->setValue(vBar->value() - delta.y());
-		
-		
-		
-		addjustAllStaticItems();
-
-		
+        viewMove(delta.x(), delta.y());
+	
 		
 		//cl_log.log("==m_handMoving!!!=====", cl_logDEBUG1);
 
@@ -1026,7 +1042,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 				int duration = 800;
 				m_movement.move(scene_pos, duration, doubl_clk_delay, CLAnimationTimeLine::SLOW_START_SLOW_END);
-				m_scenezoom.zoom_abs(zoom, duration, doubl_clk_delay,  CLAnimationTimeLine::SLOW_START_SLOW_END);
+				m_scenezoom.zoom_abs(zoom, duration, doubl_clk_delay, QPoint(0,0), CLAnimationTimeLine::SLOW_START_SLOW_END);
 
 			}
 
@@ -1935,7 +1951,7 @@ void GraphicsView::onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int de
 	qreal zoom = m_scenezoom.scaleTozoom(scale) ;
 
 
-	m_scenezoom.zoom_abs(zoom, item_select_duration, delay, CLAnimationTimeLine::SLOW_START_SLOW_END);
+	m_scenezoom.zoom_abs(zoom, item_select_duration, delay, QPoint(0,0), CLAnimationTimeLine::SLOW_START_SLOW_END);
 
 	m_camLayout.setMaxFps(MAX_FPS_selected);
 
@@ -2154,7 +2170,7 @@ void GraphicsView::fitInView(int duration, int delay, CLAnimationTimeLine::CLAni
 	//scale(scl, scl);
 
 	
-	m_scenezoom.zoom_abs(zoom, duration, delay, curve);
+	m_scenezoom.zoom_abs(zoom, duration, delay, QPoint(0,0), curve);
 
 }
 
@@ -2207,7 +2223,7 @@ void GraphicsView::onItemFullScreen_helper(CLAbstractSceneItem* wnd)
 	//scale(scl, scl);
 
 	
-	m_scenezoom.zoom_abs(zoom, duration, 0, CLAnimationTimeLine::SLOW_START_SLOW_END);
+	m_scenezoom.zoom_abs(zoom, duration, 0, QPoint(0,0), CLAnimationTimeLine::SLOW_START_SLOW_END);
 
 
 	

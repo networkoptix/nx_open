@@ -55,6 +55,9 @@ public:
 	void addjustAllStaticItems();
 	void centerOn(const QPointF &pos);
 
+    // moves scene in view coord
+    void viewMove(int dx, int dy);
+
 	void initDecoration();
 
 	void setViewMode(ViewMode mode);

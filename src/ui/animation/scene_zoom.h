@@ -14,10 +14,9 @@ public:
 	virtual ~CLSceneZoom();
 
 
-	void zoom_delta(qreal delta, int duration, int delay, CLAnimationTimeLine::CLAnimationCurve curve =  CLAnimationTimeLine::SLOW_END_POW_40);
-	void zoom_abs(qreal z, int duration, int delay, CLAnimationTimeLine::CLAnimationCurve curve =  CLAnimationTimeLine::SLOW_END_POW_40);
-	
-	void zoom_minimum(int duration, int delay, CLAnimationTimeLine::CLAnimationCurve curve =  CLAnimationTimeLine::SLOW_END_POW_40);
+	void zoom_delta(qreal delta, int duration, int delay, QPoint unmoved_point = QPoint(0,0), CLAnimationTimeLine::CLAnimationCurve curve =  CLAnimationTimeLine::SLOW_END_POW_40);
+	void zoom_abs(qreal z, int duration, int delay, QPoint unmoved_point = QPoint(0,0), CLAnimationTimeLine::CLAnimationCurve curve =  CLAnimationTimeLine::SLOW_END_POW_40);
+	void zoom_minimum(int duration, int delay, QPoint unmoved_point = QPoint(0,0), CLAnimationTimeLine::CLAnimationCurve curve =  CLAnimationTimeLine::SLOW_END_POW_40);
 
 	qreal getZoom() const;
 
@@ -40,6 +39,8 @@ protected:
 	qreal m_zoom,  m_targetzoom, m_diff, m_start_point;
 
 	CLStreamreader::StreamQuality m_quality;
+
+    QPoint m_unmoved_point; // during zoom this point should remain same position on the screen
 
 };
 

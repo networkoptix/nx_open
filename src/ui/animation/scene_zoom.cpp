@@ -46,8 +46,10 @@ qreal CLSceneZoom::getZoom() const
 }
 
 
-void CLSceneZoom::zoom_abs(qreal z, int duration, int delay, CLAnimationTimeLine::CLAnimationCurve curve)
+void CLSceneZoom::zoom_abs(qreal z, int duration, int delay, QPoint unmoved_point, CLAnimationTimeLine::CLAnimationCurve curve)
 {
+
+    m_unmoved_point = unmoved_point;
 
 	m_timeline.setCurve(curve);
 
@@ -56,15 +58,17 @@ void CLSceneZoom::zoom_abs(qreal z, int duration, int delay, CLAnimationTimeLine
 	zoom_helper(duration, delay);
 }
 
-void CLSceneZoom::zoom_minimum(int duration, int delay, CLAnimationTimeLine::CLAnimationCurve curve)
+void CLSceneZoom::zoom_minimum(int duration, int delay, QPoint unmoved_point, CLAnimationTimeLine::CLAnimationCurve curve)
 {
+    m_unmoved_point = unmoved_point;
 	m_timeline.setCurve(curve);
 	zoom_abs(m_view->getMinSceneZoom() , duration, delay);
 }
 
 
-void CLSceneZoom::zoom_delta(qreal delta, int duration, int delay, CLAnimationTimeLine::CLAnimationCurve curve)
+void CLSceneZoom::zoom_delta(qreal delta, int duration, int delay, QPoint unmoved_point, CLAnimationTimeLine::CLAnimationCurve curve)
 {
+    m_unmoved_point = unmoved_point;
 	m_timeline.setCurve(curve);
 	m_targetzoom += delta;
 	zoom_helper(duration, delay);
@@ -80,11 +84,30 @@ void CLSceneZoom::valueChanged( qreal dpos )
 
 	qreal scl = zoomToscale(m_zoom);
 
+    QPoint unmoved_viewpos;
+    if (m_unmoved_point!=QPoint(0,0))
+    {
+        // first of all lets get m_unmoved_point view pos
+         unmoved_viewpos = m_view->mapFromScene(m_unmoved_point);
+    }
+
+
 	QTransform tr;
 	tr.scale(scl, scl);
 	tr.rotate(global_rotation_angel, Qt::YAxis);
 	m_view->setTransform(tr);
-	m_view->addjustAllStaticItems();
+
+
+    if (m_unmoved_point!=QPoint(0,0))
+    {
+        // first of all lets get m_unmoved_point view pos
+        QPoint delta = unmoved_viewpos - m_view->mapFromScene(m_unmoved_point);
+        m_view->viewMove(delta.x(), delta.y());
+    }
+    else // viewMove already called addjustAllStaticItems; do not need to do it second time
+    {
+        m_view->addjustAllStaticItems();
+    }
 
 
 	//=======================================

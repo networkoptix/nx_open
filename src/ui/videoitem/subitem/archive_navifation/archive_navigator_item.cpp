@@ -265,7 +265,7 @@ void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
 
 		mReader->setSingleShotMode(false);
 		mReader->resume();
-		// mReader->resumeDataProcessors();
+		mReader->resumeDataProcessors();
 
 		m_videoCamera->getCamCamDisplay()->playAudio(true);
 
@@ -280,7 +280,7 @@ void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
 		mStepForward->setVisible(true);
 
 
-		// mReader->pauseDataProcessors();
+		//mReader->pauseDataProcessors();
 		mReader->pause();
 		m_videoCamera->getCamCamDisplay()->playAudio(false);
 		
@@ -291,11 +291,13 @@ void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
 	case RewindBackwardSubItem:
 		mReader->jumpTo(0, true);
         m_videoCamera->streamJump();
+        mReader->resumeDataProcessors();
 		break;
 
 	case RewindForwardSubItem:
 		mReader->jumpTo(mReader->len_mks(), true);
         m_videoCamera->streamJump();
+        mReader->resumeDataProcessors();
 		break;
 
 	case StepForwardSubItem:
