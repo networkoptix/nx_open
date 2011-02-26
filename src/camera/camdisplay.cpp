@@ -105,7 +105,7 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
 		m_display[channel]->dispay(vd, draw, scale_factor);
 
         if (!draw)
-            cl_log.log("skip drawing frame!!", display_time.elapsed(), cl_logWARNING);
+            cl_log.log("skip drawing frame!!", display_time.elapsed(), cl_logDEBUG1);
 
 
         if (!sleep)
@@ -224,7 +224,7 @@ void CLCamDisplay::processData(CLAbstractData* data)
                 // video runs faster than audio; // need to hold video this frame
                 enqueueVideo(vd);
 
-                cl_log.log("HOLD FRAME", cl_logWARNING);
+                cl_log.log("HOLD FRAME", cl_logDEBUG1);
 
                 return;
             }
@@ -254,7 +254,7 @@ void CLCamDisplay::processData(CLAbstractData* data)
 
                     if (!lastFrameToDisplay)
                     {
-                        cl_log.log("FAST PLAY, diff = ", (int)diff/1000, cl_logWARNING);
+                        cl_log.log("FAST PLAY, diff = ", (int)diff/1000, cl_logDEBUG1);
                         //cl_log.log("ms audio buff = ", m_audioDisplay->msInBuffer(), cl_logWARNING);
 
                         ++fast_frames;

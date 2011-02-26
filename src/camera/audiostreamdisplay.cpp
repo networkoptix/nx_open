@@ -158,7 +158,7 @@ void CLAudioStreamDisplay::putdata(CLCompressedAudioData* data)
 
         if ( msInQueue() > m_buff_ms )
         {
-            cl_log.log("to many data in audio queue!!!!", cl_logWARNING);
+            cl_log.log("to many data in audio queue!!!!", cl_logDEBUG1);
             clearAudioBuff();
             return;
         }
@@ -166,7 +166,7 @@ void CLAudioStreamDisplay::putdata(CLCompressedAudioData* data)
         if ( msInQueue() < m_buff_ms/10 )
         {
             //paying too fast; need to slowdown
-            cl_log.log("to few data in audio queue!!!!", cl_logWARNING);
+            cl_log.log("too few data in audio queue!!!!", cl_logDEBUG1);
             m_too_few_data_detected = true;
             suspend();
             data->dataProvider->setNeedSleep(false); //lets reader run without delays;
