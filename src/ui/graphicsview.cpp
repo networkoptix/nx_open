@@ -384,6 +384,10 @@ void GraphicsView::showStop_helper()
 
 void GraphicsView::viewMove(int dx, int dy)
 {
+
+    if (qAbs(dx) > 200 || (qAbs(dy) > 200))
+        return;
+
     m_movement.stopAnimation();
 
     QPoint delta(dx,dy);
