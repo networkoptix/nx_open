@@ -5,7 +5,7 @@
 extern QPixmap cached(const QString &img);
 
 CLUnMovedPixture::CLUnMovedPixture(QString name, QGraphicsItem* parent, qreal normal_opacity, qreal active_opacity, QString img, int max_width, int max_height, qreal z):
-CLUnMovedOpacityItem(name, parent, normal_opacity, active_opacity)
+CLUnMovedInteractiveOpacityItem(name, parent, normal_opacity, active_opacity)
 {
 	m_img = cached(img);
 

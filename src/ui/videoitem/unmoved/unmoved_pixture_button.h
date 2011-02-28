@@ -2,10 +2,10 @@
 #define unmoved_pixture_button_h_1867
 
 
-#include "abstract_animated_unmoved_item.h"
+#include "unmoved_interactive_opacity_item.h"
 class QPropertyAnimation;
 
-class CLUnMovedPixture : public CLUnMovedOpacityItem
+class CLUnMovedPixture : public CLUnMovedInteractiveOpacityItem
 {
 	Q_OBJECT
 public:

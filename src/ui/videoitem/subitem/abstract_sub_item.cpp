@@ -4,7 +4,7 @@
 
 
 CLAbstractSubItem::CLAbstractSubItem(CLAbstractSubItemContainer* parent, qreal normal_opacity, qreal active_opacity):
-CLUnMovedOpacityItem("", static_cast<QGraphicsItem*>(parent), normal_opacity, active_opacity),
+CLUnMovedInteractiveOpacityItem("", static_cast<QGraphicsItem*>(parent), normal_opacity, active_opacity),
 m_parent(parent)
 {
 	setFlag(QGraphicsItem::ItemIgnoresTransformations, false); // at any momrnt this item can becom umoved; but by default disable this flag
