@@ -8,6 +8,7 @@
 #include "video_cam_layout/videocamlayout.h"
 #include "ui_common.h"
 #include "animation/animation_manager.h"
+#include "animation/steady_mouse_animation.h"
 
 
 class CLAbstractSceneItem;
@@ -72,6 +73,9 @@ public:
 	void instantArrange();
 
 	void updateTransform(qreal angle);
+
+    void goToSteadyMode(bool steady);
+    void onUserInput();
 
 signals:
 	void scneZoomFinished();
@@ -200,6 +204,8 @@ protected:
 	QGraphicsPixmapItem* m_logo;
 
 	Show_helper mShow;
+
+    CLSteadyMouseAnimation mSteadyShow;
 
 	QTimer m_secTimer;
 

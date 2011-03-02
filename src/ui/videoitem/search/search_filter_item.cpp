@@ -3,13 +3,16 @@
 #include "search_edit.h"
 #include "device\device_managmen\device_criteria.h"
 #include "ui\video_cam_layout\layout_content.h"
+#include "ui\graphicsview.h"
+#include <QModelIndex>
 
 
-CLSerachEditItem::CLSerachEditItem(QWidget* parent, LayoutContent* sceneContent):
+CLSerachEditItem::CLSerachEditItem(GraphicsView* view, QWidget* parent, LayoutContent* sceneContent):
 QWidget(parent),
 m_sceneContent(sceneContent),
 m_width(100),
-m_height(100)
+m_height(100),
+m_view(view)
 {
 	m_lineEdit = new CLSearchEdit(this);
 	m_lineEdit->setFocus();
@@ -51,20 +54,20 @@ m_height(100)
 	m_completer->setCompletionMode(QCompleter::PopupCompletion);
 	m_completer->setCaseSensitivity(Qt::CaseInsensitive);
 
-	QListView* lstview = new QListView();
-	lstview->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	lstview->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	m_lstview = new QListView();
+	m_lstview->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	m_lstview->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
 
 
-	lstview->setStyleSheet(
+	m_lstview->setStyleSheet(
 		"color: rgb(0, 240, 240);"
 		"background-color: rgb(0, 16, 72);"
 		"selection-color: yellow;"
 		"selection-background-color: blue;"
 		"font-size: 20px; \n");
 
-	m_completer->setPopup(lstview);
+	m_completer->setPopup(m_lstview);
 
 
 
@@ -86,7 +89,13 @@ CLSerachEditItem::~CLSerachEditItem()
 
 }
 
+void CLSerachEditItem::setVisible(bool visible)
+{
+    QWidget::setVisible(visible);
 
+    if (!visible)
+        m_lstview->setVisible(visible);
+}
 
 void CLSerachEditItem::resize()
 {
@@ -110,6 +119,9 @@ void CLSerachEditItem::resize()
 
 void CLSerachEditItem::onEditTextChanged (const QString & text)
 {
+
+    m_view->onUserInput();
+
 	mTimer.stop();
 	mTimer.start();
 
@@ -148,4 +160,9 @@ void CLSerachEditItem::onTimer()
 
 	m_sceneContent->setDeviceCriteria(cr);
 
+}
+
+bool CLSerachEditItem::hasFocus() const
+{
+    return m_lineEdit->hasFocus();
 }

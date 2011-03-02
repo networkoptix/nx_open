@@ -33,6 +33,7 @@ void CLSerchEditCompleter::updateStringLst(QStringList lst)
 	m_list = lst;
 }
 
+
 //=======================================================
 
 CLSearchEdit::CLSearchEdit(QWidget *parent)
@@ -102,5 +103,5 @@ void CLSearchEdit::keyPressEvent(QKeyEvent *e)
 	}
 
 	c->filter(text());
-	c->popup()->setCurrentIndex(c->completionModel()->index(0, 0));
+	//c->popup()->setCurrentIndex(c->completionModel()->index(0, 0));
 }

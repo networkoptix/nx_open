@@ -18,8 +18,8 @@ public:
 
 	QString getName() const;
 
-    //virtual void hide(int duration) = 0;
-    //virtual void show(int duration) = 0;
+    virtual void hide(int duration) = 0;
+    virtual void show(int duration) = 0;
 
 protected:
 	QString m_name;

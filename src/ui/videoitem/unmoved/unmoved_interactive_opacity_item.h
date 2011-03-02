@@ -11,9 +11,17 @@ class CLUnMovedInteractiveOpacityItem: public CLAbstractUnMovedOpacityItem
 public:
 	CLUnMovedInteractiveOpacityItem(QString name, QGraphicsItem* parent, qreal normal_opacity, qreal active_opacity);
 	~CLUnMovedInteractiveOpacityItem();
+
+    virtual void hide(int duration);
+    virtual void show(int duration);
+
+
 protected:
 	virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
 	virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
+
+
+
 protected:
     bool needAnimation() const;
 protected:

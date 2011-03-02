@@ -5,6 +5,8 @@
 #include "ui/graphicsview.h"
 #include "settings.h"
 
+//(videoCodecCtx && videoCodecCtx->sample_aspect_ratio.num) ? av_q2d(videoCodecCtx->sample_aspect_ratio) : 1.0f;
+
 
 CLVideoWindowItem::CLVideoWindowItem(GraphicsView* view, const CLDeviceVideoLayout* layout, int max_width, int max_height,
 									 QString name):
@@ -213,6 +215,10 @@ void CLVideoWindowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
 	//painter->setClipRect( option->exposedRect );
 	
 	// save the GL state set for QPainter
+    if (m_steadyMode)
+        drawSteadyWall(painter);
+
+
 	painter->beginNativePainting();
 	saveGLState();
 
@@ -248,6 +254,8 @@ bool CLVideoWindowItem::wantText() const
 
 void CLVideoWindowItem::drawStuff(QPainter* painter)
 {
+    if (m_steadyMode)
+        return;
 
 	CLImageItem::drawStuff(painter);
 

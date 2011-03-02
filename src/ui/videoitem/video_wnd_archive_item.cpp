@@ -52,7 +52,6 @@ void CLVideoWindowArchiveItem::setItemSelected(bool sel, bool animate, int delay
 {
 	CLVideoWindowItem::setItemSelected(sel, animate , delay );
 
-	
 	if (sel)
 		mArchiveNavigator->setVisible(true);
 	else

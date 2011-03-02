@@ -17,6 +17,7 @@ class CLAbstractSceneItem : public CLAbstractSubItemContainer
 	Q_OBJECT
 	Q_PROPERTY(QPointF pos READ pos WRITE setPos)
 	Q_PROPERTY(qreal rotation	READ getRotation WRITE setRotation)
+    Q_PROPERTY(int steadycolor	READ steadyBlackColor WRITE setSteadyBlackColor)
 public:
 
 	enum CLSceneItemType {VIDEO, IMAGE, BUTTON, RECORDER, LAYOUT};
@@ -100,13 +101,15 @@ public:
 
 	//====rotation=======
 	void drawRotationHelper(bool val);
-
-	
 	void setRotationPointCenter(QPointF center);
 	QPointF getRotationPointCenter() const;
-
-	
 	void setRotationPointHand(QPointF point);
+
+    //== steady mode
+
+    void goToSteadyMode(bool steady, bool instant);
+    int steadyBlackColor() const;
+    void setSteadyBlackColor(int color);
 
 public slots:
 	
@@ -116,9 +119,13 @@ signals:
 	void onDoubleClick(CLAbstractSceneItem*);
 	void onFullScreen(CLAbstractSceneItem*);
 	void onSelected(CLAbstractSceneItem*);
+
+protected slots:
+        void stopSteadyAnimation();
 	
 protected:
 	void drawShadow(QPainter* painter);
+    void drawSteadyWall(QPainter* painter);
 
 	void drawRotationHelper(QPainter* painter);
 
@@ -128,7 +135,7 @@ protected:
 	virtual void mousePressEvent ( QGraphicsSceneMouseEvent * event );
 	virtual void mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * event );
 
-
+    
 
 protected:
 	bool m_selected;
@@ -160,6 +167,11 @@ protected:
 
 	QPointF m_originalPos;
 	bool m_originallyArranged;
+
+    // steady mode
+    bool m_steadyMode; // in steady mode nothing should be on the screen but item itself
+    QPropertyAnimation* m_steady_animation;
+    int m_steady_black_color;
 };
 
 

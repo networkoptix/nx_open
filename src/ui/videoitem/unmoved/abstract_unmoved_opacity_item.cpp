@@ -1,8 +1,6 @@
 #include <math.h>
 #include "abstract_unmoved_opacity_item.h"
 
-#define OPACITY_TIME 500
-
 
 
 CLAbstractUnMovedOpacityItem::CLAbstractUnMovedOpacityItem(QString name, QGraphicsItem* parent):
@@ -27,7 +25,7 @@ void CLAbstractUnMovedOpacityItem::changeOpacity(qreal new_opacity, int duration
     }
 
     m_animation = new QPropertyAnimation(this, "opacity");
-    m_animation->setDuration(OPACITY_TIME);
+    m_animation->setDuration(duration_ms);
     m_animation->setStartValue(opacity());
     m_animation->setEndValue(new_opacity);
     m_animation->start();	

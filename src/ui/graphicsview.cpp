@@ -79,7 +79,8 @@ m_fps_frames(0),
 m_seachItem(0),
 m_min_scene_zoom(0.06),
 mShow(this),
-m_gridItem(0)
+m_gridItem(0),
+mSteadyShow(this)
 {
 
 	setScene(&m_scene);
@@ -183,6 +184,7 @@ void GraphicsView::start()
 	}
 
 	enableMultipleSelection(false, true);
+    mSteadyShow.start();
 
 }
 
@@ -293,6 +295,8 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
 {
 	if (!mViewStarted)
 		return;
+
+    onUserInput();
 
 	showStop_helper();
 
@@ -505,7 +509,7 @@ void GraphicsView::initDecoration()
 
 	if (serach)
 	{
-		m_seachItem = new CLSerachEditItem(this, m_camLayout.getContent());
+		m_seachItem = new CLSerachEditItem(this, this, m_camLayout.getContent());
 	}
 	else
 	{
@@ -566,6 +570,7 @@ void GraphicsView::stopAnimation()
 
 	m_animationManager.stopAllAnimations();
 	showStop_helper();
+    //mSteadyShow.stopAnimation();
 	
 }
 
@@ -576,6 +581,8 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 
 	if (m_gridItem->isVisible() && !isCTRLPressed(event))
 		m_gridItem->hide();
+
+    onUserInput();
 
 
 	m_yRotate = 0;
@@ -669,7 +676,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 	if (m_gridItem->isVisible() && !isCTRLPressed(event))
 		m_gridItem->hide();
 
-
+    mSteadyShow.onUserInput();
 
 	QGraphicsItem *item = itemAt(event->pos());
 	CLAbstractSceneItem* aitem = navigationItem(item);
@@ -848,6 +855,8 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 {
 	if (!mViewStarted)
 		return;
+
+    onUserInput();
 
 	if (m_ignore_release_event)
 	{
@@ -1473,6 +1482,67 @@ void GraphicsView::dropEvent ( QDropEvent * event )
 	}
 }
 
+void GraphicsView::onUserInput()
+{
+    mSteadyShow.onUserInput();
+}
+
+void GraphicsView::goToSteadyMode(bool steady)
+{
+    CLUnMovedPixture* bk_item = static_cast<CLUnMovedPixture*>(staticItemByName("background"));
+
+    if (steady)
+    {
+        if (m_seachItem && m_seachItem->hasFocus())
+        {
+            mSteadyShow.onUserInput(false);
+            return;
+        }
+
+
+
+        foreach(CLAbstractUnmovedItem* item, m_staticItems)
+        {
+            if (item != bk_item)
+                item->hide(500);
+        }
+
+        if (m_seachItem && m_seachItem->isVisible())
+            m_seachItem->setVisible(false);
+
+        if (m_selectedWnd && m_selectedWnd->isFullScreen())
+        {
+            m_selectedWnd->goToSteadyMode(true, false);
+        }
+
+    }
+    else
+    {
+        foreach(CLAbstractUnmovedItem* item, m_staticItems)
+        {
+            if (item != bk_item)
+                item->show(500);
+        }
+
+        if (m_seachItem && !m_seachItem->isVisible())
+        {
+            m_seachItem->setVisible(true);
+        }
+
+        if (m_seachItem)
+            m_seachItem->setFocus();
+            
+        
+
+        if(m_selectedWnd && m_selectedWnd->isFullScreen())
+        {
+            m_selectedWnd->goToSteadyMode(false, false);
+        }
+
+
+    }
+}
+
 
 void GraphicsView::enableMultipleSelection(bool enable, bool unselect)
 {
@@ -1517,6 +1587,8 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 {
 	if (!mViewStarted)
 		return;
+
+    mSteadyShow.onUserInput();
 
 
 	CLAbstractSceneItem* last_sel_item = getLastSelectedItem();

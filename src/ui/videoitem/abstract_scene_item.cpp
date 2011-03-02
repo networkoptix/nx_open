@@ -20,6 +20,8 @@ extern int item_hoverevent_duration;
 
 #define SHADOW_SIZE 100
 
+extern int global_opacity_change_period;
+
 
 CLAbstractSceneItem::CLAbstractSceneItem(GraphicsView* view, int max_width, int max_height, 
 										 QString name):
@@ -40,7 +42,10 @@ m_needUpdate(false),
 mEditable(false),
 m_rotation_center(0,0),
 m_complicatedItem(0),
-m_can_be_droped(false)
+m_can_be_droped(false),
+m_steadyMode(false),
+m_steady_animation(0),
+m_steady_black_color(0)
 {
 	setAcceptsHoverEvents(true);
 
@@ -220,6 +225,9 @@ void CLAbstractSceneItem::setFullScreen(bool full)
 {
 	m_fullscreen = full;
 
+    if (!m_fullscreen)
+        goToSteadyMode(false, true);
+
 	if (m_fullscreen )
 		emit onFullScreen(this);
 }
@@ -325,8 +333,30 @@ void CLAbstractSceneItem::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 		QGraphicsItem::mouseReleaseEvent(event);
 }
 
+
+void CLAbstractSceneItem::drawSteadyWall(QPainter* painter)
+{
+    if (!m_steadyMode)
+        return; // do not need to draw anything in this mode
+
+
+    QColor color(0,0,0,m_steady_black_color);
+
+    QRect rect(0, 0, width(), height());
+
+    int maxd = qMax(width(), height());
+    rect.adjust(-maxd, -maxd, maxd, maxd);
+    painter->fillRect(rect, color);
+    
+
+
+}
+
 void CLAbstractSceneItem::drawShadow(QPainter* painter)
 {
+    if (m_steadyMode)
+        return; // do not need to draw anything in this mode
+
 	QRect rect1(width(), SHADOW_SIZE, SHADOW_SIZE, height());
 	QRect rect2(SHADOW_SIZE, height(), width()-SHADOW_SIZE, SHADOW_SIZE);
 	painter->fillRect(rect1, global_shadow_color);
@@ -449,4 +479,89 @@ void CLAbstractSceneItem::drawRotationHelper(QPainter* painter)
 	painter->restore();
 	/**/
 
+}
+
+void CLAbstractSceneItem::stopSteadyAnimation()
+{
+    if (m_steady_animation)
+    {
+        if (steadyBlackColor()==0)
+            m_steadyMode = false;
+        m_steady_animation->stop();
+        delete m_steady_animation;
+        m_steady_animation = 0;
+    }
+}
+
+void CLAbstractSceneItem::goToSteadyMode(bool steady, bool instant)
+{
+    if (steady)
+    {
+        m_steadyMode = true;
+
+        QList<QGraphicsItem *> childrenLst = childItems();
+        foreach(QGraphicsItem * item, childrenLst)
+        {
+            CLAbstractSubItem* sub_item = static_cast<CLAbstractSubItem*>(item);
+            sub_item->hide(global_opacity_change_period*(!instant));
+        }
+
+
+        if (instant)
+        {
+            setSteadyBlackColor(255);
+            return;
+        }
+
+        stopSteadyAnimation();
+
+        m_steady_animation = new QPropertyAnimation(this, "steadycolor");
+        m_steady_animation->setDuration(global_opacity_change_period);
+        m_steady_animation->setStartValue(steadyBlackColor());
+        m_steady_animation->setEndValue(255);
+        m_steady_animation->start();
+        connect(m_steady_animation, SIGNAL(finished ()), this, SLOT(stopSteadyAnimation()));
+
+        return;
+    }
+
+
+    // escape steady mode
+    QList<QGraphicsItem *> childrenLst = childItems();
+    foreach(QGraphicsItem * item, childrenLst)
+    {
+        CLAbstractSubItem* sub_item = static_cast<CLAbstractSubItem*>(item);
+        sub_item->show(global_opacity_change_period*(!instant));
+    }
+
+    if (instant)
+    {
+        stopSteadyAnimation();
+        setSteadyBlackColor(255);
+        m_steadyMode = false;
+        return;
+    }
+
+
+    stopSteadyAnimation();
+
+    m_steady_animation = new QPropertyAnimation(this, "steadycolor");
+    m_steady_animation->setDuration(global_opacity_change_period);
+    m_steady_animation->setStartValue(steadyBlackColor());
+    m_steady_animation->setEndValue(0);
+    m_steady_animation->start();
+    connect(m_steady_animation, SIGNAL(finished ()), this, SLOT(stopSteadyAnimation()));
+
+
+}
+
+int CLAbstractSceneItem::steadyBlackColor() const
+{
+    return m_steady_black_color;
+}
+
+void CLAbstractSceneItem::setSteadyBlackColor(int color) 
+{
+    m_steady_black_color = color;
+    update();
 }
