@@ -24,18 +24,22 @@ public:
 	void putWidget(CLAbstractSettingsWidget* wgt);
 	void putGroup(QGroupBox* group);
 
-	void addTab(CLDeviceSettingsTab* tab);
 
 public slots:
 	virtual void setParam(const QString& name, const CLValue& val);
 	virtual void onClose();
 	virtual void onSuggestions();
 
+    virtual void onNewtab(int index);
+
 protected:
+    void addTabWidget(CLDeviceSettingsTab* tab);
 	CLAbstractSettingsWidget* getWidgetByName(QString name) const;
 	QGroupBox* getGroupByName(QString name) const;
 	CLDeviceSettingsTab* tabByName(QString name) const;
 
+
+    QList<CLAbstractSettingsWidget*> getWidgetsBygroup(QString group) const;
 protected:
 	CLDevice* mDevice;
 

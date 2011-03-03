@@ -4,6 +4,7 @@
 #include "style.h"
 #include "widgets.h"
 #include "settings.h"
+#include "settings_getter.h"
 
 CLAbstractDeviceSettingsDlg::CLAbstractDeviceSettingsDlg(CLDevice* dev):
 QDialog(0, Qt::CustomizeWindowHint | Qt::WindowTitleHint | 
@@ -39,7 +40,6 @@ mDevice(dev)
 	for (int i = 0; i < groups.count(); ++i)
 	{
 		QString group = groups.at(i);
-		//mTabWidget->addTab(new CLDeviceSettingsTab(this, this, mDevice, group), group);
 		mTabs.push_back(new CLDeviceSettingsTab(this, this, mDevice, group));
 	}
 
@@ -60,11 +60,6 @@ mDevice(dev)
 
 
 
-
-	
-
-
-
 	//! [4]
 	
 	mainLayout->addWidget(mTabWidget);
@@ -72,9 +67,9 @@ mDevice(dev)
 	setLayout(mainLayout);
 
 	//suggestionsBtn->move(30,30);
-
 	mDevice->addRef();
 
+    connect(mTabWidget, SIGNAL(currentChanged(int)), this, SLOT(onNewtab(int)) );
 
 }
 
@@ -99,7 +94,7 @@ void CLAbstractDeviceSettingsDlg::setParam(const QString& name, const CLValue& v
 	mDevice->setParam_asynch(name,val);
 }
 
-void CLAbstractDeviceSettingsDlg::addTab(CLDeviceSettingsTab* tab)
+void CLAbstractDeviceSettingsDlg::addTabWidget(CLDeviceSettingsTab* tab)
 {
 	mTabWidget->addTab(tab, tab->name());
 }
@@ -151,6 +146,19 @@ QGroupBox* CLAbstractDeviceSettingsDlg::getGroupByName(QString name) const
 	return 0;
 }
 
+QList<CLAbstractSettingsWidget*> CLAbstractDeviceSettingsDlg::getWidgetsBygroup(QString group) const
+{
+    QList<CLAbstractSettingsWidget*> result;
+
+    foreach(CLAbstractSettingsWidget* wgt, mWgtsLst)
+    {
+        if (wgt->group()==group)
+            result.push_back(wgt);
+    }
+
+    return result;
+}
+
 void CLAbstractDeviceSettingsDlg::onClose()
 {
 	close();
@@ -158,5 +166,20 @@ void CLAbstractDeviceSettingsDlg::onClose()
 
 void CLAbstractDeviceSettingsDlg::onSuggestions()
 {
+
+}
+
+void CLAbstractDeviceSettingsDlg::onNewtab(int index)
+{
+    QString group = static_cast<CLDeviceSettingsTab*>(mTabWidget->currentWidget())->name();
+    QList<CLAbstractSettingsWidget*> wgt_to_update = getWidgetsBygroup(group);
+
+
+    foreach(CLAbstractSettingsWidget* wgt, wgt_to_update)
+    {
+        CLDeviceGetParamCommand* command = new CLDeviceGetParamCommand(wgt);
+        CLDevice::addCommandToProc(command);
+        command->releaseRef();
+    }
 
 }

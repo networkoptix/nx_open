@@ -17,9 +17,11 @@ void SettingsSlider::keyReleaseEvent ( QKeyEvent * event )
 }
 //==============================================
 
-CLAbstractSettingsWidget::CLAbstractSettingsWidget(QObject* handler, CLDevice*dev, QString paramname):
+CLAbstractSettingsWidget::CLAbstractSettingsWidget(QObject* handler, CLDevice*dev, QString group, QString sub_group, QString paramname):
 mDevice(dev),
-mHandler(handler)
+mHandler(handler),
+m_group(group),
+m_sub_group(sub_group)
 {
 	mParam = mDevice->getDevicePramList().get(paramname);
 
@@ -55,20 +57,31 @@ void CLAbstractSettingsWidget::setParam_helper(const QString& name, const CLValu
 	emit setParam(mParam.name,val);
 }
 
-//==============================================
-SettingsOnOffWidget::SettingsOnOffWidget(QObject* handler, CLDevice*dev, QString paramname):
-CLAbstractSettingsWidget(handler, dev, paramname)
+QString CLAbstractSettingsWidget::group() const
 {
-	QCheckBox * checkBox = new QCheckBox(mParam.name);
-	if (mParam.value.value==mParam.value.possible_values.front())
-		checkBox->setCheckState(Qt::Checked);
+    return m_group;
+}
 
-	QObject::connect(checkBox, SIGNAL(stateChanged ( int )), this, SLOT(stateChanged(int)));
+QString CLAbstractSettingsWidget::subGroup() const
+{
+    return m_sub_group;
+}
+
+
+//==============================================
+SettingsOnOffWidget::SettingsOnOffWidget(QObject* handler, CLDevice*dev, QString group, QString sub_group, QString paramname):
+CLAbstractSettingsWidget(handler, dev, group, sub_group, paramname)
+{
+	m_checkBox = new QCheckBox(mParam.name);
+	if (mParam.value.value==mParam.value.possible_values.front())
+		m_checkBox->setCheckState(Qt::Checked);
+
+	QObject::connect(m_checkBox, SIGNAL(stateChanged ( int )), this, SLOT(stateChanged(int)));
 
 	//QPalette plt;	plt.setColor(QPalette::WindowText, Qt::white);	checkBox->setPalette(plt);//black
 	
 
-	mWidget = checkBox;
+	mWidget = m_checkBox;
 	
 
 }
@@ -101,9 +114,18 @@ void SettingsOnOffWidget::stateChanged(int state)
 
 }
 
+void SettingsOnOffWidget::updateParam(CLValue val)
+{
+    if (val==mParam.value.possible_values.front())
+        m_checkBox->setChecked(true);
+    else
+        m_checkBox->setChecked(false);
+}
+
+
 //==============================================
-SettingsMinMaxStepWidget::SettingsMinMaxStepWidget(QObject* handler, CLDevice*dev, QString paramname):
-CLAbstractSettingsWidget(handler, dev, paramname)
+SettingsMinMaxStepWidget::SettingsMinMaxStepWidget(QObject* handler, CLDevice*dev, QString group, QString sub_group, QString paramname):
+CLAbstractSettingsWidget(handler, dev, group, sub_group, paramname)
 {
 	groupBox = new QGroupBox();
 
@@ -149,9 +171,14 @@ void SettingsMinMaxStepWidget::onValChanged()
 	setParam_helper(mParam.name,slider->value());
 }
 
+void SettingsMinMaxStepWidget::updateParam(CLValue val)
+{
+    cl_log.log("updateParam", cl_logALWAYS);
+}
+
 //==============================================
-SettingsEnumerationWidget::SettingsEnumerationWidget(QObject* handler, CLDevice*dev, QString paramname):
-CLAbstractSettingsWidget(handler, dev, paramname)
+SettingsEnumerationWidget::SettingsEnumerationWidget(QObject* handler, CLDevice*dev, QString group, QString sub_group, QString paramname):
+CLAbstractSettingsWidget(handler, dev, group, sub_group, paramname)
 {
 	QGroupBox* groupBox  = new QGroupBox();
 	mWidget = groupBox;
@@ -190,9 +217,15 @@ void SettingsEnumerationWidget::onClicked()
 
 	setParam_helper(mParam.name, val);
 }
+
+void SettingsEnumerationWidget::updateParam(CLValue val)
+{
+    cl_log.log("updateParam", cl_logALWAYS);
+}
+
 //==================================================
-SettingsButtonWidget::SettingsButtonWidget(QObject* handler, CLDevice*dev, QString paramname):
-CLAbstractSettingsWidget(handler, dev, paramname)
+SettingsButtonWidget::SettingsButtonWidget(QObject* handler, CLDevice*dev, QString group, QString sub_group, QString paramname):
+CLAbstractSettingsWidget(handler, dev, group, sub_group, paramname)
 {
 	QPushButton* btn = new QPushButton(mParam.name);
 
@@ -207,4 +240,9 @@ CLAbstractSettingsWidget(handler, dev, paramname)
 void SettingsButtonWidget::onClicked()
 {
 	setParam_helper(mParam.name, "");
+}
+
+void SettingsButtonWidget::updateParam(CLValue val)
+{
+
 }

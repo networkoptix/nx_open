@@ -111,29 +111,29 @@ void AVSettingsDlg::initTabsOrder()
 	CLDeviceSettingsTab* tab = 0;
 
 	if (tab=tabByName(tr("Image quality")))
-		addTab(tab);
+		addTabWidget(tab);
 
 	if (tab=tabByName(tr("Exposure")))
-		addTab(tab);
+		addTabWidget(tab);
 
 	if (tab=tabByName(tr("AutoIris")))
-		addTab(tab);
+		addTabWidget(tab);
 
 	if (tab=tabByName(tr("Day/Night")))
-		addTab(tab);
+		addTabWidget(tab);
 
 	if (tab=tabByName(tr("Binning")))
-		addTab(tab);
+		addTabWidget(tab);
 
 	if (tab=tabByName(tr("Motion detection")))
-		addTab(tab);
+		addTabWidget(tab);
 
 
 	if (tab=tabByName(tr("Network")))
-		addTab(tab);
+		addTabWidget(tab);
 
 	if (tab=tabByName(tr("Administration/Info")))
-		addTab(tab);
+		addTabWidget(tab);
 
 
 }

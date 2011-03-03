@@ -150,6 +150,7 @@ public:
 
 	static void startCommandProc() {m_commanproc.start();};
 	static void stopCommandProc() {m_commanproc.stop();};
+    static void addCommandToProc(CLAbstractData* data) {m_commanproc.putData(data);};
 	static int commandProcQueSize() {return m_commanproc.queSize();}
 	static bool commandProchasSuchDeviceInQueue(CLDevice* dev) {return m_commanproc.hasSuchDeviceInQueue(dev);}
 

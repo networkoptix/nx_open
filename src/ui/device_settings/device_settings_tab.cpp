@@ -64,19 +64,19 @@ mDlg(dlg)
 			switch(param.value.type)
 			{
 			case CLParamType::OnOff:
-				awidget =  new SettingsOnOffWidget(handler, dev, param.name);
+				awidget =  new SettingsOnOffWidget(handler, dev, group, sub_group, param.name);
 				break;
 
 			case CLParamType::MinMaxStep:
-				awidget =  new SettingsMinMaxStepWidget(handler, dev, param.name);
+				awidget =  new SettingsMinMaxStepWidget(handler, dev, group, sub_group, param.name);
 				break;
 
 			case CLParamType::Enumeration:
-				awidget =  new SettingsEnumerationWidget(handler, dev, param.name);
+				awidget =  new SettingsEnumerationWidget(handler, dev, group, sub_group, param.name);
 				break;
 
 			case CLParamType::Button:
-				awidget =  new SettingsButtonWidget(handler, dev, param.name);
+				awidget =  new SettingsButtonWidget(handler, dev, group, sub_group, param.name);
 				break;
 
 
