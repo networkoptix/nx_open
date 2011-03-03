@@ -69,7 +69,8 @@ struct CLVideoData
 	int key_frame; 
 	bool use_twice; // some decoders delays frame by one 
 
-
+    int width; // image width 
+    int height;// image height 
 };
 
 

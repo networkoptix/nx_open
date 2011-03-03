@@ -129,6 +129,19 @@ void CLLog::log(const QString& msg, CLLogLevel loglevel)
 
 }
 
+void CLLog::log(CLLogLevel loglevel, const char* format, ...)
+{
+    static const int MAX_MESSAGE_SIZE = 1024;
+
+    char buffer[MAX_MESSAGE_SIZE];
+    va_list args;
+
+    va_start(args, format);
+    vsnprintf_s(buffer, MAX_MESSAGE_SIZE, MAX_MESSAGE_SIZE, format, args);
+    cl_log.log(buffer, loglevel);
+    va_end(args);
+}
+
 void CLLog::openNextFile()
 {
 	m_file.close(); // close current file

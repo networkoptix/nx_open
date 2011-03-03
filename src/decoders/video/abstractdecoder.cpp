@@ -24,3 +24,18 @@ CLAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder(CLCodecType codec, 
 
 	return 0;
 }
+
+void CLAbstractVideoDecoder::setTryHardwareAcceleration(bool tryHardwareAcceleration)
+{
+    m_tryHardwareAcceleration = tryHardwareAcceleration;
+}
+
+CLAbstractVideoDecoder::CLAbstractVideoDecoder()
+    : m_tryHardwareAcceleration(false),
+      m_hardwareAccelerationEnabled(false)
+{}
+
+bool CLAbstractVideoDecoder::isHardwareAccelerationEnabled() const 
+{
+    return m_hardwareAccelerationEnabled;
+}

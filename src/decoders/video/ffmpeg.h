@@ -2,6 +2,7 @@
 #define cl_ffmpeg_h2026
 
 #include "abstractdecoder.h"
+#include "dxva/dxva.h"
 
 
 struct AVCodec;
@@ -23,26 +24,43 @@ public:
 
 	virtual void setLightCpuMode(bool val);
 
+    static bool isHardwareAccellerationPossible(CLCodecType codecId, int width, int height)
+    {
+        return codecId == CL_H264 && width <= 1920 && height <= 1088;
+    }
+private:
+    static AVCodec* findCodec(CLCodecType codecId);
+
+    void openDecoder();
+    void closeDecoder();
+
+    void resetDecoder();
 
 private:
+    AVCodecContext *m_passedContext;
 
-	AVCodec *codec;
+    static int hwcounter;
+	AVCodec *m_codec;
 	AVCodecContext *c;
 	AVFrame *picture;
+    DecoderContext m_decoderContext;
 
 	int m_width;
 	int m_height;
 
 
 	static bool m_first_instance;
-	CLCodecType m_codec;
+	CLCodecType m_codecId;
 	bool m_showmotion;
 	bool m_lightCPUMode;
 	bool m_wantEscapeFromLightCPUMode;
 
 	unsigned int m_lightModeFrameCounter;
 
+    bool needResetCodec;
 	//===================
+
+    int m_lastWidth;
 };
 
 

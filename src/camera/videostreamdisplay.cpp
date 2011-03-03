@@ -43,6 +43,9 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 	img.buff_len = data->data.size();
 	img.key_frame = data->keyFrame;
 	img.use_twice = data->use_twice;
+    img.width = data->width;
+    img.height = data->height;
+
 	CLAbstractVideoDecoder* dec;
 
 

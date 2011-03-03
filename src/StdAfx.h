@@ -1,7 +1,18 @@
+// DXVA headers (should be included before ffmpeg headers)
+#include <d3d9.h>
+#include <dxva2api.h>
+#include <windows.h>
+#include <windowsx.h>
+#include <ole2.h>
+#include <commctrl.h>
+#include <shlwapi.h>
+#include <Strsafe.h>
+
 // ffmpeg headers
 extern "C" {
 	#include <libavcodec/avcodec.h>
 	#include <libavformat/avformat.h>
+    #include <libavcodec/dxva2.h>
 };
 
 #if defined __cplusplus

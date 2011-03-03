@@ -6,19 +6,29 @@
 class CLAbstractVideoDecoder
 {
 public:
-	explicit CLAbstractVideoDecoder(){}
+	explicit CLAbstractVideoDecoder();
+
 	virtual ~CLAbstractVideoDecoder(){};
 
+    /**
+      * Decode video frame.
+      * Set hardwareAccelerationEnabled flag if hardware acceleration was used
+      */
 	virtual bool decode(CLVideoData& )=0;
 
 	virtual void showMotion(bool show ) = 0;
 
 	virtual void setLightCpuMode(bool val) = 0;
 
+    void setTryHardwareAcceleration(bool tryHardwareAcceleration);
+    bool isHardwareAccelerationEnabled() const;
 private:
 	CLAbstractVideoDecoder(const CLAbstractVideoDecoder&){};
 	CLAbstractVideoDecoder& operator=(CLAbstractVideoDecoder&){};
 
+protected:
+    bool m_tryHardwareAcceleration;
+    bool m_hardwareAccelerationEnabled;
 };
 
 class CLVideoDecoderFactory

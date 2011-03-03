@@ -1,26 +1,33 @@
 #include "ffmpeg.h"
 
+#include "dxva/ffmpeg_callbacks.h"
 
 extern QMutex global_ffmpeg_mutex;
 
 
 #define LIGHT_CPU_MODE_FRAME_PERIOD 30
 bool CLFFmpegVideoDecoder::m_first_instance = true;
+int CLFFmpegVideoDecoder::hwcounter = 0;
 
 
 //================================================
 
 
 CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CLCodecType codec_id, AVCodecContext* codecContext):
-c(codecContext),
+m_passedContext(codecContext),
 m_width(0),
 m_height(0),
-m_codec(codec_id),
+m_codecId(codec_id),
 m_showmotion(false),
 m_lightCPUMode(false),
 m_wantEscapeFromLightCPUMode(false),
-m_lightModeFrameCounter(0)
+m_lightModeFrameCounter(0),
+needResetCodec(false),
+m_lastWidth(0)
 {
+
+    // XXX Debug, should be passed in constructor
+    m_tryHardwareAcceleration = false; //hwcounter % 2;
 
 	QMutexLocker mutex(&global_ffmpeg_mutex);
 
@@ -31,97 +38,128 @@ m_lightModeFrameCounter(0)
 		// must be called before using avcodec 
 		avcodec_init();
 
-		// register all the codecs (you can also register only the codec you wish to have smaller code
+		// register all the codecs (you can also register only the m_codec you wish to have smaller code
 		avcodec_register_all();
 
 	}
 
-	//codec = avcodec_find_decoder(CODEC_ID_H264);
+	//m_codec = avcodec_find_decoder(CODEC_ID_H264);
+
+    openDecoder();
+}
 
 
-	switch(m_codec)
-	{
-	case CL_JPEG:
-		codec = avcodec_find_decoder(CODEC_ID_MJPEG);
-		break;
+AVCodec* CLFFmpegVideoDecoder::findCodec(CLCodecType codecId)
+{
+    AVCodec* codec = 0;
 
-	case CL_MPEG2:
-		codec = avcodec_find_decoder(CODEC_ID_MPEG2VIDEO);
-		break;
+    switch(codecId)
+    {
+    case CL_JPEG:
+        codec = avcodec_find_decoder(CODEC_ID_MJPEG);
+        break;
 
-
-	case CL_MPEG4:
-		codec = avcodec_find_decoder(CODEC_ID_MPEG4);
-		break;
-
-	case CL_MSMPEG4V2:
-		codec = avcodec_find_decoder(CODEC_ID_MSMPEG4V2);
-		break;
+    case CL_MPEG2:
+        codec = avcodec_find_decoder(CODEC_ID_MPEG2VIDEO);
+        break;
 
 
-	case CL_MSMPEG4V3:
-		codec = avcodec_find_decoder(CODEC_ID_MSMPEG4V3);
-		break;
+    case CL_MPEG4:
+        codec = avcodec_find_decoder(CODEC_ID_MPEG4);
+        break;
 
-	case CL_MPEG1VIDEO:
-		codec = avcodec_find_decoder(CODEC_ID_MPEG1VIDEO);
-		break;
-
-
-
-	case CL_H264:
-		codec = avcodec_find_decoder(CODEC_ID_H264);
-	    break;
-
-	case CL_WMV3:
-		codec = avcodec_find_decoder(CODEC_ID_WMV3);
-		break;
-
-	case CL_MSVIDEO1:
-		codec = avcodec_find_decoder(CODEC_ID_MSVIDEO1);
-		break;
-	
-	default:
-		codec = 0;
-		return;
+    case CL_MSMPEG4V2:
+        codec = avcodec_find_decoder(CODEC_ID_MSMPEG4V2);
+        break;
 
 
-	}
+    case CL_MSMPEG4V3:
+        codec = avcodec_find_decoder(CODEC_ID_MSMPEG4V3);
+        break;
 
-	c = avcodec_alloc_context();
+    case CL_MPEG1VIDEO:
+        codec = avcodec_find_decoder(CODEC_ID_MPEG1VIDEO);
+        break;
 
-	if (codecContext) {
-		avcodec_copy_context(c, codecContext);
-	}
 
-	picture = avcodec_alloc_frame();
 
-	//if(codec->capabilities&CODEC_CAP_TRUNCATED)	c->flags|= CODEC_FLAG_TRUNCATED;
+    case CL_H264:
+        codec = avcodec_find_decoder(CODEC_ID_H264);
+        break;
 
-	//c->debug_mv = 1;
+    case CL_WMV3:
+        codec = avcodec_find_decoder(CODEC_ID_WMV3);
+        break;
 
-	// TODO: check return value
-	if (avcodec_open(c, codec) < 0) 
-		codec = 0;
+    case CL_MSVIDEO1:
+        codec = avcodec_find_decoder(CODEC_ID_MSVIDEO1);
+        break;
+    }
 
+    return codec;
+}
+
+void CLFFmpegVideoDecoder::closeDecoder()
+{   
+    avcodec_close(c);
+    m_decoderContext.close();
+
+    av_free(picture);
+    av_free(c);
+}
+
+void CLFFmpegVideoDecoder::openDecoder()
+{
+    m_codec = findCodec(m_codecId);
+
+    c = avcodec_alloc_context();
+
+    if (m_passedContext) {
+        avcodec_copy_context(c, m_passedContext);
+    }
+
+    if (m_codecId == CL_H264)
+    {
+        c->get_format = FFMpegCallbacks::ffmpeg_GetFormat;
+        c->get_buffer = FFMpegCallbacks::ffmpeg_GetFrameBuf;
+        c->release_buffer = FFMpegCallbacks::ffmpeg_ReleaseFrameBuf;
+
+        c->opaque = &m_decoderContext;
+    }
+
+    picture = avcodec_alloc_frame();
+
+    //if(m_codec->capabilities&CODEC_CAP_TRUNCATED)	c->flags|= CODEC_FLAG_TRUNCATED;
+
+    //c->debug_mv = 1;
+
+    // TODO: check return value
+    if (avcodec_open(c, m_codec) < 0)
+    {
+        m_codec = 0;
+    }
 }
 
 CLFFmpegVideoDecoder::~CLFFmpegVideoDecoder(void)
 {
 	QMutexLocker mutex(&global_ffmpeg_mutex);
 
-	av_free(picture);
-	avcodec_close(c);
-	av_free(c);
+    closeDecoder();
 }
 
+void CLFFmpegVideoDecoder::resetDecoder()
+{
+    QMutexLocker mutex(&global_ffmpeg_mutex);
 
+    closeDecoder();
+    openDecoder();
+}
 //The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than the actual read bytes because some optimized bitstream readers read 32 or 64 bits at once and could read over the end.
 //The end of the input buffer buf should be set to 0 to ensure that no overreading happens for damaged MPEG streams.
 bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 {
 
-	if (codec==0)
+	if (m_codec==0)
 		return false;
 
 	if (m_wantEscapeFromLightCPUMode && data.key_frame)
@@ -183,16 +221,55 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 
 	/**/
 
+    // XXX: DEBUG
+
+
+    
+    bool needResetCodec = false;
+
+    //if (m_lastWidth != 0 && m_lastWidth != data.width)
+    //{
+    //    needResetCodec = true;
+    //}
+
+    if (m_decoderContext.isHardwareAcceleration() && !isHardwareAccellerationPossible(data.codec, data.width, data.height))
+    {
+        m_decoderContext.setHardwareAcceleration(false);
+        needResetCodec = true;
+    }
+
+    if (m_tryHardwareAcceleration && !m_decoderContext.isHardwareAcceleration() && isHardwareAccellerationPossible(data.codec, data.width, data.height))
+    {
+        m_decoderContext.setHardwareAcceleration(true);
+        needResetCodec = true;
+    }
+
+    // XXX Debug
+    if(needResetCodec && !data.key_frame)
+    {
+        DebugBreak();
+    }
+
+    if(needResetCodec)
+    {
+        needResetCodec = false;
+        resetDecoder();
+    }
+
 	int got_picture = 0;
 	avcodec_decode_video(c, picture, &got_picture,(unsigned char*)data.inbuf, data.buff_len);
 	if (data.use_twice)
 		avcodec_decode_video(c, picture, &got_picture,(unsigned char*)data.inbuf, data.buff_len);
 
 
-gotpicture:
-
 	if (got_picture )
 	{
+        m_lastWidth = data.width;
+        if (m_decoderContext.isHardwareAcceleration())
+        {
+            m_decoderContext.extract(picture);
+        }
+
 		if (m_showmotion)
 		{
 			c->debug_mv = 1;
