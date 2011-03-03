@@ -71,19 +71,19 @@ PixelFormat FFMpegCallbacks::ffmpeg_GetFormat( AVCodecContext *p_codec, const en
 
     DxvaSupportObject *va = dec->va();
 
+    const char *ppsz_name[PIX_FMT_NB];
+
+    ppsz_name[PIX_FMT_DXVA2_VLD] = "PIX_FMT_DXVA2_VLD",
+    ppsz_name[PIX_FMT_YUYV422] = "PIX_FMT_YUYV422";
+    ppsz_name[PIX_FMT_YUV420P] = "PIX_FMT_YUV420P";
+
     /* Try too look for a supported hw acceleration */
     for( int i = 0; pi_fmt[i] != PIX_FMT_NONE; i++ )
     {
-        const char *ppsz_name[PIX_FMT_NB];
-
-        ppsz_name[PIX_FMT_DXVA2_VLD] = "PIX_FMT_DXVA2_VLD",
-            ppsz_name[PIX_FMT_YUYV422] = "PIX_FMT_YUYV422";
-        ppsz_name[PIX_FMT_YUV420P] = "PIX_FMT_YUV420P";
-
-        cl_log.log(cl_logDEBUG1, "Available decoder output format %d (%s)", pi_fmt[i], ppsz_name[pi_fmt[i]] ? ppsz_name[pi_fmt[i]] : "Unknown" );
-
         if( pi_fmt[i] == PIX_FMT_DXVA2_VLD && p_codec->width > 0 && p_codec->height > 0)
         {
+            cl_log.log(cl_logDEBUG1, "Available decoder output format %d (%s)", pi_fmt[i], ppsz_name[pi_fmt[i]] ? ppsz_name[pi_fmt[i]] : "Unknown" );
+
             if (p_codec->width > 1920 || p_codec->height > 1088)
             {
                 cl_log.log(cl_logDEBUG1, "Resolution is too high for dxva");
