@@ -100,7 +100,7 @@ bool CLPing::ping(const QString& ip, int retry, int timeout_per_retry, int pack_
 	} 
 	else 
 	{
-		cl_log.log("CLPing: Call to IcmpSendEcho2 failed", cl_logERROR);
+		cl_log.log(ip + " CLPing: Call to IcmpSendEcho2 failed", cl_logERROR);
 
 		
 		printf("Call to IcmpSendEcho2 failed.\n");
