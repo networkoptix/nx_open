@@ -12,10 +12,10 @@ class CLAbstractUnMovedOpacityItem: public CLAbstractUnmovedItem
 public:
 	CLAbstractUnMovedOpacityItem(QString name, QGraphicsItem* parent);
 	~CLAbstractUnMovedOpacityItem();
+public slots:
+        void stopAnimation();
 protected:
     void changeOpacity(qreal new_opacity, int duration_ms);
-protected slots:
-	void stopAnimation();
 protected:
 
 	QPropertyAnimation* m_animation;

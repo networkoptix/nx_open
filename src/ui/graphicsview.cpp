@@ -114,6 +114,16 @@ mSteadyShow(this)
 	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
+
+    //I've noticed that if I add a large number of objects to a scene and then start deleting them 
+    //very quickly (commanded by a keystroke from my parent widget) I can actually crash qgraphicsscene. 
+    //I'm not sure what's happening, but I get the impression that while I am deleting the objects 
+    //qgraphicsscene starts a redraw/update and while it's updating I delete more objects and a 
+    //pointer probably goes null and it crashes.
+    //Someone suggested I turn off BSP indexing (which I did), and the problem went away.
+    //http://www.qtcentre.org/threads/24825-Does-qgraphicsscene-schedule-updates-in-a-separate-thread
+    m_scene.setItemIndexMethod(QGraphicsScene::NoIndex);
+
 	//setBackgroundBrush(QPixmap("./skin/logo.png"));
 	//m_scene.setItemIndexMethod(QGraphicsScene::NoIndex);
 
@@ -148,6 +158,7 @@ mSteadyShow(this)
 	m_gridItem = new CLGridItem(this);
 	m_scene.addItem(m_gridItem);
 	m_gridItem->setPos(m_camLayout.getGridEngine().getSettings().left, m_camLayout.getGridEngine().getSettings().top);
+
 
 	setMinimumWidth(600);
 }

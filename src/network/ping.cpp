@@ -102,18 +102,21 @@ bool CLPing::ping(const QString& ip, int retry, int timeout_per_retry, int pack_
 	{
 		cl_log.log("CLPing: Call to IcmpSendEcho2 failed", cl_logERROR);
 
-		/*/
+		
 		printf("Call to IcmpSendEcho2 failed.\n");
 		dwError = GetLastError();
 		switch (dwError) {
 		case IP_BUF_TOO_SMALL:
-			printf("\tReplyBufferSize to small\n");
+            cl_log.log("CLPing: tReplyBufferSize to small", cl_logERROR);
+			//printf("\tReplyBufferSize to small\n");
 			break;
 		case IP_REQ_TIMED_OUT:
-			printf("\tRequest timed out\n");
+            cl_log.log("CLPing: \tRequest timed out", cl_logERROR);
+			//printf("\tRequest timed out\n");
 			break;
 		default:
-			printf("\tExtended error returned: %ld\n", dwError);
+            cl_log.log("CLPing: \tExtended error returned ", (int)dwError, cl_logERROR);
+			//printf("\tExtended error returned: %ld\n", dwError);
 			break;
 		}
 		/**/

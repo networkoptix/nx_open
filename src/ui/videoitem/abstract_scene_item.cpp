@@ -219,6 +219,15 @@ void CLAbstractSceneItem::setRotation(qreal angle)
 void CLAbstractSceneItem::stop_animation()
 {
 	m_animationTransform.stopAnimation();
+
+    QList<QGraphicsItem *> childrenLst = childItems();
+    foreach(QGraphicsItem * item, childrenLst)
+    {
+        CLAbstractSubItem* sub_item = static_cast<CLAbstractSubItem*>(item);
+        sub_item->stopAnimation();
+    }
+
+
 }
 
 void CLAbstractSceneItem::setFullScreen(bool full)
