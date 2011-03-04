@@ -21,10 +21,10 @@
     
     <Upgrade Id="286227c5-25b4-4796-aa48-2d9822e10b0d">
       <UpgradeVersion
-         Minimum="0.1.0" Maximum="$(env.VERSION)"
+         Minimum="0.1.0" Maximum="$(env.APPLICATION_VERSION)"
          Property="PREVIOUSVERSIONSINSTALLED"
          IncludeMinimum="yes" IncludeMaximum="yes" />
-      <UpgradeVersion OnlyDetect='yes' Property='NEWERFOUND' Minimum='$(env.VERSION)' IncludeMinimum='no' />
+      <UpgradeVersion OnlyDetect='yes' Property='NEWERFOUND' Minimum='$(env.APPLICATION_VERSION)' IncludeMinimum='no' />
     </Upgrade>
 
     <CustomAction Id="AssignMediaFolder" Property="MEDIAFOLDER" Value="[%SystemDrive]\photo" Execute="firstSequence"/>
