@@ -17,7 +17,4 @@ private:
     CLAbstractSettingsWidget* m_wgt;
 };
 
-
-
-
 #endif //dlg_settings_getter_h2355

@@ -1,7 +1,6 @@
 #ifndef cl_expensive_object1338_h
 #define cl_expensive_object1338_h
 
- 
 class CLRefCounter
 {
 public:
@@ -31,6 +30,5 @@ private:
 	QAtomicInt ref_counter;
 	//void operator delete(void*); 
 };
-
 
 #endif //cl_ThreadQueue_h_2236

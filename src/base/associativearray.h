@@ -3,9 +3,7 @@
 
 #include "base.h"
 
-
 #include <math.h>
-
 
 class CLValue
 {
@@ -65,7 +63,6 @@ public:
 		return (fabs(value.toDouble() - val))< 1e-6;
 	}
 
-
 	bool operator == ( QString val ) const
 	{
 		return value == val;
@@ -76,10 +73,7 @@ public:
 		return value != val;
 	}
 
-	
-
 };
-
 
 class CLAssociativeArray
 {

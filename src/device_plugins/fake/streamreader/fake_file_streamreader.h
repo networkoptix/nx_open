@@ -1,7 +1,6 @@
 #ifndef FakeStreamReader_h_106
 #define FakeStreamReader_h_106
 
-
 #include "../../../streamreader/cpull_stremreader.h"
 #include "../../../base/adaptivesleep.h"
 #include "../../../device/device_video_layout.h"
@@ -10,14 +9,12 @@ class FakeStreamReader : public CLClientPullStreamreader
 {
 public:
 	explicit FakeStreamReader(CLDevice* dev, int channels);
-	
 
 	~FakeStreamReader();
 
 protected:
 	virtual CLAbstractMediaData* getNextData();
-	
-	
+
 protected:
 
 private:
@@ -35,8 +32,6 @@ private:
 	static int descr_data_len;
 
 	CLAdaptiveSleep m_sleep;
-
-
 
 };
 

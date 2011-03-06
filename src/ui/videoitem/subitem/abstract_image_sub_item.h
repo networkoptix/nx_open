@@ -14,7 +14,7 @@ public:
 
 	void setMaxSize(int max_width, int max_height);
 protected:
-	
+
 	QRectF boundingRect() const;
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
@@ -23,6 +23,5 @@ protected:
 	int m_width;
 	int m_height;
 };
-
 
 #endif //abstract_img_sub_item_h1440

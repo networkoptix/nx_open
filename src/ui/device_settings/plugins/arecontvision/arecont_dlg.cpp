@@ -3,7 +3,6 @@
 #include "..\..\widgets.h"
 #include "settings.h"
 
-
 AreconVisionDlgManufacture::AreconVisionDlgManufacture()
 {
 	mPossibleNames.push_back("1300");
@@ -15,7 +14,6 @@ AreconVisionDlgManufacture::AreconVisionDlgManufacture()
 	mPossibleNames.push_back("2110");
 	mPossibleNames.push_back("3110");
 	mPossibleNames.push_back("5110");
-
 
 	mPossibleNames.push_back("1305");
 	mPossibleNames.push_back("2105");
@@ -37,8 +35,6 @@ AreconVisionDlgManufacture::AreconVisionDlgManufacture()
 	mPossibleNames.push_back("2125");
 	mPossibleNames.push_back("3125");
 	mPossibleNames.push_back("5125");
-	
-
 
 	mPossibleNames.push_back("2805");
 	mPossibleNames.push_back("2815");
@@ -52,7 +48,6 @@ AreconVisionDlgManufacture::AreconVisionDlgManufacture()
 
 	mPossibleNames.push_back("3130");
 	mPossibleNames.push_back("3135");
-
 
 	QList<QString> base = mPossibleNames;
 
@@ -68,8 +63,6 @@ AreconVisionDlgManufacture::AreconVisionDlgManufacture()
 		mPossibleNames.push_back(ai);
 		mPossibleNames.push_back(ir);
 	}
-
-
 
 }
 
@@ -128,16 +121,13 @@ void AVSettingsDlg::initTabsOrder()
 	if (tab=tabByName(tr("Motion detection")))
 		addTabWidget(tab);
 
-
 	if (tab=tabByName(tr("Network")))
 		addTabWidget(tab);
 
 	if (tab=tabByName(tr("Administration/Info")))
 		addTabWidget(tab);
 
-
 }
-
 
 void AVSettingsDlg::initImageQuality()
 {
@@ -181,16 +171,13 @@ void AVSettingsDlg::initImageQuality()
 		group->setFixedWidth(180);
 		group->setFixedHeight(205);
 
-
 		if (wgt = getWidgetByName("Red"))
 			wgt->toWidget()->move(10,30);
 
 		if (wgt = getWidgetByName("Blue"))
 			wgt->toWidget()->move(10,120);
 
-
 	}
-
 
 	if (group=getGroupByName("Adjustment"))
 	{
@@ -207,10 +194,7 @@ void AVSettingsDlg::initImageQuality()
 		if (wgt = getWidgetByName("Saturation"))
 			wgt->toWidget()->move(380,30);
 
-
-
 	}
-
 
 	if (wgt = getWidgetByName("Equalize Brightness"))
 	{
@@ -218,8 +202,6 @@ void AVSettingsDlg::initImageQuality()
 
 		if (wgt = getWidgetByName("Equalize Color"))
 			wgt->toWidget()->move(340,360);
-
-
 
 		if (wgt = getWidgetByName("Rotate 180"))
 			wgt->toWidget()->hide(); // for now
@@ -231,15 +213,12 @@ void AVSettingsDlg::initImageQuality()
 			wgt->toWidget()->move(255,360);
 	}
 
-
-
 	//
 
 }
 
 void AVSettingsDlg::initExposure()
 {
-	
 
 	QGroupBox* group;
 	CLAbstractSettingsWidget* wgt;
@@ -277,7 +256,6 @@ void AVSettingsDlg::initAI()
 	if (wgt = getWidgetByName("AutoIris enable"))
 		wgt->toWidget()->move(200,180);
 
-	
 }
 
 void AVSettingsDlg::initDN()
@@ -325,7 +303,6 @@ void AVSettingsDlg::initAdmin()
 	if (wgt = getWidgetByName("Factory defaults"))
 		wgt->toWidget()->move(230,150);
 
-
 }
 
 //=========================================================================
@@ -366,7 +343,6 @@ void AVSettingsDlg::correctWgtsState()
 				wgt->toWidget()->hide();
 		}
 	}
-
 
 	//=================================================
 	if (wgt = getWidgetByName("Codec"))

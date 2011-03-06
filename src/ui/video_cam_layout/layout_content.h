@@ -16,7 +16,6 @@ struct CLRectAdjustment
 	int x1, y1, x2, y2;
 };
 
-
 class LayoutContent : public LayoutButton
 {
 public:
@@ -36,7 +35,6 @@ public:
 	void setRecorder();
 
 	bool hasSuchSublayoutName(const QString& name) const;
-	
 
 	bool checkDecorationFlag(unsigned int flag) const;
 	void addDecorationFlag(unsigned int flag);
@@ -64,7 +62,7 @@ public:
 	QList<LayoutDevice*>& getDevices();
 
 	QList<LayoutContent*>& childrenList();
-	
+
 	static LayoutContent* coppyLayout(LayoutContent* l);
 
 	void toXml(QDomDocument& doc, QDomElement& parent) ;
@@ -76,7 +74,6 @@ public:
 	void removeIntereactionFlag(unsigned long flag);
 	bool checkIntereactionFlag(unsigned long flag);
 
-	
 protected:
 
 	// scene rect adjustment
@@ -87,8 +84,6 @@ protected:
 	QList<LayoutDevice*> m_devices;
 
 	QList<LayoutContent*> m_childlist;
-	
-
 
 	CLDeviceCriteria m_cr;
 

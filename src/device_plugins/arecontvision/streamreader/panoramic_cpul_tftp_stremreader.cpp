@@ -4,7 +4,6 @@
 #include "../tools/AVJpegHeader.h"
 #include "../devices/av_device.h"
 
-
 //======================================================
 
 extern int create_sps_pps(
@@ -13,9 +12,7 @@ extern int create_sps_pps(
 				   int deblock_filter,
 				   unsigned char* data, int max_datalen);
 
-
 extern AVLastPacketSize ExtractSize(const unsigned char* arr);
-
 
 //=========================================================
 
@@ -23,18 +20,15 @@ AVPanoramicClientPullSSTFTPStreamreader ::AVPanoramicClientPullSSTFTPStreamreade
 CLAVClinetPullStreamReader(dev)
 {
 	CLAreconVisionDevice* device = static_cast<CLAreconVisionDevice*>(dev);
-	
+
 	m_model = device->getModel();
-	
+
 	m_timeout = 500;
-	
+
 	m_last_width = 1600;
 	m_last_height = 1200;
 
-
 }
-
-
 
 CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 {
@@ -68,12 +62,10 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 			}
 
 			streamID = m_streamParam.get("streamID").value.value;
-			
 
 		}
 
 	}
-
 
 	if (!h264)
 		os <<"image";
@@ -82,7 +74,6 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 		os<<"h264?ssn="<< streamID;
 	}
 
-	
 	if (h264)
 	{
 		if (needKeyData())
@@ -91,17 +82,13 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 			os <<";iframe=0;";
 
 	}
-	
 
 	forecast_size = (width*height)/2; // 0.5 meg per megapixel as maximum 
-			
-	
-	
+
 	CLSimpleTFTPClient tftp_client((static_cast<CLAreconVisionDevice*>(m_device))->getIP().toString().toLatin1().data(),  m_timeout, 3);
 
 	CLCompressedVideoData* videoData = new CLCompressedVideoData(CL_MEDIA_ALIGNMENT,forecast_size);
 	CLByteArray& img = videoData->data;
-
 
 	//==========================================
 	int expectable_header_size;
@@ -132,9 +119,9 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 	}
 
 	//==========================================
-	
+
 	int readed = tftp_client.read(request.toLatin1().data(), img);
-	
+
 	if (readed == 0) // cannot read data
 	{
 		//delete videoData;
@@ -163,7 +150,6 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 	}
 
 	AVLastPacketSize size;
-	
 
 	if(AV8365 == m_model || AV8185 == m_model || AV8180 == m_model || AV8360 == m_model)
 	{
@@ -176,22 +162,18 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 			videoData->releaseRef();
 			return 0;
 		}
-						
-
 
 		m_last_width = size.width;
 		m_last_height = size.height;
 
-		videoData->channel_num = arr[0] & 3;
+		videoData->channelNumber = arr[0] & 3;
 
 		//multisensor_is_zoomed = arr[0] & 8;
 		//IMAGE_RESOLUTION res;
 		//arr[0] & 4 ? res = imFULL : res = imHALF;
 
-
 		quality = arr[1];
 	}
-
 
 	if (h264 && (lp_size < iframe_index))
 	{
@@ -217,7 +199,6 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 		img.write(&c,1); //0x09
 		c = videoData->keyFrame ? 0x10 : 0x30; 
 		img.write(&c,1); // 0x10
-
 
 		//==========================================
 		char* dst = img.data();
@@ -249,7 +230,6 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 			dst+=expectable_header_size;
 		}
 		/**/
-		
 
 		// we also need to put very begining of SH
 		dst[0] = dst[1] = dst[2] = 0; dst[3] = 1;
@@ -258,7 +238,7 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 		img.prepareToWrite(8);
 		dst = img.data() + img.size();
 		dst[0] = dst[1] = dst[2] = dst[3] = dst[4] = dst[5] =  dst[6] = dst[7] = 0;
-		
+
 	}
 	else
 	{
@@ -269,14 +249,12 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 		AVJpeg::Header::GetHeader((unsigned char*)img.data(), size.width, size.height, quality,model.toLatin1().data());
 	}
 
-	
-	
 	videoData->compressionType = h264 ? CL_H264 : CL_JPEG;
 	videoData->width = size.width;
 	videoData->height = size.height;
 
 	videoData->timestamp = QDateTime::currentMSecsSinceEpoch()*1000;
-	
+
 	return videoData;
 
 }

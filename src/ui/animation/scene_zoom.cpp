@@ -6,8 +6,6 @@
 #include "../src/corelib/global/qglobal.h"
 #include "ui/videoitem/abstract_scene_item.h"
 
-
-
 static const qreal max_zoom = 4.0;
 static const qreal def_zoom = 0.22;
 
@@ -45,7 +43,6 @@ qreal CLSceneZoom::getZoom() const
 	return m_zoom;
 }
 
-
 void CLSceneZoom::zoom_abs(qreal z, int duration, int delay, QPoint unmoved_point, CLAnimationTimeLine::CLAnimationCurve curve)
 {
 
@@ -65,7 +62,6 @@ void CLSceneZoom::zoom_minimum(int duration, int delay, QPoint unmoved_point, CL
 	zoom_abs(m_view->getMinSceneZoom() , duration, delay);
 }
 
-
 void CLSceneZoom::zoom_delta(qreal delta, int duration, int delay, QPoint unmoved_point, CLAnimationTimeLine::CLAnimationCurve curve)
 {
     m_unmoved_point = unmoved_point;
@@ -73,7 +69,6 @@ void CLSceneZoom::zoom_delta(qreal delta, int duration, int delay, QPoint unmove
 	m_targetzoom += delta;
 	zoom_helper(duration, delay);
 }
-
 
 void CLSceneZoom::valueChanged( qreal dpos )
 {
@@ -91,12 +86,10 @@ void CLSceneZoom::valueChanged( qreal dpos )
          unmoved_viewpos = m_view->mapFromScene(m_unmoved_point);
     }
 
-
 	QTransform tr;
 	tr.scale(scl, scl);
 	tr.rotate(global_rotation_angel, Qt::YAxis);
 	m_view->setTransform(tr);
-
 
     if (m_unmoved_point!=QPoint(0,0))
     {
@@ -109,9 +102,7 @@ void CLSceneZoom::valueChanged( qreal dpos )
         m_view->addjustAllStaticItems();
     }
 
-
 	//=======================================
-	
 
 	bool zooming_out = (m_targetzoom < getZoom()) && qAbs(m_targetzoom - getZoom())/m_targetzoom > 0.03;
 
@@ -121,9 +112,6 @@ void CLSceneZoom::valueChanged( qreal dpos )
 		QRectF item_rect = m_view->getSelectedItem()->sceneBoundingRect();
 		QRectF view_rect = m_view->mapToScene(m_view->viewport()->rect()).boundingRect();
 
-
-		
-
 		if ( item_rect.width() < view_rect.width()*0.95 && 
 			item_rect.height() < view_rect.height()*0.95)
 			m_view->getSelectedItem()->setFullScreen(false);
@@ -131,8 +119,7 @@ void CLSceneZoom::valueChanged( qreal dpos )
 		if ( view_rect.width()/item_rect.width() > 3.2  && 
 			view_rect.height()/item_rect.height() > 3.2)
 			m_view->setZeroSelection();
-		
-		
+
 	}
 
 	if (zooming_out)
@@ -142,7 +129,6 @@ void CLSceneZoom::valueChanged( qreal dpos )
 			m_view->setAllItemsQuality(CLStreamreader::CLSHigh, false);
 			m_quality = CLStreamreader::CLSHigh;
 		}
-
 
 		if (m_quality==CLStreamreader::CLSHigh && getZoom() <= normal_hight_qulity_zoom)
 		{
@@ -176,7 +162,6 @@ void CLSceneZoom::valueChanged( qreal dpos )
 			m_quality = CLStreamreader::CLSHighest;
 		}
 
-
 	}
 
 	//#include "camera\camera.h"
@@ -187,9 +172,8 @@ void CLSceneZoom::valueChanged( qreal dpos )
 
 void CLSceneZoom::set_qulity_helper()
 {
-	
-}
 
+}
 
 void CLSceneZoom::zoom_helper(int duration, int delay)
 {

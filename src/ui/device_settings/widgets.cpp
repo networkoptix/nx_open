@@ -3,8 +3,6 @@
 #include "base/log.h"
 #include "settings.h"
 
-
-
 SettingsSlider::SettingsSlider( Qt::Orientation orientation, QWidget * parent):
 QSlider(orientation, parent)
 {
@@ -23,18 +21,16 @@ mHandler(handler),
 m_group(group),
 m_sub_group(sub_group)
 {
-	mParam = mDevice->getDevicePramList().get(paramname);
+	mParam = mDevice->getDeviceParamList().get(paramname);
 
 	QObject::connect(this, SIGNAL( setParam(const QString&, const CLValue&) ), 
 					handler, SLOT( setParam(const QString&, const CLValue&) )  );
 }
 
-
 CLAbstractSettingsWidget::~CLAbstractSettingsWidget()
 {
 
 }
-
 
 CLDevice* CLAbstractSettingsWidget::getDevice() const
 {
@@ -67,7 +63,6 @@ QString CLAbstractSettingsWidget::subGroup() const
     return m_sub_group;
 }
 
-
 //==============================================
 SettingsOnOffWidget::SettingsOnOffWidget(QObject* handler, CLDevice*dev, QString group, QString sub_group, QString paramname):
 CLAbstractSettingsWidget(handler, dev, group, sub_group, paramname)
@@ -79,10 +74,8 @@ CLAbstractSettingsWidget(handler, dev, group, sub_group, paramname)
 	QObject::connect(m_checkBox, SIGNAL(stateChanged ( int )), this, SLOT(stateChanged(int)));
 
 	//QPalette plt;	plt.setColor(QPalette::WindowText, Qt::white);	checkBox->setPalette(plt);//black
-	
 
 	mWidget = m_checkBox;
-	
 
 }
 
@@ -122,13 +115,11 @@ void SettingsOnOffWidget::updateParam(CLValue val)
         m_checkBox->setChecked(false);
 }
 
-
 //==============================================
 SettingsMinMaxStepWidget::SettingsMinMaxStepWidget(QObject* handler, CLDevice*dev, QString group, QString sub_group, QString paramname):
 CLAbstractSettingsWidget(handler, dev, group, sub_group, paramname)
 {
 	groupBox = new QGroupBox();
-
 
 	slider = new SettingsSlider(Qt::Horizontal, groupBox);
 	slider->setMinimumWidth(130);
@@ -146,11 +137,8 @@ CLAbstractSettingsWidget(handler, dev, group, sub_group, paramname)
 	QTextStream(&str) << mParam.name<< "(" << (QString)mParam.value.value<< ")";
 	groupBox->setTitle(str);
 
-
 	QVBoxLayout *layout = new QVBoxLayout(groupBox);
 	layout->addWidget(slider);
-
-
 
 	QObject::connect(slider, SIGNAL(sliderReleased()), this, SLOT(onValChanged()));
 	QObject::connect(slider, SIGNAL(onKeyReleased()), this, SLOT(onValChanged()));
@@ -187,7 +175,7 @@ CLAbstractSettingsWidget(handler, dev, group, sub_group, paramname)
 	groupBox->setMinimumWidth(140);
 
 	QVBoxLayout *layout = new QVBoxLayout(groupBox);
-	
+
 	for (int i = 0; i < mParam.value.ui_possible_values.count();++i)
 	{
 		QRadioButton *btn = new QRadioButton(mParam.value.ui_possible_values.at(i), groupBox);
@@ -207,8 +195,6 @@ CLAbstractSettingsWidget(handler, dev, group, sub_group, paramname)
 	//btnt->select
 	//layout->addWidget(btnt);
 
-	
-	
 }
 
 void SettingsEnumerationWidget::onClicked()

@@ -4,8 +4,6 @@
 #include "device\device.h"
 #include "grid_engine.h"
 
-
-
 class CLAbstractSceneItem;
 class CLVideoWindowItem;
 class CLVideoCamera;
@@ -16,7 +14,6 @@ class CLDevice;
 class LayoutContent;
 class CLAbstractComplicatedItem;
 class CLAbstractSubItemContainer;
-
 
 class SceneLayout : public QObject
 {
@@ -62,9 +59,8 @@ public:
 	//================================================
 
 	void setItemDistance(qreal distance);
-	
-	void updateSceneRect();
 
+	void updateSceneRect();
 
 	QList<CLAbstractSceneItem*> getItemList() const;
 	QList<CLAbstractSceneItem*>* getItemListPointer();
@@ -102,7 +98,6 @@ private:
 	// return false if there are no available slots
 	bool addItem(CLAbstractSceneItem* item, int x, int y, bool update_scene_rect = true);
 
-
 	// remove item from lay out
 	void removeItem(CLAbstractSceneItem* item, bool update_scene_rect = true);
 
@@ -118,23 +113,19 @@ private:
 	QList<CLAbstractSceneItem*> m_items;
 
 	QList<CLAbstractComplicatedItem*> m_deviceitems; 
-	
 
 	GraphicsView* m_view;
 	QGraphicsScene* m_scene;
 
-
 	QTimer m_videotimer;
 	QTimer m_timer;
 	bool m_firstTime;
-
 
 	bool m_isRunning;
 
 	LayoutContent* m_content;
 	bool m_editable;
 	bool m_contentchanged;
-
 
 	CLGridEngine m_grid;
 };

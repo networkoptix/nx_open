@@ -5,9 +5,6 @@
 #include <math.h>
 #include "layout_content.h"
 
-
-
-
 CLGridEngine::CLGridEngine()
 {
 
@@ -37,8 +34,6 @@ QSize CLGridEngine::calcDefaultMaxItemSize(const CLDeviceVideoLayout* layout) co
 {
 	if (layout==0)
 		return QSize(m_settings.slot_width, m_settings.slot_height);
-	
-	
 
 	qreal dlw = layout->width();
 	qreal dlh = layout->height();
@@ -50,16 +45,13 @@ QSize CLGridEngine::calcDefaultMaxItemSize(const CLDeviceVideoLayout* layout) co
 
 }
 
-
 QSize CLGridEngine::getItemMaxSize(const CLAbstractSceneItem* item) const
 {
 	if (item->toVideoItem())
 		return calcDefaultMaxItemSize(item->toVideoItem()->getVideoLayout());
 
-
 	return QSize(m_settings.slot_width, m_settings.slot_height);
 }
-
 
 bool CLGridEngine::isSpaceAvalable() const
 {
@@ -84,16 +76,14 @@ QRect CLGridEngine::gridSlotRect() const
 	item =  getVeryBottomItem();
 	int bottom = item->mapToScene(item->boundingRect().bottomRight()).y();
 
-	
 	int slot_left_x, slot_top_y;
 	slotFromPos(QPoint(left, top), slot_left_x, slot_top_y);
-	
+
 	int slot_right_x, slot_bottom_y;
 	slotFromPos(QPoint(right, bottom), slot_right_x, slot_bottom_y);
 
-
 	return QRect(QPoint(slot_left_x, slot_top_y), QPoint(slot_right_x, slot_bottom_y));
-	
+
 }
 
 QRect CLGridEngine::getGridRect() const
@@ -133,20 +123,17 @@ QList<CLIdealItemPos> CLGridEngine::calcArrangedPos() const
 	if (m_settings.items->count()==0)
 		return result;
 
-
 	// fist of all lets sort items; big one should go first 
 	QList<CLAbstractSceneItem*> sorted_items = *(m_settings.items);
 	while(1)
 	{
 		bool swaped = false;
 
-
 		for (int i = 0; i < sorted_items.count()-1; ++i)
 		{
 			CLAbstractSceneItem* item_curr = sorted_items.at(i);
 			QSize item_current_size =  getItemMaxSize(item_curr);
 			int cur_size = qMax( slotsW(item_current_size.width()),  slotsH(item_current_size.height())); 
-
 
 			CLAbstractSceneItem* item_next = sorted_items.at(i+1);
 			QSize item_next_size =  getItemMaxSize(item_next);
@@ -157,7 +144,7 @@ QList<CLIdealItemPos> CLGridEngine::calcArrangedPos() const
 				sorted_items.swap(i, i+1);			
 				swaped = true;
 			}
-			
+
 		}
 
 		if (!swaped)
@@ -175,17 +162,13 @@ QList<CLIdealItemPos> CLGridEngine::calcArrangedPos() const
 		int x, y;
 		getNextAvailablePos_helper(item_size, x,y, current_grid_width, current_grid_height, result);
 
-
 		CLIdealItemPos ipos;
-
 
 		int width = item->width();
 		int height = item->height();
 
 		x += (item_size.width() - width)/2;
 		y += (item_size.height() - height)/2;
-
-
 
 		ipos.pos = QPoint(x,y) ;
 		ipos.item = item;
@@ -202,7 +185,6 @@ QList<CLIdealItemPos> CLGridEngine::calcArrangedPos() const
 
 	}
 
-
 	return result;
 }
 
@@ -211,17 +193,14 @@ bool CLGridEngine::getNextAvailablePos(QSize size, int &x_pos, int &y_pos) const
 	// we should try to insert item at the end of each row; rows index = [0; min( last_raw+1, m_settings.max_rows];
 	// and see witch way it's closer to 4:3 ratio.
 
-
 	int item_slots_width = slotsW(size.width());
 	int item_slots_height = slotsH(size.height());
-	
 
 	int max_row_to_try = 0;
 	int max_column_to_try = 0;
 
 	int current_grid_width = 0;
 	int current_grid_height = 0;
-	
 
 	CLAbstractSceneItem* item = getVeryBottomItem();
 	if (item)
@@ -246,7 +225,6 @@ bool CLGridEngine::getNextAvailablePos(QSize size, int &x_pos, int &y_pos) const
 		return true;
 	}
 
-
 	// first of all lets check if we can add item without changing grid aspect ratio 
 	for (int y = 0; y <= max_row_to_try - item_slots_height; ++y)
 	{
@@ -254,7 +232,6 @@ bool CLGridEngine::getNextAvailablePos(QSize size, int &x_pos, int &y_pos) const
 		{
 			if (!isSlotAvailable(x,y,size))
 				continue;
-
 
 			QPoint pos = posFromSlot(x,y);
 			x_pos = pos.x();
@@ -264,24 +241,20 @@ bool CLGridEngine::getNextAvailablePos(QSize size, int &x_pos, int &y_pos) const
 		}
 	}
 
-
 	qreal best_ratio = 0xfffff;
 	int best_x_slot_pos = 0;
 	int best_y_slot_pos = 0;
-	
+
 	bool last_column_taken = false;
 	bool last_row_taken = false;
-
 
 	for (int y = 0; y <= max_row_to_try; ++y)
 	{
 		for (int x = 0; x <= max_column_to_try; ++x)
 		{
 
-
 			if (x <= max_column_to_try - item_slots_width && y <= max_row_to_try - item_slots_height)
 				continue; // already checked 
-
 
 			if (x==max_column_to_try && last_column_taken)
 				continue;
@@ -289,11 +262,8 @@ bool CLGridEngine::getNextAvailablePos(QSize size, int &x_pos, int &y_pos) const
 			if (y==max_row_to_try && last_row_taken)
 				continue;
 
-
 			if (!isSlotAvailable(x,y,size))
 				continue;
-
-		
 
 			int new_grid_width = qMax(current_grid_width, x + item_slots_width);
 			int new_grid_height = qMax(current_grid_height, y + item_slots_height);
@@ -313,23 +283,17 @@ bool CLGridEngine::getNextAvailablePos(QSize size, int &x_pos, int &y_pos) const
 				if (y==max_row_to_try)
 					last_row_taken = true;
 
-
 			}
-				
 
-			
 		}
 	}
-	
-	
+
 	QPoint pos = posFromSlot(best_x_slot_pos, best_y_slot_pos);
 	x_pos = pos.x();
 	y_pos = pos.y();
 	return true;
 
-	
 }
-
 
 QPoint CLGridEngine::adjustedPosForItem(CLAbstractSceneItem* item) const 
 {
@@ -337,8 +301,6 @@ QPoint CLGridEngine::adjustedPosForItem(CLAbstractSceneItem* item) const
 	getItemSlotPos(item, slot_x, slot_y);
 	return adjustedPosForSlot(item, slot_x,  slot_y);
 }
-
-
 
 QPoint CLGridEngine::adjustedPosForSlot(CLAbstractSceneItem* item, int slot_x, int slot_y) const 
 {
@@ -363,13 +325,11 @@ void CLGridEngine::getItemSlotPos(CLAbstractSceneItem* item, int& slot_x, int& s
 	slotFromPos( QPoint(p.x(),p.y()), slot_x,  slot_y);
 }
 
-
 void CLGridEngine::adjustItem(CLAbstractSceneItem* item) const
 {
 	QPoint new_p = adjustedPosForItem(item);
 	item->setPos(new_p);
 }
-
 
 CLAbstractSceneItem*  CLGridEngine::getCenterWnd() const
 {
@@ -414,12 +374,10 @@ CLAbstractSceneItem* CLGridEngine::getItemToSwapWith(CLAbstractSceneItem* item) 
 		if (swapitem_max_size!=item_max_size)
 			continue;
 
-		
 		QRectF swapitem_rect = swapitem->sceneBoundingRect();
 
 		if (!swapitem_rect.intersects(item_rect))
 			continue;
-
 
 		QRectF intersection = swapitem_rect.intersected(item_rect);
 
@@ -437,7 +395,7 @@ CLAbstractSceneItem* CLGridEngine::getItemToSwapWith(CLAbstractSceneItem* item) 
 
 bool CLGridEngine::canBeDropedHere(CLAbstractSceneItem* item) const
 {
-	
+
 	int left_slot, top_slot;
 	getItemSlotPos(item, left_slot, top_slot);
 
@@ -454,7 +412,6 @@ bool CLGridEngine::canBeDropedHere(CLAbstractSceneItem* item) const
 
 	return slots_rect.contains(item_rect.toAlignedRect(), true);
 }
-
 
 CLAbstractSceneItem* CLGridEngine::getNextLeftItem(const CLAbstractSceneItem* curr) const
 {
@@ -515,8 +472,6 @@ CLAbstractSceneItem* CLGridEngine::getVeryTopItem() const
 
 	return result;
 }
-
-
 
 CLAbstractSceneItem* CLGridEngine::getVeryRightItem() const
 {
@@ -582,7 +537,6 @@ CLAbstractSceneItem* CLGridEngine::next_item_helper(const CLAbstractSceneItem* c
 	if (m_settings.items->size()==1)
 		return const_cast<CLAbstractSceneItem*>(curr);
 
-
 	QPointF cP = curr->mapToScene(curr->boundingRect().center());
 
 	//looking for closest left wnd 
@@ -597,7 +551,6 @@ CLAbstractSceneItem* CLGridEngine::next_item_helper(const CLAbstractSceneItem* c
 
 		if (next_item_helper_get_quarter(cP, p)!=dir_c)
 			continue;
-
 
 		dx = cP.x() - p.x();
 		dy = cP.y() - p.y();
@@ -642,7 +595,6 @@ CLAbstractSceneItem* CLGridEngine::next_item_helper(const CLAbstractSceneItem* c
 
 }
 
-
 int CLGridEngine::next_item_helper_get_quarter(const QPointF& current, const QPointF& other) const
 {
 	/*
@@ -658,7 +610,6 @@ int CLGridEngine::next_item_helper_get_quarter(const QPointF& current, const QPo
 	down(2)
 	left(3)
 	/**/
-
 
 	int dx = other.x() - current.x();
 	int dy = other.y() - current.y();
@@ -706,7 +657,6 @@ int CLGridEngine::next_item_helper_get_quarter(const QPointF& current, const QPo
 	return -1;
 
 }
-
 
 void CLGridEngine::slotFromPos(QPoint p, int& slot_x, int& slot_y) const
 {
@@ -758,14 +708,10 @@ int CLGridEngine::slotsH(int height) const
 	return ceil( (qreal(height)/m_settings.slot_height + m_settings.item_distance)/(1+m_settings.item_distance) - 1e-7);
 }
 
-
-
-
 bool CLGridEngine::isSlotAvailable_helper(int slot_x, int slot_y, QSize size, QList<CLIdealItemPos>& arranged) const
 {
 
 	QRect r1(slot_x, slot_y, slotsW(size.width()), slotsH(size.height()) );
-
 
 	foreach(CLIdealItemPos ipos, arranged)
 	{
@@ -779,27 +725,23 @@ bool CLGridEngine::isSlotAvailable_helper(int slot_x, int slot_y, QSize size, QL
 
 		if (r1.intersects(r2))
 			return false;
-		
+
 	}
 
 	return true;
 
 }
 
-
 bool CLGridEngine::getNextAvailablePos_helper(QSize size, int &x_pos, int &y_pos, int current_grid_width, int current_grid_height, QList<CLIdealItemPos>& arranged) const
 {
 	// we should try to insert item at the end of each row; rows index = [0; min( last_raw+1, m_settings.max_rows];
 	// and see witch way it's closer to 4:3 ratio.
 
-
 	int item_slots_width = slotsW(size.width());
 	int item_slots_height = slotsH(size.height());
 
-
 	int max_row_to_try = 0;
 	int max_column_to_try = 0;
-
 
 	max_row_to_try = qMin(current_grid_height, m_settings.max_rows - item_slots_height ); //+
 	max_column_to_try = current_grid_width;
@@ -812,7 +754,6 @@ bool CLGridEngine::getNextAvailablePos_helper(QSize size, int &x_pos, int &y_pos
 			if (!isSlotAvailable_helper(x,y,size, arranged))
 				continue;
 
-
 			QPoint pos = posFromSlot(x,y);
 			x_pos = pos.x();
 			y_pos = pos.y();
@@ -821,17 +762,12 @@ bool CLGridEngine::getNextAvailablePos_helper(QSize size, int &x_pos, int &y_pos
 		}
 	}
 
-
-
-
 	qreal best_ratio = 0xfffff;
 	int best_x_slot_pos = 0;
 	int best_y_slot_pos = 0;
 
-
 	bool last_column_taken = false;
 	bool last_row_taken = false;
-	
 
 	for (int y = 0; y <= max_row_to_try; ++y)
 	{
@@ -846,13 +782,10 @@ bool CLGridEngine::getNextAvailablePos_helper(QSize size, int &x_pos, int &y_pos
 
 			if (y==max_row_to_try && last_row_taken)
 				continue;
-			
 
 			if (!isSlotAvailable_helper(x,y,size, arranged))
 				continue;
 
-
-	
 			int new_grid_width = qMax(current_grid_width, x + item_slots_width);
 			int new_grid_height = qMax(current_grid_height, y + item_slots_height);
 
@@ -871,12 +804,10 @@ bool CLGridEngine::getNextAvailablePos_helper(QSize size, int &x_pos, int &y_pos
 				if (y==max_row_to_try)
 					last_row_taken = true;
 
-
 			}
-				
+
 		}
 	}
-
 
 	QPoint pos = posFromSlot(best_x_slot_pos, best_y_slot_pos);
 	x_pos = pos.x();

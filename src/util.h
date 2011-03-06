@@ -11,5 +11,4 @@ QString getDataDirectory();
  */
 QString getMediaRootDir();
 
-
 #endif // _UNIVERSAL_CLIENT_UTIL_H

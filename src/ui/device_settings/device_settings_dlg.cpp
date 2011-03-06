@@ -35,14 +35,13 @@ mDevice(dev)
 
 	mTabWidget = new QTabWidget;
 
-	QList<QString> groups = mDevice->getDevicePramList().groupList();
+	QList<QString> groups = mDevice->getDeviceParamList().groupList();
 
 	for (int i = 0; i < groups.count(); ++i)
 	{
 		QString group = groups.at(i);
 		mTabs.push_back(new CLDeviceSettingsTab(this, this, mDevice, group));
 	}
-
 
 	mButtonBox = new QDialogButtonBox();
 	mButtonBox->setFocusPolicy(Qt::NoFocus);
@@ -52,16 +51,13 @@ mDevice(dev)
 	mButtonBox->addButton(suggestionsBtn, QDialogButtonBox::ActionRole);
 	suggestionsBtn->setFocusPolicy(Qt::NoFocus);
 
-
 	QPushButton* closeBtn = new QPushButton("Close");
 	connect(closeBtn, SIGNAL(released()), this, SLOT(onClose()));
 	mButtonBox->addButton(closeBtn, QDialogButtonBox::RejectRole);
 	closeBtn->setFocusPolicy(Qt::NoFocus);
 
-
-
 	//! [4]
-	
+
 	mainLayout->addWidget(mTabWidget);
 	mainLayout->addWidget(mButtonBox);
 	setLayout(mainLayout);
@@ -128,12 +124,10 @@ CLAbstractSettingsWidget* CLAbstractDeviceSettingsDlg::getWidgetByName(QString n
 	return 0;
 }
 
-
 void CLAbstractDeviceSettingsDlg::putGroup(QGroupBox* group)
 {
 	mGroups.push_back(group);
 }
-
 
 QGroupBox* CLAbstractDeviceSettingsDlg::getGroupByName(QString name) const
 {
@@ -173,7 +167,6 @@ void CLAbstractDeviceSettingsDlg::onNewtab(int index)
 {
     QString group = static_cast<CLDeviceSettingsTab*>(mTabWidget->currentWidget())->name();
     QList<CLAbstractSettingsWidget*> wgt_to_update = getWidgetsBygroup(group);
-
 
     foreach(CLAbstractSettingsWidget* wgt, wgt_to_update)
     {

@@ -64,7 +64,6 @@ public:
 public slots:
      void updateParam(CLValue val);
 
-
 private slots:
 	void stateChanged (int state);
 private:
@@ -79,7 +78,6 @@ public:
 
 public slots:
     void updateParam(CLValue val);
-
 
 private slots:
 	void onValChanged();
@@ -103,7 +101,6 @@ private slots:
 	void onClicked();
 
 };
-
 
 //==============================================
 class SettingsButtonWidget : public CLAbstractSettingsWidget

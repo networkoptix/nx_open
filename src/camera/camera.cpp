@@ -2,20 +2,17 @@
 
 //#include "../oem/arecontvision/streamreader/cpul_file_test.h"
 
-
 #include "../base/log.h"
 #include "../base/sleep.h"
 #include "../device/device.h"
 #include "ui/videoitem/video_wnd_item.h"
 
-CLVideoCamera::CLVideoCamera(CLDevice* device, CLVideoWindowItem* videovindow):
-m_device(device),
-m_videovindow(videovindow),
-m_recorder(device)
+CLVideoCamera::CLVideoCamera(CLDevice* device, CLVideoWindowItem* videovindow)
+    : m_device(device),
+      m_videovindow(videovindow),
+      m_recorder(device)
 {
-
 	cl_log.log("Creating camera for ", m_device->toString(), cl_logDEBUG1);
-
 
 	int videonum = m_device->getVideoLayout()->numberOfChannels();// how many sensors camera has
 
@@ -27,7 +24,6 @@ m_recorder(device)
 		m_videovindow->setStatistics(&m_stat[i], i);
 	}
 
-
 	m_reader = m_device->getDeviceStreamConnection();
 
 	m_reader->addDataProcessor(&m_camdispay);
@@ -35,7 +31,6 @@ m_recorder(device)
 
 	m_videovindow->setComplicatedItem(this);
 	m_videovindow->setInfoText(m_device->toString());
-
 }
 
 CLVideoCamera::~CLVideoCamera()
@@ -45,9 +40,7 @@ CLVideoCamera::~CLVideoCamera()
 	stopDispay();
 	delete m_reader;
 	delete[] m_stat;
-
 }
-
 
 void CLVideoCamera::streamJump()
 {
@@ -73,9 +66,7 @@ void CLVideoCamera::stopDispay()
 
 	m_reader->stop();
 	m_camdispay.stop();
-	m_camdispay.clearUnProcessedData();
-	
-	
+	m_camdispay.clearUnprocessedData();
 }
 
 void CLVideoCamera::beforestopDispay()
@@ -83,8 +74,7 @@ void CLVideoCamera::beforestopDispay()
 	m_reader->pleaseStop();
 	m_camdispay.pleaseStop();
 	m_recorder.pleaseStop();
-	m_videovindow->before_destroy();
-
+	m_videovindow->beforeDestroy();
 }
 
 void CLVideoCamera::startRecording()
@@ -138,23 +128,20 @@ const CLVideoWindowItem* CLVideoCamera::getVideoWindow() const
 	return m_videovindow;
 }
 
-
 CLStatistics* CLVideoCamera::getStatistics()
 {
 	return m_stat;
 }
-
 
 void CLVideoCamera::setLightCPUMode(bool val)
 {
 	m_camdispay.setLightCPUMode(val);
 }
 
-void CLVideoCamera::coppyImage(bool copy)
+void CLVideoCamera::copyImage(bool copy)
 {
-	m_camdispay.coppyImage(copy);
+	m_camdispay.copyImage(copy);
 }
-
 
 void CLVideoCamera::setQuality(CLStreamreader::StreamQuality q, bool increase)
 {
@@ -168,5 +155,4 @@ void CLVideoCamera::setQuality(CLStreamreader::StreamQuality q, bool increase)
 		m_reader->setQuality(CLStreamreader::CLSHighest);
 	else
 		m_reader->setQuality(q);
-
 }

@@ -42,7 +42,6 @@ void CLImgSubItem::setMaxSize(int max_width, int max_height)
 	}
 }
 
-
 QRectF CLImgSubItem::boundingRect() const
 {
 	return QRectF(0,0,m_width, m_height);

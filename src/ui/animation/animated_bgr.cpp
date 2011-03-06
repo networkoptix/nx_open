@@ -49,7 +49,6 @@ qreal CLAnimatedBackGround::currPosRelative()
 	return qreal(currPos())/MAX_STEP;
 }
 
-
 CLBlueBackGround::CLBlueBackGround(int timestep):
 CLAnimatedBackGround(timestep)
 {
@@ -61,21 +60,18 @@ void CLBlueBackGround::drawBackground(QPainter * painter, const QRectF & rect )
 	qreal dx_unit = rect.width()/MAX_STEP;
 	qreal dy_unit = rect.height()/MAX_STEP;
 	qreal rpos = currPosRelative();
-	
+
 	if (rpos<0)
 		rpos = rpos;
-
 
 	QColor bl(10,10,110+50*rpos,255);
 	//QColor bl(10,100+50*rpos,10,255);
 
-
 	QPointF center1( rect.center().x() - rpos*rect.width()/2, rect.center().y() );
 	QPointF center2( rect.center().x() + rpos*rect.width()/2, rect.center().y() );
 
-	
 	{
-		
+
 		QRadialGradient radialGrad(center1, qMin(rect.width(), rect.height())/1.5);
 		radialGrad.setColorAt(0, bl);
 		radialGrad.setColorAt(1, QColor(0,0,0,0));
@@ -83,7 +79,7 @@ void CLBlueBackGround::drawBackground(QPainter * painter, const QRectF & rect )
 	}
 
 	{
-		
+
 		QRadialGradient radialGrad(center2, qMin(rect.width(), rect.height())/1.5);
 		radialGrad.setColorAt(0, bl);
 		radialGrad.setColorAt(1, QColor(0,0,0,0));

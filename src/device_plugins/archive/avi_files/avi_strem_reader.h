@@ -4,8 +4,6 @@
 #include "..\abstract_archive_stream_reader.h"
 #include "data/mediadata.h"
 
-
-
 struct AVFormatContext;
 
 class CLAVIStreamReader : public CLAbstractArchiveReader
@@ -14,7 +12,7 @@ public:
 	CLAVIStreamReader(CLDevice* dev);
 	virtual ~CLAVIStreamReader();
 
-	virtual quint64 currTime() const;
+	virtual quint64 currentTime() const;
 
 protected:
 	virtual CLAbstractMediaData* getNextData();
@@ -25,21 +23,21 @@ protected:
 	bool init();
 	void destroy();
 
-	void smart_sleep(quint64 mksec);
+	void smartSleep(quint64 mksec);
 
 protected:
 	qint64 m_currentTime;
-	qint64 m_prev_time;
+	qint64 m_previousTime;
 
 	AVFormatContext* m_formatContext;
 
-	int	m_videoStrmIndex;
-	int	m_audioStrmIndex;
+	int	m_videoStreamIndex;
+	int	m_audioStreamIndex;
 
 	AVPacket m_packet;
 
-	CLCodecType m_videocodec_id;
-	CLCodecType m_audiocodec_id;
+	CLCodecType m_videoCodecId;
+	CLCodecType m_audioCodecId;
 
 	int m_freq;
 	int m_channels;
@@ -49,7 +47,6 @@ protected:
 	volatile bool m_wakeup;
 
 	bool m_bsleep;
-
 };
 
 #endif //avi_stream_reader_h1901

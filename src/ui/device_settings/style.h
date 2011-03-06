@@ -1,9 +1,6 @@
 #ifndef settings_style_h_1447
 #define settings_style_h_1447
 
-
-
-
 class ArthurStyle : public QWindowsStyle
 {
 public:

@@ -5,5 +5,4 @@
 
 LayoutContent& startscreen_content();
 
-
 #endif // startscreen_content__h1434

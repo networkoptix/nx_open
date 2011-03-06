@@ -1,6 +1,5 @@
 #include "layout_content.h"
 
-
 LayoutContent::LayoutContent():
 m_cr(CLDeviceCriteria::NONE),
 mDecoration(0),
@@ -72,7 +71,6 @@ bool LayoutContent::hasSuchSublayoutName(const QString& name) const
 	return false;
 }
 
-
 bool LayoutContent::checkDecorationFlag(unsigned int flag) const
 {
 	return mDecoration & flag;
@@ -87,7 +85,6 @@ void LayoutContent::removeDecorationFlag(unsigned int flag)
 {
 	mDecoration &= ~flag;
 }
-
 
 void LayoutContent::setParent(LayoutContent* parent)
 {
@@ -147,7 +144,6 @@ void LayoutContent::removeLayout(LayoutContent* l, bool del)
 		delete l;
 }
 
-
 void LayoutContent::setDeviceCriteria(const CLDeviceCriteria& cr)
 {
 	m_cr = cr;
@@ -157,7 +153,6 @@ CLDeviceCriteria LayoutContent::getDeviceCriteria() const
 {
 	return m_cr;
 }
-
 
 QList<LayoutImage*>& LayoutContent::getImages() 
 {
@@ -178,7 +173,6 @@ QList<LayoutContent*>& LayoutContent::childrenList()
 {
 	return m_childlist;
 }
-
 
 void LayoutContent::toXml(QDomDocument& doc, QDomElement& parent) 
 {
@@ -211,7 +205,6 @@ void LayoutContent::setRectAdjustment(const CLRectAdjustment& adjust)
 {
 	m_adjustment = adjust;
 }
-
 
 void LayoutContent::addIntereactionFlag(unsigned long flag)
 {
@@ -261,14 +254,12 @@ LayoutContent* LayoutContent::coppyLayout(LayoutContent* l)
 		result->m_devices.push_back(iteml);
 	}
 
-
 	foreach (LayoutContent* cont, l->m_childlist)
 	{
 		LayoutContent* contl = coppyLayout(cont);
 		contl->setParent(result);
 		result->m_childlist.push_back(contl);
 	}
-
 
 	return result;
 }

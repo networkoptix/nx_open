@@ -3,7 +3,6 @@
 
 #include "..\abstract_archive_device.h"
 
-
 class CLArchiveDevice : public CLAbstractArchiveDevice
 {
 public:
@@ -13,10 +12,7 @@ public:
 	virtual CLStreamreader* getDeviceStreamConnection();
 protected:
 
-
 	void readdescrfile();
 };
-
-
 
 #endif //archive_device_h1854

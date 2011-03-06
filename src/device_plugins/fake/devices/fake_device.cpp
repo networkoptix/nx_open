@@ -2,7 +2,6 @@
 #include "../streamreader/fake_file_streamreader.h"
 #include "../device/device_video_layout.h"
 
-
 CLDeviceList FakeDevice::findDevices()
 {
 	CLDeviceList result;
@@ -14,13 +13,11 @@ CLDeviceList FakeDevice::findDevices()
 		result[dev->getUniqueId()] = dev;
 	}
 
-	
 	/*/
 	CLDevice* dev = new FakeDevice4_180();
 	dev->setUniqueId(QString("fake180 ") + QString::number(1));
 	result[dev->getUniqueId()] = dev;
 	/**/
-
 
 	/*/
 	dev = new FakeDevice4_360();
@@ -28,10 +25,8 @@ CLDeviceList FakeDevice::findDevices()
 	result[dev->getUniqueId()] = dev;
 	/**/
 
-
 	return result;
 }
-
 
 // executing command 
 bool FakeDevice::executeCommand(CLDeviceCommand* command)
@@ -55,12 +50,10 @@ public:
 		return 4;
 	}
 
-
 	virtual unsigned int width() const 
 	{
 		return 4;
 	}
-
 
 	virtual unsigned int height() const 
 	{
@@ -90,12 +83,10 @@ public:
 		return 4;
 	}
 
-
 	virtual unsigned int width() const 
 	{
 		return 2;
 	}
-
 
 	virtual unsigned int height() const 
 	{
@@ -114,14 +105,10 @@ public:
 
 };
 
-
-
-
 FakeDevice4_180::FakeDevice4_180()
 {
 	m_videolayout = new VideoLayout4_180();
 }
-
 
 CLStreamreader* FakeDevice4_180::getDeviceStreamConnection()
 {
@@ -132,7 +119,6 @@ FakeDevice4_360::FakeDevice4_360()
 {
 	m_videolayout = new VideoLayout4_360();
 }
-
 
 CLStreamreader* FakeDevice4_360::getDeviceStreamConnection()
 {

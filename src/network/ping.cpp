@@ -1,6 +1,5 @@
 #include "ping.h"
 
-
 #include <iphlpapi.h>
 #include <icmpapi.h>
 #include <stdio.h>
@@ -9,15 +8,11 @@
 #pragma comment(lib, "iphlpapi.lib")
 #pragma comment(lib, "ws2_32.lib")
 
-
-
-
 CLPing::CLPing()
 {
-
 }
 
-bool CLPing::ping(const QString& ip, int retry, int timeout_per_retry, int pack_size)
+bool CLPing::ping(const QString& ip, int retry, int timeoutPerRetry, int packetSize)
 {
 	// Declare and initialize variables
 
@@ -26,17 +21,15 @@ bool CLPing::ping(const QString& ip, int retry, int timeout_per_retry, int pack_
 	DWORD dwRetVal = 0;
 	DWORD dwError = 0;
 	char SendData[] = "Data Buffer";
-	
+
 	const DWORD ReplySize = sizeof (ICMP_ECHO_REPLY) + sizeof (SendData) + 8;;
 	LPVOID ReplyBuffer[ReplySize];
-
 
 	ipaddr = inet_addr(ip.toLatin1().data());
 	if (ipaddr == INADDR_NONE) 
 		return false;
 
 	hIcmpFile = IcmpCreateFile();
-
 	if (hIcmpFile == INVALID_HANDLE_VALUE) 
 	{
 		cl_log.log("CLPing: Unable to open handle ", cl_logERROR);
@@ -45,14 +38,10 @@ bool CLPing::ping(const QString& ip, int retry, int timeout_per_retry, int pack_
 		return false;
 	}
 
-
 	// Allocate space for at a single reply
 	dwRetVal = IcmpSendEcho2(hIcmpFile, NULL, NULL, NULL,
 		ipaddr, SendData, sizeof (SendData), NULL,
-		ReplyBuffer, ReplySize, retry*timeout_per_retry);
-
-
-
+		ReplyBuffer, ReplySize, retry*timeoutPerRetry);
 	if (dwRetVal != 0) 
 	{
 		PICMP_ECHO_REPLY pEchoReply = (PICMP_ECHO_REPLY) ReplyBuffer;
@@ -74,7 +63,6 @@ bool CLPing::ping(const QString& ip, int retry, int timeout_per_retry, int pack_
 		printf("\t  Received from %s\n", inet_ntoa(ReplyAddr));
 		printf("\t  Status = %ld  ", pEchoReply->Status);
 		/**/
-
 
 		switch (pEchoReply->Status) 
 		{
@@ -102,7 +90,6 @@ bool CLPing::ping(const QString& ip, int retry, int timeout_per_retry, int pack_
 	{
 		cl_log.log(ip + " CLPing: Call to IcmpSendEcho2 failed", cl_logERROR);
 
-		
 		printf("Call to IcmpSendEcho2 failed.\n");
 		dwError = GetLastError();
 		switch (dwError) {
@@ -123,6 +110,4 @@ bool CLPing::ping(const QString& ip, int retry, int timeout_per_retry, int pack_
 
 		return false;
 	}
-	
-
 }

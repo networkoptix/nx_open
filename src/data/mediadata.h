@@ -4,7 +4,6 @@
 #include "data.h"
 #include "../base/bytearray.h"
 
-
 enum CLCodecType 
 {
 	CL_JPEG, 
@@ -26,25 +25,21 @@ enum CLCodecType
 	CL_ADPCM_MS,
 	CL_AMR_NB,
 	CL_UNKNOWN, 
-	CL_VARIOUSE_DECODERS};
-
-
+	CL_VARIOUSE_DECODERS
+};
 
 struct CLAbstractMediaData : public CLAbstractData
 {
-
-	CLAbstractMediaData(unsigned int alignment, unsigned int capacity):
-	data(alignment, capacity)
+	CLAbstractMediaData(unsigned int alignment, unsigned int capacity)
+        : data(alignment, capacity)
 	{
-		
-	};
+	}
+
 	virtual ~CLAbstractMediaData()
 	{
-
 	}
 
 	enum DataType {VIDEO, AUDIO};
-	
 
 	CLByteArray data;
 	DataType dataType;
@@ -52,37 +47,33 @@ struct CLAbstractMediaData : public CLAbstractData
 	quint64 timestamp; // mksec // 10^-6
 
 private:
-
-	CLAbstractMediaData():data(0,1){};
-
+	CLAbstractMediaData() : 
+       data(0,1){};
 };
-
 
 struct CLCompressedVideoData : public CLAbstractMediaData
 {
-	CLCompressedVideoData(unsigned int alignment, unsigned int capacity, void* ctx = 0):
-		CLAbstractMediaData(alignment, qMin(capacity, (unsigned int)10*1024*1024))
+	CLCompressedVideoData(unsigned int alignment, unsigned int capacity, void* ctx = 0)
+        : CLAbstractMediaData(alignment, qMin(capacity, (unsigned int)10 * 1024 * 1024))
 	{
 		dataType = VIDEO;
-		use_twice = false;
+		useTwice = false;
 		context = ctx;
 	}
 
 	int width;
 	int height;
 	bool keyFrame;
-	bool use_twice; // some decoders delay video frame by one;
-	quint32 channel_num; // video channel number; some devices might have more that one sensor.
+	bool useTwice; // some decoders delay video frame by one;
+	quint32 channelNumber; // video channel number; some devices might have more that one sensor.
 
 	void* context;
 };
 
-
 struct CLCompressedAudioData : public CLAbstractMediaData
 {
-	CLCompressedAudioData (unsigned int alignment, unsigned int capacity, void* ctx):
-	CLAbstractMediaData(alignment, capacity)
-
+	CLCompressedAudioData (unsigned int alignment, unsigned int capacity, void* ctx)
+        : CLAbstractMediaData(alignment, capacity)
 	{
 		dataType = AUDIO;
 		context = ctx;
@@ -90,12 +81,9 @@ struct CLCompressedAudioData : public CLAbstractMediaData
 
 	int freq;
 	int channels;
-
     quint64 duration;
-
 	void* context;
 };
-
 
 typedef CLThreadQueue<CLAbstractData*> CLDataQueue;
 

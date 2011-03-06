@@ -1,7 +1,6 @@
 #ifndef single_shot_reader_h_105
 #define single_shot_reader_h_105
 
-
 #include "streamreader.h"
 
 struct CLAbstractMediaData;

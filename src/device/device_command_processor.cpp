@@ -17,10 +17,6 @@ CLDevice* CLDeviceCommand::getDevice() const
 	return m_device;
 }
 
-
-
-
-
 CLDeviceCommandProcessor::CLDeviceCommandProcessor():
 CLAbstractDataProcessor(1000)
 {
@@ -31,7 +27,6 @@ CLDeviceCommandProcessor::~CLDeviceCommandProcessor()
 {
 	stop();
 }
-
 
 void CLDeviceCommandProcessor::processData(CLAbstractData* data)
 {
@@ -74,11 +69,10 @@ void CLDeviceCommandProcessor::putData(CLAbstractData* data)
 
 }
 
-void CLDeviceCommandProcessor::clearUnProcessedData()
+void CLDeviceCommandProcessor::clearUnprocessedData()
 {
-	CLAbstractDataProcessor::clearUnProcessedData();
+	CLAbstractDataProcessor::clearUnprocessedData();
 	QMutexLocker mutex(&m_cs);
 	mDevicesQue.clear();
 }
-
 

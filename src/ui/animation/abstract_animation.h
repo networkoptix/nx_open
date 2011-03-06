@@ -22,6 +22,4 @@ protected:
 
 };
 
-
-
 #endif //abstract_animation_h_2000

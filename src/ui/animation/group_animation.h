@@ -13,7 +13,4 @@ public:
 	virtual QObject* object();
 };
 
-
-
-
 #endif //group_animation_h2219

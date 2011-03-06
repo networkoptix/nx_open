@@ -8,11 +8,8 @@
 #include "subitem\recording_sign_item.h"
 #include "base\log.h"
 
-
 static const double Pi = 3.14159265358979323846264338327950288419717;
 static double TwoPi = 2.0 * Pi;
-
-
 
 extern int item_select_duration;
 extern qreal selected_item_zoom;
@@ -21,7 +18,6 @@ extern int item_hoverevent_duration;
 #define SHADOW_SIZE 100
 
 extern int global_opacity_change_period;
-
 
 CLAbstractSceneItem::CLAbstractSceneItem(GraphicsView* view, int max_width, int max_height, 
 										 QString name):
@@ -56,7 +52,6 @@ m_steady_black_color(0)
 	//setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);
 
 	//setFlag(ItemIsSelectable, true);
-	
 
 }
 
@@ -98,9 +93,6 @@ CLVideoWindowItem* CLAbstractSceneItem::toVideoItem() const
 	return static_cast<CLVideoWindowItem*>(   const_cast<CLAbstractSceneItem*>(this)  );
 }
 
-
-
-
 CLAbstractSceneItem::CLSceneItemType CLAbstractSceneItem::getType() const
 {
 	return m_type;
@@ -110,7 +102,6 @@ void CLAbstractSceneItem::setType(CLSceneItemType t)
 {
 	m_type = t;
 }
-
 
 void CLAbstractSceneItem::setMaxSize(QSize size)
 {
@@ -127,7 +118,6 @@ QSize CLAbstractSceneItem::onScreenSize() const
 {
 	return m_view->mapFromScene(sceneBoundingRect()).boundingRect().size();
 }
-
 
 QRectF CLAbstractSceneItem::boundingRect() const
 {
@@ -148,7 +138,7 @@ void CLAbstractSceneItem::setItemSelected(bool sel, bool animate , int delay )
 {
 	if (!m_selected && sel)
 		emit onSelected(this);
-	
+
 	m_selected = sel;
 
 	if (!m_selected)
@@ -227,7 +217,6 @@ void CLAbstractSceneItem::stop_animation()
         sub_item->stopAnimation();
     }
 
-
 }
 
 void CLAbstractSceneItem::setFullScreen(bool full)
@@ -281,8 +270,6 @@ void CLAbstractSceneItem::setOriginallyArranged(bool val)
 {
 	m_originallyArranged = val;
 }
-
-
 
 void CLAbstractSceneItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
@@ -342,12 +329,10 @@ void CLAbstractSceneItem::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 		QGraphicsItem::mouseReleaseEvent(event);
 }
 
-
 void CLAbstractSceneItem::drawSteadyWall(QPainter* painter)
 {
     if (!m_steadyMode)
         return; // do not need to draw anything in this mode
-
 
     QColor color(0,0,0,m_steady_black_color);
 
@@ -356,8 +341,6 @@ void CLAbstractSceneItem::drawSteadyWall(QPainter* painter)
     int maxd = qMax(width(), height());
     rect.adjust(-maxd, -maxd, maxd, maxd);
     painter->fillRect(rect, color);
-    
-
 
 }
 
@@ -387,7 +370,7 @@ void CLAbstractSceneItem::drawRotationHelper(bool val)
 
 void CLAbstractSceneItem::setRotationPointCenter(QPointF center)
 {
-	
+
 	qreal angle = getRotation();
 
 	qreal cos_a = cos(angle*Pi/180);
@@ -418,10 +401,9 @@ QPointF CLAbstractSceneItem::getRotationPointCenter() const
 
 void CLAbstractSceneItem::setRotationPointHand(QPointF point)
 {
-	
+
 	m_rotation_hand = point;
 }
-
 
 void CLAbstractSceneItem::drawRotationHelper(QPainter* painter)
 {
@@ -433,8 +415,6 @@ void CLAbstractSceneItem::drawRotationHelper(QPainter* painter)
 	static const int p_line_len = 220;
 	static const int arrowSize = 30;
 
-
-
 	QRadialGradient gradient(m_rotation_center, r);
 	gradient.setColorAt(0, color1);
 	gradient.setColorAt(1, color2);
@@ -442,8 +422,6 @@ void CLAbstractSceneItem::drawRotationHelper(QPainter* painter)
 	painter->save();
 
 	painter->setPen(QPen(color2, 0, Qt::SolidLine));
-
-
 
 	painter->setBrush(gradient);
 	painter->drawEllipse(m_rotation_center, r, r);
@@ -459,12 +437,7 @@ void CLAbstractSceneItem::drawRotationHelper(QPainter* painter)
 	line_p = QLineF(line_p.p2(),line_p.p1());
 	line_p.setLength(p_line_len);
 
-
-
 	painter->drawLine(line_p);
-
-
-
 
 	double angle = ::acos(line_p.dx() / line_p.length());
 	if (line_p.dy() >= 0)
@@ -515,7 +488,6 @@ void CLAbstractSceneItem::goToSteadyMode(bool steady, bool instant)
             sub_item->hide(global_opacity_change_period*(!instant));
         }
 
-
         if (instant)
         {
             setSteadyBlackColor(255);
@@ -534,7 +506,6 @@ void CLAbstractSceneItem::goToSteadyMode(bool steady, bool instant)
         return;
     }
 
-
     // escape steady mode
     QList<QGraphicsItem *> childrenLst = childItems();
     foreach(QGraphicsItem * item, childrenLst)
@@ -551,7 +522,6 @@ void CLAbstractSceneItem::goToSteadyMode(bool steady, bool instant)
         return;
     }
 
-
     stopSteadyAnimation();
 
     m_steady_animation = new QPropertyAnimation(this, "steadycolor");
@@ -560,7 +530,6 @@ void CLAbstractSceneItem::goToSteadyMode(bool steady, bool instant)
     m_steady_animation->setEndValue(0);
     m_steady_animation->start();
     connect(m_steady_animation, SIGNAL(finished ()), this, SLOT(stopSteadyAnimation()));
-
 
 }
 

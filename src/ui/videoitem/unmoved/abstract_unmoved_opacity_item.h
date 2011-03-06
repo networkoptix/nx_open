@@ -4,7 +4,6 @@
 #include "abstract_unmoved_item.h"
 class QPropertyAnimation;
 
-
 class CLAbstractUnMovedOpacityItem: public CLAbstractUnmovedItem
 {
 	Q_OBJECT
@@ -20,6 +19,5 @@ protected:
 
 	QPropertyAnimation* m_animation;
 };
-
 
 #endif //CLAbstractUnMovedOpacityItem_1758

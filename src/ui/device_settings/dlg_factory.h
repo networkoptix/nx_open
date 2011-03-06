@@ -1,7 +1,6 @@
 #ifndef dlg_factory__h_1712
 #define dlg_factory__h_1712
 
-
 class CLDevice;
 class CLAbstractDeviceSettingsDlg;
 

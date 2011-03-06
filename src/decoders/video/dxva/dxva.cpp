@@ -151,7 +151,6 @@ static const d3d_format_t *D3dFindFormat(D3DFORMAT format)
     return NULL;
 }
 
-
 DxvaSupportObject::DxvaSupportObject(int codecId)
 :
     m_codecId(codecId),
@@ -476,12 +475,12 @@ void DxvaSupportObject::DxDestroyVideoDecoder()
 {
     if (m_decoder)
         m_decoder->Release();
-        
+
     m_decoder = NULL;
 
     for (unsigned i = 0; i < m_surfaceCount; i++)
         m_surface[i].d3d->Release();
-        
+
     m_surfaceCount = 0;
 }
 

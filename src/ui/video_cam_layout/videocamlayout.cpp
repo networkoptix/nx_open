@@ -34,7 +34,6 @@ int MAX_FPS_selected = 100;
 
 extern int scene_zoom_duration;
 
-
 SceneLayout::SceneLayout():
 m_view(0),
 m_scene(0),
@@ -45,7 +44,6 @@ m_editable(false)
 	connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimer()));
 
 	connect(&m_videotimer, SIGNAL(timeout()), this, SLOT(onVideoTimer()));
-	
 
 	CLGridSettings settings;
 
@@ -60,9 +58,7 @@ m_editable(false)
 	settings.optimal_ratio = square_ratio;
 
 	m_grid.setSettings(settings);
-	
 
-	
 }
 
 SceneLayout::~SceneLayout()
@@ -109,17 +105,15 @@ void SceneLayout::setContentChanged(bool changed)
 	m_contentchanged = changed;
 }
 
-
 void SceneLayout::setMaxFps(int max_fps)
 {
 	CL_LOG(cl_logDEBUG1)
 	{
 		cl_log.log("max fps = ", max_fps, cl_logDEBUG1);
 	}
-	
+
 	m_videotimer.setInterval(1000/max_fps);
 }
-
 
 void SceneLayout::start()
 {
@@ -132,7 +126,6 @@ void SceneLayout::start()
 	m_timer.start(100);
 	m_videotimer.start(1000/MAX_FPS_normal); 
 	m_isRunning = true;
-
 
 }
 
@@ -199,10 +192,9 @@ void SceneLayout::stop(bool animation)
 	cl_log.log("SceneLayout::stop......\r\n ", cl_logDEBUG1);
 
 	m_view->stop();
-	
+
 	m_timer.stop();
 	m_videotimer.stop();
-
 
 	if (animation)
 	{
@@ -215,7 +207,6 @@ void SceneLayout::stop(bool animation)
 	}
 
 }
-
 
 void SceneLayout::onTimer()
 {
@@ -231,7 +222,7 @@ void SceneLayout::onTimer()
 	if (m_firstTime)
 	{
 		m_firstTime =  false;
-		
+
 		//QThread::currentThread()->setPriority(QThread::IdlePriority); // surprised. if gui thread has low priority => things looks smoother 
 		QThread::currentThread()->setPriority(QThread::LowPriority); // surprised. if gui thread has low priority => things looks smoother 
 		//QThread::currentThread()->setPriority(QThread::HighestPriority); // surprised. if gui thread has low priority => things looks smoother 
@@ -243,15 +234,10 @@ void SceneLayout::onTimer()
 		m_timer.setInterval(devices_update_interval);
 	}
 
-	
-
 	//===================video devices=======================
 	CLDeviceList all_devs =  CLDeviceManager::instance().getDeviceList(m_content->getDeviceCriteria());
 	bool added = false;
 
-
-	
-	
 	if (m_content->getDeviceCriteria().getCriteria() != CLDeviceCriteria::NONE)
 	{
 			QList<CLAbstractComplicatedItem*> remove_lst;
@@ -275,8 +261,7 @@ void SceneLayout::onTimer()
 						remove_lst.push_back(devitem);
 				}
 			}
-			
-			
+
 			if (removeDevices(remove_lst))
 				added = true;
 
@@ -284,7 +269,6 @@ void SceneLayout::onTimer()
 				CLGLRenderer::clearGarbage();
 
 	}
-
 
 	foreach(CLDevice* dev, all_devs)
 	{
@@ -295,7 +279,6 @@ void SceneLayout::onTimer()
 		else
 			added = true;
 	}
-
 
 	//==============recorders ================================
 	QList<LayoutContent*> children_lst =  m_content->childrenList();
@@ -311,13 +294,12 @@ void SceneLayout::onTimer()
 
 	}
 
-
 	//================================
 
 	if (added && !m_firstTime)
 	{
 		m_view->instantArrange();
-		
+
 		updateSceneRect();
 
 		m_view->zoomMin(0);
@@ -325,10 +307,8 @@ void SceneLayout::onTimer()
 		m_view->centerOn(m_view->getRealSceneRect().center());
 		m_view->fitInView(2000, 0);
 
-		
 	}
 
-	
 }
 
 void SceneLayout::onVideoTimer()
@@ -371,7 +351,6 @@ bool SceneLayout::addDevice(QString uniqueid, bool update_scene_rect)
 		return false;
 	}
 
-
 	return true;
 }
 
@@ -388,8 +367,6 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect)
 		if (devitem->getDevice()->getUniqueId() == device->getUniqueId())
 			return false; // already have such device here 
 	}
-
-
 
 	CLDevice::DeviceType type = device->getDeviceType();
 
@@ -437,9 +414,6 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect)
 			}
 		}
 
-
-
-
 		CLRecorderDisplay* recd = new CLRecorderDisplay(device, item);
 		addItem(item, update_scene_rect);
 
@@ -452,8 +426,6 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect)
 	return false;
 
 }
-
-
 
 bool SceneLayout::addLayoutItem(QString name, LayoutContent* lc, bool update_scene_rect)
 {
@@ -511,7 +483,6 @@ bool SceneLayout::addItem(CLAbstractSceneItem* item, int x, int y, bool update_s
 
 	//===========
 	connect(item, SIGNAL(onClose(CLAbstractSubItemContainer*)), this, SLOT(onItemClose(CLAbstractSubItemContainer*)));
-	
 
 	return true;
 }
@@ -529,7 +500,6 @@ bool SceneLayout::addItem(CLAbstractSceneItem* item, bool update_scene_rect )
 
 }
 
-
 // remove item from lay out
 void SceneLayout::removeItem(CLAbstractSceneItem* item, bool update_scene_rect )
 {
@@ -545,9 +515,7 @@ void SceneLayout::removeItem(CLAbstractSceneItem* item, bool update_scene_rect )
 		m_view->fitInView(600, 0, CLAnimationTimeLine::SLOW_START_SLOW_END);
 	}
 
-
 }
-
 
 void SceneLayout::setItemDistance(qreal distance)
 {
@@ -588,7 +556,6 @@ QList<CLAbstractSceneItem*>* SceneLayout::getItemListPointer()
 	return &m_items;
 }
 
-
 bool SceneLayout::hasSuchItem(const CLAbstractSceneItem* item) const
 {
 	return m_items.contains(const_cast<CLAbstractSceneItem*>(item));
@@ -602,20 +569,15 @@ void SceneLayout::makeAllItemsSelectable(bool selectable)
 	}
 }
 
-
 //===============================================================
 void SceneLayout::onItemClose(CLAbstractSubItemContainer* itm)
 {
 
 	CLAbstractSceneItem* item = static_cast<CLAbstractSceneItem*>(itm);
-	
 
 	m_view->stopAnimation();
 	m_view->setZeroSelection();
 	item->stop_animation();
-
-
-	
 
 	CLAbstractSceneItem::CLSceneItemType type = item->getType();
 	if (type==CLAbstractSceneItem::LAYOUT)
@@ -640,7 +602,6 @@ void SceneLayout::onItemClose(CLAbstractSubItemContainer* itm)
 	}
 	//===============
 
-
 	if (item->getComplicatedItem())
 	{
 		CLAbstractComplicatedItem* devitem = item->getComplicatedItem();
@@ -663,7 +624,6 @@ void SceneLayout::onItemClose(CLAbstractSubItemContainer* itm)
 		delete item;
 	}
 
-
 }
 
 bool SceneLayout::removeDevices(QList<CLAbstractComplicatedItem*> lst)
@@ -683,7 +643,7 @@ bool SceneLayout::removeDevices(QList<CLAbstractComplicatedItem*> lst)
 	{
 		onItemClose(devitem->getSceneItem());
 	}
-	
+
 	return true;
 }
 
@@ -712,7 +672,7 @@ void SceneLayout::onItemDoubleClick(CLAbstractSceneItem* item)
 		CLRecorderItem* ritem = static_cast<CLRecorderItem*>(item);
 		emit onNewLayoutSelected(m_content, ritem->getRefContent());
 	}
-	
+
 }
 
 void SceneLayout::onItemPressed(CLAbstractSceneItem* item)

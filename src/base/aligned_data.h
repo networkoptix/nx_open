@@ -17,22 +17,16 @@ public:
 	{
 		delete[] m_all_data;
 	}
-	
-	
+
 	char* data()
 	{
 		return m_aligned_data;
 	}
-	
-
-
-	
 
 	unsigned long capacity() const
 	{
 		return m_capacity;
 	}
-
 
 	void change_capacity(unsigned long new_capacity)
 	{
@@ -40,7 +34,7 @@ public:
 		char* all_data;
 		char* aligned_data;
 		unsigned long capacity;
-		
+
 		init(m_alignment, new_capacity, all_data, aligned_data, capacity);
 
 		memcpy(aligned_data, m_aligned_data, m_capacity); // copy old data 
@@ -52,9 +46,8 @@ public:
 		m_capacity = capacity;
 
 		cl_log.log("CLAlignedData::change_capacity is called", cl_logWARNING);
-		
-	}
 
+	}
 
 private:
 	CLAlignedData(const CLAlignedData&){};

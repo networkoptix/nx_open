@@ -8,7 +8,6 @@ struct AVLastPacketSize
 	int x0, y0, width, height;
 };
 
-
 class CLAVClinetPullStreamReader : public CLClientPullStreamreader
 {
 public:
@@ -25,4 +24,4 @@ protected:
 };
 
 #endif //cl_av_clien_pull1529
- 
+

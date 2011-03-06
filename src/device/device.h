@@ -5,15 +5,13 @@
 #include "device_command_processor.h"
 #include "../base/expensiveobject.h"
 
-
 struct CLDeviceStatus
 {
 	enum {NOT_IN_SUBNET = 1, CONFLICTING = 2, IP_LOCKED = 4, READY = 8, NOT_LOCAL = 16, ALL = 0xff};
-	CLDeviceStatus():
-	status(0)
+	CLDeviceStatus()
+        : status(0)
 	{
-
-	};
+	}
 
 	quint32 checkFlag(int flag) const
 	{
@@ -25,25 +23,17 @@ struct CLDeviceStatus
 		status  |= flag;
 	}
 
-
-
 	void removeFlag(int flag)
 	{
 		status &= (~flag);
 	}
 
-
-
 	quint32 status;
-
 };
-
-
 
 class CLDeviceCommand;
 class CLStreamreader;
 class CLDeviceVideoLayout;
-
 
 // this class and inherited must be very light to create 
 class CLDevice;
@@ -53,15 +43,12 @@ static int inst = 0;
 
 class CLDevice : public CLRefCounter
 {
-	
 public:
-
 	enum {NETWORK = 0x00000001, NVR = 0x00000002, SINGLE_SHOT = 0x00000004, ARCHIVE = 0x00000008, RECORDED = 0x00000010};
 
 	enum DeviceType {RECORDER, VIDEODEVICE};
 
 	CLDevice();
-
 
 	virtual ~CLDevice();
 
@@ -89,8 +76,6 @@ public:
 	CLDeviceStatus& getStatus() ;
 	void  setStatus(const CLDeviceStatus& status) ;
 
-
-
 	// return true if no error
 	// if (resynch) then ignore synchronized flag
 	virtual bool getParam(const QString& name, CLValue& val, bool resynch = false);
@@ -112,14 +97,13 @@ public:
 	virtual void onBeforeStart(){};
 
 	// executing command 
-	virtual bool executeCommand(CLDeviceCommand* command){return true;};
+	virtual bool executeCommand(CLDeviceCommand* /*command*/){return true;};
 
-	CLParamList& getDevicePramList();// returns params that can be changed on device level
-	const CLParamList& getDevicePramList() const;
+	CLParamList& getDeviceParamList();// returns params that can be changed on device level
+	const CLParamList& getDeviceParamList() const;
 
-	CLParamList& getStreamPramList();// returns params that can be changed on stream level 
-	const CLParamList& getStreamPramList() const;
-
+	CLParamList& getStreamParamList();// returns params that can be changed on stream level 
+	const CLParamList& getStreamParamList() const;
 
 	virtual CLStreamreader* getDeviceStreamConnection() = 0;
 
@@ -129,15 +113,11 @@ public:
 	const CLDeviceVideoLayout* getVideoLayout() const;
 
 public:
-
-	
 	static QStringList supportedDevises();
-
 
 	// this function will call getBaseInfo for each device with conflicted = false in multiple thread
 	// lst - device list; threads - number of threads 
 	static void getDevicesBasicInfo(CLDeviceList& lst, int threads);
-
 
 	// will extend the first one and remove all elements from the second one
 	static void mergeLists(CLDeviceList& first, CLDeviceList second);
@@ -146,35 +126,27 @@ public:
 
 	static void addReferences(CLDeviceList& lst);
 
-	
-
 	static void startCommandProc() {m_commanproc.start();};
 	static void stopCommandProc() {m_commanproc.stop();};
     static void addCommandToProc(CLAbstractData* data) {m_commanproc.putData(data);};
-	static int commandProcQueSize() {return m_commanproc.queSize();}
+	static int commandProcQueSize() {return m_commanproc.queueSize();}
 	static bool commandProchasSuchDeviceInQueue(CLDevice* dev) {return m_commanproc.hasSuchDeviceInQueue(dev);}
 
-
 protected:
-
 	typedef QMap<QString, CLParamList > LL;
 	static LL static_device_list; // list of all supported devices params list
 	static LL static_stream_list; // list of all supported streams params list
 
 	// this is thread to process commands like setparam
-	
+
 	static CLDeviceCommandProcessor m_commanproc;
 
 protected:
-
 	mutable CLParamList m_deviceParamList;
 	mutable CLParamList m_streamParamList;
 
-
-
 	QString m_name; // this device model like AV2105 or AV2155dn 
-
-	QString m_uniqueid; //+
+	QString m_uniqueId; //+
 	QString m_description;
 
 	CLDeviceStatus m_status;
@@ -183,9 +155,7 @@ protected:
 
 	mutable CLDeviceVideoLayout* m_videolayout;
 
-	QString mParentId;
-
+	QString m_parentId;
 };
-
 
 #endif

@@ -3,7 +3,6 @@
 #include "settings.h"
 #include "recording_sign_item.h"
 
-
 CLAbstractSubItemContainer::CLAbstractSubItemContainer(QGraphicsItem* parent):
 QGraphicsItem(parent)
 {
@@ -14,7 +13,6 @@ CLAbstractSubItemContainer::~CLAbstractSubItemContainer()
 {
 
 }
-
 
 bool CLAbstractSubItemContainer::addSubItem(CLSubItemType type)
 {
@@ -33,7 +31,6 @@ bool CLAbstractSubItemContainer::addSubItem(CLSubItemType type)
 	case RecordingSubItem:
 		item = new CLRecordingSignItem(this);
 		break;
-
 
 	default:
 		return false;
@@ -59,11 +56,10 @@ void CLAbstractSubItemContainer::removeSubItem(CLSubItemType type)
 	}
 }
 
-QPointF CLAbstractSubItemContainer::getBestSubItemPos(CLSubItemType type)
+QPointF CLAbstractSubItemContainer::getBestSubItemPos(CLSubItemType /*type*/)
 {
 	return QPointF(-1001,-1001);
 }
-
 
 void CLAbstractSubItemContainer::onResize()
 {

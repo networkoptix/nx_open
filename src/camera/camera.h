@@ -1,7 +1,6 @@
 #ifndef clcamera_h_1451
 #define clcamera_h_1451
 
-
 #include "camdisplay.h"
 #include "../statistics/statistics.h"
 #include "../streamreader/streamreader.h"
@@ -28,13 +27,11 @@ public:
 
 	virtual void beforestopDispay();
 
-
     // this function must be called if stream was interupted or so; to synch audio and video again 
     void streamJump();
-	
-	
+
 	void setLightCPUMode(bool val);
-	void coppyImage(bool copy);
+	void copyImage(bool copy);
 
 	virtual CLDevice* getDevice() const;
 
@@ -46,7 +43,6 @@ public:
 
 	CLStatistics* getStatistics();
 	CLCamDisplay* getCamCamDisplay();
-
 
 	void setQuality(CLStreamreader::StreamQuality q, bool increase);
 
@@ -61,6 +57,5 @@ private:
 	CLStatistics* m_stat;
 
 };
-
 
 #endif //clcamera_h_1451

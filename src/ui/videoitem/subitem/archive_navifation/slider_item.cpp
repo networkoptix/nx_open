@@ -1,6 +1,5 @@
 #include "slider_item.h"
 
-
 CLDirectJumpSlider::CLDirectJumpSlider(Qt::Orientation orientation, QWidget * parent ):
 QSlider(orientation, parent)
 {
@@ -11,7 +10,6 @@ CLDirectJumpSlider::~CLDirectJumpSlider()
 {
 
 }
-
 
 void CLDirectJumpSlider::mousePressEvent( QMouseEvent * event)
 {

@@ -29,7 +29,6 @@ mText(text)
 
 	setToolTip(tooltipText);
 
-
 }
 
 CLCustomBtnItem::~CLCustomBtnItem()
@@ -70,15 +69,11 @@ void CLCustomBtnItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
 	//painter->setRenderHint(QPainter::SmoothPixmapTransform);
 	//painter->setRenderHint(QPainter::Antialiasing);
 
-
-
 	painter->fillPath(mShadowRectPath, global_shadow_color);
-	
 
 	QColor border_color(20,20,160);
 	if (m_mouse_over)
 		border_color = QColor(20,20,190);
-
 
 	painter->fillPath(mRoundRectPath, border_color );
 
@@ -88,10 +83,9 @@ void CLCustomBtnItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
 
 	painter->fillPath(mSmallRectPath, btn_color);
 
-
 	//painter->setPen(QPen(QColor(100,100,100,230),  1, Qt::SolidLine));
 	//painter->drawRect(boundingRect());
-	
+
 	//==================================================
 	QFont  font("Courier New", 350);
 	font.setWeight(QFont::Bold);
@@ -106,7 +100,6 @@ void CLCustomBtnItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
 		painter->setPen(QColor(190, 190, 190));
 	else
 		painter->setPen(QColor(150, 150, 150));
-
 
 	painter->drawText((width() - rect.width())/2, border,
 		rect.width(), rect.height(),

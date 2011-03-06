@@ -3,8 +3,6 @@
 #include "device/device.h"
 #include "device/device_video_layout.h"
 
-
-
 CLStreamreader::CLStreamreader(CLDevice* dev):
 m_device(dev),
 m_qulity(StreamQuality::CLSLowest),
@@ -13,9 +11,8 @@ m_needSleep(true)
 	memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame));
 	m_channel_number = dev->getVideoLayout()->numberOfChannels();
 
-	setStreamParams(m_device->getStreamPramList());
+	setStreamParams(m_device->getStreamParamList());
 
-	
 }
 
 CLStreamreader::~CLStreamreader()
@@ -43,7 +40,6 @@ CLStreamreader::StreamQuality CLStreamreader::getQuality() const
 	return m_qulity;
 }
 
-
 void CLStreamreader::setStreamParams(CLParamList newParam)
 {
 	QMutexLocker mutex(&m_params_CS);
@@ -55,7 +51,6 @@ CLParamList CLStreamreader::getStreamParam() const
 	QMutexLocker mutex(&m_params_CS);
 	return m_streamParam;
 }
-
 
 void CLStreamreader::addDataProcessor(CLAbstractDataProcessor* dp)
 {
@@ -91,7 +86,6 @@ bool CLStreamreader::needKeyData() const
 	return false;
 
 }
-
 
 void CLStreamreader::putData(CLAbstractData* data)
 {

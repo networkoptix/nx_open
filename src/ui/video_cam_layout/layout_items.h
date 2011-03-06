@@ -6,8 +6,6 @@
 class CLCustomBtnItem;
 class CLStaticImageItem;
 
-
-
 class LayoutItem
 {
 public:
@@ -22,7 +20,6 @@ public:
 
 	virtual ~LayoutItem();
 	virtual Type type() const = 0;
-
 
 	int getX() const;
 	int getY() const;

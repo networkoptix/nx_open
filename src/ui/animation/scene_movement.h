@@ -15,7 +15,6 @@ public:
 	void move (QPointF dest, int duration, int delay, CLAnimationTimeLine::CLAnimationCurve curve =  CLAnimationTimeLine::SLOW_END_POW_40 );
 	void move (int dx, int dy, int duration, bool limited , int delay, CLAnimationTimeLine::CLAnimationCurve curve =  CLAnimationTimeLine::SLOW_END_POW_40 );
 
-
 private slots:
 	void valueChanged ( qreal pos );
 

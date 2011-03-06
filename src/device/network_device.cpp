@@ -6,14 +6,12 @@
 #include "../base/sleep.h"
 #include "device_command_processor.h"
 
-
 extern int ping_timeout ;
 
 CLNetworkDevice::CLNetworkDevice()
 {
 	addDeviceTypeFlag(CLDevice::NETWORK);
 }
-
 
 QHostAddress CLNetworkDevice::getIP() const
 {
@@ -74,7 +72,6 @@ void CLNetworkDevice::setDiscoveryAddr(QHostAddress addr)
 	m_local_adssr = addr;
 }
 
-
 QString CLNetworkDevice::toString() const
 {
 	QString result;
@@ -87,7 +84,6 @@ bool CLNetworkDevice::conflicting()
 	QTime time;
 	time.restart();
 	CL_LOG(cl_logDEBUG2) cl_log.log("begining of CLNetworkDevice::conflicting() ",  cl_logDEBUG2);
-
 
 	QString mac = getMacByIP(getIP());
 
@@ -106,7 +102,6 @@ bool CLNetworkDevice::conflicting()
 		return true;
 	}
 
-	
 	mac = getMacByIP(getIP(), false); // just in case if ARP response from some else have delayed 
 
 	if (mac!=m_mac)// someone else has this IP

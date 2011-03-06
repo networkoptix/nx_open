@@ -34,14 +34,11 @@ int CLSimpleTFTPClient::read( const std::string& fn, CLByteArray& data)
 
 	m_curr_blk_size = m_wish_blk_size;
 
-
 	for (i = 0; i < m_retry; ++i)
 	{
-	
+
 		if (!m_sock.sendTo(buff_send,len_send))	
 			return 0;
-
-		
 
 		while(1)
 		{
@@ -73,7 +70,6 @@ int CLSimpleTFTPClient::read( const std::string& fn, CLByteArray& data)
 					m_curr_blk_size = double_blk_size;
 				}
 
-
 				m_status = all_ok;
 				break;
 			}
@@ -86,13 +82,10 @@ int CLSimpleTFTPClient::read( const std::string& fn, CLByteArray& data)
     if (m_status!=all_ok)// no response
 		return 0;
 
-	
-
 	// at this point we've got option ack on our request; => must send ack on each packet
 	// tftp packets can come in any order like 1 2 3 8 7 5 6; this is unusual but possible on busy networks ( usually we will have 1234567...)
 	// so any way we need to process any incoming block data: put data in a proper position and send ack
 	// if we got last packet => done
-
 
 	int blk_cam_sending = 0;
 	int last_pack_number = 0;
@@ -100,7 +93,7 @@ int CLSimpleTFTPClient::read( const std::string& fn, CLByteArray& data)
 
 	while(1)
 	{		
-		
+
 		len_send = form_ack(blk_cam_sending, buff_send);
 
 		for (i = 0; i < m_retry; ++i)
@@ -123,15 +116,13 @@ int CLSimpleTFTPClient::read( const std::string& fn, CLByteArray& data)
 					m_status = time_out; break;
 				}
 
-
 				if (buff_recv[0] == 0 && buff_recv[1] == 3)// data block
 				{
-					
+
 					blk_cam_sending = buff_recv[2]*256 + buff_recv[3];
 
-
 					//cl_log.log("got ", blk_cam_sending, cl_logWARNING);
-				
+
 					int data_len = len_recv-4;
 
 					if (data_len<m_curr_blk_size)
@@ -141,7 +132,6 @@ int CLSimpleTFTPClient::read( const std::string& fn, CLByteArray& data)
 						last_pack_number = blk_cam_sending;
 						goto LAST_PACKET;
 					}
-						
 
 					data.write((char*)buff_recv+4, data_len, (blk_cam_sending-1)*m_curr_blk_size + data_size0);
 
@@ -152,7 +142,6 @@ int CLSimpleTFTPClient::read( const std::string& fn, CLByteArray& data)
 						m_status = time_out;
 						break;
 					}
-
 
 					m_status = all_ok; // need next packet
 					break;
@@ -180,8 +169,6 @@ int CLSimpleTFTPClient::read( const std::string& fn, CLByteArray& data)
 							m_curr_blk_size = double_blk_size;
 						}
 
-
-
 						len_send = form_ack(0, buff_send); // need to send akc0 again
 						break;
 					}
@@ -191,12 +178,11 @@ int CLSimpleTFTPClient::read( const std::string& fn, CLByteArray& data)
 			if (m_status==all_ok)
 				break;		
 
-
 		}
 
 		if (m_status == time_out)
 			return 0;
-		
+
 	}
 
 LAST_PACKET:
@@ -204,13 +190,9 @@ LAST_PACKET:
 	// need to send ack to last pack;
 	len_send = form_ack(last_pack_number, buff_send);
 	m_sock.sendTo(buff_send,len_send); // send ack
-	
 
 	return len;
 }
-
-
-
 
 int CLSimpleTFTPClient::form_read_request(const std::string& fn, char* buff)
 {
@@ -232,7 +214,6 @@ int CLSimpleTFTPClient::form_read_request(const std::string& fn, char* buff)
 	else
 		memcpy(buff+len, "1450", 4); 
 
-	
 	len+=4;
 	buff[len] = 0;	len++;
 

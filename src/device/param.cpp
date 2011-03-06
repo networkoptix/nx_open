@@ -1,6 +1,5 @@
 #include "param.h"
 
-
 CLParamType::CLParamType()
 {
 	type = None;
@@ -8,9 +7,6 @@ CLParamType::CLParamType()
 	readonly = false;
 	ui = false;
 }
-
-
-
 
 bool CLParamType::setValue(CLValue val, bool set) // safe way to set value
 {
@@ -24,7 +20,6 @@ bool CLParamType::setValue(CLValue val, bool set) // safe way to set value
 	case None:
 		return true;
 
-
 	case Enumeration:
 		if (!possible_values.contains(val))
 			return false;
@@ -34,7 +29,6 @@ bool CLParamType::setValue(CLValue val, bool set) // safe way to set value
 
 	if (set)
 		value = val;
-
 
 	return true;
 }
@@ -50,7 +44,6 @@ bool CLParamType::setDefVal(CLValue val) // safe way to set value
 
 	case None:
 		return false;
-
 
 	case Enumeration:
 		if (!possible_values.contains(val))
@@ -87,12 +80,10 @@ CLParam& CLParamList::get(const QString& name)
 	return m_params[name];
 }
 
-
 const CLParam CLParamList::get(const QString& name) const 
 {
 	return m_params[name];
 }
-
 
 void CLParamList::put(const CLParam& param) 
 {
@@ -103,7 +94,6 @@ bool CLParamList::empty() const
 {
 	return m_params.empty();
 }
-
 
 QList<QString> CLParamList::groupList() const
 {
@@ -119,7 +109,6 @@ QList<QString> CLParamList::groupList() const
 		if (!result.contains(group))
 			result.push_back(group);
 	}
-
 
 	return result;
 }

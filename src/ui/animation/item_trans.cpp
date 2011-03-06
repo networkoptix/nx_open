@@ -2,11 +2,10 @@
 #include "../../base/log.h"
 #include <math.h>
 
-
 qreal round_angle(qreal angle, qreal min_diff)
 {
 	qreal result = angle;
-	
+
 	int angle_int_90 = (int)angle/90.0;
 
 	qreal angle_mod_90 = abs(angle - angle_int_90*90);
@@ -104,9 +103,7 @@ void CLItemTransform::zoom_abs(qreal target_zoom, int duration, int delay)
 
 		m_zooming = true;
 
-
 	}
-
 
 }
 
@@ -114,7 +111,7 @@ void CLItemTransform::z_rotate_abs(QPointF center, qreal angle, int duration, in
 {
 	if (m_zooming)
 		duration = 0; // do it instantly
-	
+
 	if (duration==0)
 	{
 		m_rotatePoint = center;
@@ -135,8 +132,6 @@ void CLItemTransform::z_rotate_abs(QPointF center, qreal angle, int duration, in
 		start_helper(duration, delay);
 		m_rotating = true;
 
-		
-
 	}
 }
 
@@ -144,7 +139,7 @@ void CLItemTransform::z_rotate_delta(QPointF center, qreal angle, int duration, 
 {
 	if (m_zooming)
 		duration = 0; // do it instantly
-	
+
 	//=============
 
 	if (duration!=0) // if animation
@@ -172,11 +167,8 @@ void CLItemTransform::z_rotate_delta(QPointF center, qreal angle, int duration, 
 
 		m_rotating = true;
 
-		
-
 	}
 
-	
 }
 
 void CLItemTransform::valueChanged( qreal pos )
@@ -206,7 +198,7 @@ void CLItemTransform::transform_helper()
 	/**/
 
 	qreal transform_ange = round_angle(m_Zrotation.curent, 1);
-	
+
 	trans.translate(m_rotatePoint.x(), m_rotatePoint.y());
 	trans.rotate(transform_ange); 
 	trans.translate(-m_rotatePoint.x(), -m_rotatePoint.y());
@@ -221,6 +213,5 @@ void CLItemTransform::transform_helper()
 
 	//QPointF pf = m_item->mapToScene(m_item->boundingRect().topLeft());
 	//cl_log.log("left = ",  (int)pf.x(), cl_logDEBUG1 );
-
 
 }

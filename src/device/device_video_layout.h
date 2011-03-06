@@ -34,31 +34,27 @@ public:
 		return 1;
 	}
 
-	
 	virtual unsigned int width() const 
 	{
 		return 1;
 	}
 
-	
 	virtual unsigned int height() const 
 	{
 		return 1;
 	}
 
-	virtual unsigned int h_position(unsigned int channel) const
+	virtual unsigned int h_position(unsigned int /*channel*/) const
 	{
 		return 0;
 	}
 
-	virtual unsigned int v_position(unsigned int channel) const
+	virtual unsigned int v_position(unsigned int /*channel*/) const
 	{
 		return 0;
 	}
 
 };
-
-
 
 class CLCustomDeviceVideoLayout : public CLDeviceVideoLayout
 {
@@ -76,12 +72,10 @@ public:
 		return m_width*m_height;
 	}
 
-
 	virtual unsigned int width() const 
 	{
 		return m_width;
 	}
-
 
 	virtual unsigned int height() const 
 	{
@@ -125,8 +119,5 @@ protected:
 	int m_width;
 	int m_height;
 };
-
-
-
 
 #endif //device_video_layout_h_2143

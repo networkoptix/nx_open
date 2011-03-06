@@ -69,7 +69,6 @@ bool CLSceneLayoutManager::load()
 	if (root.tagName() != "CustomLayouts")
 		return false;
 
-
 	QDomNode node = root.firstChild();
 
 	while (!node.isNull()) 
@@ -82,7 +81,6 @@ bool CLSceneLayoutManager::load()
 
 		node = node.nextSibling();
 	}
-
 
 	return true;
 }
@@ -126,10 +124,8 @@ bool CLSceneLayoutManager::load_parseLyout(const QDomElement& layout, LayoutCont
 			}
 		}
 
-
 		node = node.nextSibling();
 	}
-
 
 	return true;
 }
@@ -140,16 +136,13 @@ void CLSceneLayoutManager::save()
 	QDomElement root = doc.createElement("CustomLayouts");
 	doc.appendChild(root);
 
-
 	QList<LayoutContent*>& custom_layots_list = mAllCustomLayouts->childrenList();
 	foreach(LayoutContent* cl, custom_layots_list)
 	{
 		cl->toXml(doc, root);
 	}
 
-
 	QString xml = doc.toString();
-
 
     QString dataLocation = getDataDirectory();
 	QFile file(dataLocation + "/custom_layouts.xml");
@@ -165,7 +158,6 @@ LayoutContent* CLSceneLayoutManager::startScreenLayoutContent()
 {
 	return &(startscreen_content());
 }
-
 
 LayoutContent* CLSceneLayoutManager::getDefaultLayoutContent()
 {
@@ -195,7 +187,6 @@ LayoutContent* CLSceneLayoutManager::generateAllRecordersAndLayouts()
 	mRecordersAndLayouts = new LayoutContent();
 	CLDeviceCriteria cr(CLDeviceCriteria::NONE);
 	mRecordersAndLayouts->setDeviceCriteria(cr);
-
 
 	QList<LayoutContent*>& childrenlst1 = mAllCustomLayouts->childrenList();
 	foreach(LayoutContent* cont,  childrenlst1)

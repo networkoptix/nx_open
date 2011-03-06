@@ -3,8 +3,6 @@
 #include "../../../data/mediadata.h"
 #include "device/device.h"
 
-
-
 unsigned char* FakeStreamReader::data = 0 ;
 unsigned char* FakeStreamReader::descr = 0;
 int FakeStreamReader::data_len = 0;
@@ -52,10 +50,7 @@ m_time(0)
 				fclose(fdescr);
 		}
 
-
-
 	}
-
 
 	for (int i = 0; i < m_channels; ++i)
 	{
@@ -85,7 +80,6 @@ CLAbstractMediaData* FakeStreamReader::getNextData()
 	if (data_len==0 || descr_data_len == 0)
 		return 0;
 
-	
 	CLCompressedVideoData* videoData = new CLCompressedVideoData(CL_MEDIA_ALIGNMENT,400*1024);
 	CLByteArray& img = videoData->data;
 
@@ -100,26 +94,19 @@ CLAbstractMediaData* FakeStreamReader::getNextData()
 
 	//len*=2;
 
-
-
 	img.write((char*)(pdata[m_curr_channel]), descr_len);
 	pdata[m_curr_channel]+=descr_len;
 
-
-	
-	
 	videoData->compressionType = CL_H264;
 	videoData->width = 1600;
 	videoData->height = 1184;
-	videoData->channel_num = m_curr_channel;
+	videoData->channelNumber = m_curr_channel;
 	videoData->timestamp = m_time;
 
 	m_curr_channel++;
 
 	if (m_curr_channel==m_channels)
 		m_curr_channel=0;
-
-	
 
 	return videoData;
 

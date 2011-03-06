@@ -1,8 +1,6 @@
 #include <math.h>
 #include "abstract_unmoved_opacity_item.h"
 
-
-
 CLAbstractUnMovedOpacityItem::CLAbstractUnMovedOpacityItem(QString name, QGraphicsItem* parent):
 CLAbstractUnmovedItem(name, parent),
 m_animation(0)
@@ -32,7 +30,6 @@ void CLAbstractUnMovedOpacityItem::changeOpacity(qreal new_opacity, int duration
     connect(m_animation, SIGNAL(finished ()), this, SLOT(stopAnimation()));
 
 }
-
 
 void CLAbstractUnMovedOpacityItem::stopAnimation()
 {

@@ -4,8 +4,6 @@
 #include "socket.h"
 #include "../base/associativearray.h"
 
-
-
 enum CLHttpStatus {CL_HTTP_SUCCESS, CL_HTTP_AUTH_REQUIRED, CL_HTTP_HOST_NOT_AVAILABLE};
 
 class CLSimpleHTTPClient : public CLAssociativeArray
@@ -31,7 +29,6 @@ public:
 		return m_contentLen;
 	}
 
-
 private:
 
 	QString m_line;
@@ -44,8 +41,6 @@ private:
 	QString m_contentType;
 	unsigned int m_contentLen;
 
-
-
 	TCPSocket m_sock;
 	bool m_connected;
 
@@ -53,6 +48,5 @@ private:
 	QAuthenticator m_auth;
 
 };
-
 
 #endif //__SIMPLE_HTTP_CLIENT__

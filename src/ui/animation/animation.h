@@ -4,8 +4,6 @@
 #include "animation_timeline.h"
 #include "abstract_animation.h"
 
-
-
 class CLAnimation: public QObject, public CLAbstractAnimation
 {
 	Q_OBJECT
@@ -13,10 +11,9 @@ public:
 	CLAnimation();
 	virtual ~CLAnimation();
 
-	
 	virtual void stopAnimation();
 	bool isRuning() const;
-	
+
 	QObject* object() ;
 signals:
 	void finished();
@@ -47,7 +44,6 @@ protected:
 		T diff;
 		T target;
 	};
-
 
 };
 

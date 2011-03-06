@@ -2,7 +2,6 @@
 #include "base\rand.h"
 #include "ui\ui_common.h"
 
-
 CLFakeRecorderDevice::CLFakeRecorderDevice()
 {
 
@@ -24,7 +23,6 @@ QString CLFakeRecorderDevice::toString() const
 		<< cpu_usage << "%\r\n CPU temperature: " << cpu_temp << "C \r\nOverAll Status: OK";
 	return result;
 }
-
 
 QString CLFakeRecorderDevice::getName() const
 {

@@ -27,16 +27,13 @@ m_editedView(0)
 
 	//=======================================================
 
-
 	const int min_wisth = 1000;
 	setMinimumWidth(min_wisth);
 	setMinimumHeight(min_wisth*3/4);
 
-
 	//showFullScreen();
 
 	//=======================================================
-
 
 	//=======add====
 	m_topView = new CLLayoutNavigator(this,  CLSceneLayoutManager::instance().generateAllRecordersAndLayouts()); 
@@ -44,8 +41,6 @@ m_editedView(0)
 	m_bottomView = new CLLayoutNavigator(this, CLSceneLayoutManager::instance().getEmptyLayoutContent()); 
 
 	m_editedView = new CLLayoutNavigator(this, contexttoEdit);
-
-
 
 	connect(m_topView, SIGNAL(onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*)), this, SLOT(onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*)));
 	connect(m_bottomView, SIGNAL(onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*)), this, SLOT(onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*)));
@@ -59,8 +54,6 @@ m_editedView(0)
 	m_editedView->setMode(LAYOUTEDITOR_ViewMode); 
 	m_editedView->getView().setViewMode(GraphicsView::ItemsAcceptor);
 
-
-
 	QLayout* ml = new QHBoxLayout();
 
 	QLayout* VLayout = new QVBoxLayout;
@@ -71,12 +64,9 @@ m_editedView(0)
 	ml->addWidget(&(m_editedView->getView()));
 	setLayout(ml);
 
-
 	resizeEvent(0);
 
 }
-
-
 
 CLLayoutEditorWnd::~CLLayoutEditorWnd()
 {
@@ -84,8 +74,6 @@ CLLayoutEditorWnd::~CLLayoutEditorWnd()
 	destroyNavigator(m_bottomView);
 	destroyNavigator(m_editedView);
 }
-
-
 
 void CLLayoutEditorWnd::closeEvent ( QCloseEvent * event )
 {
@@ -114,7 +102,6 @@ void CLLayoutEditorWnd::resizeEvent ( QResizeEvent * event)
 	m_topView->getView().setMaximumHeight(sz.height()/2);
 	m_bottomView->getView().setMaximumHeight(sz.height()/2);
 }
-
 
 void CLLayoutEditorWnd::destroyNavigator(CLLayoutNavigator*& nav)
 {

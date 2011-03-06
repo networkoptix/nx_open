@@ -1,7 +1,6 @@
 #ifndef CLDeviceCriteria_h_2120
 #define CLDeviceCriteria_h_2120
 
-
 struct CLDeviceCriteria // later
 {
 public:
@@ -22,6 +21,5 @@ protected:
 	QString mRecorderId;
 	QString mFilter;
 };
-
 
 #endif //CLDeviceCriteria_h_2120

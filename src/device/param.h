@@ -3,7 +3,6 @@
 
 #include "../base/associativearray.h"
 
-
 struct CLParamType
 {
 	enum {None, Value, OnOff, Boolen, MinMaxStep, Enumeration, Button };	
@@ -32,17 +31,10 @@ struct CLParamType
 
 	bool synchronized;
 
-
-
 	bool setValue(CLValue val, bool set = true); // safe way to set value
 	bool setDefVal(CLValue val); // safe way to set value
-	
-
 
 };
-
-
-
 
 struct CLParam
 {
@@ -50,10 +42,9 @@ struct CLParam
 	CLParamType value;
 };
 
-
 class CLParamList
 {
-	
+
 public:
 	typedef QMap<QString, CLParam> MAP;
 
@@ -64,7 +55,7 @@ public:
 	void put(const CLParam& param);
 	bool empty() const;
 	MAP& list();
-	
+
 	QList<QString> groupList() const;
 	QList<QString> subGroupList(QString group) const;
 
@@ -72,6 +63,5 @@ public:
 private:
 	MAP m_params;
 };
-
 
 #endif //cl_divice_param_h_1020

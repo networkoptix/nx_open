@@ -23,11 +23,9 @@ bool  IPPH264Decoder::Dll::init()
 	if(!destroyDecoder)
 		return false;
 
-
 	decode = reinterpret_cast<dll_decode>(::GetProcAddress(m_dll, "decode"));
 	if(!decode)
 		return false;
-
 
 	return true;
 

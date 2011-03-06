@@ -12,8 +12,6 @@ class MainWnd : public QWidget
 {
 	Q_OBJECT
 
-	
-
 public:
 	MainWnd(QWidget *parent = 0, Qt::WFlags flags = 0);
 	~MainWnd();

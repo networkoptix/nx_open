@@ -3,8 +3,6 @@
 #include "../graphicsview.h"
 #include "ui/videoitem/video_wnd_item.h"
 
-
-
 int limit_val(int val, int min_val, int max_val, bool mirror)
 {
 
@@ -16,7 +14,6 @@ int limit_val(int val, int min_val, int max_val, bool mirror)
 		if (val < min_val)
 			return min_val;
 	}
-
 
 	int width = max_val - min_val;
 
@@ -62,14 +59,13 @@ CLSceneMovement::CLSceneMovement(GraphicsView* gview):
 m_view(gview),
 m_limited(false)
 {
-	
+
 }
 
 CLSceneMovement::~CLSceneMovement()
 {
 	stopAnimation();
 }
-
 
 void CLSceneMovement::move(int dx, int dy, int duration, bool limited, int delay, CLAnimationTimeLine::CLAnimationCurve curve  )
 {
@@ -92,7 +88,7 @@ void CLSceneMovement::move (QPointF dest, int duration, int delay, CLAnimationTi
 
 	m_startpoint = m_view->mapToScene(m_view->viewport()->rect().center());
 	m_delta = dest - m_startpoint;
-	
+
 	if (duration==0)
 	{
 		valueChanged(1.0);
@@ -105,16 +101,13 @@ void CLSceneMovement::valueChanged ( qreal dpos )
 {
 	QPointF move(m_delta.x()*dpos, m_delta.y()*dpos);
 
-
 	QPointF result = m_startpoint + move;
 
-	
 	QRect rsr = m_view->getRealSceneRect();
 
 	result.rx() = limit_val(result.x(), rsr.left(), rsr.right(), false);
 	result.ry() = limit_val(result.y(), rsr.top(), rsr.bottom(), false);
-	
-	
+
 	m_view->centerOn(result);
 
 	//=======================================
@@ -136,7 +129,6 @@ void CLSceneMovement::valueChanged ( qreal dpos )
 
 			QRectF wnd_rect =  item->sceneBoundingRect();
 			QRectF viewport_rec = m_view->mapToScene(m_view->viewport()->rect()).boundingRect();
-
 
 			if (dx<0)
 			{
@@ -161,10 +153,8 @@ void CLSceneMovement::valueChanged ( qreal dpos )
 				if ( (viewport_rec.bottomLeft().y()- wnd_rect.bottomRight().y()) >  percent*wnd_rect.height())
 					stopAnimation();
 			}
-			
-			
-		}
 
+		}
 
 	}
 	else if (m_view->getSelectedItem())
@@ -173,7 +163,6 @@ void CLSceneMovement::valueChanged ( qreal dpos )
 
 		QPointF selected_center = item->mapToScene(item->boundingRect().center());
 		QPointF dest = m_startpoint + m_delta;
-		
 
 		QPointF diff = selected_center - dest;
 
@@ -183,10 +172,8 @@ void CLSceneMovement::valueChanged ( qreal dpos )
 		// else
 		diff = selected_center - result;
 
-
 		if ( abs(diff.x()) > item->boundingRect().width()*1.0 || abs(diff.y()) > item->boundingRect().height()*1.0)
 			m_view->setZeroSelection();
 	}
 
-	
 }

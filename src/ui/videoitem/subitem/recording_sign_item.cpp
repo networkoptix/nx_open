@@ -19,7 +19,6 @@ CLRecordingSignItem::~CLRecordingSignItem()
 	disconnect(&mTimer, SIGNAL(void timeout()), this, SLOT(void onTimer()));
 }
 
-
 void CLRecordingSignItem::onTimer()
 {
 	setVisible(!isVisible());

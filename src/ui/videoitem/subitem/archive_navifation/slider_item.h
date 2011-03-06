@@ -1,7 +1,6 @@
 #ifndef direct_jump_slider_h1607
 #define direct_jump_slider_h1607
 
-
 class CLDirectJumpSlider : public QSlider
 {
 	//Q_OBJECT
@@ -10,10 +9,9 @@ public:
 	~CLDirectJumpSlider();
 
 //signals:
-	
 
 protected:
-	
+
 	void mousePressEvent ( QMouseEvent * ev );
 
 };

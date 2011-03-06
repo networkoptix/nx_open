@@ -22,7 +22,6 @@ public:
 	// will animate control from current opacity( normally 1.0) to 0 and hide item 
 	void hide(int time_ms = 1000);
 
-
 	int alpha() const;
 	void setAlpha(int val);
 
@@ -33,8 +32,6 @@ private:
 	GraphicsView* m_view;
 	int m_alpha;
 	QPropertyAnimation* m_animation;
-
-	
 
 };
 

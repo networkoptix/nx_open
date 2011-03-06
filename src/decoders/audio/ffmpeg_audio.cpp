@@ -32,8 +32,6 @@ m_codec(codec_id)
 
 	}
 
-
-
 	switch(m_codec)
 	{
 
@@ -45,7 +43,6 @@ m_codec(codec_id)
 		codec = avcodec_find_decoder(CODEC_ID_MP3);
 		break;
 
-		
 	case CL_AC3:
 		codec = avcodec_find_decoder(CODEC_ID_AC3);
 		break;
@@ -53,7 +50,6 @@ m_codec(codec_id)
 	case CL_AAC:
 		codec = avcodec_find_decoder(CODEC_ID_AAC);
 		break;
-
 
 	case CL_WMAPRO:
 		codec = avcodec_find_decoder(CODEC_ID_WMAPRO);
@@ -84,7 +80,6 @@ m_codec(codec_id)
 	}
 	avcodec_open(c, codec);
 
-
 }
 
 CLFFmpegAudioDecoder::~CLFFmpegAudioDecoder(void)
@@ -99,7 +94,6 @@ CLFFmpegAudioDecoder::~CLFFmpegAudioDecoder(void)
 
 }
 
-
 //The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than the actual read bytes because some optimized bit stream readers read 32 or 64 bits at once and could read over the end.
 //The end of the input buffer buf should be set to 0 to ensure that no over reading happens for damaged MPEG streams.
 bool CLFFmpegAudioDecoder::decode(CLAudioData& data)
@@ -111,8 +105,6 @@ bool CLFFmpegAudioDecoder::decode(CLAudioData& data)
 	const unsigned char* inbuf_ptr = data.inbuf;
 	int size = data.inbuf_len;
 	unsigned char* outbuf = (unsigned char*)data.outbuf->data();
-	
-	
 
 	data.outbuf_len = 0;
 
@@ -120,7 +112,6 @@ bool CLFFmpegAudioDecoder::decode(CLAudioData& data)
 	{
 
 		int out_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-
 
 		//cl_log.log("before dec",  cl_logALWAYS);
 
@@ -142,25 +133,20 @@ bool CLFFmpegAudioDecoder::decode(CLAudioData& data)
 			}
 		}
 
-
 		int len = avcodec_decode_audio2(c, (short *)outbuf, &out_size,
 				inbuf_ptr, size);
-
 
 		//cl_log.log("after dec",  cl_logALWAYS);
 
 		if (len < 0) 
 			return false;
 
-
 		data.outbuf_len+=out_size;
 		outbuf+=out_size;
 		size -= len;
 		inbuf_ptr += len;
 
-		
 	}
-
 
 	if (c->sample_rate)
 		data.format.setFrequency(c->sample_rate);
@@ -194,7 +180,6 @@ bool CLFFmpegAudioDecoder::decode(CLAudioData& data)
 		break;
 
 	}
-
 
 	return true;
 }

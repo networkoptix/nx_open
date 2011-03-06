@@ -2,11 +2,9 @@
 #include "../base/sleep.h"
 #include "../base/log.h"
 
-
-CLAbstractDataProcessor::CLAbstractDataProcessor(int max_que_size):
-m_dataQueue(max_que_size)
+CLAbstractDataProcessor::CLAbstractDataProcessor(int maxQueueSize)
+    : m_dataQueue(maxQueueSize)
 {
-
 }
 
 bool CLAbstractDataProcessor::canAcceptData() const
@@ -20,26 +18,24 @@ void CLAbstractDataProcessor::putData(CLAbstractData* data)
 	m_dataQueue.push(data);
 }
 
-void CLAbstractDataProcessor::clearUnProcessedData()
+void CLAbstractDataProcessor::clearUnprocessedData()
 {
 	m_dataQueue.clear();
 }
 
 void CLAbstractDataProcessor::endOfRun()
 {
-
 }
 
 void CLAbstractDataProcessor::run()
 {
 	CL_LOG(cl_logINFO) cl_log.log("data processor started.", cl_logINFO);
 
-	const int timeout_ms = 100;
+	const int timeoutMs = 100;
 	while(!needToStop())
 	{
-        
-		pause_delay();
-        
+		pauseDelay();
+
 		CLAbstractData* data;
 		bool get = m_dataQueue.pop(data, 200);
 
@@ -52,11 +48,9 @@ void CLAbstractDataProcessor::run()
 
 		processData(data);
 
-
 //		cl_log.log("queue size = ", m_dataQueue.size(),cl_logALWAYS);
 
 		data->releaseRef();
-
 	}
 
 	endOfRun();
@@ -64,8 +58,7 @@ void CLAbstractDataProcessor::run()
 	CL_LOG(cl_logINFO) cl_log.log("data processor stopped.", cl_logINFO);
 }
 
-
-int CLAbstractDataProcessor::queSize() const
+int CLAbstractDataProcessor::queueSize() const
 {
 	return m_dataQueue.size();
 }

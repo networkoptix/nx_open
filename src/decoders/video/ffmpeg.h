@@ -4,7 +4,6 @@
 #include "abstractdecoder.h"
 #include "dxva/dxva.h"
 
-
 struct AVCodec;
 struct AVCodecContext;
 struct AVFrame;
@@ -48,7 +47,6 @@ private:
 	int m_width;
 	int m_height;
 
-
 	static bool m_first_instance;
 	CLCodecType m_codecId;
 	bool m_showmotion;
@@ -63,7 +61,5 @@ private:
     int m_lastWidth;
 };
 
-
 #endif //cl_ffmpeg_h
-
 

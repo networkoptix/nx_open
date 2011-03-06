@@ -29,8 +29,6 @@ void decoderLogCallback(void* pParam, int i, const char* szFmt, va_list args)
 
 	AVCodecContext* pCtxt = (AVCodecContext*)pParam;
 
-
-
 	char szMsg[1024];
 	vsprintf(szMsg, szFmt, args);
 	//if(szMsg[strlen(szMsg)] == '\n')
@@ -115,8 +113,6 @@ int main(int argc, char *argv[])
 		background: rgb(40, 40, 40);\
 		}");
 
-
- 
 	/**/
 	//=========================================================
 

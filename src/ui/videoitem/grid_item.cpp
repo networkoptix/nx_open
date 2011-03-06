@@ -4,8 +4,6 @@
 
 static const int base_line_width = 40;
 
-
-
 CLGridItem::CLGridItem(GraphicsView* view):
 m_view(view),
 m_alpha(0),
@@ -41,14 +39,13 @@ void CLGridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 
 	painter->setPen(QPen(color, base_line_width, Qt::SolidLine));
 
-
 	for(int i = grid_rect.left(); i <= grid_rect.right() + 1; ++i) // vertical lines
 	{
 		QPointF p1(i*unit_width, top);
 		QPointF p2(i*unit_width, top + total_height);
 		painter->drawLine(p1,p2);
 	}
-	
+
 	for(int i = grid_rect.top(); i <= grid_rect.bottom() + 1; ++i)// horizontal lines
 	{
 		QPointF p1( left, i*unit_height);
@@ -92,7 +89,6 @@ void CLGridItem::show(int time_ms)
 
 }
 
-
 void CLGridItem::hide(int time_ms )
 {
 	stopAnimation();
@@ -107,7 +103,6 @@ void CLGridItem::hide(int time_ms )
 	connect(m_animation, SIGNAL(finished ()), this, SLOT(stopAnimation()));
 
 }
-
 
 void CLGridItem::stopAnimation()
 {

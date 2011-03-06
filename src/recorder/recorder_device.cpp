@@ -1,6 +1,5 @@
 #include "recorder_device.h"
 
-
 CLRecorderDevice::CLRecorderDevice()
 {
 

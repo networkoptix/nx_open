@@ -10,7 +10,6 @@ public:
 	~CLAbstractArchiveDevice();
 	virtual DeviceType getDeviceType() const;
 
-
 };
 
 #endif //abstract_archive_device_h1838

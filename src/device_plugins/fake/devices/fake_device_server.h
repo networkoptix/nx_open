@@ -12,7 +12,6 @@ public:
 
 	static FakeDeviceServer& instance();
 
-	
 	virtual bool isProxy() const;
 
 	// return the name of the server 

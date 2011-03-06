@@ -14,25 +14,21 @@ public:
 
     void onUserInput(bool go_unstedy = true);
 
-
     virtual void start();
 	virtual void stopAnimation();
 	virtual bool isRuning() const;
 	virtual QObject* object();
 
-	
-	
 private slots:
 	void onTimer();
-private:
 
-	QTimer mTimer;
+private:
+	QTimer m_timer;
     GraphicsView* m_view;
 
     bool m_steadyMode;
 
     int m_counrer;
-	
 };
 
 #endif //steady_mouse_animation_h2116

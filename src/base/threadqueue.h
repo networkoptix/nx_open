@@ -1,18 +1,17 @@
 #ifndef cl_ThreadQueue_h_2236
 #define cl_ThreadQueue_h_2236 
+
 #include "log.h"
 
+static const qint32 MAX_THREAD_QUEUE_SIZE = 256;
 
-
-template< typename T>
+template <typename T>
 class CLThreadQueue
 {
 public:
-	
-	CLThreadQueue( quint32 maxSize = 256):
-	m_maxSize( maxSize )
+	CLThreadQueue( quint32 maxSize = MAX_THREAD_QUEUE_SIZE)
+        : m_maxSize( maxSize )
 	{
-
 	}
 
 	bool push(const T& val) 
@@ -27,30 +26,28 @@ public:
 		m_sem.release(); 
 
 		return true;
-
 	}
-
 
 	bool pop(T& val, quint32 time = INFINITE)
 	{
-
 		if (!m_sem.tryAcquire(1,time)) // in case of INFINITE wait the value passed to tryAcquire will be negative ( it will wait forever )
 			return false;
 
 		QMutexLocker mutex(&m_cs);
-		if( !m_queue.empty() ) 
+
+		if (!m_queue.empty()) 
 		{
 			val = m_queue.dequeue();  
 			return true; 
 		}
 
 		return false;
-
 	}
 
 	void clear()
 	{
     	QMutexLocker mutex(&m_cs);
+
 		while (!m_queue.empty()) 
 		{
 			m_sem.tryAcquire();
@@ -61,6 +58,7 @@ public:
 	int size() const
 	{
 		QMutexLocker mutex(&m_cs);
+
 		return m_queue.size();
 	}
 
@@ -73,12 +71,12 @@ public:
 	{
 		clear();
 	}
+
 private:
 	QQueue<T> m_queue;
 	quint32 m_maxSize;
 	mutable QMutex m_cs;
 	QSemaphore m_sem;
-
 };
 
 #endif //cl_ThreadQueue_h_2236

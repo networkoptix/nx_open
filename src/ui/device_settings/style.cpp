@@ -1,8 +1,6 @@
 #include "style.h"
 #include "base\log.h"
 
-
-
 QPixmap cached(const QString &img)
 {
 	static bool first = true;
@@ -11,7 +9,6 @@ QPixmap cached(const QString &img)
 	{
 		QPixmapCache::setCacheLimit(16*1024); // in kb
 	}
-
 
 	if (QPixmap *p = QPixmapCache::find(img))
 		return *p;
@@ -29,7 +26,6 @@ QPixmap cached(const QString &img)
 		msgBox.setIcon(QMessageBox::Warning);
 		msgBox.exec();
 
-
 		return QPixmap();
 	}
 
@@ -37,13 +33,11 @@ QPixmap cached(const QString &img)
 	return pm;
 }
 
-
 ArthurStyle::ArthurStyle()
 : QWindowsStyle()
 {
 	//Q_INIT_RESOURCE(shared);
 }
-
 
 void ArthurStyle::drawHoverRect(QPainter *painter, const QRect &r) const
 {
@@ -59,7 +53,6 @@ void ArthurStyle::drawHoverRect(QPainter *painter, const QRect &r) const
 	painter->setRenderHint(QPainter::Antialiasing);
 	painter->drawPath(path);
 }
-
 
 void ArthurStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *option,
 								QPainter *painter, const QWidget *widget) const
@@ -207,14 +200,12 @@ void ArthurStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *op
 		}
 		break;
 
-
 	default:
 		QWindowsStyle::drawPrimitive(element, option, painter, widget);
 		break;
 	}
 	return;
 }
-
 
 void ArthurStyle::drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
 									 QPainter *painter, const QWidget *widget) const
@@ -336,7 +327,6 @@ QSize ArthurStyle::sizeFromContents(ContentsType type, const QStyleOption *optio
 									const QSize &size, const QWidget *widget) const
 {
 	QSize newSize = QWindowsStyle::sizeFromContents(type, option, size, widget);
-
 
 	switch (type) {
 	case CT_RadioButton:

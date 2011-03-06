@@ -8,9 +8,7 @@
 CLClientPullStreamreader::CLClientPullStreamreader(CLDevice* dev ):
 CLStreamreader(dev)
 {
-
 }
-
 
 bool CLClientPullStreamreader::needToRead() const
 {
@@ -19,19 +17,18 @@ bool CLClientPullStreamreader::needToRead() const
 	for (int i = 0; i < m_dataprocessors.size(); ++i)
 	{
 		CLAbstractDataProcessor* dp = m_dataprocessors.at(i);
-		
+
 		 if (dp->canAcceptData())
 			result = true;
 		else 
 			return false;
-		
 	}
+
 	return result;
 }
 
 void CLClientPullStreamreader::run()
 {
-
 	CL_LOG(cl_logINFO) cl_log.log("stream reader started.", cl_logINFO);
 
 	setNeedKeyData();
@@ -41,8 +38,7 @@ void CLClientPullStreamreader::run()
 
 	while(!needToStop())
 	{
-
-		pause_delay(); // pause if needed;
+		pauseDelay(); // pause if needed;
 		if (needToStop()) // extra check after pause
 			break;
 
@@ -64,7 +60,7 @@ void CLClientPullStreamreader::run()
 		data = getNextData();
 		//if (data) data->releaseRef();
 		//continue;
-		
+
 		if (data==0)
 		{
 			setNeedKeyData();
@@ -76,13 +72,11 @@ void CLClientPullStreamreader::run()
 				m_stat[0].onLostConnection();
 
 			CLSleep::msleep(30);
-			
+
 			continue;
 		}
 
-
 		CLCompressedVideoData* videoData = ( data->dataType == CLAbstractMediaData::VIDEO) ? static_cast<CLCompressedVideoData *>(data) : 0;
-
 
 		if (frames_lost>0) // we are alive again
 		{
@@ -96,25 +90,19 @@ void CLClientPullStreamreader::run()
 			frames_lost = 0;
 		}
 
-		
-		
-
 		if (videoData && needKeyData())
 		{
 			// I do not like; need to do smth with it 
 			if (videoData->keyFrame)
 			{
-				if (videoData->channel_num>CL_MAX_CHANNEL_NUMBER-1)
+				if (videoData->channelNumber>CL_MAX_CHANNEL_NUMBER-1)
 				{
 					Q_ASSERT(false);
 					data->releaseRef();
 					continue;
 				}
 
-
-
-				m_gotKeyFrame[videoData->channel_num]++;
-
+				m_gotKeyFrame[videoData->channelNumber]++;
 			}
 			else
 			{
@@ -127,11 +115,9 @@ void CLClientPullStreamreader::run()
 		data->dataProvider = this;
 
         if (videoData)
-            m_stat[videoData->channel_num].onData(data->data.size());
+            m_stat[videoData->channelNumber].onData(data->data.size());
 
         putData(data);
-
-		
 	}
 
 	CL_LOG(cl_logINFO) cl_log.log("stream reader stopped.", cl_logINFO);

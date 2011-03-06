@@ -32,11 +32,9 @@ public:
 			m_mod-=1000;
 		}
 
-
 		qint64 past = (qint64)m_prevEndTime.elapsed()*1000;
 		//cl_log.log("past = ", (int)past,  cl_logALWAYS);
 		//past*=1000;
-
 
 		qint64 havetowait = mksec - past;
 		m_prevEndTime = m_prevEndTime.addMSecs(mksec/1000);

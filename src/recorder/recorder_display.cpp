@@ -40,12 +40,10 @@ CLAbstractSceneItem* CLRecorderDisplay::getSceneItem() const
 	return mRecitem;
 }
 
-
 CLRecorderItem* CLRecorderDisplay::getRecorderItem() const
 {
 	return mRecitem;
 }
-
 
 void CLRecorderDisplay::run()
 {
@@ -53,7 +51,6 @@ void CLRecorderDisplay::run()
 	{
 		QString text = mDev->toString();
 		mRecitem->setText(text);
-
 
 		//=== 0.5 sec delay===
 		for (int i = 0; i < 5; ++i)
@@ -63,7 +60,6 @@ void CLRecorderDisplay::run()
 
 			CLSleep::msleep(100);
 		}
-
 
 	}
 }

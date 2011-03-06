@@ -3,7 +3,6 @@
 
 class CLAbstractAnimation;
 
-
 class CLAnimationManager : public QObject 
 {
 public:
@@ -15,6 +14,5 @@ public:
 private:
 	QList<CLAbstractAnimation*> m_anim_list;
 };
-
 
 #endif //animation_manager_h_2037

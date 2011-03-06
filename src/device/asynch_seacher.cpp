@@ -43,9 +43,8 @@ void CLDiviceSeracher::run()
 			first_time = false;
 		}
 	}
-	
-}
 
+}
 
 CLDeviceList CLDiviceSeracher::findNewDevices(bool allow_to_change_ip, bool& ip_finished)
 {
@@ -73,7 +72,6 @@ CLDeviceList CLDiviceSeracher::findNewDevices(bool allow_to_change_ip, bool& ip_
 
 	}
 	//
-
 
 	//excluding already existing devices with READY status
 	{
@@ -112,7 +110,6 @@ CLDeviceList CLDiviceSeracher::findNewDevices(bool allow_to_change_ip, bool& ip_
 
 				}
 
-
 				//delete it.value(); //here+
 				it.value()->releaseRef();
 				devices.erase(it++);
@@ -143,9 +140,8 @@ CLDeviceList CLDiviceSeracher::findNewDevices(bool allow_to_change_ip, bool& ip_
 				++it;
 		}
 	}
-	
-	// now devices list has only network devices 
 
+	// now devices list has only network devices 
 
 	// lets form the list of existing IP
 	CLIPList busy_list;
@@ -160,12 +156,10 @@ CLDeviceList CLDiviceSeracher::findNewDevices(bool allow_to_change_ip, bool& ip_
 			cl_log.log(it.value()->toString(), cl_logDEBUG2);
 	}
 
-
 	cl_log.log("Time elapsed: ", time.elapsed(), cl_logDEBUG1);
 
 	if (devices.size()==0) // no new devices
 		goto END;
-
 
 	//====================================
 	checkObviousConflicts(devices); // if conflicting it will mark it
@@ -180,14 +174,12 @@ CLDeviceList CLDiviceSeracher::findNewDevices(bool allow_to_change_ip, bool& ip_
 		if (!m_netState.isInMachineSubnet(device->getIP())) // not the same network
 			device->getStatus().setFlag(CLDeviceStatus::NOT_IN_SUBNET);
 	}
-	
+
 	//=====================================
-	
 
 	// move all conflicting cams and cams with bad ip to bad_ip_list
 	fromListToList(devices, bad_ip_list, CLDeviceStatus::NOT_IN_SUBNET, CLDeviceStatus::NOT_IN_SUBNET);
 	fromListToList(devices, bad_ip_list, CLDeviceStatus::CONFLICTING, CLDeviceStatus::CONFLICTING);
-
 
 	time.restart();
 
@@ -214,7 +206,6 @@ CLDeviceList CLDiviceSeracher::findNewDevices(bool allow_to_change_ip, bool& ip_
 	if (bad_ip_list.size()==0)
 		goto END;
 
-
 	// put ip of all devices into busy_list
 	{
 		QMutexLocker lock(&all_devices_mtx);
@@ -235,13 +226,11 @@ CLDeviceList CLDiviceSeracher::findNewDevices(bool allow_to_change_ip, bool& ip_
 		busy_list.insert(device->getIP().toIPv4Address());
 	}
 
-
 	//======================================
 
 	time.restart();
 	if (bad_ip_list.size())
 		cl_log.log("Changing IP addresses... ", cl_logDEBUG1);
-
 
 	resovle_conflicts(bad_ip_list, busy_list, ip_finished);
 
@@ -251,7 +240,6 @@ CLDeviceList CLDiviceSeracher::findNewDevices(bool allow_to_change_ip, bool& ip_
 	fromListToList(bad_ip_list,  devices, 0, 0); // move everything to result list
 
 END:
-
 
 	if (!ip_finished && allow_to_change_ip)
 	{
@@ -268,9 +256,7 @@ END:
 			fromListToList(bad_ip_list, all_devices, 0, 0);
 		}
 
-
 	}
-
 
 	// ok. at this point devices contains only network devices. and some of them have unknownDevice==true;
 	// we need to resolve such devices 
@@ -294,10 +280,8 @@ void CLDiviceSeracher::resovle_conflicts(CLDeviceList& device_list, CLIPList& bu
 	{
 		CLNetworkDevice* device = static_cast<CLNetworkDevice*>(dev);
 
-
 		if (!m_netState.existsSubnet(device->getDiscoveryAddr())) // very strange
 			continue;
-
 
 		CLSubNetState& subnet = m_netState.getSubNetState(device->getDiscoveryAddr());
 
@@ -318,9 +302,7 @@ void CLDiviceSeracher::resovle_conflicts(CLDeviceList& device_list, CLIPList& bu
 
 	}
 
-
 }
-
 
 bool CLDiviceSeracher::checkObviousConflicts(CLDeviceList& lst)
 {
@@ -347,8 +329,6 @@ bool CLDiviceSeracher::checkObviousConflicts(CLDeviceList& lst)
 		}
 	}
 	/**/
-
-
 
 	CLDeviceList::iterator it = lst.begin();
 	while (it!=lst.end())
@@ -412,7 +392,6 @@ void CLDiviceSeracher::markConflictingDevices(CLDeviceList& lst, int threads)
 		CLNetworkDevice* device;
 	};
 
-
 	QList<T> local_list;
 
 	CLDeviceList::iterator it = lst.begin();
@@ -423,14 +402,11 @@ void CLDiviceSeracher::markConflictingDevices(CLDeviceList& lst, int threads)
 		++it;
 	}
 
-
 	QThreadPool* global = QThreadPool::globalInstance();
 
 	for (int i = 0; i < threads; ++i ) global->releaseThread();
 	QtConcurrent::blockingMap(local_list, &T::f);
 	for (int i = 0; i < threads; ++i )global->reserveThread();
-
-
 
 }
 
@@ -470,11 +446,8 @@ CLDeviceList CLDiviceSeracher::resolveUnknown_helper(CLDeviceList& lst)
 			result[device->getUniqueId()] = device;
 		}
 
-
 		++it;
 	}
-
-	
 
 	return result;
 

@@ -3,7 +3,6 @@
 #include <memory.h>
 #include "log.h"
 
-
 CLByteArray::CLByteArray(unsigned int alignment, unsigned int capacity):
 m_alignment(alignment),
 m_size(0)
@@ -56,7 +55,6 @@ bool CLByteArray::increase_capacity(unsigned int new_capacity)
 {
 	cl_log.log("CLByteArray::increase_capacity:reallocate", cl_logWARNING);
 
-
 	new_capacity += m_alignment;
 
 	if (new_capacity <= m_size + m_alignment)
@@ -82,7 +80,6 @@ bool CLByteArray::increase_capacity(unsigned int new_capacity)
 
 }
 
-
 unsigned int CLByteArray::write(const char* data, unsigned int size)
 {
 	if (size > m_capacity - m_size) // if we do not have anougth space 
@@ -91,13 +88,10 @@ unsigned int CLByteArray::write(const char* data, unsigned int size)
 			return 0;
 	}
 
-
 	memcpy(m_al_data + m_size, data, size);
 	m_size += size;
 	return size;
 }
-
-
 
 unsigned int CLByteArray::write(const char* data, unsigned int size, int abs_shift  )
 {
@@ -107,13 +101,10 @@ unsigned int CLByteArray::write(const char* data, unsigned int size, int abs_shi
 			return 0;
 	}
 
-
 	memcpy(m_al_data + abs_shift, data, size);
 
 	if (size + abs_shift > m_size)
 		m_size = size + abs_shift;
-
-
 
 	return size;
 
@@ -123,7 +114,6 @@ unsigned int CLByteArray::write(const CLByteArray& other )
 {
 	return write(other.data(), other.size());
 }
-
 
 void CLByteArray::clear()
 {

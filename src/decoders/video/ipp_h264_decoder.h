@@ -24,7 +24,7 @@ public:
 	void showMotion(bool show ){};
 
 	virtual void setLightCpuMode(bool val) {};
-	
+
 private:
 
 	class Dll
@@ -38,7 +38,6 @@ private:
 		typedef unsigned long  (__stdcall *dll_createDecoder)(int);
 		typedef void  (__stdcall *dll_destroyDecoder)(unsigned long);
 		typedef int  (__stdcall *dll_decode)(unsigned long id, CLVideoData* params);
-	
 
 		dll_createDecoder createDecoder;
 		dll_destroyDecoder destroyDecoder;
@@ -54,9 +53,6 @@ private:
 public:
 	static Dll dll;
 
-
-	
-	
 };
 
 #endif //ipp_decoder_h149

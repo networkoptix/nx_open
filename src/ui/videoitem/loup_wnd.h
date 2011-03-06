@@ -11,7 +11,6 @@ public:
 protected:
 	void drawStuff(QPainter* painter);
 
-
 };
 
 #endif // loupe_wnd_h_1841

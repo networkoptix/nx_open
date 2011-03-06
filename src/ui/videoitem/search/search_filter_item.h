@@ -19,13 +19,12 @@ public:
 
     bool hasFocus() const;
 
-
 protected slots:
 	void onEditTextChanged (const QString & text);
 	void onTimer(); 
 
 protected:    
-	
+
 protected:
 	LayoutContent* m_sceneContent;
 
@@ -38,8 +37,6 @@ protected:
 	QTimer mTimer;
 
     GraphicsView* m_view;
-
-	
 
 };
 

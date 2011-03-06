@@ -8,7 +8,6 @@ AVDeviceServer::AVDeviceServer()
 	// everything related to Arecont must be initialized here
 	AVJpeg::Header::Initialize("ArecontVision", "CamLabs", "ArecontVision");
 
-
 	QString error;
 	if (CLAreconVisionDevice::loadDevicesParam("./arecontvision/devices.xml", error))
 	{
@@ -38,7 +37,7 @@ AVDeviceServer::AVDeviceServer()
 		msgBox.setDefaultButton(QMessageBox::Ok);
 		msgBox.setIcon(QMessageBox::Warning);
 		msgBox.exec();
-	
+
 	}
 
 }

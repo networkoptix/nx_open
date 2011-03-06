@@ -3,7 +3,6 @@
 #include "device\device.h"
 #include "base\sleep.h"
 
-
 CLDeviceGetParamCommand::CLDeviceGetParamCommand(CLAbstractSettingsWidget* wgt):
 CLDeviceCommand(wgt->getDevice()),
 m_wgt(wgt)

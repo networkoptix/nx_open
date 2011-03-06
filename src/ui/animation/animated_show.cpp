@@ -13,7 +13,6 @@ m_value(0)
 	mTimer.setInterval(1000/60); // 60 fps   
 }
 
-
 Show_helper::~Show_helper()
 {
 	mTimer.stop();
@@ -54,7 +53,6 @@ bool Show_helper::isShowTime() const
 	return m_showTime;
 }
 
-
 void Show_helper::start()
 {
 	m_value = 0;
@@ -78,11 +76,10 @@ QObject* Show_helper::object()
 	return this;
 }
 
-
 void Show_helper::onTimer()
 {
 	m_value++;
-	
+
 	qreal total = m_items->size();
 
 	int i = 0;
@@ -94,7 +91,6 @@ void Show_helper::onTimer()
 		item->setPos(pos);
 
 		item->setRotation(item->getRotation() - 4.0/cl_get_random_val(7,10));
-
 
 		++i;
 	}
@@ -109,7 +105,6 @@ void Show_helper::onTimer()
 		{
 			int mod = (m_value - max_val/2)%max_val;
 			if (mod==0)	m_positive_dir = !m_positive_dir;
-
 
 			if (m_positive_dir)
 				m_view->updateTransform(0.001);

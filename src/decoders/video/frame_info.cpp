@@ -41,7 +41,7 @@ void CLVideoDecoderOutput::copy(const CLVideoDecoderOutput* src, CLVideoDecoderO
 		dst->stride3 = src->width/2;
 
 		dst->width = src->width;
-		
+
 		dst->height = src->height;
 		dst->out_type = src->out_type;
 
@@ -65,7 +65,7 @@ void CLVideoDecoderOutput::copy(const CLVideoDecoderOutput* src, CLVideoDecoderO
 
 void CLVideoDecoderOutput::copyPlane(unsigned char* dst, const unsigned char* src, int width, int dst_stride,  int src_stride, int height)
 {
-	
+
 	for (int i = 0; i < height; ++i)
 	{
 		memcpy(dst, src, width);
@@ -77,7 +77,6 @@ void CLVideoDecoderOutput::copyPlane(unsigned char* dst, const unsigned char* sr
 void CLVideoDecoderOutput::downscale(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst, downscale_factor factor)
 {
 
-
 	int src_width = src->width;
 	int src_height = src->height;
 
@@ -88,8 +87,6 @@ void CLVideoDecoderOutput::downscale(const CLVideoDecoderOutput* src, CLVideoDec
 	const int mod_w = chroma_h_factor*factor*4;
 	if ((src_width%mod_w) != 0)
 		src_width = src_width/mod_w*mod_w;
-
-
 
 	dst->stride1 = src_width/factor;
 	dst->stride2 = src_width/chroma_h_factor/factor;
@@ -110,10 +107,9 @@ void CLVideoDecoderOutput::downscale(const CLVideoDecoderOutput* src, CLVideoDec
 		dst->m_capacity = new_min_capacity;
 		dst->C1 = new unsigned char[dst->m_capacity];
 	}
-	
+
 	dst->C2 = dst->C1 + dst->stride1*dst->height;
 	dst->C3 = dst->C2 + dst->stride2*yu_h;
-
 
 	int src_yu_h = src_height/chroma_v_factor;
 
@@ -136,10 +132,7 @@ void CLVideoDecoderOutput::downscale(const CLVideoDecoderOutput* src, CLVideoDec
 		downscalePlate_factor8(dst->C3, src->C3, src_width/chroma_h_factor, src->stride3, src_yu_h);
 	}
 
-
 }
-
-
 
 void CLVideoDecoderOutput::downscalePlate_factor2(unsigned char* dst, const unsigned char* src, int src_width, int src_stride, int src_height)
 {
@@ -213,8 +206,6 @@ void CLVideoDecoderOutput::downscalePlate_factor8(unsigned char* dst, const unsi
 	}
 }
 
-
-
 bool CLVideoDecoderOutput::imagesAreEqual(const CLVideoDecoderOutput* img1, const CLVideoDecoderOutput* img2, unsigned int max_diff)
 {
 	if (img1->width!=img2->width || img1->height!=img2->height || img1->out_type != img2->out_type) 
@@ -230,7 +221,6 @@ bool CLVideoDecoderOutput::imagesAreEqual(const CLVideoDecoderOutput* img1, cons
 
 	if (!equalPlanes(img1->C3, img2->C3, img1->width/2, img1->stride3, img2->stride3, uv_h, max_diff))
 		return false;
-
 
 	return true;
 }
@@ -259,9 +249,6 @@ bool CLVideoDecoderOutput::equalPlanes(const unsigned char* plane1, const unsign
 				difs = 0;
 			}
 
-				
-
-
 			++p1;
 			++p2;
 		}
@@ -276,7 +263,6 @@ bool CLVideoDecoderOutput::equalPlanes(const unsigned char* plane1, const unsign
 void CLVideoDecoderOutput::saveToFile(const char* filename)
 {
 
-
 	static bool first_time  = true;
 	FILE * out = 0;
 
@@ -289,7 +275,6 @@ void CLVideoDecoderOutput::saveToFile(const char* filename)
 		out = fopen(filename, "ab");
 
 	if (!out) return;
-
 
 	//Y
 	unsigned char* p = C1;
@@ -306,7 +291,6 @@ void CLVideoDecoderOutput::saveToFile(const char* filename)
 		fwrite(p, 1, width/2, out);
 		p+=stride2;
 	}
-
 
 	//V
 	p = C3;

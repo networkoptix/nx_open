@@ -7,7 +7,6 @@
 class CLDevice;
 class CLRecorderItem;
 
-
 class CLRecorderDisplay : public CLLongRunnable, public CLAbstractComplicatedItem
 {
 public:
@@ -22,8 +21,6 @@ public:
 
 	virtual CLAbstractSceneItem* getSceneItem() const;
 
-
-
 	CLRecorderItem* getRecorderItem() const;
 
 protected:
@@ -32,7 +29,5 @@ private:
 	CLDevice* mDev;
 	CLRecorderItem* mRecitem;
 };
-
-
 
 #endif //recorder_display_h_1347

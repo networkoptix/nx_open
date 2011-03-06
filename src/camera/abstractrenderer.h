@@ -3,30 +3,26 @@
 
 #include "../decoders/video/frame_info.h"
 
-
 class CLAbstractRenderer
 {
 public:
-	CLAbstractRenderer():
-	m_copydata(false)
+	CLAbstractRenderer()
+        : m_copyData(false)
 	{
-
 	}
 
-	virtual void draw(CLVideoDecoderOutput& image, unsigned int channel)=0;
-	virtual void before_destroy() = 0;
+	virtual void draw(CLVideoDecoderOutput& image, unsigned int channel) = 0;
+	virtual void beforeDestroy() = 0;
 
-	virtual QSize size_on_screen(unsigned int channel) const = 0;
+	virtual QSize sizeOnScreen(unsigned int channel) const = 0;
 
-	virtual void copyVideoDataBeforePainting(bool copy)
+	virtual void copyVideoDataBeforePainting(bool copyData)
 	{
-		m_copydata = copy;
+		m_copyData = copyData;
 	}
 
 protected:
-	bool m_copydata;
-
+	bool m_copyData;
 };
-
 
 #endif //clgl_draw_h_20_31

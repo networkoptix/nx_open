@@ -12,21 +12,16 @@ public:
 	explicit Show_helper(GraphicsView* view);
 	virtual ~Show_helper();
 
-
 	void setCenterPoint(QPointF center);
 	QPointF getCenter() const;
-
 
 	void setRadius(int radius);
 	int getRadius() const;
 
 	void setItems(QList<CLAbstractSceneItem*>* items);
 
-
-
 	void setShowTime(bool showtime);
 	bool isShowTime() const; // this is almost same as is running; but if show is about to start this value is diffrent
-
 
 	virtual void stopAnimation();
 	virtual bool isRuning() const;
@@ -34,9 +29,8 @@ public:
 
 	int m_counrer;
 
-	
 public slots:
-	
+
 	void start(); // starts the show 
 
 private slots:
@@ -46,7 +40,7 @@ private slots:
 private:
 
 	QTimer mTimer;
-	
+
 	QPointF m_center;
 	int m_radius;
 

@@ -3,7 +3,6 @@
 
 #include "abstract_scene_item.h"
 
-
 class CLWebItem : public CLAbstractSceneItem
 {
 public:
@@ -19,6 +18,5 @@ protected:
 	QGraphicsProxyWidget* mWeb_item;
 	QWebView m_web_widget;
 };
-
 
 #endif //web_item_h_1425

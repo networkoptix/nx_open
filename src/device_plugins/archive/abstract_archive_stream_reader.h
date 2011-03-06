@@ -8,7 +8,7 @@
 class CLAbstractArchiveReader : public CLClientPullStreamreader
 {
 public:
-	CLAbstractArchiveReader(CLDevice* dev );
+	CLAbstractArchiveReader(CLDevice* dev);
 	virtual ~CLAbstractArchiveReader();
 
 	void setSingleShotMode(bool single);
@@ -17,30 +17,28 @@ public:
 	void setdirection(bool forward);
 	bool isForwardDirection() const;
 
-	virtual quint64 currTime() const = 0;
+	virtual quint64 currentTime() const = 0;
 
-	// returns len of archive in mksec
-	quint64 len_mks() const;
+	/**
+      * @return length of archive in mksec
+      */
+	quint64 lengthMksec() const;
+
 	virtual void jumpTo(quint64 mksec, bool makeshot);
-	
 
 protected:
-
 	virtual void channeljumpTo(quint64 mksec, int channel) = 0;
 
 protected:
-
-	quint64 m_len_mksec;
-	bool mForward;
-	bool mSingleShot;
-	CLAdaptiveSleep mAdaptiveSleep;
-	qint64 m_need_tosleep;
+	quint64 m_lengthMksec;
+	bool m_forward;
+	bool m_singleShot;
+	CLAdaptiveSleep m_adaptiveSleep;
+	qint64 m_needToSleep;
 
 	mutable QMutex m_cs;
 
-	bool m_use_twice;
+	bool m_useTwice;
 };
-
-
 
 #endif //abstract_archive_stream_reader_h1907

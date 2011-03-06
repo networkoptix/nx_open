@@ -1,7 +1,6 @@
 #include "animation_manager.h"
 #include "abstract_animation.h"
 
-
 CLAnimationManager::CLAnimationManager()
 {
 
@@ -16,7 +15,6 @@ void CLAnimationManager::registerAnimation(CLAbstractAnimation* anim)
 {
 	m_anim_list.push_back(anim);
 }
-
 
 void CLAnimationManager::stopAllAnimations()
 {
@@ -38,5 +36,5 @@ void CLAnimationManager::stopAllAnimations()
 		}
 
 	}
-	
+
 }

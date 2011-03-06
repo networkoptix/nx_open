@@ -4,11 +4,9 @@
 #include "../network/netstate.h"
 #include "device.h"
 
-
-
 class CLFileDevice : public CLDevice 
 {
-	
+
 public:
 	CLFileDevice(QString filename);
 
@@ -17,16 +15,12 @@ public:
 		return VIDEODEVICE;
 	}
 
-
 	virtual QString toString() const;
 	QString getFileName() const;
 
-
 	virtual CLStreamreader* getDeviceStreamConnection();
 protected:
-	
-	
-};
 
+};
 
 #endif // file_device_h_227

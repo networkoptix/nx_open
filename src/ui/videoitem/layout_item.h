@@ -3,7 +3,6 @@
 
 #include "custom_draw_button.h"
 
-
 class LayoutContent;
 
 class CLLayoutItem : public CLCustomBtnItem
@@ -23,8 +22,6 @@ protected:
 
 	LayoutContent* mContent; //this item references to this content
 
-
 };
-
 
 #endif //layout_item_h1421_h

@@ -6,7 +6,6 @@
 
 class QDomElement;
 
-
 enum 
 {	
 	AVUNKNOWN = 2000,
@@ -19,8 +18,6 @@ enum
 	AV8360 = 8360, AV8365 = 8365,
 	AV10005 = 10005, AV2805 = 2805
 };
-
-
 
 // this class and inhereted must be very light to create 
 class CLAreconVisionDevice : public CLNetworkDevice
@@ -44,9 +41,8 @@ public:
 
 	QString toString() const;
 
-	
 	virtual bool getDescription() {return true;};
-	
+
 	CLHttpStatus getRegister(int page, int num, int& val);
 	CLHttpStatus setRegister(int page, int num, int val);
 	CLHttpStatus setRegister_asynch(int page, int num, int val);
@@ -59,7 +55,7 @@ public:
 	//========
 
 	virtual void onBeforeStart();
-	
+
 	// model is for internal use of any kind of AV plugin 
 	int getModel() const;
 
@@ -71,7 +67,7 @@ protected:
 	m_model(model)
 	{
 	}
-	
+
 	// some AV devices are really challenging to integrate with
 	// so this function will do really dirty work about some special cam params
 	virtual bool setParam_special(const QString& name, const CLValue& val);
@@ -91,8 +87,6 @@ private:
 	static bool isPanoramic(int model);
 
 	CLAreconVisionDevice(){};
-
-
 
 };
 

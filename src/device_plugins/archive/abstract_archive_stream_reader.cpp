@@ -1,54 +1,51 @@
 #include "abstract_archive_stream_reader.h"
 
-
-CLAbstractArchiveReader::CLAbstractArchiveReader(CLDevice* dev ):
-CLClientPullStreamreader(dev),
-mSingleShot(false),
-mForward(true),
-m_len_mksec(0),
-m_need_tosleep(0),
-m_cs(QMutex::Recursive),
-mAdaptiveSleep(20*1000),
-m_use_twice(false)
+CLAbstractArchiveReader::CLAbstractArchiveReader(CLDevice* dev )
+    : CLClientPullStreamreader(dev),
+      m_singleShot(false),
+      m_forward(true),
+      m_lengthMksec(0),
+      m_needToSleep(0),
+      m_cs(QMutex::Recursive),
+      m_adaptiveSleep(20 * 1000),
+      m_useTwice(false)
 {
 }
 
 CLAbstractArchiveReader::~CLAbstractArchiveReader()
 {
-
 }
 
 void CLAbstractArchiveReader::setSingleShotMode(bool single)
 {
-	mSingleShot = single;
-	if (!mSingleShot)
+	m_singleShot = single;
+	if (!m_singleShot)
 	{
-		mAdaptiveSleep.afterdelay();
+		m_adaptiveSleep.afterdelay();
 		resume();
 	}
 }
 
 bool CLAbstractArchiveReader::isSingleShotMode() const
 {
-	return mSingleShot;
+	return m_singleShot;
 }
 
 void CLAbstractArchiveReader::setdirection(bool forward)
 {
-	mForward = forward;
+	m_forward = forward;
 }
 
 bool CLAbstractArchiveReader::isForwardDirection() const
 {
-	return mForward;
+	return m_forward;
 }
 
 // returns len of archive in mksec
-quint64 CLAbstractArchiveReader::len_mks() const
+quint64 CLAbstractArchiveReader::lengthMksec() const
 {
-	return m_len_mksec;
+	return m_lengthMksec;
 }
-
 
 void CLAbstractArchiveReader::jumpTo(quint64 mksec, bool makeshot)
 {
@@ -59,11 +56,10 @@ void CLAbstractArchiveReader::jumpTo(quint64 mksec, bool makeshot)
 		channeljumpTo(mksec, channel);
 	}
 
-	m_use_twice = true;
+	m_useTwice = true;
 
 	if (makeshot && isSingleShotMode())
 		resume();
 
 }
-
 

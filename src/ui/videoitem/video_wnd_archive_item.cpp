@@ -4,8 +4,6 @@
 #include "camera\camera.h"
 #include "device_plugins\archive\abstract_archive_stream_reader.h"
 
-
-
 CLVideoWindowArchiveItem::CLVideoWindowArchiveItem (GraphicsView* view, const CLDeviceVideoLayout* layout, 
 													int max_width, int max_height, QString name):
 CLVideoWindowItem(view, layout, max_width, max_height, name)
@@ -23,7 +21,6 @@ CLVideoWindowArchiveItem::~CLVideoWindowArchiveItem()
 {
 	mArchiveNavigator->goToFullScreenMode(false);
 }
-
 
 QPointF CLVideoWindowArchiveItem::getBestSubItemPos(CLSubItemType type)
 {
@@ -44,9 +41,8 @@ void CLVideoWindowArchiveItem::paint(QPainter *painter, const QStyleOptionGraphi
 void CLVideoWindowArchiveItem::draw(CLVideoDecoderOutput& image, unsigned int channel)
 {
 	CLVideoWindowItem::draw(image, channel);
-	
-}
 
+}
 
 void CLVideoWindowArchiveItem::setItemSelected(bool sel, bool animate, int delay)
 {
@@ -58,12 +54,10 @@ void CLVideoWindowArchiveItem::setItemSelected(bool sel, bool animate, int delay
 		mArchiveNavigator->setVisible(false);
 }
 
-
 void CLVideoWindowArchiveItem::setFullScreen(bool full)
 {
 	CLVideoWindowItem::setFullScreen(full);
 
-	
 	if (full)
 	{
 		/*
@@ -88,8 +82,6 @@ void CLVideoWindowArchiveItem::setFullScreen(bool full)
 
 		//cl_log.log("setFullScreen FALSE", cl_logALWAYS);
 	}
-
-	
 
 }
 

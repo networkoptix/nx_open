@@ -26,7 +26,6 @@ protected slots:
 protected:
 	CLSubItemType mType;
 	CLAbstractSubItemContainer* m_parent;
-	
 
 };
 

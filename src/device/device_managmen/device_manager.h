@@ -1,7 +1,6 @@
 #ifndef device_manager_h_1537_
 #define device_manager_h_1537_
 
-
 // this class holds all devices in the system ( a least knows how to get the list )
 // it also can give list of devices based on some criteria
 #include "..\asynch_seacher.h"
@@ -10,7 +9,6 @@
 
 class CLDevice;
 class CLRecorderDevice;
-
 
 // this class is a buffer. makes searcher to serch cameras and puts it into buffer
 class CLDeviceManager : public QObject
@@ -28,7 +26,6 @@ public:
 	static CLDeviceManager& instance();
 
 	CLDiviceSeracher& getDiveceSercher(); 
-
 
 	CLDeviceList getDeviceList(CLDeviceCriteria& cr);
 	CLDevice* getDeviceById(QString id);
@@ -57,6 +54,5 @@ protected:
 
 	CLDeviceList mRecDevices;
 };
-
 
 #endif //device_manager_h_1537_

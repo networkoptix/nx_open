@@ -7,17 +7,15 @@ static inline qreal qt_smoothBeginEndMixFactor(qreal value)
 	return qMin(qMax(1 - value * 2 + qreal(0.3), qreal(0.0)), qreal(1.0));
 }
 
-
 static inline qreal ln_normal(qreal value)
 {
 	// assume that value [0;1];
 	//value = value*3.0+1.0; //[1;4]
-	
+
 	static const qreal _2ln4 = 2.7725887222397812376689284858327;
 
 	return qLn(value*3.0+1.0)/_2ln4 + qreal(0.5); // [0;ln4]/2ln4+0.5 => result [0.5; 1]
 
-	
 }
 
 static inline qreal exp_normal(qreal value)
@@ -29,10 +27,8 @@ static inline qreal exp_normal(qreal value)
 	static const qreal exp_3 = exp(3.0); 
 	static const qreal exp_3_m_1 = exp_3 - exp_1; 
 
-
 	value = exp(value)-exp_1; // [0; exp_m_3-exp_m_1]
 
-	
 	return value/exp_3_m_1; //[0;0.5]
 }
 
@@ -42,7 +38,7 @@ CLAnimationTimeLine::CLAnimationTimeLine(CLAnimationCurve curve , int duration ,
 QTimeLine(duration/m_animation_speed, parent ),
 m_curve(curve)
 {
-	
+
 }
 
 CLAnimationTimeLine::~CLAnimationTimeLine()
@@ -79,7 +75,6 @@ qreal CLAnimationTimeLine::valueForTime ( int msec ) const
 	case SLOW_END_POW_40:
 		return slow_end_pow(msec, 0.40);
 
-
 	case SLOW_START:
 		return slow_start(msec);
 
@@ -92,12 +87,10 @@ qreal CLAnimationTimeLine::valueForTime ( int msec ) const
     case OUTCUBIC:
         return outCubic(msec);
 
-
-		
 	case INHERITED:
 	default:
 		return QTimeLine::valueForTime(msec);
-	    
+
 	}
 }
 

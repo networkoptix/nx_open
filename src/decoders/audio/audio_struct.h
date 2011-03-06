@@ -13,7 +13,6 @@ struct CLAudioData
 	const unsigned char* inbuf; // pointer to compressed data
 	int inbuf_len; // compressed data len
 
-
 	CLAlignedData* outbuf; // pointer where decoder puts decompressed data;
 	unsigned long outbuf_len;
 

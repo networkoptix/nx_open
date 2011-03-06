@@ -11,7 +11,6 @@ public:
 
 	virtual bool decode(CLAudioData& )=0;
 
-
 private:
 	CLAbstractAudioDecoder(const CLAbstractAudioDecoder&){};
 	CLAbstractAudioDecoder& operator=(CLAbstractAudioDecoder&){};
@@ -23,7 +22,5 @@ class CLAudioDecoderFactory
 public:
 	static CLAbstractAudioDecoder* createDecoder(CLCodecType codec, void* codecContext);
 };
-
-
 
 #endif //abstract_audio_decoder_h_1532

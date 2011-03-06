@@ -63,8 +63,6 @@ CLDeviceManager::~CLDeviceManager()
 		dev->releaseRef();
 	}
 
-	
-
 }
 
 CLDiviceSeracher& CLDeviceManager::getDiveceSercher()
@@ -79,12 +77,9 @@ void CLDeviceManager::onTimer()
 		m_dev_searcher.start(); // first of all start fevice searcher
 		m_firstTime = false;
 
-
-
 		m_timer.setInterval(devices_update_interval);
 
 	}
-
 
 	if (!m_dev_searcher.isRunning() )
 	{
@@ -93,8 +88,6 @@ void CLDeviceManager::onTimer()
 		m_dev_searcher.start(); // run searcher again ...
 	}
 }
-
-
 
 CLDeviceList CLDeviceManager::getDeviceList(CLDeviceCriteria& cr)
 {
@@ -163,7 +156,6 @@ CLDevice* CLDeviceManager::getRecorderById(QString id)
 	return dev;
 }
 
-
 CLDevice* CLDeviceManager::getArchiveDevice(QString id)
 {
 	QDir dir(id);
@@ -174,10 +166,9 @@ CLDevice* CLDeviceManager::getArchiveDevice(QString id)
 	return dev;
 }
 
-
 void CLDeviceManager::onNewDevices_helper(CLDeviceList devices, QString parentId)
 {
-	
+
 	foreach (CLDevice* device, devices)
 	{
 		if (device->getStatus().checkFlag(CLDeviceStatus::ALL) == 0  ) //&&  device->getMAC()=="00-1A-07-00-12-DB")
@@ -198,7 +189,6 @@ void CLDeviceManager::onNewDevices_helper(CLDeviceList devices, QString parentId
 
 }
 
-
 bool CLDeviceManager::isDeviceMeetCriteria(CLDeviceCriteria& cr, CLDevice* dev) const
 {
 	if (dev==0)
@@ -214,8 +204,6 @@ bool CLDeviceManager::isDeviceMeetCriteria(CLDeviceCriteria& cr, CLDevice* dev) 
 
 		if (dev->getParentId() == "")
 			return false;
-
-
 
 		if (dev->getParentId()!=cr.getRecorderId())
 			return false;
@@ -234,9 +222,8 @@ bool CLDeviceManager::isDeviceMeetCriteria(CLDeviceCriteria& cr, CLDevice* dev) 
 
 	}
 
-
 	return true;
-	
+
 }
 
 QStringList CLDeviceManager::subDirList(const QString& abspath) const
@@ -255,7 +242,6 @@ QStringList CLDeviceManager::subDirList(const QString& abspath) const
 		if (info.isDir() && info.fileName()!="." && info.fileName()!="..")
 			result.push_back(info.fileName());
 	}
-
 
 	return result;
 

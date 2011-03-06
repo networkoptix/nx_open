@@ -2,7 +2,6 @@
 #include "nettools.h"
 #include "base\log.h"
 
-
 CLNetState::CLNetState()
 {
 	updateNetState();
@@ -26,7 +25,6 @@ void CLNetState::updateNetState()
 		//QString ip_s = entry.ip().toString(); //debug
 		//QString mask_s = entry.netmask().toString(); //debug
 
-
 		quint32 minaddr = ip & mask;
 		quint32 maxaddr = ip | (~mask);
 
@@ -49,24 +47,19 @@ void CLNetState::updateNetState()
 		else
 			net_state_changed = true; // ip changed or new subnet
 
-
 		new_netstate[entry.ip().toString()] = state;
 	}
 
-	
 	if (new_netstate.size()!=m_netstate.size())
 		net_state_changed = true;
 
-
 	m_netstate = new_netstate;
-
 
 	if (net_state_changed)
 	{
 		cl_log.log("Current Net state:", cl_logALWAYS);
 		cl_log.log(toString(), cl_logALWAYS);
 	}
-
 
 }
 
@@ -80,7 +73,6 @@ QString CLNetState::toString() const
 	str << endl;
 	str << endl;
 
-	
 	for (int i = 0; i < m_net_entries.size(); ++i)
 	{
 		QNetworkAddressEntry entr = m_net_entries.at(i);
@@ -95,7 +87,6 @@ QString CLNetState::toString() const
 	return result;
 
 }
-
 
 bool CLNetState::existsSubnet(const QHostAddress& machine_ip) const
 {
@@ -113,7 +104,6 @@ bool CLNetState::isInMachineSubnet(const QHostAddress& addr) const
 	for (int i = 0; i < m_net_entries.size(); ++i)
 	{
 		const QNetworkAddressEntry& entr = m_net_entries.at(i);
-		
 
 		//QString addr_str = addr.toString();
 		//QString entr_ip_str = entr.ip().toString();

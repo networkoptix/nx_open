@@ -6,63 +6,55 @@
 #include "base\aligned_data.h"
 #include "decoders\audio\audio_struct.h"
 
-
 // display one video stream
 // decodes the video and pass it to video window
 class CLAbstractAudioDecoder;
 struct CLCompressedAudioData;
 class CLAudioDevice;
 
-
 class CLAudioStreamDisplay : public QObject
 {
 	Q_OBJECT
 public:
-	CLAudioStreamDisplay(int buff_ms);
+	CLAudioStreamDisplay(int buffMs);
 	~CLAudioStreamDisplay();
 
-	void putdata(CLCompressedAudioData* data);
-
-    void enqueData(CLCompressedAudioData* data);
-
+	void putData(CLCompressedAudioData* data);
+    void enqueueData(CLCompressedAudioData* data);
 	void suspend();
 
 	void resume();
 
 	// removes all data from audio buffers
-	void clearAudioBuff();
+	void clearAudioBuffer();
 
     // clears only device buff, not packets queue
-    void clearDeviceBuff();
+    void clearDeviceBuffer();
 
 	// how many ms is buffered in audio buffers at this moment(!)
 	int msInBuffer() const;
 
 	// returns true if audio is not playing, just accumulating 
-	bool isBuffring() const;
+	bool isBuffering() const;
 
 private:
-
     // returns amount of ms which buffered before start playing 
     int playAfterMs() const;
     int msInQueue() const;
 
-
-	static void down_mix(CLAudioData& audio);
+	static void downmix(CLAudioData& audio);
 	static void float2int(CLAudioData& audio);
-private:
 
+private:
 	CLAbstractAudioDecoder* m_decoder[CL_VARIOUSE_DECODERS];
 
-	int m_buff_ms;
+	int m_bufferMs;
 	CLAlignedData m_decodedaudio;
 	bool m_downmixing;
-	bool m_too_few_data_detected;
-    CLAudioDevice* m_audiodevice;
+	bool m_tooFewDataDetected;
+    CLAudioDevice* m_audioDevice;
 
     QQueue<CLCompressedAudioData*> m_audioQueue;
-
-    
 };
 
 #endif //audiostreamdisplay_h_1811

@@ -1,14 +1,11 @@
 #ifndef serach_edit_2215_h
 #define serach_edit_2215_h 
 
-
-
 class CLSerchEditCompleter : public QCompleter
 {
 	Q_OBJECT 
 public:    
 	CLSerchEditCompleter(QObject * parent);
-	
 
 	void filter(QString filter);
 

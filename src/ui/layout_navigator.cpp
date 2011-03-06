@@ -16,7 +16,6 @@ QString button_magnifyingglass = "magnifyingglass";
 QString button_squarelayout = "squarelayout";
 QString button_longlayout = "longlayout";
 
-
 CLLayoutNavigator::CLLayoutNavigator(QWidget* mainWnd, LayoutContent* content):
 m_videoView(mainWnd),
 mCurrentContent(content)
@@ -24,22 +23,17 @@ mCurrentContent(content)
 	// layout stoped go to the new one
 	connect(&m_videoView.getCamLayOut(), SIGNAL(stoped(LayoutContent*)), this, SLOT(onLayOutStoped(LayoutContent*))); 
 
-
 	// something like logo pressed
 	connect(&m_videoView.getCamLayOut(), SIGNAL(onItemPressed(LayoutContent*, QString)), this, SLOT(onButtonItemPressed(LayoutContent*, QString))); 
-	
 
 	// home, levelup button or so
 	connect(&m_videoView, SIGNAL(onDecorationPressed(LayoutContent*, QString)), this, SLOT(onDecorationPressed(LayoutContent*, QString)));
 
-	
 	// some layout ref pressed
 	connect(&m_videoView.getCamLayOut(), SIGNAL(onNewLayoutSelected(LayoutContent*, LayoutContent*)), this, SLOT(onNewLayoutSelected(LayoutContent*, LayoutContent*)));
 
 	// for layout editor	
 	connect(&m_videoView.getCamLayOut(), SIGNAL(onNewLayoutItemSelected(LayoutContent*)), this, SLOT(onNewLayoutItemSelected(LayoutContent*)));
-
-
 
 	if (mCurrentContent==0)
 		mCurrentContent = CLSceneLayoutManager::instance().startScreenLayoutContent();
@@ -130,7 +124,6 @@ void CLLayoutNavigator::onButtonItemPressed(LayoutContent* l, QString itemname )
 			mNewContent = CLSceneLayoutManager::instance().getAllRecordersContent();
 			goToNewLayoutContent();
 		}
-		
 
 		if (itemname==button_layout)
 		{

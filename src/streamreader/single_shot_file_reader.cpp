@@ -9,7 +9,6 @@ CLSingleShotStreamreader(dev)
 	m_fileName = device->getFileName();
 }
 
-
 CLAbstractMediaData* CLSingleShotFileStreamreader::getData()
 {
 	QFileInfo finfo(m_fileName);
@@ -37,14 +36,13 @@ CLAbstractMediaData* CLSingleShotFileStreamreader::getData()
 
 	data.done(readed);
 
-
 	outData->compressionType = CL_JPEG;
 
 	outData->width = 0; // does not really meter (this is single shot)
 	outData->height = 0; //does not really meter (this is single shot)
 	outData->keyFrame = true;
 
-	outData->channel_num = 0;
+	outData->channelNumber = 0;
 
 	return outData;
 }

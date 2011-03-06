@@ -7,13 +7,10 @@
 #include "device_command_processor.h"
 #include "device_video_layout.h"
 
-
-
 CLDeviceCommandProcessor CLDevice::m_commanproc;
 
 CLDevice::LL CLDevice::static_device_list; // list of all supported devices params list
 CLDevice::LL CLDevice::static_stream_list; // list of all supported streams params list
-
 
 CLDevice::CLDevice():
 m_deviceTypeFlags(0),
@@ -21,7 +18,6 @@ m_videolayout(0)
 {
 	inst++;	
 };
-
 
 CLDevice::~CLDevice()
 {
@@ -32,26 +28,23 @@ CLDevice::~CLDevice()
 
 void CLDevice::setParentId(QString parentid)
 {
-	mParentId = parentid;
+	m_parentId = parentid;
 }
 
 QString CLDevice::getParentId() const
 {
-	return mParentId;
+	return m_parentId;
 }
-
-
 
 QString CLDevice::getUniqueId() const
 {
-	return m_uniqueid;
+	return m_uniqueId;
 }
 
 void CLDevice::setUniqueId(const QString& id)
 {
-	m_uniqueid = id;
+	m_uniqueId = id;
 }
-
 
 QString CLDevice::getName() const
 {
@@ -63,9 +56,6 @@ void CLDevice::setName(const QString& name)
 	m_name = name;
 }
 
-
-
-
 CLDeviceStatus& CLDevice::getStatus()
 {
 	return m_status;
@@ -76,8 +66,7 @@ void  CLDevice::setStatus(const CLDeviceStatus& status)
 	m_status = status;
 }
 
-
-CLParamList& CLDevice::getDevicePramList()
+CLParamList& CLDevice::getDeviceParamList()
 {
 	if (m_deviceParamList.empty())
 		m_deviceParamList = static_device_list[m_name];
@@ -85,7 +74,7 @@ CLParamList& CLDevice::getDevicePramList()
 	return m_deviceParamList;
 }
 
-const CLParamList& CLDevice::getDevicePramList() const
+const CLParamList& CLDevice::getDeviceParamList() const
 {
 	if (m_deviceParamList.empty())
 		m_deviceParamList = static_device_list[m_name];
@@ -109,7 +98,7 @@ void CLDevice::removeDeviceTypeFlag(unsigned long flag)
 	m_deviceTypeFlags &= ~flag;
 }
 
-CLParamList& CLDevice::getStreamPramList()
+CLParamList& CLDevice::getStreamParamList()
 {
 	if (m_streamParamList.empty())
 		m_streamParamList = static_stream_list[m_name];
@@ -117,7 +106,7 @@ CLParamList& CLDevice::getStreamPramList()
 	return m_streamParamList;
 }
 
-const CLParamList& CLDevice::getStreamPramList() const
+const CLParamList& CLDevice::getStreamParamList() const
 {
 	if (m_streamParamList.empty())
 		m_streamParamList = static_stream_list[m_name];
@@ -131,7 +120,6 @@ QStringList CLDevice::supportedDevises()
 	for (LL::iterator it = static_device_list.begin();it != static_device_list.end(); ++it)
 		result.push_back(it.key());
 
-	
 	return result;
 }
 
@@ -140,7 +128,6 @@ void CLDevice::setVideoLayout(CLDeviceVideoLayout* layout)
 	delete m_videolayout;
 	m_videolayout = layout;
 }
-
 
 const CLDeviceVideoLayout* CLDevice::getVideoLayout() const
 {
@@ -157,7 +144,6 @@ QString CLDevice::toString() const
 	QTextStream(&result) << getName() << "  " <<  getUniqueId();
 	return result;
 }
-
 
 void CLDevice::mergeLists(CLDeviceList& first, CLDeviceList second)
 {
@@ -179,7 +165,6 @@ void CLDevice::mergeLists(CLDeviceList& first, CLDeviceList second)
 		}
 	}
 }
-
 
 void CLDevice::deleteDevices(CLDeviceList& lst)
 {
@@ -208,8 +193,6 @@ void CLDevice::addReferences(CLDeviceList& lst)
 
 }
 
-
-
 void CLDevice::getDevicesBasicInfo(CLDeviceList& lst, int threads)
 {
 	// cannot make concurrent work with pointer CLDevice* ; => so extra steps needed
@@ -228,7 +211,6 @@ void CLDevice::getDevicesBasicInfo(CLDeviceList& lst, int threads)
 		CLDevice* device;
 	};
 
-
 	cl_log.log("Geting device info...", cl_logDEBUG1);
 	QTime time;
 	time.start();
@@ -245,7 +227,6 @@ void CLDevice::getDevicesBasicInfo(CLDeviceList& lst, int threads)
 		++it;
 	}
 
-	
 	QThreadPool* global = QThreadPool::globalInstance();
 	for (int i = 0; i < threads; ++i ) global->releaseThread();
 	QtConcurrent::blockingMap(local_list, &T::f);
@@ -262,10 +243,9 @@ void CLDevice::getDevicesBasicInfo(CLDeviceList& lst, int threads)
 
 }
 
-
 bool CLDevice::getParam(const QString& name, CLValue& val, bool resynch) 
 {
-	if (!getDevicePramList().exists(name))
+	if (!getDeviceParamList().exists(name))
 	{
 		cl_log.log("getParam: requested param does not exist!", cl_logWARNING);
 		return false;
@@ -274,23 +254,22 @@ bool CLDevice::getParam(const QString& name, CLValue& val, bool resynch)
 	return true;
 }
 
-
 bool CLDevice::setParam(const QString& name, const CLValue& val)
 {
-	if (!getDevicePramList().exists(name))
+	if (!getDeviceParamList().exists(name))
 	{
 		cl_log.log("setParam: requested param does not exist!", cl_logWARNING);
 		return false;
 	}
 
-	if (getDevicePramList().get(name).value.readonly)
+	if (getDeviceParamList().get(name).value.readonly)
 	{
 		cl_log.log("setParam: cannot set readonly param!", cl_logWARNING);
 		return false;
 	}
 
 	return true;
-	
+
 }
 
 bool CLDevice::setParam_asynch(const QString& name, const CLValue& val)
@@ -317,11 +296,10 @@ bool CLDevice::setParam_asynch(const QString& name, const CLValue& val)
 
 	};
 
-
 	CLDeviceSetParamCommand *command = new CLDeviceSetParamCommand(this, name, val);
 	m_commanproc.putData(command);
 	command->releaseRef();
-	
+
 	return true;
 
 }

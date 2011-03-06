@@ -5,7 +5,6 @@
 #include "device_settings_dlg.h"
 #include "settings.h"
 
-
 CLDeviceSettingsTab::CLDeviceSettingsTab(CLAbstractDeviceSettingsDlg* dlg, QObject* handler, CLDevice* dev, QString group):
 mDevice(dev),
 mGroup(group),
@@ -19,7 +18,7 @@ mDlg(dlg)
 
 	//QVBoxLayout *mainLayout = new QVBoxLayout;
 
-	QList<QString> sub_groups = mDevice->getDevicePramList().subGroupList(mGroup);
+	QList<QString> sub_groups = mDevice->getDeviceParamList().subGroupList(mGroup);
 
 	int size = 175;
 
@@ -31,7 +30,6 @@ mDlg(dlg)
 		QString sub_group = sub_groups.at(i);
 
 		QWidget* parent = this;
-		
 
 		if (sub_group!="")
 		{
@@ -50,7 +48,7 @@ mDlg(dlg)
 			x+=(size+15);
 		}
 
-		CLParamList::MAP paramLst = mDevice->getDevicePramList().paramList(group, sub_group).list();
+		CLParamList::MAP paramLst = mDevice->getDeviceParamList().paramList(group, sub_group).list();
 
 		int y = 0;
 		foreach (CLParam param, paramLst)
@@ -59,7 +57,6 @@ mDlg(dlg)
 				continue;
 
 			CLAbstractSettingsWidget* awidget = 0;
-			
 
 			switch(param.value.type)
 			{
@@ -79,9 +76,7 @@ mDlg(dlg)
 				awidget =  new SettingsButtonWidget(handler, dev, group, sub_group, param.name);
 				break;
 
-
 			}
-
 
 			if (awidget==0)
 				continue;
@@ -100,11 +95,7 @@ mDlg(dlg)
 
 		}
 
-
-
 		//mainLayout->addWidget(subgroupBox);
-
-		
 
 	}
 

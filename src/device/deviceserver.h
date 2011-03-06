@@ -9,7 +9,6 @@
 
 #include "device.h"
 
-
 class CLDeviceServer
 {
 public:
@@ -25,6 +24,5 @@ public:
 	virtual CLDeviceList findDevices() = 0;
 
 };
-
 
 #endif //device_server_h_1658

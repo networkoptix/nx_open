@@ -7,39 +7,36 @@ m_view(view),
 m_counrer(0),
 m_steadyMode(false)
 {
-	connect(&mTimer, SIGNAL(timeout()), this , SLOT(onTimer()));
-	mTimer.setInterval(1000); // 60 fps   
+	connect(&m_timer, SIGNAL(timeout()), this , SLOT(onTimer()));
+	m_timer.setInterval(1000); // 60 fps   
 }
-
 
 CLSteadyMouseAnimation::~CLSteadyMouseAnimation()
 {
-	mTimer.stop();
+	m_timer.stop();
 }
-
 
 void CLSteadyMouseAnimation::start()
 {
     m_counrer = 0;
-    mTimer.start();
+    m_timer.start();
 }
 
 void CLSteadyMouseAnimation::stopAnimation()
 {
-	mTimer.stop();
+	m_timer.stop();
 	m_counrer = 0;
 }
 
 bool CLSteadyMouseAnimation::isRuning() const
 {
-	return mTimer.isActive();
+	return m_timer.isActive();
 }
 
 QObject* CLSteadyMouseAnimation::object()
 {
 	return this;
 }
-
 
 void CLSteadyMouseAnimation::onTimer()
 {
@@ -59,7 +56,6 @@ void CLSteadyMouseAnimation::onTimer()
 void CLSteadyMouseAnimation::onUserInput(bool go_unstedy)
 {
     m_counrer = 0;
-
 
     if (m_steadyMode && go_unstedy)
     {

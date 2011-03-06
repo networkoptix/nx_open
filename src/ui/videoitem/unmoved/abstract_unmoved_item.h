@@ -3,7 +3,6 @@
 
 #include "..\subitem\abstract_sub_item_container.h"
 
-
 class QGraphicsView;
 
 class CLAbstractUnmovedItem : public CLAbstractSubItemContainer
@@ -28,7 +27,5 @@ protected:
 
 };
 
-
 #endif //abstract_unmoved_item_h_1753
-
 

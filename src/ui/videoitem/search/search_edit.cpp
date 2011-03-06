@@ -1,7 +1,5 @@
 #include "search_edit.h"
 
-
-
 CLSerchEditCompleter::CLSerchEditCompleter(QObject * parent) :
 QCompleter(parent)
 {
@@ -21,9 +19,6 @@ void CLSerchEditCompleter::filter(QString filter)
 		filtered = filtered.filter(word, caseSensitivity());
 	}
 
-
-
-
 	m_model.setStringList(filtered);        
 	complete();    
 }     
@@ -32,7 +27,6 @@ void CLSerchEditCompleter::updateStringLst(QStringList lst)
 {
 	m_list = lst;
 }
-
 
 //=======================================================
 
@@ -69,7 +63,6 @@ void CLSearchEdit::insertCompletion(const QString& completion)
 	setText(completion);
 	selectAll();
 }
-
 
 void CLSearchEdit::keyPressEvent(QKeyEvent *e)
 {

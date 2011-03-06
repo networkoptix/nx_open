@@ -2,7 +2,6 @@
 #include "file_device.h"
 #include "device_plugins\archive\avi_files\avi_device.h"
 
-
 CLDirectoryBrowserDeviceServer::CLDirectoryBrowserDeviceServer(const QString dir)
 {
 	m_directory = dir;
@@ -12,7 +11,6 @@ CLDirectoryBrowserDeviceServer::~CLDirectoryBrowserDeviceServer()
 {
 
 }
-
 
 bool CLDirectoryBrowserDeviceServer::isProxy() const
 {
@@ -48,7 +46,6 @@ CLDeviceList CLDirectoryBrowserDeviceServer::findDevices()
 
 	}
 
-
 	{
 		QStringList filter;
 		filter << "*.avi";
@@ -70,8 +67,6 @@ CLDeviceList CLDirectoryBrowserDeviceServer::findDevices()
 		}
 
 	}
-
-
 
 	return result;
 

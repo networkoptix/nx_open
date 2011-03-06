@@ -10,7 +10,6 @@
 #include "animation/animation_manager.h"
 #include "animation/steady_mouse_animation.h"
 
-
 class CLAbstractSceneItem;
 class CLVideoWindowItem;
 class QGraphicsPixmapItem;
@@ -51,7 +50,6 @@ public:
 
 	void setAllItemsQuality(CLStreamreader::StreamQuality q, bool increase);
 	void closeAllDlg();
-		
 
 	void addjustAllStaticItems();
 	void centerOn(const QPointF &pos);
@@ -63,7 +61,6 @@ public:
 
 	void setViewMode(ViewMode mode);
 	ViewMode getViewMode() const;
-
 
 	void addStaticItem(CLAbstractUnmovedItem* item, bool connect = true);
 	void removeStaticItem(CLAbstractUnmovedItem* item);
@@ -91,12 +88,10 @@ protected:
 	void dragEnterEvent ( QDragEnterEvent * event );
 	void dragMoveEvent ( QDragMoveEvent * event );
 	void dropEvent ( QDropEvent * event );
-	
 
 	virtual void keyPressEvent( QKeyEvent * e );
 	virtual void keyReleaseEvent( QKeyEvent * e );
 
-	
 	void resizeEvent(QResizeEvent * event);
 
 	//=========================
@@ -105,12 +100,12 @@ protected:
 
 	void onItemFullScreen_helper(CLAbstractSceneItem* wnd);
 	qreal zoomForFullScreen_helper(QRectF rect) const;
-	
+
 	void onArrange_helper();
 	void onCircle_helper(bool show=false);
 
 	void show_device_settings_helper(CLDevice* dev);
-	
+
 	CLAbstractSceneItem* getLastSelectedItem();
 	void mouseSpeed_helper(qreal& mouse_speed,  int& dx, int&dy, int min_spped, int speed_factor);
 	bool isItemStillExists(const CLAbstractSceneItem* wnd) const;
@@ -119,15 +114,12 @@ protected:
 
 	void showStop_helper();
 
-
-
 	//========decorations=====
 	void removeAllStaticItems();
 	void updateDecorations();
 	CLAbstractUnmovedItem* staticItemByName(QString name) const;
 	void recalcSomeParams();
-	
-	
+
 	//========navigation=======
 	void enableMultipleSelection(bool enable, bool unselect = true); 
 	bool isCTRLPressed(const QInputEvent* event) const;
@@ -148,7 +140,7 @@ protected:
 	void navigation_grid_items_drop_helper();
 
 public slots:
-	
+
 	void fitInView(int duration = 700 , int delay = 0, CLAnimationTimeLine::CLAnimationCurve curve =  CLAnimationTimeLine::SLOW_END_POW_40);
 private slots:
 	void onScneZoomFinished();
@@ -158,40 +150,33 @@ private slots:
 
 	void on_grid_drop_animation_finished();
 protected:
-	
+
 	QGraphicsScene m_scene;
 	SceneLayout m_camLayout;
 
 	int m_xRotate;
 	qreal m_yRotate;
-	
-		
-	/**/
 
+	/**/
 
 	CLSceneMovement m_movement;
 	CLSceneZoom m_scenezoom;
 	CLMouseState m_mousestate;
 
 	qreal m_min_scene_zoom;
-	
+
 	int m_rotationCounter;
 
 	bool m_handScrolling;
 	int m_handMoving;
 	bool mSubItemMoving;
 
-
-
 	CLAbstractSceneItem* m_selectedWnd;
 	CLAbstractSceneItem* m_last_selectedWnd;
 	CLAbstractSceneItem* m_rotatingWnd;
 	unsigned int m_movingWnd;
 
-
 	QRect m_realSceneRect;
-	
-
 
 	bool m_ignore_release_event, m_ignore_conext_menu_event;
 
@@ -213,20 +198,17 @@ protected:
 	qreal m_old_distance;
 
 	bool mViewStarted;
-	
+
 	//====decoration======
 	QList<CLAbstractUnmovedItem*> m_staticItems;
-	
 
 	//======fps
 	int m_fps_frames;
 	QTime m_fps_time;
 
-
 	ViewMode m_viewMode;
 
 	CLSerachEditItem* m_seachItem;
-
 
 	CLAnimationManager m_animationManager;
 

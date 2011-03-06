@@ -3,7 +3,6 @@
 
 #include "../../../device/device.h"
 
-
 // this class and inhereted must be very light to create 
 class FakeDevice : public CLDevice
 {
@@ -18,7 +17,6 @@ public:
 		return VIDEODEVICE;
 	}
 
-
 protected:
 
 	FakeDevice()
@@ -26,11 +24,8 @@ protected:
 
 	}
 
-
 public:
 	static CLDeviceList findDevices();
-
-
 
 };
 
@@ -40,9 +35,8 @@ public:
 	FakeDevice4_180();
 	virtual CLStreamreader* getDeviceStreamConnection();
 protected:
-	
-};
 
+};
 
 class FakeDevice4_360 : public FakeDevice
 {
@@ -50,8 +44,7 @@ public:
 	FakeDevice4_360();
 	virtual CLStreamreader* getDeviceStreamConnection();
 protected:
-	
-};
 
+};
 
 #endif // fake_ss_device_h_2110

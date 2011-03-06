@@ -1,7 +1,6 @@
 // nalconstructor.cpp : Defines the entry point for the console application.
 //
 
-
 // These typedefs are already defined in stdint.h included with ffmpeg headers
 #if 0
 typedef signed char int8_t;
@@ -12,7 +11,6 @@ typedef int  int32_t;
 typedef unsigned   uint32_t;
 #endif
 
-
 typedef struct bs_s
 {
 	uint8_t *p_start; // pointer to the begining
@@ -21,7 +19,6 @@ typedef struct bs_s
 
 	int     i_left;    /* i_count number of available bits */
 } bs_t;
-
 
 static inline void bs_init( bs_t *s, uint8_t *p_data, int i_data )
 {
@@ -93,8 +90,6 @@ static inline void bs_align( bs_t *s )
 {
 	bs_align_0( s );
 }
-
-
 
 /* golomb functions */
 
@@ -187,9 +182,7 @@ int create_sps_pps(
 	bs_t stream;
 	bs_init(&stream,data,max_datalen); // just stream init
 
-
 	bs_write_startcode(&stream); // write start code
-
 
 	//int header = ( 0x00 << 7 ) | ( i_ref_idc << 5 ) | i_type;
 	//for sps header = 103 (0x67)
@@ -216,8 +209,7 @@ int create_sps_pps(
 	{
 		bs_write_ue( &stream, 1 ); //log2_max_pic_order_cnt_lsb_minus4
 	}
-	
-	
+
 	bs_write_ue( &stream, 1 ); // num_ref_frames
 	bs_write( &stream, 1, 0); //gaps_in_frame_num_value_allowed_flag
 
@@ -232,20 +224,16 @@ int create_sps_pps(
 
 	bs_write( &stream, 1, 0 ); //frame_cropping_flag; in first version = 0;
 
-
-
 	bs_write( &stream, 1, 0 ); //vui_parameters_present_flag
 
 	bs_rbsp_trailing( &stream );
 	//======= sps main======
-
 
 	bs_write_startcode(&stream); // write start code
 	//int header = ( 0x00 << 7 ) | ( i_ref_idc << 5 ) | i_type;
 	//for sps header = 104 (0x68)
 	bs_write(&stream,8,0x68); // header
 	//=======pps main========
-
 
 	bs_write_ue( &stream, 0); //pic_parameter_set_id
 	bs_write_ue( &stream, 0); //seq_parameter_set_id
@@ -267,7 +255,6 @@ int create_sps_pps(
 		bs_write( &stream, 1, 0 );
 	else // we have ti disable it in sh
 		bs_write( &stream, 1, 1 );
-
 
 	bs_write( &stream, 1, 0); //constrained_intra_pred_flag
 	bs_write( &stream, 1, 0 ); //redundant_pic_cnt_present_flag

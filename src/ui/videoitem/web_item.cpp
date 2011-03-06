@@ -21,7 +21,6 @@ CLAbstractSceneItem(view, max_width, max_height, name)
 
 CLWebItem::~CLWebItem()
 {
-
 }
 
 void CLWebItem::navigate(const QString& str)
@@ -30,9 +29,8 @@ void CLWebItem::navigate(const QString& str)
 	//m_web_widget.load(QUrl("http://google.com"));
 }
 
-void CLWebItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void CLWebItem::paint(QPainter* /*painter*/, const QStyleOptionGraphicsItem* /*option*/, QWidget* /*widget*/)
 {
-
 }
 
 QPointF CLWebItem::getBestSubItemPos(CLSubItemType type)

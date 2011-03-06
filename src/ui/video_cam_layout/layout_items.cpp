@@ -1,6 +1,5 @@
 #include "layout_items.h"
 
-
 LayoutItem::LayoutItem()
 {
 
@@ -15,7 +14,6 @@ angl(angle_)
 {
 
 }
-
 
 LayoutItem::~LayoutItem()
 {
@@ -45,11 +43,10 @@ QString LayoutItem::Type2String(Type t)
 
 	default:
 		return "NONE";
-	    
+
 	}
 	return "NONE";
 }
-
 
 LayoutItem::Type LayoutItem::String2Type(const QString& str)
 {
@@ -91,13 +88,10 @@ QString LayoutItem::getName() const
 	return name;
 }
 
-
-
 int LayoutItem::getX() const
 {
 	return x;
 }
-
 
 int LayoutItem::getY() const
 {
@@ -108,7 +102,6 @@ QPointF LayoutItem::pos() const
 {
 	return QPointF(x,y);
 }
-
 
 int LayoutItem::width() const
 {
@@ -192,14 +185,13 @@ LayoutImage::LayoutImage(const QString& img, const QString& name, const QString&
 LayoutButton(name, text, tooltip, x_, y_, width_, height_,  angle_),
 image(img)
 {
-	
+
 }
 
 LayoutItem::Type LayoutImage::type() const
 {
 	return BUTTON;
 }
-
 
 QString LayoutImage::getImage() const
 {
@@ -210,6 +202,5 @@ void LayoutImage::toXml(QDomDocument& doc, QDomElement& parent)
 {
 	LayoutItem::toXml(doc, parent);
 }
-
 
 //=======================================================================================================

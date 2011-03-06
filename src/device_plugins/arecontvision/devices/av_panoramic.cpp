@@ -3,7 +3,6 @@
 #include "../../../base/log.h"
 #include "device/device_video_layout.h"
 
-
 class AVVideoLayout180 : public CLDeviceVideoLayout
 {
 public:
@@ -15,12 +14,10 @@ public:
 		return 4;
 	}
 
-
 	virtual unsigned int width() const 
 	{
 		return 4;
 	}
-
 
 	virtual unsigned int height() const 
 	{
@@ -65,12 +62,10 @@ public:
 		return 4;
 	}
 
-
 	virtual unsigned int width() const 
 	{
 		return 2;
 	}
-
 
 	virtual unsigned int height() const 
 	{
@@ -88,10 +83,6 @@ public:
 	}
 
 };
-
-
-
-
 
 CLArecontPanoramicDevice::CLArecontPanoramicDevice(int model):
 CLAreconVisionDevice(model),
@@ -123,8 +114,6 @@ CLStreamreader* CLArecontPanoramicDevice::getDeviceStreamConnection()
 	return new AVPanoramicClientPullSSTFTPStreamreader(this);
 }
 
-
-
 bool CLArecontPanoramicDevice::hasTestPattern() const
 {
 	return m_hastestPattern;
@@ -138,13 +127,10 @@ bool CLArecontPanoramicDevice::setParam(const QString& name, const CLValue& val 
 	if (setParam_special(name, val)) // try special first 
 		return true;
 
-	CLParamType& value = getDevicePramList().get(name).value;
+	CLParamType& value = getDeviceParamList().get(name).value;
 
 	//if (value.synchronized && value.value==val) // the same value
 	//	return true;
-
-
-
 
 	if (!value.setValue(val, false))
 	{
@@ -157,7 +143,6 @@ bool CLArecontPanoramicDevice::setParam(const QString& name, const CLValue& val 
 		value.setValue(val);
 		return true;
 	}
-
 
 	if (value.type==CLParamType::None || value.type==CLParamType::Button) 
 	{
@@ -193,10 +178,6 @@ bool CLArecontPanoramicDevice::setParam(const QString& name, const CLValue& val 
 
 	}
 
-
-
-
-
 	value.setValue(val);
 	value.synchronized = true;
 
@@ -209,7 +190,6 @@ bool CLArecontPanoramicDevice::setParam_special(const QString& name, const CLVal
 
 	if (CLAreconVisionDevice::setParam_special(name, val))
 		return true;
-
 
 	if (name=="resolution")
 	{
@@ -227,9 +207,8 @@ bool CLArecontPanoramicDevice::setParam_special(const QString& name, const CLVal
 			return false;
 
 		return setQulity(q);
-		
-	}
 
+	}
 
 	return false;
 }
@@ -241,7 +220,7 @@ bool CLArecontPanoramicDevice::setResolution(bool full)
 
 	if (CL_HTTP_SUCCESS!=setRegister(3, 0xD1, value)) // FULL RES QULITY
 		return false;
-	
+
 	return true;
 }
 
@@ -249,7 +228,6 @@ bool CLArecontPanoramicDevice::setQulity(int q)
 {
 	if (CL_HTTP_SUCCESS!=setRegister(3, 0xED, q)) // FULL RES QULITY
 		return false;
-
 
 	if (CL_HTTP_SUCCESS!=setRegister(3, 0xEE, q)) // HALF RES QULITY
 		return false;

@@ -13,7 +13,6 @@ public:
 	static int GetHeader(unsigned char* pBuffer, unsigned int nWidth, unsigned int nHeight, int iQuality, const char* szCameraModel); 
 	static int GetHeaderSize();
 
-
 protected:
 	static unsigned char s_JpegHeaderTemplate[];
 	static unsigned char s_LuminTbl[25][64];

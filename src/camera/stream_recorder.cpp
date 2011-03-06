@@ -9,20 +9,18 @@
 
 CLStreamRecorder::CLStreamRecorder(CLDevice* dev):
 CLAbstractDataProcessor(10),
-mDevice(dev),
-mFirsTime(true)
+m_device(dev),
+m_firstTime(true)
 {
-	mVersion = 1;
+	m_version = 1;
 
-	memset(mData, 0, sizeof(mData));
-	memset(mDescr, 0, sizeof(mDescr));
+	memset(m_data, 0, sizeof(m_data));
+	memset(m_description, 0, sizeof(m_description));
 
-	memset(mGotKeyFrame, 0, sizeof(mGotKeyFrame)); // false
+	memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
 
-	memset(mDataFile, 0, sizeof(mDataFile));
-	memset(mDescrFile, 0, sizeof(mDescrFile));
-	
-
+	memset(m_dataFile, 0, sizeof(m_dataFile));
+	memset(m_descriptionFile, 0, sizeof(m_descriptionFile));
 }
 
 CLStreamRecorder::~CLStreamRecorder()
@@ -34,48 +32,46 @@ void CLStreamRecorder::cleanup()
 {
 	for (int i = 0; i < CL_MAX_CHANNELS; ++i)
 	{
-		flush_channel(i);
+		flushChannel(i);
 
-		delete mData[i];
-		mData[i] = 0;
+		delete m_data[i];
+		m_data[i] = 0;
 
-		delete mDescr[i];
-		mDescr[i] = 0;
+		delete m_description[i];
+		m_description[i] = 0;
 
-		mGotKeyFrame[i] = false;
+		m_gotKeyFrame[i] = false;
 
-		if (mDataFile[i])
+		if (m_dataFile[i])
 		{
-			fclose(mDataFile[i]);
-			mDataFile[i] = 0;
+			fclose(m_dataFile[i]);
+			m_dataFile[i] = 0;
 		}
 
-		if (mDescrFile[i])
+		if (m_descriptionFile[i])
 		{
-			fclose(mDescrFile[i]);
-			mDescrFile[i] = 0;
+			fclose(m_descriptionFile[i]);
+			m_descriptionFile[i] = 0;
 		}
-
-
 	}
-	
-	mFirsTime = true;
 
-	memset(mData, 0, sizeof(mData));
-	memset(mDescr, 0, sizeof(mDescr));
+	m_firstTime = true;
 
-	memset(mGotKeyFrame, 0, sizeof(mGotKeyFrame)); // false
+	memset(m_data, 0, sizeof(m_data));
+	memset(m_description, 0, sizeof(m_description));
 
-	memset(mDataFile, 0, sizeof(mDataFile));
-	memset(mDescrFile, 0, sizeof(mDescrFile));
+	memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
+
+	memset(m_dataFile, 0, sizeof(m_dataFile));
+	memset(m_descriptionFile, 0, sizeof(m_descriptionFile));
 }
 
 void CLStreamRecorder::processData(CLAbstractData* data)
 {
-	if (mFirsTime)
+	if (m_firstTime)
 	{
-		mFirsTime = false;
-		onFirstdata(data);
+		m_firstTime = false;
+		onFirstData(data);
 	}
 
 	CLAbstractMediaData* md = static_cast<CLAbstractMediaData*>(data);
@@ -83,7 +79,7 @@ void CLStreamRecorder::processData(CLAbstractData* data)
 		return;
 
 	CLCompressedVideoData *vd= static_cast<CLCompressedVideoData*>(data);
-	int channel = vd->channel_num;
+	int channel = vd->channelNumber;
 
 	if (channel>CL_MAX_CHANNELS-1)
 		return;
@@ -91,36 +87,34 @@ void CLStreamRecorder::processData(CLAbstractData* data)
 	bool keyFrame = vd->keyFrame;
 
 	if (keyFrame)
-		mGotKeyFrame[channel] = true;
+		m_gotKeyFrame[channel] = true;
 
-	if (!mGotKeyFrame[channel]) // did not got key frame so far
+	if (!m_gotKeyFrame[channel]) // did not got key frame so far
 		return;
 
-	if (mData[channel]==0)
-		mData[channel] = new CLByteArray(0, 1024*1024);
+	if (m_data[channel]==0)
+		m_data[channel] = new CLByteArray(0, 1024*1024);
 
-	if (mDescr[channel]==0)
+	if (m_description[channel]==0)
 	{
-		mDescr[channel] = new CLByteArray(0, 1024);
-		mDescr[channel]->write((char*)(&mVersion), 4); // version
+		m_description[channel] = new CLByteArray(0, 1024);
+		m_description[channel]->write((char*)(&m_version), 4); // version
 	}
 
-	
 	quint64 t64 = vd->timestamp;
 
 	unsigned int data_size = vd->data.size();
 	unsigned int codec = (unsigned int)vd->compressionType;
-	
 
-	mDescr[channel]->write((char*)&data_size,4);
-	mDescr[channel]->write((char*)&t64,8);
-	mDescr[channel]->write((char*)&codec,4);
-	mDescr[channel]->write((char*)&keyFrame,1);
+	m_description[channel]->write((char*)&data_size,4);
+	m_description[channel]->write((char*)&t64,8);
+	m_description[channel]->write((char*)&codec,4);
+	m_description[channel]->write((char*)&keyFrame,1);
 
-	mData[channel]->write(vd->data);
+	m_data[channel]->write(vd->data);
 
-	if (need_to_flush(channel))
-		flush_channel(channel);
+	if (needToFlush(channel))
+		flushChannel(channel);
 }
 
 void CLStreamRecorder::endOfRun()
@@ -128,10 +122,10 @@ void CLStreamRecorder::endOfRun()
 	cleanup();
 }
 
-void CLStreamRecorder::onFirstdata(CLAbstractData* data)
+void CLStreamRecorder::onFirstData(CLAbstractData* data)
 {
 	QDir current_dir;
-	current_dir.mkpath(dir_helper());
+	current_dir.mkpath(dirHelper());
 
 	CLStreamreader* reader = data->dataProvider;
 	CLDevice* dev = reader->getDevice();
@@ -140,11 +134,9 @@ void CLStreamRecorder::onFirstdata(CLAbstractData* data)
 	QDomElement root = doc.createElement("layout");
 	doc.appendChild(root);
 
-
 	root.setAttribute("channels", dev->getVideoLayout()->numberOfChannels());
 	root.setAttribute("width", dev->getVideoLayout()->width());
 	root.setAttribute("height", dev->getVideoLayout()->height());
-
 
 	for (int i = 0; i < dev->getVideoLayout()->numberOfChannels(); ++i)
 	{
@@ -157,10 +149,9 @@ void CLStreamRecorder::onFirstdata(CLAbstractData* data)
 		root.appendChild(channel);
 	}
 
-
 	QString xml = doc.toString();
 
-	QFile file(dir_helper() + "/layout.xml");
+	QFile file(dirHelper() + "/layout.xml");
 	file.open(QIODevice::WriteOnly);
 
 	QTextStream fstr(&file);
@@ -169,77 +160,70 @@ void CLStreamRecorder::onFirstdata(CLAbstractData* data)
 }
 
 //=====================================
-bool CLStreamRecorder::need_to_flush(int channel)
+bool CLStreamRecorder::needToFlush(int channel)
 {
-	if (mDescr[channel]==0 || mData[channel]==0 || mDescr[channel]->size()==0 || mData[channel]->size()==0)
+	if (m_description[channel]==0 || m_data[channel]==0 || m_description[channel]->size()==0 || m_data[channel]->size()==0)
 		return false;
 
-	if (mData[channel]->size()>=FLUSH_SIZE)
+	if (m_data[channel]->size()>=FLUSH_SIZE)
 		return true;
 
 	return false;
 }
 
-
-void CLStreamRecorder::flush_channel(int channel)
+void CLStreamRecorder::flushChannel(int channel)
 {
-	
-	
-	if (mDescr[channel]==0 || mData[channel]==0 || mDescr[channel]->size()==0 || mData[channel]->size()==0)
+	if (m_description[channel]==0 || m_data[channel]==0 || m_description[channel]->size()==0 || m_data[channel]->size()==0)
 		return;
 
-	if (mDescrFile[channel]==0)
-		mDescrFile[channel] = fopen(filname_descr(channel).toLatin1().data(), "wb");
+	if (m_descriptionFile[channel]==0)
+		m_descriptionFile[channel] = fopen(filenameDescription(channel).toLatin1().data(), "wb");
 
-	if (mDescrFile[channel]==0)
+	if (m_descriptionFile[channel]==0)
 		return;
 
+	if (m_dataFile[channel]==0)
+		m_dataFile[channel] = fopen(filenameData(channel).toLatin1().data(), "wb");
 
-	if (mDataFile[channel]==0)
-		mDataFile[channel] = fopen(filname_data(channel).toLatin1().data(), "wb");
-
-	if (mDataFile[channel]==0)
+	if (m_dataFile[channel]==0)
 		return;
 
-	fwrite(mDescr[channel]->data(),1,mDescr[channel]->size(),mDescrFile[channel]);
-	fflush(mDescrFile[channel]);
-	mDescr[channel]->clear();
+	fwrite(m_description[channel]->data(),1,m_description[channel]->size(),m_descriptionFile[channel]);
+	fflush(m_descriptionFile[channel]);
+	m_description[channel]->clear();
 
-	fwrite(mData[channel]->data(),1,mData[channel]->size(),mDataFile[channel]);
-	fflush(mDataFile[channel]);
-	mData[channel]->clear();
-
-
+	fwrite(m_data[channel]->data(),1,m_data[channel]->size(),m_dataFile[channel]);
+	fflush(m_dataFile[channel]);
+	m_data[channel]->clear();
 
 }
 
-QString CLStreamRecorder::filname_data(int channel)
+QString CLStreamRecorder::filenameData(int channel)
 {
-	return filname_helper(channel) + ".data";
+	return filenameHelper(channel) + ".data";
 }
 
-QString CLStreamRecorder::filname_descr(int channel)
+QString CLStreamRecorder::filenameDescription(int channel)
 {
-	return filname_helper(channel) + ".descr";
+	return filenameHelper(channel) + ".descr";
 }
 
-QString CLStreamRecorder::filname_helper(int channel)
+QString CLStreamRecorder::filenameHelper(int channel)
 {
-	
 	QString str;
 	QTextStream stream(&str);
 
-	stream << dir_helper() << "/channel_" << channel;
+	stream << dirHelper() << "/channel_" << channel;
 
 	return str;
 }
 
-QString CLStreamRecorder::dir_helper()
+QString CLStreamRecorder::dirHelper()
 {
 	QString str;
 	QTextStream stream(&str);
 
-	stream << "./archive/" << mDevice->getUniqueId();
+	stream << "./archive/" << m_device->getUniqueId();
 
 	return str;
 }

@@ -6,7 +6,6 @@
 #include "ui\graphicsview.h"
 #include <QModelIndex>
 
-
 CLSerachEditItem::CLSerachEditItem(GraphicsView* view, QWidget* parent, LayoutContent* sceneContent):
 QWidget(parent),
 m_sceneContent(sceneContent),
@@ -17,7 +16,6 @@ m_view(view)
 	m_lineEdit = new CLSearchEdit(this);
 	m_lineEdit->setFocus();
 
-	
 	QString style (
 
 		"QLineEdit{ border-width: 2px; \n"
@@ -42,13 +40,10 @@ m_view(view)
 		"border-bottom-color: rgb(0, 240, 240);}"
 		);
 
-
 	m_lineEdit->setStyleSheet(style);
-	
 
 	m_height = 40;
 
-	
 	m_completer = new CLSerchEditCompleter(this);
 	m_completer->setMaxVisibleItems(10);
 	m_completer->setCompletionMode(QCompleter::PopupCompletion);
@@ -57,8 +52,6 @@ m_view(view)
 	m_lstview = new QListView();
 	m_lstview->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_lstview->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
-
 
 	m_lstview->setStyleSheet(
 		"color: rgb(0, 240, 240);"
@@ -69,11 +62,8 @@ m_view(view)
 
 	m_completer->setPopup(m_lstview);
 
-
-
 	m_lineEdit->setCompleter(m_completer);
 	connect(m_lineEdit, SIGNAL( textChanged ( const QString &) ), this, SLOT(onEditTextChanged (const QString& )));
-
 
 	mTimer.setSingleShot(true);
 	mTimer.setInterval(600);
@@ -112,10 +102,8 @@ void CLSerachEditItem::resize()
 
 	move(QPoint(vpw/2 - m_width/2, 0));
 	QWidget::resize(m_width, m_height);
-	
+
 }
-
-
 
 void CLSerachEditItem::onEditTextChanged (const QString & text)
 {
@@ -124,7 +112,6 @@ void CLSerachEditItem::onEditTextChanged (const QString & text)
 
 	mTimer.stop();
 	mTimer.start();
-
 
 	CLDeviceCriteria cr = m_sceneContent->getDeviceCriteria();
 	cr.setCriteria(CLDeviceCriteria::FILTER);
@@ -139,8 +126,6 @@ void CLSerachEditItem::onEditTextChanged (const QString & text)
 		dev->releaseRef();
 	}
 
-
-	
 	m_completer->updateStringLst(result);
 	/**/
 
@@ -149,7 +134,6 @@ void CLSerachEditItem::onEditTextChanged (const QString & text)
 void CLSerachEditItem::onTimer()
 {
 	mTimer.stop();
-
 
 	CLDeviceCriteria cr = m_sceneContent->getDeviceCriteria();
 	cr.setCriteria(CLDeviceCriteria::FILTER);

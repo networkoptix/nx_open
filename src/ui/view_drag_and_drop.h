@@ -1,7 +1,6 @@
 #ifndef view_drag_and_drop_helper_h_1835
 #define view_drag_and_drop_helper_h_1835
 
-
 class QGraphicsItem;
 
 struct CLDragAndDropItems

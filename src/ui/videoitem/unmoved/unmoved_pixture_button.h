@@ -1,7 +1,6 @@
 #ifndef unmoved_pixture_button_h_1867
 #define unmoved_pixture_button_h_1867
 
-
 #include "unmoved_interactive_opacity_item.h"
 class QPropertyAnimation;
 
@@ -40,7 +39,6 @@ signals:
 protected:
 	void mouseReleaseEvent( QGraphicsSceneMouseEvent * event );
 	void mousePressEvent ( QGraphicsSceneMouseEvent * event );
-
 
 };
 

@@ -4,7 +4,6 @@
 #include "../../../data/mediadata.h"
 #include "../devices/av_device.h"
 
-
 AVClientPullSSHTTPStreamreader::AVClientPullSSHTTPStreamreader(CLDevice* dev):
 CLAVClinetPullStreamReader(dev)
 {
@@ -17,7 +16,6 @@ CLAVClinetPullStreamReader(dev)
 	m_model = device->getModel();
 
 }
-
 
 CLAbstractMediaData* AVClientPullSSHTTPStreamreader::getNextData()
 {
@@ -33,7 +31,6 @@ CLAbstractMediaData* AVClientPullSSHTTPStreamreader::getNextData()
 
 	int width, height;
 
-
 	int quality;
 	int bitrate;
 
@@ -41,8 +38,6 @@ CLAbstractMediaData* AVClientPullSSHTTPStreamreader::getNextData()
 	int streamID;
 
 	bool h264;
-
-
 
 	{
 			QMutexLocker mutex(&m_params_CS);
@@ -57,7 +52,7 @@ CLAbstractMediaData* AVClientPullSSHTTPStreamreader::getNextData()
 					h264 = true;
 			}
 			/**/
-			
+
 			if (!m_streamParam.exists("Quality") || !m_streamParam.exists("resolution") || 
 				!m_streamParam.exists("image_left") || !m_streamParam.exists("image_top") ||
 				!m_streamParam.exists("image_right") || !m_streamParam.exists("image_bottom") ||
@@ -76,7 +71,6 @@ CLAbstractMediaData* AVClientPullSSHTTPStreamreader::getNextData()
 			width = right - left;
 			height = bottom - top;
 
-
 			//quality = m_streamParam.get("Quality").value.value;
 			quality = getQuality();
 
@@ -90,11 +84,9 @@ CLAbstractMediaData* AVClientPullSSHTTPStreamreader::getNextData()
 			}
 			//=========
 
-
 			if (h264)
 				quality=37-quality; // for H.264 it's not quality; it's qp 
 
-			
 			if (!h264)
 				os <<"image";
 			else
@@ -116,25 +108,19 @@ CLAbstractMediaData* AVClientPullSSHTTPStreamreader::getNextData()
 
 			os<< quality << "&doublescan=1" << "&ssn=" << streamID;
 
-			
 			if (h264)
 			{
 				//os <<"&iframe=" << *Ifarme;
 				if (needKeyData())
 					os <<"&iframe=1";
 
-
 				if (bitrate)
 					os <<"&bitrate=" << bitrate;
 			}
-	
 
 			forecast_size = resolutionFULL ? (width*height)/2  : (width*height)/4; // 0.5 meg per megapixel; to avoid mem realock
 	}
 
-
-	
-	
 	CLSimpleHTTPClient http_client((static_cast<CLAreconVisionDevice*>(m_device))->getIP(), m_port, m_timeout, m_auth);
 
 	http_client.setRequestLine(request);
@@ -147,7 +133,6 @@ CLAbstractMediaData* AVClientPullSSHTTPStreamreader::getNextData()
 
 	videoData = new CLCompressedVideoData(CL_MEDIA_ALIGNMENT,forecast_size);
 	CLByteArray& img = videoData->data;
-
 
 	while(http_client.isOpened())
 	{
@@ -173,7 +158,6 @@ CLAbstractMediaData* AVClientPullSSHTTPStreamreader::getNextData()
 
 	img.removeZerrowsAtTheEnd();
 
-	
 	//unit delimetr
 	if (h264)
 	{
@@ -206,10 +190,10 @@ CLAbstractMediaData* AVClientPullSSHTTPStreamreader::getNextData()
 		else
 			if (http_client.get("Content-Type")==QString("video/H.264P"))
 				videoData->keyFrame = false;
-		
+
 	}
 
-	videoData->channel_num = 0;
+	videoData->channelNumber = 0;
 
 	videoData->timestamp = QDateTime::currentMSecsSinceEpoch()*1000;
 

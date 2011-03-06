@@ -3,12 +3,13 @@
 
 #include "../decoders/video/frame_info.h"
 
-// display one video stream
-// decodes the video and pass it to video window
 class CLAbstractVideoDecoder;
 struct CLCompressedVideoData;
 class CLAbstractRenderer;
 
+/**
+  * Display one video stream. Decode the video and pass it to video window.
+  */
 class CLVideoStreamDisplay
 {
 public:
@@ -18,27 +19,26 @@ public:
 	void dispay(CLCompressedVideoData* data, bool draw, CLVideoDecoderOutput::downscale_factor force_factor = CLVideoDecoderOutput::factor_any);
 
 	void setLightCPUMode(bool val);
-	void coppyImage(bool copy);
+	void copyImage(bool copy);
 
-	CLVideoDecoderOutput::downscale_factor getCurrentDownScaleFactor() const;
+	CLVideoDecoderOutput::downscale_factor getCurrentDownscaleFactor() const;
 
 private:
 	QMutex m_mtx;
 	CLAbstractVideoDecoder* m_decoder[CL_VARIOUSE_DECODERS];
 	CLAbstractRenderer* m_draw;
 
-	CLVideoDecoderOutput m_out_frame; // to reduce image size for weak video cards 
-	
+    /**
+      * to reduce image size for weak video cards 
+      */
+	CLVideoDecoderOutput m_outFrame;
 
 	bool m_lightCPUmode;
-
-	bool m_can_downscale;
-	
+	bool m_canDownscale;
 
 	CLVideoDecoderOutput::downscale_factor m_prevFactor;
-	CLVideoDecoderOutput::downscale_factor m_scalefactor;
-	QSize m_prev_on_screen_size;
-
+	CLVideoDecoderOutput::downscale_factor m_scaleFactor;
+	QSize m_previousOnScreenSize;
 };
 
 #endif //videostreamdisplay_h_2044

@@ -15,7 +15,6 @@ public:
 	virtual int height() const;
 	virtual int width() const;
 
-
 	virtual float aspectRatio() const;
 	int imageWidth() const;
 	int imageHeight() const;
@@ -25,15 +24,12 @@ public:
 	void setShowInfoText(bool show);
 	void setShowImagesize(bool show);
 
-
 signals:
 	void onAspectRatioChanged(CLImageItem* item);
 
 protected:
 	virtual void drawStuff(QPainter* painter);
 	virtual void drawInfoText(QPainter* painter);
-
-	
 
 	virtual bool wantText() const;
 
@@ -48,8 +44,6 @@ protected:
 	mutable QMutex m_mutex_aspect;
 	float m_aspectratio;
 
-
-
 	bool m_showinfotext;
 	bool m_showimagesize;
 
@@ -57,15 +51,10 @@ protected:
 	QTime m_textTime; // draw text is very very very expensive. so want to delay it a bit
 	bool m_timeStarted;
 
-	
-
 	QString m_infoText;
-
 
 	QFont m_Info_Font;
 
-
 };
-
 
 #endif //img_item_h_2211

@@ -23,8 +23,6 @@ public:
 
 	unsigned int capacity() const;
 
-
-	
 	//writes size bytes to array starting from current position.
 	// if size > (capacity - curr_size) then capacity automatically increased by factor of 2
 	unsigned int write(const char* data, unsigned int size );
@@ -37,7 +35,6 @@ public:
 	// if other.size > (this.capacity - this.curr_size) then capacity automatically increased by factor of 2
 	unsigned int write(const CLByteArray& other );
 
-
 	// sets current write position and size to 0;
 	// capacity remains the same
 	void clear();
@@ -46,7 +43,6 @@ public:
 	// returns a pointer
 	// this function is used with done()
 	char* prepareToWrite(int size);
-
 
 	void done(int size);
 
@@ -57,7 +53,6 @@ public:
 	//av cam
 	void removeZerrowsAtTheEnd();
 
-
 private:
 	CLByteArray(const CLByteArray&){};
 	CLByteArray& operator=(const CLByteArray&){};
@@ -67,14 +62,12 @@ private:
 	// return false if can not allocate new memorry
 	bool increase_capacity(unsigned int new_capacity);
 
-
 private:
 	unsigned int m_alignment;
 
-	
 	unsigned int m_size;
 	unsigned int m_capacity;
-	
+
 	char* m_data;
 
 	char* m_al_data;
@@ -82,6 +75,5 @@ private:
 	int m_ignore;
 
 };
-
 
 #endif //CL_bytearray_1207

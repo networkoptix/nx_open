@@ -1,7 +1,6 @@
 #include "mouse_state.h"
 #include <math.h>
 
-
 void CLMouseState::mouseMoveEventHandler(QMouseEvent *event)
 {
 	while (m_mouseTrackQueue.size() > 10)
@@ -35,18 +34,15 @@ void CLMouseState::getMouseSpeed(qreal& speed, qreal& h_speed, qreal& v_speed)
 	int dy = lastPoint.y() - firstPoint.y();
 	int idt = firstTime.msecsTo(lastTime);
 
-
-
 	if (idt == 0)
 		idt = 1;
 
 	qreal dt = idt/ 1000.0;
 
-	
 	qreal dst = sqrt((qreal)dx*dx + (qreal)dy*dy);
 
 	const qreal correction = 1.05;
-		 
+
 	speed = correction*dst / dt;
 	h_speed = correction*dx / dt;
 	v_speed = correction*dy / dt;
@@ -60,7 +56,6 @@ void CLMouseState::getMouseSpeed(qreal& speed, qreal& h_speed, qreal& v_speed)
 		h_speed/=factor;
 		v_speed/=factor;
 	}
-
 
 }
 

@@ -1,7 +1,6 @@
 #ifndef cl_long_runnable_146
 #define cl_long_runnable_146
 
-
 class CLLongRunnable : public QThread
 {
 	Q_OBJECT
@@ -19,7 +18,7 @@ public:
 
 	CLLongRunnable():
 	  m_runing(false),
-	  m_onpause(false)
+	  m_onPause(false)
 	  {
 
 	  }
@@ -29,7 +28,7 @@ public:
     virtual void pleaseStop()
 	{
 		m_needStop = true;
-		if (m_onpause)
+		if (m_onPause)
 			resume();
 	}
 
@@ -47,29 +46,29 @@ public:
 
 	virtual void pause()
 	{
-		m_sem.tryAcquire(m_sem.available());
-		m_onpause = true;
-		
+		m_semaphore.tryAcquire(m_semaphore.available());
+		m_onPause = true;
+
 	}
 
 	virtual void resume()
 	{
-		m_onpause = false;
-		m_sem.release();
+		m_onPause = false;
+		m_semaphore.release();
 	}
 
-	void pause_delay()
+	void pauseDelay()
 	{
-		while(m_onpause && !needToStop())
-			m_sem.tryAcquire(1,50);
+		while(m_onPause && !needToStop())
+			m_semaphore.tryAcquire(1,50);
 	}
 
 protected:
 	bool m_runing;
 	volatile bool m_needStop;
 
-	bool m_onpause;
-	QSemaphore m_sem;
+	bool m_onPause;
+	QSemaphore m_semaphore;
 };
 
 #endif //cl_long_runnable_146

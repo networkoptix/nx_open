@@ -12,13 +12,10 @@ mContent(0)
 	m_type = LAYOUT;
 }
 
-
 CLLayoutItem::~CLLayoutItem()
 {
 
 }
-
-
 
 void CLLayoutItem::setRefContent(LayoutContent* cont)
 {
@@ -29,7 +26,6 @@ LayoutContent* CLLayoutItem::getRefContent() const
 {
 	return mContent;
 }
-
 
 QPointF CLLayoutItem::getBestSubItemPos(CLSubItemType type)
 {
@@ -46,16 +42,13 @@ QPointF CLLayoutItem::getBestSubItemPos(CLSubItemType type)
 
 }
 
-
 void CLLayoutItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
 	painter->fillPath(mShadowRectPath, global_shadow_color);
 
-
 	QColor border_color(20,20,160);
 	if (m_mouse_over)
 		border_color = QColor(20,20,190);
-
 
 	painter->fillPath(mRoundRectPath, border_color );
 
@@ -64,7 +57,6 @@ void CLLayoutItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 		btn_color = QColor(25,25,230);
 
 	painter->fillPath(mSmallRectPath, btn_color);
-
 
 	//painter->setPen(QPen(QColor(100,100,100,230),  1, Qt::SolidLine));
 	//painter->drawRect(boundingRect());
@@ -84,7 +76,6 @@ void CLLayoutItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 	else
 		painter->setPen(QColor(150, 150, 150));
 
-
 	painter->drawText((width() - rect.width())/2, border,
 		rect.width(), rect.height(),
 		Qt::AlignCenter | Qt::TextWordWrap, UIDisplayName(getName()));
@@ -93,6 +84,5 @@ void CLLayoutItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 	{
 		painter->fillPath(mRoundRectPath, m_can_be_droped ? global_can_be_droped_color :  global_selection_color );
 	}
-
 
 }

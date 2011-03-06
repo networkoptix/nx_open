@@ -14,9 +14,8 @@ public:
 	virtual void execute() = 0;
 protected:
 	CLDevice* m_device;
-	
-};
 
+};
 
 class CLDeviceCommandProcessor : public CLAbstractDataProcessor
 {
@@ -26,7 +25,7 @@ public:
 
 	virtual void putData(CLAbstractData* data);
 
-	virtual void clearUnProcessedData();
+	virtual void clearUnprocessedData();
 
 	bool hasSuchDeviceInQueue(CLDevice* dev) const;
 
@@ -36,6 +35,5 @@ private:
 	QMap<CLDevice*, unsigned int> mDevicesQue;
 	mutable QMutex m_cs;
 };
-
 
 #endif //CLDeveceCommandProcessor_h_1207

@@ -23,14 +23,13 @@ public:
 
 	int getMaxTextureSize() const;
 
-
 	void draw(CLVideoDecoderOutput& image, unsigned int channel);
 
 	bool paintEvent(const QRect& r);
 
-	virtual void before_destroy();
+	virtual void beforeDestroy();
 
-	QSize size_on_screen(unsigned int channel) const;
+	QSize sizeOnScreen(unsigned int channel) const;
 
 	void applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation)
 	{
@@ -43,15 +42,12 @@ public:
 
 	void copyVideoDataBeforePainting(bool copy);
 
-
 private:
 
 	void init(bool msgbox);
 	static int gl_status; 
 
-	
 private:
-
 
 	// ARB_fragment_program
 	typedef void (APIENTRY *_glProgramStringARB) (GLenum, GLenum, GLsizei, const GLvoid *);
@@ -69,7 +65,6 @@ private:
 
 	int checkOpenGLError() const;
 
-
 	int getMinPow2(int value) const
 	{
 		int result = 1;
@@ -85,9 +80,6 @@ private:
 
 	void drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const float* v_array);
 	void updateTexture();
-
-
-
 
 private:
 	GLint clampConstant;
@@ -110,7 +102,6 @@ private:
 
 	CLColorSpace m_color, m_color_old; 
 
-
 	enum Program
 	{
 		YV12toRGB = 0,
@@ -123,7 +114,6 @@ private:
 	float m_videoCoeffH[4];
 
 	bool m_videoTextureReady;
-
 
 	qreal m_brightness,
 		m_contrast,
@@ -151,6 +141,5 @@ private:
 	GLint mTexSize;
 
 };
-
 
 #endif //clgl_renderer_12_29

@@ -1,7 +1,6 @@
 #ifndef abstract_sub_item_container_h1031
 #define abstract_sub_item_container_h1031
 
-
 class CLAbstractSubItem;
 
 enum CLSubItemType {CloseSubItem, ArchiveNavigatorSubItem, RecordingSubItem, PlaySubItem, PauseSubItem, StepForwardSubItem, StepBackwardSubItem, RewindBackwardSubItem, RewindForwardSubItem};
@@ -35,6 +34,5 @@ protected:
 	QList<QGraphicsItem*> m_eventtransperent_list;
 
 };
-
 
 #endif //abstract_sub_item_container_h1031

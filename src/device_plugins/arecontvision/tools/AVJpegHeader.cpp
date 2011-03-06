@@ -203,7 +203,6 @@ unsigned char AVJpeg::Header::s_JpegHeaderTemplate[] =
 unsigned char AVJpeg::Header::s_LuminTbl[25][64];
 unsigned char AVJpeg::Header::s_ChromTbl[25][64];
 
-
 //Static
 int AVJpeg::Header::GetHeader(unsigned char* pBuffer, unsigned int nWidth, unsigned int nHeight, int iQuality, const char* szCameraModel)
 {
@@ -259,6 +258,4 @@ int AVJpeg::Header::GetHeaderSize()
 {
 	return sizeof(s_JpegHeaderTemplate);
 }
-
-
 

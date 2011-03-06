@@ -1,6 +1,5 @@
 #include "abstract_archive_device.h"
 
-
 CLAbstractArchiveDevice::CLAbstractArchiveDevice()
 {
 	addDeviceTypeFlag(CLDevice::ARCHIVE);

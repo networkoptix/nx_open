@@ -16,7 +16,6 @@ public:
 
 	virtual void setItemSelected(bool sel, bool animate = true, int delay = 0);
 
-
 	void draw(CLVideoDecoderOutput& image, unsigned int channel);
 	QPointF getBestSubItemPos(CLSubItemType  type);
 
@@ -29,6 +28,5 @@ protected:
 
 	int m_archNavigatorHeight;
 };
-
 
 #endif //video_wnd_archive_h1753

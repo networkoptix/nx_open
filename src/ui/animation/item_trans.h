@@ -24,7 +24,6 @@ public:
 	qreal current_zrotation() const;
 	qreal current_zoom() const;
 
-
 private:
 
 	void transform_helper();
@@ -32,15 +31,12 @@ private:
 private slots:
 	void valueChanged ( qreal pos );
 
-
-
 	virtual void onFinished();
 
 protected:
 
 	QPointF m_rotatePoint;
 
-	
 	QGraphicsItem* m_item;
 
 	CLAnimationUnit<qreal> m_zoom;

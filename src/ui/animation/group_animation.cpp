@@ -1,10 +1,8 @@
 #include "group_animation.h"
 
-
 CLParallelAnimationGroup::CLParallelAnimationGroup()
 {
 }
-
 
 void CLParallelAnimationGroup::stopAnimation()
 {
@@ -15,7 +13,6 @@ bool CLParallelAnimationGroup::isRuning() const
 {
 	return true;
 }
-
 
 QObject* CLParallelAnimationGroup::object()
 {

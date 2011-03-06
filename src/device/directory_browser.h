@@ -20,5 +20,4 @@ protected:
 	QString m_directory;
 };
 
-
 #endif //directory_browser_h_1708

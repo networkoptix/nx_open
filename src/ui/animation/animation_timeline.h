@@ -1,7 +1,6 @@
 #ifndef cl_animation_timeline_h_0004
 #define cl_animation_timeline_h_0004
 
- 
 class CLAnimationTimeLine : public QTimeLine
 {
 public:
@@ -30,10 +29,8 @@ public:
 	static void setAnimationSpeed(qreal speed);
 	static qreal getAnimationSpeed();
 
-
 protected:
 	CLAnimationCurve m_curve;
-
 
 	static qreal m_animation_speed;
 
@@ -46,8 +43,7 @@ private:
 	qreal slow_start_slow_end( int msec ) const;
 	qreal inOutBack( int msec ) const;
     qreal outCubic(int msec) const;
-	
-};
 
+};
 
 #endif //cl_animation_timeline_h_0004

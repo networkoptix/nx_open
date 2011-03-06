@@ -24,7 +24,6 @@ void CLStatistics::resetStatistics()
 
 	m_current_stat = 0;
 
-
 	m_bitrate = 0;
 	m_framerate = 0;
 
@@ -55,7 +54,7 @@ void CLStatistics::onData(unsigned int datalen)
 		m_dataTotal+=datalen;
 		m_connectionLost = false;
 	}
-	
+
 	if (m_first_ondata_call)
 	{
 		m_statTime.start();
@@ -105,7 +104,6 @@ void CLStatistics::onData(unsigned int datalen)
 
 }
 
-
 float CLStatistics::getBitrate() const
 {
 	QMutexLocker locker(&m_mutex);
@@ -140,7 +138,6 @@ void CLStatistics::onEvent(CLStatisticsEvent event)
 		m_events[event].firtTime = current;
 
 	m_events[event].lastTime = current;
-
 
 }
 
@@ -184,7 +181,6 @@ float CLStatistics::getavBitrate() const
 	if (seconds==0)
 		seconds = 1; // // to avoid devision by zero
 
-
 	return (m_dataTotal*8.0)/(1024*1024)/seconds;
 
 }
@@ -207,9 +203,8 @@ unsigned long CLStatistics::totalSecs() const
 	QMutexLocker locker(&m_mutex);
 	QDateTime current = m_runing ? QDateTime::currentDateTime() : m_stopTime;
 	return m_startTime.secsTo(current); 
-	
-}
 
+}
 
 void CLStatistics::onLostConnection()
 {

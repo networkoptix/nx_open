@@ -35,7 +35,7 @@ private:
 
 	unsigned char m_last_packet[3100];
 	unsigned int m_last_packet_size;
-	
+
 	int m_retry;
 	int m_timeout;
 	int m_status;
@@ -45,6 +45,5 @@ private:
 	int m_curr_blk_size;
 
 };
-
 
 #endif //__SIMPLE_TFTP_CLIENT__1117

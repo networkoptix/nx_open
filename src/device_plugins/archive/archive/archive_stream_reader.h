@@ -19,21 +19,16 @@ protected:
 		quint64 time; // time in mks from beginning 
 	};
 
-
 public:
 	CLArchiveStreamReader(CLDevice* dev);
 	~CLArchiveStreamReader();
 
-	quint64 currTime() const;
+	quint64 currentTime() const;
 	virtual void resume();
 protected:
 
-	
-
 	virtual void channeljumpTo(quint64 mksec, int channel);
 	virtual CLAbstractMediaData* getNextData();
-
-	
 
 	// i do not want to do it in constructor to unload gui thread 
 	// let reader thread do the work
@@ -50,17 +45,14 @@ protected:
 protected:
 	bool m_firsttime;
 
-
 	QList<ArchiveFrameInfo> mMovie[CL_MAX_CHANNELS];
 	unsigned int mCurrIndex[CL_MAX_CHANNELS];
 	bool mFinished[CL_MAX_CHANNELS];
-	
+
 	QFile m_data_file[CL_MAX_CHANNELS];
 	QDataStream m_data_stream[CL_MAX_CHANNELS];
-	
 
 };
 
 #endif //archive_stream_reader_h1145
-
 

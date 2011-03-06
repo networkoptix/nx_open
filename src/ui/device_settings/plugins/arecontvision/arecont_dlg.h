@@ -27,7 +27,7 @@ protected slots:
 	virtual void onSuggestions();
 	virtual void setParam(const QString& name, const CLValue& val);
 private:
-	
+
 	void initTabsOrder();
 	void initImageQuality();
 	void initExposure();
@@ -37,7 +37,7 @@ private:
 	void initAdmin();
 	//==========
 	void correctWgtsState();
-	
+
 };
 
 #endif //arecon_dlg_factory_h1733

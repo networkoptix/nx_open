@@ -4,15 +4,10 @@
 #include <cmath> //for sin and cos
 #include "ui/videoitem/video_wnd_item.h"
 
-
-
-
 #ifndef GL_FRAGMENT_PROGRAM_ARB
 #define GL_FRAGMENT_PROGRAM_ARB           0x8804
 #define GL_PROGRAM_FORMAT_ASCII_ARB       0x8875
 #endif
-
-
 
 #ifndef GL_CLAMP_TO_EDGE
 #define GL_CLAMP_TO_EDGE	0x812F
@@ -34,7 +29,6 @@
 # define GL_TEXTURE1    0x84C1
 # define GL_TEXTURE2    0x84C2
 #endif
-
 
 #define OGL_CHECK_ERROR(str)// if (checkOpenGLError() != GL_NO_ERROR) {cl_log.log(str, __LINE__ , cl_logERROR); }
 
@@ -66,7 +60,6 @@ static const char yv12ToRgb[] =
 "DP3 result.color.z, R0, c[4];"
 "MOV result.color.w, c[1].y;"
 "END";
-
 
 static const char yuy2ToRgb[] =
 "!!ARBfp1.0"
@@ -113,8 +106,6 @@ static const char yuy2ToRgb[] =
 "MOV result.color.w, c[1].y;"
 "END";
 
-
-
 int CLGLRenderer::gl_status = CLGLRenderer::CL_GL_NOT_TESTED;
 QList<GLuint*> CLGLRenderer::mGarbage;
 
@@ -143,7 +134,6 @@ m_textureUploaded(false)
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &mTexSize); 
 	cl_log.log("Max Texture size: ", mTexSize,cl_logALWAYS);
 
-
 }
 
 int CLGLRenderer::checkOpenGLError() const
@@ -168,7 +158,7 @@ CLGLRenderer::~CLGLRenderer()
 
 		// I do not know why but if I glDeleteTextures here some items on the other view might become green( especially if we animate them a lot )
 		// not sure I i do something wrong with opengl or it's bug of QT. for now can not spend much time on it. but it needs to be fixed.
-		
+
 		GLuint* heap = new GLuint[3];
 		memcpy(heap,m_texture,sizeof(m_texture));
 		mGarbage.push_back(heap); // to delete later
@@ -204,12 +194,9 @@ void CLGLRenderer::getTextureRect(QRect& drawRect,
 	drawRect.setHeight(static_cast<int>(windowHeight));
 }
 
-
-
 void CLGLRenderer::init(bool msgbox)
 {
 //	makeCurrent();
-
 
 	glProgramStringARB = (_glProgramStringARB) QGLContext::currentContext()->getProcAddress(QLatin1String("glProgramStringARB"));
 	glBindProgramARB = (_glBindProgramARB) QGLContext::currentContext()->getProcAddress(QLatin1String("glBindProgramARB"));
@@ -217,7 +204,6 @@ void CLGLRenderer::init(bool msgbox)
 	glGenProgramsARB = (_glGenProgramsARB) QGLContext::currentContext()->getProcAddress(QLatin1String("glGenProgramsARB"));
 	glProgramLocalParameter4fARB = (_glProgramLocalParameter4fARB) QGLContext::currentContext()->getProcAddress(QLatin1String("glProgramLocalParameter4fARB"));
 	glActiveTexture = (_glActiveTexture) QGLContext::currentContext()->getProcAddress(QLatin1String("glActiveTexture"));
-
 
 	if (!glActiveTexture) 
 	{
@@ -249,7 +235,6 @@ void CLGLRenderer::init(bool msgbox)
 	{
 		CL_LOG(cl_logWARNING) cl_log.log("Vendor: ", reinterpret_cast<const char *>(vendor),cl_logALWAYS);
 	}
-
 
 	//version = "1.0.7";
 	if (version && QString(version) >= QString("1.2.0")) 
@@ -292,7 +277,6 @@ void CLGLRenderer::init(bool msgbox)
 		}
 	}
 
-
 	if (!error && glProgramStringARB && glBindProgramARB && glDeleteProgramsARB &&
 		glGenProgramsARB && glProgramLocalParameter4fARB) 
 	{
@@ -330,8 +314,6 @@ void CLGLRenderer::init(bool msgbox)
 		error = true;
 	}
 
-
-
 	if (error) 
 	{
 		CL_LOG(cl_logWARNING) cl_log.log("OpenGL shader support init failed, use soft yuv->rgb converter!!!", cl_logWARNING);
@@ -348,7 +330,6 @@ void CLGLRenderer::init(bool msgbox)
 			box->show();
 		}
 
-
 	}
 
 	//if (mGarbage.count()<80)
@@ -364,10 +345,8 @@ void CLGLRenderer::init(bool msgbox)
 	}
 	/**/
 
-
-
 	OGL_CHECK_ERROR("glGenTextures");
-	
+
 	glEnable(GL_TEXTURE_2D);
 	OGL_CHECK_ERROR("glEnable");
 
@@ -380,7 +359,7 @@ int CLGLRenderer::getMaxTextureSize() const
 	return mTexSize;
 }
 
-void CLGLRenderer::before_destroy()
+void CLGLRenderer::beforeDestroy()
 {
 	m_needwait = false;
 	m_waitCon.wakeOne();
@@ -388,7 +367,7 @@ void CLGLRenderer::before_destroy()
 
 void CLGLRenderer::copyVideoDataBeforePainting(bool copy)
 {
-	m_copydata = copy;
+	m_copyData = copy;
 	if (copy)
 	{
 		m_abort_drawing = true; // after we cancel wait process we need to abort_draw.
@@ -399,31 +378,26 @@ void CLGLRenderer::copyVideoDataBeforePainting(bool copy)
 	{
 		m_needwait = true;
 	}
-	
+
 }
 
 void CLGLRenderer::draw(CLVideoDecoderOutput& img, unsigned int channel)
 {
-	
+
 	QMutexLocker locker(&m_mutex);
 
 	m_abort_drawing = false;
 
-	if (m_copydata)
+	if (m_copyData)
 		CLVideoDecoderOutput::copy(&img, &m_image);
 
-	
-	CLVideoDecoderOutput& image =  m_copydata ?  m_image : img;
-
+	CLVideoDecoderOutput& image =  m_copyData ?  m_image : img;
 
 	m_stride = image.stride1;
 	m_height = image.height;
 	m_width = image.width;
 
-
 	m_color = image.out_type;
-
-	
 
 	if (m_stride != m_stride_old || m_height!=m_height_old || m_color!=m_color_old)
 	{
@@ -433,7 +407,6 @@ void CLGLRenderer::draw(CLVideoDecoderOutput& img, unsigned int channel)
 		m_color_old = m_color;
 
 	}
-
 
 	int luma_shift = (m_stride - m_width)>>1;
 
@@ -450,29 +423,25 @@ void CLGLRenderer::draw(CLVideoDecoderOutput& img, unsigned int channel)
 		m_arrayPixels[2] = image.C3 - luma_shift;
 	}
 
-
-
 	m_gotnewimage = true;
 	//CLSleep::msleep(15);
-	
+
 	//QTime time;
 	//time.restart();
 
 	if (!m_videowindow->isVisible())
 		return;
 
-	
 	m_videowindow->needUpdate(true); // sending paint event
 	//m_videowindow->update();
-	
-	
+
 	if (m_needwait)
 	{
 		m_do_not_need_to_wait_any_more = false;
 
 		while (!m_waitCon.wait(&m_mutex,50)) // unlock the mutex 
 		{
-			
+
 			if (!m_videowindow->isVisible() || !m_needwait)
 				break;
 
@@ -480,7 +449,6 @@ void CLGLRenderer::draw(CLVideoDecoderOutput& img, unsigned int channel)
 				break; // some times It does not wake up after wakeone is called ; is it a bug?
 		}
 	}
-
 
 	//cl_log.log("time =", time.elapsed() , cl_logDEBUG1);
 
@@ -493,11 +461,10 @@ void CLGLRenderer::updateTexture()
 {
 	//image.saveToFile("test.yuv");
 
-
 	int w[3] = { m_stride, m_stride / 2, m_stride / 2 };
 	int r_w[3] = { m_width, m_width / 2, m_width / 2 }; // real_width / visable
 	int h[3] = { m_height, m_height / 2, m_height / 2 };
-	
+
 	if (m_color == CL_DECODER_YUV422)
 		h[1] = h[2] = m_height;
 
@@ -508,13 +475,8 @@ void CLGLRenderer::updateTexture()
 		r_w[1] = r_w[2] = m_width;
 	}
 
-
-
 	glEnable(GL_TEXTURE_2D);
 	OGL_CHECK_ERROR("glEnable");
-
-
-
 
 	if (!isSoftYuv2Rgb) 
 	{
@@ -530,7 +492,6 @@ void CLGLRenderer::updateTexture()
 					const int wPow = isNonPower2 ? w[i] : getMinPow2(w[i]);
 					const int hPow = isNonPower2 ? h[i] : getMinPow2(h[i]);
 					// support GL_ARB_texture_non_power_of_two ?
-
 
 					if (isNonPower2) 
 					{
@@ -561,7 +522,6 @@ void CLGLRenderer::updateTexture()
 
 				}
 
-				
 				glTexSubImage2D(GL_TEXTURE_2D, 0,
 					0, 0,
 					w[i], h[i],
@@ -573,21 +533,19 @@ void CLGLRenderer::updateTexture()
 
 			m_textureUploaded = true;
 
-
-
 	}
 	else 
 	{
 		// not supported for now
 		/*
 		glBindTexture(GL_TEXTURE_2D, m_texture[0]);
-	
+
 		const int wPow = isNonPower2 ? w[0] : getMinPow2(w[0]);
 		const int hPow = isNonPower2 ? h[0] : getMinPow2(h[0]);
 
 		if (!m_videoTextureReady) 
 		{
-			
+
 			if (isNonPower2) 
 			{
 				m_videoCoeffW[0] = 1.0f;
@@ -600,7 +558,6 @@ void CLGLRenderer::updateTexture()
 				m_videoCoeffW[0] = wCoeff;
 				m_videoCoeffH[0] = hCoeff;
 			}
-
 
 			if (!m_videoTextureReady) 
 			{
@@ -643,10 +600,9 @@ void CLGLRenderer::updateTexture()
 
 }
 
-
 void CLGLRenderer::drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const float* v_array)
 {
-	
+
 	float tx_array[8] = {m_videoCoeffL[0], 0.0f, 
 						m_videoCoeffW[0], 0.0f, 
 						m_videoCoeffW[0], m_videoCoeffH[0],
@@ -660,12 +616,11 @@ void CLGLRenderer::drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const
 		0.0f, m_videoCoeffH[0]};
 		/**/
 
-
 	if (!isSoftYuv2Rgb) 
 	{
-		
+
 		const Program prog =  YV12toRGB ;
-		
+
 		glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, m_program[prog]);
 		OGL_CHECK_ERROR("glBindProgramARB");
 		//loading the parameters
@@ -675,10 +630,9 @@ void CLGLRenderer::drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const
 		OGL_CHECK_ERROR("glProgramLocalParameter4fARB");
 		/**/
 
-
 		glEnable(GL_FRAGMENT_PROGRAM_ARB);
 		OGL_CHECK_ERROR("glEnable");
-		
+
 		/*
 		if (YUY2toRGB == prog) 
 		{
@@ -698,29 +652,24 @@ void CLGLRenderer::drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const
 		glActiveTexture(GL_TEXTURE0);
 		OGL_CHECK_ERROR("glActiveTexture");
 
-
-		
 		glBindTexture(GL_TEXTURE_2D, tex0);
 		OGL_CHECK_ERROR("glBindTexture");
 
-		
 		if (YV12toRGB == prog) 
 		{
-			
+
 			glActiveTexture(GL_TEXTURE1);
 			OGL_CHECK_ERROR("glActiveTexture");
 			/**/
 			glBindTexture(GL_TEXTURE_2D, tex1);
 			OGL_CHECK_ERROR("glBindTexture");
 
-			
 			glActiveTexture(GL_TEXTURE2);
 			OGL_CHECK_ERROR("glActiveTexture");
 			/**/
 			glBindTexture(GL_TEXTURE_2D, tex2);
 			OGL_CHECK_ERROR("glBindTexture");
 
-			
 		}
 		/**/
 	}
@@ -730,7 +679,6 @@ void CLGLRenderer::drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const
 		OGL_CHECK_ERROR("glBindTexture");
 	}
 
-	
 	glVertexPointer(2, GL_FLOAT, 0, v_array);
 	OGL_CHECK_ERROR("glVertexPointer");
 	glTexCoordPointer(2, GL_FLOAT, 0, tx_array);
@@ -755,7 +703,6 @@ void CLGLRenderer::drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const
 
 }
 
-
 bool CLGLRenderer::paintEvent(const QRect& r)
 {
 
@@ -768,13 +715,10 @@ bool CLGLRenderer::paintEvent(const QRect& r)
 		m_inited = true;
 	}
 
-	
-	
 	QMutexLocker locker(&m_mutex);
 
 	if (m_stride == 0)
 		return true;
-
 
 	bool draw = (m_width < mTexSize) && (m_height < mTexSize);
 
@@ -793,8 +737,6 @@ bool CLGLRenderer::paintEvent(const QRect& r)
 
 			//getTextureRect(temp, m_stride, m_height, r.width(), r.height(), sar);
 
-
-
 			const float v_array[] = { temp.left(), temp.top(), temp.right()+1, temp.top(), temp.right()+1, temp.bottom()+1, temp.left(), temp.bottom()+1 };
 			drawVideoTexture(m_texture[0], m_texture[1], m_texture[2], v_array);
 			/**/
@@ -803,15 +745,14 @@ bool CLGLRenderer::paintEvent(const QRect& r)
 	{
 		draw = draw;
 	}
-	
+
 	m_waitCon.wakeOne();
 	m_do_not_need_to_wait_any_more = true;
 
 	return draw;
 }
 
-
-QSize CLGLRenderer::size_on_screen(unsigned int channel) const
+QSize CLGLRenderer::sizeOnScreen(unsigned int channel) const
 {
-	return m_videowindow->size_on_screen(channel);
+	return m_videowindow->sizeOnScreen(channel);
 }

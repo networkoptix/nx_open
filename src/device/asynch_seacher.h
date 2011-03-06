@@ -7,7 +7,6 @@
 
 class CLDeviceServer;
 
-
 // this class just searches for new devices
 // it uses others proxy
 // it will be moved to recorder I guess 
@@ -18,7 +17,7 @@ class CLDiviceSeracher : public QThread
 public:
 	CLDiviceSeracher(bool allow_change_ip = true);
 	~CLDiviceSeracher();
-	
+
 	// this function returns only new devices( not in all_devices list);
 	CLDeviceList result();
 	void addDeviceServer(CLDeviceServer* serv);
@@ -67,9 +66,8 @@ private:
 	ServerList m_servers;
 	QMutex m_servers_mtx;
 
-	
 	CLDeviceList all_devices; // this list of ever found devices.
-	
+
 	CLNetState m_netState;
 };
 

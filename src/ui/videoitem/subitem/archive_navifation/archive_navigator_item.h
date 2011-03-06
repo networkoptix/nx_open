@@ -51,11 +51,9 @@ protected:
 	CLImgSubItem* mStepForward;
 	CLImgSubItem* mStepBackward;
 
-
 	QSlider* mSlider;
 	QGraphicsProxyWidget* mSlider_item;
 	CLAbstractArchiveReader* mStreamReader;
-
 
 	bool mPlayMode;
 	bool mSliderIsmoving;

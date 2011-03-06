@@ -172,42 +172,31 @@ void CommunicatingSocket::connect(const string &foreignAddress,
   sockaddr_in destAddr;
   fillAddr(foreignAddress, foreignPort, destAddr);
 
-
   u_long iMode = 1;
   ioctlsocket(sockDesc, FIONBIO, &iMode); // set sock in asynch mode
 
-  
   ::connect(sockDesc, (sockaddr *) &destAddr, sizeof(destAddr));// Try to connect to the given port
-
 
   TIMEVAL timeVal;
   FD_SET wrtFDS;
   int iSockRet, iSelRet;
 
-
-
-
   /* monitor for incomming connections */
   FD_ZERO(&wrtFDS);
   FD_SET(sockDesc, &wrtFDS);
-
 
   /* set timeout values */
   timeVal.tv_sec  = m_timeout/1000;
   timeVal.tv_usec = m_timeout%1000;
 
-
-
-
   iSelRet = ::select(0, NULL, &wrtFDS, NULL, &timeVal);
-
 
   if (iSelRet<=0)
 	throw SocketException("Connect failed (connect())", true);
 
   iMode = 0;
   int t = ioctlsocket(sockDesc, FIONBIO, &iMode);  //set socket to synch  mode
-  
+
 }
 
 void CommunicatingSocket::setTimeOut( unsigned int ms )
@@ -221,8 +210,6 @@ void CommunicatingSocket::setTimeOut( unsigned int ms )
 	::setsockopt(sockDesc, SOL_SOCKET, SO_RCVTIMEO,(const char *)&tv,sizeof(struct timeval));
 
 }
-
-
 
 void CommunicatingSocket::send(const void *buffer, int bufferLen) 
      {
@@ -396,7 +383,6 @@ int UDPSocket::recvFrom(void *buffer, int bufferLen, string &sourceAddress,
 
   return rtn;
 }
-
 
 void UDPSocket::setMulticastTTL(unsigned char multicastTTL)  {
   if (setsockopt(sockDesc, IPPROTO_IP, IP_MULTICAST_TTL, 

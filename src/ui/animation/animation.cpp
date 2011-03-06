@@ -2,7 +2,6 @@
 #include "../../base/log.h"
 #include "../src/corelib/kernel/qtimer.h"
 
-
 CLAnimation::CLAnimation():
 m_timeline(CLAnimationTimeLine::CLAnimationCurve::SLOW_END_POW_40)
 //m_timeline(CLAnimationTimeLine::CLAnimationCurve::SLOW_START_SLOW_END)
@@ -14,11 +13,9 @@ m_timeline(CLAnimationTimeLine::CLAnimationCurve::SLOW_END_POW_40)
 
 	m_delay_timer.setSingleShot(true);
 
-
 	connect(&m_timeline, SIGNAL(valueChanged(qreal)), this, SLOT(valueChanged(qreal)));
 	connect(&m_timeline, SIGNAL(finished()), this, SLOT(onFinished()));
 }
-
 
 CLAnimation::~CLAnimation()
 {

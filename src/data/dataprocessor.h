@@ -9,17 +9,16 @@ struct CLAbstractData;
 class CLAbstractDataProcessor : public CLLongRunnable
 {
 public:
-	CLAbstractDataProcessor(int max_que_size);
+	CLAbstractDataProcessor(int maxQueueSize);
 	virtual ~CLAbstractDataProcessor(){}
 
-
-	virtual bool canAcceptData() const; // is any space in the queue
-
+    /**
+      * @return true is there is any space in the queue, false otherwise
+      */
+	virtual bool canAcceptData() const; 
 	virtual void putData(CLAbstractData* data);
-	
-	virtual void clearUnProcessedData();
-	
-	int queSize() const;
+	virtual void clearUnprocessedData();
+	int queueSize() const;
 
 protected:
 	void run();

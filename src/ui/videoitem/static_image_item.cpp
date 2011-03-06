@@ -1,6 +1,5 @@
 #include "static_image_item.h"
 
-
 extern QPixmap cached(const QString &img);
 
 CLStaticImageItem::CLStaticImageItem(GraphicsView* view, int max_width, int max_height,
@@ -28,6 +27,5 @@ void CLStaticImageItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
 	painter->drawPixmap(boundingRect(), m_img, m_img.rect());
 	drawStuff(painter);
 }
-
 
 //

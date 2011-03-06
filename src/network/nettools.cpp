@@ -19,13 +19,11 @@ QList<QHostAddress> getAllIPv4Addresses()
 	return result;
 }
 
-
 QString MACToString (unsigned char* mac)
 {
 	char t[4];
 
 	QString result;
-
 
 	for (int i = 0; i < 6; i++)
 	{
@@ -40,15 +38,12 @@ QString MACToString (unsigned char* mac)
 	return result;
 }
 
-
-
 unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress)
 {
 
 	const char cSep = '-';
 	QByteArray arr = macs.toLatin1();
 	const char *pszMACAddress = arr.data();
-	
 
 	for (int iConunter = 0; iConunter < 6; ++iConunter)
 	{
@@ -97,18 +92,11 @@ unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress)
 	return pbyAddress;
 }
 
-
-
-
-
-
-
 QList<QNetworkAddressEntry> getAllIPv4AddressEntries()
 {
 	QList<QNetworkInterface> inter_list = QNetworkInterface::allInterfaces(); // all interfaces 
 
 	QList<QNetworkAddressEntry> ipv4_enty_list;
-
 
 	for (int il = 0; il < inter_list.size(); ++il)
 	{
@@ -125,15 +113,11 @@ QList<QNetworkAddressEntry> getAllIPv4AddressEntries()
 		}
 	}
 
-
 	return ipv4_enty_list;
 }
 
-
-
 bool isInIPV4Subnet(QHostAddress addr, const QList<QNetworkAddressEntry>& ipv4_enty_list)
 {
-
 
 	for (int i = 0; i < ipv4_enty_list.size(); ++i)
 	{
@@ -146,20 +130,15 @@ bool isInIPV4Subnet(QHostAddress addr, const QList<QNetworkAddressEntry>& ipv4_e
 
 }
 
-
 bool getNextAvailableAddr(CLSubNetState& state, const CLIPList& busy_lst)
 {
-	
 
 	quint32 curr = state.currHostAddress.toIPv4Address();
 	quint32 maxaddr = state.maxHostAddress.toIPv4Address();
 
-
 	quint32 original = curr;
 
-	
 	CLPing ping;
-	
 
 	while(1)
 	{
@@ -177,7 +156,6 @@ bool getNextAvailableAddr(CLSubNetState& state, const CLIPList& busy_lst)
 		if (busy_lst.find(curr)!=busy_lst.end())// this ip is already in use
 			continue;
 
-
 		if (!ping.ping(QHostAddress(curr).toString(), 2, ping_timeout))
 		{
 			// is this free addr?
@@ -194,7 +172,6 @@ bool getNextAvailableAddr(CLSubNetState& state, const CLIPList& busy_lst)
 
 }
 
-
 //{ windows
 #include <iphlpapi.h>
 #pragma comment(lib, "Iphlpapi.lib")
@@ -206,15 +183,12 @@ void removeARPrecord(const QHostAddress& ip)
 	unsigned long ulSize = 0;
 	GetIpNetTable(0, &ulSize, false);
 
-
 	mtb = new MIB_IPNETTABLE[ ulSize/sizeof(MIB_IPNETTABLE) + 1];
 
 	if(NO_ERROR != GetIpNetTable(mtb, &ulSize, false))
 		return;
 
-
 	//GetIpNetTable(mtb, &ulSize, TRUE);
-
 
 	in_addr addr;
 	int i = 0;
@@ -270,27 +244,20 @@ QString getMacByIP(const QHostAddress& ip, bool net)
 		if (ulLen==0)
 			return "";
 
-
-
 		return MACToString((unsigned char*)pulMac);
 	}
-
-	
 
 	// from memorry
 	MIB_IPNETTABLE* mtb = 0;
 	unsigned long ulSize = 0;
 	GetIpNetTable(0, &ulSize, false);
 
-
 	mtb = new MIB_IPNETTABLE[ ulSize/sizeof(MIB_IPNETTABLE) + 1];
 
 	if(NO_ERROR != GetIpNetTable(mtb, &ulSize, false))
 		return "";
 
-
 	//GetIpNetTable(mtb, &ulSize, TRUE);
-
 
 	in_addr addr;
 	int i = 0;
@@ -308,10 +275,8 @@ QString getMacByIP(const QHostAddress& ip, bool net)
 	delete[] mtb;
 
 	return "";
-	
+
 }
-
-
 
 //}
 

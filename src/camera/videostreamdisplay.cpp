@@ -4,14 +4,12 @@
 #include "../data/mediadata.h"
 #include "abstractrenderer.h"
 
-
-
-CLVideoStreamDisplay::CLVideoStreamDisplay(bool can_downscale):
-m_lightCPUmode(false),
-m_can_downscale(can_downscale),
-m_prevFactor(CLVideoDecoderOutput::factor_1),
-m_scalefactor(CLVideoDecoderOutput::factor_1),
-m_prev_on_screen_size(0,0)
+CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale)
+    : m_lightCPUmode(false),
+      m_canDownscale(canDownscale),
+      m_prevFactor(CLVideoDecoderOutput::factor_1),
+      m_scaleFactor(CLVideoDecoderOutput::factor_1),
+      m_previousOnScreenSize(0,0)
 {
 	for (int i = 0; i < CL_VARIOUSE_DECODERS;++i)
 		m_decoder[i] = 0;
@@ -21,7 +19,6 @@ CLVideoStreamDisplay::~CLVideoStreamDisplay()
 {
 	for (int i = 0; i < CL_VARIOUSE_DECODERS;++i)
 		delete m_decoder[i];
-
 }
 
 void CLVideoStreamDisplay::setDrawer(CLAbstractRenderer* draw)
@@ -29,29 +26,25 @@ void CLVideoStreamDisplay::setDrawer(CLAbstractRenderer* draw)
 	m_draw = draw;
 }
 
-CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::getCurrentDownScaleFactor() const
+CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::getCurrentDownscaleFactor() const
 {
-	return m_scalefactor;
+	return m_scaleFactor;
 }
 
 void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVideoDecoderOutput::downscale_factor force_factor)
 {
-
 	CLVideoData img;
 
-	img.inbuf = (unsigned char*)(data->data.data()); // :-)
-	img.buff_len = data->data.size();
-	img.key_frame = data->keyFrame;
-	img.use_twice = data->use_twice;
+	img.inBuffer = (unsigned char*)(data->data.data()); // :-)
+	img.bufferLength = data->data.size();
+	img.keyFrame = data->keyFrame;
+	img.useTwice = data->useTwice;
     img.width = data->width;
     img.height = data->height;
 
 	CLAbstractVideoDecoder* dec;
-
-
 	{
 		QMutexLocker mutex(&m_mtx);
-
 
 		if (data->compressionType<0 || data->compressionType>CL_VARIOUSE_DECODERS-1)
 		{
@@ -67,7 +60,6 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 
 		img.codec = data->compressionType;
 		dec = m_decoder[data->compressionType];
-
 	}
 
 	if (!dec || !dec->decode(img))
@@ -79,70 +71,58 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 	if (!draw || !m_draw)
 		return;
 
-
-	if (m_can_downscale)
+	if (m_canDownscale)
 	{
-		
 		//force_factor
-		m_scalefactor = CLVideoDecoderOutput::factor_1;
+		m_scaleFactor = CLVideoDecoderOutput::factor_1;
 
 		if (force_factor==CLVideoDecoderOutput::factor_any) // if nobody pushing lets peek it 
 		{
+			QSize on_screen = m_draw->sizeOnScreen(data->channelNumber);
+			if (on_screen.width()*8 <= img.outFrame.width  && on_screen.height()*8 <= img.outFrame.height)
+				m_scaleFactor = CLVideoDecoderOutput::factor_8;
+			else if (on_screen.width()*4 <= img.outFrame.width  && on_screen.height()*4 <= img.outFrame.height)
+				m_scaleFactor = CLVideoDecoderOutput::factor_4;
+			else if (on_screen.width()*2 <= img.outFrame.width  && on_screen.height()*2 <= img.outFrame.height)
+				m_scaleFactor = CLVideoDecoderOutput::factor_2;
 
-				QSize on_screen = m_draw->size_on_screen(data->channel_num);
-				if (on_screen.width()*8 <= img.out_frame.width  && on_screen.height()*8 <= img.out_frame.height)
-					m_scalefactor = CLVideoDecoderOutput::factor_8;
-				else if (on_screen.width()*4 <= img.out_frame.width  && on_screen.height()*4 <= img.out_frame.height)
-					m_scalefactor = CLVideoDecoderOutput::factor_4;
-				else if (on_screen.width()*2 <= img.out_frame.width  && on_screen.height()*2 <= img.out_frame.height)
-					m_scalefactor = CLVideoDecoderOutput::factor_2;
+			if (m_scaleFactor < m_prevFactor)
+			{
+				// new factor is less than prev one; about to change factor => about to increase resource usage 
+				if ( qAbs((qreal)on_screen.width() - m_previousOnScreenSize.width())/on_screen.width() < 0.05 && 
+					qAbs((qreal)on_screen.height() - m_previousOnScreenSize.height())/on_screen.height() < 0.05)
+					m_scaleFactor = m_prevFactor; // hold bigger factor ( smaller image )
 
+				// why?
+				// we need to do so ( introduce some histerezis )coz downscaling changes resolution not proportionally some time( cut vertical size a bit )
+				// so it may be a loop downscale => changed aspectratio => upscale => changed aspectratio => downscale.
+			}
 
-
-				if (m_scalefactor < m_prevFactor)
-				{
-					// new factor is less than prev one; about to change factor => about to increase resource usage 
-					if ( qAbs((qreal)on_screen.width() - m_prev_on_screen_size.width())/on_screen.width() < 0.05 && 
-						qAbs((qreal)on_screen.height() - m_prev_on_screen_size.height())/on_screen.height() < 0.05)
-						m_scalefactor = m_prevFactor; // hold bigger factor ( smaller image )
-
-					// why?
-					// we need to do so ( introduce some histerezis )coz downscaling changes resolution not proportionally some time( cut vertical size a bit )
-					// so it may be a loop downscale => changed aspectratio => upscale => changed aspectratio => downscale.
-
-
-				}
-			
-
-				if (m_scalefactor != m_prevFactor)
-				{
-					m_prev_on_screen_size = on_screen;
-					m_prevFactor = m_scalefactor;
-				}
+			if (m_scaleFactor != m_prevFactor)
+			{
+				m_previousOnScreenSize = on_screen;
+				m_prevFactor = m_scaleFactor;
+			}
 
 		}
 		else
-			m_scalefactor = force_factor;
-
-
+			m_scaleFactor = force_factor;
 
 		//factor = CLVideoDecoderOutput::factor_1;
 
-		if (m_scalefactor == CLVideoDecoderOutput::factor_1)
+		if (m_scaleFactor == CLVideoDecoderOutput::factor_1)
 		{
-			m_draw->draw(img.out_frame, data->channel_num);
+			m_draw->draw(img.outFrame, data->channelNumber);
 		}
 		else
 		{
-			CLVideoDecoderOutput::downscale(&img.out_frame, &m_out_frame, m_scalefactor); // extra cpu work but less to display( for weak video cards )
-			m_draw->draw(m_out_frame, data->channel_num);
+			CLVideoDecoderOutput::downscale(&img.outFrame, &m_outFrame, m_scaleFactor); // extra cpu work but less to display( for weak video cards )
+			m_draw->draw(m_outFrame, data->channelNumber);
 		}
 
 	}
 	else
-		m_draw->draw(img.out_frame, data->channel_num);
-
-
+		m_draw->draw(img.outFrame, data->channelNumber);
 }
 
 void CLVideoStreamDisplay::setLightCPUMode(bool val)
@@ -155,7 +135,7 @@ void CLVideoStreamDisplay::setLightCPUMode(bool val)
 			m_decoder[i]->setLightCpuMode(val);
 }
 
-void CLVideoStreamDisplay::coppyImage(bool copy)
+void CLVideoStreamDisplay::copyImage(bool copy)
 {
 	m_draw->copyVideoDataBeforePainting(copy);
 }

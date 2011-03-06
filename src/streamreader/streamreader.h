@@ -9,10 +9,8 @@
 class CLStreamreader;
 class CLDevice;
 
-
 #define CL_MAX_DATASIZE (20*1024*1024) // assume we can never get compressed data with  size greater than this
 #define CL_MAX_CHANNEL_NUMBER (10) 
-
 
 class CLStreamreader : public CLLongRunnable
 {
@@ -24,11 +22,9 @@ public:
 
 	CLDevice* getDevice() const;
 
-	
 	void setStatistics(CLStatistics* stat);
 	virtual void setStreamParams(CLParamList newParam);
 	CLParamList getStreamParam() const;
-	
 
 	void addDataProcessor(CLAbstractDataProcessor* dp);
 	void removeDataProcessor(CLAbstractDataProcessor* dp);
@@ -65,17 +61,13 @@ protected:
 	QList<CLAbstractDataProcessor*> m_dataprocessors;
 	QMutex m_proc_CS;
 
-
 	mutable QMutex m_params_CS;
 	CLParamList m_streamParam;
-	
-
 
 	CLStatistics* m_stat;
 
 	int m_gotKeyFrame[CL_MAX_CHANNEL_NUMBER];
 	int m_channel_number;
-
 
 	CLDevice* m_device; // reader reads data from this device.
 

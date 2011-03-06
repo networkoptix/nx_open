@@ -1,21 +1,18 @@
 #include "archive_device.h"
 #include "archive_stream_reader.h"
 
-
 CLArchiveDevice::CLArchiveDevice(const QString& arch_path)
 {
 
 	addDeviceTypeFlag(CLDevice::RECORDED);
 
-	m_uniqueid = arch_path;
+	m_uniqueId = arch_path;
 	m_name = arch_path;
-
 
 	QFile file(arch_path + "/layout.xml");
 
 	if (!file.exists())
 		return ;
-	
 
 	QString errorStr;
 	int errorLine;
@@ -35,7 +32,6 @@ CLArchiveDevice::CLArchiveDevice(const QString& arch_path)
 	if (layout_element.tagName() != "layout")
 		return ;
 
-
 	QString ws = layout_element.attribute("width");
 	QString hs = layout_element.attribute("height");
 
@@ -45,7 +41,6 @@ CLArchiveDevice::CLArchiveDevice(const QString& arch_path)
 	m_videolayout = new CLCustomDeviceVideoLayout(width, height);
 
 	CLCustomDeviceVideoLayout* la = static_cast<CLCustomDeviceVideoLayout*>(m_videolayout);
-
 
 	QDomNode node = layout_element.firstChild();
 
@@ -60,10 +55,8 @@ CLArchiveDevice::CLArchiveDevice(const QString& arch_path)
 			la->setChannel(sh_pos.toInt(), sv_pos.toInt(), snumber.toInt());
 		}
 
-
 		node = node.nextSibling();
 	}
-
 
 }
 

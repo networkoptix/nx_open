@@ -5,12 +5,10 @@
 #include "subitem/abstract_sub_item.h"
 #include "subitem/abstract_sub_item_container.h"
 
-
 class GraphicsView;
 class CLVideoWindowItem;
 class CLAbstractSubItem;
 class CLAbstractComplicatedItem;
-
 
 class CLAbstractSceneItem : public CLAbstractSubItemContainer
 {
@@ -21,7 +19,6 @@ class CLAbstractSceneItem : public CLAbstractSubItemContainer
 public:
 
 	enum CLSceneItemType {VIDEO, IMAGE, BUTTON, RECORDER, LAYOUT};
-
 
 	CLAbstractSceneItem(GraphicsView* view, int max_width, int max_height,
 						QString name="");
@@ -34,7 +31,6 @@ public:
 	void setEditable(bool editable);
 
 	// returns true of added
-	
 
 	QString getName() const;
 	void setName(const QString& name);
@@ -45,7 +41,6 @@ public:
 	CLAbstractComplicatedItem* getComplicatedItem() const;
 	virtual void setComplicatedItem(CLAbstractComplicatedItem* complicatedItem);
 
-	
 	void setMaxSize(QSize size);
 	QSize getMaxSize() const;
 
@@ -64,7 +59,6 @@ public:
 	{
 		m_needUpdate = val;
 	}
-
 
 	virtual int height() const;
 	virtual int width() const;
@@ -97,8 +91,6 @@ public:
 	bool getOriginallyArranged() const;
 	void setOriginallyArranged(bool val);
 
-
-
 	//====rotation=======
 	void drawRotationHelper(bool val);
 	void setRotationPointCenter(QPointF center);
@@ -112,7 +104,6 @@ public:
     void setSteadyBlackColor(int color);
 
 public slots:
-	
 
 signals:
 	void onPressed(CLAbstractSceneItem*);
@@ -122,7 +113,7 @@ signals:
 
 protected slots:
         void stopSteadyAnimation();
-	
+
 protected:
 	void drawShadow(QPainter* painter);
     void drawSteadyWall(QPainter* painter);
@@ -134,8 +125,6 @@ protected:
 	virtual void mouseReleaseEvent( QGraphicsSceneMouseEvent * event );
 	virtual void mousePressEvent ( QGraphicsSceneMouseEvent * event );
 	virtual void mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * event );
-
-    
 
 protected:
 	bool m_selected;
@@ -173,7 +162,5 @@ protected:
     QPropertyAnimation* m_steady_animation;
     int m_steady_black_color;
 };
-
-
 
 #endif //_abstarct_scene_item_h_1641

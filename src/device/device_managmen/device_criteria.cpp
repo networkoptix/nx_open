@@ -1,6 +1,5 @@
 #include "device_criteria.h"
 
-
 //=============================================================
 CLDeviceCriteria::CLDeviceCriteria(CriteriaType cr):
 mCriteria(cr)
@@ -23,12 +22,10 @@ QString CLDeviceCriteria::getRecorderId() const
 	return mRecorderId;
 }
 
-
 void CLDeviceCriteria::setCriteria(CriteriaType cr)
 {
 	this->mCriteria = cr;
 }
-
 
 void CLDeviceCriteria::setFilter(const QString& filter)
 {

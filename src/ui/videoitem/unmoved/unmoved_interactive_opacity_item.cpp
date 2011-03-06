@@ -17,7 +17,7 @@ CLUnMovedInteractiveOpacityItem::~CLUnMovedInteractiveOpacityItem()
 	stopAnimation();
 }
 
-void CLUnMovedInteractiveOpacityItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+void CLUnMovedInteractiveOpacityItem::hoverEnterEvent(QGraphicsSceneHoverEvent* /*event*/)
 {
 	if (needAnimation())
         changeOpacity(m_active_opacity, global_opacity_change_period);
@@ -28,8 +28,6 @@ void CLUnMovedInteractiveOpacityItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *
 	if (needAnimation())
         changeOpacity(m_normal_opacity, global_opacity_change_period);
 }
-
-
 
 bool CLUnMovedInteractiveOpacityItem::needAnimation() const
 {

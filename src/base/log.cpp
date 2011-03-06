@@ -1,6 +1,5 @@
 #include "log.h"
 
-
 CLLog cl_log;
 
 QString cl_log_msg[] =  { "ALWAYS", "ERROR", "WARNING", "INFO", "DEBUG1", "DEBUG2" };
@@ -20,7 +19,7 @@ bool CLLog::create(const QString& base_name,
 	m_max_file_size = max_file_size;
 	m_maxBackupFiles = maxBackupFiles;
 	m_cur_num = 0;
-	
+
 	m_loglevel = loglevel;
 
 	m_file.setFileName(currFileName());
@@ -34,12 +33,10 @@ void CLLog::setLogLevel(CLLogLevel loglevel)
 	m_loglevel = loglevel;
 }
 
-
 void CLLog::setLoglistner(CLLogListner * loglistner)
 {
 	m_loglistner = loglistner;
 }
-
 
 void CLLog::log(const QString& msg, int val, CLLogLevel loglevel)
 {
@@ -114,7 +111,6 @@ void CLLog::log(const QString& msg, CLLogLevel loglevel)
 	if (!m_file.isOpen())
 		return;
 
-	
 	QString th;
 	hex(QTextStream (&th)) <<(quint32)QThread::currentThread();
 
@@ -122,10 +118,8 @@ void CLLog::log(const QString& msg, CLLogLevel loglevel)
 	fstr<< QDateTime::currentDateTime().toString("ddd MMM d yy  hh:mm:ss.zzz") <<	" Thread " << th << " (" <<cl_log_msg[loglevel] <<"): " << msg << "\r\n";
 	fstr.flush();
 
-
 	if (m_file.size() >= m_max_file_size) 
 		openNextFile();
-
 
 }
 
@@ -172,7 +166,6 @@ void CLLog::openNextFile()
 
 }
 
-
 QString CLLog::currFileName() const
 {
 	return m_base_name + ".log";
@@ -184,7 +177,7 @@ QString CLLog::backupFileName(quint8 num) const
 	QTextStream stream(&result);
 
 	char cnum[4];
-	sprintf(cnum, "%.3d", num);
+	sprintf_s(cnum, 4, "%.3d", num);
 
 	stream << m_base_name << cnum << ".log";
 	return result;

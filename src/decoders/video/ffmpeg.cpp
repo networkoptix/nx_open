@@ -4,14 +4,11 @@
 
 extern QMutex global_ffmpeg_mutex;
 
-
 #define LIGHT_CPU_MODE_FRAME_PERIOD 30
 bool CLFFmpegVideoDecoder::m_first_instance = true;
 int CLFFmpegVideoDecoder::hwcounter = 0;
 
-
 //================================================
-
 
 CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CLCodecType codec_id, AVCodecContext* codecContext):
 m_passedContext(codecContext),
@@ -48,7 +45,6 @@ m_lastWidth(0)
     openDecoder();
 }
 
-
 AVCodec* CLFFmpegVideoDecoder::findCodec(CLCodecType codecId)
 {
     AVCodec* codec = 0;
@@ -63,7 +59,6 @@ AVCodec* CLFFmpegVideoDecoder::findCodec(CLCodecType codecId)
         codec = avcodec_find_decoder(CODEC_ID_MPEG2VIDEO);
         break;
 
-
     case CL_MPEG4:
         codec = avcodec_find_decoder(CODEC_ID_MPEG4);
         break;
@@ -72,7 +67,6 @@ AVCodec* CLFFmpegVideoDecoder::findCodec(CLCodecType codecId)
         codec = avcodec_find_decoder(CODEC_ID_MSMPEG4V2);
         break;
 
-
     case CL_MSMPEG4V3:
         codec = avcodec_find_decoder(CODEC_ID_MSMPEG4V3);
         break;
@@ -80,8 +74,6 @@ AVCodec* CLFFmpegVideoDecoder::findCodec(CLCodecType codecId)
     case CL_MPEG1VIDEO:
         codec = avcodec_find_decoder(CODEC_ID_MPEG1VIDEO);
         break;
-
-
 
     case CL_H264:
         codec = avcodec_find_decoder(CODEC_ID_H264);
@@ -162,13 +154,12 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 	if (m_codec==0)
 		return false;
 
-	if (m_wantEscapeFromLightCPUMode && data.key_frame)
+	if (m_wantEscapeFromLightCPUMode && data.keyFrame)
 	{
 		m_wantEscapeFromLightCPUMode = false;
 		m_lightModeFrameCounter = 0;
 		m_lightCPUMode = false;
 	}
-
 
 	if (m_lightCPUMode)
 	{
@@ -183,16 +174,14 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 			else
 				m_lightModeFrameCounter = 0;
 
-
 		}
 		else // h.264
 		{
-			if (!data.key_frame)
+			if (!data.keyFrame)
 				return false;
 		}
 	}
 
-	
 	/*
 	if ((data.!=m_width)||(height!=m_height))
 	{
@@ -203,7 +192,7 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 	/**/
 
 	/*
-	
+
 	FILE * f = fopen("test.264_", "ab");
 	fwrite(data.inbuf,1,data.buff_len,f);
 	fclose(f);
@@ -212,7 +201,6 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 	QString filename = "frame";
 	filename+=QString::number(fn);
 	filename+=".264";
-
 
 	FILE * f2 = fopen(filename.toLatin1(), "wb");
 	fwrite(data.inbuf,1,data.buff_len,f2);
@@ -223,8 +211,6 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 
     // XXX: DEBUG
 
-
-    
     bool needResetCodec = false;
 
     //if (m_lastWidth != 0 && m_lastWidth != data.width)
@@ -245,7 +231,7 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
     }
 
     // XXX Debug
-    if(needResetCodec && !data.key_frame)
+    if(needResetCodec && !data.keyFrame)
     {
         DebugBreak();
     }
@@ -257,10 +243,9 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
     }
 
 	int got_picture = 0;
-	avcodec_decode_video(c, picture, &got_picture,(unsigned char*)data.inbuf, data.buff_len);
-	if (data.use_twice)
-		avcodec_decode_video(c, picture, &got_picture,(unsigned char*)data.inbuf, data.buff_len);
-
+	avcodec_decode_video(c, picture, &got_picture,(unsigned char*)data.inBuffer, data.bufferLength);
+	if (data.useTwice)
+		avcodec_decode_video(c, picture, &got_picture,(unsigned char*)data.inBuffer, data.bufferLength);
 
 	if (got_picture )
 	{
@@ -281,46 +266,41 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 			c->debug_mv = 0;
 		}
 
-
 		//if (m_showmotion)
 		//	ff_print_debug_info((MpegEncContext*)(c->priv_data), picture);
 
-		data.out_frame.width = c->width;
-		data.out_frame.height = c->height;
+		data.outFrame.width = c->width;
+		data.outFrame.height = c->height;
 
-		data.out_frame.C1 = picture->data[0];
-		data.out_frame.C2 = picture->data[1];
-		data.out_frame.C3 = picture->data[2];
+		data.outFrame.C1 = picture->data[0];
+		data.outFrame.C2 = picture->data[1];
+		data.outFrame.C3 = picture->data[2];
 
-		data.out_frame.stride1 = picture->linesize[0];
-		data.out_frame.stride2 = picture->linesize[1];
-		data.out_frame.stride3 = picture->linesize[2];
-
+		data.outFrame.stride1 = picture->linesize[0];
+		data.outFrame.stride2 = picture->linesize[1];
+		data.outFrame.stride3 = picture->linesize[2];
 
 		switch (c->pix_fmt)
 		{
 		case PIX_FMT_YUVJ422P:
-			data.out_frame.out_type = CL_DECODER_YUV422;
+			data.outFrame.out_type = CL_DECODER_YUV422;
 			break;
 		case PIX_FMT_YUVJ444P:
-			data.out_frame.out_type = CL_DECODER_YUV444;
+			data.outFrame.out_type = CL_DECODER_YUV444;
 			break;
 		case PIX_FMT_YUV420P:
-			data.out_frame.out_type = CL_DECODER_YUV420;
+			data.outFrame.out_type = CL_DECODER_YUV420;
 			break;
 		case PIX_FMT_UYVY422: //// must be romoved; just coz using all decoders witn new header
-			data.out_frame.out_type = CL_DECODER_YUV444;
+			data.outFrame.out_type = CL_DECODER_YUV444;
 			break;
-
 
 		case PIX_FMT_XVMC_MPEG2_IDCT: // must be romoved; just coz using all decoders witn new header
-			data.out_frame.out_type = CL_DECODER_YUV422;
+			data.outFrame.out_type = CL_DECODER_YUV422;
 			break;
 
-
-
 		default:
-			data.out_frame.out_type = CL_DECODER_YUV420;
+			data.outFrame.out_type = CL_DECODER_YUV420;
 			break;
 		}
 
@@ -337,11 +317,8 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 
 		/**/
 
-
 		return false;
 	}
-
-
 
 }
 

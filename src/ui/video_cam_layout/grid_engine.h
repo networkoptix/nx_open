@@ -1,8 +1,6 @@
 #ifndef grid_engine_h1754
 #define grid_engine_h1754
 
-
-
 class CLAbstractSceneItem;
 class CLDeviceVideoLayout;
 class LayoutContent;
@@ -12,8 +10,6 @@ struct CLIdealItemPos
 	CLAbstractSceneItem* item;
 	QPoint pos;
 };
-
-
 
 struct CLGridSettings
 {
@@ -41,8 +37,6 @@ struct CLGridSettings
 		return slot_height*item_distance/2;
 	}
 
-
-
 	int left;
 	int top;
 
@@ -58,7 +52,6 @@ struct CLGridSettings
 
 	QList<CLAbstractSceneItem*>* items;
 };
-
 
 class CLGridEngine
 {
@@ -81,13 +74,11 @@ public:
 	// means that at least one item can be added 
 	bool isSpaceAvalable() const;
 
-
 	// returns grid rect in scene coordinates 
 	QRect getGridRect() const;
 
 	// returns grid rect in terms of slots 
 	QRect gridSlotRect() const;
-
 
 	QList<CLIdealItemPos> calcArrangedPos() const;
 
@@ -100,7 +91,6 @@ public:
 	// returns adjusted pos for this item
 	QPoint adjustedPosForItem(CLAbstractSceneItem* item) const;//+
 
-
 	// returns adjusted pos for this item if item will be putted on this slot
 	QPoint adjustedPosForSlot(CLAbstractSceneItem* item, int slot_x, int slot_y) const ;//+
 
@@ -109,7 +99,6 @@ public:
 	// return wnd on the center of the lay out;
 	// returns 0 if there is no wnd at all
 	CLAbstractSceneItem*  getCenterWnd() const;
-
 
 	CLAbstractSceneItem* getNextLeftItem(const CLAbstractSceneItem* curr) const;
 	CLAbstractSceneItem* getNextRightItem(const CLAbstractSceneItem* curr) const;
@@ -123,7 +112,6 @@ public:
 	// returns true if can be dropped inside empty slot(s); if slot is busy function returns false. this function complete getItemToSwapWith
 	bool canBeDropedHere(CLAbstractSceneItem* item) const;
 
-
 private:
 	CLAbstractSceneItem* next_item_helper(const CLAbstractSceneItem* curr, int dir_c, int dir_f) const;
 	int next_item_helper_get_quarter(const QPointF& current, const QPointF& other) const;
@@ -133,22 +121,17 @@ private:
 	CLAbstractSceneItem* getVeryTopItem() const;
 	CLAbstractSceneItem* getVeryBottomItem() const;
 
-
 	QPoint getMassCenter() const;
-
 
 	// returns slot pos for item
 	void getItemSlotPos(CLAbstractSceneItem* item, int& slot_x, int& slot_y) const;
 
-
 	// returns position of the slot 
 	QPoint slotPos(int slot_x, int slot_y) const;
-
 
 	// returns position item inside the slot( not arranged )
 	QPoint posFromSlot(int slot_x, int slot_y) const;
 	bool isSlotAvailable(int slot_x, int slot_y, QSize size, CLAbstractSceneItem* ignoreItem = 0) const;
-	
 
 	// how many slots window occupies 
 	int slotsW(int width) const;
@@ -158,14 +141,12 @@ private:
 	bool isSlotAvailable_helper(int slot_x, int slot_y, QSize size, QList<CLIdealItemPos>& arranged) const;
 	bool getNextAvailablePos_helper(QSize size, int &x, int &y, int current_grid_width, int current_grid_height, QList<CLIdealItemPos>& arranged) const;
 
-
 private:
 
 	CLGridSettings m_settings;
 
 	LayoutContent* m_scene_layout;
-	
-};
 
+};
 
 #endif //grid_engine_h1754

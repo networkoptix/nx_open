@@ -10,7 +10,6 @@ class CLAbstractSettingsWidget;
 class QGroupBox;
 class CLDeviceSettingsTab;
 
-
 class CLAbstractDeviceSettingsDlg : public QDialog
 {
 	Q_OBJECT
@@ -24,7 +23,6 @@ public:
 	void putWidget(CLAbstractSettingsWidget* wgt);
 	void putGroup(QGroupBox* group);
 
-
 public slots:
 	virtual void setParam(const QString& name, const CLValue& val);
 	virtual void onClose();
@@ -37,7 +35,6 @@ protected:
 	CLAbstractSettingsWidget* getWidgetByName(QString name) const;
 	QGroupBox* getGroupByName(QString name) const;
 	CLDeviceSettingsTab* tabByName(QString name) const;
-
 
     QList<CLAbstractSettingsWidget*> getWidgetsBygroup(QString group) const;
 protected:

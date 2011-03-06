@@ -40,20 +40,16 @@ m_normalView(0)
 	showFullScreen();
 }
 
-
-
 MainWnd::~MainWnd()
 {
 	destroyNavigator(m_normalView);
 	CLDeviceManager::instance().getDiveceSercher().wait();
 }
 
-
 void MainWnd::closeEvent ( QCloseEvent * event )
 {
 	destroyNavigator(m_normalView);
 }
-
 
 void MainWnd::destroyNavigator(CLLayoutNavigator*& nav)
 {

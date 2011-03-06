@@ -3,7 +3,6 @@
 #include "settings.h"
 #include "device_settings\style.h"
 
-
 QString UIgetText(QWidget* parent, const QString& title, const QString& labletext, const QString& deftext, bool& ok)
 {
 	QInputDialog dialog(parent);
@@ -11,7 +10,6 @@ QString UIgetText(QWidget* parent, const QString& title, const QString& labletex
 	dialog.setWindowOpacity(global_dlg_opacity);
 	QStyle *arthurStyle = new ArthurStyle();
 	dialog.setStyle(arthurStyle);
-
 
 	dialog.setWindowTitle(title);
 	dialog.setLabelText(labletext);

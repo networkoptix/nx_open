@@ -1,26 +1,22 @@
 #ifndef CL_ringbuffer_1842
 #define CL_ringbuffer_1842
 
-
 class CLRingBuffer : public QIODevice
 {
-
 public:
-	CLRingBuffer( unsigned int capacity, QObject* parent = 0);
+	CLRingBuffer(unsigned int capacity, QObject* parent = 0);
 	~CLRingBuffer();
 
 	qint64 readData(char *data, qint64 maxlen);
 	qint64 writeData(const char *data, qint64 len);
 
-    // reads data and puts it to IOdevice
-    qint64 readToIODevice(QIODevice* divce, qint64 maxlen);
-
+    /**
+      * Reads data and puts it to IOdevice
+      */
+    qint64 readToIODevice(QIODevice* device, qint64 maxlen);
 	qint64 bytesAvailable() const;
-
 	qint64 avalable_to_write() const;
-
 	void clear();
-
     unsigned int capacity() const;
 
 private:
@@ -31,8 +27,6 @@ private:
 	char* m_pr;
 
 	mutable QMutex m_mtx;
-
 };
-
 
 #endif //CL_ringbuffer_1842

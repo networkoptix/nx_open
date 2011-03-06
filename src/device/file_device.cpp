@@ -18,7 +18,6 @@ QString CLFileDevice::toString() const
 	return m_name;
 }
 
-
 CLStreamreader* CLFileDevice::getDeviceStreamConnection()
 {
 	return new CLSingleShotFileStreamreader(this);

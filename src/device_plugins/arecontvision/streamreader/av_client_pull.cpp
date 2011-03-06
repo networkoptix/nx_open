@@ -10,7 +10,6 @@ CLClientPullStreamreader(dev)
 
 	if (m_streamParam.exists("streamID"))
 		m_streamParam.get("streamID").value.value = (int)cl_get_random_val(1, 32000);
-	
 
 	//========this is due to bug in AV firmware;
 	// you cannot set up maxSensorWidth with HTTP. ( you can do it in tftp if you are really want to ). 
@@ -23,7 +22,6 @@ CLClientPullStreamreader(dev)
 		m_streamParam.get("image_right").value.value = right;
 	}
 
-
 	if (m_streamParam.exists("image_bottom"))
 	{
 		int bottom = m_streamParam.get("image_bottom").value.value;
@@ -34,12 +32,10 @@ CLClientPullStreamreader(dev)
 
 }
 
-
 CLAVClinetPullStreamReader::~CLAVClinetPullStreamReader()
 {
 
 }
-
 
 void CLAVClinetPullStreamReader::setQuality(StreamQuality q)
 {
@@ -48,26 +44,21 @@ void CLAVClinetPullStreamReader::setQuality(StreamQuality q)
 
 	setNeedKeyData();
 
-
 	CLParamList pl = getStreamParam();
 
 	switch(q)
 	{
 	case CLSHighest:
 
-
 		if (pl.exists("resolution"))
 			pl.get("resolution").value.value = "full";
 		else
 			m_device->setParam_asynch("resolution", "full");
 
-
 		if (pl.exists("Quality"))
 			pl.get("Quality").value.value = "15";
 		else
 			m_device->setParam_asynch("Quality", "17"); // panoramic
-
-
 
 		break;
 
@@ -77,17 +68,13 @@ void CLAVClinetPullStreamReader::setQuality(StreamQuality q)
 			pl.get("resolution").value.value = "full";
 		else
 			m_device->setParam_asynch("resolution", "full");
-		
 
 		if (pl.exists("Quality"))
 			pl.get("Quality").value.value = "7";
 		else
 			m_device->setParam_asynch("Quality", "11"); // panoramic
 
-	
-
 		break;
-
 
 	case CLSNormal:
 
@@ -96,14 +83,12 @@ void CLAVClinetPullStreamReader::setQuality(StreamQuality q)
 		else
 			m_device->setParam_asynch("resolution", "half");
 
-
 		if (pl.exists("Quality"))
 			pl.get("Quality").value.value = "7";
 		else
 			m_device->setParam_asynch("Quality", "11");
 
 	    break;
-
 
 	case CLSLow:
 	case CLSLowest:
@@ -112,7 +97,6 @@ void CLAVClinetPullStreamReader::setQuality(StreamQuality q)
 			pl.get("resolution").value.value = "half";
 		else
 			m_device->setParam_asynch("resolution", "half");
-
 
 		if (pl.exists("Quality"))
 			pl.get("Quality").value.value = "6";
@@ -125,7 +109,6 @@ void CLAVClinetPullStreamReader::setQuality(StreamQuality q)
 	setNeedKeyData();
 
 	setStreamParams(pl);
-
 
 }
 

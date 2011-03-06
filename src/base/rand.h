@@ -3,7 +3,6 @@
 
 #include <time.h>
 
-
 static unsigned int cl_get_random_val(unsigned int minVal, unsigned int maxVal)
 {
 	static bool first = true;
@@ -14,7 +13,7 @@ static unsigned int cl_get_random_val(unsigned int minVal, unsigned int maxVal)
 	}
 
 	return minVal + rand()%(maxVal - minVal);
-	
+
 }
 
 #endif //cl_sleep_100

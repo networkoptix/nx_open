@@ -4,10 +4,8 @@
 #include "../../../network/nettools.h"
 #include "../../../network/ping.h"
 
-
 #include "av_singesensor.h"
 #include "av_panoramic.h"
-
 
 #define CL_BROAD_CAST_RETRY 3
 
@@ -22,10 +20,9 @@ CLHttpStatus CLAreconVisionDevice::getRegister(int page, int num, int& val)
 	http.setRequestLine(req);
 
 	CLHttpStatus result = http.openStream();
-	
+
 	if (result!=CL_HTTP_SUCCESS)
 		return result;
-
 
 	char c_response[200];
 	int result_size =  http.read(c_response,sizeof(c_response));
@@ -33,21 +30,17 @@ CLHttpStatus CLAreconVisionDevice::getRegister(int page, int num, int& val)
 	if (result_size <0)
 		return CL_HTTP_HOST_NOT_AVAILABLE;
 
-
 	QByteArray arr = QByteArray::fromRawData(c_response, result_size); // QByteArray  will not copy data
 
-		
-	
 	int index = arr.indexOf('=');
 	if (index==-1)
 		return CL_HTTP_HOST_NOT_AVAILABLE;
-
 
 	QByteArray cnum = arr.mid(index+1);
 	val = cnum.toInt();
 
 	return CL_HTTP_SUCCESS;
-	
+
 }
 
 CLStreamreader* CLAreconVisionDevice::getDeviceStreamConnection()
@@ -68,7 +61,6 @@ CLNetworkDevice* CLAreconVisionDevice::updateDevice()
 	if (!getParam("Model", model))
 		return 0;
 
-	
 	if (!getParam("ModelRelease", model_relase))
 		return 0;
 
@@ -84,7 +76,6 @@ CLNetworkDevice* CLAreconVisionDevice::updateDevice()
 			model = model_relase;
 	}
 
-	
 	CLNetworkDevice* result = deviceByID(model, atoi( QString(model).toLatin1().data() )); // atoi here coz av 8185dn returns "8185DN" string on the get?model request; and QString::toInt returns 0 on such str
 
 	if (!result)
@@ -102,7 +93,6 @@ CLNetworkDevice* CLAreconVisionDevice::updateDevice()
 
 	return result;
 }
-
 
 int CLAreconVisionDevice::getModel() const
 {
@@ -147,7 +137,6 @@ CLHttpStatus CLAreconVisionDevice::setRegister_asynch(int page, int num, int val
 		int m_val;
 	};
 
-
 	CLDeviceSetRegCommand *command = new CLDeviceSetRegCommand(this, page, num, val);
 	m_commanproc.putData(command);
 	command->releaseRef();
@@ -170,13 +159,12 @@ void CLAreconVisionDevice::onBeforeStart()
 
 }
 
-
 bool CLAreconVisionDevice::getParam(const QString& name, CLValue& val, bool resynch )
 {
 	if (!CLDevice::getParam(name, val, resynch)) // check if param exists
 		return false;
 
-	CLParamType& value = getDevicePramList().get(name).value;
+	CLParamType& value = getDeviceParamList().get(name).value;
 
 	if (value.synchronized && !resynch) // if synchronized and do not need to do resynch
 	{
@@ -206,23 +194,18 @@ bool CLAreconVisionDevice::getParam(const QString& name, CLValue& val, bool resy
 	if (connection.openStream()!=CL_HTTP_SUCCESS)
 		return false;
 
-
 	char c_response[200];
-
 
 	int result_size =  connection.read(c_response,sizeof(c_response));
 
 	if (result_size <0)
 		return false;
 
-
 	QByteArray response = QByteArray::fromRawData(c_response, result_size); // QByteArray  will not copy data
-
 
 	int index = response.indexOf('=');
 	if (index==-1)
 		return false;
-
 
 	QByteArray rarray = response.mid(index+1);
 
@@ -232,7 +215,6 @@ bool CLAreconVisionDevice::getParam(const QString& name, CLValue& val, bool resy
 	val = value.value;
 
 	return true;
-
 
 }
 
@@ -250,13 +232,10 @@ bool CLAreconVisionDevice::setParam(const QString& name, const CLValue& val )
 	if (setParam_special(name, val)) // try special first 
 		return true;
 
-	CLParamType& value = getDevicePramList().get(name).value;
+	CLParamType& value = getDeviceParamList().get(name).value;
 
 	//if (value.synchronized && value.value==val) // the same value
 	//	return true;
-
-
-
 
 	if (!value.setValue(val, false))
 	{
@@ -270,10 +249,7 @@ bool CLAreconVisionDevice::setParam(const QString& name, const CLValue& val )
 		return true;
 	}
 
-
-
 	CLSimpleHTTPClient connection(getIP(), 80, getHttpTimeout(), getAuth());
-
 
 	QString request;
 
@@ -288,25 +264,21 @@ bool CLAreconVisionDevice::setParam(const QString& name, const CLValue& val )
 		if (connection.openStream()!=CL_HTTP_SUCCESS) // try twice.
 			return false;
 
-
-
 	value.setValue(val);
 	value.synchronized = true;
 
 	return true;
 }
 
-
 bool CLAreconVisionDevice::executeCommand(CLDeviceCommand* command)
 {
 	return true;
 }
 
-
 CLDeviceList CLAreconVisionDevice::findDevices()
 {
 	CLDeviceList result;
-	
+
 	QList<QHostAddress> ipaddrs = getAllIPv4Addresses();
 
 	CL_LOG(cl_logDEBUG1)
@@ -354,14 +326,13 @@ CLDeviceList CLAreconVisionDevice::findDevices()
 				quint16 senderPort;
 
 				sock.readDatagram(datagram.data(), datagram.size(),	&sender, &senderPort);
-				
+
 				if (senderPort!=69 || datagram.size() < 32) // minimum response size
 					continue;
 
 				const unsigned char* data = (unsigned char*)(datagram.data());
 				if (memcmp(data, "Arecont_Vision-AV2000", 21 )!=0)
 					continue; // this responde id not from arecont camera
-				
 
 				unsigned char mac[6];
 				memcpy(mac,data + 22,6);
@@ -370,16 +341,14 @@ CLDeviceList CLAreconVisionDevice::findDevices()
 				if (result.find(smac)!=result.end())
 					continue; // already found;
 
-
 				QString id = "AVUNKNOWN";
 				int model = 0;
-	
+
 				/*/
 				int shift = 32;
 
 				CLAreconVisionDevice* device = 0;
 
-				
 				if (datagram.size() > shift + 5)
 				{
 					model = (unsigned char)data[shift+2] * 256 + (unsigned char)data[shift+3]; //4
@@ -397,25 +366,21 @@ CLDeviceList CLAreconVisionDevice::findDevices()
 					// very old cam; in future need to request model seporatly 
 					device = new CLAreconVisionDevice(AVUNKNOWN);
 					device->setName("AVUNKNOWN");
-					
+
 				}
 				/**/
-
 
 				// in any case let's HTTP do it's job at very end of discovery 
 				CLAreconVisionDevice* device = new CLAreconVisionDevice(AVUNKNOWN);
 				device->setName("AVUNKNOWN");
 
-				
 				if (device==0)
 					continue;
 
 				device->setIP(sender, false);
 				device->setMAC(smac);
 				device->setUniqueId(smac);
-				
 
-				
 				CLDeviceStatus dh;
 				device->m_local_adssr = ipaddrs.at(i);
 				device->setStatus(dh);
@@ -428,9 +393,8 @@ CLDeviceList CLAreconVisionDevice::findDevices()
 
 		}
 
-
 	}
-	
+
 	return result;
 }
 
@@ -450,7 +414,6 @@ bool CLAreconVisionDevice::setIP(const QHostAddress& ip, bool net )
 
 		char data[256];
 
-
 		int shift = 22;
 		memcpy(data,basic_str.data(),shift);
 		MACsToByte(m_mac, (unsigned char*)data + shift); //memcpy(data + shift, mac, 6);
@@ -458,19 +421,16 @@ bool CLAreconVisionDevice::setIP(const QHostAddress& ip, bool net )
 		quint32 new_ip = htonl(ip.toIPv4Address());
 		memcpy(data + shift + 6, &new_ip,4);
 
-
 		sock.writeDatagram(data, shift + 10,QHostAddress::Broadcast, 69);
 		sock.writeDatagram(data, shift + 10,QHostAddress::Broadcast, 69);
 
 		removeARPrecord(ip);
 		removeARPrecord(getIP());
 
-
 		//
 		CLPing ping;
 		if (!ping.ping(ip.toString(), 2, ping_timeout)) // check if ip really changed 
 			return false; 
-		
 
 	}
 
@@ -517,10 +477,8 @@ bool CLAreconVisionDevice::loadDevicesParam(const QString& file_name, QString& e
 		node = node.nextSibling();
 	}
 
-
 	return true;
 }
-
 
 bool CLAreconVisionDevice::parseDevice(const QDomElement &device, QString& error)
 {
@@ -531,8 +489,6 @@ bool CLAreconVisionDevice::parseDevice(const QDomElement &device, QString& error
 	}
 
 	QString device_name = device.attribute("id");
-
-
 
 	LL::iterator it1 = static_device_list.find(device_name);
 	LL::iterator it2 = static_stream_list.find(device_name);
@@ -566,12 +522,10 @@ bool CLAreconVisionDevice::parseDevice(const QDomElement &device, QString& error
 			if (it2!=static_stream_list.end())
 				stream_param_list.inheritedFrom(it2.value());
 
-			
-			
 		}
-		
+
 	}
-	
+
 	//global_params 
 	QDomNode node = device.firstChild();
 	if (node.isNull())
@@ -581,7 +535,6 @@ bool CLAreconVisionDevice::parseDevice(const QDomElement &device, QString& error
 
 		return true; // just public make sence 
 	}
-
 
 	QDomElement element = node.toElement();
 
@@ -636,8 +589,6 @@ bool CLAreconVisionDevice::parseDevice(const QDomElement &device, QString& error
 		static_stream_list[device_name] = stream_param_list;
 	}
 
-
-
 	return true;
 }
 
@@ -650,7 +601,7 @@ bool CLAreconVisionDevice::parseParam(const QDomElement &element, QString& error
 	}
 
 	QString name = element.attribute("name");
-	
+
 	CLParam param = paramlist.exists(name) ? paramlist.get(name) : CLParam();
 	param.name = name;
 
@@ -685,7 +636,6 @@ bool CLAreconVisionDevice::parseParam(const QDomElement &element, QString& error
 		}
 	}
 
-	
 	if (element.hasAttribute("group"))
 		param.value.group = element.attribute("group");
 
@@ -713,7 +663,6 @@ bool CLAreconVisionDevice::parseParam(const QDomElement &element, QString& error
 	if (element.hasAttribute("ui"))
 		param.value.ui = element.attribute("ui").toInt();
 
-
 	if (element.hasAttribute("readonly"))
 	{
 		if (element.attribute("readonly")=="true")
@@ -721,8 +670,6 @@ bool CLAreconVisionDevice::parseParam(const QDomElement &element, QString& error
 		else
 			param.value.readonly = false;
 	}
-
-	
 
 	if (element.hasAttribute("values"))
 	{
@@ -750,15 +697,12 @@ bool CLAreconVisionDevice::parseParam(const QDomElement &element, QString& error
 
 	}
 
-
 	if (element.hasAttribute("value"))
 		param.value.value = element.attribute("value");
 	else
 		param.value.value = param.value.default_value;
 
-
 	paramlist.put(param);
-	
 
 	return true;
 }
@@ -772,13 +716,12 @@ CLAreconVisionDevice* CLAreconVisionDevice::deviceByID(QString id, int model)
 		cl_log.log("Unsupported device found(!!!): ", id, cl_logERROR);
 		return 0;
 	}
-	
+
 	if (isPanoramic(model))
 		return new  CLArecontPanoramicDevice(model);
 	else
 		return new CLArecontSingleSensorDevice(model);
 }
-
 
 bool CLAreconVisionDevice::getBaseInfo()
 {
@@ -802,12 +745,9 @@ QString CLAreconVisionDevice::toString() const
 {
 	QString result;
 
-	QString firmware = getDevicePramList().get("Firmware version").value.value;
-	QString hardware = getDevicePramList().get("Image engine").value.value;
-	QString net = getDevicePramList().get("Net version").value.value;
-
-
-	
+	QString firmware = getDeviceParamList().get("Firmware version").value.value;
+	QString hardware = getDeviceParamList().get("Image engine").value.value;
+	QString net = getDeviceParamList().get("Net version").value.value;
 
 	QTextStream t(&result);
 	t<< CLDevice::toString() <<" live fw=" << firmware << " hw=" << hardware << " net=" << net;

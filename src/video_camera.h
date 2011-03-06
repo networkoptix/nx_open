@@ -7,10 +7,8 @@ class VideoCamera : public CLVideoCamera
 {
 public:
 	VideoCamera(CLDevice* device, CLVideoWindowItem* videovindow);
-	
 
 	~VideoCamera();
 };
-
 
 #endif //video_camera_h_2021

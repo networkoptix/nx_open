@@ -26,11 +26,9 @@ protected:
 	QString text() const;
 protected:
 
-	
 	LayoutContent* mContent; //this item references to this content
 	mutable QMutex m_mutex;
 
 };
-
 
 #endif //recorder_item_h1421_h

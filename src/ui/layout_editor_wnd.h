@@ -1,7 +1,6 @@
 #ifndef layout_editor_wnd_h1223
 #define layout_editor_wnd_h1223
 
-
 class CLLayoutNavigator;
 class LayoutContent;
 
@@ -13,7 +12,6 @@ public:
 	CLLayoutEditorWnd(LayoutContent* contexttoEdit);
 	~CLLayoutEditorWnd();
 private:
-
 
 private slots:
 	void onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*);
@@ -30,6 +28,5 @@ private:
 };
 
 /**/
-
 
 #endif // layout_editor_wnd_h1223

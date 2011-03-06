@@ -15,33 +15,30 @@ public:
 protected:
 	virtual void processData(CLAbstractData* data);
 	virtual void endOfRun();
-	void onFirstdata(CLAbstractData* data);
+	void onFirstData(CLAbstractData* data);
 	void cleanup();
 
+	QString filenameData(int channel);
+	QString filenameDescription(int channel);
+	QString filenameHelper(int channel);
+	QString dirHelper();
 
-	QString filname_data(int channel);
-	QString filname_descr(int channel);
-	QString filname_helper(int channel);
-	QString dir_helper();
-
-	void flush_channel(int channel);
-	bool need_to_flush(int channel);
-	
+	void flushChannel(int channel);
+	bool needToFlush(int channel);
 
 protected:
-	CLDevice* mDevice;
+	CLDevice* m_device;
 
-	CLByteArray* mData[CL_MAX_CHANNELS];
-	CLByteArray* mDescr[CL_MAX_CHANNELS];
+	CLByteArray* m_data[CL_MAX_CHANNELS];
+	CLByteArray* m_description[CL_MAX_CHANNELS];
 
-	bool mFirsTime;
-	bool mGotKeyFrame[CL_MAX_CHANNELS];
+	bool m_firstTime;
+	bool m_gotKeyFrame[CL_MAX_CHANNELS];
 
-	FILE* mDataFile[CL_MAX_CHANNELS];
-	FILE* mDescrFile[CL_MAX_CHANNELS];
+	FILE* m_dataFile[CL_MAX_CHANNELS];
+	FILE* m_descriptionFile[CL_MAX_CHANNELS];
 
-	unsigned int mVersion;
-
+	unsigned int m_version;
 };
 
 #endif //stream_recorder_h_15_14h

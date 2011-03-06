@@ -1,7 +1,6 @@
 #ifndef single_shot_file_reader_h_215
 #define single_shot_file_reader_h_215
 
-
 #include "single_shot_reader.h"
 
 struct CLAbstractMediaData;
@@ -15,11 +14,11 @@ class CLSingleShotFileStreamreader : public CLSingleShotStreamreader
 public:
 	CLSingleShotFileStreamreader(CLDevice* dev );
 	~CLSingleShotFileStreamreader(){stop();}
-	
+
 protected:
 	virtual CLAbstractMediaData* getData();
 private:
-	
+
 	QString m_fileName;
 
 };

@@ -1,6 +1,5 @@
 #include "view_drag_and_drop.h"
 
-
 #include "videoitem\abstract_scene_item.h"
 #include "videoitem\video_wnd_item.h"
 #include "camera\camera.h"
@@ -8,12 +7,11 @@
 #include "videoitem\recorder_item.h"
 #include "videoitem\layout_item.h"
 
-
 class QGraphicsItem;
 
 void items2DDstream(QList<QGraphicsItem*> itemslst, QDataStream& dataStream)
 {
-	
+
 	CLDragAndDropItems items;
 
 	foreach(QGraphicsItem* itm, itemslst)
@@ -40,10 +38,8 @@ void items2DDstream(QList<QGraphicsItem*> itemslst, QDataStream& dataStream)
 		}
 	}
 
-
 	dataStream << items.videodevices << items.recorders << items.layoutlinks;
 }
-
 
 void DDstream2items(QDataStream& dataStream, CLDragAndDropItems& items)
 {

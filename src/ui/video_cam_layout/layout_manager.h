@@ -1,7 +1,6 @@
 #ifndef layout_manager_h_2058
 #define layout_manager_h_2058
 
-
 class LayoutContent;
 
 class CLSceneLayoutManager
@@ -13,7 +12,6 @@ public:
 	static CLSceneLayoutManager& instance();
 
 	void save();
-
 
 	// start screen 
 	LayoutContent* startScreenLayoutContent();
@@ -30,11 +28,9 @@ public:
 	// returns layout with recorders 
 	LayoutContent* getAllRecordersContent();
 
-
 	// returns layout with recorders and top level custom layouts
 	LayoutContent* getAllLayoutsContent();
 
-	
 	// old one will be deleted 
 	// such layout mostly will be used for layout editor
 	LayoutContent* generateAllRecordersAndLayouts();
@@ -45,7 +41,6 @@ public:
 
 	// returns empty content. does not create new one. this content used for layout editor as start one 
 	LayoutContent* getEmptyLayoutContent();
-
 
 	LayoutContent* getSearchLayout();
 
@@ -59,7 +54,6 @@ private:
 	LayoutContent* mSearchLayout;
 
 	LayoutContent* mRecordersAndLayouts;
-	
 
 };
 

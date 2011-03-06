@@ -26,13 +26,10 @@ QAction cm_layout_editor_bgp("Change BackGround picture...",0);
 QAction cm_layout_editor_bgp_sz("Change BackGround picture size...",0);
 QAction cm_layout_editor_change_t("Change layout title...",0);
 
-
-
 QAction cm_rotate_90("90",0);
 QAction cm_rotate_0("0",0);
 QAction cm_rotate_minus90("-90",0);
 QAction cm_rotate_180("180",0);
-
 
 void initContextMenu()
 {

@@ -6,7 +6,6 @@ CLVideoWindowItem(0, 0, width, height)
 	m_videolayout = new CLDefaultDeviceVideoLayout();
 }
 
-
 LoupeWnd::~LoupeWnd()
 {
 	delete m_videolayout;

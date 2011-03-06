@@ -19,7 +19,6 @@ CLSimpleHTTPClient::~CLSimpleHTTPClient()
 
 }
 
-
 CLHttpStatus CLSimpleHTTPClient::getNextLine()
 {
 	m_line = "";
@@ -33,14 +32,11 @@ CLHttpStatus CLSimpleHTTPClient::getNextLine()
 		if (m_sock.recv(&curr,1)<0)
 			return CL_HTTP_HOST_NOT_AVAILABLE;
 
-		
-
 		if (prev=='\r' && curr == '\n')
 			break;
 
 		if (prev==0 && curr == 0 && readed>1)
 			break;
-
 
 		response << curr;
 		prev = curr;
@@ -56,7 +52,7 @@ CLHttpStatus CLSimpleHTTPClient::openStream()
 	try
 	{
 		m_sock.connect(m_host.toString().toLatin1().data(), m_port);
-		
+
 		QString request;
 		QTextStream os(&request);
 
@@ -74,17 +70,12 @@ CLHttpStatus CLSimpleHTTPClient::openStream()
 			os << base64 << "\r\n";
 		}
 
-
 		os<< "\r\n";
 
-		
 		m_sock.send(request.toLatin1().data(), request.toLatin1().size());
-
-
 
 		if (CL_HTTP_HOST_NOT_AVAILABLE==getNextLine())
 			return CL_HTTP_HOST_NOT_AVAILABLE;
-
 
 		if (!m_line.contains("200 OK"))// not ok
 		{
@@ -93,11 +84,8 @@ CLHttpStatus CLSimpleHTTPClient::openStream()
 			if (m_line.contains("401 Unauthorized"))
 				return CL_HTTP_AUTH_REQUIRED;
 
-
-
 			return CL_HTTP_HOST_NOT_AVAILABLE;
 		}
-
 
 		m_contentType = "";
 		m_contentLen = 0;
@@ -115,10 +103,9 @@ CLHttpStatus CLSimpleHTTPClient::openStream()
 			if (m_line.length()<3)// last line before data
 				break;
 
-
 			//Content-Type
 			//ContentLength
-			
+
 			pos  = m_line.indexOf(":");
 
 			if (pos>=0) 
@@ -130,10 +117,8 @@ CLHttpStatus CLSimpleHTTPClient::openStream()
 
 		}
 
-
 		m_connected = true;
 		return CL_HTTP_SUCCESS;
-
 
 	}
 	catch (...) 
@@ -141,7 +126,7 @@ CLHttpStatus CLSimpleHTTPClient::openStream()
 		m_connected = false;
 		return CL_HTTP_HOST_NOT_AVAILABLE;
 	}
-	
+
 }
 
 long CLSimpleHTTPClient::read(char* data, unsigned long max_len)
@@ -152,7 +137,6 @@ long CLSimpleHTTPClient::read(char* data, unsigned long max_len)
 	readed = m_sock.recv(data, max_len);
 	if (readed<=0)	
 		m_connected = false;
-
 
 	return readed;
 }

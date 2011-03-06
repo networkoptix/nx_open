@@ -1,15 +1,12 @@
 #ifndef cl_net_state_439
 #define cl_net_state_439
 
-
-
 struct CLSubNetState
 {
 	QHostAddress minHostAddress;
 	QHostAddress maxHostAddress;
 	QHostAddress currHostAddress;
 };
-
 
 class CLNetState
 {
@@ -33,7 +30,7 @@ public:
 
 	QString toString() const;
 private:	
-	
+
 	QList<QNetworkAddressEntry> m_net_entries;
 	StateMAP m_netstate; // net state for each subnet
 	//mutable QMutex m_mutex;

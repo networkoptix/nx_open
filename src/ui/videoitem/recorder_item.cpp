@@ -12,7 +12,6 @@ mContent(0)
 	createPaths(width()/3);
 }
 
-
 CLRecorderItem::~CLRecorderItem()
 {
 
@@ -25,12 +24,10 @@ void CLRecorderItem::setText(QString text)
 	needUpdate(true);
 }
 
-
 CLRecorderDisplay* CLRecorderItem::getRecorderDisplay() const
 {
 	return static_cast<CLRecorderDisplay*>(m_complicatedItem);
 }
-
 
 QString CLRecorderItem::text() const
 {
@@ -67,11 +64,9 @@ void CLRecorderItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 {
 	painter->fillPath(mShadowRectPath, global_shadow_color);
 
-
 	QColor border_color(20,20,160);
 	if (m_mouse_over)
 		border_color = QColor(20,20,190);
-
 
 	painter->fillPath(mRoundRectPath, border_color );
 
@@ -80,7 +75,6 @@ void CLRecorderItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 		btn_color = QColor(25,25,230);
 
 	painter->fillPath(mSmallRectPath, btn_color);
-
 
 	//painter->setPen(QPen(QColor(100,100,100,230),  1, Qt::SolidLine));
 	//painter->drawRect(boundingRect());
@@ -100,7 +94,6 @@ void CLRecorderItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 	else
 		painter->setPen(QColor(150, 150, 150));
 
-
 	painter->drawText((width() - rect.width())/2, border,
 		rect.width(), rect.height(),
 		Qt::AlignCenter | Qt::TextWordWrap, text());
@@ -109,6 +102,5 @@ void CLRecorderItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 	{
 		painter->fillPath(mRoundRectPath, m_can_be_droped ? global_can_be_droped_color :  global_selection_color );
 	}
-
 
 }

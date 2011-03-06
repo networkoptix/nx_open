@@ -25,7 +25,6 @@ int CLImageItem::height() const
 	return width()/aspectRatio();
 }
 
-
 int CLImageItem::width() const
 {
 	qreal ar = aspectRatio();
@@ -38,7 +37,6 @@ int CLImageItem::width() const
 	else 
 		return m_max_height*aspectRatio();
 }
-
 
 float CLImageItem::aspectRatio() const
 {
@@ -104,7 +102,6 @@ void CLImageItem::drawStuff(QPainter* painter)
 	}
 	//===================================
 
-
 	if (m_showing_text)
 	{
 		if (m_showinfotext || m_showimagesize)
@@ -115,7 +112,6 @@ void CLImageItem::drawStuff(QPainter* painter)
 
 	if (m_draw_rotation_helper)
 		drawRotationHelper(painter);
-
 
 }
 
@@ -129,8 +125,6 @@ void CLImageItem::drawInfoText(QPainter* painter)
 	//painter->setPen(QColor(255,0,0,220));
 	painter->setPen(QColor(30,55,255));
 
-
-
 	QFontMetrics fm(painter->font());
 
 	QString text;
@@ -141,7 +135,6 @@ void CLImageItem::drawInfoText(QPainter* painter)
 
 	if (m_showinfotext)
 		str << m_infoText;
-
 
 	painter->drawText(2,20 + fm.height()/2, text);
 	//painter->drawText(2,20 + 100, text);

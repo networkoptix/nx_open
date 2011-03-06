@@ -5,15 +5,12 @@
 #include "../network/netstate.h"
 #include "device.h"
 
-
-
 class CLNetworkDevice : public CLDevice
 {
-	
+
 public:
 
 	CLNetworkDevice();
-
 
 	QHostAddress getIP() const;
 
@@ -26,17 +23,16 @@ public:
 
 	QString getMAC() const;
 	void  setMAC(const QString& mac);
-	
+
 	void setAuth(const QString& user, QString password);
 	QAuthenticator getAuth() const;
 
 	// address used to discover this divece ( in case if machine has more than one NIC/address)
 	QHostAddress getDiscoveryAddr() const;
 	void setDiscoveryAddr(QHostAddress);
-	
+
 	// return true if device conflicting with smth else ( IP coflict )
 	bool conflicting();
-
 
 	virtual QString toString() const;
 
@@ -49,14 +45,10 @@ public:
 	// updateDevice requests the additional  information and return device with the same mac, ip but ready to use...
 	virtual CLNetworkDevice* updateDevice()  = 0;
 	//=============
-	
 
 protected:
 
-	
 	unsigned int getHttpTimeout() ;
-
-
 
 protected:
 
@@ -70,6 +62,5 @@ private:
 	mutable QMutex m_cs;
 
 };
-
 
 #endif // network_device_h_1249

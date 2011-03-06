@@ -4,7 +4,6 @@
 #include <string>            // For std::string
 #include <exception>         // For exception class
 
-
 /**
  *   Signals a problem with the execution of a socket call.
  */
@@ -238,7 +237,6 @@ private:
 /**
   *   UDP socket class
   */
-class sockaddr_in;
 class UDPSocket : public CommunicatingSocket {
 public:
   /**
@@ -298,7 +296,6 @@ public:
    */
   int recvFrom(void *buffer, int bufferLen, std::string &sourceAddress, 
                unsigned short &sourcePort) ;
-
 
   /**
    *   Set the multicast TTL

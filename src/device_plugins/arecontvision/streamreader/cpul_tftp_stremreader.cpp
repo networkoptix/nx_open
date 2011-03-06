@@ -4,7 +4,6 @@
 #include "../tools/AVJpegHeader.h"
 #include "../devices/av_device.h"
 
-
 //======================================================
 
 extern int create_sps_pps(
@@ -12,8 +11,6 @@ extern int create_sps_pps(
 				   int frameHeight,
 				   int deblock_filter,
 				   unsigned char* data, int max_datalen);
-
-
 
 AVLastPacketSize ExtractSize(const unsigned char* arr)
 {
@@ -26,7 +23,6 @@ AVLastPacketSize ExtractSize(const unsigned char* arr)
 	return size;
 }
 
-
 //=========================================================
 
 AVClientPullSSTFTPStreamreader::AVClientPullSSTFTPStreamreader (CLDevice* dev ):
@@ -34,12 +30,11 @@ CLAVClinetPullStreamReader(dev),
 m_black_white(false)
 {
 	CLAreconVisionDevice* device = static_cast<CLAreconVisionDevice*>(dev);
-	
+
 	m_model = device->getModel();
-	
-	
+
 	m_timeout = 500;
-	
+
 	m_last_width = 0;
 	m_last_height = 0;
 
@@ -47,8 +42,6 @@ m_black_white(false)
 	m_last_cam_height = 0;
 
 }
-
-
 
 CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 {
@@ -61,7 +54,6 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 	int top;
 	int right;
 	int bottom;
-
 
 	int width;
 	int height;
@@ -79,7 +71,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 			QMutexLocker mutex(&m_params_CS);
 
 			h264 = isH264();//false;
-			
+
 			/*
 			if (m_streamParam.exists("Codec")) // cam is not jpeg only
 			{
@@ -88,7 +80,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 					h264 = true;
 			}
 			/**/
-			
+
 			if (!m_streamParam.exists("Quality") || !m_streamParam.exists("resolution") || 
 				!m_streamParam.exists("image_left") || !m_streamParam.exists("image_top") ||
 				!m_streamParam.exists("image_right") || !m_streamParam.exists("image_bottom") ||
@@ -123,7 +115,6 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 			//right/=2;
 			//bottom/=2;
 
-
 			width = right - left;
 			height = bottom - top;
 
@@ -132,9 +123,6 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 
 			if (m_last_cam_height==0)
 				m_last_cam_height= height;
-
-
-
 
 			//quality = m_streamParam.get("Quality").value.value;
 			quality = getQuality();
@@ -156,7 +144,6 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 					setNeedKeyData();
 				}
 
-
 				streamID = m_streamParam.get("streamID").value.value;
 				//bitrate = m_streamParam.get("Bitrate").value.value;
 				bitrate = getBitrate();
@@ -167,8 +154,6 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 
 	if (h264)
 		quality=37-quality; // for H.264 it's not quality; it's qp 
-
-	
 
 	if (!h264)
 		os <<"image";
@@ -194,15 +179,12 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 	//h264?res=full;x0=0;y0=0;x1=1600;y1=1184;qp=27;doublescan=0;iframe=0;ssn=574;netasciiblksize1450
 	//image?res=full;x0=0;y0=0;x1=1600;y1=1184;quality=10;doublescan=0;ssn=4184;
 
-
-	
 	if (h264)
 	{
 		if (needKeyData())
 			os <<";iframe=1;";
 		else
 			os <<";iframe=0;";
-
 
 		//os <<"&iframe=" << *Ifarme;
 
@@ -212,14 +194,11 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 	/**/
 
 	forecast_size = resolutionFULL ? (width*height)/4  : (width*height)/8; // 0.25 meg per megapixel as maximum 
-			
-	
-	
+
 	CLSimpleTFTPClient tftp_client((static_cast<CLAreconVisionDevice*>(m_device))->getIP().toString().toLatin1().data(),  m_timeout, 3);
 
 	CLCompressedVideoData* videoData = new CLCompressedVideoData(CL_MEDIA_ALIGNMENT,forecast_size);
 	CLByteArray& img = videoData->data;
-
 
 	//==========================================
 	int expectable_header_size;
@@ -250,9 +229,9 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 	}
 
 	//==========================================
-	
+
 	int readed = tftp_client.read(request.toLatin1().data(), img);
-	
+
 	if (readed == 0) // cannot read data
 	{
 		//delete videoData;
@@ -293,8 +272,6 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 		m_black_white = last_packet[20];
 	}
 
-	
-
 	if (h264 && (lp_size < iframe_index))
 	{
 		cl_log.log("last packet is too short!", cl_logERROR);
@@ -303,9 +280,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 		return 0;
 	}
 
-
 	AVLastPacketSize size;
-	
 
 	if(AV3135 == m_model || AV3130 == m_model)
 	{
@@ -314,7 +289,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 	else
 	{
 		const unsigned char* arr = last_packet + 0x0C + 4 + 64;
-		
+
 		arr[0] & 4 ? resolutionFULL = true: false;
 		size = ExtractSize(&arr[2]);
 
@@ -329,12 +304,8 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 
 	}
 
-
-
 	m_last_cam_width = size.width;
 	m_last_cam_height = size.height;
-
-
 
 	videoData->keyFrame = true;
 	if (h264)
@@ -353,7 +324,6 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 		img.write(&c,1); //0x09
 		c = videoData->keyFrame ? 0x10 : 0x30; 
 		img.write(&c,1); // 0x10
-
 
 		//==========================================
 		char* dst = img.data();
@@ -385,7 +355,6 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 			dst+=expectable_header_size;
 		}
 		/**/
-		
 
 		// we also need to put very begining of SH
 		dst[0] = dst[1] = dst[2] = 0; dst[3] = 1;
@@ -394,7 +363,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 		img.prepareToWrite(8);
 		dst = img.data() + img.size();
 		dst[0] = dst[1] = dst[2] = dst[3] = dst[4] = dst[5] =  dst[6] = dst[7] = 0;
-		
+
 	}
 	else
 	{
@@ -405,16 +374,14 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 		AVJpeg::Header::GetHeader((unsigned char*)img.data(), size.width, size.height, quality,model.toLatin1().data());
 	}
 
-	
-	
 	videoData->compressionType = h264 ? CL_H264 : CL_JPEG;
 	videoData->width = size.width;
 	videoData->height = size.height;
 
-	videoData->channel_num = 0;
+	videoData->channelNumber = 0;
 
 	videoData->timestamp = QDateTime::currentMSecsSinceEpoch()*1000;
-	
+
 	return videoData;
 
 }
