@@ -120,7 +120,6 @@ void CLCamDisplay::jump()
 
 void CLCamDisplay::processData(CLAbstractData* data)
 {
-
 	CLCompressedVideoData *vd = 0;
 	CLCompressedAudioData *ad = 0;
 
@@ -204,7 +203,7 @@ void CLCamDisplay::processData(CLAbstractData* data)
 		if (haveAudio() && !m_audioDisplay->isBuffering())
 		{
             qint64 videoDuration;
-            qint64 diff = diffBetweenVideoandAudio(vd, channel, videoDuration);
+            qint64 diff = diffBetweenVideoAndAudio(vd, channel, videoDuration);
 
             //cl_log.log("diff = ", (int)diff/1000, cl_logALWAYS);
 
@@ -228,7 +227,7 @@ void CLCamDisplay::processData(CLAbstractData* data)
 
                 while(1)
                 {
-                    qint64 diff = diffBetweenVideoandAudio(incoming, channel, videoDuration);
+                    qint64 diff = diffBetweenVideoAndAudio(incoming, channel, videoDuration);
 
                     vd = nextInOutVideodata(incoming, channel);
                     incoming = 0;
@@ -331,7 +330,7 @@ void CLCamDisplay::clearVideoQueue()
 	}
 }
 
-qint64 CLCamDisplay::diffBetweenVideoandAudio(CLCompressedVideoData* incoming, int channel, qint64& duration) const
+qint64 CLCamDisplay::diffBetweenVideoAndAudio(CLCompressedVideoData* incoming, int channel, qint64& duration) const
 {
     qint64 currentPlayingAudioTime = m_lastAudioPacketTime - (quint64)m_audioDisplay->msInBuffer()*1000;
     qint64 currentPlayingVideoTime = nextVideoImageTime(incoming, channel);

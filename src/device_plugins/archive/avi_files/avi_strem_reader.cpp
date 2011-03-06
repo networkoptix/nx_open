@@ -97,9 +97,9 @@ bool CLAVIStreamReader::init()
 
 	switch(ffmpeg_video_codec_id)
 	{
-	//case CODEC_ID_MSVIDEO1: // crashes
-	//	m_videocodec_id =CL_MSVIDEO1;
-	//	break;
+	case CODEC_ID_MSVIDEO1:
+		m_videoCodecId = CL_MSVIDEO1;
+		break;
 
 	case CODEC_ID_MJPEG:
 		m_videoCodecId =CL_JPEG;
@@ -118,7 +118,7 @@ bool CLAVIStreamReader::init()
 		break;
 
 	//case CODEC_ID_MPEG1VIDEO:
-	//	m_videocodec_id = CL_MPEG1VIDEO;
+	//	m_videoCodecId = CL_MPEG1VIDEO;
 	//	break;
 
 	case CODEC_ID_MSMPEG4V2:

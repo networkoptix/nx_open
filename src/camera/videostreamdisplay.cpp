@@ -9,7 +9,12 @@ CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale)
       m_canDownscale(canDownscale),
       m_prevFactor(CLVideoDecoderOutput::factor_1),
       m_scaleFactor(CLVideoDecoderOutput::factor_1),
-      m_previousOnScreenSize(0,0)
+      m_previousOnScreenSize(0,0),
+	  m_scaleContext(0),
+	  m_frameYUV(0),
+	  m_buffer(0),
+	  m_outputWidth(0),
+	  m_outputHeight(0)
 {
 	for (int i = 0; i < CL_VARIOUSE_DECODERS;++i)
 		m_decoder[i] = 0;
@@ -19,6 +24,8 @@ CLVideoStreamDisplay::~CLVideoStreamDisplay()
 {
 	for (int i = 0; i < CL_VARIOUSE_DECODERS;++i)
 		delete m_decoder[i];
+
+	freeScaleContext();
 }
 
 void CLVideoStreamDisplay::setDrawer(CLAbstractRenderer* draw)
@@ -29,6 +36,35 @@ void CLVideoStreamDisplay::setDrawer(CLAbstractRenderer* draw)
 CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::getCurrentDownscaleFactor() const
 {
 	return m_scaleFactor;
+}
+
+void CLVideoStreamDisplay::allocScaleContext(const CLVideoDecoderOutput& outFrame)
+{
+	m_outputWidth = outFrame.width / m_scaleFactor;
+	m_outputHeight = outFrame.height / m_scaleFactor;
+
+	m_scaleContext = sws_getContext(outFrame.width, outFrame.height, PIX_FMT_RGB555LE,// img.outFrame.out_type,
+		m_outputWidth, m_outputHeight, PIX_FMT_YUV420P,
+		SWS_BICUBIC, NULL, NULL, NULL);
+
+	m_frameYUV = avcodec_alloc_frame();
+
+	int numBytes = avpicture_get_size(PIX_FMT_YUV420P, m_outputWidth, m_outputHeight);
+	m_outFrame.out_type = CL_DECODER_YUV420;
+
+	m_buffer = (uint8_t*)av_malloc(numBytes * sizeof(uint8_t));
+
+	avpicture_fill((AVPicture *)m_frameYUV, m_buffer, PIX_FMT_YUV420P, m_outputWidth, m_outputHeight);
+}
+
+void CLVideoStreamDisplay::freeScaleContext()
+{
+	if (m_scaleContext) {
+		sws_freeContext(m_scaleContext);
+		av_free(m_buffer);
+		av_free(m_frameYUV);
+        m_scaleContext = 0;
+	}
 }
 
 void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVideoDecoderOutput::downscale_factor force_factor)
@@ -110,13 +146,48 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 
 		//factor = CLVideoDecoderOutput::factor_1;
 
-		if (m_scaleFactor == CLVideoDecoderOutput::factor_1)
+		// XXX RGB555 hack. Need to refactor video processing code.
+		if (m_scaleFactor == CLVideoDecoderOutput::factor_1 && img.outFrame.out_type != CL_DECODER_RGB555LE)
 		{
 			m_draw->draw(img.outFrame, data->channelNumber);
 		}
 		else
 		{
-			CLVideoDecoderOutput::downscale(&img.outFrame, &m_outFrame, m_scaleFactor); // extra cpu work but less to display( for weak video cards )
+			if (img.outFrame.out_type == CL_DECODER_RGB555LE)
+			{
+				int newWidth = img.outFrame.width / m_scaleFactor;
+				int newHeight = img.outFrame.height / m_scaleFactor;
+
+				if (m_scaleContext != 0 && (m_outputWidth != newWidth || m_outputHeight != newHeight))
+				{
+					freeScaleContext();
+					allocScaleContext(img.outFrame);
+				} else if (m_scaleContext == 0)
+				{
+					allocScaleContext(img.outFrame);
+				}
+
+				const uint8_t* const srcSlice[] = {img.outFrame.C1, img.outFrame.C2, img.outFrame.C3};
+				int srcStride[] = {img.outFrame.stride1, img.outFrame.stride2, img.outFrame.stride3};
+
+				sws_scale(m_scaleContext,srcSlice, srcStride, 0, 
+					img.outFrame.height, 
+					m_frameYUV->data, m_frameYUV->linesize);
+
+				m_outFrame.width = m_outputWidth;
+				m_outFrame.height = m_outputHeight;
+
+				m_outFrame.C1 = m_frameYUV->data[0];
+				m_outFrame.C2 = m_frameYUV->data[1];
+				m_outFrame.C3 = m_frameYUV->data[2];
+
+				m_outFrame.stride1 = m_frameYUV->linesize[0];
+				m_outFrame.stride2 = m_frameYUV->linesize[1];
+				m_outFrame.stride3 = m_frameYUV->linesize[2];
+			} else 
+			{
+				CLVideoDecoderOutput::downscale(&img.outFrame, &m_outFrame, m_scaleFactor); // extra cpu work but less to display( for weak video cards )
+			}
 			m_draw->draw(m_outFrame, data->channelNumber);
 		}
 

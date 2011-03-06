@@ -3,7 +3,14 @@
 
 #include "data\mediadata.h"
 
-enum CLColorSpace{CL_DECODER_YUV420 = 0, CL_DECODER_YUV422 = 1, CL_DECODER_YUV444 = 2 , CL_DECODER_RGB24 = 3};
+enum CLColorSpace
+{
+	CL_DECODER_YUV420   = 0,
+	CL_DECODER_YUV422   = 1,
+	CL_DECODER_YUV444   = 2,
+	CL_DECODER_RGB24    = 3, 
+	CL_DECODER_RGB555LE = 4
+};
 
 struct CLVideoDecoderOutput
 {

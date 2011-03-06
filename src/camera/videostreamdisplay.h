@@ -39,6 +39,16 @@ private:
 	CLVideoDecoderOutput::downscale_factor m_prevFactor;
 	CLVideoDecoderOutput::downscale_factor m_scaleFactor;
 	QSize m_previousOnScreenSize;
+
+	AVFrame *m_frameYUV;
+	uint8_t* m_buffer;
+	SwsContext *m_scaleContext;
+	int m_outputWidth;
+	int m_outputHeight;
+
+private:
+	void allocScaleContext(const CLVideoDecoderOutput& outFrame);
+	void freeScaleContext();
 };
 
 #endif //videostreamdisplay_h_2044

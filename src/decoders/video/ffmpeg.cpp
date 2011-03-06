@@ -299,13 +299,16 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 			data.outFrame.out_type = CL_DECODER_YUV422;
 			break;
 
+		case PIX_FMT_RGB555LE:
+			data.outFrame.out_type = CL_DECODER_RGB555LE;
+			break;
+
 		default:
 			data.outFrame.out_type = CL_DECODER_YUV420;
 			break;
 		}
 
 		return true;
-
 	}
 	else
 	{

@@ -76,7 +76,6 @@ void CLVideoDecoderOutput::copyPlane(unsigned char* dst, const unsigned char* sr
 
 void CLVideoDecoderOutput::downscale(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst, downscale_factor factor)
 {
-
 	int src_width = src->width;
 	int src_height = src->height;
 
@@ -131,7 +130,6 @@ void CLVideoDecoderOutput::downscale(const CLVideoDecoderOutput* src, CLVideoDec
 		downscalePlate_factor8(dst->C2, src->C2, src_width/chroma_h_factor, src->stride2, src_yu_h);
 		downscalePlate_factor8(dst->C3, src->C3, src_width/chroma_h_factor, src->stride3, src_yu_h);
 	}
-
 }
 
 void CLVideoDecoderOutput::downscalePlate_factor2(unsigned char* dst, const unsigned char* src, int src_width, int src_stride, int src_height)

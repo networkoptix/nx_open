@@ -13,6 +13,7 @@ extern "C" {
 	#include <libavcodec/avcodec.h>
 	#include <libavformat/avformat.h>
     #include <libavcodec/dxva2.h>
+	#include <libswscale/swscale.h>
 };
 
 #if defined __cplusplus
