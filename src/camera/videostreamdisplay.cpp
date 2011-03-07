@@ -4,6 +4,32 @@
 #include "../data/mediadata.h"
 #include "abstractrenderer.h"
 
+PixelFormat pixelFormatFromColorSpace(CLColorSpace colorSpace)
+{
+	PixelFormat result;
+
+	switch(colorSpace)
+	{
+	case CL_DECODER_YUV422:
+		result = PIX_FMT_YUVJ422P;
+		break;
+	case CL_DECODER_YUV444:
+		result = PIX_FMT_YUVJ444P;
+		break;
+	case CL_DECODER_YUV420:
+		result = PIX_FMT_YUV420P;
+		break;
+	case CL_DECODER_RGB555LE:
+		result = PIX_FMT_RGB555LE;
+		break;
+	default:
+		result = PIX_FMT_YUV420P;
+		break;
+	}
+
+	return result;
+}
+
 CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale)
     : m_lightCPUmode(false),
       m_canDownscale(canDownscale),
@@ -43,9 +69,9 @@ void CLVideoStreamDisplay::allocScaleContext(const CLVideoDecoderOutput& outFram
 	m_outputWidth = outFrame.width / m_scaleFactor;
 	m_outputHeight = outFrame.height / m_scaleFactor;
 
-	m_scaleContext = sws_getContext(outFrame.width, outFrame.height, PIX_FMT_RGB555LE,// img.outFrame.out_type,
+	m_scaleContext = sws_getContext(outFrame.width, outFrame.height, pixelFormatFromColorSpace(outFrame.out_type),
 		m_outputWidth, m_outputHeight, PIX_FMT_YUV420P,
-		SWS_BICUBIC, NULL, NULL, NULL);
+		SWS_POINT, NULL, NULL, NULL);
 
 	m_frameYUV = avcodec_alloc_frame();
 
