@@ -17,6 +17,7 @@
 #include "ui/videoitem/layout_item.h"
 #include "layout_manager.h"
 #include "ui/videoitem/video_wnd_archive_item.h"
+#include "ui/videoitem/dynamic_image_item.h"
 
 const int  SLOT_WIDTH = 640*10;
 const int  SLOT_HEIGHT = SLOT_WIDTH*3/4;
@@ -707,7 +708,14 @@ void SceneLayout::loadContent()
 
 	foreach(LayoutImage* img, img_list)
 	{
-		CLStaticImageItem* item = new CLStaticImageItem(m_view, img->width(), img->height(), img->getImage(), img->getName());
+
+        CLImageItem* item = 0;
+
+        if (img->getImage().contains(".png"))
+		    item = new CLStaticImageItem(m_view, img->width(), img->height(), img->getImage(), img->getName());
+        else
+            item = new CLDynamicImageItem(m_view, img->width(), img->height(), img->getImage(), img->getName());
+
 		item->setOpacity(0.8);
 		addItem(item, img->getX(), img->getY());
 		added = true;

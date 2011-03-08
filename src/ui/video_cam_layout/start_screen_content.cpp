@@ -40,8 +40,11 @@ LayoutContent& startscreen_content()
 		//instance.addImage("./skin/startscreen/Control Room.png", "control" ,"","", logo_left + delta_w, SCENE_TOP, btn_width, btn_height);
 		//instance.addImage("./skin/startscreen/Achive.png","archive", "","",logo_left + delta_w, logo_top + logo_heih + item_distance - 500, btn_width, btn_height);
 
-		instance.addImage("./skin/startscreen/System.png", button_system, "","", btn_left, btn_top, btn_width, btn_height);
-		instance.addImage("./skin/startscreen/Layouts.png", button_layout , "","",btn2_left, btn_top, btn_width, btn_height);
+		//instance.addImage("./skin/startscreen/System.png", button_system, "","", btn_left, btn_top, btn_width, btn_height);
+        //instance.addImage("./skin/startscreen/Layouts.png", button_layout , "","",btn2_left, btn_top, btn_width, btn_height);
+
+        instance.addImage("./skin/try/dynamic_button", button_layout , "","",btn2_left, btn_top, btn_width, btn_height);
+        instance.addImage("./skin/try/dynamic_button", button_system, "","", btn_left, btn_top, btn_width, btn_height);
 
 		CLDeviceCriteria cr(CLDeviceCriteria::NONE);
 
