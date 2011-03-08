@@ -7,7 +7,7 @@
   * Note: to avoid situation than all data goes from buffered audio to qt buffer at one shot 
   * qt buffer size must be much smaller than buffered audio size
   */
-static const int QT_AUDIO_BUFFER_SIZE = 200;
+static const int QT_AUDIO_BUFFER_SIZE = 300;
 
 CLAudioDevice::CLAudioDevice(QAudioFormat format)
   : m_downmixing(false),
@@ -39,7 +39,7 @@ CLAudioDevice::CLAudioDevice(QAudioFormat format)
         m_audioOutput = new QAudioOutput(format);
         m_audioOutput->setBufferSize( bytesFromTime(format, QT_AUDIO_BUFFER_SIZE) );
 
-        m_ringBuffer = new CLRingBuffer( bytesFromTime(format, 1000) ); // I assume one packet will never contain more than one 700 ms of decompressed sound
+        m_ringBuffer = new CLRingBuffer( bytesFromTime(format, 1500) ); // I assume one packet will never contain more than one 700 ms of decompressed sound
 
         m_audioBuffer = m_audioOutput->start();
     }
@@ -71,7 +71,7 @@ bool CLAudioDevice::wantMoreData()
 
     //return (moreChunks>0);
 
-    return (m_ringBuffer->bytesAvailable() < m_ringBuffer->capacity()/4); // 7 is luky number
+    return (m_ringBuffer->bytesAvailable() < m_ringBuffer->capacity()/2); // 7 is luky number
 }
 
 void CLAudioDevice::write(const char* data, unsigned long size)
