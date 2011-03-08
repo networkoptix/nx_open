@@ -26,6 +26,7 @@ public:
 protected slots:
 	virtual void onSuggestions();
 	virtual void setParam(const QString& name, const CLValue& val);
+    virtual void onClose();
 private:
 
 	void initTabsOrder();

@@ -310,7 +310,6 @@ void AVSettingsDlg::setParam(const QString& name, const CLValue& val)
 {
 	CLAbstractDeviceSettingsDlg::setParam(name, val);
 	correctWgtsState();
-
 }
 
 void AVSettingsDlg::onSuggestions()
@@ -321,6 +320,12 @@ void AVSettingsDlg::onSuggestions()
 
 	mbox.exec();
 
+}
+
+void AVSettingsDlg::onClose()
+{
+    CLAbstractDeviceSettingsDlg::setParam("Save to flash", "");
+    CLAbstractDeviceSettingsDlg::close();
 }
 
 void AVSettingsDlg::correctWgtsState()
