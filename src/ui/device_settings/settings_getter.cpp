@@ -7,7 +7,7 @@ CLDeviceGetParamCommand::CLDeviceGetParamCommand(CLAbstractSettingsWidget* wgt):
 CLDeviceCommand(wgt->getDevice()),
 m_wgt(wgt)
 {
-    connect(this, SIGNAL(ongetvalue(CLValue)), m_wgt, SLOT(updateParam(CLValue)));// , Qt::BlockingQueuedConnection );
+    connect(this, SIGNAL(ongetvalue(QString)), m_wgt, SLOT(updateParam(QString)));// , Qt::BlockingQueuedConnection );
 }
 
 void CLDeviceGetParamCommand::execute()
@@ -15,7 +15,8 @@ void CLDeviceGetParamCommand::execute()
     QString name = m_wgt->param().name;
     CLValue val;  
     if (m_device->getParam(name, val, true))
-        emit ongetvalue(val);
-
-    CLSleep::msleep(100);
+    {
+        emit ongetvalue(QString(val));
+    }
+   
 }

@@ -210,12 +210,14 @@ void CLAbstractSceneItem::stop_animation()
 {
 	m_animationTransform.stopAnimation();
 
+    /*
     QList<QGraphicsItem *> childrenLst = childItems();
     foreach(QGraphicsItem * item, childrenLst)
     {
         CLAbstractSubItem* sub_item = static_cast<CLAbstractSubItem*>(item);
         sub_item->stopAnimation();
     }
+    /**/
 
 }
 
@@ -477,6 +479,7 @@ void CLAbstractSceneItem::stopSteadyAnimation()
 
 void CLAbstractSceneItem::goToSteadyMode(bool steady, bool instant)
 {
+    return;
     if (steady)
     {
         m_steadyMode = true;

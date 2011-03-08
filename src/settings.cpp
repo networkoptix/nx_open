@@ -2,7 +2,8 @@
 
 bool global_show_item_text = true;
 qreal global_rotation_angel = 0;
-QFont settings_font("Bodoni MT", 12);
+//QFont settings_font("Bodoni MT", 12);
+QFont settings_font;//("Bodoni MT", 12);
 
 QColor global_shadow_color(0, 0, 0, 128);
 

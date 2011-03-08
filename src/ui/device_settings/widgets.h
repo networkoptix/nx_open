@@ -2,6 +2,7 @@
 #define settings_widgets_h_1820
 
 #include "device\param.h"
+#include "base\log.h"
 class CLDevice;
 class QGroupBox;
 
@@ -38,10 +39,7 @@ signals:
 	void setParam(const QString& name, const CLValue& val);
 
 public slots:
-    virtual void updateParam(CLValue val)
-    {
-        //cl_log.log("updateParam", cl_logALWAYS);
-    }
+    virtual void updateParam(QString val) = 0;
 
 protected:
 	virtual void setParam_helper(const QString& name, const CLValue& val);
@@ -62,7 +60,7 @@ public:
 	~SettingsOnOffWidget();
 
 public slots:
-     void updateParam(CLValue val);
+     void updateParam(QString val);
 
 private slots:
 	void stateChanged (int state);
@@ -77,14 +75,14 @@ public:
 	SettingsMinMaxStepWidget(QObject* handler, CLDevice*dev, QString group, QString sub_group, QString paramname);
 
 public slots:
-    void updateParam(CLValue val);
+    void updateParam(QString val);
 
 private slots:
 	void onValChanged();
 	void onValChanged(int val);
 
 private:
-	SettingsSlider* slider;
+	SettingsSlider* m_slider;
 	QGroupBox* groupBox;
 };
 //==============================================
@@ -95,11 +93,14 @@ public:
 	SettingsEnumerationWidget(QObject* handler, CLDevice*dev, QString group, QString sub_group, QString paramname);
 
 public slots:
-    void updateParam(CLValue val);
+    void updateParam(QString val);
 
 private slots:
 	void onClicked();
-
+private:
+    QRadioButton* getBtnByname(const QString& name);
+private:
+    QList<QRadioButton*> m_radioBtns;
 };
 
 //==============================================
@@ -110,7 +111,7 @@ public:
 	SettingsButtonWidget(QObject* handler, CLDevice*dev, QString group, QString sub_group, QString paramname);
 
 public slots:
-     void updateParam(CLValue val);
+     void updateParam(QString val);
 
 private slots:
 		void onClicked();

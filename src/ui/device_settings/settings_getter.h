@@ -12,7 +12,7 @@ public:
     CLDeviceGetParamCommand(CLAbstractSettingsWidget* wgt);
     void execute();
 signals:
-    void ongetvalue(CLValue val);
+    void ongetvalue(QString val);
 private:
     CLAbstractSettingsWidget* m_wgt;
 };
