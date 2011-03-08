@@ -22,6 +22,7 @@
 #include "../src/corelib/animation/qpropertyanimation.h"
 #include "animation/group_animation.h"
 #include "videoitem/grid_item.h"
+#include "util.h"
 
 int doubl_clk_delay = qApp->doubleClickInterval()*0.75;
 int item_select_duration = 800;
@@ -2365,7 +2366,8 @@ void GraphicsView::contextMenuHelper_viewRecordedVideo(CLVideoCamera* cam)
 	cam->stopRecording();
 
 	QString id = cam->getDevice()->getUniqueId();
-	id = QString("./archive/") + id;
+	id = QString("/archive/") + id;
+    id = getDataDirectory() + id;
 
 	m_camLayout.addDevice(id, true);
 	fitInView(600, 100, CLAnimationTimeLine::SLOW_START_SLOW_END);

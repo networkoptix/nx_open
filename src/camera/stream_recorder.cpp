@@ -4,6 +4,7 @@
 #include "base\bytearray.h"
 #include "data\mediadata.h"
 #include "streamreader\streamreader.h"
+#include "util.h"
 
 #define FLUSH_SIZE (512*1024)
 
@@ -223,7 +224,7 @@ QString CLStreamRecorder::dirHelper()
 	QString str;
 	QTextStream stream(&str);
 
-	stream << "./archive/" << m_device->getUniqueId();
 
+	stream << getDataDirectory() <<"/archive/" << m_device->getUniqueId();
 	return str;
 }
