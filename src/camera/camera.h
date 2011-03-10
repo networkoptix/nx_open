@@ -45,6 +45,7 @@ public:
 	CLCamDisplay* getCamCamDisplay();
 
 	void setQuality(CLStreamreader::StreamQuality q, bool increase);
+	quint64 currentTime() const;
 
 private:
 	CLDevice* m_device;

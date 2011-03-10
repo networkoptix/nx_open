@@ -259,7 +259,7 @@ TCPSocket::TCPSocket()
     IPPROTO_TCP) {
 }
 
-TCPSocket::TCPSocket(const string &foreignAddress, unsigned short foreignPort)
+TCPSocket::TCPSocket(const std::string &foreignAddress, unsigned short foreignPort)
      : CommunicatingSocket(SOCK_STREAM, IPPROTO_TCP) {
   connect(foreignAddress, foreignPort);
 }
@@ -275,7 +275,7 @@ TCPServerSocket::TCPServerSocket(unsigned short localPort, int queueLen)
   setListen(queueLen);
 }
 
-TCPServerSocket::TCPServerSocket(const string &localAddress, 
+TCPServerSocket::TCPServerSocket(const std::string &localAddress, 
     unsigned short localPort, int queueLen) 
      : Socket(SOCK_STREAM, IPPROTO_TCP) {
   setLocalAddressAndPort(localAddress, localPort);
@@ -313,7 +313,7 @@ UDPSocket::UDPSocket(unsigned short localPort)   :
   m_destAddr = new sockaddr_in();
 }
 
-UDPSocket::UDPSocket(const string &localAddress, unsigned short localPort) 
+UDPSocket::UDPSocket(const std::string &localAddress, unsigned short localPort) 
       : CommunicatingSocket(SOCK_DGRAM, IPPROTO_UDP) {
   setLocalAddressAndPort(localAddress, localPort);
   setBroadcast();

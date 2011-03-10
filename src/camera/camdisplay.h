@@ -37,6 +37,8 @@ public:
     //I assume that first incoming frame after jump is keyframe
     void jump(); 
 
+	quint64 currentTime() const { return m_previousVideoDisplayedTime; }
+
 private:
 	bool haveAudio() const;
 
@@ -52,7 +54,6 @@ private:
 	void clearVideoQueue();
     void enqueueVideo(CLCompressedVideoData* vd);
     void afterJump(qint64 new_time);
-
 private:
 	QQueue<CLCompressedVideoData*> m_videoQueue[CL_MAX_CHANNELS];
 
@@ -77,6 +78,8 @@ private:
     bool m_afterJump;
 
     int m_displayLasts;
+
+    bool m_ignoringVideo;
 };
 
 #endif //clcam_display_h_1211

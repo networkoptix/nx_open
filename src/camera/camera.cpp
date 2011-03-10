@@ -42,6 +42,11 @@ CLVideoCamera::~CLVideoCamera()
 	delete[] m_stat;
 }
 
+quint64 CLVideoCamera::currentTime() const
+{
+    return m_camdispay.currentTime();
+}
+
 void CLVideoCamera::streamJump()
 {
     m_camdispay.jump();

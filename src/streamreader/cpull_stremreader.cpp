@@ -50,6 +50,7 @@ void CLClientPullStreamreader::run()
 			continue;
 		}
 
+
 		if (CLDevice::commandProchasSuchDeviceInQueue(m_device)) // if command processor has something in the queue for this device let it go first
 		{
 			CLSleep::msleep(5);

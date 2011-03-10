@@ -17,7 +17,8 @@ CLCamDisplay::CLCamDisplay()
       m_lastVideoPacketTime(0),
       m_hadAudio(false),
       m_afterJump(false),
-      m_displayLasts(0)
+      m_displayLasts(0),
+      m_ignoringVideo(false)
 {
 	for (int i = 0; i< CL_MAX_CHANNELS; ++i)
 		m_display[i] = 0;
@@ -95,7 +96,12 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
         QTime displayTime;
         displayTime.restart();
 
-        bool draw = sleep || (m_displayLasts * 1000 < needToSleep); // do not draw if computer is very slow and we still wanna sync with audio
+		if (vd->ignore)
+			cl_log.log("Ignoring frame ", (int)vd->timestamp, cl_logDEBUG1);
+		else
+			cl_log.log("Playing frame ", (int)vd->timestamp, cl_logDEBUG1);
+
+        bool draw = !vd->ignore && (sleep || (m_displayLasts * 1000 < needToSleep)); // do not draw if computer is very slow and we still wanna sync with audio
 
 		m_display[channel]->dispay(vd, draw, scaleFactor);
 
@@ -125,7 +131,10 @@ void CLCamDisplay::processData(CLAbstractData* data)
 
 	CLAbstractMediaData* md = static_cast<CLAbstractMediaData*>(data);
 	if (md->dataType == CLAbstractMediaData::VIDEO)
+    {
 		vd = static_cast<CLCompressedVideoData*>(data);
+        m_ignoringVideo = vd->ignore;
+    }
 	else if (md->dataType == CLAbstractMediaData::AUDIO)
 		ad = static_cast<CLCompressedAudioData*>(data);
 
@@ -186,7 +195,7 @@ void CLCamDisplay::processData(CLAbstractData* data)
 			if (!vd)
 				return; // impossible? incoming vd!=0
 
-			display(vd,true);
+			display(vd, !vd->ignore);
 			return;
 		}
 
@@ -237,7 +246,7 @@ void CLCamDisplay::processData(CLAbstractData* data)
 
                     bool lastFrameToDisplay = qAbs(diff) < 2 * videoDuration; //factor 2 here is to avoid frequent switch between normal play and fast play
 
-                    display(vd, lastFrameToDisplay);
+                    display(vd, lastFrameToDisplay && !vd->ignore);
 
                     if (!lastFrameToDisplay)
                     {
@@ -288,7 +297,7 @@ void CLCamDisplay::playAudio(bool play)
 
 bool CLCamDisplay::haveAudio() const
 {
-	return m_playAudio && m_hadAudio;
+	return (m_playAudio && m_hadAudio) && !m_ignoringVideo;
 }
 
 CLCompressedVideoData* CLCamDisplay::nextInOutVideodata(CLCompressedVideoData* incoming, int channel)

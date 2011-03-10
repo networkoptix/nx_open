@@ -217,12 +217,14 @@ void CLArchiveNavigatorItem::onResize()
 
 void CLArchiveNavigatorItem::onSliderMoved(int val)
 {
+    if (mReader->isSkippingFrames())
+        return;
+
 	qreal factor = (qreal)(val) / (mSlider->maximum() - mSlider->minimum());
 	quint64 time = mReader->lengthMksec() * factor;
 
-    mReader->jumpTo(time, true);
+    mReader->jumpToPreviousFrame(time, true);
     m_videoCamera->streamJump();
-
 }
 
 void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
@@ -276,17 +278,20 @@ void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
 		break;
 
 	case StepForwardSubItem:
-
 		mReader->resume();
 		mReader->resumeDataProcessors();
 		break;
 
 	case StepBackwardSubItem:
-		curr_time = mReader->currentTime();
-		mReader->jumpTo(curr_time - 100 * 1000, true);
-		//mReader->setdirection(true);
-        m_videoCamera->streamJump();
-		mReader->resumeDataProcessors();
+        if (!mReader->isSkippingFrames())
+        {
+            cl_log.log("StepBackwardSubItem", cl_logALWAYS);
+		    curr_time = m_videoCamera->currentTime();
+		    mReader->jumpToPreviousFrame(curr_time, true);
+		    //mReader->setdirection(true);
+            m_videoCamera->streamJump();
+		    mReader->resumeDataProcessors();
+        }
 
 		break;
 
@@ -296,7 +301,7 @@ void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
 
 }
 
-void CLArchiveNavigatorItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void CLArchiveNavigatorItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
 	painter->fillRect(boundingRect(),QColor(0, 0, 0));
 }
@@ -311,7 +316,16 @@ void CLArchiveNavigatorItem::updateSliderPos()
 	if (mSliderIsmoving)
 		return;
 
-	quint64 time = mReader->currentTime();
+	quint64 time;
+	if (mReader->isSkippingFrames())
+	{
+		time = mReader->currentTime();
+	} else
+	{
+		time = m_videoCamera->currentTime();
+	}
+
+	 
 	quint64 total = mReader->lengthMksec();
 
 	qreal scale = mSlider->maximum() - mSlider->minimum();

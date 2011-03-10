@@ -18,6 +18,7 @@ public:
 	bool isForwardDirection() const;
 
 	virtual quint64 currentTime() const = 0;
+	bool isSkippingFrames() const;
 
 	/**
       * @return length of archive in mksec
@@ -25,9 +26,12 @@ public:
 	quint64 lengthMksec() const;
 
 	virtual void jumpTo(quint64 mksec, bool makeshot);
+	void jumpToPreviousFrame(quint64 mksec, bool makeshot);
 
 protected:
 	virtual void channeljumpTo(quint64 mksec, int channel) = 0;
+    quint64 skipFramesToTime() const;
+    void setSkipFramesToTime(quint64 skipFramesToTime);
 
 protected:
 	quint64 m_lengthMksec;
@@ -39,6 +43,9 @@ protected:
 	mutable QMutex m_cs;
 
 	bool m_useTwice;
+
+private:
+	quint64 m_skipFramesToTime;
 };
 
 #endif //abstract_archive_stream_reader_h1907
