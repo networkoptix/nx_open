@@ -12,9 +12,9 @@ CLVideoWindowItem(view, layout, max_width, max_height, name)
 	m_archNavigatorHeight = 400 ;
 
 	mArchiveNavigator = new CLArchiveNavigatorItem(this, m_archNavigatorHeight);
-	onResize();
-
 	mArchiveNavigator->setVisible(false);
+    addSubItem(mArchiveNavigator);
+    onResize();
 }
 
 CLVideoWindowArchiveItem::~CLVideoWindowArchiveItem()
@@ -24,12 +24,10 @@ CLVideoWindowArchiveItem::~CLVideoWindowArchiveItem()
 
 QPointF CLVideoWindowArchiveItem::getBestSubItemPos(CLSubItemType type)
 {
-	QPointF result = CLVideoWindowItem::getBestSubItemPos(type);
-	if (result.x()>=-1000 || result.y()>=-1000)
-		return result;
+    if (type==ArchiveNavigatorSubItem)
+        return QPointF(0, height() - m_archNavigatorHeight);
 
-	if (type==ArchiveNavigatorSubItem)
-		return QPointF(0, height() - m_archNavigatorHeight);
+    return CLVideoWindowItem::getBestSubItemPos(type);
 }
 
 void CLVideoWindowArchiveItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)

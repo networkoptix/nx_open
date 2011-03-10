@@ -13,6 +13,9 @@ public:
 
 	~CLAbstractSubItemContainer();
 
+    QList<CLAbstractSubItem*> subItemList() const;
+
+    void addSubItem(CLAbstractSubItem *item);
 	bool addSubItem(CLSubItemType type);
 	virtual void removeSubItem(CLSubItemType type);
 	virtual QPointF getBestSubItemPos(CLSubItemType type);
@@ -32,7 +35,7 @@ protected slots:
 protected:
 
 	QList<QGraphicsItem*> m_eventtransperent_list;
-
+    QList<CLAbstractSubItem*> m_subItems;
 };
 
 #endif //abstract_sub_item_container_h1031

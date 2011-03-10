@@ -505,6 +505,8 @@ void GraphicsView::addjustAllStaticItems()
 
 void GraphicsView::addStaticItem(CLAbstractUnmovedItem* item, bool conn)
 {
+    Q_ASSERT(!m_staticItems.contains(item));
+
 	m_staticItems.push_back(item);
 
 	scene()->addItem(item);

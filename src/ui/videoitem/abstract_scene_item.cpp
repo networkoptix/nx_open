@@ -210,15 +210,11 @@ void CLAbstractSceneItem::stop_animation()
 {
 	m_animationTransform.stopAnimation();
 
-    /*
-    QList<QGraphicsItem *> childrenLst = childItems();
-    foreach(QGraphicsItem * item, childrenLst)
+    QList<CLAbstractSubItem*> childrenLst = subItemList();
+    foreach(CLAbstractSubItem* sub_item, childrenLst)
     {
-        CLAbstractSubItem* sub_item = static_cast<CLAbstractSubItem*>(item);
         sub_item->stopAnimation();
     }
-    /**/
-
 }
 
 void CLAbstractSceneItem::setFullScreen(bool full)
@@ -479,15 +475,13 @@ void CLAbstractSceneItem::stopSteadyAnimation()
 
 void CLAbstractSceneItem::goToSteadyMode(bool steady, bool instant)
 {
-    return;
     if (steady)
     {
         m_steadyMode = true;
 
-        QList<QGraphicsItem *> childrenLst = childItems();
-        foreach(QGraphicsItem * item, childrenLst)
+        QList<CLAbstractSubItem*> childrenLst = subItemList();
+        foreach(CLAbstractSubItem* sub_item, childrenLst)
         {
-            CLAbstractSubItem* sub_item = static_cast<CLAbstractSubItem*>(item);
             sub_item->hide(global_opacity_change_period*(!instant));
         }
 
@@ -510,10 +504,9 @@ void CLAbstractSceneItem::goToSteadyMode(bool steady, bool instant)
     }
 
     // escape steady mode
-    QList<QGraphicsItem *> childrenLst = childItems();
-    foreach(QGraphicsItem * item, childrenLst)
+    QList<CLAbstractSubItem*> childrenLst = subItemList();
+    foreach(CLAbstractSubItem* sub_item, childrenLst)
     {
-        CLAbstractSubItem* sub_item = static_cast<CLAbstractSubItem*>(item);
         sub_item->show(global_opacity_change_period*(!instant));
     }
 

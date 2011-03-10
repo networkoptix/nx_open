@@ -14,6 +14,16 @@ CLAbstractSubItemContainer::~CLAbstractSubItemContainer()
 
 }
 
+QList<CLAbstractSubItem*> CLAbstractSubItemContainer::subItemList() const
+{
+    return m_subItems;
+}
+
+void CLAbstractSubItemContainer::addSubItem(CLAbstractSubItem *item)
+{
+    m_subItems.push_back(item);
+}
+
 bool CLAbstractSubItemContainer::addSubItem(CLSubItemType type)
 {
 	QPointF pos = getBestSubItemPos(type);
@@ -38,15 +48,15 @@ bool CLAbstractSubItemContainer::addSubItem(CLSubItemType type)
 
 	item->setPos(pos);
 
+    addSubItem(item);
+
 	return true;
 }
 
 void CLAbstractSubItemContainer::removeSubItem(CLSubItemType type)
 {
-	QList<QGraphicsItem *> childrenLst = childItems();
-	foreach(QGraphicsItem * item, childrenLst)
+	foreach(CLAbstractSubItem* sub_item, m_subItems)
 	{
-		CLAbstractSubItem* sub_item = static_cast<CLAbstractSubItem*>(item);
 		if (sub_item->getType()==type)
 		{
 			scene()->removeItem(sub_item);
@@ -63,11 +73,13 @@ QPointF CLAbstractSubItemContainer::getBestSubItemPos(CLSubItemType /*type*/)
 
 void CLAbstractSubItemContainer::onResize()
 {
-	QList<QGraphicsItem *> childrenLst = childItems();
-	foreach(QGraphicsItem * item, childrenLst)
-	{
-		CLAbstractSubItem* sub_item = static_cast<CLAbstractSubItem*>(item);
+    foreach(CLAbstractSubItem* sub_item, m_subItems)	
+    {
 		QPointF pos = getBestSubItemPos(sub_item->getType());
+
+        if (sub_item->getType()==ArchiveNavigatorSubItem)
+            continue;
+        
 		sub_item->setPos(pos);
 		sub_item->onResize();
 	}
