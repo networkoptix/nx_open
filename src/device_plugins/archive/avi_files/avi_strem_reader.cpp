@@ -25,6 +25,10 @@ CLAVIStreamReader::CLAVIStreamReader(CLDevice* dev )
       m_currentPacketIndex(0),
       m_haveSavedPacket(false)
 {
+    // Should init packets here as some times destroy (av_free_packet) could be called before init
+    av_init_packet(&m_packets[0]);
+    av_init_packet(&m_packets[1]);
+
 	//init();
 }
 
