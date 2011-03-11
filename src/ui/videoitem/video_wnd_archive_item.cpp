@@ -54,32 +54,19 @@ void CLVideoWindowArchiveItem::setItemSelected(bool sel, bool animate, int delay
 
 void CLVideoWindowArchiveItem::setFullScreen(bool full)
 {
-	CLVideoWindowItem::setFullScreen(full);
 
 	if (full)
 	{
-		/*
-		mArchiveNavigator->setParentItem(0);
-		scene()->addItem(mArchiveNavigator);
-		mArchiveNavigator->onResize();
-		/**/
-
+        removeSubItem(mArchiveNavigator);
 		mArchiveNavigator->goToFullScreenMode(true);
-
-		//cl_log.log("setFullScreen TRUE", cl_logALWAYS);
 	}
 	else
 	{
-		/*
-		scene()->removeItem(mArchiveNavigator);
-		mArchiveNavigator->setParentItem(this);
-		mArchiveNavigator->onResize();
-		/**/
-
-		mArchiveNavigator->goToFullScreenMode(false);
-
-		//cl_log.log("setFullScreen FALSE", cl_logALWAYS);
+		addSubItem(mArchiveNavigator);
+        mArchiveNavigator->goToFullScreenMode(false);
 	}
+
+    CLVideoWindowItem::setFullScreen(full);
 
 }
 

@@ -222,7 +222,9 @@ void CLAbstractSceneItem::setFullScreen(bool full)
 	m_fullscreen = full;
 
     if (!m_fullscreen)
+    {
         goToSteadyMode(false, true);
+    }
 
 	if (m_fullscreen )
 		emit onFullScreen(this);

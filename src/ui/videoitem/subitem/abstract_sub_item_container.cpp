@@ -21,7 +21,13 @@ QList<CLAbstractSubItem*> CLAbstractSubItemContainer::subItemList() const
 
 void CLAbstractSubItemContainer::addSubItem(CLAbstractSubItem *item)
 {
-    m_subItems.push_back(item);
+    if (!m_subItems.contains(item))
+        m_subItems.push_back(item);
+}
+
+void CLAbstractSubItemContainer::removeSubItem(CLAbstractSubItem *item)
+{
+    m_subItems.removeOne(item);
 }
 
 bool CLAbstractSubItemContainer::addSubItem(CLSubItemType type)
@@ -76,10 +82,6 @@ void CLAbstractSubItemContainer::onResize()
     foreach(CLAbstractSubItem* sub_item, m_subItems)	
     {
 		QPointF pos = getBestSubItemPos(sub_item->getType());
-
-        if (sub_item->getType()==ArchiveNavigatorSubItem)
-            continue;
-        
 		sub_item->setPos(pos);
 		sub_item->onResize();
 	}

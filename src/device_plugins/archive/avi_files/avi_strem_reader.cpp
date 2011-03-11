@@ -4,6 +4,8 @@
 #include "data/mediadata.h"
 #include "stdint.h"
 
+QMutex avi_mutex;
+
 static qint64 packetTimestamp(AVStream* stream, const AVPacket& packet)
 {
 	double timeBase = av_q2d(stream->time_base);
@@ -293,7 +295,8 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 {
 	if (mFirstTime)
 	{
-		init();
+        QMutexLocker mutex(&avi_mutex); // speeds up concurrent reading of lots of files, if files not cashed yet 
+		init(); // this is here instead if constructor to unload ui thread 
 		mFirstTime = false;
 	}
 

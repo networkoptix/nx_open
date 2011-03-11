@@ -141,9 +141,9 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 		if (force_factor==CLVideoDecoderOutput::factor_any) // if nobody pushing lets peek it 
 		{
 			QSize on_screen = m_draw->sizeOnScreen(data->channelNumber);
-			if (on_screen.width()*8 <= img.outFrame.width  && on_screen.height()*8 <= img.outFrame.height)
-				m_scaleFactor = CLVideoDecoderOutput::factor_8;
-			else if (on_screen.width()*4 <= img.outFrame.width  && on_screen.height()*4 <= img.outFrame.height)
+			//if (on_screen.width()*8 <= img.outFrame.width  && on_screen.height()*8 <= img.outFrame.height) // never use 8 factor ( to low quality )
+			//	m_scaleFactor = CLVideoDecoderOutput::factor_8;
+			if (on_screen.width()*4 <= img.outFrame.width  && on_screen.height()*4 <= img.outFrame.height)
 				m_scaleFactor = CLVideoDecoderOutput::factor_4;
 			else if (on_screen.width()*2 <= img.outFrame.width  && on_screen.height()*2 <= img.outFrame.height)
 				m_scaleFactor = CLVideoDecoderOutput::factor_2;

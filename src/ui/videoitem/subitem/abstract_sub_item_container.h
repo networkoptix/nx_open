@@ -16,6 +16,8 @@ public:
     QList<CLAbstractSubItem*> subItemList() const;
 
     void addSubItem(CLAbstractSubItem *item);
+    void removeSubItem(CLAbstractSubItem *item);
+
 	bool addSubItem(CLSubItemType type);
 	virtual void removeSubItem(CLSubItemType type);
 	virtual QPointF getBestSubItemPos(CLSubItemType type);

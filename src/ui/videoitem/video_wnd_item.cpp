@@ -55,7 +55,7 @@ CLVideoCamera* CLVideoWindowItem::getVideoCam() const
 
 QSize CLVideoWindowItem::sizeOnScreen(unsigned int /*channel*/) const
 {
-	return onScreenSize() / m_videonum;
+	return QSize(onScreenSize().width() / m_videolayout->width(), onScreenSize().height() / m_videolayout->height());
 }
 
 bool CLVideoWindowItem::isZoomable() const

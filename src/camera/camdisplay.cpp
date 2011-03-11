@@ -96,17 +96,23 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
         QTime displayTime;
         displayTime.restart();
 
-		if (vd->ignore)
-			cl_log.log("Ignoring frame ", (int)vd->timestamp, cl_logDEBUG1);
-		else
-			cl_log.log("Playing frame ", (int)vd->timestamp, cl_logDEBUG1);
-
         bool draw = !vd->ignore && (sleep || (m_displayLasts * 1000 < needToSleep)); // do not draw if computer is very slow and we still wanna sync with audio
 
-		m_display[channel]->dispay(vd, draw, scaleFactor);
+        
+        CL_LOG(cl_logDEBUG1)
+        {
+            if (vd->ignore)
+                cl_log.log("Ignoring frame ", (int)vd->timestamp, cl_logDEBUG1);
+            else
+                cl_log.log("Playing frame ", (int)vd->timestamp, cl_logDEBUG1);
 
-        if (!draw)
-            cl_log.log("skip drawing frame!!", displayTime.elapsed(), cl_logDEBUG1);
+            if (!draw)
+                cl_log.log("skip drawing frame!!", displayTime.elapsed(), cl_logDEBUG1);
+
+        }
+        
+
+		m_display[channel]->dispay(vd, draw, scaleFactor);
 
         if (!sleep)
             m_displayLasts = displayTime.elapsed(); // this is how long would i take to draw frame.
