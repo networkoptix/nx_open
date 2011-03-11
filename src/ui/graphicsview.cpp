@@ -85,7 +85,11 @@ mSteadyShow(this)
 	m_camLayout.setView(this);
 	m_camLayout.setScene(&m_scene);
 
-	setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers))); //Antialiasing
+    QGLFormat glFormat(QGL::SampleBuffers);
+    glFormat.setSwapInterval(1); // vsync
+
+
+	setViewport(new QGLWidget(glFormat)); //Antialiasing
 	//setViewport(new QGLWidget());
 	setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform	| QPainter::TextAntialiasing); //Antialiasing
 
