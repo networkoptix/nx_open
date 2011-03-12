@@ -111,6 +111,11 @@ void CLArchiveStreamReader::init_data()
 quint64 CLArchiveStreamReader::currentTime() const
 {
 	QMutexLocker mutex(&m_cs);
+
+    quint64 jumpTime = skipFramesToTime();
+    if (jumpTime)
+        return jumpTime;
+
 	int slowe_channel = slowest_channel();
 	return mMovie[slowe_channel].at(mCurrIndex[slowe_channel]).time;
 }
@@ -123,7 +128,7 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
 		m_firsttime = false;
 	}
 
-	if (!isSingleShotMode())
+	if (!isSingleShotMode() && !isSkippingFrames())
 		m_adaptiveSleep.sleep(m_needToSleep);
 
 	// will return next channel ( if channel is finished it will not be selected
@@ -194,13 +199,17 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
 
 		int next_channel = slowest_channel();
 		qint64 next_time = mMovie[channel].at(mCurrIndex[next_channel]).time;
+        if (next_time < skipFramesToTime())
+            videoData->ignore = true;
+        else
+            setSkipFramesToTime(0);
 
 		m_needToSleep = labs(next_time - this_time);
 
 	}
 
 	//=================
-	if (isSingleShotMode())
+	if (isSingleShotMode() && !isSkippingFrames())
 		pause();
 
 	return videoData;

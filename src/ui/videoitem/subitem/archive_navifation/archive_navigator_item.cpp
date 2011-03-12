@@ -223,7 +223,11 @@ void CLArchiveNavigatorItem::onSliderMoved(int val)
 	qreal factor = (qreal)(val) / (mSlider->maximum() - mSlider->minimum());
 	quint64 time = mReader->lengthMksec() * factor;
 
-    mReader->jumpToPreviousFrame(time, true);
+    if (mSliderIsmoving)
+        mReader->jumpTo(time, true);
+    else
+        mReader->jumpToPreviousFrame(time, true);
+
     m_videoCamera->streamJump();
 }
 

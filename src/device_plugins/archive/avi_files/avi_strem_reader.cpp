@@ -106,6 +106,9 @@ bool CLAVIStreamReader::init()
 
 	m_lengthMksec = m_formatContext->duration;
 
+    if (m_formatContext->start_time != AV_NOPTS_VALUE)
+        m_startMksec = m_formatContext->start_time;
+
 	for(unsigned i = 0; i < m_formatContext->nb_streams; i++) 
 	{
 		AVStream *strm= m_formatContext->streams[i];
@@ -354,6 +357,8 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 		{
 			if (!m_haveSavedPacket)
 			{
+                QMutexLocker mutex(&m_cs);
+
                 if (!getNextVideoPacket())
                 {
                     // Some error or end of file. Stop reading frames.
@@ -407,6 +412,8 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 void CLAVIStreamReader::channeljumpTo(quint64 mksec, int /*channel*/)
 {
 	QMutexLocker mutex(&m_cs);
+
+    mksec += startMksec();
 
 	avformat_seek_file(m_formatContext, -1, 0, mksec, _I64_MAX, AVSEEK_FLAG_BACKWARD);
 

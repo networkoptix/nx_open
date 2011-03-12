@@ -24,6 +24,7 @@ public:
       * @return length of archive in mksec
       */
 	quint64 lengthMksec() const;
+    quint64 startMksec() const;
 
 	virtual void jumpTo(quint64 mksec, bool makeshot);
 	void jumpToPreviousFrame(quint64 mksec, bool makeshot);
@@ -35,6 +36,8 @@ protected:
 
 protected:
 	quint64 m_lengthMksec;
+    quint64 m_startMksec;
+
 	bool m_forward;
 	bool m_singleShot;
 	CLAdaptiveSleep m_adaptiveSleep;

@@ -5,6 +5,7 @@ CLAbstractArchiveReader::CLAbstractArchiveReader(CLDevice* dev )
       m_singleShot(false),
       m_forward(true),
       m_lengthMksec(0),
+      m_startMksec(0),
       m_needToSleep(0),
       m_cs(QMutex::Recursive),
       m_adaptiveSleep(20 * 1000),
@@ -48,6 +49,11 @@ quint64 CLAbstractArchiveReader::lengthMksec() const
 	return m_lengthMksec;
 }
 
+quint64 CLAbstractArchiveReader::startMksec() const
+{
+    return m_startMksec;
+}
+
 void CLAbstractArchiveReader::jumpTo(quint64 mksec, bool makeshot)
 {
  	QMutexLocker mutex(&m_cs);
@@ -63,9 +69,9 @@ void CLAbstractArchiveReader::jumpTo(quint64 mksec, bool makeshot)
 
 void CLAbstractArchiveReader::jumpToPreviousFrame(quint64 mksec, bool makeshot)
 {
-	jumpTo(mksec - 100 * 1000, makeshot);
-
     setSkipFramesToTime(mksec);
+
+	jumpTo(mksec - 100 * 1000, makeshot);
 }
 
 quint64 CLAbstractArchiveReader::skipFramesToTime() const
