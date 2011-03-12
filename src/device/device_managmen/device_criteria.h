@@ -4,7 +4,14 @@
 struct CLDeviceCriteria // later
 {
 public:
-	enum CriteriaType {ALL, NONE, FILTER};
+	enum CriteriaType 
+    {
+        ALL, // no filter 
+        NONE, // none device will meet criteria 
+        STATIC, // same as none, but already existing must not be deleted
+        FILTER // string filter or other 
+    };
+
 	CLDeviceCriteria(CriteriaType cr);
 
 	CriteriaType getCriteria() const;

@@ -1,7 +1,7 @@
 #include "layout_content.h"
 
 LayoutContent::LayoutContent():
-m_cr(CLDeviceCriteria::NONE),
+m_cr(CLDeviceCriteria::STATIC),
 mDecoration(0),
 m_recorder(false),
 m_editable(false),

@@ -136,11 +136,15 @@ void CLSerachEditItem::onTimer()
 	mTimer.stop();
 
 	CLDeviceCriteria cr = m_sceneContent->getDeviceCriteria();
-	cr.setCriteria(CLDeviceCriteria::FILTER);
-	cr.setFilter(m_lineEdit->text());
 
-	if (m_lineEdit->text().length()<4)
-		cr.setFilter("39827fjhkdjfhurw98r7029r");
+    if (m_lineEdit->text().length()>=4)
+    {
+        cr.setCriteria(CLDeviceCriteria::FILTER);
+        cr.setFilter(m_lineEdit->text());
+    }
+    else
+        cr.setCriteria(CLDeviceCriteria::NONE);
+		
 
 	m_sceneContent->setDeviceCriteria(cr);
 

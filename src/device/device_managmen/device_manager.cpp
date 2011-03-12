@@ -93,7 +93,7 @@ CLDeviceList CLDeviceManager::getDeviceList(CLDeviceCriteria& cr)
 {
 	CLDeviceList result;
 
-	if (cr.getCriteria() == CLDeviceCriteria::NONE)
+	if (cr.getCriteria() == CLDeviceCriteria::STATIC || cr.getCriteria() == CLDeviceCriteria::NONE )
 	{
 		return result; // empty
 	}
@@ -194,8 +194,12 @@ bool CLDeviceManager::isDeviceMeetCriteria(CLDeviceCriteria& cr, CLDevice* dev) 
 	if (dev==0)
 		return false;
 
-	if (cr.getCriteria()== CLDeviceCriteria::NONE)
+	if (cr.getCriteria()== CLDeviceCriteria::STATIC)
 		return false;
+
+    if (cr.getCriteria()== CLDeviceCriteria::NONE)
+        return false;
+
 
 	if (cr.getCriteria()== CLDeviceCriteria::ALL)
 	{

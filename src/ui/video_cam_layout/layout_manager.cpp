@@ -185,7 +185,7 @@ LayoutContent* CLSceneLayoutManager::generateAllRecordersAndLayouts()
 	delete mRecordersAndLayouts;
 
 	mRecordersAndLayouts = new LayoutContent();
-	CLDeviceCriteria cr(CLDeviceCriteria::NONE);
+	CLDeviceCriteria cr(CLDeviceCriteria::STATIC);
 	mRecordersAndLayouts->setDeviceCriteria(cr);
 
 	QList<LayoutContent*>& childrenlst1 = mAllCustomLayouts->childrenList();
@@ -208,7 +208,7 @@ LayoutContent* CLSceneLayoutManager::getNewEmptyLayoutContent(unsigned int flags
 	LayoutContent* cont = new LayoutContent();
 	cont->addDecorationFlag(LayoutContent::HomeButton | LayoutContent::BackGroundLogo | LayoutContent::MagnifyingGlass | LayoutContent::SquareLayout | LayoutContent::LongLayout | flags);
 
-	CLDeviceCriteria cr(CLDeviceCriteria::NONE);
+	CLDeviceCriteria cr(CLDeviceCriteria::STATIC);
 	cont->setDeviceCriteria(cr);
 
 	cont->setEditable(true);

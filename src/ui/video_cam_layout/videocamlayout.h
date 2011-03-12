@@ -114,6 +114,8 @@ private:
 
 	QList<CLAbstractComplicatedItem*> m_deviceitems; 
 
+    QList<QString> m_deletedIds; // list of deleted items from scene (search will not show such item again unless serach line is empty )
+
 	GraphicsView* m_view;
 	QGraphicsScene* m_scene;
 

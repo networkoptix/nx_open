@@ -46,7 +46,7 @@ LayoutContent& startscreen_content()
         instance.addImage("./skin/try/dynamic_button", button_layout , "","",btn2_left, btn_top, btn_width, btn_height);
         instance.addImage("./skin/try/dynamic_button", button_system, "","", btn_left, btn_top, btn_width, btn_height);
 
-		CLDeviceCriteria cr(CLDeviceCriteria::NONE);
+		CLDeviceCriteria cr(CLDeviceCriteria::STATIC);
 
 		CLRectAdjustment adj;
 		adj.x1 = 800;

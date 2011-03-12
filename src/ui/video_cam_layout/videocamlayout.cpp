@@ -132,6 +132,7 @@ void SceneLayout::start()
 
 void SceneLayout::stop_helper(bool emt)
 {
+    m_deletedIds.clear();
 
 	m_view->stopAnimation();
 
@@ -239,7 +240,13 @@ void SceneLayout::onTimer()
 	CLDeviceList all_devs =  CLDeviceManager::instance().getDeviceList(m_content->getDeviceCriteria());
 	bool added = false;
 
-	if (m_content->getDeviceCriteria().getCriteria() != CLDeviceCriteria::NONE)
+
+    if (m_content->getDeviceCriteria().getCriteria() == CLDeviceCriteria::NONE)
+    {
+        m_deletedIds.clear();
+    }
+
+	if (m_content->getDeviceCriteria().getCriteria() != CLDeviceCriteria::STATIC)
 	{
 			QList<CLAbstractComplicatedItem*> remove_lst;
 
@@ -362,6 +369,9 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect)
 		cl_log.log("Cannot support so many devices ", cl_logWARNING);
 		return false;
 	}
+
+    if (m_deletedIds.contains(device->getUniqueId()))
+        return false; // if this device was deleted before 
 
 	foreach(CLAbstractComplicatedItem* devitem, m_deviceitems)
 	{
@@ -610,6 +620,7 @@ void SceneLayout::onItemClose(CLAbstractSubItemContainer* itm)
 		devitem->beforestopDispay();
 		devitem->stopDispay();
 		CLDevice* dev =  devitem->getDevice();
+        m_deletedIds.push_back(dev->getUniqueId());
 		m_deviceitems.removeOne(devitem);
 		removeItem(item); // here device is used. ( bounding rect; layout );
 		delete devitem; // here dev and item might be used; can not delete item
