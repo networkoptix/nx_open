@@ -107,6 +107,7 @@ void CLAbstractSceneItem::setMaxSize(QSize size)
 {
 	m_max_width = size.width();
 	m_max_height = size.height();
+    onResize();
 }
 
 QSize CLAbstractSceneItem::getMaxSize() const
