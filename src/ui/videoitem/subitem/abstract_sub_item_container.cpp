@@ -65,8 +65,10 @@ void CLAbstractSubItemContainer::removeSubItem(CLSubItemType type)
 	{
 		if (sub_item->getType()==type)
 		{
+            removeSubItem(sub_item);
 			scene()->removeItem(sub_item);
 			delete sub_item;
+            break;
 		}
 
 	}
