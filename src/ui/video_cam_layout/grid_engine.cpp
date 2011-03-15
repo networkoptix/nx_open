@@ -226,9 +226,9 @@ bool CLGridEngine::getNextAvailablePos(QSize size, int &x_pos, int &y_pos) const
 	}
 
 	// first of all lets check if we can add item without changing grid aspect ratio 
-	for (int y = 0; y <= max_row_to_try - item_slots_height; ++y)
+	for (int y = 0; y <= current_grid_height - item_slots_height; ++y)
 	{
-		for (int x = 0; x <= max_column_to_try - item_slots_width; ++x)
+		for (int x = 0; x <= current_grid_width - item_slots_width; ++x)
 		{
 			if (!isSlotAvailable(x,y,size))
 				continue;
@@ -747,9 +747,9 @@ bool CLGridEngine::getNextAvailablePos_helper(QSize size, int &x_pos, int &y_pos
 	max_column_to_try = current_grid_width;
 
 	// first of all lets check if we can add item without changing grid aspect ratio 
-	for (int y = 0; y <= max_row_to_try - item_slots_height; ++y)
+	for (int y = 0; y <= current_grid_height - item_slots_height; ++y)
 	{
-		for (int x = 0; x <= max_column_to_try - item_slots_width; ++x)
+		for (int x = 0; x <= current_grid_width - item_slots_width; ++x)
 		{
 			if (!isSlotAvailable_helper(x,y,size, arranged))
 				continue;

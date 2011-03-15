@@ -89,7 +89,7 @@ protected slots:
 	void onTimer();
 	void onVideoTimer();
 
-	void onItemClose(CLAbstractSubItemContainer* item);
+	void onItemClose(CLAbstractSubItemContainer* item, bool addToremovedLst = true);
 
 	void stop_helper(bool emt = true);
 private:

@@ -44,6 +44,9 @@ protected:
 	QStringList subDirList(const QString& abspath) const;
 	void addArchiver(QString id);
 
+private:
+    bool match_subfilter(QString dec, QString fltr) const;
+
 protected slots:
 	void onTimer();
 protected:

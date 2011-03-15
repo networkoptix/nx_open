@@ -581,7 +581,7 @@ void SceneLayout::makeAllItemsSelectable(bool selectable)
 }
 
 //===============================================================
-void SceneLayout::onItemClose(CLAbstractSubItemContainer* itm)
+void SceneLayout::onItemClose(CLAbstractSubItemContainer* itm, bool addToremovedLst )
 {
 
 	CLAbstractSceneItem* item = static_cast<CLAbstractSceneItem*>(itm);
@@ -620,7 +620,10 @@ void SceneLayout::onItemClose(CLAbstractSubItemContainer* itm)
 		devitem->beforestopDispay();
 		devitem->stopDispay();
 		CLDevice* dev =  devitem->getDevice();
-        m_deletedIds.push_back(dev->getUniqueId());
+
+        if (addToremovedLst)  
+            m_deletedIds.push_back(dev->getUniqueId());
+
 		m_deviceitems.removeOne(devitem);
 		removeItem(item); // here device is used. ( bounding rect; layout );
 		delete devitem; // here dev and item might be used; can not delete item
@@ -653,7 +656,7 @@ bool SceneLayout::removeDevices(QList<CLAbstractComplicatedItem*> lst)
 
 	foreach(CLAbstractComplicatedItem* devitem, lst)
 	{
-		onItemClose(devitem->getSceneItem());
+		onItemClose(devitem->getSceneItem(), false);
 	}
 
 	return true;

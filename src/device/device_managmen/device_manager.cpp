@@ -215,14 +215,24 @@ bool CLDeviceManager::isDeviceMeetCriteria(CLDeviceCriteria& cr, CLDevice* dev) 
 
 	if (cr.getCriteria()== CLDeviceCriteria::FILTER)
 	{
-		QStringList serach_list = cr.filter().split(" ", QString::SkipEmptyParts);
-		QString dev_string = dev->toString();
+        if (cr.filter().length()==0)
+            return false;
 
-		foreach(QString str, serach_list)
-		{
-			if (!dev_string.contains(str, Qt::CaseInsensitive))
-				return false;
-		}
+
+        QString dev_string = dev->toString();
+
+        bool matches = false;
+
+
+        QStringList serach_list = cr.filter().split('+', QString::SkipEmptyParts);
+        foreach(QString sub_filter, serach_list)
+        {
+            if (sub_filter.length()>2)
+                matches = matches || match_subfilter(dev_string, sub_filter);
+        }
+
+
+        return matches;
 
 	}
 
@@ -261,4 +271,21 @@ void CLDeviceManager::addArchiver(QString id)
 void CLDeviceManager::setRootDir( QString rootDir )
 {
 	ms_RootDir = rootDir;
+}
+
+
+//=========================================
+
+bool CLDeviceManager::match_subfilter(QString dev, QString fltr) const
+{
+    QStringList serach_list = fltr.split(" ", QString::SkipEmptyParts);
+
+    foreach(QString str, serach_list)
+    {
+        if (!dev.contains(str, Qt::CaseInsensitive))
+            return false;
+    }
+
+    return (serach_list.count());
+
 }
