@@ -227,7 +227,7 @@ bool CLDeviceManager::isDeviceMeetCriteria(CLDeviceCriteria& cr, CLDevice* dev) 
         QStringList serach_list = cr.filter().split('+', QString::SkipEmptyParts);
         foreach(QString sub_filter, serach_list)
         {
-            if (sub_filter.length()>2)
+            if (serach_list.count()<2 || sub_filter.length()>2)
                 matches = matches || match_subfilter(dev_string, sub_filter);
         }
 
