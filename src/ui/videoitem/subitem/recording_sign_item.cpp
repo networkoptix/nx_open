@@ -3,7 +3,7 @@
 QTimer CLRecordingSignItem::mTimer;
 
 CLRecordingSignItem::CLRecordingSignItem(CLAbstractSubItemContainer* parent):
-CLImgSubItem(parent, "./skin/try/recording2.png", RecordingSubItem, 0.6, 0.6, 400, 400)
+CLImgSubItem(parent, ":/skin/try/recording2.png", RecordingSubItem, 0.6, 0.6, 400, 400)
 {
 	if (!mTimer.isActive()) // just for the first instance 
 	{

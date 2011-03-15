@@ -35,15 +35,15 @@ LayoutContent& startscreen_content()
 
 		int btn2_left = btn_left + logo_width - 9350;
 
-		instance.addImage("./skin/logo.png", button_logo, "","", logo_left - 600 , logo_top+200 , logo_width, logo_heih);
+		instance.addImage(":/skin/logo.png", button_logo, "","", logo_left - 600 , logo_top+200 , logo_width, logo_heih);
 
-		//instance.addImage("./skin/startscreen/Control Room.png", "control" ,"","", logo_left + delta_w, SCENE_TOP, btn_width, btn_height);
-		//instance.addImage("./skin/startscreen/Achive.png","archive", "","",logo_left + delta_w, logo_top + logo_heih + item_distance - 500, btn_width, btn_height);
+		//instance.addImage(":/skin/startscreen/control room.png", "control" ,"","", logo_left + delta_w, SCENE_TOP, btn_width, btn_height);
+		//instance.addImage(":/skin/startscreen/achive.png","archive", "","",logo_left + delta_w, logo_top + logo_heih + item_distance - 500, btn_width, btn_height);
 
-		//instance.addImage("./skin/startscreen/System.png", button_system, "","", btn_left, btn_top, btn_width, btn_height);
-        //instance.addImage("./skin/startscreen/Layouts.png", button_layout , "","",btn2_left, btn_top, btn_width, btn_height);
-        instance.addImage("./skin/try/dynamic_button", button_layout , "","",btn2_left, btn_top, btn_width, btn_height);
-        instance.addImage("./skin/try/dynamic_button", button_system, "","", btn_left, btn_top, btn_width, btn_height);
+		//instance.addImage(":/skin/startscreen/system.png", button_system, "","", btn_left, btn_top, btn_width, btn_height);
+        //instance.addImage(":/skin/startscreen/layouts.png", button_layout , "","",btn2_left, btn_top, btn_width, btn_height);
+        instance.addImage(":/skin/try/dynamic_button", button_layout , "","",btn2_left, btn_top, btn_width, btn_height);
+        instance.addImage(":/skin/try/dynamic_button", button_system, "","", btn_left, btn_top, btn_width, btn_height);
 
 		CLDeviceCriteria cr(CLDeviceCriteria::STATIC);
 

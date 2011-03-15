@@ -90,7 +90,6 @@
             </Component>
             <Component Id="FFmpegLibraries" Guid="AD81912C-85E7-4f23-9106-6CF2CA5A5993">
               <File Id="avcodecDll" Name="avcodec-52.dll" Source="../bin/avcodec-52.dll"/>
-              <File Id="avcoreDll" Name="avcore-0.dll" Source="../bin/avcore-0.dll"/>
               <File Id="avdeviceDll" Name="avdevice-52.dll" Source="../bin/avdevice-52.dll"/>
               <File Id="avfilterDll" Name="avfilter-1.dll" Source="../bin/avfilter-1.dll"/>
               <File Id="avformatDll" Name="avformat-52.dll" Source="../bin/avformat-52.dll"/>
@@ -145,7 +144,6 @@
       <ComponentRef Id='Settings'/>
       <ComponentRef Id='arecontvision'/>
       <ComponentRef Id='MediaFolderComponent'/>
-      <ComponentGroupRef Id='group_skin'/>
 
       <!-- Note: The following ComponentGroupRef is required to pull in generated authoring from project references. -->
       <!-- <ComponentGroupRef Id="Product.Generated" /> -->

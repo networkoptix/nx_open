@@ -118,7 +118,7 @@ mSteadyShow(this)
     //http://www.qtcentre.org/threads/24825-Does-qgraphicsscene-schedule-updates-in-a-separate-thread
     m_scene.setItemIndexMethod(QGraphicsScene::NoIndex);
 
-	//setBackgroundBrush(QPixmap("./skin/logo.png"));
+	//setBackgroundBrush(QPixmap(":/skin/logo.png"));
 	//m_scene.setItemIndexMethod(QGraphicsScene::NoIndex);
 
 	//setTransformationAnchor(QGraphicsView::NoAnchor);
@@ -442,7 +442,7 @@ void GraphicsView::initDecoration()
 
 	if (home)
 	{
-		item = new CLUnMovedPixtureButton(button_home, 0,  global_decoration_opacity, 1.0, "./skin/home.png", 100, 100, 255);
+        item = new CLUnMovedPixtureButton(button_home, 0,  global_decoration_opacity, 1.0, ":/skin/home.png", 100, 100, 255);
 		item->setStaticPos(QPoint(1,1));
 		addStaticItem(item);
 		top_left+= 105;
@@ -450,7 +450,7 @@ void GraphicsView::initDecoration()
 
 	if (level_up)
 	{
-		item = new CLUnMovedPixtureButton(button_level_up, 0,  global_decoration_opacity, 1.0, "./skin/up.png", 100, 100, 255);
+		item = new CLUnMovedPixtureButton(button_level_up, 0,  global_decoration_opacity, 1.0, ":/skin/up.png", 100, 100, 255);
 		item->setStaticPos(QPoint(top_left,1));
 		addStaticItem(item);
 		top_left+=100;
@@ -458,22 +458,22 @@ void GraphicsView::initDecoration()
 
 	if (cont->checkDecorationFlag(LayoutContent::BackGroundLogo))
 	{
-		item = new CLUnMovedPixture("background", 0, 0.03, 0.03, "./skin/logo.png", viewport()->width(), viewport()->height(), -100);
-        //item = new CLUnMovedPixture("background", 0, 0.03, 0.03, "./skin/logo", viewport()->width(), viewport()->height(), -100);
+		item = new CLUnMovedPixture("background", 0, 0.03, 0.03, ":/skin/logo.png", viewport()->width(), viewport()->height(), -100);
+        //item = new CLUnMovedPixture("background", 0, 0.03, 0.03, ":/skin/logo", viewport()->width(), viewport()->height(), -100);
 		item->setStaticPos(QPoint(1,1));
 		addStaticItem(item);
 	}
 
 	if (magnifyingGlass)
 	{
-		item = new CLUnMovedPixtureButton(button_magnifyingglass, 0,  0.4, 1.0, "./skin/try/Search.png", 100, 100, 255);
+		item = new CLUnMovedPixtureButton(button_magnifyingglass, 0,  0.4, 1.0, ":/skin/try/search.png", 100, 100, 255);
 		item->setStaticPos(QPoint(viewport()->width()/2 - 50,0));
 		addStaticItem(item);
 	}
 
 	if (square_layout)
 	{
-		item = new CLUnMovedPixtureButton(button_squarelayout, 0,  global_decoration_opacity, 1.0, "./skin/try/square_layout.png", 100, 100, 255);
+		item = new CLUnMovedPixtureButton(button_squarelayout, 0,  global_decoration_opacity, 1.0, ":/skin/try/square_layout.png", 100, 100, 255);
 		item->setStaticPos(QPoint(viewport()->width() - 220,1));
 		addStaticItem(item);
 		top_left+=110;
@@ -481,7 +481,7 @@ void GraphicsView::initDecoration()
 
 	if (long_layout)
 	{
-		item = new CLUnMovedPixtureButton(button_longlayout, 0,  global_decoration_opacity, 1.0, "./skin/try/long_layout.png", 100, 100, 255);
+		item = new CLUnMovedPixtureButton(button_longlayout, 0,  global_decoration_opacity, 1.0, ":/skin/try/long_layout.png", 100, 100, 255);
 		item->setStaticPos(QPoint(viewport()->width() - 110+1,1));
 		addStaticItem(item);
 	}
@@ -743,8 +743,8 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 
 			QDrag *drag = new QDrag(this);
 			drag->setMimeData(mimeData);
-			drag->setPixmap(cached("./skin/camera_dd_icon.png"));
-			//drag->setPixmap(cached("./skin/logo.png"));
+			drag->setPixmap(cached(":/skin/camera_dd_icon.png"));
+			//drag->setPixmap(cached(":/skin/logo.png"));
 
 			drag->exec(Qt::CopyAction);
 			m_scene.clearSelection();

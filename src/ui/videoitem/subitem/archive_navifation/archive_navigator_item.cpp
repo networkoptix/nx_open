@@ -22,8 +22,8 @@ mFullScreen(false)
 	mType = ArchiveNavigatorSubItem;
 
 	/*/
-	mPlayItem = new CLImgSubItem(this, "./skin/try/play2.png", CLAbstractSubItem::Play, 0.7, 1.0, m_height, m_height);
-	mPauseItem = new CLImgSubItem(this, "./skin/try/pause2.png", CLAbstractSubItem::Pause, 0.7, 1.0, m_height, m_height);
+	mPlayItem = new CLImgSubItem(this, ":/skin/try/play2.png", CLAbstractSubItem::Play, 0.7, 1.0, m_height, m_height);
+	mPauseItem = new CLImgSubItem(this, ":/skin/try/pause2.png", CLAbstractSubItem::Pause, 0.7, 1.0, m_height, m_height);
 	mPauseItem->setVisible(false);
 
 	mSlider_item = new QGraphicsProxyWidget(this);
@@ -47,17 +47,17 @@ mFullScreen(false)
 
 	/**/
 
-	mPlayItem = new CLImgSubItem(this, "./skin/try/play1.png", PlaySubItem, 0.7, 1.0, m_height, m_height);
-	mPauseItem = new CLImgSubItem(this, "./skin/try/pause1.png", PauseSubItem, 0.7, 1.0, m_height, m_height);
+	mPlayItem = new CLImgSubItem(this, ":/skin/try/play1.png", PlaySubItem, 0.7, 1.0, m_height, m_height);
+	mPauseItem = new CLImgSubItem(this, ":/skin/try/pause1.png", PauseSubItem, 0.7, 1.0, m_height, m_height);
 	mPlayItem->setVisible(false);
 
-	mRewindBackward = new CLImgSubItem(this, "./skin/try/player_rew.png", RewindBackwardSubItem, 0.7, 1.0, m_height, m_height);
-	mRewindForward = new CLImgSubItem(this, "./skin/try/player_fwd.png", RewindForwardSubItem, 0.7, 1.0, m_height, m_height);
+	mRewindBackward = new CLImgSubItem(this, ":/skin/try/player_rew.png", RewindBackwardSubItem, 0.7, 1.0, m_height, m_height);
+	mRewindForward = new CLImgSubItem(this, ":/skin/try/player_fwd.png", RewindForwardSubItem, 0.7, 1.0, m_height, m_height);
 
-	mStepForward = new CLImgSubItem(this, "./skin/try/player_end.png", StepForwardSubItem, 0.7, 1.0, m_height, m_height);
+	mStepForward = new CLImgSubItem(this, ":/skin/try/player_end.png", StepForwardSubItem, 0.7, 1.0, m_height, m_height);
 	mStepForward->setVisible(false);
 
-	mStepBackward = new CLImgSubItem(this, "./skin/try/player_start.png", StepBackwardSubItem, 0.7, 1.0, m_height, m_height);
+	mStepBackward = new CLImgSubItem(this, ":/skin/try/player_start.png", StepBackwardSubItem, 0.7, 1.0, m_height, m_height);
 	mStepBackward->setVisible(false);
 
 	/**/
