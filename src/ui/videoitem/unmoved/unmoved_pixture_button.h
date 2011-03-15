@@ -14,16 +14,30 @@ public:
 
 	void setMaxSize(int max_width, int max_height);
 
+    void setFps(int fps);
+
 	QSize getSize() const;
+
+protected slots:
+        void onTimer();
+
 
 protected:
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
 protected:
-	QPixmap m_img;
-	int m_width;
-	int m_height;
-	qreal m_opacity;
+
+    int m_width;
+    int m_height;
+    qreal m_opacity;
+
+
+    const QPixmap *m_CurrentImg;
+    QList<QPixmap> m_Images;
+    QTimer m_Timer;
+
+    int m_CurrentIndex;
+    bool m_forwardDirection;
 };
 
 //=============================================================================================

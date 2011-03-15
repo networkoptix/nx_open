@@ -459,6 +459,7 @@ void GraphicsView::initDecoration()
 	if (cont->checkDecorationFlag(LayoutContent::BackGroundLogo))
 	{
 		item = new CLUnMovedPixture("background", 0, 0.03, 0.03, "./skin/logo.png", viewport()->width(), viewport()->height(), -100);
+        //item = new CLUnMovedPixture("background", 0, 0.03, 0.03, "./skin/logo", viewport()->width(), viewport()->height(), -100);
 		item->setStaticPos(QPoint(1,1));
 		addStaticItem(item);
 	}

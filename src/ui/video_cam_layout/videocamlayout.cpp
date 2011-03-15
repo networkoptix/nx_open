@@ -9,7 +9,6 @@
 #include "device/device_managmen/device_manager.h"
 #include "video_camera.h"
 #include "base/log.h"
-#include "ui/videoitem/static_image_item.h"
 #include "ui/videoitem/custom_draw_button.h"
 #include "layout_content.h"
 #include "recorder/recorder_display.h"
@@ -17,7 +16,7 @@
 #include "ui/videoitem/layout_item.h"
 #include "layout_manager.h"
 #include "ui/videoitem/video_wnd_archive_item.h"
-#include "ui/videoitem/dynamic_image_item.h"
+#include "ui/videoitem/picture_image_item.h"
 
 const int  SLOT_WIDTH = 640*10;
 const int  SLOT_HEIGHT = SLOT_WIDTH*3/4;
@@ -724,12 +723,8 @@ void SceneLayout::loadContent()
 	{
 
         CLImageItem* item = 0;
-
-        if (img->getImage().contains(".png"))
-		    item = new CLStaticImageItem(m_view, img->width(), img->height(), img->getImage(), img->getName());
-        else
-            item = new CLDynamicImageItem(m_view, img->width(), img->height(), img->getImage(), img->getName());
-
+        
+        item = new CLPictureImageItem(m_view, img->width(), img->height(), img->getImage(), img->getName());
 		item->setOpacity(0.8);
 		addItem(item, img->getX(), img->getY());
 		added = true;
