@@ -32,7 +32,7 @@ public:
 protected:
 	virtual void channeljumpTo(quint64 mksec, int channel) = 0;
     quint64 skipFramesToTime() const;
-    void setSkipFramesToTime(quint64 skipFramesToTime);
+    virtual void setSkipFramesToTime(quint64 skipFramesToTime);
 
 protected:
 	quint64 m_lengthMksec;

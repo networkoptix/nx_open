@@ -73,6 +73,7 @@ private:
 	quint64 m_lastAudioPacketTime;
     quint64 m_lastVideoPacketTime;
 
+    quint64 m_previousVideoTime;
     quint64 m_previousVideoDisplayedTime;
 
     bool m_afterJump;

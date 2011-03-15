@@ -320,8 +320,13 @@ void CLArchiveNavigatorItem::updateSliderPos()
 	if (mSliderIsmoving)
 		return;
 
+    /*
+      If reader is skipping frames to time or is already not skipping, but the display
+      has not shown any frame - set slider to the position reader is waiting.
+      Otherwise use timestamp from display.
+     */
 	quint64 time;
-	if (mReader->isSkippingFrames())
+	if (mReader->isSkippingFrames() || m_videoCamera->currentTime() == 0)
 	{
 		time = mReader->currentTime();
 	} else
@@ -335,8 +340,6 @@ void CLArchiveNavigatorItem::updateSliderPos()
 	qreal scale = mSlider->maximum() - mSlider->minimum();
 
 	quint64 pos = (double)time * scale / total;
-
-	// cl_log.log("SLIDER: ", (int) mReader->currTime(), cl_logALWAYS);
 
 	mSlider->setValue(pos);
 

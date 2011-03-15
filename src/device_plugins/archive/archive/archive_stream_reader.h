@@ -52,6 +52,14 @@ protected:
 	QFile m_data_file[CL_MAX_CHANNELS];
 	QDataStream m_data_stream[CL_MAX_CHANNELS];
 
+protected:
+    void setSkipFramesToTime(quint64 skipFramesToTime);
+
+private:
+    bool m_skippedToTime[CL_MAX_CHANNELS];
+
+private:
+    bool isAllChannelsSkippedToTime() const;
 };
 
 #endif //archive_stream_reader_h1145

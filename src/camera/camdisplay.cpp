@@ -10,6 +10,7 @@
 
 CLCamDisplay::CLCamDisplay()
     : CLAbstractDataProcessor(CL_MAX_DISPLAY_QUEUE_SIZE),
+      m_previousVideoTime(0),
       m_previousVideoDisplayedTime(0),
       m_delay(100*1000), // do not put a big value here to avoid cpu usage in case of zoom out 
       m_playAudio(false),
@@ -66,9 +67,9 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
 	// in ideal world data comes to queue at the same speed as it goes out 
 	// but timer on the sender side runs at a bit different rate in comparison to the timer here
 	// adaptive delay will not solve all problems => need to minus little appendix based on queue size
-	qint32 needToSleep = currentTime - m_previousVideoDisplayedTime - (m_dataQueue.size()) * 2 * 1000;
+	qint32 needToSleep = currentTime - m_previousVideoTime - (m_dataQueue.size()) * 2 * 1000;
 
-	m_previousVideoDisplayedTime = currentTime;
+	m_previousVideoTime = currentTime;
 
 	//===== to avoid unrelated streams / stop play delays 
 	if (needToSleep < 0)
@@ -98,7 +99,10 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
 
         bool draw = !vd->ignore && (sleep || (m_displayLasts * 1000 < needToSleep)); // do not draw if computer is very slow and we still wanna sync with audio
 
-        
+        // If there are multiple channels for this timestamp use only one of them
+        if (channel == 0 && draw)
+            m_previousVideoDisplayedTime = currentTime;
+
         CL_LOG(cl_logDEBUG1)
         {
             if (vd->ignore)
@@ -352,7 +356,7 @@ qint64 CLCamDisplay::diffBetweenVideoAndAudio(CLCompressedVideoData* incoming, i
 
     // strongly saning this duration of prev frame; not exact, but I think its fine
     // let's assume this frame has same duration
-    duration = currentPlayingVideoTime - m_previousVideoDisplayedTime;
+    duration = currentPlayingVideoTime - m_previousVideoTime;
 
     // difference between video and audio
     return currentPlayingVideoTime - (currentPlayingAudioTime + 150*1000); // sorry for the magic number
@@ -371,7 +375,8 @@ void CLCamDisplay::afterJump(qint64 newTime)
     cl_log.log("after jump", cl_logWARNING);
 
     m_lastAudioPacketTime = newTime;
-    m_previousVideoDisplayedTime = newTime;
+    m_previousVideoTime = newTime;
+    m_previousVideoDisplayedTime = 0;
     clearVideoQueue();
     m_audioDisplay->clearAudioBuffer();
 }

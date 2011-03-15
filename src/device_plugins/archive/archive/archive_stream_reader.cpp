@@ -12,6 +12,7 @@ m_firsttime(true)
 	for (int channel = 0; channel < m_channel_number; ++channel)
 	{
 		mFinished[channel] = false;
+        m_skippedToTime[channel] = false;
 	}
 
 	init_data();
@@ -200,9 +201,16 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
 		int next_channel = slowest_channel();
 		qint64 next_time = mMovie[channel].at(mCurrIndex[next_channel]).time;
         if (next_time < skipFramesToTime())
+        {
             videoData->ignore = true;
+        }
         else
-            setSkipFramesToTime(0);
+        {
+            m_skippedToTime[channel] = true;
+
+            if (isAllChannelsSkippedToTime())
+                setSkipFramesToTime(0);
+        }
 
 		m_needToSleep = labs(next_time - this_time);
 
@@ -216,6 +224,16 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
 
 }
 
+bool CLArchiveStreamReader::isAllChannelsSkippedToTime() const
+{
+    for (int channel = 0; channel < m_channel_number; ++channel)
+    {
+        if (m_skippedToTime[channel] == false)
+            return false;
+    }
+
+    return true;
+}
 //================================================================
 
 bool CLArchiveStreamReader::reachedTheEnd() const
@@ -354,3 +372,12 @@ void CLArchiveStreamReader::parse_channel_data(int channel, int data_version, ch
 	}
 }
 
+void CLArchiveStreamReader::setSkipFramesToTime(quint64 skip)
+{
+    CLAbstractArchiveReader::setSkipFramesToTime(skip);
+
+    for (int channel = 0; channel < m_channel_number; ++channel)
+    {
+        m_skippedToTime[channel] = (skip == 0);
+    }
+}
