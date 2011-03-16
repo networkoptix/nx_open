@@ -25,3 +25,5 @@ print >> skin_qrc, """
 </qresource>
 </RCC>
 """
+
+skin_qrc.close()

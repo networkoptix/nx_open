@@ -287,10 +287,14 @@ void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
 		break;
 
 	case StepBackwardSubItem:
-        if (!mReader->isSkippingFrames())
+        if (!mReader->isSkippingFrames() && m_videoCamera->currentTime() != 0)
         {
-            cl_log.log("StepBackwardSubItem", cl_logALWAYS);
 		    curr_time = m_videoCamera->currentTime();
+            // cl_log.log("StepBackwardSubItem", int(curr_time/1000), cl_logALWAYS);
+
+            if (mReader->isSingleShotMode())
+                m_videoCamera->getCamCamDisplay()->playAudio(false);
+
 		    mReader->jumpToPreviousFrame(curr_time, true);
 		    //mReader->setdirection(true);
             m_videoCamera->streamJump();
