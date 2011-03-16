@@ -198,6 +198,7 @@ protected:
 	qreal m_old_distance;
 
 	bool mViewStarted;
+    bool mWheelZooming; // this var is to avoid wheel zooming scene center shifts. 
 
 	//====decoration======
 	QList<CLAbstractUnmovedItem*> m_staticItems;

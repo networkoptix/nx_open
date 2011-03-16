@@ -77,7 +77,8 @@ m_seachItem(0),
 m_min_scene_zoom(0.06),
 mShow(this),
 m_gridItem(0),
-mSteadyShow(this)
+mSteadyShow(this),
+mWheelZooming(false)
 {
 
 	setScene(&m_scene);
@@ -302,6 +303,15 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
     if (!getRealSceneRect().contains(unmoved_point))
     {
         unmoved_point = QPoint(0,0);
+    }
+
+    if (m_scenezoom.isRuning() && !mWheelZooming) // if zooming and not coz of wheel event 
+    {
+        unmoved_point = QPoint(0,0);
+    }
+    else
+    {
+        mWheelZooming = true;
     }
 
 	int numDegrees = e->delta() ;
@@ -1846,6 +1856,7 @@ void GraphicsView::onDecorationItemPressed(QString name)
 
 void GraphicsView::onScneZoomFinished()
 {
+    mWheelZooming = false;
 	emit scneZoomFinished();
 }
 

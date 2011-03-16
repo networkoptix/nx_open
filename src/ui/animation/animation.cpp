@@ -29,7 +29,7 @@ QObject* CLAnimation::object()
 
 bool CLAnimation::isRuning() const
 {
-	return (m_timeline.state() & QTimeLine::Running);
+	return ((m_timeline.state() & QTimeLine::Running) || m_delay_timer.isActive());
 }
 
 void CLAnimation::stopAnimation()
