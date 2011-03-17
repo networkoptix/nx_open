@@ -1,7 +1,7 @@
 #include "animated_show.h"
-#include "ui\videoitem\abstract_scene_item.h"
-#include "base\rand.h"
-#include "ui\graphicsview.h"
+#include "ui/videoitem/abstract_scene_item.h"
+#include "base/rand.h"
+#include "ui/graphicsview.h"
 
 Show_helper::Show_helper(GraphicsView* view):
 m_view(view),

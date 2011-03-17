@@ -1,7 +1,7 @@
 #include "archive_stream_reader.h"
-#include "device\device.h"
-#include "base\bytearray.h"
-#include "data\mediadata.h"
+#include "device/device.h"
+#include "base/bytearray.h"
+#include "data/mediadata.h"
 
 CLArchiveStreamReader::CLArchiveStreamReader(CLDevice* dev):
 CLAbstractArchiveReader(dev),

@@ -1,7 +1,7 @@
 #ifndef abstract_sub_item_h1031
 #define abstract_sub_item_h1031
 
-#include "..\unmoved\unmoved_interactive_opacity_item.h"
+#include "../unmoved/unmoved_interactive_opacity_item.h"
 
 class CLAbstractSceneItem;
 class CLAbstractSubItem;

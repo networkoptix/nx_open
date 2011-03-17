@@ -1,9 +1,9 @@
 #include "device_manager.h"
-#include "..\asynch_seacher.h"
-#include "..\directory_browser.h"
+#include "../asynch_seacher.h"
+#include "../directory_browser.h"
 #include "settings.h"
-#include "recorder\fake_recorder_device.h"
-#include "device_plugins\archive\archive\archive_device.h"
+#include "recorder/fake_recorder_device.h"
+#include "device_plugins/archive/archive/archive_device.h"
 
 // Init static variables
 CLDeviceManager* CLDeviceManager::m_Instance = 0;

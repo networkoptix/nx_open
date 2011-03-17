@@ -1,11 +1,11 @@
 #include "view_drag_and_drop.h"
 
-#include "videoitem\abstract_scene_item.h"
-#include "videoitem\video_wnd_item.h"
-#include "camera\camera.h"
-#include "device\device.h"
-#include "videoitem\recorder_item.h"
-#include "videoitem\layout_item.h"
+#include "videoitem/abstract_scene_item.h"
+#include "videoitem/video_wnd_item.h"
+#include "camera/camera.h"
+#include "device/device.h"
+#include "videoitem/recorder_item.h"
+#include "videoitem/layout_item.h"
 
 class QGraphicsItem;
 

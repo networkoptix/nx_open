@@ -1,7 +1,7 @@
 #ifndef archive_stream_reader_h1145
 #define archive_stream_reader_h1145
 
-#include "..\abstract_archive_stream_reader.h"
+#include "../abstract_archive_stream_reader.h"
 
 class CLArchiveStreamReader  : public CLAbstractArchiveReader 
 {

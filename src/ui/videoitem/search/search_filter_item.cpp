@@ -1,9 +1,9 @@
 #include "search_filter_item.h"
 
 #include "search_edit.h"
-#include "device\device_managmen\device_criteria.h"
-#include "ui\video_cam_layout\layout_content.h"
-#include "ui\graphicsview.h"
+#include "device/device_managmen/device_criteria.h"
+#include "ui/video_cam_layout/layout_content.h"
+#include "ui/graphicsview.h"
 #include <QModelIndex>
 
 CLSerachEditItem::CLSerachEditItem(GraphicsView* view, QWidget* parent, LayoutContent* sceneContent):

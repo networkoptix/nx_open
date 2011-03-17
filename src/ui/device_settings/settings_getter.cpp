@@ -1,7 +1,7 @@
 #include "settings_getter.h"
 #include "widgets.h"
-#include "device\device.h"
-#include "base\sleep.h"
+#include "device/device.h"
+#include "base/sleep.h"
 
 CLDeviceGetParamCommand::CLDeviceGetParamCommand(CLAbstractSettingsWidget* wgt):
 CLDeviceCommand(wgt->getDevice()),

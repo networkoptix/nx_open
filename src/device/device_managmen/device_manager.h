@@ -3,8 +3,8 @@
 
 // this class holds all devices in the system ( a least knows how to get the list )
 // it also can give list of devices based on some criteria
-#include "..\asynch_seacher.h"
-#include "..\device.h"
+#include "../asynch_seacher.h"
+#include "../device.h"
 #include "device_criteria.h"
 
 class CLDevice;

@@ -1,7 +1,7 @@
 #include "layout_navigator.h"
-#include "video_cam_layout\start_screen_content.h"
-#include "video_cam_layout\layout_manager.h"
-#include "camera\gl_renderer.h"
+#include "video_cam_layout/start_screen_content.h"
+#include "video_cam_layout/layout_manager.h"
+#include "camera/gl_renderer.h"
 
 extern QString start_screen;
 

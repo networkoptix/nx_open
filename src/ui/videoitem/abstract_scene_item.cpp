@@ -1,12 +1,12 @@
 #include "abstract_scene_item.h"
-#include "ui\graphicsview.h"
+#include "ui/graphicsview.h"
 #include "video_wnd_item.h"
 
 #include <math.h>
 #include "settings.h"
-#include "subitem\abstract_image_sub_item.h"
-#include "subitem\recording_sign_item.h"
-#include "base\log.h"
+#include "subitem/abstract_image_sub_item.h"
+#include "subitem/recording_sign_item.h"
+#include "base/log.h"
 
 static const double Pi = 3.14159265358979323846264338327950288419717;
 static double TwoPi = 2.0 * Pi;

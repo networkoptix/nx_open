@@ -1,7 +1,7 @@
 #ifndef audio_struct_h1530
 #define audio_struct_h1530
 
-#include "data\mediadata.h"
+#include "data/mediadata.h"
 
 class CLAlignedData;
 

@@ -1,7 +1,7 @@
 #ifndef avi_device_h_1827
 #define avi_device_h_1827
 
-#include "..\abstract_archive_device.h"
+#include "../abstract_archive_device.h"
 
 class CLAviDevice : public CLAbstractArchiveDevice
 {

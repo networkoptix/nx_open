@@ -1,5 +1,5 @@
 #include "avi_strem_reader.h"
-#include "device\device.h"
+#include "device/device.h"
 
 #include "data/mediadata.h"
 #include "stdint.h"

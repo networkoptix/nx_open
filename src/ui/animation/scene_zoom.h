@@ -2,7 +2,7 @@
 #define scene_zoom_h1907
 
 #include "animation.h"
-#include "streamreader\streamreader.h"
+#include "streamreader/streamreader.h"
 
 class GraphicsView;
 

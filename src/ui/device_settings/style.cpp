@@ -1,5 +1,5 @@
 #include "style.h"
-#include "base\log.h"
+#include "base/log.h"
 
 QPixmap cached(const QString &img)
 {

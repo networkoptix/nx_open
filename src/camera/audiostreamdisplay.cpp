@@ -1,9 +1,9 @@
 #include "audiostreamdisplay.h"
-#include "decoders\audio\audio_struct.h"
-#include "base\log.h"
-#include "decoders\audio\abstractaudiodecoder.h"
-#include "base\sleep.h"
-#include "streamreader\streamreader.h"
+#include "decoders/audio/audio_struct.h"
+#include "base/log.h"
+#include "decoders/audio/abstractaudiodecoder.h"
+#include "base/sleep.h"
+#include "streamreader/streamreader.h"
 #include "audio_device.h"
 
 #define DEFAULT_AUDIO_FRAME_SIZE (AVCODEC_MAX_AUDIO_FRAME_SIZE*2)

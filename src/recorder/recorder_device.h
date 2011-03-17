@@ -1,7 +1,7 @@
 #ifndef recorder_device_h
 #define recorder_device_h
 
-#include "device\network_device.h"
+#include "device/network_device.h"
 
 class CLRecorderDevice : public CLNetworkDevice
 {

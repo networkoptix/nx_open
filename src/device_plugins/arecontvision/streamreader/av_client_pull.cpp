@@ -1,7 +1,7 @@
 #include "av_client_pull.h"
-#include "streamreader\streamreader.h"
-#include "device\device.h"
-#include "base\rand.h"
+#include "streamreader/streamreader.h"
+#include "device/device.h"
+#include "base/rand.h"
 
 CLAVClinetPullStreamReader::CLAVClinetPullStreamReader(CLDevice* dev ):
 CLClientPullStreamreader(dev)

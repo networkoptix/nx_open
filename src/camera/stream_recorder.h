@@ -1,8 +1,8 @@
 #ifndef stream_recorder_h_15_14h
 #define stream_recorder_h_15_14h
 
-#include "data\dataprocessor.h"
-#include "device\device_video_layout.h"
+#include "data/dataprocessor.h"
+#include "device/device_video_layout.h"
 class CLDevice;
 class CLByteArray;
 

@@ -1,6 +1,6 @@
 #include "audio_device.h"
-#include "base\log.h"
-#include "base\ringbuffer.h"
+#include "base/log.h"
+#include "base/ringbuffer.h"
 
 /**
   * QT audio buffer size.

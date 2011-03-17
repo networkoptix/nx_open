@@ -1,6 +1,6 @@
 #include "arecont_dlg.h"
-#include "device\device.h"
-#include "..\..\widgets.h"
+#include "device/device.h"
+#include "../../widgets.h"
 #include "settings.h"
 
 AreconVisionDlgManufacture::AreconVisionDlgManufacture()

@@ -1,10 +1,10 @@
 #ifndef audiostreamdisplay_h_1811
 #define audiostreamdisplay_h_1811
 
-#include "data\mediadata.h"
-#include "..\src\multimedia\audio\qaudioformat.h"
-#include "base\aligned_data.h"
-#include "decoders\audio\audio_struct.h"
+#include "data/mediadata.h"
+#include "../src/multimedia/audio/qaudioformat.h"
+#include "base/aligned_data.h"
+#include "decoders/audio/audio_struct.h"
 
 // display one video stream
 // decodes the video and pass it to video window

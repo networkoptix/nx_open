@@ -1,7 +1,7 @@
 #include "ui_common.h"
 
 #include "settings.h"
-#include "device_settings\style.h"
+#include "device_settings/style.h"
 
 QString UIgetText(QWidget* parent, const QString& title, const QString& labletext, const QString& deftext, bool& ok)
 {

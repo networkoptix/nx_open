@@ -1,8 +1,8 @@
 #ifndef recorder_display_h_1347
 #define recorder_display_h_1347
 
-#include "base\longrunnable.h"
-#include "videodisplay\complicated_item.h"
+#include "base/longrunnable.h"
+#include "videodisplay/complicated_item.h"
 
 class CLDevice;
 class CLRecorderItem;

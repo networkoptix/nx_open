@@ -1,7 +1,7 @@
 #ifndef avi_stream_reader_h1901
 #define avi_stream_reader_h1901
 
-#include "..\abstract_archive_stream_reader.h"
+#include "../abstract_archive_stream_reader.h"
 #include "data/mediadata.h"
 
 struct AVFormatContext;

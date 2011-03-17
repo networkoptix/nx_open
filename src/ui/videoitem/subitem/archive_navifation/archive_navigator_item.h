@@ -1,8 +1,8 @@
 #ifndef archive_navigator_item_h1756
 #define archive_navigator_item_h1756
 
-#include "..\abstract_sub_item.h"
-#include "camera\camera.h"
+#include "../abstract_sub_item.h"
+#include "camera/camera.h"
 class CLImgSubItem;
 class QGraphicsProxyWidget;
 class QSlider;

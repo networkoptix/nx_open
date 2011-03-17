@@ -1,6 +1,6 @@
 #include "fake_recorder_device.h"
-#include "base\rand.h"
-#include "ui\ui_common.h"
+#include "base/rand.h"
+#include "ui/ui_common.h"
 
 CLFakeRecorderDevice::CLFakeRecorderDevice()
 {

@@ -1,7 +1,7 @@
 #include "recorder_display.h"
 #include "recorder_device.h"
-#include "ui\videoitem\recorder_item.h"
-#include "base\sleep.h"
+#include "ui/videoitem/recorder_item.h"
+#include "base/sleep.h"
 
 CLRecorderDisplay::CLRecorderDisplay(CLDevice* dev, CLRecorderItem* recitem):
 mDev(dev),

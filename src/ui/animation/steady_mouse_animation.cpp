@@ -1,5 +1,5 @@
-#include "ui\videoitem\abstract_scene_item.h"
-#include "ui\graphicsview.h"
+#include "ui/videoitem/abstract_scene_item.h"
+#include "ui/graphicsview.h"
 #include "steady_mouse_animation.h"
 
 CLSteadyMouseAnimation::CLSteadyMouseAnimation(GraphicsView* view):

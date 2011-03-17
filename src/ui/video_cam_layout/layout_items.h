@@ -1,7 +1,7 @@
 #ifndef layout_items_h_2210
 #define layout_items_h_2210
 
-#include "device\device_managmen\device_manager.h"
+#include "device/device_managmen/device_manager.h"
 
 class CLCustomBtnItem;
 class CLStaticImageItem;

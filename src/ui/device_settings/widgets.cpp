@@ -1,5 +1,5 @@
 #include "widgets.h"
-#include "device\device.h"
+#include "device/device.h"
 #include "base/log.h"
 #include "settings.h"
 

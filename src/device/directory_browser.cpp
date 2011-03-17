@@ -1,6 +1,6 @@
 #include "directory_browser.h"
 #include "file_device.h"
-#include "device_plugins\archive\avi_files\avi_device.h"
+#include "device_plugins/archive/avi_files/avi_device.h"
 
 CLDirectoryBrowserDeviceServer::CLDirectoryBrowserDeviceServer(const QString dir)
 {

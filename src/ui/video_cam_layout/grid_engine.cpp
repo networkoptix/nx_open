@@ -1,7 +1,7 @@
 #include "grid_engine.h"
-#include "device\device_video_layout.h"
-#include "ui\videoitem\abstract_scene_item.h"
-#include "ui\videoitem\video_wnd_item.h"
+#include "device/device_video_layout.h"
+#include "ui/videoitem/abstract_scene_item.h"
+#include "ui/videoitem/video_wnd_item.h"
 #include <math.h>
 #include "layout_content.h"
 

@@ -1,6 +1,6 @@
 #include "settings.h"
 #include "layout_item.h"
-#include "ui\ui_common.h"
+#include "ui/ui_common.h"
 
 CLLayoutItem::CLLayoutItem(GraphicsView* view, int max_width, int max_height, QString name, QString tooltip):
 CLCustomBtnItem(view,max_width,max_height, name, "", tooltip),

@@ -1,8 +1,8 @@
 #ifndef settings_widgets_h_1820
 #define settings_widgets_h_1820
 
-#include "device\param.h"
-#include "base\log.h"
+#include "device/param.h"
+#include "base/log.h"
 class CLDevice;
 class QGroupBox;
 

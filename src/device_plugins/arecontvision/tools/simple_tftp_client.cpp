@@ -1,4 +1,4 @@
-#include ".\simple_tftp_client.h"
+#include "./simple_tftp_client.h"
 #include "../../../streamreader/streamreader.h"
 #include "../../../base/log.h"
 #include "../../../base/bytearray.h"

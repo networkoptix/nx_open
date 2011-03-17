@@ -3,7 +3,7 @@
 #include "start_screen_content.h"
 #include "layout_content.h"
 
-#include "base\log.h"
+#include "base/log.h"
 
 CLSceneLayoutManager::CLSceneLayoutManager():
 mRecordersAndLayouts(0)

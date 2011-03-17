@@ -1,5 +1,5 @@
 #include "abstract_sub_item.h"
-#include "..\abstract_scene_item.h"
+#include "../abstract_scene_item.h"
 
 CLAbstractSubItem::CLAbstractSubItem(CLAbstractSubItemContainer* parent, qreal normal_opacity, qreal active_opacity):
 CLUnMovedInteractiveOpacityItem("", static_cast<QGraphicsItem*>(parent), normal_opacity, active_opacity),

@@ -1,9 +1,9 @@
 #include "stream_recorder.h"
 
-#include "device\device.h"
-#include "base\bytearray.h"
-#include "data\mediadata.h"
-#include "streamreader\streamreader.h"
+#include "device/device.h"
+#include "base/bytearray.h"
+#include "data/mediadata.h"
+#include "streamreader/streamreader.h"
 #include "util.h"
 
 #define FLUSH_SIZE (512*1024)

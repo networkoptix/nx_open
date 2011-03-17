@@ -1,7 +1,7 @@
 #ifndef video_wnd_layout_h1750
 #define video_wnd_layout_h1750
 
-#include "device\device.h"
+#include "device/device.h"
 #include "grid_engine.h"
 
 class CLAbstractSceneItem;

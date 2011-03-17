@@ -1,7 +1,7 @@
 #ifndef dlg_settings_getter_h2355
 #define dlg_settings_getter_h2355
-#include "device\device_command_processor.h"
-#include "base\associativearray.h"
+#include "device/device_command_processor.h"
+#include "base/associativearray.h"
 
 class CLAbstractSettingsWidget;
 
