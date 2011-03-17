@@ -77,16 +77,20 @@ bool CLAVIStreamReader::init()
 		firstInstance = false;
 
 		QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
+
 		av_register_all();
+
+        extern URLProtocol ufile_protocol;
+
+        av_register_protocol2(&ufile_protocol, sizeof(ufile_protocol));
 	}
 
 	m_currentTime = 0;
 	m_previousTime = -1;
 	m_needToSleep = 0;
 
-	m_formatContext = avformat_alloc_context();
-
-	int err = av_open_input_file(&m_formatContext, m_device->getUniqueId().toLatin1().data(), NULL, 0, NULL);
+    QString url = "ufile:" + m_device->getUniqueId();
+    int err = av_open_input_file(&m_formatContext, url.toUtf8().constData(), NULL, 0, NULL);
 	if (err < 0)
 	{
 		destroy();
