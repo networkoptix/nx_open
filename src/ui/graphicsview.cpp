@@ -554,7 +554,9 @@ void GraphicsView::removeAllStaticItems()
 
 void GraphicsView::stopAnimation()
 {
-	foreach(CLAbstractSceneItem* itm, m_camLayout.getItemList())
+	QList<CLAbstractSceneItem*> lst = m_camLayout.getItemList();
+    
+    foreach(CLAbstractSceneItem* itm, lst)
 	{
 		itm->stop_animation();
 	}
@@ -717,7 +719,9 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 
 			QPointF delta = mapToScene(event->pos()) - mapToScene(m_mousestate.getLastEventPoint());
 
-			foreach(QGraphicsItem* itm, m_scene.selectedItems())
+            QList<QGraphicsItem *> lst = m_scene.selectedItems();
+			
+            foreach(QGraphicsItem* itm, lst)
 			{
 				CLAbstractSceneItem* item = static_cast<CLAbstractSceneItem*>(itm);
 				//QPointF wnd_pos = item->scenePos(); //<---- this does not work coz item zoom ;case1
@@ -1814,7 +1818,9 @@ void GraphicsView::resizeEvent( QResizeEvent * event )
 		fitInView(1000, 0);
 	}
 
-	foreach(CLAbstractSceneItem* item, m_camLayout.getItemList())
+
+    QList<CLAbstractSceneItem*> lst = m_camLayout.getItemList();
+	foreach(CLAbstractSceneItem* item, lst)
 	{
 		item->onResize();
 	}
@@ -2424,7 +2430,9 @@ void GraphicsView::navigation_grid_items_drop_helper()
 
 	CLGridEngine& ge = m_camLayout.getGridEngine();
 
-	foreach(QGraphicsItem* itm, m_scene.selectedItems())
+    QList<QGraphicsItem *> lst = m_scene.selectedItems();
+
+	foreach(QGraphicsItem* itm, lst)
 	{
 		CLAbstractSceneItem* item = static_cast<CLAbstractSceneItem*>(itm);
 		item->setCanDrop(false);
@@ -2505,7 +2513,9 @@ void GraphicsView::navigation_grid_items_drop_helper()
 
 void GraphicsView::on_grid_drop_animation_finished()
 {
-	foreach(CLAbstractSceneItem* itm, m_camLayout.getItemList())
+    QList<CLAbstractSceneItem*> lst = m_camLayout.getItemList();
+	
+    foreach(CLAbstractSceneItem* itm, lst)
 	{
 		itm->setZValue(global_base_scene_z_level);
 		itm->setArranged(true);

@@ -29,7 +29,7 @@ signals:
 	void onClose(CLAbstractSubItemContainer*);
 
 public slots:
-	void onResize();
+	virtual void onResize();
 
 protected slots:
 	virtual void onSubItemPressed(CLAbstractSubItem* subitem);

@@ -22,6 +22,16 @@ CLVideoWindowArchiveItem::~CLVideoWindowArchiveItem()
 	mArchiveNavigator->goToFullScreenMode(false);
 }
 
+void CLVideoWindowArchiveItem::onResize()
+{
+    CLVideoWindowItem::onResize();
+    if (isFullScreen())
+    {
+        mArchiveNavigator->goToFullScreenMode(false);
+        mArchiveNavigator->goToFullScreenMode(true);
+    }
+}
+
 QPointF CLVideoWindowArchiveItem::getBestSubItemPos(CLSubItemType type)
 {
     if (type==ArchiveNavigatorSubItem)

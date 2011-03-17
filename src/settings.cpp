@@ -1,6 +1,6 @@
 #include "settings.h"
 
-bool global_show_item_text = true;
+bool global_show_item_text = false;
 qreal global_rotation_angel = 0;
 //QFont settings_font("Bodoni MT", 12);
 QFont settings_font;//("Bodoni MT", 12);
