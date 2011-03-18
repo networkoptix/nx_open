@@ -7,7 +7,7 @@ class CLDeviceVideoLayout
 {
 public:
 	CLDeviceVideoLayout(){};
-	virtual ~CLDeviceVideoLayout()=0{};
+    virtual ~CLDeviceVideoLayout() {}
 	//returns number of video channels device has
 	virtual unsigned int numberOfChannels() const = 0;
 
@@ -27,7 +27,7 @@ class CLDefaultDeviceVideoLayout : public CLDeviceVideoLayout
 {
 public:
 	CLDefaultDeviceVideoLayout(){};
-	virtual ~CLDefaultDeviceVideoLayout(){};
+	virtual ~CLDefaultDeviceVideoLayout() {}
 	//returns number of video channels device has
 	virtual unsigned int numberOfChannels() const
 	{

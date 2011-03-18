@@ -29,7 +29,7 @@ m_zooming(false),
 m_rotating(false),
 m_moving(false)
 {
-	m_timeline.setCurve(CLAnimationTimeLine::CLAnimationCurve::SLOW_END_POW_30);
+	m_timeline.setCurve(CLAnimationTimeLine::SLOW_END_POW_30);
 }
 
 CLItemTransform::~CLItemTransform()

@@ -7,6 +7,8 @@
 #include "device_command_processor.h"
 #include "device_video_layout.h"
 
+static int inst = 0;
+
 CLDeviceCommandProcessor CLDevice::m_commanproc;
 
 CLDevice::LL CLDevice::static_device_list; // list of all supported devices params list
@@ -193,24 +195,24 @@ void CLDevice::addReferences(CLDeviceList& lst)
 
 }
 
+struct T
+{
+    T(CLDevice* d)
+    {
+        device = d;
+    }
+
+    void f()
+    {
+        device->getBaseInfo();
+    }
+
+    CLDevice* device;
+};
+
 void CLDevice::getDevicesBasicInfo(CLDeviceList& lst, int threads)
 {
 	// cannot make concurrent work with pointer CLDevice* ; => so extra steps needed
-	struct T
-	{
-		T(CLDevice* d)
-		{
-			device = d;
-		}
-
-		void f()
-		{
-			device->getBaseInfo();
-		}
-
-		CLDevice* device;
-	};
-
 	cl_log.log("Geting device info...", cl_logDEBUG1);
 	QTime time;
 	time.start();

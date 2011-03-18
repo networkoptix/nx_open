@@ -1,6 +1,6 @@
 #include "fake_device.h"
 #include "../streamreader/fake_file_streamreader.h"
-#include "../device/device_video_layout.h"
+#include "device/device_video_layout.h"
 
 CLDeviceList FakeDevice::findDevices()
 {

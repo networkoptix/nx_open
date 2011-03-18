@@ -89,7 +89,7 @@ void CLDeviceManager::onTimer()
 	}
 }
 
-CLDeviceList CLDeviceManager::getDeviceList(CLDeviceCriteria& cr)
+CLDeviceList CLDeviceManager::getDeviceList(const CLDeviceCriteria& cr)
 {
 	CLDeviceList result;
 
@@ -189,7 +189,7 @@ void CLDeviceManager::onNewDevices_helper(CLDeviceList devices, QString parentId
 
 }
 
-bool CLDeviceManager::isDeviceMeetCriteria(CLDeviceCriteria& cr, CLDevice* dev) const
+bool CLDeviceManager::isDeviceMeetCriteria(const CLDeviceCriteria& cr, CLDevice* dev) const
 {
 	if (dev==0)
 		return false;

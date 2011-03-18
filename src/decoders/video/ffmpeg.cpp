@@ -94,7 +94,9 @@ AVCodec* CLFFmpegVideoDecoder::findCodec(CLCodecType codecId)
 void CLFFmpegVideoDecoder::closeDecoder()
 {   
     avcodec_close(c);
+#ifdef _WIN32
     m_decoderContext.close();
+#endif
 
     av_free(picture);
     av_free(c);
@@ -110,6 +112,7 @@ void CLFFmpegVideoDecoder::openDecoder()
         avcodec_copy_context(c, m_passedContext);
     }
 
+#ifdef _WIN32
     if (m_codecId == CL_H264)
     {
         c->get_format = FFMpegCallbacks::ffmpeg_GetFormat;
@@ -118,6 +121,7 @@ void CLFFmpegVideoDecoder::openDecoder()
 
         c->opaque = &m_decoderContext;
     }
+#endif
 
     picture = avcodec_alloc_frame();
 
@@ -218,6 +222,7 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
     //    needResetCodec = true;
     //}
 
+#ifdef _WIN32
     if (m_decoderContext.isHardwareAcceleration() && !isHardwareAccellerationPossible(data.codec, data.width, data.height))
     {
         m_decoderContext.setHardwareAcceleration(false);
@@ -229,12 +234,8 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
         m_decoderContext.setHardwareAcceleration(true);
         needResetCodec = true;
     }
+#endif
 
-    // XXX Debug
-    if(needResetCodec && !data.keyFrame)
-    {
-        DebugBreak();
-    }
 
     if(needResetCodec)
     {
@@ -250,10 +251,12 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 	if (got_picture )
 	{
         m_lastWidth = data.width;
+#ifdef _WIN32
         if (m_decoderContext.isHardwareAcceleration())
         {
             m_decoderContext.extract(picture);
         }
+#endif
 
 		if (m_showmotion)
 		{

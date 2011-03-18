@@ -5,6 +5,10 @@
 
 static const qint32 MAX_THREAD_QUEUE_SIZE = 256;
 
+#ifndef INFINITE
+#define INFINITE            0xFFFFFFFF  // Infinite timeout
+#endif
+
 template <typename T>
 class CLThreadQueue
 {

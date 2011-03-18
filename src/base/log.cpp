@@ -112,7 +112,8 @@ void CLLog::log(const QString& msg, CLLogLevel loglevel)
 		return;
 
 	QString th;
-	hex(QTextStream (&th)) <<(quint32)QThread::currentThread();
+    QTextStream textStream(&th);
+	hex(textStream) << (quint64)QThread::currentThread();
 
 	QTextStream fstr(&m_file);
 	fstr<< QDateTime::currentDateTime().toString("ddd MMM d yy  hh:mm:ss.zzz") <<	" Thread " << th << " (" <<cl_log_msg[loglevel] <<"): " << msg << "\r\n";
@@ -131,7 +132,12 @@ void CLLog::log(CLLogLevel loglevel, const char* format, ...)
     va_list args;
 
     va_start(args, format);
+#ifdef _WIN32
     vsnprintf_s(buffer, MAX_MESSAGE_SIZE, MAX_MESSAGE_SIZE, format, args);
+#else
+    vsnprintf(buffer, MAX_MESSAGE_SIZE, format, args);
+#endif
+
     cl_log.log(buffer, loglevel);
     va_end(args);
 }
@@ -177,7 +183,12 @@ QString CLLog::backupFileName(quint8 num) const
 	QTextStream stream(&result);
 
 	char cnum[4];
+
+#ifdef _WIN32
 	sprintf_s(cnum, 4, "%.3d", num);
+#else
+	snprintf(cnum, 4, "%.3d", num);
+#endif
 
 	stream << m_base_name << cnum << ".log";
 	return result;

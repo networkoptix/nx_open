@@ -149,7 +149,7 @@ void SceneLayout::stop_helper(bool emt)
 	foreach(CLAbstractComplicatedItem* devitem, m_deviceitems)
 	{
 		// after we can wait for each thread to stop
-		cl_log.log("About to shutdown device ", (int)devitem ,"\r\n", cl_logDEBUG1);
+		cl_log.log("About to shutdown device ", (int)(long)devitem ,"\r\n", cl_logDEBUG1);
 		devitem->stopDispay();
 
 		CLDevice* dev = devitem->getDevice();

@@ -2,7 +2,7 @@
 #define cpull_httpreader_1119
 
 #include "av_client_pull.h"
-#include "../data/mediadata.h"
+#include "data/mediadata.h"
 
 //single sensor TFTP reader
 // arecont vision TFTP stack is faster (for JPEG image; for H.264 they are almost equal )( you can get more fps with it )

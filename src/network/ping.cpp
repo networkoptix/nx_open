@@ -1,5 +1,6 @@
 #include "ping.h"
 
+#ifdef _WIN32
 #include <iphlpapi.h>
 #include <icmpapi.h>
 #include <stdio.h>
@@ -111,3 +112,15 @@ bool CLPing::ping(const QString& ip, int retry, int timeoutPerRetry, int packetS
 		return false;
 	}
 }
+#else
+
+CLPing::CLPing()
+{
+}
+
+bool CLPing::ping(const QString& ip, int retry, int timeoutPerRetry, int packetSize)
+{
+    return true;
+}
+
+#endif

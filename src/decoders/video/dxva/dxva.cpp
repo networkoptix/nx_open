@@ -1,6 +1,7 @@
 // dxva.cpp : Defines the entry point for the console application.
 //
 
+#ifdef _WIN32
 #include "dxva.h"
 #include "base/log.h"
 
@@ -866,3 +867,5 @@ picture_t* DecoderContext::pict()
 {
     return m_pict;
 }
+
+#endif

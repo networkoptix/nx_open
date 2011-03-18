@@ -19,7 +19,6 @@
 #include "videoitem/search/search_filter_item.h"
 #include "device/network_device.h"
 #include "videoitem/web_item.h"
-#include "../src/corelib/animation/qpropertyanimation.h"
 #include "animation/group_animation.h"
 #include "videoitem/grid_item.h"
 #include "util.h"
@@ -1955,7 +1954,7 @@ void GraphicsView::onCircle_helper(bool show)
 	QRectF item_rect = m_camLayout.getGridEngine().getGridRect();
 
 	mShow.setCenterPoint(item_rect.center());
-	mShow.setRadius(max(item_rect.width(), item_rect.height())/8);
+	mShow.setRadius(qMax(item_rect.width(), item_rect.height())/8);
 	mShow.setItems(m_camLayout.getItemListPointer());
 
 	int i = 0;

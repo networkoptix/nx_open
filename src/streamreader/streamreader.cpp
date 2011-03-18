@@ -5,7 +5,7 @@
 
 CLStreamreader::CLStreamreader(CLDevice* dev):
 m_device(dev),
-m_qulity(StreamQuality::CLSLowest),
+m_qulity(CLSLowest),
 m_needSleep(true)
 {
 	memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame));

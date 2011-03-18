@@ -85,12 +85,12 @@ public:
 	CLAssociativeArray(){};
 	void put(const QString& key, const CLValue& value)
 	{
-		map[key] = value;
+		map[key] = (QString) value;
 	}
 
 	bool exist(const QString& key) const
 	{
-		MAP::iterator it = map.find(key);
+		MAP::const_iterator it = map.find(key);
 		return (it!=map.end());
 	}
 

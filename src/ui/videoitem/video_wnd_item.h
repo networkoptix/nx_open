@@ -1,8 +1,8 @@
 #ifndef clgl_video_window
 #define clgl_video_window
 
-#include "../statistics/statistics.h"
-#include "../device/device_video_layout.h"
+#include "statistics/statistics.h"
+#include "device/device_video_layout.h"
 #include "img_item.h"
 #include "camera/abstractrenderer.h"
 #include "camera/gl_renderer.h"

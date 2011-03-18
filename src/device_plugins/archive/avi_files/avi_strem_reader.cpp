@@ -419,7 +419,11 @@ void CLAVIStreamReader::channeljumpTo(quint64 mksec, int /*channel*/)
 
     mksec += startMksec();
 
+#ifdef _WIN32
 	avformat_seek_file(m_formatContext, -1, 0, mksec, _I64_MAX, AVSEEK_FLAG_BACKWARD);
+#else
+	avformat_seek_file(m_formatContext, -1, 0, mksec, LLONG_MAX, AVSEEK_FLAG_BACKWARD);
+#endif
 
 	m_needToSleep = 0;
 	m_previousTime = -1;

@@ -1,5 +1,6 @@
 #include "ipp_h264_decoder.h"
 
+#ifdef _WIN32
 IPPH264Decoder::Dll IPPH264Decoder::dll;
 
 IPPH264Decoder::Dll::Dll()
@@ -35,3 +36,5 @@ IPPH264Decoder::Dll::~Dll()
 {
 	::FreeLibrary(m_dll);
 }
+
+#endif

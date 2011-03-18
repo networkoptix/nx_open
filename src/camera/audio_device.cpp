@@ -10,10 +10,10 @@
 static const int QT_AUDIO_BUFFER_SIZE = 300;
 
 CLAudioDevice::CLAudioDevice(QAudioFormat format)
-  : m_downmixing(false),
-    m_audioOutput(0),
+  : m_audioOutput(0),
     m_audioBuffer(0),
-    m_ringBuffer(0)
+    m_ringBuffer(0),
+    m_downmixing(false)
 {
     QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
 
@@ -66,10 +66,7 @@ bool CLAudioDevice::downmixing() const
 
 bool CLAudioDevice::wantMoreData() 
 {
-    int moreChunks = tryMoveDatafromRingBufferToQtBuffer(); 
-    //if moreChunks>0  => ring buffer do not have enought data to move it to the qt buffer
-
-    //return (moreChunks>0);
+    tryMoveDatafromRingBufferToQtBuffer();
 
     return (m_ringBuffer->bytesAvailable() < m_ringBuffer->capacity()/2); // 7 is luky number
 }
@@ -124,7 +121,7 @@ void CLAudioDevice::clearAudioBuff()
 		m_audioOutput->reset();
 		m_audioOutput->start();
 	}
-    /**/
+    */
 }
 
 //=============================================================

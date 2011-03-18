@@ -65,7 +65,7 @@ void CLVideoCamera::stopDispay()
 {
 	CL_LOG(cl_logDEBUG1) cl_log.log("CLVideoCamera::stopDispay", m_device->getUniqueId(), cl_logDEBUG1);
 
-	CL_LOG(cl_logDEBUG1) cl_log.log("CLVideoCamera::stopDispay reader is about to pleases stop ", QString::number((int)m_reader,16), cl_logDEBUG1);
+	CL_LOG(cl_logDEBUG1) cl_log.log("CLVideoCamera::stopDispay reader is about to pleases stop ", QString::number((long)m_reader,16), cl_logDEBUG1);
 
 	stopRecording();
 

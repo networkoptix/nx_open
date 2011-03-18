@@ -3,7 +3,6 @@
 #include "../../base/log.h"
 #include "../graphicsview.h"
 #include "settings.h"
-#include "../src/corelib/global/qglobal.h"
 #include "ui/videoitem/abstract_scene_item.h"
 
 static const qreal max_zoom = 4.0;

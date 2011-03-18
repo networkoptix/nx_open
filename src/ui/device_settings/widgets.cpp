@@ -96,11 +96,11 @@ void SettingsOnOffWidget::stateChanged(int state)
 
 	if (state == Qt::Checked)
 	{
-		val = mParam.value.possible_values.front();
+		val = (QString)mParam.value.possible_values.front();
 	}
 	else
 	{
-		val = mParam.value.possible_values.back();
+		val = (QString)mParam.value.possible_values.back();
 	}
 
 	setParam_helper(mParam.name,val);

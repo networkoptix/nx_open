@@ -54,8 +54,8 @@ public:
 	void removeZerrowsAtTheEnd();
 
 private:
-	CLByteArray(const CLByteArray&){};
-	CLByteArray& operator=(const CLByteArray&){};
+	CLByteArray(const CLByteArray&) {}
+	CLByteArray& operator=(const CLByteArray&) { return *this; }
 
 	// this function realocates data and changes capacity.
 	// if new capacity smaller than current size+alignment this function does nothing 

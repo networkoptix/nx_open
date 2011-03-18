@@ -34,7 +34,7 @@ void items2DDstream(QList<QGraphicsItem*> itemslst, QDataStream& dataStream)
 		else if (type == CLAbstractSceneItem::LAYOUT)
 		{
 			CLLayoutItem* it = static_cast<CLLayoutItem*>(item);
-			items.layoutlinks.push_back((int)it->getRefContent());
+			items.layoutlinks.push_back((int)(long)it->getRefContent());
 		}
 	}
 

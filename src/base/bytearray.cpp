@@ -12,7 +12,7 @@ m_size(0)
 
 	m_data = new char[capacity];
 
-	int shift  = (alignment==0) ? 0 : (alignment - ((unsigned int)m_data)%alignment);
+	int shift  = (alignment==0) ? 0 : (alignment - ((unsigned long)m_data)%alignment);
 
 	m_al_data = m_data + shift;
 
@@ -64,7 +64,7 @@ bool CLByteArray::increase_capacity(unsigned int new_capacity)
 	if (!new_data)
 		return false;
 
-	int shift = (m_alignment==0) ? 0 : (m_alignment - ((unsigned int)new_data)%m_alignment);
+	int shift = (m_alignment==0) ? 0 : (m_alignment - ((unsigned long)new_data)%m_alignment);
 	m_capacity = new_capacity - shift;
 
 	memcpy(new_data + shift, m_al_data, m_size); // copy old data to new

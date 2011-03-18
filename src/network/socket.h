@@ -4,6 +4,11 @@
 #include <string>            // For std::string
 #include <exception>         // For exception class
 
+#ifndef _WIN32
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#endif
 /**
  *   Signals a problem with the execution of a socket call.
  */

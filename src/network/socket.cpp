@@ -168,6 +168,7 @@ m_timeout(3000)
 
 void CommunicatingSocket::connect(const string &foreignAddress,
     unsigned short foreignPort)  {
+#ifdef _WIN32
   // Get the address of the requested host
   sockaddr_in destAddr;
   fillAddr(foreignAddress, foreignPort, destAddr);
@@ -196,7 +197,7 @@ void CommunicatingSocket::connect(const string &foreignAddress,
 
   iMode = 0;
   int t = ioctlsocket(sockDesc, FIONBIO, &iMode);  //set socket to synch  mode
-
+#endif
 }
 
 void CommunicatingSocket::setTimeOut( unsigned int ms )
@@ -224,7 +225,6 @@ int CommunicatingSocket::recv(void *buffer, int bufferLen)
   if ((rtn = ::recv(sockDesc, (raw_type *) buffer, bufferLen, 0)) < 0) 
   {
 
-	  int err = WSAGetLastError();
 	  return -1;
   }
 

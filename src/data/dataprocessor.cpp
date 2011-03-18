@@ -41,7 +41,7 @@ void CLAbstractDataProcessor::run()
 
 		if (!get)
 		{
-			CL_LOG(cl_logDEBUG2) cl_log.log("queue is empty ", (int)&m_dataQueue,cl_logDEBUG2);
+			CL_LOG(cl_logDEBUG2) cl_log.log("queue is empty ", (int)(long)(&m_dataQueue),cl_logDEBUG2);
 			CLSleep::msleep(10);
 			continue;
 		}

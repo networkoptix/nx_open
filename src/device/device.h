@@ -39,8 +39,6 @@ class CLDeviceVideoLayout;
 class CLDevice;
 typedef QMap<QString, CLDevice*>  CLDeviceList;
 
-static int inst = 0;
-
 class CLDevice : public CLRefCounter
 {
 public:

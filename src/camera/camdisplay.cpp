@@ -3,7 +3,6 @@
 #include "../device/device_video_layout.h"
 #include "videostreamdisplay.h"
 #include "audiostreamdisplay.h"
-#include "../src/corelib/tools/qstringbuilder.h"
 
 #define CL_MAX_DISPLAY_QUEUE_SIZE 7
 #define AUDIO_BUFF_SIZE (4000) // ms

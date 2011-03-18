@@ -1,5 +1,5 @@
 #include "video_wnd_item.h"
-#include "../base/log.h"
+#include "base/log.h"
 #include "camera/camera.h"
 #include "device/device.h"
 #include "ui/graphicsview.h"
@@ -266,7 +266,11 @@ void CLVideoWindowItem::drawFPS(QPainter* painter)
 
 		QRect rect = getSubChannelRect(i);
 
+#ifdef _WIN32
 		sprintf_s(fps, "%6.2ffps %6.2fMbps", m_stat[i]->getFrameRate(), m_stat[i]->getBitrate());
+#else
+		sprintf(fps, "%6.2ffps %6.2fMbps", m_stat[i]->getFrameRate(), m_stat[i]->getBitrate());
+#endif
 		QFontMetrics fm(painter->font());
 		painter->drawText(rect.left()+150,rect.top()+170 + fm.height()/2, fps);
 	}

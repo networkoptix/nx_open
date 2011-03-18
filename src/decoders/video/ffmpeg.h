@@ -2,7 +2,10 @@
 #define cl_ffmpeg_h2026
 
 #include "abstractdecoder.h"
+
+#ifdef _WIN32
 #include "dxva/dxva.h"
+#endif
 
 struct AVCodec;
 struct AVCodecContext;
@@ -42,7 +45,10 @@ private:
 	AVCodec *m_codec;
 	AVCodecContext *c;
 	AVFrame *picture;
+
+#ifdef _WIN32
     DecoderContext m_decoderContext;
+#endif
 
 	int m_width;
 	int m_height;

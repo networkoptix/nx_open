@@ -1,9 +1,8 @@
 #include "animation.h"
 #include "../../base/log.h"
-#include "../src/corelib/kernel/qtimer.h"
 
 CLAnimation::CLAnimation():
-m_timeline(CLAnimationTimeLine::CLAnimationCurve::SLOW_END_POW_40)
+m_timeline(CLAnimationTimeLine::SLOW_END_POW_40)
 //m_timeline(CLAnimationTimeLine::CLAnimationCurve::SLOW_START_SLOW_END)
 {
 	//m_timeline.setCurveShape(QTimeLine::CurveShape::LinearCurve);

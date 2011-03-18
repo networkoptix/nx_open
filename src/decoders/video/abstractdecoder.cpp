@@ -13,9 +13,11 @@ CLAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder(CLCodecType codec, 
 	// h264 
 	switch(m_codecManufacture)
 	{
+#ifdef _WIN32
 	case INTELIPP:
 		return new IPPH264Decoder();
 	    break;
+#endif
 	case FFMPEG:
 	default:
 		return new CLFFmpegVideoDecoder(codec, (AVCodecContext*)context);

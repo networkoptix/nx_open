@@ -23,8 +23,8 @@ public:
     void setTryHardwareAcceleration(bool tryHardwareAcceleration);
     bool isHardwareAccelerationEnabled() const;
 private:
-	CLAbstractVideoDecoder(const CLAbstractVideoDecoder&){};
-	CLAbstractVideoDecoder& operator=(CLAbstractVideoDecoder&){};
+	CLAbstractVideoDecoder(const CLAbstractVideoDecoder&) {}
+	CLAbstractVideoDecoder& operator=(const CLAbstractVideoDecoder&) { return *this; }
 
 protected:
     bool m_tryHardwareAcceleration;

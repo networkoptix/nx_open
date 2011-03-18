@@ -27,7 +27,7 @@ public:
 
 	CLDiviceSeracher& getDiveceSercher(); 
 
-	CLDeviceList getDeviceList(CLDeviceCriteria& cr);
+	CLDeviceList getDeviceList(const CLDeviceCriteria& cr);
 	CLDevice* getDeviceById(QString id);
 
 	CLDeviceList getRecorderList();
@@ -39,7 +39,7 @@ protected:
 	CLDeviceManager();
 	void onNewDevices_helper(CLDeviceList devices, QString parentId);
 
-	bool isDeviceMeetCriteria(CLDeviceCriteria& cr, CLDevice* dev) const;
+	bool isDeviceMeetCriteria(const CLDeviceCriteria& cr, CLDevice* dev) const;
 
 	QStringList subDirList(const QString& abspath) const;
 	void addArchiver(QString id);

@@ -1,6 +1,7 @@
 #ifndef ipp_decoder_h149
 #define ipp_decoder_h149
 
+#ifdef _WIN32
 #include <windows.h>
 #include "abstractdecoder.h"
 
@@ -55,4 +56,5 @@ public:
 
 };
 
+#endif
 #endif //ipp_decoder_h149

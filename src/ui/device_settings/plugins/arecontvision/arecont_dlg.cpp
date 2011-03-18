@@ -335,7 +335,7 @@ void AVSettingsDlg::correctWgtsState()
 
 	if (wgt = getWidgetByName("Light Mode"))
 	{
-		val  = wgt->param().value.value;
+		val  = (QString)wgt->param().value.value;
 
 		if (val==QString("highspeed"))
 		{
@@ -352,7 +352,7 @@ void AVSettingsDlg::correctWgtsState()
 	//=================================================
 	if (wgt = getWidgetByName("Codec"))
 	{
-		val  = wgt->param().value.value;
+		val  = (QString)wgt->param().value.value;
 
 		if (val==QString("H.264"))
 		{

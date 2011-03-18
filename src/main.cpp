@@ -14,10 +14,11 @@
 #include "device/device_managmen/device_manager.h"
 #include "ui/video_cam_layout/layout_manager.h"
 #include "ui/context_menu_helper.h"
+#include "decoders/video/abstractdecoder.h"
 
 QMutex global_ffmpeg_mutex;
 
-void decoderLogCallback(void* pParam, int i, const char* szFmt, va_list args)
+void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
 	//USES_CONVERSION;
 
@@ -27,7 +28,7 @@ void decoderLogCallback(void* pParam, int i, const char* szFmt, va_list args)
 		//return;
 	}
 
-	AVCodecContext* pCtxt = (AVCodecContext*)pParam;
+	// AVCodecContext* pCtxt = (AVCodecContext*)pParam;
 
 	char szMsg[1024];
 	vsprintf(szMsg, szFmt, args);
@@ -57,7 +58,11 @@ int main(int argc, char *argv[])
     dataDirectory.mkpath(dataLocation + "/log");
 
 	if (!cl_log.create(dataLocation + "/log/log_file", 1024*1024*10, 5, cl_logDEBUG1))
-		return a.quit();
+    {
+		a.quit();
+
+        return 0;
+    }
 
 #ifdef _DEBUG
 	 cl_log.setLogLevel(cl_logDEBUG1);

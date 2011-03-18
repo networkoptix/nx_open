@@ -49,6 +49,10 @@ private:
 
 private:
 
+#ifndef _WIN32
+    #define APIENTRY
+#endif
+
 	// ARB_fragment_program
 	typedef void (APIENTRY *_glProgramStringARB) (GLenum, GLenum, GLsizei, const GLvoid *);
 	typedef void (APIENTRY *_glBindProgramARB) (GLenum, GLuint);

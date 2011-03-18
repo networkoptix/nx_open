@@ -206,6 +206,10 @@ unsigned char AVJpeg::Header::s_ChromTbl[25][64];
 //Static
 int AVJpeg::Header::GetHeader(unsigned char* pBuffer, unsigned int nWidth, unsigned int nHeight, int iQuality, const char* szCameraModel)
 {
+#ifndef _countof
+#define _countof(_Array) (sizeof(_Array) / sizeof(_Array[0]))
+#endif
+
 	memcpy(pBuffer, s_JpegHeaderTemplate, _countof(s_JpegHeaderTemplate));
 
 	if(szCameraModel && *szCameraModel)
@@ -247,8 +251,8 @@ void AVJpeg::Header::Initialize(const char* szCompany, const char* szApplication
 	{
 		for(int i = 0; i < 64; i++)
 		{
-			s_LuminTbl[iQuality][i] = unsigned char(STD_LUMIN_TBL[JPEG_NATURAL_ORDER_TBL[i]] * QUALITY_TABLE[iQuality] + 0.5);
-			s_ChromTbl[iQuality][i] = unsigned char(STD_CHROM_TBL[JPEG_NATURAL_ORDER_TBL[i]] * QUALITY_TABLE[iQuality] + 0.5);
+			s_LuminTbl[iQuality][i] = (unsigned char)(STD_LUMIN_TBL[JPEG_NATURAL_ORDER_TBL[i]] * QUALITY_TABLE[iQuality] + 0.5);
+			s_ChromTbl[iQuality][i] = (unsigned char)(STD_CHROM_TBL[JPEG_NATURAL_ORDER_TBL[i]] * QUALITY_TABLE[iQuality] + 0.5);
 		}
 	}
 }

@@ -12,8 +12,8 @@ public:
 	virtual bool decode(CLAudioData& )=0;
 
 private:
-	CLAbstractAudioDecoder(const CLAbstractAudioDecoder&){};
-	CLAbstractAudioDecoder& operator=(CLAbstractAudioDecoder&){};
+	CLAbstractAudioDecoder(const CLAbstractAudioDecoder&) {}
+	CLAbstractAudioDecoder& operator=(CLAbstractAudioDecoder&) { return *this; }
 
 };
 
