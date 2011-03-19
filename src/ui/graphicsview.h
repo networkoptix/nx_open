@@ -135,6 +135,7 @@ protected:
 	void contextMenuHelper_viewRecordedVideo(CLVideoCamera* cam);
 	void contextMenuHelper_openInWebBroser(CLVideoCamera* cam);
 	void contextMenuHelper_Rotation(CLAbstractSceneItem* wnd, qreal angle);
+    void contextMenuHelper_saveLayout( bool new_name);
 	//==========================
 
 	void navigation_grid_items_drop_helper();

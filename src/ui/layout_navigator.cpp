@@ -97,6 +97,13 @@ void CLLayoutNavigator::onDecorationPressed(LayoutContent* layout, QString itemn
 			mNewContent = layout->getParent();
 			goToNewLayoutContent();
 		}
+
+        if (layout == CLSceneLayoutManager::instance().getSearchLayout())
+        {
+            mNewContent = CLSceneLayoutManager::instance().getAllLayoutsContent();
+            goToNewLayoutContent();
+        }
+
 	}
 	else if (itemname==button_magnifyingglass)
 	{

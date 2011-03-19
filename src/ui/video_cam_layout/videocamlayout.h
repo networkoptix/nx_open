@@ -48,13 +48,13 @@ public:
 	void stop(bool animation = false);
 
 	//================================================
-	bool addLayoutItem(QString name, LayoutContent* lc, bool update_scene_rect = true);
+	bool addLayoutItem(QString name, LayoutContent* lc, bool update_scene_rect);
 
-	bool addDevice(QString uniqueid, bool update_scene_rect = true);
+	bool addDevice(QString uniqueid, bool update_scene_rect);
 
 	//does same as bool addCamera(CLVideoCamera* cam, int x, int y, int z_order = 0);
 	//but function peeks up position by it self 
-	bool addItem(CLAbstractSceneItem* item,  bool update_scene_rect = true);
+	bool addItem(CLAbstractSceneItem* item,  bool update_scene_rect);
 
 	//================================================
 
@@ -72,6 +72,8 @@ public:
 	void loadContent();
 	void saveContent();
 	//========================================================
+
+    void removeItems(QList<CLAbstractSubItemContainer*> itemlst);
 
 signals:
 	void stoped(LayoutContent* l);
@@ -96,13 +98,13 @@ private:
 
 	// position of window( if any ) will be changed
 	// return false if there are no available slots
-	bool addItem(CLAbstractSceneItem* item, int x, int y, bool update_scene_rect = true);
+	bool addItem(CLAbstractSceneItem* item, int x, int y, bool update_scene_rect);
 
 	// remove item from lay out
 	void removeItem(CLAbstractSceneItem* item, bool update_scene_rect = true);
 
 	// creates video item for device, if needed, camera and so on...
-	bool addDevice(CLDevice* dev, bool update_scene_rect = true);
+	bool addDevice(CLDevice* dev, bool update_scene_rect);
 
 	// removes devices;
 	bool removeDevices( QList<CLAbstractComplicatedItem*> lst); 

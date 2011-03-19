@@ -426,7 +426,8 @@ void GraphicsView::initDecoration()
 
 	bool level_up = false;
 
-	if (m_camLayout.getContent()->getParent()) // if layout has parent add LevelUp decoration
+	if (m_camLayout.getContent()->getParent() || 
+        m_camLayout.getContent() == CLSceneLayoutManager::instance().getSearchLayout()) // if layout has parent add LevelUp decoration
 		level_up = true;
 
 	// if this is ItemsAcceptor( the layout we are editing now ) and parent is root we should not go to the root
@@ -1116,12 +1117,13 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 	QMenu menu;
 	menu.setWindowOpacity(global_menu_opacity);
 
-	if (aitem) // video wnd
+	if (aitem && m_scene.selectedItems().count()==0) // video wnd and single selection
 	{
 		if (aitem->getType() == CLAbstractSceneItem::VIDEO)
 		{
 			// video item
 			menu.addAction(&cm_fullscren);
+            menu.addAction(&cm_remove_from_layout);
 			menu.addMenu(&rotation_manu);
 
 			video_wnd = static_cast<CLVideoWindowItem*>(aitem);
@@ -1161,6 +1163,11 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 		menu.addAction(&cm_settings);
 		menu.addAction(&cm_exit);
 	}
+    else if (aitem && m_scene.selectedItems().count()>0)
+    {
+        // multiple selection
+        menu.addAction(&cm_remove_from_layout);
+    }
 	else
 	{
 		// on void menu...
@@ -1172,6 +1179,10 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 			menu.addAction(&cm_add_layout);
 			//menu.addMenu(&layout_editor_menu);
 		}
+
+
+        menu.addAction(&cm_save_layout);
+        menu.addAction(&cm_save_layout_as);
 
 		menu.addMenu(&distance_menu);
 		menu.addAction(&cm_togglefs);
@@ -1215,8 +1226,14 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 			contextMenuHelper_addNewLayout();
 		}
 
+        else if (act == &cm_save_layout_as) 
+        {
+            contextMenuHelper_saveLayout(true);
+        }
+
+
 	}
-	else // video item menu?
+	else if (aitem && m_scene.selectedItems().count()==0 )// video item single selection
 	{
 		if (!m_camLayout.hasSuchItem(aitem))
 			return;
@@ -1276,7 +1293,33 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 				contextMenuHelper_editLayout(aitem);
 		}
 
+        if (act == &cm_remove_from_layout)
+        {
+            QList<CLAbstractSubItemContainer*> lst;
+            lst.push_back(aitem);
+            m_camLayout.removeItems(lst);
+        }
+
 	}
+    else if (aitem && m_scene.selectedItems().count()>0 )// video item single selection
+    {
+
+        if (act == &cm_remove_from_layout)
+        {
+            QList<CLAbstractSubItemContainer*> lst;
+
+            foreach(QGraphicsItem* item, m_scene.selectedItems())
+            {
+                CLAbstractSubItemContainer* aitemc = static_cast<CLAbstractSubItemContainer*>(item);
+                lst.push_back(aitemc);
+            }
+            
+            m_camLayout.removeItems(lst);
+        }
+
+    }
+
+
 
 	QGraphicsView::contextMenuEvent(event);
 	/**/
@@ -1394,14 +1437,14 @@ void GraphicsView::dropEvent ( QDropEvent * event )
 	foreach(QString id, items.videodevices)
 	{
 		m_camLayout.getContent()->addDevice(id);
-		m_camLayout.addDevice(id);
+		m_camLayout.addDevice(id, true);
 	}
 
 	foreach(QString id, items.recorders)
 	{
 		LayoutContent* lc =  CLSceneLayoutManager::instance().createRecorderContent(id);
 		m_camLayout.getContent()->addLayout(lc, false);
-		m_camLayout.addDevice(id);
+		m_camLayout.addDevice(id, true);
 	}
 
 	foreach(int lcp, items.layoutlinks)
@@ -2266,7 +2309,7 @@ void GraphicsView::contextMenuHelper_addNewLayout()
 			bool empty_layout = m_camLayout.getItemList().count() == 0;
 
 			m_camLayout.getContent()->addLayout(lc, false);
-			m_camLayout.addLayoutItem(name, lc);
+			m_camLayout.addLayoutItem(name, lc, true);
 			m_camLayout.setContentChanged(true);
 
 			if (empty_layout)
@@ -2294,7 +2337,7 @@ void GraphicsView::contextMenuHelper_addNewLayout()
 				bool empty_layout = m_camLayout.getItemList().count() == 0;
 
 				m_camLayout.getContent()->addLayout(lc, false);
-				m_camLayout.addLayoutItem(name, lc);
+				m_camLayout.addLayoutItem(name, lc, true);
 				m_camLayout.setContentChanged(true);
 
 				if (empty_layout)
@@ -2404,7 +2447,7 @@ void GraphicsView::contextMenuHelper_openInWebBroser(CLVideoCamera* cam)
 	QTextStream(&url) << "http://" << net_device->getIP().toString();
 
 	CLWebItem* wi = new CLWebItem(this, m_camLayout.getGridEngine().calcDefaultMaxItemSize().width(), m_camLayout.getGridEngine().calcDefaultMaxItemSize().height());
-	m_camLayout.addItem(wi);
+	m_camLayout.addItem(wi, true);
 	wi->navigate(url);
 
 	fitInView(600, 100, CLAnimationTimeLine::SLOW_START_SLOW_END);
@@ -2419,6 +2462,51 @@ void GraphicsView::contextMenuHelper_Rotation(CLAbstractSceneItem* wnd, qreal an
 	wnd->setRotationPointCenter(center_point_item);
 
 	wnd->z_rotate_abs(center_point_item, angle, 600, 0);
+
+}
+
+void GraphicsView::contextMenuHelper_saveLayout( bool new_name)
+{
+    if (new_name)
+    {
+        bool ok;
+        QString name;
+        while(true)
+        {
+            name = UIgetText(this, tr("Save layout as"), tr("Layout title:"), "", ok).trimmed();
+            if (!ok)
+                break;
+
+            if (name.isEmpty())
+            {
+                UIOKMessage(this, "", "Empty tittle cannot be used.");
+                continue;
+            }
+
+            name = QString("Layout:") + name;
+
+            if (!CLSceneLayoutManager::instance().getAllLayoutsContent()->hasSuchSublayoutName(name))
+                break;
+
+            UIOKMessage(this, "", "Such title layout already exists.");
+
+        }
+
+        if (!ok)
+            return;
+
+
+        LayoutContent* new_cont = LayoutContent::coppyLayout(m_camLayout.getContent());
+
+        new_cont->addDecorationFlag(LayoutContent::MagnifyingGlass);
+        new_cont->removeDecorationFlag(LayoutContent::SearchEdit);
+
+        new_cont->setName(name);
+        CLDeviceCriteria cr(CLDeviceCriteria::STATIC);
+        new_cont->setDeviceCriteria(cr);
+        CLSceneLayoutManager::instance().getAllLayoutsContent()->addLayout(new_cont, false);
+
+    }
 
 }
 
@@ -2521,3 +2609,4 @@ void GraphicsView::on_grid_drop_animation_finished()
 	}
 	m_camLayout.updateSceneRect();
 }
+

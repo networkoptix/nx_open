@@ -7,8 +7,13 @@ extern QAction cm_exit;
 extern QAction cm_fitinview;
 extern QAction cm_arrange;
 extern QAction cm_add_layout;
+
+extern QAction cm_save_layout;
+extern QAction cm_save_layout_as;
+
 extern QAction cm_togglefs;
 extern QAction cm_fullscren;
+extern QAction cm_remove_from_layout;
 extern QAction cm_settings;
 extern QAction cm_start_recording;
 extern QAction cm_stop_recording;

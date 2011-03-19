@@ -284,7 +284,10 @@ void SceneLayout::onTimer()
 		if (!addDevice(dev, false))
 			dev->releaseRef();
 		else
+        {
 			added = true;
+            m_content->addDevice(dev->getUniqueId());
+        }
 	}
 
 	//==============recorders ================================
@@ -640,6 +643,32 @@ void SceneLayout::onItemClose(CLAbstractSubItemContainer* itm, bool addToremoved
 
 }
 
+void SceneLayout::removeItems(QList<CLAbstractSubItemContainer*> itemlst)
+{
+    foreach(CLAbstractSubItemContainer* item, itemlst)
+    {
+        CLAbstractSceneItem* aitem = static_cast<CLAbstractSceneItem*>(item);
+
+        if (!m_items.contains(aitem))
+            continue;
+
+        foreach(CLAbstractComplicatedItem* citem, m_deviceitems)
+        {
+            if (citem->getSceneItem() == aitem)
+                citem->beforestopDispay();
+        }
+
+    }
+
+    foreach(CLAbstractSubItemContainer* item, itemlst)
+    {
+        CLAbstractSceneItem* aitem = static_cast<CLAbstractSceneItem*>(item);
+
+        onItemClose(aitem, true);
+    }
+
+}
+
 bool SceneLayout::removeDevices(QList<CLAbstractComplicatedItem*> lst)
 {
 
@@ -726,14 +755,14 @@ void SceneLayout::loadContent()
         
         item = new CLPictureImageItem(m_view, img->width(), img->height(), img->getImage(), img->getName());
 		item->setOpacity(0.8);
-		addItem(item, img->getX(), img->getY());
+		addItem(item, img->getX(), img->getY(), false);
 		added = true;
 	}
 
 	foreach(LayoutButton* btn, btns_list)
 	{
 		CLCustomBtnItem* item = new CLCustomBtnItem(m_view, btn->width(), btn->height(), btn->getName(), btn->getName(), "tiiktip text");
-		addItem(item, btn->getX(), btn->getY());
+		addItem(item, btn->getX(), btn->getY(), false);
 		added = true;
 	}
 
