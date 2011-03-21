@@ -18,7 +18,7 @@ mRecordersAndLayouts(0)
 
 	mEmptyLayout = getNewEmptyLayoutContent();
 
-	mSearchLayout = getNewEmptyLayoutContent(LayoutContent::HomeButton | LayoutContent::BackGroundLogo | LayoutContent::SquareLayout | LayoutContent::LongLayout);
+	mSearchLayout = getNewEmptyLayoutContent(LayoutContent::HomeButton | LayoutContent::BackGroundLogo | LayoutContent::SquareLayout | LayoutContent::LongLayout );
 	mSearchLayout->removeDecorationFlag(LayoutContent::MagnifyingGlass);
 	mSearchLayout->addDecorationFlag(LayoutContent::SearchEdit);
 

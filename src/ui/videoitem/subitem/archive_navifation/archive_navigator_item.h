@@ -42,6 +42,8 @@ protected:
 	int m_width;
 	int m_height;
 
+    int mNonFullScreenHight;
+
 	CLImgSubItem* mPlayItem;
 	CLImgSubItem* mPauseItem;
 
@@ -62,6 +64,8 @@ protected:
  	CLAbstractArchiveReader* mReader;
 
 	bool mFullScreen;
+
+    qreal mButtonAspectRatio;
 
 };
 

@@ -54,7 +54,7 @@ m_forwardDirection(true)
 
     if (m_Images.count()>1)
     {
-        m_Timer.setInterval(1000/15); // 25 fps
+        m_Timer.setInterval(1000/200); // 25 fps
         connect(&m_Timer, SIGNAL(timeout()), this, SLOT(onTimer()));
         m_Timer.start();
     }

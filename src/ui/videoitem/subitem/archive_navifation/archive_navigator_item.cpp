@@ -8,14 +8,16 @@
 #include "device_plugins/archive/abstract_archive_stream_reader.h"
 #include "ui/graphicsview.h"
 
-//int NavigatorItemHeight = 200;
+int FullScreenHight = 35;
 
 CLArchiveNavigatorItem::CLArchiveNavigatorItem(CLAbstractSubItemContainer* parent, int height):
 CLAbstractSubItem(parent, 0.2, 0.8),
 mStreamReader(0),
 mPlayMode(true),
 mSliderIsmoving(false),
-mFullScreen(false)
+mFullScreen(false),
+mNonFullScreenHight(height),
+mButtonAspectRatio(120.0/70)
 {
 	m_height = height;
 	m_width = parent->boundingRect().width();
@@ -46,18 +48,20 @@ mFullScreen(false)
 	/**/
 
 	/**/
+    
+    int button_width = m_height*mButtonAspectRatio;
 
-	mPlayItem = new CLImgSubItem(this, ":/skin/try/play1.png", PlaySubItem, 0.7, 1.0, m_height, m_height);
-	mPauseItem = new CLImgSubItem(this, ":/skin/try/pause1.png", PauseSubItem, 0.7, 1.0, m_height, m_height);
+	mPlayItem = new CLImgSubItem(this, ":/skin/player/play.png", PlaySubItem, 0.7, 1.0, button_width, m_height);
+	mPauseItem = new CLImgSubItem(this, ":/skin/player/pause.png", PauseSubItem, 0.7, 1.0, button_width, m_height);
 	mPlayItem->setVisible(false);
 
-	mRewindBackward = new CLImgSubItem(this, ":/skin/try/player_rew.png", RewindBackwardSubItem, 0.7, 1.0, m_height, m_height);
-	mRewindForward = new CLImgSubItem(this, ":/skin/try/player_fwd.png", RewindForwardSubItem, 0.7, 1.0, m_height, m_height);
+	mRewindBackward = new CLImgSubItem(this, ":/skin/player/to_very_beginning.png", RewindBackwardSubItem, 0.5, 1.0, button_width, m_height);
+	mRewindForward = new CLImgSubItem(this, ":/skin/player/to_very_end.png", RewindForwardSubItem, 0.5, 1.0, button_width, m_height);
 
-	mStepForward = new CLImgSubItem(this, ":/skin/try/player_end.png", StepForwardSubItem, 0.7, 1.0, m_height, m_height);
+	mStepForward = new CLImgSubItem(this, ":/skin/player/frame_forward.png", StepForwardSubItem, 0.5, 1.0, button_width, m_height);
 	mStepForward->setVisible(false);
 
-	mStepBackward = new CLImgSubItem(this, ":/skin/try/player_start.png", StepBackwardSubItem, 0.7, 1.0, m_height, m_height);
+	mStepBackward = new CLImgSubItem(this, ":/skin/player/frame_backward.png", StepBackwardSubItem, 0.5, 1.0, button_width, m_height);
 	mStepBackward->setVisible(false);
 
 	/**/
@@ -94,13 +98,13 @@ void CLArchiveNavigatorItem::goToFullScreenMode(bool fullscreen)
 	{
 		QGraphicsView* view = scene()->views().at(0);
 		m_width = view->viewport()->width();
-		m_height = 50;
+		m_height = FullScreenHight;
 
 	}
 	else
 	{
 		m_width = m_parent->boundingRect().width();
-		m_height = 400;
+		m_height = mNonFullScreenHight;
 	}
 
 	QGraphicsView* view = m_parent->scene()->views().at(0);
@@ -141,27 +145,29 @@ void CLArchiveNavigatorItem::onResize()
 	{
 		QGraphicsView* view = scene()->views().at(0);
 		m_width = view->viewport()->width();
-		m_height = 50;
+		m_height = FullScreenHight;
 
 	}
 	else
 	{
 		m_width = m_parent->boundingRect().width();
-		m_height = 400;
+		m_height = mNonFullScreenHight;
 	}
 
-	mRewindBackward->setMaxSize(m_height, m_height);
-	mPauseItem->setMaxSize(m_height, m_height);
-	mPlayItem->setMaxSize(m_height, m_height);
-	mRewindForward->setMaxSize(m_height, m_height);
+    int button_width = m_height*mButtonAspectRatio; // this is just very big value; I assume that w>h
 
-	mStepForward->setMaxSize(m_height, m_height);
-	mStepBackward->setMaxSize(m_height, m_height);
+	mRewindBackward->setMaxSize(button_width, m_height);
+	mPauseItem->setMaxSize(button_width, m_height);
+	mPlayItem->setMaxSize(button_width, m_height);
+	mRewindForward->setMaxSize(button_width, m_height);
+
+	mStepForward->setMaxSize(button_width, m_height);
+	mStepBackward->setMaxSize(button_width, m_height);
 	/**/
 
 	const int shift0 = 5;
-	const int item_distance = 10;
-	const int item_size = item_distance + m_height;
+	const int item_distance = 1;
+	const int item_size = item_distance + button_width;
 
 	mRewindBackward->setPos(shift0, 0);
 	mPauseItem->setPos(shift0 + item_size,0);
@@ -171,43 +177,184 @@ void CLArchiveNavigatorItem::onResize()
 	mStepForward->setPos(m_width - shift0 - item_size, 0);
 	mStepBackward->setPos(m_width - shift0 - 2*item_size, 0);
 
-	int slider_width = m_width - m_height*(3+2+ (m_height==400 ? 2.5 : 3));
+	int slider_width = m_width - button_width*(3+2+ (m_height==mNonFullScreenHight ? 2.5 : 3));
 
 	mSlider->resize(slider_width, m_height*2/3);
-	mSlider_item->setPos(m_height*(3+2), m_height/6);
+	mSlider_item->setPos(button_width*(3+2), m_height/6);
 
-	if (m_height==50)
+    //mSlider->resize(slider_width, m_height);
+    //mSlider_item->setPos(button_width*(3+2), 0);
+
+
+	if (m_height==FullScreenHight)
 	{
 
-		mSlider->setStyleSheet("QSlider { height: 33px}"
-			"QSlider::groove:horizontal {"
-			"border: 1px solid #6a6a6a;"
-			"background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #6a6a7a, stop:1 #6a6afa);"
-			"height: 29px;"
-			"margin: 0 0 0 0;}"
-			"QSlider::handle:horizontal {"
-			"background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #567ecd, stop:1 #567eff);"
-			"border: 2px solid #205eff;"
-			"width: 33px;"
-			"margin: -2px 0 -2px 0;"
-			"border-radius: 3px;}");    
+        /*/
+        mSlider->setStyleSheet("QSlider::groove:horizontal {"
+        "top: 2px;"
+        "border: 1px solid #bbb;"
+        "background: white;"
+        "height: 14px;"
+        "border-radius: 4px;}"
+        ""
+        "QSlider::sub-page:horizontal {"
+        "background: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1,"
+        "stop: 0 #66e, stop: 1 #bbf);"
+        "background: qlineargradient(x1: 0, y1: 0.2, x2: 1, y2: 1,"
+        "stop: 0 #bbf, stop: 1 #55f);"
+        "border: 1px solid #777;"
+        "height: 10px;"
+        "border-radius: 4px;}"
+        ""
+        "QSlider::add-page:horizontal {"
+        "background: #fff;"
+        "border: 1px solid #777;"
+        "height: 10px;"
+        "border-radius: 4px;}"
+        ""
+        "QSlider::handle:horizontal {"
+        "background: qlineargradient(x1:0, y1:0, x2:1, y2:1,"
+        "stop:0 #eee, stop:1 #ccc);"
+        "border: 1px solid #777;"
+        "width: 15px;"
+        "margin-top: -2px;"
+        "margin-bottom: -2px;"
+        "border-radius: 4px;}"
+        ""
+        "QSlider::handle:horizontal:hover {"
+        "background: qlineargradient(x1:0, y1:0, x2:1, y2:1,"
+        "stop:0 #fff, stop:1 #ddd);"
+        "border: 1px solid #444;"
+        "border-radius: 4px;}");
+
+
+        /**/
+
+
+        mSlider->resize(slider_width, 28);
+        mSlider_item->setPos(button_width*(3+2), 3);
+
+
+        mSlider->setStyleSheet("QSlider::groove:horizontal {"
+                               "top: 0px;"
+                               "border: 1px solid #bbb;"
+                               "background: white;"
+                               "height: 28px;"
+                               "border-radius: 4px;}"
+                               ""
+                               "QSlider::sub-page:horizontal {"
+                               "background: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1,"
+                               "stop: 0 #66e, stop: 1 #bbf);"
+                               "background: qlineargradient(x1: 0, y1: 0.2, x2: 1, y2: 1,"
+                               "stop: 0 #bbf, stop: 1 #07f);"
+                               "border: 1px solid #777;"
+                               "height: 10px;"
+                               "border-radius: 4px;}"
+                               ""
+                               "QSlider::add-page:horizontal {"
+                               "background: #fff;"
+                               "border: 1px solid #777;"
+                               "height: 10px;"
+                               "border-radius: 4px;}"
+                               ""
+                               "QSlider::handle:horizontal {"
+                               "background: qlineargradient(x1:0, y1:0, x2:1, y2:1,"
+                               "stop:0 #eee, stop:1 #ccc);"
+                               "border: 2px solid #777;"
+                               "width: 35px;"
+                               "margin-top: -2px;"
+                               "margin-bottom: -2px;"
+                               "border-radius: 4px;}"
+                               ""
+                               "QSlider::handle:horizontal:hover {"
+                               "background: qlineargradient(x1:0, y1:0, x2:1, y2:1,"
+                               "stop:0 #fff, stop:1 #ddd);"
+                               "border: 2px solid #444;"
+                               "border-radius: 4px;}");
+
+	
 	}
 	else
 	{
 
-		mSlider->setStyleSheet("QSlider { height: 266px}"
-			"QSlider::groove:horizontal {"
-			"border: 8px solid #6a6a6a;"
-			"background: qlineargradient(x1:0, y1:0, x2:0, y2:4, stop:0 #6a6a7a, stop:1 #6a6afa);"
-			"height: 260px;"
-			"margin: 0 0 0 0;}"
-			"QSlider::handle:horizontal {"
-			"background: qlineargradient(x1:0, y1:0, x2:4, y2:4, stop:0 #567ecd, stop:1 #567eff);"
-			"border: 10px solid #205eff;" // border of handle 
-			"width: 266px;"
-			"margin: -8px 0 -8px 0;"
-			"border-radius: 30px;}");
-			/**/
+        mSlider->resize(slider_width, 180);
+        mSlider_item->setPos(button_width*(3+2), 10);
+
+        /*/
+        mSlider->setStyleSheet("QSlider::groove:horizontal {"
+        "border: 4px solid #bbb;"
+        "background: white;"
+        "height: 90px;"
+        "border-radius: 16px;}"
+        ""
+        "QSlider::sub-page:horizontal {"
+        "background: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1,"
+        "stop: 0 #66e, stop: 1 #bbf);"
+        "background: qlineargradient(x1: 0, y1: 0.2, x2: 1, y2: 1,"
+        "stop: 0 #bbf, stop: 1 #55f);"
+        "border: 4px solid #777;"
+        "height: 10px;"
+        "border-radius: 14px;}"
+        ""
+        "QSlider::add-page:horizontal {"
+        "background: #fff;"
+        "border: 4px solid #777;"
+        "height: 10px;"
+        "border-radius: 16px;}"
+        ""
+        "QSlider::handle:horizontal {"
+        "background: qlineargradient(x1:0, y1:0, x2:1, y2:1,"
+        "stop:0 #eee, stop:1 #ccc);"
+        "border: 4px solid #777;"
+        "width: 100px;"
+        "margin-top: -8px;"
+        "margin-bottom: -8px;"
+        "border-radius: 16px;}"
+        ""
+        "QSlider::handle:horizontal:hover {"
+        "background: qlineargradient(x1:0, y1:0, x2:1, y2:1,"
+        "stop:0 #fff, stop:1 #ddd);"
+        "border: 4px solid #444;"
+        "border-radius: 16px;}");
+
+        /**/
+
+        mSlider->setStyleSheet("QSlider::groove:horizontal {"
+                               "border: 4px solid #bbb;"
+                               "background: white;"
+                               "height: 180px;"
+                               "border-radius: 16px;}"
+                               ""
+                               "QSlider::sub-page:horizontal {"
+                               "background: qlineargradient(x1: 0, y1: 0,    x2: 0, y2: 1,"
+                               "stop: 0 #66e, stop: 1 #bbf);"
+                               "background: qlineargradient(x1: 0, y1: 0.2, x2: 1, y2: 1,"
+                               "stop: 0 #bbf, stop: 1 #07f);"
+                               "border: 4px solid #777;"
+                               "height: 10px;"
+                               "border-radius: 14px;}"
+                               ""
+                               "QSlider::add-page:horizontal {"
+                               "background: #fff;"
+                               "border: 4px solid #777;"
+                               "height: 10px;"
+                               "border-radius: 16px;}"
+                               ""
+                               "QSlider::handle:horizontal {"
+                               "background: qlineargradient(x1:0, y1:0, x2:1, y2:1,"
+                               "stop:0 #eee, stop:1 #ccc);"
+                               "border: 4px solid #777;"
+                               "width: 200px;"
+                               "margin-top: -8px;"
+                               "margin-bottom: -8px;"
+                               "border-radius: 16px;}"
+                               ""
+                               "QSlider::handle:horizontal:hover {"
+                               "background: qlineargradient(x1:0, y1:0, x2:1, y2:1,"
+                               "stop:0 #fff, stop:1 #ddd);"
+                               "border: 4px solid #444;"
+                               "border-radius: 16px;}");
+
 
 	}
 

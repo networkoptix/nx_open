@@ -28,10 +28,10 @@ int item_select_duration = 800;
 int item_hoverevent_duration = 300;
 int scene_zoom_duration = 2500;
 int scene_move_duration = 3000;
-
 int item_rotation_duration = 2000;
-
 qreal selected_item_zoom = 1.63;
+
+int decoration_size = 60;
 
 extern QString button_home;
 extern QString button_level_up;
@@ -452,23 +452,23 @@ void GraphicsView::initDecoration()
 
 	if (home)
 	{
-        item = new CLUnMovedPixtureButton(button_home, 0,  global_decoration_opacity, 1.0, ":/skin/home.png", 100, 100, 255);
+        item = new CLUnMovedPixtureButton(button_home, 0,  global_decoration_opacity, 1.0, ":/skin/decorations/home.png", decoration_size, decoration_size, 255);
 		item->setStaticPos(QPoint(1,1));
 		addStaticItem(item);
-		top_left+= 105;
+		top_left+= (decoration_size + 5);
 	}
 
 	if (level_up)
 	{
-		item = new CLUnMovedPixtureButton(button_level_up, 0,  global_decoration_opacity, 1.0, ":/skin/up.png", 100, 100, 255);
+		item = new CLUnMovedPixtureButton(button_level_up, 0,  global_decoration_opacity, 1.0, ":/skin/decorations/level-up.png", decoration_size, decoration_size, 255);
 		item->setStaticPos(QPoint(top_left,1));
 		addStaticItem(item);
-		top_left+=100;
+		top_left+=decoration_size;
 	}
 
 	if (cont->checkDecorationFlag(LayoutContent::BackGroundLogo))
 	{
-		item = new CLUnMovedPixture("background", 0, 0.03, 0.03, ":/skin/logo.png", viewport()->width(), viewport()->height(), -100);
+		item = new CLUnMovedPixture("background", 0, 0.03, 0.03, ":/skin/startscreen/no_logo.png", viewport()->width(), viewport()->height(), -100);
         //item = new CLUnMovedPixture("background", 0, 0.03, 0.03, ":/skin/logo", viewport()->width(), viewport()->height(), -100);
 		item->setStaticPos(QPoint(1,1));
 		addStaticItem(item);
@@ -476,23 +476,23 @@ void GraphicsView::initDecoration()
 
 	if (magnifyingGlass)
 	{
-		item = new CLUnMovedPixtureButton(button_magnifyingglass, 0,  0.4, 1.0, ":/skin/try/search.png", 100, 100, 255);
-		item->setStaticPos(QPoint(viewport()->width()/2 - 50,0));
+		item = new CLUnMovedPixtureButton(button_magnifyingglass, 0,  0.4, 1.0, ":/skin/decorations/search.png", decoration_size, decoration_size, 255);
+		item->setStaticPos(QPoint((viewport()->width() - decoration_size)/2,0));
 		addStaticItem(item);
 	}
 
 	if (square_layout)
 	{
-		item = new CLUnMovedPixtureButton(button_squarelayout, 0,  global_decoration_opacity, 1.0, ":/skin/try/square_layout.png", 100, 100, 255);
-		item->setStaticPos(QPoint(viewport()->width() - 220,1));
+		item = new CLUnMovedPixtureButton(button_squarelayout, 0,  global_decoration_opacity, 1.0, ":/skin/decorations/square-view.png", decoration_size, decoration_size, 255);
+		item->setStaticPos(QPoint(viewport()->width() - 2.2*decoration_size,1));
 		addStaticItem(item);
-		top_left+=110;
+		top_left+=(decoration_size+10);
 	}
 
 	if (long_layout)
 	{
-		item = new CLUnMovedPixtureButton(button_longlayout, 0,  global_decoration_opacity, 1.0, ":/skin/try/long_layout.png", 100, 100, 255);
-		item->setStaticPos(QPoint(viewport()->width() - 110+1,1));
+		item = new CLUnMovedPixtureButton(button_longlayout, 0,  global_decoration_opacity, 1.0, ":/skin/decorations/horizontal-view.png", decoration_size, decoration_size, 255);
+		item->setStaticPos(QPoint(viewport()->width() - 1.1*decoration_size+1,1));
 		addStaticItem(item);
 	}
 	/**/
@@ -1820,15 +1820,15 @@ void GraphicsView::updateDecorations()
 
 	item = static_cast<CLUnMovedPixture*>(staticItemByName(button_magnifyingglass));
 	if (item)
-		item->setStaticPos(QPoint(viewport()->width()/2 - 50,0));
+		item->setStaticPos(QPoint((viewport()->width() - decoration_size)/2,0));
 
 	item = static_cast<CLUnMovedPixture*>(staticItemByName(button_squarelayout));
 	if (item)
-		item->setStaticPos(QPoint(viewport()->width() - 220,0));
+		item->setStaticPos(QPoint(viewport()->width() - 2.2*decoration_size,1));
 
 	item = static_cast<CLUnMovedPixture*>(staticItemByName(button_longlayout));
 	if (item)
-		item->setStaticPos(QPoint(viewport()->width() - 110,0));
+		item->setStaticPos(QPoint(viewport()->width() - 1.1*decoration_size,0));
 
 	if (m_seachItem)
 	{
@@ -2487,6 +2487,8 @@ void GraphicsView::contextMenuHelper_saveLayout( bool new_name)
 
             if (!CLSceneLayoutManager::instance().getAllLayoutsContent()->hasSuchSublayoutName(name))
                 break;
+
+            //YesNoCancel(this, )
 
             UIOKMessage(this, "", "Such title layout already exists.");
 

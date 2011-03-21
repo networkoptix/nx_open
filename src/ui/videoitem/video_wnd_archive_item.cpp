@@ -9,7 +9,7 @@ CLVideoWindowArchiveItem::CLVideoWindowArchiveItem (GraphicsView* view, const CL
 CLVideoWindowItem(view, layout, max_width, max_height, name)
 {
 
-	m_archNavigatorHeight = 400 ;
+	m_archNavigatorHeight = 200;
 
 	mArchiveNavigator = new CLArchiveNavigatorItem(this, m_archNavigatorHeight);
 	mArchiveNavigator->setVisible(false);
