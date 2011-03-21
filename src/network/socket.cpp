@@ -5,12 +5,14 @@ using namespace std;
   typedef int socklen_t;
   typedef char raw_type;       // Type used for raw data on this platform
 #else
+  #include <sys/select.h>
   #include <sys/types.h>       // For data types
   #include <sys/socket.h>      // For socket(), connect(), send(), and recv()
   #include <netdb.h>           // For gethostbyname()
   #include <arpa/inet.h>       // For inet_addr()
   #include <unistd.h>          // For close()
   #include <netinet/in.h>      // For sockaddr_in
+  #include <fcntl.h>
   typedef void raw_type;       // Type used for raw data on this platform
 #endif
 
@@ -168,19 +170,22 @@ m_timeout(3000)
 
 void CommunicatingSocket::connect(const string &foreignAddress,
     unsigned short foreignPort)  {
-#ifdef _WIN32
   // Get the address of the requested host
   sockaddr_in destAddr;
   fillAddr(foreignAddress, foreignPort, destAddr);
 
   u_long iMode = 1;
+#ifdef _WIN32
   ioctlsocket(sockDesc, FIONBIO, &iMode); // set sock in asynch mode
+#else
+  fcntl(sockDesc, F_SETFL, O_NONBLOCK);
+#endif
 
   ::connect(sockDesc, (sockaddr *) &destAddr, sizeof(destAddr));// Try to connect to the given port
 
-  TIMEVAL timeVal;
-  FD_SET wrtFDS;
-  int iSockRet, iSelRet;
+  timeval timeVal;
+  fd_set wrtFDS;
+  int iSelRet;
 
   /* monitor for incomming connections */
   FD_ZERO(&wrtFDS);
@@ -196,8 +201,12 @@ void CommunicatingSocket::connect(const string &foreignAddress,
 	throw SocketException("Connect failed (connect())", true);
 
   iMode = 0;
-  int t = ioctlsocket(sockDesc, FIONBIO, &iMode);  //set socket to synch  mode
+#ifdef _WIN32
+	ioctlsocket(sockDesc, FIONBIO, &iMode); // set sock in asynch mode
+#else
+	fcntl(sockDesc, F_SETFL, 0);
 #endif
+	
 }
 
 void CommunicatingSocket::setTimeOut( unsigned int ms )

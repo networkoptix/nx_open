@@ -37,7 +37,7 @@ m_firstTime(true)
 
 	foreach(QString subdir, subdirList)
 	{
-		CLDirectoryBrowserDeviceServer dirbrowsr(rootDir + subdir);
+		CLDirectoryBrowserDeviceServer dirbrowsr(rootDir + QString("/") + subdir);
 
 		subdir = QString("Recorder:") + subdir;
 

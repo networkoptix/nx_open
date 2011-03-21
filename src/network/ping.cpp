@@ -8,7 +8,11 @@
 
 #pragma comment(lib, "iphlpapi.lib")
 #pragma comment(lib, "ws2_32.lib")
+#else
+#include <SystemConfiguration/SCNetworkReachability.h>
+#endif
 
+#ifdef _WIN32
 CLPing::CLPing()
 {
 }
@@ -120,7 +124,14 @@ CLPing::CLPing()
 
 bool CLPing::ping(const QString& ip, int retry, int timeoutPerRetry, int packetSize)
 {
-    return true;
+	SCNetworkReachabilityRef target;
+	SCNetworkConnectionFlags flags = 0;
+	Boolean ok;
+	target = SCNetworkReachabilityCreateWithName(NULL, ip.toLatin1().data());
+	ok = SCNetworkReachabilityGetFlags(target, &flags);
+	CFRelease(target);
+	
+	return ok;
 }
 
 #endif

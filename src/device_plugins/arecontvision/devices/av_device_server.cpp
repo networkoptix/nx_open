@@ -9,7 +9,7 @@ AVDeviceServer::AVDeviceServer()
 	AVJpeg::Header::Initialize("ArecontVision", "CamLabs", "ArecontVision");
 
 	QString error;
-	if (CLAreconVisionDevice::loadDevicesParam("./arecontvision/devices.xml", error))
+	if (CLAreconVisionDevice::loadDevicesParam(QCoreApplication::applicationDirPath() + "/arecontvision/devices.xml", error))
 	{
 		CL_LOG(cl_logINFO)
 		{
@@ -29,7 +29,7 @@ AVDeviceServer::AVDeviceServer()
 			cl_log.log(log, cl_logERROR);
 		}
 
-		cl_log.log("Cannot load /arecontvision/devices.xml", cl_logERROR);
+		cl_log.log("Cannot load arecontvision/devices.xml", cl_logERROR);
 		QMessageBox msgBox;
 		msgBox.setText("Error");
 		msgBox.setInformativeText("Cannot load /arecontvision/devices.xml");
