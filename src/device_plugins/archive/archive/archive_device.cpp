@@ -7,7 +7,7 @@ CLArchiveDevice::CLArchiveDevice(const QString& arch_path)
 	addDeviceTypeFlag(CLDevice::RECORDED);
 
 	m_uniqueId = arch_path;
-	m_name = arch_path;
+	m_name = QDir(arch_path).dirName();
 
 	QFile file(arch_path + "/layout.xml");
 
@@ -34,6 +34,7 @@ CLArchiveDevice::CLArchiveDevice(const QString& arch_path)
 
 	QString ws = layout_element.attribute("width");
 	QString hs = layout_element.attribute("height");
+    mOriginalName = layout_element.attribute("name");
 
 	int width = ws.toInt();
 	int height = hs.toInt();
@@ -70,7 +71,19 @@ void CLArchiveDevice::readdescrfile()
 
 }
 
+QString CLArchiveDevice::originalName() const
+{
+    return mOriginalName;
+}
+
+
 CLStreamreader* CLArchiveDevice::getDeviceStreamConnection()
 {
 	return new CLArchiveStreamReader(this);
+}
+
+
+QString CLArchiveDevice::toString() const
+{
+    return QString("recorded:") + m_name;
 }

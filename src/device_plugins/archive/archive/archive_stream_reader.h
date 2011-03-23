@@ -25,6 +25,8 @@ public:
 
 	quint64 currentTime() const;
 	virtual void resume();
+
+    bool setRecordedDataDst(const QString& dst);
 protected:
 
 	virtual void channeljumpTo(quint64 mksec, int channel);
@@ -42,6 +44,10 @@ protected:
 	int findBestIndex(int channel, quint64 mksec) const;
 	int slowest_channel() const;
 
+    void setSkipFramesToTime(quint64 skipFramesToTime);
+
+    bool isAllChannelsSkippedToTime() const;
+
 protected:
 	bool m_firsttime;
 
@@ -52,14 +58,9 @@ protected:
 	QFile m_data_file[CL_MAX_CHANNELS];
 	QDataStream m_data_stream[CL_MAX_CHANNELS];
 
-protected:
-    void setSkipFramesToTime(quint64 skipFramesToTime);
 
-private:
     bool m_skippedToTime[CL_MAX_CHANNELS];
-
-private:
-    bool isAllChannelsSkippedToTime() const;
+    QString mRecordedDataDst;
 };
 
 #endif //archive_stream_reader_h1145

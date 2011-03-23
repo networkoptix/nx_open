@@ -7,7 +7,6 @@
 #include "ui/videoitem/video_wnd_item.h"
 #include "settings.h"
 #include "device/device_managmen/device_manager.h"
-#include "video_camera.h"
 #include "base/log.h"
 #include "ui/videoitem/custom_draw_button.h"
 #include "layout_content.h"
@@ -17,6 +16,7 @@
 #include "layout_manager.h"
 #include "ui/videoitem/video_wnd_archive_item.h"
 #include "ui/videoitem/picture_image_item.h"
+
 
 const int  SLOT_WIDTH = 640*10;
 const int  SLOT_HEIGHT = SLOT_WIDTH*3/4;
@@ -200,7 +200,7 @@ void SceneLayout::stop(bool animation)
 	if (animation)
 	{
 		connect(m_view, SIGNAL(scneZoomFinished()), this, SLOT(stop_helper()));
-		m_view->zoomMin(400);
+		m_view->zoomMin(10); // zzz
 	}
 	else
 	{
@@ -247,12 +247,16 @@ void SceneLayout::onTimer()
 
 	if (m_content->getDeviceCriteria().getCriteria() != CLDeviceCriteria::STATIC)
 	{
-			QList<CLAbstractComplicatedItem*> remove_lst;
 
+            bool criteria_chnged = (m_content->getDeviceCriteria().filter() != mSearchFilter);
+            mSearchFilter = m_content->getDeviceCriteria().filter();
+
+			QList<CLAbstractComplicatedItem*> remove_lst;
 			foreach(CLAbstractComplicatedItem* devitem, m_deviceitems)
 			{
 				if (devitem->getDevice()->getDeviceType() == CLDevice::VIDEODEVICE &&
-					!devitem->getDevice()->checkDeviceTypeFlag(CLDevice::RECORDED)) // if this is video device
+					(!devitem->getDevice()->checkDeviceTypeFlag(CLDevice::RECORDED) || criteria_chnged)
+                    ) // if this is video device
 				{
 					bool need_to_remove = true;
 					foreach(CLDevice* dev, all_devs)
@@ -281,6 +285,10 @@ void SceneLayout::onTimer()
 	{
 		// the ref counter for device already increased in getDeviceList; 
 		// must not do it again
+
+        if (m_deletedIds.contains(dev->getUniqueId()))
+            continue; // if this device was deleted before 
+
 		if (!addDevice(dev, false))
 			dev->releaseRef();
 		else
@@ -372,9 +380,6 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect)
 		return false;
 	}
 
-    if (m_deletedIds.contains(device->getUniqueId()))
-        return false; // if this device was deleted before 
-
 	foreach(CLAbstractComplicatedItem* devitem, m_deviceitems)
 	{
 		if (devitem->getDevice()->getUniqueId() == device->getUniqueId())
@@ -397,7 +402,7 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect)
 		else
 			video_wnd = new CLVideoWindowItem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height());
 
-		CLVideoCamera* cam = new VideoCamera(device, video_wnd);
+        CLVideoCamera* cam = new CLVideoCamera(device, video_wnd);
 		addItem(video_wnd, update_scene_rect);
 
 		m_deviceitems.push_back(cam);
@@ -580,6 +585,22 @@ void SceneLayout::makeAllItemsSelectable(bool selectable)
 	{
 		item->setFlag(QGraphicsItem::ItemIsSelectable, selectable);
 	}
+}
+
+CLAbstractComplicatedItem* SceneLayout::haveRecordedVideoPlayingFor(CLVideoCamera* cam)
+{
+    QString id = cam->getDevice()->getUniqueId();
+
+    foreach(CLAbstractComplicatedItem* dev, m_deviceitems)
+    {
+        if (!dev->getDevice()->checkDeviceTypeFlag(CLDevice::RECORDED))
+            continue;
+
+        if (dev->getDevice()->getUniqueId().contains(id))
+            return dev;
+    }
+
+    return 0;
 }
 
 //===============================================================

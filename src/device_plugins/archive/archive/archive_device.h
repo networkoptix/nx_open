@@ -10,9 +10,15 @@ public:
 	~CLArchiveDevice();
 
 	virtual CLStreamreader* getDeviceStreamConnection();
-protected:
 
+    QString toString() const;
+
+    QString originalName() const;
+protected:
 	void readdescrfile();
+protected:
+    QString mOriginalName;
+
 };
 
 #endif //archive_device_h1854

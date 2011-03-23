@@ -102,15 +102,15 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
         if (channel == 0 && draw)
             m_previousVideoDisplayedTime = currentTime;
 
-        CL_LOG(cl_logDEBUG1)
+        CL_LOG(cl_logDEBUG2)
         {
             if (vd->ignore)
-                cl_log.log("Ignoring frame ", (int)vd->timestamp, cl_logDEBUG1);
+                cl_log.log("Ignoring frame ", (int)vd->timestamp, cl_logDEBUG2);
             else
-                cl_log.log("Playing frame ", (int)vd->timestamp, cl_logDEBUG1);
+                cl_log.log("Playing frame ", (int)vd->timestamp, cl_logDEBUG2);
 
             if (!draw)
-                cl_log.log("skip drawing frame!!", displayTime.elapsed(), cl_logDEBUG1);
+                cl_log.log("skip drawing frame!!", displayTime.elapsed(), cl_logDEBUG2);
 
         }
         

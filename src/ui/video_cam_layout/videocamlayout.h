@@ -66,6 +66,8 @@ public:
 	QList<CLAbstractSceneItem*>* getItemListPointer();
 	bool hasSuchItem(const CLAbstractSceneItem* item) const;
 
+    CLAbstractComplicatedItem* haveRecordedVideoPlayingFor( CLVideoCamera* cam);
+
 	void makeAllItemsSelectable(bool selectable);
 
 	//========================================================
@@ -130,6 +132,8 @@ private:
 	LayoutContent* m_content;
 	bool m_editable;
 	bool m_contentchanged;
+
+    QString mSearchFilter;
 
 	CLGridEngine m_grid;
 };

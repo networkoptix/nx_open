@@ -117,6 +117,7 @@ qreal CLAnimationTimeLine::slow_start( int msec ) const
 qreal CLAnimationTimeLine::slow_start_slow_end( int msec ) const
 {
 	static QEasingCurve ec(QEasingCurve::InOutQuad);
+    //static QEasingCurve ec(QEasingCurve::InOutSine);
 
 	qreal value = msec / qreal(duration());
 	return ec.valueForProgress(value);

@@ -30,5 +30,24 @@ QString getMediaRootDir()
     if (!QDir(rootDir).exists())
         return DEFAULT_MEDIA_DIR;
 
+    if (rootDir.length()<1)
+        return DEFAULT_MEDIA_DIR;
+
+
+    if (rootDir.at(rootDir.length()-1) != '/')
+        rootDir += QString("/");
+
+
     return rootDir;
+}
+
+
+QString getTempRecordingDir()
+{
+    return getMediaRootDir()  + QString("_temp/");
+}
+
+QString getRecordingDir()
+{
+    return getMediaRootDir()  + QString("_Recorded/");
 }

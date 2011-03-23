@@ -11,4 +11,15 @@ QString getDataDirectory();
  */
 QString getMediaRootDir();
 
+/*
+ * Get temp directory for video recording.
+ */
+QString getTempRecordingDir();
+
+/*
+ * Get directory to save recorded video.
+ */
+QString getRecordingDir();
+
+
 #endif // _UNIVERSAL_CLIENT_UTIL_H

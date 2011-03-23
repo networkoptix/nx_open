@@ -17,12 +17,8 @@ class CLDeviceManager : public QObject
 
 private:
 	~CLDeviceManager();
-
 	static CLDeviceManager* m_Instance;
-	static QString ms_RootDir;
 public:
-	static void setRootDir( QString rootDir );
-
 	static CLDeviceManager& instance();
 
 	CLDiviceSeracher& getDiveceSercher(); 
@@ -33,7 +29,10 @@ public:
 	CLDeviceList getRecorderList();
 	CLDevice* getRecorderById(QString id); 
 
-	CLDevice* getArchiveDevice(QString id); 
+	CLDevice* getArchiveDevice(QString id);
+
+    void pleaseCheckDirs(const QStringList& lst);
+    QStringList getPleaseCheckDirs() const;
 
 protected:
 	CLDeviceManager();
@@ -41,7 +40,6 @@ protected:
 
 	bool isDeviceMeetCriteria(const CLDeviceCriteria& cr, CLDevice* dev) const;
 
-	QStringList subDirList(const QString& abspath) const;
 	void addArchiver(QString id);
 
 private:
@@ -56,6 +54,9 @@ protected:
 	bool m_firstTime;
 
 	CLDeviceList mRecDevices;
+
+    mutable QMutex mPleaseCheckDirsLst_cs;
+    QStringList  mPleaseCheckDirsLst;
 };
 
 #endif //device_manager_h_1537_

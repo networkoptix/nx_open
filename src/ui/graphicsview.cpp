@@ -22,6 +22,9 @@
 #include "animation/group_animation.h"
 #include "videoitem/grid_item.h"
 #include "util.h"
+#include "device_plugins/archive/archive/archive_stream_reader.h"
+#include "device_plugins/archive/archive/archive_device.h"
+
 
 int doubl_clk_delay = qApp->doubleClickInterval()*0.75;
 int item_select_duration = 800;
@@ -179,7 +182,7 @@ void GraphicsView::start()
 	if (m_camLayout.getItemList().count())
 	{
 		zoomMin(0);
-		fitInView(3000, 0, CLAnimationTimeLine::SLOW_END_POW_40);
+		fitInView(1000, 0, CLAnimationTimeLine::SLOW_START_SLOW_END);
 	}
 
 	enableMultipleSelection(false, true);
@@ -1141,10 +1144,16 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 					menu.addAction(&cm_start_recording);
 				}
 
-				menu.addAction(&cm_view_recorded);
-				menu.addAction(&cm_open_web_page);
+                if (contextMenuHelper_existRecordedVideo(cam))
+				    menu.addAction(&cm_view_recorded);
 
+				menu.addAction(&cm_open_web_page);
 			}
+
+            if (dev->checkDeviceTypeFlag(CLDevice::RECORDED) && !dev->getUniqueId().contains(getRecordingDir()))
+            {
+                menu.addAction(&cm_save_recorded_as);
+            }
 
 		}
 
@@ -1161,7 +1170,6 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 		}
 
 		menu.addAction(&cm_settings);
-		menu.addAction(&cm_exit);
 	}
     else if (aitem && m_scene.selectedItems().count()>0)
     {
@@ -1247,13 +1255,27 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 				show_device_settings_helper(dev);
 
 			if (act == &cm_start_recording && cam)
+            {
+                CLAbstractComplicatedItem* recorded =  m_camLayout.haveRecordedVideoPlayingFor(cam);
+                if (recorded)
+                {
+                    QList<CLAbstractSubItemContainer*> itemlst;
+                    itemlst.push_back(recorded->getSceneItem());
+                    m_camLayout.removeItems(itemlst);
+                }
+
 				cam->startRecording();
+            }
 
 			if (act == &cm_stop_recording && cam)
 				cam->stopRecording();
 
 			if (act == &cm_view_recorded&& cam)
 				contextMenuHelper_viewRecordedVideo(cam);
+
+            if (act == &cm_save_recorded_as && cam)
+                contextMenuHelper_saveRecordedAs(cam);
+            
 
 			if (act == &cm_open_web_page&& cam)
 				contextMenuHelper_openInWebBroser(cam);
@@ -1264,7 +1286,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 					contextMenuHelper_Rotation(aitem, 90);
 			}
 
-			if (act == &cm_rotate_minus90)
+			if (act == &cm_rotate_minus90)  
 			{
 				if (m_camLayout.hasSuchItem(aitem))
 					contextMenuHelper_Rotation(aitem, -90);
@@ -2427,16 +2449,72 @@ void GraphicsView::contextMenuHelper_editLayout(CLAbstractSceneItem* wnd)
 	}
 }
 
+bool GraphicsView::contextMenuHelper_existRecordedVideo(CLVideoCamera* cam)
+{
+    QString id = getTempRecordingDir() + cam->getDevice()->getUniqueId();
+    return QDir(id).exists();
+}
+
 void GraphicsView::contextMenuHelper_viewRecordedVideo(CLVideoCamera* cam)
 {
 	cam->stopRecording();
 
-	QString id = cam->getDevice()->getUniqueId();
-	id = QString("/archive/") + id;
-    id = getDataDirectory() + id;
+    QString id = getTempRecordingDir() + cam->getDevice()->getUniqueId();
 
 	m_camLayout.addDevice(id, true);
 	fitInView(600, 100, CLAnimationTimeLine::SLOW_START_SLOW_END);
+}
+
+void GraphicsView::contextMenuHelper_saveRecordedAs(CLVideoCamera* cam)
+{
+    if (!cam->getDevice()->checkDeviceTypeFlag(CLDevice::RECORDED))
+        return;
+
+    QString suggetion = (static_cast<CLArchiveDevice*>(cam->getDevice()))->originalName();
+
+    bool ok;
+    QString name;
+    while(true)
+    {
+        name = UIgetText(this, tr("Save recorded video as"), tr("Title:"), suggetion, ok).trimmed();
+        if (!ok)
+            break;
+
+        if (name.isEmpty())
+        {
+            UIOKMessage(this, "", "Please provide a title.");
+            continue;
+        }
+
+        // make sure we'll be able to create such folder
+        name.replace( QRegExp(
+             "[^"
+                "A-Z,a-z,0-9,"
+                "\\^,\\&,\\',\\@,"
+                "\\{,\\},\\[,\\],"
+                "\\,,\\$,\\=,\\!,"
+                "\\-,\\#,\\(,\\),"
+                "\\%,\\.,\\+,\\~,\\_"
+             "]"), "_" );
+
+
+        QDir dir(getRecordingDir() + name);
+        if (dir.exists())
+        {
+            UIOKMessage(this, "", "Appears this title already exists.");
+            continue;
+        }
+
+        break;
+    }
+
+    if (ok)
+    {
+        CLArchiveStreamReader* rreader = static_cast<CLArchiveStreamReader*>(cam->getStreamreader());
+        rreader->setRecordedDataDst(name);
+    }
+
+
 }
 
 void GraphicsView::contextMenuHelper_openInWebBroser(CLVideoCamera* cam)

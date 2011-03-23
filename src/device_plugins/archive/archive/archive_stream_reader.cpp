@@ -2,6 +2,8 @@
 #include "device/device.h"
 #include "base/bytearray.h"
 #include "data/mediadata.h"
+#include "util.h"
+#include "device/device_managmen/device_manager.h"
 
 CLArchiveStreamReader::CLArchiveStreamReader(CLDevice* dev):
 CLAbstractArchiveReader(dev),
@@ -20,13 +22,45 @@ m_firsttime(true)
 
 CLArchiveStreamReader::~CLArchiveStreamReader()
 {
+    if (mRecordedDataDst=="")
+        return;
 
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+    {
+        m_data_file[i].close();
+    }
+
+    QDir recDir(getRecordingDir());
+    if (!recDir.exists())
+        recDir.mkdir(getRecordingDir());
+
+
+    QString original = getDevice()->getUniqueId();
+    QString dst =  getRecordingDir() + mRecordedDataDst;
+
+    QDir().rename(original, dst);
+
+    QStringList checkLst;
+
+    checkLst.push_back(getRecordingDir());
+    CLDeviceManager::instance().pleaseCheckDirs(checkLst);
 }
 
 void CLArchiveStreamReader::resume()
 {
 	CLAbstractArchiveReader::resume();
 	m_adaptiveSleep.afterdelay();
+}
+
+bool CLArchiveStreamReader::setRecordedDataDst(const QString& dst)
+{
+    QDir dir(getRecordingDir() + dst);
+    if (dir.exists()) // already exists 
+        return false;
+
+    mRecordedDataDst = dst;
+
+    return true;
 }
 
 void CLArchiveStreamReader::init_data()
@@ -118,6 +152,12 @@ quint64 CLArchiveStreamReader::currentTime() const
         return jumpTime;
 
 	int slowe_channel = slowest_channel();
+    if (slowe_channel<0)
+    {
+        CLSleep::msleep(20);
+        return 0;
+    }
+
 	return mMovie[slowe_channel].at(mCurrIndex[slowe_channel]).time;
 }
 
@@ -199,6 +239,13 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
 		mCurrIndex[channel] = new_index;
 
 		int next_channel = slowest_channel();
+        if (next_channel<0)
+        {
+            CLSleep::msleep(20);
+            return 0;
+        }
+
+
 		qint64 next_time = mMovie[channel].at(mCurrIndex[next_channel]).time;
         if (next_time < skipFramesToTime())
         {

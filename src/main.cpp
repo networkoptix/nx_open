@@ -80,7 +80,6 @@ int main(int argc, char *argv[])
 
 	QString rootDir = getMediaRootDir();
     cl_log.log("Using " + rootDir + " as media root directory", cl_logALWAYS);
-	CLDeviceManager::setRootDir(rootDir);
 
 	CLDevice::startCommandProc();
 

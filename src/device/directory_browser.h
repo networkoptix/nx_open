@@ -16,6 +16,11 @@ public:
 
 	// returns all available devices 
 	virtual CLDeviceList findDevices();
+
+    static QStringList subDirList(const QString& abspath);
+
+protected:
+    CLDeviceList findDevices(const QString& directory);
 protected:
 	QString m_directory;
 };

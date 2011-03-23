@@ -139,6 +139,10 @@ void CLStreamRecorder::onFirstData(CLAbstractData* data)
 	root.setAttribute("width", dev->getVideoLayout()->width());
 	root.setAttribute("height", dev->getVideoLayout()->height());
 
+    
+
+    root.setAttribute("name", dev->getName() + QDateTime::currentDateTime().toString(" ddd MMM d yyyy  hh_mm"));
+
 	for (int i = 0; i < dev->getVideoLayout()->numberOfChannels(); ++i)
 	{
 		QDomElement channel = doc.createElement("channel");
@@ -225,6 +229,6 @@ QString CLStreamRecorder::dirHelper()
 	QTextStream stream(&str);
 
 
-	stream << getDataDirectory() <<"/archive/" << m_device->getUniqueId();
+	stream << getTempRecordingDir() << m_device->getUniqueId();
 	return str;
 }

@@ -13,7 +13,8 @@ QAction cm_settings("Settings...",0);
 QAction cm_start_recording("Start recording",0);
 QAction cm_stop_recording("Stop recording",0);
 QAction cm_view_recorded("View recorded video",0);
-QAction cm_open_web_page("Open web page",0);
+QAction cm_save_recorded_as("Save recorded video as...",0);
+QAction cm_open_web_page("Open web page(experimental)",0);
 
 QAction dis_0("0%",0);
 QAction dis_5("5%",0);

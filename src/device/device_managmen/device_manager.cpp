@@ -4,10 +4,14 @@
 #include "settings.h"
 #include "recorder/fake_recorder_device.h"
 #include "device_plugins/archive/archive/archive_device.h"
+#include "util.h"
 
 // Init static variables
 CLDeviceManager* CLDeviceManager::m_Instance = 0;
-QString CLDeviceManager::ms_RootDir;
+
+
+
+QString generalArchiverId = "Recorder:General Archiver";
 
 //=============================================================
 CLDeviceManager& CLDeviceManager::instance()
@@ -25,26 +29,14 @@ m_firstTime(true)
 	connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimer()));
 	m_timer.start(100); // first time should come fast
 
-	addArchiver("Recorder:General Archiver");
+	addArchiver(generalArchiverId);
 
-	if (ms_RootDir.isEmpty()) {
-		ms_RootDir = "c:/Photo/";
-	}
+    QStringList checkLst;
+    checkLst.push_back(getMediaRootDir());
+    pleaseCheckDirs(checkLst);
 
-	QString rootDir(ms_RootDir);
-
-	QStringList subdirList = subDirList(rootDir);
-
-	foreach(QString subdir, subdirList)
-	{
-		CLDirectoryBrowserDeviceServer dirbrowsr(rootDir + QString("/") + subdir);
-
-		subdir = QString("Recorder:") + subdir;
-
-		onNewDevices_helper(dirbrowsr.findDevices(), subdir);
-		addArchiver(subdir);
-	}
-
+	//CLDirectoryBrowserDeviceServer dirbrowsr(getMediaRootDir());
+	//onNewDevices_helper(dirbrowsr.findDevices(), generalArchiverId);
 }
 
 CLDeviceManager::~CLDeviceManager()
@@ -70,11 +62,23 @@ CLDiviceSeracher& CLDeviceManager::getDiveceSercher()
 	return m_dev_searcher;
 }
 
+void CLDeviceManager::pleaseCheckDirs(const QStringList& lst)
+{
+    QMutexLocker mutex(&mPleaseCheckDirsLst_cs);
+    mPleaseCheckDirsLst = lst;
+}
+
+QStringList CLDeviceManager::getPleaseCheckDirs() const
+{
+    QMutexLocker mutex(&mPleaseCheckDirsLst_cs);
+    return mPleaseCheckDirsLst;
+}
+
 void CLDeviceManager::onTimer()
 {
 	if (m_firstTime)
 	{
-		m_dev_searcher.start(); // first of all start fevice searcher
+		m_dev_searcher.start(); // first of all start device searcher
 		m_firstTime = false;
 
 		m_timer.setInterval(devices_update_interval);
@@ -84,9 +88,56 @@ void CLDeviceManager::onTimer()
 	if (!m_dev_searcher.isRunning() )
 	{
 		onNewDevices_helper(m_dev_searcher.result(), "Recorder:General Archiver");
-
 		m_dev_searcher.start(); // run searcher again ...
 	}
+
+
+    QStringList checklist = getPleaseCheckDirs();
+    pleaseCheckDirs(QStringList()); // set an empty list;
+
+    if (checklist.count())
+    {
+        QTime time; time.restart();
+        cl_log.log("=====about to check dirs...", cl_logALWAYS);
+
+        // if the have something to check
+
+        foreach(QString dir, checklist)
+        {
+            CLDirectoryBrowserDeviceServer dirbrowsr(dir);
+            CLDeviceList dev_list = dirbrowsr.findDevices();
+
+            {
+                // exclude already existing devices 
+                QMutexLocker lock(&m_dev_searcher.all_devices_mtx);
+                CLDeviceList& all_devices =  m_dev_searcher.getAllDevices();
+
+                CLDeviceList::iterator it = dev_list.begin(); 
+                while (it!=dev_list.end())
+                {
+                    if (!all_devices.contains(it.key()))
+                    {
+                        ++it;
+                        continue;
+                    }
+
+                    it.value()->releaseRef();
+                    dev_list.erase(it++);
+                }
+
+            }
+
+            onNewDevices_helper(dev_list, generalArchiverId);
+
+        }
+
+        
+
+        cl_log.log("=====done checking dirs. Time elapsed = ", time.elapsed(), cl_logALWAYS);
+
+
+    }
+
 }
 
 CLDeviceList CLDeviceManager::getDeviceList(const CLDeviceCriteria& cr)
@@ -240,37 +291,12 @@ bool CLDeviceManager::isDeviceMeetCriteria(const CLDeviceCriteria& cr, CLDevice*
 
 }
 
-QStringList CLDeviceManager::subDirList(const QString& abspath) const
-{
-
-	QStringList result;
-
-	QDir dir(abspath);
-	if (!dir.exists())
-		return result;
-
-	QFileInfoList list = dir.entryInfoList();
-
-	foreach(QFileInfo info, list)
-	{
-		if (info.isDir() && info.fileName()!="." && info.fileName()!="..")
-			result.push_back(info.fileName());
-	}
-
-	return result;
-
-}
 
 void CLDeviceManager::addArchiver(QString id)
 {
 	CLDevice* rec = new CLFakeRecorderDevice();
 	rec->setUniqueId(id);
 	mRecDevices[rec->getUniqueId()] = rec;
-}
-
-void CLDeviceManager::setRootDir( QString rootDir )
-{
-	ms_RootDir = rootDir;
 }
 
 
