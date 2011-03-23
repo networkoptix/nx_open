@@ -616,6 +616,15 @@ void SceneLayout::onItemClose(CLAbstractSubItemContainer* itm, bool addToremoved
 	CLAbstractSceneItem::CLSceneItemType type = item->getType();
 	if (type==CLAbstractSceneItem::LAYOUT)
 	{
+
+        if (addToremovedLst && getContent()==CLSceneLayoutManager::instance().getAllLayoutsContent())
+        {
+            QMessageBox::StandardButton result = YesNoCancel(0, tr("Are you sure?") , tr("Delete this layout?"));
+
+            if (result!=QMessageBox::Yes)
+                return;
+        }
+
 		CLLayoutItem* litem = static_cast<CLLayoutItem*>(item);
 		LayoutContent* lc = litem->getRefContent();
 		getContent()->removeLayout(lc, true);

@@ -1097,17 +1097,6 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 	distance_menu.addAction(&dis_30);
 	distance_menu.addAction(&dis_35);
 
-	// layout editor
-	QMenu layout_editor_menu;
-	layout_editor_menu.setWindowOpacity(global_menu_opacity);
-	layout_editor_menu.setTitle("Layout Editor");
-
-	if (m_viewMode==NormalView)
-		layout_editor_menu.addAction(&cm_layout_editor_editlayout);
-
-	layout_editor_menu.addAction(&cm_layout_editor_change_t);
-	layout_editor_menu.addAction(&cm_layout_editor_bgp);
-	layout_editor_menu.addAction(&cm_layout_editor_bgp_sz);
 
 	QMenu rotation_manu;
 	rotation_manu.setTitle("Rotation");
@@ -1155,13 +1144,14 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
                 menu.addAction(&cm_save_recorded_as);
             }
 
+            menu.addAction(&cm_settings);
+
 		}
 
 		if (aitem->getType()==CLAbstractSceneItem::LAYOUT )
 		{
-			//layout button
-			if (m_viewMode!=ItemsDonor)
-				menu.addMenu(&layout_editor_menu);
+			menu.addAction(&cm_layout_editor_change_t);
+            menu.addAction(&cm_remove_from_layout);
 		}
 
 		if (aitem->getType()==CLAbstractSceneItem::RECORDER)
@@ -1169,7 +1159,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
 		}
 
-		menu.addAction(&cm_settings);
+		
 	}
     else if (aitem && m_scene.selectedItems().count()>0)
     {
@@ -1213,20 +1203,29 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 	else
 	{
 		// on void menu...
-		menu.addAction(&cm_fitinview);
-		menu.addAction(&cm_arrange);
-
-		if (m_camLayout.isEditable() && m_viewMode!=ItemsDonor)
-		{
-			menu.addAction(&cm_add_layout);
-			//menu.addMenu(&layout_editor_menu);
-		}
+        if (m_camLayout.getContent() != CLSceneLayoutManager::instance().startScreenLayoutContent())
+        {
+            menu.addAction(&cm_fitinview);
+            menu.addAction(&cm_arrange);
 
 
-        menu.addAction(&cm_save_layout);
-        menu.addAction(&cm_save_layout_as);
+            if (m_camLayout.isEditable() && m_viewMode!=ItemsDonor)
+            {
+                //menu.addAction(&cm_add_layout); // major functions disabled 
+                //menu.addMenu(&layout_editor_menu);
+            }
 
-		menu.addMenu(&distance_menu);
+            if (m_camLayout.getContent() != CLSceneLayoutManager::instance().getAllLayoutsContent())
+            {
+                if (m_camLayout.getContent() != CLSceneLayoutManager::instance().getSearchLayout())
+                    menu.addAction(&cm_save_layout);
+
+                menu.addAction(&cm_save_layout_as);
+            }
+
+            menu.addMenu(&distance_menu);
+        }
+        
 		menu.addAction(&cm_togglefs);
 		menu.addAction(&cm_exit);
 

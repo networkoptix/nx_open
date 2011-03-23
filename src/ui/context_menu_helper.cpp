@@ -8,7 +8,7 @@ QAction cm_save_layout("Save layout",0);
 QAction cm_save_layout_as("Save layout as...",0);
 QAction cm_togglefs("Toggle fullscreen",0);
 QAction cm_fullscren("Fullscreen",0);
-QAction cm_remove_from_layout("Remove from layout",0);
+QAction cm_remove_from_layout("Remove",0);
 QAction cm_settings("Settings...",0);
 QAction cm_start_recording("Start recording",0);
 QAction cm_stop_recording("Stop recording",0);
