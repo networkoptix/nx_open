@@ -1175,6 +1175,40 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
     {
         // multiple selection
         menu.addAction(&cm_remove_from_layout);
+        bool haveAtLeastOneNonrecordingCam = false;
+        bool haveAtLeastOneRecordingCam = false;
+
+
+        foreach(QGraphicsItem* item, m_scene.selectedItems())
+        {
+            CLAbstractComplicatedItem* ca  = (static_cast<CLAbstractSceneItem*>(item))->getComplicatedItem();
+
+            if (!ca)
+                continue;
+
+            if (!ca->getDevice()->checkDeviceTypeFlag(CLDevice::NETWORK))
+                continue;
+
+            if (ca->getDevice()->checkDeviceTypeFlag(CLDevice::RECORDED))
+                continue;
+
+
+            CLVideoCamera* cam = static_cast<CLVideoCamera*>(ca);
+
+            if (cam->isRecording())
+                haveAtLeastOneRecordingCam = true;
+            else
+                haveAtLeastOneNonrecordingCam = true;
+        }
+
+        if (haveAtLeastOneNonrecordingCam)
+            menu.addAction(&cm_start_recording);
+
+        if (haveAtLeastOneRecordingCam )
+            menu.addAction(&cm_stop_recording);
+
+
+
     }
 	else
 	{
@@ -1323,7 +1357,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
         }
 
 	}
-    else if (aitem && m_scene.selectedItems().count()>0 )// video item single selection
+    else if (aitem && m_scene.selectedItems().count()>0 )// video item multiple selection
     {
 
         if (act == &cm_remove_from_layout)
@@ -1339,8 +1373,48 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
             m_camLayout.removeItems(lst);
         }
 
-    }
+        
+        if (act == &cm_start_recording || act == &cm_stop_recording)
+        {
+            foreach(QGraphicsItem* item, m_scene.selectedItems())
+            {
+                CLAbstractComplicatedItem* ca  = (static_cast<CLAbstractSceneItem*>(item))->getComplicatedItem();
 
+                if (!ca)
+                    continue;
+
+                if (!ca->getDevice()->checkDeviceTypeFlag(CLDevice::NETWORK))
+                    continue;
+
+                CLVideoCamera* cam = static_cast<CLVideoCamera*>(ca);
+
+                if (act == &cm_start_recording)
+                {
+                    if (cam->isRecording())
+                        continue;
+
+                    CLAbstractComplicatedItem* recorded =  m_camLayout.haveRecordedVideoPlayingFor(cam);
+                    if (recorded)
+                    {
+                        QList<CLAbstractSubItemContainer*> itemlst;
+                        itemlst.push_back(recorded->getSceneItem());
+                        m_camLayout.removeItems(itemlst);
+                    }
+
+                    cam->startRecording();
+
+                }
+
+                if (act == &cm_stop_recording)
+                {
+                    cam->stopRecording();
+                }
+
+            }
+
+        }
+
+    }
 
 
 	QGraphicsView::contextMenuEvent(event);
