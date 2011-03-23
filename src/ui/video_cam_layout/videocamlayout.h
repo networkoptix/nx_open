@@ -37,6 +37,8 @@ public:
 
 	void setMaxFps(int max_fps);
 
+    void saveLayoutContent();
+
 	//================================================
 
 	//start should be called only after Layout putted on the scene, but before first item is added
@@ -130,6 +132,8 @@ private:
 	bool m_isRunning;
 
 	LayoutContent* m_content;
+    LayoutContent* m_contentCopy;
+
 	bool m_editable;
 	bool m_contentchanged;
 

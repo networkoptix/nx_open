@@ -63,7 +63,8 @@ public:
 
 	QList<LayoutContent*>& childrenList();
 
-	static LayoutContent* coppyLayout(LayoutContent* l);
+	static LayoutContent* coppyLayoutContent(LayoutContent* l, bool skipSubL = false);
+    static void coppyLayoutContent(LayoutContent* to, LayoutContent* from, bool skipSubL);
 
 	void toXml(QDomDocument& doc, QDomElement& parent) ;
 
@@ -74,6 +75,10 @@ public:
 	void removeIntereactionFlag(unsigned long flag);
 	bool checkIntereactionFlag(unsigned long flag);
 
+    
+
+protected:
+    void destroy(bool skipSubL);
 protected:
 
 	// scene rect adjustment
@@ -95,6 +100,7 @@ protected:
 	bool m_editable;
 
 	unsigned long m_interaction_flags;
+
 
 };
 #endif //layout_content_h_2210

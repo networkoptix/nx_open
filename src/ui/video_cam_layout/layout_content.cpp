@@ -13,25 +13,39 @@ m_interaction_flags(0xffffffff)
 
 LayoutContent::~LayoutContent()
 {
-	foreach (LayoutImage* item, m_imgs)
-	{
-		delete item;
-	}
+    destroy(false);
+}
 
-	foreach (LayoutButton* item, m_btns)
-	{
-		delete item;
-	}
 
-	foreach (LayoutDevice* item, m_devices)
-	{
-		delete item;
-	}
+void LayoutContent::destroy(bool skipSubL)
+{
+    foreach (LayoutImage* item, m_imgs)
+    {
+        delete item;
+    }
+    m_imgs.clear();
 
-	foreach (LayoutContent* cont, m_childlist)
-	{
-		delete cont;
-	}
+    foreach (LayoutButton* item, m_btns)
+    {
+        delete item;
+    }
+    m_btns.clear();
+
+    foreach (LayoutDevice* item, m_devices)
+    {
+        delete item;
+    }
+    m_devices.clear();
+
+    if (!skipSubL)
+    {
+        foreach (LayoutContent* cont, m_childlist)
+        {
+            delete cont;
+        }
+        m_childlist.clear();
+    }
+    
 
 }
 
@@ -127,7 +141,7 @@ void LayoutContent::removeDevice(const QString& uniqueId)
 LayoutContent* LayoutContent::addLayout(LayoutContent* l, bool copy)
 {
 	if (copy)
-		m_childlist.push_back(coppyLayout(l));
+		m_childlist.push_back(coppyLayoutContent(l));
 	else
 		m_childlist.push_back(l);
 
@@ -223,43 +237,63 @@ bool LayoutContent::checkIntereactionFlag(unsigned long flag)
 
 //=========================================================================
 
-LayoutContent* LayoutContent::coppyLayout(LayoutContent* l)
+LayoutContent* LayoutContent::coppyLayoutContent(LayoutContent* l, bool skipSubL)
 {
 	LayoutContent* result = new LayoutContent();
-	*result = *l; // this copy everything including lists of pointers; we do not need that;
-
-	result->m_imgs.clear();
-	result->m_btns.clear();
-	result->m_devices.clear();
-	result->m_childlist.clear();
-
-	foreach (LayoutImage* item, l->m_imgs)
-	{
-		LayoutImage* iteml = new LayoutImage();
-		*iteml = *item;
-		result->m_imgs.push_back(iteml);
-	}
-
-	foreach (LayoutButton* item, l->m_btns)
-	{
-		LayoutButton* iteml = new LayoutButton();
-		*iteml = *item;
-		result->m_btns.push_back(iteml);
-	}
-
-	foreach (LayoutDevice* item, l->m_devices)
-	{
-		LayoutDevice* iteml = new LayoutDevice();
-		*iteml = *item;
-		result->m_devices.push_back(iteml);
-	}
-
-	foreach (LayoutContent* cont, l->m_childlist)
-	{
-		LayoutContent* contl = coppyLayout(cont);
-		contl->setParent(result);
-		result->m_childlist.push_back(contl);
-	}
+    coppyLayoutContent(result, l, skipSubL);
 
 	return result;
+}
+
+void LayoutContent::coppyLayoutContent(LayoutContent* to, LayoutContent* from, bool skipSubL)
+{
+    to->destroy(skipSubL);
+
+
+    QList<LayoutContent*> lst_tmp = to->m_childlist;
+
+    *to = *from; // this copy everything including lists of pointers; we do not need that;
+    
+    to->m_imgs.clear();
+    to->m_btns.clear();
+    to->m_devices.clear();
+
+    if (!skipSubL)
+        to->m_childlist.clear();
+    else
+        to->m_childlist = lst_tmp;
+
+    /**/
+
+    foreach (LayoutImage* item, from->m_imgs)
+    {
+        LayoutImage* iteml = new LayoutImage();
+        *iteml = *item;
+        to->m_imgs.push_back(iteml);
+    }
+
+    foreach (LayoutButton* item, from->m_btns)
+    {
+        LayoutButton* iteml = new LayoutButton();
+        *iteml = *item;
+        to->m_btns.push_back(iteml);
+    }
+
+    foreach (LayoutDevice* item, from->m_devices)
+    {
+        LayoutDevice* iteml = new LayoutDevice();
+        *iteml = *item;
+        to->m_devices.push_back(iteml);
+    }
+
+    if (!skipSubL)
+    {
+        foreach (LayoutContent* cont, from->m_childlist)
+        {
+            LayoutContent* contl = coppyLayoutContent(cont);
+            contl->setParent(to);
+            to->m_childlist.push_back(contl);
+        }
+    }
+
 }

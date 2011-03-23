@@ -120,6 +120,8 @@ void SceneLayout::start()
 	if (m_isRunning)
 		return;
 
+    m_contentCopy = LayoutContent::coppyLayoutContent(m_content, true);
+
 	m_firstTime = true;
 
 	m_contentchanged = false;
@@ -182,11 +184,20 @@ void SceneLayout::stop_helper(bool emt)
 
 }
 
+void SceneLayout::saveLayoutContent()
+{
+    LayoutContent::coppyLayoutContent(m_contentCopy, m_content , true);
+}
+
 void SceneLayout::stop(bool animation)
 {
 
 	if (!m_isRunning)
 		return;
+
+
+    LayoutContent::coppyLayoutContent(m_content, m_contentCopy , true);
+    delete m_contentCopy;
 
 	m_isRunning = false;
 

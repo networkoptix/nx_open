@@ -1271,6 +1271,10 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
         {
             contextMenuHelper_saveLayout(true);
         }
+        else if (act == &cm_save_layout)
+        {
+            contextMenuHelper_saveLayout(false);
+        }
 
 
 	}
@@ -2501,7 +2505,7 @@ void GraphicsView::contextMenuHelper_editLayout(CLAbstractSceneItem* wnd)
 	CLLayoutItem* litem = static_cast<CLLayoutItem*>(wnd);
 	LayoutContent* content = litem->getRefContent();
 
-	LayoutContent* content_copy = LayoutContent::coppyLayout(content);
+	LayoutContent* content_copy = LayoutContent::coppyLayoutContent(content);
 
 	CLLayoutEditorWnd* editor = new CLLayoutEditorWnd(content);
 	editor->setWindowModality(Qt::ApplicationModal);
@@ -2649,7 +2653,7 @@ void GraphicsView::contextMenuHelper_saveLayout( bool new_name)
             return;
 
 
-        LayoutContent* new_cont = LayoutContent::coppyLayout(m_camLayout.getContent());
+        LayoutContent* new_cont = LayoutContent::coppyLayoutContent(m_camLayout.getContent());
 
         new_cont->addDecorationFlag(LayoutContent::MagnifyingGlass);
         new_cont->removeDecorationFlag(LayoutContent::SearchEdit);
@@ -2660,6 +2664,8 @@ void GraphicsView::contextMenuHelper_saveLayout( bool new_name)
         CLSceneLayoutManager::instance().getAllLayoutsContent()->addLayout(new_cont, false);
 
     }
+    else
+        m_camLayout.saveLayoutContent();
 
 }
 
