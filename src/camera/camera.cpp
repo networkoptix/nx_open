@@ -95,6 +95,7 @@ void CLVideoCamera::stopRecording()
 {
 	m_recorder.stop();
 	m_reader->removeDataProcessor(&m_recorder);
+    m_reader->setQuality(CLStreamreader::CLSNormal);
 	m_videovindow->removeSubItem(RecordingSubItem);
 }
 
