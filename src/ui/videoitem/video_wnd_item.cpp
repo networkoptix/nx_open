@@ -16,6 +16,9 @@ CLVideoWindowItem::CLVideoWindowItem(GraphicsView* view, const CLDeviceVideoLayo
       m_opacity(0.0),
       m_videonum(layout->numberOfChannels())
 {
+
+    m_aspectratio = m_aspectratio/layout->width()*layout->height();
+
 	m_FPS_Font.setWeight(QFont::Bold);
 
 	m_zoomOnhover = false;
