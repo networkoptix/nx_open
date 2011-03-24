@@ -64,22 +64,37 @@ public:
 
 	virtual unsigned int width() const 
 	{
-		return 2;
+		return 4;
 	}
 
 	virtual unsigned int height() const 
 	{
-		return 2;
+		return 1;
 	}
 
 	virtual unsigned int h_position(unsigned int channel) const
 	{
-		return channel%2;
+        switch(channel)
+        {
+        case 0:
+            return 0;
+
+        case 1:
+            return 3;
+
+        case 2:
+            return 2;
+
+        case 3:
+            return 1;
+        default:
+            return 0;
+        }
 	}
 
 	virtual unsigned int v_position(unsigned int channel) const
 	{
-		return channel/2;
+		return 0;
 	}
 
 };
