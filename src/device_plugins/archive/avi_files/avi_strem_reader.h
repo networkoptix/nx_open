@@ -14,6 +14,7 @@ public:
 
 	virtual quint64 currentTime() const;
 
+    void previousFrame(quint64 mksec);
 protected:
 	virtual CLAbstractMediaData* getNextData();
 	virtual void channeljumpTo(quint64 mksec, int channel);

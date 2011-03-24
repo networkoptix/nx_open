@@ -7,14 +7,17 @@
 
 CLArchiveStreamReader::CLArchiveStreamReader(CLDevice* dev):
 CLAbstractArchiveReader(dev),
-m_firsttime(true)
-
+m_firsttime(true),
+m_currentTime(-1)
 {
 	memset(mCurrIndex,0,sizeof(mCurrIndex));
+    m_nextFrameRequested = false;
+
 	for (int channel = 0; channel < m_channel_number; ++channel)
 	{
 		mFinished[channel] = false;
         m_skippedToTime[channel] = false;
+        m_nextFrame[channel] = false;
 	}
 
 	init_data();
@@ -147,18 +150,62 @@ quint64 CLArchiveStreamReader::currentTime() const
 {
 	QMutexLocker mutex(&m_cs);
 
-    quint64 jumpTime = skipFramesToTime();
-    if (jumpTime)
-        return jumpTime;
+    if (m_currentTime == -1)
+        return slowestChannelTime();
 
-	int slowe_channel = slowest_channel();
-    if (slowe_channel<0)
+    return m_currentTime;
+}
+
+quint64 CLArchiveStreamReader::slowestChannelTime() const
+{
+    int slowestChannel = slowest_channel();
+
+    return mMovie[slowestChannel].at(mCurrIndex[slowestChannel]).time;
+}
+
+void CLArchiveStreamReader::previousFrame(quint64 mksec)
+{
+    QMutexLocker mutex(&m_cs);
+
+    quint64 maxPrevTime = -1;
+    quint64 minPlayTime = -1;
+    for (int channel = 0; channel < m_channel_number; ++channel)
     {
-        CLSleep::msleep(20);
-        return 0;
+        int index = findBestIndex(channel, mksec);
+        if (index <= 0)
+            continue;
+
+        if (maxPrevTime == -1)
+            maxPrevTime = mMovie[channel].at(index-1).time;
+        else if (maxPrevTime < mMovie[channel].at(index-1).time)
+            maxPrevTime = mMovie[channel].at(index-1).time;
+
+        if (minPlayTime == -1)
+            minPlayTime = mMovie[channel].at(index).time;
+        else if (maxPrevTime >= mMovie[channel].at(index).time)
+            minPlayTime = mMovie[channel].at(index).time;
     }
 
-	return mMovie[slowe_channel].at(mCurrIndex[slowe_channel]).time;
+    if (maxPrevTime == -1)
+        return;
+
+    setSkipFramesToTime(maxPrevTime);
+    m_currentTime = minPlayTime;
+
+    for (int channel = 0; channel < m_channel_number; ++channel)
+        channeljumpTo(maxPrevTime, channel);
+
+    resume();
+}
+
+void CLArchiveStreamReader::nextFrame()
+{
+    m_nextFrameRequested = true;
+
+    for (int channel = 0; channel < m_channel_number; ++channel)
+    {
+        m_nextFrame[channel] = false;
+    }
 }
 
 CLAbstractMediaData* CLArchiveStreamReader::getNextData()
@@ -169,7 +216,7 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
 		m_firsttime = false;
 	}
 
-	if (!isSingleShotMode() && !isSkippingFrames())
+	if (!isSingleShotMode() && !isSkippingFrames() && !m_nextFrameRequested)
 		m_adaptiveSleep.sleep(m_needToSleep);
 
 	// will return next channel ( if channel is finished it will not be selected
@@ -236,6 +283,26 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
 		}
 
 		qint64 this_time = mMovie[channel].at(mCurrIndex[channel]).time;
+
+        if (this_time <= skipFramesToTime())
+        {
+            videoData->ignore = true;
+        }
+        else if (skipFramesToTime())
+        {
+            m_skippedToTime[channel] = true;
+
+            if (isSlowestChannelSkippedToTime())
+                m_currentTime = this_time;
+
+            if (isAllChannelsSkippedToTime())
+                setSkipFramesToTime(0);
+        }
+        else
+        {
+            m_currentTime = this_time;
+        }
+
 		mCurrIndex[channel] = new_index;
 
 		int next_channel = slowest_channel();
@@ -245,30 +312,38 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
             return 0;
         }
 
-
-		qint64 next_time = mMovie[channel].at(mCurrIndex[next_channel]).time;
-        if (next_time < skipFramesToTime())
+        if (m_nextFrameRequested)
         {
-            videoData->ignore = true;
-        }
-        else
-        {
-            m_skippedToTime[channel] = true;
+            m_nextFrame[channel] = true;
 
-            if (isAllChannelsSkippedToTime())
-                setSkipFramesToTime(0);
+            if (m_nextFrame[next_channel])
+                m_nextFrameRequested = false;
         }
+
+		qint64 next_time = mMovie[next_channel].at(mCurrIndex[next_channel]).time;
 
 		m_needToSleep = labs(next_time - this_time);
 
 	}
 
 	//=================
-	if (isSingleShotMode() && !isSkippingFrames())
+	if (isSingleShotMode() && !isSkippingFrames() && !m_nextFrameRequested)
 		pause();
 
 	return videoData;
 
+}
+
+bool CLArchiveStreamReader::isSlowestChannelSkippedToTime() const
+{
+    int count = 0;
+    for (int channel = 0; channel < m_channel_number; ++channel)
+    {
+        if (m_skippedToTime[channel] == true)
+            count++;
+    }
+
+    return count == 1;
 }
 
 bool CLArchiveStreamReader::isAllChannelsSkippedToTime() const

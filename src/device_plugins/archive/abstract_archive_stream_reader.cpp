@@ -58,6 +58,8 @@ void CLAbstractArchiveReader::jumpTo(quint64 mksec, bool makeshot)
 {
  	QMutexLocker mutex(&m_cs);
 
+    nextFrame();
+
 	for (int channel = 0; channel  < m_channel_number; ++channel)
 		channeljumpTo(mksec, channel);
 

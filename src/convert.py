@@ -3,7 +3,7 @@
 import shutil
 from version import *
 from genskin import genskin
-import os
+import os, sys
 
 EXCLUDE_DIRS = ('.svn', 'dxva')
 EXCLUDE_FILES = ('dxva', 'moc_', 'qrc_', 'StdAfx')
@@ -32,6 +32,7 @@ print >> version_h, '#endif // UNIVERSAL_CLIENT_VERSION_H_'
 
 genskin()
 
+os.unlink('uniclient.pro')
 shutil.copy('const.pro', 'uniclient.pro')
 
 headers = []
@@ -61,3 +62,6 @@ for cpp in sources:
     print >> uniclient_pro,    "SOURCES += %s" % cpp
 
 uniclient_pro.close()
+
+if sys.platform == 'win32':
+    os.system('convert_qt_to_vs.bat uniclient')

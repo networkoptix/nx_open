@@ -29,6 +29,9 @@ public:
 	virtual void jumpTo(quint64 mksec, bool makeshot);
 	void jumpToPreviousFrame(quint64 mksec, bool makeshot);
 
+    virtual void previousFrame(quint64 mksec) {}
+    virtual void nextFrame() {}
+
 protected:
 	virtual void channeljumpTo(quint64 mksec, int channel) = 0;
     quint64 skipFramesToTime() const;

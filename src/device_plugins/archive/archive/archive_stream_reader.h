@@ -26,6 +26,9 @@ public:
 	quint64 currentTime() const;
 	virtual void resume();
 
+    void previousFrame(quint64 mksec);
+    void nextFrame();
+
     bool setRecordedDataDst(const QString& dst);
 protected:
 
@@ -46,14 +49,19 @@ protected:
 
     void setSkipFramesToTime(quint64 skipFramesToTime);
 
+    bool isSlowestChannelSkippedToTime() const;
     bool isAllChannelsSkippedToTime() const;
 
 protected:
 	bool m_firsttime;
 
+    quint64 m_currentTime;
 	QList<ArchiveFrameInfo> mMovie[CL_MAX_CHANNELS];
 	unsigned int mCurrIndex[CL_MAX_CHANNELS];
 	bool mFinished[CL_MAX_CHANNELS];
+
+    bool m_nextFrameRequested;
+    bool m_nextFrame[CL_MAX_CHANNELS];
 
 	QFile m_data_file[CL_MAX_CHANNELS];
 	QDataStream m_data_stream[CL_MAX_CHANNELS];
@@ -61,6 +69,9 @@ protected:
 
     bool m_skippedToTime[CL_MAX_CHANNELS];
     QString mRecordedDataDst;
+
+private:
+    quint64 slowestChannelTime() const;
 };
 
 #endif //archive_stream_reader_h1145

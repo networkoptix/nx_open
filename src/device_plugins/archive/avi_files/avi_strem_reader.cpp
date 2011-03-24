@@ -39,6 +39,11 @@ CLAVIStreamReader::~CLAVIStreamReader()
 	destroy();
 }
 
+void CLAVIStreamReader::previousFrame(quint64 mksec)
+{
+    jumpToPreviousFrame(mksec, true);
+}
+
 void CLAVIStreamReader::switchPacket()
 {
     m_currentPacketIndex ^= 1;

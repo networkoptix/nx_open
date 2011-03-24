@@ -94,7 +94,7 @@ AVCodec* CLFFmpegVideoDecoder::findCodec(CLCodecType codecId)
 void CLFFmpegVideoDecoder::closeDecoder()
 {   
     avcodec_close(c);
-#ifdef _WIN32
+#ifdef _USE_DXVA
     m_decoderContext.close();
 #endif
 
@@ -112,7 +112,7 @@ void CLFFmpegVideoDecoder::openDecoder()
         avcodec_copy_context(c, m_passedContext);
     }
 
-#ifdef _WIN32
+#ifdef _USE_DXVA
     if (m_codecId == CL_H264)
     {
         c->get_format = FFMpegCallbacks::ffmpeg_GetFormat;
@@ -128,6 +128,9 @@ void CLFFmpegVideoDecoder::openDecoder()
     //if(m_codec->capabilities&CODEC_CAP_TRUNCATED)	c->flags|= CODEC_FLAG_TRUNCATED;
 
     //c->debug_mv = 1;
+
+    c->thread_count = QThread::idealThreadCount();
+    c->thread_type = FF_THREAD_SLICE;
 
     // TODO: check return value
     if (avcodec_open(c, m_codec) < 0)
@@ -222,7 +225,7 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
     //    needResetCodec = true;
     //}
 
-#ifdef _WIN32
+#ifdef _USE_DXVA
     if (m_decoderContext.isHardwareAcceleration() && !isHardwareAccellerationPossible(data.codec, data.width, data.height))
     {
         m_decoderContext.setHardwareAcceleration(false);
@@ -251,7 +254,7 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 	if (got_picture )
 	{
         m_lastWidth = data.width;
-#ifdef _WIN32
+#ifdef _USE_DXVA
         if (m_decoderContext.isHardwareAcceleration())
         {
             m_decoderContext.extract(picture);

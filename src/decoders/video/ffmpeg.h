@@ -46,7 +46,7 @@ private:
 	AVCodecContext *c;
 	AVFrame *picture;
 
-#ifdef _WIN32
+#ifdef _USE_DXVA
     DecoderContext m_decoderContext;
 #endif
 

@@ -28,7 +28,7 @@ RESOURCES += mainwnd.qrc skin.qrc
 FORMS += mainwnd.ui
 
 win32 {
-  QMAKE_LFLAGS += avcodec-52.lib avdevice-52.lib avfilter-1.lib avformat-52.lib avutil-50.lib swscale-0.lib d3d9.lib dxva2.lib
+  QMAKE_LFLAGS += avcodec-52.lib avdevice-52.lib avfilter-1.lib avformat-52.lib avutil-50.lib swscale-0.lib
   QMAKE_LFLAGS_DEBUG += /libpath:../contrib/ffmpeg-git-aecd0a4/bin/debug
   QMAKE_LFLAGS_RELEASE += /libpath:../contrib/ffmpeg-git-aecd0a4/bin/release
 }  

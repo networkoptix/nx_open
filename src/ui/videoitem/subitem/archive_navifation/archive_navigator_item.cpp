@@ -429,6 +429,7 @@ void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
 		break;
 
 	case StepForwardSubItem:
+        mReader->nextFrame();
 		mReader->resume();
 		mReader->resumeDataProcessors();
 		break;
@@ -442,8 +443,7 @@ void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
             if (mReader->isSingleShotMode())
                 m_videoCamera->getCamCamDisplay()->playAudio(false);
 
-		    mReader->jumpToPreviousFrame(curr_time, true);
-		    //mReader->setdirection(true);
+            mReader->previousFrame(curr_time);
             m_videoCamera->streamJump();
 		    mReader->resumeDataProcessors();
         }
@@ -477,13 +477,10 @@ void CLArchiveNavigatorItem::updateSliderPos()
       Otherwise use timestamp from display.
      */
 	quint64 time;
-	if (mReader->isSkippingFrames() || m_videoCamera->currentTime() == 0)
-	{
+	if (mReader->isSingleShotMode() || mReader->isSkippingFrames() || m_videoCamera->currentTime() == 0)
 		time = mReader->currentTime();
-	} else
-	{
+	else
 		time = m_videoCamera->currentTime();
-	}
 
 	 
 	quint64 total = mReader->lengthMksec();
@@ -493,7 +490,6 @@ void CLArchiveNavigatorItem::updateSliderPos()
 	quint64 pos = (double)time * scale / total;
 
 	mSlider->setValue(pos);
-
 }
 
 void CLArchiveNavigatorItem::sliderPressed()
@@ -508,6 +504,11 @@ void CLArchiveNavigatorItem::sliderReleased()
 {
 	//cl_log.log("RELEASED",  cl_logALWAYS);
 	mSliderIsmoving = false;
+
+    qreal factor = (qreal)(mSlider->value()) / (mSlider->maximum() - mSlider->minimum());
+    quint64 time = mReader->lengthMksec() * factor;
+
+    mReader->previousFrame(time);
 
 	if (mPlayMode)
     {
