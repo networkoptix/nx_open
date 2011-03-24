@@ -1,6 +1,6 @@
 #include "util.h"
 
-static const QString DEFAULT_MEDIA_DIR = "c:/photo/";
+static const QString DEFAULT_MEDIA_DIR = "c:/EVEMedia/";
 
 QString getDataDirectory()
 {
