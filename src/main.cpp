@@ -2,6 +2,7 @@
 #include "version.h"
 #include "util.h"
 #include "mainwnd.h"
+#include "serial.h"
 
 #include "device/asynch_seacher.h"
 #include "base/log.h"
@@ -42,6 +43,10 @@ void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args
 
 int main(int argc, char *argv[])
 {
+    //SerialChecker serialChecker;
+    //bool isv1 = serialChecker.isValidSerial("SDFUIH123");
+    //bool isv2 = serialChecker.isValidSerial("5GWA6U1ZSJ");
+
 //	av_log_set_callback(decoderLogCallback);
 
     QApplication::setOrganizationName(ORGANIZATION_NAME);
