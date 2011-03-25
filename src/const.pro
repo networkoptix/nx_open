@@ -12,6 +12,7 @@ win32 {
   QMAKE_CXXFLAGS += -MP
   INCLUDEPATH += ../contrib/ffmpeg-misc-headers-win32
   INCLUDEPATH += ../contrib/ffmpeg-git-aecd0a4/include
+  RC_FILE = uniclient.rc
 }
 
 mac {

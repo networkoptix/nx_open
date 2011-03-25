@@ -4,6 +4,12 @@
   <Product Id="*" Name="$(env.APPLICATION_NAME)" Language="1033" Version="$(env.APPLICATION_VERSION)" Manufacturer="$(env.ORGANIZATION_NAME)" UpgradeCode="286227c5-25b4-4796-aa48-2d9822e10b0d">
     <Package Id="*" InstallerVersion="200" Compressed="yes" Keywords="Installer" Comments="Network Optix Universal Client Installer" Manufacturer="$(env.ORGANIZATION_NAME)" InstallPrivileges="elevated"/>
 
+    <WixVariable Id="WixUIBannerBmp" Value="Binary\eve\eve_logo-493x58.bmp" />
+    <WixVariable Id="WixUIDialogBmp" Value="Binary\eve\eve_logo-493x312.bmp" />
+
+    <Icon Id="eve_logo.ico" SourceFile="Binary\eve\eve_logo.ico"/>
+    <Property Id="ARPPRODUCTICON" Value="eve_logo.ico" />
+
     <Property Id="NEWERFOUND" Secure="yes"/>
     <Property Id="ALLUSERS" Secure="yes"/>
     <Property Id="PREVIOUSVERSIONSINSTALLED" Secure="yes" />
@@ -85,7 +91,9 @@
                 <Shortcut Id="startmenuUniclient" Directory="ProgramMenuDir" Name="Network Optix"
                                   WorkingDirectory='INSTALLDIR' Advertise="yes" />
                 <Shortcut Id="desktopUniclient" Directory="DesktopFolder" Name="$(env.APPLICATION_NAME)"
-                  WorkingDirectory='INSTALLDIR' Advertise="yes" />
+                  WorkingDirectory='INSTALLDIR' Advertise="yes" Icon="icon.exe">
+                  <Icon Id="icon.exe" SourceFile="Binary\eve\eve_logo.ico"/>
+                </Shortcut>
               </File>
             </Component>
             <Component Id="FFmpegLibraries" Guid="AD81912C-85E7-4f23-9106-6CF2CA5A5993">
