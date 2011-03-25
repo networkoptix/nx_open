@@ -51,3 +51,13 @@ QString getRecordingDir()
 {
     return getMediaRootDir()  + QString("_Recorded/");
 }
+
+int digitsInNumber(unsigned num)
+{
+    int digits = 1;
+    while(num /= 10)
+        digits++;
+
+    return digits;
+}
+

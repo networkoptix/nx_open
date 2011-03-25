@@ -7,6 +7,7 @@
 #include "../../video_wnd_archive_item.h"
 #include "device_plugins/archive/abstract_archive_stream_reader.h"
 #include "ui/graphicsview.h"
+#include "util.h"
 
 int FullScreenHight = 35;
 
@@ -17,7 +18,8 @@ mPlayMode(true),
 mSliderIsmoving(false),
 mFullScreen(false),
 mNonFullScreenHight(height),
-mButtonAspectRatio(120.0/70)
+mButtonAspectRatio(120.0/70),
+mReader(0)
 {
 	m_height = height;
 	m_width = parent->boundingRect().width();
@@ -71,6 +73,7 @@ mButtonAspectRatio(120.0/70)
 	mSlider->setRange(0,2000);
 	mSlider->setUpdatesEnabled(false);
 	mSlider_item->setWidget(mSlider);
+
 	connect(mSlider, SIGNAL(sliderMoved (int)), this, SLOT(onSliderMoved(int)));
 	connect(mSlider, SIGNAL(sliderPressed()), this, SLOT(sliderPressed()));
 	connect(mSlider, SIGNAL(sliderReleased()), this, SLOT(sliderReleased()));
@@ -177,8 +180,21 @@ void CLArchiveNavigatorItem::onResize()
 	mStepForward->setPos(m_width - shift0 - item_size, 0);
 	mStepBackward->setPos(m_width - shift0 - 2*item_size, 0);
 
-	int slider_width = m_width - button_width*(3+2+ (m_height==mNonFullScreenHight ? 2.5 : 3));
+    int timeLabelWidth = 0;
 
+    if (mReader)
+    {
+        unsigned lengthSecs = mReader->lengthMksec() / 1000000;
+        int digits = digitsInNumber(lengthSecs);
+
+        QString sampleTimeString = QString("%1/%2 sec").arg(QString(digits, '0')).arg(lengthSecs);
+        QFont myFont = mSlider->font();
+        myFont.setPixelSize(28);
+        QFontMetrics fm(myFont);
+        timeLabelWidth = fm.width(sampleTimeString);
+    }
+
+    int slider_width = m_width - button_width*(3+2+ (m_height==mNonFullScreenHight ? 2.5 : 3)) - timeLabelWidth;
 	mSlider->resize(slider_width, m_height*2/3);
 	mSlider_item->setPos(button_width*(3+2), m_height/6);
 
@@ -458,7 +474,20 @@ void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
 
 void CLArchiveNavigatorItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-	painter->fillRect(boundingRect(),QColor(0, 0, 0));
+	painter->fillRect(boundingRect(), QColor(0, 0, 0));
+
+    if (mFullScreen)
+    {
+        QFont font = painter->font();
+        font.setPixelSize(28);
+        painter->setFont(font);
+
+        int total = mReader->lengthMksec() / 1000000;
+        int time = mSlider->value() * total / (mSlider->maximum() - mSlider->minimum());
+
+        QString timeLabel = QString("%1/%2 sec").arg(time).arg(total);
+        painter->drawText(mSlider->pos().rx() + mSlider->width() + 20 , 26, timeLabel);
+    }
 }
 
 QRectF CLArchiveNavigatorItem::boundingRect() const

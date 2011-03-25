@@ -21,5 +21,9 @@ QString getTempRecordingDir();
  */
 QString getRecordingDir();
 
+/*
+ * Get number of digits in decimal representaion of an integer.
+ */
+int digitsInNumber(unsigned num);
 
 #endif // _UNIVERSAL_CLIENT_UTIL_H
