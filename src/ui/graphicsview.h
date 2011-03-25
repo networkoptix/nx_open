@@ -48,6 +48,8 @@ public:
 
 	qreal getZoom() const;
 
+    bool shouldOptimizeDrawing() const;
+
 	void setAllItemsQuality(CLStreamreader::StreamQuality q, bool increase);
 	void closeAllDlg();
 
@@ -73,6 +75,8 @@ public:
 
     void goToSteadyMode(bool steady);
     void onUserInput();
+
+    
 
 signals:
 	void scneZoomFinished();

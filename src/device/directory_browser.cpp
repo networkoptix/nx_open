@@ -63,6 +63,19 @@ CLDeviceList CLDirectoryBrowserDeviceServer::findDevices(const QString& director
         filter << "*.mov";
         filter << "*.vob";
         filter << "*.m4v";
+        filter << "*.3gp";
+        filter << "*.mpeg";
+        filter << "*.mpg";
+        filter << "*.mpe";
+
+        /*
+        filter << "*.";
+        filter << "*.";
+        filter << "*.";
+        filter << "*.";
+        /**/
+        
+
 
         QStringList list = dir.entryList(filter);
 

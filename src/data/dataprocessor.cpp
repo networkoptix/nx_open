@@ -48,7 +48,7 @@ void CLAbstractDataProcessor::run()
 
 		processData(data);
 
-//		cl_log.log("queue size = ", m_dataQueue.size(),cl_logALWAYS);
+		//cl_log.log("queue size = ", m_dataQueue.size(),cl_logALWAYS);
 
 		data->releaseRef();
 	}

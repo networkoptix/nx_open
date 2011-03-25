@@ -16,6 +16,8 @@ public:
 
 	virtual QSize sizeOnScreen(unsigned int channel) const = 0;
 
+    virtual bool constantDownscaleFactor() const = 0;
+
 	virtual void copyVideoDataBeforePainting(bool copyData)
 	{
 		m_copyData = copyData;

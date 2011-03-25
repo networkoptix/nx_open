@@ -284,7 +284,11 @@ void GraphicsView::setAllItemsQuality(CLStreamreader::StreamQuality q, bool incr
 		if (increase || m_selectedWnd!=item) // can not decrease quality on selected wnd
 			cam->setQuality(q, increase);
 	}
+}
 
+bool GraphicsView::shouldOptimizeDrawing() const
+{
+    return (m_scenezoom.isRuning() && !mWheelZooming) || mShow.isShowTime();
 }
 
 //================================================================

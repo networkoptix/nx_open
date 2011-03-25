@@ -61,6 +61,11 @@ QSize CLVideoWindowItem::sizeOnScreen(unsigned int /*channel*/) const
 	return QSize(onScreenSize().width() / m_videolayout->width(), onScreenSize().height() / m_videolayout->height());
 }
 
+bool CLVideoWindowItem::constantDownscaleFactor() const
+{
+    return (m_view->shouldOptimizeDrawing() && !isFullScreen());
+}
+
 bool CLVideoWindowItem::isZoomable() const
 {
 	return true;

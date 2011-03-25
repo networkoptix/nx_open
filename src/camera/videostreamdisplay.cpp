@@ -138,6 +138,12 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 		//force_factor
 		m_scaleFactor = CLVideoDecoderOutput::factor_1;
 
+        if (m_draw->constantDownscaleFactor())
+        {
+           force_factor = CLVideoDecoderOutput::factor_2;
+        }
+
+
 		if (force_factor==CLVideoDecoderOutput::factor_any) // if nobody pushing lets peek it 
 		{
 			QSize on_screen = m_draw->sizeOnScreen(data->channelNumber);
@@ -170,7 +176,7 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 		else
 			m_scaleFactor = force_factor;
 
-		//m_scaleFactor  = CLVideoDecoderOutput::factor_1;
+		//m_scaleFactor  = CLVideoDecoderOutput::factor_2;
 
 		// XXX RGB555 hack. Need to refactor video processing code.
 		if (m_scaleFactor == CLVideoDecoderOutput::factor_1 && img.outFrame.out_type != CL_DECODER_RGB555LE)

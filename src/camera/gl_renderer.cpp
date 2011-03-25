@@ -756,3 +756,8 @@ QSize CLGLRenderer::sizeOnScreen(unsigned int channel) const
 {
 	return m_videowindow->sizeOnScreen(channel);
 }
+
+bool CLGLRenderer::constantDownscaleFactor() const
+{
+    return m_videowindow->constantDownscaleFactor();
+}

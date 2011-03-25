@@ -27,6 +27,8 @@ public:
 
 	virtual QSize sizeOnScreen(unsigned int channel) const;
 
+    virtual bool constantDownscaleFactor() const;
+
 	virtual void beforeDestroy();
 
 	void showFPS(bool show);

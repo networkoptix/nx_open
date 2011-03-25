@@ -30,6 +30,7 @@ public:
 	virtual void beforeDestroy();
 
 	QSize sizeOnScreen(unsigned int channel) const;
+    bool constantDownscaleFactor() const;
 
 	void applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation)
 	{
