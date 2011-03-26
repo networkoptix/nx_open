@@ -2586,6 +2586,13 @@ void GraphicsView::contextMenuHelper_saveRecordedAs(CLVideoCamera* cam)
             continue;
         }
 
+        if (!dir.mkdir(getRecordingDir() + name))
+        {
+            UIOKMessage(this, "", "Can't save with this title. Please provide another one.");
+            continue;
+        }
+
+        dir.rmdir(getRecordingDir() + name);
         break;
     }
 
