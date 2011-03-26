@@ -12,14 +12,15 @@
 int FullScreenHight = 35;
 
 CLArchiveNavigatorItem::CLArchiveNavigatorItem(CLAbstractSubItemContainer* parent, int height):
-CLAbstractSubItem(parent, 0.2, 0.8),
-mStreamReader(0),
-mPlayMode(true),
-mSliderIsmoving(false),
-mFullScreen(false),
-mNonFullScreenHight(height),
-mButtonAspectRatio(120.0/70),
-mReader(0)
+    CLAbstractSubItem(parent, 0.2, 0.8),
+    mStreamReader(0),
+    mPlayMode(true),
+    mSliderIsmoving(false),
+    mFullScreen(false),
+    mNonFullScreenHight(height),
+    mButtonAspectRatio(120.0/70),
+    mReader(0),
+    m_readerIsSet(false)
 {
 	m_height = height;
 	m_width = parent->boundingRect().width();
@@ -139,6 +140,28 @@ void CLArchiveNavigatorItem::goToFullScreenMode(bool fullscreen)
 	onResize();
 }
 
+void CLArchiveNavigatorItem::resizeSlider()
+{
+    int sliderHeight = m_height == FullScreenHight ? 28 : 180;
+
+    int buttonWidth = m_height * mButtonAspectRatio; // this is just very big value; I assume that w>h
+
+    int timeLabelWidth = 0;
+    if (mReader)
+    {
+        unsigned lengthSecs = mReader->lengthMksec() / 1000000;
+
+        QFont myFont = mSlider->font();
+        myFont.setPixelSize(sliderHeight);
+        QFontMetrics fm(myFont);
+        timeLabelWidth = fm.width(formatDuration(0, lengthSecs));
+    }
+
+    int sliderWidth = m_width - buttonWidth*(3+2+ (m_height==mNonFullScreenHight ? 2.5 : 3)) - timeLabelWidth;
+
+    mSlider->resize(sliderWidth, sliderHeight);
+}
+
 // this function uses parent width
 void CLArchiveNavigatorItem::onResize()
 {
@@ -180,22 +203,8 @@ void CLArchiveNavigatorItem::onResize()
 	mStepForward->setPos(m_width - shift0 - item_size, 0);
 	mStepBackward->setPos(m_width - shift0 - 2*item_size, 0);
 
-    int timeLabelWidth = 0;
+    resizeSlider();
 
-    if (mReader)
-    {
-        unsigned lengthSecs = mReader->lengthMksec() / 1000000;
-        int digits = digitsInNumber(lengthSecs);
-
-        QString sampleTimeString = QString("%1/%2 sec").arg(QString(digits, '0')).arg(lengthSecs);
-        QFont myFont = mSlider->font();
-        myFont.setPixelSize(28);
-        QFontMetrics fm(myFont);
-        timeLabelWidth = fm.width(sampleTimeString);
-    }
-
-    int slider_width = m_width - button_width*(3+2+ (m_height==mNonFullScreenHight ? 2.5 : 3)) - timeLabelWidth;
-	mSlider->resize(slider_width, m_height*2/3);
 	mSlider_item->setPos(button_width*(3+2), m_height/6);
 
     //mSlider->resize(slider_width, m_height);
@@ -247,7 +256,6 @@ void CLArchiveNavigatorItem::onResize()
         /**/
 
 
-        mSlider->resize(slider_width, 28);
         mSlider_item->setPos(button_width*(3+2), 3);
 
 
@@ -292,8 +300,6 @@ void CLArchiveNavigatorItem::onResize()
 	}
 	else
 	{
-
-        mSlider->resize(slider_width, 180);
         mSlider_item->setPos(button_width*(3+2), 10);
 
         /*/
@@ -469,25 +475,27 @@ void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
 	default:
 		break;
 	}
-
 }
 
 void CLArchiveNavigatorItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
 	painter->fillRect(boundingRect(), QColor(0, 0, 0));
 
-    if (mFullScreen)
+    if (m_readerIsSet)
     {
-        QFont font = painter->font();
-        font.setPixelSize(28);
-        painter->setFont(font);
-
-        int total = mReader->lengthMksec() / 1000000;
-        int time = mSlider->value() * total / (mSlider->maximum() - mSlider->minimum());
-
-        QString timeLabel = QString("%1/%2 sec").arg(time).arg(total);
-        painter->drawText(mSlider->pos().rx() + mSlider->width() + 20 , 26, timeLabel);
+        resizeSlider();
+        m_readerIsSet = false;
     }
+
+    QFont font = painter->font();
+    font.setPixelSize(mSlider->height());
+    painter->setPen(QColor(63, 159, 216));
+    painter->setFont(font);
+
+    int total = mReader->lengthMksec() / 1000000;
+    int time = mSlider->value() * total / (mSlider->maximum() - mSlider->minimum());
+
+    painter->drawText(mSlider->pos().rx() + mSlider->width() * 1.01 , mSlider->height(), formatDuration(time, total));
 }
 
 QRectF CLArchiveNavigatorItem::boundingRect() const
@@ -550,6 +558,8 @@ void CLArchiveNavigatorItem::setVideoCamera(CLVideoCamera* camera)
 {
 	m_videoCamera = camera;
 	mReader = static_cast<CLAbstractArchiveReader*>(m_videoCamera->getStreamreader());
+
+    m_readerIsSet = true;
 }
 
 void CLArchiveNavigatorItem::renewSlider()

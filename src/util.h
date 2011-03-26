@@ -27,6 +27,14 @@ QString getRecordingDir();
 int digitsInNumber(unsigned num);
 
 /*
+ * Format duration like HH:MM:SS/HH:MM:SS
+ *
+ * @param duration duration in seconds
+ * @param total duration in seconds
+ */
+QString formatDuration(unsigned duration, unsigned total = 0);
+
+/*
  * Gets param from string;   for example str= {param1="param_val" sdhksjh}
  * function return param_val
  */

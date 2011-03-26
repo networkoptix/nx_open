@@ -42,6 +42,8 @@ protected:
 	int m_width;
 	int m_height;
 
+    bool m_readerIsSet;
+
     int mNonFullScreenHight;
 
 	CLImgSubItem* mPlayItem;
@@ -67,6 +69,8 @@ protected:
 
     qreal mButtonAspectRatio;
 
+private:
+    void resizeSlider();
 };
 
 #endif  //archive_navigator_item_h1756
