@@ -26,4 +26,11 @@ QString getRecordingDir();
  */
 int digitsInNumber(unsigned num);
 
+/*
+ * Gets param from string;   for example str= {param1="param_val" sdhksjh}
+ * function return param_val
+ */
+QString getParamFromString(const QString& str, const QString& param);
+
+
 #endif // _UNIVERSAL_CLIENT_UTIL_H

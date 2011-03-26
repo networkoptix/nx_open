@@ -16,6 +16,7 @@
 #include "ui/video_cam_layout/layout_manager.h"
 #include "ui/context_menu_helper.h"
 #include "decoders/video/abstractdecoder.h"
+#include "device_plugins/avigilon/devices/avigilon_device_server.h"
 
 QMutex global_ffmpeg_mutex;
 
@@ -43,8 +44,8 @@ void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args
 
 int main(int argc, char *argv[])
 {
-    //SerialChecker serialChecker;
-    //bool isv1 = serialChecker.isValidSerial("SDFUIH123");
+    SerialChecker serialChecker;
+    bool isv1 = serialChecker.isValidSerial("SDFUIH123");
     //bool isv2 = serialChecker.isValidSerial("5GWA6U1ZSJ");
 
 //	av_log_set_callback(decoderLogCallback);
@@ -98,6 +99,7 @@ int main(int argc, char *argv[])
 	//============================
 	CLDeviceManager::instance().getDiveceSercher().addDeviceServer(&AVDeviceServer::instance());
 	CLDeviceManager::instance().getDiveceSercher().addDeviceServer(&FakeDeviceServer::instance());
+    CLDeviceManager::instance().getDiveceSercher().addDeviceServer(&AVigilonDeviceServer::instance());
 
 	CLDeviceSettingsDlgFactory::instance().registerDlgManufacture(&AreconVisionDlgManufacture::instance());
 	//============================

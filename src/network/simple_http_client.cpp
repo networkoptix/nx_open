@@ -1,6 +1,7 @@
 #include "./simple_http_client.h"
 
 #include <sstream>
+#include "util.h"
 
 using namespace std;
 
@@ -47,8 +48,9 @@ CLHttpStatus CLSimpleHTTPClient::getNextLine()
 
 }
 
-CLHttpStatus CLSimpleHTTPClient::openStream()
+CLHttpStatus CLSimpleHTTPClient::openStream(bool recursive)
 {
+    
 	try
 	{
 		m_sock.connect(m_host.toString().toLatin1().data(), m_port);
@@ -59,16 +61,14 @@ CLHttpStatus CLSimpleHTTPClient::openStream()
 		os << "GET /" << m_request<<" HTTP/1.1\r\n"
 			<< "Host: "<< m_host.toString() << "\r\n";
 
-		if (m_auth.password().length()>0)
+		if (m_auth.password().length()>0 && mNonce == "")
 		{
-			QString lp = m_auth.user() + ":";
-			lp += m_auth.password();
-
-			QString base64 = "Authorization: Basic ";
-			base64 += lp.toLatin1().toBase64().data();
-
-			os << base64 << "\r\n";
+			os << basicAuth() << "\r\n";
 		}
+        else if (m_auth.password().length()>0 && mNonce != "")
+        {
+            os << digestAccess();
+        }
 
 		os<< "\r\n";
 
@@ -82,7 +82,14 @@ CLHttpStatus CLSimpleHTTPClient::openStream()
 			m_connected = false;
 
 			if (m_line.contains("401 Unauthorized"))
-				return CL_HTTP_AUTH_REQUIRED;
+            {
+                getAuthInfo();
+                
+                if (recursive)
+                    return openStream(false);
+                else
+				    return CL_HTTP_AUTH_REQUIRED;
+            }
 
 			return CL_HTTP_HOST_NOT_AVAILABLE;
 		}
@@ -113,6 +120,11 @@ CLHttpStatus CLSimpleHTTPClient::openStream()
 				QString name = m_line.left(pos).trimmed();
 				QString val = m_line.mid(pos+1, m_line.length()- (pos + 1 ) );
 				CLAssociativeArray::put(name, val );
+                if (name=="Content-Length")
+                {
+                    m_contentLen = val.toInt();
+                    m_readed = 0;
+                }
 			}
 
 		}
@@ -135,9 +147,83 @@ long CLSimpleHTTPClient::read(char* data, unsigned long max_len)
 
 	int readed = 0;
 	readed = m_sock.recv(data, max_len);
-	if (readed<=0)	
+
+
+	if (readed<=0)
 		m_connected = false;
+
+    m_readed+=readed;
+
+    if (m_readed == m_contentLen)
+        m_connected = false;
+
 
 	return readed;
 }
 
+//===================================================================================
+//===================================================================================
+void CLSimpleHTTPClient::getAuthInfo()
+{
+    int pos;
+    while(1)
+    {
+
+        pos = -1;
+
+        if (CL_HTTP_HOST_NOT_AVAILABLE==getNextLine())
+            return;
+
+        if (m_line.length()<3)// last line before data
+            break;
+
+        if (m_line.contains("realm"))
+        {
+            mRealm = getParamFromString(m_line, "realm");
+        }
+
+        if (m_line.contains("nonce"))
+        {
+            mNonce = getParamFromString(m_line, "nonce");
+        }
+
+        if (m_line.contains("qop"))
+        {
+            mQop = getParamFromString(m_line, "qop");
+        }
+
+    }
+
+}
+
+QString CLSimpleHTTPClient::basicAuth() const
+{
+    QString lp = m_auth.user() + ":";
+    lp += m_auth.password();
+
+    QString base64 = "Authorization: Basic ";
+    base64 += lp.toLatin1().toBase64().data();
+
+    return base64;
+}
+
+QString CLSimpleHTTPClient::digestAccess() const
+{
+    QString HA1= m_auth.user() + QString(":") + mRealm + QString(":") + m_auth.password();
+    HA1 = QCryptographicHash::hash(HA1.toAscii(), QCryptographicHash::Md5).toHex();
+
+    QString HA2 = "GET:/" + m_request;
+    HA2 = QCryptographicHash::hash(HA2.toAscii(), QCryptographicHash::Md5).toHex();
+
+    QString response = HA1 + QString(":") + mNonce + QString(":") + HA2;
+
+    response = QCryptographicHash::hash(response.toAscii(), QCryptographicHash::Md5).toHex();
+
+
+    QString result;
+    QTextStream str(&result);
+
+    str << "Authorization: Digest username=\"" << m_auth.user() << "\",realm=\"" << mRealm << "\",nonce=\"" << mNonce << "\",uri=\"/" << m_request << "\",response=\"" << response << "\"\r\n";
+
+    return result;
+}

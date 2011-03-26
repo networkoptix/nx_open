@@ -61,3 +61,23 @@ int digitsInNumber(unsigned num)
     return digits;
 }
 
+
+QString getParamFromString(const QString& str, const QString& param)
+{
+    if (!str.contains(param))
+        return "";
+
+    
+    int param_index = str.indexOf(param);
+    param_index+=param.length();
+
+    int first_index = str.indexOf("\"", param_index);
+    if (first_index<0)
+        return "";
+
+    int second_index = str.indexOf("\"", first_index + 1);
+
+    QString result = str.mid(first_index+1, second_index - (first_index+1));
+
+    return result;    
+}
