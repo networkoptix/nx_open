@@ -372,25 +372,25 @@ void CLDiviceSeracher::fromListToList(CLDeviceList& from, CLDeviceList& to, int 
 
 }
 
-struct T
-{
-    T(CLNetworkDevice* d)
-    {
-        device = d;
-    }
-
-    void f()
-    {
-        device->conflicting();
-    }
-
-    CLNetworkDevice* device;
-};
-
 void CLDiviceSeracher::markConflictingDevices(CLDeviceList& lst, int threads)
 {
 	// cannot make concurrent work with pointer CLDevice* ; => so extra steps needed
 	// this function deals with network devices only 
+
+    struct T
+    {
+        T(CLNetworkDevice* d)
+        {
+            device = d;
+        }
+
+        void f()
+        {
+            device->conflicting();
+        }
+
+        CLNetworkDevice* device;
+    };
 
 
 	QList<T> local_list;
