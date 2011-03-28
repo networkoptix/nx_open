@@ -167,6 +167,9 @@ bool CLAVIStreamReader::init()
 		m_videoCodecId = CL_MSMPEG4V3;
 		break;
 
+    case CODEC_ID_QTRLE:
+        m_videoCodecId = CL_QTRLE;
+        break;
 	//case CODEC_ID_MPEG1VIDEO:
 	//	m_videoCodecId = CL_MPEG1VIDEO;
 	//	break;
@@ -182,6 +185,7 @@ bool CLAVIStreamReader::init()
 	case CODEC_ID_H264:
 		m_videoCodecId = CL_H264;
 		break;
+
 	default:
 		destroy();
 		return false;

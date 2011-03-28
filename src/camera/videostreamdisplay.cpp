@@ -19,6 +19,9 @@ PixelFormat pixelFormatFromColorSpace(CLColorSpace colorSpace)
 	case CL_DECODER_YUV420:
 		result = PIX_FMT_YUV420P;
 		break;
+    case CL_DECODER_RGB24:
+        result = PIX_FMT_RGB24;
+        break;
 	case CL_DECODER_RGB555LE:
 		result = PIX_FMT_RGB555LE;
 		break;
@@ -179,13 +182,14 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 		//m_scaleFactor  = CLVideoDecoderOutput::factor_2;
 
 		// XXX RGB555 hack. Need to refactor video processing code.
-		if (m_scaleFactor == CLVideoDecoderOutput::factor_1 && img.outFrame.out_type != CL_DECODER_RGB555LE)
+		if (m_scaleFactor == CLVideoDecoderOutput::factor_1 &&
+            img.outFrame.out_type != CL_DECODER_RGB555LE && img.outFrame.out_type != CL_DECODER_RGB24)
 		{
 			m_draw->draw(img.outFrame, data->channelNumber);
 		}
 		else
 		{
-			if (img.outFrame.out_type == CL_DECODER_RGB555LE)
+			if (img.outFrame.out_type == CL_DECODER_RGB555LE || img.outFrame.out_type == CL_DECODER_RGB24)
 			{
 				int newWidth = img.outFrame.width / m_scaleFactor;
 				int newHeight = img.outFrame.height / m_scaleFactor;

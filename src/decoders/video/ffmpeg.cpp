@@ -86,6 +86,10 @@ AVCodec* CLFFmpegVideoDecoder::findCodec(CLCodecType codecId)
     case CL_MSVIDEO1:
         codec = avcodec_find_decoder(CODEC_ID_MSVIDEO1);
         break;
+
+    case CL_QTRLE:
+        codec = avcodec_find_decoder(CODEC_ID_QTRLE);
+        break;
     }
 
     return codec;
@@ -308,6 +312,10 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 		case PIX_FMT_RGB555LE:
 			data.outFrame.out_type = CL_DECODER_RGB555LE;
 			break;
+
+        case PIX_FMT_RGB24:
+            data.outFrame.out_type = CL_DECODER_RGB24;
+            break;
 
 		default:
 			data.outFrame.out_type = CL_DECODER_YUV420;
