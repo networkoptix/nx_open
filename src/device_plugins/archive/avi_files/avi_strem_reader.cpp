@@ -170,9 +170,10 @@ bool CLAVIStreamReader::init()
     case CODEC_ID_QTRLE:
         m_videoCodecId = CL_QTRLE;
         break;
-	//case CODEC_ID_MPEG1VIDEO:
-	//	m_videoCodecId = CL_MPEG1VIDEO;
-	//	break;
+
+	case CODEC_ID_MPEG1VIDEO:
+		m_videoCodecId = CL_MPEG1VIDEO;
+		break;
 
 	case CODEC_ID_MSMPEG4V2:
 		m_videoCodecId = CL_MSMPEG4V2;

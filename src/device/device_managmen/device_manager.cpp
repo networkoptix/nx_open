@@ -32,6 +32,20 @@ m_firstTime(true)
 
 	addArchiver(generalArchiverId);
 
+    /*
+    // for tests
+    addArchiver("0");
+    addArchiver("1");
+    addArchiver("2");
+    addArchiver("3");
+    addArchiver("4");
+    addArchiver("5");
+    addArchiver("6");
+    addArchiver("7");
+    addArchiver("8");
+    addArchiver("9");
+    /**/
+
     QStringList checkLst;
     checkLst.push_back(getMediaRootDir());
     pleaseCheckDirs(checkLst);
@@ -42,7 +56,7 @@ m_firstTime(true)
         CLDeviceList lst;
         CLAviDevice* dev = new CLAviDevice("intro.mov");
         lst[dev->getUniqueId()] = dev;
-        onNewDevices_helper(lst, "Recorder:General Archiver");
+        onNewDevices_helper(lst, generalArchiverId);
     }
     
 
@@ -96,7 +110,7 @@ void CLDeviceManager::onTimer()
 
 	if (!m_dev_searcher.isRunning() )
 	{
-		onNewDevices_helper(m_dev_searcher.result(), "Recorder:General Archiver");
+		onNewDevices_helper(m_dev_searcher.result(), generalArchiverId);
 		m_dev_searcher.start(); // run searcher again ...
 	}
 
@@ -229,13 +243,20 @@ CLDevice* CLDeviceManager::getArchiveDevice(QString id)
 void CLDeviceManager::onNewDevices_helper(CLDeviceList devices, QString parentId)
 {
 
+    //int dev_per_arch  = devices.count()/10 + 1; // tests
+    //int dev_count = 0;
+              
+
 	foreach (CLDevice* device, devices)
 	{
 		if (device->getStatus().checkFlag(CLDeviceStatus::ALL) == 0  ) //&&  device->getMAC()=="00-1A-07-00-12-DB")
 		{
 			device->getStatus().setFlag(CLDeviceStatus::READY);
 
-			device->setParentId(parentId);
+            device->setParentId(parentId);
+            
+            //device->setParentId( QString::number(dev_count/dev_per_arch)); // tests
+            //++dev_count;
 
 			QMutexLocker lock(&m_dev_searcher.all_devices_mtx);
 			m_dev_searcher.getAllDevices().insert(device->getUniqueId(),device);
