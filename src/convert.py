@@ -32,7 +32,9 @@ print >> version_h, '#endif // UNIVERSAL_CLIENT_VERSION_H_'
 
 genskin()
 
-os.unlink('uniclient.pro')
+if os.path.exists('uniclient.pro'):
+    os.unlink('uniclient.pro')
+
 shutil.copy('const.pro', 'uniclient.pro')
 
 headers = []
