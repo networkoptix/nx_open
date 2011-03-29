@@ -108,7 +108,7 @@ void CLSerachEditItem::resize()
 void CLSerachEditItem::onEditTextChanged (const QString & text)
 {
 
-    m_view->onUserInput();
+    m_view->onUserInput(true, true);
 
 	mTimer.stop();
 	mTimer.start();

@@ -12,7 +12,7 @@ public:
 	explicit CLSteadyMouseAnimation(GraphicsView* view);
 	virtual ~CLSteadyMouseAnimation();
 
-    void onUserInput(bool go_unstedy = true);
+    void onUserInput(bool go_unstedy);
 
     virtual void start();
 	virtual void stopAnimation();

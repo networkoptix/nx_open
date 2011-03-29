@@ -29,6 +29,7 @@ protected slots:
 	void onLayOutStoped(LayoutContent* l);
 	void onNewLayoutSelected(LayoutContent* oldl, LayoutContent* newl);
 	void onNewLayoutItemSelected(LayoutContent* newl);
+    void onIntroScreenEscape();
 
 protected:
 	void goToNewLayoutContent();

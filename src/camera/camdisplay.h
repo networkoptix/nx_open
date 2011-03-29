@@ -15,8 +15,9 @@ struct CLCompressedVideoData;
   */
 class CLCamDisplay : public CLAbstractDataProcessor
 {
+    Q_OBJECT
 public:
-	CLCamDisplay();
+	CLCamDisplay(bool generateEndOfStreamSignal);
 	~CLCamDisplay();
 
 	void addVideoChannel(int index, CLAbstractRenderer* vw, bool can_downsacle);
@@ -38,6 +39,9 @@ public:
     void jump(); 
 
 	quint64 currentTime() const { return m_previousVideoDisplayedTime; }
+
+signals:
+    void reachedTheEnd();
 
 private:
 	bool haveAudio() const;
@@ -81,6 +85,8 @@ private:
     int m_displayLasts;
 
     bool m_ignoringVideo;
+
+    bool mGenerateEndOfStreamSignal;
 };
 
 #endif //clcam_display_h_1211

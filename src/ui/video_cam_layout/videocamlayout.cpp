@@ -16,10 +16,11 @@
 #include "layout_manager.h"
 #include "ui/videoitem/video_wnd_archive_item.h"
 #include "ui/videoitem/picture_image_item.h"
+#include "ui/videoitem/intro_video_wnd.h"
 
 
-const int  SLOT_WIDTH = 640*10;
-const int  SLOT_HEIGHT = SLOT_WIDTH*3/4;
+int  SLOT_WIDTH = 640*10;
+int  SLOT_HEIGHT = SLOT_WIDTH*3/4;
 
 int SCENE_LEFT = (400*1000);
 int SCENE_TOP  = (400*1000);
@@ -125,7 +126,7 @@ void SceneLayout::start()
 	m_firstTime = true;
 
 	m_contentchanged = false;
-	m_timer.start(100);
+	m_timer.start(20);
 	m_videotimer.start(1000/MAX_FPS_normal); 
 	m_isRunning = true;
 
@@ -401,11 +402,18 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect)
 
 	if (type==CLDevice::VIDEODEVICE)
 	{
+
+        bool introVideo = (m_content == CLSceneLayoutManager::instance().introScreenLayoutContent());
+
 		QSize wnd_size = m_grid.calcDefaultMaxItemSize(device->getVideoLayout());
 
 		CLVideoWindowItem* video_wnd = 0;
 
-		if (device->checkDeviceTypeFlag(CLDevice::ARCHIVE))//&& false) //777
+        if (introVideo)
+        {
+            video_wnd = new CLIntroVideoitem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height());
+        }
+		else if (device->checkDeviceTypeFlag(CLDevice::ARCHIVE))//&& false) //777
 		{
 			video_wnd = new CLVideoWindowArchiveItem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height());
 			video_wnd->setEditable(true);
@@ -413,7 +421,16 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect)
 		else
 			video_wnd = new CLVideoWindowItem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height());
 
-        CLVideoCamera* cam = new CLVideoCamera(device, video_wnd);
+
+        CLVideoCamera* cam = new CLVideoCamera(device, video_wnd, introVideo);
+
+        if (introVideo)
+        {
+            connect( cam, SIGNAL(reachedTheEnd()), this, SLOT(onReachedTheEnd()) );
+        }
+
+
+
 		addItem(video_wnd, update_scene_rect);
 
 		m_deviceitems.push_back(cam);
@@ -729,6 +746,11 @@ bool SceneLayout::removeDevices(QList<CLAbstractComplicatedItem*> lst)
 	}
 
 	return true;
+}
+
+void SceneLayout::onReachedTheEnd()
+{
+    emit reachedTheEnd();
 }
 
 void SceneLayout::onItemSelected(CLAbstractSceneItem* item)

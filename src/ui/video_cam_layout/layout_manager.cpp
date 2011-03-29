@@ -4,6 +4,7 @@
 #include "layout_content.h"
 
 #include "base/log.h"
+#include "intro_screen_content.h"
 
 CLSceneLayoutManager::CLSceneLayoutManager():
 mRecordersAndLayouts(0)
@@ -152,6 +153,11 @@ void CLSceneLayoutManager::save()
 	fstr<< xml;
 	fstr.flush();
 
+}
+
+LayoutContent* CLSceneLayoutManager::introScreenLayoutContent()
+{
+    return &(intro_screen_content());
 }
 
 LayoutContent* CLSceneLayoutManager::startScreenLayoutContent()

@@ -84,12 +84,14 @@ signals:
 	void onItemPressed(LayoutContent* l, QString itemname);
 	void onNewLayoutSelected(LayoutContent* curr, LayoutContent* newl);
 	void onNewLayoutItemSelected(LayoutContent* newl);
+    void reachedTheEnd();
 protected slots:
 
 	void onItemPressed(CLAbstractSceneItem* item);
 	void onItemDoubleClick(CLAbstractSceneItem* item);
 	void onItemFullScreen(CLAbstractSceneItem* item);
 	void onItemSelected(CLAbstractSceneItem* item);
+    void onReachedTheEnd();
 
 	void onAspectRatioChanged(CLAbstractSceneItem* wnd);
 	void onTimer();

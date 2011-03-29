@@ -7,10 +7,12 @@
 #include "../device/device.h"
 #include "ui/videoitem/video_wnd_item.h"
 
-CLVideoCamera::CLVideoCamera(CLDevice* device, CLVideoWindowItem* videovindow)
+CLVideoCamera::CLVideoCamera(CLDevice* device, CLVideoWindowItem* videovindow, bool generateEndOfStreamSignal)
     : m_device(device),
       m_videovindow(videovindow),
-      m_recorder(device)
+      m_recorder(device),
+      mGenerateEndOfStreamSignal(generateEndOfStreamSignal),
+      m_camdispay(generateEndOfStreamSignal)
 {
 	cl_log.log("Creating camera for ", m_device->toString(), cl_logDEBUG1);
 
@@ -31,6 +33,9 @@ CLVideoCamera::CLVideoCamera(CLDevice* device, CLVideoWindowItem* videovindow)
 
 	m_videovindow->setComplicatedItem(this);
 	m_videovindow->setInfoText(m_device->toString());
+
+    if (mGenerateEndOfStreamSignal)
+        connect(&m_camdispay, SIGNAL( reachedTheEnd() ), this, SLOT( onReachedTheEnd() ));
 }
 
 CLVideoCamera::~CLVideoCamera()
@@ -161,4 +166,11 @@ void CLVideoCamera::setQuality(CLStreamreader::StreamQuality q, bool increase)
 		m_reader->setQuality(CLStreamreader::CLSHighest);
 	else
 		m_reader->setQuality(q);
+}
+
+
+void CLVideoCamera::onReachedTheEnd()
+{
+    if (mGenerateEndOfStreamSignal)
+        emit reachedTheEnd();
 }

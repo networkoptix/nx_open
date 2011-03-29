@@ -11,11 +11,12 @@ class CLDevice;
 class CLVideoWindowItem;
 class CLAbstractSceneItem;
 
-class CLVideoCamera : public CLAbstractComplicatedItem
+class CLVideoCamera : public QObject, public CLAbstractComplicatedItem
 {
+    Q_OBJECT
 public:
 	// number of videovindows in array must be the same as device->getNumberOfVideoChannels
-	CLVideoCamera(CLDevice* device, CLVideoWindowItem* videovindow);
+	CLVideoCamera(CLDevice* device, CLVideoWindowItem* videovindow, bool generateEndOfStreamSignal);
 	virtual ~CLVideoCamera();
 
 	virtual void startDispay();
@@ -47,6 +48,10 @@ public:
 	void setQuality(CLStreamreader::StreamQuality q, bool increase);
 	quint64 currentTime() const;
 
+signals:
+    void reachedTheEnd(); 
+protected slots:
+    void onReachedTheEnd();
 private:
 	CLDevice* m_device;
 	CLVideoWindowItem* m_videovindow;
@@ -56,6 +61,7 @@ private:
 	CLStreamreader* m_reader;
 
 	CLStatistics* m_stat;
+    bool mGenerateEndOfStreamSignal;
 
 };
 

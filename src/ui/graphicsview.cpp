@@ -26,6 +26,8 @@
 #include "device_plugins/archive/archive/archive_device.h"
 
 
+extern int  SLOT_WIDTH;
+
 int doubl_clk_delay = qApp->doubleClickInterval()*0.75;
 int item_select_duration = 800;
 int item_hoverevent_duration = 300;
@@ -179,11 +181,23 @@ void GraphicsView::start()
 
 	m_camLayout.updateSceneRect();
 	centerOn(getRealSceneRect().center());
-	if (m_camLayout.getItemList().count())
+
+	if (m_camLayout.getItemList().count() && m_camLayout.getContent() != CLSceneLayoutManager::instance().introScreenLayoutContent())
 	{
 		zoomMin(0);
-		fitInView(1000, 0, CLAnimationTimeLine::SLOW_START_SLOW_END);
+		fitInView(1000/3, 0, CLAnimationTimeLine::SLOW_START_SLOW_END);
 	}
+    else if (m_camLayout.getContent() == CLSceneLayoutManager::instance().introScreenLayoutContent())
+    {
+        // must put THE only video in full screen mode
+        if (m_camLayout.getItemList().count())
+        {
+            CLAbstractSceneItem* item = m_camLayout.getItemList().at(0);
+            onItemFullScreen_helper(item,0);
+        }
+
+        
+    }
 
 	enableMultipleSelection(false, true);
     mSteadyShow.start();
@@ -292,13 +306,13 @@ bool GraphicsView::shouldOptimizeDrawing() const
 }
 
 //================================================================
-
 void GraphicsView::wheelEvent ( QWheelEvent * e )
 {
 	if (!mViewStarted)
 		return;
 
-    onUserInput();
+    if (onUserInput(true, true))
+        return;
 
 	showStop_helper();
 
@@ -582,7 +596,9 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 	if (m_gridItem->isVisible() && !isCTRLPressed(event))
 		m_gridItem->hide();
 
-    onUserInput();
+    if (onUserInput(true, true))
+        return;
+    
 
 	m_yRotate = 0;
 
@@ -669,7 +685,8 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 	if (m_gridItem->isVisible() && !isCTRLPressed(event))
 		m_gridItem->hide();
 
-    mSteadyShow.onUserInput();
+    if (onUserInput(true, false))
+        return;
 
 	QGraphicsItem *item = itemAt(event->pos());
 	CLAbstractSceneItem* aitem = navigationItem(item);
@@ -839,7 +856,8 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 	if (!mViewStarted)
 		return;
 
-    onUserInput();
+    if (onUserInput(true, true))
+        return;
 
 	if (m_ignore_release_event)
 	{
@@ -1571,9 +1589,18 @@ void GraphicsView::dropEvent ( QDropEvent * event )
 	}
 }
 
-void GraphicsView::onUserInput()
+bool GraphicsView::onUserInput(bool go_unsteady, bool escapeFromintro)
 {
-    mSteadyShow.onUserInput();
+    mSteadyShow.onUserInput(go_unsteady);
+
+    if (escapeFromintro && m_camLayout.getContent() == CLSceneLayoutManager::instance().introScreenLayoutContent())
+    {
+        emit onIntroScreenEscape();
+        return true;
+    }
+
+    return false;
+
 }
 
 void GraphicsView::goToSteadyMode(bool steady)
@@ -1584,7 +1611,7 @@ void GraphicsView::goToSteadyMode(bool steady)
     {
         if (m_seachItem && m_seachItem->hasFocus())
         {
-            mSteadyShow.onUserInput(false);
+            onUserInput(false, false);
             return;
         }
 
@@ -1669,7 +1696,8 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 	if (!mViewStarted)
 		return;
 
-    mSteadyShow.onUserInput();
+    if (onUserInput(true, true))
+        return;
 
 	CLAbstractSceneItem* last_sel_item = getLastSelectedItem();
 
@@ -1874,6 +1902,9 @@ CLAbstractSceneItem* GraphicsView::navigationItem(QGraphicsItem* item) const
 void GraphicsView::drawBackground ( QPainter * painter, const QRectF & rect )
 {
 
+    if (m_camLayout.getContent() == CLSceneLayoutManager::instance().introScreenLayoutContent())
+        return; // do not draw bgrd in case of intro video
+
 	//QGraphicsView::drawBackground ( painter, rect );
 	//=================
 	m_fps_frames++;
@@ -1954,7 +1985,7 @@ void GraphicsView::resizeEvent( QResizeEvent * event )
 	recalcSomeParams();
 
 	if (m_selectedWnd && m_selectedWnd->isFullScreen())
-		onItemFullScreen_helper(m_selectedWnd);
+		onItemFullScreen_helper(m_selectedWnd, 800);
 	else
 		//fitInView(getRealSceneRect(),Qt::KeepAspectRatio);
 	{
@@ -2023,7 +2054,7 @@ bool GraphicsView::isItemStillExists(const CLAbstractSceneItem* wnd) const
 void GraphicsView::toggleFullScreen_helper(CLAbstractSceneItem* wnd)
 {
 	if (!wnd->isFullScreen() || isItemFullScreenZoomed(wnd) ) // if item is not in full screen mode or if it's in FS and zoomed more
-		onItemFullScreen_helper(wnd);
+		onItemFullScreen_helper(wnd, 800);
 	else
 	{
 		// escape FS MODE
@@ -2288,7 +2319,7 @@ qreal GraphicsView::zoomForFullScreen_helper(QRectF rect) const
 
 }
 
-void GraphicsView::onItemFullScreen_helper(CLAbstractSceneItem* wnd)
+void GraphicsView::onItemFullScreen_helper(CLAbstractSceneItem* wnd, int duration)
 {
 
 	//wnd->zoom_abs(selected_item_zoom, true);
@@ -2306,7 +2337,7 @@ void GraphicsView::onItemFullScreen_helper(CLAbstractSceneItem* wnd)
 	QRectF item_rect = wnd->sceneBoundingRect();
 	qreal zoom = zoomForFullScreen_helper(item_rect);
 
-	int duration = 800;
+	
 	m_movement.move(item_rect.center(), duration, 0, CLAnimationTimeLine::SLOW_START_SLOW_END);
 
 	//scale(scl, scl);

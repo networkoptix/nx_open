@@ -5,6 +5,7 @@
 #include "recorder/fake_recorder_device.h"
 #include "device_plugins/archive/archive/archive_device.h"
 #include "util.h"
+#include "device_plugins/archive/avi_files/avi_device.h"
 
 // Init static variables
 CLDeviceManager* CLDeviceManager::m_Instance = 0;
@@ -35,8 +36,16 @@ m_firstTime(true)
     checkLst.push_back(getMediaRootDir());
     pleaseCheckDirs(checkLst);
 
-	//CLDirectoryBrowserDeviceServer dirbrowsr(getMediaRootDir());
-	//onNewDevices_helper(dirbrowsr.findDevices(), generalArchiverId);
+
+    {
+        // intro video device 
+        CLDeviceList lst;
+        CLAviDevice* dev = new CLAviDevice("intro.mov");
+        lst[dev->getUniqueId()] = dev;
+        onNewDevices_helper(lst, "Recorder:General Archiver");
+    }
+    
+
 }
 
 CLDeviceManager::~CLDeviceManager()

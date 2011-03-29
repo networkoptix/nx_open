@@ -74,13 +74,16 @@ public:
 	void updateTransform(qreal angle);
 
     void goToSteadyMode(bool steady);
-    void onUserInput();
+
+    // returns true if should stop
+    bool onUserInput(bool go_unsteady, bool escapeFromintro);
 
     
 
 signals:
 	void scneZoomFinished();
 	void onDecorationPressed(LayoutContent*, QString);
+    void onIntroScreenEscape();
 protected:
 	virtual void wheelEvent ( QWheelEvent * e );
 	void mouseReleaseEvent ( QMouseEvent * e);
@@ -102,7 +105,7 @@ protected:
 	void onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int delay);
 	void toggleFullScreen_helper(CLAbstractSceneItem* new_wnd);
 
-	void onItemFullScreen_helper(CLAbstractSceneItem* wnd);
+	void onItemFullScreen_helper(CLAbstractSceneItem* wnd, int duration);
 	qreal zoomForFullScreen_helper(QRectF rect) const;
 
 	void onArrange_helper();

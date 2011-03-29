@@ -99,7 +99,7 @@ public:
 
     //== steady mode
 
-    void goToSteadyMode(bool steady, bool instant);
+    virtual void goToSteadyMode(bool steady, bool instant);
     int steadyBlackColor() const;
     void setSteadyBlackColor(int color);
 

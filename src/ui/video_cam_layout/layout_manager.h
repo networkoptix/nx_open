@@ -13,6 +13,9 @@ public:
 
 	void save();
 
+    // intro video 
+    LayoutContent* introScreenLayoutContent();
+
 	// start screen 
 	LayoutContent* startScreenLayoutContent();
 

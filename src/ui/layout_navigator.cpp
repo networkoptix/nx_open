@@ -29,6 +29,12 @@ mCurrentContent(content)
 	// home, levelup button or so
 	connect(&m_videoView, SIGNAL(onDecorationPressed(LayoutContent*, QString)), this, SLOT(onDecorationPressed(LayoutContent*, QString)));
 
+    // escape from intro screen 
+    connect(&m_videoView, SIGNAL(onIntroScreenEscape()), this, SLOT(onIntroScreenEscape()));
+
+    
+    connect(&m_videoView.getCamLayOut(), SIGNAL( reachedTheEnd() ), this, SLOT(onIntroScreenEscape()));
+
 	// some layout ref pressed
 	connect(&m_videoView.getCamLayOut(), SIGNAL(onNewLayoutSelected(LayoutContent*, LayoutContent*)), this, SLOT(onNewLayoutSelected(LayoutContent*, LayoutContent*)));
 
@@ -36,7 +42,7 @@ mCurrentContent(content)
 	connect(&m_videoView.getCamLayOut(), SIGNAL(onNewLayoutItemSelected(LayoutContent*)), this, SLOT(onNewLayoutItemSelected(LayoutContent*)));
 
 	if (mCurrentContent==0)
-		mCurrentContent = CLSceneLayoutManager::instance().startScreenLayoutContent();
+		mCurrentContent = CLSceneLayoutManager::instance().introScreenLayoutContent();
 
 	m_videoView.getCamLayOut().setContent(mCurrentContent);
 	m_videoView.getCamLayOut().start();
@@ -148,6 +154,12 @@ void CLLayoutNavigator::onNewLayoutSelected(LayoutContent* oldl, LayoutContent* 
 		goToNewLayoutContent();
 	}
 
+}
+
+void CLLayoutNavigator::onIntroScreenEscape()
+{
+    mNewContent = CLSceneLayoutManager::instance().startScreenLayoutContent();
+    goToNewLayoutContent();
 }
 
 void CLLayoutNavigator::onLayOutStoped(LayoutContent* l)

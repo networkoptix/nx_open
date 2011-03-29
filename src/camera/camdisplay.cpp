@@ -7,7 +7,7 @@
 #define CL_MAX_DISPLAY_QUEUE_SIZE 7
 #define AUDIO_BUFF_SIZE (4000) // ms
 
-CLCamDisplay::CLCamDisplay()
+CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
     : CLAbstractDataProcessor(CL_MAX_DISPLAY_QUEUE_SIZE),
       m_previousVideoTime(0),
       m_previousVideoDisplayedTime(0),
@@ -18,7 +18,8 @@ CLCamDisplay::CLCamDisplay()
       m_hadAudio(false),
       m_afterJump(false),
       m_displayLasts(0),
-      m_ignoringVideo(false)
+      m_ignoringVideo(false),
+      mGenerateEndOfStreamSignal(generateEndOfStreamSignal)
 {
 	for (int i = 0; i< CL_MAX_CHANNELS; ++i)
 		m_display[i] = 0;
@@ -378,4 +379,7 @@ void CLCamDisplay::afterJump(qint64 newTime)
     m_previousVideoDisplayedTime = 0;
     clearVideoQueue();
     m_audioDisplay->clearAudioBuffer();
+
+    if (mGenerateEndOfStreamSignal)
+        emit reachedTheEnd();
 }
