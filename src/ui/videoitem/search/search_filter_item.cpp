@@ -16,15 +16,16 @@ m_view(view)
 	m_lineEdit = new CLSearchEdit(this);
 	m_lineEdit->setFocus();
 
+    /*/
 	QString style (
 
 		"QLineEdit{ border-width: 2px; \n"
-		"color: rgb(0, 240, 240); \n"
+		"color: rgb(255, 255, 255); \n"
 		"background-color: rgb(0, 16, 72);\n"
-		"border-top-color: rgb(0, 240, 240); \n"
-		"border-left-color: rgb(0, 240, 240); \n"
-		"border-right-color: rgb(0, 240, 240); \n"
-		"border-bottom-color: rgb(0, 240, 240); \n"
+		"border-top-color: rgb(255, 255, 255); \n"
+		"border-left-color: rgb(255, 255, 255); \n"
+		"border-right-color: rgb(255, 255, 255); \n"
+		"border-bottom-color: rgb(255, 255, 255); \n"
 		"border-style: solid; \n"
 		//"spacing: 22px; \n"
 		//"margin-top: 3px; \n"
@@ -33,12 +34,39 @@ m_view(view)
 		"font-size: 25px; \n"
 		"font-weight: normal; }\n"
 		"QLineEdit:focus{ \n"
-		"color: rgb(0, 240, 240);\n"
-		"border-top-color: rgb(0, 240, 240);\n"
-		"border-left-color: rgb(0, 240, 240); \n"
-		"border-right-color: rgb(0, 240, 240); \n"
-		"border-bottom-color: rgb(0, 240, 240);}"
+		"color: rgb(255, 255, 255);\n"
+		"border-top-color: rgb(255, 255, 255);\n"
+		"border-left-color: rgb(255, 255, 255); \n"
+		"border-right-color: rgb(255, 255, 255); \n"
+		"border-bottom-color: rgb(255, 255, 255);}"
 		);
+
+        /**/
+
+    QString style (
+
+        "QLineEdit{ border-width: 2px; \n"
+        "color: rgb(150,150, 150); \n"
+        "background-color: rgb(0, 16, 72);\n"
+        "border-top-color: rgb(150,150, 150); \n"
+        "border-left-color: rgb(150,150, 150); \n"
+        "border-right-color: rgb(150,150, 150); \n"
+        "border-bottom-color: rgb(150,150, 150); \n"
+        "border-style: solid; \n"
+        //"spacing: 22px; \n"
+        //"margin-top: 3px; \n"
+        //"margin-bottom: 3px; \n"
+        //"padding: 16px; \n"
+        "font-size: 25px; \n"
+        "font-weight: normal; }\n"
+        "QLineEdit:focus{ \n"
+        "color: rgb(150,150, 150);\n"
+        "border-top-color: rgb(150,150, 150);\n"
+        "border-left-color: rgb(150,150, 150); \n"
+        "border-right-color: rgb(150,150, 150); \n"
+        "border-bottom-color: rgb(150,150, 150);}"
+        );
+
 
 	m_lineEdit->setStyleSheet(style);
 
@@ -54,7 +82,7 @@ m_view(view)
 	m_lstview->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
 	m_lstview->setStyleSheet(
-		"color: rgb(0, 240, 240);"
+		"color: rgb(150,150, 150);"
 		"background-color: rgb(0, 16, 72);"
 		"selection-color: yellow;"
 		"selection-background-color: blue;"

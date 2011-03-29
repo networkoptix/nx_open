@@ -1,11 +1,12 @@
 #ifndef layout_item_h1421_h
 #define layout_item_h1421_h
 
-#include "custom_draw_button.h"
+
+#include "img_item.h"
 
 class LayoutContent;
 
-class CLLayoutItem : public CLCustomBtnItem
+class CLLayoutItem : public CLImageItem
 {
 	Q_OBJECT
 public:
@@ -21,6 +22,8 @@ protected:
 protected:
 
 	LayoutContent* mContent; //this item references to this content
+
+    QPixmap mPixmap;
 
 };
 

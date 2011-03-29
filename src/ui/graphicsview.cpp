@@ -176,7 +176,6 @@ GraphicsView::ViewMode GraphicsView::getViewMode() const
 
 void GraphicsView::start()
 {
-	m_ignore_release_event = false;
 	mViewStarted = true;
 
 	m_camLayout.updateSceneRect();
@@ -185,7 +184,13 @@ void GraphicsView::start()
 	if (m_camLayout.getItemList().count() && m_camLayout.getContent() != CLSceneLayoutManager::instance().introScreenLayoutContent())
 	{
 		zoomMin(0);
-		fitInView(1000/3, 0, CLAnimationTimeLine::SLOW_START_SLOW_END);
+
+        int duration = 1000;
+
+        if (m_camLayout.getItemList().count() && m_camLayout.getContent() == CLSceneLayoutManager::instance().startScreenLayoutContent())
+            duration/=3;
+
+		fitInView(duration, 0, CLAnimationTimeLine::SLOW_START_SLOW_END);
 	}
     else if (m_camLayout.getContent() == CLSceneLayoutManager::instance().introScreenLayoutContent())
     {
@@ -592,6 +597,8 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 {
 	if (!mViewStarted)
 		return;
+
+    m_ignore_release_event = false;
 
 	if (m_gridItem->isVisible() && !isCTRLPressed(event))
 		m_gridItem->hide();

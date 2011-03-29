@@ -2,20 +2,24 @@
 #include "layout_item.h"
 #include "ui/ui_common.h"
 
+extern QPixmap cached(const QString &img);
+
 CLLayoutItem::CLLayoutItem(GraphicsView* view, int max_width, int max_height, QString name, QString tooltip):
-CLCustomBtnItem(view,max_width,max_height, name, "", tooltip),
+CLImageItem(view,max_width,max_height, name),
 mContent(0)
 {
-
-	createPaths(width()/9);
-
 	m_type = LAYOUT;
+
+    mPixmap = cached(":/skin/layout.png");
+
+    //setMaxSize(max_width, max_height);
 }
 
 CLLayoutItem::~CLLayoutItem()
 {
 
 }
+
 
 void CLLayoutItem::setRefContent(LayoutContent* cont)
 {
@@ -32,7 +36,7 @@ QPointF CLLayoutItem::getBestSubItemPos(CLSubItemType type)
 	switch(type)
 	{
 	case CloseSubItem:
-		return QPointF(width()-600, 200);
+		return QPointF(width()-1000, 250);
 		break;
 
 	default:
@@ -44,6 +48,7 @@ QPointF CLLayoutItem::getBestSubItemPos(CLSubItemType type)
 
 void CLLayoutItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    /*
 	painter->fillPath(mShadowRectPath, global_shadow_color);
 
 	QColor border_color(20,20,160);
@@ -62,6 +67,13 @@ void CLLayoutItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 	//painter->drawRect(boundingRect());
 
 	//==================================================
+    /**/
+
+    painter->setRenderHint(QPainter::SmoothPixmapTransform);
+    painter->setRenderHint(QPainter::Antialiasing);
+    painter->drawPixmap(boundingRect(), mPixmap, mPixmap.rect());
+
+
 	QFont  font("Courier New", 250);
 	font.setWeight(QFont::Bold);
 	painter->setFont(font);
@@ -72,17 +84,18 @@ void CLLayoutItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 	QRect rect(0, 0, width() , height());
 
 	if (m_mouse_over)
-		painter->setPen(QColor(190, 190, 190));
+		painter->setPen(QColor(190, 190, 255));
 	else
-		painter->setPen(QColor(150, 150, 150));
+		painter->setPen(QColor(150, 150, 255));
 
+    
 	painter->drawText((width() - rect.width())/2, border,
 		rect.width(), rect.height(),
 		Qt::AlignCenter | Qt::TextWordWrap, UIDisplayName(getName()));
 
 	if (option->state & QStyle::State_Selected)
 	{
-		painter->fillPath(mRoundRectPath, m_can_be_droped ? global_can_be_droped_color :  global_selection_color );
+		painter->fillRect(boundingRect(), m_can_be_droped ? global_can_be_droped_color :  global_selection_color );
 	}
 
 }

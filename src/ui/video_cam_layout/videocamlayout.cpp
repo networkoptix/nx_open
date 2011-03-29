@@ -755,29 +755,50 @@ void SceneLayout::onReachedTheEnd()
 
 void SceneLayout::onItemSelected(CLAbstractSceneItem* item)
 {
-	if (item->getType() == CLAbstractSceneItem::RECORDER || item->getType() == CLAbstractSceneItem::LAYOUT)
+	
+    if (item->getType() == CLAbstractSceneItem::RECORDER)
 	{
 		CLRecorderItem* ritem = static_cast<CLRecorderItem*>(item);
 		emit onNewLayoutItemSelected(ritem->getRefContent());
 	}
+
+    if (item->getType() == CLAbstractSceneItem::LAYOUT)
+    {
+        CLLayoutItem* ritem = static_cast<CLLayoutItem*>(item);
+        emit onNewLayoutItemSelected(ritem->getRefContent());
+    }
+    /**/
 }
 
 void SceneLayout::onItemFullScreen(CLAbstractSceneItem* item)
 {
-	if (item->getType() == CLAbstractSceneItem::RECORDER || item->getType() == CLAbstractSceneItem::LAYOUT)
+	if (item->getType() == CLAbstractSceneItem::RECORDER)
 	{
 		CLRecorderItem* ritem = static_cast<CLRecorderItem*>(item);
 		emit onNewLayoutSelected(m_content, ritem->getRefContent());
 	}
+
+    if (item->getType() == CLAbstractSceneItem::LAYOUT)
+    {
+        CLLayoutItem* ritem = static_cast<CLLayoutItem*>(item);
+        emit onNewLayoutSelected(m_content, ritem->getRefContent());
+    }
+    /**/
 }
 
 void SceneLayout::onItemDoubleClick(CLAbstractSceneItem* item)
 {
-	if (item->getType() == CLAbstractSceneItem::RECORDER || item->getType() == CLAbstractSceneItem::LAYOUT)
-	{
-		CLRecorderItem* ritem = static_cast<CLRecorderItem*>(item);
-		emit onNewLayoutSelected(m_content, ritem->getRefContent());
-	}
+    if (item->getType() == CLAbstractSceneItem::RECORDER)
+    {
+        CLRecorderItem* ritem = static_cast<CLRecorderItem*>(item);
+        emit onNewLayoutSelected(m_content, ritem->getRefContent());
+    }
+
+    if (item->getType() == CLAbstractSceneItem::LAYOUT)
+    {
+        CLLayoutItem* ritem = static_cast<CLLayoutItem*>(item);
+        emit onNewLayoutSelected(m_content, ritem->getRefContent());
+    }
 
 }
 
