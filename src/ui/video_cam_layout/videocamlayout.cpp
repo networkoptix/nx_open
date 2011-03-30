@@ -356,7 +356,7 @@ void SceneLayout::onVideoTimer()
 	}
 }
 
-bool SceneLayout::addDevice(QString uniqueid, bool update_scene_rect)
+bool SceneLayout::addDevice(QString uniqueid, bool update_scene_rect, CLBasicLayoutItemSettings itemSettings)
 {
 	//Mind Vibes - mixed by Kick Bong
 	//Go To Bed World (Vol. 2) - mixed by Xerxes
@@ -377,7 +377,7 @@ bool SceneLayout::addDevice(QString uniqueid, bool update_scene_rect)
 
 	}
 
-	if (!addDevice(dev, update_scene_rect))
+	if (!addDevice(dev, update_scene_rect, itemSettings))
 	{
 		dev->releaseRef();
 		return false;
@@ -386,7 +386,7 @@ bool SceneLayout::addDevice(QString uniqueid, bool update_scene_rect)
 	return true;
 }
 
-bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect)
+bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect, CLBasicLayoutItemSettings itemSettings)
 {
 	if (!m_grid.isSpaceAvalable())
 	{
@@ -433,7 +433,7 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect)
 
 
 
-		addItem(video_wnd, update_scene_rect);
+		addItem(video_wnd, update_scene_rect, itemSettings);
 
 		m_deviceitems.push_back(cam);
 		cam->setQuality(CLStreamreader::CLSLow, true);
@@ -463,7 +463,7 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect)
 		}
 
 		CLRecorderDisplay* recd = new CLRecorderDisplay(device, item);
-		addItem(item, update_scene_rect);
+		addItem(item, update_scene_rect, itemSettings);
 
 		m_deviceitems.push_back(recd);
 		recd->start();
@@ -475,7 +475,7 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect)
 
 }
 
-bool SceneLayout::addLayoutItem(QString name, LayoutContent* lc, bool update_scene_rect)
+bool SceneLayout::addLayoutItem(QString name, LayoutContent* lc, bool update_scene_rect, CLBasicLayoutItemSettings itemSettings)
 {
 	// new item should always be adjusted 
 	if (!m_grid.isSpaceAvalable())
@@ -484,7 +484,7 @@ bool SceneLayout::addLayoutItem(QString name, LayoutContent* lc, bool update_sce
 	CLLayoutItem* item = new CLLayoutItem(m_view, SLOT_WIDTH, SLOT_HEIGHT, name, name);
 	item->setRefContent(lc);
 
-	addItem(item, update_scene_rect);
+	addItem(item, update_scene_rect, itemSettings);
 
 	if (update_scene_rect)
 	{
@@ -495,7 +495,7 @@ bool SceneLayout::addLayoutItem(QString name, LayoutContent* lc, bool update_sce
 	return true;
 }
 
-bool SceneLayout::addItem(CLAbstractSceneItem* item, const CLBasicLayoutItemSettings& itemSettings, bool update_scene_rect)
+bool SceneLayout::addItem(CLAbstractSceneItem* item, bool update_scene_rect, CLBasicLayoutItemSettings itemSettings)
 {
 	// new item should always be adjusted 
 	if (!m_grid.isSpaceAvalable())
@@ -503,6 +503,26 @@ bool SceneLayout::addItem(CLAbstractSceneItem* item, const CLBasicLayoutItemSett
 
 	if (!item)
 		return false;
+
+    if (itemSettings.coordType == CLBasicLayoutItemSettings::Slots)
+        item->setArranged(true);
+
+
+    if (itemSettings.coordType == CLBasicLayoutItemSettings::Undefined)
+    {
+        int x, y;
+
+        if (!m_grid.getNextAvailablePos(item->getMaxSize(), x, y))
+            return false;
+
+        itemSettings.coordType = CLBasicLayoutItemSettings::Pixels;
+        itemSettings.pos_x = x;
+        itemSettings.pos_y = y;
+
+        item->setArranged(true);
+
+    }
+
 
 	m_items.push_back(item);
 	m_scene->addItem(item);
@@ -517,7 +537,9 @@ bool SceneLayout::addItem(CLAbstractSceneItem* item, const CLBasicLayoutItemSett
 	//=========
 
 	if (update_scene_rect)
-		updateSceneRect();
+    {
+        updateSceneRect();
+    }
 
 	connect(item, SIGNAL(onAspectRatioChanged(CLAbstractSceneItem*)), this, SLOT(onAspectRatioChanged(CLAbstractSceneItem*)));
 
@@ -532,28 +554,10 @@ bool SceneLayout::addItem(CLAbstractSceneItem* item, const CLBasicLayoutItemSett
 	//===========
 	connect(item, SIGNAL(onClose(CLAbstractSubItemContainer*)), this, SLOT(onItemClose(CLAbstractSubItemContainer*)));
 
+
 	return true;
 }
 
-bool SceneLayout::addItem(CLAbstractSceneItem* item, bool update_scene_rect )
-{
-	int x, y;
-
-	if (!m_grid.getNextAvailablePos(item->getMaxSize(), x, y))
-		return false;
-
-    CLBasicLayoutItemSettings sett;
-    sett.coordType = CLBasicLayoutItemSettings::Pixels;
-    sett.pos_x = x;
-    sett.pos_y = y;
-
-
-
-	addItem(item, sett, update_scene_rect);
-	item->setArranged(true);
-	return true;
-
-}
 
 // remove item from lay out
 void SceneLayout::removeItem(CLAbstractSceneItem* item, bool update_scene_rect )
@@ -848,7 +852,7 @@ void SceneLayout::loadContent()
         CLImageItem* item = 0;
         item = new CLPictureImageItem(m_view, iset.width, iset.height, img->getImage(), img->getName());
 		item->setOpacity(0.8);
-		addItem(item, iset, false);
+		addItem(item, false, iset);
 		added = true;
 	}
 
@@ -856,7 +860,7 @@ void SceneLayout::loadContent()
 	{
         CLBasicLayoutItemSettings& iset = btn->getBasicSettings();
 		CLCustomBtnItem* item = new CLCustomBtnItem(m_view, iset.width, iset.height, iset.name, iset.name, "tiiktip text");
-		addItem(item, iset, false);
+		addItem(item, false, iset);
 		added = true;
 	}
 
@@ -864,14 +868,16 @@ void SceneLayout::loadContent()
 	{
 		if (!children->isRecorder())
 		{
-			addLayoutItem(children->getName(), children, false);
+            CLBasicLayoutItemSettings& iset = children->getBasicSettings();
+			addLayoutItem(children->getName(), children, false, iset);
 			added = true;
 		}
 	}
 
 	foreach(LayoutDevice* dev, devices_list)
 	{
-		addDevice(dev->getId(), false);
+        CLBasicLayoutItemSettings& iset = dev->getBasicSettings();
+		addDevice(dev->getId(), false, iset);
 		added = true;
 	}
 
