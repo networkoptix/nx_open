@@ -43,9 +43,9 @@ public:
 	void setParent(LayoutContent* parent);
 	LayoutContent* getParent() const;
 
-	void addButton(const QString& name, const QString& text, const QString& tooltip, int x, int y, int width, int height, int angle = 0);
-	void addImage(const QString& img, const QString& name, const QString& text, const QString& tooltip, int x, int y, int width, int height, int angle = 0);
-	void addDevice(const QString& uniqueId, int x=0, int y=0, int width=0, int height=0, int angle = 0);
+	void addButton(const QString& text, const QString& tooltip, const CLBasicLayoutItemSettings& setting);
+	void addImage(const QString& img, const QString& text, const QString& tooltip, const CLBasicLayoutItemSettings& setting);
+	void addDevice(const QString& uniqueId, const CLBasicLayoutItemSettings& setting = CLBasicLayoutItemSettings());
 	void removeDevice(const QString& uniqueId);
 
 	// return l if copy is false, else returns copy of l

@@ -30,6 +30,17 @@ void CLGridEngine::setLayoutContent(LayoutContent* sl)
 	m_scene_layout = sl;
 }
 
+QPoint CLGridEngine::posFromItemSettings(const CLBasicLayoutItemSettings& sett) const
+{
+    if (sett.coordType==CLBasicLayoutItemSettings::Pixels)
+        return QPoint(sett.pos_x, sett.pos_y);
+
+    if (sett.coordType==CLBasicLayoutItemSettings::Slots)
+        return posFromSlot(sett.pos_x, sett.pos_y);
+
+    return QPoint(m_settings.left, m_settings.top);
+}
+
 QSize CLGridEngine::calcDefaultMaxItemSize(const CLDeviceVideoLayout* layout) const
 {
 	if (layout==0)

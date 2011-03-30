@@ -1,5 +1,6 @@
 #ifndef grid_engine_h1754
 #define grid_engine_h1754
+#include "layout_items.h"
 
 class CLAbstractSceneItem;
 class CLDeviceVideoLayout;
@@ -64,6 +65,10 @@ public:
 	CLGridSettings& getSettings();
 
 	void setLayoutContent(LayoutContent* sl);
+
+    QPoint posFromItemSettings(const CLBasicLayoutItemSettings& sett) const;
+
+    //void clarify
 
 	// returns recommended item size for such grid; ususally caled befor Item is created
 	QSize calcDefaultMaxItemSize(const CLDeviceVideoLayout* lo = 0) const;

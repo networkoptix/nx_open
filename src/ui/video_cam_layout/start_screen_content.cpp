@@ -16,9 +16,9 @@ LayoutContent& startscreen_content()
 	if (frist_time)
 	{
 
-		instance.setName(start_screen);
-
 		frist_time = false;
+
+        instance.setName(start_screen);
 
         int noLogoWidth = 702*1.7;
         int noLogoHeight = 243*1.7;
@@ -42,17 +42,39 @@ LayoutContent& startscreen_content()
 
 		int btn_top = eveLogoTop + eveLogoHeight - 100;
 
-		
+        CLBasicLayoutItemSettings settings;
+        settings.angle = 0;
+        settings.coordType = CLBasicLayoutItemSettings::Pixels;
 
-        instance.addImage(":/skin/startscreen/no_logo.png", "abc", "","", noLogoLeft, noLogoTop, noLogoWidth, noLogoHeight);
+        settings.name = "abc";
+        settings.pos_x = noLogoLeft;
+        settings.pos_y = noLogoTop;
+        settings.width = noLogoWidth;
+        settings.height = noLogoHeight;
+        instance.addImage(":/skin/startscreen/no_logo.png", "","", settings);
 
-		instance.addImage(":/skin/startscreen/eve_logo.png", button_logo, "","", eveLogoLeft, eveLogoTop, eveLogoWidth, eveLogoHeight);
+        settings.name = button_logo;
+        settings.pos_x = eveLogoLeft;
+        settings.pos_y = eveLogoTop;
+        settings.width = eveLogoWidth;
+        settings.height = eveLogoHeight;
+		instance.addImage(":/skin/startscreen/eve_logo.png", "","", settings);
 
-		//instance.addImage(":/skin/startscreen/control room.png", "control" ,"","", logo_left + delta_w, SCENE_TOP, btn_width, btn_height);
-		//instance.addImage(":/skin/startscreen/achive.png","archive", "","",logo_left + delta_w, logo_top + logo_heih + item_distance - 500, btn_width, btn_height);
 
-        instance.addImage(":/skin/startscreen/dynamic_launch/", button_layout , "","",btn2_left, btn_top, btn_width, btn_height);
-        instance.addImage(":/skin/startscreen/setup_2.png", button_system, "","", btn_left, btn_top, btn_width, btn_height);
+        settings.name = button_layout;
+        settings.pos_x = btn2_left;
+        settings.pos_y = btn_top;
+        settings.width = btn_width;
+        settings.height = btn_height;
+        instance.addImage(":/skin/startscreen/dynamic_launch/", "","", settings);
+
+
+        settings.name = button_system;
+        settings.pos_x = btn_left;
+        settings.pos_y = btn_top;
+        settings.width = btn_width;
+        settings.height = btn_height;
+        instance.addImage(":/skin/startscreen/setup_2.png", "","", settings);
 
 		CLDeviceCriteria cr(CLDeviceCriteria::STATIC);
 

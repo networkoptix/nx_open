@@ -1,16 +1,24 @@
 #include "layout_items.h"
 
+CLBasicLayoutItemSettings::CLBasicLayoutItemSettings():
+coordType(Undefined),
+pos_x(0),
+pos_y(0),
+width(0), 
+height(0),
+angle(0)
+{
+}
+
+
+
 LayoutItem::LayoutItem()
 {
 
 }
 
-LayoutItem::LayoutItem(int x_, int y_, int width_, int height_, int angle_):
-x(x_),
-y(y_),
-w(width_),
-h(height_),
-angl(angle_)
+LayoutItem::LayoutItem(const CLBasicLayoutItemSettings& setting):
+mSettings(setting)
 {
 
 }
@@ -78,49 +86,20 @@ void LayoutItem::toXml(QDomDocument& doc, QDomElement& parent)
 
 }
 
-void LayoutItem::setName(const QString& name)
-{
-	this->name = name;
-}
-
 QString LayoutItem::getName() const
 {
-	return name;
+    return mSettings.name;
 }
 
-int LayoutItem::getX() const
+void LayoutItem::setName(const QString& name )
 {
-	return x;
+    mSettings.name = name;
 }
 
-int LayoutItem::getY() const
-{
-	return y;
-}
 
-QPointF LayoutItem::pos() const
+CLBasicLayoutItemSettings& LayoutItem::getBasicSettings()
 {
-	return QPointF(x,y);
-}
-
-int LayoutItem::width() const
-{
-	return w;
-}
-
-int LayoutItem::height() const
-{
-	return h;
-}
-
-QSize LayoutItem::size() const
-{
-	return QSize(x,y);
-}
-
-int LayoutItem::angle() const
-{
-	return angl;
+    return mSettings;
 }
 
 //=======
@@ -129,8 +108,8 @@ LayoutDevice::LayoutDevice()
 
 }
 
-LayoutDevice::LayoutDevice(const QString& uniqueId, int x_, int y_, int width_, int height_, int angle_):
-LayoutItem(x_, y_, width_, height_,  angle_),
+LayoutDevice::LayoutDevice(const QString& uniqueId, const CLBasicLayoutItemSettings& setting):
+LayoutItem(setting),
 id(uniqueId)
 {
 	setName(uniqueId);
@@ -157,12 +136,11 @@ LayoutButton::LayoutButton()
 
 }
 
-LayoutButton::LayoutButton(const QString& name_, const QString& text, const QString& tooltip, int x_, int y_, int width_, int height_, int angle_):
-LayoutItem(x_, y_, width_, height_,  angle_),
+LayoutButton::LayoutButton(const QString& text, const QString& tooltip, const CLBasicLayoutItemSettings& setting):
+LayoutItem(setting),
 m_text(text),
 m_tooltip(tooltip)
 {
-	setName(name_);
 }
 
 LayoutItem::Type LayoutButton::type() const
@@ -181,8 +159,8 @@ LayoutImage::LayoutImage()
 
 }
 
-LayoutImage::LayoutImage(const QString& img, const QString& name, const QString& text, const QString& tooltip, int x_, int y_, int width_, int height_, int angle_):
-LayoutButton(name, text, tooltip, x_, y_, width_, height_,  angle_),
+LayoutImage::LayoutImage(const QString& img, const QString& text, const QString& tooltip, const CLBasicLayoutItemSettings& setting):
+LayoutButton(text, tooltip, setting),
 image(img)
 {
 

@@ -1746,6 +1746,19 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 			mShow.m_counrer+=10*60;
 			break;
 
+        case Qt::Key_Escape:
+            if (!mMainWnd->isFullScreen())
+                mMainWnd->showFullScreen();
+            else
+                mMainWnd->showMaximized();
+            break;
+
+        case Qt::Key_A:
+                onArrange_helper();
+            break;
+
+
+
 	}
 
 	// ===========new item selection 

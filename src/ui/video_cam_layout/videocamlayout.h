@@ -104,7 +104,7 @@ private:
 
 	// position of window( if any ) will be changed
 	// return false if there are no available slots
-	bool addItem(CLAbstractSceneItem* item, int x, int y, bool update_scene_rect);
+	bool addItem(CLAbstractSceneItem* item, const CLBasicLayoutItemSettings& itemSettings, bool update_scene_rect);
 
 	// remove item from lay out
 	void removeItem(CLAbstractSceneItem* item, bool update_scene_rect = true);

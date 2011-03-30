@@ -17,6 +17,7 @@
 #include "ui/videoitem/video_wnd_archive_item.h"
 #include "ui/videoitem/picture_image_item.h"
 #include "ui/videoitem/intro_video_wnd.h"
+#include "layout_items.h"
 
 
 int  SLOT_WIDTH = 640*10;
@@ -196,9 +197,10 @@ void SceneLayout::stop(bool animation)
 	if (!m_isRunning)
 		return;
 
-
     LayoutContent::coppyLayoutContent(m_content, m_contentCopy , true);
     delete m_contentCopy;
+
+
 
 	m_isRunning = false;
 
@@ -493,7 +495,7 @@ bool SceneLayout::addLayoutItem(QString name, LayoutContent* lc, bool update_sce
 	return true;
 }
 
-bool SceneLayout::addItem(CLAbstractSceneItem* item, int x, int y, bool update_scene_rect)
+bool SceneLayout::addItem(CLAbstractSceneItem* item, const CLBasicLayoutItemSettings& itemSettings, bool update_scene_rect)
 {
 	// new item should always be adjusted 
 	if (!m_grid.isSpaceAvalable())
@@ -503,9 +505,9 @@ bool SceneLayout::addItem(CLAbstractSceneItem* item, int x, int y, bool update_s
 		return false;
 
 	m_items.push_back(item);
-
 	m_scene->addItem(item);
-	item->setPos(x, y);
+
+	item->setPos(m_grid.posFromItemSettings(itemSettings));
 
 	//=========
 	if (isEditable() || item->isEtitable())	
@@ -540,7 +542,14 @@ bool SceneLayout::addItem(CLAbstractSceneItem* item, bool update_scene_rect )
 	if (!m_grid.getNextAvailablePos(item->getMaxSize(), x, y))
 		return false;
 
-	addItem(item, x, y, update_scene_rect);
+    CLBasicLayoutItemSettings sett;
+    sett.coordType = CLBasicLayoutItemSettings::Pixels;
+    sett.pos_x = x;
+    sett.pos_y = y;
+
+
+
+	addItem(item, sett, update_scene_rect);
 	item->setArranged(true);
 	return true;
 
@@ -834,19 +843,20 @@ void SceneLayout::loadContent()
 
 	foreach(LayoutImage* img, img_list)
 	{
+        CLBasicLayoutItemSettings& iset = img->getBasicSettings();
 
         CLImageItem* item = 0;
-        
-        item = new CLPictureImageItem(m_view, img->width(), img->height(), img->getImage(), img->getName());
+        item = new CLPictureImageItem(m_view, iset.width, iset.height, img->getImage(), img->getName());
 		item->setOpacity(0.8);
-		addItem(item, img->getX(), img->getY(), false);
+		addItem(item, iset, false);
 		added = true;
 	}
 
 	foreach(LayoutButton* btn, btns_list)
 	{
-		CLCustomBtnItem* item = new CLCustomBtnItem(m_view, btn->width(), btn->height(), btn->getName(), btn->getName(), "tiiktip text");
-		addItem(item, btn->getX(), btn->getY(), false);
+        CLBasicLayoutItemSettings& iset = btn->getBasicSettings();
+		CLCustomBtnItem* item = new CLCustomBtnItem(m_view, iset.width, iset.height, iset.name, iset.name, "tiiktip text");
+		addItem(item, iset, false);
 		added = true;
 	}
 

@@ -6,12 +6,24 @@
 class CLCustomBtnItem;
 class CLStaticImageItem;
 
+struct CLBasicLayoutItemSettings
+{
+    CLBasicLayoutItemSettings();
+    enum Coordtype{Undefined, Pixels, Slots}; 
+    Coordtype coordType;
+    int pos_x, pos_y;
+    int width, height;
+    int angle;
+    QString name;
+
+};
+
 class LayoutItem
 {
 public:
 	enum Type {DEVICE, BUTTON, LAYOUT, IMAGE, BACKGROUND};
 	LayoutItem();
-	LayoutItem(int x, int y, int width, int height, int angle = 0);
+	explicit LayoutItem(const CLBasicLayoutItemSettings& setting);
 
 	static QString Type2String(Type t);
 	static Type String2Type(const QString& str);
@@ -21,24 +33,13 @@ public:
 	virtual ~LayoutItem();
 	virtual Type type() const = 0;
 
-	int getX() const;
-	int getY() const;
-	QPointF pos() const;
+    CLBasicLayoutItemSettings& getBasicSettings();
 
-	int width() const;
-	int height() const;
-	QSize size() const;
-
-	int angle() const;
-
-	void setName(const QString& name);
-	QString getName() const;
+    QString getName() const;
+    void  setName(const QString& name );
 
 protected:
-	int x, y;
-	int w, h;
-	int angl;
-	QString name;
+    CLBasicLayoutItemSettings mSettings;
 };
 //=======
 
@@ -46,7 +47,7 @@ class LayoutDevice : public LayoutItem
 {
 public:
 	LayoutDevice();
-	LayoutDevice(const QString& uniqueId, int x, int y, int width, int height, int angle = 0);
+	LayoutDevice(const QString& uniqueId, const CLBasicLayoutItemSettings& setting);
 	virtual Type type() const;
 	QString getId() const;
 	virtual void toXml(QDomDocument& doc, QDomElement& parent) ;
@@ -59,7 +60,7 @@ class LayoutButton: public LayoutItem
 {
 public:
 	LayoutButton();
-	LayoutButton(const QString& name, const QString& text, const QString& tooltip, int x, int y, int width, int height, int angle = 0);
+	LayoutButton(const QString& text, const QString& tooltip, const CLBasicLayoutItemSettings& setting);
 	virtual Type type() const;
 	virtual void toXml(QDomDocument& doc, QDomElement& parent) ;
 protected:
@@ -72,7 +73,7 @@ class LayoutImage: public LayoutButton
 {
 public:
 	LayoutImage();
-	LayoutImage(const QString& img, const QString& name, const QString& text, const QString& tooltip, int x, int y, int width, int height, int angle = 0);
+	LayoutImage(const QString& img, const QString& text, const QString& tooltip, const CLBasicLayoutItemSettings& setting);
 
 	virtual Type type() const ;
 	QString getImage() const;
