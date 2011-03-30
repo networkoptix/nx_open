@@ -47,7 +47,7 @@ CLDeviceList CLDirectoryBrowserDeviceServer::findDevices(const QString& director
         for (int i = 0; i < list.size(); ++i)
         {
             QString file = list.at(i);
-            QString abs_file_name = directory + QString("/") + file;
+            QString abs_file_name = directory + file;
             CLDevice* dev = new CLFileDevice(abs_file_name);
             result[abs_file_name] = dev;
         }
