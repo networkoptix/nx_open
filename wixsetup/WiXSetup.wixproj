@@ -25,7 +25,6 @@
   <ItemGroup>
     <Compile Include="MediaDirDlg.wxs" />
     <Compile Include="Product.wxs" />
-    <Compile Include="skin.wxs" />
   </ItemGroup>
   <ItemGroup>
     <WixExtension Include="WixFirewallExtension">

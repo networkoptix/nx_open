@@ -63,7 +63,7 @@
           <Directory Id="LocalUniversalClient" Name="$(env.APPLICATION_NAME)">
             <Component Id='Settings' Guid='D5B8FC1A-6828-4e66-B1D1-13BD2FD6EDA8' Permanent='yes'>
               <CreateFolder Directory='LocalUniversalClient'/>
-              <File Id='XmlSettings' Name='settings.xml' DiskId='1' Source='../bin/settings.xml.tmpl' Vital='yes'/>
+              <File Id='XmlSettings' Name='settings.xml' DiskId='1' Source='../resource/settings.xml.tmpl' Vital='yes'/>
               <util:XmlConfig Id='XmlSettings1' Action='create' Value='[MEDIAFOLDER]' Node='value'
                               ElementPath='//settings/config/mediaRoot' File='[LocalUniversalClient]/settings.xml' On='install' Sequence='1' />
             </Component>
@@ -75,7 +75,7 @@
         <Directory Id="NetworkOptix" Name="$(env.ORGANIZATION_NAME)">
           <Directory Id="INSTALLDIR" Name="$(env.APPLICATION_NAME)">
             <Component Id="MainExecutable" Guid="B9B60D1E-3B2C-47dd-9922-A1FC5F3818D4">
-              <File Id="UniclientEXE" Name="uniclient.exe" Source="../bin/uniclient.exe" KeyPath="yes">
+              <File Id="UniclientEXE" Name="uniclient.exe" Source="../bin/release/uniclient.exe" KeyPath="yes">
                 <fire:FirewallException Id="FirewallException" Name="$(env.APPLICATION_NAME)" Scope="any"/>
                 <Shortcut Id="startmenuUniclient" Directory="ProgramMenuDir" Name="$(env.APPLICATION_NAME)"
                                   WorkingDirectory='INSTALLDIR' Advertise="yes" Icon="icon_menu.exe">
@@ -88,12 +88,12 @@
               </File>
             </Component>
             <Component Id="FFmpegLibraries" Guid="AD81912C-85E7-4f23-9106-6CF2CA5A5993">
-              <File Id="avcodecDll" Name="avcodec-52.dll" Source="../bin/avcodec-52.dll"/>
-              <File Id="avdeviceDll" Name="avdevice-52.dll" Source="../bin/avdevice-52.dll"/>
-              <File Id="avfilterDll" Name="avfilter-1.dll" Source="../bin/avfilter-1.dll"/>
-              <File Id="avformatDll" Name="avformat-52.dll" Source="../bin/avformat-52.dll"/>
-              <File Id="avutilDll" Name="avutil-50.dll" Source="../bin/avutil-50.dll"/>
-              <File Id="swscaleDll" Name="swscale-0.dll" Source="../bin/swscale-0.dll"/>
+              <File Id="avcodecDll" Name="avcodec-52.dll" Source="../bin/release/avcodec-52.dll"/>
+              <File Id="avdeviceDll" Name="avdevice-52.dll" Source="../bin/release/avdevice-52.dll"/>
+              <File Id="avfilterDll" Name="avfilter-1.dll" Source="../bin/release/avfilter-1.dll"/>
+              <File Id="avformatDll" Name="avformat-52.dll" Source="../bin/release/avformat-52.dll"/>
+              <File Id="avutilDll" Name="avutil-50.dll" Source="../bin/release/avutil-50.dll"/>
+              <File Id="swscaleDll" Name="swscale-0.dll" Source="../bin/release/swscale-0.dll"/>
             </Component>
 
             <Component Id="QTLibraries" Guid="3E273FF1-35A7-44da-864C-61EE9E9B7EA8">
@@ -110,7 +110,7 @@
 
             <Directory Id="arecontvision" Name="arecontvision">
               <Component Id="arecontvision" Guid="3A62601C-9F6A-45b0-AEFB-8C5DD70437F0">
-                <File Id="devicesxml" Name="devices.xml" Source="../bin/arecontvision/devices.xml"/>
+                <File Id="devicesxml" Name="devices.xml" Source="../resource/arecontvision/devices.xml"/>
               </Component>
             </Directory>
           </Directory>

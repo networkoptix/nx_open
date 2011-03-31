@@ -1,12 +1,22 @@
 #!/usr/bin/env python
 
 import shutil
+import glob
 from version import *
 from genskin import genskin
-import os, sys
+import os, sys, posixpath
+
+os.path = posixpath
+
+FFMPEG = 'ffmpeg-git-aecd0a4'
 
 EXCLUDE_DIRS = ('.svn', 'dxva')
 EXCLUDE_FILES = ('dxva', 'moc_', 'qrc_', 'StdAfx')
+
+
+def copy_files(src_glob, dst_folder):
+    for fname in glob.iglob(src_glob):
+        shutil.copy(fname, dst_folder)
 
 def is_exclude_file(f):
     for exclude_file in EXCLUDE_FILES:
@@ -15,13 +25,23 @@ def is_exclude_file(f):
 
     return False
 
-try:
-    shutil.rmtree('release')
-    shutil.rmtree('debug')
-except:
-    pass
+shutil.rmtree('bin', True)
+shutil.rmtree('build', True)
 
-version_h = open('version.h', 'w')
+os.mkdir('bin')
+os.mkdir('bin/debug')
+os.mkdir('bin/release')
+
+copy_files('contrib/' + FFMPEG + '/bin/debug/*.dll', 'bin/debug')
+copy_files('contrib/' + FFMPEG + '/bin/release/*.dll', 'bin/release')
+
+os.mkdir('bin/debug/arecontvision')
+os.mkdir('bin/release/arecontvision')
+
+copy_files('resource/arecontvision/*', 'bin/debug/arecontvision')
+copy_files('resource/arecontvision/*', 'bin/release/arecontvision')
+
+version_h = open('src/version.h', 'w')
 print >> version_h, '#ifndef UNIVERSAL_CLIENT_VERSION_H_'
 print >> version_h, '#define UNIVERSAL_CLIENT_VERSION_H_'
 print >> version_h, '// This file is generated. Go to version.py'
@@ -32,16 +52,17 @@ print >> version_h, '#endif // UNIVERSAL_CLIENT_VERSION_H_'
 
 genskin()
 
-if os.path.exists('uniclient.pro'):
-    os.unlink('uniclient.pro')
+if os.path.exists('src/uniclient.pro'):
+    os.unlink('src/uniclient.pro')
 
-shutil.copy('const.pro', 'uniclient.pro')
+shutil.copy('src/const.pro', 'src/uniclient.pro')
 
 headers = []
 sources = []
 
-for root, dirs, files in os.walk('.'):
-    parent = root[2:]
+SCAN_DIR = 'src' 
+for root, dirs, files in os.walk(SCAN_DIR):
+    parent = root[len(SCAN_DIR)+1:]
     for exclude_dir in EXCLUDE_DIRS:
         if exclude_dir in dirs:
             dirs.remove(exclude_dir)    # don't visit SVN directories
@@ -55,7 +76,7 @@ for root, dirs, files in os.walk('.'):
         elif f.endswith('.cpp'):
             sources.append(os.path.join(parent, f))
 
-uniclient_pro = open('uniclient.pro', 'a')
+uniclient_pro = open('src/uniclient.pro', 'a')
 
 for header in headers:
     print >> uniclient_pro, "HEADERS += %s" % header
@@ -66,4 +87,7 @@ for cpp in sources:
 uniclient_pro.close()
 
 if sys.platform == 'win32':
-    os.system('convert_qt_to_vs.bat uniclient')
+    os.system('qmake -tp vc FFMPEG=%s -o src/uniclient.vcproj src/uniclient.pro' % FFMPEG)
+    os.system('src\\qmake_vc_fixer src\\uniclient.vcproj')
+    os.unlink('src/uniclient.vcproj')
+    os.rename('src/uniclient.new.vcproj', 'src/uniclient.vcproj')
