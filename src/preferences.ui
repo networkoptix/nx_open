@@ -143,13 +143,13 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>GroupBox</string>
+          <string>Conflict resolving</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_11">
           <item>
            <widget class="QCheckBox" name="allowChangeIPCheckBox">
             <property name="text">
-             <string>Allow to change camera IP Address if required to work</string>
+             <string>Allow to change camera IP Address if required for cameras to work</string>
             </property>
            </widget>
           </item>
