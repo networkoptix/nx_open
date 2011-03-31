@@ -10,6 +10,7 @@ debug {
   OBJECTS_DIR  = ../build/debug
   MOC_DIR = ../build/debug/generated
   UI_DIR = ../build/debug/generated
+  RCC_DIR = ../build/debug/generated
 }
 
 release {
@@ -17,6 +18,7 @@ release {
   OBJECTS_DIR  = ../build/release
   MOC_DIR = ../build/release/generated
   UI_DIR = ../build/release/generated
+  RCC_DIR = ../build/release/generated
 }
 
 
