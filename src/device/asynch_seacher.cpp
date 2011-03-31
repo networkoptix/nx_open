@@ -4,29 +4,29 @@
 #include "../network/nettools.h"
 #include "network_device.h"
 
-CLDiviceSeracher::CLDiviceSeracher(bool allow_change_ip):
+CLDeviceSearcher::CLDeviceSearcher(bool allow_change_ip):
 m_allow_change_ip(allow_change_ip)
 {
 
 }
 
-CLDiviceSeracher::~CLDiviceSeracher()
+CLDeviceSearcher::~CLDeviceSearcher()
 {
 	wait();
 }
 
-void CLDiviceSeracher::addDeviceServer(CLDeviceServer* serv)
+void CLDeviceSearcher::addDeviceServer(CLDeviceServer* serv)
 {
 	QMutexLocker lock(&m_servers_mtx);
 	m_servers.push_back(serv);
 }
 
-CLDeviceList CLDiviceSeracher::result()
+CLDeviceList CLDeviceSearcher::result()
 {
 	return m_result;
 }
 
-void CLDiviceSeracher::run()
+void CLDeviceSearcher::run()
 {
 	bool ip_finished;
 	m_result = findNewDevices(m_allow_change_ip, ip_finished);
@@ -46,7 +46,7 @@ void CLDiviceSeracher::run()
 
 }
 
-CLDeviceList CLDiviceSeracher::findNewDevices(bool allow_to_change_ip, bool& ip_finished)
+CLDeviceList CLDeviceSearcher::findNewDevices(bool allow_to_change_ip, bool& ip_finished)
 {
 	ip_finished = false;
 
@@ -274,7 +274,7 @@ END:
 }
 //====================================================================================
 
-void CLDiviceSeracher::resovle_conflicts(CLDeviceList& device_list, CLIPList& busy_list, bool& ip_finished)
+void CLDeviceSearcher::resovle_conflicts(CLDeviceList& device_list, CLIPList& busy_list, bool& ip_finished)
 {
 	foreach(CLDevice* dev, device_list)
 	{
@@ -304,7 +304,7 @@ void CLDiviceSeracher::resovle_conflicts(CLDeviceList& device_list, CLIPList& bu
 
 }
 
-bool CLDiviceSeracher::checkObviousConflicts(CLDeviceList& lst)
+bool CLDeviceSearcher::checkObviousConflicts(CLDeviceList& lst)
 {
 	// this function deals with network devices only 
 
@@ -354,7 +354,7 @@ bool CLDiviceSeracher::checkObviousConflicts(CLDeviceList& lst)
 	return result;
 }
 
-void CLDiviceSeracher::fromListToList(CLDeviceList& from, CLDeviceList& to, int mask, int value)
+void CLDeviceSearcher::fromListToList(CLDeviceList& from, CLDeviceList& to, int mask, int value)
 {
 	CLDeviceList::iterator it = from.begin();
 	while (it!=from.end())
@@ -372,7 +372,7 @@ void CLDiviceSeracher::fromListToList(CLDeviceList& from, CLDeviceList& to, int 
 
 }
 
-void CLDiviceSeracher::markConflictingDevices(CLDeviceList& lst, int threads)
+void CLDeviceSearcher::markConflictingDevices(CLDeviceList& lst, int threads)
 {
 	// cannot make concurrent work with pointer CLDevice* ; => so extra steps needed
 	// this function deals with network devices only 
@@ -411,7 +411,7 @@ void CLDiviceSeracher::markConflictingDevices(CLDeviceList& lst, int threads)
 
 }
 
-CLDeviceList CLDiviceSeracher::resolveUnknown_helper(CLDeviceList& lst)
+CLDeviceList CLDeviceSearcher::resolveUnknown_helper(CLDeviceList& lst)
 {
 
 	CLDeviceList result;

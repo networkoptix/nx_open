@@ -114,7 +114,7 @@ void PreferencesWindow::updateView()
 void PreferencesWindow::updateCameras()
 {
     {
-        CLDiviceSeracher& seracher = CLDeviceManager::instance().getDiveceSercher();
+        CLDeviceSearcher& seracher = CLDeviceManager::instance().getDeviceSearcher();
         QMutexLocker lock(&seracher.all_devices_mtx);
         CLDeviceList& devices =  seracher.getAllDevices();
         foreach(CLDevice *device, devices.values())

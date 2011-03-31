@@ -29,12 +29,10 @@ public:
 	void updateNetState();
 
 	QString toString() const;
-private:	
 
+private:	
 	QList<QNetworkAddressEntry> m_net_entries;
 	StateMAP m_netstate; // net state for each subnet
-	//mutable QMutex m_mutex;
-
 };
 
 #endif //cl_net_state_439

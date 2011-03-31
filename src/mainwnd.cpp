@@ -43,7 +43,7 @@ m_normalView(0)
 MainWnd::~MainWnd()
 {
 	destroyNavigator(m_normalView);
-	CLDeviceManager::instance().getDiveceSercher().wait();
+	CLDeviceManager::instance().getDeviceSearcher().wait();
 }
 
 void MainWnd::closeEvent ( QCloseEvent * event )

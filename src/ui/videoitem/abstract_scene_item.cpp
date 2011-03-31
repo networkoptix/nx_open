@@ -167,7 +167,7 @@ bool CLAbstractSceneItem::isItemSelected() const
 	return m_selected;
 }
 
-void CLAbstractSceneItem::zoom_abs(qreal z, int duration, int delay)
+void CLAbstractSceneItem::zoom_abs(qreal z, int duration, int /*delay*/)
 {
 	m_animationTransform.zoom_abs(z, duration, 0);
 }
@@ -272,7 +272,7 @@ void CLAbstractSceneItem::setOriginallyArranged(bool val)
 	m_originallyArranged = val;
 }
 
-void CLAbstractSceneItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+void CLAbstractSceneItem::hoverEnterEvent(QGraphicsSceneHoverEvent * /*event*/)
 {
 	m_mouse_over = true;
 
@@ -290,7 +290,7 @@ void CLAbstractSceneItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 
 }
 
-void CLAbstractSceneItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+void CLAbstractSceneItem::hoverLeaveEvent(QGraphicsSceneHoverEvent * /*event*/)
 {
 
 	m_mouse_over = false;
@@ -316,7 +316,7 @@ void CLAbstractSceneItem::mousePressEvent ( QGraphicsSceneMouseEvent * event )
 	event->accept();
 }
 
-void CLAbstractSceneItem::mouseDoubleClickEvent( QGraphicsSceneMouseEvent * event )
+void CLAbstractSceneItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * /*event*/)
 {
 	emit onDoubleClick(this);
 }

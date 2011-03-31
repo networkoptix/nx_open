@@ -647,8 +647,6 @@ int CLGridEngine::next_item_helper_get_quarter(const QPointF& current, const QPo
 	if ((qreal)dx*dx + dy*dy<8)
 		return -1; // if distance is so small we should
 
-	qreal dir;
-
 	if (dy<0) // might be up, left right
 	{
 		if (dx>0) // up or right

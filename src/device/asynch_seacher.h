@@ -10,13 +10,13 @@ class CLDeviceServer;
 // this class just searches for new devices
 // it uses others proxy
 // it will be moved to recorder I guess 
-class CLDiviceSeracher : public QThread
+class CLDeviceSearcher : public QThread
 {
 	typedef QList<CLDeviceServer*> ServerList;
 
 public:
-	CLDiviceSeracher(bool allow_change_ip = true);
-	~CLDiviceSeracher();
+	CLDeviceSearcher(bool allow_change_ip = true);
+	~CLDeviceSearcher();
 
 	// this function returns only new devices( not in all_devices list);
 	CLDeviceList result();

@@ -282,7 +282,7 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
 			m_data_file[channel].seek(shift);
 		}
 
-		qint64 this_time = mMovie[channel].at(mCurrIndex[channel]).time;
+		quint64 this_time = mMovie[channel].at(mCurrIndex[channel]).time;
 
         if (this_time <= skipFramesToTime())
         {

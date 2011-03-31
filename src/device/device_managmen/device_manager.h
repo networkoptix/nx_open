@@ -21,7 +21,7 @@ private:
 public:
 	static CLDeviceManager& instance();
 
-	CLDiviceSeracher& getDiveceSercher(); 
+	CLDeviceSearcher& getDeviceSearcher(); 
 
 	CLDeviceList getDeviceList(const CLDeviceCriteria& cr);
 	CLDevice* getDeviceById(QString id);
@@ -50,7 +50,7 @@ protected slots:
 protected:
 
 	QTimer m_timer;
-	CLDiviceSeracher m_dev_searcher;
+	CLDeviceSearcher m_dev_searcher;
 	bool m_firstTime;
 
 	CLDeviceList mRecDevices;

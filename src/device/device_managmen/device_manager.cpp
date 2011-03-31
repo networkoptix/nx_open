@@ -80,7 +80,7 @@ CLDeviceManager::~CLDeviceManager()
 
 }
 
-CLDiviceSeracher& CLDeviceManager::getDiveceSercher()
+CLDeviceSearcher& CLDeviceManager::getDeviceSearcher()
 {
 	return m_dev_searcher;
 }

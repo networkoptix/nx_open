@@ -146,7 +146,7 @@ void CLLayoutNavigator::onButtonItemPressed(LayoutContent* l, QString itemname )
 	}
 }
 
-void CLLayoutNavigator::onNewLayoutSelected(LayoutContent* oldl, LayoutContent* newl)
+void CLLayoutNavigator::onNewLayoutSelected(LayoutContent* /*oldl*/, LayoutContent* newl)
 {
 	if (newl != mNewContent)
 	{
@@ -162,7 +162,7 @@ void CLLayoutNavigator::onIntroScreenEscape()
     goToNewLayoutContent();
 }
 
-void CLLayoutNavigator::onLayOutStoped(LayoutContent* l)
+void CLLayoutNavigator::onLayOutStoped(LayoutContent* /*l*/)
 {
 	if (m_mode==NORMAL_ViewMode)
 		CLGLRenderer::clearGarbage();

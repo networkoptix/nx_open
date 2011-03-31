@@ -682,7 +682,6 @@ void SceneLayout::onItemClose(CLAbstractSubItemContainer* itm, bool addToremoved
 	if (type==CLAbstractSceneItem::VIDEO)
 	{
 		CLVideoWindowItem* vitem = static_cast<CLVideoWindowItem*>(item);
-		CLAbstractComplicatedItem* devitem = vitem->getVideoCam();
 		getContent()->removeDevice(vitem->getComplicatedItem()->getDevice()->getUniqueId());
 	}
 	//===============

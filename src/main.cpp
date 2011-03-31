@@ -99,9 +99,9 @@ int main(int argc, char *argv[])
 	CLVideoDecoderFactory::setCodecManufacture(CLVideoDecoderFactory::FFMPEG);
 
 	//============================
-	CLDeviceManager::instance().getDiveceSercher().addDeviceServer(&AVDeviceServer::instance());
-	CLDeviceManager::instance().getDiveceSercher().addDeviceServer(&FakeDeviceServer::instance());
-    CLDeviceManager::instance().getDiveceSercher().addDeviceServer(&AVigilonDeviceServer::instance());
+	CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&AVDeviceServer::instance());
+	CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
+    CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&AVigilonDeviceServer::instance());
 
 	CLDeviceSettingsDlgFactory::instance().registerDlgManufacture(&AreconVisionDlgManufacture::instance());
 	//============================
