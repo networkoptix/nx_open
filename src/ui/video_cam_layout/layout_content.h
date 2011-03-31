@@ -12,8 +12,16 @@ struct CLRectAdjustment
 	{
 
 	}
-
 	int x1, y1, x2, y2;
+};
+
+struct CLUserGridSettings
+{
+    enum {scale_factor = 10000};
+    CLUserGridSettings();
+    int max_rows;
+    int item_distance;
+    int optimal_ratio;
 };
 
 class LayoutContent : public LayoutButton
@@ -34,7 +42,12 @@ public:
 	bool isRecorder() const;
 	void setRecorder();
 
+    CLUserGridSettings& getGridSettings();
+
 	bool hasSuchSublayoutName(const QString& name) const;
+
+    // returns item with such name
+    LayoutItem* getItemByname(const QString& name) const;
 
 	bool checkDecorationFlag(unsigned int flag) const;
 	void addDecorationFlag(unsigned int flag);
@@ -75,6 +88,7 @@ public:
 	void removeIntereactionFlag(unsigned long flag);
 	bool checkIntereactionFlag(unsigned long flag);
 
+
     
 
 protected:
@@ -87,7 +101,6 @@ protected:
 	QList<LayoutImage*> m_imgs;
 	QList<LayoutButton*> m_btns;
 	QList<LayoutDevice*> m_devices;
-
 	QList<LayoutContent*> m_childlist;
 
 	CLDeviceCriteria m_cr;
@@ -100,6 +113,8 @@ protected:
 	bool m_editable;
 
 	unsigned long m_interaction_flags;
+
+    CLUserGridSettings mGridSettings;
 
 
 };

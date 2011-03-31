@@ -10,8 +10,34 @@ angle(0)
 {
 }
 
+QString CLBasicLayoutItemSettings::coordTypeS() const
+{
+    switch (coordType)
+    {
+    case Pixels:
+        return "Pixels";
+
+    case Slots:
+        return "Slots";
+
+    default:
+        return "Undefined";
+
+    }
+}
+
+void CLBasicLayoutItemSettings::setCorrdType(const QString& type)
+{
+    if (type == "Pixels")
+        coordType = Pixels;
+    else if (type == "Slots")
+            coordType = Slots;
+    else 
+        coordType = Undefined;
+}
 
 
+//==================================================
 LayoutItem::LayoutItem()
 {
 
@@ -82,6 +108,10 @@ void LayoutItem::toXml(QDomDocument& doc, QDomElement& parent)
 	QDomElement element = doc.createElement("item");
 	element.setAttribute("type", Type2String(type()));
 	element.setAttribute("name", getName());
+    element.setAttribute("coordType", mSettings.coordTypeS());
+    element.setAttribute("pos_x", mSettings.pos_x);
+    element.setAttribute("pos_y", mSettings.pos_y);
+    element.setAttribute("angle", mSettings.angle);
 	parent.appendChild(element);
 
 }
@@ -125,11 +155,6 @@ QString LayoutDevice::getId() const
 	return id;
 }
 
-void LayoutDevice::toXml(QDomDocument& doc, QDomElement& parent) 
-{
-	LayoutItem::toXml(doc, parent);
-}
-
 //=======
 LayoutButton::LayoutButton()
 {
@@ -148,10 +173,6 @@ LayoutItem::Type LayoutButton::type() const
 	return BUTTON;
 }
 
-void LayoutButton::toXml(QDomDocument& doc, QDomElement& parent) 
-{
-	LayoutItem::toXml(doc, parent);
-}
 
 //=======
 LayoutImage::LayoutImage()
@@ -174,11 +195,6 @@ LayoutItem::Type LayoutImage::type() const
 QString LayoutImage::getImage() const
 {
 	return image;
-}
-
-void LayoutImage::toXml(QDomDocument& doc, QDomElement& parent) 
-{
-	LayoutItem::toXml(doc, parent);
 }
 
 //=======================================================================================================

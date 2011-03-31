@@ -188,6 +188,9 @@ void SceneLayout::stop_helper(bool emt)
 
 void SceneLayout::saveLayoutContent()
 {
+    m_grid.clarifyLayoutContent();
+
+    // copy from copy_content to original one 
     LayoutContent::coppyLayoutContent(m_contentCopy, m_content , true);
 }
 
@@ -199,8 +202,6 @@ void SceneLayout::stop(bool animation)
 
     LayoutContent::coppyLayoutContent(m_content, m_contentCopy , true);
     delete m_contentCopy;
-
-
 
 	m_isRunning = false;
 
@@ -413,15 +414,15 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect, CLBasicLay
 
         if (introVideo)
         {
-            video_wnd = new CLIntroVideoitem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height());
+            video_wnd = new CLIntroVideoitem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height(), device->getUniqueId());
         }
 		else if (device->checkDeviceTypeFlag(CLDevice::ARCHIVE))//&& false) //777
 		{
-			video_wnd = new CLVideoWindowArchiveItem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height());
+			video_wnd = new CLVideoWindowArchiveItem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height(), device->getUniqueId());
 			video_wnd->setEditable(true);
 		}
 		else
-			video_wnd = new CLVideoWindowItem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height());
+			video_wnd = new CLVideoWindowItem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height(), device->getUniqueId());
 
 
         CLVideoCamera* cam = new CLVideoCamera(device, video_wnd, introVideo);

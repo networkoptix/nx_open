@@ -2714,7 +2714,7 @@ void GraphicsView::contextMenuHelper_saveLayout( bool new_name)
         if (!ok)
             return;
 
-
+        m_camLayout.getGridEngine().clarifyLayoutContent();
         LayoutContent* new_cont = LayoutContent::coppyLayoutContent(m_camLayout.getContent());
 
         new_cont->addDecorationFlag(LayoutContent::MagnifyingGlass);

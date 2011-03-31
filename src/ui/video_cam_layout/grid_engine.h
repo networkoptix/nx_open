@@ -66,9 +66,11 @@ public:
 
 	void setLayoutContent(LayoutContent* sl);
 
-    QPoint posFromItemSettings(const CLBasicLayoutItemSettings& sett) const;
+    // updates all pos for m_scene_layout, based on current scene 
+    void clarifyLayoutContent();
 
-    //void clarify
+
+    QPoint posFromItemSettings(const CLBasicLayoutItemSettings& sett) const;
 
 	// returns recommended item size for such grid; ususally caled befor Item is created
 	QSize calcDefaultMaxItemSize(const CLDeviceVideoLayout* lo = 0) const;

@@ -30,6 +30,25 @@ void CLGridEngine::setLayoutContent(LayoutContent* sl)
 	m_scene_layout = sl;
 }
 
+void CLGridEngine::clarifyLayoutContent()
+{
+    foreach (CLAbstractSceneItem* item, *(m_settings.items))
+    {
+        QString name = item->getName();
+        LayoutItem* litem = m_scene_layout->getItemByname(name);
+
+        if (!litem)
+            continue;
+
+        CLBasicLayoutItemSettings& sett = litem->getBasicSettings();
+        sett.coordType = CLBasicLayoutItemSettings::Slots;
+        getItemSlotPos(item, sett.pos_x, sett.pos_y);
+        sett.angle = item->getRotation();
+
+    }
+}
+
+
 QPoint CLGridEngine::posFromItemSettings(const CLBasicLayoutItemSettings& sett) const
 {
     if (sett.coordType==CLBasicLayoutItemSettings::Pixels)

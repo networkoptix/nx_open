@@ -1,5 +1,15 @@
 #include "layout_content.h"
 
+CLUserGridSettings::CLUserGridSettings():
+max_rows(5),
+item_distance(0.36*scale_factor),
+optimal_ratio(17.0/9*scale_factor)
+{
+
+}
+
+//============================================
+
 LayoutContent::LayoutContent():
 m_cr(CLDeviceCriteria::STATIC),
 mDecoration(0),
@@ -74,6 +84,11 @@ void LayoutContent::setEditable(bool editable)
 	m_editable = editable;
 }
 
+CLUserGridSettings& LayoutContent::getGridSettings()
+{
+    return mGridSettings;
+}
+
 bool LayoutContent::hasSuchSublayoutName(const QString& name) const
 {
 	foreach (LayoutContent* cont, m_childlist)
@@ -84,6 +99,43 @@ bool LayoutContent::hasSuchSublayoutName(const QString& name) const
 
 	return false;
 }
+
+LayoutItem* LayoutContent::getItemByname(const QString& name) const
+{
+    foreach (LayoutDevice* cont, m_devices)
+    {
+        if (cont->getName()==name)
+            return cont;
+    }
+
+
+
+    foreach (LayoutButton* cont, m_btns)
+    {
+        if (cont->getName()==name)
+            return cont;
+    }
+
+
+
+    foreach (LayoutImage* cont, m_imgs)
+    {
+        if (cont->getName()==name)
+            return cont;
+    }
+
+
+
+    foreach (LayoutContent* cont, m_childlist)
+    {
+        if (cont->getName()==name)
+            return cont;
+    }
+
+    return 0;
+
+}
+
 
 bool LayoutContent::checkDecorationFlag(unsigned int flag) const
 {
@@ -194,6 +246,11 @@ void LayoutContent::toXml(QDomDocument& doc, QDomElement& parent)
 	element.setAttribute("type", Type2String(type()));
 	element.setAttribute("name", getName());
 	element.setAttribute("recorder", (int)isRecorder());
+
+    element.setAttribute("max_rows", mGridSettings.max_rows);
+    element.setAttribute("item_distance", mGridSettings.item_distance);
+    element.setAttribute("optimal_ratio", mGridSettings.optimal_ratio);
+
 	parent.appendChild(element);
 
 	QList<LayoutDevice*>& dev_lst = getDevices();

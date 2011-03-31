@@ -16,6 +16,9 @@ struct CLBasicLayoutItemSettings
     int angle;
     QString name;
 
+    QString coordTypeS() const;
+    void setCorrdType(const QString& type);
+
 };
 
 class LayoutItem
@@ -28,7 +31,7 @@ public:
 	static QString Type2String(Type t);
 	static Type String2Type(const QString& str);
 
-	virtual void toXml(QDomDocument& doc, QDomElement& parent)  = 0;
+	virtual void toXml(QDomDocument& doc, QDomElement& parent);
 
 	virtual ~LayoutItem();
 	virtual Type type() const = 0;
@@ -50,7 +53,6 @@ public:
 	LayoutDevice(const QString& uniqueId, const CLBasicLayoutItemSettings& setting);
 	virtual Type type() const;
 	QString getId() const;
-	virtual void toXml(QDomDocument& doc, QDomElement& parent) ;
 protected:
 	QString id;
 };
@@ -62,7 +64,6 @@ public:
 	LayoutButton();
 	LayoutButton(const QString& text, const QString& tooltip, const CLBasicLayoutItemSettings& setting);
 	virtual Type type() const;
-	virtual void toXml(QDomDocument& doc, QDomElement& parent) ;
 protected:
 	QString m_text;
 	QString m_tooltip;
@@ -77,7 +78,6 @@ public:
 
 	virtual Type type() const ;
 	QString getImage() const;
-	virtual void toXml(QDomDocument& doc, QDomElement& parent) ;
 protected:
 	QString image;
 
