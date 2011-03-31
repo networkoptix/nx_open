@@ -3,7 +3,7 @@ import os, posixpath
 def genskin():
   os.path = posixpath
 
-  skin_qrc = open('src/skin.qrc', 'w')
+  skin_qrc = open('build/skin.qrc', 'w')
 
   print >> skin_qrc, """
   <!DOCTYPE RCC>

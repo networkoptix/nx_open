@@ -5,6 +5,7 @@ import glob
 from version import *
 from genskin import genskin
 import os, sys, posixpath
+import stat, time
 
 os.path = posixpath
 
@@ -13,6 +14,19 @@ FFMPEG = 'ffmpeg-git-aecd0a4'
 EXCLUDE_DIRS = ('.svn', 'dxva')
 EXCLUDE_FILES = ('dxva', 'moc_', 'qrc_', 'StdAfx')
 
+def rmtree(path):
+    def on_rm_error( func, path, exc_info):
+        # Dirty windows hack. Sometimes windows list already deleted files/folders.
+        # Command line "rmdir /Q /S" also fails. So, just wait while the files really deleted.
+        for i in xrange(20):
+            if not os.listdir(path):
+                break
+
+            time.sleep(1)
+
+        func(path)
+
+    shutil.rmtree(path, onerror = on_rm_error)
 
 def copy_files(src_glob, dst_folder):
     for fname in glob.iglob(src_glob):
@@ -25,12 +39,17 @@ def is_exclude_file(f):
 
     return False
 
-shutil.rmtree('bin', True)
-shutil.rmtree('build', True)
+if os.path.exists('bin'):
+    rmtree('bin')
+
+if os.path.exists('build'):
+    rmtree('build')
 
 os.mkdir('bin')
 os.mkdir('bin/debug')
 os.mkdir('bin/release')
+
+os.mkdir('build')
 
 copy_files('contrib/' + FFMPEG + '/bin/debug/*.dll', 'bin/debug')
 copy_files('contrib/' + FFMPEG + '/bin/release/*.dll', 'bin/release')
