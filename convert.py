@@ -10,6 +10,7 @@ import stat, time
 os.path = posixpath
 
 FFMPEG = 'ffmpeg-git-aecd0a4'
+INTRO_FILE = '../uniclient_media/intro.mov'
 
 EXCLUDE_DIRS = ('.svn', 'dxva')
 EXCLUDE_FILES = ('dxva', 'moc_', 'qrc_', 'StdAfx')
@@ -39,6 +40,13 @@ def is_exclude_file(f):
 
     return False
 
+def link_or_copy(src, dst):
+    try:
+        import win32file
+        win32file.CreateHardLink(dst, src)
+    except:
+        shutil.copy(src, dst)
+
 if os.path.exists('bin'):
     rmtree('bin')
 
@@ -59,6 +67,10 @@ os.mkdir('bin/release/arecontvision')
 
 copy_files('resource/arecontvision/*', 'bin/debug/arecontvision')
 copy_files('resource/arecontvision/*', 'bin/release/arecontvision')
+
+if os.path.exists(INTRO_FILE):
+    link_or_copy(INTRO_FILE, 'bin/debug/intro.mov')
+    link_or_copy(INTRO_FILE, 'bin/release/intro.mov')
 
 version_h = open('src/version.h', 'w')
 print >> version_h, '#ifndef UNIVERSAL_CLIENT_VERSION_H_'

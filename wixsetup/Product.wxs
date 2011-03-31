@@ -108,6 +108,11 @@
               <File Id="phonon4" Name="phonon4.dll" Source="C:\Qt\4.7.1\bin\phonon4.dll"/>
             </Component>
 
+            
+            <Component Id="Intro" Guid="81A16E24-1A84-4044-B52A-E12E7A01D6F3">
+              <File Id="IntroMov" Name="intro.mov" Source="../../uniclient_media/intro.mov"/>
+            </Component>
+
             <Directory Id="arecontvision" Name="arecontvision">
               <Component Id="arecontvision" Guid="3A62601C-9F6A-45b0-AEFB-8C5DD70437F0">
                 <File Id="devicesxml" Name="devices.xml" Source="../resource/arecontvision/devices.xml"/>
@@ -139,6 +144,7 @@
       <ComponentRef Id="MainExecutable" />
       <ComponentRef Id="FFmpegLibraries"/>
       <ComponentRef Id="QTLibraries" />
+      <ComponentRef Id="Intro" />
       <ComponentRef Id='ProgramMenuDir' />
       <ComponentRef Id='Settings'/>
       <ComponentRef Id='arecontvision'/>

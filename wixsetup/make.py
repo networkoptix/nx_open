@@ -2,7 +2,7 @@
 
 import os, sys
 
-sys.path.append('../src')
+sys.path.append('..')
 
 from version import *
 
