@@ -5,6 +5,7 @@
 #include "ui_licensekey.h"
 #include "device/network_device.h"
 #include "version.h"
+#include "device_settings/style.h"
 
 extern QString button_layout;
 extern QString button_home;
@@ -12,6 +13,9 @@ extern QString button_home;
 PreferencesWindow::PreferencesWindow()
     : QDialog(0, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint)
 {
+//    QStyle *arthurStyle = new ArthurStyle();
+//    setStyle(arthurStyle);
+
     setupUi(this);
 
     Settings::instance().fillData(m_settingsData);
@@ -107,6 +111,13 @@ void PreferencesWindow::updateView()
     {
         camerasList->addItem(key);
     }
+
+    if (ipv4entries.size() == 0)
+        cameraStatusLabel->setText("No IP addresses detected. Ensure you either have static IP or there is DHCP server in your network.");
+    if (ipv4entries.size() > 0 && m_cameras.size() == 0)
+        cameraStatusLabel->setText("No cameras detected. If you're connected to router check that it doesn't block broadcasts.");
+    else
+        cameraStatusLabel->setText("");
 
     totalCamerasLabel->setText(QString("Total %1 cameras detected").arg(m_cameras.size()));
 }
