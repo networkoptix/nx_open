@@ -3,6 +3,7 @@
 #include "util.h"
 #include "mainwnd.h"
 #include "serial.h"
+#include "settings.h"
 
 #include "device/asynch_seacher.h"
 #include "base/log.h"
@@ -44,10 +45,6 @@ void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args
 
 int main(int argc, char *argv[])
 {
-    SerialChecker serialChecker;
-    bool isv1 = serialChecker.isValidSerial("SDFUIH123");
-    //bool isv2 = serialChecker.isValidSerial("5GWA6U1ZSJ");
-
 //	av_log_set_callback(decoderLogCallback);
 
     QApplication::setOrganizationName(ORGANIZATION_NAME);
@@ -84,8 +81,13 @@ int main(int argc, char *argv[])
 		cl_log.log(argv[0], cl_logALWAYS);
 	}
 
-	QString rootDir = getMediaRootDir();
-    cl_log.log("Using " + rootDir + " as media root directory", cl_logALWAYS);
+    Settings& settings = Settings::instance();
+    settings.load(getDataDirectory() + "/settings.xml");
+
+    settings.addAuxMediaRoot(getMoviesDirectory());
+    settings.save();
+
+    cl_log.log("Using " + settings.mediaRoot() + " as media root directory", cl_logALWAYS);
 
 	CLDevice::startCommandProc();
 

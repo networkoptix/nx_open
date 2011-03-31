@@ -7,6 +7,11 @@
 QString getDataDirectory();
 
 /*
+ * Get user movies directory.
+ */
+QString getMoviesDirectory();
+
+/*
  * Get media root directory.
  */
 QString getMediaRootDir();

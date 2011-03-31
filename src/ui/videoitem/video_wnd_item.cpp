@@ -33,7 +33,7 @@ CLVideoWindowItem::CLVideoWindowItem(GraphicsView* view, const CLDeviceVideoLayo
 	//setCacheMode(ItemCoordinateCache);
 	//setFlag(QGraphicsItem::ItemIsMovable);
 
-	for (int i = 0; i  < m_videonum; ++i)
+	for (unsigned i = 0; i  < m_videonum; ++i)
 		m_gldraw[i] = new CLGLRenderer(this);
 
 	connect( this, SIGNAL(onAspectRatioChanged(CLAbstractSceneItem*)), this, SLOT(onResize()));
@@ -41,13 +41,13 @@ CLVideoWindowItem::CLVideoWindowItem(GraphicsView* view, const CLDeviceVideoLayo
 
 CLVideoWindowItem::~CLVideoWindowItem()
 {
-	for (int i = 0; i  < m_videonum; ++i)
+	for (unsigned i = 0; i  < m_videonum; ++i)
 		delete m_gldraw[i];
 }
 
 void CLVideoWindowItem::beforeDestroy()
 {
-	for (int i = 0; i  < m_videonum; ++i)
+	for (unsigned i = 0; i  < m_videonum; ++i)
 		m_gldraw[i]->beforeDestroy();;
 }
 
@@ -162,7 +162,7 @@ QPointF CLVideoWindowItem::getBestSubItemPos(CLSubItemType type)
 
 void CLVideoWindowItem::copyVideoDataBeforePainting(bool copy)
 {
-	for (int i = 0; i  < m_videonum; ++i)
+	for (unsigned i = 0; i  < m_videonum; ++i)
 		m_gldraw[i]->copyVideoDataBeforePainting(copy);
 }
 
@@ -214,7 +214,7 @@ void CLVideoWindowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
 	painter->beginNativePainting();
 	saveGLState();
 
-	for (int i = 0; i  < m_videonum; ++i)
+	for (unsigned i = 0; i  < m_videonum; ++i)
 	{
 		if (!m_gldraw[i]->paintEvent(getSubChannelRect(i)))
 			drawGLfailaure(painter);
@@ -267,7 +267,7 @@ void CLVideoWindowItem::drawFPS(QPainter* painter)
 
 	char fps[100];
 
-	for (int i = 0; i < m_videonum; ++i)
+	for (unsigned i = 0; i < m_videonum; ++i)
 	{
 		if (m_stat[i]==0)
 			continue;

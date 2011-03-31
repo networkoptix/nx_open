@@ -37,8 +37,8 @@ PRECOMPILED_SOURCE = StdAfx.cpp
 
 DEFINES += __STDC_CONSTANT_MACROS
 
-RESOURCES += mainwnd.qrc skin.qrc
-FORMS += mainwnd.ui preferences.ui
+RESOURCES += mainwnd.qrc ../build/skin.qrc
+FORMS += mainwnd.ui preferences.ui licensekey.ui
 
 win32 {
   QMAKE_LFLAGS += avcodec-52.lib avdevice-52.lib avfilter-1.lib avformat-52.lib avutil-50.lib swscale-0.lib

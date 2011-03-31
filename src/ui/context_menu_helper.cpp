@@ -7,6 +7,7 @@ QAction cm_add_layout("Add new layout...",0);
 QAction cm_save_layout("Save layout",0);
 QAction cm_save_layout_as("Save layout as...",0);
 QAction cm_togglefs("Toggle fullscreen",0);
+QAction cm_preferences("Preferences",0);
 QAction cm_fullscren("Fullscreen",0);
 QAction cm_remove_from_layout("Remove",0);
 QAction cm_settings("Settings...",0);

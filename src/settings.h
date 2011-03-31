@@ -20,4 +20,51 @@ extern qreal global_base_scene_z_level;
 extern int global_grid_aparence_delay;
 extern int global_opacity_change_period;
 
+class Settings
+{
+public:
+    static Settings& instance();
+
+    struct Data
+    {
+        bool allowChangeIP;
+        QString mediaRoot;
+        QList<QString> auxMediaRoots;
+    };
+
+    void update(const Data& data);
+    void fillData(Data& data) const;
+
+    void load(const QString& fileName);
+    void save();
+
+    bool isAllowChangeIP() const;
+    QString mediaRoot() const;
+    QList<QString> auxMediaRoots() const;
+
+    bool haveValidSerialNumber() const;
+    void setSerialNumber(const QString& serial);
+
+    void addAuxMediaRoot(const QString& root);
+
+private:
+    Settings();
+    Settings(const Settings&) {}
+
+    void setAllowChangeIP(bool allow);
+    void setMediaRoot(const QString& root);
+    void setAuxMediaRoots(const QList<QString>&);
+    void removeAuxMediaRoot(const QString& root);
+    void reset();
+
+private:
+    mutable QReadWriteLock m_RWLock;
+    QString m_fileName;
+
+    Data m_data;
+
+    QString m_serialNumber;
+    bool m_haveValidSerialNumber;
+};
+
 #endif //global_settings_h1933

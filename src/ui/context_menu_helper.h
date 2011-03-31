@@ -12,6 +12,7 @@ extern QAction cm_save_layout;
 extern QAction cm_save_layout_as;
 
 extern QAction cm_togglefs;
+extern QAction cm_preferences;
 extern QAction cm_fullscren;
 extern QAction cm_remove_from_layout;
 extern QAction cm_settings;

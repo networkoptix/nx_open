@@ -7,6 +7,11 @@ QString getDataDirectory()
     return QDesktopServices::storageLocation(QDesktopServices::DataLocation);
 }
 
+QString getMoviesDirectory()
+{
+    return QDesktopServices::storageLocation(QDesktopServices::MoviesLocation);
+}
+
 QString getMediaRootDir()
 {
     QFile settingsFile(getDataDirectory() + "/settings.xml");

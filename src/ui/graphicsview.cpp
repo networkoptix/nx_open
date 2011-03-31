@@ -14,6 +14,7 @@
 #include "video_cam_layout/layout_manager.h"
 #include "view_drag_and_drop.h"
 #include "layout_editor_wnd.h"
+#include "preferences_wnd.h"
 #include "videoitem/layout_item.h"
 #include "videoitem/unmoved/unmoved_pixture_button.h"
 #include "videoitem/search/search_filter_item.h"
@@ -1256,6 +1257,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
         }
         
 		menu.addAction(&cm_togglefs);
+        menu.addAction(&cm_preferences);
 		menu.addAction(&cm_exit);
 
 	}
@@ -1276,8 +1278,13 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 				mMainWnd->showFullScreen();
 			else
 				mMainWnd->showMaximized();
-
 		}
+        else if (act == &cm_preferences)
+        {
+            PreferencesWindow* preferencesDialog = new PreferencesWindow();
+            preferencesDialog->exec();
+            delete preferencesDialog;
+        }
 		else if (act== &cm_fitinview)
 		{
 			fitInView(700, 0, CLAnimationTimeLine::SLOW_START_SLOW_END);
