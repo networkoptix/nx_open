@@ -3,9 +3,9 @@
 #include "deviceserver.h"
 #include "../network/nettools.h"
 #include "network_device.h"
+#include "settings.h"
 
-CLDeviceSearcher::CLDeviceSearcher(bool allow_change_ip):
-m_allow_change_ip(allow_change_ip)
+CLDeviceSearcher::CLDeviceSearcher()
 {
 
 }
@@ -29,7 +29,7 @@ CLDeviceList CLDeviceSearcher::result()
 void CLDeviceSearcher::run()
 {
 	bool ip_finished;
-	m_result = findNewDevices(m_allow_change_ip, ip_finished);
+	m_result = findNewDevices(ip_finished);
 
 	if (ip_finished)
 	{
@@ -46,8 +46,11 @@ void CLDeviceSearcher::run()
 
 }
 
-CLDeviceList CLDeviceSearcher::findNewDevices(bool allow_to_change_ip, bool& ip_finished)
+CLDeviceList CLDeviceSearcher::findNewDevices(bool& ip_finished)
 {
+
+    bool allow_to_change_ip = Settings::instance().isAllowChangeIP();
+
 	ip_finished = false;
 
 	CLDeviceList::iterator it;

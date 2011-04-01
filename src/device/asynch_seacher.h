@@ -15,7 +15,7 @@ class CLDeviceSearcher : public QThread
 	typedef QList<CLDeviceServer*> ServerList;
 
 public:
-	CLDeviceSearcher(bool allow_change_ip = true);
+	CLDeviceSearcher();
 	~CLDeviceSearcher();
 
 	// this function returns only new devices( not in all_devices list);
@@ -38,7 +38,7 @@ protected:
 	virtual void run();
 private:
 	// new here means any device BUT any from all_devices with READY flag 
-	CLDeviceList findNewDevices(bool allow_to_change_ip, bool& ip_finished);
+	CLDeviceList findNewDevices(bool& ip_finished);
 
 	// this function will modify CLDeviceList( conflict flag)
 	// it only checks obvious conflicts 
@@ -61,7 +61,6 @@ private:
 private:
 
 	CLDeviceList m_result;
-	bool m_allow_change_ip;
 
 	ServerList m_servers;
 	QMutex m_servers_mtx;

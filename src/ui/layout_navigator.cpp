@@ -2,6 +2,8 @@
 #include "video_cam_layout/start_screen_content.h"
 #include "video_cam_layout/layout_manager.h"
 #include "camera/gl_renderer.h"
+#include "settings.h"
+#include "preferences_wnd.h"
 
 extern QString start_screen;
 
@@ -128,21 +130,35 @@ void CLLayoutNavigator::onButtonItemPressed(LayoutContent* l, QString itemname )
 	{
 		if (itemname==button_logo)
 		{
+            /*
 			mNewContent = CLSceneLayoutManager::instance().getDefaultLayoutContent();
 			if (!mNewContent) // no default so far
 				mNewContent = CLSceneLayoutManager::instance().getAllLayoutsContent();
 
 			goToNewLayoutContent();
+            /**/
+
+            // does nothing 
 		}
 
 		if (itemname==button_system)
 		{
-			mNewContent = CLSceneLayoutManager::instance().getAllRecordersContent();
-			goToNewLayoutContent();
+			//mNewContent = CLSceneLayoutManager::instance().getAllRecordersContent();
+			//goToNewLayoutContent();
+            PreferencesWindow* preferencesDialog = new PreferencesWindow();
+            preferencesDialog->exec();
+            delete preferencesDialog;
+
 		}
 
 		if (itemname==button_layout)
 		{
+            if (!Settings::instance().haveValidSerialNumber())
+            {
+                UIOKMessage(0, "License", "Please enter license key. Press Setup button and go to About section.");
+                return;
+            }
+
 			mNewContent = CLSceneLayoutManager::instance().getAllLayoutsContent();
 			goToNewLayoutContent();
 		}
