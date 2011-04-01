@@ -1245,6 +1245,25 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
                 //menu.addMenu(&layout_editor_menu);
             }
 
+            bool saved_content = false;
+            LayoutContent* current =  m_camLayout.getContent();
+            while(1)
+            {
+                current = current->getParent();
+                if (current==0)
+                    break;
+
+                if (current == CLSceneLayoutManager::instance().getAllLayoutsContent())
+                {
+                    saved_content = true;
+                    break;
+                }
+            }
+
+            if (saved_content)
+                menu.addAction(&cm_restore_layout);
+                
+
             if (m_camLayout.getContent() != CLSceneLayoutManager::instance().getAllLayoutsContent())
             {
                 if (m_camLayout.getContent() != CLSceneLayoutManager::instance().getSearchLayout())
@@ -1302,7 +1321,10 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 		{
 			contextMenuHelper_addNewLayout();
 		}
-
+        else if (act == &cm_restore_layout)
+        {
+            contextMenuHelper_restoreLayout();
+        }
         else if (act == &cm_save_layout_as) 
         {
             contextMenuHelper_saveLayout(true);
@@ -2838,3 +2860,7 @@ void GraphicsView::on_grid_drop_animation_finished()
 	m_camLayout.updateSceneRect();
 }
 
+void GraphicsView::contextMenuHelper_restoreLayout()
+{
+    emit onNewLayoutSelected(0, m_camLayout.getContent());
+}

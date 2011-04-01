@@ -50,6 +50,7 @@ class LayoutDevice : public LayoutItem
 {
 public:
 	LayoutDevice();
+    ~LayoutDevice();
 	LayoutDevice(const QString& uniqueId, const CLBasicLayoutItemSettings& setting);
 	virtual Type type() const;
 	QString getId() const;

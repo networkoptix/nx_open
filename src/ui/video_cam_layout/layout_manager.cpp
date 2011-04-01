@@ -102,6 +102,12 @@ bool CLSceneLayoutManager::load_parseLyout(const QDomElement& layout, LayoutCont
 		lc->setName(name);
 	}
 
+    CLUserGridSettings& gs = lc->getGridSettings();
+    gs.max_rows = layout.attribute("max_rows").toInt();
+    gs.item_distance = layout.attribute("item_distance").toInt();
+    gs.optimal_ratio = layout.attribute("optimal_ratio").toInt();
+    
+
 	parent->addLayout(lc, false);
 
 	//=========
@@ -119,9 +125,18 @@ bool CLSceneLayoutManager::load_parseLyout(const QDomElement& layout, LayoutCont
 		{
 			QString type = node.toElement().attribute("type");
 			QString name = node.toElement().attribute("name");
+
+            
+
 			if (type=="DEVICE")
 			{
-				lc->addDevice(name);
+                LayoutDevice* dev = lc->addDevice(name);
+
+                CLBasicLayoutItemSettings& bs = dev->getBasicSettings();
+                bs.coordType = CLBasicLayoutItemSettings::Slots;
+                bs.pos_x = node.toElement().attribute("pos_x").toInt();
+                bs.pos_y = node.toElement().attribute("pos_y").toInt();
+                bs.angle = node.toElement().attribute("angle").toInt();
 			}
 		}
 

@@ -4,6 +4,7 @@ QAction cm_exit("Exit",0);
 QAction cm_fitinview("Fit in View",0);
 QAction cm_arrange("Arrange",0);
 QAction cm_add_layout("Add new layout...",0);
+QAction cm_restore_layout("Restore layout",0);
 QAction cm_save_layout("Save layout",0);
 QAction cm_save_layout_as("Save layout as...",0);
 QAction cm_togglefs("Toggle fullscreen",0);

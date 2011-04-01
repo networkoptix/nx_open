@@ -32,6 +32,11 @@ void CLGridEngine::setLayoutContent(LayoutContent* sl)
 
 void CLGridEngine::clarifyLayoutContent()
 {
+    CLUserGridSettings& ugs = m_scene_layout->getGridSettings();
+    ugs.item_distance = m_settings.item_distance*CLUserGridSettings::scale_factor;
+    ugs.optimal_ratio = m_settings.optimal_ratio*CLUserGridSettings::scale_factor;
+    ugs.max_rows = m_settings.max_rows;
+    
     foreach (CLAbstractSceneItem* item, *(m_settings.items))
     {
         QString name = item->getName();

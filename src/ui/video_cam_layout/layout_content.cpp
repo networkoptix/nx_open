@@ -162,19 +162,25 @@ LayoutContent* LayoutContent::getParent() const
 	return m_parent;
 }
 
-void LayoutContent::addButton(const QString& text, const QString& tooltip, const CLBasicLayoutItemSettings& setting)
+LayoutButton* LayoutContent::addButton(const QString& text, const QString& tooltip, const CLBasicLayoutItemSettings& setting)
 {
-	m_btns.push_back(new LayoutButton(text, tooltip, setting) );
+    LayoutButton* result = new LayoutButton(text, tooltip, setting);
+	m_btns.push_back(result);
+    return result;
 }
 
-void LayoutContent::addImage(const QString& img, const QString& text, const QString& tooltip, const CLBasicLayoutItemSettings& setting)
+LayoutImage* LayoutContent::addImage(const QString& img, const QString& text, const QString& tooltip, const CLBasicLayoutItemSettings& setting)
 {
-	m_imgs.push_back(new LayoutImage(img, text, tooltip, setting));
+    LayoutImage* result = new LayoutImage(img, text, tooltip, setting);
+	m_imgs.push_back(result);
+    return result;
 }
 
-void LayoutContent::addDevice(const QString& uniqueId, const CLBasicLayoutItemSettings& setting )
+LayoutDevice* LayoutContent::addDevice(const QString& uniqueId, const CLBasicLayoutItemSettings& setting )
 {
-	m_devices.push_back(new LayoutDevice(uniqueId, setting));
+    LayoutDevice* result = new LayoutDevice(uniqueId, setting);
+	m_devices.push_back(result);
+    return result;
 }
 
 void LayoutContent::removeDevice(const QString& uniqueId)

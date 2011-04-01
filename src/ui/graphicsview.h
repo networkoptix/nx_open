@@ -84,6 +84,7 @@ signals:
 	void scneZoomFinished();
 	void onDecorationPressed(LayoutContent*, QString);
     void onIntroScreenEscape();
+    void onNewLayoutSelected(LayoutContent*, LayoutContent*);
 protected:
 	virtual void wheelEvent ( QWheelEvent * e );
 	void mouseReleaseEvent ( QMouseEvent * e);
@@ -144,6 +145,7 @@ protected:
     void contextMenuHelper_saveRecordedAs(CLVideoCamera* cam);
 	void contextMenuHelper_openInWebBroser(CLVideoCamera* cam);
 	void contextMenuHelper_Rotation(CLAbstractSceneItem* wnd, qreal angle);
+    void contextMenuHelper_restoreLayout();
     void contextMenuHelper_saveLayout( bool new_name);
 	//==========================
 

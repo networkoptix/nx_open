@@ -145,6 +145,11 @@ id(uniqueId)
 	setName(uniqueId);
 }
 
+LayoutDevice::~LayoutDevice()
+{
+
+}
+
 LayoutItem::Type LayoutDevice::type() const
 {
 	return DEVICE;

@@ -66,7 +66,7 @@ LayoutContent& startscreen_content()
         settings.pos_y = btn_top;
         settings.width = btn_width;
         settings.height = btn_height;
-        instance.addImage(":/skin/startscreen/dynamic_launch/", "","", settings);
+        instance.addImage(":/skin/startscreen/launch_1.png", "","", settings);
 
 
         settings.name = button_system;

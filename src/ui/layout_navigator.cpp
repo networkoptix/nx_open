@@ -38,6 +38,8 @@ mCurrentContent(content)
 	// some layout ref pressed
 	connect(&m_videoView.getCamLayOut(), SIGNAL(onNewLayoutSelected(LayoutContent*, LayoutContent*)), this, SLOT(onNewLayoutSelected(LayoutContent*, LayoutContent*)));
 
+    connect(&m_videoView, SIGNAL(onNewLayoutSelected(LayoutContent*, LayoutContent*)), this, SLOT(onNewLayoutSelected(LayoutContent*, LayoutContent*)));
+
 	// for layout editor	
 	connect(&m_videoView.getCamLayOut(), SIGNAL(onNewLayoutItemSelected(LayoutContent*)), this, SLOT(onNewLayoutItemSelected(LayoutContent*)));
 
@@ -148,7 +150,7 @@ void CLLayoutNavigator::onButtonItemPressed(LayoutContent* l, QString itemname )
 
 void CLLayoutNavigator::onNewLayoutSelected(LayoutContent* /*oldl*/, LayoutContent* newl)
 {
-	if (newl != mNewContent)
+	//if (newl != mNewContent)
 	{
 		mNewContent = newl;
 		goToNewLayoutContent();

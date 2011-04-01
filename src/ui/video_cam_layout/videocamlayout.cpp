@@ -529,6 +529,7 @@ bool SceneLayout::addItem(CLAbstractSceneItem* item, bool update_scene_rect, CLB
 	m_scene->addItem(item);
 
 	item->setPos(m_grid.posFromItemSettings(itemSettings));
+    //item->setRotation(itemSettings.angle);
 
 	//=========
 	if (isEditable() || item->isEtitable())	
@@ -836,6 +837,15 @@ void SceneLayout::onAspectRatioChanged(CLAbstractSceneItem* item)
 
 void SceneLayout::loadContent()
 {
+
+    CLGridSettings& gridsett =  m_grid.getSettings();
+    CLUserGridSettings& saved_settings = m_content->getGridSettings();
+
+    gridsett.max_rows = saved_settings.max_rows;
+    gridsett.optimal_ratio = (qreal)(saved_settings.optimal_ratio)/CLUserGridSettings::scale_factor;
+    gridsett.item_distance = (qreal)(saved_settings.item_distance)/CLUserGridSettings::scale_factor;
+
+
 	QList<LayoutImage*>& img_list = m_content->getImages();
 	QList<LayoutButton*>& btns_list = m_content->getButtons();
 	QList<LayoutContent*>& children_list = m_content->childrenList();
