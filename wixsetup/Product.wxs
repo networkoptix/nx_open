@@ -2,7 +2,7 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
   <Product Id="*" Name="$(env.APPLICATION_NAME)" Language="1033" Version="$(env.APPLICATION_VERSION)" Manufacturer="$(env.ORGANIZATION_NAME)" UpgradeCode="286227c5-25b4-4796-aa48-2d9822e10b0d">
-    <Package Id="*" InstallerVersion="200" Compressed="yes" Keywords="Installer" Comments="$(env.ORGANIZATION_NAME) $(env.APPLICATION_NAME) Installer" Manufacturer="$(env.ORGANIZATION_NAME)" InstallPrivileges="elevated"/>
+    <Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="$(env.ORGANIZATION_NAME) $(env.APPLICATION_NAME) Installer" Manufacturer="$(env.ORGANIZATION_NAME)" InstallPrivileges="elevated"/>
 
     <WixVariable Id="WixUIBannerBmp" Value="Binary\eve\eve_logo-493x58.bmp" />
     <WixVariable Id="WixUIDialogBmp" Value="Binary\eve\eve_logo-493x312.bmp" />
@@ -49,7 +49,6 @@
     <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
 
     <Directory Id="TARGETDIR" Name="SourceDir">
-
       <Directory Id="MEDIAFOLDER" Name="EVEMedia">
         <Component Id="MediaFolderComponent" Guid="2B72351D-264E-44a5-8E1F-B8C82BB80817" Permanent="yes">
           <CreateFolder Directory="MEDIAFOLDER"/>
@@ -138,6 +137,16 @@
       <Directory Id="DesktopFolder" Name="Desktop"/>
     </Directory>
 
+
+    <DirectoryRef Id="TARGETDIR">
+      <Merge Id="VCRedist1" SourceFile="C:\Program Files (x86)\Common Files\Merge Modules\Microsoft_VC90_CRT_x86.msm" DiskId="1" Language="0"/>
+      <Merge Id="VCRedist2" SourceFile="C:\Program Files (x86)\Common Files\Merge Modules\policy_9_0_Microsoft_VC90_CRT_x86.msm" DiskId="1" Language="0"/>
+    </DirectoryRef>
+
+    <Feature Id="VCRedist" Title="Visual C++ 9.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
+        <MergeRef Id="VCRedist1"/>
+        <MergeRef Id="VCRedist2"/>
+    </Feature>
 
     <Feature Id="ProductFeature" Title="SetupProject1" Level="1"
              ConfigurableDirectory="INSTALLDIR" >

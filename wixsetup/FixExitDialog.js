@@ -9,4 +9,9 @@ var sql = "UPDATE `Control` SET `Control`.`Height` = '18', `Control`.`Width` = '
 var view = database.OpenView(sql);
 view.Execute();
 view.Close();
+
+sql = "DELETE FROM `Property` WHERE `Property`='ALLUSERS'";
+view = database.OpenView(sql);
+view.Execute();
+view.Close();
 database.Commit();
