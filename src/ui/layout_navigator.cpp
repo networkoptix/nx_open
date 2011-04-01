@@ -15,6 +15,7 @@ QString button_level_up = "level_up";
 QString button_magnifyingglass = "magnifyingglass";
 QString button_squarelayout = "squarelayout";
 QString button_longlayout = "longlayout";
+QString button_singleLineLayout = "siglelinelayout";
 
 CLLayoutNavigator::CLLayoutNavigator(QWidget* mainWnd, LayoutContent* content):
 m_videoView(mainWnd),

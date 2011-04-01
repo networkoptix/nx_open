@@ -44,6 +44,7 @@ extern QString button_level_up;
 extern QString button_magnifyingglass;
 extern QString button_squarelayout;
 extern QString button_longlayout;
+extern QString button_singleLineLayout;
 
 extern int MAX_FPS_normal;
 extern int MAX_FPS_selected;
@@ -469,6 +470,7 @@ void GraphicsView::initDecoration()
 	bool serach = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::SearchEdit);
 	bool square_layout = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::SquareLayout);
 	bool long_layout = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::LongLayout);
+    bool sigle_line_layout = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::SingleLineLayout);
 
 	removeAllStaticItems();
 
@@ -511,7 +513,7 @@ void GraphicsView::initDecoration()
 	if (square_layout)
 	{
 		item = new CLUnMovedPixtureButton(button_squarelayout, 0,  global_decoration_opacity, 1.0, ":/skin/decorations/square-view.png", decoration_size, decoration_size, 255);
-		item->setStaticPos(QPoint(viewport()->width() - 2.2*decoration_size,1));
+		item->setStaticPos(QPoint(viewport()->width() - 3.3*decoration_size,1));
 		addStaticItem(item);
 		top_left+=(decoration_size+10);
 	}
@@ -519,9 +521,17 @@ void GraphicsView::initDecoration()
 	if (long_layout)
 	{
 		item = new CLUnMovedPixtureButton(button_longlayout, 0,  global_decoration_opacity, 1.0, ":/skin/decorations/horizontal-view.png", decoration_size, decoration_size, 255);
-		item->setStaticPos(QPoint(viewport()->width() - 1.1*decoration_size+1,1));
+		item->setStaticPos(QPoint(viewport()->width() - 2.2*decoration_size+1,1));
 		addStaticItem(item);
 	}
+
+    if (sigle_line_layout)
+    {
+        item = new CLUnMovedPixtureButton(button_singleLineLayout, 0,  global_decoration_opacity, 1.0, ":/skin/decorations/single-line-view.png", decoration_size, decoration_size, 255);
+        item->setStaticPos(QPoint(viewport()->width() - 1.1*decoration_size+1,1));
+        addStaticItem(item);
+    }
+
 	/**/
 
 	if (serach)
@@ -1813,7 +1823,13 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 
 		}
 
-		if (next_item)
+        if (m_camLayout.getGridEngine().getSettings().max_rows==1 && next_item && m_selectedWnd!=0 && m_selectedWnd == last_sel_item && m_selectedWnd->isFullScreen())
+        {
+            // if single raw mode and we are looking at the full scree window
+            setZeroSelection();
+            onItemFullScreen_helper(next_item, 800);
+        }
+        else if (next_item)
 		{
 			onNewItemSelected_helper(next_item, 0);
 		}
@@ -2007,11 +2023,16 @@ void GraphicsView::updateDecorations()
 
 	item = static_cast<CLUnMovedPixture*>(staticItemByName(button_squarelayout));
 	if (item)
-		item->setStaticPos(QPoint(viewport()->width() - 2.2*decoration_size,1));
+		item->setStaticPos(QPoint(viewport()->width() - 3.3*decoration_size,1));
 
 	item = static_cast<CLUnMovedPixture*>(staticItemByName(button_longlayout));
 	if (item)
-		item->setStaticPos(QPoint(viewport()->width() - 1.1*decoration_size,0));
+		item->setStaticPos(QPoint(viewport()->width() - 2.2*decoration_size,0));
+
+    item = static_cast<CLUnMovedPixture*>(staticItemByName(button_singleLineLayout));
+    if (item)
+        item->setStaticPos(QPoint(viewport()->width() - 1.1*decoration_size,0));
+
 
 	if (m_seachItem)
 	{
@@ -2081,6 +2102,12 @@ void GraphicsView::onDecorationItemPressed(QString name)
 		m_camLayout.getGridEngine().getSettings().max_rows = 2;
 		onArrange_helper();
 	}
+    else if (name == button_singleLineLayout)
+    {
+        m_camLayout.getGridEngine().getSettings().optimal_ratio = long_ratio;
+        m_camLayout.getGridEngine().getSettings().max_rows = 1;
+        onArrange_helper();
+    }
 	else
 		emit onDecorationPressed(m_camLayout.getContent(), name);
 }
