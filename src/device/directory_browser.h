@@ -3,26 +3,27 @@
 
 #include "deviceserver.h"
 
-class CLDirectoryBrowserDeviceServer : public CLDeviceServer
+class CLDeviceDirectoryBrowser : public QThread
 {
 public:
-	CLDirectoryBrowserDeviceServer(const QString dir);
-	virtual ~CLDirectoryBrowserDeviceServer();
+	CLDeviceDirectoryBrowser();
+	virtual ~CLDeviceDirectoryBrowser();
 
-	// true means we deal with NVR proxy server; false - with actual devices 
-	virtual bool isProxy() const ;
-	// return the name of the server 
-	virtual QString name() const ;
-
-	// returns all available devices 
-	virtual CLDeviceList findDevices();
-
-    static QStringList subDirList(const QString& abspath);
+    void setDirList(QStringList& dirs);
+    CLDeviceList result();
 
 protected:
+    void run();
     CLDeviceList findDevices(const QString& directory);
+private:
+    static QStringList subDirList(const QString& abspath);
 protected:
-	QString m_directory;
+
+    QStringList mDirsToCheck;
+    CLDeviceList mResult;
+
+    volatile bool mNeedStop;
+	
 };
 
 #endif //directory_browser_h_1708

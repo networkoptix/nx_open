@@ -4,37 +4,81 @@
 #include "util.h"
 #include "device_plugins/archive/archive/archive_device.h"
 
-CLDirectoryBrowserDeviceServer::CLDirectoryBrowserDeviceServer(const QString dir)
-{
-	m_directory = dir;
-}
-
-CLDirectoryBrowserDeviceServer::~CLDirectoryBrowserDeviceServer()
+CLDeviceDirectoryBrowser::CLDeviceDirectoryBrowser():
+mNeedStop(false)
 {
 
 }
 
-bool CLDirectoryBrowserDeviceServer::isProxy() const
+CLDeviceDirectoryBrowser::~CLDeviceDirectoryBrowser()
 {
-	return false;
+    mNeedStop = true;
+    wait();
 }
 
-// return the name of the server 
-QString CLDirectoryBrowserDeviceServer::name() const
+void CLDeviceDirectoryBrowser::setDirList(QStringList& dirs)
 {
-	return "CLDirectoryBrowserDeviceServer";
+    mDirsToCheck = dirs;
 }
 
-// returns all available devices 
-CLDeviceList CLDirectoryBrowserDeviceServer::findDevices()
+CLDeviceList CLDeviceDirectoryBrowser::result()
 {
-    return findDevices(m_directory);
-
+    return mResult;
 }
+
+void CLDeviceDirectoryBrowser::run()
+{
+
+    QThread::currentThread()->setPriority(QThread::IdlePriority);
+
+    cl_log.log("Browsing directories....", cl_logALWAYS);
+    
+    QTime time;
+    time.restart();
+
+
+
+
+    mNeedStop = false;
+    mResult.clear();
+
+
+    foreach(QString dir, mDirsToCheck)
+    {
+
+        QChar c = dir.at(dir.length()-1);
+
+        if (c!='/' && c!='\\')
+            dir+="/";
+
+
+        cl_log.log("Checking ", dir,   cl_logALWAYS);
+
+        CLDeviceList dev_lst = findDevices(dir);
+
+        cl_log.log("found ", dev_lst.count(), " devices",  cl_logALWAYS);
+
+        foreach(CLDevice* dev, dev_lst)
+        {
+            mResult[dev->getUniqueId()] = dev;
+        }
+
+    }
+
+    cl_log.log("Done(Browsing directories). Time elapsed =  ", time.elapsed(), cl_logALWAYS);
+    
+}
+
 //=============================================================================================
-CLDeviceList CLDirectoryBrowserDeviceServer::findDevices(const QString& directory)
+CLDeviceList CLDeviceDirectoryBrowser::findDevices(const QString& directory)
 {
     CLDeviceList result;
+
+
+
+    if (mNeedStop)
+        return result;
+
     QDir dir(directory);
     if (!dir.exists())
         return result;
@@ -123,7 +167,7 @@ CLDeviceList CLDirectoryBrowserDeviceServer::findDevices(const QString& director
 
 }
 //=============================================================================================
-QStringList CLDirectoryBrowserDeviceServer::subDirList(const QString& abspath)
+QStringList CLDeviceDirectoryBrowser::subDirList(const QString& abspath)
 {
     QStringList result;
 

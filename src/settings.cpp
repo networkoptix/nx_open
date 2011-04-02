@@ -164,7 +164,7 @@ void Settings::setMediaRoot(const QString& root)
     m_data.mediaRoot = root;
 }
 
-QList<QString> Settings::auxMediaRoots() const
+QStringList Settings::auxMediaRoots() const
 {
     QReadLocker _lock(&m_RWLock);
 
@@ -210,7 +210,7 @@ void Settings::removeAuxMediaRoot(const QString& root)
     m_data.auxMediaRoots.removeAll(root);
 }
 
-void Settings::setAuxMediaRoots(const QList<QString>& auxMediaRoots)
+void Settings::setAuxMediaRoots(const QStringList& auxMediaRoots)
 {
     m_data.auxMediaRoots.clear();
 

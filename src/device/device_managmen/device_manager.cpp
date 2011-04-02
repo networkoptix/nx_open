@@ -1,6 +1,5 @@
 #include "device_manager.h"
 #include "../asynch_seacher.h"
-#include "../directory_browser.h"
 #include "settings.h"
 #include "recorder/fake_recorder_device.h"
 #include "device_plugins/archive/archive/archive_device.h"
@@ -25,7 +24,8 @@ CLDeviceManager& CLDeviceManager::instance()
 }
 
 CLDeviceManager::CLDeviceManager():
-m_firstTime(true)
+m_firstTime(true),
+mNeedresultsFromDirbrowsr(false)
 {
 	connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimer()));
 	m_timer.start(100); // first time should come fast
@@ -46,7 +46,7 @@ m_firstTime(true)
     addArchiver("9");
     /**/
 
-    QStringList checkLst;
+    QStringList checkLst(Settings::instance().auxMediaRoots());
     checkLst.push_back(getMediaRootDir());
     pleaseCheckDirs(checkLst);
 
@@ -114,51 +114,25 @@ void CLDeviceManager::onTimer()
 		m_dev_searcher.start(); // run searcher again ...
 	}
 
+    if (mDirbrowsr.isRunning())
+        return;
+
+    if (mNeedresultsFromDirbrowsr)
+    {
+        //mDirbrowsr is not running 
+        getResultFromDirBrowser();
+        mNeedresultsFromDirbrowsr = false;
+    }
+
 
     QStringList checklist = getPleaseCheckDirs();
     pleaseCheckDirs(QStringList()); // set an empty list;
 
     if (checklist.count())
     {
-        QTime time; time.restart();
-        cl_log.log("=====about to check dirs...", cl_logALWAYS);
-
-        // if the have something to check
-
-        foreach(QString dir, checklist)
-        {
-            CLDirectoryBrowserDeviceServer dirbrowsr(dir);
-            CLDeviceList dev_list = dirbrowsr.findDevices();
-
-            {
-                // exclude already existing devices 
-                QMutexLocker lock(&m_dev_searcher.all_devices_mtx);
-                CLDeviceList& all_devices =  m_dev_searcher.getAllDevices();
-
-                CLDeviceList::iterator it = dev_list.begin(); 
-                while (it!=dev_list.end())
-                {
-                    if (!all_devices.contains(it.key()))
-                    {
-                        ++it;
-                        continue;
-                    }
-
-                    it.value()->releaseRef();
-                    dev_list.erase(it++);
-                }
-
-            }
-
-            onNewDevices_helper(dev_list, generalArchiverId);
-
-        }
-
-        
-
-        cl_log.log("=====done checking dirs. Time elapsed = ", time.elapsed(), cl_logALWAYS);
-
-
+        mNeedresultsFromDirbrowsr = true;
+        mDirbrowsr.setDirList(checklist);
+        mDirbrowsr.start();
     }
 
 }
@@ -344,4 +318,32 @@ bool CLDeviceManager::match_subfilter(QString dev, QString fltr) const
 
     return (serach_list.count());
 
+}
+
+
+void CLDeviceManager::getResultFromDirBrowser()
+{
+    CLDeviceList dev_list = mDirbrowsr.result();
+
+    {
+        // exclude already existing devices 
+        QMutexLocker lock(&m_dev_searcher.all_devices_mtx);
+        CLDeviceList& all_devices =  m_dev_searcher.getAllDevices();
+
+        CLDeviceList::iterator it = dev_list.begin(); 
+        while (it!=dev_list.end())
+        {
+            if (!all_devices.contains(it.key()))
+            {
+                ++it;
+                continue;
+            }
+
+            it.value()->releaseRef();
+            dev_list.erase(it++);
+        }
+
+    }
+
+    onNewDevices_helper(dev_list, generalArchiverId);
 }

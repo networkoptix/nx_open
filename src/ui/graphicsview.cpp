@@ -497,10 +497,12 @@ void GraphicsView::initDecoration()
 
 	if (cont->checkDecorationFlag(LayoutContent::BackGroundLogo))
 	{
+        
 		item = new CLUnMovedPixture("background", 0, 0.03, 0.03, ":/skin/startscreen/no_logo.png", viewport()->width(), viewport()->height(), -100);
         //item = new CLUnMovedPixture("background", 0, 0.03, 0.03, ":/skin/logo", viewport()->width(), viewport()->height(), -100);
 		item->setStaticPos(QPoint(1,1));
 		addStaticItem(item);
+        /**/
 	}
 
 	if (magnifyingGlass)
@@ -1967,7 +1969,7 @@ CLAbstractSceneItem* GraphicsView::navigationItem(QGraphicsItem* item) const
 void GraphicsView::drawBackground ( QPainter * painter, const QRectF & rect )
 {
 
-    if (m_camLayout.getContent() == CLSceneLayoutManager::instance().introScreenLayoutContent())
+    if ( m_camLayout.getContent() == CLSceneLayoutManager::instance().introScreenLayoutContent())
         return; // do not draw bgrd in case of intro video
 
 	//QGraphicsView::drawBackground ( painter, rect );
@@ -2010,11 +2012,11 @@ void GraphicsView::updateDecorations()
 {
 	CLUnMovedPixture* item = static_cast<CLUnMovedPixture*>(staticItemByName("background"));
 
-	if (item)
+    if (item)
 	{
 		item->setMaxSize(viewport()->width(), viewport()->height());
 		QSize size = item->getSize();
-		item->setStaticPos( QPoint( (viewport()->width() - size.width())/2, (viewport()->height() - size.height())/2) );
+		item->setStaticPos( QPoint( (viewport()->width() - size.width())/2, (viewport()->height() - size.height())/2 ) );
 	}
 
 	item = static_cast<CLUnMovedPixture*>(staticItemByName(button_magnifyingglass));

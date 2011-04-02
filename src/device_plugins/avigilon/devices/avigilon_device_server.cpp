@@ -37,7 +37,7 @@ CLDeviceList AVigilonDeviceServer::findDevices()
     dev->setIP(QHostAddress("192.168.1.99"), false);
     dev->setMAC("00-18-85-00-C8-72");
     dev->setUniqueId(dev->getMAC());
-    dev->setName("avigilon");
+    dev->setName("clearpix");
     dev->setAuth("admin", "admin");
 
     lst[dev->getUniqueId()] = dev;

@@ -29,7 +29,7 @@ public:
     {
         bool allowChangeIP;
         QString mediaRoot;
-        QList<QString> auxMediaRoots;
+        QStringList auxMediaRoots;
     };
 
     void update(const Data& data);
@@ -40,7 +40,7 @@ public:
 
     bool isAllowChangeIP() const;
     QString mediaRoot() const;
-    QList<QString> auxMediaRoots() const;
+    QStringList auxMediaRoots() const;
 
     bool haveValidSerialNumber() const;
     void setSerialNumber(const QString& serial);
@@ -53,7 +53,7 @@ private:
 
     void setAllowChangeIP(bool allow);
     void setMediaRoot(const QString& root);
-    void setAuxMediaRoots(const QList<QString>&);
+    void setAuxMediaRoots(const QStringList&);
     void removeAuxMediaRoot(const QString& root);
     void reset();
 

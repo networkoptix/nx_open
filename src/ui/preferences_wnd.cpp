@@ -6,6 +6,7 @@
 #include "device/network_device.h"
 #include "version.h"
 #include "device_settings/style.h"
+#include "util.h"
 
 extern QString button_layout;
 extern QString button_home;
@@ -61,6 +62,10 @@ void PreferencesWindow::accept()
     Settings& settings = Settings::instance();
     settings.update(m_settingsData);
     settings.save();
+
+    QStringList checkLst(settings.auxMediaRoots());
+    checkLst.push_back(getMediaRootDir());
+    CLDeviceManager::instance().pleaseCheckDirs(checkLst);
 
     QDialog::accept();
 }

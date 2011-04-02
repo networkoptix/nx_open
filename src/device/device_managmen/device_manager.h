@@ -6,6 +6,7 @@
 #include "../asynch_seacher.h"
 #include "../device.h"
 #include "device_criteria.h"
+#include "../directory_browser.h"
 
 class CLDevice;
 class CLRecorderDevice;
@@ -41,9 +42,9 @@ protected:
 	bool isDeviceMeetCriteria(const CLDeviceCriteria& cr, CLDevice* dev) const;
 
 	void addArchiver(QString id);
-
-private:
     bool match_subfilter(QString dec, QString fltr) const;
+
+    void getResultFromDirBrowser();
 
 protected slots:
 	void onTimer();
@@ -57,6 +58,10 @@ protected:
 
     mutable QMutex mPleaseCheckDirsLst_cs;
     QStringList  mPleaseCheckDirsLst;
+
+    CLDeviceDirectoryBrowser mDirbrowsr;
+
+    bool mNeedresultsFromDirbrowsr;
 };
 
 #endif //device_manager_h_1537_
