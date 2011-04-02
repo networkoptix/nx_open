@@ -49,7 +49,9 @@ void ArthurStyle::drawHoverRect(QPainter *painter, const QRect &r) const
 	path.addEllipse(r.x() + r.width() - h, r.y(), h, h);
 	path.setFillRule(Qt::WindingFill);
 	painter->setPen(Qt::NoPen);
-	painter->setBrush(QColor(191, 215, 191));
+	//painter->setBrush(QColor(191, 215, 191)); changed
+    //painter->setBrush(QColor(124-50, 164-50, 255));// +
+    painter->setBrush(QColor(124, 164, 255));// +
 	painter->setRenderHint(QPainter::Antialiasing);
 	painter->drawPath(path);
 }
@@ -124,7 +126,8 @@ void ArthurStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *op
 				button->rect.y(),
 				right);
 			if (hover)
-				painter->fillRect(widget->rect().adjusted(3,5,-3,-5), QColor(31,127,31,63));
+				//painter->fillRect(widget->rect().adjusted(3,5,-3,-5), QColor(31,127,31,63));
+                painter->fillRect(widget->rect().adjusted(3,5,-3,-5), QColor(124, 164, 255));// changed
 			painter->restore();
 		}
 		break;

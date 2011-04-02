@@ -498,7 +498,7 @@ void GraphicsView::initDecoration()
 	if (cont->checkDecorationFlag(LayoutContent::BackGroundLogo))
 	{
         
-		item = new CLUnMovedPixture("background", 0, 0.03, 0.03, ":/skin/startscreen/no_logo.png", viewport()->width(), viewport()->height(), -100);
+		item = new CLUnMovedPixture("background", 0, 0.03, 0.03, ":/skin/startscreen/no_logo_bkg.png", viewport()->width(), viewport()->height(), -100);
         //item = new CLUnMovedPixture("background", 0, 0.03, 0.03, ":/skin/logo", viewport()->width(), viewport()->height(), -100);
 		item->setStaticPos(QPoint(1,1));
 		addStaticItem(item);
@@ -1969,7 +1969,8 @@ CLAbstractSceneItem* GraphicsView::navigationItem(QGraphicsItem* item) const
 void GraphicsView::drawBackground ( QPainter * painter, const QRectF & rect )
 {
 
-    if ( m_camLayout.getContent() == CLSceneLayoutManager::instance().introScreenLayoutContent())
+    if (m_camLayout.getContent() == CLSceneLayoutManager::instance().introScreenLayoutContent() || 
+        m_camLayout.getContent() == CLSceneLayoutManager::instance().startScreenLayoutContent() )
         return; // do not draw bgrd in case of intro video
 
 	//QGraphicsView::drawBackground ( painter, rect );

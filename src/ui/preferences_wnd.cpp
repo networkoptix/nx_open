@@ -14,8 +14,8 @@ extern QString button_home;
 PreferencesWindow::PreferencesWindow()
     : QDialog(0, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint)
 {
-//    QStyle *arthurStyle = new ArthurStyle();
-//    setStyle(arthurStyle);
+    QStyle *arthurStyle = new ArthurStyle();
+    setStyle(arthurStyle);
 
     setupUi(this);
 
