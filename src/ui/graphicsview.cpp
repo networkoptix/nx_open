@@ -1998,8 +1998,8 @@ CLAbstractSceneItem* GraphicsView::navigationItem(QGraphicsItem* item) const
 void GraphicsView::drawBackground ( QPainter * painter, const QRectF & rect )
 {
 
-    if (m_camLayout.getContent() == CLSceneLayoutManager::instance().introScreenLayoutContent() || 
-        m_camLayout.getContent() == CLSceneLayoutManager::instance().startScreenLayoutContent() )
+    if (m_camLayout.getContent() == CLSceneLayoutManager::instance().introScreenLayoutContent())// ||
+        //m_camLayout.getContent() == CLSceneLayoutManager::instance().startScreenLayoutContent() )
         return; // do not draw bgrd in case of intro video
 
 	//QGraphicsView::drawBackground ( painter, rect );

@@ -20,15 +20,15 @@ LayoutContent& startscreen_content()
 
         instance.setName(start_screen);
 
-        int noLogoWidth = 702*1.7;
-        int noLogoHeight = 243*1.7;
-		int noLogoLeft = SCENE_LEFT - 150;
-		int noLogoTop = SCENE_TOP;
+        int noLogoWidth = 1500/1.1;
+        int noLogoHeight = 658/1.1;
+		int noLogoLeft = SCENE_LEFT-250;
+		int noLogoTop = SCENE_TOP - 100;
 
 
         int eveLogoWidth = 720*0.5;
         int eveLogoHeight = 475*0.5;
-        int eveLogoLeft = SCENE_LEFT + 250;
+        int eveLogoLeft = SCENE_LEFT + 260;
         int eveLogoTop = noLogoTop + noLogoHeight -50;
         
 
@@ -37,7 +37,7 @@ LayoutContent& startscreen_content()
         int btn_height = 300*0.7;
 
 
-		int btn_left = SCENE_LEFT + -100;
+		int btn_left = SCENE_LEFT -100;
         int btn2_left = btn_left + 800;
 
 		int btn_top = eveLogoTop + eveLogoHeight - 100;
@@ -79,10 +79,12 @@ LayoutContent& startscreen_content()
 		CLDeviceCriteria cr(CLDeviceCriteria::STATIC);
 
 		CLRectAdjustment adj;
+        
 		adj.x1 = 1500;
-		adj.y1 = 1580;
+		adj.y1 = 1700;
 		adj.x2 = -1500;
 		adj.y2 = -1500;
+        /**/
 		instance.setRectAdjustment(adj);
 
 		instance.setDeviceCriteria(cr);
