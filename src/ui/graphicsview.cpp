@@ -767,7 +767,10 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 			
             foreach(QGraphicsItem* itm, lst)
 			{
-				CLAbstractSceneItem* item = static_cast<CLAbstractSceneItem*>(itm);
+				CLAbstractSceneItem* item = navigationItem(itm);
+                if (!item)
+                    continue;
+
 				//QPointF wnd_pos = item->scenePos(); //<---- this does not work coz item zoom ;case1
 				QPointF wnd_pos = item->sceneBoundingRect().center();
 				wnd_pos-=QPointF(item->boundingRect().width()/2, item->boundingRect().height()/2);
@@ -1213,7 +1216,12 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
         foreach(QGraphicsItem* item, m_scene.selectedItems())
         {
-            CLAbstractComplicatedItem* ca  = (static_cast<CLAbstractSceneItem*>(item))->getComplicatedItem();
+
+            CLAbstractSceneItem* nav_item = navigationItem(item);;
+            if (!nav_item)
+                continue;
+            
+            CLAbstractComplicatedItem* ca  = nav_item->getComplicatedItem();
 
             if (!ca)
                 continue;
@@ -1451,7 +1459,11 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
         {
             foreach(QGraphicsItem* item, m_scene.selectedItems())
             {
-                CLAbstractComplicatedItem* ca  = (static_cast<CLAbstractSceneItem*>(item))->getComplicatedItem();
+                CLAbstractSceneItem* nav_item = navigationItem(item);;
+                if (!nav_item)
+                    continue;
+
+                CLAbstractComplicatedItem* ca  = nav_item->getComplicatedItem();
 
                 if (!ca)
                     continue;
@@ -2801,7 +2813,10 @@ void GraphicsView::navigation_grid_items_drop_helper()
 
 	foreach(QGraphicsItem* itm, lst)
 	{
-		CLAbstractSceneItem* item = static_cast<CLAbstractSceneItem*>(itm);
+		CLAbstractSceneItem* item = navigationItem(itm);
+        if (!item)
+            continue;
+
 		item->setCanDrop(false);
 
 		CLAbstractSceneItem* item_to_swap_with = m_camLayout.getGridEngine().getItemToSwapWith(item);
