@@ -20,7 +20,7 @@ CLDevice::DeviceType CLAvigilonDevice::getDeviceType() const
 
 QString CLAvigilonDevice::toString() const
 {
-    return QString("live avigilon ") + getUniqueId();
+    return QString("live clearpix ") + getUniqueId();
 }
 
 CLStreamreader* CLAvigilonDevice::getDeviceStreamConnection()

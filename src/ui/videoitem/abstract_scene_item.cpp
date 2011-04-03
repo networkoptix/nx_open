@@ -146,7 +146,20 @@ void CLAbstractSceneItem::setItemSelected(bool sel, bool animate , int delay )
 		setFullScreen(false);
 
 	if (!animate)
+    {
+        if (m_selected)
+        {
+            setZValue(global_base_scene_z_level+1);
+        }
+        else
+        {
+            setZValue(global_base_scene_z_level);
+        }
+
 		return;
+    }
+
+
 
 	if (m_selected)
 	{

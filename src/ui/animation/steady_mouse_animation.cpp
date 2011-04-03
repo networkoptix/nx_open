@@ -8,7 +8,7 @@ m_counrer(0),
 m_steadyMode(false)
 {
 	connect(&m_timer, SIGNAL(timeout()), this , SLOT(onTimer()));
-	m_timer.setInterval(1000); // 60 fps   
+	m_timer.setInterval(500);  
 }
 
 CLSteadyMouseAnimation::~CLSteadyMouseAnimation()
@@ -46,7 +46,7 @@ void CLSteadyMouseAnimation::onTimer()
 
     ++m_counrer;
 
-    if (m_counrer > 4)
+    if (m_counrer > 3)
     {
         m_steadyMode = true;
         m_view->goToSteadyMode(true);
