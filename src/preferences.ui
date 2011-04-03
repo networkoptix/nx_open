@@ -166,7 +166,7 @@
        <item>
         <widget class="QGroupBox" name="groupBox_5">
          <property name="title">
-          <string>Detected cameras</string>
+          <string>Detected Cameras</string>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
@@ -271,6 +271,55 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="tab_5">
+      <attribute name="title">
+       <string>License</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_10">
+       <item>
+        <widget class="QGroupBox" name="groupBox_8">
+         <property name="title">
+          <string>License Infromation</string>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <item>
+           <widget class="QLabel" name="licenseInfoLabel">
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="licenseButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Enter License</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="tab_4">
       <attribute name="title">
        <string>About</string>
@@ -298,55 +347,6 @@
             </property>
             <property name="text">
              <string>Version:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_3">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>License Information:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="6">
-           <widget class="QPushButton" name="licenseButton">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>Enter License</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="6">
-           <spacer name="horizontalSpacer">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="2" column="1">
-           <widget class="QLabel" name="licenseInfoLabel">
-            <property name="text">
-             <string>TextLabel</string>
             </property>
            </widget>
           </item>
@@ -544,22 +544,6 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel">
      <x>440</x>
      <y>322</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>licenseButton</sender>
-   <signal>clicked()</signal>
-   <receiver>PreferencesDialog</receiver>
-   <slot>enterLicenseClick()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>506</x>
-     <y>143</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>287</x>
-     <y>197</y>
     </hint>
    </hints>
   </connection>
