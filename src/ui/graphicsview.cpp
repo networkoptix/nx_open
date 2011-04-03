@@ -1842,6 +1842,23 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
             // if single raw mode and we are looking at the full scree window
             setZeroSelection();
             onItemFullScreen_helper(next_item, 800);
+
+            if (next_item->getType() == CLAbstractSceneItem::VIDEO)
+            {
+                CLVideoWindowItem* video_wnd = static_cast<CLVideoWindowItem*>(next_item);
+                CLVideoCamera* cam = video_wnd->getVideoCam();
+                CLDevice* dev = cam->getDevice();
+                if (dev->checkDeviceTypeFlag(CLDevice::RECORDED) || dev->checkDeviceTypeFlag(CLDevice::ARCHIVE))
+                {
+                    CLAbstractArchiveReader* asr = static_cast<CLAbstractArchiveReader*>(cam->getStreamreader());
+                    asr->jumpTo(0, true);
+                }
+                
+            }
+
+
+
+            //if (next_item)
         }
         else if (next_item)
 		{
