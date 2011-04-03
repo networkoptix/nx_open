@@ -31,7 +31,7 @@
       <UpgradeVersion OnlyDetect='yes' Property='NEWERFOUND' Minimum='$(env.APPLICATION_VERSION)' IncludeMinimum='no' />
     </Upgrade>
 
-    <CustomAction Id="AssignMediaFolder" Property="MEDIAFOLDER" Value="[%SystemDrive]\EVEMedia" Execute="firstSequence"/>
+    <CustomAction Id="AssignMediaFolder" Property="MEDIAFOLDER" Value="[%SystemDrive]\EVE Media" Execute="firstSequence"/>
     <CustomAction Id="StartAppOnExit" FileKey="UniclientEXE" ExeCommand="" Execute="immediate" Impersonate="yes" Return="asyncNoWait"/>
 
     <InstallUISequence>
@@ -50,7 +50,7 @@
     <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
 
     <Directory Id="TARGETDIR" Name="SourceDir">
-      <Directory Id="MEDIAFOLDER" Name="EVEMedia">
+      <Directory Id="MEDIAFOLDER" Name="EVE Media">
         <Component Id="MediaFolderComponent" Guid="2B72351D-264E-44a5-8E1F-B8C82BB80817" Permanent="yes">
           <CreateFolder Directory="MEDIAFOLDER"/>
           <Shortcut Id="mediaFolderShortcut" Directory="DesktopFolder" Name="EVE Media Folder" Target="[MEDIAFOLDER]" />
