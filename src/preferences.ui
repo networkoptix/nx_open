@@ -149,7 +149,7 @@
           <item>
            <widget class="QCheckBox" name="allowChangeIPCheckBox">
             <property name="text">
-             <string>Allow to change camera IP Address if required for cameras to work</string>
+             <string>Allow to change camera IP address if required for cameras to work (for this run only)</string>
             </property>
            </widget>
           </item>

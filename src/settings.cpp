@@ -86,8 +86,6 @@ void Settings::load(const QString& fileName)
 
         if (xml.isStartElement())
         {
-            if (xml.name() == "allowChangeIP")
-                m_data.allowChangeIP = (xml.readElementText() == "true");
             if (xml.name() == "mediaRoot")
                 m_data.mediaRoot = xml.readElementText();
             else if (xml.name() == "auxMediaRoot")
@@ -122,7 +120,6 @@ void Settings::save()
     stream.writeStartElement("settings");
     stream.writeStartElement("config");
 
-    stream.writeTextElement("allowChangeIP", m_data.allowChangeIP ? "true" : "false");
     stream.writeTextElement("mediaRoot", m_data.mediaRoot);
 
     foreach(QString auxMediaRoot, m_data.auxMediaRoots)
