@@ -40,6 +40,11 @@ Settings& Settings::instance()
     return settings;
 }
 
+bool Settings::isAfterFirstRun() const
+{
+    return m_data.afterFirstRun;
+}
+
 void Settings::fillData(Settings::Data& data) const
 {
     QReadLocker _lock(&m_RWLock);
@@ -92,6 +97,8 @@ void Settings::load(const QString& fileName)
                 m_data.auxMediaRoots.push_back(xml.readElementText());
             else if (xml.name() == "serialNumber")
                 setSerialNumber(xml.readElementText());
+            else if (xml.name() == "afterFirstRun")
+                m_data.afterFirstRun = (xml.readElementText() == "true");
         }
     }
 
@@ -132,6 +139,8 @@ void Settings::save()
         stream.writeTextElement("serialNumber", m_serialNumber);
     }
     
+    stream.writeTextElement("afterFirstRun", "true");
+
     stream.writeEndElement(); // config
     stream.writeEndElement(); // settings
 
@@ -219,6 +228,7 @@ void Settings::setAuxMediaRoots(const QStringList& auxMediaRoots)
 
 void Settings::reset()
 {
+    m_data.afterFirstRun = false;
     m_data.allowChangeIP = false;
     m_haveValidSerialNumber = false;
 }

@@ -28,6 +28,7 @@ public:
     struct Data
     {
         bool allowChangeIP;
+        bool afterFirstRun;
         QString mediaRoot;
         QStringList auxMediaRoots;
     };
@@ -39,6 +40,7 @@ public:
     void save();
 
     bool isAllowChangeIP() const;
+    bool isAfterFirstRun() const;
     QString mediaRoot() const;
     QStringList auxMediaRoots() const;
 

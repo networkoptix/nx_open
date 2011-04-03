@@ -84,7 +84,9 @@ int main(int argc, char *argv[])
     Settings& settings = Settings::instance();
     settings.load(getDataDirectory() + "/settings.xml");
 
-    settings.addAuxMediaRoot(getMoviesDirectory());
+    if (!settings.isAfterFirstRun() && !getMoviesDirectory().isEmpty())
+        settings.addAuxMediaRoot(getMoviesDirectory());
+
     settings.save();
 
     cl_log.log("Using " + settings.mediaRoot() + " as media root directory", cl_logALWAYS);
