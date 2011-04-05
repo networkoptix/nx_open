@@ -122,3 +122,5 @@ if sys.platform == 'win32':
     os.system('src\\qmake_vc_fixer src\\uniclient.vcproj')
     os.unlink('src/uniclient.vcproj')
     os.rename('src/uniclient.new.vcproj', 'src/uniclient.vcproj')
+elif sys.platform == 'darwin':
+    os.system('qmake FFMPEG=%s -o src/uniclient.xcodeproj src/uniclient.pro' % FFMPEG)

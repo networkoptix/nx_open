@@ -1,7 +1,7 @@
 #ifndef cl_avigilon_clien_pul1721
 #define cl_avigilon_clien_pul1721
 
-#include "streamreader\cpull_stremreader.h"
+#include "streamreader/cpull_stremreader.h"
 
 
 

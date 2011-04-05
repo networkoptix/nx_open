@@ -1,7 +1,7 @@
 #include "avigilon_client_pull.h"
-#include "device\network_device.h"
-#include "network\simple_http_client.h"
-#include "data\mediadata.h"
+#include "device/network_device.h"
+#include "network/simple_http_client.h"
+#include "data/mediadata.h"
 
 CLAvigilonStreamreader::CLAvigilonStreamreader(CLDevice* dev):
 CLClientPullStreamreader(dev)

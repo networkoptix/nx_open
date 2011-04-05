@@ -1,5 +1,5 @@
 #include "avigilon_device.h"
-#include "..\streamreader\avigilon_client_pull.h"
+#include "../streamreader/avigilon_client_pull.h"
 
 
 CLAvigilonDevice::CLAvigilonDevice()
