@@ -3,18 +3,13 @@
 
 #include "streamreader/cpull_stremreader.h"
 
-
-
 class CLAvigilonStreamreader: public CLClientPullStreamreader
 {
 public:
-	CLAvigilonStreamreader(CLDevice* dev );
+	CLAvigilonStreamreader(CLDevice* dev);
 	virtual ~CLAvigilonStreamreader();
 
     virtual CLAbstractMediaData* getNextData();
-
-protected:
-    
 };
 
 #endif //cl_av_clien_pull1529

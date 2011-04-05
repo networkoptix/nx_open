@@ -3,8 +3,8 @@
 #include "network/simple_http_client.h"
 #include "data/mediadata.h"
 
-CLAvigilonStreamreader::CLAvigilonStreamreader(CLDevice* dev):
-CLClientPullStreamreader(dev)
+CLAvigilonStreamreader::CLAvigilonStreamreader(CLDevice* dev)
+	: CLClientPullStreamreader(dev)
 {
 }
 
@@ -20,11 +20,8 @@ CLAbstractMediaData* CLAvigilonStreamreader::getNextData()
     QString request = "media/still.jpg";
     CLNetworkDevice* ndev = static_cast<CLNetworkDevice*>(m_device);
 
-
-
     CLSimpleHTTPClient http_client(ndev->getIP(), 80, 2000, ndev->getAuth());
 
-    
     http_client.setRequestLine(request);
     http_client.openStream();
 
@@ -36,11 +33,11 @@ CLAbstractMediaData* CLAvigilonStreamreader::getNextData()
     videoData = new CLCompressedVideoData(CL_MEDIA_ALIGNMENT, qMax(http_client.getContentLen(),  (unsigned int)5*1024*1024));
     CLByteArray& img = videoData->data;
 
-    while(http_client.isOpened())
+    while (http_client.isOpened())
     {
         int readed = http_client.read(img.prepareToWrite(2000), 2000);
 
-        if (readed<0) // error
+        if (readed < 0) // error
         {
             //delete videoData;
             //videoData->releaseRef();
@@ -49,7 +46,7 @@ CLAbstractMediaData* CLAvigilonStreamreader::getNextData()
 
         img.done(readed);
 
-        if (img.size()>CL_MAX_DATASIZE)
+        if (img.size() > CL_MAX_DATASIZE)
         {
             cl_log.log("Image is too big!!", cl_logERROR);
             //delete videoData;
@@ -67,6 +64,7 @@ CLAbstractMediaData* CLAvigilonStreamreader::getNextData()
 
     videoData->keyFrame = true;
     videoData->channelNumber = 0;
-    videoData->timestamp = QDateTime::currentMSecsSinceEpoch()*1000;
+    videoData->timestamp = QDateTime::currentMSecsSinceEpoch() * 1000;
+	
     return videoData;
 }
