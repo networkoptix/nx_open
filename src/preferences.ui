@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>626</width>
+    <width>630</width>
     <height>395</height>
    </rect>
   </property>
@@ -544,6 +544,22 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel">
      <x>440</x>
      <y>322</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>licenseButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PreferencesDialog</receiver>
+   <slot>enterLicenseClick()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>530</x>
+     <y>76</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>314</x>
+     <y>197</y>
     </hint>
    </hints>
   </connection>

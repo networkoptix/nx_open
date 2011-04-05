@@ -31,6 +31,10 @@ win32 {
 
 mac {
   INCLUDEPATH += /Users/ivan/opt/ffmpeg/include
+
+  PRIVATE_FRAMEWORKS.files = ../resource/arecontvision
+  PRIVATE_FRAMEWORKS.path = Contents/MacOS
+  QMAKE_BUNDLE_DATA += PRIVATE_FRAMEWORKS
 }
 
 INCLUDEPATH += $$PWD
