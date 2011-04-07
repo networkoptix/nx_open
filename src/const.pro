@@ -47,6 +47,7 @@ RESOURCES += mainwnd.qrc ../build/skin.qrc
 FORMS += mainwnd.ui preferences.ui licensekey.ui
 
 win32 {
+  LIBS += ws2_32.lib Iphlpapi.lib
   QMAKE_LFLAGS += avcodec-52.lib avdevice-52.lib avfilter-1.lib avformat-52.lib avutil-50.lib swscale-0.lib
   QMAKE_LFLAGS_DEBUG += /libpath:../contrib/$$FFMPEG/bin/debug
   QMAKE_LFLAGS_RELEASE += /libpath:../contrib/$$FFMPEG/bin/release

@@ -1,7 +1,6 @@
 #include "Socket.h"
 using namespace std;
 #ifdef WIN32
-  #include <winsock.h>         // For socket(), connect(), send(), and recv()
   typedef int socklen_t;
   typedef char raw_type;       // Type used for raw data on this platform
 #else

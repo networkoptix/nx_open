@@ -1,13 +1,9 @@
 #include "ping.h"
 
 #ifdef _WIN32
-#include <iphlpapi.h>
-#include <icmpapi.h>
 #include <stdio.h>
 #include "base/log.h"
 
-#pragma comment(lib, "iphlpapi.lib")
-#pragma comment(lib, "ws2_32.lib")
 #else
 #include <SystemConfiguration/SCNetworkReachability.h>
 #endif
@@ -44,9 +40,8 @@ bool CLPing::ping(const QString& ip, int retry, int timeoutPerRetry, int packetS
 	}
 
 	// Allocate space for at a single reply
-	dwRetVal = IcmpSendEcho2(hIcmpFile, NULL, NULL, NULL,
-		ipaddr, SendData, sizeof (SendData), NULL,
-		ReplyBuffer, ReplySize, retry*timeoutPerRetry);
+	dwRetVal = IcmpSendEcho(hIcmpFile, ipaddr, SendData, sizeof (SendData), NULL,
+		ReplyBuffer, ReplySize, retry * timeoutPerRetry);
 	if (dwRetVal != 0) 
 	{
 		PICMP_ECHO_REPLY pEchoReply = (PICMP_ECHO_REPLY) ReplyBuffer;

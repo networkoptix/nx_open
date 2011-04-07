@@ -174,9 +174,6 @@ bool getNextAvailableAddr(CLSubNetState& state, const CLIPList& busy_lst)
 
 //{ windows
 #ifdef _WIN32
-#include <iphlpapi.h>
-#pragma comment(lib, "Iphlpapi.lib")
-#pragma comment(lib,"Ws2_32.lib")
 
 void removeARPrecord(const QHostAddress& ip)
 {

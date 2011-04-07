@@ -1,5 +1,11 @@
 #ifdef _WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <iphlpapi.h>
+#include <icmpapi.h>
+
 // DXVA headers (should be included before ffmpeg headers)
+#ifdef _USE_DXVA
 #include <d3d9.h>
 #include <dxva2api.h>
 #include <windows.h>
@@ -9,12 +15,13 @@
 #include <shlwapi.h>
 #include <Strsafe.h>
 #endif
+#endif
 
 // ffmpeg headers
 extern "C" {
 	#include <libavcodec/avcodec.h>
 	#include <libavformat/avformat.h>
-    #ifdef _WIN32
+    #ifdef _USE_DXVA
     #include <libavcodec/dxva2.h>
     #endif
 	#include <libswscale/swscale.h>

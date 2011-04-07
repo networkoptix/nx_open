@@ -3,7 +3,7 @@
 
 #include "abstractdecoder.h"
 
-#ifdef _WIN32
+#ifdef _USE_DXVA
 #include "dxva/dxva.h"
 #endif
 

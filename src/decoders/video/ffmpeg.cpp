@@ -1,6 +1,8 @@
 #include "ffmpeg.h"
 
+#ifdef _USE_DXVA
 #include "dxva/ffmpeg_callbacks.h"
+#endif
 
 extern QMutex global_ffmpeg_mutex;
 
