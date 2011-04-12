@@ -13,7 +13,8 @@ CLAudioDevice::CLAudioDevice(QAudioFormat format)
   : m_audioOutput(0),
     m_audioBuffer(0),
     m_ringBuffer(0),
-    m_downmixing(false)
+    m_downmixing(false),
+    m_convertingFloat(false)
 {
     QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
 
@@ -24,6 +25,14 @@ CLAudioDevice::CLAudioDevice(QAudioFormat format)
         if (format.channels()>2)
         {
             format.setChannels(2);
+
+            if (format.sampleType() == QAudioFormat::Float)
+            {
+                format.setSampleType(QAudioFormat::SignedInt);
+                format.setSampleSize(16);
+                m_convertingFloat = true;
+            }
+            
             if (!info.isFormatSupported(format)) 
             {
                 cl_log.log("audio format not supported by backend, cannot play audio.", cl_logERROR);
@@ -62,6 +71,11 @@ CLAudioDevice::~CLAudioDevice()
 bool CLAudioDevice::downmixing() const
 {
     return m_downmixing;
+}
+
+bool CLAudioDevice::convertingFloat() const
+{
+    return m_convertingFloat;
 }
 
 bool CLAudioDevice::wantMoreData() 

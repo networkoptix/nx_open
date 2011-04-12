@@ -26,6 +26,8 @@ public:
     // returns true if data must be down mixed into to channels
     bool downmixing() const;
 
+    bool convertingFloat() const;
+
     // returns true if more data wanted; should be followed by write call
     // more data wanted if we can write at least one chunk of data in qt buffer and in ring buffer there is less than one chunk
     bool wantMoreData();
@@ -56,6 +58,7 @@ private:
 
     QIODevice* m_audioBuffer; // not owned by this class 
     bool m_downmixing;
+    bool m_convertingFloat;
 
     QAudioFormat m_format;
 };

@@ -155,7 +155,7 @@ bool CLFFmpegAudioDecoder::decode(CLAudioData& data)
 		data.format.setChannels(c->channels);
 
 	data.format.setCodec("audio/pcm");
-	data.format.setByteOrder(QAudioFormat::BigEndian);
+	data.format.setByteOrder(QAudioFormat::LittleEndian);
 
 	switch(c->sample_fmt)
 	{

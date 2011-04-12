@@ -204,11 +204,15 @@ void CLAudioStreamDisplay::putData(CLCompressedAudioData* data)
         if (!m_audioDevice)
             m_audioDevice = new CLAudioDevice(audio.format);
 
+        if (m_audioDevice->convertingFloat())
+        {
+            float2int(audio);
+            audio.outbuf_len /= 2;
+        }
+
         if (audio.format.channels() > 2 && m_audioDevice->downmixing())
             downmix(audio);
 
-        if (audio.format.sampleType() == QAudioFormat::Float)
-            float2int(audio);
 
         m_audioDevice->write(audio.outbuf->data(), audio.outbuf_len);
     }
@@ -235,17 +239,17 @@ void CLAudioStreamDisplay::float2int(CLAudioData& audio)
 {
 	Q_ASSERT(sizeof(float) == 4); // not sure about sizeof(float) in 64 bit version
 
-	qint32* p = (qint32*)(audio.outbuf->data());
+	qint32* inP = (qint32*)(audio.outbuf->data());
+    qint16* outP = (qint16*)inP;
 	int len = audio.outbuf_len/4;
 
 	for (int i = 0; i < len; ++i)
 	{
-		float f = *((float*)p); 
-		*p = (qint32)(f * (1 << 31));
-		++p;
+		float f = *((float*)inP); 
+		*outP = (qint16)(f * (1 << 15));
+		++inP;
+        ++outP;
 	}
-
-	audio.format.setSampleType(QAudioFormat::SignedInt);
 }
 
 int CLAudioStreamDisplay::playAfterMs() const
