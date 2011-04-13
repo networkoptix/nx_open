@@ -43,6 +43,7 @@ void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args
 	cl_log.log("FFMPEG ", szMsg, cl_logERROR);
 }
 
+#ifndef UNICLIENT_TESTS
 int main(int argc, char *argv[])
 {
 //	av_log_set_callback(decoderLogCallback);
@@ -149,3 +150,4 @@ int main(int argc, char *argv[])
 
 	CLDevice::stopCommandProc();
 }
+#endif
