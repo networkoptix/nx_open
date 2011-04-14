@@ -17,8 +17,17 @@ public:
 	virtual QString name() const;
 
 	// returns all available devices 
-	virtual CLDeviceList findDevices();
+    virtual CLDeviceList findDevices();
 
+private:
+
+    struct AvigilonCam
+    {
+        QString ip;
+        QString mac;
+    };
+
+    QList<AvigilonCam> mCams;
 
 };
 
