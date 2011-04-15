@@ -88,9 +88,9 @@ bool CLPing::ping(const QString& ip, int retry, int timeoutPerRetry, int packetS
 	} 
 	else 
 	{
-		cl_log.log(ip + " CLPing: Call to IcmpSendEcho2 failed", cl_logERROR);
+		cl_log.log(ip + " CLPing: Call to IcmpSendEcho failed", cl_logERROR);
 
-		printf("Call to IcmpSendEcho2 failed.\n");
+		printf("Call to IcmpSendEcho failed.\n");
 		dwError = GetLastError();
 		switch (dwError) {
 		case IP_BUF_TOO_SMALL:

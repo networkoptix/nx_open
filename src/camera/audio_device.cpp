@@ -25,22 +25,22 @@ CLAudioDevice::CLAudioDevice(QAudioFormat format)
         if (format.channels()>2)
         {
             format.setChannels(2);
-
-            if (format.sampleType() == QAudioFormat::Float)
-            {
-                format.setSampleType(QAudioFormat::SignedInt);
-                format.setSampleSize(16);
-                m_convertingFloat = true;
-            }
-            
-            if (!info.isFormatSupported(format)) 
-            {
-                cl_log.log("audio format not supported by backend, cannot play audio.", cl_logERROR);
-                supported = false;
-            }
-
             m_downmixing = true;
         }
+
+        if (format.sampleType() == QAudioFormat::Float)
+        {
+            format.setSampleType(QAudioFormat::SignedInt);
+            format.setSampleSize(16);
+            m_convertingFloat = true;
+        }
+            
+        if (!info.isFormatSupported(format)) 
+        {
+            cl_log.log("audio format not supported by backend, cannot play audio.", cl_logERROR);
+            supported = false;
+        }
+
     }
 
     if (supported)
