@@ -48,6 +48,8 @@ AreconVisionDlgManufacture::AreconVisionDlgManufacture()
 
 	mPossibleNames.push_back("3130");
 	mPossibleNames.push_back("3135");
+    mPossibleNames.push_back("20185");
+    mPossibleNames.push_back("20365");
 
 	QList<QString> base = mPossibleNames;
 
