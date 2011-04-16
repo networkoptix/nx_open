@@ -92,6 +92,11 @@ AVCodec* CLFFmpegVideoDecoder::findCodec(CLCodecType codecId)
     case CL_QTRLE:
         codec = avcodec_find_decoder(CODEC_ID_QTRLE);
         break;
+
+    case CL_SVQ3:
+        codec = avcodec_find_decoder(CODEC_ID_SVQ3);
+        break;
+
     }
 
     return codec;
