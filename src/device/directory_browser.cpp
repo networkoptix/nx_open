@@ -111,6 +111,8 @@ CLDeviceList CLDeviceDirectoryBrowser::findDevices(const QString& directory)
         filter << "*.mpeg";
         filter << "*.mpg";
         filter << "*.mpe";
+        filter << "*.m2ts";
+        
 
         /*
         filter << "*.";
