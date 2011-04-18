@@ -143,59 +143,62 @@ bool CLAVIStreamReader::init()
 		}
 	}
 
-	CodecID ffmpeg_video_codec_id = m_formatContext->streams[m_videoStreamIndex]->codec->codec_id;
+    if (m_videoStreamIndex != -1)
+    {
+	    CodecID ffmpeg_video_codec_id = m_formatContext->streams[m_videoStreamIndex]->codec->codec_id;
 
-	switch(ffmpeg_video_codec_id)
-	{
-	case CODEC_ID_MSVIDEO1:
-		m_videoCodecId = CL_MSVIDEO1;
-		break;
+	    switch(ffmpeg_video_codec_id)
+	    {
+	    case CODEC_ID_MSVIDEO1:
+		    m_videoCodecId = CL_MSVIDEO1;
+		    break;
 
-	case CODEC_ID_MJPEG:
-		m_videoCodecId =CL_JPEG;
-		break;
+	    case CODEC_ID_MJPEG:
+		    m_videoCodecId =CL_JPEG;
+		    break;
 
-	case CODEC_ID_MPEG2VIDEO:
-		m_videoCodecId = CL_MPEG2;
-		break;
+	    case CODEC_ID_MPEG2VIDEO:
+		    m_videoCodecId = CL_MPEG2;
+		    break;
 
-	case CODEC_ID_MPEG4:
-		m_videoCodecId = CL_MPEG4;
-		break;
+	    case CODEC_ID_MPEG4:
+		    m_videoCodecId = CL_MPEG4;
+		    break;
 
-	case CODEC_ID_MSMPEG4V3:
-		m_videoCodecId = CL_MSMPEG4V3;
-		break;
+	    case CODEC_ID_MSMPEG4V3:
+		    m_videoCodecId = CL_MSMPEG4V3;
+		    break;
 
-    case CODEC_ID_QTRLE:
-        m_videoCodecId = CL_QTRLE;
-        break;
+        case CODEC_ID_QTRLE:
+            m_videoCodecId = CL_QTRLE;
+            break;
 
-	case CODEC_ID_MPEG1VIDEO:
-		m_videoCodecId = CL_MPEG1VIDEO;
-		break;
+	    case CODEC_ID_MPEG1VIDEO:
+		    m_videoCodecId = CL_MPEG1VIDEO;
+		    break;
 
-	case CODEC_ID_MSMPEG4V2:
-		m_videoCodecId = CL_MSMPEG4V2;
-		break;
+	    case CODEC_ID_MSMPEG4V2:
+		    m_videoCodecId = CL_MSMPEG4V2;
+		    break;
 
-	case CODEC_ID_WMV3:
-		m_videoCodecId = CL_WMV3;
-		break;
+	    case CODEC_ID_WMV3:
+		    m_videoCodecId = CL_WMV3;
+		    break;
 
     case CODEC_ID_SVQ3:
         m_videoCodecId = CL_SVQ3;
         break;
 
 
-	case CODEC_ID_H264:
-		m_videoCodecId = CL_H264;
-		break;
+	    case CODEC_ID_H264:
+		    m_videoCodecId = CL_H264;
+		    break;
 
-	default:
-		destroy();
-		return false;
-	}
+	    default:
+		    destroy();
+		    return false;
+	    }
+    }
 
 	if (m_audioStreamIndex!=-1)
 	{
