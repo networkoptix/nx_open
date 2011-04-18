@@ -35,8 +35,6 @@ public:
 	bool isContentChanged() const;
 	void setContentChanged(bool changed);
 
-	void setMaxFps(int max_fps);
-
     void saveLayoutContent();
 
 	//================================================
@@ -94,6 +92,7 @@ protected slots:
 	void onItemDoubleClick(CLAbstractSceneItem* item);
 	void onItemFullScreen(CLAbstractSceneItem* item);
 	void onItemSelected(CLAbstractSceneItem* item);
+    void onNeedToUpdateItem(CLAbstractSceneItem* );
     void onReachedTheEnd();
 
 	void onAspectRatioChanged(CLAbstractSceneItem* wnd);

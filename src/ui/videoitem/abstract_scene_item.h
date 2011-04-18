@@ -58,6 +58,10 @@ public:
 	void needUpdate(bool val)
 	{
 		m_needUpdate = val;
+
+        if (m_needUpdate && (isFullScreen() || isItemSelected()))
+            emit onNeedToUpdate(this);
+
 	}
 
 	virtual int height() const;
@@ -110,6 +114,7 @@ signals:
 	void onDoubleClick(CLAbstractSceneItem*);
 	void onFullScreen(CLAbstractSceneItem*);
 	void onSelected(CLAbstractSceneItem*);
+    void onNeedToUpdate(CLAbstractSceneItem*);
 
 protected slots:
         void stopSteadyAnimation();

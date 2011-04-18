@@ -31,8 +31,7 @@ qreal long_ratio = 2.7/1;
 
 static const int max_items = 40;
 
-int MAX_FPS_normal = 35;
-int MAX_FPS_selected = 100;
+const int MAX_FPS = 35;
 
 extern int scene_zoom_duration;
 
@@ -107,15 +106,6 @@ void SceneLayout::setContentChanged(bool changed)
 	m_contentchanged = changed;
 }
 
-void SceneLayout::setMaxFps(int max_fps)
-{
-	CL_LOG(cl_logDEBUG1)
-	{
-		cl_log.log("max fps = ", max_fps, cl_logDEBUG1);
-	}
-
-	m_videotimer.setInterval(1000/max_fps);
-}
 
 void SceneLayout::start()
 {
@@ -128,7 +118,7 @@ void SceneLayout::start()
 
 	m_contentchanged = false;
 	m_timer.start(20);
-	m_videotimer.start(1000/MAX_FPS_normal); 
+	m_videotimer.start(1000/MAX_FPS); 
 	m_isRunning = true;
 
 }
@@ -553,6 +543,8 @@ bool SceneLayout::addItem(CLAbstractSceneItem* item, bool update_scene_rect, CLB
 
 	connect(item, SIGNAL(onSelected(CLAbstractSceneItem*)), this, SLOT(onItemSelected(CLAbstractSceneItem* )));
 
+    connect(item, SIGNAL(onNeedToUpdate(CLAbstractSceneItem*)), this, SLOT(onNeedToUpdateItem(CLAbstractSceneItem* )));
+
 	//===========
 	connect(item, SIGNAL(onClose(CLAbstractSubItemContainer*)), this, SLOT(onItemClose(CLAbstractSubItemContainer*)));
 
@@ -765,6 +757,15 @@ bool SceneLayout::removeDevices(QList<CLAbstractComplicatedItem*> lst)
 void SceneLayout::onReachedTheEnd()
 {
     emit reachedTheEnd();
+}
+
+void SceneLayout::onNeedToUpdateItem(CLAbstractSceneItem* item)
+{
+    if (!hasSuchItem(item))
+        return;
+
+    item->needUpdate(false);
+    item->update();
 }
 
 void SceneLayout::onItemSelected(CLAbstractSceneItem* item)

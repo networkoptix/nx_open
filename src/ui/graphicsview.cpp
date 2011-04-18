@@ -285,7 +285,6 @@ void GraphicsView::setZeroSelection()
 	m_last_selectedWnd = m_selectedWnd;
 	m_selectedWnd  = 0;
 
-	m_camLayout.setMaxFps(MAX_FPS_normal);
 }
 
 void GraphicsView::setAllItemsQuality(CLStreamreader::StreamQuality q, bool increase)
@@ -1041,7 +1040,6 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 					m_last_selectedWnd = aitem;
 					aitem->setItemSelected(true, false);
 					aitem->setFullScreen(true);
-					m_camLayout.setMaxFps(MAX_FPS_selected);
 				}
 				else
 					onNewItemSelected_helper(aitem, doubl_clk_delay);
@@ -2216,8 +2214,6 @@ void GraphicsView::onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int de
 
 	m_scenezoom.zoom_abs(zoom, item_select_duration, delay, QPoint(0,0), CLAnimationTimeLine::SLOW_START_SLOW_END);
 
-	m_camLayout.setMaxFps(MAX_FPS_selected);
-
 }
 
 void GraphicsView::onCircle_helper(bool show)
@@ -2458,8 +2454,6 @@ void GraphicsView::onItemFullScreen_helper(CLAbstractSceneItem* wnd, int duratio
 	wnd->setItemSelected(true,false); // do not animate
 	m_selectedWnd = wnd;
 	m_last_selectedWnd = wnd;
-
-	m_camLayout.setMaxFps(MAX_FPS_selected);
 
 }
 
