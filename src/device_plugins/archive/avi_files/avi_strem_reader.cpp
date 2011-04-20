@@ -210,6 +210,10 @@ bool CLAVIStreamReader::init()
 
 		switch(ffmpeg_audio_codec_id )
 		{
+        case CODEC_ID_PCM_S16LE:
+            m_audioCodecId = CL_PCM_S16LE;
+            break;
+
 		case CODEC_ID_MP2:
 			m_audioCodecId = CL_MP2;
 			break;

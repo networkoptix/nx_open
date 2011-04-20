@@ -35,6 +35,10 @@ m_codec(codec_id)
 	switch(m_codec)
 	{
 
+    case CL_PCM_S16LE:
+        codec = avcodec_find_decoder(CODEC_ID_PCM_S16LE);
+        break;
+
 	case CL_MP2:
 		codec = avcodec_find_decoder(CODEC_ID_MP2);
 		break;
