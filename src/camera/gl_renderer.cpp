@@ -723,7 +723,7 @@ bool CLGLRenderer::paintEvent(const QRect& r)
 	if (m_stride == 0)
 		return true;
 
-	bool draw = (m_width < ms_maxTextureSize) && (m_height < ms_maxTextureSize);
+	bool draw = (m_width < getMaxTextureSize()) && (m_height < getMaxTextureSize());
 
 	if (draw)
 	{
