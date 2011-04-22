@@ -3,6 +3,7 @@
 #include "../decoders/video/abstractdecoder.h"
 #include "../data/mediadata.h"
 #include "abstractrenderer.h"
+#include "gl_renderer.h"
 
 PixelFormat pixelFormatFromColorSpace(CLColorSpace colorSpace)
 {
@@ -67,14 +68,20 @@ CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::getCurrentDownscale
 	return m_scaleFactor;
 }
 
-void CLVideoStreamDisplay::allocScaleContext(const CLVideoDecoderOutput& outFrame)
+bool CLVideoStreamDisplay::allocScaleContext(const CLVideoDecoderOutput& outFrame, int newWidth, int newHeight)
 {
-	m_outputWidth = outFrame.width / m_scaleFactor;
-	m_outputHeight = outFrame.height / m_scaleFactor;
+    m_outputWidth = newWidth;
+    m_outputHeight = newHeight;
 
 	m_scaleContext = sws_getContext(outFrame.width, outFrame.height, pixelFormatFromColorSpace(outFrame.out_type),
 		m_outputWidth, m_outputHeight, PIX_FMT_YUV420P,
 		SWS_POINT, NULL, NULL, NULL);
+
+    if (m_scaleContext == 0)
+    {
+        cl_log.log("Can't get swscale context", cl_logERROR);
+        return false;
+    }
 
 	m_frameYUV = avcodec_alloc_frame();
 
@@ -84,6 +91,8 @@ void CLVideoStreamDisplay::allocScaleContext(const CLVideoDecoderOutput& outFram
 	m_buffer = (uint8_t*)av_malloc(numBytes * sizeof(uint8_t));
 
 	avpicture_fill((AVPicture *)m_frameYUV, m_buffer, PIX_FMT_YUV420P, m_outputWidth, m_outputHeight);
+
+    return true;
 }
 
 void CLVideoStreamDisplay::freeScaleContext()
@@ -150,12 +159,10 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 		if (force_factor==CLVideoDecoderOutput::factor_any) // if nobody pushing lets peek it 
 		{
 			QSize on_screen = m_draw->sizeOnScreen(data->channelNumber);
-			if (on_screen.width()*8 <= img.outFrame.width  && on_screen.height()*8 <= img.outFrame.height) // never use 8 factor ( to low quality )
-				m_scaleFactor = CLVideoDecoderOutput::factor_8;
-			if (on_screen.width()*4 <= img.outFrame.width  && on_screen.height()*4 <= img.outFrame.height)
-				m_scaleFactor = CLVideoDecoderOutput::factor_4;
-			else if (on_screen.width()*2 <= img.outFrame.width  && on_screen.height()*2 <= img.outFrame.height)
-				m_scaleFactor = CLVideoDecoderOutput::factor_2;
+
+            CLVideoDecoderOutput::downscale_factor scaleFactor = findScaleFactor(img.outFrame.width, img.outFrame.height, on_screen.width(), on_screen.height());
+            if (scaleFactor != CLVideoDecoderOutput::factor_any)
+                m_scaleFactor = scaleFactor;
 
 			if (m_scaleFactor < m_prevFactor)
 			{
@@ -194,32 +201,7 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 				int newWidth = img.outFrame.width / m_scaleFactor;
 				int newHeight = img.outFrame.height / m_scaleFactor;
 
-				if (m_scaleContext != 0 && (m_outputWidth != newWidth || m_outputHeight != newHeight))
-				{
-					freeScaleContext();
-					allocScaleContext(img.outFrame);
-				} else if (m_scaleContext == 0)
-				{
-					allocScaleContext(img.outFrame);
-				}
-
-				const uint8_t* const srcSlice[] = {img.outFrame.C1, img.outFrame.C2, img.outFrame.C3};
-				int srcStride[] = {img.outFrame.stride1, img.outFrame.stride2, img.outFrame.stride3};
-
-				sws_scale(m_scaleContext,srcSlice, srcStride, 0, 
-					img.outFrame.height, 
-					m_frameYUV->data, m_frameYUV->linesize);
-
-				m_outFrame.width = m_outputWidth;
-				m_outFrame.height = m_outputHeight;
-
-				m_outFrame.C1 = m_frameYUV->data[0];
-				m_outFrame.C2 = m_frameYUV->data[1];
-				m_outFrame.C3 = m_frameYUV->data[2];
-
-				m_outFrame.stride1 = m_frameYUV->linesize[0];
-				m_outFrame.stride2 = m_frameYUV->linesize[1];
-				m_outFrame.stride3 = m_frameYUV->linesize[2];
+                rescaleFrame(img.outFrame, newWidth, newHeight);
 			} else 
 			{
 				CLVideoDecoderOutput::downscale(&img.outFrame, &m_outFrame, m_scaleFactor); // extra cpu work but less to display( for weak video cards )
@@ -227,9 +209,57 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 			m_draw->draw(m_outFrame, data->channelNumber);
 		}
 
-	}
-	else
-		m_draw->draw(img.outFrame, data->channelNumber);
+	} else
+    {
+        int maxTextureSize = CLGLRenderer::getMaxTextureSize();
+
+
+        CLVideoDecoderOutput::downscale_factor scaleFactor = findOversizeScaleFactor(img.outFrame.width, img.outFrame.height, maxTextureSize, maxTextureSize);
+        if (scaleFactor != CLVideoDecoderOutput::factor_1)
+        {
+            CLVideoDecoderOutput::downscale(&img.outFrame, &m_outFrame, scaleFactor);
+            m_draw->draw(m_outFrame, data->channelNumber);
+        }
+        else
+        {
+            m_draw->draw(img.outFrame, data->channelNumber);
+        }
+        
+    }
+}
+
+bool CLVideoStreamDisplay::rescaleFrame(CLVideoDecoderOutput& outFrame, int newWidth, int newHeight)
+{
+    if (m_scaleContext != 0 && (m_outputWidth != newWidth || m_outputHeight != newHeight))
+    {
+        freeScaleContext();
+        if (!allocScaleContext(outFrame, newWidth, newHeight))
+            return false;
+    }
+    else if (m_scaleContext == 0)
+    {
+        if (!allocScaleContext(outFrame, newWidth, newHeight))
+            return false;
+    }
+
+    const uint8_t* const srcSlice[] = {outFrame.C1, outFrame.C2, outFrame.C3};
+    int srcStride[] = {outFrame.stride1, outFrame.stride2, outFrame.stride3};
+
+    sws_scale(m_scaleContext,srcSlice, srcStride, 0, 
+        outFrame.height, m_frameYUV->data, m_frameYUV->linesize);
+
+    m_outFrame.width = m_outputWidth;
+    m_outFrame.height = m_outputHeight;
+
+    m_outFrame.C1 = m_frameYUV->data[0];
+    m_outFrame.C2 = m_frameYUV->data[1];
+    m_outFrame.C3 = m_frameYUV->data[2];
+
+    m_outFrame.stride1 = m_frameYUV->linesize[0];
+    m_outFrame.stride2 = m_frameYUV->linesize[1];
+    m_outFrame.stride3 = m_frameYUV->linesize[2];
+
+    return true;
 }
 
 void CLVideoStreamDisplay::setLightCPUMode(bool val)
@@ -245,4 +275,53 @@ void CLVideoStreamDisplay::setLightCPUMode(bool val)
 void CLVideoStreamDisplay::copyImage(bool copy)
 {
 	m_draw->copyVideoDataBeforePainting(copy);
+}
+
+CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::findScaleFactor(int width, int height, int fitWidth, int fitHeight)
+{
+    if (fitWidth * 8 <= width  && fitHeight * 8 <= height) // never use 8 factor ( to low quality )
+        return CLVideoDecoderOutput::factor_8;
+    if (fitWidth * 4 <= width  && fitHeight * 4 <= height)
+        return CLVideoDecoderOutput::factor_4;
+    else if (fitWidth * 2 <= width  && fitHeight * 2 <= height)
+        return CLVideoDecoderOutput::factor_2;
+
+    return CLVideoDecoderOutput::factor_any;
+}
+
+CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::findOversizeScaleFactor(int width, int height, int fitWidth, int fitHeight)
+{
+    CLVideoDecoderOutput::downscale_factor scaleFactor = CLVideoDecoderOutput::factor_1;
+
+    int newWidth = width;
+    int newHeight = height;
+
+    if (newWidth > fitWidth || newHeight > fitHeight)
+    {
+        newWidth = width / 2;
+        newHeight = height / 2;
+        scaleFactor = CLVideoDecoderOutput::factor_2;
+    }
+
+    if (newWidth > fitWidth || newHeight > fitHeight)
+    {
+        newWidth = width / 4;
+        newHeight = height / 4;
+        scaleFactor = CLVideoDecoderOutput::factor_4;
+    }
+
+    if (newWidth > fitWidth || newHeight > fitHeight)
+    {
+        newWidth = width / 8;
+        newHeight = height / 8;
+        scaleFactor = CLVideoDecoderOutput::factor_8;
+    }
+
+    if (newWidth > fitWidth || newHeight > fitHeight)
+    {
+        // Giving up. The error will be shown later.
+        scaleFactor = CLVideoDecoderOutput::factor_1;
+    }
+
+    return scaleFactor;
 }

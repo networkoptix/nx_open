@@ -47,8 +47,11 @@ private:
 	int m_outputHeight;
 
 private:
-	void allocScaleContext(const CLVideoDecoderOutput& outFrame);
+	bool allocScaleContext(const CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);
 	void freeScaleContext();
+    bool rescaleFrame(CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);
+    CLVideoDecoderOutput::downscale_factor findScaleFactor(int width, int height, int fitWidth, int fitHeight);
+    CLVideoDecoderOutput::downscale_factor findOversizeScaleFactor(int width, int height, int fitWidth, int fitHeight);
 };
 
 #endif //videostreamdisplay_h_2044

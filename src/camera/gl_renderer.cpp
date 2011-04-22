@@ -107,6 +107,7 @@ static const char yuy2ToRgb[] =
 "END";
 
 int CLGLRenderer::gl_status = CLGLRenderer::CL_GL_NOT_TESTED;
+GLint CLGLRenderer::ms_maxTextureSize = 0;
 QList<GLuint*> CLGLRenderer::mGarbage;
 
 CLGLRenderer::CLGLRenderer(CLVideoWindowItem *vw):
@@ -130,10 +131,6 @@ m_inited(false),
 m_textureUploaded(false)
 {
 	applyMixerSettings(m_brightness, m_contrast, m_hue, m_saturation);
-
-	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &mTexSize); 
-	cl_log.log("Max Texture size: ", mTexSize,cl_logALWAYS);
-
 }
 
 int CLGLRenderer::checkOpenGLError() const
@@ -354,9 +351,15 @@ void CLGLRenderer::init(bool msgbox)
 
 }
 
-int CLGLRenderer::getMaxTextureSize() const
+int CLGLRenderer::getMaxTextureSize()
 {
-	return mTexSize;
+    if (ms_maxTextureSize == 0)
+    {
+        glGetIntegerv(GL_MAX_TEXTURE_SIZE, &ms_maxTextureSize); 
+        cl_log.log("Max Texture size: ", ms_maxTextureSize,cl_logALWAYS);
+    }
+
+	return ms_maxTextureSize;
 }
 
 void CLGLRenderer::beforeDestroy()
@@ -720,7 +723,7 @@ bool CLGLRenderer::paintEvent(const QRect& r)
 	if (m_stride == 0)
 		return true;
 
-	bool draw = (m_width < mTexSize) && (m_height < mTexSize);
+	bool draw = (m_width < ms_maxTextureSize) && (m_height < ms_maxTextureSize);
 
 	if (draw)
 	{
