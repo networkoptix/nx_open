@@ -75,7 +75,7 @@
         <Directory Id="NetworkOptix" Name="$(env.ORGANIZATION_NAME)">
           <Directory Id="INSTALLDIR" Name="$(env.APPLICATION_NAME)">
             <Component Id="MainExecutable" Guid="B9B60D1E-3B2C-47dd-9922-A1FC5F3818D4">
-              <File Id="UniclientEXE" Name="uniclient.exe" Source="../bin/release/uniclient.exe" KeyPath="yes">
+              <File Id="UniclientEXE" Name="eveplayer.exe" Source="../bin/release/eveplayer.exe" KeyPath="yes">
                 <fire:FirewallException Id="FirewallException" Name="$(env.APPLICATION_NAME)" Scope="any"/>
                 <Shortcut Id="startmenuUniclient" Directory="ProgramMenuDir" Name="$(env.APPLICATION_NAME)"
                                   WorkingDirectory='INSTALLDIR' Advertise="yes" Icon="icon_menu.exe">
@@ -109,10 +109,6 @@
             </Component>
 
             
-            <Component Id="Intro" Guid="81A16E24-1A84-4044-B52A-E12E7A01D6F3">
-              <File Id="IntroMov" Name="intro.mov" Source="../../uniclient_media/intro.mov"/>
-            </Component>
-
             <Directory Id="arecontvision" Name="arecontvision">
               <Component Id="arecontvision" Guid="3A62601C-9F6A-45b0-AEFB-8C5DD70437F0">
                 <File Id="devicesxml" Name="devices.xml" Source="../resource/arecontvision/devices.xml"/>
@@ -154,7 +150,6 @@
       <ComponentRef Id="MainExecutable" />
       <ComponentRef Id="FFmpegLibraries"/>
       <ComponentRef Id="QTLibraries" />
-      <ComponentRef Id="Intro" />
       <ComponentRef Id='ProgramMenuDir' />
       <ComponentRef Id='Settings'/>
       <ComponentRef Id='arecontvision'/>

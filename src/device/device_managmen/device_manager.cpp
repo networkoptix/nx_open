@@ -51,6 +51,7 @@ mNeedresultsFromDirbrowsr(false)
     pleaseCheckDirs(checkLst);
 
 
+    /*/
     {
         // intro video device 
         CLDeviceList lst;
@@ -58,6 +59,7 @@ mNeedresultsFromDirbrowsr(false)
         lst[dev->getUniqueId()] = dev;
         onNewDevices_helper(lst, generalArchiverId);
     }
+    /**/
     
 
 }

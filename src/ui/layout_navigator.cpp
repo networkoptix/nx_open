@@ -47,7 +47,8 @@ mCurrentContent(content)
 	connect(&m_videoView.getCamLayOut(), SIGNAL(onNewLayoutItemSelected(LayoutContent*)), this, SLOT(onNewLayoutItemSelected(LayoutContent*)));
 
 	if (mCurrentContent==0)
-		mCurrentContent = CLSceneLayoutManager::instance().introScreenLayoutContent();
+		//mCurrentContent = CLSceneLayoutManager::instance().introScreenLayoutContent();
+        mCurrentContent = CLSceneLayoutManager::instance().startScreenLayoutContent();
 
 	m_videoView.getCamLayOut().setContent(mCurrentContent);
 	m_videoView.getCamLayOut().start();
