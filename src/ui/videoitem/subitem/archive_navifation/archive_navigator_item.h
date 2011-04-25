@@ -26,7 +26,7 @@ public:
 
     bool isCursorOnSlider() const;
 
-    virtual void hideIfNeeded();
+    virtual void hideIfNeeded(int duration);
 protected:
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	virtual QRectF boundingRect() const;
