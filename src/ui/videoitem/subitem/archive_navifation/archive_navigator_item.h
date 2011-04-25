@@ -24,6 +24,9 @@ public:
 
 	void goToFullScreenMode(bool fullscreen);
 
+    bool isCursorOnSlider() const;
+
+    virtual void hideIfNeeded();
 protected:
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	virtual QRectF boundingRect() const;

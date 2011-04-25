@@ -17,6 +17,11 @@ public:
 
 	QString getName() const;
 
+    virtual void hideIfNeeded()
+    {
+        hide(500);
+    }
+
     virtual void hide(int duration) = 0;
     virtual void show(int duration) = 0;
 

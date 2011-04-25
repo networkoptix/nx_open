@@ -17,6 +17,14 @@ CLVideoWindowItem(view, layout, max_width, max_height, name)
     onResize();
 }
 
+void CLVideoWindowArchiveItem::goToSteadyMode(bool steady, bool instant)
+{
+    if (mArchiveNavigator->isCursorOnSlider())
+        return;
+
+    CLVideoWindowItem::goToSteadyMode(steady, instant);
+}
+
 CLVideoWindowArchiveItem::~CLVideoWindowArchiveItem()
 {
 	mArchiveNavigator->goToFullScreenMode(false);

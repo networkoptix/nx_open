@@ -92,6 +92,19 @@ CLArchiveNavigatorItem::~CLArchiveNavigatorItem()
 		goToFullScreenMode(false);
 }
 
+void CLArchiveNavigatorItem::hideIfNeeded()
+{
+    if (!isCursorOnSlider())
+    {
+        CLAbstractSubItem::hideIfNeeded();
+    }
+}
+
+bool CLArchiveNavigatorItem::isCursorOnSlider() const
+{
+    return mSlider->underMouse();
+}
+
 void CLArchiveNavigatorItem::goToFullScreenMode(bool fullscreen)
 {
 	if (mFullScreen == fullscreen) // already in this mode

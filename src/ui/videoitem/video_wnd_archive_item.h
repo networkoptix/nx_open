@@ -21,6 +21,8 @@ public:
 
 	virtual void setComplicatedItem(CLAbstractComplicatedItem* complicatedItem);
 
+    virtual void goToSteadyMode(bool steady, bool instant);
+
 public slots:
     void onResize();
 
