@@ -1676,7 +1676,7 @@ void GraphicsView::goToSteadyMode(bool steady)
         foreach(CLAbstractUnmovedItem* item, m_staticItems)
         {
             if (item != bk_item)
-                item->hideIfNeeded();
+                item->hideIfNeeded(500);
         }
 
         if (m_seachItem && m_seachItem->isVisible())

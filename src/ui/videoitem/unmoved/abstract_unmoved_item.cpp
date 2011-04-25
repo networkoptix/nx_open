@@ -15,6 +15,11 @@ CLAbstractUnmovedItem::~CLAbstractUnmovedItem()
 
 }
 
+void CLAbstractUnmovedItem::hideIfNeeded(int duration)
+{
+    hide(duration);
+}
+
 void CLAbstractUnmovedItem::setStaticPos(QPoint p)
 {
 	m_pos = p;

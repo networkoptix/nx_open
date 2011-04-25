@@ -92,11 +92,11 @@ CLArchiveNavigatorItem::~CLArchiveNavigatorItem()
 		goToFullScreenMode(false);
 }
 
-void CLArchiveNavigatorItem::hideIfNeeded()
+void CLArchiveNavigatorItem::hideIfNeeded(int duration)
 {
     if (!isCursorOnSlider())
     {
-        CLAbstractSubItem::hideIfNeeded();
+        CLAbstractSubItem::hideIfNeeded(duration);
     }
 }
 
