@@ -88,11 +88,11 @@
               </File>
             </Component>
             <Component Id="FFmpegLibraries" Guid="AD81912C-85E7-4f23-9106-6CF2CA5A5993">
-              <File Id="avcodecDll" Name="avcodec-52.dll" Source="../bin/release/avcodec-52.dll"/>
-              <File Id="avdeviceDll" Name="avdevice-52.dll" Source="../bin/release/avdevice-52.dll"/>
-              <File Id="avfilterDll" Name="avfilter-1.dll" Source="../bin/release/avfilter-1.dll"/>
-              <File Id="avformatDll" Name="avformat-52.dll" Source="../bin/release/avformat-52.dll"/>
-              <File Id="avutilDll" Name="avutil-50.dll" Source="../bin/release/avutil-50.dll"/>
+              <File Id="avcodecDll" Name="avcodec-53.dll" Source="../bin/release/avcodec-53.dll"/>
+              <File Id="avdeviceDll" Name="avdevice-53.dll" Source="../bin/release/avdevice-53.dll"/>
+              <File Id="avfilterDll" Name="avfilter-2.dll" Source="../bin/release/avfilter-2.dll"/>
+              <File Id="avformatDll" Name="avformat-53.dll" Source="../bin/release/avformat-53.dll"/>
+              <File Id="avutilDll" Name="avutil-51.dll" Source="../bin/release/avutil-51.dll"/>
               <File Id="swscaleDll" Name="swscale-0.dll" Source="../bin/release/swscale-0.dll"/>
             </Component>
 
