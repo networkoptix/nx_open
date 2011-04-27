@@ -262,10 +262,18 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
         resetDecoder();
     }
 
-	int got_picture = 0;
-	avcodec_decode_video(c, picture, &got_picture,(unsigned char*)data.inBuffer, data.bufferLength);
+    AVPacket avpkt;
+    av_init_packet(&avpkt);
+    avpkt.data = (unsigned char*)data.inBuffer;
+    avpkt.size = data.bufferLength;
+    // HACK for CorePNG to decode as normal PNG by default
+    avpkt.flags = AV_PKT_FLAG_KEY;
+    
+    int got_picture = 0;
+    avcodec_decode_video2(c, picture, &got_picture, &avpkt);
+
 	if (data.useTwice)
-		avcodec_decode_video(c, picture, &got_picture,(unsigned char*)data.inBuffer, data.bufferLength);
+        avcodec_decode_video2(c, picture, &got_picture, &avpkt);
 
 	if (got_picture )
 	{
