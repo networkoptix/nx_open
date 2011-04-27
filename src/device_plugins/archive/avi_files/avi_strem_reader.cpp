@@ -276,7 +276,7 @@ CLCompressedVideoData* CLAVIStreamReader::getVideoData(const AVPacket& packet, A
     data.done(packet.size + extra);
 
     videoData->compressionType = m_videoCodecId;
-    videoData->keyFrame = packet.flags & PKT_FLAG_KEY;
+    videoData->keyFrame = packet.flags & AV_PKT_FLAG_KEY;
     videoData->channelNumber = 0;
     videoData->timestamp = m_currentTime;
 

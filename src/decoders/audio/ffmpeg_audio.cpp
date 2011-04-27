@@ -137,8 +137,12 @@ bool CLFFmpegAudioDecoder::decode(CLAudioData& data)
 			}
 		}
 
-		int len = avcodec_decode_audio2(c, (short *)outbuf, &out_size,
-				inbuf_ptr, size);
+        AVPacket avpkt;
+        av_init_packet(&avpkt);
+        avpkt.data = (uint8_t*)inbuf_ptr;
+        avpkt.size = size;
+
+        int len = avcodec_decode_audio3(c, (short *)outbuf, &out_size, &avpkt);
 
 		//cl_log.log("after dec",  cl_logALWAYS);
 
