@@ -156,6 +156,8 @@ mWheelZooming(false)
 	m_gridItem->setPos(m_camLayout.getGridEngine().getSettings().left, m_camLayout.getGridEngine().getSettings().top);
 
 	setMinimumWidth(600);
+
+    setFrameShape(QFrame::NoFrame);
 }
 
 GraphicsView::~GraphicsView()
