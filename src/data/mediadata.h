@@ -17,6 +17,7 @@ enum CLCodecType
 	CL_MPEG1VIDEO,
     CL_QTRLE,
     CL_SVQ3,
+    CL_VP6F,
 
     CL_PCM_S16LE,
 	CL_MP2,
