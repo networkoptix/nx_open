@@ -26,31 +26,9 @@ PreferencesWindow::PreferencesWindow()
     updateView();
     updateCameras();
 
-//    setAutoFillBackground(false);
-
-    //QPalette palette;
-    //palette.setColor(backgroundRole(), app_bkr_color);
-    //setPalette(palette);
-
     setWindowOpacity(.90);
 
-    //=======================================================
-
-//    const int min_wisth = 1000;
-//    setMinimumWidth(min_wisth);
-//    setMinimumHeight(min_wisth*3/4);
-
-    //showFullScreen();
-
-    //=======================================================
-
-//    QLayout* ml = new QHBoxLayout();
-
-    ///QLayout* VLayout = new QVBoxLayout;
-    //setLayout(ml);
-
     resizeEvent(0);
-
 }
 
 PreferencesWindow::~PreferencesWindow()
@@ -112,9 +90,10 @@ void PreferencesWindow::updateView()
         networkInterfacesList->addItem(entryString);
     }
 
-    foreach(QString key, m_cameras.keys())
+    camerasList->clear();
+    foreach(CameraNameAndInfo camera, m_cameras)
     {
-        camerasList->addItem(key);
+        camerasList->addItem(camera.first);
     }
 
     if (ipv4entries.size() == 0)
@@ -130,15 +109,17 @@ void PreferencesWindow::updateView()
 void PreferencesWindow::updateCameras()
 {
     {
-        CLDeviceSearcher& seracher = CLDeviceManager::instance().getDeviceSearcher();
-        QMutexLocker lock(&seracher.all_devices_mtx);
-        CLDeviceList& devices =  seracher.getAllDevices();
+        CLDeviceSearcher& searcher = CLDeviceManager::instance().getDeviceSearcher();
+        QMutexLocker lock(&searcher.all_devices_mtx);
+
+        CLDeviceList& devices =  searcher.getAllDevices();
+        m_cameras.clear();
         foreach(CLDevice *device, devices.values())
         {
             if (!device->checkDeviceTypeFlag(CLDevice::NETWORK))
                 continue;
 
-            m_cameras.insert(device->getName(), cameraInfoString(device));
+            m_cameras.append(CameraNameAndInfo(device->getName(), cameraInfoString(device)));
         }
     }
 
@@ -149,7 +130,7 @@ QString PreferencesWindow::cameraInfoString(CLDevice *device)
 {
     CLNetworkDevice* networkDevice = (CLNetworkDevice*)device;
     
-    return QString("Name: %1\nCamer MAC Address: %2\nCamera IP Address: %3\nLocal IP Address: %4").arg(device->getName()).
+    return QString("Name: %1\nCamera MAC Address: %2\nCamera IP Address: %3\nLocal IP Address: %4").arg(device->getName()).
         arg(networkDevice->getMAC()).arg(networkDevice->getIP().toString()).arg(networkDevice->getDiscoveryAddr().toString());
 }
 
@@ -228,9 +209,9 @@ void PreferencesWindow::allowChangeIPChanged()
     m_settingsData.allowChangeIP = allowChangeIPCheckBox->isChecked();
 }
 
-void PreferencesWindow::cameraSelected()
+void PreferencesWindow::cameraSelected(int row)
 {
-    cameraInfoLabel->setText(m_cameras[camerasList->selectedItems().at(0)->text()]);
+    cameraInfoLabel->setText(m_cameras[row].second);
 }
 
 void PreferencesWindow::enterLicenseClick()

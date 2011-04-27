@@ -26,7 +26,10 @@ private:
 
 private:
     Settings::Data m_settingsData;
-    QMap<QString, QString> m_cameras;
+
+    typedef QPair<QString, QString> CameraNameAndInfo;
+
+    QList<CameraNameAndInfo> m_cameras;
 
 private slots:
     void accept();
@@ -34,7 +37,7 @@ private slots:
     void auxMediaFolderBrowse();
     void auxMediaFolderRemove();
     void allowChangeIPChanged();
-    void cameraSelected();
+    void cameraSelected(int);
     void enterLicenseClick();
 };
 

@@ -533,9 +533,9 @@ p, li { white-space: pre-wrap; }
   </connection>
   <connection>
    <sender>camerasList</sender>
-   <signal>itemSelectionChanged()</signal>
+   <signal>currentRowChanged(int)</signal>
    <receiver>PreferencesDialog</receiver>
-   <slot>cameraSelected()</slot>
+   <slot>cameraSelected(int)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>158</x>
@@ -569,7 +569,7 @@ p, li { white-space: pre-wrap; }
   <slot>auxMediaFolderBrowse()</slot>
   <slot>auxMediaFolderRemove()</slot>
   <slot>allowChangeIPChanged()</slot>
-  <slot>cameraSelected()</slot>
+  <slot>cameraSelected(int)</slot>
   <slot>enterLicenseClick()</slot>
  </slots>
 </ui>
