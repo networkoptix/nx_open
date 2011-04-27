@@ -1547,7 +1547,7 @@ void GraphicsView::mouseDoubleClickEvent( QMouseEvent * event )
 		onArrange_helper();
 		/**/
 
-		fitInView(2000, 0, CLAnimationTimeLine::INOUTBACK);
+		fitInView(1500, 0, CLAnimationTimeLine::SLOW_START_SLOW_END);
 
 		return;
 	}
