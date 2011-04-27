@@ -104,11 +104,18 @@ bool CLNetworkDevice::conflicting()
 
 	mac = getMacByIP(getIP(), false); // just in case if ARP response from some else have delayed 
 
-	if (mac!=m_mac)// someone else has this IP
+    
+
+	if (mac!=m_mac && mac!="00-00-00-00-00-00")// someone else has this IP
 	{
 		getStatus().setFlag(CLDeviceStatus::CONFLICTING);
 		return true;
 	}
+
+    if (mac!="00-00-00-00-00-00")
+    {
+        CL_LOG(cl_logERROR) cl_log.log("00-00-00-00-00-00 mac record in OS arp( got it once on WIN7) table?!", cl_logERROR);
+    }
 
 	CL_LOG(cl_logDEBUG2) cl_log.log("end of  CLNetworkDevice::conflicting(),  time elapsed: ", time.elapsed(), cl_logDEBUG2);
 	return false;
