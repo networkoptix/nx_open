@@ -283,12 +283,13 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
 		}
 
 		quint64 this_time = mMovie[channel].at(mCurrIndex[channel]).time;
+        quint64 skipTime = skipFramesToTime();
 
-        if (this_time <= skipFramesToTime())
+        if (skipTime && this_time <= skipTime)
         {
             videoData->ignore = true;
         }
-        else if (skipFramesToTime())
+        else if (skipTime)
         {
             m_skippedToTime[channel] = true;
 
