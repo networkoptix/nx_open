@@ -75,7 +75,7 @@
         <Directory Id="NetworkOptix" Name="$(env.ORGANIZATION_NAME)">
           <Directory Id="INSTALLDIR" Name="$(env.APPLICATION_NAME)">
             <Component Id="MainExecutable" Guid="B9B60D1E-3B2C-47dd-9922-A1FC5F3818D4">
-              <File Id="UniclientEXE" Name="eveplayer.exe" Source="../bin/release/eveplayer.exe" KeyPath="yes">
+              <File Id="UniclientEXE" Name="eveplayer_beta.exe" Source="../bin/release/eveplayer_beta.exe" KeyPath="yes">
                 <fire:FirewallException Id="FirewallException" Name="$(env.APPLICATION_NAME)" Scope="any"/>
                 <Shortcut Id="startmenuUniclient" Directory="ProgramMenuDir" Name="$(env.APPLICATION_NAME)"
                                   WorkingDirectory='INSTALLDIR' Advertise="yes" Icon="icon_menu.exe">

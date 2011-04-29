@@ -3,7 +3,7 @@ CONFIG += x86
 TEMPLATE = app
 VERSION = 0.0.1
 
-TARGET = eveplayer
+TARGET = eveplayer_beta
 
 debug {
   DESTDIR = ../bin/debug
