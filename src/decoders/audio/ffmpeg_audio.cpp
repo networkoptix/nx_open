@@ -39,6 +39,11 @@ m_codec(codec_id)
         codec = avcodec_find_decoder(CODEC_ID_PCM_S16LE);
         break;
 
+    case CL_PCM_U8:
+        codec = avcodec_find_decoder(CODEC_ID_PCM_U8);
+        break;
+
+
 	case CL_MP2:
 		codec = avcodec_find_decoder(CODEC_ID_MP2);
 		break;

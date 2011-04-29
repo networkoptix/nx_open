@@ -28,6 +28,12 @@ CLAudioDevice::CLAudioDevice(QAudioFormat format)
             m_downmixing = true;
         }
 
+        if (format.frequency()==11024)
+        {
+            format.setFrequency(11025);
+        }
+
+
         if (format.sampleType() == QAudioFormat::Float)
         {
             format.setSampleType(QAudioFormat::SignedInt);
@@ -80,6 +86,9 @@ bool CLAudioDevice::convertingFloat() const
 
 bool CLAudioDevice::wantMoreData() 
 {
+    if (!m_ringBuffer)
+        return false;
+
     tryMoveDatafromRingBufferToQtBuffer();
 
     return (m_ringBuffer->bytesAvailable() < m_ringBuffer->capacity()/2); // 7 is luky number
@@ -87,6 +96,9 @@ bool CLAudioDevice::wantMoreData()
 
 void CLAudioDevice::write(const char* data, unsigned long size)
 {
+    if (!m_ringBuffer)
+        return;
+
     // firs of all try to write all data to ring buffer 
     size = qMin (m_ringBuffer->avalable_to_write(), (qint64)size);
     m_ringBuffer->writeData(data,size);
