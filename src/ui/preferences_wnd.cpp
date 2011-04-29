@@ -64,7 +64,7 @@ void PreferencesWindow::updateView()
     if (Settings::instance().haveValidSerialNumber())
     {
         QPalette palette = licenseInfoLabel->palette();
-        palette.setColor(QPalette::Foreground, QColor(0,0xff,00));
+        palette.setColor(QPalette::Foreground, QColor(0,0,0));
         licenseInfoLabel->setPalette(palette);
 
         licenseInfoLabel->setText("You have valid license installed");
