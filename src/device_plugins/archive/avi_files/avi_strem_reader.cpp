@@ -219,6 +219,11 @@ bool CLAVIStreamReader::init()
             m_audioCodecId = CL_PCM_S16LE;
             break;
 
+        case CODEC_ID_PCM_U8:
+            m_audioCodecId = CL_PCM_U8;
+            break;
+
+
 		case CODEC_ID_MP2:
 			m_audioCodecId = CL_MP2;
 			break;
