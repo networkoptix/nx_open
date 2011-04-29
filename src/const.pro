@@ -30,7 +30,7 @@ win32 {
 }
 
 mac {
-  INCLUDEPATH += /Users/ivan/opt/ffmpeg/include
+  INCLUDEPATH += /Users/ivan/opt/$$FFMPEG-mingw-release/include
 
   PRIVATE_FRAMEWORKS.files = ../resource/arecontvision
   PRIVATE_FRAMEWORKS.path = Contents/MacOS
@@ -51,11 +51,15 @@ win32 {
   QMAKE_LFLAGS += avcodec-53.lib avdevice-53.lib avfilter-2.lib avformat-53.lib avutil-51.lib swscale-0.lib
   QMAKE_LFLAGS_DEBUG += /libpath:../contrib/$$FFMPEG/bin/debug
   QMAKE_LFLAGS_RELEASE += /libpath:../contrib/$$FFMPEG/bin/release
+#  QMAKE_LFLAGS_DEBUG += /libpath:../contrib/$$FFMPEG-mingw-debug/lib
+#  QMAKE_LFLAGS_RELEASE += /libpath:../contrib/$$FFMPEG-mingw-release/lib
 }  
 
 mac {
   LIBS += -framework SystemConfiguration
-  QMAKE_LFLAGS += -lavcodec.53 -lavdevice.53 -lavfilter.2 -lavformat.53 -lavutil.51 -lswscale.0 -lz -lbz2 -L/Users/ivan/opt/ffmpeg/lib
+  QMAKE_LFLAGS += -lavcodec.53 -lavdevice.53 -lavfilter.2 -lavformat.53 -lavutil.51 -lswscale.0 -lz -lbz2
+  QMAKE_LFLAGS_DEBUG += -L/Users/ivan/opt/$$FFMPEG-mingw-debug/lib
+  QMAKE_LFLAGS_RELEASE += -L/Users/ivan/opt/$$FFMPEG-mingw-release/lib
   QMAKE_POST_LINK += mkdir -p `dirname $(TARGET)`/arecontvision; cp -f ../bin/arecontvision/devices.xml `dirname $(TARGET)`/arecontvision
 }
 

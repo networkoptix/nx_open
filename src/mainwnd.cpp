@@ -33,10 +33,14 @@ m_normalView(0)
 	QLayout* l = new QHBoxLayout();
 	l->addWidget(&(m_normalView->getView()));
 
-    // Can't set 0,0,0,0 as in fullScreen mode context menu becomes invisible
+    // Can't set 0,0,0,0 on Windows as in fullScreen mode context menu becomes invisible
     // Looks like QT bug: http://bugreports.qt.nokia.com/browse/QTBUG-7556
+#ifdef _WIN32	
     l->setContentsMargins(0, 1, 0, 0);
-
+#else
+	l->setContentsMargins(0, 0, 0, 0);
+#endif
+	
 	m_normalView->setMode(NORMAL_ViewMode);
 	m_normalView->getView().setViewMode(GraphicsView::NormalView);
 

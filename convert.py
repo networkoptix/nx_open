@@ -10,6 +10,7 @@ import stat, time
 os.path = posixpath
 
 FFMPEG = 'ffmpeg-git-2011-04-27'
+# FFMPEG = 'ffmpeg-git-2011-04-29'
 INTRO_FILE = '../uniclient_media/intro.mov'
 
 EXCLUDE_DIRS = ('.svn', 'dxva')

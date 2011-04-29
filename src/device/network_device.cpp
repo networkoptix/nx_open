@@ -87,6 +87,12 @@ bool CLNetworkDevice::conflicting()
 
 	QString mac = getMacByIP(getIP());
 
+#ifndef _WIN32
+	// If mac is empty or resolution is not implemented
+	if (mac == "")
+		return false;
+#endif
+	
 	if (mac!=m_mac)// someone else has this IP
 	{
 		getStatus().setFlag(CLDeviceStatus::CONFLICTING);

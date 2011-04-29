@@ -177,11 +177,18 @@ void CommunicatingSocket::connect(const string &foreignAddress,
 #ifdef _WIN32
   ioctlsocket(sockDesc, FIONBIO, &iMode); // set sock in asynch mode
 #else
-  fcntl(sockDesc, F_SETFL, O_NONBLOCK);
+  // fcntl(sockDesc, F_SETFL, O_NONBLOCK);
 #endif
 
-  ::connect(sockDesc, (sockaddr *) &destAddr, sizeof(destAddr));// Try to connect to the given port
+  int connectResult = ::connect(sockDesc, (sockaddr *) &destAddr, sizeof(destAddr));// Try to connect to the given port
 
+#ifndef _WIN32
+  if (connectResult != 0) {
+	  throw SocketException("Connect failed (connect())", true);
+  }
+#endif
+
+#ifdef _WIN32
   timeval timeVal;
   fd_set wrtFDS;
   int iSelRet;
@@ -194,18 +201,18 @@ void CommunicatingSocket::connect(const string &foreignAddress,
   timeVal.tv_sec  = m_timeout/1000;
   timeVal.tv_usec = m_timeout%1000;
 
-  iSelRet = ::select(0, NULL, &wrtFDS, NULL, &timeVal);
+  iSelRet = ::select(sockDesc + 1, NULL, &wrtFDS, NULL, &timeVal);
 
   if (iSelRet<=0)
 	throw SocketException("Connect failed (connect())", true);
+#endif // _WIN32
 
   iMode = 0;
 #ifdef _WIN32
 	ioctlsocket(sockDesc, FIONBIO, &iMode); // set sock in asynch mode
 #else
-	fcntl(sockDesc, F_SETFL, 0);
+	// fcntl(sockDesc, F_SETFL, 0);
 #endif
-	
 }
 
 void CommunicatingSocket::setTimeOut( unsigned int ms )
