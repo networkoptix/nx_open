@@ -539,7 +539,13 @@ void GraphicsView::initDecoration()
 
 	if (serach)
 	{
+#ifdef _WIN32
 		m_seachItem = new CLSerachEditItem(this, this, m_camLayout.getContent());
+#else
+		// There is a problem on Mac OS X with embedding control into scene.
+		// As a temporary solution we are using separate window.
+		m_seachItem = new CLSerachEditItem(this, 0, m_camLayout.getContent());
+#endif
 	}
 	else
 	{
@@ -1997,7 +2003,6 @@ CLAbstractSceneItem* GraphicsView::navigationItem(QGraphicsItem* item) const
 
 void GraphicsView::drawBackground ( QPainter * painter, const QRectF & rect )
 {
-
     if (m_camLayout.getContent() == CLSceneLayoutManager::instance().introScreenLayoutContent())// ||
         //m_camLayout.getContent() == CLSceneLayoutManager::instance().startScreenLayoutContent() )
         return; // do not draw bgrd in case of intro video
