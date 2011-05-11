@@ -40,6 +40,8 @@ m_lastWidth(0)
 		// register all the codecs (you can also register only the m_codec you wish to have smaller code
 		avcodec_register_all();
 
+        cl_log.log("FFMEG version = ", (int)avcodec_version(), cl_logALWAYS) ;
+
 	}
 
 	//m_codec = avcodec_find_decoder(CODEC_ID_H264);
@@ -101,6 +103,9 @@ AVCodec* CLFFmpegVideoDecoder::findCodec(CLCodecType codecId)
         codec = avcodec_find_decoder(CODEC_ID_VP6F);
         break;
 
+    case CL_CINEPAK:
+        codec = avcodec_find_decoder(CODEC_ID_CINEPAK);
+        break;
 
     }
 
@@ -175,7 +180,10 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 {
 
 	if (m_codec==0)
+    {
+        cl_log.log("decoder not found: m_codec = 0", cl_logWARNING);
 		return false;
+    }
 
 	if (m_wantEscapeFromLightCPUMode && data.keyFrame)
 	{
@@ -355,6 +363,8 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 			goto gotpicture;
 
 		/**/
+
+        cl_log.log("cannot decode image", cl_logWARNING);
 
 		return false;
 	}

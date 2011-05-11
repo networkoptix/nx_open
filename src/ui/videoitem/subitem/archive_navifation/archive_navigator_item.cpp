@@ -102,7 +102,7 @@ void CLArchiveNavigatorItem::hideIfNeeded(int duration)
 
 bool CLArchiveNavigatorItem::isCursorOnSlider() const
 {
-    return mSlider->underMouse();
+    return isUnderMouse();
 }
 
 void CLArchiveNavigatorItem::goToFullScreenMode(bool fullscreen)

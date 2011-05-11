@@ -18,6 +18,7 @@ enum CLCodecType
     CL_QTRLE,
     CL_SVQ3,
     CL_VP6F,
+    CL_CINEPAK,
 
     CL_PCM_S16LE,
 	CL_MP2,
