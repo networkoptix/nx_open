@@ -131,6 +131,8 @@ protected:
 	//========navigation=======
 	void enableMultipleSelection(bool enable, bool unselect = true); 
 	bool isCTRLPressed(const QInputEvent* event) const;
+	bool isALTPressed(const QInputEvent* event) const;
+
 
 	bool isItemFullScreenZoomed(QGraphicsItem* item);
 
