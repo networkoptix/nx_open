@@ -148,5 +148,7 @@ if sys.platform == 'win32':
     os.unlink('test/uniclient_tests.vcproj')
     os.rename('test/uniclient_tests.new.vcproj', 'test/uniclient_tests.vcproj')
 elif sys.platform == 'darwin':
-    rmtree('src/uniclient.xcodeproj')
+    if os.path.exists('src/uniclient.xcodeproj'):
+        rmtree('src/uniclient.xcodeproj')
+
     os.system('qmake FFMPEG=%s -o src/uniclient.xcodeproj src/uniclient.pro' % FFMPEG)
