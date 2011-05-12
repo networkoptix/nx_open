@@ -7,7 +7,7 @@
 #include <QModelIndex>
 
 CLSerachEditItem::CLSerachEditItem(GraphicsView* view, QWidget* parent, LayoutContent* sceneContent):
-QWidget(parent),
+QWidget(parent, Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint),
 m_sceneContent(sceneContent),
 m_width(100),
 m_height(100),

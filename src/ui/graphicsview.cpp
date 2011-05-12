@@ -539,7 +539,13 @@ void GraphicsView::initDecoration()
 
 	if (serach)
 	{
+#ifdef _WIN32
 		m_seachItem = new CLSerachEditItem(this, this, m_camLayout.getContent());
+#else
+		// There is a problem on Mac OS X with embedding control into scene.
+		// As a temporary solution we are using separate window.
+		m_seachItem = new CLSerachEditItem(this, 0, m_camLayout.getContent());
+#endif
 	}
 	else
 	{
@@ -677,13 +683,14 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 			m_movingWnd = 1;
 		}
 	}
-	else if (event->button() == Qt::LeftButton && !isCTRLPressed(event)) 
+	else if (event->button() == Qt::LeftButton && !isCTRLPressed(event) && !isALTPressed(event)) 
 	{
 		//may be about to scroll the scene 
         m_handScrolling = true;
 		viewport()->setCursor(Qt::ClosedHandCursor);
 	}
-	else if (event->button() == Qt::RightButton && !isCTRLPressed(event)) 
+	else if ((event->button() == Qt::RightButton && !isCTRLPressed(event))
+			 || (event->button() == Qt::LeftButton && isALTPressed(event))) 
 	{
 		m_rotatingWnd = aitem;
 
@@ -722,7 +729,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 	bool left_button = event->buttons() & Qt::LeftButton;
 	bool right_button = event->buttons() & Qt::RightButton;
 
-	if (left_button && !isCTRLPressed(event)) 
+	if (left_button && !isCTRLPressed(event) && !isALTPressed(event)) 
 	{
 		//may be about to scroll the scene 
 		m_handScrolling = true;
@@ -755,7 +762,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 	}
 
 	//item movement 
-	if (left_button && isCTRLPressed(event) && m_scene.selectedItems().count() && m_movingWnd && m_camLayout.getContent()->checkIntereactionFlag(LayoutContent::ItemMovable))
+	if (left_button && isCTRLPressed(event) && !isALTPressed(event) && m_scene.selectedItems().count() && m_movingWnd && m_camLayout.getContent()->checkIntereactionFlag(LayoutContent::ItemMovable))
 	{
 		if (m_viewMode!=ItemsDonor)
 		{
@@ -815,7 +822,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 
 	}
 
-	if (m_rotatingWnd && right_button && m_camLayout.getContent()->checkIntereactionFlag(LayoutContent::ItemRotatable))
+	if (m_rotatingWnd && (right_button || (left_button && isALTPressed(event))) && m_camLayout.getContent()->checkIntereactionFlag(LayoutContent::ItemRotatable))
 	{
 
 		if (isItemStillExists(m_rotatingWnd))
@@ -960,7 +967,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 	}
 
-	if (rotating && right_button)
+	if (rotating /*&& (right_button || (left_button && isALTPressed(event)))*/)
 	{
 
 		m_ignore_conext_menu_event = true;
@@ -1006,7 +1013,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 
 	//====================================================
 
-	if (!handMoving && left_button && !isCTRLPressed(event) && !m_movingWnd)
+	if (!handMoving && left_button && !isCTRLPressed(event) && !isALTPressed(event) && !m_movingWnd)
 	{
 		// if left button released and we did not move the scene, and we did not move selected windows, so may bee need to zoom on the item
 
@@ -1098,7 +1105,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 		m_handMoving = 0;
 	}
 
-	if (right_button)
+//	if (right_button || (left_button && isALTPressed(event)))
 	{
 		m_rotationCounter = 0;
 		m_rotatingWnd = 0;
@@ -1958,6 +1965,11 @@ bool GraphicsView::isCTRLPressed(const QInputEvent* event) const
 	return event->modifiers() & Qt::ControlModifier;
 }
 
+bool GraphicsView::isALTPressed(const QInputEvent* event) const
+{
+	return event->modifiers() & Qt::AltModifier;
+}
+
 bool GraphicsView::isItemFullScreenZoomed(QGraphicsItem* item)
 {
 	QRectF scene_rect =  item->sceneBoundingRect();
@@ -1997,7 +2009,6 @@ CLAbstractSceneItem* GraphicsView::navigationItem(QGraphicsItem* item) const
 
 void GraphicsView::drawBackground ( QPainter * painter, const QRectF & rect )
 {
-
     if (m_camLayout.getContent() == CLSceneLayoutManager::instance().introScreenLayoutContent())// ||
         //m_camLayout.getContent() == CLSceneLayoutManager::instance().startScreenLayoutContent() )
         return; // do not draw bgrd in case of intro video

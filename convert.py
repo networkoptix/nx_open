@@ -9,7 +9,11 @@ import stat, time
 
 os.path = posixpath
 
-FFMPEG = 'ffmpeg-git-2011-04-27'
+if sys.platform == 'win32':
+    FFMPEG = 'ffmpeg-git-2011-04-27'
+else:
+    FFMPEG = 'ffmpeg-git-2011-05-09'
+
 INTRO_FILE = '../uniclient_media/intro.mov'
 
 EXCLUDE_DIRS = ('.svn', 'dxva')
@@ -144,5 +148,7 @@ if sys.platform == 'win32':
     os.unlink('test/uniclient_tests.vcproj')
     os.rename('test/uniclient_tests.new.vcproj', 'test/uniclient_tests.vcproj')
 elif sys.platform == 'darwin':
-    rmtree('src/uniclient.xcodeproj')
+    if os.path.exists('src/uniclient.xcodeproj'):
+        rmtree('src/uniclient.xcodeproj')
+
     os.system('qmake FFMPEG=%s -o src/uniclient.xcodeproj src/uniclient.pro' % FFMPEG)
