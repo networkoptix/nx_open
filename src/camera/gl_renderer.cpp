@@ -107,6 +107,9 @@ static const char yuy2ToRgb[] =
 "END";
 
 int CLGLRenderer::gl_status = CLGLRenderer::CL_GL_NOT_TESTED;
+GLint CLGLRenderer::ms_maxTextureSize = 0;
+QMutex CLGLRenderer::ms_maxTextureSizeMutex;
+
 QList<GLuint*> CLGLRenderer::mGarbage;
 
 CLGLRenderer::CLGLRenderer(CLVideoWindowItem *vw):
@@ -127,8 +130,7 @@ m_stride_old(0),
 m_height_old(0),
 m_needwait(true),
 m_inited(false),
-m_textureUploaded(false),
-m_maxTextureSize(0)
+m_textureUploaded(false)
 {
 	applyMixerSettings(m_brightness, m_contrast, m_hue, m_saturation);
 }
@@ -354,28 +356,24 @@ void CLGLRenderer::init(bool msgbox)
 
 }
 
-int CLGLRenderer::maxImageSize()
-{
-    return getMaxTextureSize();
-}
-
 int CLGLRenderer::getMaxTextureSize()
 {
-    if (m_maxTextureSize != 0)
-        return m_maxTextureSize;
+    if (ms_maxTextureSize)
+        return ms_maxTextureSize;
 
-    if (!m_inited)
     {
-        QMutexLocker init_locker_(&m_initMutex);
+        QMutexLocker maxTextureSizeLocker_(&ms_maxTextureSizeMutex);
 
-        init(false);
-        m_inited = true;
+        if (!ms_maxTextureSize)
+        {
+            glGetIntegerv(GL_MAX_TEXTURE_SIZE, &ms_maxTextureSize); 
+//            ms_maxTextureSize = 1024;
+
+            cl_log.log("Max Texture size: ", ms_maxTextureSize, cl_logALWAYS);
+        }
     }
 
-    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &m_maxTextureSize); 
-    cl_log.log("Max Texture size: ", m_maxTextureSize, cl_logALWAYS);
-
-	return m_maxTextureSize;
+	return ms_maxTextureSize;
 }
 
 void CLGLRenderer::beforeDestroy()
@@ -730,8 +728,6 @@ bool CLGLRenderer::paintEvent(const QRect& r)
 
     if (!m_inited)
     {
-        QMutexLocker init_locker_(&m_initMutex);
-
         init(gl_status == CL_GL_NOT_TESTED);
         m_inited = true;
     }

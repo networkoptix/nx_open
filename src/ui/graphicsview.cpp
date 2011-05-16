@@ -2009,6 +2009,10 @@ CLAbstractSceneItem* GraphicsView::navigationItem(QGraphicsItem* item) const
 
 void GraphicsView::drawBackground ( QPainter * painter, const QRectF & rect )
 {
+    // Initialize maxTextureSize value. It should be somewhere where GL context already initialized, otherwise it will return 0.
+    // Probably Medved6 knows better place.
+    CLGLRenderer::getMaxTextureSize();
+
     if (m_camLayout.getContent() == CLSceneLayoutManager::instance().introScreenLayoutContent())// ||
         //m_camLayout.getContent() == CLSceneLayoutManager::instance().startScreenLayoutContent() )
         return; // do not draw bgrd in case of intro video

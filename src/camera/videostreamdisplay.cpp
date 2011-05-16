@@ -145,6 +145,8 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 	if (!draw || !m_draw)
 		return;
 
+    int maxTextureSize = CLGLRenderer::getMaxTextureSize();
+
 	if (m_canDownscale)
 	{
 		//force_factor
@@ -192,28 +194,49 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 		if (m_scaleFactor == CLVideoDecoderOutput::factor_1 &&
             img.outFrame.out_type != CL_DECODER_RGB555LE && img.outFrame.out_type != CL_DECODER_RGB24)
 		{
-			m_draw->draw(img.outFrame, data->channelNumber);
+            // If there is no scaling needed check if size is greater than maximum allowed image size (maximum texture size for opengl).
+            CLVideoDecoderOutput::downscale_factor scaleFactor = findOversizeScaleFactor(img.outFrame.width, img.outFrame.height, maxTextureSize, maxTextureSize);
+            if (scaleFactor != CLVideoDecoderOutput::factor_1)
+            {
+                CLVideoDecoderOutput::downscale(&img.outFrame, &m_outFrame, scaleFactor);
+                m_draw->draw(m_outFrame, data->channelNumber);
+            } else
+            {
+                m_draw->draw(img.outFrame, data->channelNumber);
+            }
 		}
 		else
 		{
+            int newWidth = img.outFrame.width / m_scaleFactor;
+            int newHeight = img.outFrame.height / m_scaleFactor;
+            
+            CLVideoDecoderOutput::downscale_factor scaleFactor = findOversizeScaleFactor(newWidth, newHeight, maxTextureSize, maxTextureSize);
+            newWidth /= scaleFactor;
+            newHeight /= scaleFactor;
+            
+            // It's possible m_scaleFactor and scaleFactor both are not equal to 1.
+            int scale = m_scaleFactor * scaleFactor;
+
 			if (img.outFrame.out_type == CL_DECODER_RGB555LE || img.outFrame.out_type == CL_DECODER_RGB24)
 			{
-				int newWidth = img.outFrame.width / m_scaleFactor;
-				int newHeight = img.outFrame.height / m_scaleFactor;
-
                 rescaleFrame(img.outFrame, newWidth, newHeight);
 			} else 
 			{
-				CLVideoDecoderOutput::downscale(&img.outFrame, &m_outFrame, m_scaleFactor); // extra cpu work but less to display( for weak video cards )
+                // Check if we can downscale. Scaling is implemented to factor_8.
+                if (scale <= CLVideoDecoderOutput::factor_8)
+                    CLVideoDecoderOutput::downscale(&img.outFrame, &m_outFrame, (CLVideoDecoderOutput::downscale_factor)scale); // extra cpu work but less to display( for weak video cards )
+                else {
+                    // Giving up. Error message will be shown.
+                    m_draw->draw(img.outFrame, data->channelNumber);
+                    return;
+                }
 			}
 			m_draw->draw(m_outFrame, data->channelNumber);
 		}
 
 	} else
     {
-        int maxImageSize = m_draw->maxImageSize();
-
-        CLVideoDecoderOutput::downscale_factor scaleFactor = findOversizeScaleFactor(img.outFrame.width, img.outFrame.height, maxImageSize, maxImageSize);
+        CLVideoDecoderOutput::downscale_factor scaleFactor = findOversizeScaleFactor(img.outFrame.width, img.outFrame.height, maxTextureSize, maxTextureSize);
         if (scaleFactor != CLVideoDecoderOutput::factor_1)
         {
             CLVideoDecoderOutput::downscale(&img.outFrame, &m_outFrame, scaleFactor);
@@ -290,6 +313,10 @@ CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::findScaleFactor(int
 
 CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::findOversizeScaleFactor(int width, int height, int fitWidth, int fitHeight)
 {
+    // Fit exclusive
+    width++;
+    height++;
+
     CLVideoDecoderOutput::downscale_factor scaleFactor = CLVideoDecoderOutput::factor_1;
 
     int newWidth = width;

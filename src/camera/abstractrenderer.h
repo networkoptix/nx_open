@@ -23,8 +23,6 @@ public:
 		m_copyData = copyData;
 	}
 
-    virtual int maxImageSize() const { return 0; }
-
 protected:
 	bool m_copyData;
 };
