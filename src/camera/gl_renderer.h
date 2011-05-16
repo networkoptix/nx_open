@@ -21,7 +21,7 @@ public:
 	CLGLRenderer(CLVideoWindowItem *vw);
 	~CLGLRenderer();
 
-	static int getMaxTextureSize();
+    int maxImageSize();
 
 	void draw(CLVideoDecoderOutput& image, unsigned int channel);
 
@@ -44,6 +44,8 @@ public:
 	void copyVideoDataBeforePainting(bool copy);
 
 private:
+
+    int getMaxTextureSize();
 
 	void init(bool msgbox);
 	static int gl_status; 
@@ -134,8 +136,6 @@ private:
 
 	CLVideoWindowItem* m_videowindow;
 
-	bool m_inited;
-
 	CLVideoDecoderOutput m_image;
 	bool m_abort_drawing;
 
@@ -143,8 +143,10 @@ private:
 
 	static QList<GLuint*> mGarbage;
 
-	static GLint ms_maxTextureSize;
+	GLint m_maxTextureSize;
 
+    bool m_inited;
+    QMutex m_initMutex;
 };
 
 #endif //clgl_renderer_12_29

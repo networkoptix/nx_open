@@ -211,10 +211,9 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 
 	} else
     {
-        int maxTextureSize = CLGLRenderer::getMaxTextureSize();
+        int maxImageSize = m_draw->maxImageSize();
 
-
-        CLVideoDecoderOutput::downscale_factor scaleFactor = findOversizeScaleFactor(img.outFrame.width, img.outFrame.height, maxTextureSize, maxTextureSize);
+        CLVideoDecoderOutput::downscale_factor scaleFactor = findOversizeScaleFactor(img.outFrame.width, img.outFrame.height, maxImageSize, maxImageSize);
         if (scaleFactor != CLVideoDecoderOutput::factor_1)
         {
             CLVideoDecoderOutput::downscale(&img.outFrame, &m_outFrame, scaleFactor);

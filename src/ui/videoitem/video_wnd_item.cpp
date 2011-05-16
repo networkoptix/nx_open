@@ -289,7 +289,7 @@ void CLVideoWindowItem::drawGLfailaure(QPainter* painter)
 	painter->setFont(m_FPS_Font);
 
 	QString text;
-	QTextStream(&text) << tr("Image size is bigger than MAXGlTextureSize(") << m_gldraw[0]->getMaxTextureSize() << ") on this video hardware. Such images cannot be displayed in this version." ;
+	QTextStream(&text) << tr("Image size is bigger than MAXGlTextureSize(") << m_gldraw[0]->maxImageSize() << ") on this video hardware. Such images cannot be displayed in this version." ;
 
 	QFontMetrics metrics = QFontMetrics(m_FPS_Font);
 	int border = qMax(4, metrics.leading());
