@@ -7,7 +7,7 @@
 extern QString button_layout;
 extern QString button_home;
 
-MainWnd::MainWnd(QWidget *parent, Qt::WFlags flags):
+MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WFlags flags):
 //QMainWindow(parent, flags),
 m_normalView(0)
 {
@@ -28,8 +28,29 @@ m_normalView(0)
 	setMinimumWidth(min_wisth);
 	setMinimumHeight(min_wisth*3/4);
 
+    QStringList files;
+    for (int i = 1; i < argc; ++i)
+    {
+        if (QFile(argv[i]).exists())
+            files.append(argv[i]);
+    }
+
+    LayoutContent* content = 0;
+    
+    if (!files.isEmpty())
+    {
+        CLDeviceManager::instance().addFiles(files);
+
+        content = CLSceneLayoutManager::instance().getNewEmptyLayoutContent();
+
+        foreach(QString file, files)
+        {
+            content->addDevice(file);
+        }
+    }
+
 	//=======add====
-	m_normalView = new CLLayoutNavigator(this);
+	m_normalView = new CLLayoutNavigator(this, content);
 	QLayout* l = new QHBoxLayout();
 	l->addWidget(&(m_normalView->getView()));
 

@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
 
 	initContextMenu();
 
-	MainWnd w;
+	MainWnd w(argc, argv);
 	w.show();
 	return a.exec();
 

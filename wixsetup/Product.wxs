@@ -76,6 +76,13 @@
         <Directory Id="NetworkOptix" Name="$(env.ORGANIZATION_NAME)">
           <Directory Id="INSTALLDIR" Name="$(env.APPLICATION_NAME)">
             <Component Id="MainExecutable" Guid="B9B60D1E-3B2C-47dd-9922-A1FC5F3818D4">
+
+              <ProgId Id='EveMediaPlayer.file' Description='EVE Media Player file'>
+                <Extension Id='avi' ContentType='media/video'>
+                  <Verb Id='open' Command='Open' TargetFile='UniclientEXE' Argument='"%1"' />
+                </Extension>
+              </ProgId>
+
               <File Id="UniclientEXE" Name="eveplayer_beta.exe" Source="../bin/release/eveplayer_beta.exe" KeyPath="yes">
                 <fire:FirewallException Id="FirewallException" Name="$(env.APPLICATION_NAME)" Scope="any"/>
                 <Shortcut Id="startmenuUniclient" Directory="ProgramMenuDir" Name="$(env.APPLICATION_NAME)"

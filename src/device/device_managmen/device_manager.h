@@ -19,6 +19,7 @@ class CLDeviceManager : public QObject
 private:
 	~CLDeviceManager();
 	static CLDeviceManager* m_Instance;
+
 public:
 	static CLDeviceManager& instance();
 
@@ -35,6 +36,7 @@ public:
     void pleaseCheckDirs(const QStringList& lst);
     QStringList getPleaseCheckDirs() const;
 
+    void addFiles(const QStringList& files);
 protected:
 	CLDeviceManager();
 	void onNewDevices_helper(CLDeviceList devices, QString parentId);
@@ -48,8 +50,8 @@ protected:
 
 protected slots:
 	void onTimer();
-protected:
 
+protected:
 	QTimer m_timer;
 	CLDeviceSearcher m_dev_searcher;
 	bool m_firstTime;

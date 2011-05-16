@@ -51,7 +51,7 @@ mNeedresultsFromDirbrowsr(false)
     pleaseCheckDirs(checkLst);
 
 
-    /*/
+#if 0
     {
         // intro video device 
         CLDeviceList lst;
@@ -59,9 +59,7 @@ mNeedresultsFromDirbrowsr(false)
         lst[dev->getUniqueId()] = dev;
         onNewDevices_helper(lst, generalArchiverId);
     }
-    /**/
-    
-
+#endif    
 }
 
 CLDeviceManager::~CLDeviceManager()
@@ -348,4 +346,15 @@ void CLDeviceManager::getResultFromDirBrowser()
     }
 
     onNewDevices_helper(dev_list, generalArchiverId);
+}
+
+void CLDeviceManager::addFiles(const QStringList& files)
+{
+    CLDeviceList lst;
+    foreach(QString xfile, files)
+    {
+        CLAviDevice* dev = new CLAviDevice(xfile);
+        lst[dev->getUniqueId()] = dev;
+    }
+    onNewDevices_helper(lst, generalArchiverId);
 }
