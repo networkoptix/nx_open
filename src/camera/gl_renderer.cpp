@@ -367,7 +367,6 @@ int CLGLRenderer::getMaxTextureSize()
         if (!ms_maxTextureSize)
         {
             glGetIntegerv(GL_MAX_TEXTURE_SIZE, &ms_maxTextureSize); 
-//            ms_maxTextureSize = 1024;
 
             cl_log.log("Max Texture size: ", ms_maxTextureSize, cl_logALWAYS);
         }
