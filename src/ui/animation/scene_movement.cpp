@@ -67,113 +67,126 @@ CLSceneMovement::~CLSceneMovement()
 	stopAnimation();
 }
 
-void CLSceneMovement::move(int dx, int dy, int duration, bool limited, int delay, CLAnimationTimeLine::CLAnimationCurve curve  )
+void CLSceneMovement::move(int dx, int dy, int duration, bool limited, int delay, CLAnimationCurve curve  )
 {
-	m_timeline.setCurve(curve);
+
 	QPoint curr = m_view->viewport()->rect().center();
 	curr.rx()+=dx;
 	curr.ry()+=dy;
 
-	move(m_view->mapToScene(curr), duration, delay);
+	move(m_view->mapToScene(curr), duration, delay, curve);
 
 	m_limited = limited; // this will overwrite false value set inside move_abs function above
 }
 
-void CLSceneMovement::move (QPointF dest, int duration, int delay, CLAnimationTimeLine::CLAnimationCurve curve )
+void CLSceneMovement::move (QPointF dest, int duration, int delay, CLAnimationCurve curve )
 {
 	//cl_log.log("CLSceneMovement::move() ", cl_logDEBUG1);
-	m_timeline.setCurve(curve);
+    stopAnimation();
 
 	m_limited = false;
 
-	m_startpoint = m_view->mapToScene(m_view->viewport()->rect().center());
-	m_delta = dest - m_startpoint;
-
 	if (duration==0)
 	{
-		valueChanged(1.0);
+		setPosition(dest);
 	}
 	else
+    {
+        m_startpoint = getPosition();
+        m_delta = dest - m_startpoint;
+        
+        m_animation = new QPropertyAnimation(this, "position");
+        QPropertyAnimation* panimation = static_cast<QPropertyAnimation*>(m_animation);
+        panimation->setStartValue(getPosition());
+        panimation->setEndValue(dest);
+        panimation->setDuration(duration);
+
+        panimation->setEasingCurve(easingCurve(curve));
+
 		start_helper(duration, delay);
+    }
 }
 
-void CLSceneMovement::valueChanged ( qreal dpos )
+QPointF CLSceneMovement::getPosition() const
 {
-	QPointF move(m_delta.x()*dpos, m_delta.y()*dpos);
+    return m_view->mapToScene(m_view->viewport()->rect().center());
+}
 
-	QPointF result = m_startpoint + move;
+void CLSceneMovement::setPosition(QPointF p)
+{
+    QRect rsr = m_view->getRealSceneRect();
 
-	QRect rsr = m_view->getRealSceneRect();
+    p.rx() = limit_val(p.x(), rsr.left(), rsr.right(), false);
+    p.ry() = limit_val(p.y(), rsr.top(), rsr.bottom(), false);
 
-	result.rx() = limit_val(result.x(), rsr.left(), rsr.right(), false);
-	result.ry() = limit_val(result.y(), rsr.top(), rsr.bottom(), false);
+    m_view->centerOn(p);
 
-	m_view->centerOn(result);
+    //=======================================
+    if (m_limited && m_view->getSelectedItem())
+    {
+        CLAbstractSceneItem* item = m_view->getSelectedItem();
 
-	//=======================================
-	if (m_limited && m_view->getSelectedItem())
-	{
-		CLAbstractSceneItem* item = m_view->getSelectedItem();
+        QPointF wnd_center = item->mapToScene(item->boundingRect().center());
+        QPointF final_dest = m_startpoint + m_delta;
+        QPointF curr = m_view->mapToScene(m_view->viewport()->rect().center());
 
-		QPointF wnd_center = item->mapToScene(item->boundingRect().center());
-		QPointF final_dest = m_startpoint + m_delta;
-		QPointF curr = m_view->mapToScene(m_view->viewport()->rect().center());
+        if (QLineF(final_dest, wnd_center).length() > QLineF(curr, wnd_center).length()   ) 
+        {
+            // if difference between final point and item center is more than curr and item center => moving out of item center
+            int dx = curr.x() - wnd_center.x();
+            int dy = curr.y() - wnd_center.y();
 
-		if (QLineF(final_dest, wnd_center).length() > QLineF(curr, wnd_center).length()   ) 
-		{
-			// if difference between final point and item center is more than curr and item center => moving out of item center
-			int dx = curr.x() - wnd_center.x();
-			int dy = curr.y() - wnd_center.y();
+            qreal percent = 0.05;
 
-			qreal percent = 0.05;
+            QRectF wnd_rect =  item->sceneBoundingRect();
+            QRectF viewport_rec = m_view->mapToScene(m_view->viewport()->rect()).boundingRect();
 
-			QRectF wnd_rect =  item->sceneBoundingRect();
-			QRectF viewport_rec = m_view->mapToScene(m_view->viewport()->rect()).boundingRect();
+            if (dx<0)
+            {
+                if ( (wnd_rect.topLeft().x() -  viewport_rec.topLeft().x()) >  percent*wnd_rect.width())
+                    stopAnimation();
+            }
 
-			if (dx<0)
-			{
-				if ( (wnd_rect.topLeft().x() -  viewport_rec.topLeft().x()) >  percent*wnd_rect.width())
-					stopAnimation();
-			}
+            if (dx>0)
+            {
+                if ( (viewport_rec.topRight().x() - wnd_rect.topRight().x()) >  percent*wnd_rect.width())
+                    stopAnimation();
+            }
 
-			if (dx>0)
-			{
-				if ( (viewport_rec.topRight().x() - wnd_rect.topRight().x()) >  percent*wnd_rect.width())
-					stopAnimation();
-			}
+            if (dy<0)
+            {
+                if ( (wnd_rect.topLeft().y() - viewport_rec.topLeft().y()) >  percent*wnd_rect.height())
+                    stopAnimation();
+            }
 
-			if (dy<0)
-			{
-				if ( (wnd_rect.topLeft().y() - viewport_rec.topLeft().y()) >  percent*wnd_rect.height())
-					stopAnimation();
-			}
+            if (dy>0)
+            {
+                if ( (viewport_rec.bottomLeft().y()- wnd_rect.bottomRight().y()) >  percent*wnd_rect.height())
+                    stopAnimation();
+            }
 
-			if (dy>0)
-			{
-				if ( (viewport_rec.bottomLeft().y()- wnd_rect.bottomRight().y()) >  percent*wnd_rect.height())
-					stopAnimation();
-			}
+        }
 
-		}
+    }
+    else if (m_view->getSelectedItem())
+    {
+        CLAbstractSceneItem* item = m_view->getSelectedItem();
 
-	}
-	else if (m_view->getSelectedItem())
-	{
-		CLAbstractSceneItem* item = m_view->getSelectedItem();
+        QPointF selected_center = item->mapToScene(item->boundingRect().center());
+        QPointF dest = m_startpoint + m_delta;
 
-		QPointF selected_center = item->mapToScene(item->boundingRect().center());
-		QPointF dest = m_startpoint + m_delta;
+        QPointF diff = selected_center - dest;
 
-		QPointF diff = selected_center - dest;
+        if ( abs(diff.x())< 1.0 &&  abs(diff.y())< 1.0 )
+            return; // moving to the selection => do not need to unselect
 
-		if ( abs(diff.x())< 1.0 &&  abs(diff.y())< 1.0 )
-			return; // moving to the selection => do not need to unselect
+        // else
+        diff = selected_center - p;
 
-		// else
-		diff = selected_center - result;
-
-		if ( abs(diff.x()) > item->boundingRect().width()*1.0 || abs(diff.y()) > item->boundingRect().height()*1.0)
-			m_view->setZeroSelection();
-	}
+        if ( abs(diff.x()) > item->boundingRect().width()*1.0 || abs(diff.y()) > item->boundingRect().height()*1.0)
+            m_view->setZeroSelection();
+    }
 
 }
+
+

@@ -1,6 +1,5 @@
 #include "animation_timeline.h"
 
-qreal CLAnimationTimeLine::m_animation_speed = 1.0;
 
 static inline qreal qt_smoothBeginEndMixFactor(qreal value)
 {
@@ -33,125 +32,126 @@ static inline qreal exp_normal(qreal value)
 }
 
 //===================================================
-
-CLAnimationTimeLine::CLAnimationTimeLine(CLAnimationCurve curve , int duration , QObject *parent ):
-QTimeLine(duration/m_animation_speed, parent ),
-m_curve(curve)
+static qreal slow_end( qreal value ) 
 {
-
+	const qreal lnprogress = ln_normal(value);
+	const qreal linearProgress = value;
+	const qreal mix = qt_smoothBeginEndMixFactor(value);
+	return  linearProgress * mix + lnprogress* (1-mix) ;
 }
 
-CLAnimationTimeLine::~CLAnimationTimeLine()
+static qreal slow_start( qreal value ) 
 {
-	stop();
-}
-
-void CLAnimationTimeLine::setCurve(CLAnimationCurve curve)
-{
-	m_curve = curve;
-}
-
-qreal CLAnimationTimeLine::valueForTime ( int msec ) const
-{
-	switch(m_curve)
-	{
-	case SLOW_END:
-		return slow_end(msec);
-
-	case SLOW_END_POW_20:
-		return slow_end_pow(msec, 0.20);
-
-	case SLOW_END_POW_22:
-		return slow_end_pow(msec, 0.22);
-
-	case SLOW_END_POW_25:
-		return slow_end_pow(msec, 0.25);
-	case SLOW_END_POW_30:
-		return slow_end_pow(msec, 0.30);
-
-	case SLOW_END_POW_35:
-		return slow_end_pow(msec, 0.35);
-
-	case SLOW_END_POW_40:
-		return slow_end_pow(msec, 0.40);
-
-	case SLOW_START:
-		return slow_start(msec);
-
-	case SLOW_START_SLOW_END:
-		return slow_start_slow_end(msec);
-
-	case INOUTBACK:
-		return inOutBack(msec);
-
-    case OUTCUBIC:
-        return outCubic(msec);
-
-	case INHERITED:
-	default:
-		return QTimeLine::valueForTime(msec);
-
-	}
-}
-
-qreal CLAnimationTimeLine::slow_end( int msec ) const
-{
-		qreal value = msec / qreal(duration());
-
-		const qreal lnprogress = ln_normal(value);
-		const qreal linearProgress = value;
-		const qreal mix = qt_smoothBeginEndMixFactor(value);
-		return  linearProgress * mix + lnprogress* (1-mix) ;
-}
-
-qreal CLAnimationTimeLine::slow_start( int msec ) const
-{
-	qreal value = msec / qreal(duration());
-
 	const qreal expprogress = exp_normal(value);
 	const qreal linearProgress = value;
 	const qreal mix = qt_smoothBeginEndMixFactor(value);
 	return   expprogress * mix + linearProgress* (1-mix) ;
 }
 
-qreal CLAnimationTimeLine::slow_start_slow_end( int msec ) const
-{
-	static QEasingCurve ec(QEasingCurve::InOutQuad);
-    //static QEasingCurve ec(QEasingCurve::InOutSine);
 
-	qreal value = msec / qreal(duration());
-	return ec.valueForProgress(value);
+static qreal slow_end_pow_20(qreal value)
+{
+    return pow(value, 0.20);
 }
 
-qreal CLAnimationTimeLine::inOutBack( int msec ) const
+static qreal slow_end_pow_22(qreal value)
 {
-	static QEasingCurve ec(QEasingCurve::InOutBack);
-
-	qreal value = msec / qreal(duration());
-	return ec.valueForProgress(value);
+    return pow(value, 0.22);
 }
 
-qreal CLAnimationTimeLine::slow_end_pow( int msec, qreal pw ) const
+static qreal slow_end_pow_25(qreal value)
 {
-	qreal value = msec / qreal(duration());
-	return pow(value, pw);
+    return pow(value, 0.25);
 }
 
-qreal CLAnimationTimeLine::outCubic(int msec) const
+static qreal slow_end_pow_30(qreal value)
 {
-    static QEasingCurve ec(QEasingCurve::OutCubic);
-
-    qreal value = msec / qreal(duration());
-    return ec.valueForProgress(value);
+    return pow(value, 0.30);
 }
+
+static qreal slow_end_pow_35(qreal value)
+{
+    return pow(value, 0.35);
+}
+
+static qreal slow_end_pow_40(qreal value)
+{
+    return pow(value, 0.40);
+}
+
 
 //=================================================================
-void CLAnimationTimeLine::setAnimationSpeed(qreal speed)
-{
-	m_animation_speed = speed;
-}
 
-qreal CLAnimationTimeLine::getAnimationSpeed()
+QEasingCurve& easingCurve(CLAnimationCurve ac)
 {
-	return m_animation_speed;
+
+    static QEasingCurve inOutQuad(QEasingCurve::InOutQuad);
+    static QEasingCurve inOutBack(QEasingCurve::InOutBack);
+    static QEasingCurve outCubic(QEasingCurve::OutCubic);
+
+    static QEasingCurve slowEnd;
+    slowEnd.setCustomType(slow_end);
+
+    static QEasingCurve slowStart;
+    slowEnd.setCustomType(slow_start);
+
+
+    static QEasingCurve slowEnd_pow_20;
+    slowEnd_pow_20.setCustomType(slow_end_pow_20);
+
+    static QEasingCurve slowEnd_pow_22;
+    slowEnd_pow_22.setCustomType(slow_end_pow_22);
+
+
+    static QEasingCurve slowEnd_pow_25;
+    slowEnd_pow_25.setCustomType(slow_end_pow_25);
+
+
+    static QEasingCurve slowEnd_pow_30;
+    slowEnd_pow_30.setCustomType(slow_end_pow_30);
+
+    static QEasingCurve slowEnd_pow_35;
+    slowEnd_pow_35.setCustomType(slow_end_pow_35);
+
+    static QEasingCurve slowEnd_pow_40;
+    slowEnd_pow_40.setCustomType(slow_end_pow_40);
+
+
+    switch(ac)
+    {
+    case SLOW_END:
+        return slowEnd;
+
+    case SLOW_END_POW_20:
+        return slowEnd_pow_20;
+
+    case SLOW_END_POW_22:
+        return slowEnd_pow_22;
+
+    case SLOW_END_POW_25:
+        return slowEnd_pow_25;
+
+    case SLOW_END_POW_30:
+        return slowEnd_pow_30;
+
+    case SLOW_END_POW_35:
+        return slowEnd_pow_35;
+
+    case SLOW_END_POW_40:
+        return slowEnd_pow_40;
+
+    case SLOW_START:
+        return slowStart;
+
+    case SLOW_START_SLOW_END:
+        return inOutQuad;
+
+    case INOUTBACK:
+        return inOutBack;
+
+    case OUTCUBIC:
+        return outCubic;
+
+    }
+
 }

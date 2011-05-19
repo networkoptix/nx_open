@@ -565,7 +565,7 @@ void SceneLayout::removeItem(CLAbstractSceneItem* item, bool update_scene_rect )
 	if (update_scene_rect)
 	{
 		updateSceneRect();
-		m_view->fitInView(600, 0, CLAnimationTimeLine::SLOW_START_SLOW_END);
+		m_view->fitInView(600, 0, SLOW_START_SLOW_END);
 	}
 
 }

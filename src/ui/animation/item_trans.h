@@ -7,11 +7,11 @@ class QGraphicsItem;
 class CLItemTransform : public CLAnimation
 {
 	Q_OBJECT
+    Q_PROPERTY(qreal zoom	READ getZoom WRITE setZoom)
+    Q_PROPERTY(qreal rotation	READ getRotation WRITE setRotation)
 public:
 	CLItemTransform(QGraphicsItem* item);
 	virtual ~CLItemTransform();
-
-	void stopAnimation();
 
 	qreal zoomToscale(qreal zoom) const;
 	qreal scaleTozoom(qreal scale) const;
@@ -21,17 +21,16 @@ public:
 	void z_rotate_abs(QPointF center, qreal angle, int duration, int delay );
 	void move_abs(QPointF pos, int duration, int delay);
 
-	qreal current_zrotation() const;
-	qreal current_zoom() const;
+	qreal getRotation() const;
+	qreal getZoom() const;
+
+    void setRotation(qreal r);
+    void setZoom(qreal z);
+
 
 private:
 
 	void transform_helper();
-
-private slots:
-	void valueChanged ( qreal pos );
-
-	virtual void onFinished();
 
 protected:
 
@@ -39,11 +38,8 @@ protected:
 
 	QGraphicsItem* m_item;
 
-	CLAnimationUnit<qreal> m_zoom;
-	CLAnimationUnit<qreal> m_Zrotation;
-	CLAnimationUnit<QPointF> m_movment;
-
-	bool m_zooming, m_rotating, m_moving;
+	qreal m_zoom;
+	qreal m_Zrotation;
 
 };
 

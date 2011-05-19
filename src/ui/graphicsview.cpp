@@ -194,7 +194,7 @@ void GraphicsView::start()
         if (m_camLayout.getItemList().count() && m_camLayout.getContent() == CLSceneLayoutManager::instance().startScreenLayoutContent())
             duration/=3;
 
-		fitInView(duration, 0, CLAnimationTimeLine::SLOW_START_SLOW_END);
+		fitInView(duration, 0, SLOW_START_SLOW_END);
 	}
     else if (m_camLayout.getContent() == CLSceneLayoutManager::instance().introScreenLayoutContent())
     {
@@ -343,7 +343,7 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
     }
 
 	int numDegrees = e->delta() ;
-    m_scenezoom.zoom_delta(numDegrees/4000.0, 1500, 0, unmoved_point, CLAnimationTimeLine::OUTCUBIC);
+    m_scenezoom.zoom_delta(numDegrees/3000.0, 1500, 0, unmoved_point, OUTCUBIC);
 }
 
 void GraphicsView::zoomMin(int duration)
@@ -1058,7 +1058,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 				// clicked on the same already selected item, fit in view ?
 
 				if (!isItemFullScreenZoomed(aitem)) // check if wnd is manually zoomed; without double click
-					fitInView(item_select_duration + 100, doubl_clk_delay, CLAnimationTimeLine::SLOW_START_SLOW_END);
+					fitInView(item_select_duration + 100, doubl_clk_delay, SLOW_START_SLOW_END);
 				else
 					aitem->setFullScreen(true);
 
@@ -1073,8 +1073,8 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 				qreal zoom = zoomForFullScreen_helper(QRectF(scene_pos.x() - w/2, scene_pos.y() - h/2, w, h));
 
 				int duration = 800;
-				m_movement.move(scene_pos, duration, doubl_clk_delay, CLAnimationTimeLine::SLOW_START_SLOW_END);
-				m_scenezoom.zoom_abs(zoom, duration, doubl_clk_delay, QPoint(0,0), CLAnimationTimeLine::SLOW_START_SLOW_END);
+				m_movement.move(scene_pos, duration, doubl_clk_delay, SLOW_START_SLOW_END);
+				m_scenezoom.zoom_abs(zoom, duration, doubl_clk_delay, QPoint(0,0), SLOW_START_SLOW_END);
 
 			}
 
@@ -1333,7 +1333,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
         }
 		else if (act== &cm_fitinview)
 		{
-			fitInView(700, 0, CLAnimationTimeLine::SLOW_START_SLOW_END);
+			fitInView(700, 0, SLOW_START_SLOW_END);
 		}
 		else if (act== &cm_arrange)
 		{
@@ -1554,7 +1554,7 @@ void GraphicsView::mouseDoubleClickEvent( QMouseEvent * event )
 		onArrange_helper();
 		/**/
 
-		fitInView(1500, 0, CLAnimationTimeLine::SLOW_START_SLOW_END);
+		fitInView(1500, 0, SLOW_START_SLOW_END);
 
 		return;
 	}
@@ -2183,7 +2183,7 @@ void GraphicsView::toggleFullScreen_helper(CLAbstractSceneItem* wnd)
 		// escape FS MODE
 		setZeroSelection();
 		wnd->setFullScreen(false);
-		fitInView(1000, 0, CLAnimationTimeLine::SLOW_START_SLOW_END);
+		fitInView(1000, 0, SLOW_START_SLOW_END);
 
 	}
 }
@@ -2221,7 +2221,7 @@ void GraphicsView::onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int de
 
 	}
 
-	m_movement.move(point, item_select_duration, delay, CLAnimationTimeLine::SLOW_START_SLOW_END);
+	m_movement.move(point, item_select_duration, delay, SLOW_START_SLOW_END);
 
 	//===================	
 	// width 1900 => zoom 0.278 => scale 0.07728
@@ -2229,7 +2229,7 @@ void GraphicsView::onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int de
 	qreal scale = 0.07728*width/1900.0;
 	qreal zoom = m_scenezoom.scaleTozoom(scale) ;
 
-	m_scenezoom.zoom_abs(zoom, item_select_duration, delay, QPoint(0,0), CLAnimationTimeLine::SLOW_START_SLOW_END);
+	m_scenezoom.zoom_abs(zoom, item_select_duration, delay, QPoint(0,0), SLOW_START_SLOW_END);
 
 }
 
@@ -2384,7 +2384,7 @@ void GraphicsView::onArrange_helper_finished()
 
 }
 
-void GraphicsView::fitInView(int duration, int delay, CLAnimationTimeLine::CLAnimationCurve curve)
+void GraphicsView::fitInView(int duration, int delay, CLAnimationCurve curve)
 {
 
 	if (m_selectedWnd && isItemStillExists(m_selectedWnd) && m_selectedWnd->isFullScreen())
@@ -2459,11 +2459,11 @@ void GraphicsView::onItemFullScreen_helper(CLAbstractSceneItem* wnd, int duratio
 	qreal zoom = zoomForFullScreen_helper(item_rect);
 
 	
-	m_movement.move(item_rect.center(), duration, 0, CLAnimationTimeLine::SLOW_START_SLOW_END);
+	m_movement.move(item_rect.center(), duration, 0, SLOW_START_SLOW_END);
 
 	//scale(scl, scl);
 
-	m_scenezoom.zoom_abs(zoom, duration, 0, QPoint(0,0), CLAnimationTimeLine::SLOW_START_SLOW_END);
+	m_scenezoom.zoom_abs(zoom, duration, 0, QPoint(0,0), SLOW_START_SLOW_END);
 
 	wnd->zoom_abs(wnd_zoom , 0, 0);
 	wnd->zoom_abs(1.0 , duration, 0);
@@ -2693,7 +2693,7 @@ void GraphicsView::contextMenuHelper_viewRecordedVideo(CLVideoCamera* cam)
     QString id = getTempRecordingDir() + cam->getDevice()->getUniqueId();
 
 	m_camLayout.addDevice(id, true);
-	fitInView(600, 100, CLAnimationTimeLine::SLOW_START_SLOW_END);
+	fitInView(600, 100, SLOW_START_SLOW_END);
 }
 
 void GraphicsView::contextMenuHelper_saveRecordedAs(CLVideoCamera* cam)
@@ -2766,7 +2766,7 @@ void GraphicsView::contextMenuHelper_openInWebBroser(CLVideoCamera* cam)
 	m_camLayout.addItem(wi, true);
 	wi->navigate(url);
 
-	fitInView(600, 100, CLAnimationTimeLine::SLOW_START_SLOW_END);
+	fitInView(600, 100, SLOW_START_SLOW_END);
 
 }
 

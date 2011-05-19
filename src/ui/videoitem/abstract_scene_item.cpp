@@ -197,7 +197,7 @@ void CLAbstractSceneItem::z_rotate_abs(QPointF center, qreal angle, int duration
 
 qreal CLAbstractSceneItem::getZoom() const
 {
-	return m_animationTransform.current_zoom();
+	return m_animationTransform.getZoom();
 }
 
 CLAbstractComplicatedItem* CLAbstractSceneItem::getComplicatedItem() const
@@ -212,7 +212,7 @@ void CLAbstractSceneItem::setComplicatedItem(CLAbstractComplicatedItem* complica
 
 qreal CLAbstractSceneItem::getRotation() const
 {
-	return m_animationTransform.current_zrotation();
+	return m_animationTransform.getRotation();
 }
 
 void CLAbstractSceneItem::setRotation(qreal angle)

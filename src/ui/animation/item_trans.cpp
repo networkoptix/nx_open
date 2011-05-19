@@ -23,13 +23,9 @@ qreal round_angle(qreal angle, qreal min_diff)
 CLItemTransform::CLItemTransform(QGraphicsItem* item):
 m_item(item),
 m_zoom(1.0),
-m_Zrotation(0.0),
-m_movment(QPointF(0,0)),
-m_zooming(false),
-m_rotating(false),
-m_moving(false)
+m_Zrotation(0.0)
 {
-	m_timeline.setCurve(CLAnimationTimeLine::SLOW_END_POW_30);
+	
 }
 
 CLItemTransform::~CLItemTransform()
@@ -37,21 +33,6 @@ CLItemTransform::~CLItemTransform()
 	stopAnimation();
 }
 
-void CLItemTransform::stopAnimation()
-{
-	CLAnimation::stopAnimation();
-	m_rotating = false;
-	m_zooming = false;
-	m_moving = false;
-}
-
-void CLItemTransform::onFinished()
-{
-	CLAnimation::onFinished();
-	m_zooming = false;
-	m_rotating = false;
-	m_moving = false;
-}
 
 qreal CLItemTransform::zoomToscale(qreal zoom) const
 {
@@ -68,118 +49,88 @@ void CLItemTransform::move_abs(QPointF pos, int duration, int delay )
 	//m_moving.start_point = m_item->scenePos()
 }
 
-qreal CLItemTransform::current_zrotation() const
+qreal CLItemTransform::getRotation() const
 {
-	return m_Zrotation.curent;
+	return m_Zrotation;
 }
 
-qreal CLItemTransform::current_zoom() const
+qreal CLItemTransform::getZoom() const
 {
-	return m_zoom.curent;
+	return m_zoom;
 }
+
+void CLItemTransform::setRotation(qreal r)
+{
+    m_Zrotation = r;
+    transform_helper();
+}
+
+void CLItemTransform::setZoom(qreal z)
+{
+    m_zoom = z;
+    transform_helper();
+}
+
 
 void CLItemTransform::zoom_abs(qreal target_zoom, int duration, int delay)
 {
 
-	if (m_rotating)
-	{
-		duration = 0; // do it instantly
-		m_Zrotation.curent = m_Zrotation.start_point + m_Zrotation.diff;
-	}
+    stopAnimation();
 
 	if (duration==0)
 	{
-		stopAnimation();
-
-		m_zoom.curent = target_zoom;
-		transform_helper();
+        setZoom(target_zoom);
 	}
 	else
 	{
-		m_zoom.start_point = m_zoom.curent;
-		m_zoom.diff = target_zoom - m_zoom.curent;
-
+        m_animation = new QPropertyAnimation(this, "zoom");
+        QPropertyAnimation* panimation = static_cast<QPropertyAnimation*>(m_animation);
+        panimation->setStartValue(this->getZoom());
+        panimation->setEndValue(target_zoom);
+        panimation->setDuration(duration);
+        panimation->setEasingCurve(easingCurve(SLOW_END_POW_30));
 		start_helper(duration, delay);
-
-		m_zooming = true;
-
 	}
 
 }
 
 void CLItemTransform::z_rotate_abs(QPointF center, qreal angle, int duration, int delay)
 {
-	if (m_zooming)
-		duration = 0; // do it instantly
+
+    stopAnimation();
+
+    m_rotatePoint = center;
 
 	if (duration==0)
 	{
-		m_rotatePoint = center;
-		m_Zrotation.curent = angle;
-		m_Zrotation.curent = m_Zrotation.curent - ((int)m_Zrotation.curent/360)*360;
+		
+		m_Zrotation = angle;
+		m_Zrotation = m_Zrotation - ((int)m_Zrotation/360)*360;
 		transform_helper();
 	}
 	else
 	{
-		m_rotatePoint = center;
-		m_Zrotation.start_point = m_Zrotation.curent;
-
-		if (m_Zrotation.start_point>180 && angle==0.)
+		
+		if (getRotation() > 180 && angle==0.)
 			angle = 360.;
 
-		m_Zrotation.diff = angle - m_Zrotation.start_point;
-
+        m_animation = new QPropertyAnimation(this, "rotation");
+        QPropertyAnimation* panimation = static_cast<QPropertyAnimation*>(m_animation);
+        panimation->setStartValue(getRotation());
+        panimation->setEndValue(angle);
+        panimation->setDuration(duration);
+        panimation->setEasingCurve(easingCurve(SLOW_END_POW_30));
 		start_helper(duration, delay);
-		m_rotating = true;
 
 	}
 }
 
 void CLItemTransform::z_rotate_delta(QPointF center, qreal angle, int duration, int delay)
 {
-	if (m_zooming)
-		duration = 0; // do it instantly
 
 	//=============
-
-	if (duration!=0) // if animation
-	{
-		qreal final = m_Zrotation.curent + angle;
-		angle = final - m_Zrotation.curent;
-	}
-
-	//=============
-
-	if (duration==0)
-	{
-		m_rotatePoint = center;
-		m_Zrotation.curent += angle;
-		m_Zrotation.curent = m_Zrotation.curent - ((int)m_Zrotation.curent/360)*360;
-		transform_helper();
-	}
-	else
-	{
-		m_rotatePoint = center;
-		m_Zrotation.start_point = m_Zrotation.curent;
-		m_Zrotation.diff = angle;
-
-		start_helper(duration, delay);
-
-		m_rotating = true;
-
-	}
-
-}
-
-void CLItemTransform::valueChanged( qreal pos )
-{
-	if (m_zooming)
-		m_zoom.curent = m_zoom.start_point + pos*m_zoom.diff;
-
-	if (m_rotating)
-		m_Zrotation.curent = m_Zrotation.start_point + pos*m_Zrotation.diff;
-
-	transform_helper();
+	qreal final = m_Zrotation + angle;
+    z_rotate_abs(center, final, duration, delay);
 
 }
 
@@ -187,7 +138,7 @@ void CLItemTransform::transform_helper()
 {
 	QPointF center = m_item->boundingRect().center();
 
-	qreal scl = zoomToscale(m_zoom.curent);
+	qreal scl = zoomToscale(m_zoom);
 
 	QTransform trans;
 	/*
@@ -197,7 +148,7 @@ void CLItemTransform::transform_helper()
 	trans.translate(-center.x(), -center.y());
 	/**/
 
-	qreal transform_ange = round_angle(m_Zrotation.curent, 1);
+	qreal transform_ange = round_angle(m_Zrotation, 1);
 
 	trans.translate(m_rotatePoint.x(), m_rotatePoint.y());
 	trans.rotate(transform_ange); 

@@ -18,32 +18,14 @@ public:
 signals:
 	void finished();
 protected slots:
-		virtual void valueChanged ( qreal pos ) = 0;
 		virtual void onFinished();
 		virtual void Start();
 protected:
 		void start_helper(int duration, int delay);
 protected:
-	CLAnimationTimeLine m_timeline;
-	int m_defaultduration;
 	QTimer m_delay_timer;
+    QAbstractAnimation *m_animation;
 
-protected:
-	template< typename T>
-	struct CLAnimationUnit
-	{
-		CLAnimationUnit(T val)
-		{
-			diff = T();
-			curent = val;
-			start_point = val;
-			target = val;
-		}
-		T curent;
-		T start_point;
-		T diff;
-		T target;
-	};
 
 };
 

@@ -2,18 +2,11 @@
 #include "../../base/log.h"
 
 CLAnimation::CLAnimation():
-m_timeline(CLAnimationTimeLine::SLOW_END_POW_40)
-//m_timeline(CLAnimationTimeLine::CLAnimationCurve::SLOW_START_SLOW_END)
+m_animation(0)
 {
-	//m_timeline.setCurveShape(QTimeLine::CurveShape::LinearCurve);
-	m_timeline.setDuration(2000);
-	m_timeline.setFrameRange(0, 200000);
-	m_timeline.setUpdateInterval(1000/120.0); // 60 fps
-
-	m_delay_timer.setSingleShot(true);
-
-	connect(&m_timeline, SIGNAL(valueChanged(qreal)), this, SLOT(valueChanged(qreal)));
-	connect(&m_timeline, SIGNAL(finished()), this, SLOT(onFinished()));
+	//m_delay_timer.setSingleShot(true);
+	//connect(&m_timeline, SIGNAL(valueChanged(qreal)), this, SLOT(valueChanged(qreal)));
+	//connect(&m_timeline, SIGNAL(finished()), this, SLOT(onFinished()));
 }
 
 CLAnimation::~CLAnimation()
@@ -28,31 +21,42 @@ QObject* CLAnimation::object()
 
 bool CLAnimation::isRuning() const
 {
-	return ((m_timeline.state() & QTimeLine::Running) || m_delay_timer.isActive());
+	return (  (m_animation && (m_animation->state() & QAbstractAnimation::Running)));
 }
 
 void CLAnimation::stopAnimation()
 {
-	m_timeline.stop();
-	m_delay_timer.stop();
+    if (!m_animation)
+        return;
+
+    disconnect(m_animation, SIGNAL(finished()), this, SLOT(onFinished()));
+
+    m_animation->stop();
+    delete m_animation;
+
+    m_animation = 0;
+
+    m_delay_timer.stop();
 }
 
 void CLAnimation::Start()
 {
-	m_timeline.start();
+	if (m_animation)
+    {
+        connect(m_animation, SIGNAL(finished()), this, SLOT(onFinished()));
+        m_animation->start();
+    }
 }
 
 void CLAnimation::start_helper(int duration, int delay)
 {
-	m_timeline.setDuration(duration);
-
 	if (!isRuning())
 	{
 
 		m_delay_timer.stop(); // just in case if it's still running
 
 		if (delay==0)
-			m_timeline.start();
+			Start();
 		else
 		{
 			//QTimer::singleShot(delay, this, SLOT(Start()));
@@ -61,11 +65,12 @@ void CLAnimation::start_helper(int duration, int delay)
 
 		}
 	}
-	m_timeline.setCurrentTime(0);
+	
 }
 
 void CLAnimation::onFinished()
 {
 	emit finished();
+    stopAnimation();
 }
 
