@@ -5,10 +5,14 @@ import os, sys
 sys.path.append('..')
 
 from version import *
+from genassoc import genassoc
 
 os.putenv('ORGANIZATION_NAME', ORGANIZATION_NAME)
 os.putenv('APPLICATION_NAME', APPLICATION_NAME)
 os.putenv('APPLICATION_VERSION', APPLICATION_VERSION)
+
+# Generate Associations.wxs
+genassoc()
 
 os.system(r'candle -dORGANIZATION_NAME="%s" -dAPPLICATION_NAME="%s" -dAPPLICATION_VERSION="%s" -out obj\Release\ -ext WixFirewallExtension.dll -ext WixUIExtension.dll -ext WixUtilExtension.dll *.wxs' % (ORGANIZATION_NAME, APPLICATION_NAME, APPLICATION_VERSION))
 

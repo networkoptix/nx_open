@@ -76,13 +76,6 @@
         <Directory Id="NetworkOptix" Name="$(env.ORGANIZATION_NAME)">
           <Directory Id="INSTALLDIR" Name="$(env.APPLICATION_NAME)">
             <Component Id="MainExecutable" Guid="B9B60D1E-3B2C-47dd-9922-A1FC5F3818D4">
-
-              <ProgId Id='EveMediaPlayer.file' Description='EVE Media Player file'>
-                <Extension Id='avi' ContentType='media/video'>
-                  <Verb Id='open' Command='Open' TargetFile='UniclientEXE' Argument='"%1"' />
-                </Extension>
-              </ProgId>
-
               <File Id="UniclientEXE" Name="eveplayer_beta.exe" Source="../bin/release/eveplayer_beta.exe" KeyPath="yes">
                 <fire:FirewallException Id="FirewallException" Name="$(env.APPLICATION_NAME)" Scope="any"/>
                 <Shortcut Id="startmenuUniclient" Directory="ProgramMenuDir" Name="$(env.APPLICATION_NAME)"
@@ -95,6 +88,36 @@
                 </Shortcut>
               </File>
             </Component>
+
+            <Component Id="DummyFileAssocationFeatureComponent" Guid="1CF8A9DB-87DF-4b66-856F-B10B9770FBE0">
+              <!--
+												Fix ICE18 error. The validator thinks that the install folder
+				 								could be empty so we have to use CreateFolder in this component.
+				
+												http://msdn.microsoft.com/library/en-us/msi/setup/ice18.asp
+											-->
+              <CreateFolder />
+            </Component>
+
+            <!--
+              <ProgId Id='EVE.avi' Description='EVE media player file' Icon='UniclientEXE'>
+                <Extension Id='avi' ContentType='video/avi'>
+                  <Verb Id='open' Command='Open' TargetFile='UniclientEXE' Argument='"%1"'/>
+                </Extension>
+              </ProgId> -->
+
+            <Component Id="EveApplication" Guid="2CB8AFBB-FE1F-4683-A07A-D3736DD30065" DiskId="1">
+              <RegistryValue Root="HKCR" Type="string" Key="Applications\eveplayer_beta.exe" Name="FriendlyAppName" Value="EVE media player"/>
+              <RegistryValue Root="HKCR" Type="string" Key="Applications\eveplayer_beta.exe\shell\Open" Value="Play with EVE media player"/>
+              <RegistryValue Root="HKCR" Type="string" Key="Applications\eveplayer_beta.exe\shell\Open\command" Value="&quot;[#UniclientEXE]&quot; &quot;%1&quot;" />
+
+              <RegistryValue Root="HKLM" Type="string" Key="Software\Clients\Media\EVE media player" Value="EVE media player"/>
+              <RegistryValue Root="HKLM" Type="string" Key="Software\Clients\Media\EVE media player\Capabilities" Name="ApplicationName" Value="EVE media player"/>
+              <RegistryValue Root="HKLM" Type="string" Key="Software\Clients\Media\EVE media player\Capabilities" Name="ApplicationDescription" Value="Network Optix EVE media player"/>
+
+              <RegistryValue Root="HKLM" Type="string" Key="Software\RegisteredApplications" Name="EVE media player" Value="Software\Clients\Media\EVE media player\Capabilities"/>
+            </Component>
+            
             <Component Id="FFmpegLibraries" Guid="AD81912C-85E7-4f23-9106-6CF2CA5A5993">
               <File Id="avcodecDll" Name="avcodec-53.dll" Source="../bin/release/avcodec-53.dll"/>
               <File Id="avdeviceDll" Name="avdevice-53.dll" Source="../bin/release/avdevice-53.dll"/>
@@ -153,8 +176,8 @@
         <MergeRef Id="VCRedist2"/>
     </Feature>
 
-    <Feature Id="ProductFeature" Title="SetupProject1" Level="1"
-             ConfigurableDirectory="INSTALLDIR" >
+    <Feature Id="ProductFeature" Title="$(env.APPLICATION_NAME) files" Level="1"
+           ConfigurableDirectory="INSTALLDIR" Absent="disallow" InstallDefault="local" AllowAdvertise="no" Display="expand">
       <ComponentRef Id="MainExecutable" />
       <ComponentRef Id="FFmpegLibraries"/>
       <ComponentRef Id="QTLibraries" />
@@ -163,10 +186,15 @@
       <ComponentRef Id='arecontvision'/>
       <ComponentRef Id='MediaFolderComponent'/>
 
+      <ComponentRef Id='EveApplication' />
+      
       <!-- Note: The following ComponentGroupRef is required to pull in generated authoring from project references. -->
       <!-- <ComponentGroupRef Id="Product.Generated" /> -->
     </Feature>
 
+
+    <FeatureRef Id='EveMediaPlayerFileAssociations' />
+    
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
     <Property Id="WIXUI_MEDIAFOLDER" Value="MEDIAFOLDER" />
 
@@ -187,6 +215,7 @@
 
       <Property Id="ARPNOMODIFY" Value="1" />
 
+      <DialogRef Id="FeaturesDlg" />
       <DialogRef Id="BrowseDlg" />
       <DialogRef Id="DiskCostDlg" />
       <DialogRef Id="ErrorDlg" />
@@ -256,9 +285,12 @@
 
       <Publish Dialog="MediaDirDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg">1</Publish>
       <Publish Dialog="MediaDirDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_MEDIAFOLDER]" Order="1">1</Publish>
-      <Publish Dialog="MediaDirDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="2">1</Publish>
+      <Publish Dialog="MediaDirDlg" Control="Next" Event="NewDialog" Value="FeaturesDlg" Order="2">1</Publish>
       <Publish Dialog="MediaDirDlg" Control="ChangeFolder" Property="_BrowseProperty" Value="[WIXUI_MEDIAFOLDER]" Order="1">1</Publish>
       <Publish Dialog="MediaDirDlg" Control="ChangeFolder" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
+
+      <Publish Dialog="FeaturesDlg" Control="Back" Event="NewDialog" Value="MediaDirDlg">1</Publish>
+      <Publish Dialog="FeaturesDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
 
       <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaDirDlg" Order="1">NOT Installed</Publish>
       <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2">Installed</Publish>
