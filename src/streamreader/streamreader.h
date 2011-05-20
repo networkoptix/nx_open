@@ -9,7 +9,7 @@
 class CLStreamreader;
 class CLDevice;
 
-#define CL_MAX_DATASIZE (20*1024*1024) // assume we can never get compressed data with  size greater than this
+#define CL_MAX_DATASIZE (10*1024*1024) // assume we can never get compressed data with  size greater than this
 #define CL_MAX_CHANNEL_NUMBER (10) 
 
 class CLStreamreader : public CLLongRunnable
@@ -21,6 +21,8 @@ public:
 	virtual ~CLStreamreader();
 
 	CLDevice* getDevice() const;
+
+    virtual bool dataCanBeAccepted() const;
 
 	void setStatistics(CLStatistics* stat);
 	virtual void setStreamParams(CLParamList newParam);

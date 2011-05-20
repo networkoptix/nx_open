@@ -8,7 +8,8 @@
 
 extern int ping_timeout ;
 
-CLNetworkDevice::CLNetworkDevice()
+CLNetworkDevice::CLNetworkDevice():
+mAfterRouter(false)
 {
 	addDeviceTypeFlag(CLDevice::NETWORK);
 }
@@ -39,6 +40,16 @@ QString CLNetworkDevice::getMAC() const
 void  CLNetworkDevice::setMAC(const QString& mac) 
 {
 	m_mac = mac;
+}
+
+void CLNetworkDevice::setAfterRouter(bool after)
+{
+    mAfterRouter = after;
+}
+
+bool CLNetworkDevice::isAfterRouter() const
+{
+    return mAfterRouter;
 }
 
 void CLNetworkDevice::setAuth(const QString& user, QString password)
@@ -81,7 +92,10 @@ QString CLNetworkDevice::toString() const
 
 bool CLNetworkDevice::conflicting()
 {
-	QTime time;
+    if (mAfterRouter)
+        return false;
+	
+    QTime time;
 	time.restart();
 	CL_LOG(cl_logDEBUG2) cl_log.log("begining of CLNetworkDevice::conflicting() ",  cl_logDEBUG2);
 

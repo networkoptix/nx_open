@@ -34,6 +34,9 @@ public:
 	// return true if device conflicting with smth else ( IP coflict )
 	bool conflicting();
 
+    void setAfterRouter(bool after);
+    bool isAfterRouter() const;
+
 	virtual QString toString() const;
 
 	//=============
@@ -56,6 +59,8 @@ protected:
 	QString m_mac;
 
 	QHostAddress m_local_adssr; // address used to discover this divece ( in case if machine has more than one NIC/address
+
+    bool mAfterRouter; // if this flag is true conflicting() will return false anyway 
 
 private:
 	QAuthenticator m_auth;

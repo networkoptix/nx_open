@@ -174,7 +174,7 @@ CLDeviceList CLDeviceSearcher::findNewDevices(bool& ip_finished)
 	{
 		CLNetworkDevice* device = static_cast<CLNetworkDevice*>(dev);
 
-		if (!m_netState.isInMachineSubnet(device->getIP())) // not the same network
+		if ((!device->isAfterRouter()) && (!m_netState.isInMachineSubnet(device->getIP()))) // not the same network
 			device->getStatus().setFlag(CLDeviceStatus::NOT_IN_SUBNET);
 	}
 

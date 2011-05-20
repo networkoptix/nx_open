@@ -1,17 +1,17 @@
-#include "./cpull_stremreader.h"
+#include "./spush_streamreader.h"
 #include "../base/sleep.h"
 #include "../base/log.h"
 #include "../data/mediadata.h"
 #include "device/device.h"
 #include "device/device_video_layout.h"
 
-CLClientPullStreamreader::CLClientPullStreamreader(CLDevice* dev ):
+CLServerPushStreamreader::CLServerPushStreamreader(CLDevice* dev ):
 CLStreamreader(dev)
 {
 }
 
 
-void CLClientPullStreamreader::run()
+void CLServerPushStreamreader::run()
 {
 	CL_LOG(cl_logINFO) cl_log.log("stream reader started.", cl_logINFO);
 
@@ -26,25 +26,27 @@ void CLClientPullStreamreader::run()
 		if (needToStop()) // extra check after pause
 			break;
 
-		// check queue sizes
+        if (!isStreamOpened())
+        {
+            openStream();
+            if (!isStreamOpened())
+            {
+                CLSleep::msleep(20); // to avoid large CPU usage
 
-		if (!dataCanBeAccepted())
-		{
-			CLSleep::msleep(5);
-			continue;
-		}
+                setNeedKeyData();
+                frames_lost++;
+                m_stat[0].onData(0);
+                m_stat[0].onEvent(CL_STAT_FRAME_LOST);
 
+                if (frames_lost==4) // if we lost 2 frames => connection is lost for sure (2)
+                    m_stat[0].onLostConnection();
 
-		if (CLDevice::commandProchasSuchDeviceInQueue(m_device)) // if command processor has something in the queue for this device let it go first
-		{
-			CLSleep::msleep(5);
-			continue;
-		}
+                continue;
+            }
+        }
 
-		CLAbstractMediaData *data = 0;
-		data = getNextData();
-		//if (data) data->releaseRef();
-		//continue;
+        CLAbstractMediaData *data = 0;
+        data = getNextData();
 
 		if (data==0)
 		{
@@ -55,8 +57,6 @@ void CLClientPullStreamreader::run()
 
 			if (frames_lost==4) // if we lost 2 frames => connection is lost for sure (2)
 				m_stat[0].onLostConnection();
-
-			CLSleep::msleep(30);
 
 			continue;
 		}
@@ -102,8 +102,17 @@ void CLClientPullStreamreader::run()
         if (videoData)
             m_stat[videoData->channelNumber].onData(data->data.size());
 
-        putData(data);
+        // check queue sizes
+        if (dataCanBeAccepted())
+            putData(data);        
+        else
+            data->releaseRef();
+
+        
 	}
+
+    if (isStreamOpened())
+        closeStream();
 
 	CL_LOG(cl_logINFO) cl_log.log("stream reader stopped.", cl_logINFO);
 }

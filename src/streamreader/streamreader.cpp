@@ -25,6 +25,25 @@ CLDevice* CLStreamreader::getDevice() const
 	return m_device;
 }
 
+bool CLStreamreader::dataCanBeAccepted() const
+{
+    // need to read only if all queues has more space and at least one queue is exist
+    bool result = false;
+    for (int i = 0; i < m_dataprocessors.size(); ++i)
+    {
+        CLAbstractDataProcessor* dp = m_dataprocessors.at(i);
+
+        if (dp->canAcceptData())
+            result = true;
+        else 
+            return false;
+    }
+
+    return result;
+}
+
+
+
 void CLStreamreader::setStatistics(CLStatistics* stat)
 {
 	m_stat = stat;
