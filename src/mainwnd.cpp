@@ -3,6 +3,7 @@
 #include "settings.h"
 #include "ui/layout_navigator.h"
 #include "ui/video_cam_layout/layout_manager.h"
+#include "device/directory_browser.h"
 
 extern QString button_layout;
 extern QString button_home;
@@ -104,8 +105,22 @@ void MainWnd::dropEvent(QDropEvent *event)
     foreach (QUrl url, event->mimeData()->urls())
     {
         QString filename = url.toLocalFile();
-        if (QFile(filename).exists())
+        QFileInfo fileInfo(filename);
+
+        if (fileInfo.isDir())
+        {
+            QDirIterator iter(filename, QDirIterator::Subdirectories);
+            while (iter.hasNext())
+            {
+                QString nextFilename = iter.next();
+                if (QFileInfo(nextFilename).isFile())
+                    files.append(nextFilename);
+            }
+        }
+        else if (fileInfo.isFile())
+        {
             files.append(filename);
+        }
     }
 
     if (!files.isEmpty())
