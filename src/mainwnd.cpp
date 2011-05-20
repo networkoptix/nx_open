@@ -11,6 +11,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WFlags flags):
 //QMainWindow(parent, flags),
 m_normalView(0)
 {
+    setAcceptDrops(true);
 	//ui.setupUi(this);
 	setWindowTitle("HDWitness");
 
@@ -89,4 +90,35 @@ void MainWnd::destroyNavigator(CLLayoutNavigator*& nav)
 		nav = 0;
 	}
 
+}
+
+
+void MainWnd::dragEnterEvent(QDragEnterEvent *event)
+{
+    event->acceptProposedAction();
+}
+
+void MainWnd::dropEvent(QDropEvent *event)
+{
+    QStringList files;
+    foreach (QUrl url, event->mimeData()->urls())
+    {
+        QString filename = url.toLocalFile();
+        if (QFile(filename).exists())
+            files.append(filename);
+    }
+
+    if (!files.isEmpty())
+    {
+        LayoutContent* content = CLSceneLayoutManager::instance().getNewEmptyLayoutContent();
+
+        CLDeviceManager::instance().addFiles(files);
+
+        foreach(QString file, files)
+        {
+            content->addDevice(file);
+        }
+
+        m_normalView->goToNewLayoutContent(content);
+    }
 }

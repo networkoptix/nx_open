@@ -19,6 +19,9 @@ public:
 private:
 	void closeEvent ( QCloseEvent * event );
 	void destroyNavigator(CLLayoutNavigator*& nav);
+
+    void dragEnterEvent(QDragEnterEvent *event);
+    void dropEvent(QDropEvent *event);
 private:
 
 	CLLayoutNavigator* m_normalView;
