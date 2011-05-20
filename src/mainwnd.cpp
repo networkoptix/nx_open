@@ -68,7 +68,10 @@ m_normalView(0)
 	m_normalView->getView().setViewMode(GraphicsView::NormalView);
 
 	setLayout(l);
-	showFullScreen();
+    if (!files.isEmpty())
+        show();
+    else
+	    showFullScreen();
 }
 
 MainWnd::~MainWnd()
