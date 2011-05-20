@@ -5,6 +5,7 @@
 #include "device_plugins/archive/archive/archive_device.h"
 #include "util.h"
 #include "device_plugins/archive/avi_files/avi_device.h"
+#include "../file_device.h"
 
 // Init static variables
 CLDeviceManager* CLDeviceManager::m_Instance = 0;
@@ -353,7 +354,13 @@ void CLDeviceManager::addFiles(const QStringList& files)
     CLDeviceList lst;
     foreach(QString xfile, files)
     {
-        CLAviDevice* dev = new CLAviDevice(xfile);
+        CLDevice* dev = 0;
+
+        if (xfile.endsWith(".jpeg") || xfile.endsWith(".jpg"))
+            dev = new CLFileDevice(xfile);
+        else
+            dev = new CLAviDevice(xfile);
+
         lst[dev->getUniqueId()] = dev;
     }
     onNewDevices_helper(lst, generalArchiverId);
