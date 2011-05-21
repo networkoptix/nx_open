@@ -1,54 +1,30 @@
-#include "android_stream_reader.h"
+#include "iqeye_stream_reader.h"
 #include "device/network_device.h"
 #include "network/simple_http_client.h"
 #include "data/mediadata.h"
 
 
-char jpeg_start[2] = {0xff, 0xd8};
-char jpeg_end[2] = {0xff, 0xd9};
+extern char jpeg_start[2];
+extern char jpeg_end[2];
 
 
-int contain_subst(char *data, int datalen, char *subdata, int subdatalen)
-{
-    if (!data || !subdata || datalen<=0 || subdatalen <= 0 ) 
-        return -1;
-
-    int coincidence_len = 0;
-    char *pdata = data;
+extern int contain_subst(char *data, int datalen, char *subdata, int subdatalen);
 
 
-    while(1)
-    {
-        if (*pdata == subdata[coincidence_len])
-            ++coincidence_len;
-        else
-            coincidence_len = 0;
 
-        if (coincidence_len==subdatalen)
-            return (pdata-data - subdatalen + 1);
-
-        if (pdata-data==datalen-1)
-            return -1;//not found
-
-        pdata++;
-
-    }
-}
-
-
-CLAndroidStreamreader::CLAndroidStreamreader(CLDevice* dev)
+CLIQEyeStreamreader::CLIQEyeStreamreader(CLDevice* dev)
 :CLServerPushStreamreader(dev),
 mHttpClient(0)
 {
 
 }
 
-CLAndroidStreamreader::~CLAndroidStreamreader()
+CLIQEyeStreamreader::~CLIQEyeStreamreader()
 {
     
 }
 
-CLAbstractMediaData* CLAndroidStreamreader::getNextData()
+CLAbstractMediaData* CLIQEyeStreamreader::getNextData()
 {
     if (!isStreamOpened())
         return 0;
@@ -56,35 +32,39 @@ CLAbstractMediaData* CLAndroidStreamreader::getNextData()
     CLCompressedVideoData* videoData = new CLCompressedVideoData(CL_MEDIA_ALIGNMENT,   CL_MAX_DATASIZE/2);
     CLByteArray& img = videoData->data;
 
-
     bool getting_image = false;
+
+
 
     while (isStreamOpened() && !needToStop())
     {
-        int readed = 0;
-
         if (mDataRemainedBeginIndex<0)
-            readed = mHttpClient->read(mData, BLOCK_SIZE);
+        {
+            mReaded = mHttpClient->read(mData, BLOCK_SIZE);
+        }
         else
         {
-            readed = BLOCK_SIZE - mDataRemainedBeginIndex;
-            memmove(mData, mData + mDataRemainedBeginIndex, readed);
+            mReaded = mReaded - mDataRemainedBeginIndex;
+            memmove(mData, mData + mDataRemainedBeginIndex, mReaded);
             mDataRemainedBeginIndex = -1;
         }
 
-        if (readed < 0 )
+        
+        if (mReaded < 0 )
             break;
 
 
         if (!getting_image)
         {
-            int image_index = contain_subst(mData, readed, jpeg_start, 2);
-            if (image_index>=0)
+
+            int image_index = contain_subst(mData, mReaded, jpeg_start, 2);
+
+            if (image_index >=0 )
             {
                 getting_image = true;
-                char *to = img.prepareToWrite(readed - image_index); // I assume any image is bigger than BLOCK_SIZE
-                memcpy(to, mData + image_index, readed - image_index);
-                img.done(readed - image_index);
+                char *to = img.prepareToWrite(mReaded - image_index); // I assume any image is bigger than BLOCK_SIZE
+                memcpy(to, mData + image_index, mReaded - image_index);
+                img.done(mReaded - image_index);
             }
             else
             {
@@ -98,13 +78,14 @@ CLAbstractMediaData* CLAndroidStreamreader::getNextData()
                 break;
 
 
-            int image_end_index = contain_subst(mData, readed, jpeg_end, 2);
-            if (image_end_index<0)
+            int image_end_index = contain_subst(mData, mReaded, jpeg_end, 2);
+            if (image_end_index < 0)
             {
-                img.write(mData, readed); // I assume any image is bigger than BLOCK_SIZE
+                img.write(mData, mReaded);
             }
             else
             {
+
                 image_end_index+=2;
 
 
@@ -112,8 +93,8 @@ CLAbstractMediaData* CLAndroidStreamreader::getNextData()
                 getting_image = false;
                 img.write(mData, image_end_index);
 
-                if (readed - image_end_index - 1 > 0)
-                    mDataRemainedBeginIndex = image_end_index + 1;
+                if (mReaded - image_end_index > 0)
+                    mDataRemainedBeginIndex = image_end_index;
                 else
                     mDataRemainedBeginIndex = -1;
                     
@@ -145,28 +126,28 @@ CLAbstractMediaData* CLAndroidStreamreader::getNextData()
 
 }
 
-void CLAndroidStreamreader::openStream()
+void CLIQEyeStreamreader::openStream()
 {
     if (isStreamOpened())
         return;
 
-    QString request = "videofeed";
+    QString request = "now.jpg?snap=spush?dummy=1305868336917";
     CLNetworkDevice* ndev = static_cast<CLNetworkDevice*>(m_device);
 
-    mHttpClient = new CLSimpleHTTPClient(ndev->getIP(), 8080, 2000, ndev->getAuth());
+    mHttpClient = new CLSimpleHTTPClient(ndev->getIP(), 80, 2000, ndev->getAuth());
     mHttpClient->setRequestLine(request);
     mHttpClient->openStream();
 
     mDataRemainedBeginIndex = -1;
 }
 
-void CLAndroidStreamreader::closeStream()
+void CLIQEyeStreamreader::closeStream()
 {
     delete mHttpClient;
     mHttpClient = 0;
 }
 
-bool CLAndroidStreamreader::isStreamOpened() const
+bool CLIQEyeStreamreader::isStreamOpened() const
 {
     return ( mHttpClient && mHttpClient->isOpened() );
 }

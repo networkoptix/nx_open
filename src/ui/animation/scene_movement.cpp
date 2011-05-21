@@ -141,6 +141,8 @@ void CLSceneMovement::setPosition(QPointF p)
             QRectF wnd_rect =  item->sceneBoundingRect();
             QRectF viewport_rec = m_view->mapToScene(m_view->viewport()->rect()).boundingRect();
 
+            // animation cannot be stoped inside animation
+            /*/
             if (dx<0)
             {
                 if ( (wnd_rect.topLeft().x() -  viewport_rec.topLeft().x()) >  percent*wnd_rect.width())
@@ -164,6 +166,7 @@ void CLSceneMovement::setPosition(QPointF p)
                 if ( (viewport_rec.bottomLeft().y()- wnd_rect.bottomRight().y()) >  percent*wnd_rect.height())
                     stopAnimation();
             }
+            /**/
 
         }
 
