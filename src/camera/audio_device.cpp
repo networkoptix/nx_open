@@ -20,6 +20,13 @@ CLAudioDevice::CLAudioDevice(QAudioFormat format)
 
     bool supported = true;
 
+
+    // qt code is strange; isFormatSupported expects centain set of freq; but everything works
+    int old_frequency = format.frequency(); // remember old frequency 
+    format.setFrequency(44100); // set supported frequency
+
+
+
     if (!info.isFormatSupported(format)) 
     {
         if (format.channels()>2)
@@ -27,12 +34,6 @@ CLAudioDevice::CLAudioDevice(QAudioFormat format)
             format.setChannels(2);
             m_downmixing = true;
         }
-
-        if (format.frequency()==11024)
-        {
-            format.setFrequency(11025);
-        }
-
 
         if (format.sampleType() == QAudioFormat::Float)
         {
@@ -48,6 +49,8 @@ CLAudioDevice::CLAudioDevice(QAudioFormat format)
         }
 
     }
+
+    format.setFrequency(old_frequency);
 
     if (supported)
     {
