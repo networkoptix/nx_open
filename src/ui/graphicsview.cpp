@@ -383,7 +383,7 @@ void GraphicsView::onSecTimer()
 
 		++mShow.m_counrer;
 
-		if (mShow.m_counrer>4*60)
+		if (mShow.m_counrer>4*60*60) // show will start after 4 h 
 		{
 			if (m_camLayout.getItemList().count()<2 || !m_camLayout.getContent()->checkIntereactionFlag(LayoutContent::ShowAvalable))
 			{
@@ -1807,7 +1807,7 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 			break;
 
 		case Qt::Key_X:
-			mShow.m_counrer+=10*60;
+			mShow.m_counrer+=10*60*60;
 			break;
 
         case Qt::Key_Escape:
