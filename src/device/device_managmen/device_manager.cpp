@@ -354,7 +354,17 @@ void CLDeviceManager::addFiles(const QStringList& files)
     CLDeviceList lst;
     foreach(QString xfile, files)
     {
-        CLDevice* dev = 0;
+
+        //onNewDevices_helper does not check if devices already exist
+        //so must be checked here
+
+        CLDevice* dev = getDeviceById(xfile);
+
+        if (dev)
+        {
+            dev->releaseRef();
+            continue; // such dev already exists 
+        }
 
         if (xfile.endsWith(".jpeg") || xfile.endsWith(".jpg"))
             dev = new CLFileDevice(xfile);
@@ -363,5 +373,7 @@ void CLDeviceManager::addFiles(const QStringList& files)
 
         lst[dev->getUniqueId()] = dev;
     }
+
+
     onNewDevices_helper(lst, generalArchiverId);
 }
