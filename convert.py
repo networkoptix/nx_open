@@ -9,10 +9,7 @@ import stat, time
 
 os.path = posixpath
 
-if sys.platform == 'win32':
-    FFMPEG = 'ffmpeg-git-2011-04-27'
-else:
-    FFMPEG = 'ffmpeg-git-2011-05-09'
+FFMPEG_VERSION = '2011-05-24'
 
 INTRO_FILE = '../uniclient_media/intro.mov'
 
@@ -91,6 +88,35 @@ def index_dirs(xdirs, template_file, output_file, use_prefix = False):
 
     uniclient_pro.close()
 
+
+ffmpeg_path = os.getenv('EVE_FFMPEG').replace('\\', '/')
+if not ffmpeg_path:
+    print r"""EVE_FFMPEG environment variable is not defined.
+Do the following:
+1. Clone repository ssh://hg@vigasin.com/ffmpeg to somewhere, say c:\programming\ffmpeg
+2. Go to c:\programming\ffmpeg and run get_ffmpegs.bat
+3. Add system environment variable EVE_FFMPEG with value c:\programming\ffmpeg
+"""
+    sys.exit(1)
+
+ffmpeg = 'ffmpeg-git-' + FFMPEG_VERSION
+if sys.platform == 'win32':
+    ffmpeg += '-mingw'
+else:
+    ffmpeg += '-macos'
+
+ffmpeg_path = os.path.join(ffmpeg_path, ffmpeg)
+ffmpeg_path_debug = ffmpeg_path + '-debug'
+ffmpeg_path_release = ffmpeg_path + '-release'
+
+if not os.path.isdir(ffmpeg_path_debug):
+    print >> sys.stderr, "Can't find directory %s. Make sure variable EVE_FFMPEG is correct." % ffmpeg_path_debug
+    sys.exit(1)
+
+if not os.path.isdir(ffmpeg_path_release):
+    print >> sys.stderr, "Can't find directory %s. Make sure variable EVE_FFMPEG is correct." % ffmpeg_path_release
+    sys.exit(1)
+
 if os.path.exists('bin'):
     rmtree('bin')
 
@@ -105,11 +131,17 @@ os.mkdir('bin/release-test')
 
 os.mkdir('build')
 
-copy_files('contrib/' + FFMPEG + '/bin/debug/*.dll', 'bin/debug')
-copy_files('contrib/' + FFMPEG + '/bin/release/*.dll', 'bin/release')
+copy_files(ffmpeg_path_debug + '/bin/*-[0-9].dll', 'bin/debug')
+copy_files(ffmpeg_path_debug + '/bin/*-[0-9][0-9].dll', 'bin/debug')
 
-copy_files('contrib/' + FFMPEG + '/bin/debug/*.dll', 'bin/debug-test')
-copy_files('contrib/' + FFMPEG + '/bin/release/*.dll', 'bin/release-test')
+copy_files(ffmpeg_path_release + '/bin/*-[0-9].dll', 'bin/release')
+copy_files(ffmpeg_path_release + '/bin/*-[0-9][0-9].dll', 'bin/release')
+
+copy_files(ffmpeg_path_debug + '/bin/*-[0-9].dll', 'bin/debug-test')
+copy_files(ffmpeg_path_debug + '/bin/*-[0-9][0-9].dll', 'bin/debug-test')
+
+copy_files(ffmpeg_path_release + '/bin/*-[0-9].dll', 'bin/release-test')
+copy_files(ffmpeg_path_release + '/bin/*-[0-9][0-9].dll', 'bin/release-test')
 
 os.mkdir('bin/debug/arecontvision')
 os.mkdir('bin/release/arecontvision')
@@ -138,8 +170,8 @@ index_dirs(('src', 'test'), 'test/const.pro', 'test/uniclient_tests.pro', True)
 
 
 if sys.platform == 'win32':
-    os.system('qmake -tp vc FFMPEG=%s -o src/uniclient.vcproj src/uniclient.pro' % FFMPEG)
-    os.system('qmake -tp vc FFMPEG=%s -o test/uniclient_tests.vcproj test/uniclient_tests.pro' % FFMPEG)
+    os.system('qmake -tp vc FFMPEG=%s -o src/uniclient.vcproj src/uniclient.pro' % ffmpeg_path)
+    os.system('qmake -tp vc FFMPEG=%s -o test/uniclient_tests.vcproj test/uniclient_tests.pro' % ffmpeg_path)
     os.system('src\\qmake_vc_fixer src\\uniclient.vcproj')
     os.unlink('src/uniclient.vcproj')
     os.rename('src/uniclient.new.vcproj', 'src/uniclient.vcproj')
@@ -151,4 +183,4 @@ elif sys.platform == 'darwin':
     if os.path.exists('src/uniclient.xcodeproj'):
         rmtree('src/uniclient.xcodeproj')
 
-    os.system('qmake FFMPEG=%s -o src/uniclient.xcodeproj src/uniclient.pro' % FFMPEG)
+    os.system('qmake FFMPEG=%s -o src/uniclient.xcodeproj src/uniclient.pro' % ffmpeg_path)

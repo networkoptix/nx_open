@@ -128,15 +128,15 @@
             </Component>
 
             <Component Id="QTLibraries" Guid="3E273FF1-35A7-44da-864C-61EE9E9B7EA8">
-              <File Id="QtCore4" Name="QtCore4.dll" Source="C:\Qt\4.7.2\bin\QtCore4.dll"/>
-              <File Id="QtGui4" Name="QtGui4.dll" Source="C:\Qt\4.7.2\bin\QtGui4.dll"/>
-              <File Id="QtMultimedia4" Name="QtMultimedia4.dll" Source="C:\Qt\4.7.2\bin\QtMultimedia4.dll"/>
-              <File Id="QtNetwork4" Name="QtNetwork4.dll" Source="C:\Qt\4.7.2\bin\QtNetwork4.dll"/>
-              <File Id="QtOpenGL4" Name="QtOpenGL4.dll" Source="C:\Qt\4.7.2\bin\QtOpenGL4.dll"/>
-              <File Id="QtWebKit4" Name="QtWebKit4.dll" Source="C:\Qt\4.7.2\bin\QtWebKit4.dll"/>
-              <File Id="QtXml4" Name="QtXml4.dll" Source="C:\Qt\4.7.2\bin\QtXml4.dll"/>
-              <File Id="QtXmlPatterns4" Name="QtXmlPatterns4.dll" Source="C:\Qt\4.7.2\bin\QtXmlPatterns4.dll"/>
-              <File Id="phonon4" Name="phonon4.dll" Source="C:\Qt\4.7.2\bin\phonon4.dll"/>
+              <File Id="QtCore4" Name="QtCore4.dll" Source="C:\Qt\4.7.3\bin\QtCore4.dll"/>
+              <File Id="QtGui4" Name="QtGui4.dll" Source="C:\Qt\4.7.3\bin\QtGui4.dll"/>
+              <File Id="QtMultimedia4" Name="QtMultimedia4.dll" Source="C:\Qt\4.7.3\bin\QtMultimedia4.dll"/>
+              <File Id="QtNetwork4" Name="QtNetwork4.dll" Source="C:\Qt\4.7.3\bin\QtNetwork4.dll"/>
+              <File Id="QtOpenGL4" Name="QtOpenGL4.dll" Source="C:\Qt\4.7.3\bin\QtOpenGL4.dll"/>
+              <File Id="QtWebKit4" Name="QtWebKit4.dll" Source="C:\Qt\4.7.3\bin\QtWebKit4.dll"/>
+              <File Id="QtXml4" Name="QtXml4.dll" Source="C:\Qt\4.7.3\bin\QtXml4.dll"/>
+              <File Id="QtXmlPatterns4" Name="QtXmlPatterns4.dll" Source="C:\Qt\4.7.3\bin\QtXmlPatterns4.dll"/>
+              <File Id="phonon4" Name="phonon4.dll" Source="C:\Qt\4.7.3\bin\phonon4.dll"/>
             </Component>
 
             

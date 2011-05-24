@@ -12,6 +12,7 @@ debug {
   MOC_DIR = ../build/debug/generated
   UI_DIR = ../build/debug/generated
   RCC_DIR = ../build/debug/generated
+  INCLUDEPATH += $$FFMPEG-debug/include
 }
 
 release {
@@ -20,19 +21,17 @@ release {
   MOC_DIR = ../build/release/generated
   UI_DIR = ../build/release/generated
   RCC_DIR = ../build/release/generated
+  INCLUDEPATH += $$FFMPEG-release/include
 }
 
 
 win32 {
   QMAKE_CXXFLAGS += -MP /Fd$(IntDir)
   INCLUDEPATH += ../contrib/ffmpeg-misc-headers-win32
-  INCLUDEPATH += ../contrib/$$FFMPEG/include
   RC_FILE = uniclient.rc
 }
 
 mac {
-  INCLUDEPATH += /Users/ivan/opt/$$FFMPEG-mingw-release/include
-
   PRIVATE_FRAMEWORKS.files = ../resource/arecontvision
   PRIVATE_FRAMEWORKS.path = Contents/MacOS
   QMAKE_BUNDLE_DATA += PRIVATE_FRAMEWORKS
@@ -50,17 +49,15 @@ FORMS += mainwnd.ui preferences.ui licensekey.ui
 win32 {
   LIBS += ws2_32.lib Iphlpapi.lib
   QMAKE_LFLAGS += avcodec-53.lib avdevice-53.lib avfilter-2.lib avformat-53.lib avutil-51.lib swscale-0.lib
-  QMAKE_LFLAGS_DEBUG += /libpath:../contrib/$$FFMPEG/bin/debug
-  QMAKE_LFLAGS_RELEASE += /libpath:../contrib/$$FFMPEG/bin/release
-#  QMAKE_LFLAGS_DEBUG += /libpath:../contrib/$$FFMPEG-mingw-debug/lib
-#  QMAKE_LFLAGS_RELEASE += /libpath:../contrib/$$FFMPEG-mingw-release/lib
+  QMAKE_LFLAGS_DEBUG += /libpath:$$FFMPEG-debug/bin
+  QMAKE_LFLAGS_RELEASE += /libpath:$$FFMPEG-release/bin
 }  
 
 mac {
   LIBS += -framework SystemConfiguration
   QMAKE_LFLAGS += -lavcodec.53 -lavdevice.53 -lavfilter.2 -lavformat.53 -lavutil.51 -lswscale.0 -lz -lbz2
-  QMAKE_LFLAGS_DEBUG += -L/Users/ivan/opt/$$FFMPEG-mingw-debug/lib
-  QMAKE_LFLAGS_RELEASE += -L/Users/ivan/opt/$$FFMPEG-mingw-release/lib
+  QMAKE_LFLAGS_DEBUG += -L$$FFMPEG-debug/lib
+  QMAKE_LFLAGS_RELEASE += -L$$FFMPEG-release/lib
   QMAKE_POST_LINK += mkdir -p `dirname $(TARGET)`/arecontvision; cp -f ../bin/arecontvision/devices.xml `dirname $(TARGET)`/arecontvision
 }
 

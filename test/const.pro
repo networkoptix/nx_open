@@ -11,6 +11,7 @@ debug {
   MOC_DIR = ../build/debug-test/generated
   UI_DIR = ../build/debug-test/generated
   RCC_DIR = ../build/debug-test/generated
+  INCLUDEPATH += $$FFMPEG-debug/include
 }
 
 release {
@@ -19,6 +20,7 @@ release {
   MOC_DIR = ../build/release-test/generated
   UI_DIR = ../build/release-test/generated
   RCC_DIR = ../build/release-test/generated
+  INCLUDEPATH += $$FFMPEG-release/include
 }
 
 
@@ -26,7 +28,6 @@ win32 {
   QMAKE_CXXFLAGS += -MP /Fd$(IntDir) -DUNICLIENT_TESTS
   INCLUDEPATH += ../src
   INCLUDEPATH += ../contrib/ffmpeg-misc-headers-win32
-  INCLUDEPATH += ../contrib/$$FFMPEG/include
   RC_FILE = ../src/uniclient.rc
 }
 
