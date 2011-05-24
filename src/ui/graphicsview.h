@@ -229,6 +229,8 @@ protected:
 
 	CLGridItem* m_gridItem;
 
+    bool mMenuIsHere;
+
 };
 
 #endif //PH_graphicsview_h328

@@ -84,7 +84,8 @@ m_min_scene_zoom(0.06),
 mShow(this),
 m_gridItem(0),
 mSteadyShow(this),
-mWheelZooming(false)
+mWheelZooming(false),
+mMenuIsHere(false)
 {
 
 	setScene(&m_scene);
@@ -1308,7 +1309,9 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
 	}
 
+    mMenuIsHere = true;
 	QAction* act = menu.exec(QCursor::pos());
+    mMenuIsHere = false;
 
 	//=========results===============================
 
@@ -1676,7 +1679,7 @@ void GraphicsView::goToSteadyMode(bool steady)
 
     if (steady)
     {
-        if (m_seachItem && m_seachItem->hasFocus())
+        if (m_seachItem && m_seachItem->hasFocus() || mMenuIsHere)
         {
             onUserInput(false, false);
             return;
@@ -1864,9 +1867,7 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
                     CLAbstractArchiveReader* asr = static_cast<CLAbstractArchiveReader*>(cam->getStreamreader());
                     asr->jumpTo(0, true);
                 }
-                
             }
-
 
 
             //if (next_item)
