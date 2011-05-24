@@ -366,7 +366,7 @@ void CLDeviceManager::addFiles(const QStringList& files)
             continue; // such dev already exists 
         }
 
-        if (xfile.endsWith(".jpeg") || xfile.endsWith(".jpg"))
+        if (xfile.toLower().endsWith(".jpeg") || xfile.toLower().endsWith(".jpg"))
             dev = new CLFileDevice(xfile);
         else
             dev = new CLAviDevice(xfile);
