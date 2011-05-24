@@ -46,14 +46,14 @@ CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale)
 	  m_outputWidth(0),
 	  m_outputHeight(0)
 {
-	for (int i = 0; i < CL_VARIOUSE_DECODERS;++i)
-		m_decoder[i] = 0;
 }
 
 CLVideoStreamDisplay::~CLVideoStreamDisplay()
 {
-	for (int i = 0; i < CL_VARIOUSE_DECODERS;++i)
-		delete m_decoder[i];
+    foreach(CLAbstractVideoDecoder* decoder, m_decoder)
+    {
+        delete decoder;
+    }
 
 	freeScaleContext();
 }
@@ -120,7 +120,7 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 	{
 		QMutexLocker mutex(&m_mtx);
 
-		if (data->compressionType<0 || data->compressionType>CL_VARIOUSE_DECODERS-1)
+		if (data->compressionType == CODEC_ID_NONE)
 		{
 			cl_log.log("CLVideoStreamDisplay::dispay: unknown codec type...", cl_logERROR);
 			return;
@@ -289,9 +289,10 @@ void CLVideoStreamDisplay::setLightCPUMode(bool val)
 	m_lightCPUmode = val;
 	QMutexLocker mutex(&m_mtx);
 
-	for (int i = 0; i < CL_VARIOUSE_DECODERS;++i)
-		if (m_decoder[i])
-			m_decoder[i]->setLightCpuMode(val);
+    foreach(CLAbstractVideoDecoder* decoder, m_decoder)
+    {
+	    decoder->setLightCpuMode(val);
+    }
 }
 
 void CLVideoStreamDisplay::copyImage(bool copy)

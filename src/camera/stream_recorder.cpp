@@ -13,7 +13,7 @@ CLAbstractDataProcessor(10),
 m_device(dev),
 m_firstTime(true)
 {
-	m_version = 1;
+	m_version = 2;
 
 	memset(m_data, 0, sizeof(m_data));
 	memset(m_description, 0, sizeof(m_description));

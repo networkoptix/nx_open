@@ -97,7 +97,7 @@ CLAbstractMediaData* FakeStreamReader::getNextData()
 	img.write((char*)(pdata[m_curr_channel]), descr_len);
 	pdata[m_curr_channel]+=descr_len;
 
-	videoData->compressionType = CL_H264;
+	videoData->compressionType = CODEC_ID_H264;
 	videoData->width = 1600;
 	videoData->height = 1184;
 	videoData->channelNumber = m_curr_channel;

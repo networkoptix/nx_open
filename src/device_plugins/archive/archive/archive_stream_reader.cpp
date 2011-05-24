@@ -246,7 +246,7 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
 	int readed = m_data_stream[channel].readRawData(data.data(), finfo.size);
 	data.done(readed);
 
-	videoData->compressionType = CLCodecType(finfo.codec);
+	videoData->compressionType = (CodecID)finfo.codec;
 	videoData->keyFrame = finfo.keyFrame;
 	videoData->channelNumber = channel;
 	videoData->useTwice = m_useTwice;
@@ -473,7 +473,7 @@ int CLArchiveStreamReader::slowest_channel() const
 
 void CLArchiveStreamReader::parse_channel_data(int channel, int data_version, char* data, unsigned int len)
 {
-	if (data_version!=1)
+	if (data_version != 1 && data_version != 2)
 		return;
 
 	char* endpoint = data + len - 1;
@@ -486,7 +486,13 @@ void CLArchiveStreamReader::parse_channel_data(int channel, int data_version, ch
 
 		finfo.size = *((unsigned int*)data); data+=4;
 		finfo.abs_time = *((quint64*)data); data+=8;
+
 		finfo.codec = *((unsigned int*)data); data+=4;
+        if (data_version == 1)
+        {
+            finfo.codec = internalCodecIdToFfmpeg(CLCodecType(finfo.codec));
+        }
+
 		finfo.keyFrame = *((unsigned char*)data); data+=1;
 		finfo.shift = shift;
 		shift+= finfo.size;

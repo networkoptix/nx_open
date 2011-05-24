@@ -20,7 +20,10 @@ private:
 class CLAudioDecoderFactory
 {
 public:
-	static CLAbstractAudioDecoder* createDecoder(CLCodecType codec, void* codecContext);
+    /**
+      * Passing ffmpeg codec-id. In case of other decoder we'll change it to some decoder-independent type and add decoder framework id as parameter.
+      */
+	static CLAbstractAudioDecoder* createDecoder(CodecID codec, void* codecContext);
 };
 
 #endif //abstract_audio_decoder_h_1532

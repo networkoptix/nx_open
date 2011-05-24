@@ -8,7 +8,7 @@ class CLAlignedData;
 // input to the decoder 
 struct CLAudioData
 {
-	CLCodecType codec; 
+	CodecID codec; 
 
 	const unsigned char* inbuf; // pointer to compressed data
 	int inbuf_len; // compressed data len

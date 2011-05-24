@@ -4,11 +4,11 @@
 
 CLVideoDecoderFactory::CLCodecManufacture CLVideoDecoderFactory::m_codecManufacture = FFMPEG;
 
-CLAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder(CLCodecType codec, void* context)
+CLAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder(CodecID codec, void* context)
 {
 
-	if (codec == CL_JPEG)
-		return new CLFFmpegVideoDecoder(CL_JPEG); // for now only FFMPEG JPEG decoder is ready
+	if (codec == CODEC_ID_MJPEG)
+		return new CLFFmpegVideoDecoder(CODEC_ID_MJPEG); // for now only FFMPEG JPEG decoder is ready
 
 	// h264 
 	switch(m_codecManufacture)

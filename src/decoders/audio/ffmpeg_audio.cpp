@@ -13,9 +13,9 @@ extern int MAX_AUDIO_FRAME_SIZE;
 bool CLFFmpegAudioDecoder::m_first_instance = true;
 
 //================================================
-CLFFmpegAudioDecoder::CLFFmpegAudioDecoder(CLCodecType codec_id, AVCodecContext* codecContext):
+CLFFmpegAudioDecoder::CLFFmpegAudioDecoder(CodecID codecId, AVCodecContext* codecContext):
 c(0),
-m_codec(codec_id)
+m_codec(codecId)
 {
 
 	QMutexLocker mutex(&global_ffmpeg_mutex);
@@ -32,55 +32,18 @@ m_codec(codec_id)
 
 	}
 
-	switch(m_codec)
-	{
+//    CodecID codecId = internalCodecIdToFfmpeg(m_codec);
 
-    case CL_PCM_S16LE:
-        codec = avcodec_find_decoder(CODEC_ID_PCM_S16LE);
-        break;
-
-    case CL_PCM_U8:
-        codec = avcodec_find_decoder(CODEC_ID_PCM_U8);
-        break;
-
-
-	case CL_MP2:
-		codec = avcodec_find_decoder(CODEC_ID_MP2);
-		break;
-
-	case CL_MP3:
-		codec = avcodec_find_decoder(CODEC_ID_MP3);
-		break;
-
-	case CL_AC3:
-		codec = avcodec_find_decoder(CODEC_ID_AC3);
-		break;
-
-	case CL_AAC:
-		codec = avcodec_find_decoder(CODEC_ID_AAC);
-		break;
-
-	case CL_WMAPRO:
-		codec = avcodec_find_decoder(CODEC_ID_WMAPRO);
-		break;
-
-	case CL_WMAV2:
-		codec = avcodec_find_decoder(CODEC_ID_WMAV2);
-		break;
-
-	case CL_ADPCM_MS:
-		codec = avcodec_find_decoder(CODEC_ID_ADPCM_MS);
-		break;
-
-	case CL_AMR_NB:
-		codec = avcodec_find_decoder(CODEC_ID_AMR_NB);
-		break;
-
-	default:
-		codec = 0;
-		c = 0;
-		return;
-	}
+    if (codecId != CODEC_ID_NONE)
+    {
+        codec = avcodec_find_decoder(codecId);
+    }
+    else
+    {
+        codec = 0;
+        c = 0;
+        return;
+    }
 
 	c = avcodec_alloc_context();
 

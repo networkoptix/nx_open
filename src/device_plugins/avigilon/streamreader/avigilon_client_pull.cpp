@@ -58,7 +58,7 @@ CLAbstractMediaData* CLAvigilonStreamreader::getNextData()
     img.removeZerrowsAtTheEnd();
 
     //video/H.264I
-    videoData->compressionType = CL_JPEG;
+    videoData->compressionType = CODEC_ID_MJPEG;
     videoData->width = 1920;
     videoData->height = 1088;
 

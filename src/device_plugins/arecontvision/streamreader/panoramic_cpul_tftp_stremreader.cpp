@@ -249,7 +249,7 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 		AVJpeg::Header::GetHeader((unsigned char*)img.data(), size.width, size.height, quality,model.toLatin1().data());
 	}
 
-	videoData->compressionType = h264 ? CL_H264 : CL_JPEG;
+	videoData->compressionType = h264 ? CODEC_ID_H264 : CODEC_ID_MJPEG;
 	videoData->width = size.width;
 	videoData->height = size.height;
 

@@ -18,7 +18,7 @@ struct MpegEncContext;
 class CLFFmpegVideoDecoder : public CLAbstractVideoDecoder
 {
 public:
-	CLFFmpegVideoDecoder(CLCodecType codec, AVCodecContext* codecContext = 0);
+	CLFFmpegVideoDecoder(CodecID codec, AVCodecContext* codecContext = 0);
 	bool decode(CLVideoData& data);
 	~CLFFmpegVideoDecoder();
 
@@ -26,12 +26,12 @@ public:
 
 	virtual void setLightCpuMode(bool val);
 
-    static bool isHardwareAccellerationPossible(CLCodecType codecId, int width, int height)
+    static bool isHardwareAccellerationPossible(CodecID codecId, int width, int height)
     {
-        return codecId == CL_H264 && width <= 1920 && height <= 1088;
+        return codecId == CODEC_ID_H264 && width <= 1920 && height <= 1088;
     }
 private:
-    static AVCodec* findCodec(CLCodecType codecId);
+    static AVCodec* findCodec(CodecID codecId);
 
     void openDecoder();
     void closeDecoder();
@@ -54,7 +54,7 @@ private:
 	int m_height;
 
 	static bool m_first_instance;
-	CLCodecType m_codecId;
+	CodecID m_codecId;
 	bool m_showmotion;
 	bool m_lightCPUMode;
 	bool m_wantEscapeFromLightCPUMode;

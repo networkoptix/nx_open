@@ -25,7 +25,8 @@ public:
 
 private:
 	QMutex m_mtx;
-	CLAbstractVideoDecoder* m_decoder[CL_VARIOUSE_DECODERS];
+    QMap<CodecID, CLAbstractVideoDecoder*> m_decoder;
+
 	CLAbstractRenderer* m_draw;
 
     /**

@@ -45,7 +45,9 @@ private:
 	static void float2int(CLAudioData& audio);
 
 private:
-	CLAbstractAudioDecoder* m_decoder[CL_VARIOUSE_DECODERS];
+    QMap<CodecID, CLAbstractAudioDecoder*> m_decoder;
+
+//	CLAbstractAudioDecoder* m_decoder[CL_VARIOUSE_DECODERS];
 
 	int m_bufferMs;
 	CLAlignedData m_decodedaudio;

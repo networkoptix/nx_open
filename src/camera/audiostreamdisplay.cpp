@@ -53,16 +53,16 @@ CLAudioStreamDisplay::CLAudioStreamDisplay(int bufferMs)
       m_tooFewDataDetected(true),
       m_audioDevice(0)
 {
-	for (int i = 0; i < CL_VARIOUSE_DECODERS;++i)
-		m_decoder[i] = 0;
 }
 
 CLAudioStreamDisplay::~CLAudioStreamDisplay()
 {
 	delete m_audioDevice;
 
-	for (int i = 0; i < CL_VARIOUSE_DECODERS;++i)
-		delete m_decoder[i];
+    foreach(CLAbstractAudioDecoder* decoder, m_decoder)
+    {
+        delete decoder;
+    }
 }
 
 int CLAudioStreamDisplay::msInBuffer() const
@@ -180,7 +180,7 @@ void CLAudioStreamDisplay::putData(CLCompressedAudioData* data)
 
         CLAbstractAudioDecoder* dec = 0;
 
-        if (data->compressionType < 0 || data->compressionType > CL_VARIOUSE_DECODERS - 1)
+        if (data->compressionType == CODEC_ID_NONE)
         {
             cl_log.log("CLAudioStreamDisplay::putdata: unknown codec type...", cl_logERROR);
             data->releaseRef();

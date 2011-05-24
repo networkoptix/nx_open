@@ -12,7 +12,7 @@ int CLFFmpegVideoDecoder::hwcounter = 0;
 
 //================================================
 
-CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CLCodecType codec_id, AVCodecContext* codecContext):
+CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, AVCodecContext* codecContext):
 m_passedContext(codecContext),
 m_width(0),
 m_height(0),
@@ -49,65 +49,13 @@ m_lastWidth(0)
     openDecoder();
 }
 
-AVCodec* CLFFmpegVideoDecoder::findCodec(CLCodecType codecId)
+AVCodec* CLFFmpegVideoDecoder::findCodec(CodecID codecId)
 {
     AVCodec* codec = 0;
 
-    switch(codecId)
-    {
-    case CL_JPEG:
-        codec = avcodec_find_decoder(CODEC_ID_MJPEG);
-        break;
-
-    case CL_MPEG2:
-        codec = avcodec_find_decoder(CODEC_ID_MPEG2VIDEO);
-        break;
-
-    case CL_MPEG4:
-        codec = avcodec_find_decoder(CODEC_ID_MPEG4);
-        break;
-
-    case CL_MSMPEG4V2:
-        codec = avcodec_find_decoder(CODEC_ID_MSMPEG4V2);
-        break;
-
-    case CL_MSMPEG4V3:
-        codec = avcodec_find_decoder(CODEC_ID_MSMPEG4V3);
-        break;
-
-    case CL_MPEG1VIDEO:
-        codec = avcodec_find_decoder(CODEC_ID_MPEG1VIDEO);
-        break;
-
-    case CL_H264:
-        codec = avcodec_find_decoder(CODEC_ID_H264);
-        break;
-
-    case CL_WMV3:
-        codec = avcodec_find_decoder(CODEC_ID_WMV3);
-        break;
-
-    case CL_MSVIDEO1:
-        codec = avcodec_find_decoder(CODEC_ID_MSVIDEO1);
-        break;
-
-    case CL_QTRLE:
-        codec = avcodec_find_decoder(CODEC_ID_QTRLE);
-        break;
-
-    case CL_SVQ3:
-        codec = avcodec_find_decoder(CODEC_ID_SVQ3);
-        break;
-
-    case CL_VP6F:
-        codec = avcodec_find_decoder(CODEC_ID_VP6F);
-        break;
-
-    case CL_CINEPAK:
-        codec = avcodec_find_decoder(CODEC_ID_CINEPAK);
-        break;
-
-    }
+    // CodecID codecId = internalCodecIdToFfmpeg(internalCodecId);
+    if (codecId != CODEC_ID_NONE)
+        codec = avcodec_find_decoder(codecId);
 
     return codec;
 }
@@ -134,7 +82,7 @@ void CLFFmpegVideoDecoder::openDecoder()
     }
 
 #ifdef _USE_DXVA
-    if (m_codecId == CL_H264)
+    if (m_codecId == CODEC_ID_H264)
     {
         c->get_format = FFMpegCallbacks::ffmpeg_GetFormat;
         c->get_buffer = FFMpegCallbacks::ffmpeg_GetFrameBuf;
@@ -195,7 +143,7 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 	if (m_lightCPUMode)
 	{
 
-		if (data.codec == CL_JPEG)
+		if (data.codec == CODEC_ID_MJPEG)
 		{
 			if (m_lightModeFrameCounter < LIGHT_CPU_MODE_FRAME_PERIOD )
 			{

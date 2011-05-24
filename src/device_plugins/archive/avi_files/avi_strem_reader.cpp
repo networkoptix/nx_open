@@ -1,5 +1,6 @@
 #include "avi_strem_reader.h"
 #include "device/device.h"
+#include "base/ffmpeg_codec.h"
 
 #include "data/mediadata.h"
 #include "stdint.h"
@@ -147,65 +148,16 @@ bool CLAVIStreamReader::init()
     {
 	    CodecID ffmpeg_video_codec_id = m_formatContext->streams[m_videoStreamIndex]->codec->codec_id;
 
-	    switch(ffmpeg_video_codec_id)
-	    {
-	    case CODEC_ID_MSVIDEO1:
-		    m_videoCodecId = CL_MSVIDEO1;
-		    break;
+        if (ffmpeg_video_codec_id != CODEC_ID_NONE)
+        {
+            m_videoCodecId = ffmpeg_video_codec_id;
+        }
+        else
+        {
+            destroy();
+            return false;
+        }
 
-	    case CODEC_ID_MJPEG:
-		    m_videoCodecId =CL_JPEG;
-		    break;
-
-	    case CODEC_ID_MPEG2VIDEO:
-		    m_videoCodecId = CL_MPEG2;
-		    break;
-
-	    case CODEC_ID_MPEG4:
-		    m_videoCodecId = CL_MPEG4;
-		    break;
-
-	    case CODEC_ID_MSMPEG4V3:
-		    m_videoCodecId = CL_MSMPEG4V3;
-		    break;
-
-        case CODEC_ID_QTRLE:
-            m_videoCodecId = CL_QTRLE;
-            break;
-
-	    case CODEC_ID_MPEG1VIDEO:
-		    m_videoCodecId = CL_MPEG1VIDEO;
-		    break;
-
-	    case CODEC_ID_MSMPEG4V2:
-		    m_videoCodecId = CL_MSMPEG4V2;
-		    break;
-
-	    case CODEC_ID_WMV3:
-		    m_videoCodecId = CL_WMV3;
-		    break;
-
-    case CODEC_ID_SVQ3:
-        m_videoCodecId = CL_SVQ3;
-        break;
-
-    case CODEC_ID_VP6F:
-        m_videoCodecId = CL_VP6F;
-        break;
-
-    case CODEC_ID_CINEPAK:
-        m_videoCodecId = CL_CINEPAK;
-        break;
-
-
-	    case CODEC_ID_H264:
-		    m_videoCodecId = CL_H264;
-		    break;
-
-	    default:
-		    destroy();
-		    return false;
-	    }
     }
 
 	if (m_audioStreamIndex!=-1)
@@ -216,53 +168,8 @@ bool CLAVIStreamReader::init()
 		m_freq = aCodecCtx->sample_rate;
 		m_channels = aCodecCtx->channels;
 
-		switch(ffmpeg_audio_codec_id )
-		{
-        case CODEC_ID_PCM_S16LE:
-            m_audioCodecId = CL_PCM_S16LE;
-            break;
+        m_audioCodecId = ffmpeg_audio_codec_id;
 
-        case CODEC_ID_PCM_U8:
-            m_audioCodecId = CL_PCM_U8;
-            break;
-
-
-		case CODEC_ID_MP2:
-			m_audioCodecId = CL_MP2;
-			break;
-
-		case CODEC_ID_MP3:
-			m_audioCodecId = CL_MP3;
-			break;
-
-		case CODEC_ID_AC3:
-			m_audioCodecId = CL_AC3;
-			break;
-
-		case CODEC_ID_AAC:
-			m_audioCodecId = CL_AAC;  // crashes 
-			break;
-
-		case CODEC_ID_WMAV2:
-			m_audioCodecId = CL_WMAV2;
-			break;
-
-		case CODEC_ID_WMAPRO:
-			m_audioCodecId = CL_WMAPRO;
-			break;
-
-		case CODEC_ID_ADPCM_MS:
-			m_audioCodecId = CL_ADPCM_MS;
-			break;
-
-		case CODEC_ID_AMR_NB:
-			m_audioCodecId = CL_AMR_NB;
-			break;
-
-		default:
-			m_audioCodecId = CL_UNKNOWN;
-			break;
-		}
 	}
 
     // Alloc common resources

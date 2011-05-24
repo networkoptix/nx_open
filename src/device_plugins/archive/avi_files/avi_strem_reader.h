@@ -33,8 +33,8 @@ protected:
 	int	m_videoStreamIndex;
 	int	m_audioStreamIndex;
 
-	CLCodecType m_videoCodecId;
-	CLCodecType m_audioCodecId;
+	CodecID m_videoCodecId;
+	CodecID m_audioCodecId;
 
 	int m_freq;
 	int m_channels;

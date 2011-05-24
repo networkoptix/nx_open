@@ -36,7 +36,7 @@ CLAbstractMediaData* CLSingleShotFileStreamreader::getData()
 
 	data.done(readed);
 
-	outData->compressionType = CL_JPEG;
+	outData->compressionType = CODEC_ID_MJPEG;
 
 	outData->width = 0; // does not really meter (this is single shot)
 	outData->height = 0; //does not really meter (this is single shot)
