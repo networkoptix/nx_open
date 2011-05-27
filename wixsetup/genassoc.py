@@ -1,4 +1,4 @@
-from string import Template
+from string import Template, join
 
 filetypes = (
     ('avi',  '753E66D9-8015-4b4d-97CA-1E777E96E34F'),
@@ -39,6 +39,16 @@ component_template_string = """     <Component Id="Eve${capitalized_ext}FileAsso
 
               <RegistryValue Root="HKCR" Type="string" Key="Applications\eveplayer_beta.exe\SupportedTypes" Name=".${ext}" Value=""/>
               <RegistryValue Root="HKLM" Type="string" Key="Software\Clients\Media\EVE media player\Capabilities\FileAssociations" Name=".${ext}" Value="EVE.${ext}"/>
+
+<!--              <RegistryKey Id="Type${capitalized_ext}" Action="create" Root="HKCU" Key="Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.${ext}">
+                  <AppSecInc:RegistryKeyCopy Id="RegistryKeyBackupCopy${capitalized_ext}" TargetRoot="HKEY_CURRENT_USER" TargetPath="Software\Microsoft\Windows\CurrentVersion\Explorer\EveBackupFileExts\.${ext}" CopyOnInstall="yes" RestoreOnRollback="yes" Overwrite="yes" CheckIfExists="yes" RemoveSource="yes"/>
+              </RegistryKey> -->
+              
+<!--              <Property Id='ExtBackup${capitalized_ext}' Value=''>
+                <RegistrySearch Id='ExtBackup${capitalized_ext}Registry' Type='raw' Root='HKCR' Key='.${ext}' />
+              </Property> -->
+
+              <Registry Action="removeKeyOnInstall" Root="HKCU" Key="Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.${ext}"/>
             </Component>
 """
 
@@ -53,7 +63,7 @@ feature_template_string = """
       </Feature>
 """
 
-def genassoc():
+def gen_assoc():
     xout = open('Associations.wxs', 'w')
     print >> xout, header_string
 
@@ -78,5 +88,16 @@ def genassoc():
 
     xout.close()
 
+def gen_file_exts():
+    xout = open('FileExtensions.wxs', 'w')
+    print >> xout, header_string
+
+    print >> xout, '<Property Id="FILETYPES" Admin="yes" Value="%s" />' % join([x[0] for x in filetypes],'|')
+
+    print >> xout, footer_string
+
+    xout.close()
+
 if __name__ == '__main__':
-    getassoc()
+    gen_assoc()
+    gen_file_exts()

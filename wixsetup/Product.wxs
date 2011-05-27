@@ -17,13 +17,23 @@
     <Property Id="PREVIOUSVERSIONSINSTALLED" Secure="yes" />
     <Property Id="LAUNCHAPPONEXIT" Secure="yes" />
     <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch $(env.APPLICATION_NAME) when setup exits."  />
+    <PropertyRef Id="FILETYPES"/>
 
     <!--[%LocalAppData]-->
     <Property Id="XMLSETTINGS" Value="%LocalAppData%\$(env.ORGANIZATION_NAME)\$(env.APPLICATION_NAME)\settings.xml" />
     
     <Binary Id="SETPROPERTIES" SourceFile="SetProperties.vbs" />
     <CustomAction Id="SetProperties" BinaryKey="SETPROPERTIES" VBScriptCall="SetProperties" Execute="firstSequence" />
+
+<!-- Custom actions for saving/restoring file associations.
     
+    <Binary Id="FILEASSOCBACKUP" SourceFile="FileAssociationsBackup.js"/>
+    <CustomAction Id="FileAssocBackup" BinaryKey="FILEASSOCBACKUP" JScriptCall="PreserveFileAssociations" Execute="deferred" Impersonate="no" Win64="no"/>
+    
+    <Binary Id="FILEASSOCRESTORE" SourceFile="FileAssociationsRestore.js"/>
+    <CustomAction Id="FileAssocRestore" BinaryKey="FILEASSOCRESTORE" JScriptCall="RestoreFileAssociations" Execute="deferred" Impersonate="no" Win64="no"/> 
+-->
+
     <Upgrade Id="286227c5-25b4-4796-aa48-2d9822e10b0d">
       <UpgradeVersion
          Minimum="0.1.0" Maximum="$(env.APPLICATION_VERSION)"
@@ -46,6 +56,10 @@
     <InstallExecuteSequence>
       <RemoveExistingProducts Before="InstallInitialize" />
       <Custom Action="AssignMediaFolder" Before="CostInitialize">MEDIAFOLDER=""</Custom>
+<!-- Custom actions for saving/restoring file associations.
+      <Custom Action="FileAssocBackup" After="WriteRegistryValues"/>
+      <Custom Action="FileAssocRestore" After="RemoveRegistryValues">Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
+-->
     </InstallExecuteSequence>
 
     <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
