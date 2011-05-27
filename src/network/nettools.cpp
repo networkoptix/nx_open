@@ -107,7 +107,9 @@ QList<QNetworkAddressEntry> getAllIPv4AddressEntries()
 		for (int al = 0; al < addr_enntry_list.size(); ++al)
 		{
 			const QNetworkAddressEntry& adrentr = addr_enntry_list.at(al);
-			if (QAbstractSocket::IPv4Protocol == adrentr.ip().protocol() && adrentr.ip()!=QHostAddress::LocalHost)
+			if (QAbstractSocket::IPv4Protocol == adrentr.ip().protocol() && // if it has IPV4
+                adrentr.ip()!=QHostAddress::LocalHost &&// if this is not 0.0.0.0 or 127.0.0.1
+                adrentr.netmask().toIPv4Address()!=0) // and mask !=0
 				ipv4_enty_list.push_back(addr_enntry_list.at(al));
 
 		}
@@ -171,6 +173,71 @@ bool getNextAvailableAddr(CLSubNetState& state, const CLIPList& busy_lst)
 	return true;
 
 }
+
+QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHostAddress& endAddr, int threads)
+{
+
+    struct T
+    {
+        quint32 addr;
+        bool online;
+
+        void f()
+        {
+            online = false;
+            CLPing ping;
+            if (ping.ping(QHostAddress(addr).toString(), 2, ping_timeout))
+                online = true;
+        }
+    };
+
+    cl_log.log("about to find all ip responded to ping....", cl_logALWAYS);
+    QTime time;   time.restart();
+
+    quint32 curr = startAddr.toIPv4Address();
+    quint32 maxaddr = endAddr.toIPv4Address();
+
+
+    QList<T> hostslist;
+
+    while(curr < maxaddr)
+    {
+        T t;
+        t.addr = curr;
+        hostslist.push_back(t);
+
+        ++curr;
+    }
+    
+
+    QThreadPool* global = QThreadPool::globalInstance();
+    for (int i = 0; i < threads; ++i ) global->releaseThread();
+    QtConcurrent::blockingMap(hostslist, &T::f);
+    for (int i = 0; i < threads; ++i )global->reserveThread();
+
+    QList<QHostAddress> result;
+
+    foreach(T addr, hostslist)
+    {
+        if (addr.online)
+            result.push_back(QHostAddress(addr.addr));
+    }
+
+    cl_log.log("Done. time elapsed = ", time.elapsed(), cl_logALWAYS);
+
+    CL_LOG(cl_logDEBUG1)
+    {
+        cl_log.log("ping results...", cl_logALWAYS);
+        foreach(QHostAddress addr, result)
+            cl_log.log(addr.toString(), cl_logALWAYS);
+    }
+
+
+
+    return result;
+}
+
+
 
 //{ windows
 #ifdef _WIN32

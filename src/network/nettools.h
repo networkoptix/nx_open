@@ -21,4 +21,7 @@ void removeARPrecord(const QHostAddress& ip);
 
 QString getMacByIP(const QHostAddress& ip, bool net = true);
 
+// returns all pingable hosts in the range
+QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHostAddress& endAddr, int threads);
+
 #endif //cl_net_tools_1232

@@ -34,7 +34,7 @@ void CLNetState::updateNetState()
 		state.minHostAddress = QHostAddress(minaddr);
 		state.maxHostAddress = QHostAddress(maxaddr);
 
-		if ( existsSubnet(entry.ip()) )
+		if ( existsSubnet(entry.ip()) ) // mostly to check if net state changed 
 		{
 			CLSubNetState& existing_state = getSubNetState(entry.ip());
 

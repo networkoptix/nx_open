@@ -165,6 +165,28 @@ CLDeviceList CLDeviceManager::getDeviceList(const CLDeviceCriteria& cr)
 	// first implementation is very simple; returns all dev
 }
 
+
+CLNetworkDevice* CLDeviceManager::getDeviceByIp(const QHostAddress& ip)
+{
+    QMutexLocker lock(&m_dev_searcher.all_devices_mtx);
+    CLDeviceList& devices =  m_dev_searcher.getAllDevices();
+
+    foreach(CLDevice* dev, devices)
+    {
+        if (!dev->checkDeviceTypeFlag(CLDevice::NETWORK))
+            continue;
+
+        CLNetworkDevice* nd = static_cast<CLNetworkDevice*>(dev);
+        if (nd->getIP()== ip)
+        {
+            nd->addRef();
+            return nd;
+        }
+    }
+
+    return 0;
+}
+
 CLDevice* CLDeviceManager::getDeviceById(QString id)
 {
 	QMutexLocker lock(&m_dev_searcher.all_devices_mtx);

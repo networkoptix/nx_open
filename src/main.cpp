@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
 
 #ifdef _DEBUG
 	 cl_log.setLogLevel(cl_logDEBUG1);
-	cl_log.setLogLevel(cl_logWARNING);
+	//cl_log.setLogLevel(cl_logWARNING);
 #else
 	cl_log.setLogLevel(cl_logWARNING);
 #endif

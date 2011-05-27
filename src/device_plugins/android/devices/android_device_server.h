@@ -21,13 +21,6 @@ public:
 
 private:
 
-    struct AndroidCam
-    {
-        QString ip;
-        QString mac;
-    };
-
-    QList<AndroidCam> mCams;
 
 };
 

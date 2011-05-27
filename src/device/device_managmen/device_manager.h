@@ -9,7 +9,9 @@
 #include "../directory_browser.h"
 
 class CLDevice;
+class CLNetworkDevice;
 class CLRecorderDevice;
+
 
 // this class is a buffer. makes searcher to serch cameras and puts it into buffer
 class CLDeviceManager : public QObject
@@ -27,6 +29,8 @@ public:
 
 	CLDeviceList getDeviceList(const CLDeviceCriteria& cr);
 	CLDevice* getDeviceById(QString id);
+
+    CLNetworkDevice* getDeviceByIp(const QHostAddress& ip);
 
 	CLDeviceList getRecorderList();
 	CLDevice* getRecorderById(QString id); 
