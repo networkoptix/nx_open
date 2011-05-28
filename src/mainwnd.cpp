@@ -33,8 +33,9 @@ m_normalView(0)
     QStringList files;
     for (int i = 1; i < argc; ++i)
     {
-        if (QFile(argv[i]).exists())
-            files.append(argv[i]);
+        QString fileName = QString::fromLocal8Bit(argv[i]);
+        if (QFile(fileName).exists())
+            files.append(fileName);
     }
 
     LayoutContent* content = 0;
