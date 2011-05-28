@@ -80,6 +80,45 @@ MainWnd::~MainWnd()
 	CLDeviceManager::instance().getDeviceSearcher().wait();
 }
 
+void MainWnd::addFilesToCurrentOrNewLayout(const QStringList& files)
+{
+    if (files.isEmpty())
+        return;
+
+    CLDeviceManager::instance().addFiles(files);
+
+    // If current content created by opening files or DND, use it. Otherwise create new one.
+    LayoutContent* content = m_normalView->getView().getCamLayOut().getContent();
+
+    if (content->getName() == "Layout:unnamed")
+    {
+        foreach(QString file, files)
+        {
+            m_normalView->getView().getCamLayOut().addDevice(file, true);
+            content->addDevice(file);
+        }
+
+        m_normalView->getView().fitInView(600, 100, SLOW_START_SLOW_END);
+    } else
+    {
+        content = CLSceneLayoutManager::instance().getNewEmptyLayoutContent();
+
+        foreach(QString file, files)
+        {
+            content->addDevice(file);
+        }
+
+        m_normalView->goToNewLayoutContent(content);
+    }
+}
+
+void MainWnd::handleMessage(const QString& message)
+{
+    QStringList files = message.split(QChar('\0'));
+
+    addFilesToCurrentOrNewLayout(files);
+}
+
 void MainWnd::closeEvent ( QCloseEvent * event )
 {
 	destroyNavigator(m_normalView);
@@ -126,17 +165,5 @@ void MainWnd::dropEvent(QDropEvent *event)
         }
     }
 
-    if (!files.isEmpty())
-    {
-        LayoutContent* content = CLSceneLayoutManager::instance().getNewEmptyLayoutContent();
-
-        CLDeviceManager::instance().addFiles(files);
-
-        foreach(QString file, files)
-        {
-            content->addDevice(file);
-        }
-
-        m_normalView->goToNewLayoutContent(content);
-    }
+    addFilesToCurrentOrNewLayout(files);
 }

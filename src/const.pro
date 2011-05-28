@@ -6,6 +6,8 @@ ICON = eve_logo.icns
 
 TARGET = eveplayer_beta
 
+include(../contrib/qtsingleapplication/src/qtsingleapplication.pri)
+
 debug {
   DESTDIR = ../bin/debug
   OBJECTS_DIR  = ../build/debug

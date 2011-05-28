@@ -1,4 +1,6 @@
 //#include <vld.h>
+#include <QtSingleApplication>
+
 #include "version.h"
 #include "util.h"
 #include "mainwnd.h"
@@ -54,10 +56,23 @@ int main(int argc, char *argv[])
     QApplication::setApplicationName(APPLICATION_NAME);
     QApplication::setApplicationVersion(APPLICATION_VERSION);
 
+	QtSingleApplication application(argc, argv);
+
+    QString argsMessage;
+    for (int i = 1; i < argc; ++i)
+    {
+        argsMessage += argv[i];
+        if (i < argc-1)
+            argsMessage += QChar('\0');
+    }
+
+    while (application.isRunning())
+    {
+        if (application.sendMessage(argsMessage))
+            return 0;
+    }
+
     QString dataLocation = getDataDirectory();
-
-	QApplication a(argc, argv);
-
 	QDir::setCurrent(QFileInfo(argv[0]).absolutePath());
 
 	QDir dataDirectory;
@@ -65,7 +80,7 @@ int main(int argc, char *argv[])
 
 	if (!cl_log.create(dataLocation + "/log/log_file", 1024*1024*10, 5, cl_logDEBUG1))
     {
-		a.quit();
+		application.quit();
 
         return 0;
     }
@@ -148,9 +163,13 @@ int main(int argc, char *argv[])
 
 	initContextMenu();
 
-	MainWnd w(argc, argv);
-	w.show();
-	return a.exec();
+	MainWnd mainWindow(argc, argv);
+	mainWindow.show();
+
+    QObject::connect(&application, SIGNAL(messageReceived(const QString&)),
+        &mainWindow, SLOT(handleMessage(const QString&)));
+
+	return application.exec();
 
 	CLDevice::stopCommandProc();
 }

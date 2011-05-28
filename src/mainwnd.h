@@ -16,12 +16,17 @@ public:
 	MainWnd(int argc, char* argv[], QWidget *parent = 0, Qt::WFlags flags = 0);
 	~MainWnd();
 
+private slots:
+    void handleMessage(const QString& message);
+
 private:
 	void closeEvent ( QCloseEvent * event );
 	void destroyNavigator(CLLayoutNavigator*& nav);
 
     void dragEnterEvent(QDragEnterEvent *event);
     void dropEvent(QDropEvent *event);
+
+    void addFilesToCurrentOrNewLayout(const QStringList& files);
 private:
 
 	CLLayoutNavigator* m_normalView;
