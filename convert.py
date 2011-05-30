@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import shutil
 import glob
@@ -160,6 +161,27 @@ print >> version_h, '// This file is generated. Go to version.py'
 print >> version_h, 'static const char* ORGANIZATION_NAME="%s";' % ORGANIZATION_NAME
 print >> version_h, 'static const char* APPLICATION_NAME="%s";' % APPLICATION_NAME
 print >> version_h, 'static const char* APPLICATION_VERSION="%s";' % APPLICATION_VERSION
+print >> version_h, ''
+
+print >> version_h, '// There constans are here for windows resouce file.'
+
+app_version_commas = APPLICATION_VERSION.replace('.', ',')
+print >> version_h, '#define VER_FILEVERSION             %s,0' % app_version_commas
+print >> version_h, '#define VER_FILEVERSION_STR         "%s.0\0"' % APPLICATION_VERSION
+
+print >> version_h, '#define VER_PRODUCTVERSION          %s' % app_version_commas
+print >> version_h, '#define VER_PRODUCTVERSION_STR      "%s\0"' % APPLICATION_VERSION
+
+print >> version_h, '#define VER_COMPANYNAME_STR         "%s"' % ORGANIZATION_NAME
+print >> version_h, '#define VER_FILEDESCRIPTION_STR     "%s"' % APPLICATION_NAME
+print >> version_h, '#define VER_INTERNALNAME_STR        "%s"' % APPLICATION_NAME
+print >> version_h, '#define VER_LEGALCOPYRIGHT_STR      "Copyright © 2011 %s"' % ORGANIZATION_NAME
+print >> version_h, '#define VER_LEGALTRADEMARKS1_STR    "All Rights Reserved"'
+print >> version_h, '#define VER_LEGALTRADEMARKS2_STR    VER_LEGALTRADEMARKS1_STR'
+print >> version_h, '#define VER_ORIGINALFILENAME_STR    "eveplayer_beta.exe"'
+print >> version_h, '#define VER_PRODUCTNAME_STR         "EvePlayer"'
+
+print >> version_h, '#define VER_COMPANYDOMAIN_STR       "networkoptix.com"'
 print >> version_h, '#endif // UNIVERSAL_CLIENT_VERSION_H_'
 
 genskin()
