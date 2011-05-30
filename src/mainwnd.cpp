@@ -4,6 +4,7 @@
 #include "ui/layout_navigator.h"
 #include "ui/video_cam_layout/layout_manager.h"
 #include "device/directory_browser.h"
+#include "device_plugins/archive/filetypesupport.h"
 
 extern QString button_layout;
 extern QString button_home;
@@ -144,6 +145,8 @@ void MainWnd::dragEnterEvent(QDragEnterEvent *event)
 
 void MainWnd::dropEvent(QDropEvent *event)
 {
+    FileTypeSupport fileTypeSupport;
+
     QStringList files;
     foreach (QUrl url, event->mimeData()->urls())
     {
@@ -157,12 +160,20 @@ void MainWnd::dropEvent(QDropEvent *event)
             {
                 QString nextFilename = iter.next();
                 if (QFileInfo(nextFilename).isFile())
-                    files.append(nextFilename);
+                {
+                    if (fileTypeSupport.isFileSupported(nextFilename))
+                    {
+                        files.append(nextFilename);
+                    }
+                }
             }
         }
         else if (fileInfo.isFile())
         {
-            files.append(filename);
+            if (fileTypeSupport.isFileSupported(filename))
+            {
+                files.append(filename);
+            }
         }
     }
 
