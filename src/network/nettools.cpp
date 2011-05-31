@@ -174,23 +174,22 @@ bool getNextAvailableAddr(CLSubNetState& state, const CLIPList& busy_lst)
 
 }
 
+struct PinagableT
+{
+	quint32 addr;
+	bool online;
+	
+	void f()
+	{
+		online = false;
+		CLPing ping;
+		if (ping.ping(QHostAddress(addr).toString(), 2, ping_timeout))
+			online = true;
+	}
+};
+
 QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHostAddress& endAddr, int threads)
 {
-
-    struct T
-    {
-        quint32 addr;
-        bool online;
-
-        void f()
-        {
-            online = false;
-            CLPing ping;
-            if (ping.ping(QHostAddress(addr).toString(), 2, ping_timeout))
-                online = true;
-        }
-    };
-
     cl_log.log("about to find all ip responded to ping....", cl_logALWAYS);
     QTime time;   time.restart();
 
@@ -198,11 +197,11 @@ QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHost
     quint32 maxaddr = endAddr.toIPv4Address();
 
 
-    QList<T> hostslist;
+    QList<PinagableT> hostslist;
 
     while(curr < maxaddr)
     {
-        T t;
+        PinagableT t;
         t.addr = curr;
         hostslist.push_back(t);
 
@@ -212,12 +211,12 @@ QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHost
 
     QThreadPool* global = QThreadPool::globalInstance();
     for (int i = 0; i < threads; ++i ) global->releaseThread();
-    QtConcurrent::blockingMap(hostslist, &T::f);
+    QtConcurrent::blockingMap(hostslist, &PinagableT::f);
     for (int i = 0; i < threads; ++i )global->reserveThread();
 
     QList<QHostAddress> result;
 
-    foreach(T addr, hostslist)
+    foreach(PinagableT addr, hostslist)
     {
         if (addr.online)
             result.push_back(QHostAddress(addr.addr));
