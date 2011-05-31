@@ -92,7 +92,7 @@ CLDeviceList AndroidDeviceServer::findDevices()
         quint32 curr = min_addr.toIPv4Address();
         quint32 max_ip = max_addr.toIPv4Address();
 
-        while(curr < max_ip)
+        while(curr <= max_ip)
         {
             CLNetworkDevice* nd = CLDeviceManager::instance().getDeviceByIp(QHostAddress(curr));
             if (nd)

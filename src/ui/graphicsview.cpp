@@ -1699,7 +1699,7 @@ void GraphicsView::goToSteadyMode(bool steady)
             m_selectedWnd->goToSteadyMode(true, false);
         }
 
-        viewport()->setCursor(Qt::BlankCursor);
+        
 
     }
     else
@@ -1722,8 +1722,6 @@ void GraphicsView::goToSteadyMode(bool steady)
         {
             m_selectedWnd->goToSteadyMode(false, false);
         }
-
-        viewport()->setCursor(Qt::OpenHandCursor);
 
     }
 }
