@@ -47,8 +47,17 @@ mNeedresultsFromDirbrowsr(false)
     addArchiver("9");
     /**/
 
+	QString mediaRoot = Settings::instance().mediaRoot();
+	if (mediaRoot.isEmpty()) {
+		mediaRoot = getMediaRootDir();
+		Settings::instance().setMediaRoot(mediaRoot);
+	}
+	
+	if (!QDir(mediaRoot).exists())
+		QDir(mediaRoot).mkpath(mediaRoot);
+	
     QStringList checkLst(Settings::instance().auxMediaRoots());
-    checkLst.push_back(getMediaRootDir());
+    checkLst.push_back(mediaRoot);
     pleaseCheckDirs(checkLst);
 
 
