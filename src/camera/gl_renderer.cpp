@@ -3,6 +3,11 @@
 #include "../base/sleep.h"
 #include <cmath> //for sin and cos
 #include "ui/videoitem/video_wnd_item.h"
+#include "yuvconvert.h"
+#include "camera.h"
+#include "device/device.h"
+
+#include <QTime>
 
 #ifndef GL_FRAGMENT_PROGRAM_ARB
 #define GL_FRAGMENT_PROGRAM_ARB           0x8804
@@ -30,7 +35,11 @@
 # define GL_TEXTURE2    0x84C2
 #endif
 
-#define OGL_CHECK_ERROR(str)// if (checkOpenGLError() != GL_NO_ERROR) {cl_log.log(str, __LINE__ , cl_logERROR); }
+
+static const int MAX_SHADER_SIZE = 1024*3; 
+
+#define OGL_CHECK_ERROR(str) //if (checkOpenGLError() != GL_NO_ERROR) {cl_log.log(str, __LINE__ , cl_logERROR); }
+
 
 // arbfp1 fragment program for converting yuv (YV12) to rgb
 static const char yv12ToRgb[] =
@@ -130,7 +139,8 @@ m_stride_old(0),
 m_height_old(0),
 m_needwait(true),
 m_inited(false),
-m_textureUploaded(false)
+m_textureUploaded(false),
+m_forceSoftYUV(false)
 {
 	applyMixerSettings(m_brightness, m_contrast, m_hue, m_saturation);
 }
@@ -243,7 +253,7 @@ void CLGLRenderer::init(bool msgbox)
 	{
 		clampConstant = GL_CLAMP_TO_EDGE;
 	} 
-	else if (extensions && strstr(extensions, "GL_EXT_texture_edge_clamp")) 
+	if (extensions && strstr(extensions, "GL_EXT_texture_edge_clamp")) 
 	{
 		clampConstant = GL_CLAMP_TO_EDGE_EXT;
 	} 
@@ -316,6 +326,9 @@ void CLGLRenderer::init(bool msgbox)
 		error = true;
 	}
 
+
+	//isSoftYuv2Rgb = true;
+
 	if (error) 
 	{
 		CL_LOG(cl_logWARNING) cl_log.log("OpenGL shader support init failed, use soft yuv->rgb converter!!!", cl_logWARNING);
@@ -333,6 +346,16 @@ void CLGLRenderer::init(bool msgbox)
 		}
 
 	}
+	if (m_forceSoftYUV) 
+	{
+		isSoftYuv2Rgb = true;
+	}
+    // force CPU yuv->rgb for large textures (due to ATI bug). Only for still images.
+    else if (m_videowindow && m_videowindow->getVideoCam()->getDevice()->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT) &&
+                (m_width >= MAX_SHADER_SIZE || m_height >= MAX_SHADER_SIZE))
+    {
+		isSoftYuv2Rgb = true;
+    }
 
 	//if (mGarbage.count()<80)
 	{
@@ -473,6 +496,11 @@ void CLGLRenderer::draw(CLVideoDecoderOutput& img, unsigned int channel)
 	//paintEvent
 }
 
+void CLGLRenderer::setForceSoftYUV(bool value) 
+{ 
+	m_forceSoftYUV = value; 
+}
+
 void CLGLRenderer::updateTexture()
 {
 	//image.saveToFile("test.yuv");
@@ -553,35 +581,40 @@ void CLGLRenderer::updateTexture()
 	else 
 	{
 		// not supported for now
-		/*
+		
 		glBindTexture(GL_TEXTURE_2D, m_texture[0]);
 
 		const int wPow = isNonPower2 ? w[0] : getMinPow2(w[0]);
 		const int hPow = isNonPower2 ? h[0] : getMinPow2(h[0]);
 
-		if (!m_videoTextureReady) 
-		{
-
-			if (isNonPower2) 
-			{
-				m_videoCoeffW[0] = 1.0f;
-				m_videoCoeffH[0] = 1.0f;
-			}
-			else 
-			{
-				float wCoeff = w[0] / static_cast<float>(wPow);
-				float hCoeff = h[0] / static_cast<float>(hPow);
-				m_videoCoeffW[0] = wCoeff;
-				m_videoCoeffH[0] = hCoeff;
-			}
-
 			if (!m_videoTextureReady) 
 			{
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wPow, hPow, 0,
-					GL_RGBA, GL_UNSIGNED_BYTE, 0);
+				// if support "GL_ARB_texture_non_power_of_two", use default size of texture,
+				// else nearest power of two
+				const int wPow = isNonPower2 ? w[0] : getMinPow2(w[0]);
+				const int hPow = isNonPower2 ? h[0] : getMinPow2(h[0]);
+				// support GL_ARB_texture_non_power_of_two ?
+
+				if (isNonPower2) 
+				{
+					m_videoCoeffL[0] = (w[0] - r_w[0])/(static_cast<float>(w[0]))/2;
+
+					m_videoCoeffW[0] = 1.0f - m_videoCoeffL[0];
+					m_videoCoeffH[0] = 1.0f;
+				}
+				else 
+				{
+					float wCoeff = w[0] / static_cast<float>(wPow);
+					float hCoeff = h[0] / static_cast<float>(hPow);
+
+					m_videoCoeffL[0] = (w[0] - r_w[0])/(static_cast<float>(wPow))/2;
+
+					m_videoCoeffW[0] = wCoeff - m_videoCoeffL[0];
+					m_videoCoeffH[0] = hCoeff;
+				}
+
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 				OGL_CHECK_ERROR("glTexImage2D");
-				glPixelStorei(GL_UNPACK_ROW_LENGTH, isNonPower2 ? 0 : w[0]);
-				OGL_CHECK_ERROR("glPixelStorei");
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 				OGL_CHECK_ERROR("glTexParameteri");
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -590,16 +623,59 @@ void CLGLRenderer::updateTexture()
 				OGL_CHECK_ERROR("glTexParameteri");
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, clampConstant);
 				OGL_CHECK_ERROR("glTexParameteri");
-			}
-		}	
 
-		unsigned char* pixels = m_arrayPixels[0];
-		//yuv420_argb32_mmx(pixels, arrayPixels[0], arrayPixels[2], arrayPixels[1], w[0], h[0], 4 * w[0], w[0], w[0] / 2);
+			}
+
+		
+		int size = 4 * m_stride * h[0];
+		if (yuv2rgbBuffer.size() != size) {
+			yuv2rgbBuffer.resize(size);
+		}
+
+		uint8_t* pixels = &yuv2rgbBuffer[0];
+		
+		uint8_t* pixelsArray[4];
+		pixelsArray[0] = pixels;
+		int dstStride[4];
+		dstStride[0] = m_stride * 4;
+		
+		if (m_color == CL_DECODER_YUV422)
+		{
+			yuv422_argb32_mmx(pixels, m_arrayPixels[0], m_arrayPixels[2], m_arrayPixels[1], 
+										m_width, h[0], 
+										4 * m_stride, 
+										m_stride, m_stride / 2);
+		}
+		else if (m_color == CL_DECODER_YUV420)
+		{
+			yuv420_argb32_mmx(pixels, m_arrayPixels[0], m_arrayPixels[2], m_arrayPixels[1], 
+										m_width, h[0], 
+										4 * m_stride, 
+										m_stride, m_stride / 2);
+		}
+		else if (m_color == CL_DECODER_YUV444){
+			yuv444_argb32_mmx(pixels, m_arrayPixels[0], m_arrayPixels[2], m_arrayPixels[1], 
+										m_width, h[0], 
+										4 * m_stride, 
+										m_stride, m_stride);
+		}
+
+		glPixelStorei(GL_UNPACK_ROW_LENGTH, m_stride);
+		OGL_CHECK_ERROR("glPixelStorei");
 		glTexSubImage2D(GL_TEXTURE_2D, 0,
 			0, 0,
-			w[0], h[0],
+			qMin(m_width, ms_maxTextureSize) , qMin(h[0], ms_maxTextureSize),
 			GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 		OGL_CHECK_ERROR("glTexSubImage2D");
+		glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+		OGL_CHECK_ERROR("glPixelStorei");
+
+        if (m_videowindow->getVideoCam()->getDevice()->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT))
+        {
+            // free memory immediatly for still images
+            yuv2rgbBuffer.clear();
+        }
+
 		/**/
 	}
 
@@ -607,12 +683,14 @@ void CLGLRenderer::updateTexture()
 	m_videoTextureReady = true;
 	m_gotnewimage = false;
 
+	/*
 	if (!isSoftYuv2Rgb)
 	{
 		glActiveTexture(GL_TEXTURE0);glDisable (GL_TEXTURE_2D);
 		glActiveTexture(GL_TEXTURE1);glDisable (GL_TEXTURE_2D);
 		glActiveTexture(GL_TEXTURE2);glDisable (GL_TEXTURE_2D);
 	}
+	*/
 
 }
 
@@ -631,6 +709,9 @@ void CLGLRenderer::drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const
 		m_videoCoeffW[0], m_videoCoeffH[0],
 		0.0f, m_videoCoeffH[0]};
 		/**/
+	glEnable(GL_TEXTURE_2D);
+	OGL_CHECK_ERROR("glEnable");
+
 
 	if (!isSoftYuv2Rgb) 
 	{
@@ -715,6 +796,8 @@ void CLGLRenderer::drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const
 	{
 		glDisable(GL_FRAGMENT_PROGRAM_ARB);
 		OGL_CHECK_ERROR("glDisable");
+		glActiveTexture(GL_TEXTURE0);
+		OGL_CHECK_ERROR("glActiveTexture");
 	}
 
 }
