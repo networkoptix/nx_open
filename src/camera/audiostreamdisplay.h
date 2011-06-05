@@ -5,8 +5,7 @@
 #include "base/aligned_data.h"
 #include "decoders/audio/audio_struct.h"
 
-// display one video stream
-// decodes the video and pass it to video window
+
 class CLAbstractAudioDecoder;
 struct CLCompressedAudioData;
 class CLAudioDevice;
@@ -35,6 +34,9 @@ public:
 
 	// returns true if audio is not playing, just accumulating 
 	bool isBuffering() const;
+
+    // returns false if format is not supported 
+    bool isFormatSupported() const;
 
 private:
     // returns amount of ms which buffered before start playing 

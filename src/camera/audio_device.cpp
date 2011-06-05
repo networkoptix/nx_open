@@ -15,6 +15,7 @@ CLAudioDevice::CLAudioDevice(QAudioFormat format)
     m_ringBuffer(0),
     m_downmixing(false),
     m_convertingFloat(false)
+
 {
     QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
 
@@ -50,7 +51,10 @@ CLAudioDevice::CLAudioDevice(QAudioFormat format)
 
     }
 
-    format.setFrequency(old_frequency);
+
+   format.setFrequency(old_frequency);
+
+
 
     if (supported)
     {
@@ -75,6 +79,11 @@ CLAudioDevice::~CLAudioDevice()
 
         delete m_ringBuffer;
     }
+}
+
+bool CLAudioDevice::isFormatSupported() const
+{
+    return (m_audioOutput  && m_audioBuffer);
 }
 
 bool CLAudioDevice::downmixing() const
@@ -167,7 +176,7 @@ unsigned int CLAudioDevice::bytesFromTime(const QAudioFormat& format, unsigned l
 
 int CLAudioDevice::tryMoveDatafromRingBufferToQtBuffer()
 {
-    if (!m_audioOutput)
+    if (!m_audioOutput || !m_audioBuffer)
         return 0;
 
     int period = m_audioOutput->periodSize();
