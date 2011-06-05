@@ -17,6 +17,7 @@
     <Property Id="PREVIOUSVERSIONSINSTALLED" Secure="yes" />
     <Property Id="LAUNCHAPPONEXIT" Secure="yes" />
     <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch $(env.APPLICATION_NAME) when setup exits."  />
+    <Property Id="MEDIAFOLDER" Secure="yes" />
     <PropertyRef Id="FILETYPES"/>
 
     <!--[%LocalAppData]-->
@@ -36,7 +37,7 @@
 
     <Binary Id="PropsCA.dll" SourceFile="PropsCA\Release\PropsCA.dll" />
 
-    <CustomAction Id="SetMoviesFolder" BinaryKey="PropsCA.dll" DllEntry="SetMoviesFolder" Execute="firstSequence"/>
+    <CustomAction Id="SetMoviesFolder" BinaryKey="PropsCA.dll" DllEntry="SetMoviesFolder" />
 
     <Upgrade Id="286227c5-25b4-4796-aa48-2d9822e10b0d">
       <UpgradeVersion
@@ -46,7 +47,7 @@
       <UpgradeVersion OnlyDetect='yes' Property='NEWERFOUND' Minimum='$(env.APPLICATION_VERSION)' IncludeMinimum='no' />
     </Upgrade>
 
-    <CustomAction Id="AssignMediaFolder" Property="MEDIAFOLDER" Value="[MoviesFolder]\EVE Media" Execute="firstSequence"/>
+    <CustomAction Id="AssignMediaFolder" Property="MEDIAFOLDER" Value="[MOVIESFOLDER]\EVE Media" />
     <CustomAction Id="StartAppOnExit" FileKey="UniclientEXE" ExeCommand="" Execute="immediate" Impersonate="yes" Return="asyncNoWait"/>
 
     <InstallUISequence>
@@ -60,7 +61,6 @@
 
     <InstallExecuteSequence>
       <RemoveExistingProducts Before="InstallInitialize" />
-      <Custom Action="AssignMediaFolder" Before="CostInitialize">MEDIAFOLDER=""</Custom>
 <!-- Custom actions for saving/restoring file associations.
       <Custom Action="FileAssocBackup" After="WriteRegistryValues"/>
       <Custom Action="FileAssocRestore" After="RemoveRegistryValues">Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
@@ -95,7 +95,7 @@
         <Directory Id="NetworkOptix" Name="$(env.ORGANIZATION_NAME)">
           <Directory Id="INSTALLDIR" Name="$(env.APPLICATION_NAME)">
             <Component Id="MainExecutable" Guid="B9B60D1E-3B2C-47dd-9922-A1FC5F3818D4">
-              <File Id="UniclientEXE" Name="eveplayer_beta.exe" Source="../bin/release/eveplayer_beta.exe" KeyPath="yes">
+              <File Id="UniclientEXE" Name="EvePlayer-Beta.exe" Source="../bin/release/EvePlayer-Beta.exe" KeyPath="yes">
                 <fire:FirewallException Id="FirewallException" Name="$(env.APPLICATION_NAME)" Scope="any"/>
                 <Shortcut Id="startmenuUniclient" Directory="ProgramMenuDir" Name="$(env.APPLICATION_NAME)"
                                   WorkingDirectory='INSTALLDIR' Advertise="yes" Icon="icon_menu.exe">
@@ -126,9 +126,9 @@
               </ProgId> -->
 
             <Component Id="EveApplication" Guid="2CB8AFBB-FE1F-4683-A07A-D3736DD30065" DiskId="1">
-              <RegistryValue Root="HKCR" Type="string" Key="Applications\eveplayer_beta.exe" Name="FriendlyAppName" Value="EVE media player"/>
-              <RegistryValue Root="HKCR" Type="string" Key="Applications\eveplayer_beta.exe\shell\Open" Value="Play with EVE media player"/>
-              <RegistryValue Root="HKCR" Type="string" Key="Applications\eveplayer_beta.exe\shell\Open\command" Value="&quot;[#UniclientEXE]&quot; &quot;%1&quot;" />
+              <RegistryValue Root="HKCR" Type="string" Key="Applications\EvePlayer-Beta.exe" Name="FriendlyAppName" Value="EVE media player"/>
+              <RegistryValue Root="HKCR" Type="string" Key="Applications\EvePlayer-Beta.exe\shell\Open" Value="Play with EVE media player"/>
+              <RegistryValue Root="HKCR" Type="string" Key="Applications\EvePlayer-Beta.exe\shell\Open\command" Value="&quot;[#UniclientEXE]&quot; &quot;%1&quot;" />
 
               <RegistryValue Root="HKLM" Type="string" Key="Software\Clients\Media\EVE media player" Value="EVE media player"/>
               <RegistryValue Root="HKLM" Type="string" Key="Software\Clients\Media\EVE media player\Capabilities" Name="ApplicationName" Value="EVE media player"/>

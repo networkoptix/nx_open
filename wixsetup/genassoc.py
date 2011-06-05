@@ -37,7 +37,7 @@ component_template_string = """     <Component Id="Eve${capitalized_ext}FileAsso
               <RegistryValue Root="HKLM" Key="SOFTWARE\Classes\SystemFileAssociations\.${ext}\shell\play.EvePlayer.exe" Value="Play with $$(env.APPLICATION_NAME)" Type="string" />
               <RegistryValue Root="HKLM" Key="SOFTWARE\Classes\SystemFileAssociations\.${ext}\shell\play.EvePlayer.exe\command" Value="&quot;[#UniclientEXE]&quot; &quot;%1&quot;" Type="string" />
 
-              <RegistryValue Root="HKCR" Type="string" Key="Applications\eveplayer_beta.exe\SupportedTypes" Name=".${ext}" Value=""/>
+              <RegistryValue Root="HKCR" Type="string" Key="Applications\EvePlayer-Beta.exe\SupportedTypes" Name=".${ext}" Value=""/>
               <RegistryValue Root="HKLM" Type="string" Key="Software\Clients\Media\EVE media player\Capabilities\FileAssociations" Name=".${ext}" Value="EVE.${ext}"/>
 
 <!--              <RegistryKey Id="Type${capitalized_ext}" Action="create" Root="HKCU" Key="Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.${ext}">
