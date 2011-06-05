@@ -347,16 +347,19 @@ void CLGLRenderer::init(bool msgbox)
 		}
 
 	}
+	
 	if (m_forceSoftYUV) 
 	{
 		isSoftYuv2Rgb = true;
 	}
+#ifdef _WIN32	
     // force CPU yuv->rgb for large textures (due to ATI bug). Only for still images.
     else if (m_videowindow && m_videowindow->getVideoCam()->getDevice()->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT) &&
                 (m_width >= MAX_SHADER_SIZE || m_height >= MAX_SHADER_SIZE))
     {
 		isSoftYuv2Rgb = true;
     }
+#endif
 
 	//if (mGarbage.count()<80)
 	{

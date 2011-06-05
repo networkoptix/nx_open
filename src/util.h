@@ -16,11 +16,6 @@ QString getDataDirectory();
 QString getMoviesDirectory();
 
 /*
- * Get media root directory.
- */
-QString getMediaRootDir();
-
-/*
  * Get temp directory for video recording.
  */
 QString getTempRecordingDir();

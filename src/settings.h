@@ -47,13 +47,13 @@ public:
     bool haveValidSerialNumber() const;
     void setSerialNumber(const QString& serial);
 
-    void setMediaRoot(const QString& root);
     void addAuxMediaRoot(const QString& root);
 
 private:
     Settings();
     Settings(const Settings&) {}
 
+    void setMediaRoot(const QString& root);
     void setAllowChangeIP(bool allow);
     void setAuxMediaRoots(const QStringList&);
     void removeAuxMediaRoot(const QString& root);
