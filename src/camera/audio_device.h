@@ -45,6 +45,8 @@ public:
     // removes all data from audio buffers
     void clearAudioBuff();
 
+    bool isFormatSupported() const;
+
 private:
     unsigned int msFromSize(const QAudioFormat& format, unsigned long bytes) const;
     unsigned int bytesFromTime(const QAudioFormat& format, unsigned long ms) const;

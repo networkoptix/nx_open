@@ -91,6 +91,14 @@ bool CLAudioStreamDisplay::isBuffering() const
 	return m_tooFewDataDetected;
 }
 
+bool CLAudioStreamDisplay::isFormatSupported() const
+{
+    if (!m_audioDevice)
+        return true; // it's not constructed yet
+
+    return m_audioDevice->isFormatSupported();
+}
+
 void CLAudioStreamDisplay::clearDeviceBuffer()
 {
     if (m_audioDevice)
