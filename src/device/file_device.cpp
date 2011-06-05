@@ -3,7 +3,8 @@
 
 CLFileDevice::CLFileDevice(QString filename)
 {
-	setUniqueId(filename);
+    QFileInfo fi(filename);
+	setUniqueId(fi.absoluteFilePath());
 	m_name = QFileInfo(filename).fileName();
 	addDeviceTypeFlag(CLDevice::SINGLE_SHOT);
 }
