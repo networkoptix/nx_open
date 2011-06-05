@@ -4,7 +4,7 @@ TEMPLATE = app
 VERSION = 0.0.1
 ICON = eve_logo.icns
 
-TARGET = eveplayer_beta
+TARGET = EvePlayer-Beta
 
 include(../contrib/qtsingleapplication/src/qtsingleapplication.pri)
 

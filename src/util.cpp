@@ -1,4 +1,5 @@
 #include "util.h"
+#include "settings.h"
 
 QString getDataDirectory()
 {
@@ -10,51 +11,14 @@ QString getMoviesDirectory()
     return QDesktopServices::storageLocation(QDesktopServices::MoviesLocation);
 }
 
-QString getMediaRootDir()
-{
-	QString defaultMediaDir = getMoviesDirectory() + "/EVE Media";
-	
-    QFile settingsFile(getDataDirectory() + "/settings.xml");
-    if (!settingsFile.exists())
-        return defaultMediaDir;
-
-    if (!settingsFile.open(QIODevice::ReadOnly | QIODevice::Text))
-        return defaultMediaDir;
-
-    QXmlQuery query;
-    query.setFocus(&settingsFile);
-    query.setQuery("settings/config/mediaRoot/text()");
-    if (!query.isValid())
-        return defaultMediaDir;
-
-    QString rootDir;
-    query.evaluateTo(&rootDir);
-    settingsFile.close();
-
-    rootDir = QDir::fromNativeSeparators(rootDir.trimmed());
-    if (!QDir(rootDir).exists())
-        return defaultMediaDir;
-
-    if (rootDir.length()<1)
-        return defaultMediaDir;
-
-
-    if (rootDir.at(rootDir.length()-1) != '/')
-        rootDir += QString("/");
-
-
-    return rootDir;
-}
-
-
 QString getTempRecordingDir()
 {
-    return getMediaRootDir()  + QString("_temp/");
+    return Settings::instance().mediaRoot()  + QString("_temp/");
 }
 
 QString getRecordingDir()
 {
-    return getMediaRootDir()  + QString("_Recorded/");
+    return Settings::instance().mediaRoot()  + QString("_Recorded/");
 }
 
 QString formatDuration(unsigned duration, unsigned total)

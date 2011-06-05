@@ -42,7 +42,7 @@ void PreferencesWindow::accept()
     settings.save();
 
     QStringList checkLst(settings.auxMediaRoots());
-    checkLst.push_back(getMediaRootDir());
+    checkLst.push_back(QDir::toNativeSeparators(settings.mediaRoot()));
     CLDeviceManager::instance().pleaseCheckDirs(checkLst);
 
     QDialog::accept();
@@ -51,12 +51,12 @@ void PreferencesWindow::accept()
 void PreferencesWindow::updateView()
 {
     versionLabel->setText(APPLICATION_VERSION);
-    mediaRootLabel->setText(m_settingsData.mediaRoot);
+    mediaRootLabel->setText(QDir::toNativeSeparators(m_settingsData.mediaRoot));
 
     auxMediaRootsList->clear();
     foreach (const QString& auxMediaRoot, m_settingsData.auxMediaRoots)
     {
-        auxMediaRootsList->addItem(auxMediaRoot);
+        auxMediaRootsList->addItem(QDir::toNativeSeparators(auxMediaRoot));
     }
 
     allowChangeIPCheckBox->setChecked(m_settingsData.allowChangeIP);
@@ -198,7 +198,7 @@ void PreferencesWindow::auxMediaFolderRemove()
 
     foreach(QListWidgetItem* item, auxMediaRootsList->selectedItems())
     {
-        m_settingsData.auxMediaRoots.removeAll(item->text());
+        m_settingsData.auxMediaRoots.removeAll(QDir::fromNativeSeparators(item->text()));
     }
 
     updateView();

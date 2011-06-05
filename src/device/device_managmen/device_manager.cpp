@@ -48,11 +48,6 @@ mNeedresultsFromDirbrowsr(false)
     /**/
 
 	QString mediaRoot = Settings::instance().mediaRoot();
-	if (mediaRoot.isEmpty()) {
-		mediaRoot = getMediaRootDir();
-		Settings::instance().setMediaRoot(mediaRoot);
-	}
-	
 	if (!QDir(mediaRoot).exists())
 		QDir(mediaRoot).mkpath(mediaRoot);
 	

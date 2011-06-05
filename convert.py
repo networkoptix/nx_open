@@ -178,7 +178,7 @@ print >> version_h, '#define VER_INTERNALNAME_STR        "%s"' % APPLICATION_NAM
 print >> version_h, '#define VER_LEGALCOPYRIGHT_STR      "Copyright © 2011 %s"' % ORGANIZATION_NAME
 print >> version_h, '#define VER_LEGALTRADEMARKS1_STR    "All Rights Reserved"'
 print >> version_h, '#define VER_LEGALTRADEMARKS2_STR    VER_LEGALTRADEMARKS1_STR'
-print >> version_h, '#define VER_ORIGINALFILENAME_STR    "eveplayer_beta.exe"'
+print >> version_h, '#define VER_ORIGINALFILENAME_STR    "EvePlayer-Beta.exe"'
 print >> version_h, '#define VER_PRODUCTNAME_STR         "EvePlayer"'
 
 print >> version_h, '#define VER_COMPANYDOMAIN_STR       "networkoptix.com"'

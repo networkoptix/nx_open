@@ -93,9 +93,9 @@ void Settings::load(const QString& fileName)
         if (xml.isStartElement())
         {
             if (xml.name() == "mediaRoot")
-                m_data.mediaRoot = xml.readElementText();
+                m_data.mediaRoot = QDir::fromNativeSeparators(xml.readElementText());
             else if (xml.name() == "auxMediaRoot")
-                m_data.auxMediaRoots.push_back(xml.readElementText());
+                m_data.auxMediaRoots.push_back(QDir::fromNativeSeparators(xml.readElementText()));
             else if (xml.name() == "serialNumber")
                 setSerialNumber(xml.readElementText());
             else if (xml.name() == "afterFirstRun")
@@ -106,6 +106,16 @@ void Settings::load(const QString& fileName)
     if (xml.hasError())
     {
         reset();
+    }
+
+    if (m_data.mediaRoot.isEmpty())
+    {
+        m_data.mediaRoot = getMoviesDirectory() + "/EVE Media/";
+    }
+
+    if (m_data.mediaRoot.at(m_data.mediaRoot.length() - 1) != '/')
+    {
+        m_data.mediaRoot += QString("/");
     }
 }
 
@@ -128,11 +138,11 @@ void Settings::save()
     stream.writeStartElement("settings");
     stream.writeStartElement("config");
 
-    stream.writeTextElement("mediaRoot", m_data.mediaRoot);
+    stream.writeTextElement("mediaRoot", QDir::toNativeSeparators(m_data.mediaRoot));
 
     foreach(QString auxMediaRoot, m_data.auxMediaRoots)
     {
-        stream.writeTextElement("auxMediaRoot", auxMediaRoot);
+        stream.writeTextElement("auxMediaRoot", QDir::toNativeSeparators(auxMediaRoot));
     }
     
     if (!m_serialNumber.isEmpty())
@@ -186,7 +196,7 @@ void Settings::addAuxMediaRoot(const QString& root)
     if (m_data.auxMediaRoots.indexOf(root) != -1)
         return;
 
-    m_data.auxMediaRoots.append(root);
+    m_data.auxMediaRoots.append(QDir::fromNativeSeparators(root));
 }
 
 void Settings::setSerialNumber(const QString& serial)

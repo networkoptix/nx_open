@@ -85,7 +85,7 @@ private:
 
 	void drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const float* v_array);
 	void updateTexture();
-
+	void setForceSoftYUV(bool value);
 private:
 	GLint clampConstant;
 	bool isNonPower2;
@@ -93,6 +93,9 @@ private:
 
 	GLuint m_program[2];
 	GLuint m_texture[3];
+	bool m_forceSoftYUV;
+
+	QVector<uchar> yuv2rgbBuffer;
 
 	bool m_textureUploaded;
 

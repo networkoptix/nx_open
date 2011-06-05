@@ -24,7 +24,7 @@ UINT __stdcall SetMoviesFolder(MSIHANDLE hInstall)
         SHGetSpecialFolderPath(0, moviesFolderPath, CSIDL_MYDOCUMENTS, FALSE);
     }
 
-    MsiSetProperty(hInstall, L"MoviesFolder", moviesFolderPath);
+    MsiSetProperty(hInstall, L"MOVIESFOLDER", moviesFolderPath);
 
 LExit:
     
