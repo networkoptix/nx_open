@@ -47,6 +47,8 @@ public:
 
 	virtual void setItemSelected(bool sel, bool animate = true, int delay = 0);
 
+    virtual void goToSteadyMode(bool steady, bool instant);
+
 signals:
 	void onAspectRatioChanged(CLAbstractSceneItem* item);
 

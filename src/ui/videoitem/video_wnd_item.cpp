@@ -71,6 +71,20 @@ bool CLVideoWindowItem::isZoomable() const
 	return true;
 }
 
+void CLVideoWindowItem::goToSteadyMode(bool steady, bool instant)
+{
+    CLImageItem::goToSteadyMode(steady, instant);
+    if (steady)
+    {
+        scene()->views().at(0)->viewport()->setCursor(Qt::BlankCursor);
+    }
+    else
+    {
+        scene()->views().at(0)->viewport()->setCursor(Qt::OpenHandCursor);
+    }
+
+}
+
 void CLVideoWindowItem::setItemSelected(bool sel, bool animate, int delay )
 {
 	CLImageItem::setItemSelected(sel, animate, delay);

@@ -307,7 +307,7 @@ void CLCamDisplay::playAudio(bool play)
 
 bool CLCamDisplay::haveAudio() const
 {
-	return (m_playAudio && m_hadAudio) && !m_ignoringVideo;
+	return (m_playAudio && m_hadAudio) && !m_ignoringVideo && m_audioDisplay->isFormatSupported();
 }
 
 CLCompressedVideoData* CLCamDisplay::nextInOutVideodata(CLCompressedVideoData* incoming, int channel)

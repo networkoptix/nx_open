@@ -1,8 +1,8 @@
 #include "android_device_server.h"
 #include "android_device.h"
-#include "network\nettools.h"
-#include "network\simple_http_client.h"
-#include "device\device_managmen\device_manager.h"
+#include "network/nettools.h"
+#include "network/simple_http_client.h"
+#include "device/device_managmen/device_manager.h"
 
 AndroidDeviceServer::AndroidDeviceServer()
 {
@@ -31,32 +31,30 @@ QString AndroidDeviceServer::name() const
 }
 
 
+struct AnDroidDev
+{
+	// Aluma - All I Need Is Time (Sluslik Luna Mix)
+	
+	quint32 ip;
+	bool android;
+	
+	void checkIfItAndroid()
+	{
+		android = false;
+		QString request = "";
+		
+		CLSimpleHTTPClient httpClient(QHostAddress(ip), 8080, 2000, QAuthenticator());
+		httpClient.setRequestLine(request);
+		httpClient.openStream();
+		
+		if (httpClient.isOpened())
+			android = true;
+		
+	}
+};
+
 CLDeviceList AndroidDeviceServer::findDevices()
 {
-
-    struct AnDroidDev
-    {
-        // Aluma - All I Need Is Time (Sluslik Luna Mix)
-
-        quint32 ip;
-        bool android;
-
-        void checkIfItAndroid()
-        {
-            android = false;
-            QString request = "";
-
-            CLSimpleHTTPClient httpClient(QHostAddress(ip), 8080, 2000, QAuthenticator());
-            httpClient.setRequestLine(request);
-            httpClient.openStream();
-
-            if (httpClient.isOpened())
-                android = true;
-
-        }
-    };
-
-
     CLDeviceList lst;
 
     QFile file("android.txt"); // Create a file handle for the file named
@@ -92,7 +90,7 @@ CLDeviceList AndroidDeviceServer::findDevices()
         quint32 curr = min_addr.toIPv4Address();
         quint32 max_ip = max_addr.toIPv4Address();
 
-        while(curr < max_ip)
+        while(curr <= max_ip)
         {
             CLNetworkDevice* nd = CLDeviceManager::instance().getDeviceByIp(QHostAddress(curr));
             if (nd)

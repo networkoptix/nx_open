@@ -1,5 +1,6 @@
 #include "settings.h"
 #include "serial.h"
+#include "util.h"
 
 #include "base/log.h"
 

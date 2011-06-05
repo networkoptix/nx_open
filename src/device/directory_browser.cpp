@@ -3,6 +3,7 @@
 #include "device_plugins/archive/avi_files/avi_device.h"
 #include "util.h"
 #include "device_plugins/archive/archive/archive_device.h"
+#include "device_plugins/archive/filetypesupport.h"
 
 CLDeviceDirectoryBrowser::CLDeviceDirectoryBrowser():
 mNeedStop(false)
@@ -72,9 +73,9 @@ void CLDeviceDirectoryBrowser::run()
 //=============================================================================================
 CLDeviceList CLDeviceDirectoryBrowser::findDevices(const QString& directory)
 {
+    FileTypeSupport fileTypeSupport;
+
     CLDeviceList result;
-
-
 
     if (mNeedStop)
         return result;
@@ -84,9 +85,7 @@ CLDeviceList CLDeviceDirectoryBrowser::findDevices(const QString& directory)
         return result;
 
     {
-        QStringList filter;
-        filter << "*.jpg" << "*.jpeg";
-        QStringList list = dir.entryList(filter);
+        QStringList list = dir.entryList(fileTypeSupport.imagesFilter());
 
         for (int i = 0; i < list.size(); ++i)
         {
@@ -95,36 +94,10 @@ CLDeviceList CLDeviceDirectoryBrowser::findDevices(const QString& directory)
             CLDevice* dev = new CLFileDevice(abs_file_name);
             result[abs_file_name] = dev;
         }
-
     }
 
     {
-        QStringList filter;
-        filter << "*.avi";
-        filter << "*.mp4";
-        filter << "*.mkv";
-        filter << "*.wmv";
-        filter << "*.mov";
-        filter << "*.vob";
-        filter << "*.m4v";
-        filter << "*.3gp";
-        filter << "*.mpeg";
-        filter << "*.mpg";
-        filter << "*.mpe";
-        filter << "*.m2ts";
-        filter << "*.flv";
-        
-
-        /*
-        filter << "*.";
-        filter << "*.";
-        filter << "*.";
-        filter << "*.";
-        /**/
-        
-
-
-        QStringList list = dir.entryList(filter);
+        QStringList list = dir.entryList(fileTypeSupport.moviesFilter());
 
         for (int i = 0; i < list.size(); ++i)
         {
@@ -133,10 +106,7 @@ CLDeviceList CLDeviceDirectoryBrowser::findDevices(const QString& directory)
             CLDevice* dev = new CLAviDevice(abs_file_name);
             result[abs_file_name] = dev;
         }
-
     }
-
-
 
     //=============================================
     QStringList sub_dirs = subDirList(directory);
@@ -149,8 +119,6 @@ CLDeviceList CLDeviceDirectoryBrowser::findDevices(const QString& directory)
             CLDevice* dev = new CLArchiveDevice(directory + str + QString("/"));
             result[dev->getUniqueId()] = dev;
         }
-
-        
     }
     else
     {
@@ -163,12 +131,11 @@ CLDeviceList CLDeviceDirectoryBrowser::findDevices(const QString& directory)
                 result[dev->getUniqueId()] = dev;
             }
         }
-
     }
 
     return result;
-
 }
+
 //=============================================================================================
 QStringList CLDeviceDirectoryBrowser::subDirList(const QString& abspath)
 {
