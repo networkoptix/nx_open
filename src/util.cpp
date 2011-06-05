@@ -1,7 +1,5 @@
 #include "util.h"
 
-static const QString DEFAULT_MEDIA_DIR = "c:/EVE Media/";
-
 QString getDataDirectory()
 {
     return QDesktopServices::storageLocation(QDesktopServices::DataLocation);
@@ -14,18 +12,20 @@ QString getMoviesDirectory()
 
 QString getMediaRootDir()
 {
+	QString defaultMediaDir = getMoviesDirectory() + "/EVE Media";
+	
     QFile settingsFile(getDataDirectory() + "/settings.xml");
     if (!settingsFile.exists())
-        return DEFAULT_MEDIA_DIR;
+        return defaultMediaDir;
 
     if (!settingsFile.open(QIODevice::ReadOnly | QIODevice::Text))
-        return DEFAULT_MEDIA_DIR;
+        return defaultMediaDir;
 
     QXmlQuery query;
     query.setFocus(&settingsFile);
     query.setQuery("settings/config/mediaRoot/text()");
     if (!query.isValid())
-        return DEFAULT_MEDIA_DIR;
+        return defaultMediaDir;
 
     QString rootDir;
     query.evaluateTo(&rootDir);
@@ -33,10 +33,10 @@ QString getMediaRootDir()
 
     rootDir = QDir::fromNativeSeparators(rootDir.trimmed());
     if (!QDir(rootDir).exists())
-        return DEFAULT_MEDIA_DIR;
+        return defaultMediaDir;
 
     if (rootDir.length()<1)
-        return DEFAULT_MEDIA_DIR;
+        return defaultMediaDir;
 
 
     if (rootDir.at(rootDir.length()-1) != '/')

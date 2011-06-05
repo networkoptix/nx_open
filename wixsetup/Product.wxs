@@ -34,6 +34,10 @@
     <CustomAction Id="FileAssocRestore" BinaryKey="FILEASSOCRESTORE" JScriptCall="RestoreFileAssociations" Execute="deferred" Impersonate="no" Win64="no"/> 
 -->
 
+    <Binary Id="PropsCA.dll" SourceFile="PropsCA\Release\PropsCA.dll" />
+
+    <CustomAction Id="SetMoviesFolder" BinaryKey="PropsCA.dll" DllEntry="SetMoviesFolder" Execute="firstSequence"/>
+
     <Upgrade Id="286227c5-25b4-4796-aa48-2d9822e10b0d">
       <UpgradeVersion
          Minimum="0.1.0" Maximum="$(env.APPLICATION_VERSION)"
@@ -42,10 +46,11 @@
       <UpgradeVersion OnlyDetect='yes' Property='NEWERFOUND' Minimum='$(env.APPLICATION_VERSION)' IncludeMinimum='no' />
     </Upgrade>
 
-    <CustomAction Id="AssignMediaFolder" Property="MEDIAFOLDER" Value="[%SystemDrive]\EVE Media" Execute="firstSequence"/>
+    <CustomAction Id="AssignMediaFolder" Property="MEDIAFOLDER" Value="[MoviesFolder]\EVE Media" Execute="firstSequence"/>
     <CustomAction Id="StartAppOnExit" FileKey="UniclientEXE" ExeCommand="" Execute="immediate" Impersonate="yes" Return="asyncNoWait"/>
 
     <InstallUISequence>
+      <Custom Action="SetMoviesFolder" Before="SetProperties" />
       <Custom Action="SetProperties" Before="AssignMediaFolder"/>
       <Custom Action="AssignMediaFolder" Before="CostInitialize">MEDIAFOLDER=""</Custom>
       <!--<Custom Action='DowngradeWarning' After='FindRelatedProducts'>NEWERFOUND</Custom>-->

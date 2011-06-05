@@ -47,6 +47,7 @@ public:
     bool haveValidSerialNumber() const;
     void setSerialNumber(const QString& serial);
 
+    void setMediaRoot(const QString& root);
     void addAuxMediaRoot(const QString& root);
 
 private:
@@ -54,7 +55,6 @@ private:
     Settings(const Settings&) {}
 
     void setAllowChangeIP(bool allow);
-    void setMediaRoot(const QString& root);
     void setAuxMediaRoots(const QStringList&);
     void removeAuxMediaRoot(const QString& root);
     void reset();
