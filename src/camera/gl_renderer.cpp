@@ -43,77 +43,77 @@ static const int MAX_SHADER_SIZE = 1024*3;
 
 // arbfp1 fragment program for converting yuv (YV12) to rgb
 static const char yv12ToRgb[] =
-"!!ARBfp1.0"
-"PARAM c[5] = { program.local[0..1],"
-"                { 1.164, 0, 1.596, 0.5 },"
-"                { 0.0625, 1.164, -0.391, -0.81300002 },"
-"                { 1.164, 2.0179999, 0 } };"
-"TEMP R0;"
-"TEX R0.x, fragment.texcoord[0], texture[1], 2D;"
-"ADD R0.y, R0.x, -c[2].w;"
-"TEX R0.x, fragment.texcoord[0], texture[2], 2D;"
-"ADD R0.x, R0, -c[2].w;"
-"MUL R0.z, R0.y, c[0].w;"
-"MAD R0.z, R0.x, c[0], R0;"
-"MUL R0.w, R0.x, c[0];"
-"MUL R0.z, R0, c[0].y;"
-"TEX R0.x, fragment.texcoord[0], texture[0], 2D;"
-"MAD R0.y, R0, c[0].z, R0.w;"
-"ADD R0.x, R0, -c[3];"
-"MUL R0.y, R0, c[0];"
-"MUL R0.z, R0, c[1].x;"
-"MAD R0.x, R0, c[0].y, c[0];"
-"MUL R0.y, R0, c[1].x;"
-"DP3 result.color.x, R0, c[2];"
-"DP3 result.color.y, R0, c[3].yzww;"
-"DP3 result.color.z, R0, c[4];"
-"MOV result.color.w, c[1].y;"
-"END";
+"!!ARBfp1.0\n"
+"PARAM c[5] = { program.local[0..1],\n"
+"                { 1.164, 0, 1.596, 0.5 },\n"
+"                { 0.0625, 1.164, -0.391, -0.81300002 },\n"
+"                { 1.164, 2.0179999, 0 } };\n"
+"TEMP R0;\n"
+"TEX R0.x, fragment.texcoord[0], texture[1], 2D;\n"
+"ADD R0.y, R0.x, -c[2].w;\n"
+"TEX R0.x, fragment.texcoord[0], texture[2], 2D;\n"
+"ADD R0.x, R0, -c[2].w;\n"
+"MUL R0.z, R0.y, c[0].w;\n"
+"MAD R0.z, R0.x, c[0], R0;\n"
+"MUL R0.w, R0.x, c[0];\n"
+"MUL R0.z, R0, c[0].y;\n"
+"TEX R0.x, fragment.texcoord[0], texture[0], 2D;\n"
+"MAD R0.y, R0, c[0].z, R0.w;\n"
+"ADD R0.x, R0, -c[3];\n"
+"MUL R0.y, R0, c[0];\n"
+"MUL R0.z, R0, c[1].x;\n"
+"MAD R0.x, R0, c[0].y, c[0];\n"
+"MUL R0.y, R0, c[1].x;\n"
+"DP3 result.color.x, R0, c[2];\n"
+"DP3 result.color.y, R0, c[3].yzww;\n"
+"DP3 result.color.z, R0, c[4];\n"
+"MOV result.color.w, c[1].y;\n"
+"END\n";
 
 static const char yuy2ToRgb[] =
-"!!ARBfp1.0"
-"PARAM c[5] = { program.local[0..1],"
-"                { 0.5, 2, 1, 0.0625 },"
-"                { 1.164, 0, 1.596, 2.0179999 },"
-"                { 1.164, -0.391, -0.81300002 } };"
-"TEMP R0;"
-"TEMP R1;"
-"TEMP R2;"
-"FLR R1.z, fragment.texcoord[0].x;"
-"ADD R0.x, R1.z, c[2];"
-"ADD R1.z, fragment.texcoord[0].x, -R1;"
-"MUL R1.x, fragment.texcoord[0].z, R0;"
-"MOV R1.y, fragment.texcoord[0];"
-"TEX R0, R1, texture[0], 2D;"
-"ADD R1.y, R0.z, -R0.x;"
-"MUL R2.x, R1.z, R1.y;"
-"MAD R0.x, R2, c[2].y, R0;"
-"MOV R1.y, fragment.texcoord[0];"
-"ADD R1.x, fragment.texcoord[0].z, R1;"
-"TEX R1.xyw, R1, texture[0], 2D;"
-"ADD R2.x, R1, -R0.z;"
-"MAD R1.x, R1.z, c[2].y, -c[2].z;"
-"MAD R0.z, R1.x, R2.x, R0;"
-"ADD R1.xy, R1.ywzw, -R0.ywzw;"
-"ADD R0.z, R0, -R0.x;"
-"SGE R1.w, R1.z, c[2].x;"
-"MAD R0.x, R1.w, R0.z, R0;"
-"MAD R0.yz, R1.z, R1.xxyw, R0.xyww;"
-"ADD R0.xyz, R0, -c[2].wxxw;"
-"MUL R0.w, R0.y, c[0];"
-"MAD R0.w, R0.z, c[0].z, R0;"
-"MUL R0.z, R0, c[0].w;"
-"MAD R0.y, R0, c[0].z, R0.z;"
-"MUL R0.w, R0, c[0].y;"
-"MUL R0.y, R0, c[0];"
-"MUL R0.z, R0.w, c[1].x;"
-"MAD R0.x, R0, c[0].y, c[0];"
-"MUL R0.y, R0, c[1].x;"
-"DP3 result.color.x, R0, c[3];"
-"DP3 result.color.y, R0, c[4];"
-"DP3 result.color.z, R0, c[3].xwyw;"
-"MOV result.color.w, c[1].y;"
-"END";
+"!!ARBfp1.0\n"
+"PARAM c[5] = { program.local[0..1],\n"
+"                { 0.5, 2, 1, 0.0625 },\n"
+"                { 1.164, 0, 1.596, 2.0179999 },\n"
+"                { 1.164, -0.391, -0.81300002 } };\n"
+"TEMP R0;\n"
+"TEMP R1;\n"
+"TEMP R2;\n"
+"FLR R1.z, fragment.texcoord[0].x;\n"
+"ADD R0.x, R1.z, c[2];\n"
+"ADD R1.z, fragment.texcoord[0].x, -R1;\n"
+"MUL R1.x, fragment.texcoord[0].z, R0;\n"
+"MOV R1.y, fragment.texcoord[0];\n"
+"TEX R0, R1, texture[0], 2D;\n"
+"ADD R1.y, R0.z, -R0.x;\n"
+"MUL R2.x, R1.z, R1.y;\n"
+"MAD R0.x, R2, c[2].y, R0;\n"
+"MOV R1.y, fragment.texcoord[0];\n"
+"ADD R1.x, fragment.texcoord[0].z, R1;\n"
+"TEX R1.xyw, R1, texture[0], 2D;\n"
+"ADD R2.x, R1, -R0.z;\n"
+"MAD R1.x, R1.z, c[2].y, -c[2].z;\n"
+"MAD R0.z, R1.x, R2.x, R0;\n"
+"ADD R1.xy, R1.ywzw, -R0.ywzw;\n"
+"ADD R0.z, R0, -R0.x;\n"
+"SGE R1.w, R1.z, c[2].x;\n"
+"MAD R0.x, R1.w, R0.z, R0;\n"
+"MAD R0.yz, R1.z, R1.xxyw, R0.xyww;\n"
+"ADD R0.xyz, R0, -c[2].wxxw;\n"
+"MUL R0.w, R0.y, c[0];\n"
+"MAD R0.w, R0.z, c[0].z, R0;\n"
+"MUL R0.z, R0, c[0].w;\n"
+"MAD R0.y, R0, c[0].z, R0.z;\n"
+"MUL R0.w, R0, c[0].y;\n"
+"MUL R0.y, R0, c[0];\n"
+"MUL R0.z, R0.w, c[1].x;\n"
+"MAD R0.x, R0, c[0].y, c[0];\n"
+"MUL R0.y, R0, c[1].x;\n"
+"DP3 result.color.x, R0, c[3];\n"
+"DP3 result.color.y, R0, c[4];\n"
+"DP3 result.color.z, R0, c[3].xwyw;\n"
+"MOV result.color.w, c[1].y;\n"
+"END\n";
 
 int CLGLRenderer::gl_status = CLGLRenderer::CL_GL_NOT_TESTED;
 GLint CLGLRenderer::ms_maxTextureSize = 0;
@@ -287,7 +287,7 @@ void CLGLRenderer::init(bool msgbox)
 			CL_LOG(cl_logERROR) cl_log.log(fragmentProgram, " not support" ,cl_logERROR);
 			error = true;
 		}
-	}
+    }
 
 	if (!error && glProgramStringARB && glBindProgramARB && glDeleteProgramsARB &&
 		glGenProgramsARB && glProgramLocalParameter4fARB) 
@@ -346,6 +346,7 @@ void CLGLRenderer::init(bool msgbox)
 		}
 
 	}
+
 	if (m_forceSoftYUV) 
 	{
 		isSoftYuv2Rgb = true;
@@ -524,6 +525,7 @@ void CLGLRenderer::updateTexture()
 
 	if (!isSoftYuv2Rgb) 
 	{
+            // hardware 
 			for (int i = 0; i < 3; ++i) 
 			{
 				glBindTexture(GL_TEXTURE_2D, m_texture[i]);
