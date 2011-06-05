@@ -352,7 +352,7 @@ void CLGLRenderer::init(bool msgbox)
 	{
 		isSoftYuv2Rgb = true;
 	}
-#ifdef _WIN32	
+#if 0
     // force CPU yuv->rgb for large textures (due to ATI bug). Only for still images.
     else if (m_videowindow && m_videowindow->getVideoCam()->getDevice()->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT) &&
                 (m_width >= MAX_SHADER_SIZE || m_height >= MAX_SHADER_SIZE))
@@ -572,7 +572,9 @@ void CLGLRenderer::updateTexture()
 
 				glTexSubImage2D(GL_TEXTURE_2D, 0,
 					0, 0,
-					w[i], h[i],
+					//w[i], 
+                    r_w[i],
+                    h[i],
 					GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels);
 				OGL_CHECK_ERROR("glTexSubImage2D");
 				glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
@@ -666,7 +668,7 @@ void CLGLRenderer::updateTexture()
 		OGL_CHECK_ERROR("glPixelStorei");
 		glTexSubImage2D(GL_TEXTURE_2D, 0,
 			0, 0,
-			qMin(m_stride, ms_maxTextureSize) , qMin(h[0], ms_maxTextureSize),
+			qMin(m_width, ms_maxTextureSize) , qMin(h[0], ms_maxTextureSize),
 			GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 		OGL_CHECK_ERROR("glTexSubImage2D");
 		glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
