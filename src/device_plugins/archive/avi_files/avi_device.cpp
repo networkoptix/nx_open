@@ -3,7 +3,9 @@
 
 CLAviDevice::CLAviDevice(const QString& file)
 {
-	m_uniqueId = file;
+    QFileInfo fi(file);
+
+	m_uniqueId = fi.absoluteFilePath();
 	m_name = QFileInfo(file).fileName();
 }
 
