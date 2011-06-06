@@ -92,7 +92,8 @@ void MainWnd::addFilesToCurrentOrNewLayout(const QStringList& files)
     // If current content created by opening files or DND, use it. Otherwise create new one.
     LayoutContent* content = m_normalView->getView().getCamLayOut().getContent();
 
-    if (content->getName() == "Layout:unnamed")
+    if (content != CLSceneLayoutManager::instance().getSearchLayout() &&
+        content != CLSceneLayoutManager::instance().startScreenLayoutContent())
     {
         foreach(QString file, files)
         {
