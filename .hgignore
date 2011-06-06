@@ -18,3 +18,4 @@ src/Info.plist
 test/uniclient_tests.vcproj
 wixsetup/Associations.wxs
 wixsetup/FileExtensions.wxs
+.DS_Store
