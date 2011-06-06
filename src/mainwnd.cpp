@@ -34,7 +34,7 @@ m_normalView(0)
     QStringList files;
     for (int i = 1; i < argc; ++i)
     {
-        QString fileName = QString::fromLocal8Bit(argv[i]);
+        QString fileName = QDir::fromNativeSeparators(QString::fromLocal8Bit(argv[i]));
         if (QFile(fileName).exists())
             files.append(fileName);
     }
