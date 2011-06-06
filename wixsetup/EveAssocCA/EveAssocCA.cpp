@@ -61,7 +61,11 @@ UINT __stdcall SetDefaultAssociations(MSIHANDLE hInstall)
             (void **)&pAAR);
 
         if (FAILED(hr))
-            throw Error("CoCreateInstance failed");
+        {
+            // No IApplicationAssociationRegistration implementation. Assume we're on Windows XP.
+            hr = S_OK;
+            throw Error("CoCreateInstance failed.");
+        }
 
         WcaLog(LOGMSG_STANDARD, "CoCreateInstance succeeded.");
 
