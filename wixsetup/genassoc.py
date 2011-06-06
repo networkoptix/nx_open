@@ -47,8 +47,6 @@ component_template_string = """     <Component Id="Eve${capitalized_ext}FileAsso
 <!--              <Property Id='ExtBackup${capitalized_ext}' Value=''>
                 <RegistrySearch Id='ExtBackup${capitalized_ext}Registry' Type='raw' Root='HKCR' Key='.${ext}' />
               </Property> -->
-
-              <Registry Action="removeKeyOnInstall" Root="HKCU" Key="Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.${ext}"/>
             </Component>
 """
 
