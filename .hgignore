@@ -1,0 +1,20 @@
+syntax: glob
+
+bin
+build
+Debug
+Release
+*.pyc
+*.sln
+*.ncb
+*.suo
+*.pro
+*.user
+src/uniclient.vcproj
+src/uniclient.xcodeproj
+src/version.h
+src/ui_mainwnd.h
+src/Info.plist
+test/uniclient_tests.vcproj
+wixsetup/Associations.wxs
+wixsetup/FileExtensions.wxs
