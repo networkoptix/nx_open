@@ -52,8 +52,6 @@ UINT __stdcall SetDefaultAssociations(MSIHANDLE hInstall)
 
         WcaLog(LOGMSG_STANDARD, "Initialized.");
 
-        MessageBox(NULL,L"In",NULL,NULL);
-
         IApplicationAssociationRegistration *pAAR = NULL;
 
         hr = CoCreateInstance(CLSID_ApplicationAssociationRegistration, 
