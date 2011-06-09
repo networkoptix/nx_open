@@ -91,8 +91,16 @@ def index_dirs(xdirs, template_file, output_file, use_prefix = False):
 
 
 ffmpeg_path = os.getenv('EVE_FFMPEG').replace('\\', '/')
+
+openal_path = 'contrib/openal/bin/'
+openal_path += sys.platform
+
 if not ffmpeg_path:
     print r"""EVE_FFMPEG environment variable is not defined.
+    
+if not openal_path:
+    print Can not find openAL binary files.
+    
 Do the following:
 1. Clone repository ssh://hg@vigasin.com/ffmpeg to somewhere, say c:\programming\ffmpeg
 2. Go to c:\programming\ffmpeg and run get_ffmpegs.bat
@@ -105,6 +113,7 @@ if sys.platform == 'win32':
     ffmpeg += '-mingw'
 else:
     ffmpeg += '-macos'
+
 
 ffmpeg_path = os.path.join(ffmpeg_path, ffmpeg)
 ffmpeg_path_debug = ffmpeg_path + '-debug'
@@ -143,6 +152,11 @@ copy_files(ffmpeg_path_debug + '/bin/*-[0-9][0-9].dll', 'bin/debug-test')
 
 copy_files(ffmpeg_path_release + '/bin/*-[0-9].dll', 'bin/release-test')
 copy_files(ffmpeg_path_release + '/bin/*-[0-9][0-9].dll', 'bin/release-test')
+
+copy_files(openal_path + '/*.dll', 'bin/release-test')
+copy_files(openal_path + '/*.dll', 'bin/debug-test')
+copy_files(openal_path + '/*.dll', 'bin/release')
+copy_files(openal_path + '/*.dll', 'bin/debug')
 
 os.mkdir('bin/debug/arecontvision')
 os.mkdir('bin/release/arecontvision')
