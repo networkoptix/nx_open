@@ -9,14 +9,14 @@
 #define DEFAULT_AUDIO_FRAME_SIZE (AVCODEC_MAX_AUDIO_FRAME_SIZE*2)
 int  MAX_AUDIO_FRAME_SIZE = DEFAULT_AUDIO_FRAME_SIZE*5;
 
-static short clip_short(int v)
+static inline short clip_short(int v)
 {
 	if (v < -32768)
-        v = -32768;
+        return -32768;
     else if (v > 32767)
-        v = 32767;
-
-    return (short) v;
+        return 32767;
+    else
+        return (short) v;
 }
 
 static void down_mix_6_2(short *data, int len) 
@@ -51,13 +51,14 @@ CLAudioStreamDisplay::CLAudioStreamDisplay(int bufferMs)
       m_decodedaudio(16, DEFAULT_AUDIO_FRAME_SIZE),
       m_downmixing(false),
       m_tooFewDataDetected(true),
-      m_audioDevice(0)
+      m_audioSound(0)
 {
 }
 
 CLAudioStreamDisplay::~CLAudioStreamDisplay()
 {
-	delete m_audioDevice;
+    if (m_audioSound)
+        QtvAudioDevice::instance().removeSound(m_audioSound);
 
     foreach(CLAbstractAudioDecoder* decoder, m_decoder)
     {
@@ -67,23 +68,25 @@ CLAudioStreamDisplay::~CLAudioStreamDisplay()
 
 int CLAudioStreamDisplay::msInBuffer() const
 {
-    return msInQueue() + (m_audioDevice ? m_audioDevice->msInBuffer() : 0);
+    int internalBufferSize = (m_audioSound ? m_audioSound->playTimeElapsed()/1000.0 : 0);
+    //cl_log.log("internalBufferSize = ", internalBufferSize, cl_logALWAYS);
+    return msInQueue() + internalBufferSize;
 }
 
 void CLAudioStreamDisplay::suspend()
 {
-	if (!m_audioDevice)
+	if (!m_audioSound)
 		return;
 
-	m_audioDevice->suspend();
+	m_audioSound->suspend();
 }
 
 void CLAudioStreamDisplay::resume()
 {
-	if (!m_audioDevice)
+	if (!m_audioSound)
 		return;
 
-	m_audioDevice->resume();
+	m_audioSound->resume();
 }
 
 bool CLAudioStreamDisplay::isBuffering() const
@@ -93,16 +96,16 @@ bool CLAudioStreamDisplay::isBuffering() const
 
 bool CLAudioStreamDisplay::isFormatSupported() const
 {
-    if (!m_audioDevice)
+    if (!m_audioSound)
         return true; // it's not constructed yet
 
-    return m_audioDevice->isFormatSupported();
+    return m_audioSound->isFormatSupported();
 }
 
 void CLAudioStreamDisplay::clearDeviceBuffer()
 {
-    if (m_audioDevice)
-        m_audioDevice->clearAudioBuff();
+    if (m_audioSound)
+        m_audioSound->clear();
 }
 
 void CLAudioStreamDisplay::clearAudioBuffer()
@@ -124,7 +127,8 @@ void CLAudioStreamDisplay::enqueueData(CLCompressedAudioData* data)
 
 void CLAudioStreamDisplay::putData(CLCompressedAudioData* data)
 {
-	if (data == 0 && !m_audioDevice) // do not need to check audio device in case of data=0 and no audio device
+    
+	if (data == 0 && !m_audioSound) // do not need to check audio device in case of data=0 and no audio device
         return;
 
     // some times distance between audio packets in file is very large ( may be more than audio_device buffer );
@@ -149,9 +153,8 @@ void CLAudioStreamDisplay::putData(CLCompressedAudioData* data)
             cl_log.log("to many data in audio queue!!!!", cl_logDEBUG1);
             clearAudioBuffer();
             return;
-        }
-
-        if (msInQueue() < m_bufferMs / 10)
+        }        
+        else if (msInBuffer() < m_bufferMs / 10)
         {
             //paying too fast; need to slowdown
             cl_log.log("too few data in audio queue!!!!", cl_logDEBUG1);
@@ -159,16 +162,13 @@ void CLAudioStreamDisplay::putData(CLCompressedAudioData* data)
             suspend();
             data->dataProvider->setNeedSleep(false); //lets reader run without delays;
             return;
-        }
+        }        
 	}
 
     if (m_audioQueue.empty()) // possible if incoming data = 0
         return;
 
-    if (m_audioDevice && !m_audioDevice->wantMoreData())
-        return;
-
-    if (msInQueue() > m_tooFewDataDetected*playAfterMs() )
+    if (msInBuffer() > m_tooFewDataDetected*playAfterMs() )
     {
         m_tooFewDataDetected = false;
         resume(); // does nothing if resumed already
@@ -186,8 +186,6 @@ void CLAudioStreamDisplay::putData(CLCompressedAudioData* data)
         audio.format.setChannels(data->channels);
         audio.format.setFrequency(data->freq);
 
-        CLAbstractAudioDecoder* dec = 0;
-
         if (data->compressionType == CODEC_ID_NONE)
         {
             cl_log.log("CLAudioStreamDisplay::putdata: unknown codec type...", cl_logERROR);
@@ -201,28 +199,24 @@ void CLAudioStreamDisplay::putData(CLCompressedAudioData* data)
 
         }
 
-        dec = m_decoder[data->compressionType];
-
-        bool decoded = dec->decode(audio);
+        bool decoded = m_decoder[data->compressionType]->decode(audio);
         data->releaseRef();
 
         if (!decoded || audio.outbuf_len == 0)
             return;
 
-        if (!m_audioDevice)
-            m_audioDevice = new CLAudioDevice(audio.format);
-
-        if (m_audioDevice->convertingFloat())
+        if (audio.format.sampleType() == QAudioFormat::Float)
         {
             float2int(audio);
             audio.outbuf_len /= 2;
         }
 
-        if (audio.format.channels() > 2 && m_audioDevice->downmixing())
-            downmix(audio);
+        if (!m_audioSound) 
+            m_audioSound = QtvAudioDevice::instance().addSound(audio.format.channels(), qMin(audio.format.sampleSize(), 16), audio.format.frequency(), audio.outbuf_len);
 
-
-        m_audioDevice->write(audio.outbuf->data(), audio.outbuf_len);
+        //if (audio.format.channels() > 2 && m_audioDevice->downmixing())
+        //    downmix(audio);
+        m_audioSound->play(audio.outbuf->data(), audio.outbuf_len);
     }
 
 //		qint64 bytesInBuffer = m_audioOutput->bufferSize() - m_audioOutput->bytesFree();

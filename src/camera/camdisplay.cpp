@@ -10,6 +10,7 @@
 CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
     : CLAbstractDataProcessor(CL_MAX_DISPLAY_QUEUE_SIZE),
       m_previousVideoTime(0),
+      m_lastNonZerroDuration(0),
       m_previousVideoDisplayedTime(0),
       m_delay(100*1000), // do not put a big value here to avoid cpu usage in case of zoom out 
       m_playAudio(false),
@@ -226,6 +227,7 @@ void CLCamDisplay::processData(CLAbstractData* data)
 
             //cl_log.log("diff = ", (int)diff/1000, cl_logALWAYS);
 
+
             if (diff >= 2 * videoDuration) //factor 2 here is to avoid frequent switch between normal play and fast play
             {
                 // video runs faster than audio; // need to hold video this frame
@@ -236,7 +238,8 @@ void CLCamDisplay::processData(CLAbstractData* data)
                 return;
             }
 
-            if (diff < 2 * videoDuration) //factor 2 here is to avoid frequent switch between normal play and fast play
+            //if (diff < 2 * videoDuration) //factor 2 here is to avoid frequent switch between normal play and fast play
+            else
             {
                 // need to draw frame(s); at least one
 
@@ -246,7 +249,7 @@ void CLCamDisplay::processData(CLAbstractData* data)
 
                 while(1)
                 {
-                    qint64 diff = diffBetweenVideoAndAudio(incoming, channel, videoDuration);
+                    //qint64 diff = diffBetweenVideoAndAudio(incoming, channel, videoDuration);
 
                     vd = nextInOutVideodata(incoming, channel);
                     incoming = 0;
@@ -254,7 +257,7 @@ void CLCamDisplay::processData(CLAbstractData* data)
                     if (!vd)
                         break; // no more video in queue
 
-                    bool lastFrameToDisplay = qAbs(diff) < 2 * videoDuration; //factor 2 here is to avoid frequent switch between normal play and fast play
+                    bool lastFrameToDisplay = diff > -2 * videoDuration; //factor 2 here is to avoid frequent switch between normal play and fast play
 
                     display(vd, lastFrameToDisplay && !vd->ignore);
 
@@ -273,6 +276,7 @@ void CLCamDisplay::processData(CLAbstractData* data)
                     {
                         break;
                     }
+                    diff = diffBetweenVideoAndAudio(incoming, channel, videoDuration);
                 }
             }
 		}
@@ -321,7 +325,6 @@ CLCompressedVideoData* CLCamDisplay::nextInOutVideodata(CLCompressedVideoData* i
 	// queue is not empty 
 	if (incoming)
 		enqueueVideo(incoming);
-
 	return m_videoQueue[channel].dequeue();
 }
 
@@ -349,17 +352,22 @@ void CLCamDisplay::clearVideoQueue()
 	}
 }
 
-qint64 CLCamDisplay::diffBetweenVideoAndAudio(CLCompressedVideoData* incoming, int channel, qint64& duration) const
+qint64 CLCamDisplay::diffBetweenVideoAndAudio(CLCompressedVideoData* incoming, int channel, qint64& duration) 
 {
     qint64 currentPlayingAudioTime = m_lastAudioPacketTime - (quint64)m_audioDisplay->msInBuffer()*1000;
+
     qint64 currentPlayingVideoTime = nextVideoImageTime(incoming, channel);
 
     // strongly saning this duration of prev frame; not exact, but I think its fine
     // let's assume this frame has same duration
     duration = currentPlayingVideoTime - m_previousVideoTime;
+    if (duration == 0)
+        duration = m_lastNonZerroDuration;
+    else
+        m_lastNonZerroDuration = duration;
 
     // difference between video and audio
-    return currentPlayingVideoTime - (currentPlayingAudioTime + 150*1000); // sorry for the magic number
+    return currentPlayingVideoTime - currentPlayingAudioTime; 
 }
 
 void CLCamDisplay::enqueueVideo(CLCompressedVideoData* vd)

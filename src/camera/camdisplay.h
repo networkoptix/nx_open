@@ -53,7 +53,7 @@ private:
     quint64 nextVideoImageTime(CLCompressedVideoData* incoming, int channel) const;
 
     // this function returns diff between video and audio at any given moment
-    qint64 diffBetweenVideoAndAudio(CLCompressedVideoData* incoming, int channel, qint64& duration) const;
+    qint64 diffBetweenVideoAndAudio(CLCompressedVideoData* incoming, int channel, qint64& duration);
 
 	void clearVideoQueue();
     void enqueueVideo(CLCompressedVideoData* vd);
@@ -78,6 +78,7 @@ private:
     quint64 m_lastVideoPacketTime;
 
     quint64 m_previousVideoTime;
+    quint64 m_lastNonZerroDuration;
     quint64 m_previousVideoDisplayedTime;
 
     bool m_afterJump;
