@@ -160,6 +160,9 @@ quint64 CLArchiveStreamReader::slowestChannelTime() const
 {
     int slowestChannel = slowest_channel();
 
+    if (slowestChannel<0)
+        return 0;
+
     return mMovie[slowestChannel].at(mCurrIndex[slowestChannel]).time;
 }
 

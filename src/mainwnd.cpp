@@ -117,7 +117,7 @@ void MainWnd::addFilesToCurrentOrNewLayout(const QStringList& files)
 
 void MainWnd::handleMessage(const QString& message)
 {
-    QStringList files = message.split(QChar('\0'));
+    QStringList files = message.trimmed().split(QChar('\0'), QString::SkipEmptyParts);
 
     addFilesToCurrentOrNewLayout(files);
 }

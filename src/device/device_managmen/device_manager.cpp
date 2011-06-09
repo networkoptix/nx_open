@@ -392,6 +392,12 @@ void CLDeviceManager::addFiles(const QStringList& files)
             continue; // such dev already exists 
         }
 
+        QFile file(xfile);
+        if (!file.exists())
+            continue;
+
+
+
         if (xfile.toLower().endsWith(".jpeg") || xfile.toLower().endsWith(".jpg"))
             dev = new CLFileDevice(xfile);
         else
