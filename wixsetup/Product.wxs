@@ -36,6 +36,7 @@
 -->
 
     <Binary Id="PropsCA.dll" SourceFile="PropsCA\Release\PropsCA.dll" />
+    <Binary Id="EveAssocCA.dll" SourceFile="EveAssocCA\Release\EveAssocCA.dll" />
 
     <CustomAction Id="SetMoviesFolder" BinaryKey="PropsCA.dll" DllEntry="SetMoviesFolder" />
 
@@ -49,6 +50,7 @@
 
     <CustomAction Id="AssignMediaFolder" Property="MEDIAFOLDER" Value="[MOVIESFOLDER]\EVE Media" />
     <CustomAction Id="StartAppOnExit" FileKey="UniclientEXE" ExeCommand="" Execute="immediate" Impersonate="yes" Return="asyncNoWait"/>
+    <CustomAction Id="SetDefaultAssociations" BinaryKey="EveAssocCA.dll" DllEntry="SetDefaultAssociations" Execute="deferred"/>
 
     <InstallUISequence>
       <Custom Action="SetMoviesFolder" Before="SetProperties" />
@@ -61,7 +63,9 @@
 
     <InstallExecuteSequence>
       <RemoveExistingProducts Before="InstallInitialize" />
-<!-- Custom actions for saving/restoring file associations.
+      <Custom Action="SetDefaultAssociations" After="WriteRegistryValues">NOT Installed</Custom>
+
+      <!-- Custom actions for saving/restoring file associations.
       <Custom Action="FileAssocBackup" After="WriteRegistryValues"/>
       <Custom Action="FileAssocRestore" After="RemoveRegistryValues">Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
 -->
