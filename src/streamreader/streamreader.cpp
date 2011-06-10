@@ -108,6 +108,9 @@ bool CLStreamreader::needKeyData() const
 
 void CLStreamreader::putData(CLAbstractData* data)
 {
+    if (!data)
+        return;
+
 	QMutexLocker mutex(&m_proc_CS);
 	for (int i = 0; i < m_dataprocessors.size(); ++i)
 	{

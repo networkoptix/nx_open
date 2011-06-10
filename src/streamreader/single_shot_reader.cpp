@@ -17,7 +17,8 @@ void CLSingleShotStreamreader::run()
 	CLAbstractMediaData *data = 0;
 	data = getData();
 
-	putData(data);
+    if (data)
+	    putData(data);
 
 	CL_LOG(cl_logINFO) cl_log.log("single shot stream reader stopped.", cl_logINFO);
 }
