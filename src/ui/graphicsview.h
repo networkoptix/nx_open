@@ -231,6 +231,8 @@ protected:
 
     bool mMenuIsHere;
 
+    QTime mTimeAfterDoubleClick;
+
 };
 
 #endif //PH_graphicsview_h328

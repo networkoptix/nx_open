@@ -29,7 +29,7 @@
 
 extern int  SLOT_WIDTH;
 
-int doubl_clk_delay = qApp->doubleClickInterval()*0.75;
+int doubl_clk_delay = qApp->doubleClickInterval();
 int item_select_duration = 800;
 int item_hoverevent_duration = 300;
 int scene_zoom_duration = 2500;
@@ -87,6 +87,7 @@ mSteadyShow(this),
 mWheelZooming(false),
 mMenuIsHere(false)
 {
+    mTimeAfterDoubleClick.restart();
 
 	setScene(&m_scene);
 
@@ -619,6 +620,9 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 	if (!mViewStarted)
 		return;
 
+    if (mTimeAfterDoubleClick.elapsed() < doubl_clk_delay)
+        return; // ignore some accident mouse click accidents after double click
+
     m_ignore_release_event = false;
 
 	if (m_gridItem->isVisible() && !isCTRLPressed(event))
@@ -887,6 +891,10 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 {
 	if (!mViewStarted)
 		return;
+
+    if (mTimeAfterDoubleClick.elapsed() < doubl_clk_delay)
+        return; // ignore some accident mouse click accidents after double click
+
 
     if (onUserInput(true, true))
         return;
@@ -1522,6 +1530,8 @@ void GraphicsView::mouseDoubleClickEvent( QMouseEvent * event )
 	if (!mViewStarted)
 		return;
 
+    mTimeAfterDoubleClick.restart();
+
 	QGraphicsItem *item = itemAt(event->pos());
 	CLAbstractSceneItem* aitem = navigationItem(item);
 
@@ -1578,6 +1588,7 @@ void GraphicsView::mouseDoubleClickEvent( QMouseEvent * event )
 	m_ignore_release_event  = true;
 
 	QGraphicsView::mouseDoubleClickEvent(event);
+
 }
 
 void GraphicsView::dragEnterEvent ( QDragEnterEvent * event )
