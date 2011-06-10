@@ -53,7 +53,6 @@ void CLDeviceDirectoryBrowser::run()
             dir+="/";
 
 
-        cl_log.log("Checking ", dir,   cl_logALWAYS);
 
         CLDeviceList dev_lst = findDevices(dir);
 
@@ -73,6 +72,9 @@ void CLDeviceDirectoryBrowser::run()
 //=============================================================================================
 CLDeviceList CLDeviceDirectoryBrowser::findDevices(const QString& directory)
 {
+
+    cl_log.log("Checking ", directory,   cl_logALWAYS);
+
     FileTypeSupport fileTypeSupport;
 
     CLDeviceList result;
@@ -145,12 +147,11 @@ QStringList CLDeviceDirectoryBrowser::subDirList(const QString& abspath)
     if (!dir.exists())
         return result;
 
-    QFileInfoList list = dir.entryInfoList();
+    QFileInfoList list = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
 
     foreach(QFileInfo info, list)
     {
-        if (info.isDir() && info.fileName()!="." && info.fileName()!="..")
-            result.push_back(info.fileName());
+        result.push_back(info.fileName());
     }
 
     return result;
