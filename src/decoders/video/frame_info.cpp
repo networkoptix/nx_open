@@ -104,13 +104,6 @@ void downscalePlate_factor4_mmx(unsigned char * dst, const unsigned int dst_stri
                                 const unsigned int width, const unsigned int src_stride, const unsigned int height)
 {
     int round_width = width / 32 * 32;
-    if (round_width != width) {
-        int gg = 4;
-    }
-    if (dst_stride % 8 != 0) 
-    {
-        int gg5 = 4;
-    }
     unsigned int y = 0;
     do {
         const unsigned char* src_line1 = src + src_stride * y;
