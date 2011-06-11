@@ -215,50 +215,34 @@ void downscalePlate_factor8_mmx(unsigned char * dst, const unsigned int dst_stri
             mov edi, [dst]
             mov eax, [src_line1_end]
             .align 8;
-            movq mm7, mmx_000000ffw
+            pxor mm7, mm7
             movq mm6, mmx_00ffw
 __loop1:
             PREFETCHNTA [esi + 64]
             PREFETCHNTA [edx + 64]
 
-            movq  mm0, [esi]   ; load first 8 pixels from first line
-            movq  mm1, [esi+8] ; load next 8 pixels from first line
-            movq  mm4, [esi+16]  ; load first 8 pixels from first line
-            movq  mm5, [esi+24]  ; load next 8 pixels from first line
+            PINSRW mm0, [esi], 0
+            PINSRW mm1, [esi+4], 0
+            PINSRW mm0, [esi+8], 1
+            PINSRW mm1, [esi+12], 1
+            PINSRW mm0, [esi+16], 2
+            PINSRW mm1, [esi+20], 2
+            PINSRW mm0, [esi+24], 3
+            PINSRW mm1, [esi+28], 3
+           
+            PINSRW mm2, [edx], 0
+            PINSRW mm3, [edx+4], 0
+            PINSRW mm2, [edx+8], 1
+            PINSRW mm3, [edx+12], 1
+            PINSRW mm2, [edx+16], 2
+            PINSRW mm3, [edx+20], 2
+            PINSRW mm2, [edx+24], 3
+            PINSRW mm3, [edx+28], 3
 
-            pand      mm0, mm7
-            pand      mm1, mm7
-            pand      mm4, mm7
-            pand      mm5, mm7
-
-            packssdw mm0, mm1
-            packssdw mm4, mm5
-
-            movq  mm2, [edx]   
-            movq  mm3, [edx+8] 
-            movq  mm5, [edx+16]
-            movq  mm1, [edx+24]
-
-            pand      mm2, mm7
-            pand      mm3, mm7
-            pand      mm5, mm7
-            pand      mm1, mm7
-
-
-            packssdw mm2, mm3
-            packssdw mm5, mm1
-
-            packuswb mm0, mm4
-            packuswb mm2, mm5
-
-            movq  mm1, mm0      
-            movq  mm3, mm2
-
-            psrlw mm1, 8        
-            psrlw mm3, 8
-
-            pand      mm0, mm6
-            pand      mm2, mm6
+            pand mm0, mm6
+            pand mm1, mm6
+            pand mm2, mm6
+            pand mm3, mm6
 
             /////////////////////
             paddsw    mm0, mm1 ; add all pixels
@@ -267,9 +251,8 @@ __loop1:
             paddsw    mm0, mmx_word_const_2 // round value
             paddsw    mm0, mm2
 
-            pxor mm1, mm1
             psrlw mm0, 2 // div by 4 pixel color
-            packuswb mm0, mm1
+            packuswb mm0, mm7
 
             MOVD [edi], mm0
 
@@ -295,6 +278,7 @@ __loop1:
     } while ( y < height);
     __asm { emms }
 }
+
 
 #define q_abs(x) ((x) >= 0 ? (x) : (-x))
 
