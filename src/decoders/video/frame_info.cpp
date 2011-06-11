@@ -40,47 +40,47 @@ __loop1:
             PREFETCHNTA [edx + 64]
 
             movq  mm0, [esi]   ; load first 8 pixels from first line
-                movq  mm4, [esi+8] ; load next 8 pixels from first line
-                movq  mm2, [edx]   ; load first 8 pixels from second line
-                movq  mm6, [edx+8] ; load next 8 pixels from second line
+            movq  mm4, [esi+8] ; load next 8 pixels from first line
+            movq  mm2, [edx]   ; load first 8 pixels from second line
+            movq  mm6, [edx+8] ; load next 8 pixels from second line
 
-                movq  mm1, mm0      ; prepare 16-bit data for eatch pixel.
-                movq  mm3, mm2
-                movq  mm5, mm4
-                movq  mm7, mm6
+            movq  mm1, mm0      ; prepare 16-bit data for eatch pixel.
+            movq  mm3, mm2
+            movq  mm5, mm4
+            movq  mm7, mm6
 
-                psrlw mm1, 8        ; first step of 16 bit data
-                psrlw mm3, 8
-                psrlw mm5, 8
-                psrlw mm7, 8
+            psrlw mm1, 8        ; first step of 16 bit data
+            psrlw mm3, 8
+            psrlw mm5, 8
+            psrlw mm7, 8
 
-                pand      mm0, mmx_00ffw ; second step of 16 bit data
-                pand      mm2, mmx_00ffw
-                pand      mm4, mmx_00ffw
-                pand      mm6, mmx_00ffw
+            pand      mm0, mmx_00ffw ; second step of 16 bit data
+            pand      mm2, mmx_00ffw
+            pand      mm4, mmx_00ffw
+            pand      mm6, mmx_00ffw
 
-                paddsw    mm0, mm1 ; add all pixels
-                paddsw    mm2, mm3
-                paddsw    mm4, mm5
-                paddsw    mm6, mm7
+            paddsw    mm0, mm1 ; add all pixels
+            paddsw    mm2, mm3
+            paddsw    mm4, mm5
+            paddsw    mm6, mm7
 
-                paddsw    mm0, mm2
-                paddsw    mm4, mm6
+            paddsw    mm0, mm2
+            paddsw    mm4, mm6
 
-                paddsw    mm0, mmx_word_const_2
-                paddsw    mm4, mmx_word_const_2
+            paddsw    mm0, mmx_word_const_2
+            paddsw    mm4, mmx_word_const_2
 
-                psrlw mm0, 2 // div by 4 pixel color
-                psrlw mm4, 2 
+            psrlw mm0, 2 // div by 4 pixel color
+            psrlw mm4, 2 
 
-                packuswb mm0, mm4
-                MOVNTQ [edi], mm0
+            packuswb mm0, mm4
+            MOVNTQ [edi], mm0
 
-                add esi, 16
-                add edx, 16
-                add edi ,8
-                cmp esi, eax
-                jl __loop1
+            add esi, 16
+            add edx, 16
+            add edi ,8
+            cmp esi, eax
+            jl __loop1
         }
         if (round_width != width) 
         {
@@ -128,66 +128,66 @@ __loop1:
             PREFETCHNTA [edx + 64]
 
             movq  mm0, [esi]   ; load first 8 pixels from first line
-                movq  mm1, [esi+8] ; load next 8 pixels from first line
-                movq  mm4, [esi+16]  ; load first 8 pixels from first line
-                movq  mm5, [esi+24]  ; load next 8 pixels from first line
-                movq  mm2, [edx]   ; load first 8 pixels from first line
-                movq  mm3, [edx+8] ; load next 8 pixels from first line
-                movq  mm6, [edx+16]  ; load first 8 pixels from first line
-                movq  mm7, [edx+24]  ; load next 8 pixels from first line
+            movq  mm1, [esi+8] ; load next 8 pixels from first line
+            movq  mm4, [esi+16]  ; load first 8 pixels from first line
+            movq  mm5, [esi+24]  ; load next 8 pixels from first line
+            movq  mm2, [edx]   ; load first 8 pixels from first line
+            movq  mm3, [edx+8] ; load next 8 pixels from first line
+            movq  mm6, [edx+16]  ; load first 8 pixels from first line
+            movq  mm7, [edx+24]  ; load next 8 pixels from first line
 
-                pand      mm0, mmx_00ffw 
-                pand      mm1, mmx_00ffw 
-                pand      mm4, mmx_00ffw 
-                pand      mm5, mmx_00ffw 
-                pand      mm2, mmx_00ffw 
-                pand      mm3, mmx_00ffw 
-                pand      mm6, mmx_00ffw 
-                pand      mm7, mmx_00ffw 
+            pand      mm0, mmx_00ffw 
+            pand      mm1, mmx_00ffw 
+            pand      mm4, mmx_00ffw 
+            pand      mm5, mmx_00ffw 
+            pand      mm2, mmx_00ffw 
+            pand      mm3, mmx_00ffw 
+            pand      mm6, mmx_00ffw 
+            pand      mm7, mmx_00ffw 
 
-                packuswb mm0, mm1
-                packuswb mm4, mm5
-                packuswb mm2, mm3
-                packuswb mm6, mm7
+            packuswb mm0, mm1
+            packuswb mm4, mm5
+            packuswb mm2, mm3
+            packuswb mm6, mm7
 
 
-                movq  mm1, mm0      ; prepare 32-bit data for eatch pixel.
-                movq  mm3, mm2
-                movq  mm5, mm4
-                movq  mm7, mm6
+            movq  mm1, mm0      ; prepare 32-bit data for eatch pixel.
+            movq  mm3, mm2
+            movq  mm5, mm4
+            movq  mm7, mm6
 
-                psrlw mm1, 8        ; first step of 32 bit data
-                psrlw mm3, 8
-                psrlw mm5, 8
-                psrlw mm7, 8
+            psrlw mm1, 8        ; first step of 32 bit data
+            psrlw mm3, 8
+            psrlw mm5, 8
+            psrlw mm7, 8
 
-                pand      mm0, mmx_00ffw ; second step of 16 bit data
-                pand      mm2, mmx_00ffw
-                pand      mm4, mmx_00ffw
-                pand      mm6, mmx_00ffw
+            pand      mm0, mmx_00ffw ; second step of 16 bit data
+            pand      mm2, mmx_00ffw
+            pand      mm4, mmx_00ffw
+            pand      mm6, mmx_00ffw
 
-                paddsw    mm0, mm1 ; add all pixels
-                paddsw    mm2, mm3
-                paddsw    mm4, mm5
-                paddsw    mm6, mm7
+            paddsw    mm0, mm1 ; add all pixels
+            paddsw    mm2, mm3
+            paddsw    mm4, mm5
+            paddsw    mm6, mm7
 
-                paddsw    mm0, mm2
-                paddsw    mm4, mm6
+            paddsw    mm0, mm2
+            paddsw    mm4, mm6
 
-                paddsw    mm0, mmx_word_const_2
-                paddsw    mm4, mmx_word_const_2
+            paddsw    mm0, mmx_word_const_2
+            paddsw    mm4, mmx_word_const_2
 
-                psrlw mm0, 2 // div by 4 pixel color
-                psrlw mm4, 2 
+            psrlw mm0, 2 // div by 4 pixel color
+            psrlw mm4, 2 
 
-                packuswb mm0, mm4
-                MOVNTQ [edi], mm0
+            packuswb mm0, mm4
+            MOVNTQ [edi], mm0
 
-                add esi, 32
-                add edx, 32
-                add edi ,8
-                cmp esi, eax
-                jl __loop1
+            add esi, 32
+            add edx, 32
+            add edi ,8
+            cmp esi, eax
+            jl __loop1
         }
         if (round_width != width) 
         {
