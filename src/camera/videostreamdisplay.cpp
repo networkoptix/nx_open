@@ -252,8 +252,9 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 
 bool CLVideoStreamDisplay::rescaleFrame(CLVideoDecoderOutput& outFrame, int newWidth, int newHeight)
 {
-    static const int ROUND_FACTOR = 8;
+    static const int ROUND_FACTOR = 16;
     // due to openGL requirements chroma MUST be devided by 4, luma MUST be devided by 8
+    // due to MMX scaled functions requirements chroma MUST be devided by 8, so luma MUST be devided by 16
     newWidth = (newWidth / ROUND_FACTOR ) * ROUND_FACTOR;
 
     if (m_scaleContext != 0 && (m_outputWidth != newWidth || m_outputHeight != newHeight))
