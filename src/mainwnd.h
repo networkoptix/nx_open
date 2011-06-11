@@ -26,7 +26,7 @@ private:
     void dragEnterEvent(QDragEnterEvent *event);
     void dropEvent(QDropEvent *event);
 
-    void addFilesToCurrentOrNewLayout(const QStringList& files);
+    void addFilesToCurrentOrNewLayout(const QStringList& files, bool forceNewLayout = false);
 private:
 
 	CLLayoutNavigator* m_normalView;
