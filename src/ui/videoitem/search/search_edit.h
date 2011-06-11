@@ -26,7 +26,7 @@ public:
 	void setCompleter(CLSerchEditCompleter *c);
 	CLSerchEditCompleter *completer() const; 
 
-    void setViewPort(QWidget* vport);
+    void setFocusWidget(QWidget* fw) ;
 
 protected:    
 	void keyPressEvent(QKeyEvent *e); 
@@ -38,7 +38,6 @@ protected:
 private:    
 	CLSerchEditCompleter *c;
 
-    QWidget* m_Vport;
-
+    QWidget* mFocusWidget;
 }; 
 #endif // serach_edit_2215_h

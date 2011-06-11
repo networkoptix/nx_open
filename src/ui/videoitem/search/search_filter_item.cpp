@@ -13,10 +13,13 @@ m_width(100),
 m_height(100),
 m_view(view)
 {
+
+    setFocusPolicy(Qt::NoFocus);
+
 	m_lineEdit = new CLSearchEdit(this);
+    m_lineEdit->setFocusWidget(m_view);
 	m_lineEdit->setFocus();
 
-    m_lineEdit->setViewPort(m_view->viewport());
 
     /*/
 	QString style (
@@ -112,6 +115,7 @@ CLSerachEditItem::~CLSerachEditItem()
 void CLSerachEditItem::setVisible(bool visible)
 {
     QWidget::setVisible(visible);
+    m_lineEdit->setVisible(visible);
 
     if (!visible)
         m_lstview->setVisible(visible);

@@ -1,4 +1,5 @@
 #include "search_edit.h"
+#include "base\log.h"
 
 CLSerchEditCompleter::CLSerchEditCompleter(QObject * parent):
 QCompleter(parent)
@@ -33,8 +34,9 @@ void CLSerchEditCompleter::updateStringLst(QStringList lst)
 CLSearchEdit::CLSearchEdit(QWidget *parent)
 : QLineEdit(parent), 
 c(0),
-m_Vport(0)
+mFocusWidget(0)
 {
+    setFocusPolicy(Qt::StrongFocus);
 }
 
 CLSearchEdit::~CLSearchEdit()
@@ -60,9 +62,10 @@ CLSerchEditCompleter *CLSearchEdit::completer() const
 	return c;
 }
 
-void CLSearchEdit::setViewPort(QWidget* vport)
+
+void CLSearchEdit::setFocusWidget(QWidget* fw) 
 {
-    m_Vport = vport;
+    mFocusWidget = fw;
 }
 
 void CLSearchEdit::insertCompletion(const QString& completion)
@@ -78,31 +81,27 @@ void CLSearchEdit::keyPressEvent(QKeyEvent *e)
 		// The following keys are forwarded by the completer to the widget
 		switch (e->key())
 		{
-		
+
 		case Qt::Key_Escape:
 		case Qt::Key_Tab:
 		case Qt::Key_Backtab:
 			e->ignore();
 			return; // Let the completer do default behavior
 
-        case Qt::Key_Return:
-        case Qt::Key_Enter:
-            e->ignore();
-            clearFocus();
-            if (m_Vport)
-                m_Vport->setFocus();
-            return; // Let the completer do default behavior
-
-
 		}
 	}
 
-    if (e->key()==Qt::Key_Return && e->key()==Qt::Key_Enter)
+    if (e->key() == Qt::Key_Return || e->key() == Qt::Key_Enter)
     {
-        clearFocus();
-        if (m_Vport)
-            m_Vport->setFocus();
+        mFocusWidget->setFocus();
+        //e->ignore();
+        if (!c || !c->popup()->isVisible())
+            return;
     }
+
+            
+
+
 
 	bool isShortcut = (e->modifiers() & Qt::ControlModifier) && e->key() == Qt::Key_E;
 	if (!isShortcut)
@@ -127,8 +126,9 @@ void CLSearchEdit::focusInEvent ( QFocusEvent * e )
 {
     Qt::FocusReason reason = e->reason();
 
-    if (reason == Qt::TabFocusReason )
-        return;
+    //if (reason == Qt::TabFocusReason )          return;
+
+    cl_log.log("reason ==================================== ", reason, cl_logALWAYS);
 
     QLineEdit::focusInEvent(e);
 }
