@@ -21,8 +21,10 @@
 #include <objbase.h>
 #include <shobjidl.h>
 #include <atlstr.h>
+#include <atlsimpcoll.h>
+#include <atlcoll.h>
+
 #include <stdexcept>
 #include <sstream>
-
 
 // TODO: reference additional headers your program requires here
