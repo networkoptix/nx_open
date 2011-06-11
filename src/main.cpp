@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
 	CL_LOG(cl_logALWAYS)
 	{
 		cl_log.log("\n\n========================================", cl_logALWAYS);
-		cl_log.log("Software version 0.1", cl_logALWAYS);
+		cl_log.log(cl_logALWAYS, "Software version %s", APPLICATION_VERSION);
 		cl_log.log(argv[0], cl_logALWAYS);
 	}
 

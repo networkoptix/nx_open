@@ -45,13 +45,18 @@
          Minimum="0.1.0" Maximum="$(env.APPLICATION_VERSION)"
          Property="PREVIOUSVERSIONSINSTALLED"
          IncludeMinimum="yes" IncludeMaximum="yes" />
-      <UpgradeVersion OnlyDetect='yes' Property='NEWERFOUND' Minimum='$(env.APPLICATION_VERSION)' IncludeMinimum='no' />
+      <UpgradeVersion OnlyDetect='no' Property='NEWERFOUND' Minimum='$(env.APPLICATION_VERSION)' IncludeMinimum='no' />
     </Upgrade>
 
     <CustomAction Id="AssignMediaFolder" Property="MEDIAFOLDER" Value="[MOVIESFOLDER]\EVE Media" />
     <CustomAction Id="StartAppOnExit" FileKey="UniclientEXE" ExeCommand="" Execute="immediate" Impersonate="yes" Return="asyncNoWait"/>
-    <CustomAction Id="SetDefaultAssociations" BinaryKey="EveAssocCA.dll" DllEntry="SetDefaultAssociations" Execute="deferred"/>
+    
+    <CustomAction Id="SaveAssociations" BinaryKey="EveAssocCA.dll" DllEntry="SaveAssociations" Execute="deferred"/>
+    <CustomAction Id="SaveAssociations.SetProperty" Return="check" Property="SaveAssociations" Value="[FILETYPES]"/>
 
+    <CustomAction Id="RestoreAssociations" BinaryKey="EveAssocCA.dll" DllEntry="RestoreAssociations" Execute="deferred"/>
+    <CustomAction Id="RestoreAssociations.SetProperty" Return="check" Property="RestoreAssociations" Value="[FILETYPES]"/>
+    
     <InstallUISequence>
       <Custom Action="SetMoviesFolder" Before="SetProperties" />
       <Custom Action="SetProperties" Before="AssignMediaFolder"/>
@@ -63,12 +68,12 @@
 
     <InstallExecuteSequence>
       <RemoveExistingProducts Before="InstallInitialize" />
-      <Custom Action="SetDefaultAssociations" After="WriteRegistryValues">NOT Installed</Custom>
 
-      <!-- Custom actions for saving/restoring file associations.
-      <Custom Action="FileAssocBackup" After="WriteRegistryValues"/>
-      <Custom Action="FileAssocRestore" After="RemoveRegistryValues">Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
--->
+      <Custom Action="SaveAssociations.SetProperty" After="WriteRegistryValues">NOT Installed</Custom>
+      <Custom Action="SaveAssociations" After="SaveAssociations.SetProperty">NOT Installed</Custom>
+
+      <Custom Action="RestoreAssociations.SetProperty" Before="RestoreAssociations">Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
+      <Custom Action="RestoreAssociations" Before="RemoveRegistryValues">Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
     </InstallExecuteSequence>
 
     <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
@@ -162,6 +167,10 @@
               <File Id="phonon4" Name="phonon4.dll" Source="C:\Qt\4.7.3\bin\phonon4.dll"/>
             </Component>
 
+            <Component Id="OpenAL" Guid="5C74B9BD-A9D5-4c91-AE84-EFC2B51D1E12">
+              <File Id="OpenAL32.dll" Name="OpenAL32.dll" Source="..\contrib\openal\bin\Win32\OpenAL32.dll"/>
+              <File Id="wrap_oal.dll" Name="wrap_oal.dll" Source="..\contrib\openal\bin\Win32\wrap_oal.dll"/>
+            </Component>
             
             <Directory Id="arecontvision" Name="arecontvision">
               <Component Id="arecontvision" Guid="3A62601C-9F6A-45b0-AEFB-8C5DD70437F0">
@@ -204,6 +213,7 @@
       <ComponentRef Id="MainExecutable" />
       <ComponentRef Id="FFmpegLibraries"/>
       <ComponentRef Id="QTLibraries" />
+      <ComponentRef Id="OpenAL" />
       <ComponentRef Id='ProgramMenuDir' />
       <ComponentRef Id='Settings'/>
       <ComponentRef Id='arecontvision'/>

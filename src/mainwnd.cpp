@@ -82,7 +82,7 @@ MainWnd::~MainWnd()
 	CLDeviceManager::instance().getDeviceSearcher().wait();
 }
 
-void MainWnd::addFilesToCurrentOrNewLayout(const QStringList& files)
+void MainWnd::addFilesToCurrentOrNewLayout(const QStringList& files, bool forceNewLayout)
 {
     if (files.isEmpty())
         return;
@@ -92,7 +92,7 @@ void MainWnd::addFilesToCurrentOrNewLayout(const QStringList& files)
     // If current content created by opening files or DND, use it. Otherwise create new one.
     LayoutContent* content = m_normalView->getView().getCamLayOut().getContent();
 
-    if (content != CLSceneLayoutManager::instance().getSearchLayout() &&
+    if (!forceNewLayout && content != CLSceneLayoutManager::instance().getSearchLayout() &&
         content != CLSceneLayoutManager::instance().startScreenLayoutContent())
     {
         foreach(QString file, files)
@@ -138,7 +138,6 @@ void MainWnd::destroyNavigator(CLLayoutNavigator*& nav)
 
 }
 
-
 void MainWnd::dragEnterEvent(QDragEnterEvent *event)
 {
     event->acceptProposedAction();
@@ -178,5 +177,5 @@ void MainWnd::dropEvent(QDropEvent *event)
         }
     }
 
-    addFilesToCurrentOrNewLayout(files);
+    addFilesToCurrentOrNewLayout(files, event->keyboardModifiers() & Qt::AltModifier);
 }

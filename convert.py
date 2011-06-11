@@ -89,43 +89,48 @@ def index_dirs(xdirs, template_file, output_file, use_prefix = False):
 
     uniclient_pro.close()
 
+def setup_ffmpeg():
+    ffmpeg_path = os.getenv('EVE_FFMPEG').replace('\\', '/')
 
-ffmpeg_path = os.getenv('EVE_FFMPEG').replace('\\', '/')
+    if not ffmpeg_path:
+        print r"""EVE_FFMPEG environment variable is not defined.
+        
+    Do the following:
+    1. Clone repository ssh://hg@vigasin.com/ffmpeg to somewhere, say c:\programming\ffmpeg
+    2. Go to c:\programming\ffmpeg and run get_ffmpegs.bat
+    3. Add system environment variable EVE_FFMPEG with value c:\programming\ffmpeg
+    """
+        sys.exit(1)
 
-openal_path = 'contrib/openal/bin/'
-openal_path += sys.platform
-
-if not ffmpeg_path:
-    print r"""EVE_FFMPEG environment variable is not defined.
-    
-if not openal_path:
-    print Can not find openAL binary files.
-    
-Do the following:
-1. Clone repository ssh://hg@vigasin.com/ffmpeg to somewhere, say c:\programming\ffmpeg
-2. Go to c:\programming\ffmpeg and run get_ffmpegs.bat
-3. Add system environment variable EVE_FFMPEG with value c:\programming\ffmpeg
-"""
-    sys.exit(1)
-
-ffmpeg = 'ffmpeg-git-' + FFMPEG_VERSION
-if sys.platform == 'win32':
-    ffmpeg += '-mingw'
-else:
-    ffmpeg += '-macos'
+    ffmpeg = 'ffmpeg-git-' + FFMPEG_VERSION
+    if sys.platform == 'win32':
+        ffmpeg += '-mingw'
+    else:
+        ffmpeg += '-macos'
 
 
-ffmpeg_path = os.path.join(ffmpeg_path, ffmpeg)
-ffmpeg_path_debug = ffmpeg_path + '-debug'
-ffmpeg_path_release = ffmpeg_path + '-release'
+    ffmpeg_path = os.path.join(ffmpeg_path, ffmpeg)
+    ffmpeg_path_debug = ffmpeg_path + '-debug'
+    ffmpeg_path_release = ffmpeg_path + '-release'
 
-if not os.path.isdir(ffmpeg_path_debug):
-    print >> sys.stderr, "Can't find directory %s. Make sure variable EVE_FFMPEG is correct." % ffmpeg_path_debug
-    sys.exit(1)
+    if not os.path.isdir(ffmpeg_path_debug):
+        print >> sys.stderr, "Can't find directory %s. Make sure variable EVE_FFMPEG is correct." % ffmpeg_path_debug
+        sys.exit(1)
 
-if not os.path.isdir(ffmpeg_path_release):
-    print >> sys.stderr, "Can't find directory %s. Make sure variable EVE_FFMPEG is correct." % ffmpeg_path_release
-    sys.exit(1)
+    if not os.path.isdir(ffmpeg_path_release):
+        print >> sys.stderr, "Can't find directory %s. Make sure variable EVE_FFMPEG is correct." % ffmpeg_path_release
+        sys.exit(1)
+
+    return ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release
+
+def setup_openal():
+    openal_path = 'contrib/openal/bin/'
+    openal_path += sys.platform
+
+    return openal_path
+
+ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release = setup_ffmpeg()
+openal_path = setup_openal()
 
 if os.path.exists('bin'):
     rmtree('bin')
