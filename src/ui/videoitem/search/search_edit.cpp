@@ -1,6 +1,6 @@
 #include "search_edit.h"
 
-CLSerchEditCompleter::CLSerchEditCompleter(QObject * parent) :
+CLSerchEditCompleter::CLSerchEditCompleter(QObject * parent):
 QCompleter(parent)
 {
 	setModel(&m_model);
@@ -31,7 +31,9 @@ void CLSerchEditCompleter::updateStringLst(QStringList lst)
 //=======================================================
 
 CLSearchEdit::CLSearchEdit(QWidget *parent)
-: QLineEdit(parent), c(0)
+: QLineEdit(parent), 
+c(0),
+m_Vport(0)
 {
 }
 
@@ -58,6 +60,11 @@ CLSerchEditCompleter *CLSearchEdit::completer() const
 	return c;
 }
 
+void CLSearchEdit::setViewPort(QWidget* vport)
+{
+    m_Vport = vport;
+}
+
 void CLSearchEdit::insertCompletion(const QString& completion)
 {
 	setText(completion);
@@ -71,15 +78,31 @@ void CLSearchEdit::keyPressEvent(QKeyEvent *e)
 		// The following keys are forwarded by the completer to the widget
 		switch (e->key())
 		{
-		case Qt::Key_Enter:
-		case Qt::Key_Return:
+		
 		case Qt::Key_Escape:
 		case Qt::Key_Tab:
 		case Qt::Key_Backtab:
 			e->ignore();
 			return; // Let the completer do default behavior
+
+        case Qt::Key_Return:
+        case Qt::Key_Enter:
+            e->ignore();
+            clearFocus();
+            if (m_Vport)
+                m_Vport->setFocus();
+            return; // Let the completer do default behavior
+
+
 		}
 	}
+
+    if (e->key()==Qt::Key_Return && e->key()==Qt::Key_Enter)
+    {
+        clearFocus();
+        if (m_Vport)
+            m_Vport->setFocus();
+    }
 
 	bool isShortcut = (e->modifiers() & Qt::ControlModifier) && e->key() == Qt::Key_E;
 	if (!isShortcut)
@@ -97,4 +120,15 @@ void CLSearchEdit::keyPressEvent(QKeyEvent *e)
 
 	c->filter(text());
 	//c->popup()->setCurrentIndex(c->completionModel()->index(0, 0));
+}
+
+
+void CLSearchEdit::focusInEvent ( QFocusEvent * e )
+{
+    Qt::FocusReason reason = e->reason();
+
+    if (reason == Qt::TabFocusReason )
+        return;
+
+    QLineEdit::focusInEvent(e);
 }

@@ -23,17 +23,22 @@ class CLSearchEdit : public QLineEdit
 public:    
 	CLSearchEdit(QWidget *parent = 0);    
 	~CLSearchEdit();     
-	void setCompleter(CLSerchEditCompleter *c);    
+	void setCompleter(CLSerchEditCompleter *c);
 	CLSerchEditCompleter *completer() const; 
+
+    void setViewPort(QWidget* vport);
 
 protected:    
 	void keyPressEvent(QKeyEvent *e); 
+    void focusInEvent ( QFocusEvent * e );
 
 	private slots:    
 		void insertCompletion(const QString &completion); 
 
 private:    
 	CLSerchEditCompleter *c;
+
+    QWidget* m_Vport;
 
 }; 
 #endif // serach_edit_2215_h

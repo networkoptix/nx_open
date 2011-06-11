@@ -16,6 +16,8 @@ m_view(view)
 	m_lineEdit = new CLSearchEdit(this);
 	m_lineEdit->setFocus();
 
+    m_lineEdit->setViewPort(m_view->viewport());
+
     /*/
 	QString style (
 
