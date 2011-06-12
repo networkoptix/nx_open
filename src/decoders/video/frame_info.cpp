@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#ifdef Q_OS_WIN
 
 #ifdef Q_CC_MSVC
 #define USED_U64(foo) static volatile const unsigned long long foo
@@ -278,7 +279,7 @@ __loop1:
     } while ( y < height);
     __asm { emms }
 }
-
+#endif
 
 #define q_abs(x) ((x) >= 0 ? (x) : (-x))
 
