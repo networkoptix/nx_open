@@ -1,6 +1,5 @@
 #include "eve_app.h"
-
-#include "log.h"
+#include "base/log.h"
 
 EveApplication::EveApplication(int &argc, char **argv)
     : QtSingleApplication(argc, argv, true)
