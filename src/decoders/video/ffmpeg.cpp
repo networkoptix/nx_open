@@ -13,7 +13,7 @@ int CLFFmpegVideoDecoder::hwcounter = 0;
 //================================================
 
 CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, AVCodecContext* codecContext):
-//m_passedContext(codecContext),
+m_passedContext(0),
 m_width(0),
 m_height(0),
 m_codecId(codec_id),
@@ -24,8 +24,11 @@ m_lightModeFrameCounter(0),
 needResetCodec(false),
 m_lastWidth(0)
 {
-    m_passedContext = avcodec_alloc_context();
-    avcodec_copy_context(m_passedContext, codecContext);
+	if (codecContext)
+	{
+		m_passedContext = avcodec_alloc_context();
+		avcodec_copy_context(m_passedContext, codecContext);
+	}
 
     // XXX Debug, should be passed in constructor
     m_tryHardwareAcceleration = false; //hwcounter % 2;
@@ -128,7 +131,9 @@ CLFFmpegVideoDecoder::~CLFFmpegVideoDecoder(void)
 	QMutexLocker mutex(&global_ffmpeg_mutex);
 
     closeDecoder();
-    avcodec_close(m_passedContext);
+	
+	if (m_passedContext)
+		avcodec_close(m_passedContext);
 }
 
 void CLFFmpegVideoDecoder::resetDecoder()
