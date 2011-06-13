@@ -1,5 +1,5 @@
 #include "search_edit.h"
-#include "base\log.h"
+#include "base/log.h"
 
 CLSerchEditCompleter::CLSerchEditCompleter(QObject * parent):
 QCompleter(parent)

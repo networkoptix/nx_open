@@ -26,6 +26,10 @@ using namespace std;
 static bool initialized = false;
 #endif
 
+#ifndef SOCKET_ERROR
+#define SOCKET_ERROR (-1)
+#endif
+
 // SocketException Code
 
 SocketException::SocketException(const string &message, bool inclSysMsg)
