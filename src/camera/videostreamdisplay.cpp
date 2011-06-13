@@ -357,3 +357,12 @@ CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::findOversizeScaleFa
 
     return scaleFactor;
 }
+
+void CLVideoStreamDisplay::setMTDecoding(bool value)
+{
+    foreach(CLAbstractVideoDecoder* decoder, m_decoder)
+    {
+        decoder->setMTDecoding(value);
+    }
+}
+

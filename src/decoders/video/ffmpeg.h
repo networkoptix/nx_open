@@ -44,7 +44,10 @@ private:
     static int hwcounter;
 	AVCodec *m_codec;
 	AVCodecContext *c;
-	AVFrame *picture;
+	AVFrame *frame;
+	
+	uint8_t* m_deinterlaceBuffer;
+	AVFrame *m_deinterlacedFrame;
 
 #ifdef _USE_DXVA
     DecoderContext m_decoderContext;

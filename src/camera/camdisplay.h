@@ -40,6 +40,8 @@ public:
 
 	quint64 currentTime() const { return m_previousVideoDisplayedTime; }
 
+    void setMTDecoding(bool value);
+
 signals:
     void reachedTheEnd();
 
