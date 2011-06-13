@@ -103,6 +103,7 @@ void CLFFmpegVideoDecoder::openDecoder()
 
     c->thread_count = qMin(4, QThread::idealThreadCount() + 1);
     c->thread_type = m_mtDecoding ? FF_THREAD_FRAME : FF_THREAD_SLICE;
+    
 
 	cl_log.log(QString("Creating ") + (m_mtDecoding ? "FRAME threaded decoder" : "SLICE threaded decoder"), cl_logALWAYS);
     // TODO: check return value
@@ -230,7 +231,7 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
         resetDecoder();
     }
 
-    if (m_needRecreate && data.keyFrame)
+    if (false && m_needRecreate && data.keyFrame)
     {
         m_needRecreate = false;
         resetDecoder();

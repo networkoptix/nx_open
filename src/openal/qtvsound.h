@@ -20,7 +20,7 @@ public:
 	bool isValid() const { return m_isValid; }
 
 	uint playTimeElapsed() const;
-	bool play(const void* data, uint size);
+	bool play(const quint8* data, uint size);
     void suspend();
     void resume();
     void clear();
@@ -34,7 +34,7 @@ private:
 
 	static bool outError(int err, const char* strerr);
 	static int checkOpenALErrorDebug(ALCdevice* device);
-
+    bool internalPlay(const void* data, uint size);
 private:
 	QVector<uint> m_buffers;
 	uint m_source;
@@ -45,6 +45,8 @@ private:
 	uint m_size;
 	bool m_isValid;
 	ALCdevice* m_device;
+    quint8* m_proxyBuffer;
+    int m_proxyBufferLen;
 private:
     void internalClear();
 public:
