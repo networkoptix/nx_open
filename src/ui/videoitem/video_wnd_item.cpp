@@ -4,6 +4,7 @@
 #include "device/device.h"
 #include "ui/graphicsview.h"
 #include "settings.h"
+#include "device_plugins/archive/avi_files/avi_strem_reader.h"
 
 //(videoCodecCtx && videoCodecCtx->sample_aspect_ratio.num) ? av_q2d(videoCodecCtx->sample_aspect_ratio) : 1.0f;
 
@@ -91,12 +92,17 @@ void CLVideoWindowItem::setItemSelected(bool sel, bool animate, int delay )
 
 	if (m_selected)
 	{
+        if (dynamic_cast<CLAVIStreamReader*>(getVideoCam()->getStreamreader()))
+        {
+            getVideoCam()->getCamCamDisplay()->setMTDecoding(true);
+        }
+        
 		getVideoCam()->setQuality(CLStreamreader::CLSHighest, true);
 		getVideoCam()->getCamCamDisplay()->playAudio(true);
-
 	}
 	else
 	{
+        getVideoCam()->getCamCamDisplay()->setMTDecoding(false);
 		getVideoCam()->setQuality(CLStreamreader::CLSNormal, false);
 		getVideoCam()->getCamCamDisplay()->playAudio(false);
 	}

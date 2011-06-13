@@ -391,3 +391,13 @@ void CLCamDisplay::afterJump(qint64 newTime)
     if (mGenerateEndOfStreamSignal)
         emit reachedTheEnd();
 }
+
+void CLCamDisplay::setMTDecoding(bool value)
+{
+    for (int i = 0; i < CL_MAX_CHANNELS; i++)
+    {
+        if (m_display[i])
+            m_display[i]->setMTDecoding(value);
+    }
+}
+
