@@ -13,7 +13,7 @@ int CLFFmpegVideoDecoder::hwcounter = 0;
 //================================================
 
 CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, AVCodecContext* codecContext):
-m_passedContext(codecContext),
+//m_passedContext(codecContext),
 m_width(0),
 m_height(0),
 m_codecId(codec_id),
@@ -24,6 +24,8 @@ m_lightModeFrameCounter(0),
 needResetCodec(false),
 m_lastWidth(0)
 {
+    m_passedContext = avcodec_alloc_context();
+    avcodec_copy_context(m_passedContext, codecContext);
 
     // XXX Debug, should be passed in constructor
     m_tryHardwareAcceleration = false; //hwcounter % 2;
@@ -126,6 +128,7 @@ CLFFmpegVideoDecoder::~CLFFmpegVideoDecoder(void)
 	QMutexLocker mutex(&global_ffmpeg_mutex);
 
     closeDecoder();
+    avcodec_close(m_passedContext);
 }
 
 void CLFFmpegVideoDecoder::resetDecoder()
@@ -139,6 +142,7 @@ void CLFFmpegVideoDecoder::resetDecoder()
 //The end of the input buffer buf should be set to 0 to ensure that no overreading happens for damaged MPEG streams.
 bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 {
+
 
 	if (m_codec==0)
     {
@@ -231,7 +235,7 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
         resetDecoder();
     }
 
-    if (false && m_needRecreate && data.keyFrame)
+    if (m_needRecreate && data.keyFrame)
     {
         m_needRecreate = false;
         resetDecoder();
@@ -243,6 +247,7 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
     avpkt.size = data.bufferLength;
     // HACK for CorePNG to decode as normal PNG by default
     avpkt.flags = AV_PKT_FLAG_KEY;
+
 
     int got_picture = 0;
     avcodec_decode_video2(c, frame, &got_picture, &avpkt);
@@ -350,7 +355,7 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 
 		/**/
 
-        cl_log.log("cannot decode image", cl_logWARNING);
+        //cl_log.log("cannot decode image", cl_logWARNING);
 
 		return false;
 	}
