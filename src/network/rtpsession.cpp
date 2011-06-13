@@ -4,10 +4,17 @@
 #define DEFAULT_RTP_PORT 554
 #define RESERVED_TIMEOUT_TIME (5*1000)
 
+static const int MAX_RTCP_PACKET_SIZE = 1024 * 2;
+static const int RTP_VERSION = 2;
+static const quint32 SSRC_CONST = 0x2a55a9e8;
+static const quint32 CSRC_CONST = 0xe8a9552a;
+
 
 RTPIODevice::RTPIODevice(RTPSession& owner, CommunicatingSocket& sock)
 :m_sock(sock),
-m_owner(owner)
+m_owner(owner),
+m_receivedPackets(0),
+m_receivedOctets(0)
 {
 
 }
@@ -20,8 +27,18 @@ RTPIODevice::~RTPIODevice()
 
 qint64	RTPIODevice::read( char * data, qint64 maxSize )
 {
-    m_owner.sendKeepAliveIfNeeded();
     int readed = m_sock.recv(data, maxSize);
+    if (readed > 0)
+    {
+        m_receivedPackets++;
+        m_receivedPackets += readed;
+    }
+    RtspStatistic stats;
+    stats.nptTime = 0;
+    stats.timestamp = 0;
+    stats.receivedOctets = m_receivedPackets;
+    stats.receivedPackets = m_receivedPackets;
+    m_owner.sendKeepAliveIfNeeded(&stats);
     return readed;
 }
 
@@ -31,6 +48,7 @@ qint64	RTPIODevice::read( char * data, qint64 maxSize )
 RTPSession::RTPSession():
 m_csec(2),
 m_udpSock(0),
+m_rtcpUdpSock(0),
 m_rtpIo(*this, m_udpSock)
 {
     m_udpSock.setTimeOut(500);
@@ -200,6 +218,8 @@ RTPIODevice*  RTPSession::sendSetup()
     
 
     request += QString::number(m_udpSock.getLocalPort());
+    request += ',';
+    request += QString::number(m_rtcpUdpSock.getLocalPort());
     request += "\r\n\r\n";
 
     //qDebug() << request;
@@ -238,6 +258,19 @@ RTPIODevice*  RTPSession::sendSetup()
             }
         }
     }
+
+    /*
+    tmp = extractRTSPParam(responce, "Transport:");
+    if (tmp.size() > 0)  {
+        QStringList data = tmp.split(';');
+        foreach(QString param, data) 
+        {
+            if (param.starsWith("server_port")) {
+
+            }
+        }
+    }
+    */
 
     updateTransportHeader(responce);
 
@@ -310,11 +343,90 @@ bool RTPSession::sendTeardown()
         //d->lastSendTime.start();
         return 0;
     }
-
 }
 
-bool RTPSession::sendKeepAliveIfNeeded()
+
+static const int RTCP_RECEIVER_REPORT = 201;
+static const int RTCP_SOURCE_DESCRIPTION = 202;
+
+int RTPSession::buildRTCPReport(quint8* dstBuffer, const RtspStatistic* stats)
 {
+    QByteArray esDescr("netoptix");
+
+
+    quint8* curBuffer = dstBuffer;
+    *curBuffer++ = (RTP_VERSION << 6); 
+    *curBuffer++ = RTCP_RECEIVER_REPORT;  // packet type
+    curBuffer += 2; // skip len field;
+
+    quint32* curBuf32 = (quint32*) curBuffer;
+    *curBuf32++ = htonl(SSRC_CONST);
+    *curBuf32++ = htonl((quint32) stats->nptTime);
+    quint32 fracTime = (quint32) ((stats->nptTime - (quint32) stats->nptTime) * UINT_MAX); // UINT32_MAX
+    *curBuf32++ = htonl(fracTime);
+    *curBuf32++ = htonl(stats->timestamp);
+    *curBuf32++ = htonl(stats->receivedPackets);
+    *curBuf32++ = htonl(stats->receivedOctets);
+
+    // correct len field (count of 32 bit words -1)
+    quint16 len = (quint16) (curBuf32 - (quint32*) dstBuffer);
+    * ((quint16*) (dstBuffer + 2)) = htons(len-1);
+    
+    // build source description
+    curBuffer = (quint8*) curBuf32;
+    *curBuffer++ = (RTP_VERSION << 6) + 1;  // source count = 1
+    *curBuffer++ = RTCP_SOURCE_DESCRIPTION;  // packet type
+    *curBuffer++ = 0; // len field = 6 (hi)
+    *curBuffer++ = 6; // len field = 6 (low)
+    curBuf32 = (quint32*) curBuffer;
+    *curBuf32 = htonl(CSRC_CONST);
+    curBuffer+=4;
+    *curBuffer++ = 1; // ES_TYPE CNAME
+    *curBuffer++ = esDescr.size();
+    memcpy(curBuffer, esDescr.data(), esDescr.size());
+    curBuffer += esDescr.size();
+    while ((curBuffer - dstBuffer)%4 != 0)
+        *curBuffer++ = 0;
+    //return len * sizeof(quint32);
+    
+    return curBuffer - dstBuffer;
+}
+
+void RTPSession::processRtcpData(const RtspStatistic* stats)
+{
+    quint8 rtcpBuffer[MAX_RTCP_PACKET_SIZE];
+    quint8 sendBuffer[MAX_RTCP_PACKET_SIZE];
+    while (m_rtcpUdpSock.hasData())
+    {
+        std::string lastReceivedAddr;
+        unsigned short lastReceivedPort;
+        int readed = m_rtcpUdpSock.recvFrom(rtcpBuffer, sizeof(rtcpBuffer), lastReceivedAddr, lastReceivedPort);
+        if (readed > 0)
+        {
+            if (!m_rtcpUdpSock.isConnected())
+            {
+                
+                m_rtcpUdpSock.setDestAddr(lastReceivedAddr, lastReceivedPort);
+            }
+
+            quint32 timestamp = 0;
+            double nptTime = 0;
+            if (stats) 
+            {
+                int outBufSize = buildRTCPReport(sendBuffer, stats);
+                if (outBufSize > 0)
+                {
+                    m_rtcpUdpSock.sendTo(sendBuffer, outBufSize);
+                }
+            }
+        }
+    }
+}
+
+bool RTPSession::sendKeepAliveIfNeeded(const RtspStatistic* stats)
+{
+    processRtcpData(stats);
+    // send rtsp keep alive
     if (m_TimeOut==0)
         return true;
 

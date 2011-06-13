@@ -4,6 +4,13 @@
 
 class RTPSession;
 
+struct RtspStatistic {
+    quint32 timestamp;
+    double nptTime;
+    qint64 receivedPackets;
+    qint64 receivedOctets;
+};
+
 class RTPIODevice 
 {
 public:
@@ -16,7 +23,8 @@ private:
 
     CommunicatingSocket& m_sock;
     RTPSession& m_owner;
-
+    qint64 m_receivedPackets;
+    qint64 m_receivedOctets;
 };
 
 class RTPSession
@@ -42,8 +50,8 @@ public:
 
     const QByteArray& getSdp() const;
 
-    bool sendKeepAliveIfNeeded();
-
+    bool sendKeepAliveIfNeeded(const RtspStatistic* stats);
+    void processRtcpData(const RtspStatistic* stats);
 private:
 
     bool sendDescribe();
@@ -60,6 +68,7 @@ private:
     void updateTransportHeader(QByteArray& responce);
 
     void parseSDP();
+    int buildRTCPReport(quint8* dstBuffer, const RtspStatistic* stats);
 private:
 
     enum {MAX_RESPONCE_LEN	= 1024*8};
@@ -69,6 +78,7 @@ private:
 
     TCPSocket m_tcpSock;
     UDPSocket m_udpSock;
+    UDPSocket m_rtcpUdpSock;
     RTPIODevice m_rtpIo;
     
 
@@ -84,6 +94,5 @@ private:
 
     QTime m_keepAliveTime;
 };
-
 
 #endif //rtp_session_h_1935_h

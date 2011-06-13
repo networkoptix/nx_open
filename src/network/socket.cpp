@@ -472,3 +472,25 @@ void UDPSocket::leaveGroup(const string &multicastGroup)  {
     throw SocketException("Multicast group leave failed (setsockopt())", true);
   }
 }
+
+bool UDPSocket::hasData() const
+{
+    fd_set read_set;
+    struct timeval timeout;
+    FD_ZERO(&read_set);
+    FD_SET(sockDesc, &read_set);
+    timeout.tv_sec = 0;
+    timeout.tv_usec = 0;
+    switch( ::select(FD_SETSIZE, &read_set, NULL, NULL, &timeout))
+    {
+        case 0:				// timeout expired
+            {
+                return false;
+            }
+        case SOCKET_ERROR: 	// error occured
+            {
+                return false;
+            }
+    }
+    return true;
+}

@@ -326,6 +326,8 @@ public:
    */
   void leaveGroup(const std::string &multicastGroup) ;
 
+    bool hasData() const;
+
 private:
   void setBroadcast();
 private:
