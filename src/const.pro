@@ -3,6 +3,7 @@ CONFIG += x86
 TEMPLATE = app
 VERSION = 0.0.1
 ICON = eve_logo.icns
+QMAKE_INFO_PLIST = Info.plist
 
 TARGET = EvePlayer-Beta
 

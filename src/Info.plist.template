@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleExecutable</key>
+	<string>EvePlayer-Beta</string>
+	<key>CFBundleGetInfoString</key>
+	<string>Copyright © 2011 Network Optix</string>
+	<key>CFBundleIconFile</key>
+	<string>eve_logo.icns</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.networkoptix.EvePlayer-Beta</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleSignature</key>
+	<string>EVE#</string>
+    <key>CFBundleURLTypes</key>
+    <array>
+        ${ASSOCIATIONS}
+    </array>
+</dict>
+</plist>

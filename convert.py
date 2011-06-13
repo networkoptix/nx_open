@@ -7,6 +7,9 @@ from version import *
 from genskin import genskin
 import os, sys, posixpath
 import stat, time
+from StringIO import StringIO
+from filetypes import filetypes
+from string import Template
 
 os.path = posixpath
 
@@ -129,6 +132,37 @@ def setup_openal():
 
     return openal_path
 
+def generate_info_plist():
+    def gen_association(ext):
+        association = """
+                <dict>
+                    <key>CFBundleTypeExtensions</key>
+                    <array>
+                        <string>${ext}</string>
+                    </array>
+                    <key>CFBundleTypeIconFile</key>
+                    <string>eve_logo.icns</string>
+                    <key>CFBundleTypeName</key>
+                    <string>${ext_upper} container</string>
+                    <key>CFBundleTypeRole</key>
+                    <string>Viewer</string>
+                </dict>
+        """
+
+        association_template = Template(association)
+        return association_template.substitute(ext=ext, ext_upper=ext.upper())
+
+    xin = open('src/Info.plist.template', 'r').read()
+    xout = open('src/Info.plist', 'w')
+
+    associations = StringIO()
+
+    for ext, guid in filetypes:
+        print >> associations, gen_association(ext)
+
+    strings_template = Template(xin)
+    print >> xout, strings_template.substitute(ASSOCIATIONS=associations.getvalue())
+
 ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release = setup_ffmpeg()
 openal_path = setup_openal()
 
@@ -221,6 +255,8 @@ if sys.platform == 'win32':
     os.unlink('test/uniclient_tests.vcproj')
     os.rename('test/uniclient_tests.new.vcproj', 'test/uniclient_tests.vcproj')
 elif sys.platform == 'darwin':
+    generate_info_plist()
+
     if os.path.exists('src/uniclient.xcodeproj'):
         rmtree('src/uniclient.xcodeproj')
 
