@@ -25,12 +25,13 @@ IQEyeDeviceServer::IQEyeDeviceServer()
         QStringList list = line.split(" ", QString::SkipEmptyParts);
         
 
-        if (list.count()<2)
+        if (list.count()<3)
             continue;
 
         Cam cam;
         cam.ip = list.at(0);
-        cam.mac = list.at(1);
+        cam.name = list.at(1);
+        cam.mac = list.at(2);
 
         mCams.push_back(cam);
 
@@ -72,7 +73,7 @@ CLDeviceList IQEyeDeviceServer::findDevices()
         dev->setIP(QHostAddress(cam.ip), false);
         dev->setMAC(cam.mac);
         dev->setUniqueId(dev->getMAC());
-        dev->setName(QString("iqeye") + QString::number(lst.count()+1));
+        dev->setName(cam.name);
         dev->setAuth("root", "system");
         lst[dev->getUniqueId()] = dev;
     }

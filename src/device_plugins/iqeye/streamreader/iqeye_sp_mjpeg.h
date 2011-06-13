@@ -1,18 +1,18 @@
-#ifndef cl_iqeye_clien_pul1721
-#define cl_iqeye_clien_pul1721
+#ifndef cl_iqeye_serverpush_jpeg_1846
+#define cl_iqeye_serverpush_jpeg_1846
 
 #include "streamreader/spush_streamreader.h"
 #include "network/simple_http_client.h"
 
 
 
-class CLIQEyeStreamreader: public CLServerPushStreamreader
+class CLIQEyeMJPEGtreamreader: public CLServerPushStreamreader
 {
 private:
     enum {BLOCK_SIZE = 1460};
 public:
-	CLIQEyeStreamreader(CLDevice* dev);
-	virtual ~CLIQEyeStreamreader();
+	CLIQEyeMJPEGtreamreader(CLDevice* dev);
+	virtual ~CLIQEyeMJPEGtreamreader();
 
 protected:
     virtual CLAbstractMediaData* getNextData();
@@ -29,4 +29,4 @@ private:
 
 };
 
-#endif //cl_android_clien_pul1721
+#endif //cl_iqeye_serverpush_jpeg_1846

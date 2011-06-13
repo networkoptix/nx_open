@@ -94,7 +94,7 @@ bool CLNetworkDevice::conflicting()
 {
     if (mAfterRouter)
         return false;
-	
+
     QTime time;
 	time.restart();
 	CL_LOG(cl_logDEBUG2) cl_log.log("begining of CLNetworkDevice::conflicting() ",  cl_logDEBUG2);
@@ -132,7 +132,7 @@ bool CLNetworkDevice::conflicting()
 		return true;
 	}
 
-    if (mac!="00-00-00-00-00-00")
+    if (mac=="00-00-00-00-00-00")
     {
         CL_LOG(cl_logERROR) cl_log.log("00-00-00-00-00-00 mac record in OS arp( got it once on WIN7) table?!", cl_logERROR);
     }

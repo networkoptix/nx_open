@@ -1,4 +1,4 @@
-#include "iqeye_stream_reader.h"
+#include "iqeye_sp_mjpeg.h"
 #include "device/network_device.h"
 #include "network/simple_http_client.h"
 #include "data/mediadata.h"
@@ -12,20 +12,21 @@ extern int contain_subst(char *data, int datalen, char *subdata, int subdatalen)
 
 
 
-CLIQEyeStreamreader::CLIQEyeStreamreader(CLDevice* dev)
+CLIQEyeMJPEGtreamreader::CLIQEyeMJPEGtreamreader(CLDevice* dev)
 :CLServerPushStreamreader(dev),
 mHttpClient(0)
 {
 
 }
 
-CLIQEyeStreamreader::~CLIQEyeStreamreader()
+CLIQEyeMJPEGtreamreader::~CLIQEyeMJPEGtreamreader()
 {
     
 }
 
-CLAbstractMediaData* CLIQEyeStreamreader::getNextData()
+CLAbstractMediaData* CLIQEyeMJPEGtreamreader::getNextData()
 {
+
     if (!isStreamOpened())
         return 0;
 
@@ -126,7 +127,7 @@ CLAbstractMediaData* CLIQEyeStreamreader::getNextData()
 
 }
 
-void CLIQEyeStreamreader::openStream()
+void CLIQEyeMJPEGtreamreader::openStream()
 {
     if (isStreamOpened())
         return;
@@ -141,13 +142,13 @@ void CLIQEyeStreamreader::openStream()
     mDataRemainedBeginIndex = -1;
 }
 
-void CLIQEyeStreamreader::closeStream()
+void CLIQEyeMJPEGtreamreader::closeStream()
 {
     delete mHttpClient;
     mHttpClient = 0;
 }
 
-bool CLIQEyeStreamreader::isStreamOpened() const
+bool CLIQEyeMJPEGtreamreader::isStreamOpened() const
 {
     return ( mHttpClient && mHttpClient->isOpened() );
 }

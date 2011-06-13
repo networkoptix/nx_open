@@ -92,23 +92,29 @@ Socket::~Socket() {
   sockDesc = -1;
 }
 
-string Socket::getLocalAddress()  {
+string Socket::getLocalAddress()  
+{
   sockaddr_in addr;
   unsigned int addr_len = sizeof(addr);
 
-  if (getsockname(sockDesc, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0) {
-    throw SocketException("Fetch of local address failed (getsockname())", true);
+  if (getsockname(sockDesc, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0) 
+  {
+    return "";
   }
+
   return inet_ntoa(addr.sin_addr);
 }
 
-unsigned short Socket::getLocalPort()  {
+unsigned short Socket::getLocalPort()  
+{
   sockaddr_in addr;
   unsigned int addr_len = sizeof(addr);
 
-  if (getsockname(sockDesc, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0) {
-    throw SocketException("Fetch of local port failed (getsockname())", true);
+  if (getsockname(sockDesc, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0) 
+  {
+    return 0;
   }
+
   return ntohs(addr.sin_port);
 }
 
@@ -120,9 +126,11 @@ void Socket::setLocalPort(unsigned short localPort)  {
   localAddr.sin_addr.s_addr = htonl(INADDR_ANY);
   localAddr.sin_port = htons(localPort);
 
-  if (bind(sockDesc, (sockaddr *) &localAddr, sizeof(sockaddr_in)) < 0) {
-    throw SocketException("Set of local port failed (bind())", true);
+  if (bind(sockDesc, (sockaddr *) &localAddr, sizeof(sockaddr_in)) < 0) 
+  {
+      //error
   }
+      
 }
 
 void Socket::setLocalAddressAndPort(const string &localAddress,
@@ -158,7 +166,8 @@ unsigned short Socket::resolveService(const string &service,
 
 CommunicatingSocket::CommunicatingSocket(int type, int protocol)  
      : Socket(type, protocol),
-m_timeout(3000)
+m_timeout(3000),
+mConnected(false)
 {
 }
 
@@ -167,9 +176,18 @@ m_timeout(3000)
 {
 }
 
-void CommunicatingSocket::connect(const string &foreignAddress,
-    unsigned short foreignPort)  {
+bool CommunicatingSocket::isConnected() const
+{
+    return mConnected;
+}
+
+bool CommunicatingSocket::connect(const string &foreignAddress,
+    unsigned short foreignPort)  
+{
   // Get the address of the requested host
+
+    mConnected = false;
+
   sockaddr_in destAddr;
   fillAddr(foreignAddress, foreignPort, destAddr);
 
@@ -183,8 +201,10 @@ void CommunicatingSocket::connect(const string &foreignAddress,
   int connectResult = ::connect(sockDesc, (sockaddr *) &destAddr, sizeof(destAddr));// Try to connect to the given port
 
 #ifndef _WIN32
-  if (connectResult != 0) {
-	  throw SocketException("Connect failed (connect())", true);
+  if (connectResult != 0) 
+  {
+	  //throw SocketException("Connect failed (connect())", true);
+      return false;
   }
 #endif
 
@@ -204,7 +224,7 @@ void CommunicatingSocket::connect(const string &foreignAddress,
   iSelRet = ::select(sockDesc + 1, NULL, &wrtFDS, NULL, &timeVal);
 
   if (iSelRet<=0)
-	throw SocketException("Connect failed (connect())", true);
+	return false;
 #endif // _WIN32
 
   iMode = 0;
@@ -213,6 +233,10 @@ void CommunicatingSocket::connect(const string &foreignAddress,
 #else
 	// fcntl(sockDesc, F_SETFL, 0);
 #endif
+
+  mConnected = true;
+
+  return true;
 }
 
 void CommunicatingSocket::setTimeOut( unsigned int ms )
@@ -227,11 +251,16 @@ void CommunicatingSocket::setTimeOut( unsigned int ms )
 
 }
 
-void CommunicatingSocket::send(const void *buffer, int bufferLen) 
-     {
-  if (::send(sockDesc, (raw_type *) buffer, bufferLen, 0) < 0) {
-    throw SocketException("Send failed (send())", true);
+bool CommunicatingSocket::send(const void *buffer, int bufferLen) 
+{
+  if (::send(sockDesc, (raw_type *) buffer, bufferLen, 0) < 0) 
+  {
+    //throw SocketException("Send failed (send())", true);
+      mConnected = false;
+      return false;
   }
+
+  return true;
 }
 
 int CommunicatingSocket::recv(void *buffer, int bufferLen) 
@@ -240,6 +269,7 @@ int CommunicatingSocket::recv(void *buffer, int bufferLen)
   if ((rtn = ::recv(sockDesc, (raw_type *) buffer, bufferLen, 0)) < 0) 
   {
 
+      mConnected = false;
 	  return -1;
   }
 

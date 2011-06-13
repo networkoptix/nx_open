@@ -25,6 +25,7 @@ private:
     {
         QString ip;
         QString mac;
+        QString name;
     };
 
     QList<Cam> mCams;

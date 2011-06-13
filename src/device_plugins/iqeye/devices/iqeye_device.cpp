@@ -1,5 +1,6 @@
 #include "iqeye_device.h"
-#include "../streamreader/iqeye_stream_reader.h"
+#include "../streamreader/iqeye_sp_h264.h"
+#include "../streamreader/iqeye_sp_mjpeg.h"
 
 
 CLIQEyeDevice::CLIQEyeDevice()
@@ -25,7 +26,10 @@ QString CLIQEyeDevice::toString() const
 
 CLStreamreader* CLIQEyeDevice::getDeviceStreamConnection()
 {
-    return new CLIQEyeStreamreader(this);
+    if (getName()=="IQ042S")
+        return new CLIQEyeH264treamreader(this);
+    else
+        return new CLIQEyeMJPEGtreamreader(this);
 }
 
 bool CLIQEyeDevice::unknownDevice() const

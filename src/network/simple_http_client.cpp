@@ -53,7 +53,8 @@ CLHttpStatus CLSimpleHTTPClient::openStream(bool recursive)
     
 	try
 	{
-		m_sock.connect(m_host.toString().toLatin1().data(), m_port);
+		if (!m_sock.connect(m_host.toString().toLatin1().data(), m_port))
+            return CL_HTTP_HOST_NOT_AVAILABLE;
 
 		QString request;
 		QTextStream os(&request);
@@ -72,7 +73,8 @@ CLHttpStatus CLSimpleHTTPClient::openStream(bool recursive)
 
 		os<< "\r\n";
 
-		m_sock.send(request.toLatin1().data(), request.toLatin1().size());
+		if (!m_sock.send(request.toLatin1().data(), request.toLatin1().size()))
+            return CL_HTTP_HOST_NOT_AVAILABLE;
 
 		if (CL_HTTP_HOST_NOT_AVAILABLE==getNextLine())
 			return CL_HTTP_HOST_NOT_AVAILABLE;

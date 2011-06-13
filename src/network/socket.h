@@ -118,17 +118,17 @@ protected:
 /**
  *   Socket which is able to connect, send, and receive
  */
-class CommunicatingSocket : public Socket {
+class CommunicatingSocket : public Socket 
+{
 public:
   /**
    *   Establish a socket connection with the given foreign
    *   address and port
    *   @param foreignAddress foreign address (IP address or name)
    *   @param foreignPort foreign port
-   *   @exception SocketException thrown if unable to establish connection
+   *   @return false if unable to establish connection
    */
-  void connect(const std::string &foreignAddress, unsigned short foreignPort)
-    ;
+  bool connect(const std::string &foreignAddress, unsigned short foreignPort);
 
   void setTimeOut( unsigned int ms );
 
@@ -139,7 +139,7 @@ public:
    *   @param bufferLen number of bytes from buffer to be written
    *   @exception SocketException thrown if unable to send data
    */
-  void send(const void *buffer, int bufferLen) ;
+  bool send(const void *buffer, int bufferLen) ;
 
   /**
    *   Read into the given buffer up to bufferLen bytes data from this
@@ -165,11 +165,14 @@ public:
    */
   unsigned short getForeignPort() ;
 
+  bool isConnected() const;
+
 protected:
   CommunicatingSocket(int type, int protocol) ;
   CommunicatingSocket(int newConnSD);
 protected:
 	unsigned int m_timeout;
+    bool mConnected;
 };
 
 /**
