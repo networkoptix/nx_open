@@ -147,7 +147,9 @@ void CLCamDisplay::processData(CLAbstractData* data)
         m_ignoringVideo = vd->ignore;
     }
 	else if (md->dataType == CLAbstractMediaData::AUDIO)
+    {
 		ad = static_cast<CLCompressedAudioData*>(data);
+    }
 
     if (m_afterJump)
     {

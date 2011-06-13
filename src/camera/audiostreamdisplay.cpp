@@ -69,7 +69,12 @@ CLAudioStreamDisplay::~CLAudioStreamDisplay()
 int CLAudioStreamDisplay::msInBuffer() const
 {
     int internalBufferSize = (m_audioSound ? m_audioSound->playTimeElapsed()/1000.0 : 0);
+
     //cl_log.log("internalBufferSize = ", internalBufferSize, cl_logALWAYS);
+    //cl_log.log("compressedBufferSize = ", msInQueue(), cl_logALWAYS);
+    //cl_log.log("tptalaudio = ", msInQueue() + internalBufferSize, cl_logALWAYS);
+
+
     return msInQueue() + internalBufferSize;
 }
 
@@ -212,13 +217,16 @@ void CLAudioStreamDisplay::putData(CLCompressedAudioData* data)
         }
 
 		int channels = qMin(audio.format.channels(), 2);
-        if (!m_audioSound) 
-            m_audioSound = QtvAudioDevice::instance().addSound(channels, qMin(audio.format.sampleSize(), 16), audio.format.frequency(), audio.outbuf_len);
 
         if (audio.format.channels() > 2)
             downmix(audio);
+
+
+        if (!m_audioSound) 
+            m_audioSound = QtvAudioDevice::instance().addSound(channels, qMin(audio.format.sampleSize(), 16), audio.format.frequency(), audio.outbuf_len);
+
 		
-        m_audioSound->play(audio.outbuf->data(), audio.outbuf_len);
+        m_audioSound->play((const quint8*) audio.outbuf->data(), audio.outbuf_len);
     }
 
 //		qint64 bytesInBuffer = m_audioOutput->bufferSize() - m_audioOutput->bytesFree();

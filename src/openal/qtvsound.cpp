@@ -16,6 +16,8 @@ QtvSound::QtvSound(ALCdevice* device, uint numChannels, uint bitsPerSample, uint
 	m_frequency = frequency;
 	m_bitsPerSample = bitsPerSample;
 	m_size = size;
+    m_proxyBuffer = new quint8[m_size];
+    m_proxyBufferLen = 0;
 	m_source = 0;
 	m_format = 0;
 	m_device = device;
@@ -25,6 +27,7 @@ QtvSound::QtvSound(ALCdevice* device, uint numChannels, uint bitsPerSample, uint
 QtvSound::~QtvSound()
 {
     internalClear();
+    delete [] m_proxyBuffer;
 }
 
 bool QtvSound::setup() 
@@ -93,7 +96,13 @@ uint QtvSound::playTimeElapsed() const
 	checkOpenALErrorDebug(m_device);
 	alGetSourcei(m_source, AL_BUFFERS_QUEUED, &queued);
 	checkOpenALErrorDebug(m_device);
-	return static_cast<uint>(bufferTime() * queued - offset * 1000000.0f);
+
+    ALint ggg = 0;
+    alGetSourcei(m_source, AL_SIZE, &ggg);
+
+    uint res = static_cast<uint>(bufferTime() * queued - offset * 1000000.0f);
+
+	return res;
 }
 
 bool QtvSound::playImpl() const
@@ -124,28 +133,52 @@ bool QtvSound::isFormatSupported()
     return m_isValid;
 }
 
-bool QtvSound::play(const void* data, uint size)
+bool QtvSound::play(const quint8* data, uint size)
 {
+    while (m_proxyBufferLen == 0 && size >= m_size)
+    {
+        internalPlay(data, m_size);
+        data += m_size;
+        size -= m_size;
+    }
 
-	//QMutexLocker locker(&mutex);
-	ALint processed = 0;
-	alGetSourcei(m_source, AL_BUFFERS_PROCESSED, &processed);
-	checkOpenALErrorDebug(m_device);
-	ALuint buf = 0;
-	if (processed) {
-		alSourceUnqueueBuffers(m_source, 1, &buf);
-		checkOpenALErrorDebug(m_device);
-	}
-	if (buf == 0) {
-		alGenBuffers(1, &buf);
-		checkOpenALErrorDebug(m_device);
-		m_buffers << buf;
-	}
-	alBufferData(buf, m_format, data, size, m_frequency);
-	checkOpenALErrorDebug(m_device);
-	alSourceQueueBuffers(m_source, 1, &buf);
-	checkOpenALErrorDebug(m_device);
-	return playImpl();
+    while (size > 0)
+    {
+        int copyLen = qMin(size, m_size - m_proxyBufferLen);
+        memcpy(m_proxyBuffer + m_proxyBufferLen, data, copyLen);
+        m_proxyBufferLen += copyLen;
+        if (m_proxyBufferLen == m_size)
+        {
+            internalPlay(m_proxyBuffer, m_proxyBufferLen);
+            m_proxyBufferLen = 0;
+        }
+        data += copyLen;
+        size -= copyLen;
+    }
+    return true;
+}
+
+bool QtvSound::internalPlay(const void* data, uint size)
+{
+    //QMutexLocker locker(&mutex);
+    ALint processed = 0;
+    alGetSourcei(m_source, AL_BUFFERS_PROCESSED, &processed);
+    checkOpenALErrorDebug(m_device);
+    ALuint buf = 0;
+    if (processed) {
+        alSourceUnqueueBuffers(m_source, 1, &buf);
+        checkOpenALErrorDebug(m_device);
+    }
+    if (buf == 0) {
+        alGenBuffers(1, &buf);
+        checkOpenALErrorDebug(m_device);
+        m_buffers << buf;
+    }
+    alBufferData(buf, m_format, data, size, m_frequency);
+    checkOpenALErrorDebug(m_device);
+    alSourceQueueBuffers(m_source, 1, &buf);
+    checkOpenALErrorDebug(m_device);
+    return playImpl();
 }
 
 
@@ -219,4 +252,5 @@ void QtvSound::internalClear()
 		checkOpenALError(m_device);
 	}
     m_buffers.clear();
+    m_proxyBufferLen = 0;
 }
