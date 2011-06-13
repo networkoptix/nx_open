@@ -2,18 +2,20 @@
 #define rtp_session_h_1935_h
 #include "socket.h"
 
-class RTPIODevice : public QIODevice
+class RTPSession;
+
+class RTPIODevice 
 {
 public:
-    explicit RTPIODevice(CommunicatingSocket& sock);
+    explicit RTPIODevice(RTPSession& owner,  CommunicatingSocket& sock);
     virtual ~RTPIODevice();
-
-private:
-    virtual qint64	readData ( char * data, qint64 maxSize );
-    virtual qint64	writeData ( const char * data, qint64 maxSize );
+    virtual qint64	read(char * data, qint64 maxSize );
+    
+    
 private:
 
     CommunicatingSocket& m_sock;
+    RTPSession& m_owner;
 
 };
 
@@ -26,7 +28,7 @@ public:
     // returns true if stream was opened, false in case of some error
     bool open(const QString& url);
     
-	QIODevice* play();
+	RTPIODevice* play();
 
     // returns true if there is no error delivering STOP
 	bool stop();
@@ -40,14 +42,16 @@ public:
 
     const QByteArray& getSdp() const;
 
+    bool sendKeepAliveIfNeeded();
 
 private:
 
     bool sendDescribe();
     bool sendOptions();
-    QIODevice*  sendSetup();
+    RTPIODevice*  sendSetup();
     bool sendPlay();
     bool sendTeardown();
+    bool sendKeepAlive();
 
     bool readResponce(QByteArray& responce);
 
@@ -70,13 +74,15 @@ private:
 
     QUrl mUrl;
 
-    unsigned int mcsec;
-    QString mSessionId;
-    unsigned short mServerPort;
+    unsigned int m_csec;
+    QString m_SessionId;
+    unsigned short m_ServerPort;
     // format: key - codc name, value - track number
     QMap<QString, int> m_sdpTracks;
 
-    unsigned int mTimeOut;
+    unsigned int m_TimeOut;
+
+    QTime m_keepAliveTime;
 };
 
 

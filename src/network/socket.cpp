@@ -1,4 +1,8 @@
 #include "Socket.h"
+#include <errno.h>             // For errno
+#include "base/log.h"
+
+
 using namespace std;
 #ifdef WIN32
   typedef int socklen_t;
@@ -15,7 +19,6 @@ using namespace std;
   typedef void raw_type;       // Type used for raw data on this platform
 #endif
 
-#include <errno.h>             // For errno
 
 using namespace std;
 
@@ -246,8 +249,11 @@ void CommunicatingSocket::setTimeOut( unsigned int ms )
 	timeval tv;
 
 	tv.tv_sec = ms/1000;
-	tv.tv_usec = ms%1000;   //1 Secs Timeout 
-	::setsockopt(sockDesc, SOL_SOCKET, SO_RCVTIMEO,(const char *)&tv,sizeof(struct timeval));
+	tv.tv_usec = (ms%1000) * 1000;   //1 Secs Timeout 
+	if (::setsockopt(sockDesc, SOL_SOCKET, SO_RCVTIMEO,(const char *)&tv,sizeof(struct timeval)) < 0)
+    {
+        cl_log.log("Timeout function failed", cl_logALWAYS);
+    }
 
 }
 
@@ -356,6 +362,13 @@ UDPSocket::UDPSocket(unsigned short localPort)   :
   setLocalPort(localPort);
   setBroadcast();
   m_destAddr = new sockaddr_in();
+
+  int buff_size = 1024*1024;
+  if (::setsockopt(sockDesc, SOL_SOCKET, SO_RCVBUF, (const char*) &buff_size, sizeof(buff_size))<0)
+  {
+      //error
+      buff_size = buff_size;
+  }
 }
 
 UDPSocket::UDPSocket(const std::string &localAddress, unsigned short localPort) 

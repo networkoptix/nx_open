@@ -2,10 +2,12 @@
 #include "base/sleep.h"
 
 #define DEFAULT_RTP_PORT 554
+#define RESERVED_TIMEOUT_TIME (5*1000)
 
 
-RTPIODevice::RTPIODevice(CommunicatingSocket& sock)
-:m_sock(sock)
+RTPIODevice::RTPIODevice(RTPSession& owner, CommunicatingSocket& sock)
+:m_sock(sock),
+m_owner(owner)
 {
 
 }
@@ -16,25 +18,23 @@ RTPIODevice::~RTPIODevice()
 }
 
 
-qint64	RTPIODevice::readData ( char * data, qint64 maxSize )
+qint64	RTPIODevice::read( char * data, qint64 maxSize )
 {
+    m_owner.sendKeepAliveIfNeeded();
     int readed = m_sock.recv(data, maxSize);
     return readed;
 }
 
-qint64	RTPIODevice::writeData ( const char * data, qint64 maxSize )
-{
-    return 0;
-}
 
 
 //============================================================================================
 RTPSession::RTPSession():
-mcsec(2),
+m_csec(2),
 m_udpSock(0),
-m_rtpIo(m_udpSock)
+m_rtpIo(*this, m_udpSock)
 {
-
+    m_udpSock.setTimeOut(500);
+    m_tcpSock.setTimeOut(3*1000);
 }
 
 RTPSession::~RTPSession()
@@ -103,9 +103,9 @@ bool RTPSession::open(const QString& url)
     return true;
 }
 
-QIODevice* RTPSession::play()
+RTPIODevice* RTPSession::play()
 {
-    QIODevice* ioDevice = sendSetup();
+    RTPIODevice* ioDevice = sendSetup();
 
     if (ioDevice == 0)
         return 0;
@@ -113,6 +113,7 @@ QIODevice* RTPSession::play()
     
     if (!sendPlay())
         return 0;
+
 
     return &m_rtpIo;
 
@@ -149,7 +150,7 @@ bool RTPSession::sendDescribe()
     request += mUrl.toString();
     request += " RTSP/1.0\r\n";
     request += "CSeq: ";
-    request += QByteArray::number(mcsec++);
+    request += QByteArray::number(m_csec++);
     request += "\r\n";
     request += "User-Agent: Network Optix\r\n";
     request += "Accept: application/sdp\r\n\r\n";
@@ -170,7 +171,7 @@ bool RTPSession::sendOptions()
     request += mUrl.toString();
     request += " RTSP/1.0\r\n";
     request += "CSeq: ";
-    request += QByteArray::number(mcsec++);
+    request += QByteArray::number(m_csec++);
     request += "\r\n\r\n";
 
 
@@ -181,7 +182,7 @@ bool RTPSession::sendOptions()
 
 }
 
-QIODevice*  RTPSession::sendSetup()
+RTPIODevice*  RTPSession::sendSetup()
 {
     QByteArray request;
     request += "SETUP ";
@@ -192,7 +193,7 @@ QIODevice*  RTPSession::sendSetup()
 
     request += " RTSP/1.0\r\n";
     request += "CSeq: ";
-    request += QByteArray::number(mcsec++);
+    request += QByteArray::number(m_csec++);
     request += "\r\n";
     request += "User-Agent: Network Optix\r\n";
     request += "Transport: RTP/AVP;unicast;client_port=";
@@ -218,14 +219,14 @@ QIODevice*  RTPSession::sendSetup()
     }
 
 
-    mTimeOut = 10*1000; // default timeout 10 sec
+    m_TimeOut = 0; // default timeout 0 ( do not send keep alive )
 
     QString tmp = extractRTSPParam(responce, "Session:");
 
     if (tmp.size() > 0) 
     {
         QStringList tmpList = tmp.split(';');
-        mSessionId = tmpList[0];
+        m_SessionId = tmpList[0];
 
         for (int i = 0; i < tmpList.size(); ++i)
         {
@@ -233,7 +234,7 @@ QIODevice*  RTPSession::sendSetup()
             {
                 QStringList tmpParams = tmpList[i].split('=');
                 if (tmpParams.size() > 1)
-                    mTimeOut = tmpParams[1].toInt();
+                    m_TimeOut = tmpParams[1].toInt();
             }
         }
     }
@@ -254,10 +255,10 @@ bool RTPSession::sendPlay()
     request += mUrl.toString();
     request += " RTSP/1.0\r\n";
     request += "CSeq: ";
-    request += QByteArray::number(mcsec++);
+    request += QByteArray::number(m_csec++);
     request += "\r\n";
     request += "Session: ";
-    request += mSessionId;
+    request += m_SessionId;
     request += "\r\n";
     request += "Range: npt=0.000"; // offset
     request += "-\r\n\r\n";
@@ -273,6 +274,7 @@ bool RTPSession::sendPlay()
     if (responce.startsWith("RTSP/1.0 200"))
     {
         updateTransportHeader(responce);
+        m_keepAliveTime.restart();
         return true;
     }
 
@@ -288,10 +290,10 @@ bool RTPSession::sendTeardown()
     request += mUrl.toString();
     request += " RTSP/1.0\r\n";
     request += "CSeq: ";
-    request += QByteArray::number(mcsec++);
+    request += QByteArray::number(m_csec++);
     request += "\r\n";
     request += "Session: ";
-    request += mSessionId;
+    request += m_SessionId;
     request += "\r\n\r\n";
 
     if (!m_tcpSock.send(request.data(), request.size()))
@@ -310,6 +312,58 @@ bool RTPSession::sendTeardown()
     }
 
 }
+
+bool RTPSession::sendKeepAliveIfNeeded()
+{
+    if (m_TimeOut==0)
+        return true;
+
+    if (m_keepAliveTime.elapsed() < m_TimeOut - RESERVED_TIMEOUT_TIME)
+        return true;
+    else 
+    {
+        bool res= sendKeepAlive();
+        m_keepAliveTime.restart();
+        return res;
+    }
+}
+
+bool RTPSession::sendKeepAlive()
+{
+
+    QByteArray request;
+    QByteArray responce;
+    request += "GET_PARAMETER ";
+    request += mUrl.toString();
+    request += " RTSP/1.0\r\n";
+    request += "CSeq: ";
+    request += QByteArray::number(m_csec++);
+    //if (!d->sessionId.isEmpty()) 
+    {
+        request += "\r\n";
+        request += "Session: ";
+        request += m_SessionId;
+    }
+    request += "\r\n\r\n";
+    //
+
+
+    if (!m_tcpSock.send(request.data(), request.size()))
+        false;
+
+
+    if(!readResponce(responce) || !responce.startsWith("RTSP/1.0 200"))
+    {
+        return false;
+    }
+    else 
+    {
+        return true;
+    }
+}
+
+
+
 
 bool RTPSession::readResponce(QByteArray& responce)
 {
@@ -359,7 +413,7 @@ void RTPSession::updateTransportHeader(QByteArray& responce)
             {
                 QStringList tmpParams = tmpList[i].split('=');
                 if (tmpParams.size() > 1)
-                    mServerPort = tmpParams[1].toInt();
+                    m_ServerPort = tmpParams[1].toInt();
             }
         }
     }

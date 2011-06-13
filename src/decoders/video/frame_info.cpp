@@ -21,10 +21,11 @@ USED_U64(mmx_word_const_2)= 0x0002000200020002ull;
 
 
 void downscalePlate_factor2_mmx(unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
-                                const unsigned int width, const unsigned int src_stride, const unsigned int height)
+                                const unsigned int width, const unsigned int src_stride, unsigned int height)
 {
     unsigned int y = 0;
     int round_width = width / 16 * 16;
+    height = height / 2 * 2;
     do {
         const unsigned char* src_line1 = src + src_stride * y;
         const unsigned char* src_line2 = src_line1 + src_stride;
@@ -102,9 +103,10 @@ __loop1:
 }
 
 void downscalePlate_factor4_mmx(unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
-                                const unsigned int width, const unsigned int src_stride, const unsigned int height)
+                                const unsigned int width, const unsigned int src_stride, unsigned int height)
 {
     int round_width = width / 32 * 32;
+    height = height / 4 * 4;
     unsigned int y = 0;
     do {
         const unsigned char* src_line1 = src + src_stride * y;
@@ -201,8 +203,9 @@ __loop1:
 }
 
 void downscalePlate_factor8_mmx(unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
-                                const unsigned int width, const unsigned int src_stride, const unsigned int height)
+                                const unsigned int width, const unsigned int src_stride, unsigned int height)
 {
+    height = height / 8 * 8;
     int round_width = width / 32 * 32;
     unsigned int y = 0;
     do {

@@ -106,7 +106,10 @@ void CLServerPushStreamreader::run()
         if (dataCanBeAccepted())
             putData(data);        
         else
+        {
+            setNeedKeyData();
             data->releaseRef();
+        }
 
         
 	}

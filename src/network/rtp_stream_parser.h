@@ -1,9 +1,15 @@
+#ifndef __RTP_STREAM_PARSER_H
+#define __RTP_STREAM_PARSER_H
+
 #include <QIODevice>
 
 #include "data/mediadata.h"
+class RTPIODevice;
 
+#pragma pack(push, 1)
 typedef struct
 {
+    static const int RTP_HEADER_SIZE = 12;
 #if Q_BYTE_ORDER == Q_BIG_ENDIAN
     unsigned short   version:2;	/* packet type                */
     unsigned short   padding:1;		/* padding flag               */
@@ -25,15 +31,20 @@ typedef struct
     //quint32 csrc;		// synchronization source
     //quint32 csrc[1];	// optional CSRC list
 } RtpHeader;
+#pragma pack(pop)
+
+
 
 class CLRtpStreamParser
 {
 public:
-    CLRtpStreamParser(QIODevice* input);
+    CLRtpStreamParser(RTPIODevice* input);
     virtual void setSDPInfo(const QByteArray& data);
     virtual CLAbstractMediaData* getNextData() = 0;
     virtual ~CLRtpStreamParser();
 protected:
-    QIODevice* m_input;
+    RTPIODevice* m_input;
     QByteArray m_sdp;
 };
+
+#endif

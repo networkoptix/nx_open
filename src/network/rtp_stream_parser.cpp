@@ -1,13 +1,12 @@
 #include "rtp_stream_parser.h"
 
-CLRtpStreamParser::CLRtpStreamParser(QIODevice* input):
+CLRtpStreamParser::CLRtpStreamParser(RTPIODevice* input):
             m_input(input)
 {
 }
 
 CLRtpStreamParser::~CLRtpStreamParser()
 {
-    delete m_input;
 }
 
 void CLRtpStreamParser::setSDPInfo(const QByteArray& data)

@@ -5,7 +5,7 @@
 #include "network/simple_http_client.h"
 #include "network/rtpsession.h"
 
-
+class CLRtpStreamParser;
 
 class CLIQEyeH264treamreader: public CLServerPushStreamreader
 {
@@ -23,7 +23,8 @@ protected:
 private:
     
     RTPSession m_RtpSession;
-    QIODevice* m_rtpIo;
+    RTPIODevice* m_rtpIo;
+    CLRtpStreamParser* m_streamParser;
 
 };
 
