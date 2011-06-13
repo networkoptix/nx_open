@@ -254,7 +254,11 @@ void CommunicatingSocket::setTimeOut( unsigned int ms )
 
 	tv.tv_sec = ms/1000;
 	tv.tv_usec = (ms%1000) * 1000;   //1 Secs Timeout 
-	if (::setsockopt(sockDesc, SOL_SOCKET, SO_RCVTIMEO,(const char *)&tv,sizeof(struct timeval)) < 0)
+#ifdef Q_OS_WIN32
+    if ( setsockopt (sockDesc, SOL_SOCKET, SO_RCVTIMEO, ( char* )&ms,  sizeof ( ms ) ) != 0) 
+#else
+    if (::setsockopt(sockDesc, SOL_SOCKET, SO_RCVTIMEO,(const char *)&tv,sizeof(struct timeval)) < 0)
+#endif
     {
         cl_log.log("Timeout function failed", cl_logALWAYS);
     }
