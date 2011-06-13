@@ -87,6 +87,8 @@ void MainWnd::addFilesToCurrentOrNewLayout(const QStringList& files, bool forceN
     if (files.isEmpty())
         return;
 
+	cl_log.log("Entering addFilesToCurrentOrNewLayout", cl_logALWAYS);
+	
     CLDeviceManager::instance().addFiles(files);
 
     // If current content created by opening files or DND, use it. Otherwise create new one.
@@ -95,6 +97,7 @@ void MainWnd::addFilesToCurrentOrNewLayout(const QStringList& files, bool forceN
     if (!forceNewLayout && content != CLSceneLayoutManager::instance().getSearchLayout() &&
         content != CLSceneLayoutManager::instance().startScreenLayoutContent())
     {
+		cl_log.log(QString("Using old layout, content ") + content->getName(), cl_logALWAYS);
         foreach(QString file, files)
         {
             m_normalView->getView().getCamLayOut().addDevice(file, true);
@@ -104,6 +107,7 @@ void MainWnd::addFilesToCurrentOrNewLayout(const QStringList& files, bool forceN
         m_normalView->getView().fitInView(600, 100, SLOW_START_SLOW_END);
     } else
     {
+		cl_log.log(QString("Creating new layout, content ") + (content->getName()), cl_logALWAYS);
         content = CLSceneLayoutManager::instance().getNewEmptyLayoutContent();
 
         foreach(QString file, files)

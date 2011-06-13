@@ -211,11 +211,13 @@ void CLAudioStreamDisplay::putData(CLCompressedAudioData* data)
             audio.outbuf_len /= 2;
         }
 
+		int channels = qMin(audio.format.channels(), 2);
         if (!m_audioSound) 
-            m_audioSound = QtvAudioDevice::instance().addSound(audio.format.channels(), qMin(audio.format.sampleSize(), 16), audio.format.frequency(), audio.outbuf_len);
+            m_audioSound = QtvAudioDevice::instance().addSound(channels, qMin(audio.format.sampleSize(), 16), audio.format.frequency(), audio.outbuf_len);
 
-        //if (audio.format.channels() > 2 && m_audioDevice->downmixing())
-        //    downmix(audio);
+        if (audio.format.channels() > 2)
+            downmix(audio);
+		
         m_audioSound->play(audio.outbuf->data(), audio.outbuf_len);
     }
 

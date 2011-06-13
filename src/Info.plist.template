@@ -2,6 +2,15 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>English</string>
+    <key>CFBundleDocumentTypes</key>
+    <array>
+        ${associations}
+    </array>
+
+    <key>CFBundleVersion</key>
+    <string>${version}</string>
 	<key>CFBundleExecutable</key>
 	<string>EvePlayer-Beta</string>
 	<key>CFBundleGetInfoString</key>
@@ -14,9 +23,5 @@
 	<string>APPL</string>
 	<key>CFBundleSignature</key>
 	<string>EVE#</string>
-    <key>CFBundleURLTypes</key>
-    <array>
-        ${ASSOCIATIONS}
-    </array>
 </dict>
 </plist>

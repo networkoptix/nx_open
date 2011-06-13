@@ -93,6 +93,11 @@ unsigned int CLByteArray::write(const char* data, unsigned int size)
 	return size;
 }
 
+unsigned int CLByteArray::write(const QByteArray& data)
+{
+    return write(data.constData(), data.size());
+}
+
 unsigned int CLByteArray::write(const char* data, unsigned int size, int abs_shift  )
 {
 	if (size + abs_shift > m_capacity) // if we do not have anougth space 

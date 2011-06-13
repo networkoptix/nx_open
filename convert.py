@@ -161,7 +161,7 @@ def generate_info_plist():
         print >> associations, gen_association(ext)
 
     strings_template = Template(xin)
-    print >> xout, strings_template.substitute(ASSOCIATIONS=associations.getvalue())
+    print >> xout, strings_template.substitute(associations=associations.getvalue(), version=APPLICATION_VERSION)
 
 ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release = setup_ffmpeg()
 openal_path = setup_openal()
