@@ -31,7 +31,7 @@ private:
     quint16 m_packetPerNal;
 private:
     void serializeSpsPps(CLByteArray& dst);
-    void CLH264RtpParser::decodeSpsInfo(const QByteArray& data);
+    void decodeSpsInfo(const QByteArray& data);
 };
 
 #endif

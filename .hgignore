@@ -20,3 +20,5 @@ wixsetup/Associations.wxs
 wixsetup/FileExtensions.wxs
 wixsetup/CustomStrings.wxl
 .DS_Store
+src/Info.plist
+macsetup/*.dmg

@@ -1,22 +1,9 @@
-from string import Template, join
+import os, sys
 
-filetypes = (
-    ('avi',  '753E66D9-8015-4b4d-97CA-1E777E96E34F'),
-    ('mp4',  '46397F4F-9E29-49a0-AB81-FEDF814661E9'),
-    ('mkv',  '502013E6-530F-4964-A6EE-B45ABEFB78A5'),
-    ('wmv',  '183AB5BA-1409-4fe2-8E43-3759BE300509'),
-    ('mov',  'B9F8B8FC-4F40-4870-BC67-5B262AD9AC6A'),
-    ('vob',  'AC88723D-A68C-4617-A0F8-92AF90FDF9B5'),
-    ('m4v',  'D0DF03A2-038F-423e-BFB1-C935DA1CCFD3'),
-    ('3gp',  '37B6723E-8B14-40a7-8D0F-B830D34F8A95'),
-    ('mpeg', '4A06B0D6-7A47-494a-B829-82CCC7B0B134'),
-    ('mpg',  '75CAC87E-2C68-4f0d-A737-250F3BA292B7'),
-    ('mpe',  '9732F38C-B2FD-4a2e-8D3B-7BABBCC2C129'),
-    ('m2ts', '71E87F51-1410-4f8f-9CA5-B230E21D8116'),
-    ('flv',  '90A28113-3849-4164-8FA3-D57CF0D8C03F'),
-    ('jpg',  '950A5F13-D30F-41d5-8A4D-1A4AEEE7F203'),
-    ('jpeg', '155E336F-25E4-48d9-AAA8-F1176D00EB12')
-)
+sys.path.append('..')
+
+from string import Template, join
+from filetypes import filetypes
 
 header_string = """<?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">

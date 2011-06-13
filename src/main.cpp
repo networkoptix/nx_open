@@ -1,5 +1,5 @@
 //#include <vld.h>
-#include <QtSingleApplication>
+#include "eve_app.h"
 
 #include "version.h"
 #include "util.h"
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
     QApplication::setApplicationName(APPLICATION_NAME);
     QApplication::setApplicationVersion(APPLICATION_VERSION);
 
-	QtSingleApplication application(argc, argv);
+	EveApplication application(argc, argv);
 
     QString argsMessage;
     for (int i = 1; i < argc; ++i)

@@ -788,7 +788,8 @@ bool CLGLRenderer::paintEvent(const QRect& r)
 	{
 			if (m_gotnewimage)	updateTexture();
 
-			m_painterOpacity = 0.3;
+			//m_painterOpacity = 0.3;
+            m_painterOpacity = 1.0;
 			QRect temp;
 			//QRect r(0,0,m_videowindow->width(),m_videowindow->height());
 			float sar = 1.0f;
