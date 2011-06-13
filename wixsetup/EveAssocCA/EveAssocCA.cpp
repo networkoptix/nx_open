@@ -7,6 +7,8 @@
 
 static const LPWSTR EVE_MEDIA_PLAYER = L"EVE media player";
 
+#define CHECK(x, msg) if (FAILED(x)) { throw Error(msg); }
+
 TCHAR* GetProperty(MSIHANDLE hInstall, LPCWSTR name)
 {
     TCHAR* szValueBuf = NULL;
@@ -47,8 +49,7 @@ UINT __stdcall SetDefaultAssociations(MSIHANDLE hInstall)
     try
     {
         hr = WcaInitialize(hInstall, "SetDefaultAssociations");
-        if (FAILED(hr))
-            throw Error("Failed to initialize");
+        CHECK(hr, "Failed to initialize");
 
         WcaLog(LOGMSG_STANDARD, "Initialized.");
 
@@ -70,9 +71,7 @@ UINT __stdcall SetDefaultAssociations(MSIHANDLE hInstall)
         WcaLog(LOGMSG_STANDARD, "CoCreateInstance succeeded.");
 
         hr = pAAR->SetAppAsDefaultAll(EVE_MEDIA_PLAYER);
-
-        if (FAILED(hr))
-            throw Error("SetAppAsDefaultAll failed");
+        CHECK(hr, "SetAppAsDefaultAll failed");
 
         WcaLog(LOGMSG_STANDARD, "SetAppAsDefaultAll succeeded.");
 
@@ -90,111 +89,91 @@ UINT __stdcall SetDefaultAssociations(MSIHANDLE hInstall)
     return WcaFinalize(er);
 }
 
-UINT __stdcall SaveFileAssociations(MSIHANDLE hInstall)
+UINT __stdcall SaveAssociations(MSIHANDLE hInstall)
 {
     HRESULT hr = S_OK;
     UINT er = ERROR_SUCCESS;
 
     TCHAR* fileExtsString = 0;
 
-    MessageBox(NULL,L"In",NULL,NULL);
-
     try
     {
-        hr = WcaInitialize(hInstall, "SaveFileAssociations");
-        if (FAILED(hr))
-        {
-            ExitTrace(hr, "Failed to initialize");
-            throw Error("Failed to initialize");
-        }
+        hr = WcaInitialize(hInstall, "SaveAssociations");
+        CHECK(hr, "Failed to initialize");
 
         WcaLog(LOGMSG_STANDARD, "Initialized.");
 
         fileExtsString = GetProperty(hInstall, TEXT("CustomActionData"));
-
         if (fileExtsString == NULL)
-        {
             throw Error("SaveFileAssociations: FILETYPES is null.");
+
+        IApplicationAssociationRegistration *pAAR = NULL;
+
+        CoInitializeEx(NULL, COINIT_MULTITHREADED);
+
+        hr = CoCreateInstance(CLSID_ApplicationAssociationRegistration, 
+            NULL,
+            CLSCTX_INPROC,
+            __uuidof(IApplicationAssociationRegistration),
+            (void **)&pAAR);
+
+        if (FAILED(hr))
+        {
+            // No IApplicationAssociationRegistration implementation. Assume we're on Windows XP.
+            hr = S_OK;
+            throw Error("CoCreateInstance failed.");
         }
 
+        LPWSTR EVE_MEDIA_PLAYER = L"EVE media player";
+
+        WcaLog(LOGMSG_STANDARD, "CoCreateInstance succeeded.");
+
+        RegistryManager registryManager;
+
+        CAtlString fileExts(fileExtsString);
+            
+        CAtlString fileExt;
+        int extPosition = 0;
+        
+        fileExt = fileExts.Tokenize(_T("|"), extPosition);
+        for (; fileExt != _T(""); fileExt = fileExts.Tokenize(_T("|"), extPosition))
         {
-            IApplicationAssociationRegistration *pAAR = NULL;
+            if (!registryManager.isExtSupported(fileExt))
+                continue;
 
-            CoInitializeEx(NULL, COINIT_MULTITHREADED);
+            CAtlString eve("EVE");
 
-            hr = CoCreateInstance(CLSID_ApplicationAssociationRegistration, 
-                NULL,
-                CLSCTX_INPROC,
-                __uuidof(IApplicationAssociationRegistration),
-                (void **)&pAAR);
-
-            LPWSTR EVE_MEDIA_PLAYER = L"EVE media player";
-
-            if (SUCCEEDED(hr)) {
-                WcaLog(LOGMSG_STANDARD, "CoCreateInstance succeeded.");
-
-                CAtlString fileExts(fileExtsString);
-
-                CAtlString fileExt;
-                int extPosition = 0;
-
-                RegistryManager registryManager;
-
-                fileExt = fileExts.Tokenize(_T("|"), extPosition);
-                for (; fileExt != _T(""); fileExt = fileExts.Tokenize(_T("|"), extPosition))
-                {
-                    CAtlString dotFileExt(".");
-                    CAtlString eve("EVE");
-                    dotFileExt += fileExt;
-
-                    LPWSTR association = NULL;
-                    pAAR->QueryCurrentDefault(dotFileExt, AT_FILEEXTENSION, AL_MACHINE, &association);
-                    if (association == NULL)
-                        continue;
-
-                    if (wcscmp(association, eve + dotFileExt))
-                    {
-                        CoTaskMemFree(association);
-                        continue;
-                    }
-
-                    CoTaskMemFree(association);
-                    pAAR->QueryCurrentDefault(dotFileExt, AT_FILEEXTENSION, AL_EFFECTIVE, &association);
-                    if (wcscmp(association, eve + dotFileExt) == 0)
-                    {
-                        CoTaskMemFree(association);
-                        continue;
-                    }
-
-                    // System association is EVE, effective is not EVE => backup existing, set our
-                    CAtlString logMessage("Ext was selected: ");
-                    logMessage += fileExt;
-                    logMessage += " and associated with ";
-                    logMessage += association;
-
-                    CT2CA pszConvertedAnsiString(logMessage);
-                    WcaLog(LOGMSG_STANDARD, pszConvertedAnsiString);
-
-                    registryManager.backupAssociation(fileExt, association);
-
-                    CoTaskMemFree(association);
-                }
-
-                hr = pAAR->SetAppAsDefaultAll(EVE_MEDIA_PLAYER);
-
-                if (SUCCEEDED(hr)) {
-                    WcaLog(LOGMSG_STANDARD, "SetAppAsDefaultAll succeeded.");
-                } else {
-                    WcaLog(LOGMSG_STANDARD, "SetAppAsDefaultAll failed.");
-                }
-
-                pAAR->Release();
-            } else {
-                WcaLog(LOGMSG_STANDARD, "CoCreateInstance failed.");
+            LPWSTR association = NULL;
+            pAAR->QueryCurrentDefault(fileExt, AT_FILEEXTENSION, AL_EFFECTIVE, &association);
+            if (wcscmp(association, eve + fileExt) == 0)
+            {
+                CoTaskMemFree(association);
+                continue;
             }
 
-            CoUninitialize();
+            // System association is EVE, effective is not EVE => backup existing, set to our
+            CAtlString logMessage("Ext was selected: ");
+            logMessage += fileExt;
+            logMessage += " and associated with ";
+            logMessage += association;
+
+            CT2CA pszConvertedAnsiString(logMessage);
+            WcaLog(LOGMSG_STANDARD, pszConvertedAnsiString);
+
+            registryManager.setBackupAssociation(fileExt, association);
+
+            CoTaskMemFree(association);
         }
+
+
+        hr = pAAR->SetAppAsDefaultAll(EVE_MEDIA_PLAYER);
+        CHECK(hr, "SetAppAsDefaultAll failed.");
+
+        WcaLog(LOGMSG_STANDARD, "SetAppAsDefaultAll succeeded.");
+
+        pAAR->Release();
+
+        CoUninitialize();
     }
     catch (const Error& e)
     {
@@ -210,46 +189,72 @@ UINT __stdcall SaveFileAssociations(MSIHANDLE hInstall)
     return WcaFinalize(er);
 }
 
-UINT __stdcall RestoreFileAssociations(MSIHANDLE hInstall)
+UINT __stdcall RestoreAssociations(MSIHANDLE hInstall)
 {
     HRESULT hr = S_OK;
     UINT er = ERROR_SUCCESS;
 
-    hr = WcaInitialize(hInstall, "RestoreFileAssociations");
-    ExitOnFailure(hr, "Failed to initialize");
+    TCHAR* fileExtsString = 0;
 
-    WcaLog(LOGMSG_STANDARD, "Initialized.");
+    // MessageBox(NULL,L"In",NULL,NULL);
 
-#if 0
-    IApplicationAssociationRegistration *pAAR = NULL;
+    try
+    {
+        hr = WcaInitialize(hInstall, "RestoreAssociations");
+        CHECK(hr, "Failed to initialize");
 
-    CoInitializeEx(NULL, COINIT_MULTITHREADED);
+        WcaLog(LOGMSG_STANDARD, "Initialized.");
 
-    hr = CoCreateInstance(CLSID_ApplicationAssociationRegistration, 
-        NULL,
-        CLSCTX_INPROC,
-        __uuidof(IApplicationAssociationRegistration),
-        (void **)&pAAR);
+        RegistryManager registryManager;
 
-    if (SUCCEEDED(hr)) {
-        WcaLog(LOGMSG_STANDARD, "CoCreateInstance succeeded.");
+        fileExtsString = GetProperty(hInstall, TEXT("CustomActionData"));
+        if (fileExtsString == NULL)
+            throw Error("RestoreAssociations: FILETYPES is null.");
 
-        hr = pAAR->SetAppAsDefaultAll(L"EVE media player");
+        IApplicationAssociationRegistration *pAAR = NULL;
 
-        if (SUCCEEDED(hr)) {
-            WcaLog(LOGMSG_STANDARD, "SetAppAsDefaultAll succeeded.");
-        } else {
-            WcaLog(LOGMSG_STANDARD, "SetAppAsDefaultAll failed.");
+        CoInitializeEx(NULL, COINIT_MULTITHREADED);
+
+        hr = CoCreateInstance(CLSID_ApplicationAssociationRegistration, 
+            NULL,
+            CLSCTX_INPROC,
+            __uuidof(IApplicationAssociationRegistration),
+            (void **)&pAAR);
+
+        if (FAILED(hr))
+        {
+            // No IApplicationAssociationRegistration implementation. Assume we're on Windows XP.
+            hr = S_OK;
+            throw Error("CoCreateInstance failed.");
         }
+
+        ProgIdDictionary progIdDictionary;
+
+        CAtlString fileExts(fileExtsString);
+
+        CAtlString fileExt;
+        int extPosition = 0;
+
+        fileExt = fileExts.Tokenize(_T("|"), extPosition);
+        for (; fileExt != _T(""); fileExt = fileExts.Tokenize(_T("|"), extPosition))
+        {
+            if (!registryManager.isExtSupported(fileExt))
+                continue;
+
+            CAtlString backupProgId = registryManager.getBackupAssociation(fileExt);
+            CAtlString backupApp = progIdDictionary.appNameFromProgId(backupProgId);
+            HRESULT hr = pAAR->SetAppAsDefault(backupApp, fileExt, AT_FILEEXTENSION);
+        }
+
         pAAR->Release();
-    } else {
-        WcaLog(LOGMSG_STANDARD, "CoCreateInstance failed.");
+
+        CoUninitialize();
+    }
+    catch (const Error& e)
+    {
+        WcaLog(LOGMSG_STANDARD, e.what());
     }
 
-    CoUninitialize();
-#endif
-
-LExit:
     er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     return WcaFinalize(er);
 }

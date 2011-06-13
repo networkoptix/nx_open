@@ -23,6 +23,7 @@ public:
 
 	CLVideoDecoderOutput::downscale_factor getCurrentDownscaleFactor() const;
 
+    void setMTDecoding(bool value);
 private:
 	QMutex m_mtx;
     QMap<CodecID, CLAbstractVideoDecoder*> m_decoder;

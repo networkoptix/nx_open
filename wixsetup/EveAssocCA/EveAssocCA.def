@@ -3,5 +3,5 @@ LIBRARY	"EveAssocCA"
 EXPORTS
 
 SetDefaultAssociations
-SaveFileAssociations
-RestoreFileAssociations
+SaveAssociations
+RestoreAssociations

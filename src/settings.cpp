@@ -72,41 +72,42 @@ void Settings::load(const QString& fileName)
 
     QFile settingsFile(m_fileName);
 
-    if (!settingsFile.exists())
+    if (settingsFile.exists())
     {
-        cl_log.log("Can't find settings file", cl_logERROR);
-        return;
-    }
+		if (settingsFile.open(QIODevice::ReadOnly | QIODevice::Text))
+		{
+			QXmlStreamReader xml(&settingsFile);
+			
+			while (!xml.atEnd())
+			{
+				xml.readNext();
+				
+				if (xml.isStartElement())
+				{
+					if (xml.name() == "mediaRoot")
+						m_data.mediaRoot = QDir::fromNativeSeparators(xml.readElementText());
+					else if (xml.name() == "auxMediaRoot")
+						m_data.auxMediaRoots.push_back(QDir::fromNativeSeparators(xml.readElementText()));
+					else if (xml.name() == "serialNumber")
+						setSerialNumber(xml.readElementText());
+					else if (xml.name() == "afterFirstRun")
+						m_data.afterFirstRun = (xml.readElementText() == "true");
+				}
+			}
+			
+			if (xml.hasError())
+			{
+				reset();
+			}
+		} else
+		{
+			cl_log.log("Can't open settings file", cl_logERROR);
+		}
 
-    if (!settingsFile.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        cl_log.log("Can't open settings file", cl_logERROR);
-        return;
-    }
-
-    QXmlStreamReader xml(&settingsFile);
-
-    while (!xml.atEnd())
-    {
-        xml.readNext();
-
-        if (xml.isStartElement())
-        {
-            if (xml.name() == "mediaRoot")
-                m_data.mediaRoot = QDir::fromNativeSeparators(xml.readElementText());
-            else if (xml.name() == "auxMediaRoot")
-                m_data.auxMediaRoots.push_back(QDir::fromNativeSeparators(xml.readElementText()));
-            else if (xml.name() == "serialNumber")
-                setSerialNumber(xml.readElementText());
-            else if (xml.name() == "afterFirstRun")
-                m_data.afterFirstRun = (xml.readElementText() == "true");
-        }
-    }
-
-    if (xml.hasError())
-    {
-        reset();
-    }
+    } else
+	{
+        cl_log.log("No settings file", cl_logERROR);
+	}
 
     if (m_data.mediaRoot.isEmpty())
     {

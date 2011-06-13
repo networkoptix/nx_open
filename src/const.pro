@@ -30,6 +30,7 @@ release {
 win32 {
   QMAKE_CXXFLAGS += -MP /Fd$(IntDir)
   INCLUDEPATH += ../contrib/ffmpeg-misc-headers-win32
+  INCLUDEPATH += ../contrib/openal/include
   RC_FILE = uniclient.rc
 }
 
@@ -48,15 +49,19 @@ DEFINES += __STDC_CONSTANT_MACROS
 RESOURCES += mainwnd.qrc ../build/skin.qrc
 FORMS += mainwnd.ui preferences.ui licensekey.ui
 
+
 win32 {
   LIBS += ws2_32.lib Iphlpapi.lib
   QMAKE_LFLAGS += avcodec-53.lib avdevice-53.lib avfilter-2.lib avformat-53.lib avutil-51.lib swscale-0.lib
   QMAKE_LFLAGS_DEBUG += /libpath:$$FFMPEG-debug/bin
   QMAKE_LFLAGS_RELEASE += /libpath:$$FFMPEG-release/bin
+  
+  LIBS += ../contrib/openal/bin/win32/OpenAL32.lib
 }  
 
 mac {
   LIBS += -framework SystemConfiguration
+  LIBS += -framework OpenAL
   QMAKE_LFLAGS += -lavcodec.53 -lavdevice.53 -lavfilter.2 -lavformat.53 -lavutil.51 -lswscale.0 -lz -lbz2
   QMAKE_LFLAGS_DEBUG += -L$$FFMPEG-debug/lib
   QMAKE_LFLAGS_RELEASE += -L$$FFMPEG-release/lib

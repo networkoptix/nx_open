@@ -5,6 +5,8 @@
 #include "base/aligned_data.h"
 #include "decoders/audio/audio_struct.h"
 
+#include "openal/qtvsound.h"
+#include "openal/qtvaudiodevice.h"
 
 class CLAbstractAudioDecoder;
 struct CLCompressedAudioData;
@@ -55,7 +57,7 @@ private:
 	CLAlignedData m_decodedaudio;
 	bool m_downmixing;
 	bool m_tooFewDataDetected;
-    CLAudioDevice* m_audioDevice;
+    QtvSound* m_audioSound;
 
     QQueue<CLCompressedAudioData*> m_audioQueue;
 };

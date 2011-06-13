@@ -34,7 +34,9 @@ void CLAbstractVideoDecoder::setTryHardwareAcceleration(bool tryHardwareAccelera
 
 CLAbstractVideoDecoder::CLAbstractVideoDecoder()
     : m_tryHardwareAcceleration(false),
-      m_hardwareAccelerationEnabled(false)
+      m_hardwareAccelerationEnabled(false),
+      m_mtDecoding(false),
+      m_needRecreate(false)
 {}
 
 bool CLAbstractVideoDecoder::isHardwareAccelerationEnabled() const 

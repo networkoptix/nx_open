@@ -28,6 +28,7 @@ public:
 
 	void log(const QString& msg, CLLogLevel loglevel);
 	void log(const QString& msg, int val, CLLogLevel loglevel);
+    void log(const QString& msg, qint64 val, CLLogLevel loglevel);
 	void log(const QString& msg, qreal val, CLLogLevel loglevel);
 	void log(const QString& msg1, const QString& msg2, CLLogLevel loglevel);
 	void log(const QString& msg1, int val, const QString& msg2, CLLogLevel loglevel);

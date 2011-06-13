@@ -765,6 +765,9 @@ void CLGLRenderer::drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const
 bool CLGLRenderer::paintEvent(const QRect& r)
 {
 
+    glEnable (GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	if (m_abort_drawing)
 		return true;
 
@@ -785,7 +788,7 @@ bool CLGLRenderer::paintEvent(const QRect& r)
 	{
 			if (m_gotnewimage)	updateTexture();
 
-			m_painterOpacity = 1.0;
+			m_painterOpacity = 0.3;
 			QRect temp;
 			//QRect r(0,0,m_videowindow->width(),m_videowindow->height());
 			float sar = 1.0f;

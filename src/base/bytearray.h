@@ -27,6 +27,10 @@ public:
 	// if size > (capacity - curr_size) then capacity automatically increased by factor of 2
 	unsigned int write(const char* data, unsigned int size );
 
+    //writes QByteArray to array starting from current position.
+    // if size > (capacity - curr_size) then capacity automatically increased by factor of 2
+    unsigned int write(const QByteArray& data);
+
 	//writes size bytes to array starting from abs_shift position.
 	// if size + shift > (capacity) then capacity automatically increased by factor of 2
 	unsigned int write(const char* data, unsigned int size, int abs_shift );

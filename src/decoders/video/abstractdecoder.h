@@ -20,6 +20,15 @@ public:
 
 	virtual void setLightCpuMode(bool val) = 0;
 
+    void setMTDecoding(bool value)
+    {
+        if (m_mtDecoding != value)
+            m_needRecreate = true;
+
+        m_mtDecoding = value;
+    }
+
+
     void setTryHardwareAcceleration(bool tryHardwareAcceleration);
     bool isHardwareAccelerationEnabled() const;
 private:
@@ -29,6 +38,9 @@ private:
 protected:
     bool m_tryHardwareAcceleration;
     bool m_hardwareAccelerationEnabled;
+
+    bool m_mtDecoding;
+    bool m_needRecreate;
 };
 
 class CLVideoDecoderFactory

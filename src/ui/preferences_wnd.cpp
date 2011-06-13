@@ -19,6 +19,7 @@ PreferencesWindow::PreferencesWindow()
 
     setupUi(this);
 
+    creditsLabel->setText(creditsLabel->text().replace("QT_VERSION", QT_VERSION_STR));
     Settings::instance().fillData(m_settingsData);
 
     setWindowTitle(tr("Preferences Editor"));
