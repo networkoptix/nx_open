@@ -97,9 +97,6 @@ uint QtvSound::playTimeElapsed() const
 	alGetSourcei(m_source, AL_BUFFERS_QUEUED, &queued);
 	checkOpenALErrorDebug(m_device);
 
-    ALint ggg = 0;
-    alGetSourcei(m_source, AL_SIZE, &ggg);
-
     uint res = static_cast<uint>(bufferTime() * queued - offset * 1000000.0f);
 
 	return res;
