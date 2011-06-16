@@ -90,7 +90,18 @@ QSize CLGridEngine::getItemMaxSize(const CLAbstractSceneItem* item) const
 
 bool CLGridEngine::isSpaceAvalable() const
 {
-	return m_settings.items->count() < m_settings.max_items;
+    int count = 0;
+
+    
+    foreach(CLAbstractSceneItem* item, *m_settings.items)
+    {
+        if (item->toVideoItem())
+            count += item->toVideoItem()->getVideoLayout()->numberOfChannels();
+        else
+            ++count;
+    }
+
+	return count < m_settings.max_items;
 }
 
 QRect CLGridEngine::gridSlotRect() const
