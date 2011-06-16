@@ -253,8 +253,10 @@ void SceneLayout::onTimer()
 	if (m_content->getDeviceCriteria().getCriteria() != CLDeviceCriteria::STATIC)
 	{
 
-            bool criteria_chnged = (m_content->getDeviceCriteria().filter() != mSearchFilter);
+        bool criteria_chnged = (m_content->getDeviceCriteria().filter() != mSearchFilter || m_content->getDeviceCriteria().getCriteria()==CLDeviceCriteria::NONE);
             mSearchFilter = m_content->getDeviceCriteria().filter();
+            if (criteria_chnged)
+                criteria_chnged = criteria_chnged;
 
 			QList<CLAbstractComplicatedItem*> remove_lst;
 			foreach(CLAbstractComplicatedItem* devitem, m_deviceitems)
