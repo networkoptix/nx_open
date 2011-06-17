@@ -3,7 +3,7 @@ import os, sys
 sys.path.append('..')
 
 from string import Template, join
-from filetypes import filetypes
+from filetypes import all_filetypes, video_filetypes, image_filetypes
 
 header_string = """<?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
@@ -46,7 +46,7 @@ def gen_assoc():
 
     component_template = Template(component_template_string)
     print >> xout, '  <DirectoryRef Id="INSTALLDIR">'
-    for ext, guid in filetypes:
+    for ext, guid in all_filetypes:
         print >> xout, component_template.substitute(ext=ext, guid=guid, capitalized_ext=ext.capitalize())
     print >> xout, '  </DirectoryRef>'
 
@@ -57,8 +57,29 @@ def gen_assoc():
                      Description='Registers file associations with $(env.APPLICATION_NAME).'>
               <ComponentRef Id='DummyFileAssocationFeatureComponent'/>
 """
-    for ext, guid in filetypes:
+
+    print >> xout, """
+             <Feature Id='EveMediaPlayerVideoFileAssociations' Level='1' AllowAdvertise='no' InstallDefault='local' Title='Video File Associations'
+                         Description='Associatie video files with $(env.APPLICATION_NAME).'>
+                  <ComponentRef Id='DummyFileAssocationFeatureComponent'/>
+"""
+
+    for ext, guid in video_filetypes:
         print >> xout, feature_template.substitute(ext=ext, upper_ext=ext.upper(), capitalized_ext=ext.capitalize())
+
+    print >> xout, '  </Feature>'
+
+
+    print >> xout, """
+             <Feature Id='EveMediaPlayerImageFileAssociations' Level='1' AllowAdvertise='no' InstallDefault='local' Title='Image File Associations'
+                         Description='Associate image files with $(env.APPLICATION_NAME).'>
+                  <ComponentRef Id='DummyFileAssocationFeatureComponent'/>
+"""
+
+    for ext, guid in image_filetypes:
+        print >> xout, feature_template.substitute(ext=ext, upper_ext=ext.upper(), capitalized_ext=ext.capitalize())
+    print >> xout, '  </Feature>'
+
     print >> xout, '  </Feature>'
 
     print >> xout, footer_string
@@ -69,7 +90,7 @@ def gen_file_exts():
     xout = open('FileExtensions.wxs', 'w')
     print >> xout, header_string
 
-    print >> xout, '<Property Id="FILETYPES" Admin="yes" Value="%s" />' % join(['.' + x[0] for x in filetypes],'|')
+    print >> xout, '<Property Id="FILETYPES" Admin="yes" Value="%s" />' % join(['.' + x[0] for x in all_filetypes],'|')
 
     print >> xout, footer_string
 

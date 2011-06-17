@@ -1,32 +1,19 @@
 #include "filetypesupport.h"
+#include "filetypes.h"
+#include "util.h"
 
 FileTypeSupport::FileTypeSupport()
 {
-    m_imageFileExtensions << ".jpg";
-    m_imageFileExtensions << ".jpeg";
-
-    m_movieFileExtensions << ".avi";
-    m_movieFileExtensions << ".mp4";
-    m_movieFileExtensions << ".mkv";
-    m_movieFileExtensions << ".wmv";
-    m_movieFileExtensions << ".mov";
-    m_movieFileExtensions << ".vob";
-    m_movieFileExtensions << ".m4v";
-    m_movieFileExtensions << ".3gp";
-    m_movieFileExtensions << ".mpeg";
-    m_movieFileExtensions << ".mpg";
-    m_movieFileExtensions << ".mpe";
-    m_movieFileExtensions << ".m2ts";
-    m_movieFileExtensions << ".flv";
-
-    foreach(QString ext, m_imageFileExtensions)
+    for(int i = 0; i < arraysize(IMAGE_FILETYPES); i++)
     {
-        m_imageFileFilter << QString("*") + ext;
+        m_imageFileExtensions << QString(".") + IMAGE_FILETYPES[i]; 
+        m_imageFileFilter << QString("*.") + IMAGE_FILETYPES[i];
     }
 
-    foreach(QString ext, m_movieFileExtensions)
+    for(int i = 0; i < arraysize(VIDEO_FILETYPES); i++)
     {
-        m_movieFileFilter << QString("*") + ext;
+        m_movieFileExtensions << QString(".") + VIDEO_FILETYPES[i];
+        m_movieFileFilter << QString("*.") + VIDEO_FILETYPES[i];
     }
 }
 
