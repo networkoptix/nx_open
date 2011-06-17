@@ -14,6 +14,7 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_previousVideoDisplayedTime(0),
       m_delay(100*1000), // do not put a big value here to avoid cpu usage in case of zoom out 
       m_playAudio(false),
+      m_needChangePriority(false),
       m_lastAudioPacketTime(0),
       m_lastVideoPacketTime(0),
       m_hadAudio(false),
@@ -137,6 +138,15 @@ void CLCamDisplay::jump()
 
 void CLCamDisplay::processData(CLAbstractData* data)
 {
+    if (m_needChangePriority)
+    {
+        if (m_playAudio)
+            setPriority(QThread::HighestPriority);
+        else
+            setPriority(QThread::NormalPriority);
+        m_needChangePriority = false;
+    }
+
 	CLCompressedVideoData *vd = 0;
 	CLCompressedAudioData *ad = 0;
 
@@ -260,7 +270,7 @@ void CLCamDisplay::processData(CLAbstractData* data)
                         break; // no more video in queue
 
                     bool lastFrameToDisplay = diff > -2 * videoDuration; //factor 2 here is to avoid frequent switch between normal play and fast play
-
+                    
                     display(vd, lastFrameToDisplay && !vd->ignore);
 
                     if (!lastFrameToDisplay)
@@ -301,8 +311,10 @@ void CLCamDisplay::copyImage(bool copy)
 
 void CLCamDisplay::playAudio(bool play)
 {
-	m_playAudio = play;
+    m_needChangePriority = play != m_playAudio;
 
+	m_playAudio = play;
+        
     if (!play)
     {
         m_audioDisplay->clearDeviceBuffer();
@@ -402,4 +414,3 @@ void CLCamDisplay::setMTDecoding(bool value)
             m_display[i]->setMTDecoding(value);
     }
 }
-

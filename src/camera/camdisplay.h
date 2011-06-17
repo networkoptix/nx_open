@@ -41,7 +41,6 @@ public:
 	quint64 currentTime() const { return m_previousVideoDisplayedTime; }
 
     void setMTDecoding(bool value);
-
 signals:
     void reachedTheEnd();
 
@@ -70,6 +69,7 @@ private:
 
 	bool m_playAudioSet;
 	bool m_playAudio;
+    bool m_needChangePriority;
 
     /**
       * got at least one audio packet

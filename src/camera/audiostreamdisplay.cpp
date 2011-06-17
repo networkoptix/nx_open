@@ -164,7 +164,7 @@ void CLAudioStreamDisplay::putData(CLCompressedAudioData* data)
             //paying too fast; need to slowdown
             cl_log.log("too few data in audio queue!!!!", cl_logDEBUG1);
             m_tooFewDataDetected = true;
-            suspend();
+            //suspend();
             data->dataProvider->setNeedSleep(false); //lets reader run without delays;
             return;
         }        
