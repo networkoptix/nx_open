@@ -317,7 +317,7 @@ CLDeviceList CLAreconVisionDevice::findDevices()
 
 		while(time.elapsed()<150)
 		{
-			//while (sock.hasPendingDatagrams()) 
+			while (sock.hasPendingDatagrams()) 
 			{
 				QByteArray datagram;
 				datagram.resize(sock.pendingDatagramSize());
