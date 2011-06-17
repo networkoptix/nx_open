@@ -11,14 +11,26 @@
 #include <alc.h>
 #endif
 
-//#include <algorithm>
+#define OPENAL_STATIC
 
+//#include <algorithm>
+#ifdef OPENAL_STATIC
+extern "C" {
+void alc_init(void);
+void alc_deinit(void);
+#pragma comment(lib, "winmm.lib")
+//"msvcrt.lib"
+}
+#endif
 
 QtvAudioDevice* QtvAudioDevice::m_qtvAudioDevice = 0;
 
 
 QtvAudioDevice::QtvAudioDevice() 
 {
+#ifdef OPENAL_STATIC
+    alc_init();
+#endif
 	qDebug("%s", "OpenAL init");
 	m_device = alcOpenDevice(NULL);
 	if (m_device == 0)
@@ -58,6 +70,9 @@ QtvAudioDevice::QtvAudioDevice()
 
 QtvAudioDevice::~QtvAudioDevice()
 {
+#ifdef OPENAL_STATIC
+    alc_deinit();
+#endif
 }
 
 void QtvAudioDevice::removeSound(QtvSound* soundObject)

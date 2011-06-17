@@ -29,7 +29,6 @@ int SCENE_TOP  = (400*1000);
 qreal square_ratio = 17.0/9;
 qreal long_ratio = 2.7/1;
 
-static const int max_items = 40;
 
 const int MAX_FPS = 35;
 
@@ -52,7 +51,7 @@ m_editable(false)
 	settings.items = &m_items;
 	settings.left = SCENE_LEFT;
 	settings.top = SCENE_TOP;
-	settings.max_items = 36;
+	settings.max_items = 4*QThread::idealThreadCount();
 	settings.max_rows = 5;
 	settings.slot_width = SLOT_WIDTH;
 	settings.slot_height= SLOT_HEIGHT;
@@ -253,8 +252,10 @@ void SceneLayout::onTimer()
 	if (m_content->getDeviceCriteria().getCriteria() != CLDeviceCriteria::STATIC)
 	{
 
-            bool criteria_chnged = (m_content->getDeviceCriteria().filter() != mSearchFilter);
+        bool criteria_chnged = (m_content->getDeviceCriteria().filter() != mSearchFilter || m_content->getDeviceCriteria().getCriteria()==CLDeviceCriteria::NONE);
             mSearchFilter = m_content->getDeviceCriteria().filter();
+            if (criteria_chnged)
+                criteria_chnged = criteria_chnged;
 
 			QList<CLAbstractComplicatedItem*> remove_lst;
 			foreach(CLAbstractComplicatedItem* devitem, m_deviceitems)

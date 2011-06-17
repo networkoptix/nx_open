@@ -32,6 +32,8 @@ public:
 	QSize sizeOnScreen(unsigned int channel) const;
     bool constantDownscaleFactor() const;
 
+    void setOpacity(qreal opacity); 
+
 	void applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation)
 	{
 		//let's normalize the values

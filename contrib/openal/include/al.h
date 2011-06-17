@@ -12,7 +12,11 @@ extern "C" {
  #if defined(AL_BUILD_LIBRARY) || defined (_OPENAL32LIB)
   #define AL_API __declspec(dllexport)
  #else
-  #define AL_API __declspec(dllimport)
+  #ifdef OPENAL_STATIC
+   #define AL_API 
+  #else 
+   #define AL_API __declspec(dllimport)
+  #endif 
  #endif
 #else
  #define AL_API extern
