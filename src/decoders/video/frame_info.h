@@ -3,15 +3,6 @@
 
 #include "data/mediadata.h"
 
-enum CLColorSpace
-{
-	CL_DECODER_YUV420   = 0,
-	CL_DECODER_YUV422   = 1,
-	CL_DECODER_YUV444   = 2,
-	CL_DECODER_RGB24    = 3, 
-	CL_DECODER_RGB555LE = 4
-};
-
 struct CLVideoDecoderOutput
 {
 	enum downscale_factor{factor_any = 0, factor_1 = 1, factor_2 = 2, factor_4 = 4, factor_8 = 8};
@@ -19,7 +10,7 @@ struct CLVideoDecoderOutput
 	CLVideoDecoderOutput();
 	~CLVideoDecoderOutput();
 
-	CLColorSpace out_type;
+	PixelFormat out_type;
 
 	unsigned char* C1; // color components
 	unsigned char* C2;

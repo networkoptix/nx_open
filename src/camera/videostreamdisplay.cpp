@@ -5,35 +5,6 @@
 #include "abstractrenderer.h"
 #include "gl_renderer.h"
 
-PixelFormat pixelFormatFromColorSpace(CLColorSpace colorSpace)
-{
-	PixelFormat result;
-
-	switch(colorSpace)
-	{
-	case CL_DECODER_YUV422:
-		result = PIX_FMT_YUVJ422P;
-		break;
-	case CL_DECODER_YUV444:
-		result = PIX_FMT_YUVJ444P;
-		break;
-	case CL_DECODER_YUV420:
-		result = PIX_FMT_YUV420P;
-		break;
-    case CL_DECODER_RGB24:
-        result = PIX_FMT_RGB24;
-        break;
-	case CL_DECODER_RGB555LE:
-		result = PIX_FMT_RGB555LE;
-		break;
-	default:
-		result = PIX_FMT_YUV420P;
-		break;
-	}
-
-	return result;
-}
-
 CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale)
     : m_lightCPUmode(false),
       m_canDownscale(canDownscale),
@@ -73,7 +44,7 @@ bool CLVideoStreamDisplay::allocScaleContext(const CLVideoDecoderOutput& outFram
     m_outputWidth = newWidth;
     m_outputHeight = newHeight;
 
-	m_scaleContext = sws_getContext(outFrame.width, outFrame.height, pixelFormatFromColorSpace(outFrame.out_type),
+	m_scaleContext = sws_getContext(outFrame.width, outFrame.height, outFrame.out_type,
 		m_outputWidth, m_outputHeight, PIX_FMT_YUV420P,
 		SWS_POINT, NULL, NULL, NULL);
 
@@ -86,7 +57,7 @@ bool CLVideoStreamDisplay::allocScaleContext(const CLVideoDecoderOutput& outFram
 	m_frameYUV = avcodec_alloc_frame();
 
 	int numBytes = avpicture_get_size(PIX_FMT_YUV420P, m_outputWidth, m_outputHeight);
-	m_outFrame.out_type = CL_DECODER_YUV420;
+	m_outFrame.out_type = PIX_FMT_YUV420P;
 
 	m_buffer = (uint8_t*)av_malloc(numBytes * sizeof(uint8_t));
 
@@ -103,6 +74,11 @@ void CLVideoStreamDisplay::freeScaleContext()
 		av_free(m_frameYUV);
         m_scaleContext = 0;
 	}
+}
+
+bool pixelFormatSupported(PixelFormat pixfmt)
+{
+    return pixfmt == PIX_FMT_YUV420P || pixfmt == PIX_FMT_YUV422P || pixfmt == PIX_FMT_YUV444P;
 }
 
 void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVideoDecoderOutput::downscale_factor force_factor)
@@ -190,9 +166,7 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 
 		//m_scaleFactor  = CLVideoDecoderOutput::factor_2;
 
-		// XXX RGB555 hack. Need to refactor video processing code.
-		if (m_scaleFactor == CLVideoDecoderOutput::factor_1 &&
-            img.outFrame.out_type != CL_DECODER_RGB555LE && img.outFrame.out_type != CL_DECODER_RGB24)
+		if (m_scaleFactor == CLVideoDecoderOutput::factor_1 && pixelFormatSupported(img.outFrame.out_type))
 		{
             // If there is no scaling needed check if size is greater than maximum allowed image size (maximum texture size for opengl).
             CLVideoDecoderOutput::downscale_factor scaleFactor = findOversizeScaleFactor(img.outFrame.width, img.outFrame.height, maxTextureSize, maxTextureSize);
@@ -217,7 +191,7 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
             // It's possible m_scaleFactor and scaleFactor both are not equal to 1.
             int scale = m_scaleFactor * scaleFactor;
 
-			if (img.outFrame.out_type == CL_DECODER_RGB555LE || img.outFrame.out_type == CL_DECODER_RGB24)
+			if (!pixelFormatSupported(img.outFrame.out_type))
 			{
                 rescaleFrame(img.outFrame, newWidth, newHeight);
 			} else 
@@ -244,9 +218,17 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
         }
         else
         {
-            m_draw->draw(img.outFrame, data->channelNumber);
+            // Convert to YUV
+            if (!pixelFormatSupported(img.outFrame.out_type))
+            {
+                rescaleFrame(img.outFrame, img.outFrame.width, img.outFrame.height);
+                m_draw->draw(m_outFrame, data->channelNumber);
+            }
+            else
+            {
+                m_draw->draw(img.outFrame, data->channelNumber);
+            }
         }
-        
     }
 }
 

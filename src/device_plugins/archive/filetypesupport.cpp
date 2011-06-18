@@ -17,7 +17,20 @@ FileTypeSupport::FileTypeSupport()
     }
 }
 
-bool FileTypeSupport::isFileSupported(const QString& filename) const
+bool FileTypeSupport::isMovieFileExt(const QString& filename) const
+{
+    QString lowerFilename = filename.toLower();
+
+    foreach(QString ext, m_movieFileExtensions)
+    {
+        if (lowerFilename.endsWith(ext))
+            return true;
+    }
+
+    return false;
+}
+
+bool FileTypeSupport::isImageFileExt(const QString& filename) const
 {
     QString lowerFilename = filename.toLower();
 
@@ -27,13 +40,12 @@ bool FileTypeSupport::isFileSupported(const QString& filename) const
             return true;
     }
 
-    foreach(QString ext, m_movieFileExtensions)
-    {
-        if (lowerFilename.endsWith(ext))
-            return true;
-    }
-
     return false;
+}
+
+bool FileTypeSupport::isFileSupported(const QString& filename) const
+{
+    return isImageFileExt(filename) || isMovieFileExt(filename);
 }
 
 const QStringList& FileTypeSupport::imagesFilter() const

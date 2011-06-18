@@ -6,6 +6,7 @@
 #include "util.h"
 #include "device_plugins/archive/avi_files/avi_device.h"
 #include "../file_device.h"
+#include "device_plugins/archive/filetypesupport.h"
 
 // Init static variables
 CLDeviceManager* CLDeviceManager::m_Instance = 0;
@@ -397,11 +398,20 @@ void CLDeviceManager::addFiles(const QStringList& files)
             continue;
 
 
+        FileTypeSupport fileTypeSupport;
 
-        if (xfile.toLower().endsWith(".jpeg") || xfile.toLower().endsWith(".jpg"))
+        if (fileTypeSupport.isImageFileExt(xfile))
+        {
             dev = new CLFileDevice(xfile);
-        else
+        }
+        else if (fileTypeSupport.isMovieFileExt(xfile))
+        {
             dev = new CLAviDevice(xfile);
+        }
+        else
+        {
+            continue;
+        }
 
         lst[dev->getUniqueId()] = dev;
     }

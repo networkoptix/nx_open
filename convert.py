@@ -203,7 +203,7 @@ def gen_filetypes_h():
     print >> filetypes_h, '// This file is generated. Edit filetypes.py instead.'
     print >> filetypes_h, 'static const char* VIDEO_FILETYPES[] = {%s};' % string.join(['"' + x[0] + '"' for x in video_filetypes], ', ')
     print >> filetypes_h
-    print >> filetypes_h, 'static const char* IMAGE_FILETYPES[] = {%s};' % string.join(['"' + x[0] + '"' for x in image_filetypes], ',')
+    print >> filetypes_h, 'static const char* IMAGE_FILETYPES[] = {%s};' % string.join(['"' + x[0] + '"' for x in image_filetypes], ', ')
     print >> filetypes_h, '#endif // UNICLIENT_FILETYPES_H_'
 
 ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release = setup_ffmpeg()

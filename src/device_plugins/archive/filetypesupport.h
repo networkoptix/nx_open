@@ -8,6 +8,9 @@ public:
 
     bool isFileSupported(const QString& filename) const;
 
+    bool isMovieFileExt(const QString& filename) const;
+    bool isImageFileExt(const QString& filename) const;
+
     const QStringList& imagesFilter() const;
     const QStringList& moviesFilter() const;
 private:

@@ -110,7 +110,7 @@ private:
 
 	unsigned char*  m_arrayPixels[3];
 
-	CLColorSpace m_color, m_color_old; 
+	PixelFormat m_color, m_color_old; 
 
 	enum Program
 	{

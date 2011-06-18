@@ -314,39 +314,28 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 		data.outFrame.stride2 = outputFrame->linesize[1];
 		data.outFrame.stride3 = outputFrame->linesize[2];
 
-		switch (c->pix_fmt)
-		{
-		case PIX_FMT_YUVJ422P:
-			data.outFrame.out_type = CL_DECODER_YUV422;
-			break;
-		case PIX_FMT_YUVJ444P:
-			data.outFrame.out_type = CL_DECODER_YUV444;
-			break;
-		case PIX_FMT_YUV420P:
+        if (c->pix_fmt == PIX_FMT_NONE)
+            return false;
+
+        // Filter deprecated pixel formats
+        switch(c->pix_fmt)
+        {
         case PIX_FMT_YUVJ420P:
-			data.outFrame.out_type = CL_DECODER_YUV420;
-			break;
-		case PIX_FMT_UYVY422: //// must be romoved; just coz using all decoders witn new header
-			data.outFrame.out_type = CL_DECODER_YUV444;
-			break;
-
-		case PIX_FMT_XVMC_MPEG2_IDCT: // must be romoved; just coz using all decoders witn new header
-			data.outFrame.out_type = CL_DECODER_YUV422;
-			break;
-
-		case PIX_FMT_RGB555LE:
-			data.outFrame.out_type = CL_DECODER_RGB555LE;
-			break;
-
-        case PIX_FMT_RGB24:
-            data.outFrame.out_type = CL_DECODER_RGB24;
+            data.outFrame.out_type = PIX_FMT_YUV420P;
             break;
 
-		default:
-			//data.outFrame.out_type = CL_DECODER_YUV420;
-            return false;
-			break;
-		}
+        case PIX_FMT_YUVJ422P:
+            data.outFrame.out_type = PIX_FMT_YUV422P;
+            break;
+
+        case PIX_FMT_YUVJ444P:
+            data.outFrame.out_type = PIX_FMT_YUV444P;
+            break;
+
+        default:
+            data.outFrame.out_type = c->pix_fmt;
+        }
+        
 
 		return true;
 	}

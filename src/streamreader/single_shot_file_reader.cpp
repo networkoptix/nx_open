@@ -1,6 +1,7 @@
 #include "./single_shot_file_reader.h"
 #include "../data/mediadata.h"
 #include "../device/file_device.h"
+#include "device_plugins/archive/filetypesupport.h"
 
 CLSingleShotFileStreamreader::CLSingleShotFileStreamreader(CLDevice* dev ):
 CLSingleShotStreamreader(dev)
@@ -11,10 +12,9 @@ CLSingleShotStreamreader(dev)
 
 CLAbstractMediaData* CLSingleShotFileStreamreader::getData()
 {
-	QFileInfo finfo(m_fileName);
-	QString extention = finfo.suffix().toLower();
+    FileTypeSupport fileTypeSupport;
 
-	if (extention!="jpeg" && extention!="jpg") // so far we support only these
+	if (!fileTypeSupport.isImageFileExt(m_fileName))
 		return 0;
 
 	QFile file(m_fileName);
@@ -23,6 +23,23 @@ CLAbstractMediaData* CLSingleShotFileStreamreader::getData()
 
 	if (!file.open(QIODevice::ReadOnly))
 		return 0;
+
+    QByteArray imageFormat = QImageReader::imageFormat(&file);
+
+    CodecID compressionType;
+
+    if (imageFormat == "png")
+        compressionType = CODEC_ID_PNG;
+    else if (imageFormat == "jpeg")
+        compressionType = CODEC_ID_MJPEG;
+    else if (imageFormat == "tiff")
+        compressionType = CODEC_ID_TIFF;
+    else if (imageFormat == "gif")
+        compressionType = CODEC_ID_GIF;
+    else if (imageFormat == "bmp")
+        compressionType = CODEC_ID_BMP;
+    else
+        return 0;
 
 	unsigned int file_size = file.size();
 
@@ -36,7 +53,7 @@ CLAbstractMediaData* CLSingleShotFileStreamreader::getData()
 
 	data.done(readed);
 
-	outData->compressionType = CODEC_ID_MJPEG;
+    outData->compressionType = compressionType;
 
 	outData->width = 0; // does not really meter (this is single shot)
 	outData->height = 0; //does not really meter (this is single shot)

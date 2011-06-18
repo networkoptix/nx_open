@@ -51,7 +51,12 @@ video_filetypes = (
 
 image_filetypes = (
     ('jpg',  '950A5F13-D30F-41d5-8A4D-1A4AEEE7F203'),
-    ('jpeg', '155E336F-25E4-48d9-AAA8-F1176D00EB12')
+    ('jpeg', '155E336F-25E4-48d9-AAA8-F1176D00EB12'),
+    ('png', '5F476F90-6C93-405f-B1D0-C18F007DBA20'),
+    ('bmp', 'D88FE039-3A1D-4c28-91A0-BCD99A3A5073'),
+    ('gif', 'D9925A65-1789-463b-839D-B2BE5BDDF218'),
+    ('tif', 'DAE8FC7B-2C07-4080-B218-95287040FAF8'),
+    ('tiff', 'E72E62FC-09E4-432b-9DD0-9C1A974F0163')
 )
 
 all_filetypes = video_filetypes + image_filetypes

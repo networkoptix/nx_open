@@ -453,17 +453,8 @@ void CLGLRenderer::draw(CLVideoDecoderOutput& img, unsigned int channel)
 
 
 	m_arrayPixels[0] = image.C1;
-
-	if (m_color != CL_DECODER_YUV444)
-	{
-		m_arrayPixels[1] = image.C2;
-		m_arrayPixels[2] = image.C3;
-	}
-	else
-	{
-		m_arrayPixels[1] = image.C2;
-		m_arrayPixels[2] = image.C3;
-	}
+	m_arrayPixels[1] = image.C2;
+	m_arrayPixels[2] = image.C3;
 
 	m_gotnewimage = true;
 	//CLSleep::msleep(15);
@@ -523,10 +514,10 @@ void CLGLRenderer::updateTexture()
 	int r_w[3] = { m_width, m_width / 2, m_width / 2 }; // real_width / visable
 	int h[3] = { m_height, m_height / 2, m_height / 2 };
 
-	if (m_color == CL_DECODER_YUV422)
+	if (m_color == PIX_FMT_YUV422P)
 		h[1] = h[2] = m_height;
 
-	if (m_color == CL_DECODER_YUV444)
+	if (m_color == PIX_FMT_YUV444P)
 	{
 		h[1] = h[2] = m_height;
 		w[1] = w[2] = m_stride;
@@ -621,21 +612,21 @@ void CLGLRenderer::updateTexture()
 		uint8_t* pixelsArray[4];
 		pixelsArray[0] = pixels;
 		
-		if (m_color == CL_DECODER_YUV422)
+		if (m_color == PIX_FMT_YUV422P)
 		{
 			yuv422_argb32_mmx(pixels, m_arrayPixels[0], m_arrayPixels[2], m_arrayPixels[1], 
 										round_width[0], h[0], 
 										4 * m_stride, 
 										m_stride, m_stride / 2);
 		}
-		else if (m_color == CL_DECODER_YUV420)
+		else if (m_color == PIX_FMT_YUV420P)
 		{
 			yuv420_argb32_mmx(pixels, m_arrayPixels[0], m_arrayPixels[2], m_arrayPixels[1], 
 										round_width[0], h[0], 
 										4 * m_stride, 
 										m_stride, m_stride / 2);
 		}
-		else if (m_color == CL_DECODER_YUV444){
+		else if (m_color == PIX_FMT_YUV444P){
 			yuv444_argb32_mmx(pixels, m_arrayPixels[0], m_arrayPixels[2], m_arrayPixels[1], 
 										round_width[0], h[0], 
 										4 * m_stride, 

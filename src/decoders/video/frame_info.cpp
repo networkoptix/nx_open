@@ -326,7 +326,7 @@ void CLVideoDecoderOutput::copy(const CLVideoDecoderOutput* src, CLVideoDecoderO
         dst->height = src->height;
         dst->out_type = src->out_type;
 
-        int yu_h = dst->out_type == CL_DECODER_YUV420 ? dst->height/2 : dst->height;
+        int yu_h = dst->out_type == PIX_FMT_YUV420P ? dst->height/2 : dst->height;
 
         dst->m_capacity = dst->stride1*dst->height + (dst->stride2+dst->stride3)*yu_h;
 
@@ -336,7 +336,7 @@ void CLVideoDecoderOutput::copy(const CLVideoDecoderOutput* src, CLVideoDecoderO
 
     }
 
-    int yu_h = dst->out_type == CL_DECODER_YUV420 ? dst->height/2 : dst->height;
+    int yu_h = dst->out_type == PIX_FMT_YUV420P ? dst->height/2 : dst->height;
 
     copyPlane(dst->C1, src->C1, dst->stride1, dst->stride1, src->stride1, src->height);
     copyPlane(dst->C2, src->C2, dst->stride2, dst->stride2, src->stride2, yu_h);
@@ -360,8 +360,8 @@ void CLVideoDecoderOutput::downscale(const CLVideoDecoderOutput* src, CLVideoDec
     int src_width = src->width;
     int src_height = src->height;
 
-    const int chroma_h_factor = (src->out_type == CL_DECODER_YUV420 || src->out_type == CL_DECODER_YUV422) ? 2 : 1;
-    const int chroma_v_factor = (src->out_type == CL_DECODER_YUV420) ? 2 : 1;
+    const int chroma_h_factor = (src->out_type == PIX_FMT_YUV420P || src->out_type == PIX_FMT_YUV422P) ? 2 : 1;
+    const int chroma_v_factor = (src->out_type == PIX_FMT_YUV420P) ? 2 : 1;
 
     // after downscale chroma_width must be divisible by 4 ( opengl requirements )
     const int mod_w = chroma_h_factor*factor*4;
@@ -512,7 +512,7 @@ bool CLVideoDecoderOutput::imagesAreEqual(const CLVideoDecoderOutput* img1, cons
     if (!equalPlanes(img1->C1, img2->C1, img1->width, img1->stride1, img2->stride1, img1->height, max_diff))
         return false;
 
-    int uv_h = img1->out_type == CL_DECODER_YUV420 ? img1->height/2 : img1->height;
+    int uv_h = img1->out_type == PIX_FMT_YUV420P ? img1->height/2 : img1->height;
 
     if (!equalPlanes(img1->C2, img2->C2, img1->width/2, img1->stride2, img2->stride2, uv_h, max_diff))
         return false;
