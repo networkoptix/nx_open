@@ -11,7 +11,7 @@
 #include <alc.h>
 #endif
 
-#define OPENAL_STATIC
+//#define OPENAL_STATIC
 
 //#include <algorithm>
 #ifdef OPENAL_STATIC
