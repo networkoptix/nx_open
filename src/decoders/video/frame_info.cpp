@@ -20,11 +20,14 @@ USED_U64(mmx_000000ffw)   = 0x000000ff000000ffull;
 USED_U64(mmx_word_const_2)= 0x0002000200020002ull;
 
 
-void downscalePlate_factor2_mmx(unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
+const quint16 __declspec(align(16)) sse_00ffw[]        = { 0x00ff,0x00ff,0x00ff,0x00ff,0x00ff,0x00ff,0x00ff,0x00ff };
+const quint16 __declspec(align(16)) sse_word_const_2[] = { 0x0002,0x0002,0x0002,0x0002,0x0002,0x0002,0x0002,0x0002 };
+
+void downscalePlate_factor2_sse(unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
                                 const unsigned int width, const unsigned int src_stride, unsigned int height)
 {
     unsigned int y = 0;
-    int round_width = width / 16 * 16;
+    int round_width = width / 32 * 32;
     height = height / 2 * 2;
     do {
         const unsigned char* src_line1 = src + src_stride * y;
@@ -37,50 +40,46 @@ void downscalePlate_factor2_mmx(unsigned char * dst, const unsigned int dst_stri
             mov edi, [dst]
             mov eax, [src_line1_end]
             .align 8;
+			MOVAPS xmm6, sse_00ffw 
+			MOVAPS xmm7, sse_word_const_2
 __loop1:
             PREFETCHNTA [esi + 64]
             PREFETCHNTA [edx + 64]
+			
+            MOVUPS    xmm0, [esi]
+            MOVUPS    xmm4, [esi+16]
+            MOVUPS    xmm1, [edx]
+            MOVUPS    xmm5, [edx+16]
+            MOVAPS    xmm2, xmm0
+            MOVAPS    xmm3, xmm1
+            psrlw xmm2, 8
+            psrlw xmm3, 8
+            pand      xmm0, xmm6
+            pand      xmm1, xmm6
+            paddsw xmm0, xmm2
+            paddsw xmm1, xmm3
+            MOVAPS    xmm2, xmm4
+            paddsw xmm0, xmm1
+            MOVAPS    xmm3, xmm5
+            psrlw xmm2, 8
+            psrlw xmm3, 8
+            pand      xmm4, xmm6
+            pand      xmm5, xmm6
+            paddsw xmm4, xmm2
+            paddsw xmm5, xmm3
+            paddsw    xmm0, xmm7
+            paddsw xmm4, xmm5
+            psrlw xmm0, 2 
+            paddsw    xmm4, xmm7
+            packuswb xmm0, xmm6
+            psrlw xmm4, 2 
+            packuswb xmm4, xmm6
+            MOVLHPS xmm0, xmm4
+            MOVNTPS [edi], xmm0
 
-            movq  mm0, [esi]   ; load first 8 pixels from first line
-            movq  mm4, [esi+8] ; load next 8 pixels from first line
-            movq  mm2, [edx]   ; load first 8 pixels from second line
-            movq  mm6, [edx+8] ; load next 8 pixels from second line
-
-            movq  mm1, mm0      ; prepare 16-bit data for eatch pixel.
-            movq  mm3, mm2
-            movq  mm5, mm4
-            movq  mm7, mm6
-
-            psrlw mm1, 8        ; first step of 16 bit data
-            psrlw mm3, 8
-            psrlw mm5, 8
-            psrlw mm7, 8
-
-            pand      mm0, mmx_00ffw ; second step of 16 bit data
-            pand      mm2, mmx_00ffw
-            pand      mm4, mmx_00ffw
-            pand      mm6, mmx_00ffw
-
-            paddsw    mm0, mm1 ; add all pixels
-            paddsw    mm2, mm3
-            paddsw    mm4, mm5
-            paddsw    mm6, mm7
-
-            paddsw    mm0, mm2
-            paddsw    mm4, mm6
-
-            paddsw    mm0, mmx_word_const_2
-            paddsw    mm4, mmx_word_const_2
-
-            psrlw mm0, 2 // div by 4 pixel color
-            psrlw mm4, 2 
-
-            packuswb mm0, mm4
-            MOVNTQ [edi], mm0
-
-            add esi, 16
-            add edx, 16
-            add edi ,8
+            add esi, 32
+            add edx, 32
+            add edi, 16
             cmp esi, eax
             jl __loop1
         }
@@ -202,7 +201,7 @@ __loop1:
     __asm { emms }
 }
 
-void downscalePlate_factor8_mmx(unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
+void downscalePlate_factor8_sse(unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
                                 const unsigned int width, const unsigned int src_stride, unsigned int height)
 {
     height = height / 8 * 8;
@@ -396,9 +395,38 @@ void CLVideoDecoderOutput::downscale(const CLVideoDecoderOutput* src, CLVideoDec
     if (factor == factor_2)
     {
 #ifdef Q_OS_WIN
-        downscalePlate_factor2_mmx(dst->C1, src_width/2,   src->C1, src_width, src->stride1, src_height);
-        downscalePlate_factor2_mmx(dst->C2, src_width/chroma_h_factor/2, src->C2, src_width/chroma_h_factor, src->stride2, src_yu_h);
-        downscalePlate_factor2_mmx(dst->C3, src_width/chroma_h_factor/2, src->C3, src_width/chroma_h_factor, src->stride3, src_yu_h);
+		/*
+		// perfomance test block
+		// last test result: sandy bridge 4.3Ghz. SSE faster than c code at 4-4.5 times for 1920x1080 source
+		QTime t1;
+		t1.start();
+		int g = 0;
+		for (int i = 0; i < 1000; ++i)
+		{
+			downscalePlate_factor2_sse(dst->C1, src_width/2,   src->C1, src_width, src->stride1, src_height);
+			downscalePlate_factor2_sse(dst->C2, src_width/chroma_h_factor/2, src->C2, src_width/chroma_h_factor, src->stride2, src_yu_h);
+			downscalePlate_factor2_sse(dst->C3, src_width/chroma_h_factor/2, src->C3, src_width/chroma_h_factor, src->stride3, src_yu_h);
+			g+=i;
+		}
+		int e1 = t1.elapsed();
+
+		QTime t2;
+		t2.start();
+		for (int i = 0; i < 1000; ++i)
+		{
+			downscalePlate_factor2(dst->C1, src->C1, src_width, src->stride1, src_height);
+			downscalePlate_factor2(dst->C2, src->C2, src_width/chroma_h_factor, src->stride2, src_yu_h);
+			downscalePlate_factor2(dst->C3, src->C3, src_width/chroma_h_factor, src->stride3, src_yu_h);
+			g+=i;
+		}
+		int e2 = t2.elapsed();
+		cl_log.log("scale factor 2. c code time:", e2, cl_logALWAYS);
+		cl_log.log("scale factor 2. sse time:", e1, cl_logALWAYS);
+		cl_log.log("-------------------------",  g, cl_logALWAYS);
+		*/
+		downscalePlate_factor2_sse(dst->C1, src_width/2,   src->C1, src_width, src->stride1, src_height);
+		downscalePlate_factor2_sse(dst->C2, src_width/chroma_h_factor/2, src->C2, src_width/chroma_h_factor, src->stride2, src_yu_h);
+		downscalePlate_factor2_sse(dst->C3, src_width/chroma_h_factor/2, src->C3, src_width/chroma_h_factor, src->stride3, src_yu_h);
 #else
         downscalePlate_factor2(dst->C1, src->C1, src_width, src->stride1, src_height);
         downscalePlate_factor2(dst->C2, src->C2, src_width/chroma_h_factor, src->stride2, src_yu_h);
@@ -420,9 +448,9 @@ void CLVideoDecoderOutput::downscale(const CLVideoDecoderOutput* src, CLVideoDec
     else if(factor == factor_8)
     {
 #ifdef Q_OS_WIN
-        downscalePlate_factor8_mmx(dst->C1, src_width/8, src->C1, src_width, src->stride1, src->height);
-        downscalePlate_factor8_mmx(dst->C2, src_width/chroma_h_factor/8, src->C2, src_width/chroma_h_factor, src->stride2, src_yu_h);
-        downscalePlate_factor8_mmx(dst->C3, src_width/chroma_h_factor/8, src->C3, src_width/chroma_h_factor, src->stride3, src_yu_h);
+        downscalePlate_factor8_sse(dst->C1, src_width/8, src->C1, src_width, src->stride1, src->height);
+        downscalePlate_factor8_sse(dst->C2, src_width/chroma_h_factor/8, src->C2, src_width/chroma_h_factor, src->stride2, src_yu_h);
+        downscalePlate_factor8_sse(dst->C3, src_width/chroma_h_factor/8, src->C3, src_width/chroma_h_factor, src->stride3, src_yu_h);
 #else
         downscalePlate_factor8(dst->C1, src->C1, src_width, src->stride1, src->height);
         downscalePlate_factor8(dst->C2, src->C2, src_width/chroma_h_factor, src->stride2, src_yu_h);
