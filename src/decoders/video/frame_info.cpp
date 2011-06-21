@@ -197,7 +197,7 @@ void downscalePlate_factor8_sse(unsigned char * dst, const unsigned int dst_stri
             mov edi, [dst]
             mov eax, [src_line1_end]
             .align 8;
-            pxor mm7, mm7
+            movq mm7, mmx_word_const_2 // round value
             movq mm6, mmx_00ffw
 __loop1:
             PREFETCHNTA [esi + 64]
@@ -225,12 +225,11 @@ __loop1:
             pand mm3, mm6
             paddsw    mm0, mm1 ; add all pixels
             paddsw    mm2, mm3
-            paddsw    mm0, mmx_word_const_2 // round value
+            paddsw    mm0, mm7
             paddsw    mm0, mm2
             psrlw mm0, 2 // div by 4 pixel color
-            packuswb mm0, mm7
+            packuswb mm0, mm0
             MOVD [edi], mm0
-            
 
             add esi, 32
             add edx, 32
