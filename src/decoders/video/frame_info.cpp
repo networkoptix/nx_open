@@ -211,7 +211,6 @@ __loop1:
             PINSRW mm1, [esi+20], 2
             PINSRW mm0, [esi+24], 3
             PINSRW mm1, [esi+28], 3
-           
             PINSRW mm2, [edx], 0
             PINSRW mm3, [edx+4], 0
             PINSRW mm2, [edx+8], 1
@@ -220,23 +219,18 @@ __loop1:
             PINSRW mm3, [edx+20], 2
             PINSRW mm2, [edx+24], 3
             PINSRW mm3, [edx+28], 3
-
             pand mm0, mm6
             pand mm1, mm6
             pand mm2, mm6
             pand mm3, mm6
-
-            /////////////////////
             paddsw    mm0, mm1 ; add all pixels
             paddsw    mm2, mm3
-
             paddsw    mm0, mmx_word_const_2 // round value
             paddsw    mm0, mm2
-
             psrlw mm0, 2 // div by 4 pixel color
             packuswb mm0, mm7
-
             MOVD [edi], mm0
+            
 
             add esi, 32
             add edx, 32
@@ -283,7 +277,7 @@ void CLVideoDecoderOutput::clean()
 {
     if (m_capacity)
     {
-        delete[] C1;
+        av_free(C1);
         C1 = 0;
         m_capacity = 0;
     }
@@ -308,7 +302,7 @@ void CLVideoDecoderOutput::copy(const CLVideoDecoderOutput* src, CLVideoDecoderO
 
         dst->m_capacity = dst->stride1*dst->height + (dst->stride2+dst->stride3)*yu_h;
 
-        dst->C1 = new unsigned char[dst->m_capacity];
+        dst->C1 = (unsigned char*) av_malloc(dst->m_capacity);
         dst->C2 = dst->C1 + dst->stride1*dst->height;
         dst->C3 = dst->C2 + dst->stride2*yu_h;
 
@@ -363,7 +357,7 @@ void CLVideoDecoderOutput::downscale(const CLVideoDecoderOutput* src, CLVideoDec
     {
         dst->clean();
         dst->m_capacity = new_min_capacity;
-        dst->C1 = new unsigned char[dst->m_capacity];
+        dst->C1 = (unsigned char*) av_malloc(dst->m_capacity);
     }
 
     dst->C2 = dst->C1 + dst->stride1*dst->height;
