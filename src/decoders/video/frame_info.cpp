@@ -6,6 +6,8 @@
 // i am not sure about SSE syntax in 64-bit version, it is need testing. So, define is WIN32, not Q_OS_WIN
 #ifdef WIN32
 
+static const int ROUND_FACTOR = 32;
+
 #ifdef Q_CC_MSVC
 #define USED_U64(foo) static volatile const unsigned long long foo
 #elif __GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 3)
@@ -253,9 +255,17 @@ __loop1:
     } while ( y < height);
     __asm { emms }
 }
+#else
+static const int ROUND_FACTOR = 1;
 #endif
 
 #define q_abs(x) ((x) >= 0 ? (x) : (-x))
+
+static int roundUp(int value)
+{
+    return value / ROUND_FACTOR * ROUND_FACTOR + (value % ROUND_FACTOR ? ROUND_FACTOR : 0);
+}
+
 
 CLVideoDecoderOutput::CLVideoDecoderOutput():
 m_capacity(0),
@@ -304,7 +314,6 @@ void CLVideoDecoderOutput::copy(const CLVideoDecoderOutput* src, CLVideoDecoderO
         dst->C1 = (unsigned char*) av_malloc(dst->m_capacity);
         dst->C2 = dst->C1 + dst->stride1*dst->height;
         dst->C3 = dst->C2 + dst->stride2*yu_h;
-
     }
 
     int yu_h = dst->out_type == PIX_FMT_YUV420P ? dst->height/2 : dst->height;
@@ -339,11 +348,11 @@ void CLVideoDecoderOutput::downscale(const CLVideoDecoderOutput* src, CLVideoDec
     if ((src_width%mod_w) != 0)
         src_width = src_width/mod_w*mod_w;
 
-    dst->stride1 = src_width/factor;
-    dst->stride2 = src_width/chroma_h_factor/factor;
+    dst->stride1 = roundUp(src_width/factor);
+    dst->stride2 = dst->stride1 / chroma_h_factor;
     dst->stride3 = dst->stride2;
 
-    dst->width = dst->stride1;
+    dst->width = src_width/factor;
 
     dst->height = src_height/factor;
     dst->out_type = src->out_type;
@@ -396,9 +405,9 @@ void CLVideoDecoderOutput::downscale(const CLVideoDecoderOutput* src, CLVideoDec
 		cl_log.log("scale factor 2. sse time:", e1, cl_logALWAYS);
 		cl_log.log("-------------------------",  g, cl_logALWAYS);
 		*/
-		downscalePlate_factor2_sse(dst->C1, src_width/2,   src->C1, src_width, src->stride1, src_height);
-		downscalePlate_factor2_sse(dst->C2, src_width/chroma_h_factor/2, src->C2, src_width/chroma_h_factor, src->stride2, src_yu_h);
-		downscalePlate_factor2_sse(dst->C3, src_width/chroma_h_factor/2, src->C3, src_width/chroma_h_factor, src->stride3, src_yu_h);
+		downscalePlate_factor2_sse(dst->C1, dst->stride1,   src->C1, src_width, src->stride1, src_height);
+		downscalePlate_factor2_sse(dst->C2, dst->stride2, src->C2, src_width/chroma_h_factor, src->stride2, src_yu_h);
+		downscalePlate_factor2_sse(dst->C3, dst->stride3, src->C3, src_width/chroma_h_factor, src->stride3, src_yu_h);
 #else
         downscalePlate_factor2(dst->C1, src->C1, src_width, src->stride1, src_height);
         downscalePlate_factor2(dst->C2, src->C2, src_width/chroma_h_factor, src->stride2, src_yu_h);
@@ -408,9 +417,9 @@ void CLVideoDecoderOutput::downscale(const CLVideoDecoderOutput* src, CLVideoDec
     else if(factor == factor_4)
     {
 #ifdef WIN32
-        downscalePlate_factor4_sse(dst->C1, src_width/4, src->C1, src_width, src->stride1, src->height);
-        downscalePlate_factor4_sse(dst->C2, src_width/chroma_h_factor/4, src->C2, src_width/chroma_h_factor, src->stride2, src_yu_h);
-        downscalePlate_factor4_sse(dst->C3, src_width/chroma_h_factor/4, src->C3, src_width/chroma_h_factor, src->stride3, src_yu_h);
+        downscalePlate_factor4_sse(dst->C1, dst->stride1, src->C1, src_width, src->stride1, src->height);
+        downscalePlate_factor4_sse(dst->C2, dst->stride2, src->C2, src_width/chroma_h_factor, src->stride2, src_yu_h);
+        downscalePlate_factor4_sse(dst->C3, dst->stride3, src->C3, src_width/chroma_h_factor, src->stride3, src_yu_h);
 #else
         downscalePlate_factor4(dst->C1, src->C1, src_width, src->stride1, src->height);
         downscalePlate_factor4(dst->C2, src->C2, src_width/chroma_h_factor, src->stride2, src_yu_h);
@@ -420,9 +429,9 @@ void CLVideoDecoderOutput::downscale(const CLVideoDecoderOutput* src, CLVideoDec
     else if(factor == factor_8)
     {
 #ifdef WIN32
-        downscalePlate_factor8_sse(dst->C1, src_width/8, src->C1, src_width, src->stride1, src->height);
-        downscalePlate_factor8_sse(dst->C2, src_width/chroma_h_factor/8, src->C2, src_width/chroma_h_factor, src->stride2, src_yu_h);
-        downscalePlate_factor8_sse(dst->C3, src_width/chroma_h_factor/8, src->C3, src_width/chroma_h_factor, src->stride3, src_yu_h);
+        downscalePlate_factor8_sse(dst->C1, dst->stride1, src->C1, src_width, src->stride1, src->height);
+        downscalePlate_factor8_sse(dst->C2, dst->stride2, src->C2, src_width/chroma_h_factor, src->stride2, src_yu_h);
+        downscalePlate_factor8_sse(dst->C3, dst->stride3, src->C3, src_width/chroma_h_factor, src->stride3, src_yu_h);
 #else
         downscalePlate_factor8(dst->C1, src->C1, src_width, src->stride1, src->height);
         downscalePlate_factor8(dst->C2, src->C2, src_width/chroma_h_factor, src->stride2, src_yu_h);
