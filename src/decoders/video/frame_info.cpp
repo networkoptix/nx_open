@@ -200,8 +200,8 @@ void downscalePlate_factor8_sse(unsigned char * dst, const unsigned int dst_stri
             movq mm7, mmx_word_const_2 // round value
             movq mm6, mmx_00ffw
 __loop1:
-            PREFETCHNTA [esi + 64]
-            PREFETCHNTA [edx + 64]
+            //PREFETCHNTA [esi + 64]
+            //PREFETCHNTA [edx + 64]
 
             PINSRW mm0, [esi], 0
             PINSRW mm1, [esi+4], 0
