@@ -37,11 +37,10 @@ private:
     qint32 readPacket(quint8* buf, int size);
     qint32 writePacket(quint8* buf, int size);
     qint64 seek(qint64 offset, qint32 whence);
-    qint64 seekForcedSingleFile(qint64 offset, qint32 whence);
     bool openNextFile();
     qint64 setSingleFileMode(quint64 mksec);
+    qint64 seekToFile(qint64 offset);
 private:
-    qint64 m_position;              // total playback position (in bytes) throught all files
     QFile m_currentFile;            
     int m_currentFileIndex;
     int m_chapter;                  // dvd chapter number, -1 by default: play all chapters

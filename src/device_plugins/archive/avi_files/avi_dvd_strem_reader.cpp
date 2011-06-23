@@ -36,7 +36,6 @@ CLAVIDvdStreamReader::CLAVIDvdStreamReader(CLDevice* dev):
     m_ffmpegIOContext(0),
     m_chapter(-1),
     m_initialized(false),
-    m_position(0),
     m_currentFileIndex(0),
     m_totalSize(0),
     m_forceSingleFile(-1),
@@ -131,18 +130,20 @@ AVFormatContext* CLAVIDvdStreamReader::getFormatContext()
     }
     m_currentFileIndex = -1;
     m_initialized = true;
-    seek(0, SEEK_SET);
+    seekToFile(0);
     if (m_fileList.isEmpty())
         return 0;
     else 
         return m_fileList[0]->m_formatContext;
 }
 
-qint64 CLAVIDvdStreamReader::seekForcedSingleFile(qint64 offset, qint32 whence)
+qint64 CLAVIDvdStreamReader::seek(qint64 offset, qint32 whence)
 {
+    if (m_forceSingleFile == -1)
+        return -1;
     if (whence == AVSEEK_SIZE)
         return m_fileList[m_forceSingleFile]->m_formatContext->file_size;
-    qint64 offsetInFile = m_position;
+    qint64 offsetInFile = m_currentFile.pos();
     qint64 prevFileSize = 0;
     for (int i = 0; i < m_forceSingleFile; ++i)
         prevFileSize += m_fileList[i]->m_formatContext->file_size;
@@ -162,23 +163,12 @@ qint64 CLAVIDvdStreamReader::seekForcedSingleFile(qint64 offset, qint32 whence)
     if (!m_currentFile.seek(offsetInFile))
         return -1;
 
-    m_position = offsetInFile + prevFileSize;
-
     return offsetInFile;
 }
 
-qint64 CLAVIDvdStreamReader::seek(qint64 offset, qint32 whence)
+qint64 CLAVIDvdStreamReader::seekToFile(qint64 offset)
 {
-    if (m_forceSingleFile != -1)
-        return seekForcedSingleFile(offset, whence);
-    if (whence == AVSEEK_SIZE)
-        return m_totalSize;
-
     qint64 absoluteValue = offset; // SEEK_SET by default
-    if (whence == SEEK_CUR)
-        absoluteValue = m_position + offset;
-    else if (whence == SEEK_END)
-        absoluteValue = m_totalSize - offset;
     if (absoluteValue < 0)
         return -1; // seek failed
 
@@ -214,14 +204,12 @@ qint64 CLAVIDvdStreamReader::seek(qint64 offset, qint32 whence)
             return -1;
     }
 
-    m_position = absoluteValue;
     m_currentFileIndex = newFileIndex;
     return absoluteValue;
 }
 
 qint32 CLAVIDvdStreamReader::readPacket(quint8* buf, int size)
 {
-    //buildFileList();
     int rez = m_currentFile.read( (char*) buf, size);
     int totalRez = -1;
     while (rez >= 0 && rez < size && m_currentFileIndex < m_fileList.size()-1 && !m_inSeek)
@@ -250,7 +238,6 @@ qint32 CLAVIDvdStreamReader::readPacket(quint8* buf, int size)
 
 qint32 CLAVIDvdStreamReader::writePacket(quint8* buf, int size)
 {
-    //buildFileList();
     return 0; // not implemented
 }
 
@@ -269,7 +256,7 @@ qint64 CLAVIDvdStreamReader::setSingleFileMode(quint64 mksec)
     if (newFileIndex < m_fileList.size())
     {
         m_forceSingleFile = -1;
-        seek(newFileBytePosition, SEEK_SET); // switch to nesessary file
+        seekToFile(newFileBytePosition); // switch to nesessary file
         m_forceSingleFile = newFileIndex;
         m_formatContext = m_fileList[m_forceSingleFile]->m_formatContext;
         return mksec;
@@ -286,7 +273,6 @@ void CLAVIDvdStreamReader::channeljumpTo(quint64 mksec, int )
     quint64 relativeMksec = setSingleFileMode(mksec);
     if (relativeMksec == -1)
         return; // error seeking
-    //setSkipFramesToTime(skipFramesToTime() - (mksec - relativeMksec)); // change absolute value to relative value
 
     m_startMksec = m_fileList[m_forceSingleFile]->m_formatContext->start_time;
     if (m_startMksec != AV_NOPTS_VALUE)
@@ -334,7 +320,6 @@ void CLAVIDvdStreamReader::destroy()
 
     m_ffmpegIOContext = 0;
     m_initialized = false;
-    m_position = 0;
     m_currentFileIndex = 0;
     m_totalSize = 0;
     m_forceSingleFile = -1;
