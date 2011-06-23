@@ -4,7 +4,7 @@
 #include "device/device.h"
 
 extern QMutex global_ffmpeg_mutex;
-static const int IO_BLOCK_SIZE = 1024 * 128;
+static const int IO_BLOCK_SIZE = 1024 * 32;
 
 // FFMPEG static functions for IO context
 
@@ -46,6 +46,8 @@ CLAVIDvdStreamReader::CLAVIDvdStreamReader(CLDevice* dev):
 CLAVIDvdStreamReader::~CLAVIDvdStreamReader()
 {
     destroy();
+    if (m_ffmpegIOContext)
+        av_free(m_ffmpegIOContext);
     av_free(m_ioBuffer);
 }
 
@@ -82,7 +84,11 @@ AVFormatContext* CLAVIDvdStreamReader::getFormatContext()
     }
     QString sourceDir = m_device->getUniqueId();
     if (!sourceDir.toUpper().endsWith("VIDEO_TS"))
-        sourceDir += QDir::separator() + QString("VIDEO_TS");
+    {
+        if (!sourceDir.endsWith('/') && !sourceDir.endsWith('\\'))
+            sourceDir += QDir::separator();
+        sourceDir += QString("VIDEO_TS");
+    }
     QDir dvdDir = QDir(sourceDir);
     if (!dvdDir.exists())
         return false;
@@ -266,12 +272,18 @@ void CLAVIDvdStreamReader::destroy()
     foreach(CLFileInfo* fi, m_fileList)
     {
         fi->m_formatContext->pb = fi->m_orig_pb;
-        av_close_input_file(fi->m_formatContext);
+        if (fi->m_formatContext)
+            av_close_input_file(fi->m_formatContext);
         delete fi;
     }
-    av_free(m_ffmpegIOContext);
-    m_ffmpegIOContext = 0;
 
+    /*
+    if (m_ffmpegIOContext)
+    {
+        av_free(m_ffmpegIOContext);
+        m_ffmpegIOContext = 0;
+    }
+    */
 
     m_initialized = false;
     m_currentFileIndex = -1;
