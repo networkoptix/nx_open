@@ -19,7 +19,11 @@ bool CLAviDvdDevice::isAcceptedUrl(const QString& url)
 {
     QString sourceDir = url;
     if (!sourceDir.toUpper().endsWith("VIDEO_TS"))
-        sourceDir += QDir::separator() + QString("VIDEO_TS");
+    {
+        if (!sourceDir.endsWith('/') && !sourceDir.endsWith('\\'))
+            sourceDir += QDir::separator();
+        sourceDir += QString("VIDEO_TS");
+    }
     QDir dvdDir = QDir(sourceDir);
     if (!dvdDir.exists())
         return false;
