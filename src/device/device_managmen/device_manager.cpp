@@ -5,6 +5,8 @@
 #include "device_plugins/archive/archive/archive_device.h"
 #include "util.h"
 #include "device_plugins/archive/avi_files/avi_device.h"
+#include "device_plugins/archive/avi_files/avi_dvd_device.h"
+#include "device_plugins/archive/avi_files/avi_bluray_device.h"
 #include "../file_device.h"
 #include "device_plugins/archive/filetypesupport.h"
 
@@ -403,6 +405,14 @@ void CLDeviceManager::addFiles(const QStringList& files)
         if (fileTypeSupport.isImageFileExt(xfile))
         {
             dev = new CLFileDevice(xfile);
+        }
+        else if (CLAviDvdDevice::isAcceptedUrl(xfile))
+        {
+            dev = new CLAviDvdDevice(xfile);
+        }
+        else if (CLAviBluRayDevice::isAcceptedUrl(xfile))
+        {
+            dev = new CLAviBluRayDevice(xfile);
         }
         else if (fileTypeSupport.isMovieFileExt(xfile))
         {

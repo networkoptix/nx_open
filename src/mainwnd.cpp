@@ -6,6 +6,9 @@
 #include "device/directory_browser.h"
 #include "device_plugins/archive/filetypesupport.h"
 
+#include "device_plugins/archive/avi_files/avi_dvd_device.h"
+#include "device_plugins/archive/avi_files/avi_bluray_device.h"
+
 extern QString button_layout;
 extern QString button_home;
 
@@ -156,18 +159,28 @@ void MainWnd::dropEvent(QDropEvent *event)
     {
         QString filename = url.toLocalFile();
         QFileInfo fileInfo(filename);
-
         if (fileInfo.isDir())
         {
-            QDirIterator iter(filename, QDirIterator::Subdirectories);
-            while (iter.hasNext())
+            if (CLAviDvdDevice::isAcceptedUrl(fileInfo.absoluteFilePath()))
             {
-                QString nextFilename = iter.next();
-                if (QFileInfo(nextFilename).isFile())
+                files.append(filename);
+            }
+            else if (CLAviBluRayDevice::isAcceptedUrl(fileInfo.absoluteFilePath()))
+            {
+                files.append(filename);
+            }
+            else 
+            {
+                QDirIterator iter(filename, QDirIterator::Subdirectories);
+                while (iter.hasNext())
                 {
-                    if (fileTypeSupport.isFileSupported(nextFilename))
+                    QString nextFilename = iter.next();
+                    if (QFileInfo(nextFilename).isFile())
                     {
-                        files.append(nextFilename);
+                        if (fileTypeSupport.isFileSupported(nextFilename))
+                        {
+                            files.append(nextFilename);
+                        }
                     }
                 }
             }

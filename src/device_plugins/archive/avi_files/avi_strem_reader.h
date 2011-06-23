@@ -19,11 +19,15 @@ protected:
 	virtual CLAbstractMediaData* getNextData();
 	virtual void channeljumpTo(quint64 mksec, int channel);
 
-	bool init();
-	void destroy();
+	virtual bool init();
+	virtual void destroy();
 
 	void smartSleep(quint64 mksec);
+    virtual ByteIOContext* getIOContext();
 
+    virtual qint64 packetTimestamp(AVStream* stream, const AVPacket& packet);
+    virtual AVFormatContext* getFormatContext() { return 0; }
+    bool initCodecs();
 protected:
 	qint64 m_currentTime;
 	qint64 m_previousTime;
@@ -49,7 +53,7 @@ private:
     AVPacket m_packets[2];
     int m_currentPacketIndex;
     bool m_haveSavedPacket;
-
+    static QMutex avi_mutex;
 private:
     /**
       * Read next packet from file

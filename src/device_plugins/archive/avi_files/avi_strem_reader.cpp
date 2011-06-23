@@ -5,9 +5,11 @@
 #include "data/mediadata.h"
 #include "stdint.h"
 
-QMutex avi_mutex;
+QMutex CLAVIStreamReader::avi_mutex;
+extern QMutex global_ffmpeg_mutex;
+static const int FFMPEG_PROBE_BUFFER_SIZE = 1024 * 512;
 
-static qint64 packetTimestamp(AVStream* stream, const AVPacket& packet)
+qint64 CLAVIStreamReader::packetTimestamp(AVStream* stream, const AVPacket& packet)
 {
 	double timeBase = av_q2d(stream->time_base);
 	qint64 firstDts = (stream->first_dts == AV_NOPTS_VALUE) ? 0 : stream->first_dts;
@@ -15,8 +17,6 @@ static qint64 packetTimestamp(AVStream* stream, const AVPacket& packet)
 
 	return qint64(1e+6 * ttm);
 }
-
-extern QMutex global_ffmpeg_mutex;
 
 CLAVIStreamReader::CLAVIStreamReader(CLDevice* dev )
     : CLAbstractArchiveReader(dev),
@@ -72,6 +72,11 @@ quint64 CLAVIStreamReader::currentTime() const
 	return m_currentTime;
 }
 
+ByteIOContext* CLAVIStreamReader::getIOContext() 
+{
+    return 0;
+}
+
 bool CLAVIStreamReader::init()
 {
 	static bool firstInstance = true;
@@ -94,59 +99,122 @@ bool CLAVIStreamReader::init()
 	m_currentTime = 0;
 	m_previousTime = -1;
 	m_needToSleep = 0;
+    m_lengthMksec = 0;
 
-    QString url = "ufile:" + m_device->getUniqueId();
-    int err = av_open_input_file(&m_formatContext, url.toUtf8().constData(), NULL, 0, NULL);
-	if (err < 0)
-	{
-		destroy();
-		return false; 
-	}
 
-	{
-		QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
+    m_formatContext = getFormatContext();
+    /*
+    ByteIOContext* ioContext = getIOContext();
+    int err;
+    if (!ioContext)
+    {
+        QString url = "ufile:" + m_device->getUniqueId();
+        err = av_open_input_file(&m_formatContext, url.toUtf8().constData(), NULL, 0, NULL);
+    }
+    else 
+    {
+        AVProbeData probeData;
+        probeData.filename = "";
+        probeData.buf = new unsigned char[FFMPEG_PROBE_BUFFER_SIZE];
+        probeData.buf_size = ioContext->read_packet(ioContext->opaque, probeData.buf, FFMPEG_PROBE_BUFFER_SIZE);
+        if (probeData.buf_size > 0)
+        {
+            ioContext->seek(ioContext->opaque, 0, SEEK_SET);
+            AVInputFormat* inCtx = av_probe_input_format(&probeData, 1);
+            delete [] probeData.buf;
+            err = av_open_input_stream(&m_formatContext, ioContext, "", inCtx, 0 );
+        }
+        else
+            err = -1;
+    }
+    */
+    if (!m_formatContext)
+    {
+        QString url = "ufile:" + m_device->getUniqueId();
+        int err = av_open_input_file(&m_formatContext, url.toUtf8().constData(), NULL, 0, NULL);
+        if (err < 0)
+        {
+            destroy();
+            return false; 
+        }
 
-		err = av_find_stream_info(m_formatContext);
-		if (err < 0)
-		{
-			destroy();
-			return false;
-		}
-	}
+        {
+            QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
 
-	m_lengthMksec = m_formatContext->duration;
+            err = av_find_stream_info(m_formatContext);
+            if (err < 0)
+            {
+                destroy();
+                return false;
+            }
+        }
+    }
+    else 
+    {
+        /*
+        ByteIOContext* ioContext = m_formatContext->pb;
+        AVProbeData probeData;
+        probeData.filename = "";
+        probeData.buf = new unsigned char[FFMPEG_PROBE_BUFFER_SIZE];
+        probeData.buf_size = ioContext->read_packet(ioContext->opaque, probeData.buf, FFMPEG_PROBE_BUFFER_SIZE);
+        if (probeData.buf_size > 0)
+        {
+            ioContext->seek(ioContext->opaque, 0, SEEK_SET);
+            AVInputFormat* inCtx = av_probe_input_format(&probeData, 1);
+            delete [] probeData.buf;
+            err = av_open_input_stream(&m_formatContext, ioContext, "", inCtx, 0 );
+        }
+        else
+            err = -1;
+        */
+    }
+
+    if (m_lengthMksec == 0)
+	    m_lengthMksec = m_formatContext->duration; // it is not filled during opening context
 
     if (m_formatContext->start_time != AV_NOPTS_VALUE)
         m_startMksec = m_formatContext->start_time;
+    
+    if (!initCodecs())
+        return false;
 
-	for(unsigned i = 0; i < m_formatContext->nb_streams; i++) 
-	{
-		AVStream *strm= m_formatContext->streams[i];
-		AVCodecContext *codecContext = strm->codec;
+    // Alloc common resources
+    av_init_packet(&m_packets[0]);
+    av_init_packet(&m_packets[1]);
 
-		if(codecContext->codec_type >= (unsigned)AVMEDIA_TYPE_NB)
-			continue;
+	return true;
+}
 
-		switch(codecContext->codec_type) 
-		{
-		case AVMEDIA_TYPE_VIDEO:
-			if (m_videoStreamIndex == -1) // Take only first video stream
-				m_videoStreamIndex = i;
-			break;
+bool CLAVIStreamReader::initCodecs()
+{
+    for(unsigned i = 0; i < m_formatContext->nb_streams; i++) 
+    {
+        AVStream *strm= m_formatContext->streams[i];
+        AVCodecContext *codecContext = strm->codec;
 
-		case AVMEDIA_TYPE_AUDIO:
-			if (m_audioStreamIndex == -1) // Take only first audio stream
-				m_audioStreamIndex = i;
-			break;
+        if(codecContext->codec_type >= (unsigned)AVMEDIA_TYPE_NB)
+            continue;
 
-		default:
-			break;
-		}
-	}
+        switch(codecContext->codec_type) 
+        {
+        case AVMEDIA_TYPE_VIDEO:
+            if (m_videoStreamIndex == -1) // Take only first video stream
+                m_videoStreamIndex = i;
+            break;
+
+        case AVMEDIA_TYPE_AUDIO:
+            if (m_audioStreamIndex == -1) // Take only first audio stream
+                m_audioStreamIndex = i;
+            break;
+
+        default:
+            break;
+        }
+    }
 
     if (m_videoStreamIndex != -1)
     {
-	    CodecID ffmpeg_video_codec_id = m_formatContext->streams[m_videoStreamIndex]->codec->codec_id;
+        CodecID ffmpeg_video_codec_id = m_formatContext->streams[m_videoStreamIndex]->codec->codec_id;
 
         if (ffmpeg_video_codec_id != CODEC_ID_NONE)
         {
@@ -160,23 +228,18 @@ bool CLAVIStreamReader::init()
 
     }
 
-	if (m_audioStreamIndex!=-1)
-	{
+    if (m_audioStreamIndex!=-1)
+    {
 
-		AVCodecContext *aCodecCtx = m_formatContext->streams[m_audioStreamIndex]->codec;
-		CodecID ffmpeg_audio_codec_id = aCodecCtx->codec_id;
-		m_freq = aCodecCtx->sample_rate;
-		m_channels = aCodecCtx->channels;
+        AVCodecContext *aCodecCtx = m_formatContext->streams[m_audioStreamIndex]->codec;
+        CodecID ffmpeg_audio_codec_id = aCodecCtx->codec_id;
+        m_freq = aCodecCtx->sample_rate;
+        m_channels = aCodecCtx->channels;
 
         m_audioCodecId = ffmpeg_audio_codec_id;
 
-	}
-
-    // Alloc common resources
-    av_init_packet(&m_packets[0]);
-    av_init_packet(&m_packets[1]);
-
-	return true;
+    }
+    return true;
 }
 
 CLCompressedVideoData* CLAVIStreamReader::getVideoData(const AVPacket& packet, AVCodecContext* codecContext)
@@ -376,7 +439,10 @@ void CLAVIStreamReader::destroy()
 {
 	if (m_formatContext) // crashes without condition 
     {
-		av_close_input_file(m_formatContext);
+        if (getIOContext())
+            av_close_input_stream(m_formatContext);
+        else
+            av_close_input_file(m_formatContext);
         m_formatContext = 0;
     }
 
@@ -390,9 +456,11 @@ bool CLAVIStreamReader::getNextPacket(AVPacket& packet)
 		int err = av_read_frame(m_formatContext, &packet);
 		if (err < 0)
 		{
+            
 			destroy();
-			init();
-
+			if (!init())
+                return false;
+            
 			err = av_read_frame(m_formatContext, &packet);
 			if (err < 0)
 				return false;

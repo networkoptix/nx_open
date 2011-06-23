@@ -1,0 +1,42 @@
+#include "avi_dvd_device.h"
+#include "avi_dvd_strem_reader.h"
+
+CLAviDvdDevice::CLAviDvdDevice(const QString& file):
+    CLAviDevice(file)
+{
+}
+
+CLAviDvdDevice::~CLAviDvdDevice()
+{
+}
+
+CLStreamreader* CLAviDvdDevice::getDeviceStreamConnection()
+{
+    return new CLAVIDvdStreamReader(this);
+}
+
+bool CLAviDvdDevice::isAcceptedUrl(const QString& url)
+{
+    QString sourceDir = url;
+    if (!sourceDir.toUpper().endsWith("VIDEO_TS"))
+        sourceDir += QDir::separator() + QString("VIDEO_TS");
+    QDir dvdDir = QDir(sourceDir);
+    if (!dvdDir.exists())
+        return false;
+    QFileInfoList tmpFileList = dvdDir.entryInfoList();
+    
+    bool videoTsFound = false;
+    bool validNameFound = false;
+    bool vobFound = false;
+    bool ifoFound = false;
+
+    foreach(QFileInfo fi, tmpFileList)
+    {
+        QString name = fi.baseName().toUpper();
+        videoTsFound |= name == "VIDEO_TS";
+        validNameFound |= name.startsWith("VTS_") && name.count('_') == 2;
+        vobFound |= fi.suffix().toUpper() == "VOB";
+        ifoFound |= fi.suffix().toUpper() == "IFO";
+    }
+    return videoTsFound && validNameFound && vobFound && ifoFound;
+}
