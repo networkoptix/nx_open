@@ -14,7 +14,7 @@ public:
 public slots:
         void stopAnimation();
 protected:
-    void changeOpacity(qreal new_opacity, int duration_ms);
+    virtual void changeOpacity(qreal new_opacity, int duration_ms);
 protected:
 
 	QPropertyAnimation* m_animation;

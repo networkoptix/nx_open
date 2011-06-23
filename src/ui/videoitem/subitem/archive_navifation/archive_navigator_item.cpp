@@ -100,9 +100,11 @@ void CLArchiveNavigatorItem::hideIfNeeded(int duration)
     }
 }
 
+
 bool CLArchiveNavigatorItem::isCursorOnSlider() const
 {
-    return isUnderMouse();
+    //return isUnderMouse();
+    return m_underMouse; //qt bug 18797 When setting the flag ItemIgnoresTransformations for an item, it will receive mouse events as if it was transformed by the view.
 }
 
 void CLArchiveNavigatorItem::goToFullScreenMode(bool fullscreen)
@@ -152,6 +154,7 @@ void CLArchiveNavigatorItem::goToFullScreenMode(bool fullscreen)
 
 	onResize();
 }
+
 
 void CLArchiveNavigatorItem::resizeSlider()
 {

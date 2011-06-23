@@ -25,6 +25,7 @@
 #include "util.h"
 #include "device_plugins/archive/archive/archive_stream_reader.h"
 #include "device_plugins/archive/archive/archive_device.h"
+#include "videoitem/unmoved/multipage/page_selector.h"
 
 
 extern int  SLOT_WIDTH;
@@ -85,9 +86,11 @@ mShow(this),
 m_gridItem(0),
 mSteadyShow(this),
 mWheelZooming(false),
-mMenuIsHere(false)
+m_menuIsHere(false),
+m_pageSelector(0),
+m_lastPressedItem(0)
 {
-    mTimeAfterDoubleClick.restart();
+    m_timeAfterDoubleClick.restart();
 
 	setScene(&m_scene);
 
@@ -236,6 +239,11 @@ void GraphicsView::closeAllDlg()
 SceneLayout& GraphicsView::getCamLayOut()
 {
 	return m_camLayout;
+}
+
+QnPageSelector* GraphicsView::getPageSelector() const
+{
+    return m_pageSelector;
 }
 
 void GraphicsView::setRealSceneRect(QRect rect)
@@ -474,6 +482,7 @@ void GraphicsView::initDecoration()
 	bool square_layout = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::SquareLayout);
 	bool long_layout = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::LongLayout);
     bool sigle_line_layout = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::SingleLineLayout);
+    bool multiPageSelector = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::MultiPageSelection);
 
 	removeAllStaticItems();
 
@@ -501,7 +510,7 @@ void GraphicsView::initDecoration()
 	if (cont->checkDecorationFlag(LayoutContent::BackGroundLogo))
 	{
         
-		item = new CLUnMovedPixture("background", 0, 0.03, 0.03, ":/skin/startscreen/no_logo_bkg.png", viewport()->width(), viewport()->height(), -100);
+		item = new CLUnMovedPixture("background", 0, 0.05, 0.05, ":/skin/startscreen/no_logo_bkg.png", viewport()->width(), viewport()->height(), -100);
         //item = new CLUnMovedPixture("background", 0, 0.03, 0.03, ":/skin/logo", viewport()->width(), viewport()->height(), -100);
 		item->setStaticPos(QPoint(1,1));
 		addStaticItem(item);
@@ -555,6 +564,14 @@ void GraphicsView::initDecoration()
 		m_seachItem = 0;
 	}
 
+
+    if (multiPageSelector)
+    {
+        m_pageSelector = new QnPageSelector("page_selector", 0, 0.5, 1.0);
+        addStaticItem(m_pageSelector, false);
+        connect(m_pageSelector, SIGNAL(onNewPageSlected(int)), &m_camLayout, SLOT(onNewPageSelected(int)) );
+    }
+
 	updateDecorations();
 }
 
@@ -590,6 +607,10 @@ void GraphicsView::removeStaticItem(CLAbstractUnmovedItem* item)
 
 void GraphicsView::removeAllStaticItems()
 {
+
+    if (m_pageSelector)
+        disconnect(m_pageSelector, SIGNAL(onNewPageSlected(int)), &m_camLayout, SLOT(onNewPageSelected(int)) );
+
 	foreach(CLAbstractUnmovedItem* item, m_staticItems)
 	{
 		scene()->removeItem(item);
@@ -598,6 +619,7 @@ void GraphicsView::removeAllStaticItems()
 	}
 
 	m_staticItems.clear();
+    m_pageSelector = 0;
 }
 
 void GraphicsView::stopAnimation()
@@ -620,7 +642,7 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 	if (!mViewStarted)
 		return;
 
-    if (mTimeAfterDoubleClick.elapsed() < doubl_clk_delay)
+    if (m_timeAfterDoubleClick.elapsed() < doubl_clk_delay)
         return; // ignore some accident mouse click accidents after double click
 
     m_ignore_release_event = false;
@@ -638,6 +660,8 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 
 	QGraphicsItem *item = itemAt(event->pos());
 	CLAbstractSceneItem* aitem = navigationItem(item);
+
+    m_lastPressedItem = aitem;
 
 	if (item && item->parentItem() && !aitem) // item has non navigational parent 
 	{
@@ -892,7 +916,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 	if (!mViewStarted)
 		return;
 
-    if (mTimeAfterDoubleClick.elapsed() < doubl_clk_delay)
+    if (m_timeAfterDoubleClick.elapsed() < doubl_clk_delay)
         return; // ignore some accident mouse click accidents after double click
 
 
@@ -910,7 +934,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 	QGraphicsItem *item = itemAt(event->pos());
 	CLAbstractSceneItem* aitem = navigationItem(item);
 
-	if (item && item->parentItem() && !aitem) // item has non navigational parent 
+	if ((item && item->parentItem() && !aitem) || (aitem!=m_lastPressedItem)) // item has non navigational parent 
 	{
 		QGraphicsView::mouseReleaseEvent(event);
 		return;
@@ -1317,9 +1341,9 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
 	}
 
-    mMenuIsHere = true;
+    m_menuIsHere = true;
 	QAction* act = menu.exec(QCursor::pos());
-    mMenuIsHere = false;
+    m_menuIsHere = false;
 
 	//=========results===============================
 
@@ -1394,7 +1418,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
                 {
                     QList<CLAbstractSubItemContainer*> itemlst;
                     itemlst.push_back(recorded->getSceneItem());
-                    m_camLayout.removeItems(itemlst);
+                    m_camLayout.removeItems(itemlst, true);
                 }
 
 				cam->startRecording();
@@ -1452,7 +1476,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
         {
             QList<CLAbstractSubItemContainer*> lst;
             lst.push_back(aitem);
-            m_camLayout.removeItems(lst);
+            m_camLayout.removeItems(lst, true);
         }
 
 	}
@@ -1469,7 +1493,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
                 lst.push_back(aitemc);
             }
             
-            m_camLayout.removeItems(lst);
+            m_camLayout.removeItems(lst, true);
         }
 
         
@@ -1501,7 +1525,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
                     {
                         QList<CLAbstractSubItemContainer*> itemlst;
                         itemlst.push_back(recorded->getSceneItem());
-                        m_camLayout.removeItems(itemlst);
+                        m_camLayout.removeItems(itemlst, true);
                     }
 
                     cam->startRecording();
@@ -1530,7 +1554,7 @@ void GraphicsView::mouseDoubleClickEvent( QMouseEvent * event )
 	if (!mViewStarted)
 		return;
 
-    mTimeAfterDoubleClick.restart();
+    m_timeAfterDoubleClick.restart();
 
 	QGraphicsItem *item = itemAt(event->pos());
 	CLAbstractSceneItem* aitem = navigationItem(item);
@@ -1690,7 +1714,20 @@ void GraphicsView::goToSteadyMode(bool steady)
 
     if (steady)
     {
-        if (m_seachItem && m_seachItem->hasFocus() || mMenuIsHere)
+
+        foreach(CLAbstractUnmovedItem* item, m_staticItems)
+        {
+
+            if (item != bk_item && item->preferNonSteadyMode())
+            {
+                onUserInput(false, false);
+                return;
+            }
+                
+        }
+
+
+        if ((m_seachItem && m_seachItem->hasFocus()) || m_menuIsHere)
         {
             onUserInput(false, false);
             return;
@@ -1789,7 +1826,6 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 	{
 		case Qt::Key_S:
 			global_show_item_text=!global_show_item_text;
-			//removeAllStaticItems();
 			break;
 
 		case Qt::Key_Q:
@@ -2067,6 +2103,18 @@ CLAbstractUnmovedItem* GraphicsView::staticItemByName(QString name) const
 	return 0;
 }
 
+void GraphicsView::updatePageSelector()
+{
+    if (m_pageSelector)
+    {
+        int viewPoertWidth = viewport()->width();
+        int itemWidth = m_pageSelector->boundingRect().width();
+        int itemHeight = m_pageSelector->boundingRect().height();
+
+        m_pageSelector->setStaticPos(QPoint( (viewPoertWidth -  itemWidth) / 2 , viewport()->height() - itemHeight - 15 ));
+    }
+}
+
 void GraphicsView::updateDecorations()
 {
 	CLUnMovedPixture* item = static_cast<CLUnMovedPixture*>(staticItemByName("background"));
@@ -2094,6 +2142,7 @@ void GraphicsView::updateDecorations()
     if (item)
         item->setStaticPos(QPoint(viewport()->width() - 1.1*decoration_size,0));
 
+    updatePageSelector();
 
 	if (m_seachItem)
 	{
@@ -2707,6 +2756,7 @@ void GraphicsView::contextMenuHelper_viewRecordedVideo(CLVideoCamera* cam)
     QString id = getTempRecordingDir() + cam->getDevice()->getUniqueId();
 
 	m_camLayout.addDevice(id, true);
+    m_camLayout.getContent()->addDevice(id);
 	fitInView(600, 100, SLOW_START_SLOW_END);
 }
 
