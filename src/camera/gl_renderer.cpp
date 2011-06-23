@@ -328,7 +328,7 @@ void CLGLRenderer::init(bool msgbox)
 		error = true;
 	}
 
-	//isSoftYuv2Rgb = true;
+	isSoftYuv2Rgb = true;
 
 	if (error) 
 	{
@@ -500,6 +500,12 @@ void CLGLRenderer::setOpacity(qreal opacity)
     m_painterOpacity = opacity;
 }
 
+int roundUp(int value)
+{
+    static const int ROUND_COEFF = 8;
+    return value % ROUND_COEFF ? (value + ROUND_COEFF - (value % ROUND_COEFF)) : value;
+}
+
 void CLGLRenderer::updateTexture()
 {
 	//image.saveToFile("test.yuv");
@@ -517,10 +523,11 @@ void CLGLRenderer::updateTexture()
 		w[1] = w[2] = m_stride;
 		r_w[1] = r_w[2] = m_width;
 	}
+    int round_width[3] = {roundUp(w[0]), roundUp(w[1]), roundUp(w[2])};
+    //int round_width[3] = {roundUp(r_w[0]), roundUp(r_w[1]), roundUp(r_w[2])};
 
 	glEnable(GL_TEXTURE_2D);
 	OGL_CHECK_ERROR("glEnable");
-
 	if (!isSoftYuv2Rgb) 
 	{
 			for (int i = 0; i < 3; ++i) 
@@ -532,8 +539,8 @@ void CLGLRenderer::updateTexture()
 				{
 					// if support "GL_ARB_texture_non_power_of_two", use default size of texture,
 					// else nearest power of two
-					const int wPow = isNonPower2 ? w[i] : getMinPow2(w[i]);
-					const int hPow = isNonPower2 ? h[i] : getMinPow2(h[i]);
+					int wPow = isNonPower2 ? round_width[i] : getMinPow2(w[i]);
+					int hPow = isNonPower2 ? h[i] : getMinPow2(h[i]);
 					// support GL_ARB_texture_non_power_of_two ?
 
 					m_videoCoeffL[i] = 0;
@@ -551,7 +558,8 @@ void CLGLRenderer::updateTexture()
 				glPixelStorei(GL_UNPACK_ROW_LENGTH, w[i]);
 				glTexSubImage2D(GL_TEXTURE_2D, 0,
 					0, 0,
-                    w[i],
+                    //round_width[i],
+                    roundUp(r_w[i]),
                     h[i],
 					GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels);
 				OGL_CHECK_ERROR("glTexSubImage2D");
@@ -566,7 +574,7 @@ void CLGLRenderer::updateTexture()
 	{
 		    glBindTexture(GL_TEXTURE_2D, m_texture[0]);
 
-			const int wPow = isNonPower2 ? w[0] : getMinPow2(w[0]);
+			const int wPow = isNonPower2 ? round_width[0] : getMinPow2(w[0]);
 			const int hPow = isNonPower2 ? h[0] : getMinPow2(h[0]);
 
 
@@ -575,7 +583,7 @@ void CLGLRenderer::updateTexture()
 				// if support "GL_ARB_texture_non_power_of_two", use default size of texture,
 				// else nearest power of two
 
-				const int wPow = isNonPower2 ? w[0] : getMinPow2(w[0]);
+				const int wPow = isNonPower2 ? round_width[0] : getMinPow2(w[0]);
 				const int hPow = isNonPower2 ? h[0] : getMinPow2(h[0]);
 				// support GL_ARB_texture_non_power_of_two ?
 				m_videoCoeffL[0] = 0;
@@ -608,20 +616,20 @@ void CLGLRenderer::updateTexture()
 		if (m_color == PIX_FMT_YUV422P)
 		{
 			yuv422_argb32_mmx(pixels, m_arrayPixels[0], m_arrayPixels[2], m_arrayPixels[1], 
-										w[0], h[0], 
+										round_width[0], h[0], 
 										4 * m_stride, 
 										m_stride, m_stride / 2);
 		}
 		else if (m_color == PIX_FMT_YUV420P)
 		{
 			yuv420_argb32_mmx(pixels, m_arrayPixels[0], m_arrayPixels[2], m_arrayPixels[1], 
-										w[0], h[0], 
+										round_width[0], h[0], 
 										4 * m_stride, 
 										m_stride, m_stride / 2);
 		}
 		else if (m_color == PIX_FMT_YUV444P){
 			yuv444_argb32_mmx(pixels, m_arrayPixels[0], m_arrayPixels[2], m_arrayPixels[1], 
-										w[0], h[0], 
+										round_width[0], h[0], 
 										4 * m_stride, 
 										m_stride, m_stride);
 		}
@@ -630,7 +638,9 @@ void CLGLRenderer::updateTexture()
 		OGL_CHECK_ERROR("glPixelStorei");
 		glTexSubImage2D(GL_TEXTURE_2D, 0,
 			0, 0,
-			w[0], h[0],
+			//round_width[0], 
+            roundUp(r_w[0]),
+            h[0],
 			GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 		OGL_CHECK_ERROR("glTexSubImage2D");
 		glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
