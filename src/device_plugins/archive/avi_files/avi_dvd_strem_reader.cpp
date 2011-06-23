@@ -46,6 +46,7 @@ CLAVIDvdStreamReader::CLAVIDvdStreamReader(CLDevice* dev):
 CLAVIDvdStreamReader::~CLAVIDvdStreamReader()
 {
     destroy();
+    av_free(m_ioBuffer);
 }
 
 ByteIOContext* CLAVIDvdStreamReader::getIOContext() 
@@ -261,15 +262,17 @@ qint64 CLAVIDvdStreamReader::packetTimestamp(AVStream* stream, const AVPacket& p
 
 void CLAVIDvdStreamReader::destroy()
 {
+    
     foreach(CLFileInfo* fi, m_fileList)
     {
         fi->m_formatContext->pb = fi->m_orig_pb;
         av_close_input_file(fi->m_formatContext);
         delete fi;
     }
-    av_free(m_ioBuffer);
-
+    av_free(m_ffmpegIOContext);
     m_ffmpegIOContext = 0;
+
+
     m_initialized = false;
     m_currentFileIndex = -1;
     m_formatContext = 0;
