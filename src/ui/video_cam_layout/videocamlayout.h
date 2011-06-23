@@ -35,7 +35,7 @@ public:
 	bool isContentChanged() const;
 	void setContentChanged(bool changed);
 
-    void saveLayoutContent();
+    
 
 	//================================================
 
@@ -75,10 +75,10 @@ public:
 
 	//========================================================
 	void loadContent();
-	void saveContent();
+    void saveLayoutContent();
 	//========================================================
 
-    void removeItems(QList<CLAbstractSubItemContainer*> itemlst);
+    void removeItems(QList<CLAbstractSubItemContainer*> itemlst, bool removeFromLayoutcontent);
 
 signals:
 	void stoped(LayoutContent* l);
@@ -86,7 +86,11 @@ signals:
 	void onNewLayoutSelected(LayoutContent* curr, LayoutContent* newl);
 	void onNewLayoutItemSelected(LayoutContent* newl);
     void reachedTheEnd();
+
+    
 protected slots:
+
+    void onNewPageSelected(int page); 
 
 	void onItemPressed(CLAbstractSceneItem* item);
 	void onItemDoubleClick(CLAbstractSceneItem* item);
@@ -99,7 +103,7 @@ protected slots:
 	void onTimer();
 	void onVideoTimer();
 
-	void onItemClose(CLAbstractSubItemContainer* item, bool addToremovedLst = true);
+	void onItemClose(CLAbstractSubItemContainer* item, bool addToremovedLst = true, bool removeFromLayoutcontent = true);
 
 	void stop_helper(bool emt = true);
 private:
@@ -110,7 +114,7 @@ private:
 	bool addDevice(CLDevice* dev, bool update_scene_rect, CLBasicLayoutItemSettings itemSettings = CLBasicLayoutItemSettings());
 
 	// removes devices;
-	bool removeDevices( QList<CLAbstractComplicatedItem*> lst); 
+	bool removeDevices( QList<CLAbstractComplicatedItem*> lst, bool removeFromLayoutcontent ); 
 
 	//================================================
 private:

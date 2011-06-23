@@ -10,16 +10,38 @@ CLSceneLayoutManager::CLSceneLayoutManager():
 mRecordersAndLayouts(0)
 {
 	mAllCustomLayouts = new LayoutContent();
-	mAllCustomLayouts->addDecorationFlag(LayoutContent::HomeButton | LayoutContent::BackGroundLogo | LayoutContent::MagnifyingGlass | LayoutContent::SquareLayout | LayoutContent::LongLayout | LayoutContent::SingleLineLayout);
+	mAllCustomLayouts->addDecorationFlag(
+        LayoutContent::HomeButton | 
+        LayoutContent::BackGroundLogo | 
+        LayoutContent::MagnifyingGlass | 
+        LayoutContent::SquareLayout | 
+        LayoutContent::LongLayout | 
+        LayoutContent::SingleLineLayout |
+        LayoutContent::MultiPageSelection );
+
 	mAllCustomLayouts->setEditable(true);
 	load();
 
 	mAllRecorders = new LayoutContent();
-	mAllRecorders->addDecorationFlag(LayoutContent::HomeButton | LayoutContent::BackGroundLogo | LayoutContent::MagnifyingGlass | LayoutContent::SquareLayout | LayoutContent::LongLayout | LayoutContent::SingleLineLayout);
+	mAllRecorders->addDecorationFlag(
+        LayoutContent::HomeButton | 
+        LayoutContent::BackGroundLogo | 
+        LayoutContent::MagnifyingGlass | 
+        LayoutContent::SquareLayout | 
+        LayoutContent::LongLayout | 
+        LayoutContent::SingleLineLayout |
+        LayoutContent::MultiPageSelection);
 
 	mEmptyLayout = getNewEmptyLayoutContent();
 
-	mSearchLayout = getNewEmptyLayoutContent(LayoutContent::HomeButton | LayoutContent::BackGroundLogo | LayoutContent::SquareLayout | LayoutContent::LongLayout | LayoutContent::SingleLineLayout );
+	mSearchLayout = getNewEmptyLayoutContent(
+        LayoutContent::HomeButton | 
+        LayoutContent::BackGroundLogo | 
+        LayoutContent::SquareLayout | 
+        LayoutContent::LongLayout | 
+        LayoutContent::SingleLineLayout |
+        LayoutContent::MultiPageSelection);
+
 	mSearchLayout->removeDecorationFlag(LayoutContent::MagnifyingGlass);
 	mSearchLayout->addDecorationFlag(LayoutContent::SearchEdit);
 
@@ -227,7 +249,14 @@ LayoutContent* CLSceneLayoutManager::generateAllRecordersAndLayouts()
 LayoutContent* CLSceneLayoutManager::getNewEmptyLayoutContent(unsigned int flags )
 {
 	LayoutContent* cont = new LayoutContent();
-	cont->addDecorationFlag(LayoutContent::HomeButton | LayoutContent::BackGroundLogo | LayoutContent::MagnifyingGlass | LayoutContent::SquareLayout | LayoutContent::LongLayout | LayoutContent::SingleLineLayout | flags);
+	cont->addDecorationFlag(
+        LayoutContent::HomeButton | 
+        LayoutContent::BackGroundLogo | 
+        LayoutContent::MagnifyingGlass | 
+        LayoutContent::SquareLayout | 
+        LayoutContent::LongLayout | 
+        LayoutContent::SingleLineLayout |
+        LayoutContent::MultiPageSelection | flags);
 
 	CLDeviceCriteria cr(CLDeviceCriteria::STATIC);
 	cont->setDeviceCriteria(cr);
@@ -251,7 +280,15 @@ LayoutContent* CLSceneLayoutManager::getSearchLayout()
 LayoutContent* CLSceneLayoutManager::createRecorderContent(QString id)
 {
 	LayoutContent* cont = new LayoutContent();
-	cont->addDecorationFlag(LayoutContent::HomeButton | LayoutContent::BackGroundLogo | LayoutContent::MagnifyingGlass | LayoutContent::SquareLayout | LayoutContent::LongLayout | LayoutContent::SingleLineLayout | LayoutContent::LevelUp);
+	cont->addDecorationFlag(
+        LayoutContent::HomeButton | 
+        LayoutContent::BackGroundLogo | 
+        LayoutContent::MagnifyingGlass | 
+        LayoutContent::SquareLayout | 
+        LayoutContent::LongLayout | 
+        LayoutContent::SingleLineLayout | 
+        LayoutContent::MultiPageSelection |
+        LayoutContent::LevelUp);
 
 	CLDeviceCriteria cr(CLDeviceCriteria::ALL);
 	cr.setRecorderId(id);

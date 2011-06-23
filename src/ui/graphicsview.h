@@ -20,6 +20,7 @@ class QParallelAnimationGroup;
 class QInputEvent;
 class CLSerachEditItem;
 class CLGridItem;
+class QnPageSelector;
 
 class GraphicsView: public QGraphicsView 
 {
@@ -41,6 +42,9 @@ public:
 	void setMinSceneZoom(qreal z);
 
 	SceneLayout& getCamLayOut();
+
+    QnPageSelector* getPageSelector() const;
+
 
 	CLAbstractSceneItem* getSelectedItem() const;
 
@@ -78,7 +82,7 @@ public:
     // returns true if should stop
     bool onUserInput(bool go_unsteady, bool escapeFromintro);
 
-    
+    void updatePageSelector();
 
 signals:
 	void scneZoomFinished();
@@ -224,14 +228,17 @@ protected:
 	ViewMode m_viewMode;
 
 	CLSerachEditItem* m_seachItem;
+    QnPageSelector* m_pageSelector;
 
 	CLAnimationManager m_animationManager;
 
 	CLGridItem* m_gridItem;
 
-    bool mMenuIsHere;
+    bool m_menuIsHere;
 
-    QTime mTimeAfterDoubleClick;
+    QTime m_timeAfterDoubleClick;
+
+    CLAbstractSceneItem* m_lastPressedItem;
 
 };
 

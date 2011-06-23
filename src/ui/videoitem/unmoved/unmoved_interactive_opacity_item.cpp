@@ -8,7 +8,6 @@ CLAbstractUnMovedOpacityItem(name, parent),
 m_normal_opacity(normal_opacity),
 m_active_opacity(active_opacity)
 {
-	setAcceptsHoverEvents(true);
 	setOpacity(m_normal_opacity);
 }
 
@@ -17,14 +16,18 @@ CLUnMovedInteractiveOpacityItem::~CLUnMovedInteractiveOpacityItem()
 	stopAnimation();
 }
 
-void CLUnMovedInteractiveOpacityItem::hoverEnterEvent(QGraphicsSceneHoverEvent* /*event*/)
+void CLUnMovedInteractiveOpacityItem::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
 {
+    CLAbstractUnMovedOpacityItem::hoverEnterEvent(event);
+
 	if (needAnimation())
         changeOpacity(m_active_opacity, global_opacity_change_period);
 }
 
 void CLUnMovedInteractiveOpacityItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
+    CLAbstractUnMovedOpacityItem::hoverLeaveEvent(event);
+
 	if (needAnimation())
         changeOpacity(m_normal_opacity, global_opacity_change_period);
 }
