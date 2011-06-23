@@ -8,6 +8,7 @@
 QMutex CLAVIStreamReader::avi_mutex;
 extern QMutex global_ffmpeg_mutex;
 static const int FFMPEG_PROBE_BUFFER_SIZE = 1024 * 512;
+static const int MAX_VALID_SLEEP_TIME = 1000 * 1000 * 5; // 5 seconds as most long sleep time
 
 qint64 CLAVIStreamReader::packetTimestamp(AVStream* stream, const AVPacket& packet)
 {
@@ -169,6 +170,9 @@ bool CLAVIStreamReader::init()
 
 bool CLAVIStreamReader::initCodecs()
 {
+    m_videoStreamIndex = -1;
+    m_audioStreamIndex = -1;
+
     for(unsigned i = 0; i < m_formatContext->nb_streams; i++) 
     {
         AVStream *strm= m_formatContext->streams[i];
@@ -329,6 +333,19 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 			{
 				// we assume that we have constant frame rate 
 				m_needToSleep = m_currentTime - m_previousTime;
+                if(m_needToSleep > MAX_VALID_SLEEP_TIME)
+                {
+                    AVRational frameRate = m_formatContext->streams[m_videoStreamIndex]->r_frame_rate;
+                    if (frameRate.den && frameRate.num)
+                    {
+                        qint64 frameDuration = 1000000ull * frameRate.den / frameRate.num;
+                        if (frameDuration)
+                        {
+                            // it is a jump between PTS, so use default sleep value
+                            m_needToSleep = frameDuration;
+                        }
+                    }
+                }
 			}
 
 			m_previousTime = m_currentTime;
@@ -457,23 +474,27 @@ bool CLAVIStreamReader::getNextPacket(AVPacket& packet)
 	return true;
 }
 
-void CLAVIStreamReader::smartSleep(quint64 mksec)
+void CLAVIStreamReader::smartSleep(qint64 mksec)
 {
+    if (mksec < 0)
+        return;
+    // 45000 more that wide used fps values in movies, so we are going to sleep only once for AVI movies (it is more carefull than 2 slepp calls)
+    static const int SLEEP_WAKEUP_INTERVAL = 45000; 
 	m_wakeup = false;
-	int sleep_times = mksec/32000;
+	int sleep_times = mksec/SLEEP_WAKEUP_INTERVAL; // 40000, 1
 
 	for (int i = 0; i < sleep_times; ++i)
 	{
 		if (m_wakeup || needToStop())
 			return;
 
-		m_adaptiveSleep.sleep(32000);
+		m_adaptiveSleep.sleep(SLEEP_WAKEUP_INTERVAL);
 	}
 
 	if (m_wakeup || needToStop())
 		return;
 
-	m_adaptiveSleep.sleep(mksec%32000);
+	m_adaptiveSleep.sleep(mksec%SLEEP_WAKEUP_INTERVAL);
 
 }
 

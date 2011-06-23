@@ -10,18 +10,14 @@ class CLAVIDvdStreamReader : public CLAVIStreamReader
 {
     struct CLFileInfo
     {
-        CLFileInfo()    { m_formatContext = 0; }
-        ~CLFileInfo()   { av_close_input_file(m_formatContext); }
         QString m_name;
         qint64 m_offsetInMks; // offset in micro seconds from the beginning (duration sum of previous files)
         AVFormatContext* m_formatContext;
         AVIOContext* m_orig_pb;
     };
-
 public:
 	CLAVIDvdStreamReader(CLDevice* dev);
 	virtual ~CLAVIDvdStreamReader();
-
     void setChapterNum(int chupter);
 protected:
     ByteIOContext* getIOContext();
@@ -46,8 +42,6 @@ private:
     int m_chapter;                  // dvd chapter number, -1 by default: play all chapters
     bool m_initialized;             // file list has been built
     QList<CLFileInfo*> m_fileList;   
-    qint64 m_totalSize;             // total size in bytes of all files in the list
-    qint64 m_forceSingleFile;
     bool m_inSeek;
 };
 

@@ -22,7 +22,7 @@ protected:
 	virtual bool init();
 	virtual void destroy();
 
-	void smartSleep(quint64 mksec);
+	void smartSleep(qint64 mksec);
     virtual ByteIOContext* getIOContext();
 
     virtual qint64 packetTimestamp(AVStream* stream, const AVPacket& packet);
