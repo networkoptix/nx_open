@@ -18,6 +18,7 @@
 #include "ui/videoitem/picture_image_item.h"
 #include "ui/videoitem/intro_video_wnd.h"
 #include "layout_items.h"
+#include "ui/videoitem/unmoved/multipage/page_selector.h"
 
 
 int  SLOT_WIDTH = 640*10;
@@ -47,11 +48,15 @@ m_editable(false)
 
 	CLGridSettings settings;
 
-	settings.item_distance = 35.0/100;
+	settings.item_distance = 35.0 / 100;
 	settings.items = &m_items;
 	settings.left = SCENE_LEFT;
 	settings.top = SCENE_TOP;
-	settings.max_items = 4*QThread::idealThreadCount();
+	settings.max_items = 3 * QThread::idealThreadCount();
+
+    settings.max_items = qMin(settings.max_items, 24);
+    settings.max_items = qMax(settings.max_items, 4);
+
 	settings.max_rows = 5;
 	settings.slot_width = SLOT_WIDTH;
 	settings.slot_height= SLOT_HEIGHT;
@@ -239,10 +244,27 @@ void SceneLayout::onTimer()
 		m_timer.setInterval(devices_update_interval);
 	}
 
+    if (m_view->getPageSelector())
+    {
+        QnPageSelector* ps = m_view->getPageSelector();
+        unsigned int pages = m_content->numberOfPages(m_grid.getSettings().max_items);
+        if (ps->getMaxPageNumber()!=pages)
+        {
+            ps->setMaxPageNumber(pages);
+            //m_view->updatePageSelector();
+        }
+
+        m_view->updatePageSelector();
+
+        if (ps->getCurrentPage() == ps->getMaxPageNumber() && ps->getCurrentPage()>1) // this is the last page 
+            return; // do not need to add something 
+    }
+
 	//===================video devices=======================
+    //D-Light & Bissen Feat Victoria Gross - Like I Do (John O'Callaghan Remiix)
+
 	CLDeviceList all_devs =  CLDeviceManager::instance().getDeviceList(m_content->getDeviceCriteria());
 	bool added = false;
-
 
     if (m_content->getDeviceCriteria().getCriteria() == CLDeviceCriteria::NONE)
     {
@@ -252,34 +274,35 @@ void SceneLayout::onTimer()
 	if (m_content->getDeviceCriteria().getCriteria() != CLDeviceCriteria::STATIC)
 	{
 
-        bool criteria_chnged = (m_content->getDeviceCriteria().filter() != mSearchFilter || m_content->getDeviceCriteria().getCriteria()==CLDeviceCriteria::NONE);
+        bool criteriaChanged = (m_content->getDeviceCriteria().filter() != mSearchFilter || m_content->getDeviceCriteria().getCriteria()==CLDeviceCriteria::NONE);
             mSearchFilter = m_content->getDeviceCriteria().filter();
-            if (criteria_chnged)
-                criteria_chnged = criteria_chnged;
+
+            
+            QList<LayoutDevice*> ldList =  m_content->getDevices();
+            foreach(LayoutDevice* ld, ldList)
+            {
+                if (!all_devs.contains(ld->getId()))
+                    m_content->removeDevice(ld->getId());
+
+            }
+            
+
 
 			QList<CLAbstractComplicatedItem*> remove_lst;
 			foreach(CLAbstractComplicatedItem* devitem, m_deviceitems)
 			{
 				if (devitem->getDevice()->getDeviceType() == CLDevice::VIDEODEVICE &&
-					(!devitem->getDevice()->checkDeviceTypeFlag(CLDevice::RECORDED) || criteria_chnged)
+					(!devitem->getDevice()->checkDeviceTypeFlag(CLDevice::RECORDED) || criteriaChanged)
                     ) // if this is video device
 				{
-					bool need_to_remove = true;
-					foreach(CLDevice* dev, all_devs)
-					{
-						if (devitem->getDevice()->getUniqueId() == dev->getUniqueId())
-						{
-							need_to_remove = false;
-							break;
-						}
-					}
 
-					if (need_to_remove)
-						remove_lst.push_back(devitem);
+                    if (!all_devs.contains(devitem->getDevice()->getUniqueId()))
+                        remove_lst.push_back(devitem);
+
 				}
 			}
 
-			if (removeDevices(remove_lst))
+			if (removeDevices(remove_lst, true))
 				added = true;
 
 			if (m_deviceitems.count()==0)	
@@ -300,8 +323,10 @@ void SceneLayout::onTimer()
 		else
         {
 			added = true;
-            m_content->addDevice(dev->getUniqueId());
+            //m_content->addDevice(dev->getUniqueId());
         }
+
+        m_content->addDevice(dev->getUniqueId());
 	}
 
 	//==============recorders ================================
@@ -640,7 +665,7 @@ CLAbstractComplicatedItem* SceneLayout::haveRecordedVideoPlayingFor(CLVideoCamer
 }
 
 //===============================================================
-void SceneLayout::onItemClose(CLAbstractSubItemContainer* itm, bool addToremovedLst )
+void SceneLayout::onItemClose(CLAbstractSubItemContainer* itm, bool addToremovedLst, bool removeFromLayoutcontent)
 {
 
 	CLAbstractSceneItem* item = static_cast<CLAbstractSceneItem*>(itm);
@@ -649,35 +674,40 @@ void SceneLayout::onItemClose(CLAbstractSubItemContainer* itm, bool addToremoved
 	m_view->setZeroSelection();
 	item->stop_animation();
 
-	CLAbstractSceneItem::CLSceneItemType type = item->getType();
-	if (type==CLAbstractSceneItem::LAYOUT)
-	{
+    if (removeFromLayoutcontent)
+    {
 
-        if (addToremovedLst && getContent()==CLSceneLayoutManager::instance().getAllLayoutsContent())
-        {
-            QMessageBox::StandardButton result = YesNoCancel(0, tr("Are you sure?") , tr("Delete this layout?"));
+	        CLAbstractSceneItem::CLSceneItemType type = item->getType();
+	        if (type==CLAbstractSceneItem::LAYOUT)
+	        {
 
-            if (result!=QMessageBox::Yes)
-                return;
-        }
+                if (addToremovedLst && getContent()==CLSceneLayoutManager::instance().getAllLayoutsContent())
+                {
+                    QMessageBox::StandardButton result = YesNoCancel(0, tr("Are you sure?") , tr("Delete this layout?"));
 
-		CLLayoutItem* litem = static_cast<CLLayoutItem*>(item);
-		LayoutContent* lc = litem->getRefContent();
-		getContent()->removeLayout(lc, true);
-	}
+                    if (result!=QMessageBox::Yes)
+                        return;
+                }
 
-	if (type==CLAbstractSceneItem::RECORDER)
-	{
-		CLRecorderItem* ritem = static_cast<CLRecorderItem*>(item);
-		LayoutContent* lc = ritem->getRefContent();
-		getContent()->removeLayout(lc, true);
-	}
+		        CLLayoutItem* litem = static_cast<CLLayoutItem*>(item);
+		        LayoutContent* lc = litem->getRefContent();
+		        getContent()->removeLayout(lc, true);
+	        }
 
-	if (type==CLAbstractSceneItem::VIDEO)
-	{
-		CLVideoWindowItem* vitem = static_cast<CLVideoWindowItem*>(item);
-		getContent()->removeDevice(vitem->getComplicatedItem()->getDevice()->getUniqueId());
-	}
+	        if (type==CLAbstractSceneItem::RECORDER)
+	        {
+		        CLRecorderItem* ritem = static_cast<CLRecorderItem*>(item);
+		        LayoutContent* lc = ritem->getRefContent();
+		        getContent()->removeLayout(lc, true);
+	        }
+
+	        if (type==CLAbstractSceneItem::VIDEO)
+	        {
+		        CLVideoWindowItem* vitem = static_cast<CLVideoWindowItem*>(item);
+                    getContent()->removeDevice(vitem->getComplicatedItem()->getDevice()->getUniqueId());
+	        }
+
+    }
 	//===============
 
 	if (item->getComplicatedItem())
@@ -708,7 +738,7 @@ void SceneLayout::onItemClose(CLAbstractSubItemContainer* itm, bool addToremoved
 
 }
 
-void SceneLayout::removeItems(QList<CLAbstractSubItemContainer*> itemlst)
+void SceneLayout::removeItems(QList<CLAbstractSubItemContainer*> itemlst, bool removeFromLayoutcontent)
 {
     foreach(CLAbstractSubItemContainer* item, itemlst)
     {
@@ -729,12 +759,12 @@ void SceneLayout::removeItems(QList<CLAbstractSubItemContainer*> itemlst)
     {
         CLAbstractSceneItem* aitem = static_cast<CLAbstractSceneItem*>(item);
 
-        onItemClose(aitem, true);
+        onItemClose(aitem, true, removeFromLayoutcontent);
     }
 
 }
 
-bool SceneLayout::removeDevices(QList<CLAbstractComplicatedItem*> lst)
+bool SceneLayout::removeDevices(QList<CLAbstractComplicatedItem*> lst, bool removeFromLayoutcontent)
 {
 
 	if (lst.count()==0)
@@ -749,7 +779,7 @@ bool SceneLayout::removeDevices(QList<CLAbstractComplicatedItem*> lst)
 
 	foreach(CLAbstractComplicatedItem* devitem, lst)
 	{
-		onItemClose(devitem->getSceneItem(), false);
+		onItemClose(devitem->getSceneItem(), false, removeFromLayoutcontent);
 	}
 
 	return true;
@@ -835,6 +865,25 @@ void SceneLayout::onAspectRatioChanged(CLAbstractSceneItem* item)
 		m_grid.adjustItem(item);
 }
 
+void SceneLayout::onNewPageSelected(int page)
+{
+    removeDevices(m_deviceitems, false );
+
+    QStringList devs = m_content->getDevicesOnPage(page, m_grid.getSettings().max_items);
+
+    foreach(QString id, devs)
+    {
+        addDevice(id, false);
+    }
+    
+    m_view->instantArrange();
+    updateSceneRect();
+    m_view->zoomMin(0);
+    m_view->centerOn(m_view->getRealSceneRect().center());
+    m_view->fitInView(2000, 0);
+
+}
+
 //===============================================================
 
 void SceneLayout::loadContent()
@@ -897,9 +946,3 @@ void SceneLayout::loadContent()
 		updateSceneRect();
 
 }
-
-void SceneLayout::saveContent()
-{
-
-}
-

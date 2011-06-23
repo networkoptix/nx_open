@@ -3,10 +3,13 @@
 CLAbstractUnmovedItem::CLAbstractUnmovedItem(QString name, QGraphicsItem* parent):
 CLAbstractSubItemContainer(parent),
 m_view(0),
-m_name(name)
+m_name(name),
+m_underMouse(false)
 {
 	setFlag(QGraphicsItem::ItemIgnoresTransformations);
 	//setFlag(QGraphicsItem::ItemIsMovable);
+
+    setAcceptsHoverEvents(true);
 
 }
 
@@ -19,6 +22,23 @@ void CLAbstractUnmovedItem::hideIfNeeded(int duration)
 {
     hide(duration);
 }
+
+bool CLAbstractUnmovedItem::preferNonSteadyMode() const
+{
+    //return isUnderMouse(); //qt bug 18797 When setting the flag ItemIgnoresTransformations for an item, it will receive mouse events as if it was transformed by the view.
+    return m_underMouse;
+}
+
+void CLAbstractUnmovedItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+{
+    m_underMouse = true;
+}
+
+void CLAbstractUnmovedItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+{
+    m_underMouse = false;
+}
+
 
 void CLAbstractUnmovedItem::setStaticPos(QPoint p)
 {

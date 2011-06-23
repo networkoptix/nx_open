@@ -178,7 +178,11 @@ LayoutImage* LayoutContent::addImage(const QString& img, const QString& text, co
 
 LayoutDevice* LayoutContent::addDevice(const QString& uniqueId, const CLBasicLayoutItemSettings& setting )
 {
-    LayoutDevice* result = new LayoutDevice(uniqueId, setting);
+    LayoutDevice* result = dynamic_cast<LayoutDevice*>(getItemByname(uniqueId));
+    if (result)
+        return result;
+
+    result = new LayoutDevice(uniqueId, setting);
 	m_devices.push_back(result);
     return result;
 }
@@ -270,8 +274,35 @@ void LayoutContent::toXml(QDomDocument& doc, QDomElement& parent)
 	{
 		l->toXml(doc, element);
 	}
+}
+
+unsigned int LayoutContent::numberOfPages(unsigned int maxItemsPerPage)
+{
+    unsigned int size = getDevices().size();
+    unsigned int result = ((size % maxItemsPerPage) == 0) ? size / maxItemsPerPage : size / maxItemsPerPage + 1;
+    return qMax(result , (unsigned int)1);
+}
+
+QStringList LayoutContent::getDevicesOnPage(unsigned int page, unsigned int maxItemsPerPage)
+{
+    QStringList result;
+    if (page > numberOfPages(maxItemsPerPage) )
+        return result;
+
+    QList<LayoutDevice*>& devlst = getDevices();
+
+    unsigned int start = (page - 1) * maxItemsPerPage;
+    unsigned int end = qMin((page)*maxItemsPerPage, (unsigned int)devlst.size());
+
+    
+
+    for (int i = start; i < end; ++i)
+        result.push_back( devlst.at(i)->getId() );
+
+    return result;
 
 }
+
 
 CLRectAdjustment LayoutContent::getRectAdjustment() const
 {

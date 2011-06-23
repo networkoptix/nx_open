@@ -29,7 +29,8 @@ class LayoutContent : public LayoutButton
 public:
 
 	enum {HomeButton = 0x01, LevelUp = 0x02, BackGroundLogo = 0x04, MagnifyingGlass = 0x08, 
-        SearchEdit = 0x10, SquareLayout = 0x20,  LongLayout = 0x40, SingleLineLayout = 0x40};
+        SearchEdit = 0x10, SquareLayout = 0x20,  LongLayout = 0x40, SingleLineLayout = 0x80,
+        MultiPageSelection = 0x100};
 	enum {Zoomable = 0x01, SceneMovable = 0x02, ShowAvalable = 0x04, ItemMovable = 0x08, GridEnable = 0x10, ItemRotatable = 0x20, ItemSelectable = 0x40};
 
 	LayoutContent();
@@ -75,6 +76,7 @@ public:
 	QList<LayoutButton*>& getButtons();
 	QList<LayoutDevice*>& getDevices();
 
+
 	QList<LayoutContent*>& childrenList();
 
 	static LayoutContent* coppyLayoutContent(LayoutContent* l, bool skipSubL = false);
@@ -89,6 +91,9 @@ public:
 	void removeIntereactionFlag(unsigned long flag);
 	bool checkIntereactionFlag(unsigned long flag);
 
+
+    unsigned int numberOfPages(unsigned int maxItemsPerPage);
+    QStringList getDevicesOnPage(unsigned int page, unsigned int maxItemsPerPage);
 
     
 

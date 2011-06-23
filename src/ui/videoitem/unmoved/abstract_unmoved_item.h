@@ -19,13 +19,23 @@ public:
 
     virtual void hideIfNeeded(int duration);
 
+    virtual bool preferNonSteadyMode() const;
+
     virtual void hide(int duration) = 0;
     virtual void show(int duration) = 0;
 
 protected:
+
+    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
+    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
+
+protected:
+
 	QString m_name;
 	QGraphicsView* m_view;
 	QPoint m_pos;
+
+    bool m_underMouse;
 
 };
 
