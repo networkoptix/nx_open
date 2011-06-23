@@ -52,7 +52,7 @@ m_rtcpUdpSock(0),
 m_rtpIo(*this, m_udpSock)
 {
     m_udpSock.setTimeOut(500);
-    m_tcpSock.setTimeOut(3*1000);
+    m_tcpSock.setTimeOut(3 * 1000);
 }
 
 RTPSession::~RTPSession()

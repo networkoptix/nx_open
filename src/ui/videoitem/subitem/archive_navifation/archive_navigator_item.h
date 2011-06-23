@@ -27,6 +27,7 @@ public:
     bool isCursorOnSlider() const;
 
     virtual void hideIfNeeded(int duration);
+
 protected:
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 	virtual QRectF boundingRect() const;
@@ -40,6 +41,9 @@ protected slots:
 
 	// QT has bug about stile; after set one another one does not work well
 	void renewSlider();
+
+private:
+    void resizeSlider();
 
 protected:
 	int m_width;
@@ -72,8 +76,6 @@ protected:
 
     qreal mButtonAspectRatio;
 
-private:
-    void resizeSlider();
 };
 
 #endif  //archive_navigator_item_h1756

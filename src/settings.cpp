@@ -28,7 +28,7 @@ qreal global_base_scene_z_level = 1.0;
 
 int global_grid_aparence_delay = 2000;
 
-int global_opacity_change_period = 1000;
+int global_opacity_change_period = 500;
 
 Settings::Settings()
     : m_RWLock(QReadWriteLock::Recursive)

@@ -318,7 +318,7 @@ CLAbstractMediaData* CLH264RtpParser::getNextData()
         m_lastTimeStamp = timeStamp;
         /**/
 
-        videoData->timestamp = QDateTime::currentMSecsSinceEpoch()*1000;
+        videoData->timestamp = QDateTime::currentMSecsSinceEpoch() * 1000;
     }
 
     return videoData;
