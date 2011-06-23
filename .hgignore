@@ -1,0 +1,17 @@
+syntax: glob
+
+bin
+build
+Debug
+Release
+*.pyc
+*.sln
+*.ncb
+*.suo
+*.pro
+*.user
+*.vcproj
+*.xcodeproj
+server/src/version.h
+client/src/version.h
+.DS_Store
