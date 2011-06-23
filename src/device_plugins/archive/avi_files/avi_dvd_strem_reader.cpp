@@ -36,7 +36,7 @@ CLAVIDvdStreamReader::CLAVIDvdStreamReader(CLDevice* dev):
     m_ffmpegIOContext(0),
     m_chapter(-1),
     m_initialized(false),
-    m_currentFileIndex(0),
+    m_currentFileIndex(-1),
     m_inSeek(false)
 {
     QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
@@ -127,7 +127,7 @@ AVFormatContext* CLAVIDvdStreamReader::getFormatContext()
     }
     m_currentFileIndex = -1;
     m_initialized = true;
-    seekToFile(0);
+    switchToFile(0);
     if (m_fileList.isEmpty())
         return 0;
     else 
@@ -163,46 +163,20 @@ qint64 CLAVIDvdStreamReader::seek(qint64 offset, qint32 whence)
     return offsetInFile;
 }
 
-qint64 CLAVIDvdStreamReader::seekToFile(qint64 offset)
+bool CLAVIDvdStreamReader::switchToFile(int newFileIndex)
 {
-    qint64 absoluteValue = offset; // SEEK_SET by default
-    if (absoluteValue < 0)
-        return -1; // seek failed
-
-    // calculate file number and offset inside file
-    int newFileIndex = 0;
-    qint64 offsetInFile = absoluteValue;
-    while (newFileIndex < m_fileList.size() && m_fileList[newFileIndex]->m_formatContext->file_size <= offsetInFile)
+    if (newFileIndex != m_currentFileIndex && newFileIndex < m_fileList.size())
     {
-        offsetInFile -= m_fileList[newFileIndex]->m_formatContext->file_size;
-        newFileIndex++;
-    }
-    if (newFileIndex >= m_fileList.size())
-        return -1; // seek failed: position out of the file size
-
-    if (m_currentFileIndex != newFileIndex)
-    {
-        qint64 oldFilePosition = m_currentFile.pos();
         m_currentFile.close();
         m_currentFile.setFileName(m_fileList[newFileIndex]->m_name);
-        if (!m_currentFile.open(QFile::ReadOnly) || !m_currentFile.seek(offsetInFile))
-        {
-            // seek failed. try to rollback
-            m_currentFile.close();
-            m_currentFile.setFileName(m_fileList[m_currentFileIndex]->m_name);
-            m_currentFile.open(QFile::ReadOnly);
-            m_currentFile.seek(oldFilePosition);
-            m_formatContext = m_fileList[m_currentFileIndex]->m_formatContext;
-            return -1;
-        }
+        if (!m_currentFile.open(QFile::ReadOnly))
+            return false;
+        m_currentFileIndex = newFileIndex;
+        QMutexLocker mutex(&m_cs);
+        m_formatContext = m_fileList[m_currentFileIndex]->m_formatContext;
+        initCodecs();
     }
-    else {
-        if (!m_currentFile.seek(offsetInFile))
-            return -1;
-    }
-
-    m_currentFileIndex = newFileIndex;
-    return absoluteValue;
+    return true;
 }
 
 qint32 CLAVIDvdStreamReader::readPacket(quint8* buf, int size)
@@ -215,8 +189,11 @@ qint32 CLAVIDvdStreamReader::readPacket(quint8* buf, int size)
         m_currentFile.setFileName(m_fileList[m_currentFileIndex]->m_name);
         if (!m_currentFile.open(QFile::ReadOnly))
             return 0;
-        m_formatContext = m_fileList[m_currentFileIndex]->m_formatContext;
-        initCodecs();
+        {
+            QMutexLocker mutex(&m_cs);
+            m_formatContext = m_fileList[m_currentFileIndex]->m_formatContext;
+            initCodecs();
+        }
         rez = m_currentFile.read( (char*) buf, size);
     }
     return rez;
@@ -227,22 +204,19 @@ qint32 CLAVIDvdStreamReader::writePacket(quint8* buf, int size)
     return 0; // not implemented
 }
 
-qint64 CLAVIDvdStreamReader::setSingleFileMode(quint64 mksec)
+qint64 CLAVIDvdStreamReader::findFileIndexByTime(quint64 mksec)
 {
     int newFileIndex = 0;
-    qint64 newFileBytePosition = 0;
     foreach(CLFileInfo* fi, m_fileList)
     {
        if (mksec < fi->m_formatContext->duration)
            break;
        mksec -= fi->m_formatContext->duration;
-       newFileBytePosition += fi->m_formatContext->file_size;
        newFileIndex++;
     }
     if (newFileIndex < m_fileList.size()) 
     {
-        seekToFile(newFileBytePosition); // switch to nesessary file
-        m_formatContext = m_fileList[m_currentFileIndex]->m_formatContext;
+        switchToFile(newFileIndex); // switch to nesessary file
         return mksec;
     }  
     else {
@@ -254,7 +228,7 @@ void CLAVIDvdStreamReader::channeljumpTo(quint64 mksec, int )
 {
     QMutexLocker mutex(&m_cs);
     int oldFileNum = m_currentFileIndex;
-    quint64 relativeMksec = setSingleFileMode(mksec);
+    quint64 relativeMksec = findFileIndexByTime(mksec);
     if (relativeMksec == -1)
         return; // error seeking
 
@@ -274,9 +248,6 @@ void CLAVIDvdStreamReader::channeljumpTo(quint64 mksec, int )
     m_needToSleep = 0;
     m_previousTime = -1;
     m_wakeup = true;
-
-    if (m_currentFileIndex != oldFileNum)
-        initCodecs();
 }
 
 qint64 CLAVIDvdStreamReader::packetTimestamp(AVStream* stream, const AVPacket& packet)
@@ -300,8 +271,7 @@ void CLAVIDvdStreamReader::destroy()
 
     m_ffmpegIOContext = 0;
     m_initialized = false;
-    m_currentFileIndex = 0;
+    m_currentFileIndex = -1;
     m_formatContext = 0;
-
-    CLAVIStreamReader::destroy();
+    m_fileList.clear();
 }

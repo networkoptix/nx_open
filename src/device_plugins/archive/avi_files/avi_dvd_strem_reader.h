@@ -34,14 +34,14 @@ private:
     qint32 writePacket(quint8* buf, int size);
     qint64 seek(qint64 offset, qint32 whence);
     bool openNextFile();
-    qint64 setSingleFileMode(quint64 mksec);
-    qint64 seekToFile(qint64 offset);
+    qint64 findFileIndexByTime(quint64 mksec);
+    bool switchToFile(int newFileIndex);
 private:
     QFile m_currentFile;            
     int m_currentFileIndex;
     int m_chapter;                  // dvd chapter number, -1 by default: play all chapters
     bool m_initialized;             // file list has been built
-    QList<CLFileInfo*> m_fileList;   
+    QVector<CLFileInfo*> m_fileList;   
     bool m_inSeek;
 };
 
