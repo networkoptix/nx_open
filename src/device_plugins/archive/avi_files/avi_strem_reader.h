@@ -26,7 +26,7 @@ protected:
     virtual ByteIOContext* getIOContext();
 
     virtual qint64 packetTimestamp(AVStream* stream, const AVPacket& packet);
-    virtual AVFormatContext* getFormatContext() { return 0; }
+    virtual AVFormatContext* getFormatContext();
     bool initCodecs();
 protected:
 	qint64 m_currentTime;

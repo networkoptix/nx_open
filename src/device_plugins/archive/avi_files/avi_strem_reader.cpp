@@ -77,6 +77,29 @@ ByteIOContext* CLAVIStreamReader::getIOContext()
     return 0;
 }
 
+AVFormatContext* CLAVIStreamReader::getFormatContext()
+{
+    QString url = "ufile:" + m_device->getUniqueId();
+    AVFormatContext* formatContext;
+    int err = av_open_input_file(&formatContext, url.toUtf8().constData(), NULL, 0, NULL);
+    if (err < 0)
+    {
+        destroy();
+        return 0; 
+    }
+
+    {
+        QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
+        err = av_find_stream_info(formatContext);
+        if (err < 0)
+        {
+            destroy();
+            return 0;
+        }
+    }
+    return formatContext;
+}
+
 bool CLAVIStreamReader::init()
 {
 	static bool firstInstance = true;
@@ -100,7 +123,6 @@ bool CLAVIStreamReader::init()
 	m_previousTime = -1;
 	m_needToSleep = 0;
     m_lengthMksec = 0;
-
 
     m_formatContext = getFormatContext();
     /*
@@ -128,46 +150,6 @@ bool CLAVIStreamReader::init()
             err = -1;
     }
     */
-    if (!m_formatContext)
-    {
-        QString url = "ufile:" + m_device->getUniqueId();
-        int err = av_open_input_file(&m_formatContext, url.toUtf8().constData(), NULL, 0, NULL);
-        if (err < 0)
-        {
-            destroy();
-            return false; 
-        }
-
-        {
-            QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
-
-            err = av_find_stream_info(m_formatContext);
-            if (err < 0)
-            {
-                destroy();
-                return false;
-            }
-        }
-    }
-    else 
-    {
-        /*
-        ByteIOContext* ioContext = m_formatContext->pb;
-        AVProbeData probeData;
-        probeData.filename = "";
-        probeData.buf = new unsigned char[FFMPEG_PROBE_BUFFER_SIZE];
-        probeData.buf_size = ioContext->read_packet(ioContext->opaque, probeData.buf, FFMPEG_PROBE_BUFFER_SIZE);
-        if (probeData.buf_size > 0)
-        {
-            ioContext->seek(ioContext->opaque, 0, SEEK_SET);
-            AVInputFormat* inCtx = av_probe_input_format(&probeData, 1);
-            delete [] probeData.buf;
-            err = av_open_input_stream(&m_formatContext, ioContext, "", inCtx, 0 );
-        }
-        else
-            err = -1;
-        */
-    }
 
     if (m_lengthMksec == 0)
 	    m_lengthMksec = m_formatContext->duration; // it is not filled during opening context
@@ -439,10 +421,7 @@ void CLAVIStreamReader::destroy()
 {
 	if (m_formatContext) // crashes without condition 
     {
-        if (getIOContext())
-            av_close_input_stream(m_formatContext);
-        else
-            av_close_input_file(m_formatContext);
+        av_close_input_file(m_formatContext);
         m_formatContext = 0;
     }
 

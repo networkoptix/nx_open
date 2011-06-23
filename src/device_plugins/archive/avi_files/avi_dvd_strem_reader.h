@@ -6,8 +6,6 @@
 
 #include "avi_strem_reader.h"
 
-class AVFormatContext;
-
 class CLAVIDvdStreamReader : public CLAVIStreamReader
 {
     struct CLFileInfo
@@ -15,11 +13,9 @@ class CLAVIDvdStreamReader : public CLAVIStreamReader
         CLFileInfo()    { m_formatContext = 0; }
         ~CLFileInfo()   { av_close_input_file(m_formatContext); }
         QString m_name;
-        qint64 m_size;      // size in bytes
-        qint64 m_duration;  // duration in mksec
-        qint64 m_startTime; // first PTS value in mksec
         qint64 m_offsetInMks; // offset in micro seconds from the beginning (duration sum of previous files)
         AVFormatContext* m_formatContext;
+        AVIOContext* m_orig_pb;
     };
 
 public:
@@ -42,9 +38,7 @@ private:
     qint32 writePacket(quint8* buf, int size);
     qint64 seek(qint64 offset, qint32 whence);
     qint64 seekForcedSingleFile(qint64 offset, qint32 whence);
-    //bool buildFileList();
     bool openNextFile();
-    void getTotalDuration();
     qint64 setSingleFileMode(quint64 mksec);
 private:
     qint64 m_position;              // total playback position (in bytes) throught all files
