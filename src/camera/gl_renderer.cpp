@@ -328,7 +328,7 @@ void CLGLRenderer::init(bool msgbox)
 		error = true;
 	}
 
-	isSoftYuv2Rgb = true;
+	//isSoftYuv2Rgb = true;
 
 	if (error) 
 	{
