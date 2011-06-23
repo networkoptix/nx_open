@@ -231,14 +231,14 @@ void CLVideoWindowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
     if (m_steadyMode)
         drawSteadyWall(painter);
 
-    bool draw_selection = option->state & QStyle::State_Selected;
+    bool drawSelection = option->state & QStyle::State_Selected;
 
 	painter->beginNativePainting();
 	saveGLState();
 
 	for (unsigned i = 0; i  < m_videonum; ++i)
 	{
-        if (draw_selection)
+        if (drawSelection)
             m_gldraw[i]->setOpacity(0.5);
         else
             m_gldraw[i]->setOpacity(1.0);
@@ -256,7 +256,7 @@ void CLVideoWindowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
 	painter->endNativePainting();
 	drawStuff(painter);
 
-	if (draw_selection)
+	if (drawSelection)
 	{
 		painter->fillRect(QRect(0, 0, width(), height()),
 			m_can_be_droped ? global_can_be_droped_color :  global_selection_color);

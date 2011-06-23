@@ -274,7 +274,7 @@ void SceneLayout::onTimer()
 	if (m_content->getDeviceCriteria().getCriteria() != CLDeviceCriteria::STATIC)
 	{
 
-        bool criteria_chnged = (m_content->getDeviceCriteria().filter() != mSearchFilter || m_content->getDeviceCriteria().getCriteria()==CLDeviceCriteria::NONE);
+        bool criteriaChanged = (m_content->getDeviceCriteria().filter() != mSearchFilter || m_content->getDeviceCriteria().getCriteria()==CLDeviceCriteria::NONE);
             mSearchFilter = m_content->getDeviceCriteria().filter();
 
             
@@ -292,7 +292,7 @@ void SceneLayout::onTimer()
 			foreach(CLAbstractComplicatedItem* devitem, m_deviceitems)
 			{
 				if (devitem->getDevice()->getDeviceType() == CLDevice::VIDEODEVICE &&
-					(!devitem->getDevice()->checkDeviceTypeFlag(CLDevice::RECORDED) || criteria_chnged)
+					(!devitem->getDevice()->checkDeviceTypeFlag(CLDevice::RECORDED) || criteriaChanged)
                     ) // if this is video device
 				{
 
