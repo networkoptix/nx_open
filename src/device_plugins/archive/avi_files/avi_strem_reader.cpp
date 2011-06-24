@@ -6,6 +6,29 @@
 #include "stdint.h"
 
 QMutex CLAVIStreamReader::avi_mutex;
+QSemaphore CLAVIStreamReader::aviSemaphore(4);
+
+class QnAviSemaphoreHelpr
+{
+public:
+    QnAviSemaphoreHelpr(QSemaphore& sem):
+      m_sem(sem)
+      {
+          m_sem.tryAcquire();
+      }
+
+    ~QnAviSemaphoreHelpr()
+    {
+        m_sem.release();
+    }
+
+private:
+    QSemaphore& m_sem;
+
+};
+
+
+
 extern QMutex global_ffmpeg_mutex;
 static const int FFMPEG_PROBE_BUFFER_SIZE = 1024 * 512;
 static const int MAX_VALID_SLEEP_TIME = 1000 * 1000 * 5; // 5 seconds as most long sleep time
@@ -298,7 +321,9 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 		mFirstTime = false;
 	}
 
-	if (!m_formatContext || m_videoStreamIndex == -1)
+    QnAviSemaphoreHelpr sem(aviSemaphore);
+
+    if (!m_formatContext || m_videoStreamIndex == -1)
 		return 0;
 
 	if (m_bsleep && !isSingleShotMode() && m_needSleep && !isSkippingFrames())

@@ -54,6 +54,7 @@ private:
     int m_currentPacketIndex;
     bool m_haveSavedPacket;
     static QMutex avi_mutex;
+    static QSemaphore aviSemaphore ;
 private:
     /**
       * Read next packet from file
