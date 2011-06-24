@@ -149,31 +149,8 @@ bool CLAVIStreamReader::init()
     m_lengthMksec = 0;
 
     m_formatContext = getFormatContext();
-    /*
-    ByteIOContext* ioContext = getIOContext();
-    int err;
-    if (!ioContext)
-    {
-        QString url = "ufile:" + m_device->getUniqueId();
-        err = av_open_input_file(&m_formatContext, url.toUtf8().constData(), NULL, 0, NULL);
-    }
-    else 
-    {
-        AVProbeData probeData;
-        probeData.filename = "";
-        probeData.buf = new unsigned char[FFMPEG_PROBE_BUFFER_SIZE];
-        probeData.buf_size = ioContext->read_packet(ioContext->opaque, probeData.buf, FFMPEG_PROBE_BUFFER_SIZE);
-        if (probeData.buf_size > 0)
-        {
-            ioContext->seek(ioContext->opaque, 0, SEEK_SET);
-            AVInputFormat* inCtx = av_probe_input_format(&probeData, 1);
-            delete [] probeData.buf;
-            err = av_open_input_stream(&m_formatContext, ioContext, "", inCtx, 0 );
-        }
-        else
-            err = -1;
-    }
-    */
+    if (!m_formatContext)
+        return false;
 
     if (m_lengthMksec == 0)
 	    m_lengthMksec = m_formatContext->duration; // it is not filled during opening context
