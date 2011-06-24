@@ -2,7 +2,8 @@
 #include "../../base/log.h"
 
 CLAnimation::CLAnimation():
-m_animation(0)
+    m_animationMutex(QMutex::Recursive),
+    m_animation(0)
 {
 	//m_delay_timer.setSingleShot(true);
 	//connect(&m_timeline, SIGNAL(valueChanged(qreal)), this, SLOT(valueChanged(qreal)));
@@ -21,11 +22,15 @@ QObject* CLAnimation::object()
 
 bool CLAnimation::isRuning() const
 {
-	return (  (m_animation && (m_animation->state() & QAbstractAnimation::Running)));
+    QMutexLocker _locker(&m_animationMutex);
+    
+	return (m_animation && (m_animation->state() & QAbstractAnimation::Running));
 }
 
 void CLAnimation::stopAnimation()
 {
+    QMutexLocker _locker(&m_animationMutex);
+
     if (!m_animation)
         return;
 
@@ -41,6 +46,8 @@ void CLAnimation::stopAnimation()
 
 void CLAnimation::Start()
 {
+    QMutexLocker _locker(&m_animationMutex);
+
 	if (m_animation)
     {
         connect(m_animation, SIGNAL(finished()), this, SLOT(onFinished()));
@@ -62,10 +69,8 @@ void CLAnimation::start_helper(int duration, int delay)
 			//QTimer::singleShot(delay, this, SLOT(Start()));
 			connect(&m_delay_timer, SIGNAL(timeout()), this, SLOT(Start()));
 			m_delay_timer.start(delay);
-
 		}
 	}
-	
 }
 
 void CLAnimation::onFinished()

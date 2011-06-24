@@ -74,6 +74,7 @@ void CLItemTransform::setZoom(qreal z)
 
 void CLItemTransform::zoom_abs(qreal target_zoom, int duration, int delay)
 {
+    QMutexLocker _locker(&m_animationMutex);
 
     stopAnimation();
 
@@ -96,6 +97,7 @@ void CLItemTransform::zoom_abs(qreal target_zoom, int duration, int delay)
 
 void CLItemTransform::z_rotate_abs(QPointF center, qreal angle, int duration, int delay)
 {
+    QMutexLocker _locker(&m_animationMutex);
 
     stopAnimation();
 

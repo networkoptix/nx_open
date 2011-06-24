@@ -165,6 +165,7 @@ void CLSceneZoom::set_qulity_helper()
 
 void CLSceneZoom::zoom_helper(int duration, int delay, CLAnimationCurve curve)
 {
+    QMutexLocker _locker(&m_animationMutex);
 
     stopAnimation();
 

@@ -7,6 +7,7 @@
 class CLAnimation: public QObject, public CLAbstractAnimation
 {
 	Q_OBJECT
+    
 public:
 	CLAnimation();
 	virtual ~CLAnimation();
@@ -14,19 +15,23 @@ public:
 	virtual void stopAnimation();
 	bool isRuning() const;
 
-	QObject* object() ;
+	QObject* object();
+    
 signals:
 	void finished();
+    
 protected slots:
-		virtual void onFinished();
-		virtual void Start();
+	virtual void onFinished();
+	virtual void Start();
+    
 protected:
-		void start_helper(int duration, int delay);
+	void start_helper(int duration, int delay);
+    
 protected:
 	QTimer m_delay_timer;
+    
+    mutable QMutex m_animationMutex;
     QAbstractAnimation *m_animation;
-
-
 };
 
 #endif //animation_h2344

@@ -81,6 +81,8 @@ void CLSceneMovement::move(int dx, int dy, int duration, bool limited, int delay
 
 void CLSceneMovement::move (QPointF dest, int duration, int delay, CLAnimationCurve curve )
 {
+    QMutexLocker _locker(&m_animationMutex);
+    
 	//cl_log.log("CLSceneMovement::move() ", cl_logDEBUG1);
     stopAnimation();
 
