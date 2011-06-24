@@ -35,7 +35,13 @@ CLArchiveStreamReader::~CLArchiveStreamReader()
 
     QDir recDir(getRecordingDir());
     if (!recDir.exists())
-        recDir.mkdir(getRecordingDir());
+    {
+        cl_log.log("Trying to create Recording dir...: ", getRecordingDir(), cl_logALWAYS);
+        if (recDir.mkdir(getRecordingDir()))
+            cl_log.log(getRecordingDir(), "  created", cl_logALWAYS);
+        else
+            cl_log.log(getRecordingDir(), "  failed to create!!!", cl_logWARNING);
+    }
 
 
     QString original = getDevice()->getUniqueId();

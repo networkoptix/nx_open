@@ -2799,8 +2799,8 @@ void GraphicsView::contextMenuHelper_saveRecordedAs(CLVideoCamera* cam)
             UIOKMessage(this, "", "Appears this title already exists.");
             continue;
         }
-
-        if (!dir.mkdir(getRecordingDir() + name))
+        
+        if (!dir.mkpath(getRecordingDir() + name))
         {
             UIOKMessage(this, "", "Can't save with this title. Please provide another one.");
             continue;
