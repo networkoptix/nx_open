@@ -22,7 +22,7 @@ bool CLAviDvdDevice::isAcceptedUrl(const QString& url)
     {
         if (!sourceDir.endsWith('/') && !sourceDir.endsWith('\\'))
             sourceDir += QDir::separator();
-        sourceDir += QString("VIDEO_TS");
+        sourceDir = CLAVIPlaylistStreamReader::addDirPath(sourceDir, "VIDEO_TS");
     }
     QDir dvdDir = QDir(sourceDir);
     if (!dvdDir.exists())
