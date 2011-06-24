@@ -1,6 +1,9 @@
-#include "item_trans.h"
-#include "../../base/log.h"
 #include <math.h>
+
+#include "item_trans.h"
+#include "base/log.h"
+#include "ui/animation/property_animation.h"
+
 
 qreal round_angle(qreal angle, qreal min_diff)
 {
@@ -21,12 +24,15 @@ qreal round_angle(qreal angle, qreal min_diff)
 
 //=========================================================
 CLItemTransform::CLItemTransform(QGraphicsItem* item):
-m_item(item),
-m_zoom(1.0),
-m_Zrotation(0.0)
+    CLAnimation(0),
+    m_item(item),
+    m_zoom(1.0),
+    m_Zrotation(0.0)
 {
-	
+    if (item->scene() && item->scene()->views().size() > 0)
+        m_view = (GraphicsView*) *item->scene()->views().begin();
 }
+
 
 CLItemTransform::~CLItemTransform()
 {
@@ -84,7 +90,7 @@ void CLItemTransform::zoom_abs(qreal target_zoom, int duration, int delay)
 	}
 	else
 	{
-        m_animation = new QPropertyAnimation(this, "zoom");
+        m_animation = AnimationManager::instance().addAnimation(this, "zoom");
         QPropertyAnimation* panimation = static_cast<QPropertyAnimation*>(m_animation);
         panimation->setStartValue(this->getZoom());
         panimation->setEndValue(target_zoom);
@@ -116,7 +122,7 @@ void CLItemTransform::z_rotate_abs(QPointF center, qreal angle, int duration, in
 		if (getRotation() > 180 && angle==0.)
 			angle = 360.;
 
-        m_animation = new QPropertyAnimation(this, "rotation");
+        m_animation = AnimationManager::instance().addAnimation(this, "rotation");
         QPropertyAnimation* panimation = static_cast<QPropertyAnimation*>(m_animation);
         panimation->setStartValue(getRotation());
         panimation->setEndValue(angle);

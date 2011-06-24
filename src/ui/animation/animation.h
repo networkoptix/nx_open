@@ -4,12 +4,14 @@
 #include "animation_timeline.h"
 #include "abstract_animation.h"
 
+class GraphicsView;
+
 class CLAnimation: public QObject, public CLAbstractAnimation
 {
 	Q_OBJECT
     
 public:
-	CLAnimation();
+	CLAnimation(GraphicsView* gview);
 	virtual ~CLAnimation();
 
 	virtual void stopAnimation();
@@ -17,6 +19,10 @@ public:
 
 	QObject* object();
     
+    void enableViewUpdateMode(bool value);
+    void updateView();
+    
+    bool isSkipViewUpdate() const;
 signals:
 	void finished();
     
@@ -30,8 +36,12 @@ protected:
 protected:
 	QTimer m_delay_timer;
     
+    GraphicsView* m_view;
+
     mutable QMutex m_animationMutex;
     QAbstractAnimation *m_animation;
+    
+    bool m_skipViewUpdate;
 };
 
 #endif //animation_h2344

@@ -1,12 +1,14 @@
-#include "abstract_scene_item.h"
-#include "ui/graphicsview.h"
-#include "video_wnd_item.h"
-
 #include <math.h>
+
 #include "settings.h"
+#include "base/log.h"
+#include "abstract_scene_item.h"
+#include "video_wnd_item.h"
 #include "subitem/abstract_image_sub_item.h"
 #include "subitem/recording_sign_item.h"
-#include "base/log.h"
+#include "ui/graphicsview.h"
+#include "ui/animation/property_animation.h"
+
 
 static const double Pi = 3.14159265358979323846264338327950288419717;
 static double TwoPi = 2.0 * Pi;
@@ -509,7 +511,7 @@ void CLAbstractSceneItem::goToSteadyMode(bool steady, bool instant)
 
         stopSteadyAnimation();
 
-        m_steady_animation = new QPropertyAnimation(this, "steadycolor");
+        m_steady_animation = AnimationManager::instance().addAnimation(this, "steadycolor");
         m_steady_animation->setDuration(global_opacity_change_period);
         m_steady_animation->setStartValue(steadyBlackColor());
         m_steady_animation->setEndValue(255);
@@ -536,7 +538,7 @@ void CLAbstractSceneItem::goToSteadyMode(bool steady, bool instant)
 
     stopSteadyAnimation();
 
-    m_steady_animation = new QPropertyAnimation(this, "steadycolor");
+    m_steady_animation = AnimationManager::instance().addAnimation(this, "steadycolor");
     m_steady_animation->setDuration(global_opacity_change_period);
     m_steady_animation->setStartValue(steadyBlackColor());
     m_steady_animation->setEndValue(0);

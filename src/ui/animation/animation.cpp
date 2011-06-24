@@ -1,9 +1,12 @@
 #include "animation.h"
+#include "ui/graphicsview.h"
 #include "../../base/log.h"
 
-CLAnimation::CLAnimation():
+CLAnimation::CLAnimation(GraphicsView* gview):
+    m_view(gview),
     m_animationMutex(QMutex::Recursive),
-    m_animation(0)
+    m_animation(0),
+    m_skipViewUpdate(false)
 {
 	//m_delay_timer.setSingleShot(true);
 	//connect(&m_timeline, SIGNAL(valueChanged(qreal)), this, SLOT(valueChanged(qreal)));
@@ -79,3 +82,23 @@ void CLAnimation::onFinished()
     stopAnimation();
 }
 
+void CLAnimation::enableViewUpdateMode(bool enable)
+{
+    if (!m_view)
+        return;
+    
+    m_view->setViewportUpdateMode(enable ? QGraphicsView::MinimalViewportUpdate : QGraphicsView::NoViewportUpdate);
+}
+
+void CLAnimation::updateView()
+{
+    if (!m_view)
+        return;
+    
+    m_view->update();
+}
+
+bool CLAnimation::isSkipViewUpdate() const
+{
+    return m_skipViewUpdate;
+}

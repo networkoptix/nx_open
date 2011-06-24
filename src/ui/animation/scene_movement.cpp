@@ -1,7 +1,8 @@
 #include "scene_movement.h"
-#include "../../base/log.h"
-#include "../graphicsview.h"
+#include "base/log.h"
+#include "ui/graphicsview.h"
 #include "ui/videoitem/video_wnd_item.h"
+#include "ui/animation/property_animation.h"
 
 int limit_val(int val, int min_val, int max_val, bool mirror)
 {
@@ -56,8 +57,9 @@ int limit_val(int val, int min_val, int max_val, bool mirror)
 //========================================================================================
 
 CLSceneMovement::CLSceneMovement(GraphicsView* gview):
-m_view(gview),
-m_limited(false)
+    CLAnimation(gview),
+    m_view(gview),
+    m_limited(false)
 {
 
 }
@@ -97,7 +99,7 @@ void CLSceneMovement::move (QPointF dest, int duration, int delay, CLAnimationCu
         m_startpoint = getPosition();
         m_delta = dest - m_startpoint;
         
-        m_animation = new QPropertyAnimation(this, "position");
+        m_animation = AnimationManager::instance().addAnimation(this, "position");
         QPropertyAnimation* panimation = static_cast<QPropertyAnimation*>(m_animation);
         panimation->setStartValue(getPosition());
         panimation->setEndValue(dest);
