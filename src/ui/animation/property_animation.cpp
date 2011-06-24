@@ -18,7 +18,12 @@ AnimationManager::AnimationManager()
 QPropertyAnimation* AnimationManager::addAnimation(QObject * target, const QByteArray & propertyName, QObject * parent)
 {
     PropertyAnimationWrapper* animation = new PropertyAnimationWrapper(this, target, propertyName, parent);
-    
+ 
+    // For now there are problems on win32
+#ifdef _WIN32
+    return animation;
+#endif
+
     CLAnimation* clanimation = dynamic_cast<CLAnimation*> (target);
     if (!clanimation)
         return animation;
