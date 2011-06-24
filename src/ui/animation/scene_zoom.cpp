@@ -1,9 +1,11 @@
-#include "scene_zoom.h"
 #include <math.h>
-#include "../../base/log.h"
-#include "../graphicsview.h"
+
+#include "scene_zoom.h"
+#include "base/log.h"
+#include "ui/graphicsview.h"
 #include "settings.h"
 #include "ui/videoitem/abstract_scene_item.h"
+#include "ui/animation/property_animation.h"
 
 static const qreal max_zoom = 4.0;
 static const qreal def_zoom = 0.22;
@@ -13,10 +15,10 @@ static const qreal normal_hight_qulity_zoom = 0.30;
 static const qreal hight_highest_qulity_zoom = 0.32;
 
 CLSceneZoom::CLSceneZoom(GraphicsView* gview):
-m_view(gview),
-m_zoom(def_zoom+0.1),
-m_targetzoom(0),
-m_quality(CLStreamreader::CLSNormal)
+    CLAnimation(gview),
+    m_zoom(def_zoom+0.1),
+    m_targetzoom(0),
+    m_quality(CLStreamreader::CLSNormal)
 {
 }
 
@@ -138,6 +140,8 @@ void CLSceneZoom::setZoom(qreal z)
 
 void CLSceneZoom::zoom_abs(qreal z, int duration, int delay, QPoint unmoved_point, CLAnimationCurve curve)
 {
+    m_skipViewUpdate = false;
+    
     m_unmoved_point = unmoved_point;
 	m_targetzoom = z;
 	zoom_helper(duration, delay, curve);
@@ -145,12 +149,16 @@ void CLSceneZoom::zoom_abs(qreal z, int duration, int delay, QPoint unmoved_poin
 
 void CLSceneZoom::zoom_minimum(int duration, int delay, QPoint unmoved_point, CLAnimationCurve curve)
 {
+    m_skipViewUpdate = false;
+
     m_unmoved_point = unmoved_point;
 	zoom_abs(m_view->getMinSceneZoom() , duration, delay, QPoint(0,0), curve);
 }
 
 void CLSceneZoom::zoom_delta(qreal delta, int duration, int delay, QPoint unmoved_point, CLAnimationCurve curve)
 {
+    m_skipViewUpdate = true;
+
     m_unmoved_point = unmoved_point;
 	m_targetzoom += delta;
 	zoom_helper(duration, delay, curve);
@@ -183,7 +191,7 @@ void CLSceneZoom::zoom_helper(int duration, int delay, CLAnimationCurve curve)
 	else
 	{
 
-        m_animation = new QPropertyAnimation(this, "zoom");
+        m_animation = AnimationManager::instance().addAnimation(this, "zoom");
 
         QPropertyAnimation* panimation = static_cast<QPropertyAnimation*>(m_animation);
         panimation->setStartValue(this->getZoom());

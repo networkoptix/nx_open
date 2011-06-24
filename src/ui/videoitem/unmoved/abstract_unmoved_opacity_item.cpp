@@ -1,5 +1,8 @@
 #include <math.h>
+
 #include "abstract_unmoved_opacity_item.h"
+#include "ui/animation/property_animation.h"
+
 
 CLAbstractUnMovedOpacityItem::CLAbstractUnMovedOpacityItem(QString name, QGraphicsItem* parent):
 CLAbstractUnmovedItem(name, parent),
@@ -16,13 +19,14 @@ void CLAbstractUnMovedOpacityItem::changeOpacity(qreal new_opacity, int duration
 {
     stopAnimation();
 
+    duration_ms = 0;
     if (duration_ms==0)
     {
         setOpacity(new_opacity);
         return;
     }
 
-    m_animation = new QPropertyAnimation(this, "opacity");
+    m_animation = AnimationManager::instance().addAnimation(this, "opacity");
     m_animation->setDuration(duration_ms);
     m_animation->setStartValue(opacity());
     m_animation->setEndValue(new_opacity);

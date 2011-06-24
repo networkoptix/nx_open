@@ -1,6 +1,8 @@
 #include "grid_item.h"
 #include "ui/video_cam_layout/grid_engine.h"
 #include "ui/graphicsview.h"
+#include "ui/animation/property_animation.h"
+
 
 static const int base_line_width = 40;
 
@@ -78,7 +80,7 @@ void CLGridItem::show(int time_ms)
 	stopAnimation();
 	setVisible(true);
 
-	m_animation = new QPropertyAnimation(this, "alpha");
+	m_animation = AnimationManager::instance().addAnimation(this, "alpha");
 	m_animation->setDuration(time_ms);
 	m_animation->setEasingCurve(QEasingCurve::InOutSine);
 	m_animation->setStartValue(alpha());
@@ -93,7 +95,7 @@ void CLGridItem::hide(int time_ms )
 {
 	stopAnimation();
 
-	m_animation = new QPropertyAnimation(this, "alpha");
+	m_animation = AnimationManager::instance().addAnimation(this, "alpha");
 	m_animation->setDuration(time_ms);
 	m_animation->setEasingCurve(QEasingCurve::InOutSine);
 	m_animation->setStartValue(alpha());

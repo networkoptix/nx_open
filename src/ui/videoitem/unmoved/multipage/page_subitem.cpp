@@ -1,5 +1,6 @@
 #include "page_subitem.h"
 #include "settings.h"
+#include "ui/animation/property_animation.h"
 #include "base/log.h"
 
 //static QFont  page_font("Courier New", 20);
@@ -157,7 +158,7 @@ void QnPageSubItem::animateScale(qreal sc, unsigned int duration)
         return;
     }
 
-    m_scaleAnimation = new QPropertyAnimation(this, "scale");
+    m_scaleAnimation = AnimationManager::instance().addAnimation(this, "scale");
     m_scaleAnimation->setEasingCurve(QEasingCurve::OutBack);
     m_scaleAnimation->setDuration(duration);
     m_scaleAnimation->setStartValue(scale());
@@ -178,7 +179,7 @@ void QnPageSubItem::animateColor(QColor c, unsigned int duration)
         return;
     }
 
-    m_colorAnimation = new QPropertyAnimation(this, "color");
+    m_colorAnimation = AnimationManager::instance().addAnimation(this, "color");
     m_colorAnimation->setEasingCurve(QEasingCurve::OutBack);
     m_colorAnimation->setDuration(duration);
     m_colorAnimation->setStartValue(color());

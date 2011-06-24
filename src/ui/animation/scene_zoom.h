@@ -32,14 +32,11 @@ protected:
 	void set_qulity_helper();
 
 protected:
-	GraphicsView* m_view;
 	qreal m_zoom, m_targetzoom;
 
 	CLStreamreader::StreamQuality m_quality;
 
     QPoint m_unmoved_point; // during zoom this point should remain same position on the screen
-
-   
 };
 
 #endif //scene_zoom_h1907
