@@ -47,6 +47,7 @@ private:
 	ALCdevice* m_device;
     quint8* m_proxyBuffer;
     int m_proxyBufferLen;
+    bool m_deinitialized;
 private:
     void internalClear();
 public:

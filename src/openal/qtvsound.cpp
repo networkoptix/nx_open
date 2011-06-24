@@ -21,6 +21,7 @@ QtvSound::QtvSound(ALCdevice* device, uint numChannels, uint bitsPerSample, uint
 	m_source = 0;
 	m_format = 0;
 	m_device = device;
+    m_deinitialized = false;
 	m_isValid = setup();
 }
 
@@ -89,9 +90,10 @@ uint QtvSound::bufferTime() const
 
 uint QtvSound::playTimeElapsed() const
 {
+    if (m_deinitialized)
+        return 0;
 	ALfloat offset;
 	ALint queued = 0;
-	//QMutexLocker locker(&mutex);
 	alGetSourcef(m_source, AL_SEC_OFFSET, &offset);
 	checkOpenALErrorDebug(m_device);
 	alGetSourcei(m_source, AL_BUFFERS_QUEUED, &queued);
@@ -132,6 +134,12 @@ bool QtvSound::isFormatSupported()
 
 bool QtvSound::play(const quint8* data, uint size)
 {
+    if (m_deinitialized)
+    {
+        m_isValid = setup();
+        m_deinitialized = false;
+    }
+
     while (m_proxyBufferLen == 0 && size >= m_size)
     {
         internalPlay(data, m_size);
@@ -157,7 +165,6 @@ bool QtvSound::play(const quint8* data, uint size)
 
 bool QtvSound::internalPlay(const void* data, uint size)
 {
-    //QMutexLocker locker(&mutex);
     ALint processed = 0;
     alGetSourcei(m_source, AL_BUFFERS_PROCESSED, &processed);
     checkOpenALErrorDebug(m_device);
@@ -232,8 +239,11 @@ void QtvSound::resume()
 
 void QtvSound::clear()
 {
+    if (m_deinitialized)
+        return;
     internalClear();
-    m_isValid = setup();
+    //m_isValid = setup();
+    m_deinitialized = true;
 }
 
 void QtvSound::internalClear()
@@ -250,4 +260,5 @@ void QtvSound::internalClear()
 	}
     m_buffers.clear();
     m_proxyBufferLen = 0;
+    m_source = 0;
 }
