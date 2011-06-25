@@ -1,8 +1,7 @@
-#include "bitStream.h"
+#include "base/bitstream.h"
 
 int BitStream::m_maskInitialized = 0;
 unsigned BitStream::m_masks[INT_BIT + 1];
-
 
 void updateBits(const BitStreamReader& bitReader, int bitOffset, int bitLen, int value)
 {
