@@ -3,6 +3,7 @@
 
 #include <assert.h>
 #include <limits.h>
+#include <stdexcept>
 
 const static unsigned INT_BIT = CHAR_BIT * sizeof(unsigned);
 
@@ -11,9 +12,17 @@ public:
 	//BitStreamException(const char* str): std::exception(str) {}
 	//BitStreamException(const std::string& str): std::exception(str.c_str()) {}
 	BitStreamException(): std::exception() {}
-    BitStreamException(const std::string& str): std::exception(str.c_str()) {}
-    BitStreamException(const QString& str): std::exception(str.toAscii()) {}
-    BitStreamException(const char* str): std::exception(str) {}
+    ~BitStreamException() throw() {}
+    BitStreamException(const std::string& str): message(str.c_str()) {}
+    BitStreamException(const QString& str): message(str.toAscii()) {}
+    BitStreamException(const char* str): message(str) {}
+    
+    virtual const char* what() const throw()
+    {
+        return message.toAscii();
+    }
+private:
+    QString message;
 };
 
 #define THROW_BITSTREAM_ERR throw BitStreamException()

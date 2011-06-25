@@ -7,7 +7,8 @@ sys.path.append('..')
 from version import *
 
 destination = 'EvePlayer-Beta-%s.dmg' % APPLICATION_VERSION
-os.unlink(destination)
+if os.path.isfile(destination):
+    os.unlink(destination)
 
 pwd = os.getcwd()
 os.chdir('../src')
