@@ -23,7 +23,7 @@ m_editedView(0)
 	palette.setColor(backgroundRole(), app_bkr_color);
 	setPalette(palette);
 
-	setWindowOpacity(.90);
+	//setWindowOpacity(.90);
 
 	//=======================================================
 

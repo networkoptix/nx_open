@@ -19,7 +19,7 @@ void CLAbstractUnMovedOpacityItem::changeOpacity(qreal new_opacity, int duration
 {
     stopAnimation();
 
-    duration_ms = 0;
+    
     if (duration_ms==0)
     {
         setOpacity(new_opacity);

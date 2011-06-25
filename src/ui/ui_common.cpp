@@ -7,7 +7,7 @@ QString UIgetText(QWidget* parent, const QString& title, const QString& labletex
 {
 	QInputDialog dialog(parent);
 
-	dialog.setWindowOpacity(global_dlg_opacity);
+	//dialog.setWindowOpacity(global_dlg_opacity);
 	QStyle *arthurStyle = new ArthurStyle();
 	dialog.setStyle(arthurStyle);
 
@@ -28,7 +28,7 @@ QString UIgetText(QWidget* parent, const QString& title, const QString& labletex
 QMessageBox::StandardButton YesNoCancel(QWidget *parent, const QString &title, const QString& text)
 {
 	QMessageBox msgBox(QMessageBox::Information, title, text, QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, parent);
-	msgBox.setWindowOpacity(global_dlg_opacity);
+	//msgBox.setWindowOpacity(global_dlg_opacity);
 	QStyle *arthurStyle = new ArthurStyle();
 	msgBox.setStyle(arthurStyle);
 
@@ -41,7 +41,7 @@ QMessageBox::StandardButton YesNoCancel(QWidget *parent, const QString &title, c
 void UIOKMessage(QWidget* parent, const QString& title, const QString& text)
 {
 	QMessageBox msgBox(QMessageBox::Information, title, text, QMessageBox::Ok, parent);
-	msgBox.setWindowOpacity(global_dlg_opacity);
+	//msgBox.setWindowOpacity(global_dlg_opacity);
 	QStyle *arthurStyle = new ArthurStyle();
 	msgBox.setStyle(arthurStyle);
 
