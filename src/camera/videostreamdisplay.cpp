@@ -45,7 +45,7 @@ bool CLVideoStreamDisplay::allocScaleContext(const CLVideoDecoderOutput& outFram
     m_outputHeight = newHeight;
 
 	m_scaleContext = sws_getContext(outFrame.width, outFrame.height, outFrame.out_type,
-		m_outputWidth, m_outputHeight, PIX_FMT_YUV420P,
+		m_outputWidth, m_outputHeight, PIX_FMT_RGBA,
 		SWS_POINT, NULL, NULL, NULL);
 
     if (m_scaleContext == 0)
@@ -56,12 +56,12 @@ bool CLVideoStreamDisplay::allocScaleContext(const CLVideoDecoderOutput& outFram
 
 	m_frameYUV = avcodec_alloc_frame();
 
-	int numBytes = avpicture_get_size(PIX_FMT_YUV420P, m_outputWidth, m_outputHeight);
-	m_outFrame.out_type = PIX_FMT_YUV420P;
+	int numBytes = avpicture_get_size(PIX_FMT_RGBA, m_outputWidth, m_outputHeight);
+	m_outFrame.out_type = PIX_FMT_RGBA;
 
 	m_buffer = (uint8_t*)av_malloc(numBytes * sizeof(uint8_t));
 
-	avpicture_fill((AVPicture *)m_frameYUV, m_buffer, PIX_FMT_YUV420P, m_outputWidth, m_outputHeight);
+	avpicture_fill((AVPicture *)m_frameYUV, m_buffer, PIX_FMT_RGBA, m_outputWidth, m_outputHeight);
 
     return true;
 }
@@ -112,8 +112,8 @@ CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::determineScaleFacto
 
     CLVideoDecoderOutput::downscale_factor rez = m_canDownscale ? qMax(m_scaleFactor, CLVideoDecoderOutput::factor_1) : CLVideoDecoderOutput::factor_1;
     // If there is no scaling needed check if size is greater than maximum allowed image size (maximum texture size for opengl).
-    int newWidth = img.outFrame.width / m_scaleFactor;
-    int newHeight = img.outFrame.height / m_scaleFactor;
+    int newWidth = img.outFrame.width / rez;
+    int newHeight = img.outFrame.height / rez;
     int maxTextureSize = CLGLRenderer::getMaxTextureSize();
     while (maxTextureSize > 0 && newWidth > maxTextureSize || newHeight > maxTextureSize)
     {
@@ -172,7 +172,7 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
         scaleFactor > CLVideoDecoderOutput::factor_8 ||
         (scaleFactor > CLVideoDecoderOutput::factor_1 && !CLVideoDecoderOutput::isPixelFormatSupported(img.outFrame.out_type)))
     {
-        rescaleFrame(img.outFrame, img.outFrame.width / m_scaleFactor, img.outFrame.height / m_scaleFactor);
+        rescaleFrame(img.outFrame, img.outFrame.width / scaleFactor, img.outFrame.height / scaleFactor);
         m_draw->draw(m_outFrame, data->channelNumber);
     }
     else if (scaleFactor > CLVideoDecoderOutput::factor_1)
