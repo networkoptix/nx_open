@@ -53,7 +53,7 @@ private:
 	void freeScaleContext();
     bool rescaleFrame(CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);
     CLVideoDecoderOutput::downscale_factor findScaleFactor(int width, int height, int fitWidth, int fitHeight);
-    CLVideoDecoderOutput::downscale_factor findOversizeScaleFactor(int width, int height, int fitWidth, int fitHeight);
+    CLVideoDecoderOutput::downscale_factor determineScaleFactor(CLCompressedVideoData* data, const CLVideoData& img, CLVideoDecoderOutput::downscale_factor force_factor);
 };
 
 #endif //videostreamdisplay_h_2044

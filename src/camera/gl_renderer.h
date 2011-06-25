@@ -44,7 +44,7 @@ public:
 	}
 
 	void copyVideoDataBeforePainting(bool copy);
-
+    static bool isPixelFormatSupported(PixelFormat pixfmt);
 private:
 
 	void init(bool msgbox);
@@ -88,6 +88,8 @@ private:
 	void drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const float* v_array);
 	void updateTexture();
 	void setForceSoftYUV(bool value);
+    bool isYuvFormat() const;
+    int glRGBFormat() const;
 private:
 	GLint clampConstant;
 	bool isNonPower2;

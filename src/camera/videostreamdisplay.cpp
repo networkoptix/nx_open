@@ -76,9 +76,52 @@ void CLVideoStreamDisplay::freeScaleContext()
 	}
 }
 
-bool pixelFormatSupported(PixelFormat pixfmt)
+CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::determineScaleFactor(CLCompressedVideoData* data, const CLVideoData& img, CLVideoDecoderOutput::downscale_factor force_factor)
 {
-    return pixfmt == PIX_FMT_YUV420P || pixfmt == PIX_FMT_YUV422P || pixfmt == PIX_FMT_YUV444P;
+    if (m_draw->constantDownscaleFactor())
+       force_factor = CLVideoDecoderOutput::factor_2;
+
+	if (force_factor==CLVideoDecoderOutput::factor_any) // if nobody pushing lets peek it 
+	{
+		QSize on_screen = m_draw->sizeOnScreen(data->channelNumber);
+
+        m_scaleFactor = findScaleFactor(img.outFrame.width, img.outFrame.height, on_screen.width(), on_screen.height());
+
+		if (m_scaleFactor < m_prevFactor)
+		{
+			// new factor is less than prev one; about to change factor => about to increase resource usage 
+			if ( qAbs((qreal)on_screen.width() - m_previousOnScreenSize.width())/on_screen.width() < 0.05 && 
+				qAbs((qreal)on_screen.height() - m_previousOnScreenSize.height())/on_screen.height() < 0.05)
+            {
+				m_scaleFactor = m_prevFactor; // hold bigger factor ( smaller image )
+            }
+
+			// why?
+			// we need to do so ( introduce some histerezis )coz downscaling changes resolution not proportionally some time( cut vertical size a bit )
+			// so it may be a loop downscale => changed aspectratio => upscale => changed aspectratio => downscale.
+		}
+
+		if (m_scaleFactor != m_prevFactor)
+		{
+			m_previousOnScreenSize = on_screen;
+			m_prevFactor = m_scaleFactor;
+		}
+	}
+	else
+		m_scaleFactor = force_factor;
+
+    CLVideoDecoderOutput::downscale_factor rez = m_canDownscale ? qMax(m_scaleFactor, CLVideoDecoderOutput::factor_1) : CLVideoDecoderOutput::factor_1;
+    // If there is no scaling needed check if size is greater than maximum allowed image size (maximum texture size for opengl).
+    int newWidth = img.outFrame.width / m_scaleFactor;
+    int newHeight = img.outFrame.height / m_scaleFactor;
+    int maxTextureSize = CLGLRenderer::getMaxTextureSize();
+    while (maxTextureSize > 0 && newWidth > maxTextureSize || newHeight > maxTextureSize)
+    {
+        rez = CLVideoDecoderOutput::downscale_factor ((int)rez * 2);
+        newWidth /= 2;
+        newHeight /= 2;
+    }
+    return rez;
 }
 
 void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVideoDecoderOutput::downscale_factor force_factor)
@@ -123,112 +166,22 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 
     int maxTextureSize = CLGLRenderer::getMaxTextureSize();
 
-	if (m_canDownscale)
-	{
-		//force_factor
-		m_scaleFactor = CLVideoDecoderOutput::factor_1;
+    CLVideoDecoderOutput::downscale_factor scaleFactor = determineScaleFactor(data, img, force_factor);
 
-        if (m_draw->constantDownscaleFactor())
-        {
-           force_factor = CLVideoDecoderOutput::factor_2;
-        }
-
-
-		if (force_factor==CLVideoDecoderOutput::factor_any) // if nobody pushing lets peek it 
-		{
-			QSize on_screen = m_draw->sizeOnScreen(data->channelNumber);
-
-            CLVideoDecoderOutput::downscale_factor scaleFactor = findScaleFactor(img.outFrame.width, img.outFrame.height, on_screen.width(), on_screen.height());
-            if (scaleFactor != CLVideoDecoderOutput::factor_any)
-                m_scaleFactor = scaleFactor;
-
-			if (m_scaleFactor < m_prevFactor)
-			{
-				// new factor is less than prev one; about to change factor => about to increase resource usage 
-				if ( qAbs((qreal)on_screen.width() - m_previousOnScreenSize.width())/on_screen.width() < 0.05 && 
-					qAbs((qreal)on_screen.height() - m_previousOnScreenSize.height())/on_screen.height() < 0.05)
-					m_scaleFactor = m_prevFactor; // hold bigger factor ( smaller image )
-
-				// why?
-				// we need to do so ( introduce some histerezis )coz downscaling changes resolution not proportionally some time( cut vertical size a bit )
-				// so it may be a loop downscale => changed aspectratio => upscale => changed aspectratio => downscale.
-			}
-
-			if (m_scaleFactor != m_prevFactor)
-			{
-				m_previousOnScreenSize = on_screen;
-				m_prevFactor = m_scaleFactor;
-			}
-
-		}
-		else
-			m_scaleFactor = force_factor;
-
-		//m_scaleFactor  = CLVideoDecoderOutput::factor_2;
-
-		if (m_scaleFactor == CLVideoDecoderOutput::factor_1 && pixelFormatSupported(img.outFrame.out_type))
-		{
-            // If there is no scaling needed check if size is greater than maximum allowed image size (maximum texture size for opengl).
-            CLVideoDecoderOutput::downscale_factor scaleFactor = findOversizeScaleFactor(img.outFrame.width, img.outFrame.height, maxTextureSize, maxTextureSize);
-            if (scaleFactor != CLVideoDecoderOutput::factor_1)
-            {
-                CLVideoDecoderOutput::downscale(&img.outFrame, &m_outFrame, scaleFactor);
-                m_draw->draw(m_outFrame, data->channelNumber);
-            } else
-            {
-                m_draw->draw(img.outFrame, data->channelNumber);
-            }
-		}
-		else
-		{
-            int newWidth = img.outFrame.width / m_scaleFactor;
-            int newHeight = img.outFrame.height / m_scaleFactor;
-            
-            CLVideoDecoderOutput::downscale_factor scaleFactor = findOversizeScaleFactor(newWidth, newHeight, maxTextureSize, maxTextureSize);
-            newWidth /= scaleFactor;
-            newHeight /= scaleFactor;
-            
-            // It's possible m_scaleFactor and scaleFactor both are not equal to 1.
-            int scale = m_scaleFactor * scaleFactor;
-
-			if (!pixelFormatSupported(img.outFrame.out_type))
-			{
-                rescaleFrame(img.outFrame, newWidth, newHeight);
-			} else 
-			{
-                // Check if we can downscale. Scaling is implemented to factor_8.
-                if (scale <= CLVideoDecoderOutput::factor_8)
-                    CLVideoDecoderOutput::downscale(&img.outFrame, &m_outFrame, (CLVideoDecoderOutput::downscale_factor)scale); // extra cpu work but less to display( for weak video cards )
-                else {
-                    // Giving up. Error message will be shown.
-                    m_draw->draw(img.outFrame, data->channelNumber);
-                    return;
-                }
-			}
-			m_draw->draw(m_outFrame, data->channelNumber);
-		}
-
-	} else
+    if (!CLGLRenderer::isPixelFormatSupported(img.outFrame.out_type) || 
+        scaleFactor > CLVideoDecoderOutput::factor_8 ||
+        (scaleFactor > CLVideoDecoderOutput::factor_1 && !CLVideoDecoderOutput::isPixelFormatSupported(img.outFrame.out_type)))
     {
-        CLVideoDecoderOutput::downscale_factor scaleFactor = findOversizeScaleFactor(img.outFrame.width, img.outFrame.height, maxTextureSize, maxTextureSize);
-        if (scaleFactor != CLVideoDecoderOutput::factor_1)
-        {
-            CLVideoDecoderOutput::downscale(&img.outFrame, &m_outFrame, scaleFactor);
-            m_draw->draw(m_outFrame, data->channelNumber);
-        }
-        else
-        {
-            // Convert to YUV
-            if (!pixelFormatSupported(img.outFrame.out_type))
-            {
-                rescaleFrame(img.outFrame, img.outFrame.width, img.outFrame.height);
-                m_draw->draw(m_outFrame, data->channelNumber);
-            }
-            else
-            {
-                m_draw->draw(img.outFrame, data->channelNumber);
-            }
-        }
+        rescaleFrame(img.outFrame, img.outFrame.width / m_scaleFactor, img.outFrame.height / m_scaleFactor);
+        m_draw->draw(m_outFrame, data->channelNumber);
+    }
+    else if (scaleFactor > CLVideoDecoderOutput::factor_1)
+    {
+        CLVideoDecoderOutput::downscale(&img.outFrame, &m_outFrame, scaleFactor); // extra cpu work but less to display( for weak video cards )
+        m_draw->draw(m_outFrame, data->channelNumber);
+    }
+    else {
+        m_draw->draw(img.outFrame, data->channelNumber);
     }
 }
 
@@ -289,55 +242,14 @@ void CLVideoStreamDisplay::copyImage(bool copy)
 
 CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::findScaleFactor(int width, int height, int fitWidth, int fitHeight)
 {
-    if (fitWidth * 8 <= width  && fitHeight * 8 <= height) // never use 8 factor ( to low quality )
+    if (fitWidth * 8 <= width  && fitHeight * 8 <= height) 
         return CLVideoDecoderOutput::factor_8;
     if (fitWidth * 4 <= width  && fitHeight * 4 <= height)
         return CLVideoDecoderOutput::factor_4;
     else if (fitWidth * 2 <= width  && fitHeight * 2 <= height)
         return CLVideoDecoderOutput::factor_2;
-
-    return CLVideoDecoderOutput::factor_any;
-}
-
-CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::findOversizeScaleFactor(int width, int height, int fitWidth, int fitHeight)
-{
-    // Fit exclusive
-    width++;
-    height++;
-
-    CLVideoDecoderOutput::downscale_factor scaleFactor = CLVideoDecoderOutput::factor_1;
-
-    int newWidth = width;
-    int newHeight = height;
-
-    if (newWidth > fitWidth || newHeight > fitHeight)
-    {
-        newWidth = width / 2;
-        newHeight = height / 2;
-        scaleFactor = CLVideoDecoderOutput::factor_2;
-    }
-
-    if (newWidth > fitWidth || newHeight > fitHeight)
-    {
-        newWidth = width / 4;
-        newHeight = height / 4;
-        scaleFactor = CLVideoDecoderOutput::factor_4;
-    }
-
-    if (newWidth > fitWidth || newHeight > fitHeight)
-    {
-        newWidth = width / 8;
-        newHeight = height / 8;
-        scaleFactor = CLVideoDecoderOutput::factor_8;
-    }
-
-    if (newWidth > fitWidth || newHeight > fitHeight)
-    {
-        // Giving up. The error will be shown later.
-        scaleFactor = CLVideoDecoderOutput::factor_1;
-    }
-
-    return scaleFactor;
+    else
+        return CLVideoDecoderOutput::factor_1;
 }
 
 void CLVideoStreamDisplay::setMTDecoding(bool value)

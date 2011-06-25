@@ -35,7 +35,6 @@
 # define GL_TEXTURE2    0x84C2
 #endif
 
-
 static const int MAX_SHADER_SIZE = 1024*3; 
 
 #define OGL_CHECK_ERROR(str) //if (checkOpenGLError() != GL_NO_ERROR) {cl_log.log(str, __LINE__ , cl_logERROR); }
@@ -506,6 +505,50 @@ int roundUp(int value)
     return value % ROUND_COEFF ? (value + ROUND_COEFF - (value % ROUND_COEFF)) : value;
 }
 
+int CLGLRenderer::glRGBFormat() const
+{
+    if (isYuvFormat())
+        return GL_RGBA;
+    switch(m_color)
+    {
+        case PIX_FMT_RGBA:
+            return GL_RGBA;
+        case PIX_FMT_BGRA:
+            return GL_BGRA_EXT;
+        case PIX_FMT_RGB24:
+            return GL_RGB;
+        case PIX_FMT_BGR24:
+             return GL_BGR_EXT;
+        default:
+            return GL_RGBA;
+    }
+}
+
+bool CLGLRenderer::isPixelFormatSupported(PixelFormat pixfmt) 
+{
+    static const PixelFormat supportedFormats[] = 
+    {
+            PIX_FMT_YUV422P, 
+            PIX_FMT_YUV420P, 
+            PIX_FMT_YUV444P, 
+            PIX_FMT_RGBA, 
+            PIX_FMT_BGRA, 
+            PIX_FMT_RGB24,
+            PIX_FMT_BGR24
+    };
+    for (int i = 0; i < sizeof (supportedFormats)/ sizeof(PixelFormat); ++i)
+    {
+        if (pixfmt == supportedFormats[i])
+            return true;
+    }
+    return false;
+}
+
+bool CLGLRenderer::isYuvFormat() const
+{
+    return m_color == PIX_FMT_YUV422P || m_color == PIX_FMT_YUV420P || m_color == PIX_FMT_YUV444P;
+}
+
 void CLGLRenderer::updateTexture()
 {
 	//image.saveToFile("test.yuv");
@@ -528,8 +571,9 @@ void CLGLRenderer::updateTexture()
 
 	glEnable(GL_TEXTURE_2D);
 	OGL_CHECK_ERROR("glEnable");
-	if (!isSoftYuv2Rgb) 
+	if (!isSoftYuv2Rgb && isYuvFormat()) 
 	{
+            // using pixel shader to yuv-> rgb conversion
 			for (int i = 0; i < 3; ++i) 
 			{
 				glBindTexture(GL_TEXTURE_2D, m_texture[i]);
@@ -576,7 +620,6 @@ void CLGLRenderer::updateTexture()
 			const int wPow = isNonPower2 ? roundUp(w[0]) : getMinPow2(w[0]);
 			const int hPow = isNonPower2 ? h[0] : getMinPow2(h[0]);
 
-
 			if (!m_videoTextureReady) 
 			{
 				// if support "GL_ARB_texture_non_power_of_two", use default size of texture,
@@ -589,7 +632,7 @@ void CLGLRenderer::updateTexture()
 				m_videoCoeffW[0] =  roundUp(r_w[0]) / (float) wPow;
 				m_videoCoeffH[0] = h[0] / (float) hPow;
 
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wPow, hPow, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wPow, hPow, 0, glRGBFormat(), GL_UNSIGNED_BYTE, 0);
 				OGL_CHECK_ERROR("glTexImage2D");
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 				OGL_CHECK_ERROR("glTexParameteri");
@@ -601,17 +644,16 @@ void CLGLRenderer::updateTexture()
 				OGL_CHECK_ERROR("glTexParameteri");
 			}
 
-		
-		int size = 4 * m_stride * h[0];
-		if (yuv2rgbBuffer.size() != size) {
-			yuv2rgbBuffer.resize(size);
+        uint8_t* pixels = m_arrayPixels[0];
+		if (isYuvFormat())
+        {
+		    int size = 4 * m_stride * h[0];
+		    if (yuv2rgbBuffer.size() != size) 
+			    yuv2rgbBuffer.resize(size);
+		    pixels = &yuv2rgbBuffer[0];
 		}
-
-		uint8_t* pixels = &yuv2rgbBuffer[0];
 		
-		uint8_t* pixelsArray[4];
-		pixelsArray[0] = pixels;
-		
+        int lineInPixelsSize = m_stride;
 		if (m_color == PIX_FMT_YUV422P)
 		{
 			yuv422_argb32_mmx(pixels, m_arrayPixels[0], m_arrayPixels[2], m_arrayPixels[1], 
@@ -628,21 +670,29 @@ void CLGLRenderer::updateTexture()
 										4 * m_stride, 
 										m_stride, m_stride / 2);
 		}
-		else if (m_color == PIX_FMT_YUV444P){
+		else if (m_color == PIX_FMT_YUV444P)
+        {
 			yuv444_argb32_mmx(pixels, m_arrayPixels[0], m_arrayPixels[2], m_arrayPixels[1], 
 										roundUp(r_w[0]), 
                                         h[0], 
 										4 * m_stride, 
 										m_stride, m_stride);
 		}
+        else if (m_color == PIX_FMT_RGB24 || m_color == PIX_FMT_BGR24) {
+            lineInPixelsSize /= 3;
+        }
+        else {
+            lineInPixelsSize /= 4; // RGBA, BGRA
+        }
 
-		glPixelStorei(GL_UNPACK_ROW_LENGTH, m_stride);
+		glPixelStorei(GL_UNPACK_ROW_LENGTH, lineInPixelsSize);
 		OGL_CHECK_ERROR("glPixelStorei");
 		glTexSubImage2D(GL_TEXTURE_2D, 0,
 			0, 0,
             roundUp(r_w[0]),
             h[0],
-			GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+			glRGBFormat(), GL_UNSIGNED_BYTE, pixels);
+
 		OGL_CHECK_ERROR("glTexSubImage2D");
 		glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 		OGL_CHECK_ERROR("glPixelStorei");
@@ -690,7 +740,7 @@ void CLGLRenderer::drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const
 	OGL_CHECK_ERROR("glEnable");
 
 
-	if (!isSoftYuv2Rgb) 
+	if (!isSoftYuv2Rgb && isYuvFormat()) 
 	{
 
 		const Program prog =  YV12toRGB ;
