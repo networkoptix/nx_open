@@ -48,8 +48,8 @@ QStringList CLAVIBlurayStreamReader::getPlaylist()
         double playListDuration = 0;
         foreach(MPLSPlayItem playItem, parser.m_playItems)        
         {
-            tmpList << mediaDir.absolutePath() + '/' + playItem.fileName + '.' + parser.fileExt;
-            playListDuration += (playItem.OUT_time - playItem.IN_time)  / (float) MPLSParser::TIME_BASE;
+            tmpList << mediaDir.absolutePath() + '/' + playItem.m_fileName + '.' + parser.m_fileExt;
+            playListDuration += (playItem.m_OUT_time - playItem.m_IN_time)  / (float) MPLSParser::TIME_BASE;
         }
         if (playListDuration >= maxDuration)
         {

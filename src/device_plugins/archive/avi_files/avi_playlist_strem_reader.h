@@ -36,7 +36,6 @@ private:
     qint32 readPacket(quint8* buf, int size);
     qint32 writePacket(quint8* buf, int size);
     qint64 seek(qint64 offset, qint32 whence);
-    bool openNextFile();
     qint64 findFileIndexByTime(quint64 mksec);
     bool switchToFile(int newFileIndex);
 private:
