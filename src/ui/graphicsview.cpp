@@ -1170,7 +1170,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 	// distance menu 
 	QMenu distance_menu;
 
-	distance_menu.setWindowOpacity(global_menu_opacity);
+	//distance_menu.setWindowOpacity(global_menu_opacity);
 	distance_menu.setTitle("Item distance");
 
 	distance_menu.addAction(&dis_0);
@@ -1192,7 +1192,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
 	//===== final menu=====
 	QMenu menu;
-	menu.setWindowOpacity(global_menu_opacity);
+	//menu.setWindowOpacity(global_menu_opacity);
 
 	if (aitem && m_scene.selectedItems().count()==0) // video wnd and single selection
 	{

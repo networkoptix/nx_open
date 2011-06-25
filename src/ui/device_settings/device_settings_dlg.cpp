@@ -17,7 +17,7 @@ mDevice(dev)
 	str+=mDevice->toString();
 
 	setWindowTitle(str);
-	setWindowOpacity(global_dlg_opacity);
+	//setWindowOpacity(global_dlg_opacity);
 
 	int width = 610;
 	int height = 490;

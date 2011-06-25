@@ -27,7 +27,7 @@ PreferencesWindow::PreferencesWindow()
     updateView();
     updateCameras();
 
-    setWindowOpacity(.90);
+    //setWindowOpacity(.90);
 
     resizeEvent(0);
 }
