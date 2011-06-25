@@ -11,10 +11,13 @@ public:
 	//BitStreamException(const char* str): std::exception(str) {}
 	//BitStreamException(const std::string& str): std::exception(str.c_str()) {}
 	BitStreamException(): std::exception() {}
+    BitStreamException(const std::string& str): std::exception(str.c_str()) {}
+    BitStreamException(const QString& str): std::exception(str.toAscii()) {}
+    BitStreamException(const char* str): std::exception(str) {}
 };
 
-//#define THROW_BITSTREAM_ERR throw BitStreamException(std::string(__FILE__) + std::string(" ") + std::string(__FUNCTION__) + std::string(" at line ") + int32ToStr(__LINE__))
 #define THROW_BITSTREAM_ERR throw BitStreamException()
+#define THROW_BITSTREAM_ERR2(x) throw BitStreamException(x)
 
 class BitStream {
 public:

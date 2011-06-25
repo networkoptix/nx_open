@@ -3,7 +3,7 @@
 
 #include <QString>
 
-#include "bitstream.h"
+#include "base/bitstream.h"
 
 class AbstractBlurayStream
 {

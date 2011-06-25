@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "bitStream.h"
 
 int BitStream::m_maskInitialized = 0;
@@ -10,14 +9,14 @@ void updateBits(const BitStreamReader& bitReader, int bitOffset, int bitLen, int
 	updateBits(bitReader.getBuffer(), bitOffset, bitLen, value);
 }
 
-void updateBits(const uint8_t* buffer, int bitOffset, int bitLen, int value)
+void updateBits(const quint8* buffer, int bitOffset, int bitLen, int value)
 {
-	uint8_t* ptr = (uint8_t*) buffer + bitOffset/8;
+	quint8* ptr = (quint8*) buffer + bitOffset/8;
 	BitStreamWriter bitWriter;
 	int byteOffset = bitOffset % 8;
 	bitWriter.setBuffer(ptr, ptr + (bitLen / 8 + 5));
 	
-	uint8_t* ptr_end = (uint8_t*) buffer + (bitOffset + bitLen)/8;
+	quint8* ptr_end = (quint8*) buffer + (bitOffset + bitLen)/8;
 	int endBitsPostfix = 8 - ((bitOffset + bitLen) % 8);
 
 	if (byteOffset > 0) {
@@ -33,12 +32,12 @@ void updateBits(const uint8_t* buffer, int bitOffset, int bitLen, int value)
 	bitWriter.flushBits();
 }
 
-void moveBits(uint8_t* buffer, int oldBitOffset, int newBitOffset, int len)
+void moveBits(quint8* buffer, int oldBitOffset, int newBitOffset, int len)
 {
-	uint8_t* src = (uint8_t*) buffer + (oldBitOffset >> 3);
+	quint8* src = (quint8*) buffer + (oldBitOffset >> 3);
 	BitStreamReader reader;
 	reader.setBuffer(src, src + len/8 + 1);
-	uint8_t* dst = (uint8_t*) buffer + (newBitOffset >> 3);
+	quint8* dst = (quint8*) buffer + (newBitOffset >> 3);
 	BitStreamWriter writer;
 	writer.setBuffer(dst, dst + len/8 + 1);
 	writer.skipBits(newBitOffset % 8);
