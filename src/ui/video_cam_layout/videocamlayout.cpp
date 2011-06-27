@@ -233,9 +233,6 @@ void SceneLayout::onTimer()
 	{
 		m_firstTime =  false;
 
-		//QThread::currentThread()->setPriority(QThread::IdlePriority); // surprised. if gui thread has low priority => things looks smoother 
-		QThread::currentThread()->setPriority(QThread::LowPriority); // surprised. if gui thread has low priority => things looks smoother 
-		//QThread::currentThread()->setPriority(QThread::HighestPriority); // surprised. if gui thread has low priority => things looks smoother 
 		m_view->start();
 	}
 
