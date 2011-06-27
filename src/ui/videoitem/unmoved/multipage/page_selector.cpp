@@ -59,8 +59,7 @@ void QnPageSelector::setCurrentPage(unsigned int page)
     m_currPage = qMax(page, (unsigned int)1);
     m_currPage = qMin(m_currPage, m_maxPage);
 
-
-    updateItems();
+    onPageSelected(page);
 }
 
 void QnPageSelector::onPageSelected(int page)

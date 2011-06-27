@@ -253,8 +253,8 @@ void SceneLayout::onTimer()
 
         m_view->updatePageSelector();
 
-        if (ps->getCurrentPage() == ps->getMaxPageNumber() && ps->getCurrentPage()>1) // this is the last page 
-            return; // do not need to add something 
+        //if (ps->getCurrentPage() == ps->getMaxPageNumber() && ps->getCurrentPage()>1) // this is the last page 
+        //    return; // do not need to add something 
     }
 
 	//===================video devices=======================
@@ -273,6 +273,17 @@ void SceneLayout::onTimer()
 
         bool criteriaChanged = (m_content->getDeviceCriteria().filter() != mSearchFilter || m_content->getDeviceCriteria().getCriteria()==CLDeviceCriteria::NONE);
             mSearchFilter = m_content->getDeviceCriteria().filter();
+
+        if (m_view->getPageSelector())
+        {
+            QnPageSelector* ps = m_view->getPageSelector();
+
+            if (ps->getCurrentPage() == ps->getMaxPageNumber() && ps->getCurrentPage()>1 && !criteriaChanged) // this is the last page 
+                return; // do not need to add something 
+
+            if (criteriaChanged)
+                ps->setCurrentPage(1);
+        }
 
             
             QList<LayoutDevice*> ldList =  m_content->getDevices();
