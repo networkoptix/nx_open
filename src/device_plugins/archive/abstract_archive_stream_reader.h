@@ -32,6 +32,13 @@ public:
     virtual void previousFrame(quint64 /*mksec*/) {}
     virtual void nextFrame() {}
 
+    // gives a list of audio tracks 
+    virtual QStringList getAudioTracksInfo() const {return QStringList();};
+
+
+    // sets certain track 
+    virtual void setAudioChannel(unsigned int num){};
+
 protected:
 	virtual void channeljumpTo(quint64 mksec, int channel) = 0;
     quint64 skipFramesToTime() const;
