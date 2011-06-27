@@ -10,8 +10,7 @@
 #include "property_animation.h"
 
 AnimationManager::AnimationManager()
-    : m_skipViewUpdate(false),
-      m_lastAnimation(0)
+    : m_skipViewUpdate(false)
 {
 }
 
@@ -27,14 +26,35 @@ QPropertyAnimation* AnimationManager::addAnimation(QObject * target, const QByte
     CLAnimation* clanimation = dynamic_cast<CLAnimation*> (target);
     if (!clanimation)
         return animation;
-    
-    if (clanimation->isSkipViewUpdate())
-        m_skipViewUpdate = true;
-    
+
+    cl_log.log(cl_logALWAYS, "Size=%d, Adding animation: %d", m_animations.size(), (int)(void*)animation);
     m_animations.insert(animation, clanimation);
-    m_lastAnimation = animation;
-    
+    m_animationsOrder.append(animation);
+
     return animation;
+}
+
+void AnimationManager::removeAnimation(PropertyAnimationWrapper* animation)
+{
+    if (!m_animations.contains(animation))
+        return;
+    
+    cl_log.log(cl_logALWAYS, "Removing animation: %d", (int)(void*)animation);
+    
+    CLAnimationEntry& entry = m_animations[animation];
+
+    // TODO: The following line seems reasonable, but looks like enableViewUpdateMode do not work as required and we see animation freeze.
+    // if (m_animations.size() == 1)
+    {
+        cl_log.log(cl_logALWAYS, "Enable updates animation: %d", (int)(void*)animation);
+        entry.clanimation->enableViewUpdateMode(true);
+    }
+    
+    m_animations.remove(animation);
+    m_animationsOrder.removeOne(animation);
+
+    
+    updateSkipViewUpdate();
 }
 
 void AnimationManager::updateState (PropertyAnimationWrapper* animation, QAbstractAnimation::State newState, QAbstractAnimation::State oldState)
@@ -42,40 +62,38 @@ void AnimationManager::updateState (PropertyAnimationWrapper* animation, QAbstra
     if (!m_animations.contains(animation))
         return;
     
-    QMap<PropertyAnimationWrapper*, CLAnimation*>::const_iterator first = m_animations.begin();
-    
-    // Call updateView only once.
-    if (m_lastAnimation != animation)
-    {
-        if (oldState == QAbstractAnimation::Running && newState == QAbstractAnimation::Stopped)
-        {
-            m_animations.remove(animation);
-        }
-        
-        return;
-    }
-    
-    CLAnimation* clanimation = m_animations[animation];
+    CLAnimationEntry& entry = m_animations[animation];
     
     if (oldState == QAbstractAnimation::Stopped && newState == QAbstractAnimation::Running)
     {
-        clanimation->enableViewUpdateMode(false);
-    } 
+        cl_log.log(cl_logALWAYS, "Disable updates animation: %d", (int)(void*)animation);
+        entry.clanimation->enableViewUpdateMode(false);
+        
+        cl_log.log(cl_logALWAYS, "Starting animation: %d", (int)(void*)animation);
+        entry.started = true;
+        
+        updateSkipViewUpdate();
+    }
     else if (oldState == QAbstractAnimation::Running && newState == QAbstractAnimation::Stopped)
     {
-        clanimation->enableViewUpdateMode(true);
-        m_animations.remove(animation);
-        
-        foreach (CLAnimation* cl, m_animations)
-        {
-            if (cl->isSkipViewUpdate())
-            {
-                m_skipViewUpdate = true;
-                return;
-            }
-        }
-        m_skipViewUpdate = false;
+        removeAnimation(animation);
     }
+}
+
+void AnimationManager::updateSkipViewUpdate()
+{
+    // Check if there any animation which forces us to skip update remains
+    foreach (const CLAnimationEntry& entry, m_animations)
+    {
+        if (entry.started && entry.clanimation->isSkipViewUpdate())
+        {
+            m_skipViewUpdate = true;
+            cl_log.log(cl_logALWAYS, "updateSkipViewUpdate, m_skipViewUpdate = %d", m_skipViewUpdate);
+            return;
+        }
+    }
+    m_skipViewUpdate = false;
+    cl_log.log(cl_logALWAYS, "updateSkipViewUpdate, m_skipViewUpdate = %d", m_skipViewUpdate);
 }
 
 void AnimationManager::updateCurrentValue(PropertyAnimationWrapper* animation, const QVariant & value)
@@ -84,14 +102,14 @@ void AnimationManager::updateCurrentValue(PropertyAnimationWrapper* animation, c
         return;
     
     // Call updateView only once
-    if (m_lastAnimation != animation)
+    if (m_animationsOrder.back() != animation)
         return;
     
-    CLAnimation* clanimation = m_animations[animation];
-    
-    if (!clanimation->isSkipViewUpdate())
+    CLAnimationEntry& entry = m_animations[animation];
+    cl_log.log(cl_logALWAYS, "updateCurrentValue, animation: %d, skip: %d", (int)(void*)animation, m_skipViewUpdate);
+    if (!m_skipViewUpdate)
     {
-        clanimation->updateView();
+        entry.clanimation->updateView();
     }
 }
 
@@ -99,6 +117,11 @@ PropertyAnimationWrapper::PropertyAnimationWrapper(AnimationManager* manager, QO
 	: QPropertyAnimation(target, propertyName, parent),
 	  m_manager(manager)	
 {
+}
+
+PropertyAnimationWrapper::~PropertyAnimationWrapper()
+{
+    m_manager->removeAnimation(this);
 }
 
 void PropertyAnimationWrapper::updateState (QAbstractAnimation::State newState, QAbstractAnimation::State oldState) 

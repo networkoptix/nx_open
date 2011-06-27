@@ -16,6 +16,11 @@
 
 class PropertyAnimationWrapper;
 
+/**
+  * @class AnimationManager
+  *
+  * Manage concurrent animation to not allow multiple repaints
+  */
 class AnimationManager
 {
 public:
@@ -32,23 +37,39 @@ public:
     void updateCurrentValue(PropertyAnimationWrapper* animation, const QVariant & value);
     
 private:
+	AnimationManager();
+    
+    void updateSkipViewUpdate();
+    void removeAnimation(PropertyAnimationWrapper* animation);
+    
+private:
     friend class PropertyAnimationWrapper;
     
-	AnimationManager();
-	
-	QMap<PropertyAnimationWrapper*, CLAnimation*> m_animations;
-    bool m_skipViewUpdate;
+    struct CLAnimationEntry
+    {
+        CLAnimationEntry(CLAnimation* cl = 0)
+        : clanimation(cl),
+          started(false)
+        {
+        }
+        
+        CLAnimation* clanimation;
+        bool started;
+    };
     
-    PropertyAnimationWrapper* m_lastAnimation;
+	QMap<PropertyAnimationWrapper*, CLAnimationEntry> m_animations;
+    QLinkedList<PropertyAnimationWrapper*> m_animationsOrder;
+    bool m_skipViewUpdate;
 };
 
 class PropertyAnimationWrapper : public QPropertyAnimation
 {
 public:
 	PropertyAnimationWrapper(AnimationManager* manager, QObject * target, const QByteArray & propertyName, QObject * parent = 0);
+    ~PropertyAnimationWrapper();
 	
 	void updateState (QAbstractAnimation::State newState, QAbstractAnimation::State oldState);
-    void updateCurrentValue ( const QVariant & value );
+    void updateCurrentValue (const QVariant & value);
     
 private:
 	AnimationManager* m_manager; 
