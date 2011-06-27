@@ -24,19 +24,19 @@ CLAbstractMediaData* CLSingleShotFileStreamreader::getData()
 	if (!file.open(QIODevice::ReadOnly))
 		return 0;
 
-    QByteArray imageFormat = QImageReader::imageFormat(&file);
-
     CodecID compressionType;
 
-    if (imageFormat == "png")
+    QString lowerFileName = m_fileName.toLower();
+    
+    if (lowerFileName.endsWith(".png"))
         compressionType = CODEC_ID_PNG;
-    else if (imageFormat == "jpeg")
+    else if (lowerFileName.endsWith(".jpeg") || lowerFileName.endsWith(".jpg"))
         compressionType = CODEC_ID_MJPEG;
-    else if (imageFormat == "tiff")
+    else if (lowerFileName.endsWith(".tiff") || lowerFileName.endsWith(".tif"))
         compressionType = CODEC_ID_TIFF;
-    else if (imageFormat == "gif")
+    else if (lowerFileName.endsWith(".gif"))
         compressionType = CODEC_ID_GIF;
-    else if (imageFormat == "bmp")
+    else if (lowerFileName.endsWith(".bmp"))
         compressionType = CODEC_ID_BMP;
     else
         return 0;
