@@ -33,8 +33,11 @@ public:
     virtual void nextFrame() {}
 
     // gives a list of audio tracks 
-    virtual QStringList getAudioTracksInfo() const {return QStringList();};
+    virtual QStringList getAudioTracksInfo() const;
 
+
+    //gets current audio channel ( if we have the only channel - returns 0 )
+    virtual unsigned int getCurrentAudioChannel() const{return 0;};
 
     // sets certain track 
     virtual void setAudioChannel(unsigned int num){};

@@ -1190,6 +1190,21 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 	rotation_manu.addAction(&cm_rotate_minus90);
 	rotation_manu.addAction(&cm_rotate_180);
 
+
+    QMenu audioMenu;
+    audioMenu.setTitle("Audio tracks");
+    QAction cmAudio0(0);
+    QAction cmAudio1(0);
+    QAction cmAudio2(0);
+    QAction cmAudio3(0);
+    QAction* AudioTracks[4] = {&cmAudio0, &cmAudio1, &cmAudio2, &cmAudio3};
+
+    cmAudio0.setCheckable(true);
+    cmAudio1.setCheckable(true);
+    cmAudio2.setCheckable(true);
+    cmAudio3.setCheckable(true);
+    
+
 	//===== final menu=====
 	QMenu menu;
 	//menu.setWindowOpacity(global_menu_opacity);
@@ -1223,6 +1238,29 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
 				menu.addAction(&cm_open_web_page);
 			}
+
+            if (dev->checkDeviceTypeFlag(CLDevice::ARCHIVE))
+            {
+                CLAbstractArchiveReader* reader = static_cast<CLAbstractArchiveReader*>(cam->getStreamreader());
+                QStringList tracks = reader->getAudioTracksInfo();
+                if (tracks.size() > 1 ) // if we've got more than one channel
+                {
+                    
+
+                    for (int i = 0; i  < qMin(tracks.size(), 4); ++i )
+                    {
+                        AudioTracks[i]->setText(QString("  ") + tracks.at(i));
+                        audioMenu.addAction(AudioTracks[i]);
+                    }
+
+                    unsigned int selectedAudio = qMin((unsigned int)3, reader->getCurrentAudioChannel());
+                    AudioTracks[selectedAudio]->setChecked(true);
+
+
+                    menu.addMenu(&audioMenu);
+                }
+            }
+
 
             if (dev->checkDeviceTypeFlag(CLDevice::RECORDED) && !dev->getUniqueId().contains(getRecordingDir()))
             {
@@ -1405,6 +1443,27 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
 		if (aitem->getType() == CLAbstractSceneItem::VIDEO)
 		{
+
+            if (dev->checkDeviceTypeFlag(CLDevice::ARCHIVE))
+            {
+                CLAbstractArchiveReader* reader = static_cast<CLAbstractArchiveReader*>(cam->getStreamreader());
+
+                if (act == AudioTracks[0])
+                    reader->setAudioChannel(0);
+
+                if (act == AudioTracks[1])
+                    reader->setAudioChannel(1);
+
+                if (act == AudioTracks[2])
+                    reader->setAudioChannel(2);
+
+                if (act == AudioTracks[3])
+                    reader->setAudioChannel(3);
+
+
+            }
+
+
 			if (act==&cm_fullscren)
 				toggleFullScreen_helper(aitem);
 

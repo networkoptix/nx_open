@@ -96,3 +96,12 @@ bool CLAbstractArchiveReader::isSkippingFrames() const
 
     return m_skipFramesToTime != 0;
 }
+
+
+QStringList CLAbstractArchiveReader::getAudioTracksInfo() const
+{
+    QStringList result;
+    result << "Track 1";
+    result << "Track 2";
+    return result;
+}
