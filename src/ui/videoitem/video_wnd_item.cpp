@@ -239,7 +239,7 @@ void CLVideoWindowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
 	for (unsigned i = 0; i  < m_videonum; ++i)
 	{
         if (drawSelection)
-            m_gldraw[i]->setOpacity(0.5);
+            m_gldraw[i]->setOpacity(0.7);
         else
             m_gldraw[i]->setOpacity(1.0);
 
