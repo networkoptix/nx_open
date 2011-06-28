@@ -10,7 +10,7 @@ class CLItemTransform : public CLAnimation
     Q_PROPERTY(qreal zoom	READ getZoom WRITE setZoom)
     Q_PROPERTY(qreal rotation	READ getRotation WRITE setRotation)
 public:
-	CLItemTransform(QGraphicsItem* item);
+	CLItemTransform(QGraphicsItem* item, GraphicsView* gview);
 	virtual ~CLItemTransform();
 
 	qreal zoomToscale(qreal zoom) const;

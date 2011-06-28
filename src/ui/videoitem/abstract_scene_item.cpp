@@ -26,7 +26,7 @@ CLAbstractSceneItem::CLAbstractSceneItem(GraphicsView* view, int max_width, int 
 CLAbstractSubItemContainer(0),
 m_max_width(max_width),
 m_max_height(max_height),
-m_animationTransform(this),
+m_animationTransform(this, view),
 m_view(view),
 m_type(BUTTON),
 mName(name),

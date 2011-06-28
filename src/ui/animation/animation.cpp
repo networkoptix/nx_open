@@ -30,6 +30,7 @@ bool CLAnimation::isRuning() const
 	return (m_animation && (m_animation->state() & QAbstractAnimation::Running));
 }
 
+
 void CLAnimation::stopAnimation()
 {
     QMutexLocker _locker(&m_animationMutex);
@@ -85,7 +86,10 @@ void CLAnimation::onFinished()
 void CLAnimation::enableViewUpdateMode(bool enable)
 {
     if (!m_view)
+    {
+        // problem 1
         return;
+    }
     
     m_view->setViewportUpdateMode(enable ? QGraphicsView::MinimalViewportUpdate : QGraphicsView::NoViewportUpdate);
 }
@@ -93,9 +97,12 @@ void CLAnimation::enableViewUpdateMode(bool enable)
 void CLAnimation::updateView()
 {
     if (!m_view)
+    {
+        // problem 1
         return;
+    }
     
-    m_view->update();
+    m_view->viewport()-> update(); // problem 2
 }
 
 bool CLAnimation::isSkipViewUpdate() const

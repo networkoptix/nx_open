@@ -23,8 +23,8 @@ qreal round_angle(qreal angle, qreal min_diff)
 }
 
 //=========================================================
-CLItemTransform::CLItemTransform(QGraphicsItem* item):
-    CLAnimation(0),
+CLItemTransform::CLItemTransform(QGraphicsItem* item, GraphicsView* gview):
+    CLAnimation(gview),
     m_item(item),
     m_zoom(1.0),
     m_Zrotation(0.0)

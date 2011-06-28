@@ -18,11 +18,6 @@ QPropertyAnimation* AnimationManager::addAnimation(QObject * target, const QByte
 {
     PropertyAnimationWrapper* animation = new PropertyAnimationWrapper(this, target, propertyName, parent);
  
-    // For now there are problems on win32
-#ifdef _WIN32
-    return animation;
-#endif
-
     CLAnimation* clanimation = dynamic_cast<CLAnimation*> (target);
     if (!clanimation)
         return animation;
@@ -44,7 +39,7 @@ void AnimationManager::removeAnimation(PropertyAnimationWrapper* animation)
     CLAnimationEntry& entry = m_animations[animation];
 
     // TODO: The following line seems reasonable, but looks like enableViewUpdateMode do not work as required and we see animation freeze.
-    // if (m_animations.size() == 1)
+    if (m_animations.size() == 1)
     {
         cl_log.log(cl_logALWAYS, "Enable updates animation: %d", (int)(void*)animation);
         entry.clanimation->enableViewUpdateMode(true);
@@ -106,7 +101,7 @@ void AnimationManager::updateCurrentValue(PropertyAnimationWrapper* animation, c
         return;
     
     CLAnimationEntry& entry = m_animations[animation];
-    cl_log.log(cl_logALWAYS, "updateCurrentValue, animation: %d, skip: %d", (int)(void*)animation, m_skipViewUpdate);
+    //cl_log.log(cl_logALWAYS, "updateCurrentValue, animation: %d, skip: %d", (int)(void*)animation, m_skipViewUpdate);
     if (!m_skipViewUpdate)
     {
         entry.clanimation->updateView();
