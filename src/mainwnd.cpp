@@ -12,6 +12,46 @@
 extern QString button_layout;
 extern QString button_home;
 
+void findAcceptedFiles(QStringList& files, const QString& path)
+{
+    FileTypeSupport fileTypeSupport;
+
+    QFileInfo fileInfo(path);
+    if (fileInfo.isDir())
+    {
+        if (CLAviDvdDevice::isAcceptedUrl(fileInfo.absoluteFilePath()))
+        {
+            files.append(path);
+        }
+        else if (CLAviBluRayDevice::isAcceptedUrl(fileInfo.absoluteFilePath()))
+        {
+            files.append(path);
+        }
+        else 
+        {
+            QDirIterator iter(path, QDirIterator::Subdirectories);
+            while (iter.hasNext())
+            {
+                QString nextFilename = iter.next();
+                if (QFileInfo(nextFilename).isFile())
+                {
+                    if (fileTypeSupport.isFileSupported(nextFilename))
+                    {
+                        files.append(nextFilename);
+                    }
+                }
+            }
+        }
+    }
+    else if (fileInfo.isFile())
+    {
+        if (fileTypeSupport.isFileSupported(path))
+        {
+            files.append(path);
+        }
+    }
+}
+
 MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WFlags flags):
 //QMainWindow(parent, flags),
 m_normalView(0)
@@ -39,7 +79,7 @@ m_normalView(0)
     {
         QString fileName = QDir::fromNativeSeparators(QString::fromLocal8Bit(argv[i]));
         if (QFile(fileName).exists())
-            files.append(fileName);
+            findAcceptedFiles(files, fileName);
     }
 
     LayoutContent* content = 0;
@@ -152,46 +192,12 @@ void MainWnd::dragEnterEvent(QDragEnterEvent *event)
 
 void MainWnd::dropEvent(QDropEvent *event)
 {
-    FileTypeSupport fileTypeSupport;
-
     QStringList files;
     foreach (QUrl url, event->mimeData()->urls())
     {
         QString filename = url.toLocalFile();
-        QFileInfo fileInfo(filename);
-        if (fileInfo.isDir())
-        {
-            if (CLAviDvdDevice::isAcceptedUrl(fileInfo.absoluteFilePath()))
-            {
-                files.append(filename);
-            }
-            else if (CLAviBluRayDevice::isAcceptedUrl(fileInfo.absoluteFilePath()))
-            {
-                files.append(filename);
-            }
-            else 
-            {
-                QDirIterator iter(filename, QDirIterator::Subdirectories);
-                while (iter.hasNext())
-                {
-                    QString nextFilename = iter.next();
-                    if (QFileInfo(nextFilename).isFile())
-                    {
-                        if (fileTypeSupport.isFileSupported(nextFilename))
-                        {
-                            files.append(nextFilename);
-                        }
-                    }
-                }
-            }
-        }
-        else if (fileInfo.isFile())
-        {
-            if (fileTypeSupport.isFileSupported(filename))
-            {
-                files.append(filename);
-            }
-        }
+        
+        findAcceptedFiles(files, filename);
     }
 
     addFilesToCurrentOrNewLayout(files, event->keyboardModifiers() & Qt::AltModifier);
