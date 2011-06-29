@@ -63,7 +63,6 @@ m_editable(false)
 	settings.optimal_ratio = square_ratio;
 
 	m_grid.setSettings(settings);
-
 }
 
 SceneLayout::~SceneLayout()
@@ -72,7 +71,6 @@ SceneLayout::~SceneLayout()
 
 	//delete[] m_potantial_x;
 	//delete[] m_potantial_y;
-
 }
 
 void SceneLayout::setContent(LayoutContent* cont)
@@ -110,7 +108,6 @@ void SceneLayout::setContentChanged(bool changed)
 	m_contentchanged = changed;
 }
 
-
 void SceneLayout::start()
 {
 	if (m_isRunning)
@@ -124,7 +121,6 @@ void SceneLayout::start()
 	m_timer.start(20);
 	m_videotimer.start(1000/MAX_FPS); 
 	m_isRunning = true;
-
 }
 
 void SceneLayout::stop_helper(bool emt)
@@ -160,7 +156,6 @@ void SceneLayout::stop_helper(bool emt)
 
 		delete item;
 		dev->releaseRef();
-
 	}
 
 	m_deviceitems.clear();
@@ -190,7 +185,6 @@ void SceneLayout::saveLayoutContent()
 
 void SceneLayout::stop(bool animation)
 {
-
 	if (!m_isRunning)
 		return;
 
@@ -215,12 +209,10 @@ void SceneLayout::stop(bool animation)
 	{
 		stop_helper(animation);
 	}
-
 }
 
 void SceneLayout::onTimer()
 {
-
 	if (m_firstTime)
 	{
 		m_view->zoomMin(0);
@@ -252,7 +244,6 @@ void SceneLayout::onTimer()
         }
 
         m_view->updatePageSelector();
-
         //if (ps->getCurrentPage() == ps->getMaxPageNumber() && ps->getCurrentPage()>1) // this is the last page 
         //    return; // do not need to add something 
     }
@@ -294,8 +285,6 @@ void SceneLayout::onTimer()
 
             }
             
-
-
 			QList<CLAbstractComplicatedItem*> remove_lst;
 			foreach(CLAbstractComplicatedItem* devitem, m_deviceitems)
 			{
@@ -306,7 +295,6 @@ void SceneLayout::onTimer()
 
                     if (!all_devs.contains(devitem->getDevice()->getUniqueId()))
                         remove_lst.push_back(devitem);
-
 				}
 			}
 
@@ -315,7 +303,6 @@ void SceneLayout::onTimer()
 
 			if (m_deviceitems.count()==0)	
 				CLGLRenderer::clearGarbage();
-
 	}
 
 	foreach(CLDevice* dev, all_devs)
@@ -348,7 +335,6 @@ void SceneLayout::onTimer()
 
 		if (addDevice(child->getName(), false))
 			added = true;
-
 	}
 
 	//================================
@@ -365,7 +351,6 @@ void SceneLayout::onTimer()
 		m_view->fitInView(2000, 0);
 
 	}
-
 }
 
 void SceneLayout::onVideoTimer()
@@ -399,7 +384,6 @@ bool SceneLayout::addDevice(QString uniqueid, bool update_scene_rect, CLBasicLay
 			if (dev==0)
 				return false;
 		}
-
 	}
 
 	if (!addDevice(dev, update_scene_rect, itemSettings))
@@ -456,8 +440,6 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect, CLBasicLay
             connect( cam, SIGNAL(reachedTheEnd()), this, SLOT(onReachedTheEnd()) );
         }
 
-
-
 		addItem(video_wnd, update_scene_rect, itemSettings);
 
 		m_deviceitems.push_back(cam);
@@ -497,7 +479,6 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect, CLBasicLay
 	}
 
 	return false;
-
 }
 
 bool SceneLayout::addLayoutItem(QString name, LayoutContent* lc, bool update_scene_rect, CLBasicLayoutItemSettings itemSettings)
