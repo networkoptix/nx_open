@@ -5,6 +5,7 @@
 #include "ui/video_cam_layout/layout_manager.h"
 #include "device/directory_browser.h"
 #include "device_plugins/archive/filetypesupport.h"
+#include "util.h"
 
 #include "device_plugins/archive/avi_files/avi_dvd_device.h"
 #include "device_plugins/archive/avi_files/avi_bluray_device.h"
@@ -77,7 +78,7 @@ m_normalView(0)
     QStringList files;
     for (int i = 1; i < argc; ++i)
     {
-        QString fileName = QDir::fromNativeSeparators(QString::fromLocal8Bit(argv[i]));
+        QString fileName = fromNativePath(QString::fromLocal8Bit(argv[i]));
         if (QFile(fileName).exists())
             findAcceptedFiles(files, fileName);
     }
