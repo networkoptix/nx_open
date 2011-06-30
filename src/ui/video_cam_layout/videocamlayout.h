@@ -114,7 +114,7 @@ private:
 	bool addDevice(CLDevice* dev, bool update_scene_rect, CLBasicLayoutItemSettings itemSettings = CLBasicLayoutItemSettings());
 
 	// removes devices;
-	bool removeDevices( QList<CLAbstractComplicatedItem*> lst, bool removeFromLayoutcontent ); 
+	bool removeDevices(QList<CLAbstractComplicatedItem*> lst, bool removeFromLayoutcontent); 
 
 	//================================================
 private:

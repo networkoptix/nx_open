@@ -38,12 +38,12 @@ private:
     void addNumber(int page);
 
     void addItemHelper(QnPageSubItem* item);
+
 private:
     int m_currPage;
     int m_maxPage;
 
     int m_totalWidth;
-
 
 };
 

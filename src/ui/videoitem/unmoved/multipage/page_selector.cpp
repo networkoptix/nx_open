@@ -9,9 +9,9 @@ static const qreal activeOpacity = 1.0;
 static const qreal itemsDistance = 25;
 
 QnPageSelector::QnPageSelector(QString name, QGraphicsItem* parent, qreal normal_opacity, qreal active_opacity):
-CLUnMovedInteractiveOpacityItem(name, parent, normal_opacity, active_opacity),
-m_maxPage(1),
-m_currPage(1)
+    CLUnMovedInteractiveOpacityItem(name, parent, normal_opacity, active_opacity),
+    m_maxPage(1),
+    m_currPage(1)
 {
     //setFlag(QGraphicsItem::ItemIgnoresTransformations, false);
 }
@@ -43,7 +43,7 @@ QRectF QnPageSelector::boundingRect() const
 {
     QList<QGraphicsItem*> lst = childItems();
 
-    if (childItems().size()==0)
+    if (childItems().size() == 0)
         return QRect(0,0,0,0);
 
     return QRect(0, 0, m_totalWidth, lst.at(0)->boundingRect().height());
@@ -94,7 +94,7 @@ void QnPageSelector::updateItems()
 
     //=====================
 
-    if (m_maxPage>2)// if we have at least 3 pages
+    if (m_maxPage > 2)// if we have at least 3 pages
     {
         addPrev();
     }
@@ -110,7 +110,7 @@ void QnPageSelector::updateItems()
     }
 
 
-    if (maxPage>1)
+    if (maxPage > 1)
     for (int i = minPage; i <= maxPage; ++i)
     {
         addNumber(i);
@@ -123,7 +123,7 @@ void QnPageSelector::updateItems()
         addEllipsis(false);
     }
 
-    if (m_maxPage>2)// if we have at least 3 pages
+    if (m_maxPage > 2)// if we have at least 3 pages
     {
         addNext();
     }
@@ -144,7 +144,7 @@ void QnPageSelector::addPrev()
 {
     QnPageSubItem* item = new QnPageSubItem("Prev", this, normalOpacity, activeOpacity, m_currPage == 1 ? m_maxPage : m_currPage - 1, false );
     addItemHelper(item);
-    m_totalWidth+=10;
+    m_totalWidth += 10;
 }
 
 void QnPageSelector::addNext()

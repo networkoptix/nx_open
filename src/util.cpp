@@ -1,6 +1,18 @@
 #include "util.h"
 #include "settings.h"
 
+QString fromNativePath(QString path)
+{
+    path = QDir::cleanPath(QDir::fromNativeSeparators(path));
+    
+    if (!path.isEmpty() && path.at(path.length() - 1) == '/')
+    {
+        path.remove(path.length() - 1, 1);
+    }
+
+    return path;
+}
+
 QString getDataDirectory()
 {
     return QDesktopServices::storageLocation(QDesktopServices::DataLocation);
@@ -13,12 +25,12 @@ QString getMoviesDirectory()
 
 QString getTempRecordingDir()
 {
-    return Settings::instance().mediaRoot()  + QString("_temp/");
+    return Settings::instance().mediaRoot()  + QString("/_temp/");
 }
 
 QString getRecordingDir()
 {
-    return Settings::instance().mediaRoot()  + QString("_Recorded/");
+    return Settings::instance().mediaRoot()  + QString("/_Recorded/");
 }
 
 QString formatDuration(unsigned duration, unsigned total)

@@ -25,7 +25,6 @@ public:
     virtual void show(int duration) = 0;
 
 protected:
-
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
 
@@ -36,7 +35,6 @@ protected:
 	QPoint m_pos;
 
     bool m_underMouse;
-
 };
 
 #endif //abstract_unmoved_item_h_1753

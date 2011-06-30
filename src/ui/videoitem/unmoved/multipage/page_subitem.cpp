@@ -14,12 +14,12 @@ static const int animationPeriod = 350;
 
 
 QnPageSubItem::QnPageSubItem(QString name, QGraphicsItem* parent, qreal normal_opacity, qreal active_opacity, int number, bool current):
-CLUnMovedInteractiveOpacityItem(name, parent, normal_opacity, active_opacity),
-m_number(number),
-m_scaleAnimation(0),
-m_colorAnimation(0),
-m_current(current),
-m_firstPaint(true)
+    CLUnMovedInteractiveOpacityItem(name, parent, normal_opacity, active_opacity),
+    m_number(number),
+    m_scaleAnimation(0),
+    m_colorAnimation(0),
+    m_current(current),
+    m_firstPaint(true)
 {
     setFlag(QGraphicsItem::ItemIgnoresTransformations, false);
 
@@ -30,21 +30,7 @@ m_firstPaint(true)
 
     setTransformOriginPoint(boundingRect().center() + QPointF(0,boundingRect().height()/2));
 
-    /*
-    if (m_current)
-    {
-        setScale(1.3);
-        m_color = activeColor;
-    }
-    else
-    {
-        m_color = normalColor;
-    }
-    /**/
-
     m_color = normalColor;
-
-    
 }
 
 QnPageSubItem::~QnPageSubItem()
@@ -87,7 +73,6 @@ void QnPageSubItem::stopScaleAnimation()
         delete m_scaleAnimation;
         m_scaleAnimation = 0;
     }
-
 }
 
 void QnPageSubItem::stopColorAnimation()
@@ -110,7 +95,6 @@ void QnPageSubItem::setColor(QColor c)
     m_color = c;
 }
 
-
 void QnPageSubItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
     if (m_current)
@@ -119,7 +103,6 @@ void QnPageSubItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
     CLUnMovedInteractiveOpacityItem::hoverEnterEvent(event);
     animateScale(1.6, animationPeriod);
     animateColor(activeColor, animationPeriod);
-
 }
 
 void QnPageSubItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
@@ -151,7 +134,6 @@ void QnPageSubItem::animateScale(qreal sc, unsigned int duration)
 {
     stopScaleAnimation();
 
-
     if (duration==0)
     {
         setScale(sc);
@@ -165,13 +147,11 @@ void QnPageSubItem::animateScale(qreal sc, unsigned int duration)
     m_scaleAnimation->setEndValue(sc);
     m_scaleAnimation->start();	
     connect(m_scaleAnimation, SIGNAL(finished ()), this, SLOT(stopScaleAnimation()));
-
 }
 
 void QnPageSubItem::animateColor(QColor c, unsigned int duration)
 {
     stopColorAnimation();
-
 
     if (duration==0)
     {
@@ -186,5 +166,4 @@ void QnPageSubItem::animateColor(QColor c, unsigned int duration)
     m_colorAnimation->setEndValue(c);
     m_colorAnimation->start();	
     connect(m_colorAnimation, SIGNAL(finished ()), this, SLOT(stopColorAnimation()));
-
 }

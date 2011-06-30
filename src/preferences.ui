@@ -19,9 +19,6 @@
   <property name="windowTitle">
    <string>Preferences1</string>
   </property>
-  <property name="windowOpacity">
-   <double>0.900000000000000</double>
-  </property>
   <property name="sizeGripEnabled">
    <bool>false</bool>
   </property>
@@ -102,7 +99,10 @@
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="pushButton_2">
+               <widget class="QPushButton" name="auxRemovePushButton">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="text">
                  <string>Remove</string>
                 </property>
@@ -500,7 +500,7 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>pushButton_2</sender>
+   <sender>auxRemovePushButton</sender>
    <signal>clicked()</signal>
    <receiver>PreferencesDialog</receiver>
    <slot>auxMediaFolderRemove()</slot>
@@ -563,6 +563,22 @@ p, li { white-space: pre-wrap; }
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>auxMediaRootsList</sender>
+   <signal>itemSelectionChanged()</signal>
+   <receiver>PreferencesDialog</receiver>
+   <slot>auxMediaFolderSelectionChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>272</x>
+     <y>230</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>314</x>
+     <y>197</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>mainMediaFolderBrowse()</slot>
@@ -571,5 +587,6 @@ p, li { white-space: pre-wrap; }
   <slot>allowChangeIPChanged()</slot>
   <slot>cameraSelected(int)</slot>
   <slot>enterLicenseClick()</slot>
+  <slot>auxMediaFolderSelectionChanged()</slot>
  </slots>
 </ui>

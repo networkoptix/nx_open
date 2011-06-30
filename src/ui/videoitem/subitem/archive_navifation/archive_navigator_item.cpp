@@ -100,7 +100,6 @@ void CLArchiveNavigatorItem::hideIfNeeded(int duration)
     }
 }
 
-
 bool CLArchiveNavigatorItem::isCursorOnSlider() const
 {
     //return isUnderMouse();

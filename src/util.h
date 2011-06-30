@@ -6,6 +6,11 @@ char (&ArraySizeHelper(T (&array)[N]))[N];
 #define arraysize(array) (sizeof(ArraySizeHelper(array)))
 
 /*
+ * Convert path from native to inner.
+ */
+QString fromNativePath(QString path);
+
+/*
  * Get user data directory. Directory should be available for writing.
  */
 QString getDataDirectory();

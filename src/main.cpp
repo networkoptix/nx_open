@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
     QString argsMessage;
     for (int i = 1; i < argc; ++i)
     {
-        argsMessage += QDir::fromNativeSeparators(QString::fromLocal8Bit(argv[i]));
+        argsMessage += fromNativePath(QString::fromLocal8Bit(argv[i]));
         if (i < argc-1)
             argsMessage += QChar('\0');
     }

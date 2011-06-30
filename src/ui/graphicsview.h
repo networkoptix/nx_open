@@ -45,7 +45,6 @@ public:
 
     QnPageSelector* getPageSelector() const;
 
-
 	CLAbstractSceneItem* getSelectedItem() const;
 
 	void setZeroSelection(); 
@@ -239,7 +238,6 @@ protected:
     QTime m_timeAfterDoubleClick;
 
     CLAbstractSceneItem* m_lastPressedItem;
-
 };
 
 #endif //PH_graphicsview_h328
