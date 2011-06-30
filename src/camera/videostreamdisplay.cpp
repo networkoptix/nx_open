@@ -59,7 +59,7 @@ bool CLVideoStreamDisplay::allocScaleContext(const CLVideoDecoderOutput& outFram
 	int numBytes = avpicture_get_size(PIX_FMT_RGBA, m_outputWidth, m_outputHeight);
 	m_outFrame.out_type = PIX_FMT_RGBA;
 
-	m_buffer = (uint8_t*)av_malloc(numBytes * sizeof(uint8_t));
+	m_buffer = (quint8*)av_malloc(numBytes * sizeof(quint8));
 
 	avpicture_fill((AVPicture *)m_frameYUV, m_buffer, PIX_FMT_RGBA, m_outputWidth, m_outputHeight);
 
@@ -204,7 +204,7 @@ bool CLVideoStreamDisplay::rescaleFrame(CLVideoDecoderOutput& outFrame, int newW
             return false;
     }
 
-    const uint8_t* const srcSlice[] = {outFrame.C1, outFrame.C2, outFrame.C3};
+    const quint8* const srcSlice[] = {outFrame.C1, outFrame.C2, outFrame.C3};
     int srcStride[] = {outFrame.stride1, outFrame.stride2, outFrame.stride3};
 
     sws_scale(m_scaleContext,srcSlice, srcStride, 0, 

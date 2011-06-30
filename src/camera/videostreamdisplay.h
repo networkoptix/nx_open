@@ -43,7 +43,7 @@ private:
 	QSize m_previousOnScreenSize;
 
 	AVFrame *m_frameYUV;
-	uint8_t* m_buffer;
+	quint8* m_buffer;
 	SwsContext *m_scaleContext;
 	int m_outputWidth;
 	int m_outputHeight;

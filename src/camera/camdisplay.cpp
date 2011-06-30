@@ -374,7 +374,7 @@ qint64 CLCamDisplay::diffBetweenVideoAndAudio(CLCompressedVideoData* incoming, i
 
     // strongly saning this duration of prev frame; not exact, but I think its fine
     // let's assume this frame has same duration
-    duration = currentPlayingVideoTime - m_previousVideoTime;
+    duration = qMax(currentPlayingVideoTime - m_previousVideoTime, 0ll);
     if (duration == 0)
         duration = m_lastNonZerroDuration;
     else

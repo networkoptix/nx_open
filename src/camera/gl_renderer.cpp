@@ -644,7 +644,7 @@ void CLGLRenderer::updateTexture()
 				OGL_CHECK_ERROR("glTexParameteri");
 			}
 
-        uint8_t* pixels = m_arrayPixels[0];
+        quint8* pixels = m_arrayPixels[0];
 		if (isYuvFormat())
         {
 		    int size = 4 * m_stride * h[0];

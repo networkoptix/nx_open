@@ -1,6 +1,6 @@
 #include "avi_bluray_strem_reader.h"
 #include "avi_bluray_device.h"
-#include "bluray_helper.h"
+#include "base/bluray_reader/bluray_helper.h"
 
 CLAVIBlurayStreamReader::CLAVIBlurayStreamReader(CLDevice* dev):
     CLAVIPlaylistStreamReader(dev)

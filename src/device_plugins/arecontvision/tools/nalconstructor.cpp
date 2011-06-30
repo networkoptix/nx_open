@@ -3,24 +3,24 @@
 
 // These typedefs are already defined in stdint.h included with ffmpeg headers
 #if 0
-typedef signed char int8_t;
-typedef unsigned char   uint8_t;
-typedef short  int16_t;
-typedef unsigned short  uint16_t;
-typedef int  int32_t;
-typedef unsigned   uint32_t;
+typedef signed char qint8;
+typedef unsigned char   quint8;
+typedef short  qint16;
+typedef unsigned short  quint16;
+typedef int  qint32;
+typedef unsigned   quint32;
 #endif
 
 typedef struct bs_s
 {
-	uint8_t *p_start; // pointer to the begining
-	uint8_t *p;			// pointer to the current
-	uint8_t *p_end; // pointer to the end
+	quint8 *p_start; // pointer to the begining
+	quint8 *p;			// pointer to the current
+	quint8 *p_end; // pointer to the end
 
 	int     i_left;    /* i_count number of available bits */
 } bs_t;
 
-static inline void bs_init( bs_t *s, uint8_t *p_data, int i_data )
+static inline void bs_init( bs_t *s, quint8 *p_data, int i_data )
 {
 	s->p_start = p_data;
 	s->p       = p_data;
@@ -28,7 +28,7 @@ static inline void bs_init( bs_t *s, uint8_t *p_data, int i_data )
 	s->i_left  = 8;
 }
 
-static inline void bs_write( bs_t *s, int i_count, uint32_t i_bits )
+static inline void bs_write( bs_t *s, int i_count, quint32 i_bits )
 {
 	if( s->p >= s->p_end - 4 )
 		return;
@@ -52,7 +52,7 @@ static inline void bs_write( bs_t *s, int i_count, uint32_t i_bits )
 	}
 }
 
-static inline void bs_write1( bs_t *s, uint32_t i_bit )
+static inline void bs_write1( bs_t *s, quint32 i_bit )
 {
 	if( s->p < s->p_end )
 	{
