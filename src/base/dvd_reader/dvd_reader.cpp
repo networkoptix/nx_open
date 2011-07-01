@@ -58,10 +58,6 @@ extern "C"
 
 #define DEFAULT_UDF_CACHE_LEVEL 1
 
-#ifdef _WIN32
-static const int PATH_MAX = 1024;
-#endif
-
 struct dvd_reader_t {
   /* Basic information. */
   int isImageFile;
