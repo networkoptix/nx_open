@@ -46,7 +46,8 @@ void CLDeviceDirectoryBrowser::run()
 
     foreach(QString dir, mDirsToCheck)
     {
-        dir += "/";
+        if (!dir.endsWith("/"))
+            dir += "/";
 
         CLDeviceList dev_lst = findDevices(dir);
 
