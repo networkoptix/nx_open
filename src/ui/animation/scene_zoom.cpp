@@ -58,6 +58,8 @@ void CLSceneZoom::setZoom(qreal z)
     QTransform tr;
     tr.scale(scl, scl);
     tr.rotate(global_rotation_angel, Qt::YAxis);
+
+    m_skipViewUpdate = m_view->transform() != tr;
     m_view->setTransform(tr);
 
     if (m_unmoved_point!=QPoint(0,0))
@@ -157,7 +159,7 @@ void CLSceneZoom::zoom_minimum(int duration, int delay, QPoint unmoved_point, CL
 
 void CLSceneZoom::zoom_delta(qreal delta, int duration, int delay, QPoint unmoved_point, CLAnimationCurve curve)
 {
-    m_skipViewUpdate = true;
+    m_skipViewUpdate = false;
 
     m_unmoved_point = unmoved_point;
 	m_targetzoom += delta;
