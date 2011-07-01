@@ -20,6 +20,7 @@ protected:
     virtual ByteIOContext* getIOContext();
     virtual bool switchToFile(int newFileIndex);
     virtual qint32 readPacket(quint8* buf, int size);
+    virtual void fillAdditionalInfo(CLFileInfo* fi);
 private:
     friend class CLAVIDvdStreamReaderPriv;
     qint64 seek(qint64 offset, qint32 whence);

@@ -4,9 +4,12 @@
 
 #include "data/mediadata.h"
 #include "stdint.h"
+#include <libavformat/avformat.h>
+#include "base/ffmpeg_helper.h"
 
 QMutex CLAVIStreamReader::avi_mutex;
 QSemaphore CLAVIStreamReader::aviSemaphore(4);
+
 
 class QnAviSemaphoreHelpr
 {
@@ -50,7 +53,8 @@ CLAVIStreamReader::CLAVIStreamReader(CLDevice* dev )
       m_formatContext(0),
       m_bsleep(false),
       m_currentPacketIndex(0),
-      m_haveSavedPacket(false)
+      m_haveSavedPacket(false),
+      m_selectedAudioChannel(0)
 {
     // Should init packets here as some times destroy (av_free_packet) could be called before init
     av_init_packet(&m_packets[0]);
@@ -172,6 +176,7 @@ bool CLAVIStreamReader::initCodecs()
 {
     m_videoStreamIndex = -1;
     m_audioStreamIndex = -1;
+    int lastStreamID = -1;
 
     for(unsigned i = 0; i < m_formatContext->nb_streams; i++) 
     {
@@ -180,6 +185,10 @@ bool CLAVIStreamReader::initCodecs()
 
         if(codecContext->codec_type >= (unsigned)AVMEDIA_TYPE_NB)
             continue;
+
+        if (strm->id == lastStreamID)
+            continue; // duplicate
+        lastStreamID = strm->id;
 
         switch(codecContext->codec_type) 
         {
@@ -191,6 +200,7 @@ bool CLAVIStreamReader::initCodecs()
         case AVMEDIA_TYPE_AUDIO:
             if (m_audioStreamIndex == -1) // Take only first audio stream
                 m_audioStreamIndex = i;
+                m_selectedAudioChannel = 0;
             break;
 
         default:
@@ -216,14 +226,13 @@ bool CLAVIStreamReader::initCodecs()
 
     if (m_audioStreamIndex!=-1)
     {
-
         AVCodecContext *aCodecCtx = m_formatContext->streams[m_audioStreamIndex]->codec;
         CodecID ffmpeg_audio_codec_id = aCodecCtx->codec_id;
         m_freq = aCodecCtx->sample_rate;
         m_channels = aCodecCtx->channels;
 
         m_audioCodecId = ffmpeg_audio_codec_id;
-
+        emit audioParamsChanged();
     }
     return true;
 }
@@ -500,3 +509,108 @@ void CLAVIStreamReader::smartSleep(qint64 mksec)
 
 }
 
+unsigned int CLAVIStreamReader::getCurrentAudioChannel() const
+{
+    return m_selectedAudioChannel;
+}
+
+QStringList CLAVIStreamReader::getAudioTracksInfo() const
+{
+    QStringList result;
+    if (m_formatContext == 0)
+        return result;
+    int audioNumber = 0;
+    int lastStreamID = -1;
+    for(unsigned i = 0; i < m_formatContext->nb_streams; i++) 
+    {
+        AVStream *strm= m_formatContext->streams[i];
+
+        AVCodecContext *codecContext = strm->codec;
+
+        if(codecContext->codec_type >= (unsigned)AVMEDIA_TYPE_NB)
+            continue;
+
+        if (strm->id == lastStreamID)
+            continue; // duplicate
+        lastStreamID = strm->id;
+
+        if (codecContext->codec_type == AVMEDIA_TYPE_AUDIO) 
+        {
+            QString str = QString::number(++audioNumber);
+            str += ". ";
+
+            AVMetadataTag* lang = av_metadata_get(strm->metadata, "language", 0, 0);
+            if (lang && lang->value  && lang->value[0])
+            {
+                QString langName = lang->value;
+                str += langName;
+                str += " - ";
+            }
+
+            QString codecStr = codecIDToString(codecContext->codec_id);
+            if (!codecStr.isEmpty())
+            {
+                str += codecStr;
+                str += ' ';
+            }
+
+            //str += QString::number(codecContext->sample_rate / 1000)+ "Khz ";
+            if (codecContext->channels == 3)
+                str += "3.1";
+            else if (codecContext->channels == 6)
+                str += "5.1";
+            else if (codecContext->channels == 8)
+                str += "7.1";
+            else if (codecContext->channels == 2)
+                str += "stereo";
+            else if (codecContext->channels == 1)
+                str += "mono";
+            else
+                str += QString::number(codecContext->channels);
+            //str += "ch";
+
+            result << str;
+        }
+    }
+    return result;
+}
+
+bool CLAVIStreamReader::setAudioChannel(unsigned int num)
+{
+    // convert num to absolute track number
+    int lastStreamID = -1;
+    int currentAudioTrackNum = 0;
+    for(unsigned i = 0; i < m_formatContext->nb_streams; i++) 
+    {
+        AVStream *strm= m_formatContext->streams[i];
+        AVCodecContext *codecContext = strm->codec;
+
+        if(codecContext->codec_type >= (unsigned)AVMEDIA_TYPE_NB)
+            continue;
+
+        if (strm->id == lastStreamID)
+            continue; // duplicate
+        lastStreamID = strm->id;
+
+        if (codecContext->codec_type == AVMEDIA_TYPE_AUDIO) 
+        {
+            if (currentAudioTrackNum == num)
+            {
+                m_audioStreamIndex = i;
+                m_selectedAudioChannel = num;
+
+                AVCodecContext *aCodecCtx = m_formatContext->streams[m_audioStreamIndex]->codec;
+                CodecID ffmpeg_audio_codec_id = aCodecCtx->codec_id;
+                m_freq = aCodecCtx->sample_rate;
+                m_channels = aCodecCtx->channels;
+
+                m_audioCodecId = ffmpeg_audio_codec_id;
+
+                emit audioParamsChanged();
+                return true;
+            }
+            currentAudioTrackNum++;
+        }
+    }
+    return false;
+}

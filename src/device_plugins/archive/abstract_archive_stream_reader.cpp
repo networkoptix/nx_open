@@ -98,10 +98,19 @@ bool CLAbstractArchiveReader::isSkippingFrames() const
 }
 
 
+// ------------------- Audio tracks -------------------------
+
+unsigned int CLAbstractArchiveReader::getCurrentAudioChannel() const
+{
+    return 0;
+}
+
 QStringList CLAbstractArchiveReader::getAudioTracksInfo() const
 {
-    QStringList result;
-    result << "Track 1";
-    result << "Track 2";
-    return result;
+    return QStringList();
+}
+
+bool CLAbstractArchiveReader::setAudioChannel(unsigned int num)
+{
+    return false;
 }

@@ -8,6 +8,7 @@ struct AVFormatContext;
 
 class CLAVIStreamReader : public CLAbstractArchiveReader
 {
+    Q_OBJECT
 public:
 	CLAVIStreamReader(CLDevice* dev);
 	virtual ~CLAVIStreamReader();
@@ -15,6 +16,12 @@ public:
 	virtual quint64 currentTime() const;
 
     void previousFrame(quint64 mksec);
+
+    virtual QStringList getAudioTracksInfo() const;
+    virtual unsigned int getCurrentAudioChannel() const;
+    virtual bool setAudioChannel(unsigned int num);
+signals:
+    void audioParamsChanged();
 protected:
 	virtual CLAbstractMediaData* getNextData();
 	virtual void channeljumpTo(quint64 mksec, int channel);
@@ -53,6 +60,7 @@ private:
     AVPacket m_packets[2];
     int m_currentPacketIndex;
     bool m_haveSavedPacket;
+    int m_selectedAudioChannel;
     static QMutex avi_mutex;
     static QSemaphore aviSemaphore ;
 private:

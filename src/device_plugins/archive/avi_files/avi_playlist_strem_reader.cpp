@@ -45,7 +45,6 @@ AVFormatContext* CLAVIPlaylistStreamReader::getFormatContext()
         fi->m_offsetInMks = 0;
         fi->opaque = 0;
         fi->m_formatContext = 0;
-        fi->m_durationHint = 0;
     
         m_fileList << fi;
 
@@ -90,8 +89,7 @@ AVFormatContext* CLAVIPlaylistStreamReader::getFormatContext()
         }
         else
         {
-            if (fi->m_durationHint)
-                fi->m_formatContext->duration = fi->m_durationHint;
+            fillAdditionalInfo(fi);
             m_lengthMksec += fi->m_formatContext->duration;
             if (m_fileList.size() > 1)
                 fi->m_offsetInMks = m_fileList[m_fileList.size()-2]->m_offsetInMks + m_fileList[m_fileList.size()-2]->m_formatContext->duration;

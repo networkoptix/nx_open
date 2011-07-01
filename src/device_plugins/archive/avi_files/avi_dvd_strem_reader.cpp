@@ -11,10 +11,174 @@
 static const int IO_BLOCK_SIZE = 32 * 1024;
 static const int IO_SKIP_BLOCK_SIZE = 1024 * 1024;
 
+struct dvdLangCode
+{
+    char* codeString;
+    quint16 code;
+};
+
+dvdLangCode dvdLangCodes[] =
+{
+{"Afar", 24929},
+{"Abkhazian", 24930},
+{"Afrikaans", 24934},
+{"Albanian", 29553},
+{"Amharic", 24941},
+{"Arabic", 24946},
+{"Armenian", 26977},
+{"Assamese", 24947},
+{"Aymara", 24953},
+{"Azerbaijani", 24954},
+{"Bashkir", 25185},
+{"Basque", 25973},
+{"Bhutani", 25722},
+{"Bihari", 25192},
+{"Bislama", 25193},
+{"Bengali", 25198},
+{"Breton", 25202},
+{"Bulgarian", 25191},
+{"Burmese", 28025},
+{"Byelorussian", 25189},
+{"Cambodian", 27501},
+{"Catalan", 25441},
+{"Chinese", 31336},
+{"Corsican", 25455},
+{"Czech", 25459},
+{"Dansk", 25697},
+{"Deutsch", 25701},
+{"English", 25966},
+{"Esperanto", 25967},
+{"Espanol", 25971},
+{"Estonian", 25972},
+{"Finnish", 26217},
+{"Fiji", 26218},
+{"Faroese", 26223},
+{"Francais", 26226},
+{"Frisian", 26233},
+{"Galician", 26476},
+{"Georgian", 27489},
+{"Greek", 25964},
+{"Greenlandic", 27500},
+{"Guarani", 26478},
+{"Gujarati", 26485},
+{"Hausa", 26721},
+{"Hebrew", 26725},
+{"Hebrew", 26999},
+{"Hindi", 26729},
+{"Hrvatski", 26738},
+{"Indonesian", 26980},
+{"Indonesian", 26990},
+{"Interlingue", 26981},
+{"Inupiak", 26987},
+{"Irish", 26465},
+{"Islenska", 26995},
+{"Italiano", 26996},
+{"Inuktitut", 26997},
+{"Japanese", 27233},
+{"Javanese", 27255},
+{"Kannada", 27502},
+{"Kashmiri", 27507},
+{"Kazakh", 27499},
+{"Korean", 27503},
+{"Kurdish", 27509},
+{"Kinyarwanda", 29303},
+{"Kirghiz", 27513},
+{"Kirundi", 29294},
+{"Latin", 27745},
+{"Lingala", 27758},
+{"Laothian", 27759},
+{"Lithuanian", 27764},
+{"Latvian", 27766},
+{"Macedonian", 28011},
+{"Magyar", 26741},
+{"Malagasy", 28007},
+{"Malay", 28019},
+{"Malayalam", 28012},
+{"Maltese", 28020},
+{"Maori", 28009},
+{"Marathi", 28018},
+{"Moldavian", 28015},
+{"Mongolian", 28014},
+{"Nauru", 28257},
+{"Nederlands", 28268},
+{"Nepali", 28261},
+{"Norsk", 28271},
+{"Occitan", 28515},
+{"Oriya", 28530},
+{"Oromo", 28525},
+{"Pashto", 28787},
+{"Persian", 26209},
+{"Polish", 28780},
+{"Portugues", 28788},
+{"Punjabi", 28769},
+{"Quechua", 29045},
+{"Rhaeto-Romance", 29293},
+{"Romanian", 29295},
+{"Russian", 29301},
+{"Sangho", 29543},
+{"Samoan", 29549},
+{"Sanskrit", 29537},
+{"Scots", 26468},
+{"Serbian", 29554},
+{"Serbo-Croatian", 29544},
+{"Sesotho", 29556},
+{"Setswana", 29806},
+{"Shona", 29550},
+{"Sinhalese", 29545},
+{"Sindhi", 29540},
+{"Siswati", 29555},
+{"Slovak", 29547},
+{"Slovenian", 29548},
+{"Somali", 29551},
+{"Sundanese", 29557},
+{"Svenska", 29558},
+{"Swahili", 29559},
+{"Tagalog", 29804},
+{"Tajik", 29799},
+{"Tamil", 29793},
+{"Tatar", 29812},
+{"Telugu", 29797},
+{"Thai", 29800},
+{"Tibetan", 25199},
+{"Tigrinya", 29801},
+{"Tonga", 29807},
+{"Tsonga", 29811},
+{"Turkish", 29810},
+{"Turkmen", 29803},
+{"Twi", 29815},
+{"Uighur", 30055},
+{"Ukrainian", 30059},
+{"Urdu", 30066},
+{"Uzbek", 30074},
+{"Vietnamese", 30057},
+{"Volapuk", 30319},
+{"Welsh", 25465},
+{"Wolof", 30575},
+{"Xhosa", 30824},
+{"Yiddish", 27241},
+{"Yiddish", 31081},
+{"Yoruba", 31087},
+{"Zhuang", 31329},
+{"Zulu", 31349}
+
+};
+
+QString findLangByCode(quint16 langCode)
+{
+    for (int i = 0; i < sizeof(dvdLangCodes) / sizeof(dvdLangCode); ++i)
+    {
+        if (dvdLangCodes[i].code == langCode)
+            return dvdLangCodes[i].codeString;
+    }
+    return QString();
+}
+
 struct DvdDecryptInfo
 {
-    DvdDecryptInfo(): m_dvd_file(0) {}
+    DvdDecryptInfo(): m_dvd_file(0), m_duration(0) {}
     dvd_file_t* m_dvd_file;
+    qint64 m_duration;
+    QVector<quint16> m_audioLang;
 };
 
 CLAVIDvdStreamReader::CLAVIDvdStreamReader(CLDevice* dev): 
@@ -62,8 +226,6 @@ QStringList CLAVIDvdStreamReader::getPlaylist()
         QStringList vobName = tmpFileList[i].baseName().split("_");
         if ((vobName.size()==3) && (vobName.at(2).left(1) == "1"))
         {
-            QFile f(tmpFileList[i].absoluteFilePath());
-            f.open(QFile::ReadOnly);
             rez << tmpFileList[i].absoluteFilePath();
         }
     }
@@ -115,7 +277,10 @@ bool CLAVIDvdStreamReader::switchToFile(int newFileIndex)
     QString fileName = m_fileList[newFileIndex]->m_name;
     if (!m_dvdReader)
     {
-        m_dvdReader = DVDOpen(m_device->getUniqueId().toAscii().constData());
+        QString path = m_device->getUniqueId();
+        if (path.length() == 3 && path.endsWith(":/"))
+            path = path.left(2); // physical mode access under WIN32 expects path in 2-letter format.
+        m_dvdReader = DVDOpen(path.toAscii().constData());
         if (!m_dvdReader)
             return false;
     }
@@ -142,10 +307,17 @@ bool CLAVIDvdStreamReader::switchToFile(int newFileIndex)
             if (ifo)
             {
                 if (ifo->vts_tmapt && ifo->vts_tmapt->nr_of_tmaps)
-                    m_fileList[newFileIndex]->m_durationHint = ifo->vts_tmapt->tmap->nr_of_entries * ifo->vts_tmapt->tmap->tmu * 1000000ull;
+                    data->m_duration = ifo->vts_tmapt->tmap->nr_of_entries * ifo->vts_tmapt->tmap->tmu * 1000000ull;
+                // find lang info
+                audio_attr_t& audioInfo = ifo->vmgi_mat->vmgm_audio_attr;
+                // ifo->vtsi_mat->vts->audio_attr->lang_code // nr_of_vts_audio_streams
+                for (int k = 0; k < ifo->vtsi_mat->nr_of_vts_audio_streams; ++k)
+                {
+                    data->m_audioLang << ifo->vtsi_mat->vts_audio_attr[k].lang_code;
+                }
                 ifoClose(ifo);
             }
-            if (m_fileList[newFileIndex]->m_durationHint == 0)
+            if (data->m_duration == 0)
                 return false; // skip file
 
             data->m_dvd_file = DVDOpenFile(m_dvdReader, number, DVD_READ_TITLE_VOBS);
@@ -270,4 +442,25 @@ void CLAVIDvdStreamReader::destroy()
     m_dvdReader = 0;
     m_tmpBufferSize = 0;
     CLAVIPlaylistStreamReader::destroy();
+}
+
+void CLAVIDvdStreamReader::fillAdditionalInfo(CLFileInfo* fi) 
+{
+    DvdDecryptInfo* info = (DvdDecryptInfo*) fi->opaque;
+    if (info == 0)
+        return;
+    fi->m_formatContext->duration = info->m_duration;
+
+    
+    for (int i = 0; i < fi->m_formatContext->nb_streams; ++i)
+    {
+        AVStream *avStream = fi->m_formatContext->streams[i];
+        if (avStream->id >= 128 && avStream->id < 128 + info->m_audioLang.size())
+        {
+            QString lang = findLangByCode(info->m_audioLang[avStream->id - 128]);
+            if (!lang.isEmpty())
+            av_metadata_set2(&avStream->metadata, "language", lang.toAscii().constData(), 0);
+        }
+    }
+    
 }

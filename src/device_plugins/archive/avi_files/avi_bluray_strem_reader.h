@@ -13,6 +13,7 @@ public:
 	virtual ~CLAVIBlurayStreamReader();
 protected:
     virtual QStringList getPlaylist();
+    virtual void fillAdditionalInfo(CLFileInfo* fi);
 };
 
 #endif __AVI_BLURAY_STREAM_READER_H
