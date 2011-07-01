@@ -295,7 +295,7 @@ void _dvdcss_check ( dvdcss_t dvdcss )
         snprintf( psz_buf, sizeof(psz_buf), "%s%c", _PATH_DEV, 'r' );
         i_pathlen = strlen( psz_buf );
 
-        if( CFStringGetCString( psz_path,
+        if( CFStringGetCString( (const __CFString*)psz_path,
                                 (char*)&psz_buf + i_pathlen,
                                 sizeof(psz_buf) - i_pathlen,
                                 kCFStringEncodingASCII ) )

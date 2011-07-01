@@ -57,7 +57,10 @@ extern "C"
 #include "dvdread_internal.h"
 
 #define DEFAULT_UDF_CACHE_LEVEL 1
-//static const int PATH_MAX = 1024;
+
+#ifdef _WIN32
+static const int PATH_MAX = 1024;
+#endif
 
 struct dvd_reader_t {
   /* Basic information. */
@@ -427,7 +430,7 @@ static char *bsd_block2char( const char *path )
     return (char *) strdup( path );
 
   /* Replace "/dev/" with "/dev/r" */
-  new_path = malloc( strlen(path) + 2 );
+  new_path = (char*)malloc( strlen(path) + 2 );
   strcpy( new_path, "/dev/r" );
   strcat( new_path, path + strlen( "/dev/" ) );
 
@@ -515,7 +518,7 @@ dvd_reader_t *DVDOpen( const char *path )
       char *new_path;
       char *current_path;
 
-      current_path = malloc(PATH_MAX);
+      current_path = (char*)malloc(PATH_MAX);
       if(current_path) {
         if(!getcwd(current_path, PATH_MAX)) {
           free(current_path);
@@ -524,7 +527,7 @@ dvd_reader_t *DVDOpen( const char *path )
       }
       if(current_path) {
         chdir( path_copy );
-        new_path = malloc(PATH_MAX);
+        new_path = (char*)malloc(PATH_MAX);
         if(new_path) {
           if(!getcwd(new_path, PATH_MAX )) {
             free(new_path);

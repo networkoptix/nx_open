@@ -118,7 +118,9 @@
 
 #include <limits.h>
 
+#ifdef _WIN32
 #include <direct.h>
+#endif
 
 #include "dvdcss.h"
 
