@@ -76,7 +76,10 @@ void CLStreamreader::addDataProcessor(CLAbstractDataProcessor* dp)
 	QMutexLocker mutex(&m_proc_CS);
 
 	if (!m_dataprocessors.contains(dp))
+    {
 		m_dataprocessors.push_back(dp);
+        connect(this, SIGNAL(dataEvent(CLStreamreader::StreamReaderEvent)), dp, SLOT(onDataEvent(CLStreamreader::StreamReaderEvent)));
+    }
 }
 
 void CLStreamreader::removeDataProcessor(CLAbstractDataProcessor* dp)

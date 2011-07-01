@@ -14,7 +14,16 @@ class CLDevice;
 
 class CLStreamreader : public CLLongRunnable
 {
+    Q_OBJECT
 public:
+
+    enum StreamReaderEvent
+    {
+        AudioParamsChanged,
+        VideoParamsChanged, // for future use
+        EOF_Reached  // for future use
+    };
+
 	enum StreamQuality {CLSLowest, CLSLow, CLSNormal, CLSHigh, CLSHighest};
 
 	explicit CLStreamreader(CLDevice* dev);
@@ -53,7 +62,8 @@ public:
 
 	virtual void setQuality(StreamQuality q);
 	StreamQuality getQuality() const;
-
+signals:
+    void dataEvent(CLStreamreader::StreamReaderEvent changeCode);
 protected:
 
 	void putData(CLAbstractData* data);

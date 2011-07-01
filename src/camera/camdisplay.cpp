@@ -21,7 +21,8 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_afterJump(false),
       m_displayLasts(0),
       m_ignoringVideo(false),
-      mGenerateEndOfStreamSignal(generateEndOfStreamSignal)
+      mGenerateEndOfStreamSignal(generateEndOfStreamSignal),
+      m_needReinitAudio(false)
 {
 	for (int i = 0; i< CL_MAX_CHANNELS; ++i)
 		m_display[i] = 0;
@@ -138,6 +139,13 @@ void CLCamDisplay::jump()
 
 void CLCamDisplay::processData(CLAbstractData* data)
 {
+    if (m_needReinitAudio)
+    {
+        delete m_audioDisplay;
+        m_audioDisplay = new CLAudioStreamDisplay(AUDIO_BUFF_SIZE);
+        m_needReinitAudio = false;
+    }
+
     if (m_needChangePriority)
     {
         if (m_playAudio)
@@ -412,5 +420,13 @@ void CLCamDisplay::setMTDecoding(bool value)
     {
         if (m_display[i])
             m_display[i]->setMTDecoding(value);
+    }
+}
+
+void CLCamDisplay::onDataEvent(CLStreamreader::StreamReaderEvent event)
+{
+    if (event == CLStreamreader::AudioParamsChanged)
+    {
+        m_needReinitAudio = true; 
     }
 }

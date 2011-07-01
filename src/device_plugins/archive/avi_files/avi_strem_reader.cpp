@@ -221,7 +221,7 @@ bool CLAVIStreamReader::initCodecs()
             destroy();
             return false;
         }
-
+        emit dataEvent(VideoParamsChanged);
     }
 
     if (m_audioStreamIndex!=-1)
@@ -232,7 +232,7 @@ bool CLAVIStreamReader::initCodecs()
         m_channels = aCodecCtx->channels;
 
         m_audioCodecId = ffmpeg_audio_codec_id;
-        emit audioParamsChanged();
+        emit dataEvent(AudioParamsChanged);
     }
     return true;
 }
@@ -606,7 +606,7 @@ bool CLAVIStreamReader::setAudioChannel(unsigned int num)
 
                 m_audioCodecId = ffmpeg_audio_codec_id;
 
-                emit audioParamsChanged();
+                emit dataEvent(AudioParamsChanged);
                 return true;
             }
             currentAudioTrackNum++;
