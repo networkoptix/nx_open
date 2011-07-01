@@ -58,7 +58,7 @@
       fprintf(stderr, "%02x", *((quint8 *)&arg + i_CZ));               \
     fprintf(stderr, "\n");                                              \
   }
-static const quint8 my_friendly_zeros[2048];
+static quint8 my_friendly_zeros[2048];
 #else
 #define CHECK_ZERO0(arg) (void)(arg)
 #define CHECK_ZERO(arg) (void)(arg)

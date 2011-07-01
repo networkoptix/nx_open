@@ -77,7 +77,7 @@
 #define B2N_64(x) x = be64toh(x)
 
 
-#elif defined(__APPLE__) || defined(__DARWIN__)
+#elif defined(Q_OS_MAC)
 #include <libkern/OSByteOrder.h>
 #define B2N_16(x) x = OSSwapBigToHostConstInt16(x)
 #define B2N_32(x) x = OSSwapBigToHostConstInt32(x)

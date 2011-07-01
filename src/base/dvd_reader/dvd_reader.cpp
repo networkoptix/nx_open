@@ -35,9 +35,9 @@ extern "C"
 //#include <dirent.h>
 
 #include <QDir>
+#include "base/dvd_decrypt/common.h"
 
-
-#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__bsdi__) || defined(__DARWIN__) || defined(__DragonFly__)
+#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__bsdi__) || defined(Q_OS_MAC) || defined(__DragonFly__)
 #define SYS_BSD 1
 #endif
 
@@ -57,7 +57,7 @@ extern "C"
 #include "dvdread_internal.h"
 
 #define DEFAULT_UDF_CACHE_LEVEL 1
-static const int PATH_MAX = 1024;
+//static const int PATH_MAX = 1024;
 
 struct dvd_reader_t {
   /* Basic information. */
