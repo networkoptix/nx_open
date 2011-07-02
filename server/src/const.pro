@@ -1,9 +1,13 @@
 QT = core network xml xmlpatterns multimedia webkit 
 CONFIG += x86
+CONFIG += qt console
 TEMPLATE = app
 VERSION = 0.0.1
 ICON = eve_logo.icns
 QMAKE_INFO_PLIST = Info.plist
+
+INCLUDEPATH += ./common/core
+INCLUDEPATH += ./common/utils
 
 TARGET = server
 

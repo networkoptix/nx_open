@@ -1,16 +1,22 @@
-#include "common/base/log.h"
-#include "common/device/device.h"
-#include "common/device/device_managmen/device_manager.h"
-#include "common/device_plugins/arecontvision/devices/av_device_server.h"
-#include "common/device_plugins/fake/devices/fake_device_server.h"
-#include "common/device_plugins/avigilon/devices/avigilon_device_server.h"
-#include "common/device_plugins/android/devices/android_device_server.h"
-#include "common/device_plugins/iqeye/devices/iqeye_device_server.h"
+#include "common/log.h"
+#include "resource/resource.h"
+#include "plugins/resources/avigilon/resoutce/avigilon_resource_seaecher.h"
+#include "resourcecontrol/resource_manager.h"
+#include "plugins/resources/arecontvision/resource/av_resource_searcher.h"
+#include "plugins/resources/iqeye/resource/iqeye_resource_searcher.h"
+#include "plugins/resources/android/resource/android_resource_searcher.h"
 
 int main(int argc, char *argv[])
 {
+    QCoreApplication app(argc, argv);
 
-	if (!cl_log.create("/log/log_file", 1024*1024*10, 5, cl_logDEBUG1))
+    QDir::setCurrent(QFileInfo(argv[0]).absolutePath());
+
+    QDir dataDirectory;
+    dataDirectory.mkdir("./log");
+
+
+	if (!cl_log.create("./log/log_file", 1024*1024*10, 5, cl_logDEBUG1))
     {
         return 0;
     }
@@ -42,12 +48,12 @@ int main(int argc, char *argv[])
 
 	//============================
 	CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&AVDeviceServer::instance());
-	CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
     CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&AVigilonDeviceServer::instance());
     CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&AndroidDeviceServer::instance());
     CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&IQEyeDeviceServer::instance());
 
 	//=========================================================
+    app.exec();
 
 	CLDevice::stopCommandProc();
 }
