@@ -155,6 +155,9 @@ bool CLAudioStreamDisplay::initFormatConvertRule(QAudioFormat format)
 		format.setChannelCount(2);
 		m_downmixing = true;
 	}
+	else {
+		m_downmixing = false;
+	}
 
 	if (QtvSound::isFormatSupported(format))
 		return true;
