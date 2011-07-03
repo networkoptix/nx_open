@@ -282,9 +282,9 @@ void CLAudioStreamDisplay::putData(CLCompressedAudioData* data)
 				m_audioSound = 0;
 			}
 
-			if (initFormatConvertRule(audio.format))
-				m_isConvertMethodInitialized = true;
-			else
+			m_isFormatSupported = initFormatConvertRule(audio.format);
+			m_isConvertMethodInitialized = true;
+			if (!m_isFormatSupported)
 				return; // can play audio
 		}
 		if (m_sampleConvertMethod == SampleConvert_Float2Int32)
