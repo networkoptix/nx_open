@@ -98,7 +98,7 @@ CLAudioStreamDisplay::CLAudioStreamDisplay(int bufferMs)
 	  m_forceDownmix(true), // mac version use SPDIF by default for multichannel audio.
 #endif
 	  m_sampleConvertMethod(SampleConvert_None),
-	  m_isConvertMethodinitialized(false)
+	  m_isConvertMethodInitialized(false)
 {
 }
 
@@ -304,10 +304,16 @@ void CLAudioStreamDisplay::putData(CLCompressedAudioData* data)
             return;
 
 		//  convert format
-		if (!m_isConvertMethodinitialized)
+		if (!m_isConvertMethodInitialized)
 		{
+			if (m_audioSound) 
+			{
+				QtvAudioDevice::instance().removeSound(m_audioSound);
+				m_audioSound = 0;
+			}
+
 			if (initFormatConvertRule(audio.format))
-				m_isConvertMethodinitialized = true;
+				m_isConvertMethodInitialized = true;
 			else
 				return; // can play audio
 		}
@@ -426,4 +432,10 @@ int CLAudioStreamDisplay::msInQueue() const
     qint64 diff = m_audioQueue.last()->duration + m_audioQueue.last()->timestamp  - m_audioQueue.first()->timestamp;
 	
     return diff / 1000;
+}
+
+void CLAudioStreamDisplay::setForceDownmix(bool value)
+{ 
+	m_forceDownmix = value; 
+	m_isConvertMethodInitialized = false;
 }

@@ -41,7 +41,7 @@ public:
     bool isFormatSupported() const;
 	
 	// forcing downmixing, even if output device supports multichannel output
-	void setForceDownmix(bool value) { m_forceDownmix = value; }
+	void setForceDownmix(bool value);
 
 	bool isDownmixForced() const { return m_forceDownmix; }
 private:
@@ -71,7 +71,7 @@ private:
 	bool m_downmixing;    // do downmix. 
 	bool m_forceDownmix;  // force downmix, even if output device supports multichannel
 	SampleConvertMethod m_sampleConvertMethod;
-	bool m_isConvertMethodinitialized;
+	bool m_isConvertMethodInitialized;
 };
 
 #endif //audiostreamdisplay_h_1811
