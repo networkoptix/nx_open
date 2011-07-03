@@ -54,36 +54,6 @@ static void down_mix_to_stereo(T *data, int channels, int len)
 	}
 }
 
-template <class T>
-static void down_mix_8_2(T *data, int len) 
-{
-	T* output = data;
-	T* input = data;
-
-	int steps = len / 8 / sizeof(T);
-
-	for(int i = 0; i < steps; ++i) 
-	{
-	    /* 5.1 to stereo. l, c, r, ls, rs, sw */
-		int fl,fr,c,rl,rr,lfe,sl,sr;
-
-		fl = input[0];
-		fr = input[1];
-		c =  input[2];
-		//lfe = input[3]; //Postings on the Doom9 say that Dolby specifically says the LFE (.1) channel should usually be ignored during downmixing to Dolby ProLogic II, with quotes from official Dolby documentation.
-		rl = input[4];
-		rr = input[5];
-		//sl = input[6];
-		//sr = input[7];
-
-		output[0] = clip_short(fl + (0.5 * rl) + (0.7 * c));
-		output[1] = clip_short(fr + (0.5 * rr) + (0.7 * c));
-
-		output += 2;
-		input += 8;
-	}
-}
-
 CLAudioStreamDisplay::CLAudioStreamDisplay(int bufferMs)
     : m_bufferMs(bufferMs),
       m_decodedaudio(16, DEFAULT_AUDIO_FRAME_SIZE),
