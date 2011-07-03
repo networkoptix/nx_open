@@ -5,14 +5,14 @@
 #include "common/bytearray.h"
 
 
-struct CLAbstractMediaData : public CLAbstractData
+struct QnAbstractMediaDataPacket : public QnAbstractDataPacket
 {
-	CLAbstractMediaData(unsigned int alignment, unsigned int capacity)
+	QnAbstractMediaDataPacket(unsigned int alignment, unsigned int capacity)
         : data(alignment, capacity)
 	{
 	}
 
-	virtual ~CLAbstractMediaData()
+	virtual ~QnAbstractMediaDataPacket()
 	{
 	}
 
@@ -24,14 +24,17 @@ struct CLAbstractMediaData : public CLAbstractData
 	quint64 timestamp; // mksec // 10^-6
 
 private:
-	CLAbstractMediaData() : 
+	QnAbstractMediaDataPacket() : 
        data(0,1){};
 };
 
-struct CLCompressedVideoData : public CLAbstractMediaData
+typedef QSharedPointer<QnAbstractMediaDataPacket> QnAbstractMediaDataPacketPtr;
+
+
+struct QnCompressedVideoData : public QnAbstractMediaDataPacket
 {
-	CLCompressedVideoData(unsigned int alignment, unsigned int capacity, void* ctx = 0)
-        : CLAbstractMediaData(alignment, qMin(capacity, (unsigned int)10 * 1024 * 1024))
+	QnCompressedVideoData(unsigned int alignment, unsigned int capacity, void* ctx = 0)
+        : QnAbstractMediaDataPacket(alignment, qMin(capacity, (unsigned int)10 * 1024 * 1024))
 	{
 		dataType = VIDEO;
 		useTwice = false;
@@ -48,10 +51,12 @@ struct CLCompressedVideoData : public CLAbstractMediaData
 	void* context;
 };
 
-struct CLCompressedAudioData : public CLAbstractMediaData
+typedef QSharedPointer<QnCompressedVideoData> QnCompressedVideoDataPtr;
+
+struct QnCompressedAudioData : public QnAbstractMediaDataPacket
 {
-	CLCompressedAudioData (unsigned int alignment, unsigned int capacity, void* ctx)
-        : CLAbstractMediaData(alignment, capacity)
+	QnCompressedAudioData (unsigned int alignment, unsigned int capacity, void* ctx)
+        : QnAbstractMediaDataPacket(alignment, capacity)
 	{
 		dataType = AUDIO;
 		context = ctx;
@@ -63,6 +68,6 @@ struct CLCompressedAudioData : public CLAbstractMediaData
 	void* context;
 };
 
-typedef CLThreadQueue<CLAbstractData*> CLDataQueue;
+typedef QSharedPointer<QnCompressedAudioData> QnCompressedAudioDataPtr;
 
 #endif //abstract_media_data_h_112

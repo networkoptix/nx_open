@@ -19,7 +19,7 @@ QString CLAviDevice::toString() const
 	return m_name;
 }
 
-CLStreamreader* CLAviDevice::getDeviceStreamConnection()
+QnStreamDataProvider* CLAviDevice::getDeviceStreamConnection()
 {
-	return new CLAVIStreamReader(this);
+	return new QnPlAVIStreamProvider(this);
 }

@@ -14,7 +14,7 @@ struct AVLastPacketSize
 class CLAVClinetPullStreamReader : public CLClientPullStreamreader
 {
 public:
-	CLAVClinetPullStreamReader(CLDevice* dev );
+	CLAVClinetPullStreamReader(QnResource* dev );
 	virtual ~CLAVClinetPullStreamReader();
 
 	virtual void setQuality(StreamQuality q);

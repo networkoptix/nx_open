@@ -12,15 +12,15 @@ struct CLParamType
 
 	int type;
 
-	CLValue min_val;
-	CLValue max_val;
-	CLValue step;
+	QnValue min_val;
+	QnValue max_val;
+	QnValue step;
 
-	QList<CLValue> possible_values;
-	QList<CLValue> ui_possible_values;
+	QList<QnValue> possible_values;
+	QList<QnValue> ui_possible_values;
 
-	CLValue value;
-	CLValue default_value;
+	QnValue value;
+	QnValue default_value;
 
 	QString http;
 	QString group;
@@ -32,8 +32,8 @@ struct CLParamType
 
 	bool synchronized;
 
-	bool setValue(CLValue val, bool set = true); // safe way to set value
-	bool setDefVal(CLValue val); // safe way to set value
+	bool setValue(QnValue val, bool set = true); // safe way to set value
+	bool setDefVal(QnValue val); // safe way to set value
 
 };
 
@@ -43,13 +43,13 @@ struct CLParam
 	CLParamType value;
 };
 
-class CLParamList
+class QnParamList
 {
 
 public:
 	typedef QMap<QString, CLParam> MAP;
 
-	void inheritedFrom(const CLParamList& other);
+	void inheritedFrom(const QnParamList& other);
 	bool exists(const QString& name) const;
 	CLParam& get(const QString& name);
 	const CLParam get(const QString& name) const;
@@ -60,7 +60,7 @@ public:
 	QList<QString> groupList() const;
 	QList<QString> subGroupList(QString group) const;
 
-	CLParamList paramList(QString group, QString subgroup) const;
+	QnParamList paramList(QString group, QString subgroup) const;
 private:
 	MAP m_params;
 };

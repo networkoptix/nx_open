@@ -1,7 +1,7 @@
 #ifndef cl_long_runnable_146
 #define cl_long_runnable_146
 
-class CLLongRunnable : public QThread
+class QnLongRunnable : public QThread
 {
 	Q_OBJECT
 public slots:
@@ -16,14 +16,14 @@ public slots:
 	}
 public:
 
-	CLLongRunnable():
+	QnLongRunnable():
 	  m_runing(false),
 	  m_onPause(false)
 	  {
 
 	  }
 
-	virtual ~CLLongRunnable(){};
+	virtual ~QnLongRunnable(){};
 
     virtual void pleaseStop()
 	{

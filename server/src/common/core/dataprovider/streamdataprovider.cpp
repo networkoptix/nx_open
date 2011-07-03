@@ -3,7 +3,7 @@
 #include "resource/video_resource_layout.h"
 
 
-CLStreamreader::CLStreamreader(CLDevice* dev):
+QnStreamDataProvider::QnStreamDataProvider(QnResource* dev):
 m_device(dev),
 m_qulity(CLSLowest),
 m_needSleep(true)
@@ -15,23 +15,23 @@ m_needSleep(true)
 
 }
 
-CLStreamreader::~CLStreamreader()
+QnStreamDataProvider::~QnStreamDataProvider()
 {
 	stop();
 }
 
-CLDevice* CLStreamreader::getDevice() const
+QnResource* QnStreamDataProvider::getDevice() const
 {
 	return m_device;
 }
 
-bool CLStreamreader::dataCanBeAccepted() const
+bool QnStreamDataProvider::dataCanBeAccepted() const
 {
     // need to read only if all queues has more space and at least one queue is exist
     bool result = false;
     for (int i = 0; i < m_dataprocessors.size(); ++i)
     {
-        CLAbstractDataProcessor* dp = m_dataprocessors.at(i);
+        QnAbstractDataConsumer* dp = m_dataprocessors.at(i);
 
         if (dp->canAcceptData())
             result = true;
@@ -44,34 +44,34 @@ bool CLStreamreader::dataCanBeAccepted() const
 
 
 
-void CLStreamreader::setStatistics(CLStatistics* stat)
+void QnStreamDataProvider::setStatistics(CLStatistics* stat)
 {
 	m_stat = stat;
 }
 
-void CLStreamreader::setQuality(StreamQuality q)
+void QnStreamDataProvider::setQuality(StreamQuality q)
 {
 	m_qulity = q;
 }
 
-CLStreamreader::StreamQuality CLStreamreader::getQuality() const
+QnStreamDataProvider::StreamQuality QnStreamDataProvider::getQuality() const
 {
 	return m_qulity;
 }
 
-void CLStreamreader::setStreamParams(CLParamList newParam)
+void QnStreamDataProvider::setStreamParams(QnParamList newParam)
 {
 	QMutexLocker mutex(&m_params_CS);
 	m_streamParam = newParam;
 }	
 
-CLParamList CLStreamreader::getStreamParam() const
+QnParamList QnStreamDataProvider::getStreamParam() const
 {
 	QMutexLocker mutex(&m_params_CS);
 	return m_streamParam;
 }
 
-void CLStreamreader::addDataProcessor(CLAbstractDataProcessor* dp)
+void QnStreamDataProvider::addDataProcessor(QnAbstractDataConsumer* dp)
 {
 	QMutexLocker mutex(&m_proc_CS);
 
@@ -79,24 +79,24 @@ void CLStreamreader::addDataProcessor(CLAbstractDataProcessor* dp)
 		m_dataprocessors.push_back(dp);
 }
 
-void CLStreamreader::removeDataProcessor(CLAbstractDataProcessor* dp)
+void QnStreamDataProvider::removeDataProcessor(QnAbstractDataConsumer* dp)
 {
 	QMutexLocker mutex(&m_proc_CS);
 	m_dataprocessors.removeOne(dp);
 }
 
-void CLStreamreader::setNeedKeyData()
+void QnStreamDataProvider::setNeedKeyData()
 {
 	for (int i = 0; i < m_channel_number; ++i)
 		m_gotKeyFrame[i] = 0;
 }
 
-bool CLStreamreader::needKeyData(int channel) const
+bool QnStreamDataProvider::needKeyData(int channel) const
 {
 	return m_gotKeyFrame[channel]==0;
 }
 
-bool CLStreamreader::needKeyData() const
+bool QnStreamDataProvider::needKeyData() const
 {
 	for (int i = 0; i < m_channel_number; ++i)
 		if (m_gotKeyFrame[i]==0)
@@ -105,24 +105,24 @@ bool CLStreamreader::needKeyData() const
 	return false;
 }
 
-void CLStreamreader::pauseDataProcessors()
+void QnStreamDataProvider::pauseDataProcessors()
 {
-    foreach(CLAbstractDataProcessor* dataProcessor, m_dataprocessors) 
+    foreach(QnAbstractDataConsumer* dataProcessor, m_dataprocessors) 
     {
         dataProcessor->pause();
     }
 }
 
-void CLStreamreader::resumeDataProcessors()
+void QnStreamDataProvider::resumeDataProcessors()
 {
-    foreach(CLAbstractDataProcessor* dataProcessor, m_dataprocessors) 
+    foreach(QnAbstractDataConsumer* dataProcessor, m_dataprocessors) 
     {
         dataProcessor->resume();
     }
 }
 
 
-void CLStreamreader::putData(CLAbstractData* data)
+void QnStreamDataProvider::putData(QnAbstractDataPacketPtr data)
 {
     if (!data)
         return;
@@ -130,14 +130,12 @@ void CLStreamreader::putData(CLAbstractData* data)
 	QMutexLocker mutex(&m_proc_CS);
 	for (int i = 0; i < m_dataprocessors.size(); ++i)
 	{
-		CLAbstractDataProcessor* dp = m_dataprocessors.at(i);
+		QnAbstractDataConsumer* dp = m_dataprocessors.at(i);
 		dp->putData(data);
 	}
-
-	data->releaseRef(); // now data belongs only to processors;
 }
 
-void CLStreamreader::setNeedSleep(bool sleep)
+void QnStreamDataProvider::setNeedSleep(bool sleep)
 {
     m_needSleep = sleep;   
 }

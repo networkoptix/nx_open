@@ -9,13 +9,13 @@ AVDeviceServer::AVDeviceServer()
 	AVJpeg::Header::Initialize("ArecontVision", "CamLabs", "ArecontVision");
 
 	QString error;
-	if (CLAreconVisionDevice::loadDevicesParam(QCoreApplication::applicationDirPath() + "/arecontvision/devices.xml", error))
+	if (QnPlAreconVisionDevice::loadDevicesParam(QCoreApplication::applicationDirPath() + "/arecontvision/devices.xml", error))
 	{
 		CL_LOG(cl_logINFO)
 		{
 			QString msg;
 			QTextStream str(&msg) ;
-			QStringList lst = CLDevice::supportedDevises();
+			QStringList lst = QnResource::supportedDevises();
 			str << "Ssupported devices loaded; size = " << lst.size() << ": " << endl << lst.join("\n");
 			cl_log.log(msg, cl_logINFO);
 		}
@@ -44,9 +44,9 @@ QString AVDeviceServer::name() const
 }
 
 // returns all available devices 
-CLDeviceList AVDeviceServer::findDevices()
+QnResourceList AVDeviceServer::findDevices()
 {
-	return CLAreconVisionDevice::findDevices();
+	return QnPlAreconVisionDevice::findDevices();
 }
 
 AVDeviceServer& AVDeviceServer::instance()

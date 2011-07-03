@@ -5,12 +5,12 @@
 
 
 
-class CLArecontSingleSensorDevice : public CLAreconVisionDevice
+class CLArecontSingleSensorDevice : public QnPlAreconVisionDevice
 {
 public:
 	CLArecontSingleSensorDevice(int model);
 	bool getDescription();
-	virtual CLStreamreader* getDeviceStreamConnection();
+	virtual QnStreamDataProvider* getDeviceStreamConnection();
 
 	virtual bool hasTestPattern() const;
 

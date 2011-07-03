@@ -8,16 +8,16 @@
 
 class CLRtpStreamParser;
 
-class CLIQEyeH264treamreader: public CLServerPushStreamreader
+class CLIQEyeH264treamreader: public QnServerPushDataProvider
 {
 private:
     enum {BLOCK_SIZE = 1460};
 public:
-	CLIQEyeH264treamreader(CLDevice* dev);
+	CLIQEyeH264treamreader(QnResource* dev);
 	virtual ~CLIQEyeH264treamreader();
 
 protected:
-    virtual CLAbstractMediaData* getNextData();
+    virtual QnAbstractMediaDataPacketPtr getNextData();
     virtual void openStream();
     virtual void closeStream() ;
     virtual bool isStreamOpened() const;

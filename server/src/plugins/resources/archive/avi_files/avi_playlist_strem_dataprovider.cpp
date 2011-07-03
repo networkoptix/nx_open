@@ -30,8 +30,8 @@ struct CLAVIPlaylistStreamReaderPriv
 
 /////////////////////////////////////////////////////////////
 
-CLAVIPlaylistStreamReader::CLAVIPlaylistStreamReader(CLDevice* dev):
-    CLAVIStreamReader(dev),
+CLAVIPlaylistStreamReader::CLAVIPlaylistStreamReader(QnResource* dev):
+    QnPlAVIStreamProvider(dev),
     m_ffmpegIOContext(0),
     m_initialized(false),
     m_currentFileIndex(-1),

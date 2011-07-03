@@ -18,7 +18,7 @@ public:
 	virtual QString name() const;
 
 	// returns all available devices 
-    virtual CLDeviceList findDevices();
+    virtual QnResourceList findDevices();
 
 private:
 

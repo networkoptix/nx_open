@@ -8,10 +8,10 @@
 class CLAvigilonStreamreader: public CLClientPullStreamreader
 {
 public:
-	CLAvigilonStreamreader(CLDevice* dev);
+	CLAvigilonStreamreader(QnResource* dev);
 	virtual ~CLAvigilonStreamreader();
 
-    virtual CLAbstractMediaData* getNextData();
+    virtual QnAbstractMediaDataPacketPtr getNextData();
 };
 
 #endif //cl_av_clien_pull1529

@@ -6,26 +6,26 @@
 #include "common/base.h"
 
 
-CLSingleShotFileStreamreader::CLSingleShotFileStreamreader(CLDevice* dev ):
+CLSingleShotFileStreamreader::CLSingleShotFileStreamreader(QnResource* dev ):
 CLSingleShotStreamreader(dev)
 {
 	CLFileDevice* device = static_cast<CLFileDevice*>(dev);
 	m_fileName = device->getFileName();
 }
 
-CLAbstractMediaData* CLSingleShotFileStreamreader::getData()
+QnAbstractMediaDataPacketPtr CLSingleShotFileStreamreader::getData()
 {
     FileTypeSupport fileTypeSupport;
 
 	if (!fileTypeSupport.isImageFileExt(m_fileName))
-		return 0;
+		return QnAbstractMediaDataPacketPtr(0);
 
 	QFile file(m_fileName);
 	if (!file.exists())
-		return 0;
+		return QnAbstractMediaDataPacketPtr(0);
 
 	if (!file.open(QIODevice::ReadOnly))
-		return 0;
+		return QnAbstractMediaDataPacketPtr(0);
 
     CodecID compressionType;
 
@@ -42,11 +42,11 @@ CLAbstractMediaData* CLSingleShotFileStreamreader::getData()
     else if (lowerFileName.endsWith(".bmp"))
         compressionType = CODEC_ID_BMP;
     else
-        return 0;
+        return QnAbstractMediaDataPacketPtr(0);
 
 	unsigned int file_size = file.size();
 
-	CLCompressedVideoData* outData = new CLCompressedVideoData(CL_MEDIA_ALIGNMENT,file_size);
+	QnCompressedVideoDataPtr outData ( new QnCompressedVideoData(CL_MEDIA_ALIGNMENT,file_size) );
 	CLByteArray& data = outData->data;
 
 	data.prepareToWrite(file_size);

@@ -10,7 +10,7 @@
 
 extern int ping_timeout;
 
-CLHttpStatus CLAreconVisionDevice::getRegister(int page, int num, int& val)
+CLHttpStatus QnPlAreconVisionDevice::getRegister(int page, int num, int& val)
 {
 	QString req;
 	QTextStream(&req) << "getreg?page=" << page << "&reg=" << num;
@@ -42,20 +42,20 @@ CLHttpStatus CLAreconVisionDevice::getRegister(int page, int num, int& val)
 
 }
 
-CLStreamreader* CLAreconVisionDevice::getDeviceStreamConnection()
+QnStreamDataProvider* QnPlAreconVisionDevice::getDeviceStreamConnection()
 {
 	return 0;
 }
 
-bool CLAreconVisionDevice::unknownDevice() const
+bool QnPlAreconVisionDevice::unknownDevice() const
 {
 	return (getModel()==AVUNKNOWN);
 }
 
-CLNetworkDevice* CLAreconVisionDevice::updateDevice() 
+CLNetworkDevice* QnPlAreconVisionDevice::updateDevice() 
 {
-	CLValue model;
-	CLValue model_relase;
+	QnValue model;
+	QnValue model_relase;
 
 	if (!getParam("Model", model))
 		return 0;
@@ -93,12 +93,12 @@ CLNetworkDevice* CLAreconVisionDevice::updateDevice()
 	return result;
 }
 
-int CLAreconVisionDevice::getModel() const
+int QnPlAreconVisionDevice::getModel() const
 {
 	return m_model;
 }
 
-CLHttpStatus CLAreconVisionDevice::setRegister(int page, int num, int val)
+CLHttpStatus QnPlAreconVisionDevice::setRegister(int page, int num, int val)
 {
 	QString req;
 	QTextStream(&req) << "setreg?page=" << page << "&reg=" << num << "&val=" << val;
@@ -112,13 +112,13 @@ CLHttpStatus CLAreconVisionDevice::setRegister(int page, int num, int val)
 
 }
 
-CLHttpStatus CLAreconVisionDevice::setRegister_asynch(int page, int num, int val)
+CLHttpStatus QnPlAreconVisionDevice::setRegister_asynch(int page, int num, int val)
 {
-	class CLDeviceSetRegCommand : public CLDeviceCommand
+	class QnPlArecontResourceSetRegCommand : public QnResourceCommand
 	{
 	public:
-		CLDeviceSetRegCommand(CLDevice* dev, int page, int reg, int val):
-		  CLDeviceCommand(dev),
+		QnPlArecontResourceSetRegCommand(QnResource* dev, int page, int reg, int val):
+		  QnResourceCommand(dev),
 			  m_page(page),
 			  m_val(val),
 			  m_reg(reg)
@@ -128,7 +128,7 @@ CLHttpStatus CLAreconVisionDevice::setRegister_asynch(int page, int num, int val
 
 		  void execute()
 		  {
-			  (static_cast<CLAreconVisionDevice*>(m_device))->setRegister(m_page,m_reg,m_val);
+			  (static_cast<QnPlAreconVisionDevice*>(m_device))->setRegister(m_page,m_reg,m_val);
 		  }
 	private:
 		int m_page;
@@ -136,18 +136,19 @@ CLHttpStatus CLAreconVisionDevice::setRegister_asynch(int page, int num, int val
 		int m_val;
 	};
 
-	CLDeviceSetRegCommand *command = new CLDeviceSetRegCommand(this, page, num, val);
-	m_commanproc.putData(command);
-	command->releaseRef();
+    typedef QSharedPointer<QnPlArecontResourceSetRegCommand> QnPlArecontResourceSetRegCommandPtr;
 
+
+	QnPlArecontResourceSetRegCommandPtr command ( new QnPlArecontResourceSetRegCommand(this, page, num, val) );
+	m_commanproc.putData(command);
 	return CL_HTTP_SUCCESS;
 
 }
 
-void CLAreconVisionDevice::onBeforeStart()
+void QnPlAreconVisionDevice::onBeforeStart()
 {
-	CLValue maxSensorWidth;
-	CLValue maxSensorHight;
+	QnValue maxSensorWidth;
+	QnValue maxSensorHight;
 	getParam("MaxSensorWidth", maxSensorWidth);
 	getParam("MaxSensorHeight", maxSensorHight);
 
@@ -158,9 +159,9 @@ void CLAreconVisionDevice::onBeforeStart()
 
 }
 
-bool CLAreconVisionDevice::getParam(const QString& name, CLValue& val, bool resynch )
+bool QnPlAreconVisionDevice::getParam(const QString& name, QnValue& val, bool resynch )
 {
-	if (!CLDevice::getParam(name, val, resynch)) // check if param exists
+	if (!QnResource::getParam(name, val, resynch)) // check if param exists
 		return false;
 
 	CLParamType& value = getDeviceParamList().get(name).value;
@@ -217,15 +218,15 @@ bool CLAreconVisionDevice::getParam(const QString& name, CLValue& val, bool resy
 
 }
 
-bool CLAreconVisionDevice::setParam_special(const QString& name, const CLValue& val)
+bool QnPlAreconVisionDevice::setParam_special(const QString& name, const QnValue& val)
 {
 	return false;
 }
 
-bool CLAreconVisionDevice::setParam(const QString& name, const CLValue& val )
+bool QnPlAreconVisionDevice::setParam(const QString& name, const QnValue& val )
 {
 
-	if (!CLDevice::setParam(name, val))
+	if (!QnResource::setParam(name, val))
 		return false;
 
 	if (setParam_special(name, val)) // try special first 
@@ -269,14 +270,14 @@ bool CLAreconVisionDevice::setParam(const QString& name, const CLValue& val )
 	return true;
 }
 
-bool CLAreconVisionDevice::executeCommand(CLDeviceCommand* command)
+bool QnPlAreconVisionDevice::executeCommand(QnResourceCommand* command)
 {
 	return true;
 }
 
-CLDeviceList CLAreconVisionDevice::findDevices()
+QnResourceList QnPlAreconVisionDevice::findDevices()
 {
-	CLDeviceList result;
+	QnResourceList result;
 
 	QList<QHostAddress> ipaddrs = getAllIPv4Addresses();
 
@@ -370,7 +371,7 @@ CLDeviceList CLAreconVisionDevice::findDevices()
 				/**/
 
 				// in any case let's HTTP do it's job at very end of discovery 
-				CLAreconVisionDevice* device = new CLAreconVisionDevice(AVUNKNOWN);
+				QnPlAreconVisionDevice* device = new QnPlAreconVisionDevice(AVUNKNOWN);
 				device->setName("AVUNKNOWN");
 
 				if (device==0)
@@ -380,7 +381,7 @@ CLDeviceList CLAreconVisionDevice::findDevices()
 				device->setMAC(smac);
 				device->setUniqueId(smac);
 
-				CLDeviceStatus dh;
+				QnResourceStatus dh;
 				device->m_local_adssr = ipaddrs.at(i);
 				device->setStatus(dh);
 
@@ -397,7 +398,7 @@ CLDeviceList CLAreconVisionDevice::findDevices()
 	return result;
 }
 
-bool CLAreconVisionDevice::setIP(const QHostAddress& ip, bool net )
+bool QnPlAreconVisionDevice::setIP(const QHostAddress& ip, bool net )
 {
 	// this will work only in local networks ( camera must be able ti get broadcat from this ip);
 
@@ -436,7 +437,7 @@ bool CLAreconVisionDevice::setIP(const QHostAddress& ip, bool net )
 	return CLNetworkDevice::setIP(ip);
 }
 
-bool CLAreconVisionDevice::loadDevicesParam(const QString& file_name, QString& error)
+bool QnPlAreconVisionDevice::loadDevicesParam(const QString& file_name, QString& error)
 {
 	QFile file(file_name);
 
@@ -479,7 +480,7 @@ bool CLAreconVisionDevice::loadDevicesParam(const QString& file_name, QString& e
 	return true;
 }
 
-bool CLAreconVisionDevice::parseDevice(const QDomElement &device, QString& error)
+bool QnPlAreconVisionDevice::parseDevice(const QDomElement &device, QString& error)
 {
 	if (!device.hasAttribute("id"))
 	{
@@ -499,8 +500,8 @@ bool CLAreconVisionDevice::parseDevice(const QDomElement &device, QString& error
 		return false;
 	}
 
-	CLParamList device_param_list;
-	CLParamList stream_param_list;
+	QnParamList device_param_list;
+	QnParamList stream_param_list;
 
 	if (device.hasAttribute("public"))
 	{
@@ -591,7 +592,7 @@ bool CLAreconVisionDevice::parseDevice(const QDomElement &device, QString& error
 	return true;
 }
 
-bool CLAreconVisionDevice::parseParam(const QDomElement &element, QString& error, CLParamList& paramlist)
+bool QnPlAreconVisionDevice::parseParam(const QDomElement &element, QString& error, QnParamList& paramlist)
 {
 	if (!element.hasAttribute("name"))
 	{
@@ -706,9 +707,9 @@ bool CLAreconVisionDevice::parseParam(const QDomElement &element, QString& error
 	return true;
 }
 
-CLAreconVisionDevice* CLAreconVisionDevice::deviceByID(QString id, int model)
+QnPlAreconVisionDevice* QnPlAreconVisionDevice::deviceByID(QString id, int model)
 {
-	QStringList supp = CLDevice::supportedDevises();
+	QStringList supp = QnResource::supportedDevises();
 
 	if (!supp.contains(id))
 	{
@@ -722,9 +723,9 @@ CLAreconVisionDevice* CLAreconVisionDevice::deviceByID(QString id, int model)
 		return new CLArecontSingleSensorDevice(model);
 }
 
-bool CLAreconVisionDevice::getBaseInfo()
+bool QnPlAreconVisionDevice::getBaseInfo()
 {
-	CLValue val;
+	QnValue val;
 	if (!getParam("Firmware version", val))
 		return false;
 
@@ -740,7 +741,7 @@ bool CLAreconVisionDevice::getBaseInfo()
 	return true;
 }
 
-QString CLAreconVisionDevice::toString() const
+QString QnPlAreconVisionDevice::toString() const
 {
 	QString result;
 
@@ -749,14 +750,14 @@ QString CLAreconVisionDevice::toString() const
 	QString net = getDeviceParamList().get("Net version").value.value;
 
 	QTextStream t(&result);
-	t<< CLDevice::toString() <<" live fw=" << firmware << " hw=" << hardware << " net=" << net;
+	t<< QnResource::toString() <<" live fw=" << firmware << " hw=" << hardware << " net=" << net;
 	if (m_description!="")
 		t <<  " dsc=" << m_description;
 	return result;
 
 }
 
-bool CLAreconVisionDevice::isPanoramic(int model)
+bool QnPlAreconVisionDevice::isPanoramic(int model)
 {
 	return (model==AV8180 || model==AV8185 || model==AV8360 || model==AV8365);
 }

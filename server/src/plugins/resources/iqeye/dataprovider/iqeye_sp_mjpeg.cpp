@@ -13,8 +13,8 @@ extern int contain_subst(char *data, int datalen, char *subdata, int subdatalen)
 
 
 
-CLIQEyeMJPEGtreamreader::CLIQEyeMJPEGtreamreader(CLDevice* dev)
-:CLServerPushStreamreader(dev),
+CLIQEyeMJPEGtreamreader::CLIQEyeMJPEGtreamreader(QnResource* dev)
+:QnServerPushDataProvider(dev),
 mHttpClient(0)
 {
 
@@ -25,13 +25,13 @@ CLIQEyeMJPEGtreamreader::~CLIQEyeMJPEGtreamreader()
     
 }
 
-CLAbstractMediaData* CLIQEyeMJPEGtreamreader::getNextData()
+QnAbstractMediaDataPacketPtr CLIQEyeMJPEGtreamreader::getNextData()
 {
 
     if (!isStreamOpened())
-        return 0;
+        return QnAbstractMediaDataPacketPtr(0);
 
-    CLCompressedVideoData* videoData = new CLCompressedVideoData(CL_MEDIA_ALIGNMENT,   CL_MAX_DATASIZE/2);
+    QnCompressedVideoDataPtr videoData (new QnCompressedVideoData(CL_MEDIA_ALIGNMENT,   CL_MAX_DATASIZE/2));
     CLByteArray& img = videoData->data;
 
     bool getting_image = false;
@@ -118,14 +118,8 @@ CLAbstractMediaData* CLIQEyeMJPEGtreamreader::getNextData()
 
     }
 
-
-    videoData->releaseRef();
     closeStream();
-
-    return 0;
-
-
-
+    return QnAbstractMediaDataPacketPtr(0);
 }
 
 void CLIQEyeMJPEGtreamreader::openStream()

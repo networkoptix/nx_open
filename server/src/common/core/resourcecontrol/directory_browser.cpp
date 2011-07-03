@@ -22,7 +22,7 @@ void CLDeviceDirectoryBrowser::setDirList(QStringList& dirs)
     mDirsToCheck = dirs;
 }
 
-CLDeviceList CLDeviceDirectoryBrowser::result()
+QnResourceList CLDeviceDirectoryBrowser::result()
 {
     return mResult;
 }
@@ -48,11 +48,11 @@ void CLDeviceDirectoryBrowser::run()
     {
         dir += "/";
 
-        CLDeviceList dev_lst = findDevices(dir);
+        QnResourceList dev_lst = findDevices(dir);
 
         cl_log.log("found ", dev_lst.count(), " devices",  cl_logALWAYS);
 
-        foreach(CLDevice* dev, dev_lst)
+        foreach(QnResource* dev, dev_lst)
         {
             mResult[dev->getUniqueId()] = dev;
         }
@@ -64,14 +64,14 @@ void CLDeviceDirectoryBrowser::run()
 }
 
 //=============================================================================================
-CLDeviceList CLDeviceDirectoryBrowser::findDevices(const QString& directory)
+QnResourceList CLDeviceDirectoryBrowser::findDevices(const QString& directory)
 {
 
     cl_log.log("Checking ", directory,   cl_logALWAYS);
 
     FileTypeSupport fileTypeSupport;
 
-    CLDeviceList result;
+    QnResourceList result;
 
     if (mNeedStop)
         return result;
@@ -87,7 +87,7 @@ CLDeviceList CLDeviceDirectoryBrowser::findDevices(const QString& directory)
         {
             QString file = list.at(i);
             QString abs_file_name = directory + file;
-            CLDevice* dev = new CLFileDevice(abs_file_name);
+            QnResource* dev = new CLFileDevice(abs_file_name);
             result[abs_file_name] = dev;
         }
     }
@@ -99,7 +99,7 @@ CLDeviceList CLDeviceDirectoryBrowser::findDevices(const QString& directory)
         {
             QString file = list.at(i);
             QString abs_file_name = directory + file;
-            CLDevice* dev = new CLAviDevice(abs_file_name);
+            QnResource* dev = new CLAviDevice(abs_file_name);
             result[abs_file_name] = dev;
         }
     }
@@ -109,9 +109,9 @@ CLDeviceList CLDeviceDirectoryBrowser::findDevices(const QString& directory)
 
     foreach(QString str, sub_dirs)
     {
-        CLDeviceList sub_result = findDevices(directory + str + QString("/"));
+        QnResourceList sub_result = findDevices(directory + str + QString("/"));
 
-        foreach(CLDevice* dev, sub_result)
+        foreach(QnResource* dev, sub_result)
         {
             result[dev->getUniqueId()] = dev;
         }

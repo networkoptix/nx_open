@@ -3,35 +3,36 @@
 
 #include "common/longrunnable.h"
 #include "resource/resource_param.h"
+#include "datapacket/datapacket.h"
 
 
-class CLStreamreader;
-class CLDevice;
+class QnStreamDataProvider;
+class QnResource;
 class CLStatistics;
-class CLAbstractDataProcessor;
-class CLAbstractData;
+class QnAbstractDataConsumer;
+
 
 #define CL_MAX_DATASIZE (10*1024*1024) // assume we can never get compressed data with  size greater than this
 #define CL_MAX_CHANNEL_NUMBER (10) 
 
-class CLStreamreader : public CLLongRunnable
+class QnStreamDataProvider : public QnLongRunnable
 {
 public:
 	enum StreamQuality {CLSLowest, CLSLow, CLSNormal, CLSHigh, CLSHighest};
 
-	explicit CLStreamreader(CLDevice* dev);
-	virtual ~CLStreamreader();
+	explicit QnStreamDataProvider(QnResource* dev);
+	virtual ~QnStreamDataProvider();
 
-	CLDevice* getDevice() const;
+	QnResource* getDevice() const;
 
     virtual bool dataCanBeAccepted() const;
 
 	void setStatistics(CLStatistics* stat);
-	virtual void setStreamParams(CLParamList newParam);
-	CLParamList getStreamParam() const;
+	virtual void setStreamParams(QnParamList newParam);
+	QnParamList getStreamParam() const;
 
-	void addDataProcessor(CLAbstractDataProcessor* dp);
-	void removeDataProcessor(CLAbstractDataProcessor* dp);
+	void addDataProcessor(QnAbstractDataConsumer* dp);
+	void removeDataProcessor(QnAbstractDataConsumer* dp);
 
 	void pauseDataProcessors();
 
@@ -48,22 +49,22 @@ public:
 
 protected:
 
-	void putData(CLAbstractData* data);
+	void putData(QnAbstractDataPacketPtr data);
 
 protected:
 
-	QList<CLAbstractDataProcessor*> m_dataprocessors;
+	QList<QnAbstractDataConsumer*> m_dataprocessors;
 	QMutex m_proc_CS;
 
 	mutable QMutex m_params_CS;
-	CLParamList m_streamParam;
+	QnParamList m_streamParam;
 
 	CLStatistics* m_stat;
 
 	int m_gotKeyFrame[CL_MAX_CHANNEL_NUMBER];
 	int m_channel_number;
 
-	CLDevice* m_device; // reader reads data from this device.
+	QnResource* m_device; // reader reads data from this device.
 
 	StreamQuality m_qulity;
 

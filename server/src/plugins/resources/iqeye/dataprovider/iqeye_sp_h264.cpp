@@ -4,8 +4,8 @@
 #include "network/h264_rtp_parser.h"
 
 
-CLIQEyeH264treamreader::CLIQEyeH264treamreader(CLDevice* dev)
-:CLServerPushStreamreader(dev),
+CLIQEyeH264treamreader::CLIQEyeH264treamreader(QnResource* dev)
+:QnServerPushDataProvider(dev),
 m_streamParser(0)
 {
 
@@ -16,16 +16,16 @@ CLIQEyeH264treamreader::~CLIQEyeH264treamreader()
     delete m_streamParser;    
 }
 
-CLAbstractMediaData* CLIQEyeH264treamreader::getNextData()
+QnAbstractMediaDataPacketPtr CLIQEyeH264treamreader::getNextData()
 {
 
     if (!isStreamOpened())
-        return 0;
+        return QnAbstractMediaDataPacketPtr(0);
 
     if(m_streamParser)
         return m_streamParser->getNextData();
 
-    return 0;
+    return QnAbstractMediaDataPacketPtr(0);
 
 
 

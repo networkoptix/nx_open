@@ -64,9 +64,9 @@ QString IQEyeDeviceServer::name() const
 }
 
 
-CLDeviceList IQEyeDeviceServer::findDevices()
+QnResourceList IQEyeDeviceServer::findDevices()
 {
-    CLDeviceList lst;
+    QnResourceList lst;
     foreach(Cam cam, mCams)
     {
         CLIQEyeDevice* dev = new CLIQEyeDevice();

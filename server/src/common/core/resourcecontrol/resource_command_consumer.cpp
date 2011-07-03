@@ -3,39 +3,39 @@
 
 
 
-CLDeviceCommand::CLDeviceCommand(CLDevice* device):
+QnResourceCommand::QnResourceCommand(QnResource* device):
 m_device(device)
 {
 	m_device->addRef();
 }
 
-CLDeviceCommand::~CLDeviceCommand()
+QnResourceCommand::~QnResourceCommand()
 {
 	m_device->releaseRef();
 };
 
-CLDevice* CLDeviceCommand::getDevice() const
+QnResource* QnResourceCommand::getDevice() const
 {
 	return m_device;
 }
 
-CLDeviceCommandProcessor::CLDeviceCommandProcessor():
-CLAbstractDataProcessor(1000)
+QnResourceCommandProcessor::QnResourceCommandProcessor():
+QnAbstractDataConsumer(1000)
 {
 	//start(); This is static singleton and run() uses log (another singleton). Jusst in case I will start it with first device created.
 }
 
-CLDeviceCommandProcessor::~CLDeviceCommandProcessor()
+QnResourceCommandProcessor::~QnResourceCommandProcessor()
 {
 	stop();
 }
 
-void CLDeviceCommandProcessor::processData(CLAbstractData* data)
+void QnResourceCommandProcessor::processData(QnAbstractDataPacketPtr data)
 {
-	CLDeviceCommand* command = static_cast<CLDeviceCommand*>(data);
+	QnResourceCommandPtr command = data.staticCast<QnResourceCommand>();
 	command->execute();
 
-	CLDevice* dev = command->getDevice();
+	QnResource* dev = command->getDevice();
 	QMutexLocker mutex(&m_cs);
 	Q_ASSERT(mDevicesQue.contains(dev));
 	Q_ASSERT(mDevicesQue[dev]>0);
@@ -43,7 +43,7 @@ void CLDeviceCommandProcessor::processData(CLAbstractData* data)
 	mDevicesQue[dev]--;
 }
 
-bool CLDeviceCommandProcessor::hasSuchDeviceInQueue(CLDevice* dev) const
+bool QnResourceCommandProcessor::hasSuchDeviceInQueue(QnResource* dev) const
 {
 	QMutexLocker mutex(&m_cs);
 	if (!mDevicesQue.contains(dev))
@@ -52,10 +52,10 @@ bool CLDeviceCommandProcessor::hasSuchDeviceInQueue(CLDevice* dev) const
 	return (mDevicesQue[dev]>0);
 }
 
-void CLDeviceCommandProcessor::putData(CLAbstractData* data)
+void QnResourceCommandProcessor::putData(QnAbstractDataPacketPtr data)
 {
-	CLDeviceCommand* command = static_cast<CLDeviceCommand*>(data);
-	CLDevice* dev = command->getDevice();
+	QnResourceCommandPtr command = data.staticCast<QnResourceCommand>();
+	QnResource* dev = command->getDevice();
 
 	QMutexLocker mutex(&m_cs);
 	if (!mDevicesQue.contains(dev))
@@ -67,13 +67,13 @@ void CLDeviceCommandProcessor::putData(CLAbstractData* data)
 		mDevicesQue[dev]++;
 	}
 
-	CLAbstractDataProcessor::putData(data);
+	QnAbstractDataConsumer::putData(data);
 
 }
 
-void CLDeviceCommandProcessor::clearUnprocessedData()
+void QnResourceCommandProcessor::clearUnprocessedData()
 {
-	CLAbstractDataProcessor::clearUnprocessedData();
+	QnAbstractDataConsumer::clearUnprocessedData();
 	QMutexLocker mutex(&m_cs);
 	mDevicesQue.clear();
 }

@@ -10,7 +10,7 @@ public:
 	CLAviDvdDevice(const QString& file);
 	virtual ~CLAviDvdDevice();
 
-	virtual CLStreamreader* getDeviceStreamConnection();
+	virtual QnStreamDataProvider* getDeviceStreamConnection();
     static bool isAcceptedUrl(const QString& url);
 };
 

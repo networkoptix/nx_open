@@ -8,7 +8,7 @@ extern int ping_timeout ;
 CLNetworkDevice::CLNetworkDevice():
 mAfterRouter(false)
 {
-	addDeviceTypeFlag(CLDevice::NETWORK);
+	addDeviceTypeFlag(QnResource::NETWORK);
 }
 
 QHostAddress CLNetworkDevice::getIP() const
@@ -64,7 +64,7 @@ QAuthenticator CLNetworkDevice::getAuth() const
 
 unsigned int CLNetworkDevice::getHttpTimeout() 
 {
-	if (getStatus().checkFlag(CLDeviceStatus::NOT_LOCAL)) 
+	if (getStatus().checkFlag(QnResourceStatus::NOT_LOCAL)) 
 		return 3000;
 	else 
 		return 1050;
@@ -106,7 +106,7 @@ bool CLNetworkDevice::conflicting()
 	
 	if (mac!=m_mac)// someone else has this IP
 	{
-		getStatus().setFlag(CLDeviceStatus::CONFLICTING);
+		getStatus().setFlag(QnResourceStatus::CONFLICTING);
 		return true;
 	}
 
@@ -115,7 +115,7 @@ bool CLNetworkDevice::conflicting()
 	CLPing ping;
 	if (!ping.ping(getIP().toString(), 2, ping_timeout)) // I do know know how else to solve this problem. but getMacByIP do not creates any ARP record 
 	{
-		getStatus().setFlag(CLDeviceStatus::CONFLICTING);
+		getStatus().setFlag(QnResourceStatus::CONFLICTING);
 		return true;
 	}
 
@@ -125,7 +125,7 @@ bool CLNetworkDevice::conflicting()
 
 	if (mac!=m_mac && mac!="00-00-00-00-00-00")// someone else has this IP
 	{
-		getStatus().setFlag(CLDeviceStatus::CONFLICTING);
+		getStatus().setFlag(QnResourceStatus::CONFLICTING);
 		return true;
 	}
 

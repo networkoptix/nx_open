@@ -3,7 +3,7 @@
 
 #include "../abstract_archive_resource.h"
 
-class CLStreamreader;
+class QnStreamDataProvider;
 
 class CLAviDevice : public CLAbstractArchiveDevice
 {
@@ -11,7 +11,7 @@ public:
 	CLAviDevice(const QString& file);
 	~CLAviDevice();
 
-	virtual CLStreamreader* getDeviceStreamConnection();
+	virtual QnStreamDataProvider* getDeviceStreamConnection();
 	virtual QString toString() const;
 
 protected:

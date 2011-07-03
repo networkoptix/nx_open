@@ -7,13 +7,13 @@
 
 
 
-CLServerPushStreamreader::CLServerPushStreamreader(CLDevice* dev ):
-CLStreamreader(dev)
+QnServerPushDataProvider::QnServerPushDataProvider(QnResource* dev ):
+QnStreamDataProvider(dev)
 {
 }
 
 
-void CLServerPushStreamreader::run()
+void QnServerPushDataProvider::run()
 {
 	CL_LOG(cl_logINFO) cl_log.log("stream reader started.", cl_logINFO);
 
@@ -47,8 +47,7 @@ void CLServerPushStreamreader::run()
             }
         }
 
-        CLAbstractMediaData *data = 0;
-        data = getNextData();
+        QnAbstractMediaDataPacketPtr data ( getNextData() );
 
 		if (data==0)
 		{
@@ -63,7 +62,7 @@ void CLServerPushStreamreader::run()
 			continue;
 		}
 
-		CLCompressedVideoData* videoData = ( data->dataType == CLAbstractMediaData::VIDEO) ? static_cast<CLCompressedVideoData *>(data) : 0;
+		QnCompressedVideoDataPtr videoData ( ( data->dataType == QnAbstractMediaDataPacket::VIDEO) ? data.staticCast<QnCompressedVideoData>() : QnCompressedVideoDataPtr(0) );
 
 		if (frames_lost>0) // we are alive again
 		{
@@ -85,7 +84,6 @@ void CLServerPushStreamreader::run()
 				if (videoData->channelNumber>CL_MAX_CHANNEL_NUMBER-1)
 				{
 					Q_ASSERT(false);
-					data->releaseRef();
 					continue;
 				}
 
@@ -94,7 +92,6 @@ void CLServerPushStreamreader::run()
 			else
 			{
 				// need key data but got not key data
-				data->releaseRef();
 				continue;
 			}
 		}
@@ -110,7 +107,6 @@ void CLServerPushStreamreader::run()
         else
         {
             setNeedKeyData();
-            data->releaseRef();
         }
 
         

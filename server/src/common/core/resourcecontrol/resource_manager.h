@@ -10,7 +10,7 @@
 // this class holds all devices in the system ( a least knows how to get the list )
 // it also can give list of devices based on some criteria
 
-class CLDevice;
+class QnResource;
 class CLNetworkDevice;
 class CLRecorderDevice;
 
@@ -29,13 +29,13 @@ public:
 
 	CLDeviceSearcher& getDeviceSearcher(); 
 
-	CLDeviceList getDeviceList(const CLDeviceCriteria& cr);
-	CLDevice* getDeviceById(QString id);
+	QnResourceList getDeviceList(const CLDeviceCriteria& cr);
+	QnResource* getDeviceById(QString id);
 
     CLNetworkDevice* getDeviceByIp(const QHostAddress& ip);
 
-	CLDeviceList getRecorderList();
-	CLDevice* getRecorderById(QString id); 
+	QnResourceList getRecorderList();
+	QnResource* getRecorderById(QString id); 
 
     void pleaseCheckDirs(const QStringList& lst);
     QStringList getPleaseCheckDirs() const;
@@ -43,9 +43,9 @@ public:
     void addFiles(const QStringList& files);
 protected:
 	CLDeviceManager();
-	void onNewDevices_helper(CLDeviceList devices, QString parentId);
+	void onNewDevices_helper(QnResourceList devices, QString parentId);
 
-	bool isDeviceMeetCriteria(const CLDeviceCriteria& cr, CLDevice* dev) const;
+	bool isDeviceMeetCriteria(const CLDeviceCriteria& cr, QnResource* dev) const;
 
     bool match_subfilter(QString dec, QString fltr) const;
 
@@ -59,7 +59,7 @@ protected:
 	CLDeviceSearcher m_dev_searcher;
 	bool m_firstTime;
 
-	CLDeviceList mRecDevices;
+	QnResourceList mRecDevices;
 
     mutable QMutex mPleaseCheckDirsLst_cs;
     QStringList  mPleaseCheckDirsLst;

@@ -5,36 +5,39 @@
 #include "dataconsumer/dataconsumer.h"
 
 
-class CLDevice;
+class QnResource;
 
-class CLDeviceCommand : public CLAbstractData
+class QnResourceCommand : public QnAbstractDataPacket
 {
 public:
-	CLDeviceCommand(CLDevice* device);
-	virtual ~CLDeviceCommand();
-	CLDevice* getDevice() const;
+	QnResourceCommand(QnResource* device);
+	virtual ~QnResourceCommand();
+	QnResource* getDevice() const;
 	virtual void execute() = 0;
 protected:
-	CLDevice* m_device;
+	QnResource* m_device;
 
 };
 
-class CLDeviceCommandProcessor : public CLAbstractDataProcessor
+typedef QSharedPointer<QnResourceCommand> QnResourceCommandPtr;
+
+
+class QnResourceCommandProcessor : public QnAbstractDataConsumer
 {
 public:
-	CLDeviceCommandProcessor();
-	~CLDeviceCommandProcessor();
+	QnResourceCommandProcessor();
+	~QnResourceCommandProcessor();
 
-	virtual void putData(CLAbstractData* data);
+	virtual void putData(QnAbstractDataPacketPtr data);
 
 	virtual void clearUnprocessedData();
 
-	bool hasSuchDeviceInQueue(CLDevice* dev) const;
+	bool hasSuchDeviceInQueue(QnResource* dev) const;
 
 protected:
-	virtual void processData(CLAbstractData* data);
+	virtual void processData(QnAbstractDataPacketPtr data);
 private:
-	QMap<CLDevice*, unsigned int> mDevicesQue;
+	QMap<QnResource*, unsigned int> mDevicesQue;
 	mutable QMutex m_cs;
 };
 

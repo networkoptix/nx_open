@@ -55,7 +55,7 @@ public:
 		while (!m_queue.empty()) 
 		{
 			m_sem.tryAcquire();
-			m_queue.dequeue()->releaseRef();;
+			m_queue.dequeue();
 		}
 	}
 

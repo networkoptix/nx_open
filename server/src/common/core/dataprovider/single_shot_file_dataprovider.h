@@ -2,8 +2,9 @@
 #define single_shot_file_reader_h_215
 
 #include "single_shot_dataprovider.h"
+#include "datapacket/mediadatapacket.h"
 
-struct CLAbstractMediaData;
+
 
 // difference between this class and pull reader is that run function does not have infinit loop
 // it quits after first getData
@@ -12,11 +13,11 @@ struct CLAbstractMediaData;
 class CLSingleShotFileStreamreader : public CLSingleShotStreamreader
 {
 public:
-	CLSingleShotFileStreamreader(CLDevice* dev );
+	CLSingleShotFileStreamreader(QnResource* dev );
 	~CLSingleShotFileStreamreader(){stop();}
 
 protected:
-	virtual CLAbstractMediaData* getData();
+	virtual QnAbstractMediaDataPacketPtr getData();
 private:
 
 	QString m_fileName;

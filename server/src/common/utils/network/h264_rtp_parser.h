@@ -13,7 +13,7 @@ class CLH264RtpParser: public CLRtpStreamParser
 {
 public:
     CLH264RtpParser(RTPIODevice* input);
-    virtual CLAbstractMediaData* getNextData();
+    virtual QnAbstractMediaDataPacketPtr getNextData();
     virtual ~CLH264RtpParser();
     virtual void setSDPInfo(const QByteArray& data);
 private:

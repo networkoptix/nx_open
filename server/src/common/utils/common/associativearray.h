@@ -5,20 +5,20 @@
 
 #include <math.h>
 
-class CLValue
+class QnValue
 {
 	QString value;
 public:
-	CLValue(){}
-	CLValue(const QString& val) : value(val){}
-	CLValue(const char* val) : value(val){}
+	QnValue(){}
+	QnValue(const QString& val) : value(val){}
+	QnValue(const char* val) : value(val){}
 
-	CLValue(int val) 
+	QnValue(int val) 
 	{
 		value.setNum(val);
 	}
 
-	CLValue(double val)
+	QnValue(double val)
 	{
 		value.setNum(val);
 	}
@@ -28,27 +28,27 @@ public:
 	operator double() const { return value.toDouble(); }
 	operator QString() const { return value; }
 
-	bool operator < ( const CLValue & other ) const
+	bool operator < ( const QnValue & other ) const
 	{
 		return value.toDouble() < (double)other;
 	}
 
-	bool operator > ( const CLValue & other ) const
+	bool operator > ( const QnValue & other ) const
 	{
 		return value.toDouble() > (double)other;
 	}
 
-	bool operator <= ( const CLValue & other ) const
+	bool operator <= ( const QnValue & other ) const
 	{
 		return value.toDouble() <= (double)other;
 	}
 
-	bool operator >= ( const CLValue & other ) const
+	bool operator >= ( const QnValue & other ) const
 	{
 		return value.toDouble() >= (double)other;
 	}
 
-	bool operator == ( const CLValue & other ) const
+	bool operator == ( const QnValue & other ) const
 	{
 		return value == other.value;
 	}
@@ -83,7 +83,7 @@ class CLAssociativeArray
 
 public:
 	CLAssociativeArray(){};
-	void put(const QString& key, const CLValue& value)
+	void put(const QString& key, const QnValue& value)
 	{
 		map[key] = (QString) value;
 	}
@@ -94,22 +94,22 @@ public:
 		return (it!=map.end());
 	}
 
-	CLValue get(const QString& key)
+	QnValue get(const QString& key)
 	{
 		MAP::iterator it = map.find(key);
 		if (it==map.end())
-			return CLValue("");
+			return QnValue("");
 		else
-			return CLValue( it.value() );
+			return QnValue( it.value() );
 	}
 
-	CLValue get(const QString& key, const CLValue& defaultvalue)
+	QnValue get(const QString& key, const QnValue& defaultvalue)
 	{
 		MAP::iterator it = map.find(key);
 		if (it==map.end())
 			return defaultvalue;
 		else
-			return CLValue(it.value());
+			return QnValue(it.value());
 	}
 };
 

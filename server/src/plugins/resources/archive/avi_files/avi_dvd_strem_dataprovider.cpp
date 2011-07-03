@@ -4,7 +4,7 @@
 #include "resource/resource.h"
 
 
-CLAVIDvdStreamReader::CLAVIDvdStreamReader(CLDevice* dev): 
+CLAVIDvdStreamReader::CLAVIDvdStreamReader(QnResource* dev): 
     CLAVIPlaylistStreamReader(dev),
     m_chapter(-1)
 {

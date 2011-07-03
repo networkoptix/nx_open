@@ -1,19 +1,17 @@
-#ifndef server_push_stream_reader_h2055
-#define server_push_stream_reader_h2055
+#ifndef QnServerPushDataProvider_h2055
+#define QnServerPushDataProvider_h2055
 
 #include "dataprovider/streamdataprovider.h"
+#include "datapacket/mediadatapacket.h"
 
 
-
-struct CLAbstractMediaData;
-
-class CLServerPushStreamreader : public CLStreamreader
+class QnServerPushDataProvider : public QnStreamDataProvider
 {
 public:
-    CLServerPushStreamreader(CLDevice* dev );
-    virtual ~CLServerPushStreamreader(){stop();}
+    QnServerPushDataProvider(QnResource* dev );
+    virtual ~QnServerPushDataProvider(){stop();}
 protected:
-    virtual CLAbstractMediaData* getNextData() = 0;
+    virtual QnAbstractMediaDataPacketPtr getNextData() = 0;
     virtual void openStream() = 0;
     virtual void closeStream() = 0;
     virtual bool isStreamOpened() const = 0;
@@ -22,4 +20,4 @@ private:
     void run(); // in a loop: takes data from device and puts into queue
 };
 
-#endif //server_push_stream_reader_h2055
+#endif //QnServerPushDataProvider_h2055

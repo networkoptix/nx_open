@@ -13,7 +13,7 @@ CLIQEyeDevice::~CLIQEyeDevice()
 }
 
 
-CLDevice::DeviceType CLIQEyeDevice::getDeviceType() const
+QnResource::DeviceType CLIQEyeDevice::getDeviceType() const
 {
     return VIDEODEVICE;
 }
@@ -23,7 +23,7 @@ QString CLIQEyeDevice::toString() const
     return QString("live iqeye ") + getUniqueId();
 }
 
-CLStreamreader* CLIQEyeDevice::getDeviceStreamConnection()
+QnStreamDataProvider* CLIQEyeDevice::getDeviceStreamConnection()
 {
     if (getName()=="IQ042S")
         return new CLIQEyeH264treamreader(this);

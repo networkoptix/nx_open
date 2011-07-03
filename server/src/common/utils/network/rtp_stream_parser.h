@@ -41,7 +41,7 @@ class CLRtpStreamParser
 public:
     CLRtpStreamParser(RTPIODevice* input);
     virtual void setSDPInfo(const QByteArray& data);
-    virtual CLAbstractMediaData* getNextData() = 0;
+    virtual QnAbstractMediaDataPacketPtr getNextData() = 0;
     virtual ~CLRtpStreamParser();
 protected:
     RTPIODevice* m_input;

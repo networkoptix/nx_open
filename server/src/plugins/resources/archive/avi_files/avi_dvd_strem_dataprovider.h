@@ -7,7 +7,7 @@
 class CLAVIDvdStreamReader : public CLAVIPlaylistStreamReader
 {
 public:
-	CLAVIDvdStreamReader(CLDevice* dev);
+	CLAVIDvdStreamReader(QnResource* dev);
 	virtual ~CLAVIDvdStreamReader();
     void setChapterNum(int chupter);
 protected:

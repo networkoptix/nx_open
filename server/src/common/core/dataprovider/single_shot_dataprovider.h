@@ -3,20 +3,20 @@
 
 
 #include "streamdataprovider.h"
+#include "datapacket/mediadatapacket.h"
 
-struct CLAbstractMediaData;
 
 // difference between this class and pull reader is that run function does not have infinit loop
 // it quits after first getData
 // such reader can be used for photo 
 
-class CLSingleShotStreamreader : public CLStreamreader
+class CLSingleShotStreamreader : public QnStreamDataProvider
 {
 public:
-	CLSingleShotStreamreader(CLDevice* dev );
+	CLSingleShotStreamreader(QnResource* dev );
 	~CLSingleShotStreamreader(){stop();}
 protected:
-	virtual CLAbstractMediaData* getData() = 0;
+	virtual QnAbstractMediaDataPacketPtr getData() = 0;
 private:
 	void run(); // takes images from camera and put into queue
 };

@@ -5,16 +5,16 @@
 
 class CLSimpleHTTPClient;
 
-class CLAndroidStreamreader: public CLServerPushStreamreader
+class CLAndroidStreamreader: public QnServerPushDataProvider
 {
 private:
     enum {BLOCK_SIZE = 1460};
 public:
-	CLAndroidStreamreader(CLDevice* dev);
+	CLAndroidStreamreader(QnResource* dev);
 	virtual ~CLAndroidStreamreader();
 
 protected:
-    virtual CLAbstractMediaData* getNextData();
+    virtual QnAbstractMediaDataPacketPtr getNextData();
     virtual void openStream();
     virtual void closeStream() ;
     virtual bool isStreamOpened() const;

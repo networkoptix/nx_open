@@ -3,11 +3,11 @@
 
 #define CL_MAX_CHANNELS 4
 
-class CLDeviceVideoLayout
+class QnVideoResoutceLayout
 {
 public:
-	CLDeviceVideoLayout(){};
-    virtual ~CLDeviceVideoLayout() {}
+	QnVideoResoutceLayout(){};
+    virtual ~QnVideoResoutceLayout() {}
 	//returns number of video channels device has
 	virtual unsigned int numberOfChannels() const = 0;
 
@@ -23,7 +23,7 @@ public:
 };
 
 // this is default DeviceVideoLayout for any camera with only one sensor 
-class CLDefaultDeviceVideoLayout : public CLDeviceVideoLayout
+class CLDefaultDeviceVideoLayout : public QnVideoResoutceLayout
 {
 public:
 	CLDefaultDeviceVideoLayout(){};
@@ -56,7 +56,7 @@ public:
 
 };
 
-class CLCustomDeviceVideoLayout : public CLDeviceVideoLayout
+class CLCustomDeviceVideoLayout : public QnVideoResoutceLayout
 {
 public:
 	CLCustomDeviceVideoLayout(int width, int height):

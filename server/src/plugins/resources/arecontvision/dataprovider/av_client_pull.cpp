@@ -3,7 +3,7 @@
 #include "resource/resource_param.h"
 #include "common/rand.h"
 
-CLAVClinetPullStreamReader::CLAVClinetPullStreamReader(CLDevice* dev ):
+CLAVClinetPullStreamReader::CLAVClinetPullStreamReader(QnResource* dev ):
 CLClientPullStreamreader(dev)
 {
 	setQuality(m_qulity);
@@ -44,7 +44,7 @@ void CLAVClinetPullStreamReader::setQuality(StreamQuality q)
 
 	setNeedKeyData();
 
-	CLParamList pl = getStreamParam();
+	QnParamList pl = getStreamParam();
 
 	switch(q)
 	{
@@ -123,7 +123,7 @@ int CLAVClinetPullStreamReader::getQuality() const
 	}
 	else
 	{
-		CLValue val;
+		QnValue val;
 		m_device->getParam("Quality", val);
 		return val;
 	}
@@ -141,7 +141,7 @@ int CLAVClinetPullStreamReader::getBitrate() const
 	}
 	else
 	{
-		CLValue val;
+		QnValue val;
 		m_device->getParam("Bitrate", val);
 		return val;
 	}
@@ -159,7 +159,7 @@ bool CLAVClinetPullStreamReader::isH264() const
 	}
 	else
 	{
-		CLValue val;
+		QnValue val;
 		m_device->getParam("Codec", val);
 		return val==QString("H.264");
 	}

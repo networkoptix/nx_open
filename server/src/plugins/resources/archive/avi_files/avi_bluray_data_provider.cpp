@@ -2,7 +2,7 @@
 #include "resource/resource.h"
 #include "bluray_helper.h"
 
-CLAVIBlurayStreamReader::CLAVIBlurayStreamReader(CLDevice* dev):
+CLAVIBlurayStreamReader::CLAVIBlurayStreamReader(QnResource* dev):
     CLAVIPlaylistStreamReader(dev)
 {
 }

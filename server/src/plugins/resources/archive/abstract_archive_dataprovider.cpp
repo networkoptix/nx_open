@@ -1,7 +1,7 @@
 #include "abstract_archive_dataprovider.h"
 
 
-CLAbstractArchiveReader::CLAbstractArchiveReader(CLDevice* dev )
+QnPlAbstractArchiveProvider::QnPlAbstractArchiveProvider(QnResource* dev )
     : CLClientPullStreamreader(dev),
       m_singleShot(false),
       m_forward(true),
@@ -15,11 +15,11 @@ CLAbstractArchiveReader::CLAbstractArchiveReader(CLDevice* dev )
 {
 }
 
-CLAbstractArchiveReader::~CLAbstractArchiveReader()
+QnPlAbstractArchiveProvider::~QnPlAbstractArchiveProvider()
 {
 }
 
-void CLAbstractArchiveReader::setSingleShotMode(bool single)
+void QnPlAbstractArchiveProvider::setSingleShotMode(bool single)
 {
 	m_singleShot = single;
 	if (!m_singleShot)
@@ -29,33 +29,33 @@ void CLAbstractArchiveReader::setSingleShotMode(bool single)
 	}
 }
 
-bool CLAbstractArchiveReader::isSingleShotMode() const
+bool QnPlAbstractArchiveProvider::isSingleShotMode() const
 {
 	return m_singleShot;
 }
 
-void CLAbstractArchiveReader::setdirection(bool forward)
+void QnPlAbstractArchiveProvider::setdirection(bool forward)
 {
 	m_forward = forward;
 }
 
-bool CLAbstractArchiveReader::isForwardDirection() const
+bool QnPlAbstractArchiveProvider::isForwardDirection() const
 {
 	return m_forward;
 }
 
 // returns len of archive in mksec
-quint64 CLAbstractArchiveReader::lengthMksec() const
+quint64 QnPlAbstractArchiveProvider::lengthMksec() const
 {
 	return m_lengthMksec;
 }
 
-quint64 CLAbstractArchiveReader::startMksec() const
+quint64 QnPlAbstractArchiveProvider::startMksec() const
 {
     return m_startMksec;
 }
 
-void CLAbstractArchiveReader::jumpTo(quint64 mksec, bool makeshot)
+void QnPlAbstractArchiveProvider::jumpTo(quint64 mksec, bool makeshot)
 {
  	QMutexLocker mutex(&m_cs);
 
@@ -70,28 +70,28 @@ void CLAbstractArchiveReader::jumpTo(quint64 mksec, bool makeshot)
 		resume();
 }
 
-void CLAbstractArchiveReader::jumpToPreviousFrame(quint64 mksec, bool makeshot)
+void QnPlAbstractArchiveProvider::jumpToPreviousFrame(quint64 mksec, bool makeshot)
 {
     setSkipFramesToTime(mksec);
 
 	jumpTo(mksec - 100 * 1000, makeshot);
 }
 
-quint64 CLAbstractArchiveReader::skipFramesToTime() const
+quint64 QnPlAbstractArchiveProvider::skipFramesToTime() const
 {
     QMutexLocker mutex(&m_cs);
 
     return m_skipFramesToTime;
 }
 
-void CLAbstractArchiveReader::setSkipFramesToTime(quint64 skipFramesToTime)
+void QnPlAbstractArchiveProvider::setSkipFramesToTime(quint64 skipFramesToTime)
 {
     QMutexLocker mutex(&m_cs);
 
     m_skipFramesToTime = skipFramesToTime;
 }
 
-bool CLAbstractArchiveReader::isSkippingFrames() const
+bool QnPlAbstractArchiveProvider::isSkippingFrames() const
 { 
     QMutexLocker mutex(&m_cs);
 
@@ -99,7 +99,7 @@ bool CLAbstractArchiveReader::isSkippingFrames() const
 }
 
 
-QStringList CLAbstractArchiveReader::getAudioTracksInfo() const
+QStringList QnPlAbstractArchiveProvider::getAudioTracksInfo() const
 {
     QStringList result;
     result << "Track 1";

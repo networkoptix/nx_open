@@ -3,7 +3,7 @@
 
 CLAbstractArchiveDevice::CLAbstractArchiveDevice()
 {
-	addDeviceTypeFlag(CLDevice::ARCHIVE);
+	addDeviceTypeFlag(QnResource::ARCHIVE);
 }
 
 CLAbstractArchiveDevice::~CLAbstractArchiveDevice()
@@ -11,7 +11,7 @@ CLAbstractArchiveDevice::~CLAbstractArchiveDevice()
 
 }
 
-CLDevice::DeviceType CLAbstractArchiveDevice::getDeviceType() const
+QnResource::DeviceType CLAbstractArchiveDevice::getDeviceType() const
 {
 	return VIDEODEVICE;
 }

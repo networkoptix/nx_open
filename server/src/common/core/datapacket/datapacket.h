@@ -1,16 +1,22 @@
-#ifndef abstract_data_h_1112
-#define abstract_data_h_1112
+#ifndef abstract_data_packrt_h_1112
+#define abstract_data_packrt_h_1112
+
 #include "common/threadqueue.h"
-#include "common/expensiveobject.h"
 
 
-class CLStreamreader;
+class QnStreamDataProvider;
 
-struct CLAbstractData : public CLRefCounter
+struct QnAbstractDataPacket
 {
-	CLStreamreader* dataProvider;
+	QnStreamDataProvider* dataProvider;
+
+    virtual ~QnAbstractDataPacket()
+    {
+   
+    };
 };
 
-typedef CLThreadQueue<CLAbstractData*> CLDataQueue;
+typedef QSharedPointer<QnAbstractDataPacket> QnAbstractDataPacketPtr;
+typedef CLThreadQueue<QnAbstractDataPacketPtr> QnDataPacketQueue;
 
-#endif //abstract_data_h_1112
+#endif //abstract_data_packrt_h_1112

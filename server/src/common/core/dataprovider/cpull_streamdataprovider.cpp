@@ -5,8 +5,8 @@
 #include "streamdata_statistics.h"
 #include "datapacket/mediadatapacket.h"
 
-CLClientPullStreamreader::CLClientPullStreamreader(CLDevice* dev ):
-CLStreamreader(dev)
+CLClientPullStreamreader::CLClientPullStreamreader(QnResource* dev ):
+QnStreamDataProvider(dev)
 {
 }
 
@@ -35,14 +35,13 @@ void CLClientPullStreamreader::run()
 		}
 
 
-		if (CLDevice::commandProchasSuchDeviceInQueue(m_device)) // if command processor has something in the queue for this device let it go first
+		if (QnResource::commandProchasSuchDeviceInQueue(m_device)) // if command processor has something in the queue for this device let it go first
 		{
 			CLSleep::msleep(5);
 			continue;
 		}
 
-		CLAbstractMediaData *data = 0;
-		data = getNextData();
+		QnAbstractMediaDataPacketPtr data ( getNextData() );
 		//if (data) data->releaseRef();
 		//continue;
 
@@ -61,7 +60,7 @@ void CLClientPullStreamreader::run()
 			continue;
 		}
 
-		CLCompressedVideoData* videoData = ( data->dataType == CLAbstractMediaData::VIDEO) ? static_cast<CLCompressedVideoData *>(data) : 0;
+		QnCompressedVideoDataPtr videoData ( ( data->dataType == QnAbstractMediaDataPacket::VIDEO) ? data.staticCast<QnCompressedVideoData>() : QnCompressedVideoDataPtr(0)) ;
 
 		if (frames_lost>0) // we are alive again
 		{
@@ -83,7 +82,6 @@ void CLClientPullStreamreader::run()
 				if (videoData->channelNumber>CL_MAX_CHANNEL_NUMBER-1)
 				{
 					Q_ASSERT(false);
-					data->releaseRef();
 					continue;
 				}
 
@@ -92,7 +90,6 @@ void CLClientPullStreamreader::run()
 			else
 			{
 				// need key data but got not key data
-				data->releaseRef();
 				continue;
 			}
 		}

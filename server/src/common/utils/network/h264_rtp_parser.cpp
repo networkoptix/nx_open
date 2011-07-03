@@ -111,7 +111,7 @@ void CLH264RtpParser::decodeSpsInfo(const QByteArray& data)
     }
 }
 
-CLAbstractMediaData* CLH264RtpParser::getNextData()
+QnAbstractMediaDataPacketPtr CLH264RtpParser::getNextData()
 {
     int lasttSeqNum;
     int nalUnitLen;
@@ -125,7 +125,7 @@ CLAbstractMediaData* CLH264RtpParser::getNextData()
     quint16 lastSeqNum = 0;
 
     bool lastPacketReceived = false;
-    CLCompressedVideoData* videoData = new CLCompressedVideoData(CL_MEDIA_ALIGNMENT, DEFAULT_SLICE_SIZE);
+    QnCompressedVideoDataPtr videoData (  new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, DEFAULT_SLICE_SIZE) );
 
     while(!lastPacketReceived) // todo: add termination code here
     {
@@ -136,13 +136,11 @@ CLAbstractMediaData* CLH264RtpParser::getNextData()
     
         if (readed < 1)
         {
-            videoData->releaseRef();
-            return 0;
+            return QnAbstractMediaDataPacketPtr(0);
         }
         if (readed < RtpHeader::RTP_HEADER_SIZE + 1)
         {
-            videoData->releaseRef();
-            return 0; 
+            return QnAbstractMediaDataPacketPtr(0); 
         }
         rtpHeader = (RtpHeader*) rtpBuffer;
         //bool isLastPacket = rtpHeader->marker;
@@ -169,8 +167,7 @@ CLAbstractMediaData* CLH264RtpParser::getNextData()
                 case STAP_B_PACKET:
                     if (bytesLeft < 2)
                     {
-                        videoData->releaseRef();
-                        return 0; 
+                        return QnAbstractMediaDataPacketPtr(0); 
                     }
                     don = (*curPtr << 8) + curPtr[1];
                     curPtr += 2;
@@ -178,16 +175,14 @@ CLAbstractMediaData* CLH264RtpParser::getNextData()
                 case STAP_A_PACKET:
                     if (bytesLeft < 2)
                     {
-                        videoData->releaseRef();
-                        return 0; 
+                        return QnAbstractMediaDataPacketPtr(0); 
                     }
                     nalUnitLen = (*curPtr << 8) + curPtr[1];
                     curPtr += 2;
                     bytesLeft -= 2;
                     if (bytesLeft < nalUnitLen)
                     {
-                        videoData->releaseRef();
-                        return 0; 
+                        return QnAbstractMediaDataPacketPtr(0); 
                     }
                     nalUnitType = *curPtr & 0x1f;
                     if ((nalUnitType & 0x1f) >= nuSliceNonIDR && nalUnitType <= nuSliceIDR)
@@ -218,8 +213,7 @@ CLAbstractMediaData* CLH264RtpParser::getNextData()
                 case FU_A_PACKET:
                     if (bytesLeft < 1)
                     {
-                        videoData->releaseRef();
-                        return 0; 
+                        return QnAbstractMediaDataPacketPtr(0); 
                     }
                     firstPacketReceived = *curPtr  & 0x80;
                     lastPacketReceived = *curPtr & 0x40;
@@ -243,8 +237,7 @@ CLAbstractMediaData* CLH264RtpParser::getNextData()
                             //videoData->data.clear();
                             //lastPacketReceived = false;
                             //break;
-                            videoData->releaseRef();
-                            return 0;
+                            return QnAbstractMediaDataPacketPtr(0);
                         }
 
                     }
@@ -256,8 +249,7 @@ CLAbstractMediaData* CLH264RtpParser::getNextData()
                     {
                         if (bytesLeft < 2)
                         {
-                            videoData->releaseRef();
-                            return 0; 
+                            return QnAbstractMediaDataPacketPtr(0); 
                         }
                         don = (*curPtr << 8) + curPtr[1];
                         curPtr += 2;
@@ -298,8 +290,7 @@ CLAbstractMediaData* CLH264RtpParser::getNextData()
                 MTAP16_PACKET:
                 MTAP24_PACKET:
                 default:
-                    videoData->releaseRef();
-                    return 0; 
+                    return QnAbstractMediaDataPacketPtr(0); 
             }
         }
     }

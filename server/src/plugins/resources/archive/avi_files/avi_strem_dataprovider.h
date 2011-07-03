@@ -7,21 +7,21 @@
 
 
 struct AVFormatContext;
-class CLCompressedVideoData;
-class CLCompressedAudioData;
+class QnCompressedVideoData;
+class QnCompressedAudioData;
 class AVStream;
 
-class CLAVIStreamReader : public CLAbstractArchiveReader
+class QnPlAVIStreamProvider : public QnPlAbstractArchiveProvider
 {
 public:
-	CLAVIStreamReader(CLDevice* dev);
-	virtual ~CLAVIStreamReader();
+	QnPlAVIStreamProvider(QnResource* dev);
+	virtual ~QnPlAVIStreamProvider();
 
 	virtual quint64 currentTime() const;
 
     void previousFrame(quint64 mksec);
 protected:
-	virtual CLAbstractMediaData* getNextData();
+	virtual QnAbstractMediaDataPacketPtr getNextData();
 	virtual void channeljumpTo(quint64 mksec, int channel);
 
 	virtual bool init();
@@ -83,14 +83,14 @@ private:
       *
       * @return created object
       */
-    CLCompressedVideoData* getVideoData(const AVPacket& packet, AVCodecContext* codecContext);
+    QnCompressedVideoDataPtr getVideoData(const AVPacket& packet, AVCodecContext* codecContext);
 
     /**
       * Create CLCompressedAudioData object and fill it from StreamReader state, packet and AVStream
       *
       * @return created object
       */
-    CLCompressedAudioData* getAudioData(const AVPacket& packet, AVStream* stream);
+    QnCompressedAudioDataPtr getAudioData(const AVPacket& packet, AVStream* stream);
 
     /**
       * Replace current and next packet references.

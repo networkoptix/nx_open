@@ -6,7 +6,7 @@
 #include "avi_strem_dataprovider.h"
 
 
-class CLAVIPlaylistStreamReader : public CLAVIStreamReader
+class CLAVIPlaylistStreamReader : public QnPlAVIStreamProvider
 {
     struct CLFileInfo
     {
@@ -16,7 +16,7 @@ class CLAVIPlaylistStreamReader : public CLAVIStreamReader
         AVIOContext* m_orig_pb;
     };
 public:
-	CLAVIPlaylistStreamReader(CLDevice* dev);
+	CLAVIPlaylistStreamReader(QnResource* dev);
 	virtual ~CLAVIPlaylistStreamReader();
 
     static QString addDirPath(const QString sourceDir, const QString& postfix);

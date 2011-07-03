@@ -37,8 +37,8 @@ int contain_subst(char *data, int datalen, char *subdata, int subdatalen)
 }
 
 
-CLAndroidStreamreader::CLAndroidStreamreader(CLDevice* dev)
-:CLServerPushStreamreader(dev),
+CLAndroidStreamreader::CLAndroidStreamreader(QnResource* dev)
+:QnServerPushDataProvider(dev),
 mHttpClient(0)
 {
 
@@ -49,12 +49,12 @@ CLAndroidStreamreader::~CLAndroidStreamreader()
     
 }
 
-CLAbstractMediaData* CLAndroidStreamreader::getNextData()
+QnAbstractMediaDataPacketPtr CLAndroidStreamreader::getNextData()
 {
     if (!isStreamOpened())
-        return 0;
+        return QnAbstractMediaDataPacketPtr(0);
 
-    CLCompressedVideoData* videoData = new CLCompressedVideoData(CL_MEDIA_ALIGNMENT,   CL_MAX_DATASIZE/2);
+    QnCompressedVideoDataPtr videoData( new QnCompressedVideoData(CL_MEDIA_ALIGNMENT,   CL_MAX_DATASIZE/2) );
     CLByteArray& img = videoData->data;
 
 
@@ -136,14 +136,8 @@ CLAbstractMediaData* CLAndroidStreamreader::getNextData()
 
     }
 
-
-    videoData->releaseRef();
     closeStream();
-
-    return 0;
-
-
-
+    return QnAbstractMediaDataPacketPtr(0);
 }
 
 void CLAndroidStreamreader::openStream()

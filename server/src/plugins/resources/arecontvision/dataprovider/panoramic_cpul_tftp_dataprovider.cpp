@@ -20,10 +20,10 @@ extern AVLastPacketSize ExtractSize(const unsigned char* arr);
 
 //=========================================================
 
-AVPanoramicClientPullSSTFTPStreamreader ::AVPanoramicClientPullSSTFTPStreamreader  (CLDevice* dev ):
+AVPanoramicClientPullSSTFTPStreamreader ::AVPanoramicClientPullSSTFTPStreamreader  (QnResource* dev ):
 CLAVClinetPullStreamReader(dev)
 {
-	CLAreconVisionDevice* device = static_cast<CLAreconVisionDevice*>(dev);
+	QnPlAreconVisionDevice* device = static_cast<QnPlAreconVisionDevice*>(dev);
 
 	m_model = device->getModel();
 
@@ -34,7 +34,7 @@ CLAVClinetPullStreamReader(dev)
 
 }
 
-CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
+QnAbstractMediaDataPacketPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 {
 
 	QString request;
@@ -62,7 +62,7 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 			if (!m_streamParam.exists("streamID"))
 			{
 				cl_log.log("Erorr!!! parameter is missing in stream params.", cl_logERROR);
-				return 0;
+				return QnAbstractMediaDataPacketPtr(0);
 			}
 
 			streamID = m_streamParam.get("streamID").value.value;
@@ -89,9 +89,9 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 
 	forecast_size = (width*height)/2; // 0.5 meg per megapixel as maximum 
 
-	CLSimpleTFTPClient tftp_client((static_cast<CLAreconVisionDevice*>(m_device))->getIP().toString().toLatin1().data(),  m_timeout, 3);
+	CLSimpleTFTPClient tftp_client((static_cast<QnPlAreconVisionDevice*>(m_device))->getIP().toString().toLatin1().data(),  m_timeout, 3);
 
-	CLCompressedVideoData* videoData = new CLCompressedVideoData(CL_MEDIA_ALIGNMENT,forecast_size);
+	QnCompressedVideoDataPtr videoData ( new QnCompressedVideoData(CL_MEDIA_ALIGNMENT,forecast_size) );
 	CLByteArray& img = videoData->data;
 
 	//==========================================
@@ -128,9 +128,7 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 
 	if (readed == 0) // cannot read data
 	{
-		//delete videoData;
-		videoData->releaseRef();
-		return 0;
+		return QnAbstractMediaDataPacketPtr(0);
 	}
 
 	img.removeZerrowsAtTheEnd();
@@ -163,8 +161,7 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 
 		if (size.width>5000 || size.width<0 || size.height>5000 || size.height<0) // bug of arecontvision firmware 
 		{
-			videoData->releaseRef();
-			return 0;
+			return QnAbstractMediaDataPacketPtr(0);
 		}
 
 		m_last_width = size.width;
@@ -182,9 +179,7 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 	if (h264 && (lp_size < iframe_index))
 	{
 		cl_log.log("last packet is too short!", cl_logERROR);
-		//delete videoData;
-		videoData->releaseRef();
-		return 0;
+		return QnAbstractMediaDataPacketPtr(0);
 	}
 
 	videoData->keyFrame = true;
@@ -249,7 +244,7 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 		QString model;
 		model.setNum(m_model);
 
-		// writes JPEG header at very begining
+		// writes JPEG header at very beginning
 		AVJpeg::Header::GetHeader((unsigned char*)img.data(), size.width, size.height, quality,model.toLatin1().data());
 	}
 

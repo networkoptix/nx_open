@@ -9,7 +9,7 @@
 class CLAVIBlurayStreamReader : public CLAVIPlaylistStreamReader
 {
 public:
-	CLAVIBlurayStreamReader(CLDevice* dev);
+	CLAVIBlurayStreamReader(QnResource* dev);
 	virtual ~CLAVIBlurayStreamReader();
 protected:
     virtual QStringList getPlaylist();

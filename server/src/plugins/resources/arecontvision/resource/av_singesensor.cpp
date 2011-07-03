@@ -2,7 +2,7 @@
 #include "../dataprovider/cpul_tftp_dataprovider.h"
 
 CLArecontSingleSensorDevice::CLArecontSingleSensorDevice(int model):
-CLAreconVisionDevice(model),
+QnPlAreconVisionDevice(model),
 m_hastestPattern(true)
 {
 
@@ -33,7 +33,7 @@ bool CLArecontSingleSensorDevice::getDescription()
 	return true;
 }
 
-CLStreamreader* CLArecontSingleSensorDevice::getDeviceStreamConnection()
+QnStreamDataProvider* CLArecontSingleSensorDevice::getDeviceStreamConnection()
 {
 	cl_log.log("Creating streamreader for ", getIP().toString(), cl_logDEBUG1);
 	return new AVClientPullSSTFTPStreamreader(this);

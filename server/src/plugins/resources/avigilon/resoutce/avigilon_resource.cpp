@@ -13,7 +13,7 @@ CLAvigilonDevice::~CLAvigilonDevice()
 }
 
 
-CLDevice::DeviceType CLAvigilonDevice::getDeviceType() const
+QnResource::DeviceType CLAvigilonDevice::getDeviceType() const
 {
     return VIDEODEVICE;
 }
@@ -23,7 +23,7 @@ QString CLAvigilonDevice::toString() const
     return QString("live clearpix ") + getUniqueId();
 }
 
-CLStreamreader* CLAvigilonDevice::getDeviceStreamConnection()
+QnStreamDataProvider* CLAvigilonDevice::getDeviceStreamConnection()
 {
     return new CLAvigilonStreamreader(this);
 }

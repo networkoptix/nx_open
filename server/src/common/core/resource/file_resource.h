@@ -3,9 +3,9 @@
 
 #include "resource.h"
 
-class CLStreamreader;
+class QnStreamDataProvider;
 
-class CLFileDevice : public CLDevice 
+class CLFileDevice : public QnResource 
 {
 
 public:
@@ -19,7 +19,7 @@ public:
 	virtual QString toString() const;
 	QString getFileName() const;
 
-	virtual CLStreamreader* getDeviceStreamConnection();
+	virtual QnStreamDataProvider* getDeviceStreamConnection();
 protected:
 
 };

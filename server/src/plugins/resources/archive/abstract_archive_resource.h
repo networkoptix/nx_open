@@ -3,7 +3,7 @@
 
 #include "resource/resource.h"
 
-class CLAbstractArchiveDevice : public CLDevice
+class CLAbstractArchiveDevice : public QnResource
 {
 public:
 	CLAbstractArchiveDevice();

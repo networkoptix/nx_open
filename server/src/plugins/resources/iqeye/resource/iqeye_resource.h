@@ -14,7 +14,7 @@ public:
 
     QString toString() const;
 
-    CLStreamreader* getDeviceStreamConnection();
+    QnStreamDataProvider* getDeviceStreamConnection();
 
     virtual bool unknownDevice() const;
     CLNetworkDevice* updateDevice();

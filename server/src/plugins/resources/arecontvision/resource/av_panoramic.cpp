@@ -3,7 +3,7 @@
 #include "av_panoramic.h"
 #include "../dataprovider/panoramic_cpul_tftp_dataprovider.h"
 
-class AVVideoLayout180 : public CLDeviceVideoLayout
+class AVVideoLayout180 : public QnVideoResoutceLayout
 {
 public:
 	AVVideoLayout180(){};
@@ -51,7 +51,7 @@ public:
 
 };
 
-class AVVideoLayout360 : public CLDeviceVideoLayout
+class AVVideoLayout360 : public QnVideoResoutceLayout
 {
 public:
 	AVVideoLayout360(){};
@@ -100,7 +100,7 @@ public:
 };
 
 CLArecontPanoramicDevice::CLArecontPanoramicDevice(int model):
-CLAreconVisionDevice(model),
+QnPlAreconVisionDevice(model),
 m_hastestPattern(false)
 {
 	switch(model)
@@ -123,7 +123,7 @@ bool CLArecontPanoramicDevice::getDescription()
 	return true;
 }
 
-CLStreamreader* CLArecontPanoramicDevice::getDeviceStreamConnection()
+QnStreamDataProvider* CLArecontPanoramicDevice::getDeviceStreamConnection()
 {
 	cl_log.log("Creating streamreader for ", getIP().toString(), cl_logDEBUG1);
 	return new AVPanoramicClientPullSSTFTPStreamreader(this);
@@ -134,9 +134,9 @@ bool CLArecontPanoramicDevice::hasTestPattern() const
 	return m_hastestPattern;
 }
 
-bool CLArecontPanoramicDevice::setParam(const QString& name, const CLValue& val )
+bool CLArecontPanoramicDevice::setParam(const QString& name, const QnValue& val )
 {
-	if (!CLDevice::setParam(name, val))
+	if (!QnResource::setParam(name, val))
 		return false;
 
 	if (setParam_special(name, val)) // try special first 
@@ -200,10 +200,10 @@ bool CLArecontPanoramicDevice::setParam(const QString& name, const CLValue& val 
 
 }
 
-bool CLArecontPanoramicDevice::setParam_special(const QString& name, const CLValue& val)
+bool CLArecontPanoramicDevice::setParam_special(const QString& name, const QnValue& val)
 {
 
-	if (CLAreconVisionDevice::setParam_special(name, val))
+	if (QnPlAreconVisionDevice::setParam_special(name, val))
 		return true;
 
 	if (name=="resolution")

@@ -10,7 +10,7 @@
 class AVPanoramicClientPullSSTFTPStreamreader : public CLAVClinetPullStreamReader
 {
 public:
-	explicit AVPanoramicClientPullSSTFTPStreamreader  (CLDevice* dev );
+	explicit AVPanoramicClientPullSSTFTPStreamreader  (QnResource* dev );
 
 	~AVPanoramicClientPullSSTFTPStreamreader()
 	{
@@ -18,7 +18,7 @@ public:
 	}
 
 protected:
-	virtual CLAbstractMediaData* getNextData();
+	virtual QnAbstractMediaDataPacketPtr getNextData();
 
 	virtual bool needKeyData() const;
 

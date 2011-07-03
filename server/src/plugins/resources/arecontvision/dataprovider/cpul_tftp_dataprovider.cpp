@@ -28,11 +28,11 @@ AVLastPacketSize ExtractSize(const unsigned char* arr)
 
 //=========================================================
 
-AVClientPullSSTFTPStreamreader::AVClientPullSSTFTPStreamreader (CLDevice* dev ):
+AVClientPullSSTFTPStreamreader::AVClientPullSSTFTPStreamreader (QnResource* dev ):
 CLAVClinetPullStreamReader(dev),
 m_black_white(false)
 {
-	CLAreconVisionDevice* device = static_cast<CLAreconVisionDevice*>(dev);
+	QnPlAreconVisionDevice* device = static_cast<QnPlAreconVisionDevice*>(dev);
 
 	m_model = device->getModel();
 
@@ -46,7 +46,7 @@ m_black_white(false)
 
 }
 
-CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
+QnAbstractMediaDataPacketPtr AVClientPullSSTFTPStreamreader::getNextData()
 {
 
 	QString request;
@@ -90,7 +90,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 				(h264 && !m_streamParam.exists("streamID")) || (h264 && !m_streamParam.exists("Bitrate")))
 			{
 				cl_log.log("Erorr!!! parameter is missing in stream params.", cl_logERROR);
-				return 0;
+				return QnAbstractMediaDataPacketPtr(0);
 			}
 
 			//=========
@@ -198,9 +198,9 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 
 	forecast_size = resolutionFULL ? (width*height)/4  : (width*height)/8; // 0.25 meg per megapixel as maximum 
 
-	CLSimpleTFTPClient tftp_client((static_cast<CLAreconVisionDevice*>(m_device))->getIP().toString().toLatin1().data(),  m_timeout, 3);
+	CLSimpleTFTPClient tftp_client((static_cast<QnPlAreconVisionDevice*>(m_device))->getIP().toString().toLatin1().data(),  m_timeout, 3);
 
-	CLCompressedVideoData* videoData = new CLCompressedVideoData(CL_MEDIA_ALIGNMENT,forecast_size);
+	QnCompressedVideoDataPtr videoData ( new QnCompressedVideoData(CL_MEDIA_ALIGNMENT,forecast_size) );
 	CLByteArray& img = videoData->data;
 
 	//==========================================
@@ -237,9 +237,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 
 	if (readed == 0) // cannot read data
 	{
-		//delete videoData;
-		videoData->releaseRef();
-		return 0;
+		return QnCompressedVideoDataPtr(0);
 	}
 
 	img.removeZerrowsAtTheEnd();
@@ -267,9 +265,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 		if (lp_size<21)
 		{
 			cl_log.log("last packet is too short!", cl_logERROR);
-			//delete videoData;
-			videoData->releaseRef();
-			return 0;
+			return QnAbstractMediaDataPacketPtr(0);
 		}
 
 		m_black_white = last_packet[20];
@@ -279,8 +275,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 	{
 		cl_log.log("last packet is too short!", cl_logERROR);
 		//delete videoData;
-		videoData->releaseRef();
-		return 0;
+		return QnAbstractMediaDataPacketPtr(0);
 	}
 
 	AVLastPacketSize size;

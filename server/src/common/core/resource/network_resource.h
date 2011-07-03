@@ -4,7 +4,7 @@
 #include "resource.h"
 
 
-class CLNetworkDevice : public CLDevice
+class CLNetworkDevice : public QnResource
 {
 
 public:

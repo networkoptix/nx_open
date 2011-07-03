@@ -52,9 +52,9 @@ struct AnDroidDev
 	}
 };
 
-CLDeviceList AndroidDeviceServer::findDevices()
+QnResourceList AndroidDeviceServer::findDevices()
 {
-    CLDeviceList lst;
+    QnResourceList lst;
 
     QFile file("android.txt"); // Create a file handle for the file named
     if (!file.exists())

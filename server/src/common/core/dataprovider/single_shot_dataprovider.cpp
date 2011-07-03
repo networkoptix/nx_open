@@ -3,10 +3,10 @@
 #include "streamdataprovider.h"
 #include "datapacket/mediadatapacket.h"
 
-CLSingleShotStreamreader::CLSingleShotStreamreader(CLDevice* dev ):
-CLStreamreader(dev)
+CLSingleShotStreamreader::CLSingleShotStreamreader(QnResource* dev ):
+QnStreamDataProvider(dev)
 {
-	dev->addDeviceTypeFlag(CLDevice::SINGLE_SHOT);
+	dev->addDeviceTypeFlag(QnResource::SINGLE_SHOT);
 }
 
 void CLSingleShotStreamreader::run()
@@ -14,8 +14,7 @@ void CLSingleShotStreamreader::run()
 
 	CL_LOG(cl_logINFO) cl_log.log("single shot stream reader started.", cl_logINFO);
 
-	CLAbstractMediaData *data = 0;
-	data = getData();
+	QnAbstractMediaDataPacketPtr data (getData());
 
     if (data)
 	    putData(data);

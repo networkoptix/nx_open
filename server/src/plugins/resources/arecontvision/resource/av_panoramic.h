@@ -4,19 +4,19 @@
 #include "av_resource.h"
 
 
-class CLArecontPanoramicDevice : public CLAreconVisionDevice
+class CLArecontPanoramicDevice : public QnPlAreconVisionDevice
 {
 public:
 	CLArecontPanoramicDevice(int model);
 	bool getDescription();
-	virtual CLStreamreader* getDeviceStreamConnection();
+	virtual QnStreamDataProvider* getDeviceStreamConnection();
 
 	virtual bool hasTestPattern() const;
 
 protected:
-	virtual bool setParam(const QString& name, const CLValue& val);
+	virtual bool setParam(const QString& name, const QnValue& val);
 
-	virtual bool setParam_special(const QString& name, const CLValue& val);
+	virtual bool setParam_special(const QString& name, const QnValue& val);
 
 private:
 	bool setResolution(bool full);

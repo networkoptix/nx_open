@@ -13,7 +13,7 @@ CLANdroidDevice::~CLANdroidDevice()
 }
 
 
-CLDevice::DeviceType CLANdroidDevice::getDeviceType() const
+QnResource::DeviceType CLANdroidDevice::getDeviceType() const
 {
     return VIDEODEVICE;
 }
@@ -23,7 +23,7 @@ QString CLANdroidDevice::toString() const
     return QString("live android ") + getUniqueId();
 }
 
-CLStreamreader* CLANdroidDevice::getDeviceStreamConnection()
+QnStreamDataProvider* CLANdroidDevice::getDeviceStreamConnection()
 {
     return new CLAndroidStreamreader(this);
 }

@@ -2,32 +2,31 @@
 #include "dataconsumer.h"
 #include "common/sleep.h"
 
-CLAbstractDataProcessor::CLAbstractDataProcessor(int maxQueueSize)
+QnAbstractDataConsumer::QnAbstractDataConsumer(int maxQueueSize)
     : m_dataQueue(maxQueueSize)
 {
 }
 
-bool CLAbstractDataProcessor::canAcceptData() const
+bool QnAbstractDataConsumer::canAcceptData() const
 {
 	return (m_dataQueue.size() < m_dataQueue.maxSize());
 }
 
-void CLAbstractDataProcessor::putData(CLAbstractData* data)
+void QnAbstractDataConsumer::putData(QnAbstractDataPacketPtr data)
 {
-	data->addRef();
 	m_dataQueue.push(data);
 }
 
-void CLAbstractDataProcessor::clearUnprocessedData()
+void QnAbstractDataConsumer::clearUnprocessedData()
 {
 	m_dataQueue.clear();
 }
 
-void CLAbstractDataProcessor::endOfRun()
+void QnAbstractDataConsumer::endOfRun()
 {
 }
 
-void CLAbstractDataProcessor::run()
+void QnAbstractDataConsumer::run()
 {
 	CL_LOG(cl_logINFO) cl_log.log("data processor started.", cl_logINFO);
 
@@ -36,7 +35,7 @@ void CLAbstractDataProcessor::run()
 	{
 		pauseDelay();
 
-		CLAbstractData* data;
+		QnAbstractDataPacketPtr data;
 		bool get = m_dataQueue.pop(data, 200);
 
 		if (!get)
@@ -49,8 +48,6 @@ void CLAbstractDataProcessor::run()
 		processData(data);
 
 		//cl_log.log("queue size = ", m_dataQueue.size(),cl_logALWAYS);
-
-		data->releaseRef();
 	}
 
 	endOfRun();
@@ -58,7 +55,7 @@ void CLAbstractDataProcessor::run()
 	CL_LOG(cl_logINFO) cl_log.log("data processor stopped.", cl_logINFO);
 }
 
-int CLAbstractDataProcessor::queueSize() const
+int QnAbstractDataConsumer::queueSize() const
 {
 	return m_dataQueue.size();
 }

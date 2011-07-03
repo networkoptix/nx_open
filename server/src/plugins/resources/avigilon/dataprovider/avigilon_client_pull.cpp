@@ -4,7 +4,7 @@
 #include "datapacket/mediadatapacket.h"
 #include "common/base.h"
 
-CLAvigilonStreamreader::CLAvigilonStreamreader(CLDevice* dev)
+CLAvigilonStreamreader::CLAvigilonStreamreader(QnResource* dev)
 	: CLClientPullStreamreader(dev)
 {
 }
@@ -14,7 +14,7 @@ CLAvigilonStreamreader::~CLAvigilonStreamreader()
 
 }
 
-CLAbstractMediaData* CLAvigilonStreamreader::getNextData()
+QnAbstractMediaDataPacketPtr CLAvigilonStreamreader::getNextData()
 {
     //http://192.168.1.99/media/still.jpg
 
@@ -26,12 +26,12 @@ CLAbstractMediaData* CLAvigilonStreamreader::getNextData()
     http_client.setRequestLine(request);
     http_client.openStream();
 
-    CLCompressedVideoData* videoData = 0;
+    QnCompressedVideoDataPtr videoData(0);
 
     if (!http_client.isOpened())
-        return 0;
+        return QnAbstractMediaDataPacketPtr(0);
 
-    videoData = new CLCompressedVideoData(CL_MEDIA_ALIGNMENT, qMax(http_client.getContentLen(),  (unsigned int)5*1024*1024));
+    videoData = QnCompressedVideoDataPtr( new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, qMax(http_client.getContentLen(),  (unsigned int)5*1024*1024)) );
     CLByteArray& img = videoData->data;
 
     while (http_client.isOpened())
@@ -50,9 +50,7 @@ CLAbstractMediaData* CLAvigilonStreamreader::getNextData()
         if (img.size() > CL_MAX_DATASIZE)
         {
             cl_log.log("Image is too big!!", cl_logERROR);
-            //delete videoData;
-            videoData->releaseRef();
-            return 0;
+            return QnAbstractMediaDataPacketPtr(0);
         }
     }
 

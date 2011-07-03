@@ -63,14 +63,14 @@ QString AVigilonDeviceServer::name() const
 }
 
 
-CLDeviceList AVigilonDeviceServer::findDevices()
+QnResourceList AVigilonDeviceServer::findDevices()
 {
 
     //dev->setIP(QHostAddress("192.168.1.99"), false);
     //dev->setMAC("00-18-85-00-C8-72");
 
 
-    CLDeviceList lst;
+    QnResourceList lst;
 
 
     foreach(AvigilonCam cam, mCams)

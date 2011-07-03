@@ -2,19 +2,20 @@
 #define client_pull_stream_reader_h1226
 
 #include "streamdataprovider.h"
+#include "datapacket/mediadatapacket.h"
 
 
 
-struct CLAbstractMediaData;
+struct QnAbstractMediaDataPacket;
 
-class CLClientPullStreamreader : public CLStreamreader
+class CLClientPullStreamreader : public QnStreamDataProvider
 {
 public:
-	CLClientPullStreamreader(CLDevice* dev );
+	CLClientPullStreamreader(QnResource* dev );
 	virtual ~CLClientPullStreamreader(){stop();}
 
 protected:
-	virtual CLAbstractMediaData* getNextData() = 0;
+	virtual QnAbstractMediaDataPacketPtr getNextData() = 0;
 	
 
 private:

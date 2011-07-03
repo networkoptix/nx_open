@@ -3,7 +3,7 @@
 
 #include "av_client_pull.h"
 
-class CLAbstractMediaData;
+class QnAbstractMediaDataPacket;
 
 //single sensor TFTP reader
 // arecont vision TFTP stack is faster (for JPEG image; for H.264 they are almost equal )( you can get more fps with it )
@@ -11,7 +11,7 @@ class CLAbstractMediaData;
 class AVClientPullSSTFTPStreamreader : public CLAVClinetPullStreamReader
 {
 public:
-	explicit AVClientPullSSTFTPStreamreader (CLDevice* dev );
+	explicit AVClientPullSSTFTPStreamreader (QnResource* dev );
 
 	~AVClientPullSSTFTPStreamreader()
 	{
@@ -19,7 +19,7 @@ public:
 	}
 
 protected:
-	virtual CLAbstractMediaData* getNextData();
+	virtual QnAbstractMediaDataPacketPtr getNextData();
 
 protected:
 

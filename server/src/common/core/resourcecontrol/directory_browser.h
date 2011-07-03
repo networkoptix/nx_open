@@ -12,17 +12,17 @@ public:
 	virtual ~CLDeviceDirectoryBrowser();
 
     void setDirList(QStringList& dirs);
-    CLDeviceList result();
+    QnResourceList result();
 
 protected:
     void run();
-    CLDeviceList findDevices(const QString& directory);
+    QnResourceList findDevices(const QString& directory);
 private:
     static QStringList subDirList(const QString& abspath);
 protected:
 
     QStringList mDirsToCheck;
-    CLDeviceList mResult;
+    QnResourceList mResult;
 
     volatile bool mNeedStop;
 	

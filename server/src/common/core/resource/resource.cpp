@@ -3,66 +3,66 @@
 
 static int inst = 0;
 
-CLDeviceCommandProcessor CLDevice::m_commanproc;
+QnResourceCommandProcessor QnResource::m_commanproc;
 
-CLDevice::LL CLDevice::static_device_list; // list of all supported devices params list
-CLDevice::LL CLDevice::static_stream_list; // list of all supported streams params list
+QnResource::LL QnResource::static_device_list; // list of all supported devices params list
+QnResource::LL QnResource::static_stream_list; // list of all supported streams params list
 
-CLDevice::CLDevice():
+QnResource::QnResource():
 m_deviceTypeFlags(0),
 m_videolayout(0)
 {
 	inst++;	
 };
 
-CLDevice::~CLDevice()
+QnResource::~QnResource()
 {
 	delete m_videolayout;
 	inst--;	
 	cl_log.log("inst", inst, cl_logDEBUG1);
 };
 
-void CLDevice::setParentId(QString parentid)
+void QnResource::setParentId(QString parentid)
 {
 	m_parentId = parentid;
 }
 
-QString CLDevice::getParentId() const
+QString QnResource::getParentId() const
 {
 	return m_parentId;
 }
 
-QString CLDevice::getUniqueId() const
+QString QnResource::getUniqueId() const
 {
 	return m_uniqueId;
 }
 
-void CLDevice::setUniqueId(const QString& id)
+void QnResource::setUniqueId(const QString& id)
 {
 	m_uniqueId = id;
 }
 
-QString CLDevice::getName() const
+QString QnResource::getName() const
 {
 	return m_name;
 }
 
-void CLDevice::setName(const QString& name)
+void QnResource::setName(const QString& name)
 {
 	m_name = name;
 }
 
-CLDeviceStatus& CLDevice::getStatus()
+QnResourceStatus& QnResource::getStatus()
 {
 	return m_status;
 }
 
-void  CLDevice::setStatus(const CLDeviceStatus& status)
+void  QnResource::setStatus(const QnResourceStatus& status)
 {
 	m_status = status;
 }
 
-CLParamList& CLDevice::getDeviceParamList()
+QnParamList& QnResource::getDeviceParamList()
 {
 	if (m_deviceParamList.empty())
 		m_deviceParamList = static_device_list[m_name];
@@ -70,7 +70,7 @@ CLParamList& CLDevice::getDeviceParamList()
 	return m_deviceParamList;
 }
 
-const CLParamList& CLDevice::getDeviceParamList() const
+const QnParamList& QnResource::getDeviceParamList() const
 {
 	if (m_deviceParamList.empty())
 		m_deviceParamList = static_device_list[m_name];
@@ -79,22 +79,22 @@ const CLParamList& CLDevice::getDeviceParamList() const
 
 }
 
-bool CLDevice::checkDeviceTypeFlag(unsigned long flag) const
+bool QnResource::checkDeviceTypeFlag(unsigned long flag) const
 {
 	return m_deviceTypeFlags & flag;
 }
 
-void CLDevice::addDeviceTypeFlag(unsigned long flag)
+void QnResource::addDeviceTypeFlag(unsigned long flag)
 {
 	m_deviceTypeFlags |= flag;
 }
 
-void CLDevice::removeDeviceTypeFlag(unsigned long flag)
+void QnResource::removeDeviceTypeFlag(unsigned long flag)
 {
 	m_deviceTypeFlags &= ~flag;
 }
 
-CLParamList& CLDevice::getStreamParamList()
+QnParamList& QnResource::getStreamParamList()
 {
 	if (m_streamParamList.empty())
 		m_streamParamList = static_stream_list[m_name];
@@ -102,7 +102,7 @@ CLParamList& CLDevice::getStreamParamList()
 	return m_streamParamList;
 }
 
-const CLParamList& CLDevice::getStreamParamList() const
+const QnParamList& QnResource::getStreamParamList() const
 {
 	if (m_streamParamList.empty())
 		m_streamParamList = static_stream_list[m_name];
@@ -110,7 +110,7 @@ const CLParamList& CLDevice::getStreamParamList() const
 	return m_streamParamList;
 }
 
-QStringList CLDevice::supportedDevises()
+QStringList QnResource::supportedDevises()
 {
 	QStringList result;
 	for (LL::iterator it = static_device_list.begin();it != static_device_list.end(); ++it)
@@ -119,13 +119,13 @@ QStringList CLDevice::supportedDevises()
 	return result;
 }
 
-void CLDevice::setVideoLayout(CLDeviceVideoLayout* layout)
+void QnResource::setVideoLayout(QnVideoResoutceLayout* layout)
 {
 	delete m_videolayout;
 	m_videolayout = layout;
 }
 
-const CLDeviceVideoLayout* CLDevice::getVideoLayout() const
+const QnVideoResoutceLayout* QnResource::getVideoLayout() const
 {
 	if (!m_videolayout)
 		m_videolayout = new CLDefaultDeviceVideoLayout();
@@ -134,19 +134,19 @@ const CLDeviceVideoLayout* CLDevice::getVideoLayout() const
 
 }
 
-QString CLDevice::toString() const
+QString QnResource::toString() const
 {
 	QString result;
 	QTextStream(&result) << getName() << "  " <<  getUniqueId();
 	return result;
 }
 
-void CLDevice::mergeLists(CLDeviceList& first, CLDeviceList second)
+void QnResource::mergeLists(QnResourceList& first, QnResourceList second)
 {
-	CLDeviceList::iterator its = second.begin();
+	QnResourceList::iterator its = second.begin();
 	while (its!=second.end())
 	{
-		CLDeviceList::iterator itf = first.find(its.key());
+		QnResourceList::iterator itf = first.find(its.key());
 
 		if (itf==first.end())
 		{
@@ -162,12 +162,12 @@ void CLDevice::mergeLists(CLDeviceList& first, CLDeviceList second)
 	}
 }
 
-void CLDevice::deleteDevices(CLDeviceList& lst)
+void QnResource::deleteDevices(QnResourceList& lst)
 {
-	CLDeviceList::iterator it = lst.begin();
+	QnResourceList::iterator it = lst.begin();
 	while (it!=lst.end())
 	{
-		CLDevice* device = it.value();
+		QnResource* device = it.value();
 		//delete device; //here+
 		device->releaseRef(); 
 		//lst.erase(it++);
@@ -177,12 +177,12 @@ void CLDevice::deleteDevices(CLDeviceList& lst)
 
 }
 
-void CLDevice::addReferences(CLDeviceList& lst)
+void QnResource::addReferences(QnResourceList& lst)
 {
-	CLDeviceList::iterator it = lst.begin();
+	QnResourceList::iterator it = lst.begin();
 	while (it!=lst.end())
 	{
-		CLDevice* device = it.value();
+		QnResource* device = it.value();
 		device->addRef();
 		++it;
 	}
@@ -192,7 +192,7 @@ void CLDevice::addReferences(CLDeviceList& lst)
 #ifndef _WIN32
 struct T
 {
-	T(CLDevice* d)
+	T(QnResource* d)
 	{
 		device = d;
 	}
@@ -202,18 +202,18 @@ struct T
 		device->getBaseInfo();
 	}
 	
-	CLDevice* device;
+	QnResource* device;
 };
 #endif
 
-void CLDevice::getDevicesBasicInfo(CLDeviceList& lst, int threads)
+void QnResource::getDevicesBasicInfo(QnResourceList& lst, int threads)
 {
 	// cannot make concurrent work with pointer CLDevice* ; => so extra steps needed
 
 #ifdef _WIN32
     struct T
     {
-        T(CLDevice* d)
+        T(QnResource* d)
         {
             device = d;
         }
@@ -223,7 +223,7 @@ void CLDevice::getDevicesBasicInfo(CLDeviceList& lst, int threads)
             device->getBaseInfo();
         }
 
-        CLDevice* device;
+        QnResource* device;
     };
 #endif
 
@@ -233,11 +233,11 @@ void CLDevice::getDevicesBasicInfo(CLDeviceList& lst, int threads)
 
 	QList<T> local_list;
 
-	CLDeviceList::iterator it = lst.begin();
+	QnResourceList::iterator it = lst.begin();
 	while(it!=lst.end())
 	{
-		CLDevice* device = it.value();
-		if (device->getStatus().checkFlag(CLDeviceStatus::CONFLICTING)==false)
+		QnResource* device = it.value();
+		if (device->getStatus().checkFlag(QnResourceStatus::CONFLICTING)==false)
 			local_list.push_back(T(device));
 
 		++it;
@@ -252,14 +252,14 @@ void CLDevice::getDevicesBasicInfo(CLDeviceList& lst, int threads)
 	{
 		cl_log.log("Done. Time elapsed: ", time.elapsed(), cl_logDEBUG1);
 
-		for (CLDeviceList::iterator it = lst.begin(); it != lst.end(); ++it)
+		for (QnResourceList::iterator it = lst.begin(); it != lst.end(); ++it)
 			cl_log.log(it.value()->toString(), cl_logDEBUG1);
 
 	}
 
 }
 
-bool CLDevice::getParam(const QString& name, CLValue& val, bool resynch) 
+bool QnResource::getParam(const QString& name, QnValue& val, bool resynch) 
 {
 	if (!getDeviceParamList().exists(name))
 	{
@@ -270,7 +270,7 @@ bool CLDevice::getParam(const QString& name, CLValue& val, bool resynch)
 	return true;
 }
 
-bool CLDevice::setParam(const QString& name, const CLValue& val)
+bool QnResource::setParam(const QString& name, const QnValue& val)
 {
 	if (!getDeviceParamList().exists(name))
 	{
@@ -288,14 +288,14 @@ bool CLDevice::setParam(const QString& name, const CLValue& val)
 
 }
 
-bool CLDevice::setParam_asynch(const QString& name, const CLValue& val)
+bool QnResource::setParam_asynch(const QString& name, const QnValue& val)
 {
 
-	class CLDeviceSetParamCommand : public CLDeviceCommand
+	class QnResourceSetParamCommand : public QnResourceCommand
 	{
 	public:
-		CLDeviceSetParamCommand(CLDevice* dev, const QString& name, const CLValue& val):
-		CLDeviceCommand(dev),
+		QnResourceSetParamCommand(QnResource* dev, const QString& name, const QnValue& val):
+		QnResourceCommand(dev),
 		m_name(name),
 		m_val(val)
 		{
@@ -308,14 +308,14 @@ bool CLDevice::setParam_asynch(const QString& name, const CLValue& val)
 		}
 	private:
 		QString m_name;
-		CLValue m_val;
+		QnValue m_val;
 
 	};
 
-	CLDeviceSetParamCommand *command = new CLDeviceSetParamCommand(this, name, val);
+    typedef QSharedPointer<QnResourceSetParamCommand> QnResourceSetParamCommandPtr;
+
+	QnResourceSetParamCommandPtr command ( new QnResourceSetParamCommand(this, name, val) );
 	m_commanproc.putData(command);
-	command->releaseRef();
 
 	return true;
-
 }

@@ -4,13 +4,13 @@
 #include "dataprovider/cpull_streamdataprovider.h"
 #include "common/adaptivesleep.h"
 
-class CLDevice;
+class QnResource;
 
-class CLAbstractArchiveReader : public CLClientPullStreamreader
+class QnPlAbstractArchiveProvider : public CLClientPullStreamreader
 {
 public:
-	CLAbstractArchiveReader(CLDevice* dev);
-	virtual ~CLAbstractArchiveReader();
+	QnPlAbstractArchiveProvider(QnResource* dev);
+	virtual ~QnPlAbstractArchiveProvider();
 
 	void setSingleShotMode(bool single);
 	bool isSingleShotMode() const;

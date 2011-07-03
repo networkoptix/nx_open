@@ -40,11 +40,11 @@ CLDeviceManager::~CLDeviceManager()
 
 	{
 		QMutexLocker lock(&m_dev_searcher.all_devices_mtx);
-		CLDeviceList& list = m_dev_searcher.getAllDevices();
-		CLDevice::deleteDevices(list);
+		QnResourceList& list = m_dev_searcher.getAllDevices();
+		QnResource::deleteDevices(list);
 	}
 
-	foreach(CLDevice* dev, mRecDevices)
+	foreach(QnResource* dev, mRecDevices)
 	{
 		dev->releaseRef();
 	}
@@ -108,9 +108,9 @@ void CLDeviceManager::onTimer()
 
 }
 
-CLDeviceList CLDeviceManager::getDeviceList(const CLDeviceCriteria& cr)
+QnResourceList CLDeviceManager::getDeviceList(const CLDeviceCriteria& cr)
 {
-	CLDeviceList result;
+	QnResourceList result;
 
 	if (cr.getCriteria() == CLDeviceCriteria::STATIC || cr.getCriteria() == CLDeviceCriteria::NONE )
 	{
@@ -119,8 +119,8 @@ CLDeviceList CLDeviceManager::getDeviceList(const CLDeviceCriteria& cr)
 	else
 	{
 		QMutexLocker lock(&m_dev_searcher.all_devices_mtx);
-		CLDeviceList& devices =  m_dev_searcher.getAllDevices();
-		foreach (CLDevice* device, devices)
+		QnResourceList& devices =  m_dev_searcher.getAllDevices();
+		foreach (QnResource* device, devices)
 		{
 			if (isDeviceMeetCriteria(cr, device))
 			{
@@ -139,11 +139,11 @@ CLDeviceList CLDeviceManager::getDeviceList(const CLDeviceCriteria& cr)
 CLNetworkDevice* CLDeviceManager::getDeviceByIp(const QHostAddress& ip)
 {
     QMutexLocker lock(&m_dev_searcher.all_devices_mtx);
-    CLDeviceList& devices =  m_dev_searcher.getAllDevices();
+    QnResourceList& devices =  m_dev_searcher.getAllDevices();
 
-    foreach(CLDevice* dev, devices)
+    foreach(QnResource* dev, devices)
     {
-        if (!dev->checkDeviceTypeFlag(CLDevice::NETWORK))
+        if (!dev->checkDeviceTypeFlag(QnResource::NETWORK))
             continue;
 
         CLNetworkDevice* nd = static_cast<CLNetworkDevice*>(dev);
@@ -157,13 +157,13 @@ CLNetworkDevice* CLDeviceManager::getDeviceByIp(const QHostAddress& ip)
     return 0;
 }
 
-CLDevice* CLDeviceManager::getDeviceById(QString id)
+QnResource* CLDeviceManager::getDeviceById(QString id)
 {
 	QMutexLocker lock(&m_dev_searcher.all_devices_mtx);
-	CLDeviceList& devices =  m_dev_searcher.getAllDevices();
+	QnResourceList& devices =  m_dev_searcher.getAllDevices();
 	if (devices.contains(id))
 	{
-		CLDevice* dev = devices[id];
+		QnResource* dev = devices[id];
 		dev->addRef();
 
 		return dev;
@@ -172,10 +172,10 @@ CLDevice* CLDeviceManager::getDeviceById(QString id)
 	return 0;
 }
 
-CLDeviceList CLDeviceManager::getRecorderList()
+QnResourceList CLDeviceManager::getRecorderList()
 {
 	// gonna be different if we have server
-	foreach(CLDevice* dev, mRecDevices)
+	foreach(QnResource* dev, mRecDevices)
 	{
 		dev->addRef();
 	}
@@ -184,32 +184,32 @@ CLDeviceList CLDeviceManager::getRecorderList()
 
 }
 
-CLDevice* CLDeviceManager::getRecorderById(QString id)
+QnResource* CLDeviceManager::getRecorderById(QString id)
 {
 	// gonna be different if we have server
 
 	if (!mRecDevices.contains(id))
 		return 0;
 
-	CLDevice* dev = mRecDevices[id];
+	QnResource* dev = mRecDevices[id];
 	dev->addRef();
 
 	return dev;
 }
 
 
-void CLDeviceManager::onNewDevices_helper(CLDeviceList devices, QString parentId)
+void CLDeviceManager::onNewDevices_helper(QnResourceList devices, QString parentId)
 {
 
     //int dev_per_arch  = devices.count()/10 + 1; // tests
     //int dev_count = 0;
               
 
-	foreach (CLDevice* device, devices)
+	foreach (QnResource* device, devices)
 	{
-		if (device->getStatus().checkFlag(CLDeviceStatus::ALL) == 0  ) //&&  device->getMAC()=="00-1A-07-00-12-DB")
+		if (device->getStatus().checkFlag(QnResourceStatus::ALL) == 0  ) //&&  device->getMAC()=="00-1A-07-00-12-DB")
 		{
-			device->getStatus().setFlag(CLDeviceStatus::READY);
+			device->getStatus().setFlag(QnResourceStatus::READY);
 
             device->setParentId(parentId);
             
@@ -228,7 +228,7 @@ void CLDeviceManager::onNewDevices_helper(CLDeviceList devices, QString parentId
 
 }
 
-bool CLDeviceManager::isDeviceMeetCriteria(const CLDeviceCriteria& cr, CLDevice* dev) const
+bool CLDeviceManager::isDeviceMeetCriteria(const CLDeviceCriteria& cr, QnResource* dev) const
 {
 	if (dev==0)
 		return false;
@@ -299,14 +299,14 @@ bool CLDeviceManager::match_subfilter(QString dev, QString fltr) const
 
 void CLDeviceManager::getResultFromDirBrowser()
 {
-    CLDeviceList dev_list = mDirbrowsr.result();
+    QnResourceList dev_list = mDirbrowsr.result();
 
     {
         // exclude already existing devices 
         QMutexLocker lock(&m_dev_searcher.all_devices_mtx);
-        CLDeviceList& all_devices =  m_dev_searcher.getAllDevices();
+        QnResourceList& all_devices =  m_dev_searcher.getAllDevices();
 
-        CLDeviceList::iterator it = dev_list.begin(); 
+        QnResourceList::iterator it = dev_list.begin(); 
         while (it!=dev_list.end())
         {
             if (!all_devices.contains(it.key()))
@@ -326,14 +326,14 @@ void CLDeviceManager::getResultFromDirBrowser()
 
 void CLDeviceManager::addFiles(const QStringList& files)
 {
-    CLDeviceList lst;
+    QnResourceList lst;
     foreach(QString xfile, files)
     {
 
         //onNewDevices_helper does not check if devices already exist
         //so must be checked here
 
-        CLDevice* dev = getDeviceById(xfile);
+        QnResource* dev = getDeviceById(xfile);
 
         if (dev)
         {

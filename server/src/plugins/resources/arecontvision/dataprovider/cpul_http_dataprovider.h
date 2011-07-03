@@ -7,7 +7,7 @@
 class AVClientPullSSHTTPStreamreader : public CLAVClinetPullStreamReader
 {
 public:
-	explicit AVClientPullSSHTTPStreamreader(CLDevice* dev);
+	explicit AVClientPullSSHTTPStreamreader(QnResource* dev);
 
 	~AVClientPullSSHTTPStreamreader()
 	{
@@ -15,7 +15,7 @@ public:
 	}
 
 protected:
-	virtual CLAbstractMediaData* getNextData();
+	virtual QnAbstractMediaDataPacketPtr getNextData();
 
 protected:
 

@@ -7,8 +7,8 @@
 
 QMutex global_ffmpeg_mutex;
 
-QMutex CLAVIStreamReader::avi_mutex;
-QSemaphore CLAVIStreamReader::aviSemaphore(4);
+QMutex QnPlAVIStreamProvider::avi_mutex;
+QSemaphore QnPlAVIStreamProvider::aviSemaphore(4);
 
 class QnAviSemaphoreHelpr
 {
@@ -35,7 +35,7 @@ extern QMutex global_ffmpeg_mutex;
 static const int FFMPEG_PROBE_BUFFER_SIZE = 1024 * 512;
 static const int MAX_VALID_SLEEP_TIME = 1000 * 1000 * 5; // 5 seconds as most long sleep time
 
-qint64 CLAVIStreamReader::packetTimestamp(AVStream* stream, const AVPacket& packet)
+qint64 QnPlAVIStreamProvider::packetTimestamp(AVStream* stream, const AVPacket& packet)
 {
 	double timeBase = av_q2d(stream->time_base);
 	qint64 firstDts = (stream->first_dts == AV_NOPTS_VALUE) ? 0 : stream->first_dts;
@@ -44,8 +44,8 @@ qint64 CLAVIStreamReader::packetTimestamp(AVStream* stream, const AVPacket& pack
 	return qint64(1e+6 * ttm);
 }
 
-CLAVIStreamReader::CLAVIStreamReader(CLDevice* dev )
-    : CLAbstractArchiveReader(dev),
+QnPlAVIStreamProvider::QnPlAVIStreamProvider(QnResource* dev )
+    : QnPlAbstractArchiveProvider(dev),
       m_videoStreamIndex(-1),
       m_audioStreamIndex(-1),
       mFirstTime(true),
@@ -61,32 +61,32 @@ CLAVIStreamReader::CLAVIStreamReader(CLDevice* dev )
 	//init();
 }
 
-CLAVIStreamReader::~CLAVIStreamReader()
+QnPlAVIStreamProvider::~QnPlAVIStreamProvider()
 {
 	destroy();
 }
 
-void CLAVIStreamReader::previousFrame(quint64 mksec)
+void QnPlAVIStreamProvider::previousFrame(quint64 mksec)
 {
     jumpToPreviousFrame(mksec, true);
 }
 
-void CLAVIStreamReader::switchPacket()
+void QnPlAVIStreamProvider::switchPacket()
 {
     m_currentPacketIndex ^= 1;
 }
 
-AVPacket& CLAVIStreamReader::currentPacket()
+AVPacket& QnPlAVIStreamProvider::currentPacket()
 {
     return m_packets[m_currentPacketIndex];
 }
 
-AVPacket& CLAVIStreamReader::nextPacket()
+AVPacket& QnPlAVIStreamProvider::nextPacket()
 {
     return m_packets[m_currentPacketIndex ^ 1];
 }
 
-quint64 CLAVIStreamReader::currentTime() const
+quint64 QnPlAVIStreamProvider::currentTime() const
 {
 	QMutexLocker mutex(&m_cs);
 
@@ -98,12 +98,12 @@ quint64 CLAVIStreamReader::currentTime() const
 	return m_currentTime;
 }
 
-ByteIOContext* CLAVIStreamReader::getIOContext() 
+ByteIOContext* QnPlAVIStreamProvider::getIOContext() 
 {
     return 0;
 }
 
-AVFormatContext* CLAVIStreamReader::getFormatContext()
+AVFormatContext* QnPlAVIStreamProvider::getFormatContext()
 {
     QString url = "ufile:" + m_device->getUniqueId();
     AVFormatContext* formatContext;
@@ -126,7 +126,7 @@ AVFormatContext* CLAVIStreamReader::getFormatContext()
     return formatContext;
 }
 
-bool CLAVIStreamReader::init()
+bool QnPlAVIStreamProvider::init()
 {
 	static bool firstInstance = true;
 
@@ -170,7 +170,7 @@ bool CLAVIStreamReader::init()
 	return true;
 }
 
-bool CLAVIStreamReader::initCodecs()
+bool QnPlAVIStreamProvider::initCodecs()
 {
     m_videoStreamIndex = -1;
     m_audioStreamIndex = -1;
@@ -230,10 +230,10 @@ bool CLAVIStreamReader::initCodecs()
     return true;
 }
 
-CLCompressedVideoData* CLAVIStreamReader::getVideoData(const AVPacket& packet, AVCodecContext* codecContext)
+QnCompressedVideoDataPtr QnPlAVIStreamProvider::getVideoData(const AVPacket& packet, AVCodecContext* codecContext)
 {
     int extra = 0;
-    CLCompressedVideoData* videoData = new CLCompressedVideoData(CL_MEDIA_ALIGNMENT, packet.size + extra, codecContext);
+    QnCompressedVideoDataPtr videoData ( new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, packet.size + extra, codecContext) );
     CLByteArray& data = videoData->data;
 
     data.prepareToWrite(packet.size + extra);
@@ -253,10 +253,10 @@ CLCompressedVideoData* CLAVIStreamReader::getVideoData(const AVPacket& packet, A
     return videoData;
 }
 
-CLCompressedAudioData* CLAVIStreamReader::getAudioData(const AVPacket& packet, AVStream* stream)
+QnCompressedAudioDataPtr QnPlAVIStreamProvider::getAudioData(const AVPacket& packet, AVStream* stream)
 {
     int extra = 0;
-    CLCompressedAudioData* audioData = new CLCompressedAudioData(CL_MEDIA_ALIGNMENT, packet.size + extra, stream->codec);
+    QnCompressedAudioDataPtr audioData ( new QnCompressedAudioData(CL_MEDIA_ALIGNMENT, packet.size + extra, stream->codec) );
     CLByteArray& data = audioData->data;
 
     data.prepareToWrite(packet.size + extra);
@@ -276,7 +276,7 @@ CLCompressedAudioData* CLAVIStreamReader::getAudioData(const AVPacket& packet, A
     return audioData;
 }
 
-bool CLAVIStreamReader::getNextVideoPacket()
+bool QnPlAVIStreamProvider::getNextVideoPacket()
 {
     for (;;)
     {
@@ -291,7 +291,7 @@ bool CLAVIStreamReader::getNextVideoPacket()
     }
 }
 
-CLAbstractMediaData* CLAVIStreamReader::getNextData()
+QnAbstractMediaDataPacketPtr QnPlAVIStreamProvider::getNextData()
 {
 	if (mFirstTime)
 	{
@@ -303,7 +303,7 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
     QnAviSemaphoreHelpr sem(aviSemaphore);
 
     if (!m_formatContext || m_videoStreamIndex == -1)
-		return 0;
+		return QnAbstractMediaDataPacketPtr(0);
 
 	if (m_bsleep && !isSingleShotMode() && m_needSleep && !isSkippingFrames())
 	{
@@ -323,7 +323,7 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 		if (!m_haveSavedPacket)
 		{
 			if (!getNextPacket(currentPacket()))
-				return 0;
+				return QnAbstractMediaDataPacketPtr(0);
 		} else
         {
             switchPacket();
@@ -361,7 +361,7 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 		m_bsleep = true; // sleep only in case of video
 
 		AVCodecContext* codecContext = m_formatContext->streams[m_videoStreamIndex]->codec;
-        CLCompressedVideoData* videoData = getVideoData(currentPacket(), codecContext);
+        QnCompressedVideoDataPtr videoData ( getVideoData(currentPacket(), codecContext) );
 
 		m_useTwice = false;
 
@@ -410,18 +410,18 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 
 		m_bsleep = false;
 
-        CLCompressedAudioData* audioData = getAudioData(currentPacket(), stream);
+        QnCompressedAudioDataPtr audioData ( getAudioData(currentPacket(), stream) );
 		av_free_packet(&currentPacket());
 		return audioData;
 	}
 
 	av_free_packet(&currentPacket());
 
-	return 0;
+	return QnAbstractMediaDataPacketPtr(0);
 
 }
 
-void CLAVIStreamReader::channeljumpTo(quint64 mksec, int /*channel*/)
+void QnPlAVIStreamProvider::channeljumpTo(quint64 mksec, int /*channel*/)
 {
 	QMutexLocker mutex(&m_cs);
 
@@ -438,7 +438,7 @@ void CLAVIStreamReader::channeljumpTo(quint64 mksec, int /*channel*/)
 	m_wakeup = true;
 }
 
-void CLAVIStreamReader::destroy()
+void QnPlAVIStreamProvider::destroy()
 {
 	if (m_formatContext) // crashes without condition 
     {
@@ -449,7 +449,7 @@ void CLAVIStreamReader::destroy()
     av_free_packet(&nextPacket());
 }
 
-bool CLAVIStreamReader::getNextPacket(AVPacket& packet)
+bool QnPlAVIStreamProvider::getNextPacket(AVPacket& packet)
 {
 	while (1)
 	{
@@ -478,7 +478,7 @@ bool CLAVIStreamReader::getNextPacket(AVPacket& packet)
 	return true;
 }
 
-void CLAVIStreamReader::smartSleep(qint64 mksec)
+void QnPlAVIStreamProvider::smartSleep(qint64 mksec)
 {
     if (mksec < 0)
         return;

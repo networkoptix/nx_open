@@ -3,11 +3,11 @@
 #include "datapacket/mediadatapacket.h"
 #include "common/base.h"
 
-AVClientPullSSHTTPStreamreader::AVClientPullSSHTTPStreamreader(CLDevice* dev):
+AVClientPullSSHTTPStreamreader::AVClientPullSSHTTPStreamreader(QnResource* dev):
 CLAVClinetPullStreamReader(dev)
 {
 
-	CLAreconVisionDevice* device = static_cast<CLAreconVisionDevice*>(dev);
+	QnPlAreconVisionDevice* device = static_cast<QnPlAreconVisionDevice*>(dev);
 
 	m_port = 69;
 	m_timeout = 500;
@@ -16,7 +16,7 @@ CLAVClinetPullStreamReader(dev)
 
 }
 
-CLAbstractMediaData* AVClientPullSSHTTPStreamreader::getNextData()
+QnAbstractMediaDataPacketPtr AVClientPullSSHTTPStreamreader::getNextData()
 {
 
 	QString request;
@@ -58,7 +58,7 @@ CLAbstractMediaData* AVClientPullSSHTTPStreamreader::getNextData()
 				(h264 && !m_streamParam.exists("streamID")) )
 			{
 				cl_log.log("Erorr!!! parameter is missing in stream params.", cl_logERROR);
-				return 0;
+				return QnAbstractMediaDataPacketPtr(0);
 			}
 
 			//=========
@@ -120,17 +120,15 @@ CLAbstractMediaData* AVClientPullSSHTTPStreamreader::getNextData()
 			forecast_size = resolutionFULL ? (width*height)/2  : (width*height)/4; // 0.5 meg per megapixel; to avoid mem realock
 	}
 
-	CLSimpleHTTPClient http_client((static_cast<CLAreconVisionDevice*>(m_device))->getIP(), m_port, m_timeout, m_auth);
+	CLSimpleHTTPClient http_client((static_cast<QnPlAreconVisionDevice*>(m_device))->getIP(), m_port, m_timeout, m_auth);
 
 	http_client.setRequestLine(request);
 	http_client.openStream();
 
-	CLCompressedVideoData* videoData = 0;
-
 	if (!http_client.isOpened())
-		return 0;
+		return QnAbstractMediaDataPacketPtr(0);
 
-	videoData = new CLCompressedVideoData(CL_MEDIA_ALIGNMENT,forecast_size);
+    QnCompressedVideoDataPtr videoData ( new QnCompressedVideoData(CL_MEDIA_ALIGNMENT,forecast_size) );
 	CLByteArray& img = videoData->data;
 
 	while(http_client.isOpened())
@@ -139,9 +137,7 @@ CLAbstractMediaData* AVClientPullSSHTTPStreamreader::getNextData()
 
 		if (readed<0) // error
 		{
-			//delete videoData;
-			videoData->releaseRef();
-			return 0;
+			return QnAbstractMediaDataPacketPtr(0);
 		}
 
 		img.done(readed);
@@ -149,9 +145,7 @@ CLAbstractMediaData* AVClientPullSSHTTPStreamreader::getNextData()
 		if (img.size()>CL_MAX_DATASIZE)
 		{
 			cl_log.log("Image is too big!!", cl_logERROR);
-			//delete videoData;
-			videoData->releaseRef();
-			return 0;
+			return QnAbstractMediaDataPacketPtr(0);
 		}
 	}
 

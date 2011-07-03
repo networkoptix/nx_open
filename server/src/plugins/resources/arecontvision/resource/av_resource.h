@@ -21,7 +21,7 @@ enum
 };
 
 // this class and inhereted must be very light to create 
-class CLAreconVisionDevice : public CLNetworkDevice
+class QnPlAreconVisionDevice : public CLNetworkDevice
 {
 public:
 
@@ -31,10 +31,10 @@ public:
 	}
 
 	// return true if no error
-	virtual bool getParam(const QString& name, CLValue& val, bool resynch = false);
+	virtual bool getParam(const QString& name, QnValue& val, bool resynch = false);
 
 	// return true if no error
-	virtual bool setParam(const QString& name, const CLValue& val);
+	virtual bool setParam(const QString& name, const QnValue& val);
 
 	virtual bool setIP(const QHostAddress& ip, bool net = true);
 
@@ -48,7 +48,7 @@ public:
 	CLHttpStatus setRegister(int page, int num, int val);
 	CLHttpStatus setRegister_asynch(int page, int num, int val);
 
-	CLStreamreader* getDeviceStreamConnection();
+	QnStreamDataProvider* getDeviceStreamConnection();
 
 	//========
 	virtual bool unknownDevice() const;
@@ -60,21 +60,21 @@ public:
 	// model is for internal use of any kind of AV plugin 
 	int getModel() const;
 
-	virtual bool executeCommand(CLDeviceCommand* command);
+	virtual bool executeCommand(QnResourceCommand* command);
 
 protected:
 
-	CLAreconVisionDevice(int model):
+	QnPlAreconVisionDevice(int model):
 	m_model(model)
 	{
 	}
 
 	// some AV devices are really challenging to integrate with
 	// so this function will do really dirty work about some special cam params
-	virtual bool setParam_special(const QString& name, const CLValue& val);
+	virtual bool setParam_special(const QString& name, const QnValue& val);
 
 public:
-	static CLDeviceList findDevices();
+	static QnResourceList findDevices();
 	static bool loadDevicesParam(const QString& file_name, QString& error );
 
 protected:
@@ -82,12 +82,12 @@ protected:
 
 private:
 	static bool parseDevice(const QDomElement &element, QString& error );
-	static bool parseParam(const QDomElement &element, QString& error, CLParamList& paramlist);
-	static CLAreconVisionDevice* deviceByID(QString id, int model);
+	static bool parseParam(const QDomElement &element, QString& error, QnParamList& paramlist);
+	static QnPlAreconVisionDevice* deviceByID(QString id, int model);
 
 	static bool isPanoramic(int model);
 
-	CLAreconVisionDevice(){};
+	QnPlAreconVisionDevice(){};
 
 };
 

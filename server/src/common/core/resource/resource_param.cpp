@@ -9,7 +9,7 @@ CLParamType::CLParamType()
 	ui = false;
 }
 
-bool CLParamType::setValue(CLValue val, bool set) // safe way to set value
+bool CLParamType::setValue(QnValue val, bool set) // safe way to set value
 {
 	switch(type)
 	{
@@ -34,7 +34,7 @@ bool CLParamType::setValue(CLValue val, bool set) // safe way to set value
 	return true;
 }
 
-bool CLParamType::setDefVal(CLValue val) // safe way to set value
+bool CLParamType::setDefVal(QnValue val) // safe way to set value
 {
 	switch(type)
 	{
@@ -59,7 +59,7 @@ bool CLParamType::setDefVal(CLValue val) // safe way to set value
 
 //===================================================================================
 
-void CLParamList::inheritedFrom(const CLParamList& other)
+void QnParamList::inheritedFrom(const QnParamList& other)
 {
 	MAP::const_iterator it = other.m_params.constBegin();
 	for (;it!=other.m_params.constEnd(); ++it)
@@ -67,7 +67,7 @@ void CLParamList::inheritedFrom(const CLParamList& other)
 
 }
 
-bool CLParamList::exists(const QString& name) const
+bool QnParamList::exists(const QString& name) const
 {
 	MAP::const_iterator it = m_params.find(name);
 	if (it == m_params.end())
@@ -76,27 +76,27 @@ bool CLParamList::exists(const QString& name) const
 	return true;
 }
 
-CLParam& CLParamList::get(const QString& name) 
+CLParam& QnParamList::get(const QString& name) 
 {
 	return m_params[name];
 }
 
-const CLParam CLParamList::get(const QString& name) const 
+const CLParam QnParamList::get(const QString& name) const 
 {
 	return m_params[name];
 }
 
-void CLParamList::put(const CLParam& param) 
+void QnParamList::put(const CLParam& param) 
 {
 	m_params[param.name] = param;
 }
 
-bool CLParamList::empty() const
+bool QnParamList::empty() const
 {
 	return m_params.empty();
 }
 
-QList<QString> CLParamList::groupList() const
+QList<QString> QnParamList::groupList() const
 {
 	QList<QString> result;
 
@@ -114,7 +114,7 @@ QList<QString> CLParamList::groupList() const
 	return result;
 }
 
-QList<QString> CLParamList::subGroupList(QString group) const
+QList<QString> QnParamList::subGroupList(QString group) const
 {
 	QList<QString> result;
 
@@ -136,9 +136,9 @@ QList<QString> CLParamList::subGroupList(QString group) const
 	return result;
 }
 
-CLParamList CLParamList::paramList(QString group, QString subgroup) const
+QnParamList QnParamList::paramList(QString group, QString subgroup) const
 {
-	CLParamList result;
+	QnParamList result;
 
 	foreach (CLParam param, m_params)
 	{
@@ -153,7 +153,7 @@ CLParamList CLParamList::paramList(QString group, QString subgroup) const
 
 }
 
-CLParamList::MAP& CLParamList::list()
+QnParamList::MAP& QnParamList::list()
 {
 	return m_params;
 }

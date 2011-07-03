@@ -9,16 +9,16 @@ class CLSimpleHTTPClient;
 
 
 
-class CLIQEyeMJPEGtreamreader: public CLServerPushStreamreader
+class CLIQEyeMJPEGtreamreader: public QnServerPushDataProvider
 {
 private:
     enum {BLOCK_SIZE = 1460};
 public:
-	CLIQEyeMJPEGtreamreader(CLDevice* dev);
+	CLIQEyeMJPEGtreamreader(QnResource* dev);
 	virtual ~CLIQEyeMJPEGtreamreader();
 
 protected:
-    virtual CLAbstractMediaData* getNextData();
+    virtual QnAbstractMediaDataPacketPtr getNextData();
     virtual void openStream();
     virtual void closeStream() ;
     virtual bool isStreamOpened() const;

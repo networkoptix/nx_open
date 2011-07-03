@@ -23,7 +23,7 @@ public:
 	virtual QString name() const = 0;
 
 	// returns all available devices 
-	virtual CLDeviceList findDevices() = 0;
+	virtual QnResourceList findDevices() = 0;
 
 };
 

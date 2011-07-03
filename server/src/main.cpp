@@ -5,7 +5,10 @@
 #include "plugins/resources/arecontvision/resource/av_resource_searcher.h"
 #include "plugins/resources/iqeye/resource/iqeye_resource_searcher.h"
 #include "plugins/resources/android/resource/android_resource_searcher.h"
+#include "datapacket/mediadatapacket.h"
+#include "common/base.h"
 
+ 
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
@@ -37,7 +40,7 @@ int main(int argc, char *argv[])
 
 
 
-	CLDevice::startCommandProc();
+	QnResource::startCommandProc();
 
 	CLDeviceManager::instance(); // to initialize net state;
 
@@ -55,5 +58,5 @@ int main(int argc, char *argv[])
 	//=========================================================
     app.exec();
 
-	CLDevice::stopCommandProc();
+	QnResource::stopCommandProc();
 }
