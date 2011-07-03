@@ -86,7 +86,7 @@ void QtvAudioDevice::removeSound(QtvSound* soundObject)
 }
 
 
-QtvSound* QtvAudioDevice::addSound(uint numChannels, uint bitsPerSample, uint frequency, uint size)
+QtvSound* QtvAudioDevice::addSound(const QAudioFormat& format)
 {
 	if (m_device == 0) {
 		qWarning() << "Addsound command is ignored because sound card not found";
@@ -97,7 +97,7 @@ QtvSound* QtvAudioDevice::addSound(uint numChannels, uint bitsPerSample, uint fr
 		return 0;
 	}
 
-	QtvSound* result = new QtvSound(m_device, numChannels, bitsPerSample, frequency, size);
+	QtvSound* result = new QtvSound(m_device, format);
 	if (!result->isValid()) {
 		delete result;
 		return 0;

@@ -1,5 +1,6 @@
 #include "qtvsound.h"
 #include "qtvaudiodevice.h"
+#include "base/log.h"
 
 #ifdef Q_OS_MAC
 #include <OpenAL/al.h>
@@ -10,12 +11,14 @@
 #endif
 
 
-QtvSound::QtvSound(ALCdevice* device, uint numChannels, uint bitsPerSample, uint frequency, uint size) 
+QtvSound::QtvSound(ALCdevice* device, const QAudioFormat& audioFormat) 
 {
-	m_numChannels = numChannels;
-	m_frequency = frequency;
-	m_bitsPerSample = bitsPerSample;
-	m_size = size;
+	m_audioFormat = audioFormat;
+	m_numChannels = audioFormat.channelCount();
+	m_frequency = audioFormat.frequency();
+	m_bitsPerSample = audioFormat.sampleSize();
+	m_size = bitRate() / 30; // use 33 ms buffers
+
     m_proxyBuffer = new quint8[m_size];
     m_proxyBufferLen = 0;
 	m_source = 0;
@@ -35,9 +38,13 @@ bool QtvSound::setup()
 {
 	Q_ASSERT(m_bitsPerSample && m_numChannels && m_size);
 
-	if (!m_bitsPerSample || !m_numChannels || !m_size || !setFormat()) {
+	if (!m_bitsPerSample || !m_numChannels || !m_size ) 
 		return false;
-	}
+	
+	m_format = getFormat(m_audioFormat);
+	if (m_format == 0)
+		return false;
+
 	if (!alIsSource(m_source)) {
 		checkOpenALError(m_device);
 		// create source for sound
@@ -51,29 +58,52 @@ bool QtvSound::setup()
 	return true;
 }
 
-
-
-bool QtvSound::setFormat()
+int QtvSound::getFormat(const QAudioFormat& audioFormat)
 {
-	switch(m_numChannels) {
+	if (audioFormat.sampleType() == QAudioFormat::Float)
+		return false;
+	QByteArray requestFormat;
+	int bitsPerSample = audioFormat.sampleSize();
+	int numChannels = audioFormat.channelCount();
+	int format = 0;
+	switch(numChannels) 
+	{
 		case 1:
-			m_format = 16 == m_bitsPerSample ? AL_FORMAT_MONO16 : AL_FORMAT_MONO8;
+			if (32 == bitsPerSample)
+			{
+				// format detected, but audio does not play. So, mark format as unsupported
+				format = 0; // alGetEnumValue("AL_FORMAT_MONO32");
+			}
+			else if (16 == bitsPerSample)
+				format = AL_FORMAT_MONO16;
+			else if (8 == bitsPerSample)
+				format = AL_FORMAT_MONO8;
 			break;
 		case 2:
-			m_format = 16 == m_bitsPerSample ? AL_FORMAT_STEREO16 : AL_FORMAT_STEREO8;
+			if (32 == bitsPerSample)
+			{
+				// format detected, but audio does not play. So, mark format as unsupported
+				format = 0; //alGetEnumValue("AL_FORMAT_STEREO32");
+			}
+			else if (16 == bitsPerSample)
+				format = AL_FORMAT_STEREO16;
+			else if (8 == bitsPerSample)
+				format = AL_FORMAT_STEREO8;
 			break;
 		case 4:
-			m_format = 16 == m_bitsPerSample ? alGetEnumValue("AL_FORMAT_QUAD16") : alGetEnumValue("AL_FORMAT_QUAD8");
-			checkOpenALError(m_device);
-			break;
-		case 6:
-			m_format = 16 == m_bitsPerSample ? alGetEnumValue("AL_FORMAT_51CHN16") : alGetEnumValue("AL_FORMAT_51CHN8");
-			checkOpenALError(m_device);
+			requestFormat = "AL_FORMAT_QUAD";
+			requestFormat += QByteArray::number(bitsPerSample);
+			format = alGetEnumValue(requestFormat);
 			break;
 		default:
-			return false;
+			requestFormat  = QByteArray("AL_FORMAT_");
+			requestFormat += QByteArray::number(numChannels-1);
+			requestFormat += QByteArray("1CHN");
+			requestFormat += QByteArray::number(bitsPerSample);
+			format = alGetEnumValue(requestFormat);
+			break;
 	}
-	return true;
+	return format;
 }
 
 uint QtvSound::bitRate() const 
@@ -101,6 +131,7 @@ uint QtvSound::playTimeElapsed() const
 
     uint res = static_cast<uint>(bufferTime() * queued - offset * 1000000.0f);
 
+	//cl_log.log("elapsed=", (double) res/1000000.0, cl_logALWAYS);
 	return res;
 }
 
@@ -124,12 +155,12 @@ bool QtvSound::playImpl() const
 			return true;
 		}
 	}
-	return false;
+	return true;
 }
 
-bool QtvSound::isFormatSupported()
+bool QtvSound::isFormatSupported(const QAudioFormat& format)
 {
-    return m_isValid;
+    return getFormat(format) != 0;
 }
 
 bool QtvSound::play(const quint8* data, uint size)
@@ -154,7 +185,7 @@ bool QtvSound::play(const quint8* data, uint size)
         m_proxyBufferLen += copyLen;
         if (m_proxyBufferLen == m_size)
         {
-            internalPlay(m_proxyBuffer, m_proxyBufferLen);
+            internalPlay(m_proxyBuffer, m_size);
             m_proxyBufferLen = 0;
         }
         data += copyLen;
@@ -228,13 +259,7 @@ void QtvSound::suspend()
 
 void QtvSound::resume()
 {
-	ALint state = 0;
-	alGetSourcei(m_source, AL_SOURCE_STATE, &state);
-	checkOpenALErrorDebug(m_device);
-	if (AL_PLAYING != state) 
-    {
-        alSourcePlay(m_source);
-    }
+	playImpl();
 }
 
 void QtvSound::clear()

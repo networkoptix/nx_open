@@ -39,27 +39,39 @@ public:
 
     // returns false if format is not supported 
     bool isFormatSupported() const;
+	
+	// forcing downmixing, even if output device supports multichannel output
+	void setForceDownmix(bool value) { m_forceDownmix = value; }
 
+	bool isDownmixForced() const { return m_forceDownmix; }
 private:
     // returns amount of ms which buffered before start playing 
     int playAfterMs() const;
     int msInQueue() const;
 
 	static void downmix(CLAudioData& audio);
-	static void float2int(CLAudioData& audio);
-
+	static void float2int16(CLAudioData& audio);
+	static void float2int32(CLAudioData& audio);
+	static void int32Toint16(CLAudioData& audio);
+	bool initFormatConvertRule(QAudioFormat format);
 private:
+	enum SampleConvertMethod {SampleConvert_None, SampleConvert_Float2Int32, SampleConvert_Float2Int16, SampleConvert_Int32ToInt16};
+
     QMap<CodecID, CLAbstractAudioDecoder*> m_decoder;
 
 //	CLAbstractAudioDecoder* m_decoder[CL_VARIOUSE_DECODERS];
 
 	int m_bufferMs;
 	CLAlignedData m_decodedaudio;
-	bool m_downmixing;
 	bool m_tooFewDataDetected;
+	bool m_isFormatSupported;
     QtvSound* m_audioSound;
-
     QQueue<CLCompressedAudioData*> m_audioQueue;
+
+	bool m_downmixing;    // do downmix. 
+	bool m_forceDownmix;  // force downmix, even if output device supports multichannel
+	SampleConvertMethod m_sampleConvertMethod;
+	bool m_isConvertMethodinitialized;
 };
 
 #endif //audiostreamdisplay_h_1811

@@ -4,7 +4,8 @@
 #include "videostreamdisplay.h"
 #include "audiostreamdisplay.h"
 
-#define CL_MAX_DISPLAY_QUEUE_SIZE 7
+// a lot of small audio packets in bluray HD audio codecs. So, previous size 7 is not enought
+#define CL_MAX_DISPLAY_QUEUE_SIZE 15 
 #define AUDIO_BUFF_SIZE (4000) // ms
 
 CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
@@ -142,8 +143,16 @@ void CLCamDisplay::processData(CLAbstractData* data)
     if (m_needReinitAudio)
     {
         delete m_audioDisplay;
+
+		while(m_dataQueue.size() > 0)
+		{
+			bool get = m_dataQueue.pop(data, 0);
+			if (get)
+				data->releaseRef();
+		}
         m_audioDisplay = new CLAudioStreamDisplay(AUDIO_BUFF_SIZE);
         m_needReinitAudio = false;
+		return; // skip current packet
     }
 
     if (m_needChangePriority)
