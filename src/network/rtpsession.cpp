@@ -176,10 +176,9 @@ bool RTPSession::sendDescribe()
     //qDebug() << request;
 
     if (!m_tcpSock.send(request.data(), request.size()))
-        false;
+        return false;
 
     return true;
-
 }
 
 bool RTPSession::sendOptions()
@@ -192,12 +191,10 @@ bool RTPSession::sendOptions()
     request += QByteArray::number(m_csec++);
     request += "\r\n\r\n";
 
-
     if (!m_tcpSock.send(request.data(), request.size()))
-        false;
+        return false;
 
     return true;
-
 }
 
 RTPIODevice*  RTPSession::sendSetup()
@@ -215,7 +212,6 @@ RTPIODevice*  RTPSession::sendSetup()
     request += "\r\n";
     request += "User-Agent: Network Optix\r\n";
     request += "Transport: RTP/AVP;unicast;client_port=";
-    
 
     request += QString::number(m_udpSock.getLocalPort());
     request += ',';
@@ -232,12 +228,10 @@ RTPIODevice*  RTPSession::sendSetup()
     if (!readResponce(responce))
         return 0;
 
-
     if (!responce.startsWith("RTSP/1.0 200")) 
     {
         return 0;
     }
-
 
     m_TimeOut = 0; // default timeout 0 ( do not send keep alive )
 
@@ -275,12 +269,10 @@ RTPIODevice*  RTPSession::sendSetup()
     updateTransportHeader(responce);
 
     return &m_rtpIo;
-
 }
 
 bool RTPSession::sendPlay()
 {
-
     QByteArray request;
     QByteArray responce;
 
@@ -303,7 +295,6 @@ bool RTPSession::sendPlay()
     if (!readResponce(responce))
         return false;
 
-
     if (responce.startsWith("RTSP/1.0 200"))
     {
         updateTransportHeader(responce);
@@ -312,7 +303,6 @@ bool RTPSession::sendPlay()
     }
 
     return false;
-
 }
 
 bool RTPSession::sendTeardown()
@@ -330,10 +320,8 @@ bool RTPSession::sendTeardown()
     request += "\r\n\r\n";
 
     if (!m_tcpSock.send(request.data(), request.size()))
-        false;
+        return false;
 
-
-    
     if (!readResponce(responce) || !responce.startsWith("RTSP/1.0 200"))
     {
         return false;
@@ -345,14 +333,12 @@ bool RTPSession::sendTeardown()
     }
 }
 
-
 static const int RTCP_RECEIVER_REPORT = 201;
 static const int RTCP_SOURCE_DESCRIPTION = 202;
 
 int RTPSession::buildRTCPReport(quint8* dstBuffer, const RtspStatistic* stats)
 {
     QByteArray esDescr("netoptix");
-
 
     quint8* curBuffer = dstBuffer;
     *curBuffer++ = (RTP_VERSION << 6); 
@@ -442,7 +428,6 @@ bool RTPSession::sendKeepAliveIfNeeded(const RtspStatistic* stats)
 
 bool RTPSession::sendKeepAlive()
 {
-
     QByteArray request;
     QByteArray responce;
     request += "GET_PARAMETER ";
@@ -457,12 +442,9 @@ bool RTPSession::sendKeepAlive()
         request += m_SessionId;
     }
     request += "\r\n\r\n";
-    //
-
 
     if (!m_tcpSock.send(request.data(), request.size()))
-        false;
-
+        return false;
 
     if(!readResponce(responce) || !responce.startsWith("RTSP/1.0 200"))
     {
@@ -473,9 +455,6 @@ bool RTPSession::sendKeepAlive()
         return true;
     }
 }
-
-
-
 
 bool RTPSession::readResponce(QByteArray& responce)
 {
