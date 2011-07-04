@@ -23,3 +23,4 @@ wixsetup/CustomStrings.wxl
 src/Info.plist
 macsetup/*.dmg
 src/device_plugins/archive/filetypes.h
+*Makefile*
