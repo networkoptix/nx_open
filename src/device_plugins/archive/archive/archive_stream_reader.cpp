@@ -184,18 +184,18 @@ void CLArchiveStreamReader::previousFrame(quint64 mksec)
         if (index <= 0)
             continue;
 
-        if (maxPrevTime == -1)
+        if (maxPrevTime == (quint64)-1)
             maxPrevTime = mMovie[channel].at(index-1).time;
         else if (maxPrevTime < mMovie[channel].at(index-1).time)
             maxPrevTime = mMovie[channel].at(index-1).time;
 
-        if (minPlayTime == -1)
+        if (minPlayTime == (quint64)-1)
             minPlayTime = mMovie[channel].at(index).time;
         else if (maxPrevTime >= mMovie[channel].at(index).time)
             minPlayTime = mMovie[channel].at(index).time;
     }
 
-    if (maxPrevTime == -1)
+    if (maxPrevTime == (quint64)-1)
         return;
 
     setSkipFramesToTime(maxPrevTime);
@@ -415,8 +415,8 @@ void CLArchiveStreamReader::channeljumpTo(quint64 mksec, int channel)
 
 	mFinished[channel] = (mCurrIndex[channel]==-1);
 
-	if (mCurrIndex[channel]==-1)
-		return;
+    if (mCurrIndex[channel] == (unsigned)-1)
+        return;
 
 	unsigned long shift = mMovie[channel].at(mCurrIndex[channel]).shift;
 	m_data_file[channel].seek(shift);
