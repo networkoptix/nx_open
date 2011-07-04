@@ -13,7 +13,7 @@ static const int IO_SKIP_BLOCK_SIZE = 1024 * 1024;
 
 struct dvdLangCode
 {
-    char* codeString;
+    const char* codeString;
     quint16 code;
 };
 
