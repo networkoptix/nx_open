@@ -297,7 +297,7 @@ void AVSettingsDlg::initAdmin()
     CLAbstractSettingsWidget* wgt;
 
     if ( (wgt = getWidgetByName("Factory defaults")) )
-        wgt->toWidget()->move(230,150);å
+        wgt->toWidget()->move(230,150);
 }
 
 //=========================================================================
