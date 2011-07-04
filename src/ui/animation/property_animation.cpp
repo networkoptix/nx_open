@@ -82,15 +82,15 @@ void AnimationManager::updateSkipViewUpdate()
     m_skipViewUpdate = false;
 }
 
-void AnimationManager::updateCurrentValue(PropertyAnimationWrapper* animation, const QVariant & value)
+void AnimationManager::updateCurrentValue(PropertyAnimationWrapper* animation, const QVariant& /*value*/)
 {
     if (!m_animations.contains(animation))
         return;
-    
+
     // Call updateView only once
     if (m_animationsOrder.back() != animation)
         return;
-    
+
     CLAnimationEntry& entry = m_animations[animation];
     if (!m_skipViewUpdate)
     {

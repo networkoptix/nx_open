@@ -5,17 +5,17 @@
 #include "abstractrenderer.h"
 #include "gl_renderer.h"
 
-CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale)
-    : m_lightCPUmode(false),
-      m_canDownscale(canDownscale),
-      m_prevFactor(CLVideoDecoderOutput::factor_1),
-      m_scaleFactor(CLVideoDecoderOutput::factor_1),
-      m_previousOnScreenSize(0,0),
-	  m_scaleContext(0),
-	  m_frameYUV(0),
-	  m_buffer(0),
-	  m_outputWidth(0),
-	  m_outputHeight(0)
+CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale) :
+    m_lightCPUmode(false),
+    m_canDownscale(canDownscale),
+    m_prevFactor(CLVideoDecoderOutput::factor_1),
+    m_scaleFactor(CLVideoDecoderOutput::factor_1),
+    m_previousOnScreenSize(0,0),
+    m_frameYUV(0),
+    m_buffer(0),
+    m_scaleContext(0),
+    m_outputWidth(0),
+    m_outputHeight(0)
 {
 }
 
@@ -26,17 +26,17 @@ CLVideoStreamDisplay::~CLVideoStreamDisplay()
         delete decoder;
     }
 
-	freeScaleContext();
+    freeScaleContext();
 }
 
 void CLVideoStreamDisplay::setDrawer(CLAbstractRenderer* draw)
 {
-	m_draw = draw;
+    m_draw = draw;
 }
 
 CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::getCurrentDownscaleFactor() const
 {
-	return m_scaleFactor;
+    return m_scaleFactor;
 }
 
 bool CLVideoStreamDisplay::allocScaleContext(const CLVideoDecoderOutput& outFrame, int newWidth, int newHeight)
@@ -44,9 +44,9 @@ bool CLVideoStreamDisplay::allocScaleContext(const CLVideoDecoderOutput& outFram
     m_outputWidth = newWidth;
     m_outputHeight = newHeight;
 
-	m_scaleContext = sws_getContext(outFrame.width, outFrame.height, outFrame.out_type,
-		m_outputWidth, m_outputHeight, PIX_FMT_RGBA,
-		SWS_POINT, NULL, NULL, NULL);
+    m_scaleContext = sws_getContext(outFrame.width, outFrame.height, outFrame.out_type,
+                                    m_outputWidth, m_outputHeight, PIX_FMT_RGBA,
+                                    SWS_POINT, NULL, NULL, NULL);
 
     if (m_scaleContext == 0)
     {
@@ -54,14 +54,14 @@ bool CLVideoStreamDisplay::allocScaleContext(const CLVideoDecoderOutput& outFram
         return false;
     }
 
-	m_frameYUV = avcodec_alloc_frame();
+    m_frameYUV = avcodec_alloc_frame();
 
-	int numBytes = avpicture_get_size(PIX_FMT_RGBA, m_outputWidth, m_outputHeight);
-	m_outFrame.out_type = PIX_FMT_RGBA;
+    int numBytes = avpicture_get_size(PIX_FMT_RGBA, m_outputWidth, m_outputHeight);
+    m_outFrame.out_type = PIX_FMT_RGBA;
 
-	m_buffer = (quint8*)av_malloc(numBytes * sizeof(quint8));
+    m_buffer = (quint8*)av_malloc(numBytes * sizeof(quint8));
 
-	avpicture_fill((AVPicture *)m_frameYUV, m_buffer, PIX_FMT_RGBA, m_outputWidth, m_outputHeight);
+    avpicture_fill((AVPicture *)m_frameYUV, m_buffer, PIX_FMT_RGBA, m_outputWidth, m_outputHeight);
 
     return true;
 }
@@ -165,6 +165,7 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 		return;
 
     int maxTextureSize = CLGLRenderer::getMaxTextureSize();
+    Q_UNUSED(maxTextureSize);
 
     CLVideoDecoderOutput::downscale_factor scaleFactor = determineScaleFactor(data, img, force_factor);
 

@@ -6,18 +6,17 @@
 using namespace std;
 
 CLSimpleHTTPClient::CLSimpleHTTPClient(const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth):
-m_host(host),
-m_port(port),
-m_timeout(timeout),
-m_auth(auth),
-m_connected(false)
+    m_host(host),
+    m_port(port),
+    m_connected(false),
+    m_timeout(timeout),
+    m_auth(auth)
 {
-	m_sock.setTimeOut(timeout);
+    m_sock.setTimeOut(timeout);
 }
 
 CLSimpleHTTPClient::~CLSimpleHTTPClient()
 {
-
 }
 
 CLHttpStatus CLSimpleHTTPClient::getNextLine()

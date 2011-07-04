@@ -7,12 +7,12 @@
 #include "../device/device.h"
 #include "ui/videoitem/video_wnd_item.h"
 
-CLVideoCamera::CLVideoCamera(CLDevice* device, CLVideoWindowItem* videovindow, bool generateEndOfStreamSignal)
-    : m_device(device),
-      m_videovindow(videovindow),
-      m_recorder(device),
-      mGenerateEndOfStreamSignal(generateEndOfStreamSignal),
-      m_camdispay(generateEndOfStreamSignal)
+CLVideoCamera::CLVideoCamera(CLDevice* device, CLVideoWindowItem* videovindow, bool generateEndOfStreamSignal) :
+    m_device(device),
+    m_videovindow(videovindow),
+    m_camdispay(generateEndOfStreamSignal),
+    m_recorder(device),
+    mGenerateEndOfStreamSignal(generateEndOfStreamSignal)
 {
 	cl_log.log("Creating camera for ", m_device->toString(), cl_logDEBUG1);
 

@@ -120,27 +120,27 @@ QMutex CLGLRenderer::ms_maxTextureSizeMutex;
 
 QList<GLuint*> CLGLRenderer::mGarbage;
 
-CLGLRenderer::CLGLRenderer(CLVideoWindowItem *vw):
-m_videowindow(vw),
-clampConstant(GL_CLAMP),
-isSoftYuv2Rgb(false),
-isNonPower2(false),
-m_videoTextureReady(false),
-m_brightness(0),
-m_contrast(0),
-m_hue(0),
-m_saturation(0),
-m_gotnewimage(false),
-m_stride(0), // in memorry 
-m_width(0), // visible width
-m_height(0),
-m_stride_old(0),
-m_height_old(0),
-m_needwait(true),
-m_inited(false),
-m_textureUploaded(false),
-m_forceSoftYUV(false),
-m_painterOpacity(1.0)
+CLGLRenderer::CLGLRenderer(CLVideoWindowItem *vw) :
+    clampConstant(GL_CLAMP),
+    isNonPower2(false),
+    isSoftYuv2Rgb(false),
+    m_forceSoftYUV(false),
+    m_textureUploaded(false),
+    m_stride(0), // in memorry
+    m_width(0), // visible width
+    m_height(0),
+    m_stride_old(0),
+    m_height_old(0),
+    m_videoTextureReady(false),
+    m_brightness(0),
+    m_contrast(0),
+    m_hue(0),
+    m_saturation(0),
+    m_painterOpacity(1.0),
+    m_gotnewimage(false),
+    m_needwait(true),
+    m_videowindow(vw),
+    m_inited(false)
 {
     applyMixerSettings(m_brightness, m_contrast, m_hue, m_saturation);
 }

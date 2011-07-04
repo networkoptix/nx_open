@@ -50,10 +50,10 @@ BluRayCoarseInfo::BluRayCoarseInfo(quint32 coarsePts, quint32 fineRefID, quint32
 
 // --------------------- PMTStreamInfo ----------------------
 
-PMTStreamInfo::PMTStreamInfo():
+PMTStreamInfo::PMTStreamInfo() :
     m_streamType(0), 
+    m_pid(0),
     m_esInfoLen(0), 
-    m_pid(0), 
     m_pmtPID(-1), 
     m_priorityStream(false), 
     m_isSecondary(false) 
@@ -142,6 +142,7 @@ void CLPIStreamInfo::parseStreamCodingInfo(BitStreamReader& reader)
 		m_aspect_ratio_index = reader.getBits(4);
 		reader.skipBits(2); //reserved_for_future_use 2 bslbf
 		bool cc_flag  = reader.getBit();
+        Q_UNUSED(cc_flag);
 	    reader.skipBits(17); // reserved_for_future_use 17 bslbf
 		ISRC(reader);
 		reader.skipBits(32); // reserved_for_future_use 32 bslbf
@@ -386,13 +387,16 @@ void CLPIParser::parseSequenceInfo(quint8* buffer, quint8* end)
 	for (int atc_id = 0; atc_id < number_of_ATC_sequences; atc_id++) 
 	{
 		quint32 SPN_ATC_start = reader.getBits(32); // 0 is tipical value
-		quint8 number_of_STC_sequences = reader.getBits(8);
+        Q_UNUSED(SPN_ATC_start);
+        quint8 number_of_STC_sequences = reader.getBits(8);
 		int offset_STC_id = reader.getBits(8); 
 		for (int stc_id=offset_STC_id; stc_id < number_of_STC_sequences + offset_STC_id; stc_id++) 
 		{
 			int PCR_PID = reader.getBits(16); 
-			quint32 SPN_STC_start = reader.getBits(32); 
-			m_presentation_start_time = reader.getBits(32); 
+            Q_UNUSED(PCR_PID);
+            quint32 SPN_STC_start = reader.getBits(32);
+            Q_UNUSED(SPN_STC_start);
+            m_presentation_start_time = reader.getBits(32);
 			m_presentation_end_time = reader.getBits(32); 
 		}
 	}
@@ -826,7 +830,8 @@ int MPLSParser::compose(quint8* buffer, int bufferSize, MPLSParser::DiskType dt)
 void MPLSParser::AppInfoPlayList(BitStreamReader& reader) 
 {
 	quint32 length = reader.getBits(32);
-	reader.skipBits(8); //reserved_for_future_use 8 bslbf
+    Q_UNUSED(length);
+    reader.skipBits(8); //reserved_for_future_use 8 bslbf
 	m_PlayList_playback_type = reader.getBits(8); //8 bslbf
 	if (m_PlayList_playback_type==2 || m_PlayList_playback_type==3) { // 1 == Sequential playback of PlayItems
 		m_playback_count = reader.getBits(16); //16 uimsbf

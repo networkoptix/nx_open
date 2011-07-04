@@ -15,52 +15,54 @@ class CLVideoCamera : public QObject, public CLAbstractComplicatedItem
 {
     Q_OBJECT
 public:
-	// number of videovindows in array must be the same as device->getNumberOfVideoChannels
-	CLVideoCamera(CLDevice* device, CLVideoWindowItem* videovindow, bool generateEndOfStreamSignal);
-	virtual ~CLVideoCamera();
+    // number of videovindows in array must be the same as device->getNumberOfVideoChannels
+    CLVideoCamera(CLDevice* device, CLVideoWindowItem* videovindow, bool generateEndOfStreamSignal);
+    virtual ~CLVideoCamera();
 
-	virtual void startDispay();
-	virtual void stopDispay();
+    virtual void startDispay();
+    virtual void stopDispay();
 
-	void startRecording();
-	void stopRecording();
-	bool isRecording();
+    void startRecording();
+    void stopRecording();
+    bool isRecording();
 
-	virtual void beforestopDispay();
+    virtual void beforestopDispay();
 
     // this function must be called if stream was interupted or so; to synch audio and video again 
     void streamJump();
 
-	void setLightCPUMode(bool val);
-	void copyImage(bool copy);
+    void setLightCPUMode(bool val);
+    void copyImage(bool copy);
 
-	virtual CLDevice* getDevice() const;
+    virtual CLDevice* getDevice() const;
 
-	CLStreamreader* getStreamreader();
-	CLVideoWindowItem* getVideoWindow();
-	const CLVideoWindowItem* getVideoWindow() const;
+    CLStreamreader* getStreamreader();
+    CLVideoWindowItem* getVideoWindow();
+    const CLVideoWindowItem* getVideoWindow() const;
 
-	virtual CLAbstractSceneItem* getSceneItem() const;
+    virtual CLAbstractSceneItem* getSceneItem() const;
 
-	CLStatistics* getStatistics();
-	CLCamDisplay* getCamCamDisplay();
+    CLStatistics* getStatistics();
+    CLCamDisplay* getCamCamDisplay();
 
-	void setQuality(CLStreamreader::StreamQuality q, bool increase);
-	quint64 currentTime() const;
+    void setQuality(CLStreamreader::StreamQuality q, bool increase);
+    quint64 currentTime() const;
 
 signals:
-    void reachedTheEnd(); 
+    void reachedTheEnd();
+
 protected slots:
     void onReachedTheEnd();
+
 private:
-	CLDevice* m_device;
-	CLVideoWindowItem* m_videovindow;
-	CLCamDisplay m_camdispay;
-	CLStreamRecorder m_recorder;
+    CLDevice* m_device;
+    CLVideoWindowItem* m_videovindow;
+    CLCamDisplay m_camdispay;
+    CLStreamRecorder m_recorder;
 
-	CLStreamreader* m_reader;
+    CLStreamreader* m_reader;
 
-	CLStatistics* m_stat;
+    CLStatistics* m_stat;
     bool mGenerateEndOfStreamSignal;
 
 };

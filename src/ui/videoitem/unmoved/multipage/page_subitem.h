@@ -45,8 +45,8 @@ private:
     unsigned int m_number;
     bool m_current;
 
-    QPropertyAnimation* m_scaleAnimation;
     QPropertyAnimation* m_colorAnimation;
+    QPropertyAnimation* m_scaleAnimation;
 
     QRectF m_boundingRect;
 

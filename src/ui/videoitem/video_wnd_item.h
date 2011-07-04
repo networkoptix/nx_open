@@ -84,7 +84,6 @@ protected:
 
 	const CLDeviceVideoLayout* m_videolayout;
 	unsigned int m_videonum;
-
 };
 
 #endif //clgl_draw_h_20_31

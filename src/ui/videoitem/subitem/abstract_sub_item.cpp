@@ -24,12 +24,12 @@ CLSubItemType CLAbstractSubItem::getType() const
 	return mType;
 }
 
-void CLAbstractSubItem::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
+void CLAbstractSubItem::mouseReleaseEvent( QGraphicsSceneMouseEvent * /*event*/)
 {
 	emit onPressed(this);
 }
 
-void CLAbstractSubItem::mousePressEvent( QGraphicsSceneMouseEvent * event )
+void CLAbstractSubItem::mousePressEvent( QGraphicsSceneMouseEvent * event)
 {
 	event->accept();
 }
