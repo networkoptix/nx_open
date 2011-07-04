@@ -48,7 +48,7 @@ mNeedresultsFromDirbrowsr(false)
     addArchiver("7");
     addArchiver("8");
     addArchiver("9");
-    /**/
+    */
 
 	QString mediaRoot = Settings::instance().mediaRoot();
 	if (!QDir(mediaRoot).exists())

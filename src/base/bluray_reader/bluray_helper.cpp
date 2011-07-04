@@ -954,7 +954,7 @@ void MPLSParser::composePlayList(BitStreamWriter& writer) {
 	*lengthPos = htonl(writer.getBitsCount()/8 - beforeCount);
 }
 
-void MPLSParser::composeSubPath(BitStreamWriter& writer, int playItemNum, QVector<PMTIndex>& pmtIndexList)
+void MPLSParser::composeSubPath(BitStreamWriter& writer, int /*playItemNum*/, QVector<PMTIndex>& pmtIndexList)
 {
 	quint32* lengthPos = (quint32*) (writer.getBuffer() + writer.getBitsCount()/8);
 	writer.putBits(32,0); // skip lengthField
@@ -1024,7 +1024,7 @@ void MPLSParser::composeSubPlayItem(BitStreamWriter& writer, int playItemNum, QV
 	*lengthPos = htons(writer.getBitsCount()/8 - beforeCount);
 }
 
-int MPLSParser::composePip_metadata(quint8* buffer, int bufferSize, int subPathId, QVector<PMTIndex>& pmtIndexList)
+int MPLSParser::composePip_metadata(quint8* buffer, int bufferSize, int /*subPathId*/, QVector<PMTIndex>& pmtIndexList)
 {
 	// The ID1 value and the ID2 value of the ExtensionData() shall be set to 0x0001 and 0x0001
 	BitStreamWriter writer;
@@ -1231,7 +1231,8 @@ void MPLSParser::parsePlayListMark(quint8* buffer, int len)
 	BitStreamReader reader;
 	reader.setBuffer(buffer, buffer + len);
 	quint32 length = reader.getBits(32); //
-	int number_of_PlayList_marks = reader.getBits(16); //16 uimsbf
+    Q_UNUSED(length);
+    int number_of_PlayList_marks = reader.getBits(16); //16 uimsbf
 	for(int PL_mark_id=0; PL_mark_id<number_of_PlayList_marks; PL_mark_id++) 
 	{
 		reader.skipBits(8); //reserved_for_future_use 8 bslbf
@@ -1240,7 +1241,9 @@ void MPLSParser::parsePlayListMark(quint8* buffer, int len)
 		quint32 mark_time_stamp = reader.getBits(32); //32 uimsbf
 		int entry_ES_PID = reader.getBits(16); //16 uimsbf
 		quint32 duration = reader.getBits(32); // 32 uimsbf
-		if (mark_type == 1) //mark_type 0x01 = Chapter search
+        Q_UNUSED(entry_ES_PID);
+        Q_UNUSED(duration);
+        if (mark_type == 1) //mark_type 0x01 = Chapter search
 			m_marks.push_back(PlayListMark(ref_to_PlayItem_id, mark_time_stamp));
 	}
 }
@@ -1421,6 +1424,7 @@ void MPLSParser::composeSTN_table(BitStreamWriter& writer)
 void MPLSParser::STN_table(BitStreamReader& reader)
 {
 	int length = reader.getBits(16); //16 uimsbf
+    Q_UNUSED(length);
 	reader.skipBits(16); //reserved_for_future_use 16 bslbf
 	int number_of_primary_video_stream_entries = reader.getBits(8); //8 uimsbf
 	int number_of_primary_audio_stream_entries = reader.getBits(8); //8 uimsbf
@@ -1470,6 +1474,7 @@ void MPLSParser::STN_table(BitStreamReader& reader)
 		streamInfo.parseStreamAttributes(reader);
 		//comb_info_Secondary_audio_Primary_audio(){
 		int number_of_primary_audio_ref_entries = reader.getBits(8); //8 uimsbf
+        Q_UNUSED(number_of_primary_audio_ref_entries);
 		reader.skipBits(8); //reserved_for_word_align  8 bslbf
 		for (int i=0; i<number_of_primary_audio_ref_entries; i++) 
 			int primary_audio_stream_id_ref = reader.getBits(8); //8 uimsbf
@@ -1485,15 +1490,20 @@ void MPLSParser::STN_table(BitStreamReader& reader)
 		//comb_info_Secondary_video_Secondary_audio(){
 		int number_of_secondary_audio_ref_entries = reader.getBits(8); //8 uimsbf
 		reader.skipBits(8); //reserved_for_word_align 8 bslbf
-		for (int i=0; i<number_of_secondary_audio_ref_entries; i++) 
+
+        for (int i=0; i<number_of_secondary_audio_ref_entries; i++) {
 			int secondary_audio_stream_id_ref = reader.getBits(8); //8 uimsbf
+            Q_UNUSED(secondary_audio_stream_id_ref);
+        }
 		if (number_of_secondary_audio_ref_entries%2==1)
 			reader.skipBits(8); //reserved_for_word_align 8 bslbf
 		//comb_info_Secondary_video_PiP_PG_textST(){
 		int number_of_PiP_PG_textST_ref_entries = reader.getBits(8); //8 uimsbf
 		reader.skipBits(8); //reserved_for_word_align 8 bslbf
-		for (int i=0; i < number_of_PiP_PG_textST_ref_entries; i++) 
-			int PiP_PG_textST_stream_id_ref = reader.getBits(8); //8 uimsbf
+        for (int i=0; i < number_of_PiP_PG_textST_ref_entries; i++) {
+            int PiP_PG_textST_stream_id_ref = reader.getBits(8); //8 uimsbf
+            Q_UNUSED(PiP_PG_textST_stream_id_ref);
+        }
 		if (number_of_PiP_PG_textST_ref_entries%2==1)
 			reader.skipBits(8); //reserved_for_word_align 8 bslbf
 	}
@@ -1834,15 +1844,15 @@ void MovieObject::parseNavigationCommand(BitStreamReader& reader)
 	*/
 
 	quint32 command = reader.getBits(32);
-	switch(command) 
+    switch(command)
     {
-		case 0x20010000:
-			cl_log.log("BDMO command: Goto (register arg)", cl_logDEBUG1);
-			break;	
-		case 0x20810000:
-			cl_log.log("BDMO command: Goto (const arg)", cl_logDEBUG1);
-			break;	
-	}
+        case 0x20010000:
+            cl_log.log("BDMO command: Goto (register arg)", cl_logDEBUG1);
+            break;
+        case 0x20810000:
+            cl_log.log("BDMO command: Goto (const arg)", cl_logDEBUG1);
+            break;
+    }
 
 	// operand destination 32 bits
 	// next syntax only if iFlag for operand == 0
@@ -1851,6 +1861,7 @@ void MovieObject::parseNavigationCommand(BitStreamReader& reader)
 	if (iFlag1 == 0) 
     {
 		bool reg_flag1 = reader.getBit(); // 0: General Purpose Register, 1: Player Status Registers
+        Q_UNUSED(reg_flag1);
 		reader.skipBits(19);
 		int regigsterNumber1 = reader.getBits(12);
 		regigsterNumber1 = regigsterNumber1;
@@ -1863,16 +1874,17 @@ void MovieObject::parseNavigationCommand(BitStreamReader& reader)
 
 	// operand source 32 bits
 	// next syntax only if iFlag for operand == 0
-	if (iFlag2 == 0) 
+    if (iFlag2 == 0)
     {
-		bool reg_flag1 = reader.getBit(); // 0: General Purpose Register, 1: Player Status Registers
-		reader.skipBits(19);
-		int regigsterNumber1 = reader.getBits(12);
-		regigsterNumber1 = regigsterNumber1;
-	}
-	else 
+        bool reg_flag1 = reader.getBit(); // 0: General Purpose Register, 1: Player Status Registers
+        Q_UNUSED(reg_flag1);
+        reader.skipBits(19);
+        int regigsterNumber1 = reader.getBits(12);
+        regigsterNumber1 = regigsterNumber1;
+    }
+    else
     {
-		int immediateValue = reader.getBits(32);
-		immediateValue = immediateValue;
-	}
+        int immediateValue = reader.getBits(32);
+        immediateValue = immediateValue;
+    }
 }

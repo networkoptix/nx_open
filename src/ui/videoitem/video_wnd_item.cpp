@@ -201,7 +201,7 @@ QRect CLVideoWindowItem::getSubChannelRect(unsigned int channel) const
 	|	 |	  |
 	*----*----*
 
-	/**/
+    */
 
 	int cel_x = m_videolayout->h_position(channel);
 	int cel_y = m_videolayout->v_position(channel);

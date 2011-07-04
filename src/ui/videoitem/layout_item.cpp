@@ -8,7 +8,9 @@ CLLayoutItem::CLLayoutItem(GraphicsView* view, int max_width, int max_height, QS
 CLImageItem(view,max_width,max_height, name),
 mContent(0)
 {
-	m_type = LAYOUT;
+    Q_UNUSED(tooltip);
+
+    m_type = LAYOUT;
 
     mPixmap = cached(":/skin/layout.png");
 
@@ -20,15 +22,14 @@ CLLayoutItem::~CLLayoutItem()
 
 }
 
-
 void CLLayoutItem::setRefContent(LayoutContent* cont)
 {
-	mContent = cont;
+    mContent = cont;
 }
 
 LayoutContent* CLLayoutItem::getRefContent() const
 {
-	return mContent;
+    return mContent;
 }
 
 QPointF CLLayoutItem::getBestSubItemPos(CLSubItemType type)
@@ -48,6 +49,8 @@ QPointF CLLayoutItem::getBestSubItemPos(CLSubItemType type)
 
 void CLLayoutItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    Q_UNUSED(widget);
+
     /*
 	painter->fillPath(mShadowRectPath, global_shadow_color);
 
@@ -67,7 +70,7 @@ void CLLayoutItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 	//painter->drawRect(boundingRect());
 
 	//==================================================
-    /**/
+    */
 
     painter->setRenderHint(QPainter::SmoothPixmapTransform);
     painter->setRenderHint(QPainter::Antialiasing);

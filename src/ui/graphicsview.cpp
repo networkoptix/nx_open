@@ -285,7 +285,7 @@ void GraphicsView::setZeroSelection()
 		m_selectedWnd->setItemSelected(false);
 
 		CLVideoWindowItem* videoItem = 0;
-		if (videoItem = m_selectedWnd->toVideoItem())
+        if ( (videoItem = m_selectedWnd->toVideoItem()) )
 		{
 			videoItem->showFPS(false);
 			videoItem->setShowImagesize(false);
@@ -373,7 +373,7 @@ void GraphicsView::updateTransform(qreal angle)
 	tr.scale(0.05, 0.05);
 	tr.translate(-center.x(), -center.y());
 	setTransform(tr);
-	/**/
+    */
 
 	QTransform tr = transform();
 	tr.rotate(angle/10.0, Qt::YAxis);
@@ -780,7 +780,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 		new_scene_pos.rx() = limit_val(new_scene_pos.x(), rsr.left(), rsr.right(), false);
 		new_scene_pos.ry() = limit_val(new_scene_pos.y(), rsr.top(), rsr.bottom(), false);
 		centerOn(new_scene_pos);
-		/**/
+        */
 
 		QPoint delta = event->pos() - m_mousestate.getLastEventPoint();
         viewMove(delta.x(), delta.y());
@@ -943,7 +943,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 	mSubItemMoving = false;
 
 	bool left_button = event->button() == Qt::LeftButton;
-	bool right_button = event->button() == Qt::RightButton;
+//	bool right_button = event->button() == Qt::RightButton;
 	bool mid_button = event->button() == Qt::MidButton;
 	bool handMoving = m_handMoving>2;
 	bool rotating = m_rotationCounter>2;
@@ -1648,7 +1648,7 @@ void GraphicsView::mouseDoubleClickEvent( QMouseEvent * event )
 		}
 
 		onArrange_helper();
-		/**/
+        */
 
 		fitInView(1500, 0, SLOW_START_SLOW_END);
 
@@ -2217,6 +2217,8 @@ void GraphicsView::recalcSomeParams()
 
 void GraphicsView::resizeEvent( QResizeEvent * event )
 {
+    Q_UNUSED(event);
+
 	if (!mViewStarted)
 		return;
 

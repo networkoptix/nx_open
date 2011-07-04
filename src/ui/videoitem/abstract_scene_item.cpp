@@ -301,7 +301,7 @@ void CLAbstractSceneItem::hoverEnterEvent(QGraphicsSceneHoverEvent * /*event*/)
 			m_animationTransform.zoom_abs(1.11, item_hoverevent_duration, 0);
 		}
 	}
-	/**/
+    */
 
 }
 
@@ -320,7 +320,7 @@ void CLAbstractSceneItem::hoverLeaveEvent(QGraphicsSceneHoverEvent * /*event*/)
 			m_animationTransform.zoom_abs(1.0, item_hoverevent_duration, 0);
 		}
 	}
-	/**/
+    */
 }
 
 void CLAbstractSceneItem::mousePressEvent ( QGraphicsSceneMouseEvent * event )

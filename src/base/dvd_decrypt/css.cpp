@@ -1607,7 +1607,7 @@ static int CrackTitleKey( dvdcss_t dvdcss, int i_pos, int i_len,
  * a contiuation of that pattern.
  *****************************************************************************/
 static int AttackPattern( quint8 const p_sec[ DVDCSS_BLOCK_SIZE ],
-                          int i_pos, quint8 *p_key )
+                          int /*i_pos*/, quint8 *p_key )
 {
     unsigned int i_best_plen = 0;
     unsigned int i_best_p = 0;

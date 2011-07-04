@@ -287,35 +287,35 @@ void CLGLRenderer::init(bool msgbox)
     }
 
     if (!error && glProgramStringARB && glBindProgramARB && glDeleteProgramsARB &&
-        glGenProgramsARB && glProgramLocalParameter4fARB)
+            glGenProgramsARB && glProgramLocalParameter4fARB)
     {
-            glGenProgramsARB(2, m_program);
+        glGenProgramsARB(2, m_program);
 
-            //==================
-            const char *code[] = {yv12ToRgb, yuy2ToRgb};
+        //==================
+        const char *code[] = {yv12ToRgb, yuy2ToRgb};
 
-            bool error = false;
-            for(int i = 0; i < ProgramCount && !error;  ++i)
+        bool error = false;
+        for(int i = 0; i < ProgramCount && !error;  ++i)
+        {
+
+            glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, m_program[i]);
+
+            const GLbyte *gl_src = reinterpret_cast<const GLbyte *>(code[i]);
+            glProgramStringARB(GL_FRAGMENT_PROGRAM_ARB, GL_PROGRAM_FORMAT_ASCII_ARB,
+                               strlen(code[i]), gl_src);
+
+            if (checkOpenGLError() != GL_NO_ERROR)
             {
-
-                glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, m_program[i]);
-
-                const GLbyte *gl_src = reinterpret_cast<const GLbyte *>(code[i]);
-                glProgramStringARB(GL_FRAGMENT_PROGRAM_ARB, GL_PROGRAM_FORMAT_ASCII_ARB,
-                    strlen(code[i]), gl_src);
-
-                if (checkOpenGLError() != GL_NO_ERROR)
-                {
-                    error = true;
-                }
+                error = true;
             }
+        }
 
-            if (error)
-            {
-                glDeleteProgramsARB(2, m_program);
-                CL_LOG(cl_logERROR) cl_log.log("Error compile shader!!!", cl_logERROR);
-            }
-            //==================
+        if (error)
+        {
+            glDeleteProgramsARB(2, m_program);
+            CL_LOG(cl_logERROR) cl_log.log("Error compile shader!!!", cl_logERROR);
+        }
+        //==================
 
     }
     else
@@ -416,7 +416,6 @@ void CLGLRenderer::copyVideoDataBeforePainting(bool copy)
     {
         m_needwait = true;
     }
-
 }
 
 void CLGLRenderer::draw(CLVideoDecoderOutput& img, unsigned int channel)
@@ -469,7 +468,6 @@ void CLGLRenderer::draw(CLVideoDecoderOutput& img, unsigned int channel)
 
         while (!m_waitCon.wait(&m_mutex, 50)) // unlock the mutex
         {
-
             if (!m_videowindow->isVisible() || !m_needwait)
                 break;
 
@@ -569,45 +567,44 @@ void CLGLRenderer::updateTexture()
     OGL_CHECK_ERROR("glEnable");
     if (!isSoftYuv2Rgb && isYuvFormat())
     {
-            // using pixel shader to yuv-> rgb conversion
-            for (int i = 0; i < 3; ++i)
+        // using pixel shader to yuv-> rgb conversion
+        for (int i = 0; i < 3; ++i)
+        {
+            glBindTexture(GL_TEXTURE_2D, m_texture[i]);
+            OGL_CHECK_ERROR("glBindTexture");
+            const uchar* pixels = m_arrayPixels[i];
+            if (!m_videoTextureReady)
             {
-                glBindTexture(GL_TEXTURE_2D, m_texture[i]);
-                OGL_CHECK_ERROR("glBindTexture");
-                const uchar* pixels = m_arrayPixels[i];
-                if (!m_videoTextureReady)
-                {
-                    // if support "GL_ARB_texture_non_power_of_two", use default size of texture,
-                    // else nearest power of two
-                    int wPow = isNonPower2 ? roundUp(w[i]) : getMinPow2(w[i]);
-                    int hPow = isNonPower2 ? h[i] : getMinPow2(h[i]);
-                    // support GL_ARB_texture_non_power_of_two ?
+                // if support "GL_ARB_texture_non_power_of_two", use default size of texture,
+                // else nearest power of two
+                int wPow = isNonPower2 ? roundUp(w[i]) : getMinPow2(w[i]);
+                int hPow = isNonPower2 ? h[i] : getMinPow2(h[i]);
+                // support GL_ARB_texture_non_power_of_two ?
 
-                    m_videoCoeffL[i] = 0;
-                    m_videoCoeffW[i] =  roundUp(r_w[i]) / (float) wPow;
-                    m_videoCoeffH[i] = h[i] / (float) hPow;
+                m_videoCoeffL[i] = 0;
+                m_videoCoeffW[i] =  roundUp(r_w[i]) / (float) wPow;
+                m_videoCoeffH[i] = h[i] / (float) hPow;
 
-                    glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, wPow, hPow, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, 0);
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, wPow, hPow, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, 0);
 
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, clampConstant);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, clampConstant);
-                }
-
-                glPixelStorei(GL_UNPACK_ROW_LENGTH, w[i]);
-                glTexSubImage2D(GL_TEXTURE_2D, 0,
-                    0, 0,
-                    roundUp(r_w[i]),
-                    h[i],
-                    GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels);
-                OGL_CHECK_ERROR("glTexSubImage2D");
-                glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-                OGL_CHECK_ERROR("glPixelStorei");
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, clampConstant);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, clampConstant);
             }
 
-            m_textureUploaded = true;
+            glPixelStorei(GL_UNPACK_ROW_LENGTH, w[i]);
+            glTexSubImage2D(GL_TEXTURE_2D, 0,
+                            0, 0,
+                            roundUp(r_w[i]),
+                            h[i],
+                            GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels);
+            OGL_CHECK_ERROR("glTexSubImage2D");
+            glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+            OGL_CHECK_ERROR("glPixelStorei");
+        }
 
+        m_textureUploaded = true;
     }
     else
     {
@@ -653,26 +650,26 @@ void CLGLRenderer::updateTexture()
         if (m_color == PIX_FMT_YUV422P)
         {
             yuv422_argb32_mmx(pixels, m_arrayPixels[0], m_arrayPixels[2], m_arrayPixels[1],
-                                        roundUp(r_w[0]),
-                                        h[0], 
-                                        4 * m_stride,
-                                        m_stride, m_stride / 2);
+                              roundUp(r_w[0]),
+                              h[0],
+                              4 * m_stride,
+                              m_stride, m_stride / 2);
         }
         else if (m_color == PIX_FMT_YUV420P)
         {
             yuv420_argb32_mmx(pixels, m_arrayPixels[0], m_arrayPixels[2], m_arrayPixels[1],
-                                        roundUp(r_w[0]),
-                                        h[0], 
-                                        4 * m_stride,
-                                        m_stride, m_stride / 2);
+                              roundUp(r_w[0]),
+                              h[0],
+                              4 * m_stride,
+                              m_stride, m_stride / 2);
         }
         else if (m_color == PIX_FMT_YUV444P)
         {
             yuv444_argb32_mmx(pixels, m_arrayPixels[0], m_arrayPixels[2], m_arrayPixels[1],
-                                        roundUp(r_w[0]),
-                                        h[0], 
-                                        4 * m_stride,
-                                        m_stride, m_stride);
+                              roundUp(r_w[0]),
+                              h[0],
+                              4 * m_stride,
+                              m_stride, m_stride);
         }
         else if (m_color == PIX_FMT_RGB24 || m_color == PIX_FMT_BGR24) {
             lineInPixelsSize /= 3;
@@ -714,12 +711,10 @@ void CLGLRenderer::updateTexture()
         glActiveTexture(GL_TEXTURE2);glDisable (GL_TEXTURE_2D);
     }
     */
-
 }
 
 void CLGLRenderer::drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const float* v_array)
 {
-
     float tx_array[8] = {m_videoCoeffL[0], 0.0f,
                         m_videoCoeffW[0], 0.0f,
                         m_videoCoeffW[0], m_videoCoeffH[0],
@@ -734,7 +729,6 @@ void CLGLRenderer::drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const
         */
     glEnable(GL_TEXTURE_2D);
     OGL_CHECK_ERROR("glEnable");
-
 
     if (!isSoftYuv2Rgb && isYuvFormat())
     {

@@ -137,13 +137,13 @@ void CLSceneMovement::setPosition(QPointF p)
         if (QLineF(final_dest, wnd_center).length() > QLineF(curr, wnd_center).length()   ) 
         {
             // if difference between final point and item center is more than curr and item center => moving out of item center
-            int dx = curr.x() - wnd_center.x();
-            int dy = curr.y() - wnd_center.y();
+//            int dx = curr.x() - wnd_center.x();
+//            int dy = curr.y() - wnd_center.y();
 
-            qreal percent = 0.05;
+//            qreal percent = 0.05;
 
-            QRectF wnd_rect =  item->sceneBoundingRect();
-            QRectF viewport_rec = m_view->mapToScene(m_view->viewport()->rect()).boundingRect();
+//            QRectF wnd_rect =  item->sceneBoundingRect();
+//            QRectF viewport_rec = m_view->mapToScene(m_view->viewport()->rect()).boundingRect();
 
             // animation cannot be stoped inside animation
             /*/
@@ -170,7 +170,7 @@ void CLSceneMovement::setPosition(QPointF p)
                 if ( (viewport_rec.bottomLeft().y()- wnd_rect.bottomRight().y()) >  percent*wnd_rect.height())
                     stopAnimation();
             }
-            /**/
+            */
 
         }
 

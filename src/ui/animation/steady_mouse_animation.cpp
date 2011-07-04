@@ -4,8 +4,8 @@
 
 CLSteadyMouseAnimation::CLSteadyMouseAnimation(GraphicsView* view):
 m_view(view),
-m_counrer(0),
-m_steadyMode(false)
+m_steadyMode(false),
+m_counrer(0)
 {
 	connect(&m_timer, SIGNAL(timeout()), this , SLOT(onTimer()));
 	m_timer.setInterval(500);  

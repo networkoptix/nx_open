@@ -63,7 +63,7 @@ QPainterPath CLCustomBtnItem::createRoundRectpath(int width, int height, int rad
 
 }
 
-void CLCustomBtnItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void CLCustomBtnItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
 	//painter->fillRect(boundingRect(),QColor(255, 0, 0, 85));
 	//painter->setRenderHint(QPainter::SmoothPixmapTransform);

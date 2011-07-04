@@ -48,10 +48,8 @@ CLArchiveNavigatorItem::CLArchiveNavigatorItem(CLAbstractSubItemContainer* paren
 	"width: 120px;"
 	"margin: -8px 0 -8px 0;"
 	"border-radius: 30px;}");
-	/**/
+    */
 
-	/**/
-    
     int button_width = m_height*mButtonAspectRatio;
 
 	mPlayItem = new CLImgSubItem(this, ":/skin/player/play.png", PlaySubItem, 0.7, 1.0, button_width, m_height);
@@ -268,7 +266,7 @@ void CLArchiveNavigatorItem::onResize()
         "border-radius: 4px;}");
 
 
-        /**/
+       */
 
 
         mSlider_item->setPos(button_width*(3+2), 3);
@@ -354,7 +352,7 @@ void CLArchiveNavigatorItem::onResize()
         "border: 4px solid #444;"
         "border-radius: 16px;}");
 
-        /**/
+        */
 
         mSlider->setStyleSheet("QSlider::groove:horizontal {"
                                "border: 4px solid #bbb;"

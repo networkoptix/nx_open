@@ -218,9 +218,9 @@ bool CLAreconVisionDevice::getParam(const QString& name, CLValue& val, bool resy
 
 }
 
-bool CLAreconVisionDevice::setParam_special(const QString& name, const CLValue& val)
+bool CLAreconVisionDevice::setParam_special(const QString& /*name*/, const CLValue& /*val*/)
 {
-	return false;
+    return false;
 }
 
 bool CLAreconVisionDevice::setParam(const QString& name, const CLValue& val )
@@ -270,9 +270,9 @@ bool CLAreconVisionDevice::setParam(const QString& name, const CLValue& val )
 	return true;
 }
 
-bool CLAreconVisionDevice::executeCommand(CLDeviceCommand* command)
+bool CLAreconVisionDevice::executeCommand(CLDeviceCommand* /*command*/)
 {
-	return true;
+    return true;
 }
 
 CLDeviceList CLAreconVisionDevice::findDevices()
@@ -342,7 +342,7 @@ CLDeviceList CLAreconVisionDevice::findDevices()
 					continue; // already found;
 
 				QString id = "AVUNKNOWN";
-				int model = 0;
+//				int model = 0;
 
 				/*/
 				int shift = 32;
@@ -368,7 +368,7 @@ CLDeviceList CLAreconVisionDevice::findDevices()
 					device->setName("AVUNKNOWN");
 
 				}
-				/**/
+                */
 
 				// in any case let's HTTP do it's job at very end of discovery 
 				CLAreconVisionDevice* device = new CLAreconVisionDevice(AVUNKNOWN);

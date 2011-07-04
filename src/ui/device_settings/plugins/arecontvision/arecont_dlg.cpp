@@ -252,8 +252,8 @@ void AVSettingsDlg::initExposure()
 
 void AVSettingsDlg::initAI()
 {
-	QGroupBox* group;
-	CLAbstractSettingsWidget* wgt;
+//	QGroupBox* group;
+    CLAbstractSettingsWidget* wgt;
 
 	if (wgt = getWidgetByName("AutoIris enable"))
 		wgt->toWidget()->move(200,180);
@@ -262,7 +262,7 @@ void AVSettingsDlg::initAI()
 
 void AVSettingsDlg::initDN()
 {
-	QGroupBox* group;
+//	QGroupBox* group;
 	CLAbstractSettingsWidget* wgt;
 
 	if (wgt = getWidgetByName("Day/Night Mode"))
@@ -271,7 +271,7 @@ void AVSettingsDlg::initDN()
 
 void AVSettingsDlg::initMD()
 {
-	QGroupBox* group;
+//	QGroupBox* group;
 	CLAbstractSettingsWidget* wgt;
 
 	//Enable motion detection
@@ -299,7 +299,7 @@ void AVSettingsDlg::initMD()
 
 void AVSettingsDlg::initAdmin()
 {
-	QGroupBox* group;
+//	QGroupBox* group;
 	CLAbstractSettingsWidget* wgt;
 
 	if (wgt = getWidgetByName("Factory defaults"))

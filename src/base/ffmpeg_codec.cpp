@@ -55,7 +55,6 @@ CLCodecType ffmpegCodecIdToInternal(CodecID ffmpeg_video_codec_id)
         m_videoCodecId = CL_CINEPAK;
         break;
 
-
     case CODEC_ID_H264:
         m_videoCodecId = CL_H264;
         break;
@@ -67,7 +66,6 @@ CLCodecType ffmpegCodecIdToInternal(CodecID ffmpeg_video_codec_id)
     case CODEC_ID_PCM_U8:
         m_audioCodecId = CL_PCM_U8;
         break;
-
 
     case CODEC_ID_MP2:
         m_audioCodecId = CL_MP2;
@@ -101,6 +99,8 @@ CLCodecType ffmpegCodecIdToInternal(CodecID ffmpeg_video_codec_id)
         m_audioCodecId = CL_AMR_NB;
         break;
 
+    default:
+        break;
     }
 
     return m_videoCodecId;
@@ -205,6 +205,8 @@ CodecID internalCodecIdToFfmpeg(CLCodecType internalCodecId)
         codec = (CODEC_ID_AMR_NB);
         break;
 
+    default:
+        break;
     }
 
     return codec;

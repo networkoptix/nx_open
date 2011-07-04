@@ -93,7 +93,7 @@ void CLLayoutEditorWnd::closeEvent ( QCloseEvent * event )
 	destroyNavigator(m_editedView);
 }
 
-void CLLayoutEditorWnd::resizeEvent ( QResizeEvent * event)
+void CLLayoutEditorWnd::resizeEvent ( QResizeEvent * /*event*/)
 {
 	QSize sz = this->size();
 	m_topView->getView().setMaximumWidth(sz.width()/3);

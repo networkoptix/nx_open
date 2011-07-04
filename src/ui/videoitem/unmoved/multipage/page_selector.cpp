@@ -74,7 +74,7 @@ void QnPageSelector::onPageSelected(int page)
 }
 
 
-void QnPageSelector::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void QnPageSelector::paint(QPainter */*painter*/, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
     //painter->fillRect(boundingRect(), QColor(255,0,0,128));
 }

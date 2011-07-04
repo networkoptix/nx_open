@@ -9,7 +9,7 @@ QSlider(orientation, parent)
 
 }
 
-void SettingsSlider::keyReleaseEvent ( QKeyEvent * event )
+void SettingsSlider::keyReleaseEvent ( QKeyEvent * /*event*/ )
 {
 	emit onKeyReleased();
 }
@@ -245,7 +245,7 @@ void SettingsButtonWidget::onClicked()
 	setParam_helper(mParam.name, "");
 }
 
-void SettingsButtonWidget::updateParam(QString val)
+void SettingsButtonWidget::updateParam(QString /*val*/)
 {
     //cl_log.log("updateParam", cl_logALWAYS);
 }

@@ -62,6 +62,8 @@ QPointF CLRecorderItem::getBestSubItemPos(CLSubItemType type)
 
 void CLRecorderItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    Q_UNUSED(widget);
+
 	painter->fillPath(mShadowRectPath, global_shadow_color);
 
 	QColor border_color(20,20,160);

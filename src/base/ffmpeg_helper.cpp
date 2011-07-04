@@ -318,4 +318,5 @@ QString codecIDToString(CodecID codecID)
                                       * stream (only used by libavformat) */
     case CODEC_ID_FFMETADATA: return "FFMETADATA";   ///< Dummy codec for streams containing only metadata information.
     };
+    return QString();
 }
