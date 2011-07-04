@@ -31,7 +31,7 @@ void CLAbstractDataProcessor::run()
 {
 	CL_LOG(cl_logINFO) cl_log.log("data processor started.", cl_logINFO);
 
-	const int timeoutMs = 100;
+//	const int timeoutMs = 100;
 	while(!needToStop())
 	{
 		pauseDelay();

@@ -165,7 +165,7 @@ dvdLangCode dvdLangCodes[] =
 
 QString findLangByCode(quint16 langCode)
 {
-    for (int i = 0; i < sizeof(dvdLangCodes) / sizeof(dvdLangCode); ++i)
+    for (unsigned i = 0; i < sizeof(dvdLangCodes) / sizeof(dvdLangCode); ++i)
     {
         if (dvdLangCodes[i].code == langCode)
             return dvdLangCodes[i].codeString;
@@ -310,6 +310,7 @@ bool CLAVIDvdStreamReader::switchToFile(int newFileIndex)
                     data->m_duration = ifo->vts_tmapt->tmap->nr_of_entries * ifo->vts_tmapt->tmap->tmu * 1000000ull;
                 // find lang info
                 audio_attr_t& audioInfo = ifo->vmgi_mat->vmgm_audio_attr;
+                Q_UNUSED(audioInfo);
                 // ifo->vtsi_mat->vts->audio_attr->lang_code // nr_of_vts_audio_streams
                 for (int k = 0; k < ifo->vtsi_mat->nr_of_vts_audio_streams; ++k)
                 {
@@ -421,12 +422,10 @@ qint64 CLAVIDvdStreamReader::seek(qint64 offset, qint32 whence)
     
 }
 
-
-qint32 CLAVIDvdStreamReader::writePacket(quint8* buf, int size)
+qint32 CLAVIDvdStreamReader::writePacket(quint8* /*buf*/, int /*size*/)
 {
     return 0; // not implemented
 }
-
 
 void CLAVIDvdStreamReader::destroy()
 {
@@ -451,8 +450,7 @@ void CLAVIDvdStreamReader::fillAdditionalInfo(CLFileInfo* fi)
         return;
     fi->m_formatContext->duration = info->m_duration;
 
-    
-    for (int i = 0; i < fi->m_formatContext->nb_streams; ++i)
+    for (unsigned i = 0; i < fi->m_formatContext->nb_streams; ++i)
     {
         AVStream *avStream = fi->m_formatContext->streams[i];
         if (avStream->id >= 128 && avStream->id < 128 + info->m_audioLang.size())

@@ -94,7 +94,7 @@ bool RTPSession::open(const QString& url)
 {
     mUrl = url; 
 
-    unsigned int port = DEFAULT_RTP_PORT;
+//    unsigned int port = DEFAULT_RTP_PORT;
 
     if (!m_tcpSock.connect(mUrl.host().toLatin1().data(), DEFAULT_RTP_PORT))
         return false;
@@ -395,8 +395,8 @@ void RTPSession::processRtcpData(const RtspStatistic* stats)
                 m_rtcpUdpSock.setDestAddr(lastReceivedAddr, lastReceivedPort);
             }
 
-            quint32 timestamp = 0;
-            double nptTime = 0;
+//            quint32 timestamp = 0;
+//            double nptTime = 0;
             if (stats) 
             {
                 int outBufSize = buildRTCPReport(sendBuffer, stats);

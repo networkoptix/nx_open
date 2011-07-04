@@ -57,8 +57,8 @@ CLAnimatedBackGround(timestep)
 
 void CLBlueBackGround::drawBackground(QPainter * painter, const QRectF & rect )
 {
-	qreal dx_unit = rect.width()/MAX_STEP;
-	qreal dy_unit = rect.height()/MAX_STEP;
+//	qreal dx_unit = rect.width()/MAX_STEP;
+//	qreal dy_unit = rect.height()/MAX_STEP;
 	qreal rpos = currPosRelative();
 
 	if (rpos<0)

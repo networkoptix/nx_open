@@ -44,7 +44,7 @@ public:
 		}
 	}
 
-	virtual unsigned int v_position(unsigned int channel) const
+    virtual unsigned int v_position(unsigned int /*channel*/) const
 	{
 		return 0;
 	}
@@ -92,7 +92,7 @@ public:
         }
 	}
 
-	virtual unsigned int v_position(unsigned int channel) const
+    virtual unsigned int v_position(unsigned int /*channel*/) const
 	{
 		return 0;
 	}

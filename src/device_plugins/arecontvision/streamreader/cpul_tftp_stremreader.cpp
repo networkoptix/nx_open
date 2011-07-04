@@ -79,7 +79,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 				if (codec.value.value != QString("JPEG"))
 					h264 = true;
 			}
-			/**/
+            */
 
 			if (!m_streamParam.exists("Quality") || !m_streamParam.exists("resolution") || 
 				!m_streamParam.exists("image_left") || !m_streamParam.exists("image_top") ||
@@ -354,7 +354,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 			img.ignore_first_bytes(expectable_header_size); // if you decoder needs compressed data alignment, just do not do it. ffmpeg will delay one frame if do not do it.
 			dst+=expectable_header_size;
 		}
-		/**/
+        */
 
 		// we also need to put very begining of SH
 		dst[0] = dst[1] = dst[2] = 0; dst[3] = 1;

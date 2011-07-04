@@ -110,12 +110,12 @@ void CLH264RtpParser::decodeSpsInfo(const QByteArray& data)
 
 CLAbstractMediaData* CLH264RtpParser::getNextData()
 {
-    int lasttSeqNum;
+//    int lasttSeqNum;
     int nalUnitLen;
     int don;
     quint8 nalUnitType;
     bool firstPacketReceived;
-    int nal_ref_idc = 0;
+//    int nal_ref_idc = 0;
     RtpHeader* rtpHeader = 0;
     bool isKeyFrame = false;
     int readed = 0;
@@ -316,7 +316,7 @@ CLAbstractMediaData* CLH264RtpParser::getNextData()
         quint64 fullTimestamp = (quint64) timeStamp + m_timeCycles; 
         videoData->timestamp = fullTimestamp * 1000000ull / m_frequency;
         m_lastTimeStamp = timeStamp;
-        /**/
+        */
 
         videoData->timestamp = QDateTime::currentMSecsSinceEpoch() * 1000;
     }

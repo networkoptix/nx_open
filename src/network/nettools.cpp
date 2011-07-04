@@ -343,7 +343,7 @@ QString getMacByIP(const QHostAddress& ip, bool net)
 }
 
 #else
-void removeARPrecord(const QHostAddress& ip) {}
+void removeARPrecord(const QHostAddress& /*ip*/) {}
 
 #define ROUNDUP(a) ((a) > 0 ? (1 + (((a) - 1) | (sizeof(long) - 1))) : sizeof(long))
 
@@ -360,7 +360,7 @@ void removeARPrecord(const QHostAddress& ip) {}
 #include <stdlib.h>
 
 
-QString getMacByIP(const QHostAddress& ip, bool net)
+QString getMacByIP(const QHostAddress& ip, bool /*net*/)
 {
 	return "";
 	

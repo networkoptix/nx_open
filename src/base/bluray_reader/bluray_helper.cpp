@@ -132,7 +132,8 @@ void CLPIStreamInfo::composeISRC(BitStreamWriter& writer) const
 void CLPIStreamInfo::parseStreamCodingInfo(BitStreamReader& reader)
 {
 	int length = reader.getBits(8);
-	m_stream_coding_type = reader.getBits(8);
+    Q_UNUSED(length);
+    m_stream_coding_type = reader.getBits(8);
 
 	if (m_stream_coding_type==0x02 || m_stream_coding_type==0x1B || m_stream_coding_type==0xEA) 
     {
@@ -236,7 +237,8 @@ void CLPIParser::parseProgramInfo(quint8* buffer, quint8* end)
 	BitStreamReader reader;
 	reader.setBuffer(buffer, end);
 	quint32 length = reader.getBits(32);
-	reader.skipBits(8); // reserved
+    Q_UNUSED(length);
+    reader.skipBits(8); // reserved
 	quint8 number_of_program_sequences = reader.getBits(8);
 	for (int i=0; i < number_of_program_sequences; i++) 
     {
@@ -284,8 +286,10 @@ void CLPIParser::composeProgramInfo(BitStreamWriter& writer)
 void CLPIParser::TS_type_info_block(BitStreamReader& reader) 
 {
 	quint16 length = reader.getBits(16);
-	quint8 Validity_flags  = reader.getBits(8); // 1000 0000b is tipical value
-	CLPIStreamInfo::readString(m_format_identifier, reader, 4);    // HDMV
+    Q_UNUSED(length);
+    quint8 Validity_flags  = reader.getBits(8); // 1000 0000b is tipical value
+    Q_UNUSED(Validity_flags);
+    CLPIStreamInfo::readString(m_format_identifier, reader, 4);    // HDMV
 	//Network_information 8*9 bslbf zerro
 	for (int i = 0; i < 9; i++)
 		reader.skipBits(8);
@@ -315,7 +319,8 @@ void CLPIParser::composeTS_type_info_block(BitStreamWriter& writer)
 void CLPIParser::parseClipInfo(BitStreamReader& reader)
 {
 	quint32 length = reader.getBits(32);
-	reader.skipBits(16); //reserved_for_future_use 16 bslbf
+    Q_UNUSED(length);
+    reader.skipBits(16); //reserved_for_future_use 16 bslbf
 	m_clip_stream_type = reader.getBits(8); // 1 - AV stream
 	m_application_type = reader.getBits(8); // 1 - Main TS for a main-path of Movie
 	reader.skipBits(31); //reserved_for_future_use 31 bslbf
@@ -375,7 +380,8 @@ void CLPIParser::parseSequenceInfo(quint8* buffer, quint8* end)
 	BitStreamReader reader;
 	reader.setBuffer(buffer, end);
 	quint32 length = reader.getBits(32);
-	reader.skipBits(8); //reserved_for_word_align 8 bslbf
+    Q_UNUSED(length);
+    reader.skipBits(8); //reserved_for_word_align 8 bslbf
 	quint8 number_of_ATC_sequences  = reader.getBits(8); // 1 is tipical value
 	for (int atc_id = 0; atc_id < number_of_ATC_sequences; atc_id++) 
 	{
@@ -584,6 +590,7 @@ void CLPIParser::parseClipMark(quint8* buffer, quint8* end) {
 	BitStreamReader reader;
 	reader.setBuffer(buffer, end);
 	quint32 length = reader.getBits(32);
+    Q_UNUSED(length);
 }
 
 void CLPIParser::composeClipMark(BitStreamWriter& writer) 
@@ -612,7 +619,7 @@ bool CLPIParser::parse(const QString& fileName)
 	}
 }
 
-void CLPIParser::parseExtensionData(quint8* buffer, quint8* end)
+void CLPIParser::parseExtensionData(quint8* /*buffer*/, quint8* /*end*/)
 {
 }
 
@@ -1611,9 +1618,10 @@ MPLSStreamInfo::MPLSStreamInfo(const PMTStreamInfo& pmtStreamInfo):
 
 void MPLSStreamInfo::parseStreamEntry(BitStreamReader& reader) 
 {
-	int length = reader.getBits(8); //8 uimsbf
-	m_type = reader.getBits(8); //8 bslbf
-	if (m_type==1) 
+    int length = reader.getBits(8); //8 uimsbf
+    Q_UNUSED(length);
+    m_type = reader.getBits(8); //8 bslbf
+    if (m_type==1)
     {
 		m_ref_to_stream_PID_of_mainClip = reader.getBits(16); //16 uimsbf
 		reader.skipBits(32); //reserved_for_future_use 48 bslbf
@@ -1763,7 +1771,8 @@ void MovieObject::parse(quint8* buffer, int len)
 	CLPIStreamInfo::readString(m_type_indicator, reader, 4);
 	CLPIStreamInfo::readString(version_number, reader, 4);
 	quint32 ExtensionData_start_address = reader.getBits(32); //32 uimsbf
-	for (int i = 0; i < 7; i++)
+    Q_UNUSED(ExtensionData_start_address);
+    for (int i = 0; i < 7; i++)
 		reader.skipBits(32); //reserved_for_future_use 224 bslbf
 	parseMovieObjects(reader);
 	//for (int i=0; i<N1; i++) padding_word 16 bslbf

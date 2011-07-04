@@ -125,43 +125,41 @@ void CLStreamRecorder::endOfRun()
 
 void CLStreamRecorder::onFirstData(CLAbstractData* data)
 {
-	QDir current_dir;
-	current_dir.mkpath(dirHelper());
+    QDir current_dir;
+    current_dir.mkpath(dirHelper());
 
-	CLStreamreader* reader = data->dataProvider;
-	CLDevice* dev = reader->getDevice();
+    CLStreamreader* reader = data->dataProvider;
+    CLDevice* dev = reader->getDevice();
 
-	QDomDocument doc("");
-	QDomElement root = doc.createElement("layout");
-	doc.appendChild(root);
+    QDomDocument doc("");
+    QDomElement root = doc.createElement("layout");
+    doc.appendChild(root);
 
-	root.setAttribute("channels", dev->getVideoLayout()->numberOfChannels());
-	root.setAttribute("width", dev->getVideoLayout()->width());
-	root.setAttribute("height", dev->getVideoLayout()->height());
-
-    
+    root.setAttribute("channels", dev->getVideoLayout()->numberOfChannels());
+    root.setAttribute("width", dev->getVideoLayout()->width());
+    root.setAttribute("height", dev->getVideoLayout()->height());
 
     root.setAttribute("name", dev->getName() + QDateTime::currentDateTime().toString(" ddd MMM d yyyy  hh_mm"));
 
-	for (int i = 0; i < dev->getVideoLayout()->numberOfChannels(); ++i)
-	{
-		QDomElement channel = doc.createElement("channel");
+    for (unsigned int i = 0; i < dev->getVideoLayout()->numberOfChannels(); ++i)
+    {
+        QDomElement channel = doc.createElement("channel");
 
-		channel.setAttribute("number", i);
-		channel.setAttribute("h_pos", dev->getVideoLayout()->h_position(i));
-		channel.setAttribute("v_pos", dev->getVideoLayout()->v_position(i));
+        channel.setAttribute("number", i);
+        channel.setAttribute("h_pos", dev->getVideoLayout()->h_position(i));
+        channel.setAttribute("v_pos", dev->getVideoLayout()->v_position(i));
 
-		root.appendChild(channel);
-	}
+        root.appendChild(channel);
+    }
 
-	QString xml = doc.toString();
+    QString xml = doc.toString();
 
-	QFile file(dirHelper() + "/layout.xml");
-	file.open(QIODevice::WriteOnly);
+    QFile file(dirHelper() + "/layout.xml");
+    file.open(QIODevice::WriteOnly);
 
-	QTextStream fstr(&file);
-	fstr<< xml;
-	fstr.flush();	
+    QTextStream fstr(&file);
+    fstr << xml;
+    fstr.flush();
 }
 
 //=====================================

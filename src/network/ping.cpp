@@ -62,7 +62,7 @@ bool CLPing::ping(const QString& ip, int retry, int timeoutPerRetry, int packetS
 
 		printf("\t  Received from %s\n", inet_ntoa(ReplyAddr));
 		printf("\t  Status = %ld  ", pEchoReply->Status);
-		/**/
+        */
 
 		switch (pEchoReply->Status) 
 		{
@@ -117,7 +117,7 @@ CLPing::CLPing()
 {
 }
 
-bool CLPing::ping(const QString& ip, int retry, int timeoutPerRetry, int packetSize)
+bool CLPing::ping(const QString& ip, int /*retry*/, int /*timeoutPerRetry*/, int /*packetSize*/)
 {
 	SCNetworkReachabilityRef target;
 	SCNetworkConnectionFlags flags = 0;

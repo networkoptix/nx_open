@@ -1255,7 +1255,7 @@ int UDFReadBlocksRaw2( dvd_reader_t *device,
                      size_t block_count, unsigned char *data, 
                      int encrypted )
 {
-    int ret;
+//    int ret;
 
     if( !device->dev ) {
         if(device->verbose >= 1) {

@@ -51,7 +51,7 @@ CLAbstractMediaData* AVClientPullSSHTTPStreamreader::getNextData()
 				if (codec.value.value != QString("JPEG"))
 					h264 = true;
 			}
-			/**/
+            */
 
 			if (!m_streamParam.exists("Quality") || !m_streamParam.exists("resolution") || 
 				!m_streamParam.exists("image_left") || !m_streamParam.exists("image_top") ||
