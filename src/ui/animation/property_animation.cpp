@@ -22,7 +22,6 @@ QPropertyAnimation* AnimationManager::addAnimation(QObject * target, const QByte
     if (!clanimation)
         return animation;
 
-    cl_log.log(cl_logALWAYS, "Size=%d, Adding animation: %d", m_animations.size(), (int)(void*)animation);
     m_animations.insert(animation, clanimation);
     m_animationsOrder.append(animation);
 
@@ -34,14 +33,10 @@ void AnimationManager::removeAnimation(PropertyAnimationWrapper* animation)
     if (!m_animations.contains(animation))
         return;
     
-    cl_log.log(cl_logALWAYS, "Removing animation: %d", (int)(void*)animation);
-    
     CLAnimationEntry& entry = m_animations[animation];
 
-    // TODO: The following line seems reasonable, but looks like enableViewUpdateMode do not work as required and we see animation freeze.
     if (m_animations.size() == 1)
     {
-        cl_log.log(cl_logALWAYS, "Enable updates animation: %d", (int)(void*)animation);
         entry.clanimation->enableViewUpdateMode(true);
     }
     
@@ -61,10 +56,8 @@ void AnimationManager::updateState (PropertyAnimationWrapper* animation, QAbstra
     
     if (oldState == QAbstractAnimation::Stopped && newState == QAbstractAnimation::Running)
     {
-        cl_log.log(cl_logALWAYS, "Disable updates animation: %d", (int)(void*)animation);
         entry.clanimation->enableViewUpdateMode(false);
         
-        cl_log.log(cl_logALWAYS, "Starting animation: %d", (int)(void*)animation);
         entry.started = true;
         
         updateSkipViewUpdate();
@@ -83,12 +76,10 @@ void AnimationManager::updateSkipViewUpdate()
         if (entry.started && entry.clanimation->isSkipViewUpdate())
         {
             m_skipViewUpdate = true;
-            cl_log.log(cl_logALWAYS, "updateSkipViewUpdate, m_skipViewUpdate = %d", m_skipViewUpdate);
             return;
         }
     }
     m_skipViewUpdate = false;
-    cl_log.log(cl_logALWAYS, "updateSkipViewUpdate, m_skipViewUpdate = %d", m_skipViewUpdate);
 }
 
 void AnimationManager::updateCurrentValue(PropertyAnimationWrapper* animation, const QVariant & value)
@@ -101,7 +92,6 @@ void AnimationManager::updateCurrentValue(PropertyAnimationWrapper* animation, c
         return;
     
     CLAnimationEntry& entry = m_animations[animation];
-    //cl_log.log(cl_logALWAYS, "updateCurrentValue, animation: %d, skip: %d", (int)(void*)animation, m_skipViewUpdate);
     if (!m_skipViewUpdate)
     {
         entry.clanimation->updateView();

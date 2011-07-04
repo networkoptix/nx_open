@@ -119,7 +119,7 @@ void CLFFmpegVideoDecoder::openDecoder()
 
 	int numBytes = avpicture_get_size(PIX_FMT_YUV420P, c->width, c->height);
 	
-	m_deinterlaceBuffer = (uint8_t*)av_malloc(numBytes * sizeof(uint8_t));
+	m_deinterlaceBuffer = (quint8*)av_malloc(numBytes * sizeof(quint8));
 	
 	avpicture_fill((AVPicture *)m_deinterlacedFrame, m_deinterlaceBuffer, PIX_FMT_YUV420P, c->width, c->height);
 	

@@ -8,13 +8,14 @@
 #define __QTVSOUND_H__
 
 #include <QVector>
+#include <QAudioFormat>
 
 class QtvAudioDevice;
 typedef struct ALCdevice_struct ALCdevice;
 
 class QtvSound {
 public:
-	QtvSound(ALCdevice* device, uint numChannels, uint bitsPerSample, uint frequency, uint size);
+	QtvSound(ALCdevice* device, const QAudioFormat& audioFormat);
 	~QtvSound();
 
 	bool isValid() const { return m_isValid; }
@@ -24,11 +25,11 @@ public:
     void suspend();
     void resume();
     void clear();
-    bool isFormatSupported();
+    static bool isFormatSupported(const QAudioFormat& format);
 private:
 	uint bufferTime() const;
 	bool setup();
-	bool setFormat();
+	static int getFormat(const QAudioFormat& audioFormat);
 	uint bitRate() const;
 	bool playImpl() const;
 
@@ -36,6 +37,7 @@ private:
 	static int checkOpenALErrorDebug(ALCdevice* device);
     bool internalPlay(const void* data, uint size);
 private:
+	QAudioFormat m_audioFormat;
 	QVector<uint> m_buffers;
 	uint m_source;
 	uint m_format;

@@ -67,7 +67,7 @@ public:
 
 	static int extractUEGolombCode(BitStreamReader& bitReader);
 	static void writeUEGolombCode(BitStreamWriter& bitWriter, quint32 value);
-	void writeSEGolombCode(BitStreamWriter& bitWriter, int32_t value);
+	void writeSEGolombCode(BitStreamWriter& bitWriter, qint32 value);
 	const BitStreamReader& getBitReader() const {return bitReader;}
 	void write_rbsp_trailing_bits(BitStreamWriter& writer);
 	void write_byte_align_bits(BitStreamWriter& writer);

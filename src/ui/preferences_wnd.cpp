@@ -135,21 +135,6 @@ QString PreferencesWindow::cameraInfoString(CLDevice *device)
         arg(networkDevice->getMAC()).arg(networkDevice->getIP().toString()).arg(networkDevice->getDiscoveryAddr().toString());
 }
 
-void PreferencesWindow::closeEvent(QCloseEvent * event)
-{
-    QMessageBox::StandardButton result = YesNoCancel(this, tr("Preferences Editor") , tr("Save changes?"));
-
-    if (result == QMessageBox::Cancel)
-    {
-        event->ignore();
-
-        return;
-    }
-
-    if (result == QMessageBox::Yes)
-        accept();
-}
-
 void PreferencesWindow::resizeEvent ( QResizeEvent * event)
 {
     QSize sz = this->size();
@@ -172,19 +157,28 @@ void PreferencesWindow::mainMediaFolderBrowse()
     if (xdir == "")
         return;
 
-    m_settingsData.mediaRoot = xdir;
+    m_settingsData.mediaRoot = fromNativePath(xdir);
 
     updateView();
+}
+
+void PreferencesWindow::auxMediaFolderSelectionChanged()
+{
+    auxRemovePushButton->setEnabled(!auxMediaRootsList->selectedItems().isEmpty());
 }
 
 void PreferencesWindow::auxMediaFolderBrowse()
 {
     QString xdir = browseForDirectory();
-    if (xdir == "")
+    if (xdir.isEmpty())
         return;
 
-    if (m_settingsData.auxMediaRoots.indexOf(xdir) != -1)
+    xdir = fromNativePath(xdir);
+    if (m_settingsData.auxMediaRoots.contains(xdir) || xdir == m_settingsData.mediaRoot)
+    {
+        UIOKMessage(this, tr("Folder is already added"), tr("This folder is already added."));
         return;
+    }
 
     m_settingsData.auxMediaRoots.append(xdir);
 
@@ -193,13 +187,9 @@ void PreferencesWindow::auxMediaFolderBrowse()
 
 void PreferencesWindow::auxMediaFolderRemove()
 {
-    QMessageBox::StandardButton result = YesNoCancel(this, tr("Preferences Editor") , tr("Really remove selected item(s) from the list?"));
-    if (result == QMessageBox::Cancel)
-        return;
-
     foreach(QListWidgetItem* item, auxMediaRootsList->selectedItems())
     {
-        m_settingsData.auxMediaRoots.removeAll(QDir::fromNativeSeparators(item->text()));
+        m_settingsData.auxMediaRoots.removeAll(fromNativePath(item->text()));
     }
 
     updateView();

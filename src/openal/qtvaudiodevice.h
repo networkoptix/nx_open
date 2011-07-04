@@ -21,7 +21,7 @@ public:
 	~QtvAudioDevice();
 	void release();
 
-	QtvSound* addSound(uint numChannels, uint bitsPerSample, uint frequency, uint size);
+	QtvSound* addSound(const QAudioFormat& format);
 	void removeSound(QtvSound* soundObject);
 
 private:

@@ -19,12 +19,13 @@ static inline short clip_short(int v)
         return (short) v;
 }
 
-static void down_mix_6_2(short *data, int len) 
+template <class T>
+static void down_mix_to_stereo(T *data, int channels, int len) 
 {
-	short* output = data;
-	short* input = data;
+	T* output = data;
+	T* input = data;
 
-	int steps = len / 6;
+	int steps = len / 6 / sizeof(T);
 
 	for(int i = 0; i < steps; ++i) 
 	{
@@ -32,26 +33,42 @@ static void down_mix_6_2(short *data, int len)
 		int fl,fr,c,rl,rr,lfe;
 
 		fl = input[0];
-		c = input[2];
 		fr = input[1];
-		rl = input[3];
-		rr = input[4];
-		//lfe = input[5]; //Postings on the Doom9 say that Dolby specifically says the LFE (.1) channel should usually be ignored during downmixing to Dolby ProLogic II, with quotes from official Dolby documentation.
+		if (channels >= 6)
+		{
+			c =  input[2];
+			lfe = input[3]; //Postings on the Doom9 say that Dolby specifically says the LFE (.1) channel should usually be ignored during downmixing to Dolby ProLogic II, with quotes from official Dolby documentation.
+			rl = input[4];
+			rr = input[5];
 
-		output[0] = clip_short(fl + (0.5 * rl) + (0.7 * c));
-		output[1] = clip_short(fr + (0.5 * rr) + (0.7 * c));
-
+			output[0] = clip_short(fl + (0.5 * rl) + (0.7 * c));
+			output[1] = clip_short(fr + (0.5 * rr) + (0.7 * c));
+		}
+		else 
+		{
+			output[0] = fl;
+			output[1] = fr;
+		}
 		output += 2;
-		input += 6;
+		input += channels;
 	}
 }
 
 CLAudioStreamDisplay::CLAudioStreamDisplay(int bufferMs)
     : m_bufferMs(bufferMs),
       m_decodedaudio(16, DEFAULT_AUDIO_FRAME_SIZE),
-      m_downmixing(false),
+	  m_isFormatSupported(true),
       m_tooFewDataDetected(true),
-      m_audioSound(0)
+      m_audioSound(0),
+
+      m_downmixing(false),
+#ifdef Q_OS_WIN32
+	  m_forceDownmix(false),
+#else
+	  m_forceDownmix(true), // mac version use SPDIF by default for multichannel audio.
+#endif
+	  m_sampleConvertMethod(SampleConvert_None),
+	  m_isConvertMethodInitialized(false)
 {
 }
 
@@ -104,7 +121,8 @@ bool CLAudioStreamDisplay::isFormatSupported() const
     if (!m_audioSound)
         return true; // it's not constructed yet
 
-    return m_audioSound->isFormatSupported();
+    //return m_audioSound->isFormatSupported();
+	return m_isFormatSupported;
 }
 
 void CLAudioStreamDisplay::clearDeviceBuffer()
@@ -130,9 +148,57 @@ void CLAudioStreamDisplay::enqueueData(CLCompressedAudioData* data)
     m_audioQueue.dequeue()->releaseRef();
 }
 
+bool CLAudioStreamDisplay::initFormatConvertRule(QAudioFormat format)
+{
+	if (m_forceDownmix && format.channelCount() > 2)
+	{
+		format.setChannelCount(2);
+		m_downmixing = true;
+	}
+	else {
+		m_downmixing = false;
+	}
+
+	if (QtvSound::isFormatSupported(format))
+		return true;
+
+	if (format.sampleType() == QAudioFormat::Float)
+	{
+		format.setSampleType(QAudioFormat::SignedInt);
+		if (QtvSound::isFormatSupported(format))
+		{
+			m_sampleConvertMethod = SampleConvert_Float2Int32;
+			return true;
+		}
+		format.setSampleSize(16);
+		if (QtvSound::isFormatSupported(format))
+		{
+			m_sampleConvertMethod = SampleConvert_Float2Int16;
+			return true;
+		}
+	}
+	else if (format.sampleSize() == 32)
+	{
+		format.setSampleSize(16);
+		if (QtvSound::isFormatSupported(format))
+		{
+			m_sampleConvertMethod = SampleConvert_Int32ToInt16;
+			return true;
+		}
+	}
+
+	format.setChannelCount(2);
+	if (QtvSound::isFormatSupported(format))
+	{
+		m_downmixing = true;
+		return true;
+	}
+	return false; // conversion rule not found
+}
+
 void CLAudioStreamDisplay::putData(CLCompressedAudioData* data)
 {
-    
+    static const int MAX_BUFFER_LEN = 3000;
 	if (data == 0 && !m_audioSound) // do not need to check audio device in case of data=0 and no audio device
         return;
 
@@ -145,12 +211,12 @@ void CLAudioStreamDisplay::putData(CLCompressedAudioData* data)
 	{
         data->addRef();
 
-        if (m_audioQueue.size()<1000)
+        if (m_audioQueue.size() < MAX_BUFFER_LEN)
             m_audioQueue.enqueue(data);
         else
         {
             data->releaseRef();
-            return;
+            //return;
         }
 
         if (msInQueue() > m_bufferMs)
@@ -173,7 +239,7 @@ void CLAudioStreamDisplay::putData(CLCompressedAudioData* data)
     if (m_audioQueue.empty()) // possible if incoming data = 0
         return;
 
-    if (msInBuffer() > m_tooFewDataDetected*playAfterMs() )
+    if (msInBuffer() > m_tooFewDataDetected*playAfterMs() || m_audioQueue.size() >= MAX_BUFFER_LEN )
     {
         m_tooFewDataDetected = false;
         resume(); // does nothing if resumed already
@@ -210,23 +276,35 @@ void CLAudioStreamDisplay::putData(CLCompressedAudioData* data)
         if (!decoded || audio.outbuf_len == 0)
             return;
 
-        if (audio.format.sampleType() == QAudioFormat::Float)
-        {
-            float2int(audio);
-            audio.outbuf_len /= 2;
-        }
+		//  convert format
+		if (!m_isConvertMethodInitialized)
+		{
+			if (m_audioSound) 
+			{
+				QtvAudioDevice::instance().removeSound(m_audioSound);
+				m_audioSound = 0;
+			}
 
-		int channels = qMin(audio.format.channels(), 2);
-
-        if (audio.format.channels() > 2)
+			m_isFormatSupported = initFormatConvertRule(audio.format);
+			m_isConvertMethodInitialized = true;
+			if (!m_isFormatSupported)
+				return; // can play audio
+		}
+		if (m_sampleConvertMethod == SampleConvert_Float2Int32)
+            float2int32(audio); 
+		else if (m_sampleConvertMethod == SampleConvert_Float2Int16)
+            float2int16(audio); 
+		else if (m_sampleConvertMethod == SampleConvert_Int32ToInt16)
+            int32Toint16(audio); 
+        if (audio.format.channels() > 2 && m_downmixing)
             downmix(audio);
-
-
+	
+		// play audio
         if (!m_audioSound) 
-            m_audioSound = QtvAudioDevice::instance().addSound(channels, qMin(audio.format.sampleSize(), 16), audio.format.frequency(), audio.outbuf_len);
+			m_audioSound = QtvAudioDevice::instance().addSound(audio.format);
 
-		
-        m_audioSound->play((const quint8*) audio.outbuf->data(), audio.outbuf_len);
+		if (m_audioSound)
+			m_audioSound->play((const quint8*) audio.outbuf->data(), audio.outbuf_len);
     }
 
 //		qint64 bytesInBuffer = m_audioOutput->bufferSize() - m_audioOutput->bytesFree();
@@ -239,15 +317,24 @@ void CLAudioStreamDisplay::putData(CLCompressedAudioData* data)
 //=======================================================================
 void CLAudioStreamDisplay::downmix(CLAudioData& audio)
 {
-	if (audio.format.channels() == 6)
+	if (audio.format.channels() > 2)
 	{
-		down_mix_6_2((short*)(audio.outbuf->data()), audio.outbuf_len);
+		if (audio.format.sampleSize() == 8)
+			down_mix_to_stereo<qint8>((qint8*)(audio.outbuf->data()), audio.format.channelCount(), audio.outbuf_len);
+		else if (audio.format.sampleSize() == 16)
+			down_mix_to_stereo<qint16>((qint16*)(audio.outbuf->data()), audio.format.channelCount(), audio.outbuf_len);
+		else if (audio.format.sampleSize() == 32)
+			down_mix_to_stereo<qint32>((qint32*)(audio.outbuf->data()), audio.format.channelCount(), audio.outbuf_len);
+		else 
+		{
+			Q_ASSERT_X(1 == 0, Q_FUNC_INFO + __LINE__, "invalid sample size");
+		}
 		audio.outbuf_len /= 3;
 		audio.format.setChannels(2);
 	}
 }
 
-void CLAudioStreamDisplay::float2int(CLAudioData& audio)
+void CLAudioStreamDisplay::float2int16(CLAudioData& audio)
 {
 	Q_ASSERT(sizeof(float) == 4); // not sure about sizeof(float) in 64 bit version
 
@@ -262,6 +349,43 @@ void CLAudioStreamDisplay::float2int(CLAudioData& audio)
 		++inP;
         ++outP;
 	}
+	audio.outbuf_len /= 2;
+	audio.format.setSampleSize(16);
+	audio.format.setSampleType(QAudioFormat::SignedInt);
+}
+
+void CLAudioStreamDisplay::int32Toint16(CLAudioData& audio)
+{
+	Q_ASSERT(sizeof(float) == 4); // not sure about sizeof(float) in 64 bit version
+
+	qint32* inP = (qint32*)(audio.outbuf->data());
+    qint16* outP = (qint16*)inP;
+	int len = audio.outbuf_len/4;
+
+	for (int i = 0; i < len; ++i)
+	{
+		*outP = *inP >> 16;
+		++inP;
+        ++outP;
+	}
+	audio.outbuf_len /= 2;
+	audio.format.setSampleSize(16);
+	audio.format.setSampleType(QAudioFormat::SignedInt);
+}
+
+void CLAudioStreamDisplay::float2int32(CLAudioData& audio)
+{
+	Q_ASSERT(sizeof(float) == 4); // not sure about sizeof(float) in 64 bit version
+
+	qint32* inP = (qint32*)(audio.outbuf->data());
+	int len = audio.outbuf_len/4;
+	for (int i = 0; i < len; ++i)
+	{
+		float f = *((float*)inP); 
+		*inP = (qint32) (f * INT_MAX);
+		++inP;
+	}
+	audio.format.setSampleType(QAudioFormat::SignedInt);
 }
 
 int CLAudioStreamDisplay::playAfterMs() const
@@ -279,6 +403,12 @@ int CLAudioStreamDisplay::msInQueue() const
     //qint64 old_t = m_audioQueue.first()->timestamp;
 
     qint64 diff = m_audioQueue.last()->duration + m_audioQueue.last()->timestamp  - m_audioQueue.first()->timestamp;
-
+	
     return diff / 1000;
+}
+
+void CLAudioStreamDisplay::setForceDownmix(bool value)
+{ 
+	m_forceDownmix = value; 
+	m_isConvertMethodInitialized = false;
 }

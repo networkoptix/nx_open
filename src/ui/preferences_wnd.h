@@ -16,7 +16,6 @@ public:
     ~PreferencesWindow();
 
 private:
-    void closeEvent (QCloseEvent * event );
     void resizeEvent (QResizeEvent * event);
 
     void updateView();
@@ -39,6 +38,8 @@ private slots:
     void allowChangeIPChanged();
     void cameraSelected(int);
     void enterLicenseClick();
+    void auxMediaFolderSelectionChanged();
+
 };
 
 #endif // preferences_wnd_h

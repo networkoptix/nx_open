@@ -107,7 +107,7 @@ bool CLFFmpegAudioDecoder::decode(CLAudioData& data)
 
         AVPacket avpkt;
         av_init_packet(&avpkt);
-        avpkt.data = (uint8_t*)inbuf_ptr;
+        avpkt.data = (quint8*)inbuf_ptr;
         avpkt.size = size;
 
         int len = avcodec_decode_audio3(c, (short *)outbuf, &out_size, &avpkt);

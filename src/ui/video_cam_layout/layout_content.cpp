@@ -294,13 +294,10 @@ QStringList LayoutContent::getDevicesOnPage(unsigned int page, unsigned int maxI
     unsigned int start = (page - 1) * maxItemsPerPage;
     unsigned int end = qMin((page)*maxItemsPerPage, (unsigned int)devlst.size());
 
-    
-
     for (int i = start; i < end; ++i)
         result.push_back( devlst.at(i)->getId() );
 
     return result;
-
 }
 
 

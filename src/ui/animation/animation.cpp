@@ -102,7 +102,7 @@ void CLAnimation::updateView()
         return;
     }
     
-    m_view->viewport()-> update(); // problem 2
+    m_view->viewport()->update(); // problem 2
 }
 
 bool CLAnimation::isSkipViewUpdate() const

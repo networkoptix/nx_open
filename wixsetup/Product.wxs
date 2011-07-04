@@ -118,6 +118,7 @@
             </Component>
 
             <Component Id="DummyFileAssocationFeatureComponent" Guid="1CF8A9DB-87DF-4b66-856F-B10B9770FBE0">
+
               <!--
 												Fix ICE18 error. The validator thinks that the install folder
 				 								could be empty so we have to use CreateFolder in this component.
@@ -125,6 +126,11 @@
 												http://msdn.microsoft.com/library/en-us/msi/setup/ice18.asp
 											-->
               <CreateFolder />
+            </Component>
+
+	    <Component Id="EveDirectoryPlayWithMenuItem" Guid="AA081E9B-26A0-4333-9BBA-975733254DC2" DiskId="1">
+              <RegistryValue Root="HKCR" Key="Directory\shell\play.EvePlayer.exe" Value="Play with $(env.APPLICATION_NAME)" Type="string" />
+              <RegistryValue Root="HKCR" Key="Directory\shell\play.EvePlayer.exe\command" Value="&quot;[#UniclientEXE]&quot; &quot;%1&quot;" Type="string" />
             </Component>
 
             <!--
@@ -218,6 +224,8 @@
       <ComponentRef Id='Settings'/>
       <ComponentRef Id='arecontvision'/>
       <ComponentRef Id='MediaFolderComponent'/>
+
+      <ComponentRef Id='EveDirectoryPlayWithMenuItem' />
 
       <ComponentRef Id='EveApplication' />
       

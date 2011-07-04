@@ -4,6 +4,7 @@
 #include "../data/dataprocessor.h"
 #include "base/adaptivesleep.h"
 #include "device/device_video_layout.h"
+#include "streamreader/streamreader.h"
 
 class CLAbstractRenderer;
 class CLVideoStreamDisplay;
@@ -41,9 +42,10 @@ public:
 	quint64 currentTime() const { return m_previousVideoDisplayedTime; }
 
     void setMTDecoding(bool value);
+public slots:
+    void onDataEvent(CLStreamreader::StreamReaderEvent);
 signals:
     void reachedTheEnd();
-
 private:
 	bool haveAudio() const;
 
@@ -79,7 +81,7 @@ private:
 	quint64 m_lastAudioPacketTime;
     quint64 m_lastVideoPacketTime;
 
-    quint64 m_previousVideoTime;
+    qint64 m_previousVideoTime;
     quint64 m_lastNonZerroDuration;
     quint64 m_previousVideoDisplayedTime;
 
@@ -90,6 +92,8 @@ private:
     bool m_ignoringVideo;
 
     bool mGenerateEndOfStreamSignal;
+
+    bool m_needReinitAudio;
 };
 
 #endif //clcam_display_h_1211

@@ -1,7 +1,6 @@
 #ifndef unmoved_page_subitem_h_1828
 #define unmoved_page_subitem_h_1828
 
-
 #include "../unmoved_interactive_opacity_item.h"
 class QPropertyAnimation;
 
@@ -56,8 +55,5 @@ private:
     bool m_firstPaint;
 
 };
-
-//=============================================================================================
-
 
 #endif //unmoved_page_subitem_h_1828

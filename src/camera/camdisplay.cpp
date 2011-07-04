@@ -4,7 +4,8 @@
 #include "videostreamdisplay.h"
 #include "audiostreamdisplay.h"
 
-#define CL_MAX_DISPLAY_QUEUE_SIZE 7
+// a lot of small audio packets in bluray HD audio codecs. So, previous size 7 is not enought
+#define CL_MAX_DISPLAY_QUEUE_SIZE 15 
 #define AUDIO_BUFF_SIZE (4000) // ms
 
 CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
@@ -21,7 +22,8 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_afterJump(false),
       m_displayLasts(0),
       m_ignoringVideo(false),
-      mGenerateEndOfStreamSignal(generateEndOfStreamSignal)
+      mGenerateEndOfStreamSignal(generateEndOfStreamSignal),
+      m_needReinitAudio(false)
 {
 	for (int i = 0; i< CL_MAX_CHANNELS; ++i)
 		m_display[i] = 0;
@@ -138,6 +140,21 @@ void CLCamDisplay::jump()
 
 void CLCamDisplay::processData(CLAbstractData* data)
 {
+    if (m_needReinitAudio)
+    {
+        delete m_audioDisplay;
+
+		while(m_dataQueue.size() > 0)
+		{
+			bool get = m_dataQueue.pop(data, 0);
+			if (get)
+				data->releaseRef();
+		}
+        m_audioDisplay = new CLAudioStreamDisplay(AUDIO_BUFF_SIZE);
+        m_needReinitAudio = false;
+		return; // skip current packet
+    }
+
     if (m_needChangePriority)
     {
         if (m_playAudio)
@@ -374,7 +391,7 @@ qint64 CLCamDisplay::diffBetweenVideoAndAudio(CLCompressedVideoData* incoming, i
 
     // strongly saning this duration of prev frame; not exact, but I think its fine
     // let's assume this frame has same duration
-    duration = currentPlayingVideoTime - m_previousVideoTime;
+    duration = qMax(currentPlayingVideoTime - m_previousVideoTime, 0ll);
     if (duration == 0)
         duration = m_lastNonZerroDuration;
     else
@@ -412,5 +429,13 @@ void CLCamDisplay::setMTDecoding(bool value)
     {
         if (m_display[i])
             m_display[i]->setMTDecoding(value);
+    }
+}
+
+void CLCamDisplay::onDataEvent(CLStreamreader::StreamReaderEvent event)
+{
+    if (event == CLStreamreader::AudioParamsChanged)
+    {
+        m_needReinitAudio = true; 
     }
 }

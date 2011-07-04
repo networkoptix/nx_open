@@ -46,7 +46,7 @@ private:
 	AVCodecContext *c;
 	AVFrame *frame;
 	
-	uint8_t* m_deinterlaceBuffer;
+	quint8* m_deinterlaceBuffer;
 	AVFrame *m_deinterlacedFrame;
 
 #ifdef _USE_DXVA

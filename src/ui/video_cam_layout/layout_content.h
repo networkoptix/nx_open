@@ -91,11 +91,8 @@ public:
 	void removeIntereactionFlag(unsigned long flag);
 	bool checkIntereactionFlag(unsigned long flag);
 
-
     unsigned int numberOfPages(unsigned int maxItemsPerPage);
     QStringList getDevicesOnPage(unsigned int page, unsigned int maxItemsPerPage);
-
-    
 
 protected:
     void destroy(bool skipSubL);
@@ -121,7 +118,5 @@ protected:
 	unsigned long m_interaction_flags;
 
     CLUserGridSettings mGridSettings;
-
-
 };
 #endif //layout_content_h_2210
