@@ -1,16 +1,16 @@
 #include "abstract_archive_stream_reader.h"
 
-CLAbstractArchiveReader::CLAbstractArchiveReader(CLDevice* dev )
-    : CLClientPullStreamreader(dev),
-      m_singleShot(false),
-      m_forward(true),
-      m_lengthMksec(0),
-      m_startMksec(0),
-      m_needToSleep(0),
-      m_cs(QMutex::Recursive),
-      m_adaptiveSleep(20 * 1000),
-      m_useTwice(false),
-	  m_skipFramesToTime(0)
+CLAbstractArchiveReader::CLAbstractArchiveReader(CLDevice* dev ) :
+    CLClientPullStreamreader(dev),
+    m_lengthMksec(0),
+    m_startMksec(0),
+    m_forward(true),
+    m_singleShot(false),
+    m_adaptiveSleep(20 * 1000),
+    m_needToSleep(0),
+    m_cs(QMutex::Recursive),
+    m_useTwice(false),
+    m_skipFramesToTime(0)
 {
 }
 
@@ -20,33 +20,33 @@ CLAbstractArchiveReader::~CLAbstractArchiveReader()
 
 void CLAbstractArchiveReader::setSingleShotMode(bool single)
 {
-	m_singleShot = single;
-	if (!m_singleShot)
-	{
-		m_adaptiveSleep.afterdelay();
-		resume();
-	}
+    m_singleShot = single;
+    if (!m_singleShot)
+    {
+        m_adaptiveSleep.afterdelay();
+        resume();
+    }
 }
 
 bool CLAbstractArchiveReader::isSingleShotMode() const
 {
-	return m_singleShot;
+    return m_singleShot;
 }
 
 void CLAbstractArchiveReader::setdirection(bool forward)
 {
-	m_forward = forward;
+    m_forward = forward;
 }
 
 bool CLAbstractArchiveReader::isForwardDirection() const
 {
-	return m_forward;
+    return m_forward;
 }
 
 // returns len of archive in mksec
 quint64 CLAbstractArchiveReader::lengthMksec() const
 {
-	return m_lengthMksec;
+    return m_lengthMksec;
 }
 
 quint64 CLAbstractArchiveReader::startMksec() const
@@ -56,24 +56,24 @@ quint64 CLAbstractArchiveReader::startMksec() const
 
 void CLAbstractArchiveReader::jumpTo(quint64 mksec, bool makeshot)
 {
- 	QMutexLocker mutex(&m_cs);
+     QMutexLocker mutex(&m_cs);
 
     nextFrame();
 
-	for (int channel = 0; channel  < m_channel_number; ++channel)
-		channeljumpTo(mksec, channel);
+    for (int channel = 0; channel  < m_channel_number; ++channel)
+        channeljumpTo(mksec, channel);
 
-	m_useTwice = true;
+    m_useTwice = true;
 
-	if (makeshot && isSingleShotMode())
-		resume();
+    if (makeshot && isSingleShotMode())
+        resume();
 }
 
 void CLAbstractArchiveReader::jumpToPreviousFrame(quint64 mksec, bool makeshot)
 {
     setSkipFramesToTime(mksec);
 
-	jumpTo(mksec - 100 * 1000, makeshot);
+    jumpTo(mksec - 100 * 1000, makeshot);
 }
 
 quint64 CLAbstractArchiveReader::skipFramesToTime() const
@@ -110,7 +110,7 @@ QStringList CLAbstractArchiveReader::getAudioTracksInfo() const
     return QStringList();
 }
 
-bool CLAbstractArchiveReader::setAudioChannel(unsigned int num)
+bool CLAbstractArchiveReader::setAudioChannel(unsigned int /*num*/)
 {
     return false;
 }

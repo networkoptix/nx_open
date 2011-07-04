@@ -45,11 +45,11 @@ qint64	RTPIODevice::read( char * data, qint64 maxSize )
 
 
 //============================================================================================
-RTPSession::RTPSession():
-m_csec(2),
-m_udpSock(0),
-m_rtcpUdpSock(0),
-m_rtpIo(*this, m_udpSock)
+RTPSession::RTPSession() :
+    m_udpSock(0),
+    m_rtcpUdpSock(0),
+    m_rtpIo(*this, m_udpSock),
+    m_csec(2)
 {
     m_udpSock.setTimeOut(500);
     m_tcpSock.setTimeOut(3 * 1000);

@@ -266,14 +266,15 @@ static int roundUp(int value)
     return value / ROUND_FACTOR * ROUND_FACTOR + (value % ROUND_FACTOR ? ROUND_FACTOR : 0);
 }
 
-
-CLVideoDecoderOutput::CLVideoDecoderOutput():
-m_capacity(0),
-C1(0), C2(0), C3(0),
-stride1(0),
-width(0)
+CLVideoDecoderOutput::CLVideoDecoderOutput() :
+    C1(0), C2(0), C3(0),
+    width(0),
+    height(0),
+    stride1(0),
+    stride2(0),
+    stride3(0),
+    m_capacity(0)
 {
-
 }
 
 CLVideoDecoderOutput::~CLVideoDecoderOutput()

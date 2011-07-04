@@ -3,11 +3,11 @@
 #include "base/rand.h"
 #include "ui/graphicsview.h"
 
-Show_helper::Show_helper(GraphicsView* view):
-m_view(view),
-m_showTime(false),
-m_counrer(0),
-m_value(0)
+Show_helper::Show_helper(GraphicsView* view) :
+    m_counrer(0),
+    m_value(0),
+    m_view(view),
+    m_showTime(false)
 {
 	connect(&mTimer, SIGNAL(timeout()), this , SLOT(onTimer()));
 	mTimer.setInterval(1000/60); // 60 fps   

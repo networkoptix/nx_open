@@ -8,14 +8,14 @@
 
 //(videoCodecCtx && videoCodecCtx->sample_aspect_ratio.num) ? av_q2d(videoCodecCtx->sample_aspect_ratio) : 1.0f;
 
-CLVideoWindowItem::CLVideoWindowItem(GraphicsView* view, const CLDeviceVideoLayout* layout, int max_width, int max_height, QString name)
-    : CLImageItem(view, max_width, max_height, name),
-      m_videolayout(layout),
-      m_first_draw(true),
-      m_showfps(false),
-      m_FPS_Font("Courier New", 250),
-      m_opacity(0.0),
-      m_videonum(layout->numberOfChannels())
+CLVideoWindowItem::CLVideoWindowItem(GraphicsView* view, const CLDeviceVideoLayout* layout, int max_width, int max_height, QString name) :
+    CLImageItem(view, max_width, max_height, name),
+    m_first_draw(true),
+    m_showfps(false),
+    m_FPS_Font("Courier New", 250),
+    m_opacity(0.0),
+    m_videolayout(layout),
+    m_videonum(layout->numberOfChannels())
 {
 
     m_aspectratio = m_aspectratio/layout->width()*layout->height();

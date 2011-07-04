@@ -155,6 +155,8 @@ bool CLFFmpegAudioDecoder::decode(CLAudioData& data)
 		data.format.setSampleType(QAudioFormat::Float);
 		break;
 
+    default:
+        break;
 	}
 
 	return true;

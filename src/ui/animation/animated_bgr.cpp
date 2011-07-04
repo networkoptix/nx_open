@@ -2,12 +2,12 @@
 
 #define MAX_STEP 600
 
-CLAnimatedBackGround::CLAnimatedBackGround(int timestep):
-mTimeStep(timestep),
-mForward(true),
-mSteps(0)
+CLAnimatedBackGround::CLAnimatedBackGround(int timestep) :
+    mForward(true),
+    mSteps(0),
+    mTimeStep(timestep)
 {
-	mTime.restart();
+    mTime.restart();
 }
 
 bool CLAnimatedBackGround::tick()

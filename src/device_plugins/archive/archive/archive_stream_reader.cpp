@@ -403,23 +403,22 @@ int CLArchiveStreamReader::nextFrameIndex(bool after_jump, int channel, int curr
 
 void CLArchiveStreamReader::channeljumpTo(quint64 mksec, int channel)
 {
+    int new_index = findBestIndex(channel, mksec);
+    if (new_index < 0)
+        return;
 
-	int new_index = findBestIndex(channel, mksec);
-	if (new_index<0)
-		return;
+    mCurrIndex[channel] = nextFrameIndex(true, channel, new_index, true, !m_forward);
 
-	mCurrIndex[channel] = nextFrameIndex(true, channel, new_index, true, !m_forward);
+    if (mCurrIndex[channel] == (unsigned)-1)
+        mCurrIndex[channel] = nextFrameIndex(true, channel, new_index, true, m_forward);
 
-	if (mCurrIndex[channel]==-1)
-		mCurrIndex[channel] = nextFrameIndex(true, channel, new_index, true, m_forward);
-
-	mFinished[channel] = (mCurrIndex[channel]==-1);
+    mFinished[channel] = (mCurrIndex[channel]==-1);
 
     if (mCurrIndex[channel] == (unsigned)-1)
         return;
 
-	unsigned long shift = mMovie[channel].at(mCurrIndex[channel]).shift;
-	m_data_file[channel].seek(shift);
+    unsigned long shift = mMovie[channel].at(mCurrIndex[channel]).shift;
+    m_data_file[channel].seek(shift);
 }
 
 int CLArchiveStreamReader::findBestIndex(int channel, quint64 mksec) const

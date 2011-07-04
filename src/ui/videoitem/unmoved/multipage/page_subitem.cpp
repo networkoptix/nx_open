@@ -13,12 +13,12 @@ static const QColor activeColor(0,240,240,170);
 static const int animationPeriod = 350;
 
 
-QnPageSubItem::QnPageSubItem(QString name, QGraphicsItem* parent, qreal normal_opacity, qreal active_opacity, int number, bool current):
+QnPageSubItem::QnPageSubItem(QString name, QGraphicsItem* parent, qreal normal_opacity, qreal active_opacity, int number, bool current) :
     CLUnMovedInteractiveOpacityItem(name, parent, normal_opacity, active_opacity),
     m_number(number),
-    m_scaleAnimation(0),
-    m_colorAnimation(0),
     m_current(current),
+    m_colorAnimation(0),
+    m_scaleAnimation(0),
     m_firstPaint(true)
 {
     setFlag(QGraphicsItem::ItemIgnoresTransformations, false);
@@ -47,7 +47,7 @@ QRectF QnPageSubItem::boundingRect () const
 
 //==========================================================================
 
-void QnPageSubItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void QnPageSubItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
     painter->setFont(page_font);
     painter->setPen(m_color);

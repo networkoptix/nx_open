@@ -59,7 +59,7 @@ void CLAnimation::Start()
     }
 }
 
-void CLAnimation::start_helper(int duration, int delay)
+void CLAnimation::start_helper(int /*duration*/, int delay)
 {
 	if (!isRuning())
 	{

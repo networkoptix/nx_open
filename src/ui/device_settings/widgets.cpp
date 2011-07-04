@@ -47,7 +47,7 @@ QWidget* CLAbstractSettingsWidget::toWidget()
 	return mWidget;
 }
 
-void CLAbstractSettingsWidget::setParam_helper(const QString& name, const CLValue& val)
+void CLAbstractSettingsWidget::setParam_helper(const QString& /*name*/, const CLValue& val)
 {
 	mParam.value.value = val;
 	emit setParam(mParam.name,val);

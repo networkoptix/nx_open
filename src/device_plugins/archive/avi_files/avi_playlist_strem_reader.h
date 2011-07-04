@@ -35,7 +35,7 @@ protected:
     virtual ByteIOContext* getIOContext();
     virtual qint32 readPacket(quint8* buf, int size);
 
-    virtual void fillAdditionalInfo(CLFileInfo* fi) {}
+    virtual void fillAdditionalInfo(CLFileInfo* /*fi*/) {}
 protected:
     quint8* m_ioBuffer;
     ByteIOContext* m_ffmpegIOContext;

@@ -10,12 +10,12 @@ int FakeStreamReader::descr_data_len = 0;
 
 //=========================================================
 
-FakeStreamReader::FakeStreamReader (CLDevice* dev, int channels):
-CLClientPullStreamreader(dev),
-m_channels(channels),
-m_curr_channel(0),
-m_sleep(20*1000),
-m_time(0)
+FakeStreamReader::FakeStreamReader (CLDevice* dev, int channels) :
+    CLClientPullStreamreader(dev),
+    m_channels(channels),
+    m_curr_channel(0),
+    m_time(0),
+    m_sleep(20*1000)
 {
 
 	dev->addDeviceTypeFlag(CLDevice::ARCHIVE);
@@ -62,8 +62,8 @@ m_time(0)
 
 FakeStreamReader::~FakeStreamReader()
 {
-	//delete[] data;
-	//delete[] descr;
+    //delete[] data;
+    //delete[] descr;
 }
 
 CLAbstractMediaData* FakeStreamReader::getNextData()
