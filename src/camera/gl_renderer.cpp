@@ -176,13 +176,6 @@ CLGLRenderer::~CLGLRenderer()
 
 void CLGLRenderer::clearGarbage()
 {
-    //return;
-
-    if (mGarbage.count())
-    {
-        int n = 0;
-    }
-
     foreach(GLuint* heap, mGarbage)
     {
         glDeleteTextures(3, heap);
@@ -190,13 +183,16 @@ void CLGLRenderer::clearGarbage()
     }
 
     mGarbage.clear();
-
 }
 
 void CLGLRenderer::getTextureRect(QRect& drawRect, 
                     float textureWidth, float textureHeight,
                     float windowWidth, float windowHeight, const float sar) const
 {
+    Q_UNUSED(textureWidth);
+    Q_UNUSED(textureHeight);
+    Q_UNUSED(sar);
+
     drawRect.setTop(0);
     drawRect.setLeft(0);
     drawRect.setWidth(static_cast<int>(windowWidth));
@@ -425,6 +421,7 @@ void CLGLRenderer::copyVideoDataBeforePainting(bool copy)
 
 void CLGLRenderer::draw(CLVideoDecoderOutput& img, unsigned int channel)
 {
+    Q_UNUSED(channel);
 
     QMutexLocker locker(&m_mutex);
 
@@ -450,7 +447,6 @@ void CLGLRenderer::draw(CLVideoDecoderOutput& img, unsigned int channel)
 
     }
 
-
     m_arrayPixels[0] = image.C1;
     m_arrayPixels[1] = image.C2;
     m_arrayPixels[2] = image.C3;
@@ -471,7 +467,7 @@ void CLGLRenderer::draw(CLVideoDecoderOutput& img, unsigned int channel)
     {
         m_do_not_need_to_wait_any_more = false;
 
-        while (!m_waitCon.wait(&m_mutex,50)) // unlock the mutex
+        while (!m_waitCon.wait(&m_mutex, 50)) // unlock the mutex
         {
 
             if (!m_videowindow->isVisible() || !m_needwait)
@@ -617,8 +613,8 @@ void CLGLRenderer::updateTexture()
     {
             glBindTexture(GL_TEXTURE_2D, m_texture[0]);
 
-            const int wPow = isNonPower2 ? roundUp(w[0]) : getMinPow2(w[0]);
-            const int hPow = isNonPower2 ? h[0] : getMinPow2(h[0]);
+            //const int wPow = isNonPower2 ? roundUp(w[0]) : getMinPow2(w[0]);
+            //const int hPow = isNonPower2 ? h[0] : getMinPow2(h[0]);
 
             if (!m_videoTextureReady)
             {
