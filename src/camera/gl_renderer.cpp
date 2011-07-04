@@ -15,7 +15,7 @@
 #endif
 
 #ifndef GL_CLAMP_TO_EDGE
-#define GL_CLAMP_TO_EDGE	0x812F
+#define GL_CLAMP_TO_EDGE    0x812F
 #endif
 
 #ifndef GL_CLAMP_TO_EDGE_SGIS
@@ -142,65 +142,65 @@ m_textureUploaded(false),
 m_forceSoftYUV(false),
 m_painterOpacity(1.0)
 {
-	applyMixerSettings(m_brightness, m_contrast, m_hue, m_saturation);
+    applyMixerSettings(m_brightness, m_contrast, m_hue, m_saturation);
 }
 
 int CLGLRenderer::checkOpenGLError() const
 {
-	int err = glGetError();
-	if (GL_NO_ERROR != err) 
-	{
-		const char* errorString = reinterpret_cast<const char *>(gluErrorString(err));
-		if (errorString) 
-		{
-			cl_log.log("OpenGL Error: ",  errorString, cl_logERROR);
-		}
-	}
-	return err;
+    int err = glGetError();
+    if (GL_NO_ERROR != err)
+    {
+        const char* errorString = reinterpret_cast<const char *>(gluErrorString(err));
+        if (errorString)
+        {
+            cl_log.log("OpenGL Error: ",  errorString, cl_logERROR);
+        }
+    }
+    return err;
 }
 
 CLGLRenderer::~CLGLRenderer()
 {
-	if (m_textureUploaded)
-	{
-		//glDeleteTextures(3, m_texture);
+    if (m_textureUploaded)
+    {
+        //glDeleteTextures(3, m_texture);
 
-		// I do not know why but if I glDeleteTextures here some items on the other view might become green( especially if we animate them a lot )
-		// not sure I i do something wrong with opengl or it's bug of QT. for now can not spend much time on it. but it needs to be fixed.
+        // I do not know why but if I glDeleteTextures here some items on the other view might become green( especially if we animate them a lot )
+        // not sure I i do something wrong with opengl or it's bug of QT. for now can not spend much time on it. but it needs to be fixed.
 
-		GLuint* heap = new GLuint[3];
-		memcpy(heap,m_texture,sizeof(m_texture));
-		mGarbage.push_back(heap); // to delete later
-	}
+        GLuint* heap = new GLuint[3];
+        memcpy(heap,m_texture,sizeof(m_texture));
+        mGarbage.push_back(heap); // to delete later
+    }
 }
 
 void CLGLRenderer::clearGarbage()
 {
-	//return;
+    //return;
 
-	if (mGarbage.count())
-	{
-		int n = 0;
-	}
+    if (mGarbage.count())
+    {
+        int n = 0;
+    }
 
-	foreach(GLuint* heap, mGarbage)
-	{
-		glDeleteTextures(3, heap);
-		delete[] heap;
-	}
+    foreach(GLuint* heap, mGarbage)
+    {
+        glDeleteTextures(3, heap);
+        delete[] heap;
+    }
 
-	mGarbage.clear();
+    mGarbage.clear();
 
 }
 
 void CLGLRenderer::getTextureRect(QRect& drawRect, 
-					float textureWidth, float textureHeight,
-					float windowWidth, float windowHeight, const float sar) const
+                    float textureWidth, float textureHeight,
+                    float windowWidth, float windowHeight, const float sar) const
 {
-	drawRect.setTop(0);
-	drawRect.setLeft(0);
-	drawRect.setWidth(static_cast<int>(windowWidth));
-	drawRect.setHeight(static_cast<int>(windowHeight));
+    drawRect.setTop(0);
+    drawRect.setLeft(0);
+    drawRect.setWidth(static_cast<int>(windowWidth));
+    drawRect.setHeight(static_cast<int>(windowHeight));
 }
 
 void CLGLRenderer::init(bool msgbox)
@@ -208,177 +208,177 @@ void CLGLRenderer::init(bool msgbox)
     if (m_inited)
         return;
 
-//	makeCurrent();
+//    makeCurrent();
 
-	glProgramStringARB = (_glProgramStringARB) QGLContext::currentContext()->getProcAddress(QLatin1String("glProgramStringARB"));
-	glBindProgramARB = (_glBindProgramARB) QGLContext::currentContext()->getProcAddress(QLatin1String("glBindProgramARB"));
-	glDeleteProgramsARB = (_glDeleteProgramsARB) QGLContext::currentContext()->getProcAddress(QLatin1String("glDeleteProgramsARB"));
-	glGenProgramsARB = (_glGenProgramsARB) QGLContext::currentContext()->getProcAddress(QLatin1String("glGenProgramsARB"));
-	glProgramLocalParameter4fARB = (_glProgramLocalParameter4fARB) QGLContext::currentContext()->getProcAddress(QLatin1String("glProgramLocalParameter4fARB"));
-	glActiveTexture = (_glActiveTexture) QGLContext::currentContext()->getProcAddress(QLatin1String("glActiveTexture"));
+    glProgramStringARB = (_glProgramStringARB) QGLContext::currentContext()->getProcAddress(QLatin1String("glProgramStringARB"));
+    glBindProgramARB = (_glBindProgramARB) QGLContext::currentContext()->getProcAddress(QLatin1String("glBindProgramARB"));
+    glDeleteProgramsARB = (_glDeleteProgramsARB) QGLContext::currentContext()->getProcAddress(QLatin1String("glDeleteProgramsARB"));
+    glGenProgramsARB = (_glGenProgramsARB) QGLContext::currentContext()->getProcAddress(QLatin1String("glGenProgramsARB"));
+    glProgramLocalParameter4fARB = (_glProgramLocalParameter4fARB) QGLContext::currentContext()->getProcAddress(QLatin1String("glProgramLocalParameter4fARB"));
+    glActiveTexture = (_glActiveTexture) QGLContext::currentContext()->getProcAddress(QLatin1String("glActiveTexture"));
 
-	if (!glActiveTexture) 
-	{
-		CL_LOG(cl_logWARNING) cl_log.log("GL_ARB_multitexture not supported",cl_logWARNING);
-	}
+    if (!glActiveTexture)
+    {
+        CL_LOG(cl_logWARNING) cl_log.log("GL_ARB_multitexture not supported",cl_logWARNING);
+    }
 
-	// OpenGL info
-	const char* extensions = reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS));
-	if (extensions) 
-	{
-		CL_LOG(cl_logWARNING) cl_log.log("OpenGL extensions: ", extensions, cl_logDEBUG1);
-	}
-	const char* version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
+    // OpenGL info
+    const char* extensions = reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS));
+    if (extensions)
+    {
+        CL_LOG(cl_logWARNING) cl_log.log("OpenGL extensions: ", extensions, cl_logDEBUG1);
+    }
+    const char* version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
 
-	if (version) 
-	{
-		//CL_LOG(cl_logWARNING) cl_log.log(,cl_logWARNING);
-		CL_LOG(cl_logWARNING) cl_log.log("OpenGL version: ", version, cl_logALWAYS);
-	}
+    if (version)
+    {
+        //CL_LOG(cl_logWARNING) cl_log.log(,cl_logWARNING);
+        CL_LOG(cl_logWARNING) cl_log.log("OpenGL version: ", version, cl_logALWAYS);
+    }
 
-	const uchar* renderer = glGetString(GL_RENDERER);
-	if (renderer) 
-	{
-		CL_LOG(cl_logWARNING) cl_log.log("Renderer: ", reinterpret_cast<const char *>(renderer),cl_logALWAYS);
-	}
+    const uchar* renderer = glGetString(GL_RENDERER);
+    if (renderer)
+    {
+        CL_LOG(cl_logWARNING) cl_log.log("Renderer: ", reinterpret_cast<const char *>(renderer),cl_logALWAYS);
+    }
 
-	const uchar* vendor = glGetString(GL_VENDOR);
-	if (vendor) 
-	{
-		CL_LOG(cl_logWARNING) cl_log.log("Vendor: ", reinterpret_cast<const char *>(vendor),cl_logALWAYS);
-	}
+    const uchar* vendor = glGetString(GL_VENDOR);
+    if (vendor)
+    {
+        CL_LOG(cl_logWARNING) cl_log.log("Vendor: ", reinterpret_cast<const char *>(vendor),cl_logALWAYS);
+    }
 
-	//version = "1.0.7";
-	if (version && QString(version) >= QString("1.2.0")) 
-	{
-		clampConstant = GL_CLAMP_TO_EDGE;
-	} 
-	if (extensions && strstr(extensions, "GL_EXT_texture_edge_clamp")) 
-	{
-		clampConstant = GL_CLAMP_TO_EDGE_EXT;
-	} 
-	else if (extensions && strstr(extensions, "GL_SGIS_texture_edge_clamp")) 
-	{
-		clampConstant = GL_CLAMP_TO_EDGE_SGIS;
-	} 
-	else 
-	{
-		clampConstant = GL_CLAMP;
-	}
+    //version = "1.0.7";
+    if (version && QString(version) >= QString("1.2.0"))
+    {
+        clampConstant = GL_CLAMP_TO_EDGE;
+    }
+    if (extensions && strstr(extensions, "GL_EXT_texture_edge_clamp"))
+    {
+        clampConstant = GL_CLAMP_TO_EDGE_EXT;
+    }
+    else if (extensions && strstr(extensions, "GL_SGIS_texture_edge_clamp"))
+    {
+        clampConstant = GL_CLAMP_TO_EDGE_SGIS;
+    }
+    else
+    {
+        clampConstant = GL_CLAMP;
+    }
 
-	if (version && QString(version) <= "1.1.0") 
-	{ // Microsoft Generic software
-		const QString& message = QObject::trUtf8("SLOW_OPENGL");
-		CL_LOG(cl_logWARNING) cl_log.log(message ,cl_logWARNING);
-		if (msgbox)
-		{
-			QMessageBox* box = new QMessageBox(QMessageBox::Warning, "Info", message, QMessageBox::Ok, 0);
-			box->show();
-		}
-	}
+    if (version && QString(version) <= "1.1.0")
+    { // Microsoft Generic software
+        const QString& message = QObject::trUtf8("SLOW_OPENGL");
+        CL_LOG(cl_logWARNING) cl_log.log(message ,cl_logWARNING);
+        if (msgbox)
+        {
+            QMessageBox* box = new QMessageBox(QMessageBox::Warning, "Info", message, QMessageBox::Ok, 0);
+            box->show();
+        }
+    }
 
-	bool error = false;
-	if (extensions) 
-	{
-		isNonPower2 = strstr(extensions, "GL_ARB_texture_non_power_of_two") != NULL;
+    bool error = false;
+    if (extensions)
+    {
+        isNonPower2 = strstr(extensions, "GL_ARB_texture_non_power_of_two") != NULL;
         
-		const char* fragmentProgram = "GL_ARB_fragment_program";
-		if (!strstr(extensions, fragmentProgram)) 
-		{
-			CL_LOG(cl_logERROR) cl_log.log(fragmentProgram, " not support" ,cl_logERROR);
-			error = true;
-		}
-	}
+        const char* fragmentProgram = "GL_ARB_fragment_program";
+        if (!strstr(extensions, fragmentProgram))
+        {
+            CL_LOG(cl_logERROR) cl_log.log(fragmentProgram, " not support" ,cl_logERROR);
+            error = true;
+        }
+    }
 
-	if (!error && glProgramStringARB && glBindProgramARB && glDeleteProgramsARB &&
-		glGenProgramsARB && glProgramLocalParameter4fARB) 
-	{
-			glGenProgramsARB(2, m_program);
+    if (!error && glProgramStringARB && glBindProgramARB && glDeleteProgramsARB &&
+        glGenProgramsARB && glProgramLocalParameter4fARB)
+    {
+            glGenProgramsARB(2, m_program);
 
-			//==================
-			const char *code[] = {yv12ToRgb, yuy2ToRgb};
+            //==================
+            const char *code[] = {yv12ToRgb, yuy2ToRgb};
 
-			bool error = false;
-			for(int i = 0; i < ProgramCount && !error;  ++i) 
-			{
+            bool error = false;
+            for(int i = 0; i < ProgramCount && !error;  ++i)
+            {
 
-				glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, m_program[i]);
+                glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, m_program[i]);
 
-				const GLbyte *gl_src = reinterpret_cast<const GLbyte *>(code[i]);
-				glProgramStringARB(GL_FRAGMENT_PROGRAM_ARB, GL_PROGRAM_FORMAT_ASCII_ARB,
-					strlen(code[i]), gl_src);
+                const GLbyte *gl_src = reinterpret_cast<const GLbyte *>(code[i]);
+                glProgramStringARB(GL_FRAGMENT_PROGRAM_ARB, GL_PROGRAM_FORMAT_ASCII_ARB,
+                    strlen(code[i]), gl_src);
 
-				if (checkOpenGLError() != GL_NO_ERROR) 
-				{
-					error = true;
-				}
-			}
+                if (checkOpenGLError() != GL_NO_ERROR)
+                {
+                    error = true;
+                }
+            }
 
-			if (error) 
-			{
-				glDeleteProgramsARB(2, m_program);
-				CL_LOG(cl_logERROR) cl_log.log("Error compile shader!!!", cl_logERROR);
-			}
-			//==================
+            if (error)
+            {
+                glDeleteProgramsARB(2, m_program);
+                CL_LOG(cl_logERROR) cl_log.log("Error compile shader!!!", cl_logERROR);
+            }
+            //==================
 
-	}
-	else 
-	{
-		error = true;
-	}
+    }
+    else
+    {
+        error = true;
+    }
 
-	//isSoftYuv2Rgb = true;
+    //isSoftYuv2Rgb = true;
 
-	if (error) 
-	{
-		CL_LOG(cl_logWARNING) cl_log.log("OpenGL shader support init failed, use soft yuv->rgb converter!!!", cl_logWARNING);
-		isSoftYuv2Rgb = true;
+    if (error)
+    {
+        CL_LOG(cl_logWARNING) cl_log.log("OpenGL shader support init failed, use soft yuv->rgb converter!!!", cl_logWARNING);
+        isSoftYuv2Rgb = true;
 
-		// in this first revision we do not support software color transform
-		gl_status = CL_GL_NOT_SUPPORTED;
+        // in this first revision we do not support software color transform
+        gl_status = CL_GL_NOT_SUPPORTED;
 
-		const QString& message = QObject::trUtf8("This software version supports only GPU(not CPU) color transformation. This video card do not supports shaders(GPU transforms). Please contact to developers to get new software version with YUV=>RGB software transform for your video card. Or update your video card:-)");
-		CL_LOG(cl_logWARNING) cl_log.log(message ,cl_logWARNING);
-		if (msgbox)
-		{
-			QMessageBox* box = new QMessageBox(QMessageBox::Warning, "Info", message, QMessageBox::Ok, 0);
-			box->show();
-		}
+        const QString& message = QObject::trUtf8("This software version supports only GPU(not CPU) color transformation. This video card do not supports shaders(GPU transforms). Please contact to developers to get new software version with YUV=>RGB software transform for your video card. Or update your video card:-)");
+        CL_LOG(cl_logWARNING) cl_log.log(message ,cl_logWARNING);
+        if (msgbox)
+        {
+            QMessageBox* box = new QMessageBox(QMessageBox::Warning, "Info", message, QMessageBox::Ok, 0);
+            box->show();
+        }
 
-	}
-	
-	if (m_forceSoftYUV) 
-	{
-		isSoftYuv2Rgb = true;
-	}
+    }
+
+    if (m_forceSoftYUV)
+    {
+        isSoftYuv2Rgb = true;
+    }
 #if 0
     // force CPU yuv->rgb for large textures (due to ATI bug). Only for still images.
     else if (m_videowindow && m_videowindow->getVideoCam()->getDevice()->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT) &&
                 (m_width >= MAX_SHADER_SIZE || m_height >= MAX_SHADER_SIZE))
     {
-		isSoftYuv2Rgb = true;
+        isSoftYuv2Rgb = true;
     }
 #endif
 
-	//if (mGarbage.count()<80)
-	{
-		glGenTextures(3, m_texture);
-	}
-	/*
-	else
-	{
-		GLuint* heap = mGarbage.takeFirst();
-		memcpy(m_texture, heap, sizeof(m_texture));
-		delete heap;
-	}
-	/**/
+    //if (mGarbage.count()<80)
+    {
+        glGenTextures(3, m_texture);
+    }
+    /*
+    else
+    {
+        GLuint* heap = mGarbage.takeFirst();
+        memcpy(m_texture, heap, sizeof(m_texture));
+        delete heap;
+    }
+    */
 
-	OGL_CHECK_ERROR("glGenTextures");
+    OGL_CHECK_ERROR("glGenTextures");
 
-	glEnable(GL_TEXTURE_2D);
-	OGL_CHECK_ERROR("glEnable");
+    glEnable(GL_TEXTURE_2D);
+    OGL_CHECK_ERROR("glEnable");
 
-	gl_status = CL_GL_SUPPORTED;
+    gl_status = CL_GL_SUPPORTED;
 
 }
 
@@ -398,100 +398,100 @@ int CLGLRenderer::getMaxTextureSize()
         }
     }
 
-	return ms_maxTextureSize;
+    return ms_maxTextureSize;
 }
 
 void CLGLRenderer::beforeDestroy()
 {
-	m_needwait = false;
-	m_waitCon.wakeOne();
+    m_needwait = false;
+    m_waitCon.wakeOne();
 }
 
 void CLGLRenderer::copyVideoDataBeforePainting(bool copy)
 {
-	m_copyData = copy;
-	if (copy)
-	{
-		m_abort_drawing = true; // after we cancel wait process we need to abort_draw.
-		m_needwait = false;
-		m_waitCon.wakeOne();
-	}
-	else
-	{
-		m_needwait = true;
-	}
+    m_copyData = copy;
+    if (copy)
+    {
+        m_abort_drawing = true; // after we cancel wait process we need to abort_draw.
+        m_needwait = false;
+        m_waitCon.wakeOne();
+    }
+    else
+    {
+        m_needwait = true;
+    }
 
 }
 
 void CLGLRenderer::draw(CLVideoDecoderOutput& img, unsigned int channel)
 {
 
-	QMutexLocker locker(&m_mutex);
+    QMutexLocker locker(&m_mutex);
 
-	m_abort_drawing = false;
+    m_abort_drawing = false;
 
-	if (m_copyData)
-		CLVideoDecoderOutput::copy(&img, &m_image);
+    if (m_copyData)
+        CLVideoDecoderOutput::copy(&img, &m_image);
 
-	CLVideoDecoderOutput& image =  m_copyData ?  m_image : img;
+    CLVideoDecoderOutput& image =  m_copyData ?  m_image : img;
 
-	m_stride = image.stride1;
-	m_height = image.height;
-	m_width = image.width;
+    m_stride = image.stride1;
+    m_height = image.height;
+    m_width = image.width;
 
-	m_color = image.out_type;
+    m_color = image.out_type;
 
-	if (m_stride != m_stride_old || m_height!=m_height_old || m_color!=m_color_old)
-	{
-		m_videoTextureReady = false;
-		m_stride_old = m_stride;
-		m_height_old = m_height;
-		m_color_old = m_color;
+    if (m_stride != m_stride_old || m_height!=m_height_old || m_color!=m_color_old)
+    {
+        m_videoTextureReady = false;
+        m_stride_old = m_stride;
+        m_height_old = m_height;
+        m_color_old = m_color;
 
-	}
+    }
 
 
-	m_arrayPixels[0] = image.C1;
-	m_arrayPixels[1] = image.C2;
-	m_arrayPixels[2] = image.C3;
+    m_arrayPixels[0] = image.C1;
+    m_arrayPixels[1] = image.C2;
+    m_arrayPixels[2] = image.C3;
 
-	m_gotnewimage = true;
-	//CLSleep::msleep(15);
+    m_gotnewimage = true;
+    //CLSleep::msleep(15);
 
-	//QTime time;
-	//time.restart();
+    //QTime time;
+    //time.restart();
 
-	if (!m_videowindow->isVisible())
-		return;
+    if (!m_videowindow->isVisible())
+        return;
 
-	m_videowindow->needUpdate(true); // sending paint event
-	//m_videowindow->update();
+    m_videowindow->needUpdate(true); // sending paint event
+    //m_videowindow->update();
 
-	if (m_needwait)
-	{
-		m_do_not_need_to_wait_any_more = false;
+    if (m_needwait)
+    {
+        m_do_not_need_to_wait_any_more = false;
 
-		while (!m_waitCon.wait(&m_mutex,50)) // unlock the mutex 
-		{
+        while (!m_waitCon.wait(&m_mutex,50)) // unlock the mutex
+        {
 
-			if (!m_videowindow->isVisible() || !m_needwait)
-				break;
+            if (!m_videowindow->isVisible() || !m_needwait)
+                break;
 
-			if (m_do_not_need_to_wait_any_more)
-				break; // some times It does not wake up after wakeone is called ; is it a bug?
-		}
-	}
+            if (m_do_not_need_to_wait_any_more)
+                break; // some times It does not wake up after wakeone is called ; is it a bug?
+        }
+    }
 
-	//cl_log.log("time =", time.elapsed() , cl_logDEBUG1);
+    //cl_log.log("time =", time.elapsed() , cl_logDEBUG1);
 
-	// after paint had hapened 
+    // after paint had hapened
 
-	//paintEvent
+    //paintEvent
 }
 
 void CLGLRenderer::setForceSoftYUV(bool value) 
 { 
-	m_forceSoftYUV = value; 
+    m_forceSoftYUV = value;
 }
 
 void CLGLRenderer::setOpacity(qreal opacity)
@@ -551,133 +551,133 @@ bool CLGLRenderer::isYuvFormat() const
 
 void CLGLRenderer::updateTexture()
 {
-	//image.saveToFile("test.yuv");
+    //image.saveToFile("test.yuv");
 
-	int w[3] = { m_stride, m_stride / 2, m_stride / 2 };
-	int r_w[3] = { m_width, m_width / 2, m_width / 2 }; // real_width / visable
-	int h[3] = { m_height, m_height / 2, m_height / 2 };
+    int w[3] = { m_stride, m_stride / 2, m_stride / 2 };
+    int r_w[3] = { m_width, m_width / 2, m_width / 2 }; // real_width / visable
+    int h[3] = { m_height, m_height / 2, m_height / 2 };
 
-	if (m_color == PIX_FMT_YUV422P)
-		h[1] = h[2] = m_height;
+    if (m_color == PIX_FMT_YUV422P)
+        h[1] = h[2] = m_height;
 
-	if (m_color == PIX_FMT_YUV444P)
-	{
-		h[1] = h[2] = m_height;
-		w[1] = w[2] = m_stride;
-		r_w[1] = r_w[2] = m_width;
-	}
+    if (m_color == PIX_FMT_YUV444P)
+    {
+        h[1] = h[2] = m_height;
+        w[1] = w[2] = m_stride;
+        r_w[1] = r_w[2] = m_width;
+    }
     //int round_width[3] = {roundUp(w[0]), roundUp(w[1]), roundUp(w[2])};
     //int round_width[3] = {roundUp(r_w[0]), roundUp(r_w[1]), roundUp(r_w[2])};
 
-	glEnable(GL_TEXTURE_2D);
-	OGL_CHECK_ERROR("glEnable");
-	if (!isSoftYuv2Rgb && isYuvFormat()) 
-	{
+    glEnable(GL_TEXTURE_2D);
+    OGL_CHECK_ERROR("glEnable");
+    if (!isSoftYuv2Rgb && isYuvFormat())
+    {
             // using pixel shader to yuv-> rgb conversion
-			for (int i = 0; i < 3; ++i) 
-			{
-				glBindTexture(GL_TEXTURE_2D, m_texture[i]);
-				OGL_CHECK_ERROR("glBindTexture");
-				const uchar* pixels = m_arrayPixels[i];
-				if (!m_videoTextureReady) 
-				{
-					// if support "GL_ARB_texture_non_power_of_two", use default size of texture,
-					// else nearest power of two
-					int wPow = isNonPower2 ? roundUp(w[i]) : getMinPow2(w[i]);
-					int hPow = isNonPower2 ? h[i] : getMinPow2(h[i]);
-					// support GL_ARB_texture_non_power_of_two ?
+            for (int i = 0; i < 3; ++i)
+            {
+                glBindTexture(GL_TEXTURE_2D, m_texture[i]);
+                OGL_CHECK_ERROR("glBindTexture");
+                const uchar* pixels = m_arrayPixels[i];
+                if (!m_videoTextureReady)
+                {
+                    // if support "GL_ARB_texture_non_power_of_two", use default size of texture,
+                    // else nearest power of two
+                    int wPow = isNonPower2 ? roundUp(w[i]) : getMinPow2(w[i]);
+                    int hPow = isNonPower2 ? h[i] : getMinPow2(h[i]);
+                    // support GL_ARB_texture_non_power_of_two ?
 
-					m_videoCoeffL[i] = 0;
-					m_videoCoeffW[i] =  roundUp(r_w[i]) / (float) wPow;
-					m_videoCoeffH[i] = h[i] / (float) hPow;
+                    m_videoCoeffL[i] = 0;
+                    m_videoCoeffW[i] =  roundUp(r_w[i]) / (float) wPow;
+                    m_videoCoeffH[i] = h[i] / (float) hPow;
 
-					glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, wPow, hPow, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, 0);
+                    glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, wPow, hPow, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, 0);
 
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, clampConstant);
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, clampConstant);
-				}
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, clampConstant);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, clampConstant);
+                }
 
-				glPixelStorei(GL_UNPACK_ROW_LENGTH, w[i]);
-				glTexSubImage2D(GL_TEXTURE_2D, 0,
-					0, 0,
+                glPixelStorei(GL_UNPACK_ROW_LENGTH, w[i]);
+                glTexSubImage2D(GL_TEXTURE_2D, 0,
+                    0, 0,
                     roundUp(r_w[i]),
                     h[i],
-					GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels);
-				OGL_CHECK_ERROR("glTexSubImage2D");
-				glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-				OGL_CHECK_ERROR("glPixelStorei");
-			}
+                    GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels);
+                OGL_CHECK_ERROR("glTexSubImage2D");
+                glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+                OGL_CHECK_ERROR("glPixelStorei");
+            }
 
-			m_textureUploaded = true;
+            m_textureUploaded = true;
 
-	}
-	else 
-	{
-		    glBindTexture(GL_TEXTURE_2D, m_texture[0]);
+    }
+    else
+    {
+            glBindTexture(GL_TEXTURE_2D, m_texture[0]);
 
-			const int wPow = isNonPower2 ? roundUp(w[0]) : getMinPow2(w[0]);
-			const int hPow = isNonPower2 ? h[0] : getMinPow2(h[0]);
+            const int wPow = isNonPower2 ? roundUp(w[0]) : getMinPow2(w[0]);
+            const int hPow = isNonPower2 ? h[0] : getMinPow2(h[0]);
 
-			if (!m_videoTextureReady) 
-			{
-				// if support "GL_ARB_texture_non_power_of_two", use default size of texture,
-				// else nearest power of two
+            if (!m_videoTextureReady)
+            {
+                // if support "GL_ARB_texture_non_power_of_two", use default size of texture,
+                // else nearest power of two
 
-				const int wPow = isNonPower2 ? roundUp(w[0]) : getMinPow2(w[0]);
-				const int hPow = isNonPower2 ? h[0] : getMinPow2(h[0]);
-				// support GL_ARB_texture_non_power_of_two ?
-				m_videoCoeffL[0] = 0;
-				m_videoCoeffW[0] =  roundUp(r_w[0]) / (float) wPow;
-				m_videoCoeffH[0] = h[0] / (float) hPow;
+                const int wPow = isNonPower2 ? roundUp(w[0]) : getMinPow2(w[0]);
+                const int hPow = isNonPower2 ? h[0] : getMinPow2(h[0]);
+                // support GL_ARB_texture_non_power_of_two ?
+                m_videoCoeffL[0] = 0;
+                m_videoCoeffW[0] =  roundUp(r_w[0]) / (float) wPow;
+                m_videoCoeffH[0] = h[0] / (float) hPow;
 
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wPow, hPow, 0, glRGBFormat(), GL_UNSIGNED_BYTE, 0);
-				OGL_CHECK_ERROR("glTexImage2D");
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-				OGL_CHECK_ERROR("glTexParameteri");
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-				OGL_CHECK_ERROR("glTexParameteri");
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, clampConstant);
-				OGL_CHECK_ERROR("glTexParameteri");
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, clampConstant);
-				OGL_CHECK_ERROR("glTexParameteri");
-			}
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wPow, hPow, 0, glRGBFormat(), GL_UNSIGNED_BYTE, 0);
+                OGL_CHECK_ERROR("glTexImage2D");
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                OGL_CHECK_ERROR("glTexParameteri");
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                OGL_CHECK_ERROR("glTexParameteri");
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, clampConstant);
+                OGL_CHECK_ERROR("glTexParameteri");
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, clampConstant);
+                OGL_CHECK_ERROR("glTexParameteri");
+            }
 
         quint8* pixels = m_arrayPixels[0];
-		if (isYuvFormat())
+        if (isYuvFormat())
         {
-		    int size = 4 * m_stride * h[0];
-		    if (yuv2rgbBuffer.size() != size) 
-			    yuv2rgbBuffer.resize(size);
-		    pixels = &yuv2rgbBuffer[0];
-		}
-		
+            int size = 4 * m_stride * h[0];
+            if (yuv2rgbBuffer.size() != size)
+                yuv2rgbBuffer.resize(size);
+            pixels = &yuv2rgbBuffer[0];
+        }
+
         int lineInPixelsSize = m_stride;
-		if (m_color == PIX_FMT_YUV422P)
-		{
-			yuv422_argb32_mmx(pixels, m_arrayPixels[0], m_arrayPixels[2], m_arrayPixels[1], 
-										roundUp(r_w[0]), 
-                                        h[0], 
-										4 * m_stride, 
-										m_stride, m_stride / 2);
-		}
-		else if (m_color == PIX_FMT_YUV420P)
-		{
-			yuv420_argb32_mmx(pixels, m_arrayPixels[0], m_arrayPixels[2], m_arrayPixels[1], 
-										roundUp(r_w[0]), 
-                                        h[0], 
-										4 * m_stride, 
-										m_stride, m_stride / 2);
-		}
-		else if (m_color == PIX_FMT_YUV444P)
+        if (m_color == PIX_FMT_YUV422P)
         {
-			yuv444_argb32_mmx(pixels, m_arrayPixels[0], m_arrayPixels[2], m_arrayPixels[1], 
-										roundUp(r_w[0]), 
+            yuv422_argb32_mmx(pixels, m_arrayPixels[0], m_arrayPixels[2], m_arrayPixels[1],
+                                        roundUp(r_w[0]),
                                         h[0], 
-										4 * m_stride, 
-										m_stride, m_stride);
-		}
+                                        4 * m_stride,
+                                        m_stride, m_stride / 2);
+        }
+        else if (m_color == PIX_FMT_YUV420P)
+        {
+            yuv420_argb32_mmx(pixels, m_arrayPixels[0], m_arrayPixels[2], m_arrayPixels[1],
+                                        roundUp(r_w[0]),
+                                        h[0], 
+                                        4 * m_stride,
+                                        m_stride, m_stride / 2);
+        }
+        else if (m_color == PIX_FMT_YUV444P)
+        {
+            yuv444_argb32_mmx(pixels, m_arrayPixels[0], m_arrayPixels[2], m_arrayPixels[1],
+                                        roundUp(r_w[0]),
+                                        h[0], 
+                                        4 * m_stride,
+                                        m_stride, m_stride);
+        }
         else if (m_color == PIX_FMT_RGB24 || m_color == PIX_FMT_BGR24) {
             lineInPixelsSize /= 3;
         }
@@ -685,17 +685,17 @@ void CLGLRenderer::updateTexture()
             lineInPixelsSize /= 4; // RGBA, BGRA
         }
 
-		glPixelStorei(GL_UNPACK_ROW_LENGTH, lineInPixelsSize);
-		OGL_CHECK_ERROR("glPixelStorei");
-		glTexSubImage2D(GL_TEXTURE_2D, 0,
-			0, 0,
+        glPixelStorei(GL_UNPACK_ROW_LENGTH, lineInPixelsSize);
+        OGL_CHECK_ERROR("glPixelStorei");
+        glTexSubImage2D(GL_TEXTURE_2D, 0,
+            0, 0,
             roundUp(r_w[0]),
             h[0],
-			glRGBFormat(), GL_UNSIGNED_BYTE, pixels);
+            glRGBFormat(), GL_UNSIGNED_BYTE, pixels);
 
-		OGL_CHECK_ERROR("glTexSubImage2D");
-		glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-		OGL_CHECK_ERROR("glPixelStorei");
+        OGL_CHECK_ERROR("glTexSubImage2D");
+        glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+        OGL_CHECK_ERROR("glPixelStorei");
 
         if (m_videowindow->getVideoCam()->getDevice()->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT))
         {
@@ -703,113 +703,112 @@ void CLGLRenderer::updateTexture()
             yuv2rgbBuffer.clear();
         }
 
-		/**/
-	}
+        /**/
+    }
 
-	//glDisable(GL_TEXTURE_2D);
-	m_videoTextureReady = true;
-	m_gotnewimage = false;
+    //glDisable(GL_TEXTURE_2D);
+    m_videoTextureReady = true;
+    m_gotnewimage = false;
 
-	/*
-	if (!isSoftYuv2Rgb)
-	{
-		glActiveTexture(GL_TEXTURE0);glDisable (GL_TEXTURE_2D);
-		glActiveTexture(GL_TEXTURE1);glDisable (GL_TEXTURE_2D);
-		glActiveTexture(GL_TEXTURE2);glDisable (GL_TEXTURE_2D);
-	}
-	*/
+    /*
+    if (!isSoftYuv2Rgb)
+    {
+        glActiveTexture(GL_TEXTURE0);glDisable (GL_TEXTURE_2D);
+        glActiveTexture(GL_TEXTURE1);glDisable (GL_TEXTURE_2D);
+        glActiveTexture(GL_TEXTURE2);glDisable (GL_TEXTURE_2D);
+    }
+    */
 
 }
 
 void CLGLRenderer::drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const float* v_array)
 {
 
-	float tx_array[8] = {m_videoCoeffL[0], 0.0f, 
-						m_videoCoeffW[0], 0.0f, 
-						m_videoCoeffW[0], m_videoCoeffH[0],
-						m_videoCoeffL[0], m_videoCoeffH[0]};
-						/**/
+    float tx_array[8] = {m_videoCoeffL[0], 0.0f,
+                        m_videoCoeffW[0], 0.0f,
+                        m_videoCoeffW[0], m_videoCoeffH[0],
+                        m_videoCoeffL[0], m_videoCoeffH[0]};
+                        /**/
 
-	/*
-	float tx_array[8] = {0.0f, 0.0f, 
-		m_videoCoeffW[0], 0.0f, 
-		m_videoCoeffW[0], m_videoCoeffH[0],
-		0.0f, m_videoCoeffH[0]};
-		/**/
-	glEnable(GL_TEXTURE_2D);
-	OGL_CHECK_ERROR("glEnable");
+    /*
+    float tx_array[8] = {0.0f, 0.0f,
+        m_videoCoeffW[0], 0.0f,
+        m_videoCoeffW[0], m_videoCoeffH[0],
+        0.0f, m_videoCoeffH[0]};
+        */
+    glEnable(GL_TEXTURE_2D);
+    OGL_CHECK_ERROR("glEnable");
 
 
-	if (!isSoftYuv2Rgb && isYuvFormat()) 
-	{
+    if (!isSoftYuv2Rgb && isYuvFormat())
+    {
 
-		const Program prog =  YV12toRGB ;
+        const Program prog =  YV12toRGB ;
 
-		glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, m_program[prog]);
-		OGL_CHECK_ERROR("glBindProgramARB");
-		//loading the parameters
-		glProgramLocalParameter4fARB(GL_FRAGMENT_PROGRAM_ARB, 0, m_brightness / 256.0f, m_contrast, cos(m_hue), sin(m_hue));
-		OGL_CHECK_ERROR("glProgramLocalParameter4fARB");
-		glProgramLocalParameter4fARB(GL_FRAGMENT_PROGRAM_ARB, 1, m_saturation, m_painterOpacity, 0.0f, 0.0f);
-		OGL_CHECK_ERROR("glProgramLocalParameter4fARB");
-		/**/
+        glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, m_program[prog]);
+        OGL_CHECK_ERROR("glBindProgramARB");
+        //loading the parameters
+        glProgramLocalParameter4fARB(GL_FRAGMENT_PROGRAM_ARB, 0, m_brightness / 256.0f, m_contrast, cos(m_hue), sin(m_hue));
+        OGL_CHECK_ERROR("glProgramLocalParameter4fARB");
+        glProgramLocalParameter4fARB(GL_FRAGMENT_PROGRAM_ARB, 1, m_saturation, m_painterOpacity, 0.0f, 0.0f);
+        OGL_CHECK_ERROR("glProgramLocalParameter4fARB");
 
-		glEnable(GL_FRAGMENT_PROGRAM_ARB);
-		OGL_CHECK_ERROR("glEnable");
+        glEnable(GL_FRAGMENT_PROGRAM_ARB);
+        OGL_CHECK_ERROR("glEnable");
 
-		glActiveTexture(GL_TEXTURE0);
-		OGL_CHECK_ERROR("glActiveTexture");
+        glActiveTexture(GL_TEXTURE0);
+        OGL_CHECK_ERROR("glActiveTexture");
 
-		glBindTexture(GL_TEXTURE_2D, tex0);
-		OGL_CHECK_ERROR("glBindTexture");
+        glBindTexture(GL_TEXTURE_2D, tex0);
+        OGL_CHECK_ERROR("glBindTexture");
 
-		if (YV12toRGB == prog) 
-		{
+        if (YV12toRGB == prog)
+        {
 
-			glActiveTexture(GL_TEXTURE1);
-			OGL_CHECK_ERROR("glActiveTexture");
-			/**/
-			glBindTexture(GL_TEXTURE_2D, tex1);
-			OGL_CHECK_ERROR("glBindTexture");
+            glActiveTexture(GL_TEXTURE1);
+            OGL_CHECK_ERROR("glActiveTexture");
+            /**/
+            glBindTexture(GL_TEXTURE_2D, tex1);
+            OGL_CHECK_ERROR("glBindTexture");
 
-			glActiveTexture(GL_TEXTURE2);
-			OGL_CHECK_ERROR("glActiveTexture");
-			/**/
-			glBindTexture(GL_TEXTURE_2D, tex2);
-			OGL_CHECK_ERROR("glBindTexture");
+            glActiveTexture(GL_TEXTURE2);
+            OGL_CHECK_ERROR("glActiveTexture");
+            /**/
+            glBindTexture(GL_TEXTURE_2D, tex2);
+            OGL_CHECK_ERROR("glBindTexture");
 
-		}
-		/**/
-	}
-	else 
-	{
-		glBindTexture(GL_TEXTURE_2D, tex0);
-		OGL_CHECK_ERROR("glBindTexture");
-	}
+        }
+        /**/
+    }
+    else
+    {
+        glBindTexture(GL_TEXTURE_2D, tex0);
+        OGL_CHECK_ERROR("glBindTexture");
+    }
 
-	glVertexPointer(2, GL_FLOAT, 0, v_array);
-	OGL_CHECK_ERROR("glVertexPointer");
-	glTexCoordPointer(2, GL_FLOAT, 0, tx_array);
-	OGL_CHECK_ERROR("glTexCoordPointer");
-	glEnableClientState(GL_VERTEX_ARRAY);
-	OGL_CHECK_ERROR("glEnableClientState");
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	OGL_CHECK_ERROR("glEnableClientState");
-	glDrawArrays(GL_QUADS, 0, 4);
-	OGL_CHECK_ERROR("glDrawArrays");
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	OGL_CHECK_ERROR("glDisableClientState");
-	glDisableClientState(GL_VERTEX_ARRAY);
-	OGL_CHECK_ERROR("glDisableClientState");
-	/**/
+    glVertexPointer(2, GL_FLOAT, 0, v_array);
+    OGL_CHECK_ERROR("glVertexPointer");
+    glTexCoordPointer(2, GL_FLOAT, 0, tx_array);
+    OGL_CHECK_ERROR("glTexCoordPointer");
+    glEnableClientState(GL_VERTEX_ARRAY);
+    OGL_CHECK_ERROR("glEnableClientState");
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    OGL_CHECK_ERROR("glEnableClientState");
+    glDrawArrays(GL_QUADS, 0, 4);
+    OGL_CHECK_ERROR("glDrawArrays");
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    OGL_CHECK_ERROR("glDisableClientState");
+    glDisableClientState(GL_VERTEX_ARRAY);
+    OGL_CHECK_ERROR("glDisableClientState");
+    /**/
 
-	if (!isSoftYuv2Rgb) 
-	{
-		glDisable(GL_FRAGMENT_PROGRAM_ARB);
-		OGL_CHECK_ERROR("glDisable");
-		glActiveTexture(GL_TEXTURE0);
-		OGL_CHECK_ERROR("glActiveTexture");
-	}
+    if (!isSoftYuv2Rgb)
+    {
+        glDisable(GL_FRAGMENT_PROGRAM_ARB);
+        OGL_CHECK_ERROR("glDisable");
+        glActiveTexture(GL_TEXTURE0);
+        OGL_CHECK_ERROR("glActiveTexture");
+    }
 
 }
 
@@ -819,8 +818,8 @@ bool CLGLRenderer::paintEvent(const QRect& r)
     glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	if (m_abort_drawing)
-		return true;
+    if (m_abort_drawing)
+        return true;
 
     if (!m_inited)
     {
@@ -828,47 +827,46 @@ bool CLGLRenderer::paintEvent(const QRect& r)
         m_inited = true;
     }
 
-	QMutexLocker locker(&m_mutex);
+    QMutexLocker locker(&m_mutex);
 
-	if (m_stride == 0)
-		return true;
+    if (m_stride == 0)
+        return true;
 
-	bool draw = (m_width <= getMaxTextureSize()) && (m_height <= getMaxTextureSize());
+    bool draw = (m_width <= getMaxTextureSize()) && (m_height <= getMaxTextureSize());
 
-	if (draw)
-	{
-			if (m_gotnewimage)	updateTexture();
+    if (draw)
+    {
+        if (m_gotnewimage)    updateTexture();
 
-			//m_painterOpacity = 0.3;
-            //m_painterOpacity = 1.0;
-			QRect temp;
-			//QRect r(0,0,m_videowindow->width(),m_videowindow->height());
-			float sar = 1.0f;
+        //m_painterOpacity = 0.3;
+        //m_painterOpacity = 1.0;
+        QRect temp;
+        //QRect r(0,0,m_videowindow->width(),m_videowindow->height());
+        //float sar = 1.0f;
 
-			temp.setLeft(r.left());	temp.setTop(r.top());
-			temp.setWidth(r.width());
-			temp.setHeight(r.height());
+        temp.setLeft(r.left());    temp.setTop(r.top());
+        temp.setWidth(r.width());
+        temp.setHeight(r.height());
 
-			//getTextureRect(temp, m_stride, m_height, r.width(), r.height(), sar);
+        //getTextureRect(temp, m_stride, m_height, r.width(), r.height(), sar);
 
-			const float v_array[] = { temp.left(), temp.top(), temp.right()+1, temp.top(), temp.right()+1, temp.bottom()+1, temp.left(), temp.bottom()+1 };
-			drawVideoTexture(m_texture[0], m_texture[1], m_texture[2], v_array);
-			/**/
-	}
-	else
-	{
-		draw = draw;
-	}
+        const float v_array[] = { temp.left(), temp.top(), temp.right()+1, temp.top(), temp.right()+1, temp.bottom()+1, temp.left(), temp.bottom()+1 };
+        drawVideoTexture(m_texture[0], m_texture[1], m_texture[2], v_array);
+    }
+    else
+    {
+        draw = draw;
+    }
 
-	m_waitCon.wakeOne();
-	m_do_not_need_to_wait_any_more = true;
+    m_waitCon.wakeOne();
+    m_do_not_need_to_wait_any_more = true;
 
-	return draw;
+    return draw;
 }
 
 QSize CLGLRenderer::sizeOnScreen(unsigned int channel) const
 {
-	return m_videowindow->sizeOnScreen(channel);
+    return m_videowindow->sizeOnScreen(channel);
 }
 
 bool CLGLRenderer::constantDownscaleFactor() const
