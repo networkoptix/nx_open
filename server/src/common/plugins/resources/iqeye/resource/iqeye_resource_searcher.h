@@ -1,10 +1,11 @@
 #ifndef iqeye_device_server_h_2054
 #define iqeye_device_server_h_2054
 
-#include "resourcecontrol/resourceserver.h"
+
+#include "resourcecontrol/abstract_resource_searcher.h"
 
 
-class IQEyeDeviceServer : public CLDeviceServer
+class IQEyeDeviceServer : public QnAbstractNetworkResourceSearcher
 {
 	IQEyeDeviceServer();
 public:
@@ -13,12 +14,14 @@ public:
 
 	static IQEyeDeviceServer& instance();
 
-	virtual bool isProxy() const;
+
 	// return the name of the server 
 	virtual QString name() const;
 
 	// returns all available devices 
     virtual QnResourceList findDevices();
+
+    virtual QnResource* checkHostAddr(QHostAddress addr);
 
 private:
 

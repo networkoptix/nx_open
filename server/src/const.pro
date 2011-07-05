@@ -7,6 +7,7 @@ ICON = eve_logo.icns
 QMAKE_INFO_PLIST = Info.plist
 
 INCLUDEPATH += ./common/core
+INCLUDEPATH += ./common/plugins
 INCLUDEPATH += ./common/utils
 
 TARGET = server

@@ -53,10 +53,6 @@ IQEyeDeviceServer& IQEyeDeviceServer::instance()
     return inst;
 }
 
-bool IQEyeDeviceServer::isProxy() const
-{
-    return false;
-}
 
 QString IQEyeDeviceServer::name() const
 {
@@ -79,4 +75,9 @@ QnResourceList IQEyeDeviceServer::findDevices()
     }
 
     return lst;
+}
+
+QnResource* IQEyeDeviceServer::checkHostAddr(QHostAddress addr)
+{
+    return 0;
 }

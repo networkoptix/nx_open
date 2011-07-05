@@ -1,7 +1,7 @@
 #include "asynch_seacher.h"
 #include "resource/network_resource.h"
-#include "resourceserver.h"
 #include "settings.h"
+#include "abstract_resource_searcher.h"
 
 CLDeviceSearcher::CLDeviceSearcher()
 {
@@ -13,7 +13,7 @@ CLDeviceSearcher::~CLDeviceSearcher()
 	wait();
 }
 
-void CLDeviceSearcher::addDeviceServer(CLDeviceServer* serv)
+void CLDeviceSearcher::addDeviceServer(QnAbstractResourceSearcher* serv)
 {
 	QMutexLocker lock(&m_servers_mtx);
 	m_servers.push_back(serv);
@@ -65,7 +65,7 @@ QnResourceList CLDeviceSearcher::findNewDevices(bool& ip_finished)
 		QMutexLocker lock(&m_servers_mtx);
 		for (int i = 0; i < m_servers.size(); ++i)
 		{
-			CLDeviceServer* serv = m_servers.at(i);
+			QnAbstractResourceSearcher* serv = m_servers.at(i);
 			QnResourceList temp = serv->findDevices();
 			QnResource::mergeLists(devices, temp);
 		}

@@ -1,11 +1,12 @@
 #ifndef android_device_server_h_2054
 #define android_device_server_h_2054
 
-#include "resourcecontrol/resourceserver.h"
+
+#include "resourcecontrol/abstract_resource_searcher.h"
 
 
 
-class AndroidDeviceServer : public CLDeviceServer
+class AndroidDeviceServer : public QnAbstractNetworkResourceSearcher
 {
 	AndroidDeviceServer();
 public:
@@ -14,12 +15,14 @@ public:
 
 	static AndroidDeviceServer& instance();
 
-	virtual bool isProxy() const;
+
 	// return the name of the server 
 	virtual QString name() const;
 
 	// returns all available devices 
     virtual QnResourceList findDevices();
+
+    QnResource* checkHostAddr(QHostAddress addr);
 
 private:
 

@@ -1,35 +1,31 @@
 #include "directory_browser.h"
 #include "resource/file_resource.h"
-#include "plugins/resources/archive/avi_files/avi_resource.h"
-#include "plugins/resources/archive/filetypesupport.h"
+#include "resources/archive/avi_files/avi_resource.h"
+#include "resources/archive/filetypesupport.h"
+#include "resources/archive/avi_files/avi_dvd_resource.h"
+#include "resources/archive/avi_files/avi_bluray_resource.h"
 
 
 
-CLDeviceDirectoryBrowser::CLDeviceDirectoryBrowser():
-mNeedStop(false)
+QnResourceDirectoryBrowser::QnResourceDirectoryBrowser()
 {
 
 }
 
-CLDeviceDirectoryBrowser::~CLDeviceDirectoryBrowser()
+QnResourceDirectoryBrowser::~QnResourceDirectoryBrowser()
 {
-    mNeedStop = true;
-    wait();
 }
 
-void CLDeviceDirectoryBrowser::setDirList(QStringList& dirs)
+
+QString QnResourceDirectoryBrowser::name() const
 {
-    mDirsToCheck = dirs;
+    return "DirectoryBrowser";
 }
 
-QnResourceList CLDeviceDirectoryBrowser::result()
-{
-    return mResult;
-}
-
-void CLDeviceDirectoryBrowser::run()
+QnResourceList QnResourceDirectoryBrowser::findDevices()
 {
 
+    QThread::Priority old_priority = QThread::currentThread()->priority();
     QThread::currentThread()->setPriority(QThread::IdlePriority);
 
     cl_log.log("Browsing directories....", cl_logALWAYS);
@@ -38,13 +34,10 @@ void CLDeviceDirectoryBrowser::run()
     time.restart();
 
 
+    QnResourceList result;
 
 
-    mNeedStop = false;
-    mResult.clear();
-
-
-    foreach(QString dir, mDirsToCheck)
+    foreach(QString dir, m_PathListToCheck)
     {
         dir += "/";
 
@@ -54,17 +47,44 @@ void CLDeviceDirectoryBrowser::run()
 
         foreach(QnResource* dev, dev_lst)
         {
-            mResult[dev->getUniqueId()] = dev;
+            result[dev->getUniqueId()] = dev;
         }
+
+        if (shouldStop())
+            return result;
+
 
     }
 
     cl_log.log("Done(Browsing directories). Time elapsed =  ", time.elapsed(), cl_logALWAYS);
+
+    QThread::currentThread()->setPriority(old_priority);
+
+    return result;    
+}
+
+QnResource* QnResourceDirectoryBrowser::checkFile(const QString& filename)
+{
+    FileTypeSupport fileTypeSupport;
+
+
+    if (fileTypeSupport.isImageFileExt(filename))
+        return new CLFileDevice(filename);
+
+    if (CLAviDvdDevice::isAcceptedUrl(filename))
+        return new CLAviDvdDevice(filename);
     
+    if (CLAviBluRayDevice::isAcceptedUrl(filename))
+        return new CLAviBluRayDevice(filename);
+
+    if (fileTypeSupport.isMovieFileExt(filename))
+        return new CLAviDevice(filename);
+
+    return 0;
 }
 
 //=============================================================================================
-QnResourceList CLDeviceDirectoryBrowser::findDevices(const QString& directory)
+QnResourceList QnResourceDirectoryBrowser::findDevices(const QString& directory)
 {
 
     cl_log.log("Checking ", directory,   cl_logALWAYS);
@@ -73,7 +93,7 @@ QnResourceList CLDeviceDirectoryBrowser::findDevices(const QString& directory)
 
     QnResourceList result;
 
-    if (mNeedStop)
+    if (shouldStop())
         return result;
 
     QDir dir(directory);
@@ -122,7 +142,7 @@ QnResourceList CLDeviceDirectoryBrowser::findDevices(const QString& directory)
 }
 
 //=============================================================================================
-QStringList CLDeviceDirectoryBrowser::subDirList(const QString& abspath)
+QStringList QnResourceDirectoryBrowser::subDirList(const QString& abspath)
 {
     QStringList result;
 

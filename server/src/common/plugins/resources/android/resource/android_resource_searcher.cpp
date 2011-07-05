@@ -1,6 +1,6 @@
 #include "android_resource_searcher.h"
 #include "network/simple_http_client.h"
-#include "resourcecontrol/resource_manager.h"
+#include "resourcecontrol/resource_pool.h"
 #include "android_resource.h"
 
 AndroidDeviceServer::AndroidDeviceServer()
@@ -19,10 +19,6 @@ AndroidDeviceServer& AndroidDeviceServer::instance()
     return inst;
 }
 
-bool AndroidDeviceServer::isProxy() const
-{
-    return false;
-}
 
 QString AndroidDeviceServer::name() const
 {
@@ -91,7 +87,8 @@ QnResourceList AndroidDeviceServer::findDevices()
 
         while(curr <= max_ip)
         {
-            CLNetworkDevice* nd = CLDeviceManager::instance().getDeviceByIp(QHostAddress(curr));
+            //CLNetworkDevice* nd = QnResourcePool::instance().getDeviceByIp(QHostAddress(curr)); // tyty
+            CLNetworkDevice* nd;
             if (nd)
             {
                 // such dev alredy exists;
@@ -135,4 +132,9 @@ QnResourceList AndroidDeviceServer::findDevices()
 
 
     return lst;
+}
+
+QnResource* AndroidDeviceServer::checkHostAddr(QHostAddress addr)
+{
+    return 0;
 }

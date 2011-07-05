@@ -1,10 +1,10 @@
 #ifndef avigilon_device_server_h_1809
 #define avigilon_device_server_h_1809
 
-#include "resourcecontrol/resourceserver.h"
+#include "resourcecontrol/abstract_resource_searcher.h"
 
 
-class AVigilonDeviceServer : public CLDeviceServer
+class AVigilonDeviceServer : public QnAbstractNetworkResourceSearcher
 {
 	AVigilonDeviceServer();
 public:
@@ -13,12 +13,14 @@ public:
 
 	static AVigilonDeviceServer& instance();
 
-	virtual bool isProxy() const;
+
 	// return the name of the server 
 	virtual QString name() const;
 
 	// returns all available devices 
     virtual QnResourceList findDevices();
+
+    virtual QnResource* checkHostAddr(QHostAddress addr);
 
 private:
 

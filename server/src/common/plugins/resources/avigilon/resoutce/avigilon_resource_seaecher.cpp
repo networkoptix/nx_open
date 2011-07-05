@@ -52,10 +52,6 @@ AVigilonDeviceServer& AVigilonDeviceServer::instance()
     return inst;
 }
 
-bool AVigilonDeviceServer::isProxy() const
-{
-    return false;
-}
 
 QString AVigilonDeviceServer::name() const
 {
@@ -86,4 +82,9 @@ QnResourceList AVigilonDeviceServer::findDevices()
     }
 
     return lst;
+}
+
+QnResource* AVigilonDeviceServer::checkHostAddr(QHostAddress addr)
+{
+    return 0;
 }

@@ -1,5 +1,5 @@
 #include "single_shot_file_dataprovider.h"
-#include "plugins/resources/archive/filetypesupport.h"
+#include "resources/archive/filetypesupport.h"
 #include "resource/file_resource.h"
 #include "common/bytearray.h"
 #include "datapacket/mediadatapacket.h"

@@ -1,16 +1,17 @@
 #include "common/log.h"
 #include "resource/resource.h"
-#include "plugins/resources/avigilon/resoutce/avigilon_resource_seaecher.h"
-#include "resourcecontrol/resource_manager.h"
-#include "plugins/resources/arecontvision/resource/av_resource_searcher.h"
-#include "plugins/resources/iqeye/resource/iqeye_resource_searcher.h"
-#include "plugins/resources/android/resource/android_resource_searcher.h"
+#include "resources/avigilon/resoutce/avigilon_resource_seaecher.h"
+#include "resourcecontrol/resource_pool.h"
+#include "resources/arecontvision/resource/av_resource_searcher.h"
+#include "resources/iqeye/resource/iqeye_resource_searcher.h"
+#include "resources/android/resource/android_resource_searcher.h"
 #include "datapacket/mediadatapacket.h"
 #include "common/base.h"
 
  
 int main(int argc, char *argv[])
 {
+
     QCoreApplication app(argc, argv);
 
     QDir::setCurrent(QFileInfo(argv[0]).absolutePath());
@@ -42,7 +43,7 @@ int main(int argc, char *argv[])
 
 	QnResource::startCommandProc();
 
-	CLDeviceManager::instance(); // to initialize net state;
+	QnResourcePool::instance(); // to initialize net state;
 
 	//===========================================================================
 	//IPPH264Decoder::dll.init();
@@ -50,10 +51,10 @@ int main(int argc, char *argv[])
 
 
 	//============================
-	CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&AVDeviceServer::instance());
-    CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&AVigilonDeviceServer::instance());
-    CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&AndroidDeviceServer::instance());
-    CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&IQEyeDeviceServer::instance());
+	//QnResourcePool::instance().getDeviceSearcher().addDeviceServer(&QnPlArecontResourceSearcher::instance());
+    //QnResourcePool::instance().getDeviceSearcher().addDeviceServer(&AVigilonDeviceServer::instance());
+    //QnResourcePool::instance().getDeviceSearcher().addDeviceServer(&AndroidDeviceServer::instance());
+    //QnResourcePool::instance().getDeviceSearcher().addDeviceServer(&IQEyeDeviceServer::instance());
 
 	//=========================================================
     app.exec();

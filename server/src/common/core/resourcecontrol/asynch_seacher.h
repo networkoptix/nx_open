@@ -7,14 +7,14 @@
 
 
 
-class CLDeviceServer;
+class QnAbstractResourceSearcher;
 
 // this class just searches for new devices
 // it uses others proxy
 // it will be moved to recorder I guess 
 class CLDeviceSearcher : public QThread
 {
-	typedef QList<CLDeviceServer*> ServerList;
+	typedef QList<QnAbstractResourceSearcher*> ServerList;
 
 public:
 	CLDeviceSearcher();
@@ -22,7 +22,7 @@ public:
 
 	// this function returns only new devices( not in all_devices list);
 	QnResourceList result();
-	void addDeviceServer(CLDeviceServer* serv);
+	void addDeviceServer(QnAbstractResourceSearcher* serv);
 
 	QnResourceList& getAllDevices()
 	{

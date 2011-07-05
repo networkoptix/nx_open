@@ -3,7 +3,7 @@
 #include "../tools/AVJpegHeader.h"
 
 
-AVDeviceServer::AVDeviceServer()
+QnPlArecontResourceSearcher::QnPlArecontResourceSearcher()
 {
 	// everything related to Arecont must be initialized here
 	AVJpeg::Header::Initialize("ArecontVision", "CamLabs", "ArecontVision");
@@ -33,24 +33,25 @@ AVDeviceServer::AVDeviceServer()
 
 }
 
-bool AVDeviceServer::isProxy() const
-{
-	return false; // this not actualy a server; this is just a cameras
-}
 
-QString AVDeviceServer::name() const
+QString QnPlArecontResourceSearcher::name() const
 {
 	return "Arecont Vision";
 }
 
 // returns all available devices 
-QnResourceList AVDeviceServer::findDevices()
+QnResourceList QnPlArecontResourceSearcher::findDevices()
 {
 	return QnPlAreconVisionDevice::findDevices();
 }
 
-AVDeviceServer& AVDeviceServer::instance()
+QnPlArecontResourceSearcher& QnPlArecontResourceSearcher::instance()
 {
-	static AVDeviceServer inst;
+	static QnPlArecontResourceSearcher inst;
 	return inst;
+}
+
+QnResource* QnPlArecontResourceSearcher::checkHostAddr(QHostAddress addr)
+{
+    return 0;
 }
