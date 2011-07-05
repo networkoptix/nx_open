@@ -92,7 +92,7 @@ QnResourceList AndroidDeviceServer::findDevices()
             if (nd)
             {
                 // such dev alredy exists;
-                nd->releaseRef();
+                //nd->releaseRef();
                 ++curr;
                 continue;
             }

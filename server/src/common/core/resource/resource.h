@@ -42,7 +42,7 @@ class QnVideoResoutceLayout;
 class QnResource;
 typedef QMap<QString, QnResource*>  QnResourceList;
 
-class QnResource : public CLRefCounter
+class QnResource
 {
 public:
 	enum {NETWORK = 0x00000001, NVR = 0x00000002, SINGLE_SHOT = 0x00000004, ARCHIVE = 0x00000008, RECORDED = 0x00000010};

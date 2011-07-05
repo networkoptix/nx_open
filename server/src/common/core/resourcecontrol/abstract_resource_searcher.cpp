@@ -41,10 +41,10 @@ bool QnAbstractResourceSearcher::shouldStop() const
 
 void QnAbstractFileResourceSearcher::setPathCheckList(const QStringList& paths)
 {
-    m_PathListToCheck = paths;
+    m_pathListToCheck = paths;
 }
 
 void QnAbstractFileResourceSearcher::clearPathCheckList()
 {
-    m_PathListToCheck.clear();
+    m_pathListToCheck.clear();
 }

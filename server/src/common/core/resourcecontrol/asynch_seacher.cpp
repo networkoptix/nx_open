@@ -111,7 +111,7 @@ QnResourceList CLDeviceSearcher::findNewDevices(bool& ip_finished)
 				}
 
 				//delete it.value(); //here+
-				it.value()->releaseRef();
+				//it.value()->releaseRef();
 				devices.erase(it++);
 			}
 			else
@@ -457,7 +457,7 @@ QnResourceList CLDeviceSearcher::resolveUnknown_helper(QnResourceList& lst)
 		{
 			// device updated
 			result[new_device->getUniqueId()] = new_device;
-			device->releaseRef();
+			//device->releaseRef();
 		}
 		else
 		{

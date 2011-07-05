@@ -22,6 +22,12 @@ QString QnResourceDirectoryBrowser::name() const
     return "DirectoryBrowser";
 }
 
+QnResourceDirectoryBrowser& QnResourceDirectoryBrowser::instance()
+{
+    static QnResourceDirectoryBrowser inst;
+    return inst;
+}
+
 QnResourceList QnResourceDirectoryBrowser::findDevices()
 {
 
@@ -37,7 +43,7 @@ QnResourceList QnResourceDirectoryBrowser::findDevices()
     QnResourceList result;
 
 
-    foreach(QString dir, m_PathListToCheck)
+    foreach(QString dir, m_pathListToCheck)
     {
         dir += "/";
 

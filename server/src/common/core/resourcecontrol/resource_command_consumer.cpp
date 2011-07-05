@@ -6,12 +6,12 @@
 QnResourceCommand::QnResourceCommand(QnResource* device):
 m_device(device)
 {
-	m_device->addRef();
+
 }
 
 QnResourceCommand::~QnResourceCommand()
 {
-	m_device->releaseRef();
+
 };
 
 QnResource* QnResourceCommand::getDevice() const

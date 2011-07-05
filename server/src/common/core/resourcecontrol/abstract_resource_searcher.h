@@ -63,7 +63,7 @@ public:
     virtual QnResource* checkFile(const QString& filename) = 0;
 
 protected:
-    QStringList m_PathListToCheck;
+    QStringList m_pathListToCheck;
 };
 
 

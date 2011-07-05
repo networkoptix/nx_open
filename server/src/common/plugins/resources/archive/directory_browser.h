@@ -11,17 +11,17 @@ class QnResourceDirectoryBrowser : public QnAbstractFileResourceSearcher
 {
     QnResourceDirectoryBrowser();
 public:
-	
 	virtual ~QnResourceDirectoryBrowser();
+
+    static QnResourceDirectoryBrowser& instance();
 
     virtual QString name() const;
     virtual QnResourceList findDevices();
 
-    // creates an instance of proper resource fro file 
+    // creates an instance of proper resource from file 
     virtual QnResource* checkFile(const QString& filename);
 
 protected:
-    void run();
     QnResourceList findDevices(const QString& directory);
 private:
     static QStringList subDirList(const QString& abspath);

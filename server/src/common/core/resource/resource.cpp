@@ -156,7 +156,7 @@ void QnResource::mergeLists(QnResourceList& first, QnResourceList second)
 		else
 		{
 			//delete its.value(); // here+
-			its.value()->releaseRef();
+			//its.value()->releaseRef();
 			second.erase(its++);
 		}
 	}
@@ -169,7 +169,7 @@ void QnResource::deleteDevices(QnResourceList& lst)
 	{
 		QnResource* device = it.value();
 		//delete device; //here+
-		device->releaseRef(); 
+		//device->releaseRef(); 
 		//lst.erase(it++);
 
 		++it;
@@ -183,7 +183,7 @@ void QnResource::addReferences(QnResourceList& lst)
 	while (it!=lst.end())
 	{
 		QnResource* device = it.value();
-		device->addRef();
+		//device->addRef();
 		++it;
 	}
 
