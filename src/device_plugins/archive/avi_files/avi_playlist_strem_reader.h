@@ -34,6 +34,9 @@ protected:
     virtual bool switchToFile(int newFileIndex);
     virtual ByteIOContext* getIOContext();
     virtual qint32 readPacket(quint8* buf, int size);
+    
+    // seek to specified position. If functionis not implemeted, ffmpeg seek method is used (may be more slow)
+    virtual bool directSeekToPosition(qint64 pos_mks) { return false;}
 
     virtual void fillAdditionalInfo(CLFileInfo* fi) {}
 protected:
@@ -42,6 +45,7 @@ protected:
     int m_currentFileIndex;
     QVector<CLFileInfo*> m_fileList;   
     bool m_initialized;             // file list has been built
+    bool m_inSeek;
 private:
     friend class CLAVIPlaylistStreamReaderPriv;
     qint32 writePacket(quint8* buf, int size);
@@ -49,7 +53,6 @@ private:
     qint64 findFileIndexByTime(quint64 mksec);
 private:
     QFile m_currentFile;            
-    bool m_inSeek;
 };
 
 #endif __AVI_PLAYLIST_STREAM_READER_H

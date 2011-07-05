@@ -3,6 +3,12 @@
 #include "avi_playlist_strem_reader.h"
 #include "device/device.h"
 
+extern "C" 
+{
+    // this function placed at <libavformat/internal.h> header
+    void ff_read_frame_flush(AVFormatContext *s);
+};
+
 extern QMutex global_ffmpeg_mutex;
 static const int IO_BLOCK_SIZE = 1024 * 32;
 
@@ -142,11 +148,18 @@ void CLAVIPlaylistStreamReader::channeljumpTo(quint64 mksec, int )
     }
     int rez;
     m_inSeek = true;
+    if (directSeekToPosition(relativeMksec))
+    {
+        ff_read_frame_flush(m_formatContext); 
+    }
+    else 
+    {
 #ifdef _WIN32
-    rez = avformat_seek_file(m_formatContext, -1, 0, relativeMksec, _I64_MAX, AVSEEK_FLAG_BACKWARD);
+        rez = avformat_seek_file(m_formatContext, -1, 0, relativeMksec, _I64_MAX, AVSEEK_FLAG_BACKWARD);
 #else
-    rez = avformat_seek_file(m_formatContext, -1, 0, relativeMksec, LLONG_MAX, AVSEEK_FLAG_BACKWARD);
+        rez = avformat_seek_file(m_formatContext, -1, 0, relativeMksec, LLONG_MAX, AVSEEK_FLAG_BACKWARD);
 #endif
+    }
     m_inSeek = false;
     m_needToSleep = 0;
     m_previousTime = -1;

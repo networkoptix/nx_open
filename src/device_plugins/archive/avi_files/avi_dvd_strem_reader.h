@@ -5,6 +5,7 @@
 #include <QFile>
 
 #include "avi_playlist_strem_reader.h"
+#include "base/dvd_reader/ifo_read.h"
 
 struct dvd_reader_t;
 
@@ -21,10 +22,13 @@ protected:
     virtual bool switchToFile(int newFileIndex);
     virtual qint32 readPacket(quint8* buf, int size);
     virtual void fillAdditionalInfo(CLFileInfo* fi);
+    virtual bool directSeekToPosition(qint64 pos_mks);
 private:
     friend class CLAVIDvdStreamReaderPriv;
     qint64 seek(qint64 offset, qint32 whence);
     qint32 writePacket(quint8* buf, int size);
+    qint64 packetTimestamp(AVStream* stream, const AVPacket& packet);
+    qint64 findFirstDts(quint8* buffer, int bufSize);
 private:
     int m_chapter;
     dvd_reader_t* m_dvdReader;
@@ -35,6 +39,7 @@ private:
     int m_tmpBufferSize;
     //qint64 m_currentFileSize;
     qint64 m_currentPosition;
+    ifo_handle_t* m_mainIfo;
 };
 
 #endif __AVI_DVD_STREAM_READER_H

@@ -556,7 +556,7 @@ QStringList CLAVIStreamReader::getAudioTracksInfo() const
 
             //str += QString::number(codecContext->sample_rate / 1000)+ "Khz ";
             if (codecContext->channels == 3)
-                str += "3.1";
+                str += "2.1";
             else if (codecContext->channels == 6)
                 str += "5.1";
             else if (codecContext->channels == 8)
