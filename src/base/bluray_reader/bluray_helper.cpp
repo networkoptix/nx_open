@@ -50,10 +50,10 @@ BluRayCoarseInfo::BluRayCoarseInfo(quint32 coarsePts, quint32 fineRefID, quint32
 
 // --------------------- PMTStreamInfo ----------------------
 
-PMTStreamInfo::PMTStreamInfo():
+PMTStreamInfo::PMTStreamInfo() :
     m_streamType(0), 
+    m_pid(0),
     m_esInfoLen(0), 
-    m_pid(0), 
     m_pmtPID(-1), 
     m_priorityStream(false), 
     m_isSecondary(false) 
@@ -131,51 +131,56 @@ void CLPIStreamInfo::composeISRC(BitStreamWriter& writer) const
 
 void CLPIStreamInfo::parseStreamCodingInfo(BitStreamReader& reader)
 {
-	int length = reader.getBits(8);
-	m_stream_coding_type = reader.getBits(8);
+    int length = reader.getBits(8);
+    Q_UNUSED(length);
+    m_stream_coding_type = reader.getBits(8);
 
-	if (m_stream_coding_type==0x02 || m_stream_coding_type==0x1B || m_stream_coding_type==0xEA) 
+    if (m_stream_coding_type==0x02 || m_stream_coding_type==0x1B || m_stream_coding_type==0xEA)
     {
-		m_video_format  = reader.getBits(4);
-		m_frame_rate_index = reader.getBits(4);
-		m_aspect_ratio_index = reader.getBits(4);
-		reader.skipBits(2); //reserved_for_future_use 2 bslbf
-		bool cc_flag  = reader.getBit();
-	    reader.skipBits(17); // reserved_for_future_use 17 bslbf
-		ISRC(reader);
-		reader.skipBits(32); // reserved_for_future_use 32 bslbf
-	} else if (m_stream_coding_type==0x80 || m_stream_coding_type==0x81 ||
-		       m_stream_coding_type==0x82 || m_stream_coding_type==0x83 ||
-			   m_stream_coding_type==0x84 || m_stream_coding_type==0x85 ||
-			   m_stream_coding_type==0x86 || m_stream_coding_type==0xA1 ||
-			   m_stream_coding_type==0xA2) 
-    { 
-		m_audio_presentation_type  = reader.getBits(4);
-		m_sampling_frequency_index  = reader.getBits(4);
-		readString(m_language_code, reader, 3);
-		ISRC(reader);
-		reader.skipBits(32);
-	} else if (m_stream_coding_type==0x90) {
-		// Presentation Graphics stream
-		readString(m_language_code, reader, 3);
-		reader.skipBits(8); // reserved_for_future_use 8 bslbf
-		ISRC(reader);
-		reader.skipBits(32); // reserved_for_future_use 32 bslbf
-	} else if (m_stream_coding_type==0x91) 
+        m_video_format  = reader.getBits(4);
+        m_frame_rate_index = reader.getBits(4);
+        m_aspect_ratio_index = reader.getBits(4);
+        reader.skipBits(2); //reserved_for_future_use 2 bslbf
+        bool cc_flag  = reader.getBit();
+        Q_UNUSED(cc_flag);
+        reader.skipBits(17); // reserved_for_future_use 17 bslbf
+        ISRC(reader);
+        reader.skipBits(32); // reserved_for_future_use 32 bslbf
+    } else if (m_stream_coding_type==0x80 || m_stream_coding_type==0x81 ||
+               m_stream_coding_type==0x82 || m_stream_coding_type==0x83 ||
+               m_stream_coding_type==0x84 || m_stream_coding_type==0x85 ||
+               m_stream_coding_type==0x86 || m_stream_coding_type==0xA1 ||
+               m_stream_coding_type==0xA2)
     {
-		// Interactive Graphics stream
-		readString(m_language_code, reader, 3);
-		reader.skipBits(8); //reserved_for_future_use 8 bslbf
-		ISRC(reader);
-		reader.skipBits(32); // reserved_for_future_use 32 bslbf
-	} else if (m_stream_coding_type==0x92) 
+        m_audio_presentation_type  = reader.getBits(4);
+        m_sampling_frequency_index  = reader.getBits(4);
+        readString(m_language_code, reader, 3);
+        ISRC(reader);
+        reader.skipBits(32);
+    }
+    else if (m_stream_coding_type==0x90) {
+        // Presentation Graphics stream
+        readString(m_language_code, reader, 3);
+        reader.skipBits(8); // reserved_for_future_use 8 bslbf
+        ISRC(reader);
+        reader.skipBits(32); // reserved_for_future_use 32 bslbf
+    }
+    else if (m_stream_coding_type==0x91)
     {
-		// Text subtitle stream
-		m_character_code = reader.getBits(8);
-		readString(m_language_code, reader, 3);
-		ISRC(reader);
-		reader.skipBits(32); // reserved_for_future_use 32 bslbf
-	}
+        // Interactive Graphics stream
+        readString(m_language_code, reader, 3);
+        reader.skipBits(8); //reserved_for_future_use 8 bslbf
+        ISRC(reader);
+        reader.skipBits(32); // reserved_for_future_use 32 bslbf
+    }
+    else if (m_stream_coding_type==0x92)
+    {
+        // Text subtitle stream
+        m_character_code = reader.getBits(8);
+        readString(m_language_code, reader, 3);
+        ISRC(reader);
+        reader.skipBits(32); // reserved_for_future_use 32 bslbf
+    }
 }
 
 void CLPIStreamInfo::composeStreamCodingInfo(BitStreamWriter& writer) const
@@ -236,7 +241,8 @@ void CLPIParser::parseProgramInfo(quint8* buffer, quint8* end)
 	BitStreamReader reader;
 	reader.setBuffer(buffer, end);
 	quint32 length = reader.getBits(32);
-	reader.skipBits(8); // reserved
+    Q_UNUSED(length);
+    reader.skipBits(8); // reserved
 	quint8 number_of_program_sequences = reader.getBits(8);
 	for (int i=0; i < number_of_program_sequences; i++) 
     {
@@ -284,8 +290,10 @@ void CLPIParser::composeProgramInfo(BitStreamWriter& writer)
 void CLPIParser::TS_type_info_block(BitStreamReader& reader) 
 {
 	quint16 length = reader.getBits(16);
-	quint8 Validity_flags  = reader.getBits(8); // 1000 0000b is tipical value
-	CLPIStreamInfo::readString(m_format_identifier, reader, 4);    // HDMV
+    Q_UNUSED(length);
+    quint8 Validity_flags  = reader.getBits(8); // 1000 0000b is tipical value
+    Q_UNUSED(Validity_flags);
+    CLPIStreamInfo::readString(m_format_identifier, reader, 4);    // HDMV
 	//Network_information 8*9 bslbf zerro
 	for (int i = 0; i < 9; i++)
 		reader.skipBits(8);
@@ -315,7 +323,8 @@ void CLPIParser::composeTS_type_info_block(BitStreamWriter& writer)
 void CLPIParser::parseClipInfo(BitStreamReader& reader)
 {
 	quint32 length = reader.getBits(32);
-	reader.skipBits(16); //reserved_for_future_use 16 bslbf
+    Q_UNUSED(length);
+    reader.skipBits(16); //reserved_for_future_use 16 bslbf
 	m_clip_stream_type = reader.getBits(8); // 1 - AV stream
 	m_application_type = reader.getBits(8); // 1 - Main TS for a main-path of Movie
 	reader.skipBits(31); //reserved_for_future_use 31 bslbf
@@ -375,18 +384,22 @@ void CLPIParser::parseSequenceInfo(quint8* buffer, quint8* end)
 	BitStreamReader reader;
 	reader.setBuffer(buffer, end);
 	quint32 length = reader.getBits(32);
-	reader.skipBits(8); //reserved_for_word_align 8 bslbf
+    Q_UNUSED(length);
+    reader.skipBits(8); //reserved_for_word_align 8 bslbf
 	quint8 number_of_ATC_sequences  = reader.getBits(8); // 1 is tipical value
 	for (int atc_id = 0; atc_id < number_of_ATC_sequences; atc_id++) 
 	{
 		quint32 SPN_ATC_start = reader.getBits(32); // 0 is tipical value
-		quint8 number_of_STC_sequences = reader.getBits(8);
+        Q_UNUSED(SPN_ATC_start);
+        quint8 number_of_STC_sequences = reader.getBits(8);
 		int offset_STC_id = reader.getBits(8); 
 		for (int stc_id=offset_STC_id; stc_id < number_of_STC_sequences + offset_STC_id; stc_id++) 
 		{
 			int PCR_PID = reader.getBits(16); 
-			quint32 SPN_STC_start = reader.getBits(32); 
-			m_presentation_start_time = reader.getBits(32); 
+            Q_UNUSED(PCR_PID);
+            quint32 SPN_STC_start = reader.getBits(32);
+            Q_UNUSED(SPN_STC_start);
+            m_presentation_start_time = reader.getBits(32);
 			m_presentation_end_time = reader.getBits(32); 
 		}
 	}
@@ -584,6 +597,7 @@ void CLPIParser::parseClipMark(quint8* buffer, quint8* end) {
 	BitStreamReader reader;
 	reader.setBuffer(buffer, end);
 	quint32 length = reader.getBits(32);
+    Q_UNUSED(length);
 }
 
 void CLPIParser::composeClipMark(BitStreamWriter& writer) 
@@ -612,7 +626,7 @@ bool CLPIParser::parse(const QString& fileName)
 	}
 }
 
-void CLPIParser::parseExtensionData(quint8* buffer, quint8* end)
+void CLPIParser::parseExtensionData(quint8* /*buffer*/, quint8* /*end*/)
 {
 }
 
@@ -721,6 +735,8 @@ void MPLSParser::parse(quint8* buffer, int len)
 		int playList_start_address = reader.getBits(32); 
 		int playListMark_start_address = reader.getBits(32);
 		int extensionData_start_address =  reader.getBits(32);
+		Q_UNUSED(extensionData_start_address);
+		
 		for (int i = 0; i < 5; i++)
 			reader.skipBits(32); //reserved_for_future_use 160 bslbf
 		AppInfoPlayList(reader);
@@ -819,7 +835,8 @@ int MPLSParser::compose(quint8* buffer, int bufferSize, MPLSParser::DiskType dt)
 void MPLSParser::AppInfoPlayList(BitStreamReader& reader) 
 {
 	quint32 length = reader.getBits(32);
-	reader.skipBits(8); //reserved_for_future_use 8 bslbf
+    Q_UNUSED(length);
+    reader.skipBits(8); //reserved_for_future_use 8 bslbf
 	m_PlayList_playback_type = reader.getBits(8); //8 bslbf
 	if (m_PlayList_playback_type==2 || m_PlayList_playback_type==3) { // 1 == Sequential playback of PlayItems
 		m_playback_count = reader.getBits(16); //16 uimsbf
@@ -954,7 +971,7 @@ void MPLSParser::composePlayList(BitStreamWriter& writer) {
 	*lengthPos = htonl(writer.getBitsCount()/8 - beforeCount);
 }
 
-void MPLSParser::composeSubPath(BitStreamWriter& writer, int playItemNum, QVector<PMTIndex>& pmtIndexList)
+void MPLSParser::composeSubPath(BitStreamWriter& writer, int /*playItemNum*/, QVector<PMTIndex>& pmtIndexList)
 {
 	quint32* lengthPos = (quint32*) (writer.getBuffer() + writer.getBitsCount()/8);
 	writer.putBits(32,0); // skip lengthField
@@ -1024,7 +1041,7 @@ void MPLSParser::composeSubPlayItem(BitStreamWriter& writer, int playItemNum, QV
 	*lengthPos = htons(writer.getBitsCount()/8 - beforeCount);
 }
 
-int MPLSParser::composePip_metadata(quint8* buffer, int bufferSize, int subPathId, QVector<PMTIndex>& pmtIndexList)
+int MPLSParser::composePip_metadata(quint8* buffer, int bufferSize, int /*subPathId*/, QVector<PMTIndex>& pmtIndexList)
 {
 	// The ID1 value and the ID2 value of the ExtensionData() shall be set to 0x0001 and 0x0001
 	BitStreamWriter writer;
@@ -1231,7 +1248,8 @@ void MPLSParser::parsePlayListMark(quint8* buffer, int len)
 	BitStreamReader reader;
 	reader.setBuffer(buffer, buffer + len);
 	quint32 length = reader.getBits(32); //
-	int number_of_PlayList_marks = reader.getBits(16); //16 uimsbf
+    Q_UNUSED(length);
+    int number_of_PlayList_marks = reader.getBits(16); //16 uimsbf
 	for(int PL_mark_id=0; PL_mark_id<number_of_PlayList_marks; PL_mark_id++) 
 	{
 		reader.skipBits(8); //reserved_for_future_use 8 bslbf
@@ -1240,7 +1258,9 @@ void MPLSParser::parsePlayListMark(quint8* buffer, int len)
 		quint32 mark_time_stamp = reader.getBits(32); //32 uimsbf
 		int entry_ES_PID = reader.getBits(16); //16 uimsbf
 		quint32 duration = reader.getBits(32); // 32 uimsbf
-		if (mark_type == 1) //mark_type 0x01 = Chapter search
+        Q_UNUSED(entry_ES_PID);
+        Q_UNUSED(duration);
+        if (mark_type == 1) //mark_type 0x01 = Chapter search
 			m_marks.push_back(PlayListMark(ref_to_PlayItem_id, mark_time_stamp));
 	}
 }
@@ -1271,7 +1291,7 @@ void MPLSParser::composePlayListMark(BitStreamWriter& writer)
 			m_marks.push_back(PlayListMark(-1, m_IN_time));
         }
 		else {
-			for (int i = m_IN_time; i < m_OUT_time; i += m_chapterLen*45000)
+			for (unsigned i = m_IN_time; i < m_OUT_time; i += m_chapterLen*45000)
 				m_marks.push_back(PlayListMark(-1,i));
 		}
 	}
@@ -1421,6 +1441,7 @@ void MPLSParser::composeSTN_table(BitStreamWriter& writer)
 void MPLSParser::STN_table(BitStreamReader& reader)
 {
 	int length = reader.getBits(16); //16 uimsbf
+    Q_UNUSED(length);
 	reader.skipBits(16); //reserved_for_future_use 16 bslbf
 	int number_of_primary_video_stream_entries = reader.getBits(8); //8 uimsbf
 	int number_of_primary_audio_stream_entries = reader.getBits(8); //8 uimsbf
@@ -1470,6 +1491,7 @@ void MPLSParser::STN_table(BitStreamReader& reader)
 		streamInfo.parseStreamAttributes(reader);
 		//comb_info_Secondary_audio_Primary_audio(){
 		int number_of_primary_audio_ref_entries = reader.getBits(8); //8 uimsbf
+        Q_UNUSED(number_of_primary_audio_ref_entries);
 		reader.skipBits(8); //reserved_for_word_align  8 bslbf
 		for (int i=0; i<number_of_primary_audio_ref_entries; i++) 
 			int primary_audio_stream_id_ref = reader.getBits(8); //8 uimsbf
@@ -1485,15 +1507,20 @@ void MPLSParser::STN_table(BitStreamReader& reader)
 		//comb_info_Secondary_video_Secondary_audio(){
 		int number_of_secondary_audio_ref_entries = reader.getBits(8); //8 uimsbf
 		reader.skipBits(8); //reserved_for_word_align 8 bslbf
-		for (int i=0; i<number_of_secondary_audio_ref_entries; i++) 
+
+        for (int i=0; i<number_of_secondary_audio_ref_entries; i++) {
 			int secondary_audio_stream_id_ref = reader.getBits(8); //8 uimsbf
+            Q_UNUSED(secondary_audio_stream_id_ref);
+        }
 		if (number_of_secondary_audio_ref_entries%2==1)
 			reader.skipBits(8); //reserved_for_word_align 8 bslbf
 		//comb_info_Secondary_video_PiP_PG_textST(){
 		int number_of_PiP_PG_textST_ref_entries = reader.getBits(8); //8 uimsbf
 		reader.skipBits(8); //reserved_for_word_align 8 bslbf
-		for (int i=0; i < number_of_PiP_PG_textST_ref_entries; i++) 
-			int PiP_PG_textST_stream_id_ref = reader.getBits(8); //8 uimsbf
+        for (int i=0; i < number_of_PiP_PG_textST_ref_entries; i++) {
+            int PiP_PG_textST_stream_id_ref = reader.getBits(8); //8 uimsbf
+            Q_UNUSED(PiP_PG_textST_stream_id_ref);
+        }
 		if (number_of_PiP_PG_textST_ref_entries%2==1)
 			reader.skipBits(8); //reserved_for_word_align 8 bslbf
 	}
@@ -1601,9 +1628,10 @@ MPLSStreamInfo::MPLSStreamInfo(const PMTStreamInfo& pmtStreamInfo):
 
 void MPLSStreamInfo::parseStreamEntry(BitStreamReader& reader) 
 {
-	int length = reader.getBits(8); //8 uimsbf
-	m_type = reader.getBits(8); //8 bslbf
-	if (m_type==1) 
+    int length = reader.getBits(8); //8 uimsbf
+    Q_UNUSED(length);
+    m_type = reader.getBits(8); //8 bslbf
+    if (m_type==1)
     {
 		m_ref_to_stream_PID_of_mainClip = reader.getBits(16); //16 uimsbf
 		reader.skipBits(32); //reserved_for_future_use 48 bslbf
@@ -1753,7 +1781,8 @@ void MovieObject::parse(quint8* buffer, int len)
 	CLPIStreamInfo::readString(m_type_indicator, reader, 4);
 	CLPIStreamInfo::readString(version_number, reader, 4);
 	quint32 ExtensionData_start_address = reader.getBits(32); //32 uimsbf
-	for (int i = 0; i < 7; i++)
+    Q_UNUSED(ExtensionData_start_address);
+    for (int i = 0; i < 7; i++)
 		reader.skipBits(32); //reserved_for_future_use 224 bslbf
 	parseMovieObjects(reader);
 	//for (int i=0; i<N1; i++) padding_word 16 bslbf
@@ -1834,15 +1863,15 @@ void MovieObject::parseNavigationCommand(BitStreamReader& reader)
 	*/
 
 	quint32 command = reader.getBits(32);
-	switch(command) 
+    switch(command)
     {
-		case 0x20010000:
-			cl_log.log("BDMO command: Goto (register arg)", cl_logDEBUG1);
-			break;	
-		case 0x20810000:
-			cl_log.log("BDMO command: Goto (const arg)", cl_logDEBUG1);
-			break;	
-	}
+        case 0x20010000:
+            cl_log.log("BDMO command: Goto (register arg)", cl_logDEBUG1);
+            break;
+        case 0x20810000:
+            cl_log.log("BDMO command: Goto (const arg)", cl_logDEBUG1);
+            break;
+    }
 
 	// operand destination 32 bits
 	// next syntax only if iFlag for operand == 0
@@ -1851,6 +1880,7 @@ void MovieObject::parseNavigationCommand(BitStreamReader& reader)
 	if (iFlag1 == 0) 
     {
 		bool reg_flag1 = reader.getBit(); // 0: General Purpose Register, 1: Player Status Registers
+        Q_UNUSED(reg_flag1);
 		reader.skipBits(19);
 		int regigsterNumber1 = reader.getBits(12);
 		regigsterNumber1 = regigsterNumber1;
@@ -1863,16 +1893,17 @@ void MovieObject::parseNavigationCommand(BitStreamReader& reader)
 
 	// operand source 32 bits
 	// next syntax only if iFlag for operand == 0
-	if (iFlag2 == 0) 
+    if (iFlag2 == 0)
     {
-		bool reg_flag1 = reader.getBit(); // 0: General Purpose Register, 1: Player Status Registers
-		reader.skipBits(19);
-		int regigsterNumber1 = reader.getBits(12);
-		regigsterNumber1 = regigsterNumber1;
-	}
-	else 
+        bool reg_flag1 = reader.getBit(); // 0: General Purpose Register, 1: Player Status Registers
+        Q_UNUSED(reg_flag1);
+        reader.skipBits(19);
+        int regigsterNumber1 = reader.getBits(12);
+        regigsterNumber1 = regigsterNumber1;
+    }
+    else
     {
-		int immediateValue = reader.getBits(32);
-		immediateValue = immediateValue;
-	}
+        int immediateValue = reader.getBits(32);
+        immediateValue = immediateValue;
+    }
 }

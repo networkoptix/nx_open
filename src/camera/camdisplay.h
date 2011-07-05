@@ -78,7 +78,7 @@ private:
       */
     bool m_hadAudio;
 
-	quint64 m_lastAudioPacketTime;
+    quint64 m_lastAudioPacketTime;
     quint64 m_lastVideoPacketTime;
 
     qint64 m_previousVideoTime;

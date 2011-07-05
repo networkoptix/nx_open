@@ -21,29 +21,28 @@ extern int item_hoverevent_duration;
 
 extern int global_opacity_change_period;
 
-CLAbstractSceneItem::CLAbstractSceneItem(GraphicsView* view, int max_width, int max_height, 
-										 QString name):
-CLAbstractSubItemContainer(0),
-m_max_width(max_width),
-m_max_height(max_height),
-m_animationTransform(this, view),
-m_view(view),
-m_type(BUTTON),
-mName(name),
-m_selected(false),
-m_fullscreen(false),
-m_arranged(true),
-m_mouse_over(false),
-m_draw_rotation_helper(false),
-m_zoomOnhover(true),
-m_needUpdate(false),
-mEditable(false),
-m_rotation_center(0,0),
-m_complicatedItem(0),
-m_can_be_droped(false),
-m_steadyMode(false),
-m_steady_animation(0),
-m_steady_black_color(0)
+CLAbstractSceneItem::CLAbstractSceneItem(GraphicsView* view, int max_width, int max_height, QString name) :
+    CLAbstractSubItemContainer(0),
+    m_arranged(true),
+    m_fullscreen(false),
+    m_selected(false),
+    m_mouse_over(false),
+    m_zoomOnhover(true),
+    m_animationTransform(this, view),
+    m_view(view),
+    m_max_width(max_width),
+    m_max_height(max_height),
+    m_type(BUTTON),
+    mName(name),
+    m_draw_rotation_helper(false),
+    m_rotation_center(0,0),
+    m_editable(false),
+    m_needUpdate(false),
+    m_complicatedItem(0),
+    m_can_be_droped(false),
+    m_steadyMode(false),
+    m_steady_animation(0),
+    m_steady_black_color(0)
 {
 	setAcceptsHoverEvents(true);
 
@@ -74,12 +73,12 @@ void CLAbstractSceneItem::setName(const QString& name)
 
 bool CLAbstractSceneItem::isEtitable() const
 {
-	return mEditable;
+    return m_editable;
 }
 
 void CLAbstractSceneItem::setEditable(bool editable)
 {
-	mEditable = editable;
+    m_editable = editable;
 }
 
 bool CLAbstractSceneItem::isZoomable() const
@@ -301,7 +300,7 @@ void CLAbstractSceneItem::hoverEnterEvent(QGraphicsSceneHoverEvent * /*event*/)
 			m_animationTransform.zoom_abs(1.11, item_hoverevent_duration, 0);
 		}
 	}
-	/**/
+    */
 
 }
 
@@ -320,7 +319,7 @@ void CLAbstractSceneItem::hoverLeaveEvent(QGraphicsSceneHoverEvent * /*event*/)
 			m_animationTransform.zoom_abs(1.0, item_hoverevent_duration, 0);
 		}
 	}
-	/**/
+    */
 }
 
 void CLAbstractSceneItem::mousePressEvent ( QGraphicsSceneMouseEvent * event )

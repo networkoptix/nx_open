@@ -10,15 +10,15 @@
 
 CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
     : CLAbstractDataProcessor(CL_MAX_DISPLAY_QUEUE_SIZE),
+      m_delay(100*1000), // do not put a big value here to avoid cpu usage in case of zoom out
+      m_playAudio(false),
+      m_needChangePriority(false),
+      m_hadAudio(false),
+      m_lastAudioPacketTime(0),
+      m_lastVideoPacketTime(0),
       m_previousVideoTime(0),
       m_lastNonZerroDuration(0),
       m_previousVideoDisplayedTime(0),
-      m_delay(100*1000), // do not put a big value here to avoid cpu usage in case of zoom out 
-      m_playAudio(false),
-      m_needChangePriority(false),
-      m_lastAudioPacketTime(0),
-      m_lastVideoPacketTime(0),
-      m_hadAudio(false),
       m_afterJump(false),
       m_displayLasts(0),
       m_ignoringVideo(false),

@@ -61,17 +61,17 @@ private:
 
 //	CLAbstractAudioDecoder* m_decoder[CL_VARIOUSE_DECODERS];
 
-	int m_bufferMs;
-	CLAlignedData m_decodedaudio;
-	bool m_tooFewDataDetected;
-	bool m_isFormatSupported;
+    int m_bufferMs;
+    CLAlignedData m_decodedaudio;
+    bool m_tooFewDataDetected;
+    bool m_isFormatSupported;
     QtvSound* m_audioSound;
     QQueue<CLCompressedAudioData*> m_audioQueue;
 
-	bool m_downmixing;    // do downmix. 
-	bool m_forceDownmix;  // force downmix, even if output device supports multichannel
-	SampleConvertMethod m_sampleConvertMethod;
-	bool m_isConvertMethodInitialized;
+    bool m_downmixing;    // do downmix.
+    bool m_forceDownmix;  // force downmix, even if output device supports multichannel
+    SampleConvertMethod m_sampleConvertMethod;
+    bool m_isConvertMethodInitialized;
 };
 
 #endif //audiostreamdisplay_h_1811

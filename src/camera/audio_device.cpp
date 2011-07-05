@@ -9,10 +9,10 @@
   */
 static const int QT_AUDIO_BUFFER_SIZE = 300;
 
-CLAudioDevice::CLAudioDevice(QAudioFormat format)
-  : m_audioOutput(0),
-    m_audioBuffer(0),
+CLAudioDevice::CLAudioDevice(QAudioFormat format) :
+    m_audioOutput(0),
     m_ringBuffer(0),
+    m_audioBuffer(0),
     m_downmixing(false),
     m_convertingFloat(false)
 

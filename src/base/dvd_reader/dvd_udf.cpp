@@ -69,7 +69,7 @@ extern void SetAlignHandle(dvd_reader_t *device, void *align);
 static void *dvdalign_lbmalloc(dvd_reader_t *device, quint32 num_lbs)
 {
   void *m;
-  int n;
+  unsigned n;
   dvdalign_t *a;
   
   m = malloc((num_lbs+1)*DVD_VIDEO_LB_LEN);
@@ -133,12 +133,11 @@ static void *dvdalign_lbmalloc(dvd_reader_t *device, quint32 num_lbs)
  */
 static void dvdalign_lbfree(dvd_reader_t *device, void *ptr)
 {
-  int n;
   dvdalign_t *a;
 
   a = (dvdalign_t *)GetAlignHandle(device);
-  if(a && a->ptrs) {
-    for(n = 0; n < a->ptrs_max; n++) {
+  if (a && a->ptrs) {
+    for (unsigned n = 0; n < a->ptrs_max; n++) {
       if(a->ptrs[n].aligned == ptr) {
         free(a->ptrs[n].start);
         a->ptrs[n].start = NULL;

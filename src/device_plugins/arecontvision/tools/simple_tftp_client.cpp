@@ -5,13 +5,13 @@
 
 using namespace std;
 
-CLSimpleTFTPClient::CLSimpleTFTPClient(const std::string& ip, unsigned int timeout, unsigned int retry):
-m_retry(retry),
-m_ip(ip),
-m_timeout(timeout)
+CLSimpleTFTPClient::CLSimpleTFTPClient(const std::string& ip, unsigned int timeout, unsigned int retry) :
+    m_retry(retry),
+    m_timeout(timeout),
+    m_ip(ip)
 {
-	//m_wish_blk_size = double_blk_size;
-	m_wish_blk_size  = blk_size;
+    //m_wish_blk_size = double_blk_size;
+    m_wish_blk_size  = blk_size;
 }
 
 int CLSimpleTFTPClient::read( const std::string& fn, CLByteArray& data)

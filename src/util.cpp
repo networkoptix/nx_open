@@ -5,10 +5,8 @@ QString fromNativePath(QString path)
 {
     path = QDir::cleanPath(QDir::fromNativeSeparators(path));
     
-    if (!path.isEmpty() && path.at(path.length() - 1) == '/')
-    {
-        path.remove(path.length() - 1, 1);
-    }
+    if (!path.isEmpty() && path.endsWith("/"))
+        path.chop(1);
 
     return path;
 }

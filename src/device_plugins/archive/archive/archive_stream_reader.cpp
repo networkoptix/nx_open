@@ -156,7 +156,7 @@ quint64 CLArchiveStreamReader::currentTime() const
 {
 	QMutexLocker mutex(&m_cs);
 
-    if (m_currentTime == -1)
+    if (m_currentTime == (unsigned)-1)
         return slowestChannelTime();
 
     return m_currentTime;
@@ -184,18 +184,18 @@ void CLArchiveStreamReader::previousFrame(quint64 mksec)
         if (index <= 0)
             continue;
 
-        if (maxPrevTime == -1)
+        if (maxPrevTime == (quint64)-1)
             maxPrevTime = mMovie[channel].at(index-1).time;
         else if (maxPrevTime < mMovie[channel].at(index-1).time)
             maxPrevTime = mMovie[channel].at(index-1).time;
 
-        if (minPlayTime == -1)
+        if (minPlayTime == (quint64)-1)
             minPlayTime = mMovie[channel].at(index).time;
         else if (maxPrevTime >= mMovie[channel].at(index).time)
             minPlayTime = mMovie[channel].at(index).time;
     }
 
-    if (maxPrevTime == -1)
+    if (maxPrevTime == (quint64)-1)
         return;
 
     setSkipFramesToTime(maxPrevTime);
@@ -403,23 +403,22 @@ int CLArchiveStreamReader::nextFrameIndex(bool after_jump, int channel, int curr
 
 void CLArchiveStreamReader::channeljumpTo(quint64 mksec, int channel)
 {
+    int new_index = findBestIndex(channel, mksec);
+    if (new_index < 0)
+        return;
 
-	int new_index = findBestIndex(channel, mksec);
-	if (new_index<0)
-		return;
+    mCurrIndex[channel] = nextFrameIndex(true, channel, new_index, true, !m_forward);
 
-	mCurrIndex[channel] = nextFrameIndex(true, channel, new_index, true, !m_forward);
+    if (mCurrIndex[channel] == (unsigned)-1)
+        mCurrIndex[channel] = nextFrameIndex(true, channel, new_index, true, m_forward);
 
-	if (mCurrIndex[channel]==-1)
-		mCurrIndex[channel] = nextFrameIndex(true, channel, new_index, true, m_forward);
+    mFinished[channel] = (mCurrIndex[channel] == (unsigned)-1);
 
-	mFinished[channel] = (mCurrIndex[channel]==-1);
+    if (mCurrIndex[channel] == (unsigned)-1)
+        return;
 
-	if (mCurrIndex[channel]==-1)
-		return;
-
-	unsigned long shift = mMovie[channel].at(mCurrIndex[channel]).shift;
-	m_data_file[channel].seek(shift);
+    unsigned long shift = mMovie[channel].at(mCurrIndex[channel]).shift;
+    m_data_file[channel].seek(shift);
 }
 
 int CLArchiveStreamReader::findBestIndex(int channel, quint64 mksec) const

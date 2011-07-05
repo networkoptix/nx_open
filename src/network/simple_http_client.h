@@ -43,7 +43,6 @@ private:
     QString digestAccess() const;
 
 private:
-
     QString m_line;
 
 	QHostAddress m_host;
@@ -59,9 +58,6 @@ private:
 
 	unsigned int m_timeout;
 	QAuthenticator m_auth;
-
-    
-
 };
 
 #endif //__SIMPLE_HTTP_CLIENT__

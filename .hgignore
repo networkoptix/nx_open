@@ -24,3 +24,4 @@ src/Info.plist
 macsetup/*.dmg
 src/device_plugins/archive/filetypes.h
 *Makefile*
+EvePlayer-Beta.xcodeproj*

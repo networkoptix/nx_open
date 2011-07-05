@@ -10,71 +10,71 @@ class CLAbstractArchiveReader;
 
 class CLArchiveNavigatorItem : public CLAbstractSubItem
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	CLArchiveNavigatorItem(CLAbstractSubItemContainer* parent, int height);
-	~CLArchiveNavigatorItem();
+    CLArchiveNavigatorItem(CLAbstractSubItemContainer* parent, int height);
+    ~CLArchiveNavigatorItem();
 
-	// this function uses parent width
-	void onResize();
+    // this function uses parent width
+    void onResize();
 
-	void updateSliderPos();
+    void updateSliderPos();
 
-	void setVideoCamera(CLVideoCamera* camera);
+    void setVideoCamera(CLVideoCamera* camera);
 
-	void goToFullScreenMode(bool fullscreen);
+    void goToFullScreenMode(bool fullscreen);
 
     bool isCursorOnSlider() const;
 
     virtual void hideIfNeeded(int duration);
 
 protected:
-	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-	virtual QRectF boundingRect() const;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    virtual QRectF boundingRect() const;
 
 protected slots:
-	virtual void onSubItemPressed(CLAbstractSubItem* subitem);
-	void onSliderMoved(int val);
+    virtual void onSubItemPressed(CLAbstractSubItem* subitem);
+    void onSliderMoved(int val);
 
-	void sliderPressed();
-	void sliderReleased();
+    void sliderPressed();
+    void sliderReleased();
 
-	// QT has bug about stile; after set one another one does not work well
-	void renewSlider();
+    // QT has bug about stile; after set one another one does not work well
+    void renewSlider();
 
 private:
     void resizeSlider();
 
 protected:
-	int m_width;
-	int m_height;
+    int m_width;
+    int m_height;
 
     bool m_readerIsSet;
 
-    int mNonFullScreenHight;
+    int m_nonFullScreenHeight;
 
-	CLImgSubItem* mPlayItem;
-	CLImgSubItem* mPauseItem;
+    CLImgSubItem* mPlayItem;
+    CLImgSubItem* mPauseItem;
 
-	CLImgSubItem* mRewindBackward;
-	CLImgSubItem* mRewindForward;
+    CLImgSubItem* mRewindBackward;
+    CLImgSubItem* mRewindForward;
 
-	CLImgSubItem* mStepForward;
-	CLImgSubItem* mStepBackward;
+    CLImgSubItem* mStepForward;
+    CLImgSubItem* mStepBackward;
 
-	QSlider* mSlider;
-	QGraphicsProxyWidget* mSlider_item;
-	CLAbstractArchiveReader* mStreamReader;
+    QSlider* mSlider;
+    QGraphicsProxyWidget* mSlider_item;
+    CLAbstractArchiveReader* m_streamReader;
 
-	bool mPlayMode;
-	bool mSliderIsmoving;
+    bool m_playMode;
+    bool m_sliderIsmoving;
 
-	CLVideoCamera* m_videoCamera;
- 	CLAbstractArchiveReader* mReader;
+    CLVideoCamera* m_videoCamera;
+    CLAbstractArchiveReader* m_reader;
 
-	bool mFullScreen;
+    bool m_fullScreen;
 
-    qreal mButtonAspectRatio;
+    qreal m_buttonAspectRatio;
 
 };
 

@@ -10,15 +10,15 @@ optimal_ratio(17.0/9*scale_factor)
 
 //============================================
 
-LayoutContent::LayoutContent():
-m_cr(CLDeviceCriteria::STATIC),
-mDecoration(0),
-m_recorder(false),
-m_editable(false),
-m_parent(0),
-m_interaction_flags(0xffffffff)
+LayoutContent::LayoutContent() :
+    m_cr(CLDeviceCriteria::STATIC),
+    m_parent(0),
+    mDecoration(0),
+    m_recorder(false),
+    m_editable(false),
+    m_interaction_flags(0xffffffff)
 {
-	setName("Layout:unnamed");
+    setName("Layout:unnamed");
 }
 
 LayoutContent::~LayoutContent()
@@ -294,7 +294,7 @@ QStringList LayoutContent::getDevicesOnPage(unsigned int page, unsigned int maxI
     unsigned int start = (page - 1) * maxItemsPerPage;
     unsigned int end = qMin((page)*maxItemsPerPage, (unsigned int)devlst.size());
 
-    for (int i = start; i < end; ++i)
+    for (unsigned i = start; i < end; ++i)
         result.push_back( devlst.at(i)->getId() );
 
     return result;

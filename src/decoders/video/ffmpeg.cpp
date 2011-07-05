@@ -190,7 +190,7 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 		m_height = height;
 
 	}
-	/**/
+    */
 
 	/*
 
@@ -208,7 +208,7 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 	fclose(f2);
 	fn++;
 
-	/**/
+    */
 
     // XXX: DEBUG
 
@@ -347,7 +347,7 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 		if (got_picture)
 			goto gotpicture;
 
-		/**/
+        */
 
         //cl_log.log("cannot decode image", cl_logWARNING);
 

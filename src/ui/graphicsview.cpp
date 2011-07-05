@@ -57,38 +57,39 @@ extern QPixmap cached(const QString &img);
 extern int limit_val(int val, int min_val, int max_val, bool mirror);
 //==============================================================================
 
-GraphicsView::GraphicsView(QWidget* mainWnd):
-QGraphicsView(),
-m_xRotate(0), m_yRotate(0),
-m_movement(this),
-m_scenezoom(this),
-m_handScrolling(false),
-m_handMoving(0),
-mSubItemMoving(false),
-m_rotationCounter(0),
-m_selectedWnd(0),
-m_last_selectedWnd(0),
-m_ignore_release_event(false),
-m_ignore_conext_menu_event(false),
-m_rotatingWnd(0),
-mMainWnd(mainWnd),
-m_movingWnd(0),
-m_drawBkg(true),
-m_logo(0),
-m_animated_bckg(new CLBlueBackGround(50)),
-mDeviceDlg(0),
-mZerroDistance(true),
-mViewStarted(false),
-m_fps_frames(0),
-m_seachItem(0),
-m_min_scene_zoom(0.06),
-mShow(this),
-m_gridItem(0),
-mSteadyShow(this),
-mWheelZooming(false),
-m_menuIsHere(false),
-m_pageSelector(0),
-m_lastPressedItem(0)
+GraphicsView::GraphicsView(QWidget* mainWnd) :
+    QGraphicsView(),
+    m_xRotate(0),
+    m_yRotate(0),
+    m_movement(this),
+    m_scenezoom(this),
+    m_min_scene_zoom(0.06),
+    m_rotationCounter(0),
+    m_handScrolling(false),
+    m_handMoving(0),
+    mSubItemMoving(false),
+    m_selectedWnd(0),
+    m_last_selectedWnd(0),
+    m_rotatingWnd(0),
+    m_movingWnd(0),
+    m_ignore_release_event(false),
+    m_ignore_conext_menu_event(false),
+    mMainWnd(mainWnd),
+    mDeviceDlg(0),
+    m_drawBkg(true),
+    m_animated_bckg(new CLBlueBackGround(50)),
+    m_logo(0),
+    m_show(this),
+    mSteadyShow(this),
+    mZerroDistance(true),
+    mViewStarted(false),
+    mWheelZooming(false),
+    m_fps_frames(0),
+    m_seachItem(0),
+    m_pageSelector(0),
+    m_gridItem(0),
+    m_menuIsHere(false),
+    m_lastPressedItem(0)
 {
     m_timeAfterDoubleClick.restart();
 
@@ -285,7 +286,7 @@ void GraphicsView::setZeroSelection()
 		m_selectedWnd->setItemSelected(false);
 
 		CLVideoWindowItem* videoItem = 0;
-		if (videoItem = m_selectedWnd->toVideoItem())
+        if ( (videoItem = m_selectedWnd->toVideoItem()) )
 		{
 			videoItem->showFPS(false);
 			videoItem->setShowImagesize(false);
@@ -320,7 +321,7 @@ void GraphicsView::setAllItemsQuality(CLStreamreader::StreamQuality q, bool incr
 
 bool GraphicsView::shouldOptimizeDrawing() const
 {
-    return (m_scenezoom.isRuning() && !mWheelZooming) || mShow.isShowTime();
+    return (m_scenezoom.isRuning() && !mWheelZooming) || m_show.isShowTime();
 }
 
 //================================================================
@@ -373,7 +374,7 @@ void GraphicsView::updateTransform(qreal angle)
 	tr.scale(0.05, 0.05);
 	tr.translate(-center.x(), -center.y());
 	setTransform(tr);
-	/**/
+    */
 
 	QTransform tr = transform();
 	tr.rotate(angle/10.0, Qt::YAxis);
@@ -388,20 +389,20 @@ void GraphicsView::onSecTimer()
 	if (!mViewStarted) // we are about to stop this view
 		return;
 
-	if (!mShow.isShowTime())
+    if (!m_show.isShowTime())
 	{
 
-		++mShow.m_counrer;
+        ++m_show.m_counrer;
 
-		if (mShow.m_counrer>4*60*60) // show will start after 4 h 
+        if (m_show.m_counrer>4*60*60) // show will start after 4 h
 		{
 			if (m_camLayout.getItemList().count()<2 || !m_camLayout.getContent()->checkIntereactionFlag(LayoutContent::ShowAvalable))
 			{
-				mShow.m_counrer = 0;
+                m_show.m_counrer = 0;
 				return;
 			}
 
-			mShow.setShowTime(true);
+            m_show.setShowTime(true);
 
 			onCircle_helper(true);
 
@@ -413,11 +414,11 @@ void GraphicsView::onSecTimer()
 
 void GraphicsView::showStop_helper()
 {
-	mShow.m_counrer = 0;
-	if (mShow.isShowTime())
+    m_show.m_counrer = 0;
+    if (m_show.isShowTime())
 	{
-		mShow.stopAnimation();
-		mShow.setShowTime(false);
+        m_show.stopAnimation();
+        m_show.setShowTime(false);
 		if (mViewStarted) // if we are not about to stop this view
 			onArrange_helper();
 	}
@@ -780,7 +781,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 		new_scene_pos.rx() = limit_val(new_scene_pos.x(), rsr.left(), rsr.right(), false);
 		new_scene_pos.ry() = limit_val(new_scene_pos.y(), rsr.top(), rsr.bottom(), false);
 		centerOn(new_scene_pos);
-		/**/
+        */
 
 		QPoint delta = event->pos() - m_mousestate.getLastEventPoint();
         viewMove(delta.x(), delta.y());
@@ -943,7 +944,7 @@ void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
 	mSubItemMoving = false;
 
 	bool left_button = event->button() == Qt::LeftButton;
-	bool right_button = event->button() == Qt::RightButton;
+//	bool right_button = event->button() == Qt::RightButton;
 	bool mid_button = event->button() == Qt::MidButton;
 	bool handMoving = m_handMoving>2;
 	bool rotating = m_rotationCounter>2;
@@ -1648,7 +1649,7 @@ void GraphicsView::mouseDoubleClickEvent( QMouseEvent * event )
 		}
 
 		onArrange_helper();
-		/**/
+        */
 
 		fitInView(1500, 0, SLOW_START_SLOW_END);
 
@@ -1914,7 +1915,7 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 			break;
 
 		case Qt::Key_X:
-			mShow.m_counrer+=10*60*60;
+            m_show.m_counrer+=10*60*60;
 			break;
 
         case Qt::Key_Escape:
@@ -2217,6 +2218,8 @@ void GraphicsView::recalcSomeParams()
 
 void GraphicsView::resizeEvent( QResizeEvent * event )
 {
+    Q_UNUSED(event);
+
 	if (!mViewStarted)
 		return;
 
@@ -2373,9 +2376,9 @@ void GraphicsView::onCircle_helper(bool show)
 	m_camLayout.updateSceneRect();
 	QRectF item_rect = m_camLayout.getGridEngine().getGridRect();
 
-	mShow.setCenterPoint(item_rect.center());
-	mShow.setRadius(qMax(item_rect.width(), item_rect.height())/8);
-	mShow.setItems(m_camLayout.getItemListPointer());
+    m_show.setCenterPoint(item_rect.center());
+    m_show.setRadius(qMax(item_rect.width(), item_rect.height())/8);
+    m_show.setItems(m_camLayout.getItemListPointer());
 
 	int i = 0;
 
@@ -2398,7 +2401,7 @@ void GraphicsView::onCircle_helper(bool show)
 
 		anim2->setStartValue(item->pos());
 
-		anim2->setEndValue( QPointF ( mShow.getCenter().x() + cos((i / total) * 6.28) * mShow.getRadius(), mShow.getCenter().y() + sin((i / total) * 6.28) * mShow.getRadius() ) );
+        anim2->setEndValue( QPointF ( m_show.getCenter().x() + cos((i / total) * 6.28) * m_show.getRadius(), m_show.getCenter().y() + sin((i / total) * 6.28) * m_show.getRadius() ) );
 
 		anim2->setDuration(1500 + cl_get_random_val(0, 300));
 		anim2->setEasingCurve(QEasingCurve::InOutBack);
@@ -2411,7 +2414,7 @@ void GraphicsView::onCircle_helper(bool show)
 	}
 
 	if (show)
-		connect(groupAnimation, SIGNAL(finished ()), &mShow, SLOT(start()));
+        connect(groupAnimation, SIGNAL(finished ()), &m_show, SLOT(start()));
 
 	connect(groupAnimation, SIGNAL(finished ()), this, SLOT(fitInView()));
 

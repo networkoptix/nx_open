@@ -47,7 +47,7 @@ QRectF CLImgSubItem::boundingRect() const
 	return QRectF(0,0,m_width, m_height);
 }
 
-void CLImgSubItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void CLImgSubItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
 	painter->setRenderHint(QPainter::SmoothPixmapTransform);
 	painter->setRenderHint(QPainter::Antialiasing);

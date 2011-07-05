@@ -24,7 +24,7 @@ const static int SEI_MSG_BUFFERING_PERIOD = 0;
 const static int SEI_MSG_PIC_TIMING = 1;
 
 #ifndef __TS_MUXER_COMPILE_MODE
-const static char* NALUnitDescr[30] =
+const char* const NALUnitDescr[30] =
                    {"nuUnspecified", "nuSliceNonIDR", "nuSliceA", "nuSliceB", "nuSliceC", 
                     "nuSliceIDR","nuSEI","nuSPS","nuPPS","nuAUD", 
 					"nuEOSeq","nuEOStream","nuFillerData","nuSPSExt","nuReserved1", 
@@ -281,7 +281,7 @@ private:
 	void serializeHDRParameters(BitStreamWriter& writer);
 };
 
-const static char* sliceTypeStr[5] = {"P_TYPE", "B_TYPE", "I_TYPE", "SP_TYPE", "SI_TYPE"};
+const char* const sliceTypeStr[5] = {"P_TYPE", "B_TYPE", "I_TYPE", "SP_TYPE", "SI_TYPE"};
 
 class SEIUnit: public NALUnit {
 public:

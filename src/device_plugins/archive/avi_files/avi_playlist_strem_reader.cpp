@@ -12,11 +12,11 @@ extern "C"
 extern QMutex global_ffmpeg_mutex;
 static const int IO_BLOCK_SIZE = 1024 * 32;
 
-CLAVIPlaylistStreamReader::CLAVIPlaylistStreamReader(CLDevice* dev):
+CLAVIPlaylistStreamReader::CLAVIPlaylistStreamReader(CLDevice* dev) :
     CLAVIStreamReader(dev),
     m_ffmpegIOContext(0),
-    m_initialized(false),
     m_currentFileIndex(-1),
+    m_initialized(false),
     m_inSeek(false)
 {
     QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
@@ -131,14 +131,15 @@ qint64 CLAVIPlaylistStreamReader::findFileIndexByTime(quint64 mksec)
     else {
         return -1;
     }
-};
+}
 
 void CLAVIPlaylistStreamReader::channeljumpTo(quint64 mksec, int )
 {
     QMutexLocker mutex(&m_cs);
     int oldFileNum = m_currentFileIndex;
+    Q_UNUSED(oldFileNum);
     quint64 relativeMksec = findFileIndexByTime(mksec);
-    if (relativeMksec == -1)
+    if (relativeMksec == (quint64)-1)
         return; // error seeking
 
     m_startMksec = m_fileList[m_currentFileIndex]->m_formatContext->start_time;
@@ -312,7 +313,7 @@ qint32 CLAVIPlaylistStreamReader::readPacket(quint8* buf, int size)
     return rez;
 }
 
-qint32 CLAVIPlaylistStreamReader::writePacket(quint8* buf, int size)
+qint32 CLAVIPlaylistStreamReader::writePacket(quint8* /*buf*/, int /*size*/)
 {
     return 0; // not implemented
 }

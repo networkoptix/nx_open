@@ -57,6 +57,9 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WFlags flags):
 //QMainWindow(parent, flags),
 m_normalView(0)
 {
+    Q_UNUSED(parent);
+    Q_UNUSED(flags);
+
     setAcceptDrops(true);
 	//ui.setupUi(this);
 	setWindowTitle("HDWitness");
@@ -170,7 +173,7 @@ void MainWnd::handleMessage(const QString& message)
     addFilesToCurrentOrNewLayout(files);
 }
 
-void MainWnd::closeEvent ( QCloseEvent * event )
+void MainWnd::closeEvent ( QCloseEvent * /*event*/ )
 {
 	destroyNavigator(m_normalView);
 }

@@ -16,7 +16,7 @@ static const int SEEK_DIRECT_SECTOR = 5;
 
 struct dvdLangCode
 {
-    char* codeString;
+    const char* codeString;
     quint16 code;
 };
 
@@ -216,7 +216,7 @@ dvdLangCode dvdLangCodes[] =
 
 QString findLangByCode(quint16 langCode)
 {
-    for (int i = 0; i < sizeof(dvdLangCodes) / sizeof(dvdLangCode); ++i)
+    for (unsigned i = 0; i < sizeof(dvdLangCodes) / sizeof(dvdLangCode); ++i)
     {
         if (dvdLangCodes[i].code == langCode)
             return dvdLangCodes[i].codeString;
@@ -644,12 +644,10 @@ qint64 CLAVIDvdStreamReader::seek(qint64 offset, qint32 whence)
     return offset;
 }
 
-
-qint32 CLAVIDvdStreamReader::writePacket(quint8* buf, int size)
+qint32 CLAVIDvdStreamReader::writePacket(quint8* /*buf*/, int /*size*/)
 {
     return 0; // not implemented
 }
-
 
 void CLAVIDvdStreamReader::destroy()
 {

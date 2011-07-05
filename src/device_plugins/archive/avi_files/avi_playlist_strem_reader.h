@@ -38,7 +38,7 @@ protected:
     // seek to specified position. If functionis not implemeted, ffmpeg seek method is used (may be more slow)
     virtual bool directSeekToPosition(qint64 pos_mks) { return false;}
 
-    virtual void fillAdditionalInfo(CLFileInfo* fi) {}
+    virtual void fillAdditionalInfo(CLFileInfo* /*fi*/) {}
 protected:
     quint8* m_ioBuffer;
     ByteIOContext* m_ffmpegIOContext;

@@ -67,7 +67,7 @@ CLPictureImageItem::~CLPictureImageItem()
     m_Timer.stop();
 }
 
-void CLPictureImageItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void CLPictureImageItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
     if (!m_CurrentImg)
         return;

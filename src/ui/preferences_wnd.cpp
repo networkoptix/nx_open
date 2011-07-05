@@ -135,9 +135,9 @@ QString PreferencesWindow::cameraInfoString(CLDevice *device)
         arg(networkDevice->getMAC()).arg(networkDevice->getIP().toString()).arg(networkDevice->getDiscoveryAddr().toString());
 }
 
-void PreferencesWindow::resizeEvent ( QResizeEvent * event)
+void PreferencesWindow::resizeEvent ( QResizeEvent * /*event*/)
 {
-    QSize sz = this->size();
+//    QSize sz = this->size();
 }
 
 QString browseForDirectory()

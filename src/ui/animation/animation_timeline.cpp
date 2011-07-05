@@ -79,12 +79,10 @@ static qreal slow_end_pow_40(qreal value)
     return pow(value, 0.40);
 }
 
-
 //=================================================================
 
 QEasingCurve& easingCurve(CLAnimationCurve ac)
 {
-
     static QEasingCurve inOutQuad(QEasingCurve::InOutQuad);
     static QEasingCurve inOutBack(QEasingCurve::InOutBack);
     static QEasingCurve outCubic(QEasingCurve::OutCubic);
@@ -115,7 +113,6 @@ QEasingCurve& easingCurve(CLAnimationCurve ac)
 
     static QEasingCurve slowEnd_pow_40;
     slowEnd_pow_40.setCustomType(slow_end_pow_40);
-
 
     switch(ac)
     {
@@ -152,6 +149,9 @@ QEasingCurve& easingCurve(CLAnimationCurve ac)
     case OUTCUBIC:
         return outCubic;
 
+    default:
+        break;
     }
 
+    return inOutQuad;
 }

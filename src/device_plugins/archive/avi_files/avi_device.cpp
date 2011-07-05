@@ -1,11 +1,10 @@
 #include "avi_device.h"
 #include "avi_strem_reader.h"
+#include "util.h"
 
 CLAviDevice::CLAviDevice(const QString& file)
 {
-    QFileInfo fi(file);
-
-	m_uniqueId = fi.absoluteFilePath();
+    m_uniqueId = QDir::cleanPath(file);
 	m_name = QFileInfo(file).fileName();
 }
 

@@ -9,10 +9,10 @@ struct AVFormatContext;
 class CLAVIStreamReader : public CLAbstractArchiveReader
 {
 public:
-	CLAVIStreamReader(CLDevice* dev);
-	virtual ~CLAVIStreamReader();
+    CLAVIStreamReader(CLDevice* dev);
+    virtual ~CLAVIStreamReader();
 
-	virtual quint64 currentTime() const;
+    virtual quint64 currentTime() const;
 
     void previousFrame(quint64 mksec);
 
@@ -20,38 +20,38 @@ public:
     virtual unsigned int getCurrentAudioChannel() const;
     virtual bool setAudioChannel(unsigned int num);
 protected:
-	virtual CLAbstractMediaData* getNextData();
-	virtual void channeljumpTo(quint64 mksec, int channel);
+    virtual CLAbstractMediaData* getNextData();
+    virtual void channeljumpTo(quint64 mksec, int channel);
 
-	virtual bool init();
-	virtual void destroy();
+    virtual bool init();
+    virtual void destroy();
 
-	void smartSleep(qint64 mksec);
+    void smartSleep(qint64 mksec);
     virtual ByteIOContext* getIOContext();
 
     virtual qint64 packetTimestamp(AVStream* stream, const AVPacket& packet);
     virtual AVFormatContext* getFormatContext();
     bool initCodecs();
 protected:
-	qint64 m_currentTime;
-	qint64 m_previousTime;
+    qint64 m_currentTime;
+    qint64 m_previousTime;
 
-	AVFormatContext* m_formatContext;
+    AVFormatContext* m_formatContext;
 
-	int	m_videoStreamIndex;
-	int	m_audioStreamIndex;
+    int m_videoStreamIndex;
+    int m_audioStreamIndex;
 
-	CodecID m_videoCodecId;
-	CodecID m_audioCodecId;
+    CodecID m_videoCodecId;
+    CodecID m_audioCodecId;
 
-	int m_freq;
-	int m_channels;
+    int m_freq;
+    int m_channels;
 
-	bool mFirstTime;
+    bool mFirstTime;
 
-	volatile bool m_wakeup;
+    volatile bool m_wakeup;
 
-	bool m_bsleep;
+    bool m_bsleep;
 
 private:
     AVPacket m_packets[2];
@@ -68,7 +68,7 @@ private:
       *
       * @return true if successful
       */
-	bool getNextPacket(AVPacket& packet);
+    bool getNextPacket(AVPacket& packet);
 
     /**
       * Read next video packet from file ignoring audio packets.

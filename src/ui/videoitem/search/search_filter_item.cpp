@@ -46,7 +46,7 @@ m_view(view)
 		"border-bottom-color: rgb(255, 255, 255);}"
 		);
 
-        /**/
+        */
 
     QString style (
 
@@ -73,7 +73,7 @@ m_view(view)
         );
 
 
-	m_lineEdit->setStyleSheet(style);
+    m_lineEdit->setStyleSheet(style);
 
 	m_height = 40;
 
@@ -141,6 +141,7 @@ void CLSerachEditItem::resize()
 
 void CLSerachEditItem::onEditTextChanged (const QString & text)
 {
+    Q_UNUSED(text);
 
     m_view->onUserInput(true, true);
 

@@ -265,7 +265,7 @@ void CLDevice::getDevicesBasicInfo(CLDeviceList& lst, int threads)
 
 }
 
-bool CLDevice::getParam(const QString& name, CLValue& val, bool resynch) 
+bool CLDevice::getParam(const QString& name, CLValue& /*val*/, bool /*resynch*/)
 {
 	if (!getDeviceParamList().exists(name))
 	{
@@ -276,7 +276,7 @@ bool CLDevice::getParam(const QString& name, CLValue& val, bool resynch)
 	return true;
 }
 
-bool CLDevice::setParam(const QString& name, const CLValue& val)
+bool CLDevice::setParam(const QString& name, const CLValue& /*val*/)
 {
 	if (!getDeviceParamList().exists(name))
 	{

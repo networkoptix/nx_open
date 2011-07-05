@@ -45,16 +45,16 @@ qint64 CLAVIStreamReader::packetTimestamp(AVStream* stream, const AVPacket& pack
 	return qint64(1e+6 * ttm);
 }
 
-CLAVIStreamReader::CLAVIStreamReader(CLDevice* dev )
-    : CLAbstractArchiveReader(dev),
-      m_videoStreamIndex(-1),
-      m_audioStreamIndex(-1),
-      mFirstTime(true),
-      m_formatContext(0),
-      m_bsleep(false),
-      m_currentPacketIndex(0),
-      m_haveSavedPacket(false),
-      m_selectedAudioChannel(0)
+CLAVIStreamReader::CLAVIStreamReader(CLDevice* dev ) :
+    CLAbstractArchiveReader(dev),
+    m_formatContext(0),
+    m_videoStreamIndex(-1),
+    m_audioStreamIndex(-1),
+    mFirstTime(true),
+    m_bsleep(false),
+    m_currentPacketIndex(0),
+    m_haveSavedPacket(false),
+    m_selectedAudioChannel(0)
 {
     // Should init packets here as some times destroy (av_free_packet) could be called before init
     av_init_packet(&m_packets[0]);
@@ -579,8 +579,8 @@ bool CLAVIStreamReader::setAudioChannel(unsigned int num)
 {
     // convert num to absolute track number
     int lastStreamID = -1;
-    int currentAudioTrackNum = 0;
-    for(unsigned i = 0; i < m_formatContext->nb_streams; i++) 
+    unsigned currentAudioTrackNum = 0;
+    for (unsigned i = 0; i < m_formatContext->nb_streams; i++) 
     {
         AVStream *strm= m_formatContext->streams[i];
         AVCodecContext *codecContext = strm->codec;

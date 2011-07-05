@@ -2,12 +2,12 @@
 
 #define MAX_STEP 600
 
-CLAnimatedBackGround::CLAnimatedBackGround(int timestep):
-mTimeStep(timestep),
-mForward(true),
-mSteps(0)
+CLAnimatedBackGround::CLAnimatedBackGround(int timestep) :
+    mForward(true),
+    mSteps(0),
+    mTimeStep(timestep)
 {
-	mTime.restart();
+    mTime.restart();
 }
 
 bool CLAnimatedBackGround::tick()
@@ -57,8 +57,8 @@ CLAnimatedBackGround(timestep)
 
 void CLBlueBackGround::drawBackground(QPainter * painter, const QRectF & rect )
 {
-	qreal dx_unit = rect.width()/MAX_STEP;
-	qreal dy_unit = rect.height()/MAX_STEP;
+//	qreal dx_unit = rect.width()/MAX_STEP;
+//	qreal dy_unit = rect.height()/MAX_STEP;
 	qreal rpos = currPosRelative();
 
 	if (rpos<0)

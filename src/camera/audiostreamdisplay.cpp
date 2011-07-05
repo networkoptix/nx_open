@@ -54,21 +54,21 @@ static void down_mix_to_stereo(T *data, int channels, int len)
 	}
 }
 
-CLAudioStreamDisplay::CLAudioStreamDisplay(int bufferMs)
-    : m_bufferMs(bufferMs),
-      m_decodedaudio(16, DEFAULT_AUDIO_FRAME_SIZE),
-	  m_isFormatSupported(true),
-      m_tooFewDataDetected(true),
-      m_audioSound(0),
+CLAudioStreamDisplay::CLAudioStreamDisplay(int bufferMs) :
+    m_bufferMs(bufferMs),
+    m_decodedaudio(16, DEFAULT_AUDIO_FRAME_SIZE),
+    m_tooFewDataDetected(true),
+    m_isFormatSupported(true),
+    m_audioSound(0),
 
-      m_downmixing(false),
+    m_downmixing(false),
 #ifdef Q_OS_WIN32
-	  m_forceDownmix(false),
+    m_forceDownmix(false),
 #else
-	  m_forceDownmix(true), // mac version use SPDIF by default for multichannel audio.
+    m_forceDownmix(true), // mac version use SPDIF by default for multichannel audio.
 #endif
-	  m_sampleConvertMethod(SampleConvert_None),
-	  m_isConvertMethodInitialized(false)
+    m_sampleConvertMethod(SampleConvert_None),
+    m_isConvertMethodInitialized(false)
 {
 }
 

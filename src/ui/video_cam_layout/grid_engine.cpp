@@ -655,7 +655,7 @@ int CLGridEngine::next_item_helper_get_quarter(const QPointF& current, const QPo
 	right(1)
 	down(2)
 	left(3)
-	/**/
+    */
 
 	int dx = other.x() - current.x();
 	int dy = other.y() - current.y();

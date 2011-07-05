@@ -4,13 +4,13 @@
 
 FileTypeSupport::FileTypeSupport()
 {
-    for(int i = 0; i < arraysize(IMAGE_FILETYPES); i++)
+    for (unsigned i = 0; i < arraysize(IMAGE_FILETYPES); i++)
     {
         m_imageFileExtensions << QString(".") + IMAGE_FILETYPES[i]; 
         m_imageFileFilter << QString("*.") + IMAGE_FILETYPES[i];
     }
 
-    for(int i = 0; i < arraysize(VIDEO_FILETYPES); i++)
+    for (unsigned i = 0; i < arraysize(VIDEO_FILETYPES); i++)
     {
         m_movieFileExtensions << QString(".") + VIDEO_FILETYPES[i];
         m_movieFileFilter << QString("*.") + VIDEO_FILETYPES[i];

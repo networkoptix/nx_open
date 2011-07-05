@@ -205,7 +205,7 @@ protected:
 	CLAnimatedBackGround* m_animated_bckg;
 	QGraphicsPixmapItem* m_logo;
 
-	Show_helper mShow;
+    Show_helper m_show;
 
     CLSteadyMouseAnimation mSteadyShow;
 

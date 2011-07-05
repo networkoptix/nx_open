@@ -221,7 +221,11 @@ struct MPLSParser
     enum DiskType {DT_NONE, DT_BLURAY, DT_AVCHD};
     static const int TIME_BASE = 45000;
 
-	MPLSParser(): m_chapterLen(0), m_number_of_SubPaths(0), m_m2tsOffset(0) {}
+    MPLSParser() :
+        m_number_of_SubPaths(0),
+        m_chapterLen(0),
+        m_m2tsOffset(0)
+    {}
 
 	bool parse(const QString& fileName);
 	void parse(quint8* buffer, int len);

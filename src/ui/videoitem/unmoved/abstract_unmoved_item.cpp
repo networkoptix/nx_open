@@ -1,21 +1,19 @@
 #include "abstract_unmoved_item.h"
 
-CLAbstractUnmovedItem::CLAbstractUnmovedItem(QString name, QGraphicsItem* parent):
-CLAbstractSubItemContainer(parent),
-m_view(0),
-m_name(name),
-m_underMouse(false)
+CLAbstractUnmovedItem::CLAbstractUnmovedItem(QString name, QGraphicsItem* parent) :
+    CLAbstractSubItemContainer(parent),
+    m_name(name),
+    m_view(0),
+    m_underMouse(false)
 {
-	setFlag(QGraphicsItem::ItemIgnoresTransformations);
-	//setFlag(QGraphicsItem::ItemIsMovable);
+    setFlag(QGraphicsItem::ItemIgnoresTransformations);
+    //setFlag(QGraphicsItem::ItemIsMovable);
 
     setAcceptsHoverEvents(true);
-
 }
 
 CLAbstractUnmovedItem::~CLAbstractUnmovedItem()
 {
-
 }
 
 void CLAbstractUnmovedItem::hideIfNeeded(int duration)
@@ -29,16 +27,15 @@ bool CLAbstractUnmovedItem::preferNonSteadyMode() const
     return m_underMouse;
 }
 
-void CLAbstractUnmovedItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+void CLAbstractUnmovedItem::hoverEnterEvent(QGraphicsSceneHoverEvent */*event*/)
 {
     m_underMouse = true;
 }
 
-void CLAbstractUnmovedItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+void CLAbstractUnmovedItem::hoverLeaveEvent(QGraphicsSceneHoverEvent */*event*/)
 {
     m_underMouse = false;
 }
-
 
 void CLAbstractUnmovedItem::setStaticPos(QPoint p)
 {

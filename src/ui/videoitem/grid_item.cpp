@@ -22,6 +22,8 @@ CLGridItem::~CLGridItem()
 
 void CLGridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
 
 	CLGridEngine& ge = m_view->getCamLayOut().getGridEngine();
 
@@ -33,6 +35,7 @@ void CLGridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 	int total_height = unit_height*grid_rect.height();
 
 	int line_width = base_line_width + qMin( qMax(total_width, total_height)*4 ,100);
+    Q_UNUSED(line_width);
 
 	int left = grid_rect.left()*unit_width;
 	int top = grid_rect.top()*unit_height;
@@ -70,7 +73,7 @@ QRectF CLGridItem::boundingRect() const
 	int unit_height = ge.getSettings().totalSlotHeight();
 	QRect grid_rect = ge.gridSlotRect();
 	return QRectF(0, 0, unit_width*grid_rect.width(), unit_height*grid_rect.height());
-	/**/
+    */
 
 	return QRectF(0, 0, 100000,100000);
 }

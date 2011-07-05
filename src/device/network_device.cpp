@@ -20,7 +20,7 @@ QHostAddress CLNetworkDevice::getIP() const
 	return m_ip;
 }
 
-bool CLNetworkDevice::setIP(const QHostAddress& ip, bool net )
+bool CLNetworkDevice::setIP(const QHostAddress& ip, bool /*net*/)
 {
 	QMutexLocker mutex(&m_cs);
 	m_ip = ip;

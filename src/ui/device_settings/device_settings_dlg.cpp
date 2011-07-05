@@ -163,7 +163,7 @@ void CLAbstractDeviceSettingsDlg::onSuggestions()
 
 }
 
-void CLAbstractDeviceSettingsDlg::onNewtab(int index)
+void CLAbstractDeviceSettingsDlg::onNewtab(int /*index*/)
 {
     QString group = static_cast<CLDeviceSettingsTab*>(mTabWidget->currentWidget())->name();
     QList<CLAbstractSettingsWidget*> wgt_to_update = getWidgetsBygroup(group);

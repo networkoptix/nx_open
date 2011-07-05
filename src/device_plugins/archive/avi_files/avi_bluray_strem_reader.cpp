@@ -581,7 +581,7 @@ void CLAVIBlurayStreamReader::fillAdditionalInfo(CLFileInfo* fi)
     if (!rez)
         return;
 
-    for (int i = 0; i < fi->m_formatContext->nb_streams; ++i)
+    for (unsigned i = 0; i < fi->m_formatContext->nb_streams; ++i)
     {
         AVStream *avStream = fi->m_formatContext->streams[i];
         QMap<int, CLPIStreamInfo>::const_iterator itr = parser.m_streamInfo.find(avStream->id);
@@ -589,7 +589,7 @@ void CLAVIBlurayStreamReader::fillAdditionalInfo(CLFileInfo* fi)
         {
             const CLPIStreamInfo& info = itr.value();
             QString langName = info.m_language_code;
-            for (int k = 0; k < sizeof(languageCode) / sizeof(char*)/2; ++k)
+            for (unsigned k = 0; k < sizeof(languageCode) / sizeof(char*)/2; ++k)
             {
                 if (langName == languageCode[k][0])
                 {

@@ -8,10 +8,10 @@ static const qreal normalOpacity = 0.5;
 static const qreal activeOpacity = 1.0;
 static const qreal itemsDistance = 25;
 
-QnPageSelector::QnPageSelector(QString name, QGraphicsItem* parent, qreal normal_opacity, qreal active_opacity):
+QnPageSelector::QnPageSelector(QString name, QGraphicsItem* parent, qreal normal_opacity, qreal active_opacity) :
     CLUnMovedInteractiveOpacityItem(name, parent, normal_opacity, active_opacity),
-    m_maxPage(1),
-    m_currPage(1)
+    m_currPage(1),
+    m_maxPage(1)
 {
     //setFlag(QGraphicsItem::ItemIgnoresTransformations, false);
 }
@@ -21,7 +21,7 @@ QnPageSelector::~QnPageSelector()
     stopAnimation();
 }
 
-void QnPageSelector::setMaxPageNumber(unsigned int maxpage)
+void QnPageSelector::setMaxPageNumber(int maxpage)
 {
     if (m_maxPage == maxpage)
         return;
@@ -74,7 +74,7 @@ void QnPageSelector::onPageSelected(int page)
 }
 
 
-void QnPageSelector::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void QnPageSelector::paint(QPainter */*painter*/, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
     //painter->fillRect(boundingRect(), QColor(255,0,0,128));
 }

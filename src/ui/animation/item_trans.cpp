@@ -50,7 +50,7 @@ qreal CLItemTransform::scaleTozoom(qreal scale) const
 	return scale;
 }
 
-void CLItemTransform::move_abs(QPointF pos, int duration, int delay )
+void CLItemTransform::move_abs(QPointF /*pos*/, int /*duration*/, int /*delay*/ )
 {
 	//m_moving.start_point = m_item->scenePos()
 }
@@ -154,7 +154,7 @@ void CLItemTransform::transform_helper()
 	trans.scale(scl, scl);
 	trans.rotate(m_Zrotation.curent); 
 	trans.translate(-center.x(), -center.y());
-	/**/
+    */
 
 	qreal transform_ange = round_angle(m_Zrotation, 1);
 

@@ -132,9 +132,9 @@ protected:
 	virtual void mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * event );
 
 protected:
-	bool m_selected;
-	bool m_arranged;
-	bool m_fullscreen; // could be only if m_selected
+    bool m_arranged;
+    bool m_fullscreen; // could be only if m_selected
+    bool m_selected;
 
 	bool m_mouse_over;
 	bool m_zoomOnhover;
@@ -153,8 +153,8 @@ protected:
 	QPointF m_rotation_center; 
 	QPointF m_rotation_hand;
 
-	bool m_needUpdate;
-	bool mEditable;
+    bool m_editable;
+    bool m_needUpdate;
 	CLAbstractComplicatedItem* m_complicatedItem;
 
 	bool m_can_be_droped; // flag is used to draw selection. true if item is selected and can be drop on top of the other in case of mouse release 
