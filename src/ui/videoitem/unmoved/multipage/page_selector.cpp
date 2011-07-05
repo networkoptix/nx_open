@@ -21,7 +21,7 @@ QnPageSelector::~QnPageSelector()
     stopAnimation();
 }
 
-void QnPageSelector::setMaxPageNumber(unsigned int maxpage)
+void QnPageSelector::setMaxPageNumber(int maxpage)
 {
     if (m_maxPage == maxpage)
         return;

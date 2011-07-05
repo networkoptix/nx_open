@@ -141,7 +141,7 @@ int NALUnit::decodeNAL(const quint8* srcBuffer, const quint8* srcEnd, quint8* ds
 int NALUnit::extractUEGolombCode()
 {
 	int cnt = 0;
-	for(; bitReader.getBits(1) == 0; cnt++);
+	for ( ; bitReader.getBits(1) == 0; cnt++) {}
 	if (cnt > INT_BIT)
 		THROW_BITSTREAM_ERR;
 	return (1 << cnt)-1 + bitReader.getBits(cnt);
@@ -166,10 +166,10 @@ void NALUnit::writeUEGolombCode(BitStreamWriter& bitWriter, quint32 value)
 		nBit++;
 	}
 	*/
-	int maxVal = 0;
+	unsigned maxVal = 0;
 	int x = 1;
 	int nBit = 0;
-	for (; maxVal < value; maxVal += x ) {
+	for ( ; maxVal < value; maxVal += x) {
 		x <<= 1;
 		nBit++;
 	}
@@ -182,7 +182,7 @@ void NALUnit::writeUEGolombCode(BitStreamWriter& bitWriter, quint32 value)
 int NALUnit::extractUEGolombCode(BitStreamReader& bitReader)
 {
 	int cnt = 0;
-	for(; bitReader.getBits(1) == 0; cnt++);
+	for ( ; bitReader.getBits(1) == 0; cnt++) {}
 	return (1 << cnt)-1 + bitReader.getBits(cnt);
 }
 
@@ -350,6 +350,7 @@ int PPSUnit::deserialize()
 					THROW_BITSTREAM_ERR;
 				for( int i = 0; i <= pic_size_in_map_units_minus1; i++ ) {
 					int bits = ceil_log2( num_slice_groups_minus1 + 1 );
+					Q_UNUSED(bits);
 					slice_group_id[i] = bitReader.getBits(1);
 				}
 			}
@@ -1061,6 +1062,7 @@ int SliceUnit::NextMbAddress(int n)
 	int PicHeightInMbs = FrameHeightInMbs / ( 1 + m_field_pic_flag );
 	int PicWidthInMbs = FrameWidthInMbs / ( 1 + m_field_pic_flag );
 	int PicSizeInMbs = PicWidthInMbs * PicHeightInMbs;
+	Q_UNUSED(PicSizeInMbs);
 	int i = n + 1;
 	//while( i < PicSizeInMbs  &&  MbToSliceGroupMap[ i ]  !=  MbToSliceGroupMap[ n ] )
 	//	i++;
@@ -1498,7 +1500,7 @@ void SEIUnit::sei_payload(SPSUnit& sps, int payloadType, quint8* curBuff, int pa
 	*/
 }
 
-void SEIUnit::buffering_period(int payloadSize) {}
+void SEIUnit::buffering_period(int /*payloadSize*/) {}
 
 void SEIUnit::serialize_pic_timing_message(const SPSUnit& sps, BitStreamWriter& writer, bool seiHeader)
 {
@@ -1653,25 +1655,25 @@ int getNumClockTS()
 }
 */
 
-void SEIUnit::pan_scan_rect(int payloadSize) {}
-void SEIUnit::filler_payload(int payloadSize) {}
-void SEIUnit::user_data_registered_itu_t_t35(int payloadSize) {}
-void SEIUnit::user_data_unregistered(int payloadSize) {}
-void SEIUnit::recovery_point(int payloadSize) {}
-void SEIUnit::dec_ref_pic_marking_repetition(int payloadSize) {}
-void SEIUnit::spare_pic(int payloadSize) {}
-void SEIUnit::scene_info(int payloadSize) {}
-void SEIUnit::sub_seq_info(int payloadSize) {}
-void SEIUnit::sub_seq_layer_characteristics(int payloadSize) {}
-void SEIUnit::sub_seq_characteristics(int payloadSize) {}
-void SEIUnit::full_frame_freeze(int payloadSize) {}
-void SEIUnit::full_frame_freeze_release(int payloadSize) {}
-void SEIUnit::full_frame_snapshot(int payloadSize) {}
-void SEIUnit::progressive_refinement_segment_start(int payloadSize) {}
-void SEIUnit::progressive_refinement_segment_end(int payloadSize) {}
-void SEIUnit::motion_constrained_slice_group_set(int payloadSize) {}
-void SEIUnit::film_grain_characteristics(int payloadSize) {}
-void SEIUnit::deblocking_filter_display_preference(int payloadSize) {}
-void SEIUnit::stereo_video_info(int payloadSize) {}
-void SEIUnit::reserved_sei_message(int payloadSize) {}
+void SEIUnit::pan_scan_rect(int /*payloadSize*/) {}
+void SEIUnit::filler_payload(int /*payloadSize*/) {}
+void SEIUnit::user_data_registered_itu_t_t35(int /*payloadSize*/) {}
+void SEIUnit::user_data_unregistered(int /*payloadSize*/) {}
+void SEIUnit::recovery_point(int /*payloadSize*/) {}
+void SEIUnit::dec_ref_pic_marking_repetition(int /*payloadSize*/) {}
+void SEIUnit::spare_pic(int /*payloadSize*/) {}
+void SEIUnit::scene_info(int /*payloadSize*/) {}
+void SEIUnit::sub_seq_info(int /*payloadSize*/) {}
+void SEIUnit::sub_seq_layer_characteristics(int /*payloadSize*/) {}
+void SEIUnit::sub_seq_characteristics(int /*payloadSize*/) {}
+void SEIUnit::full_frame_freeze(int /*payloadSize*/) {}
+void SEIUnit::full_frame_freeze_release(int /*payloadSize*/) {}
+void SEIUnit::full_frame_snapshot(int /*payloadSize*/) {}
+void SEIUnit::progressive_refinement_segment_start(int /*payloadSize*/) {}
+void SEIUnit::progressive_refinement_segment_end(int /*payloadSize*/) {}
+void SEIUnit::motion_constrained_slice_group_set(int /*payloadSize*/) {}
+void SEIUnit::film_grain_characteristics(int /*payloadSize*/) {}
+void SEIUnit::deblocking_filter_display_preference(int /*payloadSize*/) {}
+void SEIUnit::stereo_video_info(int /*payloadSize*/) {}
+void SEIUnit::reserved_sei_message(int /*payloadSize*/) {}
 

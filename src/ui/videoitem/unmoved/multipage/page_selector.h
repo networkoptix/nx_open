@@ -15,7 +15,7 @@ public:
 	QnPageSelector(QString name, QGraphicsItem* parent, qreal normal_opacity, qreal active_opacity);
 	~QnPageSelector();
 
-    void setMaxPageNumber(unsigned int maxpage);
+    void setMaxPageNumber(int maxpage);
     unsigned int getMaxPageNumber() const;
 
     unsigned int getCurrentPage() const;

@@ -170,9 +170,9 @@ def gen_version_h():
     print >> version_h, '#ifndef UNIVERSAL_CLIENT_VERSION_H_'
     print >> version_h, '#define UNIVERSAL_CLIENT_VERSION_H_'
     print >> version_h, '// This file is generated. Go to version.py'
-    print >> version_h, 'static const char* ORGANIZATION_NAME="%s";' % ORGANIZATION_NAME
-    print >> version_h, 'static const char* APPLICATION_NAME="%s";' % APPLICATION_NAME
-    print >> version_h, 'static const char* APPLICATION_VERSION="%s";' % APPLICATION_VERSION
+    print >> version_h, 'const char* const ORGANIZATION_NAME="%s";' % ORGANIZATION_NAME
+    print >> version_h, 'const char* const APPLICATION_NAME="%s";' % APPLICATION_NAME
+    print >> version_h, 'const char* const APPLICATION_VERSION="%s";' % APPLICATION_VERSION
     print >> version_h, ''
 
     print >> version_h, '// There constans are here for windows resouce file.'

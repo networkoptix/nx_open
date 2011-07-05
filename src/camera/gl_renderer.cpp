@@ -530,7 +530,7 @@ bool CLGLRenderer::isPixelFormatSupported(PixelFormat pixfmt)
             PIX_FMT_RGB24,
             PIX_FMT_BGR24
     };
-    for (int i = 0; i < sizeof (supportedFormats)/ sizeof(PixelFormat); ++i)
+    for (unsigned i = 0; i < sizeof (supportedFormats)/ sizeof(PixelFormat); ++i)
     {
         if (pixfmt == supportedFormats[i])
             return true;

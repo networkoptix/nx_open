@@ -166,7 +166,7 @@ void AVSettingsDlg::initImageQuality()
 
     }
 
-    if (group=getGroupByName("Color"))
+    if ( (group = getGroupByName("Color")) )
     {
         group->move(385,10);
         group->setFixedWidth(180);
@@ -180,7 +180,7 @@ void AVSettingsDlg::initImageQuality()
 
     }
 
-    if (group=getGroupByName("Adjustment"))
+    if ( (group = getGroupByName("Adjustment")) )
     {
         group->move(10,240);
         group->setFixedWidth(555);
@@ -260,7 +260,7 @@ void AVSettingsDlg::initDN()
 //    QGroupBox* group;
     CLAbstractSettingsWidget* wgt;
 
-    if (wgt = getWidgetByName("Day/Night Mode"))
+    if ( (wgt = getWidgetByName("Day/Night Mode")) )
         wgt->toWidget()->move(215,130);
 }
 
@@ -328,7 +328,7 @@ void AVSettingsDlg::correctWgtsState()
     CLAbstractSettingsWidget* wgt;
     QString val;
 
-    if (wgt = getWidgetByName("Light Mode"))
+    if ( (wgt = getWidgetByName("Light Mode")) )
     {
         val = (QString)wgt->param().value.value;
 
@@ -345,7 +345,7 @@ void AVSettingsDlg::correctWgtsState()
     }
 
     //=================================================
-    if (wgt = getWidgetByName("Codec"))
+    if ( (wgt = getWidgetByName("Codec")) )
     {
         val = (QString)wgt->param().value.value;
 

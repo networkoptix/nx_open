@@ -579,8 +579,8 @@ bool CLAVIStreamReader::setAudioChannel(unsigned int num)
 {
     // convert num to absolute track number
     int lastStreamID = -1;
-    int currentAudioTrackNum = 0;
-    for(unsigned i = 0; i < m_formatContext->nb_streams; i++) 
+    unsigned currentAudioTrackNum = 0;
+    for (unsigned i = 0; i < m_formatContext->nb_streams; i++) 
     {
         AVStream *strm= m_formatContext->streams[i];
         AVCodecContext *codecContext = strm->codec;

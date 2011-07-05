@@ -242,7 +242,7 @@ int QtvSound::checkOpenALError(ALCdevice* device)
 	return err;
 }
 
-int QtvSound::checkOpenALErrorDebug(ALCdevice* device) 
+int QtvSound::checkOpenALErrorDebug(ALCdevice* /*device*/)
 {
 #ifdef _DEBUG
 	return checkOpenALError(device);

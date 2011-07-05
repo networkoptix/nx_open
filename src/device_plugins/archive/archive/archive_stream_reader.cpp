@@ -156,7 +156,7 @@ quint64 CLArchiveStreamReader::currentTime() const
 {
 	QMutexLocker mutex(&m_cs);
 
-    if (m_currentTime == -1)
+    if (m_currentTime == (unsigned)-1)
         return slowestChannelTime();
 
     return m_currentTime;
@@ -412,7 +412,7 @@ void CLArchiveStreamReader::channeljumpTo(quint64 mksec, int channel)
     if (mCurrIndex[channel] == (unsigned)-1)
         mCurrIndex[channel] = nextFrameIndex(true, channel, new_index, true, m_forward);
 
-    mFinished[channel] = (mCurrIndex[channel]==-1);
+    mFinished[channel] = (mCurrIndex[channel] == (unsigned)-1);
 
     if (mCurrIndex[channel] == (unsigned)-1)
         return;
