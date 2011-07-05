@@ -179,15 +179,15 @@ def gen_version_h():
 
     app_version_commas = APPLICATION_VERSION.replace('.', ',')
     print >> version_h, '#define VER_FILEVERSION             %s,0' % app_version_commas
-    print >> version_h, '#define VER_FILEVERSION_STR         "%s.0\0"' % APPLICATION_VERSION
+    print >> version_h, '#define VER_FILEVERSION_STR         "%s.0"' % APPLICATION_VERSION
 
     print >> version_h, '#define VER_PRODUCTVERSION          %s' % app_version_commas
-    print >> version_h, '#define VER_PRODUCTVERSION_STR      "%s\0"' % APPLICATION_VERSION
+    print >> version_h, '#define VER_PRODUCTVERSION_STR      "%s"' % APPLICATION_VERSION
 
     print >> version_h, '#define VER_COMPANYNAME_STR         "%s"' % ORGANIZATION_NAME
     print >> version_h, '#define VER_FILEDESCRIPTION_STR     "%s"' % APPLICATION_NAME
     print >> version_h, '#define VER_INTERNALNAME_STR        "%s"' % APPLICATION_NAME
-    print >> version_h, '#define VER_LEGALCOPYRIGHT_STR      "Copyright © 2011 %s"' % ORGANIZATION_NAME
+    print >> version_h, '#define VER_LEGALCOPYRIGHT_STR      "Copyright Â© 2011 %s"' % ORGANIZATION_NAME
     print >> version_h, '#define VER_LEGALTRADEMARKS1_STR    "All Rights Reserved"'
     print >> version_h, '#define VER_LEGALTRADEMARKS2_STR    VER_LEGALTRADEMARKS1_STR'
     print >> version_h, '#define VER_ORIGINALFILENAME_STR    "EvePlayer-Beta.exe"'
