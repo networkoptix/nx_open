@@ -531,11 +531,12 @@ qint32 CLAVIDvdStreamReader::readPacket(quint8* buf, int size)
     CellPlaybackInfo* cell =  &data->m_cellList[data->m_currentCell];
     int cellLastBlock = cell->m_lastSector;
 
-    if (m_currentPosition > cellLastBlock && data->m_currentCell == data->m_cellList.size()-1 
+    if (currentBlock > cellLastBlock && data->m_currentCell == data->m_cellList.size()-1 
         && m_currentFileIndex < m_fileList.size()-1 && !m_inSeek)
     {
         // goto next VTS file
         switchToFile(m_currentFileIndex+1);
+        seek(0, SEEK_SET);
     }
 
     int blocksToRead = qMin(IO_BLOCK_SIZE/DVDCSS_BLOCK_SIZE, int(cellLastBlock - currentBlock + 1));
