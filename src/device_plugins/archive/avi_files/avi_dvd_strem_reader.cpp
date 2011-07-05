@@ -237,13 +237,12 @@ struct CellPlaybackInfo
 
 struct DvdDecryptInfo
 {
-    DvdDecryptInfo(): m_dvd_file(0), m_duration(0), m_ifo_handle(0), m_ifoNum(0),m_fileSize(0), m_currentCell(0) {}
+    DvdDecryptInfo(): m_dvd_file(0), m_duration(0), m_ifo_handle(0), m_fileSize(0), m_currentCell(0) {}
     dvd_file_t* m_dvd_file;
-    ifo_handle_t* m_ifo_handle;
     qint64 m_duration;
+    ifo_handle_t* m_ifo_handle;
     QVector<quint16> m_audioLang;
     QVector<CellPlaybackInfo> m_cellList;
-    int m_ifoNum;
     qint64 m_fileSize;
     int m_currentCell;
 };
@@ -262,6 +261,7 @@ CLAVIDvdStreamReader::CLAVIDvdStreamReader(CLDevice* dev):
 
 CLAVIDvdStreamReader::~CLAVIDvdStreamReader()
 {
+    destroy();
     delete [] m_tmpBuffer;
     delete [] m_dvdReadBuffer;
 }
@@ -274,28 +274,25 @@ void CLAVIDvdStreamReader::setChapterNum(int chapter)
 QStringList CLAVIDvdStreamReader::getPlaylist()
 {
     QStringList rez;
-    QString sourceDir = m_device->getUniqueId();
-    if (!sourceDir.toUpper().endsWith("VIDEO_TS"))
-        sourceDir = CLAVIPlaylistStreamReader::addDirPath(sourceDir, "VIDEO_TS");
-    QDir dvdDir = QDir(sourceDir);
-    if (!dvdDir.exists())
+    if (!m_dvdReader)
+    {
+        QString path = m_device->getUniqueId();
+        if (path.length() == 3 && path.endsWith(":/"))
+            path = path.left(2); // physical mode access under WIN32 expects path in 2-letter format.
+        m_dvdReader = DVDOpen(path.toAscii().constData());
+        if (!m_dvdReader)
+            return rez;
+    }
+
+    if (m_mainIfo == 0)
+        m_mainIfo = ifoOpen(m_dvdReader, 0);
+
+    if (m_mainIfo == 0)
         return rez;
 
-    QString mask = "VTS_";
-    dvdDir.setNameFilters(QStringList() << mask+"*.vob" << mask+"*.VOB");
-    dvdDir.setSorting(QDir::Name);
-    QFileInfoList tmpFileList = dvdDir.entryInfoList();
-    QString chapterStr = QString::number(m_chapter);
-    if (m_chapter < 10)
-        chapterStr.insert(0, "0");
-
-    for (int i = 0; i < tmpFileList.size(); ++i)
+    for (int i = 0; i < m_mainIfo->tt_srpt->nr_of_srpts; ++i)
     {
-        QStringList vobName = tmpFileList[i].baseName().split("_");
-        if ((vobName.size()==3) && (vobName.at(2).left(1) == "1"))
-        {
-            rez << tmpFileList[i].absoluteFilePath();
-        }
+        rez << QString::number(i+1);
     }
     return rez;
 }
@@ -379,15 +376,6 @@ qint64 CLAVIDvdStreamReader::findFirstDts(quint8* buffer, int bufSize)
 bool CLAVIDvdStreamReader::switchToFile(int newFileIndex)
 {
     QString fileName = m_fileList[newFileIndex]->m_name;
-    if (!m_dvdReader)
-    {
-        QString path = m_device->getUniqueId();
-        if (path.length() == 3 && path.endsWith(":/"))
-            path = path.left(2); // physical mode access under WIN32 expects path in 2-letter format.
-        m_dvdReader = DVDOpen(path.toAscii().constData());
-        if (!m_dvdReader)
-            return false;
-    }
     if (newFileIndex >= m_fileList.size())
         return false;
 
@@ -400,20 +388,22 @@ bool CLAVIDvdStreamReader::switchToFile(int newFileIndex)
         {
             data = new DvdDecryptInfo();
             m_fileList[newFileIndex]->opaque = data;
+            
+            int titleNum = m_fileList[newFileIndex]->m_name.toInt();
 
-            QFileInfo info(m_fileList[newFileIndex]->m_name);
-            data->m_ifoNum = 1;
-            QStringList parts = info.baseName().split('_');
-            if (parts.size() > 1)
-                data->m_ifoNum = parts[1].toInt();
+            if (m_mainIfo->tt_srpt->nr_of_srpts < titleNum)
+                return false;
+            quint8 i_ttn = m_mainIfo->tt_srpt->title[titleNum-1].vts_ttn; // number-1 is valid title?
+            int vtsnum = m_mainIfo->tt_srpt->title[titleNum-1].title_set_nr;
+            int chapid = 0;
 
-            data->m_dvd_file = DVDOpenFile(m_dvdReader, data->m_ifoNum, DVD_READ_TITLE_VOBS);
+            data->m_dvd_file = DVDOpenFile(m_dvdReader, vtsnum, DVD_READ_TITLE_VOBS);
             if (data->m_dvd_file == 0)
                 return false;
 
             if (data->m_ifo_handle == 0)
             {
-                data->m_ifo_handle = ifoOpen(m_dvdReader, data->m_ifoNum);
+                data->m_ifo_handle = ifoOpen(m_dvdReader, vtsnum);
                 ifo_handle_t* ifo = data->m_ifo_handle;
                 data->m_duration = 0;
                 if (ifo)
@@ -425,21 +415,21 @@ bool CLAVIDvdStreamReader::switchToFile(int newFileIndex)
                     }
 
                     // fill cell map
-                    if (m_mainIfo == 0)
-                        m_mainIfo = ifoOpen(m_dvdReader, 0);
                     ifo_handle_t* ifo = data->m_ifo_handle;
 
-                    // Ignore titles, instead go throught vts01..vts0N.
                     
-                    /*quint8 i_ttn = m_mainIfo->tt_srpt->title[data->m_ifoNum-1].vts_ttn; // number-1 is valid title?
-                    quint8 i_ttn = m_mainIfo->tt_srpt->title[data->m_ifoNum-1].vts_ttn; // number-1 is valid title?
-                    int chapid = 0;
+                    if (ifo->vts_ptt_srpt->nr_of_srpts < i_ttn)
+                        return false;
                     quint16 pgc_id = ifo->vts_ptt_srpt->title[i_ttn - 1].ptt[chapid].pgcn;
+
                     quint16 pgn = ifo->vts_ptt_srpt->title[i_ttn - 1].ptt[chapid].pgn;
-                    */
-                    quint16 pgc_id = ifo->vts_ptt_srpt->title[0].ptt[0].pgcn;
-                    quint16 pgn = ifo->vts_ptt_srpt->title[0].ptt[0].pgn;
+
+                    if (ifo->vts_pgcit->nr_of_pgci_srp < pgc_id)
+                        return false;
                     pgc_t* p_pgc = ifo->vts_pgcit->pgci_srp[pgc_id - 1].pgc;
+                    if ( p_pgc->nr_of_programs < pgn)
+                        return false;
+
                     qint64 totalSectors = 0;
                     
                     int angle = 0;
@@ -649,24 +639,31 @@ qint32 CLAVIDvdStreamReader::writePacket(quint8* /*buf*/, int /*size*/)
     return 0; // not implemented
 }
 
+void CLAVIDvdStreamReader::deleteFileInfo(CLFileInfo* fi)
+{
+    DvdDecryptInfo* info = (DvdDecryptInfo*) fi->opaque;
+    if (info && info->m_dvd_file)
+        DVDCloseFile(info->m_dvd_file);
+    if (info && info->m_ifo_handle)
+        ifoClose(info->m_ifo_handle);
+    delete info;
+    CLAVIPlaylistStreamReader::deleteFileInfo(fi);
+}
+
 void CLAVIDvdStreamReader::destroy()
 {
-
     foreach(CLFileInfo* fi, m_fileList)
-    {
-        DvdDecryptInfo* info = (DvdDecryptInfo*) fi->opaque;
-        if (info && info->m_dvd_file)
-            DVDCloseFile(info->m_dvd_file);
-        if (info && info->m_ifo_handle)
-            ifoClose(info->m_ifo_handle);
-        delete info;
-    }
+        deleteFileInfo(fi);
+    m_fileList.clear();
+
+    CLAVIPlaylistStreamReader::destroy();
+
     if (m_mainIfo)
         ifoClose(m_mainIfo);
+    m_mainIfo = 0;
     DVDClose(m_dvdReader);
     m_dvdReader = 0;
     m_tmpBufferSize = 0;
-    CLAVIPlaylistStreamReader::destroy();
 }
 
 void CLAVIDvdStreamReader::fillAdditionalInfo(CLFileInfo* fi) 

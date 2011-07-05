@@ -58,7 +58,7 @@ AVFormatContext* CLAVIPlaylistStreamReader::getFormatContext()
 
         if (!switchToFile(m_fileList.size() - 1))
         {
-            delete fi;
+            deleteFileInfo(fi);
             m_fileList.remove(m_fileList.size() - 1);
             continue;
         }
@@ -82,7 +82,7 @@ AVFormatContext* CLAVIPlaylistStreamReader::getFormatContext()
         delete [] buffer;
         if (!switchToFile(m_fileList.size() - 1))
         {
-            delete fi;
+            deleteFileInfo(fi);
             m_fileList.remove(m_fileList.size() - 1);
             continue;
         }
@@ -90,7 +90,7 @@ AVFormatContext* CLAVIPlaylistStreamReader::getFormatContext()
         if (!inCtx || av_open_input_stream(&fi->m_formatContext, getIOContext(), "", inCtx, 0) < 0 ||
             av_find_stream_info(fi->m_formatContext) < 0)	
         {
-            delete fi;
+            deleteFileInfo(fi);
             m_fileList.remove(m_fileList.size() - 1);
         }
         else
@@ -178,20 +178,25 @@ qint64 CLAVIPlaylistStreamReader::packetTimestamp(AVStream* stream, const AVPack
         return packetTime + m_fileList[m_currentFileIndex]->m_offsetInMks;
 }
 
+void CLAVIPlaylistStreamReader::deleteFileInfo(CLFileInfo* fi)
+{
+    if (fi->m_formatContext)
+        av_close_input_stream(fi->m_formatContext);
+    delete fi;
+}
+
 void CLAVIPlaylistStreamReader::destroy()
 {
     
     foreach(CLFileInfo* fi, m_fileList)
     {
-        if (fi->m_formatContext)
-            av_close_input_stream(fi->m_formatContext);
-        delete fi;
+        deleteFileInfo(fi);
     }
+    m_fileList.clear();
 
     m_initialized = false;
     m_currentFileIndex = -1;
     m_formatContext = 0;
-    m_fileList.clear();
 }
 
 QString CLAVIPlaylistStreamReader::addDirPath(const QString sourceDir, const QString& postfix)

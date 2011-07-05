@@ -29,6 +29,7 @@ private:
     qint32 writePacket(quint8* buf, int size);
     qint64 packetTimestamp(AVStream* stream, const AVPacket& packet);
     qint64 findFirstDts(quint8* buffer, int bufSize);
+    virtual void deleteFileInfo(CLFileInfo* fi);
 private:
     int m_chapter;
     dvd_reader_t* m_dvdReader;

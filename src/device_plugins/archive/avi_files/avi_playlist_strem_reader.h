@@ -20,7 +20,6 @@ protected:
         QString m_name;
         qint64 m_offsetInMks; // offset in micro seconds from the beginning (duration sum of previous files)
         AVFormatContext* m_formatContext;
-        //qint64 m_durationHint; // override play item duration from hint instead ffmpeg autodetection. Ffmpeg fails (invalid duration) for some VOB files
         void* opaque;
     };
 
@@ -39,6 +38,7 @@ protected:
     virtual bool directSeekToPosition(qint64 pos_mks) { return false;}
 
     virtual void fillAdditionalInfo(CLFileInfo* /*fi*/) {}
+    virtual void deleteFileInfo(CLFileInfo* fi);
 protected:
     quint8* m_ioBuffer;
     ByteIOContext* m_ffmpegIOContext;
