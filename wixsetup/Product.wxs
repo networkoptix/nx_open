@@ -128,7 +128,37 @@
               <CreateFolder />
             </Component>
 
-	    <Component Id="EveDirectoryPlayWithMenuItem" Guid="AA081E9B-26A0-4333-9BBA-975733254DC2" DiskId="1">
+            <Component Id="EveDVDMovie" Guid="515E9EA0-B5FF-41bb-A59D-D339D786D59E" DiskId="1">
+              <RegistryValue Root="HKCR" Type="string" Key="EVE.DVDMovie" Value="EVE DVD movie" KeyPath="yes" />
+              <RegistryValue Root="HKCR" Type="string" Key="EVE.DVDMovie\shell\open\command" Value="&quot;[#UniclientEXE]&quot; %1"/>
+              <RegistryValue Root="HKCR" Type="string" Key="EVE.DVDMovie\DefaultIcon" Value="&quot;[#UniclientEXE]&quot;" />
+
+              <RegistryValue Root="HKLM" Type="string" Key="SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\EventHandlers\PlayDVDMovieOnArrival" Name="EVEPlayDVDMovieOnArrival" Value=""/>
+              <RegistryKey Root="HKLM" Key="SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\EVEPlayDVDMovieOnArrival">
+                <RegistryValue Type="string" Name="Action" Value="Play DVD movie"/>
+                <RegistryValue Type="string" Name="DefaultIcon" Value="&quot;[#UniclientEXE]&quot;"/>
+                <RegistryValue Type="string" Name="InvokeProgID" Value="EVE.DVDMovie"/>
+                <RegistryValue Type="string" Name="InvokeVerb" Value="Open"/>
+                <RegistryValue Type="string" Name="Provider" Value="EVE media player"/>
+              </RegistryKey>
+            </Component>
+
+            <Component Id="EveMovieFiles" Guid="CEB4BFE6-9E08-4ef9-8D4B-49FA14E76204" DiskId="1">
+              <RegistryValue Root="HKCR" Type="string" Key="EVE.MovieFiles" Value="EVE movie files" KeyPath="yes" />
+              <RegistryValue Root="HKCR" Type="string" Key="EVE.MovieFiles\shell\open\command" Value="&quot;[#UniclientEXE]&quot; %1"/>
+              <RegistryValue Root="HKCR" Type="string" Key="EVE.MovieFiles\DefaultIcon" Value="&quot;[#UniclientEXE]&quot;" />
+
+              <RegistryValue Root="HKLM" Type="string" Key="SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\EventHandlers\PlayVideoFilesOnArrival" Name="EVEPlayVideoFilesOnArrival" Value=""/>
+              <RegistryKey Root="HKLM" Key="SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\EVEPlayVideoFilesOnArrival">
+                <RegistryValue Type="string" Name="Action" Value="Play movie files"/>
+                <RegistryValue Type="string" Name="DefaultIcon" Value="&quot;[#UniclientEXE]&quot;"/>
+                <RegistryValue Type="string" Name="InvokeProgID" Value="EVE.MovieFiles"/>
+                <RegistryValue Type="string" Name="InvokeVerb" Value="Open"/>
+                <RegistryValue Type="string" Name="Provider" Value="EVE media player"/>
+              </RegistryKey>
+            </Component>
+            
+            <Component Id="EveDirectoryPlayWithMenuItem" Guid="AA081E9B-26A0-4333-9BBA-975733254DC2" DiskId="1">
               <RegistryValue Root="HKCR" Key="Directory\shell\play.EvePlayer.exe" Value="Play with $(env.APPLICATION_NAME)" Type="string" />
               <RegistryValue Root="HKCR" Key="Directory\shell\play.EvePlayer.exe\command" Value="&quot;[#UniclientEXE]&quot; &quot;%1&quot;" Type="string" />
             </Component>
@@ -225,7 +255,9 @@
       <ComponentRef Id='arecontvision'/>
       <ComponentRef Id='MediaFolderComponent'/>
 
-      <ComponentRef Id='EveDirectoryPlayWithMenuItem' />
+      <ComponentRef Id='EveDirectoryPlayWithMenuItem'/>
+      <ComponentRef Id='EveDVDMovie'/>
+      <ComponentRef Id='EveMovieFiles'/>
 
       <ComponentRef Id='EveApplication' />
       
