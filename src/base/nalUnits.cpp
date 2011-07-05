@@ -259,7 +259,7 @@ int ceil_log2(double val)
 	int mask = 1 << (bits-1);
 	iVal = (int) val;
 	if (iVal - mask == 0 && frac == 0)
-		return bits-1; // Например: cail(log2(8.0)) = 3, а для 8.2 или 9.0 уже 4
+        return bits-1; // For example: cail(log2(8.0)) = 3, but for 8.2 or 9.0 is 4
 	else
 		return bits;
 }
@@ -574,8 +574,8 @@ void SPSUnit::deserializeVuiParameters()
 		hrd_parameters();
 
 	// last part not used now.
-	// и еще очень похоже на то, что x264 в этих битах ставит багу
-	vcl_hrd_parameters_present_flag = bitReader.getBit();
+    // looks like x264 sets bug in this bits
+    vcl_hrd_parameters_present_flag = bitReader.getBit();
 	if( vcl_hrd_parameters_present_flag )
 		hrd_parameters();
 	if( nal_hrd_parameters_present_flag  ||  vcl_hrd_parameters_present_flag )

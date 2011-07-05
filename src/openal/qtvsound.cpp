@@ -10,7 +10,6 @@
 #include <alc.h>
 #endif
 
-
 QtvSound::QtvSound(ALCdevice* device, const QAudioFormat& audioFormat) 
 {
 	m_audioFormat = audioFormat;
@@ -229,7 +228,7 @@ bool QtvSound::outError(int err, const char* strerr)
 
 int QtvSound::checkOpenALError(ALCdevice* device) 
 {
-	// получить ошибку
+    // get an error
 	int err = alGetError();
 	if (err  != AL_NO_ERROR) {
 		const char* strerr = alGetString(err);
