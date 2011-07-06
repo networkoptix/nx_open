@@ -3,6 +3,7 @@
 #include "../device/device_video_layout.h"
 #include "videostreamdisplay.h"
 #include "audiostreamdisplay.h"
+#include "decoders/audio/ffmpeg_audio.h"
 
 // a lot of small audio packets in bluray HD audio codecs. So, previous size 7 is not enought
 #define CL_MAX_DISPLAY_QUEUE_SIZE 15 
@@ -140,21 +141,6 @@ void CLCamDisplay::jump()
 
 void CLCamDisplay::processData(CLAbstractData* data)
 {
-    if (m_needReinitAudio)
-    {
-        delete m_audioDisplay;
-
-		while(m_dataQueue.size() > 0)
-		{
-			bool get = m_dataQueue.pop(data, 0);
-			if (get)
-				data->releaseRef();
-		}
-        m_audioDisplay = new CLAudioStreamDisplay(AUDIO_BUFF_SIZE);
-        m_needReinitAudio = false;
-		return; // skip current packet
-    }
-
     if (m_needChangePriority)
     {
         if (m_playAudio)
@@ -188,6 +174,19 @@ void CLCamDisplay::processData(CLAbstractData* data)
 
 	if (ad)
 	{
+		if (m_needReinitAudio)
+		{
+			AVCodecContext* codec = (AVCodecContext*) ad->context;
+			QAudioFormat currentAudioFormat;
+			CLFFmpegAudioDecoder::audioCodecFillFormat(currentAudioFormat, codec);
+			if (m_expectedAudioFormat == currentAudioFormat)
+			{
+				delete m_audioDisplay;
+				m_audioDisplay = new CLAudioStreamDisplay(AUDIO_BUFF_SIZE);
+				m_needReinitAudio = false;
+			}
+		}
+
         if (ad->timestamp < m_lastAudioPacketTime)
             afterJump(ad->timestamp);
 
@@ -432,10 +431,8 @@ void CLCamDisplay::setMTDecoding(bool value)
     }
 }
 
-void CLCamDisplay::onDataEvent(CLStreamreader::StreamReaderEvent event)
+void CLCamDisplay::onAudioParamsChanged(AVCodecContext * codec)
 {
-    if (event == CLStreamreader::AudioParamsChanged)
-    {
-        m_needReinitAudio = true; 
-    }
+	CLFFmpegAudioDecoder::audioCodecFillFormat(m_expectedAudioFormat, codec);
+    m_needReinitAudio = true; 
 }

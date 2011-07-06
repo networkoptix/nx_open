@@ -43,7 +43,7 @@ public:
 
     void setMTDecoding(bool value);
 public slots:
-    void onDataEvent(CLStreamreader::StreamReaderEvent);
+    void onAudioParamsChanged(AVCodecContext * codec);
 signals:
     void reachedTheEnd();
 private:
@@ -94,6 +94,7 @@ private:
     bool mGenerateEndOfStreamSignal;
 
     bool m_needReinitAudio;
+	QAudioFormat m_expectedAudioFormat;
 };
 
 #endif //clcam_display_h_1211

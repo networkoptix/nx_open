@@ -78,7 +78,7 @@ void CLStreamreader::addDataProcessor(CLAbstractDataProcessor* dp)
 	if (!m_dataprocessors.contains(dp))
     {
 		m_dataprocessors.push_back(dp);
-        connect(this, SIGNAL(dataEvent(CLStreamreader::StreamReaderEvent)), dp, SLOT(onDataEvent(CLStreamreader::StreamReaderEvent)), Qt::DirectConnection);
+        connect(this, SIGNAL(audioParamsChanged(AVCodecContext*)), dp, SLOT(onAudioParamsChanged(AVCodecContext*)), Qt::DirectConnection);
     }
 }
 

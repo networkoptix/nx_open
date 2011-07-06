@@ -12,17 +12,12 @@ class CLDevice;
 #define CL_MAX_DATASIZE (10*1024*1024) // assume we can never get compressed data with  size greater than this
 #define CL_MAX_CHANNEL_NUMBER (10) 
 
+struct AVCodecContext;
+
 class CLStreamreader : public CLLongRunnable
 {
     Q_OBJECT
 public:
-
-    enum StreamReaderEvent
-    {
-        AudioParamsChanged,
-        VideoParamsChanged, // for future use
-        EOF_Reached  // for future use
-    };
 
 	enum StreamQuality {CLSLowest, CLSLow, CLSNormal, CLSHigh, CLSHighest};
 
@@ -63,7 +58,8 @@ public:
 	virtual void setQuality(StreamQuality q);
 	StreamQuality getQuality() const;
 signals:
-    void dataEvent(CLStreamreader::StreamReaderEvent changeCode);
+    void audioParamsChanged(AVCodecContext * codec);
+    void videoParamsChanged(AVCodecContext * codec);
 protected:
 
 	void putData(CLAbstractData* data);

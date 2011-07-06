@@ -2,6 +2,7 @@
 
 #include "base/log.h"
 #include "base/aligned_data.h"
+#include "base/ffmpeg_helper.h"
 
 struct AVCodecContext;
 
@@ -66,6 +67,45 @@ CLFFmpegAudioDecoder::~CLFFmpegAudioDecoder(void)
 
 }
 
+void CLFFmpegAudioDecoder::audioCodecFillFormat(QAudioFormat& format, AVCodecContext *c)
+{
+	if (c->sample_rate)
+		format.setFrequency(c->sample_rate);
+
+	if (c->channels) 
+		format.setChannels(c->channels);
+
+	//format.setCodec("audio/pcm");
+	format.setCodec(codecIDToString(c->codec_id));
+	format.setByteOrder(QAudioFormat::LittleEndian);
+
+	switch(c->sample_fmt)
+	{
+	case SAMPLE_FMT_U8: ///< unsigned 8 bits
+		format.setSampleSize(8);
+		format.setSampleType(QAudioFormat::UnSignedInt);
+		break;
+
+	case SAMPLE_FMT_S16: ///< signed 16 bits
+		format.setSampleSize(16);
+		format.setSampleType(QAudioFormat::SignedInt);
+		break;
+
+	case SAMPLE_FMT_S32:///< signed 32 bits
+		format.setSampleSize(32);
+		format.setSampleType(QAudioFormat::SignedInt);
+	    break;
+
+	case AV_SAMPLE_FMT_FLT:
+		format.setSampleSize(32);
+		format.setSampleType(QAudioFormat::Float);
+		break;
+
+    default:
+        break;
+	}
+}
+
 //The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than the actual read bytes because some optimized bit stream readers read 32 or 64 bits at once and could read over the end.
 //The end of the input buffer buf should be set to 0 to ensure that no over reading happens for damaged MPEG streams.
 bool CLFFmpegAudioDecoder::decode(CLAudioData& data)
@@ -124,40 +164,7 @@ bool CLFFmpegAudioDecoder::decode(CLAudioData& data)
 
 	}
 
-	if (c->sample_rate)
-		data.format.setFrequency(c->sample_rate);
-
-	if (c->channels) 
-		data.format.setChannels(c->channels);
-
-	data.format.setCodec("audio/pcm");
-	data.format.setByteOrder(QAudioFormat::LittleEndian);
-
-	switch(c->sample_fmt)
-	{
-	case SAMPLE_FMT_U8: ///< unsigned 8 bits
-		data.format.setSampleSize(8);
-		data.format.setSampleType(QAudioFormat::UnSignedInt);
-		break;
-
-	case SAMPLE_FMT_S16: ///< signed 16 bits
-		data.format.setSampleSize(16);
-		data.format.setSampleType(QAudioFormat::SignedInt);
-		break;
-
-	case SAMPLE_FMT_S32:///< signed 32 bits
-		data.format.setSampleSize(32);
-		data.format.setSampleType(QAudioFormat::SignedInt);
-	    break;
-
-	case AV_SAMPLE_FMT_FLT:
-		data.format.setSampleSize(32);
-		data.format.setSampleType(QAudioFormat::Float);
-		break;
-
-    default:
-        break;
-	}
+	audioCodecFillFormat(data.format, c);
 
 	return true;
 }

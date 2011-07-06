@@ -13,6 +13,7 @@ public:
 	bool decode(CLAudioData& data);
 	~CLFFmpegAudioDecoder();
 
+	static void audioCodecFillFormat(QAudioFormat& format, AVCodecContext *c);
 private:
 
 	AVCodec *codec;
@@ -20,7 +21,6 @@ private:
 
 	static bool m_first_instance;
 	CodecID m_codec;
-
 	//===================
 };
 
