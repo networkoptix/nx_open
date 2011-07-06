@@ -95,6 +95,7 @@ private:
 
     bool m_needReinitAudio;
 	QAudioFormat m_expectedAudioFormat;
+	QMutex m_audioChangeMutex;
 };
 
 #endif //clcam_display_h_1211

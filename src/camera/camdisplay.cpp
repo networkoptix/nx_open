@@ -176,6 +176,7 @@ void CLCamDisplay::processData(CLAbstractData* data)
 	{
 		if (m_needReinitAudio)
 		{
+			QMutexLocker lock(&m_audioChangeMutex);
 			AVCodecContext* codec = (AVCodecContext*) ad->context;
 			QAudioFormat currentAudioFormat;
 			CLFFmpegAudioDecoder::audioCodecFillFormat(currentAudioFormat, codec);
@@ -433,6 +434,7 @@ void CLCamDisplay::setMTDecoding(bool value)
 
 void CLCamDisplay::onAudioParamsChanged(AVCodecContext * codec)
 {
+	QMutexLocker lock(&m_audioChangeMutex);
 	CLFFmpegAudioDecoder::audioCodecFillFormat(m_expectedAudioFormat, codec);
     m_needReinitAudio = true; 
 }
