@@ -57,6 +57,7 @@ protected:
 	qint64 m_needToSleep;
 
 	mutable QMutex m_cs;
+    mutable QMutex m_framesMutex;
 
 	bool m_useTwice;
 
