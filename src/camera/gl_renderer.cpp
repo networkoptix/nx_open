@@ -36,9 +36,12 @@
 #endif
 
 static const int MAX_SHADER_SIZE = 1024*3; 
+static const int ROUND_COEFF = 8;
+
+QVector<quint8> CLGLRenderer::m_staticYFiller;
+QVector<quint8> CLGLRenderer::m_staticUVFiller;
 
 #define OGL_CHECK_ERROR(str) //if (checkOpenGLError() != GL_NO_ERROR) {cl_log.log(str, __LINE__ , cl_logERROR); }
-
 
 // arbfp1 fragment program for converting yuv (YV12) to rgb
 static const char yv12ToRgb[] =
@@ -245,6 +248,7 @@ void CLGLRenderer::init(bool msgbox)
     }
 
     //version = "1.0.7";
+    clampConstant = GL_CLAMP;
     if (version && QString(version) >= QString("1.2.0"))
     {
         clampConstant = GL_CLAMP_TO_EDGE;
@@ -256,10 +260,6 @@ void CLGLRenderer::init(bool msgbox)
     else if (extensions && strstr(extensions, "GL_SGIS_texture_edge_clamp"))
     {
         clampConstant = GL_CLAMP_TO_EDGE_SGIS;
-    }
-    else
-    {
-        clampConstant = GL_CLAMP;
     }
 
     if (version && QString(version) <= "1.1.0")
@@ -495,7 +495,6 @@ void CLGLRenderer::setOpacity(qreal opacity)
 
 int roundUp(int value)
 {
-    static const int ROUND_COEFF = 8;
     return value % ROUND_COEFF ? (value + ROUND_COEFF - (value % ROUND_COEFF)) : value;
 }
 
@@ -582,7 +581,9 @@ void CLGLRenderer::updateTexture()
                 // support GL_ARB_texture_non_power_of_two ?
 
                 m_videoCoeffL[i] = 0;
-                m_videoCoeffW[i] =  roundUp(r_w[i]) / (float) wPow;
+                int round_r_w = roundUp(r_w[i]);
+                m_videoCoeffW[i] =  round_r_w / (float) wPow;
+
                 m_videoCoeffH[i] = h[i] / (float) hPow;
 
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, wPow, hPow, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, 0);
@@ -591,8 +592,51 @@ void CLGLRenderer::updateTexture()
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, clampConstant);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, clampConstant);
-            }
+                
+                // by default uninitialized YUV texture has green color. Fill right and bottom black bars 
+                // due to GL_LINEAR filtering, openGL uses some "unvisible" pixels, so it is unvisible pixels MUST be black
+                int fillSize = qMax(round_r_w, h[i]) * ROUND_COEFF;
+                quint8* staticFiller;
+                if (i == 0)
+                {
+                    if (m_staticYFiller.size() < fillSize)
+                    {
+                        m_staticYFiller.resize(fillSize);
+                        m_staticYFiller.fill(0x10);
+                    }
+                    staticFiller = &m_staticYFiller[0];
+                } else {
+                    if (m_staticUVFiller.size() < fillSize)
+                    {
+                        m_staticUVFiller.resize(fillSize);
+                        m_staticUVFiller.fill(0x80);
+                    }
+                    staticFiller = &m_staticUVFiller[0];
+                }
+            
+                glPixelStorei(GL_UNPACK_ROW_LENGTH, ROUND_COEFF);
+                if (round_r_w < wPow)
+                {
+                    glTexSubImage2D(GL_TEXTURE_2D, 0,
+                        round_r_w, 
+                        0,
+                        qMin(ROUND_COEFF, wPow - round_r_w),
+                        h[i],
+                        GL_LUMINANCE, GL_UNSIGNED_BYTE, staticFiller);
+                    OGL_CHECK_ERROR("glTexSubImage2D");
+                }
+                if (h[i] < hPow)
+                {
+                    glTexSubImage2D(GL_TEXTURE_2D, 0,
+                        0, h[i],
+                        qMin(round_r_w + ROUND_COEFF, wPow),
+                        qMin(h[i] + ROUND_COEFF, hPow),
+                        GL_LUMINANCE, GL_UNSIGNED_BYTE, staticFiller);
+                    OGL_CHECK_ERROR("glTexSubImage2D");
+                }
 
+            }
+            
             glPixelStorei(GL_UNPACK_ROW_LENGTH, w[i]);
             glTexSubImage2D(GL_TEXTURE_2D, 0,
                             0, 0,

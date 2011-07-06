@@ -152,6 +152,9 @@ private:
     static QMutex ms_maxTextureSizeMutex;
 
     bool m_inited;
+
+    static QVector<quint8> m_staticYFiller;
+    static QVector<quint8> m_staticUVFiller;
 };
 
 #endif //clgl_renderer_12_29
