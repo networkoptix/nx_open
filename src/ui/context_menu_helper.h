@@ -43,4 +43,6 @@ extern QAction cm_rotate_0;
 extern QAction cm_rotate_minus90;
 extern QAction cm_rotate_180;
 
+extern QAction cm_open_containing_folder;
+
 #endif //context_menu_helper_h_1250

@@ -37,6 +37,8 @@ QAction cm_rotate_0("0",0);
 QAction cm_rotate_minus90("-90",0);
 QAction cm_rotate_180("180",0);
 
+QAction cm_open_containing_folder("Open in containing folder...",0);
+
 void initContextMenu()
 {
 	dis_0.setData(0.0);

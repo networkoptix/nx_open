@@ -1262,6 +1262,13 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
                 }
             }
 
+            if (dev->checkDeviceTypeFlag(CLDevice::ARCHIVE) || dev->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT))
+            {
+                menu.addAction(&cm_open_containing_folder);
+            }
+
+            
+
 
             if (dev->checkDeviceTypeFlag(CLDevice::RECORDED) && !dev->getUniqueId().contains(getRecordingDir()))
             {
@@ -1463,6 +1470,28 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
 
             }
+
+            if (dev->checkDeviceTypeFlag(CLDevice::ARCHIVE) || dev->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT))
+            {
+                
+                if (act == &cm_open_containing_folder)
+                {
+                    
+                    QString file = dev->getUniqueId();
+
+#ifdef WIN32
+                    file = file.replace('/', '\\');
+                    QString program;
+                    QTextStream(&program) << "explorer.exe /select," << file;
+                    WinExec(program.toLatin1(),SW_SHOW);
+#endif
+
+                    
+                }
+                
+
+            }
+
 
 
 			if (act==&cm_fullscren)
