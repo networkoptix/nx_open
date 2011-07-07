@@ -2,7 +2,6 @@
 
 #include "base/log.h"
 #include "base/aligned_data.h"
-#include "base/ffmpeg_helper.h"
 
 struct AVCodecContext;
 
@@ -75,8 +74,7 @@ void CLFFmpegAudioDecoder::audioCodecFillFormat(QAudioFormat& format, AVCodecCon
 	if (c->channels) 
 		format.setChannels(c->channels);
 
-	//format.setCodec("audio/pcm");
-	format.setCodec(codecIDToString(c->codec_id));
+	format.setCodec("audio/pcm");
 	format.setByteOrder(QAudioFormat::LittleEndian);
 
 	switch(c->sample_fmt)
