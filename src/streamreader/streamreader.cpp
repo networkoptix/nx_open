@@ -5,8 +5,8 @@
 
 CLStreamreader::CLStreamreader(CLDevice* dev):
 m_device(dev),
-m_qulity(CLSLowest),
-m_needSleep(true)
+m_qulity(CLSLowest)
+//m_needSleep(true)
 {
 	memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame));
 	m_channel_number = dev->getVideoLayout()->numberOfChannels();
@@ -79,6 +79,7 @@ void CLStreamreader::addDataProcessor(CLAbstractDataProcessor* dp)
     {
 		m_dataprocessors.push_back(dp);
         connect(this, SIGNAL(audioParamsChanged(AVCodecContext*)), dp, SLOT(onAudioParamsChanged(AVCodecContext*)), Qt::DirectConnection);
+        connect(this, SIGNAL(realTimeStreamHint(bool)), dp, SLOT(onRealTimeStreamHint(bool)), Qt::DirectConnection);
     }
 }
 
@@ -124,7 +125,9 @@ void CLStreamreader::putData(CLAbstractData* data)
 	data->releaseRef(); // now data belongs only to processors;
 }
 
+/*
 void CLStreamreader::setNeedSleep(bool sleep)
 {
     m_needSleep = sleep;   
 }
+*/

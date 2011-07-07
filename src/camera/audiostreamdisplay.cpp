@@ -99,7 +99,7 @@ void CLAudioStreamDisplay::suspend()
 {
 	if (!m_audioSound)
 		return;
-
+    m_tooFewDataDetected = true;
 	m_audioSound->suspend();
 }
 
@@ -141,11 +141,21 @@ void CLAudioStreamDisplay::clearAudioBuffer()
     clearDeviceBuffer();
 }
 
-void CLAudioStreamDisplay::enqueueData(CLCompressedAudioData* data)
+void CLAudioStreamDisplay::enqueueData(CLCompressedAudioData* data, qint64 minTime)
 {
     data->addRef();
     m_audioQueue.enqueue(data);
-    m_audioQueue.dequeue()->releaseRef();
+
+    while (m_audioQueue.size() > 0)
+    {
+        CLCompressedAudioData* front = m_audioQueue.front();
+        if (front->timestamp >= minTime)
+            break;
+        m_audioQueue.dequeue()->releaseRef();
+    }
+
+    //if (msInBuffer() >= m_bufferMs / 10)
+    //    m_audioQueue.dequeue()->releaseRef();
 }
 
 bool CLAudioStreamDisplay::initFormatConvertRule(QAudioFormat format)
@@ -209,8 +219,16 @@ void CLAudioStreamDisplay::putData(CLCompressedAudioData* data)
 
     if (data!=0)
 	{
-        data->addRef();
+        if (msInBuffer() > m_bufferMs)
+        {
+            cl_log.log("to many data in audio queue!!!!", cl_logALWAYS);
+            return; // too much data
+        }
 
+        data->addRef();
+        m_audioQueue.enqueue(data);
+
+        /*
         if (m_audioQueue.size() < MAX_BUFFER_LEN)
             m_audioQueue.enqueue(data);
         else
@@ -225,28 +243,32 @@ void CLAudioStreamDisplay::putData(CLCompressedAudioData* data)
             clearAudioBuffer();
             return;
         }        
-        else if (msInBuffer() < m_bufferMs / 10)
+        */
+        
+        
+        if (msInBuffer() < m_bufferMs / 10)
         {
             //paying too fast; need to slowdown
             cl_log.log("too few data in audio queue!!!!", cl_logDEBUG1);
             m_tooFewDataDetected = true;
             //suspend();
-            data->dataProvider->setNeedSleep(false); //lets reader run without delays;
+            //data->dataProvider->setNeedSleep(false); //lets reader run without delays;
             return;
-        }        
+        } 
+        
 	}
 
     if (m_audioQueue.empty()) // possible if incoming data = 0
         return;
 
-    if (msInBuffer() > m_tooFewDataDetected*playAfterMs() || m_audioQueue.size() >= MAX_BUFFER_LEN )
+    //if (msInBuffer() > m_tooFewDataDetected*playAfterMs() || m_audioQueue.size() >= MAX_BUFFER_LEN )
+    while (msInQueue() > m_tooFewDataDetected*playAfterMs() || m_audioQueue.size() >= MAX_BUFFER_LEN )
     {
         m_tooFewDataDetected = false;
-        resume(); // does nothing if resumed already
 
         data = m_audioQueue.dequeue();
 
-        data->dataProvider->setNeedSleep(true); // need to introduce delay again
+        //data->dataProvider->setNeedSleep(true); // need to introduce delay again
 
         CLAudioData audio;
         audio.codec = data->compressionType;
@@ -298,7 +320,9 @@ void CLAudioStreamDisplay::putData(CLCompressedAudioData* data)
             int32Toint16(audio); 
         if (audio.format.channels() > 2 && m_downmixing)
             downmix(audio);
-	
+
+        //resume(); // does nothing if resumed already
+
 		// play audio
         if (!m_audioSound) 
 			m_audioSound = QtvAudioDevice::instance().addSound(audio.format);

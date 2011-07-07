@@ -10,7 +10,7 @@
 #include "base/pespacket.h"
 #include "base/nalUnits.h"
 
-static const int IO_BLOCK_SIZE = 32 * 1024;
+static const int IO_BLOCK_SIZE = 1024 * 1024;
 static const int IO_SKIP_BLOCK_SIZE = 1024 * 1024;
 static const int SEEK_DIRECT_SECTOR = 5;
 

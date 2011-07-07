@@ -45,9 +45,13 @@ void CLAbstractDataProcessor::run()
 			CLSleep::msleep(10);
 			continue;
 		}
-
-		processData(data);
-
+        while(!needToStop())
+        {
+            if (processData(data))
+                break;
+            else
+                CLSleep::msleep(1);
+        }
 		//cl_log.log("queue size = ", m_dataQueue.size(),cl_logALWAYS);
 
 		data->releaseRef();

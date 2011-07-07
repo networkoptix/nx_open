@@ -71,6 +71,11 @@ public:
 		return m_maxSize;
 	}
 
+    void setMaxSize(int value) 
+    {
+        m_maxSize = value;
+    }
+
 	~CLThreadQueue()
 	{
 		clear();

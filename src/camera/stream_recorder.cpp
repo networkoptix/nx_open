@@ -67,7 +67,7 @@ void CLStreamRecorder::cleanup()
 	memset(m_descriptionFile, 0, sizeof(m_descriptionFile));
 }
 
-void CLStreamRecorder::processData(CLAbstractData* data)
+bool CLStreamRecorder::processData(CLAbstractData* data)
 {
 	if (m_firstTime)
 	{
@@ -77,13 +77,13 @@ void CLStreamRecorder::processData(CLAbstractData* data)
 
 	CLAbstractMediaData* md = static_cast<CLAbstractMediaData*>(data);
 	if (md->dataType != CLAbstractMediaData::VIDEO)
-		return;
+		return true;
 
 	CLCompressedVideoData *vd= static_cast<CLCompressedVideoData*>(data);
 	int channel = vd->channelNumber;
 
 	if (channel>CL_MAX_CHANNELS-1)
-		return;
+		return true;
 
 	bool keyFrame = vd->keyFrame;
 
@@ -91,7 +91,7 @@ void CLStreamRecorder::processData(CLAbstractData* data)
 		m_gotKeyFrame[channel] = true;
 
 	if (!m_gotKeyFrame[channel]) // did not got key frame so far
-		return;
+		return true;
 
 	if (m_data[channel]==0)
 		m_data[channel] = new CLByteArray(0, 1024*1024);
@@ -116,6 +116,7 @@ void CLStreamRecorder::processData(CLAbstractData* data)
 
 	if (needToFlush(channel))
 		flushChannel(channel);
+    return true;
 }
 
 void CLStreamRecorder::endOfRun()

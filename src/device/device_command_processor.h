@@ -30,7 +30,7 @@ public:
 	bool hasSuchDeviceInQueue(CLDevice* dev) const;
 
 protected:
-	virtual void processData(CLAbstractData* data);
+	virtual bool processData(CLAbstractData* data);
 private:
 	QMap<CLDevice*, unsigned int> mDevicesQue;
 	mutable QMutex m_cs;

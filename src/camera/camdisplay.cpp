@@ -6,7 +6,8 @@
 #include "decoders/audio/ffmpeg_audio.h"
 
 // a lot of small audio packets in bluray HD audio codecs. So, previous size 7 is not enought
-#define CL_MAX_DISPLAY_QUEUE_SIZE 15 
+#define CL_MAX_DISPLAY_QUEUE_SIZE 5
+#define CL_MAX_ALLOWED_QUEUE_SIZE (CL_MAX_DISPLAY_QUEUE_SIZE*32)
 #define AUDIO_BUFF_SIZE (4000) // ms
 
 CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
@@ -17,6 +18,7 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_hadAudio(false),
       m_lastAudioPacketTime(0),
       m_lastVideoPacketTime(0),
+      m_lastDisplayedVideoTime(0),
       m_previousVideoTime(0),
       m_lastNonZerroDuration(0),
       m_previousVideoDisplayedTime(0),
@@ -24,7 +26,9 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_displayLasts(0),
       m_ignoringVideo(false),
       mGenerateEndOfStreamSignal(generateEndOfStreamSignal),
-      m_needReinitAudio(false)
+      m_needReinitAudio(false),
+      m_isRealTimeSource(true),
+      m_growEnabled(false)
 {
 	for (int i = 0; i< CL_MAX_CHANNELS; ++i)
 		m_display[i] = 0;
@@ -72,7 +76,9 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
 	// in ideal world data comes to queue at the same speed as it goes out 
 	// but timer on the sender side runs at a bit different rate in comparison to the timer here
 	// adaptive delay will not solve all problems => need to minus little appendix based on queue size
-	qint32 needToSleep = currentTime - m_previousVideoTime - (m_dataQueue.size()) * 2 * 1000;
+	qint32 needToSleep = currentTime - m_previousVideoTime;
+    if (m_isRealTimeSource)
+        needToSleep -= (m_dataQueue.size()) * 2 * 1000;
 
 	m_previousVideoTime = currentTime;
 
@@ -136,11 +142,26 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
 void CLCamDisplay::jump()
 {
     m_afterJump = true;
+    m_growEnabled = false;
     clearUnprocessedData();
 }
 
-void CLCamDisplay::processData(CLAbstractData* data)
+void CLCamDisplay::growInputQueue()
 {
+    int maxSize = m_dataQueue.maxSize();
+    if (m_dataQueue.size() >= maxSize - 1)
+        m_growEnabled = true;
+    if (m_growEnabled && m_dataQueue.size() <= maxSize/5 && maxSize <= CL_MAX_ALLOWED_QUEUE_SIZE/2)
+    {
+        m_dataQueue.setMaxSize(maxSize * 2); // grow queue
+        m_growEnabled = false;
+        cl_log.log("grow input queue. new max size=", m_dataQueue.maxSize(), cl_logALWAYS);
+    }
+};
+
+bool CLCamDisplay::processData(CLAbstractData* data)
+{
+    growInputQueue();
     if (m_needChangePriority)
     {
         if (m_playAudio)
@@ -196,19 +217,25 @@ void CLCamDisplay::processData(CLAbstractData* data)
 		// we synch video to the audio; so just put audio in player with out thinking
 		if (m_playAudio)
 		{
-			m_audioDisplay->putData(ad);
+            if (m_audioDisplay->msInBuffer() > AUDIO_BUFF_SIZE && m_videoQueue->isEmpty())
+            {
+                // If we have only audio stream, delay current packet if queue size too large
+                return false; // current packet can not be processed. try latter
+            }
+
+            m_audioDisplay->putData(ad);
             m_hadAudio = true;
 		}
         else if (m_hadAudio)
         {
-            m_audioDisplay->enqueueData(ad);
+            m_audioDisplay->enqueueData(ad, m_lastDisplayedVideoTime);
         }
 	}
 	else if (vd)
 	{
+        bool result = true;
         if (vd->timestamp < m_lastVideoPacketTime)
             afterJump(vd->timestamp);
-
         m_lastVideoPacketTime = vd->timestamp;
 
         if (haveAudio())
@@ -216,41 +243,49 @@ void CLCamDisplay::processData(CLAbstractData* data)
             // to put data from ring buff to audio buff( if any )
             m_audioDisplay->putData(0);
         }
+        int channel = vd->channelNumber;
+        if (channel >= CL_MAX_CHANNELS)
+            return true;
 
-		int channel = vd->channelNumber;
-		if (channel >= CL_MAX_CHANNELS)
-			return;
+        // this is the only point to addreff; 
+        // video data can escape from this object only if displayed or in case of clearVideoQueue
+        // so release ref must be in both places
+        vd->addRef(); 
 
-		// this is the only point to addreff; 
-		// video data can escape from this object only if displayed or in case of clearVideoQueue
-		// so release ref must be in both places
-		vd->addRef(); 
+        // three are 3 possible scenarios:
 
-		// three are 3 possible scenarios:
+        //1) we do not have audio playing;
+        if (!haveAudio())
+        {
+            AVCodecContext* codec = (AVCodecContext*) vd->context;
 
-		//1) we do not have audio playing;
-		if (!haveAudio())
-		{
-			vd = nextInOutVideodata(vd, channel);
-			if (!vd)
-				return; // impossible? incoming vd!=0
+            qint64 m_videoDuration = m_videoQueue->size() * m_lastNonZerroDuration;
+            if (m_videoDuration >  1000 * 1000)
+            {
+                // skip current video packet, process it latter
+                vd->releaseRef(); 
+                result = false; 
+                vd = 0;
+            }
+            vd = nextInOutVideodata(vd, channel);
+            if (!vd)
+                return true; // impossible? incoming vd!=0
+            m_lastDisplayedVideoTime = vd->timestamp;
+            display(vd, !vd->ignore);
+            return result;
+        }
 
-			display(vd, !vd->ignore);
-			return;
-		}
-
-		//2) we have audio and it's buffering( not playing yet )
-		if (haveAudio() && m_audioDisplay->isBuffering())
-		{
-			// audio is not playinf yet; video must not be played as well
+        //2) we have audio and it's buffering( not playing yet )
+        if (m_audioDisplay->isBuffering())
+        {
+            // audio is not playinf yet; video must not be played as well
             enqueueVideo(vd);
+            return true;
+        }
 
-			return;
-		}
-
-		//3) video and audio playing
-		if (haveAudio() && !m_audioDisplay->isBuffering())
-		{
+        //3) video and audio playing
+        else
+        {
             qint64 videoDuration;
             qint64 diff = diffBetweenVideoAndAudio(vd, channel, videoDuration);
 
@@ -261,18 +296,26 @@ void CLCamDisplay::processData(CLAbstractData* data)
             {
                 // video runs faster than audio; // need to hold video this frame
                 enqueueVideo(vd);
-
                 cl_log.log("HOLD FRAME", cl_logDEBUG1);
+                // avoid to fast buffer filling on startup
 
-                return;
+                qint64 sleepTime = qMin(diff, (m_audioDisplay->msInBuffer() - AUDIO_BUFF_SIZE / 10) * 1000ll);
+                if (sleepTime > 0)
+                    m_delay.sleep(sleepTime);
+                return true;
             }
 
             //if (diff < 2 * videoDuration) //factor 2 here is to avoid frequent switch between normal play and fast play
             else
             {
                 // need to draw frame(s); at least one
-
-                CLCompressedVideoData* incoming = vd;
+                CLCompressedVideoData* incoming = 0;
+                if (m_audioDisplay->msInBuffer() < AUDIO_BUFF_SIZE)
+                    incoming = vd; // process packet
+                else {
+                    vd->releaseRef(); // queue too large. postpone packet.
+                    result = false;
+                }
 
                 int fastFrames = 0;
 
@@ -287,7 +330,9 @@ void CLCamDisplay::processData(CLAbstractData* data)
                         break; // no more video in queue
 
                     bool lastFrameToDisplay = diff > -2 * videoDuration; //factor 2 here is to avoid frequent switch between normal play and fast play
-                    
+
+                    //display(vd, lastFrameToDisplay && !vd->ignore && m_audioDisplay->msInBuffer() >= AUDIO_BUFF_SIZE / 10);
+                    m_lastDisplayedVideoTime = vd->timestamp;
                     display(vd, lastFrameToDisplay && !vd->ignore);
 
                     if (!lastFrameToDisplay)
@@ -308,8 +353,10 @@ void CLCamDisplay::processData(CLAbstractData* data)
                     diff = diffBetweenVideoAndAudio(incoming, channel, videoDuration);
                 }
             }
-		}
+        }
+        return result;
 	}
+    return true;
 }
 
 void CLCamDisplay::setLightCPUMode(bool val)
@@ -437,4 +484,9 @@ void CLCamDisplay::onAudioParamsChanged(AVCodecContext * codec)
 	QMutexLocker lock(&m_audioChangeMutex);
 	CLFFmpegAudioDecoder::audioCodecFillFormat(m_expectedAudioFormat, codec);
     m_needReinitAudio = true; 
+}
+
+void CLCamDisplay::onRealTimeStreamHint(bool value)
+{
+    m_isRealTimeSource = value;
 }

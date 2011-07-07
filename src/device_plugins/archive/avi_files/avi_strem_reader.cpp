@@ -149,7 +149,7 @@ bool CLAVIStreamReader::init()
 
 	m_currentTime = 0;
 	m_previousTime = -1;
-	m_needToSleep = 0;
+	//m_needToSleep = 0;
     m_lengthMksec = 0;
 
     m_formatContext = getFormatContext();
@@ -234,6 +234,7 @@ bool CLAVIStreamReader::initCodecs()
         m_audioCodecId = ffmpeg_audio_codec_id;
         emit audioParamsChanged(aCodecCtx);
     }
+    emit realTimeStreamHint(false);
     return true;
 }
 
@@ -312,10 +313,12 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
     if (!m_formatContext || m_videoStreamIndex == -1)
 		return 0;
 
+    /*
 	if (m_bsleep && !isSingleShotMode() && m_needSleep && !isSkippingFrames())
 	{
 		smartSleep(m_needToSleep);
 	}
+    */
 
 	{
 		QMutexLocker mutex(&m_cs);
@@ -343,6 +346,7 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 			if (m_previousTime != -1)
 			{
 				// we assume that we have constant frame rate 
+                /*
 				m_needToSleep = m_currentTime - m_previousTime;
                 if(m_needToSleep > MAX_VALID_SLEEP_TIME)
                 {
@@ -357,6 +361,7 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
                         }
                     }
                 }
+                */
 			}
 
 			m_previousTime = m_currentTime;
@@ -440,7 +445,7 @@ void CLAVIStreamReader::channeljumpTo(quint64 mksec, int /*channel*/)
 	avformat_seek_file(m_formatContext, -1, 0, mksec, LLONG_MAX, AVSEEK_FLAG_BACKWARD);
 #endif
 
-	m_needToSleep = 0;
+	//m_needToSleep = 0;
 	m_previousTime = -1;
 	m_wakeup = true;
 }
@@ -485,6 +490,7 @@ bool CLAVIStreamReader::getNextPacket(AVPacket& packet)
 	return true;
 }
 
+/*
 void CLAVIStreamReader::smartSleep(qint64 mksec)
 {
     if (mksec < 0)
@@ -508,6 +514,7 @@ void CLAVIStreamReader::smartSleep(qint64 mksec)
 	m_adaptiveSleep.sleep(mksec%SLEEP_WAKEUP_INTERVAL);
 
 }
+*/
 
 unsigned int CLAVIStreamReader::getCurrentAudioChannel() const
 {
