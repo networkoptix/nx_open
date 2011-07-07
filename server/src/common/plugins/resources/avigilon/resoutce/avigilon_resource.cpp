@@ -2,38 +2,38 @@
 #include "../dataprovider/avigilon_client_pull.h"
 
 
-CLAvigilonDevice::CLAvigilonDevice()
+QnPlAvigilonResource::QnPlAvigilonResource()
 {
  
 }
 
-CLAvigilonDevice::~CLAvigilonDevice()
+QnPlAvigilonResource::~QnPlAvigilonResource()
 {
 
 }
 
 
-QnResource::DeviceType CLAvigilonDevice::getDeviceType() const
+QnResource::DeviceType QnPlAvigilonResource::getDeviceType() const
 {
     return VIDEODEVICE;
 }
 
-QString CLAvigilonDevice::toString() const
+QString QnPlAvigilonResource::toString() const
 {
-    return QString("live clearpix ") + getUniqueId();
+    return QString("live clearpix ") + getMAC();
 }
 
-QnStreamDataProvider* CLAvigilonDevice::getDeviceStreamConnection()
+QnStreamDataProvider* QnPlAvigilonResource::getDeviceStreamConnection()
 {
     return new CLAvigilonStreamreader(this);
 }
 
-bool CLAvigilonDevice::unknownDevice() const
+bool QnPlAvigilonResource::unknownDevice() const
 {
     return false;
 }
 
-CLNetworkDevice* CLAvigilonDevice::updateDevice()
+QnNetworkResourcePtr QnPlAvigilonResource::updateDevice()
 {
-    return 0;
+    return QnNetworkResourcePtr(0);
 }

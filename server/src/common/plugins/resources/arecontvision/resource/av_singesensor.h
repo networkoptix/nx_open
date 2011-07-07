@@ -5,7 +5,7 @@
 
 
 
-class CLArecontSingleSensorDevice : public QnPlAreconVisionDevice
+class CLArecontSingleSensorDevice : public QnPlAreconVisionResource
 {
 public:
 	CLArecontSingleSensorDevice(int model);

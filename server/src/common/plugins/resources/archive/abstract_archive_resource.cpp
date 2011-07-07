@@ -1,17 +1,17 @@
 #include "abstract_archive_resource.h"
 
 
-CLAbstractArchiveDevice::CLAbstractArchiveDevice()
+QnAbstractArchiveResource::QnAbstractArchiveResource()
 {
 	addDeviceTypeFlag(QnResource::ARCHIVE);
 }
 
-CLAbstractArchiveDevice::~CLAbstractArchiveDevice()
+QnAbstractArchiveResource::~QnAbstractArchiveResource()
 {
 
 }
 
-QnResource::DeviceType CLAbstractArchiveDevice::getDeviceType() const
+QnResource::DeviceType QnAbstractArchiveResource::getDeviceType() const
 {
 	return VIDEODEVICE;
 }

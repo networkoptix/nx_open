@@ -6,6 +6,7 @@
 #include "resource_param.h"
 #include "datapacket/datapacket.h"
 #include "resourcecontrol/resource_command_consumer.h"
+#include "id.h"
 
 
 struct QnResourceStatus
@@ -40,7 +41,9 @@ class QnVideoResoutceLayout;
 
 // this class and inherited must be very light to create 
 class QnResource;
-typedef QMap<QString, QnResource*>  QnResourceList;
+typedef QSharedPointer<QnResource> QnResourcePtr;
+typedef QList<QnResourcePtr> QnResourceList;
+
 
 class QnResource
 {
@@ -53,15 +56,18 @@ public:
 
 	virtual ~QnResource();
 
+    // returns true if resources are equal 
+    virtual bool equalsTo(const QnResourcePtr other) const = 0;
+
 	virtual DeviceType getDeviceType() const = 0;
 
-	void setParentId(QString parent);
-	QString getParentId() const;
+	void setParentId(QnId parent);
+	QnId getParentId() const;
 
 	// each device has unique( over the world) ID; 
 	// good example for network device could be MAC address
-	QString getUniqueId() const;
-	void setUniqueId(const QString& id);
+	QnId getUniqueId() const;
+	void setUniqueId(const QnId& id);
 
 	//Name is class of the devices. like 2105DN; => arecontvision 2 megapixel H.264 day night camera; or "exacq nvr divece"
 	virtual QString getName() const;
@@ -120,12 +126,6 @@ public:
 	// lst - device list; threads - number of threads 
 	static void getDevicesBasicInfo(QnResourceList& lst, int threads);
 
-	// will extend the first one and remove all elements from the second one
-	static void mergeLists(QnResourceList& first, QnResourceList second);
-
-	static void deleteDevices(QnResourceList& lst);
-
-	static void addReferences(QnResourceList& lst);
 
 	static void startCommandProc() {m_commanproc.start();};
 	static void stopCommandProc() {m_commanproc.stop();};
@@ -143,11 +143,15 @@ protected:
 	static QnResourceCommandProcessor m_commanproc;
 
 protected:
+
+    QnId m_uniqueId; //+
+    QnId m_parentId;
+
+
 	mutable QnParamList m_deviceParamList;
 	mutable QnParamList m_streamParamList;
 
 	QString m_name; // this device model like AV2105 or AV2155dn 
-	QString m_uniqueId; //+
 	QString m_description;
 
 	QnResourceStatus m_status;
@@ -156,7 +160,9 @@ protected:
 
 	mutable QnVideoResoutceLayout* m_videolayout;
 
-	QString m_parentId;
+	
 };
+
+bool hasEqual(const QnResourceList& lst, const QnResourcePtr res);
 
 #endif

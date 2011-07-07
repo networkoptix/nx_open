@@ -28,7 +28,7 @@ QnResourceDirectoryBrowser& QnResourceDirectoryBrowser::instance()
     return inst;
 }
 
-QnResourceList QnResourceDirectoryBrowser::findDevices()
+QnResourceList QnResourceDirectoryBrowser::findResources()
 {
 
     QThread::Priority old_priority = QThread::currentThread()->priority();
@@ -47,18 +47,14 @@ QnResourceList QnResourceDirectoryBrowser::findDevices()
     {
         dir += "/";
 
-        QnResourceList dev_lst = findDevices(dir);
+        QnResourceList dev_lst = findResources(dir);
 
         cl_log.log("found ", dev_lst.count(), " devices",  cl_logALWAYS);
 
-        foreach(QnResource* dev, dev_lst)
-        {
-            result[dev->getUniqueId()] = dev;
-        }
-
+        result.append(dev_lst);
+        
         if (shouldStop())
             return result;
-
 
     }
 
@@ -69,28 +65,28 @@ QnResourceList QnResourceDirectoryBrowser::findDevices()
     return result;    
 }
 
-QnResource* QnResourceDirectoryBrowser::checkFile(const QString& filename)
+QnResourcePtr QnResourceDirectoryBrowser::checkFile(const QString& filename)
 {
     FileTypeSupport fileTypeSupport;
 
 
     if (fileTypeSupport.isImageFileExt(filename))
-        return new CLFileDevice(filename);
+        return QnResourcePtr(new QnFileResource(filename));
 
     if (CLAviDvdDevice::isAcceptedUrl(filename))
-        return new CLAviDvdDevice(filename);
+        return QnResourcePtr( new CLAviDvdDevice(filename));
     
     if (CLAviBluRayDevice::isAcceptedUrl(filename))
-        return new CLAviBluRayDevice(filename);
+        return QnResourcePtr( new CLAviBluRayDevice(filename) );
 
     if (fileTypeSupport.isMovieFileExt(filename))
-        return new CLAviDevice(filename);
+        return QnResourcePtr( new QnAviResource(filename) );
 
-    return 0;
+    return QnResourcePtr(0);
 }
 
 //=============================================================================================
-QnResourceList QnResourceDirectoryBrowser::findDevices(const QString& directory)
+QnResourceList QnResourceDirectoryBrowser::findResources(const QString& directory)
 {
 
     cl_log.log("Checking ", directory,   cl_logALWAYS);
@@ -113,8 +109,7 @@ QnResourceList QnResourceDirectoryBrowser::findDevices(const QString& directory)
         {
             QString file = list.at(i);
             QString abs_file_name = directory + file;
-            QnResource* dev = new CLFileDevice(abs_file_name);
-            result[abs_file_name] = dev;
+            result.push_back( QnResourcePtr( new QnFileResource(abs_file_name) ) );
         }
     }
 
@@ -125,8 +120,7 @@ QnResourceList QnResourceDirectoryBrowser::findDevices(const QString& directory)
         {
             QString file = list.at(i);
             QString abs_file_name = directory + file;
-            QnResource* dev = new CLAviDevice(abs_file_name);
-            result[abs_file_name] = dev;
+            result.push_back( QnResourcePtr (new QnAviResource(abs_file_name)) );
         }
     }
 
@@ -135,12 +129,8 @@ QnResourceList QnResourceDirectoryBrowser::findDevices(const QString& directory)
 
     foreach(QString str, sub_dirs)
     {
-        QnResourceList sub_result = findDevices(directory + str + QString("/"));
-
-        foreach(QnResource* dev, sub_result)
-        {
-            result[dev->getUniqueId()] = dev;
-        }
+        QnResourceList sub_result = findResources(directory + str + QString("/"));
+        result.append(sub_result);
     }
 
 

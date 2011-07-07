@@ -100,7 +100,7 @@ public:
 };
 
 CLArecontPanoramicDevice::CLArecontPanoramicDevice(int model):
-QnPlAreconVisionDevice(model),
+QnPlAreconVisionResource(model),
 m_hastestPattern(false)
 {
 	switch(model)
@@ -203,7 +203,7 @@ bool CLArecontPanoramicDevice::setParam(const QString& name, const QnValue& val 
 bool CLArecontPanoramicDevice::setParam_special(const QString& name, const QnValue& val)
 {
 
-	if (QnPlAreconVisionDevice::setParam_special(name, val))
+	if (QnPlAreconVisionResource::setParam_special(name, val))
 		return true;
 
 	if (name=="resolution")

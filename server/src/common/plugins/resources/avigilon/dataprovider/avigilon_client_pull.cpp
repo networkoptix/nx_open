@@ -19,7 +19,7 @@ QnAbstractMediaDataPacketPtr CLAvigilonStreamreader::getNextData()
     //http://192.168.1.99/media/still.jpg
 
     QString request = "media/still.jpg";
-    CLNetworkDevice* ndev = static_cast<CLNetworkDevice*>(m_device);
+    QnNetworkResource* ndev = static_cast<QnNetworkResource*>(m_device);
 
     CLSimpleHTTPClient http_client(ndev->getIP(), 80, 2000, ndev->getAuth());
 

@@ -3,13 +3,14 @@
 
 #include "resource/network_resource.h"
 
+class QnPlAvigilonResource;
+typedef QSharedPointer<QnPlAvigilonResource> QnPlAvigilonResourcePtr;
 
-
-class CLAvigilonDevice : public CLNetworkDevice
+class QnPlAvigilonResource : public QnNetworkResource
 {
 public:
-    CLAvigilonDevice();
-    ~CLAvigilonDevice();
+    QnPlAvigilonResource();
+    ~QnPlAvigilonResource();
 
     DeviceType getDeviceType() const;
 
@@ -18,9 +19,10 @@ public:
     QnStreamDataProvider* getDeviceStreamConnection();
 
     virtual bool unknownDevice() const;
-    CLNetworkDevice* updateDevice();
+    QnNetworkResourcePtr updateDevice();
 
 };
+
 
 
 

@@ -20,26 +20,56 @@ QnResourcePool& QnResourcePool::instance()
 }
 
 
-
-
-void QnResourcePool::addResource(QnResource* resource)
+void QnResourcePool::addResource(QnResourcePtr resource)
 {
     QMutexLocker mtx(&m_resourcesMtx);
     m_resources[resource->getUniqueId()] = resource;
 }
 
-void QnResourcePool::removeResource(QnResource* resource)
+void QnResourcePool::removeResource(QnResourcePtr resource)
 {
     QMutexLocker mtx(&m_resourcesMtx);
     m_resources.remove(resource->getUniqueId());
 
 }
 
-QnResource* QnResourcePool::getResourceById(QString id) const
+QnResourcePtr QnResourcePool::getResourceById(QString id) const
 {
-    QnResourceList::iterator it = m_resources.find(id);
+    ResourceMap::const_iterator it = m_resources.find(id);
     if (it == m_resources.end())
-        return 0;
+        return QnResourcePtr(0);
 
     return it.value();
+}
+
+QnResourcePtr QnResourcePool::hasEqualResource(QnResourcePtr res) const
+{
+    QMutexLocker mtx(&m_resourcesMtx);
+    foreach(QnResourcePtr lres, m_resources)
+    {
+        if (lres->equalsTo(res))
+            return lres;
+    }
+
+    return QnResourcePtr(0);
+}
+
+QnResourceList QnResourcePool::getResources() const
+{
+    QMutexLocker mtx(&m_resourcesMtx);
+    return m_resources.values();
+}
+
+QnResourceList QnResourcePool::getResourcesWithFlag(unsigned long flag)
+{
+    QnResourceList result;
+    QMutexLocker mtx(&m_resourcesMtx);
+
+    foreach(QnResourcePtr res, m_resources)
+    {
+        if (res->checkDeviceTypeFlag(flag))
+            result.push_back(res);
+    }
+
+    return result;
 }

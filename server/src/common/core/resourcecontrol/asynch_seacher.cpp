@@ -2,6 +2,7 @@
 #include "resource/network_resource.h"
 #include "settings.h"
 #include "abstract_resource_searcher.h"
+#include "resource_pool.h"
 
 CLDeviceSearcher::CLDeviceSearcher()
 {
@@ -15,8 +16,8 @@ CLDeviceSearcher::~CLDeviceSearcher()
 
 void CLDeviceSearcher::addDeviceServer(QnAbstractResourceSearcher* serv)
 {
-	QMutexLocker lock(&m_servers_mtx);
-	m_servers.push_back(serv);
+	QMutexLocker lock(&m_searchersListMtx);
+	m_searchersList.push_back(serv);
 }
 
 QnResourceList CLDeviceSearcher::result()
@@ -57,146 +58,141 @@ QnResourceList CLDeviceSearcher::findNewDevices(bool& ip_finished)
 	m_netState.updateNetState(); // update net state before serach 
 
 	//====================================
-	CL_LOG(cl_logDEBUG1) cl_log.log("looking for devices...", cl_logDEBUG1);
+	CL_LOG(cl_logDEBUG1) cl_log.log("looking for resources...", cl_logDEBUG1);
 
-	QnResourceList devices;
+	QnResourceList resources;
 
 	{
-		QMutexLocker lock(&m_servers_mtx);
-		for (int i = 0; i < m_servers.size(); ++i)
+		QMutexLocker lock(&m_searchersListMtx);
+        foreach(QnAbstractResourceSearcher* searcher, m_searchersList)
 		{
-			QnAbstractResourceSearcher* serv = m_servers.at(i);
-			QnResourceList temp = serv->findDevices();
-			QnResource::mergeLists(devices, temp);
+			QnResourceList temp = searcher->findResources();
+			resources.append(temp);
 		}
 
 	}
 	//
 
-	//excluding already existing devices with READY status
+	//excluding already existing resources with READY status
 	{
-		QMutexLocker lock(&all_devices_mtx);
 
-		it = devices.begin(); 
-		while (it!=devices.end())
+		it = resources.begin(); 
+		while (it!=resources.end())
 		{
-			const QString& unique = it.key();
-			QnResourceList::iterator all_it = all_devices.find(unique);
+            
+            QnResourcePtr existingResource = QnResourcePool::instance().hasEqualResource(*it);
 
-			if (all_it == all_devices.end())
+			if (!existingResource)
 			{
+                // new one; sholud stay
 				++it;
 				continue;
 			}
 
-			QnResource* all_dev = all_it.value();
-			if (all_dev->getStatus().checkFlag(QnResourceStatus::READY)) // such device already exists
+			if (existingResource->getStatus().checkFlag(QnResourceStatus::READY)) // such resource already exists
 			{
 				// however, ip address or mask may be changed( very unlikely but who knows )
-				// and this is why we need to check if old( already existing device) still is in our subnet 
-				if (all_dev->checkDeviceTypeFlag(QnResource::NETWORK))
+				// and this is why we need to check if old( already existing resource) still is in our subnet 
+				if (existingResource->checkDeviceTypeFlag(QnResource::NETWORK))
 				{
-					CLNetworkDevice* all_dev_net = static_cast<CLNetworkDevice*>(all_dev);
-					if (!m_netState.isInMachineSubnet(all_dev_net->getIP())) // not the same network
+					QnNetworkResourcePtr existingResourceNet = existingResource.staticCast<QnNetworkResource>();
+					if (!m_netState.isInMachineSubnet(existingResourceNet->getIP())) // not the same network
 					{
 						//[-1-]
-						// we do changed ip address or subnet musk or even removed old nic interface and likely this device has "lost connection status"
+						// we do changed ip address or subnet mask or even removed old nic interface and likely this resource has "lost connection status"
 						// ip address must be changed
 
-						CLNetworkDevice* new_dev_net = static_cast<CLNetworkDevice*>(it.value());
-						all_dev_net->setDiscoveryAddr(new_dev_net->getDiscoveryAddr()); // update DiscoveryAddr; it will help to find new available ip in subnet
-						all_dev_net->getStatus().setFlag(QnResourceStatus::NOT_IN_SUBNET);
+						QnNetworkResourcePtr newResourceNet = (*it).staticCast<QnNetworkResource>();
+						existingResourceNet->setDiscoveryAddr(newResourceNet->getDiscoveryAddr()); // update DiscoveryAddr; it will help to find new available ip in subnet
+						existingResourceNet->getStatus().setFlag(QnResourceStatus::NOT_IN_SUBNET);
 					}
 
 				}
 
-				//delete it.value(); //here+
-				//it.value()->releaseRef();
-				devices.erase(it++);
+				it = resources.erase(it);
 			}
 			else
-				++it; // new device; must stay
+				++it; // new resource; must stay
 
 		}
 
 	}
 	//====================================
-	// at this point in devices we have all new found devices
-	QnResourceList not_network_devices;
+	// at this point in resources we have all new found resources
+	QnResourceList notNetworkResources;
 
-	// remove all not network devices from list 
+	// remove all not network resources from list 
 	{
-		QnResourceList::iterator it = devices.begin();
-		while (it!=devices.end())
+		QnResourceList::iterator it = resources.begin();
+		while (it!=resources.end())
 		{
-			QnResource* device = it.value();
 
-			if (!device->checkDeviceTypeFlag(QnResource::NETWORK)) // is it network device
+            if (!(*it).dynamicCast<QnNetworkResource>()) // is it network resource
 			{
-				not_network_devices[device->getUniqueId()] = device;
-				devices.erase(it++);
+				notNetworkResources.push_back(*it);
+				it = resources.erase(it);
 			}
 			else
 				++it;
 		}
 	}
 
-	// now devices list has only network devices 
+	// now resources list has only network resources 
 
 	// lets form the list of existing IP
 	CLIPList busy_list;
 
 	QnResourceList bad_ip_list;
 
-	cl_log.log("Found ", devices.size() + not_network_devices.size(), " new(!) devices.", cl_logDEBUG1);
+	cl_log.log("Found ", resources.size() + notNetworkResources.size(), " new(!) resources.", cl_logDEBUG1);
 
 	CL_LOG(cl_logDEBUG2)
 	{
-		for (QnResourceList::iterator it = devices.begin(); it != devices.end(); ++it)
-			cl_log.log(it.value()->toString(), cl_logDEBUG2);
+		foreach(QnResourcePtr res, resources)
+			cl_log.log(res->toString(), cl_logDEBUG2);
 	}
 
 	cl_log.log("Time elapsed: ", time.elapsed(), cl_logDEBUG1);
 
-	if (devices.size()==0) // no new devices
+	if (resources.size()==0) // no new resources
 		goto END;
 
 	//====================================
-	checkObviousConflicts(devices); // if conflicting it will mark it
+	checkObviousConflicts(resources); // if conflicting it will mark it
 	//====================================
 
 	// check if all in our subnet
 
-	foreach(QnResource* dev, devices)
+	foreach(QnResourcePtr res, resources)
 	{
-		CLNetworkDevice* device = static_cast<CLNetworkDevice*>(dev);
+		QnNetworkResourcePtr resource = res.staticCast<QnNetworkResource>();
 
-		if ((!device->isAfterRouter()) && (!m_netState.isInMachineSubnet(device->getIP()))) // not the same network
-			device->getStatus().setFlag(QnResourceStatus::NOT_IN_SUBNET);
+		if ((!resource->isAfterRouter()) && (!m_netState.isInMachineSubnet(resource->getIP()))) // not the same network
+			resource->getStatus().setFlag(QnResourceStatus::NOT_IN_SUBNET);
 	}
 
 	//=====================================
 
 	// move all conflicting cams and cams with bad ip to bad_ip_list
-	fromListToList(devices, bad_ip_list, QnResourceStatus::NOT_IN_SUBNET, QnResourceStatus::NOT_IN_SUBNET);
-	fromListToList(devices, bad_ip_list, QnResourceStatus::CONFLICTING, QnResourceStatus::CONFLICTING);
+	fromListToList(resources, bad_ip_list, QnResourceStatus::NOT_IN_SUBNET, QnResourceStatus::NOT_IN_SUBNET);
+	fromListToList(resources, bad_ip_list, QnResourceStatus::CONFLICTING, QnResourceStatus::CONFLICTING);
 
 	time.restart();
 
-	cl_log.log("Checking for real conflicts ", devices.size(), " devices.", cl_logDEBUG1);
-	markConflictingDevices(devices,5);
-	fromListToList(devices, bad_ip_list, QnResourceStatus::CONFLICTING, QnResourceStatus::CONFLICTING);
+	cl_log.log("Checking for real conflicts ", resources.size(), " resources.", cl_logDEBUG1);
+	markConflictingDevices(resources,5);
+	fromListToList(resources, bad_ip_list, QnResourceStatus::CONFLICTING, QnResourceStatus::CONFLICTING);
 	cl_log.log("Time elapsed ", time.restart(), cl_logDEBUG1);
-	cl_log.log(" ", devices.size(), " new(!) devices not conflicting .", cl_logDEBUG1);
+	cl_log.log(" ", resources.size(), " new(!) resources not conflicting .", cl_logDEBUG1);
 
 	//======================================
 
-	// now in devices only new non conflicting devices; in bad_ip_list only devices with conflicts, so ip of bad_ip_list must be chnged 
-	if (!allow_to_change_ip)// nothing elese we can do
+	// now in resources only new non conflicting resources; in bad_ip_list only resources with conflicts, so ip of bad_ip_list must be chnged 
+	if (!allow_to_change_ip)// nothing else we can do
 	{
-		// move all back to devices
-		fromListToList(bad_ip_list, devices,  QnResourceStatus::CONFLICTING, QnResourceStatus::CONFLICTING);
-		fromListToList(bad_ip_list, devices, QnResourceStatus::NOT_IN_SUBNET, QnResourceStatus::NOT_IN_SUBNET);
+		// move all back to resources
+		fromListToList(bad_ip_list, resources,  QnResourceStatus::CONFLICTING, QnResourceStatus::CONFLICTING);
+		fromListToList(bad_ip_list, resources, QnResourceStatus::NOT_IN_SUBNET, QnResourceStatus::NOT_IN_SUBNET);
 
 		goto END;
 	}
@@ -206,24 +202,22 @@ QnResourceList CLDeviceSearcher::findNewDevices(bool& ip_finished)
 	if (bad_ip_list.size()==0)
 		goto END;
 
-	// put ip of all devices into busy_list
+	// put ip of all resources into busy_list
 	{
-		QMutexLocker lock(&all_devices_mtx);
 
-		foreach(QnResource* dev, all_devices)
+        QnResourceList networkResources = QnResourcePool::instance().getResourcesWithFlag(QnResource::NETWORK);
+
+		foreach(QnResourcePtr res, networkResources)
 		{
-			CLNetworkDevice* device = static_cast<CLNetworkDevice*>(dev);
-
-			if (device->checkDeviceTypeFlag(QnResource::NETWORK))
-				busy_list.insert(device->getIP().toIPv4Address());
-
+			QnNetworkResourcePtr netResource = res.staticCast<QnNetworkResource>();
+			busy_list.insert(netResource->getIP().toIPv4Address());
 		}
 	}
 
-	foreach(QnResource* dev, devices)
+	foreach(QnResourcePtr res, resources)
 	{
-		CLNetworkDevice* device = static_cast<CLNetworkDevice*>(dev);
-		busy_list.insert(device->getIP().toIPv4Address());
+		QnNetworkResourcePtr netResource = res.staticCast<QnNetworkResource>();
+		busy_list.insert(netResource->getIP().toIPv4Address());
 	}
 
 	//======================================
@@ -237,15 +231,16 @@ QnResourceList CLDeviceSearcher::findNewDevices(bool& ip_finished)
 	if (bad_ip_list.size())
 		cl_log.log("Done. Time elapsed: ", time.elapsed(), cl_logDEBUG1);
 
-	fromListToList(bad_ip_list,  devices, 0, 0); // move everything to result list
+	fromListToList(bad_ip_list,  resources, 0, 0); // move everything to result list
 
 END:
 
 	if (!ip_finished && allow_to_change_ip)
 	{
-		// also in case if in already existing devices some devices conflicts with something see [-1-]
+		// also in case if in already existing resources some resources conflicts with something see [-1-]
 		// we need to resolve that conflicts
 
+        /* todo
 		QnResourceList bad_ip_list;
 
 		QMutexLocker lock(&all_devices_mtx);
@@ -255,35 +250,36 @@ END:
 			resovle_conflicts(bad_ip_list, busy_list, ip_finished);
 			fromListToList(bad_ip_list, all_devices, 0, 0);
 		}
+        /**/
 
 	}
 
-	// ok. at this point devices contains only network devices. and some of them have unknownDevice==true;
-	// we need to resolve such devices 
-	if (devices.count())
+	// ok. at this point resources contains only network resources. and some of them have unknownDevice==true;
+	// we need to resolve such resources 
+	if (resources.count())
 	{
-		devices = resolveUnknown_helper(devices);
-		QnResource::getDevicesBasicInfo(devices, 4);
+		resources = resolveUnknown_helper(resources);
+		QnResource::getDevicesBasicInfo(resources, 4);
 
 	}
 
-	QnResource::mergeLists(devices, not_network_devices); // move everything to result list
+	resources.append(notNetworkResources); // move everything to result list
 
-	return devices;
+	return resources;
 
 }
 //====================================================================================
 
-void CLDeviceSearcher::resovle_conflicts(QnResourceList& device_list, CLIPList& busy_list, bool& ip_finished)
+void CLDeviceSearcher::resovle_conflicts(QnResourceList& resourceList, CLIPList& busy_list, bool& ip_finished)
 {
-	foreach(QnResource* dev, device_list)
+	foreach(QnResourcePtr res, resourceList)
 	{
-		CLNetworkDevice* device = static_cast<CLNetworkDevice*>(dev);
+		QnNetworkResourcePtr resource = res.staticCast<QnNetworkResource>();
 
-		if (!m_netState.existsSubnet(device->getDiscoveryAddr())) // very strange
+		if (!m_netState.existsSubnet(resource->getDiscoveryAddr())) // very strange
 			continue;
 
-		CLSubNetState& subnet = m_netState.getSubNetState(device->getDiscoveryAddr());
+		CLSubNetState& subnet = m_netState.getSubNetState(resource->getDiscoveryAddr());
 
 		cl_log.log("Looking for next addr...", cl_logDEBUG1);
 
@@ -294,10 +290,10 @@ void CLDeviceSearcher::resovle_conflicts(QnResourceList& device_list, CLIPList& 
 			break;
 		}
 
-		if (device->setIP(subnet.currHostAddress, true))
+		if (resource->setIP(subnet.currHostAddress, true))
 		{
-			device->getStatus().removeFlag(QnResourceStatus::CONFLICTING);
-			device->getStatus().removeFlag(QnResourceStatus::NOT_IN_SUBNET);
+			resource->getStatus().removeFlag(QnResourceStatus::CONFLICTING);
+			resource->getStatus().removeFlag(QnResourceStatus::NOT_IN_SUBNET);
 		}
 
 	}
@@ -306,14 +302,15 @@ void CLDeviceSearcher::resovle_conflicts(QnResourceList& device_list, CLIPList& 
 
 bool CLDeviceSearcher::checkObviousConflicts(QnResourceList& lst)
 {
-	// this function deals with network devices only 
+	// this function deals with network resources only 
 
+    /*/
 	bool result = false;
 
 	QMap<QString,  QnResource*> ips;
 	QMap<QString,  QnResource*>::iterator ip_it;
 
-	/**/
+	
 	{
 		// put in already busy ip, ip from all_devices
 		QMutexLocker lock(&all_devices_mtx);
@@ -321,21 +318,21 @@ bool CLDeviceSearcher::checkObviousConflicts(QnResourceList& lst)
 		QnResourceList::iterator it = all_devices.begin();
 		while (it!=all_devices.end())
 		{
-			CLNetworkDevice* device = static_cast<CLNetworkDevice*>(it.value());
-			if (device->checkDeviceTypeFlag(QnResource::NETWORK))
-				ips[device->getIP().toString()] = device;
+			QnNetworkResource* resource = static_cast<QnNetworkResource*>(it.value());
+			if (resource->checkDeviceTypeFlag(QnResource::NETWORK))
+				ips[resource->getIP().toString()] = resource;
 
 			++it;
 		}
 	}
-	/**/
+	
 
 	QnResourceList::iterator it = lst.begin();
 	while (it!=lst.end())
 	{
-		CLNetworkDevice* device = static_cast<CLNetworkDevice*>(it.value());
+		QnNetworkResource* resource = static_cast<QnNetworkResource*>(it.value());
 
-		QString ip = device->getIP().toString();
+		QString ip = resource->getIP().toString();
 		ip_it = ips.find(ip);
 
 		if (ip_it == ips.end())
@@ -352,75 +349,80 @@ bool CLDeviceSearcher::checkObviousConflicts(QnResourceList& lst)
 	}
 
 	return result;
+    /**/
+    return true;
 }
 
 void CLDeviceSearcher::fromListToList(QnResourceList& from, QnResourceList& to, int mask, int value)
 {
+    // todo
+    /*
 	QnResourceList::iterator it = from.begin();
 	while (it!=from.end())
 	{
-		QnResource* device = it.value();
+		QnResource* resource = it.value();
 
-		if (device->getStatus().checkFlag(mask)==value)
+		if (resource->getStatus().checkFlag(mask)==value)
 		{
-			to[device->getUniqueId()] = device;
+			to[resource->getUniqueId()] = resource;
 			from.erase(it++);
 		}
 		else
 			++it;
 	}
+    /**/
 
 }
 
 #ifndef _WIN32
 struct T
 {
-	T(CLNetworkDevice* d)
+	T(QnNetworkResourcePtr r)
 	{
-		device = d;
+		resource = r;
 	}
 	
 	void f()
 	{
-		device->conflicting();
+		resource->conflicting();
 	}
 	
-	CLNetworkDevice* device;
+	QnNetworkResourcePtr resource;
 };
 #endif
 
 void CLDeviceSearcher::markConflictingDevices(QnResourceList& lst, int threads)
 {
 	// cannot make concurrent work with pointer CLDevice* ; => so extra steps needed
-	// this function deals with network devices only 
+	// this function deals with network resources only 
 
 #ifdef _WIN32
     struct T
     {
-        T(CLNetworkDevice* d)
+        T(QnNetworkResourcePtr r)
         {
-            device = d;
+            resource = r;
         }
 
         void f()
         {
-            device->conflicting();
+            resource->conflicting();
         }
 
-        CLNetworkDevice* device;
+        QnNetworkResourcePtr resource;
     };
 #endif
 
 
 	QList<T> local_list;
 
-	QnResourceList::iterator it = lst.begin();
-	while(it!=lst.end())
-	{
-		CLNetworkDevice* device = static_cast<CLNetworkDevice*>(it.value());
-		local_list.push_back(T(device));
-		++it;
-	}
+
+    foreach(QnResourcePtr res, lst)
+    {
+        QnNetworkResourcePtr resource = res.staticCast<QnNetworkResource>();
+        local_list.push_back(T(resource));
+    }
+
 
 	QThreadPool* global = QThreadPool::globalInstance();
 
@@ -435,38 +437,36 @@ QnResourceList CLDeviceSearcher::resolveUnknown_helper(QnResourceList& lst)
 
 	QnResourceList result;
 
-	QnResourceList::iterator it = lst.begin();
-	while (it!=lst.end())
-	{
-		CLNetworkDevice* device = static_cast<CLNetworkDevice*>(it.value());
+	
+    foreach(QnResourcePtr res, lst)
+    {
+		QnNetworkResourcePtr resource = res.staticCast<QnNetworkResource>();
 
-		if (!device->unknownDevice() || 
-			device->getStatus().checkFlag(QnResourceStatus::CONFLICTING) ||
-			device->getStatus().checkFlag(QnResourceStatus::NOT_IN_SUBNET))
+		if (!resource->unknownDevice() || 
+			resource->getStatus().checkFlag(QnResourceStatus::CONFLICTING) ||
+			resource->getStatus().checkFlag(QnResourceStatus::NOT_IN_SUBNET))
 		{
-			// if this is not unknown device or if we cannot access it anyway
-			result[device->getUniqueId()] = device;
-			++it;
+			// if this is not unknown resource or if we cannot access it anyway
+			result.push_back(resource);
 			continue;
 		}
 
-		// device is unknown and not conflicting 
-		CLNetworkDevice* new_device = device->updateDevice();
+		// resource is unknown and not conflicting 
+		QnNetworkResourcePtr newResource = resource->updateDevice();
 
-		if (new_device)
+		if (newResource)
 		{
-			// device updated
-			result[new_device->getUniqueId()] = new_device;
-			//device->releaseRef();
+			// resource updated
+			result.push_back(newResource);
+			//resource->releaseRef();
 		}
 		else
 		{
-			// must be we still can not access to this device
-			device->getStatus().setFlag(QnResourceStatus::CONFLICTING);
-			result[device->getUniqueId()] = device;
+			// must be we still can not access to this resource
+			resource->getStatus().setFlag(QnResourceStatus::CONFLICTING);
+			result.push_back(resource);
 		}
 
-		++it;
 	}
 
 	return result;

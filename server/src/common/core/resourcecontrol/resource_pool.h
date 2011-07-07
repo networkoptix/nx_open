@@ -3,9 +3,10 @@
 #include "resourcecontrol/asynch_seacher.h"
 #include "resource/resource.h"
 #include "resource_criteria.h"
+#include "resource/id.h"
 
 class QnResource;
-class CLNetworkDevice;
+class QnNetworkResource;
 class CLRecorderDevice;
 
 // this class holds all resources in the system ( as long as resource is in the pool => share pointer counter >= 1)
@@ -20,10 +21,18 @@ class QnResourcePool
 public:
 	static QnResourcePool& instance();
     
-    void addResource(QnResource* resource);
-    void removeResource(QnResource* resource);
+    void addResource(QnResourcePtr resource);
+    void removeResource(QnResourcePtr resource);
 
-    QnResource* getResourceById(QString id) const;
+    QnResourceList getResources() const;
+
+    QnResourcePtr getResourceById(QString id) const;
+
+    // if it has; returns the pointer to the first equal
+    QnResourcePtr hasEqualResource(QnResourcePtr res) const;
+
+    // returns list of resources with such flag
+    QnResourceList getResourcesWithFlag(unsigned long flag);
 
 
 private:
@@ -31,9 +40,8 @@ private:
 
 private:
     mutable QMutex m_resourcesMtx;
-	QnResourceList m_resources;
-    
-
+    typedef QMap<QnId, QnResourcePtr> ResourceMap;
+	ResourceMap m_resources;
 
 };
 

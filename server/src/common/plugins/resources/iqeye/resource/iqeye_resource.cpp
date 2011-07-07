@@ -2,28 +2,28 @@
 #include "../dataprovider/iqeye_sp_h264.h"
 #include "../dataprovider/iqeye_sp_mjpeg.h"
 
-CLIQEyeDevice::CLIQEyeDevice()
+QnPlQEyeResource::QnPlQEyeResource()
 {
     
 }
 
-CLIQEyeDevice::~CLIQEyeDevice()
+QnPlQEyeResource::~QnPlQEyeResource()
 {
 
 }
 
 
-QnResource::DeviceType CLIQEyeDevice::getDeviceType() const
+QnResource::DeviceType QnPlQEyeResource::getDeviceType() const
 {
     return VIDEODEVICE;
 }
 
-QString CLIQEyeDevice::toString() const
+QString QnPlQEyeResource::toString() const
 {
-    return QString("live iqeye ") + getUniqueId();
+    return QString("live iqeye ") + getMAC();
 }
 
-QnStreamDataProvider* CLIQEyeDevice::getDeviceStreamConnection()
+QnStreamDataProvider* QnPlQEyeResource::getDeviceStreamConnection()
 {
     if (getName()=="IQ042S")
         return new CLIQEyeH264treamreader(this);
@@ -31,12 +31,12 @@ QnStreamDataProvider* CLIQEyeDevice::getDeviceStreamConnection()
         return new CLIQEyeMJPEGtreamreader(this);
 }
 
-bool CLIQEyeDevice::unknownDevice() const
+bool QnPlQEyeResource::unknownDevice() const
 {
     return false;
 }
 
-CLNetworkDevice* CLIQEyeDevice::updateDevice()
+QnNetworkResourcePtr QnPlQEyeResource::updateDevice()
 {
-    return 0;
+    return QnNetworkResourcePtr(0);
 }

@@ -23,7 +23,7 @@ extern AVLastPacketSize ExtractSize(const unsigned char* arr);
 AVPanoramicClientPullSSTFTPStreamreader ::AVPanoramicClientPullSSTFTPStreamreader  (QnResource* dev ):
 CLAVClinetPullStreamReader(dev)
 {
-	QnPlAreconVisionDevice* device = static_cast<QnPlAreconVisionDevice*>(dev);
+	QnPlAreconVisionResource* device = static_cast<QnPlAreconVisionResource*>(dev);
 
 	m_model = device->getModel();
 
@@ -89,7 +89,7 @@ QnAbstractMediaDataPacketPtr AVPanoramicClientPullSSTFTPStreamreader::getNextDat
 
 	forecast_size = (width*height)/2; // 0.5 meg per megapixel as maximum 
 
-	CLSimpleTFTPClient tftp_client((static_cast<QnPlAreconVisionDevice*>(m_device))->getIP().toString().toLatin1().data(),  m_timeout, 3);
+	CLSimpleTFTPClient tftp_client((static_cast<QnPlAreconVisionResource*>(m_device))->getIP().toString().toLatin1().data(),  m_timeout, 3);
 
 	QnCompressedVideoDataPtr videoData ( new QnCompressedVideoData(CL_MEDIA_ALIGNMENT,forecast_size) );
 	CLByteArray& img = videoData->data;

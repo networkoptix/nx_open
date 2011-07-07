@@ -16,13 +16,13 @@ public:
     static QnResourceDirectoryBrowser& instance();
 
     virtual QString name() const;
-    virtual QnResourceList findDevices();
+    virtual QnResourceList findResources();
 
     // creates an instance of proper resource from file 
-    virtual QnResource* checkFile(const QString& filename);
+    virtual QnResourcePtr checkFile(const QString& filename);
 
 protected:
-    QnResourceList findDevices(const QString& directory);
+    QnResourceList findResources(const QString& directory);
 private:
     static QStringList subDirList(const QString& abspath);
  

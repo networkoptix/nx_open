@@ -22,22 +22,22 @@ QnResource::~QnResource()
 	cl_log.log("inst", inst, cl_logDEBUG1);
 };
 
-void QnResource::setParentId(QString parentid)
+void QnResource::setParentId(QnId parentid)
 {
 	m_parentId = parentid;
 }
 
-QString QnResource::getParentId() const
+QnId QnResource::getParentId() const
 {
 	return m_parentId;
 }
 
-QString QnResource::getUniqueId() const
+QnId QnResource::getUniqueId() const
 {
 	return m_uniqueId;
 }
 
-void QnResource::setUniqueId(const QString& id)
+void QnResource::setUniqueId(const QnId& id)
 {
 	m_uniqueId = id;
 }
@@ -137,72 +137,26 @@ const QnVideoResoutceLayout* QnResource::getVideoLayout() const
 QString QnResource::toString() const
 {
 	QString result;
-	QTextStream(&result) << getName() << "  " <<  getUniqueId();
+	QTextStream(&result) << getName() << "  " <<  getUniqueId().toString();
 	return result;
 }
 
-void QnResource::mergeLists(QnResourceList& first, QnResourceList second)
-{
-	QnResourceList::iterator its = second.begin();
-	while (its!=second.end())
-	{
-		QnResourceList::iterator itf = first.find(its.key());
 
-		if (itf==first.end())
-		{
-			first[its.key()] = its.value();
-			second.erase(its++);
-		}
-		else
-		{
-			//delete its.value(); // here+
-			//its.value()->releaseRef();
-			second.erase(its++);
-		}
-	}
-}
-
-void QnResource::deleteDevices(QnResourceList& lst)
-{
-	QnResourceList::iterator it = lst.begin();
-	while (it!=lst.end())
-	{
-		QnResource* device = it.value();
-		//delete device; //here+
-		//device->releaseRef(); 
-		//lst.erase(it++);
-
-		++it;
-	}
-
-}
-
-void QnResource::addReferences(QnResourceList& lst)
-{
-	QnResourceList::iterator it = lst.begin();
-	while (it!=lst.end())
-	{
-		QnResource* device = it.value();
-		//device->addRef();
-		++it;
-	}
-
-}
 
 #ifndef _WIN32
 struct T
 {
-	T(QnResource* d)
-	{
-		device = d;
-	}
-	
-	void f()
-	{
-		device->getBaseInfo();
-	}
-	
-	QnResource* device;
+    T(QnResourcePtr d)
+    {
+        resource = d;
+    }
+
+    void f()
+    {
+        resource->getBaseInfo();
+    }
+
+    QnResourcePtr resource;
 };
 #endif
 
@@ -213,35 +167,32 @@ void QnResource::getDevicesBasicInfo(QnResourceList& lst, int threads)
 #ifdef _WIN32
     struct T
     {
-        T(QnResource* d)
+        T(QnResourcePtr d)
         {
-            device = d;
+            resource = d;
         }
 
         void f()
         {
-            device->getBaseInfo();
+            resource->getBaseInfo();
         }
 
-        QnResource* device;
+        QnResourcePtr resource;
     };
 #endif
 
-	cl_log.log("Geting device info...", cl_logDEBUG1);
+    cl_log.log("Getting resource info...", cl_logDEBUG1);
 	QTime time;
 	time.start();
 
 	QList<T> local_list;
 
-	QnResourceList::iterator it = lst.begin();
-	while(it!=lst.end())
-	{
-		QnResource* device = it.value();
-		if (device->getStatus().checkFlag(QnResourceStatus::CONFLICTING)==false)
-			local_list.push_back(T(device));
 
-		++it;
-	}
+    foreach(QnResourcePtr resource, lst)
+    {
+        if (resource->getStatus().checkFlag(QnResourceStatus::CONFLICTING)==false)
+            local_list.push_back(T(resource));
+    }
 
 	QThreadPool* global = QThreadPool::globalInstance();
 	for (int i = 0; i < threads; ++i ) global->releaseThread();
@@ -252,8 +203,10 @@ void QnResource::getDevicesBasicInfo(QnResourceList& lst, int threads)
 	{
 		cl_log.log("Done. Time elapsed: ", time.elapsed(), cl_logDEBUG1);
 
-		for (QnResourceList::iterator it = lst.begin(); it != lst.end(); ++it)
-			cl_log.log(it.value()->toString(), cl_logDEBUG1);
+		foreach(QnResourcePtr resource, lst)
+        {
+			cl_log.log(resource->toString(), cl_logDEBUG1);
+        }
 
 	}
 
@@ -318,4 +271,17 @@ bool QnResource::setParam_asynch(const QString& name, const QnValue& val)
 	m_commanproc.putData(command);
 
 	return true;
+}
+
+//==================================================================================================================
+
+bool hasEqual(const QnResourceList& lst, const QnResourcePtr res)
+{
+    foreach(QnResourcePtr resource, lst)
+    {
+        if (res->equalsTo(resource))
+            return true;
+    }
+
+    return false;
 }

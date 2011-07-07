@@ -59,32 +59,25 @@ QString AVigilonDeviceServer::name() const
 }
 
 
-QnResourceList AVigilonDeviceServer::findDevices()
+QnResourceList AVigilonDeviceServer::findResources()
 {
-
-    //dev->setIP(QHostAddress("192.168.1.99"), false);
-    //dev->setMAC("00-18-85-00-C8-72");
-
-
     QnResourceList lst;
-
 
     foreach(AvigilonCam cam, mCams)
     {
-        CLAvigilonDevice* dev = new CLAvigilonDevice();
-        dev->setIP(QHostAddress(cam.ip), false);
-        dev->setMAC(cam.mac);
-        dev->setUniqueId(dev->getMAC());
-        dev->setName(QString("clearpix") + QString::number(lst.count()+1));
-        dev->setAuth("admin", "admin");
-        lst[dev->getUniqueId()] = dev;
-
+        QnPlAvigilonResourcePtr resource ( new QnPlAvigilonResource() );
+        resource->setIP(QHostAddress(cam.ip), false);
+        resource->setMAC(cam.mac);
+        resource->setUniqueId(resource->getMAC());
+        resource->setName(QString("clearpix") + QString::number(lst.count()+1));
+        resource->setAuth("admin", "admin");
+        lst.push_back(resource);
     }
 
     return lst;
 }
 
-QnResource* AVigilonDeviceServer::checkHostAddr(QHostAddress addr)
+QnResourcePtr AVigilonDeviceServer::checkHostAddr(QHostAddress addr)
 {
-    return 0;
+    return QnResourcePtr(0);
 }

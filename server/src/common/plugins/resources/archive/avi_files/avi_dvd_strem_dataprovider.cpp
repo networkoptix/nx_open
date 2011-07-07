@@ -24,7 +24,7 @@ void CLAVIDvdStreamReader::setChapterNum(int chapter)
 QStringList CLAVIDvdStreamReader::getPlaylist()
 {
     QStringList rez;
-    QString sourceDir = m_device->getUniqueId();
+    QString sourceDir = m_device->getUniqueId().toString();
     if (!sourceDir.toUpper().endsWith("VIDEO_TS"))
         sourceDir = CLAVIPlaylistStreamReader::addDirPath(sourceDir, "VIDEO_TS");
     QDir dvdDir = QDir(sourceDir);

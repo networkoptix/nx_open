@@ -36,7 +36,7 @@ void CLIQEyeH264treamreader::openStream()
     if (isStreamOpened())
         return;
 
-    CLNetworkDevice* ndev = static_cast<CLNetworkDevice*>(m_device);
+    QnNetworkResource* ndev = static_cast<QnNetworkResource*>(m_device);
 
     QString url;
     QTextStream(&url) << "rtsp://" << ndev->getIP().toString();

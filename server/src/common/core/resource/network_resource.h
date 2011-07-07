@@ -3,14 +3,17 @@
 
 #include "resource.h"
 
+class QnNetworkResource;
+typedef QSharedPointer<QnNetworkResource> QnNetworkResourcePtr;
 
-
-class CLNetworkDevice : public QnResource
+class QnNetworkResource : public QnResource
 {
 
 public:
 
-	CLNetworkDevice();
+	QnNetworkResource();
+
+    virtual bool equalsTo(const QnResourcePtr other) const;
 
 	QHostAddress getIP() const;
 
@@ -46,7 +49,7 @@ public:
 	virtual bool unknownDevice() const = 0;
 
 	// updateDevice requests the additional  information and return device with the same mac, ip but ready to use...
-	virtual CLNetworkDevice* updateDevice()  = 0;
+	virtual QnNetworkResourcePtr updateDevice()  = 0;
 	//=============
 
 protected:

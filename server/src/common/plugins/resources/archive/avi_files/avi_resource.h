@@ -4,17 +4,26 @@
 #include "../abstract_archive_resource.h"
 
 class QnStreamDataProvider;
+class QnAviResource;
 
-class CLAviDevice : public CLAbstractArchiveDevice
+typedef QSharedPointer<QnAviResource> QnAviResourcePtr;
+
+class QnAviResource : public QnAbstractArchiveResource
 {
 public:
-	CLAviDevice(const QString& file);
-	~CLAviDevice();
+	QnAviResource(const QString& file);
+	~QnAviResource();
+
+    QString getUrl() const;
 
 	virtual QnStreamDataProvider* getDeviceStreamConnection();
 	virtual QString toString() const;
 
+    virtual bool equalsTo(const QnResourcePtr other) const;
+
 protected:
+    
+    QString m_url;
 
 };
 

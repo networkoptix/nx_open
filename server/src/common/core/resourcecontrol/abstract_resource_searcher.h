@@ -21,7 +21,7 @@ public:
     bool sholdBeUsed() const;
 
 	// returns all available devices 
-	virtual QnResourceList findDevices() = 0;
+	virtual QnResourceList findResources() = 0;
     
     // is some cases search might take time 
     //if pleaseStop is called search will be interrupted 
@@ -45,7 +45,7 @@ public:
 
     // checks this QHostAddress and creates a QnResource in case of success
     // this function is designed for manual resource addition 
-    virtual QnResource* checkHostAddr(QHostAddress addr) = 0;
+    virtual QnResourcePtr checkHostAddr(QHostAddress addr) = 0;
 };
 
 //=====================================================================
@@ -60,7 +60,7 @@ public:
     void setPathCheckList(const QStringList& paths);
     void clearPathCheckList();
 
-    virtual QnResource* checkFile(const QString& filename) = 0;
+    virtual QnResourcePtr checkFile(const QString& filename) = 0;
 
 protected:
     QStringList m_pathListToCheck;

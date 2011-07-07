@@ -4,7 +4,7 @@
 #include "av_resource.h"
 
 
-class CLArecontPanoramicDevice : public QnPlAreconVisionDevice
+class CLArecontPanoramicDevice : public QnPlAreconVisionResource
 {
 public:
 	CLArecontPanoramicDevice(int model);

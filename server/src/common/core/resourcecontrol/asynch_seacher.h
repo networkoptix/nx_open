@@ -14,7 +14,7 @@ class QnAbstractResourceSearcher;
 // it will be moved to recorder I guess 
 class CLDeviceSearcher : public QThread
 {
-	typedef QList<QnAbstractResourceSearcher*> ServerList;
+	typedef QList<QnAbstractResourceSearcher*> ResourceSearcherList;
 
 public:
 	CLDeviceSearcher();
@@ -24,17 +24,10 @@ public:
 	QnResourceList result();
 	void addDeviceServer(QnAbstractResourceSearcher* serv);
 
-	QnResourceList& getAllDevices()
-	{
-		return all_devices;
-	}
-
 	CLNetState& getNetState()
 	{
 		return m_netState;
 	}
-
-	QMutex all_devices_mtx; // this mutex must be used if deal with all_devices
 
 protected:
 	virtual void run();
@@ -64,10 +57,8 @@ private:
 
 	QnResourceList m_result;
 
-	ServerList m_servers;
-	QMutex m_servers_mtx;
-
-	QnResourceList all_devices; // this list of ever found devices.
+	ResourceSearcherList m_searchersList;
+	QMutex m_searchersListMtx;
 
 	CLNetState m_netState;
 };

@@ -5,64 +5,76 @@
 
 extern int ping_timeout ;
 
-CLNetworkDevice::CLNetworkDevice():
+QnNetworkResource::QnNetworkResource():
 mAfterRouter(false)
 {
 	addDeviceTypeFlag(QnResource::NETWORK);
 }
 
-QHostAddress CLNetworkDevice::getIP() const
+bool QnNetworkResource::equalsTo(const  QnResourcePtr other) const
+{
+
+    QnNetworkResourcePtr nr = other.dynamicCast<QnNetworkResource>();
+
+    if (!nr)
+        return false;
+    
+
+    return (getIP() == nr->getIP() && getMAC() == nr->getMAC());
+}
+
+QHostAddress QnNetworkResource::getIP() const
 {
 	QMutexLocker mutex(&m_cs);
 	return m_ip;
 }
 
-bool CLNetworkDevice::setIP(const QHostAddress& ip, bool net )
+bool QnNetworkResource::setIP(const QHostAddress& ip, bool net )
 {
 	QMutexLocker mutex(&m_cs);
 	m_ip = ip;
 	return true;
 }
 
-void CLNetworkDevice::setLocalAddr(QHostAddress addr)
+void QnNetworkResource::setLocalAddr(QHostAddress addr)
 {
 	m_local_adssr = addr;
 }
 
-QString CLNetworkDevice::getMAC() const
+QString QnNetworkResource::getMAC() const
 {
 	return m_mac;
 }
 
-void  CLNetworkDevice::setMAC(const QString& mac) 
+void  QnNetworkResource::setMAC(const QString& mac) 
 {
 	m_mac = mac;
 }
 
-void CLNetworkDevice::setAfterRouter(bool after)
+void QnNetworkResource::setAfterRouter(bool after)
 {
     mAfterRouter = after;
 }
 
-bool CLNetworkDevice::isAfterRouter() const
+bool QnNetworkResource::isAfterRouter() const
 {
     return mAfterRouter;
 }
 
-void CLNetworkDevice::setAuth(const QString& user, QString password)
+void QnNetworkResource::setAuth(const QString& user, QString password)
 {
 	QMutexLocker mutex(&m_cs);
 	m_auth.setUser(user);
 	m_auth.setPassword(password);
 }
 
-QAuthenticator CLNetworkDevice::getAuth() const
+QAuthenticator QnNetworkResource::getAuth() const
 {
 	QMutexLocker mutex(&m_cs);
 	return m_auth;
 }
 
-unsigned int CLNetworkDevice::getHttpTimeout() 
+unsigned int QnNetworkResource::getHttpTimeout() 
 {
 	if (getStatus().checkFlag(QnResourceStatus::NOT_LOCAL)) 
 		return 3000;
@@ -70,31 +82,31 @@ unsigned int CLNetworkDevice::getHttpTimeout()
 		return 1050;
 }
 
-QHostAddress CLNetworkDevice::getDiscoveryAddr() const
+QHostAddress QnNetworkResource::getDiscoveryAddr() const
 {
 	return m_local_adssr;
 }
 
-void CLNetworkDevice::setDiscoveryAddr(QHostAddress addr)
+void QnNetworkResource::setDiscoveryAddr(QHostAddress addr)
 {
 	m_local_adssr = addr;
 }
 
-QString CLNetworkDevice::toString() const
+QString QnNetworkResource::toString() const
 {
 	QString result;
 	QTextStream(&result) << getName() << "  " << getIP().toString() << "  " << getMAC();
 	return result;
 }
 
-bool CLNetworkDevice::conflicting()
+bool QnNetworkResource::conflicting()
 {
     if (mAfterRouter)
         return false;
 
     QTime time;
 	time.restart();
-	CL_LOG(cl_logDEBUG2) cl_log.log("begining of CLNetworkDevice::conflicting() ",  cl_logDEBUG2);
+	CL_LOG(cl_logDEBUG2) cl_log.log("begining of QnNetworkResource::conflicting() ",  cl_logDEBUG2);
 
 	QString mac = getMacByIP(getIP());
 
@@ -134,7 +146,7 @@ bool CLNetworkDevice::conflicting()
         CL_LOG(cl_logERROR) cl_log.log("00-00-00-00-00-00 mac record in OS arp( got it once on WIN7) table?!", cl_logERROR);
     }
 
-	CL_LOG(cl_logDEBUG2) cl_log.log("end of  CLNetworkDevice::conflicting(),  time elapsed: ", time.elapsed(), cl_logDEBUG2);
+	CL_LOG(cl_logDEBUG2) cl_log.log("end of  QnNetworkResource::conflicting(),  time elapsed: ", time.elapsed(), cl_logDEBUG2);
 	return false;
 }
 

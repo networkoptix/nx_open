@@ -18,9 +18,9 @@ public:
 	virtual QString name() const;
 
 	// returns all available devices 
-    virtual QnResourceList findDevices();
+    virtual QnResourceList findResources();
 
-    virtual QnResource* checkHostAddr(QHostAddress addr);
+    virtual QnResourcePtr checkHostAddr(QHostAddress addr);
 
 private:
 

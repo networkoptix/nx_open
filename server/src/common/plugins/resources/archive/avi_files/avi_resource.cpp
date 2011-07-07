@@ -1,25 +1,41 @@
 #include "avi_resource.h"
 #include "avi_strem_dataprovider.h"
 
-CLAviDevice::CLAviDevice(const QString& file)
+QnAviResource::QnAviResource(const QString& file)
 {
     QFileInfo fi(file);
 
-	m_uniqueId = fi.absoluteFilePath();
+	m_url = fi.absoluteFilePath();
 	m_name = QFileInfo(file).fileName();
 }
 
-CLAviDevice::~CLAviDevice()
+QnAviResource::~QnAviResource()
 {
 
 }
 
-QString CLAviDevice::toString() const
+bool QnAviResource::equalsTo(const QnResourcePtr other) const
+{
+    QnAviResourcePtr r = other.dynamicCast<QnAviResource>();
+
+    if (!r)
+        return false;
+
+    return (getUrl() == r->getUrl());
+}
+
+QString QnAviResource::getUrl() const
+{
+    return m_url;
+}
+
+QString QnAviResource::toString() const
 {
 	return m_name;
 }
 
-QnStreamDataProvider* CLAviDevice::getDeviceStreamConnection()
+QnStreamDataProvider* QnAviResource::getDeviceStreamConnection()
 {
 	return new QnPlAVIStreamProvider(this);
 }
+

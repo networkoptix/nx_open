@@ -15,7 +15,7 @@ QStringList CLAVIBlurayStreamReader::getPlaylist()
 {
     QStringList rez;
 
-    QDir sourceDir = m_device->getUniqueId();
+    QDir sourceDir = m_device->getUniqueId().toString();
 
     QFileInfoList rootDirList = sourceDir.entryInfoList();
     foreach(QFileInfo fi, rootDirList)

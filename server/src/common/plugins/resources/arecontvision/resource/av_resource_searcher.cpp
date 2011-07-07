@@ -9,7 +9,7 @@ QnPlArecontResourceSearcher::QnPlArecontResourceSearcher()
 	AVJpeg::Header::Initialize("ArecontVision", "CamLabs", "ArecontVision");
 
 	QString error;
-	if (QnPlAreconVisionDevice::loadDevicesParam(QCoreApplication::applicationDirPath() + "/arecontvision/devices.xml", error))
+	if (QnPlAreconVisionResource::loadDevicesParam(QCoreApplication::applicationDirPath() + "/arecontvision/devices.xml", error))
 	{
 		CL_LOG(cl_logINFO)
 		{
@@ -40,9 +40,9 @@ QString QnPlArecontResourceSearcher::name() const
 }
 
 // returns all available devices 
-QnResourceList QnPlArecontResourceSearcher::findDevices()
+QnResourceList QnPlArecontResourceSearcher::findResources()
 {
-	return QnPlAreconVisionDevice::findDevices();
+	return QnPlAreconVisionResource::findDevices();
 }
 
 QnPlArecontResourceSearcher& QnPlArecontResourceSearcher::instance()
@@ -51,7 +51,7 @@ QnPlArecontResourceSearcher& QnPlArecontResourceSearcher::instance()
 	return inst;
 }
 
-QnResource* QnPlArecontResourceSearcher::checkHostAddr(QHostAddress addr)
+QnResourcePtr QnPlArecontResourceSearcher::checkHostAddr(QHostAddress addr)
 {
-    return 0;
+    return QnResourcePtr(0);
 }

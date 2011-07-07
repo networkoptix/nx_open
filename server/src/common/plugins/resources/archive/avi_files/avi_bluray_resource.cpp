@@ -2,7 +2,7 @@
 #include "avi_bluray_data_provider.h"
 
 CLAviBluRayDevice::CLAviBluRayDevice(const QString& file):
-    CLAviDevice(file)
+    QnAviResource(file)
 {
 }
 

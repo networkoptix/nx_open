@@ -20,8 +20,8 @@ enum
 	AV10005 = 10005, AV2805 = 2805
 };
 
-// this class and inhereted must be very light to create 
-class QnPlAreconVisionDevice : public CLNetworkDevice
+// this class and inherited must be very light to create 
+class QnPlAreconVisionResource : public QnNetworkResource
 {
 public:
 
@@ -52,7 +52,7 @@ public:
 
 	//========
 	virtual bool unknownDevice() const;
-	virtual CLNetworkDevice* updateDevice();
+	virtual QnNetworkResourcePtr updateDevice();
 	//========
 
 	virtual void onBeforeStart();
@@ -64,7 +64,7 @@ public:
 
 protected:
 
-	QnPlAreconVisionDevice(int model):
+	QnPlAreconVisionResource(int model):
 	m_model(model)
 	{
 	}
@@ -83,12 +83,14 @@ protected:
 private:
 	static bool parseDevice(const QDomElement &element, QString& error );
 	static bool parseParam(const QDomElement &element, QString& error, QnParamList& paramlist);
-	static QnPlAreconVisionDevice* deviceByID(QString id, int model);
+	static QnPlAreconVisionResource* deviceByID(QString id, int model);
 
 	static bool isPanoramic(int model);
 
-	QnPlAreconVisionDevice(){};
+	QnPlAreconVisionResource(){};
 
 };
+
+typedef QSharedPointer<QnPlAreconVisionResource> QnPlAreconVisionResourcePtr;
 
 #endif // av_device_h_1252

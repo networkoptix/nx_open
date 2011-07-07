@@ -2,25 +2,38 @@
 #include "dataprovider/single_shot_file_dataprovider.h"
 #include "dataprovider/streamdataprovider.h"
 
-CLFileDevice::CLFileDevice(QString filename)
+QnFileResource::QnFileResource(QString filename)
 {
     QFileInfo fi(filename);
 	setUniqueId(fi.absoluteFilePath());
-	m_name = QFileInfo(filename).fileName();
+    m_filename = QFileInfo(filename).fileName();
+	 
 	addDeviceTypeFlag(QnResource::SINGLE_SHOT);
+
+    m_name = "FileResource ";
 }
 
-QString CLFileDevice::getFileName() const
+bool QnFileResource::equalsTo(const QnResourcePtr other) const
 {
-	return getUniqueId();
+    QnFileResourcePtr r = other.dynamicCast<QnFileResource>();
+
+    if (!r)
+        return false;
+
+    return (getFileName() == r->getFileName());
 }
 
-QString CLFileDevice::toString() const 
+QString QnFileResource::getFileName() const
 {
-	return m_name;
+	return m_filename;
 }
 
-QnStreamDataProvider* CLFileDevice::getDeviceStreamConnection()
+QString QnFileResource::toString() const 
+{
+	return m_filename;
+}
+
+QnStreamDataProvider* QnFileResource::getDeviceStreamConnection()
 {
 	return new CLSingleShotFileStreamreader(this);
 }

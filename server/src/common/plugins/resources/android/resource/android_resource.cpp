@@ -2,38 +2,38 @@
 #include "../dataprovider/android_stream_reader.h"
 
 
-CLANdroidDevice::CLANdroidDevice()
+QnPlANdroidResource::QnPlANdroidResource()
 {
     setAfterRouter(true); // wifi, huli
 }
 
-CLANdroidDevice::~CLANdroidDevice()
+QnPlANdroidResource::~QnPlANdroidResource()
 {
 
 }
 
 
-QnResource::DeviceType CLANdroidDevice::getDeviceType() const
+QnResource::DeviceType QnPlANdroidResource::getDeviceType() const
 {
     return VIDEODEVICE;
 }
 
-QString CLANdroidDevice::toString() const
+QString QnPlANdroidResource::toString() const
 {
-    return QString("live android ") + getUniqueId();
+    return QString("live android ") + getUniqueId().toString();
 }
 
-QnStreamDataProvider* CLANdroidDevice::getDeviceStreamConnection()
+QnStreamDataProvider* QnPlANdroidResource::getDeviceStreamConnection()
 {
     return new CLAndroidStreamreader(this);
 }
 
-bool CLANdroidDevice::unknownDevice() const
+bool QnPlANdroidResource::unknownDevice() const
 {
     return false;
 }
 
-CLNetworkDevice* CLANdroidDevice::updateDevice()
+QnNetworkResourcePtr QnPlANdroidResource::updateDevice()
 {
-    return 0;
+    return QnNetworkResourcePtr(0);
 }

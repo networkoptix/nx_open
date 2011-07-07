@@ -2,7 +2,7 @@
 #include "../dataprovider/cpul_tftp_dataprovider.h"
 
 CLArecontSingleSensorDevice::CLArecontSingleSensorDevice(int model):
-QnPlAreconVisionDevice(model),
+QnPlAreconVisionResource(model),
 m_hastestPattern(true)
 {
 

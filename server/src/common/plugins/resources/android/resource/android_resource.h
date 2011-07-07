@@ -4,11 +4,11 @@
 #include "resource/network_resource.h"
 
 
-class CLANdroidDevice : public CLNetworkDevice
+class QnPlANdroidResource : public QnNetworkResource
 {
 public:
-    CLANdroidDevice ();
-    ~CLANdroidDevice ();
+    QnPlANdroidResource ();
+    ~QnPlANdroidResource ();
 
     DeviceType getDeviceType() const;
 
@@ -17,10 +17,10 @@ public:
     QnStreamDataProvider* getDeviceStreamConnection();
 
     virtual bool unknownDevice() const;
-    CLNetworkDevice* updateDevice();
+    QnNetworkResourcePtr updateDevice();
 
 };
 
-
+typedef QSharedPointer<QnPlANdroidResource> QnPlANdroidResourcePtr;
 
 #endif //avigilon_h_16_43_h

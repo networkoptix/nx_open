@@ -3,11 +3,11 @@
 
 #include "resource/resource.h"
 
-class CLAbstractArchiveDevice : public QnResource
+class QnAbstractArchiveResource : public QnResource
 {
 public:
-	CLAbstractArchiveDevice();
-	~CLAbstractArchiveDevice();
+	QnAbstractArchiveResource();
+	~QnAbstractArchiveResource();
 	virtual DeviceType getDeviceType() const;
 
 };

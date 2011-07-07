@@ -2,7 +2,7 @@
 #include "avi_dvd_strem_dataprovider.h"
 
 CLAviDvdDevice::CLAviDvdDevice(const QString& file):
-    CLAviDevice(file)
+    QnAviResource(file)
 {
 }
 

@@ -105,7 +105,7 @@ ByteIOContext* QnPlAVIStreamProvider::getIOContext()
 
 AVFormatContext* QnPlAVIStreamProvider::getFormatContext()
 {
-    QString url = "ufile:" + m_device->getUniqueId();
+    QString url = "ufile:" + m_device->getUniqueId().toString();
     AVFormatContext* formatContext;
     int err = av_open_input_file(&formatContext, url.toUtf8().constData(), NULL, 0, NULL);
     if (err < 0)

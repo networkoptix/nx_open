@@ -4,7 +4,7 @@
 
 #include "avi_resource.h"
 
-class CLAviDvdDevice : public CLAviDevice
+class CLAviDvdDevice : public QnAviResource
 {
 public:
 	CLAviDvdDevice(const QString& file);
@@ -13,5 +13,6 @@ public:
 	virtual QnStreamDataProvider* getDeviceStreamConnection();
     static bool isAcceptedUrl(const QString& url);
 };
+
 
 #endif // __CL_AVI_DVD_DEVICE_H

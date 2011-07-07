@@ -128,7 +128,7 @@ void CLIQEyeMJPEGtreamreader::openStream()
         return;
 
     QString request = "now.jpg?snap=spush?dummy=1305868336917";
-    CLNetworkDevice* ndev = static_cast<CLNetworkDevice*>(m_device);
+    QnNetworkResource* ndev = static_cast<QnNetworkResource*>(m_device);
 
     mHttpClient = new CLSimpleHTTPClient(ndev->getIP(), 80, 2000, ndev->getAuth());
     mHttpClient->setRequestLine(request);

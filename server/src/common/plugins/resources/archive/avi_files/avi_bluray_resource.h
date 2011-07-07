@@ -3,7 +3,7 @@
 
 #include "avi_resource.h"
 
-class CLAviBluRayDevice : public CLAviDevice
+class CLAviBluRayDevice : public QnAviResource
 {
 public:
 	CLAviBluRayDevice(const QString& file);

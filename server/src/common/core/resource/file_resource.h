@@ -4,12 +4,17 @@
 #include "resource.h"
 
 class QnStreamDataProvider;
+class QnFileResource;
 
-class CLFileDevice : public QnResource 
+typedef QSharedPointer<QnFileResource> QnFileResourcePtr;
+
+class QnFileResource : public QnResource 
 {
 
 public:
-	CLFileDevice(QString filename);
+	QnFileResource(QString filename);
+
+    virtual bool equalsTo(const QnResourcePtr other) const;
 
 	DeviceType getDeviceType() const
 	{
@@ -21,6 +26,8 @@ public:
 
 	virtual QnStreamDataProvider* getDeviceStreamConnection();
 protected:
+
+    QString m_filename;
 
 };
 

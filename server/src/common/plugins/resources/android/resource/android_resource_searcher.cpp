@@ -48,7 +48,7 @@ struct AnDroidDev
 	}
 };
 
-QnResourceList AndroidDeviceServer::findDevices()
+QnResourceList AndroidDeviceServer::findResources()
 {
     QnResourceList lst;
 
@@ -87,11 +87,11 @@ QnResourceList AndroidDeviceServer::findDevices()
 
         while(curr <= max_ip)
         {
-            //CLNetworkDevice* nd = QnResourcePool::instance().getDeviceByIp(QHostAddress(curr)); // tyty
-            CLNetworkDevice* nd;
+            //QnNetworkResource* nd = QnResourcePool::instance().getDeviceByIp(QHostAddress(curr)); // tyty
+            QnNetworkResource* nd;
             if (nd)
             {
-                // such dev alredy exists;
+                // such res alredy exists;
                 //nd->releaseRef();
                 ++curr;
                 continue;
@@ -118,12 +118,12 @@ QnResourceList AndroidDeviceServer::findDevices()
                 static int n = 0;
                 n++;
 
-                CLANdroidDevice* dev = new CLANdroidDevice();
-                dev->setIP(QHostAddress(ad.ip), false);
-                dev->setMAC( QString("android") + QString::number(n) );
-                dev->setUniqueId(dev->getMAC());
-                dev->setName(QString("android") + QString::number(lst.count()+1));
-                lst[dev->getUniqueId()] = dev;
+                QnNetworkResourcePtr res ( new QnPlANdroidResource() );
+                res->setIP(QHostAddress(ad.ip), false);
+                res->setMAC( QString("android") + QString::number(n) );
+                res->setUniqueId(res->getMAC());
+                res->setName(QString("android") + QString::number(lst.count()+1));
+                lst.push_back(res);
 
             }
         }
@@ -134,7 +134,7 @@ QnResourceList AndroidDeviceServer::findDevices()
     return lst;
 }
 
-QnResource* AndroidDeviceServer::checkHostAddr(QHostAddress addr)
+QnResourcePtr AndroidDeviceServer::checkHostAddr(QHostAddress addr)
 {
-    return 0;
+    return QnResourcePtr(0);
 }

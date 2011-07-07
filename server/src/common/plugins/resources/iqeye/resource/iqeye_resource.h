@@ -3,12 +3,14 @@
 
 #include "resource/network_resource.h"
 
+class QnPlQEyeResource;
+typedef QSharedPointer<QnPlQEyeResource> QnPlQEyeResourcePtr;
 
-class CLIQEyeDevice : public CLNetworkDevice
+class QnPlQEyeResource : public QnNetworkResource
 {
 public:
-    CLIQEyeDevice();
-    ~CLIQEyeDevice();
+    QnPlQEyeResource();
+    ~QnPlQEyeResource();
 
     DeviceType getDeviceType() const;
 
@@ -17,9 +19,10 @@ public:
     QnStreamDataProvider* getDeviceStreamConnection();
 
     virtual bool unknownDevice() const;
-    CLNetworkDevice* updateDevice();
+    QnNetworkResourcePtr updateDevice();
 
 };
+
 
 
 

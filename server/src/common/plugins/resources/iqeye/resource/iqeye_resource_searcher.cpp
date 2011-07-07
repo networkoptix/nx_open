@@ -60,24 +60,24 @@ QString IQEyeDeviceServer::name() const
 }
 
 
-QnResourceList IQEyeDeviceServer::findDevices()
+QnResourceList IQEyeDeviceServer::findResources()
 {
     QnResourceList lst;
     foreach(Cam cam, mCams)
     {
-        CLIQEyeDevice* dev = new CLIQEyeDevice();
-        dev->setIP(QHostAddress(cam.ip), false);
-        dev->setMAC(cam.mac);
-        dev->setUniqueId(dev->getMAC());
-        dev->setName(cam.name);
-        dev->setAuth("root", "system");
-        lst[dev->getUniqueId()] = dev;
+        QnPlQEyeResourcePtr res ( new QnPlQEyeResource() );
+        res->setIP(QHostAddress(cam.ip), false);
+        res->setMAC(cam.mac);
+        res->setUniqueId(res->getMAC());
+        res->setName(cam.name);
+        res->setAuth("root", "system");
+        lst.push_back(res);
     }
 
     return lst;
 }
 
-QnResource* IQEyeDeviceServer::checkHostAddr(QHostAddress addr)
+QnResourcePtr IQEyeDeviceServer::checkHostAddr(QHostAddress addr)
 {
-    return 0;
+    return QnResourcePtr(0);
 }

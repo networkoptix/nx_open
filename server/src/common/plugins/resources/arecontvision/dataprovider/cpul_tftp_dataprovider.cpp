@@ -32,7 +32,7 @@ AVClientPullSSTFTPStreamreader::AVClientPullSSTFTPStreamreader (QnResource* dev 
 CLAVClinetPullStreamReader(dev),
 m_black_white(false)
 {
-	QnPlAreconVisionDevice* device = static_cast<QnPlAreconVisionDevice*>(dev);
+	QnPlAreconVisionResource* device = static_cast<QnPlAreconVisionResource*>(dev);
 
 	m_model = device->getModel();
 
@@ -198,7 +198,7 @@ QnAbstractMediaDataPacketPtr AVClientPullSSTFTPStreamreader::getNextData()
 
 	forecast_size = resolutionFULL ? (width*height)/4  : (width*height)/8; // 0.25 meg per megapixel as maximum 
 
-	CLSimpleTFTPClient tftp_client((static_cast<QnPlAreconVisionDevice*>(m_device))->getIP().toString().toLatin1().data(),  m_timeout, 3);
+	CLSimpleTFTPClient tftp_client((static_cast<QnPlAreconVisionResource*>(m_device))->getIP().toString().toLatin1().data(),  m_timeout, 3);
 
 	QnCompressedVideoDataPtr videoData ( new QnCompressedVideoData(CL_MEDIA_ALIGNMENT,forecast_size) );
 	CLByteArray& img = videoData->data;
