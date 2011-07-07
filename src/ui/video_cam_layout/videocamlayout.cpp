@@ -244,8 +244,6 @@ void SceneLayout::onTimer()
         }
 
         m_view->updatePageSelector();
-        //if (ps->getCurrentPage() == ps->getMaxPageNumber() && ps->getCurrentPage()>1) // this is the last page 
-        //    return; // do not need to add something 
     }
 
 	//===================video devices=======================
@@ -312,6 +310,14 @@ void SceneLayout::onTimer()
 
         if (m_deletedIds.contains(dev->getUniqueId()))
             continue; // if this device was deleted before 
+
+        QnPageSelector* ps = m_view->getPageSelector();
+        if (ps->getCurrentPage() == ps->getMaxPageNumber() && ps->getCurrentPage()>1) // this is the last page 
+        {
+            if (!dev->checkDeviceTypeFlag(CLDevice::RECORDED))
+                continue; // do not need to add something 
+        }
+
 
 		if (!addDevice(dev, false))
 			dev->releaseRef();
