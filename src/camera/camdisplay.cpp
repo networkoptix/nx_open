@@ -149,8 +149,6 @@ void CLCamDisplay::jump()
 void CLCamDisplay::growInputQueue()
 {
     int maxSize = m_dataQueue.maxSize();
-    if (m_dataQueue.size() >= maxSize - 1)
-        m_growEnabled = true;
     if (m_growEnabled && m_dataQueue.size() <= maxSize/5 && maxSize <= CL_MAX_ALLOWED_QUEUE_SIZE/2)
     {
         m_dataQueue.setMaxSize(maxSize * 2); // grow queue
@@ -161,7 +159,8 @@ void CLCamDisplay::growInputQueue()
 
 bool CLCamDisplay::processData(CLAbstractData* data)
 {
-    growInputQueue();
+    if (m_dataQueue.size() >= (m_dataQueue.maxSize()*4)/5 )
+        m_growEnabled = true;
     if (m_needChangePriority)
     {
         if (m_playAudio)
@@ -272,6 +271,7 @@ bool CLCamDisplay::processData(CLAbstractData* data)
                 return true; // impossible? incoming vd!=0
             m_lastDisplayedVideoTime = vd->timestamp;
             display(vd, !vd->ignore);
+            growInputQueue();
             return result;
         }
 
@@ -334,6 +334,7 @@ bool CLCamDisplay::processData(CLAbstractData* data)
                     //display(vd, lastFrameToDisplay && !vd->ignore && m_audioDisplay->msInBuffer() >= AUDIO_BUFF_SIZE / 10);
                     m_lastDisplayedVideoTime = vd->timestamp;
                     display(vd, lastFrameToDisplay && !vd->ignore);
+                    growInputQueue();
 
                     if (!lastFrameToDisplay)
                     {
