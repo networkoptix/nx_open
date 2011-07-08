@@ -562,6 +562,8 @@ qint32 CLAVIDvdStreamReader::readPacket(quint8* buf, int size)
         return -1;
 
     qint64 currentBlock = m_currentPosition / DVDCSS_BLOCK_SIZE;
+    if (data->m_currentCell == -1)
+        return 0;
     CellPlaybackInfo* cell =  &data->m_cellList[data->m_currentCell];
     int cellLastBlock = cell->m_lastSector;
 
@@ -675,7 +677,10 @@ qint64 CLAVIDvdStreamReader::seek(qint64 offset, qint32 whence)
             }
         }
     }
-    return offset;
+    if (data->m_currentCell == -1)
+        return -1;
+    else
+        return offset;
 }
 
 qint32 CLAVIDvdStreamReader::writePacket(quint8* /*buf*/, int /*size*/)
