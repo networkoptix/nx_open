@@ -15,14 +15,15 @@ public:
 	CLAVIDvdStreamReader(CLDevice* dev);
 	virtual ~CLAVIDvdStreamReader();
     void setChapterNum(int chupter);
+    static QStringList getTitleList(const QString& url);
 protected:
     virtual void destroy();
-    virtual QStringList getPlaylist();
     virtual ByteIOContext* getIOContext();
     virtual bool switchToFile(int newFileIndex);
     virtual qint32 readPacket(quint8* buf, int size);
     virtual void fillAdditionalInfo(CLFileInfo* fi);
     virtual bool directSeekToPosition(qint64 pos_mks);
+    virtual QStringList getPlaylist();
 private:
     friend class CLAVIDvdStreamReaderPriv;
     qint64 seek(qint64 offset, qint32 whence);

@@ -9,26 +9,35 @@
 
 #include "device_plugins/archive/avi_files/avi_dvd_device.h"
 #include "device_plugins/archive/avi_files/avi_bluray_device.h"
+#include "device_plugins/archive/avi_files/avi_dvd_strem_reader.h"
 
 extern QString button_layout;
 extern QString button_home;
 
 void findAcceptedFiles(QStringList& files, const QString& path)
 {
-    FileTypeSupport fileTypeSupport;
-
-    QFileInfo fileInfo(path);
-    if (fileInfo.isDir())
+    if (CLAviDvdDevice::isAcceptedUrl(path))
     {
-        if (CLAviDvdDevice::isAcceptedUrl(fileInfo.absoluteFilePath()))
+        if (path.indexOf('?') == -1)
         {
+            // open all titles on DVD
+            QStringList titles = CLAVIDvdStreamReader::getTitleList(path);
+            foreach(QString title, titles)
+                files << path + QString("?title=") + title;
+        }
+        else {
             files.append(path);
         }
-        else if (CLAviBluRayDevice::isAcceptedUrl(fileInfo.absoluteFilePath()))
-        {
-            files.append(path);
-        }
-        else 
+    }
+    else if (CLAviBluRayDevice::isAcceptedUrl(path))
+    {
+        files.append(path);
+    }
+    else 
+    {
+        FileTypeSupport fileTypeSupport;
+        QFileInfo fileInfo(path);
+        if (fileInfo.isDir())
         {
             QDirIterator iter(path, QDirIterator::Subdirectories);
             while (iter.hasNext())
@@ -43,12 +52,12 @@ void findAcceptedFiles(QStringList& files, const QString& path)
                 }
             }
         }
-    }
-    else if (fileInfo.isFile())
-    {
-        if (fileTypeSupport.isFileSupported(path))
+        else if (fileInfo.isFile())
         {
-            files.append(path);
+            if (fileTypeSupport.isFileSupported(path))
+            {
+                files.append(path);
+            }
         }
     }
 }
@@ -82,8 +91,7 @@ m_normalView(0)
     for (int i = 1; i < argc; ++i)
     {
         QString fileName = fromNativePath(QString::fromLocal8Bit(argv[i]));
-        if (QFile(fileName).exists())
-            findAcceptedFiles(files, fileName);
+        findAcceptedFiles(files, fileName);
     }
 
     LayoutContent* content = 0;

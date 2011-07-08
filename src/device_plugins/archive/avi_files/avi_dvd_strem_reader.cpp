@@ -9,10 +9,12 @@
 #include "base/dvd_decrypt/dvdcss.h"
 #include "base/pespacket.h"
 #include "base/nalUnits.h"
+#include "avi_dvd_device.h"
 
 static const int IO_BLOCK_SIZE = 1024 * 1024;
 static const int IO_SKIP_BLOCK_SIZE = 1024 * 1024;
 static const int SEEK_DIRECT_SECTOR = 5;
+static const qint64 MIN_TITLE_PLAYBACK_TIME = 240 * 1000000ll; // ignore title < 2 minutes
 
 struct dvdLangCode
 {
@@ -271,12 +273,29 @@ void CLAVIDvdStreamReader::setChapterNum(int chapter)
     m_chapter = chapter;
 }
 
+QStringList CLAVIDvdStreamReader::getTitleList(const QString& url)
+{
+    CLAviDvdDevice device(url);
+    CLAVIDvdStreamReader reader(&device);
+    return reader.getPlaylist();
+}
+
 QStringList CLAVIDvdStreamReader::getPlaylist()
 {
     QStringList rez;
+    int titleNum = -1;
     if (!m_dvdReader)
     {
-        QString path = m_device->getUniqueId();
+        QStringList pathAndParams = m_device->getUniqueId().split('?');
+        QString path = pathAndParams[0];
+        if (pathAndParams.size() > 1)
+        {
+            QUrl url = m_device->getUniqueId();
+            QString titleStr = url.queryItemValue("title");
+            if (!titleStr.isEmpty())
+                titleNum = titleStr.toInt();
+        }
+
         if (path.length() == 3 && path.endsWith(":/"))
             path = path.left(2); // physical mode access under WIN32 expects path in 2-letter format.
         m_dvdReader = DVDOpen(path.toAscii().constData());
@@ -290,9 +309,33 @@ QStringList CLAVIDvdStreamReader::getPlaylist()
     if (m_mainIfo == 0)
         return rez;
 
-    for (int i = 0; i < m_mainIfo->tt_srpt->nr_of_srpts; ++i)
+    if (titleNum < 1 || titleNum > m_mainIfo->tt_srpt->nr_of_srpts)
     {
-        rez << QString::number(i+1);
+        titleNum = -1;
+        cl_log.log("Invalid titleNum value ignored. Open all titles.", cl_logINFO);
+    }
+
+    if (titleNum == -1)
+    {
+        for (int i = 0; i < m_mainIfo->tt_srpt->nr_of_srpts; ++i)
+        {
+            quint8 i_ttn = m_mainIfo->tt_srpt->title[i].vts_ttn; // number-1 is valid title?
+            int vtsnum = m_mainIfo->tt_srpt->title[i].title_set_nr;
+            ifo_handle_t* ifo = ifoOpen(m_dvdReader, vtsnum);
+            if (ifo)
+            {
+                quint16 pgc_id = ifo->vts_ptt_srpt->title[i_ttn - 1].ptt[0].pgcn;
+                pgc_t* p_pgc = ifo->vts_pgcit->pgci_srp[pgc_id - 1].pgc;
+                qint64 playbackTime = dvdtime_to_time(&p_pgc->playback_time, 0);
+                if (playbackTime >= MIN_TITLE_PLAYBACK_TIME)
+                    rez << QString::number(i+1);
+                ifoClose(ifo);
+            }
+        }
+    }
+    else
+    {
+        rez << QString::number(titleNum);
     }
     return rez;
 }
@@ -325,9 +368,10 @@ ByteIOContext* CLAVIDvdStreamReader::getIOContext()
     //QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
     if (m_ffmpegIOContext == 0)
     {
+        m_ioBuffer = (quint8*) av_malloc(32*1024);
         m_ffmpegIOContext = av_alloc_put_byte(
             m_ioBuffer,
-            IO_BLOCK_SIZE,
+            32*1024,
             0,
             this,
             &CLAVIDvdStreamReaderPriv::readPacket,
@@ -652,18 +696,22 @@ void CLAVIDvdStreamReader::deleteFileInfo(CLFileInfo* fi)
 
 void CLAVIDvdStreamReader::destroy()
 {
+
     foreach(CLFileInfo* fi, m_fileList)
         deleteFileInfo(fi);
     m_fileList.clear();
-
     CLAVIPlaylistStreamReader::destroy();
-
     if (m_mainIfo)
         ifoClose(m_mainIfo);
     m_mainIfo = 0;
     DVDClose(m_dvdReader);
     m_dvdReader = 0;
     m_tmpBufferSize = 0;
+
+    return;
+
+
+
 }
 
 void CLAVIDvdStreamReader::fillAdditionalInfo(CLFileInfo* fi) 

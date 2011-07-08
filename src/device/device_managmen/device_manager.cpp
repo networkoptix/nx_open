@@ -395,7 +395,11 @@ void CLDeviceManager::addFiles(const QStringList& files)
             continue; // such dev already exists 
         }
 
-        QFile file(xfile);
+        QString xfileName = xfile;
+        int paramsPos = xfile.indexOf('?');
+        if (paramsPos >= 0)
+            xfileName = xfile.left(paramsPos);
+        QFile file(xfileName);
         if (!file.exists())
             continue;
 
