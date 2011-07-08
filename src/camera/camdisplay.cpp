@@ -10,6 +10,8 @@
 #define CL_MAX_ALLOWED_QUEUE_SIZE (CL_MAX_DISPLAY_QUEUE_SIZE*32)
 #define AUDIO_BUFF_SIZE (4000) // ms
 
+static const qint64 MIN_DETECT_JUMP_INTERVAL = 100 * 1000; // 100ms
+
 CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
     : CLAbstractDataProcessor(CL_MAX_DISPLAY_QUEUE_SIZE),
       m_delay(100*1000), // do not put a big value here to avoid cpu usage in case of zoom out
@@ -208,7 +210,7 @@ bool CLCamDisplay::processData(CLAbstractData* data)
 			}
 		}
 
-        if (ad->timestamp < m_lastAudioPacketTime)
+        if (ad->timestamp - m_lastAudioPacketTime < -MIN_DETECT_JUMP_INTERVAL)
             afterJump(ad->timestamp);
 
         m_lastAudioPacketTime = ad->timestamp;
@@ -233,8 +235,10 @@ bool CLCamDisplay::processData(CLAbstractData* data)
 	else if (vd)
 	{
         bool result = true;
-        if (vd->timestamp < m_lastVideoPacketTime)
+        if (vd->timestamp - m_lastVideoPacketTime < -MIN_DETECT_JUMP_INTERVAL)
+        {
             afterJump(vd->timestamp);
+        }
         m_lastVideoPacketTime = vd->timestamp;
 
         if (haveAudio())
@@ -282,13 +286,11 @@ bool CLCamDisplay::processData(CLAbstractData* data)
             enqueueVideo(vd);
             return true;
         }
-
         //3) video and audio playing
         else
         {
             qint64 videoDuration;
             qint64 diff = diffBetweenVideoAndAudio(vd, channel, videoDuration);
-
             //cl_log.log("diff = ", (int)diff/1000, cl_logALWAYS);
 
 
@@ -298,10 +300,12 @@ bool CLCamDisplay::processData(CLAbstractData* data)
                 enqueueVideo(vd);
                 cl_log.log("HOLD FRAME", cl_logDEBUG1);
                 // avoid to fast buffer filling on startup
-
-                qint64 sleepTime = qMin(diff, (m_audioDisplay->msInBuffer() - AUDIO_BUFF_SIZE / 10) * 1000ll);
-                if (sleepTime > 0)
-                    m_delay.sleep(sleepTime);
+                if (!m_audioDisplay->isBuffering())
+                {
+                    qint64 sleepTime = qMin(diff, (m_audioDisplay->msInBuffer() - AUDIO_BUFF_SIZE / 10) * 1000ll);
+                    if (sleepTime > 0)
+                        m_delay.sleep(sleepTime);
+                }
                 return true;
             }
 
@@ -309,8 +313,9 @@ bool CLCamDisplay::processData(CLAbstractData* data)
             else
             {
                 // need to draw frame(s); at least one
+                
                 CLCompressedVideoData* incoming = 0;
-                if (m_audioDisplay->msInBuffer() < AUDIO_BUFF_SIZE)
+                if (m_audioDisplay->msInBuffer() < AUDIO_BUFF_SIZE )
                     incoming = vd; // process packet
                 else {
                     vd->releaseRef(); // queue too large. postpone packet.
@@ -400,11 +405,10 @@ CLCompressedVideoData* CLCamDisplay::nextInOutVideodata(CLCompressedVideoData* i
 
 	if (m_videoQueue[channel].isEmpty())
 		return incoming;
-
+    if (incoming)
+        enqueueVideo(incoming);
 	// queue is not empty 
-	if (incoming)
-		enqueueVideo(incoming);
-	return m_videoQueue[channel].dequeue();
+    return m_videoQueue[channel].dequeue();
 }
 
 quint64 CLCamDisplay::nextVideoImageTime(CLCompressedVideoData* incoming, int channel) const

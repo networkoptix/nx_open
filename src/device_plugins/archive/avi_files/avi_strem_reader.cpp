@@ -40,9 +40,14 @@ qint64 CLAVIStreamReader::packetTimestamp(AVStream* stream, const AVPacket& pack
 {
 	double timeBase = av_q2d(stream->time_base);
 	qint64 firstDts = (stream->first_dts == AV_NOPTS_VALUE) ? 0 : stream->first_dts;
-	double ttm = timeBase * (packet.dts - firstDts);
-
-	return qint64(1e+6 * ttm);
+    if (packet.dts != AV_NOPTS_VALUE)
+    {
+        double ttm = timeBase * (packet.dts - firstDts);
+        return qint64(1e+6 * ttm);
+    }
+    else {
+        return firstDts;
+    }
 }
 
 CLAVIStreamReader::CLAVIStreamReader(CLDevice* dev ) :
@@ -186,7 +191,7 @@ bool CLAVIStreamReader::initCodecs()
         if(codecContext->codec_type >= (unsigned)AVMEDIA_TYPE_NB)
             continue;
 
-        if (strm->id == lastStreamID)
+        if (strm->id && strm->id == lastStreamID)
             continue; // duplicate
         lastStreamID = strm->id;
 
@@ -537,7 +542,7 @@ QStringList CLAVIStreamReader::getAudioTracksInfo() const
         if(codecContext->codec_type >= (unsigned)AVMEDIA_TYPE_NB)
             continue;
 
-        if (strm->id == lastStreamID)
+        if (strm->id && strm->id == lastStreamID)
             continue; // duplicate
         lastStreamID = strm->id;
 
@@ -595,7 +600,7 @@ bool CLAVIStreamReader::setAudioChannel(unsigned int num)
         if(codecContext->codec_type >= (unsigned)AVMEDIA_TYPE_NB)
             continue;
 
-        if (strm->id == lastStreamID)
+        if (strm->id && strm->id == lastStreamID)
             continue; // duplicate
         lastStreamID = strm->id;
 

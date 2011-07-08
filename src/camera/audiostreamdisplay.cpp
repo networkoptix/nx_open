@@ -222,30 +222,13 @@ void CLAudioStreamDisplay::putData(CLCompressedAudioData* data)
         if (msInBuffer() > m_bufferMs)
         {
             cl_log.log("to many data in audio queue!!!!", cl_logALWAYS);
-            return; // too much data
         }
-
-        data->addRef();
-        m_audioQueue.enqueue(data);
-
-        /*
-        if (m_audioQueue.size() < MAX_BUFFER_LEN)
+        else 
+        {
+            data->addRef();
             m_audioQueue.enqueue(data);
-        else
-        {
-            data->releaseRef();
-            //return;
         }
 
-        if (msInQueue() > m_bufferMs)
-        {
-            cl_log.log("to many data in audio queue!!!!", cl_logDEBUG1);
-            clearAudioBuffer();
-            return;
-        }        
-        */
-        
-        
         if (msInBuffer() < m_bufferMs / 10)
         {
             //paying too fast; need to slowdown
@@ -258,11 +241,7 @@ void CLAudioStreamDisplay::putData(CLCompressedAudioData* data)
         
 	}
 
-    if (m_audioQueue.empty()) // possible if incoming data = 0
-        return;
-
-    //if (msInBuffer() > m_tooFewDataDetected*playAfterMs() || m_audioQueue.size() >= MAX_BUFFER_LEN )
-    while (msInQueue() > m_tooFewDataDetected*playAfterMs() || m_audioQueue.size() >= MAX_BUFFER_LEN )
+    while (!m_audioQueue.isEmpty() && msInQueue() >= m_tooFewDataDetected*playAfterMs() || m_audioQueue.size() >= MAX_BUFFER_LEN )
     {
         m_tooFewDataDetected = false;
 

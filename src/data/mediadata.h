@@ -21,7 +21,7 @@ struct CLAbstractMediaData : public CLAbstractData
 	CLByteArray data;
 	DataType dataType;
 	CodecID compressionType;
-	quint64 timestamp; // mksec // 10^-6
+	qint64 timestamp; // mksec // 10^-6
 
 private:
 	CLAbstractMediaData() : 
