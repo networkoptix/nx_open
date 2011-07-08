@@ -9,11 +9,7 @@
 
 
 class QnResourceCommand;
-class QnStreamDataProvider;
 class QnResourceConsumer;
-class QnResource;
-typedef QSharedPointer<QnResource> QnResourcePtr;
-typedef QList<QnResourcePtr> QnResourceList;
 
 enum QnDomain
 {
@@ -93,9 +89,9 @@ public:
 	const QnParamList& getResourceParamList() const;
 
 
-    void addConsumer(QnResourceConsumer* consumer);
-    void removeConsumer(QnResourceConsumer* consumer);
-    bool hasSuchConsumer(QnResourceConsumer* consumer) const;
+    void addConsumer(const QnResourceConsumer* consumer);
+    void removeConsumer(const QnResourceConsumer* consumer);
+    bool hasSuchConsumer(const QnResourceConsumer* consumer) const;
     void disconnectAllConsumers();
 
 signals:
@@ -107,7 +103,7 @@ public:
 	static void stopCommandProc() {static_commandProc.stop();};
     static void addCommandToProc(QnAbstractDataPacketPtr data) {static_commandProc.putData(data);};
 	static int commandProcQueSize() {return static_commandProc.queueSize();}
-	static bool commandProcHasSuchResourceInQueue(QnResourcePtr res) {return static_commandProc.hasSuchDeviceInQueue(res);}
+	static bool commandProcHasSuchResourceInQueue(QnResourcePtr res) {return static_commandProc.hasSuchResourceInQueue(res);}
 protected:
 	typedef QMap<QString, QnParamList > QnParamLists;
 	static QnParamLists static_resourcesParamLists; // list of all supported resources params list

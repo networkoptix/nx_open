@@ -4,12 +4,13 @@
 #include "datapacket/datapacket.h"
 #include "dataconsumer/dataconsumer.h"
 #include "resource/resource_consumer.h"
+#include "resource/id.h"
 
 
 class QnResourceCommand : public QnAbstractDataPacket, public QnResourceConsumer
 {
 public:
-	QnResourceCommand(QnResource* res);
+	QnResourceCommand(QnResourcePtr res);
 	virtual ~QnResourceCommand();
 	virtual void execute() = 0;
 
@@ -30,13 +31,14 @@ public:
 
 	virtual void clearUnprocessedData();
 
-	bool hasSuchDeviceInQueue(QnResource* dev) const;
+	bool hasSuchResourceInQueue(QnResourcePtr res) const;
 
 protected:
 	virtual void processData(QnAbstractDataPacketPtr data);
 private:
-	QMap<QnResource*, unsigned int> mDevicesQue;
-	mutable QMutex m_cs;
+    mutable QMutex m_cs;
+	QMap<QnId, unsigned int> mResourceQueue;
+	
 };
 
 #endif //CLDeveceCommandProcessor_h_1207

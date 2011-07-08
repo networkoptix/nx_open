@@ -3,10 +3,11 @@
 
 
 
-QnResourceCommand::QnResourceCommand(QnResource* device):
-m_resource(device)
-{
 
+QnResourceCommand::QnResourceCommand(QnResourcePtr res):
+QnResourceConsumer(res)
+{
+    disconnectFromResource();
 }
 
 QnResourceCommand::~QnResourceCommand()
@@ -14,10 +15,6 @@ QnResourceCommand::~QnResourceCommand()
 
 };
 
-QnResource* QnResourceCommand::getDevice() const
-{
-	return m_resource;
-}
 
 QnResourceCommandProcessor::QnResourceCommandProcessor():
 QnAbstractDataConsumer(1000)
@@ -30,51 +27,57 @@ QnResourceCommandProcessor::~QnResourceCommandProcessor()
 	stop();
 }
 
+void QnResourceCommandProcessor::putData(QnAbstractDataPacketPtr data)
+{
+    QnResourceCommandPtr command = data.staticCast<QnResourceCommand>();
+    QnId id = command->getResource()->getId();
+
+    QMutexLocker mutex(&m_cs);
+    if (!mResourceQueue.contains(id))
+    {
+        mResourceQueue[id] = 1;
+    }
+    else
+    {
+        mResourceQueue[id]++;
+    }
+
+    QnAbstractDataConsumer::putData(data);
+
+}
+
+
 void QnResourceCommandProcessor::processData(QnAbstractDataPacketPtr data)
 {
 	QnResourceCommandPtr command = data.staticCast<QnResourceCommand>();
-	command->execute();
 
-	QnResource* dev = command->getDevice();
+    if (command->isConnectedToTheResource())
+        command->execute();
+
+	QnId id = command->getResource()->getId();
 	QMutexLocker mutex(&m_cs);
-	Q_ASSERT(mDevicesQue.contains(dev));
-	Q_ASSERT(mDevicesQue[dev]>0);
+	Q_ASSERT(mResourceQueue.contains(id));
+	Q_ASSERT(mResourceQueue[id]>0);
 
-	mDevicesQue[dev]--;
+	mResourceQueue[id]--;
 }
 
-bool QnResourceCommandProcessor::hasSuchDeviceInQueue(QnResource* dev) const
+bool QnResourceCommandProcessor::hasSuchResourceInQueue(QnResourcePtr res) const
 {
+    QnId id = res->getId();
+
 	QMutexLocker mutex(&m_cs);
-	if (!mDevicesQue.contains(dev))
+	if (!mResourceQueue.contains(id))
 		return false;
 
-	return (mDevicesQue[dev]>0);
+	return (mResourceQueue[id]>0);
 }
 
-void QnResourceCommandProcessor::putData(QnAbstractDataPacketPtr data)
-{
-	QnResourceCommandPtr command = data.staticCast<QnResourceCommand>();
-	QnResource* dev = command->getDevice();
-
-	QMutexLocker mutex(&m_cs);
-	if (!mDevicesQue.contains(dev))
-	{
-		mDevicesQue[dev] = 1;
-	}
-	else
-	{
-		mDevicesQue[dev]++;
-	}
-
-	QnAbstractDataConsumer::putData(data);
-
-}
 
 void QnResourceCommandProcessor::clearUnprocessedData()
 {
 	QnAbstractDataConsumer::clearUnprocessedData();
 	QMutexLocker mutex(&m_cs);
-	mDevicesQue.clear();
+	mResourceQueue.clear();
 }
 

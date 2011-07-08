@@ -1,15 +1,16 @@
+#include "resource.h"
 #include "resource_consumer.h"
 
 
 QnResourceConsumer::QnResourceConsumer(QnResourcePtr resource):
 m_resource(resource)
 {
-
+    m_resource->addConsumer(this);
 }
 
 QnResourceConsumer::~QnResourceConsumer()
 {
-
+    disconnectFromResource();
 }
 
 QnResourcePtr QnResourceConsumer::getResource() const
@@ -17,17 +18,17 @@ QnResourcePtr QnResourceConsumer::getResource() const
     return m_resource;
 }
 
-void QnResourceConsumer::isConnectedToTheResource() const
+bool QnResourceConsumer::isConnectedToTheResource() const
 {
     return m_resource->hasSuchConsumer(this);
 }
 
-virtual void QnResourceConsumer::beforeDisconnectFromResource()
+void QnResourceConsumer::beforeDisconnectFromResource()
 {
 
 }
 
-virtual void QnResourceConsumer::disconnectFromResource()
+void QnResourceConsumer::disconnectFromResource()
 {
     if (!isConnectedToTheResource())
         return;
