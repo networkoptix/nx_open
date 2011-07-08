@@ -86,7 +86,7 @@ QnNetworkResourcePtr QnPlAreconVisionResource::updateDevice()
 	result->setName(model);
 	result->setIP(getIP(), false);
 	result->setMAC(getMAC());
-	result->setUniqueId(getMAC());
+	result->setId(getMAC());
 	result->setLocalAddr(m_local_adssr);
 	result->setStatus(getStatus());
 
@@ -128,7 +128,7 @@ CLHttpStatus QnPlAreconVisionResource::setRegister_asynch(int page, int num, int
 
 		  void execute()
 		  {
-			  (static_cast<QnPlAreconVisionResource*>(m_device))->setRegister(m_page,m_reg,m_val);
+			  (static_cast<QnPlAreconVisionResource*>(m_resource))->setRegister(m_page,m_reg,m_val);
 		  }
 	private:
 		int m_page;
@@ -140,7 +140,7 @@ CLHttpStatus QnPlAreconVisionResource::setRegister_asynch(int page, int num, int
 
 
 	QnPlArecontResourceSetRegCommandPtr command ( new QnPlArecontResourceSetRegCommand(this, page, num, val) );
-	m_commanproc.putData(command);
+	static_commandProc.putData(command);
 	return CL_HTTP_SUCCESS;
 
 }
@@ -152,10 +152,10 @@ void QnPlAreconVisionResource::onBeforeStart()
 	getParam("MaxSensorWidth", maxSensorWidth);
 	getParam("MaxSensorHeight", maxSensorHight);
 
-	setParam_asynch("sensorleft", 0);
-	setParam_asynch("sensortop", 0);
-	setParam_asynch("sensorwidth", maxSensorWidth);
-	setParam_asynch("sensorheight", maxSensorHight);
+	setParamAsynch("sensorleft", 0);
+	setParamAsynch("sensortop", 0);
+	setParamAsynch("sensorwidth", maxSensorWidth);
+	setParamAsynch("sensorheight", maxSensorHight);
 
 }
 
@@ -164,7 +164,7 @@ bool QnPlAreconVisionResource::getParam(const QString& name, QnValue& val, bool 
 	if (!QnResource::getParam(name, val, resynch)) // check if param exists
 		return false;
 
-	CLParamType& value = getDeviceParamList().get(name).value;
+	CLParamType& value = getResourceParamList().get(name).value;
 
 	if (value.synchronized && !resynch) // if synchronized and do not need to do resynch
 	{
@@ -232,7 +232,7 @@ bool QnPlAreconVisionResource::setParam(const QString& name, const QnValue& val 
 	if (setParam_special(name, val)) // try special first 
 		return true;
 
-	CLParamType& value = getDeviceParamList().get(name).value;
+	CLParamType& value = getResourceParamList().get(name).value;
 
 	//if (value.synchronized && value.value==val) // the same value
 	//	return true;
@@ -270,10 +270,6 @@ bool QnPlAreconVisionResource::setParam(const QString& name, const QnValue& val 
 	return true;
 }
 
-bool QnPlAreconVisionResource::executeCommand(QnResourceCommand* command)
-{
-	return true;
-}
 
 QnResourceList QnPlAreconVisionResource::findDevices()
 {
@@ -377,7 +373,7 @@ QnResourceList QnPlAreconVisionResource::findDevices()
 
 				resource->setIP(sender, false);
 				resource->setMAC(smac);
-				resource->setUniqueId(smac);
+				resource->setId(smac);
 
 				QnResourceStatus dh;
 				resource->setLocalAddr ( ipaddrs.at(i) );
@@ -490,10 +486,10 @@ bool QnPlAreconVisionResource::parseDevice(const QDomElement &device, QString& e
 
 	QString device_name = device.attribute("id");
 
-	LL::iterator it1 = static_device_list.find(device_name);
-	LL::iterator it2 = static_stream_list.find(device_name);
+	QnParamLists::iterator it1 = static_resourcesParamLists.find(device_name);
+	QnParamLists::iterator it2 = static_stream_list.find(device_name);
 
-	if (it1!=static_device_list.end() || it2!=static_stream_list.end())
+	if (it1!=static_resourcesParamLists.end() || it2!=static_stream_list.end())
 	{
 		QTextStream str(&error);
 		str << "Such device " << device_name << " already exists.";
@@ -511,10 +507,10 @@ bool QnPlAreconVisionResource::parseDevice(const QDomElement &device, QString& e
 		while(lst_iter.hasNext())
 		{
 			QString val = lst_iter.next().trimmed();
-			LL::iterator it1 = static_device_list.find(val);
-			LL::iterator it2 = static_stream_list.find(val);
+			QnParamLists::iterator it1 = static_resourcesParamLists.find(val);
+			QnParamLists::iterator it2 = static_stream_list.find(val);
 
-			if (it1!=static_device_list.end())
+			if (it1!=static_resourcesParamLists.end())
 				device_param_list.inheritedFrom(it1.value());
 			else
 				cl_log.log("Smth wrong with public tag for ", device_name, cl_logWARNING);
@@ -530,7 +526,7 @@ bool QnPlAreconVisionResource::parseDevice(const QDomElement &device, QString& e
 	QDomNode node = device.firstChild();
 	if (node.isNull())
 	{
-		static_device_list[device_name] = device_param_list;
+		static_resourcesParamLists[device_name] = device_param_list;
 		static_stream_list[device_name] = stream_param_list;
 
 		return true; // just public make sence 
@@ -561,7 +557,7 @@ bool QnPlAreconVisionResource::parseDevice(const QDomElement &device, QString& e
 			param_node  = param_node.nextSibling();
 		}
 
-		static_device_list[device_name] = device_param_list;
+		static_resourcesParamLists[device_name] = device_param_list;
 
 		// move to stream_params
 		node = node.nextSibling();
@@ -723,7 +719,7 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::deviceByID(QString id, int m
 		return new CLArecontSingleSensorDevice(model);
 }
 
-bool QnPlAreconVisionResource::getBaseInfo()
+bool QnPlAreconVisionResource::getBasicInfo()
 {
 	QnValue val;
 	if (!getParam("Firmware version", val))
@@ -745,9 +741,9 @@ QString QnPlAreconVisionResource::toString() const
 {
 	QString result;
 
-	QString firmware = getDeviceParamList().get("Firmware version").value.value;
-	QString hardware = getDeviceParamList().get("Image engine").value.value;
-	QString net = getDeviceParamList().get("Net version").value.value;
+	QString firmware = getResourceParamList().get("Firmware version").value.value;
+	QString hardware = getResourceParamList().get("Image engine").value.value;
+	QString net = getResourceParamList().get("Net version").value.value;
 
 	QTextStream t(&result);
 	t<< QnResource::toString() <<" live fw=" << firmware << " hw=" << hardware << " net=" << net;

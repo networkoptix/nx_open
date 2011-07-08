@@ -5,7 +5,7 @@
 QnFileResource::QnFileResource(QString filename)
 {
     QFileInfo fi(filename);
-	setUniqueId(fi.absoluteFilePath());
+	setId(fi.absoluteFilePath());
     m_filename = QFileInfo(filename).fileName();
 	 
 	addDeviceTypeFlag(QnResource::SINGLE_SHOT);

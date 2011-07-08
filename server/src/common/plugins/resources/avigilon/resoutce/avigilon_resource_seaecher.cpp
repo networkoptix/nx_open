@@ -68,7 +68,7 @@ QnResourceList AVigilonDeviceServer::findResources()
         QnPlAvigilonResourcePtr resource ( new QnPlAvigilonResource() );
         resource->setIP(QHostAddress(cam.ip), false);
         resource->setMAC(cam.mac);
-        resource->setUniqueId(resource->getMAC());
+        resource->setId(resource->getMAC());
         resource->setName(QString("clearpix") + QString::number(lst.count()+1));
         resource->setAuth("admin", "admin");
         lst.push_back(resource);

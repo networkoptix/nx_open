@@ -4,7 +4,7 @@
 
 
 QnResourceCommand::QnResourceCommand(QnResource* device):
-m_device(device)
+m_resource(device)
 {
 
 }
@@ -16,7 +16,7 @@ QnResourceCommand::~QnResourceCommand()
 
 QnResource* QnResourceCommand::getDevice() const
 {
-	return m_device;
+	return m_resource;
 }
 
 QnResourceCommandProcessor::QnResourceCommandProcessor():

@@ -52,11 +52,18 @@ public:
         return (m_id >= other.m_id);
     }
 
+    void setEmpty()
+    {
+        m_id = "";
+    }
+
 
     QString toString() const
     {
         return m_id;
     }
+
+    
 
 private:
     QString generateNewId();

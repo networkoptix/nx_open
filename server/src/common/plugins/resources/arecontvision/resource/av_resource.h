@@ -38,7 +38,7 @@ public:
 
 	virtual bool setIP(const QHostAddress& ip, bool net = true);
 
-	bool getBaseInfo();
+	bool getBasicInfo();
 
 	QString toString() const;
 
@@ -59,8 +59,6 @@ public:
 
 	// model is for internal use of any kind of AV plugin 
 	int getModel() const;
-
-	virtual bool executeCommand(QnResourceCommand* command);
 
 protected:
 

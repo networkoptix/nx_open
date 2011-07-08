@@ -1,168 +1,142 @@
 #ifndef device_h_1051
 #define device_h_1051
 
-#include "common/expensiveobject.h"
-#include "common/associativearray.h"
+
 #include "resource_param.h"
 #include "datapacket/datapacket.h"
 #include "resourcecontrol/resource_command_consumer.h"
 #include "id.h"
 
 
-struct QnResourceStatus
-{
-	enum {NOT_IN_SUBNET = 1, CONFLICTING = 2, IP_LOCKED = 4, READY = 8, NOT_LOCAL = 16, ALL = 0xff};
-	QnResourceStatus()
-        : status(0)
-	{
-	}
-
-	quint32 checkFlag(int flag) const
-	{
-		return status & flag;
-	}
-
-	void setFlag(int flag)
-	{
-		status  |= flag;
-	}
-
-	void removeFlag(int flag)
-	{
-		status &= (~flag);
-	}
-
-	quint32 status;
-};
-
 class QnResourceCommand;
 class QnStreamDataProvider;
-class QnVideoResoutceLayout;
-
-// this class and inherited must be very light to create 
+class QnResourceConsumer;
 class QnResource;
 typedef QSharedPointer<QnResource> QnResourcePtr;
 typedef QList<QnResourcePtr> QnResourceList;
 
-
-class QnResource
+enum QnDomain
 {
-public:
-	enum {NETWORK = 0x00000001, NVR = 0x00000002, SINGLE_SHOT = 0x00000004, ARCHIVE = 0x00000008, RECORDED = 0x00000010};
+    QnDomainMemory = 1,
+    QnDomainDatabase = 2,
+    QnDomainPhysical = 4
+};
 
-	enum DeviceType {RECORDER, VIDEODEVICE};
+//enum {NETWORK = 0x00000001, NVR = 0x00000002, SINGLE_SHOT = 0x00000004, ARCHIVE = 0x00000008, RECORDED = 0x00000010};
+
+class QnResource : public QObject
+{
+    Q_OBJECT
+public:
+
+    enum 
+    {
+        network = 0x01, // resource has ip and mac 
+        url = 0x02,  // has url, like file name
+        streamprovider = 0x04,
+        media = 0x08, // video audio 
+        playback = 0x10 // something playable ( not real time and not a single shot)
+    };
 
 	QnResource();
-
 	virtual ~QnResource();
 
-    // returns true if resources are equal 
+    //returns true if resources are equal to each other
     virtual bool equalsTo(const QnResourcePtr other) const = 0;
 
-	virtual DeviceType getDeviceType() const = 0;
+    // flags like network media and so on
+	bool checkFlag(unsigned long flag) const;
 
-	void setParentId(QnId parent);
+    QnId getId() const;
+    void setId(const QnId& id);
+
+	void setParentId(const QnId& parent);
 	QnId getParentId() const;
 
-	// each device has unique( over the world) ID; 
-	// good example for network device could be MAC address
-	QnId getUniqueId() const;
-	void setUniqueId(const QnId& id);
+    // if resource physically removed from system - becomes unavailable 
+    // we even do not need to try setparam or so 
+    bool available() const;
+    void setAvailable(bool av);
 
-	//Name is class of the devices. like 2105DN; => arecontvision 2 megapixel H.264 day night camera; or "exacq nvr divece"
-	virtual QString getName() const;
+	//Name is class of the devices. like 2105DN; => arecontvision 2 megapixel H.264 day night camera; 
+	QString getName() const;
 	void setName(const QString& name);
 
-	// each device has type; for example AV divece has NETWORK
-	bool checkDeviceTypeFlag(unsigned long flag) const;
-	void addDeviceTypeFlag(unsigned long flag);
-	void removeDeviceTypeFlag(unsigned long flag);
+    void addTag(const QString& tag);
+    void removeTag(const QString& tag);
+    void hasTag(const QString& tag) const;
+    QStringList tagList() const;
 
 	virtual QString toString() const;
 
-	QnResourceStatus& getStatus() ;
-	void  setStatus(const QnResourceStatus& status) ;
 
 	// return true if no error
-	// if (resynch) then ignore synchronized flag
-	virtual bool getParam(const QString& name, QnValue& val, bool resynch = false);
+	virtual bool getParam(const QString& name, QnValue& val, QnDomain domain = QnDomainMemory);
+
+    // same as getParam is invoked in separate thread.
+    // as soon as param changed onParametrChanged signal is emitted 
+    void getParamAsynch(const QString& name, QnValue& val, QnDomain domain = QnDomainMemory);
+
 
 	// return true if no error
-	// if (resynch) then ignore synchronized flag
-	// this is synch function ( will not return value until network part is done)
-	virtual bool setParam(const QString& name, const QnValue& val);
+	virtual bool setParam(const QString& name, const QnValue& val, QnDomain domain = QnDomainMemory);
 
 	// same as setParam but but returns immediately;
-	// this function leads setParam invoke. so no need to make it virtual
-	bool setParam_asynch(const QString& name, const QnValue& val);
+	// this function leads setParam invoke in separate thread. so no need to make it virtual
+	void setParamAsynch(const QString& name, const QnValue& val, QnDomain domain = QnDomainMemory);
 
-	// return false if not accessible 
-	virtual bool getBaseInfo(){return true;};
+	// gets resource basic info; may be firmware version or so 
+    // return false if not accessible 
+	virtual bool getBasicInfo(){return true;};
 
-	// this function is called by stream reader before start read;
-	// on in case of connection lost and restored 
-	virtual void onBeforeStart(){};
+	QnParamList& getResourceParamList();// returns params that can be changed on device level
+	const QnParamList& getResourceParamList() const;
 
-	// executing command 
-	virtual bool executeCommand(QnResourceCommand* /*command*/){return true;};
 
-	QnParamList& getDeviceParamList();// returns params that can be changed on device level
-	const QnParamList& getDeviceParamList() const;
+    void addConsumer(QnResourceConsumer* consumer);
+    void removeConsumer(QnResourceConsumer* consumer);
+    bool hasSuchConsumer(QnResourceConsumer* consumer) const;
+    void disconnectAllConsumers();
 
-	QnParamList& getStreamParamList();// returns params that can be changed on stream level 
-	const QnParamList& getStreamParamList() const;
-
-	virtual QnStreamDataProvider* getDeviceStreamConnection() = 0;
-
-	// after setVideoLayout is called device is responsable for the destroying the layout 
-	void setVideoLayout(QnVideoResoutceLayout* layout);
-
-	const QnVideoResoutceLayout* getVideoLayout() const;
+signals:
+    
+    void onParametrChanged(QString paramname, QString value);
 
 public:
-	static QStringList supportedDevises();
-
-	// this function will call getBaseInfo for each device with conflicted = false in multiple thread
-	// lst - device list; threads - number of threads 
-	static void getDevicesBasicInfo(QnResourceList& lst, int threads);
-
-
-	static void startCommandProc() {m_commanproc.start();};
-	static void stopCommandProc() {m_commanproc.stop();};
-    static void addCommandToProc(QnAbstractDataPacketPtr data) {m_commanproc.putData(data);};
-	static int commandProcQueSize() {return m_commanproc.queueSize();}
-	static bool commandProchasSuchDeviceInQueue(QnResource* dev) {return m_commanproc.hasSuchDeviceInQueue(dev);}
-
+	static void startCommandProc() {static_commandProc.start();};
+	static void stopCommandProc() {static_commandProc.stop();};
+    static void addCommandToProc(QnAbstractDataPacketPtr data) {static_commandProc.putData(data);};
+	static int commandProcQueSize() {return static_commandProc.queueSize();}
+	static bool commandProcHasSuchResourceInQueue(QnResourcePtr res) {return static_commandProc.hasSuchDeviceInQueue(res);}
 protected:
-	typedef QMap<QString, QnParamList > LL;
-	static LL static_device_list; // list of all supported devices params list
-	static LL static_stream_list; // list of all supported streams params list
+	typedef QMap<QString, QnParamList > QnParamLists;
+	static QnParamLists static_resourcesParamLists; // list of all supported resources params list
 
 	// this is thread to process commands like setparam
-
-	static QnResourceCommandProcessor m_commanproc;
+	static QnResourceCommandProcessor static_commandProc;
 
 protected:
+    mutable QMutex m_mutex; // resource mutex for everything 
 
-    QnId m_uniqueId; //+
+
+    QnId m_Id; //+
     QnId m_parentId;
 
-
-	mutable QnParamList m_deviceParamList;
-	mutable QnParamList m_streamParamList;
+    unsigned long m_deviceTypeFlags;
 
 	QString m_name; // this device model like AV2105 or AV2155dn 
-	QString m_description;
 
-	QnResourceStatus m_status;
+    mutable QnParamList m_deviceParamList;
+    QStringList m_tags;
 
-	unsigned long m_deviceTypeFlags;
+    bool m_avalable;
 
-	mutable QnVideoResoutceLayout* m_videolayout;
 
-	
+    mutable QMutex m_consumersMtx; 
+    QSet<QnResourceConsumer*> m_consumers;
 };
 
+// some resource related non member functions 
 bool hasEqual(const QnResourceList& lst, const QnResourcePtr res);
 
 #endif

@@ -3,19 +3,17 @@
 
 #include "datapacket/datapacket.h"
 #include "dataconsumer/dataconsumer.h"
+#include "resource/resource_consumer.h"
 
 
-class QnResource;
-
-class QnResourceCommand : public QnAbstractDataPacket
+class QnResourceCommand : public QnAbstractDataPacket, public QnResourceConsumer
 {
 public:
-	QnResourceCommand(QnResource* device);
+	QnResourceCommand(QnResource* res);
 	virtual ~QnResourceCommand();
-	QnResource* getDevice() const;
 	virtual void execute() = 0;
-protected:
-	QnResource* m_device;
+
+	
 
 };
 

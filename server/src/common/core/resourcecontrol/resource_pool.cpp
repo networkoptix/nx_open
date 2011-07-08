@@ -23,13 +23,13 @@ QnResourcePool& QnResourcePool::instance()
 void QnResourcePool::addResource(QnResourcePtr resource)
 {
     QMutexLocker mtx(&m_resourcesMtx);
-    m_resources[resource->getUniqueId()] = resource;
+    m_resources[resource->getId()] = resource;
 }
 
 void QnResourcePool::removeResource(QnResourcePtr resource)
 {
     QMutexLocker mtx(&m_resourcesMtx);
-    m_resources.remove(resource->getUniqueId());
+    m_resources.remove(resource->getId());
 
 }
 

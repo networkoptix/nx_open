@@ -3,10 +3,10 @@
 
 static int inst = 0;
 
-QnResourceCommandProcessor QnResource::m_commanproc;
+QnResourceCommandProcessor QnResource::static_commandProc;
 
-QnResource::LL QnResource::static_device_list; // list of all supported devices params list
-QnResource::LL QnResource::static_stream_list; // list of all supported streams params list
+QnResource::QnParamLists QnResource::static_resourcesParamLists; // list of all supported devices params list
+QnResource::QnParamLists QnResource::static_stream_list; // list of all supported streams params list
 
 QnResource::QnResource():
 m_deviceTypeFlags(0),
@@ -32,14 +32,14 @@ QnId QnResource::getParentId() const
 	return m_parentId;
 }
 
-QnId QnResource::getUniqueId() const
+QnId QnResource::getId() const
 {
-	return m_uniqueId;
+	return m_Id;
 }
 
-void QnResource::setUniqueId(const QnId& id)
+void QnResource::setId(const QnId& id)
 {
-	m_uniqueId = id;
+	m_Id = id;
 }
 
 QString QnResource::getName() const
@@ -62,18 +62,18 @@ void  QnResource::setStatus(const QnResourceStatus& status)
 	m_status = status;
 }
 
-QnParamList& QnResource::getDeviceParamList()
+QnParamList& QnResource::getResourceParamList()
 {
 	if (m_deviceParamList.empty())
-		m_deviceParamList = static_device_list[m_name];
+		m_deviceParamList = static_resourcesParamLists[m_name];
 
 	return m_deviceParamList;
 }
 
-const QnParamList& QnResource::getDeviceParamList() const
+const QnParamList& QnResource::getResourceParamList() const
 {
 	if (m_deviceParamList.empty())
-		m_deviceParamList = static_device_list[m_name];
+		m_deviceParamList = static_resourcesParamLists[m_name];
 
 	return m_deviceParamList;
 
@@ -110,14 +110,6 @@ const QnParamList& QnResource::getStreamParamList() const
 	return m_streamParamList;
 }
 
-QStringList QnResource::supportedDevises()
-{
-	QStringList result;
-	for (LL::iterator it = static_device_list.begin();it != static_device_list.end(); ++it)
-		result.push_back(it.key());
-
-	return result;
-}
 
 void QnResource::setVideoLayout(QnVideoResoutceLayout* layout)
 {
@@ -137,7 +129,7 @@ const QnVideoResoutceLayout* QnResource::getVideoLayout() const
 QString QnResource::toString() const
 {
 	QString result;
-	QTextStream(&result) << getName() << "  " <<  getUniqueId().toString();
+	QTextStream(&result) << getName() << "  " <<  getId().toString();
 	return result;
 }
 
@@ -153,7 +145,7 @@ struct T
 
     void f()
     {
-        resource->getBaseInfo();
+        resource->getBasicInfo();
     }
 
     QnResourcePtr resource;
@@ -174,7 +166,7 @@ void QnResource::getDevicesBasicInfo(QnResourceList& lst, int threads)
 
         void f()
         {
-            resource->getBaseInfo();
+            resource->getBasicInfo();
         }
 
         QnResourcePtr resource;
@@ -214,7 +206,7 @@ void QnResource::getDevicesBasicInfo(QnResourceList& lst, int threads)
 
 bool QnResource::getParam(const QString& name, QnValue& val, bool resynch) 
 {
-	if (!getDeviceParamList().exists(name))
+	if (!getResourceParamList().exists(name))
 	{
 		cl_log.log("getParam: requested param does not exist!", cl_logWARNING);
 		return false;
@@ -225,13 +217,13 @@ bool QnResource::getParam(const QString& name, QnValue& val, bool resynch)
 
 bool QnResource::setParam(const QString& name, const QnValue& val)
 {
-	if (!getDeviceParamList().exists(name))
+	if (!getResourceParamList().exists(name))
 	{
 		cl_log.log("setParam: requested param does not exist!", cl_logWARNING);
 		return false;
 	}
 
-	if (getDeviceParamList().get(name).value.readonly)
+	if (getResourceParamList().get(name).value.readonly)
 	{
 		cl_log.log("setParam: cannot set readonly param!", cl_logWARNING);
 		return false;
@@ -241,7 +233,7 @@ bool QnResource::setParam(const QString& name, const QnValue& val)
 
 }
 
-bool QnResource::setParam_asynch(const QString& name, const QnValue& val)
+bool QnResource::setParamAsynch(const QString& name, const QnValue& val)
 {
 
 	class QnResourceSetParamCommand : public QnResourceCommand
@@ -257,7 +249,7 @@ bool QnResource::setParam_asynch(const QString& name, const QnValue& val)
 
 		void execute()
 		{
-			m_device->setParam(m_name, m_val);
+			m_resource->setParam(m_name, m_val);
 		}
 	private:
 		QString m_name;
@@ -268,7 +260,7 @@ bool QnResource::setParam_asynch(const QString& name, const QnValue& val)
     typedef QSharedPointer<QnResourceSetParamCommand> QnResourceSetParamCommandPtr;
 
 	QnResourceSetParamCommandPtr command ( new QnResourceSetParamCommand(this, name, val) );
-	m_commanproc.putData(command);
+	static_commandProc.putData(command);
 
 	return true;
 }

@@ -20,7 +20,7 @@ QnResource::DeviceType QnPlANdroidResource::getDeviceType() const
 
 QString QnPlANdroidResource::toString() const
 {
-    return QString("live android ") + getUniqueId().toString();
+    return QString("live android ") + getId().toString();
 }
 
 QnStreamDataProvider* QnPlANdroidResource::getDeviceStreamConnection()

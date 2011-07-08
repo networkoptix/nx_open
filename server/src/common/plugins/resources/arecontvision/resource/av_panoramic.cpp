@@ -142,7 +142,7 @@ bool CLArecontPanoramicDevice::setParam(const QString& name, const QnValue& val 
 	if (setParam_special(name, val)) // try special first 
 		return true;
 
-	CLParamType& value = getDeviceParamList().get(name).value;
+	CLParamType& value = getResourceParamList().get(name).value;
 
 	//if (value.synchronized && value.value==val) // the same value
 	//	return true;
