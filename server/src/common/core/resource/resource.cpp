@@ -6,64 +6,184 @@ static int inst = 0;
 QnResourceCommandProcessor QnResource::static_commandProc;
 
 QnResource::QnParamLists QnResource::static_resourcesParamLists; // list of all supported devices params list
-QnResource::QnParamLists QnResource::static_stream_list; // list of all supported streams params list
+
 
 QnResource::QnResource():
 m_deviceTypeFlags(0),
-m_videolayout(0)
+m_avalable(true)
 {
-	inst++;	
+	++inst;	
+
+    m_parentId.setEmpty();
 };
 
 QnResource::~QnResource()
 {
-	delete m_videolayout;
-	inst--;	
+	--inst;	
 	cl_log.log("inst", inst, cl_logDEBUG1);
 };
 
-void QnResource::setParentId(QnId parentid)
+bool QnResource::checkFlag(unsigned long flag) const
 {
-	m_parentId = parentid;
-}
-
-QnId QnResource::getParentId() const
-{
-	return m_parentId;
+    QMutexLocker locker(&m_mutex);
+    return m_deviceTypeFlags & flag;
 }
 
 QnId QnResource::getId() const
 {
-	return m_Id;
+    QMutexLocker locker(&m_mutex);
+    return m_Id;
 }
 
 void QnResource::setId(const QnId& id)
 {
-	m_Id = id;
+    QMutexLocker locker(&m_mutex);
+    m_Id = id;
 }
+
+void QnResource::setParentId(const QnId& parent)
+{
+    QMutexLocker locker(&m_mutex);
+    m_parentId = parent;
+}
+
+QnId QnResource::getParentId() const
+{
+    QMutexLocker locker(&m_mutex);
+    return m_parentId;
+}
+
+bool QnResource::available() const
+{
+    return m_avalable;
+}
+
+void QnResource::setAvailable(bool av)
+{
+    m_avalable = av;
+}
+
 
 QString QnResource::getName() const
 {
-	return m_name;
+    QMutexLocker locker(&m_mutex);
+    return m_name;
 }
 
 void QnResource::setName(const QString& name)
 {
-	m_name = name;
+    QMutexLocker locker(&m_mutex);
+    m_name = name;
 }
 
-QnResourceStatus& QnResource::getStatus()
+void QnResource::addTag(const QString& tag)
 {
-	return m_status;
+    QMutexLocker locker(&m_mutex);
+    if (!m_tags.contains(tag))
+        m_tags.push_back(tag);
 }
 
-void  QnResource::setStatus(const QnResourceStatus& status)
+void QnResource::removeTag(const QString& tag)
 {
-	m_status = status;
+    QMutexLocker locker(&m_mutex);
+    m_tags.removeAll(tag);
 }
+
+bool QnResource::hasTag(const QString& tag) const
+{
+    QMutexLocker locker(&m_mutex);
+    return m_tags.contains(tag);
+}
+
+QStringList QnResource::tagList() const
+{
+    QMutexLocker locker(&m_mutex);
+    return m_tags;
+}
+
+QString QnResource::toString() const
+{
+    QString result;
+    QTextStream(&result) << getName();
+    return result;
+}
+
+
+bool QnResource::getParam(const QString& name, QnValue& val, QnDomain domain ) 
+{
+    if (!getResourceParamList().exists(name))
+    {
+        cl_log.log("getParam: requested param does not exist!", cl_logWARNING);
+        return false;
+    }
+
+    return true;
+}
+
+void QnResource::getParamAsynch(const QString& name, QnValue& val, QnDomain domain )
+{
+
+}
+
+bool QnResource::setParam(const QString& name, const QnValue& val, QnDomain domain)
+{
+    if (!getResourceParamList().exists(name))
+    {
+        cl_log.log("setParam: requested param does not exist!", cl_logWARNING);
+        return false;
+    }
+
+    if (getResourceParamList().get(name).value.readonly)
+    {
+        cl_log.log("setParam: cannot set readonly param!", cl_logWARNING);
+        return false;
+    }
+
+    return true;
+
+}
+
+void QnResource::setParamAsynch(const QString& name, const QnValue& val, QnDomain domain)
+{
+
+    class QnResourceSetParamCommand : public QnResourceCommand
+    {
+    public:
+        QnResourceSetParamCommand(QnResourcePtr res, const QString& name, const QnValue& val, QnDomain domain):
+          QnResourceCommand(res),
+              m_name(name),
+              m_val(val),
+              m_domain(domain)
+          {
+
+          }
+
+          void execute()
+          {
+              if (isConnectedToTheResource())
+                m_resource->setParam(m_name, m_val, m_domain);
+          }
+    private:
+        QString m_name;
+        QnValue m_val;
+        QnDomain m_domain;
+
+    };
+
+    typedef QSharedPointer<QnResourceSetParamCommand> QnResourceSetParamCommandPtr;
+
+    QnResourceSetParamCommandPtr command ( new QnResourceSetParamCommand(QnResourcePtr(this), name, val, domain) );
+    static_commandProc.putData(command);
+
+}
+
+
+
 
 QnParamList& QnResource::getResourceParamList()
 {
+    QMutexLocker locker(&m_mutex);
+
 	if (m_deviceParamList.empty())
 		m_deviceParamList = static_resourcesParamLists[m_name];
 
@@ -72,6 +192,8 @@ QnParamList& QnResource::getResourceParamList()
 
 const QnParamList& QnResource::getResourceParamList() const
 {
+    QMutexLocker locker(&m_mutex);
+
 	if (m_deviceParamList.empty())
 		m_deviceParamList = static_resourcesParamLists[m_name];
 
@@ -79,58 +201,37 @@ const QnParamList& QnResource::getResourceParamList() const
 
 }
 
-bool QnResource::checkDeviceTypeFlag(unsigned long flag) const
+void QnResource::addConsumer(QnResourceConsumer* consumer)
 {
-	return m_deviceTypeFlags & flag;
+    QMutexLocker locker(&m_consumersMtx);
+    m_consumers.insert(consumer);
 }
 
-void QnResource::addDeviceTypeFlag(unsigned long flag)
+void QnResource::removeConsumer(QnResourceConsumer* consumer)
 {
-	m_deviceTypeFlags |= flag;
+    QMutexLocker locker(&m_consumersMtx);
+    m_consumers.remove(consumer);
+    consumer->beforeDisconnectFromResource();
+    consumer->disconnectFromResource();
 }
 
-void QnResource::removeDeviceTypeFlag(unsigned long flag)
+bool QnResource::hasSuchConsumer(const QnResourceConsumer* consumer) const
 {
-	m_deviceTypeFlags &= ~flag;
+    QMutexLocker locker(&m_consumersMtx);
+    return m_consumers.contains(consumer);
 }
 
-QnParamList& QnResource::getStreamParamList()
+void QnResource::disconnectAllConsumers()
 {
-	if (m_streamParamList.empty())
-		m_streamParamList = static_stream_list[m_name];
-
-	return m_streamParamList;
-}
-
-const QnParamList& QnResource::getStreamParamList() const
-{
-	if (m_streamParamList.empty())
-		m_streamParamList = static_stream_list[m_name];
-
-	return m_streamParamList;
-}
-
-
-void QnResource::setVideoLayout(QnVideoResoutceLayout* layout)
-{
-	delete m_videolayout;
-	m_videolayout = layout;
-}
-
-const QnVideoResoutceLayout* QnResource::getVideoLayout() const
-{
-	if (!m_videolayout)
-		m_videolayout = new CLDefaultDeviceVideoLayout();
-
-	return m_videolayout;
-
-}
-
-QString QnResource::toString() const
-{
-	QString result;
-	QTextStream(&result) << getName() << "  " <<  getId().toString();
-	return result;
+    QMutexLocker locker(&m_consumersMtx);
+    QSet<QnResourceConsumer*> lconsumers = m_consumers;
+    m_consumers.clear()
+    foreach(QnResourceConsumer* con, lconsumers)
+    {
+        con->beforeDisconnectFromResource();
+        con->disconnectFromResource();
+    }
+    
 }
 
 
@@ -204,66 +305,6 @@ void QnResource::getDevicesBasicInfo(QnResourceList& lst, int threads)
 
 }
 
-bool QnResource::getParam(const QString& name, QnValue& val, bool resynch) 
-{
-	if (!getResourceParamList().exists(name))
-	{
-		cl_log.log("getParam: requested param does not exist!", cl_logWARNING);
-		return false;
-	}
-
-	return true;
-}
-
-bool QnResource::setParam(const QString& name, const QnValue& val)
-{
-	if (!getResourceParamList().exists(name))
-	{
-		cl_log.log("setParam: requested param does not exist!", cl_logWARNING);
-		return false;
-	}
-
-	if (getResourceParamList().get(name).value.readonly)
-	{
-		cl_log.log("setParam: cannot set readonly param!", cl_logWARNING);
-		return false;
-	}
-
-	return true;
-
-}
-
-bool QnResource::setParamAsynch(const QString& name, const QnValue& val)
-{
-
-	class QnResourceSetParamCommand : public QnResourceCommand
-	{
-	public:
-		QnResourceSetParamCommand(QnResource* dev, const QString& name, const QnValue& val):
-		QnResourceCommand(dev),
-		m_name(name),
-		m_val(val)
-		{
-
-		}
-
-		void execute()
-		{
-			m_resource->setParam(m_name, m_val);
-		}
-	private:
-		QString m_name;
-		QnValue m_val;
-
-	};
-
-    typedef QSharedPointer<QnResourceSetParamCommand> QnResourceSetParamCommandPtr;
-
-	QnResourceSetParamCommandPtr command ( new QnResourceSetParamCommand(this, name, val) );
-	static_commandProc.putData(command);
-
-	return true;
-}
 
 //==================================================================================================================
 

@@ -60,7 +60,7 @@ public:
 
     void addTag(const QString& tag);
     void removeTag(const QString& tag);
-    void hasTag(const QString& tag) const;
+    bool hasTag(const QString& tag) const;
     QStringList tagList() const;
 
 	virtual QString toString() const;
@@ -89,8 +89,8 @@ public:
 	const QnParamList& getResourceParamList() const;
 
 
-    void addConsumer(const QnResourceConsumer* consumer);
-    void removeConsumer(const QnResourceConsumer* consumer);
+    void addConsumer(QnResourceConsumer* consumer);
+    void removeConsumer(QnResourceConsumer* consumer);
     bool hasSuchConsumer(const QnResourceConsumer* consumer) const;
     void disconnectAllConsumers();
 
@@ -114,19 +114,17 @@ protected:
 protected:
     mutable QMutex m_mutex; // resource mutex for everything 
 
-
-    QnId m_Id; //+
-    QnId m_parentId;
-
     unsigned long m_deviceTypeFlags;
 
-	QString m_name; // this device model like AV2105 or AV2155dn 
+    QString m_name; // this device model like AV2105 or AV2155dn 
 
     mutable QnParamList m_deviceParamList;
+
+private:
+    QnId m_Id; //+
+    QnId m_parentId;
     QStringList m_tags;
-
     bool m_avalable;
-
 
     mutable QMutex m_consumersMtx; 
     QSet<QnResourceConsumer*> m_consumers;
