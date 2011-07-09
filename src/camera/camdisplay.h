@@ -22,7 +22,7 @@ public:
 	~CLCamDisplay();
 
 	void addVideoChannel(int index, CLAbstractRenderer* vw, bool can_downsacle);
-	void processData(CLAbstractData* data);
+	virtual bool processData(CLAbstractData* data);
 
 	void pause();
 	void resume();
@@ -44,6 +44,7 @@ public:
     void setMTDecoding(bool value);
 public slots:
     void onAudioParamsChanged(AVCodecContext * codec);
+    void onRealTimeStreamHint(bool value);
 signals:
     void reachedTheEnd();
 private:
@@ -61,6 +62,7 @@ private:
 	void clearVideoQueue();
     void enqueueVideo(CLCompressedVideoData* vd);
     void afterJump(qint64 new_time);
+    void growInputQueue();
 private:
 	QQueue<CLCompressedVideoData*> m_videoQueue[CL_MAX_CHANNELS];
 
@@ -78,8 +80,9 @@ private:
       */
     bool m_hadAudio;
 
-    quint64 m_lastAudioPacketTime;
-    quint64 m_lastVideoPacketTime;
+    qint64 m_lastAudioPacketTime;
+    qint64 m_lastVideoPacketTime;
+    qint64 m_lastDisplayedVideoTime;
 
     qint64 m_previousVideoTime;
     quint64 m_lastNonZerroDuration;
@@ -94,8 +97,11 @@ private:
     bool mGenerateEndOfStreamSignal;
 
     bool m_needReinitAudio;
+
+    bool m_isRealTimeSource;
 	QAudioFormat m_expectedAudioFormat;
 	QMutex m_audioChangeMutex;
+    bool m_growEnabled;
 };
 
 #endif //clcam_display_h_1211

@@ -60,6 +60,7 @@ public:
 signals:
     void audioParamsChanged(AVCodecContext * codec);
     void videoParamsChanged(AVCodecContext * codec);
+	void realTimeStreamHint(bool value);
 protected:
 
 	void putData(CLAbstractData* data);
@@ -81,7 +82,7 @@ protected:
 
 	StreamQuality m_qulity;
 
-	volatile bool m_needSleep;
+	//volatile bool m_needSleep;
 
 };
 

@@ -13,7 +13,7 @@ public:
 	~CLStreamRecorder();
 
 protected:
-	virtual void processData(CLAbstractData* data);
+	virtual bool processData(CLAbstractData* data);
 	virtual void endOfRun();
 	void onFirstData(CLAbstractData* data);
 	void cleanup();

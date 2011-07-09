@@ -40,6 +40,8 @@ qreal selected_item_zoom = 1.63;
 
 int decoration_size = 60;
 
+static const int MAX_AUDIO_TRACKS = 16;
+
 extern QString button_home;
 extern QString button_level_up;
 extern QString button_magnifyingglass;
@@ -1194,17 +1196,29 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
     QMenu audioMenu;
     audioMenu.setTitle("Audio tracks");
+    /*
     QAction cmAudio0(0);
     QAction cmAudio1(0);
     QAction cmAudio2(0);
     QAction cmAudio3(0);
-    QAction* AudioTracks[4] = {&cmAudio0, &cmAudio1, &cmAudio2, &cmAudio3};
-
+    QAction* AudioTracks[12] = {&cmAudio0, &cmAudio1, &cmAudio2,  &cmAudio3,
+                                &cmAudio4, &cmAudio5, &cmAudio6,  &cmAudio7,
+                                &cmAudio8, &cmAudio9, &cmAudio10, &cmAudio11};
     cmAudio0.setCheckable(true);
     cmAudio1.setCheckable(true);
     cmAudio2.setCheckable(true);
     cmAudio3.setCheckable(true);
-    
+    */
+    /*
+    QAction* AudioTracks[MAX_AUDIO_TRACKS];
+    for (int i = 0; i < MAX_AUDIO_TRACKS; ++i)
+    {
+        AudioTracks[i] = new QAction(0);
+        AudioTracks[i]->setCheckable(true);
+    }
+    */
+
+    QVector<QAction*> AudioTracks;
 
 	//===== final menu=====
 	QMenu menu;
@@ -1248,13 +1262,15 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
                 {
                     
 
-                    for (int i = 0; i  < qMin(tracks.size(), 4); ++i )
+                    for (int i = 0; i  < qMin(tracks.size(), MAX_AUDIO_TRACKS); ++i )
                     {
+                        AudioTracks << new QAction(0);
+                        AudioTracks[i]->setCheckable(true);
                         AudioTracks[i]->setText(QString("  ") + tracks.at(i));
                         audioMenu.addAction(AudioTracks[i]);
                     }
 
-                    unsigned int selectedAudio = qMin((unsigned int)3, reader->getCurrentAudioChannel());
+                    unsigned int selectedAudio = qMin((unsigned int)MAX_AUDIO_TRACKS-1, reader->getCurrentAudioChannel());
                     AudioTracks[selectedAudio]->setChecked(true);
 
 
@@ -1635,7 +1651,8 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
 	QGraphicsView::contextMenuEvent(event);
 	/**/
-
+    foreach(QAction* action, AudioTracks)
+        delete action;
 }
 
 void GraphicsView::mouseDoubleClickEvent( QMouseEvent * event )

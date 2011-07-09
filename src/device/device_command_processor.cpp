@@ -28,7 +28,7 @@ CLDeviceCommandProcessor::~CLDeviceCommandProcessor()
 	stop();
 }
 
-void CLDeviceCommandProcessor::processData(CLAbstractData* data)
+bool CLDeviceCommandProcessor::processData(CLAbstractData* data)
 {
 	CLDeviceCommand* command = static_cast<CLDeviceCommand*>(data);
 	command->execute();
@@ -39,6 +39,7 @@ void CLDeviceCommandProcessor::processData(CLAbstractData* data)
 	Q_ASSERT(mDevicesQue[dev]>0);
 
 	mDevicesQue[dev]--;
+    return true;
 }
 
 bool CLDeviceCommandProcessor::hasSuchDeviceInQueue(CLDevice* dev) const

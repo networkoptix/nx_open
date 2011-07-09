@@ -17,18 +17,22 @@ CLAVIPlaylistStreamReader::CLAVIPlaylistStreamReader(CLDevice* dev) :
     m_ffmpegIOContext(0),
     m_currentFileIndex(-1),
     m_initialized(false),
-    m_inSeek(false)
+    m_inSeek(false),
+    m_ioBuffer(0)
 {
-    QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
-    m_ioBuffer = (quint8*) av_malloc(IO_BLOCK_SIZE);
 }
 
 CLAVIPlaylistStreamReader::~CLAVIPlaylistStreamReader()
 {
+    QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
     destroy();
     if (m_ffmpegIOContext)
+    {
         av_free(m_ffmpegIOContext);
-    av_free(m_ioBuffer);
+        m_ffmpegIOContext = 0;
+    }
+    if (m_ioBuffer) 
+        av_free(m_ioBuffer);
 }
 
 AVFormatContext* CLAVIPlaylistStreamReader::getFormatContext()
@@ -236,6 +240,7 @@ ByteIOContext* CLAVIPlaylistStreamReader::getIOContext()
     //QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
     if (m_ffmpegIOContext == 0)
     {
+        m_ioBuffer = (quint8*) av_malloc(IO_BLOCK_SIZE);
         m_ffmpegIOContext = av_alloc_put_byte(      
             m_ioBuffer,
             IO_BLOCK_SIZE,

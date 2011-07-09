@@ -18,6 +18,9 @@ CLStreamreader* CLAviDvdDevice::getDeviceStreamConnection()
 bool CLAviDvdDevice::isAcceptedUrl(const QString& url)
 {
     QString sourceDir = url;
+    int paramsPos = sourceDir.indexOf('?');
+    if (paramsPos >= 0)
+        sourceDir = sourceDir.left(paramsPos);
     if (!sourceDir.toUpper().endsWith("VIDEO_TS"))
     {
         if (!sourceDir.endsWith('/') && !sourceDir.endsWith('\\'))
