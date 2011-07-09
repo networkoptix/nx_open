@@ -101,20 +101,6 @@ void CLIQEyeDevice::findDevices(CLDeviceList& result)
         std::string localAddressString = localAddress.toString().toStdString();
         std::string groupAddressString = groupAddress.toString().toStdString();
 
-//        UDPSocket udpSocket;
-
-        //try
-        //{
-        //    udpSocket.setLocalAddressAndPort(localAddressString, MDNS_PORT);
-        //}
-        //catch (...)
-        //{
-        //    continue;
-        //}
-        
-
-        // udpSocket.joinGroup(groupAddressString);
-
         QUdpSocket udpSocket;
         udpSocket.bind(localAddress, MDNS_PORT, QUdpSocket::ReuseAddressHint | QUdpSocket::ShareAddress);
         multicastJoinGroup(udpSocket, groupAddress, localAddress);
@@ -128,29 +114,21 @@ void CLIQEyeDevice::findDevices(CLDeviceList& result)
         request.toDatagram(datagram);
 
         udpSocket.writeDatagram(datagram.data(), datagram.size(), groupAddress, MDNS_PORT);
-        // udpSocket.setDestAddr("224.0.0.251", 5353);
-        // udpSocket.send(datagram.data(), datagram.size());
 
         QTime time;
         time.start();
 
-        char buffer[1024];
-        int size = 1024;
         while(time.elapsed() < 150)
         {
             while (udpSocket.hasPendingDatagrams()) 
-            //while (udpSocket.recv(buffer, 1024)) 
             {
-                QByteArray responseData; //(buffer, size);
+                QByteArray responseData;
                 responseData.resize(udpSocket.pendingDatagramSize());
 
                 QHostAddress sender;
                 quint16 senderPort;
 
                 udpSocket.readDatagram(responseData.data(), responseData.size(),	&sender, &senderPort);
-                //std::string sourceAddr;
-                //unsigned short sourcePort;
-                //udpSocket.recvFrom(buffer, size, sourceAddr, sourcePort);
                 cl_log.log(cl_logALWAYS, "size: %d\n", responseData.size());
                 if (senderPort != MDNS_PORT || sender == localAddress)
                     continue;
@@ -161,26 +139,26 @@ void CLIQEyeDevice::findDevices(CLDeviceList& result)
 
                 int iqpos = responseData.indexOf("IQ");
 
-                if (iqpos != -1)
+                if (iqpos == -1)
+                    continue;
+
+                int macpos = responseData.indexOf('-', iqpos);
+
+                for (int i = iqpos; i < macpos; i++)
                 {
-                    int macpos = responseData.indexOf('-', iqpos);
+                    name += responseData[i];
+                }
 
-                    for (int i = iqpos; i < macpos; i++)
+                if (macpos != -1)
+                {
+                    macpos++;
+
+                    for (int i = 0; i < 12; i++)
                     {
-                        name += responseData[i];
-                    }
+                        if (i > 0 && i % 2 == 0)
+                            smac += "-";
 
-                    if (macpos != -1)
-                    {
-                        macpos++;
-
-                        for (int i = 0; i < 12; i++)
-                        {
-                            if (i > 0 && i % 2 == 0)
-                                smac += "-";
-
-                            smac += responseData[macpos + i];
-                        }
+                        smac += responseData[macpos + i];
                     }
                 }
 
@@ -213,7 +191,6 @@ void CLIQEyeDevice::findDevices(CLDeviceList& result)
             CLSleep::msleep(2); // to avoid 100% cpu usage
         }
 
-//        udpSocket.leaveGroup(groupAddress.toString().toStdString());
          multicastLeaveGroup(udpSocket, groupAddress);
     }
 }
