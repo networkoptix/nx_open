@@ -93,9 +93,8 @@ void CLIQEyeDevice::findDevices(CLDeviceList& result)
         }
     }
 
-    // foreach(QHostAddress localAddress, localAddresses)
+    foreach(QHostAddress localAddress, localAddresses)
     {
-        QHostAddress localAddress("10.0.1.5");
         QHostAddress groupAddress("224.0.0.251");
         quint16 MDNS_PORT = 5353;
 
