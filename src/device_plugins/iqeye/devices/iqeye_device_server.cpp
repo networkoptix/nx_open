@@ -78,5 +78,7 @@ CLDeviceList IQEyeDeviceServer::findDevices()
         lst[dev->getUniqueId()] = dev;
     }
 
+    CLIQEyeDevice::findDevices(lst);
+
     return lst;
 }

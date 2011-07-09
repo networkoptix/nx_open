@@ -19,6 +19,7 @@ public:
     virtual bool unknownDevice() const;
     CLNetworkDevice* updateDevice();
 
+    static void findDevices(CLDeviceList& result);
 };
 
 
