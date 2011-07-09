@@ -6,8 +6,8 @@
 #include "decoders/audio/ffmpeg_audio.h"
 
 // a lot of small audio packets in bluray HD audio codecs. So, previous size 7 is not enought
-#define CL_MAX_DISPLAY_QUEUE_SIZE 5
-#define CL_MAX_ALLOWED_QUEUE_SIZE (CL_MAX_DISPLAY_QUEUE_SIZE*32)
+#define CL_MAX_DISPLAY_QUEUE_SIZE 15
+#define CL_MAX_ALLOWED_QUEUE_SIZE (CL_MAX_DISPLAY_QUEUE_SIZE*16)
 #define AUDIO_BUFF_SIZE (4000) // ms
 
 static const qint64 MIN_DETECT_JUMP_INTERVAL = 100 * 1000; // 100ms
@@ -161,6 +161,7 @@ void CLCamDisplay::growInputQueue()
 
 bool CLCamDisplay::processData(CLAbstractData* data)
 {
+
     if (m_dataQueue.size() >= (m_dataQueue.maxSize()*4)/5 )
         m_growEnabled = true;
     if (m_needChangePriority)
@@ -218,10 +219,10 @@ bool CLCamDisplay::processData(CLAbstractData* data)
 		// we synch video to the audio; so just put audio in player with out thinking
 		if (m_playAudio)
 		{
-            if (m_audioDisplay->msInBuffer() > AUDIO_BUFF_SIZE && m_videoQueue->isEmpty())
+            if (m_audioDisplay->msInBuffer() > AUDIO_BUFF_SIZE)
             {
-                // If we have only audio stream, delay current packet if queue size too large
-                return false; // current packet can not be processed. try latter
+                // Audio buffer too large. waiting
+                return false; 
             }
 
             m_audioDisplay->putData(ad);
@@ -281,6 +282,7 @@ bool CLCamDisplay::processData(CLAbstractData* data)
 
         //2) we have audio and it's buffering( not playing yet )
         if (m_audioDisplay->isBuffering())
+        //if (m_audioDisplay->isBuffering() || m_audioDisplay->msInBuffer() < AUDIO_BUFF_SIZE / 10)
         {
             // audio is not playinf yet; video must not be played as well
             enqueueVideo(vd);
@@ -300,12 +302,9 @@ bool CLCamDisplay::processData(CLAbstractData* data)
                 enqueueVideo(vd);
                 cl_log.log("HOLD FRAME", cl_logDEBUG1);
                 // avoid to fast buffer filling on startup
-                if (!m_audioDisplay->isBuffering())
-                {
-                    qint64 sleepTime = qMin(diff, (m_audioDisplay->msInBuffer() - AUDIO_BUFF_SIZE / 10) * 1000ll);
-                    if (sleepTime > 0)
-                        m_delay.sleep(sleepTime);
-                }
+                qint64 sleepTime = qMin(diff, (m_audioDisplay->msInBuffer() - AUDIO_BUFF_SIZE / 2) * 1000ll);
+                if (sleepTime > 0)
+                    m_delay.sleep(sleepTime);
                 return true;
             }
 
@@ -455,10 +454,9 @@ qint64 CLCamDisplay::diffBetweenVideoAndAudio(CLCompressedVideoData* incoming, i
 
 void CLCamDisplay::enqueueVideo(CLCompressedVideoData* vd)
 {
-    if (m_videoQueue[vd->channelNumber].size() < (AUDIO_BUFF_SIZE*30*5/1000)) // I assume we are not gonna buffer 
-        m_videoQueue[vd->channelNumber].enqueue(vd);
-    else
-        vd->releaseRef();
+	m_videoQueue[vd->channelNumber].enqueue(vd);
+    if (m_videoQueue[vd->channelNumber].size() > (AUDIO_BUFF_SIZE*60/1000)) // I assume we are not gonna buffer 
+        m_videoQueue->dequeue()->releaseRef();
 }
 
 void CLCamDisplay::afterJump(qint64 newTime)

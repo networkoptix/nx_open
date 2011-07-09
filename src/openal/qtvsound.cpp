@@ -117,10 +117,31 @@ uint QtvSound::bufferTime() const
 	return result;
 }
 
-uint QtvSound::playTimeElapsed() const
+void QtvSound::clearBuffers(bool clearAll)
+{
+	ALint processed;
+	if (clearAll)
+		alGetSourcei(m_source, AL_BUFFERS_QUEUED, &processed);
+	else
+		alGetSourcei(m_source, AL_BUFFERS_PROCESSED, &processed);
+    checkOpenALErrorDebug(m_device);
+    if (processed) 
+	{
+		processed = qMin(sizeof(m_tmpBuffer)/sizeof(uint), (uint) processed);
+        alSourceUnqueueBuffers(m_source, processed, m_tmpBuffer);
+        checkOpenALErrorDebug(m_device);
+		alDeleteBuffers(processed, m_tmpBuffer);
+        checkOpenALErrorDebug(m_device);
+    }
+}
+
+uint QtvSound::playTimeElapsed() 
 {
     if (m_deinitialized)
         return 0;
+
+	clearBuffers(false);
+
 	ALfloat offset;
 	ALint queued = 0;
 	alGetSourcef(m_source, AL_SEC_OFFSET, &offset);
@@ -130,7 +151,7 @@ uint QtvSound::playTimeElapsed() const
 
     uint res = static_cast<uint>(bufferTime() * queued - offset * 1000000.0f);
 
-	//cl_log.log("elapsed=", (double) res/1000000.0, cl_logALWAYS);
+	cl_log.log("elapsed=", (double) res/1000000.0, cl_logALWAYS);
 	return res;
 }
 
@@ -195,18 +216,23 @@ bool QtvSound::play(const quint8* data, uint size)
 
 bool QtvSound::internalPlay(const void* data, uint size)
 {
+	clearBuffers(false);
+
+	ALuint buf = 0;
+	/*
     ALint processed = 0;
     alGetSourcei(m_source, AL_BUFFERS_PROCESSED, &processed);
     checkOpenALErrorDebug(m_device);
-    ALuint buf = 0;
     if (processed) {
         alSourceUnqueueBuffers(m_source, 1, &buf);
         checkOpenALErrorDebug(m_device);
     }
-    if (buf == 0) {
+    if (buf == 0) 
+	*/
+	{
         alGenBuffers(1, &buf);
         checkOpenALErrorDebug(m_device);
-        m_buffers << buf;
+        //m_buffers << buf;
     }
     alBufferData(buf, m_format, data, size, m_frequency);
     checkOpenALErrorDebug(m_device);
@@ -276,13 +302,9 @@ void QtvSound::internalClear()
 	checkOpenALError(m_device);
 	alSourceRewind(m_source);
 	checkOpenALError(m_device);
+	clearBuffers(true);
 	alDeleteSources(1, &m_source);
 	checkOpenALError(m_device);
-	if (!m_buffers.empty()) {
-		alDeleteBuffers(m_buffers.size(), &m_buffers[0]);
-		checkOpenALError(m_device);
-	}
-    m_buffers.clear();
     m_proxyBufferLen = 0;
     m_source = 0;
 }

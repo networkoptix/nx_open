@@ -20,7 +20,7 @@ public:
 
 	bool isValid() const { return m_isValid; }
 
-	uint playTimeElapsed() const;
+	uint playTimeElapsed();
 	bool play(const quint8* data, uint size);
     void suspend();
     void resume();
@@ -36,9 +36,10 @@ private:
 	static bool outError(int err, const char* strerr);
 	static int checkOpenALErrorDebug(ALCdevice* device);
     bool internalPlay(const void* data, uint size);
+	void clearBuffers(bool clearAll);
 private:
 	QAudioFormat m_audioFormat;
-	QVector<uint> m_buffers;
+	uint m_tmpBuffer[1024];
 	uint m_source;
 	uint m_format;
 	uint m_numChannels;

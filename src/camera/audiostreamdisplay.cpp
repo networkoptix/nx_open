@@ -219,97 +219,86 @@ void CLAudioStreamDisplay::putData(CLCompressedAudioData* data)
 
     if (data!=0)
 	{
-        if (msInBuffer() > m_bufferMs)
-        {
-            cl_log.log("to many data in audio queue!!!!", cl_logALWAYS);
-        }
-        else 
-        {
-            data->addRef();
-            m_audioQueue.enqueue(data);
-        }
-
-        if (msInBuffer() < m_bufferMs / 10)
-        {
-            //paying too fast; need to slowdown
-            cl_log.log("too few data in audio queue!!!!", cl_logDEBUG1);
-            m_tooFewDataDetected = true;
-            //suspend();
-            //data->dataProvider->setNeedSleep(false); //lets reader run without delays;
-            return;
-        } 
-        
+        data->addRef();
+        m_audioQueue.enqueue(data);
+	}
+	int bufferSize = msInBuffer();
+	if (bufferSize < m_bufferMs / 10)
+	{
+		m_tooFewDataDetected = true;
 	}
 
-    while (!m_audioQueue.isEmpty() && msInQueue() >= m_tooFewDataDetected*playAfterMs() || m_audioQueue.size() >= MAX_BUFFER_LEN )
+    if (bufferSize >= m_tooFewDataDetected*playAfterMs() || m_audioQueue.size() >= MAX_BUFFER_LEN)
     {
-        m_tooFewDataDetected = false;
-
-        data = m_audioQueue.dequeue();
-
-        //data->dataProvider->setNeedSleep(true); // need to introduce delay again
-
-        CLAudioData audio;
-        audio.codec = data->compressionType;
-        audio.inbuf = (unsigned char*)data->data.data();
-        audio.inbuf_len = data->data.size();
-        audio.outbuf = &m_decodedaudio;
-        audio.outbuf_len = 0;
-        audio.format.setChannels(data->channels);
-        audio.format.setFrequency(data->freq);
-
-        if (data->compressionType == CODEC_ID_NONE)
+        while (!m_audioQueue.isEmpty() )
         {
-            cl_log.log("CLAudioStreamDisplay::putdata: unknown codec type...", cl_logERROR);
+            m_tooFewDataDetected = false;
+
+            data = m_audioQueue.dequeue();
+
+            //data->dataProvider->setNeedSleep(true); // need to introduce delay again
+
+            CLAudioData audio;
+            audio.codec = data->compressionType;
+            audio.inbuf = (unsigned char*)data->data.data();
+            audio.inbuf_len = data->data.size();
+            audio.outbuf = &m_decodedaudio;
+            audio.outbuf_len = 0;
+            audio.format.setChannels(data->channels);
+            audio.format.setFrequency(data->freq);
+
+            if (data->compressionType == CODEC_ID_NONE)
+            {
+                cl_log.log("CLAudioStreamDisplay::putdata: unknown codec type...", cl_logERROR);
+                data->releaseRef();
+                return;
+            }
+
+            if (m_decoder[data->compressionType] == 0)
+            {
+                m_decoder[data->compressionType] = CLAudioDecoderFactory::createDecoder(data->compressionType, data->context);
+
+            }
+
+            bool decoded = m_decoder[data->compressionType]->decode(audio);
             data->releaseRef();
-            return;
+
+            if (!decoded || audio.outbuf_len == 0)
+                return;
+
+            //  convert format
+            if (!m_isConvertMethodInitialized)
+            {
+                if (m_audioSound) 
+                {
+                    QtvAudioDevice::instance().removeSound(m_audioSound);
+                    m_audioSound = 0;
+                }
+
+                m_isFormatSupported = initFormatConvertRule(audio.format);
+                m_isConvertMethodInitialized = true;
+                if (!m_isFormatSupported)
+                    return; // can play audio
+            }
+            if (m_sampleConvertMethod == SampleConvert_Float2Int32)
+                float2int32(audio); 
+            else if (m_sampleConvertMethod == SampleConvert_Float2Int16)
+                float2int16(audio); 
+            else if (m_sampleConvertMethod == SampleConvert_Int32ToInt16)
+                int32Toint16(audio); 
+            if (audio.format.channels() > 2 && m_downmixing)
+                downmix(audio);
+
+            //resume(); // does nothing if resumed already
+
+            // play audio
+            if (!m_audioSound) 
+                m_audioSound = QtvAudioDevice::instance().addSound(audio.format);
+
+            if (m_audioSound)
+                m_audioSound->play((const quint8*) audio.outbuf->data(), audio.outbuf_len);
         }
-
-        if (m_decoder[data->compressionType] == 0)
-        {
-            m_decoder[data->compressionType] = CLAudioDecoderFactory::createDecoder(data->compressionType, data->context);
-
-        }
-
-        bool decoded = m_decoder[data->compressionType]->decode(audio);
-        data->releaseRef();
-
-        if (!decoded || audio.outbuf_len == 0)
-            return;
-
-		//  convert format
-		if (!m_isConvertMethodInitialized)
-		{
-			if (m_audioSound) 
-			{
-				QtvAudioDevice::instance().removeSound(m_audioSound);
-				m_audioSound = 0;
-			}
-
-			m_isFormatSupported = initFormatConvertRule(audio.format);
-			m_isConvertMethodInitialized = true;
-			if (!m_isFormatSupported)
-				return; // can play audio
-		}
-		if (m_sampleConvertMethod == SampleConvert_Float2Int32)
-            float2int32(audio); 
-		else if (m_sampleConvertMethod == SampleConvert_Float2Int16)
-            float2int16(audio); 
-		else if (m_sampleConvertMethod == SampleConvert_Int32ToInt16)
-            int32Toint16(audio); 
-        if (audio.format.channels() > 2 && m_downmixing)
-            downmix(audio);
-
-        //resume(); // does nothing if resumed already
-
-		// play audio
-        if (!m_audioSound) 
-			m_audioSound = QtvAudioDevice::instance().addSound(audio.format);
-
-		if (m_audioSound)
-			m_audioSound->play((const quint8*) audio.outbuf->data(), audio.outbuf_len);
     }
-
 //		qint64 bytesInBuffer = m_audioOutput->bufferSize() - m_audioOutput->bytesFree();
 //		qint64 usInBuffer = ms_from_size(audio.format, bytesInBuffer);
 //		cl_log.log("ms in audio buff = ", (int)usInBuffer, cl_logALWAYS);
