@@ -54,12 +54,12 @@ CLDevice::DeviceType CLIQEyeDevice::getDeviceType() const
 
 QString CLIQEyeDevice::toString() const
 {
-    return QString("live iqeye ") + getUniqueId();
+    return QString("live iqeye ") + getName() + QString(" ") + getUniqueId();
 }
 
 CLStreamreader* CLIQEyeDevice::getDeviceStreamConnection()
 {
-    if (getName()=="IQ042S")
+    if (getName()=="IQA32N" && getName()=="IQD31S")
         return new CLIQEyeH264treamreader(this);
     else
         return new CLIQEyeMJPEGtreamreader(this);
@@ -171,7 +171,7 @@ void CLIQEyeDevice::findDevices(CLDeviceList& result)
                 // in any case let's HTTP do it's job at very end of discovery 
 
                 CLIQEyeDevice* device = new CLIQEyeDevice();
-                device->setName("IQUNKNOWN");
+                device->setName(name);
 
                 if (device==0)
                     continue;

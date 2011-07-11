@@ -21,15 +21,6 @@ public:
 
 private:
 
-    struct Cam
-    {
-        QString ip;
-        QString mac;
-        QString name;
-    };
-
-    QList<Cam> mCams;
-
 };
 
 #endif // avigilon_device_server_h_1809
