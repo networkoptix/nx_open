@@ -379,7 +379,7 @@ QnResourceList QnPlAreconVisionResource::findDevices()
 				resource->setLocalAddr ( ipaddrs.at(i) );
 				resource->setStatus(dh);
 
-                if (hasEqual(result, resource))
+                if (hasEqualResource(result, resource))
                     continue; // already has such 
 
 				result.push_back(resource);

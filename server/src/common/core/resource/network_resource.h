@@ -6,7 +6,7 @@
 class QnNetworkResource;
 typedef QSharedPointer<QnNetworkResource> QnNetworkResourcePtr;
 
-class QnNetworkResource : public QnResource
+class QnNetworkResource : virtual public QnResource
 {
 
 public:
@@ -20,8 +20,9 @@ public:
 	// if net is true it will change real ip of device
 	// return true if IP changed;
 	// always return true if net = false
-	virtual bool setIP(const QHostAddress& ip, bool net = true);
+	virtual bool setIP(const QHostAddress& ip, QnDomain domaun = QnDomain_Physical);
 
+    // the address resource was descovered with ( in case we have more than one NIC or so )
 	void setLocalAddr(QHostAddress addr);
 
 	QString getMAC() const;

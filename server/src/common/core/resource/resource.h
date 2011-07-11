@@ -91,7 +91,7 @@ public:
 
     void addConsumer(QnResourceConsumer* consumer);
     void removeConsumer(QnResourceConsumer* consumer);
-    bool hasSuchConsumer(const QnResourceConsumer* consumer) const;
+    bool hasSuchConsumer(QnResourceConsumer* consumer) const;
     void disconnectAllConsumers();
 
 signals:
@@ -131,6 +131,8 @@ private:
 };
 
 // some resource related non member functions 
-bool hasEqual(const QnResourceList& lst, const QnResourcePtr res);
+
+bool hasEqualResource(const QnResourceList& lst, const QnResourcePtr res);
+void getResourcesBasicInfo(QnResourceList& lst, int threads);
 
 #endif

@@ -211,11 +211,9 @@ void QnResource::removeConsumer(QnResourceConsumer* consumer)
 {
     QMutexLocker locker(&m_consumersMtx);
     m_consumers.remove(consumer);
-    consumer->beforeDisconnectFromResource();
-    consumer->disconnectFromResource();
 }
 
-bool QnResource::hasSuchConsumer(const QnResourceConsumer* consumer) const
+bool QnResource::hasSuchConsumer(QnResourceConsumer* consumer) const
 {
     QMutexLocker locker(&m_consumersMtx);
     return m_consumers.contains(consumer);
@@ -224,22 +222,24 @@ bool QnResource::hasSuchConsumer(const QnResourceConsumer* consumer) const
 void QnResource::disconnectAllConsumers()
 {
     QMutexLocker locker(&m_consumersMtx);
-    QSet<QnResourceConsumer*> lconsumers = m_consumers;
-    m_consumers.clear()
-    foreach(QnResourceConsumer* con, lconsumers)
+  
+    foreach(QnResourceConsumer* con, m_consumers)
     {
         con->beforeDisconnectFromResource();
+    }
+
+    foreach(QnResourceConsumer* con, m_consumers)
+    {
         con->disconnectFromResource();
     }
-    
+
+    m_consumers.clear();
 }
 
 
-
-#ifndef _WIN32
-struct T
+struct ResourcesBasicInfoHelper
 {
-    T(QnResourcePtr d)
+    ResourcesBasicInfoHelper(QnResourcePtr d)
     {
         resource = d;
     }
@@ -251,45 +251,20 @@ struct T
 
     QnResourcePtr resource;
 };
-#endif
 
-void QnResource::getDevicesBasicInfo(QnResourceList& lst, int threads)
+
+void getResourcesBasicInfo(QnResourceList& lst, int threads)
 {
 	// cannot make concurrent work with pointer CLDevice* ; => so extra steps needed
-
-#ifdef _WIN32
-    struct T
-    {
-        T(QnResourcePtr d)
-        {
-            resource = d;
-        }
-
-        void f()
-        {
-            resource->getBasicInfo();
-        }
-
-        QnResourcePtr resource;
-    };
-#endif
-
     cl_log.log("Getting resource info...", cl_logDEBUG1);
 	QTime time;
 	time.start();
 
-	QList<T> local_list;
-
-
-    foreach(QnResourcePtr resource, lst)
-    {
-        if (resource->getStatus().checkFlag(QnResourceStatus::CONFLICTING)==false)
-            local_list.push_back(T(resource));
-    }
+	QList<ResourcesBasicInfoHelper> local_list;
 
 	QThreadPool* global = QThreadPool::globalInstance();
 	for (int i = 0; i < threads; ++i ) global->releaseThread();
-	QtConcurrent::blockingMap(local_list, &T::f);
+	QtConcurrent::blockingMap(local_list, &ResourcesBasicInfoHelper::f);
 	for (int i = 0; i < threads; ++i )global->reserveThread();
 
 	CL_LOG(cl_logDEBUG1)
@@ -308,7 +283,7 @@ void QnResource::getDevicesBasicInfo(QnResourceList& lst, int threads)
 
 //==================================================================================================================
 
-bool hasEqual(const QnResourceList& lst, const QnResourcePtr res)
+bool hasEqualResource(const QnResourceList& lst, const QnResourcePtr res)
 {
     foreach(QnResourcePtr resource, lst)
     {
