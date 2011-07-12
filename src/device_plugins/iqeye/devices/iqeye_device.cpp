@@ -6,23 +6,23 @@
 #include "base/sleep.h"
 
 // These functions added temporary as in Qt 4.8 they are already in QUdpSocket
-void multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress)
+bool multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress)
 {
     struct ip_mreq imr;
 
     memset(&imr, 0, sizeof(imr));
 
     imr.imr_multiaddr.s_addr = htonl(groupAddress.toIPv4Address());
-    imr.imr_interface.s_addr = htonl(localAddress.toIPv4Address()); //htonl(INADDR_ANY);
+    imr.imr_interface.s_addr = htonl(localAddress.toIPv4Address());
 
     int res = setsockopt(udpSocket.socketDescriptor(), IPPROTO_IP, IP_ADD_MEMBERSHIP, (const char *)&imr, sizeof(struct ip_mreq));
     if (res == -1)
-    {
-        cl_log.log("Unable to join multicast group", cl_logERROR);
-    }
+        return false;
+
+    return true;
 }
 
-void multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress)
+bool multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress)
 {
     struct ip_mreq imr;
 
@@ -31,9 +31,9 @@ void multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress)
 
     int res = setsockopt(udpSocket.socketDescriptor(), IPPROTO_IP, IP_DROP_MEMBERSHIP, (const char *)&imr, sizeof(struct ip_mreq));
     if (res == -1)
-    {
-        cl_log.log("Unable to join multicast group", cl_logERROR);
-    }
+        return false;
+
+    return true;
 }
 
 CLIQEyeDevice::CLIQEyeDevice()
@@ -117,7 +117,8 @@ void CLIQEyeDevice::findDevices(CLDeviceList& result)
 
         QUdpSocket udpSocket;
         udpSocket.bind(localAddress, MDNS_PORT, QUdpSocket::ReuseAddressHint | QUdpSocket::ShareAddress);
-        multicastJoinGroup(udpSocket, groupAddress, localAddress);
+        if (!multicastJoinGroup(udpSocket, groupAddress, localAddress))
+            continue;
 
         MDNSPacket request;
         MDNSPacket response;
