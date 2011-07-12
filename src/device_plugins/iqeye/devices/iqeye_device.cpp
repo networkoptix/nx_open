@@ -59,7 +59,21 @@ QString CLIQEyeDevice::toString() const
 
 CLStreamreader* CLIQEyeDevice::getDeviceStreamConnection()
 {
-    if (getName()=="IQA32N" && getName()=="IQD31S")
+    //IQ732N   IQ732S     IQ832N   IQ832S   IQD30S   IQD31S  IQD32S  IQM30S  IQM31S  IQM32S
+    if (getName()=="IQA35" || 
+        getName()=="IQA33N" ||
+        getName()=="IQA32N" ||
+        getName()=="IQA31" ||
+        getName()=="IQ732N" ||
+        getName()=="IQ732S" ||
+        getName()=="IQ832N" ||
+        getName()=="IQ832S" ||
+        getName()=="IQD30S" ||
+        getName()=="IQD31S" ||
+        getName()=="IQD32S" ||
+        getName()=="IQM30S" ||
+        getName()=="IQM31S" ||
+        getName()=="IQM32S")
         return new CLIQEyeH264treamreader(this);
     else
         return new CLIQEyeMJPEGtreamreader(this);
@@ -129,7 +143,7 @@ void CLIQEyeDevice::findDevices(CLDeviceList& result)
                 quint16 senderPort;
 
                 udpSocket.readDatagram(responseData.data(), responseData.size(),	&sender, &senderPort);
-                cl_log.log(cl_logALWAYS, "size: %d\n", responseData.size());
+                //cl_log.log(cl_logALWAYS, "size: %d\n", responseData.size());
                 if (senderPort != MDNS_PORT || sender == localAddress)
                     continue;
 
