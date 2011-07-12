@@ -1472,18 +1472,21 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
             {
                 CLAbstractArchiveReader* reader = static_cast<CLAbstractArchiveReader*>(cam->getStreamreader());
 
-                if (act == AudioTracks[0])
-                    reader->setAudioChannel(0);
+                QStringList tracks = reader->getAudioTracksInfo();
+                if (tracks.size() > 1 ) // if we've got more than one channel
+                {
+                    if (act == AudioTracks[0])
+                        reader->setAudioChannel(0);
 
-                if (act == AudioTracks[1])
-                    reader->setAudioChannel(1);
+                    if (act == AudioTracks[1])
+                        reader->setAudioChannel(1);
 
-                if (act == AudioTracks[2])
-                    reader->setAudioChannel(2);
+                    if (act == AudioTracks[2])
+                        reader->setAudioChannel(2);
 
-                if (act == AudioTracks[3])
-                    reader->setAudioChannel(3);
-
+                    if (act == AudioTracks[3])
+                        reader->setAudioChannel(3);
+                }
 
             }
 

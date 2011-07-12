@@ -2,8 +2,6 @@
 #define iqeye_h_2054_h
 #include "device/network_device.h"
 
-
-
 class CLIQEyeDevice : public CLNetworkDevice
 {
 public:
@@ -21,7 +19,5 @@ public:
 
     static void findDevices(CLDeviceList& result);
 };
-
-
 
 #endif //avigilon_h_16_43_h
