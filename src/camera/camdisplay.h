@@ -56,6 +56,8 @@ private:
     // this function doest not changes any quues; it just returns time of next frame been displayed
     quint64 nextVideoImageTime(CLCompressedVideoData* incoming, int channel) const;
 
+    quint64 nextVideoImageTime(int channel) const;
+
     // this function returns diff between video and audio at any given moment
     qint64 diffBetweenVideoAndAudio(CLCompressedVideoData* incoming, int channel, qint64& duration);
 
@@ -102,6 +104,7 @@ private:
 	QAudioFormat m_expectedAudioFormat;
 	QMutex m_audioChangeMutex;
     bool m_growEnabled;
+    bool m_videoBufferOverflow;
 };
 
 #endif //clcam_display_h_1211
