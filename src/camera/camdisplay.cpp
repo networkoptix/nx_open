@@ -10,7 +10,8 @@
 #define CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE 120
 #define AUDIO_BUFF_SIZE (4000) // ms
 
-static const qint64 MIN_DETECT_JUMP_INTERVAL = 100 * 1000; // 100ms
+static const qint64 MIN_VIDEO_DETECT_JUMP_INTERVAL = 100 * 1000; // 100ms
+static const qint64 MIN_AUDIO_DETECT_JUMP_INTERVAL = MIN_VIDEO_DETECT_JUMP_INTERVAL + AUDIO_BUFF_SIZE*1000;
 static const int MAX_VALID_SLEEP_TIME = 1000*1000*5;
 
 CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
@@ -198,7 +199,9 @@ bool CLCamDisplay::processData(CLAbstractData* data)
 			}
 		}
 
-        if (ad->timestamp - m_lastAudioPacketTime < -MIN_DETECT_JUMP_INTERVAL)
+        // after seek, when audio is shifted related video (it is often), first audio packet will be < seek threshold
+        // so, second afterJump is generated after several video packet. To prevent it, increase jump detection interval for audio
+        if (ad->timestamp - m_lastAudioPacketTime < -MIN_AUDIO_DETECT_JUMP_INTERVAL)
             afterJump(ad->timestamp);
 
         m_lastAudioPacketTime = ad->timestamp;
@@ -223,7 +226,7 @@ bool CLCamDisplay::processData(CLAbstractData* data)
 	else if (vd)
 	{
         bool result = true;
-        if (vd->timestamp - m_lastVideoPacketTime < -MIN_DETECT_JUMP_INTERVAL)
+        if (vd->timestamp - m_lastVideoPacketTime < -MIN_VIDEO_DETECT_JUMP_INTERVAL)
         {
             afterJump(vd->timestamp);
         }
