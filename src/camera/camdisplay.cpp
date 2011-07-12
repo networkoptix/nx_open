@@ -11,6 +11,7 @@
 #define AUDIO_BUFF_SIZE (4000) // ms
 
 static const qint64 MIN_DETECT_JUMP_INTERVAL = 100 * 1000; // 100ms
+static const int MAX_VALID_SLEEP_TIME = 1000*1000*5;
 
 CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
     : CLAbstractDataProcessor(CL_MAX_DISPLAY_QUEUE_SIZE),
@@ -88,7 +89,7 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
 	if (needToSleep < 0)
 		needToSleep = 0;
 
-	if (needToSleep > 500 * 1000) // in case of key frame only and sliding archive slider forward - would not look good; need to do smth
+	if (needToSleep > MAX_VALID_SLEEP_TIME) // in case of key frame only and sliding archive slider forward - would not look good; need to do smth
 		needToSleep = 0;
 	//=========
 
