@@ -1,5 +1,6 @@
 #include "qtvsound.h"
 #include "qtvaudiodevice.h"
+#include "util.h"
 #include "base/log.h"
 
 #ifdef Q_OS_MAC
@@ -130,7 +131,7 @@ void QtvSound::clearBuffers(bool clearAll)
     checkOpenALErrorDebug(m_device);
     if (processed) 
 	{
-		processed = qMin(sizeof(m_tmpBuffer)/sizeof(uint), (uint) processed);
+		processed = qMin(arraysize(m_tmpBuffer), (long unsigned) processed);
         alSourceUnqueueBuffers(m_source, processed, m_tmpBuffer);
         checkOpenALErrorDebug(m_device);
 		alDeleteBuffers(processed, m_tmpBuffer);
