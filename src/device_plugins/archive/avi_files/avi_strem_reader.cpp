@@ -39,7 +39,9 @@ static const int MAX_VALID_SLEEP_TIME = 1000 * 1000 * 5; // 5 seconds as most lo
 qint64 CLAVIStreamReader::packetTimestamp(AVStream* stream, const AVPacket& packet)
 {
 	double timeBase = av_q2d(stream->time_base);
-	qint64 firstDts = (stream->first_dts == AV_NOPTS_VALUE) ? 0 : stream->first_dts;
+    qint64 dts = m_videoStreamIndex != -1 ? m_formatContext->streams[m_videoStreamIndex]->first_dts : stream->first_dts;
+    qint64 firstDts = (dts == AV_NOPTS_VALUE) ? 0 : dts;
+
     if (packet.dts != AV_NOPTS_VALUE)
     {
         double ttm = timeBase * (packet.dts - firstDts);
