@@ -45,6 +45,7 @@ public:
 public slots:
     void onAudioParamsChanged(AVCodecContext * codec);
     void onRealTimeStreamHint(bool value);
+    void onSlowSourceHint();
 signals:
     void reachedTheEnd();
 private:
@@ -64,7 +65,6 @@ private:
 	void clearVideoQueue();
     void enqueueVideo(CLCompressedVideoData* vd);
     void afterJump(qint64 new_time);
-    void growInputQueue();
 private:
 	QQueue<CLCompressedVideoData*> m_videoQueue[CL_MAX_CHANNELS];
 
@@ -103,7 +103,6 @@ private:
     bool m_isRealTimeSource;
 	QAudioFormat m_expectedAudioFormat;
 	QMutex m_audioChangeMutex;
-    bool m_growEnabled;
     bool m_videoBufferOverflow;
 };
 

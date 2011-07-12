@@ -7,7 +7,7 @@
 
 // a lot of small audio packets in bluray HD audio codecs. So, previous size 7 is not enought
 #define CL_MAX_DISPLAY_QUEUE_SIZE 15
-#define CL_MAX_ALLOWED_QUEUE_SIZE (CL_MAX_DISPLAY_QUEUE_SIZE*16)
+#define CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE 120
 #define AUDIO_BUFF_SIZE (4000) // ms
 
 static const qint64 MIN_DETECT_JUMP_INTERVAL = 100 * 1000; // 100ms
@@ -31,7 +31,6 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       mGenerateEndOfStreamSignal(generateEndOfStreamSignal),
       m_needReinitAudio(false),
       m_isRealTimeSource(true),
-      m_growEnabled(false),
       m_videoBufferOverflow(false)
 {
 	for (int i = 0; i< CL_MAX_CHANNELS; ++i)
@@ -146,26 +145,12 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
 void CLCamDisplay::jump()
 {
     m_afterJump = true;
-    m_growEnabled = false;
     clearUnprocessedData();
 }
-
-void CLCamDisplay::growInputQueue()
-{
-    int maxSize = m_dataQueue.maxSize();
-    if (m_growEnabled && m_dataQueue.size() <= maxSize/5 && maxSize <= CL_MAX_ALLOWED_QUEUE_SIZE/2)
-    {
-        m_dataQueue.setMaxSize(maxSize * 2); // grow queue
-        m_growEnabled = false;
-        cl_log.log("grow input queue. new max size=", m_dataQueue.maxSize(), cl_logALWAYS);
-    }
-};
 
 bool CLCamDisplay::processData(CLAbstractData* data)
 {
 
-    if (m_dataQueue.size() >= (m_dataQueue.maxSize()*4)/5 )
-        m_growEnabled = true;
     if (m_needChangePriority)
     {
         if (m_playAudio)
@@ -280,7 +265,6 @@ bool CLCamDisplay::processData(CLAbstractData* data)
                 return true; // impossible? incoming vd!=0
             m_lastDisplayedVideoTime = vd->timestamp;
             display(vd, !vd->ignore);
-            growInputQueue();
             return result;
         }
 
@@ -343,7 +327,6 @@ bool CLCamDisplay::processData(CLAbstractData* data)
                     //display(vd, lastFrameToDisplay && !vd->ignore && m_audioDisplay->msInBuffer() >= AUDIO_BUFF_SIZE / 10);
                     m_lastDisplayedVideoTime = vd->timestamp;
                     display(vd, lastFrameToDisplay && !vd->ignore);
-                    growInputQueue();
 
                     if (!lastFrameToDisplay)
                     {
@@ -487,6 +470,7 @@ void CLCamDisplay::afterJump(qint64 newTime)
     cl_log.log("after jump", cl_logWARNING);
 
     m_lastAudioPacketTime = newTime;
+    m_lastVideoPacketTime = newTime;
     m_previousVideoTime = newTime;
     m_previousVideoDisplayedTime = 0;
     clearVideoQueue();
@@ -515,4 +499,9 @@ void CLCamDisplay::onAudioParamsChanged(AVCodecContext * codec)
 void CLCamDisplay::onRealTimeStreamHint(bool value)
 {
     m_isRealTimeSource = value;
+}
+
+void CLCamDisplay::onSlowSourceHint()
+{
+    m_dataQueue.setMaxSize(CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE);
 }

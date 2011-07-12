@@ -368,6 +368,7 @@ ByteIOContext* CLAVIDvdStreamReader::getIOContext()
     //QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
     if (m_ffmpegIOContext == 0)
     {
+        emit slowSourceHint();
         m_ioBuffer = (quint8*) av_malloc(32*1024);
         m_ffmpegIOContext = av_alloc_put_byte(
             m_ioBuffer,

@@ -520,7 +520,7 @@ CLAVIBlurayStreamReader::~CLAVIBlurayStreamReader()
 QStringList CLAVIBlurayStreamReader::getPlaylist()
 {
     QStringList rez;
-
+    emit slowSourceHint();
     QDir sourceDir = m_device->getUniqueId();
 
     QFileInfoList rootDirList = sourceDir.entryInfoList();
