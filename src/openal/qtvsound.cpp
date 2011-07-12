@@ -10,6 +10,8 @@
 #include <alc.h>
 #endif
 
+static const int ALIGN_FACTOR = 8;
+
 QtvSound::QtvSound(ALCdevice* device, const QAudioFormat& audioFormat) 
 {
 	m_audioFormat = audioFormat;
@@ -17,6 +19,8 @@ QtvSound::QtvSound(ALCdevice* device, const QAudioFormat& audioFormat)
 	m_frequency = audioFormat.frequency();
 	m_bitsPerSample = audioFormat.sampleSize();
 	m_size = bitRate() / 30; // use 33 ms buffers
+    if (m_size % ALIGN_FACTOR)
+        m_size += ALIGN_FACTOR - (m_size % ALIGN_FACTOR);
 
     m_proxyBuffer = new quint8[m_size];
     m_proxyBufferLen = 0;
@@ -151,7 +155,7 @@ uint QtvSound::playTimeElapsed()
 
     uint res = static_cast<uint>(bufferTime() * queued - offset * 1000000.0f);
 
-	cl_log.log("elapsed=", (double) res/1000000.0, cl_logALWAYS);
+	//cl_log.log("elapsed=", (double) res/1000000.0, cl_logALWAYS);
 	return res;
 }
 
