@@ -18,7 +18,9 @@ QtvSound::QtvSound(ALCdevice* device, const QAudioFormat& audioFormat)
 	m_frequency = audioFormat.frequency();
 	m_bitsPerSample = audioFormat.sampleSize();
 	m_size = bitRate() / 30; // use 33 ms buffers
-    int sampleSize = audioFormat.channels() * audioFormat.sampleSize() / 8;
+    
+    // Multiply by 2 to align OpenAL buffer
+    int sampleSize = 2 * audioFormat.channels() * audioFormat.sampleSize() / 8;
     if (m_size % sampleSize)
         m_size += sampleSize - (m_size % sampleSize);
 
