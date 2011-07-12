@@ -133,7 +133,8 @@ void QtvSound::clearBuffers(bool clearAll)
     checkOpenALErrorDebug(m_device);
     if (processed) 
 	{
-		processed = qMin(arraysize(m_tmpBuffer), (long unsigned) processed);
+        if (arraysize(m_tmpBuffer) < processed)
+		    processed = arraysize(m_tmpBuffer);
         alSourceUnqueueBuffers(m_source, processed, m_tmpBuffer);
         checkOpenALErrorDebug(m_device);
 		alDeleteBuffers(processed, m_tmpBuffer);
