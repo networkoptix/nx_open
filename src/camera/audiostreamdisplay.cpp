@@ -139,6 +139,7 @@ void CLAudioStreamDisplay::clearAudioBuffer()
     }
 
     clearDeviceBuffer();
+    m_tooFewDataDetected = true;
 }
 
 void CLAudioStreamDisplay::enqueueData(CLCompressedAudioData* data, qint64 minTime)
@@ -223,9 +224,13 @@ void CLAudioStreamDisplay::putData(CLCompressedAudioData* data, qint64 minTime)
 	if (bufferSize < m_bufferMs / 10)
 	{
 		m_tooFewDataDetected = true;
-        if (data && data->timestamp < minTime)
-            return;
 	}
+
+    if (m_tooFewDataDetected && data && data->timestamp < minTime)
+    {
+        clearAudioBuffer();
+        return;
+    }
 
     if (data!=0)
     {
