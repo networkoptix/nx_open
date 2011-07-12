@@ -61,6 +61,7 @@ signals:
     void audioParamsChanged(AVCodecContext * codec);
     void videoParamsChanged(AVCodecContext * codec);
 	void realTimeStreamHint(bool value);
+    void slowSourceHint();
 protected:
 
 	void putData(CLAbstractData* data);

@@ -7,10 +7,11 @@
 
 // a lot of small audio packets in bluray HD audio codecs. So, previous size 7 is not enought
 #define CL_MAX_DISPLAY_QUEUE_SIZE 15
-#define CL_MAX_ALLOWED_QUEUE_SIZE (CL_MAX_DISPLAY_QUEUE_SIZE*16)
+#define CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE 120
 #define AUDIO_BUFF_SIZE (4000) // ms
 
-static const qint64 MIN_DETECT_JUMP_INTERVAL = 100 * 1000; // 100ms
+static const qint64 MIN_VIDEO_DETECT_JUMP_INTERVAL = 100 * 1000; // 100ms
+static const qint64 MIN_AUDIO_DETECT_JUMP_INTERVAL = MIN_VIDEO_DETECT_JUMP_INTERVAL + AUDIO_BUFF_SIZE*1000;
 static const int MAX_VALID_SLEEP_TIME = 1000*1000*5;
 
 CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
@@ -31,7 +32,6 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       mGenerateEndOfStreamSignal(generateEndOfStreamSignal),
       m_needReinitAudio(false),
       m_isRealTimeSource(true),
-      m_growEnabled(false),
       m_videoBufferOverflow(false)
 {
 	for (int i = 0; i< CL_MAX_CHANNELS; ++i)
@@ -146,26 +146,12 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
 void CLCamDisplay::jump()
 {
     m_afterJump = true;
-    m_growEnabled = false;
     clearUnprocessedData();
 }
-
-void CLCamDisplay::growInputQueue()
-{
-    int maxSize = m_dataQueue.maxSize();
-    if (m_growEnabled && m_dataQueue.size() <= maxSize/5 && maxSize <= CL_MAX_ALLOWED_QUEUE_SIZE/2)
-    {
-        m_dataQueue.setMaxSize(maxSize * 2); // grow queue
-        m_growEnabled = false;
-        cl_log.log("grow input queue. new max size=", m_dataQueue.maxSize(), cl_logALWAYS);
-    }
-};
 
 bool CLCamDisplay::processData(CLAbstractData* data)
 {
 
-    if (m_dataQueue.size() >= (m_dataQueue.maxSize()*4)/5 )
-        m_growEnabled = true;
     if (m_needChangePriority)
     {
         if (m_playAudio)
@@ -213,7 +199,9 @@ bool CLCamDisplay::processData(CLAbstractData* data)
 			}
 		}
 
-        if (ad->timestamp - m_lastAudioPacketTime < -MIN_DETECT_JUMP_INTERVAL)
+        // after seek, when audio is shifted related video (it is often), first audio packet will be < seek threshold
+        // so, second afterJump is generated after several video packet. To prevent it, increase jump detection interval for audio
+        if (ad->timestamp - m_lastAudioPacketTime < -MIN_AUDIO_DETECT_JUMP_INTERVAL)
             afterJump(ad->timestamp);
 
         m_lastAudioPacketTime = ad->timestamp;
@@ -238,7 +226,7 @@ bool CLCamDisplay::processData(CLAbstractData* data)
 	else if (vd)
 	{
         bool result = true;
-        if (vd->timestamp - m_lastVideoPacketTime < -MIN_DETECT_JUMP_INTERVAL)
+        if (vd->timestamp - m_lastVideoPacketTime < -MIN_VIDEO_DETECT_JUMP_INTERVAL)
         {
             afterJump(vd->timestamp);
         }
@@ -280,7 +268,6 @@ bool CLCamDisplay::processData(CLAbstractData* data)
                 return true; // impossible? incoming vd!=0
             m_lastDisplayedVideoTime = vd->timestamp;
             display(vd, !vd->ignore);
-            growInputQueue();
             return result;
         }
 
@@ -343,7 +330,6 @@ bool CLCamDisplay::processData(CLAbstractData* data)
                     //display(vd, lastFrameToDisplay && !vd->ignore && m_audioDisplay->msInBuffer() >= AUDIO_BUFF_SIZE / 10);
                     m_lastDisplayedVideoTime = vd->timestamp;
                     display(vd, lastFrameToDisplay && !vd->ignore);
-                    growInputQueue();
 
                     if (!lastFrameToDisplay)
                     {
@@ -487,6 +473,7 @@ void CLCamDisplay::afterJump(qint64 newTime)
     cl_log.log("after jump", cl_logWARNING);
 
     m_lastAudioPacketTime = newTime;
+    m_lastVideoPacketTime = newTime;
     m_previousVideoTime = newTime;
     m_previousVideoDisplayedTime = 0;
     clearVideoQueue();
@@ -515,4 +502,9 @@ void CLCamDisplay::onAudioParamsChanged(AVCodecContext * codec)
 void CLCamDisplay::onRealTimeStreamHint(bool value)
 {
     m_isRealTimeSource = value;
+}
+
+void CLCamDisplay::onSlowSourceHint()
+{
+    m_dataQueue.setMaxSize(CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE);
 }
