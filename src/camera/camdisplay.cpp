@@ -31,7 +31,8 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       mGenerateEndOfStreamSignal(generateEndOfStreamSignal),
       m_needReinitAudio(false),
       m_isRealTimeSource(true),
-      m_growEnabled(false)
+      m_growEnabled(false),
+      m_videoBufferOverflow(false)
 {
 	for (int i = 0; i< CL_MAX_CHANNELS; ++i)
 		m_display[i] = 0;
@@ -223,15 +224,15 @@ bool CLCamDisplay::processData(CLAbstractData* data)
             if (m_audioDisplay->msInBuffer() > AUDIO_BUFF_SIZE)
             {
                 // Audio buffer too large. waiting
-                return false; 
+                CLSleep::msleep(40);
             }
 
-            m_audioDisplay->putData(ad);
+            m_audioDisplay->putData(ad, nextVideoImageTime(0));
             m_hadAudio = true;
 		}
         else if (m_hadAudio)
         {
-            m_audioDisplay->enqueueData(ad, m_lastDisplayedVideoTime);
+            m_audioDisplay->enqueueData(ad, nextVideoImageTime(0));
         }
 	}
 	else if (vd)
@@ -243,11 +244,13 @@ bool CLCamDisplay::processData(CLAbstractData* data)
         }
         m_lastVideoPacketTime = vd->timestamp;
 
+        /*
         if (haveAudio())
         {
             // to put data from ring buff to audio buff( if any )
-            m_audioDisplay->putData(0);
+            m_audioDisplay->putData(0, 0);
         }
+        */
         int channel = vd->channelNumber;
         if (channel >= CL_MAX_CHANNELS)
             return true;
@@ -301,9 +304,10 @@ bool CLCamDisplay::processData(CLAbstractData* data)
             {
                 // video runs faster than audio; // need to hold video this frame
                 enqueueVideo(vd);
-                cl_log.log("HOLD FRAME", cl_logDEBUG1);
                 // avoid to fast buffer filling on startup
                 qint64 sleepTime = qMin(diff, (m_audioDisplay->msInBuffer() - AUDIO_BUFF_SIZE / 2) * 1000ll);
+                sleepTime = qMin(sleepTime, 500 * 1000ll);
+                cl_log.log("HOLD FRAME. sleep time=", sleepTime/1000.0, cl_logDEBUG1);
                 if (sleepTime > 0)
                     m_delay.sleep(sleepTime);
                 return true;
@@ -424,6 +428,18 @@ quint64 CLCamDisplay::nextVideoImageTime(CLCompressedVideoData* incoming, int ch
 
 }
 
+quint64 CLCamDisplay::nextVideoImageTime(int channel) const
+{
+    if (m_videoQueue[channel].isEmpty())
+        return m_lastVideoPacketTime;
+    else if (m_videoBufferOverflow)
+        return 0;
+    else
+        return m_videoQueue[channel].head()->timestamp;
+
+
+}
+
 void CLCamDisplay::clearVideoQueue()
 {
 	for (int i = 0; i< CL_MAX_CHANNELS; ++i)
@@ -433,6 +449,7 @@ void CLCamDisplay::clearVideoQueue()
 			m_videoQueue[i].dequeue()->releaseRef();
 		}
 	}
+    m_videoBufferOverflow = false;
 }
 
 qint64 CLCamDisplay::diffBetweenVideoAndAudio(CLCompressedVideoData* incoming, int channel, qint64& duration) 
@@ -455,9 +472,14 @@ qint64 CLCamDisplay::diffBetweenVideoAndAudio(CLCompressedVideoData* incoming, i
 
 void CLCamDisplay::enqueueVideo(CLCompressedVideoData* vd)
 {
-	m_videoQueue[vd->channelNumber].enqueue(vd);
-    if (m_videoQueue[vd->channelNumber].size() > (AUDIO_BUFF_SIZE*60/1000)) // I assume we are not gonna buffer 
+    m_videoQueue[vd->channelNumber].enqueue(vd);
+    if (m_videoQueue[vd->channelNumber].size() > 60 * 6) // I assume we are not gonna buffer 
+    {
+        cl_log.log("Video buffer overflow!", cl_logWARNING);
         m_videoQueue->dequeue()->releaseRef();
+        // some protection for very large difference between video and audio tracks. Need to improve sync logic for this case (now a lot of glithces)
+        m_videoBufferOverflow = true; 
+    }
 }
 
 void CLCamDisplay::afterJump(qint64 newTime)

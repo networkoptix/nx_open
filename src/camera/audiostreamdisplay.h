@@ -19,7 +19,7 @@ public:
 	CLAudioStreamDisplay(int buffMs);
 	~CLAudioStreamDisplay();
 
-	void putData(CLCompressedAudioData* data);
+    void putData(CLCompressedAudioData* data, qint64 minTime);
     void enqueueData(CLCompressedAudioData* data, qint64 minTime);
 	void suspend();
 

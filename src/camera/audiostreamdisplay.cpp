@@ -146,6 +146,7 @@ void CLAudioStreamDisplay::enqueueData(CLCompressedAudioData* data, qint64 minTi
     data->addRef();
     m_audioQueue.enqueue(data);
 
+    
     while (m_audioQueue.size() > 0)
     {
         CLCompressedAudioData* front = m_audioQueue.front();
@@ -153,6 +154,7 @@ void CLAudioStreamDisplay::enqueueData(CLCompressedAudioData* data, qint64 minTi
             break;
         m_audioQueue.dequeue()->releaseRef();
     }
+    
 
     //if (msInBuffer() >= m_bufferMs / 10)
     //    m_audioQueue.dequeue()->releaseRef();
@@ -206,7 +208,7 @@ bool CLAudioStreamDisplay::initFormatConvertRule(QAudioFormat format)
 	return false; // conversion rule not found
 }
 
-void CLAudioStreamDisplay::putData(CLCompressedAudioData* data)
+void CLAudioStreamDisplay::putData(CLCompressedAudioData* data, qint64 minTime)
 {
     static const int MAX_BUFFER_LEN = 3000;
 	if (data == 0 && !m_audioSound) // do not need to check audio device in case of data=0 and no audio device
@@ -217,16 +219,20 @@ void CLAudioStreamDisplay::putData(CLCompressedAudioData* data)
 
     //cl_log.log("AUDIO_QUUE = ", m_audioQueue.size(), cl_logALWAYS);
 
-    if (data!=0)
-	{
-        data->addRef();
-        m_audioQueue.enqueue(data);
-	}
 	int bufferSize = msInBuffer();
 	if (bufferSize < m_bufferMs / 10)
 	{
 		m_tooFewDataDetected = true;
+        if (data && data->timestamp < minTime)
+            return;
 	}
+
+    if (data!=0)
+    {
+        data->addRef();
+        m_audioQueue.enqueue(data);
+    }
+
 
     if (bufferSize >= m_tooFewDataDetected*playAfterMs() || m_audioQueue.size() >= MAX_BUFFER_LEN)
     {
