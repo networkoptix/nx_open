@@ -201,7 +201,8 @@ bool CLCamDisplay::processData(CLAbstractData* data)
 
         // after seek, when audio is shifted related video (it is often), first audio packet will be < seek threshold
         // so, second afterJump is generated after several video packet. To prevent it, increase jump detection interval for audio
-        if (ad->timestamp - m_lastAudioPacketTime < -MIN_AUDIO_DETECT_JUMP_INTERVAL)
+        
+        if (ad->timestamp && ad->timestamp - m_lastAudioPacketTime < -MIN_AUDIO_DETECT_JUMP_INTERVAL)
             afterJump(ad->timestamp);
 
         m_lastAudioPacketTime = ad->timestamp;
