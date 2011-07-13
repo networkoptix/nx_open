@@ -32,7 +32,9 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       mGenerateEndOfStreamSignal(generateEndOfStreamSignal),
       m_needReinitAudio(false),
       m_isRealTimeSource(true),
-      m_videoBufferOverflow(false)
+      m_videoBufferOverflow(false),
+      m_singleShotMode(false),
+      m_singleShotQuantProcessed(false)
 {
 	for (int i = 0; i< CL_MAX_CHANNELS; ++i)
 		m_display[i] = 0;
@@ -58,6 +60,7 @@ void CLCamDisplay::pause()
 
 void CLCamDisplay::resume()
 {
+    m_singleShotMode = false;
 	m_audioDisplay->resume();
 
 	CLAbstractDataProcessor::resume();
@@ -149,9 +152,14 @@ void CLCamDisplay::jump()
     clearUnprocessedData();
 }
 
+void CLCamDisplay::setSingleShotMode(bool single) 
+{
+    m_singleShotMode = single;
+    m_singleShotQuantProcessed = false;
+}
+
 bool CLCamDisplay::processData(CLAbstractData* data)
 {
-
     if (m_needChangePriority)
     {
         if (m_playAudio)
@@ -228,9 +236,7 @@ bool CLCamDisplay::processData(CLAbstractData* data)
 	{
         bool result = true;
         if (vd->timestamp - m_lastVideoPacketTime < -MIN_VIDEO_DETECT_JUMP_INTERVAL)
-        {
             afterJump(vd->timestamp);
-        }
         m_lastVideoPacketTime = vd->timestamp;
 
         /*
@@ -248,6 +254,12 @@ bool CLCamDisplay::processData(CLAbstractData* data)
         // video data can escape from this object only if displayed or in case of clearVideoQueue
         // so release ref must be in both places
         vd->addRef(); 
+
+        if (m_singleShotMode && m_singleShotQuantProcessed)
+        {
+            enqueueVideo(vd);
+            return true; 
+        }
 
         // three are 3 possible scenarios:
 
@@ -269,6 +281,7 @@ bool CLCamDisplay::processData(CLAbstractData* data)
                 return true; // impossible? incoming vd!=0
             m_lastDisplayedVideoTime = vd->timestamp;
             display(vd, !vd->ignore);
+            m_singleShotQuantProcessed = true;
             return result;
         }
 
@@ -331,6 +344,7 @@ bool CLCamDisplay::processData(CLAbstractData* data)
                     //display(vd, lastFrameToDisplay && !vd->ignore && m_audioDisplay->msInBuffer() >= AUDIO_BUFF_SIZE / 10);
                     m_lastDisplayedVideoTime = vd->timestamp;
                     display(vd, lastFrameToDisplay && !vd->ignore);
+                    m_singleShotQuantProcessed = true;
 
                     if (!lastFrameToDisplay)
                     {

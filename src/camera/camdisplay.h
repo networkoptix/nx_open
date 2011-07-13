@@ -42,6 +42,9 @@ public:
 	quint64 currentTime() const { return m_previousVideoDisplayedTime; }
 
     void setMTDecoding(bool value);
+
+    void setSingleShotMode(bool single);
+
 public slots:
     void onAudioParamsChanged(AVCodecContext * codec);
     void onRealTimeStreamHint(bool value);
@@ -104,6 +107,9 @@ private:
 	QAudioFormat m_expectedAudioFormat;
 	QMutex m_audioChangeMutex;
     bool m_videoBufferOverflow;
+    bool m_singleShotMode;
+    bool m_singleShotQuantProcessed;
+
 };
 
 #endif //clcam_display_h_1211

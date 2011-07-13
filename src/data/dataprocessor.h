@@ -19,6 +19,7 @@ public:
 	virtual void putData(CLAbstractData* data);
 	virtual void clearUnprocessedData();
 	int queueSize() const;
+    virtual void setSingleShotMode(bool single) {}
 
 protected:
 	void run();
