@@ -13,6 +13,7 @@ public:
 protected:
 
 	void mousePressEvent ( QMouseEvent * ev );
+    void mouseDoubleClickEvent( QMouseEvent * e );
 
 };
 

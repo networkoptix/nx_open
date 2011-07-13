@@ -80,6 +80,7 @@ void CLStreamreader::addDataProcessor(CLAbstractDataProcessor* dp)
 		m_dataprocessors.push_back(dp);
         connect(this, SIGNAL(audioParamsChanged(AVCodecContext*)), dp, SLOT(onAudioParamsChanged(AVCodecContext*)), Qt::DirectConnection);
         connect(this, SIGNAL(realTimeStreamHint(bool)), dp, SLOT(onRealTimeStreamHint(bool)), Qt::DirectConnection);
+        connect(this, SIGNAL(slowSourceHint()), dp, SLOT(onSlowSourceHint()), Qt::DirectConnection);
     }
 }
 

@@ -42,9 +42,13 @@ public:
 	quint64 currentTime() const { return m_previousVideoDisplayedTime; }
 
     void setMTDecoding(bool value);
+
+    void setSingleShotMode(bool single);
+
 public slots:
     void onAudioParamsChanged(AVCodecContext * codec);
     void onRealTimeStreamHint(bool value);
+    void onSlowSourceHint();
 signals:
     void reachedTheEnd();
 private:
@@ -56,13 +60,14 @@ private:
     // this function doest not changes any quues; it just returns time of next frame been displayed
     quint64 nextVideoImageTime(CLCompressedVideoData* incoming, int channel) const;
 
+    quint64 nextVideoImageTime(int channel) const;
+
     // this function returns diff between video and audio at any given moment
     qint64 diffBetweenVideoAndAudio(CLCompressedVideoData* incoming, int channel, qint64& duration);
 
 	void clearVideoQueue();
     void enqueueVideo(CLCompressedVideoData* vd);
     void afterJump(qint64 new_time);
-    void growInputQueue();
 private:
 	QQueue<CLCompressedVideoData*> m_videoQueue[CL_MAX_CHANNELS];
 
@@ -101,7 +106,10 @@ private:
     bool m_isRealTimeSource;
 	QAudioFormat m_expectedAudioFormat;
 	QMutex m_audioChangeMutex;
-    bool m_growEnabled;
+    bool m_videoBufferOverflow;
+    bool m_singleShotMode;
+    bool m_singleShotQuantProcessed;
+
 };
 
 #endif //clcam_display_h_1211

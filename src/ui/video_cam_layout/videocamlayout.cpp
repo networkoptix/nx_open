@@ -263,6 +263,9 @@ void SceneLayout::onTimer()
         bool criteriaChanged = (m_content->getDeviceCriteria().filter() != mSearchFilter || m_content->getDeviceCriteria().getCriteria()==CLDeviceCriteria::NONE);
             mSearchFilter = m_content->getDeviceCriteria().filter();
 
+        if (criteriaChanged)
+            m_deletedIds.clear();
+
         if (m_view->getPageSelector())
         {
             QnPageSelector* ps = m_view->getPageSelector();

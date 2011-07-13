@@ -6,23 +6,23 @@
 #include "base/sleep.h"
 
 // These functions added temporary as in Qt 4.8 they are already in QUdpSocket
-void multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress)
+bool multicastJoinGroup(QUdpSocket& udpSocket, QHostAddress groupAddress, QHostAddress localAddress)
 {
     struct ip_mreq imr;
 
     memset(&imr, 0, sizeof(imr));
 
     imr.imr_multiaddr.s_addr = htonl(groupAddress.toIPv4Address());
-    imr.imr_interface.s_addr = htonl(localAddress.toIPv4Address()); //htonl(INADDR_ANY);
+    imr.imr_interface.s_addr = htonl(localAddress.toIPv4Address());
 
     int res = setsockopt(udpSocket.socketDescriptor(), IPPROTO_IP, IP_ADD_MEMBERSHIP, (const char *)&imr, sizeof(struct ip_mreq));
     if (res == -1)
-    {
-        cl_log.log("Unable to join multicast group", cl_logERROR);
-    }
+        return false;
+
+    return true;
 }
 
-void multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress)
+bool multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress)
 {
     struct ip_mreq imr;
 
@@ -31,9 +31,9 @@ void multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress)
 
     int res = setsockopt(udpSocket.socketDescriptor(), IPPROTO_IP, IP_DROP_MEMBERSHIP, (const char *)&imr, sizeof(struct ip_mreq));
     if (res == -1)
-    {
-        cl_log.log("Unable to join multicast group", cl_logERROR);
-    }
+        return false;
+
+    return true;
 }
 
 CLIQEyeDevice::CLIQEyeDevice()
@@ -54,12 +54,26 @@ CLDevice::DeviceType CLIQEyeDevice::getDeviceType() const
 
 QString CLIQEyeDevice::toString() const
 {
-    return QString("live iqeye ") + getUniqueId();
+    return QString("live iqeye ") + getName() + QString(" ") + getUniqueId();
 }
 
 CLStreamreader* CLIQEyeDevice::getDeviceStreamConnection()
 {
-    if (getName()=="IQ042S")
+    //IQ732N   IQ732S     IQ832N   IQ832S   IQD30S   IQD31S  IQD32S  IQM30S  IQM31S  IQM32S
+    if (getName()=="IQA35" || 
+        getName()=="IQA33N" ||
+        getName()=="IQA32N" ||
+        getName()=="IQA31" ||
+        getName()=="IQ732N" ||
+        getName()=="IQ732S" ||
+        getName()=="IQ832N" ||
+        getName()=="IQ832S" ||
+        getName()=="IQD30S" ||
+        getName()=="IQD31S" ||
+        getName()=="IQD32S" ||
+        getName()=="IQM30S" ||
+        getName()=="IQM31S" ||
+        getName()=="IQM32S")
         return new CLIQEyeH264treamreader(this);
     else
         return new CLIQEyeMJPEGtreamreader(this);
@@ -103,7 +117,8 @@ void CLIQEyeDevice::findDevices(CLDeviceList& result)
 
         QUdpSocket udpSocket;
         udpSocket.bind(localAddress, MDNS_PORT, QUdpSocket::ReuseAddressHint | QUdpSocket::ShareAddress);
-        multicastJoinGroup(udpSocket, groupAddress, localAddress);
+        if (!multicastJoinGroup(udpSocket, groupAddress, localAddress))
+            continue;
 
         MDNSPacket request;
         MDNSPacket response;
@@ -129,7 +144,7 @@ void CLIQEyeDevice::findDevices(CLDeviceList& result)
                 quint16 senderPort;
 
                 udpSocket.readDatagram(responseData.data(), responseData.size(),	&sender, &senderPort);
-                cl_log.log(cl_logALWAYS, "size: %d\n", responseData.size());
+                //cl_log.log(cl_logALWAYS, "size: %d\n", responseData.size());
                 if (senderPort != MDNS_PORT || sender == localAddress)
                     continue;
 
@@ -171,7 +186,7 @@ void CLIQEyeDevice::findDevices(CLDeviceList& result)
                 // in any case let's HTTP do it's job at very end of discovery 
 
                 CLIQEyeDevice* device = new CLIQEyeDevice();
-                device->setName("IQUNKNOWN");
+                device->setName(name);
 
                 if (device==0)
                     continue;

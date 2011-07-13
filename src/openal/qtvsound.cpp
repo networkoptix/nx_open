@@ -1,5 +1,6 @@
 #include "qtvsound.h"
 #include "qtvaudiodevice.h"
+#include "util.h"
 #include "base/log.h"
 
 #ifdef Q_OS_MAC
@@ -17,6 +18,11 @@ QtvSound::QtvSound(ALCdevice* device, const QAudioFormat& audioFormat)
 	m_frequency = audioFormat.frequency();
 	m_bitsPerSample = audioFormat.sampleSize();
 	m_size = bitRate() / 30; // use 33 ms buffers
+    
+    // Multiply by 2 to align OpenAL buffer
+    int sampleSize = 2 * audioFormat.channels() * audioFormat.sampleSize() / 8;
+    if (m_size % sampleSize)
+        m_size += sampleSize - (m_size % sampleSize);
 
     m_proxyBuffer = new quint8[m_size];
     m_proxyBufferLen = 0;
@@ -127,7 +133,8 @@ void QtvSound::clearBuffers(bool clearAll)
     checkOpenALErrorDebug(m_device);
     if (processed) 
 	{
-		processed = qMin(sizeof(m_tmpBuffer)/sizeof(uint), (uint) processed);
+        if (arraysize(m_tmpBuffer) < processed)
+		    processed = arraysize(m_tmpBuffer);
         alSourceUnqueueBuffers(m_source, processed, m_tmpBuffer);
         checkOpenALErrorDebug(m_device);
 		alDeleteBuffers(processed, m_tmpBuffer);
@@ -151,7 +158,7 @@ uint QtvSound::playTimeElapsed()
 
     uint res = static_cast<uint>(bufferTime() * queued - offset * 1000000.0f);
 
-	cl_log.log("elapsed=", (double) res/1000000.0, cl_logALWAYS);
+	//cl_log.log("elapsed=", (double) res/1000000.0, cl_logALWAYS);
 	return res;
 }
 

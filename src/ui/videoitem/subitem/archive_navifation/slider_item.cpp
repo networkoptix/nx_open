@@ -26,3 +26,9 @@ void CLDirectJumpSlider::mousePressEvent( QMouseEvent * event)
 
 	QSlider::mousePressEvent(event);
 }
+
+// without this call slider lost release event on dbl click
+void CLDirectJumpSlider::mouseDoubleClickEvent( QMouseEvent * event )
+{
+    QSlider::mouseReleaseEvent(event);
+}
