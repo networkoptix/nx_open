@@ -150,6 +150,7 @@ void CLCamDisplay::jump()
 {
     m_afterJump = true;
     clearUnprocessedData();
+    m_singleShotMode = false;
 }
 
 void CLCamDisplay::setSingleShotMode(bool single) 
