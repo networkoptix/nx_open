@@ -4,11 +4,11 @@
 #include "common/threadqueue.h"
 
 
-class QnStreamDataProvider;
+class QnMediaStreamDataProvider;
 
 struct QnAbstractDataPacket
 {
-	QnStreamDataProvider* dataProvider;
+	QnMediaStreamDataProvider* dataProvider;
 
     virtual ~QnAbstractDataPacket()
     {

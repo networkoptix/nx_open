@@ -5,18 +5,15 @@
 #define CL_STATISTICS_UPDATE_PERIOD_MS 700
 #define CL_STATS_NUM  (CL_STATISTICS_WINDOW_MS/CL_STATISTICS_UPDATE_PERIOD_MS + 1)
 
-enum CLStatisticsEvent
+enum QnStatisticsEvent
 {
 	CL_STAT_DATA,
 	CL_STAT_FRAME_LOST,
-	CL_STAT_BAD_SENSOR,
-	CL_STAT_BAD_IMAGE,
-	CL_STAT_DECODEERROR,
 	CL_STAT_CAMRESETED,
 	CL_STAT_END// must not be used in onEvent
 };
 
-class CLStatistics
+class QnStatistics
 {
 
 	struct EventStat
@@ -33,7 +30,7 @@ class CLStatistics
 	};
 
 public:
-	CLStatistics();
+	QnStatistics();
 
 	void resetStatistics(); // resets statistics; and make it runing 
 	void stop(); // stops the statistic;
@@ -52,11 +49,11 @@ public:
 	bool isConnectioLost() const;
 	int connectionLostSec() const;
 
-	void onEvent(CLStatisticsEvent event);
-	unsigned long totalEvents(CLStatisticsEvent event) const;
-	float eventsPerHour(CLStatisticsEvent event) const;
-	QDateTime firstOccurred(CLStatisticsEvent event) const;
-	QDateTime lastOccurred(CLStatisticsEvent event) const;
+	void onEvent(QnStatisticsEvent event);
+	unsigned long totalEvents(QnStatisticsEvent event) const;
+	float eventsPerHour(QnStatisticsEvent event) const;
+	QDateTime firstOccurred(QnStatisticsEvent event) const;
+	QDateTime lastOccurred(QnStatisticsEvent event) const;
 
 	//========
 

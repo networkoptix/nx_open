@@ -8,7 +8,7 @@
 
 
 QnServerPushDataProvider::QnServerPushDataProvider(QnResource* dev ):
-QnStreamDataProvider(dev)
+QnMediaStreamDataProvider(dev)
 {
 }
 

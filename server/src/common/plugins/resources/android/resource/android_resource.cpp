@@ -23,7 +23,7 @@ QString QnPlANdroidResource::toString() const
     return QString("live android ") + getId().toString();
 }
 
-QnStreamDataProvider* QnPlANdroidResource::getDeviceStreamConnection()
+QnMediaStreamDataProvider* QnPlANdroidResource::getDeviceStreamConnection()
 {
     return new CLAndroidStreamreader(this);
 }

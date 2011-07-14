@@ -23,7 +23,7 @@ QString QnPlQEyeResource::toString() const
     return QString("live iqeye ") + getMAC();
 }
 
-QnStreamDataProvider* QnPlQEyeResource::getDeviceStreamConnection()
+QnMediaStreamDataProvider* QnPlQEyeResource::getDeviceStreamConnection()
 {
     if (getName()=="IQ042S")
         return new CLIQEyeH264treamreader(this);

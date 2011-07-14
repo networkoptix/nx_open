@@ -8,7 +8,7 @@
 
 struct QnAbstractMediaDataPacket;
 
-class CLClientPullStreamreader : public QnStreamDataProvider
+class CLClientPullStreamreader : public QnMediaStreamDataProvider
 {
 public:
 	CLClientPullStreamreader(QnResource* dev );

@@ -10,7 +10,7 @@ CLAviDvdDevice::~CLAviDvdDevice()
 {
 }
 
-QnStreamDataProvider* CLAviDvdDevice::getDeviceStreamConnection()
+QnMediaStreamDataProvider* CLAviDvdDevice::getDeviceStreamConnection()
 {
     return new CLAVIDvdStreamReader(this);
 }

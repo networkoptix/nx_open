@@ -6,28 +6,28 @@
 #include "datapacket/datapacket.h"
 
 
-class QnStreamDataProvider;
+class QnMediaStreamDataProvider;
 class QnResource;
-class CLStatistics;
+class QnStatistics;
 class QnAbstractDataConsumer;
 
 
 #define CL_MAX_DATASIZE (10*1024*1024) // assume we can never get compressed data with  size greater than this
 #define CL_MAX_CHANNEL_NUMBER (10) 
 
-class QnStreamDataProvider : public QnLongRunnable
+class QnMediaStreamDataProvider : public QnLongRunnable
 {
 public:
 	enum StreamQuality {CLSLowest, CLSLow, CLSNormal, CLSHigh, CLSHighest};
 
-	explicit QnStreamDataProvider(QnResource* dev);
-	virtual ~QnStreamDataProvider();
+	explicit QnMediaStreamDataProvider(QnResource* dev);
+	virtual ~QnMediaStreamDataProvider();
 
 	QnResource* getDevice() const;
 
     virtual bool dataCanBeAccepted() const;
 
-	void setStatistics(CLStatistics* stat);
+	void setStatistics(QnStatistics* stat);
 	virtual void setStreamParams(QnParamList newParam);
 	QnParamList getStreamParam() const;
 
@@ -59,7 +59,7 @@ protected:
 	mutable QMutex m_params_CS;
 	QnParamList m_streamParam;
 
-	CLStatistics* m_stat;
+	QnStatistics* m_stat;
 
 	int m_gotKeyFrame[CL_MAX_CHANNEL_NUMBER];
 	int m_channel_number;

@@ -23,7 +23,7 @@ QString QnPlAvigilonResource::toString() const
     return QString("live clearpix ") + getMAC();
 }
 
-QnStreamDataProvider* QnPlAvigilonResource::getDeviceStreamConnection()
+QnMediaStreamDataProvider* QnPlAvigilonResource::getDeviceStreamConnection()
 {
     return new CLAvigilonStreamreader(this);
 }

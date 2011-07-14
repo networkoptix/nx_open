@@ -47,7 +47,7 @@ CLHttpStatus QnPlAreconVisionResource::getRegister(int page, int num, int& val)
 
 }
 
-QnStreamDataProvider* QnPlAreconVisionResource::getDeviceStreamConnection()
+QnMediaStreamDataProvider* QnPlAreconVisionResource::getDeviceStreamConnection()
 {
 	return 0;
 }

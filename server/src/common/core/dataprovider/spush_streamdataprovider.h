@@ -5,7 +5,7 @@
 #include "datapacket/mediadatapacket.h"
 
 
-class QnServerPushDataProvider : public QnStreamDataProvider
+class QnServerPushDataProvider : public QnMediaStreamDataProvider
 {
 public:
     QnServerPushDataProvider(QnResource* dev );

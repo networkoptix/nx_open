@@ -33,7 +33,7 @@ QString QnFileResource::toString() const
 	return m_filename;
 }
 
-QnStreamDataProvider* QnFileResource::getDeviceStreamConnection()
+QnMediaStreamDataProvider* QnFileResource::getDeviceStreamConnection()
 {
 	return new CLSingleShotFileStreamreader(this);
 }

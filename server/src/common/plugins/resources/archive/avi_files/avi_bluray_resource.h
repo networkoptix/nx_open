@@ -9,7 +9,7 @@ public:
 	CLAviBluRayDevice(const QString& file);
 	virtual ~CLAviBluRayDevice();
 
-	virtual QnStreamDataProvider* getDeviceStreamConnection();
+	virtual QnMediaStreamDataProvider* getDeviceStreamConnection();
     static bool isAcceptedUrl(const QString& url);
 };
 

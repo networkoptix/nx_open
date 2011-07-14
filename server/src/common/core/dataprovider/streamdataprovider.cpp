@@ -3,7 +3,7 @@
 #include "resource/video_resource_layout.h"
 
 
-QnStreamDataProvider::QnStreamDataProvider(QnResource* dev):
+QnMediaStreamDataProvider::QnMediaStreamDataProvider(QnResource* dev):
 m_device(dev),
 m_qulity(CLSLowest),
 m_needSleep(true)
@@ -15,17 +15,17 @@ m_needSleep(true)
 
 }
 
-QnStreamDataProvider::~QnStreamDataProvider()
+QnMediaStreamDataProvider::~QnMediaStreamDataProvider()
 {
 	stop();
 }
 
-QnResource* QnStreamDataProvider::getDevice() const
+QnResource* QnMediaStreamDataProvider::getDevice() const
 {
 	return m_device;
 }
 
-bool QnStreamDataProvider::dataCanBeAccepted() const
+bool QnMediaStreamDataProvider::dataCanBeAccepted() const
 {
     // need to read only if all queues has more space and at least one queue is exist
     bool result = false;
@@ -44,34 +44,34 @@ bool QnStreamDataProvider::dataCanBeAccepted() const
 
 
 
-void QnStreamDataProvider::setStatistics(CLStatistics* stat)
+void QnMediaStreamDataProvider::setStatistics(QnStatistics* stat)
 {
 	m_stat = stat;
 }
 
-void QnStreamDataProvider::setQuality(StreamQuality q)
+void QnMediaStreamDataProvider::setQuality(StreamQuality q)
 {
 	m_qulity = q;
 }
 
-QnStreamDataProvider::StreamQuality QnStreamDataProvider::getQuality() const
+QnMediaStreamDataProvider::StreamQuality QnMediaStreamDataProvider::getQuality() const
 {
 	return m_qulity;
 }
 
-void QnStreamDataProvider::setStreamParams(QnParamList newParam)
+void QnMediaStreamDataProvider::setStreamParams(QnParamList newParam)
 {
 	QMutexLocker mutex(&m_params_CS);
 	m_streamParam = newParam;
 }	
 
-QnParamList QnStreamDataProvider::getStreamParam() const
+QnParamList QnMediaStreamDataProvider::getStreamParam() const
 {
 	QMutexLocker mutex(&m_params_CS);
 	return m_streamParam;
 }
 
-void QnStreamDataProvider::addDataProcessor(QnAbstractDataConsumer* dp)
+void QnMediaStreamDataProvider::addDataProcessor(QnAbstractDataConsumer* dp)
 {
 	QMutexLocker mutex(&m_proc_CS);
 
@@ -79,24 +79,24 @@ void QnStreamDataProvider::addDataProcessor(QnAbstractDataConsumer* dp)
 		m_dataprocessors.push_back(dp);
 }
 
-void QnStreamDataProvider::removeDataProcessor(QnAbstractDataConsumer* dp)
+void QnMediaStreamDataProvider::removeDataProcessor(QnAbstractDataConsumer* dp)
 {
 	QMutexLocker mutex(&m_proc_CS);
 	m_dataprocessors.removeOne(dp);
 }
 
-void QnStreamDataProvider::setNeedKeyData()
+void QnMediaStreamDataProvider::setNeedKeyData()
 {
 	for (int i = 0; i < m_channel_number; ++i)
 		m_gotKeyFrame[i] = 0;
 }
 
-bool QnStreamDataProvider::needKeyData(int channel) const
+bool QnMediaStreamDataProvider::needKeyData(int channel) const
 {
 	return m_gotKeyFrame[channel]==0;
 }
 
-bool QnStreamDataProvider::needKeyData() const
+bool QnMediaStreamDataProvider::needKeyData() const
 {
 	for (int i = 0; i < m_channel_number; ++i)
 		if (m_gotKeyFrame[i]==0)
@@ -105,7 +105,7 @@ bool QnStreamDataProvider::needKeyData() const
 	return false;
 }
 
-void QnStreamDataProvider::pauseDataProcessors()
+void QnMediaStreamDataProvider::pauseDataProcessors()
 {
     foreach(QnAbstractDataConsumer* dataProcessor, m_dataprocessors) 
     {
@@ -113,7 +113,7 @@ void QnStreamDataProvider::pauseDataProcessors()
     }
 }
 
-void QnStreamDataProvider::resumeDataProcessors()
+void QnMediaStreamDataProvider::resumeDataProcessors()
 {
     foreach(QnAbstractDataConsumer* dataProcessor, m_dataprocessors) 
     {
@@ -122,7 +122,7 @@ void QnStreamDataProvider::resumeDataProcessors()
 }
 
 
-void QnStreamDataProvider::putData(QnAbstractDataPacketPtr data)
+void QnMediaStreamDataProvider::putData(QnAbstractDataPacketPtr data)
 {
     if (!data)
         return;
@@ -135,7 +135,7 @@ void QnStreamDataProvider::putData(QnAbstractDataPacketPtr data)
 	}
 }
 
-void QnStreamDataProvider::setNeedSleep(bool sleep)
+void QnMediaStreamDataProvider::setNeedSleep(bool sleep)
 {
     m_needSleep = sleep;   
 }

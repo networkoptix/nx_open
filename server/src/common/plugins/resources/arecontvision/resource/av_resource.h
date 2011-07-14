@@ -46,7 +46,7 @@ public:
 	CLHttpStatus setRegister(int page, int num, int val);
 	CLHttpStatus setRegister_asynch(int page, int num, int val);
 
-	QnStreamDataProvider* getDeviceStreamConnection();
+	QnMediaStreamDataProvider* getDeviceStreamConnection();
 
 	//========
 	virtual bool unknownResource() const;

@@ -6,7 +6,7 @@
 #include "datapacket/mediadatapacket.h"
 
 CLClientPullStreamreader::CLClientPullStreamreader(QnResource* dev ):
-QnStreamDataProvider(dev)
+QnMediaStreamDataProvider(dev)
 {
 }
 

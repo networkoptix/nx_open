@@ -4,7 +4,7 @@
 #include "datapacket/mediadatapacket.h"
 
 CLSingleShotStreamreader::CLSingleShotStreamreader(QnResource* dev ):
-QnStreamDataProvider(dev)
+QnMediaStreamDataProvider(dev)
 {
 	dev->addDeviceTypeFlag(QnResource::SINGLE_SHOT);
 }

@@ -14,7 +14,7 @@ public:
 
     QString toString() const;
 
-    QnStreamDataProvider* getDeviceStreamConnection();
+    QnMediaStreamDataProvider* getDeviceStreamConnection();
 
     virtual bool unknownResource() const;
     QnNetworkResourcePtr updateResource();
