@@ -52,9 +52,9 @@ quint64 CLVideoCamera::currentTime() const
     return m_camdispay.currentTime();
 }
 
-void CLVideoCamera::streamJump()
+void CLVideoCamera::streamJump(qint64 time)
 {
-    m_camdispay.jump();
+    m_camdispay.jump(time);
 }
 
 void CLVideoCamera::startDispay()

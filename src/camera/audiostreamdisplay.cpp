@@ -151,7 +151,7 @@ void CLAudioStreamDisplay::enqueueData(CLCompressedAudioData* data, qint64 minTi
     while (m_audioQueue.size() > 0)
     {
         CLCompressedAudioData* front = m_audioQueue.front();
-        if (front->timestamp >= minTime)
+        if (front->timestamp >= minTime && msInQueue() < m_bufferMs)
             break;
         m_audioQueue.dequeue()->releaseRef();
     }

@@ -2020,7 +2020,7 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
                 {
                     CLAbstractArchiveReader* asr = static_cast<CLAbstractArchiveReader*>(cam->getStreamreader());
                     asr->jumpTo(0, true);
-                    cam->streamJump();
+                    cam->streamJump(0);
                 }
             }
 
