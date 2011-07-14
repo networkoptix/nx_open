@@ -20,12 +20,10 @@ QtvSound::QtvSound(ALCdevice* device, const QAudioFormat& audioFormat)
 	m_size = bitRate() / 30; // use 33 ms buffers
 
     
-#ifdef OPENAL_WIN32_ONLY
     // Multiply by 2 to align OpenAL buffer
     int sampleSize = 2 * audioFormat.channels() * audioFormat.sampleSize() / 8;
     if (m_size % sampleSize)
         m_size += sampleSize - (m_size % sampleSize);
-#endif
 
     m_proxyBuffer = new quint8[m_size];
     m_proxyBufferLen = 0;
@@ -229,7 +227,7 @@ bool QtvSound::play(const quint8* data, uint size)
 bool QtvSound::internalPlay(const void* data, uint size)
 {
     clearBuffers(false);
-
+    ALuint buf = 0;
 #ifdef OPENAL_WIN32_ONLY
     alGenBuffers(1, &buf);
     checkOpenALErrorDebug(m_device);
@@ -237,7 +235,6 @@ bool QtvSound::internalPlay(const void* data, uint size)
     ALint processed = 0;
     alGetSourcei(m_source, AL_BUFFERS_PROCESSED, &processed);
     checkOpenALErrorDebug(m_device);
-    ALuint buf = 0;
     if (processed) {
         alSourceUnqueueBuffers(m_source, 1, &buf);
         checkOpenALErrorDebug(m_device);
@@ -326,8 +323,8 @@ void QtvSound::internalClear()
 		alDeleteBuffers(m_buffers.size(), &m_buffers[0]);
 		checkOpenALError(m_device);
 	}
-#endif
     m_buffers.clear();
+#endif
     m_proxyBufferLen = 0;
     m_source = 0;
 }

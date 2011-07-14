@@ -190,7 +190,7 @@ bool CLCamDisplay::processData(CLAbstractData* data)
     {
         qint64 ts = vd? vd->timestamp : ad->timestamp;
         // Some clips has very low key frame rate. This condition protect audio buffer overflowing and improve seeking for such clips
-        if (ts < m_jumpTime - AUDIO_BUFF_SIZE/2*1000)
+        if (ad && ts < m_jumpTime - AUDIO_BUFF_SIZE/2*1000)
             return true; // skip packet
 
         m_afterJump = false;
