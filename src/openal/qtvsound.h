@@ -10,22 +10,29 @@
 #include <QVector>
 #include <QAudioFormat>
 
+#ifdef _WIN32
+#define OPENAL_WIN32_ONLY
+#endif
+
 class QtvAudioDevice;
 typedef struct ALCdevice_struct ALCdevice;
 
-class QtvSound {
+class QtvSound
+{
 public:
 	QtvSound(ALCdevice* device, const QAudioFormat& audioFormat);
 	~QtvSound();
 
 	bool isValid() const { return m_isValid; }
 
-	uint playTimeElapsed();
+    uint playTimeElapsed();
+
 	bool play(const quint8* data, uint size);
     void suspend();
     void resume();
     void clear();
     static bool isFormatSupported(const QAudioFormat& format);
+    
 private:
 	uint bufferTime() const;
 	bool setup();
@@ -36,10 +43,17 @@ private:
 	static bool outError(int err, const char* strerr);
 	static int checkOpenALErrorDebug(ALCdevice* device);
     bool internalPlay(const void* data, uint size);
-	void clearBuffers(bool clearAll);
+    void clearBuffers(bool clearAll);
+
 private:
 	QAudioFormat m_audioFormat;
-	uint m_tmpBuffer[1024];
+
+#ifdef OPENAL_WIN32_ONLY
+    uint m_tmpBuffer[1024];
+#else
+	QVector<uint> m_buffers;
+#endif
+
 	uint m_source;
 	uint m_format;
 	uint m_numChannels;
@@ -51,8 +65,10 @@ private:
     quint8* m_proxyBuffer;
     int m_proxyBufferLen;
     bool m_deinitialized;
+    
 private:
     void internalClear();
+    
 public:
 	static int checkOpenALError(ALCdevice* device);
 };
