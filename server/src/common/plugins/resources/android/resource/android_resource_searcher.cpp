@@ -119,7 +119,7 @@ QnResourceList AndroidDeviceServer::findResources()
                 n++;
 
                 QnNetworkResourcePtr res ( new QnPlANdroidResource() );
-                res->setIP(QHostAddress(ad.ip), false);
+                res->setHostAddress(QHostAddress(ad.ip), false);
                 res->setMAC( QString("android") + QString::number(n) );
                 res->setId(res->getMAC());
                 res->setName(QString("android") + QString::number(lst.count()+1));

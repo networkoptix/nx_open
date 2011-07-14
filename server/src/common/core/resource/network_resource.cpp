@@ -6,109 +6,127 @@
 extern int ping_timeout ;
 
 QnNetworkResource::QnNetworkResource():
-mAfterRouter(false)
+m_networkStatus(0),
+m_networkTimeout(2000)
 {
-	addDeviceTypeFlag(QnResource::NETWORK);
+    addFlag(QnResource::network);
+}
+
+QnNetworkResource::~QnNetworkResource()
+{
+
 }
 
 bool QnNetworkResource::equalsTo(const  QnResourcePtr other) const
 {
-
     QnNetworkResourcePtr nr = other.dynamicCast<QnNetworkResource>();
 
     if (!nr)
         return false;
-    
 
-    return (getIP() == nr->getIP() && getMAC() == nr->getMAC());
+    return (getHostAddress() == nr->getHostAddress() && getMAC() == nr->getMAC());
 }
 
-QHostAddress QnNetworkResource::getIP() const
+QHostAddress QnNetworkResource::getHostAddress() const
 {
-	QMutexLocker mutex(&m_cs);
-	return m_ip;
+	QMutexLocker mutex(&m_mutex);
+	return m_hostAddr;
 }
 
-bool QnNetworkResource::setIP(const QHostAddress& ip, bool net )
+bool QnNetworkResource::setHostAddress(const QHostAddress& ip, QnDomain domaun )
 {
-	QMutexLocker mutex(&m_cs);
-	m_ip = ip;
+	QMutexLocker mutex(&m_mutex);
+	m_hostAddr = ip;
 	return true;
 }
 
-void QnNetworkResource::setLocalAddr(QHostAddress addr)
+QnMacAddress QnNetworkResource::getMAC() const
 {
-	m_local_adssr = addr;
+    QMutexLocker mutex(&m_mutex);
+	return m_macAddress;
 }
 
-QString QnNetworkResource::getMAC() const
+void  QnNetworkResource::setMAC(QnMacAddress mac) 
 {
-	return m_mac;
-}
-
-void  QnNetworkResource::setMAC(const QString& mac) 
-{
-	m_mac = mac;
-}
-
-void QnNetworkResource::setAfterRouter(bool after)
-{
-    mAfterRouter = after;
-}
-
-bool QnNetworkResource::isAfterRouter() const
-{
-    return mAfterRouter;
+    QMutexLocker mutex(&m_mutex);
+	m_macAddress = mac;
 }
 
 void QnNetworkResource::setAuth(const QString& user, QString password)
 {
-	QMutexLocker mutex(&m_cs);
+	QMutexLocker mutex(&m_mutex);
 	m_auth.setUser(user);
 	m_auth.setPassword(password);
 }
 
 QAuthenticator QnNetworkResource::getAuth() const
 {
-	QMutexLocker mutex(&m_cs);
+	QMutexLocker mutex(&m_mutex);
 	return m_auth;
 }
 
-unsigned int QnNetworkResource::getHttpTimeout() 
-{
-	if (getStatus().checkFlag(QnResourceStatus::NOT_LOCAL)) 
-		return 3000;
-	else 
-		return 1050;
-}
 
 QHostAddress QnNetworkResource::getDiscoveryAddr() const
 {
-	return m_local_adssr;
+    QMutexLocker mutex(&m_mutex);
+	return m_localAddress;
 }
 
 void QnNetworkResource::setDiscoveryAddr(QHostAddress addr)
 {
-	m_local_adssr = addr;
+    QMutexLocker mutex(&m_mutex);
+	m_localAddress = addr;
 }
 
 QString QnNetworkResource::toString() const
 {
 	QString result;
-	QTextStream(&result) << getName() << "  " << getIP().toString() << "  " << getMAC();
+	QTextStream(&result) << getName() << "  " << getHostAddress().toString() << "  " << getMAC().toString();
 	return result;
 }
 
+void QnNetworkResource::addNetworkStatus(unsigned long status)
+{
+    QMutexLocker mutex(&m_mutex);
+    m_networkStatus |=  status;
+}
+
+void QnNetworkResource::removeNetworkStatus(unsigned long status)
+{
+    QMutexLocker mutex(&m_mutex);
+    m_networkStatus &=  (~status);
+}
+
+bool QnNetworkResource::checkNetworkStatus(unsigned long status) const
+{
+    QMutexLocker mutex(&m_mutex);
+    return m_networkStatus & status;
+}
+
+void QnNetworkResource::setNetworkTimeout(unsigned int timeout)
+{
+    QMutexLocker mutex(&m_mutex);
+    m_networkTimeout = timeout;
+}
+
+unsigned int QnNetworkResource::getNetworkTimeout() const
+{
+    QMutexLocker mutex(&m_mutex);
+    return m_networkTimeout;
+}
+
+
 bool QnNetworkResource::conflicting()
 {
-    if (mAfterRouter)
+
+    if (checkNetworkStatus(QnNetworkResource::NotSameLAN))
         return false;
 
     QTime time;
 	time.restart();
 	CL_LOG(cl_logDEBUG2) cl_log.log("begining of QnNetworkResource::conflicting() ",  cl_logDEBUG2);
 
-	QString mac = getMacByIP(getIP());
+	QString mac = getMacByIP(getHostAddress());
 
 #ifndef _WIN32
 	// If mac is empty or resolution is not implemented
@@ -116,28 +134,28 @@ bool QnNetworkResource::conflicting()
 		return false;
 #endif
 	
-	if (mac!=m_mac)// someone else has this IP
+	if (mac!=m_macAddress.toString())// someone else has this IP
 	{
-		getStatus().setFlag(QnResourceStatus::CONFLICTING);
+		addNetworkStatus(QnNetworkResource::HasConflicts);
 		return true;
 	}
 
 	CLSleep::msleep(10);
 
 	CLPing ping;
-	if (!ping.ping(getIP().toString(), 2, ping_timeout)) // I do know know how else to solve this problem. but getMacByIP do not creates any ARP record 
+	if (!ping.ping(getHostAddress().toString(), 2, ping_timeout)) // I do not know how else to solve this problem. but getMacByIP do not creates any ARP record 
 	{
-		getStatus().setFlag(QnResourceStatus::CONFLICTING);
+		addNetworkStatus(QnNetworkResource::HasConflicts);
 		return true;
 	}
 
-	mac = getMacByIP(getIP(), false); // just in case if ARP response from some else have delayed 
+	mac = getMacByIP(getHostAddress(), false); // just in case if ARP response from some else have delayed 
 
     
 
-	if (mac!=m_mac && mac!="00-00-00-00-00-00")// someone else has this IP
+	if (mac!=m_macAddress.toString() && mac!="00-00-00-00-00-00")// someone else has this IP
 	{
-		getStatus().setFlag(QnResourceStatus::CONFLICTING);
+		addNetworkStatus(QnNetworkResource::HasConflicts);
 		return true;
 	}
 

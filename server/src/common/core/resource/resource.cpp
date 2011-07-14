@@ -9,7 +9,7 @@ QnResource::QnParamLists QnResource::static_resourcesParamLists; // list of all 
 
 
 QnResource::QnResource():
-m_deviceTypeFlags(0),
+m_typeFlags(0),
 m_avalable(true)
 {
 	++inst;	
@@ -23,11 +23,24 @@ QnResource::~QnResource()
 	cl_log.log("inst", inst, cl_logDEBUG1);
 };
 
+void QnResource::addFlag(unsigned long flag)
+{
+    QMutexLocker locker(&m_mutex);
+    m_typeFlags |= flag;
+}
+
+void QnResource::removeFlag(unsigned long flag)
+{
+    QMutexLocker locker(&m_mutex);
+    m_typeFlags &= (~flag);
+}
+
 bool QnResource::checkFlag(unsigned long flag) const
 {
     QMutexLocker locker(&m_mutex);
-    return m_deviceTypeFlags & flag;
+    return m_typeFlags & flag;
 }
+
 
 QnId QnResource::getId() const
 {

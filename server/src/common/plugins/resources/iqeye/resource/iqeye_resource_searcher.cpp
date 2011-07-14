@@ -66,7 +66,7 @@ QnResourceList IQEyeDeviceServer::findResources()
     foreach(Cam cam, mCams)
     {
         QnPlQEyeResourcePtr res ( new QnPlQEyeResource() );
-        res->setIP(QHostAddress(cam.ip), false);
+        res->setHostAddress(QHostAddress(cam.ip), false);
         res->setMAC(cam.mac);
         res->setId(res->getMAC());
         res->setName(cam.name);

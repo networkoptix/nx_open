@@ -25,10 +25,8 @@ class QnPlAreconVisionResource : public QnNetworkResource
 {
 public:
 
-	DeviceType getDeviceType() const
-	{
-		return VIDEODEVICE;
-	}
+    QnPlAreconVisionResource();
+
 
 	// return true if no error
 	virtual bool getParam(const QString& name, QnValue& val, bool resynch = false);
@@ -36,7 +34,7 @@ public:
 	// return true if no error
 	virtual bool setParam(const QString& name, const QnValue& val);
 
-	virtual bool setIP(const QHostAddress& ip, bool net = true);
+	virtual bool setHostAddress(const QHostAddress& ip, bool net = true);
 
 	bool getBasicInfo();
 
@@ -51,8 +49,8 @@ public:
 	QnStreamDataProvider* getDeviceStreamConnection();
 
 	//========
-	virtual bool unknownDevice() const;
-	virtual QnNetworkResourcePtr updateDevice();
+	virtual bool unknownResource() const;
+	virtual QnNetworkResourcePtr updateResource();
 	//========
 
 	virtual void onBeforeStart();

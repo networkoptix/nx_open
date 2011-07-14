@@ -39,7 +39,7 @@ void CLIQEyeH264treamreader::openStream()
     QnNetworkResource* ndev = static_cast<QnNetworkResource*>(m_device);
 
     QString url;
-    QTextStream(&url) << "rtsp://" << ndev->getIP().toString();
+    QTextStream(&url) << "rtsp://" << ndev->getHostAddress().toString();
 
     if (m_RtpSession.open(url))
     {

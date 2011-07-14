@@ -35,7 +35,7 @@ bool CLArecontSingleSensorDevice::getDescription()
 
 QnStreamDataProvider* CLArecontSingleSensorDevice::getDeviceStreamConnection()
 {
-	cl_log.log("Creating streamreader for ", getIP().toString(), cl_logDEBUG1);
+	cl_log.log("Creating streamreader for ", getHostAddress().toString(), cl_logDEBUG1);
 	return new AVClientPullSSTFTPStreamreader(this);
 }
 

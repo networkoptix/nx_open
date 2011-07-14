@@ -148,7 +148,7 @@ void CLAndroidStreamreader::openStream()
     QString request = "videofeed";
     QnNetworkResource* ndev = static_cast<QnNetworkResource*>(m_device);
 
-    mHttpClient = new CLSimpleHTTPClient(ndev->getIP(), 8080, 2000, ndev->getAuth());
+    mHttpClient = new CLSimpleHTTPClient(ndev->getHostAddress(), 8080, 2000, ndev->getAuth());
     mHttpClient->setRequestLine(request);
     mHttpClient->openStream();
 

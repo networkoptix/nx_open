@@ -96,7 +96,7 @@ QnResourceList CLDeviceSearcher::findNewDevices(bool& ip_finished)
 				if (existingResource->checkDeviceTypeFlag(QnResource::NETWORK))
 				{
 					QnNetworkResourcePtr existingResourceNet = existingResource.staticCast<QnNetworkResource>();
-					if (!m_netState.isInMachineSubnet(existingResourceNet->getIP())) // not the same network
+					if (!m_netState.isInMachineSubnet(existingResourceNet->getHostAddress())) // not the same network
 					{
 						//[-1-]
 						// we do changed ip address or subnet mask or even removed old nic interface and likely this resource has "lost connection status"
@@ -167,7 +167,7 @@ QnResourceList CLDeviceSearcher::findNewDevices(bool& ip_finished)
 	{
 		QnNetworkResourcePtr resource = res.staticCast<QnNetworkResource>();
 
-		if ((!resource->isAfterRouter()) && (!m_netState.isInMachineSubnet(resource->getIP()))) // not the same network
+		if ((!resource->isAfterRouter()) && (!m_netState.isInMachineSubnet(resource->getHostAddress()))) // not the same network
 			resource->getStatus().setFlag(QnResourceStatus::NOT_IN_SUBNET);
 	}
 
@@ -210,14 +210,14 @@ QnResourceList CLDeviceSearcher::findNewDevices(bool& ip_finished)
 		foreach(QnResourcePtr res, networkResources)
 		{
 			QnNetworkResourcePtr netResource = res.staticCast<QnNetworkResource>();
-			busy_list.insert(netResource->getIP().toIPv4Address());
+			busy_list.insert(netResource->getHostAddress().toIPv4Address());
 		}
 	}
 
 	foreach(QnResourcePtr res, resources)
 	{
 		QnNetworkResourcePtr netResource = res.staticCast<QnNetworkResource>();
-		busy_list.insert(netResource->getIP().toIPv4Address());
+		busy_list.insert(netResource->getHostAddress().toIPv4Address());
 	}
 
 	//======================================
@@ -254,7 +254,7 @@ END:
 
 	}
 
-	// ok. at this point resources contains only network resources. and some of them have unknownDevice==true;
+	// ok. at this point resources contains only network resources. and some of them have unknownResource==true;
 	// we need to resolve such resources 
 	if (resources.count())
 	{
@@ -290,7 +290,7 @@ void CLDeviceSearcher::resovle_conflicts(QnResourceList& resourceList, CLIPList&
 			break;
 		}
 
-		if (resource->setIP(subnet.currHostAddress, true))
+		if (resource->setHostAddress(subnet.currHostAddress, true))
 		{
 			resource->getStatus().removeFlag(QnResourceStatus::CONFLICTING);
 			resource->getStatus().removeFlag(QnResourceStatus::NOT_IN_SUBNET);
@@ -320,7 +320,7 @@ bool CLDeviceSearcher::checkObviousConflicts(QnResourceList& lst)
 		{
 			QnNetworkResource* resource = static_cast<QnNetworkResource*>(it.value());
 			if (resource->checkDeviceTypeFlag(QnResource::NETWORK))
-				ips[resource->getIP().toString()] = resource;
+				ips[resource->getHostAddress().toString()] = resource;
 
 			++it;
 		}
@@ -332,7 +332,7 @@ bool CLDeviceSearcher::checkObviousConflicts(QnResourceList& lst)
 	{
 		QnNetworkResource* resource = static_cast<QnNetworkResource*>(it.value());
 
-		QString ip = resource->getIP().toString();
+		QString ip = resource->getHostAddress().toString();
 		ip_it = ips.find(ip);
 
 		if (ip_it == ips.end())
@@ -442,7 +442,7 @@ QnResourceList CLDeviceSearcher::resolveUnknown_helper(QnResourceList& lst)
     {
 		QnNetworkResourcePtr resource = res.staticCast<QnNetworkResource>();
 
-		if (!resource->unknownDevice() || 
+		if (!resource->unknownResource() || 
 			resource->getStatus().checkFlag(QnResourceStatus::CONFLICTING) ||
 			resource->getStatus().checkFlag(QnResourceStatus::NOT_IN_SUBNET))
 		{
@@ -452,7 +452,7 @@ QnResourceList CLDeviceSearcher::resolveUnknown_helper(QnResourceList& lst)
 		}
 
 		// resource is unknown and not conflicting 
-		QnNetworkResourcePtr newResource = resource->updateDevice();
+		QnNetworkResourcePtr newResource = resource->updateResource();
 
 		if (newResource)
 		{

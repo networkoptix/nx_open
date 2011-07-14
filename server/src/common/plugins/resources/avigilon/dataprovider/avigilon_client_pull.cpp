@@ -21,7 +21,7 @@ QnAbstractMediaDataPacketPtr CLAvigilonStreamreader::getNextData()
     QString request = "media/still.jpg";
     QnNetworkResource* ndev = static_cast<QnNetworkResource*>(m_device);
 
-    CLSimpleHTTPClient http_client(ndev->getIP(), 80, 2000, ndev->getAuth());
+    CLSimpleHTTPClient http_client(ndev->getHostAddress(), 80, 2000, ndev->getAuth());
 
     http_client.setRequestLine(request);
     http_client.openStream();

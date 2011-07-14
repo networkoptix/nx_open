@@ -31,12 +31,12 @@ QnStreamDataProvider* QnPlQEyeResource::getDeviceStreamConnection()
         return new CLIQEyeMJPEGtreamreader(this);
 }
 
-bool QnPlQEyeResource::unknownDevice() const
+bool QnPlQEyeResource::unknownResource() const
 {
     return false;
 }
 
-QnNetworkResourcePtr QnPlQEyeResource::updateDevice()
+QnNetworkResourcePtr QnPlQEyeResource::updateResource()
 {
     return QnNetworkResourcePtr(0);
 }

@@ -1,20 +1,34 @@
-#ifndef ping_1750
-#define ping_1750
+#ifndef mac_address_h_2244
+#define mac_address_h_2244
 
-/**
-  * Max ICMP packet size
-  */
-#define CL_MAX_PING_PACKET 1024 
-
-class CLPing
+class QnMacAddress
 {
 public:
-	CLPing();
-	bool ping(const QString& ip, int retry, int timeoutPerRetry, int packetSize = 32);
+    QnMacAddress();
+    QnMacAddress(unsigned char* mac);
+    QnMacAddress(const QString& mac);
+    ~QnMacAddress();
+
+    QString toString() const;
+    const unsigned char* toBytes() const;
+
+    void setByte(int number, unsigned char val);
+    unsigned char getByte(int number) const;
+
+    QnMacAddress& operator = ( const QnMacAddress& other );
+    bool operator == ( const QnMacAddress& other ) const;
+    bool operator != ( const QnMacAddress& other ) const;
+    bool operator < ( const QnMacAddress& other ) const;
+    bool operator <= ( const QnMacAddress& other ) const;
+    bool operator > ( const QnMacAddress& other ) const;
+    bool operator >= ( const QnMacAddress& other ) const;
 
 private:
-	char m_icmpData[CL_MAX_PING_PACKET];
-	char m_receiveBuffer[CL_MAX_PING_PACKET];
+    unsigned char m_data[6];
+
+
 };
 
-#endif //ping_1750
+
+
+#endif //mac_address_h_2244

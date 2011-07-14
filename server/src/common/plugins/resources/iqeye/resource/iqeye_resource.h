@@ -12,14 +12,11 @@ public:
     QnPlQEyeResource();
     ~QnPlQEyeResource();
 
-    DeviceType getDeviceType() const;
-
     QString toString() const;
-
     QnStreamDataProvider* getDeviceStreamConnection();
 
-    virtual bool unknownDevice() const;
-    QnNetworkResourcePtr updateDevice();
+    virtual bool unknownResource() const;
+    QnNetworkResourcePtr updateResource();
 
 };
 

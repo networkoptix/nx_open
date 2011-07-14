@@ -5,8 +5,10 @@ struct CLSubNetState;
 
 typedef QSet<quint32> CLIPList;
 
-QString MACToString (unsigned char* mac);
+QString MACToString (const unsigned char* mac);
+
 unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress);
+
 
 // returns list of IPv4 addresses of current machine
 QList<QHostAddress> getAllIPv4Addresses();

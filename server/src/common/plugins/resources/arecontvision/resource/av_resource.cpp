@@ -10,12 +10,17 @@
 
 extern int ping_timeout;
 
+QnPlAreconVisionResource::QnPlAreconVisionResource()
+{
+
+}
+
 CLHttpStatus QnPlAreconVisionResource::getRegister(int page, int num, int& val)
 {
 	QString req;
 	QTextStream(&req) << "getreg?page=" << page << "&reg=" << num;
 
-	CLSimpleHTTPClient http(getIP(), 80,getHttpTimeout(), getAuth());
+	CLSimpleHTTPClient http(getHostAddress(), 80,getNetworkTimeout(), getAuth());
 	http.setRequestLine(req);
 
 	CLHttpStatus result = http.openStream();
@@ -47,12 +52,12 @@ QnStreamDataProvider* QnPlAreconVisionResource::getDeviceStreamConnection()
 	return 0;
 }
 
-bool QnPlAreconVisionResource::unknownDevice() const
+bool QnPlAreconVisionResource::unknownResource() const
 {
 	return (getModel()==AVUNKNOWN);
 }
 
-QnNetworkResourcePtr QnPlAreconVisionResource::updateDevice() 
+QnNetworkResourcePtr QnPlAreconVisionResource::updateResource() 
 {
 	QnValue model;
 	QnValue model_relase;
@@ -84,10 +89,10 @@ QnNetworkResourcePtr QnPlAreconVisionResource::updateDevice()
 	}
 
 	result->setName(model);
-	result->setIP(getIP(), false);
+	result->setHostAddress(getHostAddress(), false);
 	result->setMAC(getMAC());
 	result->setId(getMAC());
-	result->setLocalAddr(m_local_adssr);
+	result->setLocalHostAddress(m_localAddress);
 	result->setStatus(getStatus());
 
 	return result;
@@ -103,7 +108,7 @@ CLHttpStatus QnPlAreconVisionResource::setRegister(int page, int num, int val)
 	QString req;
 	QTextStream(&req) << "setreg?page=" << page << "&reg=" << num << "&val=" << val;
 
-	CLSimpleHTTPClient http(getIP(), 80,getHttpTimeout(), getAuth());
+	CLSimpleHTTPClient http(getHostAddress(), 80,getNetworkTimeout(), getAuth());
 	http.setRequestLine(req);
 
 	CLHttpStatus result = http.openStream();
@@ -183,7 +188,7 @@ bool QnPlAreconVisionResource::getParam(const QString& name, QnValue& val, bool 
 		//return false;
 	}
 
-	CLSimpleHTTPClient connection(getIP(), 80, getHttpTimeout(), getAuth());
+	CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
 
 	QString request;
 
@@ -249,7 +254,7 @@ bool QnPlAreconVisionResource::setParam(const QString& name, const QnValue& val 
 		return true;
 	}
 
-	CLSimpleHTTPClient connection(getIP(), 80, getHttpTimeout(), getAuth());
+	CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
 
 	QString request;
 
@@ -371,12 +376,12 @@ QnResourceList QnPlAreconVisionResource::findDevices()
 				if (resource==0)
 					continue;
 
-				resource->setIP(sender, false);
+				resource->setHostAddress(sender, false);
 				resource->setMAC(smac);
 				resource->setId(smac);
 
 				QnResourceStatus dh;
-				resource->setLocalAddr ( ipaddrs.at(i) );
+				resource->setLocalHostAddress ( ipaddrs.at(i) );
 				resource->setStatus(dh);
 
                 if (hasEqualResource(result, resource))
@@ -394,7 +399,7 @@ QnResourceList QnPlAreconVisionResource::findDevices()
 	return result;
 }
 
-bool QnPlAreconVisionResource::setIP(const QHostAddress& ip, bool net )
+bool QnPlAreconVisionResource::setHostAddress(const QHostAddress& ip, bool net )
 {
 	// this will work only in local networks ( camera must be able ti get broadcat from this ip);
 
@@ -402,8 +407,8 @@ bool QnPlAreconVisionResource::setIP(const QHostAddress& ip, bool net )
 	{
 		QUdpSocket sock;
 
-		sock.bind(m_local_adssr , 0); // address usesd to find cam
-		QString m_local_adssr_srt = m_local_adssr.toString(); // debug only
+		sock.bind(m_localAddress , 0); // address usesd to find cam
+		QString m_local_adssr_srt = m_localAddress.toString(); // debug only
 		QString new_ip_srt = ip.toString(); // debug only
 
 		QByteArray basic_str = "Arecont_Vision-AV2000\2";
@@ -421,7 +426,7 @@ bool QnPlAreconVisionResource::setIP(const QHostAddress& ip, bool net )
 		sock.writeDatagram(data, shift + 10,QHostAddress::Broadcast, 69);
 
 		removeARPrecord(ip);
-		removeARPrecord(getIP());
+		removeARPrecord(getHostAddress());
 
 		//
 		CLPing ping;
@@ -430,7 +435,7 @@ bool QnPlAreconVisionResource::setIP(const QHostAddress& ip, bool net )
 
 	}
 
-	return QnNetworkResource::setIP(ip);
+	return QnNetworkResource::setHostAddress(ip);
 }
 
 bool QnPlAreconVisionResource::loadDevicesParam(const QString& file_name, QString& error)

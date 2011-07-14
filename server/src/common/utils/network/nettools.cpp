@@ -5,6 +5,81 @@
 
 int ping_timeout = 100;
 
+
+QString MACToString (const unsigned char* mac)
+{
+    char t[4];
+
+    QString result;
+
+    for (int i = 0; i < 6; i++)
+    {
+        if (i<5)
+            sprintf (t, ("%02X-"), mac[i]);
+        else
+            sprintf (t, ("%02X"), mac[i]);
+
+        result+=t;
+    }
+
+    return result;
+}
+
+unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress)
+{
+
+    const char cSep = '-';
+    QByteArray arr = macs.toLatin1();
+    const char *pszMACAddress = arr.data();
+
+    for (int iConunter = 0; iConunter < 6; ++iConunter)
+    {
+        unsigned int iNumber = 0;
+        char ch;
+
+        //Convert letter into lower case.
+        ch = tolower (*pszMACAddress++);
+
+        if ((ch < '0' || ch > '9') && (ch < 'a' || ch > 'f'))
+        {
+            return 0;
+        }
+
+        //Convert into number. 
+        //       a. If character is digit then ch - '0'
+        //	b. else (ch - 'a' + 10) it is done 
+        //	because addition of 10 takes correct value.
+        iNumber = isdigit (ch) ? (ch - '0') : (ch - 'a' + 10);
+        ch = tolower (*pszMACAddress);
+
+        if ((iConunter < 5 && ch != cSep) || 
+            (iConunter == 5 && ch != '\0' && !isspace (ch)))
+        {
+            ++pszMACAddress;
+
+            if ((ch < '0' || ch > '9') && (ch < 'a' || ch > 'f'))
+            {
+                return 0;
+            }
+
+            iNumber <<= 4;
+            iNumber += isdigit (ch) ? (ch - '0') : (ch - 'a' + 10);
+            ch = *pszMACAddress;
+
+            if (iConunter < 5 && ch != cSep)
+            {
+                return 0;
+            }
+        }
+        /* Store result.  */
+        pbyAddress[iConunter] = (unsigned char) iNumber;
+        /* Skip cSep.  */
+        ++pszMACAddress;
+    }
+    return pbyAddress;
+}
+
+
 QList<QHostAddress> getAllIPv4Addresses()
 {
 	QList<QHostAddress> ipaddrs = QNetworkInterface::allAddresses();
@@ -19,78 +94,6 @@ QList<QHostAddress> getAllIPv4Addresses()
 	return result;
 }
 
-QString MACToString (unsigned char* mac)
-{
-	char t[4];
-
-	QString result;
-
-	for (int i = 0; i < 6; i++)
-	{
-		if (i<5)
-			sprintf (t, ("%02X-"), mac[i]);
-		else
-			sprintf (t, ("%02X"), mac[i]);
-
-		result+=t;
-	}
-
-	return result;
-}
-
-unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress)
-{
-
-	const char cSep = '-';
-	QByteArray arr = macs.toLatin1();
-	const char *pszMACAddress = arr.data();
-
-	for (int iConunter = 0; iConunter < 6; ++iConunter)
-	{
-		unsigned int iNumber = 0;
-		char ch;
-
-		//Convert letter into lower case.
-		ch = tolower (*pszMACAddress++);
-
-		if ((ch < '0' || ch > '9') && (ch < 'a' || ch > 'f'))
-		{
-			return 0;
-		}
-
-		//Convert into number. 
-		//       a. If character is digit then ch - '0'
-		//	b. else (ch - 'a' + 10) it is done 
-		//	because addition of 10 takes correct value.
-		iNumber = isdigit (ch) ? (ch - '0') : (ch - 'a' + 10);
-		ch = tolower (*pszMACAddress);
-
-		if ((iConunter < 5 && ch != cSep) || 
-			(iConunter == 5 && ch != '\0' && !isspace (ch)))
-		{
-			++pszMACAddress;
-
-			if ((ch < '0' || ch > '9') && (ch < 'a' || ch > 'f'))
-			{
-				return NULL;
-			}
-
-			iNumber <<= 4;
-			iNumber += isdigit (ch) ? (ch - '0') : (ch - 'a' + 10);
-			ch = *pszMACAddress;
-
-			if (iConunter < 5 && ch != cSep)
-			{
-				return NULL;
-			}
-		}
-		/* Store result.  */
-		pbyAddress[iConunter] = (unsigned char) iNumber;
-		/* Skip cSep.  */
-		++pszMACAddress;
-	}
-	return pbyAddress;
-}
 
 QList<QNetworkAddressEntry> getAllIPv4AddressEntries()
 {

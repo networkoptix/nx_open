@@ -30,8 +30,10 @@ public:
         network = 0x01, // resource has ip and mac 
         url = 0x02,  // has url, like file name
         streamprovider = 0x04,
-        media = 0x08, // video audio 
-        playback = 0x10 // something playable ( not real time and not a single shot)
+        media = 0x08, 
+        playback = 0x10, // something playable ( not real time and not a single shot)
+        video = 0x20,
+        audio = 0x40
     };
 
 	QnResource();
@@ -41,6 +43,8 @@ public:
     virtual bool equalsTo(const QnResourcePtr other) const = 0;
 
     // flags like network media and so on
+    void addFlag(unsigned long flag);
+    void removeFlag(unsigned long flag);
 	bool checkFlag(unsigned long flag) const;
 
     QnId getId() const;
@@ -83,7 +87,7 @@ public:
 
 	// gets resource basic info; may be firmware version or so 
     // return false if not accessible 
-	virtual bool getBasicInfo(){return true;};
+	virtual bool getBasicInfo() = 0;
 
 	QnParamList& getResourceParamList();// returns params that can be changed on device level
 	const QnParamList& getResourceParamList() const;
@@ -114,7 +118,7 @@ protected:
 protected:
     mutable QMutex m_mutex; // resource mutex for everything 
 
-    unsigned long m_deviceTypeFlags;
+    unsigned long m_typeFlags;
 
     QString m_name; // this device model like AV2105 or AV2155dn 
 

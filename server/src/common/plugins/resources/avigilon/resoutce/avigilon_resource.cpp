@@ -28,12 +28,12 @@ QnStreamDataProvider* QnPlAvigilonResource::getDeviceStreamConnection()
     return new CLAvigilonStreamreader(this);
 }
 
-bool QnPlAvigilonResource::unknownDevice() const
+bool QnPlAvigilonResource::unknownResource() const
 {
     return false;
 }
 
-QnNetworkResourcePtr QnPlAvigilonResource::updateDevice()
+QnNetworkResourcePtr QnPlAvigilonResource::updateResource()
 {
     return QnNetworkResourcePtr(0);
 }

@@ -120,7 +120,7 @@ QnAbstractMediaDataPacketPtr AVClientPullSSHTTPStreamreader::getNextData()
 			forecast_size = resolutionFULL ? (width*height)/2  : (width*height)/4; // 0.5 meg per megapixel; to avoid mem realock
 	}
 
-	CLSimpleHTTPClient http_client((static_cast<QnPlAreconVisionResource*>(m_device))->getIP(), m_port, m_timeout, m_auth);
+	CLSimpleHTTPClient http_client((static_cast<QnPlAreconVisionResource*>(m_device))->getHostAddress(), m_port, m_timeout, m_auth);
 
 	http_client.setRequestLine(request);
 	http_client.openStream();

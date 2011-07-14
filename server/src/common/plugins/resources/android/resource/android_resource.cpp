@@ -28,12 +28,12 @@ QnStreamDataProvider* QnPlANdroidResource::getDeviceStreamConnection()
     return new CLAndroidStreamreader(this);
 }
 
-bool QnPlANdroidResource::unknownDevice() const
+bool QnPlANdroidResource::unknownResource() const
 {
     return false;
 }
 
-QnNetworkResourcePtr QnPlANdroidResource::updateDevice()
+QnNetworkResourcePtr QnPlANdroidResource::updateResource()
 {
     return QnNetworkResourcePtr(0);
 }
