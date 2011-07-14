@@ -34,7 +34,8 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_isRealTimeSource(true),
       m_videoBufferOverflow(false),
       m_singleShotMode(false),
-      m_singleShotQuantProcessed(false)
+      m_singleShotQuantProcessed(false),
+      m_jumpTime(0)
 {
 	for (int i = 0; i< CL_MAX_CHANNELS; ++i)
 		m_display[i] = 0;
@@ -146,8 +147,9 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
 	vd->releaseRef();
 }
 
-void CLCamDisplay::jump()
+void CLCamDisplay::jump(qint64 time)
 {
+    m_jumpTime = time;
     m_afterJump = true;
     clearUnprocessedData();
     m_singleShotMode = false;
@@ -186,10 +188,14 @@ bool CLCamDisplay::processData(CLAbstractData* data)
 
     if (m_afterJump)
     {
-        m_afterJump = false;
+        qint64 ts = vd? vd->timestamp : ad->timestamp;
+        // Some clips has very low key frame rate. This condition protect audio buffer overflowing and improve seeking for such clips
+        if (ts < m_jumpTime - AUDIO_BUFF_SIZE/2*1000)
+            return true; // skip packet
 
+        m_afterJump = false;
         // clear everything we can
-        afterJump(vd? vd->timestamp : ad->timestamp);
+        afterJump(ts);
     }
 
 	if (ad)

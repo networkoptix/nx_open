@@ -29,7 +29,7 @@ public:
     virtual void beforestopDispay();
 
     // this function must be called if stream was interupted or so; to synch audio and video again 
-    void streamJump();
+    void streamJump(qint64 time);
 
     void setLightCPUMode(bool val);
     void copyImage(bool copy);

@@ -37,7 +37,7 @@ public:
     // schedule to clean up buffers all; 
     // schedule - coz I do not want to introduce mutexes
     //I assume that first incoming frame after jump is keyframe
-    void jump(); 
+    void jump(qint64 time); 
 
 	quint64 currentTime() const { return m_previousVideoDisplayedTime; }
 
@@ -109,6 +109,7 @@ private:
     bool m_videoBufferOverflow;
     bool m_singleShotMode;
     bool m_singleShotQuantProcessed;
+    qint64 m_jumpTime;
 
 };
 
