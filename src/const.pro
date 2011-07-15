@@ -70,7 +70,7 @@ win32 {
   compiler.depends=\$(IntDir)${QMAKE_FILE_BASE}.obj
   asm_compiler.variable_out = OBJECTS
   QMAKE_EXTRA_COMPILERS += asm_compiler
-  LIBS += d3d9.lib d3dx9.lib
+  LIBS += d3d9.lib d3dx9.lib dwmapi.lib
 }
 
 mac {

@@ -8,6 +8,12 @@ extern "C" {
 #include "base/colorspace_convert/colorspace.h"
 #include "base/log.h"
 
+#include <Dwmapi.h>
+
+QMutex CLScreenGrapper::m_instanceMutex;
+int CLScreenGrapper::m_instanceCounter;
+
+
 CLScreenGrapper::CLScreenGrapper(int displayNumber, int poolSize): 
     m_pD3D(0), 
     m_pd3dDevice(0), 
@@ -17,7 +23,15 @@ CLScreenGrapper::CLScreenGrapper(int displayNumber, int poolSize):
 {
     m_pSurface.resize(poolSize+1);
     memset(&m_rect, 0, sizeof(m_rect));
+
+    {
+        QMutexLocker locker(&m_instanceMutex);
+        m_instanceCounter++;
+        if (m_instanceCounter == 1)
+            DwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
+    }
     m_initialized = InitD3D(GetDesktopWindow());
+    m_timer.start();
 }
 
 CLScreenGrapper::~CLScreenGrapper()
@@ -40,6 +54,10 @@ CLScreenGrapper::~CLScreenGrapper()
         m_pD3D->Release();
         m_pD3D=NULL;
     }
+    QMutexLocker locker(&m_instanceMutex);
+    m_instanceCounter--;
+    if (m_instanceCounter == 0)
+        DwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
 }
 
 HRESULT	CLScreenGrapper::InitD3D(HWND hWnd)
@@ -86,7 +104,7 @@ HRESULT	CLScreenGrapper::InitD3D(HWND hWnd)
             return E_FAIL;
         }
     }
-    m_timer.start();
+    
     return S_OK;
 };
 

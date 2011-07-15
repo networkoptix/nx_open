@@ -37,6 +37,9 @@ private:
     QTime m_timer;
     unsigned m_frameNum;
     int m_currentIndex;
+
+    static QMutex m_instanceMutex;
+    static int m_instanceCounter;
 };
 
 #endif
