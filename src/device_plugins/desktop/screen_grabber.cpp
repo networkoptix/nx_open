@@ -5,7 +5,7 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 }
 
-#include "base/color_convert/colorspace.h"
+#include "base/colorspace_convert/colorspace.h"
 #include "base/log.h"
 
 CLScreenGrapper::CLScreenGrapper(int displayNumber, int poolSize): 
