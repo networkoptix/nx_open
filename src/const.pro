@@ -70,7 +70,8 @@ win32 {
   compiler.depends=\$(IntDir)${QMAKE_FILE_BASE}.obj
   asm_compiler.variable_out = OBJECTS
   QMAKE_EXTRA_COMPILERS += asm_compiler
-}  
+  LIBS += d3d9.lib d3dx9.lib
+}
 
 mac {
   LIBS += -framework SystemConfiguration
@@ -81,4 +82,3 @@ mac {
   QMAKE_LFLAGS_RELEASE += -L$$FFMPEG-release/lib
   QMAKE_POST_LINK += mkdir -p `dirname $(TARGET)`/arecontvision; cp -f ../bin/arecontvision/devices.xml `dirname $(TARGET)`/arecontvision
 }
-
