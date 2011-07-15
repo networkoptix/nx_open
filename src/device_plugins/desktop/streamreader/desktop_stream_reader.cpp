@@ -42,7 +42,6 @@ CLDesktopStreamreader::CLDesktopStreamreader(CLDevice* dev):
 CLDesktopStreamreader::~CLDesktopStreamreader()
 {
     closeStream();
-    av_free(m_videoBuf);
 }
 
 bool CLDesktopStreamreader::init()
@@ -84,9 +83,6 @@ bool CLDesktopStreamreader::init()
     m_videoCodecCtx->mb_lmin = m_videoCodecCtx->lmin = m_videoCodecCtx->qmin * FF_QP2LAMBDA;
     m_videoCodecCtx->mb_lmax = m_videoCodecCtx->lmax = m_videoCodecCtx->qmax * FF_QP2LAMBDA;
     m_videoCodecCtx->flags |= CODEC_FLAG_QSCALE;
-    //m_videoCodecCtx->coded_frame = avcodec_alloc_frame();
-    //avpicture_alloc((AVPicture*) m_videoCodecCtx->coded_frame, m_grabber->format(), m_grabber->width(), m_grabber->height() );
-
 
     if (avcodec_open(m_videoCodecCtx, codec) < 0)
     {
@@ -135,8 +131,16 @@ void CLDesktopStreamreader::closeStream()
 {
     delete m_grabber;
     m_grabber = 0;
-    avcodec_close(m_videoCodecCtx);
+    if (m_videoCodecCtx)
+        avcodec_close(m_videoCodecCtx);
     m_videoCodecCtx = 0;
+    if (m_frame)
+        av_free(m_frame);
+    m_frame = 0;
+    if (m_videoBuf)
+        av_free(m_videoBuf);
+    m_videoBuf = 0;
+
     m_initialized = false;
 }
 

@@ -15,6 +15,7 @@ CLBufferedScreenGrabber::CLBufferedScreenGrabber(int displayNumber, int queueSiz
 
 CLBufferedScreenGrabber::~CLBufferedScreenGrabber()
 {
+    m_needStop = true;
     wait();
 }
 
@@ -22,11 +23,13 @@ void CLBufferedScreenGrabber::run()
 {
     while (!m_needStop)
     {
-        if (m_queue.size() == m_queue.maxSize())
+        if (!m_needStop && m_queue.size() == m_queue.maxSize())
         {
             msleep(1);
             continue;
         }
+        if (m_needStop)
+            break;
         AVFrame* curFrame = m_frames[m_frameIndex];
         m_frameIndex = m_frameIndex < m_frames.size()-1 ? m_frameIndex+1 : 0;
         m_queue.push(m_grabber.captureFrame());
