@@ -24,7 +24,7 @@ void QnServerPushDataProvider::run()
 
 	while(!needToStop())
 	{
-		pauseDelay(); // pause if needed;
+		pauseIfNeeded(); // pause if needed;
 		if (needToStop()) // extra check after pause
 			break;
 
@@ -33,7 +33,7 @@ void QnServerPushDataProvider::run()
             openStream();
             if (!isStreamOpened())
             {
-                CLSleep::msleep(20); // to avoid large CPU usage
+                QnSleep::msleep(20); // to avoid large CPU usage
 
                 setNeedKeyData();
                 frames_lost++;

@@ -33,7 +33,7 @@ void QnAbstractDataConsumer::run()
 	const int timeoutMs = 100;
 	while(!needToStop())
 	{
-		pauseDelay();
+		pauseIfNeeded();
 
 		QnAbstractDataPacketPtr data;
 		bool get = m_dataQueue.pop(data, 200);
@@ -41,7 +41,7 @@ void QnAbstractDataConsumer::run()
 		if (!get)
 		{
 			CL_LOG(cl_logDEBUG2) cl_log.log("queue is empty ", (int)(long)(&m_dataQueue),cl_logDEBUG2);
-			CLSleep::msleep(10);
+			QnSleep::msleep(10);
 			continue;
 		}
 

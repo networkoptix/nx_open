@@ -308,7 +308,7 @@ QnResourceList QnPlAreconVisionResource::findDevices()
 			sock.writeDatagram(datagram.data(), datagram.size(),QHostAddress::Broadcast, 69);
 
 			if (r!=CL_BROAD_CAST_RETRY-1)
-				CLSleep::msleep(5);
+				QnSleep::msleep(5);
 
 		}
 
@@ -390,7 +390,7 @@ QnResourceList QnPlAreconVisionResource::findDevices()
 				result.push_back(resource);
 			}
 
-			CLSleep::msleep(2); // to avoid 100% cpu usage
+			QnSleep::msleep(2); // to avoid 100% cpu usage
 
 		}
 

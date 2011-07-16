@@ -57,7 +57,7 @@ public:
 		m_semaphore.release();
 	}
 
-	void pauseDelay()
+	void pauseIfNeeded()
 	{
 		while(m_onPause && !needToStop())
 			m_semaphore.tryAcquire(1,50);

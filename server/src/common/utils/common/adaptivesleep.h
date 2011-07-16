@@ -46,7 +46,7 @@ public:
 			return;
 		}
 
-		CLSleep::msleep(havetowait/1000);
+		QnSleep::msleep(havetowait/1000);
 
 	}
 

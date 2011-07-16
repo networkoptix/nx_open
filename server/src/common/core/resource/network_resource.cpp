@@ -140,7 +140,7 @@ bool QnNetworkResource::conflicting()
 		return true;
 	}
 
-	CLSleep::msleep(10);
+	QnSleep::msleep(10);
 
 	CLPing ping;
 	if (!ping.ping(getHostAddress().toString(), 2, ping_timeout)) // I do not know how else to solve this problem. but getMacByIP do not creates any ARP record 

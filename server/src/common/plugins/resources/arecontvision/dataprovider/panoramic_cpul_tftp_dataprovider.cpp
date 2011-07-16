@@ -260,7 +260,7 @@ QnAbstractMediaDataPacketPtr AVPanoramicClientPullSSTFTPStreamreader::getNextDat
 
 bool AVPanoramicClientPullSSTFTPStreamreader::needKeyData() const
 {
-	for (int i = 0; i < m_channel_number; ++i)
+	for (int i = 0; i < m_NumaberOfVideoChannels; ++i)
 		if (m_gotKeyFrame[i]<2)  // due to bug of AV panoramic H.264 cam. cam do not send frame with diff resolution of resolution changed. first I frame comes with old resolution
 			return true;
 

@@ -1,7 +1,7 @@
 #ifndef cl_sleep_100
 #define cl_sleep_100
 
-class CLSleep : public QThread
+class QnSleep : public QThread
 {
 public:
 

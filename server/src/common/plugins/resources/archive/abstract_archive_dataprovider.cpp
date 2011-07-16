@@ -61,7 +61,7 @@ void QnPlAbstractArchiveProvider::jumpTo(quint64 mksec, bool makeshot)
 
     nextFrame();
 
-	for (int channel = 0; channel  < m_channel_number; ++channel)
+	for (int channel = 0; channel  < m_NumaberOfVideoChannels; ++channel)
 		channeljumpTo(mksec, channel);
 
 	m_useTwice = true;
