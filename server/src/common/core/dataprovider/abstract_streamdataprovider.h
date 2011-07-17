@@ -1,5 +1,5 @@
-#ifndef stream_reader_514
-#define stream_reader_514
+#ifndef QnAbstractStreamDataProvider_514
+#define QnAbstractStreamDataProvider_514
 
 #include "common/longrunnable.h"
 #include "datapacket/datapacket.h"
@@ -33,8 +33,11 @@ protected:
 
     virtual QnAbstractDataPacketPtr getNextData() = 0;
 
-    virtual void beforeGetData() = 0;
-    virtual void afterGetData(QnAbstractDataPacketPtr data) = 0;
+    // if function returns false we do not call getNextData
+    virtual bool beforeGetData() = 0;
+
+    // if function returns false we do not put result into the queues
+    virtual bool afterGetData(QnAbstractDataPacketPtr data) = 0;
 
     virtual void beforeRun() = 0;
     virtual void afterRun() = 0;
@@ -48,4 +51,4 @@ protected:
     qreal m_dataRate;
 };
 
-#endif //stream_reader_514
+#endif //QnAbstractStreamDataProvider_514

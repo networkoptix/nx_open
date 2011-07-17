@@ -1,15 +1,19 @@
-#ifndef device_h_1051
-#define device_h_1051
+#ifndef resource_h_1051
+#define resource_h_1051
 
 
 #include "resource_param.h"
 #include "datapacket/datapacket.h"
-#include "resourcecontrol/resource_command_consumer.h"
 #include "id.h"
 
 
 class QnResourceCommand;
 class QnResourceConsumer;
+
+class QnResource;
+typedef QSharedPointer<QnResource> QnResourcePtr;
+typedef QList<QnResourcePtr> QnResourceList;
+
 
 enum QnDomain
 {
@@ -52,6 +56,10 @@ public:
 
 	void setParentId(const QnId& parent);
 	QnId getParentId() const;
+
+    // this value is updated by discovery process
+    QDateTime getLastDiscoveredTime() const;
+    void setLastDiscoveredTime(QDateTime time);
 
     // if resource physically removed from system - becomes unavailable 
     // we even do not need to try setparam or so 
@@ -103,17 +111,14 @@ signals:
     void onParametrChanged(QString paramname, QString value);
 
 public:
-	static void startCommandProc() {static_commandProc.start();};
-	static void stopCommandProc() {static_commandProc.stop();};
-    static void addCommandToProc(QnAbstractDataPacketPtr data) {static_commandProc.putData(data);};
-	static int commandProcQueSize() {return static_commandProc.queueSize();}
-	static bool commandProcHasSuchResourceInQueue(QnResourcePtr res) {return static_commandProc.hasSuchResourceInQueue(res);}
+	static void startCommandProc();
+	static void stopCommandProc();
+    static void addCommandToProc(QnAbstractDataPacketPtr data);
+	static int commandProcQueSize();
+    static bool commandProcHasSuchResourceInQueue(QnResourcePtr res);
 protected:
 	typedef QMap<QString, QnParamList > QnParamLists;
 	static QnParamLists static_resourcesParamLists; // list of all supported resources params list
-
-	// this is thread to process commands like setparam
-	static QnResourceCommandProcessor static_commandProc;
 
 protected:
     mutable QMutex m_mutex; // resource mutex for everything 
@@ -130,6 +135,9 @@ private:
     QStringList m_tags;
     bool m_avalable;
 
+    QDateTime m_lastDiscoveredTime;
+
+
     mutable QMutex m_consumersMtx; 
     QSet<QnResourceConsumer*> m_consumers;
 };
@@ -139,4 +147,4 @@ private:
 bool hasEqualResource(const QnResourceList& lst, const QnResourcePtr res);
 void getResourcesBasicInfo(QnResourceList& lst, int threads);
 
-#endif
+#endif //resource_h_1051

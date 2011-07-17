@@ -86,10 +86,12 @@ void QnAbstractStreamDataProvider::run()
     while(!needToStop())
     {
         pauseIfNeeded(); // pause if needed;
+
         if (needToStop()) // extra check after pause
             break;
 
         sleepIfNeeded();
+
         if (needToStop()) // extra check after pause
             break;
 
@@ -100,11 +102,13 @@ void QnAbstractStreamDataProvider::run()
             continue;
         }
 
-        beforeGetData();
+        if (!beforeGetData())
+            continue;
 
         QnAbstractDataPacketPtr data (getNextData());
 
-        afterGetData(data);
+        if (!afterGetData(data))
+            continue;
 
         if (data)
             putData(data); // data can be accepted anyway

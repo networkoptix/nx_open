@@ -1,9 +1,16 @@
 #include "resource.h"
 #include "video_resource_layout.h"
+#include "resourcecontrol/resource_command_consumer.h"
 
 static int inst = 0;
 
-QnResourceCommandProcessor QnResource::static_commandProc;
+QnResourceCommandProcessor& commendProcessor()
+{ 
+    static QnResourceCommandProcessor inst;
+    return inst;
+}
+
+
 
 QnResource::QnParamLists QnResource::static_resourcesParamLists; // list of all supported devices params list
 
@@ -65,6 +72,19 @@ QnId QnResource::getParentId() const
     QMutexLocker locker(&m_mutex);
     return m_parentId;
 }
+
+QDateTime QnResource::getLastDiscoveredTime() const
+{
+    QMutexLocker locker(&m_mutex);
+    return m_lastDiscoveredTime;
+}
+
+void QnResource::setLastDiscoveredTime(QDateTime time)
+{
+    QMutexLocker locker(&m_mutex);
+    m_lastDiscoveredTime = time;
+}
+
 
 bool QnResource::available() const
 {
@@ -186,7 +206,7 @@ void QnResource::setParamAsynch(const QString& name, const QnValue& val, QnDomai
     typedef QSharedPointer<QnResourceSetParamCommand> QnResourceSetParamCommandPtr;
 
     QnResourceSetParamCommandPtr command ( new QnResourceSetParamCommand(QnResourcePtr(this), name, val, domain) );
-    static_commandProc.putData(command);
+    commendProcessor().putData(command);
 
 }
 
@@ -248,7 +268,35 @@ void QnResource::disconnectAllConsumers()
 
     m_consumers.clear();
 }
+//========================================================================================
+// static 
 
+void QnResource::startCommandProc() 
+{
+    commendProcessor().start();
+};
+
+void QnResource::stopCommandProc() 
+{
+    commendProcessor().stop();
+};
+
+void QnResource::addCommandToProc(QnAbstractDataPacketPtr data) 
+{
+    commendProcessor().putData(data);
+};
+
+int QnResource::commandProcQueSize() 
+{
+    return commendProcessor().queueSize();
+}
+
+bool QnResource::commandProcHasSuchResourceInQueue(QnResourcePtr res) 
+{
+    return commendProcessor().hasSuchResourceInQueue(res);
+}
+
+//========================================================================================
 
 struct ResourcesBasicInfoHelper
 {

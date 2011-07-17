@@ -1,4 +1,3 @@
-#include "resource.h"
 #include "resource_consumer.h"
 
 
@@ -20,7 +19,7 @@ QnResourcePtr QnResourceConsumer::getResource() const
 
 bool QnResourceConsumer::isConnectedToTheResource() const
 {
-    return m_resource->hasSuchConsumer(this);
+    return m_resource->hasSuchConsumer(const_cast<QnResourceConsumer*>(this));
 }
 
 void QnResourceConsumer::beforeDisconnectFromResource()

@@ -1,9 +1,7 @@
 #ifndef resource_consumer_h_1921
 #define resource_consumer_h_1921
 
-class QnResource;
-typedef QSharedPointer<QnResource> QnResourcePtr;
-typedef QList<QnResourcePtr> QnResourceList;
+#include "resource.h"
 
 class QnResourceConsumer
 {

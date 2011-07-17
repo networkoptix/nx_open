@@ -1,10 +1,10 @@
-#ifndef CLDeveceCommandProcessor_h_1207
-#define CLDeveceCommandProcessor_h_1207
+#ifndef resource_commendprocessor_h_2221
+#define resource_commendprocessor_h_2221
 
 #include "datapacket/datapacket.h"
 #include "dataconsumer/dataconsumer.h"
-#include "resource/resource_consumer.h"
 #include "resource/id.h"
+#include "resource/resource_consumer.h"
 
 
 class QnResourceCommand : public QnAbstractDataPacket, public QnResourceConsumer
@@ -41,4 +41,4 @@ private:
 	
 };
 
-#endif //CLDeveceCommandProcessor_h_1207
+#endif //resource_commendprocessor_h_2221

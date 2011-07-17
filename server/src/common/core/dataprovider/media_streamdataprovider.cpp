@@ -1,6 +1,5 @@
-#include "resource/resource.h"
-#include "streamdataprovider.h"
-#include "resource/video_resource_layout.h"
+#include "media_streamdataprovider.h"
+
 
 
 QnMediaStreamDataProvider::QnMediaStreamDataProvider(QnResourcePtr res):
@@ -9,7 +8,7 @@ m_qulity(CLSLowest)
 
 {
 	memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame));
-	m_NumaberOfVideoChannels = 0;//dev->getVideoLayout()->numberOfChannels();
+	m_NumaberOfVideoChannels = 0;//dev->getVideoLayout()->numberOfChannels(); //todo
 
 }
 
@@ -34,17 +33,20 @@ QnMediaStreamDataProvider::StreamQuality QnMediaStreamDataProvider::getQuality()
 
 void QnMediaStreamDataProvider::setNeedKeyData()
 {
+    QMutexLocker mtx(&m_mtx);
 	for (int i = 0; i < m_NumaberOfVideoChannels; ++i)
 		m_gotKeyFrame[i] = 0;
 }
 
 bool QnMediaStreamDataProvider::needKeyData(int channel) const
 {
+    QMutexLocker mtx(&m_mtx);
 	return m_gotKeyFrame[channel]==0;
 }
 
 bool QnMediaStreamDataProvider::needKeyData() const
 {
+    QMutexLocker mtx(&m_mtx);
 	for (int i = 0; i < m_NumaberOfVideoChannels; ++i)
 		if (m_gotKeyFrame[i]==0)
 			return true;
