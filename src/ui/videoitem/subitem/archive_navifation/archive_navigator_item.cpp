@@ -410,7 +410,7 @@ void CLArchiveNavigatorItem::onSliderMoved(int val)
     else
         m_reader->jumpToPreviousFrame(time, true);
 
-    m_videoCamera->streamJump();
+    m_videoCamera->streamJump(time);
 }
 
 void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
@@ -454,13 +454,14 @@ void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
 
 	case RewindBackwardSubItem:
         m_reader->jumpTo(0, true);
-        m_videoCamera->streamJump();
+        m_videoCamera->streamJump(0);
         m_reader->resumeDataProcessors();
 		break;
 
 	case RewindForwardSubItem:
+        curr_time = m_videoCamera->currentTime();
         m_reader->jumpTo(m_reader->lengthMksec(), true);
-        m_videoCamera->streamJump();
+        m_videoCamera->streamJump(m_reader->lengthMksec()); 
         m_reader->resumeDataProcessors();
 		break;
 
@@ -481,7 +482,7 @@ void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
                 m_videoCamera->getCamCamDisplay()->playAudio(false);
 
             m_reader->previousFrame(curr_time);
-            m_videoCamera->streamJump();
+            m_videoCamera->streamJump(curr_time);
             m_videoCamera->getCamCamDisplay()->setSingleShotMode(false);
             //m_reader->resumeDataProcessors();
         }

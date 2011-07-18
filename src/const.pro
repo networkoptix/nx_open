@@ -56,9 +56,22 @@ win32 {
   QMAKE_LFLAGS += avcodec-53.lib avdevice-53.lib avfilter-2.lib avformat-53.lib avutil-51.lib swscale-0.lib
   QMAKE_LFLAGS_DEBUG += /libpath:$$FFMPEG-debug/bin
   QMAKE_LFLAGS_RELEASE += /libpath:$$FFMPEG-release/bin
-  
+
   LIBS += ../contrib/openal/bin/win32/OpenAL32.lib
-}  
+
+  asm_sources = base/colorspace_convert/colorspace_rgb_mmx.asm
+  SOURCES += $$asm_sources base/colorspace_convert/colorspace.c
+  DEFINES += ARCH_IS_32BIT ARCH_IS_IA32
+
+  asm_compiler.commands = ..\\contrib\\nasm.exe -f win32 -DWINDOWS ${QMAKE_FILE_IN} -o \$(IntDir)${QMAKE_FILE_BASE}.obj -I$$PWD/
+  asm_compiler.input = asm_sources
+  asm_compiler.output = \$(IntDir)${QMAKE_FILE_BASE}.obj
+  asm_compiler.CONFIG = explicit_dependencies
+  compiler.depends=\$(IntDir)${QMAKE_FILE_BASE}.obj
+  asm_compiler.variable_out = OBJECTS
+  QMAKE_EXTRA_COMPILERS += asm_compiler
+  LIBS += d3d9.lib d3dx9.lib dwmapi.lib
+}
 
 mac {
   LIBS += -framework SystemConfiguration
@@ -69,4 +82,3 @@ mac {
   QMAKE_LFLAGS_RELEASE += -L$$FFMPEG-release/lib
   QMAKE_POST_LINK += mkdir -p `dirname $(TARGET)`/arecontvision; cp -f ../bin/arecontvision/devices.xml `dirname $(TARGET)`/arecontvision
 }
-
