@@ -23,6 +23,11 @@ VideoRecordingDialog::~VideoRecordingDialog()
     delete ui;
 }
 
+QString VideoRecordingDialog::filePath() const
+{
+    return ui->fileLineEdit->text();
+}
+
 VideoRecordingDialog::CaptureMode VideoRecordingDialog::captureMode() const
 {
     if (ui->fullscreenButton->isChecked())
@@ -59,7 +64,7 @@ void VideoRecordingDialog::onStartRecordingPressed()
     QString path = ui->fileLineEdit->text();
 
     if (path.isEmpty()) {
-        QMessageBox::information(this, tr("Wrong file name"), tr("File name can't be empty"));
+        QMessageBox::warning(this, tr("Wrong file name"), tr("File name can't be empty"));
         return;
     }
 

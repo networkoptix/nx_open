@@ -22,6 +22,8 @@ public:
     Q_ENUMS(DecoderQuality)
     Q_ENUMS(Resolution)
 
+    QString filePath() const;
+
     CaptureMode captureMode() const;
     DecoderQuality decoderQuality() const;
     Resolution resolution() const;
