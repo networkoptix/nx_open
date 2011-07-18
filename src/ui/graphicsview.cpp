@@ -1358,9 +1358,9 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
 
     }
-	else
-	{
-		// on void menu...
+    else
+    {
+        // on void menu...
         if (m_camLayout.getContent() != CLSceneLayoutManager::instance().startScreenLayoutContent())
         {
             menu.addAction(&cm_start_video_recording);
@@ -1405,14 +1405,15 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
             menu.addMenu(&distance_menu);
         }
         
-		menu.addAction(&cm_togglefs);
+        menu.addAction(&cm_togglefs);
         menu.addAction(&cm_preferences);
-		menu.addAction(&cm_exit);
+        menu.addSeparator();
+        menu.addAction(&cm_exit);
 
-	}
+    }
 
     m_menuIsHere = true;
-	QAction* act = menu.exec(QCursor::pos());
+    QAction* act = menu.exec(QCursor::pos());
     m_menuIsHere = false;
 
 	//=========results===============================

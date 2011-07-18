@@ -28,37 +28,37 @@ QMutex global_ffmpeg_mutex;
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
-	//USES_CONVERSION;
+    //USES_CONVERSION;
 
-	//Ignore debug and info (i == 2 || i == 1) messages
-	if(AV_LOG_ERROR != i)
-	{
-		//return;
-	}
+    //Ignore debug and info (i == 2 || i == 1) messages
+    if(AV_LOG_ERROR != i)
+    {
+        //return;
+    }
 
-	// AVCodecContext* pCtxt = (AVCodecContext*)pParam;
+    // AVCodecContext* pCtxt = (AVCodecContext*)pParam;
 
-	char szMsg[1024];
-	vsprintf(szMsg, szFmt, args);
-	//if(szMsg[strlen(szMsg)] == '\n')
-	{	
-		szMsg[strlen(szMsg)-1] = 0;
-	}
+    char szMsg[1024];
+    vsprintf(szMsg, szFmt, args);
+    //if(szMsg[strlen(szMsg)] == '\n')
+    {
+        szMsg[strlen(szMsg)-1] = 0;
+    }
 
-	cl_log.log("FFMPEG ", szMsg, cl_logERROR);
+    cl_log.log("FFMPEG ", szMsg, cl_logERROR);
 }
 
 #ifndef UNICLIENT_TESTS
 
 int main(int argc, char *argv[])
 {
-//	av_log_set_callback(decoderLogCallback);
+//    av_log_set_callback(decoderLogCallback);
 
     QApplication::setOrganizationName(ORGANIZATION_NAME);
     QApplication::setApplicationName(APPLICATION_NAME);
     QApplication::setApplicationVersion(APPLICATION_VERSION);
 
-	EveApplication application(argc, argv);
+    EveApplication application(argc, argv);
 
     QString argsMessage;
     for (int i = 1; i < argc; ++i)
@@ -75,31 +75,31 @@ int main(int argc, char *argv[])
     }
 
     QString dataLocation = getDataDirectory();
-	QDir::setCurrent(QFileInfo(argv[0]).absolutePath());
+    QDir::setCurrent(QFileInfo(argv[0]).absolutePath());
 
-	QDir dataDirectory;
+    QDir dataDirectory;
     dataDirectory.mkpath(dataLocation + "/log");
 
-	if (!cl_log.create(dataLocation + "/log/log_file", 1024*1024*10, 5, cl_logDEBUG1))
+    if (!cl_log.create(dataLocation + "/log/log_file", 1024*1024*10, 5, cl_logDEBUG1))
     {
-		application.quit();
+        application.quit();
 
         return 0;
     }
 
 #ifdef _DEBUG
-	 cl_log.setLogLevel(cl_logDEBUG1);
-	//cl_log.setLogLevel(cl_logWARNING);
+     cl_log.setLogLevel(cl_logDEBUG1);
+    //cl_log.setLogLevel(cl_logWARNING);
 #else
-	cl_log.setLogLevel(cl_logWARNING);
+    cl_log.setLogLevel(cl_logWARNING);
 #endif
 
-	CL_LOG(cl_logALWAYS)
-	{
-		cl_log.log("\n\n========================================", cl_logALWAYS);
-		cl_log.log(cl_logALWAYS, "Software version %s", APPLICATION_VERSION);
-		cl_log.log(argv[0], cl_logALWAYS);
-	}
+    CL_LOG(cl_logALWAYS)
+    {
+        cl_log.log("\n\n========================================", cl_logALWAYS);
+        cl_log.log(cl_logALWAYS, "Software version %s", APPLICATION_VERSION);
+        cl_log.log(argv[0], cl_logALWAYS);
+    }
 
     Settings& settings = Settings::instance();
     settings.load(getDataDirectory() + "/settings.xml");
@@ -111,18 +111,18 @@ int main(int argc, char *argv[])
 
     cl_log.log("Using " + settings.mediaRoot() + " as media root directory", cl_logALWAYS);
 
-	CLDevice::startCommandProc();
+    CLDevice::startCommandProc();
 
-	CLDeviceManager::instance(); // to initialize net state;
+    CLDeviceManager::instance(); // to initialize net state;
 
-	//===========================================================================
-	//IPPH264Decoder::dll.init();
+    //===========================================================================
+    //IPPH264Decoder::dll.init();
 
-	CLVideoDecoderFactory::setCodecManufacture(CLVideoDecoderFactory::FFMPEG);
+    CLVideoDecoderFactory::setCodecManufacture(CLVideoDecoderFactory::FFMPEG);
 
-	//============================
-	CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&AVDeviceServer::instance());
-	CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
+    //============================
+    CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&AVDeviceServer::instance());
+    CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
     CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&AVigilonDeviceServer::instance());
     CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&AndroidDeviceServer::instance());
     CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&IQEyeDeviceServer::instance());
@@ -130,52 +130,58 @@ int main(int argc, char *argv[])
     CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&DesktopDeviceServer::instance());
 #endif // Q_OS_WIN
 
-	CLDeviceSettingsDlgFactory::instance().registerDlgManufacture(&AreconVisionDlgManufacture::instance());
-	//============================
+    CLDeviceSettingsDlgFactory::instance().registerDlgManufacture(&AreconVisionDlgManufacture::instance());
+    //============================
 
-	//=========================================================
+    //=========================================================
 
-	qApp->setStyleSheet("\
-		QMenu {\
-		background-color: black;\
-		color: white;\
-		font-family: Bodoni MT;\
-		font-size: 18px;\
-		border: 1px solid rgb(110, 110, 110);\
-		}\
-		QMenu::item{\
-		padding-top: 4px;\
-		padding-left: 5px;\
-		padding-right: 15px;\
-		padding-bottom: 4px;\
-		}\
-		QMenu::item:selected {\
-		background: rgb(40, 40, 40);\
-		}");
+    qApp->setStyleSheet("\
+        QMenu {\
+        background-color: black;\
+        font-family: Bodoni MT;\
+        font-size: 18px;\
+        border: 1px solid rgb(110, 110, 110);\
+        }\
+        QMenu::item{\
+        color: white;\
+        padding-top: 4px;\
+        padding-left: 5px;\
+        padding-right: 15px;\
+        padding-bottom: 4px;\
+        }\
+        QMenu::item:disabled{\
+        color: rgb(110, 110, 110);\
+        }\
+        QMenu::item:selected {\
+        background: rgb(40, 40, 40);\
+        }\
+        QMenu::separator {\
+        background: rgb(20, 20, 20);\
+        }");
 
-	/**/
-	//=========================================================
+    /**/
+    //=========================================================
 
-	CLDeviceList recorders = CLDeviceManager::instance().getRecorderList();
-	foreach(CLDevice* dev, recorders)
-	{
-		QString id = dev->getUniqueId();
-		CLSceneLayoutManager::instance().addRecorderLayoutContent(id);
-		dev->releaseRef();
-	}
+    CLDeviceList recorders = CLDeviceManager::instance().getRecorderList();
+    foreach(CLDevice* dev, recorders)
+    {
+        QString id = dev->getUniqueId();
+        CLSceneLayoutManager::instance().addRecorderLayoutContent(id);
+        dev->releaseRef();
+    }
 
-	//=========================================================
+    //=========================================================
 
-	initContextMenu();
+    initContextMenu();
 
-	MainWnd mainWindow(argc, argv);
-	mainWindow.show();
+    MainWnd mainWindow(argc, argv);
+    mainWindow.show();
 
     QObject::connect(&application, SIGNAL(messageReceived(const QString&)),
         &mainWindow, SLOT(handleMessage(const QString&)));
 
-	return application.exec();
+    return application.exec();
 
-	CLDevice::stopCommandProc();
+    CLDevice::stopCommandProc();
 }
 #endif
