@@ -34,7 +34,7 @@ QString QnAviResource::toString() const
 	return m_name;
 }
 
-QnMediaStreamDataProvider* QnAviResource::getDeviceStreamConnection()
+QnAbstractMediaStreamDataProvider* QnAviResource::getDeviceStreamConnection()
 {
 	return new QnPlAVIStreamProvider(this);
 }

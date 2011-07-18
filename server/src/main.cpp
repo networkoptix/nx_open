@@ -1,10 +1,7 @@
 #include "common/log.h"
 #include "resource/resource.h"
-#include "resources/avigilon/resoutce/avigilon_resource_seaecher.h"
 #include "resourcecontrol/resource_pool.h"
 #include "resources/arecontvision/resource/av_resource_searcher.h"
-#include "resources/iqeye/resource/iqeye_resource_searcher.h"
-#include "resources/android/resource/android_resource_searcher.h"
 #include "datapacket/mediadatapacket.h"
 #include "common/base.h"
 
@@ -51,7 +48,7 @@ int main(int argc, char *argv[])
 
 
 	//============================
-	//QnResourcePool::instance().getDeviceSearcher().addDeviceServer(&QnPlArecontResourceSearcher::instance());
+	QnResourcePool::instance().getDeviceSearcher().addDeviceServer(&QnPlArecontResourceSearcher::instance());
     //QnResourcePool::instance().getDeviceSearcher().addDeviceServer(&AVigilonDeviceServer::instance());
     //QnResourcePool::instance().getDeviceSearcher().addDeviceServer(&AndroidDeviceServer::instance());
     //QnResourcePool::instance().getDeviceSearcher().addDeviceServer(&IQEyeDeviceServer::instance());

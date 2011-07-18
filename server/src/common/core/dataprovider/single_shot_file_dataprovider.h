@@ -10,7 +10,7 @@
 // it quits after first getData
 // such reader can be used for photo 
 
-class CLSingleShotFileStreamreader : public CLSingleShotStreamreader
+class CLSingleShotFileStreamreader : public QnSingleShotStreamreader
 {
 public:
 	CLSingleShotFileStreamreader(QnResource* dev );

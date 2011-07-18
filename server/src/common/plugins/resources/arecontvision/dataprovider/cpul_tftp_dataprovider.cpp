@@ -29,7 +29,7 @@ AVLastPacketSize ExtractSize(const unsigned char* arr)
 //=========================================================
 
 AVClientPullSSTFTPStreamreader::AVClientPullSSTFTPStreamreader (QnResource* dev ):
-CLAVClinetPullStreamReader(dev),
+QnPlAVClinetPullStreamReader(dev),
 m_black_white(false)
 {
 	QnPlAreconVisionResource* device = static_cast<QnPlAreconVisionResource*>(dev);

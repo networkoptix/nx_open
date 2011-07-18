@@ -97,6 +97,10 @@ public:
     // return false if not accessible 
 	virtual bool getBasicInfo() = 0;
 
+    // this function must be called before use the resource 
+    // for example some on some cameras we have to setup sensor geometry and I frame frequency
+    virtual void beforeUse() = 0;
+
 	QnParamList& getResourceParamList();// returns params that can be changed on device level
 	const QnParamList& getResourceParamList() const;
 

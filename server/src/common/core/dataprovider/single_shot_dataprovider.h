@@ -2,23 +2,32 @@
 #define single_shot_reader_h_105
 
 
-#include "streamdataprovider.h"
-#include "datapacket/mediadatapacket.h"
+#include "media_streamdataprovider.h"
 
-
-// difference between this class and pull reader is that run function does not have infinit loop
+// difference between this class and pull reader is that run function does not have infinite loop
 // it quits after first getData
 // such reader can be used for photo 
 
-class CLSingleShotStreamreader : public QnMediaStreamDataProvider
+class QnSingleShotStreamreader : public QnAbstractMediaStreamDataProvider
 {
 public:
-	CLSingleShotStreamreader(QnResource* dev );
-	~CLSingleShotStreamreader(){stop();}
+	QnSingleShotStreamreader(QnResourcePtr res);
+	~QnSingleShotStreamreader(){stop();}
 protected:
-	virtual QnAbstractMediaDataPacketPtr getData() = 0;
+
 private:
 	void run(); // takes images from camera and put into queue
+
+    virtual bool beforeGetData(){return true;};
+
+    // if function returns false we do not put result into the queues
+    virtual bool afterGetData(QnAbstractDataPacketPtr data){return true;};
+
+    virtual void beforeRun(){};
+    virtual void afterRun() {};
+
+    virtual void sleepIfNeeded(){};
+
 };
 
 /**/

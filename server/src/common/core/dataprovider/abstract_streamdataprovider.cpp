@@ -102,6 +102,13 @@ void QnAbstractStreamDataProvider::run()
             continue;
         }
 
+        if (QnResource::commandProcHasSuchResourceInQueue(getResource())) // if command processor has something in the queue for this device let it go first
+        {
+            QnSleep::msleep(5);
+            continue;
+        }
+
+
         if (!beforeGetData())
             continue;
 

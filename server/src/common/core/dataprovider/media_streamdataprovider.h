@@ -8,13 +8,13 @@
 #define CL_MAX_DATASIZE (10*1024*1024) // assume we can never get compressed data with  size greater than this
 #define CL_MAX_CHANNEL_NUMBER (4) 
 
-class QnMediaStreamDataProvider : public QnAbstractStreamDataProvider
+class QnAbstractMediaStreamDataProvider : public QnAbstractStreamDataProvider
 {
 public:
 	enum StreamQuality {CLSLowest, CLSLow, CLSNormal, CLSHigh, CLSHighest};
 
-	explicit QnMediaStreamDataProvider(QnResourcePtr res);
-	virtual ~QnMediaStreamDataProvider();
+	explicit QnAbstractMediaStreamDataProvider(QnResourcePtr res);
+	virtual ~QnAbstractMediaStreamDataProvider();
 
 
 	QnStatistics* getStatistics(int channel) const;
@@ -26,6 +26,15 @@ public:
 	virtual void setQuality(StreamQuality q);
 	StreamQuality getQuality() const;
 
+protected:
+    void sleepIfNeeded() = 0;
+
+    virtual void beforeRun();
+    virtual void afterRun();
+
+    virtual bool beforeGetData() = 0;
+    // if function returns false we do not put result into the queues
+    virtual bool afterGetData(QnAbstractDataPacketPtr data);
 
 protected:
 
@@ -33,6 +42,8 @@ protected:
 	int m_gotKeyFrame[CL_MAX_CHANNEL_NUMBER];
 	int m_NumaberOfVideoChannels;
 	StreamQuality m_qulity;
+
+    int mFramesLost;
 
 };
 

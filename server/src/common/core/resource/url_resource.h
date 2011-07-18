@@ -3,7 +3,7 @@
 
 #include "resource.h"
 
-class QnMediaStreamDataProvider;
+class QnAbstractMediaStreamDataProvider;
 class QnFileResource;
 
 typedef QSharedPointer<QnFileResource> QnFileResourcePtr;
@@ -24,7 +24,7 @@ public:
 	virtual QString toString() const;
 	QString getFileName() const;
 
-	virtual QnMediaStreamDataProvider* getDeviceStreamConnection();
+	virtual QnAbstractMediaStreamDataProvider* getDeviceStreamConnection();
 protected:
 
     QString m_filename;

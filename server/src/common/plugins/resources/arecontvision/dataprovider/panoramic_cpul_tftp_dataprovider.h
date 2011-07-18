@@ -7,7 +7,7 @@
 //single sensor TFTP reader
 // arecont vision TFTP stack is faster (for JPEG image; for H.264 they are almost equal )( you can get more fps with it )
 // so if it's possible to use TFP ( local networks ) it's btter be TFTP but HTTP
-class AVPanoramicClientPullSSTFTPStreamreader : public CLAVClinetPullStreamReader
+class AVPanoramicClientPullSSTFTPStreamreader : public QnPlAVClinetPullStreamReader
 {
 public:
 	explicit AVPanoramicClientPullSSTFTPStreamreader  (QnResource* dev );

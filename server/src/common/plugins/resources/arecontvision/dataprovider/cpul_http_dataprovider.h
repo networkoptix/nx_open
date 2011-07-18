@@ -4,7 +4,7 @@
 #include "av_client_pull.h"
 
 //single sensor HTTP reader
-class AVClientPullSSHTTPStreamreader : public CLAVClinetPullStreamReader
+class AVClientPullSSHTTPStreamreader : public QnPlAVClinetPullStreamReader
 {
 public:
 	explicit AVClientPullSSHTTPStreamreader(QnResource* dev);

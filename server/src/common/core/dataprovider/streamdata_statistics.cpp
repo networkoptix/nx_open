@@ -117,6 +117,11 @@ float QnStatistics::getFrameRate() const
 	return m_framerate;
 }
 
+int QnStatistics::getFrameSize() const
+{
+    return getBitrate()/8*1024 / getFrameRate();
+}
+
 void QnStatistics::onBadSensor()
 {
 	if (!m_runing) return; 

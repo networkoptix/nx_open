@@ -3,8 +3,8 @@
 #include "resource/resource_param.h"
 #include "common/rand.h"
 
-CLAVClinetPullStreamReader::CLAVClinetPullStreamReader(QnResource* dev ):
-CLClientPullStreamreader(dev)
+QnPlAVClinetPullStreamReader::QnPlAVClinetPullStreamReader(QnResource* dev ):
+QnClientPullStreamProvider(dev)
 {
 	setQuality(m_qulity);
 
@@ -32,15 +32,15 @@ CLClientPullStreamreader(dev)
 
 }
 
-CLAVClinetPullStreamReader::~CLAVClinetPullStreamReader()
+QnPlAVClinetPullStreamReader::~QnPlAVClinetPullStreamReader()
 {
 
 }
 
-void CLAVClinetPullStreamReader::setQuality(StreamQuality q)
+void QnPlAVClinetPullStreamReader::setQuality(StreamQuality q)
 {
 
-	CLClientPullStreamreader::setQuality(q);
+	QnClientPullStreamProvider::setQuality(q);
 
 	setNeedKeyData();
 
@@ -112,7 +112,7 @@ void CLAVClinetPullStreamReader::setQuality(StreamQuality q)
 
 }
 
-int CLAVClinetPullStreamReader::getQuality() const
+int QnPlAVClinetPullStreamReader::getQuality() const
 {
 	if (!m_streamParam.exists("Quality"))
 		return 10;
@@ -130,7 +130,7 @@ int CLAVClinetPullStreamReader::getQuality() const
 
 }
 
-int CLAVClinetPullStreamReader::getBitrate() const
+int QnPlAVClinetPullStreamReader::getBitrate() const
 {
 	if (!m_streamParam.exists("Bitrate"))
 		return 0;
@@ -148,7 +148,7 @@ int CLAVClinetPullStreamReader::getBitrate() const
 
 }
 
-bool CLAVClinetPullStreamReader::isH264() const
+bool QnPlAVClinetPullStreamReader::isH264() const
 {
 	if (!m_streamParam.exists("Codec")) // cam is jpeg only
 		return false;

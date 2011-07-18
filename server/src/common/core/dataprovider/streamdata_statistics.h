@@ -38,6 +38,7 @@ public:
 	void onData(unsigned int datalen);// must be called then new data from cam arrived; if datalen==0 => timeout
 	float getBitrate() const; // returns instant bitrate
 	float getFrameRate() const;// returns instant framerate
+    int getFrameSize() const;// returns average frame size in kb( based on getBitrate and getFrameRate)
 	float getavBitrate() const; // returns average bitrate
 	float getavFrameRate() const;// returns average framerate
 	unsigned long totalSecs() const; // how long statistics is assembled in seconds

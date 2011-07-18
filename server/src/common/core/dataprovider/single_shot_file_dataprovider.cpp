@@ -7,7 +7,7 @@
 
 
 CLSingleShotFileStreamreader::CLSingleShotFileStreamreader(QnResource* dev ):
-CLSingleShotStreamreader(dev)
+QnSingleShotStreamreader(dev)
 {
 	QnFileResource* device = static_cast<QnFileResource*>(dev);
 	m_fileName = device->getFileName();

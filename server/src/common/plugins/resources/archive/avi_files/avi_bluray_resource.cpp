@@ -10,7 +10,7 @@ CLAviBluRayDevice::~CLAviBluRayDevice()
 {
 }
 
-QnMediaStreamDataProvider* CLAviBluRayDevice::getDeviceStreamConnection()
+QnAbstractMediaStreamDataProvider* CLAviBluRayDevice::getDeviceStreamConnection()
 {
     return new CLAVIBlurayStreamReader(this); 
 }

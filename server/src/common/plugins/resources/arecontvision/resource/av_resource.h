@@ -25,8 +25,6 @@ class QnPlAreconVisionResource : public QnNetworkResource
 {
 public:
 
-    QnPlAreconVisionResource();
-
 
 	// return true if no error
 	virtual bool getParam(const QString& name, QnValue& val, bool resynch = false);
@@ -46,7 +44,7 @@ public:
 	CLHttpStatus setRegister(int page, int num, int val);
 	CLHttpStatus setRegister_asynch(int page, int num, int val);
 
-	QnMediaStreamDataProvider* getDeviceStreamConnection();
+	QnAbstractMediaStreamDataProvider* getDeviceStreamConnection();
 
 	//========
 	virtual bool unknownResource() const;
@@ -83,7 +81,7 @@ private:
 
 	static bool isPanoramic(int model);
 
-	QnPlAreconVisionResource(){};
+	QnPlAreconVisionResource();
 
 };
 

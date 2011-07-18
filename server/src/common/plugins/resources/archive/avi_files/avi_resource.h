@@ -3,7 +3,7 @@
 
 #include "../abstract_archive_resource.h"
 
-class QnMediaStreamDataProvider;
+class QnAbstractMediaStreamDataProvider;
 class QnAviResource;
 
 typedef QSharedPointer<QnAviResource> QnAviResourcePtr;
@@ -16,7 +16,7 @@ public:
 
     QString getUrl() const;
 
-	virtual QnMediaStreamDataProvider* getDeviceStreamConnection();
+	virtual QnAbstractMediaStreamDataProvider* getDeviceStreamConnection();
 	virtual QString toString() const;
 
     virtual bool equalsTo(const QnResourcePtr other) const;

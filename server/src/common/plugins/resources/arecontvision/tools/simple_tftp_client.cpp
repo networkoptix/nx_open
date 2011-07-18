@@ -2,7 +2,8 @@
 #include "network/socket.h"
 #include "common/log.h"
 #include "common/bytearray.h"
-#include "dataprovider/streamdataprovider.h"
+#include "dataprovider/media_streamdataprovider.h"
+
 
 using namespace std;
 

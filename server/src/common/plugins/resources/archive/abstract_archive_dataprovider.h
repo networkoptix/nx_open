@@ -6,7 +6,7 @@
 
 class QnResource;
 
-class QnPlAbstractArchiveProvider : public CLClientPullStreamreader
+class QnPlAbstractArchiveProvider : public QnClientPullStreamProvider
 {
 public:
 	QnPlAbstractArchiveProvider(QnResource* dev);

@@ -10,7 +10,7 @@ class CLArecontSingleSensorDevice : public QnPlAreconVisionResource
 public:
 	CLArecontSingleSensorDevice(int model);
 	bool getDescription();
-	virtual QnMediaStreamDataProvider* getDeviceStreamConnection();
+	virtual QnAbstractMediaStreamDataProvider* getDeviceStreamConnection();
 
 	virtual bool hasTestPattern() const;
 

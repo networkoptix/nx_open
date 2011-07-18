@@ -4,7 +4,7 @@
 #include "common/base.h"
 
 AVClientPullSSHTTPStreamreader::AVClientPullSSHTTPStreamreader(QnResource* dev):
-CLAVClinetPullStreamReader(dev)
+QnPlAVClinetPullStreamReader(dev)
 {
 
 	QnPlAreconVisionResource* device = static_cast<QnPlAreconVisionResource*>(dev);

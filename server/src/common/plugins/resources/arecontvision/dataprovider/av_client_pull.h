@@ -1,21 +1,19 @@
 #ifndef cl_av_clien_pull1529
 #define cl_av_clien_pull1529
 
-#include "dataprovider/cpull_streamdataprovider.h"
 
-
-
+#include "dataprovider/cpull_media_stream_provider.h"
 
 struct AVLastPacketSize
 {
 	int x0, y0, width, height;
 };
 
-class CLAVClinetPullStreamReader : public CLClientPullStreamreader
+class QnPlAVClinetPullStreamReader : public QnClientPullStreamProvider
 {
 public:
-	CLAVClinetPullStreamReader(QnResource* dev );
-	virtual ~CLAVClinetPullStreamReader();
+	QnPlAVClinetPullStreamReader(QnResource* dev );
+	virtual ~QnPlAVClinetPullStreamReader();
 
 	virtual void setQuality(StreamQuality q);
 

@@ -21,7 +21,7 @@ extern AVLastPacketSize ExtractSize(const unsigned char* arr);
 //=========================================================
 
 AVPanoramicClientPullSSTFTPStreamreader ::AVPanoramicClientPullSSTFTPStreamreader  (QnResource* dev ):
-CLAVClinetPullStreamReader(dev)
+QnPlAVClinetPullStreamReader(dev)
 {
 	QnPlAreconVisionResource* device = static_cast<QnPlAreconVisionResource*>(dev);
 

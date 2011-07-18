@@ -2,7 +2,7 @@
 
 
 QnPlAbstractArchiveProvider::QnPlAbstractArchiveProvider(QnResource* dev )
-    : CLClientPullStreamreader(dev),
+    : QnClientPullStreamProvider(dev),
       m_singleShot(false),
       m_forward(true),
       m_lengthMksec(0),
