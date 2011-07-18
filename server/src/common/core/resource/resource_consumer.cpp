@@ -22,10 +22,6 @@ bool QnResourceConsumer::isConnectedToTheResource() const
     return m_resource->hasSuchConsumer(const_cast<QnResourceConsumer*>(this));
 }
 
-void QnResourceConsumer::beforeDisconnectFromResource()
-{
-
-}
 
 void QnResourceConsumer::disconnectFromResource()
 {

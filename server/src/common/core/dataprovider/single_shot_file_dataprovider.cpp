@@ -9,8 +9,8 @@
 CLSingleShotFileStreamreader::CLSingleShotFileStreamreader(QnResource* dev ):
 QnSingleShotStreamreader(dev)
 {
-	QnFileResource* device = static_cast<QnFileResource*>(dev);
-	m_fileName = device->getFileName();
+	QnURLResource* device = static_cast<QnURLResource*>(dev);
+	m_fileName = device->getUrl();
 }
 
 QnAbstractMediaDataPacketPtr CLSingleShotFileStreamreader::getData()

@@ -37,7 +37,7 @@ QnPlAVClinetPullStreamReader::~QnPlAVClinetPullStreamReader()
 
 }
 
-void QnPlAVClinetPullStreamReader::setQuality(StreamQuality q)
+void QnPlAVClinetPullStreamReader::setQuality(QnStreamQuality q)
 {
 
 	QnClientPullStreamProvider::setQuality(q);
@@ -48,7 +48,7 @@ void QnPlAVClinetPullStreamReader::setQuality(StreamQuality q)
 
 	switch(q)
 	{
-	case CLSHighest:
+	case QnQualityHighest:
 
 		if (pl.exists("resolution"))
 			pl.get("resolution").value.value = "full";
@@ -62,7 +62,7 @@ void QnPlAVClinetPullStreamReader::setQuality(StreamQuality q)
 
 		break;
 
-	case CLSHigh:
+	case QnQualityHigh:
 
 		if (pl.exists("resolution"))
 			pl.get("resolution").value.value = "full";
@@ -76,7 +76,7 @@ void QnPlAVClinetPullStreamReader::setQuality(StreamQuality q)
 
 		break;
 
-	case CLSNormal:
+	case QnQualityNormal:
 
 		if (pl.exists("resolution"))
 			pl.get("resolution").value.value = "half";
@@ -90,8 +90,8 @@ void QnPlAVClinetPullStreamReader::setQuality(StreamQuality q)
 
 	    break;
 
-	case CLSLow:
-	case CLSLowest:
+	case QnQualityLow:
+	case QnQualityLowest:
 
 		if (pl.exists("resolution"))
 			pl.get("resolution").value.value = "half";
@@ -117,7 +117,7 @@ int QnPlAVClinetPullStreamReader::getQuality() const
 	if (!m_streamParam.exists("Quality"))
 		return 10;
 
-	if (m_qulity!=CLSHighest)
+	if (m_qulity!=QnQualityHighest)
 	{
 		return m_streamParam.get("Quality").value.value;
 	}
@@ -135,7 +135,7 @@ int QnPlAVClinetPullStreamReader::getBitrate() const
 	if (!m_streamParam.exists("Bitrate"))
 		return 0;
 
-	if (m_qulity!=CLSHighest)
+	if (m_qulity!=QnQualityHighest)
 	{
 		return m_streamParam.get("Bitrate").value.value;
 	}
@@ -153,7 +153,7 @@ bool QnPlAVClinetPullStreamReader::isH264() const
 	if (!m_streamParam.exists("Codec")) // cam is jpeg only
 		return false;
 
-	if (m_qulity!=CLSHighest)
+	if (m_qulity!=QnQualityHighest)
 	{
 		return (m_streamParam.get("Codec").value.value == QString("H.264"));
 	}

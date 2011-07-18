@@ -3,31 +3,25 @@
 
 #include "resource.h"
 
-class QnAbstractMediaStreamDataProvider;
-class QnFileResource;
 
-typedef QSharedPointer<QnFileResource> QnFileResourcePtr;
+class QnURLResource;
 
-class QnFileResource : public QnResource 
+typedef QSharedPointer<QnURLResource> QnUrlResourcePtr;
+
+class QnURLResource : virtual public QnResource 
 {
 
 public:
-	QnFileResource(QString filename);
+	QnURLResource(QString url);
 
     virtual bool equalsTo(const QnResourcePtr other) const;
 
-	DeviceType getDeviceType() const
-	{
-		return VIDEODEVICE;
-	}
-
 	virtual QString toString() const;
-	QString getFileName() const;
+	QString getUrl() const;
 
-	virtual QnAbstractMediaStreamDataProvider* getDeviceStreamConnection();
 protected:
 
-    QString m_filename;
+    QString m_url;
 
 };
 

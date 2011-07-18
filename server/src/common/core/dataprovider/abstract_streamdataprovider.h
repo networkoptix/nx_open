@@ -27,6 +27,11 @@ public:
     qreal getDataRate() const;
 
 protected:
+
+    virtual void beforeDisconnectFromResource();
+
+    virtual void disconnectFromResource();
+
     virtual void run(); 
 
 	void putData(QnAbstractDataPacketPtr data);

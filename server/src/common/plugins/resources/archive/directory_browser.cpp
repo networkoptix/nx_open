@@ -71,7 +71,7 @@ QnResourcePtr QnResourceDirectoryBrowser::checkFile(const QString& filename)
 
 
     if (fileTypeSupport.isImageFileExt(filename))
-        return QnResourcePtr(new QnFileResource(filename));
+        return QnResourcePtr(new QnURLResource(filename));
 
     if (CLAviDvdDevice::isAcceptedUrl(filename))
         return QnResourcePtr( new CLAviDvdDevice(filename));
@@ -109,7 +109,7 @@ QnResourceList QnResourceDirectoryBrowser::findResources(const QString& director
         {
             QString file = list.at(i);
             QString abs_file_name = directory + file;
-            result.push_back( QnResourcePtr( new QnFileResource(abs_file_name) ) );
+            result.push_back( QnResourcePtr( new QnURLResource(abs_file_name) ) );
         }
     }
 

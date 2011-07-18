@@ -23,11 +23,11 @@ public:
 };
 
 // this is default DeviceVideoLayout for any camera with only one sensor 
-class CLDefaultDeviceVideoLayout : public QnVideoResoutceLayout
+class QnDefaultDeviceVideoLayout : public QnVideoResoutceLayout
 {
 public:
-	CLDefaultDeviceVideoLayout(){};
-	virtual ~CLDefaultDeviceVideoLayout() {}
+	QnDefaultDeviceVideoLayout(){};
+	virtual ~QnDefaultDeviceVideoLayout() {}
 	//returns number of video channels device has
 	virtual unsigned int numberOfChannels() const
 	{
@@ -56,16 +56,21 @@ public:
 
 };
 
-class CLCustomDeviceVideoLayout : public QnVideoResoutceLayout
+QnDefaultDeviceVideoLayout globalDefaultDeviceVideoLayout;
+
+class QnCustomDeviceVideoLayout : public QnVideoResoutceLayout
 {
 public:
-	CLCustomDeviceVideoLayout(int width, int height):
+	QnCustomDeviceVideoLayout(int width, int height):
 	m_width(width),
 	m_height(height)
 	{
 		m_channels = new int[m_width*m_height];
 	};
-	virtual ~CLCustomDeviceVideoLayout(){};
+	virtual ~QnCustomDeviceVideoLayout()
+    {
+        delete[] m_channels;
+    };
 	//returns number of video channels device has
 	virtual unsigned int numberOfChannels() const
 	{

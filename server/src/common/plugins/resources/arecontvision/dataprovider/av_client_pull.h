@@ -15,7 +15,7 @@ public:
 	QnPlAVClinetPullStreamReader(QnResource* dev );
 	virtual ~QnPlAVClinetPullStreamReader();
 
-	virtual void setQuality(StreamQuality q);
+	virtual void setQuality(QnStreamQuality q);
 
 protected:
 	int getQuality() const;

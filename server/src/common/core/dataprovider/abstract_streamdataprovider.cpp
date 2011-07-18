@@ -79,6 +79,17 @@ void QnAbstractStreamDataProvider::putData(QnAbstractDataPacketPtr data)
 	}
 }
 
+void QnAbstractStreamDataProvider::beforeDisconnectFromResource()
+{
+    pleaseStop();
+}
+
+void QnAbstractStreamDataProvider::disconnectFromResource()
+{
+    stop();
+    QnResourceConsumer::disconnectFromResource();
+}
+
 void QnAbstractStreamDataProvider::run()
 {
     beforeRun();

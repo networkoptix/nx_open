@@ -4,8 +4,7 @@
 
 QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(QnResourcePtr res):
 QnAbstractStreamDataProvider(res),
-m_qulity(CLSLowest),
-m_frames_lost(0)
+m_qulity(QnQualityLowest)
 {
 	memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame));
 	m_NumaberOfVideoChannels = 0;//dev->getVideoLayout()->numberOfChannels(); //todo
@@ -19,7 +18,7 @@ QnAbstractMediaStreamDataProvider::~QnAbstractMediaStreamDataProvider()
 
 
 
-void QnAbstractMediaStreamDataProvider::setQuality(StreamQuality q)
+void QnAbstractMediaStreamDataProvider::setQuality(QnStreamQuality q)
 {
     QMutexLocker mtx(&m_mtx);
 	m_qulity = q;

@@ -13,7 +13,7 @@ public:
 
     bool isConnectedToTheResource() const;
 
-    virtual void beforeDisconnectFromResource();
+    virtual void beforeDisconnectFromResource() = 0;
     virtual void disconnectFromResource();
 
 protected:

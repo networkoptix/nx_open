@@ -36,6 +36,9 @@ public:
 
     virtual QString toString() const;
 
+    // like arecont or iqinvision
+    virtual QString manufacture() const = 0;
+
     void addNetworkStatus(unsigned long status);
     void removeNetworkStatus(unsigned long status);
     bool checkNetworkStatus(unsigned long status) const;
