@@ -130,9 +130,9 @@ IDirect3DSurface9* CLScreenGrapper::captureFrame()
 void bgra_to_yv12_sse(quint8* rgba, int xStride, quint8* y, quint8* u, quint8* v, int yStride, int uvStride, int width, int height)
 {
     static const quint16 __declspec(align(16)) sse_2000[]         = { 0x2020, 0x2020, 0x2020, 0x2020, 0x2020, 0x2020, 0x2020, 0x2020 };
-    static const quint16 __declspec(align(16)) sse_00a0[]         = { 0x0420, 0x0420, 0x0420, 0x0420, 0x0420, 0x0420, 0x0420, 0x0420 };
-    static const quint32 __declspec(align(16)) sse_mask_color[]   = { 0x00007f80, 0x00007f80, 0x00007f80, 0x00007f80};
-    static const quint32 __declspec(align(16)) sse_mask_ffff[]    = { 0x0000ffff, 0x0000ffff, 0x0000ffff, 0x0000ffff };
+    static const quint16 __declspec(align(16)) sse_00a0[]         = { 0x0210, 0x0210, 0x0210, 0x0210, 0x0210, 0x0210, 0x0210, 0x0210 };
+    static const quint32 __declspec(align(16)) sse_mask_color[]   = { 0x00003fc0, 0x00003fc0, 0x00003fc0, 0x00003fc0};
+    static const qint16 __declspec(align(16)) sse_01[] = {0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001, 0x0001};
 
     static const int K = 32768;
     static const qint16 __declspec(align(16)) y_r_coeff[] =  { 0.257*K, 0.257*K, 0.257*K, 0.257*K, 0.257*K, 0.257*K, 0.257*K, 0.257*K };
@@ -175,11 +175,11 @@ loop1:
         MOVAPS    xmm1, [esi]
         MOVAPS    xmm7, [esi+16]
 
-        psllD xmm0, 7 // R
-        psllD xmm6, 7 // R
+        psllD xmm0, 6 // R
+        psllD xmm6, 6 // R
 
-        psrlD xmm1, 1 // G
-        psrlD xmm7, 1 // G
+        psrlD xmm1, 2 // G
+        psrlD xmm7, 2 // G
 
         pand xmm0, sse_mask_color
         pand xmm6, sse_mask_color
@@ -196,11 +196,11 @@ loop1:
         MOVAPS    xmm3, [esi+edx] // BGRA
         MOVAPS    xmm7, [esi+edx+16] // BGRA
 
-        psrlD xmm5, 9 // B
-        psrlD xmm6, 9 // B
+        psrlD xmm5, 10 // B
+        psrlD xmm6, 10 // B
 
-        psrlD xmm3, 1 // G
-        psrlD xmm7, 1 // G
+        psrlD xmm3, 2 // G
+        psrlD xmm7, 2 // G
 
         pand xmm5, sse_mask_color
         pand xmm6, sse_mask_color
@@ -221,11 +221,11 @@ loop1:
         MOVAPS    xmm4, [esi+edx]
         MOVAPS    xmm7, [esi+edx+16]
 
-        psllD xmm2, 7 // R
-        psllD xmm6, 7 // R
+        psllD xmm2, 6 // R
+        psllD xmm6, 6 // R
 
-        psrlD xmm4, 9 // B
-        psrlD xmm7, 9 // B
+        psrlD xmm4, 10 // B
+        psrlD xmm7, 10 // B
 
         pand xmm2, sse_mask_color
         pand xmm6, sse_mask_color
@@ -247,9 +247,9 @@ loop1:
         pmulhw xmm6, y_b_coeff
         pmulhw xmm7, y_g_coeff
 
+        pavgw xmm0, xmm2
         paddw xmm6, xmm7
 
-        pavgw xmm0, xmm2
         MOVAPS xmm7, xmm5
 
         paddw xmm6, sse_00a0
@@ -259,7 +259,9 @@ loop1:
         paddw xmm6, xmm7
 
         pavgw xmm5, xmm4
-        psrlw xmm6, 6
+        psrlw xmm6, 5
+
+        // ----------------------------------------------
 
         MOVAPS xmm7, xmm3
         packuswb xmm6, xmm6
@@ -269,46 +271,35 @@ loop1:
 
         // calculate Y of second line
         MOVAPS xmm6, xmm2
-        MOVAPS xmm3, xmm1
+        PMADDWD xmm1, sse_01
 
         pmulhw xmm6, y_b_coeff
-        MOVAPS xmm2, xmm0
+        PMADDWD xmm0, sse_01
 
         paddw xmm6, xmm7
-        psrlD xmm2, 16
-
         MOVAPS xmm7, xmm4
-        psrlD xmm3, 16
-
-        MOVAPS xmm4, xmm5
+                        
+        PMADDWD xmm5, sse_01
         pmulhw xmm7, y_r_coeff
 
-        psrlD xmm4, 16
-        paddw xmm6, xmm7
-
-        pavgw xmm0, xmm2
         paddw xmm6, sse_00a0
-
-        pand xmm0, sse_mask_ffff
-        psrlw xmm6, 6
-
-        pavgw xmm1, xmm3
-        packuswb xmm6, xmm6
-
-        pavgw xmm5, xmm4
-        MOVLPS [edi+ebx], xmm6
-
-        pand xmm1, sse_mask_ffff
-        pand xmm5, sse_mask_ffff
-
         packusdw xmm0, xmm0
+
+        paddw xmm6, xmm7
         packusdw xmm1, xmm1
+
+        psrlw xmm6, 5
         packusdw xmm5, xmm5
 
+        pmulhw xmm0, uv_b_coeff
+        packuswb xmm6, xmm6
+
+        pmulhw xmm1, uv_g_coeff
+        MOVLPS [edi+ebx], xmm6
+
+        // ---------------------------------------------------------
         // calculate UV colors
 
-        pmulhw xmm0, uv_b_coeff
-        pmulhw xmm1, uv_g_coeff
 
         paddw xmm0, sse_2000
         pmulhw xmm5, uv_r_coeff
