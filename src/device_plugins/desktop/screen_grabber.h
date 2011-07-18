@@ -1,6 +1,8 @@
 #ifndef __CL_SCREEN_GRABBER_H
 #define __CL_SCREEN_GRABBER_H
 
+#ifdef Q_OS_WIN
+
 #include <windows.h>
 #include <shellapi.h>
 #include <commdlg.h>
@@ -41,5 +43,7 @@ private:
     static QMutex m_instanceMutex;
     static int m_instanceCounter;
 };
+
+#endif // Q_OS_WIN
 
 #endif

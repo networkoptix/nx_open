@@ -1,6 +1,8 @@
 #ifndef __BUFFERED_SCREEN_GRABBER_H
 #define __BUFFERED_SCREEN_GRABBER_H
 
+#ifdef Q_OS_WIN
+
 #include "base/longrunnable.h"
 #include "screen_grabber.h"
 #include "base/threadqueue.h"
@@ -33,6 +35,8 @@ private:
     int m_frameIndex;
     QTime m_timer;
 };
+
+#endif // Q_OS_WIN
 
 #endif
 

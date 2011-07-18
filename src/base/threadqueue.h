@@ -75,18 +75,19 @@ class CLThreadQueue: public CLNonReferredThreadQueue<T>
 {
 public:
 	CLThreadQueue( quint32 maxSize = MAX_THREAD_QUEUE_SIZE)
-        : CLNonReferredThreadQueue( maxSize )
+        : CLNonReferredThreadQueue<T>( maxSize )
 	{
+        this->maxSize();
 	}
 
 	void clear()
 	{
-    	QMutexLocker mutex(&m_cs);
+    	QMutexLocker mutex(&this->m_cs);
 
-		while (!m_queue.empty()) 
+		while (!this->m_queue.empty()) 
 		{
-			m_sem.tryAcquire();
-			m_queue.dequeue()->releaseRef();
+			this->m_sem.tryAcquire();
+			this->m_queue.dequeue()->releaseRef();
 		}
 	}
 

@@ -1,3 +1,5 @@
+#ifdef Q_OS_WIN
+
 #include <windows.h>
 #include <shellapi.h>
 #include <commdlg.h>
@@ -41,3 +43,5 @@ CLDeviceList DesktopDeviceServer::findDevices()
         result[dev->getUniqueId()] = dev;
     }    
 }
+
+#endif // Q_OS_WIN

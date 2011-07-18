@@ -1,3 +1,5 @@
+#ifdef Q_OS_WIN
+
 #include "screen_grabber.h"
 
 extern "C" {
@@ -440,3 +442,6 @@ bool CLScreenGrapper::SurfaceToFrame(IDirect3DSurface9* pSurface, AVFrame* pFram
 
     pSurface->UnlockRect();
 }
+
+#endif // Q_OS_WIN
+

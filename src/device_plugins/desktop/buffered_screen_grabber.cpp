@@ -1,5 +1,7 @@
 #include "buffered_screen_grabber.h"
 
+#ifdef Q_OS_WIN
+
 CLBufferedScreenGrabber::CLBufferedScreenGrabber(int displayNumber, int queueSize, int frameRate):
     m_grabber(displayNumber, queueSize),
     m_queue(queueSize),
@@ -58,3 +60,6 @@ AVRational CLBufferedScreenGrabber::getFrameRate()
     rez.den = m_frameRate;
     return rez;
 }
+
+#endif // Q_OS_WIN
+
