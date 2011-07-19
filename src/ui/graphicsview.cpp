@@ -30,6 +30,8 @@
 #include "ui/videorecordingdialog.h"
 #include "ui/device_settings/style.h"
 
+#include <QMessageBox>
+
 extern int  SLOT_WIDTH;
 
 int doubl_clk_delay = qApp->doubleClickInterval();
@@ -171,6 +173,8 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
 
     connect(&cm_start_video_recording, SIGNAL(triggered()), SLOT(onRecordingStarted()));
     connect(&cm_stop_video_recording, SIGNAL(triggered()), SLOT(onRecordingStopped()));
+    cm_start_video_recording.setShortcuts(QList<QKeySequence>() << tr("Ctrl+R") << Qt::Key_MediaRecord);
+    cm_stop_video_recording.setShortcuts(QList<QKeySequence>() << tr("Ctrl+R") << Qt::Key_MediaRecord);
     cm_stop_video_recording.setEnabled(false);
 }
 
@@ -1358,9 +1362,9 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
 
     }
-	else
-	{
-		// on void menu...
+    else
+    {
+        // on void menu...
         if (m_camLayout.getContent() != CLSceneLayoutManager::instance().startScreenLayoutContent())
         {
             menu.addAction(&cm_start_video_recording);
@@ -1405,14 +1409,15 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
             menu.addMenu(&distance_menu);
         }
         
-		menu.addAction(&cm_togglefs);
+        menu.addAction(&cm_togglefs);
         menu.addAction(&cm_preferences);
-		menu.addAction(&cm_exit);
+        menu.addSeparator();
+        menu.addAction(&cm_exit);
 
-	}
+    }
 
     m_menuIsHere = true;
-	QAction* act = menu.exec(QCursor::pos());
+    QAction* act = menu.exec(QCursor::pos());
     m_menuIsHere = false;
 
 	//=========results===============================
