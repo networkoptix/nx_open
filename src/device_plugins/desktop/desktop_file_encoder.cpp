@@ -112,9 +112,10 @@ DesktopFileEncoder::DesktopFileEncoder(const QString& fileName, int desktopNum):
     m_fileName(fileName),
     m_device(0),
     m_iocontext(0),
-    m_formatCtx(0)
+    m_formatCtx(0),
+    m_grabber(0),
+    m_desktopNum(desktopNum)
 {
-    m_grabber = new CLBufferedScreenGrabber(desktopNum);
     m_encoderCodecName = "mpeg2video";
     //m_encoderCodecName = "mpeg4";
     m_needStop = false;
@@ -126,11 +127,12 @@ DesktopFileEncoder::~DesktopFileEncoder()
     m_needStop = true;
     wait();
     closeStream();
-    delete m_device;
 }
 
 bool DesktopFileEncoder::init()
 {
+    m_grabber = new CLBufferedScreenGrabber(m_desktopNum);
+
     AVRational st_rate = {1,90000};
 
     avcodec_init();
@@ -298,6 +300,10 @@ void DesktopFileEncoder::closeStream()
 {
     delete m_grabber;
     m_grabber = 0;
+
+    //if (m_formatCtx)
+    //    av_close_input_stream(m_formatCtx);
+
     if (m_videoCodecCtx)
         avcodec_close(m_videoCodecCtx);
     m_videoCodecCtx = 0;
@@ -307,13 +313,11 @@ void DesktopFileEncoder::closeStream()
     if (m_videoBuf)
         av_free(m_videoBuf);
     m_videoBuf = 0;
-    if (m_device)
-        m_device->close();
 
-    if (m_formatCtx)
-        av_close_input_stream(m_formatCtx);
-    if (m_iocontext)
-        av_free(m_iocontext);
+    delete m_iocontext;
+    m_iocontext = 0;
+    delete m_device;
+    m_device = 0;
 
     m_initialized = false;
 }

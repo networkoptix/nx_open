@@ -93,7 +93,8 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
     m_pageSelector(0),
     m_gridItem(0),
     m_menuIsHere(false),
-    m_lastPressedItem(0)
+    m_lastPressedItem(0),
+    m_desktopEncoder(0)
 {
     m_timeAfterDoubleClick.restart();
 
@@ -2582,6 +2583,9 @@ void GraphicsView::onRecordingStarted()
         cm_start_video_recording.setEnabled(false);
         cm_stop_video_recording.setEnabled(true);
         //Recorder.start();
+        if (m_desktopEncoder)
+            delete m_desktopEncoder;
+        m_desktopEncoder = new DesktopFileEncoder(filePath);
     }
 }
 
@@ -2590,6 +2594,8 @@ void GraphicsView::onRecordingStopped()
     cm_start_video_recording.setEnabled(true);
     cm_stop_video_recording.setEnabled(false);
     //Recorder.stop();
+    delete m_desktopEncoder;
+    m_desktopEncoder = 0;
 }
 
 void GraphicsView::fitInView(int duration, int delay, CLAnimationCurve curve)

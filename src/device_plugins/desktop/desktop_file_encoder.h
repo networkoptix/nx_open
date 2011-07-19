@@ -31,6 +31,7 @@ private:
     char* m_encoderCodecName;
     bool m_initialized;
     AVFrame* m_frame;
+    int m_desktopNum;
 
     AVFormatContext* m_formatCtx;
     AVOutputFormat * m_outputCtx;
