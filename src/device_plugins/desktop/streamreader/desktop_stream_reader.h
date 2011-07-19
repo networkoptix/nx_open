@@ -1,6 +1,8 @@
 #ifndef __DESKTOP_H264_STREAM_READER_H
 #define __DESKTOP_H264_STREAM_READER_H
 
+#ifdef Q_OS_WIN
+
 #include "streamreader/spush_streamreader.h"
 #include "device_plugins/desktop/buffered_screen_grabber.h"
 
@@ -27,5 +29,7 @@ private:
     bool m_initialized;
     AVFrame* m_frame;
 };
+
+#endif // Q_OS_WIN
 
 #endif //__DESKTOP_H264_STREAM_READER_H

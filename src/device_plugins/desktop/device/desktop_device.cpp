@@ -1,3 +1,5 @@
+#ifdef Q_OS_WIN
+
 #include "desktop_device.h"
 #include "device_plugins/desktop/streamreader/desktop_stream_reader.h"
 
@@ -35,3 +37,5 @@ CLNetworkDevice* CLDesktopDevice::updateDevice()
 {
     return 0;
 }
+
+#endif // Q_OS_WIN

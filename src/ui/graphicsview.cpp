@@ -27,6 +27,8 @@
 #include "device_plugins/archive/archive/archive_device.h"
 #include "videoitem/unmoved/multipage/page_selector.h"
 #include "ui/animation/property_animation.h"
+#include "ui/videorecordingdialog.h"
+#include "ui/device_settings/style.h"
 
 extern int  SLOT_WIDTH;
 
@@ -166,6 +168,10 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
 	setMinimumWidth(600);
 
     setFrameShape(QFrame::NoFrame);
+
+    connect(&cm_start_video_recording, SIGNAL(triggered()), SLOT(onRecordingStarted()));
+    connect(&cm_stop_video_recording, SIGNAL(triggered()), SLOT(onRecordingStopped()));
+    cm_stop_video_recording.setEnabled(false);
 }
 
 GraphicsView::~GraphicsView()
@@ -1352,14 +1358,16 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
 
     }
-	else
-	{
-		// on void menu...
+    else
+    {
+        // on void menu...
         if (m_camLayout.getContent() != CLSceneLayoutManager::instance().startScreenLayoutContent())
         {
+            menu.addAction(&cm_start_video_recording);
+            menu.addAction(&cm_stop_video_recording);
+            menu.addSeparator();
             menu.addAction(&cm_fitinview);
             menu.addAction(&cm_arrange);
-
 
             if (m_camLayout.isEditable() && m_viewMode!=ItemsDonor)
             {
@@ -1397,14 +1405,15 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
             menu.addMenu(&distance_menu);
         }
         
-		menu.addAction(&cm_togglefs);
+        menu.addAction(&cm_togglefs);
         menu.addAction(&cm_preferences);
-		menu.addAction(&cm_exit);
+        menu.addSeparator();
+        menu.addAction(&cm_exit);
 
-	}
+    }
 
     m_menuIsHere = true;
-	QAction* act = menu.exec(QCursor::pos());
+    QAction* act = menu.exec(QCursor::pos());
     m_menuIsHere = false;
 
 	//=========results===============================
@@ -2557,6 +2566,30 @@ void GraphicsView::onArrange_helper_finished()
 		item->setArranged(true);
 	}
 
+}
+
+void GraphicsView::onRecordingStarted()
+{
+    VideoRecordingDialog d;
+    ArthurStyle s;
+    d.setStyle(&s);
+    if (d.exec() == QDialog::Accepted) {
+        QString filePath = d.filePath();
+        VideoRecordingDialog::CaptureMode captureMode = d.captureMode();
+        VideoRecordingDialog::DecoderQuality decoderQuality = d.decoderQuality();
+        VideoRecordingDialog::Resolution resolution = d.resolution();
+
+        cm_start_video_recording.setEnabled(false);
+        cm_stop_video_recording.setEnabled(true);
+        //Recorder.start();
+    }
+}
+
+void GraphicsView::onRecordingStopped()
+{
+    cm_start_video_recording.setEnabled(true);
+    cm_stop_video_recording.setEnabled(false);
+    //Recorder.stop();
 }
 
 void GraphicsView::fitInView(int duration, int delay, CLAnimationCurve curve)
