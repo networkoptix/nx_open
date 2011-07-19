@@ -4,7 +4,8 @@ CLBufferedScreenGrabber::CLBufferedScreenGrabber(int displayNumber, int queueSiz
     m_grabber(displayNumber, queueSize),
     m_queue(queueSize),
     m_frameRate(frameRate),
-    m_frameIndex(0)
+    m_frameIndex(0),
+    m_currentFrameNum(0)
 {
     m_frames.resize(queueSize);
     for (int i = 0; i < m_frames.size(); ++i)
@@ -34,9 +35,10 @@ void CLBufferedScreenGrabber::run()
         m_frameIndex = m_frameIndex < m_frames.size()-1 ? m_frameIndex+1 : 0;
         m_queue.push(m_grabber.captureFrame());
 
-        qint64 nextTiming = (curFrame->coded_picture_number+1)*1000/m_frameRate;
+        qint64 nextTiming = ++m_currentFrameNum * 1000 / m_frameRate;
+
         int toSleep = nextTiming - m_timer.elapsed();
-        //qDebug() << "sleep time=" << toSleep;
+        //cl_log.log("sleep time=", toSleep, cl_logALWAYS);
         if (toSleep > 0)
             msleep(toSleep);
     }

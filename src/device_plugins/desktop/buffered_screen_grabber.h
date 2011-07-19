@@ -32,6 +32,7 @@ private:
     QVector<AVFrame*> m_frames;
     int m_frameIndex;
     QTime m_timer;
+    int m_currentFrameNum;
 };
 
 #endif
