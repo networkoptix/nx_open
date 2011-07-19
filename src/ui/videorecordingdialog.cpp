@@ -11,7 +11,7 @@ VideoRecordingDialog::VideoRecordingDialog(QWidget *parent) :
     ui->setupUi(this);
 #ifndef Q_OS_WIN
     ui->fullscreenNoAeroButton->setVisible(false);
-#elif
+#else
     ui->fullscreenNoAeroButton->setEnabled(true);
 #endif
     connect(ui->saveAsButton, SIGNAL(pressed()), SLOT(onSaveAsPressed()));
