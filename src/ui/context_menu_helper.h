@@ -5,7 +5,7 @@ void initContextMenu();
 
 extern QAction cm_exit;
 extern QAction cm_start_video_recording;
-extern QAction cm_stop_video_recording;
+extern QAction cm_recording_settings;
 extern QAction cm_fitinview;
 extern QAction cm_arrange;
 extern QAction cm_add_layout;

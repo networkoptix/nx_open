@@ -22,15 +22,14 @@ public:
     Q_ENUMS(DecoderQuality)
     Q_ENUMS(Resolution)
 
-    QString filePath() const;
-
     CaptureMode captureMode() const;
+    void setCaptureMode(CaptureMode c);
+    
     DecoderQuality decoderQuality() const;
+    void setDecoderQuality(DecoderQuality q);
+    
     Resolution resolution() const;
-
-private slots:
-    void onSaveAsPressed();
-    void onStartRecordingPressed();
+    void setResolution(Resolution r);
 
 private:
     Ui::VideoRecordingDialog *ui;

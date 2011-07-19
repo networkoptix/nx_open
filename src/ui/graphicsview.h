@@ -164,8 +164,8 @@ private slots:
 	void onSecTimer();
 	void onDecorationItemPressed(QString);
 	void onArrange_helper_finished();
-    void onRecordingStarted();
-    void onRecordingStopped();
+    void toggleRecording();
+    void recordingSettings();
 
 	void on_grid_drop_animation_finished();
 protected:

@@ -30,7 +30,9 @@
 #include "ui/videorecordingdialog.h"
 #include "ui/device_settings/style.h"
 
-#include <QMessageBox>
+#include <QtCore/QSettings>
+#include <QtGui/QFileDialog>
+#include <QtGui/QMessageBox>
 
 extern int  SLOT_WIDTH;
 
@@ -171,11 +173,9 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
 
     setFrameShape(QFrame::NoFrame);
 
-    connect(&cm_start_video_recording, SIGNAL(triggered()), SLOT(onRecordingStarted()));
-    connect(&cm_stop_video_recording, SIGNAL(triggered()), SLOT(onRecordingStopped()));
+    connect(&cm_start_video_recording, SIGNAL(triggered()), SLOT(toggleRecording()));
     cm_start_video_recording.setShortcuts(QList<QKeySequence>() << tr("Ctrl+R") << Qt::Key_MediaRecord);
-    cm_stop_video_recording.setShortcuts(QList<QKeySequence>() << tr("Ctrl+R") << Qt::Key_MediaRecord);
-    cm_stop_video_recording.setEnabled(false);
+    connect(&cm_recording_settings, SIGNAL(triggered()), SLOT(recordingSettings()));
 }
 
 GraphicsView::~GraphicsView()
@@ -1368,7 +1368,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
         if (m_camLayout.getContent() != CLSceneLayoutManager::instance().startScreenLayoutContent())
         {
             menu.addAction(&cm_start_video_recording);
-            menu.addAction(&cm_stop_video_recording);
+            menu.addAction(&cm_recording_settings);
             menu.addSeparator();
             menu.addAction(&cm_fitinview);
             menu.addAction(&cm_arrange);
@@ -2572,28 +2572,70 @@ void GraphicsView::onArrange_helper_finished()
 
 }
 
-void GraphicsView::onRecordingStarted()
+void GraphicsView::toggleRecording()
 {
-    VideoRecordingDialog d;
-    ArthurStyle s;
-    d.setStyle(&s);
-    if (d.exec() == QDialog::Accepted) {
-        QString filePath = d.filePath();
-        VideoRecordingDialog::CaptureMode captureMode = d.captureMode();
-        VideoRecordingDialog::DecoderQuality decoderQuality = d.decoderQuality();
-        VideoRecordingDialog::Resolution resolution = d.resolution();
+    bool recording = cm_start_video_recording.property("recoding").toBool();
 
-        cm_start_video_recording.setEnabled(false);
-        cm_stop_video_recording.setEnabled(true);
+    QSettings settings;
+    settings.beginGroup("videoRecording");
+
+    if (!recording) {
+        cm_start_video_recording.setProperty("recoding", true);
+
+        VideoRecordingDialog::CaptureMode captureMode =
+                (VideoRecordingDialog::CaptureMode)settings.value("captureMode").toInt();
+        VideoRecordingDialog::DecoderQuality decoderQuality =
+                (VideoRecordingDialog::DecoderQuality)settings.value("decoderQuality").toInt();
+        VideoRecordingDialog::Resolution resolution =
+                (VideoRecordingDialog::Resolution)settings.value("resolution").toInt();
+
         //Recorder.start();
+    } else {
+        cm_start_video_recording.setProperty("recoding", QVariant());
+        //Recorder.stop();
+
+        QString previousFile = settings.value(QLatin1String("previousFile")).toString();
+        QString fileName = QFileDialog::getSaveFileName(this,
+                                                        tr("Save Recording As"),
+                                                        previousFile,
+                                                        tr("Transport Stream (*.ts)"));
+
+        if (!fileName.isEmpty()) {
+            settings.setValue(QLatin1String("previousFile"), previousFile);
+        }
     }
+    settings.endGroup();
 }
 
-void GraphicsView::onRecordingStopped()
+void GraphicsView::recordingSettings()
 {
-    cm_start_video_recording.setEnabled(true);
-    cm_stop_video_recording.setEnabled(false);
-    //Recorder.stop();
+    VideoRecordingDialog dialog;
+    ArthurStyle style;
+    dialog.setStyle(&style);
+
+    QSettings settings;
+    settings.beginGroup("videoRecording");
+
+    VideoRecordingDialog::CaptureMode captureMode =
+            (VideoRecordingDialog::CaptureMode)settings.value("captureMode").toInt();
+    VideoRecordingDialog::DecoderQuality decoderQuality =
+            (VideoRecordingDialog::DecoderQuality)settings.value("decoderQuality").toInt();
+    VideoRecordingDialog::Resolution resolution =
+            (VideoRecordingDialog::Resolution)settings.value("resolution").toInt();
+
+    dialog.setCaptureMode(captureMode);
+    dialog.setDecoderQuality(decoderQuality);
+    dialog.setResolution(resolution);
+
+    if (dialog.exec() == QDialog::Accepted) {
+        captureMode = dialog.captureMode();
+        decoderQuality = dialog.decoderQuality();
+        resolution = dialog.resolution();
+        settings.setValue("captureMode", captureMode);
+        settings.setValue("decoderQuality", decoderQuality);
+        settings.setValue("resolution", resolution);
+    }
+    settings.endGroup();
 }
 
 void GraphicsView::fitInView(int duration, int delay, CLAnimationCurve curve)

@@ -11,56 +11,97 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Video Recording</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0" colspan="2">
-    <widget class="QLineEdit" name="fileLineEdit"/>
-   </item>
-   <item row="0" column="2">
-    <widget class="QPushButton" name="saveAsButton">
-     <property name="text">
-      <string>Save As...</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2">
-    <widget class="QComboBox" name="resolutionComboBox">
-     <item>
-      <property name="text">
-       <string>Native</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Quater Native</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>1920x1080</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>1280x720</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>640x480</string>
-      </property>
-     </item>
-    </widget>
-   </item>
    <item row="2" column="0" colspan="3">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Quality</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Resolution:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="resolutionComboBox">
+        <item>
+         <property name="text">
+          <string>Native</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Quater Native</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>1920x1080</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>1280x720</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>640x480</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Encoder quality:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QComboBox" name="qualityComboBox">
+        <item>
+         <property name="text">
+          <string>Best</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Balanced</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Performance</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="3">
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
       <string>Capture Mode</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
+      <property name="spacing">
+       <number>10</number>
+      </property>
       <property name="margin">
-       <number>5</number>
+       <number>12</number>
       </property>
       <item>
        <widget class="QRadioButton" name="fullscreenButton">
@@ -95,82 +136,23 @@
      </layout>
     </widget>
    </item>
-   <item row="3" column="0" colspan="3">
-    <widget class="QGroupBox" name="groupBox">
-     <property name="title">
-      <string>Encoder quality:</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <property name="margin">
-       <number>5</number>
-      </property>
-      <item>
-       <widget class="QRadioButton" name="bestButton">
-        <property name="text">
-         <string>Best</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="balancedButton">
-        <property name="text">
-         <string>Balanced</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="PerformanceButton">
-        <property name="text">
-         <string>Perfomance</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QPushButton" name="cancelButton">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text">
-      <string>Cancel</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="2">
-    <widget class="QPushButton" name="startRecordingButton">
-     <property name="text">
-      <string>Start recording</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="1">
-    <spacer name="horizontalSpacer">
+   <item row="3" column="1">
+    <spacer name="verticalSpacer">
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Vertical</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>40</width>
-       <height>20</height>
+       <width>20</width>
+       <height>0</height>
       </size>
      </property>
     </spacer>
    </item>
-   <item row="1" column="1">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Resolution:</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   <item row="4" column="1">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>
@@ -179,18 +161,34 @@
  <resources/>
  <connections>
   <connection>
-   <sender>cancelButton</sender>
-   <signal>clicked()</signal>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>VideoRecordingDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>202</x>
+     <y>279</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>149</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
    <receiver>VideoRecordingDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>78</x>
-     <y>274</y>
+     <x>202</x>
+     <y>279</y>
     </hint>
     <hint type="destinationlabel">
-     <x>183</x>
-     <y>287</y>
+     <x>199</x>
+     <y>149</y>
     </hint>
    </hints>
   </connection>
