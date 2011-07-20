@@ -18,11 +18,11 @@ VideoRecordingDialog::VideoRecordingDialog(QWidget *parent) :
     ui->fullscreenNoAeroButton->setEnabled(true);
 #endif
     QSettings settings;
-    settings.beginGroup("videoRecording");
+    settings.beginGroup(QLatin1String("videoRecording"));
 
-    setCaptureMode((VideoRecordingDialog::CaptureMode)settings.value("captureMode").toInt());
-    setDecoderQuality((VideoRecordingDialog::DecoderQuality)settings.value("decoderQuality").toInt());
-    setResolution((VideoRecordingDialog::Resolution)settings.value("resolution").toInt());
+    setCaptureMode((VideoRecordingDialog::CaptureMode)settings.value(QLatin1String("captureMode")).toInt());
+    setDecoderQuality((VideoRecordingDialog::DecoderQuality)settings.value(QLatin1String("decoderQuality")).toInt());
+    setResolution((VideoRecordingDialog::Resolution)settings.value(QLatin1String("resolution")).toInt());
 
     QDesktopWidget *desktop = qApp->desktop();
     for (int i = 0; i < desktop->screenCount(); i++) {
@@ -39,12 +39,12 @@ VideoRecordingDialog::VideoRecordingDialog(QWidget *parent) :
                                         arg(geometry.height()));
         }
     }
-    setScreen(settings.value("screen").toInt());
+    setScreen(settings.value(QLatin1String("screen")).toInt());
 
     foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {
         ui->audioDevicesComboBox->addItem(info.deviceName());
     }
-    setAudioDeviceName(settings.value("audioDevice").toString());
+    setAudioDeviceName(settings.value(QLatin1String("audioDevice")).toString());
 
     settings.endGroup();
 }
@@ -113,13 +113,13 @@ void VideoRecordingDialog::setResolution(VideoRecordingDialog::Resolution r)
 void VideoRecordingDialog::accept()
 {
     QSettings settings;
-    settings.beginGroup("videoRecording");
+    settings.beginGroup(QLatin1String("videoRecording"));
 
-    settings.setValue("captureMode", captureMode());
-    settings.setValue("decoderQuality", decoderQuality());
-    settings.setValue("resolution", resolution());
-    settings.setValue("screen", screen());
-    settings.setValue("audioDevice", audioDeviceName());
+    settings.setValue(QLatin1String("captureMode"), captureMode());
+    settings.setValue(QLatin1String("decoderQuality"), decoderQuality());
+    settings.setValue(QLatin1String("resolution"), resolution());
+    settings.setValue(QLatin1String("screen"), screen());
+    settings.setValue(QLatin1String("audioDevice"), audioDeviceName());
 
     settings.endGroup();
 

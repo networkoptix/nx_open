@@ -41,6 +41,9 @@ public slots:
     void accept();
 
 private:
+    void restoreSettings();
+    void storeSettings();
+
     Ui::VideoRecordingDialog *ui;
 };
 
