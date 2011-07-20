@@ -98,6 +98,9 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
     m_gridItem(0),
     m_menuIsHere(false),
     m_lastPressedItem(0)
+#ifdef Q_OS_WIN
+    ,m_desktopEncoder(0)
+#endif
 {
     m_timeAfterDoubleClick.restart();
 
@@ -2589,10 +2592,19 @@ void GraphicsView::toggleRecording()
         VideoRecordingDialog::Resolution resolution =
                 (VideoRecordingDialog::Resolution)settings.value("resolution").toInt();
 
-        //Recorder.start();
+#ifdef Q_OS_WIN
+        if (m_desktopEncoder)
+            delete m_desktopEncoder;
+        QString filePath = getTempRecordingDir() + "video.ts";
+        m_desktopEncoder = new DesktopFileEncoder(filePath);
+#endif
     } else {
         cm_start_video_recording.setProperty("recoding", QVariant());
         //Recorder.stop();
+#ifdef Q_OS_WIN
+        delete m_desktopEncoder;
+        m_desktopEncoder = 0;
+#endif
 
         QString previousFile = settings.value(QLatin1String("previousFile")).toString();
         QString fileName = QFileDialog::getSaveFileName(this,

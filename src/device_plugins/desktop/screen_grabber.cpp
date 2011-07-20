@@ -1,6 +1,6 @@
-#ifdef Q_OS_WIN
-
 #include "screen_grabber.h"
+
+#ifdef Q_OS_WIN
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -401,7 +401,7 @@ bool CLScreenGrapper::SurfaceToFrame(IDirect3DSurface9* pSurface, AVFrame* pFram
 
         avpicture_fill((AVPicture *)pFrame, videoBuf, format(), width(), height());
         pFrame->key_frame = 1;
-        pFrame->pict_type = AV_PICTURE_TYPE_I;
+        //pFrame->pict_type = AV_PICTURE_TYPE_I;
         pFrame->width = m_ddm.Width;
         pFrame->height = m_ddm.Height;
         pFrame->format = format();
@@ -409,7 +409,7 @@ bool CLScreenGrapper::SurfaceToFrame(IDirect3DSurface9* pSurface, AVFrame* pFram
         pFrame->sample_aspect_ratio.den = 1;
 
     }
-    pFrame->coded_picture_number = pFrame->coded_picture_number = m_frameNum++;
+    pFrame->coded_picture_number = m_frameNum++;
     pFrame->pts = m_timer.elapsed();
     pFrame->best_effort_timestamp = pFrame->pts;
     
@@ -444,4 +444,3 @@ bool CLScreenGrapper::SurfaceToFrame(IDirect3DSurface9* pSurface, AVFrame* pFram
 }
 
 #endif // Q_OS_WIN
-

@@ -9,6 +9,7 @@
 #include "ui_common.h"
 #include "animation/animation_manager.h"
 #include "animation/steady_mouse_animation.h"
+#include "device_plugins/desktop/desktop_file_encoder.h"
 
 class CLAbstractSceneItem;
 class CLVideoWindowItem;
@@ -240,6 +241,11 @@ protected:
     QTime m_timeAfterDoubleClick;
 
     CLAbstractSceneItem* m_lastPressedItem;
+
+#ifdef Q_OS_WIN
+    DesktopFileEncoder* m_desktopEncoder;
+#endif // Q_OS_WIN
 };
+
 
 #endif //PH_graphicsview_h328
