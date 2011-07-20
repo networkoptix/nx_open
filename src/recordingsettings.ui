@@ -31,7 +31,14 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QComboBox" name="screenComboBox"/>
+       <widget class="QComboBox" name="screenComboBox">
+        <property name="toolTip">
+         <string comment="Use this to change grabbed screen"/>
+        </property>
+        <property name="statusTip">
+         <string/>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -50,6 +57,12 @@
       </property>
       <item>
        <widget class="QRadioButton" name="fullscreenButton">
+        <property name="toolTip">
+         <string comment="Grabs video from entire screen"/>
+        </property>
+        <property name="statusTip">
+         <string/>
+        </property>
         <property name="text">
          <string>Fullscreen</string>
         </property>
@@ -73,6 +86,9 @@
       </item>
       <item>
        <widget class="QRadioButton" name="windowButton">
+        <property name="toolTip">
+         <string comment="Grabs Eve window"/>
+        </property>
         <property name="text">
          <string>Eve window</string>
         </property>
@@ -102,6 +118,9 @@
       </item>
       <item row="0" column="1">
        <widget class="QComboBox" name="resolutionComboBox">
+        <property name="toolTip">
+         <string comment="Use this to change output video resolution"/>
+        </property>
         <item>
          <property name="text">
           <string>Native</string>
@@ -141,6 +160,9 @@
       </item>
       <item row="1" column="1">
        <widget class="QComboBox" name="qualityComboBox">
+        <property name="toolTip">
+         <string comment="Use this to set encoder quality"/>
+        </property>
         <item>
          <property name="text">
           <string>Best</string>
@@ -175,7 +197,11 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QComboBox" name="audioDevicesComboBox"/>
+       <widget class="QComboBox" name="audioDevicesComboBox">
+        <property name="toolTip">
+         <string comment="Use this to select audio device"/>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
