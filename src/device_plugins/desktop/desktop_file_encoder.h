@@ -12,6 +12,8 @@ private:
 public:
     DesktopFileEncoder(const QString& fileName, int desktopNum = 0); // 0 - default
     virtual ~DesktopFileEncoder();
+
+    QString fileName() const { return m_fileName; }
 protected:
     virtual void run();
 private:

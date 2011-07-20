@@ -29,6 +29,7 @@
 #include "ui/animation/property_animation.h"
 #include "ui/videorecordingdialog.h"
 #include "ui/device_settings/style.h"
+#include "videorecordersettings.h"
 
 #include <QtCore/QSettings>
 #include <QtGui/QFileDialog>
@@ -2575,27 +2576,36 @@ void GraphicsView::onArrange_helper_finished()
 
 }
 
+QString getRecordName()
+{
+    QString base = getTempRecordingDir() + "video%1.ts";
+    for (int i = 0; ; i++) {
+        QString filePath = base.arg(i == 0 ? QString() : QLatin1String(" ") + QString::number(i));
+        if (!QFileInfo(filePath).exists()) {
+            return filePath;
+        }
+    }
+}
+
 void GraphicsView::toggleRecording()
 {
     bool recording = cm_start_video_recording.property("recoding").toBool();
 
-    QSettings settings;
-    settings.beginGroup("videoRecording");
+    VideoRecorderSettings recorderSettings;
 
     if (!recording) {
         cm_start_video_recording.setProperty("recoding", true);
 
-        VideoRecordingDialog::CaptureMode captureMode =
-                (VideoRecordingDialog::CaptureMode)settings.value("captureMode").toInt();
-        VideoRecordingDialog::DecoderQuality decoderQuality =
-                (VideoRecordingDialog::DecoderQuality)settings.value("decoderQuality").toInt();
-        VideoRecordingDialog::Resolution resolution =
-                (VideoRecordingDialog::Resolution)settings.value("resolution").toInt();
+        QAudioDeviceInfo audioDevice = recorderSettings.audioDevice();
+        int screen = recorderSettings.screen();
+        VideoRecorderSettings::CaptureMode captureMode = recorderSettings.captureMode();
+        VideoRecorderSettings::DecoderQuality decoderQuality = recorderSettings.decoderQuality();
+        VideoRecorderSettings::Resolution resolution = recorderSettings.resolution();
 
+        QString filePath = getRecordName();
 #ifdef Q_OS_WIN
         if (m_desktopEncoder)
             delete m_desktopEncoder;
-        QString filePath = getTempRecordingDir() + "video.ts";
         m_desktopEncoder = new DesktopFileEncoder(filePath);
 #endif
     } else {
@@ -2606,6 +2616,8 @@ void GraphicsView::toggleRecording()
         m_desktopEncoder = 0;
 #endif
 
+        QSettings settings;
+        settings.beginGroup("videoRecording");
         QString previousFile = settings.value(QLatin1String("previousFile")).toString();
         QString fileName = QFileDialog::getSaveFileName(this,
                                                         tr("Save Recording As"),
@@ -2615,8 +2627,8 @@ void GraphicsView::toggleRecording()
         if (!fileName.isEmpty()) {
             settings.setValue(QLatin1String("previousFile"), previousFile);
         }
+        settings.endGroup();
     }
-    settings.endGroup();
 }
 
 void GraphicsView::recordingSettings()

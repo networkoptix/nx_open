@@ -9,7 +9,8 @@
 
 VideoRecordingDialog::VideoRecordingDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::VideoRecordingDialog)
+    ui(new Ui::VideoRecordingDialog),
+    settings(new VideoRecorderSettings(this))
 {
     ui->setupUi(this);
 #ifndef Q_OS_WIN
@@ -17,12 +18,10 @@ VideoRecordingDialog::VideoRecordingDialog(QWidget *parent) :
 #else
     ui->fullscreenNoAeroButton->setEnabled(true);
 #endif
-    QSettings settings;
-    settings.beginGroup(QLatin1String("videoRecording"));
 
-    setCaptureMode((VideoRecordingDialog::CaptureMode)settings.value(QLatin1String("captureMode")).toInt());
-    setDecoderQuality((VideoRecordingDialog::DecoderQuality)settings.value(QLatin1String("decoderQuality")).toInt());
-    setResolution((VideoRecordingDialog::Resolution)settings.value(QLatin1String("resolution")).toInt());
+    setCaptureMode(settings->captureMode());
+    setDecoderQuality(settings->decoderQuality());
+    setResolution(settings->resolution());
 
     QDesktopWidget *desktop = qApp->desktop();
     for (int i = 0; i < desktop->screenCount(); i++) {
@@ -39,23 +38,12 @@ VideoRecordingDialog::VideoRecordingDialog(QWidget *parent) :
                                         arg(geometry.height()));
         }
     }
-    setScreen(settings.value(QLatin1String("screen")).toInt());
+    setScreen(settings->screen());
 
     foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {
         ui->audioDevicesComboBox->addItem(info.deviceName());
     }
-    setAudioDeviceName(settings.value(QLatin1String("audioDevice")).toString());
-
-    settings.endGroup();
-}
-
-QAudioDeviceInfo getDeviceByName(const QString &name, QAudio::Mode mode)
-{
-    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(mode)) {
-        if (info.deviceName() == name)
-            return info;
-    }
-    return QAudioDeviceInfo();
+    setAudioDeviceName(settings->audioDevice().deviceName());
 }
 
 VideoRecordingDialog::~VideoRecordingDialog()
@@ -63,26 +51,26 @@ VideoRecordingDialog::~VideoRecordingDialog()
     delete ui;
 }
 
-VideoRecordingDialog::CaptureMode VideoRecordingDialog::captureMode() const
+VideoRecorderSettings::CaptureMode VideoRecordingDialog::captureMode() const
 {
     if (ui->fullscreenButton->isChecked())
-        return FullScreenMode;
+        return VideoRecorderSettings::FullScreenMode;
     else if (ui->fullscreenNoAeroButton->isChecked())
-        return FullScreenNoeroMode;
+        return VideoRecorderSettings::FullScreenNoeroMode;
     else
-        return WindowMode;
+        return VideoRecorderSettings::WindowMode;
 }
 
-void VideoRecordingDialog::setCaptureMode(VideoRecordingDialog::CaptureMode c)
+void VideoRecordingDialog::setCaptureMode(VideoRecorderSettings::CaptureMode c)
 {
     switch (c) {
-    case FullScreenMode:
+    case VideoRecorderSettings::FullScreenMode:
         ui->fullscreenButton->setChecked(true);
         break;
-    case FullScreenNoeroMode:
+    case VideoRecorderSettings::FullScreenNoeroMode:
         ui->fullscreenNoAeroButton->setChecked(true);
         break;
-    case WindowMode:
+    case VideoRecorderSettings::WindowMode:
         ui->windowButton->setChecked(true);
         break;
     default:
@@ -90,38 +78,33 @@ void VideoRecordingDialog::setCaptureMode(VideoRecordingDialog::CaptureMode c)
     }
 }
 
-VideoRecordingDialog::DecoderQuality VideoRecordingDialog::decoderQuality() const
+VideoRecorderSettings::DecoderQuality VideoRecordingDialog::decoderQuality() const
 {
-    return (DecoderQuality)ui->qualityComboBox->currentIndex();
+    return (VideoRecorderSettings::DecoderQuality)ui->qualityComboBox->currentIndex();
 }
 
-void VideoRecordingDialog::setDecoderQuality(VideoRecordingDialog::DecoderQuality q)
+void VideoRecordingDialog::setDecoderQuality(VideoRecorderSettings::DecoderQuality q)
 {
     ui->qualityComboBox->setCurrentIndex(q);
 }
 
-VideoRecordingDialog::Resolution VideoRecordingDialog::resolution() const
+VideoRecorderSettings::Resolution VideoRecordingDialog::resolution() const
 {
-    return (Resolution)ui->resolutionComboBox->currentIndex();
+    return (VideoRecorderSettings::Resolution)ui->resolutionComboBox->currentIndex();
 }
 
-void VideoRecordingDialog::setResolution(VideoRecordingDialog::Resolution r)
+void VideoRecordingDialog::setResolution(VideoRecorderSettings::Resolution r)
 {
     ui->resolutionComboBox->setCurrentIndex(r);
 }
 
 void VideoRecordingDialog::accept()
 {
-    QSettings settings;
-    settings.beginGroup(QLatin1String("videoRecording"));
-
-    settings.setValue(QLatin1String("captureMode"), captureMode());
-    settings.setValue(QLatin1String("decoderQuality"), decoderQuality());
-    settings.setValue(QLatin1String("resolution"), resolution());
-    settings.setValue(QLatin1String("screen"), screen());
-    settings.setValue(QLatin1String("audioDevice"), audioDeviceName());
-
-    settings.endGroup();
+    settings->setCaptureMode(captureMode());
+    settings->setDecoderQuality(decoderQuality());
+    settings->setResolution(resolution());
+    settings->setScreen(screen());
+    settings->setAudioDeviceByName(audioDeviceName());
 
     QDialog::accept();
 }
