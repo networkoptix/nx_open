@@ -31,6 +31,12 @@ public:
     Resolution resolution() const;
     void setResolution(Resolution r);
 
+    int screen() const;
+    void setScreen(int screen);
+
+public slots:
+    void accept();
+
 private:
     Ui::VideoRecordingDialog *ui;
 };

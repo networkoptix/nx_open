@@ -2625,29 +2625,7 @@ void GraphicsView::recordingSettings()
     ArthurStyle style;
     dialog.setStyle(&style);
 
-    QSettings settings;
-    settings.beginGroup("videoRecording");
-
-    VideoRecordingDialog::CaptureMode captureMode =
-            (VideoRecordingDialog::CaptureMode)settings.value("captureMode").toInt();
-    VideoRecordingDialog::DecoderQuality decoderQuality =
-            (VideoRecordingDialog::DecoderQuality)settings.value("decoderQuality").toInt();
-    VideoRecordingDialog::Resolution resolution =
-            (VideoRecordingDialog::Resolution)settings.value("resolution").toInt();
-
-    dialog.setCaptureMode(captureMode);
-    dialog.setDecoderQuality(decoderQuality);
-    dialog.setResolution(resolution);
-
-    if (dialog.exec() == QDialog::Accepted) {
-        captureMode = dialog.captureMode();
-        decoderQuality = dialog.decoderQuality();
-        resolution = dialog.resolution();
-        settings.setValue("captureMode", captureMode);
-        settings.setValue("decoderQuality", decoderQuality);
-        settings.setValue("resolution", resolution);
-    }
-    settings.endGroup();
+    dialog.exec();
 }
 
 void GraphicsView::fitInView(int duration, int delay, CLAnimationCurve curve)
