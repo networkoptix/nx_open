@@ -22,6 +22,13 @@ INTRO_FILE = '../uniclient_media/intro.mov'
 EXCLUDE_DIRS = ('.svn', 'dxva')
 EXCLUDE_FILES = ('dxva', 'moc_', 'qrc_', 'StdAfx')
 
+if sys.platform == 'win32':
+    EXCLUDE_DIRS += ()
+    EXCLUDE_FILES += ()
+elif sys.platform == 'darwin':
+    EXCLUDE_DIRS += ('desktop',)
+    EXCLUDE_FILES += ()
+
 def rmtree(path):
     def on_rm_error( func, path, exc_info):
         # Dirty windows hack. Sometimes windows list already deleted files/folders.

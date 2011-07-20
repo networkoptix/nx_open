@@ -9,7 +9,10 @@
 #include "ui_common.h"
 #include "animation/animation_manager.h"
 #include "animation/steady_mouse_animation.h"
+
+#ifdef _WIN32
 #include "device_plugins/desktop/desktop_file_encoder.h"
+#endif
 
 class CLAbstractSceneItem;
 class CLVideoWindowItem;
