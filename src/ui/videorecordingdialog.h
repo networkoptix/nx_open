@@ -34,6 +34,9 @@ public:
     int screen() const;
     void setScreen(int screen);
 
+    QString audioDeviceName() const;
+    void setAudioDeviceName(const QString &name);
+
 public slots:
     void accept();
 

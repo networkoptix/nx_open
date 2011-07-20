@@ -1,11 +1,11 @@
 #include "videorecordingdialog.h"
 #include "ui_videorecordingdialog.h"
 
-
 #include <QtCore/QSettings>
 #include <QtGui/QApplication>
 #include <QtGui/QDesktopWidget>
 #include <QtGui/QFileDialog>
+#include "QtMultimedia/QAudioDeviceInfo"
 
 VideoRecordingDialog::VideoRecordingDialog(QWidget *parent) :
     QDialog(parent),
@@ -41,7 +41,21 @@ VideoRecordingDialog::VideoRecordingDialog(QWidget *parent) :
     }
     setScreen(settings.value("screen").toInt());
 
+    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {
+        ui->audioDevicesComboBox->addItem(info.deviceName());
+    }
+    setAudioDeviceName(settings.value("audioDevice").toString());
+
     settings.endGroup();
+}
+
+QAudioDeviceInfo getDeviceByName(const QString &name, QAudio::Mode mode)
+{
+    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(mode)) {
+        if (info.deviceName() == name)
+            return info;
+    }
+    return QAudioDeviceInfo();
 }
 
 VideoRecordingDialog::~VideoRecordingDialog()
@@ -105,6 +119,7 @@ void VideoRecordingDialog::accept()
     settings.setValue("decoderQuality", decoderQuality());
     settings.setValue("resolution", resolution());
     settings.setValue("screen", screen());
+    settings.setValue("audioDevice", audioDeviceName());
 
     settings.endGroup();
 
@@ -119,4 +134,17 @@ int VideoRecordingDialog::screen() const
 void VideoRecordingDialog::setScreen(int screen)
 {
     ui->screenComboBox->setCurrentIndex(screen);
+}
+
+QString VideoRecordingDialog::audioDeviceName() const
+{
+    return ui->audioDevicesComboBox->currentText();
+}
+
+void VideoRecordingDialog::setAudioDeviceName(const QString &name)
+{
+    for (int i = 0; i < ui->audioDevicesComboBox->count(); i++) {
+        if (ui->audioDevicesComboBox->itemText(i) == name)
+            ui->audioDevicesComboBox->setCurrentIndex(i);
+    }
 }
