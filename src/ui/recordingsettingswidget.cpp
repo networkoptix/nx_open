@@ -1,5 +1,5 @@
-#include "videorecordingdialog.h"
-#include "ui_videorecordingdialog.h"
+#include "recordingsettingswidget.h"
+#include "ui_recordingsettings.h"
 
 #include <QtCore/QSettings>
 #include <QtGui/QApplication>
@@ -7,9 +7,9 @@
 #include <QtGui/QFileDialog>
 #include "QtMultimedia/QAudioDeviceInfo"
 
-VideoRecordingDialog::VideoRecordingDialog(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::VideoRecordingDialog),
+RecordingSettingsWidget::RecordingSettingsWidget(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::RecordingSettings),
     settings(new VideoRecorderSettings(this))
 {
     ui->setupUi(this);
@@ -46,12 +46,12 @@ VideoRecordingDialog::VideoRecordingDialog(QWidget *parent) :
     setAudioDeviceName(settings->audioDevice().deviceName());
 }
 
-VideoRecordingDialog::~VideoRecordingDialog()
+RecordingSettingsWidget::~RecordingSettingsWidget()
 {
     delete ui;
 }
 
-VideoRecorderSettings::CaptureMode VideoRecordingDialog::captureMode() const
+VideoRecorderSettings::CaptureMode RecordingSettingsWidget::captureMode() const
 {
     if (ui->fullscreenButton->isChecked())
         return VideoRecorderSettings::FullScreenMode;
@@ -61,7 +61,7 @@ VideoRecorderSettings::CaptureMode VideoRecordingDialog::captureMode() const
         return VideoRecorderSettings::WindowMode;
 }
 
-void VideoRecordingDialog::setCaptureMode(VideoRecorderSettings::CaptureMode c)
+void RecordingSettingsWidget::setCaptureMode(VideoRecorderSettings::CaptureMode c)
 {
     switch (c) {
     case VideoRecorderSettings::FullScreenMode:
@@ -78,53 +78,51 @@ void VideoRecordingDialog::setCaptureMode(VideoRecorderSettings::CaptureMode c)
     }
 }
 
-VideoRecorderSettings::DecoderQuality VideoRecordingDialog::decoderQuality() const
+VideoRecorderSettings::DecoderQuality RecordingSettingsWidget::decoderQuality() const
 {
     return (VideoRecorderSettings::DecoderQuality)ui->qualityComboBox->currentIndex();
 }
 
-void VideoRecordingDialog::setDecoderQuality(VideoRecorderSettings::DecoderQuality q)
+void RecordingSettingsWidget::setDecoderQuality(VideoRecorderSettings::DecoderQuality q)
 {
     ui->qualityComboBox->setCurrentIndex(q);
 }
 
-VideoRecorderSettings::Resolution VideoRecordingDialog::resolution() const
+VideoRecorderSettings::Resolution RecordingSettingsWidget::resolution() const
 {
     return (VideoRecorderSettings::Resolution)ui->resolutionComboBox->currentIndex();
 }
 
-void VideoRecordingDialog::setResolution(VideoRecorderSettings::Resolution r)
+void RecordingSettingsWidget::setResolution(VideoRecorderSettings::Resolution r)
 {
     ui->resolutionComboBox->setCurrentIndex(r);
 }
 
-void VideoRecordingDialog::accept()
+void RecordingSettingsWidget::accept()
 {
     settings->setCaptureMode(captureMode());
     settings->setDecoderQuality(decoderQuality());
     settings->setResolution(resolution());
     settings->setScreen(screen());
     settings->setAudioDeviceByName(audioDeviceName());
-
-    QDialog::accept();
 }
 
-int VideoRecordingDialog::screen() const
+int RecordingSettingsWidget::screen() const
 {
     return ui->screenComboBox->currentIndex();
 }
 
-void VideoRecordingDialog::setScreen(int screen)
+void RecordingSettingsWidget::setScreen(int screen)
 {
     ui->screenComboBox->setCurrentIndex(screen);
 }
 
-QString VideoRecordingDialog::audioDeviceName() const
+QString RecordingSettingsWidget::audioDeviceName() const
 {
     return ui->audioDevicesComboBox->currentText();
 }
 
-void VideoRecordingDialog::setAudioDeviceName(const QString &name)
+void RecordingSettingsWidget::setAudioDeviceName(const QString &name)
 {
     for (int i = 0; i < ui->audioDevicesComboBox->count(); i++) {
         if (ui->audioDevicesComboBox->itemText(i) == name)

@@ -27,7 +27,7 @@
 #include "device_plugins/archive/archive/archive_device.h"
 #include "videoitem/unmoved/multipage/page_selector.h"
 #include "ui/animation/property_animation.h"
-#include "ui/videorecordingdialog.h"
+#include "ui/recordingsettingswidget.h"
 #include "ui/device_settings/style.h"
 #include "videorecordersettings.h"
 
@@ -2633,11 +2633,14 @@ void GraphicsView::toggleRecording()
 
 void GraphicsView::recordingSettings()
 {
-    VideoRecordingDialog dialog;
-    ArthurStyle style;
-    dialog.setStyle(&style);
+//    VideoRecordingDialog dialog;
+//    ArthurStyle style;
+//    dialog.setStyle(&style);
 
-    dialog.exec();
+//    dialog.exec();
+    PreferencesWindow preferencesDialog;
+    preferencesDialog.setCurrentTab(3);
+    preferencesDialog.exec();
 }
 
 void GraphicsView::fitInView(int duration, int delay, CLAnimationCurve curve)

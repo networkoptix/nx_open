@@ -1,21 +1,21 @@
 #ifndef VIDEORECORDINGDIALOG_H
 #define VIDEORECORDINGDIALOG_H
 
-#include <QtGui/QDialog>
+#include <QtGui/QWidget>
 #include "videorecordersettings.h"
 
 namespace Ui {
-    class VideoRecordingDialog;
+    class RecordingSettings;
 }
 
 class VideoRecorderSettings;
-class VideoRecordingDialog : public QDialog
+class RecordingSettingsWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit VideoRecordingDialog(QWidget *parent = 0);
-    ~VideoRecordingDialog();
+    explicit RecordingSettingsWidget(QWidget *parent = 0);
+    ~RecordingSettingsWidget();
 
     VideoRecorderSettings::CaptureMode captureMode() const;
     void setCaptureMode(VideoRecorderSettings::CaptureMode c);
@@ -36,7 +36,7 @@ public slots:
     void accept();
 
 private:
-    Ui::VideoRecordingDialog *ui;
+    Ui::RecordingSettings *ui;
     VideoRecorderSettings *settings;
 };
 
