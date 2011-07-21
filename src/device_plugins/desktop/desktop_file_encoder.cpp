@@ -1,5 +1,6 @@
 #include "desktop_file_encoder.h"
 
+#ifdef Q_OS_WIN
 #include <QAudioInput>
 
 static const int DEFAULT_VIDEO_STREAM_ID = 4113;
@@ -515,3 +516,4 @@ int DesktopFileEncoder::audioPacketSize()
     return m_audioCodecCtx->frame_size * m_audioFormat.channels() * m_audioFormat.sampleSize()/8;
 }
 
+#endif // Q_OS_WIN

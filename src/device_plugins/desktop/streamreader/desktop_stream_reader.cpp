@@ -1,3 +1,5 @@
+#ifdef Q_OS_WIN
+
 #include "desktop_stream_reader.h"
 #include "device/device.h"
 #include "data/mediadata.h"
@@ -149,3 +151,5 @@ bool CLDesktopStreamreader::isStreamOpened() const
 {
     return m_initialized;
 }
+
+#endif // Q_OS_WIN

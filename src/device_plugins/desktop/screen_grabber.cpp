@@ -1,5 +1,7 @@
 #include "screen_grabber.h"
 
+#ifdef Q_OS_WIN
+
 extern "C" {
 #include <libavformat/avformat.h>
 #include <libavcodec/avcodec.h>
@@ -645,3 +647,4 @@ qint64 CLScreenGrapper::currentTime() const
 {
     return m_timer.elapsed();
 }
+#endif // Q_OS_WIN

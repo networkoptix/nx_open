@@ -6,6 +6,7 @@
 #include "settings.h"
 
 class CLDevice;
+class RecordingSettingsWidget;
 
 class PreferencesWindow : public QDialog, Ui::PreferencesDialog
 {
@@ -14,6 +15,8 @@ class PreferencesWindow : public QDialog, Ui::PreferencesDialog
 public:
     PreferencesWindow();
     ~PreferencesWindow();
+
+    void setCurrentTab(int index);
 
 private:
     void resizeEvent (QResizeEvent * event);
@@ -25,6 +28,7 @@ private:
 
 private:
     Settings::Data m_settingsData;
+    RecordingSettingsWidget *videoRecorderWidget;
 
     typedef QPair<QString, QString> CameraNameAndInfo;
 
@@ -39,7 +43,6 @@ private slots:
     void cameraSelected(int);
     void enterLicenseClick();
     void auxMediaFolderSelectionChanged();
-
 };
 
 #endif // preferences_wnd_h

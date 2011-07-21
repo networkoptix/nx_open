@@ -27,8 +27,13 @@
 #include "device_plugins/archive/archive/archive_device.h"
 #include "videoitem/unmoved/multipage/page_selector.h"
 #include "ui/animation/property_animation.h"
-#include "ui/videorecordingdialog.h"
+#include "ui/recordingsettingswidget.h"
 #include "ui/device_settings/style.h"
+#include "videorecordersettings.h"
+
+#include <QtCore/QSettings>
+#include <QtGui/QFileDialog>
+#include <QtGui/QMessageBox>
 
 extern int  SLOT_WIDTH;
 
@@ -93,8 +98,10 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
     m_pageSelector(0),
     m_gridItem(0),
     m_menuIsHere(false),
-    m_lastPressedItem(0),
-    m_desktopEncoder(0)
+    m_lastPressedItem(0)
+#ifdef Q_OS_WIN
+    ,m_desktopEncoder(0)
+#endif
 {
     m_timeAfterDoubleClick.restart();
 
@@ -170,9 +177,9 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
 
     setFrameShape(QFrame::NoFrame);
 
-    connect(&cm_start_video_recording, SIGNAL(triggered()), SLOT(onRecordingStarted()));
-    connect(&cm_stop_video_recording, SIGNAL(triggered()), SLOT(onRecordingStopped()));
-    cm_stop_video_recording.setEnabled(false);
+    connect(&cm_start_video_recording, SIGNAL(triggered()), SLOT(toggleRecording()));
+    cm_start_video_recording.setShortcuts(QList<QKeySequence>() << tr("Ctrl+R") << Qt::Key_MediaRecord);
+    connect(&cm_recording_settings, SIGNAL(triggered()), SLOT(recordingSettings()));
 }
 
 GraphicsView::~GraphicsView()
@@ -1365,7 +1372,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
         if (m_camLayout.getContent() != CLSceneLayoutManager::instance().startScreenLayoutContent())
         {
             menu.addAction(&cm_start_video_recording);
-            menu.addAction(&cm_stop_video_recording);
+            menu.addAction(&cm_recording_settings);
             menu.addSeparator();
             menu.addAction(&cm_fitinview);
             menu.addAction(&cm_arrange);
@@ -2569,33 +2576,71 @@ void GraphicsView::onArrange_helper_finished()
 
 }
 
-void GraphicsView::onRecordingStarted()
+QString getRecordName()
 {
-    VideoRecordingDialog d;
-    ArthurStyle s;
-    d.setStyle(&s);
-    if (d.exec() == QDialog::Accepted) {
-        QString filePath = d.filePath();
-        VideoRecordingDialog::CaptureMode captureMode = d.captureMode();
-        VideoRecordingDialog::DecoderQuality decoderQuality = d.decoderQuality();
-        VideoRecordingDialog::Resolution resolution = d.resolution();
-
-        cm_start_video_recording.setEnabled(false);
-        cm_stop_video_recording.setEnabled(true);
-        //Recorder.start();
-        if (m_desktopEncoder)
-            delete m_desktopEncoder;
-        m_desktopEncoder = new DesktopFileEncoder(filePath);
+    QString base = getTempRecordingDir() + "video%1.ts";
+    for (int i = 0; ; i++) {
+        QString filePath = base.arg(i == 0 ? QString() : QLatin1String(" ") + QString::number(i));
+        if (!QFileInfo(filePath).exists()) {
+            return filePath;
+        }
     }
 }
 
-void GraphicsView::onRecordingStopped()
+void GraphicsView::toggleRecording()
 {
-    cm_start_video_recording.setEnabled(true);
-    cm_stop_video_recording.setEnabled(false);
-    //Recorder.stop();
-    delete m_desktopEncoder;
-    m_desktopEncoder = 0;
+    bool recording = cm_start_video_recording.property("recoding").toBool();
+
+    VideoRecorderSettings recorderSettings;
+
+    if (!recording) {
+        cm_start_video_recording.setProperty("recoding", true);
+
+        QAudioDeviceInfo audioDevice = recorderSettings.audioDevice();
+        int screen = recorderSettings.screen();
+        VideoRecorderSettings::CaptureMode captureMode = recorderSettings.captureMode();
+        VideoRecorderSettings::DecoderQuality decoderQuality = recorderSettings.decoderQuality();
+        VideoRecorderSettings::Resolution resolution = recorderSettings.resolution();
+
+        QString filePath = getRecordName();
+#ifdef Q_OS_WIN
+        if (m_desktopEncoder)
+            delete m_desktopEncoder;
+        m_desktopEncoder = new DesktopFileEncoder(filePath);
+#endif
+    } else {
+        cm_start_video_recording.setProperty("recoding", QVariant());
+        //Recorder.stop();
+#ifdef Q_OS_WIN
+        delete m_desktopEncoder;
+        m_desktopEncoder = 0;
+#endif
+
+        QSettings settings;
+        settings.beginGroup("videoRecording");
+        QString previousFile = settings.value(QLatin1String("previousFile")).toString();
+        QString fileName = QFileDialog::getSaveFileName(this,
+                                                        tr("Save Recording As"),
+                                                        previousFile,
+                                                        tr("Transport Stream (*.ts)"));
+
+        if (!fileName.isEmpty()) {
+            settings.setValue(QLatin1String("previousFile"), previousFile);
+        }
+        settings.endGroup();
+    }
+}
+
+void GraphicsView::recordingSettings()
+{
+//    VideoRecordingDialog dialog;
+//    ArthurStyle style;
+//    dialog.setStyle(&style);
+
+//    dialog.exec();
+    PreferencesWindow preferencesDialog;
+    preferencesDialog.setCurrentTab(3);
+    preferencesDialog.exec();
 }
 
 void GraphicsView::fitInView(int duration, int delay, CLAnimationCurve curve)

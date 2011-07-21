@@ -1,6 +1,8 @@
 #ifndef __DESKTOP_H264_STREAM_READER_H
 #define __DESKTOP_H264_STREAM_READER_H
 
+#ifdef Q_OS_WIN
+
 #include <QIODevice>
 #include <QAudioDeviceInfo>
 #include <QAudioInput>
@@ -20,6 +22,7 @@ public:
                        const QAudioDeviceInfo audioDevice = QAudioDeviceInfo::defaultInputDevice() ); // 0 - default
     virtual ~DesktopFileEncoder();
 
+    QString fileName() const { return m_fileName; }
 protected:
     // CLLongRunnable runable
     virtual void run();
@@ -75,5 +78,7 @@ private:
     qint64 m_storedAudioPts;
     int m_maxAudioJitter;
 };
+
+#endif // Q_OS_WIN
 
 #endif //__DESKTOP_H264_STREAM_READER_H

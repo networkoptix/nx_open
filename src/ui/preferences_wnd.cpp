@@ -7,12 +7,13 @@
 #include "version.h"
 #include "device_settings/style.h"
 #include "util.h"
+#include "recordingsettingswidget.h"
 
 extern QString button_layout;
 extern QString button_home;
 
-PreferencesWindow::PreferencesWindow()
-    : QDialog(0, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint)
+PreferencesWindow::PreferencesWindow() :
+    QDialog(0, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint)
 {
     QStyle *arthurStyle = new ArthurStyle();
     setStyle(arthurStyle);
@@ -23,6 +24,8 @@ PreferencesWindow::PreferencesWindow()
     Settings::instance().fillData(m_settingsData);
 
     setWindowTitle(tr("Preferences Editor"));
+    videoRecorderWidget = new RecordingSettingsWidget;
+    tabWidget->insertTab(3, videoRecorderWidget, tr("Video Recorder"));
 
     updateView();
     updateCameras();
@@ -45,6 +48,8 @@ void PreferencesWindow::accept()
     QStringList checkLst(settings.auxMediaRoots());
     checkLst.push_back(QDir::toNativeSeparators(settings.mediaRoot()));
     CLDeviceManager::instance().pleaseCheckDirs(checkLst);
+
+    videoRecorderWidget->accept();
 
     QDialog::accept();
 }
@@ -220,4 +225,9 @@ void PreferencesWindow::enterLicenseClick()
 
     delete dialog;
 
+}
+
+void PreferencesWindow::setCurrentTab(int index)
+{
+    tabWidget->setCurrentIndex(index);
 }
