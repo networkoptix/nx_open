@@ -1,5 +1,5 @@
 QT = core gui network xml xmlpatterns opengl multimedia webkit 
-CONFIG += x86
+CONFIG += x86 precompile_header
 TEMPLATE = app
 VERSION = 0.0.1
 ICON = eve_logo.icns
@@ -48,7 +48,7 @@ PRECOMPILED_SOURCE = StdAfx.cpp
 DEFINES += __STDC_CONSTANT_MACROS
 
 RESOURCES += mainwnd.qrc ../build/skin.qrc
-FORMS += mainwnd.ui preferences.ui licensekey.ui videorecordingdialog.ui
+FORMS += mainwnd.ui preferences.ui licensekey.ui recordingsettings.ui
 
 
 win32 {
@@ -80,5 +80,5 @@ mac {
   QMAKE_LFLAGS += -lavcodec.53 -lavdevice.53 -lavfilter.2 -lavformat.53 -lavutil.51 -lswscale.0 -lz -lbz2
   QMAKE_LFLAGS_DEBUG += -L$$FFMPEG-debug/lib
   QMAKE_LFLAGS_RELEASE += -L$$FFMPEG-release/lib
-  QMAKE_POST_LINK += mkdir -p `dirname $(TARGET)`/arecontvision; cp -f ../bin/arecontvision/devices.xml `dirname $(TARGET)`/arecontvision
+  QMAKE_POST_LINK += mkdir -p `dirname $(TARGET)`/arecontvision; cp -f $$PWD/../resource/arecontvision/devices.xml `dirname $(TARGET)`/arecontvision
 }

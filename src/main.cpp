@@ -156,6 +156,7 @@ int main(int argc, char *argv[])
         background: rgb(40, 40, 40);\
         }\
         QMenu::separator {\
+        height: 3px; \
         background: rgb(20, 20, 20);\
         }");
 

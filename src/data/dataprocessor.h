@@ -19,11 +19,11 @@ public:
 	virtual void putData(CLAbstractData* data);
 	virtual void clearUnprocessedData();
 	int queueSize() const;
-    virtual void setSingleShotMode(bool single) {}
+    virtual void setSingleShotMode(bool /*single*/) {}
 
 protected:
 	void run();
-	virtual bool processData(CLAbstractData* data)=0;
+        virtual bool processData(CLAbstractData* /*data*/)=0;
 	virtual void endOfRun();
 
 protected:
