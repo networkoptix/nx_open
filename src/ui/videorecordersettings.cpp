@@ -67,10 +67,22 @@ void VideoRecorderSettings::setResolution(VideoRecorderSettings::Resolution reso
 
 int VideoRecorderSettings::screen() const
 {
-    return settings.value(QLatin1String("screen")).toInt();
+    int oldScreen = settings.value(QLatin1String("screen")).toInt();
+    QRect geometry = settings.value(QLatin1String("screenResolution")).toRect();
+    QDesktopWidget *desktop = qApp->desktop();
+    if (desktop->screen(oldScreen)->geometry() == geometry) {
+        return oldScreen;
+    } else {
+        for (int i = 0; i < desktop->screenCount(); i++) {
+            if (desktop->screen(i)->geometry() == geometry)
+                return i;
+        }
+    }
+    return desktop->primaryScreen();
 }
 
 void VideoRecorderSettings::setScreen(int screen)
 {
     settings.setValue(QLatin1String("screen"), screen);
+    settings.setValue(QLatin1String("screenResolution"),  qApp->desktop()->screen(screen)->geometry());
 }
