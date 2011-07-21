@@ -41,7 +41,10 @@ def rmtree(path):
 
         func(path)
 
-    shutil.rmtree(path, onerror = on_rm_error)
+    if os.path.isdir(path):
+        shutil.rmtree(path, onerror = on_rm_error)
+    else:
+        os.unlink(path)
 
 def copy_files(src_glob, dst_folder):
     for fname in glob.iglob(src_glob):
@@ -280,7 +283,8 @@ if sys.platform == 'win32':
 elif sys.platform == 'darwin':
     generate_info_plist()
 
-    if os.path.exists('src/uniclient.xcodeproj'):
-        rmtree('src/uniclient.xcodeproj')
+    if os.path.exists('src/Makefile'):
+        rmtree('src/Makefile')
 
-    os.system('qmake FFMPEG=%s -o src/uniclient.xcodeproj src/uniclient.pro' % ffmpeg_path)
+    os.system('qmake -spec macx-g++ CONFIG-=release CONFIG+=debug FFMPEG=%s -o build/Makefile.debug src/uniclient.pro' % ffmpeg_path)
+    os.system('qmake -spec macx-g++ CONFIG-=debug CONFIG+=release FFMPEG=%s -o build/Makefile.release src/uniclient.pro' % ffmpeg_path)
