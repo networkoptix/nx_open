@@ -1,11 +1,32 @@
 #include "desktop_file_encoder.h"
 
+#include <QAudioInput>
+
 static const int DEFAULT_VIDEO_STREAM_ID = 4113;
+static const int DEFAULT_AUDIO_STREAM_ID = 4351;
+static const int AUDIO_QUEUE_MAX_SIZE = 32;
 
 extern "C" 
 {
     #include <libavformat/avformat.h>
     #include <libavcodec/avcodec.h>
+#include "data/mediadata.h"
+}
+
+AVSampleFormat audioFormatQtToFfmpeg(const QAudioFormat& fmt)
+{
+    int s = fmt.sampleSize();
+    QAudioFormat::SampleType st = fmt.sampleType();
+    if (fmt.sampleSize() == 8)
+        return AV_SAMPLE_FMT_U8;
+    else if(fmt.sampleSize() == 16 && fmt.sampleType() == QAudioFormat::SignedInt)
+        return AV_SAMPLE_FMT_S16;
+    else if(fmt.sampleSize() == 32 && fmt.sampleType() == QAudioFormat::SignedInt)
+        return AV_SAMPLE_FMT_S32;
+    else if(fmt.sampleSize() == 32 && fmt.sampleType() == QAudioFormat::Float)
+        return AV_SAMPLE_FMT_FLT;
+    else
+        return AV_SAMPLE_FMT_NONE;
 }
 
 struct FffmpegLog
@@ -27,6 +48,56 @@ struct FffmpegLog
     }
 };
 
+
+class CaptureAudioStream: public QIODevice
+{
+public:
+    CaptureAudioStream(DesktopFileEncoder* encoder)
+        : QIODevice(),
+        m_encoder(encoder),
+        m_currentBufferSize(0),
+        m_nextAudioBuffer(0)
+    {
+        m_nextAudioBuffer = new CLAbstractMediaData(CL_MEDIA_ALIGNMENT, m_encoder->audioPacketSize());
+        m_nextAudioBuffer->timestamp = m_encoder->currentTime();
+    }
+    ~CaptureAudioStream()
+    {
+        delete m_nextAudioBuffer;
+    }
+protected:
+    // QIODevice
+    virtual qint64 readData ( char * data, qint64 maxSize ) { return -1; }
+    virtual bool isOpen () const { return true; }
+    virtual bool isReadable () const {  return false; }
+    virtual bool isWritable() const {  return true; }
+    virtual bool isSequential () const {  return true;  }
+
+    qint64 writeData ( const char * data, qint64 maxSize )
+    {
+        int currentMaxSize = maxSize;
+        while (currentMaxSize > 0)
+        {
+            int dataToWrite = qMin(currentMaxSize, m_encoder->audioPacketSize() - m_currentBufferSize);
+            m_nextAudioBuffer->data.write(data, dataToWrite);
+            data += dataToWrite;
+            currentMaxSize -= dataToWrite;
+            m_currentBufferSize += dataToWrite;
+            if (m_currentBufferSize == m_encoder->audioPacketSize())
+            {
+                m_encoder->m_audioQueue.push(m_nextAudioBuffer);
+                m_nextAudioBuffer = new CLAbstractMediaData(CL_MEDIA_ALIGNMENT, m_encoder->audioPacketSize());
+                m_nextAudioBuffer->timestamp = m_encoder->currentTime();
+                m_currentBufferSize = 0;
+            }
+        }
+        return maxSize;
+    }
+private:
+    DesktopFileEncoder* m_encoder;
+    int m_currentBufferSize;
+    CLAbstractMediaData* m_nextAudioBuffer;
+};
 
 int DesktopFileEncoder::initIOContext()
 {
@@ -55,9 +126,8 @@ int DesktopFileEncoder::initIOContext()
         }
     };
     m_buffer.resize(MAX_READ_SIZE);
-    m_iocontext = new ByteIOContext();
-    int res = init_put_byte(m_iocontext, &m_buffer[0], MAX_READ_SIZE, 1, this, &IO_ffmpeg::readPacket, &IO_ffmpeg::writePacket, &IO_ffmpeg::seek);
-    return res >= 0;
+    m_iocontext = av_alloc_put_byte(&m_buffer[0], MAX_READ_SIZE, 1, this, &IO_ffmpeg::readPacket, &IO_ffmpeg::writePacket, &IO_ffmpeg::seek);
+    return m_iocontext != 0;
 }
 qint32 DesktopFileEncoder::writePacketImpl(quint8* buf, qint32 bufSize)
 {
@@ -103,7 +173,9 @@ qint64 DesktopFileEncoder::seekPacketImpl(qint64 offset, qint32 whence)
 
 
 
-DesktopFileEncoder::DesktopFileEncoder(const QString& fileName, int desktopNum):
+DesktopFileEncoder::DesktopFileEncoder(const QString& fileName, 
+                                       int desktopNum,
+                                       const QAudioDeviceInfo audioDevice):
     CLLongRunnable(),
     m_videoBuf(0),
     m_videoBufSize(0),
@@ -114,11 +186,23 @@ DesktopFileEncoder::DesktopFileEncoder(const QString& fileName, int desktopNum):
     m_iocontext(0),
     m_formatCtx(0),
     m_grabber(0),
-    m_desktopNum(desktopNum)
+    m_desktopNum(desktopNum),
+    m_audioDevice(audioDevice),
+    m_audioInput(0),
+    m_audioOStream(0),
+
+    m_audioFramesCount(0),
+    m_audioFrameDuration(0),
+    m_storedAudioPts(0),
+    m_maxAudioJitter(0)
+
 {
+    //m_encoderCodecName = "libx264";
     m_encoderCodecName = "mpeg2video";
-    //m_encoderCodecName = "mpeg4";
     m_needStop = false;
+    m_audioQueue.setMaxSize(AUDIO_QUEUE_MAX_SIZE);
+
+    openStream();
     start();
 }
 
@@ -127,13 +211,13 @@ DesktopFileEncoder::~DesktopFileEncoder()
     m_needStop = true;
     wait();
     closeStream();
+    delete m_audioInput;
+    delete m_audioOStream;
 }
 
 bool DesktopFileEncoder::init()
 {
     m_grabber = new CLBufferedScreenGrabber(m_desktopNum);
-
-    AVRational st_rate = {1,90000};
 
     avcodec_init();
     av_register_all();
@@ -148,8 +232,8 @@ bool DesktopFileEncoder::init()
     m_frame = avcodec_alloc_frame();
     avpicture_alloc((AVPicture*) m_frame, m_grabber->format(), m_grabber->width(), m_grabber->height() );
 
-    AVCodec* codec = avcodec_find_encoder_by_name(m_encoderCodecName);
-    if(codec == 0)
+    AVCodec* videoCodec = avcodec_find_encoder_by_name(m_encoderCodecName);
+    if(videoCodec == 0)
     {
         cl_log.log("Can't find encoder", cl_logWARNING);
         return false;
@@ -164,7 +248,7 @@ bool DesktopFileEncoder::init()
     m_formatCtx->pb = m_iocontext;
     m_outputCtx = av_guess_format("mpegts",NULL,NULL);
 
-    m_outputCtx->video_codec = codec->id;
+    m_outputCtx->video_codec = videoCodec->id;
 
     m_formatCtx->oformat = m_outputCtx;
 
@@ -173,14 +257,14 @@ bool DesktopFileEncoder::init()
         return false;
     }
 
-    m_outStream = NULL;
-    m_outStream = av_new_stream(m_formatCtx, DEFAULT_VIDEO_STREAM_ID);
-    if (!m_outStream)
+    m_videoOutStream = NULL;
+    m_videoOutStream = av_new_stream(m_formatCtx, DEFAULT_VIDEO_STREAM_ID);
+    if (!m_videoOutStream)
     {
         cl_log.log("Can't create output stream for encoding", cl_logWARNING);
         return false;
     }
-    m_videoCodecCtx = m_outStream->codec;
+    m_videoCodecCtx = m_videoOutStream->codec;
     m_videoCodecCtx->codec_id = m_outputCtx->video_codec;
     m_videoCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO ;
     
@@ -201,54 +285,104 @@ bool DesktopFileEncoder::init()
     m_videoCodecCtx->me_method = ME_EPZS;
     m_videoCodecCtx->bit_rate = 1024*1024*8;
 
-    //m_videoCodecCtx->rc_min_rate = m_videoCodecCtx->bit_rate;
-    //m_videoCodecCtx->rc_max_rate = m_videoCodecCtx->bit_rate;
-    //m_videoCodecCtx->rc_buffer_size= m_videoCodecCtx->bit_rate*2;
-    //m_videoCodecCtx->bit_rate_tolerance = 0.1;
-    
-    //m_videoCodecCtx->qmin = 5;
-    //m_videoCodecCtx->qmax = 5;
-    
-
     m_videoCodecCtx->sample_aspect_ratio.num = 1;
     m_videoCodecCtx->sample_aspect_ratio.den = 1;
     
 
-    m_outStream->sample_aspect_ratio.den = 1;
-    m_outStream->sample_aspect_ratio.num = 1;
+    m_videoOutStream->sample_aspect_ratio.den = 1;
+    m_videoOutStream->sample_aspect_ratio.num = 1;
 
 
-    //m_videoCodecCtx->qmin = m_videoCodecCtx->qmax = 3;
-    //m_videoCodecCtx->mb_lmin = m_videoCodecCtx->lmin = m_videoCodecCtx->qmin * FF_QP2LAMBDA;
-    //m_videoCodecCtx->mb_lmax = m_videoCodecCtx->lmax = m_videoCodecCtx->qmax * FF_QP2LAMBDA;
-    //m_videoCodecCtx->flags |= CODEC_FLAG_QSCALE;
-
-    if (avcodec_open(m_videoCodecCtx, codec) < 0)
+    if (avcodec_open(m_videoCodecCtx, videoCodec) < 0)
     {
         cl_log.log("Can't initialize encoder", cl_logWARNING);
         return false;
     }
 
-    m_outStream->first_dts = 0;
-    m_videoStream = m_outStream->index;
-    m_outStream->pts.num=st_rate.num; // 1
-    m_outStream->pts.den=st_rate.den; // 90000
+    m_videoOutStream->first_dts = 0;
+    m_videoStreamIndex = m_videoOutStream->index;
+    //m_videoOutStream->pts.num = m_videoOutStream->time_base.num;
+    //m_videoOutStream->pts.den = m_videoOutStream->time_base.den;
+
+
+
+    // init audio capture
+
+    m_audioFormat = m_audioDevice.preferredFormat();
+    m_audioFormat.setSampleRate(48000);
+    m_audioFormat.setSampleSize(16);
+    //m_audioFormat.setChannels(1);
+    m_audioFormat.setSampleType(QAudioFormat::SignedInt);
+
+    m_audioBuf = (quint8*) av_malloc(FF_MIN_BUFFER_SIZE);
+    m_audioOutStream = NULL;
+    m_audioOutStream = av_new_stream(m_formatCtx, DEFAULT_AUDIO_STREAM_ID);
+    if (!m_audioOutStream)
+    {
+        cl_log.log("Can't create output audio stream for encoding", cl_logWARNING);
+        return false;
+    }
+
+    AVCodec* audioCodec = avcodec_find_encoder_by_name("aac");
+    //AVCodec* audioCodec = avcodec_find_encoder_by_name("libmp3lame");
+    if(audioCodec == 0)
+    {
+        cl_log.log("Can't find audio MP3 encoder", cl_logWARNING);
+        return false;
+    }
+    m_outputCtx->audio_codec = audioCodec->id;
+
+    m_audioCodecCtx = m_audioOutStream->codec;
+    m_audioCodecCtx->codec_id = m_outputCtx->audio_codec;
+    m_audioCodecCtx->codec_type = AVMEDIA_TYPE_AUDIO;
+    m_audioCodecCtx->sample_fmt = audioFormatQtToFfmpeg(m_audioFormat);
+    m_audioCodecCtx->channels = m_audioFormat.channels();
+    m_audioCodecCtx->sample_rate = m_audioFormat.frequency();
+    AVRational audioRational = {1, m_audioCodecCtx->sample_rate};
+    m_audioCodecCtx->time_base	 = audioRational;
+    m_audioCodecCtx->bit_rate = 64000 * m_audioCodecCtx->channels;
+
+    //AVCodec* audioCodec = avcodec_find_encoder_by_name("mp3");
+
+    if (avcodec_open(m_audioCodecCtx, audioCodec) < 0)
+    {
+        cl_log.log("Can't initialize encoder", cl_logWARNING);
+        return false;
+    }
 
     av_write_header(m_formatCtx);
+
+    m_audioFrameDuration = m_audioCodecCtx->frame_size / (double) m_audioCodecCtx->sample_rate;
+    m_audioFrameDuration *= m_audioOutStream->time_base.den / (double) m_audioOutStream->time_base.num;
+    m_maxAudioJitter = m_audioOutStream->time_base.den / m_audioOutStream->time_base.num / 2; // 500 ms as max jitter
+
+
+
+    if (!m_audioDevice.isFormatSupported(m_audioFormat))
+    {
+        cl_log.log("Unsupported audio format specified for capturing!", cl_logERROR);
+        return false;
+    }
+
+    m_audioInput = new QAudioInput ( m_audioDevice, m_audioFormat);
+    //m_audioInput->moveToThread(QApplication::instance()->thread());
+
+    //m_audioOStream = new QFile("c:/audio_captire.wav");
+    m_audioOStream = new CaptureAudioStream(this);
+    m_audioOStream->open(QIODevice::WriteOnly | QIODevice::Truncate);
+    m_audioInput->start(m_audioOStream);
 
     return true;
 }
 
 void DesktopFileEncoder::run()
 {
-    openStream();
-
     while (!m_needStop)
     {
-        IDirect3DSurface9* surface = m_grabber->getNextFrame();
-        if (!surface)
+        void* capturedData = m_grabber->getNextFrame();
+        if (!capturedData)
             continue;
-        m_grabber->SurfaceToFrame(surface, m_frame);
+        m_grabber->capturedDataToFrame(capturedData, m_frame);
 
         m_frame->pts = m_frame->coded_picture_number;
 
@@ -256,35 +390,83 @@ void DesktopFileEncoder::run()
         if (out_size < 1)
             continue;
 
-        AVStream * stream = m_formatCtx->streams[m_videoStream];
-        AVPacket pkt;
-        av_init_packet(&pkt);
+        AVStream * stream = m_formatCtx->streams[m_videoStreamIndex];
+        AVPacket videoPkt;
+        av_init_packet(&videoPkt);
         if (m_videoCodecCtx->coded_frame->pts != AV_NOPTS_VALUE)
-            pkt.pts = av_rescale_q(m_videoCodecCtx->coded_frame->pts, m_videoCodecCtx->time_base, stream->time_base);
+            videoPkt.pts = av_rescale_q(m_videoCodecCtx->coded_frame->pts, m_videoCodecCtx->time_base, stream->time_base);
 
         //cl_log.log("pkt.pts=" , pkt.pts, cl_logALWAYS);
 
         if(m_videoCodecCtx->coded_frame->key_frame)
-            pkt.flags |= AV_PKT_FLAG_KEY;
+            videoPkt.flags |= AV_PKT_FLAG_KEY;
 
-        pkt.stream_index= stream->index;
-        pkt.data = m_videoBuf;
-        pkt.size = out_size;
+        videoPkt.stream_index= stream->index;
+        videoPkt.data = m_videoBuf;
+        videoPkt.size = out_size;
 
-        if (av_write_frame(m_formatCtx,&pkt)<0)	
+        // write all audio frames
+        while (m_audioQueue.size() > 0)
         {
-            QString s ="VIDEO av_write_frame(formatCtx,&pkt) error. current time:"+QTime::currentTime().toString() +"\n";
-            s+="packet pts: " + QString::number(pkt.pts) + "dts:"+QString::number(pkt.dts) + "\n";
+            AVRational r;
+            r.num = 1;
+            r.den = 1000;
+            CLAbstractMediaData* audioData = m_audioQueue.front();
+
+            qint64 audioPts =  av_rescale_q(audioData->timestamp, r, stream->time_base);
+            qint64 expectedAudioPts = m_storedAudioPts + m_audioFramesCount * m_audioFrameDuration;
+            if (qAbs(audioPts - expectedAudioPts) < m_maxAudioJitter)
+            {
+                audioPts = expectedAudioPts;
+            }
+            else {
+                m_storedAudioPts = audioPts;
+                m_audioFramesCount = 1;
+            }
+    
+            if (audioPts > videoPkt.pts)
+                break;
+
+            m_audioFramesCount++;
+
+            AVPacket audioPacket;
+            m_audioQueue.pop(audioData);
+
+            // todo: add audio resample here
+
+            const short* buffer = (const short*) audioData->data.data();
+            int aEncoded = avcodec_encode_audio(m_audioCodecCtx, m_audioBuf, FF_MIN_BUFFER_SIZE, buffer);
+            if (aEncoded > 0)
+            {
+                av_init_packet(&audioPacket);
+                audioPacket.pts = audioPts;
+                audioPacket.data = m_audioBuf;
+                audioPacket.size = aEncoded;
+                audioPacket.stream_index = m_audioOutStream->index;
+                if (av_write_frame(m_formatCtx,&audioPacket)<0)	
+                {
+                    QString s ="AUDIO av_write_frame(formatCtx,&audioPacket) error. current time:"+QTime::currentTime().toString() +"\n";
+                    s+="packet pts: " + QString::number(audioPacket.pts) + "dts:"+QString::number(audioPacket.dts) + "\n";
+                    s+="error code: " + QString::number(m_iocontext->error) + "\n";
+                    s+="eof_reached: " + QString::number(m_iocontext->eof_reached) + "\n";
+                    s+="pos: " + QString::number(m_iocontext->pos) + "\n";
+                    s+="write_flag: " + QString::number(m_iocontext->write_flag) + "\n";
+                    cl_log.log(s, cl_logWARNING);
+                }
+            }
+            audioData->releaseRef();
+        }
+
+        if (av_write_frame(m_formatCtx,&videoPkt)<0)	
+        {
+            QString s ="VIDEO av_write_frame(formatCtx,&videoPkt) error. current time:"+QTime::currentTime().toString() +"\n";
+            s+="packet pts: " + QString::number(videoPkt.pts) + "dts:"+QString::number(videoPkt.dts) + "\n";
             s+="error code: " + QString::number(m_iocontext->error) + "\n";
             s+="eof_reached: " + QString::number(m_iocontext->eof_reached) + "\n";
             s+="pos: " + QString::number(m_iocontext->pos) + "\n";
             s+="write_flag: " + QString::number(m_iocontext->write_flag) + "\n";
-            s+= "will exit now!\n";
             cl_log.log(s, cl_logWARNING);
-            av_free_packet(&pkt);
-            exit(-1);
         }
-        av_free_packet(&pkt);
 
     }
     closeStream();
@@ -301,12 +483,12 @@ void DesktopFileEncoder::closeStream()
     delete m_grabber;
     m_grabber = 0;
 
-    //if (m_formatCtx)
-    //    av_close_input_stream(m_formatCtx);
-
-    if (m_videoCodecCtx)
-        avcodec_close(m_videoCodecCtx);
+    if (m_formatCtx)
+        avformat_free_context(m_formatCtx);
+    m_formatCtx = 0;
     m_videoCodecCtx = 0;
+    m_audioCodecCtx = 0;
+
     if (m_frame)
         av_free(m_frame);
     m_frame = 0;
@@ -314,10 +496,22 @@ void DesktopFileEncoder::closeStream()
         av_free(m_videoBuf);
     m_videoBuf = 0;
 
-    delete m_iocontext;
+    av_free(av_alloc_put_byte);
     m_iocontext = 0;
     delete m_device;
     m_device = 0;
 
     m_initialized = false;
 }
+
+qint64 DesktopFileEncoder::currentTime() const
+{
+    return m_grabber->currentTime();
+}
+
+
+int DesktopFileEncoder::audioPacketSize()
+{
+    return m_audioCodecCtx->frame_size * m_audioFormat.channels() * m_audioFormat.sampleSize()/8;
+}
+

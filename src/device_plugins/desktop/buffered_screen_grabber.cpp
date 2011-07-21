@@ -1,7 +1,7 @@
 #include "buffered_screen_grabber.h"
 
-CLBufferedScreenGrabber::CLBufferedScreenGrabber(int displayNumber, int queueSize, int frameRate):
-    m_grabber(displayNumber, queueSize),
+CLBufferedScreenGrabber::CLBufferedScreenGrabber(int displayNumber, int queueSize, int frameRate, CLScreenGrapper::CaptureMode mode):
+    m_grabber(displayNumber, queueSize, mode),
     m_queue(queueSize),
     m_frameRate(frameRate),
     m_frameIndex(0),
@@ -44,9 +44,9 @@ void CLBufferedScreenGrabber::run()
     }
 }
 
-IDirect3DSurface9* CLBufferedScreenGrabber::getNextFrame() 
+void* CLBufferedScreenGrabber::getNextFrame() 
 { 
-    IDirect3DSurface9* rez = 0;
+    void* rez = 0;
     if (m_queue.pop(rez, 40))
         return rez;
     else
