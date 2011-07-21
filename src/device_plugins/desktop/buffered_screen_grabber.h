@@ -13,11 +13,11 @@ public:
     static const int DEFAULT_QUEUE_SIZE = 6;
     static const int DEFAULT_FRAME_RATE = 30;
 
-    CLBufferedScreenGrabber(int displayNumber = D3DADAPTER_DEFAULT, 
+    CLBufferedScreenGrabber(int captureDelay = 0,
+                            int displayNumber = D3DADAPTER_DEFAULT, 
                             int queueSize = DEFAULT_QUEUE_SIZE, 
                             int frameRate = DEFAULT_FRAME_RATE,
                             CLScreenGrapper::CaptureMode mode = CLScreenGrapper::CaptureMode_DesktopWithoutAero);
-                            //CLScreenGrapper::CaptureMode mode = CLScreenGrapper::CaptureMode_Application);
     virtual ~CLBufferedScreenGrabber();
     void* getNextFrame();
     AVRational getFrameRate();
@@ -38,6 +38,7 @@ private:
     int m_frameIndex;
     QTime m_timer;
     int m_currentFrameNum;
+    int m_captureDelay;
 };
 
 #endif // Q_OS_WIN

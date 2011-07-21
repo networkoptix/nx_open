@@ -5,7 +5,8 @@
 
 static const int DEFAULT_VIDEO_STREAM_ID = 4113;
 static const int DEFAULT_AUDIO_STREAM_ID = 4351;
-static const int AUDIO_QUEUE_MAX_SIZE = 32;
+static const int AUDIO_QUEUE_MAX_SIZE = 128;
+static const int CAPTURE_DELAY = 80;
 
 extern "C" 
 {
@@ -87,6 +88,10 @@ protected:
             if (m_currentBufferSize == m_encoder->audioPacketSize())
             {
                 m_encoder->m_audioQueue.push(m_nextAudioBuffer);
+                if (m_encoder->m_audioQueue.size() > 16)
+                {
+                    int ff = 4;
+                }
                 m_nextAudioBuffer = new CLAbstractMediaData(CL_MEDIA_ALIGNMENT, m_encoder->audioPacketSize());
                 m_nextAudioBuffer->timestamp = m_encoder->currentTime();
                 m_currentBufferSize = 0;
@@ -218,7 +223,7 @@ DesktopFileEncoder::~DesktopFileEncoder()
 
 bool DesktopFileEncoder::init()
 {
-    m_grabber = new CLBufferedScreenGrabber(m_desktopNum);
+    m_grabber = new CLBufferedScreenGrabber(CAPTURE_DELAY, m_desktopNum);
 
     avcodec_init();
     av_register_all();
@@ -355,7 +360,7 @@ bool DesktopFileEncoder::init()
 
     m_audioFrameDuration = m_audioCodecCtx->frame_size / (double) m_audioCodecCtx->sample_rate;
     m_audioFrameDuration *= m_audioOutStream->time_base.den / (double) m_audioOutStream->time_base.num;
-    m_maxAudioJitter = m_audioOutStream->time_base.den / m_audioOutStream->time_base.num / 2; // 500 ms as max jitter
+    m_maxAudioJitter = m_audioOutStream->time_base.den / m_audioOutStream->time_base.num / 20; // 50 ms as max jitter
 
 
 
@@ -414,9 +419,13 @@ void DesktopFileEncoder::run()
             r.den = 1000;
             CLAbstractMediaData* audioData = m_audioQueue.front();
 
-            qint64 audioPts =  av_rescale_q(audioData->timestamp, r, stream->time_base);
-            qint64 expectedAudioPts = m_storedAudioPts + m_audioFramesCount * m_audioFrameDuration;
-            if (qAbs(audioPts - expectedAudioPts) < m_maxAudioJitter)
+            qint64 audioPts =  av_rescale_q(audioData->timestamp, r, stream->time_base); // + 20000;
+            qint64 expectedAudioPts = m_storedAudioPts + m_audioFramesCount * m_audioFrameDuration; // + 20000;
+            int audioJitter = qAbs(audioPts - expectedAudioPts);
+
+            qDebug() << "audio jitter" <<  audioJitter;
+
+            if (audioJitter < m_maxAudioJitter)
             {
                 audioPts = expectedAudioPts;
             }
@@ -456,6 +465,11 @@ void DesktopFileEncoder::run()
                 }
             }
             audioData->releaseRef();
+        }
+
+        if (m_audioQueue.size() > 16)
+        {
+            int gg = 4;
         }
 
         if (av_write_frame(m_formatCtx,&videoPkt)<0)	

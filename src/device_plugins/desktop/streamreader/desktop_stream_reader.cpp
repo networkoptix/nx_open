@@ -36,7 +36,7 @@ CLDesktopStreamreader::CLDesktopStreamreader(CLDevice* dev):
     int idx = num.length()-1;
     while (idx >= 0 && num[idx] >= '0' && num[idx] <= '9')
         idx--;
-    m_grabber = new CLBufferedScreenGrabber(num.right(num.length()-idx-1).toInt()-1);
+    m_grabber = new CLBufferedScreenGrabber(0, num.right(num.length()-idx-1).toInt()-1);
     m_encoderCodecName = "mpeg2video";
     //m_encoderCodecName = "mpeg4";
 }
