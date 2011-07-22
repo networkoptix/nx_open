@@ -44,6 +44,8 @@ RecordingSettingsWidget::RecordingSettingsWidget(QWidget *parent) :
         ui->audioDevicesComboBox->addItem(info.deviceName());
     }
     setAudioDeviceName(settings->audioDevice().deviceName());
+
+    ui->captureCursorCheckBox->setChecked(settings->captureCursor());
 }
 
 RecordingSettingsWidget::~RecordingSettingsWidget()
@@ -105,6 +107,7 @@ void RecordingSettingsWidget::accept()
     settings->setResolution(resolution());
     settings->setScreen(screen());
     settings->setAudioDeviceByName(audioDeviceName());
+    settings->setCaptureCursor(ui->captureCursorCheckBox->isChecked());
 }
 
 int RecordingSettingsWidget::screen() const

@@ -35,6 +35,18 @@ void VideoRecorderSettings::setAudioDeviceByName(const QString &audioDeviceName)
     settings.setValue(QLatin1String("audioDevice"), audioDeviceName);
 }
 
+bool VideoRecorderSettings::captureCursor() const
+{
+    if (!settings.contains("captureCursor"))
+        return true;
+    return settings.value("captureCursor").toBool();
+}
+
+void VideoRecorderSettings::setCaptureCursor(bool yes)
+{
+    settings.setValue("captureCursor", yes);
+}
+
 VideoRecorderSettings::CaptureMode VideoRecorderSettings::captureMode() const
 {
     return (VideoRecorderSettings::CaptureMode)settings.value(QLatin1String("captureMode")).toInt();

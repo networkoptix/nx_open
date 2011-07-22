@@ -2598,6 +2598,7 @@ void GraphicsView::toggleRecording()
 
         QAudioDeviceInfo audioDevice = recorderSettings.audioDevice();
         int screen = recorderSettings.screen();
+        bool captureCursor = recorderSettings.captureCursor();
         VideoRecorderSettings::CaptureMode captureMode = recorderSettings.captureMode();
         VideoRecorderSettings::DecoderQuality decoderQuality = recorderSettings.decoderQuality();
         VideoRecorderSettings::Resolution resolution = recorderSettings.resolution();

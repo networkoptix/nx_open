@@ -22,6 +22,9 @@ public:
     QAudioDeviceInfo audioDevice() const;
     void setAudioDeviceByName(const QString &name);
 
+    bool captureCursor() const;
+    void setCaptureCursor(bool yes);
+
     CaptureMode captureMode() const;
     void setCaptureMode(CaptureMode c);
 
