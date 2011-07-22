@@ -34,6 +34,8 @@
 #include <QtCore/QSettings>
 #include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
+#include <QTimer>
+#include <QPropertyAnimation>
 
 extern int  SLOT_WIDTH;
 
@@ -2601,6 +2603,7 @@ void GraphicsView::toggleRecording()
         VideoRecorderSettings::CaptureMode captureMode = recorderSettings.captureMode();
         VideoRecorderSettings::DecoderQuality decoderQuality = recorderSettings.decoderQuality();
         VideoRecorderSettings::Resolution resolution = recorderSettings.resolution();
+        bool captureCursor = recorderSettings.captureCursor();
 
         QString filePath = getRecordName();
 #ifdef Q_OS_WIN
@@ -2624,7 +2627,6 @@ void GraphicsView::toggleRecording()
 
         screen = 0; // todo: temp line. now non default screen has some errors. 
         audioDevice = QAudioDeviceInfo::defaultInputDevice() ; // todo: other devices has some problem
-        bool captureCursor = true; // todo: form does not contains control
         
         CLScreenGrapper::CaptureMode grabberCaptureMode = CLScreenGrapper::CaptureMode_Application;
         if (captureMode == VideoRecorderSettings::FullScreenMode)
