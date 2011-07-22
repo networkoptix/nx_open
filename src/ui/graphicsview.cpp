@@ -178,7 +178,7 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
     setFrameShape(QFrame::NoFrame);
 
     connect(&cm_start_video_recording, SIGNAL(triggered()), SLOT(toggleRecording()));
-    cm_start_video_recording.setShortcuts(QList<QKeySequence>() << tr("Ctrl+R") << Qt::Key_MediaRecord);
+    cm_start_video_recording.setShortcuts(QList<QKeySequence>() << tr("Ctrl+E") << Qt::Key_MediaRecord);
     connect(&cm_recording_settings, SIGNAL(triggered()), SLOT(recordingSettings()));
 }
 
@@ -2610,24 +2610,36 @@ void GraphicsView::toggleRecording()
 #endif
     } else {
         cm_start_video_recording.setProperty("recoding", QVariant());
-        //Recorder.stop();
-#ifdef Q_OS_WIN
-        delete m_desktopEncoder;
-        m_desktopEncoder = 0;
-#endif
 
+#ifdef Q_OS_WIN
         QSettings settings;
         settings.beginGroup("videoRecording");
         QString previousFile = settings.value(QLatin1String("previousFile")).toString();
-        QString fileName = QFileDialog::getSaveFileName(this,
+        previousFile = QFileInfo(previousFile).path() +
+                QDir::separator() +
+                QFileInfo(m_desktopEncoder->fileName()).baseName();
+
+        QString filePath = QFileDialog::getSaveFileName(this,
                                                         tr("Save Recording As"),
                                                         previousFile,
                                                         tr("Transport Stream (*.ts)"));
 
-        if (!fileName.isEmpty()) {
+        if (!filePath.isEmpty()) {
+            bool result = QFile::rename(m_desktopEncoder->fileName(), filePath);
+            if (!result) {
+                // handle error
+                QFile::remove(m_desktopEncoder->fileName());
+            }
+
+            delete m_desktopEncoder;
+            m_desktopEncoder = 0;
+
             settings.setValue(QLatin1String("previousFile"), previousFile);
+        } else {
+            QFile::remove(m_desktopEncoder->fileName());
         }
         settings.endGroup();
+#endif
     }
 }
 
