@@ -2634,6 +2634,22 @@ void GraphicsView::toggleRecording()
 
         m_desktopEncoder = new DesktopFileEncoder(filePath, screen, audioDevice, grabberCaptureMode, captureCursor, encodingSize, quality);
 #endif
+        QLabel *label = new QLabel;
+        label->move(width()/2 - 100, 300);
+        label->resize(200, 100);
+        label->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+        label->setText(tr("Recording started"));
+        label->setAlignment(Qt::AlignCenter);
+        label->setStyleSheet("QLabel { color:white; background:black }");
+        label->setFocusPolicy(Qt::NoFocus);
+        label->show();
+        QPropertyAnimation *animation = new QPropertyAnimation(label, "windowOpacity", label);
+        animation->setEasingCurve(QEasingCurve::OutCubic);
+        animation->setDuration(3000);
+        animation->setStartValue(1.0);
+        animation->setEndValue(0.0);
+        animation->start();
+        QTimer::singleShot(3000, label, SLOT(deleteLater()));
     } else 
     {
         cm_start_video_recording.setProperty("recoding", QVariant());
