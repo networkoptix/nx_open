@@ -1,4 +1,3 @@
-#ifdef Q_OS_WIN
 
 #include "desktop_stream_reader.h"
 #include "device/device.h"
@@ -101,10 +100,10 @@ CLAbstractMediaData* CLDesktopStreamreader::getNextData()
         return 0;
     while (!m_needStop)
     {
-        IDirect3DSurface9* surface = m_grabber->getNextFrame();
-        if (!surface)
+        void* capturedData = m_grabber->getNextFrame();
+        if (!capturedData)
             continue;
-        m_grabber->SurfaceToFrame(surface, m_frame);
+        m_grabber->capturedDataToFrame(capturedData, m_frame);
 
         int out_size = avcodec_encode_video(m_videoCodecCtx, m_videoBuf, m_videoBufSize, m_frame);
         if (out_size < 1)
@@ -151,5 +150,3 @@ bool CLDesktopStreamreader::isStreamOpened() const
 {
     return m_initialized;
 }
-
-#endif // Q_OS_WIN

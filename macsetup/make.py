@@ -11,8 +11,8 @@ if os.path.isfile(destination):
     os.unlink(destination)
 
 pwd = os.getcwd()
-os.chdir('../src')
-os.system("xcodebuild -configuration Release")
+os.chdir('../build')
+os.system("make -j8 -f Makefile.release")
 os.chdir(pwd)
 
 os.chdir('../bin/release')

@@ -1,9 +1,12 @@
 #include "buffered_screen_grabber.h"
 
-#ifdef Q_OS_WIN
-
-CLBufferedScreenGrabber::CLBufferedScreenGrabber(int displayNumber, int queueSize, int frameRate):
-    m_grabber(displayNumber, queueSize),
+CLBufferedScreenGrabber::CLBufferedScreenGrabber(int displayNumber, 
+                                                 int queueSize, 
+                                                 int frameRate, 
+                                                 CLScreenGrapper::CaptureMode mode,
+                                                 bool captureCursor,
+                                                 const QSize& captureResolution):
+    m_grabber(displayNumber, queueSize, mode, captureCursor, captureResolution),
     m_queue(queueSize),
     m_frameRate(frameRate),
     m_frameIndex(0),
@@ -46,9 +49,9 @@ void CLBufferedScreenGrabber::run()
     }
 }
 
-IDirect3DSurface9* CLBufferedScreenGrabber::getNextFrame() 
+void* CLBufferedScreenGrabber::getNextFrame() 
 { 
-    IDirect3DSurface9* rez = 0;
+    void* rez = 0;
     if (m_queue.pop(rez, 40))
         return rez;
     else
@@ -62,5 +65,3 @@ AVRational CLBufferedScreenGrabber::getFrameRate()
     rez.den = m_frameRate;
     return rez;
 }
-
-#endif // Q_OS_WIN

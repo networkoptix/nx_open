@@ -1,5 +1,5 @@
 QT = core gui network xml xmlpatterns opengl multimedia webkit 
-CONFIG += x86
+CONFIG += x86 precompile_header
 TEMPLATE = app
 VERSION = 0.0.1
 ICON = eve_logo.icns

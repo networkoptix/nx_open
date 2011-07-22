@@ -23,7 +23,10 @@ QString getMoviesDirectory()
 
 QString getTempRecordingDir()
 {
-    return Settings::instance().mediaRoot()  + QString("/_temp/");
+    QString path = Settings::instance().mediaRoot()  + QString("/_temp/");
+    if (!QFileInfo(path).exists())
+        QDir().mkpath(path);
+    return path;
 }
 
 QString getRecordingDir()
