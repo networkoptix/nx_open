@@ -2587,8 +2587,6 @@ QString getRecordName()
     }
 }
 
-#include <QTimer>
-#include <QPropertyAnimation>
 void GraphicsView::toggleRecording()
 {
     bool recording = cm_start_video_recording.property("recoding").toBool();
@@ -2608,34 +2606,49 @@ void GraphicsView::toggleRecording()
 #ifdef Q_OS_WIN
         if (m_desktopEncoder)
             delete m_desktopEncoder;
-        m_desktopEncoder = new DesktopFileEncoder(filePath);
+        QSize encodingSize;
+        if (resolution == VideoRecorderSettings::ResQuaterNative)
+            encodingSize = QSize(-2, -2);
+        else if (resolution == VideoRecorderSettings::Res1920x1080)
+            encodingSize = QSize(1920, 1080);
+        else if (resolution == VideoRecorderSettings::Res1280x720)
+            encodingSize = QSize(1280, 720);
+        else if (resolution == VideoRecorderSettings::Res640x480)
+            encodingSize = QSize(640, 480);
+        
+        float quality = 1.0;
+        if (decoderQuality == VideoRecorderSettings::BalancedQuality)
+            quality = 0.6;
+        else if (decoderQuality == VideoRecorderSettings::PerformanceQuality)
+            quality = 0.5;
+
+        screen = 0; // todo: temp line. now non default screen has some errors. 
+        audioDevice = QAudioDeviceInfo::defaultInputDevice() ; // todo: other devices has some problem
+        bool captureCursor = true; // todo: form does not contains control
+        
+        CLScreenGrapper::CaptureMode grabberCaptureMode = CLScreenGrapper::CaptureMode_Application;
+        if (captureMode == VideoRecorderSettings::FullScreenMode)
+            grabberCaptureMode = CLScreenGrapper::CaptureMode_DesktopWithAero;
+        else if (captureMode == VideoRecorderSettings::FullScreenNoeroMode)
+            grabberCaptureMode = CLScreenGrapper::CaptureMode_DesktopWithoutAero;
+
+        m_desktopEncoder = new DesktopFileEncoder(filePath, screen, audioDevice, grabberCaptureMode, captureCursor, encodingSize, quality);
 #endif
-        QLabel *label = new QLabel;
-        label->move(width()/2 - 100, 300);
-        label->resize(200, 100);
-        label->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
-        label->setText(tr("Recording started"));
-        label->setAlignment(Qt::AlignCenter);
-        label->setStyleSheet("QLabel { color:white; background:black }");
-        label->setFocusPolicy(Qt::NoFocus);
-        label->show();
-        QPropertyAnimation *animation = new QPropertyAnimation(label, "windowOpacity", label);
-        animation->setEasingCurve(QEasingCurve::OutCubic);
-        animation->setDuration(3000);
-        animation->setStartValue(1.0);
-        animation->setEndValue(0.0);
-        animation->start();
-        QTimer::singleShot(3000, label, SLOT(deleteLater()));
-    } else {
+    } else 
+    {
         cm_start_video_recording.setProperty("recoding", QVariant());
 
 #ifdef Q_OS_WIN
+        QString recordedFileName = m_desktopEncoder->fileName();
+        delete m_desktopEncoder;
+        m_desktopEncoder = 0;
+
         QSettings settings;
         settings.beginGroup("videoRecording");
         QString previousFile = settings.value(QLatin1String("previousFile")).toString();
         previousFile = QFileInfo(previousFile).path() +
                 QDir::separator() +
-                QFileInfo(m_desktopEncoder->fileName()).baseName();
+                QFileInfo(recordedFileName).baseName();
 
         QString filePath = QFileDialog::getSaveFileName(this,
                                                         tr("Save Recording As"),
@@ -2643,18 +2656,16 @@ void GraphicsView::toggleRecording()
                                                         tr("Transport Stream (*.ts)"));
 
         if (!filePath.isEmpty()) {
-            bool result = QFile::rename(m_desktopEncoder->fileName(), filePath);
+            QFile::remove(filePath);
+            bool result = QFile::rename(recordedFileName, filePath);
             if (!result) {
                 // handle error
-                QFile::remove(m_desktopEncoder->fileName());
+                QFile::remove(recordedFileName);
             }
-
-            delete m_desktopEncoder;
-            m_desktopEncoder = 0;
 
             settings.setValue(QLatin1String("previousFile"), previousFile);
         } else {
-            QFile::remove(m_desktopEncoder->fileName());
+            QFile::remove(recordedFileName);
         }
         settings.endGroup();
 #endif
