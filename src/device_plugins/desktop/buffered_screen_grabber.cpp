@@ -1,14 +1,16 @@
 #include "buffered_screen_grabber.h"
 
-#ifdef Q_OS_WIN
-
-CLBufferedScreenGrabber::CLBufferedScreenGrabber(int captureDelay, int displayNumber, int queueSize, int frameRate, CLScreenGrapper::CaptureMode mode):
-    m_grabber(displayNumber, queueSize, mode),
+CLBufferedScreenGrabber::CLBufferedScreenGrabber(int displayNumber, 
+                                                 int queueSize, 
+                                                 int frameRate, 
+                                                 CLScreenGrapper::CaptureMode mode,
+                                                 bool captureCursor,
+                                                 const QSize& captureResolution):
+    m_grabber(displayNumber, queueSize, mode, captureCursor, captureResolution),
     m_queue(queueSize),
     m_frameRate(frameRate),
     m_frameIndex(0),
-    m_currentFrameNum(0),
-    m_captureDelay(0)
+    m_currentFrameNum(0)
 {
     m_frames.resize(queueSize);
     for (int i = 0; i < m_frames.size(); ++i)
@@ -25,7 +27,6 @@ CLBufferedScreenGrabber::~CLBufferedScreenGrabber()
 
 void CLBufferedScreenGrabber::run()
 {
-    msleep(m_captureDelay);
     while (!m_needStop)
     {
         if (!m_needStop && m_queue.size() == m_queue.maxSize())
@@ -64,5 +65,3 @@ AVRational CLBufferedScreenGrabber::getFrameRate()
     rez.den = m_frameRate;
     return rez;
 }
-
-#endif // Q_OS_WIN

@@ -1,12 +1,10 @@
 #include "desktop_file_encoder.h"
 
-#ifdef Q_OS_WIN
 #include <QAudioInput>
 
 static const int DEFAULT_VIDEO_STREAM_ID = 4113;
 static const int DEFAULT_AUDIO_STREAM_ID = 4351;
 static const int AUDIO_QUEUE_MAX_SIZE = 128;
-static const int CAPTURE_DELAY = 80;
 
 extern "C" 
 {
@@ -223,7 +221,7 @@ DesktopFileEncoder::~DesktopFileEncoder()
 
 bool DesktopFileEncoder::init()
 {
-    m_grabber = new CLBufferedScreenGrabber(CAPTURE_DELAY, m_desktopNum);
+    m_grabber = new CLBufferedScreenGrabber(m_desktopNum);
 
     avcodec_init();
     av_register_all();
@@ -360,7 +358,10 @@ bool DesktopFileEncoder::init()
 
     m_audioFrameDuration = m_audioCodecCtx->frame_size / (double) m_audioCodecCtx->sample_rate;
     m_audioFrameDuration *= m_audioOutStream->time_base.den / (double) m_audioOutStream->time_base.num;
-    m_maxAudioJitter = m_audioOutStream->time_base.den / m_audioOutStream->time_base.num / 20; // 50 ms as max jitter
+    
+    // 50 ms as max jitter
+    // QT uses 25fps timer for audio grabbing, so jitter 40ms + 10ms reserved.
+    m_maxAudioJitter = m_audioOutStream->time_base.den / m_audioOutStream->time_base.num / 20; 
 
 
 
@@ -467,11 +468,6 @@ void DesktopFileEncoder::run()
             audioData->releaseRef();
         }
 
-        if (m_audioQueue.size() > 16)
-        {
-            int gg = 4;
-        }
-
         if (av_write_frame(m_formatCtx,&videoPkt)<0)	
         {
             QString s ="VIDEO av_write_frame(formatCtx,&videoPkt) error. current time:"+QTime::currentTime().toString() +"\n";
@@ -529,5 +525,3 @@ int DesktopFileEncoder::audioPacketSize()
 {
     return m_audioCodecCtx->frame_size * m_audioFormat.channels() * m_audioFormat.sampleSize()/8;
 }
-
-#endif // Q_OS_WIN

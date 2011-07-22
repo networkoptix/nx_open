@@ -1,4 +1,3 @@
-#ifdef Q_OS_WIN
 
 #include "desktop_stream_reader.h"
 #include "device/device.h"
@@ -36,7 +35,7 @@ CLDesktopStreamreader::CLDesktopStreamreader(CLDevice* dev):
     int idx = num.length()-1;
     while (idx >= 0 && num[idx] >= '0' && num[idx] <= '9')
         idx--;
-    m_grabber = new CLBufferedScreenGrabber(0, num.right(num.length()-idx-1).toInt()-1);
+    m_grabber = new CLBufferedScreenGrabber(num.right(num.length()-idx-1).toInt()-1);
     m_encoderCodecName = "mpeg2video";
     //m_encoderCodecName = "mpeg4";
 }
@@ -151,5 +150,3 @@ bool CLDesktopStreamreader::isStreamOpened() const
 {
     return m_initialized;
 }
-
-#endif // Q_OS_WIN

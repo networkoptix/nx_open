@@ -3,8 +3,6 @@
 
 #include <QObject>
 
-#ifdef Q_OS_WIN
-
 #include <windows.h>
 #include <shellapi.h>
 #include <commdlg.h>
@@ -17,8 +15,12 @@ class CLScreenGrapper: public QObject
     Q_OBJECT
 public:
     enum CaptureMode {CaptureMode_DesktopWithAero, CaptureMode_DesktopWithoutAero, CaptureMode_Application};
+    
+    // resolution (0,0) - use default(native resolution)
+    // negative resolution - use specified scale factor 
 
-    CLScreenGrapper(int displayNumber, int poolSize, CaptureMode mode, bool captureCursor = true); // primary display by default
+    CLScreenGrapper(int displayNumber, int poolSize, CaptureMode mode, bool captureCursor,
+                    const QSize& captureResolution);
     virtual ~CLScreenGrapper();
 
     // capture screenshot in YUV 4:2:0 format
@@ -28,12 +30,12 @@ public:
 
     PixelFormat format() const { return PIX_FMT_YUV420P; }
     //PixelFormat format() const { return PIX_FMT_BGRA; }
-    int width() const          { return m_ddm.Width; }
-    int height() const         { return m_ddm.Height; }
+    int width() const;
+    int height() const;
     qint64 currentTime() const;
 private:
     HRESULT	InitD3D(HWND hWnd);
-    bool openGlDataToFrame(void* opaque, AVFrame* pFrame);
+    bool capturedDataToFrame(quint8* data, AVFrame* pFrame);
     bool direct3DDataToFrame(void* opaque, AVFrame* pFrame);
     Q_INVOKABLE void captureFrameOpenGL(void* data);
     void drawCursor(quint32* data, int dataStride) const;
@@ -57,9 +59,14 @@ private:
     int m_poolSize;
     bool m_captureCursor;
     HDC m_cursorDC;
-
+    QSize m_captureResolution;
+    bool m_needRescale;
+    SwsContext* m_scaleContext;
+    int m_outWidth;
+    int m_outHeight;
+    AVFrame* m_tmpFrame;
+    quint8* m_tmpFrameBuffer;
 };
 
-#endif // Q_OS_WIN
 
 #endif

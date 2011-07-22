@@ -1,8 +1,6 @@
 #ifndef __BUFFERED_SCREEN_GRABBER_H
 #define __BUFFERED_SCREEN_GRABBER_H
 
-#ifdef Q_OS_WIN
-
 #include "base/longrunnable.h"
 #include "screen_grabber.h"
 #include "base/threadqueue.h"
@@ -13,11 +11,12 @@ public:
     static const int DEFAULT_QUEUE_SIZE = 6;
     static const int DEFAULT_FRAME_RATE = 30;
 
-    CLBufferedScreenGrabber(int captureDelay = 0,
-                            int displayNumber = D3DADAPTER_DEFAULT, 
+    CLBufferedScreenGrabber(int displayNumber = D3DADAPTER_DEFAULT, 
                             int queueSize = DEFAULT_QUEUE_SIZE, 
                             int frameRate = DEFAULT_FRAME_RATE,
-                            CLScreenGrapper::CaptureMode mode = CLScreenGrapper::CaptureMode_DesktopWithoutAero);
+                            CLScreenGrapper::CaptureMode mode = CLScreenGrapper::CaptureMode_DesktopWithoutAero,
+                            bool captureCursor = true,
+                            const QSize& captureResolution = QSize(0, 0));
     virtual ~CLBufferedScreenGrabber();
     void* getNextFrame();
     AVRational getFrameRate();
@@ -38,10 +37,7 @@ private:
     int m_frameIndex;
     QTime m_timer;
     int m_currentFrameNum;
-    int m_captureDelay;
 };
-
-#endif // Q_OS_WIN
 
 #endif
 

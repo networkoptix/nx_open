@@ -1,7 +1,5 @@
 #include "screen_grabber.h"
 
-#ifdef Q_OS_WIN
-
 extern "C" {
 #include <libavformat/avformat.h>
 #include <libavcodec/avcodec.h>
@@ -15,8 +13,7 @@ extern "C" {
 QMutex CLScreenGrapper::m_instanceMutex;
 int CLScreenGrapper::m_aeroInstanceCounter;
 
-
-CLScreenGrapper::CLScreenGrapper(int displayNumber, int poolSize, CaptureMode mode, bool captureCursor): 
+CLScreenGrapper::CLScreenGrapper(int displayNumber, int poolSize, CaptureMode mode, bool captureCursor, const QSize& captureResolution): 
     m_pD3D(0), 
     m_pd3dDevice(0), 
     m_displayNumber(displayNumber),
@@ -24,7 +21,11 @@ CLScreenGrapper::CLScreenGrapper(int displayNumber, int poolSize, CaptureMode mo
     m_currentIndex(0),
     m_mode(mode),
     m_poolSize(poolSize+1),
-    m_captureCursor(captureCursor)
+    m_captureCursor(captureCursor),
+    m_captureResolution(captureResolution),
+    m_scaleContext(0),
+    m_tmpFrame(0),
+    m_tmpFrameBuffer(0)
 {
     memset(&m_rect, 0, sizeof(m_rect));
 
@@ -34,6 +35,8 @@ CLScreenGrapper::CLScreenGrapper(int displayNumber, int poolSize, CaptureMode mo
         if (++m_aeroInstanceCounter == 1)
             DwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
     }
+    m_needRescale = captureResolution.width() != 0 || mode == CaptureMode_Application;
+
     m_initialized = InitD3D(GetDesktopWindow());
     m_cursorDC = CreateCompatibleDC(0);
     m_timer.start();
@@ -69,6 +72,13 @@ CLScreenGrapper::~CLScreenGrapper()
             DwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
     }
     DeleteDC(m_cursorDC);
+
+    if (m_scaleContext)
+    {
+        sws_freeContext(m_scaleContext);
+        av_free(m_tmpFrame);
+        av_free(m_tmpFrameBuffer);
+    }
 }
 
 HRESULT	CLScreenGrapper::InitD3D(HWND hWnd)
@@ -125,9 +135,38 @@ HRESULT	CLScreenGrapper::InitD3D(HWND hWnd)
         for (int i = 0; i < m_poolSize; ++i)
             m_openGLData << new quint8[m_rect.right * m_rect.bottom * 4];
     }
+
+    m_outWidth = m_ddm.Width;
+    m_outHeight = m_ddm.Height;
+    if (m_needRescale)
+    {
+        if (m_captureResolution.width() < 0)
+            m_outWidth =  m_ddm.Width / qAbs(m_captureResolution.width()); 
+        else
+            m_outWidth = m_captureResolution.width(); 
+
+        if (m_captureResolution.height() < 0)
+            m_outHeight =  m_ddm.Height / qAbs(m_captureResolution.height()); 
+        else
+            m_outHeight = m_captureResolution.height(); 
+
+
+        m_tmpFrame = avcodec_alloc_frame();
+        m_tmpFrame->format = PIX_FMT_YUV420P;
+        int numBytes = avpicture_get_size(PIX_FMT_YUV420P, m_ddm.Width, m_ddm.Height);
+
+        m_tmpFrameBuffer = (quint8*)av_malloc(numBytes * sizeof(quint8));
+
+        avpicture_fill((AVPicture *)m_tmpFrame, m_tmpFrameBuffer, PIX_FMT_YUV420P, m_ddm.Width, m_ddm.Height);
+
+        m_scaleContext = sws_getContext(
+            m_ddm.Width, m_ddm.Height, PIX_FMT_YUV420P,
+            m_outWidth, m_outHeight, PIX_FMT_YUV420P,
+            SWS_BICUBLIN, NULL, NULL, NULL);
+    }
+
     return S_OK;
 };
-
 
 void CLScreenGrapper::captureFrameOpenGL(void* data)
 {
@@ -617,18 +656,30 @@ bool CLScreenGrapper::direct3DDataToFrame(void* opaque, AVFrame* pFrame)
     int time2 = t2.elapsed();
     qDebug() << "time1=" << time1 << "time2=" << time2 << "t1/t2=" << time1 / (float) time2;
 #else    
-    bgra_to_yv12_sse((unsigned char*)lockedRect.pBits, m_ddm.Width*4, pFrame->data[0], pFrame->data[1], pFrame->data[2], 
-        pFrame->linesize[0], pFrame->linesize[1], m_ddm.Width, m_ddm.Height);
+    bool rez = capturedDataToFrame((unsigned char*)lockedRect.pBits, pFrame);
 #endif
-
     pSurface->UnlockRect();
-    return true;
+    return rez;
 }
 
-bool CLScreenGrapper::openGlDataToFrame(void* opaque, AVFrame* pFrame)
-{
-    bgra_to_yv12_sse((unsigned char*) opaque, m_ddm.Width*4, pFrame->data[0], pFrame->data[1], pFrame->data[2], 
-        pFrame->linesize[0], pFrame->linesize[1], m_ddm.Width, m_ddm.Height);
+bool CLScreenGrapper::capturedDataToFrame(quint8* data, AVFrame* pFrame)
+{   
+    if (m_needRescale)
+    {
+        bgra_to_yv12_sse(data, m_ddm.Width*4, 
+            m_tmpFrame->data[0], m_tmpFrame->data[1], m_tmpFrame->data[2], 
+            m_tmpFrame->linesize[0], m_tmpFrame->linesize[1], m_ddm.Width, m_ddm.Height);
+
+        sws_scale(m_scaleContext, 
+            m_tmpFrame->data, m_tmpFrame->linesize, 
+            0, m_ddm.Height,
+            pFrame->data, pFrame->linesize);
+    }
+    else
+    {
+        bgra_to_yv12_sse(data, m_ddm.Width*4, pFrame->data[0], pFrame->data[1], pFrame->data[2], 
+                         pFrame->linesize[0], pFrame->linesize[1], m_ddm.Width, m_ddm.Height);
+    }
    return true;
 }
 
@@ -636,7 +687,7 @@ bool CLScreenGrapper::capturedDataToFrame(void* opaque, AVFrame* pFrame)
 {
     bool rez = false;
     if (m_mode == CaptureMode_Application)
-        rez = openGlDataToFrame(opaque, pFrame);
+        rez = capturedDataToFrame((quint8*) opaque, pFrame);
     else 
         rez = direct3DDataToFrame(opaque, pFrame);
 
@@ -647,4 +698,13 @@ qint64 CLScreenGrapper::currentTime() const
 {
     return m_timer.elapsed();
 }
-#endif // Q_OS_WIN
+
+int CLScreenGrapper::width() const          
+{ 
+    return m_outWidth;
+}
+
+int CLScreenGrapper::height() const         
+{ 
+    return m_outHeight;
+}
