@@ -2653,7 +2653,7 @@ void GraphicsView::toggleRecording()
             delete m_desktopEncoder;
             m_desktopEncoder = 0;
 
-            settings.setValue(QLatin1String("previousFile"), previousFile);
+            settings.setValue(QLatin1String("previousFile"), filePath);
         } else {
             QFile::remove(m_desktopEncoder->fileName());
         }
