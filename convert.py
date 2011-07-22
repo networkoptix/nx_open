@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+﻿#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import shutil
@@ -15,7 +15,7 @@ from string import Template
 
 os.path = posixpath
 
-FFMPEG_VERSION = '2011-05-24'
+FFMPEG_VERSION = '2011-07-22'
 
 INTRO_FILE = '../uniclient_media/intro.mov'
 

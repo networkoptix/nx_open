@@ -1,8 +1,6 @@
 #ifndef __DESKTOP_H264_STREAM_READER_H
 #define __DESKTOP_H264_STREAM_READER_H
 
-#ifdef Q_OS_WIN
-
 #include <QIODevice>
 #include <QAudioDeviceInfo>
 #include <QAudioInput>
@@ -18,8 +16,14 @@ class DesktopFileEncoder: public CLLongRunnable
 private:
     enum {BLOCK_SIZE = 1460};
 public:
-    DesktopFileEncoder(const QString& fileName, int desktopNum = 0, 
-                       const QAudioDeviceInfo audioDevice = QAudioDeviceInfo::defaultInputDevice() ); // 0 - default
+    DesktopFileEncoder( const QString& fileName, 
+                        int desktopNum,           // = 0, 
+                        const QAudioDeviceInfo audioDevice, //  = QAudioDeviceInfo::defaultInputDevice(),
+                        CLScreenGrapper::CaptureMode mode,
+                        bool captureCursor,
+                        const QSize& captureResolution,
+                        float encodeQualuty // in range 0.0 .. 1.0
+                       );
     virtual ~DesktopFileEncoder();
 
     QString fileName() const { return m_fileName; }
@@ -40,13 +44,13 @@ private:
     qint32 readPacketImpl(quint8* buf, quint32 bufSize);
     qint64 seekPacketImpl(qint64 offset, qint32 whence);
     qint64 currentTime() const;
+    int calculateBitrate();
 private:
     CLBufferedScreenGrabber* m_grabber;
     quint8* m_videoBuf;
     int m_videoBufSize;
     AVCodecContext* m_videoCodecCtx;
     AVCodecContext* m_audioCodecCtx;
-    char* m_encoderCodecName;
     bool m_initialized;
     AVFrame* m_frame;
     int m_desktopNum;
@@ -65,7 +69,7 @@ private:
     ByteIOContext* m_iocontext;
     QIODevice * m_device;
 
-    const QAudioDeviceInfo m_audioDevice;
+    QAudioDeviceInfo m_audioDevice;
     QAudioInput* m_audioInput;
     QIODevice* m_audioOStream;
     quint8* m_audioBuf;
@@ -77,8 +81,12 @@ private:
     double m_audioFrameDuration;
     qint64 m_storedAudioPts;
     int m_maxAudioJitter;
-};
 
-#endif // Q_OS_WIN
+    CLScreenGrapper::CaptureMode m_captureMode;
+    bool m_captureCursor;
+    QSize m_captureResolution;
+    float m_encodeQualuty;
+
+};
 
 #endif //__DESKTOP_H264_STREAM_READER_H

@@ -5,13 +5,17 @@
 static const int DEFAULT_VIDEO_STREAM_ID = 4113;
 static const int DEFAULT_AUDIO_STREAM_ID = 4351;
 static const int AUDIO_QUEUE_MAX_SIZE = 128;
+static const int BASE_BITRATE = 1000 * 1000 * 8; // bitrate for best quality for fullHD mode;
 
 extern "C" 
 {
     #include <libavformat/avformat.h>
     #include <libavcodec/avcodec.h>
-#include "data/mediadata.h"
+
+    int av_set_string3(void *obj, const char *name, const char *val, int alloc, const AVOption **o_out);
 }
+
+#include "data/mediadata.h"
 
 AVSampleFormat audioFormatQtToFfmpeg(const QAudioFormat& fmt)
 {
@@ -174,12 +178,15 @@ qint64 DesktopFileEncoder::seekPacketImpl(qint64 offset, qint32 whence)
 }
 
 
-
-
-
-DesktopFileEncoder::DesktopFileEncoder(const QString& fileName, 
-                                       int desktopNum,
-                                       const QAudioDeviceInfo audioDevice):
+DesktopFileEncoder::DesktopFileEncoder ( 
+                   const QString& fileName, 
+                   int desktopNum, 
+                   const QAudioDeviceInfo audioDevice,
+                   CLScreenGrapper::CaptureMode captureMode,
+                   bool captureCursor,
+                   const QSize& captureResolution,
+                   float encodeQualuty // in range 0.0 .. 1.0
+                   ):
     CLLongRunnable(),
     m_videoBuf(0),
     m_videoBufSize(0),
@@ -198,11 +205,13 @@ DesktopFileEncoder::DesktopFileEncoder(const QString& fileName,
     m_audioFramesCount(0),
     m_audioFrameDuration(0),
     m_storedAudioPts(0),
-    m_maxAudioJitter(0)
+    m_maxAudioJitter(0),
 
+    m_captureMode(captureMode),
+    m_captureCursor(captureCursor), 
+    m_captureResolution(captureResolution),
+    m_encodeQualuty(encodeQualuty)
 {
-    //m_encoderCodecName = "libx264";
-    m_encoderCodecName = "mpeg2video";
     m_needStop = false;
     m_audioQueue.setMaxSize(AUDIO_QUEUE_MAX_SIZE);
 
@@ -219,9 +228,26 @@ DesktopFileEncoder::~DesktopFileEncoder()
     delete m_audioOStream;
 }
 
+int DesktopFileEncoder::calculateBitrate()
+{
+    double bitrate = BASE_BITRATE;
+
+    bitrate /=  1920.0*1080.0 / m_grabber->width() / m_grabber->height();
+
+    bitrate *= m_encodeQualuty;
+    
+    return bitrate;
+}
+
 bool DesktopFileEncoder::init()
 {
-    m_grabber = new CLBufferedScreenGrabber(m_desktopNum);
+    m_grabber = new CLBufferedScreenGrabber(
+            m_desktopNum, 
+            CLBufferedScreenGrabber::DEFAULT_QUEUE_SIZE, 
+            CLBufferedScreenGrabber::DEFAULT_FRAME_RATE, 
+            m_captureMode, 
+            m_captureCursor, 
+            m_captureResolution);
 
     avcodec_init();
     av_register_all();
@@ -236,7 +262,10 @@ bool DesktopFileEncoder::init()
     m_frame = avcodec_alloc_frame();
     avpicture_alloc((AVPicture*) m_frame, m_grabber->format(), m_grabber->width(), m_grabber->height() );
 
-    AVCodec* videoCodec = avcodec_find_encoder_by_name(m_encoderCodecName);
+    QString videoCodecName = "libx264";
+    if (m_encodeQualuty <= 0.5)
+        videoCodecName = "mpeg2video";
+    AVCodec* videoCodec = avcodec_find_encoder_by_name(videoCodecName.toAscii().constData());
     if(videoCodec == 0)
     {
         cl_log.log("Can't find encoder", cl_logWARNING);
@@ -279,20 +308,43 @@ bool DesktopFileEncoder::init()
     m_videoCodecCtx->width = m_grabber->width();
     m_videoCodecCtx->height = m_grabber->height();
 
+
+    m_videoCodecCtx->bit_rate = calculateBitrate();
+
+    if (videoCodecName != "libx264")
+    {
+        m_videoCodecCtx->gop_size = 12;
+        m_videoCodecCtx->has_b_frames = 0;
+        m_videoCodecCtx->max_b_frames = 0;
+        m_videoCodecCtx->me_threshold = 0;
+        m_videoCodecCtx->intra_dc_precision = 0;
+        m_videoCodecCtx->strict_std_compliance = 0;
+        m_videoCodecCtx->me_method = ME_EPZS;
+    }
+
+    //QString codec_prop = "bitrate=4000000;refs=1;me_method=dia;subq=1;me_range=16;g=50;keyint_min=25;sc_threshold=40;i_qfactor=0.71;b_strategy=1;qcomp=0.6;qmin=10;qmax=51;qdiff=4;bf=3";
+    //QString codec_prop = "bitrate=4000000;refs=4;me_method=dia;subq=6;me_range=16;g=50;keyint_min=25;sc_threshold=40;i_qfactor=0.71;b_strategy=1;qcomp=0.6;qmin=1;qmax=51;qdiff=4;bf=4";
+    QString codec_prop = "";
+
+    //m_videoCodecCtx->refs = 1;
+    //m_videoCodecCtx->me_method = ME_EPZS;
+    //m_videoCodecCtx->coder_type = FF_CODER_TYPE_VLC;
     
-    m_videoCodecCtx->gop_size = 12;
-    m_videoCodecCtx->has_b_frames = 0;
-    m_videoCodecCtx->max_b_frames = 0;
-    m_videoCodecCtx->me_threshold = 0;
-    m_videoCodecCtx->intra_dc_precision = 0;
-    m_videoCodecCtx->strict_std_compliance = 0;
-    m_videoCodecCtx->me_method = ME_EPZS;
-    m_videoCodecCtx->bit_rate = 1024*1024*8;
+    QStringList prop_list = codec_prop.split(";", QString::SkipEmptyParts);
+    for (int i=0; i<prop_list.size();i++)    
+    {
+        QStringList param = prop_list.at(i).split("=", QString::SkipEmptyParts);
+        if (param.size()==2) 
+        {
+            int res = av_set_string3(m_videoCodecCtx, param.at(0).trimmed().toAscii().data(), param.at(1).trimmed().toAscii().data(), 1, NULL);
+            if (res != 0)
+                cl_log.log("Wrong option for video codec:", param.at(0), cl_logWARNING);
+        }
+    }
+    
 
     m_videoCodecCtx->sample_aspect_ratio.num = 1;
     m_videoCodecCtx->sample_aspect_ratio.den = 1;
-    
-
     m_videoOutStream->sample_aspect_ratio.den = 1;
     m_videoOutStream->sample_aspect_ratio.num = 1;
 
@@ -423,8 +475,6 @@ void DesktopFileEncoder::run()
             qint64 audioPts =  av_rescale_q(audioData->timestamp, r, stream->time_base); // + 20000;
             qint64 expectedAudioPts = m_storedAudioPts + m_audioFramesCount * m_audioFrameDuration; // + 20000;
             int audioJitter = qAbs(audioPts - expectedAudioPts);
-
-            qDebug() << "audio jitter" <<  audioJitter;
 
             if (audioJitter < m_maxAudioJitter)
             {
