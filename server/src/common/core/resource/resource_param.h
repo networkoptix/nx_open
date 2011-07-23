@@ -4,11 +4,13 @@
 #include "common/associativearray.h"
 
 
-struct CLParamType
+struct QnParam
 {
 	enum {None, Value, OnOff, Boolen, MinMaxStep, Enumeration, Button };	
 
-	CLParamType();
+	QnParam();
+
+    QString name;
 
 	int type;
 
@@ -26,34 +28,28 @@ struct CLParamType
 	QString group;
 	QString subgroup;
 	QString description;
-	bool ui;
 
+	bool ui;
 	bool readonly;
 
-	bool synchronized;
 
-	bool setValue(QnValue val, bool set = true); // safe way to set value
+	bool setValue(QnValue val); // safe way to set value
 	bool setDefVal(QnValue val); // safe way to set value
 
 };
 
-struct CLParam
-{
-	QString name;
-	CLParamType value;
-};
 
 class QnParamList
 {
 
 public:
-	typedef QMap<QString, CLParam> MAP;
+	typedef QMap<QString, QnParam> MAP;
 
 	void inheritedFrom(const QnParamList& other);
 	bool exists(const QString& name) const;
-	CLParam& get(const QString& name);
-	const CLParam get(const QString& name) const;
-	void put(const CLParam& param);
+	QnParam& get(const QString& name);
+	const QnParam get(const QString& name) const;
+	void put(const QnParam& param);
 	bool empty() const;
 	MAP& list();
 

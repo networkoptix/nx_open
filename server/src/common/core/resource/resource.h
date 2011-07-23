@@ -78,6 +78,8 @@ public:
 	virtual QString toString() const;
 
 
+    bool hasSuchParam(const QString& name) const;
+
 	// return true if no error
 	virtual bool getParam(const QString& name, QnValue& val, QnDomain domain = QnDomainMemory);
 
@@ -110,6 +112,9 @@ public:
     bool hasSuchConsumer(QnResourceConsumer* consumer) const;
     void disconnectAllConsumers();
 
+protected:
+    virtual bool getParamPhysical(const QString& name, QnValue& val);
+    virtual bool setParamPhysical(const QString& name, const QnValue& val);
 signals:
     
     void onParametrChanged(QString paramname, QString value);

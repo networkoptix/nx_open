@@ -1,13 +1,13 @@
-#ifndef device_video_layout_h_2143
-#define device_video_layout_h_2143
+#ifndef QnMediaResourceLayout_h_2143
+#define QnMediaResourceLayout_h_2143
 
 #define CL_MAX_CHANNELS 4
 
-class QnVideoResoutceLayout
+class QnMediaResourceLayout
 {
 public:
-	QnVideoResoutceLayout(){};
-    virtual ~QnVideoResoutceLayout() {}
+	QnMediaResourceLayout(){};
+    virtual ~QnMediaResourceLayout() {}
 	//returns number of video channels device has
 	virtual unsigned int numberOfChannels() const = 0;
 
@@ -23,11 +23,11 @@ public:
 };
 
 // this is default DeviceVideoLayout for any camera with only one sensor 
-class QnDefaultDeviceVideoLayout : public QnVideoResoutceLayout
+class QnDefaultMediaResourceLayout : public QnMediaResourceLayout
 {
 public:
-	QnDefaultDeviceVideoLayout(){};
-	virtual ~QnDefaultDeviceVideoLayout() {}
+	QnDefaultMediaResourceLayout(){};
+	virtual ~QnDefaultMediaResourceLayout() {}
 	//returns number of video channels device has
 	virtual unsigned int numberOfChannels() const
 	{
@@ -56,9 +56,9 @@ public:
 
 };
 
-QnDefaultDeviceVideoLayout globalDefaultDeviceVideoLayout;
+QnDefaultMediaResourceLayout globalDefaultMediaResourceLayout;
 
-class QnCustomDeviceVideoLayout : public QnVideoResoutceLayout
+class QnCustomDeviceVideoLayout : public QnMediaResourceLayout
 {
 public:
 	QnCustomDeviceVideoLayout(int width, int height):

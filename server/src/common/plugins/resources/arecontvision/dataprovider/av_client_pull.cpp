@@ -3,8 +3,8 @@
 #include "resource/resource_param.h"
 #include "common/rand.h"
 
-QnPlAVClinetPullStreamReader::QnPlAVClinetPullStreamReader(QnResource* dev ):
-QnClientPullStreamProvider(dev)
+QnPlAVClinetPullStreamReader::QnPlAVClinetPullStreamReader(QnResourcePtr res):
+QnClientPullStreamProvider(res)
 {
 	setQuality(m_qulity);
 
@@ -112,55 +112,23 @@ void QnPlAVClinetPullStreamReader::setQuality(QnStreamQuality q)
 
 }
 
-int QnPlAVClinetPullStreamReader::getQuality() const
-{
-	if (!m_streamParam.exists("Quality"))
-		return 10;
-
-	if (m_qulity!=QnQualityHighest)
-	{
-		return m_streamParam.get("Quality").value.value;
-	}
-	else
-	{
-		QnValue val;
-		m_device->getParam("Quality", val);
-		return val;
-	}
-
-}
 
 int QnPlAVClinetPullStreamReader::getBitrate() const
 {
-	if (!m_streamParam.exists("Bitrate"))
-		return 0;
+    if (!getResource()->hasSuchParam("Bitrate"))
+        return 0;
 
-	if (m_qulity!=QnQualityHighest)
-	{
-		return m_streamParam.get("Bitrate").value.value;
-	}
-	else
-	{
-		QnValue val;
-		m_device->getParam("Bitrate", val);
-		return val;
-	}
-
+	QnValue val;
+	getResource()->getParam("Bitrate", val);
+	return val;
 }
 
 bool QnPlAVClinetPullStreamReader::isH264() const
 {
-	if (!m_streamParam.exists("Codec")) // cam is jpeg only
-		return false;
+    if (!getResource().hasSuchParam("Codec"))
+        return false;
 
-	if (m_qulity!=QnQualityHighest)
-	{
-		return (m_streamParam.get("Codec").value.value == QString("H.264"));
-	}
-	else
-	{
-		QnValue val;
-		m_device->getParam("Codec", val);
-		return val==QString("H.264");
-	}
+	QnValue val;
+	getResource()->getParam("Codec", val);
+	return val==QString("H.264");
 }

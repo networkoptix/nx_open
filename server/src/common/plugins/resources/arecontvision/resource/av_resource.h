@@ -1,36 +1,23 @@
-#ifndef av_device_h_1252
-#define av_device_h_1252
+#ifndef QnPlAreconVisionResource_h_1252
+#define QnPlAreconVisionResource_h_1252
 
 #include "resource/network_resource.h"
 #include "network/simple_http_client.h"
+#include "resource/media_resource.h"
 
 
 class QDomElement;
 
-enum 
-{	
-	AVUNKNOWN = 2000,
-	AV1300 = 1300, AV1305 = 1305,
-	AV2100 = 2100, AV2105 = 2105, 
-	AV3100 = 3100, AV3105 = 3105, 
-	AV3130 = 3130, AV3135 = 3135, 
-	AV5100 = 5100, AV5105 = 5105, 
-	AV8180 = 8180, AV8185 = 8185, 
-	AV8360 = 8360, AV8365 = 8365,
-	AV10005 = 10005, AV2805 = 2805
-};
 
 // this class and inherited must be very light to create 
-class QnPlAreconVisionResource : public QnNetworkResource
+class QnPlAreconVisionResource : public QnNetworkResource, public QnMediaResource
 {
 public:
+    QnPlAreconVisionResource();
 
-
-	// return true if no error
-	virtual bool getParam(const QString& name, QnValue& val, bool resynch = false);
-
-	// return true if no error
-	virtual bool setParam(const QString& name, const QnValue& val);
+    virtual bool getParam(const QString& name, QnValue& val, QnDomain domain = QnDomainMemory);
+    // return true if no error
+    virtual bool setParam(const QString& name, const QnValue& val, QnDomain domain = QnDomainMemory);
 
 	virtual bool setHostAddress(const QHostAddress& ip, bool net = true);
 
@@ -51,11 +38,6 @@ public:
 	virtual QnNetworkResourcePtr updateResource();
 	//========
 
-	virtual void onBeforeStart();
-
-	// model is for internal use of any kind of AV plugin 
-	int getModel() const;
-
 protected:
 
 	QnPlAreconVisionResource(int model):
@@ -70,21 +52,14 @@ protected:
 public:
 	static QnResourceList findDevices();
 	static bool loadDevicesParam(const QString& file_name, QString& error );
-
-protected:
-	int m_model;
-
 private:
 	static bool parseDevice(const QDomElement &element, QString& error );
 	static bool parseParam(const QDomElement &element, QString& error, QnParamList& paramlist);
 	static QnPlAreconVisionResource* deviceByID(QString id, int model);
 
-	static bool isPanoramic(int model);
-
-	QnPlAreconVisionResource();
 
 };
 
 typedef QSharedPointer<QnPlAreconVisionResource> QnPlAreconVisionResourcePtr;
 
-#endif // av_device_h_1252
+#endif // QnPlAreconVisionResource_h_1252

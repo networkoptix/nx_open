@@ -1,9 +1,8 @@
-#include "resource/video_resource_layout.h"
 #include "av_resource.h"
 #include "av_panoramic.h"
 #include "../dataprovider/panoramic_cpul_tftp_dataprovider.h"
 
-class AVVideoLayout180 : public QnVideoResoutceLayout
+class AVVideoLayout180 : public QnMediaResourceLayout
 {
 public:
 	AVVideoLayout180(){};
@@ -51,7 +50,7 @@ public:
 
 };
 
-class AVVideoLayout360 : public QnVideoResoutceLayout
+class AVVideoLayout360 : public QnMediaResourceLayout
 {
 public:
 	AVVideoLayout360(){};
@@ -142,7 +141,7 @@ bool CLArecontPanoramicDevice::setParam(const QString& name, const QnValue& val 
 	if (setParam_special(name, val)) // try special first 
 		return true;
 
-	CLParamType& value = getResourceParamList().get(name).value;
+	QnParam& value = getResourceParamList().get(name).value;
 
 	//if (value.synchronized && value.value==val) // the same value
 	//	return true;
@@ -159,7 +158,7 @@ bool CLArecontPanoramicDevice::setParam(const QString& name, const QnValue& val 
 		return true;
 	}
 
-	if (value.type==CLParamType::None || value.type==CLParamType::Button) 
+	if (value.type==QnParam::None || value.type==QnParam::Button) 
 	{
 		CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
 		QString request;

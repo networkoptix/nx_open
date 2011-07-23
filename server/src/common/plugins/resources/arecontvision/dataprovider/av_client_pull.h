@@ -12,13 +12,13 @@ struct AVLastPacketSize
 class QnPlAVClinetPullStreamReader : public QnClientPullStreamProvider
 {
 public:
-	QnPlAVClinetPullStreamReader(QnResource* dev );
+	QnPlAVClinetPullStreamReader(QnResourcePtr res);
 	virtual ~QnPlAVClinetPullStreamReader();
 
 	virtual void setQuality(QnStreamQuality q);
 
 protected:
-	int getQuality() const;
+	
 	int getBitrate() const;
 	bool isH264() const;
 

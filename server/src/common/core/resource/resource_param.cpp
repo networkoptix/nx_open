@@ -1,15 +1,14 @@
 #include "resource_param.h"
 
 
-CLParamType::CLParamType()
+QnParam::QnParam()
 {
 	type = None;
-	synchronized = false;
 	readonly = false;
 	ui = false;
 }
 
-bool CLParamType::setValue(QnValue val, bool set) // safe way to set value
+bool QnParam::setValue(QnValue val) // safe way to set value
 {
 	switch(type)
 	{
@@ -28,13 +27,12 @@ bool CLParamType::setValue(QnValue val, bool set) // safe way to set value
 
 	}
 
-	if (set)
-		value = val;
+    value = val;
 
 	return true;
 }
 
-bool CLParamType::setDefVal(QnValue val) // safe way to set value
+bool QnParam::setDefVal(QnValue val) // safe way to set value
 {
 	switch(type)
 	{
@@ -76,17 +74,17 @@ bool QnParamList::exists(const QString& name) const
 	return true;
 }
 
-CLParam& QnParamList::get(const QString& name) 
+QnParam& QnParamList::get(const QString& name) 
 {
 	return m_params[name];
 }
 
-const CLParam QnParamList::get(const QString& name) const 
+const QnParam QnParamList::get(const QString& name) const 
 {
 	return m_params[name];
 }
 
-void QnParamList::put(const CLParam& param) 
+void QnParamList::put(const QnParam& param) 
 {
 	m_params[param.name] = param;
 }
@@ -100,9 +98,9 @@ QList<QString> QnParamList::groupList() const
 {
 	QList<QString> result;
 
-	foreach (CLParam param, m_params)
+	foreach (const QnParam& param, m_params)
 	{
-		QString group = param.value.group;
+		QString group = param.group;
 
 		if (group=="")
 			continue;
@@ -118,12 +116,12 @@ QList<QString> QnParamList::subGroupList(QString group) const
 {
 	QList<QString> result;
 
-	foreach (CLParam param, m_params)
+	foreach (const QnParam& param, m_params)
 	{
-		QString lgroup = param.value.group;
+		QString lgroup = param.group;
 		if (lgroup==group)
 		{
-			QString subgroup = param.value.subgroup;
+			QString subgroup = param.subgroup;
 
 			//if (subgroup=="")
 			//	continue;
@@ -140,10 +138,10 @@ QnParamList QnParamList::paramList(QString group, QString subgroup) const
 {
 	QnParamList result;
 
-	foreach (CLParam param, m_params)
+	foreach (const QnParam& param, m_params)
 	{
-		QString lgroup = param.value.group;
-		QString lsubgroup = param.value.subgroup;
+		QString lgroup = param.group;
+		QString lsubgroup = param.subgroup;
 
 		if (lgroup==group && lsubgroup==subgroup)
 			result.put(param);

@@ -1,5 +1,4 @@
 #include "resource.h"
-#include "video_resource_layout.h"
 #include "resourcecontrol/resource_command_consumer.h"
 
 static int inst = 0;
@@ -17,7 +16,8 @@ QnResource::QnParamLists QnResource::static_resourcesParamLists; // list of all 
 
 QnResource::QnResource():
 m_typeFlags(0),
-m_avalable(true)
+m_avalable(true),
+m_mutex(QMutex::Recursive)
 {
 	++inst;	
 
@@ -141,14 +141,50 @@ QString QnResource::toString() const
     return result;
 }
 
+bool QnResource::hasSuchParam(const QString& name) const
+{
+    QMutexLocker locker(&m_mutex);
+    return getResourceParamList().exists(name);
+}
+
+bool QnResource::getParamPhysical(const QString& name, QnValue& val)
+{
+    return false;
+}
+
+bool QnResource::setParamPhysical(const QString& name, const QnValue& val)
+{
+    return false;
+}
+
 
 bool QnResource::getParam(const QString& name, QnValue& val, QnDomain domain ) 
 {
-    if (!getResourceParamList().exists(name))
+
+    if (!hasSuchParam(name))
     {
         cl_log.log("getParam: requested param does not exist!", cl_logWARNING);
         return false;
     }
+
+    QMutexLocker locker(&m_mutex);
+
+    if (domain == QnDomainMemory) 
+    {
+        QnParam& value = getResourceParamList().get(name).value;
+        val = value.value;
+        return true;
+    }
+    else if (domain == QnDomainPhysical)
+    {
+        return getParamPhysical(name, val);
+    }
+    else if (domain == QnDomainDatabase)
+    {
+
+    }
+
+
 
     return true;
 }
@@ -160,17 +196,37 @@ void QnResource::getParamAsynch(const QString& name, QnValue& val, QnDomain doma
 
 bool QnResource::setParam(const QString& name, const QnValue& val, QnDomain domain)
 {
-    if (!getResourceParamList().exists(name))
+    if (!hasSuchParam(name))
     {
         cl_log.log("setParam: requested param does not exist!", cl_logWARNING);
         return false;
     }
+    
+    
+    QMutexLocker locker(&m_mutex);
+    QnParam& value = getResourceParamList().get(name).value;
 
-    if (getResourceParamList().get(name).value.readonly)
+    if (value.readonly)
     {
         cl_log.log("setParam: cannot set readonly param!", cl_logWARNING);
         return false;
     }
+
+    
+    if (domain == QnDomainPhysical)
+    {
+        if (!setParamPhysical(name, value.value))
+            return false;
+    }
+
+    // QnDomainMemory
+    if (!value.setValue(val))
+    {
+        cl_log.log("cannot set such value!", cl_logWARNING);
+        return false;
+    }
+
+    emit onParametrChanged(name, QString(value));
 
     return true;
 
@@ -190,6 +246,8 @@ void QnResource::setParamAsynch(const QString& name, const QnValue& val, QnDomai
           {
 
           }
+
+          virtual void beforeDisconnectFromResource(){};
 
           void execute()
           {

@@ -1,5 +1,8 @@
 #include "media_streamdataprovider.h"
-
+#include "resource/media_resource.h"
+#include "resource/media_resource_layout.h"
+#include "common/sleep.h"
+#include "resource/resource_consumer.h"
 
 
 QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(QnResourcePtr res):
@@ -7,7 +10,10 @@ QnAbstractStreamDataProvider(res),
 m_qulity(QnQualityLowest)
 {
 	memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame));
-	m_NumaberOfVideoChannels = 0;//dev->getVideoLayout()->numberOfChannels(); //todo
+
+    QnMediaResourcePtr mr = getResource().dynamicCast<QnMediaResource>();
+
+	m_NumaberOfVideoChannels = mr->getVideoLayout()->numberOfChannels();
 
 }
 
@@ -24,7 +30,7 @@ void QnAbstractMediaStreamDataProvider::setQuality(QnStreamQuality q)
 	m_qulity = q;
 }
 
-QnAbstractMediaStreamDataProvider::StreamQuality QnAbstractMediaStreamDataProvider::getQuality() const
+QnStreamQuality QnAbstractMediaStreamDataProvider::getQuality() const
 {
     QMutexLocker mtx(&m_mtx);
 	return m_qulity;

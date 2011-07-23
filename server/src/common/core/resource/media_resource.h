@@ -6,7 +6,7 @@
 #include "datapacket/mediadatapacket.h"
 
 class QnAbstractMediaStreamDataProvider;
-class QnVideoResoutceLayout;
+class QnMediaResourceLayout;
 
 class QnMediaResource : virtual public QnResource 
 {
@@ -15,8 +15,9 @@ public:
 	QnMediaResource();
     virtual ~QnMediaResource();
 
-    virtual QnVideoResoutceLayout* getVideoLayout() const;
+    virtual QnMediaResourceLayout* getVideoLayout() const;
 
+    // size - is size of one channel; we assume all channels have the same size
     virtual QnStreamQuality getBestQualityForSuchOnScreenSize(QSize size) = 0;
   
     // returns one image best for such time 
@@ -32,6 +33,9 @@ public:
     // if MediaProvider with such number does not exists it will be created; 
     // number belongs to the range [0; getStreamDataProvidersMaxAmount-1];
     QnAbstractMediaStreamDataProvider* acquireMediaProvider(int number);
+
+    // call the function if MediaProvider with such number is not going to be used any more till acquireMediaProvider is called again
+    void releaseMediaProvider(int number);
 
     // if MediaProvider with such number does not => 0 pointer is returned
     QnAbstractMediaStreamDataProvider* getMediaProvider(int number);

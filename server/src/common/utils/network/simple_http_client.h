@@ -7,7 +7,7 @@
 
 enum CLHttpStatus {CL_HTTP_SUCCESS, CL_HTTP_AUTH_REQUIRED, CL_HTTP_HOST_NOT_AVAILABLE};
 
-class CLSimpleHTTPClient : public CLAssociativeArray
+class CLSimpleHTTPClient : public QnAssociativeArray
 {
     enum {Basic , Digestaccess };
 public:	

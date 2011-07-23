@@ -15,6 +15,116 @@ QnPlAreconVisionResource::QnPlAreconVisionResource()
 
 }
 
+bool QnPlAreconVisionResource::getParam(const QString& name, QnValue& val, QnDomain domain)
+{
+    if (!QnResource::getParam(name, val, resynch)) // check if param exists
+        return false;
+
+    QMutexLocker locker(&m_mutex);
+
+    QnParam& value = getResourceParamList().get(name).value;
+
+    if (domain == QnDomainMemory) 
+    {
+        val = value.value;
+        return true;
+    }
+
+    //================================================
+
+    if (value.http == "") // check if we have http command for what
+    {
+        //cl_log.log("cannot find http command for such param!", cl_logWARNING);
+        val = value.value;
+        return true;
+
+        //return false;
+    }
+
+    CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
+
+    QString request;
+
+    QTextStream(&request) << "get?" << value.http;
+
+    connection.setRequestLine(request);
+
+    if (connection.openStream()!=CL_HTTP_SUCCESS)
+        return false;
+
+    char c_response[200];
+
+    int result_size =  connection.read(c_response,sizeof(c_response));
+
+    if (result_size <0)
+        return false;
+
+    QByteArray response = QByteArray::fromRawData(c_response, result_size); // QByteArray  will not copy data
+
+    int index = response.indexOf('=');
+    if (index==-1)
+        return false;
+
+    QByteArray rarray = response.mid(index+1);
+
+    value.value = QString(rarray.data());
+    value.synchronized = true;
+
+    val = value.value;
+
+    return true;
+
+}
+
+bool QnPlAreconVisionResource::setParam(const QString& name, const QnValue& val )
+{
+
+    if (!QnResource::setParam(name, val))
+        return false;
+
+    if (setParam_special(name, val)) // try special first 
+        return true;
+
+    QnParam& value = getResourceParamList().get(name).value;
+
+    //if (value.synchronized && value.value==val) // the same value
+    //	return true;
+
+    if (!value.setValue(val, false))
+    {
+        cl_log.log("cannot set such value!", cl_logWARNING);
+        return false;
+    }
+
+    if (value.http=="") // check if we have http command for this param
+    {
+        value.setValue(val);
+        return true;
+    }
+
+    CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
+
+    QString request;
+
+    QTextStream str(&request);
+    str << "set?" << value.http;
+    if (value.type!=QnParam::None && value.type!=QnParam::Button) 
+        str << "=" << (QString)val;
+
+    connection.setRequestLine(request);
+
+    if (connection.openStream()!=CL_HTTP_SUCCESS)
+        if (connection.openStream()!=CL_HTTP_SUCCESS) // try twice.
+            return false;
+
+    value.setValue(val);
+    value.synchronized = true;
+
+    return true;
+}
+
+
+
 CLHttpStatus QnPlAreconVisionResource::getRegister(int page, int num, int& val)
 {
 	QString req;
@@ -164,116 +274,12 @@ void QnPlAreconVisionResource::onBeforeStart()
 
 }
 
-bool QnPlAreconVisionResource::getParam(const QString& name, QnValue& val, bool resynch )
-{
-	if (!QnResource::getParam(name, val, resynch)) // check if param exists
-		return false;
-
-	CLParamType& value = getResourceParamList().get(name).value;
-
-	if (value.synchronized && !resynch) // if synchronized and do not need to do resynch
-	{
-		val = value.value;
-		return true;
-	}
-
-	//================================================
-
-	if (value.http=="") // check if we have http command for what
-	{
-		//cl_log.log("cannot find http command for such param!", cl_logWARNING);
-		val = value.value;
-		return true;
-
-		//return false;
-	}
-
-	CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
-
-	QString request;
-
-	QTextStream(&request) << "get?" << value.http;
-
-	connection.setRequestLine(request);
-
-	if (connection.openStream()!=CL_HTTP_SUCCESS)
-		return false;
-
-	char c_response[200];
-
-	int result_size =  connection.read(c_response,sizeof(c_response));
-
-	if (result_size <0)
-		return false;
-
-	QByteArray response = QByteArray::fromRawData(c_response, result_size); // QByteArray  will not copy data
-
-	int index = response.indexOf('=');
-	if (index==-1)
-		return false;
-
-	QByteArray rarray = response.mid(index+1);
-
-	value.value = QString(rarray.data());
-	value.synchronized = true;
-
-	val = value.value;
-
-	return true;
-
-}
 
 bool QnPlAreconVisionResource::setParam_special(const QString& name, const QnValue& val)
 {
 	return false;
 }
 
-bool QnPlAreconVisionResource::setParam(const QString& name, const QnValue& val )
-{
-
-	if (!QnResource::setParam(name, val))
-		return false;
-
-	if (setParam_special(name, val)) // try special first 
-		return true;
-
-	CLParamType& value = getResourceParamList().get(name).value;
-
-	//if (value.synchronized && value.value==val) // the same value
-	//	return true;
-
-	if (!value.setValue(val, false))
-	{
-		cl_log.log("cannot set such value!", cl_logWARNING);
-		return false;
-	}
-
-	if (value.http=="") // check if we have http command for this param
-	{
-		value.setValue(val);
-		return true;
-	}
-
-	CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
-
-	QString request;
-
-	QTextStream str(&request);
-	str << "set?" << value.http;
-	if (value.type!=CLParamType::None && value.type!=CLParamType::Button) 
-		str << "=" << (QString)val;
-
-	connection.setRequestLine(request);
-
-	if (connection.openStream()!=CL_HTTP_SUCCESS)
-		if (connection.openStream()!=CL_HTTP_SUCCESS) // try twice.
-			return false;
-
-	value.setValue(val);
-	value.synchronized = true;
-
-	return true;
-}
 
 
 QnResourceList QnPlAreconVisionResource::findDevices()
@@ -552,7 +558,7 @@ bool QnPlAreconVisionResource::parseDevice(const QDomElement &device, QString& e
 		QDomNode param_node = element.firstChild();
 		while (!param_node .isNull()) 
 		{
-			CLParam param;
+			QnParamUnused param;
 
 			if (param_node.toElement().tagName() == "param")
 			{
@@ -577,7 +583,7 @@ bool QnPlAreconVisionResource::parseDevice(const QDomElement &device, QString& e
 		QDomNode param_node = element.firstChild();
 		while (!param_node .isNull()) 
 		{
-			CLParam param;
+			QnParamUnused param;
 
 			if (param_node.toElement().tagName() == "param")
 			{
@@ -603,10 +609,10 @@ bool QnPlAreconVisionResource::parseParam(const QDomElement &element, QString& e
 
 	QString name = element.attribute("name");
 
-	CLParam param = paramlist.exists(name) ? paramlist.get(name) : CLParam();
+	QnParamUnused param = paramlist.exists(name) ? paramlist.get(name) : QnParamUnused();
 	param.name = name;
 
-	if (param.value.type == CLParamType::None) // param type is not defined yet
+	if (param.value.type == QnParam::None) // param type is not defined yet
 	{
 		if (!element.hasAttribute("type"))
 		{
@@ -617,19 +623,19 @@ bool QnPlAreconVisionResource::parseParam(const QDomElement &element, QString& e
 		QString type = element.attribute("type").toLower();
 
 		if (type=="value")
-			param.value.type = CLParamType::Value;
+			param.value.type = QnParam::Value;
 		else if (type=="novalue")
-			param.value.type = CLParamType::None;
+			param.value.type = QnParam::None;
 		else if (type=="minmaxstep")
-			param.value.type = CLParamType::MinMaxStep;
+			param.value.type = QnParam::MinMaxStep;
 		else if (type=="boolen")
-			param.value.type = CLParamType::Boolen;
+			param.value.type = QnParam::Boolen;
 		else if (type=="onoff")
-			param.value.type = CLParamType::OnOff;
+			param.value.type = QnParam::OnOff;
 		else if (type=="enumeration")
-			param.value.type = CLParamType::Enumeration;
+			param.value.type = QnParam::Enumeration;
 		else if (type=="button")
-			param.value.type = CLParamType::Button;
+			param.value.type = QnParam::Button;
 		else
 		{
 			error = "Unsupported param type fund";

@@ -75,14 +75,14 @@ public:
 
 };
 
-class CLAssociativeArray
+class QnAssociativeArray
 {
 
 	typedef QMap<QString, QString> MAP;
 	MAP map;
 
 public:
-	CLAssociativeArray(){};
+	QnAssociativeArray(){};
 	void put(const QString& key, const QnValue& value)
 	{
 		map[key] = (QString) value;
