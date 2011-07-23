@@ -2621,7 +2621,7 @@ void GraphicsView::toggleRecording()
         
         float quality = 1.0;
         if (decoderQuality == VideoRecorderSettings::BalancedQuality)
-            quality = 0.6;
+            quality = 0.75;
         else if (decoderQuality == VideoRecorderSettings::PerformanceQuality)
             quality = 0.5;
 

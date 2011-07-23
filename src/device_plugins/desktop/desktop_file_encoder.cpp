@@ -305,7 +305,7 @@ bool DesktopFileEncoder::init()
     m_videoCodecCtx = m_videoOutStream->codec;
     m_videoCodecCtx->codec_id = m_outputCtx->video_codec;
     m_videoCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO ;
-    m_videoCodecCtx->thread_count = 4;
+    m_videoCodecCtx->thread_count = QThread::idealThreadCount();
     
     
     m_videoCodecCtx->time_base = m_grabber->getFrameRate();
@@ -316,6 +316,11 @@ bool DesktopFileEncoder::init()
 
 
     m_videoCodecCtx->bit_rate = calculateBitrate();
+    m_videoCodecCtx->rc_buffer_size = m_videoCodecCtx->bit_rate;
+    m_videoCodecCtx->rc_max_rate = m_videoCodecCtx->bit_rate;
+    
+
+    QString codec_prop = "";
 
     if (videoCodecName != "libx264")
     {
@@ -327,15 +332,11 @@ bool DesktopFileEncoder::init()
         m_videoCodecCtx->strict_std_compliance = 0;
         m_videoCodecCtx->me_method = ME_EPZS;
     }
+    else {
+        if (m_encodeQualuty <= 0.75)
+            codec_prop = "refs=2;me_method=dia;subq=3;me_range=16;g=50;keyint_min=25;sc_threshold=40;i_qfactor=0.71;b_strategy=1;qcomp=0.6;qmin=10;qmax=51;qdiff=4;bf=3";
+    }
 
-    //QString codec_prop = "bitrate=4000000;refs=1;me_method=dia;subq=1;me_range=16;g=50;keyint_min=25;sc_threshold=40;i_qfactor=0.71;b_strategy=1;qcomp=0.6;qmin=10;qmax=51;qdiff=4;bf=3";
-    //QString codec_prop = "bitrate=4000000;refs=4;me_method=dia;subq=6;me_range=16;g=50;keyint_min=25;sc_threshold=40;i_qfactor=0.71;b_strategy=1;qcomp=0.6;qmin=1;qmax=51;qdiff=4;bf=4";
-    QString codec_prop = "";
-
-    //m_videoCodecCtx->refs = 1;
-    //m_videoCodecCtx->me_method = ME_EPZS;
-    //m_videoCodecCtx->coder_type = FF_CODER_TYPE_VLC;
-    
     QStringList prop_list = codec_prop.split(";", QString::SkipEmptyParts);
     for (int i=0; i<prop_list.size();i++)    
     {
@@ -525,8 +526,8 @@ int DesktopFileEncoder::processData(bool flush)
             audioPacket.stream_index = m_audioOutStream->index;
             if (av_write_frame(m_formatCtx,&audioPacket)<0)	
                 cl_log.log("Audio packet write error", cl_logWARNING);
-            cl_log.log("audioPacket.pts=", audioPacket.pts, cl_logALWAYS);
-            cl_log.log("audio buffer=", m_audioQueue.size(), cl_logALWAYS);
+            //cl_log.log("audioPacket.pts=", audioPacket.pts, cl_logALWAYS);
+            //cl_log.log("audio buffer=", m_audioQueue.size(), cl_logALWAYS);
         }
         audioData->releaseRef();
 
@@ -537,7 +538,7 @@ int DesktopFileEncoder::processData(bool flush)
     {
         if (av_write_frame(m_formatCtx,&videoPkt)<0)	
             cl_log.log("Video packet write error", cl_logWARNING);
-        cl_log.log("videoPkt.pts=", videoPkt.pts, cl_logALWAYS);
+        //cl_log.log("videoPkt.pts=", videoPkt.pts, cl_logALWAYS);
     }
     return out_size;
 }
