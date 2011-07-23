@@ -316,8 +316,8 @@ bool DesktopFileEncoder::init()
 
 
     m_videoCodecCtx->bit_rate = calculateBitrate();
-    m_videoCodecCtx->rc_buffer_size = m_videoCodecCtx->bit_rate;
-    m_videoCodecCtx->rc_max_rate = m_videoCodecCtx->bit_rate;
+    //m_videoCodecCtx->rc_buffer_size = m_videoCodecCtx->bit_rate;
+    //m_videoCodecCtx->rc_max_rate = m_videoCodecCtx->bit_rate;
     
 
     QString codec_prop = "";
