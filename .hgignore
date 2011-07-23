@@ -1,5 +1,6 @@
 syntax: glob
 
+.idea
 bin
 build
 Debug
