@@ -22,7 +22,7 @@ public:
     virtual bool equalsTo(const QnResourcePtr other) const;
 
 	QHostAddress getHostAddress() const;
-    virtual bool setHostAddress(const QHostAddress& ip, QnDomain domaun = QnDomainPhysical);
+    virtual bool setHostAddress(const QHostAddress& ip, QnDomain domain );
 
 	QnMacAddress getMAC() const;
 	void  setMAC(QnMacAddress mac);
@@ -42,6 +42,7 @@ public:
     void addNetworkStatus(unsigned long status);
     void removeNetworkStatus(unsigned long status);
     bool checkNetworkStatus(unsigned long status) const;
+    void setNetworkStatus(unsigned long status);
 
 
 	// return true if device conflicting with something else ( IP conflict )
@@ -52,16 +53,6 @@ public:
     void setNetworkTimeout(unsigned int timeout);
     virtual unsigned int getNetworkTimeout() const;
 	
-
-	//=============
-	// some time we can find device, but cannot request additional information from it ( device has bad ip for example )
-	// in this case we need to request additional information later.
-	// unknownResource - tels if we need that additional information 
-	virtual bool unknownResource() const = 0;
-
-	// updateResource requests the additional  information and return device with the same mac, ip but ready to use...
-	virtual QnNetworkResourcePtr updateResource()  = 0;
-	//=============
 
     // sometimes resource is not in your lan, and it might be not pingable from one hand 
     // but from other hand it's still might replay to standard requests

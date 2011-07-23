@@ -37,8 +37,10 @@ public:
         media = 0x08, 
         playback = 0x10, // something playable ( not real time and not a single shot)
         video = 0x20,
-        audio = 0x40
+        audio = 0x40,
+        live = 0x80
     };
+
 
 	QnResource();
 	virtual ~QnResource();
@@ -76,24 +78,36 @@ public:
     QStringList tagList() const;
 
 	virtual QString toString() const;
+    virtual QString toSearchString() const;
 
 
     bool hasSuchParam(const QString& name) const;
 
 	// return true if no error
-	virtual bool getParam(const QString& name, QnValue& val, QnDomain domain = QnDomainMemory);
+	virtual bool getParam(const QString& name, QnValue& val, QnDomain domain);
 
     // same as getParam is invoked in separate thread.
     // as soon as param changed onParametrChanged signal is emitted 
-    void getParamAsynch(const QString& name, QnValue& val, QnDomain domain = QnDomainMemory);
+    void getParamAsynch(const QString& name, QnValue& val, QnDomain domain);
 
 
 	// return true if no error
-	virtual bool setParam(const QString& name, const QnValue& val, QnDomain domain = QnDomainMemory);
+	virtual bool setParam(const QString& name, const QnValue& val, QnDomain domain);
 
 	// same as setParam but but returns immediately;
 	// this function leads setParam invoke in separate thread. so no need to make it virtual
-	void setParamAsynch(const QString& name, const QnValue& val, QnDomain domain = QnDomainMemory);
+	void setParamAsynch(const QString& name, const QnValue& val, QnDomain domain);
+
+    //=============
+    // some time we can find resource, but cannot request additional information from it ( resource has bad ip for example )
+    // in this case we need to request additional information later.
+    // unknownResource - tels if we need that additional information 
+    virtual bool unknownResource() const;
+
+    // updateResource requests the additional  information and returns resource with same params but additional info; unknownResource() for returned resource must return false
+    virtual QnResourcePtr updateResource()  = 0;
+    //=============
+
 
 	// gets resource basic info; may be firmware version or so 
     // return false if not accessible 
@@ -113,8 +127,15 @@ public:
     void disconnectAllConsumers();
 
 protected:
+    // should change value in memory domain 
     virtual bool getParamPhysical(const QString& name, QnValue& val);
+
+    // should just do physical job( network or so ) do not care about memory domain
     virtual bool setParamPhysical(const QString& name, const QnValue& val);
+
+    // some resources might have special params; to setup such params not usual sceme is used 
+    // if function returns true setParam does not do usual routine
+    virtual bool setSpecialParam(const QString& name, const QnValue& val, QnDomain domain);
 signals:
     
     void onParametrChanged(QString paramname, QString value);

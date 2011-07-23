@@ -15,40 +15,31 @@ class QnPlAreconVisionResource : public QnNetworkResource, public QnMediaResourc
 public:
     QnPlAreconVisionResource();
 
-    virtual bool getParam(const QString& name, QnValue& val, QnDomain domain = QnDomainMemory);
-    // return true if no error
-    virtual bool setParam(const QString& name, const QnValue& val, QnDomain domain = QnDomainMemory);
+    CLHttpStatus getRegister(int page, int num, int& val);
+    CLHttpStatus setRegister(int page, int num, int val);
+    CLHttpStatus setRegister_asynch(int page, int num, int val);
 
-	virtual bool setHostAddress(const QHostAddress& ip, bool net = true);
+
+	virtual bool setHostAddress(const QHostAddress& ip, QnDomain domain);
 
 	bool getBasicInfo();
 
-	QString toString() const;
+    QString toSearchString() const;
 
 	virtual bool getDescription() {return true;};
 
-	CLHttpStatus getRegister(int page, int num, int& val);
-	CLHttpStatus setRegister(int page, int num, int val);
-	CLHttpStatus setRegister_asynch(int page, int num, int val);
-
-	QnAbstractMediaStreamDataProvider* getDeviceStreamConnection();
-
 	//========
-	virtual bool unknownResource() const;
-	virtual QnNetworkResourcePtr updateResource();
+	virtual QnResourcePtr updateResource();
 	//========
+
+    virtual void beforeUse();
 
 protected:
+    // should change value in memory domain 
+    virtual bool getParamPhysical(const QString& name, QnValue& val);
 
-	QnPlAreconVisionResource(int model):
-	m_model(model)
-	{
-	}
-
-	// some AV devices are really challenging to integrate with
-	// so this function will do really dirty work about some special cam params
-	virtual bool setParam_special(const QString& name, const QnValue& val);
-
+    // should just do physical job( network or so ) do not care about memory domain
+    virtual bool setParamPhysical(const QString& name, const QnValue& val);
 public:
 	static QnResourceList findDevices();
 	static bool loadDevicesParam(const QString& file_name, QString& error );
@@ -57,6 +48,9 @@ private:
 	static bool parseParam(const QDomElement &element, QString& error, QnParamList& paramlist);
 	static QnPlAreconVisionResource* deviceByID(QString id, int model);
 
+protected:
+
+    QString m_description;
 
 };
 

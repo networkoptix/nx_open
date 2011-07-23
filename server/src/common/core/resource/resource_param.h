@@ -24,7 +24,7 @@ struct QnParam
 	QnValue value;
 	QnValue default_value;
 
-	QString http;
+	QString paramNetHelper;
 	QString group;
 	QString subgroup;
 	QString description;

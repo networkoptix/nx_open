@@ -1,5 +1,6 @@
 #include "resource.h"
 #include "resourcecontrol/resource_command_consumer.h"
+#include "resource_param.h"
 
 static int inst = 0;
 
@@ -141,6 +142,21 @@ QString QnResource::toString() const
     return result;
 }
 
+QString QnResource::toSearchString() const
+{
+    QString result;
+    QTextStream t (&result);
+
+    t << toString() << " ";
+
+    QMutexLocker locker(&m_mutex);
+
+    foreach(QString tag, m_tags)
+        t << tag << " ";
+
+    return result;
+}
+
 bool QnResource::hasSuchParam(const QString& name) const
 {
     QMutexLocker locker(&m_mutex);
@@ -157,6 +173,10 @@ bool QnResource::setParamPhysical(const QString& name, const QnValue& val)
     return false;
 }
 
+bool QnResource::setSpecialParam(const QString& name, const QnValue& val, QnDomain domain)
+{
+    return false;
+}
 
 bool QnResource::getParam(const QString& name, QnValue& val, QnDomain domain ) 
 {
@@ -167,24 +187,33 @@ bool QnResource::getParam(const QString& name, QnValue& val, QnDomain domain )
         return false;
     }
 
+    if (setSpecialParam(name, val, domain)) // try special first
+        return true;
+
     QMutexLocker locker(&m_mutex);
 
     if (domain == QnDomainMemory) 
     {
-        QnParam& value = getResourceParamList().get(name).value;
-        val = value.value;
+        QnParam& param = getResourceParamList().get(name);
+        val = param.value;
         return true;
     }
     else if (domain == QnDomainPhysical)
     {
-        return getParamPhysical(name, val);
+        if (getParamPhysical(name, val))
+        {
+            emit onParametrChanged(name, QString(val));
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
     else if (domain == QnDomainDatabase)
     {
 
     }
-
-
 
     return true;
 }
@@ -204,9 +233,9 @@ bool QnResource::setParam(const QString& name, const QnValue& val, QnDomain doma
     
     
     QMutexLocker locker(&m_mutex);
-    QnParam& value = getResourceParamList().get(name).value;
+    QnParam& param = getResourceParamList().get(name);
 
-    if (value.readonly)
+    if (param.readonly)
     {
         cl_log.log("setParam: cannot set readonly param!", cl_logWARNING);
         return false;
@@ -215,18 +244,18 @@ bool QnResource::setParam(const QString& name, const QnValue& val, QnDomain doma
     
     if (domain == QnDomainPhysical)
     {
-        if (!setParamPhysical(name, value.value))
+        if (!setParamPhysical(name, val))
             return false;
     }
 
     // QnDomainMemory
-    if (!value.setValue(val))
+    if (!param.setValue(val))
     {
-        cl_log.log("cannot set such value!", cl_logWARNING);
+        cl_log.log("cannot set such param!", cl_logWARNING);
         return false;
     }
 
-    emit onParametrChanged(name, QString(value));
+    emit onParametrChanged(name, QString(val));
 
     return true;
 
@@ -264,11 +293,14 @@ void QnResource::setParamAsynch(const QString& name, const QnValue& val, QnDomai
     typedef QSharedPointer<QnResourceSetParamCommand> QnResourceSetParamCommandPtr;
 
     QnResourceSetParamCommandPtr command ( new QnResourceSetParamCommand(QnResourcePtr(this), name, val, domain) );
-    commendProcessor().putData(command);
+    addCommandToProc(command);
 
 }
 
-
+bool QnResource::unknownResource() const
+{
+    return getName().isEmpty();
+}
 
 
 QnParamList& QnResource::getResourceParamList()

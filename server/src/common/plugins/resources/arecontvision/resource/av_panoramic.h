@@ -16,7 +16,7 @@ public:
 protected:
 	virtual bool setParam(const QString& name, const QnValue& val);
 
-	virtual bool setParam_special(const QString& name, const QnValue& val);
+	virtual bool setSpecialParam(const QString& name, const QnValue& val);
 
 private:
 	bool setResolution(bool full);

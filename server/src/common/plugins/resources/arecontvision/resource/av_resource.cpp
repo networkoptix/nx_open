@@ -5,6 +5,7 @@
 #include "network/ping.h"
 #include "av_panoramic.h"
 #include "av_singesensor.h"
+#include "resourcecontrol/resource_command_consumer.h"
 
 #define CL_BROAD_CAST_RETRY 3
 
@@ -12,117 +13,10 @@ extern int ping_timeout;
 
 QnPlAreconVisionResource::QnPlAreconVisionResource()
 {
-
+    addFlag(QnResource::video);
+    addFlag(QnResource::streamprovider);
+    addFlag(QnResource::live);
 }
-
-bool QnPlAreconVisionResource::getParam(const QString& name, QnValue& val, QnDomain domain)
-{
-    if (!QnResource::getParam(name, val, resynch)) // check if param exists
-        return false;
-
-    QMutexLocker locker(&m_mutex);
-
-    QnParam& value = getResourceParamList().get(name).value;
-
-    if (domain == QnDomainMemory) 
-    {
-        val = value.value;
-        return true;
-    }
-
-    //================================================
-
-    if (value.http == "") // check if we have http command for what
-    {
-        //cl_log.log("cannot find http command for such param!", cl_logWARNING);
-        val = value.value;
-        return true;
-
-        //return false;
-    }
-
-    CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
-
-    QString request;
-
-    QTextStream(&request) << "get?" << value.http;
-
-    connection.setRequestLine(request);
-
-    if (connection.openStream()!=CL_HTTP_SUCCESS)
-        return false;
-
-    char c_response[200];
-
-    int result_size =  connection.read(c_response,sizeof(c_response));
-
-    if (result_size <0)
-        return false;
-
-    QByteArray response = QByteArray::fromRawData(c_response, result_size); // QByteArray  will not copy data
-
-    int index = response.indexOf('=');
-    if (index==-1)
-        return false;
-
-    QByteArray rarray = response.mid(index+1);
-
-    value.value = QString(rarray.data());
-    value.synchronized = true;
-
-    val = value.value;
-
-    return true;
-
-}
-
-bool QnPlAreconVisionResource::setParam(const QString& name, const QnValue& val )
-{
-
-    if (!QnResource::setParam(name, val))
-        return false;
-
-    if (setParam_special(name, val)) // try special first 
-        return true;
-
-    QnParam& value = getResourceParamList().get(name).value;
-
-    //if (value.synchronized && value.value==val) // the same value
-    //	return true;
-
-    if (!value.setValue(val, false))
-    {
-        cl_log.log("cannot set such value!", cl_logWARNING);
-        return false;
-    }
-
-    if (value.http=="") // check if we have http command for this param
-    {
-        value.setValue(val);
-        return true;
-    }
-
-    CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
-
-    QString request;
-
-    QTextStream str(&request);
-    str << "set?" << value.http;
-    if (value.type!=QnParam::None && value.type!=QnParam::Button) 
-        str << "=" << (QString)val;
-
-    connection.setRequestLine(request);
-
-    if (connection.openStream()!=CL_HTTP_SUCCESS)
-        if (connection.openStream()!=CL_HTTP_SUCCESS) // try twice.
-            return false;
-
-    value.setValue(val);
-    value.synchronized = true;
-
-    return true;
-}
-
 
 
 CLHttpStatus QnPlAreconVisionResource::getRegister(int page, int num, int& val)
@@ -157,25 +51,139 @@ CLHttpStatus QnPlAreconVisionResource::getRegister(int page, int num, int& val)
 
 }
 
-QnAbstractMediaStreamDataProvider* QnPlAreconVisionResource::getDeviceStreamConnection()
+CLHttpStatus QnPlAreconVisionResource::setRegister(int page, int num, int val)
 {
-	return 0;
+    QString req;
+    QTextStream(&req) << "setreg?page=" << page << "&reg=" << num << "&val=" << val;
+
+    CLSimpleHTTPClient http(getHostAddress(), 80,getNetworkTimeout(), getAuth());
+    http.setRequestLine(req);
+
+    CLHttpStatus result = http.openStream();
+
+    return result;
+
 }
 
-bool QnPlAreconVisionResource::unknownResource() const
+CLHttpStatus QnPlAreconVisionResource::setRegister_asynch(int page, int num, int val)
 {
-	return (getModel()==AVUNKNOWN);
+    class QnPlArecontResourceSetRegCommand : public QnResourceCommand
+    {
+    public:
+        QnPlArecontResourceSetRegCommand(QnResourcePtr res, int page, int reg, int val):
+          QnResourceCommand(res),
+              m_page(page),
+              m_val(val),
+              m_reg(reg)
+          {
+
+          }
+
+          void beforeDisconnectFromResource(){};
+
+          void execute()
+          {
+              getResource().dynamicCast<QnPlAreconVisionResource>()->setRegister(m_page,m_reg,m_val);
+          }
+    private:
+        int m_page;
+        int m_reg;
+        int m_val;
+    };
+
+    typedef QSharedPointer<QnPlArecontResourceSetRegCommand> QnPlArecontResourceSetRegCommandPtr;
+
+
+    QnPlArecontResourceSetRegCommandPtr command ( new QnPlArecontResourceSetRegCommand(QnResourcePtr(this), page, num, val) );
+    addCommandToProc(command);
+    return CL_HTTP_SUCCESS;
+
 }
 
-QnNetworkResourcePtr QnPlAreconVisionResource::updateResource() 
+bool QnPlAreconVisionResource::setHostAddress(const QHostAddress& ip, QnDomain domain)
+{
+    // this will work only in local networks ( camera must be able ti get broadcat from this ip);
+
+    if (domain == QnDomainPhysical)
+    {
+        QUdpSocket sock;
+
+        sock.bind(m_localAddress , 0); // address usesd to find cam
+        QString m_local_adssr_srt = m_localAddress.toString(); // debug only
+        QString new_ip_srt = ip.toString(); // debug only
+
+        QByteArray basic_str = "Arecont_Vision-AV2000\2";
+
+        char data[256];
+
+        int shift = 22;
+        memcpy(data,basic_str.data(),shift);
+        MACsToByte(m_mac, (unsigned char*)data + shift); //memcpy(data + shift, mac, 6);
+
+        quint32 new_ip = htonl(ip.toIPv4Address());
+        memcpy(data + shift + 6, &new_ip,4);
+
+        sock.writeDatagram(data, shift + 10,QHostAddress::Broadcast, 69);
+        sock.writeDatagram(data, shift + 10,QHostAddress::Broadcast, 69);
+
+        removeARPrecord(ip);
+        removeARPrecord(getHostAddress());
+
+        //
+        CLPing ping;
+        if (!ping.ping(ip.toString(), 2, ping_timeout)) // check if ip really changed 
+            return false; 
+
+    }
+
+    return QnNetworkResource::setHostAddress(ip, domain);
+}
+
+bool QnPlAreconVisionResource::getBasicInfo()
+{
+    QnValue val;
+    if (!getParam("Firmware version", val, QnDomainPhysical))
+        return false;
+
+    if (!getParam("Image engine", val, QnDomainPhysical ))
+        return false;
+
+    if (!getParam("Net version", val, QnDomainPhysical))
+        return false;
+
+    if (!getDescription())
+        return false;
+
+    return true;
+}
+
+QString QnPlAreconVisionResource::toSearchString() const
+{
+    QString result;
+
+    QString firmware = getResourceParamList().get("Firmware version").value.value;
+    QString hardware = getResourceParamList().get("Image engine").value.value;
+    QString net = getResourceParamList().get("Net version").value.value;
+
+    QTextStream t(&result);
+    t<< QnNetworkResource::toSearchString() <<" live fw=" << firmware << " hw=" << hardware << " net=" << net;
+
+    if (m_description.isEmpty())
+        t <<  " dsc=" << m_description;
+    return result;
+
+}
+
+
+QnResourcePtr QnPlAreconVisionResource::updateResource() 
 {
 	QnValue model;
 	QnValue model_relase;
 
-	if (!getParam("Model", model))
+	if (!getParam("Model", model, QnDomainPhysical))
 		return QnNetworkResourcePtr(0);
 
-	if (!getParam("ModelRelease", model_relase))
+	if (!getParam("ModelRelease", model_relase, QnDomainPhysical))
 		return QnNetworkResourcePtr(0);
 
 	if (model_relase!=model)
@@ -186,7 +194,7 @@ QnNetworkResourcePtr QnPlAreconVisionResource::updateResource()
 	else
 	{
 		//old camera; does not support relase name; but must support fullname
-		if (getParam("ModelFull", model_relase))
+		if (getParam("ModelFull", model_relase, QnDomainPhysical))
 			model = model_relase;
 	}
 
@@ -199,87 +207,101 @@ QnNetworkResourcePtr QnPlAreconVisionResource::updateResource()
 	}
 
 	result->setName(model);
-	result->setHostAddress(getHostAddress(), false);
+	result->setHostAddress(getHostAddress(), QnDomainMemory);
 	result->setMAC(getMAC());
-	result->setId(getMAC());
-	result->setLocalHostAddress(m_localAddress);
-	result->setStatus(getStatus());
+	result->setId(getId());
+	result->setNetworkStatus(m_networkStatus);
+
 
 	return result;
 }
 
-int QnPlAreconVisionResource::getModel() const
+void QnPlAreconVisionResource::beforeUse()
 {
-	return m_model;
-}
+    QnValue maxSensorWidth;
+    QnValue maxSensorHight;
+    getParam("MaxSensorWidth", maxSensorWidth);
+    getParam("MaxSensorHeight", maxSensorHight);
 
-CLHttpStatus QnPlAreconVisionResource::setRegister(int page, int num, int val)
-{
-	QString req;
-	QTextStream(&req) << "setreg?page=" << page << "&reg=" << num << "&val=" << val;
-
-	CLSimpleHTTPClient http(getHostAddress(), 80,getNetworkTimeout(), getAuth());
-	http.setRequestLine(req);
-
-	CLHttpStatus result = http.openStream();
-
-	return result;
-
-}
-
-CLHttpStatus QnPlAreconVisionResource::setRegister_asynch(int page, int num, int val)
-{
-	class QnPlArecontResourceSetRegCommand : public QnResourceCommand
-	{
-	public:
-		QnPlArecontResourceSetRegCommand(QnResource* dev, int page, int reg, int val):
-		  QnResourceCommand(dev),
-			  m_page(page),
-			  m_val(val),
-			  m_reg(reg)
-		  {
-
-		  }
-
-		  void execute()
-		  {
-			  (static_cast<QnPlAreconVisionResource*>(m_resource))->setRegister(m_page,m_reg,m_val);
-		  }
-	private:
-		int m_page;
-		int m_reg;
-		int m_val;
-	};
-
-    typedef QSharedPointer<QnPlArecontResourceSetRegCommand> QnPlArecontResourceSetRegCommandPtr;
-
-
-	QnPlArecontResourceSetRegCommandPtr command ( new QnPlArecontResourceSetRegCommand(this, page, num, val) );
-	static_commandProc.putData(command);
-	return CL_HTTP_SUCCESS;
-
-}
-
-void QnPlAreconVisionResource::onBeforeStart()
-{
-	QnValue maxSensorWidth;
-	QnValue maxSensorHight;
-	getParam("MaxSensorWidth", maxSensorWidth);
-	getParam("MaxSensorHeight", maxSensorHight);
-
-	setParamAsynch("sensorleft", 0);
-	setParamAsynch("sensortop", 0);
-	setParamAsynch("sensorwidth", maxSensorWidth);
-	setParamAsynch("sensorheight", maxSensorHight);
+    setParamAsynch("sensorleft", 0);
+    setParamAsynch("sensortop", 0);
+    setParamAsynch("sensorwidth", maxSensorWidth);
+    setParamAsynch("sensorheight", maxSensorHight);
 
 }
 
 
-bool QnPlAreconVisionResource::setParam_special(const QString& name, const QnValue& val)
+
+bool QnPlAreconVisionResource::getParamPhysical(const QString& name, QnValue& val)
 {
-	return false;
+    QMutexLocker locker(&m_mutex);
+
+    //================================================
+    QnParam& param = getResourceParamList().get(name);
+    if (param.paramNetHelper.isEmpty()) // check if we have paramNetHelper
+    {
+        //cl_log.log("cannot find http command for such param!", cl_logWARNING);
+        return false;
+    }
+
+    CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
+
+    QString request;
+
+    QTextStream(&request) << "get?" << param.paramNetHelper;
+
+    connection.setRequestLine(request);
+
+    if (connection.openStream()!=CL_HTTP_SUCCESS)
+        return false;
+
+    char c_response[200];
+
+    int result_size =  connection.read(c_response,sizeof(c_response));
+
+    if (result_size <0)
+        return false;
+
+    QByteArray response = QByteArray::fromRawData(c_response, result_size); // QByteArray  will not copy data
+
+    int index = response.indexOf('=');
+    if (index==-1)
+        return false;
+
+    QByteArray rarray = response.mid(index+1);
+
+    param.value = QString(rarray.data());
+
+    val = param.value;
+    return true;
+
 }
 
+bool QnPlAreconVisionResource::setParamPhysical(const QString& name, const QnValue& val )
+{
+    QnParam& param = getResourceParamList().get(name);
+
+    if (param.paramNetHelper.isEmpty()) // check if we have paramNetHelper command for this param
+        return false;
+
+    CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
+
+    QString request;
+
+    QTextStream str(&request);
+    str << "set?" << param.paramNetHelper;
+    if (param.type!=QnParam::None && param.type!=QnParam::Button) 
+        str << "=" << (QString)val;
+
+    connection.setRequestLine(request);
+
+    if (connection.openStream()!=CL_HTTP_SUCCESS)
+        if (connection.openStream()!=CL_HTTP_SUCCESS) // try twice.
+            return false;
+
+
+    return true;
+}
 
 
 QnResourceList QnPlAreconVisionResource::findDevices()
@@ -376,8 +398,8 @@ QnResourceList QnPlAreconVisionResource::findDevices()
 				/**/
 
 				// in any case let's HTTP do it's job at very end of discovery 
-				QnNetworkResourcePtr resource ( new QnPlAreconVisionResource(AVUNKNOWN) );
-				resource->setName("AVUNKNOWN");
+				QnNetworkResourcePtr resource ( new QnPlAreconVisionResource() );
+				//resource->setName("AVUNKNOWN");
 
 				if (resource==0)
 					continue;
@@ -405,44 +427,6 @@ QnResourceList QnPlAreconVisionResource::findDevices()
 	return result;
 }
 
-bool QnPlAreconVisionResource::setHostAddress(const QHostAddress& ip, bool net )
-{
-	// this will work only in local networks ( camera must be able ti get broadcat from this ip);
-
-	if (net)
-	{
-		QUdpSocket sock;
-
-		sock.bind(m_localAddress , 0); // address usesd to find cam
-		QString m_local_adssr_srt = m_localAddress.toString(); // debug only
-		QString new_ip_srt = ip.toString(); // debug only
-
-		QByteArray basic_str = "Arecont_Vision-AV2000\2";
-
-		char data[256];
-
-		int shift = 22;
-		memcpy(data,basic_str.data(),shift);
-		MACsToByte(m_mac, (unsigned char*)data + shift); //memcpy(data + shift, mac, 6);
-
-		quint32 new_ip = htonl(ip.toIPv4Address());
-		memcpy(data + shift + 6, &new_ip,4);
-
-		sock.writeDatagram(data, shift + 10,QHostAddress::Broadcast, 69);
-		sock.writeDatagram(data, shift + 10,QHostAddress::Broadcast, 69);
-
-		removeARPrecord(ip);
-		removeARPrecord(getHostAddress());
-
-		//
-		CLPing ping;
-		if (!ping.ping(ip.toString(), 2, ping_timeout)) // check if ip really changed 
-			return false; 
-
-	}
-
-	return QnNetworkResource::setHostAddress(ip);
-}
 
 bool QnPlAreconVisionResource::loadDevicesParam(const QString& file_name, QString& error)
 {
@@ -622,7 +606,7 @@ bool QnPlAreconVisionResource::parseParam(const QDomElement &element, QString& e
 
 		QString type = element.attribute("type").toLower();
 
-		if (type=="value")
+		if (type=="param")
 			param.value.type = QnParam::Value;
 		else if (type=="novalue")
 			param.value.type = QnParam::None;
@@ -664,8 +648,8 @@ bool QnPlAreconVisionResource::parseParam(const QDomElement &element, QString& e
 	if (element.hasAttribute("default_value"))
 		param.value.default_value = element.attribute("default_value");
 
-	if (element.hasAttribute("http"))
-		param.value.http = element.attribute("http");
+	if (element.hasAttribute("paramNetHelper"))
+		param.value.http = element.attribute("paramNetHelper");
 
 	if (element.hasAttribute("ui"))
 		param.value.ui = element.attribute("ui").toInt();
@@ -704,10 +688,10 @@ bool QnPlAreconVisionResource::parseParam(const QDomElement &element, QString& e
 
 	}
 
-	if (element.hasAttribute("value"))
-		param.value.value = element.attribute("value");
+	if (element.hasAttribute("param"))
+		param.value.value = element.attribute("param");
 	else
-		param.value.value = param.value.default_value;
+		param.value.param = param.value.default_value;
 
 	paramlist.put(param);
 
@@ -730,39 +714,7 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::deviceByID(QString id, int m
 		return new CLArecontSingleSensorDevice(model);
 }
 
-bool QnPlAreconVisionResource::getBasicInfo()
-{
-	QnValue val;
-	if (!getParam("Firmware version", val))
-		return false;
 
-	if (!getParam("Image engine", val ))
-		return false;
-
-	if (!getParam("Net version", val))
-		return false;
-
-	if (!getDescription())
-		return false;
-
-	return true;
-}
-
-QString QnPlAreconVisionResource::toString() const
-{
-	QString result;
-
-	QString firmware = getResourceParamList().get("Firmware version").value.value;
-	QString hardware = getResourceParamList().get("Image engine").value.value;
-	QString net = getResourceParamList().get("Net version").value.value;
-
-	QTextStream t(&result);
-	t<< QnResource::toString() <<" live fw=" << firmware << " hw=" << hardware << " net=" << net;
-	if (m_description!="")
-		t <<  " dsc=" << m_description;
-	return result;
-
-}
 
 bool QnPlAreconVisionResource::isPanoramic(int model)
 {

@@ -33,7 +33,7 @@ QHostAddress QnNetworkResource::getHostAddress() const
 	return m_hostAddr;
 }
 
-bool QnNetworkResource::setHostAddress(const QHostAddress& ip, QnDomain domaun )
+bool QnNetworkResource::setHostAddress(const QHostAddress& ip, QnDomain domain )
 {
 	QMutexLocker mutex(&m_mutex);
 	m_hostAddr = ip;
@@ -81,8 +81,15 @@ void QnNetworkResource::setDiscoveryAddr(QHostAddress addr)
 QString QnNetworkResource::toString() const
 {
 	QString result;
-	QTextStream(&result) << getName() << "  " << getHostAddress().toString() << "  " << getMAC().toString();
+	QTextStream(&result) << getName() << "(" << getHostAddress().toString() << ")";
 	return result;
+}
+
+QString QnNetworkResource::toSearchString() const
+{
+    QString result;
+    QTextStream(&result) << QnResource::toSearchString() << " " << getMAC().toString();
+    return result;
 }
 
 void QnNetworkResource::addNetworkStatus(unsigned long status)
@@ -101,6 +108,12 @@ bool QnNetworkResource::checkNetworkStatus(unsigned long status) const
 {
     QMutexLocker mutex(&m_mutex);
     return m_networkStatus & status;
+}
+
+void QnNetworkResource::setNetworkStatus(unsigned long status)
+{
+    QMutexLocker mutex(&m_mutex);
+    m_networkStatus = status;
 }
 
 void QnNetworkResource::setNetworkTimeout(unsigned int timeout)

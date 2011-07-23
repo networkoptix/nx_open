@@ -138,7 +138,7 @@ bool CLArecontPanoramicDevice::setParam(const QString& name, const QnValue& val 
 	if (!QnResource::setParam(name, val))
 		return false;
 
-	if (setParam_special(name, val)) // try special first 
+	if (setSpecialParam(name, val)) // try special first 
 		return true;
 
 	QnParam& value = getResourceParamList().get(name).value;
@@ -152,7 +152,7 @@ bool CLArecontPanoramicDevice::setParam(const QString& name, const QnValue& val 
 		return false;
 	}
 
-	if (value.http=="") // check if we have http command for this param
+	if (value.paramNetHelper=="") // check if we have paramNetHelper command for this param
 	{
 		value.setValue(val);
 		return true;
@@ -164,7 +164,7 @@ bool CLArecontPanoramicDevice::setParam(const QString& name, const QnValue& val 
 		QString request;
 
 		QTextStream str(&request);
-		str << "set?" << value.http;
+		str << "set?" << value.paramNetHelper;
 
 		connection.setRequestLine(request);
 
@@ -180,7 +180,7 @@ bool CLArecontPanoramicDevice::setParam(const QString& name, const QnValue& val 
 			QString request;
 
 			QTextStream str(&request);
-			str << "set" << i << "?" << value.http;
+			str << "set" << i << "?" << value.paramNetHelper;
 			str << "=" << (QString)val;
 
 			connection.setRequestLine(request);
@@ -199,10 +199,10 @@ bool CLArecontPanoramicDevice::setParam(const QString& name, const QnValue& val 
 
 }
 
-bool CLArecontPanoramicDevice::setParam_special(const QString& name, const QnValue& val)
+bool CLArecontPanoramicDevice::setSpecialParam(const QString& name, const QnValue& val)
 {
 
-	if (QnPlAreconVisionResource::setParam_special(name, val))
+	if (QnPlAreconVisionResource::setSpecialParam(name, val))
 		return true;
 
 	if (name=="resolution")
