@@ -13,6 +13,41 @@ extern "C" {
 QMutex CLScreenGrapper::m_instanceMutex;
 int CLScreenGrapper::m_aeroInstanceCounter;
 
+class CPUDetector
+{
+public:
+    enum CPUVersion { HAS_x86, HAS_MMX, HAS_SSE, HAS_SSE2, HAS_SSE3 };
+
+    CPUVersion version() const { return m_version; }
+
+    CPUDetector()
+    {
+        int a,b,c,d;
+        __asm {
+            mov eax,1
+	        cpuid
+	        mov	a, eax
+	        mov	b, ebx
+	        mov	c, ecx
+	        mov	d, edx
+        }
+        if (c & 1)
+            m_version = HAS_SSE3;
+        else if (d & (1<<26))
+            m_version = HAS_SSE2;
+        else if (d & (1<<25))
+            m_version = HAS_SSE;
+        else if (d & (1<<23))
+            m_version = HAS_MMX;
+        else
+            m_version = HAS_x86;
+    }
+private:
+    CPUVersion m_version;
+};
+CPUDetector cpuInfo;
+
+
 CLScreenGrapper::CLScreenGrapper(int displayNumber, int poolSize, CaptureMode mode, bool captureCursor, const QSize& captureResolution): 
     m_pD3D(0), 
     m_pd3dDevice(0), 
