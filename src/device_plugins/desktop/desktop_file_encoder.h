@@ -45,7 +45,10 @@ private:
     qint64 seekPacketImpl(qint64 offset, qint32 whence);
     qint64 currentTime() const;
     int calculateBitrate();
+    int processData(bool flush);
+    void stopCapturing();
 private:
+    int m_encodedFrames;
     CLBufferedScreenGrabber* m_grabber;
     quint8* m_videoBuf;
     int m_videoBufSize;
@@ -85,7 +88,7 @@ private:
     CLScreenGrapper::CaptureMode m_captureMode;
     bool m_captureCursor;
     QSize m_captureResolution;
-    float m_encodeQualuty;
+   float m_encodeQualuty;
 
 };
 

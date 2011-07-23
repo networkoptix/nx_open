@@ -14,6 +14,13 @@ class CLScreenGrapper: public QObject
 {
     Q_OBJECT
 public:
+    struct CaptureInfo
+    {
+        CaptureInfo(): pts(0), opaque(0) {}
+        qint64 pts;
+        void* opaque;
+    };
+
     enum CaptureMode {CaptureMode_DesktopWithAero, CaptureMode_DesktopWithoutAero, CaptureMode_Application};
     
     // resolution (0,0) - use default(native resolution)
@@ -25,8 +32,8 @@ public:
 
     // capture screenshot in YUV 4:2:0 format
     // allocate frame data if frame is not initialized
-    void* captureFrame();
-    bool capturedDataToFrame(void* surface, AVFrame* frame);
+    CaptureInfo captureFrame();
+    bool capturedDataToFrame(const CaptureInfo& captureInfo, AVFrame* frame);
 
     PixelFormat format() const { return PIX_FMT_YUV420P; }
     //PixelFormat format() const { return PIX_FMT_BGRA; }
@@ -35,7 +42,7 @@ public:
     qint64 currentTime() const;
 private:
     HRESULT	InitD3D(HWND hWnd);
-    bool capturedDataToFrame(quint8* data, AVFrame* pFrame);
+    bool dataToFrame(quint8* data, AVFrame* pFrame);
     bool direct3DDataToFrame(void* opaque, AVFrame* pFrame);
     Q_INVOKABLE void captureFrameOpenGL(void* data);
     void drawCursor(quint32* data, int dataStride) const;

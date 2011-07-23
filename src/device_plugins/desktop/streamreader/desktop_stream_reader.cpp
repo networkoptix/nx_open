@@ -37,6 +37,7 @@ CLDesktopStreamreader::CLDesktopStreamreader(CLDevice* dev):
         idx--;
     m_grabber = new CLBufferedScreenGrabber(num.right(num.length()-idx-1).toInt()-1);
     m_encoderCodecName = "mpeg2video";
+    m_grabber->start(QThread::HighestPriority);
     //m_encoderCodecName = "mpeg4";
 }
 
@@ -100,8 +101,8 @@ CLAbstractMediaData* CLDesktopStreamreader::getNextData()
         return 0;
     while (!m_needStop)
     {
-        void* capturedData = m_grabber->getNextFrame();
-        if (!capturedData)
+        CLScreenGrapper::CaptureInfo capturedData = m_grabber->getNextFrame();
+        if (!capturedData.opaque)
             continue;
         m_grabber->capturedDataToFrame(capturedData, m_frame);
 

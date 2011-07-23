@@ -4,8 +4,10 @@
 
 static const int DEFAULT_VIDEO_STREAM_ID = 4113;
 static const int DEFAULT_AUDIO_STREAM_ID = 4351;
-static const int AUDIO_QUEUE_MAX_SIZE = 128;
+static const int AUDIO_QUEUE_MAX_SIZE = 256;
 static const int BASE_BITRATE = 1000 * 1000 * 8; // bitrate for best quality for fullHD mode;
+
+static const int MAX_VIDEO_JITTER = 2;
 
 extern "C" 
 {
@@ -60,10 +62,9 @@ public:
         : QIODevice(),
         m_encoder(encoder),
         m_currentBufferSize(0),
-        m_nextAudioBuffer(0)
+        m_nextAudioBuffer(0),
+        m_startDelay(0)
     {
-        m_nextAudioBuffer = new CLAbstractMediaData(CL_MEDIA_ALIGNMENT, m_encoder->audioPacketSize());
-        m_nextAudioBuffer->timestamp = m_encoder->currentTime();
     }
     ~CaptureAudioStream()
     {
@@ -79,6 +80,14 @@ protected:
 
     qint64 writeData ( const char * data, qint64 maxSize )
     {
+        if (m_nextAudioBuffer == 0)
+        {
+            m_nextAudioBuffer = new CLAbstractMediaData(CL_MEDIA_ALIGNMENT, m_encoder->audioPacketSize());
+            m_startDelay = m_encoder->currentTime();
+            m_nextAudioBuffer->timestamp = 0;
+            m_startDelay = m_encoder->currentTime();
+        }
+
         int currentMaxSize = maxSize;
         while (currentMaxSize > 0)
         {
@@ -90,12 +99,8 @@ protected:
             if (m_currentBufferSize == m_encoder->audioPacketSize())
             {
                 m_encoder->m_audioQueue.push(m_nextAudioBuffer);
-                if (m_encoder->m_audioQueue.size() > 16)
-                {
-                    int ff = 4;
-                }
                 m_nextAudioBuffer = new CLAbstractMediaData(CL_MEDIA_ALIGNMENT, m_encoder->audioPacketSize());
-                m_nextAudioBuffer->timestamp = m_encoder->currentTime();
+                m_nextAudioBuffer->timestamp = m_encoder->currentTime() - m_startDelay;
                 m_currentBufferSize = 0;
             }
         }
@@ -105,6 +110,7 @@ private:
     DesktopFileEncoder* m_encoder;
     int m_currentBufferSize;
     CLAbstractMediaData* m_nextAudioBuffer;
+    int m_startDelay;
 };
 
 int DesktopFileEncoder::initIOContext()
@@ -210,7 +216,8 @@ DesktopFileEncoder::DesktopFileEncoder (
     m_captureMode(captureMode),
     m_captureCursor(captureCursor), 
     m_captureResolution(captureResolution),
-    m_encodeQualuty(encodeQualuty)
+    m_encodeQualuty(encodeQualuty),
+    m_encodedFrames(0)
 {
     m_needStop = false;
     m_audioQueue.setMaxSize(AUDIO_QUEUE_MAX_SIZE);
@@ -224,8 +231,6 @@ DesktopFileEncoder::~DesktopFileEncoder()
     m_needStop = true;
     wait();
     closeStream();
-    delete m_audioInput;
-    delete m_audioOStream;
 }
 
 int DesktopFileEncoder::calculateBitrate()
@@ -300,6 +305,7 @@ bool DesktopFileEncoder::init()
     m_videoCodecCtx = m_videoOutStream->codec;
     m_videoCodecCtx->codec_id = m_outputCtx->video_codec;
     m_videoCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO ;
+    m_videoCodecCtx->thread_count = 4;
     
     
     m_videoCodecCtx->time_base = m_grabber->getFrameRate();
@@ -429,33 +435,45 @@ bool DesktopFileEncoder::init()
     //m_audioOStream = new QFile("c:/audio_captire.wav");
     m_audioOStream = new CaptureAudioStream(this);
     m_audioOStream->open(QIODevice::WriteOnly | QIODevice::Truncate);
+
+    m_grabber->start(QThread::HighestPriority);
     m_audioInput->start(m_audioOStream);
 
     return true;
 }
 
-void DesktopFileEncoder::run()
+int DesktopFileEncoder::processData(bool flush)
 {
-    while (!m_needStop)
+    if (!flush)
     {
-        void* capturedData = m_grabber->getNextFrame();
-        if (!capturedData)
-            continue;
-        m_grabber->capturedDataToFrame(capturedData, m_frame);
+        if (m_encodedFrames == 0)
+            m_encodedFrames = m_frame->pts;
+        else {
+            if (qAbs(m_frame->pts - m_encodedFrames) <= MAX_VIDEO_JITTER)
+                m_frame->pts = m_encodedFrames;
+            else
+                m_encodedFrames = m_frame->pts;
+        }
+        m_encodedFrames++;
+    }
 
-        m_frame->pts = m_frame->coded_picture_number;
+    int out_size = avcodec_encode_video(m_videoCodecCtx, m_videoBuf, m_videoBufSize, flush ? 0 : m_frame);
+    if (out_size < 1 && !flush)
+        return out_size;
 
-        int out_size = avcodec_encode_video(m_videoCodecCtx, m_videoBuf, m_videoBufSize, m_frame);
-        if (out_size < 1)
-            continue;
+    if (out_size < 1)
+    {
+        int aSize = m_audioQueue.size();
+        aSize = aSize;
+    }
 
+    AVPacket videoPkt;
+    if (out_size > 0)
+    {
         AVStream * stream = m_formatCtx->streams[m_videoStreamIndex];
-        AVPacket videoPkt;
         av_init_packet(&videoPkt);
         if (m_videoCodecCtx->coded_frame->pts != AV_NOPTS_VALUE)
             videoPkt.pts = av_rescale_q(m_videoCodecCtx->coded_frame->pts, m_videoCodecCtx->time_base, stream->time_base);
-
-        //cl_log.log("pkt.pts=" , pkt.pts, cl_logALWAYS);
 
         if(m_videoCodecCtx->coded_frame->key_frame)
             videoPkt.flags |= AV_PKT_FLAG_KEY;
@@ -463,73 +481,92 @@ void DesktopFileEncoder::run()
         videoPkt.stream_index= stream->index;
         videoPkt.data = m_videoBuf;
         videoPkt.size = out_size;
+    }
 
-        // write all audio frames
-        while (m_audioQueue.size() > 0)
+    // write all audio frames
+    while (m_audioQueue.size() > 0)
+    {
+        AVRational r;
+        r.num = 1;
+        r.den = 1000;
+        CLAbstractMediaData* audioData = m_audioQueue.front();
+
+        qint64 audioPts =  av_rescale_q(audioData->timestamp, r, m_audioOutStream->time_base);
+        qint64 expectedAudioPts = m_storedAudioPts + m_audioFramesCount * m_audioFrameDuration; 
+        int audioJitter = qAbs(audioPts - expectedAudioPts);
+
+        if (audioJitter < m_maxAudioJitter)
         {
-            AVRational r;
-            r.num = 1;
-            r.den = 1000;
-            CLAbstractMediaData* audioData = m_audioQueue.front();
-
-            qint64 audioPts =  av_rescale_q(audioData->timestamp, r, stream->time_base); // + 20000;
-            qint64 expectedAudioPts = m_storedAudioPts + m_audioFramesCount * m_audioFrameDuration; // + 20000;
-            int audioJitter = qAbs(audioPts - expectedAudioPts);
-
-            if (audioJitter < m_maxAudioJitter)
-            {
-                audioPts = expectedAudioPts;
-            }
-            else {
-                m_storedAudioPts = audioPts;
-                m_audioFramesCount = 1;
-            }
-    
-            if (audioPts > videoPkt.pts)
-                break;
-
-            m_audioFramesCount++;
-
-            AVPacket audioPacket;
-            m_audioQueue.pop(audioData);
-
-            // todo: add audio resample here
-
-            const short* buffer = (const short*) audioData->data.data();
-            int aEncoded = avcodec_encode_audio(m_audioCodecCtx, m_audioBuf, FF_MIN_BUFFER_SIZE, buffer);
-            if (aEncoded > 0)
-            {
-                av_init_packet(&audioPacket);
-                audioPacket.pts = audioPts;
-                audioPacket.data = m_audioBuf;
-                audioPacket.size = aEncoded;
-                audioPacket.stream_index = m_audioOutStream->index;
-                if (av_write_frame(m_formatCtx,&audioPacket)<0)	
-                {
-                    QString s ="AUDIO av_write_frame(formatCtx,&audioPacket) error. current time:"+QTime::currentTime().toString() +"\n";
-                    s+="packet pts: " + QString::number(audioPacket.pts) + "dts:"+QString::number(audioPacket.dts) + "\n";
-                    s+="error code: " + QString::number(m_iocontext->error) + "\n";
-                    s+="eof_reached: " + QString::number(m_iocontext->eof_reached) + "\n";
-                    s+="pos: " + QString::number(m_iocontext->pos) + "\n";
-                    s+="write_flag: " + QString::number(m_iocontext->write_flag) + "\n";
-                    cl_log.log(s, cl_logWARNING);
-                }
-            }
-            audioData->releaseRef();
+            audioPts = expectedAudioPts;
+        }
+        else {
+            m_storedAudioPts = audioPts;
+            m_audioFramesCount = 1;
         }
 
-        if (av_write_frame(m_formatCtx,&videoPkt)<0)	
+        if (out_size > 0 && audioPts > videoPkt.pts)
+            break;
+
+        m_audioFramesCount++;
+
+        AVPacket audioPacket;
+        m_audioQueue.pop(audioData);
+
+        // todo: add audio resample here
+
+        const short* buffer = (const short*) audioData->data.data();
+        int aEncoded = avcodec_encode_audio(m_audioCodecCtx, m_audioBuf, FF_MIN_BUFFER_SIZE, buffer);
+        if (aEncoded > 0)
         {
-            QString s ="VIDEO av_write_frame(formatCtx,&videoPkt) error. current time:"+QTime::currentTime().toString() +"\n";
-            s+="packet pts: " + QString::number(videoPkt.pts) + "dts:"+QString::number(videoPkt.dts) + "\n";
-            s+="error code: " + QString::number(m_iocontext->error) + "\n";
-            s+="eof_reached: " + QString::number(m_iocontext->eof_reached) + "\n";
-            s+="pos: " + QString::number(m_iocontext->pos) + "\n";
-            s+="write_flag: " + QString::number(m_iocontext->write_flag) + "\n";
-            cl_log.log(s, cl_logWARNING);
+            av_init_packet(&audioPacket);
+            audioPacket.pts = audioPts - m_audioFrameDuration;
+            audioPacket.data = m_audioBuf;
+            audioPacket.size = aEncoded;
+            audioPacket.stream_index = m_audioOutStream->index;
+            if (av_write_frame(m_formatCtx,&audioPacket)<0)	
+                cl_log.log("Audio packet write error", cl_logWARNING);
+            cl_log.log("audioPacket.pts=", audioPacket.pts, cl_logALWAYS);
+            cl_log.log("audio buffer=", m_audioQueue.size(), cl_logALWAYS);
         }
+        audioData->releaseRef();
+
 
     }
+
+    if (out_size > 0)
+    {
+        if (av_write_frame(m_formatCtx,&videoPkt)<0)	
+            cl_log.log("Video packet write error", cl_logWARNING);
+        cl_log.log("videoPkt.pts=", videoPkt.pts, cl_logALWAYS);
+    }
+    return out_size;
+}
+
+void DesktopFileEncoder::run()
+{
+    while (!m_needStop)
+    {
+        CLScreenGrapper::CaptureInfo capturedData = m_grabber->getNextFrame();
+        if (!capturedData.opaque)
+            continue;
+        m_grabber->capturedDataToFrame(capturedData, m_frame);
+
+        AVRational r;
+        r.num = 1;
+        r.den = 1000;
+        m_frame->pts = av_rescale_q(m_frame->pts, r, m_grabber->getFrameRate());
+
+        if (processData(false) < 0)
+        {
+            cl_log.log("Video encoding error. Stop recording.", cl_logWARNING);
+            break;
+        }
+    }
+    stopCapturing();
+    cl_log.log("flushing video buffer",cl_logALWAYS);
+    do {
+    } while (processData(true) > 0); // flush buffers
+
     closeStream();
 }
 
@@ -539,16 +576,39 @@ void DesktopFileEncoder::openStream()
         m_initialized = true;
 }
 
+void DesktopFileEncoder::stopCapturing()
+{
+    delete m_grabber;
+    m_grabber = 0;
+    delete m_audioInput;
+    m_audioInput = 0;
+    delete m_audioOStream;
+    m_audioOStream = 0;
+}
+
 void DesktopFileEncoder::closeStream()
 {
     delete m_grabber;
     m_grabber = 0;
+    delete m_audioInput;
+    m_audioInput = 0;
+    delete m_audioOStream;
+    m_audioOStream = 0;
+
+    if (m_formatCtx)
+        av_write_trailer(m_formatCtx);
+
+    if (m_videoCodecCtx)
+        avcodec_close(m_videoCodecCtx);
+    m_videoCodecCtx = 0;
+
+    if (m_audioCodecCtx)
+        avcodec_close(m_audioCodecCtx);
+    m_audioCodecCtx = 0;
 
     if (m_formatCtx)
         avformat_free_context(m_formatCtx);
     m_formatCtx = 0;
-    m_videoCodecCtx = 0;
-    m_audioCodecCtx = 0;
 
     if (m_frame)
         av_free(m_frame);
@@ -559,7 +619,11 @@ void DesktopFileEncoder::closeStream()
 
     av_free(av_alloc_put_byte);
     m_iocontext = 0;
-    delete m_device;
+    if (m_device)
+    {
+        m_device->close();
+        delete m_device;
+    }
     m_device = 0;
 
     m_initialized = false;

@@ -211,23 +211,25 @@ void CLScreenGrapper::captureFrameOpenGL(void* data)
         drawCursor((quint32*) data, m_ddm.Width);
 }
 
-void* CLScreenGrapper::captureFrame()
+CLScreenGrapper::CaptureInfo CLScreenGrapper::captureFrame()
 {
-    void* rez = 0;
+    CaptureInfo rez;
 
     if (m_mode == CaptureMode_Application) 
     {   
-        rez = m_openGLData[m_currentIndex];
-        //captureFrameOpenGL(rez);
+        rez.opaque = m_openGLData[m_currentIndex];
         QGenericReturnArgument ret;
-        QMetaObject::invokeMethod(this, "captureFrameOpenGL", Qt::BlockingQueuedConnection, ret, Q_ARG(void*, rez));
+        QMetaObject::invokeMethod(this, "captureFrameOpenGL", Qt::BlockingQueuedConnection, ret, Q_ARG(void*, rez.opaque));
     }
     else 
     {   // direct3D capture mode
         if (!m_pd3dDevice)
-            return false;
+            return rez;
         if(FAILED(m_pd3dDevice->GetFrontBufferData(0, m_pSurface[m_currentIndex])))
+        {
             cl_log.log("Unable to capture frame", cl_logWARNING);
+            return rez;
+        }
         if (m_captureCursor)
         {
             D3DLOCKED_RECT	lockedRect;
@@ -237,8 +239,9 @@ void* CLScreenGrapper::captureFrame()
                 m_pSurface[m_currentIndex]->UnlockRect();
             }
         }
-        rez = m_pSurface[m_currentIndex];
+        rez.opaque = m_pSurface[m_currentIndex];
     }
+    rez.pts = m_timer.elapsed();
     m_currentIndex = m_currentIndex < m_pSurface.size()-1 ? m_currentIndex+1 : 0;
     return rez;
 }
@@ -665,7 +668,7 @@ bool CLScreenGrapper::direct3DDataToFrame(void* opaque, AVFrame* pFrame)
 
     }
     pFrame->coded_picture_number = m_frameNum++;
-    pFrame->pts = m_timer.elapsed();
+    //pFrame->pts = m_timer.elapsed();
     pFrame->best_effort_timestamp = pFrame->pts;
 
 #if 0
@@ -691,13 +694,13 @@ bool CLScreenGrapper::direct3DDataToFrame(void* opaque, AVFrame* pFrame)
     int time2 = t2.elapsed();
     qDebug() << "time1=" << time1 << "time2=" << time2 << "t1/t2=" << time1 / (float) time2;
 #else    
-    bool rez = capturedDataToFrame((unsigned char*)lockedRect.pBits, pFrame);
+    bool rez = dataToFrame((unsigned char*)lockedRect.pBits, pFrame);
 #endif
     pSurface->UnlockRect();
     return rez;
 }
 
-bool CLScreenGrapper::capturedDataToFrame(quint8* data, AVFrame* pFrame)
+bool CLScreenGrapper::dataToFrame(quint8* data, AVFrame* pFrame)
 {   
     if (m_needRescale)
     {
@@ -718,14 +721,14 @@ bool CLScreenGrapper::capturedDataToFrame(quint8* data, AVFrame* pFrame)
    return true;
 }
 
-bool CLScreenGrapper::capturedDataToFrame(void* opaque, AVFrame* pFrame)
+bool CLScreenGrapper::capturedDataToFrame(const CaptureInfo& captureInfo, AVFrame* pFrame)
 {
     bool rez = false;
     if (m_mode == CaptureMode_Application)
-        rez = capturedDataToFrame((quint8*) opaque, pFrame);
+        rez = dataToFrame((quint8*) captureInfo.opaque, pFrame);
     else 
-        rez = direct3DDataToFrame(opaque, pFrame);
-
+        rez = direct3DDataToFrame(captureInfo.opaque, pFrame);
+    pFrame->pts = captureInfo.pts;
     return rez;
 }
 
