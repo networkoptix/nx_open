@@ -36,7 +36,7 @@ QnPlArecontResourceSearcher::QnPlArecontResourceSearcher()
 
 QString QnPlArecontResourceSearcher::name() const
 {
-	return "Arecont Vision";
+	return "ArecontVision";
 }
 
 // returns all available devices 

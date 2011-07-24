@@ -13,9 +13,7 @@ extern int ping_timeout;
 
 QnPlAreconVisionResource::QnPlAreconVisionResource()
 {
-    addFlag(QnResource::video);
-    addFlag(QnResource::streamprovider);
-    addFlag(QnResource::live);
+    addFlag(QnResource::live_cam);
 }
 
 
@@ -118,7 +116,8 @@ bool QnPlAreconVisionResource::setHostAddress(const QHostAddress& ip, QnDomain d
 
         int shift = 22;
         memcpy(data,basic_str.data(),shift);
-        MACsToByte(m_mac, (unsigned char*)data + shift); //memcpy(data + shift, mac, 6);
+
+        memcpy(data + shift, getMAC().toBytes(), 6);//     MACsToByte(m_mac, (unsigned char*)data + shift); //memcpy(data + shift, mac, 6);
 
         quint32 new_ip = htonl(ip.toIPv4Address());
         memcpy(data + shift + 6, &new_ip,4);
@@ -161,9 +160,9 @@ QString QnPlAreconVisionResource::toSearchString() const
 {
     QString result;
 
-    QString firmware = getResourceParamList().get("Firmware version").value.value;
-    QString hardware = getResourceParamList().get("Image engine").value.value;
-    QString net = getResourceParamList().get("Net version").value.value;
+    QString firmware = getResourceParamList().get("Firmware version").value;
+    QString hardware = getResourceParamList().get("Image engine").value;
+    QString net = getResourceParamList().get("Net version").value;
 
     QTextStream t(&result);
     t<< QnNetworkResource::toSearchString() <<" live fw=" << firmware << " hw=" << hardware << " net=" << net;
@@ -198,7 +197,7 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
 			model = model_relase;
 	}
 
-	QnNetworkResourcePtr result ( deviceByID(model, atoi( QString(model).toLatin1().data() )) ); // atoi here coz av 8185dn returns "8185DN" string on the get?model request; and QString::toInt returns 0 on such str
+	QnNetworkResourcePtr result ( createResourceByName(model) ); // atoi here coz av 8185dn returns "8185DN" string on the get?model request; and QString::toInt returns 0 on such str
 
 	if (!result)
 	{
@@ -220,18 +219,58 @@ void QnPlAreconVisionResource::beforeUse()
 {
     QnValue maxSensorWidth;
     QnValue maxSensorHight;
-    getParam("MaxSensorWidth", maxSensorWidth);
-    getParam("MaxSensorHeight", maxSensorHight);
+    getParam("MaxSensorWidth", maxSensorWidth, QnDomainMemory);
+    getParam("MaxSensorHeight", maxSensorHight, QnDomainMemory);
 
-    setParamAsynch("sensorleft", 0);
-    setParamAsynch("sensortop", 0);
-    setParamAsynch("sensorwidth", maxSensorWidth);
-    setParamAsynch("sensorheight", maxSensorHight);
+    setParamAsynch("sensorleft", 0, QnDomainPhysical);
+    setParamAsynch("sensortop", 0, QnDomainPhysical);
+    setParamAsynch("sensorwidth", maxSensorWidth, QnDomainPhysical);
+    setParamAsynch("sensorheight", maxSensorHight, QnDomainPhysical);
 
 }
 
+QString QnPlAreconVisionResource::manufacture() const
+{
+    return "ArecontVision";
+}
 
+bool QnPlAreconVisionResource::isResourceAccessible()
+{
+    return updateMACAddress();
+}
 
+bool QnPlAreconVisionResource::updateMACAddress()
+{
+    QnValue val;
+    if (!getParam("MACAddress", val, QnDomainPhysical))
+        return false;
+
+    setMAC(QnMacAddress(val));
+
+    return true;
+}
+
+QnStreamQuality QnPlAreconVisionResource::getBestQualityForSuchOnScreenSize(QSize size)
+{
+    return QnQualityNormal;
+}
+
+QnCompressedVideoDataPtr QnPlAreconVisionResource::getImage(int channnel, QDateTime time, QnStreamQuality quality)
+{
+    return QnCompressedVideoDataPtr(0);
+}
+
+int QnPlAreconVisionResource::getStreamDataProvidersMaxAmount() const
+{
+    return 0;
+}
+
+QnAbstractMediaStreamDataProvider* QnPlAreconVisionResource::createMediaProvider()
+{
+    return 0;
+}
+
+//===============================================================================================================================
 bool QnPlAreconVisionResource::getParamPhysical(const QString& name, QnValue& val)
 {
     QMutexLocker locker(&m_mutex);
@@ -366,12 +405,14 @@ QnResourceList QnPlAreconVisionResource::findDevices()
 				unsigned char mac[6];
 				memcpy(mac,data + 22,6);
 
+                /*/
 				QString smac = MACToString(mac);
 
-				QString id = "AVUNKNOWN";
+				
+                QString id = "AVUNKNOWN";
 				int model = 0;
 
-				/*/
+				
 				int shift = 32;
 
 				CLAreconVisionDevice* resource = 0;
@@ -404,13 +445,9 @@ QnResourceList QnPlAreconVisionResource::findDevices()
 				if (resource==0)
 					continue;
 
-				resource->setHostAddress(sender, false);
-				resource->setMAC(smac);
-				resource->setId(smac);
-
-				QnResourceStatus dh;
-				resource->setLocalHostAddress ( ipaddrs.at(i) );
-				resource->setStatus(dh);
+				resource->setHostAddress(sender, QnDomainPhysical);
+				resource->setMAC(mac);
+				resource->setDiscoveryAddr( ipaddrs.at(i) );
 
                 if (hasEqualResource(result, resource))
                     continue; // already has such 
@@ -698,25 +735,37 @@ bool QnPlAreconVisionResource::parseParam(const QDomElement &element, QString& e
 	return true;
 }
 
-QnPlAreconVisionResource* QnPlAreconVisionResource::deviceByID(QString id, int model)
+QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(QString name)
 {
 	QStringList supp = QnResource::supportedDevises();
 
-	if (!supp.contains(id))
+	if (!supp.contains(name))
 	{
-		cl_log.log("Unsupported resource found(!!!): ", id, cl_logERROR);
+		cl_log.log("Unsupported resource found(!!!): ", name, cl_logERROR);
 		return 0;
 	}
 
-	if (isPanoramic(model))
-		return new  CLArecontPanoramicDevice(model);
+	if (isPanoramic(name))
+		return new  CLArecontPanoramicDevice(name);
 	else
-		return new CLArecontSingleSensorDevice(model);
+		return new CLArecontSingleSensorDevice(name);
 }
 
 
 
-bool QnPlAreconVisionResource::isPanoramic(int model)
+bool QnPlAreconVisionResource::isPanoramic(QString name)
 {
-	return (model==AV8180 || model==AV8185 || model==AV8360 || model==AV8365);
+	if (name.contains("8180"))
+        return true;
+
+    if (name.contains("8185"))
+        return true;
+
+    if (name.contains("8360"))
+        return true;
+
+    if (name.contains("8365"))
+        return true;
+
+    return false;
 }

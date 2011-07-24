@@ -33,6 +33,14 @@ public:
 	//========
 
     virtual void beforeUse();
+    virtual QString manufacture() const;
+    virtual bool isResourceAccessible();
+    virtual bool updateMACAddress();
+
+    virtual QnStreamQuality getBestQualityForSuchOnScreenSize(QSize size);
+    virtual QnCompressedVideoDataPtr getImage(int channnel, QDateTime time, QnStreamQuality quality);
+    virtual int getStreamDataProvidersMaxAmount() const;
+    virtual QnAbstractMediaStreamDataProvider* createMediaProvider();
 
 protected:
     // should change value in memory domain 
@@ -46,7 +54,8 @@ public:
 private:
 	static bool parseDevice(const QDomElement &element, QString& error );
 	static bool parseParam(const QDomElement &element, QString& error, QnParamList& paramlist);
-	static QnPlAreconVisionResource* deviceByID(QString id, int model);
+	static QnPlAreconVisionResource* createResourceByName(QString name);
+    static bool isPanoramic(QString name);
 
 protected:
 

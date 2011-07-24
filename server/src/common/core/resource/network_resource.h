@@ -36,8 +36,6 @@ public:
 
     virtual QString toString() const;
 
-    // like arecont or iqinvision
-    virtual QString manufacture() const = 0;
 
     void addNetworkStatus(unsigned long status);
     void removeNetworkStatus(unsigned long status);
@@ -58,6 +56,13 @@ public:
     // but from other hand it's still might replay to standard requests
     // so this is the way to find out do we have to change ip address
     virtual bool isResourceAccessible()  = 0;
+
+
+    // is some cases( like  device behind the router) the only possible way to discover the device is to check every ip address 
+    // and no broad cast and multi cast is accessible. so you can not get MAC of device with standard methods 
+    // the only way is to request it from device through http or so
+    // we need to get mac anyway to differentiate one device from another 
+    virtual bool updateMACAddress() = 0;
 
 protected:
 	QHostAddress m_hostAddr;
