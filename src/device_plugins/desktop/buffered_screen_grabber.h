@@ -9,7 +9,7 @@ class CLBufferedScreenGrabber: public CLLongRunnable
 {
 public:
     static const int DEFAULT_QUEUE_SIZE = 8;
-    static const int DEFAULT_FRAME_RATE = 30;
+    static const int DEFAULT_FRAME_RATE = 0;
 
     CLBufferedScreenGrabber(int displayNumber = D3DADAPTER_DEFAULT, 
                             int queueSize = DEFAULT_QUEUE_SIZE, 

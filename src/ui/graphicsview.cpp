@@ -2609,7 +2609,7 @@ void GraphicsView::toggleRecording()
 #ifdef Q_OS_WIN
         if (m_desktopEncoder)
             delete m_desktopEncoder;
-        QSize encodingSize;
+        QSize encodingSize(0,0);
         if (resolution == VideoRecorderSettings::ResQuaterNative)
             encodingSize = QSize(-2, -2);
         else if (resolution == VideoRecorderSettings::Res1920x1080)
@@ -2625,7 +2625,6 @@ void GraphicsView::toggleRecording()
         else if (decoderQuality == VideoRecorderSettings::PerformanceQuality)
             quality = 0.5;
 
-        screen = 0; // todo: temp line. now non default screen has some errors. 
         // todo: addn second device from UI
         // if device if absent (None), null pointer must be provided to recorder
         QAudioDeviceInfo secondAudioDevice = QAudioDeviceInfo::defaultInputDevice() ; 

@@ -40,6 +40,7 @@ public:
     int width() const;
     int height() const;
     qint64 currentTime() const;
+    int refreshRate() const { return m_ddm.RefreshRate;}
 private:
     HRESULT	InitD3D(HWND hWnd);
     bool dataToFrame(quint8* data, AVFrame* pFrame);
@@ -73,6 +74,7 @@ private:
     int m_outHeight;
     AVFrame* m_tmpFrame;
     quint8* m_tmpFrameBuffer;
+    MONITORINFO m_monInfo;
 };
 
 

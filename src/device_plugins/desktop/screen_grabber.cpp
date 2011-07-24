@@ -72,6 +72,7 @@ CLScreenGrapper::CLScreenGrapper(int displayNumber, int poolSize, CaptureMode mo
     }
     m_needRescale = captureResolution.width() != 0 || mode == CaptureMode_Application;
 
+
     m_initialized = InitD3D(GetDesktopWindow());
     m_cursorDC = CreateCompatibleDC(0);
     m_timer.start();
@@ -122,13 +123,20 @@ HRESULT	CLScreenGrapper::InitD3D(HWND hWnd)
 
     if((m_pD3D=Direct3DCreate9(D3D_SDK_VERSION))==NULL)
     {
-        qWarning() << "Unable to Create Direct3D ";
+        cl_log.log("Unable to Create Direct3D ", cl_logERROR);
         return E_FAIL;
+    }
+
+    memset(&m_monInfo, 0, sizeof(m_monInfo));
+    m_monInfo.cbSize = sizeof(m_monInfo);
+    if (!GetMonitorInfo(m_pD3D->GetAdapterMonitor(m_displayNumber), &m_monInfo))
+    {
+        cl_log.log("Unable to determine monitor position. Use default", cl_logWARNING);
     }
 
     if(FAILED(m_pD3D->GetAdapterDisplayMode(m_displayNumber,&m_ddm)))
     {
-        qWarning() << "Unable to Get Adapter Display Mode";
+        cl_log.log("Unable to Get Adapter Display Mode", cl_logERROR);
         return E_FAIL;
     }
 
@@ -527,6 +535,9 @@ void CLScreenGrapper::drawCursor(quint32* data, int dataStride) const
             int xPos = pci.ptScreenPos.x - ((int)icInfo.xHotspot);
             int yPos = pci.ptScreenPos.y - ((int)icInfo.yHotspot);
 
+            xPos -= m_monInfo.rcMonitor.left;
+            yPos -= m_monInfo.rcMonitor.top;
+
             quint8 maskBits[MAX_CURSOR_SIZE*MAX_CURSOR_SIZE*2/8 * 16];
             quint8 colorBits[MAX_CURSOR_SIZE*MAX_CURSOR_SIZE*4]; // max cursor size: 64x64
             quint8 lpbiData[sizeof(BITMAPINFO) + 4]; // 2 additional colors
@@ -746,3 +757,4 @@ int CLScreenGrapper::height() const
 { 
     return m_outHeight;
 }
+

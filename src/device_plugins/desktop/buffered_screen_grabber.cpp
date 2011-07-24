@@ -12,6 +12,14 @@ CLBufferedScreenGrabber::CLBufferedScreenGrabber(int displayNumber,
     m_frameIndex(0),
     m_currentFrameNum(0)
 {
+    if (m_frameRate == 0)
+    {
+        m_frameRate = m_grabber.refreshRate();
+        if (m_frameRate > 30)
+            m_frameRate /= 2;
+        if (m_frameRate == 0)
+            m_frameRate = 30;
+    }
     m_frames.resize(queueSize);
     for (int i = 0; i < m_frames.size(); ++i)
         m_frames[i] = avcodec_alloc_frame();
