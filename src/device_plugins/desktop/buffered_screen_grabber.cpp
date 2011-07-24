@@ -1,5 +1,7 @@
 #include "buffered_screen_grabber.h"
 
+static const int MAX_JITTER = 60;
+
 CLBufferedScreenGrabber::CLBufferedScreenGrabber(int displayNumber, 
                                                  int queueSize, 
                                                  int frameRate, 
@@ -57,6 +59,10 @@ void CLBufferedScreenGrabber::run()
         //cl_log.log("sleep time=", toSleep, cl_logALWAYS);
         if (toSleep > 0)
             msleep(toSleep);
+        else if (toSleep <= -MAX_JITTER)
+        {
+            m_currentFrameNum = m_timer.elapsed() * m_frameRate / 1000.0;
+        }
     }
 }
 

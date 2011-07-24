@@ -8,7 +8,7 @@ static const int DEFAULT_AUDIO_STREAM_ID = 4351;
 static const int AUDIO_QUEUE_MAX_SIZE = 256;
 static const int BASE_BITRATE = 1000 * 1000 * 8; // bitrate for best quality for fullHD mode;
 
-static const int MAX_VIDEO_JITTER = 10;
+static const int MAX_VIDEO_JITTER = 2;
 
 extern "C" 
 {
@@ -552,19 +552,6 @@ bool DesktopFileEncoder::init()
 
 int DesktopFileEncoder::processData(bool flush)
 {
-    if (!flush)
-    {
-        if (m_encodedFrames == 0)
-            m_encodedFrames = m_frame->pts;
-        else {
-            if (qAbs(m_frame->pts - m_encodedFrames) <= MAX_VIDEO_JITTER)
-                m_frame->pts = m_encodedFrames;
-            else
-                m_encodedFrames = m_frame->pts;
-        }
-        m_encodedFrames++;
-    }
-
     int out_size = avcodec_encode_video(m_videoCodecCtx, m_videoBuf, m_videoBufSize, flush ? 0 : m_frame);
     if (out_size < 1 && !flush)
         return out_size;
@@ -693,13 +680,29 @@ void DesktopFileEncoder::run()
         AVRational r;
         r.num = 1;
         r.den = 1000;
-        m_frame->pts = av_rescale_q(m_frame->pts, r, m_grabber->getFrameRate());
+        qint64 capturedPts = av_rescale_q(m_frame->pts, r, m_grabber->getFrameRate());
 
-        if (processData(false) < 0)
+
+        if (m_encodedFrames == 0)
+            m_encodedFrames = capturedPts;
+
+        //cl_log.log("captured pts=", capturedPts, cl_logALWAYS);
+
+        bool firstStep = true;
+        while (firstStep || capturedPts - m_encodedFrames >= MAX_VIDEO_JITTER)
         {
-            cl_log.log("Video encoding error. Stop recording.", cl_logWARNING);
-            break;
+            m_frame->pts = m_encodedFrames;
+            if (processData(false) < 0)
+            {
+                cl_log.log("Video encoding error. Stop recording.", cl_logWARNING);
+                break;
+            }
+            //cl_log.log("encode pts=", m_encodedFrames, cl_logALWAYS);
+
+            m_encodedFrames++;
+            firstStep = false;
         }
+
     }
     stopCapturing();
     cl_log.log("flushing video buffer",cl_logALWAYS);
