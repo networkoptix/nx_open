@@ -23,7 +23,8 @@ public:
                         CLScreenGrapper::CaptureMode mode,
                         bool captureCursor,
                         const QSize& captureResolution,
-                        float encodeQualuty // in range 0.0 .. 1.0
+                        float encodeQualuty, // in range 0.0 .. 1.0
+                        QWidget* glWidget  // used in application capture mode only
                        );
     virtual ~DesktopFileEncoder();
     void stop();
@@ -99,6 +100,7 @@ private:
     bool m_captureCursor;
     QSize m_captureResolution;
     float m_encodeQualuty;
+    QWidget* m_widget;
 };
 
 #endif //__DESKTOP_H264_STREAM_READER_H

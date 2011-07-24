@@ -8,7 +8,7 @@ static const int DEFAULT_AUDIO_STREAM_ID = 4351;
 static const int AUDIO_QUEUE_MAX_SIZE = 256;
 static const int BASE_BITRATE = 1000 * 1000 * 8; // bitrate for best quality for fullHD mode;
 
-static const int MAX_VIDEO_JITTER = 2;
+static const int MAX_VIDEO_JITTER = 10;
 
 extern "C" 
 {
@@ -41,7 +41,7 @@ void stereoAudioMux(qint16* a1, qint16* a2, int lenInShort)
         for (int i = 0; i < rest; ++i)
         {
             //*a1 = ((int)*a1 + (int)*a2) >> 1;
-            *a1 = ((int)*a1 + (int)*a2);
+            *a1 = qMax(SHRT_MIN,qMin(SHRT_MAX, ((int)*a1 + (int)*a2)));
             a1++;
             a2++;
         }
@@ -246,7 +246,8 @@ DesktopFileEncoder::DesktopFileEncoder (
                    CLScreenGrapper::CaptureMode captureMode,
                    bool captureCursor,
                    const QSize& captureResolution,
-                   float encodeQualuty // in range 0.0 .. 1.0
+                   float encodeQualuty, // in range 0.0 .. 1.0
+                   QWidget* glWidget
                    ):
     CLLongRunnable(),
     m_videoBuf(0),
@@ -277,7 +278,8 @@ DesktopFileEncoder::DesktopFileEncoder (
     m_encodedFrames(0),
     m_useSecondaryAudio(0),
     m_tmpAudioBuffer1(CL_MEDIA_ALIGNMENT, FF_MIN_BUFFER_SIZE),
-    m_tmpAudioBuffer2(CL_MEDIA_ALIGNMENT, FF_MIN_BUFFER_SIZE)
+    m_tmpAudioBuffer2(CL_MEDIA_ALIGNMENT, FF_MIN_BUFFER_SIZE),
+    m_widget(glWidget)
 {
     m_useAudio = audioDevice || audioDevice2;
     m_useSecondaryAudio = audioDevice && audioDevice2 && audioDevice->deviceName() != audioDevice2->deviceName();
@@ -326,7 +328,8 @@ bool DesktopFileEncoder::init()
             CLBufferedScreenGrabber::DEFAULT_FRAME_RATE, 
             m_captureMode, 
             m_captureCursor, 
-            m_captureResolution);
+            m_captureResolution,
+            m_widget);
 
     avcodec_init();
     av_register_all();

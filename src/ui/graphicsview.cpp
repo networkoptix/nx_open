@@ -2635,7 +2635,7 @@ void GraphicsView::toggleRecording()
         else if (captureMode == VideoRecorderSettings::FullScreenNoeroMode)
             grabberCaptureMode = CLScreenGrapper::CaptureMode_DesktopWithoutAero;
 
-        m_desktopEncoder = new DesktopFileEncoder(filePath, screen, &audioDevice, &secondAudioDevice, grabberCaptureMode, captureCursor, encodingSize, quality);
+        m_desktopEncoder = new DesktopFileEncoder(filePath, screen, &audioDevice, &secondAudioDevice, grabberCaptureMode, captureCursor, encodingSize, quality, viewport());
 #endif
         QLabel *label = new QLabel;
         label->move(width()/2 - 100, 300);

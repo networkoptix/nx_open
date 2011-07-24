@@ -16,9 +16,12 @@ class CLScreenGrapper: public QObject
 public:
     struct CaptureInfo
     {
-        CaptureInfo(): pts(0), opaque(0) {}
+        CaptureInfo(): pts(0), opaque(0), w(0), h(0) {}
         qint64 pts;
         void* opaque;
+        int w;
+        int h;
+        QPoint pos;
     };
 
     enum CaptureMode {CaptureMode_DesktopWithAero, CaptureMode_DesktopWithoutAero, CaptureMode_Application};
@@ -27,7 +30,7 @@ public:
     // negative resolution - use specified scale factor 
 
     CLScreenGrapper(int displayNumber, int poolSize, CaptureMode mode, bool captureCursor,
-                    const QSize& captureResolution);
+                    const QSize& captureResolution, QWidget* widget);
     virtual ~CLScreenGrapper();
 
     // capture screenshot in YUV 4:2:0 format
@@ -43,10 +46,11 @@ public:
     int refreshRate() const { return m_ddm.RefreshRate;}
 private:
     HRESULT	InitD3D(HWND hWnd);
-    bool dataToFrame(quint8* data, AVFrame* pFrame);
+    bool dataToFrame(quint8* data, int width, int height, AVFrame* pFrame);
     bool direct3DDataToFrame(void* opaque, AVFrame* pFrame);
-    Q_INVOKABLE void captureFrameOpenGL(void* data);
-    void drawCursor(quint32* data, int dataStride) const;
+    Q_INVOKABLE void captureFrameOpenGL(void* opaque);
+    void drawCursor(quint32* data, int dataStride, int height, int leftOffset, int topOffset, bool flip) const;
+    void allocateTmpFrame(int width, int height);
 private:
     int m_displayNumber;
 
@@ -75,6 +79,9 @@ private:
     AVFrame* m_tmpFrame;
     quint8* m_tmpFrameBuffer;
     MONITORINFO m_monInfo;
+    QWidget* m_widget;
+    int m_tmpFrameWidth;
+    int m_tmpFrameHeight;
 };
 
 

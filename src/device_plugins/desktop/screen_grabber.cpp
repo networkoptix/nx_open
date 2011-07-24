@@ -48,7 +48,7 @@ private:
 CPUDetector cpuInfo;
 
 
-CLScreenGrapper::CLScreenGrapper(int displayNumber, int poolSize, CaptureMode mode, bool captureCursor, const QSize& captureResolution): 
+CLScreenGrapper::CLScreenGrapper(int displayNumber, int poolSize, CaptureMode mode, bool captureCursor, const QSize& captureResolution, QWidget* widget): 
     m_pD3D(0), 
     m_pd3dDevice(0), 
     m_displayNumber(displayNumber),
@@ -60,7 +60,10 @@ CLScreenGrapper::CLScreenGrapper(int displayNumber, int poolSize, CaptureMode mo
     m_captureResolution(captureResolution),
     m_scaleContext(0),
     m_tmpFrame(0),
-    m_tmpFrameBuffer(0)
+    m_tmpFrameBuffer(0),
+    m_widget(widget),
+    m_tmpFrameWidth(0),
+    m_tmpFrameHeight(0)
 {
     memset(&m_rect, 0, sizeof(m_rect));
 
@@ -71,7 +74,8 @@ CLScreenGrapper::CLScreenGrapper(int displayNumber, int poolSize, CaptureMode mo
             DwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
     }
     m_needRescale = captureResolution.width() != 0 || mode == CaptureMode_Application;
-
+    if (mode == CaptureMode_Application)
+        m_displayNumber = 0;
 
     m_initialized = InitD3D(GetDesktopWindow());
     m_cursorDC = CreateCompatibleDC(0);
@@ -143,14 +147,17 @@ HRESULT	CLScreenGrapper::InitD3D(HWND hWnd)
     ZeroMemory(&d3dpp,sizeof(D3DPRESENT_PARAMETERS));
 
     d3dpp.Windowed=true; // not fullscreen
-    d3dpp.Flags=D3DPRESENTFLAG_LOCKABLE_BACKBUFFER;
+    d3dpp.Flags = 0; //D3DPRESENTFLAG_LOCKABLE_BACKBUFFER;
     d3dpp.BackBufferFormat = m_ddm.Format;
     d3dpp.BackBufferHeight = m_rect.bottom = m_ddm.Height;
     d3dpp.BackBufferWidth = m_rect.right = m_ddm.Width;
     d3dpp.MultiSampleType=D3DMULTISAMPLE_NONE;
-    d3dpp.SwapEffect=D3DSWAPEFFECT_DISCARD;
+    d3dpp.BackBufferCount = 1;
+    d3dpp.MultiSampleQuality = 0;
+    d3dpp.AutoDepthStencilFormat = D3DFMT_D24S8;
+    d3dpp.SwapEffect=D3DSWAPEFFECT_COPY;
     d3dpp.hDeviceWindow=hWnd;
-    d3dpp.PresentationInterval=D3DPRESENT_INTERVAL_DEFAULT;
+    d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE; // D3DPRESENT_INTERVAL_DEFAULT;
     d3dpp.FullScreen_RefreshRateInHz=D3DPRESENT_RATE_DEFAULT;
 
 
@@ -185,38 +192,69 @@ HRESULT	CLScreenGrapper::InitD3D(HWND hWnd)
     {
         if (m_captureResolution.width() < 0)
             m_outWidth =  m_ddm.Width / qAbs(m_captureResolution.width()); 
+        else if (m_captureResolution.width() == 0)
+            m_outWidth =  m_ddm.Width; 
         else
             m_outWidth = m_captureResolution.width(); 
 
         if (m_captureResolution.height() < 0)
             m_outHeight =  m_ddm.Height / qAbs(m_captureResolution.height()); 
+        else if (m_captureResolution.height() == 0)
+            m_outHeight =  m_ddm.Height; 
         else
             m_outHeight = m_captureResolution.height(); 
 
+        allocateTmpFrame(m_ddm.Width, m_ddm.Height);
 
-        m_tmpFrame = avcodec_alloc_frame();
-        m_tmpFrame->format = PIX_FMT_YUV420P;
-        int numBytes = avpicture_get_size(PIX_FMT_YUV420P, m_ddm.Width, m_ddm.Height);
-
-        m_tmpFrameBuffer = (quint8*)av_malloc(numBytes * sizeof(quint8));
-
-        avpicture_fill((AVPicture *)m_tmpFrame, m_tmpFrameBuffer, PIX_FMT_YUV420P, m_ddm.Width, m_ddm.Height);
-
-        m_scaleContext = sws_getContext(
-            m_ddm.Width, m_ddm.Height, PIX_FMT_YUV420P,
-            m_outWidth, m_outHeight, PIX_FMT_YUV420P,
-            SWS_BICUBLIN, NULL, NULL, NULL);
     }
 
     return S_OK;
 };
 
-void CLScreenGrapper::captureFrameOpenGL(void* data)
+void CLScreenGrapper::allocateTmpFrame(int width, int height)
 {
+    m_tmpFrameWidth = width;
+    m_tmpFrameHeight = height;
+
+    if (m_tmpFrame)
+    {
+        sws_freeContext(m_scaleContext);
+        av_free(m_tmpFrame);
+        av_free(m_tmpFrameBuffer);
+        m_tmpFrame = 0;
+    }
+
+    m_tmpFrame = avcodec_alloc_frame();
+    m_tmpFrame->format = PIX_FMT_YUV420P;
+    int numBytes = avpicture_get_size(PIX_FMT_YUV420P, width, height);
+    m_tmpFrameBuffer = (quint8*)av_malloc(numBytes * sizeof(quint8));
+    avpicture_fill((AVPicture *)m_tmpFrame, m_tmpFrameBuffer, PIX_FMT_YUV420P, width, height);
+
+    m_scaleContext = sws_getContext(
+        width, height, PIX_FMT_YUV420P,
+        m_outWidth, m_outHeight, PIX_FMT_YUV420P,
+        SWS_BICUBLIN, NULL, NULL, NULL);
+}
+
+void CLScreenGrapper::captureFrameOpenGL(void* opaque)
+{
+    CaptureInfo* data = (CaptureInfo*) opaque;
     glReadBuffer(GL_FRONT); 
-    glReadPixels(0, 0, m_rect.right, m_rect.bottom, GL_BGRA_EXT, GL_UNSIGNED_BYTE, data);
-    if (m_captureCursor)
-        drawCursor((quint32*) data, m_ddm.Width);
+    if (!m_widget)
+        return;
+    QRect rect = m_widget->geometry();
+    data->w = m_widget->width() & ~31;
+    data->h = m_widget->height() & ~1;
+    data->pos = QPoint(rect.left(), rect.top());
+    QWidget* parent = (QWidget*) m_widget->parent();
+    while (parent)
+    {
+        rect = parent->geometry();
+        data->pos += QPoint(rect.left(), rect.top());
+        parent = (QWidget*) parent->parent();
+    }
+
+    glReadPixels(0, 0, data->w, data->h, GL_BGRA_EXT, GL_UNSIGNED_BYTE, data->opaque);
 }
 
 CLScreenGrapper::CaptureInfo CLScreenGrapper::captureFrame()
@@ -227,13 +265,17 @@ CLScreenGrapper::CaptureInfo CLScreenGrapper::captureFrame()
     {   
         rez.opaque = m_openGLData[m_currentIndex];
         QGenericReturnArgument ret;
-        QMetaObject::invokeMethod(this, "captureFrameOpenGL", Qt::BlockingQueuedConnection, ret, Q_ARG(void*, rez.opaque));
+        QMetaObject::invokeMethod(this, "captureFrameOpenGL", Qt::BlockingQueuedConnection, ret, Q_ARG(void*, &rez));
+        if (m_captureCursor)
+            drawCursor((quint32*) rez.opaque, rez.w, rez.h, rez.pos.x(), rez.pos.y(), true);
+
     }
     else 
     {   // direct3D capture mode
         if (!m_pd3dDevice)
             return rez;
-        if(FAILED(m_pd3dDevice->GetFrontBufferData(0, m_pSurface[m_currentIndex])))
+        HRESULT r = m_pd3dDevice->GetFrontBufferData(0, m_pSurface[m_currentIndex]);
+        if(r != D3D_OK)
         {
             cl_log.log("Unable to capture frame", cl_logWARNING);
             return rez;
@@ -241,9 +283,9 @@ CLScreenGrapper::CaptureInfo CLScreenGrapper::captureFrame()
         if (m_captureCursor)
         {
             D3DLOCKED_RECT	lockedRect;
-            if(!FAILED(m_pSurface[m_currentIndex]->LockRect(&lockedRect, 0, D3DLOCK_NO_DIRTY_UPDATE|D3DLOCK_NOSYSLOCK|D3DLOCK_READONLY)))
+            if(m_pSurface[m_currentIndex]->LockRect(&lockedRect, &m_rect, D3DLOCK_NO_DIRTY_UPDATE|D3DLOCK_NOSYSLOCK|D3DLOCK_READONLY) == D3D_OK)
             {
-                drawCursor((quint32*) lockedRect.pBits, m_ddm.Width);
+                drawCursor((quint32*) lockedRect.pBits, m_ddm.Width, m_ddm.Height, m_monInfo.rcMonitor.left, m_monInfo.rcMonitor.top, false);
                 m_pSurface[m_currentIndex]->UnlockRect();
             }
         }
@@ -254,7 +296,7 @@ CLScreenGrapper::CaptureInfo CLScreenGrapper::captureFrame()
     return rez;
 }
 
-void bgra_to_yv12_sse(quint8* rgba, int xStride, quint8* y, quint8* u, quint8* v, int yStride, int uvStride, int width, int height)
+void bgra_to_yv12_sse(quint8* rgba, int xStride, quint8* y, quint8* u, quint8* v, int yStride, int uvStride, int width, int height, bool flip)
 {
     static const quint16 __declspec(align(16)) sse_2000[]         = { 0x2020, 0x2020, 0x2020, 0x2020, 0x2020, 0x2020, 0x2020, 0x2020 };
     static const quint16 __declspec(align(16)) sse_00a0[]         = { 0x0210, 0x0210, 0x0210, 0x0210, 0x0210, 0x0210, 0x0210, 0x0210 };
@@ -270,12 +312,24 @@ void bgra_to_yv12_sse(quint8* rgba, int xStride, quint8* y, quint8* u, quint8* v
     static const qint16 __declspec(align(16)) uv_g_coeff[] = {-0.368*K, -0.368*K, -0.368*K, -0.368*K,    -0.291*K, -0.291*K, -0.291*K, -0.291*K };
     static const qint16 __declspec(align(16)) uv_b_coeff[] = {-0.071*K, -0.071*K, -0.071*K, -0.071*K,     0.439*K,  0.439*K,  0.439*K,  0.439*K };
 
-    height /= 2;
     int xCount = width  / 8;
 
     int rgbaPostOffset = xStride - xCount*32;
     int yPostOffset = yStride - width;
     int uvPostOffset = uvStride - width/2;
+
+    if (flip)
+    {
+        y += yStride*(height-1);
+        u += uvStride*(height/2-1);
+        v += uvStride*(height/2-1);
+        yPostOffset -= yStride*2;
+        uvPostOffset -= uvStride*2;
+        yStride = -yStride;
+        uvStride = -uvStride;
+    }
+    height /= 2;
+
 
     // EAX - u
     // ECX - v
@@ -518,7 +572,7 @@ static inline void xorPixel(quint32* data, int stride, int x, int y, quint32* sr
     data[y*stride+x] ^= *srcPixel;
 }
 
-void CLScreenGrapper::drawCursor(quint32* data, int dataStride) const
+void CLScreenGrapper::drawCursor(quint32* data, int width, int height, int leftOffset, int topOffset, bool flip) const
 {
     static const int MAX_CURSOR_SIZE = 64;
     CURSORINFO  pci;
@@ -535,8 +589,11 @@ void CLScreenGrapper::drawCursor(quint32* data, int dataStride) const
             int xPos = pci.ptScreenPos.x - ((int)icInfo.xHotspot);
             int yPos = pci.ptScreenPos.y - ((int)icInfo.yHotspot);
 
-            xPos -= m_monInfo.rcMonitor.left;
-            yPos -= m_monInfo.rcMonitor.top;
+            xPos -= leftOffset;
+            yPos -= topOffset;
+
+            if (yPos >= 0 && yPos < height && flip)
+                yPos = height - yPos;
 
             quint8 maskBits[MAX_CURSOR_SIZE*MAX_CURSOR_SIZE*2/8 * 16];
             quint8 colorBits[MAX_CURSOR_SIZE*MAX_CURSOR_SIZE*4]; // max cursor size: 64x64
@@ -574,22 +631,42 @@ void CLScreenGrapper::drawCursor(quint32* data, int dataStride) const
             if (icInfo.hbmColor == 0)
                 cursorHeight /= 2;
 
-            for (int y = yPos + cursorHeight-1; y >= yPos; --y) 
+            if (!flip)
             {
-                for (int x = xPos; x < xPos + lpbi->bmiHeader.biWidth; )
+                for (int y = yPos + cursorHeight-1; y >= yPos; --y) 
                 {
-                    quint8 mask = *maskBitsPtr++;
-                    for (int k = 0; k < 8; ++k)
+                    for (int x = xPos; x < xPos + lpbi->bmiHeader.biWidth; )
                     {
-                        if ((mask & 0x80) == maskFlag && x > 0 && y > 0 && x < m_ddm.Width && y < m_ddm.Height)
-                            andPixel(data, dataStride, x, y, (quint32*) &lpbi->bmiColors[0]);
-                        mask <<= 1;
-                        x++;
+                        quint8 mask = *maskBitsPtr++;
+                        for (int k = 0; k < 8; ++k)
+                        {
+                            if ((mask & 0x80) == maskFlag && x > 0 && y > 0 && x < width && y < height)
+                                andPixel(data, width, x, y, (quint32*) &lpbi->bmiColors[0]);
+                            mask <<= 1;
+                            x++;
+                        }
                     }
+                    maskBitsPtr += bitmaskStride - lpbi->bmiHeader.biWidth/8;
                 }
-                maskBitsPtr += bitmaskStride - lpbi->bmiHeader.biWidth/8;
             }
-
+            else 
+            {
+                for (int y = yPos; y < yPos + cursorHeight; ++y) 
+                {
+                    for (int x = xPos; x < xPos + lpbi->bmiHeader.biWidth; )
+                    {
+                        quint8 mask = *maskBitsPtr++;
+                        for (int k = 0; k < 8; ++k)
+                        {
+                            if ((mask & 0x80) == maskFlag && x > 0 && y > 0 && x < width && y < height)
+                                andPixel(data, width, x, y, (quint32*) &lpbi->bmiColors[0]);
+                            mask <<= 1;
+                            x++;
+                        }
+                    }
+                    maskBitsPtr += bitmaskStride - lpbi->bmiHeader.biWidth/8;
+                }
+            }
             if (icInfo.hbmColor)
             {
                 if (GetDIBits(m_cursorDC, icInfo.hbmColor, 0, 0, 0, lpbiColor, 0) == 0)
@@ -611,38 +688,79 @@ void CLScreenGrapper::drawCursor(quint32* data, int dataStride) const
 
 
                 // draw xor colored cursor
-                for (int y = yPos + cursorHeight-1; y >= yPos; --y)
+                if (!flip)
                 {
-                    for (int x = xPos; x < xPos + lpbi->bmiHeader.biWidth; )
+                    for (int y = yPos + cursorHeight-1; y >= yPos; --y)
                     {
-                        for (int k = 0; k < 8; ++k)
+                        for (int x = xPos; x < xPos + lpbi->bmiHeader.biWidth; )
                         {
-                            if (x > 0 && y > 0 && x < m_ddm.Width && y < m_ddm.Height)
-                                xorPixel(data, dataStride, x, y, colorBitsPtr);
-                            colorBitsPtr++;
-                            x++;
+                            for (int k = 0; k < 8; ++k)
+                            {
+                                if (x > 0 && y > 0 && x < width && y < height)
+                                    xorPixel(data, width, x, y, colorBitsPtr);
+                                colorBitsPtr++;
+                                x++;
+                            }
                         }
+                        colorBitsPtr += colorStride - lpbiColor->bmiHeader.biWidth/8 * lpbiColor->bmiHeader.biBitCount;
                     }
-                    colorBitsPtr += colorStride - lpbiColor->bmiHeader.biWidth/8 * lpbiColor->bmiHeader.biBitCount;
+                }
+                else 
+                {
+                    for (int y = yPos; y < yPos + cursorHeight; ++y)
+                    {
+                        for (int x = xPos; x < xPos + lpbi->bmiHeader.biWidth; )
+                        {
+                            for (int k = 0; k < 8; ++k)
+                            {
+                                if (x > 0 && y > 0 && x < width && y < height)
+                                    xorPixel(data, width, x, y, colorBitsPtr);
+                                colorBitsPtr++;
+                                x++;
+                            }
+                        }
+                        colorBitsPtr += colorStride - lpbiColor->bmiHeader.biWidth/8 * lpbiColor->bmiHeader.biBitCount;
+                    }
                 }
             }
             else 
             {
                 // draw xor cursor
-                for (int y = yPos + cursorHeight-1; y >= yPos; --y)
+                if (!flip)
                 {
-                    for (int x = xPos; x < xPos + lpbi->bmiHeader.biWidth; )
+                    for (int y = yPos + cursorHeight-1; y >= yPos; --y)
                     {
-                        quint8 mask = *maskBitsPtr++;
-                        for (int k = 0; k < 8; ++k)
+                        for (int x = xPos; x < xPos + lpbi->bmiHeader.biWidth; )
                         {
-                            if ((mask & 0x80) == 0 && x > 0 && y > 0 && x < m_ddm.Width && y < m_ddm.Height)
-                                xorPixel(data, dataStride, x, y, (quint32*) &lpbi->bmiColors[1]);
-                            mask <<= 1;
-                            x++;
+                            quint8 mask = *maskBitsPtr++;
+                            for (int k = 0; k < 8; ++k)
+                            {
+                                if ((mask & 0x80) == 0 && x > 0 && y > 0 && x < width && y < height)
+                                    xorPixel(data, width, x, y, (quint32*) &lpbi->bmiColors[1]);
+                                mask <<= 1;
+                                x++;
+                            }
                         }
+                        maskBitsPtr += bitmaskStride - lpbi->bmiHeader.biWidth/8;
                     }
-                    maskBitsPtr += bitmaskStride - lpbi->bmiHeader.biWidth/8;
+                }
+                else 
+                {
+                    for (int y = yPos; y < yPos + cursorHeight; ++y)
+                    {
+                        for (int x = xPos; x < xPos + lpbi->bmiHeader.biWidth; )
+                        {
+                            quint8 mask = *maskBitsPtr++;
+                            for (int k = 0; k < 8; ++k)
+                            {
+                                if ((mask & 0x80) == 0 && x > 0 && y > 0 && x < width && y < height)
+                                    xorPixel(data, width, x, y, (quint32*) &lpbi->bmiColors[1]);
+                                mask <<= 1;
+                                x++;
+                            }
+                        }
+                        maskBitsPtr += bitmaskStride - lpbi->bmiHeader.biWidth/8;
+                    }
                 }
             }
             DeleteObject(icInfo.hbmMask);
@@ -705,19 +823,21 @@ bool CLScreenGrapper::direct3DDataToFrame(void* opaque, AVFrame* pFrame)
     int time2 = t2.elapsed();
     qDebug() << "time1=" << time1 << "time2=" << time2 << "t1/t2=" << time1 / (float) time2;
 #else    
-    bool rez = dataToFrame((unsigned char*)lockedRect.pBits, pFrame);
+    bool rez = dataToFrame((unsigned char*)lockedRect.pBits, m_ddm.Width, m_ddm.Height, pFrame);
 #endif
     pSurface->UnlockRect();
     return rez;
 }
 
-bool CLScreenGrapper::dataToFrame(quint8* data, AVFrame* pFrame)
+bool CLScreenGrapper::dataToFrame(quint8* data, int width, int height, AVFrame* pFrame)
 {   
     if (m_needRescale)
     {
-        bgra_to_yv12_sse(data, m_ddm.Width*4, 
+        if (width != m_tmpFrameWidth || height != m_tmpFrameHeight)
+            allocateTmpFrame(width, height);
+        bgra_to_yv12_sse(data, width * 4, 
             m_tmpFrame->data[0], m_tmpFrame->data[1], m_tmpFrame->data[2], 
-            m_tmpFrame->linesize[0], m_tmpFrame->linesize[1], m_ddm.Width, m_ddm.Height);
+            m_tmpFrame->linesize[0], m_tmpFrame->linesize[1], width, height, m_mode == CaptureMode_Application);
 
         sws_scale(m_scaleContext, 
             m_tmpFrame->data, m_tmpFrame->linesize, 
@@ -727,7 +847,7 @@ bool CLScreenGrapper::dataToFrame(quint8* data, AVFrame* pFrame)
     else
     {
         bgra_to_yv12_sse(data, m_ddm.Width*4, pFrame->data[0], pFrame->data[1], pFrame->data[2], 
-                         pFrame->linesize[0], pFrame->linesize[1], m_ddm.Width, m_ddm.Height);
+                         pFrame->linesize[0], pFrame->linesize[1], width, height, m_mode == CaptureMode_Application);
     }
    return true;
 }
@@ -736,7 +856,7 @@ bool CLScreenGrapper::capturedDataToFrame(const CaptureInfo& captureInfo, AVFram
 {
     bool rez = false;
     if (m_mode == CaptureMode_Application)
-        rez = dataToFrame((quint8*) captureInfo.opaque, pFrame);
+        rez = dataToFrame((quint8*) captureInfo.opaque, captureInfo.w, captureInfo.h, pFrame);
     else 
         rez = direct3DDataToFrame(captureInfo.opaque, pFrame);
     pFrame->pts = captureInfo.pts;

@@ -1,6 +1,7 @@
 #ifndef __BUFFERED_SCREEN_GRABBER_H
 #define __BUFFERED_SCREEN_GRABBER_H
 
+#include <QWidget>
 #include "base/longrunnable.h"
 #include "screen_grabber.h"
 #include "base/threadqueue.h"
@@ -16,7 +17,8 @@ public:
                             int frameRate = DEFAULT_FRAME_RATE,
                             CLScreenGrapper::CaptureMode mode = CLScreenGrapper::CaptureMode_DesktopWithoutAero,
                             bool captureCursor = true,
-                            const QSize& captureResolution = QSize(0, 0));
+                            const QSize& captureResolution = QSize(0, 0),
+                            QWidget* widget = 0);
     virtual ~CLBufferedScreenGrabber();
     CLScreenGrapper::CaptureInfo getNextFrame();
     AVRational getFrameRate();

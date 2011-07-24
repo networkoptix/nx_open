@@ -5,8 +5,9 @@ CLBufferedScreenGrabber::CLBufferedScreenGrabber(int displayNumber,
                                                  int frameRate, 
                                                  CLScreenGrapper::CaptureMode mode,
                                                  bool captureCursor,
-                                                 const QSize& captureResolution):
-    m_grabber(displayNumber, queueSize, mode, captureCursor, captureResolution),
+                                                 const QSize& captureResolution,
+                                                 QWidget* widget):
+    m_grabber(displayNumber, queueSize, mode, captureCursor, captureResolution, widget),
     m_queue(queueSize),
     m_frameRate(frameRate),
     m_frameIndex(0),
@@ -15,9 +16,9 @@ CLBufferedScreenGrabber::CLBufferedScreenGrabber(int displayNumber,
     if (m_frameRate == 0)
     {
         m_frameRate = m_grabber.refreshRate();
-        if (m_frameRate > 30)
-            m_frameRate /= 2;
-        if (m_frameRate == 0)
+        if (m_frameRate % 25 == 0)
+            m_frameRate = 25;
+        else
             m_frameRate = 30;
     }
     m_frames.resize(queueSize);
