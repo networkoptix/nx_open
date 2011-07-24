@@ -1,4 +1,5 @@
 #include "desktop_file_encoder.h"
+#include <intrin.h>
 
 #include <QAudioInput>
 
@@ -19,8 +20,55 @@ extern "C"
 
 #include "data/mediadata.h"
 
+// mux audio 1 and audio 2 to audio1 buffer
+// I have used intrisicts for SSE. It is portable for MSVC, GCC (mac, linux), Intel compiler
+void stereoAudioMux(qint16* a1, qint16* a2, int lenInShort)
+{
+    __m128i* audio1 = (__m128i*) a1;
+    __m128i* audio2 = (__m128i*) a2;
+    for (int i = 0; i < lenInShort/8; ++i)
+    {
+        //*audio1 = _mm_avg_epu16(*audio1, *audio2);
+        *audio1 = _mm_add_epi16(*audio1, *audio2);
+        audio1++;
+        audio2++;
+    }
+    int rest = lenInShort % 8;
+    if (rest > 0)
+    {
+        a1 += lenInShort - rest;
+        a2 += lenInShort - rest;
+        for (int i = 0; i < rest; ++i)
+        {
+            //*a1 = ((int)*a1 + (int)*a2) >> 1;
+            *a1 = ((int)*a1 + (int)*a2);
+            a1++;
+            a2++;
+        }
+    }
+}
+
+void monoToStereo(qint16* dst, qint16* src, int lenInShort)
+{
+    for (int i = 0; i < lenInShort; ++i)
+    {
+        *dst++ = *src;
+        *dst++ = *src++;
+    }
+}
+
+void monoToStereo(qint16* dst, qint16* src1, qint16* src2, int lenInShort)
+{
+    for (int i = 0; i < lenInShort; ++i)
+    {
+        *dst++ = *src1++;
+        *dst++ = *src2++;
+    }
+}
+
 AVSampleFormat audioFormatQtToFfmpeg(const QAudioFormat& fmt)
 {
+
     int s = fmt.sampleSize();
     QAudioFormat::SampleType st = fmt.sampleType();
     if (fmt.sampleSize() == 8)
@@ -63,13 +111,15 @@ public:
         m_encoder(encoder),
         m_currentBufferSize(0),
         m_nextAudioBuffer(0),
-        m_startDelay(0)
+        m_startDelay(0),
+        m_isPrimary(true)
     {
     }
     ~CaptureAudioStream()
     {
         delete m_nextAudioBuffer;
     }
+    void setPrimary(bool value) { m_isPrimary = value; }
 protected:
     // QIODevice
     virtual qint64 readData ( char * data, qint64 maxSize ) { return -1; }
@@ -80,26 +130,29 @@ protected:
 
     qint64 writeData ( const char * data, qint64 maxSize )
     {
+        int packetSize = m_encoder->audioPacketSize(m_isPrimary);
         if (m_nextAudioBuffer == 0)
         {
-            m_nextAudioBuffer = new CLAbstractMediaData(CL_MEDIA_ALIGNMENT, m_encoder->audioPacketSize());
+            m_nextAudioBuffer = new CLAbstractMediaData(CL_MEDIA_ALIGNMENT, packetSize);
             m_startDelay = m_encoder->currentTime();
             m_nextAudioBuffer->timestamp = 0;
-            m_startDelay = m_encoder->currentTime();
         }
 
         int currentMaxSize = maxSize;
         while (currentMaxSize > 0)
         {
-            int dataToWrite = qMin(currentMaxSize, m_encoder->audioPacketSize() - m_currentBufferSize);
+            int dataToWrite = qMin(currentMaxSize, packetSize - m_currentBufferSize);
             m_nextAudioBuffer->data.write(data, dataToWrite);
             data += dataToWrite;
             currentMaxSize -= dataToWrite;
             m_currentBufferSize += dataToWrite;
-            if (m_currentBufferSize == m_encoder->audioPacketSize())
+            if (m_currentBufferSize == packetSize)
             {
-                m_encoder->m_audioQueue.push(m_nextAudioBuffer);
-                m_nextAudioBuffer = new CLAbstractMediaData(CL_MEDIA_ALIGNMENT, m_encoder->audioPacketSize());
+                if (m_isPrimary)
+                    m_encoder->m_audioQueue.push(m_nextAudioBuffer);
+                else
+                    m_encoder->m_secondAudioQueue.push(m_nextAudioBuffer);
+                m_nextAudioBuffer = new CLAbstractMediaData(CL_MEDIA_ALIGNMENT, packetSize);
                 m_nextAudioBuffer->timestamp = m_encoder->currentTime() - m_startDelay;
                 m_currentBufferSize = 0;
             }
@@ -111,6 +164,7 @@ private:
     int m_currentBufferSize;
     CLAbstractMediaData* m_nextAudioBuffer;
     int m_startDelay;
+    bool m_isPrimary;
 };
 
 int DesktopFileEncoder::initIOContext()
@@ -187,7 +241,8 @@ qint64 DesktopFileEncoder::seekPacketImpl(qint64 offset, qint32 whence)
 DesktopFileEncoder::DesktopFileEncoder ( 
                    const QString& fileName, 
                    int desktopNum, 
-                   const QAudioDeviceInfo audioDevice,
+                   const QAudioDeviceInfo* audioDevice,
+                   const QAudioDeviceInfo* audioDevice2,
                    CLScreenGrapper::CaptureMode captureMode,
                    bool captureCursor,
                    const QSize& captureResolution,
@@ -197,6 +252,7 @@ DesktopFileEncoder::DesktopFileEncoder (
     m_videoBuf(0),
     m_videoBufSize(0),
     m_videoCodecCtx(0),
+    m_audioCodecCtx(0),
     m_initialized(false),
     m_fileName(fileName),
     m_device(0),
@@ -204,9 +260,10 @@ DesktopFileEncoder::DesktopFileEncoder (
     m_formatCtx(0),
     m_grabber(0),
     m_desktopNum(desktopNum),
-    m_audioDevice(audioDevice),
     m_audioInput(0),
+    m_audioInput2(0),
     m_audioOStream(0),
+    m_audioOStream2(0),
 
     m_audioFramesCount(0),
     m_audioFrameDuration(0),
@@ -217,13 +274,30 @@ DesktopFileEncoder::DesktopFileEncoder (
     m_captureCursor(captureCursor), 
     m_captureResolution(captureResolution),
     m_encodeQualuty(encodeQualuty),
-    m_encodedFrames(0)
+    m_encodedFrames(0),
+    m_useSecondaryAudio(0),
+    m_tmpAudioBuffer1(CL_MEDIA_ALIGNMENT, FF_MIN_BUFFER_SIZE),
+    m_tmpAudioBuffer2(CL_MEDIA_ALIGNMENT, FF_MIN_BUFFER_SIZE)
 {
+    m_useAudio = audioDevice || audioDevice2;
+    m_useSecondaryAudio = audioDevice && audioDevice2 && audioDevice->deviceName() != audioDevice2->deviceName();
+
+    if (m_useAudio)
+        m_audioDevice = audioDevice ? *audioDevice : *audioDevice2;
+
+    if (m_useSecondaryAudio)
+        m_audioDevice2 = *audioDevice2;
+
     m_needStop = false;
     m_audioQueue.setMaxSize(AUDIO_QUEUE_MAX_SIZE);
 
     openStream();
     start();
+}
+
+void DesktopFileEncoder::stop()
+{
+    m_needStop = true;
 }
 
 DesktopFileEncoder::~DesktopFileEncoder()
@@ -368,77 +442,107 @@ bool DesktopFileEncoder::init()
     //m_videoOutStream->pts.den = m_videoOutStream->time_base.den;
 
 
-
     // init audio capture
-
-    m_audioFormat = m_audioDevice.preferredFormat();
-    m_audioFormat.setSampleRate(48000);
-    m_audioFormat.setSampleSize(16);
-    //m_audioFormat.setChannels(1);
-    m_audioFormat.setSampleType(QAudioFormat::SignedInt);
-
-    m_audioBuf = (quint8*) av_malloc(FF_MIN_BUFFER_SIZE);
-    m_audioOutStream = NULL;
-    m_audioOutStream = av_new_stream(m_formatCtx, DEFAULT_AUDIO_STREAM_ID);
-    if (!m_audioOutStream)
+    if (m_useAudio)
     {
-        cl_log.log("Can't create output audio stream for encoding", cl_logWARNING);
-        return false;
-    }
+        m_audioFormat = m_audioDevice.preferredFormat();
+        m_audioFormat.setSampleRate(48000);
+        m_audioFormat.setSampleSize(16);
+        m_audioFormat.setChannels(2);
+        m_audioFormat.setSampleType(QAudioFormat::SignedInt);
 
-    AVCodec* audioCodec = avcodec_find_encoder_by_name("aac");
-    //AVCodec* audioCodec = avcodec_find_encoder_by_name("libmp3lame");
-    if(audioCodec == 0)
-    {
-        cl_log.log("Can't find audio MP3 encoder", cl_logWARNING);
-        return false;
-    }
-    m_outputCtx->audio_codec = audioCodec->id;
+        if (!m_audioDevice.isFormatSupported(m_audioFormat))
+        {
+            m_audioFormat.setChannels(1);
+            if (!m_audioDevice.isFormatSupported(m_audioFormat))
+            {
+                cl_log.log("Unsupported audio format specified for capturing!", cl_logERROR);
+                return false;
+            }
+        }
 
-    m_audioCodecCtx = m_audioOutStream->codec;
-    m_audioCodecCtx->codec_id = m_outputCtx->audio_codec;
-    m_audioCodecCtx->codec_type = AVMEDIA_TYPE_AUDIO;
-    m_audioCodecCtx->sample_fmt = audioFormatQtToFfmpeg(m_audioFormat);
-    m_audioCodecCtx->channels = m_audioFormat.channels();
-    m_audioCodecCtx->sample_rate = m_audioFormat.frequency();
-    AVRational audioRational = {1, m_audioCodecCtx->sample_rate};
-    m_audioCodecCtx->time_base	 = audioRational;
-    m_audioCodecCtx->bit_rate = 64000 * m_audioCodecCtx->channels;
 
-    //AVCodec* audioCodec = avcodec_find_encoder_by_name("mp3");
+        if (m_useSecondaryAudio)
+        {
+            m_audioFormat2 = m_audioDevice2.preferredFormat();
+            m_audioFormat2.setSampleRate(48000);
+            m_audioFormat2.setSampleSize(16);
+            m_audioFormat2.setChannels(2);
+            m_audioFormat2.setSampleType(QAudioFormat::SignedInt);
+            if (!m_audioDevice2.isFormatSupported(m_audioFormat2))
+            {
+                m_audioFormat.setChannels(1);
+                if (!m_audioDevice2.isFormatSupported(m_audioFormat2))
+                {
+                    cl_log.log("Unsupported audio format specified for capturing!", cl_logERROR);
+                    return false;
+                }
+            }
+        }
 
-    if (avcodec_open(m_audioCodecCtx, audioCodec) < 0)
-    {
-        cl_log.log("Can't initialize encoder", cl_logWARNING);
-        return false;
+        m_encodedAudioBuf = (quint8*) av_malloc(FF_MIN_BUFFER_SIZE);
+        m_audioOutStream = NULL;
+        m_audioOutStream = av_new_stream(m_formatCtx, DEFAULT_AUDIO_STREAM_ID);
+        if (!m_audioOutStream)
+        {
+            cl_log.log("Can't create output audio stream for encoding", cl_logWARNING);
+            return false;
+        }
+
+        AVCodec* audioCodec = avcodec_find_encoder_by_name("aac");
+        //AVCodec* audioCodec = avcodec_find_encoder_by_name("libmp3lame");
+        if(audioCodec == 0)
+        {
+            cl_log.log("Can't find audio encoder", cl_logWARNING);
+            return false;
+        }
+        m_outputCtx->audio_codec = audioCodec->id;
+
+        m_audioCodecCtx = m_audioOutStream->codec;
+        m_audioCodecCtx->codec_id = m_outputCtx->audio_codec;
+        m_audioCodecCtx->codec_type = AVMEDIA_TYPE_AUDIO;
+        m_audioCodecCtx->sample_fmt = audioFormatQtToFfmpeg(m_audioFormat);
+        m_audioCodecCtx->channels = m_useSecondaryAudio ? 2 : m_audioFormat.channels();
+        m_audioCodecCtx->sample_rate = m_audioFormat.frequency();
+        AVRational audioRational = {1, m_audioCodecCtx->sample_rate};
+        m_audioCodecCtx->time_base	 = audioRational;
+        m_audioCodecCtx->bit_rate = 64000 * m_audioCodecCtx->channels;
+
+
+        //AVCodec* audioCodec = avcodec_find_encoder_by_name("mp3");
+
+        if (avcodec_open(m_audioCodecCtx, audioCodec) < 0)
+        {
+            cl_log.log("Can't initialize encoder", cl_logWARNING);
+            return false;
+        }
+        m_audioFrameDuration = m_audioCodecCtx->frame_size / (double) m_audioCodecCtx->sample_rate;
+        m_audioFrameDuration *= m_audioOutStream->time_base.den / (double) m_audioOutStream->time_base.num;
+        
+        // 50 ms as max jitter
+        // QT uses 25fps timer for audio grabbing, so jitter 40ms + 10ms reserved.
+        m_maxAudioJitter = m_audioOutStream->time_base.den / m_audioOutStream->time_base.num / 20; 
+
+        m_audioInput = new QAudioInput ( m_audioDevice, m_audioFormat);
+        if (m_useSecondaryAudio)
+            m_audioInput2 = new QAudioInput ( m_audioDevice2, m_audioFormat2);
+        //m_audioInput->moveToThread(QApplication::instance()->thread());
+
+        m_audioOStream = new CaptureAudioStream(this);
+        m_audioOStream->open(QIODevice::WriteOnly | QIODevice::Truncate);
+
+        m_audioOStream2 = new CaptureAudioStream(this);
+        static_cast<CaptureAudioStream*>(m_audioOStream2)->setPrimary(false);
+        m_audioOStream2->open(QIODevice::WriteOnly | QIODevice::Truncate);
     }
 
     av_write_header(m_formatCtx);
 
-    m_audioFrameDuration = m_audioCodecCtx->frame_size / (double) m_audioCodecCtx->sample_rate;
-    m_audioFrameDuration *= m_audioOutStream->time_base.den / (double) m_audioOutStream->time_base.num;
-    
-    // 50 ms as max jitter
-    // QT uses 25fps timer for audio grabbing, so jitter 40ms + 10ms reserved.
-    m_maxAudioJitter = m_audioOutStream->time_base.den / m_audioOutStream->time_base.num / 20; 
-
-
-
-    if (!m_audioDevice.isFormatSupported(m_audioFormat))
-    {
-        cl_log.log("Unsupported audio format specified for capturing!", cl_logERROR);
-        return false;
-    }
-
-    m_audioInput = new QAudioInput ( m_audioDevice, m_audioFormat);
-    //m_audioInput->moveToThread(QApplication::instance()->thread());
-
-    //m_audioOStream = new QFile("c:/audio_captire.wav");
-    m_audioOStream = new CaptureAudioStream(this);
-    m_audioOStream->open(QIODevice::WriteOnly | QIODevice::Truncate);
-
     m_grabber->start(QThread::HighestPriority);
-    m_audioInput->start(m_audioOStream);
+    if (m_audioInput)
+        m_audioInput->start(m_audioOStream);
+    if (m_audioInput2)
+        m_audioInput2->start(m_audioOStream2);
 
     return true;
 }
@@ -485,7 +589,7 @@ int DesktopFileEncoder::processData(bool flush)
     }
 
     // write all audio frames
-    while (m_audioQueue.size() > 0)
+    while (m_audioQueue.size() > 0 && (!m_useSecondaryAudio || m_secondAudioQueue.size() > 0))
     {
         AVRational r;
         r.num = 1;
@@ -515,13 +619,44 @@ int DesktopFileEncoder::processData(bool flush)
 
         // todo: add audio resample here
 
-        const short* buffer = (const short*) audioData->data.data();
-        int aEncoded = avcodec_encode_audio(m_audioCodecCtx, m_audioBuf, FF_MIN_BUFFER_SIZE, buffer);
+        short* buffer1 = (short*) audioData->data.data();
+        if (m_useSecondaryAudio)
+        {
+            CLAbstractMediaData* audioData2;
+            m_secondAudioQueue.pop(audioData2);
+            short* buffer2 = (short*) audioData2->data.data();
+
+            int stereoPacketSize = m_audioCodecCtx->frame_size * 2 * m_audioFormat.sampleSize()/8;
+            /*
+            // first mono to left, second mono to right
+            // may be it is mode usefull?
+            if (m_audioFormat.channels() == 1 && m_audioFormat2.channels() == 1)
+            {
+                monoToStereo((qint16*) m_tmpAudioBuffer1.data.data(), buffer1, buffer2, stereoPacketSize/4);
+                buffer1 = (qint16*) m_tmpAudioBuffer1.data.data();
+                buffer2 = 0;
+            }
+            */
+            if (m_audioFormat.channels() == 1)
+            {
+                monoToStereo((qint16*) m_tmpAudioBuffer1.data.data(), buffer1, stereoPacketSize/4);
+                buffer1 = (qint16*) m_tmpAudioBuffer1.data.data();
+            }
+            if (m_audioFormat2.channels() == 1)
+            {
+                monoToStereo((qint16*) m_tmpAudioBuffer2.data.data(), buffer2, stereoPacketSize/4);
+                buffer2 = (qint16*) m_tmpAudioBuffer2.data.data();
+            }
+            if (buffer2)
+                stereoAudioMux(buffer1, buffer2, stereoPacketSize / 2);
+            audioData2->releaseRef();
+        }
+        int aEncoded = avcodec_encode_audio(m_audioCodecCtx, m_encodedAudioBuf, FF_MIN_BUFFER_SIZE, buffer1);
         if (aEncoded > 0)
         {
             av_init_packet(&audioPacket);
             audioPacket.pts = audioPts - m_audioFrameDuration;
-            audioPacket.data = m_audioBuf;
+            audioPacket.data = m_encodedAudioBuf;
             audioPacket.size = aEncoded;
             audioPacket.stream_index = m_audioOutStream->index;
             if (av_write_frame(m_formatCtx,&audioPacket)<0)	
@@ -581,20 +716,28 @@ void DesktopFileEncoder::stopCapturing()
 {
     delete m_grabber;
     m_grabber = 0;
-    delete m_audioInput;
-    m_audioInput = 0;
-    delete m_audioOStream;
-    m_audioOStream = 0;
+    if (m_audioOStream)
+        m_audioOStream->close();
+    if (m_audioOStream2)
+        m_audioOStream2->close();
 }
 
 void DesktopFileEncoder::closeStream()
 {
     delete m_grabber;
     m_grabber = 0;
-    delete m_audioInput;
+    if (m_audioInput)
+        m_audioInput->deleteLater(); 
     m_audioInput = 0;
-    delete m_audioOStream;
+    if (m_audioInput2)
+        m_audioInput2->deleteLater();
+    m_audioInput2 = 0;
+    if (m_audioOStream)
+        m_audioOStream->deleteLater();
     m_audioOStream = 0;
+    if (m_audioOStream2)
+        m_audioOStream2->deleteLater();
+    m_audioOStream2 = 0;
 
     if (m_formatCtx)
         av_write_trailer(m_formatCtx);
@@ -627,6 +770,10 @@ void DesktopFileEncoder::closeStream()
     }
     m_device = 0;
 
+    if (m_encodedAudioBuf)
+        av_free(m_encodedAudioBuf);
+    m_encodedAudioBuf = 0;
+
     m_initialized = false;
 }
 
@@ -636,7 +783,7 @@ qint64 DesktopFileEncoder::currentTime() const
 }
 
 
-int DesktopFileEncoder::audioPacketSize()
+int DesktopFileEncoder::audioPacketSize(bool isPrimary)
 {
-    return m_audioCodecCtx->frame_size * m_audioFormat.channels() * m_audioFormat.sampleSize()/8;
+    return m_audioCodecCtx->frame_size * (isPrimary ? m_audioFormat.channels() : m_audioFormat2.channels()) * m_audioFormat.sampleSize()/8;
 }

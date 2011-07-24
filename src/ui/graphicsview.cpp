@@ -2626,7 +2626,9 @@ void GraphicsView::toggleRecording()
             quality = 0.5;
 
         screen = 0; // todo: temp line. now non default screen has some errors. 
-        audioDevice = QAudioDeviceInfo::defaultInputDevice() ; // todo: other devices has some problem
+        // todo: addn second device from UI
+        // if device if absent (None), null pointer must be provided to recorder
+        QAudioDeviceInfo secondAudioDevice = QAudioDeviceInfo::defaultInputDevice() ; 
         
         CLScreenGrapper::CaptureMode grabberCaptureMode = CLScreenGrapper::CaptureMode_Application;
         if (captureMode == VideoRecorderSettings::FullScreenMode)
@@ -2634,7 +2636,7 @@ void GraphicsView::toggleRecording()
         else if (captureMode == VideoRecorderSettings::FullScreenNoeroMode)
             grabberCaptureMode = CLScreenGrapper::CaptureMode_DesktopWithoutAero;
 
-        m_desktopEncoder = new DesktopFileEncoder(filePath, screen, audioDevice, grabberCaptureMode, captureCursor, encodingSize, quality);
+        m_desktopEncoder = new DesktopFileEncoder(filePath, screen, &audioDevice, &secondAudioDevice, grabberCaptureMode, captureCursor, encodingSize, quality);
 #endif
         QLabel *label = new QLabel;
         label->move(width()/2 - 100, 300);
@@ -2654,12 +2656,12 @@ void GraphicsView::toggleRecording()
         QTimer::singleShot(3000, label, SLOT(deleteLater()));
     } else 
     {
+        // stop capturing
         cm_start_video_recording.setProperty("recoding", QVariant());
 
 #ifdef Q_OS_WIN
         QString recordedFileName = m_desktopEncoder->fileName();
-        delete m_desktopEncoder;
-        m_desktopEncoder = 0;
+        m_desktopEncoder->stop();
 
         QSettings settings;
         settings.beginGroup("videoRecording");
@@ -2672,6 +2674,8 @@ void GraphicsView::toggleRecording()
                                                         tr("Save Recording As"),
                                                         previousFile,
                                                         tr("Transport Stream (*.ts)"));
+        delete m_desktopEncoder;
+        m_desktopEncoder = 0;
 
         if (!filePath.isEmpty()) {
             QFile::remove(filePath);

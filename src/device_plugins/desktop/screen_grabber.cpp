@@ -16,7 +16,7 @@ int CLScreenGrapper::m_aeroInstanceCounter;
 class CPUDetector
 {
 public:
-    enum CPUVersion { HAS_x86, HAS_MMX, HAS_SSE, HAS_SSE2, HAS_SSE3 };
+    enum CPUVersion { HAS_x86, HAS_MMX, HAS_SSE, HAS_SSE2, HAS_SSE3, HAS_SSE41, HAS_SSE42, HAS_AVX};
 
     CPUVersion version() const { return m_version; }
 
