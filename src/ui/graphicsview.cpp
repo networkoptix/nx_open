@@ -2596,11 +2596,12 @@ void GraphicsView::toggleRecording()
     bool recording = cm_start_video_recording.property("recoding").toBool();
 
     VideoRecorderSettings recorderSettings;
-
+   
     if (!recording) {
         cm_start_video_recording.setProperty("recoding", true);
 
-        QAudioDeviceInfo audioDevice = recorderSettings.audioDevice();
+        QAudioDeviceInfo audioDevice = recorderSettings.primaryAudioDevice();
+        QAudioDeviceInfo secondAudioDevice = recorderSettings.secondaryAudioDevice();
         int screen = recorderSettings.screen();
         VideoRecorderSettings::CaptureMode captureMode = recorderSettings.captureMode();
         VideoRecorderSettings::DecoderQuality decoderQuality = recorderSettings.decoderQuality();
@@ -2626,10 +2627,6 @@ void GraphicsView::toggleRecording()
             quality = 0.75;
         else if (decoderQuality == VideoRecorderSettings::PerformanceQuality)
             quality = 0.5;
-
-        // todo: addn second device from UI
-        // if device if absent (None), null pointer must be provided to recorder
-        QAudioDeviceInfo secondAudioDevice = QAudioDeviceInfo::defaultInputDevice() ; 
         
         CLScreenGrapper::CaptureMode grabberCaptureMode = CLScreenGrapper::CaptureMode_Application;
         if (captureMode == VideoRecorderSettings::FullScreenMode)
