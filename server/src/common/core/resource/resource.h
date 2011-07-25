@@ -38,7 +38,8 @@ public:
         playback = 0x10, // something playable ( not real time and not a single shot)
         video = 0x20,
         audio = 0x40,
-        live = 0x80
+        live = 0x80,
+        live_cam = live | video | media | streamprovider | network
     };
 
 
@@ -71,6 +72,10 @@ public:
 	//Name is class of the devices. like 2105DN; => arecontvision 2 megapixel H.264 day night camera; 
 	QString getName() const;
 	void setName(const QString& name);
+
+    // like arecont or iqinvision
+    virtual QString manufacture() const = 0;
+
 
     void addTag(const QString& tag);
     void removeTag(const QString& tag);

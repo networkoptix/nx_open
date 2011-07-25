@@ -21,6 +21,17 @@ QnMacAddress::~QnMacAddress()
     
 }
 
+bool QnMacAddress::isEmpty() const
+{
+    for(int i = 0; i < 6; ++i)
+    {
+        if (m_data[i]!=0)
+            return false
+    }
+
+    return true;
+}
+
 QString QnMacAddress::toString() const
 {
     return MACToString(m_data);

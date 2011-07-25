@@ -9,6 +9,8 @@ public:
     QnMacAddress(const QString& mac);
     ~QnMacAddress();
 
+    bool isEmpty() const;
+
     QString toString() const;
     const unsigned char* toBytes() const;
 
