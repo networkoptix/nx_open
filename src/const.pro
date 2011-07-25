@@ -32,6 +32,12 @@ win32 {
   QMAKE_CXXFLAGS += -MP /Fd$(IntDir)
   INCLUDEPATH += ../contrib/ffmpeg-misc-headers-win32
   INCLUDEPATH += ../contrib/openal/include
+  INCLUDEPATH += $(DXSDK_DIR)/Include
+  !contains(QMAKE_HOST.arch, x86_64) {
+    LIBS += -L$(DXSDK_DIR)/Lib/x86
+  } else {
+    LIBS += -L$(DXSDK_DIR)/Lib/x64
+  }
   RC_FILE = uniclient.rc
 }
 
