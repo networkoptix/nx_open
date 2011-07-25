@@ -302,7 +302,7 @@ bool DesktopFileEncoder::start()
     if (!init())
         return false;
     m_initialized = true;
-    start();
+    CLLongRunnable::start();
     return true;
 }
 
@@ -457,6 +457,7 @@ bool DesktopFileEncoder::init()
     // init audio capture
     if (m_useAudio)
     {
+        qDebug() << m_audioDevice.deviceName();
         m_audioFormat = m_audioDevice.preferredFormat();
         m_audioFormat.setSampleRate(48000);
         m_audioFormat.setSampleSize(16);

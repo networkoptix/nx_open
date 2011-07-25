@@ -2595,8 +2595,8 @@ void GraphicsView::toggleRecording()
 
     VideoRecorderSettings recorderSettings;
 
-    if (!recording) {
-        cm_start_video_recording.setProperty("recoding", true);
+    if (!recording) 
+    {
 
         QAudioDeviceInfo audioDevice = recorderSettings.audioDevice();
         int screen = recorderSettings.screen();
@@ -2643,8 +2643,11 @@ void GraphicsView::toggleRecording()
             cl_log.log(m_desktopEncoder->lastErrorStr(), cl_logERROR);
             delete m_desktopEncoder;
             m_desktopEncoder = 0;
+            return;
         }
 #endif
+        cm_start_video_recording.setProperty("recoding", true);
+
         QLabel *label = new QLabel;
         label->move(width()/2 - 100, 300);
         label->resize(200, 100);
