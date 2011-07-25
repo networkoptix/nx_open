@@ -2580,17 +2580,6 @@ void GraphicsView::onArrange_helper_finished()
 
 }
 
-QString getRecordName()
-{
-    QString base = getTempRecordingDir() + "video%1.ts";
-    for (int i = 0; ; i++) {
-        QString filePath = base.arg(i == 0 ? QString() : QLatin1String(" ") + QString::number(i));
-        if (!QFileInfo(filePath).exists()) {
-            return filePath;
-        }
-    }
-}
-
 void GraphicsView::toggleRecording()
 {
     bool recording = cm_start_video_recording.property("recoding").toBool();
@@ -2608,7 +2597,10 @@ void GraphicsView::toggleRecording()
         VideoRecorderSettings::Resolution resolution = recorderSettings.resolution();
         bool captureCursor = recorderSettings.captureCursor();
 
-        QString filePath = getRecordName();
+        QSettings s;
+        s.beginGroup(QLatin1String("videoRecording"));
+
+        QString filePath = getTempRecordingDir() + QString(QLatin1String("video%1.ts")).arg(s.value("counter").toInt() + 1);
 #ifdef Q_OS_WIN
         if (m_desktopEncoder)
             delete m_desktopEncoder;
@@ -2638,6 +2630,7 @@ void GraphicsView::toggleRecording()
         QString errorMessage;
         if (!m_desktopEncoder->start())
         {
+            QMessageBox::warning(this, tr("Warning"), tr("Can't start recording due to following error: %1").arg(m_desktopEncoder->lastErrorStr()));
             // show error dialog here
             cl_log.log(m_desktopEncoder->lastErrorStr(), cl_logERROR);
             delete m_desktopEncoder;
@@ -2682,6 +2675,7 @@ void GraphicsView::toggleRecording()
         m_desktopEncoder = 0;
 
         if (!filePath.isEmpty()) {
+            settings.setValue("counter", settings.value("counter").toInt() + 1);
             QFile::remove(filePath);
             bool result = QFile::rename(recordedFileName, filePath);
             if (!result) {
@@ -2694,17 +2688,13 @@ void GraphicsView::toggleRecording()
             QFile::remove(recordedFileName);
         }
         settings.endGroup();
+        settings.sync();
 #endif
     }
 }
 
 void GraphicsView::recordingSettings()
 {
-//    VideoRecordingDialog dialog;
-//    ArthurStyle style;
-//    dialog.setStyle(&style);
-
-//    dialog.exec();
     PreferencesWindow preferencesDialog;
     preferencesDialog.setCurrentTab(3);
     preferencesDialog.exec();
