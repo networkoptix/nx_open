@@ -771,7 +771,8 @@ void DesktopFileEncoder::closeStream()
         av_free(m_videoBuf);
     m_videoBuf = 0;
 
-    av_free(av_alloc_put_byte);
+    if (m_iocontext)
+        av_free(m_iocontext);
     m_iocontext = 0;
     if (m_device)
     {
