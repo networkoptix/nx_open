@@ -279,7 +279,9 @@ DesktopFileEncoder::DesktopFileEncoder (
     m_useSecondaryAudio(0),
     m_tmpAudioBuffer1(CL_MEDIA_ALIGNMENT, FF_MIN_BUFFER_SIZE),
     m_tmpAudioBuffer2(CL_MEDIA_ALIGNMENT, FF_MIN_BUFFER_SIZE),
-    m_widget(glWidget)
+    m_widget(glWidget),
+    m_videoPacketWrited(false),
+    m_encodedAudioBuf(0)
 {
     m_useAudio = audioDevice || audioDevice2;
     m_useSecondaryAudio = audioDevice && audioDevice2 && audioDevice->deviceName() != audioDevice2->deviceName();
@@ -553,14 +555,10 @@ bool DesktopFileEncoder::init()
 int DesktopFileEncoder::processData(bool flush)
 {
     int out_size = avcodec_encode_video(m_videoCodecCtx, m_videoBuf, m_videoBufSize, flush ? 0 : m_frame);
+
     if (out_size < 1 && !flush)
         return out_size;
 
-    if (out_size < 1)
-    {
-        int aSize = m_audioQueue.size();
-        aSize = aSize;
-    }
 
     AVPacket videoPkt;
     if (out_size > 0)
@@ -663,6 +661,8 @@ int DesktopFileEncoder::processData(bool flush)
     {
         if (av_write_frame(m_formatCtx,&videoPkt)<0)	
             cl_log.log("Video packet write error", cl_logWARNING);
+        else
+            m_videoPacketWrited = true;
         //cl_log.log("videoPkt.pts=", videoPkt.pts, cl_logALWAYS);
     }
     return out_size;
@@ -745,7 +745,7 @@ void DesktopFileEncoder::closeStream()
         m_audioOStream2->deleteLater();
     m_audioOStream2 = 0;
 
-    if (m_formatCtx)
+    if (m_formatCtx && m_videoPacketWrited)
         av_write_trailer(m_formatCtx);
 
     if (m_videoCodecCtx)

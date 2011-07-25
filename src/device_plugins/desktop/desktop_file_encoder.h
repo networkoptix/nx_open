@@ -101,6 +101,7 @@ private:
     QSize m_captureResolution;
     float m_encodeQualuty;
     QWidget* m_widget;
+    bool m_videoPacketWrited;
 };
 
 #endif //__DESKTOP_H264_STREAM_READER_H
