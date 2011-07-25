@@ -2636,6 +2636,14 @@ void GraphicsView::toggleRecording()
             grabberCaptureMode = CLScreenGrapper::CaptureMode_DesktopWithoutAero;
 
         m_desktopEncoder = new DesktopFileEncoder(filePath, screen, &audioDevice, &secondAudioDevice, grabberCaptureMode, captureCursor, encodingSize, quality, viewport());
+        QString errorMessage;
+        if (!m_desktopEncoder->start())
+        {
+            // show error dialog here
+            cl_log.log(m_desktopEncoder->lastErrorStr(), cl_logERROR);
+            delete m_desktopEncoder;
+            m_desktopEncoder = 0;
+        }
 #endif
         QLabel *label = new QLabel;
         label->move(width()/2 - 100, 300);

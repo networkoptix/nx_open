@@ -295,8 +295,15 @@ DesktopFileEncoder::DesktopFileEncoder (
     m_needStop = false;
     m_audioQueue.setMaxSize(AUDIO_QUEUE_MAX_SIZE);
 
-    openStream();
+}
+
+bool DesktopFileEncoder::start()
+{
+    if (!init())
+        return false;
+    m_initialized = true;
     start();
+    return true;
 }
 
 void DesktopFileEncoder::stop()
@@ -352,7 +359,7 @@ bool DesktopFileEncoder::init()
     AVCodec* videoCodec = avcodec_find_encoder_by_name(videoCodecName.toAscii().constData());
     if(videoCodec == 0)
     {
-        cl_log.log("Can't find encoder", cl_logWARNING);
+        m_lastErrorStr = QString("Can't find video encoder ") + videoCodecName;
         return false;
     }
     
@@ -370,7 +377,7 @@ bool DesktopFileEncoder::init()
     m_formatCtx->oformat = m_outputCtx;
 
     if (av_set_parameters(m_formatCtx, NULL) < 0) {
-        cl_log.log("Invalid output format parameters", cl_logERROR);
+        m_lastErrorStr = "Can't initialize output format parameters";
         return false;
     }
 
@@ -378,7 +385,7 @@ bool DesktopFileEncoder::init()
     m_videoOutStream = av_new_stream(m_formatCtx, DEFAULT_VIDEO_STREAM_ID);
     if (!m_videoOutStream)
     {
-        cl_log.log("Can't create output stream for encoding", cl_logWARNING);
+        m_lastErrorStr = "Can't allocate output stream for video codec";
         return false;
     }
     m_videoCodecCtx = m_videoOutStream->codec;
@@ -437,7 +444,7 @@ bool DesktopFileEncoder::init()
 
     if (avcodec_open(m_videoCodecCtx, videoCodec) < 0)
     {
-        cl_log.log("Can't initialize encoder", cl_logWARNING);
+        m_lastErrorStr =  "Can't initialize video encoder";
         return false;
     }
 
@@ -461,7 +468,7 @@ bool DesktopFileEncoder::init()
             m_audioFormat.setChannels(1);
             if (!m_audioDevice.isFormatSupported(m_audioFormat))
             {
-                cl_log.log("Unsupported audio format specified for capturing!", cl_logERROR);
+                m_lastErrorStr = "Unsupported audio format specified for capturing!";
                 return false;
             }
         }
@@ -479,7 +486,7 @@ bool DesktopFileEncoder::init()
                 m_audioFormat.setChannels(1);
                 if (!m_audioDevice2.isFormatSupported(m_audioFormat2))
                 {
-                    cl_log.log("Unsupported audio format specified for capturing!", cl_logERROR);
+                    m_lastErrorStr = "Unsupported audio format specified for capturing secondary audio";
                     return false;
                 }
             }
@@ -490,15 +497,15 @@ bool DesktopFileEncoder::init()
         m_audioOutStream = av_new_stream(m_formatCtx, DEFAULT_AUDIO_STREAM_ID);
         if (!m_audioOutStream)
         {
-            cl_log.log("Can't create output audio stream for encoding", cl_logWARNING);
+            m_lastErrorStr = "Can't allocate output audio stream";
             return false;
         }
 
-        AVCodec* audioCodec = avcodec_find_encoder_by_name("aac");
-        //AVCodec* audioCodec = avcodec_find_encoder_by_name("libmp3lame");
+        QString audioCodecName = "aac"; // "libmp3lame"
+        AVCodec* audioCodec = avcodec_find_encoder_by_name(audioCodecName.toAscii().constData());
         if(audioCodec == 0)
         {
-            cl_log.log("Can't find audio encoder", cl_logWARNING);
+            m_lastErrorStr = QString("Can't find audio encoder") + audioCodecName;
             return false;
         }
         m_outputCtx->audio_codec = audioCodec->id;
@@ -518,7 +525,7 @@ bool DesktopFileEncoder::init()
 
         if (avcodec_open(m_audioCodecCtx, audioCodec) < 0)
         {
-            cl_log.log("Can't initialize encoder", cl_logWARNING);
+            m_lastErrorStr = "Can't initialize audio encoder";
             return false;
         }
         m_audioFrameDuration = m_audioCodecCtx->frame_size / (double) m_audioCodecCtx->sample_rate;
@@ -712,12 +719,6 @@ void DesktopFileEncoder::run()
     } while (processData(true) > 0); // flush buffers
 
     closeStream();
-}
-
-void DesktopFileEncoder::openStream()
-{
-    if (init())
-        m_initialized = true;
 }
 
 void DesktopFileEncoder::stopCapturing()

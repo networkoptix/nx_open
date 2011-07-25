@@ -28,7 +28,10 @@ public:
                        );
     virtual ~DesktopFileEncoder();
     void stop();
+    bool start();
     QString fileName() const { return m_fileName; }
+
+    QString lastErrorStr() const { return m_lastErrorStr; }
 protected:
     // CLLongRunnable runable
     virtual void run();
@@ -37,7 +40,6 @@ private:
 private:
     friend class CaptureAudioStream;
 
-    virtual void openStream();
     virtual void closeStream();
     int audioPacketSize(bool isPrimary);
 
@@ -102,6 +104,7 @@ private:
     float m_encodeQualuty;
     QWidget* m_widget;
     bool m_videoPacketWrited;
+    QString m_lastErrorStr;
 };
 
 #endif //__DESKTOP_H264_STREAM_READER_H
