@@ -314,7 +314,6 @@ void DesktopFileEncoder::stop()
 DesktopFileEncoder::~DesktopFileEncoder()
 {
     m_needStop = true;
-    bool b = isRunning();
     wait();
     closeStream();
 }

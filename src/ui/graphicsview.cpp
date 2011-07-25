@@ -2659,7 +2659,7 @@ void GraphicsView::toggleRecording()
         else if (captureMode == VideoRecorderSettings::FullScreenNoeroMode)
             grabberCaptureMode = CLScreenGrapper::CaptureMode_DesktopWithoutAero;
 
-        m_desktopEncoder = new DesktopFileEncoder(filePath, screen, &audioDevice, &secondAudioDevice, grabberCaptureMode, captureCursor, encodingSize, quality, viewport());
+        m_desktopEncoder = new DesktopFileEncoder(filePath, screen, audioDevice.isNull() ? 0 : &audioDevice, secondAudioDevice.isNull() ? 0 : &secondAudioDevice, grabberCaptureMode, captureCursor, encodingSize, quality, viewport());
         QString errorMessage;
         if (!m_desktopEncoder->start())
         {
