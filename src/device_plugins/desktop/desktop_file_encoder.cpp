@@ -554,6 +554,8 @@ bool DesktopFileEncoder::init()
 
 int DesktopFileEncoder::processData(bool flush)
 {
+    if (m_videoCodecCtx == 0)
+        return -1;
     int out_size = avcodec_encode_video(m_videoCodecCtx, m_videoBuf, m_videoBufSize, flush ? 0 : m_frame);
 
     if (out_size < 1 && !flush)
