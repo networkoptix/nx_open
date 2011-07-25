@@ -2589,6 +2589,34 @@ QString getRecordName()
     }
 }
 
+#ifdef Q_OS_WIN
+int screenToAdapter(int screen)
+{
+    IDirect3D9* pD3D;
+    if((pD3D=Direct3DCreate9(D3D_SDK_VERSION))==NULL)
+        return 0;
+
+    QRect rect = qApp->desktop()->screen(screen)->geometry();
+    MONITORINFO monInfo;
+    memset(&monInfo, 0, sizeof(monInfo));
+    monInfo.cbSize = sizeof(monInfo);
+    int rez = 0;
+
+    for (int i = 0; i < qApp->desktop()->screenCount(); ++i)
+    {
+        if (!GetMonitorInfo(pD3D->GetAdapterMonitor(i), &monInfo))
+            break;
+        if (monInfo.rcMonitor.left == rect.left() && monInfo.rcMonitor.top == rect.top())
+        {
+            rez = i;
+            break;
+        }
+    }
+    pD3D->Release();
+    return rez;
+}
+#endif
+
 void GraphicsView::toggleRecording()
 {
     bool recording = cm_start_video_recording.property("recoding").toBool();
@@ -2600,6 +2628,11 @@ void GraphicsView::toggleRecording()
 
         QAudioDeviceInfo audioDevice = recorderSettings.audioDevice();
         int screen = recorderSettings.screen();
+
+#ifdef Q_OS_WIN
+        screen = screenToAdapter(screen);
+#endif
+
         VideoRecorderSettings::CaptureMode captureMode = recorderSettings.captureMode();
         VideoRecorderSettings::DecoderQuality decoderQuality = recorderSettings.decoderQuality();
         VideoRecorderSettings::Resolution resolution = recorderSettings.resolution();
@@ -2681,7 +2714,11 @@ void GraphicsView::toggleRecording()
                 QFileInfo(recordedFileName).baseName();
 
         QFileInfo fi(previousFile);
-	    QString filePath = QFileDialog::getOpenFileName(this, tr("Add media file"), fi.path(), tr("Transport Stream (*.ts)"));
+        QString filePath = QFileDialog::getSaveFileName(
+            this,
+            tr("Save Recording As"),
+            fi.path(),
+            tr("Transport Stream (*.ts)"));
 
         delete m_desktopEncoder;
         m_desktopEncoder = 0;
