@@ -2608,6 +2608,33 @@ int screenToAdapter(int screen)
 }
 #endif
 
+QRegion createRoundRegion(int rSmall, int rLarge, const QRect& rect)
+{
+    QRegion region;
+
+    int circleX = rLarge;
+
+    int circleY = rSmall-1;
+    for (int y = 0; y < qMin(rect.height(), rSmall); ++y)
+    {
+        // calculate circle Point
+        int x = circleX - sqrt((double) rLarge*rLarge - (circleY-y)*(circleY-y)) + 0.5;
+        region += QRect(x,y, rect.width()-x*2,1);
+    }
+    for (int y = qMin(rect.height(), rSmall); y < rect.height() - rSmall; ++y)
+        region += QRect(0,y, rect.width(),1);
+
+    circleY = rect.height() - rSmall;
+    for (int y = rect.height() - rSmall; y < rect.height(); ++y)
+    {
+        // calculate circle Point
+        int x = circleX - sqrt((double) rLarge*rLarge - (circleY-y)*(circleY-y)) + 0.5;
+        region += QRect(x,y, rect.width()-x*2,1);
+    }
+    qDebug() << region;
+    return region;
+}
+
 void GraphicsView::toggleRecording()
 {
     bool recording = cm_start_video_recording.property("recoding").toBool();
@@ -2674,12 +2701,17 @@ void GraphicsView::toggleRecording()
         cm_start_video_recording.setProperty("recoding", true);
 
         QLabel *label = new QLabel;
-        label->move(width()/2 - 100, 300);
         label->resize(200, 100);
+        label->move(width()/2 - label->width()/2, 300);
         label->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
         label->setText(tr("Recording started"));
         label->setAlignment(Qt::AlignCenter);
-        label->setStyleSheet("QLabel { color:white; background:black }");
+        label->setStyleSheet("QLabel { font-size:22px; border-width: 2px; border-style: inset; border-color: #535353; border-radius: 18px; background: #212150; color: #a6a6a6; selection-background-color: ltblue } ");
+        int side = qMin(label->width(), label->height());
+        QRegion maskedRegion = createRoundRegion(18, 18, label->rect());
+        
+        label->setMask(maskedRegion);
+
         label->setFocusPolicy(Qt::NoFocus);
         label->show();
         QPropertyAnimation *animation = new QPropertyAnimation(label, "windowOpacity", label);
