@@ -38,6 +38,9 @@ public:
 public slots:
     void accept();
 
+private slots:
+    void onMonitorChanged(int);
+
 private:
     Ui::RecordingSettings *ui;
     VideoRecorderSettings *settings;

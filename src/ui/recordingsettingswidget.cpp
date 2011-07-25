@@ -48,6 +48,8 @@ RecordingSettingsWidget::RecordingSettingsWidget(QWidget *parent) :
     setSecondaryAudioDeviceName(settings->secondaryAudioDevice().deviceName());
 
     ui->captureCursorCheckBox->setChecked(settings->captureCursor());
+
+    connect(ui->screenComboBox, SIGNAL(currentIndexChanged(int)), SLOT(onMonitorChanged(int)));
 }
 
 RecordingSettingsWidget::~RecordingSettingsWidget()
@@ -111,6 +113,22 @@ void RecordingSettingsWidget::accept()
     settings->setPrimaryAudioDeviceByName(primaryAudioDeviceName());
     settings->setSecondaryAudioDeviceByName(secondaryAudioDeviceName());
     settings->setCaptureCursor(ui->captureCursorCheckBox->isChecked());
+}
+
+void RecordingSettingsWidget::onMonitorChanged(int index)
+{
+#ifdef Q_OS_WIN
+    if (index != qApp->desktop()->primaryScreen())
+    {
+        if (ui->fullscreenNoAeroButton->isChecked())
+            ui->fullscreenButton->setChecked(true);
+        ui->fullscreenNoAeroButton->setEnabled(false);
+    }
+    else
+    {
+        ui->fullscreenNoAeroButton->setEnabled(true);
+    }
+#endif
 }
 
 int RecordingSettingsWidget::screen() const
