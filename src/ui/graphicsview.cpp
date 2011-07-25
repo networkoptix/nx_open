@@ -2706,16 +2706,13 @@ void GraphicsView::toggleRecording()
         label->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
         label->setText(tr("Recording started"));
         label->setAlignment(Qt::AlignCenter);
-        label->setStyleSheet("QLabel { border-width: 2px; border-style: inset; border-color: #535353; border-radius: 18px; background: #212150; color: #a6a6a6; selection-background-color: ltblue } ");
+        label->setStyleSheet("QLabel { font-size:22px; border-width: 2px; border-style: inset; border-color: #535353; border-radius: 18px; background: #212150; color: #a6a6a6; selection-background-color: ltblue } ");
         int side = qMin(label->width(), label->height());
         QRegion maskedRegion = createRoundRegion(18, 18, label->rect());
         
         label->setMask(maskedRegion);
 
         label->setFocusPolicy(Qt::NoFocus);
-        QFont f = label->font();
-        f.setPixelSize(22);
-        label->setFont(f);
         label->show();
         QPropertyAnimation *animation = new QPropertyAnimation(label, "windowOpacity", label);
         animation->setEasingCurve(QEasingCurve::OutCubic);
