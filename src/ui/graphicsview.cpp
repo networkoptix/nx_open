@@ -2732,15 +2732,10 @@ void GraphicsView::toggleRecording()
 
         QSettings settings;
         settings.beginGroup("videoRecording");
-        QString previousFile = settings.value(QLatin1String("previousFile")).toString();
-        previousFile = QFileInfo(previousFile).path() +
-                QDir::separator() +
-                QFileInfo(recordedFileName).baseName();
-
-        QFileInfo fi(previousFile);
+        QString previousDir = settings.value(QLatin1String("previousDir")).toString();
         QString filePath = QFileDialog::getSaveFileName(this,
                                                         tr("Save Recording As"),
-                                                        fi.path(),
+                                                        previousDir,
                                                         tr("Transport Stream (*.ts)"));
 
 		delete m_desktopEncoder;
@@ -2755,7 +2750,7 @@ void GraphicsView::toggleRecording()
                 QFile::remove(recordedFileName);
             }
 
-            settings.setValue(QLatin1String("previousFile"), previousFile);
+            settings.setValue(QLatin1String("previousDir"), QFileInfo(filePath).path());
         } else {
             QFile::remove(recordedFileName);
         }
