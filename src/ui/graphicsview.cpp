@@ -1366,9 +1366,11 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
         // on void menu...
         if (m_camLayout.getContent() != CLSceneLayoutManager::instance().startScreenLayoutContent())
         {
-            menu.addAction(&cm_start_video_recording);
-            menu.addAction(&cm_recording_settings);
-            menu.addSeparator();
+            QMenu * recordingMenu = new QMenu(tr("Screen Recording"), &menu);
+
+            recordingMenu->addAction(&cm_start_video_recording);
+            recordingMenu->addAction(&cm_recording_settings);
+//            menu.addSeparator();
             menu.addAction(&cm_fitinview);
             menu.addAction(&cm_arrange);
 
@@ -1377,6 +1379,8 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
                 //menu.addAction(&cm_add_layout); // major functions disabled 
                 //menu.addMenu(&layout_editor_menu);
             }
+
+            menu.addMenu(recordingMenu);
 
             bool saved_content = false;
             LayoutContent* current =  m_camLayout.getContent();

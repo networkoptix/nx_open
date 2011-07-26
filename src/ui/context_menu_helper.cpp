@@ -2,7 +2,7 @@
 
 QAction cm_exit("Exit",0);
 QAction cm_fitinview("Fit in View",0);
-QAction cm_start_video_recording("Start/Stop Video Recording",0);
+QAction cm_start_video_recording("Start/Stop Recording",0);
 QAction cm_recording_settings("Recording settings",0);
 QAction cm_arrange("Arrange",0);
 QAction cm_add_layout("Add new layout...",0);
