@@ -131,6 +131,9 @@
         <property name="toolTip">
          <string comment="Use this to change output video resolution"/>
         </property>
+        <property name="currentIndex">
+         <number>1</number>
+        </property>
         <item>
          <property name="text">
           <string>Native</string>
@@ -172,6 +175,9 @@
        <widget class="QComboBox" name="qualityComboBox">
         <property name="toolTip">
          <string comment="Use this to set encoder quality"/>
+        </property>
+        <property name="currentIndex">
+         <number>1</number>
         </property>
         <item>
          <property name="text">
