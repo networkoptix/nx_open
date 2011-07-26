@@ -558,6 +558,15 @@ bool DesktopFileEncoder::init()
     if (m_audioInput2)
         m_audioInput2->start(m_audioOStream2);
 
+    if (m_audioInput && m_audioInput->error() != QAudio::NoError) {
+        m_lastErrorStr = "Can't start primary audio device";
+        return false;
+    }
+    if (m_audioInput2 && m_audioInput2->error() != QAudio::NoError) {
+        m_lastErrorStr = "Can't start secondary audio device";
+        return false;
+    }
+
     return true;
 }
 

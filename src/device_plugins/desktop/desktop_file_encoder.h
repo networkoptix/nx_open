@@ -13,6 +13,8 @@ class CaptureAudioStream;
 
 class DesktopFileEncoder: public CLLongRunnable
 {
+    Q_OBJECT
+
 private:
     enum {BLOCK_SIZE = 1460};
 public:
@@ -51,6 +53,7 @@ private:
     int calculateBitrate();
     int processData(bool flush);
     void stopCapturing();
+
 private:
     int m_encodedFrames;
     CLBufferedScreenGrabber* m_grabber;
