@@ -25,7 +25,7 @@ PreferencesWindow::PreferencesWindow() :
 
     setWindowTitle(tr("Preferences Editor"));
     videoRecorderWidget = new RecordingSettingsWidget;
-    tabWidget->insertTab(3, videoRecorderWidget, tr("Video Recorder"));
+    tabWidget->insertTab(3, videoRecorderWidget, tr("Screen Recorder"));
 
     updateView();
     updateCameras();

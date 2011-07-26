@@ -72,6 +72,8 @@ void VideoRecorderSettings::setCaptureMode(VideoRecorderSettings::CaptureMode ca
 
 VideoRecorderSettings::DecoderQuality VideoRecorderSettings::decoderQuality() const
 {
+    if (!settings.contains(QLatin1String("decoderQuality")))
+        return VideoRecorderSettings::BalancedQuality;
     return (VideoRecorderSettings::DecoderQuality)settings.value(QLatin1String("decoderQuality")).toInt();
 }
 
@@ -82,6 +84,8 @@ void VideoRecorderSettings::setDecoderQuality(VideoRecorderSettings::DecoderQual
 
 VideoRecorderSettings::Resolution VideoRecorderSettings::resolution() const
 {
+    if (!settings.contains(QLatin1String("resolution")))
+        return VideoRecorderSettings::ResQuaterNative;
     return (VideoRecorderSettings::Resolution)settings.value(QLatin1String("resolution")).toInt();
 }
 

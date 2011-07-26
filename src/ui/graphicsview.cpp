@@ -1301,16 +1301,12 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
                 menu.addAction(&cm_open_containing_folder);
             }
 
-            
-
-
             if (dev->checkDeviceTypeFlag(CLDevice::RECORDED) && !dev->getUniqueId().contains(getRecordingDir()))
             {
                 menu.addAction(&cm_save_recorded_as);
             }
 
             menu.addAction(&cm_settings);
-
 		}
 
 		if (aitem->getType()==CLAbstractSceneItem::LAYOUT )
@@ -1324,7 +1320,6 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
 		}
 
-		
 	}
     else if (aitem && m_scene.selectedItems().count()>0)
     {
@@ -1332,7 +1327,6 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
         menu.addAction(&cm_remove_from_layout);
         bool haveAtLeastOneNonrecordingCam = false;
         bool haveAtLeastOneRecordingCam = false;
-
 
         foreach(QGraphicsItem* item, m_scene.selectedItems())
         {
@@ -1352,7 +1346,6 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
             if (ca->getDevice()->checkDeviceTypeFlag(CLDevice::RECORDED))
                 continue;
 
-
             CLVideoCamera* cam = static_cast<CLVideoCamera*>(ca);
 
             if (cam->isRecording())
@@ -1367,17 +1360,17 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
         if (haveAtLeastOneRecordingCam )
             menu.addAction(&cm_stop_recording);
 
-
-
     }
     else
     {
         // on void menu...
         if (m_camLayout.getContent() != CLSceneLayoutManager::instance().startScreenLayoutContent())
         {
-            menu.addAction(&cm_start_video_recording);
-            menu.addAction(&cm_recording_settings);
-            menu.addSeparator();
+            QMenu * recordingMenu = new QMenu(tr("Screen Recording"), &menu);
+
+            recordingMenu->addAction(&cm_start_video_recording);
+            recordingMenu->addAction(&cm_recording_settings);
+//            menu.addSeparator();
             menu.addAction(&cm_fitinview);
             menu.addAction(&cm_arrange);
 
@@ -1386,6 +1379,8 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
                 //menu.addAction(&cm_add_layout); // major functions disabled 
                 //menu.addMenu(&layout_editor_menu);
             }
+
+            menu.addMenu(recordingMenu);
 
             bool saved_content = false;
             LayoutContent* current =  m_camLayout.getContent();
@@ -1405,7 +1400,6 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
             if (saved_content)
                 menu.addAction(&cm_restore_layout);
                 
-
             if (m_camLayout.getContent() != CLSceneLayoutManager::instance().getAllLayoutsContent())
             {
                 if (m_camLayout.getContent() != CLSceneLayoutManager::instance().getSearchLayout())
@@ -1421,7 +1415,6 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
         menu.addAction(&cm_preferences);
         menu.addSeparator();
         menu.addAction(&cm_exit);
-
     }
 
     m_menuIsHere = true;
@@ -1435,7 +1428,6 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
 	if (aitem==0) // on void menu
 	{
-
 		if (act== &cm_togglefs)
 		{
 			if (!mMainWnd->isFullScreen())
@@ -1478,8 +1470,6 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
         {
             contextMenuHelper_saveLayout(false);
         }
-
-
 	}
 	else if (aitem && m_scene.selectedItems().count()==0 )// video item single selection
 	{
@@ -1508,12 +1498,10 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
                     if (act == AudioTracks[3])
                         reader->setAudioChannel(3);
                 }
-
             }
 
             if (dev->checkDeviceTypeFlag(CLDevice::ARCHIVE) || dev->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT))
             {
-                
                 if (act == &cm_open_containing_folder)
                 {
                     
@@ -1528,11 +1516,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
                     
                 }
-                
-
             }
-
-
 
 			if (act==&cm_fullscren)
 				toggleFullScreen_helper(aitem);
@@ -1561,7 +1545,6 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
             if (act == &cm_save_recorded_as && cam)
                 contextMenuHelper_saveRecordedAs(cam);
-            
 
 			if (act == &cm_open_web_page&& cam)
 				contextMenuHelper_openInWebBroser(cam);
@@ -1625,7 +1608,6 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
             m_camLayout.removeItems(lst, true);
         }
 
-        
         if (act == &cm_start_recording || act == &cm_stop_recording)
         {
             foreach(QGraphicsItem* item, m_scene.selectedItems())
@@ -1665,18 +1647,13 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
                 {
                     cam->stopRecording();
                 }
-
             }
-
         }
-
     }
-
 
 	QGraphicsView::contextMenuEvent(event);
 	/**/
-    foreach(QAction* action, AudioTracks)
-        delete action;
+    qDeleteAll(AudioTracks);
 }
 
 void GraphicsView::mouseDoubleClickEvent( QMouseEvent * event )
@@ -1742,7 +1719,6 @@ void GraphicsView::mouseDoubleClickEvent( QMouseEvent * event )
 	m_ignore_release_event  = true;
 
 	QGraphicsView::mouseDoubleClickEvent(event);
-
 }
 
 void GraphicsView::dragEnterEvent ( QDragEnterEvent * event )
@@ -1790,20 +1766,20 @@ void GraphicsView::dropEvent ( QDropEvent * event )
 	CLDragAndDropItems items;
 	DDstream2items(dataStream, items);
 
-	foreach(QString id, items.videodevices)
+	foreach (QString id, items.videodevices)
 	{
 		m_camLayout.getContent()->addDevice(id);
 		m_camLayout.addDevice(id, true);
 	}
 
-	foreach(QString id, items.recorders)
+	foreach (const QString &id, items.recorders)
 	{
 		LayoutContent* lc =  CLSceneLayoutManager::instance().createRecorderContent(id);
 		m_camLayout.getContent()->addLayout(lc, false);
 		m_camLayout.addDevice(id, true);
 	}
 
-	foreach(int lcp, items.layoutlinks)
+	foreach (int lcp, items.layoutlinks)
 	{
 		LayoutContent* lc = reinterpret_cast<LayoutContent*>(lcp);
 		LayoutContent* t = m_camLayout.getContent()->addLayout(lc, true);
@@ -1835,7 +1811,6 @@ bool GraphicsView::onUserInput(bool go_unsteady, bool escapeFromintro)
     }
 
     return false;
-
 }
 
 void GraphicsView::goToSteadyMode(bool steady)
@@ -1856,7 +1831,6 @@ void GraphicsView::goToSteadyMode(bool steady)
                 
         }
 
-
         if ((m_seachItem && m_seachItem->hasFocus()) || m_menuIsHere)
         {
             onUserInput(false, false);
@@ -1876,9 +1850,6 @@ void GraphicsView::goToSteadyMode(bool steady)
         {
             m_selectedWnd->goToSteadyMode(true, false);
         }
-
-        
-
     }
     else
     {
@@ -1900,7 +1871,6 @@ void GraphicsView::goToSteadyMode(bool steady)
         {
             m_selectedWnd->goToSteadyMode(false, false);
         }
-
     }
 }
 
@@ -1936,9 +1906,7 @@ void GraphicsView::keyReleaseEvent( QKeyEvent * e )
 
 		m_gridItem->hide(global_grid_aparence_delay);
 		break;
-
 	}
-
 }
 
 void GraphicsView::keyPressEvent( QKeyEvent * e )
@@ -1998,9 +1966,6 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
         case Qt::Key_A:
                 onArrange_helper();
             break;
-
-
-
 	}
 
 	// ===========new item selection 
@@ -2138,7 +2103,6 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 
 	QApplication::sendEvent(scene(), e);
 	//QGraphicsView::keyPressEvent(e);
-
 }
 
 bool GraphicsView::isCTRLPressed(const QInputEvent* event) const
@@ -2164,7 +2128,6 @@ bool GraphicsView::isItemFullScreenZoomed(QGraphicsItem* item)
 
 CLAbstractSceneItem* GraphicsView::navigationItem(QGraphicsItem* item) const
 {
-
 	if (!item)
 		return 0;
 
@@ -2220,7 +2183,6 @@ void GraphicsView::drawBackground ( QPainter * painter, const QRectF & rect )
 	m_animated_bckg->drawBackground(painter, rect);
 
 	if (m_logo) m_logo->setPos(rect.topLeft());
-
 }
 
 CLAbstractUnmovedItem* GraphicsView::staticItemByName(QString name) const
@@ -2279,12 +2241,10 @@ void GraphicsView::updateDecorations()
 	{
 		m_seachItem->resize();
 	}
-
 }
 
 void GraphicsView::recalcSomeParams()
 {
-
 }
 
 void GraphicsView::resizeEvent( QResizeEvent * event )
@@ -2307,13 +2267,11 @@ void GraphicsView::resizeEvent( QResizeEvent * event )
 		fitInView(1000, 0);
 	}
 
-
     QList<CLAbstractSceneItem*> lst = m_camLayout.getItemList();
-	foreach(CLAbstractSceneItem* item, lst)
+	foreach (CLAbstractSceneItem* item, lst)
 	{
 		item->onResize();
 	}
-
 }
 
 CLAbstractSceneItem* GraphicsView::getLastSelectedItem() 
@@ -2327,7 +2285,6 @@ CLAbstractSceneItem* GraphicsView::getLastSelectedItem()
 	}
 
 	return m_camLayout.getGridEngine().getCenterWnd();
-
 }
 
 void GraphicsView::onDecorationItemPressed(QString name)
@@ -2507,7 +2464,6 @@ void GraphicsView::instantArrange()
 		ipos.item->setPos(ipos.pos);
 
 	}
-
 }
 
 void GraphicsView::onArrange_helper()
@@ -2660,7 +2616,7 @@ void GraphicsView::toggleRecording()
         QSettings s;
         s.beginGroup(QLatin1String("videoRecording"));
 
-        QString filePath = getTempRecordingDir() + QString(QLatin1String("video%1.ts")).arg(s.value("counter").toInt() + 1);
+        QString filePath = getTempRecordingDir() + QLatin1String("/video_recording.ts");
 #ifdef Q_OS_WIN
         if (m_desktopEncoder)
             delete m_desktopEncoder;
@@ -2721,7 +2677,8 @@ void GraphicsView::toggleRecording()
         animation->setEndValue(0.0);
         animation->start();
         QTimer::singleShot(3000, label, SLOT(deleteLater()));
-    } else 
+    }
+    else 
     {
         // stop capturing
         cm_start_video_recording.setProperty("recoding", QVariant());
@@ -2732,22 +2689,16 @@ void GraphicsView::toggleRecording()
 
         QSettings settings;
         settings.beginGroup("videoRecording");
-        QString previousFile = settings.value(QLatin1String("previousFile")).toString();
-        previousFile = QFileInfo(previousFile).path() +
-                QDir::separator() +
-                QFileInfo(recordedFileName).baseName();
-
-        QFileInfo fi(previousFile);
+        QString previousDir = settings.value(QLatin1String("previousDir")).toString();
         QString filePath = QFileDialog::getSaveFileName(this,
                                                         tr("Save Recording As"),
-                                                        fi.path(),
+                                                        previousDir,
                                                         tr("Transport Stream (*.ts)"));
 
 		delete m_desktopEncoder;
         m_desktopEncoder = 0;
 
         if (!filePath.isEmpty()) {
-            settings.setValue("counter", settings.value("counter").toInt() + 1);
             QFile::remove(filePath);
             bool result = QFile::rename(recordedFileName, filePath);
             if (!result) {
@@ -2755,8 +2706,10 @@ void GraphicsView::toggleRecording()
                 QFile::remove(recordedFileName);
             }
 
-            settings.setValue(QLatin1String("previousFile"), previousFile);
-        } else {
+            settings.setValue(QLatin1String("previousDir"), QFileInfo(filePath).path());
+        }
+        else
+        {
             QFile::remove(recordedFileName);
         }
         settings.endGroup();
