@@ -2660,7 +2660,7 @@ void GraphicsView::toggleRecording()
         QSettings s;
         s.beginGroup(QLatin1String("videoRecording"));
 
-        QString filePath = getTempRecordingDir() + QString(QLatin1String("video%1.ts")).arg(s.value("counter").toInt() + 1);
+        QString filePath = getTempRecordingDir() + QLatin1String("/video_recording.ts");
 #ifdef Q_OS_WIN
         if (m_desktopEncoder)
             delete m_desktopEncoder;
@@ -2721,7 +2721,8 @@ void GraphicsView::toggleRecording()
         animation->setEndValue(0.0);
         animation->start();
         QTimer::singleShot(3000, label, SLOT(deleteLater()));
-    } else 
+    }
+    else 
     {
         // stop capturing
         cm_start_video_recording.setProperty("recoding", QVariant());
@@ -2742,7 +2743,6 @@ void GraphicsView::toggleRecording()
         m_desktopEncoder = 0;
 
         if (!filePath.isEmpty()) {
-            settings.setValue("counter", settings.value("counter").toInt() + 1);
             QFile::remove(filePath);
             bool result = QFile::rename(recordedFileName, filePath);
             if (!result) {
@@ -2751,7 +2751,9 @@ void GraphicsView::toggleRecording()
             }
 
             settings.setValue(QLatin1String("previousDir"), QFileInfo(filePath).path());
-        } else {
+        }
+        else
+        {
             QFile::remove(recordedFileName);
         }
         settings.endGroup();
