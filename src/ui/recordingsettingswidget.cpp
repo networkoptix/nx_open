@@ -115,6 +115,9 @@ void RecordingSettingsWidget::accept()
     settings->setPrimaryAudioDeviceByName(primaryAudioDeviceName());
     settings->setSecondaryAudioDeviceByName(secondaryAudioDeviceName());
     settings->setCaptureCursor(ui->captureCursorCheckBox->isChecked());
+
+    if (decoderQuality() == VideoRecorderSettings::BestQuality && resolution() == VideoRecorderSettings::ResNative)
+        QMessageBox::information(this, tr("Information"), tr("Very powerful machine is required for such settings"));
 }
 
 void RecordingSettingsWidget::onMonitorChanged(int index)
