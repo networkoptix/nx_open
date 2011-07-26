@@ -17,14 +17,24 @@ DesktopDeviceServer& DesktopDeviceServer::instance()
     return inst;
 }
 
+DesktopDeviceServer::DesktopDeviceServer()
+{
+    m_pD3D = Direct3DCreate9(D3D_SDK_VERSION);
+}
+
+DesktopDeviceServer::~DesktopDeviceServer()
+{
+    m_pD3D->Release();
+}
+
 CLDeviceList DesktopDeviceServer::findDevices()
 {
     CLDeviceList result;
 
-    D3DDISPLAYMODE ddm;
-    IDirect3D9*			pD3D;
-    if((pD3D=Direct3DCreate9(D3D_SDK_VERSION))==NULL)
+    if (m_pD3D == 0)
         return result;
+
+    D3DDISPLAYMODE ddm;
 
     for(int i = 0;; i++)
     {
@@ -32,16 +42,14 @@ CLDeviceList DesktopDeviceServer::findDevices()
 #ifdef ONLY_PRIMARY_DESKTOP
         needBreak = i > 0;
 #endif
-        if(needBreak || FAILED(pD3D->GetAdapterDisplayMode(i,&ddm)))
-        {
-            pD3D->Release();
-            return result;
-        }
+        if(needBreak || FAILED(m_pD3D->GetAdapterDisplayMode(i,&ddm)))
+            break;
 
         CLDevice* dev = new CLDesktopDevice();
         dev->setUniqueId(QString("Desktop")+QString::number(i+1));
         result[dev->getUniqueId()] = dev;
-    }    
+    }
+    return result;
 }
 
 #endif // Q_OS_WIN
