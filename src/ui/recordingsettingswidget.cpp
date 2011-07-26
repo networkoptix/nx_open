@@ -50,6 +50,8 @@ RecordingSettingsWidget::RecordingSettingsWidget(QWidget *parent) :
     ui->captureCursorCheckBox->setChecked(settings->captureCursor());
 
     connect(ui->screenComboBox, SIGNAL(currentIndexChanged(int)), SLOT(onMonitorChanged(int)));
+    ui->label_primaryDeviceIcon->setPixmap(QPixmap(":/skin/sound.png").scaled(24, 24));
+    ui->label_secondaryDeviceIcon->setPixmap(QPixmap(":/skin/microphone.png").scaled(24, 24));
 }
 
 RecordingSettingsWidget::~RecordingSettingsWidget()
