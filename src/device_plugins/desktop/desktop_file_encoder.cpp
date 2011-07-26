@@ -1,12 +1,13 @@
-#include "desktop_file_encoder.h"
+#include <QAudioInput>
 #include <intrin.h>
 
-#include <QAudioInput>
+#include "desktop_file_encoder.h"
+//#include "dsp_effects/denoiser.h"
 
 static const int DEFAULT_VIDEO_STREAM_ID = 4113;
 static const int DEFAULT_AUDIO_STREAM_ID = 4351;
 static const int AUDIO_QUEUE_MAX_SIZE = 256;
-static const int AUDIO_CAUPTURE_FREQUENCY = 22050;
+static const int AUDIO_CAUPTURE_FREQUENCY = 44100;
 static const int BASE_BITRATE = 1000 * 1000 * 8; // bitrate for best quality for fullHD mode;
 
 static const int MAX_VIDEO_JITTER = 2;
@@ -282,7 +283,8 @@ DesktopFileEncoder::DesktopFileEncoder (
     m_tmpAudioBuffer2(CL_MEDIA_ALIGNMENT, FF_MIN_BUFFER_SIZE),
     m_widget(glWidget),
     m_videoPacketWrited(false),
-    m_encodedAudioBuf(0)
+    m_encodedAudioBuf(0),
+    m_speexPreprocess(0)
 {
     m_useAudio = audioDevice || audioDevice2;
     m_useSecondaryAudio = audioDevice && audioDevice2 && audioDevice->deviceName() != audioDevice2->deviceName();
@@ -532,6 +534,16 @@ bool DesktopFileEncoder::init()
         }
         m_audioFrameDuration = m_audioCodecCtx->frame_size / (double) m_audioCodecCtx->sample_rate;
         m_audioFrameDuration *= m_audioOutStream->time_base.den / (double) m_audioOutStream->time_base.num;
+
+        //m_denoiser = new AudioDenoiser(m_audioCodecCtx->frame_size * m_audioCodecCtx->channels);
+        m_speexPreprocess = speex_preprocess_state_init(m_audioCodecCtx->frame_size * m_audioCodecCtx->channels, m_audioCodecCtx->sample_rate);
+        int denoiseEnabled = 1;
+        int agcEnabled = 1;
+        float agcLevel = 16000;
+        speex_preprocess_ctl(m_speexPreprocess, SPEEX_PREPROCESS_SET_DENOISE, &denoiseEnabled);
+        speex_preprocess_ctl(m_speexPreprocess, SPEEX_PREPROCESS_SET_AGC, &agcEnabled);
+        speex_preprocess_ctl(m_speexPreprocess, SPEEX_PREPROCESS_SET_AGC_LEVEL, &agcLevel);
+
         
         // 50 ms as max jitter
         // QT uses 25fps timer for audio grabbing, so jitter 40ms + 10ms reserved.
@@ -619,6 +631,8 @@ int DesktopFileEncoder::processData(bool flush)
         // todo: add audio resample here
 
         short* buffer1 = (short*) audioData->data.data();
+        speex_preprocess(m_speexPreprocess, buffer1, NULL);
+
         if (m_useSecondaryAudio)
         {
             CLAbstractMediaData* audioData2;
@@ -785,6 +799,10 @@ void DesktopFileEncoder::closeStream()
     if (m_encodedAudioBuf)
         av_free(m_encodedAudioBuf);
     m_encodedAudioBuf = 0;
+
+    if (m_speexPreprocess)
+        speex_preprocess_state_destroy(m_speexPreprocess);
+    m_speexPreprocess = 0;
 
     m_initialized = false;
 }
