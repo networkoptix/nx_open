@@ -6,6 +6,7 @@
 static const int DEFAULT_VIDEO_STREAM_ID = 4113;
 static const int DEFAULT_AUDIO_STREAM_ID = 4351;
 static const int AUDIO_QUEUE_MAX_SIZE = 256;
+static const int AUDIO_CAUPTURE_FREQUENCY = 22050;
 static const int BASE_BITRATE = 1000 * 1000 * 8; // bitrate for best quality for fullHD mode;
 
 static const int MAX_VIDEO_JITTER = 2;
@@ -459,7 +460,7 @@ bool DesktopFileEncoder::init()
     {
         qDebug() << m_audioDevice.deviceName();
         m_audioFormat = m_audioDevice.preferredFormat();
-        m_audioFormat.setSampleRate(48000);
+        m_audioFormat.setSampleRate(AUDIO_CAUPTURE_FREQUENCY);
         m_audioFormat.setSampleSize(16);
         m_audioFormat.setChannels(2);
         m_audioFormat.setSampleType(QAudioFormat::SignedInt);
@@ -478,7 +479,7 @@ bool DesktopFileEncoder::init()
         if (m_useSecondaryAudio)
         {
             m_audioFormat2 = m_audioDevice2.preferredFormat();
-            m_audioFormat2.setSampleRate(48000);
+            m_audioFormat2.setSampleRate(AUDIO_CAUPTURE_FREQUENCY);
             m_audioFormat2.setSampleSize(16);
             m_audioFormat2.setChannels(2);
             m_audioFormat2.setSampleType(QAudioFormat::SignedInt);

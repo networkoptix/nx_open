@@ -3,12 +3,14 @@
 
 #include "../../../device/deviceserver.h"
 
+class IDirect3D9;
+
 class DesktopDeviceServer : public CLDeviceServer
 {
-    DesktopDeviceServer() {}
+    DesktopDeviceServer();
 public:
 
-    ~DesktopDeviceServer() {}
+    ~DesktopDeviceServer();
 
     static DesktopDeviceServer& instance();
 
@@ -19,6 +21,7 @@ public:
     // returns all available devices 
     virtual CLDeviceList findDevices();
 private:
+    IDirect3D9*			m_pD3D;
 };
 
 #endif // __DESKTOP_DEVICE_SERVER_H

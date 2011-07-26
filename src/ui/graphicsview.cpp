@@ -2543,7 +2543,7 @@ int screenToAdapter(int screen)
     if((pD3D=Direct3DCreate9(D3D_SDK_VERSION))==NULL)
         return 0;
 
-    QRect rect = qApp->desktop()->screen(screen)->geometry();
+    QRect rect = qApp->desktop()->screenGeometry(screen);
     MONITORINFO monInfo;
     memset(&monInfo, 0, sizeof(monInfo));
     monInfo.cbSize = sizeof(monInfo);
