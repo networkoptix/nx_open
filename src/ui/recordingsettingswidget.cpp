@@ -56,7 +56,7 @@ RecordingSettingsWidget::RecordingSettingsWidget(QWidget *parent) :
 
 #ifdef Q_OS_WIN
     ui->disableAeroCheckBox->setEnabled(false);
-    typedef HRESULT (*DwmIsCompositionEnabled)(BOOL*);
+    typedef HRESULT (WINAPI *DwmIsCompositionEnabled)(BOOL*);
     QLibrary lib("Dwmapi");
     bool ok = lib.load();
     if (!ok)
