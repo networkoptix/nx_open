@@ -6,6 +6,7 @@
 #include <QtGui/QDesktopWidget>
 #include <QtGui/QFileDialog>
 #include "QtMultimedia/QAudioDeviceInfo"
+#include "../device_plugins/desktop/win_audio_helper.h"
 
 RecordingSettingsWidget::RecordingSettingsWidget(QWidget *parent) :
     QWidget(parent),
@@ -41,8 +42,8 @@ RecordingSettingsWidget::RecordingSettingsWidget(QWidget *parent) :
     setScreen(settings->screen());
 
     foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {
-        ui->primaryAudioDeviceComboBox->addItem(info.deviceName());
-        ui->secondaryAudioDeviceComboBox->addItem(info.deviceName());
+        ui->primaryAudioDeviceComboBox->addItem(WinAudioExtendInfo(info.deviceName()).fullName());
+        ui->secondaryAudioDeviceComboBox->addItem(WinAudioExtendInfo(info.deviceName()).fullName());
     }
     setPrimaryAudioDeviceName(settings->primaryAudioDevice().deviceName());
     setSecondaryAudioDeviceName(settings->secondaryAudioDevice().deviceName());
@@ -185,7 +186,7 @@ QString RecordingSettingsWidget::primaryAudioDeviceName() const
 void RecordingSettingsWidget::setPrimaryAudioDeviceName(const QString &name)
 {
     for (int i = 0; i < ui->primaryAudioDeviceComboBox->count(); i++) {
-        if (ui->primaryAudioDeviceComboBox->itemText(i) == name)
+        if (ui->primaryAudioDeviceComboBox->itemText(i).startsWith(name))
             ui->primaryAudioDeviceComboBox->setCurrentIndex(i);
     }
 }
@@ -198,7 +199,7 @@ QString RecordingSettingsWidget::secondaryAudioDeviceName() const
 void RecordingSettingsWidget::setSecondaryAudioDeviceName(const QString &name)
 {
     for (int i = 0; i < ui->secondaryAudioDeviceComboBox->count(); i++) {
-        if (ui->secondaryAudioDeviceComboBox->itemText(i) == name)
+        if (ui->secondaryAudioDeviceComboBox->itemText(i).startsWith(name))
             ui->secondaryAudioDeviceComboBox->setCurrentIndex(i);
     }
 }

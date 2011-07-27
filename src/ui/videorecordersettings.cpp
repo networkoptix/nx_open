@@ -24,9 +24,10 @@ QAudioDeviceInfo getDeviceByName(const QString &name, QAudio::Mode mode, bool *i
         return QAudioDeviceInfo();
 
     foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(mode)) {
-        if (info.deviceName() == name)
+        if (info.deviceName().startsWith(name))
             return info;
     }
+
     if (isDefault)
         *isDefault = true;
     return QAudioDeviceInfo::defaultInputDevice();
