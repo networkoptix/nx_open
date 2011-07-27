@@ -30,7 +30,7 @@ WinAudioExtendInfo::WinAudioExtendInfo(const QString& deviceName)
         );
     if (hr != S_OK) return;
 
-    hr = m_pMMDeviceEnumerator->EnumAudioEndpoints(eCapture, DEVICE_STATE_ACTIVE, &ppDevices);
+    hr = m_pMMDeviceEnumerator->EnumAudioEndpoints(eAll, DEVICE_STATE_ACTIVE, &ppDevices);
     if (hr != S_OK) return;
 
     UINT count;
