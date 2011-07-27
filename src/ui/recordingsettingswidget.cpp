@@ -31,12 +31,12 @@ RecordingSettingsWidget::RecordingSettingsWidget(QWidget *parent) :
             ui->screenComboBox->addItem(tr("Screen %1 - %2x%3 (Primary)").
                                         arg(i + 1).
                                         arg(geometry.width()).
-                                        arg(geometry.height()));
+                                        arg(geometry.height()), i);
         } else {
             ui->screenComboBox->addItem(tr("Screen %1 - %2x%3").
                                         arg(i + 1).
                                         arg(geometry.width()).
-                                        arg(geometry.height()));
+                                        arg(geometry.height()), i);
         }
     }
     setScreen(settings->screen());
@@ -76,7 +76,7 @@ RecordingSettingsWidget::RecordingSettingsWidget(QWidget *parent) :
         ui->screenComboBox->addItem(tr("Screen %1 - %2x%3 (Primary)").
                                     arg(screen).
                                     arg(geometry.width()).
-                                    arg(geometry.height()));
+                                    arg(geometry.height()), screen);
     } else {
         ui->disableAeroCheckBox->setEnabled(true);
     }
@@ -169,7 +169,7 @@ void RecordingSettingsWidget::onMonitorChanged(int index)
 
 int RecordingSettingsWidget::screen() const
 {
-    return ui->screenComboBox->currentIndex();
+    return ui->screenComboBox->itemData(ui->screenComboBox->currentIndex()).toInt();
 }
 
 void RecordingSettingsWidget::setScreen(int screen)
@@ -214,7 +214,7 @@ void RecordingSettingsWidget::onDisableAeroChecked(bool enabled)
         ui->screenComboBox->addItem(tr("Screen %1 - %2x%3 (Primary)").
                                     arg(screen).
                                     arg(geometry.width()).
-                                    arg(geometry.height()));
+                                    arg(geometry.height()), screen);
     } else {
         ui->screenComboBox->clear();
         for (int i = 0; i < desktop->screenCount(); i++) {
@@ -223,12 +223,12 @@ void RecordingSettingsWidget::onDisableAeroChecked(bool enabled)
                ui->screenComboBox->addItem(tr("Screen %1 - %2x%3 (Primary)").
                                         arg(i + 1).
                                         arg(geometry.width()).
-                                        arg(geometry.height()));
+                                        arg(geometry.height()), i);
             } else {
                 ui->screenComboBox->addItem(tr("Screen %1 - %2x%3").
                                         arg(i + 1).
                                         arg(geometry.width()).
-                                        arg(geometry.height()));
+                                        arg(geometry.height()), i);
             }
         }
     }
