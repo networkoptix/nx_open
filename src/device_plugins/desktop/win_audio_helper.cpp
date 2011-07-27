@@ -1,0 +1,167 @@
+#include <INITGUID.H>
+#include <ks.h>
+#include <ksmedia.h>
+#include <Strsafe.h>
+#include <devpkey.h>
+#include <mmdeviceapi.h>
+#include "win_audio_helper.h"
+
+#include <dsound.h>
+#include <mmsystem.h>
+#include <mmdeviceapi.h>
+#include <functiondiscoverykeys_devpkey.h>
+
+#include "util.h"
+#include "Propvarutil.h"
+
+DEFINE_PROPERTYKEY(PKEY_AudioEndpoint_JackSubType,0x1da5d803,0xd492,0x4edd,0x8c,0x23,0xe0,0xc0,0xff,0xee,0x7f,0x0e,8);
+
+WinAudioExtendInfo::WinAudioExtendInfo(const QString& deviceName)
+{
+    IMMDeviceCollection *ppDevices;
+    HRESULT hr;
+
+    CoInitialize(0);
+
+    hr = CoCreateInstance(
+        __uuidof(MMDeviceEnumerator), NULL, CLSCTX_ALL, 
+        __uuidof(IMMDeviceEnumerator),
+        (void**)&m_pMMDeviceEnumerator
+        );
+    if (hr != S_OK) return;
+
+    hr = m_pMMDeviceEnumerator->EnumAudioEndpoints(eAll, DEVICE_STATE_ACTIVE, &ppDevices);
+    if (hr != S_OK) return;
+
+    UINT count;
+    hr = ppDevices->GetCount(&count);
+    if (hr != S_OK) return;
+    for (UINT i = 0; i < count; i++) 
+    {
+        IMMDevice *pMMDevice;
+        hr = ppDevices->Item(i, &pMMDevice);
+        if (hr != S_OK) return;
+        IPropertyStore *pPropertyStore;
+        hr = pMMDevice->OpenPropertyStore(STGM_READ, &pPropertyStore);
+        if (hr != S_OK) continue;
+
+        PROPVARIANT pv; PropVariantInit(&pv);
+        hr = pPropertyStore->GetValue(PKEY_Device_FriendlyName, &pv);
+        if (hr != S_OK) continue;
+        QString name((QChar*) pv.piVal);
+        if (!name.startsWith(deviceName))
+            continue;
+        m_fullName = name;
+
+        hr = pPropertyStore->GetValue(PKEY_AudioEndpoint_JackSubType, &pv);
+        if (hr != S_OK) break;
+        PropVariantToGUID(pv, &m_jackSubType);
+        
+        hr = pPropertyStore->GetValue(PKEY_DeviceClass_IconPath, &pv);
+        if (hr != S_OK) break;
+        m_iconPath = QString((QChar*) pv.piVal);
+        break;
+    }
+}
+
+WinAudioExtendInfo::~WinAudioExtendInfo()
+{
+    m_pMMDeviceEnumerator->Release();
+}
+
+QPixmap WinAudioExtendInfo::deviceIcon() const
+{
+    QStringList params = m_iconPath.split(',');
+    if (params.size() < 2)
+        return 0;
+
+    int persent1 = params[0].indexOf('%');
+    while (persent1 >= 0)
+    {
+        int persent2 = params[0].indexOf('%', persent1+1);
+        if (persent2 > persent1)
+        {
+            QString metaVal = params[0].mid(persent1, persent2-persent1+1);
+            QString val = getenv(metaVal.mid(1, metaVal.length()-2).toLocal8Bit().constData());
+            params[0].replace(metaVal, val);
+        }
+        persent1 = params[0].indexOf('%');
+    }
+
+    HMODULE library = LoadLibrary((LPCWSTR) params[0].constData());
+    if (library < 0)
+        return false;
+    int resNumber = qAbs(params[1].toInt());
+    HICON hIcon = LoadIcon(library, MAKEINTRESOURCE(resNumber));
+    return QPixmap::fromWinHICON( hIcon);
+}
+
+
+bool WinAudioExtendInfo::isMicrophone() const
+{
+    const GUID MicrophoneGUIDS[] = 
+    {
+        KSNODETYPE_MICROPHONE,
+        KSNODETYPE_DESKTOP_MICROPHONE,
+        KSNODETYPE_PERSONAL_MICROPHONE,
+        KSNODETYPE_OMNI_DIRECTIONAL_MICROPHONE,
+        KSNODETYPE_MICROPHONE_ARRAY,
+        KSNODETYPE_PROCESSING_MICROPHONE_ARRAY,
+        KSNODETYPE_HEADSET_MICROPHONE,
+        KSAUDFNAME_ALTERNATE_MICROPHONE,
+        KSNODETYPE_PROCESSING_MICROPHONE_ARRAY,
+
+        KSAUDFNAME_LINE_IN_VOLUME,
+        KSAUDFNAME_LINE_IN
+
+
+    };
+
+    for (int i = 0; i < arraysize(MicrophoneGUIDS); ++i)
+    {
+        if (MicrophoneGUIDS[i] == m_jackSubType)
+            return true;
+    }
+
+    // device type unknown. try to check device name
+    return m_fullName.toLower().contains("microphone");
+}
+
+
+
+
+
+/*
+DWORD propCount = 0;
+hr = pPropertyStore->GetCount(&propCount);
+
+PROPVARIANT pv; PropVariantInit(&pv);
+hr = pPropertyStore->GetValue(PKEY_Device_FriendlyName, &pv);
+hr = pPropertyStore->GetValue(PKEY_Device_DeviceDesc, &pv);
+
+hr = pPropertyStore->GetValue(PKEY_AudioEndpoint_JackSubType, &pv);
+hr = pPropertyStore->GetValue(PKEY_DeviceClass_IconPath, &pv);
+hr = pPropertyStore->GetValue(PKEY_DeviceClass_DevType, &pv);
+hr = pPropertyStore->GetValue(PKEY_DeviceClass_Name, &pv);
+
+
+hr = pPropertyStore->GetValue(PKEY_Device_Service, &pv);
+hr = pPropertyStore->GetValue(PKEY_Device_Class, &pv);
+hr = pPropertyStore->GetValue(PKEY_Device_PDOName, &pv);
+hr = pPropertyStore->GetValue(PKEY_Device_DevType, &pv);
+hr = pPropertyStore->GetValue(PKEY_Device_CompatibleIds, &pv);
+PropVariantInit(&pv);
+hr = pPropertyStore->GetValue(PKEY_AudioEndpoint_Association, &pv);
+
+//hr = pPropertyStore->GetValue(KSPROPSETID_Pin, &pv);
+
+for (int j = 0; j < propCount; ++j)
+{
+PROPERTYKEY pkey;
+hr = pPropertyStore->GetAt(j, &pkey);
+PropVariantInit(&pv);
+hr = pPropertyStore->GetValue(pkey, &pv);
+
+int gg = 4;
+}
+*/
