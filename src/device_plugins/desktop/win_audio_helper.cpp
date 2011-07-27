@@ -16,10 +16,37 @@
 
 DEFINE_PROPERTYKEY(PKEY_AudioEndpoint_JackSubType,0x1da5d803,0xd492,0x4edd,0x8c,0x23,0xe0,0xc0,0xff,0xee,0x7f,0x0e,8);
 
+bool WinAudioExtendInfo::getDeviceInfo(IMMDevice *pMMDevice, bool isDefault)
+{
+    IPropertyStore *pPropertyStore;
+    HRESULT hr = pMMDevice->OpenPropertyStore(STGM_READ, &pPropertyStore);
+    if (hr != S_OK) return false;
+
+    PROPVARIANT pv; PropVariantInit(&pv);
+    hr = pPropertyStore->GetValue(PKEY_Device_FriendlyName, &pv);
+    if (hr != S_OK) return false;
+    QString name((QChar*) pv.piVal);
+    if (!isDefault && !name.startsWith(m_deviceName))
+        return false;
+    m_fullName = name;
+
+    hr = pPropertyStore->GetValue(PKEY_AudioEndpoint_JackSubType, &pv);
+    if (hr != S_OK) return false;
+    PropVariantToGUID(pv, &m_jackSubType);
+
+    hr = pPropertyStore->GetValue(PKEY_DeviceClass_IconPath, &pv);
+    if (hr != S_OK) return false;
+    m_iconPath = QString((QChar*) pv.piVal);
+    
+    return true;
+}
+
 WinAudioExtendInfo::WinAudioExtendInfo(const QString& deviceName)
 {
+    m_deviceName = deviceName;
     IMMDeviceCollection *ppDevices;
     HRESULT hr;
+    IMMDevice *pMMDevice;
 
     CoInitialize(0);
 
@@ -30,7 +57,14 @@ WinAudioExtendInfo::WinAudioExtendInfo(const QString& deviceName)
         );
     if (hr != S_OK) return;
 
-    hr = m_pMMDeviceEnumerator->EnumAudioEndpoints(eAll, DEVICE_STATE_ACTIVE, &ppDevices);
+    if (deviceName.toLower() == "default")
+    {
+        m_pMMDeviceEnumerator->GetDefaultAudioEndpoint(eCapture, eMultimedia, &pMMDevice);
+        getDeviceInfo(pMMDevice, true);
+    }
+
+
+    hr = m_pMMDeviceEnumerator->EnumAudioEndpoints(eCapture, DEVICE_STATE_ACTIVE, &ppDevices);
     if (hr != S_OK) return;
 
     UINT count;
@@ -38,29 +72,10 @@ WinAudioExtendInfo::WinAudioExtendInfo(const QString& deviceName)
     if (hr != S_OK) return;
     for (UINT i = 0; i < count; i++) 
     {
-        IMMDevice *pMMDevice;
         hr = ppDevices->Item(i, &pMMDevice);
         if (hr != S_OK) return;
-        IPropertyStore *pPropertyStore;
-        hr = pMMDevice->OpenPropertyStore(STGM_READ, &pPropertyStore);
-        if (hr != S_OK) continue;
-
-        PROPVARIANT pv; PropVariantInit(&pv);
-        hr = pPropertyStore->GetValue(PKEY_Device_FriendlyName, &pv);
-        if (hr != S_OK) continue;
-        QString name((QChar*) pv.piVal);
-        if (!name.startsWith(deviceName))
-            continue;
-        m_fullName = name;
-
-        hr = pPropertyStore->GetValue(PKEY_AudioEndpoint_JackSubType, &pv);
-        if (hr != S_OK) break;
-        PropVariantToGUID(pv, &m_jackSubType);
-        
-        hr = pPropertyStore->GetValue(PKEY_DeviceClass_IconPath, &pv);
-        if (hr != S_OK) break;
-        m_iconPath = QString((QChar*) pv.piVal);
-        break;
+        if (getDeviceInfo(pMMDevice, false))
+            break;
     }
 }
 
