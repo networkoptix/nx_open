@@ -7,7 +7,7 @@
 
 #include "device_plugins/desktop/buffered_screen_grabber.h"
 #include "data/mediadata.h"
-
+#include <dsp_effects/speex/speex_preprocess.h>
 
 class CaptureAudioStream;
 
@@ -108,6 +108,7 @@ private:
     QWidget* m_widget;
     bool m_videoPacketWrited;
     QString m_lastErrorStr;
+    SpeexPreprocessState* m_speexPreprocess;
 };
 
 #endif //__DESKTOP_H264_STREAM_READER_H

@@ -16,8 +16,10 @@ VideoRecorderSettings::~VideoRecorderSettings()
     settings.endGroup();
 }
 
-QAudioDeviceInfo getDeviceByName(const QString &name, QAudio::Mode mode)
+QAudioDeviceInfo getDeviceByName(const QString &name, QAudio::Mode mode, bool *isDefault = 0)
 {
+    if (isDefault)
+        *isDefault = false;
     if (name == QObject::tr("None"))
         return QAudioDeviceInfo();
 
@@ -25,6 +27,8 @@ QAudioDeviceInfo getDeviceByName(const QString &name, QAudio::Mode mode)
         if (info.deviceName() == name)
             return info;
     }
+    if (isDefault)
+        *isDefault = true;
     return QAudioDeviceInfo::defaultInputDevice();
 }
 
@@ -40,6 +44,17 @@ void VideoRecorderSettings::setPrimaryAudioDeviceByName(const QString &audioDevi
 
 QAudioDeviceInfo VideoRecorderSettings::secondaryAudioDevice() const
 {
+    QAudioDeviceInfo result;
+    bool isDefault = true;
+    if (isDefault)
+        result = getDeviceByName(QLatin1String("Rec. Playback"), QAudio::AudioInput, &isDefault);
+    if (isDefault)
+        result = getDeviceByName(QLatin1String("Stereo mix"), QAudio::AudioInput, &isDefault);
+    if (isDefault)
+        result = getDeviceByName(QLatin1String("What you hear"), QAudio::AudioInput, &isDefault);
+    if (!isDefault)
+        return result;
+
     return getDeviceByName(settings.value(QLatin1String("secondaryAudioDevice")).toString(), QAudio::AudioInput);
 }
 
