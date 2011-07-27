@@ -53,7 +53,7 @@ private:
     int calculateBitrate();
     int processData(bool flush);
     void stopCapturing();
-
+    SpeexPreprocessState* createSpeexPreprocess();
 private:
     int m_encodedFrames;
     CLBufferedScreenGrabber* m_grabber;
@@ -109,6 +109,7 @@ private:
     bool m_videoPacketWrited;
     QString m_lastErrorStr;
     SpeexPreprocessState* m_speexPreprocess;
+    SpeexPreprocessState* m_speexPreprocess2;
 };
 
 #endif //__DESKTOP_H264_STREAM_READER_H

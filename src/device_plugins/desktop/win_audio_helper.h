@@ -1,6 +1,7 @@
 #include <QString>
 
 class IMMDeviceEnumerator;
+class IMMDevice;
 
 class WinAudioExtendInfo
 {
@@ -12,6 +13,9 @@ public:
     bool isMicrophone() const;
     QPixmap deviceIcon() const;
 private:
+    bool getDeviceInfo(IMMDevice *pMMDevice, bool isDefault);
+private:
+    QString m_deviceName;
     QString m_fullName;
     GUID m_jackSubType;
     QString m_iconPath;

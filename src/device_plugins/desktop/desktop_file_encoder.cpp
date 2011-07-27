@@ -21,6 +21,7 @@ extern "C"
 }
 
 #include "data/mediadata.h"
+#include "win_audio_helper.h"
 
 // mux audio 1 and audio 2 to audio1 buffer
 // I have used intrisicts for SSE. It is portable for MSVC, GCC (mac, linux), Intel compiler
@@ -284,7 +285,8 @@ DesktopFileEncoder::DesktopFileEncoder (
     m_widget(glWidget),
     m_videoPacketWrited(false),
     m_encodedAudioBuf(0),
-    m_speexPreprocess(0)
+    m_speexPreprocess(0),
+    m_speexPreprocess2(0)
 {
     m_useAudio = audioDevice || audioDevice2;
     m_useSecondaryAudio = audioDevice && audioDevice2 && audioDevice->deviceName() != audioDevice2->deviceName();
@@ -330,6 +332,19 @@ int DesktopFileEncoder::calculateBitrate()
     bitrate *= m_encodeQualuty;
     
     return bitrate;
+}
+
+SpeexPreprocessState* DesktopFileEncoder::createSpeexPreprocess()
+{
+    SpeexPreprocessState* speexPreprocess;
+    speexPreprocess = speex_preprocess_state_init(m_audioCodecCtx->frame_size * m_audioCodecCtx->channels, m_audioCodecCtx->sample_rate);
+    int denoiseEnabled = 1;
+    int agcEnabled = 1;
+    float agcLevel = 16000;
+    speex_preprocess_ctl(speexPreprocess, SPEEX_PREPROCESS_SET_DENOISE, &denoiseEnabled);
+    speex_preprocess_ctl(speexPreprocess, SPEEX_PREPROCESS_SET_AGC, &agcEnabled);
+    speex_preprocess_ctl(speexPreprocess, SPEEX_PREPROCESS_SET_AGC_LEVEL, &agcLevel);
+    return speexPreprocess;
 }
 
 bool DesktopFileEncoder::init()
@@ -535,23 +550,23 @@ bool DesktopFileEncoder::init()
         m_audioFrameDuration = m_audioCodecCtx->frame_size / (double) m_audioCodecCtx->sample_rate;
         m_audioFrameDuration *= m_audioOutStream->time_base.den / (double) m_audioOutStream->time_base.num;
 
-        //m_denoiser = new AudioDenoiser(m_audioCodecCtx->frame_size * m_audioCodecCtx->channels);
-        m_speexPreprocess = speex_preprocess_state_init(m_audioCodecCtx->frame_size * m_audioCodecCtx->channels, m_audioCodecCtx->sample_rate);
-        int denoiseEnabled = 1;
-        int agcEnabled = 1;
-        float agcLevel = 16000;
-        speex_preprocess_ctl(m_speexPreprocess, SPEEX_PREPROCESS_SET_DENOISE, &denoiseEnabled);
-        speex_preprocess_ctl(m_speexPreprocess, SPEEX_PREPROCESS_SET_AGC, &agcEnabled);
-        speex_preprocess_ctl(m_speexPreprocess, SPEEX_PREPROCESS_SET_AGC_LEVEL, &agcLevel);
-
         
+        WinAudioExtendInfo extInfo(m_audioDevice.deviceName());
+        if (extInfo.isMicrophone())
+            m_speexPreprocess = createSpeexPreprocess();
+
         // 50 ms as max jitter
         // QT uses 25fps timer for audio grabbing, so jitter 40ms + 10ms reserved.
         m_maxAudioJitter = m_audioOutStream->time_base.den / m_audioOutStream->time_base.num / 20; 
 
         m_audioInput = new QAudioInput ( m_audioDevice, m_audioFormat);
-        if (m_useSecondaryAudio)
+        if (m_useSecondaryAudio) 
+        {
+            WinAudioExtendInfo extInfo(m_audioDevice2.deviceName());
+            if (extInfo.isMicrophone())
+                m_speexPreprocess2 = createSpeexPreprocess();
             m_audioInput2 = new QAudioInput ( m_audioDevice2, m_audioFormat2);
+        }
         //m_audioInput->moveToThread(QApplication::instance()->thread());
 
         m_audioOStream = new CaptureAudioStream(this);
@@ -640,13 +655,16 @@ int DesktopFileEncoder::processData(bool flush)
         // todo: add audio resample here
 
         short* buffer1 = (short*) audioData->data.data();
-        speex_preprocess(m_speexPreprocess, buffer1, NULL);
+        if (m_speexPreprocess)
+            speex_preprocess(m_speexPreprocess, buffer1, NULL);
 
         if (m_useSecondaryAudio)
         {
             CLAbstractMediaData* audioData2;
             m_secondAudioQueue.pop(audioData2);
             short* buffer2 = (short*) audioData2->data.data();
+            if (m_speexPreprocess2)
+                speex_preprocess(m_speexPreprocess2, buffer2, NULL);
 
             int stereoPacketSize = m_audioCodecCtx->frame_size * 2 * m_audioFormat.sampleSize()/8;
             /*
@@ -812,6 +830,10 @@ void DesktopFileEncoder::closeStream()
     if (m_speexPreprocess)
         speex_preprocess_state_destroy(m_speexPreprocess);
     m_speexPreprocess = 0;
+
+    if (m_speexPreprocess2)
+        speex_preprocess_state_destroy(m_speexPreprocess2);
+    m_speexPreprocess2 = 0;
 
     m_initialized = false;
 }
