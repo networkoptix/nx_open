@@ -40,6 +40,7 @@ public slots:
 
 private slots:
     void onMonitorChanged(int);
+    void onDisableAeroChecked(bool);
 
 private:
     Ui::RecordingSettings *ui;
