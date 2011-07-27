@@ -14,9 +14,9 @@ RecordingSettingsWidget::RecordingSettingsWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 #ifndef Q_OS_WIN
-    ui->fullscreenNoAeroButton->setVisible(false);
+    ui->disableAeroCheckBox->setVisible(false);
 #else
-    ui->fullscreenNoAeroButton->setEnabled(true);
+    ui->disableAeroCheckBox->setEnabled(true);
 #endif
 
     setCaptureMode(settings->captureMode());
@@ -52,6 +52,34 @@ RecordingSettingsWidget::RecordingSettingsWidget(QWidget *parent) :
     connect(ui->screenComboBox, SIGNAL(currentIndexChanged(int)), SLOT(onMonitorChanged(int)));
     ui->label_primaryDeviceIcon->setPixmap(QPixmap(":/skin/sound.png").scaled(24, 24));
     ui->label_secondaryDeviceIcon->setPixmap(QPixmap(":/skin/microphone.png").scaled(24, 24));
+
+#ifdef Q_OS_WIN
+    ui->disableAeroCheckBox->setEnabled(false);
+    typedef HRESULT (*DwmIsCompositionEnabled)(BOOL*);
+    QLibrary lib("Dwmapi");
+    bool ok = lib.load();
+    if (!ok)
+        return;
+
+    BOOL enabled = true;
+    DwmIsCompositionEnabled f = (DwmIsCompositionEnabled)lib.resolve("DwmIsCompositionEnabled");
+    if (!f) {
+        return;
+    }
+    
+    f(&enabled);
+    if (!enabled) {
+        ui->screenComboBox->clear();
+        int screen = desktop->primaryScreen();
+        QRect geometry = desktop->screenGeometry(screen);
+        ui->screenComboBox->addItem(tr("Screen %1 - %2x%3 (Primary)").
+                                    arg(screen).
+                                    arg(geometry.width()).
+                                    arg(geometry.height()));
+    } else {
+        ui->disableAeroCheckBox->setEnabled(true);
+    }
+#endif
 }
 
 RecordingSettingsWidget::~RecordingSettingsWidget()
@@ -61,9 +89,9 @@ RecordingSettingsWidget::~RecordingSettingsWidget()
 
 VideoRecorderSettings::CaptureMode RecordingSettingsWidget::captureMode() const
 {
-    if (ui->fullscreenButton->isChecked())
+    if (ui->fullscreenButton->isChecked() && !ui->disableAeroCheckBox->isChecked())
         return VideoRecorderSettings::FullScreenMode;
-    else if (ui->fullscreenNoAeroButton->isChecked())
+    else if (ui->fullscreenButton->isChecked() && ui->disableAeroCheckBox->isChecked())
         return VideoRecorderSettings::FullScreenNoeroMode;
     else
         return VideoRecorderSettings::WindowMode;
@@ -74,9 +102,11 @@ void RecordingSettingsWidget::setCaptureMode(VideoRecorderSettings::CaptureMode 
     switch (c) {
     case VideoRecorderSettings::FullScreenMode:
         ui->fullscreenButton->setChecked(true);
+        ui->disableAeroCheckBox->setChecked(false);
         break;
     case VideoRecorderSettings::FullScreenNoeroMode:
-        ui->fullscreenNoAeroButton->setChecked(true);
+        ui->fullscreenButton->setChecked(true);
+        ui->disableAeroCheckBox->setChecked(true);
         break;
     case VideoRecorderSettings::WindowMode:
         ui->windowButton->setChecked(true);
@@ -125,13 +155,13 @@ void RecordingSettingsWidget::onMonitorChanged(int index)
 #ifdef Q_OS_WIN
     if (index != qApp->desktop()->primaryScreen())
     {
-        if (ui->fullscreenNoAeroButton->isChecked())
+        if (ui->disableAeroCheckBox->isChecked())
             ui->fullscreenButton->setChecked(true);
-        ui->fullscreenNoAeroButton->setEnabled(false);
+        ui->disableAeroCheckBox->setEnabled(false);
     }
     else
     {
-        ui->fullscreenNoAeroButton->setEnabled(true);
+        ui->disableAeroCheckBox->setEnabled(true);
     }
 #endif
 }
@@ -170,5 +200,35 @@ void RecordingSettingsWidget::setSecondaryAudioDeviceName(const QString &name)
     for (int i = 0; i < ui->secondaryAudioDeviceComboBox->count(); i++) {
         if (ui->secondaryAudioDeviceComboBox->itemText(i) == name)
             ui->secondaryAudioDeviceComboBox->setCurrentIndex(i);
+    }
+}
+
+void RecordingSettingsWidget::onDisableAeroChecked(bool enabled)
+{
+    QDesktopWidget *desktop = qApp->desktop();
+    if (enabled) {
+        ui->screenComboBox->clear();
+        int screen = desktop->primaryScreen();
+        QRect geometry = desktop->screenGeometry(screen);
+        ui->screenComboBox->addItem(tr("Screen %1 - %2x%3 (Primary)").
+                                    arg(screen).
+                                    arg(geometry.width()).
+                                    arg(geometry.height()));
+    } else {
+        ui->screenComboBox->clear();
+        for (int i = 0; i < desktop->screenCount(); i++) {
+           QRect geometry = desktop->screenGeometry(i);
+           if (i == desktop->primaryScreen()) {
+               ui->screenComboBox->addItem(tr("Screen %1 - %2x%3 (Primary)").
+                                        arg(i + 1).
+                                        arg(geometry.width()).
+                                        arg(geometry.height()));
+            } else {
+                ui->screenComboBox->addItem(tr("Screen %1 - %2x%3").
+                                        arg(i + 1).
+                                        arg(geometry.width()).
+                                        arg(geometry.height()));
+            }
+        }
     }
 }
