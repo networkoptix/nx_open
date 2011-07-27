@@ -13,7 +13,7 @@ extern int ping_timeout;
 
 QnPlAreconVisionResource::QnPlAreconVisionResource()
 {
-    addFlag(QnResource::live_cam);
+    
 }
 
 
@@ -197,7 +197,7 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
 			model = model_relase;
 	}
 
-	QnNetworkResourcePtr result ( createResourceByName(model) ); // atoi here coz av 8185dn returns "8185DN" string on the get?model request; and QString::toInt returns 0 on such str
+	QnNetworkResourcePtr result ( createResourceByName(model) ); 
 
 	if (!result)
 	{
@@ -269,6 +269,17 @@ QnAbstractMediaStreamDataProvider* QnPlAreconVisionResource::createMediaProvider
 {
     return 0;
 }
+
+void QnPlAreconVisionResource::setIframeDistance(int frames, int timems)
+{
+
+}
+
+void QnPlAreconVisionResource::setCropingPhysical(QRect croping)
+{
+
+}
+
 
 //===============================================================================================================================
 bool QnPlAreconVisionResource::getParamPhysical(const QString& name, QnValue& val)
@@ -496,9 +507,9 @@ bool QnPlAreconVisionResource::loadDevicesParam(const QString& file_name, QStrin
 
 	while (!node.isNull()) 
 	{
-		if (node.toElement().tagName() == "device")
+		if (node.toElement().tagName() == "resource")
 		{
-			if (!parseDevice(node.toElement(), error))
+			if (!parseResource(node.toElement(), error))
 				return false;
 		}
 
@@ -508,59 +519,52 @@ bool QnPlAreconVisionResource::loadDevicesParam(const QString& file_name, QStrin
 	return true;
 }
 
-bool QnPlAreconVisionResource::parseDevice(const QDomElement &device, QString& error)
+bool QnPlAreconVisionResource::parseResource(const QDomElement &resource, QString& error)
 {
-	if (!device.hasAttribute("id"))
+	if (!resource.hasAttribute("id"))
 	{
-		error = "Cannot find id of the device.";
+		error = "Cannot find id of the resource.";
 		return false;
 	}
 
-	QString device_name = device.attribute("id");
+	QString resourceName = resource.attribute("id");
 
-	QnParamLists::iterator it1 = static_resourcesParamLists.find(device_name);
-	QnParamLists::iterator it2 = static_stream_list.find(device_name);
+	QnParamLists::iterator it1 = staticResourcesParamLists.find(resourceName);
 
-	if (it1!=static_resourcesParamLists.end() || it2!=static_stream_list.end())
+
+	if (it1!=staticResourcesParamLists.end())
 	{
 		QTextStream str(&error);
-		str << "Such device " << device_name << " already exists.";
+		str << "Such resource " << resourceName << " already exists.";
 		return false;
 	}
 
 	QnParamList device_param_list;
-	QnParamList stream_param_list;
 
-	if (device.hasAttribute("public"))
+	if (resource.hasAttribute("public"))
 	{
-		QString values = device.attribute("public");
+		QString values = resource.attribute("public");
 		QStringList lst = values.split(",");
 		QStringListIterator lst_iter(lst);
 		while(lst_iter.hasNext())
 		{
 			QString val = lst_iter.next().trimmed();
-			QnParamLists::iterator it1 = static_resourcesParamLists.find(val);
-			QnParamLists::iterator it2 = static_stream_list.find(val);
+			QnParamLists::iterator it1 = staticResourcesParamLists.find(val);
 
-			if (it1!=static_resourcesParamLists.end())
+			if (it1!=staticResourcesParamLists.end())
 				device_param_list.inheritedFrom(it1.value());
 			else
-				cl_log.log("Smth wrong with public tag for ", device_name, cl_logWARNING);
-
-			if (it2!=static_stream_list.end())
-				stream_param_list.inheritedFrom(it2.value());
+				cl_log.log("Smth wrong with public tag for ", resourceName, cl_logWARNING);
 
 		}
 
 	}
 
 	//global_params 
-	QDomNode node = device.firstChild();
+	QDomNode node = resource.firstChild();
 	if (node.isNull())
 	{
-		static_resourcesParamLists[device_name] = device_param_list;
-		static_stream_list[device_name] = stream_param_list;
-
+		staticResourcesParamLists[resourceName] = device_param_list;
 		return true; // just public make sence 
 	}
 
@@ -569,27 +573,25 @@ bool QnPlAreconVisionResource::parseDevice(const QDomElement &device, QString& e
 	if (element.tagName()!="global_params" && element.tagName()!="stream_params")
 	{
 		QTextStream str(&error);
-		str << "Cannot find global_params and stream_params in " << device_name ;
+		str << "Cannot find global_params and stream_params in " << resourceName ;
 		return false;
 	}
 
 	//===============================================================
 	if (element.tagName()=="global_params" )
 	{
-		QDomNode param_node = element.firstChild();
-		while (!param_node .isNull()) 
+		QDomNode paramNode = element.firstChild();
+		while (!paramNode .isNull()) 
 		{
-			QnParamUnused param;
-
-			if (param_node.toElement().tagName() == "param")
+			if (paramNode.toElement().tagName() == "param")
 			{
-				if (!parseParam(param_node.toElement(), error, device_param_list))
+				if (!parseParam(paramNode.toElement(), error, device_param_list))
 					return false;
 			}
-			param_node  = param_node.nextSibling();
+			paramNode  = paramNode.nextSibling();
 		}
 
-		static_resourcesParamLists[device_name] = device_param_list;
+		staticResourcesParamLists[resourceName] = device_param_list;
 
 		// move to stream_params
 		node = node.nextSibling();
@@ -597,24 +599,6 @@ bool QnPlAreconVisionResource::parseDevice(const QDomElement &device, QString& e
 			return true;
 		element = node.toElement();
 
-	}
-	//===================================================================
-	if (element.tagName()=="stream_params")
-	{
-		QDomNode param_node = element.firstChild();
-		while (!param_node .isNull()) 
-		{
-			QnParamUnused param;
-
-			if (param_node.toElement().tagName() == "param")
-			{
-				if (!parseParam(param_node.toElement(), error, stream_param_list))
-					return false;
-			}
-			param_node  = param_node.nextSibling();
-		}
-
-		static_stream_list[device_name] = stream_param_list;
 	}
 
 	return true;
@@ -630,10 +614,10 @@ bool QnPlAreconVisionResource::parseParam(const QDomElement &element, QString& e
 
 	QString name = element.attribute("name");
 
-	QnParamUnused param = paramlist.exists(name) ? paramlist.get(name) : QnParamUnused();
+	QnParam param = paramlist.exists(name) ? paramlist.get(name) : QnParam();
 	param.name = name;
 
-	if (param.value.type == QnParam::None) // param type is not defined yet
+	if (param.type == QnParam::None) // param type is not defined yet
 	{
 		if (!element.hasAttribute("type"))
 		{
@@ -644,19 +628,19 @@ bool QnPlAreconVisionResource::parseParam(const QDomElement &element, QString& e
 		QString type = element.attribute("type").toLower();
 
 		if (type=="param")
-			param.value.type = QnParam::Value;
+			param.type = QnParam::Value;
 		else if (type=="novalue")
-			param.value.type = QnParam::None;
+			param.type = QnParam::None;
 		else if (type=="minmaxstep")
-			param.value.type = QnParam::MinMaxStep;
+			param.type = QnParam::MinMaxStep;
 		else if (type=="boolen")
-			param.value.type = QnParam::Boolen;
+			param.type = QnParam::Boolen;
 		else if (type=="onoff")
-			param.value.type = QnParam::OnOff;
+			param.type = QnParam::OnOff;
 		else if (type=="enumeration")
-			param.value.type = QnParam::Enumeration;
+			param.type = QnParam::Enumeration;
 		else if (type=="button")
-			param.value.type = QnParam::Button;
+			param.type = QnParam::Button;
 		else
 		{
 			error = "Unsupported param type fund";
@@ -665,38 +649,38 @@ bool QnPlAreconVisionResource::parseParam(const QDomElement &element, QString& e
 	}
 
 	if (element.hasAttribute("group"))
-		param.value.group = element.attribute("group");
+		param.group = element.attribute("group");
 
 	if (element.hasAttribute("sub_group"))
-		param.value.subgroup = element.attribute("sub_group");
+		param.subgroup = element.attribute("sub_group");
 
 	if (element.hasAttribute("min"))
-		param.value.min_val = element.attribute("min");
+		param.min_val = element.attribute("min");
 
 	if (element.hasAttribute("description"))
-		param.value.description = element.attribute("description");
+		param.description = element.attribute("description");
 
 	if (element.hasAttribute("max"))
-		param.value.max_val = element.attribute("max");
+		param.max_val = element.attribute("max");
 
 	if (element.hasAttribute("step"))
-		param.value.step = element.attribute("step");
+		param.step = element.attribute("step");
 
 	if (element.hasAttribute("default_value"))
-		param.value.default_value = element.attribute("default_value");
+		param.default_value = element.attribute("default_value");
 
 	if (element.hasAttribute("paramNetHelper"))
-		param.value.http = element.attribute("paramNetHelper");
+		param.paramNetHelper = element.attribute("paramNetHelper");
 
 	if (element.hasAttribute("ui"))
-		param.value.ui = element.attribute("ui").toInt();
+		param.ui = element.attribute("ui").toInt();
 
 	if (element.hasAttribute("readonly"))
 	{
 		if (element.attribute("readonly")=="true")
-			param.value.readonly = true;
+			param.readonly = true;
 		else
-			param.value.readonly = false;
+			param.readonly = false;
 	}
 
 	if (element.hasAttribute("values"))
@@ -707,7 +691,7 @@ bool QnPlAreconVisionResource::parseParam(const QDomElement &element, QString& e
 		while(lst_iter.hasNext())
 		{
 			QString val = lst_iter.next().trimmed();
-			param.value.possible_values.push_back(val);
+			param.possible_values.push_back(val);
 		}
 
 	}
@@ -720,15 +704,15 @@ bool QnPlAreconVisionResource::parseParam(const QDomElement &element, QString& e
 		while(lst_iter.hasNext())
 		{
 			QString val = lst_iter.next().trimmed();
-			param.value.ui_possible_values.push_back(val);
+			param.ui_possible_values.push_back(val);
 		}
 
 	}
 
 	if (element.hasAttribute("param"))
-		param.value.value = element.attribute("param");
+		param.value = element.attribute("param");
 	else
-		param.value.param = param.value.default_value;
+		param.value = param.default_value;
 
 	paramlist.put(param);
 

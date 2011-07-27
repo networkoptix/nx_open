@@ -3,14 +3,14 @@
 
 #include "resource/network_resource.h"
 #include "network/simple_http_client.h"
-#include "resource/media_resource.h"
+#include "resource/security_cam_resource.h"
 
 
 class QDomElement;
 
 
 // this class and inherited must be very light to create 
-class QnPlAreconVisionResource : public QnNetworkResource, public QnMediaResource
+class QnPlAreconVisionResource : public QnNetworkResource, public QnSequrityCamResource
 {
 public:
     QnPlAreconVisionResource();
@@ -42,6 +42,10 @@ public:
     virtual int getStreamDataProvidersMaxAmount() const;
     virtual QnAbstractMediaStreamDataProvider* createMediaProvider();
 
+    virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames 
+    virtual void setCropingPhysical(QRect croping);
+
+
 protected:
     // should change value in memory domain 
     virtual bool getParamPhysical(const QString& name, QnValue& val);
@@ -52,7 +56,7 @@ public:
 	static QnResourceList findDevices();
 	static bool loadDevicesParam(const QString& file_name, QString& error );
 private:
-	static bool parseDevice(const QDomElement &element, QString& error );
+	static bool parseResource(const QDomElement &element, QString& error );
 	static bool parseParam(const QDomElement &element, QString& error, QnParamList& paramlist);
 	static QnPlAreconVisionResource* createResourceByName(QString name);
     static bool isPanoramic(QString name);

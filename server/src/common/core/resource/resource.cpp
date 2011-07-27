@@ -12,7 +12,7 @@ QnResourceCommandProcessor& commendProcessor()
 
 
 
-QnResource::QnParamLists QnResource::static_resourcesParamLists; // list of all supported devices params list
+QnResource::QnManufacturesParamsLists QnResource::staticResourcesParamLists; // list of all supported devices params list
 
 
 QnResource::QnResource():
@@ -108,6 +108,11 @@ void QnResource::setName(const QString& name)
 {
     QMutexLocker locker(&m_mutex);
     m_name = name;
+}
+
+QString QnResource::oemName() const
+{
+    return manufacture();
 }
 
 void QnResource::addTag(const QString& tag)
@@ -307,21 +312,26 @@ QnParamList& QnResource::getResourceParamList()
 {
     QMutexLocker locker(&m_mutex);
 
-	if (m_deviceParamList.empty())
-		m_deviceParamList = static_resourcesParamLists[m_name];
+	if (m_resourceParamList.empty())
+		m_resourceParamList = staticResourcesParamLists[manufacture()][m_name];
 
-	return m_deviceParamList;
+	return m_resourceParamList;
 }
 
 const QnParamList& QnResource::getResourceParamList() const
 {
     QMutexLocker locker(&m_mutex);
 
-	if (m_deviceParamList.empty())
-		m_deviceParamList = static_resourcesParamLists[m_name];
+	if (m_resourceParamList.empty())
+		m_resourceParamList = staticResourcesParamLists[manufacture()][m_name];
 
-	return m_deviceParamList;
+	return m_resourceParamList;
 
+}
+
+QStringList QnResource::supportedResources(QString manufacture)
+{
+    return staticResourcesParamLists[manufacture].keys();
 }
 
 void QnResource::addConsumer(QnResourceConsumer* consumer)

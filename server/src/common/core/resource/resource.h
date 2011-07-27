@@ -39,7 +39,7 @@ public:
         video = 0x20,
         audio = 0x40,
         live = 0x80,
-        live_cam = live | video | media | streamprovider | network
+        live_cam = live | video | media | streamprovider 
     };
 
 
@@ -75,6 +75,7 @@ public:
 
     // like arecont or iqinvision
     virtual QString manufacture() const = 0;
+    virtual QString oemName() const;
 
 
     void addTag(const QString& tag);
@@ -151,18 +152,22 @@ public:
     static void addCommandToProc(QnAbstractDataPacketPtr data);
 	static int commandProcQueSize();
     static bool commandProcHasSuchResourceInQueue(QnResourcePtr res);
+
+    static QStringList supportedResources(QString manufacture);
 protected:
 	typedef QMap<QString, QnParamList > QnParamLists;
-	static QnParamLists static_resourcesParamLists; // list of all supported resources params list
+    typedef QMap<QString, QnParamLists> QnManufacturesParamsLists;
+
+	static QnManufacturesParamsLists staticResourcesParamLists; // list of all supported resources params list
 
 protected:
     mutable QMutex m_mutex; // resource mutex for everything 
 
     unsigned long m_typeFlags;
 
-    QString m_name; // this device model like AV2105 or AV2155dn 
+    QString m_name; // this resource model like AV2105 or AV2155dn 
 
-    mutable QnParamList m_deviceParamList;
+    mutable QnParamList m_resourceParamList;
 
 private:
     QnId m_Id; //+

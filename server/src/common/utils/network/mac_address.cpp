@@ -26,7 +26,7 @@ bool QnMacAddress::isEmpty() const
     for(int i = 0; i < 6; ++i)
     {
         if (m_data[i]!=0)
-            return false
+            return false;
     }
 
     return true;
