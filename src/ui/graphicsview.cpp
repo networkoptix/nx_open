@@ -180,7 +180,7 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
     setFrameShape(QFrame::NoFrame);
 
     connect(&cm_start_video_recording, SIGNAL(triggered()), SLOT(toggleRecording()));
-    cm_start_video_recording.setShortcuts(QList<QKeySequence>() << tr("Ctrl+R") << Qt::Key_MediaRecord);
+    cm_start_video_recording.setShortcuts(QList<QKeySequence>() << tr("Alt+R") << Qt::Key_MediaRecord);
 	cm_start_video_recording.setShortcutContext(Qt::ApplicationShortcut);
 	addAction(&cm_start_video_recording);
     connect(&cm_recording_settings, SIGNAL(triggered()), SLOT(recordingSettings()));
