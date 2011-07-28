@@ -44,6 +44,8 @@ public:
 	void setForceDownmix(bool value);
 
 	bool isDownmixForced() const { return m_forceDownmix; }
+
+    void playCurrentBuffer();
 private:
     // returns amount of ms which buffered before start playing 
     int playAfterMs() const;

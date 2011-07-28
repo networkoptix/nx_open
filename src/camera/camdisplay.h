@@ -110,7 +110,7 @@ private:
     bool m_singleShotMode;
     bool m_singleShotQuantProcessed;
     qint64 m_jumpTime;
-
+    QAudioFormat m_playingFormat;
 };
 
 #endif //clcam_display_h_1211

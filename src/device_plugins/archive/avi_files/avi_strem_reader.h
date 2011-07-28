@@ -31,6 +31,7 @@ protected:
 
     virtual qint64 packetTimestamp(AVStream* stream, const AVPacket& packet);
     virtual AVFormatContext* getFormatContext();
+    virtual qint64 contentLength() const { return m_formatContext->duration; }
     bool initCodecs();
 protected:
     qint64 m_currentTime;
@@ -60,6 +61,7 @@ private:
     int m_selectedAudioChannel;
     static QMutex avi_mutex;
     static QSemaphore aviSemaphore ;
+    bool m_eof;
 private:
     /**
       * Read next packet from file

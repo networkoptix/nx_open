@@ -60,6 +60,7 @@ CLAVIStreamReader::CLAVIStreamReader(CLDevice* dev ) :
     mFirstTime(true),
     m_bsleep(false),
     m_currentPacketIndex(0),
+    m_eof(false),
     m_haveSavedPacket(false),
     m_selectedAudioChannel(0)
 {
@@ -157,14 +158,13 @@ bool CLAVIStreamReader::init()
 	m_currentTime = 0;
 	m_previousTime = -1;
 	//m_needToSleep = 0;
-    m_lengthMksec = 0;
+    //m_lengthMksec = 0;
 
     m_formatContext = getFormatContext();
     if (!m_formatContext)
         return false;
 
-    if (m_lengthMksec == 0)
-	    m_lengthMksec = m_formatContext->duration; // it is not filled during opening context
+    m_lengthMksec = contentLength();
 
     if (m_formatContext->start_time != AV_NOPTS_VALUE)
         m_startMksec = m_formatContext->start_time;
@@ -350,30 +350,11 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 		if (currentPacket().stream_index == m_videoStreamIndex) // in case of video packet 
 		{
 			m_currentTime =  packetTimestamp(m_formatContext->streams[m_videoStreamIndex], currentPacket());
-			if (m_previousTime != -1)
-			{
-				// we assume that we have constant frame rate 
-                /*
-				m_needToSleep = m_currentTime - m_previousTime;
-                if(m_needToSleep > MAX_VALID_SLEEP_TIME)
-                {
-                    AVRational frameRate = m_formatContext->streams[m_videoStreamIndex]->r_frame_rate;
-                    if (frameRate.den && frameRate.num)
-                    {
-                        qint64 frameDuration = 1000000ull * frameRate.den / frameRate.num;
-                        if (frameDuration)
-                        {
-                            // it is a jump between PTS, so use default sleep value
-                            m_needToSleep = frameDuration;
-                        }
-                    }
-                }
-                */
-			}
-
 			m_previousTime = m_currentTime;
 		}
 	}
+
+    CLAbstractMediaData* data = 0;
 
 	if (currentPacket().stream_index == m_videoStreamIndex) // in case of video packet 
 	{
@@ -420,8 +401,7 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 		if (isSingleShotMode() && skipFramesToTime() == 0)
 			pause();
 
-		av_free_packet(&currentPacket());
-		return videoData;
+		data =  videoData;
 	}
 	else if (currentPacket().stream_index == m_audioStreamIndex) // in case of audio packet 
 	{
@@ -430,13 +410,16 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 		m_bsleep = false;
 
         CLCompressedAudioData* audioData = getAudioData(currentPacket(), stream);
-		av_free_packet(&currentPacket());
-		return audioData;
+		data =  audioData;
 	}
+    if (data && m_eof)
+    {
+        data->flags |= CLAbstractMediaData::MediaFlags_AfterEOF;
+        m_eof = false;
+    }
 
 	av_free_packet(&currentPacket());
-
-	return 0;
+	return data;
 
 }
 
@@ -477,9 +460,10 @@ bool CLAVIStreamReader::getNextPacket(AVPacket& packet)
 		{
             
 			destroy();
+            m_eof = true;
+
 			if (!init())
                 return false;
-            
 			err = av_read_frame(m_formatContext, &packet);
 			if (err < 0)
 				return false;

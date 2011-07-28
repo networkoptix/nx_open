@@ -163,6 +163,14 @@ void CLCamDisplay::setSingleShotMode(bool single)
 
 bool CLCamDisplay::processData(CLAbstractData* data)
 {
+    bool flushCurrentBuffer = false;
+    CLAbstractMediaData* mData = dynamic_cast<CLAbstractMediaData*>(data);
+    if (mData && (mData->flags & CLAbstractMediaData::MediaFlags_AfterEOF) && m_videoQueue->size() > 0)
+    {
+        // skip data (play current buffer
+        flushCurrentBuffer = true;
+    }
+
     if (m_needChangePriority)
     {
         if (m_playAudio)
@@ -198,7 +206,7 @@ bool CLCamDisplay::processData(CLAbstractData* data)
         afterJump(ts);
     }
 
-	if (ad)
+	if (ad && !flushCurrentBuffer)
 	{
 		if (m_needReinitAudio)
 		{
@@ -208,8 +216,12 @@ bool CLCamDisplay::processData(CLAbstractData* data)
 			CLFFmpegAudioDecoder::audioCodecFillFormat(currentAudioFormat, codec);
 			if (m_expectedAudioFormat == currentAudioFormat)
 			{
-				delete m_audioDisplay;
-				m_audioDisplay = new CLAudioStreamDisplay(AUDIO_BUFF_SIZE);
+                if (m_playingFormat != currentAudioFormat)
+                {
+				    delete m_audioDisplay;
+				    m_audioDisplay = new CLAudioStreamDisplay(AUDIO_BUFF_SIZE);
+                    m_playingFormat = currentAudioFormat;
+                }
 				m_needReinitAudio = false;
 			}
 		}
@@ -218,7 +230,9 @@ bool CLCamDisplay::processData(CLAbstractData* data)
         // so, second afterJump is generated after several video packet. To prevent it, increase jump detection interval for audio
         
         if (ad->timestamp && ad->timestamp - m_lastAudioPacketTime < -MIN_AUDIO_DETECT_JUMP_INTERVAL)
+        {
             afterJump(ad->timestamp);
+        }
 
         m_lastAudioPacketTime = ad->timestamp;
 
@@ -239,44 +253,44 @@ bool CLCamDisplay::processData(CLAbstractData* data)
             m_audioDisplay->enqueueData(ad, nextVideoImageTime(0));
         }
 	}
-	else if (vd)
+	
+    if (vd || flushCurrentBuffer)
 	{
-        bool result = true;
-        if (vd->timestamp - m_lastVideoPacketTime < -MIN_VIDEO_DETECT_JUMP_INTERVAL)
-            afterJump(vd->timestamp);
-        m_lastVideoPacketTime = vd->timestamp;
-
-        /*
-        if (haveAudio())
+        bool result = !flushCurrentBuffer;
+        int channel = vd ? vd->channelNumber : 0;
+        if (flushCurrentBuffer)
         {
-            // to put data from ring buff to audio buff( if any )
-            m_audioDisplay->putData(0, 0);
+            vd = 0;
         }
-        */
-        int channel = vd->channelNumber;
-        if (channel >= CL_MAX_CHANNELS)
-            return true;
-
-        // this is the only point to addreff; 
-        // video data can escape from this object only if displayed or in case of clearVideoQueue
-        // so release ref must be in both places
-        vd->addRef(); 
-
-        if (m_singleShotMode && m_singleShotQuantProcessed)
+        else
         {
-            enqueueVideo(vd);
-            return true; 
-        }
+            if (vd->timestamp - m_lastVideoPacketTime < -MIN_VIDEO_DETECT_JUMP_INTERVAL)
+            {
+                afterJump(vd->timestamp);
+            }
+            m_lastVideoPacketTime = vd->timestamp;
 
+            if (channel >= CL_MAX_CHANNELS)
+                return result;
+
+            // this is the only point to addreff; 
+            // video data can escape from this object only if displayed or in case of clearVideoQueue
+            // so release ref must be in both places
+            vd->addRef(); 
+
+            if (m_singleShotMode && m_singleShotQuantProcessed)
+            {
+                enqueueVideo(vd);
+                return result; 
+            }
+        }
         // three are 3 possible scenarios:
 
         //1) we do not have audio playing;
         if (!haveAudio())
         {
-            AVCodecContext* codec = (AVCodecContext*) vd->context;
-
             qint64 m_videoDuration = m_videoQueue->size() * m_lastNonZerroDuration;
-            if (m_videoDuration >  1000 * 1000)
+            if (vd && m_videoDuration >  1000 * 1000)
             {
                 // skip current video packet, process it latter
                 vd->releaseRef(); 
@@ -285,20 +299,24 @@ bool CLCamDisplay::processData(CLAbstractData* data)
             }
             vd = nextInOutVideodata(vd, channel);
             if (!vd)
-                return true; // impossible? incoming vd!=0
+                return result; // impossible? incoming vd!=0
             m_lastDisplayedVideoTime = vd->timestamp;
             display(vd, !vd->ignore);
             m_singleShotQuantProcessed = true;
             return result;
         }
 
+        // no more data expected. play as is            
+        if (m_audioDisplay->isBuffering() && flushCurrentBuffer)
+            m_audioDisplay->playCurrentBuffer(); 
+
         //2) we have audio and it's buffering( not playing yet )
-        if (m_audioDisplay->isBuffering())
+        if (m_audioDisplay->isBuffering() && !flushCurrentBuffer)
         //if (m_audioDisplay->isBuffering() || m_audioDisplay->msInBuffer() < AUDIO_BUFF_SIZE / 10)
         {
             // audio is not playinf yet; video must not be played as well
             enqueueVideo(vd);
-            return true;
+            return result;
         }
         //3) video and audio playing
         else
@@ -308,17 +326,18 @@ bool CLCamDisplay::processData(CLAbstractData* data)
             //cl_log.log("diff = ", (int)diff/1000, cl_logALWAYS);
 
 
-            if (diff >= 2 * videoDuration) //factor 2 here is to avoid frequent switch between normal play and fast play
+            if (diff >= 2 * videoDuration && !m_audioDisplay->isBuffering()) //factor 2 here is to avoid frequent switch between normal play and fast play
             {
                 // video runs faster than audio; // need to hold video this frame
-                enqueueVideo(vd);
+                if (vd)
+                    enqueueVideo(vd);
                 // avoid to fast buffer filling on startup
                 qint64 sleepTime = qMin(diff, (m_audioDisplay->msInBuffer() - AUDIO_BUFF_SIZE / 2) * 1000ll);
                 sleepTime = qMin(sleepTime, 500 * 1000ll);
                 cl_log.log("HOLD FRAME. sleep time=", sleepTime/1000.0, cl_logDEBUG1);
                 if (sleepTime > 0)
                     m_delay.sleep(sleepTime);
-                return true;
+                return result;
             }
 
             //if (diff < 2 * videoDuration) //factor 2 here is to avoid frequent switch between normal play and fast play
