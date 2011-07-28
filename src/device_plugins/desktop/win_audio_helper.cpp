@@ -20,23 +20,33 @@ bool WinAudioExtendInfo::getDeviceInfo(IMMDevice *pMMDevice, bool isDefault)
 {
     IPropertyStore *pPropertyStore;
     HRESULT hr = pMMDevice->OpenPropertyStore(STGM_READ, &pPropertyStore);
-    if (hr != S_OK) return false;
+    if (hr != S_OK)
+        return false;
 
     PROPVARIANT pv; PropVariantInit(&pv);
     hr = pPropertyStore->GetValue(PKEY_Device_FriendlyName, &pv);
-    if (hr != S_OK) return false;
-    QString name((QChar*) pv.piVal);
+    if (hr != S_OK) 
+        return false;
+
+    QString name = QString::fromUtf16(reinterpret_cast<const ushort *>(pv.piVal));
     if (!isDefault && !name.startsWith(m_deviceName))
         return false;
-    m_fullName = name;
+    
+    if (!isDefault)
+        m_fullName = !name.isEmpty() ? name : m_deviceName;
+    else
+        m_fullName = m_deviceName;
 
     hr = pPropertyStore->GetValue(PKEY_AudioEndpoint_JackSubType, &pv);
-    if (hr != S_OK) return false;
+    if (hr != S_OK)
+        return false;
+
     PropVariantToGUID(pv, &m_jackSubType);
 
     hr = pPropertyStore->GetValue(PKEY_DeviceClass_IconPath, &pv);
-    if (hr != S_OK) return false;
-    m_iconPath = QString((QChar*) pv.piVal);
+    if (hr != S_OK) 
+        return false;
+    m_iconPath = QString::fromUtf16(reinterpret_cast<const ushort *>(pv.piVal));
     
     return true;
 }
