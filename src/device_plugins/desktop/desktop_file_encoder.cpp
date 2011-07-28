@@ -610,9 +610,9 @@ int DesktopFileEncoder::processData(bool flush)
     }
 
     // write all audio frames
-    EncodedAudioInfo* ai = m_audioInfo[0];
+    EncodedAudioInfo* ai = m_audioInfo.size() > 0 ? m_audioInfo[0] : 0;
     EncodedAudioInfo* ai2 = m_audioInfo.size() > 1 ? m_audioInfo[1] : 0;
-    while (ai->m_audioQueue.size() > 0 && (ai2 == 0 || ai2->m_audioQueue.size() > 0))
+    while (ai && ai->m_audioQueue.size() > 0 && (ai2 == 0 || ai2->m_audioQueue.size() > 0))
     {
         AVRational r;
         r.num = 1;
