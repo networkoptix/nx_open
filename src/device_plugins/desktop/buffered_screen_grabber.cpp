@@ -34,9 +34,15 @@ CLBufferedScreenGrabber::~CLBufferedScreenGrabber()
     wait();
 }
 
+void CLBufferedScreenGrabber::stop()
+{
+    m_needStop = true;
+}
+
 void CLBufferedScreenGrabber::run()
 {
-    m_timer.start();
+    m_grabber.restartTimer();
+    //m_timer.start();
     while (!m_needStop)
     {
         if (!m_needStop && m_queue.size() == m_queue.maxSize())
@@ -55,15 +61,20 @@ void CLBufferedScreenGrabber::run()
 
         qint64 nextTiming = ++m_currentFrameNum * 1000 / m_frameRate;
 
-        int toSleep = nextTiming - m_timer.elapsed();
+        int toSleep = nextTiming - currentTime();
         //cl_log.log("sleep time=", toSleep, cl_logALWAYS);
         if (toSleep > 0)
             msleep(toSleep);
         else if (toSleep <= -MAX_JITTER)
         {
-            m_currentFrameNum = m_timer.elapsed() * m_frameRate / 1000.0;
+            m_currentFrameNum = currentTime() * m_frameRate / 1000.0;
         }
     }
+}
+
+bool CLBufferedScreenGrabber::dataExist() 
+{
+    return m_queue.size() > 0;
 }
 
 CLScreenGrapper::CaptureInfo CLBufferedScreenGrabber::getNextFrame() 

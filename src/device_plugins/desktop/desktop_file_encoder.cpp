@@ -105,65 +105,6 @@ struct FffmpegLog
     }
 };
 
-
-class CaptureAudioStream: public QIODevice
-{
-public:
-    CaptureAudioStream(DesktopFileEncoder::EncodedAudioInfo* encoder)
-        : QIODevice(),
-        m_encoder(encoder),
-        m_currentBufferSize(0),
-        m_nextAudioBuffer(0),
-        m_startDelay(0)
-    {
-    }
-    ~CaptureAudioStream()
-    {
-        delete m_nextAudioBuffer;
-    }
-protected:
-    // QIODevice
-    virtual qint64 readData ( char * data, qint64 maxSize ) { return -1; }
-    virtual bool isOpen () const { return true; }
-    virtual bool isReadable () const {  return false; }
-    virtual bool isWritable() const {  return true; }
-    virtual bool isSequential () const {  return true;  }
-
-    qint64 writeData ( const char * data, qint64 maxSize )
-    {
-        int packetSize = m_encoder->audioPacketSize();
-        if (m_nextAudioBuffer == 0)
-        {
-            m_nextAudioBuffer = new CLAbstractMediaData(CL_MEDIA_ALIGNMENT, packetSize);
-            m_startDelay = m_encoder->currentTime();
-            m_nextAudioBuffer->timestamp = 0;
-        }
-
-        int currentMaxSize = maxSize;
-        while (currentMaxSize > 0)
-        {
-            int dataToWrite = qMin(currentMaxSize, packetSize - m_currentBufferSize);
-            m_nextAudioBuffer->data.write(data, dataToWrite);
-            data += dataToWrite;
-            currentMaxSize -= dataToWrite;
-            m_currentBufferSize += dataToWrite;
-            if (m_currentBufferSize == packetSize)
-            {
-                m_encoder->m_audioQueue.push(m_nextAudioBuffer);
-                m_nextAudioBuffer = new CLAbstractMediaData(CL_MEDIA_ALIGNMENT, packetSize);
-                m_nextAudioBuffer->timestamp = m_encoder->currentTime() - m_startDelay;
-                m_currentBufferSize = 0;
-            }
-        }
-        return maxSize;
-    }
-private:
-    DesktopFileEncoder::EncodedAudioInfo* m_encoder;
-    int m_currentBufferSize;
-    CLAbstractMediaData* m_nextAudioBuffer;
-    int m_startDelay;
-};
-
 int DesktopFileEncoder::initIOContext()
 {
     enum {
@@ -234,26 +175,130 @@ qint64 DesktopFileEncoder::seekPacketImpl(qint64 offset, qint32 whence)
     return -1;
 }
 
-DesktopFileEncoder::EncodedAudioInfo::EncodedAudioInfo():
-    m_audioOStream(0),
+DesktopFileEncoder::EncodedAudioInfo::EncodedAudioInfo(DesktopFileEncoder* owner):
+    m_owner(owner),
     m_tmpAudioBuffer(CL_MEDIA_ALIGNMENT, FF_MIN_BUFFER_SIZE),
-    m_audioInput(0),
-    m_speexPreprocess(0)
+    m_speexPreprocess(0),
+    m_terminated(false)
 {
 
 }
 
 DesktopFileEncoder::EncodedAudioInfo::~EncodedAudioInfo()
 {
-    if (m_audioInput)
-        m_audioInput->deleteLater(); 
-    m_audioInput = 0;
-    if (m_audioOStream)
-        m_audioOStream->deleteLater();
-    m_audioOStream = 0;
     if (m_speexPreprocess)
         speex_preprocess_state_destroy(m_speexPreprocess);
     m_speexPreprocess = 0;
+
+    stop();
+}
+
+int DesktopFileEncoder::EncodedAudioInfo::nameToWaveIndex()
+{
+    int iNumDevs = waveInGetNumDevs();
+    QString name(m_audioDevice.deviceName());
+    for(int i = 0; i < iNumDevs; ++i) 
+    {
+        WAVEINCAPS wic;
+        if(waveInGetDevCaps(i, &wic, sizeof(WAVEINCAPS)) == MMSYSERR_NOERROR) 
+        {
+            QString tmp = QString((const QChar *) wic.szPname);
+            if (name.startsWith(tmp))
+                return i;
+        }
+    }
+    return WAVE_MAPPER;
+}
+
+void QT_WIN_CALLBACK waveInProc(HWAVEIN hWaveIn, 
+                                UINT uMsg,
+                                DWORD dwInstance, 
+                                DWORD dwParam1, 
+                                DWORD dwParam2)
+{
+    DesktopFileEncoder::EncodedAudioInfo* audio = (DesktopFileEncoder::EncodedAudioInfo*) dwInstance;
+    switch(uMsg) 
+    {
+        case WIM_OPEN:
+            break;
+        case WIM_DATA:
+            audio->gotData();
+            break;
+        case WIM_CLOSE:
+            break;
+        default:
+            return;
+    }
+}
+
+void DesktopFileEncoder::EncodedAudioInfo::clearBuffers()
+{
+    while (m_buffers.size() > 0)
+    {
+        WAVEHDR* data = m_buffers.dequeue();
+        waveInUnprepareHeader(hWaveIn, data, sizeof(WAVEHDR));
+        av_free(data->lpData);
+        delete data;
+    }
+}
+
+void DesktopFileEncoder::EncodedAudioInfo::gotData()
+{
+    if (m_terminated)
+        return;
+    QMutexLocker lock(&m_mtx);
+    if (m_buffers.isEmpty())
+        return;
+    WAVEHDR* data = m_buffers.front();
+    if(data->dwBytesRecorded > 0 && data->dwFlags & WHDR_DONE) 
+    {
+        // write data
+        int packetSize = data->dwBytesRecorded;
+        CLAbstractMediaData* outData = new CLAbstractMediaData(CL_MEDIA_ALIGNMENT, packetSize);
+        outData->data.write(data->lpData, data->dwBytesRecorded);
+        outData->timestamp = m_owner->currentTime(); // - m_startDelay;
+        //cl_log.log("got audio data. time=", outData->timestamp, cl_logALWAYS);
+        m_audioQueue.push(outData);
+
+        waveInUnprepareHeader(hWaveIn, data, sizeof(WAVEHDR));
+        av_free(data->lpData);
+        delete data;
+        m_buffers.dequeue();
+        addBuffer();
+    }
+}
+
+bool DesktopFileEncoder::EncodedAudioInfo::addBuffer()
+{
+    WAVEHDR* buffer = new WAVEHDR();
+    HRESULT hr;
+    memset(buffer, 0, sizeof(WAVEHDR));
+    buffer->dwBufferLength = audioPacketSize();
+    buffer->lpData = (LPSTR) av_malloc(audioPacketSize());
+
+    m_buffers << buffer;
+
+    hr = waveInPrepareHeader(hWaveIn, buffer, sizeof(WAVEHDR));
+    if (hr != S_OK) return false;
+
+    hr = waveInAddBuffer(hWaveIn, buffer, sizeof(WAVEHDR));
+    if (hr != S_OK) return false;
+
+    return true;
+}
+
+void DesktopFileEncoder::EncodedAudioInfo::stop()
+{
+    m_terminated = true;
+    QMutexLocker lock(&m_mtx);
+    waveInReset(hWaveIn);
+    waveInClose(hWaveIn);
+    clearBuffers();
+}
+
+bool DesktopFileEncoder::EncodedAudioInfo::start()
+{
+    return waveInStart(hWaveIn) == S_OK;
 }
 
 int DesktopFileEncoder::EncodedAudioInfo::audioPacketSize()
@@ -261,9 +306,8 @@ int DesktopFileEncoder::EncodedAudioInfo::audioPacketSize()
     return m_owner->m_audioCodecCtx->frame_size * m_audioFormat.channels() * m_audioFormat.sampleSize()/8;
 }
 
-bool DesktopFileEncoder::EncodedAudioInfo::setupFormat(DesktopFileEncoder* owner, QString& errMessage)
+bool DesktopFileEncoder::EncodedAudioInfo::setupFormat(QString& errMessage)
 {
-    m_owner = owner;
     m_audioFormat = m_audioDevice.preferredFormat();
     m_audioFormat.setSampleRate(AUDIO_CAUPTURE_FREQUENCY);
     m_audioFormat.setSampleSize(16);
@@ -279,17 +323,36 @@ bool DesktopFileEncoder::EncodedAudioInfo::setupFormat(DesktopFileEncoder* owner
             return false;
         }
     }
-    m_audioInput = new QAudioInput ( m_audioDevice, m_audioFormat);
-    m_audioOStream = new CaptureAudioStream(this);
-    m_audioOStream->open(QIODevice::WriteOnly | QIODevice::Truncate);
-    //qDebug() << m_audioDevice.deviceName();
     m_audioQueue.setMaxSize(AUDIO_QUEUE_MAX_SIZE);
-
     return true;
 }
 
-void DesktopFileEncoder::EncodedAudioInfo::setupPostProcess()
+bool DesktopFileEncoder::EncodedAudioInfo::setupPostProcess()
 {
+    int devId = nameToWaveIndex();
+    WAVEFORMATEX wfx;
+    HRESULT hr;
+    wfx.nSamplesPerSec = m_audioFormat.frequency();
+    wfx.wBitsPerSample = m_audioFormat.sampleSize();
+    wfx.nChannels = m_audioFormat.channels();
+    wfx.cbSize = 0;
+
+    wfx.wFormatTag = WAVE_FORMAT_PCM;
+    wfx.nBlockAlign = (wfx.wBitsPerSample >> 3) * wfx.nChannels;
+    wfx.nAvgBytesPerSec = wfx.nBlockAlign * wfx.nSamplesPerSec;
+
+    if(waveInOpen(&hWaveIn, devId, &wfx,
+        (DWORD_PTR)&waveInProc,
+        (DWORD_PTR) this,
+        CALLBACK_FUNCTION) != MMSYSERR_NOERROR != S_OK) 
+        return false;
+
+    for (int i = 0; i < AUDIO_BUFFERS_COUNT; ++i)
+    {
+        if (!addBuffer())
+            return false;
+    }
+
     WinAudioExtendInfo extInfo(m_audioDevice.deviceName());
     if (extInfo.isMicrophone())
     {
@@ -301,6 +364,7 @@ void DesktopFileEncoder::EncodedAudioInfo::setupPostProcess()
         speex_preprocess_ctl(m_speexPreprocess, SPEEX_PREPROCESS_SET_AGC, &agcEnabled);
         speex_preprocess_ctl(m_speexPreprocess, SPEEX_PREPROCESS_SET_AGC_LEVEL, &agcLevel);
     }
+    return true;
 }
 
 DesktopFileEncoder::DesktopFileEncoder ( 
@@ -339,17 +403,18 @@ DesktopFileEncoder::DesktopFileEncoder (
     m_encodedFrames(0),
     m_widget(glWidget),
     m_videoPacketWrited(false),
-    m_encodedAudioBuf(0)
+    m_encodedAudioBuf(0),
+    m_capturingStopped(false)
 {
     if (audioDevice || audioDevice2)
     {
-        m_audioInfo << new EncodedAudioInfo();
+        m_audioInfo << new EncodedAudioInfo(this);
         m_audioInfo[0]->m_audioDevice = audioDevice ? *audioDevice : *audioDevice2;
     }
 
     if (audioDevice && audioDevice2 && audioDevice->deviceName() != audioDevice2->deviceName())
     {
-        m_audioInfo << new EncodedAudioInfo(); // second channel
+        m_audioInfo << new EncodedAudioInfo(this); // second channel
         m_audioInfo[1]->m_audioDevice = *audioDevice2;
     }
 
@@ -518,7 +583,7 @@ bool DesktopFileEncoder::init()
     {
         foreach(EncodedAudioInfo* audioChannel, m_audioInfo)
         {
-            if (!audioChannel->setupFormat(this, m_lastErrorStr))
+            if (!audioChannel->setupFormat(m_lastErrorStr))
                 return false;
         }
 
@@ -564,7 +629,13 @@ bool DesktopFileEncoder::init()
         m_maxAudioJitter = m_audioOutStream->time_base.den / m_audioOutStream->time_base.num / 20; 
 
         foreach(EncodedAudioInfo* audioChannel, m_audioInfo)
-            audioChannel->setupPostProcess();
+        {
+            if (!audioChannel->setupPostProcess())
+            {
+                m_lastErrorStr = "Can't initialize audio device";
+                return false;
+            }
+        }
     }
 
     av_write_header(m_formatCtx);
@@ -572,8 +643,7 @@ bool DesktopFileEncoder::init()
     m_grabber->start(QThread::HighestPriority);
     foreach(EncodedAudioInfo* info, m_audioInfo)
     {
-        info->m_audioInput->start(info->m_audioOStream);
-        if (info->m_audioInput->error() != QAudio::NoError) 
+        if (!info->start())
         {
             m_lastErrorStr = "Can't start primary audio device";
             return false;
@@ -619,9 +689,11 @@ int DesktopFileEncoder::processData(bool flush)
         r.den = 1000;
         CLAbstractMediaData* audioData = ai->m_audioQueue.front();
 
-        qint64 audioPts =  av_rescale_q(audioData->timestamp, r, m_audioOutStream->time_base);
+        qint64 audioPts =  av_rescale_q(audioData->timestamp, r, m_audioOutStream->time_base) - m_audioFrameDuration;
         qint64 expectedAudioPts = m_storedAudioPts + m_audioFramesCount * m_audioFrameDuration; 
         int audioJitter = qAbs(audioPts - expectedAudioPts);
+
+        //cl_log.log("audio jitter=", audioJitter/90.0, cl_logALWAYS);
 
         if (audioJitter < m_maxAudioJitter)
         {
@@ -683,7 +755,7 @@ int DesktopFileEncoder::processData(bool flush)
         if (aEncoded > 0)
         {
             av_init_packet(&audioPacket);
-            audioPacket.pts = audioPts - m_audioFrameDuration;
+            audioPacket.pts = audioPts;
             audioPacket.data = m_encodedAudioBuf;
             audioPacket.size = aEncoded;
             audioPacket.stream_index = m_audioOutStream->index;
@@ -710,8 +782,14 @@ int DesktopFileEncoder::processData(bool flush)
 
 void DesktopFileEncoder::run()
 {
-    while (!m_needStop)
+    while (!m_needStop || m_grabber->dataExist())
     {
+        if (m_needStop && !m_capturingStopped)
+        {
+            stopCapturing();
+            m_capturingStopped = true;
+        }
+
         CLScreenGrapper::CaptureInfo capturedData = m_grabber->getNextFrame();
         if (!capturedData.opaque)
             continue;
@@ -742,9 +820,10 @@ void DesktopFileEncoder::run()
             m_encodedFrames++;
             firstStep = false;
         }
-
     }
-    stopCapturing();
+    if (!m_capturingStopped)
+        stopCapturing();
+
     cl_log.log("flushing video buffer",cl_logALWAYS);
     do {
     } while (processData(true) > 0); // flush buffers
@@ -754,13 +833,9 @@ void DesktopFileEncoder::run()
 
 void DesktopFileEncoder::stopCapturing()
 {
-    delete m_grabber;
-    m_grabber = 0;
     foreach(EncodedAudioInfo* info, m_audioInfo)
-    {
-        if (info->m_audioOStream)
-            info->m_audioOStream->close();
-    }
+        info->stop();
+    m_grabber->stop();
 }
 
 void DesktopFileEncoder::closeStream()

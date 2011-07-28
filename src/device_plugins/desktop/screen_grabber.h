@@ -44,6 +44,7 @@ public:
     int height() const;
     qint64 currentTime() const;
     int refreshRate() const { return m_ddm.RefreshRate;}
+    void restartTimer() { m_timer.restart(); }
 private:
     HRESULT	InitD3D(HWND hWnd);
     bool dataToFrame(quint8* data, int width, int height, AVFrame* pFrame);

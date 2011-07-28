@@ -4,6 +4,8 @@
 #include <QIODevice>
 #include <QAudioDeviceInfo>
 #include <QAudioInput>
+#include <windows.h>
+#include <mmsystem.h>
 
 #include "device_plugins/desktop/buffered_screen_grabber.h"
 #include "data/mediadata.h"
@@ -29,8 +31,8 @@ public:
                         QWidget* glWidget  // used in application capture mode only
                        );
     virtual ~DesktopFileEncoder();
-    void stop();
     bool start();
+    void stop();
     QString fileName() const { return m_fileName; }
 
     QString lastErrorStr() const { return m_lastErrorStr; }
@@ -54,25 +56,35 @@ private:
     void stopCapturing();
     SpeexPreprocessState* createSpeexPreprocess();
 private:
-    struct EncodedAudioInfo
+    class EncodedAudioInfo
     {
-        EncodedAudioInfo();
+    public:
+        static const int AUDIO_BUFFERS_COUNT = 2;
+        EncodedAudioInfo(DesktopFileEncoder* owner);
         ~EncodedAudioInfo();
         // doubled audio objects
-        QIODevice* m_audioOStream;
         QAudioDeviceInfo m_audioDevice;
-        QAudioInput* m_audioInput;
         QAudioFormat m_audioFormat;
         CLThreadQueue<CLAbstractMediaData*>  m_audioQueue;
         CLAbstractMediaData m_tmpAudioBuffer;
         SpeexPreprocessState* m_speexPreprocess;
 
         int audioPacketSize();
-        bool setupFormat(DesktopFileEncoder* owner, QString& errMessage);
-        void setupPostProcess();
+        bool setupFormat(QString& errMessage);
+        bool setupPostProcess();
         qint64 currentTime() const { return m_owner->m_grabber->currentTime(); }
+        bool start();
+        void stop();
+        int nameToWaveIndex();
+        bool addBuffer();
+        void gotData();
+        void clearBuffers();
     private:
         DesktopFileEncoder* m_owner;
+        HWAVEIN hWaveIn;
+        QQueue<WAVEHDR*> m_buffers;
+        QMutex m_mtx;
+        bool m_terminated;
     };
 
     int m_encodedFrames;
@@ -114,6 +126,9 @@ private:
     QWidget* m_widget;
     bool m_videoPacketWrited;
     QString m_lastErrorStr;
+    bool m_capturingStopped;
+
+    friend void QT_WIN_CALLBACK waveInProc(HWAVEIN hWaveIn, UINT uMsg, DWORD dwInstance,  DWORD dwParam1, DWORD dwParam2);
 };
 
 #endif //__DESKTOP_H264_STREAM_READER_H
