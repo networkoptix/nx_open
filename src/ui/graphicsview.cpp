@@ -2659,7 +2659,7 @@ void GraphicsView::toggleRecording()
         QLabel *label = new QLabel;
         label->resize(200, 100);
         label->move(width()/2 - label->width()/2, 300);
-        label->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+        label->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool);
         label->setText(tr("Recording started"));
         label->setAlignment(Qt::AlignCenter);
         label->setStyleSheet("QLabel { font-size:22px; border-width: 2px; border-style: inset; border-color: #535353; border-radius: 18px; background: #212150; color: #a6a6a6; selection-background-color: ltblue } ");
