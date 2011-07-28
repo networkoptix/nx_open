@@ -21,6 +21,8 @@ public:
                             QWidget* widget = 0);
     virtual ~CLBufferedScreenGrabber();
     CLScreenGrapper::CaptureInfo getNextFrame();
+    bool dataExist();
+
     AVRational getFrameRate();
     PixelFormat format() const { return m_grabber.format(); }
     int width() const          { return m_grabber.width();  }
@@ -28,6 +30,7 @@ public:
     qint64 currentTime() const { return m_grabber.currentTime(); }
 
     bool capturedDataToFrame(CLScreenGrapper::CaptureInfo data, AVFrame* frame) { return m_grabber.capturedDataToFrame(data, frame); }
+    void stop();
 protected:
     virtual void run();
 private:
@@ -36,7 +39,7 @@ private:
     CLNonReferredThreadQueue<CLScreenGrapper::CaptureInfo> m_queue;
     QVector<AVFrame*> m_frames;
     int m_frameIndex;
-    QTime m_timer;
+    //QTime m_timer;
     int m_currentFrameNum;
 };
 

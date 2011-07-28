@@ -4,6 +4,8 @@
 #include <QIODevice>
 #include <QAudioDeviceInfo>
 #include <QAudioInput>
+#include <windows.h>
+#include <mmsystem.h>
 
 #include "device_plugins/desktop/buffered_screen_grabber.h"
 #include "data/mediadata.h"
@@ -29,8 +31,8 @@ public:
                         QWidget* glWidget  // used in application capture mode only
                        );
     virtual ~DesktopFileEncoder();
-    void stop();
     bool start();
+    void stop();
     QString fileName() const { return m_fileName; }
 
     QString lastErrorStr() const { return m_lastErrorStr; }
@@ -43,7 +45,6 @@ private:
     friend class CaptureAudioStream;
 
     virtual void closeStream();
-    int audioPacketSize(bool isPrimary);
 
     int initIOContext();
     qint32 writePacketImpl(quint8* buf, qint32 bufSize);
@@ -55,6 +56,37 @@ private:
     void stopCapturing();
     SpeexPreprocessState* createSpeexPreprocess();
 private:
+    class EncodedAudioInfo
+    {
+    public:
+        static const int AUDIO_BUFFERS_COUNT = 2;
+        EncodedAudioInfo(DesktopFileEncoder* owner);
+        ~EncodedAudioInfo();
+        // doubled audio objects
+        QAudioDeviceInfo m_audioDevice;
+        QAudioFormat m_audioFormat;
+        CLThreadQueue<CLAbstractMediaData*>  m_audioQueue;
+        CLAbstractMediaData m_tmpAudioBuffer;
+        SpeexPreprocessState* m_speexPreprocess;
+
+        int audioPacketSize();
+        bool setupFormat(QString& errMessage);
+        bool setupPostProcess();
+        qint64 currentTime() const { return m_owner->m_grabber->currentTime(); }
+        bool start();
+        void stop();
+        int nameToWaveIndex();
+        bool addBuffer();
+        void gotData();
+        void clearBuffers();
+    private:
+        DesktopFileEncoder* m_owner;
+        HWAVEIN hWaveIn;
+        QQueue<WAVEHDR*> m_buffers;
+        QMutex m_mtx;
+        bool m_terminated;
+    };
+
     int m_encodedFrames;
     CLBufferedScreenGrabber* m_grabber;
     quint8* m_videoBuf;
@@ -85,21 +117,7 @@ private:
     double m_audioFrameDuration;
     qint64 m_storedAudioPts;
     int m_maxAudioJitter;
-    bool m_useSecondaryAudio;
-    bool m_useAudio;
-    // doubled audio objects
-    QIODevice* m_audioOStream;
-    QIODevice* m_audioOStream2;
-    QAudioDeviceInfo m_audioDevice;
-    QAudioDeviceInfo m_audioDevice2;
-    QAudioInput* m_audioInput;
-    QAudioInput* m_audioInput2;
-    QAudioFormat m_audioFormat;
-    QAudioFormat m_audioFormat2;
-    CLThreadQueue<CLAbstractMediaData*>  m_audioQueue;
-    CLThreadQueue<CLAbstractMediaData*>  m_secondAudioQueue;
-    CLAbstractMediaData m_tmpAudioBuffer1;
-    CLAbstractMediaData m_tmpAudioBuffer2;
+    QVector <EncodedAudioInfo*> m_audioInfo;
 
     CLScreenGrapper::CaptureMode m_captureMode;
     bool m_captureCursor;
@@ -108,8 +126,9 @@ private:
     QWidget* m_widget;
     bool m_videoPacketWrited;
     QString m_lastErrorStr;
-    SpeexPreprocessState* m_speexPreprocess;
-    SpeexPreprocessState* m_speexPreprocess2;
+    bool m_capturingStopped;
+
+    friend void QT_WIN_CALLBACK waveInProc(HWAVEIN hWaveIn, UINT uMsg, DWORD dwInstance,  DWORD dwParam1, DWORD dwParam2);
 };
 
 #endif //__DESKTOP_H264_STREAM_READER_H
