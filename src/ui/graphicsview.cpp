@@ -2705,6 +2705,7 @@ void GraphicsView::toggleRecording()
                 // handle error
                 QFile::remove(recordedFileName);
             }
+            CLDeviceManager::instance().addFiles(QStringList() << filePath);
 
             settings.setValue(QLatin1String("previousDir"), QFileInfo(filePath).path());
         }
