@@ -43,7 +43,6 @@ private:
     friend class CaptureAudioStream;
 
     virtual void closeStream();
-    int audioPacketSize(bool isPrimary);
 
     int initIOContext();
     qint32 writePacketImpl(quint8* buf, qint32 bufSize);
@@ -55,6 +54,27 @@ private:
     void stopCapturing();
     SpeexPreprocessState* createSpeexPreprocess();
 private:
+    struct EncodedAudioInfo
+    {
+        EncodedAudioInfo();
+        ~EncodedAudioInfo();
+        // doubled audio objects
+        QIODevice* m_audioOStream;
+        QAudioDeviceInfo m_audioDevice;
+        QAudioInput* m_audioInput;
+        QAudioFormat m_audioFormat;
+        CLThreadQueue<CLAbstractMediaData*>  m_audioQueue;
+        CLAbstractMediaData m_tmpAudioBuffer;
+        SpeexPreprocessState* m_speexPreprocess;
+
+        int audioPacketSize();
+        bool setupFormat(DesktopFileEncoder* owner, QString& errMessage);
+        void setupPostProcess();
+        qint64 currentTime() const { return m_owner->m_grabber->currentTime(); }
+    private:
+        DesktopFileEncoder* m_owner;
+    };
+
     int m_encodedFrames;
     CLBufferedScreenGrabber* m_grabber;
     quint8* m_videoBuf;
@@ -85,21 +105,7 @@ private:
     double m_audioFrameDuration;
     qint64 m_storedAudioPts;
     int m_maxAudioJitter;
-    bool m_useSecondaryAudio;
-    bool m_useAudio;
-    // doubled audio objects
-    QIODevice* m_audioOStream;
-    QIODevice* m_audioOStream2;
-    QAudioDeviceInfo m_audioDevice;
-    QAudioDeviceInfo m_audioDevice2;
-    QAudioInput* m_audioInput;
-    QAudioInput* m_audioInput2;
-    QAudioFormat m_audioFormat;
-    QAudioFormat m_audioFormat2;
-    CLThreadQueue<CLAbstractMediaData*>  m_audioQueue;
-    CLThreadQueue<CLAbstractMediaData*>  m_secondAudioQueue;
-    CLAbstractMediaData m_tmpAudioBuffer1;
-    CLAbstractMediaData m_tmpAudioBuffer2;
+    QVector <EncodedAudioInfo*> m_audioInfo;
 
     CLScreenGrapper::CaptureMode m_captureMode;
     bool m_captureCursor;
@@ -108,8 +114,6 @@ private:
     QWidget* m_widget;
     bool m_videoPacketWrited;
     QString m_lastErrorStr;
-    SpeexPreprocessState* m_speexPreprocess;
-    SpeexPreprocessState* m_speexPreprocess2;
 };
 
 #endif //__DESKTOP_H264_STREAM_READER_H

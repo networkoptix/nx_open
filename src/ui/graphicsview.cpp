@@ -2656,7 +2656,7 @@ void GraphicsView::toggleRecording()
 #endif
         cm_start_video_recording.setProperty("recoding", true);
 
-        QLabel *label = new QLabel;
+        QLabel *label = new QLabel(this);
         label->resize(200, 100);
         label->move(width()/2 - label->width()/2, 300);
         label->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
