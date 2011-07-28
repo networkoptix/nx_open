@@ -2656,7 +2656,7 @@ void GraphicsView::toggleRecording()
 #endif
         cm_start_video_recording.setProperty("recoding", true);
 
-        QLabel *label = new QLabel(this);
+        QLabel *label = new QLabel;
         label->resize(200, 100);
         label->move(width()/2 - label->width()/2, 300);
         label->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
@@ -2705,6 +2705,7 @@ void GraphicsView::toggleRecording()
                 // handle error
                 QFile::remove(recordedFileName);
             }
+            CLDeviceManager::instance().addFiles(QStringList() << filePath);
 
             settings.setValue(QLatin1String("previousDir"), QFileInfo(filePath).path());
         }

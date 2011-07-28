@@ -24,7 +24,7 @@ QAudioDeviceInfo getDeviceByName(const QString &name, QAudio::Mode mode, bool *i
         return QAudioDeviceInfo();
 
     foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(mode)) {
-        if (info.deviceName().startsWith(name))
+        if (name.startsWith(info.deviceName()))
             return info;
     }
 
