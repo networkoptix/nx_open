@@ -34,7 +34,7 @@ private:
 
 extern QMutex global_ffmpeg_mutex;
 static const int FFMPEG_PROBE_BUFFER_SIZE = 1024 * 512;
-static const int MAX_VALID_SLEEP_TIME = 1000 * 1000 * 5; // 5 seconds as most long sleep time
+
 
 qint64 CLAVIStreamReader::packetTimestamp(AVStream* stream, const AVPacket& packet)
 {
