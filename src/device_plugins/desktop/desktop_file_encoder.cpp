@@ -721,7 +721,7 @@ int DesktopFileEncoder::processData(bool flush)
         if (ai2)
         {
             CLAbstractMediaData* audioData2;
-            ai->m_audioQueue.pop(audioData2);
+            ai2->m_audioQueue.pop(audioData2);
             short* buffer2 = (short*) audioData2->data.data();
             if (ai2->m_speexPreprocess)
                 speex_preprocess(ai2->m_speexPreprocess, buffer2, NULL);
