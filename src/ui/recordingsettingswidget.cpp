@@ -191,8 +191,10 @@ void RecordingSettingsWidget::setPrimaryAudioDeviceName(const QString &name)
     }
 
     for (int i = 1; i < ui->primaryAudioDeviceComboBox->count(); i++) {
-        if (ui->primaryAudioDeviceComboBox->itemText(i).startsWith(name))
+        if (ui->primaryAudioDeviceComboBox->itemText(i).startsWith(name)) {
             ui->primaryAudioDeviceComboBox->setCurrentIndex(i);
+            return;
+        }
     }
 }
 
@@ -204,13 +206,15 @@ QString RecordingSettingsWidget::secondaryAudioDeviceName() const
 void RecordingSettingsWidget::setSecondaryAudioDeviceName(const QString &name)
 {
     if (name.isEmpty()) {
-        ui->primaryAudioDeviceComboBox->setCurrentIndex(0);
+        ui->secondaryAudioDeviceComboBox->setCurrentIndex(0);
         return;
     }
 
     for (int i = 1; i < ui->secondaryAudioDeviceComboBox->count(); i++) {
-        if (ui->secondaryAudioDeviceComboBox->itemText(i).startsWith(name))
+        if (ui->secondaryAudioDeviceComboBox->itemText(i).startsWith(name)) {
             ui->secondaryAudioDeviceComboBox->setCurrentIndex(i);
+            return;
+        }
     }
 }
 
