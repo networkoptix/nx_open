@@ -52,6 +52,7 @@ private:
     Q_INVOKABLE void captureFrameOpenGL(void* opaque);
     void drawCursor(quint32* data, int dataStride, int height, int leftOffset, int topOffset, bool flip) const;
     void allocateTmpFrame(int width, int height);
+    void toggleAero(bool value);
 private:
     int m_displayNumber;
 

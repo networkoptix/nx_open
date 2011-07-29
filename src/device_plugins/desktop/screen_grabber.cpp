@@ -8,7 +8,8 @@ extern "C" {
 #include "base/colorspace_convert/colorspace.h"
 #include "base/log.h"
 
-#include <Dwmapi.h>
+typedef DECLSPEC_IMPORT HRESULT (STDAPICALLTYPE *DwmEnableComposition) (UINT uCompositionAction);
+
 
 QMutex CLScreenGrapper::m_instanceMutex;
 int CLScreenGrapper::m_aeroInstanceCounter;
@@ -48,6 +49,17 @@ private:
 CPUDetector cpuInfo;
 
 
+void CLScreenGrapper::toggleAero(bool value)
+{
+    QLibrary lib("Dwmapi");
+    if (lib.load())
+    {
+        DwmEnableComposition f = (DwmEnableComposition)lib.resolve("DwmEnableComposition");
+        if (f)
+            f(value ? 1 : 0);
+    }
+}
+
 CLScreenGrapper::CLScreenGrapper(int displayNumber, int poolSize, CaptureMode mode, bool captureCursor, const QSize& captureResolution, QWidget* widget): 
     m_pD3D(0), 
     m_pd3dDevice(0), 
@@ -71,7 +83,7 @@ CLScreenGrapper::CLScreenGrapper(int displayNumber, int poolSize, CaptureMode mo
     {
         QMutexLocker locker(&m_instanceMutex);
         if (++m_aeroInstanceCounter == 1)
-            DwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
+            toggleAero(false);
     }
     m_needRescale = captureResolution.width() != 0 || mode == CaptureMode_Application;
     if (mode == CaptureMode_Application)
@@ -109,7 +121,7 @@ CLScreenGrapper::~CLScreenGrapper()
     {
         QMutexLocker locker(&m_instanceMutex);
         if (--m_aeroInstanceCounter == 0)
-            DwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
+            toggleAero(true);
     }
     DeleteDC(m_cursorDC);
 
