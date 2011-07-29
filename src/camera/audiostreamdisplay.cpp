@@ -267,8 +267,7 @@ void CLAudioStreamDisplay::playCurrentBuffer()
         audio.inbuf_len = data->data.size();
         audio.outbuf = &m_decodedaudio;
         audio.outbuf_len = 0;
-        audio.format.setChannels(data->channels);
-        audio.format.setFrequency(data->freq);
+        audio.format = data->format;
 
         if (data->compressionType == CODEC_ID_NONE)
         {
@@ -279,7 +278,7 @@ void CLAudioStreamDisplay::playCurrentBuffer()
 
         if (m_decoder[data->compressionType] == 0)
         {
-            m_decoder[data->compressionType] = CLAudioDecoderFactory::createDecoder(data->compressionType, data->context);
+            m_decoder[data->compressionType] = CLAudioDecoderFactory::createDecoder(data);
 
         }
 
@@ -315,8 +314,11 @@ void CLAudioStreamDisplay::playCurrentBuffer()
         //resume(); // does nothing if resumed already
 
         // play audio
-        if (!m_audioSound) 
+        if (!m_audioSound) {
             m_audioSound = QtvAudioDevice::instance().addSound(audio.format);
+            if (!m_audioSound)
+                m_isConvertMethodInitialized = false; // I have found PC where: 32-bit format sometime supported, sometimes not supported (may be several dll)
+        }
 
         if (m_audioSound)
             m_audioSound->play((const quint8*) audio.outbuf->data(), audio.outbuf_len);

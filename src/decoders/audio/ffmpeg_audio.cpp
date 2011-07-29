@@ -2,6 +2,7 @@
 
 #include "base/log.h"
 #include "base/aligned_data.h"
+#include "data/mediadata.h"
 
 struct AVCodecContext;
 
@@ -12,10 +13,28 @@ extern int MAX_AUDIO_FRAME_SIZE;
 
 bool CLFFmpegAudioDecoder::m_first_instance = true;
 
+AVSampleFormat CLFFmpegAudioDecoder::audioFormatQtToFfmpeg(const QAudioFormat& fmt)
+{
+
+    int s = fmt.sampleSize();
+    QAudioFormat::SampleType st = fmt.sampleType();
+    if (fmt.sampleSize() == 8)
+        return AV_SAMPLE_FMT_U8;
+    else if(fmt.sampleSize() == 16 && fmt.sampleType() == QAudioFormat::SignedInt)
+        return AV_SAMPLE_FMT_S16;
+    else if(fmt.sampleSize() == 32 && fmt.sampleType() == QAudioFormat::SignedInt)
+        return AV_SAMPLE_FMT_S32;
+    else if(fmt.sampleSize() == 32 && fmt.sampleType() == QAudioFormat::Float)
+        return AV_SAMPLE_FMT_FLT;
+    else
+        return AV_SAMPLE_FMT_NONE;
+}
+
 //================================================
-CLFFmpegAudioDecoder::CLFFmpegAudioDecoder(CodecID codecId, AVCodecContext* codecContext):
-c(0),
-m_codec(codecId)
+
+CLFFmpegAudioDecoder::CLFFmpegAudioDecoder(CLCompressedAudioData* data):
+    c(0),
+    m_codec(data->compressionType)
 {
 
 	QMutexLocker mutex(&global_ffmpeg_mutex);
@@ -34,9 +53,9 @@ m_codec(codecId)
 
 //    CodecID codecId = internalCodecIdToFfmpeg(m_codec);
 
-    if (codecId != CODEC_ID_NONE)
+    if (m_codec != CODEC_ID_NONE)
     {
-        codec = avcodec_find_decoder(codecId);
+        codec = avcodec_find_decoder(m_codec);
     }
     else
     {
@@ -47,9 +66,24 @@ m_codec(codecId)
 
 	c = avcodec_alloc_context();
 
-	if (codecContext) {
-		avcodec_copy_context(c, codecContext);
-	}
+    c->codec_id = m_codec;
+    c->codec_type = AVMEDIA_TYPE_AUDIO;
+    c->sample_fmt = audioFormatQtToFfmpeg(data->format);
+    c->channels = data->format.channels();
+    c->sample_rate = data->format.frequency();
+    c->bits_per_coded_sample = qMin(24, data->format.sampleSize());
+
+    c->bit_rate = data->format.bitrate;
+    c->block_align = data->format.block_align;
+    c->channel_layout = data->format.channel_layout;
+
+    if (data->format.extraData.size() > 0)
+    {
+        c->extradata_size = data->format.extraData.size();
+        c->extradata = (quint8*) av_malloc(c->extradata_size);
+        memcpy(c->extradata, &data->format.extraData[0], c->extradata_size);
+    }
+
 	avcodec_open(c, codec);
 
 }
@@ -64,44 +98,6 @@ CLFFmpegAudioDecoder::~CLFFmpegAudioDecoder(void)
 		av_free(c);
 	}
 
-}
-
-void CLFFmpegAudioDecoder::audioCodecFillFormat(QAudioFormat& format, AVCodecContext *c)
-{
-	if (c->sample_rate)
-		format.setFrequency(c->sample_rate);
-
-	if (c->channels) 
-		format.setChannels(c->channels);
-
-	format.setCodec("audio/pcm");
-	format.setByteOrder(QAudioFormat::LittleEndian);
-
-	switch(c->sample_fmt)
-	{
-	case SAMPLE_FMT_U8: ///< unsigned 8 bits
-		format.setSampleSize(8);
-		format.setSampleType(QAudioFormat::UnSignedInt);
-		break;
-
-	case SAMPLE_FMT_S16: ///< signed 16 bits
-		format.setSampleSize(16);
-		format.setSampleType(QAudioFormat::SignedInt);
-		break;
-
-	case SAMPLE_FMT_S32:///< signed 32 bits
-		format.setSampleSize(32);
-		format.setSampleType(QAudioFormat::SignedInt);
-	    break;
-
-	case AV_SAMPLE_FMT_FLT:
-		format.setSampleSize(32);
-		format.setSampleType(QAudioFormat::Float);
-		break;
-
-    default:
-        break;
-	}
 }
 
 //The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than the actual read bytes because some optimized bit stream readers read 32 or 64 bits at once and could read over the end.
@@ -162,7 +158,7 @@ bool CLFFmpegAudioDecoder::decode(CLAudioData& data)
 
 	}
 
-	audioCodecFillFormat(data.format, c);
+	//audioCodecFillFormat(data.format, c);
 
 	return true;
 }

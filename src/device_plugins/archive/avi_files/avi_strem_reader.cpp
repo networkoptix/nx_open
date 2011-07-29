@@ -6,6 +6,7 @@
 #include "stdint.h"
 #include <libavformat/avformat.h>
 #include "base/ffmpeg_helper.h"
+#include "decoders/audio/ffmpeg_audio.h"
 
 QMutex CLAVIStreamReader::avi_mutex;
 QSemaphore CLAVIStreamReader::aviSemaphore(4);
@@ -271,7 +272,7 @@ CLCompressedVideoData* CLAVIStreamReader::getVideoData(const AVPacket& packet, A
 CLCompressedAudioData* CLAVIStreamReader::getAudioData(const AVPacket& packet, AVStream* stream)
 {
     int extra = 0;
-    CLCompressedAudioData* audioData = new CLCompressedAudioData(CL_MEDIA_ALIGNMENT, packet.size + extra, stream->codec);
+    CLCompressedAudioData* audioData = new CLCompressedAudioData(CL_MEDIA_ALIGNMENT, packet.size + extra);
     CLByteArray& data = audioData->data;
 
     data.prepareToWrite(packet.size + extra);
@@ -280,13 +281,11 @@ CLCompressedAudioData* CLAVIStreamReader::getAudioData(const AVPacket& packet, A
     data.done(packet.size + extra);
 
     audioData->compressionType = m_audioCodecId;
-    audioData->channels = m_channels;
+    audioData->format.fromAvStream(stream->codec);
 
     double time_base = av_q2d(stream->time_base);
     audioData->timestamp = packetTimestamp(stream, packet);
     audioData->duration = qint64(1e+6 * time_base * packet.duration);
-
-    audioData->freq = m_freq;
 
     return audioData;
 }

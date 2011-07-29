@@ -30,12 +30,13 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_displayLasts(0),
       m_ignoringVideo(false),
       mGenerateEndOfStreamSignal(generateEndOfStreamSignal),
-      m_needReinitAudio(false),
       m_isRealTimeSource(true),
       m_videoBufferOverflow(false),
       m_singleShotMode(false),
       m_singleShotQuantProcessed(false),
-      m_jumpTime(0)
+      m_jumpTime(0),
+      m_playingCompress(0),
+      m_playingBitrate(0)
 {
 	for (int i = 0; i< CL_MAX_CHANNELS; ++i)
 		m_display[i] = 0;
@@ -163,9 +164,26 @@ void CLCamDisplay::setSingleShotMode(bool single)
 
 bool CLCamDisplay::processData(CLAbstractData* data)
 {
+    CLCompressedVideoData *vd = 0;
+    CLCompressedAudioData *ad = 0;
+
+    CLAbstractMediaData* md = static_cast<CLAbstractMediaData*>(data);
+    if (md->dataType == CLAbstractMediaData::VIDEO)
+    {
+        vd = static_cast<CLCompressedVideoData*>(data);
+        m_ignoringVideo = vd->ignore;
+    }
+    else if (md->dataType == CLAbstractMediaData::AUDIO)
+    {
+        ad = static_cast<CLCompressedAudioData*>(data);
+    }
+
     bool flushCurrentBuffer = false;
     CLAbstractMediaData* mData = dynamic_cast<CLAbstractMediaData*>(data);
-    if (mData && (mData->flags & CLAbstractMediaData::MediaFlags_AfterEOF) && m_videoQueue->size() > 0)
+    bool audioParamsChanged = ad && m_playingFormat != ad->format;
+    if (mData &&
+        ((mData->flags & CLAbstractMediaData::MediaFlags_AfterEOF) || audioParamsChanged) &&
+        m_videoQueue->size() > 0)
     {
         // skip data (play current buffer
         flushCurrentBuffer = true;
@@ -178,20 +196,6 @@ bool CLCamDisplay::processData(CLAbstractData* data)
         else
             setPriority(QThread::NormalPriority);
         m_needChangePriority = false;
-    }
-
-	CLCompressedVideoData *vd = 0;
-	CLCompressedAudioData *ad = 0;
-
-	CLAbstractMediaData* md = static_cast<CLAbstractMediaData*>(data);
-	if (md->dataType == CLAbstractMediaData::VIDEO)
-    {
-		vd = static_cast<CLCompressedVideoData*>(data);
-        m_ignoringVideo = vd->ignore;
-    }
-	else if (md->dataType == CLAbstractMediaData::AUDIO)
-    {
-		ad = static_cast<CLCompressedAudioData*>(data);
     }
 
     if (m_afterJump)
@@ -208,23 +212,12 @@ bool CLCamDisplay::processData(CLAbstractData* data)
 
 	if (ad && !flushCurrentBuffer)
 	{
-		if (m_needReinitAudio)
-		{
-			QMutexLocker lock(&m_audioChangeMutex);
-			AVCodecContext* codec = (AVCodecContext*) ad->context;
-			QAudioFormat currentAudioFormat;
-			CLFFmpegAudioDecoder::audioCodecFillFormat(currentAudioFormat, codec);
-			if (m_expectedAudioFormat == currentAudioFormat)
-			{
-                if (m_playingFormat != currentAudioFormat)
-                {
-				    delete m_audioDisplay;
-				    m_audioDisplay = new CLAudioStreamDisplay(AUDIO_BUFF_SIZE);
-                    m_playingFormat = currentAudioFormat;
-                }
-				m_needReinitAudio = false;
-			}
-		}
+        if (audioParamsChanged)
+        {
+            delete m_audioDisplay;
+            m_audioDisplay = new CLAudioStreamDisplay(AUDIO_BUFF_SIZE);
+            m_playingFormat = ad->format;
+        }
 
         // after seek, when audio is shifted related video (it is often), first audio packet will be < seek threshold
         // so, second afterJump is generated after several video packet. To prevent it, increase jump detection interval for audio
@@ -307,7 +300,7 @@ bool CLCamDisplay::processData(CLAbstractData* data)
         }
 
         // no more data expected. play as is            
-        if (m_audioDisplay->isBuffering() && flushCurrentBuffer)
+        if (flushCurrentBuffer)
             m_audioDisplay->playCurrentBuffer(); 
 
         //2) we have audio and it's buffering( not playing yet )
@@ -326,7 +319,7 @@ bool CLCamDisplay::processData(CLAbstractData* data)
             //cl_log.log("diff = ", (int)diff/1000, cl_logALWAYS);
 
 
-            if (diff >= 2 * videoDuration && !m_audioDisplay->isBuffering()) //factor 2 here is to avoid frequent switch between normal play and fast play
+            if (diff >= 2 * videoDuration && m_audioDisplay->msInBuffer() > 0) //factor 2 here is to avoid frequent switch between normal play and fast play
             {
                 // video runs faster than audio; // need to hold video this frame
                 if (vd)
@@ -349,7 +342,8 @@ bool CLCamDisplay::processData(CLAbstractData* data)
                 if (m_audioDisplay->msInBuffer() < AUDIO_BUFF_SIZE )
                     incoming = vd; // process packet
                 else {
-                    vd->releaseRef(); // queue too large. postpone packet.
+                    if (vd)
+                        vd->releaseRef(); // queue too large. postpone packet.
                     result = false;
                 }
 
@@ -531,13 +525,6 @@ void CLCamDisplay::setMTDecoding(bool value)
         if (m_display[i])
             m_display[i]->setMTDecoding(value);
     }
-}
-
-void CLCamDisplay::onAudioParamsChanged(AVCodecContext * codec)
-{
-	QMutexLocker lock(&m_audioChangeMutex);
-	CLFFmpegAudioDecoder::audioCodecFillFormat(m_expectedAudioFormat, codec);
-    m_needReinitAudio = true; 
 }
 
 void CLCamDisplay::onRealTimeStreamHint(bool value)

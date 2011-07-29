@@ -22,6 +22,7 @@ extern "C"
 
 #include "data/mediadata.h"
 #include "win_audio_helper.h"
+#include "decoders/audio/ffmpeg_audio.h"
 
 // mux audio 1 and audio 2 to audio1 buffer
 // I have used intrisicts for SSE. It is portable for MSVC, GCC (mac, linux), Intel compiler
@@ -67,23 +68,6 @@ void monoToStereo(qint16* dst, qint16* src1, qint16* src2, int lenInShort)
         *dst++ = *src1++;
         *dst++ = *src2++;
     }
-}
-
-AVSampleFormat audioFormatQtToFfmpeg(const QAudioFormat& fmt)
-{
-
-    int s = fmt.sampleSize();
-    QAudioFormat::SampleType st = fmt.sampleType();
-    if (fmt.sampleSize() == 8)
-        return AV_SAMPLE_FMT_U8;
-    else if(fmt.sampleSize() == 16 && fmt.sampleType() == QAudioFormat::SignedInt)
-        return AV_SAMPLE_FMT_S16;
-    else if(fmt.sampleSize() == 32 && fmt.sampleType() == QAudioFormat::SignedInt)
-        return AV_SAMPLE_FMT_S32;
-    else if(fmt.sampleSize() == 32 && fmt.sampleType() == QAudioFormat::Float)
-        return AV_SAMPLE_FMT_FLT;
-    else
-        return AV_SAMPLE_FMT_NONE;
 }
 
 struct FffmpegLog
@@ -367,7 +351,7 @@ bool DesktopFileEncoder::EncodedAudioInfo::setupPostProcess()
     return true;
 }
 
-DesktopFileEncoder::DesktopFileEncoder ( 
+DesktopFileEncoder::DesktopFileEncoder (
                    const QString& fileName, 
                    int desktopNum, 
                    const QAudioDeviceInfo* audioDevice,
@@ -608,7 +592,7 @@ bool DesktopFileEncoder::init()
         m_audioCodecCtx = m_audioOutStream->codec;
         m_audioCodecCtx->codec_id = m_outputCtx->audio_codec;
         m_audioCodecCtx->codec_type = AVMEDIA_TYPE_AUDIO;
-        m_audioCodecCtx->sample_fmt = audioFormatQtToFfmpeg(m_audioInfo[0]->m_audioFormat);
+        m_audioCodecCtx->sample_fmt = CLFFmpegAudioDecoder::audioFormatQtToFfmpeg(m_audioInfo[0]->m_audioFormat);
         m_audioCodecCtx->channels = m_audioInfo.size() > 1 ? 2 : m_audioInfo[0]->m_audioFormat.channels();
         m_audioCodecCtx->sample_rate = m_audioInfo[0]->m_audioFormat.frequency();
         AVRational audioRational = {1, m_audioCodecCtx->sample_rate};
