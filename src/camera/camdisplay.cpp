@@ -13,6 +13,7 @@
 static const qint64 MIN_VIDEO_DETECT_JUMP_INTERVAL = 100 * 1000; // 100ms
 static const qint64 MIN_AUDIO_DETECT_JUMP_INTERVAL = MIN_VIDEO_DETECT_JUMP_INTERVAL + AUDIO_BUFF_SIZE*1000;
 static const int MAX_VALID_SLEEP_TIME = 1000*1000*5;
+static const int MAX_VALID_SLEEP_LIVE_TIME = 1000 * 500; // 5 seconds as most long sleep time
 
 CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
     : CLAbstractDataProcessor(CL_MAX_DISPLAY_QUEUE_SIZE),
@@ -87,7 +88,11 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
 	// adaptive delay will not solve all problems => need to minus little appendix based on queue size
 	qint32 needToSleep = currentTime - m_previousVideoTime;
     if (m_isRealTimeSource)
+    {
         needToSleep -= (m_dataQueue.size()) * 2 * 1000;
+        if (needToSleep > MAX_VALID_SLEEP_LIVE_TIME)
+            needToSleep = 0;
+    }
 
 	m_previousVideoTime = currentTime;
 
