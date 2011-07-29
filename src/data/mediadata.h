@@ -7,8 +7,11 @@
 
 struct CLAbstractMediaData : public CLAbstractData
 {
+    enum MediaFlags {MediaFlags_None = 0, MediaFlags_AfterEOF = 1};
+
 	CLAbstractMediaData(unsigned int alignment, unsigned int capacity)
-        : data(alignment, capacity)
+        : data(alignment, capacity),
+        flags(MediaFlags_None)
 	{
 	}
 
@@ -22,6 +25,7 @@ struct CLAbstractMediaData : public CLAbstractData
 	DataType dataType;
 	CodecID compressionType;
 	qint64 timestamp; // mksec // 10^-6
+    unsigned flags;
 
 private:
 	CLAbstractMediaData() : 

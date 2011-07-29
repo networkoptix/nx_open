@@ -18,7 +18,8 @@ CLAVIPlaylistStreamReader::CLAVIPlaylistStreamReader(CLDevice* dev) :
     m_currentFileIndex(-1),
     m_initialized(false),
     m_inSeek(false),
-    m_ioBuffer(0)
+    m_ioBuffer(0),
+    m_totalContentLength(0)
 {
 }
 
@@ -37,6 +38,7 @@ CLAVIPlaylistStreamReader::~CLAVIPlaylistStreamReader()
 
 AVFormatContext* CLAVIPlaylistStreamReader::getFormatContext()
 {
+    m_totalContentLength = 0;
     if (m_initialized)
     {
         if (m_fileList.isEmpty())
@@ -100,7 +102,7 @@ AVFormatContext* CLAVIPlaylistStreamReader::getFormatContext()
         else
         {
             fillAdditionalInfo(fi);
-            m_lengthMksec += fi->m_formatContext->duration;
+            m_totalContentLength += fi->m_formatContext->duration;
             if (m_fileList.size() > 1)
                 fi->m_offsetInMks = m_fileList[m_fileList.size()-2]->m_offsetInMks + m_fileList[m_fileList.size()-2]->m_formatContext->duration;
         }
