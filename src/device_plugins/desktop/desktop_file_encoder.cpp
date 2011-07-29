@@ -632,7 +632,8 @@ bool DesktopFileEncoder::init()
         {
             if (!audioChannel->setupPostProcess())
             {
-                m_lastErrorStr = "Can't initialize audio device";
+                WinAudioExtendInfo extInfo(audioChannel->m_audioDevice.deviceName());
+                m_lastErrorStr = QString("Can't initialize audio device '") + extInfo.fullName() + QString("'");
                 return false;
             }
         }
