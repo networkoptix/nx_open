@@ -9,7 +9,7 @@ TARGET = EvePlayer-Beta
 
 include(../contrib/qtsingleapplication/src/qtsingleapplication.pri)
 
-debug {
+CONFIG(debug, debug|release) {
   DESTDIR = ../bin/debug
   OBJECTS_DIR  = ../build/debug
   MOC_DIR = ../build/debug/generated
@@ -18,7 +18,7 @@ debug {
   INCLUDEPATH += $$FFMPEG-debug/include
 }
 
-release {
+CONFIG(release, debug|release) {
   DESTDIR = ../bin/release
   OBJECTS_DIR  = ../build/release
   MOC_DIR = ../build/release/generated
@@ -29,8 +29,11 @@ release {
 
 
 win32 {
-  QMAKE_CXXFLAGS += -MP /Fd$(IntDir)
-  INCLUDEPATH += ../contrib/ffmpeg-misc-headers-win32
+  win32-msvc* {
+    QMAKE_CXXFLAGS += -MP /Fd$(IntDir)
+    INCLUDEPATH += ../contrib/ffmpeg-misc-headers-win32
+    DEFINES += _CRT_SECURE_NO_WARNINGS
+  }
   INCLUDEPATH += ../contrib/openal/include
   INCLUDEPATH += $(DXSDK_DIR)/Include
   !contains(QMAKE_HOST.arch, x86_64) {
@@ -59,7 +62,6 @@ FORMS += mainwnd.ui preferences.ui licensekey.ui recordingsettings.ui
 
 win32 {
   LIBS += ws2_32.lib Iphlpapi.lib
-  #QMAKE_LFLAGS += avcodec-53.lib avdevice-53.lib avfilter-2.lib avformat-53.lib avutil-51.lib swscale-0.lib
   LIBS += avcodec.lib avdevice.lib avfilter.lib avformat.lib avutil.lib swscale.lib
   QMAKE_LFLAGS_DEBUG += /libpath:$$FFMPEG-debug/bin
   QMAKE_LFLAGS_RELEASE += /libpath:$$FFMPEG-release/bin
