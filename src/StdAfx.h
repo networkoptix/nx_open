@@ -2,7 +2,6 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <iphlpapi.h>
-#include <icmpapi.h>
 
 // DXVA headers (should be included before ffmpeg headers)
 #ifdef _USE_DXVA
@@ -26,7 +25,7 @@ extern "C" {
     #endif
 	#include <libswscale/swscale.h>
     #include <libavutil/avstring.h>
-};
+}
 
 #if defined __cplusplus
 // stl headers

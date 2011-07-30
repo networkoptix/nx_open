@@ -1,6 +1,7 @@
 #include "ping.h"
 
 #ifdef _WIN32
+#include <icmpapi.h>
 #include <stdio.h>
 #include "base/log.h"
 
