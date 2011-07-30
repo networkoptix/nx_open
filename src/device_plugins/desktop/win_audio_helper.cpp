@@ -118,10 +118,11 @@ QPixmap WinAudioExtendInfo::deviceIcon() const
     int resNumber = qAbs(params[1].toInt());
 
     HICON hIcon = LoadIcon(library, MAKEINTRESOURCE(resNumber));
+    QPixmap rez;
     if (hIcon)
-        return QPixmap::fromWinHICON( hIcon);
-    else
-        return QPixmap();
+        rez = QPixmap::fromWinHICON( hIcon);
+    DestroyIcon(hIcon);
+    return rez;
 }
 
 
