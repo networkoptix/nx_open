@@ -41,6 +41,11 @@ static const int ROUND_COEFF = 8;
 QVector<quint8> CLGLRenderer::m_staticYFiller;
 QVector<quint8> CLGLRenderer::m_staticUVFiller;
 
+QMutex CLGLRenderer::m_programMutex; 
+bool CLGLRenderer::m_programInited = false;
+GLuint CLGLRenderer::m_program[2];
+
+
 #define OGL_CHECK_ERROR(str) //if (checkOpenGLError() != GL_NO_ERROR) {cl_log.log(str, __LINE__ , cl_logERROR); }
 
 // arbfp1 fragment program for converting yuv (YV12) to rgb
@@ -289,31 +294,40 @@ void CLGLRenderer::init(bool msgbox)
     if (!error && glProgramStringARB && glBindProgramARB && glDeleteProgramsARB &&
             glGenProgramsARB && glProgramLocalParameter4fARB)
     {
-        glGenProgramsARB(2, m_program);
 
-        //==================
-        const char *code[] = {yv12ToRgb, yuy2ToRgb};
-      
-        for(int i = 0; i < ProgramCount && !error;  ++i)
+        QMutexLocker mtx (&m_programMutex);
+        if (!m_programInited)
         {
+            glGenProgramsARB(2, m_program);
 
-            glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, m_program[i]);
+            //==================
+            const char *code[] = {yv12ToRgb, yuy2ToRgb};
 
-            const GLbyte *gl_src = reinterpret_cast<const GLbyte *>(code[i]);
-            glProgramStringARB(GL_FRAGMENT_PROGRAM_ARB, GL_PROGRAM_FORMAT_ASCII_ARB,
-                               strlen(code[i]), gl_src);
-
-            if (checkOpenGLError() != GL_NO_ERROR)
+            for(int i = 0; i < ProgramCount && !error;  ++i)
             {
-                error = true;
+
+                glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, m_program[i]);
+
+                const GLbyte *gl_src = reinterpret_cast<const GLbyte *>(code[i]);
+                glProgramStringARB(GL_FRAGMENT_PROGRAM_ARB, GL_PROGRAM_FORMAT_ASCII_ARB,
+                    strlen(code[i]), gl_src);
+
+                if (checkOpenGLError() != GL_NO_ERROR)
+                {
+                    error = true;
+                }
             }
+
+            if (error)
+            {
+                glDeleteProgramsARB(2, m_program);
+                CL_LOG(cl_logERROR) cl_log.log("Error compile shader!!!", cl_logERROR);
+            }
+            else
+                m_programInited = true;
+
         }
 
-        if (error)
-        {
-            glDeleteProgramsARB(2, m_program);
-            CL_LOG(cl_logERROR) cl_log.log("Error compile shader!!!", cl_logERROR);
-        }
         //==================
 
     }
