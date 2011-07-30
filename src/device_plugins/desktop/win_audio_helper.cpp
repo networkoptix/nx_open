@@ -94,8 +94,24 @@ WinAudioExtendInfo::~WinAudioExtendInfo()
     m_pMMDeviceEnumerator->Release();
 }
 
-QPixmap WinAudioExtendInfo::deviceIcon() const
+
+BOOL CALLBACK enumFunc(HMODULE hModule, LPCTSTR lpszType, LPTSTR lpszName,LONG_PTR lParam)
 {
+    ;
+    WinAudioExtendInfo* info = (WinAudioExtendInfo*) lParam;
+    if (info->m_iconGroupIndex == 0)
+    {
+        info->m_iconGroupNum = (short) lpszName;
+        return false;
+    }
+    info->m_iconGroupIndex--;
+    return true;
+}
+
+QPixmap WinAudioExtendInfo::deviceIcon() 
+{
+    qDebug() << m_iconPath;
+
     QStringList params = m_iconPath.split(',');
     if (params.size() < 2)
         return 0;
@@ -115,8 +131,17 @@ QPixmap WinAudioExtendInfo::deviceIcon() const
     HMODULE library = LoadLibrary((LPCWSTR) params[0].constData());
     if (library < 0)
         return false;
-    int resNumber = qAbs(params[1].toInt());
-
+    int resNumber = params[1].toInt();
+    if (resNumber < 0) {
+        resNumber = -resNumber;
+    }
+    else 
+    {
+        m_iconGroupIndex = resNumber;
+        m_iconGroupNum = 0;
+        EnumResourceNames(library, RT_GROUP_ICON, enumFunc, (LONG_PTR) this);
+        resNumber = m_iconGroupNum;
+    }
     HICON hIcon = LoadIcon(library, MAKEINTRESOURCE(resNumber));
     QPixmap rez;
     if (hIcon)
