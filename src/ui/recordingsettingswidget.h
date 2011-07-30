@@ -37,7 +37,10 @@ public:
 
 public slots:
     void accept();
-
+    void onComboboxChanged(int index);
+private:
+    void setDefaultSoundIcon(QLabel* l);
+    void additionalAdjustSize();
 private slots:
     void onMonitorChanged(int);
     void onDisableAeroChecked(bool);

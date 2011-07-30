@@ -8,6 +8,13 @@
 #include "QtMultimedia/QAudioDeviceInfo"
 #include "../device_plugins/desktop/win_audio_helper.h"
 
+static const int ICON_SIZE = 32;
+
+void RecordingSettingsWidget::setDefaultSoundIcon(QLabel* l)
+{
+    l->setPixmap(QPixmap(":/skin/microphone.png").scaled(ICON_SIZE, ICON_SIZE));
+}
+
 RecordingSettingsWidget::RecordingSettingsWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::RecordingSettings),
@@ -41,18 +48,22 @@ RecordingSettingsWidget::RecordingSettingsWidget(QWidget *parent) :
     }
     setScreen(settings->screen());
 
-    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {
-        ui->primaryAudioDeviceComboBox->addItem(WinAudioExtendInfo(info.deviceName()).fullName());
-        ui->secondaryAudioDeviceComboBox->addItem(WinAudioExtendInfo(info.deviceName()).fullName());
+    connect (ui->primaryAudioDeviceComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onComboboxChanged(int)) );
+    connect (ui->secondaryAudioDeviceComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onComboboxChanged(int)) );
+    connect(ui->screenComboBox, SIGNAL(currentIndexChanged(int)), SLOT(onMonitorChanged(int)));
+    setDefaultSoundIcon(ui->label_primaryDeviceIcon);
+    setDefaultSoundIcon(ui->label_secondaryDeviceIcon);
+
+    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) 
+    {
+        WinAudioExtendInfo ext1(info.deviceName());
+        ui->primaryAudioDeviceComboBox->addItem(ext1.fullName());
+        ui->secondaryAudioDeviceComboBox->addItem(ext1.fullName());
     }
     setPrimaryAudioDeviceName(settings->primaryAudioDevice().deviceName());
     setSecondaryAudioDeviceName(settings->secondaryAudioDevice().deviceName());
 
     ui->captureCursorCheckBox->setChecked(settings->captureCursor());
-
-    connect(ui->screenComboBox, SIGNAL(currentIndexChanged(int)), SLOT(onMonitorChanged(int)));
-    ui->label_primaryDeviceIcon->setPixmap(QPixmap(":/skin/sound.png").scaled(24, 24));
-    ui->label_secondaryDeviceIcon->setPixmap(QPixmap(":/skin/microphone.png").scaled(24, 24));
 
 #ifdef Q_OS_WIN
     ui->disableAeroCheckBox->setEnabled(false);
@@ -82,6 +93,20 @@ RecordingSettingsWidget::RecordingSettingsWidget(QWidget *parent) :
     }
 #endif
 }
+
+void RecordingSettingsWidget::onComboboxChanged(int index)
+{
+    additionalAdjustSize();
+    QComboBox* c = (QComboBox*) sender();
+    WinAudioExtendInfo info(c->itemText(index));
+    QLabel* l = c == ui->primaryAudioDeviceComboBox ? ui->label_primaryDeviceIcon : ui->label_secondaryDeviceIcon;
+    QPixmap icon = info.deviceIcon();
+    if (!icon.isNull())
+        l->setPixmap(icon.scaled(ICON_SIZE, ICON_SIZE));
+    else
+        setDefaultSoundIcon(l);
+}
+
 
 RecordingSettingsWidget::~RecordingSettingsWidget()
 {
@@ -246,4 +271,19 @@ void RecordingSettingsWidget::onDisableAeroChecked(bool enabled)
             }
         }
     }
+}
+
+void RecordingSettingsWidget::additionalAdjustSize()
+{
+    ui->label_primaryDeviceText->adjustSize();
+    ui->label_secondaryDeviceText->adjustSize();
+
+    int maxWidth = qMax(ui->label_primaryDeviceText->width(), ui->label_secondaryDeviceText->width());
+    QSize s = ui->label_primaryDeviceText->minimumSize();
+    s.setWidth(maxWidth);
+    ui->label_primaryDeviceText->setMinimumSize(s);
+    ui->label_secondaryDeviceText->setMinimumSize(s);
+
+    ui->label_primaryDeviceText->adjustSize();
+    ui->label_secondaryDeviceText->adjustSize();
 }

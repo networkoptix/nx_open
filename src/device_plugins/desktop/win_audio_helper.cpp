@@ -99,7 +99,6 @@ QPixmap WinAudioExtendInfo::deviceIcon() const
     QStringList params = m_iconPath.split(',');
     if (params.size() < 2)
         return 0;
-
     int persent1 = params[0].indexOf('%');
     while (persent1 >= 0)
     {
@@ -117,8 +116,12 @@ QPixmap WinAudioExtendInfo::deviceIcon() const
     if (library < 0)
         return false;
     int resNumber = qAbs(params[1].toInt());
+
     HICON hIcon = LoadIcon(library, MAKEINTRESOURCE(resNumber));
-    return QPixmap::fromWinHICON( hIcon);
+    if (hIcon)
+        return QPixmap::fromWinHICON( hIcon);
+    else
+        return QPixmap();
 }
 
 
