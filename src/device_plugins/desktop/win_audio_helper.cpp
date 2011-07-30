@@ -60,11 +60,10 @@ WinAudioExtendInfo::WinAudioExtendInfo(const QString& deviceName)
 
     CoInitialize(0);
 
-    hr = CoCreateInstance(
-        __uuidof(MMDeviceEnumerator), NULL, CLSCTX_ALL, 
-        __uuidof(IMMDeviceEnumerator),
-        (void**)&m_pMMDeviceEnumerator
-        );
+    const CLSID CLSID_MMDeviceEnumerator = __uuidof(MMDeviceEnumerator);
+    const IID IID_IMMDeviceEnumerator = __uuidof(IMMDeviceEnumerator);
+    hr = CoCreateInstance(CLSID_MMDeviceEnumerator, NULL, CLSCTX_ALL,
+                          IID_IMMDeviceEnumerator, (void**)&m_pMMDeviceEnumerator);
     if (hr != S_OK) return;
 
     if (deviceName.toLower() == "default")
@@ -91,7 +90,10 @@ WinAudioExtendInfo::WinAudioExtendInfo(const QString& deviceName)
 
 WinAudioExtendInfo::~WinAudioExtendInfo()
 {
-    m_pMMDeviceEnumerator->Release();
+    if (m_pMMDeviceEnumerator)
+        m_pMMDeviceEnumerator->Release();
+
+    CoUninitialize();
 }
 
 

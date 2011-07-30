@@ -144,7 +144,7 @@ void CLLog::log(CLLogLevel loglevel, const char* format, ...)
     va_list args;
 
     va_start(args, format);
-#ifdef _WIN32
+#ifdef Q_CC_MSVC
     vsnprintf_s(buffer, MAX_MESSAGE_SIZE, MAX_MESSAGE_SIZE, format, args);
 #else
     vsnprintf(buffer, MAX_MESSAGE_SIZE, format, args);
@@ -196,7 +196,7 @@ QString CLLog::backupFileName(quint8 num) const
 
 	char cnum[4];
 
-#ifdef _WIN32
+#ifdef Q_CC_MSVC
 	sprintf_s(cnum, 4, "%.3d", num);
 #else
 	snprintf(cnum, 4, "%.3d", num);

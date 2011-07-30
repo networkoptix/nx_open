@@ -195,7 +195,6 @@ void CLDevice::addReferences(CLDeviceList& lst)
 
 }
 
-#ifndef _WIN32
 struct T
 {
 	T(CLDevice* d)
@@ -210,28 +209,10 @@ struct T
 	
 	CLDevice* device;
 };
-#endif
 
 void CLDevice::getDevicesBasicInfo(CLDeviceList& lst, int threads)
 {
 	// cannot make concurrent work with pointer CLDevice* ; => so extra steps needed
-
-#ifdef _WIN32
-    struct T
-    {
-        T(CLDevice* d)
-        {
-            device = d;
-        }
-
-        void f()
-        {
-            device->getBaseInfo();
-        }
-
-        CLDevice* device;
-    };
-#endif
 
 	cl_log.log("Geting device info...", cl_logDEBUG1);
 	QTime time;
