@@ -293,8 +293,7 @@ void CLGLRenderer::init(bool msgbox)
 
         //==================
         const char *code[] = {yv12ToRgb, yuy2ToRgb};
-
-        bool error = false;
+      
         for(int i = 0; i < ProgramCount && !error;  ++i)
         {
 
