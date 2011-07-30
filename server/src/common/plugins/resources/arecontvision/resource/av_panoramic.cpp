@@ -98,8 +98,7 @@ public:
 
 };
 
-CLArecontPanoramicDevice::CLArecontPanoramicDevice(int model):
-QnPlAreconVisionResource(model),
+CLArecontPanoramicDevice::CLArecontPanoramicDevice(const QString& name):
 m_hastestPattern(false)
 {
 	switch(model)

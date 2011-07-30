@@ -17,7 +17,7 @@ QnResourceDirectoryBrowser::~QnResourceDirectoryBrowser()
 }
 
 
-QString QnResourceDirectoryBrowser::name() const
+QString QnResourceDirectoryBrowser::manufacture() const
 {
     return "DirectoryBrowser";
 }

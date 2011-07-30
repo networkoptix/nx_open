@@ -1,11 +1,11 @@
 #include "av_singesensor.h"
 #include "../dataprovider/cpul_tftp_dataprovider.h"
 
-CLArecontSingleSensorDevice::CLArecontSingleSensorDevice(int model):
-QnPlAreconVisionResource(model),
+CLArecontSingleSensorDevice::CLArecontSingleSensorDevice(const QString& name):
+QnPlAreconVisionResource(),
 m_hastestPattern(true)
 {
-
+    setName(name);
 }
 
 bool CLArecontSingleSensorDevice::getDescription()

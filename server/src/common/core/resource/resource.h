@@ -154,6 +154,12 @@ public:
     static bool commandProcHasSuchResourceInQueue(QnResourcePtr res);
 
     static QStringList supportedResources(QString manufacture);
+
+    static bool loadDevicesParam(const QString& fileName);
+private:
+    static bool parseResource(const QDomElement &element);
+    static bool parseParam(const QDomElement &element, QnParamList& paramlist);
+
 protected:
 	typedef QMap<QString, QnParamList > QnParamLists;
     typedef QMap<QString, QnParamLists> QnManufacturesParamsLists;

@@ -11,8 +11,8 @@ protected:
 public:
 	virtual ~QnAbstractResourceSearcher();
 
-	// return the name of the server; normaly this is manufacture name; like AreconVision or IQInVision
-	virtual QString name() const = 0;
+	// return the manufacture of the server; normaly this is manufacture manufacture; like AreconVision or IQInVision
+	virtual QString manufacture() const = 0;
 
     // some searchers might be enabled or disabled
     void setSholdBeUsed(bool use);

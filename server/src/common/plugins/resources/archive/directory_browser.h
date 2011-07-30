@@ -15,7 +15,7 @@ public:
 
     static QnResourceDirectoryBrowser& instance();
 
-    virtual QString name() const;
+    virtual QString manufacture() const;
     virtual QnResourceList findResources();
 
     // creates an instance of proper resource from file 

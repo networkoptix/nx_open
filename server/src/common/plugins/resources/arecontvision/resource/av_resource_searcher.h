@@ -16,8 +16,8 @@ public:
 	static QnPlArecontResourceSearcher& instance();
 
 	
-	// return the name of the server 
-	virtual QString name() const;
+	// return the manufacture of the server 
+	virtual QString manufacture() const;
 
 	// returns all available devices 
 	virtual QnResourceList findResources();

@@ -3,6 +3,8 @@
 #include "../tools/AVJpegHeader.h"
 
 
+extern const char* ArecontVisionManufacture;
+
 QnPlArecontResourceSearcher::QnPlArecontResourceSearcher()
 {
 	// everything related to Arecont must be initialized here
@@ -34,9 +36,9 @@ QnPlArecontResourceSearcher::QnPlArecontResourceSearcher()
 }
 
 
-QString QnPlArecontResourceSearcher::name() const
+QString QnPlArecontResourceSearcher::manufacture() const
 {
-	return "ArecontVision";
+	return ArecontVisionManufacture;
 }
 
 // returns all available devices 

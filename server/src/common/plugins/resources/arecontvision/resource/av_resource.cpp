@@ -7,8 +7,10 @@
 #include "av_singesensor.h"
 #include "resourcecontrol/resource_command_consumer.h"
 
-#define CL_BROAD_CAST_RETRY 3
+const char* ArecontVisionManufacture = "ArecontVision";
 
+
+#define CL_BROAD_CAST_RETRY 3
 extern int ping_timeout;
 
 QnPlAreconVisionResource::QnPlAreconVisionResource()
@@ -231,7 +233,7 @@ void QnPlAreconVisionResource::beforeUse()
 
 QString QnPlAreconVisionResource::manufacture() const
 {
-    return "ArecontVision";
+    return ArecontVisionManufacture;
 }
 
 bool QnPlAreconVisionResource::isResourceAccessible()
@@ -476,252 +478,10 @@ QnResourceList QnPlAreconVisionResource::findDevices()
 }
 
 
-bool QnPlAreconVisionResource::loadDevicesParam(const QString& file_name, QString& error)
-{
-	QFile file(file_name);
-
-	if (!file.exists())
-	{
-		error = "Cannot open file ";
-		error += file_name;
-		return false;
-	}
-
-	QString errorStr;
-	int errorLine;
-	int errorColumn;
-	QDomDocument doc;
-
-	if (!doc.setContent(&file, &errorStr, &errorLine,&errorColumn)) 
-	{
-		QTextStream str(&error);
-		str << "File " << file_name << "; Parse error at line " << errorLine << " column " << errorColumn << " : " << errorStr;
-		return false;
-	}
-
-	QDomElement root = doc.documentElement();
-	if (root.tagName() != "devices")
-		return false;
-
-	QDomNode node = root.firstChild();
-
-	while (!node.isNull()) 
-	{
-		if (node.toElement().tagName() == "resource")
-		{
-			if (!parseResource(node.toElement(), error))
-				return false;
-		}
-
-		node = node.nextSibling();
-	}
-
-	return true;
-}
-
-bool QnPlAreconVisionResource::parseResource(const QDomElement &resource, QString& error)
-{
-	if (!resource.hasAttribute("id"))
-	{
-		error = "Cannot find id of the resource.";
-		return false;
-	}
-
-	QString resourceName = resource.attribute("id");
-
-	QnParamLists::iterator it1 = staticResourcesParamLists.find(resourceName);
-
-
-	if (it1!=staticResourcesParamLists.end())
-	{
-		QTextStream str(&error);
-		str << "Such resource " << resourceName << " already exists.";
-		return false;
-	}
-
-	QnParamList device_param_list;
-
-	if (resource.hasAttribute("public"))
-	{
-		QString values = resource.attribute("public");
-		QStringList lst = values.split(",");
-		QStringListIterator lst_iter(lst);
-		while(lst_iter.hasNext())
-		{
-			QString val = lst_iter.next().trimmed();
-			QnParamLists::iterator it1 = staticResourcesParamLists.find(val);
-
-			if (it1!=staticResourcesParamLists.end())
-				device_param_list.inheritedFrom(it1.value());
-			else
-				cl_log.log("Smth wrong with public tag for ", resourceName, cl_logWARNING);
-
-		}
-
-	}
-
-	//global_params 
-	QDomNode node = resource.firstChild();
-	if (node.isNull())
-	{
-		staticResourcesParamLists[resourceName] = device_param_list;
-		return true; // just public make sence 
-	}
-
-	QDomElement element = node.toElement();
-
-	if (element.tagName()!="global_params" && element.tagName()!="stream_params")
-	{
-		QTextStream str(&error);
-		str << "Cannot find global_params and stream_params in " << resourceName ;
-		return false;
-	}
-
-	//===============================================================
-	if (element.tagName()=="global_params" )
-	{
-		QDomNode paramNode = element.firstChild();
-		while (!paramNode .isNull()) 
-		{
-			if (paramNode.toElement().tagName() == "param")
-			{
-				if (!parseParam(paramNode.toElement(), error, device_param_list))
-					return false;
-			}
-			paramNode  = paramNode.nextSibling();
-		}
-
-		staticResourcesParamLists[resourceName] = device_param_list;
-
-		// move to stream_params
-		node = node.nextSibling();
-		if (node.isNull())
-			return true;
-		element = node.toElement();
-
-	}
-
-	return true;
-}
-
-bool QnPlAreconVisionResource::parseParam(const QDomElement &element, QString& error, QnParamList& paramlist)
-{
-	if (!element.hasAttribute("name"))
-	{
-		error = "Cannot find name attribute.";
-		return false;
-	}
-
-	QString name = element.attribute("name");
-
-	QnParam param = paramlist.exists(name) ? paramlist.get(name) : QnParam();
-	param.name = name;
-
-	if (param.type == QnParam::None) // param type is not defined yet
-	{
-		if (!element.hasAttribute("type"))
-		{
-			error = "Cannot find type attribute.";
-			return false;
-		}
-
-		QString type = element.attribute("type").toLower();
-
-		if (type=="param")
-			param.type = QnParam::Value;
-		else if (type=="novalue")
-			param.type = QnParam::None;
-		else if (type=="minmaxstep")
-			param.type = QnParam::MinMaxStep;
-		else if (type=="boolen")
-			param.type = QnParam::Boolen;
-		else if (type=="onoff")
-			param.type = QnParam::OnOff;
-		else if (type=="enumeration")
-			param.type = QnParam::Enumeration;
-		else if (type=="button")
-			param.type = QnParam::Button;
-		else
-		{
-			error = "Unsupported param type fund";
-			return false;
-		}
-	}
-
-	if (element.hasAttribute("group"))
-		param.group = element.attribute("group");
-
-	if (element.hasAttribute("sub_group"))
-		param.subgroup = element.attribute("sub_group");
-
-	if (element.hasAttribute("min"))
-		param.min_val = element.attribute("min");
-
-	if (element.hasAttribute("description"))
-		param.description = element.attribute("description");
-
-	if (element.hasAttribute("max"))
-		param.max_val = element.attribute("max");
-
-	if (element.hasAttribute("step"))
-		param.step = element.attribute("step");
-
-	if (element.hasAttribute("default_value"))
-		param.default_value = element.attribute("default_value");
-
-	if (element.hasAttribute("paramNetHelper"))
-		param.paramNetHelper = element.attribute("paramNetHelper");
-
-	if (element.hasAttribute("ui"))
-		param.ui = element.attribute("ui").toInt();
-
-	if (element.hasAttribute("readonly"))
-	{
-		if (element.attribute("readonly")=="true")
-			param.readonly = true;
-		else
-			param.readonly = false;
-	}
-
-	if (element.hasAttribute("values"))
-	{
-		QString values = element.attribute("values");
-		QStringList lst = values.split(",");
-		QStringListIterator lst_iter(lst);
-		while(lst_iter.hasNext())
-		{
-			QString val = lst_iter.next().trimmed();
-			param.possible_values.push_back(val);
-		}
-
-	}
-
-	if (element.hasAttribute("ui_values"))
-	{
-		QString values = element.attribute("ui_values");
-		QStringList lst = values.split(",");
-		QStringListIterator lst_iter(lst);
-		while(lst_iter.hasNext())
-		{
-			QString val = lst_iter.next().trimmed();
-			param.ui_possible_values.push_back(val);
-		}
-
-	}
-
-	if (element.hasAttribute("param"))
-		param.value = element.attribute("param");
-	else
-		param.value = param.default_value;
-
-	paramlist.put(param);
-
-	return true;
-}
 
 QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(QString name)
 {
-	QStringList supp = QnResource::supportedDevises();
+	QStringList supp = QnResource::supportedResources(ArecontVisionManufacture);
 
 	if (!supp.contains(name))
 	{

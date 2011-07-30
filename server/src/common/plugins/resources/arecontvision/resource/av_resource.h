@@ -54,10 +54,6 @@ protected:
     virtual bool setParamPhysical(const QString& name, const QnValue& val);
 public:
 	static QnResourceList findDevices();
-	static bool loadDevicesParam(const QString& file_name, QString& error );
-private:
-	static bool parseResource(const QDomElement &element, QString& error );
-	static bool parseParam(const QDomElement &element, QString& error, QnParamList& paramlist);
 	static QnPlAreconVisionResource* createResourceByName(QString name);
     static bool isPanoramic(QString name);
 
