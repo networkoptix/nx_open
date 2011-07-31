@@ -24,4 +24,6 @@ protected:
 
 };
 
+typedef QSharedPointer<QnSequrityCamResource> QnSequrityCamResourcePtr;
+
 #endif //sequrity_cam_resource_h_1239

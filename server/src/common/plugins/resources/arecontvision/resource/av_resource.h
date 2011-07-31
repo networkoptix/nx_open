@@ -19,6 +19,7 @@ public:
     CLHttpStatus setRegister(int page, int num, int val);
     CLHttpStatus setRegister_asynch(int page, int num, int val);
 
+    bool isPanoramic() const;
 
 	virtual bool setHostAddress(const QHostAddress& ip, QnDomain domain);
 
@@ -53,7 +54,6 @@ protected:
     // should just do physical job( network or so ) do not care about memory domain
     virtual bool setParamPhysical(const QString& name, const QnValue& val);
 public:
-	static QnResourceList findDevices();
 	static QnPlAreconVisionResource* createResourceByName(QString name);
     static bool isPanoramic(QString name);
 

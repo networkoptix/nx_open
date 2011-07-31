@@ -3,7 +3,7 @@
 
 QnAbstractArchiveResource::QnAbstractArchiveResource()
 {
-	addDeviceTypeFlag(QnResource::ARCHIVE);
+	addFlag(QnResource::playback);
 }
 
 QnAbstractArchiveResource::~QnAbstractArchiveResource()
@@ -11,7 +11,3 @@ QnAbstractArchiveResource::~QnAbstractArchiveResource()
 
 }
 
-QnResource::DeviceType QnAbstractArchiveResource::getDeviceType() const
-{
-	return VIDEODEVICE;
-}

@@ -11,7 +11,7 @@ int QnSequrityCamResource::getMaxFps()
     if (hasSuchParam("MaxFPS"))
     {
         Q_ASSERT(false);
-        return 30;
+        return 15;
     }
 
     QnValue val;
@@ -19,8 +19,20 @@ int QnSequrityCamResource::getMaxFps()
     return val;
 }
 
-QSize QnSequrityCamResource::getMaxSensorSize() const
+QSize QnSequrityCamResource::getMaxSensorSize()
 {
+
+    if (hasSuchParam("MaxSensorWidth") || hasSuchParam("MaxSensorHeight"))
+    {
+        Q_ASSERT(false);
+        return QSize(0,0);
+    }
+
+    QnValue val_w, val_h;
+    getParam("MaxSensorWidth", val_w, QnDomainMemory);
+    getParam("MaxSensorHeight", val_h, QnDomainMemory);
+
+    return QSize(val_w, val_h);
 
 }
 
@@ -31,5 +43,5 @@ QRect QnSequrityCamResource::getCroping(QnDomain domain)
 
 void QnSequrityCamResource::setCroping(QRect croping, QnDomain domain)
 {
-    //setCropingPhysical(croping);
+    setCropingPhysical(croping);
 }

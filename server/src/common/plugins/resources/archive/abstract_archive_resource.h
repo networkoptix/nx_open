@@ -8,7 +8,7 @@ class QnAbstractArchiveResource : public QnResource
 public:
 	QnAbstractArchiveResource();
 	~QnAbstractArchiveResource();
-	virtual DeviceType getDeviceType() const;
+	
 
 };
 

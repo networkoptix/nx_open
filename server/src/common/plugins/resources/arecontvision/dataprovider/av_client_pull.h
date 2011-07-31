@@ -15,11 +15,9 @@ public:
 	QnPlAVClinetPullStreamReader(QnResourcePtr res);
 	virtual ~QnPlAVClinetPullStreamReader();
 
-	virtual void setQuality(QnStreamQuality q);
 
 protected:
-	
-    virtual void updateStreamParamsBasedOnQuality(); 
+	virtual void updateStreamParamsBasedOnQuality(); 
 
 	int getBitrate() const;
 	bool isH264() const;

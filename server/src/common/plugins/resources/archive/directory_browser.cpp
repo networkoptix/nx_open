@@ -1,5 +1,4 @@
 #include "directory_browser.h"
-#include "resource/file_resource.h"
 #include "resources/archive/avi_files/avi_resource.h"
 #include "resources/archive/filetypesupport.h"
 #include "resources/archive/avi_files/avi_dvd_resource.h"
