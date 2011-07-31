@@ -93,7 +93,7 @@ public:
 
     // same as getParam is invoked in separate thread.
     // as soon as param changed onParametrChanged signal is emitted 
-    void getParamAsynch(const QString& name, QnValue& val, QnDomain domain);
+    void getParamAsynch(const QString& name, QnValue& val, QnDomain domain) const;
 
 
 	// return true if no error

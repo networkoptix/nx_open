@@ -183,7 +183,7 @@ bool QnResource::setSpecialParam(const QString& name, const QnValue& val, QnDoma
     return false;
 }
 
-bool QnResource::getParam(const QString& name, QnValue& val, QnDomain domain ) 
+bool QnResource::getParam(const QString& name, QnValue& val, QnDomain domain )
 {
 
     if (!hasSuchParam(name))
@@ -191,9 +191,6 @@ bool QnResource::getParam(const QString& name, QnValue& val, QnDomain domain )
         cl_log.log("getParam: requested param does not exist!", cl_logWARNING);
         return false;
     }
-
-    if (setSpecialParam(name, val, domain)) // try special first
-        return true;
 
     QMutexLocker locker(&m_mutex);
 
