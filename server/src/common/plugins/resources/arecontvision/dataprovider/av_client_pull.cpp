@@ -6,6 +6,10 @@
 QnPlAVClinetPullStreamReader::QnPlAVClinetPullStreamReader(QnResourcePtr res):
 QnClientPullStreamProvider(res)
 {
+
+    m_streamParam.put(QnParam("streamID", (int)cl_get_random_val(1, 32000)));
+
+
 	setQuality(m_qulity);
 
 	if (m_streamParam.exists("streamID"))
@@ -109,6 +113,11 @@ void QnPlAVClinetPullStreamReader::setQuality(QnStreamQuality q)
 	setNeedKeyData();
 
 	setStreamParams(pl);
+
+}
+
+void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
+{
 
 }
 

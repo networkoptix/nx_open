@@ -2,7 +2,6 @@
 #include "../dataprovider/cpul_tftp_dataprovider.h"
 
 CLArecontSingleSensorDevice::CLArecontSingleSensorDevice(const QString& name):
-QnPlAreconVisionResource(),
 m_hastestPattern(true)
 {
     setName(name);
@@ -33,7 +32,7 @@ bool CLArecontSingleSensorDevice::getDescription()
 	return true;
 }
 
-QnAbstractMediaStreamDataProvider* CLArecontSingleSensorDevice::getDeviceStreamConnection()
+QnAbstractMediaStreamDataProvider* CLArecontSingleSensorDevice::createMediaProvider()
 {
 	cl_log.log("Creating streamreader for ", getHostAddress().toString(), cl_logDEBUG1);
 	return new AVClientPullSSTFTPStreamreader(this);

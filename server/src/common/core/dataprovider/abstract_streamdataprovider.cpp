@@ -1,12 +1,14 @@
 #include "resource/resource.h"
-#include "resource/video_resource_layout.h"
 #include "abstract_streamdataprovider.h"
 #include "common/sleep.h"
+#include "dataconsumer/dataconsumer.h"
 
 
 QnAbstractStreamDataProvider::QnAbstractStreamDataProvider(QnResourcePtr res):
 QnResourceConsumer(res),
-m_dataRate(999) // very big value, like max fps 
+m_dataRate(999), // very big value, like max fps 
+m_mtx(QMutex::Recursive)
+
 {
 
 }

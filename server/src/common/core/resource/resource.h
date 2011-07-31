@@ -22,7 +22,6 @@ enum QnDomain
     QnDomainPhysical = 4
 };
 
-//enum {NETWORK = 0x00000001, NVR = 0x00000002, SINGLE_SHOT = 0x00000004, ARCHIVE = 0x00000008, RECORDED = 0x00000010};
 
 class QnResource : public QObject
 {
@@ -161,7 +160,7 @@ private:
     static bool parseParam(const QDomElement &element, QnParamList& paramlist);
 
 protected:
-	typedef QMap<QString, QnParamList > QnParamLists;
+    typedef QMap<QString, QnParamList > QnParamLists;
     typedef QMap<QString, QnParamLists> QnManufacturesParamsLists;
 
 	static QnManufacturesParamsLists staticResourcesParamLists; // list of all supported resources params list

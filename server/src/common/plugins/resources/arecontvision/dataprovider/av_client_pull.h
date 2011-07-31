@@ -19,6 +19,8 @@ public:
 
 protected:
 	
+    virtual void updateStreamParamsBasedOnQuality(); 
+
 	int getBitrate() const;
 	bool isH264() const;
 

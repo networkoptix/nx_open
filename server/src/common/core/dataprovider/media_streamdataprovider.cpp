@@ -14,7 +14,6 @@ m_qulity(QnQualityLowest)
     QnMediaResourcePtr mr = getResource().dynamicCast<QnMediaResource>();
 
 	m_NumaberOfVideoChannels = mr->getVideoLayout()->numberOfChannels();
-
 }
 
 QnAbstractMediaStreamDataProvider::~QnAbstractMediaStreamDataProvider()
@@ -28,6 +27,8 @@ void QnAbstractMediaStreamDataProvider::setQuality(QnStreamQuality q)
 {
     QMutexLocker mtx(&m_mtx);
 	m_qulity = q;
+    updateStreamParamsBasedOnQuality();
+    setNeedKeyData();
 }
 
 QnStreamQuality QnAbstractMediaStreamDataProvider::getQuality() const

@@ -9,6 +9,7 @@ struct QnParam
 	enum {None, Value, OnOff, Boolen, MinMaxStep, Enumeration, Button };	
 
 	QnParam();
+    QnParam(const QString& name, QnValue val);
 
     QString name;
 

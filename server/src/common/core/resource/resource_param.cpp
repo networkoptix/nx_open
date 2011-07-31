@@ -1,5 +1,12 @@
 #include "resource_param.h"
 
+QnParam::QnParam(const QString& name, QnValue val)
+{
+    type = Value;
+    this->name = name;
+    this->value = val;
+}
+
 
 QnParam::QnParam()
 {
