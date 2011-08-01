@@ -9,57 +9,59 @@
 
 #include "property_animation.h"
 
+AnimationManager &AnimationManager::instance()
+{
+    // ### isn't thread-safe
+    static AnimationManager instance;
+
+    return instance;
+}
+
 AnimationManager::AnimationManager()
     : m_skipViewUpdate(false)
 {
 }
 
-QPropertyAnimation* AnimationManager::addAnimation(QObject * target, const QByteArray & propertyName, QObject * parent)
+QPropertyAnimation* AnimationManager::addAnimation(QObject *target, const QByteArray &propertyName, QObject *parent)
 {
-    PropertyAnimationWrapper* animation = new PropertyAnimationWrapper(this, target, propertyName, parent);
- 
-    CLAnimation* clanimation = dynamic_cast<CLAnimation*> (target);
-    if (!clanimation)
-        return animation;
+    PropertyAnimationWrapper *animation = new PropertyAnimationWrapper(target, propertyName, parent);
 
-    m_animations.insert(animation, clanimation);
-    m_animationsOrder.append(animation);
+    // ### avoid using RTTI
+    CLAnimation *clanimation = dynamic_cast<CLAnimation *>(target);
+    if (clanimation)
+    {
+        m_animations.insert(animation, clanimation);
+        m_animationsOrder.append(animation);
+    }
 
     return animation;
 }
 
-void AnimationManager::removeAnimation(PropertyAnimationWrapper* animation)
+void AnimationManager::removeAnimation(PropertyAnimationWrapper *animation)
 {
     if (!m_animations.contains(animation))
         return;
-    
-    CLAnimationEntry& entry = m_animations[animation];
 
     if (m_animations.size() == 1)
-    {
-        entry.clanimation->enableViewUpdateMode(true);
-    }
-    
+        m_animations[animation].clanimation->enableViewUpdateMode(true);
+
     m_animations.remove(animation);
     m_animationsOrder.removeOne(animation);
 
-    
     updateSkipViewUpdate();
 }
 
-void AnimationManager::updateState (PropertyAnimationWrapper* animation, QAbstractAnimation::State newState, QAbstractAnimation::State oldState)
+void AnimationManager::updateState(PropertyAnimationWrapper *animation, QAbstractAnimation::State newState, QAbstractAnimation::State oldState)
 {
     if (!m_animations.contains(animation))
         return;
-    
-    CLAnimationEntry& entry = m_animations[animation];
-    
+
     if (oldState == QAbstractAnimation::Stopped && newState == QAbstractAnimation::Running)
     {
+        CLAnimationEntry& entry = m_animations[animation];
         entry.clanimation->enableViewUpdateMode(false);
-        
         entry.started = true;
-        
+
         updateSkipViewUpdate();
     }
     else if (oldState == QAbstractAnimation::Running && newState == QAbstractAnimation::Stopped)
@@ -71,7 +73,7 @@ void AnimationManager::updateState (PropertyAnimationWrapper* animation, QAbstra
 void AnimationManager::updateSkipViewUpdate()
 {
     // Check if there any animation which forces us to skip update remains
-    foreach (const CLAnimationEntry& entry, m_animations)
+    foreach (const CLAnimationEntry &entry, m_animations)
     {
         if (entry.started && entry.clanimation->isSkipViewUpdate())
         {
@@ -82,8 +84,10 @@ void AnimationManager::updateSkipViewUpdate()
     m_skipViewUpdate = false;
 }
 
-void AnimationManager::updateCurrentValue(PropertyAnimationWrapper* animation, const QVariant& /*value*/)
+void AnimationManager::updateCurrentValue(PropertyAnimationWrapper *animation, const QVariant &value)
 {
+    Q_UNUSED(value);
+
     if (!m_animations.contains(animation))
         return;
 
@@ -93,32 +97,30 @@ void AnimationManager::updateCurrentValue(PropertyAnimationWrapper* animation, c
 
     CLAnimationEntry& entry = m_animations[animation];
     if (!m_skipViewUpdate)
-    {
         entry.clanimation->updateView();
-    }
 }
 
-PropertyAnimationWrapper::PropertyAnimationWrapper(AnimationManager* manager, QObject * target, const QByteArray & propertyName, QObject * parent)
-	: QPropertyAnimation(target, propertyName, parent),
-	  m_manager(manager)	
+
+PropertyAnimationWrapper::PropertyAnimationWrapper(QObject *target, const QByteArray &propertyName, QObject *parent)
+    : QPropertyAnimation(target, propertyName, parent)
 {
 }
 
 PropertyAnimationWrapper::~PropertyAnimationWrapper()
 {
-    m_manager->removeAnimation(this);
+    AnimationManager::instance().removeAnimation(this);
 }
 
-void PropertyAnimationWrapper::updateState (QAbstractAnimation::State newState, QAbstractAnimation::State oldState) 
+void PropertyAnimationWrapper::updateState(QAbstractAnimation::State newState, QAbstractAnimation::State oldState)
 {
-    m_manager->updateState(this, newState, oldState);
-    
-	QPropertyAnimation::updateState(newState, oldState);
+    AnimationManager::instance().updateState(this, newState, oldState);
+
+    QPropertyAnimation::updateState(newState, oldState);
 }
 
-void PropertyAnimationWrapper::updateCurrentValue (const QVariant & value)
+void PropertyAnimationWrapper::updateCurrentValue(const QVariant &value)
 {
     QPropertyAnimation::updateCurrentValue(value);
-    
-    m_manager->updateCurrentValue(this, value);
+
+    AnimationManager::instance().updateCurrentValue(this, value);
 }
