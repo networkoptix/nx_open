@@ -17,10 +17,10 @@ public:
     QRectF boundingRect() const;
 
     // will make control visible and animate it from current opacity(normally zero), to 1.0.
-    void show(int time_ms = 1000);
+    void showAnimated(int time_ms = 1000);
 
     // will animate control from current opacity( normally 1.0) to 0 and hide item
-    void hide(int time_ms = 1000);
+    void hideAnimated(int time_ms = 1000);
 
     int alpha() const;
     void setAlpha(int val);

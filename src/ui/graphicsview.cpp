@@ -653,7 +653,7 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
     m_ignore_release_event = false;
 
     if (m_gridItem->isVisible() && !isCTRLPressed(event))
-        m_gridItem->hide();
+        m_gridItem->hideAnimated();
 
     if (onUserInput(true, true))
         return;
@@ -743,7 +743,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
         return;
 
     if (m_gridItem->isVisible() && !isCTRLPressed(event))
-        m_gridItem->hide();
+        m_gridItem->hideAnimated();
 
     if (onUserInput(true, false))
         return;
@@ -1863,7 +1863,7 @@ void GraphicsView::keyReleaseEvent( QKeyEvent * e )
 
         //enableMultipleSelection(false, false);
 
-        m_gridItem->hide(global_grid_aparence_delay);
+        m_gridItem->hideAnimated(global_grid_aparence_delay);
         break;
     }
 }
@@ -1907,7 +1907,7 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
             enableMultipleSelection(true);
 
             if (m_camLayout.getContent()->checkIntereactionFlag(LayoutContent::GridEnable))
-                m_gridItem->show(global_grid_aparence_delay);
+                m_gridItem->showAnimated(global_grid_aparence_delay);
 
             break;
 

@@ -78,7 +78,7 @@ QRectF CLGridItem::boundingRect() const
     return QRectF(0, 0, 100000,100000);
 }
 
-void CLGridItem::show(int time_ms)
+void CLGridItem::showAnimated(int time_ms)
 {
     stopAnimation();
     setVisible(true);
@@ -94,7 +94,7 @@ void CLGridItem::show(int time_ms)
 
 }
 
-void CLGridItem::hide(int time_ms )
+void CLGridItem::hideAnimated(int time_ms )
 {
     stopAnimation();
 
