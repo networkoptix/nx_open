@@ -199,7 +199,7 @@ bool CommunicatingSocket::connect(const string &foreignAddress,
   fillAddr(foreignAddress, foreignPort, destAddr);
 
   u_long iMode = 1;
-#ifdef _WIN32
+#ifdef Q_OS_WIN
   ioctlsocket(sockDesc, FIONBIO, &iMode); // set sock in asynch mode
 #else
   // fcntl(sockDesc, F_SETFL, O_NONBLOCK);
@@ -207,7 +207,7 @@ bool CommunicatingSocket::connect(const string &foreignAddress,
 
   int connectResult = ::connect(sockDesc, (sockaddr *) &destAddr, sizeof(destAddr));// Try to connect to the given port
 
-#ifndef _WIN32
+#ifndef Q_OS_WIN
   if (connectResult != 0) 
   {
 	  //throw SocketException("Connect failed (connect())", true);
@@ -215,7 +215,7 @@ bool CommunicatingSocket::connect(const string &foreignAddress,
   }
 #endif
 
-#ifdef _WIN32
+#ifdef Q_OS_WIN
   timeval timeVal;
   fd_set wrtFDS;
   int iSelRet;
@@ -232,10 +232,10 @@ bool CommunicatingSocket::connect(const string &foreignAddress,
 
   if (iSelRet<=0)
 	return false;
-#endif // _WIN32
+#endif
 
   iMode = 0;
-#ifdef _WIN32
+#ifdef Q_OS_WIN
 	ioctlsocket(sockDesc, FIONBIO, &iMode); // set sock in asynch mode
 #else
 	// fcntl(sockDesc, F_SETFL, 0);
@@ -254,7 +254,7 @@ void CommunicatingSocket::setTimeOut( unsigned int ms )
 
 	tv.tv_sec = ms/1000;
 	tv.tv_usec = (ms%1000) * 1000;   //1 Secs Timeout 
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WIN
     if ( setsockopt (sockDesc, SOL_SOCKET, SO_RCVTIMEO, ( char* )&ms,  sizeof ( ms ) ) != 0) 
 #else
     if (::setsockopt(sockDesc, SOL_SOCKET, SO_RCVTIMEO,(const char *)&tv,sizeof(struct timeval)) < 0)

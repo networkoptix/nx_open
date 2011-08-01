@@ -1,19 +1,18 @@
 #include "ping.h"
 
-#ifdef _WIN32
+#ifdef Q_OS_WIN
 #include <icmpapi.h>
 #include <stdio.h>
 #include "base/log.h"
-
 #else
 #include <SystemConfiguration/SCNetworkReachability.h>
 #endif
 
-#ifdef _WIN32
 CLPing::CLPing()
 {
 }
 
+#ifdef Q_OS_WIN
 bool CLPing::ping(const QString& ip, int retry, int timeoutPerRetry, int packetSize)
 {
 	// Declare and initialize variables
@@ -112,11 +111,8 @@ bool CLPing::ping(const QString& ip, int retry, int timeoutPerRetry, int packetS
 		return false;
 	}
 }
-#else
 
-CLPing::CLPing()
-{
-}
+#else
 
 bool CLPing::ping(const QString& ip, int /*retry*/, int /*timeoutPerRetry*/, int /*packetSize*/)
 {

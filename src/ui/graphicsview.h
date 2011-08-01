@@ -10,7 +10,7 @@
 #include "animation/animation_manager.h"
 #include "animation/steady_mouse_animation.h"
 
-#ifdef _WIN32
+#ifdef Q_OS_WIN
 #include "device_plugins/desktop/desktop_file_encoder.h"
 #endif
 
@@ -247,7 +247,7 @@ protected:
 
 #ifdef Q_OS_WIN
     DesktopFileEncoder* m_desktopEncoder;
-#endif // Q_OS_WIN
+#endif
 };
 
 

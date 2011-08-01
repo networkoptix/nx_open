@@ -239,7 +239,7 @@ QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHost
 
 
 //{ windows
-#ifdef _WIN32
+#ifdef Q_OS_WIN
 
 void removeARPrecord(const QHostAddress& ip)
 {

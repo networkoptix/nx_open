@@ -4,7 +4,7 @@
 #include <string>            // For std::string
 #include <exception>         // For exception class
 
-#ifndef _WIN32
+#ifndef Q_OS_WIN
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>

@@ -17,7 +17,7 @@
 #include <QMessageBox>
 
 
-#if defined(Q_OS_WIN32)
+#if defined(Q_OS_WIN)
 #include <Qt/private/qwindowsurface_p.h>
 #elif defined(Q_OS_MAC)
 #import <Carbon/Carbon.h>
@@ -406,7 +406,7 @@ void VideoRendererSoftFilter::Clear() const
 	};
 void VideoRendererSoftFilter::SwapBuffers() const
 {
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WIN
 	HDC hDc = wglGetCurrentDC();
 	if (!hDc) {
 		qDebug() << "wglGetCurrentDC: HDC == NULL, error code" << GetLastError();

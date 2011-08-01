@@ -62,7 +62,7 @@ CLAudioStreamDisplay::CLAudioStreamDisplay(int bufferMs) :
     m_audioSound(0),
 
     m_downmixing(false),
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WIN
     m_forceDownmix(false),
 #else
     m_forceDownmix(true), // mac version use SPDIF by default for multichannel audio.

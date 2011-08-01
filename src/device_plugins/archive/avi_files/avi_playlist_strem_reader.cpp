@@ -161,11 +161,7 @@ void CLAVIPlaylistStreamReader::channeljumpTo(quint64 mksec, int )
     }
     else 
     {
-#ifdef _WIN32
-        rez = avformat_seek_file(m_formatContext, -1, 0, relativeMksec, _I64_MAX, AVSEEK_FLAG_BACKWARD);
-#else
         rez = avformat_seek_file(m_formatContext, -1, 0, relativeMksec, LLONG_MAX, AVSEEK_FLAG_BACKWARD);
-#endif
     }
     m_inSeek = false;
     m_needToSleep = 0;

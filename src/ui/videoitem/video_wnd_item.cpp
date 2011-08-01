@@ -303,7 +303,7 @@ void CLVideoWindowItem::drawFPS(QPainter* painter)
 
 		QRect rect = getSubChannelRect(i);
 
-#ifdef _WIN32
+#ifdef Q_CC_MSVC
 		sprintf_s(fps, "%6.2ffps %6.2fMbps", m_stat[i]->getFrameRate(), m_stat[i]->getBitrate());
 #else
 		sprintf(fps, "%6.2ffps %6.2fMbps", m_stat[i]->getFrameRate(), m_stat[i]->getBitrate());

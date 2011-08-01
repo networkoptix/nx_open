@@ -1,7 +1,7 @@
 // dxva.cpp : Defines the entry point for the console application.
 //
 
-#ifdef _WIN32
+#ifdef Q_OS_WIN
 #include "dxva.h"
 #include "base/log.h"
 

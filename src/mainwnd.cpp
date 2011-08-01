@@ -115,7 +115,7 @@ m_normalView(0)
 
     // Can't set 0,0,0,0 on Windows as in fullScreen mode context menu becomes invisible
     // Looks like QT bug: http://bugreports.qt.nokia.com/browse/QTBUG-7556
-#ifdef _WIN32	
+#ifdef Q_OS_WIN
     l->setContentsMargins(0, 1, 0, 0);
 #else
 	l->setContentsMargins(0, 0, 0, 0);

@@ -1,6 +1,6 @@
 #include "ipp_h264_decoder.h"
 
-#ifdef _WIN32
+#ifdef Q_OS_WIN
 IPPH264Decoder::Dll IPPH264Decoder::dll;
 
 IPPH264Decoder::Dll::Dll()

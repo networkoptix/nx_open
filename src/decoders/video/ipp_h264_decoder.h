@@ -1,7 +1,7 @@
 #ifndef ipp_decoder_h149
 #define ipp_decoder_h149
 
-#ifdef _WIN32
+#ifdef Q_OS_WIN
 #include <windows.h>
 #include "abstractdecoder.h"
 
