@@ -3,16 +3,19 @@
 #include "datapacket/mediadatapacket.h"
 #include "common/base.h"
 
-AVClientPullSSHTTPStreamreader::AVClientPullSSHTTPStreamreader(QnResource* dev):
-QnPlAVClinetPullStreamReader(dev)
+AVClientPullSSHTTPStreamreader::AVClientPullSSHTTPStreamreader(QnResourcePtr res):
+QnPlAVClinetPullStreamReader(res)
 {
-
-	QnPlAreconVisionResource* device = static_cast<QnPlAreconVisionResource*>(dev);
 
 	m_port = 69;
 	m_timeout = 500;
-	m_auth = device->getAuth();
-	m_model = device->getModel();
+	
+    QnPlAreconVisionResourcePtr avRes = res.dynamicCast<QnPlAreconVisionResource>();
+
+    m_panoramic = avRes->isPanoramic();
+    m_dualsensor = avRes->isDualSensor();
+    m_name = avRes->getName();
+    m_auth = avRes->getAuth();
 
 }
 
@@ -39,7 +42,7 @@ QnAbstractDataPacketPtr  AVClientPullSSHTTPStreamreader::getNextData()
 	bool h264;
 
 	{
-			QMutexLocker mutex(&m_params_CS);
+			QMutexLocker mutex(&m_mtx);
 
 			h264 = isH264();
 
@@ -62,22 +65,22 @@ QnAbstractDataPacketPtr  AVClientPullSSHTTPStreamreader::getNextData()
 			}
 
 			//=========
-			left = m_streamParam.get("image_left").value.value;
-			top = m_streamParam.get("image_top").value.value;
-			right = m_streamParam.get("image_right").value.value;
-			bottom = m_streamParam.get("image_bottom").value.value;
+			left = m_streamParam.get("image_left").value;
+			top = m_streamParam.get("image_top").value;
+			right = m_streamParam.get("image_right").value;
+			bottom = m_streamParam.get("image_bottom").value;
 
 			width = right - left;
 			height = bottom - top;
 
-			//quality = m_streamParam.get("Quality").value.value;
-			quality = getQuality();
+			quality = m_streamParam.get("Quality").value;
+			//quality = getQuality();
 
-			resolutionFULL = (m_streamParam.get("resolution").value.value == QString("full"));
+			resolutionFULL = (m_streamParam.get("resolution").value == QString("full"));
 			streamID = 0;
 			if (h264)
 			{
-				streamID = m_streamParam.get("streamID").value.value;
+				streamID = m_streamParam.get("streamID").value;
 				//bitrate = m_streamParam.get("Bitrate").value.value;
 				bitrate = getBitrate();
 			}
@@ -120,7 +123,7 @@ QnAbstractDataPacketPtr  AVClientPullSSHTTPStreamreader::getNextData()
 			forecast_size = resolutionFULL ? (width*height)/2  : (width*height)/4; // 0.5 meg per megapixel; to avoid mem realock
 	}
 
-	CLSimpleHTTPClient http_client((static_cast<QnPlAreconVisionResource*>(m_device))->getHostAddress(), m_port, m_timeout, m_auth);
+	CLSimpleHTTPClient http_client(getResource().dynamicCast<QnPlAreconVisionResource>()->getHostAddress(), m_port, m_timeout, m_auth);
 
 	http_client.setRequestLine(request);
 	http_client.openStream();

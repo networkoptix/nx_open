@@ -127,7 +127,7 @@ bool CLArecontPanoramicDevice::getDescription()
 QnAbstractMediaStreamDataProvider* CLArecontPanoramicDevice::getDeviceStreamConnection()
 {
 	cl_log.log("Creating streamreader for ", getHostAddress().toString(), cl_logDEBUG1);
-	return new AVPanoramicClientPullSSTFTPStreamreader(this);
+	return new AVPanoramicClientPullSSTFTPStreamreader(QnResourcePtr(this));
 }
 
 bool CLArecontPanoramicDevice::hasTestPattern() const

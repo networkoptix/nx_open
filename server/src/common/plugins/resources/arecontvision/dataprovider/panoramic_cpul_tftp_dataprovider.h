@@ -10,7 +10,7 @@
 class AVPanoramicClientPullSSTFTPStreamreader : public QnPlAVClinetPullStreamReader
 {
 public:
-	explicit AVPanoramicClientPullSSTFTPStreamreader  (QnResource* dev );
+	explicit AVPanoramicClientPullSSTFTPStreamreader(QnResourcePtr res);
 
 	~AVPanoramicClientPullSSTFTPStreamreader()
 	{
@@ -30,7 +30,11 @@ protected:
 	bool m_last_resolution;
 
 	unsigned int m_timeout;
-	int m_model;
+	
+    bool m_panoramic;
+    bool m_dualsensor;
+    QString m_name;
+
 
 };
 

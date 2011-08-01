@@ -21,7 +21,7 @@ public:
 
 protected:
 	
-    virtual QnAbstractDataPacketPtr getNextData() = 0;
+    virtual QnAbstractDataPacketPtr getNextData();
 
 protected:
 

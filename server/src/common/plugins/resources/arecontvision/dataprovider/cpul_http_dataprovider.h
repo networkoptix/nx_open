@@ -7,7 +7,7 @@
 class AVClientPullSSHTTPStreamreader : public QnPlAVClinetPullStreamReader
 {
 public:
-	explicit AVClientPullSSHTTPStreamreader(QnResource* dev);
+	explicit AVClientPullSSHTTPStreamreader(QnResourcePtr res);
 
 	~AVClientPullSSHTTPStreamreader()
 	{
@@ -23,7 +23,11 @@ protected:
 	unsigned int m_port;
 	unsigned int m_timeout;
 	QAuthenticator m_auth;
-	int m_model;
+
+    bool m_panoramic;
+    bool m_dualsensor;
+    QString m_name;
+
 
 };
 

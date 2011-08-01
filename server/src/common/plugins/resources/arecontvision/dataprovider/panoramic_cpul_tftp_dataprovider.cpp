@@ -20,17 +20,20 @@ extern AVLastPacketSize ExtractSize(const unsigned char* arr);
 
 //=========================================================
 
-AVPanoramicClientPullSSTFTPStreamreader ::AVPanoramicClientPullSSTFTPStreamreader  (QnResource* dev ):
-QnPlAVClinetPullStreamReader(dev)
+AVPanoramicClientPullSSTFTPStreamreader ::AVPanoramicClientPullSSTFTPStreamreader(QnResourcePtr res):
+QnPlAVClinetPullStreamReader(res)
 {
-	QnPlAreconVisionResource* device = static_cast<QnPlAreconVisionResource*>(dev);
-
-	m_model = device->getModel();
 
 	m_timeout = 500;
-
 	m_last_width = 1600;
 	m_last_height = 1200;
+
+    QnPlAreconVisionResourcePtr avRes = res.dynamicCast<QnPlAreconVisionResource>();
+
+    m_panoramic = avRes->isPanoramic();
+    m_dualsensor = avRes->isDualSensor();
+    m_name = avRes->getName();
+
 
 }
 
@@ -52,7 +55,7 @@ QnAbstractDataPacketPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 	int quality = 15;
 
 	{
-		QMutexLocker mutex(&m_params_CS);
+		QMutexLocker mutex(&m_mtx);
 
 		h264 = isH264();;
 
@@ -65,7 +68,7 @@ QnAbstractDataPacketPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 				return QnAbstractMediaDataPacketPtr(0);
 			}
 
-			streamID = m_streamParam.get("streamID").value.value;
+			streamID = m_streamParam.get("streamID").value;
 
 		}
 
@@ -89,7 +92,7 @@ QnAbstractDataPacketPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 
 	forecast_size = (width*height)/2; // 0.5 meg per megapixel as maximum 
 
-	CLSimpleTFTPClient tftp_client((static_cast<QnPlAreconVisionResource*>(m_device))->getHostAddress().toString().toLatin1().data(),  m_timeout, 3);
+	CLSimpleTFTPClient tftp_client(getResource().dynamicCast<QnPlAreconVisionResource>()->getHostAddress().toString().toLatin1().data(),  m_timeout, 3);
 
 	QnCompressedVideoDataPtr videoData ( new QnCompressedVideoData(CL_MEDIA_ALIGNMENT,forecast_size) );
 	CLByteArray& img = videoData->data;
@@ -138,22 +141,21 @@ QnAbstractDataPacketPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 
 	int iframe_index;
 
-	switch(m_model)
-	{
-	case AV8365:
-	case AV8185:
-		iframe_index = 89;
-		break;
-	case AV3135:
-		iframe_index = 88;
-		break;
-	default:
-		iframe_index = 93;
-	}
+    if (m_panoramic)
+    {
+        iframe_index = 89;
+    }
+    else if (m_dualsensor)
+    {
+        iframe_index = 98;
+    }
+    else
+        iframe_index = 93;
+
 
 	AVLastPacketSize size;
 
-	if(AV8365 == m_model || AV8185 == m_model || AV8180 == m_model || AV8360 == m_model)
+	if(m_panoramic)
 	{
 		const unsigned char* arr = last_packet + 0x0C;
 		arr[0] & 4 ? resolutionFULL = true : false;
@@ -241,11 +243,9 @@ QnAbstractDataPacketPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 	}
 	else
 	{
-		QString model;
-		model.setNum(m_model);
 
 		// writes JPEG header at very beginning
-		AVJpeg::Header::GetHeader((unsigned char*)img.data(), size.width, size.height, quality,model.toLatin1().data());
+		AVJpeg::Header::GetHeader((unsigned char*)img.data(), size.width, size.height, quality, m_name.toLatin1().data());
 	}
 
 	videoData->compressionType = h264 ? CODEC_ID_H264 : CODEC_ID_MJPEG;

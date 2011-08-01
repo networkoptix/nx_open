@@ -46,7 +46,8 @@ void CLDeviceSearcher::run()
 
 QnResourceList CLDeviceSearcher::findNewDevices(bool& ip_finished)
 {
-
+    
+    /*/
     bool allow_to_change_ip = allowToChangeresourceIP;
 
 	ip_finished = false;
@@ -62,6 +63,7 @@ QnResourceList CLDeviceSearcher::findNewDevices(bool& ip_finished)
 
 	QnResourceList resources;
 
+    
 	{
 		QMutexLocker lock(&m_searchersListMtx);
         foreach(QnAbstractResourceSearcher* searcher, m_searchersList)
@@ -240,17 +242,17 @@ END:
 		// also in case if in already existing resources some resources conflicts with something see [-1-]
 		// we need to resolve that conflicts
 
-        /* todo
-		QnResourceList bad_ip_list;
+        // todo
+		//QnResourceList bad_ip_list;
 
-		QMutexLocker lock(&all_devices_mtx);
-		fromListToList(all_devices, bad_ip_list, QnResourceStatus::NOT_IN_SUBNET, QnResourceStatus::NOT_IN_SUBNET);
-		if (bad_ip_list.size())
-		{
-			resovle_conflicts(bad_ip_list, busy_list, ip_finished);
-			fromListToList(bad_ip_list, all_devices, 0, 0);
-		}
-        /**/
+		//QMutexLocker lock(&all_devices_mtx);
+		//fromListToList(all_devices, bad_ip_list, QnResourceStatus::NOT_IN_SUBNET, QnResourceStatus::NOT_IN_SUBNET);
+		//if (bad_ip_list.size())
+		//{
+		//	resovle_conflicts(bad_ip_list, busy_list, ip_finished);
+		//	fromListToList(bad_ip_list, all_devices, 0, 0);
+		//}
+        
 
 	}
 
@@ -264,7 +266,9 @@ END:
 	}
 
 	resources.append(notNetworkResources); // move everything to result list
+    /**/
 
+    QnResourceList resources;
 	return resources;
 
 }
@@ -274,7 +278,7 @@ void CLDeviceSearcher::resovle_conflicts(QnResourceList& resourceList, CLIPList&
 {
 	foreach(QnResourcePtr res, resourceList)
 	{
-		QnNetworkResourcePtr resource = res.staticCast<QnNetworkResource>();
+		QnNetworkResourcePtr resource = res.dynamicCast<QnNetworkResource>();
 
 		if (!m_netState.existsSubnet(resource->getDiscoveryAddr())) // very strange
 			continue;
@@ -290,10 +294,11 @@ void CLDeviceSearcher::resovle_conflicts(QnResourceList& resourceList, CLIPList&
 			break;
 		}
 
-		if (resource->setHostAddress(subnet.currHostAddress, true))
+		if (resource->setHostAddress(subnet.currHostAddress, QnDomainPhysical))
 		{
-			resource->getStatus().removeFlag(QnResourceStatus::CONFLICTING);
-			resource->getStatus().removeFlag(QnResourceStatus::NOT_IN_SUBNET);
+            //todo
+			//resource->getStatus().removeFlag(QnResourceStatus::CONFLICTING);
+			//resource->getStatus().removeFlag(QnResourceStatus::NOT_IN_SUBNET);
 		}
 
 	}
@@ -419,7 +424,7 @@ void CLDeviceSearcher::markConflictingDevices(QnResourceList& lst, int threads)
 
     foreach(QnResourcePtr res, lst)
     {
-        QnNetworkResourcePtr resource = res.staticCast<QnNetworkResource>();
+        QnNetworkResourcePtr resource = res.dynamicCast<QnNetworkResource>();
         local_list.push_back(T(resource));
     }
 
@@ -437,7 +442,7 @@ QnResourceList CLDeviceSearcher::resolveUnknown_helper(QnResourceList& lst)
 
 	QnResourceList result;
 
-	
+	/*/todo
     foreach(QnResourcePtr res, lst)
     {
 		QnNetworkResourcePtr resource = res.staticCast<QnNetworkResource>();
@@ -468,6 +473,7 @@ QnResourceList CLDeviceSearcher::resolveUnknown_helper(QnResourceList& lst)
 		}
 
 	}
+    /**/
 
 	return result;
 

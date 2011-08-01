@@ -35,7 +35,7 @@ bool CLArecontSingleSensorDevice::getDescription()
 QnAbstractMediaStreamDataProvider* CLArecontSingleSensorDevice::createMediaProvider()
 {
 	cl_log.log("Creating streamreader for ", getHostAddress().toString(), cl_logDEBUG1);
-	return new AVClientPullSSTFTPStreamreader(this);
+	return new AVClientPullSSTFTPStreamreader(QnResourcePtr(this));
 }
 
 bool CLArecontSingleSensorDevice::hasTestPattern() const
