@@ -63,6 +63,8 @@ public:
 			m_semaphore.tryAcquire(1,50);
 	}
 
+        bool onPause() const { return m_onPause; }
+
 protected:
 	bool m_runing;
 	volatile bool m_needStop;

@@ -3,6 +3,7 @@
 #include "base/log.h"
 #include "camera/camera.h"
 #include "device_plugins/archive/abstract_archive_stream_reader.h"
+#include "navigationitem.h"
 
 CLVideoWindowArchiveItem::CLVideoWindowArchiveItem (GraphicsView* view, const CLDeviceVideoLayout* layout, 
 													int max_width, int max_height, QString name):
@@ -57,17 +58,24 @@ void CLVideoWindowArchiveItem::paint(QPainter *painter, const QStyleOptionGraphi
 void CLVideoWindowArchiveItem::draw(CLVideoDecoderOutput& image, unsigned int channel)
 {
 	CLVideoWindowItem::draw(image, channel);
-
 }
 
 void CLVideoWindowArchiveItem::setItemSelected(bool sel, bool animate, int delay)
 {
-	CLVideoWindowItem::setItemSelected(sel, animate , delay );
+    CLVideoWindowItem::setItemSelected(sel, animate , delay );
 
-	if (sel)
-		mArchiveNavigator->setVisible(true);
-	else
-		mArchiveNavigator->setVisible(false);
+    if (sel)
+    {
+        mArchiveNavigator->setVisible(true);
+        if (m_navigationItem)
+            m_navigationItem->setVideoCamera(getVideoCam());
+    }
+    else
+    {
+        if (m_navigationItem)
+            m_navigationItem->setVideoCamera(0);
+        mArchiveNavigator->setVisible(false);
+    }
 }
 
 void CLVideoWindowArchiveItem::setFullScreen(bool full)

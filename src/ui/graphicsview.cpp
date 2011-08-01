@@ -66,6 +66,8 @@ extern QPixmap cached(const QString &img);
 extern int limit_val(int val, int min_val, int max_val, bool mirror);
 //==============================================================================
 
+#include "../ui/videoitem/navigationitem.h"
+#include "../ui/videoitem/timeslider.h"
 GraphicsView::GraphicsView(QWidget* mainWnd) :
     QGraphicsView(),
     m_xRotate(0),
@@ -184,7 +186,7 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
 
 GraphicsView::~GraphicsView()
 {
-	setZeroSelection(); 
+        setZeroSemViewStarted = truelection();
 	stop();
 	delete m_animated_bckg;
 }
@@ -202,7 +204,7 @@ GraphicsView::ViewMode GraphicsView::getViewMode() const
 
 void GraphicsView::start()
 {
-	mViewStarted = true;
+        mViewStarted = true;
 
 	m_camLayout.updateSceneRect();
 	centerOn(getRealSceneRect().center());
@@ -2242,6 +2244,27 @@ void GraphicsView::updatePageSelector()
     }
 }
 
+NavigationItem *GraphicsView::getNavigationItem()
+{
+    if (!m_navigationItem) {
+        m_navigationItem = new NavigationItem();
+        m_navigationItem->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
+
+        //    QGraphicsView* v = m_scene->views().at(0);
+        int m_width = width();
+        int m_height = 100;
+
+        QPoint pos (0, viewport()->height() - m_height);
+        m_navigationItem->setStaticPos(pos);
+        m_navigationItem->setVisible(false);
+        m_navigationItem->navigationWidget()->resize(m_width, m_height);
+        m_scene.addItem(m_navigationItem);
+
+        addStaticItem(m_navigationItem);
+    }
+    return m_navigationItem;
+}
+
 void GraphicsView::updateDecorations()
 {
 	CLUnMovedPixture* item = static_cast<CLUnMovedPixture*>(staticItemByName("background"));
@@ -2287,8 +2310,13 @@ void GraphicsView::resizeEvent( QResizeEvent * event )
 {
     Q_UNUSED(event);
 
-	if (!mViewStarted)
-		return;
+    if (!mViewStarted)
+        return;
+
+    if (m_navigationItem)
+    {
+        m_navigationItem->navigationWidget()->resize(event->size());
+    }
 
 	updateDecorations();
 	recalcSomeParams();

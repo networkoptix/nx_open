@@ -14,6 +14,7 @@
 #include "device_plugins/desktop/desktop_file_encoder.h"
 #endif
 
+class NavigationItem;
 class CLAbstractSceneItem;
 class CLVideoWindowItem;
 class QGraphicsPixmapItem;
@@ -86,6 +87,8 @@ public:
     bool onUserInput(bool go_unsteady, bool escapeFromintro);
 
     void updatePageSelector();
+
+    NavigationItem *getNavigationItem();
 
 signals:
 	void scneZoomFinished();
@@ -244,6 +247,8 @@ protected:
     QTime m_timeAfterDoubleClick;
 
     CLAbstractSceneItem* m_lastPressedItem;
+
+    QPointer<NavigationItem> m_navigationItem;
 
 #ifdef Q_OS_WIN
     DesktopFileEncoder* m_desktopEncoder;

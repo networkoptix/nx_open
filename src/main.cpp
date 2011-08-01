@@ -50,6 +50,8 @@ void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args
 
 #ifndef UNICLIENT_TESTS
 
+#include "ui/videoitem/timeslider.h"
+
 int main(int argc, char *argv[])
 {
 //    av_log_set_callback(decoderLogCallback);
@@ -59,6 +61,10 @@ int main(int argc, char *argv[])
     QApplication::setApplicationVersion(APPLICATION_VERSION);
 
     EveApplication application(argc, argv);
+
+//    TimeSlider s;
+//    s.setMaximumValue((qint64)411601284504748032LL);
+//    s.show();
 
     QString argsMessage;
     for (int i = 1; i < argc; ++i)

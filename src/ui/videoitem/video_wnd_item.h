@@ -11,6 +11,7 @@ class QPainter;
 class MainWnd;
 class CLAbstractVideoHolder;
 class CLDeviceVideoLayout;
+class NavigationItem;
 class CLVideoCamera;
 
 class CLVideoWindowItem : public CLImageItem, public CLAbstractRenderer
@@ -49,6 +50,9 @@ public:
 
     virtual void goToSteadyMode(bool steady, bool instant);
 
+    NavigationItem *navigationItem() const { return m_navigationItem; }
+    void setNavigationItem(NavigationItem *item) { m_navigationItem = item; }
+
 signals:
 	void onAspectRatioChanged(CLAbstractSceneItem* item);
 
@@ -71,6 +75,7 @@ protected:
 	void restoreGLState();
 
 	QRect getSubChannelRect(unsigned int channel) const;
+
 protected:
 	CLGLRenderer* m_gldraw[CL_MAX_CHANNELS];
 	bool m_first_draw;
@@ -84,6 +89,8 @@ protected:
 
 	const CLDeviceVideoLayout* m_videolayout;
 	unsigned int m_videonum;
+
+    NavigationItem *m_navigationItem;
 };
 
 #endif //clgl_draw_h_20_31

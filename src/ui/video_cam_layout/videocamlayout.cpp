@@ -404,9 +404,15 @@ bool SceneLayout::addDevice(QString uniqueid, bool update_scene_rect, CLBasicLay
 	return true;
 }
 
+//#include "../../ui/videoitem/navigationitem.h"
 bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect, CLBasicLayoutItemSettings itemSettings)
 {
-	if (!m_grid.isSpaceAvalable())
+
+    GraphicsView *v = (GraphicsView*)m_scene->views().at(0);
+//    NavigationItem *item = v->getNavigationItem();
+//    item->setVisible(true);
+
+    if (!m_grid.isSpaceAvalable())
 	{
 		cl_log.log("Cannot support so many devices ", cl_logDEBUG1);
 		return false;
@@ -437,12 +443,16 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect, CLBasicLay
 		{
 			video_wnd = new CLVideoWindowArchiveItem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height(), device->getUniqueId());
 			video_wnd->setEditable(true);
+                        video_wnd->setNavigationItem(v->getNavigationItem());
+
 		}
 		else
 			video_wnd = new CLVideoWindowItem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height(), device->getUniqueId());
 
 
+
         CLVideoCamera* cam = new CLVideoCamera(device, video_wnd, introVideo);
+//        v->navigationItem()->setVideoCamera(cam);
 
         if (introVideo)
         {
