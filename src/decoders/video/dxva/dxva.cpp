@@ -301,7 +301,7 @@ bool DxvaSupportObject::D3dCreateDevice()
 		D3DDEVTYPE_HAL,
 		GetShellWindow(),
 		D3DCREATE_SOFTWARE_VERTEXPROCESSING |
-        // D3DCREATE_FPU_PRESERVE |
+		// D3DCREATE_FPU_PRESERVE |
 		D3DCREATE_MULTITHREADED
 		,
 		&m_d3dpp,
@@ -340,7 +340,7 @@ bool DxvaSupportObject::D3dCreateDeviceManager()
         return false;
     }
 
-	return true;
+    return true;
 }
 
 bool DxvaSupportObject::DxCreateVideoService()
@@ -452,7 +452,7 @@ QString DxvaSupportObject::DxDescribe()
         { 0x10DE, "NVIDIA" },
         { 0x8086, "Intel" },
         { 0x5333, "S3 Graphics" },
-        { 0, "" }
+        { 0, 0 }
     };
     const char *vendor = "Unknown";
     for (int i = 0; vendors[i].id != 0; i++) {

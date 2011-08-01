@@ -31,7 +31,7 @@ mDlg(dlg)
 
 		QWidget* parent = this;
 
-		if (sub_group!="")
+		if (!sub_group.isEmpty())
 		{
 			QGroupBox *subgroupBox = new QGroupBox(this);
 			subgroupBox->setFixedWidth(size);
@@ -53,7 +53,7 @@ mDlg(dlg)
 		int y = 0;
 		foreach (CLParam param, paramLst)
 		{
-			if (!param.value.ui)	
+			if (!param.value.ui)
 				continue;
 
 			CLAbstractSettingsWidget* awidget = 0;
@@ -84,7 +84,7 @@ mDlg(dlg)
 			QWidget* widget = awidget->toWidget();
 			widget->setFont(settings_font);
 
-			if (param.value.description!="")
+			if (!param.value.description.isEmpty())
 				widget->setToolTip(param.value.description);
 
 			widget->setParent(parent);

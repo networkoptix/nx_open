@@ -12,7 +12,7 @@ static const int ICON_SIZE = 32;
 
 void RecordingSettingsWidget::setDefaultSoundIcon(QLabel* l)
 {
-    l->setPixmap(QPixmap(":/skin/microphone.png").scaled(ICON_SIZE, ICON_SIZE));
+    l->setPixmap(QPixmap(QLatin1String(":/skin/microphone.png")).scaled(ICON_SIZE, ICON_SIZE));
 }
 
 RecordingSettingsWidget::RecordingSettingsWidget(QWidget *parent) :
@@ -54,7 +54,7 @@ RecordingSettingsWidget::RecordingSettingsWidget(QWidget *parent) :
     setDefaultSoundIcon(ui->label_primaryDeviceIcon);
     setDefaultSoundIcon(ui->label_secondaryDeviceIcon);
 
-    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) 
+    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioInput))
     {
         WinAudioExtendInfo ext1(info.deviceName());
         ui->primaryAudioDeviceComboBox->addItem(ext1.fullName());
@@ -68,7 +68,7 @@ RecordingSettingsWidget::RecordingSettingsWidget(QWidget *parent) :
 #ifdef Q_OS_WIN
     ui->disableAeroCheckBox->setEnabled(false);
     typedef HRESULT (WINAPI *DwmIsCompositionEnabled)(BOOL*);
-    QLibrary lib("Dwmapi");
+    QLibrary lib(QLatin1String("Dwmapi"));
     bool ok = lib.load();
     if (!ok)
         return;
@@ -78,7 +78,7 @@ RecordingSettingsWidget::RecordingSettingsWidget(QWidget *parent) :
     if (!f) {
         return;
     }
-    
+
     f(&enabled);
     if (!enabled) {
         ui->screenComboBox->clear();

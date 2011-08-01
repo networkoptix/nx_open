@@ -27,29 +27,29 @@ bool AndroidDeviceServer::isProxy() const
 
 QString AndroidDeviceServer::name() const
 {
-    return "Android";
+    return QLatin1String("Android");
 }
 
 
 struct AnDroidDev
 {
 	// Aluma - All I Need Is Time (Sluslik Luna Mix)
-	
+
 	quint32 ip;
 	bool android;
-	
+
 	void checkIfItAndroid()
 	{
 		android = false;
-		QString request = "";
-		
+		QString request;
+
 		CLSimpleHTTPClient httpClient(QHostAddress(ip), 8080, 2000, QAuthenticator());
 		httpClient.setRequestLine(request);
 		httpClient.openStream();
-		
+
 		if (httpClient.isOpened())
 			android = true;
-		
+
 	}
 };
 
@@ -57,7 +57,7 @@ CLDeviceList AndroidDeviceServer::findDevices()
 {
     CLDeviceList lst;
 
-    QFile file("android.txt"); // Create a file handle for the file named
+    QFile file(QLatin1String("android.txt")); // Create a file handle for the file named
     if (!file.exists())
         return lst;
 
@@ -72,10 +72,10 @@ CLDeviceList AndroidDeviceServer::findDevices()
     {
         line = stream.readLine(); // this reads a line (QString) from the file
 
-        if (line.trimmed()=="")
+        if (line.trimmed().isEmpty())
             break;
 
-        QStringList list = line.split(" ", QString::SkipEmptyParts);
+        QStringList list = line.split(QLatin1Char(' '), QString::SkipEmptyParts);
 
 
         if (list.count()<2)
@@ -124,9 +124,9 @@ CLDeviceList AndroidDeviceServer::findDevices()
 
                 CLANdroidDevice* dev = new CLANdroidDevice();
                 dev->setIP(QHostAddress(ad.ip), false);
-                dev->setMAC( QString("android") + QString::number(n) );
+                dev->setMAC(QLatin1String("android") + QString::number(n));
                 dev->setUniqueId(dev->getMAC());
-                dev->setName(QString("android") + QString::number(lst.count()+1));
+                dev->setName(QLatin1String("android") + QString::number(lst.count() + 1));
                 lst[dev->getUniqueId()] = dev;
 
             }

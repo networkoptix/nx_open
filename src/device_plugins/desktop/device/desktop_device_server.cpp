@@ -46,7 +46,7 @@ CLDeviceList DesktopDeviceServer::findDevices()
             break;
 
         CLDevice* dev = new CLDesktopDevice();
-        dev->setUniqueId(QString("Desktop")+QString::number(i+1));
+        dev->setUniqueId(QLatin1String("Desktop") + QString::number(i+1));
         result[dev->getUniqueId()] = dev;
     }
     return result;

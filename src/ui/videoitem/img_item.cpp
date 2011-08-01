@@ -2,19 +2,18 @@
 
 extern bool global_show_item_text;
 
-CLImageItem::CLImageItem(GraphicsView* view, int max_width, int max_height,
-						 QString name):
-CLAbstractSceneItem(view, max_width, max_height,name),
-m_imageWidth(m_max_width),
-m_imageHeight(m_max_height),
-m_imageWidth_old(m_max_width),
-m_imageHeight_old(m_max_height),
-m_aspectratio((qreal)m_imageWidth/m_imageHeight),
-m_showinfotext(false),
-m_showimagesize(false),
-m_showing_text(false),
-m_timeStarted(false),
-m_Info_Font("times", 110)
+CLImageItem::CLImageItem(GraphicsView* view, int max_width, int max_height, QString name)
+	: CLAbstractSceneItem(view, max_width, max_height,name),
+	m_imageWidth(m_max_width),
+	m_imageHeight(m_max_height),
+	m_imageWidth_old(m_max_width),
+	m_imageHeight_old(m_max_height),
+	m_aspectratio((qreal)m_imageWidth/m_imageHeight),
+	m_showinfotext(false),
+	m_showimagesize(false),
+	m_showing_text(false),
+	m_timeStarted(false),
+	m_Info_Font(QLatin1String("times"), 110)
 {
 	m_type = IMAGE;
 	m_Info_Font.setWeight(QFont::Bold);
@@ -34,13 +33,13 @@ int CLImageItem::width() const
 	{
 		return m_max_width;
 	}
-	else 
+	else
 		return m_max_height*aspectRatio();
 }
 
 float CLImageItem::aspectRatio() const
 {
-	QMutexLocker  locker(&m_mutex_aspect);	
+	QMutexLocker  locker(&m_mutex_aspect);
 	return m_aspectratio;
 }
 

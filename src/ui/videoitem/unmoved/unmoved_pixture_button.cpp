@@ -11,14 +11,14 @@ m_CurrentIndex(0),
 m_forwardDirection(true)
 {
 
-    if (img.contains(".png"))// single image
+    if (img.contains(QLatin1String(".png")))// single image
     {
         QPixmap pimg = cached(img);
         m_Images.push_back(pimg);
     }
     else
     {
-        // set of images 
+        // set of images
         QDir dir(img);
         if (!dir.exists())
         {
@@ -29,12 +29,12 @@ m_forwardDirection(true)
         dir.setSorting(QDir::Name);
 
         QStringList filter;
-        filter << "*.png";
+        filter << QLatin1String("*.png");
         QStringList list = dir.entryList(filter);
 
         foreach(QString file, list)
         {
-            QPixmap pimg = cached(img + QString("/") +  file);
+            QPixmap pimg = cached(img + QLatin1Char('/') +  file);
             m_Images.push_back(pimg);
         }
 
@@ -92,7 +92,7 @@ void CLUnMovedPixture::onTimer()
 
 void CLUnMovedPixture::setFps(int fps)
 {
-    m_Timer.setInterval(1000/fps); 
+	m_Timer.setInterval(1000/fps);
 }
 
 void CLUnMovedPixture::setMaxSize(int max_width, int max_height)

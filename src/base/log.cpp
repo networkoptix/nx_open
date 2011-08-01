@@ -2,7 +2,7 @@
 
 CLLog cl_log;
 
-QString cl_log_msg[] =  { "ALWAYS", "ERROR", "WARNING", "INFO", "DEBUG1", "DEBUG2" };
+char *cl_log_msg[] = { "ALWAYS", "ERROR", "WARNING", "INFO", "DEBUG1", "DEBUG2" };
 
 CLLog::CLLog():
 m_loglistner(0)
@@ -11,8 +11,8 @@ m_loglistner(0)
 }
 
 bool CLLog::create(const QString& base_name,
-				   quint32 max_file_size, 
-					quint8 maxBackupFiles, 
+				   quint32 max_file_size,
+					quint8 maxBackupFiles,
 					CLLogLevel loglevel )
 {
 	m_base_name = base_name;
@@ -123,15 +123,17 @@ void CLLog::log(const QString& msg, CLLogLevel loglevel)
 	if (!m_file.isOpen())
 		return;
 
-	QString th;
+    QString th;
     QTextStream textStream(&th);
-	hex(textStream) << (quint64)QThread::currentThread();
+    hex(textStream) << (quint64)QThread::currentThread();
 
 	QTextStream fstr(&m_file);
-	fstr<< QDateTime::currentDateTime().toString("ddd MMM d yy  hh:mm:ss.zzz") <<	" Thread " << th << " (" <<cl_log_msg[loglevel] <<"): " << msg << "\r\n";
+	fstr << QDateTime::currentDateTime().toString(QLatin1String("ddd MMM d yy  hh:mm:ss.zzz"))
+		 << QLatin1String(" Thread ") << th
+		 << QLatin1String(" (") << QString::fromAscii(cl_log_msg[loglevel]) << QLatin1String("): ") << msg << QLatin1String("\r\n");
 	fstr.flush();
 
-	if (m_file.size() >= m_max_file_size) 
+	if (m_file.size() >= m_max_file_size)
 		openNextFile();
 
 }
@@ -150,7 +152,7 @@ void CLLog::log(CLLogLevel loglevel, const char* format, ...)
     vsnprintf(buffer, MAX_MESSAGE_SIZE, format, args);
 #endif
 
-    cl_log.log(buffer, loglevel);
+    cl_log.log(QString::fromLocal8Bit(buffer), loglevel);
     va_end(args);
 }
 
@@ -174,7 +176,7 @@ void CLLog::openNextFile()
 	{
 		QFile::remove(backupFileName(1)); // delete the oldest file
 
-		for (int i = 2; i <= m_maxBackupFiles; ++i) // shift all file names by one 
+		for (int i = 2; i <= m_maxBackupFiles; ++i) // shift all file names by one
 			QFile::rename(backupFileName(i), backupFileName(i-1));
 
 		QFile::rename(currFileName(), backupFileName(m_maxBackupFiles)); // move current to the most latest backup
@@ -186,7 +188,7 @@ void CLLog::openNextFile()
 
 QString CLLog::currFileName() const
 {
-	return m_base_name + ".log";
+	return m_base_name + QLatin1String(".log");
 }
 
 QString CLLog::backupFileName(quint8 num) const

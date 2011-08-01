@@ -66,14 +66,14 @@ void VideoRecorderSettings::setSecondaryAudioDeviceByName(const QString &audioDe
 
 bool VideoRecorderSettings::captureCursor() const
 {
-    if (!settings.contains("captureCursor"))
+    if (!settings.contains(QLatin1String("captureCursor")))
         return true;
-    return settings.value("captureCursor").toBool();
+    return settings.value(QLatin1String("captureCursor")).toBool();
 }
 
 void VideoRecorderSettings::setCaptureCursor(bool yes)
 {
-    settings.setValue("captureCursor", yes);
+    settings.setValue(QLatin1String("captureCursor"), yes);
 }
 
 VideoRecorderSettings::CaptureMode VideoRecorderSettings::captureMode() const

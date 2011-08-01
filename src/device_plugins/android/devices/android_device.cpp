@@ -9,7 +9,6 @@ CLANdroidDevice::CLANdroidDevice()
 
 CLANdroidDevice::~CLANdroidDevice()
 {
-
 }
 
 
@@ -20,7 +19,7 @@ CLDevice::DeviceType CLANdroidDevice::getDeviceType() const
 
 QString CLANdroidDevice::toString() const
 {
-    return QString("live android ") + getUniqueId();
+    return QLatin1String("live android ") + getUniqueId();
 }
 
 CLStreamreader* CLANdroidDevice::getDeviceStreamConnection()

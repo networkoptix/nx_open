@@ -29,14 +29,14 @@ bool CLArecontSingleSensorDevice::getDescription()
 			break;
 	}
 
-	m_description = buff;
+	m_description = QString::fromAscii(buff);
 
 	return true;
 }
 
 CLStreamreader* CLArecontSingleSensorDevice::getDeviceStreamConnection()
 {
-	cl_log.log("Creating streamreader for ", getIP().toString(), cl_logDEBUG1);
+	cl_log.log(QLatin1String("Creating streamreader for "), getIP().toString(), cl_logDEBUG1);
 	return new AVClientPullSSTFTPStreamreader(this);
 }
 

@@ -14,11 +14,11 @@ CLVideoCamera::CLVideoCamera(CLDevice* device, CLVideoWindowItem* videovindow, b
     m_recorder(device),
     mGenerateEndOfStreamSignal(generateEndOfStreamSignal)
 {
-	cl_log.log("Creating camera for ", m_device->toString(), cl_logDEBUG1);
+    cl_log.log(QLatin1String("Creating camera for "), m_device->toString(), cl_logDEBUG1);
 
-	int videonum = m_device->getVideoLayout()->numberOfChannels();// how many sensors camera has
+    int videonum = m_device->getVideoLayout()->numberOfChannels();// how many sensors camera has
 
-	m_stat = new CLStatistics[videonum]; // array of statistics
+    m_stat = new CLStatistics[videonum]; // array of statistics
 
 	for (int i = 0; i < videonum; ++i)
 	{
@@ -40,7 +40,7 @@ CLVideoCamera::CLVideoCamera(CLDevice* device, CLVideoWindowItem* videovindow, b
 
 CLVideoCamera::~CLVideoCamera()
 {
-	cl_log.log("Destroy camera for ", m_device->toString(), cl_logDEBUG1);
+	cl_log.log(QLatin1String("Destroy camera for "), m_device->toString(), cl_logDEBUG1);
 
 	stopDispay();
 	delete m_reader;
@@ -49,17 +49,17 @@ CLVideoCamera::~CLVideoCamera()
 
 quint64 CLVideoCamera::currentTime() const
 {
-    return m_camdispay.currentTime();
+	return m_camdispay.currentTime();
 }
 
 void CLVideoCamera::streamJump(qint64 time)
 {
-    m_camdispay.jump(time);
+	m_camdispay.jump(time);
 }
 
 void CLVideoCamera::startDispay()
 {
-	CL_LOG(cl_logDEBUG1) cl_log.log("CLVideoCamera::startDispay ", m_device->getUniqueId(), cl_logDEBUG1);
+	CL_LOG(cl_logDEBUG1) cl_log.log(QLatin1String("CLVideoCamera::startDispay "), m_device->getUniqueId(), cl_logDEBUG1);
 
 	m_camdispay.start();
 	//m_reader->start(QThread::HighestPriority);
@@ -68,9 +68,8 @@ void CLVideoCamera::startDispay()
 
 void CLVideoCamera::stopDispay()
 {
-	CL_LOG(cl_logDEBUG1) cl_log.log("CLVideoCamera::stopDispay", m_device->getUniqueId(), cl_logDEBUG1);
-
-	CL_LOG(cl_logDEBUG1) cl_log.log("CLVideoCamera::stopDispay reader is about to pleases stop ", QString::number((long)m_reader,16), cl_logDEBUG1);
+	CL_LOG(cl_logDEBUG1) cl_log.log(QLatin1String("CLVideoCamera::stopDispay"), m_device->getUniqueId(), cl_logDEBUG1);
+	CL_LOG(cl_logDEBUG1) cl_log.log(QLatin1String("CLVideoCamera::stopDispay reader is about to pleases stop "), QString::number((long)m_reader,16), cl_logDEBUG1);
 
 	stopRecording();
 
@@ -100,7 +99,7 @@ void CLVideoCamera::stopRecording()
 {
 	m_recorder.stop();
 	m_reader->removeDataProcessor(&m_recorder);
-    m_reader->setQuality(CLStreamreader::CLSNormal);
+	m_reader->setQuality(CLStreamreader::CLSNormal);
 	m_videovindow->removeSubItem(RecordingSubItem);
 }
 

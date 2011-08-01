@@ -16,7 +16,7 @@ for n in xrange(1,1001):
     # serails should be unique
     while serial in serials:
       serial = gen_serial()
-    
+
     serials[serial] = hashlib.md5(serial).hexdigest()
 
 serials_txt = open('serials.txt', 'w')
@@ -26,7 +26,7 @@ for n, (serial, xhash) in enumerate(serials.items()):
     print >> f, serial
     f.close()
 
-    print >> serials_ipp, 'm_serialHashes.push_back("%s");' % xhash
+    print >> serials_ipp, 'm_serialHashes.push_back(QLatin1String("%s"));' % xhash
     print >> serials_txt, serial
 
 serials_txt.close()

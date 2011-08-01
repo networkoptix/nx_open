@@ -37,16 +37,15 @@ public:
 
 		init(m_alignment, new_capacity, all_data, aligned_data, capacity);
 
-		memcpy(aligned_data, m_aligned_data, m_capacity); // copy old data 
+		memcpy(aligned_data, m_aligned_data, m_capacity); // copy old data
 
-		delete[] m_all_data; // delete old data
+		delete [] m_all_data; // delete old data
 
 		m_all_data = all_data;
 		m_aligned_data = aligned_data;
 		m_capacity = capacity;
 
-		cl_log.log("CLAlignedData::change_capacity is called", cl_logWARNING);
-
+		cl_log.log(QLatin1String("CLAlignedData::change_capacity is called"), cl_logWARNING);
 	}
 
 private:

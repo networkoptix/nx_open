@@ -21,7 +21,7 @@ mHttpClient(0)
 
 CLIQEyeMJPEGtreamreader::~CLIQEyeMJPEGtreamreader()
 {
-    
+
 }
 
 CLAbstractMediaData* CLIQEyeMJPEGtreamreader::getNextData()
@@ -50,7 +50,7 @@ CLAbstractMediaData* CLIQEyeMJPEGtreamreader::getNextData()
             mDataRemainedBeginIndex = -1;
         }
 
-        
+
         if (mReaded < 0 )
             break;
 
@@ -72,7 +72,7 @@ CLAbstractMediaData* CLIQEyeMJPEGtreamreader::getNextData()
                 // just skip the data
             }
         }
-        else // getting the image 
+        else // getting the image
         {
 
             if (img.size() + BLOCK_SIZE > img.capacity())// too big image
@@ -90,7 +90,7 @@ CLAbstractMediaData* CLIQEyeMJPEGtreamreader::getNextData()
                 image_end_index+=2;
 
 
-                // found the end of image 
+                // found the end of image
                 getting_image = false;
                 img.write(mData, image_end_index);
 
@@ -98,7 +98,7 @@ CLAbstractMediaData* CLIQEyeMJPEGtreamreader::getNextData()
                     mDataRemainedBeginIndex = image_end_index;
                 else
                     mDataRemainedBeginIndex = -1;
-                    
+
 
                 videoData->compressionType = CODEC_ID_MJPEG;
                 videoData->width = 1920;
@@ -132,7 +132,7 @@ void CLIQEyeMJPEGtreamreader::openStream()
     if (isStreamOpened())
         return;
 
-    QString request = "now.jpg?snap=spush?dummy=1305868336917";
+    QString request = QLatin1String("now.jpg?snap=spush?dummy=1305868336917");
     CLNetworkDevice* ndev = static_cast<CLNetworkDevice*>(m_device);
 
     mHttpClient = new CLSimpleHTTPClient(ndev->getIP(), 80, 2000, ndev->getAuth());

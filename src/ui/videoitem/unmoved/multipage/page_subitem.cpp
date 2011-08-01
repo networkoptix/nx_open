@@ -4,12 +4,12 @@
 #include "base/log.h"
 
 //static QFont  page_font("Courier New", 20);
-static QFont page_font("Times", 20, QFont::Bold);
+static QFont page_font(QLatin1String("Times"), 20, QFont::Bold);
 static const int adjustment = 3;
 
 static const QColor normalColor(0,0,255);
 static const QColor activeColor(0,240,240,170);
- 
+
 static const int animationPeriod = 350;
 
 
@@ -145,7 +145,7 @@ void QnPageSubItem::animateScale(qreal sc, unsigned int duration)
     m_scaleAnimation->setDuration(duration);
     m_scaleAnimation->setStartValue(scale());
     m_scaleAnimation->setEndValue(sc);
-    m_scaleAnimation->start();	
+    m_scaleAnimation->start();
     connect(m_scaleAnimation, SIGNAL(finished ()), this, SLOT(stopScaleAnimation()));
 }
 
@@ -164,6 +164,6 @@ void QnPageSubItem::animateColor(QColor c, unsigned int duration)
     m_colorAnimation->setDuration(duration);
     m_colorAnimation->setStartValue(color());
     m_colorAnimation->setEndValue(c);
-    m_colorAnimation->start();	
+    m_colorAnimation->start();
     connect(m_colorAnimation, SIGNAL(finished ()), this, SLOT(stopColorAnimation()));
 }
