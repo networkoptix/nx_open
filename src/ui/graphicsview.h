@@ -1,6 +1,8 @@
 #ifndef PH_graphicsview_h328
 #define PH_graphicsview_h328
 
+#include <QtGui/QGraphicsView>
+
 #include "./animation/scene_movement.h"
 #include "./animation/scene_zoom.h"
 #include "./animation/mouse_state.h"
@@ -9,10 +11,6 @@
 #include "ui_common.h"
 #include "animation/animation_manager.h"
 #include "animation/steady_mouse_animation.h"
-
-#ifdef Q_OS_WIN
-#include "device_plugins/desktop/desktop_file_encoder.h"
-#endif
 
 class CLAbstractSceneItem;
 class CLVideoWindowItem;
@@ -25,6 +23,8 @@ class QInputEvent;
 class CLSerachEditItem;
 class CLGridItem;
 class QnPageSelector;
+
+class DesktopFileEncoder;
 
 class GraphicsView: public QGraphicsView 
 {
