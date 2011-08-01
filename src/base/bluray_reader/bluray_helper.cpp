@@ -4,12 +4,12 @@
 static const int DEFAULT_PCR_PID = 4097;
 static const int DEFAULT_PMT_PID = 256;
 
-QString strPadLeft(const QString& str, int len, char ch)
+static inline QString strPadLeft(const QString &str, int len, char ch)
 {
-    QString newStr = str;
-    while (str.length() < len)
-        newStr = QString(ch) + str;
-    return newStr;
+    int diff = len - str.length();
+    if (diff > 0)
+        return QString(diff, QLatin1Char(ch)) + str;
+    return str;
 }
 
 // --------------------- BlurayVideoStream ----------------------
