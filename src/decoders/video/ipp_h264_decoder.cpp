@@ -1,40 +1,49 @@
 #include "ipp_h264_decoder.h"
 
 #ifdef Q_OS_WIN
-IPPH264Decoder::Dll IPPH264Decoder::dll;
 
-IPPH264Decoder::Dll::Dll()
+#include <QtCore/QLibrary>
+
+typedef unsigned long (__stdcall *fn_createDecoder)(int);
+static fn_createDecoder ptr_createDecoder = 0;
+typedef void (__stdcall *fn_destroyDecoder)(unsigned long);
+static fn_destroyDecoder ptr_destroyDecoder = 0;
+typedef int (__stdcall *fn_decode)(unsigned long id, CLVideoData *params);
+static fn_decode ptr_decode = 0;
+
+static inline bool resolveIPPDecoder()
 {
+    static bool resolved = false;
+    if (!resolved)
+    {
+        QLibrary library(QLatin1String("ippdecoder"));
+        if (library.load())
+        {
+            ptr_createDecoder = (fn_createDecoder)library.resolve("createDecoder");
+            ptr_destroyDecoder = (fn_destroyDecoder)library.resolve("destroyDecoder");
+            ptr_decode = (fn_decode)library.resolve("decode");
+        }
+        resolved = true;
+    }
 
+    return ptr_createDecoder && ptr_destroyDecoder && ptr_decode;
 }
 
-bool  IPPH264Decoder::Dll::init()
+
+IPPH264Decoder::IPPH264Decoder() : CLAbstractVideoDecoder()
 {
-
-	m_dll  = ::LoadLibrary(L"ippdecoder.dll");
-
-	if(!m_dll)
-		return false;
-
-	createDecoder = reinterpret_cast<dll_createDecoder>(::GetProcAddress(m_dll, "createDecoder"));
-	if(!createDecoder)
-		return false;
-
-	destroyDecoder  = reinterpret_cast<dll_destroyDecoder>(::GetProcAddress(m_dll, "destroyDecoder"));
-	if(!destroyDecoder)
-		return false;
-
-	decode = reinterpret_cast<dll_decode>(::GetProcAddress(m_dll, "decode"));
-	if(!decode)
-		return false;
-
-	return true;
-
+    m_decoder = resolveIPPDecoder() ? ptr_createDecoder(0) : 0;
 }
 
-IPPH264Decoder::Dll::~Dll()
+IPPH264Decoder::~IPPH264Decoder()
 {
-	::FreeLibrary(m_dll);
+    if (m_decoder)
+        ptr_destroyDecoder(m_decoder);
+}
+
+bool IPPH264Decoder::decode(CLVideoData &params)
+{
+    return m_decoder && ptr_decode(m_decoder, &params);
 }
 
 #endif
