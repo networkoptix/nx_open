@@ -20,6 +20,7 @@ public:
     CLHttpStatus setRegister_asynch(int page, int num, int val);
 
     bool isPanoramic() const;
+    bool isDualSensor() const;
 
 	virtual bool setHostAddress(const QHostAddress& ip, QnDomain domain);
 

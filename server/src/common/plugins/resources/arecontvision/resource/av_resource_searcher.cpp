@@ -1,7 +1,10 @@
 #include "av_resource_searcher.h"
 #include "av_resource.h"
 #include "../tools/AVJpegHeader.h"
+#include "network/nettools.h"
+#include "common/sleep.h"
 
+#define CL_BROAD_CAST_RETRY 3
 
 extern const char* ArecontVisionManufacture;
 
@@ -11,13 +14,13 @@ QnPlArecontResourceSearcher::QnPlArecontResourceSearcher()
 	AVJpeg::Header::Initialize("ArecontVision", "CamLabs", "ArecontVision");
 
 	QString error;
-	if (QnPlAreconVisionResource::loadDevicesParam(QCoreApplication::applicationDirPath() + "/arecontvision/devices.xml", error))
+	if (QnResource::loadDevicesParam(QCoreApplication::applicationDirPath() + "/arecontvision/devices.xml"))
 	{
 		CL_LOG(cl_logINFO)
 		{
 			QString msg;
 			QTextStream str(&msg) ;
-			QStringList lst = QnResource::supportedDevises();
+			QStringList lst = QnResource::supportedResources(manufacture());
 			str << "Ssupported devices loaded; size = " << lst.size() << ": " << endl << lst.join("\n");
 			cl_log.log(msg, cl_logINFO);
 		}

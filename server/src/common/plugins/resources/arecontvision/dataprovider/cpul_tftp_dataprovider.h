@@ -2,6 +2,7 @@
 #define cpull_httpreader_1119
 
 #include "av_client_pull.h"
+#include "datapacket/mediadatapacket.h"
 
 class QnAbstractMediaDataPacket;
 
@@ -11,7 +12,7 @@ class QnAbstractMediaDataPacket;
 class AVClientPullSSTFTPStreamreader : public QnPlAVClinetPullStreamReader
 {
 public:
-	explicit AVClientPullSSTFTPStreamreader (QnResource* dev );
+	explicit AVClientPullSSTFTPStreamreader(QnResourcePtr res);
 
 	~AVClientPullSSTFTPStreamreader()
 	{
@@ -19,22 +20,22 @@ public:
 	}
 
 protected:
-	virtual QnAbstractMediaDataPacketPtr getNextData();
+	
+    virtual QnAbstractDataPacketPtr getNextData() = 0;
 
 protected:
 
 	int m_last_width;
 	int m_last_height;
-
 	int m_last_cam_width;
 	int m_last_cam_height;
-
 	bool m_last_resolution;
-
 	unsigned int m_timeout;
-	int m_model;
-
 	bool m_black_white; // for dual sensor only 
+
+    bool m_panoramic;
+    bool m_dualsensor;
+    QString m_name;
 
 };
 

@@ -16,7 +16,7 @@ QnPlAVClinetPullStreamReader(dev)
 
 }
 
-QnAbstractMediaDataPacketPtr AVClientPullSSHTTPStreamreader::getNextData()
+QnAbstractDataPacketPtr  AVClientPullSSHTTPStreamreader::getNextData()
 {
 
 	QString request;

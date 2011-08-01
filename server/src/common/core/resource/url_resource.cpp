@@ -1,6 +1,6 @@
-#include "file_resource.h"
 #include "dataprovider/single_shot_file_dataprovider.h"
-#include "dataprovider/streamdataprovider.h"
+#include "url_resource.h"
+
 
 QnURLResource::QnURLResource(QString filename)
 {

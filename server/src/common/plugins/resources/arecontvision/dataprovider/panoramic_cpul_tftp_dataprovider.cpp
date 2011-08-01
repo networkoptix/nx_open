@@ -34,7 +34,7 @@ QnPlAVClinetPullStreamReader(dev)
 
 }
 
-QnAbstractMediaDataPacketPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
+QnAbstractDataPacketPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 {
 
 	QString request;

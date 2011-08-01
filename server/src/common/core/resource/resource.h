@@ -93,7 +93,7 @@ public:
 
     // same as getParam is invoked in separate thread.
     // as soon as param changed onParametrChanged signal is emitted 
-    void getParamAsynch(const QString& name, QnValue& val, QnDomain domain) const;
+    void getParamAsynch(const QString& name, QnValue& val, QnDomain domain);
 
 
 	// return true if no error
@@ -110,7 +110,7 @@ public:
     virtual bool unknownResource() const;
 
     // updateResource requests the additional  information and returns resource with same params but additional info; unknownResource() for returned resource must return false
-    virtual QnResourcePtr updateResource()  = 0;
+    virtual QnResourcePtr updateResource() = 0;
     //=============
 
 

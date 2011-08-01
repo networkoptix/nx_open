@@ -15,7 +15,8 @@ public:
 	}
 
 protected:
-	virtual QnAbstractMediaDataPacketPtr getNextData();
+	
+    virtual QnAbstractDataPacketPtr getNextData() = 0;
 
 protected:
 

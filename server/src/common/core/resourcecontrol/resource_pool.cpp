@@ -67,7 +67,7 @@ QnResourceList QnResourcePool::getResourcesWithFlag(unsigned long flag)
 
     foreach(QnResourcePtr res, m_resources)
     {
-        if (res->checkDeviceTypeFlag(flag))
+        if (res->checkFlag(flag))
             result.push_back(res);
     }
 

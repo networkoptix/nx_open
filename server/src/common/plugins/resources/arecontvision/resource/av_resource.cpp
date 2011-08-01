@@ -10,7 +10,7 @@
 const char* ArecontVisionManufacture = "ArecontVision";
 
 
-#define CL_BROAD_CAST_RETRY 3
+
 extern int ping_timeout;
 
 QnPlAreconVisionResource::QnPlAreconVisionResource()
@@ -21,6 +21,15 @@ QnPlAreconVisionResource::QnPlAreconVisionResource()
 bool QnPlAreconVisionResource::isPanoramic() const
 {
     return QnPlAreconVisionResource::isPanoramic(getName());
+}
+
+bool QnPlAreconVisionResource::isDualSensor() const
+{
+    QString name = getName();
+    if (name.contains("3130") || name.contains("3135"))
+        return true;
+
+    return false;
 }
 
 CLHttpStatus QnPlAreconVisionResource::getRegister(int page, int num, int& val)

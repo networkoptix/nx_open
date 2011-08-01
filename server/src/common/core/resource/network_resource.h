@@ -35,6 +35,7 @@ public:
 	void setDiscoveryAddr(QHostAddress addr);
 
     virtual QString toString() const;
+    QString toSearchString() const;
 
 
     void addNetworkStatus(unsigned long status);

@@ -1,8 +1,9 @@
 #include "directory_browser.h"
-#include "resources/archive/avi_files/avi_resource.h"
+//#include "resources/archive/avi_files/avi_resource.h"
 #include "resources/archive/filetypesupport.h"
-#include "resources/archive/avi_files/avi_dvd_resource.h"
-#include "resources/archive/avi_files/avi_bluray_resource.h"
+//#include "resources/archive/avi_files/avi_dvd_resource.h"
+//#include "resources/archive/avi_files/avi_bluray_resource.h"
+#include "resource/url_resource.h"
 
 
 
@@ -68,6 +69,7 @@ QnResourcePtr QnResourceDirectoryBrowser::checkFile(const QString& filename)
 {
     FileTypeSupport fileTypeSupport;
 
+    /*//todo
 
     if (fileTypeSupport.isImageFileExt(filename))
         return QnResourcePtr(new QnURLResource(filename));
@@ -80,6 +82,8 @@ QnResourcePtr QnResourceDirectoryBrowser::checkFile(const QString& filename)
 
     if (fileTypeSupport.isMovieFileExt(filename))
         return QnResourcePtr( new QnAviResource(filename) );
+
+    /**/
 
     return QnResourcePtr(0);
 }
@@ -108,7 +112,7 @@ QnResourceList QnResourceDirectoryBrowser::findResources(const QString& director
         {
             QString file = list.at(i);
             QString abs_file_name = directory + file;
-            result.push_back( QnResourcePtr( new QnURLResource(abs_file_name) ) );
+            //result.push_back( QnResourcePtr( new QnURLResource(abs_file_name) ) ); //todo
         }
     }
 
@@ -119,7 +123,7 @@ QnResourceList QnResourceDirectoryBrowser::findResources(const QString& director
         {
             QString file = list.at(i);
             QString abs_file_name = directory + file;
-            result.push_back( QnResourcePtr (new QnAviResource(abs_file_name)) );
+            //result.push_back( QnResourcePtr (new QnAviResource(abs_file_name)) );//todo
         }
     }
 

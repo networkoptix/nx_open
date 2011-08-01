@@ -11,16 +11,18 @@ public:
 	bool getDescription();
 	virtual QnAbstractMediaStreamDataProvider* getDeviceStreamConnection();
 
+    virtual QnMediaResourceLayout* getVideoLayout() const;
+
 	virtual bool hasTestPattern() const;
 
 protected:
-	virtual bool setParam(const QString& name, const QnValue& val);
 
-	virtual bool setSpecialParam(const QString& name, const QnValue& val);
+    virtual bool setParamPhysical(const QString& name, const QnValue& val);
+    virtual bool setSpecialParam(const QString& name, const QnValue& val, QnDomain domain);
 
 private:
 	bool setResolution(bool full);
-	bool setQulity(int q);
+	bool setCamQulity(int q);
 
 protected:
 	bool m_hastestPattern;

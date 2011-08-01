@@ -13,7 +13,7 @@
 class CLSingleShotFileStreamreader : public QnSingleShotStreamreader
 {
 public:
-	CLSingleShotFileStreamreader(QnResource* dev );
+	CLSingleShotFileStreamreader(QnResourcePtr res);
 	~CLSingleShotFileStreamreader(){stop();}
 
 protected:

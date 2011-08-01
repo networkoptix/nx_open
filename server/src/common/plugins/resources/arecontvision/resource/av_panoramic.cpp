@@ -1,6 +1,7 @@
 #include "av_resource.h"
 #include "av_panoramic.h"
 #include "../dataprovider/panoramic_cpul_tftp_dataprovider.h"
+#include "resource/media_resource_layout.h"
 
 class AVVideoLayout180 : public QnMediaResourceLayout
 {
@@ -98,21 +99,23 @@ public:
 
 };
 
+AVVideoLayout360 avVideoLayout360;
+AVVideoLayout180 avVideoLayout180;
+
 CLArecontPanoramicDevice::CLArecontPanoramicDevice(const QString& name):
 m_hastestPattern(false)
 {
-	switch(model)
-	{
-	case AV8360:
-	case AV8365:
-		m_videolayout = new AVVideoLayout360();
-		break;
+    setName(name);
+}
 
-	case AV8180:
-	case AV8185:
-		m_videolayout = new AVVideoLayout180();
+QnMediaResourceLayout* CLArecontPanoramicDevice::getVideoLayout() const
+{
+    QString name = getName();
 
-	}
+    if (name.contains("8360") || name.contains("8365"))
+        return &avVideoLayout360;
+    else
+        return &avVideoLayout180;
 }
 
 bool CLArecontPanoramicDevice::getDescription()
@@ -132,38 +135,20 @@ bool CLArecontPanoramicDevice::hasTestPattern() const
 	return m_hastestPattern;
 }
 
-bool CLArecontPanoramicDevice::setParam(const QString& name, const QnValue& val )
+bool CLArecontPanoramicDevice::setParamPhysical(const QString& name, const QnValue& val )
 {
-	if (!QnResource::setParam(name, val))
-		return false;
+    QnParam& param = getResourceParamList().get(name);
 
-	if (setSpecialParam(name, val)) // try special first 
-		return true;
+    if (param.paramNetHelper.isEmpty()) // check if we have paramNetHelper command for this param
+        return false;
 
-	QnParam& value = getResourceParamList().get(name).value;
-
-	//if (value.synchronized && value.value==val) // the same value
-	//	return true;
-
-	if (!value.setValue(val, false))
-	{
-		cl_log.log("cannot set such value!", cl_logWARNING);
-		return false;
-	}
-
-	if (value.paramNetHelper=="") // check if we have paramNetHelper command for this param
-	{
-		value.setValue(val);
-		return true;
-	}
-
-	if (value.type==QnParam::None || value.type==QnParam::Button) 
+	if (param.type==QnParam::None || param.type==QnParam::Button) 
 	{
 		CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
 		QString request;
 
 		QTextStream str(&request);
-		str << "set?" << value.paramNetHelper;
+		str << "set?" << param.paramNetHelper;
 
 		connection.setRequestLine(request);
 
@@ -179,7 +164,7 @@ bool CLArecontPanoramicDevice::setParam(const QString& name, const QnValue& val 
 			QString request;
 
 			QTextStream str(&request);
-			str << "set" << i << "?" << value.paramNetHelper;
+			str << "set" << i << "?" << param.paramNetHelper;
 			str << "=" << (QString)val;
 
 			connection.setRequestLine(request);
@@ -191,17 +176,14 @@ bool CLArecontPanoramicDevice::setParam(const QString& name, const QnValue& val 
 
 	}
 
-	value.setValue(val);
-	value.synchronized = true;
-
 	return true;
 
 }
 
-bool CLArecontPanoramicDevice::setSpecialParam(const QString& name, const QnValue& val)
+bool CLArecontPanoramicDevice::setSpecialParam(const QString& name, const QnValue& val, QnDomain domain)
 {
 
-	if (QnPlAreconVisionResource::setSpecialParam(name, val))
+	if (QnPlAreconVisionResource::setSpecialParam(name, val, domain))
 		return true;
 
 	if (name=="resolution")
@@ -219,7 +201,7 @@ bool CLArecontPanoramicDevice::setSpecialParam(const QString& name, const QnValu
 		if (q<1 || q>21)
 			return false;
 
-		return setQulity(q);
+		return setCamQulity(q);
 
 	}
 
@@ -237,7 +219,7 @@ bool CLArecontPanoramicDevice::setResolution(bool full)
 	return true;
 }
 
-bool CLArecontPanoramicDevice::setQulity(int q)
+bool CLArecontPanoramicDevice::setCamQulity(int q)
 {
 	if (CL_HTTP_SUCCESS!=setRegister(3, 0xED, q)) // FULL RES QULITY
 		return false;

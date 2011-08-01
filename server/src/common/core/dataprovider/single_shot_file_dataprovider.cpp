@@ -1,16 +1,16 @@
 #include "single_shot_file_dataprovider.h"
 #include "resources/archive/filetypesupport.h"
-#include "resource/file_resource.h"
 #include "common/bytearray.h"
 #include "datapacket/mediadatapacket.h"
 #include "common/base.h"
+#include "resource/url_resource.h"
 
 
-CLSingleShotFileStreamreader::CLSingleShotFileStreamreader(QnResource* dev ):
-QnSingleShotStreamreader(dev)
+CLSingleShotFileStreamreader::CLSingleShotFileStreamreader(QnResourcePtr res):
+QnSingleShotStreamreader(res)
 {
-	QnURLResource* device = static_cast<QnURLResource*>(dev);
-	m_fileName = device->getUrl();
+	QnUrlResourcePtr urlRes = res.dynamicCast<QnURLResource>();
+	m_fileName = urlRes->getUrl();
 }
 
 QnAbstractMediaDataPacketPtr CLSingleShotFileStreamreader::getData()

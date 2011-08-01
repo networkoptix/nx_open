@@ -18,7 +18,8 @@ public:
 	}
 
 protected:
-	virtual QnAbstractMediaDataPacketPtr getNextData();
+	virtual QnAbstractDataPacketPtr getNextData();
+    
 
 	virtual bool needKeyData() const;
 
