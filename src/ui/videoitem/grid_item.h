@@ -1,38 +1,34 @@
 #ifndef CLGridItem_h_1841
 #define CLGridItem_h_1841
 
-class GraphicsView;
+#include <QtGui/QGraphicsObject>
 
 #include "abstract_scene_item.h"
 
-class CLGridItem : public QObject, public QGraphicsItem
+class GraphicsView;
+
+class CLGridItem : public QGraphicsObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(qreal alpha  READ opacity   WRITE setAlpha)
 public:
-    CLGridItem(GraphicsView* view);
+    CLGridItem(GraphicsView *view);
     ~CLGridItem();
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
     QRectF boundingRect() const;
 
-    // will make control visible and animate it from current opacity(normally zero), to 1.0.
-    void showAnimated(int time_ms = 1000);
+    // animates visibility changing
+    void setVisibleAnimated(bool visible, int time_ms = 1000);
+    inline void showAnimated(int time_ms = 1000) { setVisibleAnimated(true, time_ms); }
+    inline void hideAnimated(int time_ms = 1000) { setVisibleAnimated(false, time_ms); }
 
-    // will animate control from current opacity( normally 1.0) to 0 and hide item
-    void hideAnimated(int time_ms = 1000);
-
-    int alpha() const;
-    void setAlpha(int val);
-
-protected slots:
+private Q_SLOTS:
     void stopAnimation();
 
 private:
-    GraphicsView* m_view;
-    int m_alpha;
-    QPropertyAnimation* m_animation;
-
+    GraphicsView *const m_view;
+    QPropertyAnimation *m_animation;
 };
 
 #endif // CLGridItem
