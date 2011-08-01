@@ -380,8 +380,8 @@ loop1:
         pand xmm1, sse_mask_color
         pand xmm7, sse_mask_color
 
-        packusdw xmm0,xmm6 // pack dword to word
-        packusdw xmm1,xmm7
+        packssdw xmm0,xmm6 // pack dword to word
+        packssdw xmm1,xmm7
 
         MOVAPS    xmm5, [esi]
         MOVAPS    xmm6, [esi+16]
@@ -401,8 +401,8 @@ loop1:
         pand xmm3, sse_mask_color
         pand xmm7, sse_mask_color
 
-        packusdw xmm5,xmm6
-        packusdw xmm3,xmm7
+        packssdw xmm5,xmm6
+        packssdw xmm3,xmm7
 
         // prepare second line
         // -------------------------------------------------------------------------------------------
@@ -426,8 +426,8 @@ loop1:
         pand xmm4, sse_mask_color
         pand xmm7, sse_mask_color
 
-        packusdw xmm2,xmm6 // pack dword to word
-        packusdw xmm4,xmm7
+        packssdw xmm2,xmm6 // pack dword to word
+        packssdw xmm4,xmm7
 
         // ---------------------------------------------------------------------------------------
 
@@ -476,13 +476,13 @@ loop1:
         pmulhw xmm7, y_r_coeff
 
         paddw xmm6, sse_00a0
-        packusdw xmm0, xmm0
+        packssdw xmm0, xmm0
 
         paddw xmm6, xmm7
-        packusdw xmm1, xmm1
+        packssdw xmm1, xmm1
 
         psrlw xmm6, 5
-        packusdw xmm5, xmm5
+        packssdw xmm5, xmm5
 
         pmulhw xmm0, uv_b_coeff
         packuswb xmm6, xmm6
