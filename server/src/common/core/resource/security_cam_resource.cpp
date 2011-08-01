@@ -6,6 +6,11 @@ QnSequrityCamResource::QnSequrityCamResource()
     addFlag(QnResource::live_cam);
 }
 
+QnSequrityCamResource::~QnSequrityCamResource()
+{
+
+}
+
 int QnSequrityCamResource::getMaxFps()
 {
     if (hasSuchParam("MaxFPS"))

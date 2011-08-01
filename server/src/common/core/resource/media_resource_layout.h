@@ -56,8 +56,6 @@ public:
 
 };
 
-QnDefaultMediaResourceLayout globalDefaultMediaResourceLayout;
-
 class QnCustomDeviceVideoLayout : public QnMediaResourceLayout
 {
 public:

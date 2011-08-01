@@ -3,7 +3,7 @@
 
 
 
-extern QnDefaultMediaResourceLayout globalDefaultMediaResourceLayout;
+QnDefaultMediaResourceLayout globalDefaultMediaResourceLayout;
 
 QnMediaResource::QnMediaResource()
 {

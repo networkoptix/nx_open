@@ -12,13 +12,13 @@ QnClientPullStreamProvider::~QnClientPullStreamProvider()
     stop();
 }
 
-bool QnAbstractMediaStreamDataProvider::beforeGetData()
+bool QnClientPullStreamProvider::beforeGetData()
 {
     // does nothing in client pull
     return true;
 }
 
-void QnAbstractMediaStreamDataProvider::sleepIfNeeded()
+void QnClientPullStreamProvider::sleepIfNeeded()
 {
     // here some kind of adaptive delay must be inserted based on m_dataRate getDataRate and stats
 }
