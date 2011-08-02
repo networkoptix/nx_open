@@ -321,7 +321,7 @@ void GraphicsView::setZeroSelection()
 
 void GraphicsView::setAllItemsQuality(CLStreamreader::StreamQuality q, bool increase)
 {
-    cl_log.log("new quality", q, cl_logDEBUG1);
+    cl_log.log(QLatin1String("new quality"), q, cl_logDEBUG1);
 
     QList<CLAbstractSceneItem*> wndlst = m_camLayout.getItemList();
 
@@ -504,7 +504,7 @@ void GraphicsView::initDecoration()
 
     if (home)
     {
-        item = new CLUnMovedPixtureButton(button_home, 0,  global_decoration_opacity, 1.0, ":/skin/decorations/home.png", decoration_size, decoration_size, 255);
+        item = new CLUnMovedPixtureButton(button_home, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/home.png"), decoration_size, decoration_size, 255);
         item->setStaticPos(QPoint(1,1));
         addStaticItem(item);
         top_left+= (decoration_size + 5);
@@ -512,7 +512,7 @@ void GraphicsView::initDecoration()
 
     if (level_up)
     {
-        item = new CLUnMovedPixtureButton(button_level_up, 0,  global_decoration_opacity, 1.0, ":/skin/decorations/level-up.png", decoration_size, decoration_size, 255);
+        item = new CLUnMovedPixtureButton(button_level_up, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/level-up.png"), decoration_size, decoration_size, 255);
         item->setStaticPos(QPoint(top_left,1));
         addStaticItem(item);
         top_left+=decoration_size;
@@ -521,8 +521,8 @@ void GraphicsView::initDecoration()
     if (cont->checkDecorationFlag(LayoutContent::BackGroundLogo))
     {
 
-        item = new CLUnMovedPixture("background", 0, 0.05, 0.05, ":/skin/startscreen/no_logo_bkg.png", viewport()->width(), viewport()->height(), -100);
-        //item = new CLUnMovedPixture("background", 0, 0.03, 0.03, ":/skin/logo", viewport()->width(), viewport()->height(), -100);
+        item = new CLUnMovedPixture(QLatin1String("background"), 0, 0.05, 0.05, QLatin1String(":/skin/startscreen/no_logo_bkg.png"), viewport()->width(), viewport()->height(), -100);
+        //item = new CLUnMovedPixture(QLatin1String("background"), 0, 0.03, 0.03, QLatin1String(":/skin/logo"), viewport()->width(), viewport()->height(), -100);
         item->setStaticPos(QPoint(1,1));
         addStaticItem(item);
         /**/
@@ -530,14 +530,14 @@ void GraphicsView::initDecoration()
 
     if (magnifyingGlass)
     {
-        item = new CLUnMovedPixtureButton(button_magnifyingglass, 0,  0.4, 1.0, ":/skin/decorations/search.png", decoration_size, decoration_size, 255);
+        item = new CLUnMovedPixtureButton(button_magnifyingglass, 0,  0.4, 1.0, QLatin1String(":/skin/decorations/search.png"), decoration_size, decoration_size, 255);
         item->setStaticPos(QPoint((viewport()->width() - decoration_size)/2,0));
         addStaticItem(item);
     }
 
     if (square_layout)
     {
-        item = new CLUnMovedPixtureButton(button_squarelayout, 0,  global_decoration_opacity, 1.0, ":/skin/decorations/square-view.png", decoration_size, decoration_size, 255);
+        item = new CLUnMovedPixtureButton(button_squarelayout, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/square-view.png"), decoration_size, decoration_size, 255);
         item->setStaticPos(QPoint(viewport()->width() - 3.3*decoration_size,1));
         addStaticItem(item);
         top_left+=(decoration_size+10);
@@ -545,14 +545,14 @@ void GraphicsView::initDecoration()
 
     if (long_layout)
     {
-        item = new CLUnMovedPixtureButton(button_longlayout, 0,  global_decoration_opacity, 1.0, ":/skin/decorations/horizontal-view.png", decoration_size, decoration_size, 255);
+        item = new CLUnMovedPixtureButton(button_longlayout, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/horizontal-view.png"), decoration_size, decoration_size, 255);
         item->setStaticPos(QPoint(viewport()->width() - 2.2*decoration_size+1,1));
         addStaticItem(item);
     }
 
     if (sigle_line_layout)
     {
-        item = new CLUnMovedPixtureButton(button_singleLineLayout, 0,  global_decoration_opacity, 1.0, ":/skin/decorations/single-line-view.png", decoration_size, decoration_size, 255);
+        item = new CLUnMovedPixtureButton(button_singleLineLayout, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/single-line-view.png"), decoration_size, decoration_size, 255);
         item->setStaticPos(QPoint(viewport()->width() - 1.1*decoration_size+1,1));
         addStaticItem(item);
     }
@@ -577,7 +577,7 @@ void GraphicsView::initDecoration()
 
     if (multiPageSelector)
     {
-        m_pageSelector = new QnPageSelector("page_selector", 0, 0.5, 1.0);
+        m_pageSelector = new QnPageSelector(QLatin1String("page_selector"), 0, 0.5, 1.0);
         addStaticItem(m_pageSelector, false);
         connect(m_pageSelector, SIGNAL(onNewPageSlected(int)), &m_camLayout, SLOT(onNewPageSelected(int)) );
     }
@@ -836,11 +836,11 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
             items2DDstream(m_scene.selectedItems(), dataStream);
 
             QMimeData *mimeData = new QMimeData;
-            mimeData->setData("hdwitness/layout-items", itemData);
+            mimeData->setData(QLatin1String("hdwitness/layout-items"), itemData);
 
             QDrag *drag = new QDrag(this);
             drag->setMimeData(mimeData);
-            drag->setPixmap(cached(":/skin/camera_dd_icon.png"));
+            drag->setPixmap(cached(QLatin1String(":/skin/camera_dd_icon.png")));
             //drag->setPixmap(cached(":/skin/logo.png"));
 
             drag->exec(Qt::CopyAction);
@@ -1157,7 +1157,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
     QMenu distance_menu;
 
     //distance_menu.setWindowOpacity(global_menu_opacity);
-    distance_menu.setTitle("Item distance");
+    distance_menu.setTitle(tr("Item distance"));
 
     distance_menu.addAction(&dis_0);
     distance_menu.addAction(&dis_5);
@@ -1170,7 +1170,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
 
     QMenu rotation_manu;
-    rotation_manu.setTitle("Rotation");
+    rotation_manu.setTitle(tr("Rotation"));
     rotation_manu.addAction(&cm_rotate_0);
     rotation_manu.addAction(&cm_rotate_90);
     rotation_manu.addAction(&cm_rotate_minus90);
@@ -1178,7 +1178,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
 
     QMenu audioMenu;
-    audioMenu.setTitle("Audio tracks");
+    audioMenu.setTitle(tr("Audio tracks"));
     /*
     QAction cmAudio0(0);
     QAction cmAudio1(0);
@@ -1249,7 +1249,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
                     {
                         AudioTracks << new QAction(0);
                         AudioTracks[i]->setCheckable(true);
-                        AudioTracks[i]->setText(QString("  ") + tracks.at(i));
+                        AudioTracks[i]->setText(QLatin1String("  ") + tracks.at(i));
                         audioMenu.addAction(AudioTracks[i]);
                     }
 
@@ -1467,11 +1467,9 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
             {
                 if (act == &cm_open_containing_folder)
                 {
-
                     QString file = dev->getUniqueId();
-
-#ifdef WIN32
-                    file = file.replace('/', '\\');
+#ifdef Q_OS_WIN
+                    file = QDir::toNativeSeparators(file);
                     QString program;
                     QTextStream(&program) << "explorer.exe /select," << file;
                     WinExec(program.toLatin1(),SW_SHOW);
@@ -1680,7 +1678,7 @@ void GraphicsView::mouseDoubleClickEvent( QMouseEvent * event )
     QGraphicsView::mouseDoubleClickEvent(event);
 }
 
-void GraphicsView::dragEnterEvent ( QDragEnterEvent * event )
+void GraphicsView::dragEnterEvent(QDragEnterEvent *event)
 {
 
     if (m_viewMode!=ItemsAcceptor)
@@ -1689,13 +1687,13 @@ void GraphicsView::dragEnterEvent ( QDragEnterEvent * event )
         return;
     }
 
-    if (event->mimeData()->hasFormat("hdwitness/layout-items"))
+    if (event->mimeData()->hasFormat(QLatin1String("hdwitness/layout-items")))
     {
         event->accept();
     }
 }
 
-void GraphicsView::dragMoveEvent ( QDragMoveEvent * event )
+void GraphicsView::dragMoveEvent(QDragMoveEvent *event)
 {
     if (m_viewMode!=ItemsAcceptor)
     {
@@ -1703,23 +1701,23 @@ void GraphicsView::dragMoveEvent ( QDragMoveEvent * event )
         return;
     }
 
-    if (event->mimeData()->hasFormat("hdwitness/layout-items"))
+    if (event->mimeData()->hasFormat(QLatin1String("hdwitness/layout-items")))
     {
         event->accept();
     }
 }
 
-void GraphicsView::dropEvent ( QDropEvent * event )
+void GraphicsView::dropEvent(QDropEvent *event)
 {
     bool empty_scene = m_camLayout.getItemList().count() == 0;
 
-    if (m_viewMode!=ItemsAcceptor || !event->mimeData()->hasFormat("hdwitness/layout-items"))
+    if (m_viewMode!=ItemsAcceptor || !event->mimeData()->hasFormat(QLatin1String("hdwitness/layout-items")))
     {
         event->ignore();
         return;
     }
 
-    QByteArray itemData = event->mimeData()->data("hdwitness/layout-items");
+    QByteArray itemData = event->mimeData()->data(QLatin1String("hdwitness/layout-items"));
     QDataStream dataStream(&itemData, QIODevice::ReadOnly);
 
     CLDragAndDropItems items;
@@ -1774,7 +1772,7 @@ bool GraphicsView::onUserInput(bool go_unsteady, bool escapeFromintro)
 
 void GraphicsView::goToSteadyMode(bool steady)
 {
-    CLUnMovedPixture* bk_item = static_cast<CLUnMovedPixture*>(staticItemByName("background"));
+    CLUnMovedPixture* bk_item = static_cast<CLUnMovedPixture*>(staticItemByName(QLatin1String("background")));
 
     if (steady)
     {
@@ -2169,7 +2167,7 @@ void GraphicsView::updatePageSelector()
 
 void GraphicsView::updateDecorations()
 {
-    CLUnMovedPixture* item = static_cast<CLUnMovedPixture*>(staticItemByName("background"));
+    CLUnMovedPixture* item = static_cast<CLUnMovedPixture*>(staticItemByName(QLatin1String("background")));
 
     if (item)
     {
@@ -2621,7 +2619,7 @@ void GraphicsView::toggleRecording()
         label->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool);
         label->setText(tr("Recording started"));
         label->setAlignment(Qt::AlignCenter);
-        label->setStyleSheet("QLabel { font-size:22px; border-width: 2px; border-style: inset; border-color: #535353; border-radius: 18px; background: #212150; color: #a6a6a6; selection-background-color: ltblue } ");
+        label->setStyleSheet(QLatin1String("QLabel { font-size:22px; border-width: 2px; border-style: inset; border-color: #535353; border-radius: 18px; background: #212150; color: #a6a6a6; selection-background-color: ltblue }"));
         int side = qMin(label->width(), label->height());
         QRegion maskedRegion = createRoundRegion(18, 18, label->rect());
 
@@ -2647,7 +2645,7 @@ void GraphicsView::toggleRecording()
         m_desktopEncoder->stop();
 
         QSettings settings;
-        settings.beginGroup("videoRecording");
+        settings.beginGroup(QLatin1String("videoRecording"));
         QString previousDir = settings.value(QLatin1String("previousDir")).toString();
         QString filePath = QFileDialog::getSaveFileName(this,
                                                         tr("Save Recording As"),
@@ -2827,22 +2825,22 @@ void GraphicsView::contextMenuHelper_addNewLayout()
     QString name;
     while(true)
     {
-        name = UIgetText(this, tr("New layout"), tr("Layout title:"), "", ok).trimmed();
+        name = UIgetText(this, tr("New layout"), tr("Layout title:"), QString(), ok).trimmed();
         if (!ok)
             break;
 
         if (name.isEmpty())
         {
-            UIOKMessage(this, "", "Empty tittle cannot be used.");
+            UIOKMessage(this, QString(), tr("Empty tittle cannot be used."));
             continue;
         }
 
-        name = QString("Layout:") + name;
+        name = QLatin1String("Layout:") + name;
 
         if (!m_camLayout.getContent()->hasSuchSublayoutName(name))
             break;
 
-        UIOKMessage(this, "", "Such title layout already exists.");
+        UIOKMessage(this, QString(), tr("Such title layout already exists."));
     }
 
     if (ok)
@@ -2916,11 +2914,11 @@ void GraphicsView::contextMenuHelper_chngeLayoutTitle(CLAbstractSceneItem* wnd)
 
         if (name.isEmpty())
         {
-            UIOKMessage(this, "", "Empty tittle cannot be used.");
+            UIOKMessage(this, QString(), tr("Empty tittle cannot be used."));
             continue;
         }
 
-        name = QString("Layout:") + name;
+        name = QLatin1String("Layout:") + name;
 
         LayoutContent* parent = content->getParent();
         if (!parent)
@@ -2929,7 +2927,7 @@ void GraphicsView::contextMenuHelper_chngeLayoutTitle(CLAbstractSceneItem* wnd)
         if (!parent->hasSuchSublayoutName(name))
             break;
 
-        UIOKMessage(this, "", "Such title layout already exists.");
+        UIOKMessage(this, QString(), tr("Such title layout already exists."));
     }
 
     if (ok)
@@ -3001,12 +2999,12 @@ void GraphicsView::contextMenuHelper_saveRecordedAs(CLVideoCamera* cam)
 
         if (name.isEmpty())
         {
-            UIOKMessage(this, "", "Please provide a title.");
+            UIOKMessage(this, QString(), tr("Please provide a title."));
             continue;
         }
 
         // make sure we'll be able to create such folder
-        name.replace( QRegExp(
+        name.replace(QRegExp(QLatin1String(
              "[^"
                 "A-Z,a-z,0-9,"
                 "\\^,\\&,\\',\\@,"
@@ -3014,19 +3012,19 @@ void GraphicsView::contextMenuHelper_saveRecordedAs(CLVideoCamera* cam)
                 "\\,,\\$,\\=,\\!,"
                 "\\-,\\#,\\(,\\),"
                 "\\%,\\.,\\+,\\~,\\_"
-             "]"), "_" );
+             "]")), QLatin1String("_"));
 
 
         QDir dir(getRecordingDir() + name);
         if (dir.exists())
         {
-            UIOKMessage(this, "", "Appears this title already exists.");
+            UIOKMessage(this, QString(), tr("Appears this title already exists."));
             continue;
         }
 
         if (!dir.mkpath(getRecordingDir() + name))
         {
-            UIOKMessage(this, "", "Can't save with this title. Please provide another one.");
+            UIOKMessage(this, QString(), tr("Can't save with this title. Please provide another one."));
             continue;
         }
         dir.rmdir(getRecordingDir() + name);
@@ -3072,24 +3070,24 @@ void GraphicsView::contextMenuHelper_saveLayout( bool new_name)
         QString name;
         while(true)
         {
-            name = UIgetText(this, tr("Save layout as"), tr("Layout title:"), "", ok).trimmed();
+            name = UIgetText(this, tr("Save layout as"), tr("Layout title:"), QString(), ok).trimmed();
             if (!ok)
                 break;
 
             if (name.isEmpty())
             {
-                UIOKMessage(this, "", "Empty tittle cannot be used.");
+                UIOKMessage(this, QString(), tr("Empty tittle cannot be used."));
                 continue;
             }
 
-            name = QString("Layout:") + name;
+            name = QLatin1String("Layout:") + name;
 
             if (!CLSceneLayoutManager::instance().getAllLayoutsContent()->hasSuchSublayoutName(name))
                 break;
 
             //YesNoCancel(this, )
 
-            UIOKMessage(this, "", "Such title layout already exists.");
+            UIOKMessage(this, QString(), tr("Such title layout already exists."));
 
         }
 
