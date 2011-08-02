@@ -6,7 +6,7 @@
 class CLWebItem : public CLAbstractSceneItem
 {
 public:
-	CLWebItem(GraphicsView* view, int max_width, int max_height, QString name="");
+	CLWebItem(GraphicsView* view, int max_width, int max_height, QString name = QString());
 	~CLWebItem();
 	void navigate(const QString& str);
 protected:

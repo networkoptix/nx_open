@@ -9,7 +9,7 @@ class CLVideoWindowArchiveItem : public CLVideoWindowItem
 {
 public:
 	CLVideoWindowArchiveItem (GraphicsView* view, const CLDeviceVideoLayout* layout, int max_width, int max_height,
-		QString name="");
+							  QString name = QString());
 	virtual ~CLVideoWindowArchiveItem();
 
 	virtual void setFullScreen(bool full);
@@ -21,10 +21,10 @@ public:
 
 	virtual void setComplicatedItem(CLAbstractComplicatedItem* complicatedItem);
 
-    virtual void goToSteadyMode(bool steady, bool instant);
+	virtual void goToSteadyMode(bool steady, bool instant);
 
 public slots:
-    void onResize();
+	void onResize();
 
 
 protected:

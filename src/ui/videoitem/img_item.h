@@ -3,14 +3,13 @@
 
 #include "abstract_scene_item.h"
 
-// this is abstract class 
-// I assume that it inherits by video and static_image item 
+// this is abstract class
+// I assume that it inherits by video and static_image item
 class CLImageItem : public CLAbstractSceneItem
 {
 	Q_OBJECT
 public:
-	CLImageItem(GraphicsView* view, int max_width, int max_height,
-		QString name="");
+	CLImageItem(GraphicsView *view, int max_width, int max_height, QString name = QString());
 
 	virtual int height() const;
 	virtual int width() const;

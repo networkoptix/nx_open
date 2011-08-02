@@ -37,9 +37,9 @@ void CLAbstractUnmovedItem::hoverLeaveEvent(QGraphicsSceneHoverEvent */*event*/)
     m_underMouse = false;
 }
 
-void CLAbstractUnmovedItem::setStaticPos(QPoint p)
+void CLAbstractUnmovedItem::setStaticPos(const QPoint &p)
 {
-	m_pos = p;
+    m_pos = p;
 }
 
 void CLAbstractUnmovedItem::adjust()

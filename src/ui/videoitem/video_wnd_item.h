@@ -17,8 +17,8 @@ class CLVideoWindowItem : public CLImageItem, public CLAbstractRenderer
 {
 	Q_OBJECT
 public:
-	CLVideoWindowItem (GraphicsView* view, const CLDeviceVideoLayout* layout, int max_width, int max_height, QString name="");
-	virtual ~CLVideoWindowItem ();
+	CLVideoWindowItem(GraphicsView *view, const CLDeviceVideoLayout *layout, int max_width, int max_height, QString name = QString());
+	virtual ~CLVideoWindowItem();
 
 	void draw(CLVideoDecoderOutput& image, unsigned int channel);
 
@@ -27,7 +27,7 @@ public:
 
 	virtual QSize sizeOnScreen(unsigned int channel) const;
 
-    virtual bool constantDownscaleFactor() const;
+	virtual bool constantDownscaleFactor() const;
 
 	virtual void beforeDestroy();
 
@@ -36,7 +36,7 @@ public:
 
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 
-	const CLDeviceVideoLayout* getVideoLayout() const 
+	const CLDeviceVideoLayout* getVideoLayout() const
 	{
 		return m_videolayout;
 	}
@@ -47,7 +47,7 @@ public:
 
 	virtual void setItemSelected(bool sel, bool animate = true, int delay = 0);
 
-    virtual void goToSteadyMode(bool steady, bool instant);
+	virtual void goToSteadyMode(bool steady, bool instant);
 
 signals:
 	void onAspectRatioChanged(CLAbstractSceneItem* item);

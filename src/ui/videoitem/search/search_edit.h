@@ -1,43 +1,43 @@
 #ifndef serach_edit_2215_h
-#define serach_edit_2215_h 
+#define serach_edit_2215_h
 
 class CLSerchEditCompleter : public QCompleter
 {
-	Q_OBJECT 
-public:    
+	Q_OBJECT
+public:
 	CLSerchEditCompleter(QObject * parent);
 
-	void filter(QString filter);
+	void filter(const QString &filter);
 
 	void updateStringLst(QStringList lst);
 
-private:    
-	QStringList m_list;    
-	QStringListModel m_model;    
+private:
+	QStringList m_list;
+	QStringListModel m_model;
 	QString m_word;
-}; 
+};
 
 class CLSearchEdit : public QLineEdit
-{    
-	Q_OBJECT 
-public:    
-	CLSearchEdit(QWidget *parent = 0);    
-	~CLSearchEdit();     
+{
+	Q_OBJECT
+public:
+	CLSearchEdit(QWidget *parent = 0);
+	~CLSearchEdit();
 	void setCompleter(CLSerchEditCompleter *c);
-	CLSerchEditCompleter *completer() const; 
+	CLSerchEditCompleter *completer() const;
 
-    void setFocusWidget(QWidget* fw) ;
+	void setFocusWidget(QWidget* fw) ;
 
-protected:    
-	void keyPressEvent(QKeyEvent *e); 
+protected:
+    void keyPressEvent(QKeyEvent *e);
     void focusInEvent ( QFocusEvent * e );
 
-	private slots:    
-		void insertCompletion(const QString &completion); 
+	private slots:
+		void insertCompletion(const QString &completion);
 
-private:    
-	CLSerchEditCompleter *c;
+private:
+    CLSerchEditCompleter *c;
 
     QWidget* mFocusWidget;
-}; 
+};
 #endif // serach_edit_2215_h

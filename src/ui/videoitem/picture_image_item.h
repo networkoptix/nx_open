@@ -5,25 +5,25 @@
 
 class CLPictureImageItem : public CLImageItem
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
 	CLPictureImageItem(GraphicsView* view, int max_width, int max_height,
-		QString path, QString name="");
-    ~CLPictureImageItem();
+					   QString path, QString name = QString());
+	~CLPictureImageItem();
+
 protected:
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
 protected slots:
-    void onTimer();
+	void onTimer();
 
 protected:
-	const QPixmap *m_CurrentImg;
+    const QPixmap *m_CurrentImg;
     QList<QPixmap> m_Images;
     QTimer m_Timer;
 
     int m_CurrentIndex;
     bool m_forwardDirection;
-
 };
 
 #endif//static_image_item_h_0056
