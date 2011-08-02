@@ -1,25 +1,16 @@
 #include "file_device.h"
+
 #include "../streamreader/single_shot_file_reader.h"
 
-CLFileDevice::CLFileDevice(QString filename)
+CLFileDevice::CLFileDevice(const QString &filename)
 {
     QFileInfo fi(filename);
-	setUniqueId(fi.absoluteFilePath());
-	m_name = QFileInfo(filename).fileName();
-	addDeviceTypeFlag(CLDevice::SINGLE_SHOT);
-}
-
-QString CLFileDevice::getFileName() const
-{
-	return getUniqueId();
-}
-
-QString CLFileDevice::toString() const 
-{
-	return m_name;
+    setName(fi.fileName());
+    setUniqueId(fi.absoluteFilePath());
+    addDeviceTypeFlag(CLDevice::SINGLE_SHOT);
 }
 
 CLStreamreader* CLFileDevice::getDeviceStreamConnection()
 {
-	return new CLSingleShotFileStreamreader(this);
+    return new CLSingleShotFileStreamreader(this);
 }

@@ -1,26 +1,22 @@
 #ifndef file_device_h_227
 #define file_device_h_227
 
-#include "../network/netstate.h"
 #include "device.h"
 
-class CLFileDevice : public CLDevice 
+class CLFileDevice : public CLDevice
 {
-
 public:
-	CLFileDevice(QString filename);
+    CLFileDevice(const QString &filename);
 
-	DeviceType getDeviceType() const
-	{
-		return VIDEODEVICE;
-	}
+    inline DeviceType getDeviceType() const
+    { return VIDEODEVICE; }
 
-	virtual QString toString() const;
-	QString getFileName() const;
+    inline QString toString() const
+    { return getName(); }
+    inline QString getFileName() const
+    { return getUniqueId(); }
 
-	virtual CLStreamreader* getDeviceStreamConnection();
-protected:
-
+    virtual CLStreamreader* getDeviceStreamConnection();
 };
 
 #endif // file_device_h_227
