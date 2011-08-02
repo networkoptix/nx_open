@@ -1,5 +1,7 @@
 #include "screen_grabber.h"
 
+#include <QtCore/QLibrary>
+
 extern "C" {
 #include <libavformat/avformat.h>
 #include <libavcodec/avcodec.h>
@@ -8,7 +10,29 @@ extern "C" {
 #include "base/colorspace_convert/colorspace.h"
 #include "base/log.h"
 
-typedef DECLSPEC_IMPORT HRESULT (STDAPICALLTYPE *DwmEnableComposition) (UINT uCompositionAction);
+#ifndef DWM_EC_DISABLECOMPOSITION
+#  define DWM_EC_DISABLECOMPOSITION 0
+#endif
+#ifndef DWM_EC_ENABLECOMPOSITION
+#  define DWM_EC_ENABLECOMPOSITION 1
+#endif
+
+typedef DECLSPEC_IMPORT HRESULT (STDAPICALLTYPE *fn_DwmEnableComposition) (UINT uCompositionAction);
+static fn_DwmEnableComposition DwmEnableComposition = 0;
+
+static void toggleAero(bool enable)
+{
+    static bool resolved = false;
+    if (!resolved) {
+        QLibrary lib(QLatin1String("Dwmapi"));
+        if (lib.load())
+            DwmEnableComposition = (fn_DwmEnableComposition)lib.resolve("DwmEnableComposition");
+        resolved = true;
+    }
+
+    if (DwmEnableComposition)
+        DwmEnableComposition(enable ? DWM_EC_ENABLECOMPOSITION : DWM_EC_DISABLECOMPOSITION);
+}
 
 
 QMutex CLScreenGrapper::m_instanceMutex;
@@ -47,18 +71,6 @@ private:
     CPUVersion m_version;
 };
 CPUDetector cpuInfo;
-
-
-void CLScreenGrapper::toggleAero(bool value)
-{
-    QLibrary lib(QLatin1String("Dwmapi"));
-    if (lib.load())
-    {
-        DwmEnableComposition f = (DwmEnableComposition)lib.resolve("DwmEnableComposition");
-        if (f)
-            f(value ? 1 : 0);
-    }
-}
 
 CLScreenGrapper::CLScreenGrapper(int displayNumber, int poolSize, CaptureMode mode, bool captureCursor, const QSize& captureResolution, QWidget* widget):
     m_pD3D(0),
