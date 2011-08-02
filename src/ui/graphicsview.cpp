@@ -2593,11 +2593,11 @@ void GraphicsView::toggleRecording()
         else if (decoderQuality == VideoRecorderSettings::PerformanceQuality)
             quality = 0.5;
 
-        CLScreenGrapper::CaptureMode grabberCaptureMode = CLScreenGrapper::CaptureMode_Application;
+        CLScreenGrabber::CaptureMode grabberCaptureMode = CLScreenGrabber::CaptureMode_Application;
         if (captureMode == VideoRecorderSettings::FullScreenMode)
-            grabberCaptureMode = CLScreenGrapper::CaptureMode_DesktopWithAero;
+            grabberCaptureMode = CLScreenGrabber::CaptureMode_DesktopWithAero;
         else if (captureMode == VideoRecorderSettings::FullScreenNoeroMode)
-            grabberCaptureMode = CLScreenGrapper::CaptureMode_DesktopWithoutAero;
+            grabberCaptureMode = CLScreenGrabber::CaptureMode_DesktopWithoutAero;
 
         m_desktopEncoder = new DesktopFileEncoder(filePath, screen, audioDevice.isNull() ? 0 : &audioDevice, secondAudioDevice.isNull() ? 0 : &secondAudioDevice, grabberCaptureMode, captureCursor, encodingSize, quality, viewport());
         QString errorMessage;

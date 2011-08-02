@@ -356,7 +356,7 @@ DesktopFileEncoder::DesktopFileEncoder (
                    int desktopNum,
                    const QAudioDeviceInfo* audioDevice,
                    const QAudioDeviceInfo* audioDevice2,
-                   CLScreenGrapper::CaptureMode captureMode,
+                   CLScreenGrabber::CaptureMode captureMode,
                    bool captureCursor,
                    const QSize& captureResolution,
                    float encodeQualuty, // in range 0.0 .. 1.0
@@ -774,7 +774,7 @@ void DesktopFileEncoder::run()
             m_capturingStopped = true;
         }
 
-        CLScreenGrapper::CaptureInfo capturedData = m_grabber->getNextFrame();
+        CLScreenGrabber::CaptureInfo capturedData = m_grabber->getNextFrame();
         if (!capturedData.opaque)
             continue;
         m_grabber->capturedDataToFrame(capturedData, m_frame);

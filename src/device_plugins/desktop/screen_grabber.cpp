@@ -35,10 +35,10 @@ static void toggleAero(bool enable)
 }
 
 
-QMutex CLScreenGrapper::m_instanceMutex;
-int CLScreenGrapper::m_aeroInstanceCounter;
+QMutex CLScreenGrabber::m_instanceMutex;
+int CLScreenGrabber::m_aeroInstanceCounter;
 
-CLScreenGrapper::CLScreenGrapper(int displayNumber, int poolSize, CaptureMode mode, bool captureCursor, const QSize& captureResolution, QWidget* widget):
+CLScreenGrabber::CLScreenGrabber(int displayNumber, int poolSize, CaptureMode mode, bool captureCursor, const QSize& captureResolution, QWidget* widget):
     m_pD3D(0),
     m_pd3dDevice(0),
     m_displayNumber(displayNumber),
@@ -72,7 +72,7 @@ CLScreenGrapper::CLScreenGrapper(int displayNumber, int poolSize, CaptureMode mo
     m_timer.start();
 }
 
-CLScreenGrapper::~CLScreenGrapper()
+CLScreenGrabber::~CLScreenGrabber()
 {
     for (int i = 0; i < m_openGLData.size(); ++i)
         delete [] m_openGLData[i];
@@ -111,7 +111,7 @@ CLScreenGrapper::~CLScreenGrapper()
     }
 }
 
-HRESULT	CLScreenGrapper::InitD3D(HWND hWnd)
+HRESULT	CLScreenGrabber::InitD3D(HWND hWnd)
 {
     D3DPRESENT_PARAMETERS	d3dpp;
 
@@ -199,9 +199,9 @@ HRESULT	CLScreenGrapper::InitD3D(HWND hWnd)
     }
 
     return S_OK;
-};
+}
 
-void CLScreenGrapper::allocateTmpFrame(int width, int height)
+void CLScreenGrabber::allocateTmpFrame(int width, int height)
 {
     m_tmpFrameWidth = width;
     m_tmpFrameHeight = height;
@@ -226,7 +226,7 @@ void CLScreenGrapper::allocateTmpFrame(int width, int height)
         SWS_BICUBLIN, NULL, NULL, NULL);
 }
 
-void CLScreenGrapper::captureFrameOpenGL(void* opaque)
+void CLScreenGrabber::captureFrameOpenGL(void* opaque)
 {
     CaptureInfo* data = (CaptureInfo*) opaque;
     glReadBuffer(GL_FRONT);
@@ -247,7 +247,7 @@ void CLScreenGrapper::captureFrameOpenGL(void* opaque)
     glReadPixels(0, 0, data->w, data->h, GL_BGRA_EXT, GL_UNSIGNED_BYTE, data->opaque);
 }
 
-CLScreenGrapper::CaptureInfo CLScreenGrapper::captureFrame()
+CLScreenGrabber::CaptureInfo CLScreenGrabber::captureFrame()
 {
     CaptureInfo rez;
 
@@ -562,7 +562,7 @@ static inline void xorPixel(quint32* data, int stride, int x, int y, quint32* sr
     data[y*stride+x] ^= *srcPixel;
 }
 
-void CLScreenGrapper::drawCursor(quint32* data, int width, int height, int leftOffset, int topOffset, bool flip) const
+void CLScreenGrabber::drawCursor(quint32* data, int width, int height, int leftOffset, int topOffset, bool flip) const
 {
     static const int MAX_CURSOR_SIZE = 64;
     CURSORINFO  pci;
@@ -759,7 +759,7 @@ void CLScreenGrapper::drawCursor(quint32* data, int width, int height, int leftO
     }
 }
 
-bool CLScreenGrapper::direct3DDataToFrame(void* opaque, AVFrame* pFrame)
+bool CLScreenGrabber::direct3DDataToFrame(void* opaque, AVFrame* pFrame)
 {
     IDirect3DSurface9* pSurface = (IDirect3DSurface9*) opaque;
 
@@ -819,7 +819,7 @@ bool CLScreenGrapper::direct3DDataToFrame(void* opaque, AVFrame* pFrame)
     return rez;
 }
 
-bool CLScreenGrapper::dataToFrame(quint8* data, int width, int height, AVFrame* pFrame)
+bool CLScreenGrabber::dataToFrame(quint8* data, int width, int height, AVFrame* pFrame)
 {
     if (m_needRescale)
     {
@@ -842,7 +842,7 @@ bool CLScreenGrapper::dataToFrame(quint8* data, int width, int height, AVFrame* 
    return true;
 }
 
-bool CLScreenGrapper::capturedDataToFrame(const CaptureInfo& captureInfo, AVFrame* pFrame)
+bool CLScreenGrabber::capturedDataToFrame(const CaptureInfo& captureInfo, AVFrame* pFrame)
 {
     bool rez = false;
     if (m_mode == CaptureMode_Application)
@@ -853,17 +853,17 @@ bool CLScreenGrapper::capturedDataToFrame(const CaptureInfo& captureInfo, AVFram
     return rez;
 }
 
-qint64 CLScreenGrapper::currentTime() const
+qint64 CLScreenGrabber::currentTime() const
 {
     return m_timer.elapsed();
 }
 
-int CLScreenGrapper::width() const
+int CLScreenGrabber::width() const
 {
     return m_outWidth;
 }
 
-int CLScreenGrapper::height() const
+int CLScreenGrabber::height() const
 {
     return m_outHeight;
 }

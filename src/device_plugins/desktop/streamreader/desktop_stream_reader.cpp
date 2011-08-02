@@ -101,7 +101,7 @@ CLAbstractMediaData* CLDesktopStreamreader::getNextData()
         return 0;
     while (!m_needStop)
     {
-        CLScreenGrapper::CaptureInfo capturedData = m_grabber->getNextFrame();
+        CLScreenGrabber::CaptureInfo capturedData = m_grabber->getNextFrame();
         if (!capturedData.opaque)
             continue;
         m_grabber->capturedDataToFrame(capturedData, m_frame);
