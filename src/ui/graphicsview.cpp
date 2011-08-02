@@ -2257,14 +2257,14 @@ NavigationItem *GraphicsView::getNavigationItem()
         m_navigationItem = new NavigationItem();
         m_navigationItem->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
 
-        //    QGraphicsView* v = m_scene->views().at(0);
         int m_width = width();
-        int m_height = 100;
+        int m_height = NavigationItem::DEFAULT_HEIGHT;
 
         QPoint pos (0, viewport()->height() - m_height);
         m_navigationItem->setStaticPos(pos);
         m_navigationItem->setVisible(false);
         m_navigationItem->navigationWidget()->resize(m_width, m_height);
+        m_navigationItem->setZValue(2);
         m_scene.addItem(m_navigationItem);
 
         addStaticItem(m_navigationItem);
@@ -2322,11 +2322,11 @@ void GraphicsView::resizeEvent( QResizeEvent * event )
 
     if (m_navigationItem)
     {
-        QPoint pos (0, viewport()->height() - 100);
+        QPoint pos (0, viewport()->height() - NavigationItem::DEFAULT_HEIGHT);
         m_navigationItem->setStaticPos(pos);
 
         QSize s = event->size();
-        m_navigationItem->navigationWidget()->resize(s.width(), 100);
+        m_navigationItem->navigationWidget()->resize(s.width(), NavigationItem::DEFAULT_HEIGHT);
     }
 
 	updateDecorations();

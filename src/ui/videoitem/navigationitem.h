@@ -78,6 +78,8 @@ public:
 
     bool mouseOver() const { return m_mouseOver; }
 
+    static const int DEFAULT_HEIGHT = 75;
+
 protected:
     void timerEvent(QTimerEvent* event);
     void updateSlider();
