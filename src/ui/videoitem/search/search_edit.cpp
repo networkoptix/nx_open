@@ -5,24 +5,20 @@ CLSerchEditCompleter::CLSerchEditCompleter(QObject * parent):
 QCompleter(parent)
 {
 	setModel(&m_model);
-}     
+}
 
-void CLSerchEditCompleter::filter(QString filter)    
-{        
-	// Do any filtering you like.        
+void CLSerchEditCompleter::filter(const QString &filter)
+{
+	// Do any filtering you like.
 	// Here we just include all items that contain all words.
 	QStringList filtered = m_list;//.filter(word, caseSensitivity());
 
-	QStringList words = filter.split(" ", QString::SkipEmptyParts);
-
-	foreach(QString word, words)
-	{
+	foreach(const QString &word, filter.split(QLatin1Char(' '), QString::SkipEmptyParts))
 		filtered = filtered.filter(word, caseSensitivity());
-	}
 
-	m_model.setStringList(filtered);        
-	complete();    
-}     
+	m_model.setStringList(filtered);
+	complete();
+}
 
 void CLSerchEditCompleter::updateStringLst(QStringList lst)
 {
@@ -32,11 +28,11 @@ void CLSerchEditCompleter::updateStringLst(QStringList lst)
 //=======================================================
 
 CLSearchEdit::CLSearchEdit(QWidget *parent)
-: QLineEdit(parent), 
+: QLineEdit(parent),
 c(0),
 mFocusWidget(0)
 {
-    setFocusPolicy(Qt::StrongFocus);
+	setFocusPolicy(Qt::StrongFocus);
 }
 
 CLSearchEdit::~CLSearchEdit()
@@ -63,9 +59,9 @@ CLSerchEditCompleter *CLSearchEdit::completer() const
 }
 
 
-void CLSearchEdit::setFocusWidget(QWidget* fw) 
+void CLSearchEdit::setFocusWidget(QWidget* fw)
 {
-    mFocusWidget = fw;
+	mFocusWidget = fw;
 }
 
 void CLSearchEdit::insertCompletion(const QString& completion)
@@ -99,7 +95,7 @@ void CLSearchEdit::keyPressEvent(QKeyEvent *e)
             return;
     }
 
-            
+
 
 
 
@@ -128,7 +124,7 @@ void CLSearchEdit::focusInEvent ( QFocusEvent * e )
 
     //if (reason == Qt::TabFocusReason )          return;
 
-    cl_log.log("reason ==================================== ", reason, cl_logALWAYS);
+    cl_log.log(QLatin1String("reason ==================================== "), reason, cl_logALWAYS);
 
     QLineEdit::focusInEvent(e);
 }

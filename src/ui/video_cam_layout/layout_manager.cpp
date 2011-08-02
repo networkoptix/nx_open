@@ -11,34 +11,34 @@ mRecordersAndLayouts(0)
 {
 	mAllCustomLayouts = new LayoutContent();
 	mAllCustomLayouts->addDecorationFlag(
-        LayoutContent::HomeButton | 
-        LayoutContent::BackGroundLogo | 
-        LayoutContent::MagnifyingGlass | 
-        LayoutContent::SquareLayout | 
-        LayoutContent::LongLayout | 
-        LayoutContent::SingleLineLayout |
-        LayoutContent::MultiPageSelection );
+		LayoutContent::HomeButton |
+		LayoutContent::BackGroundLogo |
+		LayoutContent::MagnifyingGlass |
+		LayoutContent::SquareLayout |
+		LayoutContent::LongLayout |
+		LayoutContent::SingleLineLayout |
+		LayoutContent::MultiPageSelection );
 
 	mAllCustomLayouts->setEditable(true);
 	load();
 
 	mAllRecorders = new LayoutContent();
 	mAllRecorders->addDecorationFlag(
-        LayoutContent::HomeButton | 
-        LayoutContent::BackGroundLogo | 
-        LayoutContent::MagnifyingGlass | 
-        LayoutContent::SquareLayout | 
-        LayoutContent::LongLayout | 
-        LayoutContent::SingleLineLayout |
-        LayoutContent::MultiPageSelection);
+		LayoutContent::HomeButton |
+		LayoutContent::BackGroundLogo |
+		LayoutContent::MagnifyingGlass |
+		LayoutContent::SquareLayout |
+		LayoutContent::LongLayout |
+		LayoutContent::SingleLineLayout |
+		LayoutContent::MultiPageSelection);
 
 	mEmptyLayout = getNewEmptyLayoutContent();
 
-	mSearchLayout = getNewEmptyLayoutContent(
-        LayoutContent::HomeButton | 
-        LayoutContent::BackGroundLogo | 
-        LayoutContent::SquareLayout | 
-        LayoutContent::LongLayout | 
+    mSearchLayout = getNewEmptyLayoutContent(
+        LayoutContent::HomeButton |
+        LayoutContent::BackGroundLogo |
+        LayoutContent::SquareLayout |
+        LayoutContent::LongLayout |
         LayoutContent::SingleLineLayout |
         LayoutContent::MultiPageSelection);
 
@@ -65,9 +65,9 @@ CLSceneLayoutManager& CLSceneLayoutManager::instance()
 
 bool CLSceneLayoutManager::load()
 {
-    QString dataLocation = getDataDirectory();
+	QString dataLocation = getDataDirectory();
 
-	QFile file(dataLocation + "/custom_layouts.xml");
+	QFile file(dataLocation + QLatin1String("/custom_layouts.xml"));
 
 	if (!file.exists())
 	{
@@ -80,7 +80,7 @@ bool CLSceneLayoutManager::load()
 	QString error;
 	QDomDocument doc;
 
-	if (!doc.setContent(&file, &errorStr, &errorLine,&errorColumn)) 
+	if (!doc.setContent(&file, &errorStr, &errorLine,&errorColumn))
 	{
 		QTextStream str(&error);
 		str << "File custom_layouts.xml" << "; Parse error at line " << errorLine << " column " << errorColumn << " : " << errorStr;
@@ -89,14 +89,14 @@ bool CLSceneLayoutManager::load()
 	}
 
 	QDomElement root = doc.documentElement();
-	if (root.tagName() != "CustomLayouts")
+	if (root.tagName() != QLatin1String("CustomLayouts"))
 		return false;
 
 	QDomNode node = root.firstChild();
 
-	while (!node.isNull()) 
+	while (!node.isNull())
 	{
-		if (node.toElement().tagName() == "Layout")
+		if (node.toElement().tagName() == QLatin1String("Layout"))
 		{
 			if (!load_parseLyout(node.toElement(), mAllCustomLayouts))
 				return false;
@@ -111,10 +111,10 @@ bool CLSceneLayoutManager::load()
 bool CLSceneLayoutManager::load_parseLyout(const QDomElement& layout, LayoutContent* parent)
 {
 	LayoutContent* lc = 0;
-	QString name = layout.attribute("name");
+	QString name = layout.attribute(QLatin1String("name"));
 
-	QString recorder = layout.attribute("recorder");
-	if (recorder=="1") 
+	QString recorder = layout.attribute(QLatin1String("recorder"));
+	if (recorder == QLatin1String("1"))
 	{
 		lc = createRecorderContent(name);
 	}
@@ -125,42 +125,42 @@ bool CLSceneLayoutManager::load_parseLyout(const QDomElement& layout, LayoutCont
 	}
 
     CLUserGridSettings& gs = lc->getGridSettings();
-    gs.max_rows = layout.attribute("max_rows").toInt();
-    gs.item_distance = layout.attribute("item_distance").toInt();
-    gs.optimal_ratio = layout.attribute("optimal_ratio").toInt();
-    
+    gs.max_rows = layout.attribute(QLatin1String("max_rows")).toInt();
+    gs.item_distance = layout.attribute(QLatin1String("item_distance")).toInt();
+    gs.optimal_ratio = layout.attribute(QLatin1String("optimal_ratio")).toInt();
+
 
 	parent->addLayout(lc, false);
 
 	//=========
 	QDomNode node = layout.firstChild();
 
-	while (!node.isNull()) 
+	while (!node.isNull())
 	{
-		if (node.toElement().tagName() == "Layout")
+		if (node.toElement().tagName() == QLatin1String("Layout"))
 		{
 			if (!load_parseLyout(node.toElement(), lc))
 				return false;
 		}
 
-		if (node.toElement().tagName() == "item")
+		if (node.toElement().tagName() == QLatin1String("item"))
 		{
-			QString type = node.toElement().attribute("type");
-			QString name = node.toElement().attribute("name");
+			QString type = node.toElement().attribute(QLatin1String("type"));
+			QString name = node.toElement().attribute(QLatin1String("name"));
 
-            
 
-			if (type=="DEVICE")
+
+			if (type == QLatin1String("DEVICE"))
 			{
-                LayoutDevice* dev = lc->addDevice(name);
+				LayoutDevice* dev = lc->addDevice(name);
 
                 CLBasicLayoutItemSettings& bs = dev->getBasicSettings();
                 bs.coordType = CLBasicLayoutItemSettings::Slots;
-                bs.pos_x = node.toElement().attribute("pos_x").toInt();
-                bs.pos_y = node.toElement().attribute("pos_y").toInt();
-                bs.angle = node.toElement().attribute("angle").toInt();
-			}
-		}
+                bs.pos_x = node.toElement().attribute(QLatin1String("pos_x")).toInt();
+                bs.pos_y = node.toElement().attribute(QLatin1String("pos_y")).toInt();
+                bs.angle = node.toElement().attribute(QLatin1String("angle")).toInt();
+            }
+        }
 
 		node = node.nextSibling();
 	}
@@ -170,8 +170,8 @@ bool CLSceneLayoutManager::load_parseLyout(const QDomElement& layout, LayoutCont
 
 void CLSceneLayoutManager::save()
 {
-	QDomDocument doc("");
-	QDomElement root = doc.createElement("CustomLayouts");
+	QDomDocument doc;
+	QDomElement root = doc.createElement(QLatin1String("CustomLayouts"));
 	doc.appendChild(root);
 
 	QList<LayoutContent*>& custom_layots_list = mAllCustomLayouts->childrenList();
@@ -182,8 +182,8 @@ void CLSceneLayoutManager::save()
 
 	QString xml = doc.toString();
 
-    QString dataLocation = getDataDirectory();
-	QFile file(dataLocation + "/custom_layouts.xml");
+	QString dataLocation = getDataDirectory();
+	QFile file(dataLocation + QLatin1String("/custom_layouts.xml"));
 	file.open(QIODevice::WriteOnly);
 
 	QTextStream fstr(&file);
@@ -194,7 +194,7 @@ void CLSceneLayoutManager::save()
 
 LayoutContent* CLSceneLayoutManager::introScreenLayoutContent()
 {
-    return &(intro_screen_content());
+	return &(intro_screen_content());
 }
 
 LayoutContent* CLSceneLayoutManager::startScreenLayoutContent()
@@ -250,13 +250,13 @@ LayoutContent* CLSceneLayoutManager::getNewEmptyLayoutContent(unsigned int flags
 {
 	LayoutContent* cont = new LayoutContent();
 	cont->addDecorationFlag(
-        LayoutContent::HomeButton | 
-        LayoutContent::BackGroundLogo | 
-        LayoutContent::MagnifyingGlass | 
-        LayoutContent::SquareLayout | 
-        LayoutContent::LongLayout | 
-        LayoutContent::SingleLineLayout |
-        LayoutContent::MultiPageSelection | flags);
+		LayoutContent::HomeButton |
+		LayoutContent::BackGroundLogo |
+		LayoutContent::MagnifyingGlass |
+		LayoutContent::SquareLayout |
+		LayoutContent::LongLayout |
+		LayoutContent::SingleLineLayout |
+		LayoutContent::MultiPageSelection | flags);
 
 	CLDeviceCriteria cr(CLDeviceCriteria::STATIC);
 	cont->setDeviceCriteria(cr);
@@ -281,14 +281,14 @@ LayoutContent* CLSceneLayoutManager::createRecorderContent(QString id)
 {
 	LayoutContent* cont = new LayoutContent();
 	cont->addDecorationFlag(
-        LayoutContent::HomeButton | 
-        LayoutContent::BackGroundLogo | 
-        LayoutContent::MagnifyingGlass | 
-        LayoutContent::SquareLayout | 
-        LayoutContent::LongLayout | 
-        LayoutContent::SingleLineLayout | 
-        LayoutContent::MultiPageSelection |
-        LayoutContent::LevelUp);
+		LayoutContent::HomeButton |
+		LayoutContent::BackGroundLogo |
+		LayoutContent::MagnifyingGlass |
+		LayoutContent::SquareLayout |
+		LayoutContent::LongLayout |
+		LayoutContent::SingleLineLayout |
+		LayoutContent::MultiPageSelection |
+		LayoutContent::LevelUp);
 
 	CLDeviceCriteria cr(CLDeviceCriteria::ALL);
 	cr.setRecorderId(id);

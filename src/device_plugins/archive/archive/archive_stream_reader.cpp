@@ -10,14 +10,14 @@ CLAbstractArchiveReader(dev),
 m_firsttime(true),
 m_currentTime(-1)
 {
-	memset(mCurrIndex,0,sizeof(mCurrIndex));
+    memset(mCurrIndex,0,sizeof(mCurrIndex));
     m_nextFrameRequested = false;
 
 	for (int channel = 0; channel < m_channel_number; ++channel)
 	{
 		mFinished[channel] = false;
-        m_skippedToTime[channel] = false;
-        m_nextFrame[channel] = false;
+		m_skippedToTime[channel] = false;
+		m_nextFrame[channel] = false;
 	}
 
 	init_data();
@@ -25,7 +25,7 @@ m_currentTime(-1)
 
 CLArchiveStreamReader::~CLArchiveStreamReader()
 {
-    if (mRecordedDataDst=="")
+    if (mRecordedDataDst.isEmpty())
         return;
 
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
@@ -36,11 +36,11 @@ CLArchiveStreamReader::~CLArchiveStreamReader()
     QDir recDir(getRecordingDir());
     if (!recDir.exists())
     {
-        cl_log.log("Trying to create Recording dir...: ", getRecordingDir(), cl_logALWAYS);
+        cl_log.log(QLatin1String("Trying to create Recording dir...: "), getRecordingDir(), cl_logALWAYS);
         if (recDir.mkdir(getRecordingDir()))
-            cl_log.log(getRecordingDir(), "  created", cl_logALWAYS);
+            cl_log.log(getRecordingDir(), QLatin1String("  created"), cl_logALWAYS);
         else
-            cl_log.log(getRecordingDir(), "  failed to create!!!", cl_logWARNING);
+            cl_log.log(getRecordingDir(), QLatin1String("  failed to create!!!"), cl_logWARNING);
     }
 
 
@@ -64,7 +64,7 @@ void CLArchiveStreamReader::resume()
 bool CLArchiveStreamReader::setRecordedDataDst(const QString& dst)
 {
     QDir dir(getRecordingDir() + dst);
-    if (dir.exists()) // already exists 
+    if (dir.exists()) // already exists
         return false;
 
     mRecordedDataDst = dst;
@@ -78,9 +78,9 @@ void CLArchiveStreamReader::init_data()
 	{
 		QString fn;
 		QTextStream stream(&fn);
-		stream << m_device->getUniqueId() << "/channel_" << channel;
-		QString descr_file_name = fn + ".descr";
-		QString data_file_name = fn + ".data";
+		stream << m_device->getUniqueId() << QLatin1String("/channel_") << channel;
+		QString descr_file_name = fn + QLatin1String(".descr");
+		QString data_file_name = fn + QLatin1String(".data");
 
 		QFile file(descr_file_name);
 		if (!file.exists())
@@ -116,7 +116,7 @@ void CLArchiveStreamReader::init_data()
 	QDateTime min_date_time;
 	bool first = true;
 	for (int channel = 0; channel < m_channel_number; ++channel)
-	{	
+	{
 		if (mMovie[channel].count()==0)
 			continue;
 
@@ -154,7 +154,7 @@ void CLArchiveStreamReader::init_data()
 
 quint64 CLArchiveStreamReader::currentTime() const
 {
-	QMutexLocker mutex(&m_cs);
+    QMutexLocker mutex(&m_cs);
 
     if (m_currentTime == (unsigned)-1)
         return slowestChannelTime();
@@ -233,7 +233,7 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
 
 	{
 		QMutexLocker mutex(&m_cs);
-		channel = slowest_channel(); 
+		channel = slowest_channel();
 	}
 
 	if (channel<0)
@@ -274,7 +274,7 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
 	int new_index = nextFrameIndex(false, channel, mCurrIndex[channel], needKeyData(channel), m_forward);
 	if (new_index<0)
 	{
-		mFinished[channel]=true; // slowest_channel will not return this channel any more 
+		mFinished[channel]=true; // slowest_channel will not return this channel any more
 		if (reachedTheEnd())
 		{
 			if (m_forward)
@@ -285,13 +285,13 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
 	}
 	else
 	{
-		if (new_index - mCurrIndex[channel] !=1 ) // if need to seek file 
+		if (new_index - mCurrIndex[channel] !=1 ) // if need to seek file
 		{
 			int shift = mMovie[channel].at(new_index).shift;
 			m_data_file[channel].seek(shift);
 		}
 
-		quint64 this_time = mMovie[channel].at(mCurrIndex[channel]).time;
+        quint64 this_time = mMovie[channel].at(mCurrIndex[channel]).time;
         quint64 skipTime = skipFramesToTime();
 
         if (skipTime && this_time <= skipTime)
@@ -313,9 +313,9 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
             m_currentTime = this_time;
         }
 
-		mCurrIndex[channel] = new_index;
+        mCurrIndex[channel] = new_index;
 
-		int next_channel = slowest_channel();
+        int next_channel = slowest_channel();
         if (next_channel<0)
         {
             CLSleep::msleep(20);
@@ -330,11 +330,11 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
                 m_nextFrameRequested = false;
         }
 
-		qint64 next_time = mMovie[next_channel].at(mCurrIndex[next_channel]).time;
+        qint64 next_time = mMovie[next_channel].at(mCurrIndex[next_channel]).time;
 
-		m_needToSleep = labs(next_time - this_time);
+        m_needToSleep = labs(next_time - this_time);
 
-	}
+    }
 
 	//=================
 	if (isSingleShotMode() && !isSkippingFrames() && !m_nextFrameRequested)
@@ -472,7 +472,7 @@ int CLArchiveStreamReader::slowest_channel() const
 		{
 			best_slowest_time = curr_channel_time;
 			slowest_channel = channel;
-		}		
+		}
 	}
 
 	return slowest_channel;
@@ -495,7 +495,7 @@ void CLArchiveStreamReader::parse_channel_data(int channel, int data_version, ch
 		finfo.size = *((unsigned int*)data); data+=4;
 		finfo.abs_time = *((quint64*)data); data+=8;
 
-		finfo.codec = *((unsigned int*)data); data+=4;
+        finfo.codec = *((unsigned int*)data); data+=4;
         if (data_version == 1)
         {
             finfo.codec = internalCodecIdToFfmpeg(CLCodecType(finfo.codec));

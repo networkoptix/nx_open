@@ -48,14 +48,14 @@ const char *SocketException::what() const throw() {
 }
 
 // Function to fill in address structure given an address and port
-static void fillAddr(const string &address, unsigned short port, 
+static void fillAddr(const string &address, unsigned short port,
                      sockaddr_in &addr) {
   memset(&addr, 0, sizeof(addr));  // Zero out address structure
   addr.sin_family = AF_INET;       // Internet address
 
   hostent *host;  // Resolve name
   if ((host = gethostbyname(address.c_str())) == NULL) {
-    // strerror() will not work for gethostbyname() and hstrerror() 
+    // strerror() will not work for gethostbyname() and hstrerror()
     // is supposedly obsolete
     throw SocketException("Failed to resolve name (gethostbyname())");
   }
@@ -99,25 +99,25 @@ Socket::~Socket() {
   sockDesc = -1;
 }
 
-string Socket::getLocalAddress()  
+string Socket::getLocalAddress()
 {
   sockaddr_in addr;
   unsigned int addr_len = sizeof(addr);
 
-  if (getsockname(sockDesc, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0) 
+  if (getsockname(sockDesc, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0)
   {
-    return "";
+      return string();
   }
 
   return inet_ntoa(addr.sin_addr);
 }
 
-unsigned short Socket::getLocalPort()  
+unsigned short Socket::getLocalPort()
 {
   sockaddr_in addr;
   unsigned int addr_len = sizeof(addr);
 
-  if (getsockname(sockDesc, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0) 
+  if (getsockname(sockDesc, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0)
   {
     return 0;
   }
@@ -133,11 +133,11 @@ void Socket::setLocalPort(unsigned short localPort)  {
   localAddr.sin_addr.s_addr = htonl(INADDR_ANY);
   localAddr.sin_port = htons(localPort);
 
-  if (bind(sockDesc, (sockaddr *) &localAddr, sizeof(sockaddr_in)) < 0) 
+  if (bind(sockDesc, (sockaddr *) &localAddr, sizeof(sockaddr_in)) < 0)
   {
       //error
   }
-      
+
 }
 
 void Socket::setLocalAddressAndPort(const string &localAddress,
@@ -165,13 +165,13 @@ unsigned short Socket::resolveService(const string &service,
 
   if ((serv = getservbyname(service.c_str(), protocol.c_str())) == NULL)
     return atoi(service.c_str());  /* Service is port number */
-  else 
+  else
     return ntohs(serv->s_port);    /* Found port (network byte order) by name */
 }
 
 // CommunicatingSocket Code
 
-CommunicatingSocket::CommunicatingSocket(int type, int protocol)  
+CommunicatingSocket::CommunicatingSocket(int type, int protocol)
      : Socket(type, protocol),
 m_timeout(3000),
 mConnected(false)
@@ -189,7 +189,7 @@ bool CommunicatingSocket::isConnected() const
 }
 
 bool CommunicatingSocket::connect(const string &foreignAddress,
-    unsigned short foreignPort)  
+    unsigned short foreignPort)
 {
   // Get the address of the requested host
 
@@ -208,9 +208,9 @@ bool CommunicatingSocket::connect(const string &foreignAddress,
   int connectResult = ::connect(sockDesc, (sockaddr *) &destAddr, sizeof(destAddr));// Try to connect to the given port
 
 #ifndef Q_OS_WIN
-  if (connectResult != 0) 
+  if (connectResult != 0)
   {
-	  //throw SocketException("Connect failed (connect())", true);
+      //throw SocketException("Connect failed (connect())", true);
       return false;
   }
 #endif
@@ -231,14 +231,14 @@ bool CommunicatingSocket::connect(const string &foreignAddress,
   iSelRet = ::select(sockDesc + 1, NULL, &wrtFDS, NULL, &timeVal);
 
   if (iSelRet<=0)
-	return false;
+    return false;
 #endif
 
   iMode = 0;
 #ifdef Q_OS_WIN
-	ioctlsocket(sockDesc, FIONBIO, &iMode); // set sock in asynch mode
+    ioctlsocket(sockDesc, FIONBIO, &iMode); // set sock in asynch mode
 #else
-	// fcntl(sockDesc, F_SETFL, 0);
+    // fcntl(sockDesc, F_SETFL, 0);
 #endif
 
   mConnected = true;
@@ -253,21 +253,21 @@ void CommunicatingSocket::setTimeOut( unsigned int ms )
 	timeval tv;
 
 	tv.tv_sec = ms/1000;
-	tv.tv_usec = (ms%1000) * 1000;   //1 Secs Timeout 
+	tv.tv_usec = (ms%1000) * 1000;   //1 Secs Timeout
 #ifdef Q_OS_WIN
-    if ( setsockopt (sockDesc, SOL_SOCKET, SO_RCVTIMEO, ( char* )&ms,  sizeof ( ms ) ) != 0) 
+	if ( setsockopt (sockDesc, SOL_SOCKET, SO_RCVTIMEO, ( char* )&ms,  sizeof ( ms ) ) != 0)
 #else
-    if (::setsockopt(sockDesc, SOL_SOCKET, SO_RCVTIMEO,(const char *)&tv,sizeof(struct timeval)) < 0)
+	if (::setsockopt(sockDesc, SOL_SOCKET, SO_RCVTIMEO,(const char *)&tv,sizeof(struct timeval)) < 0)
 #endif
     {
-        cl_log.log("Timeout function failed", cl_logALWAYS);
+        cl_log.log(QLatin1String("Timeout function failed"), cl_logALWAYS);
     }
 
 }
 
-bool CommunicatingSocket::send(const void *buffer, int bufferLen) 
+bool CommunicatingSocket::send(const void *buffer, int bufferLen)
 {
-  if (::send(sockDesc, (raw_type *) buffer, bufferLen, 0) < 0) 
+  if (::send(sockDesc, (raw_type *) buffer, bufferLen, 0) < 0)
   {
     //throw SocketException("Send failed (send())", true);
       mConnected = false;
@@ -277,20 +277,20 @@ bool CommunicatingSocket::send(const void *buffer, int bufferLen)
   return true;
 }
 
-int CommunicatingSocket::recv(void *buffer, int bufferLen) 
+int CommunicatingSocket::recv(void *buffer, int bufferLen)
 {
-	int rtn;
-  if ((rtn = ::recv(sockDesc, (raw_type *) buffer, bufferLen, 0)) < 0) 
+    int rtn;
+  if ((rtn = ::recv(sockDesc, (raw_type *) buffer, bufferLen, 0)) < 0)
   {
 
-      mConnected = false;
+	  mConnected = false;
 	  return -1;
   }
 
   return rtn;
 }
 
-string CommunicatingSocket::getForeignAddress() 
+string CommunicatingSocket::getForeignAddress()
      {
   sockaddr_in addr;
   unsigned int addr_len = sizeof(addr);
@@ -313,8 +313,8 @@ unsigned short CommunicatingSocket::getForeignPort()  {
 
 // TCPSocket Code
 
-TCPSocket::TCPSocket() 
-     : CommunicatingSocket(SOCK_STREAM, 
+TCPSocket::TCPSocket()
+     : CommunicatingSocket(SOCK_STREAM,
     IPPROTO_TCP) {
 }
 
@@ -328,14 +328,14 @@ TCPSocket::TCPSocket(int newConnSD) : CommunicatingSocket(newConnSD) {
 
 // TCPServerSocket Code
 
-TCPServerSocket::TCPServerSocket(unsigned short localPort, int queueLen) 
+TCPServerSocket::TCPServerSocket(unsigned short localPort, int queueLen)
      : Socket(SOCK_STREAM, IPPROTO_TCP) {
   setLocalPort(localPort);
   setListen(queueLen);
 }
 
-TCPServerSocket::TCPServerSocket(const std::string &localAddress, 
-    unsigned short localPort, int queueLen) 
+TCPServerSocket::TCPServerSocket(const std::string &localAddress,
+    unsigned short localPort, int queueLen)
      : Socket(SOCK_STREAM, IPPROTO_TCP) {
   setLocalAddressAndPort(localAddress, localPort);
   setListen(queueLen);
@@ -359,13 +359,13 @@ void TCPServerSocket::setListen(int queueLen)  {
 // UDPSocket Code
 
 UDPSocket::UDPSocket()  : CommunicatingSocket(SOCK_DGRAM,
-    IPPROTO_UDP) 
+    IPPROTO_UDP)
 {
   setBroadcast();
-	m_destAddr = new sockaddr_in();
+    m_destAddr = new sockaddr_in();
  }
 
-UDPSocket::UDPSocket(unsigned short localPort)   : 
+UDPSocket::UDPSocket(unsigned short localPort)   :
     CommunicatingSocket(SOCK_DGRAM, IPPROTO_UDP) {
   setLocalPort(localPort);
   setBroadcast();
@@ -379,7 +379,7 @@ UDPSocket::UDPSocket(unsigned short localPort)   :
   }
 }
 
-UDPSocket::UDPSocket(const std::string &localAddress, unsigned short localPort) 
+UDPSocket::UDPSocket(const std::string &localAddress, unsigned short localPort)
       : CommunicatingSocket(SOCK_DGRAM, IPPROTO_UDP) {
   setLocalAddressAndPort(localAddress, localPort);
   setBroadcast();
@@ -388,14 +388,14 @@ UDPSocket::UDPSocket(const std::string &localAddress, unsigned short localPort)
 
 UDPSocket::~UDPSocket()
 {
-	delete m_destAddr;
+    delete m_destAddr;
 }
 
 void UDPSocket::setBroadcast() {
-  // If this fails, we'll hear about it when we try to send.  This will allow 
+  // If this fails, we'll hear about it when we try to send.  This will allow
   // system that cannot broadcast to continue if they don't plan to broadcast
   int broadcastPermission = 1;
-  setsockopt(sockDesc, SOL_SOCKET, SO_BROADCAST, 
+  setsockopt(sockDesc, SOL_SOCKET, SO_BROADCAST,
              (raw_type *) &broadcastPermission, sizeof(broadcastPermission));
 }
 
@@ -418,15 +418,15 @@ void UDPSocket::disconnect()  {
 
 void UDPSocket::setDestAddr(const std::string &foreignAddress, unsigned short foreignPort)
 {
-	fillAddr(foreignAddress, foreignPort, *m_destAddr);
+    fillAddr(foreignAddress, foreignPort, *m_destAddr);
 }
 
-bool UDPSocket::sendTo(const void *buffer, int bufferLen) 
+bool UDPSocket::sendTo(const void *buffer, int bufferLen)
 {
 
 	// Write out the whole buffer as a single message.
 	if (sendto(sockDesc, (raw_type *) buffer, bufferLen, 0,
-	(sockaddr *) m_destAddr, sizeof(sockaddr_in)) != bufferLen) 
+	(sockaddr *) m_destAddr, sizeof(sockaddr_in)) != bufferLen)
 	{
 		return false;
 	}
@@ -440,7 +440,7 @@ int UDPSocket::recvFrom(void *buffer, int bufferLen, string &sourceAddress,
   sockaddr_in clntAddr;
   socklen_t addrLen = sizeof(clntAddr);
   int rtn;
-  if ((rtn = recvfrom(sockDesc, (raw_type *) buffer, bufferLen, 0, 
+  if ((rtn = recvfrom(sockDesc, (raw_type *) buffer, bufferLen, 0,
                       (sockaddr *) &clntAddr, (socklen_t *) &addrLen)) < 0) {
     throw SocketException("Receive failed (recvfrom())", true);
   }
@@ -451,7 +451,7 @@ int UDPSocket::recvFrom(void *buffer, int bufferLen, string &sourceAddress,
 }
 
 void UDPSocket::setMulticastTTL(unsigned char multicastTTL)  {
-  if (setsockopt(sockDesc, IPPROTO_IP, IP_MULTICAST_TTL, 
+  if (setsockopt(sockDesc, IPPROTO_IP, IP_MULTICAST_TTL,
                  (raw_type *) &multicastTTL, sizeof(multicastTTL)) < 0) {
     throw SocketException("Multicast TTL set failed (setsockopt())", true);
   }
@@ -462,8 +462,8 @@ void UDPSocket::joinGroup(const string &multicastGroup)  {
 
   multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.c_str());
   multicastRequest.imr_interface.s_addr = htonl(INADDR_ANY);
-  if (setsockopt(sockDesc, IPPROTO_IP, IP_ADD_MEMBERSHIP, 
-                 (raw_type *) &multicastRequest, 
+  if (setsockopt(sockDesc, IPPROTO_IP, IP_ADD_MEMBERSHIP,
+                 (raw_type *) &multicastRequest,
                  sizeof(multicastRequest)) < 0) {
     throw SocketException("Multicast group join failed (setsockopt())", true);
   }
@@ -474,8 +474,8 @@ void UDPSocket::leaveGroup(const string &multicastGroup)  {
 
   multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.c_str());
   multicastRequest.imr_interface.s_addr = htonl(INADDR_ANY);
-  if (setsockopt(sockDesc, IPPROTO_IP, IP_DROP_MEMBERSHIP, 
-                 (raw_type *) &multicastRequest, 
+  if (setsockopt(sockDesc, IPPROTO_IP, IP_DROP_MEMBERSHIP,
+                 (raw_type *) &multicastRequest,
                  sizeof(multicastRequest)) < 0) {
     throw SocketException("Multicast group leave failed (setsockopt())", true);
   }

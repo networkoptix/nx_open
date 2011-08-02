@@ -12,13 +12,13 @@ CLVideoWindowItem::CLVideoWindowItem(GraphicsView* view, const CLDeviceVideoLayo
     CLImageItem(view, max_width, max_height, name),
     m_first_draw(true),
     m_showfps(false),
-    m_FPS_Font("Courier New", 250),
+    m_FPS_Font(QLatin1String("Courier New"), 250),
     m_opacity(0.0),
     m_videolayout(layout),
     m_videonum(layout->numberOfChannels())
 {
 
-    m_aspectratio = m_aspectratio/layout->width()*layout->height();
+	m_aspectratio = m_aspectratio/layout->width()*layout->height();
 
 	m_FPS_Font.setWeight(QFont::Bold);
 
@@ -64,7 +64,7 @@ QSize CLVideoWindowItem::sizeOnScreen(unsigned int /*channel*/) const
 
 bool CLVideoWindowItem::constantDownscaleFactor() const
 {
-    return (m_view->shouldOptimizeDrawing() && !isFullScreen());
+	return (m_view->shouldOptimizeDrawing() && !isFullScreen());
 }
 
 bool CLVideoWindowItem::isZoomable() const
@@ -92,17 +92,17 @@ void CLVideoWindowItem::setItemSelected(bool sel, bool animate, int delay )
 
 	if (m_selected)
 	{
-        if (dynamic_cast<CLAVIStreamReader*>(getVideoCam()->getStreamreader()))
-        {
-            getVideoCam()->getCamCamDisplay()->setMTDecoding(true);
-        }
-        
+		if (dynamic_cast<CLAVIStreamReader*>(getVideoCam()->getStreamreader()))
+		{
+			getVideoCam()->getCamCamDisplay()->setMTDecoding(true);
+		}
+
 		getVideoCam()->setQuality(CLStreamreader::CLSHighest, true);
 		getVideoCam()->getCamCamDisplay()->playAudio(true);
 	}
 	else
 	{
-        getVideoCam()->getCamCamDisplay()->setMTDecoding(false);
+		getVideoCam()->getCamCamDisplay()->setMTDecoding(false);
 		getVideoCam()->setQuality(CLStreamreader::CLSNormal, false);
 		getVideoCam()->getCamCamDisplay()->playAudio(false);
 	}
@@ -176,7 +176,7 @@ QPointF CLVideoWindowItem::getBestSubItemPos(CLSubItemType type)
 
 	default:
 		return QPointF(-1001, -1001);
-	    break;
+		break;
 	}
 }
 
@@ -188,7 +188,7 @@ void CLVideoWindowItem::copyVideoDataBeforePainting(bool copy)
 
 QRect CLVideoWindowItem::getSubChannelRect(unsigned int channel) const
 {
-	if (m_videonum==1) // most case scenario 
+	if (m_videonum==1) // most case scenario
 		return QRect(0,0,width(),height());
 
 	/*
@@ -201,7 +201,7 @@ QRect CLVideoWindowItem::getSubChannelRect(unsigned int channel) const
 	|	 |	  |
 	*----*----*
 
-    */
+	*/
 
 	int cel_x = m_videolayout->h_position(channel);
 	int cel_y = m_videolayout->v_position(channel);
@@ -219,7 +219,7 @@ void CLVideoWindowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
 		return;
 	}
 
-	if (painter->paintEngine()->type()	!= QPaintEngine::OpenGL && painter->paintEngine()->type()!= QPaintEngine::OpenGL2) 
+	if (painter->paintEngine()->type()	!= QPaintEngine::OpenGL && painter->paintEngine()->type()!= QPaintEngine::OpenGL2)
 	{
 		return;
 	}
@@ -227,7 +227,7 @@ void CLVideoWindowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
 	//painter->setClipping(true);
 	//painter->setClipRect( option->exposedRect );
 
-	// save the GL state set for QPainter
+    // save the GL state set for QPainter
     if (m_steadyMode)
         drawSteadyWall(painter);
 
@@ -238,10 +238,10 @@ void CLVideoWindowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
 
 	for (unsigned i = 0; i  < m_videonum; ++i)
 	{
-        if (drawSelection)
-            m_gldraw[i]->setOpacity(0.7);
-        else
-            m_gldraw[i]->setOpacity(1.0);
+		if (drawSelection)
+			m_gldraw[i]->setOpacity(0.7);
+		else
+			m_gldraw[i]->setOpacity(1.0);
 
 
 
@@ -273,9 +273,9 @@ void CLVideoWindowItem::drawStuff(QPainter* painter)
     if (m_steadyMode)
         return;
 
-	CLImageItem::drawStuff(painter);
+    CLImageItem::drawStuff(painter);
 
-	drawShadow(painter);
+    drawShadow(painter);
 
 	//============
 	if (m_showing_text && m_showfps && global_show_item_text)
@@ -309,7 +309,7 @@ void CLVideoWindowItem::drawFPS(QPainter* painter)
 		sprintf(fps, "%6.2ffps %6.2fMbps", m_stat[i]->getFrameRate(), m_stat[i]->getBitrate());
 #endif
 		QFontMetrics fm(painter->font());
-		painter->drawText(rect.left()+150,rect.top()+170 + fm.height()/2, fps);
+		painter->drawText(rect.left()+150,rect.top()+170 + fm.height()/2, QString::fromLatin1(fps));
 	}
 }
 
@@ -317,7 +317,7 @@ void CLVideoWindowItem::drawGLfailaure(QPainter* painter)
 {
 	painter->setFont(m_FPS_Font);
 
-	QString text;
+    QString text;
     QTextStream(&text) << tr("Image size is bigger than MAXGlTextureSize(") << CLGLRenderer::getMaxTextureSize() << ") on this video hardware. Such images cannot be displayed in this version." ;
 
 	QFontMetrics metrics = QFontMetrics(m_FPS_Font);
@@ -393,7 +393,7 @@ float CLVideoWindowItem::aspectRatio() const
 
 	//=============================
 	//m_videonum >1
-	// at this point we assume that all channels have the same aspect ratio; 
+	// at this point we assume that all channels have the same aspect ratio;
 	return m_aspectratio*m_videolayout->width()/m_videolayout->height();
 }
 

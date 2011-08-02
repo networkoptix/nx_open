@@ -62,7 +62,7 @@ void CLH264RtpParser::setSDPInfo(const QByteArray& data)
                 if (h264Params[i].startsWith("sprop-parameter-sets"))
                 {
                     int pos = h264Params[i].indexOf('=');
-                    if (pos >= 0) 
+                    if (pos >= 0)
                     {
                         QByteArray h264SpsPps = h264Params[i].mid(pos+1);
                         QList<QByteArray> nalUnits = h264SpsPps.split(',');
@@ -81,14 +81,14 @@ void CLH264RtpParser::setSDPInfo(const QByteArray& data)
 
 void CLH264RtpParser::serializeSpsPps(CLByteArray& dst)
 {
-    
+
     if (m_builtinSpsFound && m_builtinPpsFound)
     {
         QMap<int, QByteArray>::const_iterator itr;
         for(itr = m_allNonSliceNal.begin(); itr != m_allNonSliceNal.end(); ++itr)
             dst.write(itr.value());
     }
-    else 
+    else
     {
         dst.write(m_sdpSpsPps);
     }
@@ -96,12 +96,12 @@ void CLH264RtpParser::serializeSpsPps(CLByteArray& dst)
 
 void CLH264RtpParser::decodeSpsInfo(const QByteArray& data)
 {
-    try 
+    try
     {
         m_sps.decodeBuffer( (const quint8*) data.data() + sizeof(H264_NAL_PREFIX), (const quint8*) data.data() + data.size());
         m_sps.deserialize();
-        
-    } catch(BitStreamException& e) 
+
+    } catch(BitStreamException& e)
     {
         // bitstream error
         qWarning() << "Can't deserialize SPS unit. bitstream error" << e.what();
@@ -128,9 +128,9 @@ CLAbstractMediaData* CLH264RtpParser::getNextData()
     {
         quint8 rtpBuffer[MAX_RTP_PACKET_SIZE];
         // ioDevice read function MUST return one RTP packet per once
-    
+
         readed = m_input->read( (char*) rtpBuffer, sizeof(rtpBuffer));
-    
+
         if (readed < 1)
         {
             videoData->releaseRef();
@@ -139,19 +139,19 @@ CLAbstractMediaData* CLH264RtpParser::getNextData()
         if (readed < RtpHeader::RTP_HEADER_SIZE + 1)
         {
             videoData->releaseRef();
-            return 0; 
+            return 0;
         }
         rtpHeader = (RtpHeader*) rtpBuffer;
         //bool isLastPacket = rtpHeader->marker;
         quint8* curPtr = rtpBuffer + RtpHeader::RTP_HEADER_SIZE;
         int bytesLeft = readed - RtpHeader::RTP_HEADER_SIZE;
 
-        if (rtpHeader->padding) 
+        if (rtpHeader->padding)
         {
             bytesLeft -= ntohl(rtpHeader->padding);
         }
 
-        int packetType = *curPtr & 0x1f; 
+        int packetType = *curPtr & 0x1f;
         //quint8 stapHeader = *curPtr;
         //bool fBit = *curPtr >> 7;
         //nal_ref_idc = (*curPtr >> 5) & 0x3;
@@ -167,7 +167,7 @@ CLAbstractMediaData* CLH264RtpParser::getNextData()
                     if (bytesLeft < 2)
                     {
                         videoData->releaseRef();
-                        return 0; 
+                        return 0;
                     }
                     don = (*curPtr << 8) + curPtr[1];
                     curPtr += 2;
@@ -176,7 +176,7 @@ CLAbstractMediaData* CLH264RtpParser::getNextData()
                     if (bytesLeft < 2)
                     {
                         videoData->releaseRef();
-                        return 0; 
+                        return 0;
                     }
                     nalUnitLen = (*curPtr << 8) + curPtr[1];
                     curPtr += 2;
@@ -184,7 +184,7 @@ CLAbstractMediaData* CLH264RtpParser::getNextData()
                     if (bytesLeft < nalUnitLen)
                     {
                         videoData->releaseRef();
-                        return 0; 
+                        return 0;
                     }
                     nalUnitType = *curPtr & 0x1f;
                     if ((nalUnitType & 0x1f) >= nuSliceNonIDR && nalUnitType <= nuSliceIDR)
@@ -197,7 +197,7 @@ CLAbstractMediaData* CLH264RtpParser::getNextData()
                         videoData->data.write((const char*)curPtr, nalUnitLen);
                         lastPacketReceived = true;
                     }
-                    else 
+                    else
                     {
                         QByteArray& data = m_allNonSliceNal[nalUnitType];
                         data.clear();
@@ -216,7 +216,7 @@ CLAbstractMediaData* CLH264RtpParser::getNextData()
                     if (bytesLeft < 1)
                     {
                         videoData->releaseRef();
-                        return 0; 
+                        return 0;
                     }
                     firstPacketReceived = *curPtr  & 0x80;
                     lastPacketReceived = *curPtr & 0x40;
@@ -229,14 +229,14 @@ CLAbstractMediaData* CLH264RtpParser::getNextData()
                     }
                     else
                         m_packetPerNal++;
-                    if (lastPacketReceived) 
+                    if (lastPacketReceived)
                     {
                         lastSeqNum = ntohs(rtpHeader->sequence);
                         //if (getSequenceDiff(lastSeqNum, m_firstSeqNum) != m_packetPerNal)
                         if ((quint16) (lastSeqNum - m_firstSeqNum) != m_packetPerNal)
                         {
                             // packet lost detected
-                            cl_log.log("RTP Packet lost detected!!", cl_logWARNING);
+                            cl_log.log(QLatin1String("RTP Packet lost detected!!"), cl_logWARNING);
                             //videoData->data.clear();
                             //lastPacketReceived = false;
                             //break;
@@ -254,7 +254,7 @@ CLAbstractMediaData* CLH264RtpParser::getNextData()
                         if (bytesLeft < 2)
                         {
                             videoData->releaseRef();
-                            return 0; 
+                            return 0;
                         }
                         don = (*curPtr << 8) + curPtr[1];
                         curPtr += 2;
@@ -264,7 +264,7 @@ CLAbstractMediaData* CLH264RtpParser::getNextData()
                     if ((nalUnitType & 0x1f) >= nuSliceNonIDR && (nalUnitType  & 0x1f) <= nuSliceIDR)
                     {
                         // it is slice
-                        //if (firstPacketReceived) 
+                        //if (firstPacketReceived)
                         isKeyFrame = (nalUnitType & 0x1f) == nuSliceIDR;
                         if (videoData->data.size() == 0)
                         {
@@ -275,10 +275,10 @@ CLAbstractMediaData* CLH264RtpParser::getNextData()
                         }
                         videoData->data.write( (const char*) curPtr, bytesLeft);
                     }
-                    else 
+                    else
                     {
                         QByteArray& data = m_allNonSliceNal[nalUnitType];
-                        if (firstPacketReceived) 
+                        if (firstPacketReceived)
                         {
                             data.clear();
                             data += QByteArray(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
@@ -296,7 +296,7 @@ CLAbstractMediaData* CLH264RtpParser::getNextData()
                 MTAP24_PACKET:
                 default:
                     videoData->releaseRef();
-                    return 0; 
+                    return 0;
             }
         }
     }
@@ -307,13 +307,13 @@ CLAbstractMediaData* CLH264RtpParser::getNextData()
     videoData->channelNumber = 0;
     videoData->keyFrame = isKeyFrame;
     videoData->compressionType = CODEC_ID_H264;
-    if (rtpHeader) 
+    if (rtpHeader)
     {
         /*
         quint32 timeStamp = ntohl(rtpHeader->timestamp);
         if (timeStamp < m_lastTimeStamp && timeStamp < 0x40000000u && m_lastTimeStamp > 0xc0000000)
             m_timeCycles += 0x100000000ull;
-        quint64 fullTimestamp = (quint64) timeStamp + m_timeCycles; 
+        quint64 fullTimestamp = (quint64) timeStamp + m_timeCycles;
         videoData->timestamp = fullTimestamp * 1000000ull / m_frequency;
         m_lastTimeStamp = timeStamp;
         */

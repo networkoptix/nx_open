@@ -37,19 +37,19 @@ QString CLNetworkDevice::getMAC() const
 	return m_mac;
 }
 
-void  CLNetworkDevice::setMAC(const QString& mac) 
+void  CLNetworkDevice::setMAC(const QString& mac)
 {
 	m_mac = mac;
 }
 
 void CLNetworkDevice::setAfterRouter(bool after)
 {
-    mAfterRouter = after;
+	mAfterRouter = after;
 }
 
 bool CLNetworkDevice::isAfterRouter() const
 {
-    return mAfterRouter;
+	return mAfterRouter;
 }
 
 void CLNetworkDevice::setAuth(const QString& user, QString password)
@@ -65,11 +65,11 @@ QAuthenticator CLNetworkDevice::getAuth() const
 	return m_auth;
 }
 
-unsigned int CLNetworkDevice::getHttpTimeout() 
+unsigned int CLNetworkDevice::getHttpTimeout()
 {
-	if (getStatus().checkFlag(CLDeviceStatus::NOT_LOCAL)) 
+	if (getStatus().checkFlag(CLDeviceStatus::NOT_LOCAL))
 		return 3000;
-	else 
+	else
 		return 1050;
 }
 
@@ -95,14 +95,14 @@ bool CLNetworkDevice::conflicting()
     if (mAfterRouter)
         return false;
 
-    QTime time;
+	QTime time;
 	time.restart();
-	CL_LOG(cl_logDEBUG2) cl_log.log("begining of CLNetworkDevice::conflicting() ",  cl_logDEBUG2);
+	CL_LOG(cl_logDEBUG2) cl_log.log(QLatin1String("begining of CLNetworkDevice::conflicting() "),  cl_logDEBUG2);
 
 	QString mac = getMacByIP(getIP());
 	if (mac.isEmpty())
 		return false;
-	
+
 	if (mac!=m_mac)// someone else has this IP
 	{
 		getStatus().setFlag(CLDeviceStatus::CONFLICTING);
@@ -112,28 +112,28 @@ bool CLNetworkDevice::conflicting()
 	CLSleep::msleep(10);
 
 	CLPing ping;
-	if (!ping.ping(getIP().toString(), 2, ping_timeout)) // I do know know how else to solve this problem. but getMacByIP do not creates any ARP record 
+	if (!ping.ping(getIP().toString(), 2, ping_timeout)) // I do know know how else to solve this problem. but getMacByIP do not creates any ARP record
 	{
 		getStatus().setFlag(CLDeviceStatus::CONFLICTING);
 		return true;
 	}
 
-	mac = getMacByIP(getIP(), false); // just in case if ARP response from some else have delayed 
+	mac = getMacByIP(getIP(), false); // just in case if ARP response from some else have delayed
 
-    
 
-	if (mac!=m_mac && mac!="00-00-00-00-00-00")// someone else has this IP
+
+	if (mac!=m_mac && mac!=QLatin1String("00-00-00-00-00-00"))// someone else has this IP
 	{
 		getStatus().setFlag(CLDeviceStatus::CONFLICTING);
 		return true;
 	}
 
-    if (mac=="00-00-00-00-00-00")
+    if (mac==QLatin1String("00-00-00-00-00-00"))
     {
-        CL_LOG(cl_logERROR) cl_log.log("00-00-00-00-00-00 mac record in OS arp( got it once on WIN7) table?!", cl_logERROR);
+        CL_LOG(cl_logERROR) cl_log.log(QLatin1String("00-00-00-00-00-00 mac record in OS arp( got it once on WIN7) table?!"), cl_logERROR);
     }
 
-	CL_LOG(cl_logDEBUG2) cl_log.log("end of  CLNetworkDevice::conflicting(),  time elapsed: ", time.elapsed(), cl_logDEBUG2);
+	CL_LOG(cl_logDEBUG2) cl_log.log(QLatin1String("end of  CLNetworkDevice::conflicting(),  time elapsed: "), time.elapsed(), cl_logDEBUG2);
 	return false;
 }
 

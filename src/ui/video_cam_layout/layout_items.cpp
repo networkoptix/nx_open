@@ -1,12 +1,12 @@
 #include "layout_items.h"
 
-CLBasicLayoutItemSettings::CLBasicLayoutItemSettings():
-coordType(Undefined),
-pos_x(0),
-pos_y(0),
-width(0), 
-height(0),
-angle(0)
+CLBasicLayoutItemSettings::CLBasicLayoutItemSettings()
+    : coordType(Undefined),
+    pos_x(0),
+    pos_y(0),
+    width(0),
+    height(0),
+    angle(0)
 {
 }
 
@@ -15,24 +15,24 @@ QString CLBasicLayoutItemSettings::coordTypeS() const
     switch (coordType)
     {
     case Pixels:
-        return "Pixels";
+        return QLatin1String("Pixels");
 
     case Slots:
-        return "Slots";
+        return QLatin1String("Slots");
 
     default:
-        return "Undefined";
+        return QLatin1String("Undefined");
 
     }
 }
 
 void CLBasicLayoutItemSettings::setCorrdType(const QString& type)
 {
-    if (type == "Pixels")
+    if (type == QLatin1String("Pixels"))
         coordType = Pixels;
-    else if (type == "Slots")
-            coordType = Slots;
-    else 
+    else if (type == QLatin1String("Slots"))
+        coordType = Slots;
+    else
         coordType = Undefined;
 }
 
@@ -40,78 +40,75 @@ void CLBasicLayoutItemSettings::setCorrdType(const QString& type)
 //==================================================
 LayoutItem::LayoutItem()
 {
-
 }
 
-LayoutItem::LayoutItem(const CLBasicLayoutItemSettings& setting):
-mSettings(setting)
+LayoutItem::LayoutItem(const CLBasicLayoutItemSettings& setting)
+    : mSettings(setting)
 {
-
 }
 
 LayoutItem::~LayoutItem()
 {
-
 }
 
 QString LayoutItem::Type2String(Type t)
 {
-	enum Type {DEVICE, BUTTON, LAYOUT, IMAGE, BACKGROUND};
+	enum Type { DEVICE, BUTTON, LAYOUT, IMAGE, BACKGROUND };
 
 	switch(t)
 	{
 	case DEVICE:
-		return "DEVICE";
+		return QLatin1String("DEVICE");
 
 	case BUTTON:
-		return "BUTTON";
+		return QLatin1String("BUTTON");
 
 	case LAYOUT:
-	    return "LAYOUT";
+		return QLatin1String("LAYOUT");
 
 	case IMAGE:
-	    return "IMAGE";
+		return QLatin1String("IMAGE");
 
 	case BACKGROUND:
-		return "BACKGROUND";
+		return QLatin1String("BACKGROUND");
 
 	default:
-		return "NONE";
+		break;
 
 	}
-	return "NONE";
+	return QLatin1String("NONE");
 }
 
 LayoutItem::Type LayoutItem::String2Type(const QString& str)
 {
-	if (str=="DEVICE")
+	if (str == QLatin1String("DEVICE"))
 		return DEVICE;
 
-	if (str=="BUTTON")
+	if (str == QLatin1String("BUTTON"))
 		return BUTTON;
 
-	if (str=="LAYOUT")
+	if (str == QLatin1String("LAYOUT"))
 		return LAYOUT;
 
-	if (str=="IMAGE")
+	if (str == QLatin1String("IMAGE"))
 		return IMAGE;
 
-	if (str=="BACKGROUND")
+	if (str == QLatin1String("BACKGROUND"))
 		return BACKGROUND;
 
 	return IMAGE;
 
 }
 
-void LayoutItem::toXml(QDomDocument& doc, QDomElement& parent) 
+void LayoutItem::toXml(QDomDocument& doc, QDomElement& parent)
 {
-	QDomElement element = doc.createElement("item");
-	element.setAttribute("type", Type2String(type()));
-	element.setAttribute("name", getName());
-    element.setAttribute("coordType", mSettings.coordTypeS());
-    element.setAttribute("pos_x", mSettings.pos_x);
-    element.setAttribute("pos_y", mSettings.pos_y);
-    element.setAttribute("angle", mSettings.angle);
+	QDomElement element = doc.createElement(QLatin1String("item"));
+	element.setAttribute(QLatin1String("type"), Type2String(type()));
+	element.setAttribute(QLatin1String("name"), getName());
+	element.setAttribute(QLatin1String("coordType"), mSettings.coordTypeS());
+	element.setAttribute(QLatin1String("pos_x"), mSettings.pos_x);
+	element.setAttribute(QLatin1String("pos_y"), mSettings.pos_y);
+	element.setAttribute(QLatin1String("angle"), mSettings.angle);
 	parent.appendChild(element);
 
 }

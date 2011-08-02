@@ -18,12 +18,12 @@ void findAcceptedFiles(QStringList& files, const QString& path)
 {
     if (CLAviDvdDevice::isAcceptedUrl(path))
     {
-        if (path.indexOf('?') == -1)
+        if (path.indexOf(QLatin1Char('?')) == -1)
         {
             // open all titles on DVD
             QStringList titles = CLAVIDvdStreamReader::getTitleList(path);
             foreach(QString title, titles)
-                files << path + QString("?title=") + title;
+                files << path + QLatin1String("?title=") + title;
         }
         else {
             files.append(path);
@@ -33,7 +33,7 @@ void findAcceptedFiles(QStringList& files, const QString& path)
     {
         files.append(path);
     }
-    else 
+    else
     {
         FileTypeSupport fileTypeSupport;
         QFileInfo fileInfo(path);
@@ -69,9 +69,9 @@ m_normalView(0)
     Q_UNUSED(parent);
     Q_UNUSED(flags);
 
-    setAcceptDrops(true);
+	setAcceptDrops(true);
 	//ui.setupUi(this);
-	setWindowTitle("HDWitness");
+	setWindowTitle(tr("HDWitness"));
 
 	setAutoFillBackground(false);
 
@@ -95,7 +95,7 @@ m_normalView(0)
     }
 
     LayoutContent* content = 0;
-    
+
     if (!files.isEmpty())
     {
         CLDeviceManager::instance().addFiles(files);
@@ -118,17 +118,17 @@ m_normalView(0)
 #ifdef Q_OS_WIN
     l->setContentsMargins(0, 1, 0, 0);
 #else
-	l->setContentsMargins(0, 0, 0, 0);
+    l->setContentsMargins(0, 0, 0, 0);
 #endif
-	
+
 	m_normalView->setMode(NORMAL_ViewMode);
 	m_normalView->getView().setViewMode(GraphicsView::NormalView);
 
-	setLayout(l);
+    setLayout(l);
     if (!files.isEmpty())
         show();
     else
-	    showFullScreen();
+        showFullScreen();
 }
 
 MainWnd::~MainWnd()
@@ -142,9 +142,9 @@ void MainWnd::addFilesToCurrentOrNewLayout(const QStringList& files, bool forceN
     if (files.isEmpty())
         return;
 
-	cl_log.log("Entering addFilesToCurrentOrNewLayout", cl_logALWAYS);
-	
-    CLDeviceManager::instance().addFiles(files);
+	cl_log.log(QLatin1String("Entering addFilesToCurrentOrNewLayout"), cl_logALWAYS);
+
+	CLDeviceManager::instance().addFiles(files);
 
     // If current content created by opening files or DND, use it. Otherwise create new one.
     LayoutContent* content = m_normalView->getView().getCamLayOut().getContent();
@@ -152,7 +152,7 @@ void MainWnd::addFilesToCurrentOrNewLayout(const QStringList& files, bool forceN
     if (!forceNewLayout && content != CLSceneLayoutManager::instance().getSearchLayout() &&
         content != CLSceneLayoutManager::instance().startScreenLayoutContent())
     {
-		cl_log.log(QString("Using old layout, content ") + content->getName(), cl_logALWAYS);
+        cl_log.log(QLatin1String("Using old layout, content ") + content->getName(), cl_logALWAYS);
         foreach(QString file, files)
         {
             m_normalView->getView().getCamLayOut().addDevice(file, true);
@@ -162,7 +162,7 @@ void MainWnd::addFilesToCurrentOrNewLayout(const QStringList& files, bool forceN
         m_normalView->getView().fitInView(600, 100, SLOW_START_SLOW_END);
     } else
     {
-		cl_log.log(QString("Creating new layout, content ") + (content->getName()), cl_logALWAYS);
+        cl_log.log(QLatin1String("Creating new layout, content ") + content->getName(), cl_logALWAYS);
         content = CLSceneLayoutManager::instance().getNewEmptyLayoutContent();
 
         foreach(QString file, files)
@@ -176,19 +176,19 @@ void MainWnd::addFilesToCurrentOrNewLayout(const QStringList& files, bool forceN
 
 void MainWnd::handleMessage(const QString& message)
 {
-    QStringList files = message.trimmed().split(QChar('\0'), QString::SkipEmptyParts);
+    QStringList files = message.trimmed().split(QLatin1Char('\0'), QString::SkipEmptyParts);
 
     addFilesToCurrentOrNewLayout(files);
 }
 
 void MainWnd::closeEvent ( QCloseEvent * /*event*/ )
 {
-	destroyNavigator(m_normalView);
+    destroyNavigator(m_normalView);
 }
 
 void MainWnd::destroyNavigator(CLLayoutNavigator*& nav)
 {
-	if (nav) 
+	if (nav)
 	{
 		nav->destroy();
 		delete nav;
@@ -208,7 +208,7 @@ void MainWnd::dropEvent(QDropEvent *event)
     foreach (QUrl url, event->mimeData()->urls())
     {
         QString filename = url.toLocalFile();
-        
+
         findAcceptedFiles(files, filename);
     }
 

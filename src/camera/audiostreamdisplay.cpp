@@ -11,7 +11,7 @@ int  MAX_AUDIO_FRAME_SIZE = DEFAULT_AUDIO_FRAME_SIZE*5;
 
 static inline short clip_short(int v)
 {
-	if (v < -32768)
+    if (v < -32768)
         return -32768;
     else if (v > 32767)
         return 32767;
@@ -20,16 +20,16 @@ static inline short clip_short(int v)
 }
 
 template <class T>
-static void down_mix_to_stereo(T *data, int channels, int len) 
+static void down_mix_to_stereo(T *data, int channels, int len)
 {
 	T* output = data;
 	T* input = data;
 
 	int steps = len / 6 / sizeof(T);
 
-	for(int i = 0; i < steps; ++i) 
+	for(int i = 0; i < steps; ++i)
 	{
-	    /* 5.1 to stereo. l, c, r, ls, rs, sw */
+		/* 5.1 to stereo. l, c, r, ls, rs, sw */
 		int fl,fr,c,rl,rr,lfe;
 
 		fl = input[0];
@@ -44,7 +44,7 @@ static void down_mix_to_stereo(T *data, int channels, int len)
 			output[0] = clip_short(fl + (0.5 * rl) + (0.7 * c));
 			output[1] = clip_short(fr + (0.5 * rr) + (0.7 * c));
 		}
-		else 
+		else
 		{
 			output[0] = fl;
 			output[1] = fr;
@@ -99,7 +99,7 @@ void CLAudioStreamDisplay::suspend()
 {
 	if (!m_audioSound)
 		return;
-    m_tooFewDataDetected = true;
+	m_tooFewDataDetected = true;
 	m_audioSound->suspend();
 }
 
@@ -121,7 +121,7 @@ bool CLAudioStreamDisplay::isFormatSupported() const
     if (!m_audioSound)
         return true; // it's not constructed yet
 
-    //return m_audioSound->isFormatSupported();
+	//return m_audioSound->isFormatSupported();
 	return m_isFormatSupported;
 }
 
@@ -147,7 +147,7 @@ void CLAudioStreamDisplay::enqueueData(CLCompressedAudioData* data, qint64 minTi
     data->addRef();
     m_audioQueue.enqueue(data);
 
-    
+
     while (m_audioQueue.size() > 0)
     {
         CLCompressedAudioData* front = m_audioQueue.front();
@@ -155,7 +155,7 @@ void CLAudioStreamDisplay::enqueueData(CLCompressedAudioData* data, qint64 minTi
             break;
         m_audioQueue.dequeue()->releaseRef();
     }
-    
+
 
     //if (msInBuffer() >= m_bufferMs / 10)
     //    m_audioQueue.dequeue()->releaseRef();
@@ -211,9 +211,9 @@ bool CLAudioStreamDisplay::initFormatConvertRule(QAudioFormat format)
 
 void CLAudioStreamDisplay::putData(CLCompressedAudioData* data, qint64 minTime)
 {
-    static const int MAX_BUFFER_LEN = 3000;
+	static const int MAX_BUFFER_LEN = 3000;
 	if (data == 0 && !m_audioSound) // do not need to check audio device in case of data=0 and no audio device
-        return;
+		return;
 
     // some times distance between audio packets in file is very large ( may be more than audio_device buffer );
     // audio_device buffer is small, and we need to put data from packets audio device. to do it we call this function with 0 pinter
@@ -271,7 +271,7 @@ void CLAudioStreamDisplay::playCurrentBuffer()
 
         if (data->compressionType == CODEC_ID_NONE)
         {
-            cl_log.log("CLAudioStreamDisplay::putdata: unknown codec type...", cl_logERROR);
+            cl_log.log(QLatin1String("CLAudioStreamDisplay::putdata: unknown codec type..."), cl_logERROR);
             data->releaseRef();
             return;
         }
@@ -291,7 +291,7 @@ void CLAudioStreamDisplay::playCurrentBuffer()
         //  convert format
         if (!m_isConvertMethodInitialized)
         {
-            if (m_audioSound) 
+            if (m_audioSound)
             {
                 QtvAudioDevice::instance().removeSound(m_audioSound);
                 m_audioSound = 0;
@@ -303,11 +303,11 @@ void CLAudioStreamDisplay::playCurrentBuffer()
                 return; // can play audio
         }
         if (m_sampleConvertMethod == SampleConvert_Float2Int32)
-            float2int32(audio); 
+            float2int32(audio);
         else if (m_sampleConvertMethod == SampleConvert_Float2Int16)
-            float2int16(audio); 
+            float2int16(audio);
         else if (m_sampleConvertMethod == SampleConvert_Int32ToInt16)
-            int32Toint16(audio); 
+            int32Toint16(audio);
         if (audio.format.channels() > 2 && m_downmixing)
             downmix(audio);
 
@@ -336,7 +336,7 @@ void CLAudioStreamDisplay::downmix(CLAudioData& audio)
 			down_mix_to_stereo<qint16>((qint16*)(audio.outbuf->data()), audio.format.channelCount(), audio.outbuf_len);
 		else if (audio.format.sampleSize() == 32)
 			down_mix_to_stereo<qint32>((qint32*)(audio.outbuf->data()), audio.format.channelCount(), audio.outbuf_len);
-		else 
+		else
 		{
 			Q_ASSERT_X(1 == 0, Q_FUNC_INFO + __LINE__, "invalid sample size");
 		}
@@ -349,16 +349,16 @@ void CLAudioStreamDisplay::float2int16(CLAudioData& audio)
 {
 	Q_ASSERT(sizeof(float) == 4); // not sure about sizeof(float) in 64 bit version
 
-	qint32* inP = (qint32*)(audio.outbuf->data());
+    qint32* inP = (qint32*)(audio.outbuf->data());
     qint16* outP = (qint16*)inP;
-	int len = audio.outbuf_len/4;
+    int len = audio.outbuf_len/4;
 
 	for (int i = 0; i < len; ++i)
 	{
-		float f = *((float*)inP); 
+		float f = *((float*)inP);
 		*outP = (qint16)(f * (1 << 15));
 		++inP;
-        ++outP;
+		++outP;
 	}
 	audio.outbuf_len /= 2;
 	audio.format.setSampleSize(16);
@@ -369,15 +369,15 @@ void CLAudioStreamDisplay::int32Toint16(CLAudioData& audio)
 {
 	Q_ASSERT(sizeof(float) == 4); // not sure about sizeof(float) in 64 bit version
 
-	qint32* inP = (qint32*)(audio.outbuf->data());
+    qint32* inP = (qint32*)(audio.outbuf->data());
     qint16* outP = (qint16*)inP;
-	int len = audio.outbuf_len/4;
+    int len = audio.outbuf_len/4;
 
 	for (int i = 0; i < len; ++i)
 	{
 		*outP = *inP >> 16;
 		++inP;
-        ++outP;
+		++outP;
 	}
 	audio.outbuf_len /= 2;
 	audio.format.setSampleSize(16);
@@ -392,7 +392,7 @@ void CLAudioStreamDisplay::float2int32(CLAudioData& audio)
 	int len = audio.outbuf_len/4;
 	for (int i = 0; i < len; ++i)
 	{
-		float f = *((float*)inP); 
+		float f = *((float*)inP);
 		*inP = (qint32) (f * INT_MAX);
 		++inP;
 	}
@@ -401,7 +401,7 @@ void CLAudioStreamDisplay::float2int32(CLAudioData& audio)
 
 int CLAudioStreamDisplay::playAfterMs() const
 {
-    return m_bufferMs / 2;
+	return m_bufferMs / 2;
 }
 
 int CLAudioStreamDisplay::msInQueue() const
@@ -413,13 +413,13 @@ int CLAudioStreamDisplay::msInQueue() const
     //qint64 new_t = m_audioQueue.last()->timestamp;
     //qint64 old_t = m_audioQueue.first()->timestamp;
 
-    qint64 diff = m_audioQueue.last()->duration + m_audioQueue.last()->timestamp  - m_audioQueue.first()->timestamp;
-	
-    return diff / 1000;
+	qint64 diff = m_audioQueue.last()->duration + m_audioQueue.last()->timestamp  - m_audioQueue.first()->timestamp;
+
+	return diff / 1000;
 }
 
 void CLAudioStreamDisplay::setForceDownmix(bool value)
-{ 
-	m_forceDownmix = value; 
+{
+	m_forceDownmix = value;
 	m_isConvertMethodInitialized = false;
 }

@@ -17,10 +17,10 @@ QPixmap cached(const QString &img)
 	pm = QPixmap::fromImage(QImage(img), Qt::OrderedDither | Qt::OrderedAlphaDither);
 	if (pm.isNull())
 	{
-		cl_log.log("Cannot load image ", img, cl_logERROR);
+		cl_log.log(QLatin1String("Cannot load image "), img, cl_logERROR);
 		QMessageBox msgBox;
-		msgBox.setText("Error");
-		msgBox.setInformativeText(QString("Cannot load image ") +  img);
+		msgBox.setText(ArthurStyle::tr("Error"));
+		msgBox.setInformativeText(ArthurStyle::tr("Cannot load image `%1`").arg(img));
 		msgBox.setStandardButtons(QMessageBox::Ok);
 		msgBox.setDefaultButton(QMessageBox::Ok);
 		msgBox.setIcon(QMessageBox::Warning);
@@ -50,8 +50,8 @@ void ArthurStyle::drawHoverRect(QPainter *painter, const QRect &r) const
 	path.setFillRule(Qt::WindingFill);
 	painter->setPen(Qt::NoPen);
 	//painter->setBrush(QColor(191, 215, 191)); changed
-    //painter->setBrush(QColor(124-50, 164-50, 255));// +
-    painter->setBrush(QColor(124, 164, 255));// +
+	//painter->setBrush(QColor(124-50, 164-50, 255));// +
+	painter->setBrush(QColor(124, 164, 255));// +
 	painter->setRenderHint(QPainter::Antialiasing);
 	painter->drawPath(path);
 }
@@ -74,11 +74,11 @@ void ArthurStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *op
 				drawHoverRect(painter, widget->rect());
 
 			if (button->state & State_Sunken)
-				radio = cached(":/skin/radiobutton-on.png");
+				radio = cached(QLatin1String(":/skin/radiobutton-on.png"));
 			else if (button->state & State_On)
-				radio = cached(":/skin/radiobutton_on.png");
+				radio = cached(QLatin1String(":/skin/radiobutton_on.png"));
 			else
-				radio = cached(":/skin/radiobutton_off.png");
+				radio = cached(QLatin1String(":/skin/radiobutton_off.png"));
 			painter->drawPixmap(button->rect.topLeft(), radio);
 
 			painter->restore();
@@ -108,13 +108,13 @@ void ArthurStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *op
 
 			QPixmap left, right, mid;
 			if (down) {
-				left = cached(":/skin/button_pressed_cap_left.png");
-				right = cached(":/skin/button_pressed_cap_right.png");
-				mid = cached(":/skin/button_pressed_stretch.png");
+				left = cached(QLatin1String(":/skin/button_pressed_cap_left.png"));
+				right = cached(QLatin1String(":/skin/button_pressed_cap_right.png"));
+				mid = cached(QLatin1String(":/skin/button_pressed_stretch.png"));
 			} else {
-				left = cached(":/skin/button_normal_cap_left.png");
-				right = cached(":/skin/button_normal_cap_right.png");
-				mid = cached(":/skin/button_normal_stretch.png");
+				left = cached(QLatin1String(":/skin/button_normal_cap_left.png"));
+				right = cached(QLatin1String(":/skin/button_normal_cap_right.png"));
+				mid = cached(QLatin1String(":/skin/button_normal_stretch.png"));
 			}
 			painter->drawPixmap(button->rect.topLeft(), left);
 			painter->drawTiledPixmap(QRect(button->rect.x() + left.width(),
@@ -127,7 +127,7 @@ void ArthurStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *op
 				right);
 			if (hover)
 				//painter->fillRect(widget->rect().adjusted(3,5,-3,-5), QColor(31,127,31,63));
-                painter->fillRect(widget->rect().adjusted(3,5,-3,-5), QColor(124, 164, 255));// changed
+				painter->fillRect(widget->rect().adjusted(3,5,-3,-5), QColor(124, 164, 255));// changed
 			painter->restore();
 		}
 		break;
@@ -147,15 +147,15 @@ void ArthurStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *op
 				clipPath.arcTo(r.left(), r.bottom() - radius2, radius2, radius2, 270, -90);
 				clipPath.arcTo(r.left(), r.top(), radius2, radius2, 180, -90);
 				painter->setClipPath(clipPath);
-				QPixmap titleStretch = cached(":/skin/title_stretch.png");
-				QPixmap topLeft = cached(":/skin/groupframe_topleft.png");
-				QPixmap topRight = cached(":/skin/groupframe_topright.png");
-				QPixmap bottomLeft = cached(":/skin/groupframe_bottom_left.png");
-				QPixmap bottomRight = cached(":/skin/groupframe_bottom_right.png");
-				QPixmap leftStretch = cached(":/skin/groupframe_left_stretch.png");
-				QPixmap topStretch = cached(":/skin/groupframe_top_stretch.png");
-				QPixmap rightStretch = cached(":/skin/groupframe_right_stretch.png");
-				QPixmap bottomStretch = cached(":/skin/groupframe_bottom_stretch.png");
+				QPixmap titleStretch = cached(QLatin1String(":/skin/title_stretch.png"));
+				QPixmap topLeft = cached(QLatin1String(":/skin/groupframe_topleft.png"));
+				QPixmap topRight = cached(QLatin1String(":/skin/groupframe_topright.png"));
+				QPixmap bottomLeft = cached(QLatin1String(":/skin/groupframe_bottom_left.png"));
+				QPixmap bottomRight = cached(QLatin1String(":/skin/groupframe_bottom_right.png"));
+				QPixmap leftStretch = cached(QLatin1String(":/skin/groupframe_left_stretch.png"));
+				QPixmap topStretch = cached(QLatin1String(":/skin/groupframe_top_stretch.png"));
+				QPixmap rightStretch = cached(QLatin1String(":/skin/groupframe_right_stretch.png"));
+				QPixmap bottomStretch = cached(QLatin1String(":/skin/groupframe_bottom_stretch.png"));
 				QLinearGradient lg(0, 0, 0, r.height());
 				lg.setColorAt(0, QColor(224,224,224));
 				lg.setColorAt(1, QColor(255,255,255));
@@ -228,13 +228,13 @@ void ArthurStyle::drawComplexControl(ComplexControl control, const QStyleOptionC
 			}
 
 			if ((option->subControls & SC_SliderGroove) && groove.isValid()) {
-				QPixmap grv = cached(":/skin/slider_bar.png");
+				QPixmap grv = cached(QLatin1String(":/skin/slider_bar.png"));
 				painter->drawPixmap(QRect(groove.x() + 5, groove.y(),
 					groove.width() - 10, grv.height()),
 					grv);
 			}
 			if ((option->subControls & SC_SliderHandle) && handle.isValid()) {
-				QPixmap hndl = cached(":/skin/slider_thumb_on.png");
+				QPixmap hndl = cached(QLatin1String(":/skin/slider_thumb_on.png"));
 				painter->drawPixmap(handle.topLeft(), hndl);
 			}
 
@@ -250,9 +250,9 @@ void ArthurStyle::drawComplexControl(ComplexControl control, const QStyleOptionC
 
 				if (groupBox->subControls & SC_GroupBoxLabel) {
 					const QRect &r = groupBox->rect;
-					QPixmap titleLeft = cached(":/skin/title_cap_left.png");
-					QPixmap titleRight = cached(":/skin/title_cap_right.png");
-					QPixmap titleStretch = cached(":/skin/title_stretch.png");
+					QPixmap titleLeft = cached(QLatin1String(":/skin/title_cap_left.png"));
+					QPixmap titleRight = cached(QLatin1String(":/skin/title_cap_right.png"));
+					QPixmap titleStretch = cached(QLatin1String(":/skin/title_stretch.png"));
 					int txt_width = groupBox->fontMetrics.width(groupBox->text) + 20;
 					painter->drawPixmap(r.center().x() - txt_width/2, 0, titleLeft);
 					QRect tileRect = subControlRect(control, groupBox, SC_GroupBoxLabel, widget);
@@ -303,9 +303,9 @@ QRect ArthurStyle::subControlRect(ComplexControl control, const QStyleOptionComp
 		rect = group->rect;
 		break;
 	case SC_GroupBoxLabel:
-		QPixmap titleLeft = cached(":/skin/title_cap_left.png");
-		QPixmap titleRight = cached(":/skin/title_cap_right.png");
-		QPixmap titleStretch = cached(":/skin/title_stretch.png");
+		QPixmap titleLeft = cached(QLatin1String(":/skin/title_cap_left.png"));
+		QPixmap titleRight = cached(QLatin1String(":/skin/title_cap_right.png"));
+		QPixmap titleStretch = cached(QLatin1String(":/skin/title_stretch.png"));
 		int txt_width = group->fontMetrics.width(group->text) + 20;
 		rect = QRect(group->rect.center().x() - txt_width/2 + titleLeft.width(), 0,
 			txt_width - titleLeft.width() - titleRight.width(),

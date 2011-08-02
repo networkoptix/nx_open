@@ -75,17 +75,17 @@ bool CLParamList::exists(const QString& name) const
 	return true;
 }
 
-CLParam& CLParamList::get(const QString& name) 
+CLParam& CLParamList::get(const QString& name)
 {
 	return m_params[name];
 }
 
-const CLParam CLParamList::get(const QString& name) const 
+const CLParam CLParamList::get(const QString& name) const
 {
 	return m_params[name];
 }
 
-void CLParamList::put(const CLParam& param) 
+void CLParamList::put(const CLParam& param)
 {
 	m_params[param.name] = param;
 }
@@ -99,14 +99,10 @@ QList<QString> CLParamList::groupList() const
 {
 	QList<QString> result;
 
-	foreach (CLParam param, m_params)
+	foreach (const CLParam &param, m_params)
 	{
 		QString group = param.value.group;
-
-		if (group=="")
-			continue;
-
-		if (!result.contains(group))
+		if (!group.isEmpty() && !result.contains(group))
 			result.push_back(group);
 	}
 
@@ -117,17 +113,13 @@ QList<QString> CLParamList::subGroupList(QString group) const
 {
 	QList<QString> result;
 
-	foreach (CLParam param, m_params)
+	foreach (const CLParam &param, m_params)
 	{
 		QString lgroup = param.value.group;
-		if (lgroup==group)
+		if (lgroup == group)
 		{
 			QString subgroup = param.value.subgroup;
-
-			//if (subgroup=="")
-			//	continue;
-
-			if (!result.contains(subgroup))
+			if (!subgroup.isEmpty() && !result.contains(subgroup))
 				result.push_back(subgroup);
 		}
 	}
@@ -135,16 +127,13 @@ QList<QString> CLParamList::subGroupList(QString group) const
 	return result;
 }
 
-CLParamList CLParamList::paramList(QString group, QString subgroup) const
+CLParamList CLParamList::paramList(const QString &group, const QString &subgroup) const
 {
 	CLParamList result;
 
-	foreach (CLParam param, m_params)
+	foreach (const CLParam &param, m_params)
 	{
-		QString lgroup = param.value.group;
-		QString lsubgroup = param.value.subgroup;
-
-		if (lgroup==group && lsubgroup==subgroup)
+		if (param.value.group == group && param.value.subgroup == subgroup)
 			result.put(param);
 	}
 
@@ -152,7 +141,7 @@ CLParamList CLParamList::paramList(QString group, QString subgroup) const
 
 }
 
-CLParamList::MAP& CLParamList::list()
+CLParamList::MAP &CLParamList::list()
 {
 	return m_params;
 }

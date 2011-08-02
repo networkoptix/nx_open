@@ -37,7 +37,7 @@ int CLSimpleTFTPClient::read( const std::string& fn, CLByteArray& data)
 	for (i = 0; i < m_retry; ++i)
 	{
 
-		if (!m_sock.sendTo(buff_send,len_send))	
+		if (!m_sock.sendTo(buff_send,len_send))
 			return 0;
 
 		while(1)
@@ -51,22 +51,22 @@ int CLSimpleTFTPClient::read( const std::string& fn, CLByteArray& data)
 			}
 			catch (SocketException &e)	{
 				m_status = time_out; break;
-			}// did not get anything 
+			}// did not get anything
 
-			if (len_recv<13) // unexpected answer 
+			if (len_recv<13) // unexpected answer
 				continue;
 
 			if (buff_recv[0]==0 && buff_recv[1]==0x06)// this option ack
-			{	
+			{
 				// some times ( do not know why) cam responds with wrong blk size - very very rarely
 				if (m_wish_blk_size==double_blk_size && buff_recv[10]=='1')
 				{
-					cl_log.log("unexpected packet size", cl_logWARNING);
+					cl_log.log(QLatin1String("unexpected packet size"), cl_logWARNING);
 					m_curr_blk_size = blk_size;
 				}
 				else if (m_wish_blk_size==blk_size && buff_recv[10]=='2')
 				{
-					cl_log.log("unexpected packet size", cl_logWARNING);
+					cl_log.log(QLatin1String("unexpected packet size"), cl_logWARNING);
 					m_curr_blk_size = double_blk_size;
 				}
 
@@ -76,10 +76,10 @@ int CLSimpleTFTPClient::read( const std::string& fn, CLByteArray& data)
 		}
 
 		if (m_status==all_ok)
-			break;		
+			break;
 	}
 
-    if (m_status!=all_ok)// no response
+	if (m_status!=all_ok)// no response
 		return 0;
 
 	// at this point we've got option ack on our request; => must send ack on each packet
@@ -92,7 +92,7 @@ int CLSimpleTFTPClient::read( const std::string& fn, CLByteArray& data)
 	int data_size0= data.size();
 
 	while(1)
-	{		
+	{
 
 		len_send = form_ack(blk_cam_sending, buff_send);
 
@@ -111,7 +111,7 @@ int CLSimpleTFTPClient::read( const std::string& fn, CLByteArray& data)
 				len_recv = 0;
 				len_recv = m_sock.recv(buff_recv, sizeof(buff_recv));
 
-				if (len_recv<4)// unexpected answer or did not get anything 
+				if (len_recv<4)// unexpected answer or did not get anything
 				{
 					m_status = time_out; break;
 				}
@@ -138,7 +138,7 @@ int CLSimpleTFTPClient::read( const std::string& fn, CLByteArray& data)
 					len+=data_len;
 					if (len>CL_MAX_DATASIZE)
 					{
-						cl_log.log("Image is too big!!", cl_logERROR);
+						cl_log.log(QLatin1String("Image is too big!!"), cl_logERROR);
 						m_status = time_out;
 						break;
 					}
@@ -152,20 +152,20 @@ int CLSimpleTFTPClient::read( const std::string& fn, CLByteArray& data)
 					else
 					{
 						// this is 3 times we got option ack; need to resend ack0?
-						cl_log.log("this is 3 times we got option ack; need to resend ack0?", cl_logWARNING);
+						cl_log.log(QLatin1String("this is 3 times we got option ack; need to resend ack0?"), cl_logWARNING);
 
-						if (len_recv<13) // unexpected answer 
+						if (len_recv<13) // unexpected answer
 							continue;
 
 						// some times ( do not know why) cam responds with wrong blk size - very very rarely
 						if (m_wish_blk_size==double_blk_size && buff_recv[10]=='1')
 						{
-							cl_log.log("unexpected packet size", cl_logWARNING);
+							cl_log.log(QLatin1String("unexpected packet size"), cl_logWARNING);
 							m_curr_blk_size = blk_size;
 						}
 						else if (m_wish_blk_size==blk_size && buff_recv[10]=='2')
 						{
-							cl_log.log("unexpected packet size", cl_logWARNING);
+							cl_log.log(QLatin1String("unexpected packet size"), cl_logWARNING);
 							m_curr_blk_size = double_blk_size;
 						}
 
@@ -176,7 +176,7 @@ int CLSimpleTFTPClient::read( const std::string& fn, CLByteArray& data)
 			}
 
 			if (m_status==all_ok)
-				break;		
+				break;
 
 		}
 
@@ -210,9 +210,9 @@ int CLSimpleTFTPClient::form_read_request(const std::string& fn, char* buff)
 	buff[len] = 0;	len++;
 
 	if (m_wish_blk_size == double_blk_size)
-		memcpy(buff+len, "2904", 4); 
+		memcpy(buff+len, "2904", 4);
 	else
-		memcpy(buff+len, "1450", 4); 
+		memcpy(buff+len, "1450", 4);
 
 	len+=4;
 	buff[len] = 0;	len++;
@@ -223,7 +223,7 @@ int CLSimpleTFTPClient::form_read_request(const std::string& fn, char* buff)
 
 int CLSimpleTFTPClient::form_ack(unsigned short blk, char* buff)
 {
-	buff[0] = 0; buff[1] = 0x04; 
+	buff[0] = 0; buff[1] = 0x04;
 	buff[2] = blk>>8; buff[3] = blk&0xff;
 
 	return 4;

@@ -36,22 +36,22 @@ m_editedView(0)
 	//=======================================================
 
 	//=======add====
-	m_topView = new CLLayoutNavigator(this,  CLSceneLayoutManager::instance().generateAllRecordersAndLayouts()); 
+	m_topView = new CLLayoutNavigator(this,  CLSceneLayoutManager::instance().generateAllRecordersAndLayouts());
 
-	m_bottomView = new CLLayoutNavigator(this, CLSceneLayoutManager::instance().getEmptyLayoutContent()); 
+	m_bottomView = new CLLayoutNavigator(this, CLSceneLayoutManager::instance().getEmptyLayoutContent());
 
 	m_editedView = new CLLayoutNavigator(this, contexttoEdit);
 
 	connect(m_topView, SIGNAL(onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*)), this, SLOT(onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*)));
 	connect(m_bottomView, SIGNAL(onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*)), this, SLOT(onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*)));
 
-	m_topView->setMode(LAYOUTEDITOR_ViewMode); 
+	m_topView->setMode(LAYOUTEDITOR_ViewMode);
 	m_topView->getView().setViewMode(GraphicsView::ItemsDonor);
 
-	m_bottomView->setMode(LAYOUTEDITOR_ViewMode); 
+	m_bottomView->setMode(LAYOUTEDITOR_ViewMode);
 	m_bottomView->getView().setViewMode(GraphicsView::ItemsDonor);
 
-	m_editedView->setMode(LAYOUTEDITOR_ViewMode); 
+	m_editedView->setMode(LAYOUTEDITOR_ViewMode);
 	m_editedView->getView().setViewMode(GraphicsView::ItemsAcceptor);
 
 	QLayout* ml = new QHBoxLayout();
@@ -75,16 +75,15 @@ CLLayoutEditorWnd::~CLLayoutEditorWnd()
 	destroyNavigator(m_editedView);
 }
 
-void CLLayoutEditorWnd::closeEvent ( QCloseEvent * event )
+void CLLayoutEditorWnd::closeEvent(QCloseEvent *event)
 {
 
-	QMessageBox::StandardButton result = YesNoCancel(this, tr("Layout Editor") , tr("Save changes?"));
-
-	if (result==QMessageBox::Cancel)
+	QMessageBox::StandardButton result = YesNoCancel(this, tr("Layout Editor"), tr("Save changes?"));
+	if (result == QMessageBox::Cancel)
 	{
 		event->ignore();
 		return;
-	};
+	}
 
 	setResult(result);
 
@@ -105,7 +104,7 @@ void CLLayoutEditorWnd::resizeEvent ( QResizeEvent * /*event*/)
 
 void CLLayoutEditorWnd::destroyNavigator(CLLayoutNavigator*& nav)
 {
-	if (nav) 
+	if (nav)
 	{
 		nav->destroy();
 		delete nav;

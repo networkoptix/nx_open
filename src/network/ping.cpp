@@ -27,13 +27,13 @@ bool CLPing::ping(const QString& ip, int retry, int timeoutPerRetry, int packetS
 	LPVOID ReplyBuffer[ReplySize];
 
 	ipaddr = inet_addr(ip.toLatin1().data());
-	if (ipaddr == INADDR_NONE) 
+	if (ipaddr == INADDR_NONE)
 		return false;
 
 	hIcmpFile = IcmpCreateFile();
-	if (hIcmpFile == INVALID_HANDLE_VALUE) 
+	if (hIcmpFile == INVALID_HANDLE_VALUE)
 	{
-		cl_log.log("CLPing: Unable to open handle ", cl_logERROR);
+		cl_log.log(QLatin1String("CLPing: Unable to open handle "), cl_logERROR);
 		//printf("\tUnable to open handle.\n");
 		//printf("IcmpCreatefile returned error: %ld\n", GetLastError());
 		return false;
@@ -42,19 +42,19 @@ bool CLPing::ping(const QString& ip, int retry, int timeoutPerRetry, int packetS
 	// Allocate space for at a single reply
 	dwRetVal = IcmpSendEcho(hIcmpFile, ipaddr, SendData, sizeof (SendData), NULL,
 		ReplyBuffer, ReplySize, retry * timeoutPerRetry);
-	if (dwRetVal != 0) 
+	if (dwRetVal != 0)
 	{
 		PICMP_ECHO_REPLY pEchoReply = (PICMP_ECHO_REPLY) ReplyBuffer;
 		struct in_addr ReplyAddr;
 		ReplyAddr.S_un.S_addr = pEchoReply->Address;
 
 		/*/
-		if (dwRetVal > 1) 
+		if (dwRetVal > 1)
 		{
 			printf("\tReceived %ld icmp message responses\n", dwRetVal);
 			printf("\tInformation from the first response:\n");
-		} 
-		else 
+		}
+		else
 		{
 			printf("\tReceived %ld icmp message response\n", dwRetVal);
 			printf("\tInformation from this response:\n");
@@ -62,9 +62,9 @@ bool CLPing::ping(const QString& ip, int retry, int timeoutPerRetry, int packetS
 
 		printf("\t  Received from %s\n", inet_ntoa(ReplyAddr));
 		printf("\t  Status = %ld  ", pEchoReply->Status);
-        */
+		*/
 
-		switch (pEchoReply->Status) 
+		switch (pEchoReply->Status)
 		{
 		case IP_DEST_HOST_UNREACHABLE:
 			//printf("(Destination host was unreachable)\n");
@@ -85,24 +85,24 @@ bool CLPing::ping(const QString& ip, int retry, int timeoutPerRetry, int packetS
 		}
 
 		//printf("\t  Roundtrip time = %ld milliseconds\n",pEchoReply->RoundTripTime);
-	} 
-	else 
+	}
+	else
 	{
-		cl_log.log(ip + " CLPing: Call to IcmpSendEcho failed", cl_logERROR);
+		cl_log.log(ip + QLatin1String(" CLPing: Call to IcmpSendEcho failed"), cl_logERROR);
 
 		printf("Call to IcmpSendEcho failed.\n");
 		dwError = GetLastError();
 		switch (dwError) {
 		case IP_BUF_TOO_SMALL:
-            cl_log.log("CLPing: tReplyBufferSize to small", cl_logERROR);
+			cl_log.log(QLatin1String("CLPing: tReplyBufferSize to small"), cl_logERROR);
 			//printf("\tReplyBufferSize to small\n");
 			break;
 		case IP_REQ_TIMED_OUT:
-            cl_log.log("CLPing: \tRequest timed out", cl_logERROR);
+			cl_log.log(QLatin1String("CLPing: \tRequest timed out"), cl_logERROR);
 			//printf("\tRequest timed out\n");
 			break;
 		default:
-            cl_log.log("CLPing: \tExtended error returned ", (int)dwError, cl_logERROR);
+			cl_log.log(QLatin1String("CLPing: \tExtended error returned "), (int)dwError, cl_logERROR);
 			//printf("\tExtended error returned: %ld\n", dwError);
 			break;
 		}
@@ -122,7 +122,7 @@ bool CLPing::ping(const QString& ip, int /*retry*/, int /*timeoutPerRetry*/, int
 	target = SCNetworkReachabilityCreateWithName(NULL, ip.toLatin1().data());
 	ok = SCNetworkReachabilityGetFlags(target, &flags);
 	CFRelease(target);
-	
+
 	return ok;
 }
 

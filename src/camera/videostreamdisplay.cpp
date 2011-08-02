@@ -50,7 +50,7 @@ bool CLVideoStreamDisplay::allocScaleContext(const CLVideoDecoderOutput& outFram
 
     if (m_scaleContext == 0)
     {
-        cl_log.log("Can't get swscale context", cl_logERROR);
+        cl_log.log(QLatin1String("Can't get swscale context"), cl_logERROR);
         return false;
     }
 
@@ -72,7 +72,7 @@ void CLVideoStreamDisplay::freeScaleContext()
 		sws_freeContext(m_scaleContext);
 		av_free(m_buffer);
 		av_free(m_frameYUV);
-        m_scaleContext = 0;
+		m_scaleContext = 0;
 	}
 }
 
@@ -81,20 +81,20 @@ CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::determineScaleFacto
     if (m_draw->constantDownscaleFactor())
        force_factor = CLVideoDecoderOutput::factor_2;
 
-	if (force_factor==CLVideoDecoderOutput::factor_any) // if nobody pushing lets peek it 
+	if (force_factor==CLVideoDecoderOutput::factor_any) // if nobody pushing lets peek it
 	{
 		QSize on_screen = m_draw->sizeOnScreen(data->channelNumber);
 
-        m_scaleFactor = findScaleFactor(img.outFrame.width, img.outFrame.height, on_screen.width(), on_screen.height());
+		m_scaleFactor = findScaleFactor(img.outFrame.width, img.outFrame.height, on_screen.width(), on_screen.height());
 
 		if (m_scaleFactor < m_prevFactor)
 		{
-			// new factor is less than prev one; about to change factor => about to increase resource usage 
-			if ( qAbs((qreal)on_screen.width() - m_previousOnScreenSize.width())/on_screen.width() < 0.05 && 
+			// new factor is less than prev one; about to change factor => about to increase resource usage
+			if ( qAbs((qreal)on_screen.width() - m_previousOnScreenSize.width())/on_screen.width() < 0.05 &&
 				qAbs((qreal)on_screen.height() - m_previousOnScreenSize.height())/on_screen.height() < 0.05)
-            {
+			{
 				m_scaleFactor = m_prevFactor; // hold bigger factor ( smaller image )
-            }
+			}
 
 			// why?
 			// we need to do so ( introduce some histerezis )coz downscaling changes resolution not proportionally some time( cut vertical size a bit )
@@ -132,8 +132,8 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 	img.bufferLength = data->data.size();
 	img.keyFrame = data->keyFrame;
 	img.useTwice = data->useTwice;
-    img.width = data->width;
-    img.height = data->height;
+	img.width = data->width;
+	img.height = data->height;
 
 	CLAbstractVideoDecoder* dec;
 	{
@@ -141,7 +141,7 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 
 		if (data->compressionType == CODEC_ID_NONE)
 		{
-			cl_log.log("CLVideoStreamDisplay::dispay: unknown codec type...", cl_logERROR);
+			cl_log.log(QLatin1String("CLVideoStreamDisplay::dispay: unknown codec type..."), cl_logERROR);
 			return;
 		}
 
@@ -157,7 +157,7 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 
 	if (!dec || !dec->decode(img))
 	{
-		CL_LOG(cl_logDEBUG2) cl_log.log("CLVideoStreamDisplay::dispay: decoder cannot decode image...", cl_logDEBUG2);
+		CL_LOG(cl_logDEBUG2) cl_log.log(QLatin1String("CLVideoStreamDisplay::dispay: decoder cannot decode image..."), cl_logDEBUG2);
 		return;
 	}
 
@@ -169,7 +169,7 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 
     CLVideoDecoderOutput::downscale_factor scaleFactor = determineScaleFactor(data, img, force_factor);
 
-    if (!CLGLRenderer::isPixelFormatSupported(img.outFrame.out_type) || 
+    if (!CLGLRenderer::isPixelFormatSupported(img.outFrame.out_type) ||
         scaleFactor > CLVideoDecoderOutput::factor_8 ||
         (scaleFactor > CLVideoDecoderOutput::factor_1 && !CLVideoDecoderOutput::isPixelFormatSupported(img.outFrame.out_type)))
     {
@@ -208,7 +208,7 @@ bool CLVideoStreamDisplay::rescaleFrame(CLVideoDecoderOutput& outFrame, int newW
     const quint8* const srcSlice[] = {outFrame.C1, outFrame.C2, outFrame.C3};
     int srcStride[] = {outFrame.stride1, outFrame.stride2, outFrame.stride3};
 
-    sws_scale(m_scaleContext,srcSlice, srcStride, 0, 
+    sws_scale(m_scaleContext,srcSlice, srcStride, 0,
         outFrame.height, m_frameYUV->data, m_frameYUV->linesize);
 
     m_outFrame.width = m_outputWidth;
@@ -232,18 +232,18 @@ void CLVideoStreamDisplay::setLightCPUMode(bool val)
 
     foreach(CLAbstractVideoDecoder* decoder, m_decoder)
     {
-	    decoder->setLightCpuMode(val);
+        decoder->setLightCpuMode(val);
     }
 }
 
 void CLVideoStreamDisplay::copyImage(bool copy)
 {
-	m_draw->copyVideoDataBeforePainting(copy);
+    m_draw->copyVideoDataBeforePainting(copy);
 }
 
 CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::findScaleFactor(int width, int height, int fitWidth, int fitHeight)
 {
-    if (fitWidth * 8 <= width  && fitHeight * 8 <= height) 
+    if (fitWidth * 8 <= width  && fitHeight * 8 <= height)
         return CLVideoDecoderOutput::factor_8;
     if (fitWidth * 4 <= width  && fitHeight * 4 <= height)
         return CLVideoDecoderOutput::factor_4;

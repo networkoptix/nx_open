@@ -113,19 +113,19 @@ void SceneLayout::start()
 	if (m_isRunning)
 		return;
 
-    m_contentCopy = LayoutContent::coppyLayoutContent(m_content, true);
+	m_contentCopy = LayoutContent::coppyLayoutContent(m_content, true);
 
 	m_firstTime = true;
 
 	m_contentchanged = false;
 	m_timer.start(20);
-	m_videotimer.start(1000/MAX_FPS); 
+	m_videotimer.start(1000/MAX_FPS);
 	m_isRunning = true;
 }
 
 void SceneLayout::stop_helper(bool emt)
 {
-    m_deletedIds.clear();
+	m_deletedIds.clear();
 
 	m_view->stopAnimation();
 
@@ -143,7 +143,7 @@ void SceneLayout::stop_helper(bool emt)
 	foreach(CLAbstractComplicatedItem* devitem, m_deviceitems)
 	{
 		// after we can wait for each thread to stop
-		cl_log.log("About to shutdown device ", (int)(long)devitem ,"\r\n", cl_logDEBUG1);
+		cl_log.log(QLatin1String("About to shutdown device "), (int)(long)devitem, QLatin1String("\r\n"), cl_logDEBUG1);
 		devitem->stopDispay();
 
 		CLDevice* dev = devitem->getDevice();
@@ -151,7 +151,7 @@ void SceneLayout::stop_helper(bool emt)
 
 		m_scene->removeItem(item);
 
-		delete devitem; // here video item and dev might be used 
+		delete devitem; // here video item and dev might be used
 		m_items.removeOne(item);
 
 		delete item;
@@ -179,7 +179,7 @@ void SceneLayout::saveLayoutContent()
 {
     m_grid.clarifyLayoutContent();
 
-    // copy from copy_content to original one 
+    // copy from copy_content to original one
     LayoutContent::coppyLayoutContent(m_contentCopy, m_content , true);
 }
 
@@ -191,11 +191,11 @@ void SceneLayout::stop(bool animation)
     LayoutContent::coppyLayoutContent(m_content, m_contentCopy , true);
     delete m_contentCopy;
 
-	m_isRunning = false;
+    m_isRunning = false;
 
-	cl_log.log("SceneLayout::stop......\r\n ", cl_logDEBUG1);
+    cl_log.log(QLatin1String("SceneLayout::stop......\r\n "), cl_logDEBUG1);
 
-	m_view->stop();
+    m_view->stop();
 
 	m_timer.stop();
 	m_videotimer.stop();
@@ -246,7 +246,7 @@ void SceneLayout::onTimer()
         m_view->updatePageSelector();
     }
 
-	//===================video devices=======================
+    //===================video devices=======================
     //D-Light & Bissen Feat Victoria Gross - Like I Do (John O'Callaghan Remiix)
 
 	CLDeviceList all_devs =  CLDeviceManager::instance().getDeviceList(m_content->getDeviceCriteria());
@@ -270,14 +270,14 @@ void SceneLayout::onTimer()
         {
             QnPageSelector* ps = m_view->getPageSelector();
 
-            if (ps->getCurrentPage() == ps->getMaxPageNumber() && ps->getCurrentPage()>1 && !criteriaChanged) // this is the last page 
-                return; // do not need to add something 
+            if (ps->getCurrentPage() == ps->getMaxPageNumber() && ps->getCurrentPage()>1 && !criteriaChanged) // this is the last page
+                return; // do not need to add something
 
             if (criteriaChanged)
                 ps->setCurrentPage(1);
         }
 
-            
+
             QList<LayoutDevice*> ldList =  m_content->getDevices();
             foreach(LayoutDevice* ld, ldList)
             {
@@ -285,52 +285,52 @@ void SceneLayout::onTimer()
                     m_content->removeDevice(ld->getId());
 
             }
-            
+
 			QList<CLAbstractComplicatedItem*> remove_lst;
 			foreach(CLAbstractComplicatedItem* devitem, m_deviceitems)
 			{
 				if (devitem->getDevice()->getDeviceType() == CLDevice::VIDEODEVICE &&
 					(!devitem->getDevice()->checkDeviceTypeFlag(CLDevice::RECORDED) || criteriaChanged)
-                    ) // if this is video device
+					) // if this is video device
 				{
 
                     if (!all_devs.contains(devitem->getDevice()->getUniqueId()))
                         remove_lst.push_back(devitem);
-				}
-			}
+                }
+            }
 
 			if (removeDevices(remove_lst, true))
 				added = true;
 
-			if (m_deviceitems.count()==0)	
+			if (m_deviceitems.count()==0)
 				CLGLRenderer::clearGarbage();
 	}
 
 	foreach(CLDevice* dev, all_devs)
 	{
-		// the ref counter for device already increased in getDeviceList; 
+		// the ref counter for device already increased in getDeviceList;
 		// must not do it again
 
         if (m_deletedIds.contains(dev->getUniqueId()))
-            continue; // if this device was deleted before 
+            continue; // if this device was deleted before
 
         QnPageSelector* ps = m_view->getPageSelector();
-        if (ps->getCurrentPage() == ps->getMaxPageNumber() && ps->getCurrentPage()>1) // this is the last page 
+        if (ps->getCurrentPage() == ps->getMaxPageNumber() && ps->getCurrentPage()>1) // this is the last page
         {
             if (!dev->checkDeviceTypeFlag(CLDevice::RECORDED))
-                continue; // do not need to add something 
+                continue; // do not need to add something
         }
 
 
 		if (!addDevice(dev, false))
 			dev->releaseRef();
 		else
-        {
+		{
 			added = true;
-            //m_content->addDevice(dev->getUniqueId());
-        }
+			//m_content->addDevice(dev->getUniqueId());
+		}
 
-        m_content->addDevice(dev->getUniqueId());
+		m_content->addDevice(dev->getUniqueId());
 	}
 
 	//==============recorders ================================
@@ -408,14 +408,14 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect, CLBasicLay
 {
 	if (!m_grid.isSpaceAvalable())
 	{
-		cl_log.log("Cannot support so many devices ", cl_logDEBUG1);
+		cl_log.log(QLatin1String("Cannot support so many devices "), cl_logDEBUG1);
 		return false;
 	}
 
 	foreach(CLAbstractComplicatedItem* devitem, m_deviceitems)
 	{
 		if (devitem->getDevice()->getUniqueId() == device->getUniqueId())
-			return false; // already have such device here 
+			return false; // already have such device here
 	}
 
 	CLDevice::DeviceType type = device->getDeviceType();
@@ -423,7 +423,7 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect, CLBasicLay
 	if (type==CLDevice::VIDEODEVICE)
 	{
 
-        bool introVideo = (m_content == CLSceneLayoutManager::instance().introScreenLayoutContent());
+		bool introVideo = (m_content == CLSceneLayoutManager::instance().introScreenLayoutContent());
 
 		QSize wnd_size = m_grid.calcDefaultMaxItemSize(device->getVideoLayout());
 
@@ -433,13 +433,13 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect, CLBasicLay
         {
             video_wnd = new CLIntroVideoitem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height(), device->getUniqueId());
         }
-		else if (device->checkDeviceTypeFlag(CLDevice::ARCHIVE))//&& false) //777
-		{
-			video_wnd = new CLVideoWindowArchiveItem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height(), device->getUniqueId());
-			video_wnd->setEditable(true);
-		}
-		else
-			video_wnd = new CLVideoWindowItem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height(), device->getUniqueId());
+        else if (device->checkDeviceTypeFlag(CLDevice::ARCHIVE))//&& false) //777
+        {
+            video_wnd = new CLVideoWindowArchiveItem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height(), device->getUniqueId());
+            video_wnd->setEditable(true);
+        }
+        else
+            video_wnd = new CLVideoWindowItem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height(), device->getUniqueId());
 
 
         CLVideoCamera* cam = new CLVideoCamera(device, video_wnd, introVideo);
@@ -449,7 +449,7 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect, CLBasicLay
             connect( cam, SIGNAL(reachedTheEnd()), this, SLOT(onReachedTheEnd()) );
         }
 
-		addItem(video_wnd, update_scene_rect, itemSettings);
+        addItem(video_wnd, update_scene_rect, itemSettings);
 
 		m_deviceitems.push_back(cam);
 		cam->setQuality(CLStreamreader::CLSLow, true);
@@ -492,7 +492,7 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect, CLBasicLay
 
 bool SceneLayout::addLayoutItem(QString name, LayoutContent* lc, bool update_scene_rect, CLBasicLayoutItemSettings itemSettings)
 {
-	// new item should always be adjusted 
+	// new item should always be adjusted
 	if (!m_grid.isSpaceAvalable())
 		return false;
 
@@ -512,7 +512,7 @@ bool SceneLayout::addLayoutItem(QString name, LayoutContent* lc, bool update_sce
 
 bool SceneLayout::addItem(CLAbstractSceneItem* item, bool update_scene_rect, CLBasicLayoutItemSettings itemSettings)
 {
-	// new item should always be adjusted 
+	// new item should always be adjusted
 	if (!m_grid.isSpaceAvalable())
 		return false;
 
@@ -542,30 +542,30 @@ bool SceneLayout::addItem(CLAbstractSceneItem* item, bool update_scene_rect, CLB
 	m_items.push_back(item);
 	m_scene->addItem(item);
 
-	item->setPos(m_grid.posFromItemSettings(itemSettings));
+    item->setPos(m_grid.posFromItemSettings(itemSettings));
     //item->setRotation(itemSettings.angle);
 
 	//=========
-	if (isEditable() || item->isEtitable())	
+	if (isEditable() || item->isEtitable())
 	{
 		item->addSubItem(CloseSubItem);
 	}
 	//=========
 
-	if (update_scene_rect)
+    if (update_scene_rect)
     {
         updateSceneRect();
     }
 
-	connect(item, SIGNAL(onAspectRatioChanged(CLAbstractSceneItem*)), this, SLOT(onAspectRatioChanged(CLAbstractSceneItem*)));
+    connect(item, SIGNAL(onAspectRatioChanged(CLAbstractSceneItem*)), this, SLOT(onAspectRatioChanged(CLAbstractSceneItem*)));
 
-	connect(item, SIGNAL(onPressed(CLAbstractSceneItem*)), this, SLOT(onItemPressed(CLAbstractSceneItem*)));
+    connect(item, SIGNAL(onPressed(CLAbstractSceneItem*)), this, SLOT(onItemPressed(CLAbstractSceneItem*)));
 
-	connect(item, SIGNAL(onDoubleClick(CLAbstractSceneItem*)), this, SLOT(onItemDoubleClick(CLAbstractSceneItem*)));
+    connect(item, SIGNAL(onDoubleClick(CLAbstractSceneItem*)), this, SLOT(onItemDoubleClick(CLAbstractSceneItem*)));
 
-	connect(item, SIGNAL(onFullScreen(CLAbstractSceneItem*)), this, SLOT(onItemFullScreen(CLAbstractSceneItem*)));
+    connect(item, SIGNAL(onFullScreen(CLAbstractSceneItem*)), this, SLOT(onItemFullScreen(CLAbstractSceneItem*)));
 
-	connect(item, SIGNAL(onSelected(CLAbstractSceneItem*)), this, SLOT(onItemSelected(CLAbstractSceneItem* )));
+    connect(item, SIGNAL(onSelected(CLAbstractSceneItem*)), this, SLOT(onItemSelected(CLAbstractSceneItem* )));
 
     connect(item, SIGNAL(onNeedToUpdate(CLAbstractSceneItem*)), this, SLOT(onNeedToUpdateItem(CLAbstractSceneItem* )));
 
@@ -628,7 +628,7 @@ QList<CLAbstractSceneItem*> SceneLayout::getItemList() const
 	return m_items;
 }
 
-QList<CLAbstractSceneItem*>* SceneLayout::getItemListPointer() 
+QList<CLAbstractSceneItem*>* SceneLayout::getItemListPointer()
 {
 	return &m_items;
 }
@@ -674,38 +674,35 @@ void SceneLayout::onItemClose(CLAbstractSubItemContainer* itm, bool addToremoved
 
     if (removeFromLayoutcontent)
     {
-
-	        CLAbstractSceneItem::CLSceneItemType type = item->getType();
-	        if (type==CLAbstractSceneItem::LAYOUT)
-	        {
-
+            CLAbstractSceneItem::CLSceneItemType type = item->getType();
+            if (type==CLAbstractSceneItem::LAYOUT)
+            {
                 if (addToremovedLst && getContent()==CLSceneLayoutManager::instance().getAllLayoutsContent())
                 {
-                    QMessageBox::StandardButton result = YesNoCancel(0, tr("Are you sure?") , tr("Delete this layout?"));
-
-                    if (result!=QMessageBox::Yes)
+                    QMessageBox::StandardButton result = YesNoCancel(0, tr("Are you sure?"), tr("Delete this layout?"));
+                    if (result != QMessageBox::Yes)
                         return;
                 }
 
-		        CLLayoutItem* litem = static_cast<CLLayoutItem*>(item);
-		        LayoutContent* lc = litem->getRefContent();
-		        getContent()->removeLayout(lc, true);
-	        }
+				CLLayoutItem* litem = static_cast<CLLayoutItem*>(item);
+				LayoutContent* lc = litem->getRefContent();
+				getContent()->removeLayout(lc, true);
+			}
 
-	        if (type==CLAbstractSceneItem::RECORDER)
-	        {
-		        CLRecorderItem* ritem = static_cast<CLRecorderItem*>(item);
-		        LayoutContent* lc = ritem->getRefContent();
-		        getContent()->removeLayout(lc, true);
-	        }
+			if (type==CLAbstractSceneItem::RECORDER)
+			{
+				CLRecorderItem* ritem = static_cast<CLRecorderItem*>(item);
+				LayoutContent* lc = ritem->getRefContent();
+				getContent()->removeLayout(lc, true);
+			}
 
-	        if (type==CLAbstractSceneItem::VIDEO)
-	        {
-		        CLVideoWindowItem* vitem = static_cast<CLVideoWindowItem*>(item);
-                    getContent()->removeDevice(vitem->getComplicatedItem()->getDevice()->getUniqueId());
-	        }
+			if (type==CLAbstractSceneItem::VIDEO)
+			{
+				CLVideoWindowItem* vitem = static_cast<CLVideoWindowItem*>(item);
+					getContent()->removeDevice(vitem->getComplicatedItem()->getDevice()->getUniqueId());
+			}
 
-    }
+	}
 	//===============
 
 	if (item->getComplicatedItem())
@@ -716,7 +713,7 @@ void SceneLayout::onItemClose(CLAbstractSubItemContainer* itm, bool addToremoved
 		devitem->stopDispay();
 		CLDevice* dev =  devitem->getDevice();
 
-        if (addToremovedLst)  
+        if (addToremovedLst)
             m_deletedIds.push_back(dev->getUniqueId());
 
 		m_deviceitems.removeOne(devitem);
@@ -724,12 +721,12 @@ void SceneLayout::onItemClose(CLAbstractSubItemContainer* itm, bool addToremoved
 		delete devitem; // here dev and item might be used; can not delete item
 		delete item;
 
-		// so need to release it here 
+		// so need to release it here
 		dev->releaseRef();
 	}
 	else
 	{
-		//simple item 
+		//simple item
 		removeItem(item);
 		delete item;
 	}
@@ -785,7 +782,7 @@ bool SceneLayout::removeDevices(QList<CLAbstractComplicatedItem*> lst, bool remo
 
 void SceneLayout::onReachedTheEnd()
 {
-    emit reachedTheEnd();
+	emit reachedTheEnd();
 }
 
 void SceneLayout::onNeedToUpdateItem(CLAbstractSceneItem* item)
@@ -799,8 +796,8 @@ void SceneLayout::onNeedToUpdateItem(CLAbstractSceneItem* item)
 
 void SceneLayout::onItemSelected(CLAbstractSceneItem* item)
 {
-	
-    if (item->getType() == CLAbstractSceneItem::RECORDER)
+
+	if (item->getType() == CLAbstractSceneItem::RECORDER)
 	{
 		CLRecorderItem* ritem = static_cast<CLRecorderItem*>(item);
 		emit onNewLayoutItemSelected(ritem->getRefContent());
@@ -873,7 +870,7 @@ void SceneLayout::onNewPageSelected(int page)
     {
         addDevice(id, false);
     }
-    
+
     m_view->instantArrange();
     updateSceneRect();
     m_view->zoomMin(0);
@@ -906,19 +903,19 @@ void SceneLayout::loadContent()
 
 	foreach(LayoutImage* img, img_list)
 	{
-        CLBasicLayoutItemSettings& iset = img->getBasicSettings();
+		CLBasicLayoutItemSettings& iset = img->getBasicSettings();
 
         CLImageItem* item = 0;
         item = new CLPictureImageItem(m_view, iset.width, iset.height, img->getImage(), img->getName());
-		item->setOpacity(0.8);
-		addItem(item, false, iset);
-		added = true;
-	}
+        item->setOpacity(0.8);
+        addItem(item, false, iset);
+        added = true;
+    }
 
 	foreach(LayoutButton* btn, btns_list)
 	{
-        CLBasicLayoutItemSettings& iset = btn->getBasicSettings();
-		CLCustomBtnItem* item = new CLCustomBtnItem(m_view, iset.width, iset.height, iset.name, iset.name, "tiiktip text");
+		CLBasicLayoutItemSettings& iset = btn->getBasicSettings();
+		CLCustomBtnItem* item = new CLCustomBtnItem(m_view, iset.width, iset.height, iset.name, iset.name, QLatin1String("tiiktip text"));
 		addItem(item, false, iset);
 		added = true;
 	}
@@ -927,7 +924,7 @@ void SceneLayout::loadContent()
 	{
 		if (!children->isRecorder())
 		{
-            CLBasicLayoutItemSettings& iset = children->getBasicSettings();
+			CLBasicLayoutItemSettings& iset = children->getBasicSettings();
 			addLayoutItem(children->getName(), children, false, iset);
 			added = true;
 		}
@@ -935,7 +932,7 @@ void SceneLayout::loadContent()
 
 	foreach(LayoutDevice* dev, devices_list)
 	{
-        CLBasicLayoutItemSettings& iset = dev->getBasicSettings();
+		CLBasicLayoutItemSettings& iset = dev->getBasicSettings();
 		addDevice(dev->getId(), false, iset);
 		added = true;
 	}
