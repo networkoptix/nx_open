@@ -12,6 +12,9 @@ from StringIO import StringIO
 from string import Template
 
 os.path = posixpath
+sys.path.insert(0, '../common')
+
+from convert import index_dirs, index_common
 
 FFMPEG_VERSION = '2011-05-24'
 
@@ -36,13 +39,6 @@ def copy_files(src_glob, dst_folder):
     for fname in glob.iglob(src_glob):
         shutil.copy(fname, dst_folder)
 
-def is_exclude_file(f):
-    for exclude_file in EXCLUDE_FILES:
-        if exclude_file in f:
-            return True
-
-    return False
-
 def link_or_copy(src, dst):
     try:
         import win32file
@@ -50,45 +46,6 @@ def link_or_copy(src, dst):
     except:
         shutil.copy(src, dst)
 
-def index_dirs(xdirs, template_file, output_file, use_prefix = False):
-    if os.path.exists(output_file):
-        os.unlink(output_file)
-
-    shutil.copy(template_file, output_file)
-
-    headers = []
-    sources = []
-
-    for xdir in xdirs:
-        prefix = ''
-
-        if use_prefix:
-            prefix = os.path.join('..', xdir) + '/'
-
-        for root, dirs, files in os.walk(xdir):
-            parent = root[len(xdir)+1:]
-            for exclude_dir in EXCLUDE_DIRS:
-                if exclude_dir in dirs:
-                    dirs.remove(exclude_dir)    # don't visit SVN directories
-
-            for f in files:
-                if is_exclude_file(f):
-                    continue
-
-                if f.endswith('.h'):
-                    headers.append(prefix + os.path.join(prefix, parent, f))
-                elif f.endswith('.cpp'):
-                    sources.append(prefix + os.path.join(prefix, parent, f))
-
-    uniclient_pro = open(output_file, 'a')
-
-    for header in headers:
-        print >> uniclient_pro, "HEADERS += %s" % header
-
-    for cpp in sources:
-        print >> uniclient_pro,    "SOURCES += %s" % cpp
-
-    uniclient_pro.close()
 
 def setup_ffmpeg():
     ffmpeg_path = os.getenv('EVE_FFMPEG').replace('\\', '/')
@@ -194,14 +151,13 @@ copy_files('resource/arecontvision/*', 'bin/release/arecontvision')
 gen_version_h()
 
 
-index_dirs(('src',), 'src/const.pro', 'src/uniclient.pro')
+index_common()
+
+index_dirs(('src',), 'src/const.pro', 'src/uniclient.pro', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
 
 
 if sys.platform == 'win32':
     os.system('qmake -tp vc FFMPEG=%s -o src/uniclient.vcproj src/uniclient.pro' % ffmpeg_path)
-    os.system('src\\qmake_vc_fixer src\\uniclient.vcproj')
-    os.unlink('src/uniclient.vcproj')
-    os.rename('src/uniclient.new.vcproj', 'src/uniclient.vcproj')
 
 elif sys.platform == 'darwin':
     if os.path.exists('src/uniclient.xcodeproj'):

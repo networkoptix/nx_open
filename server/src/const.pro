@@ -1,6 +1,9 @@
+include(../../common/src/common.pri)
+
 QT = core network xml xmlpatterns multimedia webkit 
 CONFIG += x86
 CONFIG += qt console
+CONFIG -= flat
 TEMPLATE = app
 VERSION = 0.0.1
 ICON = eve_logo.icns
