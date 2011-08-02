@@ -23,7 +23,7 @@ public:
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-private slots:
+private Q_SLOTS:
     void onTimer();
 
 protected:
@@ -37,24 +37,6 @@ protected:
 
     int m_CurrentIndex;
     bool m_forwardDirection;
-};
-
-//=============================================================================================
-
-class CLUnMovedPixtureButton : public CLUnMovedPixture
-{
-    Q_OBJECT
-
-public:
-    CLUnMovedPixtureButton(QString name, QGraphicsItem* parent, qreal normal_opacity, qreal active_opacity, QString img, int max_width, int max_height, qreal z);
-    ~CLUnMovedPixtureButton();
-
-signals:
-    void onPressed(QString);
-
-protected:
-    void mouseReleaseEvent( QGraphicsSceneMouseEvent * event );
-    void mousePressEvent ( QGraphicsSceneMouseEvent * event );
 };
 
 #endif //unmoved_pixture_button_h_1867

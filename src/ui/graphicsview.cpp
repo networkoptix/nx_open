@@ -505,7 +505,7 @@ void GraphicsView::initDecoration()
 
     if (home)
     {
-        item = new CLUnMovedPixtureButton(button_home, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/home.png"), decoration_size, decoration_size, 255);
+        item = new CLUnMovedPixture(button_home, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/home.png"), decoration_size, decoration_size, 255);
         item->setStaticPos(QPoint(1,1));
         addStaticItem(item);
         top_left+= (decoration_size + 5);
@@ -513,7 +513,7 @@ void GraphicsView::initDecoration()
 
     if (level_up)
     {
-        item = new CLUnMovedPixtureButton(button_level_up, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/level-up.png"), decoration_size, decoration_size, 255);
+        item = new CLUnMovedPixture(button_level_up, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/level-up.png"), decoration_size, decoration_size, 255);
         item->setStaticPos(QPoint(top_left,1));
         addStaticItem(item);
         top_left+=decoration_size;
@@ -531,14 +531,14 @@ void GraphicsView::initDecoration()
 
     if (magnifyingGlass)
     {
-        item = new CLUnMovedPixtureButton(button_magnifyingglass, 0,  0.4, 1.0, QLatin1String(":/skin/decorations/search.png"), decoration_size, decoration_size, 255);
+        item = new CLUnMovedPixture(button_magnifyingglass, 0,  0.4, 1.0, QLatin1String(":/skin/decorations/search.png"), decoration_size, decoration_size, 255);
         item->setStaticPos(QPoint((viewport()->width() - decoration_size)/2,0));
         addStaticItem(item);
     }
 
     if (square_layout)
     {
-        item = new CLUnMovedPixtureButton(button_squarelayout, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/square-view.png"), decoration_size, decoration_size, 255);
+        item = new CLUnMovedPixture(button_squarelayout, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/square-view.png"), decoration_size, decoration_size, 255);
         item->setStaticPos(QPoint(viewport()->width() - 3.3*decoration_size,1));
         addStaticItem(item);
         top_left+=(decoration_size+10);
@@ -546,14 +546,14 @@ void GraphicsView::initDecoration()
 
     if (long_layout)
     {
-        item = new CLUnMovedPixtureButton(button_longlayout, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/horizontal-view.png"), decoration_size, decoration_size, 255);
+        item = new CLUnMovedPixture(button_longlayout, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/horizontal-view.png"), decoration_size, decoration_size, 255);
         item->setStaticPos(QPoint(viewport()->width() - 2.2*decoration_size+1,1));
         addStaticItem(item);
     }
 
     if (sigle_line_layout)
     {
-        item = new CLUnMovedPixtureButton(button_singleLineLayout, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/single-line-view.png"), decoration_size, decoration_size, 255);
+        item = new CLUnMovedPixture(button_singleLineLayout, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/single-line-view.png"), decoration_size, decoration_size, 255);
         item->setStaticPos(QPoint(viewport()->width() - 1.1*decoration_size+1,1));
         addStaticItem(item);
     }
