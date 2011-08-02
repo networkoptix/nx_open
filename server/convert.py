@@ -153,14 +153,14 @@ gen_version_h()
 
 index_common()
 
-index_dirs(('src',), 'src/const.pro', 'src/uniclient.pro', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
+index_dirs(('src',), 'src/const.pro', 'src/server.pro', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
 
 
 if sys.platform == 'win32':
-    os.system('qmake -tp vc FFMPEG=%s -o src/uniclient.vcproj src/uniclient.pro' % ffmpeg_path)
+    os.system('qmake -tp vc FFMPEG=%s -o src/server.vcproj src/server.pro' % ffmpeg_path)
 
 elif sys.platform == 'darwin':
-    if os.path.exists('src/uniclient.xcodeproj'):
-        rmtree('src/uniclient.xcodeproj')
+    if os.path.exists('src/server.xcodeproj'):
+        rmtree('src/server.xcodeproj')
 
-    os.system('qmake FFMPEG=%s -o src/uniclient.xcodeproj src/uniclient.pro' % ffmpeg_path)
+    os.system('qmake FFMPEG=%s -o src/server.xcodeproj src/server.pro' % ffmpeg_path)
