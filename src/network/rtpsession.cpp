@@ -64,9 +64,9 @@ void RTPSession::parseSDP()
 {
     QList<QByteArray> lines = m_sdp.split('\n');
 
-    int mapNum = -1; 
+    int mapNum = -1;
     QString codecName;
-    foreach(QByteArray line, lines)
+    foreach (QByteArray line, lines)
     {
         line = line.trimmed().toLower();
         if (line.startsWith("a=rtpmap"))
@@ -79,11 +79,11 @@ void RTPSession::parseSDP()
             if (trackInfo.size() < 2 || codecInfo.size() < 2)
                 continue; // invalid data format. skip
             mapNum = trackInfo[1].toUInt();
-            codecName = codecInfo[0];
+            codecName = QString::fromLatin1(codecInfo[0]);
         }
         else if (line.startsWith("a=control:trackid="))
         {
-            int trackNum = line.mid(QString("a=control:trackid=").length()).toUInt();
+            int trackNum = line.mid(qstrlen("a=control:trackid=")).toUInt();
             m_sdpTracks.insert(codecName, trackNum);
         }
     }
@@ -92,7 +92,7 @@ void RTPSession::parseSDP()
 
 bool RTPSession::open(const QString& url)
 {
-    mUrl = url; 
+    mUrl = url;
 
 //    unsigned int port = DEFAULT_RTP_PORT;
 
@@ -104,7 +104,7 @@ bool RTPSession::open(const QString& url)
 
     QByteArray sdp;
 
-    if (!readResponce(sdp))
+    if (!readResponse(sdp))
         return false;
 
     int sdp_index = sdp.indexOf("\r\n\r\n");
@@ -128,7 +128,7 @@ RTPIODevice* RTPSession::play()
     if (ioDevice == 0)
         return 0;
 
-    
+
     if (!sendPlay())
         return 0;
 
@@ -165,46 +165,43 @@ bool RTPSession::sendDescribe()
 {
     QByteArray request;
     request += "DESCRIBE ";
-    request += mUrl.toString();
+    request += mUrl.toString().toLatin1(); // ### percent encoding?
     request += " RTSP/1.0\r\n";
     request += "CSeq: ";
     request += QByteArray::number(m_csec++);
     request += "\r\n";
     request += "User-Agent: Network Optix\r\n";
     request += "Accept: application/sdp\r\n\r\n";
-    
+
     //qDebug() << request;
 
-    if (!m_tcpSock.send(request.data(), request.size()))
-        return false;
-
-    return true;
+    return m_tcpSock.send(request.data(), request.size());
 }
 
 bool RTPSession::sendOptions()
 {
     QByteArray request;
     request += "OPTIONS ";
-    request += mUrl.toString();
+    request += mUrl.toString().toLatin1(); // ### percent encoding?
     request += " RTSP/1.0\r\n";
     request += "CSeq: ";
     request += QByteArray::number(m_csec++);
     request += "\r\n\r\n";
 
-    if (!m_tcpSock.send(request.data(), request.size()))
-        return false;
-
-    return true;
+    return m_tcpSock.send(request.data(), request.size());
 }
 
-RTPIODevice*  RTPSession::sendSetup()
+RTPIODevice* RTPSession::sendSetup()
 {
     QByteArray request;
     request += "SETUP ";
-    request += mUrl.toString();
+    request += mUrl.toString().toLatin1(); // ### percent encoding?
 
     if (!m_sdpTracks.isEmpty())
-        request += QString("/trackID=") + QString::number(m_sdpTracks.begin().value());
+    {
+        request += "/trackID=";
+        request += QByteArray::number(m_sdpTracks.begin().value());
+    }
 
     request += " RTSP/1.0\r\n";
     request += "CSeq: ";
@@ -213,9 +210,9 @@ RTPIODevice*  RTPSession::sendSetup()
     request += "User-Agent: Network Optix\r\n";
     request += "Transport: RTP/AVP;unicast;client_port=";
 
-    request += QString::number(m_udpSock.getLocalPort());
+    request += QByteArray::number(m_udpSock.getLocalPort());
     request += ',';
-    request += QString::number(m_rtcpUdpSock.getLocalPort());
+    request += QByteArray::number(m_rtcpUdpSock.getLocalPort());
     request += "\r\n\r\n";
 
     //qDebug() << request;
@@ -223,50 +220,35 @@ RTPIODevice*  RTPSession::sendSetup()
     if (!m_tcpSock.send(request.data(), request.size()))
         return 0;
 
-    QByteArray responce;
+    QByteArray response;
 
-    if (!readResponce(responce))
+    if (!readResponse(response))
         return 0;
 
-    if (!responce.startsWith("RTSP/1.0 200")) 
+    if (!response.startsWith("RTSP/1.0 200"))
     {
         return 0;
     }
 
     m_TimeOut = 0; // default timeout 0 ( do not send keep alive )
 
-    QString tmp = extractRTSPParam(responce, "Session:");
-
-    if (tmp.size() > 0) 
+    QString tmp = extractRTSPParam(response, "Session:");
+    if (!tmp.isEmpty())
     {
-        QStringList tmpList = tmp.split(';');
-        m_SessionId = tmpList[0];
-
-        for (int i = 0; i < tmpList.size(); ++i)
+        QStringList tmpList = tmp.split(QLatin1Char(';'));
+        for (int i = 1; i < tmpList.size(); ++i)
         {
-            if (tmpList[i].startsWith("timeout"))
+            const QString &s = tmpList[i];
+            if (s.startsWith(QLatin1String("timeout")))
             {
-                QStringList tmpParams = tmpList[i].split('=');
+                QStringList tmpParams = s.split(QLatin1Char('='));
                 if (tmpParams.size() > 1)
                     m_TimeOut = tmpParams[1].toInt();
             }
         }
     }
 
-    /*
-    tmp = extractRTSPParam(responce, "Transport:");
-    if (tmp.size() > 0)  {
-        QStringList data = tmp.split(';');
-        foreach(QString param, data) 
-        {
-            if (param.starsWith("server_port")) {
-
-            }
-        }
-    }
-    */
-
-    updateTransportHeader(responce);
+    updateTransportHeader(response);
 
     return &m_rtpIo;
 }
@@ -274,16 +256,16 @@ RTPIODevice*  RTPSession::sendSetup()
 bool RTPSession::sendPlay()
 {
     QByteArray request;
-    QByteArray responce;
+    QByteArray response;
 
     request += "PLAY ";
-    request += mUrl.toString();
+    request += mUrl.toString().toLatin1(); // ### percent encoding?
     request += " RTSP/1.0\r\n";
     request += "CSeq: ";
     request += QByteArray::number(m_csec++);
     request += "\r\n";
     request += "Session: ";
-    request += m_SessionId;
+    request += m_SessionId.toLatin1();
     request += "\r\n";
     request += "Range: npt=0.000"; // offset
     request += "-\r\n\r\n";
@@ -292,12 +274,12 @@ bool RTPSession::sendPlay()
         return false;
 
 
-    if (!readResponce(responce))
+    if (!readResponse(response))
         return false;
 
-    if (responce.startsWith("RTSP/1.0 200"))
+    if (response.startsWith("RTSP/1.0 200"))
     {
-        updateTransportHeader(responce);
+        updateTransportHeader(response);
         m_keepAliveTime.restart();
         return true;
     }
@@ -308,25 +290,25 @@ bool RTPSession::sendPlay()
 bool RTPSession::sendTeardown()
 {
     QByteArray request;
-    QByteArray responce;
+    QByteArray response;
     request += "TEARDOWN ";
-    request += mUrl.toString();
+    request += mUrl.toString().toLatin1(); // ### percent encoding?
     request += " RTSP/1.0\r\n";
     request += "CSeq: ";
     request += QByteArray::number(m_csec++);
     request += "\r\n";
     request += "Session: ";
-    request += m_SessionId;
+    request += m_SessionId.toLatin1();
     request += "\r\n\r\n";
 
     if (!m_tcpSock.send(request.data(), request.size()))
         return false;
 
-    if (!readResponce(responce) || !responce.startsWith("RTSP/1.0 200"))
+    if (!readResponse(response) || !response.startsWith("RTSP/1.0 200"))
     {
         return false;
     }
-    else 
+    else
     {
         //d->lastSendTime.start();
         return 0;
@@ -341,7 +323,7 @@ int RTPSession::buildRTCPReport(quint8* dstBuffer, const RtspStatistic* stats)
     QByteArray esDescr("netoptix");
 
     quint8* curBuffer = dstBuffer;
-    *curBuffer++ = (RTP_VERSION << 6); 
+    *curBuffer++ = (RTP_VERSION << 6);
     *curBuffer++ = RTCP_RECEIVER_REPORT;  // packet type
     curBuffer += 2; // skip len field;
 
@@ -357,7 +339,7 @@ int RTPSession::buildRTCPReport(quint8* dstBuffer, const RtspStatistic* stats)
     // correct len field (count of 32 bit words -1)
     quint16 len = (quint16) (curBuf32 - (quint32*) dstBuffer);
     * ((quint16*) (dstBuffer + 2)) = htons(len-1);
-    
+
     // build source description
     curBuffer = (quint8*) curBuf32;
     *curBuffer++ = (RTP_VERSION << 6) + 1;  // source count = 1
@@ -374,7 +356,7 @@ int RTPSession::buildRTCPReport(quint8* dstBuffer, const RtspStatistic* stats)
     while ((curBuffer - dstBuffer)%4 != 0)
         *curBuffer++ = 0;
     //return len * sizeof(quint32);
-    
+
     return curBuffer - dstBuffer;
 }
 
@@ -391,13 +373,13 @@ void RTPSession::processRtcpData(const RtspStatistic* stats)
         {
             if (!m_rtcpUdpSock.isConnected())
             {
-                
+
                 m_rtcpUdpSock.setDestAddr(lastReceivedAddr, lastReceivedPort);
             }
 
 //            quint32 timestamp = 0;
 //            double nptTime = 0;
-            if (stats) 
+            if (stats)
             {
                 int outBufSize = buildRTCPReport(sendBuffer, stats);
                 if (outBufSize > 0)
@@ -412,97 +394,80 @@ void RTPSession::processRtcpData(const RtspStatistic* stats)
 bool RTPSession::sendKeepAliveIfNeeded(const RtspStatistic* stats)
 {
     processRtcpData(stats);
+
     // send rtsp keep alive
-    if (m_TimeOut==0)
+    if (m_TimeOut == 0 || m_keepAliveTime.elapsed() < m_TimeOut - RESERVED_TIMEOUT_TIME)
         return true;
 
-    if (m_keepAliveTime.elapsed() < m_TimeOut - RESERVED_TIMEOUT_TIME)
-        return true;
-    else 
-    {
-        bool res= sendKeepAlive();
-        m_keepAliveTime.restart();
-        return res;
-    }
+    bool res = sendKeepAlive();
+    m_keepAliveTime.restart();
+    return res;
 }
 
 bool RTPSession::sendKeepAlive()
 {
     QByteArray request;
-    QByteArray responce;
+    QByteArray response;
     request += "GET_PARAMETER ";
-    request += mUrl.toString();
+    request += mUrl.toString().toLatin1(); // ### percent encoding?
     request += " RTSP/1.0\r\n";
     request += "CSeq: ";
     request += QByteArray::number(m_csec++);
-    //if (!d->sessionId.isEmpty()) 
+    //if (!d->sessionId.isEmpty())
     {
         request += "\r\n";
         request += "Session: ";
-        request += m_SessionId;
+        request += m_SessionId.toLatin1();
     }
     request += "\r\n\r\n";
 
     if (!m_tcpSock.send(request.data(), request.size()))
         return false;
 
-    if(!readResponce(responce) || !responce.startsWith("RTSP/1.0 200"))
-    {
-        return false;
-    }
-    else 
-    {
-        return true;
-    }
+    return readResponse(response) && response.startsWith("RTSP/1.0 200");
 }
 
-bool RTPSession::readResponce(QByteArray& responce)
+bool RTPSession::readResponse(QByteArray &response)
 {
 
-    int readed = m_tcpSock.recv(mResponse, sizeof(mResponse));
-
-    if (readed<=0)
+    int bytesRead = m_tcpSock.recv(mResponse, sizeof(mResponse));
+    if (bytesRead <= 0)
+    {
+        response.clear();
         return false;
+    }
 
-    responce = QByteArray::fromRawData((char*)mResponse, readed);
+    response = QByteArray::fromRawData((char*)mResponse, bytesRead);
     return true;
 }
 
-QString RTPSession::extractRTSPParam(const QString& buffer, const QString& paramName)
+QString RTPSession::extractRTSPParam(const QByteArray &buffer, const QByteArray &paramName)
 {
+    QString res;
     int pos = buffer.indexOf(paramName);
     if (pos > 0)
     {
-        QString rez;
-        bool first = true;
-        for (int i = pos + paramName.size() + 1; i < buffer.size(); i++)
-        {
-            if (buffer[i] == ' ' && first)
-                continue;
-            else if (buffer[i] == '\r' || buffer[i] == '\n')
-                break;
-            else {
-                rez += buffer[i];
-                first = false;
-            }
-        }
-        return rez;
+        int b = pos + paramName.size();
+        while (b < buffer.size() && buffer[b] == ' ')
+            ++b;
+        int e = b;
+        while (e < buffer.size() && buffer[e] != '\r' && buffer[e] != '\n')
+            ++e;
+        res = QString::fromLatin1(buffer.constData() + b, e - b); // ### UTF-8 ?
     }
-    else
-        return "";
+    return res;
 }
 
-void RTPSession::updateTransportHeader(QByteArray& responce)
+void RTPSession::updateTransportHeader(QByteArray& response)
 {
-    QString tmp = extractRTSPParam(responce, "Transport:");
-    if (tmp.size() > 0) 
+    QString tmp = extractRTSPParam(response, "Transport:");
+    if (!tmp.isEmpty())
     {
-        QStringList tmpList = tmp.split(';');
-        for (int i = 0; i < tmpList.size(); ++i)
+        foreach (const QString &s, tmp.split(QLatin1Char(';')))
         {
-            if (tmpList[i].startsWith("port"))
+            if (s.startsWith(QLatin1String("port")))
             {
-                QStringList tmpParams = tmpList[i].split('=');
+                QStringList tmpParams = s.split(QLatin1Char('='));
                 if (tmpParams.size() > 1)
                     m_ServerPort = tmpParams[1].toInt();
             }
