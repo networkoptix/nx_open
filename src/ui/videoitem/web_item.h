@@ -1,6 +1,8 @@
 #ifndef web_item_h_1425
 #define web_item_h_1425
 
+#include <QWebView>
+
 #include "abstract_scene_item.h"
 
 class CLWebItem : public CLAbstractSceneItem

@@ -1,4 +1,4 @@
-QT = core gui network xml xmlpatterns opengl multimedia webkit 
+QT = core gui network xml opengl multimedia webkit
 CONFIG += x86 precompile_header
 TEMPLATE = app
 VERSION = 0.0.1

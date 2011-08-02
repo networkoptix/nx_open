@@ -20,11 +20,11 @@
 extern "C" {
 	#include <libavcodec/avcodec.h>
 	#include <libavformat/avformat.h>
-    #ifdef _USE_DXVA
-    #include <libavcodec/dxva2.h>
-    #endif
+	#ifdef _USE_DXVA
+	#include <libavcodec/dxva2.h>
+	#endif
 	#include <libswscale/swscale.h>
-    #include <libavutil/avstring.h>
+	#include <libavutil/avstring.h>
 }
 
 #if defined __cplusplus
@@ -40,7 +40,7 @@ extern "C" {
 #include <QCheckBox>
 #include <QCloseEvent>
 #include <QColor>
-#include <QCompleter> 
+#include <QCompleter>
 #include <QDataStream>
 #include <QDateTime>
 #include <QDesktopServices>
@@ -117,7 +117,6 @@ extern "C" {
 #include <QUdpSocket>
 #include <QVBoxLayout>
 #include <QWaitCondition>
-#include <QWebView>
 #include <QWheelEvent>
 #include <QWidget>
 #include <QWindowsStyle>
@@ -130,6 +129,5 @@ extern "C" {
 #include <QtGui/QResizeEvent>
 #include <QtGui>
 #include <QtOpenGL/QGLWidget>
-#include <QtXmlPatterns/QXmlQuery>
 
 #endif
