@@ -273,13 +273,7 @@ index_dirs(('src', 'test'), 'test/const.pro', 'test/uniclient_tests.pro', True)
 if sys.platform == 'win32':
     os.system('qmake -tp vc FFMPEG=%s -o src/uniclient.vcproj src/uniclient.pro' % ffmpeg_path)
     os.system('qmake -tp vc FFMPEG=%s -o test/uniclient_tests.vcproj test/uniclient_tests.pro' % ffmpeg_path)
-    os.system('src\\qmake_vc_fixer src\\uniclient.vcproj')
-    os.unlink('src/uniclient.vcproj')
-    os.rename('src/uniclient.new.vcproj', 'src/uniclient.vcproj')
 
-    os.system('src\\qmake_vc_fixer test\\uniclient_tests.vcproj')
-    os.unlink('test/uniclient_tests.vcproj')
-    os.rename('test/uniclient_tests.new.vcproj', 'test/uniclient_tests.vcproj')
 elif sys.platform == 'darwin':
     generate_info_plist()
 
