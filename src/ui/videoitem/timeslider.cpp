@@ -56,7 +56,8 @@ void TimeLine::paintEvent(QPaintEvent *ev)
     QFrame::paintEvent(ev);
     QPainter painter(this);
 
-    QPalette pal = qApp->style()->standardPalette();
+//    QPalette pal = qApp->style()->standardPalette();
+    QPalette pal = m_parent->palette();
     painter.setBrush(pal.brush(QPalette::Base));
     painter.setPen(pal.color(QPalette::Base));
     QRect r(frameWidth(), frameWidth(), width() - 2*frameWidth(), height() - 2*frameWidth());

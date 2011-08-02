@@ -26,6 +26,7 @@ void TimeLabel::setMaximumValue(qint64 value)
 NavigationWidget::NavigationWidget(QWidget *parent) :
     QWidget(parent)
 {
+    setObjectName("NavigationWidget");
     m_playing = false;
     m_layout = new QHBoxLayout;
     m_layout->setMargin(0);
@@ -52,14 +53,15 @@ NavigationWidget::NavigationWidget(QWidget *parent) :
     connect(m_forwardButton, SIGNAL(clicked()), SLOT(forwardPressed()));
 
     m_slider = new TimeSlider;
+    m_slider->setObjectName("TimeSlider");
     connect(m_playButton, SIGNAL(toggled()), SLOT(slot()));
 
     m_label = new TimeLabel;
 
+    m_layout->addSpacerItem(new QSpacerItem(100, 10));
     m_layout->addWidget(m_backwardButton);
     m_layout->addWidget(m_playButton);
     m_layout->addWidget(m_forwardButton);
-    m_layout->addSpacerItem(new QSpacerItem(100, 10));
     m_layout->addWidget(m_slider);
     m_layout->addWidget(m_label);
     m_layout->addSpacerItem(new QSpacerItem(100, 10));
@@ -125,6 +127,10 @@ NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
 {
     m_proxy = new QGraphicsProxyWidget(this);
     m_widget = new NavigationWidget();
+    m_proxy->installEventFilter(this);
+    m_widget->slider()->setStyleSheet("QWidget { background: rgb(15, 15, 15); color:rgb(63, 159, 216); }");
+    m_widget->label()->setStyleSheet("QLabel { font-size: 30px; color: rgb(63, 159, 216); }");
+    m_widget->setStyleSheet("QWidget { background: black; }");
     m_proxy->setWidget(m_widget);
     m_timerId = startTimer(33);
     connect(m_widget->slider(), SIGNAL(currentValueChanged(qint64)), SLOT(onValueChanged(qint64)));
@@ -138,6 +144,7 @@ NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
 
     setVideoCamera(0);
     m_sliderIsmoving = true;
+    m_mouseOver = false;
 }
 
 NavigationItem::~NavigationItem()
@@ -161,12 +168,12 @@ void NavigationItem::setVideoCamera(CLVideoCamera *camera)
         return;
 
     m_camera = camera;
-    if (!camera)
+    if (!camera) {
         setVisible(false);
-    else {
+    } else {
         setVisible(true);
         CLAbstractArchiveReader *reader = static_cast<CLAbstractArchiveReader*>(m_camera->getStreamreader());
-    m_widget->setPlaying(!reader->onPause());
+        m_widget->setPlaying(!reader->onPause());
     }
 }
 
@@ -282,3 +289,14 @@ void NavigationItem::stepForward()
     reader->resume();
     m_camera->getCamCamDisplay()->setSingleShotMode(true);
 }
+
+void NavigationItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+{
+    m_mouseOver = true;
+}
+
+void NavigationItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+{
+    m_mouseOver = false;
+}
+

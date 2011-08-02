@@ -182,11 +182,12 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
     connect(&cm_start_video_recording, SIGNAL(triggered()), SLOT(toggleRecording()));
     cm_start_video_recording.setShortcuts(QList<QKeySequence>() << tr("Ctrl+E") << Qt::Key_MediaRecord);
     connect(&cm_recording_settings, SIGNAL(triggered()), SLOT(recordingSettings()));
+
 }
 
 GraphicsView::~GraphicsView()
 {
-        setZeroSemViewStarted = truelection();
+        setZeroSelection();
 	stop();
 	delete m_animated_bckg;
 }
@@ -345,8 +346,13 @@ bool GraphicsView::shouldOptimizeDrawing() const
 //================================================================
 void GraphicsView::wheelEvent ( QWheelEvent * e )
 {
-	if (!mViewStarted)
-		return;
+    if (!mViewStarted)
+        return;
+
+    if (m_navigationItem ? m_navigationItem->mouseOver() : false) {
+        QGraphicsView::wheelEvent(e);
+        return;
+    }
 
     if (onUserInput(true, true))
         return;
@@ -373,6 +379,7 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
 
 	int numDegrees = e->delta() ;
     m_scenezoom.zoom_delta(numDegrees/3000.0, 1500, 0, unmoved_point, OUTCUBIC);
+
 }
 
 void GraphicsView::zoomMin(int duration)
@@ -2315,7 +2322,11 @@ void GraphicsView::resizeEvent( QResizeEvent * event )
 
     if (m_navigationItem)
     {
-        m_navigationItem->navigationWidget()->resize(event->size());
+        QPoint pos (0, viewport()->height() - 100);
+        m_navigationItem->setStaticPos(pos);
+
+        QSize s = event->size();
+        m_navigationItem->navigationWidget()->resize(s.width(), 100);
     }
 
 	updateDecorations();

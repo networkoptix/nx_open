@@ -34,6 +34,10 @@ public:
     bool playing() const { return m_playing; }
     void setPlaying(bool);
 
+    void resizeEvent(QResizeEvent *) {
+        int a;
+    }
+
 private slots:
     void togglePlayPause();
     void backwardPressed();
@@ -72,6 +76,8 @@ public:
     void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) {}
     QRectF boundingRect() const;
 
+    bool mouseOver() const { return m_mouseOver; }
+
 protected:
     void timerEvent(QTimerEvent* event);
     void updateSlider();
@@ -87,6 +93,10 @@ private slots:
     void stepBackward();
     void stepForward();
 
+protected:
+    void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
+
 private:
     QGraphicsProxyWidget *m_proxy;
     NavigationWidget *m_widget;
@@ -94,6 +104,7 @@ private:
     int m_timerId;
     bool m_sliderIsmoving;
     qint64 m_currentTime;
+    bool m_mouseOver;
 };
 
 #endif // NAVIGATIONITEM_H
