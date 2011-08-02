@@ -621,7 +621,6 @@ void GraphicsView::removeAllStaticItems()
     foreach(CLAbstractUnmovedItem* item, m_staticItems)
     {
         scene()->removeItem(item);
-        disconnect(item, SIGNAL(onPressed(QString)), this, SLOT(onDecorationItemPressed(QString)));
         delete item;
     }
 
@@ -631,12 +630,8 @@ void GraphicsView::removeAllStaticItems()
 
 void GraphicsView::stopAnimation()
 {
-    QList<CLAbstractSceneItem*> lst = m_camLayout.getItemList();
-
-    foreach(CLAbstractSceneItem* itm, lst)
-    {
+    foreach(CLAbstractSceneItem* itm, m_camLayout.getItemList())
         itm->stop_animation();
-    }
 
     m_animationManager.stopAllAnimations();
     showStop_helper();
@@ -2411,15 +2406,10 @@ void GraphicsView::onCircle_helper(bool show)
 
 void GraphicsView::instantArrange()
 {
-    QList<CLIdealItemPos> newPosLst = m_camLayout.getGridEngine().calcArrangedPos();
-    if (newPosLst.empty())
-        return;
-
-    foreach(CLIdealItemPos ipos, newPosLst)
+    foreach (const CLIdealItemPos &ipos, m_camLayout.getGridEngine().calcArrangedPos())
     {
         ipos.item->setRotation(0);
         ipos.item->setPos(ipos.pos);
-
     }
 }
 
