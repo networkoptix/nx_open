@@ -38,6 +38,7 @@
 #include <QPropertyAnimation>
 
 #ifdef Q_OS_WIN
+#include <QtCore/QProcess>
 #include "device_plugins/desktop/desktop_file_encoder.h"
 #endif
 
@@ -1469,10 +1470,9 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
                 {
                     QString file = dev->getUniqueId();
 #ifdef Q_OS_WIN
-                    file = QDir::toNativeSeparators(file);
-                    QString program;
-                    QTextStream(&program) << "explorer.exe /select," << file;
-                    WinExec(program.toLatin1(),SW_SHOW);
+                    QStringList args;
+                    args << QLatin1String("/select,") << QDir::toNativeSeparators(file);
+                    QProcess::startDetached(QLatin1String("explorer.exe"), args);
 #endif
                 }
             }
