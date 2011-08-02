@@ -188,6 +188,9 @@ void NavigationItem::updateSlider()
     if (!m_camera)
         return;
 
+    if (m_widget->slider()->isMoving())
+        return;
+
     CLAbstractArchiveReader *reader = static_cast<CLAbstractArchiveReader*>(m_camera->getStreamreader());
 
     qint64 length = reader->lengthMksec()/1000;
@@ -216,7 +219,7 @@ void NavigationItem::onValueChanged(qint64 time)
         return;
 
     time *= 1000;
-    if (m_sliderIsmoving)
+    if (/*m_sliderIsmoving*/m_widget->slider()->isMoving())
         reader->jumpTo(time, true);
     else
         reader->jumpToPreviousFrame(time, true);
