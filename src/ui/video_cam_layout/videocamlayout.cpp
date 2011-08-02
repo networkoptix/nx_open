@@ -408,7 +408,7 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect, CLBasicLay
 {
 	if (!m_grid.isSpaceAvalable())
 	{
-		cl_log.log(QLatin1String("Cannot support so many devices "), cl_logDEBUG1);
+//		cl_log.log(QLatin1String("Cannot support so many devices "), cl_logDEBUG1);
 		return false;
 	}
 
