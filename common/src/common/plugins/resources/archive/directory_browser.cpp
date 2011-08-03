@@ -1,28 +1,28 @@
 #include "directory_browser.h"
+
+#include <QtCore/QDir>
+#include <QtCore/QFileInfo>
+
+#include "resource/url_resource.h"
+//#include "resources/archive/avi_files/avi_bluray_resource.h"
+//#include "resources/archive/avi_files/avi_dvd_resource.h"
 //#include "resources/archive/avi_files/avi_resource.h"
 #include "resources/archive/filetypesupport.h"
-//#include "resources/archive/avi_files/avi_dvd_resource.h"
-//#include "resources/archive/avi_files/avi_bluray_resource.h"
-#include "resource/url_resource.h"
-
-
 
 QnResourceDirectoryBrowser::QnResourceDirectoryBrowser()
 {
-
 }
 
 QnResourceDirectoryBrowser::~QnResourceDirectoryBrowser()
 {
 }
 
-
 QString QnResourceDirectoryBrowser::manufacture() const
 {
-    return "DirectoryBrowser";
+    return QLatin1String("DirectoryBrowser");
 }
 
-QnResourceDirectoryBrowser& QnResourceDirectoryBrowser::instance()
+QnResourceDirectoryBrowser &QnResourceDirectoryBrowser::instance()
 {
     static QnResourceDirectoryBrowser inst;
     return inst;
@@ -35,66 +35,52 @@ QnResourceList QnResourceDirectoryBrowser::findResources()
     QThread::currentThread()->setPriority(QThread::IdlePriority);
 
     cl_log.log("Browsing directories....", cl_logALWAYS);
-    
+
     QTime time;
     time.restart();
 
-
     QnResourceList result;
 
-
-    foreach(QString dir, m_pathListToCheck)
+    foreach (const QString &dir, m_pathListToCheck)
     {
-        dir += "/";
-
         QnResourceList dev_lst = findResources(dir);
 
-        cl_log.log("found ", dev_lst.count(), " devices",  cl_logALWAYS);
+        cl_log.log("found ", dev_lst.count(), " devices", cl_logALWAYS);
 
         result.append(dev_lst);
-        
+
         if (shouldStop())
             return result;
-
     }
 
-    cl_log.log("Done(Browsing directories). Time elapsed =  ", time.elapsed(), cl_logALWAYS);
+    cl_log.log("Done(Browsing directories). Time elapsed = ", time.elapsed(), cl_logALWAYS);
 
     QThread::currentThread()->setPriority(old_priority);
 
-    return result;    
+    return result;
 }
 
 QnResourcePtr QnResourceDirectoryBrowser::checkFile(const QString& filename)
 {
-    FileTypeSupport fileTypeSupport;
-
+    QnResource *res = 0;
     /*//todo
-
+    FileTypeSupport fileTypeSupport;
     if (fileTypeSupport.isImageFileExt(filename))
-        return QnResourcePtr(new QnURLResource(filename));
-
-    if (CLAviDvdDevice::isAcceptedUrl(filename))
-        return QnResourcePtr( new CLAviDvdDevice(filename));
-    
-    if (CLAviBluRayDevice::isAcceptedUrl(filename))
-        return QnResourcePtr( new CLAviBluRayDevice(filename) );
-
-    if (fileTypeSupport.isMovieFileExt(filename))
-        return QnResourcePtr( new QnAviResource(filename) );
-
-    /**/
-
-    return QnResourcePtr(0);
+        res = new QnURLResource(filename);
+    else if (CLAviDvdDevice::isAcceptedUrl(filename))
+        res = new CLAviDvdDevice(filename);
+    else if (CLAviBluRayDevice::isAcceptedUrl(filename))
+        res = new CLAviBluRayDevice(filename);
+    else if (fileTypeSupport.isMovieFileExt(filename))
+        res = new QnAviResource(filename);
+    */
+    return QnResourcePtr(res);
 }
 
 //=============================================================================================
 QnResourceList QnResourceDirectoryBrowser::findResources(const QString& directory)
 {
-
-    cl_log.log("Checking ", directory,   cl_logALWAYS);
-
-    FileTypeSupport fileTypeSupport;
+    cl_log.log("Checking ", directory, cl_logALWAYS);
 
     QnResourceList result;
 
@@ -105,56 +91,19 @@ QnResourceList QnResourceDirectoryBrowser::findResources(const QString& director
     if (!dir.exists())
         return result;
 
-    {
-        QStringList list = dir.entryList(fileTypeSupport.imagesFilter());
+    FileTypeSupport fileTypeSupport;
+    /*//todo
+    // images
+    foreach (const QFileInfo &fi, dir.entryInfoList(fileTypeSupport.imagesFilter()))
+        result.append(QnResourcePtr(new QnURLResource(fi.absoluteFilePath())));
 
-        for (int i = 0; i < list.size(); ++i)
-        {
-            QString file = list.at(i);
-            QString abs_file_name = directory + file;
-            //result.push_back( QnResourcePtr( new QnURLResource(abs_file_name) ) ); //todo
-        }
-    }
-
-    {
-        QStringList list = dir.entryList(fileTypeSupport.moviesFilter());
-
-        for (int i = 0; i < list.size(); ++i)
-        {
-            QString file = list.at(i);
-            QString abs_file_name = directory + file;
-            //result.push_back( QnResourcePtr (new QnAviResource(abs_file_name)) );//todo
-        }
-    }
-
-    //=============================================
-    QStringList sub_dirs = subDirList(directory);
-
-    foreach(QString str, sub_dirs)
-    {
-        QnResourceList sub_result = findResources(directory + str + QString("/"));
-        result.append(sub_result);
-    }
-
-
-    return result;
-}
-
-//=============================================================================================
-QStringList QnResourceDirectoryBrowser::subDirList(const QString& abspath)
-{
-    QStringList result;
-
-    QDir dir(abspath);
-    if (!dir.exists())
-        return result;
-
-    QFileInfoList list = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
-
-    foreach(QFileInfo info, list)
-    {
-        result.push_back(info.fileName());
-    }
+    // movies
+    foreach (const QFileInfo &fi, dir.entryInfoList(fileTypeSupport.moviesFilter()))
+        result.append(QnResourcePtr(new QnAviResource(fi.absoluteFilePath())));
+    */
+    // dirs
+    foreach (const QFileInfo &fi, dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::NoSymLinks))
+        result.append(findResources(fi.absoluteFilePath()));
 
     return result;
 }
