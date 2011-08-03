@@ -2181,7 +2181,7 @@ NavigationItem *GraphicsView::getNavigationItem()
         m_navigationItem->setStaticPos(pos);
         m_navigationItem->setVisible(false);
         m_navigationItem->navigationWidget()->resize(m_width, m_height);
-        m_navigationItem->setZValue(2);
+        m_navigationItem->setZValue(INT_MAX);
         m_scene.addItem(m_navigationItem);
 
         addStaticItem(m_navigationItem);
