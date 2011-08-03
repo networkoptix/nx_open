@@ -51,41 +51,41 @@ CLAbstractMediaData* AVClientPullSSHTTPStreamreader::getNextData()
 				if (codec.value.value != QString("JPEG"))
 					h264 = true;
 			}
-            */
+			*/
 
-			if (!m_streamParam.exists("Quality") || !m_streamParam.exists("resolution") || 
-				!m_streamParam.exists("image_left") || !m_streamParam.exists("image_top") ||
-				!m_streamParam.exists("image_right") || !m_streamParam.exists("image_bottom") ||
-				(h264 && !m_streamParam.exists("streamID")) )
+			if (!m_streamParam.exists(QLatin1String("Quality")) || !m_streamParam.exists(QLatin1String("resolution")) ||
+				!m_streamParam.exists(QLatin1String("image_left")) || !m_streamParam.exists(QLatin1String("image_top")) ||
+				!m_streamParam.exists(QLatin1String("image_right")) || !m_streamParam.exists(QLatin1String("image_bottom")) ||
+				(h264 && !m_streamParam.exists(QLatin1String("streamID"))) )
 			{
-				cl_log.log("Erorr!!! parameter is missing in stream params.", cl_logERROR);
+				cl_log.log(QLatin1String("Erorr!!! parameter is missing in stream params."), cl_logERROR);
 				return 0;
 			}
 
 			//=========
-			left = m_streamParam.get("image_left").value.value;
-			top = m_streamParam.get("image_top").value.value;
-			right = m_streamParam.get("image_right").value.value;
-			bottom = m_streamParam.get("image_bottom").value.value;
+			left = m_streamParam.get(QLatin1String("image_left")).value.value;
+			top = m_streamParam.get(QLatin1String("image_top")).value.value;
+			right = m_streamParam.get(QLatin1String("image_right")).value.value;
+			bottom = m_streamParam.get(QLatin1String("image_bottom")).value.value;
 
 			width = right - left;
 			height = bottom - top;
 
-			//quality = m_streamParam.get("Quality").value.value;
+			//quality = m_streamParam.get(QLatin1String("Quality")).value.value;
 			quality = getQuality();
 
-			resolutionFULL = (m_streamParam.get("resolution").value.value == QString("full"));
+			resolutionFULL = (m_streamParam.get(QLatin1String("resolution")).value.value == QLatin1String("full"));
 			streamID = 0;
 			if (h264)
 			{
-				streamID = m_streamParam.get("streamID").value.value;
-				//bitrate = m_streamParam.get("Bitrate").value.value;
+				streamID = m_streamParam.get(QLatin1String("streamID")).value.value;
+				//bitrate = m_streamParam.get(QLatin1String("Bitrate")).value.value;
 				bitrate = getBitrate();
 			}
 			//=========
 
 			if (h264)
-				quality=37-quality; // for H.264 it's not quality; it's qp 
+				quality=37-quality; // for H.264 it's not quality; it's qp
 
 			if (!h264)
 				os <<"image";
@@ -149,7 +149,7 @@ CLAbstractMediaData* AVClientPullSSHTTPStreamreader::getNextData()
 
 		if (img.size()>CL_MAX_DATASIZE)
 		{
-			cl_log.log("Image is too big!!", cl_logERROR);
+			cl_log.log(QLatin1String("Image is too big!!"), cl_logERROR);
 			//delete videoData;
 			videoData->releaseRef();
 			return 0;
@@ -183,12 +183,12 @@ CLAbstractMediaData* AVClientPullSSHTTPStreamreader::getNextData()
 
 	if (h264) // for jpej keyFrame always true
 	{
-		if (!http_client.exist("Content-Type")) // very strange 
+		if (!http_client.exist(QLatin1String("Content-Type"))) // very strange
 		{
 			videoData->keyFrame = false;
 		}
 		else
-			if (http_client.get("Content-Type")==QString("video/H.264P"))
+			if (http_client.get(QLatin1String("Content-Type"))==QLatin1String("video/H.264P"))
 				videoData->keyFrame = false;
 
 	}

@@ -7,15 +7,16 @@ class QGraphicsView;
 
 class CLAbstractUnmovedItem : public CLAbstractSubItemContainer
 {
-	Q_OBJECT
+    Q_OBJECT
+
 public:
-	CLAbstractUnmovedItem(QString name="", QGraphicsItem* parent = 0);
-	virtual ~CLAbstractUnmovedItem();
+    CLAbstractUnmovedItem(QString name = QString(), QGraphicsItem* parent = 0);
+    virtual ~CLAbstractUnmovedItem();
 
-	void setStaticPos(QPoint p); // sets pos in term of point view coordinates 
-	void adjust(); // adjusts position and size of the item on the scene after scene transformation is done
+    void setStaticPos(const QPoint &p); // sets pos in term of point view coordinates
+    void adjust(); // adjusts position and size of the item on the scene after scene transformation is done
 
-	QString getName() const;
+    QString getName() const;
 
     virtual void hideIfNeeded(int duration);
 
@@ -28,11 +29,16 @@ protected:
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
 
-protected:
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
-	QString m_name;
-	QGraphicsView* m_view;
-	QPoint m_pos;
+Q_SIGNALS:
+    void onPressed(const QString &name);
+
+protected:
+    QString m_name;
+    QGraphicsView* m_view;
+    QPoint m_pos;
 
     bool m_underMouse;
 };

@@ -5,7 +5,7 @@
 extern QPixmap cached(const QString &img);
 
 CLPictureImageItem::CLPictureImageItem(GraphicsView* view, int max_width, int max_height,
-				   QString path, 
+				   QString path,
 				   QString name):
 CLImageItem(view, max_width,max_height,name),
 m_CurrentImg(0),
@@ -13,7 +13,7 @@ m_CurrentIndex(0),
 m_forwardDirection(true)
 {
 
-    if (path.contains(".png"))
+    if (path.contains(QLatin1String(".png")))
     {
         QPixmap img = cached(path);
         m_Images.push_back(img);
@@ -30,12 +30,12 @@ m_forwardDirection(true)
         dir.setSorting(QDir::Name);
 
         QStringList filter;
-        filter << "*.png";
+        filter << QLatin1String("*.png");
         QStringList list = dir.entryList(filter);
 
         foreach(QString file, list)
         {
-            QPixmap img = cached(path + QString("/") +  file);
+            QPixmap img = cached(path + QLatin1Char('/') +  file);
             m_Images.push_back(img);
         }
 
@@ -46,7 +46,7 @@ m_forwardDirection(true)
 
 
 
-    m_CurrentImg = &(m_Images.at(0));
+	m_CurrentImg = &(m_Images.at(0));
 
 	m_imageWidth_old = m_imageWidth = m_CurrentImg->width();
 	m_imageHeight_old = m_imageHeight = m_CurrentImg->height();

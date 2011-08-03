@@ -3,7 +3,7 @@
 #include "avi_playlist_strem_reader.h"
 #include "device/device.h"
 
-extern "C" 
+extern "C"
 {
     // this function placed at <libavformat/internal.h> header
     void ff_read_frame_flush(AVFormatContext *s);
@@ -32,7 +32,7 @@ CLAVIPlaylistStreamReader::~CLAVIPlaylistStreamReader()
         av_free(m_ffmpegIOContext);
         m_ffmpegIOContext = 0;
     }
-    if (m_ioBuffer) 
+    if (m_ioBuffer)
         av_free(m_ioBuffer);
 }
 
@@ -43,7 +43,7 @@ AVFormatContext* CLAVIPlaylistStreamReader::getFormatContext()
     {
         if (m_fileList.isEmpty())
             return 0;
-        else 
+        else
             return m_fileList[0]->m_formatContext;
     }
 
@@ -57,7 +57,7 @@ AVFormatContext* CLAVIPlaylistStreamReader::getFormatContext()
         fi->m_offsetInMks = 0;
         fi->opaque = 0;
         fi->m_formatContext = 0;
-    
+
         m_fileList << fi;
 
         QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
@@ -83,7 +83,7 @@ AVFormatContext* CLAVIPlaylistStreamReader::getFormatContext()
             else
                 break;
         }
-        
+
         AVInputFormat* inCtx = av_probe_input_format(&probeData, 1);
         delete [] buffer;
         if (!switchToFile(m_fileList.size() - 1))
@@ -94,7 +94,7 @@ AVFormatContext* CLAVIPlaylistStreamReader::getFormatContext()
         }
 
         if (!inCtx || av_open_input_stream(&fi->m_formatContext, getIOContext(), "", inCtx, 0) < 0 ||
-            av_find_stream_info(fi->m_formatContext) < 0)	
+            av_find_stream_info(fi->m_formatContext) < 0)
         {
             deleteFileInfo(fi);
             m_fileList.remove(m_fileList.size() - 1);
@@ -112,7 +112,7 @@ AVFormatContext* CLAVIPlaylistStreamReader::getFormatContext()
     m_initialized = true;
     if (m_fileList.isEmpty())
         return 0;
-    else 
+    else
     {
         switchToFile(0);
         return m_fileList[0]->m_formatContext;
@@ -129,11 +129,11 @@ qint64 CLAVIPlaylistStreamReader::findFileIndexByTime(quint64 mksec)
        mksec -= fi->m_formatContext->duration;
        newFileIndex++;
     }
-    if (newFileIndex < m_fileList.size()) 
+    if (newFileIndex < m_fileList.size())
     {
         switchToFile(newFileIndex); // switch to nesessary file
         return mksec;
-    }  
+    }
     else {
         return -1;
     }
@@ -157,15 +157,11 @@ void CLAVIPlaylistStreamReader::channeljumpTo(quint64 mksec, int )
     m_inSeek = true;
     if (directSeekToPosition(relativeMksec))
     {
-        ff_read_frame_flush(m_formatContext); 
+        ff_read_frame_flush(m_formatContext);
     }
-    else 
+    else
     {
-#ifdef _WIN32
-        rez = avformat_seek_file(m_formatContext, -1, 0, relativeMksec, _I64_MAX, AVSEEK_FLAG_BACKWARD);
-#else
         rez = avformat_seek_file(m_formatContext, -1, 0, relativeMksec, LLONG_MAX, AVSEEK_FLAG_BACKWARD);
-#endif
     }
     m_inSeek = false;
     m_needToSleep = 0;
@@ -193,7 +189,7 @@ void CLAVIPlaylistStreamReader::deleteFileInfo(CLFileInfo* fi)
 
 void CLAVIPlaylistStreamReader::destroy()
 {
-    
+
     foreach(CLFileInfo* fi, m_fileList)
     {
         deleteFileInfo(fi);
@@ -208,8 +204,8 @@ void CLAVIPlaylistStreamReader::destroy()
 QString CLAVIPlaylistStreamReader::addDirPath(const QString sourceDir, const QString& postfix)
 {
     QString rez = sourceDir;
-    if (!sourceDir.endsWith('/') && !sourceDir.endsWith('\\'))
-        rez += '/'; //QDir::separator();
+    if (!sourceDir.endsWith(QLatin1Char('/')) && !sourceDir.endsWith(QLatin1Char('\\')))
+        rez += QLatin1Char('/'); //QDir::separator();
     rez += postfix;
     return rez;
 }
@@ -237,13 +233,13 @@ struct CLAVIPlaylistStreamReaderPriv
     }
 };
 
-ByteIOContext* CLAVIPlaylistStreamReader::getIOContext() 
+ByteIOContext* CLAVIPlaylistStreamReader::getIOContext()
 {
     //QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
     if (m_ffmpegIOContext == 0)
     {
         m_ioBuffer = (quint8*) av_malloc(IO_BLOCK_SIZE);
-        m_ffmpegIOContext = av_alloc_put_byte(      
+        m_ffmpegIOContext = av_alloc_put_byte(
             m_ioBuffer,
             IO_BLOCK_SIZE,
             0,
@@ -295,7 +291,7 @@ bool CLAVIPlaylistStreamReader::switchToFile(int newFileIndex)
             initCodecs();
         }
     }
-    else 
+    else
     {
         m_currentFile.seek(0);
     }

@@ -1,6 +1,6 @@
 #include "start_screen_content.h"
 
-QString intro_screen = "intro screen";
+QString intro_screen = QLatin1String("intro screen");
 
 extern int SCENE_LEFT;
 extern int SCENE_TOP;
@@ -8,19 +8,13 @@ extern int SCENE_TOP;
 LayoutContent& intro_screen_content()
 {
 	static LayoutContent instance;
-	static bool frist_time = true;
-
-	if (frist_time)
+	static bool first_time = true;
+	if (first_time)
 	{
+		first_time = false;
 		instance.setName(intro_screen);
-		frist_time = false;
-        
-
-        instance.addDevice("intro.mov");
-
-
+		instance.addDevice(QLatin1String("intro.mov"));
 	}
-
 
 	return instance;
 }

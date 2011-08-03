@@ -25,13 +25,13 @@ bool WinAudioExtendInfo::getDeviceInfo(IMMDevice *pMMDevice, bool isDefault)
 
     PROPVARIANT pv; PropVariantInit(&pv);
     hr = pPropertyStore->GetValue(PKEY_Device_FriendlyName, &pv);
-    if (hr != S_OK) 
+    if (hr != S_OK)
         return false;
 
     QString name = QString::fromUtf16(reinterpret_cast<const ushort *>(pv.piVal));
     if (!isDefault && !name.startsWith(m_deviceName))
         return false;
-    
+
     if (!isDefault)
         m_fullName = !name.isEmpty() ? name : m_deviceName;
     else
@@ -44,10 +44,10 @@ bool WinAudioExtendInfo::getDeviceInfo(IMMDevice *pMMDevice, bool isDefault)
     PropVariantToGUID(pv, &m_jackSubType);
 
     hr = pPropertyStore->GetValue(PKEY_DeviceClass_IconPath, &pv);
-    if (hr != S_OK) 
+    if (hr != S_OK)
         return false;
     m_iconPath = QString::fromUtf16(reinterpret_cast<const ushort *>(pv.piVal));
-    
+
     return true;
 }
 
@@ -60,14 +60,13 @@ WinAudioExtendInfo::WinAudioExtendInfo(const QString& deviceName)
 
     CoInitialize(0);
 
-    hr = CoCreateInstance(
-        __uuidof(MMDeviceEnumerator), NULL, CLSCTX_ALL, 
-        __uuidof(IMMDeviceEnumerator),
-        (void**)&m_pMMDeviceEnumerator
-        );
+    const CLSID CLSID_MMDeviceEnumerator = __uuidof(MMDeviceEnumerator);
+    const IID IID_IMMDeviceEnumerator = __uuidof(IMMDeviceEnumerator);
+    hr = CoCreateInstance(CLSID_MMDeviceEnumerator, NULL, CLSCTX_ALL,
+                          IID_IMMDeviceEnumerator, (void**)&m_pMMDeviceEnumerator);
     if (hr != S_OK) return;
 
-    if (deviceName.toLower() == "default")
+    if (deviceName.toLower() == QLatin1String("default"))
     {
         m_pMMDeviceEnumerator->GetDefaultAudioEndpoint(eCapture, eMultimedia, &pMMDevice);
         getDeviceInfo(pMMDevice, true);
@@ -80,7 +79,7 @@ WinAudioExtendInfo::WinAudioExtendInfo(const QString& deviceName)
     UINT count;
     hr = ppDevices->GetCount(&count);
     if (hr != S_OK) return;
-    for (UINT i = 0; i < count; i++) 
+    for (UINT i = 0; i < count; i++)
     {
         hr = ppDevices->Item(i, &pMMDevice);
         if (hr != S_OK) return;
@@ -91,7 +90,10 @@ WinAudioExtendInfo::WinAudioExtendInfo(const QString& deviceName)
 
 WinAudioExtendInfo::~WinAudioExtendInfo()
 {
-    m_pMMDeviceEnumerator->Release();
+    if (m_pMMDeviceEnumerator)
+        m_pMMDeviceEnumerator->Release();
+
+    CoUninitialize();
 }
 
 
@@ -108,24 +110,24 @@ BOOL CALLBACK enumFunc(HMODULE hModule, LPCTSTR lpszType, LPTSTR lpszName,LONG_P
     return true;
 }
 
-QPixmap WinAudioExtendInfo::deviceIcon() 
+QPixmap WinAudioExtendInfo::deviceIcon()
 {
     qDebug() << m_iconPath;
 
-    QStringList params = m_iconPath.split(',');
+    QStringList params = m_iconPath.split(QLatin1Char(','));
     if (params.size() < 2)
         return 0;
-    int persent1 = params[0].indexOf('%');
+    int persent1 = params[0].indexOf(QLatin1Char('%'));
     while (persent1 >= 0)
     {
-        int persent2 = params[0].indexOf('%', persent1+1);
+        int persent2 = params[0].indexOf(QLatin1Char('%'), persent1+1);
         if (persent2 > persent1)
         {
             QString metaVal = params[0].mid(persent1, persent2-persent1+1);
-            QString val = getenv(metaVal.mid(1, metaVal.length()-2).toLocal8Bit().constData());
+            QString val = QString::fromLocal8Bit(qgetenv(metaVal.mid(1, metaVal.length()-2).toLocal8Bit().constData()));
             params[0].replace(metaVal, val);
         }
-        persent1 = params[0].indexOf('%');
+        persent1 = params[0].indexOf(QLatin1Char('%'));
     }
 
     HMODULE library = LoadLibrary((LPCWSTR) params[0].constData());
@@ -135,7 +137,7 @@ QPixmap WinAudioExtendInfo::deviceIcon()
     if (resNumber < 0) {
         resNumber = -resNumber;
     }
-    else 
+    else
     {
         m_iconGroupIndex = resNumber;
         m_iconGroupNum = 0;
@@ -153,7 +155,7 @@ QPixmap WinAudioExtendInfo::deviceIcon()
 
 bool WinAudioExtendInfo::isMicrophone() const
 {
-    const GUID MicrophoneGUIDS[] = 
+    const GUID MicrophoneGUIDS[] =
     {
         KSNODETYPE_MICROPHONE,
         KSNODETYPE_DESKTOP_MICROPHONE,
@@ -178,5 +180,5 @@ bool WinAudioExtendInfo::isMicrophone() const
     }
 
     // device type unknown. try to check device name
-    return m_fullName.toLower().contains("microphone");
+    return m_fullName.toLower().contains(QLatin1String("microphone"));
 }

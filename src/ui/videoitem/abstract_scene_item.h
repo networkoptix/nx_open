@@ -15,14 +15,12 @@ class CLAbstractSceneItem : public CLAbstractSubItemContainer
 	Q_OBJECT
 	Q_PROPERTY(QPointF pos READ pos WRITE setPos)
 	Q_PROPERTY(qreal rotation	READ getRotation WRITE setRotation)
-    Q_PROPERTY(int steadycolor	READ steadyBlackColor WRITE setSteadyBlackColor)
+	Q_PROPERTY(int steadycolor	READ steadyBlackColor WRITE setSteadyBlackColor)
+
 public:
+	enum CLSceneItemType { VIDEO, IMAGE, BUTTON, RECORDER, LAYOUT };
 
-	enum CLSceneItemType {VIDEO, IMAGE, BUTTON, RECORDER, LAYOUT};
-
-	CLAbstractSceneItem(GraphicsView* view, int max_width, int max_height,
-						QString name="");
-
+	CLAbstractSceneItem(GraphicsView *view, int max_width, int max_height, QString name = QString());
 	virtual ~CLAbstractSceneItem();
 
 	CLVideoWindowItem* toVideoItem() const;
@@ -62,7 +60,7 @@ public:
         if (m_needUpdate && (isFullScreen() || isItemSelected()))
             emit onNeedToUpdate(this);
 
-	}
+    }
 
 	virtual int height() const;
 	virtual int width() const;
@@ -88,7 +86,7 @@ public:
 	bool isArranged() const;
 
 	//==========grid editing ==================
-	//flag is used to draw selection with different color. true if item is selected and can be drop on top of the other in case of mouse release 
+	//flag is used to draw selection with different color. true if item is selected and can be drop on top of the other in case of mouse release
 	void setCanDrop(bool val);
 	QPointF getOriginalPos() const;
 	void setOroginalPos(QPointF pos);
@@ -101,7 +99,7 @@ public:
 	QPointF getRotationPointCenter() const;
 	void setRotationPointHand(QPointF point);
 
-    //== steady mode
+	//== steady mode
 
     virtual void goToSteadyMode(bool steady, bool instant);
     int steadyBlackColor() const;
@@ -114,16 +112,16 @@ signals:
 	void onDoubleClick(CLAbstractSceneItem*);
 	void onFullScreen(CLAbstractSceneItem*);
 	void onSelected(CLAbstractSceneItem*);
-    void onNeedToUpdate(CLAbstractSceneItem*);
+	void onNeedToUpdate(CLAbstractSceneItem*);
 
 protected slots:
-        void stopSteadyAnimation();
+		void stopSteadyAnimation();
 
 protected:
-	void drawShadow(QPainter* painter);
+    void drawShadow(QPainter* painter);
     void drawSteadyWall(QPainter* painter);
 
-	void drawRotationHelper(QPainter* painter);
+    void drawRotationHelper(QPainter* painter);
 
 	virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
 	virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
@@ -150,14 +148,14 @@ protected:
 
 	//rotation
 	bool m_draw_rotation_helper;
-	QPointF m_rotation_center; 
+	QPointF m_rotation_center;
 	QPointF m_rotation_hand;
 
     bool m_editable;
     bool m_needUpdate;
-	CLAbstractComplicatedItem* m_complicatedItem;
+    CLAbstractComplicatedItem* m_complicatedItem;
 
-	bool m_can_be_droped; // flag is used to draw selection. true if item is selected and can be drop on top of the other in case of mouse release 
+    bool m_can_be_droped; // flag is used to draw selection. true if item is selected and can be drop on top of the other in case of mouse release
 
 	QPointF m_originalPos;
 	bool m_originallyArranged;

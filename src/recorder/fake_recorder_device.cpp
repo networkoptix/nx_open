@@ -26,5 +26,5 @@ QString CLFakeRecorderDevice::toString() const
 
 QString CLFakeRecorderDevice::getName() const
 {
-	return "Network Optix Archiver";
+	return QLatin1String("Network Optix Archiver");
 }

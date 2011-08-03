@@ -524,27 +524,27 @@ QStringList CLAVIBlurayStreamReader::getPlaylist()
     QDir sourceDir = m_device->getUniqueId();
 
     QFileInfoList rootDirList = sourceDir.entryInfoList();
-    foreach(QFileInfo fi, rootDirList)
+    foreach (const QFileInfo &fi, rootDirList)
     {
-        if (fi.isDir() && (fi.baseName().toUpper() == "BDMV" || fi.baseName().toUpper() == "AVCHD"))
+        if (fi.isDir() && (fi.baseName().toUpper() == QLatin1String("BDMV") || fi.baseName().toUpper() == QLatin1String("AVCHD")))
             sourceDir.cd(fi.baseName());
     }
 
     QDir playlistDir = sourceDir;
     QDir mediaDir = sourceDir;
-    if (sourceDir.absolutePath().endsWith("PLAYLIST"))
+    if (sourceDir.absolutePath().endsWith(QLatin1String("PLAYLIST")))
         mediaDir.cdUp();
-    else 
-        playlistDir.cd("PLAYLIST");
-    mediaDir.cd("STREAM");
+    else
+        playlistDir.cd(QLatin1String("PLAYLIST"));
+    mediaDir.cd(QLatin1String("STREAM"));
 
     if (!playlistDir.exists())
         return rez;
-    playlistDir.setNameFilters(QStringList() << "*.mpls" << "*.MPLS" << "*.mpl" << "*.MPL");
+    playlistDir.setNameFilters(QStringList() << QLatin1String("*.mpls") << QLatin1String("*.MPLS") << QLatin1String("*.mpl") << QLatin1String("*.MPL"));
     QFileInfoList mplsFileList = playlistDir.entryInfoList();
 
     // finding longest playlist
-    double maxDuration = 0; 
+    double maxDuration = 0;
     foreach(QFileInfo fi, mplsFileList)
     {
         MPLSParser parser;
@@ -552,10 +552,10 @@ QStringList CLAVIBlurayStreamReader::getPlaylist()
             continue;
         QStringList tmpList;
         double playListDuration = 0;
-        foreach(MPLSPlayItem playItem, parser.m_playItems)        
+        foreach (const MPLSPlayItem &playItem, parser.m_playItems)
         {
-            tmpList << mediaDir.absolutePath() + '/' + playItem.m_fileName + '.' + parser.m_fileExt;
-            playListDuration += (playItem.m_OUT_time - playItem.m_IN_time)  / (float) MPLSParser::TIME_BASE;
+            tmpList << mediaDir.absolutePath() + QLatin1Char('/') + playItem.m_fileName + QLatin1Char('.') + parser.m_fileExt;
+            playListDuration += (playItem.m_OUT_time - playItem.m_IN_time) / (float) MPLSParser::TIME_BASE;
         }
         if (playListDuration >= maxDuration)
         {
@@ -566,18 +566,18 @@ QStringList CLAVIBlurayStreamReader::getPlaylist()
     return rez;
 }
 
-void CLAVIBlurayStreamReader::fillAdditionalInfo(CLFileInfo* fi) 
+void CLAVIBlurayStreamReader::fillAdditionalInfo(CLFileInfo* fi)
 {
-    int pos = fi->m_name.lastIndexOf("/STREAM/");
-    int posName1 = fi->m_name.lastIndexOf("/");
-    int posName2 = fi->m_name.lastIndexOf('.');
-    QString clipName = fi->m_name.left(pos) + "/CLIPINF";
+    int pos = fi->m_name.lastIndexOf(QLatin1String("/STREAM/"));
+    int posName1 = fi->m_name.lastIndexOf(QLatin1Char('/'));
+    int posName2 = fi->m_name.lastIndexOf(QLatin1Char('.'));
+    QString clipName = fi->m_name.left(pos) + QLatin1String("/CLIPINF");
     clipName += fi->m_name.mid(posName1, posName2 - posName1);
 
     CLPIParser parser;
-    bool rez = parser.parse(clipName + ".clpi");
+    bool rez = parser.parse(clipName + QLatin1String(".clpi"));
     if (!rez)
-        rez = parser.parse(clipName + ".clp");
+        rez = parser.parse(clipName + QLatin1String(".clp"));
     if (!rez)
         return;
 
@@ -588,7 +588,7 @@ void CLAVIBlurayStreamReader::fillAdditionalInfo(CLFileInfo* fi)
         if (itr != parser.m_streamInfo.end())
         {
             const CLPIStreamInfo& info = itr.value();
-            QString langName = info.m_language_code;
+            QByteArray langName = info.m_language_code;
             for (unsigned k = 0; k < sizeof(languageCode) / sizeof(char*)/2; ++k)
             {
                 if (langName == languageCode[k][0])
@@ -598,7 +598,7 @@ void CLAVIBlurayStreamReader::fillAdditionalInfo(CLFileInfo* fi)
                 }
             }
 
-            av_metadata_set2(&avStream->metadata, "language", langName.toAscii().constData(), 0);
+            av_metadata_set2(&avStream->metadata, "language", langName.constData(), 0);
         }
     }
 }

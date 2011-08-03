@@ -10,7 +10,7 @@ char jpeg_end[2] = {0xff, 0xd9};
 
 int contain_subst(char *data, int datalen, char *subdata, int subdatalen)
 {
-    if (!data || !subdata || datalen<=0 || subdatalen <= 0 ) 
+    if (!data || !subdata || datalen<=0 || subdatalen <= 0 )
         return -1;
 
     int coincidence_len = 0;
@@ -45,7 +45,7 @@ mHttpClient(0)
 
 CLAndroidStreamreader::~CLAndroidStreamreader()
 {
-    
+
 }
 
 CLAbstractMediaData* CLAndroidStreamreader::getNextData()
@@ -91,7 +91,7 @@ CLAbstractMediaData* CLAndroidStreamreader::getNextData()
                 // just skip the data
             }
         }
-        else // getting the image 
+        else // getting the image
         {
 
             if (img.size() + BLOCK_SIZE > img.capacity())// too big image
@@ -108,7 +108,7 @@ CLAbstractMediaData* CLAndroidStreamreader::getNextData()
                 image_end_index+=2;
 
 
-                // found the end of image 
+                // found the end of image
                 getting_image = false;
                 img.write(mData, image_end_index);
 
@@ -116,7 +116,7 @@ CLAbstractMediaData* CLAndroidStreamreader::getNextData()
                     mDataRemainedBeginIndex = image_end_index + 1;
                 else
                     mDataRemainedBeginIndex = -1;
-                    
+
 
                 videoData->compressionType = CODEC_ID_MJPEG;
                 videoData->width = 1920;
@@ -150,7 +150,7 @@ void CLAndroidStreamreader::openStream()
     if (isStreamOpened())
         return;
 
-    QString request = "videofeed";
+    QString request = QLatin1String("videofeed");
     CLNetworkDevice* ndev = static_cast<CLNetworkDevice*>(m_device);
 
     mHttpClient = new CLSimpleHTTPClient(ndev->getIP(), 8080, 2000, ndev->getAuth());

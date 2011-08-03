@@ -51,8 +51,7 @@ private:
     static int gl_status;
 
 private:
-
-#ifndef _WIN32
+#ifndef Q_OS_WIN
     #define APIENTRY
 #endif
 

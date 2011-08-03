@@ -10,7 +10,7 @@
 #include <d3dx9.h>
 #include <QTime>
 
-class CLScreenGrapper: public QObject
+class CLScreenGrabber: public QObject
 {
     Q_OBJECT
 public:
@@ -25,13 +25,13 @@ public:
     };
 
     enum CaptureMode {CaptureMode_DesktopWithAero, CaptureMode_DesktopWithoutAero, CaptureMode_Application};
-    
-    // resolution (0,0) - use default(native resolution)
-    // negative resolution - use specified scale factor 
 
-    CLScreenGrapper(int displayNumber, int poolSize, CaptureMode mode, bool captureCursor,
+    // resolution (0,0) - use default(native resolution)
+    // negative resolution - use specified scale factor
+
+    CLScreenGrabber(int displayNumber, int poolSize, CaptureMode mode, bool captureCursor,
                     const QSize& captureResolution, QWidget* widget);
-    virtual ~CLScreenGrapper();
+    virtual ~CLScreenGrabber();
 
     // capture screenshot in YUV 4:2:0 format
     // allocate frame data if frame is not initialized
@@ -52,7 +52,6 @@ private:
     Q_INVOKABLE void captureFrameOpenGL(void* opaque);
     void drawCursor(quint32* data, int dataStride, int height, int leftOffset, int topOffset, bool flip) const;
     void allocateTmpFrame(int width, int height);
-    void toggleAero(bool value);
 private:
     int m_displayNumber;
 

@@ -33,25 +33,25 @@ m_lastWidth(0)
     // XXX Debug, should be passed in constructor
     m_tryHardwareAcceleration = false; //hwcounter % 2;
 
-	QMutexLocker mutex(&global_ffmpeg_mutex);
+    QMutexLocker mutex(&global_ffmpeg_mutex);
 
 	if (m_first_instance)
 	{
 		m_first_instance = false;
 
-		// must be called before using avcodec 
+		// must be called before using avcodec
 		avcodec_init();
 
 		// register all the codecs (you can also register only the m_codec you wish to have smaller code
 		avcodec_register_all();
 
-        cl_log.log("FFMEG version = ", (int)avcodec_version(), cl_logALWAYS) ;
+		cl_log.log(QLatin1String("FFMEG version = "), (int)avcodec_version(), cl_logALWAYS) ;
 
 	}
 
 	//m_codec = avcodec_find_decoder(CODEC_ID_H264);
 
-    openDecoder();
+	openDecoder();
 }
 
 AVCodec* CLFFmpegVideoDecoder::findCodec(CodecID codecId)
@@ -66,7 +66,7 @@ AVCodec* CLFFmpegVideoDecoder::findCodec(CodecID codecId)
 }
 
 void CLFFmpegVideoDecoder::closeDecoder()
-{   
+{
     avcodec_close(c);
 #ifdef _USE_DXVA
     m_decoderContext.close();
@@ -75,7 +75,7 @@ void CLFFmpegVideoDecoder::closeDecoder()
 	av_free(frame);
 	av_free(m_deinterlaceBuffer);
 	av_free(m_deinterlacedFrame);
-    av_free(c);
+	av_free(c);
 }
 
 void CLFFmpegVideoDecoder::openDecoder()
@@ -99,18 +99,18 @@ void CLFFmpegVideoDecoder::openDecoder()
     }
 #endif
 
-    frame = avcodec_alloc_frame();
+	frame = avcodec_alloc_frame();
 	m_deinterlacedFrame = avcodec_alloc_frame();
 
-    //if(m_codec->capabilities&CODEC_CAP_TRUNCATED)	c->flags|= CODEC_FLAG_TRUNCATED;
+	//if(m_codec->capabilities&CODEC_CAP_TRUNCATED)	c->flags|= CODEC_FLAG_TRUNCATED;
 
-    //c->debug_mv = 1;
+	//c->debug_mv = 1;
 
     c->thread_count = qMin(4, QThread::idealThreadCount() + 1);
     c->thread_type = m_mtDecoding ? FF_THREAD_FRAME : FF_THREAD_SLICE;
-    
 
-	cl_log.log(QString("Creating ") + (m_mtDecoding ? "FRAME threaded decoder" : "SLICE threaded decoder"), cl_logALWAYS);
+
+    cl_log.log(QLatin1String("Creating ") + QLatin1String(m_mtDecoding ? "FRAME threaded decoder" : "SLICE threaded decoder"), cl_logALWAYS);
     // TODO: check return value
     if (avcodec_open(c, m_codec) < 0)
     {
@@ -118,20 +118,20 @@ void CLFFmpegVideoDecoder::openDecoder()
     }
 
 	int numBytes = avpicture_get_size(PIX_FMT_YUV420P, c->width, c->height);
-	
+
 	m_deinterlaceBuffer = (quint8*)av_malloc(numBytes * sizeof(quint8));
-	
+
 	avpicture_fill((AVPicture *)m_deinterlacedFrame, m_deinterlaceBuffer, PIX_FMT_YUV420P, c->width, c->height);
-	
+
 //	avpicture_fill((AVPicture *)picture, m_buffer, PIX_FMT_YUV420P, c->width, c->height);
 }
 
 CLFFmpegVideoDecoder::~CLFFmpegVideoDecoder(void)
 {
-	QMutexLocker mutex(&global_ffmpeg_mutex);
+    QMutexLocker mutex(&global_ffmpeg_mutex);
 
-    closeDecoder();
-	
+	closeDecoder();
+
 	if (m_passedContext)
 		avcodec_close(m_passedContext);
 }
@@ -149,10 +149,10 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 {
 
 
-	if (m_codec==0)
+    if (m_codec==0)
     {
-        cl_log.log("decoder not found: m_codec = 0", cl_logWARNING);
-		return false;
+        cl_log.log(QLatin1String("decoder not found: m_codec = 0"), cl_logWARNING);
+        return false;
     }
 
 	if (m_wantEscapeFromLightCPUMode && data.keyFrame)
@@ -189,10 +189,10 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 		m_width = width;
 		m_height = height;
 
-	}
+    }
     */
 
-	/*
+    /*
 
 	FILE * f = fopen("test.264_", "ab");
 	fwrite(data.inbuf,1,data.buff_len,f);
@@ -208,11 +208,11 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 	fclose(f2);
 	fn++;
 
-    */
+	*/
 
-    // XXX: DEBUG
+	// XXX: DEBUG
 
-    bool needResetCodec = false;
+	bool needResetCodec = false;
 
     //if (m_lastWidth != 0 && m_lastWidth != data.width)
     //{
@@ -257,17 +257,17 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
     int got_picture = 0;
     avcodec_decode_video2(c, frame, &got_picture, &avpkt);
 
-	if (data.useTwice)
+    if (data.useTwice)
         avcodec_decode_video2(c, frame, &got_picture, &avpkt);
 
 	if (got_picture )
 	{
 		AVFrame* outputFrame;
-		if (frame->interlaced_frame && m_mtDecoding) 
+		if (frame->interlaced_frame && m_mtDecoding)
 		{
 			if (avpicture_deinterlace((AVPicture*)m_deinterlacedFrame, (AVPicture*) frame, c->pix_fmt, c->width, c->height) == 0)
 			{
-				outputFrame = m_deinterlacedFrame;			
+				outputFrame = m_deinterlacedFrame;
 			}
 			else
 			{
@@ -335,21 +335,21 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
         default:
             data.outFrame.out_type = c->pix_fmt;
         }
-        
+
 
 		return true;
 	}
 	else
 	{
-		/*/			
+		/*/
 		// some times decoder wants to delay frame by one; we do not want that
 		avcodec_decode_video(c, picture, &got_picture,0, 0);
 		if (got_picture)
 			goto gotpicture;
 
-        */
+		*/
 
-        //cl_log.log("cannot decode image", cl_logWARNING);
+		//cl_log.log("cannot decode image", cl_logWARNING);
 
 		return false;
 	}

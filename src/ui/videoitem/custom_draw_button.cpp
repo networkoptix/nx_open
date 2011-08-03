@@ -8,32 +8,27 @@ QFont buttonFont()
 	font.setStyleStrategy(QFont::PreferAntialias);
 #if 0//defined(Q_OS_MAC)
 	font.setPixelSize(11);
-	font.setFamily("Silom");
+	font.setFamily(QLatin1String("Silom"));
 #else
 	font.setPixelSize(15);
-	font.setFamily("Bodoni MT");
+	font.setFamily(QLatin1String("Bodoni MT"));
 #endif
 	return font;
 }
 
 QColor buttonTextColor(QColor(255, 255, 255));
 
-CLCustomBtnItem::CLCustomBtnItem(GraphicsView* view, int max_width, int max_height, 
-								 QString name, 
-								 QString text, QString tooltipText):
-CLAbstractSceneItem(view,max_width,max_height, name),
-mText(text)
+CLCustomBtnItem::CLCustomBtnItem(GraphicsView* view, int max_width, int max_height,
+								 QString name, QString text, QString tooltipText)
+	: CLAbstractSceneItem(view, max_width, max_height, name),
+	  mText(text)
 {
-
 	//setFocusPolicy(Qt::NoFocus);
-
 	setToolTip(tooltipText);
-
 }
 
 CLCustomBtnItem::~CLCustomBtnItem()
 {
-
 }
 
 void CLCustomBtnItem::createPaths(int radius)
@@ -60,7 +55,6 @@ QPainterPath CLCustomBtnItem::createRoundRectpath(int width, int height, int rad
 	result.closeSubpath();
 
 	return result;
-
 }
 
 void CLCustomBtnItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
@@ -87,7 +81,7 @@ void CLCustomBtnItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */
 	//painter->drawRect(boundingRect());
 
 	//==================================================
-	QFont  font("Courier New", 350);
+	QFont font(QLatin1String("Courier New"), 350);
 	font.setWeight(QFont::Bold);
 	painter->setFont(font);
 
@@ -105,4 +99,3 @@ void CLCustomBtnItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */
 		rect.width(), rect.height(),
 		Qt::AlignCenter | Qt::TextWordWrap, mText);
 }
-

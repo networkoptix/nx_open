@@ -13,7 +13,7 @@ CLStreamreader(dev)
 
 void CLClientPullStreamreader::run()
 {
-	CL_LOG(cl_logINFO) cl_log.log("stream reader started.", cl_logINFO);
+	CL_LOG(cl_logINFO) cl_log.log(QLatin1String("stream reader started."), cl_logINFO);
 
 	setNeedKeyData();
 	m_device->onBeforeStart();
@@ -77,7 +77,7 @@ void CLClientPullStreamreader::run()
 
 		if (videoData && needKeyData())
 		{
-			// I do not like; need to do smth with it 
+			// I do not like; need to do smth with it
 			if (videoData->keyFrame)
 			{
 				if (videoData->channelNumber>CL_MAX_CHANNEL_NUMBER-1)
@@ -102,8 +102,8 @@ void CLClientPullStreamreader::run()
         if (videoData)
             m_stat[videoData->channelNumber].onData(data->data.size());
 
-        putData(data);
+		putData(data);
 	}
 
-	CL_LOG(cl_logINFO) cl_log.log("stream reader stopped.", cl_logINFO);
+	CL_LOG(cl_logINFO) cl_log.log(QLatin1String("stream reader stopped."), cl_logINFO);
 }

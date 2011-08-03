@@ -3,7 +3,7 @@
 #include "../base/log.h"
 
 CLAbstractDataProcessor::CLAbstractDataProcessor(int maxQueueSize)
-    : m_dataQueue(maxQueueSize)
+	: m_dataQueue(maxQueueSize)
 {
 }
 
@@ -29,7 +29,7 @@ void CLAbstractDataProcessor::endOfRun()
 
 void CLAbstractDataProcessor::run()
 {
-	CL_LOG(cl_logINFO) cl_log.log("data processor started.", cl_logINFO);
+	CL_LOG(cl_logINFO) cl_log.log(QLatin1String("data processor started."), cl_logINFO);
 
 //	const int timeoutMs = 100;
 	while(!needToStop())
@@ -41,17 +41,17 @@ void CLAbstractDataProcessor::run()
 
 		if (!get)
 		{
-			CL_LOG(cl_logDEBUG2) cl_log.log("queue is empty ", (int)(long)(&m_dataQueue),cl_logDEBUG2);
+			CL_LOG(cl_logDEBUG2) cl_log.log(QLatin1String("queue is empty "), (int)(long)(&m_dataQueue),cl_logDEBUG2);
 			CLSleep::msleep(10);
 			continue;
 		}
-        while(!needToStop())
-        {
-            if (processData(data))
-                break;
-            else
-                CLSleep::msleep(1);
-        }
+		while(!needToStop())
+		{
+			if (processData(data))
+				break;
+			else
+				CLSleep::msleep(1);
+		}
 		//cl_log.log("queue size = ", m_dataQueue.size(),cl_logALWAYS);
 
 		data->releaseRef();
@@ -59,7 +59,7 @@ void CLAbstractDataProcessor::run()
 
 	endOfRun();
 
-	CL_LOG(cl_logINFO) cl_log.log("data processor stopped.", cl_logINFO);
+	CL_LOG(cl_logINFO) cl_log.log(QLatin1String("data processor stopped."), cl_logINFO);
 }
 
 int CLAbstractDataProcessor::queueSize() const

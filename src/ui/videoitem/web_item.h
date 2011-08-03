@@ -1,12 +1,14 @@
 #ifndef web_item_h_1425
 #define web_item_h_1425
 
+#include <QWebView>
+
 #include "abstract_scene_item.h"
 
 class CLWebItem : public CLAbstractSceneItem
 {
 public:
-	CLWebItem(GraphicsView* view, int max_width, int max_height, QString name="");
+	CLWebItem(GraphicsView* view, int max_width, int max_height, QString name = QString());
 	~CLWebItem();
 	void navigate(const QString& str);
 protected:

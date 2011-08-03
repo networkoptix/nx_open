@@ -14,10 +14,10 @@
 #include <QVariant>
 #include <QtGui/QDesktopWidget>
 #include <cmath> //for sin and cos
-#include <QMessageBox>
+#include <QtGui/QMessageBox>
 
 
-#if defined(Q_OS_WIN32)
+#if defined(Q_OS_WIN)
 #include <Qt/private/qwindowsurface_p.h>
 #elif defined(Q_OS_MAC)
 #import <Carbon/Carbon.h>
@@ -104,13 +104,13 @@ public:
 
     void freeGLResources()
     {
-		m_videoTextureReady = false;
-		m_updateFullAppLayer = true;
+        m_videoTextureReady = false;
+        m_updateFullAppLayer = true;
     }
 
     void freeResources()
     {
-		m_stopped = true;
+        m_stopped = true;
         QMutexLocker locker(&m_mutex);
         freeGLResources();
         m_textureUploaded = false;
@@ -125,14 +125,14 @@ public:
         m_saturation = saturation + 1.;
     }
     //the following function is called from the GUI thread
-	void drawTexture(GLuint texture, float wCoeff, float hCoeff, const float* tvArray = NULL) const;
-	void drawAppLayer(const QRect& r) const;
+    void drawTexture(GLuint texture, float wCoeff, float hCoeff, const float* tvArray = NULL) const;
+    void drawAppLayer(const QRect& r) const;
     void repaintCurrentFrame(QPainter &painter, const QRect &r);
-	void getTextureRect(QRect& drawRect, float textureWidth, float textureHeight,
-		float windowWidth, float windowHeight, const float sar) const;
-	int checkOpenGLError() const;
+    void getTextureRect(QRect& drawRect, float textureWidth, float textureHeight,
+        float windowWidth, float windowHeight, const float sar) const;
+    int checkOpenGLError() const;
 #ifdef _DEBUG
-	int checkOpenGLErrorDebug() const;
+    int checkOpenGLErrorDebug() const;
 #endif
 	void setAspectRatio(uint ar);
 	void drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const float* v_array);
@@ -156,7 +156,7 @@ private:
 
     VideoRendererSoft* m_renderer;
     mutable QMutex m_mutex;
-	const uchar** arrayPixels;
+    const uchar** arrayPixels;
     int m_width, m_height;
     bool m_textureUploaded;
 
@@ -165,15 +165,15 @@ private:
           m_contrast,
           m_hue,
           m_saturation;
-	// ffmpeg variables
-	QRect videoRect;
-	qreal painterOpacity;
-	QMutex* textureMutex;
-	QtvVideoDataReader* qtvFfmpegReader;
-	bool isSoftYuv2Rgb;
-	bool isNonPower2;
-	bool isTestVideoDriver;
-	float vArray[8];
+    // ffmpeg variables
+    QRect videoRect;
+    qreal painterOpacity;
+    QMutex* textureMutex;
+    QtvVideoDataReader* qtvFfmpegReader;
+    bool isSoftYuv2Rgb;
+    bool isNonPower2;
+    bool isTestVideoDriver;
+    float vArray[8];
 #ifdef FPS_COUNTER
    QTime fpsTime;
    int nbFramesDisplayed;
@@ -186,9 +186,9 @@ private:
         ProgramCount = 2
     };
 
-	void updateAppLayerTexture(QWidget* widget);
+    void updateAppLayerTexture(QWidget* widget);
     void updateTexture(QWidget* widget);
-	void preinit();
+    void preinit();
     void checkGLPrograms(QWidget *target);
 
 // extension prototypes
@@ -221,7 +221,7 @@ private:
     _glActiveTexture glActiveTexture;
     bool m_checkedPrograms;
     bool m_usingOpenGL;
-	bool m_stopped;
+    bool m_stopped;
     GLuint m_program[2];
     GLuint m_texture[3];
 
@@ -278,28 +278,28 @@ VideoRendererSoftFilter::VideoRendererSoftFilter(VideoRendererSoft *renderer, QW
 #else
 	isTestVideoDriver(false)
 #endif
-    ,m_usingOpenGL(false), m_checkedPrograms(false), m_textureUploaded(false)
+	,m_usingOpenGL(false), m_checkedPrograms(false), m_textureUploaded(false)
 {
     //simply initialize the array with default values
     applyMixerSettings(0., 0., 0., 0.);
-	m_afterPlayFirstTextureCreated = true;
-	m_updateFullAppLayer = true;
-	m_appLayerTextureReady = false;
-	m_videoTextureReady = false;
-	m_stopped = true;
-	m_alWidth = 1;
-	m_alHeight = 1;
-	m_backgroundWidth = m_backgroundheight = 0;
-	checkGLPrograms(widget);
+    m_afterPlayFirstTextureCreated = true;
+    m_updateFullAppLayer = true;
+    m_appLayerTextureReady = false;
+    m_videoTextureReady = false;
+    m_stopped = true;
+    m_alWidth = 1;
+    m_alHeight = 1;
+    m_backgroundWidth = m_backgroundheight = 0;
+    checkGLPrograms(widget);
 }
 
 VideoRendererSoftFilter::~VideoRendererSoftFilter()
 {
     //this frees up resources
     freeResources();
-	glDeleteTextures(1, &m_texture_appLayer);
-	OGL_CHECK_ERROR("glDeleteTextures");
-	m_texture_appLayer = 0;
+    glDeleteTextures(1, &m_texture_appLayer);
+    OGL_CHECK_ERROR("glDeleteTextures");
+    m_texture_appLayer = 0;
 }
 
 void VideoRendererSoftFilter::getTextureRect(QRect& drawRect, float textureWidth, float textureHeight,
@@ -406,7 +406,7 @@ void VideoRendererSoftFilter::Clear() const
 	};
 void VideoRendererSoftFilter::SwapBuffers() const
 {
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WIN
 	HDC hDc = wglGetCurrentDC();
 	if (!hDc) {
 		qDebug() << "wglGetCurrentDC: HDC == NULL, error code" << GetLastError();
@@ -418,9 +418,9 @@ void VideoRendererSoftFilter::SwapBuffers() const
 		}
 	}
 #elif Q_OS_MAC
-	// glXSwapBuffers or other platform specific function call 
+	// glXSwapBuffers or other platform specific function call
 #elif Q_OS_LINUX
-	// glXSwapBuffers or other platform specific function call 
+	// glXSwapBuffers or other platform specific function call
 #endif
 }
 	static const uchar YUV[] = {
@@ -643,16 +643,16 @@ void VideoRendererSoftFilter::initSoftYUV2RBG()
 
 void VideoRendererSoftFilter::checkGLPrograms(QWidget* target)
 {
-    if (!m_checkedPrograms) {
+	if (!m_checkedPrograms) {
 		QPainter painter(target);
 		m_checkedPrograms = true;
-        //we check only once if the widget is drawn using opengl
-        glProgramStringARB = (_glProgramStringARB) QGLContext::currentContext()->getProcAddress(QLatin1String("glProgramStringARB"));
-        glBindProgramARB = (_glBindProgramARB) QGLContext::currentContext()->getProcAddress(QLatin1String("glBindProgramARB"));
-        glDeleteProgramsARB = (_glDeleteProgramsARB) QGLContext::currentContext()->getProcAddress(QLatin1String("glDeleteProgramsARB"));
-        glGenProgramsARB = (_glGenProgramsARB) QGLContext::currentContext()->getProcAddress(QLatin1String("glGenProgramsARB"));
-        glProgramLocalParameter4fARB = (_glProgramLocalParameter4fARB) QGLContext::currentContext()->getProcAddress(QLatin1String("glProgramLocalParameter4fARB"));
-        glActiveTexture = (_glActiveTexture) QGLContext::currentContext()->getProcAddress(QLatin1String("glActiveTexture"));
+		//we check only once if the widget is drawn using opengl
+		glProgramStringARB = (_glProgramStringARB) QGLContext::currentContext()->getProcAddress(QLatin1String("glProgramStringARB"));
+		glBindProgramARB = (_glBindProgramARB) QGLContext::currentContext()->getProcAddress(QLatin1String("glBindProgramARB"));
+		glDeleteProgramsARB = (_glDeleteProgramsARB) QGLContext::currentContext()->getProcAddress(QLatin1String("glDeleteProgramsARB"));
+		glGenProgramsARB = (_glGenProgramsARB) QGLContext::currentContext()->getProcAddress(QLatin1String("glGenProgramsARB"));
+		glProgramLocalParameter4fARB = (_glProgramLocalParameter4fARB) QGLContext::currentContext()->getProcAddress(QLatin1String("glProgramLocalParameter4fARB"));
+		glActiveTexture = (_glActiveTexture) QGLContext::currentContext()->getProcAddress(QLatin1String("glActiveTexture"));
 
 		if (!glActiveTexture) {
 			qWarning() << "GL_ARB_multitexture not support";
@@ -664,21 +664,21 @@ void VideoRendererSoftFilter::checkGLPrograms(QWidget* target)
 		}
 		const char* version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
 
-        if (version) {
+		if (version) {
 			qWarning() << "OpenGL version: " << version;
 		}
 
-        const uchar* renderer = glGetString(GL_RENDERER);
+		const uchar* renderer = glGetString(GL_RENDERER);
 		if (renderer) {
 			qWarning() << "Renderer: " << reinterpret_cast<const char *>(renderer);
 		}
 
-        const uchar* vendor = glGetString(GL_VENDOR);
+		const uchar* vendor = glGetString(GL_VENDOR);
 		if (vendor) {
 			qWarning() << "Vendor: " << reinterpret_cast<const char *>(vendor);
 		}
 
-        //version = "1.0.7";
+		//version = "1.0.7";
 		if (version && QString(version) >= QString("1.2.0")) {
 			clampConstant = GL_CLAMP_TO_EDGE;
 		} else if (extensions && strstr(extensions, "GL_EXT_texture_edge_clamp")) {
@@ -690,9 +690,9 @@ void VideoRendererSoftFilter::checkGLPrograms(QWidget* target)
 		}
 
 		if (version && QString(version) <= "1.1.0") { // Microsoft Generic software
-			const QString& message = QObject::trUtf8("SLOW_OPENGL");
+			const QString message = QObject::tr("SLOW_OPENGL");
 			qWarning() << message << "\n";
-			QMessageBox* box = new QMessageBox(QMessageBox::Warning, "Info", message, QMessageBox::Ok, 0);
+			QMessageBox* box = new QMessageBox(QMessageBox::Warning, tr("Info"), message, QMessageBox::Ok, 0);
 			box->show();
 		}
 		bool error = false;
@@ -819,11 +819,11 @@ void  VideoRendererSoftFilter::updateAppLayerTexture(QWidget* widget)
 //        imageBytesPerLine = (imgDepth >> 3) * imgWidth;
         imgBits = (unsigned char*)CFDataGetBytePtr(imageData);
 #else
-     	QWindowSurface* surface = ndsWidget->windowSurface();
+        QWindowSurface* surface = ndsWidget->windowSurface();
 #ifdef _DEBUG
-		QImage* mainImg = dynamic_cast<QImage*> (surface->paintDevice());
+        QImage* mainImg = dynamic_cast<QImage*> (surface->paintDevice());
 #else
-		QImage* mainImg = static_cast<QImage*> (surface->paintDevice());
+        QImage* mainImg = static_cast<QImage*> (surface->paintDevice());
 #endif
 		if (!mainImg) {
 			return;
@@ -901,7 +901,7 @@ void  VideoRendererSoftFilter::updateAppLayerTexture(QWidget* widget)
 		OGL_CHECK_ERROR("glTexParameteri");
 		m_appLayerTextureReady = true;
 #ifdef Q_OS_MAC
-        CFRelease(imageData);
+		CFRelease(imageData);
 #endif
 	}
 	unsigned backgroundHandle = widget->property("ndsBackground").toUInt();
@@ -927,7 +927,7 @@ void  VideoRendererSoftFilter::updateAppLayerTexture(QWidget* widget)
 
 void VideoRendererSoftFilter::updateTexture(QWidget* widget)
 {
-	// new image 
+	// new image
 	updateAppLayerTexture(widget);
 	if (qtvFfmpegReader) {
 		m_stopped = !qtvFfmpegReader->isStop();
@@ -987,7 +987,7 @@ void VideoRendererSoftFilter::updateTexture(QWidget* widget)
 					GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels);
 			OGL_CHECK_ERROR("glTexSubImage2D");
 			glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-			OGL_CHECK_ERROR("glPixelStorei");				
+			OGL_CHECK_ERROR("glPixelStorei");
 		}
 	}
 	else {
@@ -1021,7 +1021,7 @@ void VideoRendererSoftFilter::updateTexture(QWidget* widget)
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, clampConstant);
 				OGL_CHECK_ERROR("glTexParameteri");
 			}
-		}				
+		}
 		int size = 4 * w[0] * h[0];
 		if (yuv2rgbBuffer.size() < size) {
 			yuv2rgbBuffer.resize(size);
@@ -1101,7 +1101,7 @@ void VideoRendererSoftFilter::drawAppLayer(const QRect& r) const
 }
 void VideoRendererSoftFilter::drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const float* v_array)
 {
-	
+
 	float tx_array[8] = {0.0f, 0.0f, m_videoCoeffW[0], 0.0f, m_videoCoeffW[0], m_videoCoeffH[0],
 		0.0f, m_videoCoeffH[0]};
 	if (!isSoftYuv2Rgb) {
@@ -1172,7 +1172,7 @@ void VideoRendererSoftFilter::drawVideoTexture(GLuint tex0, GLuint tex1, GLuint 
 }
 void VideoRendererSoftFilter::repaintCurrentFrame(QPainter &painter, const QRect &r)
 {
-	// paint event
+    // paint event
     QMutexLocker locker(&m_mutex);
 #ifdef FPS_COUNTER
 	if (fpsTime.elapsed() > 1000) {
@@ -1185,26 +1185,26 @@ void VideoRendererSoftFilter::repaintCurrentFrame(QPainter &painter, const QRect
 	videoRect = r;
 	painterOpacity = painter.opacity();
 #ifdef FPS_COUNTER
-    nbFramesDisplayed++;
+	nbFramesDisplayed++;
 #endif
 
     if (painter.paintEngine()->type() == QPaintEngine::OpenGL) {
         //for now we only support YUV (both YV12 and YUY2)
 
-        if (m_usingOpenGL) 
+		if (m_usingOpenGL)
 		{
 			//let's draw the texture
 			QRect temp;
-			if (m_stopped) 
+			if (m_stopped)
 			{
 				temp = r;
 			}
-			else 
+			else
 			{
-				if (m_width && m_height) 
+				if (m_width && m_height)
 				{
 					float aspect = static_cast<float>(m_width) / m_height;
-					if (autoAspect) 
+					if (autoAspect)
 					{
 						Par = qtvFfmpegReader->sar() * aspect;
 					}
@@ -1221,7 +1221,7 @@ void VideoRendererSoftFilter::repaintCurrentFrame(QPainter &painter, const QRect
 				if (!isTestVideoDriver) {
 					memcpy(vArray, v_array, sizeof(v_array));
 				}
-				if (checkVideoDriver()) 
+				if (checkVideoDriver())
 #endif
 				{
 					updateTexture(m_renderer->target());
@@ -1249,7 +1249,7 @@ bool VideoRendererSoftFilter::update(const uchar** pixels, uint width, uint heig
 {
 	Q_UNUSED(stride);
 	m_width = stride[0];
-	
+
 	m_height = height;
 	arrayPixels = pixels;
 	QApplication::postEvent(m_renderer, new QEvent(QEvent::UpdateRequest));
@@ -1309,17 +1309,17 @@ void VideoRendererSoft::repaintCurrentFrame(QWidget *target, const QRect &rect)
 
 void VideoRendererSoft::notifyResize(const QRect &rect)
 {
-    QSize vsize = videoSize();
+	QSize vsize = videoSize();
 	vsize = QSize(rect.width(), rect.height());
-    internalNotifyResize(rect.size(), vsize);
-    m_transform.reset();
+	internalNotifyResize(rect.size(), vsize);
+	m_transform.reset();
 
     if (vsize.isValid() && rect.isValid()) {
         m_transform.translate(m_dstX, m_dstY);
         const qreal sx = qreal(m_dstWidth) / qreal(vsize.width()),
             sy = qreal(m_dstHeight) / qreal(vsize.height());
         m_transform.scale(sx, sy);
-		m_videoRect = m_transform.mapRect( QRect(0,0, vsize.width(), vsize.height()));
+        m_videoRect = m_transform.mapRect( QRect(0,0, vsize.width(), vsize.height()));
     }
 }
 
@@ -1331,7 +1331,7 @@ QSize VideoRendererSoft::videoSize() const
 
 void VideoRendererSoft::applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation)
 {
-    m_renderer->applyMixerSettings(brightness, contrast, hue, saturation);
+	m_renderer->applyMixerSettings(brightness, contrast, hue, saturation);
 }
 
 bool VideoRendererSoft::event(QEvent *e)

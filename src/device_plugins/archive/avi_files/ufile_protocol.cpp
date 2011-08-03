@@ -12,9 +12,9 @@ static int ufile_open(URLContext *h, const char *filename, int flags)
 
     QFile::OpenMode mode;
 
-    if (flags & AVIO_FLAG_READ && flags & AVIO_FLAG_WRITE)
+    if ((flags & AVIO_FLAG_READ) != 0 && (flags & AVIO_FLAG_WRITE) != 0)
         mode = QIODevice::ReadWrite;
-    else if (flags & AVIO_FLAG_WRITE)
+    else if ((flags & AVIO_FLAG_WRITE) != 0)
         mode = QIODevice::WriteOnly;
     else
         mode = QIODevice::ReadOnly;

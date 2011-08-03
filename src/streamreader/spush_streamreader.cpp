@@ -13,7 +13,7 @@ CLStreamreader(dev)
 
 void CLServerPushStreamreader::run()
 {
-	CL_LOG(cl_logINFO) cl_log.log("stream reader started.", cl_logINFO);
+	CL_LOG(cl_logINFO) cl_log.log(QLatin1String("stream reader started."), cl_logINFO);
 
 	setNeedKeyData();
 	m_device->onBeforeStart();
@@ -77,7 +77,7 @@ void CLServerPushStreamreader::run()
 
 		if (videoData && needKeyData())
 		{
-			// I do not like; need to do smth with it 
+			// I do not like; need to do smth with it
 			if (videoData->keyFrame)
 			{
 				if (videoData->channelNumber>CL_MAX_CHANNEL_NUMBER-1)
@@ -104,18 +104,18 @@ void CLServerPushStreamreader::run()
 
         // check queue sizes
         if (dataCanBeAccepted())
-            putData(data);        
+            putData(data);
         else
         {
             setNeedKeyData();
             data->releaseRef();
         }
 
-        
-	}
+
+    }
 
     if (isStreamOpened())
         closeStream();
 
-	CL_LOG(cl_logINFO) cl_log.log("stream reader stopped.", cl_logINFO);
+    CL_LOG(cl_logINFO) cl_log.log(QLatin1String("stream reader stopped."), cl_logINFO);
 }

@@ -16,12 +16,12 @@ m_view(view)
 
     setFocusPolicy(Qt::NoFocus);
 
-	m_lineEdit = new CLSearchEdit(this);
+    m_lineEdit = new CLSearchEdit(this);
     m_lineEdit->setFocusWidget(m_view);
-	m_lineEdit->setFocus();
+    m_lineEdit->setFocus();
 
 
-    /*/
+	/*/
 	QString style (
 
 		"QLineEdit{ border-width: 2px; \n"
@@ -46,10 +46,9 @@ m_view(view)
 		"border-bottom-color: rgb(255, 255, 255);}"
 		);
 
-        */
+		*/
 
-    QString style (
-
+    QString style = QLatin1String(
         "QLineEdit{ border-width: 2px; \n"
         "color: rgb(150,150, 150); \n"
         "background-color: rgb(0, 16, 72);\n"
@@ -70,10 +69,10 @@ m_view(view)
         "border-left-color: rgb(150,150, 150); \n"
         "border-right-color: rgb(150,150, 150); \n"
         "border-bottom-color: rgb(150,150, 150);}"
-        );
+    );
 
 
-    m_lineEdit->setStyleSheet(style);
+	m_lineEdit->setStyleSheet(style);
 
 	m_height = 40;
 
@@ -86,17 +85,17 @@ m_view(view)
 	m_lstview->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_lstview->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-	m_lstview->setStyleSheet(
+	m_lstview->setStyleSheet(QLatin1String(
 		"color: rgb(150,150, 150);"
 		"background-color: rgb(0, 16, 72);"
 		"selection-color: yellow;"
 		"selection-background-color: blue;"
-		"font-size: 20px; \n");
+		"font-size: 20px; \n"));
 
 	m_completer->setPopup(m_lstview);
 
 	m_lineEdit->setCompleter(m_completer);
-	connect(m_lineEdit, SIGNAL( textChanged ( const QString &) ), this, SLOT(onEditTextChanged (const QString& )));
+	connect(m_lineEdit, SIGNAL(textChanged(QString)), this, SLOT(onEditTextChanged(QString)));
 
 	mTimer.setSingleShot(true);
 	mTimer.setInterval(600);
@@ -179,9 +178,9 @@ void CLSerachEditItem::onTimer()
     }
     else
         cr.setCriteria(CLDeviceCriteria::NONE);
-		
 
-	m_sceneContent->setDeviceCriteria(cr);
+
+    m_sceneContent->setDeviceCriteria(cr);
 
 }
 

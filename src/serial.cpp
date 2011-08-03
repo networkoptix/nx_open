@@ -1,5 +1,7 @@
 #include "serial.h"
 
+#include <QtCore/QCryptographicHash>
+
 SerialChecker::SerialChecker()
 {
 #include "serials.ipp"
@@ -7,6 +9,6 @@ SerialChecker::SerialChecker()
 
 bool SerialChecker::isValidSerial(const QString& serial)
 {
-    QString serialHash(QCryptographicHash::hash(serial.toAscii(), QCryptographicHash::Md5).toHex());
-    return m_serialHashes.indexOf(serialHash) != -1;
+    QString serialHash = QString::fromAscii(QCryptographicHash::hash(serial.toAscii(), QCryptographicHash::Md5).toHex().constData());
+    return m_serialHashes.contains(serialHash);
 }

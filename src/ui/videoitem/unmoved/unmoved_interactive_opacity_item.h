@@ -2,7 +2,6 @@
 #define CLUnMovedInteractiveOpacityItem_1758_h
 
 #include "abstract_unmoved_opacity_item.h"
-class QPropertyAnimation;
 
 class CLUnMovedInteractiveOpacityItem: public CLAbstractUnMovedOpacityItem
 {
@@ -18,8 +17,6 @@ protected:
 	virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
 	virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
 
-protected:
-    bool needAnimation() const;
 protected:
 	qreal m_normal_opacity;
 	qreal m_active_opacity;

@@ -18,7 +18,7 @@ LayoutContent::LayoutContent() :
     m_editable(false),
     m_interaction_flags(0xffffffff)
 {
-    setName("Layout:unnamed");
+    setName(QLatin1String("Layout:unnamed"));
 }
 
 LayoutContent::~LayoutContent()
@@ -55,7 +55,7 @@ void LayoutContent::destroy(bool skipSubL)
         }
         m_childlist.clear();
     }
-    
+
 
 }
 
@@ -79,14 +79,14 @@ bool LayoutContent::isEditable() const
 	return m_editable;
 }
 
-void LayoutContent::setEditable(bool editable) 
+void LayoutContent::setEditable(bool editable)
 {
 	m_editable = editable;
 }
 
 CLUserGridSettings& LayoutContent::getGridSettings()
 {
-    return mGridSettings;
+	return mGridSettings;
 }
 
 bool LayoutContent::hasSuchSublayoutName(const QString& name) const
@@ -164,16 +164,16 @@ LayoutContent* LayoutContent::getParent() const
 
 LayoutButton* LayoutContent::addButton(const QString& text, const QString& tooltip, const CLBasicLayoutItemSettings& setting)
 {
-    LayoutButton* result = new LayoutButton(text, tooltip, setting);
+	LayoutButton* result = new LayoutButton(text, tooltip, setting);
 	m_btns.push_back(result);
-    return result;
+	return result;
 }
 
 LayoutImage* LayoutContent::addImage(const QString& img, const QString& text, const QString& tooltip, const CLBasicLayoutItemSettings& setting)
 {
-    LayoutImage* result = new LayoutImage(img, text, tooltip, setting);
+	LayoutImage* result = new LayoutImage(img, text, tooltip, setting);
 	m_imgs.push_back(result);
-    return result;
+	return result;
 }
 
 LayoutDevice* LayoutContent::addDevice(const QString& uniqueId, const CLBasicLayoutItemSettings& setting )
@@ -182,9 +182,9 @@ LayoutDevice* LayoutContent::addDevice(const QString& uniqueId, const CLBasicLay
     if (result)
         return result;
 
-    result = new LayoutDevice(uniqueId, setting);
+	result = new LayoutDevice(uniqueId, setting);
 	m_devices.push_back(result);
-    return result;
+	return result;
 }
 
 void LayoutContent::removeDevice(const QString& uniqueId)
@@ -216,7 +216,7 @@ LayoutContent* LayoutContent::addLayout(LayoutContent* l, bool copy)
 void LayoutContent::removeLayout(LayoutContent* l, bool del)
 {
 	m_childlist.removeOne(l);
-	if (del) 
+	if (del)
 		delete l;
 }
 
@@ -230,12 +230,12 @@ CLDeviceCriteria LayoutContent::getDeviceCriteria() const
 	return m_cr;
 }
 
-QList<LayoutImage*>& LayoutContent::getImages() 
+QList<LayoutImage*>& LayoutContent::getImages()
 {
 	return m_imgs;
 }
 
-QList<LayoutButton*>& LayoutContent::getButtons() 
+QList<LayoutButton*>& LayoutContent::getButtons()
 {
 	return m_btns;
 }
@@ -245,23 +245,23 @@ QList<LayoutDevice*>& LayoutContent::getDevices()
 	return m_devices;
 }
 
-QList<LayoutContent*>& LayoutContent::childrenList() 
+QList<LayoutContent*>& LayoutContent::childrenList()
 {
 	return m_childlist;
 }
 
-void LayoutContent::toXml(QDomDocument& doc, QDomElement& parent) 
+void LayoutContent::toXml(QDomDocument& doc, QDomElement& parent)
 {
-	QDomElement element = doc.createElement("Layout");
-	element.setAttribute("type", Type2String(type()));
-	element.setAttribute("name", getName());
-	element.setAttribute("recorder", (int)isRecorder());
+	QDomElement element = doc.createElement(QLatin1String("Layout"));
+	element.setAttribute(QLatin1String("type"), Type2String(type()));
+	element.setAttribute(QLatin1String("name"), getName());
+	element.setAttribute(QLatin1String("recorder"), (int)isRecorder());
 
-    element.setAttribute("max_rows", mGridSettings.max_rows);
-    element.setAttribute("item_distance", mGridSettings.item_distance);
-    element.setAttribute("optimal_ratio", mGridSettings.optimal_ratio);
+    element.setAttribute(QLatin1String("max_rows"), mGridSettings.max_rows);
+    element.setAttribute(QLatin1String("item_distance"), mGridSettings.item_distance);
+    element.setAttribute(QLatin1String("optimal_ratio"), mGridSettings.optimal_ratio);
 
-	parent.appendChild(element);
+    parent.appendChild(element);
 
 	QList<LayoutDevice*>& dev_lst = getDevices();
 	foreach(LayoutDevice* dev, dev_lst)
@@ -271,9 +271,7 @@ void LayoutContent::toXml(QDomDocument& doc, QDomElement& parent)
 
 	QList<LayoutContent*>& l_lst = childrenList();
 	foreach(LayoutContent* l, l_lst)
-	{
 		l->toXml(doc, element);
-	}
 }
 
 unsigned int LayoutContent::numberOfPages(unsigned int maxItemsPerPage)
@@ -330,10 +328,10 @@ bool LayoutContent::checkIntereactionFlag(unsigned long flag)
 
 LayoutContent* LayoutContent::coppyLayoutContent(LayoutContent* l, bool skipSubL)
 {
-	LayoutContent* result = new LayoutContent();
+    LayoutContent* result = new LayoutContent();
     coppyLayoutContent(result, l, skipSubL);
 
-	return result;
+    return result;
 }
 
 void LayoutContent::coppyLayoutContent(LayoutContent* to, LayoutContent* from, bool skipSubL)
@@ -344,7 +342,7 @@ void LayoutContent::coppyLayoutContent(LayoutContent* to, LayoutContent* from, b
     QList<LayoutContent*> lst_tmp = to->m_childlist;
 
     *to = *from; // this copy everything including lists of pointers; we do not need that;
-    
+
     to->m_imgs.clear();
     to->m_btns.clear();
     to->m_devices.clear();

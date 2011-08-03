@@ -24,7 +24,7 @@ bool IQEyeDeviceServer::isProxy() const
 
 QString IQEyeDeviceServer::name() const
 {
-    return "IQEye";
+    return QLatin1String("IQEye");
 }
 
 

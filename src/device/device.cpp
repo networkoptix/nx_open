@@ -18,14 +18,14 @@ CLDevice::CLDevice():
 m_deviceTypeFlags(0),
 m_videolayout(0)
 {
-	inst++;	
+	inst++;
 };
 
 CLDevice::~CLDevice()
 {
 	delete m_videolayout;
-	inst--;	
-	cl_log.log("inst", inst, cl_logDEBUG1);
+	inst--;
+	cl_log.log(QLatin1String("inst"), inst, cl_logDEBUG1);
 };
 
 void CLDevice::setParentId(QString parentid)
@@ -175,7 +175,7 @@ void CLDevice::deleteDevices(CLDeviceList& lst)
 	{
 		CLDevice* device = it.value();
 		//delete device; //here+
-		device->releaseRef(); 
+		device->releaseRef();
 		//lst.erase(it++);
 
 		++it;
@@ -195,45 +195,26 @@ void CLDevice::addReferences(CLDeviceList& lst)
 
 }
 
-#ifndef _WIN32
 struct T
 {
 	T(CLDevice* d)
 	{
 		device = d;
 	}
-	
+
 	void f()
 	{
 		device->getBaseInfo();
 	}
-	
+
 	CLDevice* device;
 };
-#endif
 
 void CLDevice::getDevicesBasicInfo(CLDeviceList& lst, int threads)
 {
 	// cannot make concurrent work with pointer CLDevice* ; => so extra steps needed
 
-#ifdef _WIN32
-    struct T
-    {
-        T(CLDevice* d)
-        {
-            device = d;
-        }
-
-        void f()
-        {
-            device->getBaseInfo();
-        }
-
-        CLDevice* device;
-    };
-#endif
-
-	cl_log.log("Geting device info...", cl_logDEBUG1);
+	cl_log.log(QLatin1String("Geting device info..."), cl_logDEBUG1);
 	QTime time;
 	time.start();
 
@@ -256,7 +237,7 @@ void CLDevice::getDevicesBasicInfo(CLDeviceList& lst, int threads)
 
 	CL_LOG(cl_logDEBUG1)
 	{
-		cl_log.log("Done. Time elapsed: ", time.elapsed(), cl_logDEBUG1);
+		cl_log.log(QLatin1String("Done. Time elapsed: "), time.elapsed(), cl_logDEBUG1);
 
 		for (CLDeviceList::iterator it = lst.begin(); it != lst.end(); ++it)
 			cl_log.log(it.value()->toString(), cl_logDEBUG1);
@@ -269,7 +250,7 @@ bool CLDevice::getParam(const QString& name, CLValue& /*val*/, bool /*resynch*/)
 {
 	if (!getDeviceParamList().exists(name))
 	{
-		cl_log.log("getParam: requested param does not exist!", cl_logWARNING);
+		cl_log.log(QLatin1String("getParam: requested param does not exist!"), cl_logWARNING);
 		return false;
 	}
 
@@ -280,13 +261,13 @@ bool CLDevice::setParam(const QString& name, const CLValue& /*val*/)
 {
 	if (!getDeviceParamList().exists(name))
 	{
-		cl_log.log("setParam: requested param does not exist!", cl_logWARNING);
+		cl_log.log(QLatin1String("setParam: requested param does not exist!"), cl_logWARNING);
 		return false;
 	}
 
 	if (getDeviceParamList().get(name).value.readonly)
 	{
-		cl_log.log("setParam: cannot set readonly param!", cl_logWARNING);
+		cl_log.log(QLatin1String("setParam: cannot set readonly param!"), cl_logWARNING);
 		return false;
 	}
 

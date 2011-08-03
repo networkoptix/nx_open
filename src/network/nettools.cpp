@@ -32,7 +32,7 @@ QString MACToString (unsigned char* mac)
 		else
 			sprintf (t, ("%02X"), mac[i]);
 
-		result+=t;
+		result += QString::fromLatin1(t);
 	}
 
 	return result;
@@ -58,14 +58,14 @@ unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress)
 			return 0;
 		}
 
-		//Convert into number. 
+		//Convert into number.
 		//       a. If character is digit then ch - '0'
-		//	b. else (ch - 'a' + 10) it is done 
+		//	b. else (ch - 'a' + 10) it is done
 		//	because addition of 10 takes correct value.
 		iNumber = isdigit (ch) ? (ch - '0') : (ch - 'a' + 10);
 		ch = tolower (*pszMACAddress);
 
-		if ((iConunter < 5 && ch != cSep) || 
+		if ((iConunter < 5 && ch != cSep) ||
 			(iConunter == 5 && ch != '\0' && !isspace (ch)))
 		{
 			++pszMACAddress;
@@ -94,7 +94,7 @@ unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress)
 
 QList<QNetworkAddressEntry> getAllIPv4AddressEntries()
 {
-	QList<QNetworkInterface> inter_list = QNetworkInterface::allInterfaces(); // all interfaces 
+	QList<QNetworkInterface> inter_list = QNetworkInterface::allInterfaces(); // all interfaces
 
 	QList<QNetworkAddressEntry> ipv4_enty_list;
 
@@ -108,8 +108,8 @@ QList<QNetworkAddressEntry> getAllIPv4AddressEntries()
 		{
 			const QNetworkAddressEntry& adrentr = addr_enntry_list.at(al);
 			if (QAbstractSocket::IPv4Protocol == adrentr.ip().protocol() && // if it has IPV4
-                adrentr.ip()!=QHostAddress::LocalHost &&// if this is not 0.0.0.0 or 127.0.0.1
-                adrentr.netmask().toIPv4Address()!=0) // and mask !=0
+				adrentr.ip()!=QHostAddress::LocalHost &&// if this is not 0.0.0.0 or 127.0.0.1
+				adrentr.netmask().toIPv4Address()!=0) // and mask !=0
 				ipv4_enty_list.push_back(addr_enntry_list.at(al));
 
 		}
@@ -153,7 +153,7 @@ bool getNextAvailableAddr(CLSubNetState& state, const CLIPList& busy_lst)
 		}
 
 		if (curr==original)
-			return false; // all addresses are busy 
+			return false; // all addresses are busy
 
 		if (busy_lst.find(curr)!=busy_lst.end())// this ip is already in use
 			continue;
@@ -163,7 +163,7 @@ bool getNextAvailableAddr(CLSubNetState& state, const CLIPList& busy_lst)
 			// is this free addr?
 			// let's check with ARP request also; might be it's not pingable device
 
-			//if (getMacByIP(QHostAddress(curr)) == "") // to long 
+			//if (getMacByIP(QHostAddress(curr)).isEmpty()) // to long
 			break;
 
 		}
@@ -178,7 +178,7 @@ struct PinagableT
 {
 	quint32 addr;
 	bool online;
-	
+
 	void f()
 	{
 		online = false;
@@ -190,8 +190,9 @@ struct PinagableT
 
 QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHostAddress& endAddr, int threads)
 {
-    cl_log.log("about to find all ip responded to ping....", cl_logALWAYS);
-    QTime time;   time.restart();
+    cl_log.log(QLatin1String("about to find all ip responded to ping...."), cl_logALWAYS);
+    QTime time;
+    time.restart();
 
     quint32 curr = startAddr.toIPv4Address();
     quint32 maxaddr = endAddr.toIPv4Address();
@@ -207,7 +208,7 @@ QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHost
 
         ++curr;
     }
-    
+
 
     QThreadPool* global = QThreadPool::globalInstance();
     for (int i = 0; i < threads; ++i ) global->releaseThread();
@@ -222,11 +223,11 @@ QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHost
             result.push_back(QHostAddress(addr.addr));
     }
 
-    cl_log.log("Done. time elapsed = ", time.elapsed(), cl_logALWAYS);
+    cl_log.log(QLatin1String("Done. time elapsed = "), time.elapsed(), cl_logALWAYS);
 
     CL_LOG(cl_logDEBUG1)
     {
-        cl_log.log("ping results...", cl_logALWAYS);
+        cl_log.log(QLatin1String("ping results..."), cl_logALWAYS);
         foreach(QHostAddress addr, result)
             cl_log.log(addr.toString(), cl_logALWAYS);
     }
@@ -239,47 +240,40 @@ QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHost
 
 
 //{ windows
-#ifdef _WIN32
+#ifdef Q_OS_WIN
 
 void removeARPrecord(const QHostAddress& ip)
 {
-	MIB_IPNETTABLE* mtb = 0;
 	unsigned long ulSize = 0;
 	GetIpNetTable(0, &ulSize, false);
 
-	mtb = new MIB_IPNETTABLE[ ulSize/sizeof(MIB_IPNETTABLE) + 1];
+	MIB_IPNETTABLE *mtb = new MIB_IPNETTABLE[ulSize/sizeof(MIB_IPNETTABLE) + 1];
 
-	if(NO_ERROR != GetIpNetTable(mtb, &ulSize, false))
-		return;
-
-	//GetIpNetTable(mtb, &ulSize, TRUE);
-
-	in_addr addr;
-	int i = 0;
-	for(i = 0; i < mtb->dwNumEntries; i++)
+	if (GetIpNetTable(mtb, &ulSize, false) == NO_ERROR)
 	{
-		addr.S_un.S_addr = mtb->table[i].dwAddr;
+		//GetIpNetTable(mtb, &ulSize, TRUE);
 
-		QString wip;
-
-		wip = (inet_ntoa(addr));
-		if(wip == ip.toString() && NO_ERROR == DeleteIpNetEntry(&mtb->table[i]))
+		in_addr addr;
+		for (int i = 0; i < mtb->dwNumEntries; ++i)
 		{
-			int old_size = mtb->dwNumEntries;
+			addr.S_un.S_addr = mtb->table[i].dwAddr;
 
-			GetIpNetTable(mtb, &ulSize, FALSE);
-
-			if (mtb->dwNumEntries == old_size)
+			QString wip = QString::fromLatin1(inet_ntoa(addr)); // ### NLS support?
+			if (wip == ip.toString() && DeleteIpNetEntry(&mtb->table[i]) == NO_ERROR)
 			{
-				break;
+				int old_size = mtb->dwNumEntries;
+
+				GetIpNetTable(mtb, &ulSize, FALSE);
+
+				if (mtb->dwNumEntries == old_size)
+					break;
+
+				i = 0;
 			}
-
-			i = 0;
-
 		}
 	}
 
-	delete[] mtb;
+	delete [] mtb;
 }
 
 // this is only works in local networks
@@ -306,40 +300,39 @@ QString getMacByIP(const QHostAddress& ip, bool net)
 		hr = SendARP (ipAddr, 0, pulMac, &ulLen);
 
 		if (ulLen==0)
-			return "";
+			return QString();
 
 		return MACToString((unsigned char*)pulMac);
 	}
 
-	// from memorry
-	MIB_IPNETTABLE* mtb = 0;
+	QString res;
+
+	// from memory
 	unsigned long ulSize = 0;
 	GetIpNetTable(0, &ulSize, false);
 
-	mtb = new MIB_IPNETTABLE[ ulSize/sizeof(MIB_IPNETTABLE) + 1];
+	MIB_IPNETTABLE *mtb = new MIB_IPNETTABLE[ ulSize/sizeof(MIB_IPNETTABLE) + 1];
 
-	if(NO_ERROR != GetIpNetTable(mtb, &ulSize, false))
-		return "";
-
-	//GetIpNetTable(mtb, &ulSize, TRUE);
-
-	in_addr addr;
-	int i = 0;
-	for(i = 0; i < mtb->dwNumEntries; i++)
+	if (GetIpNetTable(mtb, &ulSize, false) == NO_ERROR)
 	{
-		addr.S_un.S_addr = mtb->table[i].dwAddr;
-		QString wip;
-		wip = (inet_ntoa(addr));
-		if(wip == ip.toString() )
+		//GetIpNetTable(mtb, &ulSize, TRUE);
+
+		in_addr addr;
+		for (int i = 0; i < mtb->dwNumEntries; ++i)
 		{
-			return MACToString((unsigned char*)(mtb->table[i].bPhysAddr));
+			addr.S_un.S_addr = mtb->table[i].dwAddr;
+			QString wip = QString::fromLatin1(inet_ntoa(addr)); // ### NLS support?
+			if (wip == ip.toString() )
+			{
+				res = MACToString((unsigned char*)(mtb->table[i].bPhysAddr));
+				break;
+			}
 		}
 	}
 
-	delete[] mtb;
+	delete [] mtb;
 
-	return "";
-
+	return res;
 }
 
 #else
@@ -362,67 +355,67 @@ void removeARPrecord(const QHostAddress& /*ip*/) {}
 
 QString getMacByIP(const QHostAddress& ip, bool /*net*/)
 {
-	return "";
-	
+	return QString();
+
 	// This function is almost working in net=false mode
 	// Need to fix ip comparison.
-	
+
     int mib[6];
     size_t needed;
     char *lim, *buf, *next;
-	
+
     mib[0] = CTL_NET;
     mib[1] = PF_ROUTE;
     mib[2] = 0;
     mib[3] = AF_INET;
     mib[4] = NET_RT_FLAGS;
     mib[5] = RTF_LLINFO;
-	
-    if (sysctl(mib, 6, NULL, &needed, NULL, 0) < 0)
+
+	if (sysctl(mib, 6, NULL, &needed, NULL, 0) < 0)
 	{
 		cl_log.log("sysctl: route-sysctl-estimate error", cl_logERROR);
-		return "";
+		return QString();
 //		errx(1, "route-sysctl-estimate");
 	}
-	
-    if ((buf = (char*)malloc(needed)) == NULL)
+
+	if ((buf = (char*)malloc(needed)) == NULL)
 	{
-		return "";
+		return QString();
 //        errx(1, "malloc");
 	}
-	
-    if (sysctl(mib, 6, buf, &needed, NULL, 0) < 0)
+
+	if (sysctl(mib, 6, buf, &needed, NULL, 0) < 0)
 	{
 		cl_log.log("actual retrieval of routing table failed", cl_logERROR);
-		return "";
+		return QString();
 //        errx(1, "actual retrieval of routing table");
 	}
-	
+
     lim = buf + needed;
     next = buf;
     while (next < lim) {
         struct rt_msghdr *rtm = (struct rt_msghdr *)next;
         struct sockaddr_inarp *sinarp = (struct sockaddr_inarp *)(rtm + 1);
         struct sockaddr_dl *sdl = (struct sockaddr_dl *)((char *)sinarp + ROUNDUP(sinarp->sin_len));
-		
-        if (sdl->sdl_alen) { /* complete ARP entry */
+
+		if (sdl->sdl_alen) { /* complete ARP entry */
 			cl_log.log(cl_logALWAYS, "%d ? %d", ip.toIPv4Address(), sinarp->sin_addr.s_addr);
 			if (ip.toIPv4Address() == sinarp->sin_addr.s_addr)
 			{
 				free(buf);
 				return MACToString((unsigned char*)LLADDR(sdl));
 			}
-			
+
 //            printf("%s at ", inet_ntoa(sinarp->sin_addr));
 //            printf("%s", ether_ntoa((struct ether_addr *)LLADDR(sdl)));
 //            printf("\n");
         }
         next += rtm->rtm_msglen;
     }
-	
+
     free(buf);
-	
-	return "";
+
+    return QString();
 }
 #endif
 //}

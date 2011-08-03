@@ -15,15 +15,13 @@ public:
 protected:
     void run();
     CLDeviceList findDevices(const QString& directory);
-private:
-    static QStringList subDirList(const QString& abspath);
-protected:
 
+protected:
     QStringList mDirsToCheck;
     CLDeviceList mResult;
 
-    volatile bool mNeedStop;
-	
+	volatile bool mNeedStop;
+
 };
 
 #endif //directory_browser_h_1708

@@ -35,13 +35,13 @@
 # define GL_TEXTURE2    0x84C2
 #endif
 
-static const int MAX_SHADER_SIZE = 1024*3; 
+static const int MAX_SHADER_SIZE = 1024*3;
 static const int ROUND_COEFF = 8;
 
 QVector<quint8> CLGLRenderer::m_staticYFiller;
 QVector<quint8> CLGLRenderer::m_staticUVFiller;
 
-QMutex CLGLRenderer::m_programMutex; 
+QMutex CLGLRenderer::m_programMutex;
 bool CLGLRenderer::m_programInited = false;
 GLuint CLGLRenderer::m_program[2];
 
@@ -160,9 +160,7 @@ int CLGLRenderer::checkOpenGLError() const
     {
         const char* errorString = reinterpret_cast<const char *>(gluErrorString(err));
         if (errorString)
-        {
-            cl_log.log("OpenGL Error: ",  errorString, cl_logERROR);
-        }
+            cl_log.log(QLatin1String("OpenGL Error: "), QString::fromLatin1(errorString), cl_logERROR);
     }
     return err;
 }
@@ -193,7 +191,7 @@ void CLGLRenderer::clearGarbage()
     mGarbage.clear();
 }
 
-void CLGLRenderer::getTextureRect(QRect& drawRect, 
+void CLGLRenderer::getTextureRect(QRect& drawRect,
                     float textureWidth, float textureHeight,
                     float windowWidth, float windowHeight, const float sar) const
 {
@@ -223,38 +221,38 @@ void CLGLRenderer::init(bool msgbox)
 
     if (!glActiveTexture)
     {
-        CL_LOG(cl_logWARNING) cl_log.log("GL_ARB_multitexture not supported",cl_logWARNING);
+        CL_LOG(cl_logWARNING) cl_log.log(QLatin1String("GL_ARB_multitexture not supported"), cl_logWARNING);
     }
 
     // OpenGL info
     const char* extensions = reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS));
     if (extensions)
     {
-        CL_LOG(cl_logWARNING) cl_log.log("OpenGL extensions: ", extensions, cl_logDEBUG1);
+        CL_LOG(cl_logWARNING) cl_log.log(QLatin1String("OpenGL extensions: "), QString::fromLatin1(extensions), cl_logDEBUG1);
     }
     const char* version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
 
     if (version)
     {
         //CL_LOG(cl_logWARNING) cl_log.log(,cl_logWARNING);
-        CL_LOG(cl_logWARNING) cl_log.log("OpenGL version: ", version, cl_logALWAYS);
+        CL_LOG(cl_logWARNING) cl_log.log(QLatin1String("OpenGL version: "), QString::fromLatin1(version), cl_logALWAYS);
     }
 
     const uchar* renderer = glGetString(GL_RENDERER);
     if (renderer)
     {
-        CL_LOG(cl_logWARNING) cl_log.log("Renderer: ", reinterpret_cast<const char *>(renderer),cl_logALWAYS);
+        CL_LOG(cl_logWARNING) cl_log.log(QLatin1String("Renderer: "), QString::fromLatin1((const char *)renderer), cl_logALWAYS);
     }
 
     const uchar* vendor = glGetString(GL_VENDOR);
     if (vendor)
     {
-        CL_LOG(cl_logWARNING) cl_log.log("Vendor: ", reinterpret_cast<const char *>(vendor),cl_logALWAYS);
+        CL_LOG(cl_logWARNING) cl_log.log(QLatin1String("Vendor: "), QString::fromLatin1((const char *)vendor), cl_logALWAYS);
     }
 
     //version = "1.0.7";
     clampConstant = GL_CLAMP;
-    if (version && QString(version) >= QString("1.2.0"))
+    if (version && QLatin1String(version) >= QLatin1String("1.2.0"))
     {
         clampConstant = GL_CLAMP_TO_EDGE;
     }
@@ -267,14 +265,15 @@ void CLGLRenderer::init(bool msgbox)
         clampConstant = GL_CLAMP_TO_EDGE_SGIS;
     }
 
-    if (version && QString(version) <= "1.1.0")
+    if (version && QLatin1String(version) <= QLatin1String("1.1.0"))
     { // Microsoft Generic software
-        const QString& message = QObject::trUtf8("SLOW_OPENGL");
+        const QString message = QObject::tr("SLOW_OPENGL");
         CL_LOG(cl_logWARNING) cl_log.log(message ,cl_logWARNING);
         if (msgbox)
         {
-            QMessageBox* box = new QMessageBox(QMessageBox::Warning, "Info", message, QMessageBox::Ok, 0);
+            QMessageBox* box = new QMessageBox(QMessageBox::Warning, QObject::tr("Info"), message, QMessageBox::Ok, 0);
             box->show();
+            // ### fix leaking
         }
     }
 
@@ -282,11 +281,11 @@ void CLGLRenderer::init(bool msgbox)
     if (extensions)
     {
         isNonPower2 = strstr(extensions, "GL_ARB_texture_non_power_of_two") != NULL;
-        
+
         const char* fragmentProgram = "GL_ARB_fragment_program";
         if (!strstr(extensions, fragmentProgram))
         {
-            CL_LOG(cl_logERROR) cl_log.log(fragmentProgram, " not support" ,cl_logERROR);
+            CL_LOG(cl_logERROR) cl_log.log(QString::fromLatin1(fragmentProgram), QLatin1String(" not support"), cl_logERROR);
             error = true;
         }
     }
@@ -321,7 +320,7 @@ void CLGLRenderer::init(bool msgbox)
             if (error)
             {
                 glDeleteProgramsARB(2, m_program);
-                CL_LOG(cl_logERROR) cl_log.log("Error compile shader!!!", cl_logERROR);
+                CL_LOG(cl_logERROR) cl_log.log(QLatin1String("Error compile shader!!!"), cl_logERROR);
             }
             else
                 m_programInited = true;
@@ -340,18 +339,19 @@ void CLGLRenderer::init(bool msgbox)
 
     if (error)
     {
-        CL_LOG(cl_logWARNING) cl_log.log("OpenGL shader support init failed, use soft yuv->rgb converter!!!", cl_logWARNING);
+        CL_LOG(cl_logWARNING) cl_log.log(QLatin1String("OpenGL shader support init failed, use soft yuv->rgb converter!!!"), cl_logWARNING);
         isSoftYuv2Rgb = true;
 
         // in this first revision we do not support software color transform
         gl_status = CL_GL_NOT_SUPPORTED;
 
-        const QString& message = QObject::trUtf8("This software version supports only GPU(not CPU) color transformation. This video card do not supports shaders(GPU transforms). Please contact to developers to get new software version with YUV=>RGB software transform for your video card. Or update your video card:-)");
+        const QString message = QObject::tr("This software version supports only GPU(not CPU) color transformation. This video card do not supports shaders(GPU transforms). Please contact to developers to get new software version with YUV=>RGB software transform for your video card. Or update your video card:-)");
         CL_LOG(cl_logWARNING) cl_log.log(message ,cl_logWARNING);
         if (msgbox)
         {
-            QMessageBox* box = new QMessageBox(QMessageBox::Warning, "Info", message, QMessageBox::Ok, 0);
+            QMessageBox* box = new QMessageBox(QMessageBox::Warning, QObject::tr("Info"), message, QMessageBox::Ok, 0);
             box->show();
+            // ### fix leaking
         }
 
     }
@@ -401,9 +401,9 @@ int CLGLRenderer::getMaxTextureSize()
 
         if (!ms_maxTextureSize)
         {
-            glGetIntegerv(GL_MAX_TEXTURE_SIZE, &ms_maxTextureSize); 
+            glGetIntegerv(GL_MAX_TEXTURE_SIZE, &ms_maxTextureSize);
 
-            cl_log.log("Max Texture size: ", ms_maxTextureSize, cl_logALWAYS);
+            cl_log.log(QLatin1String("Max Texture size: "), ms_maxTextureSize, cl_logALWAYS);
         }
     }
 
@@ -496,8 +496,8 @@ void CLGLRenderer::draw(CLVideoDecoderOutput& img, unsigned int channel)
     //paintEvent
 }
 
-void CLGLRenderer::setForceSoftYUV(bool value) 
-{ 
+void CLGLRenderer::setForceSoftYUV(bool value)
+{
     m_forceSoftYUV = value;
 }
 
@@ -530,15 +530,15 @@ int CLGLRenderer::glRGBFormat() const
     }
 }
 
-bool CLGLRenderer::isPixelFormatSupported(PixelFormat pixfmt) 
+bool CLGLRenderer::isPixelFormatSupported(PixelFormat pixfmt)
 {
-    static const PixelFormat supportedFormats[] = 
+    static const PixelFormat supportedFormats[] =
     {
-            PIX_FMT_YUV422P, 
-            PIX_FMT_YUV420P, 
-            PIX_FMT_YUV444P, 
-            PIX_FMT_RGBA, 
-            PIX_FMT_BGRA, 
+            PIX_FMT_YUV422P,
+            PIX_FMT_YUV420P,
+            PIX_FMT_YUV444P,
+            PIX_FMT_RGBA,
+            PIX_FMT_BGRA,
             PIX_FMT_RGB24,
             PIX_FMT_BGR24
     };
@@ -605,8 +605,8 @@ void CLGLRenderer::updateTexture()
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, clampConstant);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, clampConstant);
-                
-                // by default uninitialized YUV texture has green color. Fill right and bottom black bars 
+
+                // by default uninitialized YUV texture has green color. Fill right and bottom black bars
                 // due to GL_LINEAR filtering, openGL uses some "unvisible" pixels, so it is unvisible pixels MUST be black
                 int fillSize = qMax(round_r_w, h[i]) * ROUND_COEFF;
                 quint8* staticFiller;
@@ -626,12 +626,12 @@ void CLGLRenderer::updateTexture()
                     }
                     staticFiller = &m_staticUVFiller[0];
                 }
-            
+
                 glPixelStorei(GL_UNPACK_ROW_LENGTH, ROUND_COEFF);
                 if (round_r_w < wPow)
                 {
                     glTexSubImage2D(GL_TEXTURE_2D, 0,
-                        round_r_w, 
+                        round_r_w,
                         0,
                         qMin(ROUND_COEFF, wPow - round_r_w),
                         h[i],
@@ -649,7 +649,7 @@ void CLGLRenderer::updateTexture()
                 }
 
             }
-            
+
             glPixelStorei(GL_UNPACK_ROW_LENGTH, w[i]);
             glTexSubImage2D(GL_TEXTURE_2D, 0,
                             0, 0,

@@ -7,16 +7,12 @@
 #include "settings_getter.h"
 
 CLAbstractDeviceSettingsDlg::CLAbstractDeviceSettingsDlg(CLDevice* dev):
-QDialog(0, Qt::CustomizeWindowHint | Qt::WindowTitleHint | 
+QDialog(0, Qt::CustomizeWindowHint | Qt::WindowTitleHint |
 		Qt::WindowCloseButtonHint| Qt::WindowStaysOnTopHint |
 		Qt::MSWindowsFixedSizeDialogHint),
 mDevice(dev)
 {
-	QString str = tr("Camera settings");
-	str+=": ";
-	str+=mDevice->toString();
-
-	setWindowTitle(str);
+	setWindowTitle(tr("Camera settings: ") + mDevice->toString());
 	//setWindowOpacity(global_dlg_opacity);
 
 	int width = 610;
@@ -46,12 +42,12 @@ mDevice(dev)
 	mButtonBox = new QDialogButtonBox();
 	mButtonBox->setFocusPolicy(Qt::NoFocus);
 
-	QPushButton* suggestionsBtn = new QPushButton("Suggestions...");
+	QPushButton* suggestionsBtn = new QPushButton(tr("Suggestions..."));
 	connect(suggestionsBtn, SIGNAL(released()), this, SLOT(onSuggestions()));
 	mButtonBox->addButton(suggestionsBtn, QDialogButtonBox::ActionRole);
 	suggestionsBtn->setFocusPolicy(Qt::NoFocus);
 
-	QPushButton* closeBtn = new QPushButton("Close");
+	QPushButton* closeBtn = new QPushButton(tr("Close"));
 	connect(closeBtn, SIGNAL(released()), this, SLOT(onClose()));
 	mButtonBox->addButton(closeBtn, QDialogButtonBox::RejectRole);
 	closeBtn->setFocusPolicy(Qt::NoFocus);
@@ -65,7 +61,7 @@ mDevice(dev)
 	//suggestionsBtn->move(30,30);
 	mDevice->addRef();
 
-    connect(mTabWidget, SIGNAL(currentChanged(int)), this, SLOT(onNewtab(int)) );
+	connect(mTabWidget, SIGNAL(currentChanged(int)), this, SLOT(onNewtab(int)) );
 
 }
 
@@ -155,7 +151,7 @@ QList<CLAbstractSettingsWidget*> CLAbstractDeviceSettingsDlg::getWidgetsBygroup(
 
 void CLAbstractDeviceSettingsDlg::onClose()
 {
-	close();
+    close();
 }
 
 void CLAbstractDeviceSettingsDlg::onSuggestions()

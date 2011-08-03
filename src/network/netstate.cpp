@@ -34,13 +34,13 @@ void CLNetState::updateNetState()
 		state.minHostAddress = QHostAddress(minaddr);
 		state.maxHostAddress = QHostAddress(maxaddr);
 
-		if ( existsSubnet(entry.ip()) ) // mostly to check if net state changed 
+		if ( existsSubnet(entry.ip()) ) // mostly to check if net state changed
 		{
 			CLSubNetState& existing_state = getSubNetState(entry.ip());
 
 			if (state.minHostAddress == existing_state.minHostAddress && state.maxHostAddress == existing_state.maxHostAddress)// same subnet, nothing changed
 				state.currHostAddress = existing_state.currHostAddress;
-			else// subnet mask changed 
+			else// subnet mask changed
 				net_state_changed = true;
 
 		}
@@ -57,7 +57,7 @@ void CLNetState::updateNetState()
 
 	if (net_state_changed)
 	{
-		cl_log.log("Current Net state:", cl_logALWAYS);
+		cl_log.log(QLatin1String("Current Net state:"), cl_logALWAYS);
 		cl_log.log(toString(), cl_logALWAYS);
 	}
 
@@ -93,7 +93,7 @@ bool CLNetState::existsSubnet(const QHostAddress& machine_ip) const
 	return (m_netstate.contains(machine_ip.toString()));
 }
 
-// return CLSubNetState for NIC ipv4 machine_ip 
+// return CLSubNetState for NIC ipv4 machine_ip
 CLSubNetState& CLNetState::getSubNetState(const QHostAddress& machine_ip)
 {
 	return m_netstate[machine_ip.toString()];

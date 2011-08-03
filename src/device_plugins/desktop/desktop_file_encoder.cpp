@@ -12,7 +12,7 @@ static const int BASE_BITRATE = 1000 * 1000 * 8; // bitrate for best quality for
 
 static const int MAX_VIDEO_JITTER = 2;
 
-extern "C" 
+extern "C"
 {
     #include <libavformat/avformat.h>
     #include <libavcodec/avcodec.h>
@@ -181,10 +181,10 @@ int DesktopFileEncoder::EncodedAudioInfo::nameToWaveIndex()
 {
     int iNumDevs = waveInGetNumDevs();
     QString name(m_audioDevice.deviceName());
-    for(int i = 0; i < iNumDevs; ++i) 
+    for(int i = 0; i < iNumDevs; ++i)
     {
         WAVEINCAPS wic;
-        if(waveInGetDevCaps(i, &wic, sizeof(WAVEINCAPS)) == MMSYSERR_NOERROR) 
+        if(waveInGetDevCaps(i, &wic, sizeof(WAVEINCAPS)) == MMSYSERR_NOERROR)
         {
             QString tmp = QString((const QChar *) wic.szPname);
             if (name.startsWith(tmp))
@@ -194,14 +194,14 @@ int DesktopFileEncoder::EncodedAudioInfo::nameToWaveIndex()
     return WAVE_MAPPER;
 }
 
-void QT_WIN_CALLBACK waveInProc(HWAVEIN hWaveIn, 
+void QT_WIN_CALLBACK waveInProc(HWAVEIN hWaveIn,
                                 UINT uMsg,
-                                DWORD dwInstance, 
-                                DWORD dwParam1, 
+                                DWORD dwInstance,
+                                DWORD dwParam1,
                                 DWORD dwParam2)
 {
     DesktopFileEncoder::EncodedAudioInfo* audio = (DesktopFileEncoder::EncodedAudioInfo*) dwInstance;
-    switch(uMsg) 
+    switch(uMsg)
     {
         case WIM_OPEN:
             break;
@@ -234,7 +234,7 @@ void DesktopFileEncoder::EncodedAudioInfo::gotData()
     if (m_buffers.isEmpty())
         return;
     WAVEHDR* data = m_buffers.front();
-    if(data->dwBytesRecorded > 0 && data->dwFlags & WHDR_DONE) 
+    if(data->dwBytesRecorded > 0 && data->dwFlags & WHDR_DONE)
     {
         // write data
         int packetSize = data->dwBytesRecorded;
@@ -303,7 +303,7 @@ bool DesktopFileEncoder::EncodedAudioInfo::setupFormat(QString& errMessage)
         m_audioFormat.setChannels(1);
         if (!m_audioDevice.isFormatSupported(m_audioFormat))
         {
-            errMessage = "Unsupported audio format specified for capturing!";
+            errMessage = QLatin1String("Unsupported audio format specified for capturing!");
             return false;
         }
     }
@@ -328,7 +328,7 @@ bool DesktopFileEncoder::EncodedAudioInfo::setupPostProcess()
     if(waveInOpen(&hWaveIn, devId, &wfx,
         (DWORD_PTR)&waveInProc,
         (DWORD_PTR) this,
-        CALLBACK_FUNCTION) != MMSYSERR_NOERROR != S_OK) 
+        CALLBACK_FUNCTION) != MMSYSERR_NOERROR != S_OK)
         return false;
 
     for (int i = 0; i < AUDIO_BUFFERS_COUNT; ++i)
@@ -352,11 +352,11 @@ bool DesktopFileEncoder::EncodedAudioInfo::setupPostProcess()
 }
 
 DesktopFileEncoder::DesktopFileEncoder (
-                   const QString& fileName, 
-                   int desktopNum, 
+                   const QString& fileName,
+                   int desktopNum,
                    const QAudioDeviceInfo* audioDevice,
                    const QAudioDeviceInfo* audioDevice2,
-                   CLScreenGrapper::CaptureMode captureMode,
+                   CLScreenGrabber::CaptureMode captureMode,
                    bool captureCursor,
                    const QSize& captureResolution,
                    float encodeQualuty, // in range 0.0 .. 1.0
@@ -381,7 +381,7 @@ DesktopFileEncoder::DesktopFileEncoder (
     m_maxAudioJitter(0),
 
     m_captureMode(captureMode),
-    m_captureCursor(captureCursor), 
+    m_captureCursor(captureCursor),
     m_captureResolution(captureResolution),
     m_encodeQualuty(encodeQualuty),
     m_encodedFrames(0),
@@ -433,18 +433,18 @@ int DesktopFileEncoder::calculateBitrate()
     bitrate /=  1920.0*1080.0 / m_grabber->width() / m_grabber->height();
 
     bitrate *= m_encodeQualuty;
-    
+
     return bitrate;
 }
 
 bool DesktopFileEncoder::init()
 {
     m_grabber = new CLBufferedScreenGrabber(
-            m_desktopNum, 
-            CLBufferedScreenGrabber::DEFAULT_QUEUE_SIZE, 
-            CLBufferedScreenGrabber::DEFAULT_FRAME_RATE, 
-            m_captureMode, 
-            m_captureCursor, 
+            m_desktopNum,
+            CLBufferedScreenGrabber::DEFAULT_QUEUE_SIZE,
+            CLBufferedScreenGrabber::DEFAULT_FRAME_RATE,
+            m_captureMode,
+            m_captureCursor,
             m_captureResolution,
             m_widget);
 
@@ -461,16 +461,16 @@ bool DesktopFileEncoder::init()
     m_frame = avcodec_alloc_frame();
     avpicture_alloc((AVPicture*) m_frame, m_grabber->format(), m_grabber->width(), m_grabber->height() );
 
-    QString videoCodecName = "libx264";
+    QString videoCodecName = QLatin1String("libx264");
     if (m_encodeQualuty <= 0.5)
-        videoCodecName = "mpeg2video";
+        videoCodecName = QLatin1String("mpeg2video");
     AVCodec* videoCodec = avcodec_find_encoder_by_name(videoCodecName.toAscii().constData());
     if(videoCodec == 0)
     {
-        m_lastErrorStr = QString("Can't find video encoder ") + videoCodecName;
+        m_lastErrorStr = QLatin1String("Can't find video encoder ") + videoCodecName;
         return false;
     }
-    
+
     // allocate container
     m_device = new QFile(m_fileName);
     m_device->open(QIODevice::WriteOnly);
@@ -485,7 +485,7 @@ bool DesktopFileEncoder::init()
     m_formatCtx->oformat = m_outputCtx;
 
     if (av_set_parameters(m_formatCtx, NULL) < 0) {
-        m_lastErrorStr = "Can't initialize output format parameters";
+        m_lastErrorStr = QLatin1String("Can't initialize output format parameters");
         return false;
     }
 
@@ -493,18 +493,18 @@ bool DesktopFileEncoder::init()
     m_videoOutStream = av_new_stream(m_formatCtx, DEFAULT_VIDEO_STREAM_ID);
     if (!m_videoOutStream)
     {
-        m_lastErrorStr = "Can't allocate output stream for video codec";
+        m_lastErrorStr = QLatin1String("Can't allocate output stream for video codec");
         return false;
     }
     m_videoCodecCtx = m_videoOutStream->codec;
     m_videoCodecCtx->codec_id = m_outputCtx->video_codec;
     m_videoCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO ;
     m_videoCodecCtx->thread_count = QThread::idealThreadCount();
-    
-    
+
+
     m_videoCodecCtx->time_base = m_grabber->getFrameRate();
 
-    m_videoCodecCtx->pix_fmt = m_grabber->format(); 
+    m_videoCodecCtx->pix_fmt = m_grabber->format();
     m_videoCodecCtx->width = m_grabber->width();
     m_videoCodecCtx->height = m_grabber->height();
 
@@ -512,11 +512,10 @@ bool DesktopFileEncoder::init()
     m_videoCodecCtx->bit_rate = calculateBitrate();
     //m_videoCodecCtx->rc_buffer_size = m_videoCodecCtx->bit_rate;
     //m_videoCodecCtx->rc_max_rate = m_videoCodecCtx->bit_rate;
-    
 
-    QString codec_prop = "";
+    QString codec_prop;
 
-    if (videoCodecName != "libx264")
+    if (videoCodecName != QLatin1String("libx264"))
     {
         m_videoCodecCtx->gop_size = 12;
         m_videoCodecCtx->has_b_frames = 0;
@@ -528,21 +527,21 @@ bool DesktopFileEncoder::init()
     }
     else {
         if (m_encodeQualuty <= 0.75)
-            codec_prop = "refs=2;me_method=dia;subq=3;me_range=16;g=50;keyint_min=25;sc_threshold=40;i_qfactor=0.71;b_strategy=1;qcomp=0.6;qmin=10;qmax=51;qdiff=4;bf=3";
+            codec_prop = QLatin1String("refs=2;me_method=dia;subq=3;me_range=16;g=50;keyint_min=25;sc_threshold=40;i_qfactor=0.71;b_strategy=1;qcomp=0.6;qmin=10;qmax=51;qdiff=4;bf=3");
     }
 
-    QStringList prop_list = codec_prop.split(";", QString::SkipEmptyParts);
-    for (int i=0; i<prop_list.size();i++)    
+    QStringList prop_list = codec_prop.split(QLatin1Char(';'), QString::SkipEmptyParts);
+    for (int i=0; i<prop_list.size();i++)
     {
-        QStringList param = prop_list.at(i).split("=", QString::SkipEmptyParts);
-        if (param.size()==2) 
+        QStringList param = prop_list.at(i).split(QLatin1Char('='), QString::SkipEmptyParts);
+        if (param.size()==2)
         {
             int res = av_set_string3(m_videoCodecCtx, param.at(0).trimmed().toAscii().data(), param.at(1).trimmed().toAscii().data(), 1, NULL);
             if (res != 0)
-                cl_log.log("Wrong option for video codec:", param.at(0), cl_logWARNING);
+                cl_log.log(QLatin1String("Wrong option for video codec:"), param.at(0), cl_logWARNING);
         }
     }
-    
+
 
     m_videoCodecCtx->sample_aspect_ratio.num = 1;
     m_videoCodecCtx->sample_aspect_ratio.den = 1;
@@ -552,7 +551,7 @@ bool DesktopFileEncoder::init()
 
     if (avcodec_open(m_videoCodecCtx, videoCodec) < 0)
     {
-        m_lastErrorStr =  "Can't initialize video encoder";
+        m_lastErrorStr = QLatin1String("Can't initialize video encoder");
         return false;
     }
 
@@ -576,15 +575,15 @@ bool DesktopFileEncoder::init()
         m_audioOutStream = av_new_stream(m_formatCtx, DEFAULT_AUDIO_STREAM_ID);
         if (!m_audioOutStream)
         {
-            m_lastErrorStr = "Can't allocate output audio stream";
+            m_lastErrorStr = QLatin1String("Can't allocate output audio stream");
             return false;
         }
 
-        QString audioCodecName = "aac"; // "libmp3lame"
+        QString audioCodecName = QLatin1String("aac"); // "libmp3lame"
         AVCodec* audioCodec = avcodec_find_encoder_by_name(audioCodecName.toAscii().constData());
         if(audioCodec == 0)
         {
-            m_lastErrorStr = QString("Can't find audio encoder") + audioCodecName;
+            m_lastErrorStr = QLatin1String("Can't find audio encoder") + audioCodecName;
             return false;
         }
         m_outputCtx->audio_codec = audioCodec->id;
@@ -601,23 +600,23 @@ bool DesktopFileEncoder::init()
 
         if (avcodec_open(m_audioCodecCtx, audioCodec) < 0)
         {
-            m_lastErrorStr = "Can't initialize audio encoder";
+            m_lastErrorStr = QLatin1String("Can't initialize audio encoder");
             return false;
         }
         m_audioFrameDuration = m_audioCodecCtx->frame_size / (double) m_audioCodecCtx->sample_rate;
         m_audioFrameDuration *= m_audioOutStream->time_base.den / (double) m_audioOutStream->time_base.num;
 
-        
+
         // 50 ms as max jitter
         // QT uses 25fps timer for audio grabbing, so jitter 40ms + 10ms reserved.
-        m_maxAudioJitter = m_audioOutStream->time_base.den / m_audioOutStream->time_base.num / 20; 
+        m_maxAudioJitter = m_audioOutStream->time_base.den / m_audioOutStream->time_base.num / 20;
 
         foreach(EncodedAudioInfo* audioChannel, m_audioInfo)
         {
             if (!audioChannel->setupPostProcess())
             {
                 WinAudioExtendInfo extInfo(audioChannel->m_audioDevice.deviceName());
-                m_lastErrorStr = QString("Can't initialize audio device '") + extInfo.fullName() + QString("'");
+                m_lastErrorStr = QLatin1String("Can't initialize audio device '") + extInfo.fullName() + QLatin1Char('\'');
                 return false;
             }
         }
@@ -630,7 +629,7 @@ bool DesktopFileEncoder::init()
     {
         if (!info->start())
         {
-            m_lastErrorStr = "Can't start primary audio device";
+            m_lastErrorStr = QLatin1String("Can't start primary audio device");
             return false;
         }
     }
@@ -675,7 +674,7 @@ int DesktopFileEncoder::processData(bool flush)
         CLAbstractMediaData* audioData = ai->m_audioQueue.front();
 
         qint64 audioPts =  av_rescale_q(audioData->timestamp, r, m_audioOutStream->time_base) - m_audioFrameDuration;
-        qint64 expectedAudioPts = m_storedAudioPts + m_audioFramesCount * m_audioFrameDuration; 
+        qint64 expectedAudioPts = m_storedAudioPts + m_audioFramesCount * m_audioFrameDuration;
         int audioJitter = qAbs(audioPts - expectedAudioPts);
 
         //cl_log.log("audio jitter=", audioJitter/90.0, cl_logALWAYS);
@@ -744,10 +743,10 @@ int DesktopFileEncoder::processData(bool flush)
             audioPacket.data = m_encodedAudioBuf;
             audioPacket.size = aEncoded;
             audioPacket.stream_index = m_audioOutStream->index;
-            if (av_write_frame(m_formatCtx,&audioPacket)<0)	
-                cl_log.log("Audio packet write error", cl_logWARNING);
-            //cl_log.log("audioPacket.pts=", audioPacket.pts, cl_logALWAYS);
-            //cl_log.log("audio buffer=", m_audioQueue.size(), cl_logALWAYS);
+            if (av_write_frame(m_formatCtx,&audioPacket)<0)
+                cl_log.log(QLatin1String("Audio packet write error"), cl_logWARNING);
+            //cl_log.log(QLatin1String("audioPacket.pts="), audioPacket.pts, cl_logALWAYS);
+            //cl_log.log(QLatin1String("audio buffer="), m_audioQueue.size(), cl_logALWAYS);
         }
         audioData->releaseRef();
 
@@ -756,11 +755,11 @@ int DesktopFileEncoder::processData(bool flush)
 
     if (out_size > 0)
     {
-        if (av_write_frame(m_formatCtx,&videoPkt)<0)	
-            cl_log.log("Video packet write error", cl_logWARNING);
+        if (av_write_frame(m_formatCtx,&videoPkt)<0)
+            cl_log.log(QLatin1String("Video packet write error"), cl_logWARNING);
         else
             m_videoPacketWrited = true;
-        //cl_log.log("videoPkt.pts=", videoPkt.pts, cl_logALWAYS);
+        //cl_log.log(QLatin1String("videoPkt.pts="), videoPkt.pts, cl_logALWAYS);
     }
     return out_size;
 }
@@ -775,7 +774,7 @@ void DesktopFileEncoder::run()
             m_capturingStopped = true;
         }
 
-        CLScreenGrapper::CaptureInfo capturedData = m_grabber->getNextFrame();
+        CLScreenGrabber::CaptureInfo capturedData = m_grabber->getNextFrame();
         if (!capturedData.opaque)
             continue;
         m_grabber->capturedDataToFrame(capturedData, m_frame);
@@ -797,10 +796,10 @@ void DesktopFileEncoder::run()
             m_frame->pts = m_encodedFrames;
             if (processData(false) < 0)
             {
-                cl_log.log("Video encoding error. Stop recording.", cl_logWARNING);
+                cl_log.log(QLatin1String("Video encoding error. Stop recording."), cl_logWARNING);
                 break;
             }
-            //cl_log.log("encode pts=", m_encodedFrames, cl_logALWAYS);
+            //cl_log.log(QLatin1String("encode pts="), m_encodedFrames, cl_logALWAYS);
 
             m_encodedFrames++;
             firstStep = false;
@@ -809,7 +808,7 @@ void DesktopFileEncoder::run()
     if (!m_capturingStopped)
         stopCapturing();
 
-    cl_log.log("flushing video buffer",cl_logALWAYS);
+    cl_log.log(QLatin1String("flushing video buffer"), cl_logALWAYS);
     do {
     } while (processData(true) > 0); // flush buffers
 

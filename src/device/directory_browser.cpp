@@ -32,45 +32,32 @@ void CLDeviceDirectoryBrowser::run()
 
     QThread::currentThread()->setPriority(QThread::IdlePriority);
 
-    cl_log.log("Browsing directories....", cl_logALWAYS);
-    
+    cl_log.log(QLatin1String("Browsing directories...."), cl_logALWAYS);
+
     QTime time;
     time.restart();
-
-
-
 
     mNeedStop = false;
     mResult.clear();
 
-
-    foreach(QString dir, mDirsToCheck)
+    foreach (const QString &dir, mDirsToCheck)
     {
-        if (!dir.endsWith("/"))
-            dir += "/";
-
         CLDeviceList dev_lst = findDevices(dir);
 
-        cl_log.log("found ", dev_lst.count(), " devices",  cl_logALWAYS);
+        cl_log.log(QLatin1String("found "), dev_lst.count(), QLatin1String(" devices"), cl_logALWAYS);
 
-        foreach(CLDevice* dev, dev_lst)
-        {
+        foreach (CLDevice *dev, dev_lst)
             mResult[dev->getUniqueId()] = dev;
-        }
-
     }
 
-    cl_log.log("Done(Browsing directories). Time elapsed =  ", time.elapsed(), cl_logALWAYS);
-    
+    cl_log.log(QLatin1String("Done(Browsing directories). Time elapsed = "), time.elapsed(), cl_logALWAYS);
+
 }
 
 //=============================================================================================
 CLDeviceList CLDeviceDirectoryBrowser::findDevices(const QString& directory)
 {
-
-    cl_log.log("Checking ", directory,   cl_logALWAYS);
-
-    FileTypeSupport fileTypeSupport;
+    cl_log.log(QLatin1String("Checking "), directory, cl_logALWAYS);
 
     CLDeviceList result;
 
@@ -81,72 +68,44 @@ CLDeviceList CLDeviceDirectoryBrowser::findDevices(const QString& directory)
     if (!dir.exists())
         return result;
 
-    {
-        QStringList list = dir.entryList(fileTypeSupport.imagesFilter());
+    FileTypeSupport fileTypeSupport;
 
-        for (int i = 0; i < list.size(); ++i)
-        {
-            QString file = list.at(i);
-            QString abs_file_name = directory + file;
-            CLDevice* dev = new CLFileDevice(abs_file_name);
-            result[abs_file_name] = dev;
-        }
+    // images
+    foreach (const QFileInfo &fi, dir.entryInfoList(fileTypeSupport.imagesFilter()))
+    {
+        QString abs_file_name = fi.absoluteFilePath();
+        CLDevice* dev = new CLFileDevice(abs_file_name);
+        result[abs_file_name] = dev;
     }
 
+    // movies
+    foreach (const QFileInfo &fi, dir.entryInfoList(fileTypeSupport.moviesFilter()))
     {
-        QStringList list = dir.entryList(fileTypeSupport.moviesFilter());
-
-        for (int i = 0; i < list.size(); ++i)
-        {
-            QString file = list.at(i);
-            QString abs_file_name = directory + file;
-            CLDevice* dev = new CLAviDevice(abs_file_name);
-            result[abs_file_name] = dev;
-        }
+        QString abs_file_name = fi.absoluteFilePath();
+        CLDevice* dev = new CLAviDevice(abs_file_name);
+        result[abs_file_name] = dev;
     }
 
-    //=============================================
-    QStringList sub_dirs = subDirList(directory);
-    //if (directory==getTempRecordingDir() || directory==getRecordingDir())
-    if (directory==getRecordingDir()) // ignore temp dir
+    // dirs
+    QFileInfoList sub_dirs = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
+    if (dir.absolutePath() + QLatin1Char('/') == getRecordingDir()
+        // || dir.absolutePath() + QLatin1Char('/') == getTempRecordingDir() // ignore temp dir
+       )
     {
-        // if this is recorded clip dir 
-        foreach(QString str, sub_dirs)
+        // if this is recorded clip dir
+        foreach (const QFileInfo &fi, sub_dirs)
         {
-            CLDevice* dev = new CLArchiveDevice(directory + str + QString("/"));
+            CLDevice *dev = new CLArchiveDevice(fi.absoluteFilePath());
             result[dev->getUniqueId()] = dev;
         }
     }
     else
     {
-        foreach(QString str, sub_dirs)
+        foreach (const QFileInfo &fi, sub_dirs)
         {
-            CLDeviceList sub_result = findDevices(directory + str + QString("/"));
-
-            foreach(CLDevice* dev, sub_result)
-            {
+            foreach (CLDevice *dev, findDevices(fi.absoluteFilePath()))
                 result[dev->getUniqueId()] = dev;
-            }
         }
-    }
-
-    return result;
-}
-
-//=============================================================================================
-QStringList CLDeviceDirectoryBrowser::subDirList(const QString& abspath)
-{
-    QStringList result;
-
-    QDir dir(abspath);
-    if (!dir.exists())
-        return result;
-
-    QFileInfoList list = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
-
-    foreach(QFileInfo info, list)
-    {
-        result.push_back(info.fileName());
     }
 
     return result;

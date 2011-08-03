@@ -9,7 +9,7 @@ CLArchiveDevice::CLArchiveDevice(const QString& arch_path)
 	m_uniqueId = arch_path;
 	m_name = QDir(arch_path).dirName();
 
-	QFile file(arch_path + "/layout.xml");
+	QFile file(arch_path + QLatin1String("/layout.xml"));
 
 	if (!file.exists())
 		return ;
@@ -20,7 +20,7 @@ CLArchiveDevice::CLArchiveDevice(const QString& arch_path)
 	QString error;
 	QDomDocument doc;
 
-	if (!doc.setContent(&file, &errorStr, &errorLine,&errorColumn)) 
+	if (!doc.setContent(&file, &errorStr, &errorLine,&errorColumn))
 	{
 		QTextStream str(&error);
 		str << "File custom_layouts.xml" << "; Parse error at line " << errorLine << " column " << errorColumn << " : " << errorStr;
@@ -29,12 +29,12 @@ CLArchiveDevice::CLArchiveDevice(const QString& arch_path)
 	}
 
 	QDomElement layout_element = doc.documentElement();
-	if (layout_element.tagName() != "layout")
+	if (layout_element.tagName() != QLatin1String("layout"))
 		return ;
 
-	QString ws = layout_element.attribute("width");
-	QString hs = layout_element.attribute("height");
-    mOriginalName = layout_element.attribute("name");
+	QString ws = layout_element.attribute(QLatin1String("width"));
+	QString hs = layout_element.attribute(QLatin1String("height"));
+	mOriginalName = layout_element.attribute(QLatin1String("name"));
 
 	int width = ws.toInt();
 	int height = hs.toInt();
@@ -45,13 +45,13 @@ CLArchiveDevice::CLArchiveDevice(const QString& arch_path)
 
 	QDomNode node = layout_element.firstChild();
 
-	while (!node.isNull()) 
+	while (!node.isNull())
 	{
-		if (node.toElement().tagName() == "channel")
+		if (node.toElement().tagName() == QLatin1String("channel"))
 		{
-			QString snumber = node.toElement().attribute("number");
-			QString sh_pos = node.toElement().attribute("h_pos");
-			QString sv_pos = node.toElement().attribute("v_pos");
+			QString snumber = node.toElement().attribute(QLatin1String("number"));
+			QString sh_pos = node.toElement().attribute(QLatin1String("h_pos"));
+			QString sv_pos = node.toElement().attribute(QLatin1String("v_pos"));
 
 			la->setChannel(sh_pos.toInt(), sv_pos.toInt(), snumber.toInt());
 		}
@@ -73,7 +73,7 @@ void CLArchiveDevice::readdescrfile()
 
 QString CLArchiveDevice::originalName() const
 {
-    return mOriginalName;
+	return mOriginalName;
 }
 
 
@@ -85,5 +85,5 @@ CLStreamreader* CLArchiveDevice::getDeviceStreamConnection()
 
 QString CLArchiveDevice::toString() const
 {
-    return QString("recorded:") + m_name;
+	return QLatin1String("recorded:") + m_name;
 }

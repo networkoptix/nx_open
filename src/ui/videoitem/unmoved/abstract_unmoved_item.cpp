@@ -27,19 +27,32 @@ bool CLAbstractUnmovedItem::preferNonSteadyMode() const
     return m_underMouse;
 }
 
-void CLAbstractUnmovedItem::hoverEnterEvent(QGraphicsSceneHoverEvent */*event*/)
+void CLAbstractUnmovedItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
+    Q_UNUSED(event);
     m_underMouse = true;
 }
 
-void CLAbstractUnmovedItem::hoverLeaveEvent(QGraphicsSceneHoverEvent */*event*/)
+void CLAbstractUnmovedItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
+    Q_UNUSED(event);
     m_underMouse = false;
 }
 
-void CLAbstractUnmovedItem::setStaticPos(QPoint p)
+void CLAbstractUnmovedItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-	m_pos = p;
+    Q_UNUSED(event);
+}
+
+void CLAbstractUnmovedItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    Q_UNUSED(event);
+    emit onPressed(m_name);
+}
+
+void CLAbstractUnmovedItem::setStaticPos(const QPoint &p)
+{
+    m_pos = p;
 }
 
 void CLAbstractUnmovedItem::adjust()

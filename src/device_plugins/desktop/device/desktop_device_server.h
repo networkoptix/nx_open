@@ -15,10 +15,10 @@ public:
     static DesktopDeviceServer& instance();
 
     virtual bool isProxy() const { return false; }
-    // return the name of the server 
-    virtual QString name() const { return "Desktop";}
+    // return the name of the server
+    virtual QString name() const { return QLatin1String("Desktop");}
 
-    // returns all available devices 
+    // returns all available devices
     virtual CLDeviceList findDevices();
 private:
     IDirect3D9*			m_pD3D;

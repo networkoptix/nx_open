@@ -2,10 +2,10 @@
 
 static const int MAX_JITTER = 60;
 
-CLBufferedScreenGrabber::CLBufferedScreenGrabber(int displayNumber, 
-                                                 int queueSize, 
-                                                 int frameRate, 
-                                                 CLScreenGrapper::CaptureMode mode,
+CLBufferedScreenGrabber::CLBufferedScreenGrabber(int displayNumber,
+                                                 int queueSize,
+                                                 int frameRate,
+                                                 CLScreenGrabber::CaptureMode mode,
                                                  bool captureCursor,
                                                  const QSize& captureResolution,
                                                  QWidget* widget):
@@ -54,7 +54,7 @@ void CLBufferedScreenGrabber::run()
             break;
         AVFrame* curFrame = m_frames[m_frameIndex];
         m_frameIndex = m_frameIndex < m_frames.size()-1 ? m_frameIndex+1 : 0;
-        CLScreenGrapper::CaptureInfo info = m_grabber.captureFrame();
+        CLScreenGrabber::CaptureInfo info = m_grabber.captureFrame();
         if (info.opaque == 0)
             continue;
         m_queue.push(info);
@@ -72,14 +72,14 @@ void CLBufferedScreenGrabber::run()
     }
 }
 
-bool CLBufferedScreenGrabber::dataExist() 
+bool CLBufferedScreenGrabber::dataExist()
 {
     return m_queue.size() > 0;
 }
 
-CLScreenGrapper::CaptureInfo CLBufferedScreenGrabber::getNextFrame() 
-{ 
-    CLScreenGrapper::CaptureInfo rez;
+CLScreenGrabber::CaptureInfo CLBufferedScreenGrabber::getNextFrame()
+{
+    CLScreenGrabber::CaptureInfo rez;
     rez.opaque = 0;
     m_queue.pop(rez, 40);
     return rez;

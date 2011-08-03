@@ -4,7 +4,7 @@
 
 /**
   * QT audio buffer size.
-  * Note: to avoid situation than all data goes from buffered audio to qt buffer at one shot 
+  * Note: to avoid situation than all data goes from buffered audio to qt buffer at one shot
   * qt buffer size must be much smaller than buffered audio size
   */
 static const int QT_AUDIO_BUFFER_SIZE = 300;
@@ -23,12 +23,12 @@ CLAudioDevice::CLAudioDevice(QAudioFormat format) :
 
 
     // qt code is strange; isFormatSupported expects centain set of freq; but everything works
-    int old_frequency = format.frequency(); // remember old frequency 
+    int old_frequency = format.frequency(); // remember old frequency
     format.setFrequency(44100); // set supported frequency
 
 
 
-    if (!info.isFormatSupported(format)) 
+    if (!info.isFormatSupported(format))
     {
         if (format.channels()>2)
         {
@@ -42,10 +42,10 @@ CLAudioDevice::CLAudioDevice(QAudioFormat format) :
             format.setSampleSize(16);
             m_convertingFloat = true;
         }
-            
-        if (!info.isFormatSupported(format)) 
+
+        if (!info.isFormatSupported(format))
         {
-            cl_log.log("audio format not supported by backend, cannot play audio.", cl_logERROR);
+            cl_log.log(QLatin1String("audio format not supported by backend, cannot play audio."), cl_logERROR);
             supported = false;
         }
 
@@ -96,7 +96,7 @@ bool CLAudioDevice::convertingFloat() const
     return m_convertingFloat;
 }
 
-bool CLAudioDevice::wantMoreData() 
+bool CLAudioDevice::wantMoreData()
 {
     if (!m_ringBuffer)
         return false;
@@ -111,7 +111,7 @@ void CLAudioDevice::write(const char* data, unsigned long size)
     if (!m_ringBuffer)
         return;
 
-    // firs of all try to write all data to ring buffer 
+    // firs of all try to write all data to ring buffer
     size = qMin (m_ringBuffer->avalable_to_write(), (qint64)size);
     m_ringBuffer->writeData(data,size);
 
@@ -149,16 +149,16 @@ void CLAudioDevice::resume()
 
 void CLAudioDevice::clearAudioBuff()
 {
-	if (m_ringBuffer) 
+	if (m_ringBuffer)
 		m_ringBuffer->clear();
 
     // this takes a lot of time of ui thread. let's do not care about cleaning qt audio buff
     /*
-	if (m_audioOutput)
-	{
-		m_audioOutput->reset();
-		m_audioOutput->start();
-	}
+    if (m_audioOutput)
+    {
+        m_audioOutput->reset();
+        m_audioOutput->start();
+    }
     */
 }
 

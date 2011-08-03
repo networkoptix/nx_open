@@ -50,7 +50,7 @@ void UIOKMessage(QWidget* parent, const QString& title, const QString& text)
 
 QString UIDisplayName(const QString& fullname)
 {
-	int index = fullname.indexOf(":");
+	int index = fullname.indexOf(QLatin1Char(':'));
 	if (index<0)
 		return QString();
 

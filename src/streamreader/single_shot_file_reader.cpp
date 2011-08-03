@@ -12,7 +12,7 @@ CLSingleShotStreamreader(dev)
 
 CLAbstractMediaData* CLSingleShotFileStreamreader::getData()
 {
-    FileTypeSupport fileTypeSupport;
+	FileTypeSupport fileTypeSupport;
 
 	if (!fileTypeSupport.isImageFileExt(m_fileName))
 		return 0;
@@ -24,24 +24,24 @@ CLAbstractMediaData* CLSingleShotFileStreamreader::getData()
 	if (!file.open(QIODevice::ReadOnly))
 		return 0;
 
-    CodecID compressionType;
+	CodecID compressionType;
 
     QString lowerFileName = m_fileName.toLower();
-    
-    if (lowerFileName.endsWith(".png"))
+
+    if (lowerFileName.endsWith(QLatin1String(".png")))
         compressionType = CODEC_ID_PNG;
-    else if (lowerFileName.endsWith(".jpeg") || lowerFileName.endsWith(".jpg"))
+    else if (lowerFileName.endsWith(QLatin1String(".jpeg")) || lowerFileName.endsWith(QLatin1String(".jpg")))
         compressionType = CODEC_ID_MJPEG;
-    else if (lowerFileName.endsWith(".tiff") || lowerFileName.endsWith(".tif"))
+    else if (lowerFileName.endsWith(QLatin1String(".tiff")) || lowerFileName.endsWith(QLatin1String(".tif")))
         compressionType = CODEC_ID_TIFF;
-    else if (lowerFileName.endsWith(".gif"))
+    else if (lowerFileName.endsWith(QLatin1String(".gif")))
         compressionType = CODEC_ID_GIF;
-    else if (lowerFileName.endsWith(".bmp"))
+    else if (lowerFileName.endsWith(QLatin1String(".bmp")))
         compressionType = CODEC_ID_BMP;
     else
         return 0;
 
-	unsigned int file_size = file.size();
+    unsigned int file_size = file.size();
 
 	CLCompressedVideoData* outData = new CLCompressedVideoData(CL_MEDIA_ALIGNMENT,file_size);
 	CLByteArray& data = outData->data;
@@ -53,7 +53,7 @@ CLAbstractMediaData* CLSingleShotFileStreamreader::getData()
 
 	data.done(readed);
 
-    outData->compressionType = compressionType;
+	outData->compressionType = compressionType;
 
 	outData->width = 0; // does not really meter (this is single shot)
 	outData->height = 0; //does not really meter (this is single shot)

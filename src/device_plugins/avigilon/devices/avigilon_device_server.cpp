@@ -4,7 +4,7 @@
 AVigilonDeviceServer::AVigilonDeviceServer()
 {
 
-    QFile file("clearpix.txt"); // Create a file handle for the file named
+    QFile file(QLatin1String("clearpix.txt")); // Create a file handle for the file named
     if (!file.exists())
         return;
 
@@ -19,11 +19,11 @@ AVigilonDeviceServer::AVigilonDeviceServer()
     {
         line = stream.readLine(); // this reads a line (QString) from the file
 
-        if (line.trimmed()=="")
+        if (line.trimmed().isEmpty())
             break;
 
-        QStringList list = line.split(" ", QString::SkipEmptyParts);
-        
+        QStringList list = line.split(QLatin1Char(' '), QString::SkipEmptyParts);
+
 
         if (list.count()<2)
             continue;
@@ -35,9 +35,9 @@ AVigilonDeviceServer::AVigilonDeviceServer()
         mCams.push_back(cam);
 
     }
-    
 
-    
+
+
 
 }
 
@@ -59,7 +59,7 @@ bool AVigilonDeviceServer::isProxy() const
 
 QString AVigilonDeviceServer::name() const
 {
-    return "Avigilon";
+    return QLatin1String("Avigilon");
 }
 
 
@@ -79,8 +79,8 @@ CLDeviceList AVigilonDeviceServer::findDevices()
         dev->setIP(QHostAddress(cam.ip), false);
         dev->setMAC(cam.mac);
         dev->setUniqueId(dev->getMAC());
-        dev->setName(QString("clearpix") + QString::number(lst.count()+1));
-        dev->setAuth("admin", "admin");
+        dev->setName(QLatin1String("clearpix") + QString::number(lst.count()+1));
+        dev->setAuth(QLatin1String("admin"), QLatin1String("admin"));
         lst[dev->getUniqueId()] = dev;
 
     }

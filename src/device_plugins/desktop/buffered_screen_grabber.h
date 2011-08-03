@@ -12,15 +12,15 @@ public:
     static const int DEFAULT_QUEUE_SIZE = 8;
     static const int DEFAULT_FRAME_RATE = 0;
 
-    CLBufferedScreenGrabber(int displayNumber = D3DADAPTER_DEFAULT, 
-                            int queueSize = DEFAULT_QUEUE_SIZE, 
+    CLBufferedScreenGrabber(int displayNumber = D3DADAPTER_DEFAULT,
+                            int queueSize = DEFAULT_QUEUE_SIZE,
                             int frameRate = DEFAULT_FRAME_RATE,
-                            CLScreenGrapper::CaptureMode mode = CLScreenGrapper::CaptureMode_DesktopWithoutAero,
+                            CLScreenGrabber::CaptureMode mode = CLScreenGrabber::CaptureMode_DesktopWithoutAero,
                             bool captureCursor = true,
                             const QSize& captureResolution = QSize(0, 0),
                             QWidget* widget = 0);
     virtual ~CLBufferedScreenGrabber();
-    CLScreenGrapper::CaptureInfo getNextFrame();
+    CLScreenGrabber::CaptureInfo getNextFrame();
     bool dataExist();
 
     AVRational getFrameRate();
@@ -29,14 +29,14 @@ public:
     int height() const         { return m_grabber.height(); }
     qint64 currentTime() const { return m_grabber.currentTime(); }
 
-    bool capturedDataToFrame(CLScreenGrapper::CaptureInfo data, AVFrame* frame) { return m_grabber.capturedDataToFrame(data, frame); }
+    bool capturedDataToFrame(CLScreenGrabber::CaptureInfo data, AVFrame* frame) { return m_grabber.capturedDataToFrame(data, frame); }
     void stop();
 protected:
     virtual void run();
 private:
-    CLScreenGrapper m_grabber;
+    CLScreenGrabber m_grabber;
     int m_frameRate;
-    CLNonReferredThreadQueue<CLScreenGrapper::CaptureInfo> m_queue;
+    CLNonReferredThreadQueue<CLScreenGrabber::CaptureInfo> m_queue;
     QVector<AVFrame*> m_frames;
     int m_frameIndex;
     //QTime m_timer;

@@ -7,14 +7,13 @@ class CLIntroVideoitem: public CLVideoWindowItem
 {
 public:
 	CLIntroVideoitem(GraphicsView* view, const CLDeviceVideoLayout* layout, int max_width, int max_height,
-		QString name="");
+					 QString name = QString());
 
 	virtual ~CLIntroVideoitem();
 
-    void drawStuff(QPainter* painter);
+	void drawStuff(QPainter* painter);
 
-    void goToSteadyMode(bool steady, bool instant);
-
+	void goToSteadyMode(bool steady, bool instant);
 };
 
 #endif //video_wnd_archive_h1753
