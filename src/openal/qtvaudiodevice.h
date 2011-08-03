@@ -28,7 +28,7 @@ private:
 	QtvAudioDevice();
 
 private:
-	static QtvAudioDevice* m_qtvAudioDevice;
+	static QtvAudioDevice m_qtvAudioDevice;
 	QList<QtvSound*> m_sounds;
 	ALCcontext* m_context;
 	ALCdevice* m_device;	
