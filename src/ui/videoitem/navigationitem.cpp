@@ -300,13 +300,14 @@ void NavigationItem::stepForward()
     m_camera->getCamCamDisplay()->setSingleShotMode(true);
 }
 
-void NavigationItem::hoverEnterEvent(QGraphicsSceneHoverEvent *)
+void NavigationItem::hoverEnterEvent(QGraphicsSceneHoverEvent *e)
 {
     m_mouseOver = true;
+    CLUnMovedInteractiveOpacityItem::hoverEnterEvent(e);
 }
 
-void NavigationItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
+void NavigationItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *e)
 {
     m_mouseOver = false;
+    CLUnMovedInteractiveOpacityItem::hoverLeaveEvent(e);
 }
-
