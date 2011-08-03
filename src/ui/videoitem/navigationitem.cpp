@@ -33,24 +33,46 @@ NavigationWidget::NavigationWidget(QWidget *parent) :
     m_layout->setSpacing(0);
 
     m_backwardButton = new QPushButton();
-    m_backwardButton->setFixedSize(75, 50);
+    m_backwardButton->setFixedSize(75, 40);
     m_backwardButton->setIcon(QIcon(":/skin/player/to_very_beginning.png"));
     m_backwardButton->setIconSize(QSize(50, 50));
 
     m_playButton = new QPushButton();
-    m_playButton->setFixedSize(75, 50);
+    m_playButton->setFixedSize(75, 40);
     m_playButton->setIcon(QIcon(":/skin/player/play.png"));
     m_playButton->setIconSize(QSize(50, 50));
 
     m_forwardButton = new QPushButton();
-    m_forwardButton->setFixedSize(75, 50);
+    m_forwardButton->setFixedSize(75, 40);
     m_forwardButton->setIcon(QIcon(":/skin/player/to_very_end.png"));
     m_forwardButton->setIconSize(QSize(50, 50));
 
+    m_stepBackwardButton = new QPushButton();
+    m_stepBackwardButton->setFixedSize(75, 40);
+    m_stepBackwardButton->setIcon(QIcon(":/skin/player/frame_backward.png"));
+    m_stepBackwardButton->setIconSize(QSize(50, 50));
+    m_stepBackwardButton->setEnabled(false);
+
+    m_stepForwardButton = new QPushButton();
+    m_stepForwardButton->setFixedSize(75, 40);
+    m_stepForwardButton->setIcon(QIcon(":/skin/player/frame_forward.png"));
+    m_stepForwardButton->setIconSize(QSize(50, 50));
+    m_stepForwardButton->setEnabled(false);
+
+    QGridLayout *gridLayout = new QGridLayout;
+    gridLayout->addWidget(m_backwardButton, 0, 0, 1, 2);
+    gridLayout->addWidget(m_playButton, 0, 2, 1, 2);
+    gridLayout->addWidget(m_forwardButton, 0, 4, 1, 2);
+    gridLayout->addWidget(m_stepBackwardButton, 1, 1, 1, 2);
+    gridLayout->addWidget(m_stepForwardButton, 1, 3, 1, 2);
+
     connect(m_playButton, SIGNAL(clicked()), SLOT(togglePlayPause()));
 
-    connect(m_backwardButton, SIGNAL(clicked()), SLOT(backwardPressed()));
-    connect(m_forwardButton, SIGNAL(clicked()), SLOT(forwardPressed()));
+    connect(m_backwardButton, SIGNAL(clicked()), SIGNAL(rewindBackward()));
+    connect(m_forwardButton, SIGNAL(clicked()), SIGNAL(rewindForward()));
+
+    connect(m_stepBackwardButton, SIGNAL(clicked()), SIGNAL(stepBackward()));
+    connect(m_stepForwardButton, SIGNAL(clicked()), SIGNAL(stepForward()));
 
     m_slider = new TimeSlider;
     m_slider->setObjectName("TimeSlider");
@@ -58,13 +80,14 @@ NavigationWidget::NavigationWidget(QWidget *parent) :
 
     m_label = new TimeLabel;
 
-    m_layout->addSpacerItem(new QSpacerItem(100, 10));
-    m_layout->addWidget(m_backwardButton);
-    m_layout->addWidget(m_playButton);
-    m_layout->addWidget(m_forwardButton);
+    m_layout->addSpacerItem(new QSpacerItem(50, 10));
+//    m_layout->addWidget(m_backwardButton);
+//    m_layout->addWidget(m_playButton);
+//    m_layout->addWidget(m_forwardButton);
+    m_layout->addLayout(gridLayout);
     m_layout->addWidget(m_slider);
     m_layout->addWidget(m_label);
-    m_layout->addSpacerItem(new QSpacerItem(100, 10));
+    m_layout->addSpacerItem(new QSpacerItem(50, 10));
     setLayout(m_layout);
 }
 
@@ -87,15 +110,15 @@ void NavigationWidget::setPlaying(bool playing)
     if (m_playing) {
 
         m_playButton->setIcon(QIcon(":/skin/player/pause.png"));
-        m_backwardButton->setIcon(QIcon(":/skin/player/to_very_beginning.png"));
-        m_forwardButton->setIcon(QIcon(":/skin/player/to_very_end.png"));
+        m_stepBackwardButton->setEnabled(false);
+        m_stepForwardButton->setEnabled(false);
 
         emit play();
     } else {
 
         m_playButton->setIcon(QIcon(":/skin/player/play.png"));
-        m_backwardButton->setIcon(QIcon(":/skin/player/frame_backward.png"));
-        m_forwardButton->setIcon(QIcon(":/skin/player/frame_forward.png"));
+        m_stepBackwardButton->setEnabled(true);
+        m_stepForwardButton->setEnabled(true);
 
         emit pause();
     }
@@ -104,22 +127,6 @@ void NavigationWidget::setPlaying(bool playing)
 void NavigationWidget::togglePlayPause()
 {
     setPlaying(!m_playing);
-}
-
-void NavigationWidget::backwardPressed()
-{
-    if (playing())
-        emit rewindBackward();
-    else
-        emit stepBackward();
-}
-
-void NavigationWidget::forwardPressed()
-{
-    if (playing())
-        emit rewindForward();
-    else
-        emit stepForward();
 }
 
 NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
@@ -246,7 +253,7 @@ void NavigationItem::play()
     reader->resume();
     reader->resumeDataProcessors();
 
-    m_camera->getCamCamDisplay()->playAudio(true);
+    m_camera->getCamCamDisplay()->playAudio(false);
 }
 
 void NavigationItem::rewindBackward()
@@ -293,12 +300,12 @@ void NavigationItem::stepForward()
     m_camera->getCamCamDisplay()->setSingleShotMode(true);
 }
 
-void NavigationItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+void NavigationItem::hoverEnterEvent(QGraphicsSceneHoverEvent *)
 {
     m_mouseOver = true;
 }
 
-void NavigationItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+void NavigationItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
 {
     m_mouseOver = false;
 }

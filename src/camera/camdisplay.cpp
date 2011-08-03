@@ -393,6 +393,7 @@ void CLCamDisplay::copyImage(bool copy)
 
 void CLCamDisplay::playAudio(bool play)
 {
+    return;
     m_needChangePriority = play != m_playAudio;
 
 	m_playAudio = play;

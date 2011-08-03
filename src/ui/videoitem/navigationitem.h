@@ -34,14 +34,8 @@ public:
     bool playing() const { return m_playing; }
     void setPlaying(bool);
 
-    void resizeEvent(QResizeEvent *) {
-        int a;
-    }
-
 private slots:
     void togglePlayPause();
-    void backwardPressed();
-    void forwardPressed();
 
 signals:
     void pause();
@@ -55,6 +49,8 @@ private:
     QHBoxLayout *m_layout;
     QPushButton *m_backwardButton;
     QPushButton *m_playButton;
+    QPushButton *m_stepForwardButton;
+    QPushButton *m_stepBackwardButton;
     QPushButton *m_forwardButton;
     bool m_playing;
     QPushButton *m_pauseButton;
@@ -96,8 +92,8 @@ private slots:
     void stepForward();
 
 protected:
-    void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
-    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
+    void hoverEnterEvent(QGraphicsSceneHoverEvent *);
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *);
 
 private:
     QGraphicsProxyWidget *m_proxy;

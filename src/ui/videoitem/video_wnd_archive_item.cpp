@@ -6,58 +6,9 @@
 #include "navigationitem.h"
 
 CLVideoWindowArchiveItem::CLVideoWindowArchiveItem (GraphicsView* view, const CLDeviceVideoLayout* layout, 
-													int max_width, int max_height, QString name):
+                                                    int max_width, int max_height, const QString &name) :
 CLVideoWindowItem(view, layout, max_width, max_height, name)
 {
-
-	m_archNavigatorHeight = 200;
-
-	mArchiveNavigator = new CLArchiveNavigatorItem(this, m_archNavigatorHeight);
-	mArchiveNavigator->setVisible(false);
-    addSubItem(mArchiveNavigator);
-    onResize();
-}
-
-void CLVideoWindowArchiveItem::goToSteadyMode(bool steady, bool instant)
-{
-    if (mArchiveNavigator->isCursorOnSlider())
-        return;
-
-    CLVideoWindowItem::goToSteadyMode(steady, instant);
-}
-
-CLVideoWindowArchiveItem::~CLVideoWindowArchiveItem()
-{
-	mArchiveNavigator->goToFullScreenMode(false);
-}
-
-void CLVideoWindowArchiveItem::onResize()
-{
-    CLVideoWindowItem::onResize();
-    if (isFullScreen())
-    {
-        mArchiveNavigator->goToFullScreenMode(false);
-        mArchiveNavigator->goToFullScreenMode(true);
-    }
-}
-
-QPointF CLVideoWindowArchiveItem::getBestSubItemPos(CLSubItemType type)
-{
-    if (type==ArchiveNavigatorSubItem)
-        return QPointF(0, height() - m_archNavigatorHeight);
-
-    return CLVideoWindowItem::getBestSubItemPos(type);
-}
-
-void CLVideoWindowArchiveItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-	mArchiveNavigator->updateSliderPos();
-	CLVideoWindowItem::paint(painter, option, widget);
-}
-
-void CLVideoWindowArchiveItem::draw(CLVideoDecoderOutput& image, unsigned int channel)
-{
-	CLVideoWindowItem::draw(image, channel);
 }
 
 void CLVideoWindowArchiveItem::setItemSelected(bool sel, bool animate, int delay)
@@ -66,7 +17,6 @@ void CLVideoWindowArchiveItem::setItemSelected(bool sel, bool animate, int delay
 
     if (sel)
     {
-        mArchiveNavigator->setVisible(true);
         if (m_navigationItem)
             m_navigationItem->setVideoCamera(getVideoCam());
     }
@@ -74,32 +24,5 @@ void CLVideoWindowArchiveItem::setItemSelected(bool sel, bool animate, int delay
     {
         if (m_navigationItem)
             m_navigationItem->setVideoCamera(0);
-        mArchiveNavigator->setVisible(false);
     }
 }
-
-void CLVideoWindowArchiveItem::setFullScreen(bool full)
-{
-
-	if (full)
-	{
-        removeSubItem(mArchiveNavigator);
-		mArchiveNavigator->goToFullScreenMode(true);
-	}
-	else
-	{
-		addSubItem(mArchiveNavigator);
-        mArchiveNavigator->goToFullScreenMode(false);
-	}
-
-    CLVideoWindowItem::setFullScreen(full);
-
-}
-
-void CLVideoWindowArchiveItem::setComplicatedItem(CLAbstractComplicatedItem* complicatedItem)
-{
-	CLVideoWindowItem::setComplicatedItem(complicatedItem);
-	mArchiveNavigator->setVideoCamera(getVideoCam());
-
-}
-

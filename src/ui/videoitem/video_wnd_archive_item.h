@@ -8,31 +8,16 @@ class CLAbstractArchiveReader;
 class CLVideoWindowArchiveItem : public CLVideoWindowItem
 {
 public:
-	CLVideoWindowArchiveItem (GraphicsView* view, const CLDeviceVideoLayout* layout, int max_width, int max_height,
-		QString name="");
-	virtual ~CLVideoWindowArchiveItem();
+    CLVideoWindowArchiveItem(GraphicsView* view, const CLDeviceVideoLayout* layout, int max_width, int max_height,
+                             const QString &name = QString());
 
-	virtual void setFullScreen(bool full);
+    virtual void setItemSelected(bool sel, bool animate = true, int delay = 0);
 
-	virtual void setItemSelected(bool sel, bool animate = true, int delay = 0);
-
-	void draw(CLVideoDecoderOutput& image, unsigned int channel);
-	QPointF getBestSubItemPos(CLSubItemType  type);
-
-	virtual void setComplicatedItem(CLAbstractComplicatedItem* complicatedItem);
-
-    virtual void goToSteadyMode(bool steady, bool instant);
-
-public slots:
-    void onResize();
-
+    NavigationItem *navigationItem() const { return m_navigationItem; }
+    void setNavigationItem(NavigationItem *item) { m_navigationItem = item; }
 
 protected:
-	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
-protected:
-	CLArchiveNavigatorItem* mArchiveNavigator;
-
-	int m_archNavigatorHeight;
+    NavigationItem *m_navigationItem;
 };
 
 #endif //video_wnd_archive_h1753

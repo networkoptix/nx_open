@@ -1849,6 +1849,7 @@ void GraphicsView::goToSteadyMode(bool steady)
 
     if (steady)
     {
+        return;
 
         foreach(CLAbstractUnmovedItem* item, m_staticItems)
         {

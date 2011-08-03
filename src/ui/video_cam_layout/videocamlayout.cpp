@@ -443,7 +443,7 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect, CLBasicLay
 		{
 			video_wnd = new CLVideoWindowArchiveItem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height(), device->getUniqueId());
 			video_wnd->setEditable(true);
-                        video_wnd->setNavigationItem(v->getNavigationItem());
+                        ((CLVideoWindowArchiveItem*)video_wnd)->setNavigationItem(v->getNavigationItem());
 
 		}
 		else
