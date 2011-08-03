@@ -10,6 +10,19 @@
 #include <QtGui/QWheelEvent>
 //#include <QDebug>
 
+#include <QProxyStyle>
+
+class ProxyStyle : public QProxyStyle
+{
+public:
+    int styleHint(StyleHint hint, const QStyleOption *option = 0, const QWidget *widget = 0, QStyleHintReturn *returnData = 0) const
+    {
+        if (hint == QStyle::SH_Slider_AbsoluteSetButtons)
+            return Qt::LeftButton;
+        return QProxyStyle::styleHint(hint, option, widget, returnData);
+    }
+};
+
 enum PaintMode { PaintMSeconds = 0, PaintSeconds, PaintMinutes, PaintHours, PaintDays };
 static const qint64 lengths[] = { 1, 1000, 1000*60, 1000*60*60, 1000*60*60*24, INT64_MAX };
 static const int coeffs[] = { 100, 5, 5, 1, 1, 1 };
@@ -140,6 +153,8 @@ void TimeLine::mousePressEvent(QMouseEvent *me)
     navigate more accurate.
 */
 
+Q_GLOBAL_STATIC(ProxyStyle, proxyStyle)
+
 TimeSlider::TimeSlider(QWidget *parent) :
     QWidget(parent),
     m_slider(new QSlider(this)),
@@ -157,6 +172,10 @@ TimeSlider::TimeSlider(QWidget *parent) :
     m_slider->setOrientation(Qt::Horizontal);
     m_slider->setMaximum(1000);
     m_slider->installEventFilter(this);
+
+    ProxyStyle *s = proxyStyle();
+    s->setBaseStyle(qApp->style());
+    m_slider->setStyle(s);
 
     m_frame->setFrameShape(QFrame::WinPanel);
     m_frame->setFrameShadow(QFrame::Sunken);
