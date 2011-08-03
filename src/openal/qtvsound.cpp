@@ -35,7 +35,8 @@ QtvSound::QtvSound(ALCdevice* device, const QAudioFormat& audioFormat)
 
 QtvSound::~QtvSound()
 {
-    internalClear();
+    if (!m_deinitialized)
+        internalClear();
     delete [] m_proxyBuffer;
 }
 
@@ -311,8 +312,8 @@ void QtvSound::internalClear()
 {
 	alSourceStop(m_source);
 	checkOpenALError(m_device);
-	alSourceRewind(m_source);
-	checkOpenALError(m_device);
+	//alSourceRewind(m_source);
+	//checkOpenALError(m_device);
     clearBuffers(true);
 	alDeleteSources(1, &m_source);
 	checkOpenALError(m_device);
