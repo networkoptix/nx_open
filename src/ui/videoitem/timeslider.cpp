@@ -11,7 +11,7 @@
 //#include <QDebug>
 
 enum PaintMode { PaintMSeconds = 0, PaintSeconds, PaintMinutes, PaintHours, PaintDays };
-static const qint64 lengths[] = { 1, 1000, 1000*60, 1000*60*60, 1000*60*60*24, INT64_MAX };
+static const qint64 lengths[] = { 1, 1000, 1000*60, 1000*60*60, 1000*60*60*24, 0x7fffffffffffffffll };
 static const int coeffs[] = { 100, 5, 5, 1, 1, 1 };
 static const int markCount[] = { 10, 5, 5, 4, 12, 1 };
 static const char *const names[] = { "ms", "s", "m", "h", "d" };
