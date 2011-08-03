@@ -195,6 +195,8 @@ bool QtvSound::isFormatSupported(const QAudioFormat& format)
 
 bool QtvSound::play(const quint8* data, uint size)
 {
+    QMutexLocker lock(&m_mtx);
+
     if (m_deinitialized)
     {
         m_isValid = setup();
@@ -291,16 +293,19 @@ int QtvSound::checkOpenALErrorDebug(ALCdevice* device)
 
 void QtvSound::suspend()
 {
+    QMutexLocker lock(&m_mtx);
     alSourcePause(m_source);
 }
 
 void QtvSound::resume()
 {
+    QMutexLocker lock(&m_mtx);
 	playImpl();
 }
 
 void QtvSound::clear()
 {
+    QMutexLocker lock(&m_mtx);
     if (m_deinitialized)
         return;
     internalClear();
