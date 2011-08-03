@@ -147,6 +147,8 @@ void QtvSound::clearBuffers(bool clearAll)
 
 uint QtvSound::playTimeElapsed()
 {
+    QMutexLocker lock(&m_mtx);
+
     if (m_deinitialized)
         return 0;
 
