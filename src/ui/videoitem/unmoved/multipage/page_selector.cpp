@@ -25,7 +25,7 @@ void QnPageSelector::setMaxPageNumber(int maxpage)
 {
     if (m_maxPage == maxpage)
         return;
-    
+
     m_maxPage = maxpage;
 
     if (m_currPage > m_maxPage)
@@ -105,7 +105,7 @@ void QnPageSelector::updateItems()
 
     if (minPage > 1)
     {
-        // if we do not see link to the fist page 
+        // if we do not see link to the fist page
         addEllipsis(true);
     }
 
@@ -136,20 +136,20 @@ void QnPageSelector::updateItems()
 
 void QnPageSelector::addEllipsis(bool left)
 {
-    QnPageSubItem* item = new QnPageSubItem("...", this, normalOpacity, activeOpacity, left ? 1 : m_maxPage, false);
-    addItemHelper(item);    
+    QnPageSubItem* item = new QnPageSubItem(tr("..."), this, normalOpacity, activeOpacity, left ? 1 : m_maxPage, false);
+    addItemHelper(item);
 }
 
 void QnPageSelector::addPrev()
 {
-    QnPageSubItem* item = new QnPageSubItem("Prev", this, normalOpacity, activeOpacity, m_currPage == 1 ? m_maxPage : m_currPage - 1, false );
+    QnPageSubItem* item = new QnPageSubItem(tr("Prev"), this, normalOpacity, activeOpacity, m_currPage == 1 ? m_maxPage : m_currPage - 1, false );
     addItemHelper(item);
     m_totalWidth += 10;
 }
 
 void QnPageSelector::addNext()
 {
-    QnPageSubItem* item = new QnPageSubItem("Next", this, normalOpacity, activeOpacity, m_currPage == m_maxPage ? 1 : m_currPage + 1, false );
+    QnPageSubItem* item = new QnPageSubItem(tr("Next"), this, normalOpacity, activeOpacity, m_currPage == m_maxPage ? 1 : m_currPage + 1, false );
     addItemHelper(item);
 }
 

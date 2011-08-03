@@ -46,6 +46,7 @@ private:
     void clearBuffers(bool clearAll);
 
 private:
+    QMutex m_mtx;
 	QAudioFormat m_audioFormat;
 
 #ifdef OPENAL_WIN32_ONLY

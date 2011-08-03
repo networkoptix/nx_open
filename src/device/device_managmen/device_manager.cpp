@@ -13,9 +13,7 @@
 // Init static variables
 CLDeviceManager* CLDeviceManager::m_Instance = 0;
 
-
-
-QString generalArchiverId = "Recorder:General Archiver";
+static const char generalArchiverId[] = "Recorder:General Archiver";
 
 //=============================================================
 CLDeviceManager& CLDeviceManager::instance()
@@ -34,7 +32,7 @@ mNeedresultsFromDirbrowsr(false)
 	connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimer()));
 	m_timer.start(100); // first time should come fast
 
-	addArchiver(generalArchiverId);
+	addArchiver(QLatin1String(generalArchiverId));
 
     /*
     // for tests
@@ -53,7 +51,7 @@ mNeedresultsFromDirbrowsr(false)
 	QString mediaRoot = Settings::instance().mediaRoot();
 	if (!QDir(mediaRoot).exists())
 		QDir(mediaRoot).mkpath(mediaRoot);
-	
+
     QStringList checkLst(Settings::instance().auxMediaRoots());
     checkLst.push_back(mediaRoot);
     pleaseCheckDirs(checkLst);
@@ -61,13 +59,13 @@ mNeedresultsFromDirbrowsr(false)
 
 #if 0
     {
-        // intro video device 
+        // intro video device
         CLDeviceList lst;
         CLAviDevice* dev = new CLAviDevice("intro.mov");
         lst[dev->getUniqueId()] = dev;
-        onNewDevices_helper(lst, generalArchiverId);
+        onNewDevices_helper(lst, QLatin1String(generalArchiverId));
     }
-#endif    
+#endif
 }
 
 CLDeviceManager::~CLDeviceManager()
@@ -90,7 +88,7 @@ CLDeviceManager::~CLDeviceManager()
 
 CLDeviceSearcher& CLDeviceManager::getDeviceSearcher()
 {
-	return m_dev_searcher;
+    return m_dev_searcher;
 }
 
 void CLDeviceManager::pleaseCheckDirs(const QStringList& lst)
@@ -118,7 +116,7 @@ void CLDeviceManager::onTimer()
 
 	if (!m_dev_searcher.isRunning() )
 	{
-		onNewDevices_helper(m_dev_searcher.result(), generalArchiverId);
+		onNewDevices_helper(m_dev_searcher.result(), QLatin1String(generalArchiverId));
 		m_dev_searcher.start(); // run searcher again ...
 	}
 
@@ -127,7 +125,7 @@ void CLDeviceManager::onTimer()
 
     if (mNeedresultsFromDirbrowsr)
     {
-        //mDirbrowsr is not running 
+        //mDirbrowsr is not running
         getResultFromDirBrowser();
         mNeedresultsFromDirbrowsr = false;
     }
@@ -249,7 +247,7 @@ void CLDeviceManager::onNewDevices_helper(CLDeviceList devices, QString parentId
 
     //int dev_per_arch  = devices.count()/10 + 1; // tests
     //int dev_count = 0;
-              
+
 
 	foreach (CLDevice* device, devices)
 	{
@@ -257,8 +255,8 @@ void CLDeviceManager::onNewDevices_helper(CLDeviceList devices, QString parentId
 		{
 			device->getStatus().setFlag(CLDeviceStatus::READY);
 
-            device->setParentId(parentId);
-            
+			device->setParentId(parentId);
+
             //device->setParentId( QString::number(dev_count/dev_per_arch)); // tests
             //++dev_count;
 
@@ -288,41 +286,37 @@ bool CLDeviceManager::isDeviceMeetCriteria(const CLDeviceCriteria& cr, CLDevice*
 
 	if (cr.getCriteria()== CLDeviceCriteria::ALL)
 	{
-		if (cr.getRecorderId()=="*")
-			return true;
-
-		if (dev->getParentId() == "")
+		if (dev->getParentId().isEmpty())
 			return false;
 
-		if (dev->getParentId()!=cr.getRecorderId())
+		if (cr.getRecorderId() == QLatin1String("*"))
+			return true;
+
+		if (dev->getParentId() != cr.getRecorderId())
 			return false;
 	}
 
 	if (cr.getCriteria()== CLDeviceCriteria::FILTER)
 	{
-        if (cr.filter().length()==0)
-            return false;
+		if (cr.filter().length()==0)
+			return false;
 
 
         QString dev_string = dev->toString();
 
         bool matches = false;
 
-
-        QStringList serach_list = cr.filter().split('+', QString::SkipEmptyParts);
-        foreach(QString sub_filter, serach_list)
+        QStringList serach_list = cr.filter().split(QLatin1Char('+'), QString::SkipEmptyParts);
+        foreach (const QString &sub_filter, serach_list)
         {
             if (serach_list.count()<2 || sub_filter.length()>2)
-                matches = matches || match_subfilter(dev_string, sub_filter);
+                matches |= match_subfilter(dev_string, sub_filter);
         }
 
-
         return matches;
+    }
 
-	}
-
-	return true;
-
+    return true;
 }
 
 
@@ -338,15 +332,14 @@ void CLDeviceManager::addArchiver(QString id)
 
 bool CLDeviceManager::match_subfilter(QString dev, QString fltr) const
 {
-    QStringList serach_list = fltr.split(" ", QString::SkipEmptyParts);
-
-    foreach(QString str, serach_list)
+    QStringList serach_list = fltr.split(QLatin1Char(' '), QString::SkipEmptyParts);
+    foreach(const QString &str, serach_list)
     {
         if (!dev.contains(str, Qt::CaseInsensitive))
             return false;
     }
 
-    return (serach_list.count());
+    return !serach_list.isEmpty();
 
 }
 
@@ -356,11 +349,11 @@ void CLDeviceManager::getResultFromDirBrowser()
     CLDeviceList dev_list = mDirbrowsr.result();
 
     {
-        // exclude already existing devices 
+        // exclude already existing devices
         QMutexLocker lock(&m_dev_searcher.all_devices_mtx);
         CLDeviceList& all_devices =  m_dev_searcher.getAllDevices();
 
-        CLDeviceList::iterator it = dev_list.begin(); 
+        CLDeviceList::iterator it = dev_list.begin();
         while (it!=dev_list.end())
         {
             if (!all_devices.contains(it.key()))
@@ -375,13 +368,13 @@ void CLDeviceManager::getResultFromDirBrowser()
 
     }
 
-    onNewDevices_helper(dev_list, generalArchiverId);
+    onNewDevices_helper(dev_list, QLatin1String(generalArchiverId));
 }
 
 void CLDeviceManager::addFiles(const QStringList& files)
 {
     CLDeviceList lst;
-    foreach(QString xfile, files)
+    foreach(const QString &xfile, files)
     {
 
         //onNewDevices_helper does not check if devices already exist
@@ -392,11 +385,11 @@ void CLDeviceManager::addFiles(const QStringList& files)
         if (dev)
         {
             dev->releaseRef();
-            continue; // such dev already exists 
+            continue; // such dev already exists
         }
 
         QString xfileName = xfile;
-        int paramsPos = xfile.indexOf('?');
+        int paramsPos = xfile.indexOf(QLatin1Char('?'));
         if (paramsPos >= 0)
             xfileName = xfile.left(paramsPos);
         QFile file(xfileName);
@@ -431,5 +424,5 @@ void CLDeviceManager::addFiles(const QStringList& files)
     }
 
 
-    onNewDevices_helper(lst, generalArchiverId);
+    onNewDevices_helper(lst, QLatin1String(generalArchiverId));
 }

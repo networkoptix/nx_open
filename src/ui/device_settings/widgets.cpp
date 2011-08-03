@@ -23,7 +23,7 @@ m_sub_group(sub_group)
 {
 	mParam = mDevice->getDeviceParamList().get(paramname);
 
-	QObject::connect(this, SIGNAL( setParam(const QString&, const CLValue&) ), 
+	QObject::connect(this, SIGNAL( setParam(const QString&, const CLValue&) ),
 					handler, SLOT( setParam(const QString&, const CLValue&) )  );
 }
 
@@ -55,12 +55,12 @@ void CLAbstractSettingsWidget::setParam_helper(const QString& /*name*/, const CL
 
 QString CLAbstractSettingsWidget::group() const
 {
-    return m_group;
+	return m_group;
 }
 
 QString CLAbstractSettingsWidget::subGroup() const
 {
-    return m_sub_group;
+	return m_sub_group;
 }
 
 //==============================================
@@ -88,7 +88,7 @@ void SettingsOnOffWidget::stateChanged(int state)
 {
 	if (mParam.value.possible_values.count()<2)
 	{
-		cl_log.log("param.value.possible_values.count()<2 !!!!", cl_logERROR);
+		cl_log.log(QLatin1String("param.value.possible_values.count()<2 !!!!"), cl_logERROR);
 		return;
 	}
 
@@ -192,8 +192,8 @@ CLAbstractSettingsWidget(handler, dev, group, sub_group, paramname)
 		m_radioBtns.push_back(btn);
 
         connect(btn , SIGNAL(clicked()), this, SLOT(onClicked()));
-     
-	}
+
+    }
 
 	//QPushButton* btnt = new QPushButton("test");
 	//btnt->select
@@ -242,7 +242,7 @@ CLAbstractSettingsWidget(handler, dev, group, sub_group, paramname)
 
 void SettingsButtonWidget::onClicked()
 {
-	setParam_helper(mParam.name, "");
+    setParam_helper(mParam.name, "");
 }
 
 void SettingsButtonWidget::updateParam(QString /*val*/)

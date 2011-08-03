@@ -10,35 +10,48 @@
 #include <d3dx9.h>
 #include <QTime>
 
-class CLScreenGrapper: public QObject
+class CLScreenGrabber: public QObject
 {
     Q_OBJECT
 public:
-    enum CaptureMode {CaptureMode_DesktopWithAero, CaptureMode_DesktopWithoutAero, CaptureMode_Application};
-    
-    // resolution (0,0) - use default(native resolution)
-    // negative resolution - use specified scale factor 
+    struct CaptureInfo
+    {
+        CaptureInfo(): pts(0), opaque(0), w(0), h(0) {}
+        qint64 pts;
+        void* opaque;
+        int w;
+        int h;
+        QPoint pos;
+    };
 
-    CLScreenGrapper(int displayNumber, int poolSize, CaptureMode mode, bool captureCursor,
-                    const QSize& captureResolution);
-    virtual ~CLScreenGrapper();
+    enum CaptureMode {CaptureMode_DesktopWithAero, CaptureMode_DesktopWithoutAero, CaptureMode_Application};
+
+    // resolution (0,0) - use default(native resolution)
+    // negative resolution - use specified scale factor
+
+    CLScreenGrabber(int displayNumber, int poolSize, CaptureMode mode, bool captureCursor,
+                    const QSize& captureResolution, QWidget* widget);
+    virtual ~CLScreenGrabber();
 
     // capture screenshot in YUV 4:2:0 format
     // allocate frame data if frame is not initialized
-    void* captureFrame();
-    bool capturedDataToFrame(void* surface, AVFrame* frame);
+    CaptureInfo captureFrame();
+    bool capturedDataToFrame(const CaptureInfo& captureInfo, AVFrame* frame);
 
     PixelFormat format() const { return PIX_FMT_YUV420P; }
     //PixelFormat format() const { return PIX_FMT_BGRA; }
     int width() const;
     int height() const;
     qint64 currentTime() const;
+    int refreshRate() const { return m_ddm.RefreshRate;}
+    void restartTimer() { m_timer.restart(); }
 private:
     HRESULT	InitD3D(HWND hWnd);
-    bool capturedDataToFrame(quint8* data, AVFrame* pFrame);
+    bool dataToFrame(quint8* data, int width, int height, AVFrame* pFrame);
     bool direct3DDataToFrame(void* opaque, AVFrame* pFrame);
-    Q_INVOKABLE void captureFrameOpenGL(void* data);
-    void drawCursor(quint32* data, int dataStride) const;
+    Q_INVOKABLE void captureFrameOpenGL(void* opaque);
+    void drawCursor(quint32* data, int dataStride, int height, int leftOffset, int topOffset, bool flip) const;
+    void allocateTmpFrame(int width, int height);
 private:
     int m_displayNumber;
 
@@ -66,6 +79,10 @@ private:
     int m_outHeight;
     AVFrame* m_tmpFrame;
     quint8* m_tmpFrameBuffer;
+    MONITORINFO m_monInfo;
+    QWidget* m_widget;
+    int m_tmpFrameWidth;
+    int m_tmpFrameHeight;
 };
 
 

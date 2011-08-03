@@ -12,14 +12,14 @@ CLStreamreader(dev)
 void CLSingleShotStreamreader::run()
 {
 
-	CL_LOG(cl_logINFO) cl_log.log("single shot stream reader started.", cl_logINFO);
+	CL_LOG(cl_logINFO) cl_log.log(QLatin1String("single shot stream reader started."), cl_logINFO);
 
 	CLAbstractMediaData *data = 0;
 	data = getData();
 
-    if (data)
-	    putData(data);
+	if (data)
+		putData(data);
 
-	CL_LOG(cl_logINFO) cl_log.log("single shot stream reader stopped.", cl_logINFO);
+	CL_LOG(cl_logINFO) cl_log.log(QLatin1String("single shot stream reader stopped."), cl_logINFO);
 }
 

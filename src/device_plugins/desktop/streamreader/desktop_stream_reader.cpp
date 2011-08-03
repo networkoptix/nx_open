@@ -33,10 +33,11 @@ CLDesktopStreamreader::CLDesktopStreamreader(CLDevice* dev):
 {
     QString num= dev->getUniqueId();
     int idx = num.length()-1;
-    while (idx >= 0 && num[idx] >= '0' && num[idx] <= '9')
+    while (idx >= 0 && num[idx].unicode() >= '0' && num[idx].unicode() <= '9')
         idx--;
     m_grabber = new CLBufferedScreenGrabber(num.right(num.length()-idx-1).toInt()-1);
     m_encoderCodecName = "mpeg2video";
+    m_grabber->start(QThread::HighestPriority);
     //m_encoderCodecName = "mpeg4";
 }
 
@@ -47,7 +48,7 @@ CLDesktopStreamreader::~CLDesktopStreamreader()
 
 bool CLDesktopStreamreader::init()
 {
-    // must be called before using avcodec 
+    // must be called before using avcodec
     avcodec_init();
     // register all the codecs (you can also register only the codec you wish to have smaller code
     avcodec_register_all();
@@ -64,14 +65,14 @@ bool CLDesktopStreamreader::init()
     AVCodec* codec = avcodec_find_encoder_by_name(m_encoderCodecName);
     if(codec == 0)
     {
-        cl_log.log("Can't find encoder", cl_logWARNING);
+        cl_log.log(QLatin1String("Can't find encoder"), cl_logWARNING);
         return false;
     }
-    
+
     m_videoCodecCtx = avcodec_alloc_context();
 
     m_videoCodecCtx->time_base = m_grabber->getFrameRate();
-    m_videoCodecCtx->pix_fmt = m_grabber->format(); 
+    m_videoCodecCtx->pix_fmt = m_grabber->format();
     m_videoCodecCtx->width = m_grabber->width();
     m_videoCodecCtx->height = m_grabber->height();
     m_videoCodecCtx->has_b_frames = 0;
@@ -87,7 +88,7 @@ bool CLDesktopStreamreader::init()
 
     if (avcodec_open(m_videoCodecCtx, codec) < 0)
     {
-        cl_log.log("Can't initialize encoder", cl_logWARNING);
+        cl_log.log(QLatin1String("Can't initialize encoder"), cl_logWARNING);
         return false;
     }
 
@@ -100,8 +101,8 @@ CLAbstractMediaData* CLDesktopStreamreader::getNextData()
         return 0;
     while (!m_needStop)
     {
-        void* capturedData = m_grabber->getNextFrame();
-        if (!capturedData)
+        CLScreenGrabber::CaptureInfo capturedData = m_grabber->getNextFrame();
+        if (!capturedData.opaque)
             continue;
         m_grabber->capturedDataToFrame(capturedData, m_frame);
 

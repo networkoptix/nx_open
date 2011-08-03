@@ -34,12 +34,13 @@ void CLDeviceSearcher::run()
 	if (ip_finished)
 	{
 		static bool first_time = true;
-		const QString& message = QObject::trUtf8("Cannot get available IP address.");
+		const QString message = QObject::tr("Cannot get available IP address.");
 		CL_LOG(cl_logWARNING) cl_log.log(message ,cl_logWARNING);
 		if (first_time)
 		{
-			QMessageBox* box = new QMessageBox(QMessageBox::Warning, "Info", message, QMessageBox::Ok, 0);
+			QMessageBox* box = new QMessageBox(QMessageBox::Warning, tr("Info"), message, QMessageBox::Ok, 0);
 			box->show();
+			// ### fix leaking
 			first_time = false;
 		}
 	}
@@ -49,7 +50,7 @@ void CLDeviceSearcher::run()
 CLDeviceList CLDeviceSearcher::findNewDevices(bool& ip_finished)
 {
 
-    bool allow_to_change_ip = Settings::instance().isAllowChangeIP();
+	bool allow_to_change_ip = Settings::instance().isAllowChangeIP();
 
 	ip_finished = false;
 
@@ -57,10 +58,10 @@ CLDeviceList CLDeviceSearcher::findNewDevices(bool& ip_finished)
 	QTime time;
 	time.start();
 
-	m_netState.updateNetState(); // update net state before serach 
+	m_netState.updateNetState(); // update net state before serach
 
 	//====================================
-	CL_LOG(cl_logDEBUG1) cl_log.log("looking for devices...", cl_logDEBUG1);
+	CL_LOG(cl_logDEBUG1) cl_log.log(QLatin1String("looking for devices..."), cl_logDEBUG1);
 
 	CLDeviceList devices;
 
@@ -80,7 +81,7 @@ CLDeviceList CLDeviceSearcher::findNewDevices(bool& ip_finished)
 	{
 		QMutexLocker lock(&all_devices_mtx);
 
-		it = devices.begin(); 
+		it = devices.begin();
 		while (it!=devices.end())
 		{
 			const QString& unique = it.key();
@@ -96,7 +97,7 @@ CLDeviceList CLDeviceSearcher::findNewDevices(bool& ip_finished)
 			if (all_dev->getStatus().checkFlag(CLDeviceStatus::READY)) // such device already exists
 			{
 				// however, ip address or mask may be changed( very unlikely but who knows )
-				// and this is why we need to check if old( already existing device) still is in our subnet 
+				// and this is why we need to check if old( already existing device) still is in our subnet
 				if (all_dev->checkDeviceTypeFlag(CLDevice::NETWORK))
 				{
 					CLNetworkDevice* all_dev_net = static_cast<CLNetworkDevice*>(all_dev);
@@ -127,7 +128,7 @@ CLDeviceList CLDeviceSearcher::findNewDevices(bool& ip_finished)
 	// at this point in devices we have all new found devices
 	CLDeviceList not_network_devices;
 
-	// remove all not network devices from list 
+	// remove all not network devices from list
 	{
 		CLDeviceList::iterator it = devices.begin();
 		while (it!=devices.end())
@@ -144,14 +145,14 @@ CLDeviceList CLDeviceSearcher::findNewDevices(bool& ip_finished)
 		}
 	}
 
-	// now devices list has only network devices 
+	// now devices list has only network devices
 
 	// lets form the list of existing IP
 	CLIPList busy_list;
 
 	CLDeviceList bad_ip_list;
 
-	cl_log.log("Found ", devices.size() + not_network_devices.size(), " new(!) devices.", cl_logDEBUG1);
+	cl_log.log(QLatin1String("Found "), devices.size() + not_network_devices.size(), QLatin1String(" new(!) devices."), cl_logDEBUG1);
 
 	CL_LOG(cl_logDEBUG2)
 	{
@@ -159,7 +160,7 @@ CLDeviceList CLDeviceSearcher::findNewDevices(bool& ip_finished)
 			cl_log.log(it.value()->toString(), cl_logDEBUG2);
 	}
 
-	cl_log.log("Time elapsed: ", time.elapsed(), cl_logDEBUG1);
+	cl_log.log(QLatin1String("Time elapsed: "), time.elapsed(), cl_logDEBUG1);
 
 	if (devices.size()==0) // no new devices
 		goto END;
@@ -186,15 +187,15 @@ CLDeviceList CLDeviceSearcher::findNewDevices(bool& ip_finished)
 
 	time.restart();
 
-	cl_log.log("Checking for real conflicts ", devices.size(), " devices.", cl_logDEBUG1);
+	cl_log.log(QLatin1String("Checking for real conflicts "), devices.size(), QLatin1String(" devices."), cl_logDEBUG1);
 	markConflictingDevices(devices,5);
 	fromListToList(devices, bad_ip_list, CLDeviceStatus::CONFLICTING, CLDeviceStatus::CONFLICTING);
-	cl_log.log("Time elapsed ", time.restart(), cl_logDEBUG1);
-	cl_log.log(" ", devices.size(), " new(!) devices not conflicting .", cl_logDEBUG1);
+	cl_log.log(QLatin1String("Time elapsed "), time.restart(), cl_logDEBUG1);
+	cl_log.log(QLatin1String(" "), devices.size(), QLatin1String(" new(!) devices not conflicting ."), cl_logDEBUG1);
 
 	//======================================
 
-	// now in devices only new non conflicting devices; in bad_ip_list only devices with conflicts, so ip of bad_ip_list must be chnged 
+	// now in devices only new non conflicting devices; in bad_ip_list only devices with conflicts, so ip of bad_ip_list must be chnged
 	if (!allow_to_change_ip)// nothing elese we can do
 	{
 		// move all back to devices
@@ -233,12 +234,12 @@ CLDeviceList CLDeviceSearcher::findNewDevices(bool& ip_finished)
 
 	time.restart();
 	if (bad_ip_list.size())
-		cl_log.log("Changing IP addresses... ", cl_logDEBUG1);
+		cl_log.log(QLatin1String("Changing IP addresses... "), cl_logDEBUG1);
 
 	resovle_conflicts(bad_ip_list, busy_list, ip_finished);
 
 	if (bad_ip_list.size())
-		cl_log.log("Done. Time elapsed: ", time.elapsed(), cl_logDEBUG1);
+		cl_log.log(QLatin1String("Done. Time elapsed: "), time.elapsed(), cl_logDEBUG1);
 
 	fromListToList(bad_ip_list,  devices, 0, 0); // move everything to result list
 
@@ -262,7 +263,7 @@ END:
 	}
 
 	// ok. at this point devices contains only network devices. and some of them have unknownDevice==true;
-	// we need to resolve such devices 
+	// we need to resolve such devices
 	if (devices.count())
 	{
 		devices = resolveUnknown_helper(devices);
@@ -288,12 +289,12 @@ void CLDeviceSearcher::resovle_conflicts(CLDeviceList& device_list, CLIPList& bu
 
 		CLSubNetState& subnet = m_netState.getSubNetState(device->getDiscoveryAddr());
 
-		cl_log.log("Looking for next addr...", cl_logDEBUG1);
+		cl_log.log(QLatin1String("Looking for next addr..."), cl_logDEBUG1);
 
 		if (!getNextAvailableAddr(subnet, busy_list))
 		{
 			ip_finished = true;			// no more FREE ip left ?
-			cl_log.log("No more available IP!!", cl_logERROR);
+			cl_log.log(QLatin1String("No more available IP!!"), cl_logERROR);
 			break;
 		}
 
@@ -309,7 +310,7 @@ void CLDeviceSearcher::resovle_conflicts(CLDeviceList& device_list, CLIPList& bu
 
 bool CLDeviceSearcher::checkObviousConflicts(CLDeviceList& lst)
 {
-	// this function deals with network devices only 
+	// this function deals with network devices only
 
 	bool result = false;
 
@@ -375,45 +376,25 @@ void CLDeviceSearcher::fromListToList(CLDeviceList& from, CLDeviceList& to, int 
 
 }
 
-#ifndef _WIN32
 struct T
 {
 	T(CLNetworkDevice* d)
 	{
 		device = d;
 	}
-	
+
 	void f()
 	{
 		device->conflicting();
 	}
-	
+
 	CLNetworkDevice* device;
 };
-#endif
 
 void CLDeviceSearcher::markConflictingDevices(CLDeviceList& lst, int threads)
 {
 	// cannot make concurrent work with pointer CLDevice* ; => so extra steps needed
-	// this function deals with network devices only 
-
-#ifdef _WIN32
-    struct T
-    {
-        T(CLNetworkDevice* d)
-        {
-            device = d;
-        }
-
-        void f()
-        {
-            device->conflicting();
-        }
-
-        CLNetworkDevice* device;
-    };
-#endif
-
+	// this function deals with network devices only
 
 	QList<T> local_list;
 
@@ -443,7 +424,7 @@ CLDeviceList CLDeviceSearcher::resolveUnknown_helper(CLDeviceList& lst)
 	{
 		CLNetworkDevice* device = static_cast<CLNetworkDevice*>(it.value());
 
-		if (!device->unknownDevice() || 
+		if (!device->unknownDevice() ||
 			device->getStatus().checkFlag(CLDeviceStatus::CONFLICTING) ||
 			device->getStatus().checkFlag(CLDeviceStatus::NOT_IN_SUBNET))
 		{
@@ -453,7 +434,7 @@ CLDeviceList CLDeviceSearcher::resolveUnknown_helper(CLDeviceList& lst)
 			continue;
 		}
 
-		// device is unknown and not conflicting 
+		// device is unknown and not conflicting
 		CLNetworkDevice* new_device = device->updateDevice();
 
 		if (new_device)

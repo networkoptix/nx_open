@@ -1,5 +1,6 @@
-QT = core gui network xml xmlpatterns opengl multimedia webkit 
+QT = core gui network xml opengl multimedia webkit
 CONFIG += x86 precompile_header
+CONFIG -= flat
 TEMPLATE = app
 VERSION = 0.0.1
 ICON = eve_logo.icns
@@ -9,7 +10,7 @@ TARGET = EvePlayer-Beta
 
 include(../contrib/qtsingleapplication/src/qtsingleapplication.pri)
 
-debug {
+CONFIG(debug, debug|release) {
   DESTDIR = ../bin/debug
   OBJECTS_DIR  = ../build/debug
   MOC_DIR = ../build/debug/generated
@@ -18,7 +19,7 @@ debug {
   INCLUDEPATH += $$FFMPEG-debug/include
 }
 
-release {
+CONFIG(release, debug|release) {
   DESTDIR = ../bin/release
   OBJECTS_DIR  = ../build/release
   MOC_DIR = ../build/release/generated
@@ -29,8 +30,17 @@ release {
 
 
 win32 {
-  QMAKE_CXXFLAGS += -MP /Fd$(IntDir)
-  INCLUDEPATH += ../contrib/ffmpeg-misc-headers-win32
+  win32-msvc* {
+    QMAKE_CXXFLAGS += -MP /Fd$$OBJECTS_DIR
+    DEFINES += _CRT_SECURE_NO_WARNINGS
+    INCLUDEPATH += ../contrib/ffmpeg-misc-headers-win32
+    INCLUDEPATH += "$$(DXSDK_DIR)/Include"
+    !contains(QMAKE_HOST.arch, x86_64) {
+      LIBS += -L"$$(DXSDK_DIR)/Lib/x86"
+    } else {
+      LIBS += -L"$$(DXSDK_DIR)/Lib/x64"
+    }
+  }
   INCLUDEPATH += ../contrib/openal/include
   RC_FILE = uniclient.rc
 }
@@ -52,8 +62,8 @@ FORMS += mainwnd.ui preferences.ui licensekey.ui recordingsettings.ui
 
 
 win32 {
-  LIBS += ws2_32.lib Iphlpapi.lib
-  QMAKE_LFLAGS += avcodec-53.lib avdevice-53.lib avfilter-2.lib avformat-53.lib avutil-51.lib swscale-0.lib
+  LIBS += ws2_32.lib Iphlpapi.lib Ole32.lib
+  LIBS += avcodec.lib avdevice.lib avfilter.lib avformat.lib avutil.lib swscale.lib
   QMAKE_LFLAGS_DEBUG += /libpath:$$FFMPEG-debug/bin
   QMAKE_LFLAGS_RELEASE += /libpath:$$FFMPEG-release/bin
 
@@ -63,14 +73,16 @@ win32 {
   SOURCES += $$asm_sources base/colorspace_convert/colorspace.c
   DEFINES += ARCH_IS_32BIT ARCH_IS_IA32
 
-  asm_compiler.commands = ..\\contrib\\nasm.exe -f win32 -DWINDOWS ${QMAKE_FILE_IN} -o \$(IntDir)${QMAKE_FILE_BASE}.obj -I$$PWD/
+  asm_compiler.commands = ..\\contrib\\nasm.exe -f win32 -DWINDOWS ${QMAKE_FILE_IN} -o $$OBJECTS_DIR/${QMAKE_FILE_BASE}.obj -I$$PWD
   asm_compiler.input = asm_sources
-  asm_compiler.output = \$(IntDir)${QMAKE_FILE_BASE}.obj
+  asm_compiler.output = $$OBJECTS_DIR/${QMAKE_FILE_BASE}.obj
   asm_compiler.CONFIG = explicit_dependencies
-  compiler.depends=\$(IntDir)${QMAKE_FILE_BASE}.obj
+  compiler.depends=$$OBJECTS_DIR/${QMAKE_FILE_BASE}.obj
   asm_compiler.variable_out = OBJECTS
   QMAKE_EXTRA_COMPILERS += asm_compiler
-  LIBS += d3d9.lib d3dx9.lib dwmapi.lib
+  LIBS += d3d9.lib d3dx9.lib Propsys.lib winmm.lib
+
+  SOURCES += dsp_effects/speex/preprocess.c dsp_effects/speex/filterbank.c dsp_effects/speex/fftwrap.c dsp_effects/speex/smallft.c  dsp_effects/speex/mdf.c
 }
 
 mac {

@@ -7,7 +7,7 @@
 //======================================================
 
 extern int create_sps_pps(
-				   int frameWidth, 
+				   int frameWidth,
 				   int frameHeight,
 				   int deblock_filter,
 				   unsigned char* data, int max_datalen);
@@ -73,28 +73,28 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 			h264 = isH264();//false;
 
 			/*
-			if (m_streamParam.exists("Codec")) // cam is not jpeg only
+			if (m_streamParam.exists(QLatin1String("Codec"))) // cam is not jpeg only
 			{
-				CLParam codec = m_streamParam.get("Codec");
-				if (codec.value.value != QString("JPEG"))
+				CLParam codec = m_streamParam.get(QLatin1String("Codec"));
+				if (codec.value.value != QLatin1String("JPEG"))
 					h264 = true;
 			}
-            */
+			*/
 
-			if (!m_streamParam.exists("Quality") || !m_streamParam.exists("resolution") || 
-				!m_streamParam.exists("image_left") || !m_streamParam.exists("image_top") ||
-				!m_streamParam.exists("image_right") || !m_streamParam.exists("image_bottom") ||
-				(h264 && !m_streamParam.exists("streamID")) || (h264 && !m_streamParam.exists("Bitrate")))
+			if (!m_streamParam.exists(QLatin1String("Quality")) || !m_streamParam.exists(QLatin1String("resolution")) ||
+				!m_streamParam.exists(QLatin1String("image_left")) || !m_streamParam.exists(QLatin1String("image_top")) ||
+				!m_streamParam.exists(QLatin1String("image_right")) || !m_streamParam.exists(QLatin1String("image_bottom")) ||
+				(h264 && !m_streamParam.exists(QLatin1String("streamID"))) || (h264 && !m_streamParam.exists(QLatin1String("Bitrate"))))
 			{
-				cl_log.log("Erorr!!! parameter is missing in stream params.", cl_logERROR);
+				cl_log.log(QLatin1String("Erorr!!! parameter is missing in stream params."), cl_logERROR);
 				return 0;
 			}
 
 			//=========
-			left = m_streamParam.get("image_left").value.value;
-			top = m_streamParam.get("image_top").value.value;
-			right = m_streamParam.get("image_right").value.value;
-			bottom = m_streamParam.get("image_bottom").value.value;
+			left = m_streamParam.get(QLatin1String("image_left")).value.value;
+			top = m_streamParam.get(QLatin1String("image_top")).value.value;
+			right = m_streamParam.get(QLatin1String("image_right")).value.value;
+			bottom = m_streamParam.get(QLatin1String("image_bottom")).value.value;
 
 			if ((m_model == AV3135 || m_model == AV3130) && m_black_white)
 			{
@@ -124,10 +124,10 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 			if (m_last_cam_height==0)
 				m_last_cam_height= height;
 
-			//quality = m_streamParam.get("Quality").value.value;
+			//quality = m_streamParam.get(QLatin1String("Quality")).value.value;
 			quality = getQuality();
 
-			resolutionFULL = (m_streamParam.get("resolution").value.value == QString("full"));
+			resolutionFULL = (m_streamParam.get(QLatin1String("resolution")).value.value == QLatin1String("full"));
 
 			streamID = 0;
 			if (h264)
@@ -144,16 +144,14 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 					setNeedKeyData();
 				}
 
-				streamID = m_streamParam.get("streamID").value.value;
-				//bitrate = m_streamParam.get("Bitrate").value.value;
+				streamID = m_streamParam.get(QLatin1String("streamID")).value.value;
+				//bitrate = m_streamParam.get(QLatin1String("Bitrate")).value.value;
 				bitrate = getBitrate();
 			}
-			//=========
-
 	}
 
 	if (h264)
-		quality=37-quality; // for H.264 it's not quality; it's qp 
+		quality=37-quality; // for H.264 it's not quality; it's qp
 
 	if (!h264)
 		os <<"image";
@@ -193,7 +191,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 	}
 	/**/
 
-	forecast_size = resolutionFULL ? (width*height)/4  : (width*height)/8; // 0.25 meg per megapixel as maximum 
+	forecast_size = resolutionFULL ? (width*height)/4  : (width*height)/8; // 0.25 meg per megapixel as maximum
 
 	CLSimpleTFTPClient tftp_client((static_cast<CLAreconVisionDevice*>(m_device))->getIP().toString().toLatin1().data(),  m_timeout, 3);
 
@@ -213,7 +211,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 		unsigned char h264header[50];
 		expectable_header_size = create_sps_pps(m_last_cam_width , m_last_cam_height, 0, h264header, sizeof(h264header));
 		img.prepareToWrite(expectable_header_size + 5 ); // 5: from cam in tftp mode we receive data starts from second byte of slice header; so we need to put start code and first byte
-		img.done(expectable_header_size + 5 ); 
+		img.done(expectable_header_size + 5 );
 
 		// please note that we did not write a single byte to img, we just move position...
 		// we will write header based on last packet information
@@ -221,7 +219,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 	else
 	{
 		// in jpeg image header size has constant len
-		img.prepareToWrite(AVJpeg::Header::GetHeaderSize()-2); 
+		img.prepareToWrite(AVJpeg::Header::GetHeaderSize()-2);
 		img.done(AVJpeg::Header::GetHeaderSize()-2); //  for some reason first 2 bytes from cam is trash
 
 		// please note that we did not write a single byte to img, we just move position...
@@ -263,7 +261,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 	{
 		if (lp_size<21)
 		{
-			cl_log.log("last packet is too short!", cl_logERROR);
+			cl_log.log(QLatin1String("last packet is too short!"), cl_logERROR);
 			//delete videoData;
 			videoData->releaseRef();
 			return 0;
@@ -274,7 +272,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 
 	if (h264 && (lp_size < iframe_index))
 	{
-		cl_log.log("last packet is too short!", cl_logERROR);
+		cl_log.log(QLatin1String("last packet is too short!"), cl_logERROR);
 		//delete videoData;
 		videoData->releaseRef();
 		return 0;
@@ -322,7 +320,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 		img.write(&c,1); //1
 		c = 0x09;
 		img.write(&c,1); //0x09
-		c = videoData->keyFrame ? 0x10 : 0x30; 
+		c = videoData->keyFrame ? 0x10 : 0x30;
 		img.write(&c,1); // 0x10
 
 		//==========================================
@@ -332,13 +330,13 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 			unsigned char h264header[50];
 			int header_size = create_sps_pps(size.width, size.height, 0, h264header, sizeof(h264header));
 
-			if (header_size!=expectable_header_size) // this should be very rarely 
+			if (header_size!=expectable_header_size) // this should be very rarely
 			{
 				int diff = header_size - expectable_header_size;
 				if (diff>0)
 					img.prepareToWrite(diff);
 
-				cl_log.log("moving data!!", cl_logWARNING);
+				cl_log.log(QLatin1String("moving data!!"), cl_logWARNING);
 
 				memmove(img.data() + 5 + header_size, img.data() + 5 + expectable_header_size, img.size() - (5 + expectable_header_size));
 				img.done(diff);
@@ -349,12 +347,12 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 			dst+= header_size;
 		}
 		/*
-		else 
+		else
 		{
 			img.ignore_first_bytes(expectable_header_size); // if you decoder needs compressed data alignment, just do not do it. ffmpeg will delay one frame if do not do it.
 			dst+=expectable_header_size;
 		}
-        */
+		*/
 
 		// we also need to put very begining of SH
 		dst[0] = dst[1] = dst[2] = 0; dst[3] = 1;

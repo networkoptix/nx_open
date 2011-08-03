@@ -35,7 +35,8 @@ QtvSound::QtvSound(ALCdevice* device, const QAudioFormat& audioFormat)
 
 QtvSound::~QtvSound()
 {
-    internalClear();
+    if (!m_deinitialized)
+        internalClear();
     delete [] m_proxyBuffer;
 }
 
@@ -138,14 +139,19 @@ void QtvSound::clearBuffers(bool clearAll)
            processed = arraysize(m_tmpBuffer);
         alSourceUnqueueBuffers(m_source, processed, m_tmpBuffer);
         checkOpenALErrorDebug(m_device);
-       alDeleteBuffers(processed, m_tmpBuffer);
-        checkOpenALErrorDebug(m_device);
+        if (alGetError() == AL_NO_ERROR)
+        {
+            alDeleteBuffers(processed, m_tmpBuffer);
+            checkOpenALErrorDebug(m_device);
+        }
     }
 #endif
 }
 
 uint QtvSound::playTimeElapsed()
 {
+    QMutexLocker lock(&m_mtx);
+
     if (m_deinitialized)
         return 0;
 
@@ -194,6 +200,8 @@ bool QtvSound::isFormatSupported(const QAudioFormat& format)
 
 bool QtvSound::play(const quint8* data, uint size)
 {
+    QMutexLocker lock(&m_mtx);
+
     if (m_deinitialized)
     {
         m_isValid = setup();
@@ -290,16 +298,19 @@ int QtvSound::checkOpenALErrorDebug(ALCdevice* device)
 
 void QtvSound::suspend()
 {
+    QMutexLocker lock(&m_mtx);
     alSourcePause(m_source);
 }
 
 void QtvSound::resume()
 {
+    QMutexLocker lock(&m_mtx);
 	playImpl();
 }
 
 void QtvSound::clear()
 {
+    QMutexLocker lock(&m_mtx);
     if (m_deinitialized)
         return;
     internalClear();
@@ -311,8 +322,8 @@ void QtvSound::internalClear()
 {
 	alSourceStop(m_source);
 	checkOpenALError(m_device);
-	alSourceRewind(m_source);
-	checkOpenALError(m_device);
+	//alSourceRewind(m_source);
+	//checkOpenALError(m_device);
     clearBuffers(true);
 	alDeleteSources(1, &m_source);
 	checkOpenALError(m_device);

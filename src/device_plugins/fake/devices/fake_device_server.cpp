@@ -14,10 +14,10 @@ bool FakeDeviceServer ::isProxy() const
 
 QString FakeDeviceServer::name() const
 {
-	return "Fake device server";
+	return QLatin1String("Fake device server");
 }
 
-// returns all available devices 
+// returns all available devices
 CLDeviceList FakeDeviceServer ::findDevices()
 {
 	return FakeDevice::findDevices();

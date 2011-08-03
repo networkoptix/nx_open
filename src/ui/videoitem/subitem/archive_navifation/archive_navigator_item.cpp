@@ -44,25 +44,25 @@ CLArchiveNavigatorItem::CLArchiveNavigatorItem(CLAbstractSubItemContainer* paren
 	"margin: 0 0 0 0;}"
 	"QSlider::handle:horizontal {"
 	"background: qlineargradient(x1:0, y1:0, x2:4, y2:4, stop:0 #0000a0, stop:1 #3358e0);"
-	"border: 10px solid #007eff;" // border of handle 
+	"border: 10px solid #007eff;" // border of handle
 	"width: 120px;"
 	"margin: -8px 0 -8px 0;"
 	"border-radius: 30px;}");
-    */
+	*/
 
-    int button_width = m_height*m_buttonAspectRatio;
+	int button_width = m_height*m_buttonAspectRatio;
 
-	mPlayItem = new CLImgSubItem(this, ":/skin/player/play.png", PlaySubItem, 0.7, 1.0, button_width, m_height);
-	mPauseItem = new CLImgSubItem(this, ":/skin/player/pause.png", PauseSubItem, 0.7, 1.0, button_width, m_height);
+	mPlayItem = new CLImgSubItem(this, QLatin1String(":/skin/player/play.png"), PlaySubItem, 0.7, 1.0, button_width, m_height);
+	mPauseItem = new CLImgSubItem(this, QLatin1String(":/skin/player/pause.png"), PauseSubItem, 0.7, 1.0, button_width, m_height);
 	mPlayItem->setVisible(false);
 
-	mRewindBackward = new CLImgSubItem(this, ":/skin/player/to_very_beginning.png", RewindBackwardSubItem, 0.5, 1.0, button_width, m_height);
-	mRewindForward = new CLImgSubItem(this, ":/skin/player/to_very_end.png", RewindForwardSubItem, 0.5, 1.0, button_width, m_height);
+	mRewindBackward = new CLImgSubItem(this, QLatin1String(":/skin/player/to_very_beginning.png"), RewindBackwardSubItem, 0.5, 1.0, button_width, m_height);
+	mRewindForward = new CLImgSubItem(this, QLatin1String(":/skin/player/to_very_end.png"), RewindForwardSubItem, 0.5, 1.0, button_width, m_height);
 
-	mStepForward = new CLImgSubItem(this, ":/skin/player/frame_forward.png", StepForwardSubItem, 0.5, 1.0, button_width, m_height);
+	mStepForward = new CLImgSubItem(this, QLatin1String(":/skin/player/frame_forward.png"), StepForwardSubItem, 0.5, 1.0, button_width, m_height);
 	mStepForward->setVisible(false);
 
-	mStepBackward = new CLImgSubItem(this, ":/skin/player/frame_backward.png", StepBackwardSubItem, 0.5, 1.0, button_width, m_height);
+	mStepBackward = new CLImgSubItem(this, QLatin1String(":/skin/player/frame_backward.png"), StepBackwardSubItem, 0.5, 1.0, button_width, m_height);
 	mStepBackward->setVisible(false);
 
 	/**/
@@ -86,7 +86,7 @@ CLArchiveNavigatorItem::CLArchiveNavigatorItem(CLAbstractSubItemContainer* paren
 
 CLArchiveNavigatorItem::~CLArchiveNavigatorItem()
 {
-    if (m_fullScreen)
+	if (m_fullScreen)
 		goToFullScreenMode(false);
 }
 
@@ -106,11 +106,11 @@ bool CLArchiveNavigatorItem::isCursorOnSlider() const
 
 void CLArchiveNavigatorItem::goToFullScreenMode(bool fullscreen)
 {
-    if (m_fullScreen == fullscreen) // already in this mode
+	if (m_fullScreen == fullscreen) // already in this mode
 		return;
-    m_fullScreen = fullscreen;
+	m_fullScreen = fullscreen;
 
-    if (m_fullScreen)
+	if (m_fullScreen)
 	{
 		QGraphicsView* view = scene()->views().at(0);
 		m_width = view->viewport()->width();
@@ -120,13 +120,13 @@ void CLArchiveNavigatorItem::goToFullScreenMode(bool fullscreen)
 	else
 	{
 		m_width = m_parent->boundingRect().width();
-        m_height = m_nonFullScreenHeight;
+		m_height = m_nonFullScreenHeight;
 	}
 
 	QGraphicsView* view = m_parent->scene()->views().at(0);
 	GraphicsView* clview = static_cast<GraphicsView*>(view);
 
-    if (m_fullScreen)
+	if (m_fullScreen)
 	{
 		setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
 		setParentItem(0);
@@ -146,7 +146,7 @@ void CLArchiveNavigatorItem::goToFullScreenMode(bool fullscreen)
 		clview->removeStaticItem(this);
 		setParentItem(m_parent);
 		setPos((static_cast<CLAbstractSceneItem*>(m_parent))->getBestSubItemPos(mType));
-		setZValue(1.0); 
+		setZValue(1.0);
 	}
 
 	onResize();
@@ -180,7 +180,7 @@ void CLArchiveNavigatorItem::onResize()
 {
 	renewSlider();
 
-    if (m_fullScreen)
+	if (m_fullScreen)
 	{
 		QGraphicsView* view = scene()->views().at(0);
 		m_width = view->viewport()->width();
@@ -190,10 +190,10 @@ void CLArchiveNavigatorItem::onResize()
 	else
 	{
 		m_width = m_parent->boundingRect().width();
-        m_height = m_nonFullScreenHeight;
+		m_height = m_nonFullScreenHeight;
 	}
 
-    int button_width = m_height*m_buttonAspectRatio; // this is just very big value; I assume that w>h
+	int button_width = m_height*m_buttonAspectRatio; // this is just very big value; I assume that w>h
 
 	mRewindBackward->setMaxSize(button_width, m_height);
 	mPauseItem->setMaxSize(button_width, m_height);
@@ -216,7 +216,7 @@ void CLArchiveNavigatorItem::onResize()
 	mStepForward->setPos(m_width - shift0 - item_size, 0);
 	mStepBackward->setPos(m_width - shift0 - 2*item_size, 0);
 
-    resizeSlider();
+	resizeSlider();
 
 	mSlider_item->setPos(button_width*(3+2), m_height/6);
 
@@ -272,7 +272,7 @@ void CLArchiveNavigatorItem::onResize()
         mSlider_item->setPos(button_width*(3+2), 3);
 
 
-        mSlider->setStyleSheet("QSlider::groove:horizontal {"
+        mSlider->setStyleSheet(QLatin1String("QSlider::groove:horizontal {"
                                "top: 0px;"
                                "border: 1px solid #bbb;"
                                "background: white;"
@@ -307,13 +307,13 @@ void CLArchiveNavigatorItem::onResize()
                                "background: qlineargradient(x1:0, y1:0, x2:1, y2:1,"
                                "stop:0 #fff, stop:1 #ddd);"
                                "border: 2px solid #444;"
-                               "border-radius: 4px;}");
+                               "border-radius: 4px;}"));
 
-	
+
 	}
 	else
 	{
-        mSlider_item->setPos(button_width*(3+2), 10);
+		mSlider_item->setPos(button_width*(3+2), 10);
 
         /*/
         mSlider->setStyleSheet("QSlider::groove:horizontal {"
@@ -354,7 +354,7 @@ void CLArchiveNavigatorItem::onResize()
 
         */
 
-        mSlider->setStyleSheet("QSlider::groove:horizontal {"
+        mSlider->setStyleSheet(QLatin1String("QSlider::groove:horizontal {"
                                "border: 4px solid #bbb;"
                                "background: white;"
                                "height: 180px;"
@@ -388,7 +388,7 @@ void CLArchiveNavigatorItem::onResize()
                                "background: qlineargradient(x1:0, y1:0, x2:1, y2:1,"
                                "stop:0 #fff, stop:1 #ddd);"
                                "border: 4px solid #444;"
-                               "border-radius: 16px;}");
+                               "border-radius: 16px;}"));
 
 
 	}
@@ -402,7 +402,7 @@ void CLArchiveNavigatorItem::onSliderMoved(int val)
     if (m_reader->isSkippingFrames())
         return;
 
-	qreal factor = (qreal)(val) / (mSlider->maximum() - mSlider->minimum());
+    qreal factor = (qreal)(val) / (mSlider->maximum() - mSlider->minimum());
     quint64 time = m_reader->lengthMksec() * factor;
 
     if (m_sliderIsmoving)
@@ -431,9 +431,9 @@ void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
         m_reader->resume();
         m_reader->resumeDataProcessors();
 
-		m_videoCamera->getCamCamDisplay()->playAudio(true);
+        m_videoCamera->getCamCamDisplay()->playAudio(true);
 
-        m_playMode = true;
+		m_playMode = true;
 		break;
 
 	case PauseSubItem:
@@ -443,39 +443,39 @@ void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
 		mStepBackward->setVisible(true);
 		mStepForward->setVisible(true);
 
-		//m_reader->pauseDataProcessors();
+        //m_reader->pauseDataProcessors();
         m_reader->pause();
-		m_videoCamera->getCamCamDisplay()->playAudio(false);
+        m_videoCamera->getCamCamDisplay()->playAudio(false);
 
         m_reader->setSingleShotMode(true);
         m_videoCamera->getCamCamDisplay()->setSingleShotMode(true);
         m_playMode = false;
-		break;
+        break;
 
-	case RewindBackwardSubItem:
+    case RewindBackwardSubItem:
         m_reader->jumpTo(0, true);
         m_videoCamera->streamJump(0);
         m_reader->resumeDataProcessors();
-		break;
+        break;
 
-	case RewindForwardSubItem:
+    case RewindForwardSubItem:
         curr_time = m_videoCamera->currentTime();
         m_reader->jumpTo(m_reader->lengthMksec(), true);
-        m_videoCamera->streamJump(m_reader->lengthMksec()); 
+        m_videoCamera->streamJump(m_reader->lengthMksec());
         m_reader->resumeDataProcessors();
-		break;
+        break;
 
-	case StepForwardSubItem:
+    case StepForwardSubItem:
         m_reader->nextFrame();
         m_reader->resume();
         m_videoCamera->getCamCamDisplay()->setSingleShotMode(true);
         //m_reader->resumeDataProcessors();
-		break;
+        break;
 
-	case StepBackwardSubItem:
+    case StepBackwardSubItem:
         if (!m_reader->isSkippingFrames() && m_videoCamera->currentTime() != 0)
         {
-		    curr_time = m_videoCamera->currentTime();
+            curr_time = m_videoCamera->currentTime();
             // cl_log.log("StepBackwardSubItem", int(curr_time/1000), cl_logALWAYS);
 
             if (m_reader->isSingleShotMode())
@@ -487,7 +487,7 @@ void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
             //m_reader->resumeDataProcessors();
         }
 
-		break;
+        break;
 
 	default:
 		break;
@@ -496,7 +496,7 @@ void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
 
 void CLArchiveNavigatorItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-	painter->fillRect(boundingRect(), QColor(0, 0, 0));
+    painter->fillRect(boundingRect(), QColor(0, 0, 0));
 
     if (m_readerIsSet)
     {
@@ -517,12 +517,12 @@ void CLArchiveNavigatorItem::paint(QPainter *painter, const QStyleOptionGraphics
 
 QRectF CLArchiveNavigatorItem::boundingRect() const
 {
-	return QRectF(0, 0, m_width, m_height);
+    return QRectF(0, 0, m_width, m_height);
 }
 
 void CLArchiveNavigatorItem::updateSliderPos()
 {
-    if (m_sliderIsmoving)
+	if (m_sliderIsmoving)
 		return;
 
     /*
@@ -530,14 +530,14 @@ void CLArchiveNavigatorItem::updateSliderPos()
       has not shown any frame - set slider to the position reader is waiting.
       Otherwise use timestamp from display.
      */
-	quint64 time;
+    quint64 time;
     if (m_reader->isSingleShotMode() || m_reader->isSkippingFrames() || m_videoCamera->currentTime() == 0)
         time = m_reader->currentTime();
-	else
-		time = m_videoCamera->currentTime();
+    else
+        time = m_videoCamera->currentTime();
 
-	 
-    quint64 total = m_reader->lengthMksec();
+
+	quint64 total = m_reader->lengthMksec();
 
 	qreal scale = mSlider->maximum() - mSlider->minimum();
 
@@ -548,7 +548,7 @@ void CLArchiveNavigatorItem::updateSliderPos()
 
 void CLArchiveNavigatorItem::sliderPressed()
 {
-	//cl_log.log("PRESSDED ",  cl_logALWAYS);
+    //cl_log.log("PRESSDED ",  cl_logALWAYS);
     m_reader->setSingleShotMode(true);
     m_videoCamera->getCamCamDisplay()->playAudio(false);
     m_sliderIsmoving = true;
@@ -556,7 +556,7 @@ void CLArchiveNavigatorItem::sliderPressed()
 
 void CLArchiveNavigatorItem::sliderReleased()
 {
-	//cl_log.log("RELEASED",  cl_logALWAYS);
+    //cl_log.log("RELEASED",  cl_logALWAYS);
     m_sliderIsmoving = false;
 
     qreal factor = (qreal)(mSlider->value()) / (mSlider->maximum() - mSlider->minimum());
@@ -573,7 +573,7 @@ void CLArchiveNavigatorItem::sliderReleased()
 
 void CLArchiveNavigatorItem::setVideoCamera(CLVideoCamera* camera)
 {
-	m_videoCamera = camera;
+    m_videoCamera = camera;
     m_reader = static_cast<CLAbstractArchiveReader*>(m_videoCamera->getStreamreader());
 
     m_readerIsSet = true;

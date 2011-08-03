@@ -19,8 +19,11 @@ public:
     Q_ENUMS(DecoderQuality)
     Q_ENUMS(Resolution)
 
-    QAudioDeviceInfo audioDevice() const;
-    void setAudioDeviceByName(const QString &name);
+    QAudioDeviceInfo primaryAudioDevice() const;
+    void setPrimaryAudioDeviceByName(const QString &name);
+
+    QAudioDeviceInfo secondaryAudioDevice() const;
+    void setSecondaryAudioDeviceByName(const QString &name);
 
     bool captureCursor() const;
     void setCaptureCursor(bool yes);

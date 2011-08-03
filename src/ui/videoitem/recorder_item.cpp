@@ -3,9 +3,9 @@
 #include "ui/ui_common.h"
 #include "recorder/recorder_display.h"
 
-CLRecorderItem::CLRecorderItem(GraphicsView* view, int max_width, int max_height, QString name, QString tooltip):
-CLCustomBtnItem(view,max_width,max_height, name, "", tooltip),
-mContent(0)
+CLRecorderItem::CLRecorderItem(GraphicsView* view, int max_width, int max_height, QString name, QString tooltip)
+	: CLCustomBtnItem(view,max_width,max_height, name, QString(), tooltip),
+	  mContent(0)
 {
 	m_type = RECORDER;
 
@@ -62,7 +62,7 @@ QPointF CLRecorderItem::getBestSubItemPos(CLSubItemType type)
 
 void CLRecorderItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    Q_UNUSED(widget);
+	Q_UNUSED(widget);
 
 	painter->fillPath(mShadowRectPath, global_shadow_color);
 
@@ -82,7 +82,7 @@ void CLRecorderItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 	//painter->drawRect(boundingRect());
 
 	//==================================================
-	QFont  font("Courier New", 250);
+	QFont  font(QLatin1String("Courier New"), 250);
 	font.setWeight(QFont::Bold);
 	painter->setFont(font);
 

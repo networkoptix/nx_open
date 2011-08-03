@@ -5,7 +5,7 @@
 
 struct CLParamType
 {
-	enum {None, Value, OnOff, Boolen, MinMaxStep, Enumeration, Button };	
+	enum {None, Value, OnOff, Boolen, MinMaxStep, Enumeration, Button };
 
 	CLParamType();
 
@@ -44,7 +44,6 @@ struct CLParam
 
 class CLParamList
 {
-
 public:
 	typedef QMap<QString, CLParam> MAP;
 
@@ -54,12 +53,13 @@ public:
 	const CLParam get(const QString& name) const;
 	void put(const CLParam& param);
 	bool empty() const;
-	MAP& list();
+	MAP &list();
 
 	QList<QString> groupList() const;
 	QList<QString> subGroupList(QString group) const;
 
-	CLParamList paramList(QString group, QString subgroup) const;
+	CLParamList paramList(const QString &group, const QString &subgroup) const;
+
 private:
 	MAP m_params;
 };

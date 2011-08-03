@@ -9,13 +9,12 @@
 class CLFFmpegAudioDecoder : public CLAbstractAudioDecoder
 {
 public:
-	CLFFmpegAudioDecoder(CodecID codec, AVCodecContext* codecContext);
+	CLFFmpegAudioDecoder(CLCompressedAudioData* data);
 	bool decode(CLAudioData& data);
 	~CLFFmpegAudioDecoder();
 
-	static void audioCodecFillFormat(QAudioFormat& format, AVCodecContext *c);
+    static AVSampleFormat audioFormatQtToFfmpeg(const QAudioFormat& fmt);
 private:
-
 	AVCodec *codec;
 	AVCodecContext *c;
 

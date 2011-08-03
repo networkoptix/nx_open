@@ -53,15 +53,15 @@ bool CLAreconVisionDevice::unknownDevice() const
 	return (getModel()==AVUNKNOWN);
 }
 
-CLNetworkDevice* CLAreconVisionDevice::updateDevice() 
+CLNetworkDevice* CLAreconVisionDevice::updateDevice()
 {
 	CLValue model;
 	CLValue model_relase;
 
-	if (!getParam("Model", model))
+	if (!getParam(QLatin1String("Model"), model))
 		return 0;
 
-	if (!getParam("ModelRelease", model_relase))
+	if (!getParam(QLatin1String("ModelRelease"), model_relase))
 		return 0;
 
 	if (model_relase!=model)
@@ -72,7 +72,7 @@ CLNetworkDevice* CLAreconVisionDevice::updateDevice()
 	else
 	{
 		//old camera; does not support relase name; but must support fullname
-		if (getParam("ModelFull", model_relase))
+		if (getParam(QLatin1String("ModelFull"), model_relase))
 			model = model_relase;
 	}
 
@@ -80,7 +80,7 @@ CLNetworkDevice* CLAreconVisionDevice::updateDevice()
 
 	if (!result)
 	{
-		cl_log.log("Found unknown device! ", QString(model), cl_logWARNING);
+		cl_log.log(QLatin1String("Found unknown device! "), QString(model), cl_logWARNING);
 		return 0;
 	}
 
@@ -148,13 +148,13 @@ void CLAreconVisionDevice::onBeforeStart()
 {
 	CLValue maxSensorWidth;
 	CLValue maxSensorHight;
-	getParam("MaxSensorWidth", maxSensorWidth);
-	getParam("MaxSensorHeight", maxSensorHight);
+	getParam(QLatin1String("MaxSensorWidth"), maxSensorWidth);
+	getParam(QLatin1String("MaxSensorHeight"), maxSensorHight);
 
-	setParam_asynch("sensorleft", 0);
-	setParam_asynch("sensortop", 0);
-	setParam_asynch("sensorwidth", maxSensorWidth);
-	setParam_asynch("sensorheight", maxSensorHight);
+	setParam_asynch(QLatin1String("sensorleft"), 0);
+	setParam_asynch(QLatin1String("sensortop"), 0);
+	setParam_asynch(QLatin1String("sensorwidth"), maxSensorWidth);
+	setParam_asynch(QLatin1String("sensorheight"), maxSensorHight);
 
 }
 
@@ -173,7 +173,7 @@ bool CLAreconVisionDevice::getParam(const QString& name, CLValue& val, bool resy
 
 	//================================================
 
-	if (value.http=="") // check if we have http command for what
+	if (value.http.isEmpty()) // check if we have http command for what
 	{
 		//cl_log.log("cannot find http command for such param!", cl_logWARNING);
 		val = value.value;
@@ -208,7 +208,7 @@ bool CLAreconVisionDevice::getParam(const QString& name, CLValue& val, bool resy
 
 	QByteArray rarray = response.mid(index+1);
 
-	value.value = QString(rarray.data());
+	value.value = rarray.data();
 	value.synchronized = true;
 
 	val = value.value;
@@ -219,7 +219,7 @@ bool CLAreconVisionDevice::getParam(const QString& name, CLValue& val, bool resy
 
 bool CLAreconVisionDevice::setParam_special(const QString& /*name*/, const CLValue& /*val*/)
 {
-    return false;
+	return false;
 }
 
 bool CLAreconVisionDevice::setParam(const QString& name, const CLValue& val )
@@ -228,7 +228,7 @@ bool CLAreconVisionDevice::setParam(const QString& name, const CLValue& val )
 	if (!CLDevice::setParam(name, val))
 		return false;
 
-	if (setParam_special(name, val)) // try special first 
+	if (setParam_special(name, val)) // try special first
 		return true;
 
 	CLParamType& value = getDeviceParamList().get(name).value;
@@ -238,11 +238,11 @@ bool CLAreconVisionDevice::setParam(const QString& name, const CLValue& val )
 
 	if (!value.setValue(val, false))
 	{
-		cl_log.log("cannot set such value!", cl_logWARNING);
+		cl_log.log(QLatin1String("cannot set such value!"), cl_logWARNING);
 		return false;
 	}
 
-	if (value.http=="") // check if we have http command for this param
+	if (value.http.isEmpty()) // check if we have http command for this param
 	{
 		value.setValue(val);
 		return true;
@@ -254,7 +254,7 @@ bool CLAreconVisionDevice::setParam(const QString& name, const CLValue& val )
 
 	QTextStream str(&request);
 	str << "set?" << value.http;
-	if (value.type!=CLParamType::None && value.type!=CLParamType::Button) 
+	if (value.type!=CLParamType::None && value.type!=CLParamType::Button)
 		str << "=" << (QString)val;
 
 	connection.setRequestLine(request);
@@ -271,7 +271,7 @@ bool CLAreconVisionDevice::setParam(const QString& name, const CLValue& val )
 
 bool CLAreconVisionDevice::executeCommand(CLDeviceCommand* /*command*/)
 {
-    return true;
+	return true;
 }
 
 CLDeviceList CLAreconVisionDevice::findDevices()
@@ -310,13 +310,13 @@ CLDeviceList CLAreconVisionDevice::findDevices()
 
 		}
 
-		// collecting response 
+		// collecting response
 		QTime time;
 		time.start();
 
 		while(time.elapsed()<150)
 		{
-			while (sock.hasPendingDatagrams()) 
+			while (sock.hasPendingDatagrams())
 			{
 				QByteArray datagram;
 				datagram.resize(sock.pendingDatagramSize());
@@ -340,7 +340,7 @@ CLDeviceList CLAreconVisionDevice::findDevices()
 				if (result.find(smac)!=result.end())
 					continue; // already found;
 
-				QString id = "AVUNKNOWN";
+				QString id = QLatin1String("AVUNKNOWN");
 //				int model = 0;
 
 				/*/
@@ -351,10 +351,10 @@ CLDeviceList CLAreconVisionDevice::findDevices()
 				if (datagram.size() > shift + 5)
 				{
 					model = (unsigned char)data[shift+2] * 256 + (unsigned char)data[shift+3]; //4
-					QString smodel; 
+					QString smodel;
 					smodel.setNum(model);
 					smodel = smodel;
-					id = smodel; // this is not final version of the ID; it might/must be updated later 
+					id = smodel; // this is not final version of the ID; it might/must be updated later
 					device = deviceByID(id, model);
 
 					if (device)
@@ -362,16 +362,15 @@ CLDeviceList CLAreconVisionDevice::findDevices()
 				}
 				else
 				{
-					// very old cam; in future need to request model seporatly 
+					// very old cam; in future need to request model seporatly
 					device = new CLAreconVisionDevice(AVUNKNOWN);
-					device->setName("AVUNKNOWN");
-
+					device->setName(QLatin1String("AVUNKNOWN"));
 				}
-                */
+				*/
 
-				// in any case let's HTTP do it's job at very end of discovery 
+				// in any case let's HTTP do it's job at very end of discovery
 				CLAreconVisionDevice* device = new CLAreconVisionDevice(AVUNKNOWN);
-				device->setName("AVUNKNOWN");
+				device->setName(QLatin1String("AVUNKNOWN"));
 
 				if (device==0)
 					continue;
@@ -428,8 +427,8 @@ bool CLAreconVisionDevice::setIP(const QHostAddress& ip, bool net )
 
 		//
 		CLPing ping;
-		if (!ping.ping(ip.toString(), 2, ping_timeout)) // check if ip really changed 
-			return false; 
+		if (!ping.ping(ip.toString(), 2, ping_timeout)) // check if ip really changed
+			return false;
 
 	}
 
@@ -442,7 +441,7 @@ bool CLAreconVisionDevice::loadDevicesParam(const QString& file_name, QString& e
 
 	if (!file.exists())
 	{
-		error = "Cannot open file ";
+		error = QLatin1String("Cannot open file ");
 		error += file_name;
 		return false;
 	}
@@ -452,22 +451,22 @@ bool CLAreconVisionDevice::loadDevicesParam(const QString& file_name, QString& e
 	int errorColumn;
 	QDomDocument doc;
 
-	if (!doc.setContent(&file, &errorStr, &errorLine,&errorColumn)) 
+	if (!doc.setContent(&file, &errorStr, &errorLine, &errorColumn))
 	{
 		QTextStream str(&error);
-		str << "File " << file_name << "; Parse error at line " << errorLine << " column " << errorColumn << " : " << errorStr;
+		str << QLatin1String("File ") << file_name << QLatin1String("; Parse error at line ") << errorLine << QLatin1String(" column ") << errorColumn << QLatin1String(" : ") << errorStr;
 		return false;
 	}
 
 	QDomElement root = doc.documentElement();
-	if (root.tagName() != "devices")
+	if (root.tagName() != QLatin1String("devices"))
 		return false;
 
 	QDomNode node = root.firstChild();
 
-	while (!node.isNull()) 
+	while (!node.isNull())
 	{
-		if (node.toElement().tagName() == "device")
+		if (node.toElement().tagName() == QLatin1String("device"))
 		{
 			if (!parseDevice(node.toElement(), error))
 				return false;
@@ -481,13 +480,13 @@ bool CLAreconVisionDevice::loadDevicesParam(const QString& file_name, QString& e
 
 bool CLAreconVisionDevice::parseDevice(const QDomElement &device, QString& error)
 {
-	if (!device.hasAttribute("id"))
+	if (!device.hasAttribute(QLatin1String("id")))
 	{
-		error = "Cannot find id of the device.";
+		error = QLatin1String("Cannot find id of the device.");
 		return false;
 	}
 
-	QString device_name = device.attribute("id");
+	QString device_name = device.attribute(QLatin1String("id"));
 
 	LL::iterator it1 = static_device_list.find(device_name);
 	LL::iterator it2 = static_stream_list.find(device_name);
@@ -495,17 +494,17 @@ bool CLAreconVisionDevice::parseDevice(const QDomElement &device, QString& error
 	if (it1!=static_device_list.end() || it2!=static_stream_list.end())
 	{
 		QTextStream str(&error);
-		str << "Such device " << device_name << " already exists.";
+		str << QLatin1String("Such device ") << device_name << QLatin1String(" already exists.");
 		return false;
 	}
 
 	CLParamList device_param_list;
 	CLParamList stream_param_list;
 
-	if (device.hasAttribute("public"))
+	if (device.hasAttribute(QLatin1String("public")))
 	{
-		QString values = device.attribute("public");
-		QStringList lst = values.split(",");
+		QString values = device.attribute(QLatin1String("public"));
+		QStringList lst = values.split(QLatin1Char(','));
 		QStringListIterator lst_iter(lst);
 		while(lst_iter.hasNext())
 		{
@@ -516,7 +515,7 @@ bool CLAreconVisionDevice::parseDevice(const QDomElement &device, QString& error
 			if (it1!=static_device_list.end())
 				device_param_list.inheritedFrom(it1.value());
 			else
-				cl_log.log("Smth wrong with public tag for ", device_name, cl_logWARNING);
+				cl_log.log(QLatin1String("Smth wrong with public tag for "), device_name, cl_logWARNING);
 
 			if (it2!=static_stream_list.end())
 				stream_param_list.inheritedFrom(it2.value());
@@ -525,34 +524,33 @@ bool CLAreconVisionDevice::parseDevice(const QDomElement &device, QString& error
 
 	}
 
-	//global_params 
+	//global_params
 	QDomNode node = device.firstChild();
 	if (node.isNull())
 	{
 		static_device_list[device_name] = device_param_list;
 		static_stream_list[device_name] = stream_param_list;
 
-		return true; // just public make sence 
+		return true; // just public make sence
 	}
 
 	QDomElement element = node.toElement();
 
-	if (element.tagName()!="global_params" && element.tagName()!="stream_params")
+	if (element.tagName() != QLatin1String("global_params") && element.tagName() != QLatin1String("stream_params"))
 	{
 		QTextStream str(&error);
-		str << "Cannot find global_params and stream_params in " << device_name ;
+		str << QLatin1String("Cannot find global_params and stream_params in ") << device_name;
 		return false;
 	}
 
 	//===============================================================
-	if (element.tagName()=="global_params" )
+	if (element.tagName() == QLatin1String("global_params"))
 	{
 		QDomNode param_node = element.firstChild();
-		while (!param_node .isNull()) 
+		while (!param_node .isNull())
 		{
 			CLParam param;
-
-			if (param_node.toElement().tagName() == "param")
+			if (param_node.toElement().tagName() == QLatin1String("param"))
 			{
 				if (!parseParam(param_node.toElement(), error, device_param_list))
 					return false;
@@ -570,14 +568,13 @@ bool CLAreconVisionDevice::parseDevice(const QDomElement &device, QString& error
 
 	}
 	//===================================================================
-	if (element.tagName()=="stream_params")
+	if (element.tagName() == QLatin1String("stream_params"))
 	{
 		QDomNode param_node = element.firstChild();
-		while (!param_node .isNull()) 
+		while (!param_node .isNull())
 		{
 			CLParam param;
-
-			if (param_node.toElement().tagName() == "param")
+			if (param_node.toElement().tagName() == QLatin1String("param"))
 			{
 				if (!parseParam(param_node.toElement(), error, stream_param_list))
 					return false;
@@ -593,87 +590,87 @@ bool CLAreconVisionDevice::parseDevice(const QDomElement &device, QString& error
 
 bool CLAreconVisionDevice::parseParam(const QDomElement &element, QString& error, CLParamList& paramlist)
 {
-	if (!element.hasAttribute("name"))
+	if (!element.hasAttribute(QLatin1String("name")))
 	{
-		error = "Cannot find name attribute.";
+		error = QLatin1String("Cannot find name attribute.");
 		return false;
 	}
 
-	QString name = element.attribute("name");
+	QString name = element.attribute(QLatin1String("name"));
 
 	CLParam param = paramlist.exists(name) ? paramlist.get(name) : CLParam();
 	param.name = name;
 
 	if (param.value.type == CLParamType::None) // param type is not defined yet
 	{
-		if (!element.hasAttribute("type"))
+		if (!element.hasAttribute(QLatin1String("type")))
 		{
-			error = "Cannot find type attribute.";
+			error = QLatin1String("Cannot find type attribute.");
 			return false;
 		}
 
-		QString type = element.attribute("type").toLower();
+		QString type = element.attribute(QLatin1String("type")).toLower();
 
-		if (type=="value")
+		if (type == QLatin1String("value"))
 			param.value.type = CLParamType::Value;
-		else if (type=="novalue")
+		else if (type == QLatin1String("novalue"))
 			param.value.type = CLParamType::None;
-		else if (type=="minmaxstep")
+		else if (type == QLatin1String("minmaxstep"))
 			param.value.type = CLParamType::MinMaxStep;
-		else if (type=="boolen")
+		else if (type == QLatin1String("boolen"))
 			param.value.type = CLParamType::Boolen;
-		else if (type=="onoff")
+		else if (type == QLatin1String("onoff"))
 			param.value.type = CLParamType::OnOff;
-		else if (type=="enumeration")
+		else if (type == QLatin1String("enumeration"))
 			param.value.type = CLParamType::Enumeration;
-		else if (type=="button")
+		else if (type == QLatin1String("button"))
 			param.value.type = CLParamType::Button;
 		else
 		{
-			error = "Unsupported param type fund";
+			error = QLatin1String("Unsupported param type fund");
 			return false;
 		}
 	}
 
-	if (element.hasAttribute("group"))
-		param.value.group = element.attribute("group");
+	if (element.hasAttribute(QLatin1String("group")))
+		param.value.group = element.attribute(QLatin1String("group"));
 
-	if (element.hasAttribute("sub_group"))
-		param.value.subgroup = element.attribute("sub_group");
+	if (element.hasAttribute(QLatin1String("sub_group")))
+		param.value.subgroup = element.attribute(QLatin1String("sub_group"));
 
-	if (element.hasAttribute("min"))
-		param.value.min_val = element.attribute("min");
+	if (element.hasAttribute(QLatin1String("min")))
+		param.value.min_val = element.attribute(QLatin1String("min"));
 
-	if (element.hasAttribute("description"))
-		param.value.description = element.attribute("description");
+	if (element.hasAttribute(QLatin1String("description")))
+		param.value.description = element.attribute(QLatin1String("description"));
 
-	if (element.hasAttribute("max"))
-		param.value.max_val = element.attribute("max");
+	if (element.hasAttribute(QLatin1String("max")))
+		param.value.max_val = element.attribute(QLatin1String("max"));
 
-	if (element.hasAttribute("step"))
-		param.value.step = element.attribute("step");
+	if (element.hasAttribute(QLatin1String("step")))
+		param.value.step = element.attribute(QLatin1String("step"));
 
-	if (element.hasAttribute("default_value"))
-		param.value.default_value = element.attribute("default_value");
+	if (element.hasAttribute(QLatin1String("default_value")))
+		param.value.default_value = element.attribute(QLatin1String("default_value"));
 
-	if (element.hasAttribute("http"))
-		param.value.http = element.attribute("http");
+	if (element.hasAttribute(QLatin1String("http")))
+		param.value.http = element.attribute(QLatin1String("http"));
 
-	if (element.hasAttribute("ui"))
-		param.value.ui = element.attribute("ui").toInt();
+	if (element.hasAttribute(QLatin1String("ui")))
+		param.value.ui = element.attribute(QLatin1String("ui")).toInt();
 
-	if (element.hasAttribute("readonly"))
+	if (element.hasAttribute(QLatin1String("readonly")))
 	{
-		if (element.attribute("readonly")=="true")
+		if (element.attribute(QLatin1String("readonly")) == QLatin1String("true"))
 			param.value.readonly = true;
 		else
 			param.value.readonly = false;
 	}
 
-	if (element.hasAttribute("values"))
+	if (element.hasAttribute(QLatin1String("values")))
 	{
-		QString values = element.attribute("values");
-		QStringList lst = values.split(",");
+		QString values = element.attribute(QLatin1String("values"));
+		QStringList lst = values.split(QLatin1Char(','));
 		QStringListIterator lst_iter(lst);
 		while(lst_iter.hasNext())
 		{
@@ -683,21 +680,20 @@ bool CLAreconVisionDevice::parseParam(const QDomElement &element, QString& error
 
 	}
 
-	if (element.hasAttribute("ui_values"))
+	if (element.hasAttribute(QLatin1String("ui_values")))
 	{
-		QString values = element.attribute("ui_values");
-		QStringList lst = values.split(",");
+		QString values = element.attribute(QLatin1String("ui_values"));
+		QStringList lst = values.split(QLatin1Char(','));
 		QStringListIterator lst_iter(lst);
 		while(lst_iter.hasNext())
 		{
 			QString val = lst_iter.next().trimmed();
 			param.value.ui_possible_values.push_back(val);
 		}
-
 	}
 
-	if (element.hasAttribute("value"))
-		param.value.value = element.attribute("value");
+	if (element.hasAttribute(QLatin1String("value")))
+		param.value.value = element.attribute(QLatin1String("value"));
 	else
 		param.value.value = param.value.default_value;
 
@@ -712,26 +708,25 @@ CLAreconVisionDevice* CLAreconVisionDevice::deviceByID(QString id, int model)
 
 	if (!supp.contains(id))
 	{
-		cl_log.log("Unsupported device found(!!!): ", id, cl_logERROR);
+		cl_log.log(QLatin1String("Unsupported device found(!!!): "), id, cl_logERROR);
 		return 0;
 	}
 
 	if (isPanoramic(model))
-		return new  CLArecontPanoramicDevice(model);
-	else
-		return new CLArecontSingleSensorDevice(model);
+		return new CLArecontPanoramicDevice(model);
+	return new CLArecontSingleSensorDevice(model);
 }
 
 bool CLAreconVisionDevice::getBaseInfo()
 {
 	CLValue val;
-	if (!getParam("Firmware version", val))
+	if (!getParam(QLatin1String("Firmware version"), val))
 		return false;
 
-	if (!getParam("Image engine", val ))
+	if (!getParam(QLatin1String("Image engine"), val ))
 		return false;
 
-	if (!getParam("Net version", val))
+	if (!getParam(QLatin1String("Net version"), val))
 		return false;
 
 	if (!getDescription())
@@ -744,14 +739,14 @@ QString CLAreconVisionDevice::toString() const
 {
 	QString result;
 
-	QString firmware = getDeviceParamList().get("Firmware version").value.value;
-	QString hardware = getDeviceParamList().get("Image engine").value.value;
-	QString net = getDeviceParamList().get("Net version").value.value;
+	QString firmware = getDeviceParamList().get(QLatin1String("Firmware version")).value.value;
+	QString hardware = getDeviceParamList().get(QLatin1String("Image engine")).value.value;
+	QString net = getDeviceParamList().get(QLatin1String("Net version")).value.value;
 
 	QTextStream t(&result);
-	t<< CLDevice::toString() <<" live fw=" << firmware << " hw=" << hardware << " net=" << net;
-	if (m_description!="")
-		t <<  " dsc=" << m_description;
+	t << CLDevice::toString() << QLatin1String(" live fw=") << firmware << QLatin1String(" hw=") << hardware << QLatin1String(" net=") << net;
+	if (!m_description.isEmpty())
+		t << QLatin1String(" dsc=") << m_description;
 	return result;
 
 }

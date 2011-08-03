@@ -51,8 +51,7 @@ private:
     static int gl_status;
 
 private:
-
-#ifndef _WIN32
+#ifndef Q_OS_WIN
     #define APIENTRY
 #endif
 
@@ -95,7 +94,9 @@ private:
     bool isNonPower2;
     bool isSoftYuv2Rgb;
 
-    GLuint m_program[2];
+    static QMutex m_programMutex; 
+    static bool m_programInited;
+    static GLuint m_program[2];
     GLuint m_texture[3];
     bool m_forceSoftYUV;
 

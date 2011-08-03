@@ -9,26 +9,26 @@ CLDeviceList FakeDevice::findDevices()
     for (int i = 0; i < 0; ++i)
     {
         CLDevice* dev = new FakeDevice();
-        dev->setUniqueId(QString("prerecorded ") + QString::number(i));
+        dev->setUniqueId(QLatin1String("prerecorded ") + QString::number(i));
         result[dev->getUniqueId()] = dev;
     }
 
     /*/
     CLDevice* dev = new FakeDevice4_180();
-    dev->setUniqueId(QString("fake180 ") + QString::number(1));
+    dev->setUniqueId(QLatin1String("fake180 ") + QString::number(1));
     result[dev->getUniqueId()] = dev;
     */
 
     /*/
     dev = new FakeDevice4_360();
-    dev->setUniqueId(QString("fake360 ") + QString::number(1));
+    dev->setUniqueId(QLatin1String("fake360 ") + QString::number(1));
     result[dev->getUniqueId()] = dev;
     */
 
     return result;
 }
 
-// executing command 
+// executing command
 bool FakeDevice::executeCommand(CLDeviceCommand* /*command*/)
 {
     return true;
@@ -124,4 +124,3 @@ CLStreamreader* FakeDevice4_360::getDeviceStreamConnection()
 {
     return new FakeStreamReader(this, 4);
 }
-

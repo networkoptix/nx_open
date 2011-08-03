@@ -45,7 +45,7 @@ void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args
         szMsg[strlen(szMsg)-1] = 0;
     }
 
-    cl_log.log("FFMPEG ", szMsg, cl_logERROR);
+    cl_log.log(QLatin1String("FFMPEG "), QString::fromLocal8Bit(szMsg), cl_logERROR);
 }
 
 #ifndef UNICLIENT_TESTS
@@ -56,9 +56,9 @@ int main(int argc, char *argv[])
 {
 //    av_log_set_callback(decoderLogCallback);
 
-    QApplication::setOrganizationName(ORGANIZATION_NAME);
-    QApplication::setApplicationName(APPLICATION_NAME);
-    QApplication::setApplicationVersion(APPLICATION_VERSION);
+    QApplication::setOrganizationName(QLatin1String(ORGANIZATION_NAME));
+    QApplication::setApplicationName(QLatin1String(APPLICATION_NAME));
+    QApplication::setApplicationVersion(QLatin1String(APPLICATION_VERSION));
 
     EveApplication application(argc, argv);
 
@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
     {
         argsMessage += fromNativePath(QString::fromLocal8Bit(argv[i]));
         if (i < argc-1)
-            argsMessage += QChar('\0');
+            argsMessage += QLatin1Char('\0');
     }
 
     while (application.isRunning())
@@ -81,12 +81,12 @@ int main(int argc, char *argv[])
     }
 
     QString dataLocation = getDataDirectory();
-    QDir::setCurrent(QFileInfo(argv[0]).absolutePath());
+    QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
 
     QDir dataDirectory;
-    dataDirectory.mkpath(dataLocation + "/log");
+    dataDirectory.mkpath(dataLocation + QLatin1String("/log"));
 
-    if (!cl_log.create(dataLocation + "/log/log_file", 1024*1024*10, 5, cl_logDEBUG1))
+    if (!cl_log.create(dataLocation + QLatin1String("/log/log_file"), 1024*1024*10, 5, cl_logDEBUG1))
     {
         application.quit();
 
@@ -102,20 +102,20 @@ int main(int argc, char *argv[])
 
     CL_LOG(cl_logALWAYS)
     {
-        cl_log.log("\n\n========================================", cl_logALWAYS);
+        cl_log.log(QLatin1String("\n\n========================================"), cl_logALWAYS);
         cl_log.log(cl_logALWAYS, "Software version %s", APPLICATION_VERSION);
-        cl_log.log(argv[0], cl_logALWAYS);
+        cl_log.log(QFile::decodeName(argv[0]), cl_logALWAYS);
     }
 
     Settings& settings = Settings::instance();
-    settings.load(getDataDirectory() + "/settings.xml");
+    settings.load(getDataDirectory() + QLatin1String("/settings.xml"));
 
     if (!settings.isAfterFirstRun() && !getMoviesDirectory().isEmpty())
         settings.addAuxMediaRoot(getMoviesDirectory());
 
     settings.save();
 
-    cl_log.log("Using " + settings.mediaRoot() + " as media root directory", cl_logALWAYS);
+    cl_log.log(QLatin1String("Using ") + settings.mediaRoot() + QLatin1String(" as media root directory"), cl_logALWAYS);
 
     CLDevice::startCommandProc();
 
@@ -141,30 +141,30 @@ int main(int argc, char *argv[])
 
     //=========================================================
 
-    qApp->setStyleSheet("\
-        QMenu {\
-        background-color: black;\
-        font-family: Bodoni MT;\
-        font-size: 18px;\
-        border: 1px solid rgb(110, 110, 110);\
-        }\
-        QMenu::item{\
-        color: white;\
-        padding-top: 4px;\
-        padding-left: 5px;\
-        padding-right: 15px;\
-        padding-bottom: 4px;\
-        }\
-        QMenu::item:disabled{\
-        color: rgb(110, 110, 110);\
-        }\
-        QMenu::item:selected {\
-        background: rgb(40, 40, 40);\
-        }\
-        QMenu::separator {\
-        height: 3px; \
-        background: rgb(20, 20, 20);\
-        }");
+    qApp->setStyleSheet(QLatin1String(
+        "QMenu {\n"
+        "background-color: black;\n"
+        "font-family: Bodoni MT;\n"
+        "font-size: 18px;\n"
+        "border: 1px solid rgb(110, 110, 110);\n"
+        "}\n"
+        "QMenu::item{\n"
+        "color: white;\n"
+        "padding-top: 4px;\n"
+        "padding-left: 5px;\n"
+        "padding-right: 15px;\n"
+        "padding-bottom: 4px;\n"
+        "}\n"
+        "QMenu::item:disabled{\n"
+        "color: rgb(110, 110, 110);\n"
+        "}\n"
+        "QMenu::item:selected {\n"
+        "background: rgb(40, 40, 40);\n"
+        "}\n"
+        "QMenu::separator {\n"
+        "height: 3px;\n"
+        "background: rgb(20, 20, 20);\n"
+        "}"));
 
     /**/
     //=========================================================
@@ -187,6 +187,7 @@ int main(int argc, char *argv[])
     QObject::connect(&application, SIGNAL(messageReceived(const QString&)),
         &mainWindow, SLOT(handleMessage(const QString&)));
 
+    char *s = "hello";
     return application.exec();
 
     CLDevice::stopCommandProc();

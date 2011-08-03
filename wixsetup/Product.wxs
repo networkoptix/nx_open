@@ -188,7 +188,7 @@
               <File Id="avfilterDll" Name="avfilter-2.dll" Source="../bin/release/avfilter-2.dll"/>
               <File Id="avformatDll" Name="avformat-53.dll" Source="../bin/release/avformat-53.dll"/>
               <File Id="avutilDll" Name="avutil-51.dll" Source="../bin/release/avutil-51.dll"/>
-              <File Id="swscaleDll" Name="swscale-0.dll" Source="../bin/release/swscale-0.dll"/>
+              <File Id="swscaleDll" Name="swscale-2.dll" Source="../bin/release/swscale-2.dll"/>
             </Component>
 
             <Component Id="QTLibraries" Guid="3E273FF1-35A7-44da-864C-61EE9E9B7EA8">

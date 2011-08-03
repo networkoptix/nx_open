@@ -10,7 +10,7 @@ CLAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder(CodecID codec, void
 	// h264 
 	switch(m_codecManufacture)
 	{
-#ifdef _WIN32
+#ifdef Q_OS_WIN
 	case INTELIPP:
 		return new IPPH264Decoder();
 	    break;

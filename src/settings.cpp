@@ -14,7 +14,7 @@ QColor global_shadow_color(0, 0, 0, 128);
 QColor global_selection_color(0, 150, 255, 110);
 QColor global_can_be_droped_color(0, 255, 150, 110);
 
-// how often we run new device search and how often layout synchronizes with device manager 
+// how often we run new device search and how often layout synchronizes with device manager
 int devices_update_interval = 1000;
 
 QColor app_bkr_color(0,5,5,125);
@@ -74,45 +74,43 @@ void Settings::load(const QString& fileName)
 
     if (settingsFile.exists())
     {
-		if (settingsFile.open(QIODevice::ReadOnly | QIODevice::Text))
-		{
-			QXmlStreamReader xml(&settingsFile);
-			
+        if (settingsFile.open(QIODevice::ReadOnly | QIODevice::Text))
+        {
+            QXmlStreamReader xml(&settingsFile);
+
 			while (!xml.atEnd())
 			{
 				xml.readNext();
-				
+
 				if (xml.isStartElement())
 				{
-					if (xml.name() == "mediaRoot")
+					if (xml.name() == QLatin1String("mediaRoot"))
 						m_data.mediaRoot = fromNativePath(xml.readElementText());
-					else if (xml.name() == "auxMediaRoot")
+					else if (xml.name() == QLatin1String("auxMediaRoot"))
 						m_data.auxMediaRoots.push_back(fromNativePath(xml.readElementText()));
-					else if (xml.name() == "serialNumber")
+					else if (xml.name() == QLatin1String("serialNumber"))
 						setSerialNumber(xml.readElementText());
-					else if (xml.name() == "afterFirstRun")
-						m_data.afterFirstRun = (xml.readElementText() == "true");
+					else if (xml.name() == QLatin1String("afterFirstRun"))
+						m_data.afterFirstRun = (xml.readElementText() == QLatin1String("true"));
 				}
 			}
-			
+
 			if (xml.hasError())
 			{
 				reset();
 			}
 		} else
 		{
-			cl_log.log("Can't open settings file", cl_logERROR);
+			cl_log.log(QLatin1String("Can't open settings file"), cl_logERROR);
 		}
 
-    } else
+	} else
 	{
-        cl_log.log("No settings file", cl_logERROR);
+		cl_log.log(QLatin1String("No settings file"), cl_logERROR);
 	}
 
     if (m_data.mediaRoot.isEmpty())
-    {
-        m_data.mediaRoot = getMoviesDirectory() + "/EVE Media/";
-    }
+        m_data.mediaRoot = getMoviesDirectory() + QLatin1String("/EVE Media/");
 }
 
 void Settings::save()
@@ -123,7 +121,7 @@ void Settings::save()
 
     if (!settingsFile.open(QIODevice::WriteOnly | QIODevice::Text))
     {
-        cl_log.log("Can't open settings file", cl_logERROR);
+        cl_log.log(QLatin1String("Can't open settings file"), cl_logERROR);
         return;
     }
 
@@ -131,22 +129,22 @@ void Settings::save()
     stream.setAutoFormatting(true);
     stream.writeStartDocument();
 
-    stream.writeStartElement("settings");
-    stream.writeStartElement("config");
+    stream.writeStartElement(QLatin1String("settings"));
+    stream.writeStartElement(QLatin1String("config"));
 
-    stream.writeTextElement("mediaRoot", QDir::toNativeSeparators(m_data.mediaRoot));
+    stream.writeTextElement(QLatin1String("mediaRoot"), QDir::toNativeSeparators(m_data.mediaRoot));
 
     foreach(QString auxMediaRoot, m_data.auxMediaRoots)
     {
-        stream.writeTextElement("auxMediaRoot", QDir::toNativeSeparators(auxMediaRoot));
+        stream.writeTextElement(QLatin1String("auxMediaRoot"), QDir::toNativeSeparators(auxMediaRoot));
     }
-    
+
     if (!m_serialNumber.isEmpty())
     {
-        stream.writeTextElement("serialNumber", m_serialNumber);
+        stream.writeTextElement(QLatin1String("serialNumber"), m_serialNumber);
     }
-    
-    stream.writeTextElement("afterFirstRun", "true");
+
+    stream.writeTextElement(QLatin1String("afterFirstRun"), QLatin1String("true"));
 
     stream.writeEndElement(); // config
     stream.writeEndElement(); // settings

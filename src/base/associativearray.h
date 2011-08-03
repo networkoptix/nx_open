@@ -11,9 +11,9 @@ class CLValue
 public:
 	CLValue(){}
 	CLValue(const QString& val) : value(val){}
-	CLValue(const char* val) : value(val){}
+	CLValue(const char* val) : value(QString::fromLatin1(val)){}
 
-	CLValue(int val) 
+	CLValue(int val)
 	{
 		value.setNum(val);
 	}

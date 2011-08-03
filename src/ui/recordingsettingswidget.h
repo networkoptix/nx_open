@@ -29,11 +29,21 @@ public:
     int screen() const;
     void setScreen(int screen);
 
-    QString audioDeviceName() const;
-    void setAudioDeviceName(const QString &name);
+    QString primaryAudioDeviceName() const;
+    void setPrimaryAudioDeviceName(const QString &name);
+
+    QString secondaryAudioDeviceName() const;
+    void setSecondaryAudioDeviceName(const QString &name);
 
 public slots:
     void accept();
+    void onComboboxChanged(int index);
+private:
+    void setDefaultSoundIcon(QLabel* l);
+    void additionalAdjustSize();
+private slots:
+    void onMonitorChanged(int);
+    void onDisableAeroChecked(bool);
 
 private:
     Ui::RecordingSettings *ui;

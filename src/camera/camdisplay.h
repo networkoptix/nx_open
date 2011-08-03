@@ -5,6 +5,7 @@
 #include "base/adaptivesleep.h"
 #include "device/device_video_layout.h"
 #include "streamreader/streamreader.h"
+#include "data/mediadata.h"
 
 class CLAbstractRenderer;
 class CLVideoStreamDisplay;
@@ -46,7 +47,6 @@ public:
     void setSingleShotMode(bool single);
 
 public slots:
-    void onAudioParamsChanged(AVCodecContext * codec);
     void onRealTimeStreamHint(bool value);
     void onSlowSourceHint();
 signals:
@@ -101,8 +101,6 @@ private:
 
     bool mGenerateEndOfStreamSignal;
 
-    bool m_needReinitAudio;
-
     bool m_isRealTimeSource;
 	QAudioFormat m_expectedAudioFormat;
 	QMutex m_audioChangeMutex;
@@ -110,7 +108,9 @@ private:
     bool m_singleShotMode;
     bool m_singleShotQuantProcessed;
     qint64 m_jumpTime;
-
+    CLCodecAudioFormat m_playingFormat;
+    int m_playingCompress;
+    int m_playingBitrate;
 };
 
 #endif //clcam_display_h_1211

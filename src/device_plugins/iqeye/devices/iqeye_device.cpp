@@ -38,7 +38,7 @@ bool multicastLeaveGroup(QUdpSocket& udpSocket, QHostAddress groupAddress)
 
 CLIQEyeDevice::CLIQEyeDevice()
 {
-    
+
 }
 
 CLIQEyeDevice::~CLIQEyeDevice()
@@ -54,29 +54,29 @@ CLDevice::DeviceType CLIQEyeDevice::getDeviceType() const
 
 QString CLIQEyeDevice::toString() const
 {
-    return QString("live iqeye ") + getName() + QString(" ") + getUniqueId();
+    return QLatin1String("live iqeye ") + getName() + QLatin1Char(' ') + getUniqueId();
 }
 
 CLStreamreader* CLIQEyeDevice::getDeviceStreamConnection()
 {
     //IQ732N   IQ732S     IQ832N   IQ832S   IQD30S   IQD31S  IQD32S  IQM30S  IQM31S  IQM32S
-    if (getName()=="IQA35" || 
-        getName()=="IQA33N" ||
-        getName()=="IQA32N" ||
-        getName()=="IQA31" ||
-        getName()=="IQ732N" ||
-        getName()=="IQ732S" ||
-        getName()=="IQ832N" ||
-        getName()=="IQ832S" ||
-        getName()=="IQD30S" ||
-        getName()=="IQD31S" ||
-        getName()=="IQD32S" ||
-        getName()=="IQM30S" ||
-        getName()=="IQM31S" ||
-        getName()=="IQM32S")
+    QString name = getName();
+    if (name == QLatin1String("IQA35") ||
+        name == QLatin1String("IQA33N") ||
+        name == QLatin1String("IQA32N") ||
+        name == QLatin1String("IQA31") ||
+        name == QLatin1String("IQ732N") ||
+        name == QLatin1String("IQ732S") ||
+        name == QLatin1String("IQ832N") ||
+        name == QLatin1String("IQ832S") ||
+        name == QLatin1String("IQD30S") ||
+        name == QLatin1String("IQD31S") ||
+        name == QLatin1String("IQD32S") ||
+        name == QLatin1String("IQM30S") ||
+        name == QLatin1String("IQM31S") ||
+        name == QLatin1String("IQM32S"))
         return new CLIQEyeH264treamreader(this);
-    else
-        return new CLIQEyeMJPEGtreamreader(this);
+    return new CLIQEyeMJPEGtreamreader(this);
 }
 
 bool CLIQEyeDevice::unknownDevice() const
@@ -109,7 +109,7 @@ void CLIQEyeDevice::findDevices(CLDeviceList& result)
 
     foreach(QHostAddress localAddress, localAddresses)
     {
-        QHostAddress groupAddress("224.0.0.251");
+        QHostAddress groupAddress(QLatin1String("224.0.0.251"));
         quint16 MDNS_PORT = 5353;
 
         std::string localAddressString = localAddress.toString().toStdString();
@@ -135,7 +135,7 @@ void CLIQEyeDevice::findDevices(CLDeviceList& result)
 
         while(time.elapsed() < 150)
         {
-            while (udpSocket.hasPendingDatagrams()) 
+            while (udpSocket.hasPendingDatagrams())
             {
                 QByteArray responseData;
                 responseData.resize(udpSocket.pendingDatagramSize());
@@ -161,7 +161,7 @@ void CLIQEyeDevice::findDevices(CLDeviceList& result)
 
                 for (int i = iqpos; i < macpos; i++)
                 {
-                    name += responseData[i];
+                    name += QLatin1Char(responseData[i]);
                 }
 
                 if (macpos != -1)
@@ -171,9 +171,9 @@ void CLIQEyeDevice::findDevices(CLDeviceList& result)
                     for (int i = 0; i < 12; i++)
                     {
                         if (i > 0 && i % 2 == 0)
-                            smac += "-";
+                            smac += QLatin1Char('-');
 
-                        smac += responseData[macpos + i];
+                        smac += QLatin1Char(responseData[macpos + i]);
                     }
                 }
 
@@ -183,7 +183,7 @@ void CLIQEyeDevice::findDevices(CLDeviceList& result)
                 if (result.find(smac) != result.end())
                     continue; // already found;
 
-                // in any case let's HTTP do it's job at very end of discovery 
+                // in any case let's HTTP do it's job at very end of discovery
 
                 CLIQEyeDevice* device = new CLIQEyeDevice();
                 device->setName(name);

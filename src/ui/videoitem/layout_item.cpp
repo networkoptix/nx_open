@@ -12,7 +12,7 @@ mContent(0)
 
     m_type = LAYOUT;
 
-    mPixmap = cached(":/skin/layout.png");
+    mPixmap = cached(QLatin1String(":/skin/layout.png"));
 
     //setMaxSize(max_width, max_height);
 }
@@ -51,7 +51,7 @@ void CLLayoutItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 {
     Q_UNUSED(widget);
 
-    /*
+	/*
 	painter->fillPath(mShadowRectPath, global_shadow_color);
 
 	QColor border_color(20,20,160);
@@ -69,7 +69,7 @@ void CLLayoutItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 	//painter->setPen(QPen(QColor(100,100,100,230),  1, Qt::SolidLine));
 	//painter->drawRect(boundingRect());
 
-	//==================================================
+    //==================================================
     */
 
     painter->setRenderHint(QPainter::SmoothPixmapTransform);
@@ -77,7 +77,7 @@ void CLLayoutItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     painter->drawPixmap(boundingRect(), mPixmap, mPixmap.rect());
 
 
-	QFont  font("Courier New", 250);
+	QFont font(QLatin1String("Courier New"), 250);
 	font.setWeight(QFont::Bold);
 	painter->setFont(font);
 
@@ -91,7 +91,7 @@ void CLLayoutItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 	else
 		painter->setPen(QColor(150, 150, 255));
 
-    
+
 	painter->drawText((width() - rect.width())/2, border,
 		rect.width(), rect.height(),
 		Qt::AlignCenter | Qt::TextWordWrap, UIDisplayName(getName()));

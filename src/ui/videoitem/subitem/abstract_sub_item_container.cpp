@@ -33,7 +33,7 @@ void CLAbstractSubItemContainer::removeSubItem(CLAbstractSubItem *item)
 bool CLAbstractSubItemContainer::addSubItem(CLSubItemType type)
 {
 	QPointF pos = getBestSubItemPos(type);
-	if (pos.x()<-1000 && pos.y()<-1000)//position undefined 
+	if (pos.x()<-1000 && pos.y()<-1000)//position undefined
 		return false;
 
 	CLAbstractSubItem* item = 0;
@@ -41,7 +41,7 @@ bool CLAbstractSubItemContainer::addSubItem(CLSubItemType type)
 	switch(type)
 	{
 	case CloseSubItem:
-		item = new CLImgSubItem(this, ":/skin/close3.png" ,CloseSubItem, global_decoration_opacity, global_decoration_max_opacity, 256, 256);
+		item = new CLImgSubItem(this, QLatin1String(":/skin/close3.png") ,CloseSubItem, global_decoration_opacity, global_decoration_max_opacity, 256, 256);
 		break;
 
 	case RecordingSubItem:
@@ -54,7 +54,7 @@ bool CLAbstractSubItemContainer::addSubItem(CLSubItemType type)
 
 	item->setPos(pos);
 
-    addSubItem(item);
+	addSubItem(item);
 
 	return true;
 }
@@ -65,10 +65,10 @@ void CLAbstractSubItemContainer::removeSubItem(CLSubItemType type)
 	{
 		if (sub_item->getType()==type)
 		{
-            removeSubItem(sub_item);
+			removeSubItem(sub_item);
 			scene()->removeItem(sub_item);
 			delete sub_item;
-            break;
+			break;
 		}
 
 	}
@@ -81,12 +81,12 @@ QPointF CLAbstractSubItemContainer::getBestSubItemPos(CLSubItemType /*type*/)
 
 void CLAbstractSubItemContainer::onResize()
 {
-    foreach(CLAbstractSubItem* sub_item, m_subItems)	
+    foreach(CLAbstractSubItem* sub_item, m_subItems)
     {
-		QPointF pos = getBestSubItemPos(sub_item->getType());
-		sub_item->setPos(pos);
-		sub_item->onResize();
-	}
+        QPointF pos = getBestSubItemPos(sub_item->getType());
+        sub_item->setPos(pos);
+        sub_item->onResize();
+    }
 }
 
 void CLAbstractSubItemContainer::onSubItemPressed(CLAbstractSubItem* subitem)

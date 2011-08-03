@@ -16,35 +16,64 @@ VideoRecorderSettings::~VideoRecorderSettings()
     settings.endGroup();
 }
 
-QAudioDeviceInfo getDeviceByName(const QString &name, QAudio::Mode mode)
+QAudioDeviceInfo getDeviceByName(const QString &name, QAudio::Mode mode, bool *isDefault = 0)
 {
+    if (isDefault)
+        *isDefault = false;
+    if (name == QObject::tr("None"))
+        return QAudioDeviceInfo();
+
     foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(mode)) {
-        if (info.deviceName() == name)
+        if (name.startsWith(info.deviceName()))
             return info;
     }
+
+    if (isDefault)
+        *isDefault = true;
     return QAudioDeviceInfo::defaultInputDevice();
 }
 
-QAudioDeviceInfo VideoRecorderSettings::audioDevice() const
+QAudioDeviceInfo VideoRecorderSettings::primaryAudioDevice() const
 {
-    return getDeviceByName(settings.value(QLatin1String("audioDevice")).toString(), QAudio::AudioInput);
+    return getDeviceByName(settings.value(QLatin1String("primaryAudioDevice")).toString(), QAudio::AudioInput);
 }
 
-void VideoRecorderSettings::setAudioDeviceByName(const QString &audioDeviceName)
+void VideoRecorderSettings::setPrimaryAudioDeviceByName(const QString &audioDeviceName)
 {
-    settings.setValue(QLatin1String("audioDevice"), audioDeviceName);
+    settings.setValue(QLatin1String("primaryAudioDevice"), audioDeviceName);
+}
+
+QAudioDeviceInfo VideoRecorderSettings::secondaryAudioDevice() const
+{
+    QAudioDeviceInfo result;
+    bool isDefault = true;
+    if (isDefault)
+        result = getDeviceByName(QLatin1String("Rec. Playback"), QAudio::AudioInput, &isDefault);
+    if (isDefault)
+        result = getDeviceByName(QLatin1String("Stereo mix"), QAudio::AudioInput, &isDefault);
+    if (isDefault)
+        result = getDeviceByName(QLatin1String("What you hear"), QAudio::AudioInput, &isDefault);
+    if (!isDefault)
+        return result;
+
+    return getDeviceByName(settings.value(QLatin1String("secondaryAudioDevice")).toString(), QAudio::AudioInput);
+}
+
+void VideoRecorderSettings::setSecondaryAudioDeviceByName(const QString &audioDeviceName)
+{
+    settings.setValue(QLatin1String("secondaryAudioDevice"), audioDeviceName);
 }
 
 bool VideoRecorderSettings::captureCursor() const
 {
-    if (!settings.contains("captureCursor"))
+    if (!settings.contains(QLatin1String("captureCursor")))
         return true;
-    return settings.value("captureCursor").toBool();
+    return settings.value(QLatin1String("captureCursor")).toBool();
 }
 
 void VideoRecorderSettings::setCaptureCursor(bool yes)
 {
-    settings.setValue("captureCursor", yes);
+    settings.setValue(QLatin1String("captureCursor"), yes);
 }
 
 VideoRecorderSettings::CaptureMode VideoRecorderSettings::captureMode() const
@@ -59,6 +88,8 @@ void VideoRecorderSettings::setCaptureMode(VideoRecorderSettings::CaptureMode ca
 
 VideoRecorderSettings::DecoderQuality VideoRecorderSettings::decoderQuality() const
 {
+    if (!settings.contains(QLatin1String("decoderQuality")))
+        return VideoRecorderSettings::BalancedQuality;
     return (VideoRecorderSettings::DecoderQuality)settings.value(QLatin1String("decoderQuality")).toInt();
 }
 
@@ -69,6 +100,8 @@ void VideoRecorderSettings::setDecoderQuality(VideoRecorderSettings::DecoderQual
 
 VideoRecorderSettings::Resolution VideoRecorderSettings::resolution() const
 {
+    if (!settings.contains(QLatin1String("resolution")))
+        return VideoRecorderSettings::ResQuaterNative;
     return (VideoRecorderSettings::Resolution)settings.value(QLatin1String("resolution")).toInt();
 }
 

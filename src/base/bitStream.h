@@ -12,11 +12,11 @@ public:
 	//BitStreamException(const char* str): std::exception(str) {}
 	//BitStreamException(const std::string& str): std::exception(str.c_str()) {}
 	BitStreamException(): std::exception() {}
-    ~BitStreamException() throw() {}
-    BitStreamException(const std::string& str): message(str.c_str()) {}
-    BitStreamException(const QString& str): message(str.toAscii()) {}
-    BitStreamException(const char* str): message(str) {}
-    
+	~BitStreamException() throw() {}
+	BitStreamException(const std::string& str): message(QString::fromAscii(str.c_str())) {}
+	BitStreamException(const QString& str): message(QString::fromAscii(str.toAscii())) {}
+	BitStreamException(const char* str): message(QString::fromAscii(str)) {}
+
     virtual const char* what() const throw()
     {
         return message.toAscii();
@@ -33,7 +33,7 @@ public:
 	inline quint8* getBuffer() const {return (quint8*) m_initBuffer;}
 	inline unsigned getBitsLeft() const {return m_totalBits;}
 protected:
-	inline void setBuffer(quint8* buffer, quint8* end) 
+	inline void setBuffer(quint8* buffer, quint8* end)
 	{
 		if (buffer >= end)
 			THROW_BITSTREAM_ERR;
@@ -55,14 +55,14 @@ protected:
 
 class BitStreamReader: public BitStream {
 private:
-	inline unsigned getCurVal(unsigned* buff) 
+	inline unsigned getCurVal(unsigned* buff)
 	{
 		quint8* tmpBuf = (quint8*) buff;
 		if (m_totalBits >= 32)
 			return ntohl(*buff);
-		else if (m_totalBits >= 24) 
+		else if (m_totalBits >= 24)
 			return (tmpBuf[0] << 24) + (tmpBuf[1] << 16) + (tmpBuf[2] << 8);
-		else if (m_totalBits >= 16) 
+		else if (m_totalBits >= 16)
 			return (tmpBuf[0] << 24) + (tmpBuf[1] << 16);
 		else if (m_totalBits >= 8)
 			return tmpBuf[0] << 24;
@@ -75,14 +75,14 @@ public:
 		m_curVal = getCurVal(m_buffer);
 		m_bitLeft = INT_BIT;
 	}
-	inline unsigned getBits(unsigned num) 
+	inline unsigned getBits(unsigned num)
 	{
 		if (num > INT_BIT)
 			THROW_BITSTREAM_ERR;
 		if (m_totalBits < num)
 			THROW_BITSTREAM_ERR;
 		unsigned prevVal = 0;
-		if (num <= m_bitLeft) 
+		if (num <= m_bitLeft)
 			m_bitLeft -= num;
 		else {
 			prevVal = (m_curVal &  m_masks[m_bitLeft]) << (num - m_bitLeft);
@@ -93,7 +93,7 @@ public:
 		m_totalBits -= num;
 		return prevVal + (m_curVal >> m_bitLeft) & m_masks[num];
 	}
-	inline unsigned showBits(unsigned num) 
+	inline unsigned showBits(unsigned num)
 	{
 		assert(num <= INT_BIT);
 		if (m_totalBits < num)
@@ -101,7 +101,7 @@ public:
 		unsigned prevVal = 0;
 		unsigned bitLeft = m_bitLeft;
 		unsigned curVal = m_curVal;
-		if (num <= bitLeft) 
+		if (num <= bitLeft)
 			bitLeft -= num;
 		else {
 			prevVal = (curVal &  m_masks[bitLeft]) << (num - bitLeft);
@@ -114,7 +114,7 @@ public:
 	inline unsigned getBit() {
 		if (m_totalBits < 1)
 			THROW_BITSTREAM_ERR;
-		if (m_bitLeft > 0) 
+		if (m_bitLeft > 0)
 			m_bitLeft--;
 		else {
 			m_buffer++;
@@ -128,7 +128,7 @@ public:
 		if (m_totalBits < num)
 			THROW_BITSTREAM_ERR;
 		assert(num <= INT_BIT);
-		if (num <= m_bitLeft) 
+		if (num <= m_bitLeft)
 			m_bitLeft -= num;
 		else {
 			m_buffer++;
@@ -140,7 +140,7 @@ public:
 	inline void skipBit() {
 		if (m_totalBits < 1)
 			THROW_BITSTREAM_ERR;
-		if (m_bitLeft > 0) 
+		if (m_bitLeft > 0)
 			m_bitLeft--;
 		else {
 			m_buffer++;

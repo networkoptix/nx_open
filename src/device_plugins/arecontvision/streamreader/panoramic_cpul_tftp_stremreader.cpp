@@ -7,7 +7,7 @@
 //======================================================
 
 extern int create_sps_pps(
-				   int frameWidth, 
+				   int frameWidth,
 				   int frameHeight,
 				   int deblock_filter,
 				   unsigned char* data, int max_datalen);
@@ -55,13 +55,13 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 		if (h264) // cam is not jpeg only
 		{
 
-			if (!m_streamParam.exists("streamID"))
+			if (!m_streamParam.exists(QLatin1String("streamID")))
 			{
-				cl_log.log("Erorr!!! parameter is missing in stream params.", cl_logERROR);
+				cl_log.log(QLatin1String("Erorr!!! parameter is missing in stream params."), cl_logERROR);
 				return 0;
 			}
 
-			streamID = m_streamParam.get("streamID").value.value;
+			streamID = m_streamParam.get(QLatin1String("streamID")).value.value;
 
 		}
 
@@ -83,7 +83,7 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 
 	}
 
-	forecast_size = (width*height)/2; // 0.5 meg per megapixel as maximum 
+	forecast_size = (width*height)/2; // 0.5 meg per megapixel as maximum
 
 	CLSimpleTFTPClient tftp_client((static_cast<CLAreconVisionDevice*>(m_device))->getIP().toString().toLatin1().data(),  m_timeout, 3);
 
@@ -103,7 +103,7 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 		unsigned char h264header[50];
 		expectable_header_size = create_sps_pps(resolutionFULL ? width : width/2, resolutionFULL ? height: height/2, 0, h264header, sizeof(h264header));
 		img.prepareToWrite(expectable_header_size + 5 ); // 5: from cam in tftp mode we receive data starts from second byte of slice header; so we need to put start code and first byte
-		img.done(expectable_header_size + 5 ); 
+		img.done(expectable_header_size + 5 );
 
 		// please note that we did not write a single byte to img, we just move position...
 		// we will write header based on last packet information
@@ -111,7 +111,7 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 	else
 	{
 		// in jpeg image header size has constant len
-		img.prepareToWrite(AVJpeg::Header::GetHeaderSize()-2); 
+		img.prepareToWrite(AVJpeg::Header::GetHeaderSize()-2);
 		img.done(AVJpeg::Header::GetHeaderSize()-2); //  for some reason first 2 bytes from cam is trash
 
 		// please note that we did not write a single byte to img, we just move position...
@@ -157,7 +157,7 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 		arr[0] & 4 ? resolutionFULL = true : false;
 		size = ExtractSize(&arr[2]);
 
-		if (size.width>5000 || size.width<0 || size.height>5000 || size.height<0) // bug of arecontvision firmware 
+		if (size.width>5000 || size.width<0 || size.height>5000 || size.height<0) // bug of arecontvision firmware
 		{
 			videoData->releaseRef();
 			return 0;
@@ -177,7 +177,7 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 
 	if (h264 && (lp_size < iframe_index))
 	{
-		cl_log.log("last packet is too short!", cl_logERROR);
+		cl_log.log(QLatin1String("last packet is too short!"), cl_logERROR);
 		//delete videoData;
 		videoData->releaseRef();
 		return 0;
@@ -197,7 +197,7 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 		img.write(&c,1); //1
 		c = 0x09;
 		img.write(&c,1); //0x09
-		c = videoData->keyFrame ? 0x10 : 0x30; 
+		c = videoData->keyFrame ? 0x10 : 0x30;
 		img.write(&c,1); // 0x10
 
 		//==========================================
@@ -207,13 +207,13 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 			unsigned char h264header[50];
 			int header_size = create_sps_pps(size.width, size.height, 0, h264header, sizeof(h264header));
 
-			if (header_size!=expectable_header_size) // this should be very rarely 
+			if (header_size!=expectable_header_size) // this should be very rarely
 			{
 				int diff = header_size - expectable_header_size;
 				if (diff>0)
 					img.prepareToWrite(diff);
 
-				cl_log.log("moving data!!", cl_logWARNING);
+				cl_log.log(QLatin1String("moving data!!"), cl_logWARNING);
 
 				memmove(img.data() + 5 + header_size, img.data() + 5 + expectable_header_size, img.size() - (5 + expectable_header_size));
 				img.done(diff);
@@ -224,12 +224,12 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 			dst+= header_size;
 		}
 		/*
-		else 
+		else
 		{
 			img.ignore_first_bytes(expectable_header_size); // if you decoder needs compressed data alignment, just do not do it. ffmpeg will delay one frame if do not do it.
 			dst+=expectable_header_size;
 		}
-        */
+		*/
 
 		// we also need to put very begining of SH
 		dst[0] = dst[1] = dst[2] = 0; dst[3] = 1;

@@ -1,11 +1,9 @@
 #include "ffmpeg_helper.h"
 
-QString codecIDToString(CodecID codecID)
+static inline QByteArray codecIDToByteArray(CodecID codecID)
 {
     switch(codecID)
     {
-    case CODEC_ID_NONE: return "";
-
         /* video codecs */
     case CODEC_ID_MPEG1VIDEO: return "MPEG1VIDEO";
     case CODEC_ID_MPEG2VIDEO: return "MPEG2VIDEO"; ///< preferred ID for MPEG-1/2 video decoding
@@ -194,35 +192,35 @@ QString codecIDToString(CodecID codecID)
     case CODEC_ID_S302M:
 
         /* various ADPCM codecs */
-    case CODEC_ID_ADPCM_IMA_QT: 
-    case CODEC_ID_ADPCM_IMA_WAV: 
-    case CODEC_ID_ADPCM_IMA_DK3: 
-    case CODEC_ID_ADPCM_IMA_DK4: 
-    case CODEC_ID_ADPCM_IMA_WS: 
-    case CODEC_ID_ADPCM_IMA_SMJPEG: 
-    case CODEC_ID_ADPCM_MS: 
-    case CODEC_ID_ADPCM_4XM: 
-    case CODEC_ID_ADPCM_XA: 
+    case CODEC_ID_ADPCM_IMA_QT:
+    case CODEC_ID_ADPCM_IMA_WAV:
+    case CODEC_ID_ADPCM_IMA_DK3:
+    case CODEC_ID_ADPCM_IMA_DK4:
+    case CODEC_ID_ADPCM_IMA_WS:
+    case CODEC_ID_ADPCM_IMA_SMJPEG:
+    case CODEC_ID_ADPCM_MS:
+    case CODEC_ID_ADPCM_4XM:
+    case CODEC_ID_ADPCM_XA:
     case CODEC_ID_ADPCM_ADX:
-    case CODEC_ID_ADPCM_EA: 
+    case CODEC_ID_ADPCM_EA:
     case CODEC_ID_ADPCM_G726:
-    case CODEC_ID_ADPCM_CT: 
+    case CODEC_ID_ADPCM_CT:
     case CODEC_ID_ADPCM_SWF:
     case CODEC_ID_ADPCM_YAMAHA:
     case CODEC_ID_ADPCM_SBPRO_4:
     case CODEC_ID_ADPCM_SBPRO_3:
     case CODEC_ID_ADPCM_SBPRO_2:
-    case CODEC_ID_ADPCM_THP: 
-    case CODEC_ID_ADPCM_IMA_AMV: 
-    case CODEC_ID_ADPCM_EA_R1: 
-    case CODEC_ID_ADPCM_EA_R3: 
-    case CODEC_ID_ADPCM_EA_R2: 
-    case CODEC_ID_ADPCM_IMA_EA_SEAD: 
-    case CODEC_ID_ADPCM_IMA_EA_EACS: 
-    case CODEC_ID_ADPCM_EA_XAS: 
-    case CODEC_ID_ADPCM_EA_MAXIS_XA: 
-    case CODEC_ID_ADPCM_IMA_ISS: 
-    case CODEC_ID_ADPCM_G722: 
+    case CODEC_ID_ADPCM_THP:
+    case CODEC_ID_ADPCM_IMA_AMV:
+    case CODEC_ID_ADPCM_EA_R1:
+    case CODEC_ID_ADPCM_EA_R3:
+    case CODEC_ID_ADPCM_EA_R2:
+    case CODEC_ID_ADPCM_IMA_EA_SEAD:
+    case CODEC_ID_ADPCM_IMA_EA_EACS:
+    case CODEC_ID_ADPCM_EA_XAS:
+    case CODEC_ID_ADPCM_EA_MAXIS_XA:
+    case CODEC_ID_ADPCM_IMA_ISS:
+    case CODEC_ID_ADPCM_G722:
         return "PCM";
 
         /* AMR */
@@ -234,10 +232,10 @@ QString codecIDToString(CodecID codecID)
     case CODEC_ID_RA_288: return "RA-288";
 
         /* various DPCM codecs */
-    case CODEC_ID_ROQ_DPCM: 
-    case CODEC_ID_INTERPLAY_DPCM: 
-    case CODEC_ID_XAN_DPCM: 
-    case CODEC_ID_SOL_DPCM: 
+    case CODEC_ID_ROQ_DPCM:
+    case CODEC_ID_INTERPLAY_DPCM:
+    case CODEC_ID_XAN_DPCM:
+    case CODEC_ID_SOL_DPCM:
         return "PCM";
 
         /* audio codecs */
@@ -317,6 +315,16 @@ QString codecIDToString(CodecID codecID)
     case CODEC_ID_MPEG2TS: return "MPEG2TS"; /**< _FAKE_ codec to indicate a raw MPEG-2 TS
                                       * stream (only used by libavformat) */
     case CODEC_ID_FFMETADATA: return "FFMETADATA";   ///< Dummy codec for streams containing only metadata information.
+
+    case CODEC_ID_NONE:
+    default:
+        break;
     };
-    return QString();
+
+    return 0;
+}
+
+QString codecIDToString(CodecID codecID)
+{
+    return QString::fromLatin1(codecIDToByteArray(codecID));
 }

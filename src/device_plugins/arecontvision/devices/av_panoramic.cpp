@@ -14,12 +14,12 @@ public:
 		return 4;
 	}
 
-	virtual unsigned int width() const 
+	virtual unsigned int width() const
 	{
 		return 4;
 	}
 
-	virtual unsigned int height() const 
+	virtual unsigned int height() const
 	{
 		return 1;
 	}
@@ -35,16 +35,16 @@ public:
 			return 2;
 
 		case 2:
-		    return 3;
+			return 3;
 
 		case 3:
-		    return 1;
+			return 1;
 		default:
-		    return 0;
+			return 0;
 		}
 	}
 
-    virtual unsigned int v_position(unsigned int /*channel*/) const
+	virtual unsigned int v_position(unsigned int /*channel*/) const
 	{
 		return 0;
 	}
@@ -62,22 +62,22 @@ public:
 		return 4;
 	}
 
-	virtual unsigned int width() const 
+	virtual unsigned int width() const
 	{
 		return 4;
 	}
 
-	virtual unsigned int height() const 
+	virtual unsigned int height() const
 	{
 		return 1;
 	}
 
 	virtual unsigned int h_position(unsigned int channel) const
 	{
-        switch(channel)
-        {
-        case 0:
-            return 0;
+		switch(channel)
+		{
+		case 0:
+			return 0;
 
         case 1:
             return 3;
@@ -90,9 +90,9 @@ public:
         default:
             return 0;
         }
-	}
+    }
 
-    virtual unsigned int v_position(unsigned int /*channel*/) const
+	virtual unsigned int v_position(unsigned int /*channel*/) const
 	{
 		return 0;
 	}
@@ -119,13 +119,13 @@ m_hastestPattern(false)
 
 bool CLArecontPanoramicDevice::getDescription()
 {
-	m_description = "";
+	m_description.clear();
 	return true;
 }
 
 CLStreamreader* CLArecontPanoramicDevice::getDeviceStreamConnection()
 {
-	cl_log.log("Creating streamreader for ", getIP().toString(), cl_logDEBUG1);
+	cl_log.log(QLatin1String("Creating streamreader for "), getIP().toString(), cl_logDEBUG1);
 	return new AVPanoramicClientPullSSTFTPStreamreader(this);
 }
 
@@ -139,7 +139,7 @@ bool CLArecontPanoramicDevice::setParam(const QString& name, const CLValue& val 
 	if (!CLDevice::setParam(name, val))
 		return false;
 
-	if (setParam_special(name, val)) // try special first 
+	if (setParam_special(name, val)) // try special first
 		return true;
 
 	CLParamType& value = getDeviceParamList().get(name).value;
@@ -149,23 +149,23 @@ bool CLArecontPanoramicDevice::setParam(const QString& name, const CLValue& val 
 
 	if (!value.setValue(val, false))
 	{
-		cl_log.log("cannot set such value!", cl_logWARNING);
+		cl_log.log(QLatin1String("cannot set such value!"), cl_logWARNING);
 		return false;
 	}
 
-	if (value.http=="") // check if we have http command for this param
+	if (value.http.isEmpty()) // check if we have http command for this param
 	{
 		value.setValue(val);
 		return true;
 	}
 
-	if (value.type==CLParamType::None || value.type==CLParamType::Button) 
+	if (value.type==CLParamType::None || value.type==CLParamType::Button)
 	{
 		CLSimpleHTTPClient connection(getIP(), 80, getHttpTimeout(), getAuth());
 		QString request;
 
 		QTextStream str(&request);
-		str << "set?" << value.http;
+		str << QLatin1String("set?") << value.http;
 
 		connection.setRequestLine(request);
 
@@ -181,8 +181,8 @@ bool CLArecontPanoramicDevice::setParam(const QString& name, const CLValue& val 
 			QString request;
 
 			QTextStream str(&request);
-			str << "set" << i << "?" << value.http;
-			str << "=" << (QString)val;
+			str << QLatin1String("set") << i << QLatin1Char('?') << value.http;
+			str << QLatin1Char('=') << (QString)val;
 
 			connection.setRequestLine(request);
 
@@ -206,16 +206,16 @@ bool CLArecontPanoramicDevice::setParam_special(const QString& name, const CLVal
 	if (CLAreconVisionDevice::setParam_special(name, val))
 		return true;
 
-	if (name=="resolution")
+	if (name==QLatin1String("resolution"))
 	{
-		if (val==(QString)("half"))
+		if (val==QLatin1String("half"))
 			return setResolution(false);
-		else if (val==(QString)("full"))
+		else if (val==QLatin1String("full"))
 			return setResolution(true);
 
 		return false;
 	}
-	else if (name=="Quality")
+	else if (name==QLatin1String("Quality"))
 	{
 		int q = val;
 		if (q<1 || q>21)

@@ -23,7 +23,7 @@ void alc_deinit(void);
 }
 #endif
 
-QtvAudioDevice* QtvAudioDevice::m_qtvAudioDevice = 0;
+QtvAudioDevice QtvAudioDevice::m_qtvAudioDevice;
 
 
 QtvAudioDevice::QtvAudioDevice() 
@@ -70,6 +70,7 @@ QtvAudioDevice::QtvAudioDevice()
 
 QtvAudioDevice::~QtvAudioDevice()
 {
+    release();
 #ifdef OPENAL_STATIC
     alc_deinit();
 #endif
@@ -130,8 +131,5 @@ void QtvAudioDevice::release()
 
 QtvAudioDevice& QtvAudioDevice::instance()
 {
-	if (!m_qtvAudioDevice) {
-		m_qtvAudioDevice = new QtvAudioDevice();
-	}
-	return *m_qtvAudioDevice;
+	return m_qtvAudioDevice;
 }

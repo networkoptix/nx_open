@@ -116,7 +116,7 @@ bool CLStreamRecorder::processData(CLAbstractData* data)
 
 	if (needToFlush(channel))
 		flushChannel(channel);
-    return true;
+	return true;
 }
 
 void CLStreamRecorder::endOfRun()
@@ -132,34 +132,32 @@ void CLStreamRecorder::onFirstData(CLAbstractData* data)
     CLStreamreader* reader = data->dataProvider;
     CLDevice* dev = reader->getDevice();
 
-    QDomDocument doc("");
-    QDomElement root = doc.createElement("layout");
+    QDomDocument doc;
+    QDomElement root = doc.createElement(QLatin1String("layout"));
     doc.appendChild(root);
 
-    root.setAttribute("channels", dev->getVideoLayout()->numberOfChannels());
-    root.setAttribute("width", dev->getVideoLayout()->width());
-    root.setAttribute("height", dev->getVideoLayout()->height());
+    root.setAttribute(QLatin1String("channels"), dev->getVideoLayout()->numberOfChannels());
+    root.setAttribute(QLatin1String("width"), dev->getVideoLayout()->width());
+    root.setAttribute(QLatin1String("height"), dev->getVideoLayout()->height());
 
-    root.setAttribute("name", dev->getName() + QDateTime::currentDateTime().toString(" ddd MMM d yyyy  hh_mm"));
+    root.setAttribute(QLatin1String("name"), dev->getName() + QDateTime::currentDateTime().toString(QLatin1String(" ddd MMM d yyyy  hh_mm")));
 
     for (unsigned int i = 0; i < dev->getVideoLayout()->numberOfChannels(); ++i)
     {
-        QDomElement channel = doc.createElement("channel");
+        QDomElement channel = doc.createElement(QLatin1String("channel"));
 
-        channel.setAttribute("number", i);
-        channel.setAttribute("h_pos", dev->getVideoLayout()->h_position(i));
-        channel.setAttribute("v_pos", dev->getVideoLayout()->v_position(i));
+        channel.setAttribute(QLatin1String("number"), i);
+        channel.setAttribute(QLatin1String("h_pos"), dev->getVideoLayout()->h_position(i));
+        channel.setAttribute(QLatin1String("v_pos"), dev->getVideoLayout()->v_position(i));
 
         root.appendChild(channel);
     }
 
-    QString xml = doc.toString();
-
-    QFile file(dirHelper() + "/layout.xml");
+    QFile file(dirHelper() + QLatin1String("/layout.xml"));
     file.open(QIODevice::WriteOnly);
 
     QTextStream fstr(&file);
-    fstr << xml;
+    fstr << doc.toString();
     fstr.flush();
 }
 
@@ -204,12 +202,12 @@ void CLStreamRecorder::flushChannel(int channel)
 
 QString CLStreamRecorder::filenameData(int channel)
 {
-	return filenameHelper(channel) + ".data";
+	return filenameHelper(channel) + QLatin1String(".data");
 }
 
 QString CLStreamRecorder::filenameDescription(int channel)
 {
-	return filenameHelper(channel) + ".descr";
+	return filenameHelper(channel) + QLatin1String(".descr");
 }
 
 QString CLStreamRecorder::filenameHelper(int channel)

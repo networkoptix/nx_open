@@ -39,6 +39,7 @@ protected:
 
     virtual void fillAdditionalInfo(CLFileInfo* /*fi*/) {}
     virtual void deleteFileInfo(CLFileInfo* fi);
+    virtual qint64 contentLength() const { return m_totalContentLength; }
 protected:
     quint8* m_ioBuffer;
     ByteIOContext* m_ffmpegIOContext;
@@ -52,7 +53,8 @@ private:
     qint64 seek(qint64 offset, qint32 whence);
     qint64 findFileIndexByTime(quint64 mksec);
 private:
-    QFile m_currentFile;            
+    QFile m_currentFile;
+    qint64 m_totalContentLength;
 };
 
 #endif __AVI_PLAYLIST_STREAM_READER_H
