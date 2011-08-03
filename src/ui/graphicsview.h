@@ -12,14 +12,7 @@
 #include "animation/animation_manager.h"
 #include "animation/steady_mouse_animation.h"
 
-<<<<<<< local
-#ifdef _WIN32
-#include "device_plugins/desktop/desktop_file_encoder.h"
-#endif
-
 class NavigationItem;
-=======
->>>>>>> other
 class CLAbstractSceneItem;
 class CLVideoWindowItem;
 class QGraphicsPixmapItem;

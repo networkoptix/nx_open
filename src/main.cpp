@@ -187,7 +187,6 @@ int main(int argc, char *argv[])
     QObject::connect(&application, SIGNAL(messageReceived(const QString&)),
         &mainWindow, SLOT(handleMessage(const QString&)));
 
-    char *s = "hello";
     return application.exec();
 
     CLDevice::stopCommandProc();

@@ -196,15 +196,9 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
 
 GraphicsView::~GraphicsView()
 {
-<<<<<<< local
-        setZeroSelection();
-	stop();
-	delete m_animated_bckg;
-=======
     setZeroSelection();
     stop();
     delete m_animated_bckg;
->>>>>>> other
 }
 
 void GraphicsView::setViewMode(ViewMode mode)
@@ -220,29 +214,14 @@ GraphicsView::ViewMode GraphicsView::getViewMode() const
 
 void GraphicsView::start()
 {
-<<<<<<< local
-        mViewStarted = true;
-=======
     mViewStarted = true;
->>>>>>> other
 
-<<<<<<< local
-	m_camLayout.updateSceneRect();
-	centerOn(getRealSceneRect().center());
-=======
     m_camLayout.updateSceneRect();
     centerOn(getRealSceneRect().center());
->>>>>>> other
 
-<<<<<<< local
-	if (m_camLayout.getItemList().count() && m_camLayout.getContent() != CLSceneLayoutManager::instance().introScreenLayoutContent())
-	{
-		zoomMin(0);
-=======
     if (m_camLayout.getItemList().count() && m_camLayout.getContent() != CLSceneLayoutManager::instance().introScreenLayoutContent())
     {
         zoomMin(0);
->>>>>>> other
 
         int duration = 1000;
 
@@ -373,14 +352,11 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
 {
     if (!mViewStarted)
         return;
-<<<<<<< local
 
     if (m_navigationItem ? m_navigationItem->mouseOver() : false) {
         QGraphicsView::wheelEvent(e);
         return;
     }
-=======
->>>>>>> other
 
     if (onUserInput(true, true))
         return;
@@ -1812,10 +1788,7 @@ void GraphicsView::goToSteadyMode(bool steady)
                 onUserInput(false, false);
                 return;
             }
-<<<<<<< local
-=======
 
->>>>>>> other
         }
 
         if ((m_seachItem && m_seachItem->hasFocus()) || m_menuIsHere)
@@ -2262,9 +2235,13 @@ void GraphicsView::resizeEvent( QResizeEvent * event )
     if (!mViewStarted)
         return;
 
-<<<<<<< local
-    if (m_navigationItem)
-=======
+    if (m_navigationItem) {
+        QPoint pos (0, viewport()->height() - NavigationItem::DEFAULT_HEIGHT);
+        m_navigationItem->setStaticPos(pos);
+
+        QSize s = event->size();
+        m_navigationItem->navigationWidget()->resize(s.width(), NavigationItem::DEFAULT_HEIGHT);
+    }
     updateDecorations();
     recalcSomeParams();
 
@@ -2272,39 +2249,10 @@ void GraphicsView::resizeEvent( QResizeEvent * event )
         onItemFullScreen_helper(m_selectedWnd, 800);
     else
         //fitInView(getRealSceneRect(),Qt::KeepAspectRatio);
->>>>>>> other
     {
-<<<<<<< local
-        QPoint pos (0, viewport()->height() - NavigationItem::DEFAULT_HEIGHT);
-        m_navigationItem->setStaticPos(pos);
-=======
->>>>>>> other
-
-<<<<<<< local
-        QSize s = event->size();
-        m_navigationItem->navigationWidget()->resize(s.width(), NavigationItem::DEFAULT_HEIGHT);
-=======
         centerOn(getRealSceneRect().center());
         fitInView(1000, 0);
->>>>>>> other
     }
-<<<<<<< local
-
-	updateDecorations();
-	recalcSomeParams();
-
-	if (m_selectedWnd && m_selectedWnd->isFullScreen())
-		onItemFullScreen_helper(m_selectedWnd, 800);
-	else
-		//fitInView(getRealSceneRect(),Qt::KeepAspectRatio);
-	{
-
-		centerOn(getRealSceneRect().center());
-		fitInView(1000, 0);
-	}
-
-=======
->>>>>>> other
 
     QList<CLAbstractSceneItem*> lst = m_camLayout.getItemList();
     foreach (CLAbstractSceneItem* item, lst)

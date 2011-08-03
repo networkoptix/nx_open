@@ -439,27 +439,14 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect, CLBasicLay
         {
             video_wnd = new CLIntroVideoitem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height(), device->getUniqueId());
         }
-<<<<<<< local
-		else if (device->checkDeviceTypeFlag(CLDevice::ARCHIVE))//&& false) //777
-		{
-			video_wnd = new CLVideoWindowArchiveItem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height(), device->getUniqueId());
-			video_wnd->setEditable(true);
-                        ((CLVideoWindowArchiveItem*)video_wnd)->setNavigationItem(v->getNavigationItem());
-
-		}
-		else
-			video_wnd = new CLVideoWindowItem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height(), device->getUniqueId());
-=======
         else if (device->checkDeviceTypeFlag(CLDevice::ARCHIVE))//&& false) //777
         {
             video_wnd = new CLVideoWindowArchiveItem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height(), device->getUniqueId());
             video_wnd->setEditable(true);
+            ((CLVideoWindowArchiveItem*)video_wnd)->setNavigationItem(v->getNavigationItem());
         }
         else
             video_wnd = new CLVideoWindowItem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height(), device->getUniqueId());
->>>>>>> other
-
-
 
         CLVideoCamera* cam = new CLVideoCamera(device, video_wnd, introVideo);
 //        v->navigationItem()->setVideoCamera(cam);
