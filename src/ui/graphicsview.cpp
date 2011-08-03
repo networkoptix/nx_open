@@ -1849,8 +1849,6 @@ void GraphicsView::goToSteadyMode(bool steady)
 
     if (steady)
     {
-        return;
-
         foreach(CLAbstractUnmovedItem* item, m_staticItems)
         {
 
@@ -1859,9 +1857,7 @@ void GraphicsView::goToSteadyMode(bool steady)
                 onUserInput(false, false);
                 return;
             }
-                
         }
-
 
         if ((m_seachItem && m_seachItem->hasFocus()) || m_menuIsHere)
         {

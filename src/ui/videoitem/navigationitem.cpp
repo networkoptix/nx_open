@@ -81,9 +81,6 @@ NavigationWidget::NavigationWidget(QWidget *parent) :
     m_label = new TimeLabel;
 
     m_layout->addSpacerItem(new QSpacerItem(50, 10));
-//    m_layout->addWidget(m_backwardButton);
-//    m_layout->addWidget(m_playButton);
-//    m_layout->addWidget(m_forwardButton);
     m_layout->addLayout(gridLayout);
     m_layout->addWidget(m_slider);
     m_layout->addWidget(m_label);
@@ -253,7 +250,7 @@ void NavigationItem::play()
     reader->resume();
     reader->resumeDataProcessors();
 
-    m_camera->getCamCamDisplay()->playAudio(false);
+    m_camera->getCamCamDisplay()->playAudio(true);
 }
 
 void NavigationItem::rewindBackward()
