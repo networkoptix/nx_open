@@ -70,10 +70,10 @@ QtvAudioDevice::QtvAudioDevice()
 
 QtvAudioDevice::~QtvAudioDevice()
 {
+    release();
 #ifdef OPENAL_STATIC
     alc_deinit();
 #endif
-    release();
 }
 
 void QtvAudioDevice::removeSound(QtvSound* soundObject)
