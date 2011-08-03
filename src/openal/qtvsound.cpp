@@ -139,8 +139,11 @@ void QtvSound::clearBuffers(bool clearAll)
            processed = arraysize(m_tmpBuffer);
         alSourceUnqueueBuffers(m_source, processed, m_tmpBuffer);
         checkOpenALErrorDebug(m_device);
-       alDeleteBuffers(processed, m_tmpBuffer);
-        checkOpenALErrorDebug(m_device);
+        if (alGetError() == AL_NO_ERROR)
+        {
+            alDeleteBuffers(processed, m_tmpBuffer);
+            checkOpenALErrorDebug(m_device);
+        }
     }
 #endif
 }
