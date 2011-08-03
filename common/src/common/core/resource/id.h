@@ -4,73 +4,42 @@
 class QnId
 {
 public:
-    QnId()
-    {
-        m_id = generateNewId();
-    }
+    QnId();
+    inline QnId(const QString &id) : m_id(id) {}
+    inline ~QnId() {}
 
-    QnId(const QString& id)
-    {
-        m_id = id;
-    }
-
-    ~QnId(){}
-
-    QnId& operator = ( const QnId& other )
+    inline QnId &operator=(const QnId &other)
     {
         m_id = other.m_id;
         return *this;
     }
 
-    bool operator == ( const QnId& other ) const
-    {
-        return (m_id == other.m_id);
-    }
+    inline void setEmpty()
+    { m_id.clear(); }
 
-    bool operator != ( const QnId& other ) const
-    {
-        return (m_id != other.m_id);
-    }
+    inline QString toString() const
+    { return m_id; }
 
-    bool operator < ( const QnId& other ) const
-    {
-        return (m_id < other.m_id);
-    }
+    inline operator QString() const
+    { return m_id; }
 
-    bool operator <= ( const QnId& other ) const
-    {
-        return (m_id <= other.m_id);
-    }
+    inline bool operator==(const QnId &other) const
+    { return m_id == other.m_id; }
+    inline bool operator!=(const QnId &other) const
+    { return !operator==(other); }
 
-    bool operator > ( const QnId& other ) const
-    {
-        return (m_id > other.m_id);
-    }
+    inline bool operator<(const QnId &other) const
+    { return m_id < other.m_id; }
+    inline bool operator<=(const QnId &other) const
+    { return m_id <= other.m_id; }
 
-    bool operator >= ( const QnId& other ) const
-    {
-        return (m_id >= other.m_id);
-    }
+    inline bool operator>(const QnId &other) const
+    { return m_id > other.m_id; }
+    inline bool operator>=(const QnId &other) const
+    { return m_id >= other.m_id; }
 
-    void setEmpty()
-    {
-        m_id = "";
-    }
-
-
-    QString toString() const
-    {
-        return m_id;
-    }
-
-    
-
-private:
-    QString generateNewId();
 private:
     QString m_id;
-   
 };
-
 
 #endif //resource_id_h_2344

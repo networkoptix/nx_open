@@ -1,11 +1,11 @@
 #include "id.h"
 
-static unsigned long counter = 0;
-static QMutex  counter_cs;
+#include <QtCore/QAtomicInt>
 
-QString QnId::generateNewId()
+static QBasicAtomicInt theIdCounter = Q_BASIC_ATOMIC_INITIALIZER(1);
+
+QnId::QnId()
 {
-    QMutexLocker mtx(&counter_cs);
-    return QString::number(++counter);
+    const int id = theIdCounter.fetchAndAddRelaxed(1); // generate an unique ID
+    m_id = QString::number(id);
 }
-
