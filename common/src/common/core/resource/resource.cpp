@@ -80,7 +80,7 @@ QDateTime QnResource::getLastDiscoveredTime() const
     return m_lastDiscoveredTime;
 }
 
-void QnResource::setLastDiscoveredTime(QDateTime time)
+void QnResource::setLastDiscoveredTime(const QDateTime &time)
 {
     QMutexLocker locker(&m_mutex);
     m_lastDiscoveredTime = time;

@@ -61,7 +61,7 @@ public:
 
     // this value is updated by discovery process
     QDateTime getLastDiscoveredTime() const;
-    void setLastDiscoveredTime(QDateTime time);
+    void setLastDiscoveredTime(const QDateTime &time);
 
     // if resource physically removed from system - becomes unavailable 
     // we even do not need to try setparam or so 
