@@ -127,7 +127,7 @@ uint QtvSound::bufferTime() const
 void QtvSound::clearBuffers(bool clearAll)
 {
 #ifdef OPENAL_WIN32_ONLY
-   ALint processed;
+   ALint processed = 0;
    if (clearAll)
        alGetSourcei(m_source, AL_BUFFERS_QUEUED, &processed);
    else
@@ -139,8 +139,11 @@ void QtvSound::clearBuffers(bool clearAll)
            processed = arraysize(m_tmpBuffer);
         alSourceUnqueueBuffers(m_source, processed, m_tmpBuffer);
         checkOpenALErrorDebug(m_device);
-       alDeleteBuffers(processed, m_tmpBuffer);
-        checkOpenALErrorDebug(m_device);
+        if (alGetError() == AL_NO_ERROR)
+        {
+            alDeleteBuffers(processed, m_tmpBuffer);
+            checkOpenALErrorDebug(m_device);
+        }
     }
 #endif
 }
