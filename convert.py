@@ -15,7 +15,10 @@ from string import Template
 
 os.path = posixpath
 
-FFMPEG_VERSION = '2011-07-22'
+if sys.platform == 'win32':
+    FFMPEG_VERSION = '2011-07-22'
+else:
+    FFMPEG_VERSION = '2011-05-24'
 
 INTRO_FILE = '../uniclient_media/intro.mov'
 
