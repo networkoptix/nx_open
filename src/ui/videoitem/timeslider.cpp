@@ -166,8 +166,7 @@ TimeSlider::TimeSlider(QWidget *parent) :
     m_userInput(true),
     m_delta(0),
 //    m_mode(TimeMode),
-    m_animation(new QPropertyAnimation(this, "viewPortPos")),
-    m_isMoving(false)
+    m_animation(new QPropertyAnimation(this, "viewPortPos"))
 {
     m_slider->setOrientation(Qt::Horizontal);
     m_slider->setMaximum(1000);
@@ -189,8 +188,8 @@ TimeSlider::TimeSlider(QWidget *parent) :
     setLayout(layout);
 
     connect(m_slider, SIGNAL(valueChanged(int)), SLOT(onSliderValueChanged(int)));
-    connect(m_slider, SIGNAL(sliderPressed()), SLOT(onSliderPressed()));
-    connect(m_slider, SIGNAL(sliderReleased()), SLOT(onSliderReleased()));
+    connect(m_slider, SIGNAL(sliderPressed()), SIGNAL(sliderPressed()));
+    connect(m_slider, SIGNAL(sliderReleased()), SIGNAL(sliderReleased()));
 }
 
 /*!
@@ -345,16 +344,6 @@ void TimeSlider::onSliderValueChanged(int value)
 {
     if (m_userInput)
         setCurrentValue(fromSlider(value));
-}
-
-void TimeSlider::onSliderPressed()
-{
-    m_isMoving = true;
-}
-
-void TimeSlider::onSliderReleased()
-{
-    m_isMoving = false;
 }
 
 double TimeSlider::viewPortPos() const

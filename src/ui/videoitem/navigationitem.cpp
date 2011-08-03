@@ -76,6 +76,7 @@ NavigationWidget::NavigationWidget(QWidget *parent) :
 
     m_slider = new TimeSlider;
     m_slider->setObjectName("TimeSlider");
+
     connect(m_playButton, SIGNAL(toggled()), SLOT(slot()));
 
     m_label = new TimeLabel;
@@ -138,6 +139,9 @@ NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
     m_proxy->setWidget(m_widget);
     m_timerId = startTimer(33);
     connect(m_widget->slider(), SIGNAL(currentValueChanged(qint64)), SLOT(onValueChanged(qint64)));
+    connect(m_widget->slider(), SIGNAL(sliderPressed()), this, SLOT(onSliderPressed()));
+    connect(m_widget->slider(), SIGNAL(sliderReleased()), this, SLOT(onSliderReleased()));
+
 
     connect(m_widget, SIGNAL(pause()), SLOT(pause()));
     connect(m_widget, SIGNAL(play()), SLOT(play()));
@@ -307,4 +311,26 @@ void NavigationItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *e)
 {
     m_mouseOver = false;
     CLUnMovedInteractiveOpacityItem::hoverLeaveEvent(e);
+}
+
+void NavigationItem::onSliderPressed()
+{
+    CLAbstractArchiveReader *reader = static_cast<CLAbstractArchiveReader*>(m_camera->getStreamreader());
+    reader->setSingleShotMode(true);
+    m_camera->getCamCamDisplay()->playAudio(false);
+    m_sliderIsmoving = true;
+}
+
+void NavigationItem::onSliderReleased()
+{
+    m_sliderIsmoving = false;
+    CLAbstractArchiveReader *reader = static_cast<CLAbstractArchiveReader*>(m_camera->getStreamreader());
+    quint64 time = m_widget->slider()->currentValue();
+
+    reader->previousFrame(time*1000);
+    if (m_widget->isPlaying())
+    {
+        reader->setSingleShotMode(false);
+        m_camera->getCamCamDisplay()->playAudio(true);
+    }
 }

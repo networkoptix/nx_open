@@ -31,7 +31,7 @@ public:
     TimeSlider *slider() const;
     TimeLabel *label() const;
 
-    bool playing() const { return m_playing; }
+    bool isPlaying() const { return m_playing; }
     void setPlaying(bool);
 
 private slots:
@@ -91,6 +91,8 @@ private slots:
     void stepBackward();
     void stepForward();
 
+    void onSliderPressed();
+    void onSliderReleased();
 protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent *);
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *);
