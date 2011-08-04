@@ -11,6 +11,7 @@
 //#include <QDebug>
 
 #include <QProxyStyle>
+#include "base/log.h"
 
 class ProxyStyle : public QProxyStyle
 {
@@ -222,6 +223,7 @@ TimeSlider::TimeSlider(QWidget *parent) :
     m_scalingFactor(0),
     m_userInput(true),
     m_delta(0),
+    m_sliderPressed(false),
 //    m_mode(TimeMode),
     m_animation(new QPropertyAnimation(this, "viewPortPos"))
 {
@@ -247,6 +249,9 @@ TimeSlider::TimeSlider(QWidget *parent) :
     connect(m_slider, SIGNAL(valueChanged(int)), SLOT(onSliderValueChanged(int)));
     connect(m_slider, SIGNAL(sliderPressed()), SIGNAL(sliderPressed()));
     connect(m_slider, SIGNAL(sliderReleased()), SIGNAL(sliderReleased()));
+
+    connect(m_slider, SIGNAL(sliderPressed()), SLOT(onSliderPressed()));
+    connect(m_slider, SIGNAL(sliderReleased()), SLOT(onSliderReleased()));
 }
 
 /*!
@@ -267,32 +272,44 @@ void TimeSlider::setCurrentValue(qint64 value)
     if (m_currentValue == value)
         return;
 
+    /*
     if (value < m_viewPortPos)
         setViewPortPos(value);
-
-    if (value > m_viewPortPos + sliderRange())
+    else if (value > m_viewPortPos + sliderRange())
         setViewPortPos(value - sliderRange());
-
-    m_currentValue = value < maximumValue() ? value : maximumValue();
+    */
+    m_currentValue = qMin(value, maximumValue());
+    if (!m_sliderPressed && m_animation->state() != QAbstractAnimation::Running)
+        setViewPortPos(value - sliderRange()/2);
 
     updateSlider();
 
     update();
 
-    if (!isMoving()) {
-        m_animation->stop();
-        m_animation->setDuration(1000);
-        m_animation->setStartValue(viewPortPos());
-        qint64 newViewortPos = m_currentValue - sliderRange()/2; // center
-        newViewortPos = newViewortPos < 0 ? 0 : newViewortPos;
-        newViewortPos = newViewortPos > maximumValue() - sliderRange() ?
-                    maximumValue() - sliderRange() :
-                    newViewortPos;
-        m_animation->setEndValue(newViewortPos);
-        m_animation->start();
-    }
-
     emit currentValueChanged(m_currentValue);
+}
+
+void TimeSlider::onSliderPressed()
+{
+    m_sliderPressed = true;
+}
+
+void TimeSlider::onSliderReleased()
+{
+    m_sliderPressed = false;
+    m_animation->stop();
+    m_animation->setDuration(500);
+    m_animation->setEasingCurve(QEasingCurve::InOutQuad);
+    qint64 newViewortPos = m_currentValue - sliderRange()/2; // center
+    newViewortPos = newViewortPos < 0 ? 0 : newViewortPos;
+    newViewortPos = newViewortPos > maximumValue() - sliderRange() ? maximumValue() - sliderRange() : newViewortPos;
+
+    double start = viewPortPos();
+    double end = newViewortPos;
+    m_animation->setStartValue(start);
+    m_animation->setEndValue(end);
+    m_animation->start();
+
 }
 
 /*!
@@ -394,6 +411,7 @@ void TimeSlider::setViewPortPos(double v)
         setCurrentValue(m_viewPortPos + sliderRange());
 
     m_viewPortPos = value;
+
     updateSlider();
 
     update();
