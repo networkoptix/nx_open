@@ -28,9 +28,10 @@ class TimeLine : public QFrame
 {
     TimeSlider *m_parent;
     QPoint m_previousPos;
+    QPropertyAnimation *m_wheelAnimation;
 
 public:
-    TimeLine(TimeSlider *parent) : QFrame(parent), m_parent(parent) {}
+    TimeLine(TimeSlider *parent) : QFrame(parent), m_parent(parent), m_wheelAnimation(new QPropertyAnimation(m_parent, "scalingFactor")) {}
 
 protected:
     void paintEvent(QPaintEvent *);
@@ -41,7 +42,20 @@ protected:
 
 void TimeLine::wheelEvent(QWheelEvent *event)
 {
-    m_parent->setScalingFactor(m_parent->scalingFactor() + (double)event->delta()/120);
+    int delta = event->delta();
+    if (abs(delta) == 120) {
+        if (m_wheelAnimation->state() != QPropertyAnimation::Running) {
+            m_wheelAnimation->setStartValue(m_parent->scalingFactor());
+            m_wheelAnimation->setEndValue(m_parent->scalingFactor() + (double)delta/120);
+            m_wheelAnimation->setDuration(100);
+            m_wheelAnimation->start();
+        } else {
+            m_wheelAnimation->setEndValue(m_parent->scalingFactor() + (double)delta/120);
+            m_wheelAnimation->setDuration(m_wheelAnimation->currentTime() + 100);
+        }
+    } else {
+        m_parent->setScalingFactor(m_parent->scalingFactor() + (double)delta/120);
+    }
     update();
 }
 
@@ -95,8 +109,13 @@ void TimeLine::paintEvent(QPaintEvent *ev)
     int ie = i;
     for ( ; intervalNames[ie].interval < m_parent->maximumValue() && ie < 13; ie++) {
     }
+
+    int maxLen = 1;
+    for (int j = i ; intervalNames[j].interval < range && j < 13; j++, maxLen++) {
+    }
+
     qint64 end(pos + range);
-    int len = i;
+    int len = 1;
     for ( ; i < ie; i++)
     {
         QColor color = pal.color(QPalette::Text);
@@ -123,12 +142,12 @@ void TimeLine::paintEvent(QPaintEvent *ev)
             int deltaInterval = intervalNames[i + 1].interval/intervalNames[i].interval;
             bool skipText = (i < ie - 1) && labelNumber % deltaInterval == 0;
             if (!skipText) {
-                painter.drawLine(QPoint(xpos, 0), QPoint(xpos, (h - 20)*(double)len/ie));
+                painter.drawLine(QPoint(xpos, 0), QPoint(xpos, (h - 20)*(double)len/maxLen));
                 QString text = QString("%1%2").
                         arg(intervalNames[i].value*labelNumber).
                         arg(intervalNames[i].name);
                 if (textWidth*1.1 < pixelPerTime*intervalNames[i].interval) {
-                    painter.drawText(QRect(xpos - textWidth/2, (h - 15)*(double)len/ie, textWidth, 15),
+                    painter.drawText(QRect(xpos - textWidth/2, (h - 15)*(double)len/maxLen, textWidth, 15),
                                      Qt::AlignHCenter,
                                      text
                                      );
