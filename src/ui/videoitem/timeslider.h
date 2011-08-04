@@ -56,10 +56,11 @@ private:
 
     qint64 m_currentValue;
     qint64 m_maximumValue;
-    int m_viewPortPos;
+    qint64 m_viewPortPos;
 
     double m_scalingFactor;
     bool m_userInput;
+    bool m_sliderPressed;
     int m_delta;
 
 //    Mode m_mode;
@@ -69,7 +70,8 @@ private:
 protected slots:
     void setViewPortPos(double value);
     void onSliderValueChanged(int value);
-
+    void onSliderReleased();
+    void onSliderPressed();
 protected:
     double viewPortPos() const;
 

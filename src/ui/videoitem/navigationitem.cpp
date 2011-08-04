@@ -128,7 +128,7 @@ void NavigationWidget::togglePlayPause()
 }
 
 NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
-    CLUnMovedInteractiveOpacityItem(QString("name:)"), 0, 0.5, 0.5)
+    CLUnMovedInteractiveOpacityItem(QString("name:)"), 0, 0.5, 0.95)
 {
     m_proxy = new QGraphicsProxyWidget(this);
     m_widget = new NavigationWidget();
@@ -212,7 +212,7 @@ void NavigationItem::updateSlider()
         time = m_camera->currentTime();
 
     m_currentTime = time/1000;
-//    m_widget->slider()->setCurrentValue(m_currentTime);
+    m_widget->slider()->setCurrentValue(m_currentTime);
     m_widget->label()->setCurrentValue(m_currentTime);
 }
 
