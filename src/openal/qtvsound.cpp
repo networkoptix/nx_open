@@ -64,6 +64,20 @@ bool QtvSound::setup()
 	return true;
 }
 
+void QtvSound::setVolumeLevel(float value)
+{
+    QMutexLocker lock(&m_mtx);
+    alSourcef(m_source, AL_GAIN, value);
+}
+
+float QtvSound::getVolumeLevel() const
+{
+    ALfloat volume = 0.0;
+    QMutexLocker lock(&m_mtx);
+    alGetSourcef(m_source, AL_GAIN, &volume);
+    return volume;
+}
+
 int QtvSound::getFormat(const QAudioFormat& audioFormat)
 {
 	if (audioFormat.sampleType() == QAudioFormat::Float)

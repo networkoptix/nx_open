@@ -23,8 +23,7 @@ void alc_deinit(void);
 }
 #endif
 
-QtvAudioDevice QtvAudioDevice::m_qtvAudioDevice;
-
+Q_GLOBAL_STATIC(QtvAudioDevice, getAudioDevice);
 
 QtvAudioDevice::QtvAudioDevice() 
 {
@@ -64,16 +63,32 @@ QtvAudioDevice::QtvAudioDevice()
 	qDebug("%s%s", "Device type: ", static_cast<const char *>(alGetString(AL_RENDERER)));
 	qDebug("%s%s", "OpenAL extensions: ", static_cast<const char *>(alGetString(AL_EXTENSIONS)));
 	qDebug("%s", "OpenAL init ok");
-//	return true;
 
+    m_settings.beginGroup(QLatin1String("audioControl"));
+    //	return true;
 }
 
 QtvAudioDevice::~QtvAudioDevice()
 {
+    m_settings.endGroup();
     release();
 #ifdef OPENAL_STATIC
     alc_deinit();
 #endif
+}
+
+void QtvAudioDevice::setVolume(float value)
+{
+    m_settings.setValue("volume", value);
+    m_settings.sync();
+    foreach(QtvSound* sound, m_sounds)
+        sound->setVolumeLevel(value);
+}
+
+float QtvAudioDevice::getVolume() const
+{
+    QVariant val = m_settings.value("volume");
+    return val.isNull() ? 1.0 : val.toFloat();
 }
 
 void QtvAudioDevice::removeSound(QtvSound* soundObject)
@@ -103,6 +118,7 @@ QtvSound* QtvAudioDevice::addSound(const QAudioFormat& format)
 		delete result;
 		return 0;
 	}
+    result->setVolumeLevel(getVolume());
 	m_sounds.push_back(result);
 	return result;
 }
@@ -131,5 +147,5 @@ void QtvAudioDevice::release()
 
 QtvAudioDevice& QtvAudioDevice::instance()
 {
-	return m_qtvAudioDevice;
+	return *getAudioDevice();
 }
