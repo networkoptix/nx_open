@@ -92,9 +92,6 @@ int TimeLine::getVisibleLevelCount()
     int len = 0;
     for ( ; i < ie; i++)
     {
-        QFontMetrics metric(m_parent->font());
-        int textWidth = metric.width(intervalNames[i].maxText);
-
         qint64 start(roundTime(pos, i));
         int labelNumber = (start/(intervalNames[i].interval))%intervalNames[i].count;
         bool firstTime = true;
