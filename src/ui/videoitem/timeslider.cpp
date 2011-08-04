@@ -262,16 +262,18 @@ void TimeSlider::setCurrentValue(qint64 value)
 
     update();
 
-    m_animation->stop();
-    m_animation->setDuration(1000);
-    m_animation->setStartValue(viewPortPos());
-    qint64 newViewortPos = m_currentValue - sliderRange()/2; // center
-    newViewortPos = newViewortPos < 0 ? 0 : newViewortPos;
-    newViewortPos = newViewortPos > maximumValue() - sliderRange() ?
+    if (!isMoving()) {
+        m_animation->stop();
+        m_animation->setDuration(1000);
+        m_animation->setStartValue(viewPortPos());
+        qint64 newViewortPos = m_currentValue - sliderRange()/2; // center
+        newViewortPos = newViewortPos < 0 ? 0 : newViewortPos;
+        newViewortPos = newViewortPos > maximumValue() - sliderRange() ?
                     maximumValue() - sliderRange() :
                     newViewortPos;
-    m_animation->setEndValue(newViewortPos);
-//    m_animation->start();
+        m_animation->setEndValue(newViewortPos);
+        m_animation->start();
+    }
 
     emit currentValueChanged(m_currentValue);
 }
@@ -393,7 +395,7 @@ double TimeSlider::viewPortPos() const
 
 double TimeSlider::delta() const
 {
-    return ((0.5/sliderLength())*maximumValue())/exp(scalingFactor());
+    return ((1.0/sliderLength())*maximumValue())/exp(scalingFactor()/2);
 }
 
 double TimeSlider::fromSlider(int value)
