@@ -128,7 +128,7 @@ void NavigationWidget::togglePlayPause()
 }
 
 NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
-    CLUnMovedInteractiveOpacityItem(QString("name:)"), 0, 0.5, 0.5)
+    CLUnMovedInteractiveOpacityItem(QString("name:)"), 0, 0.5, 0.95)
 {
     m_proxy = new QGraphicsProxyWidget(this);
     m_widget = new NavigationWidget();

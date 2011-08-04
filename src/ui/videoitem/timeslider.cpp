@@ -84,6 +84,23 @@ void TimeLine::paintEvent(QPaintEvent *ev)
     QRect r(frameWidth(), frameWidth(), width() - 2*frameWidth(), height() - 2*frameWidth());
     painter.drawRect(r);
 
+    int MAX_COLOR = 128+32;
+    int MIN_COLOR = 0;
+    for (int i = 0; i < height(); ++i)
+    {
+        //int k = qAbs(height()/2 - i);
+        int k = height() - i;
+        k *= (float) (MAX_COLOR-MIN_COLOR) / (float) height();
+        k += MIN_COLOR;
+        //quint32 color = k + (k << 8) + (k << 16) + (k << 24);
+        QColor color(k,k,k,k);
+        //color.setAlphaF(k / (float) MAX_COLOR);
+        painter.setPen(color);
+        painter.drawLine(0, i, width(), i);
+    }
+    painter.setPen(pal.color(QPalette::Base));
+
+
     int handleThickness = qApp->style()->pixelMetric(QStyle::PM_SliderControlThickness);
     if (handleThickness == 0)
         handleThickness = qApp->style()->pixelMetric(QStyle::PM_SliderThickness);
