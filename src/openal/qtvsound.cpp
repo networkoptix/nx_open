@@ -11,7 +11,7 @@
 #include <alc.h>
 #endif
 
-QtvSound::QtvSound(ALCdevice* device, const QAudioFormat& audioFormat) 
+QtvSound::QtvSound(ALCdevice* device, const QAudioFormat& audioFormat)
 {
 	m_audioFormat = audioFormat;
 	m_numChannels = audioFormat.channelCount();
@@ -26,11 +26,11 @@ QtvSound::QtvSound(ALCdevice* device, const QAudioFormat& audioFormat)
 
     m_proxyBuffer = new quint8[m_size];
     m_proxyBufferLen = 0;
-	m_source = 0;
-	m_format = 0;
-	m_device = device;
+    m_source = 0;
+    m_format = 0;
+    m_device = device;
     m_deinitialized = false;
-	m_isValid = setup();
+    m_isValid = setup();
 }
 
 QtvSound::~QtvSound()
@@ -40,13 +40,13 @@ QtvSound::~QtvSound()
     delete [] m_proxyBuffer;
 }
 
-bool QtvSound::setup() 
+bool QtvSound::setup()
 {
 	Q_ASSERT(m_bitsPerSample && m_numChannels && m_size);
 
-	if (!m_bitsPerSample || !m_numChannels || !m_size ) 
+	if (!m_bitsPerSample || !m_numChannels || !m_size )
 		return false;
-	
+
 	m_format = getFormat(m_audioFormat);
 	if (m_format == 0)
 		return false;
@@ -86,7 +86,7 @@ int QtvSound::getFormat(const QAudioFormat& audioFormat)
 	int bitsPerSample = audioFormat.sampleSize();
 	int numChannels = audioFormat.channelCount();
 	int format = 0;
-	switch(numChannels) 
+	switch(numChannels)
 	{
 		case 1:
 			if (32 == bitsPerSample)
@@ -126,7 +126,7 @@ int QtvSound::getFormat(const QAudioFormat& audioFormat)
 	return format;
 }
 
-uint QtvSound::bitRate() const 
+uint QtvSound::bitRate() const
 {
 	return m_frequency * (m_bitsPerSample / 8) * m_numChannels;
 }
@@ -134,7 +134,7 @@ uint QtvSound::bitRate() const
 
 uint QtvSound::bufferTime() const
 {
-    uint result = static_cast<uint>(1000000.0f * m_size / bitRate());
+	uint result = static_cast<uint>(1000000.0f * m_size / bitRate());
 	return result;
 }
 
@@ -147,7 +147,7 @@ void QtvSound::clearBuffers(bool clearAll)
    else
        alGetSourcei(m_source, AL_BUFFERS_PROCESSED, &processed);
     checkOpenALErrorDebug(m_device);
-    if (processed) 
+    if (processed)
    {
         if (arraysize(m_tmpBuffer) < processed)
            processed = arraysize(m_tmpBuffer);
@@ -178,7 +178,7 @@ uint QtvSound::playTimeElapsed()
 	alGetSourcei(m_source, AL_BUFFERS_QUEUED, &queued);
 	checkOpenALErrorDebug(m_device);
 
-    uint res = static_cast<uint>(bufferTime() * queued - offset * 1000000.0f);
+	uint res = static_cast<uint>(bufferTime() * queued - offset * 1000000.0f);
 
 	//cl_log.log("elapsed=", (double) res/1000000.0, cl_logALWAYS);
 	return res;
@@ -209,7 +209,7 @@ bool QtvSound::playImpl() const
 
 bool QtvSound::isFormatSupported(const QAudioFormat& format)
 {
-    return getFormat(format) != 0;
+	return getFormat(format) != 0;
 }
 
 bool QtvSound::play(const quint8* data, uint size)
@@ -275,7 +275,7 @@ bool QtvSound::internalPlay(const void* data, uint size)
 }
 
 
-bool QtvSound::outError(int err, const char* strerr) 
+bool QtvSound::outError(int err, const char* strerr)
 {
 	if (strerr)
 		qDebug("%s%d%s%s", "OpenAL error, code: ", err, " description: ", strerr);
@@ -285,9 +285,9 @@ bool QtvSound::outError(int err, const char* strerr)
 }
 
 
-int QtvSound::checkOpenALError(ALCdevice* device) 
+int QtvSound::checkOpenALError(ALCdevice* device)
 {
-    // get an error
+	// get an error
 	int err = alGetError();
 	if (err  != AL_NO_ERROR) {
 		const char* strerr = alGetString(err);
@@ -313,7 +313,7 @@ int QtvSound::checkOpenALErrorDebug(ALCdevice* device)
 void QtvSound::suspend()
 {
     QMutexLocker lock(&m_mtx);
-    alSourcePause(m_source);
+	alSourcePause(m_source);
 }
 
 void QtvSound::resume()
@@ -338,15 +338,15 @@ void QtvSound::internalClear()
 	checkOpenALError(m_device);
 	//alSourceRewind(m_source);
 	//checkOpenALError(m_device);
-    clearBuffers(true);
+	clearBuffers(true);
 	alDeleteSources(1, &m_source);
 	checkOpenALError(m_device);
 #ifndef OPENAL_WIN32_ONLY
-	if (!m_buffers.empty())
+    if (!m_buffers.empty())
     {
-		alDeleteBuffers(m_buffers.size(), &m_buffers[0]);
-		checkOpenALError(m_device);
-	}
+        alDeleteBuffers(m_buffers.size(), &m_buffers[0]);
+        checkOpenALError(m_device);
+    }
     m_buffers.clear();
 #endif
     m_proxyBufferLen = 0;
