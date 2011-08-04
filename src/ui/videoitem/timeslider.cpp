@@ -391,9 +391,9 @@ double TimeSlider::viewPortPos() const
     return m_viewPortPos;
 }
 
-qint64 TimeSlider::delta() const
+double TimeSlider::delta() const
 {
-    return maximumValue()/sliderLength()/exp(scalingFactor()/2);
+    return ((0.5/sliderLength())*maximumValue())/exp(scalingFactor());
 }
 
 double TimeSlider::fromSlider(int value)

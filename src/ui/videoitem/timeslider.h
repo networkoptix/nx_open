@@ -73,7 +73,7 @@ protected slots:
 protected:
     double viewPortPos() const;
 
-    qint64 delta() const;
+    double delta() const;
 
     double fromSlider(int value);
     int toSlider(double value);
