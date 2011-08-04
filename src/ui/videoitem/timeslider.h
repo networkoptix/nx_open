@@ -33,7 +33,8 @@ public:
     QSize sizeHint() const;
     QSize minimumSizeHint() const;
 
-    bool isMoving() { return m_slider->isSliderDown(); }
+     bool isMoving() { return m_slider->isSliderDown(); }
+
 signals:
     void currentValueChanged(qint64 value);
     void maximumValueChanged(qint64 value);
@@ -64,6 +65,7 @@ private:
 //    Mode m_mode;
 
     QPropertyAnimation *m_animation;
+
 protected slots:
     void setViewPortPos(double value);
     void onSliderValueChanged(int value);

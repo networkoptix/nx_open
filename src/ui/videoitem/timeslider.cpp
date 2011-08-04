@@ -22,12 +22,7 @@ public:
         return QProxyStyle::styleHint(hint, option, widget, returnData);
     }
 };
-
-enum PaintMode { PaintMSeconds = 0, PaintSeconds, PaintMinutes, PaintHours, PaintDays };
-static const qint64 lengths[] = { 1, 1000, 1000*60, 1000*60*60, 1000*60*60*24, 0x7fffffffffffffffll };
-static const int coeffs[] = { 100, 5, 5, 1, 1, 1 };
-static const int markCount[] = { 10, 5, 5, 4, 12, 1 };
-static const char *const names[] = { "ms", "s", "m", "h", "d" };
+Q_GLOBAL_STATIC(ProxyStyle, proxyStyle)
 
 class TimeLine : public QFrame
 {
@@ -50,18 +45,17 @@ void TimeLine::wheelEvent(QWheelEvent *event)
     update();
 }
 
-PaintMode getPaintMode(qint64 msecs)
-{
-    for (int i = PaintDays; i >= PaintMSeconds; i--) {
-        if (msecs > (qint64)lengths[i])
-            return (PaintMode)i;
-    }
-    return PaintMSeconds;
-}
+struct IntervalInfo { qint64 interval; int value; const char * name; int count; const char * maxText; };
+static const IntervalInfo intervalNames[] = { {100, 1, "ms", 1000, "999ms"}, {1000, 1, "s", 60, "59s"},
+                                              {5*1000, 5, "s", 12, "59s"}, {10*1000, 10, "s", 6, "59s"}, {30*1000, 30, "s", 2, "59s"}, {60*1000, 1, "m", 60, "59m"},
+                                              {5*60*1000, 5, "m", 12, "59m"}, {10*60*1000, 10, "m", 6, "59m"}, {30*60*1000, 30, "m", 2, "59m"}, {60*60*1000, 1, "h", 24, "59h"},
+                                              {3*60*60*1000, 3, "h", 8, "59h"}, {6*60*60*1000, 6, "h", 4, "59h"}, {12*60*60*1000, 12, "h", 2, "59h"},
+                                              {24*60*60*1000, 1, "d", 1, "99d"}
+                                            };
 
-qint64 roundTime(qint64 msecs, PaintMode mode)
+qint64 roundTime(qint64 msecs, int interval)
 {
-    return msecs - msecs%(coeffs[mode]*lengths[mode]);
+    return msecs - msecs%(intervalNames[interval].interval);
 }
 
 void TimeLine::paintEvent(QPaintEvent *ev)
@@ -86,43 +80,72 @@ void TimeLine::paintEvent(QPaintEvent *ev)
     int h = height();
 
     painter.setPen(pal.color(QPalette::Text));
-    qint64 sliderRange = m_parent->sliderRange();
-    PaintMode paintMode = getPaintMode(sliderRange);
 
-    qint64 viewPortPos = m_parent->viewPortPos();
-//    if (m_parent->mode() == TimeSlider::TimeMode) {
+    qint64 range = m_parent->sliderRange();
+    qint64 pos = m_parent->viewPortPos();
 
-        qint64 start(roundTime(viewPortPos, paintMode));
-        qint64 end(viewPortPos + sliderRange);
+    double pixelPerTime = (double)w/range;
+    const int minWidth = 5;
+    int i = 0;
+    while (minWidth > pixelPerTime*intervalNames[i].interval) {
+        i++;
+    }
+    const int minVisibleWidth = 20;
 
-        while (start <= end) {
+    int ie = i;
+    for ( ; intervalNames[ie].interval < m_parent->maximumValue() && ie < 13; ie++) {
+    }
+    qint64 end(pos + range);
+    int len = i;
+    for ( ; i < ie; i++)
+    {
+        QColor color = pal.color(QPalette::Text);
+        float opacity = (pixelPerTime*intervalNames[i].interval - minWidth)/minVisibleWidth;
+        color.setAlphaF(opacity > 1 ? 1 : opacity);
+        painter.setPen(color);
+        painter.setFont(m_parent->font());
 
-            int pos = x + w*(start - viewPortPos)/sliderRange;
-            painter.drawText(QRect(pos - 20, h - 15, 40, 15),
-                             Qt::AlignHCenter,
-                             QString("%1%2").
-                             arg((start%(lengths[paintMode+1])/(lengths[paintMode]))).
-                             arg(tr(names[paintMode])));
-            painter.drawLine(QPoint(pos, y), QPoint(pos, h-20));
+        QFontMetrics metric(m_parent->font());
+        int textWidth = metric.width(intervalNames[i].maxText);
 
-            qint64 length = (qint64)coeffs[paintMode]*lengths[paintMode];
-            for (int i = 0; i < markCount[paintMode]; i++) {
-                start += length/markCount[paintMode];
-                if (start <= end) {
-                    int pos = x + w*(start - viewPortPos)/sliderRange;
-                    painter.drawLine(QPoint(pos, y), QPoint(pos, h/4));
+        qint64 start(roundTime(pos, i));
+        int labelNumber = (start/(intervalNames[i].interval))%intervalNames[i].count;
+        bool firstTime = true;
+        while (start < end) {
+            int xpos = x + w*(start - pos)/range;
+            if (xpos < 0) {
+                start += intervalNames[i].interval;
+                labelNumber = (labelNumber + 1) % intervalNames[i].count;
+                continue;
+            }
+
+            start += intervalNames[i].interval;
+            int deltaInterval = intervalNames[i + 1].interval/intervalNames[i].interval;
+            bool skipText = (i < ie - 1) && labelNumber % deltaInterval == 0;
+            if (!skipText) {
+                painter.drawLine(QPoint(xpos, 0), QPoint(xpos, (h - 20)*(double)len/ie));
+                QString text = QString("%1%2").
+                        arg(intervalNames[i].value*labelNumber).
+                        arg(intervalNames[i].name);
+                if (textWidth*1.1 < pixelPerTime*intervalNames[i].interval) {
+                    painter.drawText(QRect(xpos - textWidth/2, (h - 15)*(double)len/ie, textWidth, 15),
+                                     Qt::AlignHCenter,
+                                     text
+                                     );
+                    if (firstTime) {
+                        firstTime = false;
+                        len++;
+                    }
                 }
             }
 
+            labelNumber = (labelNumber + 1) % intervalNames[i].count;
         }
-
-//    } else {
-        // not implemented yet
-//    }
+    }
 
     painter.setPen(QPen(Qt::red, 3));
-    int pos = x + m_parent->m_slider->value()*w / m_parent->sliderLength();
-    painter.drawLine(QPoint(pos, 0), QPoint(pos, height()));
+    int xpos = x + m_parent->m_slider->value()*w / m_parent->sliderLength();
+    painter.drawLine(QPoint(xpos, 0), QPoint(xpos, height()));
 }
 
 void TimeLine::mouseMoveEvent(QMouseEvent *me)
@@ -152,8 +175,6 @@ void TimeLine::mousePressEvent(QMouseEvent *me)
     on scalingFactor. Also TimeSlider allows to zoom in/out scale of time line, which allows to
     navigate more accurate.
 */
-
-Q_GLOBAL_STATIC(ProxyStyle, proxyStyle)
 
 TimeSlider::TimeSlider(QWidget *parent) :
     QWidget(parent),
