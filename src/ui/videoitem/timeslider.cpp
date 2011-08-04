@@ -47,7 +47,7 @@ void TimeLine::wheelEvent(QWheelEvent *event)
 }
 
 struct IntervalInfo { qint64 interval; int value; const char * name; int count; const char * maxText; };
-static const IntervalInfo intervalNames[] = { {100, 1, "ms", 1000, "999ms"}, {1000, 1, "s", 60, "59s"},
+static const IntervalInfo intervalNames[] = { {100, 100, "ms", 10, "999ms"}, {1000, 1, "s", 60, "59s"},
                                               {5*1000, 5, "s", 12, "59s"}, {10*1000, 10, "s", 6, "59s"}, {30*1000, 30, "s", 2, "59s"}, {60*1000, 1, "m", 60, "59m"},
                                               {5*60*1000, 5, "m", 12, "59m"}, {10*60*1000, 10, "m", 6, "59m"}, {30*60*1000, 30, "m", 2, "59m"}, {60*60*1000, 1, "h", 24, "59h"},
                                               {3*60*60*1000, 3, "h", 8, "59h"}, {6*60*60*1000, 6, "h", 4, "59h"}, {12*60*60*1000, 12, "h", 2, "59h"},
