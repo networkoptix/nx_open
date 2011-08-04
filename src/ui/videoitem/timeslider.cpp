@@ -37,6 +37,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *);
     void mousePressEvent(QMouseEvent *);
     void wheelEvent(QWheelEvent *);
+    int getVisibleLevelCount();
 };
 
 void TimeLine::wheelEvent(QWheelEvent *event)
@@ -56,6 +57,70 @@ static const IntervalInfo intervalNames[] = { {100, 1, "ms", 1000, "999ms"}, {10
 qint64 roundTime(qint64 msecs, int interval)
 {
     return msecs - msecs%(intervalNames[interval].interval);
+}
+
+int TimeLine::getVisibleLevelCount()
+{
+    QRect r(frameWidth(), frameWidth(), width() - 2*frameWidth(), height() - 2*frameWidth());
+
+    int handleThickness = qApp->style()->pixelMetric(QStyle::PM_SliderControlThickness);
+    if (handleThickness == 0)
+        handleThickness = qApp->style()->pixelMetric(QStyle::PM_SliderThickness);
+
+
+    int x = handleThickness/2 - 1;
+
+    int y = frameWidth();
+    int w = width() - handleThickness + 1;
+    int h = height();
+
+    qint64 range = m_parent->sliderRange();
+    qint64 pos = m_parent->viewPortPos();
+
+    double pixelPerTime = (double)w/range;
+    const int minWidth = 5;
+    int i = 0;
+    while (minWidth > pixelPerTime*intervalNames[i].interval) {
+        i++;
+    }
+    const int minVisibleWidth = 20;
+
+    int ie = i;
+    for ( ; intervalNames[ie].interval < m_parent->maximumValue() && ie < 13; ie++) {
+    }
+    qint64 end(pos + range);
+    int len = 0;
+    for ( ; i < ie; i++)
+    {
+        QFontMetrics metric(m_parent->font());
+        int textWidth = metric.width(intervalNames[i].maxText);
+
+        qint64 start(roundTime(pos, i));
+        int labelNumber = (start/(intervalNames[i].interval))%intervalNames[i].count;
+        bool firstTime = true;
+        while (start < end) 
+        {
+            int xpos = x + w*(start - pos)/range;
+            if (xpos < 0) {
+                start += intervalNames[i].interval;
+                labelNumber = (labelNumber + 1) % intervalNames[i].count;
+                continue;
+            }
+
+            start += intervalNames[i].interval;
+            int deltaInterval = intervalNames[i + 1].interval/intervalNames[i].interval;
+            bool skipText = (i < ie - 1) && labelNumber % deltaInterval == 0;
+            if (!skipText) 
+            {
+                if (firstTime) {
+                    firstTime = false;
+                    len++;
+                }
+            }
+            labelNumber = (labelNumber + 1) % intervalNames[i].count;
+        }
+    }
+    return len;
 }
 
 void TimeLine::paintEvent(QPaintEvent *ev)
@@ -87,6 +152,8 @@ void TimeLine::paintEvent(QPaintEvent *ev)
     double pixelPerTime = (double)w/range;
     const int minWidth = 5;
     int i = 0;
+    int levels = getVisibleLevelCount();
+
     while (minWidth > pixelPerTime*intervalNames[i].interval) {
         i++;
     }
@@ -96,7 +163,7 @@ void TimeLine::paintEvent(QPaintEvent *ev)
     for ( ; intervalNames[ie].interval < m_parent->maximumValue() && ie < 13; ie++) {
     }
     qint64 end(pos + range);
-    int len = i;
+    int len = 0;
     for ( ; i < ie; i++)
     {
         QColor color = pal.color(QPalette::Text);
@@ -122,20 +189,22 @@ void TimeLine::paintEvent(QPaintEvent *ev)
             start += intervalNames[i].interval;
             int deltaInterval = intervalNames[i + 1].interval/intervalNames[i].interval;
             bool skipText = (i < ie - 1) && labelNumber % deltaInterval == 0;
-            if (!skipText) {
-                painter.drawLine(QPoint(xpos, 0), QPoint(xpos, (h - 20)*(double)len/ie));
+            if (!skipText) 
+            {
+                if (firstTime) {
+                    firstTime = false;
+                    len++;
+                }
+
+                painter.drawLine(QPoint(xpos, 0), QPoint(xpos, (h - 20)*(double)len/levels));
                 QString text = QString("%1%2").
                         arg(intervalNames[i].value*labelNumber).
                         arg(intervalNames[i].name);
                 if (textWidth*1.1 < pixelPerTime*intervalNames[i].interval) {
-                    painter.drawText(QRect(xpos - textWidth/2, (h - 15)*(double)len/ie, textWidth, 15),
+                    painter.drawText(QRect(xpos - textWidth/2, (h - 15)*(double)len/levels, textWidth, 15),
                                      Qt::AlignHCenter,
                                      text
                                      );
-                    if (firstTime) {
-                        firstTime = false;
-                        len++;
-                    }
                 }
             }
 
