@@ -210,13 +210,13 @@ void TimeSlider::setCurrentValue(qint64 value)
     if (m_currentValue == value)
         return;
 
-    m_currentValue = value < maximumValue() ? value : maximumValue();
-
     if (value < m_viewPortPos)
         setViewPortPos(value);
 
     if (value > m_viewPortPos + sliderRange())
         setViewPortPos(value - sliderRange());
+
+    m_currentValue = value < maximumValue() ? value : maximumValue();
 
     updateSlider();
 

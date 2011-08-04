@@ -212,8 +212,8 @@ void NavigationItem::updateSlider()
         time = m_camera->currentTime();
 
     m_currentTime = time/1000;
-    m_widget->slider()->setCurrentValue(time/1000);
-    m_widget->label()->setCurrentValue(time/1000);
+    m_widget->slider()->setCurrentValue(m_currentTime);
+    m_widget->label()->setCurrentValue(m_currentTime);
 }
 
 void NavigationItem::onValueChanged(qint64 time)
