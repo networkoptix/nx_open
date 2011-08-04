@@ -28,21 +28,34 @@ class TimeLine : public QFrame
 {
     TimeSlider *m_parent;
     QPoint m_previousPos;
+    QPropertyAnimation *m_wheelAnimation;
 
 public:
-    TimeLine(TimeSlider *parent) : QFrame(parent), m_parent(parent) {}
+    TimeLine(TimeSlider *parent) : QFrame(parent), m_parent(parent), m_wheelAnimation(new QPropertyAnimation(m_parent, "scalingFactor")) {}
 
 protected:
     void paintEvent(QPaintEvent *);
     void mouseMoveEvent(QMouseEvent *);
     void mousePressEvent(QMouseEvent *);
     void wheelEvent(QWheelEvent *);
-    int getVisibleLevelCount();
 };
 
 void TimeLine::wheelEvent(QWheelEvent *event)
 {
-    m_parent->setScalingFactor(m_parent->scalingFactor() + (double)event->delta()/120);
+    int delta = event->delta();
+    if (abs(delta) == 120) {
+        if (m_wheelAnimation->state() != QPropertyAnimation::Running) {
+            m_wheelAnimation->setStartValue(m_parent->scalingFactor());
+            m_wheelAnimation->setEndValue(m_parent->scalingFactor() + (double)delta/120);
+            m_wheelAnimation->setDuration(100);
+            m_wheelAnimation->start();
+        } else {
+            m_wheelAnimation->setEndValue(m_parent->scalingFactor() + (double)delta/120);
+            m_wheelAnimation->setDuration(m_wheelAnimation->currentTime() + 100);
+        }
+    } else {
+        m_parent->setScalingFactor(m_parent->scalingFactor() + (double)delta/120);
+    }
     update();
 }
 
@@ -57,67 +70,6 @@ static const IntervalInfo intervalNames[] = { {100, 100, "ms", 10, "999ms"}, {10
 qint64 roundTime(qint64 msecs, int interval)
 {
     return msecs - msecs%(intervalNames[interval].interval);
-}
-
-int TimeLine::getVisibleLevelCount()
-{
-    QRect r(frameWidth(), frameWidth(), width() - 2*frameWidth(), height() - 2*frameWidth());
-
-    int handleThickness = qApp->style()->pixelMetric(QStyle::PM_SliderControlThickness);
-    if (handleThickness == 0)
-        handleThickness = qApp->style()->pixelMetric(QStyle::PM_SliderThickness);
-
-
-    int x = handleThickness/2 - 1;
-
-    int y = frameWidth();
-    int w = width() - handleThickness + 1;
-    int h = height();
-
-    qint64 range = m_parent->sliderRange();
-    qint64 pos = m_parent->viewPortPos();
-
-    double pixelPerTime = (double)w/range;
-    const int minWidth = 5;
-    int i = 0;
-    while (minWidth > pixelPerTime*intervalNames[i].interval) {
-        i++;
-    }
-    const int minVisibleWidth = 20;
-
-    int ie = i;
-    for ( ; intervalNames[ie].interval < m_parent->maximumValue() && ie < 13; ie++) {
-    }
-    qint64 end(pos + range);
-    int len = 0;
-    for ( ; i < ie; i++)
-    {
-        qint64 start(roundTime(pos, i));
-        int labelNumber = (start/(intervalNames[i].interval))%intervalNames[i].count;
-        bool firstTime = true;
-        while (start < end) 
-        {
-            int xpos = x + w*(start - pos)/range;
-            if (xpos < 0) {
-                start += intervalNames[i].interval;
-                labelNumber = (labelNumber + 1) % intervalNames[i].count;
-                continue;
-            }
-
-            start += intervalNames[i].interval;
-            int deltaInterval = intervalNames[i + 1].interval/intervalNames[i].interval;
-            bool skipText = (i < ie - 1) && labelNumber % deltaInterval == 0;
-            if (!skipText) 
-            {
-                if (firstTime) {
-                    firstTime = false;
-                    len++;
-                }
-            }
-            labelNumber = (labelNumber + 1) % intervalNames[i].count;
-        }
-    }
-    return len;
 }
 
 void TimeLine::paintEvent(QPaintEvent *ev)
@@ -149,8 +101,6 @@ void TimeLine::paintEvent(QPaintEvent *ev)
     double pixelPerTime = (double)w/range;
     const int minWidth = 5;
     int i = 0;
-    int levels = getVisibleLevelCount();
-
     while (minWidth > pixelPerTime*intervalNames[i].interval) {
         i++;
     }
@@ -159,8 +109,13 @@ void TimeLine::paintEvent(QPaintEvent *ev)
     int ie = i;
     for ( ; intervalNames[ie].interval < m_parent->maximumValue() && ie < 13; ie++) {
     }
-    qint64 end(pos + range);
+
     int len = 0;
+    int maxLen = 1;
+    for (int j = i ; intervalNames[j].interval < range && j < 13; j++, maxLen++) {
+    }
+
+    qint64 end(pos + range);
     for ( ; i < ie; i++)
     {
         QColor color = pal.color(QPalette::Text);
@@ -186,19 +141,17 @@ void TimeLine::paintEvent(QPaintEvent *ev)
             start += intervalNames[i].interval;
             int deltaInterval = intervalNames[i + 1].interval/intervalNames[i].interval;
             bool skipText = (i < ie - 1) && labelNumber % deltaInterval == 0;
-            if (!skipText) 
-            {
+            if (!skipText) {
                 if (firstTime) {
                     firstTime = false;
                     len++;
                 }
-
-                painter.drawLine(QPoint(xpos, 0), QPoint(xpos, (h - 20)*(double)len/levels));
+                painter.drawLine(QPoint(xpos, 0), QPoint(xpos, (h - 20)*(double)len/maxLen));
                 QString text = QString("%1%2").
                         arg(intervalNames[i].value*labelNumber).
                         arg(intervalNames[i].name);
                 if (textWidth*1.1 < pixelPerTime*intervalNames[i].interval) {
-                    painter.drawText(QRect(xpos - textWidth/2, (h - 15)*(double)len/levels, textWidth, 15),
+                    painter.drawText(QRect(xpos - textWidth/2, (h - 15)*(double)len/maxLen, textWidth, 15),
                                      Qt::AlignHCenter,
                                      text
                                      );
