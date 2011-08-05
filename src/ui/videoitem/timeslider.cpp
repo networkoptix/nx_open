@@ -31,14 +31,23 @@ class TimeLine : public QFrame
     TimeSlider *m_parent;
     QPoint m_previousPos;
     QPropertyAnimation *m_wheelAnimation;
+    QPropertyAnimation *m_lineAnimation;
+    int length;
+//    QTime t;
 
 public:
-    TimeLine(TimeSlider *parent) : QFrame(parent), m_parent(parent), m_wheelAnimation(new QPropertyAnimation(m_parent, "scalingFactor")) {}
+    TimeLine(TimeSlider *parent) :
+        QFrame(parent),
+        m_parent(parent),
+        m_wheelAnimation(new QPropertyAnimation(m_parent, "scalingFactor")),
+        m_lineAnimation(new QPropertyAnimation(m_parent, "viewPortPos"))
+    {}
 
 protected:
     void paintEvent(QPaintEvent *);
     void mouseMoveEvent(QMouseEvent *);
     void mousePressEvent(QMouseEvent *);
+    void mouseReleaseEvent(QMouseEvent *);
     void wheelEvent(QWheelEvent *);
     void drawGradient(QPainter& painter, const QRectF& r);
 };
@@ -60,6 +69,7 @@ void TimeLine::wheelEvent(QWheelEvent *event)
         m_parent->setScalingFactor(m_parent->scalingFactor() + (double)delta/120);
     }
     update();
+    m_parent->onSliderReleased(); // we need to trigger animation
 }
 
 struct IntervalInfo { qint64 interval; int value; const char * name; int count; const char * maxText; };
@@ -298,16 +308,40 @@ void TimeLine::mouseMoveEvent(QMouseEvent *me)
         // in fact, we need to use (width - slider handle thinkness/2), but it is ok without it
         qint64 length = m_parent->sliderRange();
         int dx = m_previousPos.x() - me->pos().x();
+        this->length = dx;
         qint64 dl = length/width()*dx;
         m_parent->setViewPortPos(m_parent->viewPortPos() + dl);
         m_previousPos = me->pos();
     }
+//    qDebug() << t.elapsed();
+//    t.restart();
 }
 
 void TimeLine::mousePressEvent(QMouseEvent *me)
 {
     if (me->button() == Qt::LeftButton) {
         m_previousPos = me->pos();
+        length = 0;
+        m_lineAnimation->stop();
+//        t.start();
+    }
+}
+
+void TimeLine::mouseReleaseEvent(QMouseEvent *me)
+{
+    if (me->button() == Qt::LeftButton) {
+
+        if (abs(length) > 5) {
+            int dx = length*2/**(35.0/t.elapsed())*/;
+
+            qint64 range = m_parent->sliderRange();
+            qint64 dl = range/width()*dx;
+            m_lineAnimation->setStartValue(m_parent->viewPortPos());
+            m_lineAnimation->setEasingCurve(QEasingCurve::OutQuad);
+            m_lineAnimation->setEndValue(m_parent->viewPortPos() + dl);
+            m_lineAnimation->setDuration(1000/* + abs(length)*/);
+            m_lineAnimation->start();
+        }
     }
 }
 
@@ -329,8 +363,8 @@ TimeSlider::TimeSlider(QWidget *parent) :
     m_viewPortPos(0),
     m_scalingFactor(0),
     m_userInput(true),
-    m_delta(0),
     m_sliderPressed(false),
+    m_delta(0),
 //    m_mode(TimeMode),
     m_animation(new QPropertyAnimation(this, "viewPortPos"))
 {
@@ -386,7 +420,7 @@ void TimeSlider::setCurrentValue(qint64 value)
         setViewPortPos(value - sliderRange());
     */
     m_currentValue = qMin(value, maximumValue());
-    if (!m_sliderPressed && m_animation->state() != QAbstractAnimation::Running)
+    if (!m_sliderPressed && m_animation->state() != QAbstractAnimation::Running && !m_userInput)
         setViewPortPos(value - sliderRange()/2);
 
     updateSlider();
@@ -506,6 +540,9 @@ void TimeSlider::zoomOut()
 
 void TimeSlider::setViewPortPos(double v)
 {
+    static double prev = 0;
+    qDebug() << "delta" << prev-v;
+    prev = v;
     qint64 value = v;
     if (value < 0)
         value = 0;
