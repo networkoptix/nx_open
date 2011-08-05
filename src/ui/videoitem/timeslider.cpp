@@ -12,6 +12,7 @@
 
 #include <QProxyStyle>
 #include "base/log.h"
+#include "util.h"
 
 class ProxyStyle : public QProxyStyle
 {
@@ -39,6 +40,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *);
     void mousePressEvent(QMouseEvent *);
     void wheelEvent(QWheelEvent *);
+    void drawGradient(QPainter& painter, const QRectF& r);
 };
 
 void TimeLine::wheelEvent(QWheelEvent *event)
@@ -73,6 +75,11 @@ qint64 roundTime(qint64 msecs, int interval)
     return msecs - msecs%(intervalNames[interval].interval);
 }
 
+double round(double r) {
+    return (r > 0.0) ? floor(r + 0.5) : ceil(r - 0.5);
+}
+
+/*
 void TimeLine::paintEvent(QPaintEvent *ev)
 {
     QFrame::paintEvent(ev);
@@ -133,6 +140,11 @@ void TimeLine::paintEvent(QPaintEvent *ev)
     for (int j = i ; intervalNames[j].interval < range && j < 13; j++, maxLen++) {
     }
 
+    int xposBase = x + w*(roundTime(pos, i) - pos)/(float)range + 0.5;
+    int xDeltaBase = w*intervalNames[i].interval / (double)range + 0.5;
+
+    int xDelta = xDeltaBase;
+
     qint64 end(pos + range);
     for ( ; i < ie; i++)
     {
@@ -148,40 +160,135 @@ void TimeLine::paintEvent(QPaintEvent *ev)
         qint64 start(roundTime(pos, i));
         int labelNumber = (start/(intervalNames[i].interval))%intervalNames[i].count;
         bool firstTime = true;
+        int xpos = x + w*(start - pos)/ (float) range + 0.5;
+        double dd = (xpos-xposBase) / (double) xDeltaBase;
+        int di = round(dd);
+        di*= xDeltaBase;
+        di += xposBase;
+        //xpos = ((xpos-xposBase) /xDeltaBase*xDeltaBase) + xposBase;
+        xpos = di;
+
+
         while (start < end) {
-            int xpos = x + w*(start - pos)/range;
-            if (xpos < 0) {
-                start += intervalNames[i].interval;
-                labelNumber = (labelNumber + 1) % intervalNames[i].count;
-                continue;
+            //int xpos = x + w*(start - pos)/ (float) range + 0.5;
+            if (xpos >= 0) 
+            {
+                int deltaInterval = intervalNames[i + 1].interval/intervalNames[i].interval;
+                bool skipText = (i < ie - 1) && labelNumber % deltaInterval == 0;
+                if (!skipText) {
+                    if (firstTime) {
+                        firstTime = false;
+                        len++;
+                    }
+                    painter.drawLine(QPoint(xpos, 0), QPoint(xpos, (h - 20)*(double)len/maxLen));
+                    QString text = QString("%1%2").
+                            arg(intervalNames[i].value*labelNumber).
+                            arg(intervalNames[i].name);
+                    if (textWidth*1.1 < pixelPerTime*intervalNames[i].interval) {
+                        painter.drawText(QRect(xpos - textWidth/2, (h - 15)*(double)len/maxLen, textWidth, 15),
+                                         Qt::AlignHCenter,
+                                         text
+                                         );
+                    }
+                }
             }
-
             start += intervalNames[i].interval;
-            int deltaInterval = intervalNames[i + 1].interval/intervalNames[i].interval;
-            bool skipText = (i < ie - 1) && labelNumber % deltaInterval == 0;
-            if (!skipText) {
-                if (firstTime) {
-                    firstTime = false;
-                    len++;
-                }
-                painter.drawLine(QPoint(xpos, 0), QPoint(xpos, (h - 20)*(double)len/maxLen));
-                QString text = QString("%1%2").
-                        arg(intervalNames[i].value*labelNumber).
-                        arg(intervalNames[i].name);
-                if (textWidth*1.1 < pixelPerTime*intervalNames[i].interval) {
-                    painter.drawText(QRect(xpos - textWidth/2, (h - 15)*(double)len/maxLen, textWidth, 15),
-                                     Qt::AlignHCenter,
-                                     text
-                                     );
-                }
-            }
-
             labelNumber = (labelNumber + 1) % intervalNames[i].count;
+            xpos += xDelta;
         }
+        if ( i < ie-1)
+            xDelta *= intervalNames[i+1].interval / intervalNames[i].interval;
     }
 
     painter.setPen(QPen(Qt::red, 3));
     int xpos = x + m_parent->m_slider->value()*w / m_parent->sliderLength();
+    painter.drawLine(QPoint(xpos, 0), QPoint(xpos, height()));
+}
+*/
+
+void TimeLine::drawGradient(QPainter& painter, const QRectF& r)
+{
+    int MAX_COLOR = 128+32;
+    int MIN_COLOR = 0;
+    for (int i = r.top(); i < r.bottom(); ++i)
+    {
+        //int k = qAbs(height()/2 - i);
+        int k = height() - i;
+        k *= (float) (MAX_COLOR-MIN_COLOR) / (float) height();
+        k += MIN_COLOR;
+        //quint32 color = k + (k << 8) + (k << 16) + (k << 24);
+        QColor color(k,k,k,k);
+        //color.setAlphaF(k / (float) MAX_COLOR);
+        painter.setPen(color);
+        painter.drawLine(r.left(), i, r.width(), i);
+    }
+}
+
+void TimeLine::paintEvent(QPaintEvent *ev)
+{
+    QFrame::paintEvent(ev);
+    QPainter painter(this);
+
+    int handleThickness = round(qApp->style()->pixelMetric(QStyle::PM_SliderControlThickness)/4.0);
+    if (handleThickness == 0)
+        handleThickness = round(qApp->style()->pixelMetric(QStyle::PM_SliderThickness)/4.0);
+
+    QPalette pal = m_parent->palette();
+    painter.setBrush(pal.brush(QPalette::Base));
+    painter.setPen(pal.color(QPalette::Base));
+    const QRect r(handleThickness, frameWidth(), width() - handleThickness, height() - 2*frameWidth());
+    painter.drawRect(r);
+    drawGradient(painter, r);
+    painter.setPen(pal.color(QPalette::Text));
+
+    const qint64 range = m_parent->sliderRange();
+    const qint64 pos = m_parent->viewPortPos();
+    const double pixelPerTime = (double) r.width() /range;
+
+    const int minWidth = 5;
+    const int minVisibleWidth = 20;
+
+    int level = 0;
+    for (;minWidth > pixelPerTime*intervalNames[level].interval; level++);
+
+    int maxLevel = level;
+    for (; intervalNames[maxLevel].interval < range && maxLevel < arraysize(intervalNames); maxLevel++);
+    int maxLen = maxLevel - level;
+    QFontMetrics metric(m_parent->font());
+
+    QColor color = pal.color(QPalette::Text);
+    //float opacity = (pixelPerTime*intervalNames[level].interval - minWidth)/minVisibleWidth;
+    //color.setAlphaF(opacity > 1 ? 1 : opacity);
+    painter.setPen(color);
+    painter.setFont(m_parent->font());
+
+    double xpos = r.left() - round(pixelPerTime * pos);
+    int ticksOutside = -xpos / (intervalNames[level].interval * pixelPerTime);
+    xpos += ticksOutside * intervalNames[level].interval * pixelPerTime;
+    qint64 currentTime = intervalNames[level].interval * ticksOutside;
+    while (currentTime <= pos + range) 
+    {
+        int currentLevel = level;
+        for (;currentLevel < maxLevel && currentLevel < arraysize(intervalNames)-1; currentLevel++)
+        {
+            if (currentTime % intervalNames[currentLevel+1].interval)
+                break;
+        }
+        const IntervalInfo& interval = intervalNames[currentLevel];
+        int labelNumber = (currentTime/(interval.interval))%interval.count;
+        double len = qMin(1.0, (currentLevel-level+1) / (double) maxLen);
+        painter.drawLine(QPoint(xpos, 0), QPoint(xpos, (r.height() - 20)*len));
+        QString text = QString("%1%2").arg(interval.value*labelNumber).arg(interval.name);
+        int textWidth = metric.width(interval.maxText);
+        QRectF textRect(xpos - textWidth/2, (r.height() - 15) * len, textWidth, 15);
+        if (textWidth * 1.1 < pixelPerTime*interval.interval)
+            painter.drawText(textRect, Qt::AlignHCenter, text);
+        currentTime += intervalNames[level].interval;
+        xpos += intervalNames[level].interval * pixelPerTime;
+    }
+    // draw cursor vertical line
+    painter.setPen(QPen(Qt::red, 3));
+    xpos = r.left() + m_parent->m_slider->value() * (r.width()-handleThickness-1) / m_parent->sliderLength();
     painter.drawLine(QPoint(xpos, 0), QPoint(xpos, height()));
 }
 
