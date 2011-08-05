@@ -10,6 +10,7 @@
 #include <QPainter>
 #include <QResizeEvent>
 
+class TimeLine;
 class TimeSlider : public QWidget
 {
     Q_OBJECT
@@ -35,6 +36,9 @@ public:
 
      bool isMoving() { return m_slider->isSliderDown(); }
 
+     bool centralise() const { return m_centralise; }
+     void setCentralise(bool b) { m_centralise = b; }
+
 signals:
     void currentValueChanged(qint64 value);
     void maximumValueChanged(qint64 value);
@@ -52,7 +56,7 @@ public slots:
 
 private:
     QSlider *m_slider;
-    QFrame *m_frame;
+    TimeLine *m_frame;
 
     qint64 m_currentValue;
     qint64 m_maximumValue;
@@ -66,6 +70,7 @@ private:
 //    Mode m_mode;
 
     QPropertyAnimation *m_animation;
+    bool m_centralise;
 
 protected slots:
     void setViewPortPos(double value);
@@ -84,6 +89,7 @@ protected:
     qint64 sliderRange();
 
     void updateSlider();
+    void centraliseSlider();
 
     friend class TimeLine;
 };
