@@ -44,15 +44,15 @@ CLAbstractSceneItem::CLAbstractSceneItem(GraphicsView* view, int max_width, int 
     m_steady_animation(0),
     m_steady_black_color(0)
 {
-	setAcceptsHoverEvents(true);
+    setAcceptsHoverEvents(true);
 
-	setZValue(global_base_scene_z_level);
+    setZValue(global_base_scene_z_level);
 
-	//setFlag(QGraphicsItem::ItemIsFocusable);
+    //setFlag(QGraphicsItem::ItemIsFocusable);
 
-	//setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);
+    //setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);
 
-	//setFlag(ItemIsSelectable, true);
+    //setFlag(ItemIsSelectable, true);
 
 }
 
@@ -73,12 +73,12 @@ void CLAbstractSceneItem::setName(const QString& name)
 
 bool CLAbstractSceneItem::isEtitable() const
 {
-    return m_editable;
+	return m_editable;
 }
 
 void CLAbstractSceneItem::setEditable(bool editable)
 {
-    m_editable = editable;
+	m_editable = editable;
 }
 
 bool CLAbstractSceneItem::isZoomable() const
@@ -108,7 +108,7 @@ void CLAbstractSceneItem::setMaxSize(QSize size)
 {
 	m_max_width = size.width();
 	m_max_height = size.height();
-    onResize();
+	onResize();
 }
 
 QSize CLAbstractSceneItem::getMaxSize() const
@@ -123,7 +123,7 @@ QSize CLAbstractSceneItem::onScreenSize() const
 
 QRectF CLAbstractSceneItem::boundingRect() const
 {
-	return QRectF(0,0,width(),height()); 
+	return QRectF(0,0,width(),height());
 }
 
 int CLAbstractSceneItem::height() const
@@ -146,34 +146,18 @@ void CLAbstractSceneItem::setItemSelected(bool sel, bool animate , int delay )
 	if (!m_selected)
 		setFullScreen(false);
 
-	if (!animate)
-    {
-        if (m_selected)
-        {
-            setZValue(global_base_scene_z_level+1);
-        }
-        else
-        {
-            setZValue(global_base_scene_z_level);
-        }
-
-		return;
-    }
-
-
-
 	if (m_selected)
 	{
-
-		m_animationTransform.zoom_abs(selected_item_zoom, item_select_duration - 25, delay);
+		if (animate)
+			m_animationTransform.zoom_abs(selected_item_zoom, item_select_duration - 25, delay);
 		setZValue(global_base_scene_z_level+1);
 	}
 	else
 	{
-		m_animationTransform.zoom_abs(1.0, item_hoverevent_duration, delay);
+		if (animate)
+			m_animationTransform.zoom_abs(1.0, item_hoverevent_duration, delay);
 		setZValue(global_base_scene_z_level);
 	}
-
 }
 
 bool CLAbstractSceneItem::isItemSelected() const
@@ -223,7 +207,7 @@ void CLAbstractSceneItem::setRotation(qreal angle)
 
 void CLAbstractSceneItem::stop_animation()
 {
-	m_animationTransform.stopAnimation();
+    m_animationTransform.stopAnimation();
 
     QList<CLAbstractSubItem*> childrenLst = subItemList();
     foreach(CLAbstractSubItem* sub_item, childrenLst)
@@ -234,7 +218,7 @@ void CLAbstractSceneItem::stop_animation()
 
 void CLAbstractSceneItem::setFullScreen(bool full)
 {
-	m_fullscreen = full;
+    m_fullscreen = full;
 
     if (!m_fullscreen)
     {
@@ -293,14 +277,14 @@ void CLAbstractSceneItem::hoverEnterEvent(QGraphicsSceneHoverEvent * /*event*/)
 	/*/
 	if (m_view->getSelectedItem()!=this &&(m_view->getZoom() < 0.25 || m_zoomOnhover))
 	{
-		if (m_z != 1) 
+		if (m_z != 1)
 		{
 			m_z = 1;
 			setZValue(m_z);
 			m_animationTransform.zoom_abs(1.11, item_hoverevent_duration, 0);
 		}
 	}
-    */
+	*/
 
 }
 
@@ -310,7 +294,7 @@ void CLAbstractSceneItem::hoverLeaveEvent(QGraphicsSceneHoverEvent * /*event*/)
 	m_mouse_over = false;
 
 	/*/
-	if (m_view->getSelectedItem()!=this) 
+	if (m_view->getSelectedItem()!=this)
 	{
 		if (m_z != 0)
 		{
@@ -319,7 +303,7 @@ void CLAbstractSceneItem::hoverLeaveEvent(QGraphicsSceneHoverEvent * /*event*/)
 			m_animationTransform.zoom_abs(1.0, item_hoverevent_duration, 0);
 		}
 	}
-    */
+	*/
 }
 
 void CLAbstractSceneItem::mousePressEvent ( QGraphicsSceneMouseEvent * event )
@@ -391,9 +375,9 @@ void CLAbstractSceneItem::setRotationPointCenter(QPointF center)
 	qreal cos_a = cos(angle*Pi/180);
 	qreal sin_a = sin(angle*Pi/180);
 
-	qreal x_old = (-m_rotation_center.x())*cos_a - (-m_rotation_center.y())*sin_a; // pos of the item after rotation in center of rotation coordinates 
+	qreal x_old = (-m_rotation_center.x())*cos_a - (-m_rotation_center.y())*sin_a; // pos of the item after rotation in center of rotation coordinates
 	qreal y_old = (-m_rotation_center.x())*sin_a +  (-m_rotation_center.y())*cos_a;
-	x_old += m_rotation_center.x(); // pos of the item after rotation in item coordinates 
+	x_old += m_rotation_center.x(); // pos of the item after rotation in item coordinates
 	y_old += m_rotation_center.y();
 
 	qreal x_new = (-center.x())*cos_a - (-center.y())*sin_a; // pos of the item after rotation in center of rotation coordinates ( around nex center )
@@ -463,7 +447,7 @@ void CLAbstractSceneItem::drawRotationHelper(QPainter* painter)
 	QPointF sourceArrowP1 = line_p.p1() + QPointF(sin(angle + Pi / s) * arrowSize,
 		cos(angle + Pi / s) * arrowSize);
 	QPointF sourceArrowP2 = line_p.p1() + QPointF(sin(angle + Pi - Pi / s) * arrowSize,
-		cos(angle + Pi - Pi / s) * arrowSize);   
+		cos(angle + Pi - Pi / s) * arrowSize);
 	QPointF destArrowP1 = line_p.p2() + QPointF(sin(angle - Pi / s) * arrowSize,
 		cos(angle - Pi / s) * arrowSize);
 	QPointF destArrowP2 = line_p.p2() + QPointF(sin(angle - Pi + Pi / s) * arrowSize,
@@ -471,7 +455,7 @@ void CLAbstractSceneItem::drawRotationHelper(QPainter* painter)
 
 	painter->setBrush(color2);
 	painter->drawPolygon(QPolygonF() << line_p.p1() << sourceArrowP1 << sourceArrowP2);
-	painter->drawPolygon(QPolygonF() << line_p.p2() << destArrowP1 << destArrowP2);        
+	painter->drawPolygon(QPolygonF() << line_p.p2() << destArrowP1 << destArrowP2);
 
 	painter->restore();
 	/**/
@@ -551,7 +535,7 @@ int CLAbstractSceneItem::steadyBlackColor() const
     return m_steady_black_color;
 }
 
-void CLAbstractSceneItem::setSteadyBlackColor(int color) 
+void CLAbstractSceneItem::setSteadyBlackColor(int color)
 {
     m_steady_black_color = color;
     update();
