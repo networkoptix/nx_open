@@ -89,7 +89,7 @@ public:
 	//flag is used to draw selection with different color. true if item is selected and can be drop on top of the other in case of mouse release
 	void setCanDrop(bool val);
 	QPointF getOriginalPos() const;
-	void setOroginalPos(QPointF pos);
+	void setOriginalPos(QPointF pos);
 	bool getOriginallyArranged() const;
 	void setOriginallyArranged(bool val);
 

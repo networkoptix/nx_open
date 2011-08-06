@@ -255,7 +255,7 @@ QPointF CLAbstractSceneItem::getOriginalPos() const
 
 }
 
-void CLAbstractSceneItem::setOroginalPos(QPointF pos)
+void CLAbstractSceneItem::setOriginalPos(QPointF pos)
 {
 	m_originalPos = pos;
 }
