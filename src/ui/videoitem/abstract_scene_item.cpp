@@ -170,12 +170,12 @@ void CLAbstractSceneItem::zoom_abs(qreal z, int duration, int /*delay*/)
 	m_animationTransform.zoom_abs(z, duration, 0);
 }
 
-void CLAbstractSceneItem::z_rotate_delta(QPointF center, qreal angle, int duration, int delay)
+void CLAbstractSceneItem::z_rotate_delta(const QPointF &center, qreal angle, int duration, int delay)
 {
 	m_animationTransform.z_rotate_delta(center, angle, duration, delay);
 }
 
-void CLAbstractSceneItem::z_rotate_abs(QPointF center, qreal angle, int duration, int delay)
+void CLAbstractSceneItem::z_rotate_abs(const QPointF &center, qreal angle, int duration, int delay)
 {
 	m_animationTransform.z_rotate_abs(center, angle, duration, delay);
 }
@@ -221,9 +221,7 @@ void CLAbstractSceneItem::setFullScreen(bool full)
     m_fullscreen = full;
 
     if (!m_fullscreen)
-    {
         goToSteadyMode(false, true);
-    }
 
 	if (m_fullscreen )
 		emit onFullScreen(this);
@@ -255,7 +253,7 @@ QPointF CLAbstractSceneItem::getOriginalPos() const
 
 }
 
-void CLAbstractSceneItem::setOriginalPos(QPointF pos)
+void CLAbstractSceneItem::setOriginalPos(const QPointF &pos)
 {
 	m_originalPos = pos;
 }
@@ -367,7 +365,7 @@ void CLAbstractSceneItem::drawRotationHelper(bool val)
 	m_draw_rotation_helper = val;
 }
 
-void CLAbstractSceneItem::setRotationPointCenter(QPointF center)
+void CLAbstractSceneItem::setRotationPointCenter(const QPointF &center)
 {
 
 	qreal angle = getRotation();
@@ -398,7 +396,7 @@ QPointF CLAbstractSceneItem::getRotationPointCenter() const
 	return m_rotation_center;
 }
 
-void CLAbstractSceneItem::setRotationPointHand(QPointF point)
+void CLAbstractSceneItem::setRotationPointHand(const QPointF &point)
 {
 
 	m_rotation_hand = point;

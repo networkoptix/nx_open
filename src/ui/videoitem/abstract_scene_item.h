@@ -69,8 +69,8 @@ public:
 	bool isItemSelected() const;
 
 	void zoom_abs(qreal z, int duration, int delay );
-	void z_rotate_delta(QPointF center, qreal angle, int duration, int delay );
-	void z_rotate_abs(QPointF center, qreal angle, int duration, int delay);
+	void z_rotate_delta(const QPointF &center, qreal angle, int duration, int delay );
+	void z_rotate_abs(const QPointF &center, qreal angle, int duration, int delay);
 
 	qreal getZoom() const;
 
@@ -89,15 +89,15 @@ public:
 	//flag is used to draw selection with different color. true if item is selected and can be drop on top of the other in case of mouse release
 	void setCanDrop(bool val);
 	QPointF getOriginalPos() const;
-	void setOriginalPos(QPointF pos);
+	void setOriginalPos(const QPointF &pos);
 	bool getOriginallyArranged() const;
 	void setOriginallyArranged(bool val);
 
 	//====rotation=======
 	void drawRotationHelper(bool val);
-	void setRotationPointCenter(QPointF center);
+	void setRotationPointCenter(const QPointF &center);
 	QPointF getRotationPointCenter() const;
-	void setRotationPointHand(QPointF point);
+	void setRotationPointHand(const QPointF &point);
 
 	//== steady mode
 
