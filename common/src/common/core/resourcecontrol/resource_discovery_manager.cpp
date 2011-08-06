@@ -1,8 +1,9 @@
-#include "asynch_seacher.h"
+
 #include "resource/network_resource.h"
 #include "settings.h"
 #include "abstract_resource_searcher.h"
 #include "resource_pool.h"
+#include "resource_discovery_manager.h"
 
 QnResourceDiscoveryManager::QnResourceDiscoveryManager()
 {

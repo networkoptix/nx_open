@@ -1,6 +1,5 @@
 #ifndef resource_pool_h_1537
 #define resource_pool_h_1537
-#include "resourcecontrol/asynch_seacher.h"
 #include "resource/resource.h"
 #include "resource_criteria.h"
 #include "resource/id.h"
