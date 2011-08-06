@@ -513,40 +513,35 @@ int roundUp(int value)
 
 int CLGLRenderer::glRGBFormat() const
 {
-    if (isYuvFormat())
-        return GL_RGBA;
-    switch(m_color)
+    if (!isYuvFormat())
     {
-        case PIX_FMT_RGBA:
-            return GL_RGBA;
-        case PIX_FMT_BGRA:
-            return GL_BGRA_EXT;
-        case PIX_FMT_RGB24:
-            return GL_RGB;
-        case PIX_FMT_BGR24:
-             return GL_BGR_EXT;
-        default:
-            return GL_RGBA;
+        switch (m_color)
+        {
+        case PIX_FMT_RGBA: return GL_RGBA;
+        case PIX_FMT_BGRA: return GL_BGRA_EXT;
+        case PIX_FMT_RGB24: return GL_RGB;
+        case PIX_FMT_BGR24: return GL_BGR_EXT;
+        default: break;
+        }
     }
+    return GL_RGBA;
 }
 
 bool CLGLRenderer::isPixelFormatSupported(PixelFormat pixfmt)
 {
-    static const PixelFormat supportedFormats[] =
+    switch (pixfmt)
     {
-            PIX_FMT_YUV422P,
-            PIX_FMT_YUV420P,
-            PIX_FMT_YUV444P,
-            PIX_FMT_RGBA,
-            PIX_FMT_BGRA,
-            PIX_FMT_RGB24,
-            PIX_FMT_BGR24
+    case PIX_FMT_YUV422P:
+    case PIX_FMT_YUV420P:
+    case PIX_FMT_YUV444P:
+    case PIX_FMT_RGBA:
+    case PIX_FMT_BGRA:
+    case PIX_FMT_RGB24:
+    case PIX_FMT_BGR24:
+        return true;
+    default:
+        break;
     };
-    for (unsigned i = 0; i < sizeof (supportedFormats)/ sizeof(PixelFormat); ++i)
-    {
-        if (pixfmt == supportedFormats[i])
-            return true;
-    }
     return false;
 }
 
