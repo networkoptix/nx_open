@@ -4,31 +4,31 @@
 #include "abstract_resource_searcher.h"
 #include "resource_pool.h"
 
-CLDeviceSearcher::CLDeviceSearcher()
+QnResourceDiscoveryManager::QnResourceDiscoveryManager()
 {
 
 }
 
-CLDeviceSearcher::~CLDeviceSearcher()
+QnResourceDiscoveryManager::~QnResourceDiscoveryManager()
 {
 	wait();
 }
 
-void CLDeviceSearcher::addDeviceServer(QnAbstractResourceSearcher* serv)
+void QnResourceDiscoveryManager::addDeviceServer(QnAbstractResourceSearcher* serv)
 {
 	QMutexLocker lock(&m_searchersListMtx);
 	m_searchersList.push_back(serv);
 }
 
-QnResourceList CLDeviceSearcher::result()
+QnResourceList QnResourceDiscoveryManager::result()
 {
 	return m_result;
 }
 
-void CLDeviceSearcher::run()
+void QnResourceDiscoveryManager::run()
 {
 	bool ip_finished;
-	m_result = findNewDevices(ip_finished);
+	m_result = findNewResources(ip_finished);
 
 	if (ip_finished)
 	{
@@ -44,10 +44,9 @@ void CLDeviceSearcher::run()
 
 }
 
-QnResourceList CLDeviceSearcher::findNewDevices(bool& ip_finished)
+QnResourceList QnResourceDiscoveryManager::findNewResources(bool& ip_finished)
 {
     
-    /*/
     bool allow_to_change_ip = allowToChangeresourceIP;
 
 	ip_finished = false;
@@ -182,7 +181,7 @@ QnResourceList CLDeviceSearcher::findNewDevices(bool& ip_finished)
 	time.restart();
 
 	cl_log.log("Checking for real conflicts ", resources.size(), " resources.", cl_logDEBUG1);
-	markConflictingDevices(resources,5);
+	markConflictingResources(resources,5);
 	fromListToList(resources, bad_ip_list, QnResourceStatus::CONFLICTING, QnResourceStatus::CONFLICTING);
 	cl_log.log("Time elapsed ", time.restart(), cl_logDEBUG1);
 	cl_log.log(" ", resources.size(), " new(!) resources not conflicting .", cl_logDEBUG1);
@@ -242,16 +241,16 @@ END:
 		// also in case if in already existing resources some resources conflicts with something see [-1-]
 		// we need to resolve that conflicts
 
-        // todo
-		//QnResourceList bad_ip_list;
+        
+		QnResourceList bad_ip_list;
 
-		//QMutexLocker lock(&all_devices_mtx);
-		//fromListToList(all_devices, bad_ip_list, QnResourceStatus::NOT_IN_SUBNET, QnResourceStatus::NOT_IN_SUBNET);
-		//if (bad_ip_list.size())
-		//{
-		//	resovle_conflicts(bad_ip_list, busy_list, ip_finished);
-		//	fromListToList(bad_ip_list, all_devices, 0, 0);
-		//}
+		QMutexLocker lock(&all_devices_mtx);
+		fromListToList(all_devices, bad_ip_list, QnResourceStatus::NOT_IN_SUBNET, QnResourceStatus::NOT_IN_SUBNET);
+		if (bad_ip_list.size())
+		{
+			resovle_conflicts(bad_ip_list, busy_list, ip_finished);
+			fromListToList(bad_ip_list, all_devices, 0, 0);
+		}
         
 
 	}
@@ -266,15 +265,15 @@ END:
 	}
 
 	resources.append(notNetworkResources); // move everything to result list
-    /**/
 
-    QnResourceList resources;
+
+
 	return resources;
 
 }
 //====================================================================================
 
-void CLDeviceSearcher::resovle_conflicts(QnResourceList& resourceList, CLIPList& busy_list, bool& ip_finished)
+void QnResourceDiscoveryManager::resovle_conflicts(QnResourceList& resourceList, CLIPList& busy_list, bool& ip_finished)
 {
 	foreach(QnResourcePtr res, resourceList)
 	{
@@ -305,11 +304,11 @@ void CLDeviceSearcher::resovle_conflicts(QnResourceList& resourceList, CLIPList&
 
 }
 
-bool CLDeviceSearcher::checkObviousConflicts(QnResourceList& lst)
+bool QnResourceDiscoveryManager::checkObviousConflicts(QnResourceList& lst)
 {
 	// this function deals with network resources only 
 
-    /*/
+    
 	bool result = false;
 
 	QMap<QString,  QnResource*> ips;
@@ -354,14 +353,10 @@ bool CLDeviceSearcher::checkObviousConflicts(QnResourceList& lst)
 	}
 
 	return result;
-    /**/
-    return true;
 }
 
-void CLDeviceSearcher::fromListToList(QnResourceList& from, QnResourceList& to, int mask, int value)
+void QnResourceDiscoveryManager::fromListToList(QnResourceList& from, QnResourceList& to, int mask, int value)
 {
-    // todo
-    /*
 	QnResourceList::iterator it = from.begin();
 	while (it!=from.end())
 	{
@@ -375,7 +370,6 @@ void CLDeviceSearcher::fromListToList(QnResourceList& from, QnResourceList& to, 
 		else
 			++it;
 	}
-    /**/
 
 }
 
@@ -396,7 +390,7 @@ struct T
 };
 #endif
 
-void CLDeviceSearcher::markConflictingDevices(QnResourceList& lst, int threads)
+void QnResourceDiscoveryManager::markConflictingResources(QnResourceList& lst, int threads)
 {
 	// cannot make concurrent work with pointer CLDevice* ; => so extra steps needed
 	// this function deals with network resources only 
@@ -437,7 +431,7 @@ void CLDeviceSearcher::markConflictingDevices(QnResourceList& lst, int threads)
 
 }
 
-QnResourceList CLDeviceSearcher::resolveUnknown_helper(QnResourceList& lst)
+QnResourceList QnResourceDiscoveryManager::resolveUnknown_helper(QnResourceList& lst)
 {
 
 	QnResourceList result;

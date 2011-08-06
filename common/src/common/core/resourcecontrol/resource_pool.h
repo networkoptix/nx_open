@@ -9,10 +9,13 @@ class QnResource;
 class QnNetworkResource;
 class CLRecorderDevice;
 
-// this class holds all resources in the system ( as long as resource is in the pool => share pointer counter >= 1)
+// this class holds all resources in the system which are READY TO BE USED( as long as resource is in the pool => share pointer counter >= 1)
 // so if resource is in the pool it guaranties it cannot be deleted
 // in addition to that it also can give list of resources based on some criteria
 // and helps to administrate resources 
+
+
+// if resource is conflicting it must not be placed in resource
 
 class QnResourcePool 
 {

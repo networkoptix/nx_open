@@ -12,13 +12,13 @@ class QnAbstractResourceSearcher;
 // this class just searches for new devices
 // it uses others proxy
 // it will be moved to recorder I guess 
-class CLDeviceSearcher : public QThread
+class QnResourceDiscoveryManager : public QThread
 {
 	typedef QList<QnAbstractResourceSearcher*> ResourceSearcherList;
 
 public:
-	CLDeviceSearcher();
-	~CLDeviceSearcher();
+	QnResourceDiscoveryManager();
+	~QnResourceDiscoveryManager();
 
 	// this function returns only new devices( not in all_devices list);
 	QnResourceList result();
@@ -32,8 +32,8 @@ public:
 protected:
 	virtual void run();
 private:
-	// new here means any device BUT any from all_devices with READY flag 
-	QnResourceList findNewDevices(bool& ip_finished);
+	// returns new resources( not from pool) or updates some in resource pool
+	QnResourceList findNewResources(bool& ip_finished);
 
 	// this function will modify CLDeviceList( conflict flag)
 	// it only checks obvious conflicts 
@@ -45,7 +45,7 @@ private:
 	static void fromListToList(QnResourceList& from, QnResourceList& to, int mask, int value);
 
 	// this function will mark cams from list as CONFLICTING if conflicting return true
-	static void markConflictingDevices(QnResourceList& lst, int threads);
+	static void markConflictingResources(QnResourceList& lst, int threads);
 
 private:
 

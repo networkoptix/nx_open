@@ -15,10 +15,10 @@ public:
 	virtual QString manufacture() const = 0;
 
     // some searchers might be enabled or disabled
-    void setSholdBeUsed(bool use);
+    void setShouldBeUsed(bool use);
 
     // returns true if should be used;
-    bool sholdBeUsed() const;
+    bool shouldBeUsed() const;
 
 	// returns all available devices 
 	virtual QnResourceList findResources() = 0;

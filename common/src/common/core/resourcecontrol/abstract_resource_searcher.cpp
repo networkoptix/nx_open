@@ -13,13 +13,13 @@ QnAbstractResourceSearcher::~QnAbstractResourceSearcher()
 }
 
 
-void QnAbstractResourceSearcher::setSholdBeUsed(bool use)
+void QnAbstractResourceSearcher::setShouldBeUsed(bool use)
 {
     m_sholudbeUsed = use;
 }
 
     
-bool QnAbstractResourceSearcher::sholdBeUsed() const
+bool QnAbstractResourceSearcher::shouldBeUsed() const
 {
     return m_sholudbeUsed;
 }
