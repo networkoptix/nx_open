@@ -12,6 +12,10 @@
 
 #include <QProxyStyle>
 #include "base/log.h"
+#include "util.h"
+
+static const double MAX_MIN_OPACITY = 0.6;
+static const double MIN_MIN_OPACITY = 0.1;
 
 class ProxyStyle : public QProxyStyle
 {
@@ -31,8 +35,11 @@ class TimeLine : public QFrame
     QPoint m_previousPos;
     QPropertyAnimation *m_wheelAnimation;
     QPropertyAnimation *m_lineAnimation;
+    QPropertyAnimation *m_opacityAnimation;
     int length;
     bool m_dragging;
+    float m_minOpacity;
+    float m_scaleSpeed;
 //    QTime t;
 
 public:
@@ -40,162 +47,221 @@ public:
         QFrame(parent),
         m_parent(parent),
         m_wheelAnimation(new QPropertyAnimation(m_parent, "scalingFactor")),
+        m_opacityAnimation(new QPropertyAnimation(m_parent, "minOpacity")),
         m_lineAnimation(new QPropertyAnimation(m_parent, "viewPortPos")),
-        m_dragging(false)
-    {}
+        m_dragging(false),
+        m_minOpacity(MAX_MIN_OPACITY),
+        m_scaleSpeed(1.0)
+    {
+        setAttribute(Qt::WA_TranslucentBackground);
+        connect(m_wheelAnimation, SIGNAL(finished()), m_parent, SLOT(onWheelAnimationFinished()));
+    }
 
     bool isDragging() const { return m_dragging; }
-
+    void setMinOpacity(double value) { m_minOpacity = value; }
+    double minOpacity() const { return m_minOpacity; }
+    void wheelAnimationFinished();
 protected:
     void paintEvent(QPaintEvent *);
     void mouseMoveEvent(QMouseEvent *);
     void mousePressEvent(QMouseEvent *);
     void mouseReleaseEvent(QMouseEvent *);
     void wheelEvent(QWheelEvent *);
+    void drawGradient(QPainter& painter, const QRectF& r);
 };
+
+void TimeLine::wheelAnimationFinished()
+{
+    m_opacityAnimation->stop();
+    m_opacityAnimation->setStartValue(minOpacity());
+    m_opacityAnimation->setEndValue(MAX_MIN_OPACITY);
+    m_opacityAnimation->setDuration(500);
+    m_opacityAnimation->start();
+    m_scaleSpeed = 1.0;
+}
 
 void TimeLine::wheelEvent(QWheelEvent *event)
 {
+    static const float SCALE_FACTOR = 2000.0;
+    static const int WHEEL_ANIMATION_DURATION = 250;
+    //static const float SCALE_FACTOR = 120.0;
     int delta = event->delta();
-    if (abs(delta) == 120) {
-        if (m_wheelAnimation->state() != QPropertyAnimation::Running) {
+    m_opacityAnimation->stop();
+    //setMinOpacity(0.1);
+    if (m_opacityAnimation->state() == QPropertyAnimation::Stopped || m_opacityAnimation->startValue().toFloat() < m_opacityAnimation->endValue().toFloat())
+    {
+        m_opacityAnimation->stop();
+        m_opacityAnimation->setStartValue(minOpacity());
+        m_opacityAnimation->setEndValue(MIN_MIN_OPACITY);
+        m_opacityAnimation->setDuration(500);
+        m_opacityAnimation->start();
+    }
+    if (abs(delta) == 120)
+    {
+        m_scaleSpeed *= 1.2;
+        cl_log.log("dt=", m_scaleSpeed, cl_logALWAYS);
+        m_wheelAnimation->setEndValue(m_parent->scalingFactor() + delta/SCALE_FACTOR*m_scaleSpeed);
+        if (m_wheelAnimation->state() != QPropertyAnimation::Running) 
+        {
             m_wheelAnimation->setStartValue(m_parent->scalingFactor());
-            m_wheelAnimation->setEndValue(m_parent->scalingFactor() + (double)delta/120);
-            m_wheelAnimation->setDuration(100);
+            m_wheelAnimation->setDuration(WHEEL_ANIMATION_DURATION);
             m_wheelAnimation->start();
         } else {
-            m_wheelAnimation->setEndValue(m_parent->scalingFactor() + (double)delta/120);
-            m_wheelAnimation->setDuration(m_wheelAnimation->currentTime() + 100);
+            m_wheelAnimation->setDuration(m_wheelAnimation->currentTime() + WHEEL_ANIMATION_DURATION);
         }
-    } else {
-        m_parent->setScalingFactor(m_parent->scalingFactor() + (double)delta/120);
+    } else 
+    {
+        m_parent->setScalingFactor(m_parent->scalingFactor() + delta/120.0);
     }
     update();
     m_parent->centraliseSlider(); // we need to trigger animation
 }
-
+static const int MAX_LABEL_WIDTH = 64;
 struct IntervalInfo { qint64 interval; int value; const char * name; int count; const char * maxText; };
-static const IntervalInfo intervalNames[] = { {100, 100, "ms", 10, "999ms"}, {1000, 1, "s", 60, "59s"},
-                                              {5*1000, 5, "s", 12, "59s"}, {10*1000, 10, "s", 6, "59s"}, {30*1000, 30, "s", 2, "59s"}, {60*1000, 1, "m", 60, "59m"},
-                                              {5*60*1000, 5, "m", 12, "59m"}, {10*60*1000, 10, "m", 6, "59m"}, {30*60*1000, 30, "m", 2, "59m"}, {60*60*1000, 1, "h", 24, "59h"},
-                                              {3*60*60*1000, 3, "h", 8, "59h"}, {6*60*60*1000, 6, "h", 4, "59h"}, {12*60*60*1000, 12, "h", 2, "59h"},
-                                              {24*60*60*1000, 1, "d", 1, "99d"}
-                                            };
+static const IntervalInfo intervals[] = 
+{
+    {100, 100, "ms", 10, "ms"}, 
+    {1000, 1, "s", 60, "59s"},
+    {5*1000, 5, "s", 12, "59s"}, 
+    {10*1000, 10, "s", 6, "59s"}, 
+    {30*1000, 30, "s", 2, "59s"}, 
+    {60*1000, 1, "m", 60, "59m"},
+    {5*60*1000, 5, "m", 12, "59m"},
+    {10*60*1000, 10, "m", 6, "59m"}, 
+    {30*60*1000, 30, "m", 2, "59m"}, 
+    {60*60*1000, 1, "h", 24, "59h"},
+    {3*60*60*1000, 3, "h", 8, "59h"}, 
+    {6*60*60*1000, 6, "h", 4, "59h"}, 
+    {12*60*60*1000, 12, "h", 2, "59h"},
+    {24*60*60*1000, 1, "d", 1, "99d"}
+};
 
 qint64 roundTime(qint64 msecs, int interval)
 {
-    return msecs - msecs%(intervalNames[interval].interval);
+    return msecs - msecs%(intervals[interval].interval);
+}
+
+double round(double r) {
+    return (r > 0.0) ? floor(r + 0.5) : ceil(r - 0.5);
+}
+
+void TimeLine::drawGradient(QPainter& painter, const QRectF& r)
+{
+    int MAX_COLOR = 128+32;
+    int MIN_COLOR = 0;
+    for (int i = r.top(); i < r.bottom(); ++i)
+    {
+        int k = height() - i;
+        k *= (float) (MAX_COLOR-MIN_COLOR) / (float) height();
+        k += MIN_COLOR;
+        QColor color(k,k,k,k);
+        painter.setPen(color);
+        painter.drawLine(r.left(), i, r.width(), i);
+    }
 }
 
 void TimeLine::paintEvent(QPaintEvent *ev)
 {
+    static const float MIN_FONT_SIZE = 4.0;
     QFrame::paintEvent(ev);
     QPainter painter(this);
 
-//    QPalette pal = qApp->style()->standardPalette();
+    int handleThickness = round(qApp->style()->pixelMetric(QStyle::PM_SliderControlThickness)/4.0);
+    if (handleThickness == 0)
+        handleThickness = round(qApp->style()->pixelMetric(QStyle::PM_SliderThickness)/4.0);
+
     QPalette pal = m_parent->palette();
     painter.setBrush(pal.brush(QPalette::Base));
     painter.setPen(pal.color(QPalette::Base));
-    QRect r(frameWidth(), frameWidth(), width() - 2*frameWidth(), height() - 2*frameWidth());
+    const QRect r(handleThickness, frameWidth(), width() - handleThickness, height() - 2*frameWidth());
     painter.drawRect(r);
-
-    int MAX_COLOR = 128+32;
-    int MIN_COLOR = 0;
-    for (int i = 0; i < height(); ++i)
-    {
-        //int k = qAbs(height()/2 - i);
-        int k = height() - i;
-        k *= (float) (MAX_COLOR-MIN_COLOR) / (float) height();
-        k += MIN_COLOR;
-        //quint32 color = k + (k << 8) + (k << 16) + (k << 24);
-        QColor color(k,k,k,k);
-        //color.setAlphaF(k / (float) MAX_COLOR);
-        painter.setPen(color);
-        painter.drawLine(0, i, width(), i);
-    }
-    painter.setPen(pal.color(QPalette::Base));
-
-
-    int handleThickness = qApp->style()->pixelMetric(QStyle::PM_SliderControlThickness);
-    if (handleThickness == 0)
-        handleThickness = qApp->style()->pixelMetric(QStyle::PM_SliderThickness);
-
-    int x = handleThickness/2 - 1;
-    int y = frameWidth();
-    int w = width() - handleThickness + 1;
-    int h = height();
-
+    drawGradient(painter, r);
     painter.setPen(pal.color(QPalette::Text));
 
-    qint64 range = m_parent->sliderRange();
-    qint64 pos = m_parent->viewPortPos();
+    const qint64 range = m_parent->sliderRange();
+    const qint64 pos = m_parent->viewPortPos();
+    const double pixelPerTime = (double) r.width() /range;
 
-    double pixelPerTime = (double)w/range;
-    const int minWidth = 5;
-    int i = 0;
-    while (minWidth > pixelPerTime*intervalNames[i].interval) {
-        i++;
-    }
-    const int minVisibleWidth = 100;
+    const int minWidth = 3;
 
-    int ie = i;
-    for ( ; intervalNames[ie].interval < m_parent->maximumValue() && ie < 13; ie++) {
-    }
+    int level = 0;
+    for (;minWidth > pixelPerTime*intervals[level].interval && level < arraysize(intervals)-1; level++);
 
-    int len = 0;
-    int maxLen = 1;
-    for (int j = i ; intervalNames[j].interval < range && j < 13; j++, maxLen++) {
-    }
+    int maxLevel = level;
+    for (; maxLevel < arraysize(intervals)-1 && intervals[maxLevel].interval < range; maxLevel++);
+    int maxLen = maxLevel - level;
 
-    qint64 end(pos + range);
-    for ( ; i < ie; i++)
+    QColor color = pal.color(QPalette::Text);
+
+    QVector<float> opacity;
+    QVector<int> widths;
+    QVector<QFont> fonts;
+    for (int i = level; i <= maxLevel; ++i)
     {
-        QColor color = pal.color(QPalette::Text);
-        float opacity = (pixelPerTime*intervalNames[i].interval - minWidth)/minVisibleWidth;
-        color.setAlphaF(opacity > 1 ? 1 : opacity*opacity);
-        painter.setPen(color);
-        painter.setFont(m_parent->font());
+        float k = (pixelPerTime*intervals[i].interval - minWidth)/40.0;
+        opacity << qMax(m_minOpacity, qMin(k, 1.0f));
+        QFont font = m_parent->font();
+        font.setPointSize(font.pointSize() + (i >= maxLevel-1) - (i <= level+1));
+        font.setBold(i == maxLevel);
 
-        QFontMetrics metric(m_parent->font());
-        int textWidth = metric.width(intervalNames[i].maxText);
-
-        qint64 start(roundTime(pos, i));
-        int labelNumber = (start/(intervalNames[i].interval))%intervalNames[i].count;
-        bool firstTime = true;
-        while (start < end) {
-            int xpos = x + w*(start - pos)/range;
-            if (xpos < 0) {
-                start += intervalNames[i].interval;
-                labelNumber = (labelNumber + 1) % intervalNames[i].count;
-                continue;
-            }
-
-            start += intervalNames[i].interval;
-            int deltaInterval = intervalNames[i + 1].interval/intervalNames[i].interval;
-            bool skipText = (i < ie - 1) && labelNumber % deltaInterval == 0;
-            if (!skipText) {
-                if (firstTime) {
-                    firstTime = false;
-                    len++;
-                }
-                painter.drawLine(QPoint(xpos, 0), QPoint(xpos, (h - 20)*(double)len/maxLen));
-                QString text = QString("%1%2").
-                        arg(intervalNames[i].value*labelNumber).
-                        arg(intervalNames[i].name);
-                if (textWidth*1.1 < pixelPerTime*intervalNames[i].interval) {
-                    painter.drawText(QRect(xpos - textWidth/2, (h - 15)*(double)len/maxLen, textWidth, 15),
-                                     Qt::AlignHCenter,
-                                     text
-                                     );
-                }
-            }
-
-            labelNumber = (labelNumber + 1) % intervalNames[i].count;
+        QFontMetrics metric(font);
+        double lll = (float) metric.width(intervals[i].maxText) / (pixelPerTime*intervals[i].interval);
+        while (lll > 1.0/1.1)
+        {
+            font.setPointSizeF(font.pointSizeF()-0.5);
+            if (font.pointSizeF() < MIN_FONT_SIZE)
+                break;
+            metric = QFontMetrics(font);
+            lll = (float) metric.width(intervals[i].maxText) / (pixelPerTime*intervals[i].interval);
         }
+        fonts << font;
+        if (font.pointSizeF() < MIN_FONT_SIZE)
+            widths << 0;
+        else
+            widths << metric.width(intervals[i].maxText);
     }
+    // draw grid
+    double xpos = r.left() - round(pixelPerTime * pos);
+    int outsideCnt = -xpos / (intervals[level].interval * pixelPerTime);
+    xpos += outsideCnt * intervals[level].interval * pixelPerTime;
+    for (qint64 curTime = intervals[level].interval*outsideCnt; curTime <= pos+range; curTime += intervals[level].interval)
+    {
+        int curLevel = level;
+        for (;curLevel < maxLevel && curTime % intervals[curLevel+1].interval == 0; curLevel++);
+        color.setAlphaF(opacity[curLevel-level]);
+        painter.setPen(color);
+        painter.setFont(fonts[curLevel-level]);
 
+        const IntervalInfo& interval = intervals[curLevel];
+        double lineLen = qMin(1.0, (curLevel-level+1) / (double) maxLen);
+        painter.drawLine(QPoint(xpos, 0), QPoint(xpos, (r.height() - 20)*lineLen));
+        int labelNumber = (curTime/(interval.interval))%interval.count;
+        QString text = QString("%1%2").arg(interval.value*labelNumber).arg(interval.name);
+
+        //if (widths[curLevel-level] * 1.1 < pixelPerTime*interval.interval)
+        if (widths[curLevel-level])
+        {
+            if (curLevel == 0)
+            {
+                painter.save();
+                painter.translate(xpos-3, (r.height() - 17) * lineLen);
+                painter.rotate(90);
+                painter.drawText(2, 0, text);
+                painter.restore();
+            }
+            else 
+            {
+                QRectF textRect(xpos - MAX_LABEL_WIDTH/2, (r.height() - 17) * lineLen, MAX_LABEL_WIDTH, 128);
+                if (textRect.left() < 0 && pos == 0)
+                    textRect.setLeft(0);
+                painter.drawText(textRect, Qt::AlignHCenter, text);
+            }
+        }
+        xpos += intervals[level].interval * pixelPerTime;
+    }
+    // draw cursor vertical line
     painter.setPen(QPen(Qt::red, 3));
-    int xpos = x + m_parent->m_slider->value()*w / m_parent->sliderLength();
+    xpos = r.left() + m_parent->m_slider->value() * (r.width()-handleThickness-1) / m_parent->sliderLength();
     painter.drawLine(QPoint(xpos, 0), QPoint(xpos, height()));
 }
 
@@ -265,7 +331,7 @@ void TimeLine::mouseReleaseEvent(QMouseEvent *me)
 TimeSlider::TimeSlider(QWidget *parent) :
     QWidget(parent),
     m_slider(new QSlider(this)),
-    m_frame(new TimeLine(this)),
+    m_frame(0),
     m_currentValue(0),
     m_maximumValue(1000*10), // 10 sec
     m_viewPortPos(0),
@@ -277,6 +343,8 @@ TimeSlider::TimeSlider(QWidget *parent) :
     m_animation(new QPropertyAnimation(this, "viewPortPos")),
     m_centralise(true)
 {
+    m_frame = new TimeLine(this);
+    setAttribute(Qt::WA_TranslucentBackground);
     m_slider->setOrientation(Qt::Horizontal);
     m_slider->setMaximum(1000);
     m_slider->installEventFilter(this);
@@ -334,7 +402,6 @@ void TimeSlider::setCurrentValue(qint64 value)
     updateSlider();
 
     update();
-
 
     centraliseSlider();
     emit currentValueChanged(m_currentValue);
@@ -409,6 +476,16 @@ double TimeSlider::scalingFactor() const
     return m_scalingFactor;
 }
 
+double TimeSlider::minOpacity() const
+{
+    return m_frame ? m_frame->minOpacity() : 0.0;
+}
+
+void TimeSlider::setMinOpacity(double value)
+{
+    m_frame->setMinOpacity(value);
+}
+
 void TimeSlider::setScalingFactor(double factor)
 {
     double oldfactor = m_scalingFactor;
@@ -462,7 +539,7 @@ void TimeSlider::zoomOut()
 void TimeSlider::setViewPortPos(double v)
 {
     static double prev = 0;
-    qDebug() << "delta" << prev-v;
+    //qDebug() << "delta" << prev-v;
     prev = v;
     qint64 value = v;
     if (value < 0)
@@ -527,13 +604,10 @@ void TimeSlider::updateSlider()
 void TimeSlider::centraliseSlider()
 {
     if (m_centralise) {
-                    if (m_frame->isDragging() || (m_sliderPressed && m_animation->state() != QAbstractAnimation::Running /*&& !m_userInput*/)) {
-//        if (m_frame->isDragging()) {
+        if (m_frame->isDragging() || (!m_sliderPressed && m_animation->state() != QAbstractAnimation::Running /*&& !m_userInput*/)) {
             setViewPortPos(m_currentValue - sliderRange()/2);
-            return;
         }
-
-        if (m_animation->state() != QPropertyAnimation::Running && !m_sliderPressed) {
+        else if (m_animation->state() != QPropertyAnimation::Running && !m_sliderPressed) {
                 m_animation->stop();
             m_animation->setDuration(500);
             m_animation->setEasingCurve(QEasingCurve::InOutQuad);
@@ -548,4 +622,9 @@ void TimeSlider::centraliseSlider()
             m_animation->start();
         }
     }
+}
+
+void TimeSlider::onWheelAnimationFinished()
+{
+    m_frame->wheelAnimationFinished();
 }

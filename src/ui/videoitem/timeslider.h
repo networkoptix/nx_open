@@ -17,16 +17,19 @@ class TimeSlider : public QWidget
     Q_PROPERTY(qint64 currentValue READ currentValue WRITE setCurrentValue NOTIFY currentValueChanged)
     Q_PROPERTY(qint64 maximumValue READ maximumValue WRITE setMaximumValue NOTIFY maximumValueChanged)
     Q_PROPERTY(double scalingFactor READ scalingFactor WRITE setScalingFactor NOTIFY scalingFactorChanged)
+    Q_PROPERTY(double minOpacity READ minOpacity WRITE setMinOpacity)
 
     Q_PROPERTY(double viewPortPos READ viewPortPos WRITE setViewPortPos)
 public:
 //    enum Mode { TimeMode, DateMode };
 
     explicit TimeSlider(QWidget *parent = 0);
+    ~TimeSlider() {}
 
     qint64 currentValue() const;
     qint64 maximumValue() const; // TODO: use min and max, not length
     double scalingFactor() const;
+    double minOpacity() const;
 
 //    Mode mode() const;
 //    void setMode(Mode mode);
@@ -50,10 +53,12 @@ public slots:
     void setCurrentValue(qint64 value);
     void setMaximumValue(qint64 value);
     void setScalingFactor(double factor);
+    void setMinOpacity(double value);
 
     void zoomIn();
     void zoomOut();
-
+private slots:
+    void onWheelAnimationFinished();
 private:
     QSlider *m_slider;
     TimeLine *m_frame;
@@ -63,6 +68,7 @@ private:
     qint64 m_viewPortPos;
 
     double m_scalingFactor;
+    double m_minOpacity;
     bool m_userInput;
     bool m_sliderPressed;
     int m_delta;
