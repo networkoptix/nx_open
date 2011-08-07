@@ -36,7 +36,6 @@ class TimeLine : public QFrame
     QPropertyAnimation *m_wheelAnimation;
     QPropertyAnimation *m_lineAnimation;
     QPropertyAnimation *m_opacityAnimation;
-    int length;
     bool m_dragging;
     float m_minOpacity;
     float m_scaleSpeed;
@@ -269,32 +268,32 @@ void TimeLine::mouseMoveEvent(QMouseEvent *me)
 {
     if (me->buttons() & Qt::LeftButton) {
         // in fact, we need to use (width - slider handle thinkness/2), but it is ok without it
-        qint64 length = m_parent->sliderRange();
-        int dx = m_previousPos.x() - me->pos().x();
-        if (abs(dx) > QApplication::startDragDistance())
-            m_dragging = true;
-        this->length = dx;
-        qint64 dl = length/width()*dx;
+        QPoint dpos = m_previousPos - me->pos();
+
+        if (!m_dragging && abs(dpos.manhattanLength()) < QApplication::startDragDistance())
+            return;
+
+        m_dragging = true;
+
+        qint64 dtime = m_parent->sliderRange()/width()*dpos.x();
         m_parent->m_slider->setSliderDown(true);
-//        m_parent->setViewPortPos(m_parent->viewPortPos() + dl);
+
         if (m_parent->centralise()) {
-            m_parent->setCurrentValue(m_parent->currentValue() + dl);
+            m_parent->setCurrentValue(m_parent->currentValue() + dtime);
 //            m_parent->centraliseSlider();
         }
-            else
-            m_parent->setViewPortPos(m_parent->viewPortPos() + dl);
+        else
+            m_parent->setViewPortPos(m_parent->viewPortPos() + dtime);
+
         m_parent->m_slider->setSliderDown(false);
         m_previousPos = me->pos();
     }
-//    qDebug() << t.elapsed();
-//    t.restart();
 }
 
 void TimeLine::mousePressEvent(QMouseEvent *me)
 {
     if (me->button() == Qt::LeftButton) {
         m_previousPos = me->pos();
-        length = 0;
         m_lineAnimation->stop();
 //        t.start();
     }
@@ -403,7 +402,7 @@ void TimeSlider::setCurrentValue(qint64 value)
 
     update();
 
-    centraliseSlider();
+//    centraliseSlider();
     emit currentValueChanged(m_currentValue);
 
 //    if (!m_sliderPressed)
@@ -419,9 +418,10 @@ void TimeSlider::onSliderPressed()
 
 void TimeSlider::onSliderReleased()
 {
+    centraliseSlider();
+
     m_sliderPressed = false;
 
-//    centraliseSlider();
 
 //    if (!m_centralise)
 //        return;
@@ -607,7 +607,7 @@ void TimeSlider::centraliseSlider()
         if (m_frame->isDragging() || (!m_sliderPressed && m_animation->state() != QAbstractAnimation::Running /*&& !m_userInput*/)) {
             setViewPortPos(m_currentValue - sliderRange()/2);
         }
-        else if (m_animation->state() != QPropertyAnimation::Running && !m_sliderPressed) {
+        else if (m_animation->state() != QPropertyAnimation::Running /*&& !m_sliderPressed*/) {
                 m_animation->stop();
             m_animation->setDuration(500);
             m_animation->setEasingCurve(QEasingCurve::InOutQuad);
