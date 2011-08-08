@@ -34,10 +34,16 @@ public:
 };
 Q_GLOBAL_STATIC(ProxyStyle, proxyStyle)
 
+QVariant qint64Interpolator(const qint64 &start, const qint64 &end, qreal progress)
+{
+    return start + (double)(end - start)*progress;
+}
+
 class TimeLine : public QFrame
 {
     TimeSlider *m_parent;
     QPoint m_previousPos;
+    int length;
     QPropertyAnimation *m_lineAnimation;
     QPropertyAnimation *m_opacityAnimation;
     QPropertyAnimation *m_wheelAnimation;
@@ -50,7 +56,7 @@ public:
     TimeLine(TimeSlider *parent) :
         QFrame(parent),
         m_parent(parent),
-        m_lineAnimation(new QPropertyAnimation(m_parent, "viewPortPos")),
+        m_lineAnimation(new QPropertyAnimation(m_parent, "currentValue")),
         m_opacityAnimation(new QPropertyAnimation(m_parent, "minOpacity")),
         m_wheelAnimation(new QPropertyAnimation(m_parent, "scalingFactor")),
         m_dragging(false),
@@ -285,6 +291,7 @@ void TimeLine::mouseMoveEvent(QMouseEvent *me)
 
         m_dragging = true;
         m_previousPos = me->pos();
+        length = dpos.x();
 
         qint64 dtime = m_parent->sliderRange()/width()*dpos.x();
 
@@ -308,14 +315,32 @@ void TimeLine::mousePressEvent(QMouseEvent *me)
         m_parent->m_slider->setSliderDown(true);
         m_previousPos = me->pos();
         m_lineAnimation->stop();
+        length = 0;
     }
 }
 
 void TimeLine::mouseReleaseEvent(QMouseEvent *me)
 {
     if (me->button() == Qt::LeftButton) {
-        m_dragging = false;
-        m_parent->m_slider->setSliderDown(false);
+        if (m_dragging) {
+            m_dragging = false;
+            m_parent->m_slider->setSliderDown(false);
+
+            if (abs(length) > 5) {
+                int dx = length*2/**(35.0/t.elapsed())*/;
+
+                qint64 range = m_parent->sliderRange();
+                qint64 dl = range/width()*dx;
+                m_lineAnimation->setStartValue(m_parent->viewPortPos());
+                m_lineAnimation->setEasingCurve(QEasingCurve::OutQuad);
+                m_lineAnimation->setEndValue(m_parent->viewPortPos() + dl);
+                m_lineAnimation->setDuration(1000/* + abs(length)*/);
+                //            m_lineAnimation->start();
+            }
+        } else {
+            qint64 time = m_parent->viewPortPos() + m_parent->sliderRange()/width()*me->pos().x();
+            m_parent->setCurrentValue(time);
+        }
     }
 }
 
@@ -343,6 +368,8 @@ TimeSlider::TimeSlider(QWidget *parent) :
     m_animation(new QPropertyAnimation(this, "viewPortPos")),
     m_centralise(true)
 {
+    qRegisterAnimationInterpolator<qint64>(qint64Interpolator);
+
     m_frame = new TimeLine(this);
     setAttribute(Qt::WA_TranslucentBackground);
     m_slider->setOrientation(Qt::Horizontal);
@@ -454,16 +481,6 @@ double TimeSlider::scalingFactor() const
     return m_scalingFactor;
 }
 
-double TimeSlider::minOpacity() const
-{
-    return m_frame ? m_frame->minOpacity() : 0.0;
-}
-
-void TimeSlider::setMinOpacity(double value)
-{
-    m_frame->setMinOpacity(value);
-}
-
 void TimeSlider::setScalingFactor(double factor)
 {
     double oldfactor = m_scalingFactor;
@@ -472,6 +489,16 @@ void TimeSlider::setScalingFactor(double factor)
         m_scalingFactor = oldfactor;
     //setViewPortPos(currentValue() - m_slider->value()*delta());
     setViewPortPos(currentValue() - sliderRange()/2);
+}
+
+double TimeSlider::minOpacity() const
+{
+    return m_frame ? m_frame->minOpacity() : 0.0;
+}
+
+void TimeSlider::setMinOpacity(double value)
+{
+    m_frame->setMinOpacity(value);
 }
 
 //TimeSlider::Mode TimeSlider::mode() const
@@ -513,9 +540,8 @@ void TimeSlider::zoomOut()
     setScalingFactor(scalingFactor() - 1);
 }
 
-void TimeSlider::setViewPortPos(double v)
+void TimeSlider::setViewPortPos(qint64 value)
 {
-    qint64 value = v;
     if (value < 0)
         value = 0;
     else if (value > maximumValue() - sliderRange())
@@ -542,7 +568,7 @@ void TimeSlider::onSliderValueChanged(int value)
     }
 }
 
-double TimeSlider::viewPortPos() const
+qint64 TimeSlider::viewPortPos() const
 {
     return m_viewPortPos;
 }
@@ -589,7 +615,7 @@ void TimeSlider::centraliseSlider()
             setViewPortPos(m_currentValue - sliderRange()/2);
         }
         else if (m_animation->state() != QPropertyAnimation::Running /*&& !m_sliderPressed*/) {
-                m_animation->stop();
+            m_animation->stop();
             m_animation->setDuration(500);
             m_animation->setEasingCurve(QEasingCurve::InOutQuad);
             qint64 newViewortPos = m_currentValue - sliderRange()/2; // center
