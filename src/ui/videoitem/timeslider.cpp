@@ -121,7 +121,8 @@ void TimeLine::wheelEvent(QWheelEvent *event)
         } else {
             m_wheelAnimation->setDuration(m_wheelAnimation->currentTime() + WHEEL_ANIMATION_DURATION);
         }
-    } else 
+    }
+    else
     {
         m_scaleSpeed = 1;
         m_wheelAnimation->stop();
@@ -366,7 +367,7 @@ TimeSlider::TimeSlider(QWidget *parent) :
     m_delta(0),
 //    m_mode(TimeMode),
     m_animation(new QPropertyAnimation(this, "viewPortPos")),
-    m_centralise(true)
+    m_centralise(false)
 {
     qRegisterAnimationInterpolator<qint64>(qint64Interpolator);
 
@@ -615,12 +616,16 @@ void TimeSlider::centraliseSlider()
             setViewPortPos(m_currentValue - sliderRange()/2);
         }
         else if (m_animation->state() != QPropertyAnimation::Running /*&& !m_sliderPressed*/) {
-            m_animation->stop();
-            m_animation->setDuration(500);
-            m_animation->setEasingCurve(QEasingCurve::InOutQuad);
             qint64 newViewortPos = m_currentValue - sliderRange()/2; // center
             newViewortPos = newViewortPos < 0 ? 0 : newViewortPos;
             newViewortPos = newViewortPos > maximumValue() - sliderRange() ? maximumValue() - sliderRange() : newViewortPos;
+            if (abs(newViewortPos - viewPortPos()) < 2*delta()) {
+                setViewPortPos(m_currentValue - sliderRange()/2);
+                return;
+            }
+            m_animation->stop();
+            m_animation->setDuration(500);
+            m_animation->setEasingCurve(QEasingCurve::InOutQuad);
 
             double start = viewPortPos();
             double end = newViewortPos;
