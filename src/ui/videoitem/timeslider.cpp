@@ -69,7 +69,14 @@ public:
     }
 
     bool isDragging() const { return m_dragging; }
-    void setMinOpacity(double value) { m_minOpacity = value; }
+    void setMinOpacity(double value)
+    { 
+        if (m_minOpacity != value)
+        {
+            m_minOpacity = value; 
+            update();
+        }
+    }
     double minOpacity() const { return m_minOpacity; }
     void wheelAnimationFinished();
     void wheelEvent(QWheelEvent *);
@@ -629,7 +636,7 @@ void TimeSlider::centraliseSlider()
             qint64 newViewortPos = m_currentValue - sliderRange()/2; // center
             newViewortPos = newViewortPos < 0 ? 0 : newViewortPos;
             newViewortPos = newViewortPos > maximumValue() - sliderRange() ? maximumValue() - sliderRange() : newViewortPos;
-            if (abs(newViewortPos - viewPortPos()) < 2*delta()) {
+            if (qAbs(newViewortPos - viewPortPos()) < 2*delta()) {
                 setViewPortPos(m_currentValue - sliderRange()/2);
                 return;
             }
