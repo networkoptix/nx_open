@@ -302,7 +302,7 @@ void TimeLine::mouseMoveEvent(QMouseEvent *me)
         m_previousPos = me->pos();
         length = dpos.x();
 
-        qint64 dtime = m_parent->sliderRange()/width()*dpos.x();
+        qint64 dtime = round((double) m_parent->sliderRange()/width()*dpos.x());
 
 
         
