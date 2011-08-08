@@ -207,7 +207,7 @@ void TimeLine::paintEvent(QPaintEvent *ev)
 
     const int minWidth = 3;
 
-    unsigned level = 0;
+    int level = 0;
     for ( ; minWidth > pixelPerTime*intervals[level].interval && level < arraysize(intervals)-1; level++) {}
 
     unsigned maxLevel = level;
@@ -249,11 +249,13 @@ void TimeLine::paintEvent(QPaintEvent *ev)
     xpos += outsideCnt * intervals[level].interval * pixelPerTime;
     for (qint64 curTime = intervals[level].interval*outsideCnt; curTime <= pos+range; curTime += intervals[level].interval)
     {
-        unsigned curLevel = level;
-        for ( ; curLevel < maxLevel && curTime % intervals[curLevel+1].interval == 0; curLevel++) {}
-        color.setAlphaF(opacity[curLevel-level]);
+        int curLevel = level;
+        for ( ; curLevel < arraysize(intervals)-2 && curTime % intervals[curLevel+1].interval == 0; curLevel++) {}
+        int arrayIndex = qMin(curLevel-level, opacity.size()-1);
+
+        color.setAlphaF(opacity[arrayIndex]);
         painter.setPen(color);
-        painter.setFont(fonts[curLevel-level]);
+        painter.setFont(fonts[arrayIndex]);
 
         const IntervalInfo& interval = intervals[curLevel];
         double lineLen = qMin(1.0, (curLevel-level+1) / (double) maxLen);
@@ -261,8 +263,7 @@ void TimeLine::paintEvent(QPaintEvent *ev)
         int labelNumber = (curTime/(interval.interval))%interval.count;
         QString text = QString("%1%2").arg(interval.value*labelNumber).arg(interval.name);
 
-        //if (widths[curLevel-level] * 1.1 < pixelPerTime*interval.interval)
-        if (widths[curLevel-level])
+        if (widths[arrayIndex])
         {
             if (curLevel == 0)
             {
@@ -274,7 +275,7 @@ void TimeLine::paintEvent(QPaintEvent *ev)
             }
             else 
             {
-                QRectF textRect(xpos - widths[curLevel-level]/2, (r.height() - 17) * lineLen, widths[curLevel-level], 128);
+                QRectF textRect(xpos - widths[arrayIndex]/2, (r.height() - 17) * lineLen, widths[arrayIndex], 128);
                 if (textRect.left() < 0 && pos == 0)
                     textRect.setLeft(0);
                 painter.drawText(textRect, Qt::AlignHCenter, text);
