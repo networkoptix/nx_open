@@ -95,6 +95,7 @@ protected:
 
     void updateSlider();
     void centraliseSlider();
+    virtual bool eventFilter(QObject *target, QEvent *event);
 
     friend class TimeLine;
 };

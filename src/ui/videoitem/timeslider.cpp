@@ -72,12 +72,12 @@ public:
     void setMinOpacity(double value) { m_minOpacity = value; }
     double minOpacity() const { return m_minOpacity; }
     void wheelAnimationFinished();
+    void wheelEvent(QWheelEvent *);
 protected:
     void paintEvent(QPaintEvent *);
     void mouseMoveEvent(QMouseEvent *);
     void mousePressEvent(QMouseEvent *);
     void mouseReleaseEvent(QMouseEvent *);
-    void wheelEvent(QWheelEvent *);
     void drawGradient(QPainter& painter, const QRectF& r);
 };
 
@@ -352,6 +352,16 @@ void TimeLine::mouseReleaseEvent(QMouseEvent *me)
     on scalingFactor. Also TimeSlider allows to zoom in/out scale of time line, which allows to
     navigate more accurate.
 */
+
+bool TimeSlider::eventFilter(QObject *target, QEvent *event)
+{
+    if (event->type() == QEvent::Wheel && target == m_slider)
+    {
+        m_frame->wheelEvent((QWheelEvent*) event);
+        return true;
+    }
+    return false;
+}
 
 TimeSlider::TimeSlider(QWidget *parent) :
     QWidget(parent),
