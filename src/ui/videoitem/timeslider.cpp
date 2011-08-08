@@ -86,7 +86,7 @@ void TimeLine::wheelAnimationFinished()
 void TimeLine::wheelEvent(QWheelEvent *event)
 {
     static const float SCALE_FACTOR = 2000.0;
-    static const int WHEEL_ANIMATION_DURATION = 250;
+    static const int WHEEL_ANIMATION_DURATION = 500;
     //static const float SCALE_FACTOR = 120.0;
     int delta = event->delta();
     m_opacityAnimation->stop();
@@ -102,7 +102,6 @@ void TimeLine::wheelEvent(QWheelEvent *event)
     if (abs(delta) == 120)
     {
         m_scaleSpeed *= 1.2;
-        cl_log.log("dt=", m_scaleSpeed, cl_logALWAYS);
         m_wheelAnimation->setEndValue(m_parent->scalingFactor() + delta/SCALE_FACTOR*m_scaleSpeed);
         if (m_wheelAnimation->state() != QPropertyAnimation::Running) 
         {
@@ -210,14 +209,14 @@ void TimeLine::paintEvent(QPaintEvent *ev)
         font.setBold(i == maxLevel);
 
         QFontMetrics metric(font);
-        double lll = (float) metric.width(intervals[i].maxText) / (pixelPerTime*intervals[i].interval);
-        while (lll > 1.0/1.1)
+        double sc = (float) metric.width(intervals[i].maxText) / (pixelPerTime*intervals[i].interval);
+        while (sc > 1.0/1.1)
         {
             font.setPointSizeF(font.pointSizeF()-0.5);
             if (font.pointSizeF() < MIN_FONT_SIZE)
                 break;
             metric = QFontMetrics(font);
-            lll = (float) metric.width(intervals[i].maxText) / (pixelPerTime*intervals[i].interval);
+            sc = (float) metric.width(intervals[i].maxText) / (pixelPerTime*intervals[i].interval);
         }
         fonts << font;
         if (font.pointSizeF() < MIN_FONT_SIZE)
@@ -256,7 +255,7 @@ void TimeLine::paintEvent(QPaintEvent *ev)
             }
             else 
             {
-                QRectF textRect(xpos - MAX_LABEL_WIDTH/2, (r.height() - 17) * lineLen, MAX_LABEL_WIDTH, 128);
+                QRectF textRect(xpos - widths[curLevel-level]/2, (r.height() - 17) * lineLen, widths[curLevel-level], 128);
                 if (textRect.left() < 0 && pos == 0)
                     textRect.setLeft(0);
                 painter.drawText(textRect, Qt::AlignHCenter, text);
@@ -466,7 +465,8 @@ void TimeSlider::setScalingFactor(double factor)
     m_scalingFactor = factor > 0 ? factor : 0;
     if (sliderRange() < 1000)
         m_scalingFactor = oldfactor;
-    setViewPortPos(currentValue() - m_slider->value()*delta());
+    //setViewPortPos(currentValue() - m_slider->value()*delta());
+    setViewPortPos(currentValue() - sliderRange()/2);
 }
 
 //TimeSlider::Mode TimeSlider::mode() const
