@@ -20,6 +20,11 @@ static const double MIN_MIN_OPACITY = 0.1;
 class ProxyStyle : public QProxyStyle
 {
 public:
+    ProxyStyle(): QProxyStyle()
+    {
+        setBaseStyle(qApp->style());
+    }
+
     int styleHint(StyleHint hint, const QStyleOption *option = 0, const QWidget *widget = 0, QStyleHintReturn *returnData = 0) const
     {
         if (hint == QStyle::SH_Slider_AbsoluteSetButtons)
@@ -351,7 +356,6 @@ TimeSlider::TimeSlider(QWidget *parent) :
     m_slider->installEventFilter(this);
 
     ProxyStyle *s = proxyStyle();
-    s->setBaseStyle(qApp->style());
     m_slider->setStyle(s);
 
     m_frame->setFrameShape(QFrame::WinPanel);
