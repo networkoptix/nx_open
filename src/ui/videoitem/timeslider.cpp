@@ -33,9 +33,9 @@ class TimeLine : public QFrame
 {
     TimeSlider *m_parent;
     QPoint m_previousPos;
-    QPropertyAnimation *m_wheelAnimation;
     QPropertyAnimation *m_lineAnimation;
     QPropertyAnimation *m_opacityAnimation;
+    QPropertyAnimation *m_wheelAnimation;
     bool m_dragging;
     float m_minOpacity;
     float m_scaleSpeed;
@@ -45,9 +45,9 @@ public:
     TimeLine(TimeSlider *parent) :
         QFrame(parent),
         m_parent(parent),
-        m_wheelAnimation(new QPropertyAnimation(m_parent, "scalingFactor")),
-        m_opacityAnimation(new QPropertyAnimation(m_parent, "minOpacity")),
         m_lineAnimation(new QPropertyAnimation(m_parent, "viewPortPos")),
+        m_opacityAnimation(new QPropertyAnimation(m_parent, "minOpacity")),
+        m_wheelAnimation(new QPropertyAnimation(m_parent, "scalingFactor")),
         m_dragging(false),
         m_minOpacity(MAX_MIN_OPACITY),
         m_scaleSpeed(1.0)
@@ -185,11 +185,11 @@ void TimeLine::paintEvent(QPaintEvent *ev)
 
     const int minWidth = 3;
 
-    int level = 0;
-    for (;minWidth > pixelPerTime*intervals[level].interval && level < arraysize(intervals)-1; level++);
+    unsigned level = 0;
+    for ( ; minWidth > pixelPerTime*intervals[level].interval && level < arraysize(intervals)-1; level++) {}
 
-    int maxLevel = level;
-    for (; maxLevel < arraysize(intervals)-1 && intervals[maxLevel].interval < range; maxLevel++);
+    unsigned maxLevel = level;
+    for ( ; maxLevel < arraysize(intervals)-1 && intervals[maxLevel].interval < range; maxLevel++) {}
     int maxLen = maxLevel - level;
 
     QColor color = pal.color(QPalette::Text);
@@ -197,7 +197,7 @@ void TimeLine::paintEvent(QPaintEvent *ev)
     QVector<float> opacity;
     QVector<int> widths;
     QVector<QFont> fonts;
-    for (int i = level; i <= maxLevel; ++i)
+    for (unsigned i = level; i <= maxLevel; ++i)
     {
         float k = (pixelPerTime*intervals[i].interval - minWidth)/40.0;
         opacity << qMax(m_minOpacity, qMin(k, 1.0f));
@@ -227,8 +227,8 @@ void TimeLine::paintEvent(QPaintEvent *ev)
     xpos += outsideCnt * intervals[level].interval * pixelPerTime;
     for (qint64 curTime = intervals[level].interval*outsideCnt; curTime <= pos+range; curTime += intervals[level].interval)
     {
-        int curLevel = level;
-        for (;curLevel < maxLevel && curTime % intervals[curLevel+1].interval == 0; curLevel++);
+        unsigned curLevel = level;
+        for ( ; curLevel < maxLevel && curTime % intervals[curLevel+1].interval == 0; curLevel++) {}
         color.setAlphaF(opacity[curLevel-level]);
         painter.setPen(color);
         painter.setFont(fonts[curLevel-level]);
@@ -337,7 +337,7 @@ TimeSlider::TimeSlider(QWidget *parent) :
     m_maximumValue(1000*10), // 10 sec
     m_viewPortPos(0),
     m_scalingFactor(0),
-    m_userInput(true),
+    m_isUserInput(false),
     m_sliderPressed(false),
     m_delta(0),
 //    m_mode(TimeMode),
@@ -371,7 +371,6 @@ TimeSlider::TimeSlider(QWidget *parent) :
 
     connect(m_slider, SIGNAL(sliderPressed()), SLOT(onSliderPressed()));
     connect(m_slider, SIGNAL(sliderReleased()), SLOT(onSliderReleased()));
-    bulka = false;
 }
 
 /*!
@@ -398,15 +397,15 @@ void TimeSlider::setCurrentValue(qint64 value)
     else if (value > m_viewPortPos + sliderRange())
         setViewPortPos(value - sliderRange());
     */
-    qint64 delta = m_currentValue - value;
     m_currentValue = qMin(value, maximumValue());
 
     updateSlider();
 
     update();
 
-    if (!bulka)
+    if (!m_isUserInput)
         centraliseSlider();
+
     emit currentValueChanged(m_currentValue);
 
 //    if (!m_sliderPressed)
@@ -564,10 +563,11 @@ void TimeSlider::setViewPortPos(double v)
 
 void TimeSlider::onSliderValueChanged(int value)
 {
-    if (m_userInput) {
-        bulka = true;
+    if (!m_isUserInput) {
+        m_isUserInput = true;
+        qDebug() << m_isUserInput;
         setCurrentValue(fromSlider(value));
-        bulka = false;
+        m_isUserInput = false;
     }
 }
 
@@ -603,9 +603,11 @@ qint64 TimeSlider::sliderRange()
 
 void TimeSlider::updateSlider()
 {
-    m_userInput = false;
-    m_slider->setValue(toSlider(m_currentValue));
-    m_userInput = true;
+    if (!m_isUserInput) {
+        m_isUserInput = true;
+        m_slider->setValue(toSlider(m_currentValue));
+        m_isUserInput = false;
+    }
 }
 
 void TimeSlider::centraliseSlider()

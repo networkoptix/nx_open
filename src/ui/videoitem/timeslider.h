@@ -68,8 +68,7 @@ private:
     qint64 m_viewPortPos;
 
     double m_scalingFactor;
-    double m_minOpacity;
-    bool m_userInput;
+    bool m_isUserInput;
     bool m_sliderPressed;
     int m_delta;
 
@@ -77,7 +76,6 @@ private:
 
     QPropertyAnimation *m_animation;
     bool m_centralise;
-    bool bulka;
 
 protected slots:
     void setViewPortPos(double value);
