@@ -275,17 +275,21 @@ void TimeLine::mouseMoveEvent(QMouseEvent *me)
             return;
 
         m_dragging = true;
+        m_previousPos = me->pos();
 
         qint64 dtime = m_parent->sliderRange()/width()*dpos.x();
 
         if (m_parent->centralise()) {
-            // todo: check bounds
-            m_parent->setCurrentValue(m_parent->currentValue() + dtime);
+            qint64 time = m_parent->currentValue() + dtime;
+            if (time > m_parent->maximumValue() - m_parent->sliderRange()/2)
+                return;
+            if (time < m_parent->sliderRange()/2)
+                return;
+            m_parent->setCurrentValue(time);
         }
         else
             m_parent->setViewPortPos(m_parent->viewPortPos() + dtime);
 
-        m_previousPos = me->pos();
     }
 }
 
@@ -393,11 +397,6 @@ void TimeSlider::setCurrentValue(qint64 value)
         centraliseSlider();
 
     emit currentValueChanged(m_currentValue);
-
-//    if (!m_sliderPressed)
-//        return;
-//    else
-//    centraliseSlider();
 }
 
 void TimeSlider::onSliderPressed()
