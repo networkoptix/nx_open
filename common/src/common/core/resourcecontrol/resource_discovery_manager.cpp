@@ -47,7 +47,7 @@ void QnResourceDiscoveryManager::run()
 
 QnResourceList QnResourceDiscoveryManager::findNewResources(bool& ip_finished)
 {
-    
+    /*/
     bool allow_to_change_ip = allowToChangeresourceIP;
 
 	ip_finished = false;
@@ -267,7 +267,9 @@ END:
 
 	resources.append(notNetworkResources); // move everything to result list
 
+    /**/
 
+    QnResourceList resources;
 
 	return resources;
 
@@ -309,6 +311,7 @@ bool QnResourceDiscoveryManager::checkObviousConflicts(QnResourceList& lst)
 {
 	// this function deals with network resources only 
 
+    /*/
     
 	bool result = false;
 
@@ -354,10 +357,14 @@ bool QnResourceDiscoveryManager::checkObviousConflicts(QnResourceList& lst)
 	}
 
 	return result;
+
+    /**/
+    return true;
 }
 
 void QnResourceDiscoveryManager::fromListToList(QnResourceList& from, QnResourceList& to, int mask, int value)
 {
+    /*
 	QnResourceList::iterator it = from.begin();
 	while (it!=from.end())
 	{
@@ -371,6 +378,7 @@ void QnResourceDiscoveryManager::fromListToList(QnResourceList& from, QnResource
 		else
 			++it;
 	}
+    /**/
 
 }
 
