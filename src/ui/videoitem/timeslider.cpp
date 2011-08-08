@@ -377,7 +377,7 @@ TimeSlider::TimeSlider(QWidget *parent) :
     m_delta(0),
 //    m_mode(TimeMode),
     m_animation(new QPropertyAnimation(this, "viewPortPos")),
-    m_centralise(false)
+    m_centralise(true)
 {
     qRegisterAnimationInterpolator<qint64>(qint64Interpolator);
 
