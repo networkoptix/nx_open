@@ -44,6 +44,7 @@ class TimeLine : public QFrame
     bool m_dragging;
     float m_minOpacity;
     float m_scaleSpeed;
+    int m_prevWheelDelta;
 
 public:
     TimeLine(TimeSlider *parent) :
@@ -54,7 +55,8 @@ public:
         m_wheelAnimation(new QPropertyAnimation(m_parent, "scalingFactor")),
         m_dragging(false),
         m_minOpacity(MAX_MIN_OPACITY),
-        m_scaleSpeed(1.0)
+        m_scaleSpeed(1.0),
+        m_prevWheelDelta(INT_MAX)
     {
         setAttribute(Qt::WA_TranslucentBackground);
         connect(m_wheelAnimation, SIGNAL(finished()), m_parent, SLOT(onWheelAnimationFinished()));
@@ -99,6 +101,8 @@ void TimeLine::wheelEvent(QWheelEvent *event)
         m_opacityAnimation->setDuration(500);
         m_opacityAnimation->start();
     }
+    if (delta != m_prevWheelDelta)
+        m_scaleSpeed = 1.0;
     if (abs(delta) == 120)
     {
         m_scaleSpeed *= 1.2;
@@ -119,6 +123,7 @@ void TimeLine::wheelEvent(QWheelEvent *event)
     }
     update();
     m_parent->centraliseSlider(); // we need to trigger animation
+    m_prevWheelDelta = delta;
 }
 static const int MAX_LABEL_WIDTH = 64;
 struct IntervalInfo { qint64 interval; int value; const char * name; int count; const char * maxText; };
