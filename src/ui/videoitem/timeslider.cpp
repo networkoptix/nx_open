@@ -318,19 +318,24 @@ void TimeLine::mousePressEvent(QMouseEvent *me)
 void TimeLine::mouseReleaseEvent(QMouseEvent *me)
 {
     if (me->button() == Qt::LeftButton) {
-        m_dragging = false;
-        m_parent->m_slider->setSliderDown(false);
+        if (m_dragging) {
+            m_dragging = false;
+            m_parent->m_slider->setSliderDown(false);
 
-        if (abs(length) > 5) {
-            int dx = length*2/**(35.0/t.elapsed())*/;
+            if (abs(length) > 5) {
+                int dx = length*2/**(35.0/t.elapsed())*/;
 
-            qint64 range = m_parent->sliderRange();
-            qint64 dl = range/width()*dx;
-            m_lineAnimation->setStartValue(m_parent->viewPortPos());
-            m_lineAnimation->setEasingCurve(QEasingCurve::OutQuad);
-            m_lineAnimation->setEndValue(m_parent->viewPortPos() + dl);
-            m_lineAnimation->setDuration(1000/* + abs(length)*/);
-//            m_lineAnimation->start();
+                qint64 range = m_parent->sliderRange();
+                qint64 dl = range/width()*dx;
+                m_lineAnimation->setStartValue(m_parent->viewPortPos());
+                m_lineAnimation->setEasingCurve(QEasingCurve::OutQuad);
+                m_lineAnimation->setEndValue(m_parent->viewPortPos() + dl);
+                m_lineAnimation->setDuration(1000/* + abs(length)*/);
+                //            m_lineAnimation->start();
+            }
+        } else {
+            qint64 time = m_parent->viewPortPos() + m_parent->sliderRange()/width()*me->pos().x();
+            m_parent->setCurrentValue(time);
         }
     }
 }
