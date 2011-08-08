@@ -91,7 +91,7 @@ void TimeLine::wheelEvent(QWheelEvent *event)
     int delta = event->delta();
     m_opacityAnimation->stop();
     //setMinOpacity(0.1);
-    if (m_opacityAnimation->state() == QPropertyAnimation::Stopped || m_opacityAnimation->startValue().toFloat() < m_opacityAnimation->endValue().toFloat())
+    if (m_opacityAnimation->endValue().toFloat() != MIN_MIN_OPACITY)
     {
         m_opacityAnimation->stop();
         m_opacityAnimation->setStartValue(minOpacity());
