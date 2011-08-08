@@ -303,12 +303,14 @@ void TimeLine::mouseMoveEvent(QMouseEvent *me)
 
         qint64 dtime = m_parent->sliderRange()/width()*dpos.x();
 
+
+        
         if (m_parent->centralise()) {
+            if (dtime < 0)
+                dtime = qMax(dtime, -m_parent->viewPortPos());
+            else
+                dtime = qMin(dtime, m_parent->maximumValue() - (m_parent->viewPortPos() + m_parent->sliderRange()));
             qint64 time = m_parent->currentValue() + dtime;
-            if (time > m_parent->maximumValue() - m_parent->sliderRange()/2)
-                return;
-            if (time < m_parent->sliderRange()/2)
-                return;
             m_parent->setCurrentValue(time);
         }
         else
