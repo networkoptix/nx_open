@@ -26,6 +26,8 @@ public:
 	bool isValid() const { return m_isValid; }
 
     uint playTimeElapsed();
+    void setVolumeLevel(float value); // in range 0..1
+    float getVolumeLevel() const;
 
 	bool play(const quint8* data, uint size);
     void suspend();
@@ -46,7 +48,7 @@ private:
     void clearBuffers(bool clearAll);
 
 private:
-    QMutex m_mtx;
+    mutable QMutex m_mtx;
 	QAudioFormat m_audioFormat;
 
 #ifdef OPENAL_WIN32_ONLY

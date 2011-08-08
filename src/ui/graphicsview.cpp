@@ -820,7 +820,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
                 if (m_movingWnd==2) // if this is a first movement
                 {
                     item->setOriginallyArranged(item->isArranged());
-                    item->setOroginalPos(wnd_pos);
+                    item->setOriginalPos(wnd_pos);
                 }
 
                 item->setPos(wnd_pos+delta);

@@ -6,7 +6,7 @@ class QGraphicsItem;
 
 class CLItemTransform : public CLAnimation
 {
-	Q_OBJECT
+    Q_OBJECT
     Q_PROPERTY(qreal zoom	READ getZoom WRITE setZoom)
     Q_PROPERTY(qreal rotation	READ getRotation WRITE setRotation)
 public:
@@ -17,8 +17,8 @@ public:
 	qreal scaleTozoom(qreal scale) const;
 
 	void zoom_abs(qreal target_zoom, int duration, int delay);
-	void z_rotate_delta(QPointF center, qreal angle, int duration, int delay);
-	void z_rotate_abs(QPointF center, qreal angle, int duration, int delay );
+	void z_rotate_delta(const QPointF &center, qreal angle, int duration, int delay);
+	void z_rotate_abs(const QPointF &center, qreal angle, int duration, int delay );
 	void move_abs(QPointF pos, int duration, int delay);
 
 	qreal getRotation() const;
