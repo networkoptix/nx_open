@@ -348,7 +348,7 @@ void TimeLine::mouseReleaseEvent(QMouseEvent *me)
                 //            m_lineAnimation->start();
             }
         } else {
-            qint64 time = m_parent->viewPortPos() + m_parent->sliderRange()/width()*me->pos().x();
+            qint64 time = m_parent->viewPortPos() + round((double) m_parent->sliderRange()/width()*me->pos().x());
             m_parent->setCurrentValue(time);
         }
         m_parent->m_slider->setSliderDown(false);
