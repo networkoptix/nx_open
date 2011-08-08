@@ -516,12 +516,12 @@ void TimeSlider::setViewPortPos(double v)
     else if (value > maximumValue() - sliderRange())
         value = maximumValue() - sliderRange();
 
+    m_viewPortPos = value;
+
     if (m_currentValue < m_viewPortPos)
         setCurrentValue(m_viewPortPos);
     else if (m_currentValue > m_viewPortPos + sliderRange())
         setCurrentValue(m_viewPortPos + sliderRange());
-
-    m_viewPortPos = value;
 
     updateSlider();
     update();
