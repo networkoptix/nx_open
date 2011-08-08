@@ -77,6 +77,7 @@ private:
 
     QPropertyAnimation *m_animation;
     bool m_centralise;
+    bool bulka;
 
 protected slots:
     void setViewPortPos(double value);

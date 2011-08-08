@@ -110,6 +110,8 @@ void TimeLine::wheelEvent(QWheelEvent *event)
         }
     } else 
     {
+        m_scaleSpeed = 1;
+        m_wheelAnimation->stop();
         m_parent->setScalingFactor(m_parent->scalingFactor() + delta/120.0);
     }
     update();
@@ -276,7 +278,6 @@ void TimeLine::mouseMoveEvent(QMouseEvent *me)
         m_dragging = true;
 
         qint64 dtime = m_parent->sliderRange()/width()*dpos.x();
-        m_parent->m_slider->setSliderDown(true);
 
         if (m_parent->centralise()) {
             m_parent->setCurrentValue(m_parent->currentValue() + dtime);
@@ -285,7 +286,6 @@ void TimeLine::mouseMoveEvent(QMouseEvent *me)
         else
             m_parent->setViewPortPos(m_parent->viewPortPos() + dtime);
 
-        m_parent->m_slider->setSliderDown(false);
         m_previousPos = me->pos();
     }
 }
@@ -293,6 +293,7 @@ void TimeLine::mouseMoveEvent(QMouseEvent *me)
 void TimeLine::mousePressEvent(QMouseEvent *me)
 {
     if (me->button() == Qt::LeftButton) {
+        m_parent->m_slider->setSliderDown(true);
         m_previousPos = me->pos();
         m_lineAnimation->stop();
 //        t.start();
@@ -303,6 +304,7 @@ void TimeLine::mouseReleaseEvent(QMouseEvent *me)
 {
     if (me->button() == Qt::LeftButton) {
     m_dragging = false;
+    m_parent->m_slider->setSliderDown(false);
 
 //        if (abs(length) > 5) {
 //            int dx = length*2/**(35.0/t.elapsed())*/;
@@ -369,6 +371,7 @@ TimeSlider::TimeSlider(QWidget *parent) :
 
     connect(m_slider, SIGNAL(sliderPressed()), SLOT(onSliderPressed()));
     connect(m_slider, SIGNAL(sliderReleased()), SLOT(onSliderReleased()));
+    bulka = false;
 }
 
 /*!
@@ -402,7 +405,8 @@ void TimeSlider::setCurrentValue(qint64 value)
 
     update();
 
-//    centraliseSlider();
+    if (!bulka)
+        centraliseSlider();
     emit currentValueChanged(m_currentValue);
 
 //    if (!m_sliderPressed)
@@ -560,8 +564,11 @@ void TimeSlider::setViewPortPos(double v)
 
 void TimeSlider::onSliderValueChanged(int value)
 {
-    if (m_userInput)
+    if (m_userInput) {
+        bulka = true;
         setCurrentValue(fromSlider(value));
+        bulka = false;
+    }
 }
 
 double TimeSlider::viewPortPos() const
