@@ -19,7 +19,7 @@ class TimeSlider : public QWidget
     Q_PROPERTY(double scalingFactor READ scalingFactor WRITE setScalingFactor NOTIFY scalingFactorChanged)
     Q_PROPERTY(double minOpacity READ minOpacity WRITE setMinOpacity)
 
-    Q_PROPERTY(double viewPortPos READ viewPortPos WRITE setViewPortPos)
+    Q_PROPERTY(qint64 viewPortPos READ viewPortPos WRITE setViewPortPos)
 public:
 //    enum Mode { TimeMode, DateMode };
 
@@ -78,12 +78,12 @@ private:
     bool m_centralise;
 
 protected slots:
-    void setViewPortPos(double value);
+    void setViewPortPos(qint64 value);
     void onSliderValueChanged(int value);
     void onSliderReleased();
     void onSliderPressed();
 protected:
-    double viewPortPos() const;
+    qint64 viewPortPos() const;
 
     double delta() const;
 

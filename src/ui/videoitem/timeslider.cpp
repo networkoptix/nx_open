@@ -34,9 +34,9 @@ public:
 };
 Q_GLOBAL_STATIC(ProxyStyle, proxyStyle)
 
-QVariant qint64Interpolator(const qlonglong &start, const qlonglong &end, qreal progress)
+QVariant qint64Interpolator(const qint64 &start, const qint64 &end, qreal progress)
 {
-    return start + ((double)start - end)*progress;
+    return start + (double)(end - start)*progress;
 }
 
 class TimeLine : public QFrame
@@ -330,7 +330,7 @@ void TimeLine::mouseReleaseEvent(QMouseEvent *me)
             m_lineAnimation->setEasingCurve(QEasingCurve::OutQuad);
             m_lineAnimation->setEndValue(m_parent->viewPortPos() + dl);
             m_lineAnimation->setDuration(1000/* + abs(length)*/);
-            m_lineAnimation->start();
+//            m_lineAnimation->start();
         }
     }
 }
@@ -359,7 +359,7 @@ TimeSlider::TimeSlider(QWidget *parent) :
     m_animation(new QPropertyAnimation(this, "viewPortPos")),
     m_centralise(true)
 {
-    qRegisterAnimationInterpolator<qlonglong>(qint64Interpolator);
+    qRegisterAnimationInterpolator<qint64>(qint64Interpolator);
 
     m_frame = new TimeLine(this);
     setAttribute(Qt::WA_TranslucentBackground);
@@ -530,9 +530,8 @@ void TimeSlider::zoomOut()
     setScalingFactor(scalingFactor() - 1);
 }
 
-void TimeSlider::setViewPortPos(double v)
+void TimeSlider::setViewPortPos(qint64 value)
 {
-    qint64 value = v;
     if (value < 0)
         value = 0;
     else if (value > maximumValue() - sliderRange())
@@ -559,7 +558,7 @@ void TimeSlider::onSliderValueChanged(int value)
     }
 }
 
-double TimeSlider::viewPortPos() const
+qint64 TimeSlider::viewPortPos() const
 {
     return m_viewPortPos;
 }
@@ -606,7 +605,7 @@ void TimeSlider::centraliseSlider()
             setViewPortPos(m_currentValue - sliderRange()/2);
         }
         else if (m_animation->state() != QPropertyAnimation::Running /*&& !m_sliderPressed*/) {
-                m_animation->stop();
+            m_animation->stop();
             m_animation->setDuration(500);
             m_animation->setEasingCurve(QEasingCurve::InOutQuad);
             qint64 newViewortPos = m_currentValue - sliderRange()/2; // center
