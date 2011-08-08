@@ -203,7 +203,7 @@ void TimeLine::paintEvent(QPaintEvent *ev)
     for ( ; minWidth > pixelPerTime*intervals[level].interval && level < arraysize(intervals)-1; level++) {}
 
     unsigned maxLevel = level;
-    for ( ; maxLevel < arraysize(intervals)-1 && intervals[maxLevel].interval < range; maxLevel++) {}
+    for ( ; maxLevel < arraysize(intervals)-1 && intervals[maxLevel].interval <= range; maxLevel++) {}
     int maxLen = maxLevel - level;
 
     QColor color = pal.color(QPalette::Text);
