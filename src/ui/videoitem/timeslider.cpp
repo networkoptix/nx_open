@@ -34,10 +34,16 @@ public:
 };
 Q_GLOBAL_STATIC(ProxyStyle, proxyStyle)
 
+QVariant qint64Interpolator(const qlonglong &start, const qlonglong &end, qreal progress)
+{
+    return start + ((double)start - end)*progress;
+}
+
 class TimeLine : public QFrame
 {
     TimeSlider *m_parent;
     QPoint m_previousPos;
+    int length;
     QPropertyAnimation *m_lineAnimation;
     QPropertyAnimation *m_opacityAnimation;
     QPropertyAnimation *m_wheelAnimation;
@@ -49,7 +55,7 @@ public:
     TimeLine(TimeSlider *parent) :
         QFrame(parent),
         m_parent(parent),
-        m_lineAnimation(new QPropertyAnimation(m_parent, "viewPortPos")),
+        m_lineAnimation(new QPropertyAnimation(m_parent, "currentValue")),
         m_opacityAnimation(new QPropertyAnimation(m_parent, "minOpacity")),
         m_wheelAnimation(new QPropertyAnimation(m_parent, "scalingFactor")),
         m_dragging(false),
@@ -281,6 +287,7 @@ void TimeLine::mouseMoveEvent(QMouseEvent *me)
 
         m_dragging = true;
         m_previousPos = me->pos();
+        length = dpos.x();
 
         qint64 dtime = m_parent->sliderRange()/width()*dpos.x();
 
@@ -304,6 +311,7 @@ void TimeLine::mousePressEvent(QMouseEvent *me)
         m_parent->m_slider->setSliderDown(true);
         m_previousPos = me->pos();
         m_lineAnimation->stop();
+        length = 0;
     }
 }
 
@@ -312,6 +320,18 @@ void TimeLine::mouseReleaseEvent(QMouseEvent *me)
     if (me->button() == Qt::LeftButton) {
         m_dragging = false;
         m_parent->m_slider->setSliderDown(false);
+
+        if (abs(length) > 5) {
+            int dx = length*2/**(35.0/t.elapsed())*/;
+
+            qint64 range = m_parent->sliderRange();
+            qint64 dl = range/width()*dx;
+            m_lineAnimation->setStartValue(m_parent->viewPortPos());
+            m_lineAnimation->setEasingCurve(QEasingCurve::OutQuad);
+            m_lineAnimation->setEndValue(m_parent->viewPortPos() + dl);
+            m_lineAnimation->setDuration(1000/* + abs(length)*/);
+            m_lineAnimation->start();
+        }
     }
 }
 
@@ -339,6 +359,8 @@ TimeSlider::TimeSlider(QWidget *parent) :
     m_animation(new QPropertyAnimation(this, "viewPortPos")),
     m_centralise(true)
 {
+    qRegisterAnimationInterpolator<qlonglong>(qint64Interpolator);
+
     m_frame = new TimeLine(this);
     setAttribute(Qt::WA_TranslucentBackground);
     m_slider->setOrientation(Qt::Horizontal);
@@ -450,6 +472,15 @@ double TimeSlider::scalingFactor() const
     return m_scalingFactor;
 }
 
+void TimeSlider::setScalingFactor(double factor)
+{
+    double oldfactor = m_scalingFactor;
+    m_scalingFactor = factor > 0 ? factor : 0;
+    if (sliderRange() < 1000)
+        m_scalingFactor = oldfactor;
+    setViewPortPos(currentValue() - m_slider->value()*delta());
+}
+
 double TimeSlider::minOpacity() const
 {
     return m_frame ? m_frame->minOpacity() : 0.0;
@@ -458,15 +489,6 @@ double TimeSlider::minOpacity() const
 void TimeSlider::setMinOpacity(double value)
 {
     m_frame->setMinOpacity(value);
-}
-
-void TimeSlider::setScalingFactor(double factor)
-{
-    double oldfactor = m_scalingFactor;
-    m_scalingFactor = factor > 0 ? factor : 0;
-    if (sliderRange() < 1000)
-        m_scalingFactor = oldfactor;
-    setViewPortPos(currentValue() - m_slider->value()*delta());
 }
 
 //TimeSlider::Mode TimeSlider::mode() const
