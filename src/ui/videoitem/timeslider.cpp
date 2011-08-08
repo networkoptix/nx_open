@@ -324,7 +324,6 @@ void TimeLine::mouseReleaseEvent(QMouseEvent *me)
     if (me->button() == Qt::LeftButton) {
         if (m_dragging) {
             m_dragging = false;
-            m_parent->m_slider->setSliderDown(false);
 
             if (abs(length) > 5) {
                 int dx = length*2/**(35.0/t.elapsed())*/;
@@ -341,6 +340,7 @@ void TimeLine::mouseReleaseEvent(QMouseEvent *me)
             qint64 time = m_parent->viewPortPos() + m_parent->sliderRange()/width()*me->pos().x();
             m_parent->setCurrentValue(time);
         }
+        m_parent->m_slider->setSliderDown(false);
     }
 }
 
