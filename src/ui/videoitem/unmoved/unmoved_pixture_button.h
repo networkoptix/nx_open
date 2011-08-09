@@ -39,4 +39,21 @@ protected:
     bool m_forwardDirection;
 };
 
+//=============================================================================================
+
+class CLUnMovedPixtureButton : public CLUnMovedPixture
+{
+    Q_OBJECT
+
+public:
+    CLUnMovedPixtureButton(QString name, QGraphicsItem* parent, qreal normal_opacity, qreal active_opacity, QString img, int max_width, int max_height, qreal z);
+    ~CLUnMovedPixtureButton();
+
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+
+Q_SIGNALS:
+    void onPressed(const QString &name);
+};
+
 #endif //unmoved_pixture_button_h_1867

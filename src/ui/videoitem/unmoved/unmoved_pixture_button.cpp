@@ -122,3 +122,26 @@ void CLUnMovedPixture::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
     painter->drawPixmap(boundingRect(), *m_CurrentImg, m_CurrentImg->rect());
 }
+
+
+//========================================================================================================
+CLUnMovedPixtureButton::CLUnMovedPixtureButton(QString name, QGraphicsItem* parent, qreal normal_opacity, qreal active_opacity, QString img, int max_width, int max_height, qreal z):
+CLUnMovedPixture(name, parent, normal_opacity, active_opacity, img, max_width, max_height,  z)
+{
+
+}
+
+CLUnMovedPixtureButton::~CLUnMovedPixtureButton()
+{
+}
+
+void CLUnMovedPixtureButton::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    Q_UNUSED(event);
+}
+
+void CLUnMovedPixtureButton::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    Q_UNUSED(event);
+    emit onPressed(m_name);
+}

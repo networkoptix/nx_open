@@ -39,17 +39,6 @@ void CLAbstractUnmovedItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
     m_underMouse = false;
 }
 
-void CLAbstractUnmovedItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
-{
-    Q_UNUSED(event);
-}
-
-void CLAbstractUnmovedItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-{
-    Q_UNUSED(event);
-    emit onPressed(m_name);
-}
-
 void CLAbstractUnmovedItem::setStaticPos(const QPoint &p)
 {
     m_pos = p;

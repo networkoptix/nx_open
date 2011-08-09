@@ -29,12 +29,6 @@ protected:
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
 
-    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
-
-Q_SIGNALS:
-    void onPressed(const QString &name);
-
 protected:
     QString m_name;
     QGraphicsView* m_view;
