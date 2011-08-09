@@ -205,7 +205,7 @@ void TimeLine::paintEvent(QPaintEvent *ev)
     const qint64 pos = m_parent->viewPortPos();
     const double pixelPerTime = (double) r.width() /range;
 
-    const int minWidth = 3;
+    const int minWidth = 30;
 
     unsigned level = 0;
     for ( ; minWidth > pixelPerTime*intervals[level].interval && level < arraysize(intervals)-1; level++) {}
@@ -221,7 +221,7 @@ void TimeLine::paintEvent(QPaintEvent *ev)
     QVector<QFont> fonts;
     for (unsigned i = level; i <= maxLevel; ++i)
     {
-        float k = (pixelPerTime*intervals[i].interval - minWidth)/40.0;
+        float k = (pixelPerTime*intervals[i].interval - minWidth)/60.0;
         opacity << qMax(m_minOpacity, qMin(k, 1.0f));
         QFont font = m_parent->font();
         font.setPointSize(font.pointSize() + (i >= maxLevel-1) - (i <= level+1));
