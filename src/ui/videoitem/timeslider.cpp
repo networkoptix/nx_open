@@ -217,6 +217,7 @@ void TimeLine::paintEvent(QPaintEvent *ev)
     QColor color = pal.color(QPalette::Text);
 
     QVector<float> opacity;
+    int maxHeight = 0;
     QVector<int> widths;
     QVector<QFont> fonts;
     for (unsigned i = level; i <= maxLevel; ++i)
@@ -239,9 +240,14 @@ void TimeLine::paintEvent(QPaintEvent *ev)
         }
         fonts << font;
         if (font.pointSizeF() < MIN_FONT_SIZE)
+        {
             widths << 0;
+        }
         else
+        {
             widths << metric.width(intervals[i].maxText);
+            maxHeight = maxHeight < metric.height() ? metric.height() : maxHeight;
+        }
     }
     // draw grid
     double xpos = r.left() - round(pixelPerTime * pos);
@@ -268,7 +274,7 @@ void TimeLine::paintEvent(QPaintEvent *ev)
             if (curLevel == 0)
             {
                 painter.save();
-                painter.translate(xpos-3, (r.height() - 17) * lineLen);
+                painter.translate(xpos-3, (r.height() - maxHeight) * lineLen);
                 painter.rotate(90);
                 painter.drawText(2, 0, text);
                 painter.restore();
