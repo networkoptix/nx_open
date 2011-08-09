@@ -265,7 +265,7 @@ void TimeLine::paintEvent(QPaintEvent *ev)
 
         const IntervalInfo& interval = intervals[curLevel];
         double lineLen = qMin(1.0, (curLevel-level+1) / (double) maxLen);
-        painter.drawLine(QPoint(xpos, 0), QPoint(xpos, (r.height() - 20)*lineLen));
+        painter.drawLine(QPoint(xpos, 0), QPoint(xpos, (r.height() - maxHeight - 3)*lineLen));
         int labelNumber = (curTime/(interval.interval))%interval.count;
         QString text = QString("%1%2").arg(interval.value*labelNumber).arg(interval.name);
 
@@ -281,7 +281,7 @@ void TimeLine::paintEvent(QPaintEvent *ev)
             }
             else 
             {
-                QRectF textRect(xpos - widths[arrayIndex]/2, (r.height() - 17) * lineLen, widths[arrayIndex], 128);
+                QRectF textRect(xpos - widths[arrayIndex]/2, (r.height() - maxHeight) * lineLen, widths[arrayIndex], 128);
                 if (textRect.left() < 0 && pos == 0)
                     textRect.setLeft(0);
                 painter.drawText(textRect, Qt::AlignHCenter, text);
