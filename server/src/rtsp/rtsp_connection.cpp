@@ -13,6 +13,7 @@ static const int CODE_INTERNAL_ERROR = 500;
 static const QString ENDL("\r\n");
 static const int RTP_FFMPEG_GENERIC_CODE = 102;
 static const QString RTP_FFMPEG_GENERIC_STR("FFMPEG");
+//static const QString RTP_FFMPEG_GENERIC_STR("mpeg4-generic"); // this line for debugging purpose with VLC player
 static const int MAX_QUEUE_SIZE = 15;
 
 class QnRtspDataProcessor: public QnAbstractDataConsumer
@@ -59,7 +60,9 @@ public:
     QString sessionId;
     QnAbstractMediaStreamDataProvider* dataProvider;
     QnAbstractDataConsumer* dataProcessor;
-    QSharedPointer<QnMediaResource> mediaRes;
+    QnMediaResourcePtr mediaRes; 
+    // associate trackID with RTP/RTCP ports (for TCP mode ports used as logical channel numbers, see RFC 2326)
+    QMap<int, QPair<int,int> > trackPorts; 
 };
 
 void QnRtspConnectionProcessor::sendData(const QByteArray& data)
@@ -188,9 +191,11 @@ void QnRtspConnectionProcessor::parseRequest()
     if (bodyStart >= 0 && d->requestHeaders.value("content-length").toInt() > 0)
         d->requestBody = d->clientRequest.mid(bodyStart + dblDelim.length());
 
-    //QnResourcePtr resource = QnResourcePool::instance().getResourceById(d->requestHeaders.path());
-    QnResourcePtr resource = QnResourcePool::instance().getResourceByUrl(extractMediaName(d->requestHeaders.path()));
-    d->mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
+    if (d->mediaRes == 0)
+    {
+        QnResourcePtr resource = QnResourcePool::instance().getResourceByUrl(extractMediaName(d->requestHeaders.path()));
+        d->mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
+    }
     d->clientRequest.clear();
 }
 
@@ -255,6 +260,19 @@ int QnRtspConnectionProcessor::composeDescribe()
     return CODE_OK;
 }
 
+int QnRtspConnectionProcessor::extractTrackId(const QString& path)
+{
+    int pos = path.lastIndexOf("/");
+    QString trackStr = path.mid(pos+1);
+    if (trackStr.toLower().startsWith("trackid"))
+    {
+        QStringList data = trackStr.split("=");
+        if (data.size() > 1)
+            return data[1].toInt();
+    }
+    return -1;
+}
+
 int QnRtspConnectionProcessor::composeSetup()
 {
     Q_D(QnRtspConnectionProcessor);
@@ -264,6 +282,19 @@ int QnRtspConnectionProcessor::composeSetup()
     QString transport = d->requestHeaders.value("Transport");
     if (transport.indexOf("TCP") == -1)
         return CODE_NOT_IMPLEMETED;
+    int trackId = extractTrackId(d->requestHeaders.path());
+    if (trackId >= 0)
+    {
+        QStringList transportInfo = transport.split(';');
+        foreach(const QString& data, transportInfo)
+        {
+            if (data.startsWith("interleaved="))
+            {
+                QStringList ports = data.mid(QString("interleaved=").length()).split("-");
+                d->trackPorts.insert(trackId, QPair<int,int>(ports[0].toInt(), ports.size() > 1 ? ports[1].toInt() : 0));
+            }
+        }
+    }
     d->dataProvider = d->mediaRes->getMediaProvider(0);
     return CODE_OK;
 }
@@ -278,6 +309,13 @@ int QnRtspConnectionProcessor::composePlay()
         d->dataProcessor = new QnRtspDataProcessor(this);
         d->dataProvider->addDataProcessor(d->dataProcessor);
     }
+    return CODE_OK;
+}
+
+int QnRtspConnectionProcessor::composeTeardown()
+{
+    Q_D(QnRtspConnectionProcessor);
+    d->mediaRes = QnMediaResourcePtr(0);
     return CODE_OK;
 }
 
@@ -310,6 +348,7 @@ void QnRtspConnectionProcessor::processRequest()
     }
     else if (method == "TEARDOWN")
     {
+        composeTeardown();
     }
     else if (method == "GET_PARAMETER")
     {

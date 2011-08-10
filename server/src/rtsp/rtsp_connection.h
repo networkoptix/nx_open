@@ -25,6 +25,8 @@ private:
     int composePlay();
     void sendData(const QByteArray& data);
     QString extractMediaName(const QString& path);
+    int extractTrackId(const QString& path);
+    int composeTeardown();
 private:
     QN_DECLARE_PRIVATE(QnRtspConnectionProcessor);
     friend class QnRtspDataProcessor;
