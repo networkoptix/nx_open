@@ -35,6 +35,7 @@ void QnResourcePool::removeResource(QnResourcePtr resource)
 
 QnResourcePtr QnResourcePool::getResourceById(const QString& id) const
 {
+    QMutexLocker mtx(&m_resourcesMtx);
     ResourceMap::const_iterator it = m_resources.find(id);
     if (it == m_resources.end())
         return QnResourcePtr(0);
@@ -44,6 +45,7 @@ QnResourcePtr QnResourcePool::getResourceById(const QString& id) const
 
 QnUrlResourcePtr QnResourcePool::getResourceByUrl(const QString& url) const
 {
+    QMutexLocker mtx(&m_resourcesMtx);
     for (ResourceMap::const_iterator it = m_resources.constBegin(); it != m_resources.constEnd(); ++it)
     {
         QnUrlResourcePtr mr = it->dynamicCast<QnURLResource>();
