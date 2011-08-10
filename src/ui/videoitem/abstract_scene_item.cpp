@@ -421,7 +421,7 @@ void CLAbstractSceneItem::drawRotationHelper(QPainter* painter)
 	painter->setPen(QPen(color2, 0, Qt::SolidLine));
 
 	painter->setBrush(gradient);
-	painter->drawEllipse(m_rotation_center, r, r);
+//	painter->drawEllipse(m_rotation_center, r, r); // crash here while scene is "rotated"
 
 	painter->setPen(QPen(color2, penWidth, Qt::SolidLine));
 	painter->drawLine(m_rotation_center,m_rotation_hand);
