@@ -4,16 +4,32 @@ from restclient import *
 from StringIO import StringIO
 from pprint import pprint
 
-import json
-import socket
+from xml.dom import minidom
+import socket, sys
 
-SERVER="http://localhost:8000/api/"
+SERVER = "http://localhost:8000/api/"
+CREDENTIALS = ("api", "123")
 
 class Object(object):
     def load_from_dict(self, xdict):
         for xstr, attr in self.attr_mapping.items():
             if xstr in xdict:
                 self.__setattr__(attr, xdict[xstr])
+
+class ResourceType(Object):
+    def __init__(self):
+        Object.__init__(self)
+
+        self.attr_mapping = {'id' : 'xid', 'name' : 'name'}
+
+        self.xid = ''
+        self.name = ''
+
+    def __repr__(self):
+        sio = StringIO()
+        print >> sio, 'ID: %s\t' % self.xid,
+        print >> sio, ', Name: %s\t' % self.name,
+        return sio.getvalue()
 
 class Camera(Object):
     def __init__(self):
@@ -51,10 +67,18 @@ class Server(Object):
         return sio.getvalue()
 
 def get_object_list(path, Class):
-    object_raw_list = json.loads(GET(SERVER+path))
+    xml_string = GET(SERVER+path, credentials=CREDENTIALS)
+    #print xml_string
+
+    object_raw_list = minidom.parseString(xml_string)
 
     objects = []
-    for object_dict in object_raw_list:
+    for object_element in object_raw_list.getElementsByTagName('resource'):
+        object_dict = {}
+        for child in object_element.childNodes:
+            #print dir(child)
+            object_dict[child.tagName] = child.firstChild.nodeValue
+
         xobject = Class.__new__(Class)
         xobject.__init__()
         xobject.load_from_dict(object_dict)
@@ -68,8 +92,26 @@ def get_servers():
 def get_cameras():
     return get_object_list('camera', Camera)
 
+def add_server(name, typeid):
+    return POST(SERVER + 'server/', params = {'name' : name, 'xtype_id' : typeid}, credentials=CREDENTIALS, async=False)
+
 def register_server():
-    POST(SERVER + 'server/', params = {'name' : socket.gethostname()}, async=False)
+    typeid = get_resource_types()[0].xid
+    return PUT(SERVER + 'server/', params = {'id' : '1', 'name' : 'PEN ' + socket.gethostname()}, credentials=CREDENTIALS, async=False)
+
+def get_resource_types():
+    return get_object_list('resourceType', ResourceType)
+
+def register_and_get():
+    register_server()
+    pprint(get_servers())
+
+COMMANDS = {
+  'add' : add_server,
+  'reg' : register_server,
+  'ls'  : get_servers,
+  'lrt' : get_resource_types
+}
 
 def main():
     while 1:
@@ -83,10 +125,14 @@ def main():
 
         if command[0] == 'exit':
             break
-        if command[0] == 'register':
-            register_server()
-            pprint(get_servers())
-    
+
+        if command[0] in COMMANDS:
+            result = COMMANDS[command[0]]()
+            pprint(result)
 
 if __name__ == '__main__':
-    main()
+    if len(sys.argv) > 1 and sys.argv[1] in COMMANDS:
+        result = COMMANDS[sys.argv[1]]()
+        pprint(result)
+    else:
+        main()
