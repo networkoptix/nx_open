@@ -9,7 +9,8 @@ public:
 	QnMediaResourceLayout(){};
     virtual ~QnMediaResourceLayout() {}
 	//returns number of video channels device has
-	virtual unsigned int numberOfChannels() const = 0;
+	virtual unsigned int numberOfVideoChannels() const = 0;
+    virtual unsigned int numberOfAudioChannels() const = 0;
 
 	// returns maximum width ( in terms of channels 4x1 2x2 1x1 ans so on  )
 	virtual unsigned int width() const = 0; 
@@ -29,10 +30,15 @@ public:
 	QnDefaultMediaResourceLayout(){};
 	virtual ~QnDefaultMediaResourceLayout() {}
 	//returns number of video channels device has
-	virtual unsigned int numberOfChannels() const
+	virtual unsigned int numberOfVideoChannels() const
 	{
 		return 1;
 	}
+
+    virtual unsigned int numberOfAudioChannels() const
+    {
+        return 1;
+    }
 
 	virtual unsigned int width() const 
 	{
@@ -70,10 +76,15 @@ public:
         delete[] m_channels;
     };
 	//returns number of video channels device has
-	virtual unsigned int numberOfChannels() const
+	virtual unsigned int numberOfVideoChannels() const
 	{
 		return m_width*m_height;
 	}
+
+    virtual unsigned int numberOfAudioChannels() const
+    {
+        return 1;
+    }
 
 	virtual unsigned int width() const 
 	{

@@ -4,6 +4,7 @@
 #include "common/sleep.h"
 #include "resource/resource_consumer.h"
 
+QMutex global_ffmpeg_mutex;
 
 QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(QnResourcePtr res):
 QnAbstractStreamDataProvider(res),
@@ -13,7 +14,7 @@ m_qulity(QnQualityLowest)
 
     QnMediaResourcePtr mr = getResource().dynamicCast<QnMediaResource>();
 
-	m_NumaberOfVideoChannels = mr->getVideoLayout()->numberOfChannels();
+	m_NumaberOfVideoChannels = mr->getMediaLayout()->numberOfVideoChannels();
 }
 
 QnAbstractMediaStreamDataProvider::~QnAbstractMediaStreamDataProvider()

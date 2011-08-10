@@ -11,10 +11,9 @@ public:
 	bool getDescription();
 	virtual QnAbstractMediaStreamDataProvider* getDeviceStreamConnection();
 
-    virtual QnMediaResourceLayout* getVideoLayout() const;
+    virtual QnMediaResourceLayout* getMediaLayout() const;
 
 	virtual bool hasTestPattern() const;
-
 protected:
 
     virtual bool setParamPhysical(const QString& name, const QnValue& val);

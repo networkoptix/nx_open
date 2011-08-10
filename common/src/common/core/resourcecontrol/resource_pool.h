@@ -3,6 +3,7 @@
 #include "resource/resource.h"
 #include "resource_criteria.h"
 #include "resource/id.h"
+#include "resource/url_resource.h"
 
 class QnResource;
 class QnNetworkResource;
@@ -28,7 +29,10 @@ public:
 
     QnResourceList getResources() const;
 
-    QnResourcePtr getResourceById(QString id) const;
+    QnResourcePtr getResourceById(const QString& id) const;
+
+    QnUrlResourcePtr getResourceByUrl(const QString& url) const;
+
 
     // if it has; returns the pointer to the first equal
     QnResourcePtr hasEqualResource(QnResourcePtr res) const;

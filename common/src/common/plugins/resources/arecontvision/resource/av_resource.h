@@ -39,7 +39,7 @@ public:
     virtual bool isResourceAccessible();
     virtual bool updateMACAddress();
 
-    virtual QnStreamQuality getBestQualityForSuchOnScreenSize(QSize size);
+    virtual QnStreamQuality getBestQualityForSuchOnScreenSize(QSize size) const;
     virtual QnCompressedVideoDataPtr getImage(int channnel, QDateTime time, QnStreamQuality quality);
     virtual int getStreamDataProvidersMaxAmount() const;
     virtual QnAbstractMediaStreamDataProvider* createMediaProvider();
@@ -47,6 +47,7 @@ public:
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames 
     virtual void setCropingPhysical(QRect croping);
 
+    //virtual QnMediaInfo getMediaInfo() const;
 
 protected:
     // should change value in memory domain 

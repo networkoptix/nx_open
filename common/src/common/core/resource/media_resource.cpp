@@ -5,7 +5,7 @@
 
 QnDefaultMediaResourceLayout globalDefaultMediaResourceLayout;
 
-QnMediaResource::QnMediaResource()
+QnMediaResource::QnMediaResource(): QnResource()
 {
     addFlag(QnResource::media);
 }
@@ -26,15 +26,23 @@ QnMediaResource::~QnMediaResource()
 
 }
 
-QnMediaResourceLayout* QnMediaResource::getVideoLayout() const
+QnMediaResourceLayout* QnMediaResource::getMediaLayout() const
 {
     return &globalDefaultMediaResourceLayout;
 }
 
+QnAbstractMediaStreamDataProvider* QnMediaResource::addMediaProvider()
+{
+    QnAbstractMediaStreamDataProvider* dp = createMediaProvider();
+    m_streamProviders[m_streamProviders.size()] = dp;
+    return dp;
+}
+
+
 QnAbstractMediaStreamDataProvider* QnMediaResource::acquireMediaProvider(int number)
 {
     QMutexLocker locker(&m_mutex);
-    Q_ASSERT(number < getVideoLayout()->numberOfChannels());
+    Q_ASSERT(number < getMediaLayout()->numberOfVideoChannels());
 
     StreamProvidersList::iterator it = m_streamProviders.find(number);
 
@@ -51,7 +59,7 @@ QnAbstractMediaStreamDataProvider* QnMediaResource::acquireMediaProvider(int num
 void QnMediaResource::releaseMediaProvider(int number)
 {
     QMutexLocker locker(&m_mutex);
-    Q_ASSERT(number < getVideoLayout()->numberOfChannels());
+    Q_ASSERT(number < getMediaLayout()->numberOfVideoChannels());
 
     StreamProvidersList::iterator it = m_streamProviders.find(number);
 
@@ -70,7 +78,7 @@ void QnMediaResource::releaseMediaProvider(int number)
 QnAbstractMediaStreamDataProvider* QnMediaResource::getMediaProvider(int number)
 {
     QMutexLocker locker(&m_mutex);
-    Q_ASSERT(number < getVideoLayout()->numberOfChannels());
+    Q_ASSERT(number < getMediaLayout()->numberOfVideoChannels());
 
     StreamProvidersList::iterator it = m_streamProviders.find(number);
 
@@ -80,4 +88,9 @@ QnAbstractMediaStreamDataProvider* QnMediaResource::getMediaProvider(int number)
     }
 
     return it.value();
+}
+
+QnCompressedVideoDataPtr QnMediaResource::getImage(int channnel, QDateTime time, QnStreamQuality quality)
+{
+    return QnCompressedVideoDataPtr(0);
 }
