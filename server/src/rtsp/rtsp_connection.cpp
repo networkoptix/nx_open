@@ -11,7 +11,7 @@ static const int CODE_INTERNAL_ERROR = 500;
 
 
 static const QString ENDL("\r\n");
-static const int RTP_FFMPEG_GENERIC_CODE = 193;
+static const int RTP_FFMPEG_GENERIC_CODE = 102;
 static const QString RTP_FFMPEG_GENERIC_STR("FFMPEG");
 static const int MAX_QUEUE_SIZE = 15;
 
@@ -222,6 +222,7 @@ void QnRtspConnectionProcessor::sendResponse()
     d->responseHeaders.setContentType("application/sdp");
 
     QByteArray response = d->responseHeaders.toString().toUtf8();
+    response.replace(0,4,"RTSP");
     if (!d->responseBody.isEmpty())
     {
         response += d->responseBody;
@@ -240,15 +241,16 @@ int QnRtspConnectionProcessor::composeDescribe()
     if (acceptMethods.indexOf("sdp") == -1)
         return CODE_NOT_IMPLEMETED;
 
-    QTextStream sdp(d->responseBody);
+    QTextStream sdp(&d->responseBody);
     
     QnMediaResourceLayout* layout = d->mediaRes->getMediaLayout();
     int numVideo = layout->numberOfVideoChannels();
     int numAudio = layout->numberOfAudioChannels();
     for (int i = 0; i < numVideo + numAudio; ++i)
     {
-        sdp << "m=" << (i < numVideo ? "video" : "audio") << i++ << " RTP/AVP " << RTP_FFMPEG_GENERIC_CODE << ENDL;
-        sdp << i << "a=rtpmap:" << RTP_FFMPEG_GENERIC_CODE << ' ' << RTP_FFMPEG_GENERIC_STR << "/1000000"  << ENDL;
+        sdp << "m=" << (i < numVideo ? "video " : "audio ") << i << " RTP/AVP " << RTP_FFMPEG_GENERIC_CODE << ENDL;
+        sdp << "a=control:trackID=" << i << ENDL;
+        sdp << "a=rtpmap:" << RTP_FFMPEG_GENERIC_CODE << ' ' << RTP_FFMPEG_GENERIC_STR << "/1000000"  << ENDL;
     }
     return CODE_OK;
 }
