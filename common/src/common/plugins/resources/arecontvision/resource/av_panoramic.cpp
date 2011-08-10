@@ -9,10 +9,15 @@ public:
 	AVVideoLayout180(){};
 	virtual ~AVVideoLayout180(){};
 	//returns number of video channels device has
-	virtual unsigned int numberOfChannels() const
+	virtual unsigned int numberOfVideoChannels() const
 	{
 		return 4;
 	}
+
+    virtual unsigned int numberOfAudioChannels() const
+    {
+        return 1;
+    }
 
 	virtual unsigned int width() const 
 	{
@@ -57,10 +62,15 @@ public:
 	AVVideoLayout360(){};
 	virtual ~AVVideoLayout360(){};
 	//returns number of video channels device has
-	virtual unsigned int numberOfChannels() const
+	virtual unsigned int numberOfVideoChannels() const
 	{
 		return 4;
 	}
+
+    virtual unsigned int numberOfAudioChannels() const
+    {
+        return 1;
+    }
 
 	virtual unsigned int width() const 
 	{
@@ -108,7 +118,7 @@ m_hastestPattern(false)
     setName(name);
 }
 
-QnMediaResourceLayout* CLArecontPanoramicDevice::getVideoLayout() const
+QnMediaResourceLayout* CLArecontPanoramicDevice::getMediaLayout() const
 {
     QString name = getName();
 

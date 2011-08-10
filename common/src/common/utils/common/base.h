@@ -4,4 +4,10 @@
 #define CL_MEDIA_ALIGNMENT 32
 #define CL_MEDIA_EXTRA 8
 
+#define QN_DECLARE_PRIVATE(Class) \
+    class Class##Private; \
+    Class##Private* d_ptr; \
+    Q_DECLARE_PRIVATE(Class);
+
+
 #endif //cl_common_h1003

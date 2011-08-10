@@ -1,28 +1,31 @@
 #ifndef QnMediaResource_h_227
 #define QnMediaResource_h_227
 
-#include "resource.h"
+#include <QMap>
+#include <QAudioFormat>
+
 #include "dataprovider/media_streamdataprovider.h"
 #include "datapacket/mediadatapacket.h"
+#include "url_resource.h"
 
 class QnAbstractMediaStreamDataProvider;
 class QnMediaResourceLayout;
 
-class QnMediaResource : virtual public QnResource 
+class QnMediaResource : virtual public QnResource
 {
 
 public:
 	QnMediaResource();
     virtual ~QnMediaResource();
 
-    virtual QnMediaResourceLayout* getVideoLayout() const;
+    virtual QnMediaResourceLayout* getMediaLayout() const;
 
     // size - is size of one channel; we assume all channels have the same size
-    virtual QnStreamQuality getBestQualityForSuchOnScreenSize(QSize size) = 0;
+    virtual QnStreamQuality getBestQualityForSuchOnScreenSize(QSize size) const = 0;
   
     // returns one image best for such time 
     // in case of live video time should be ignored 
-    virtual QnCompressedVideoDataPtr getImage(int channnel, QDateTime time, QnStreamQuality quality) = 0;
+    virtual QnCompressedVideoDataPtr getImage(int channnel, QDateTime time, QnStreamQuality quality);
 
     virtual int getStreamDataProvidersMaxAmount() const = 0;
     

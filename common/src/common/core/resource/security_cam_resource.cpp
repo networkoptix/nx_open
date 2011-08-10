@@ -50,3 +50,4 @@ void QnSequrityCamResource::setCroping(QRect croping, QnDomain domain)
 {
     setCropingPhysical(croping);
 }
+

@@ -257,7 +257,7 @@ bool QnPlAreconVisionResource::updateMACAddress()
     return true;
 }
 
-QnStreamQuality QnPlAreconVisionResource::getBestQualityForSuchOnScreenSize(QSize size)
+QnStreamQuality QnPlAreconVisionResource::getBestQualityForSuchOnScreenSize(QSize size) const
 {
     return QnQualityNormal;
 }
@@ -295,7 +295,15 @@ void QnPlAreconVisionResource::setCropingPhysical(QRect croping)
     setParamAsynch("sensorheight", maxSensorHight, QnDomainPhysical);
 }
 
-
+/*
+QnMediaInfo QnPlAreconVisionResource::getMediaInfo() const
+{
+    // todo: implement me!!!
+    // Sergey have to add audio/video tracks of the specified arecont camera.
+    QnMediaInfo rez;
+    return rez;
+}
+*/
 //===============================================================================================================================
 bool QnPlAreconVisionResource::getParamPhysical(const QString& name, QnValue& val)
 {

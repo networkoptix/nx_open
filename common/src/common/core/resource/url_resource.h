@@ -12,17 +12,16 @@ class QnURLResource : virtual public QnResource
 {
 
 public:
-	QnURLResource(QString url);
+    QnURLResource();
+	QnURLResource(const QString& url);
 
     virtual bool equalsTo(const QnResourcePtr other) const;
-
 	virtual QString toString() const;
+
 	QString getUrl() const;
-
+    void setUrl(const QString& url);
 protected:
-
     QString m_url;
-
 };
 
 #endif // file_device_h_227
