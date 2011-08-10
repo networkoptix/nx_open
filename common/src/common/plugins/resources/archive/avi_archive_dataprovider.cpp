@@ -31,10 +31,26 @@ private:
 // ---------------------------------- QnAviArchiveDataProvider -----------------------
 
 QnAviArchiveDataProvider::QnAviArchiveDataProvider(QnResourcePtr ptr):
-    QnAbstractArchiveDataProvider(ptr)
+    QnAbstractArchiveDataProvider(ptr),
+    m_formatContext(0),
+    m_videoStreamIndex(-1),
+    m_audioStreamIndex(-1),
+    mFirstTime(true),
+    m_bsleep(false),
+    m_currentPacketIndex(0),
+    m_eof(false),
+    m_haveSavedPacket(false),
+    m_selectedAudioChannel(0)
 {
-
+    av_init_packet(&m_packets[0]);
+    av_init_packet(&m_packets[1]);
 }
+
+QnAviArchiveDataProvider::~QnAviArchiveDataProvider()
+{
+    destroy();
+}
+
 
 AVFormatContext* QnAviArchiveDataProvider::getFormatContext()
 {

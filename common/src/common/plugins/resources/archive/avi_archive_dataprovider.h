@@ -11,6 +11,7 @@ class QnAviArchiveDataProvider: public QnAbstractArchiveDataProvider
 {
 public:
     QnAviArchiveDataProvider(QnResourcePtr ptr);
+    virtual ~QnAviArchiveDataProvider();
 protected:
     virtual QnAbstractDataPacketPtr getNextData();
     virtual bool init();

@@ -12,8 +12,8 @@ static const int CODE_INTERNAL_ERROR = 500;
 
 static const QString ENDL("\r\n");
 static const int RTP_FFMPEG_GENERIC_CODE = 102;
-static const QString RTP_FFMPEG_GENERIC_STR("FFMPEG");
-//static const QString RTP_FFMPEG_GENERIC_STR("mpeg4-generic"); // this line for debugging purpose with VLC player
+//static const QString RTP_FFMPEG_GENERIC_STR("FFMPEG");
+static const QString RTP_FFMPEG_GENERIC_STR("mpeg4-generic"); // this line for debugging purpose with VLC player
 static const int MAX_QUEUE_SIZE = 15;
 
 class QnRtspDataProcessor: public QnAbstractDataConsumer
@@ -27,7 +27,6 @@ public:
 protected:
     virtual void processData(QnAbstractDataPacketPtr data)
     {
-        // todo: implement me
         QSharedPointer<QnAbstractMediaDataPacket> mediaData = qSharedPointerDynamicCast<QnAbstractMediaDataPacket>(data);
 
         m_owner->sendData(mediaData->data.data());
@@ -193,7 +192,10 @@ void QnRtspConnectionProcessor::parseRequest()
 
     if (d->mediaRes == 0)
     {
-        QnResourcePtr resource = QnResourcePool::instance().getResourceByUrl(extractMediaName(d->requestHeaders.path()));
+        const QString resId = extractMediaName(d->requestHeaders.path());
+        QnResourcePtr resource = QnResourcePool::instance().getResourceById(resId);
+        if (resource == 0)
+            resource = QnResourcePool::instance().getResourceByUrl(resId);
         d->mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
     }
     d->clientRequest.clear();
@@ -295,19 +297,20 @@ int QnRtspConnectionProcessor::composeSetup()
             }
         }
     }
-    d->dataProvider = d->mediaRes->getMediaProvider(0);
     return CODE_OK;
 }
 
 int QnRtspConnectionProcessor::composePlay()
 {
     Q_D(QnRtspConnectionProcessor);
+    d->dataProvider = d->mediaRes->addMediaProvider();
     if (!d->dataProvider)
         return CODE_INTERNAL_ERROR;
     if (!d->dataProcessor)
     {
         d->dataProcessor = new QnRtspDataProcessor(this);
         d->dataProvider->addDataProcessor(d->dataProcessor);
+        d->dataProvider->start();
     }
     return CODE_OK;
 }

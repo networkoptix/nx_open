@@ -31,6 +31,14 @@ QnMediaResourceLayout* QnMediaResource::getMediaLayout() const
     return &globalDefaultMediaResourceLayout;
 }
 
+QnAbstractMediaStreamDataProvider* QnMediaResource::addMediaProvider()
+{
+    QnAbstractMediaStreamDataProvider* dp = createMediaProvider();
+    m_streamProviders[m_streamProviders.size()] = dp;
+    return dp;
+}
+
+
 QnAbstractMediaStreamDataProvider* QnMediaResource::acquireMediaProvider(int number)
 {
     QMutexLocker locker(&m_mutex);

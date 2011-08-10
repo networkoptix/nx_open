@@ -42,7 +42,10 @@ public:
 
     // if MediaProvider with such number does not => 0 pointer is returned
     QnAbstractMediaStreamDataProvider* getMediaProvider(int number);
-    
+
+    // create new instance of mediaProvider (so, ammount of providers is unlimited. It is used for Archive)
+    QnAbstractMediaStreamDataProvider* addMediaProvider();
+
 protected:
     virtual QnAbstractMediaStreamDataProvider* createMediaProvider() = 0;
 protected:
