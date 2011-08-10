@@ -4,6 +4,7 @@
 #include "common/sleep.h"
 #include "resource/resource_consumer.h"
 
+QMutex global_ffmpeg_mutex;
 
 QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(QnResourcePtr res):
 QnAbstractStreamDataProvider(res),

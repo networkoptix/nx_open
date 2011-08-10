@@ -7,8 +7,11 @@
 
 struct QnAbstractMediaDataPacket : public QnAbstractDataPacket
 {
+    enum MediaFlags {MediaFlags_None = 0, MediaFlags_AfterEOF = 1};
+
 	QnAbstractMediaDataPacket(unsigned int alignment, unsigned int capacity)
-        : data(alignment, capacity)
+        : data(alignment, capacity),
+        flags(MediaFlags_None)
 	{
 	}
 
@@ -22,6 +25,7 @@ struct QnAbstractMediaDataPacket : public QnAbstractDataPacket
 	DataType dataType;
 	CodecID compressionType;
 	quint64 timestamp; // mksec // 10^-6
+    unsigned flags;
 
 private:
 	QnAbstractMediaDataPacket() : 
@@ -53,19 +57,80 @@ struct QnCompressedVideoData : public QnAbstractMediaDataPacket
 
 typedef QSharedPointer<QnCompressedVideoData> QnCompressedVideoDataPtr;
 
+class CLCodecAudioFormat: public QAudioFormat
+{
+public:
+    CLCodecAudioFormat():
+      QAudioFormat(),
+          bitrate(0),
+          channel_layout(0),
+          block_align(0)
+      {
+      }
+
+      void fromAvStream(AVCodecContext* c)
+      {
+          if (c->sample_rate)
+              setFrequency(c->sample_rate);
+
+          if (c->channels) 
+              setChannels(c->channels);
+
+          //setCodec("audio/pcm");
+          setByteOrder(QAudioFormat::LittleEndian);
+
+          switch(c->sample_fmt)
+          {
+          case SAMPLE_FMT_U8: ///< unsigned 8 bits
+              setSampleSize(8);
+              setSampleType(QAudioFormat::UnSignedInt);
+              break;
+
+          case SAMPLE_FMT_S16: ///< signed 16 bits
+              setSampleSize(16);
+              setSampleType(QAudioFormat::SignedInt);
+              break;
+
+          case SAMPLE_FMT_S32:///< signed 32 bits
+              setSampleSize(32);
+              setSampleType(QAudioFormat::SignedInt);
+              break;
+
+          case AV_SAMPLE_FMT_FLT:
+              setSampleSize(32);
+              setSampleType(QAudioFormat::Float);
+              break;
+
+          default:
+              break;
+          }
+
+          if (c->extradata_size > 0)
+          {
+              extraData.resize(c->extradata_size);
+              memcpy(&extraData[0], c->extradata, c->extradata_size);
+          }
+          bitrate = c->bit_rate;
+          channel_layout = c->channel_layout;
+          block_align = c->block_align;
+      }
+
+      QVector<quint8> extraData; // codec extra data
+      int bitrate;
+      int channel_layout;
+      int block_align;
+};
+
 struct QnCompressedAudioData : public QnAbstractMediaDataPacket
 {
-	QnCompressedAudioData (unsigned int alignment, unsigned int capacity, void* ctx)
+	QnCompressedAudioData (unsigned int alignment, unsigned int capacity)
         : QnAbstractMediaDataPacket(alignment, capacity)
 	{
 		dataType = AUDIO;
-		context = ctx;
 	}
 
-	int freq;
-	int channels;
+    CLCodecAudioFormat format;
     quint64 duration;
-	void* context;
 };
 
 typedef QSharedPointer<QnCompressedAudioData> QnCompressedAudioDataPtr;
