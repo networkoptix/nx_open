@@ -127,6 +127,17 @@ bool QnRtspConnectionProcessor::isFullMessage()
     return lRequest.endsWith(dblDelim) && (!contentLen || lRequest.indexOf(dblDelim) < lRequest.length()-dblDelim.length());
 }
 
+QString QnRtspConnectionProcessor::extractMediaName(const QString& path)
+{
+    int pos = path.indexOf("://");
+    if (pos == -1)
+        return QString();
+    pos = path.indexOf('/', pos+3);
+    if (pos == -1)
+        return QString();
+    return path.mid(pos+1);
+}
+
 void QnRtspConnectionProcessor::parseRequest()
 {
     Q_D(QnRtspConnectionProcessor);
@@ -177,7 +188,8 @@ void QnRtspConnectionProcessor::parseRequest()
     if (bodyStart >= 0 && d->requestHeaders.value("content-length").toInt() > 0)
         d->requestBody = d->clientRequest.mid(bodyStart + dblDelim.length());
 
-    QnResourcePtr resource = QnResourcePool::instance().getResourceById(d->requestHeaders.path());
+    //QnResourcePtr resource = QnResourcePool::instance().getResourceById(d->requestHeaders.path());
+    QnResourcePtr resource = QnResourcePool::instance().getResourceByUrl(extractMediaName(d->requestHeaders.path()));
     d->mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
     d->clientRequest.clear();
 }

@@ -24,6 +24,7 @@ private:
     int composeSetup();
     int composePlay();
     void sendData(const QByteArray& data);
+    QString extractMediaName(const QString& path);
 private:
     QN_DECLARE_PRIVATE(QnRtspConnectionProcessor);
     friend class QnRtspDataProcessor;
