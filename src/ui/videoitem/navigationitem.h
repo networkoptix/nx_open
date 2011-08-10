@@ -45,6 +45,9 @@ signals:
     void stepBackward();
     void stepForward();
 
+protected:
+    void wheelEvent(QWheelEvent *) {} // to fix buuug with scene
+
 private:
     QHBoxLayout *m_layout;
     QPushButton *m_backwardButton;
