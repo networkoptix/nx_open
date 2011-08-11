@@ -203,8 +203,8 @@ double round(double r) {
 
 void TimeLine::drawGradient(QPainter& painter, const QRectF& r)
 {
-    int MAX_COLOR = 128+32;
-    int MIN_COLOR = 0;
+    int MAX_COLOR = 128;
+    int MIN_COLOR = 8;
     for (int i = r.top(); i < r.bottom(); ++i)
     {
         int k = height() - i;
@@ -232,7 +232,7 @@ void TimeLine::paintEvent(QPaintEvent *ev)
     painter.setPen(pal.color(QPalette::Base));
     const QRect r(handleThickness, frameWidth(), width() - handleThickness, height() - 2*frameWidth());
     painter.drawRect(r);
-    drawGradient(painter, r);
+    drawGradient(painter, QRect(0, frameWidth(), width(), height() - 2*frameWidth()));
     painter.setPen(pal.color(QPalette::Text));
 
     const qint64 range = m_parent->sliderRange();
