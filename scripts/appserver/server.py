@@ -8,7 +8,16 @@ from xml.dom import minidom
 import socket, sys
 
 SERVER = "http://localhost:8000/api/"
-CREDENTIALS = ("api", "123")
+CREDENTIALS = ("ivan", "225653")
+
+debug = False
+
+RESOURCE_STATUS = (
+    (1, 'Inactive'),
+    (2, 'Active'),
+)
+
+SERVER_ID = None
 
 class Object(object):
     def load_from_dict(self, xdict):
@@ -31,14 +40,31 @@ class ResourceType(Object):
         print >> sio, ', Name: %s\t' % self.name,
         return sio.getvalue()
 
-class Camera(Object):
+class Resource(Object):
     def __init__(self):
         Object.__init__(self)
 
-        self.attr_mapping = {'id' : 'xid', 'name' : 'name', 'mac' : 'mac', 'url' : 'url', 'login' : 'login', 'password' : 'password'}
+        self.attr_mapping = {'id' : 'xid', 'name' : 'name', 'status' : 'status', 'type' : 'xtype'}
 
         self.xid = ''
         self.name = ''
+        self.status = 0
+        self.xtype = ''
+
+    def __repr__(self):
+        sio = StringIO()
+        print >> sio, 'ID: %s\t' % self.xid,
+        print >> sio, ', Name: %s\t' % self.name,
+        print >> sio, ', Status: %s\t' % self.status,
+        print >> sio, ', Type: %s\t' % self.xtype,
+        return sio.getvalue()
+
+class Camera(Resource):
+    def __init__(self):
+        Resource.__init__(self)
+
+        self.attr_mapping.update({'mac' : 'mac', 'url' : 'url', 'login' : 'login', 'password' : 'password'})
+
         self.mac = ''
         self.url = ''
         self.login = ''
@@ -46,72 +72,126 @@ class Camera(Object):
 
     def __repr__(self):
         sio = StringIO()
-        print >> sio, 'ID: %s\t' % self.xid,
-        print >> sio, ', Name: %s\t' % self.name,
+        print >> sio, Resource.__repr__(self),
         print >> sio, ', Mac: %s\t' % self.mac,
         print >> sio, ', Url: %s\t' % self.url,
         print >> sio, ', Login: %s\t' % self.login,
         print >> sio, ', Password: %s\t' % self.password,
         return sio.getvalue()
         
-class Server(Object):
+class Server(Resource):
     def __init__(self):
-        Object.__init__(self)
+        Resource.__init__(self)
 
-        self.attr_mapping = {'id' : 'xid', 'name' : 'name'}
+        self.attr_mapping.update({})
 
     def __repr__(self):
         sio = StringIO()
-        print >> sio, 'ID: %s\t' % self.xid,
-        print >> sio, ', Name: %s\t' % self.name,
+        print >> sio, Resource.__repr__(self),
         return sio.getvalue()
 
-def get_object_list(path, Class):
-    xml_string = GET(SERVER+path, credentials=CREDENTIALS)
-    #print xml_string
+def get_object_list(path, Class, args=''):
+    request_str = SERVER+path
+    if args:
+        request_str += '?' + args
+
+    xml_string = GET(request_str, credentials=CREDENTIALS)
+    if debug:
+        print xml_string
 
     object_raw_list = minidom.parseString(xml_string)
 
     objects = []
-    for object_element in object_raw_list.getElementsByTagName('resource'):
+    resource_elements = object_raw_list.getElementsByTagName('resource')
+    for object_element in resource_elements:
         object_dict = {}
         for child in object_element.childNodes:
-            #print dir(child)
-            object_dict[child.tagName] = child.firstChild.nodeValue
+            if child.childNodes:
+                object_dict[child.tagName] = child.firstChild.nodeValue
 
         xobject = Class.__new__(Class)
         xobject.__init__()
         xobject.load_from_dict(object_dict)
         objects.append(xobject)
 
+    if not resource_elements:
+        if object_raw_list.childNodes:
+            if object_raw_list.childNodes[0].childNodes:
+                object_dict = {}
+                for child in object_raw_list.childNodes[0].childNodes:
+                    if child.childNodes:
+                        object_dict[child.tagName] = child.firstChild.nodeValue
+
+                xobject = Class.__new__(Class)
+                xobject.__init__()
+                xobject.load_from_dict(object_dict)
+                objects.append(xobject)
+
     return objects
 
-def get_servers():
-    return get_object_list('server', Server)
+# Commands
 
-def get_cameras():
+def list_cameras():
     return get_object_list('camera', Camera)
 
-def add_server(name, typeid):
-    return POST(SERVER + 'server/', params = {'name' : name, 'xtype_id' : typeid}, credentials=CREDENTIALS, async=False)
+def add_server():
+    typeid = list_resource_types()[0].xid
+    return POST(SERVER + 'server/', params = {'name' : socket.gethostname(), 'xtype_id' : typeid}, credentials=CREDENTIALS, async=False)
 
-def register_server():
-    typeid = get_resource_types()[0].xid
-    return PUT(SERVER + 'server/', params = {'id' : '1', 'name' : 'PEN ' + socket.gethostname()}, credentials=CREDENTIALS, async=False)
+def add_camera():
+    serverid = list_servers()[0].xid
+    typeid = list_resource_types()[0].xid
+    return POST(SERVER + 'camera/', params = {'name' : "new camera", 'server_id' : serverid, 'xtype_id' : typeid}, credentials=CREDENTIALS, async=False)
 
-def get_resource_types():
+def reg_server():
+    typeid = list_resource_types()[0].xid
+    return PUT(SERVER + 'server/', params = {'id' : SERVER_ID, 'name' : socket.gethostname()}, credentials=CREDENTIALS, async=False)
+
+def reg_camera(*args):
+    typeid = list_resource_types()[0].xid
+    params = {'name' : socket.gethostname()}
+
+    for arg in args:
+        name, value = arg.split('=')
+        params[name] = value
+
+    return PUT(SERVER + 'camera/', params = params, credentials=CREDENTIALS, async=False)
+
+def list_servers():
+    return get_object_list('server', Server)
+
+def list_resource_types():
     return get_object_list('resourceType', ResourceType)
 
-def register_and_get():
-    register_server()
-    pprint(get_servers())
+def list_resources(*args):
+    if args:
+        return get_object_list('resource', Resource, args[0])
+    else:
+        return get_object_list('resource', Resource)
+
+def list_resources_as_tree(*args):
+    if args:
+        return get_object_list('resource/tree', Resource, args[0])
+    else:
+        return get_object_list('resource/tree', Resource)
 
 COMMANDS = {
-  'add' : add_server,
-  'reg' : register_server,
-  'ls'  : get_servers,
-  'lrt' : get_resource_types
+  'as'  : add_server,
+  'ls'  : list_servers,
+  'rs'  : reg_server,
+
+  'ac'  : add_camera,
+  'rc'  : reg_camera,
+  'lc'  : list_cameras,
+
+  'lr'  : list_resources,
+  'lrat'  : list_resources_as_tree,
+
+  'lrt' : list_resource_types,
 }
+
+def help():
+    print 'Commands: help, register, exit'
 
 def main():
     while 1:
@@ -121,7 +201,7 @@ def main():
             continue
         
         if command[0] in ('help', '?'):
-            print 'Commands: help, register, exit'
+            help()
 
         if command[0] == 'exit':
             break
@@ -130,9 +210,40 @@ def main():
             result = COMMANDS[command[0]]()
             pprint(result)
 
+def read_state():
+    global SERVER_ID
+
+    for line in open('server.state', 'r').readlines():
+        name, value = line.split('=')
+        if name == 'SERVER_ID':
+            SERVER_ID = value.strip()
+
 if __name__ == '__main__':
-    if len(sys.argv) > 1 and sys.argv[1] in COMMANDS:
-        result = COMMANDS[sys.argv[1]]()
-        pprint(result)
+    read_state()
+
+    if len(sys.argv) > 1:
+        if sys.argv[1] == '-d':
+            debug = True
+            command = sys.argv[2]
+
+            args = ()
+            if len(sys.argv) > 3:
+                args = sys.argv[3:]
+        else:
+            debug = False
+            command = sys.argv[1]
+
+            args = ()
+            if len(sys.argv) > 2:
+                args = sys.argv[2:]
+
+        if command in COMMANDS:
+            if args:
+                result = COMMANDS[command](*args)
+            else:
+                result = COMMANDS[command]()
+            pprint(result)
+        else:
+            help()
     else:
         main()
