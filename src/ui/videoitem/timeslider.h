@@ -11,6 +11,16 @@
 #include <QResizeEvent>
 
 class TimeLine;
+
+class MySlider : public QSlider
+{
+public:
+    MySlider(QWidget *parent = 0) : QSlider(0) {}
+
+    void paintEvent(QPaintEvent *ev);
+    QSize sizehint() { return QSize(QSlider::sizeHint().width(), 16); }
+};
+
 class TimeSlider : public QWidget
 {
     Q_OBJECT
@@ -57,10 +67,11 @@ public slots:
 
     void zoomIn();
     void zoomOut();
+
 private slots:
     void onWheelAnimationFinished();
 private:
-    QSlider *m_slider;
+    MySlider *m_slider;
     TimeLine *m_frame;
 
     qint64 m_currentValue;

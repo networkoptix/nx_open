@@ -34,6 +34,39 @@ public:
 };
 Q_GLOBAL_STATIC(ProxyStyle, proxyStyle)
 
+void MySlider::paintEvent(QPaintEvent *ev)
+{
+    static const int handleSize = 16;
+    static const int gradHeigth = 6;
+    static const int margins = 7;
+    static const QPixmap pix = QPixmap(":/skin/slider-handle.png").scaled(handleSize, handleSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+    QPainter p(this);
+
+    int length = abs(maximum() - minimum());
+    double handlePos = (double)(width()-handleSize)*value()/length;
+
+    QRect r = contentsRect();
+
+    p.setPen(QPen(Qt::gray, 2));
+    p.drawRect(QRect(0, margins, r.width(), r.height() - 2*margins));
+
+    p.setPen(QPen(Qt::darkGray, 1));
+    p.drawRect(QRect(0, margins, r.width(), r.height() - 2*margins));
+
+    p.setPen(QPen(QColor(0, 87, 207), 2));
+    p.drawRect(QRect(0, margins, handlePos, r.height() - 2*margins));
+
+    QLinearGradient linearGrad(QPointF(0, 0), QPointF(handlePos, height()));
+    linearGrad.setColorAt(0, QColor(0, 43, 130));
+    linearGrad.setColorAt(1, QColor(186, 239, 255));
+    p.fillRect(0, (height() - gradHeigth)/2, handlePos, gradHeigth, linearGrad);
+
+    p.setRenderHint(QPainter::SmoothPixmapTransform, true);
+    QRect handleRect(handlePos/* - handleSize/2*/, 1, handleSize, height() - 2);
+    p.drawPixmap(handleRect, pix);
+}
+
 QVariant qint64Interpolator(const qint64 &start, const qint64 &end, qreal progress)
 {
     return start + (double)(end - start)*progress;
@@ -192,6 +225,7 @@ void TimeLine::paintEvent(QPaintEvent *ev)
     int handleThickness = round(qApp->style()->pixelMetric(QStyle::PM_SliderControlThickness)/4.0);
     if (handleThickness == 0)
         handleThickness = round(qApp->style()->pixelMetric(QStyle::PM_SliderThickness)/4.0);
+    handleThickness = 16/2;
 
     QPalette pal = m_parent->palette();
     painter.setBrush(pal.brush(QPalette::Base));
@@ -382,7 +416,7 @@ bool TimeSlider::eventFilter(QObject *target, QEvent *event)
 
 TimeSlider::TimeSlider(QWidget *parent) :
     QWidget(parent),
-    m_slider(new QSlider(this)),
+    m_slider(new MySlider(this)),
     m_frame(0),
     m_currentValue(0),
     m_maximumValue(1000*10), // 10 sec
