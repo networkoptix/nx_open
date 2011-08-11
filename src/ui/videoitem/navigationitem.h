@@ -8,6 +8,7 @@ class CLVideoCamera;
 class TimeSlider;
 class QGraphicsProxyWidget;
 
+class MyButton;
 class TimeLabel : public QLabel
 {
 public:
@@ -50,11 +51,11 @@ protected:
 
 private:
     QHBoxLayout *m_layout;
-    QPushButton *m_backwardButton;
-    QPushButton *m_playButton;
-    QPushButton *m_stepForwardButton;
-    QPushButton *m_stepBackwardButton;
-    QPushButton *m_forwardButton;
+    MyButton *m_backwardButton;
+    MyButton *m_playButton;
+    MyButton *m_stepForwardButton;
+    MyButton *m_stepBackwardButton;
+    MyButton *m_forwardButton;
     bool m_playing;
     QPushButton *m_pauseButton;
     TimeSlider *m_slider;

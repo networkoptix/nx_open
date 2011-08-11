@@ -12,6 +12,28 @@
 #include "device_plugins/archive/abstract_archive_stream_reader.h"
 #include "util.h"
 
+class MyButton : public QAbstractButton
+{
+public:
+    void setPixmap(const QPixmap &p) { m_pixmap = p; }
+    void setPressedPixmap(const QPixmap &p) { m_pressedPixmap = p; }
+
+protected:
+    void paintEvent(QPaintEvent *e)
+    {
+        QPainter p(this);
+        p.setRenderHint(QPainter::SmoothPixmapTransform, true);
+        if (!isDown())
+            p.drawPixmap(contentsRect(), m_pixmap);
+        else if (isEnabled())
+            p.drawPixmap(contentsRect(), m_pressedPixmap);
+    }
+
+private:
+    QPixmap m_pixmap;
+    QPixmap m_pressedPixmap;
+};
+
 void TimeLabel::setCurrentValue(qint64 value)
 {
     m_currentValue = value;
@@ -29,42 +51,45 @@ NavigationWidget::NavigationWidget(QWidget *parent) :
     setObjectName("NavigationWidget");
     m_playing = false;
     m_layout = new QHBoxLayout;
-    m_layout->setMargin(0);
-    m_layout->setSpacing(0);
+    m_layout->setContentsMargins(10, 0, 10, 0);
 
-    m_backwardButton = new QPushButton();
-    m_backwardButton->setFixedSize(75, 40);
-    m_backwardButton->setIcon(QIcon(":/skin/player/to_very_beginning.png"));
-    m_backwardButton->setIconSize(QSize(50, 50));
+    m_layout->setSpacing(10);
 
-    m_playButton = new QPushButton();
-    m_playButton->setFixedSize(75, 40);
-    m_playButton->setIcon(QIcon(":/skin/player/play.png"));
-    m_playButton->setIconSize(QSize(50, 50));
+    m_backwardButton = new MyButton();
+    m_backwardButton->setText("button");
+    m_backwardButton->setFixedSize(54, 30);
+    m_backwardButton->setPixmap(QPixmap(":/skin/backward_grey.png"));
+    m_backwardButton->setPressedPixmap(QPixmap(":/skin/backward_blue.png"));
 
-    m_forwardButton = new QPushButton();
-    m_forwardButton->setFixedSize(75, 40);
-    m_forwardButton->setIcon(QIcon(":/skin/player/to_very_end.png"));
-    m_forwardButton->setIconSize(QSize(50, 50));
+    m_playButton = new MyButton();
+    m_playButton->setFixedSize(54, 51);
+    m_playButton->setPixmap(QPixmap(":/skin/play_grey.png"));
+    m_playButton->setPressedPixmap(QPixmap(":/skin/play_blue.png"));
 
-    m_stepBackwardButton = new QPushButton();
-    m_stepBackwardButton->setFixedSize(75, 40);
-    m_stepBackwardButton->setIcon(QIcon(":/skin/player/frame_backward.png"));
-    m_stepBackwardButton->setIconSize(QSize(50, 50));
+    m_forwardButton = new MyButton();
+    m_forwardButton->setFixedSize(54, 30);
+    m_forwardButton->setPixmap(QPixmap(":/skin/forward_grey.png"));
+    m_forwardButton->setPressedPixmap(QPixmap(":/skin/forward_blue.png"));
+
+    m_stepBackwardButton = new MyButton();
+    m_stepBackwardButton->setFixedSize(54, 30);
+    m_stepBackwardButton->setPixmap(QPixmap(":/skin/step_backward_grey.png"));
+    m_stepBackwardButton->setPressedPixmap(QPixmap(":/skin/step_backward_blue.png"));
     m_stepBackwardButton->setEnabled(false);
 
-    m_stepForwardButton = new QPushButton();
-    m_stepForwardButton->setFixedSize(75, 40);
-    m_stepForwardButton->setIcon(QIcon(":/skin/player/frame_forward.png"));
-    m_stepForwardButton->setIconSize(QSize(50, 50));
+    m_stepForwardButton = new MyButton();
+    m_stepForwardButton->setFixedSize(54, 30);
+    m_stepForwardButton->setPixmap(QPixmap(":/skin/step_forward_grey.png"));
+    m_stepForwardButton->setPressedPixmap(QPixmap(":/skin/step_forward_blue.png"));
     m_stepForwardButton->setEnabled(false);
 
-    QGridLayout *gridLayout = new QGridLayout;
-    gridLayout->addWidget(m_backwardButton, 0, 0, 1, 2);
-    gridLayout->addWidget(m_playButton, 0, 2, 1, 2);
-    gridLayout->addWidget(m_forwardButton, 0, 4, 1, 2);
-    gridLayout->addWidget(m_stepBackwardButton, 1, 1, 1, 2);
-    gridLayout->addWidget(m_stepForwardButton, 1, 3, 1, 2);
+    QHBoxLayout *buttonLayout = new QHBoxLayout;
+    buttonLayout->addWidget(m_stepBackwardButton);
+    buttonLayout->addWidget(m_backwardButton);
+    buttonLayout->addWidget(m_playButton);
+    buttonLayout->addWidget(m_forwardButton);
+    buttonLayout->addWidget(m_stepForwardButton);
+    buttonLayout->setSpacing(2);
 
     connect(m_playButton, SIGNAL(clicked()), SLOT(togglePlayPause()));
 
@@ -81,11 +106,9 @@ NavigationWidget::NavigationWidget(QWidget *parent) :
 
     m_label = new TimeLabel;
 
-    m_layout->addSpacerItem(new QSpacerItem(50, 10));
-    m_layout->addLayout(gridLayout);
+    m_layout->addLayout(buttonLayout);
     m_layout->addWidget(m_slider);
     m_layout->addWidget(m_label);
-    m_layout->addSpacerItem(new QSpacerItem(50, 10));
     setLayout(m_layout);
 }
 
@@ -107,14 +130,16 @@ void NavigationWidget::setPlaying(bool playing)
     m_playing = playing;
     if (m_playing) {
 
-        m_playButton->setIcon(QIcon(":/skin/player/pause.png"));
+        m_playButton->setPixmap(QPixmap(":/skin/pause_grey.png"));
+        m_playButton->setPressedPixmap(QPixmap(":/skin/pause_blue.png"));
         m_stepBackwardButton->setEnabled(false);
         m_stepForwardButton->setEnabled(false);
 
         emit play();
     } else {
 
-        m_playButton->setIcon(QIcon(":/skin/player/play.png"));
+        m_playButton->setPixmap(QPixmap(":/skin/play_grey.png"));
+        m_playButton->setPressedPixmap(QPixmap(":/skin/play_blue.png"));
         m_stepBackwardButton->setEnabled(true);
         m_stepForwardButton->setEnabled(true);
 
@@ -132,7 +157,6 @@ NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
 {
     m_proxy = new QGraphicsProxyWidget(this);
     m_widget = new NavigationWidget();
-    m_proxy->installEventFilter(this);
     m_widget->slider()->setStyleSheet("QWidget { background: rgb(15, 15, 15); color:rgb(63, 159, 216); }");
     m_widget->label()->setStyleSheet("QLabel { font-size: 30px; color: rgb(63, 159, 216); }");
     m_widget->setStyleSheet("QWidget { background: black; }");
@@ -174,6 +198,9 @@ void NavigationItem::setVideoCamera(CLVideoCamera *camera)
 {
     if (m_camera == camera)
         return;
+    setAcceptHoverEvents(true);
+    m_proxy->setAcceptHoverEvents(true);
+    m_widget->setMouseTracking(true);
 
     m_camera = camera;
     if (!camera) {
