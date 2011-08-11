@@ -4,6 +4,8 @@
 #include <QByteArray>
 class AVCodecContext;
 
+// where is not marshaling at current version. So, need refactor for using with non x86 CPU in future
+
 class QnFfmpegHelper
 {
 public:

@@ -16,7 +16,6 @@ static const int CODE_INTERNAL_ERROR = 500;
 
 static const QString ENDL("\r\n");
 static const quint8 RTP_FFMPEG_GENERIC_CODE = 102;
-static const quint8 RTP_FFMPEG_CONTEXT_CODE = 103;
 //static const QString RTP_FFMPEG_GENERIC_STR("FFMPEG");
 static const QString RTP_FFMPEG_GENERIC_STR("mpeg4-generic"); // this line for debugging purpose with VLC player
 static const int MAX_QUEUE_SIZE = 15;
@@ -65,18 +64,18 @@ protected:
             return;
         // one video channel may has several subchannels (video combined with frames from difference codecContext)
         // max amount of subchannels is MAX_CONTEXTS_AT_VIDEO. Each channel used 2 ssrc: for data and for CodecContext
-        int subChannelNumber = m_ctxSended.indexOf(ctx);
+        int subChannelNumber = m_ctxSended[rtspChannelNum].indexOf(ctx);
         quint32 ssrc = BASIC_FFMPEG_SSRC + rtspChannelNum * MAX_CONTEXTS_AT_VIDEO*2;
         // serialize and send FFMPEG context to stream
         if (subChannelNumber == -1)
         {
-            m_ctxSended << ctx;
-            subChannelNumber = m_ctxSended.size();
+            subChannelNumber = m_ctxSended[rtspChannelNum].size();
             ssrc += subChannelNumber;
             QnFfmpegHelper::serializeCodecContext(ctx, &m_codecCtxData);
             buildRtspTcpHeader(rtspChannelNum, ssrc + 1, m_codecCtxData.size(), true); // ssrc+1 - switch data subchannel to context subchannel
             m_owner->sendData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
             m_owner->sendData(m_codecCtxData.data());
+            m_ctxSended[rtspChannelNum] << ctx;
         }
         else {
             ssrc += subChannelNumber;
@@ -95,7 +94,7 @@ protected:
     }
 private:
     QByteArray m_codecCtxData;
-    QList<AVCodecContext*> m_ctxSended;
+    QMap<int, QList<AVCodecContext*> > m_ctxSended;
     QTime m_timer;
     quint16 m_sequence[256];
     QnRtspConnectionProcessor* m_owner;

@@ -6,7 +6,7 @@
 class QnAbstractArchiveDataProvider: public QnClientPullStreamProvider
 {
 public:
-    QnAbstractArchiveDataProvider(QnResourcePtr res );
+    QnAbstractArchiveDataProvider(QnResourcePtr res);
 
     void setSingleShotMode(bool single);
     bool isSingleShotMode() const;

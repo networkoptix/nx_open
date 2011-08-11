@@ -1,13 +1,13 @@
-#ifndef __ARCHIVE_RESOURCE_H
-#define __ARCHIVE_RESOURCE_H
+#ifndef _CLIENT_MEDIA_RESOURCE_H
+#define _CLIENT_MEDIA_RESOURCE_H
 
-#include "resource/media_resource.h"
+#include "../media_resource.h"
 
-class QnArchiveResource : virtual public QnMediaResource, virtual public QnURLResource
+class QnClientMediaResource: virtual public QnMediaResource
 {
 public:
-    QnArchiveResource();
-    QnArchiveResource(const QString& url);
+    QnClientMediaResource();
+    virtual ~QnClientMediaResource();
 
     virtual int getStreamDataProvidersMaxAmount() const { return INT_MAX; }
     virtual QnStreamQuality getBestQualityForSuchOnScreenSize(QSize size) const { return QnQualityPreSeted; }
@@ -16,10 +16,11 @@ public:
     virtual bool getBasicInfo() { return true; }
     virtual void beforeUse() {}
 
-    virtual QString manufacture() const { return "Archive"; }
-
+    virtual QString manufacture() const { return m_manufacture; }
 protected:
     virtual QnAbstractMediaStreamDataProvider* createMediaProvider();
+private:
+    QString m_manufacture;
 };
 
 #endif

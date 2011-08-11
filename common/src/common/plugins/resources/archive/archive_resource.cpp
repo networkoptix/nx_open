@@ -14,6 +14,5 @@ QnArchiveResource::QnArchiveResource(const QString& url): QnMediaResource(), QnU
 
 QnAbstractMediaStreamDataProvider* QnArchiveResource::createMediaProvider()
 {
-    //return new QnAviArchiveDataProvider(QnResourcePtr(this));
     return new QnAviArchiveDataProvider(QnResourcePool::instance().getResourceById(getId()));
 }
