@@ -4,10 +4,15 @@
 #include "resources/arecontvision/resource/av_resource_searcher.h"
 #include "datapacket/mediadatapacket.h"
 #include "common/base.h"
+#include "rtsp/rtsp_listener.h"
+#include "resource/media_resource.h"
+#include "resource/security_cam_resource.h"
+#include "resources/archive/archive_resource.h"
 
  
 int main(int argc, char *argv[])
 {
+    QnRtspListener listener();
 
     QCoreApplication app(argc, argv);
 
@@ -42,6 +47,10 @@ int main(int argc, char *argv[])
 
 	QnResourcePool::instance(); // to initialize net state;
 
+    //QnArchiveResource* res = new QnArchiveResource("e:/Users/roman76r/video/ROCKNROLLA/BDMV/STREAM/00000.m2ts");
+    QnArchiveResource* res = new QnArchiveResource("test.flv");
+    QnResourcePool::instance().addResource(QnResourcePtr(res));
+
 	//===========================================================================
 	//IPPH264Decoder::dll.init();
 
@@ -54,6 +63,8 @@ int main(int argc, char *argv[])
     //QnResourcePool::instance().getDeviceSearcher().addDeviceServer(&IQEyeDeviceServer::instance());
 
 	//=========================================================
+    QnRtspListener rtspServer(QHostAddress::Any, 50000);
+
     app.exec();
 
 	QnResource::stopCommandProc();

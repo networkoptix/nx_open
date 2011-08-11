@@ -11,6 +11,7 @@ class RTPIODevice;
 typedef struct
 {
     static const int RTP_HEADER_SIZE = 12;
+    static const int RTP_VERSION = 2;
 #if Q_BYTE_ORDER == Q_BIG_ENDIAN
     unsigned short   version:2;	/* packet type                */
     unsigned short   padding:1;		/* padding flag               */

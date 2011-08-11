@@ -1,8 +1,9 @@
 #include "rtsp_connection.h"
-#include "resourcecontrol\resource_pool.h"
-#include "resource\media_resource.h"
-#include "resource\media_resource_layout.h"
-#include "dataconsumer\dataconsumer.h"
+#include "resourcecontrol/resource_pool.h"
+#include "resource/media_resource.h"
+#include "resource/media_resource_layout.h"
+#include "dataconsumer/dataconsumer.h"
+#include "network/rtp_stream_parser.h"
 
 static const int CODE_OK = 200;
 static const int CODE_NOT_FOUND = 404;
@@ -11,10 +12,13 @@ static const int CODE_INTERNAL_ERROR = 500;
 
 
 static const QString ENDL("\r\n");
-static const int RTP_FFMPEG_GENERIC_CODE = 102;
+static const quint8 RTP_FFMPEG_GENERIC_CODE = 102;
 //static const QString RTP_FFMPEG_GENERIC_STR("FFMPEG");
 static const QString RTP_FFMPEG_GENERIC_STR("mpeg4-generic"); // this line for debugging purpose with VLC player
 static const int MAX_QUEUE_SIZE = 15;
+static const int MAX_RTSP_DATA_LEN = 65535 - 4 - RtpHeader::RTP_HEADER_SIZE;
+static const quint32 BASIC_SSRC = 32971;
+static const int CLOCK_FREQUENCY = 1000;
 
 class QnRtspDataProcessor: public QnAbstractDataConsumer
 {
@@ -23,16 +27,50 @@ public:
       QnAbstractDataConsumer(MAX_QUEUE_SIZE),
       m_owner(owner)
     {
+        memset(m_sequence, 0, sizeof(m_sequence));
+        m_timer.start();
     }
 protected:
+    void buildRtspTcpHeader(quint8 channelNum, quint16 len, int markerBit)
+    {
+        m_rtspTcpHeader[0] = '$';
+        m_rtspTcpHeader[1] = channelNum;
+        quint16* lenPtr = (quint16*) &m_rtspTcpHeader[2];
+        *lenPtr = htons(len+sizeof(RtpHeader));
+        RtpHeader* rtp = (RtpHeader*) &m_rtspTcpHeader[4];
+        rtp->version = RtpHeader::RTP_VERSION;
+        rtp->padding = 0;  
+        rtp->extension = 0; 
+        rtp->CSRCCount = 0;  
+        rtp->marker  =  markerBit; 
+        rtp->payloadType = RTP_FFMPEG_GENERIC_CODE;
+        rtp->sequence = htons(m_sequence[channelNum]++);
+        rtp->timestamp = htonl(m_timer.elapsed()); 
+        rtp->ssrc = htonl(BASIC_SSRC + channelNum); // source ID
+    }
+
     virtual void processData(QnAbstractDataPacketPtr data)
     {
-        QSharedPointer<QnAbstractMediaDataPacket> mediaData = qSharedPointerDynamicCast<QnAbstractMediaDataPacket>(data);
-
-        m_owner->sendData(mediaData->data.data());
+        QnAbstractMediaDataPacketPtr media = qSharedPointerDynamicCast<QnAbstractMediaDataPacket>(data);
+        int rtspChannelNum = media->channelNumber;
+        if (media->dataType == QnAbstractMediaDataPacket::AUDIO)
+            rtspChannelNum += m_owner->numOfVideoChannels();
+        const char* curData = media->data.data();
+        int sendLen = 0;
+        for (int dataRest = media->data.size(); dataRest > 0; dataRest -= sendLen)
+        {
+            sendLen = qMin(MAX_RTSP_DATA_LEN, dataRest);
+            buildRtspTcpHeader(rtspChannelNum, sendLen, sendLen == dataRest);
+            m_owner->sendData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
+            m_owner->sendData(curData, sendLen);
+            curData += sendLen;
+        }
     }
 private:
+    QTime m_timer;
+    quint16 m_sequence[256];
     QnRtspConnectionProcessor* m_owner;
+    char m_rtspTcpHeader[4 + RtpHeader::RTP_HEADER_SIZE];
 };
 
 // ----------------------------- QnRtspConnectionProcessor ----------------------------
@@ -65,6 +103,12 @@ public:
 };
 
 void QnRtspConnectionProcessor::sendData(const QByteArray& data)
+{
+    Q_D(QnRtspConnectionProcessor);
+    d->socket->write(data);
+}
+
+void QnRtspConnectionProcessor::sendData(const char* data, int size)
 {
     Q_D(QnRtspConnectionProcessor);
     d->socket->write(data);
@@ -225,8 +269,11 @@ void QnRtspConnectionProcessor::generateSessionId()
 void QnRtspConnectionProcessor::sendResponse()
 {
     Q_D(QnRtspConnectionProcessor);
-    d->responseHeaders.setContentLength(d->responseBody.length());
-    d->responseHeaders.setContentType("application/sdp");
+    if (!d->responseBody.isEmpty())
+    {
+        d->responseHeaders.setContentLength(d->responseBody.length());
+        d->responseHeaders.setContentType("application/sdp");
+    }
 
     QByteArray response = d->responseHeaders.toString().toUtf8();
     response.replace(0,4,"RTSP");
@@ -236,6 +283,15 @@ void QnRtspConnectionProcessor::sendResponse()
         response += "\r\n\r\n";
     }
     d->socket->write(response);
+}
+
+int QnRtspConnectionProcessor::numOfVideoChannels()
+{
+    Q_D(QnRtspConnectionProcessor);
+    if (!d->mediaRes)
+        return -1;
+    QnMediaResourceLayout* layout = d->mediaRes->getMediaLayout();
+    return layout ? layout->numberOfVideoChannels() : -1;
 }
 
 int QnRtspConnectionProcessor::composeDescribe()
@@ -257,7 +313,7 @@ int QnRtspConnectionProcessor::composeDescribe()
     {
         sdp << "m=" << (i < numVideo ? "video " : "audio ") << i << " RTP/AVP " << RTP_FFMPEG_GENERIC_CODE << ENDL;
         sdp << "a=control:trackID=" << i << ENDL;
-        sdp << "a=rtpmap:" << RTP_FFMPEG_GENERIC_CODE << ' ' << RTP_FFMPEG_GENERIC_STR << "/1000000"  << ENDL;
+        sdp << "a=rtpmap:" << RTP_FFMPEG_GENERIC_CODE << ' ' << RTP_FFMPEG_GENERIC_STR << "/" << CLOCK_FREQUENCY << ENDL;
     }
     return CODE_OK;
 }
@@ -311,6 +367,7 @@ int QnRtspConnectionProcessor::composePlay()
         d->dataProcessor = new QnRtspDataProcessor(this);
         d->dataProvider->addDataProcessor(d->dataProcessor);
         d->dataProvider->start();
+        d->dataProcessor->start();
     }
     return CODE_OK;
 }

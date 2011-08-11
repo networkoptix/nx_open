@@ -1,11 +1,11 @@
 #include "rtpsession.h"
+#include "rtp_stream_parser.h"
 
 
 #define DEFAULT_RTP_PORT 554
 #define RESERVED_TIMEOUT_TIME (5*1000)
 
 static const int MAX_RTCP_PACKET_SIZE = 1024 * 2;
-static const int RTP_VERSION = 2;
 static const quint32 SSRC_CONST = 0x2a55a9e8;
 static const quint32 CSRC_CONST = 0xe8a9552a;
 
@@ -355,7 +355,7 @@ int RTPSession::buildRTCPReport(quint8* dstBuffer, const RtspStatistic* stats)
 
 
     quint8* curBuffer = dstBuffer;
-    *curBuffer++ = (RTP_VERSION << 6); 
+    *curBuffer++ = (RtpHeader::RTP_VERSION << 6); 
     *curBuffer++ = RTCP_RECEIVER_REPORT;  // packet type
     curBuffer += 2; // skip len field;
 
@@ -374,7 +374,7 @@ int RTPSession::buildRTCPReport(quint8* dstBuffer, const RtspStatistic* stats)
     
     // build source description
     curBuffer = (quint8*) curBuf32;
-    *curBuffer++ = (RTP_VERSION << 6) + 1;  // source count = 1
+    *curBuffer++ = (RtpHeader::RTP_VERSION << 6) + 1;  // source count = 1
     *curBuffer++ = RTCP_SOURCE_DESCRIPTION;  // packet type
     *curBuffer++ = 0; // len field = 6 (hi)
     *curBuffer++ = 6; // len field = 6 (low)

@@ -20,10 +20,12 @@ private:
     void generateSessionId();
     void sendResponse();
 
+    int numOfVideoChannels();
     int composeDescribe();
     int composeSetup();
     int composePlay();
     void sendData(const QByteArray& data);
+    void sendData(const char* data, int size);
     QString extractMediaName(const QString& path);
     int extractTrackId(const QString& path);
     int composeTeardown();
