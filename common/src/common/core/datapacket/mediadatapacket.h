@@ -12,7 +12,8 @@ struct QnAbstractMediaDataPacket : public QnAbstractDataPacket
 	QnAbstractMediaDataPacket(unsigned int alignment, unsigned int capacity)
         : data(alignment, capacity),
         flags(MediaFlags_None),
-        channelNumber(0)
+        channelNumber(0),
+        context(0)
 	{
 	}
 
@@ -28,6 +29,7 @@ struct QnAbstractMediaDataPacket : public QnAbstractDataPacket
 	quint64 timestamp; // mksec // 10^-6
     unsigned flags;
     quint32 channelNumber; // video channel number; some devices might have more that one sensor.
+    void* context;
 private:
 	QnAbstractMediaDataPacket() : 
        data(0,1){};
@@ -52,7 +54,6 @@ struct QnCompressedVideoData : public QnAbstractMediaDataPacket
 	bool keyFrame;
 	bool useTwice; // some decoders delay video frame by one;
 	bool ignore;
-	void* context;
 };
 
 typedef QSharedPointer<QnCompressedVideoData> QnCompressedVideoDataPtr;
@@ -123,13 +124,14 @@ public:
 
 struct QnCompressedAudioData : public QnAbstractMediaDataPacket
 {
-	QnCompressedAudioData (unsigned int alignment, unsigned int capacity)
+	QnCompressedAudioData (unsigned int alignment, unsigned int capacity, void* ctx)
         : QnAbstractMediaDataPacket(alignment, capacity)
 	{
 		dataType = AUDIO;
+        context = ctx;
 	}
 
-    CLCodecAudioFormat format;
+    //CLCodecAudioFormat format;
     quint64 duration;
 };
 

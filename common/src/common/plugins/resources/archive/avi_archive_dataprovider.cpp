@@ -377,7 +377,7 @@ qint64 QnAviArchiveDataProvider::packetTimestamp(AVStream* stream, const AVPacke
 QnCompressedAudioDataPtr QnAviArchiveDataProvider::getAudioData(const AVPacket& packet, AVStream* stream)
 {
     int extra = 0;
-    QnCompressedAudioDataPtr audioData = QnCompressedAudioDataPtr(new QnCompressedAudioData(CL_MEDIA_ALIGNMENT, packet.size + extra));
+    QnCompressedAudioDataPtr audioData = QnCompressedAudioDataPtr(new QnCompressedAudioData(CL_MEDIA_ALIGNMENT, packet.size + extra, stream->codec));
     CLByteArray& data = audioData->data;
 
     data.prepareToWrite(packet.size + extra);
@@ -386,7 +386,7 @@ QnCompressedAudioDataPtr QnAviArchiveDataProvider::getAudioData(const AVPacket& 
     data.done(packet.size + extra);
 
     audioData->compressionType = m_audioCodecId;
-    audioData->format.fromAvStream(stream->codec);
+    //audioData->format.fromAvStream(stream->codec);
 
     double time_base = av_q2d(stream->time_base);
     audioData->timestamp = packetTimestamp(stream, packet);
