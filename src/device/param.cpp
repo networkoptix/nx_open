@@ -101,7 +101,7 @@ QList<QString> CLParamList::groupList() const
 
 	foreach (const CLParam &param, m_params)
 	{
-		QString group = param.value.group;
+		const QString &group = param.value.group;
 		if (!group.isEmpty() && !result.contains(group))
 			result.push_back(group);
 	}
@@ -109,17 +109,17 @@ QList<QString> CLParamList::groupList() const
 	return result;
 }
 
-QList<QString> CLParamList::subGroupList(QString group) const
+QList<QString> CLParamList::subGroupList(const QString &group) const
 {
 	QList<QString> result;
 
 	foreach (const CLParam &param, m_params)
 	{
-		QString lgroup = param.value.group;
+		const QString &lgroup = param.value.group;
 		if (lgroup == group)
 		{
-			QString subgroup = param.value.subgroup;
-			if (!subgroup.isEmpty() && !result.contains(subgroup))
+			const QString &subgroup = param.value.subgroup;
+			if (/*!subgroup.isEmpty() && */!result.contains(subgroup))
 				result.push_back(subgroup);
 		}
 	}

@@ -56,7 +56,7 @@ public:
 	MAP &list();
 
 	QList<QString> groupList() const;
-	QList<QString> subGroupList(QString group) const;
+	QList<QString> subGroupList(const QString &group) const;
 
 	CLParamList paramList(const QString &group, const QString &subgroup) const;
 
