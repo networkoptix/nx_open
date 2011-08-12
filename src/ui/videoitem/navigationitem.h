@@ -37,19 +37,6 @@ private:
     QPixmap m_checkedPixmap;
 };
 
-class TimeLabel : public QLabel
-{
-public:
-    TimeLabel(QWidget *parent = 0) : QLabel(parent) {}
-
-    void setCurrentValue(qint64 value);
-    void setMaximumValue(qint64 value);
-
-private:
-    qint64 m_currentValue;
-    qint64 m_maximumValue;
-};
-
 class NavigationWidget : public QWidget
 {
     Q_OBJECT
@@ -58,7 +45,7 @@ public:
     explicit NavigationWidget(QWidget *parent = 0);
 
     TimeSlider *slider() const;
-    TimeLabel *label() const;
+    QLabel *label() const;
 
     bool isPlaying() const { return m_playing; }
     void setPlaying(bool);
@@ -87,7 +74,7 @@ private:
     bool m_playing;
     QPushButton *m_pauseButton;
     TimeSlider *m_slider;
-    TimeLabel *m_label;
+    QLabel *m_label;
     VolumeWidget *m_volumeWidget;
 
     friend class NavigationItem;

@@ -25,17 +25,6 @@ public:
     }
 };
 
-void TimeLabel::setCurrentValue(qint64 value)
-{
-    m_currentValue = value;
-    setText(formatDuration(m_currentValue/1000, m_maximumValue/1000));
-}
-
-void TimeLabel::setMaximumValue(qint64 value)
-{
-    m_maximumValue = value;
-}
-
 NavigationWidget::NavigationWidget(QWidget *parent) :
     QWidget(parent)
 {
@@ -95,14 +84,14 @@ NavigationWidget::NavigationWidget(QWidget *parent) :
 
     connect(m_playButton, SIGNAL(toggled()), SLOT(slot()));
 
-    m_label = new TimeLabel;
+    m_label = new QLabel;
 
     m_volumeWidget = new VolumeWidget;
     m_layout->addLayout(buttonLayout);
     m_layout->addWidget(m_slider);
+    m_layout->addWidget(m_label);
     m_layout->addWidget(m_volumeWidget);
 
-//    m_layout->addWidget(m_label);
     setLayout(m_layout);
 }
 
@@ -111,7 +100,7 @@ TimeSlider * NavigationWidget::slider() const
     return m_slider;
 }
 
-TimeLabel * NavigationWidget::label() const
+QLabel * NavigationWidget::label() const
 {
     return m_label;
 }
@@ -152,7 +141,7 @@ NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
     m_proxy = new QGraphicsProxyWidget(this);
     m_widget = new NavigationWidget();
     m_widget->slider()->setStyleSheet("QWidget { background: rgb(15, 15, 15); color:rgb(63, 159, 216); }");
-    m_widget->label()->setStyleSheet("QLabel { font-size: 30px; color: rgb(63, 159, 216); }");
+    m_widget->label()->setStyleSheet("QLabel { color: rgb(63, 159, 216); }");
     m_widget->setStyleSheet("QWidget { background: black; }");
     m_proxy->setWidget(m_widget);
     m_timerId = startTimer(33);
@@ -231,7 +220,6 @@ void NavigationItem::updateSlider()
 
     qint64 length = reader->lengthMksec()/1000;
     m_widget->slider()->setMaximumValue(length);
-    m_widget->label()->setMaximumValue(length);
 
     quint64 time;
     if (reader->isSingleShotMode() || reader->isSkippingFrames() || m_camera->currentTime() == 0)
@@ -241,11 +229,11 @@ void NavigationItem::updateSlider()
 
     m_currentTime = time/1000;
     m_widget->slider()->setCurrentValue(m_currentTime);
-    m_widget->label()->setCurrentValue(m_currentTime);
 
     qreal x = m_widget->slider()->x() + 8 + (double)(m_widget->slider()->width() - 16)/(m_widget->slider()->sliderRange())*(m_widget->slider()->currentValue() - m_widget->slider()->viewPortPos()); // fuck you!
     textItem->setPos(x - textItem->boundingRect().width()/2, -40);
     textItem->setPlainText(formatDuration(m_currentTime/1000));
+    m_widget->label()->setText(formatDuration(length/1000));
 }
 
 void NavigationItem::onValueChanged(qint64 time)
