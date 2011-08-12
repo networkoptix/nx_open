@@ -37,8 +37,8 @@ Q_GLOBAL_STATIC(ProxyStyle, proxyStyle)
 void MySlider::paintEvent(QPaintEvent *ev)
 {
     static const int handleSize = 16;
-    static const int gradHeigth = 6;
-    static const int margins = 7;
+    static const int gradHeigth = 10;
+    static const int margins = 5;
     static const QPixmap pix = QPixmap(":/skin/slider-handle.png").scaled(handleSize, handleSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
     QPainter p(this);
@@ -55,12 +55,12 @@ void MySlider::paintEvent(QPaintEvent *ev)
     p.drawRect(QRect(0, margins, r.width(), r.height() - 2*margins));
 
     p.setPen(QPen(QColor(0, 87, 207), 2));
-    p.drawRect(QRect(0, margins, handlePos, r.height() - 2*margins));
+    p.drawRect(QRect(0, margins, handlePos + handleSize/2, r.height() - 2*margins));
 
     QLinearGradient linearGrad(QPointF(0, 0), QPointF(handlePos, height()));
     linearGrad.setColorAt(0, QColor(0, 43, 130));
     linearGrad.setColorAt(1, QColor(186, 239, 255));
-    p.fillRect(0, (height() - gradHeigth)/2, handlePos, gradHeigth, linearGrad);
+    p.fillRect(0, (height() - gradHeigth)/2, handlePos + handleSize/2, gradHeigth, linearGrad);
 
     p.setRenderHint(QPainter::SmoothPixmapTransform, true);
     QRect handleRect(handlePos/* - handleSize/2*/, 1, handleSize, height() - 2);
@@ -232,7 +232,7 @@ void TimeLine::paintEvent(QPaintEvent *ev)
     painter.setPen(pal.color(QPalette::Base));
     const QRect r(handleThickness, frameWidth(), width() - handleThickness, height() - 2*frameWidth());
     painter.drawRect(r);
-    drawGradient(painter, QRect(0, frameWidth(), width(), height() - 2*frameWidth()));
+    drawGradient(painter, QRect(0, 0, width(), height() - 2*frameWidth()));
     painter.setPen(pal.color(QPalette::Text));
 
     const qint64 range = m_parent->sliderRange();

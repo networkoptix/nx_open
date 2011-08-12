@@ -60,6 +60,7 @@ private:
     QPushButton *m_pauseButton;
     TimeSlider *m_slider;
     TimeLabel *m_label;
+    friend class NavigationItem;
 };
 
 class NavigationItem : public CLUnMovedInteractiveOpacityItem
@@ -109,6 +110,8 @@ private:
     bool m_sliderIsmoving;
     qint64 m_currentTime;
     bool m_mouseOver;
+
+    QGraphicsTextItem *textItem;
 };
 
 #endif // NAVIGATIONITEM_H

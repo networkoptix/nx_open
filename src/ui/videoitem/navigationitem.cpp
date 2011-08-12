@@ -12,6 +12,19 @@
 #include "device_plugins/archive/abstract_archive_stream_reader.h"
 #include "util.h"
 
+class MyTextItem: public QGraphicsTextItem
+{
+public:
+    MyTextItem(QGraphicsItem * parent = 0) : QGraphicsTextItem(parent) {}
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+    {
+        static QPixmap pix(":/skin/time-window.png");
+        QRectF rect = boundingRect();
+        painter->drawPixmap(rect.width()/2-pix.width()/2, rect.y() + rect.height()/2 - (pix.height()-10)/2/* + 16/2*/, pix);
+        QGraphicsTextItem::paint(painter, option, widget);
+    }
+};
+
 class MyButton : public QAbstractButton
 {
 public:
@@ -108,7 +121,7 @@ NavigationWidget::NavigationWidget(QWidget *parent) :
 
     m_layout->addLayout(buttonLayout);
     m_layout->addWidget(m_slider);
-    m_layout->addWidget(m_label);
+//    m_layout->addWidget(m_label);
     setLayout(m_layout);
 }
 
@@ -174,6 +187,10 @@ NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
     connect(m_widget, SIGNAL(stepBackward()), SLOT(stepBackward()));
     connect(m_widget, SIGNAL(stepForward()), SLOT(stepForward()));
 
+    textItem = new MyTextItem(m_proxy);
+    textItem->setDefaultTextColor(QColor(63, 159, 216));
+    textItem->setVisible(false);
+
     setVideoCamera(0);
     m_sliderIsmoving = true;
     m_mouseOver = false;
@@ -205,10 +222,13 @@ void NavigationItem::setVideoCamera(CLVideoCamera *camera)
     m_camera = camera;
     if (!camera) {
         setVisible(false);
+        if (textItem)
+            textItem->setVisible(false);
     } else {
         setVisible(true);
         CLAbstractArchiveReader *reader = static_cast<CLAbstractArchiveReader*>(m_camera->getStreamreader());
         m_widget->setPlaying(!reader->onPause());
+        textItem->setVisible(true);
     }
 }
 
@@ -241,6 +261,10 @@ void NavigationItem::updateSlider()
     m_currentTime = time/1000;
     m_widget->slider()->setCurrentValue(m_currentTime);
     m_widget->label()->setCurrentValue(m_currentTime);
+
+    qreal x = m_widget->slider()->x() + 8 + (double)(m_widget->slider()->width() - 16)/(m_widget->slider()->sliderRange())*(m_widget->slider()->currentValue() - m_widget->slider()->viewPortPos()); // fuck you!
+    textItem->setPos(x - textItem->boundingRect().width()/2, -40);
+    textItem->setPlainText(formatDuration(m_currentTime/1000));
 }
 
 void NavigationItem::onValueChanged(qint64 time)
@@ -248,13 +272,17 @@ void NavigationItem::onValueChanged(qint64 time)
     if (m_currentTime == time)
         return;
 
+    qreal x = m_widget->slider()->x() + 8 + (double)(m_widget->slider()->width() - 16)/(m_widget->slider()->sliderRange())*(m_widget->slider()->currentValue() - m_widget->slider()->viewPortPos()); // fuck you!
+    textItem->setPos(x - textItem->boundingRect().width()/2, -40);
+    textItem->setPlainText(formatDuration(time/1000));
+
     CLAbstractArchiveReader *reader = static_cast<CLAbstractArchiveReader*>(m_camera->getStreamreader());
 
     if (reader->isSkippingFrames())
         return;
 
     time *= 1000;
-    if (/*m_sliderIsmoving*/m_widget->slider()->isMoving())
+    if (m_widget->slider()->isMoving())
         reader->jumpTo(time, true);
     else
         reader->jumpToPreviousFrame(time, true);
