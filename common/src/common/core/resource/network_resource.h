@@ -3,11 +3,12 @@
 
 #include "resource.h"
 #include "network/mac_address.h"
+#include "url_resource.h"
 
 class QnNetworkResource;
 typedef QSharedPointer<QnNetworkResource> QnNetworkResourcePtr;
 
-class QnNetworkResource : virtual public QnResource
+class QnNetworkResource : virtual public QnURLResource
 {
 public:
     enum 

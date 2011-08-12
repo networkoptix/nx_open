@@ -390,7 +390,7 @@ QnCompressedAudioDataPtr QnAviArchiveDataProvider::getAudioData(const AVPacket& 
 
     double time_base = av_q2d(stream->time_base);
     audioData->timestamp = packetTimestamp(stream, packet);
-    audioData->duration = qint64(1e+6 * time_base * packet.duration);
+    //audioData->duration = qint64(1e+6 * time_base * packet.duration);
 
     return audioData;
 }

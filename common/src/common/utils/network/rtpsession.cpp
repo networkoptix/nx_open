@@ -46,10 +46,11 @@ qint64	RTPIODevice::read( char * data, qint64 maxSize )
 
 //============================================================================================
 RTPSession::RTPSession():
-m_csec(2),
-m_udpSock(0),
-m_rtcpUdpSock(0),
-m_rtpIo(*this, m_udpSock)
+    m_csec(2),
+    m_udpSock(0),
+    m_rtcpUdpSock(0),
+    m_rtpIo(*this, m_udpSock),
+    m_transport("UDP")
 {
     m_udpSock.setTimeOut(500);
     m_tcpSock.setTimeOut(3 * 1000);
@@ -84,7 +85,7 @@ void RTPSession::parseSDP()
         else if (line.startsWith("a=control:trackid="))
         {
             int trackNum = line.mid(QString("a=control:trackid=").length()).toUInt();
-            m_sdpTracks.insert(codecName, trackNum);
+            m_sdpTracks.insert(trackNum, codecName);
         }
     }
 }
@@ -207,14 +208,14 @@ RTPIODevice*  RTPSession::sendSetup()
     request += mUrl.toString();
 
     if (!m_sdpTracks.isEmpty())
-        request += QString("/trackID=") + QString::number(m_sdpTracks.begin().value());
+        request += QString("/trackID=") + QString::number(m_sdpTracks.begin().key());
 
     request += " RTSP/1.0\r\n";
     request += "CSeq: ";
     request += QByteArray::number(m_csec++);
     request += "\r\n";
     request += "User-Agent: Network Optix\r\n";
-    request += "Transport: RTP/AVP;unicast;client_port=";
+    request += QString("Transport: RTP/AVP/") + m_transport + QString(";unicast;client_port=");
     
 
     request += QString::number(m_udpSock.getLocalPort());
@@ -529,4 +530,15 @@ void RTPSession::updateTransportHeader(QByteArray& responce)
             }
         }
     }
+}
+
+void RTPSession::setTransport(const QString& transport)
+{
+    m_transport = transport;
+}
+
+QString RTPSession::getTrackFormat(int trackNum) const
+{
+    QMap<int, QString>::const_iterator itr = m_sdpTracks.find(trackNum);
+    return itr != m_sdpTracks.end() ? itr.value() : QString();
 }

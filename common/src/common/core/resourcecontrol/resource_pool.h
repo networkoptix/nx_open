@@ -17,6 +17,8 @@ class CLRecorderDevice;
 
 // if resource is conflicting it must not be placed in resource
 
+#define qnResPool QnResourcePool::instance()
+
 class QnResourcePool 
 {
     QnResourcePool();
@@ -31,7 +33,7 @@ public:
 
     QnResourcePtr getResourceById(const QString& id) const;
 
-    QnUrlResourcePtr getResourceByUrl(const QString& url) const;
+    QnURLResourcePtr getResourceByUrl(const QString& url) const;
 
 
     // if it has; returns the pointer to the first equal

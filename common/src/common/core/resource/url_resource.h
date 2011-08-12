@@ -6,7 +6,7 @@
 
 class QnURLResource;
 
-typedef QSharedPointer<QnURLResource> QnUrlResourcePtr;
+typedef QSharedPointer<QnURLResource> QnURLResourcePtr;
 
 class QnURLResource : virtual public QnResource 
 {

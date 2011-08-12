@@ -23,4 +23,6 @@ private:
     QString m_manufacture;
 };
 
+typedef QSharedPointer<QnClientMediaResource> QnClientMediaResourcePtr;
+
 #endif

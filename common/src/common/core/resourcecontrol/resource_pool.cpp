@@ -43,16 +43,16 @@ QnResourcePtr QnResourcePool::getResourceById(const QString& id) const
     return it.value();
 }
 
-QnUrlResourcePtr QnResourcePool::getResourceByUrl(const QString& url) const
+QnURLResourcePtr QnResourcePool::getResourceByUrl(const QString& url) const
 {
     QMutexLocker mtx(&m_resourcesMtx);
     for (ResourceMap::const_iterator it = m_resources.constBegin(); it != m_resources.constEnd(); ++it)
     {
-        QnUrlResourcePtr mr = it->dynamicCast<QnURLResource>();
+        QnURLResourcePtr mr = it->dynamicCast<QnURLResource>();
         if (mr != 0 && mr->getUrl() == url)
             return mr;
     }
-    return QnUrlResourcePtr(0);
+    return QnURLResourcePtr(0);
 }
 
 

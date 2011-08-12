@@ -17,8 +17,7 @@ public:
     explicit RTPIODevice(RTPSession& owner,  CommunicatingSocket& sock);
     virtual ~RTPIODevice();
     virtual qint64	read(char * data, qint64 maxSize );
-    
-    
+   
 private:
 
     CommunicatingSocket& m_sock;
@@ -52,6 +51,9 @@ public:
 
     bool sendKeepAliveIfNeeded(const RtspStatistic* stats);
     void processRtcpData(const RtspStatistic* stats);
+
+    void setTransport(const QString& transport);
+    QString getTrackFormat(int trackNum) const;
 private:
 
     bool sendDescribe();
@@ -88,11 +90,11 @@ private:
     QString m_SessionId;
     unsigned short m_ServerPort;
     // format: key - codc name, value - track number
-    QMap<QString, int> m_sdpTracks;
-
+    QMap<int, QString> m_sdpTracks;
     unsigned int m_TimeOut;
-
     QTime m_keepAliveTime;
+   
+    QString m_transport;
 };
 
 #endif //rtp_session_h_1935_h
