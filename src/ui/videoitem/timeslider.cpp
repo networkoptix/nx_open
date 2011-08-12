@@ -23,7 +23,7 @@ SliderProxyStyle *SliderProxyStyle::instance()
     return proxyStyle();
 }
 
-void MySlider::paintEvent(QPaintEvent *ev)
+void MySlider::paintEvent(QPaintEvent *)
 {
     static const int handleSize = 18;
     static const int gradHeigth = 10;

@@ -19,7 +19,7 @@ public:
 //    QSize sizeHint() const {return m_pixmap.size(); }
 
 protected:
-    void paintEvent(QPaintEvent *e)
+    void paintEvent(QPaintEvent *)
     {
         QPainter p(this);
         p.setRenderHint(QPainter::SmoothPixmapTransform, true);

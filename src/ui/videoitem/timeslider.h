@@ -34,7 +34,7 @@ public:
 class MySlider : public QSlider
 {
 public:
-    MySlider(QWidget *parent = 0) : QSlider(0) {}
+    MySlider(QWidget *parent = 0) : QSlider(parent) {}
 
     void paintEvent(QPaintEvent *ev);
 //    QSize minimumSizeHint() { return QSize(/*QSlider::sizeHint().width()*/200, 16); }

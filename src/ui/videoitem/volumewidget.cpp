@@ -5,7 +5,7 @@
 #include "../../openal/qtvaudiodevice.h"
 #include "timeslider.h"
 
-void MyVolumeSlider::paintEvent(QPaintEvent *ev)
+void MyVolumeSlider::paintEvent(QPaintEvent *)
 {
     static const int gradHeigth = 10;
 

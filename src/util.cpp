@@ -43,7 +43,7 @@ QString formatDuration(unsigned duration, unsigned total)
     if (total == 0)
     {
         if (hours == 0)
-            return QString(QLatin1String("   %1:%2")).arg(minutes, 2, 10, QLatin1Char('0')).arg(seconds, 2, 10, QLatin1Char('0'));
+            return QString(QLatin1String("%1:%2")).arg(minutes, 2, 10, QLatin1Char('0')).arg(seconds, 2, 10, QLatin1Char('0'));
 
         return QString(QLatin1String("%1:%2:%3")).arg(hours).arg(minutes, 2, 10, QLatin1Char('0')).arg(seconds, 2, 10, QLatin1Char('0'));
     }
@@ -58,7 +58,7 @@ QString formatDuration(unsigned duration, unsigned total)
         if (totalHours == 0)
         {
             secondsString = QString(QLatin1String("%1:%2")).arg(minutes, 2, 10, QLatin1Char('0')).arg(seconds, 2, 10, QLatin1Char('0'));
-            totalString = QString(QLatin1String("   %1:%2")).arg(totalMinutes, 2, 10, QLatin1Char('0')).arg(totalSeconds, 2, 10, QLatin1Char('0'));
+            totalString = QString(QLatin1String("%1:%2")).arg(totalMinutes, 2, 10, QLatin1Char('0')).arg(totalSeconds, 2, 10, QLatin1Char('0'));
         }
         else
         {
