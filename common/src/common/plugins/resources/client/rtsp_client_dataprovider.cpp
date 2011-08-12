@@ -1,7 +1,7 @@
 #include "rtsp_client_dataprovider.h"
 
 QnRtspClientDataProvider::QnRtspClientDataProvider(QnResourcePtr res): 
-    QnClientPullStreamProvider(res)
+    QnNavigatedDataProvider(res)
 {
 
 }
@@ -12,6 +12,11 @@ QnAbstractDataPacketPtr QnRtspClientDataProvider::getNextData()
 }
 
 void QnRtspClientDataProvider::updateStreamParamsBasedOnQuality()
+{
+
+}
+
+void QnRtspClientDataProvider::channeljumpTo(quint64 mksec, int channel)
 {
 
 }

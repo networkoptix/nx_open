@@ -1,13 +1,13 @@
 #ifndef __AVI_ARCHIVE_DATAPROVIDER_H
 #define __AVI_ARCHIVE_DATAPROVIDER_H
 
-#include "abstract_archive_dataprovider.h"
 #include "libavformat/avformat.h"
 #include "libavcodec/avcodec.h"
 #include "datapacket/mediadatapacket.h"
 #include "resource/media_resource_layout.h"
+#include "dataprovider/navigated_dataprovider.h"
 
-class QnAviArchiveDataProvider: public QnAbstractArchiveDataProvider
+class QnAviArchiveDataProvider: public QnNavigatedDataProvider
 {
 public:
     QnAviArchiveDataProvider(QnResourcePtr ptr);

@@ -31,7 +31,7 @@ private:
 // ---------------------------------- QnAviArchiveDataProvider -----------------------
 
 QnAviArchiveDataProvider::QnAviArchiveDataProvider(QnResourcePtr ptr):
-    QnAbstractArchiveDataProvider(ptr),
+    QnNavigatedDataProvider(ptr),
     m_formatContext(0),
     m_videoStreamIndex(-1),
     m_audioStreamIndex(-1),
@@ -449,7 +449,7 @@ void QnAviArchiveDataProvider::channeljumpTo(quint64 mksec, int /*channel*/)
 
 void QnAviArchiveDataProvider::setSkipFramesToTime(quint64 skip)
 {
-    QnAbstractArchiveDataProvider::setSkipFramesToTime(skip);
+    QnNavigatedDataProvider::setSkipFramesToTime(skip);
     for (int channel = 0; channel < m_NumaberOfVideoChannels; ++channel)
     {
         m_skippedToTime[channel] = (skip == 0);
