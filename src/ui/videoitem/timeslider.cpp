@@ -47,7 +47,9 @@ void MySlider::paintEvent(QPaintEvent *ev)
     double handlePos = (double)(width()-handleSize)*value()/length;
 
     QRect r = contentsRect();
-
+#ifdef Q_OS_WIN
+    p.fillRect(rect(), QColor(128,128,128,128));
+#endif
     p.setPen(QPen(Qt::gray, 2));
     p.drawRect(QRect(0, margins, r.width(), r.height() - 2*margins));
 

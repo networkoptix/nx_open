@@ -18,7 +18,8 @@ public:
     MySlider(QWidget *parent = 0) : QSlider(0) {}
 
     void paintEvent(QPaintEvent *ev);
-    QSize sizehint() { return QSize(QSlider::sizeHint().width(), 16); }
+    QSize minimumSizeHint() { return QSize(QSlider::sizeHint().width(), 16); }
+    QSize sizeHint() { return QSize(QSlider::sizeHint().width(), 16); }
 };
 
 class TimeSlider : public QWidget
