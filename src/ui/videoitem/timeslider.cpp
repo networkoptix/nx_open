@@ -54,7 +54,7 @@ void MySlider::paintEvent(QPaintEvent *ev)
     p.fillRect(0, (height() - gradHeigth)/2, handlePos + handleSize/2, gradHeigth, linearGrad);
 
     p.setRenderHint(QPainter::SmoothPixmapTransform, true);
-    QRect handleRect(handlePos/* - handleSize/2*/, 1, handleSize, handleSize);
+    QRect handleRect(handlePos/* - handleSize/2*/, 0, handleSize, handleSize);
     p.drawPixmap(handleRect, pix);
 }
 
