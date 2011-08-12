@@ -25,7 +25,7 @@ SliderProxyStyle *SliderProxyStyle::instance()
 
 void MySlider::paintEvent(QPaintEvent *ev)
 {
-    static const int handleSize = 20;
+    static const int handleSize = 18;
     static const int gradHeigth = 10;
     static const int margins = 5;
     static const QPixmap pix = QPixmap(":/skin/slider-handle.png").scaled(handleSize, handleSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
