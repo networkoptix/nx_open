@@ -52,6 +52,11 @@ public:
      bool centralise() const { return m_centralise; }
      void setCentralise(bool b) { m_centralise = b; }
 
+     int sliderValue() const { return m_slider->value(); }
+     int sliderLength() const;
+     qint64 viewPortPos() const;
+     qint64 sliderRange();
+
 signals:
     void currentValueChanged(qint64 value);
     void maximumValueChanged(qint64 value);
@@ -94,15 +99,11 @@ protected slots:
     void onSliderReleased();
     void onSliderPressed();
 protected:
-    qint64 viewPortPos() const;
 
     double delta() const;
 
     double fromSlider(int value);
     int toSlider(double value);
-    int sliderLength() const;
-
-    qint64 sliderRange();
 
     void updateSlider();
     void centraliseSlider();
