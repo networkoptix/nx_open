@@ -184,7 +184,7 @@ uint QtvSound::playTimeElapsed()
 	return res;
 }
 
-bool QtvSound::playImpl() const
+bool QtvSound::playImpl()
 {
 	ALint state = 0;
 	// get state
@@ -192,6 +192,9 @@ bool QtvSound::playImpl() const
 	checkOpenALErrorDebug(m_device);
 	// if already playing
 	if (AL_PLAYING != state) {
+            float volume = QtvAudioDevice::instance().getVolume();
+            alSourcef(m_source, AL_GAIN, qMax(volume, 0.0f));
+
 		// If there are Buffers in the Source Queue then the Source was starved of audio
 		// data, so needs to be restarted (because there is more audio data to play)
 		ALint queuedBuffers = 0;

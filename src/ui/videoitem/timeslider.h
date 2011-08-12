@@ -9,8 +9,27 @@
 #include <QDebug>
 #include <QPainter>
 #include <QResizeEvent>
+#include <QProxyStyle>
 
 class TimeLine;
+
+class SliderProxyStyle : public QProxyStyle
+{
+public:
+    SliderProxyStyle(): QProxyStyle()
+    {
+        setBaseStyle(qApp->style());
+    }
+
+    int styleHint(StyleHint hint, const QStyleOption *option = 0, const QWidget *widget = 0, QStyleHintReturn *returnData = 0) const
+    {
+        if (hint == QStyle::SH_Slider_AbsoluteSetButtons)
+            return Qt::LeftButton;
+        return QProxyStyle::styleHint(hint, option, widget, returnData);
+    }
+
+    static SliderProxyStyle *instance();
+};
 
 class MySlider : public QSlider
 {
@@ -18,8 +37,8 @@ public:
     MySlider(QWidget *parent = 0) : QSlider(0) {}
 
     void paintEvent(QPaintEvent *ev);
-    QSize minimumSizeHint() { return QSize(QSlider::sizeHint().width(), 16); }
-    QSize sizeHint() { return QSize(QSlider::sizeHint().width(), 16); }
+//    QSize minimumSizeHint() { return QSize(/*QSlider::sizeHint().width()*/200, 16); }
+//    QSize sizeHint() { return QSize(QSlider::sizeHint().width(), 16); }
 };
 
 class TimeSlider : public QWidget

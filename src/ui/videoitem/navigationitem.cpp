@@ -25,28 +25,6 @@ public:
     }
 };
 
-class MyButton : public QAbstractButton
-{
-public:
-    void setPixmap(const QPixmap &p) { m_pixmap = p; }
-    void setPressedPixmap(const QPixmap &p) { m_pressedPixmap = p; }
-
-protected:
-    void paintEvent(QPaintEvent *e)
-    {
-        QPainter p(this);
-        p.setRenderHint(QPainter::SmoothPixmapTransform, true);
-        if (!isDown())
-            p.drawPixmap(contentsRect(), m_pixmap);
-        else if (isEnabled())
-            p.drawPixmap(contentsRect(), m_pressedPixmap);
-    }
-
-private:
-    QPixmap m_pixmap;
-    QPixmap m_pressedPixmap;
-};
-
 void TimeLabel::setCurrentValue(qint64 value)
 {
     m_currentValue = value;
@@ -119,8 +97,11 @@ NavigationWidget::NavigationWidget(QWidget *parent) :
 
     m_label = new TimeLabel;
 
+    m_volumeWidget = new VolumeWidget;
     m_layout->addLayout(buttonLayout);
     m_layout->addWidget(m_slider);
+    m_layout->addWidget(m_volumeWidget);
+
 //    m_layout->addWidget(m_label);
     setLayout(m_layout);
 }

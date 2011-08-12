@@ -40,7 +40,7 @@ private:
 	bool setup();
 	static int getFormat(const QAudioFormat& audioFormat);
 	uint bitRate() const;
-	bool playImpl() const;
+        bool playImpl();
 
 	static bool outError(int err, const char* strerr);
 	static int checkOpenALErrorDebug(ALCdevice* device);

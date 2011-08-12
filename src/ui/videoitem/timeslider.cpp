@@ -10,33 +10,22 @@
 #include <QtGui/QWheelEvent>
 //#include <QDebug>
 
-#include <QProxyStyle>
 #include "base/log.h"
 #include "util.h"
 
 static const double MAX_MIN_OPACITY = 0.6;
 static const double MIN_MIN_OPACITY = 0.1;
 
-class ProxyStyle : public QProxyStyle
-{
-public:
-    ProxyStyle(): QProxyStyle()
-    {
-        setBaseStyle(qApp->style());
-    }
+Q_GLOBAL_STATIC(SliderProxyStyle, proxyStyle)
 
-    int styleHint(StyleHint hint, const QStyleOption *option = 0, const QWidget *widget = 0, QStyleHintReturn *returnData = 0) const
-    {
-        if (hint == QStyle::SH_Slider_AbsoluteSetButtons)
-            return Qt::LeftButton;
-        return QProxyStyle::styleHint(hint, option, widget, returnData);
-    }
-};
-Q_GLOBAL_STATIC(ProxyStyle, proxyStyle)
+SliderProxyStyle *SliderProxyStyle::instance()
+{
+    return proxyStyle();
+}
 
 void MySlider::paintEvent(QPaintEvent *ev)
 {
-    static const int handleSize = 16;
+    static const int handleSize = 20;
     static const int gradHeigth = 10;
     static const int margins = 5;
     static const QPixmap pix = QPixmap(":/skin/slider-handle.png").scaled(handleSize, handleSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
@@ -65,7 +54,7 @@ void MySlider::paintEvent(QPaintEvent *ev)
     p.fillRect(0, (height() - gradHeigth)/2, handlePos + handleSize/2, gradHeigth, linearGrad);
 
     p.setRenderHint(QPainter::SmoothPixmapTransform, true);
-    QRect handleRect(handlePos/* - handleSize/2*/, 1, handleSize, height() - 2);
+    QRect handleRect(handlePos/* - handleSize/2*/, 1, handleSize, handleSize);
     p.drawPixmap(handleRect, pix);
 }
 
@@ -439,7 +428,7 @@ TimeSlider::TimeSlider(QWidget *parent) :
     m_slider->setMaximum(1000);
     m_slider->installEventFilter(this);
 
-    ProxyStyle *s = proxyStyle();
+    SliderProxyStyle *s = proxyStyle();
     m_slider->setStyle(s);
 
     m_frame->setFrameShape(QFrame::WinPanel);

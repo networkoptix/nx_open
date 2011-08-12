@@ -2,13 +2,41 @@
 #define NAVIGATIONITEM_H
 
 #include "unmoved/unmoved_interactive_opacity_item.h"
+#include "volumewidget.h"
 
 class QTimerEvent;
 class CLVideoCamera;
 class TimeSlider;
 class QGraphicsProxyWidget;
+class VolumeWidget;
 
-class MyButton;
+class MyButton : public QAbstractButton
+{
+public:
+    void setPixmap(const QPixmap &p) { m_pixmap = p; }
+    void setPressedPixmap(const QPixmap &p) { m_pressedPixmap = p; }
+    void setCheckedPixmap(const QPixmap &p) { m_checkedPixmap = p; }
+//    QSize sizeHint() const {return m_pixmap.size(); }
+
+protected:
+    void paintEvent(QPaintEvent *e)
+    {
+        QPainter p(this);
+        p.setRenderHint(QPainter::SmoothPixmapTransform, true);
+        if (!isDown())
+            p.drawPixmap(contentsRect(), m_pixmap);
+        else if (isEnabled())
+            p.drawPixmap(contentsRect(), m_pressedPixmap);
+        if (isChecked())
+            p.drawPixmap(contentsRect(), m_checkedPixmap);
+    }
+
+private:
+    QPixmap m_pixmap;
+    QPixmap m_pressedPixmap;
+    QPixmap m_checkedPixmap;
+};
+
 class TimeLabel : public QLabel
 {
 public:
@@ -60,6 +88,8 @@ private:
     QPushButton *m_pauseButton;
     TimeSlider *m_slider;
     TimeLabel *m_label;
+    VolumeWidget *m_volumeWidget;
+
     friend class NavigationItem;
 };
 
