@@ -1,16 +1,18 @@
 #ifndef __SIMPLE_HTTP_CLIENT__
 #define __SIMPLE_HTTP_CLIENT__
 
+#include <QtNetwork/QHostAddress>
+#include <QtNetwork/QAuthenticator>
+
 #include "socket.h"
 #include "common/associativearray.h"
-
 
 enum CLHttpStatus {CL_HTTP_SUCCESS, CL_HTTP_AUTH_REQUIRED, CL_HTTP_HOST_NOT_AVAILABLE};
 
 class CLSimpleHTTPClient : public QnAssociativeArray
 {
-    enum {Basic , Digestaccess };
-public:	
+	enum {Basic , Digestaccess };
+public:
 	CLSimpleHTTPClient(const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth);
 	~CLSimpleHTTPClient();
 
@@ -21,7 +23,7 @@ public:
 
 	long read(char* data, unsigned long max_len);
 
-	QString getContentType() const 
+	QString getContentType() const
 	{
 		return m_contentType;
 	}
@@ -37,15 +39,14 @@ public:
 
 
 private:
-	CLHttpStatus getNextLine();
+    CLHttpStatus getNextLine();
     void getAuthInfo();
 
     QString basicAuth() const;
     QString digestAccess() const;
 
 private:
-
-    QString m_line;
+	QString m_line;
 
 	QHostAddress m_host;
 	int m_port;
@@ -53,16 +54,13 @@ private:
 	QString m_request;
 	QString m_contentType;
 	unsigned int m_contentLen;
-    unsigned int m_readed;
+	unsigned int m_readed;
 
 	TCPSocket m_sock;
 	bool m_connected;
 
 	unsigned int m_timeout;
 	QAuthenticator m_auth;
-
-    
-
 };
 
 #endif //__SIMPLE_HTTP_CLIENT__

@@ -9,8 +9,8 @@ QnPlAVClinetPullStreamReader(res)
 
 	m_port = 69;
 	m_timeout = 500;
-	
-    QnPlAreconVisionResourcePtr avRes = res.dynamicCast<QnPlAreconVisionResource>();
+
+	QnPlAreconVisionResourcePtr avRes = res.dynamicCast<QnPlAreconVisionResource>();
 
     m_panoramic = avRes->isPanoramic();
     m_dualsensor = avRes->isDualSensor();
@@ -53,9 +53,9 @@ QnAbstractDataPacketPtr  AVClientPullSSHTTPStreamreader::getNextData()
 				if (codec.value.value != QString("JPEG"))
 					h264 = true;
 			}
-			/**/
+			*/
 
-			if (!m_streamParam.exists("Quality") || !m_streamParam.exists("resolution") || 
+			if (!m_streamParam.exists("Quality") || !m_streamParam.exists("resolution") ||
 				!m_streamParam.exists("image_left") || !m_streamParam.exists("image_top") ||
 				!m_streamParam.exists("image_right") || !m_streamParam.exists("image_bottom") ||
 				(h264 && !m_streamParam.exists("streamID")) )
@@ -87,7 +87,7 @@ QnAbstractDataPacketPtr  AVClientPullSSHTTPStreamreader::getNextData()
 			//=========
 
 			if (h264)
-				quality=37-quality; // for H.264 it's not quality; it's qp 
+				quality=37-quality; // for H.264 it's not quality; it's qp
 
 			if (!h264)
 				os <<"image";
@@ -131,7 +131,7 @@ QnAbstractDataPacketPtr  AVClientPullSSHTTPStreamreader::getNextData()
 	if (!http_client.isOpened())
 		return QnAbstractMediaDataPacketPtr(0);
 
-    QnCompressedVideoDataPtr videoData ( new QnCompressedVideoData(CL_MEDIA_ALIGNMENT,forecast_size) );
+	QnCompressedVideoDataPtr videoData ( new QnCompressedVideoData(CL_MEDIA_ALIGNMENT,forecast_size) );
 	CLByteArray& img = videoData->data;
 
 	while(http_client.isOpened())
@@ -179,7 +179,7 @@ QnAbstractDataPacketPtr  AVClientPullSSHTTPStreamreader::getNextData()
 
 	if (h264) // for jpej keyFrame always true
 	{
-		if (!http_client.exist("Content-Type")) // very strange 
+		if (!http_client.exist("Content-Type")) // very strange
 		{
 			videoData->keyFrame = false;
 		}

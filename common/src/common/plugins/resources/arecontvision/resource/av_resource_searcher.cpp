@@ -1,4 +1,9 @@
 #include "av_resource_searcher.h"
+
+#include <QtCore/QCoreApplication>
+
+#include <QtNetwork/QUdpSocket>
+
 #include "av_resource.h"
 #include "../tools/AVJpegHeader.h"
 #include "network/nettools.h"
@@ -44,7 +49,7 @@ QString QnPlArecontResourceSearcher::manufacture() const
 	return ArecontVisionManufacture;
 }
 
-// returns all available devices 
+// returns all available devices
 QnResourceList QnPlArecontResourceSearcher::findResources()
 {
 	QnResourceList result;
@@ -81,13 +86,13 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
 
 		}
 
-		// collecting response 
+		// collecting response
 		QTime time;
 		time.start();
 
 		while(time.elapsed()<150)
 		{
-			while (sock.hasPendingDatagrams()) 
+			while (sock.hasPendingDatagrams())
 			{
 				QByteArray datagram;
 				datagram.resize(sock.pendingDatagramSize());
@@ -107,14 +112,14 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
 				unsigned char mac[6];
 				memcpy(mac,data + 22,6);
 
-                /*/
+				/*/
 				QString smac = MACToString(mac);
 
-				
-                QString id = "AVUNKNOWN";
+
+				QString id = "AVUNKNOWN";
 				int model = 0;
 
-				
+
 				int shift = 32;
 
 				CLAreconVisionDevice* resource = 0;
@@ -122,10 +127,10 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
 				if (datagram.size() > shift + 5)
 				{
 					model = (unsigned char)data[shift+2] * 256 + (unsigned char)data[shift+3]; //4
-					QString smodel; 
+					QString smodel;
 					smodel.setNum(model);
 					smodel = smodel;
-					id = smodel; // this is not final version of the ID; it might/must be updated later 
+					id = smodel; // this is not final version of the ID; it might/must be updated later
 					resource = deviceByID(id, model);
 
 					if (resource)
@@ -133,14 +138,14 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
 				}
 				else
 				{
-					// very old cam; in future need to request model seporatly 
+					// very old cam; in future need to request model seporatly
 					resource = new CLAreconVisionDevice(AVUNKNOWN);
 					resource->setName("AVUNKNOWN");
 
 				}
-				/**/
+				/*/
 
-				// in any case let's HTTP do it's job at very end of discovery 
+				// in any case let's HTTP do it's job at very end of discovery
 				QnNetworkResourcePtr resource ( new QnPlAreconVisionResource() );
 				//resource->setName("AVUNKNOWN");
 
@@ -152,7 +157,7 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
 				resource->setDiscoveryAddr( ipaddrs.at(i) );
 
                 if (hasEqualResource(result, resource))
-                    continue; // already has such 
+                    continue; // already has such
 
 				result.push_back(resource);
 			}
@@ -175,5 +180,5 @@ QnPlArecontResourceSearcher& QnPlArecontResourceSearcher::instance()
 
 QnResourcePtr QnPlArecontResourceSearcher::checkHostAddr(QHostAddress addr)
 {
-    return QnResourcePtr(0);
+	return QnResourcePtr(0);
 }

@@ -60,7 +60,7 @@ bool CLByteArray::increase_capacity(unsigned int new_capacity)
 	if (new_capacity <= m_size + m_alignment)
 		return false;
 
-	char* new_data = new char[new_capacity]; 
+	char* new_data = new char[new_capacity];
 	if (!new_data)
 		return false;
 
@@ -82,7 +82,7 @@ bool CLByteArray::increase_capacity(unsigned int new_capacity)
 
 unsigned int CLByteArray::write(const char* data, unsigned int size)
 {
-	if (size > m_capacity - m_size) // if we do not have anougth space 
+	if (size > m_capacity - m_size) // if we do not have anougth space
 	{
 		if (!increase_capacity(m_capacity*2 + size))
 			return 0;
@@ -95,12 +95,12 @@ unsigned int CLByteArray::write(const char* data, unsigned int size)
 
 unsigned int CLByteArray::write(const QByteArray& data)
 {
-    return write(data.constData(), data.size());
+	return write(data.constData(), data.size());
 }
 
 unsigned int CLByteArray::write(const char* data, unsigned int size, int abs_shift  )
 {
-	if (size + abs_shift > m_capacity) // if we do not have anougth space 
+	if (size + abs_shift > m_capacity) // if we do not have anougth space
 	{
 		if (!increase_capacity(m_capacity*2 + size))
 			return 0;
@@ -127,7 +127,7 @@ void CLByteArray::clear()
 
 char* CLByteArray::prepareToWrite(int size)
 {
-	if (size > m_capacity - m_size) // if we do not have anogth space 
+	if (uint(size) > m_capacity - m_size) // if we do not have anogth space
 	{
 		if (!increase_capacity(m_capacity*2 + size))
 			return 0;

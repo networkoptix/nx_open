@@ -2,6 +2,9 @@
 #define rtp_session_h_1935_h
 #include "socket.h"
 
+#include <QtCore/QDateTime>
+#include <QtCore/QUrl>
+
 class RTPSession;
 
 struct RtspStatistic {
@@ -11,14 +14,14 @@ struct RtspStatistic {
     qint64 receivedOctets;
 };
 
-class RTPIODevice 
+class RTPIODevice
 {
 public:
     explicit RTPIODevice(RTPSession& owner,  CommunicatingSocket& sock);
     virtual ~RTPIODevice();
     virtual qint64	read(char * data, qint64 maxSize );
-    
-    
+
+
 private:
 
     CommunicatingSocket& m_sock;
@@ -35,20 +38,20 @@ public:
 
     // returns true if stream was opened, false in case of some error
     bool open(const QString& url);
-    
-	RTPIODevice* play();
 
-    // returns true if there is no error delivering STOP
+    RTPIODevice* play();
+
+	// returns true if there is no error delivering STOP
 	bool stop();
 
 
-    // returns true if session is opened 
+    // returns true if session is opened
     bool isOpened() const;
 
-    // session timeout in ms
+	// session timeout in ms
 	unsigned int sessionTimeoutMs();
 
-    const QByteArray& getSdp() const;
+	const QByteArray& getSdp() const;
 
     bool sendKeepAliveIfNeeded(const RtspStatistic* stats);
     void processRtcpData(const RtspStatistic* stats);
@@ -80,7 +83,7 @@ private:
     UDPSocket m_udpSock;
     UDPSocket m_rtcpUdpSock;
     RTPIODevice m_rtpIo;
-    
+
 
     QUrl mUrl;
 

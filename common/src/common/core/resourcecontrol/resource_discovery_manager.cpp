@@ -1,13 +1,14 @@
+#include "resource_discovery_manager.h"
+
+#include <QtCore/QtConcurrentMap>
+#include <QtCore/QThreadPool>
 
 #include "resource/network_resource.h"
-#include "settings.h"
 #include "abstract_resource_searcher.h"
 #include "resource_pool.h"
-#include "resource_discovery_manager.h"
 
 QnResourceDiscoveryManager::QnResourceDiscoveryManager()
 {
-
 }
 
 QnResourceDiscoveryManager::~QnResourceDiscoveryManager()
@@ -38,7 +39,7 @@ void QnResourceDiscoveryManager::run()
 		CL_LOG(cl_logWARNING) cl_log.log(message ,cl_logWARNING);
 		if (first_time)
 		{
-            // msg box was here 
+			// msg box was here
 			first_time = false;
 		}
 	}
@@ -50,23 +51,23 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool& ip_finished)
     /*/
     bool allow_to_change_ip = allowToChangeresourceIP;
 
-	ip_finished = false;
+    ip_finished = false;
 
 	QnResourceList::iterator it;
 	QTime time;
 	time.start();
 
-	m_netState.updateNetState(); // update net state before serach 
+	m_netState.updateNetState(); // update net state before serach
 
 	//====================================
 	CL_LOG(cl_logDEBUG1) cl_log.log("looking for resources...", cl_logDEBUG1);
 
 	QnResourceList resources;
 
-    
+
 	{
 		QMutexLocker lock(&m_searchersListMtx);
-        foreach(QnAbstractResourceSearcher* searcher, m_searchersList)
+		foreach(QnAbstractResourceSearcher* searcher, m_searchersList)
 		{
 			QnResourceList temp = searcher->findResources();
 			resources.append(temp);
@@ -78,15 +79,15 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool& ip_finished)
 	//excluding already existing resources with READY status
 	{
 
-		it = resources.begin(); 
+		it = resources.begin();
 		while (it!=resources.end())
 		{
-            
-            QnResourcePtr existingResource = QnResourcePool::instance().hasEqualResource(*it);
+
+			QnResourcePtr existingResource = QnResourcePool::instance().hasEqualResource(*it);
 
 			if (!existingResource)
 			{
-                // new one; sholud stay
+				// new one; sholud stay
 				++it;
 				continue;
 			}
@@ -94,7 +95,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool& ip_finished)
 			if (existingResource->getStatus().checkFlag(QnResourceStatus::READY)) // such resource already exists
 			{
 				// however, ip address or mask may be changed( very unlikely but who knows )
-				// and this is why we need to check if old( already existing resource) still is in our subnet 
+				// and this is why we need to check if old( already existing resource) still is in our subnet
 				if (existingResource->checkDeviceTypeFlag(QnResource::NETWORK))
 				{
 					QnNetworkResourcePtr existingResourceNet = existingResource.staticCast<QnNetworkResource>();
@@ -123,13 +124,13 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool& ip_finished)
 	// at this point in resources we have all new found resources
 	QnResourceList notNetworkResources;
 
-	// remove all not network resources from list 
+	// remove all not network resources from list
 	{
 		QnResourceList::iterator it = resources.begin();
 		while (it!=resources.end())
 		{
 
-            if (!(*it).dynamicCast<QnNetworkResource>()) // is it network resource
+			if (!(*it).dynamicCast<QnNetworkResource>()) // is it network resource
 			{
 				notNetworkResources.push_back(*it);
 				it = resources.erase(it);
@@ -139,7 +140,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool& ip_finished)
 		}
 	}
 
-	// now resources list has only network resources 
+	// now resources list has only network resources
 
 	// lets form the list of existing IP
 	CLIPList busy_list;
@@ -189,7 +190,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool& ip_finished)
 
 	//======================================
 
-	// now in resources only new non conflicting resources; in bad_ip_list only resources with conflicts, so ip of bad_ip_list must be chnged 
+	// now in resources only new non conflicting resources; in bad_ip_list only resources with conflicts, so ip of bad_ip_list must be chnged
 	if (!allow_to_change_ip)// nothing else we can do
 	{
 		// move all back to resources
@@ -207,7 +208,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool& ip_finished)
 	// put ip of all resources into busy_list
 	{
 
-        QnResourceList networkResources = QnResourcePool::instance().getResourcesWithFlag(QnResource::NETWORK);
+		QnResourceList networkResources = QnResourcePool::instance().getResourcesWithFlag(QnResource::NETWORK);
 
 		foreach(QnResourcePtr res, networkResources)
 		{
@@ -242,7 +243,7 @@ END:
 		// also in case if in already existing resources some resources conflicts with something see [-1-]
 		// we need to resolve that conflicts
 
-        
+
 		QnResourceList bad_ip_list;
 
 		QMutexLocker lock(&all_devices_mtx);
@@ -252,12 +253,12 @@ END:
 			resovle_conflicts(bad_ip_list, busy_list, ip_finished);
 			fromListToList(bad_ip_list, all_devices, 0, 0);
 		}
-        
+
 
 	}
 
 	// ok. at this point resources contains only network resources. and some of them have unknownResource==true;
-	// we need to resolve such resources 
+	// we need to resolve such resources
 	if (resources.count())
 	{
 		resources = resolveUnknown_helper(resources);
@@ -267,13 +268,13 @@ END:
 
 	resources.append(notNetworkResources); // move everything to result list
 
-    /**/
+	/*/
 
-    QnResourceList resources;
+	QnResourceList resources;
 
 	return resources;
-
 }
+
 //====================================================================================
 
 void QnResourceDiscoveryManager::resovle_conflicts(QnResourceList& resourceList, CLIPList& busy_list, bool& ip_finished)
@@ -298,7 +299,7 @@ void QnResourceDiscoveryManager::resovle_conflicts(QnResourceList& resourceList,
 
 		if (resource->setHostAddress(subnet.currHostAddress, QnDomainPhysical))
 		{
-            //todo
+			//todo
 			//resource->getStatus().removeFlag(QnResourceStatus::CONFLICTING);
 			//resource->getStatus().removeFlag(QnResourceStatus::NOT_IN_SUBNET);
 		}
@@ -309,16 +310,16 @@ void QnResourceDiscoveryManager::resovle_conflicts(QnResourceList& resourceList,
 
 bool QnResourceDiscoveryManager::checkObviousConflicts(QnResourceList& lst)
 {
-	// this function deals with network resources only 
+    // this function deals with network resources only
 
     /*/
-    
-	bool result = false;
+
+    bool result = false;
 
 	QMap<QString,  QnResource*> ips;
 	QMap<QString,  QnResource*>::iterator ip_it;
 
-	
+
 	{
 		// put in already busy ip, ip from all_devices
 		QMutexLocker lock(&all_devices_mtx);
@@ -333,7 +334,7 @@ bool QnResourceDiscoveryManager::checkObviousConflicts(QnResourceList& lst)
 			++it;
 		}
 	}
-	
+
 
 	QnResourceList::iterator it = lst.begin();
 	while (it!=lst.end())
@@ -358,13 +359,13 @@ bool QnResourceDiscoveryManager::checkObviousConflicts(QnResourceList& lst)
 
 	return result;
 
-    /**/
+    /*/
     return true;
 }
 
 void QnResourceDiscoveryManager::fromListToList(QnResourceList& from, QnResourceList& to, int mask, int value)
 {
-    /*
+	/*
 	QnResourceList::iterator it = from.begin();
 	while (it!=from.end())
 	{
@@ -378,52 +379,30 @@ void QnResourceDiscoveryManager::fromListToList(QnResourceList& from, QnResource
 		else
 			++it;
 	}
-    /**/
-
+	/*/
 }
 
-#ifndef _WIN32
 struct T
 {
 	T(QnNetworkResourcePtr r)
 	{
 		resource = r;
 	}
-	
+
 	void f()
 	{
 		resource->conflicting();
 	}
-	
+
 	QnNetworkResourcePtr resource;
 };
-#endif
 
 void QnResourceDiscoveryManager::markConflictingResources(QnResourceList& lst, int threads)
 {
 	// cannot make concurrent work with pointer CLDevice* ; => so extra steps needed
-	// this function deals with network resources only 
-
-#ifdef _WIN32
-    struct T
-    {
-        T(QnNetworkResourcePtr r)
-        {
-            resource = r;
-        }
-
-        void f()
-        {
-            resource->conflicting();
-        }
-
-        QnNetworkResourcePtr resource;
-    };
-#endif
-
+	// this function deals with network resources only
 
 	QList<T> local_list;
-
 
     foreach(QnResourcePtr res, lst)
     {
@@ -443,14 +422,14 @@ void QnResourceDiscoveryManager::markConflictingResources(QnResourceList& lst, i
 QnResourceList QnResourceDiscoveryManager::resolveUnknown_helper(QnResourceList& lst)
 {
 
-	QnResourceList result;
+    QnResourceList result;
 
-	/*/todo
+    /*/todo
     foreach(QnResourcePtr res, lst)
     {
-		QnNetworkResourcePtr resource = res.staticCast<QnNetworkResource>();
+        QnNetworkResourcePtr resource = res.staticCast<QnNetworkResource>();
 
-		if (!resource->unknownResource() || 
+		if (!resource->unknownResource() ||
 			resource->getStatus().checkFlag(QnResourceStatus::CONFLICTING) ||
 			resource->getStatus().checkFlag(QnResourceStatus::NOT_IN_SUBNET))
 		{
@@ -459,7 +438,7 @@ QnResourceList QnResourceDiscoveryManager::resolveUnknown_helper(QnResourceList&
 			continue;
 		}
 
-		// resource is unknown and not conflicting 
+		// resource is unknown and not conflicting
 		QnNetworkResourcePtr newResource = resource->updateResource();
 
 		if (newResource)
@@ -475,9 +454,8 @@ QnResourceList QnResourceDiscoveryManager::resolveUnknown_helper(QnResourceList&
 			result.push_back(resource);
 		}
 
-	}
-    /**/
+    }
+    /*/
 
-	return result;
-
+    return result;
 }

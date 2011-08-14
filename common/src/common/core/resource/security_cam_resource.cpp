@@ -1,6 +1,5 @@
 #include "security_cam_resource.h"
 
-
 QnSequrityCamResource::QnSequrityCamResource()
 {
     addFlag(QnResource::live_cam);

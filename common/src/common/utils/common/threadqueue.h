@@ -1,5 +1,9 @@
 #ifndef cl_ThreadQueue_h_2236
-#define cl_ThreadQueue_h_2236 
+#define cl_ThreadQueue_h_2236
+
+#include <QtCore/QMutex>
+#include <QtCore/QQueue>
+#include <QtCore/QSemaphore>
 
 #include "log.h"
 
@@ -13,21 +17,21 @@ template <typename T>
 class CLThreadQueue
 {
 public:
-	CLThreadQueue( quint32 maxSize = MAX_THREAD_QUEUE_SIZE)
+    CLThreadQueue( quint32 maxSize = MAX_THREAD_QUEUE_SIZE)
         : m_maxSize( maxSize )
-	{
-	}
+    {
+    }
 
-	bool push(const T& val) 
-	{ 
+	bool push(const T& val)
+	{
 		QMutexLocker mutex(&m_cs);
 
 		// we can have 2 threads independetlly put data at the same queue; so we need to put data any way. client is responsible for max size of the quue
 		//if ( m_queue.size()>=m_maxSize )	return false; <- wrong aproach
 
-		m_queue.enqueue(val); 
+		m_queue.enqueue(val);
 
-		m_sem.release(); 
+		m_sem.release();
 
 		return true;
 	}
@@ -39,10 +43,10 @@ public:
 
 		QMutexLocker mutex(&m_cs);
 
-		if (!m_queue.empty()) 
+		if (!m_queue.empty())
 		{
-			val = m_queue.dequeue();  
-			return true; 
+			val = m_queue.dequeue();
+			return true;
 		}
 
 		return false;
@@ -50,9 +54,9 @@ public:
 
 	void clear()
 	{
-    	QMutexLocker mutex(&m_cs);
+		QMutexLocker mutex(&m_cs);
 
-		while (!m_queue.empty()) 
+		while (!m_queue.empty())
 		{
 			m_sem.tryAcquire();
 			m_queue.dequeue();

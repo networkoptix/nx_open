@@ -1,6 +1,9 @@
 #include "rtpsession.h"
 #include "rtp_stream_parser.h"
 
+#if defined(Q_OS_WIN)
+#  include <winsock2.h>
+#endif
 
 #define DEFAULT_RTP_PORT 554
 #define RESERVED_TIMEOUT_TIME (5*1000)
@@ -64,7 +67,7 @@ void RTPSession::parseSDP()
 {
     QList<QByteArray> lines = m_sdp.split('\n');
 
-    int mapNum = -1; 
+    int mapNum = -1;
     QString codecName;
     foreach(QByteArray line, lines)
     {
@@ -92,7 +95,7 @@ void RTPSession::parseSDP()
 
 bool RTPSession::open(const QString& url)
 {
-    mUrl = url; 
+    mUrl = url;
 
     unsigned int port = DEFAULT_RTP_PORT;
 
@@ -128,7 +131,7 @@ RTPIODevice* RTPSession::play()
     if (ioDevice == 0)
         return 0;
 
-    
+
     if (!sendPlay())
         return 0;
 
@@ -172,7 +175,7 @@ bool RTPSession::sendDescribe()
     request += "\r\n";
     request += "User-Agent: Network Optix\r\n";
     request += "Accept: application/sdp\r\n\r\n";
-    
+
     //qDebug() << request;
 
     if (!m_tcpSock.send(request.data(), request.size()))
@@ -215,7 +218,7 @@ RTPIODevice*  RTPSession::sendSetup()
     request += "\r\n";
     request += "User-Agent: Network Optix\r\n";
     request += "Transport: RTP/AVP;unicast;client_port=";
-    
+
 
     request += QString::number(m_udpSock.getLocalPort());
     request += ',';
@@ -233,7 +236,7 @@ RTPIODevice*  RTPSession::sendSetup()
         return 0;
 
 
-    if (!responce.startsWith("RTSP/1.0 200")) 
+    if (!responce.startsWith("RTSP/1.0 200"))
     {
         return 0;
     }
@@ -243,7 +246,7 @@ RTPIODevice*  RTPSession::sendSetup()
 
     QString tmp = extractRTSPParam(responce, "Session:");
 
-    if (tmp.size() > 0) 
+    if (tmp.size() > 0)
     {
         QStringList tmpList = tmp.split(';');
         m_SessionId = tmpList[0];
@@ -263,7 +266,7 @@ RTPIODevice*  RTPSession::sendSetup()
     tmp = extractRTSPParam(responce, "Transport:");
     if (tmp.size() > 0)  {
         QStringList data = tmp.split(';');
-        foreach(QString param, data) 
+        foreach(QString param, data)
         {
             if (param.starsWith("server_port")) {
 
@@ -333,12 +336,12 @@ bool RTPSession::sendTeardown()
         false;
 
 
-    
+
     if (!readResponce(responce) || !responce.startsWith("RTSP/1.0 200"))
     {
         return false;
     }
-    else 
+    else
     {
         //d->lastSendTime.start();
         return 0;
@@ -355,7 +358,7 @@ int RTPSession::buildRTCPReport(quint8* dstBuffer, const RtspStatistic* stats)
 
 
     quint8* curBuffer = dstBuffer;
-    *curBuffer++ = (RtpHeader::RTP_VERSION << 6); 
+    *curBuffer++ = (RtpHeader::RTP_VERSION << 6);
     *curBuffer++ = RTCP_RECEIVER_REPORT;  // packet type
     curBuffer += 2; // skip len field;
 
@@ -371,7 +374,7 @@ int RTPSession::buildRTCPReport(quint8* dstBuffer, const RtspStatistic* stats)
     // correct len field (count of 32 bit words -1)
     quint16 len = (quint16) (curBuf32 - (quint32*) dstBuffer);
     * ((quint16*) (dstBuffer + 2)) = htons(len-1);
-    
+
     // build source description
     curBuffer = (quint8*) curBuf32;
     *curBuffer++ = (RtpHeader::RTP_VERSION << 6) + 1;  // source count = 1
@@ -388,7 +391,7 @@ int RTPSession::buildRTCPReport(quint8* dstBuffer, const RtspStatistic* stats)
     while ((curBuffer - dstBuffer)%4 != 0)
         *curBuffer++ = 0;
     //return len * sizeof(quint32);
-    
+
     return curBuffer - dstBuffer;
 }
 
@@ -405,13 +408,13 @@ void RTPSession::processRtcpData(const RtspStatistic* stats)
         {
             if (!m_rtcpUdpSock.isConnected())
             {
-                
+
                 m_rtcpUdpSock.setDestAddr(lastReceivedAddr, lastReceivedPort);
             }
 
             quint32 timestamp = 0;
             double nptTime = 0;
-            if (stats) 
+            if (stats)
             {
                 int outBufSize = buildRTCPReport(sendBuffer, stats);
                 if (outBufSize > 0)
@@ -432,7 +435,7 @@ bool RTPSession::sendKeepAliveIfNeeded(const RtspStatistic* stats)
 
     if (m_keepAliveTime.elapsed() < m_TimeOut - RESERVED_TIMEOUT_TIME)
         return true;
-    else 
+    else
     {
         bool res= sendKeepAlive();
         m_keepAliveTime.restart();
@@ -450,7 +453,7 @@ bool RTPSession::sendKeepAlive()
     request += " RTSP/1.0\r\n";
     request += "CSeq: ";
     request += QByteArray::number(m_csec++);
-    //if (!d->sessionId.isEmpty()) 
+    //if (!d->sessionId.isEmpty())
     {
         request += "\r\n";
         request += "Session: ";
@@ -468,7 +471,7 @@ bool RTPSession::sendKeepAlive()
     {
         return false;
     }
-    else 
+    else
     {
         return true;
     }
@@ -516,7 +519,7 @@ QString RTPSession::extractRTSPParam(const QString& buffer, const QString& param
 void RTPSession::updateTransportHeader(QByteArray& responce)
 {
     QString tmp = extractRTSPParam(responce, "Transport:");
-    if (tmp.size() > 0) 
+    if (tmp.size() > 0)
     {
         QStringList tmpList = tmp.split(';');
         for (int i = 0; i < tmpList.size(); ++i)

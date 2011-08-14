@@ -4,18 +4,16 @@
 #include "dataconsumer/dataconsumer.h"
 
 
-QnAbstractStreamDataProvider::QnAbstractStreamDataProvider(QnResourcePtr res):
-QnResourceConsumer(res),
-m_dataRate(999), // very big value, like max fps 
-m_mtx(QMutex::Recursive)
-
+QnAbstractStreamDataProvider::QnAbstractStreamDataProvider(QnResourcePtr res)
+	: QnResourceConsumer(res),
+	m_mtx(QMutex::Recursive),
+	m_dataRate(999) // very big value, like max fps
 {
-
 }
 
 QnAbstractStreamDataProvider::~QnAbstractStreamDataProvider()
 {
-	stop();
+    stop();
 }
 
 bool QnAbstractStreamDataProvider::dataCanBeAccepted() const
@@ -27,7 +25,7 @@ bool QnAbstractStreamDataProvider::dataCanBeAccepted() const
     {
         if (dp->canAcceptData())
             result = true;
-        else 
+        else
             return false;
     }
 
@@ -53,7 +51,7 @@ void QnAbstractStreamDataProvider::removeDataProcessor(QnAbstractDataConsumer* d
 void QnAbstractStreamDataProvider::pauseDataProcessors()
 {
     QMutexLocker mtx(&m_mtx);
-    foreach(QnAbstractDataConsumer* dataProcessor, m_dataprocessors) 
+    foreach(QnAbstractDataConsumer* dataProcessor, m_dataprocessors)
     {
         dataProcessor->pause();
     }
@@ -62,7 +60,7 @@ void QnAbstractStreamDataProvider::pauseDataProcessors()
 void QnAbstractStreamDataProvider::resumeDataProcessors()
 {
     QMutexLocker mtx(&m_mtx);
-    foreach(QnAbstractDataConsumer* dataProcessor, m_dataprocessors) 
+    foreach(QnAbstractDataConsumer* dataProcessor, m_dataprocessors)
     {
         dataProcessor->resume();
     }
@@ -74,11 +72,11 @@ void QnAbstractStreamDataProvider::putData(QnAbstractDataPacketPtr data)
     if (!data)
         return;
 
-	QMutexLocker mtx(&m_mtx);
-    foreach(QnAbstractDataConsumer* dataProcessor, m_dataprocessors) 
-	{
-		dataProcessor->putData(data);
-	}
+    QMutexLocker mtx(&m_mtx);
+    foreach(QnAbstractDataConsumer* dataProcessor, m_dataprocessors)
+    {
+        dataProcessor->putData(data);
+    }
 }
 
 void QnAbstractStreamDataProvider::beforeDisconnectFromResource()

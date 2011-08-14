@@ -2,6 +2,7 @@
 #include "simple_http_client.h"
 #include "common/util.h"
 
+#include <QtCore/QCryptographicHash>
 
 using namespace std;
 
@@ -28,7 +29,7 @@ CLHttpStatus CLSimpleHTTPClient::getNextLine()
 
 	int readed = 0;
 
-	while(1) 
+	while(1)
 	{
 		if (m_sock.recv(&curr,1)<0)
 			return CL_HTTP_HOST_NOT_AVAILABLE;
@@ -50,11 +51,11 @@ CLHttpStatus CLSimpleHTTPClient::getNextLine()
 
 CLHttpStatus CLSimpleHTTPClient::openStream(bool recursive)
 {
-    
+
 	try
 	{
 		if (!m_sock.connect(m_host.toString().toLatin1().data(), m_port))
-            return CL_HTTP_HOST_NOT_AVAILABLE;
+			return CL_HTTP_HOST_NOT_AVAILABLE;
 
 		QString request;
 		QTextStream os(&request);
@@ -66,14 +67,14 @@ CLHttpStatus CLSimpleHTTPClient::openStream(bool recursive)
 		{
 			os << basicAuth() << "\r\n";
 		}
-        else if (m_auth.password().length()>0 && mNonce != "")
-        {
-            os << digestAccess();
-        }
+		else if (m_auth.password().length()>0 && mNonce != "")
+		{
+			os << digestAccess();
+		}
 
 		os<< "\r\n";
 
-		if (!m_sock.send(request.toLatin1().data(), request.toLatin1().size()))
+        if (!m_sock.send(request.toLatin1().data(), request.toLatin1().size()))
             return CL_HTTP_HOST_NOT_AVAILABLE;
 
 		if (CL_HTTP_HOST_NOT_AVAILABLE==getNextLine())
@@ -83,14 +84,14 @@ CLHttpStatus CLSimpleHTTPClient::openStream(bool recursive)
 		{
 			m_connected = false;
 
-			if (m_line.contains("401 Unauthorized"))
+            if (m_line.contains("401 Unauthorized"))
             {
                 getAuthInfo();
-                
+
                 if (recursive)
                     return openStream(false);
                 else
-				    return CL_HTTP_AUTH_REQUIRED;
+                    return CL_HTTP_AUTH_REQUIRED;
             }
 
 			return CL_HTTP_HOST_NOT_AVAILABLE;
@@ -117,16 +118,16 @@ CLHttpStatus CLSimpleHTTPClient::openStream(bool recursive)
 
 			pos  = m_line.indexOf(":");
 
-			if (pos>=0) 
+			if (pos>=0)
 			{
 				QString name = m_line.left(pos).trimmed();
 				QString val = m_line.mid(pos+1, m_line.length()- (pos + 1 ) );
 				QnAssociativeArray::put(name, val );
-                if (name=="Content-Length")
-                {
-                    m_contentLen = val.toInt();
-                    m_readed = 0;
-                }
+				if (name=="Content-Length")
+				{
+					m_contentLen = val.toInt();
+					m_readed = 0;
+				}
 			}
 
 		}
@@ -135,7 +136,7 @@ CLHttpStatus CLSimpleHTTPClient::openStream(bool recursive)
 		return CL_HTTP_SUCCESS;
 
 	}
-	catch (...) 
+	catch (...)
 	{
 		m_connected = false;
 		return CL_HTTP_HOST_NOT_AVAILABLE;
@@ -154,13 +155,13 @@ long CLSimpleHTTPClient::read(char* data, unsigned long max_len)
 	if (readed<=0)
 		m_connected = false;
 
-    m_readed+=readed;
+	m_readed+=readed;
 
     if (m_readed == m_contentLen)
         m_connected = false;
 
 
-	return readed;
+    return readed;
 }
 
 //===================================================================================

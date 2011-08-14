@@ -4,18 +4,17 @@
 #include "datapacket.h"
 #include "common/bytearray.h"
 
-
 struct QnAbstractMediaDataPacket : public QnAbstractDataPacket
 {
-    enum MediaFlags {MediaFlags_None = 0, MediaFlags_AfterEOF = 1};
+	enum MediaFlags {MediaFlags_None = 0, MediaFlags_AfterEOF = 1};
 
-	QnAbstractMediaDataPacket(unsigned int alignment, unsigned int capacity)
+    QnAbstractMediaDataPacket(unsigned int alignment, unsigned int capacity)
         : data(alignment, capacity),
         flags(MediaFlags_None),
         channelNumber(0),
         context(0)
-	{
-	}
+    {
+    }
 
 	virtual ~QnAbstractMediaDataPacket()
 	{
@@ -27,11 +26,11 @@ struct QnAbstractMediaDataPacket : public QnAbstractDataPacket
 	DataType dataType;
 	CodecID compressionType;
 	quint64 timestamp; // mksec // 10^-6
-    unsigned flags;
-    quint32 channelNumber; // video channel number; some devices might have more that one sensor.
-    void* context;
+	unsigned flags;
+	quint32 channelNumber; // video channel number; some devices might have more that one sensor.
+	void* context;
 private:
-	QnAbstractMediaDataPacket() : 
+    QnAbstractMediaDataPacket() :
        data(0,1){};
 };
 
@@ -40,14 +39,14 @@ typedef QSharedPointer<QnAbstractMediaDataPacket> QnAbstractMediaDataPacketPtr;
 
 struct QnCompressedVideoData : public QnAbstractMediaDataPacket
 {
-	QnCompressedVideoData(unsigned int alignment, unsigned int capacity, void* ctx = 0)
+    QnCompressedVideoData(unsigned int alignment, unsigned int capacity, void* ctx = 0)
         : QnAbstractMediaDataPacket(alignment, qMin(capacity, (unsigned int)10 * 1024 * 1024))
-	{
-		dataType = VIDEO;
-		useTwice = false;
-		context = ctx;
-		ignore = false;
-	}
+    {
+        dataType = VIDEO;
+        useTwice = false;
+        context = ctx;
+        ignore = false;
+    }
 
 	int width;
 	int height;
@@ -57,6 +56,9 @@ struct QnCompressedVideoData : public QnAbstractMediaDataPacket
 };
 
 typedef QSharedPointer<QnCompressedVideoData> QnCompressedVideoDataPtr;
+
+#if 0
+#include <QAudioFormat>
 
 class CLCodecAudioFormat: public QAudioFormat
 {
@@ -74,7 +76,7 @@ public:
           if (c->sample_rate)
               setFrequency(c->sample_rate);
 
-          if (c->channels) 
+          if (c->channels)
               setChannels(c->channels);
 
           //setCodec("audio/pcm");
@@ -121,15 +123,16 @@ public:
       int channel_layout;
       int block_align;
 };
+#endif
 
 struct QnCompressedAudioData : public QnAbstractMediaDataPacket
 {
-	QnCompressedAudioData (unsigned int alignment, unsigned int capacity, void* ctx)
+    QnCompressedAudioData (unsigned int alignment, unsigned int capacity, void* ctx)
         : QnAbstractMediaDataPacket(alignment, capacity)
-	{
-		dataType = AUDIO;
+    {
+        dataType = AUDIO;
         context = ctx;
-	}
+    }
 
     //CLCodecAudioFormat format;
     quint64 duration;

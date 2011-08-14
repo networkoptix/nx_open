@@ -1,14 +1,14 @@
 // This is URLPrococol to allow ffmpeg use files with non-ascii filenames
 
+#include <QtCore/QFile>
+
 static int ufile_open(URLContext *h, const char *filename, int flags)
 {
     av_strstart(filename, "ufile:", &filename);
 
     QFile *f = new QFile(QString::fromUtf8(filename));
     if (!f)
-    {
         return AVERROR(ENOMEM);
-    }
 
     QFile::OpenMode mode;
 
@@ -33,12 +33,7 @@ static int ufile_open(URLContext *h, const char *filename, int flags)
 static int ufile_close(URLContext *h)
 {
     QFile *f = (QFile *) h->priv_data;
-
-    if (f)
-    {
-        f->close();
-        delete f;
-    }
+    delete f;
 
     return 0;
 }

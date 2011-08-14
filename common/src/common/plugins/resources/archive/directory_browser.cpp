@@ -2,6 +2,7 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
+#include <QtCore/QThread>
 
 #include "resource/url_resource.h"
 //#include "resources/archive/avi_files/avi_bluray_resource.h"

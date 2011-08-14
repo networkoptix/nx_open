@@ -15,7 +15,7 @@ void updateBits(const quint8* buffer, int bitOffset, int bitLen, int value)
 	BitStreamWriter bitWriter;
 	int byteOffset = bitOffset % 8;
 	bitWriter.setBuffer(ptr, ptr + (bitLen / 8 + 5));
-	
+
 	quint8* ptr_end = (quint8*) buffer + (bitOffset + bitLen)/8;
 	int endBitsPostfix = 8 - ((bitOffset + bitLen) % 8);
 
@@ -26,7 +26,7 @@ void updateBits(const quint8* buffer, int bitOffset, int bitLen, int value)
 	bitWriter.putBits(bitLen, value);
 
 	if (endBitsPostfix < 8) {
-		int postfix = *ptr_end & ( 1 << endBitsPostfix)-1;
+		int postfix = (*ptr_end & (1 << endBitsPostfix)) - 1;
 		bitWriter.putBits(endBitsPostfix, postfix);
 	}
 	bitWriter.flushBits();
@@ -41,7 +41,7 @@ void moveBits(quint8* buffer, int oldBitOffset, int newBitOffset, int len)
 	BitStreamWriter writer;
 	writer.setBuffer(dst, dst + len/8 + 1);
 	writer.skipBits(newBitOffset % 8);
-	if (oldBitOffset % 8) 
+	if (oldBitOffset % 8)
 	{
 		reader.skipBits(oldBitOffset % 8);
 		int c = 8 - (oldBitOffset % 8);

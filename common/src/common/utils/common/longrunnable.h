@@ -1,11 +1,15 @@
 #ifndef cl_long_runnable_146
 #define cl_long_runnable_146
 
+#include <QtCore/QSemaphore>
+#include <QtCore/QThread>
+
 class QnLongRunnable : public QThread
 {
 	Q_OBJECT
-public slots:
-	void start ( Priority priority = InheritPriority ) 
+
+public Q_SLOTS:
+	void start ( Priority priority = InheritPriority )
 	{
 		if (m_runing) // already runing;
 			return;
@@ -14,18 +18,17 @@ public slots:
 		m_needStop = false;
 		QThread::start(priority);
 	}
-public:
 
+public:
 	QnLongRunnable():
 	  m_runing(false),
 	  m_onPause(false)
 	  {
-
 	  }
 
 	virtual ~QnLongRunnable(){};
 
-    virtual void pleaseStop()
+	virtual void pleaseStop()
 	{
 		m_needStop = true;
 		if (m_onPause)

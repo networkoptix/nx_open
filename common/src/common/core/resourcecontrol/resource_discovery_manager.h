@@ -1,17 +1,17 @@
 #ifndef cl_asynch_device_sarcher_h_423
 #define cl_asynch_device_sarcher_h_423
 
+#include <QtCore/QThread>
+
 #include "resource/resource.h"
 #include "network/netstate.h"
 #include "network/nettools.h"
-
-
 
 class QnAbstractResourceSearcher;
 
 // this class just searches for new devices
 // it uses others proxy
-// it will be moved to recorder I guess 
+// it will be moved to recorder I guess
 class QnResourceDiscoveryManager : public QThread
 {
 	typedef QList<QnAbstractResourceSearcher*> ResourceSearcherList;
@@ -36,7 +36,7 @@ private:
 	QnResourceList findNewResources(bool& ip_finished);
 
 	// this function will modify CLDeviceList( conflict flag)
-	// it only checks obvious conflicts 
+	// it only checks obvious conflicts
 	// obvious - means that there are more than one device this such IP;
 	bool checkObviousConflicts(QnResourceList& lst);
 

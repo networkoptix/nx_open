@@ -7,15 +7,21 @@
 #include "av_singesensor.h"
 #include "resourcecontrol/resource_command_consumer.h"
 
+#include <QtNetwork/QUdpSocket>
+
+#if defined(Q_OS_WIN)
+#  include <winsock2.h>
+#elif defined(QT_LINUXBASE)
+#  include <arpa/inet.h>
+#endif
+
 const char* ArecontVisionManufacture = "ArecontVision";
-
-
 
 extern int ping_timeout;
 
 QnPlAreconVisionResource::QnPlAreconVisionResource()
 {
-    
+
 }
 
 bool QnPlAreconVisionResource::isPanoramic() const
@@ -78,35 +84,32 @@ CLHttpStatus QnPlAreconVisionResource::setRegister(int page, int num, int val)
 
 }
 
+class QnPlArecontResourceSetRegCommand : public QnResourceCommand
+{
+public:
+    QnPlArecontResourceSetRegCommand(QnResourcePtr res, int page, int reg, int val):
+      QnResourceCommand(res),
+          m_page(page),
+          m_reg(reg),
+          m_val(val)
+      {}
+
+      void beforeDisconnectFromResource(){}
+
+      void execute()
+      {
+          getResource().dynamicCast<QnPlAreconVisionResource>()->setRegister(m_page,m_reg,m_val);
+      }
+private:
+    int m_page;
+    int m_reg;
+    int m_val;
+};
+
+typedef QSharedPointer<QnPlArecontResourceSetRegCommand> QnPlArecontResourceSetRegCommandPtr;
+
 CLHttpStatus QnPlAreconVisionResource::setRegister_asynch(int page, int num, int val)
 {
-    class QnPlArecontResourceSetRegCommand : public QnResourceCommand
-    {
-    public:
-        QnPlArecontResourceSetRegCommand(QnResourcePtr res, int page, int reg, int val):
-          QnResourceCommand(res),
-              m_page(page),
-              m_val(val),
-              m_reg(reg)
-          {
-
-          }
-
-          void beforeDisconnectFromResource(){};
-
-          void execute()
-          {
-              getResource().dynamicCast<QnPlAreconVisionResource>()->setRegister(m_page,m_reg,m_val);
-          }
-    private:
-        int m_page;
-        int m_reg;
-        int m_val;
-    };
-
-    typedef QSharedPointer<QnPlArecontResourceSetRegCommand> QnPlArecontResourceSetRegCommandPtr;
-
-
     QnPlArecontResourceSetRegCommandPtr command ( new QnPlArecontResourceSetRegCommand(QnResourcePtr(this), page, num, val) );
     addCommandToProc(command);
     return CL_HTTP_SUCCESS;
@@ -145,8 +148,8 @@ bool QnPlAreconVisionResource::setHostAddress(const QHostAddress& ip, QnDomain d
 
         //
         CLPing ping;
-        if (!ping.ping(ip.toString(), 2, ping_timeout)) // check if ip really changed 
-            return false; 
+        if (!ping.ping(ip.toString(), 2, ping_timeout)) // check if ip really changed
+            return false;
 
     }
 
@@ -189,7 +192,7 @@ QString QnPlAreconVisionResource::toSearchString() const
 }
 
 
-QnResourcePtr QnPlAreconVisionResource::updateResource() 
+QnResourcePtr QnPlAreconVisionResource::updateResource()
 {
 	QnValue model;
 	QnValue model_relase;
@@ -212,7 +215,7 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
 			model = model_relase;
 	}
 
-	QnNetworkResourcePtr result ( createResourceByName(model) ); 
+	QnNetworkResourcePtr result ( createResourceByName(model) );
 
 	if (!result)
 	{
@@ -363,7 +366,7 @@ bool QnPlAreconVisionResource::setParamPhysical(const QString& name, const QnVal
 
     QTextStream str(&request);
     str << "set?" << param.paramNetHelper;
-    if (param.type!=QnParam::None && param.type!=QnParam::Button) 
+    if (param.type!=QnParam::None && param.type!=QnParam::Button)
         str << "=" << (QString)val;
 
     connection.setRequestLine(request);
@@ -397,7 +400,7 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(QString
 
 bool QnPlAreconVisionResource::isPanoramic(QString name)
 {
-	if (name.contains("8180"))
+    if (name.contains("8180"))
         return true;
 
     if (name.contains("8185"))

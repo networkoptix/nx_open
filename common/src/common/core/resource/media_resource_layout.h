@@ -6,24 +6,24 @@
 class QnMediaResourceLayout
 {
 public:
-	QnMediaResourceLayout(){};
+    QnMediaResourceLayout(){};
     virtual ~QnMediaResourceLayout() {}
-	//returns number of video channels device has
-	virtual unsigned int numberOfVideoChannels() const = 0;
+    //returns number of video channels device has
+    virtual unsigned int numberOfVideoChannels() const = 0;
     virtual unsigned int numberOfAudioChannels() const = 0;
 
 	// returns maximum width ( in terms of channels 4x1 2x2 1x1 ans so on  )
-	virtual unsigned int width() const = 0; 
+	virtual unsigned int width() const = 0;
 
 	// returns maximum height ( in terms of channels 4x1 2x2 1x1 ans so on  )
-	virtual unsigned int height() const = 0; 
+	virtual unsigned int height() const = 0;
 
 	virtual unsigned int h_position(unsigned int channel) const = 0; //returns horizontal position of the channel
 	virtual unsigned int v_position(unsigned int channel) const = 0; //returns vertical position of the channel
 
 };
 
-// this is default DeviceVideoLayout for any camera with only one sensor 
+// this is default DeviceVideoLayout for any camera with only one sensor
 class QnDefaultMediaResourceLayout : public QnMediaResourceLayout
 {
 public:
@@ -40,12 +40,12 @@ public:
         return 1;
     }
 
-	virtual unsigned int width() const 
+	virtual unsigned int width() const
 	{
 		return 1;
 	}
 
-	virtual unsigned int height() const 
+	virtual unsigned int height() const
 	{
 		return 1;
 	}
@@ -72,9 +72,9 @@ public:
 		m_channels = new int[m_width*m_height];
 	};
 	virtual ~QnCustomDeviceVideoLayout()
-    {
-        delete[] m_channels;
-    };
+	{
+		delete[] m_channels;
+	};
 	//returns number of video channels device has
 	virtual unsigned int numberOfVideoChannels() const
 	{
@@ -86,12 +86,12 @@ public:
         return 1;
     }
 
-	virtual unsigned int width() const 
+	virtual unsigned int width() const
 	{
 		return m_width;
 	}
 
-	virtual unsigned int height() const 
+	virtual unsigned int height() const
 	{
 		return m_height;
 	}
@@ -109,7 +109,7 @@ public:
 	{
 		for (int i = 0; i < m_width*m_height; ++i)
 		{
-			if (m_channels[i]==channel)
+			if (uint(m_channels[i]) == channel)
 				return i%m_width;
 		}
 
@@ -120,7 +120,7 @@ public:
 	{
 		for (int i = 0; i < m_width*m_height; ++i)
 		{
-			if (m_channels[i]==channel)
+			if (uint(m_channels[i]) == channel)
 				return i/m_width;
 		}
 

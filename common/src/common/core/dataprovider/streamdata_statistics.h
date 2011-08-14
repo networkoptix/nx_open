@@ -1,6 +1,9 @@
 #ifndef statistics_h_130
 #define statistics_h_130
 
+#include <QtCore/QDateTime>
+#include <QtCore/QMutex>
+
 #define CL_STATISTICS_WINDOW_MS 2000
 #define CL_STATISTICS_UPDATE_PERIOD_MS 700
 #define CL_STATS_NUM  (CL_STATISTICS_WINDOW_MS/CL_STATISTICS_UPDATE_PERIOD_MS + 1)
@@ -32,13 +35,13 @@ class QnStatistics
 public:
 	QnStatistics();
 
-	void resetStatistics(); // resets statistics; and make it runing 
+	void resetStatistics(); // resets statistics; and make it runing
 	void stop(); // stops the statistic;
 
 	void onData(unsigned int datalen);// must be called then new data from cam arrived; if datalen==0 => timeout
 	float getBitrate() const; // returns instant bitrate
 	float getFrameRate() const;// returns instant framerate
-    int getFrameSize() const;// returns average frame size in kb( based on getBitrate and getFrameRate)
+	int getFrameSize() const;// returns average frame size in kb( based on getBitrate and getFrameRate)
 	float getavBitrate() const; // returns average bitrate
 	float getavFrameRate() const;// returns average framerate
 	unsigned long totalSecs() const; // how long statistics is assembled in seconds
@@ -80,7 +83,6 @@ private:
 	float m_framerate;
 
 	bool m_runing;
-
 };
 
 #endif //log_h_109

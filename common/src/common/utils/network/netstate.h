@@ -1,6 +1,9 @@
 #ifndef cl_net_state_439
 #define cl_net_state_439
 
+#include <QtNetwork/QHostAddress>
+#include <QtNetwork/QNetworkAddressEntry>
+
 struct CLSubNetState
 {
 	QHostAddress minHostAddress;
@@ -17,10 +20,10 @@ public:
 	// check if it has SubNetState with such NIC machine_ip
 	bool existsSubnet(const QHostAddress& machine_ip) const;
 
-	// return CLSubNetState for NIC ipv4 machine_ip 
+	// return CLSubNetState for NIC ipv4 machine_ip
 	CLSubNetState& getSubNetState(const QHostAddress& machine_ip);
 
-	// check if addr is in the same subnet as one of our IPV4 interface 
+	// check if addr is in the same subnet as one of our IPV4 interface
 	bool isInMachineSubnet(const QHostAddress& addr) const;
 
 	// this function updates all IPV4 subnets;
@@ -30,7 +33,7 @@ public:
 
 	QString toString() const;
 
-private:	
+private:
 	QList<QNetworkAddressEntry> m_net_entries;
 	StateMAP m_netstate; // net state for each subnet
 };

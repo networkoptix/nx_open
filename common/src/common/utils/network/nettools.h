@@ -1,6 +1,9 @@
 #ifndef cl_net_tools_1232
 #define cl_net_tools_1232
 
+#include <QtNetwork/QHostAddress>
+#include <QtNetwork/QNetworkAddressEntry>
+
 struct CLSubNetState;
 
 typedef QSet<quint32> CLIPList;
@@ -13,10 +16,10 @@ unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress);
 // returns list of IPv4 addresses of current machine
 QList<QHostAddress> getAllIPv4Addresses();
 
-//returns list of all IPV4 QNetworkAddressEntries of current machine; this function takes time; 
+//returns list of all IPV4 QNetworkAddressEntries of current machine; this function takes time;
 QList<QNetworkAddressEntry> getAllIPv4AddressEntries();
 
-// return true if succeded 
+// return true if succeded
 bool getNextAvailableAddr(CLSubNetState& state, const CLIPList& lst);
 
 void removeARPrecord(const QHostAddress& ip);

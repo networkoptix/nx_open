@@ -1,6 +1,8 @@
 #include "ffmpeg_helper.h"
 #include "libavcodec/avcodec.h"
 
+#include <QtCore/QDebug>
+
 void QnFfmpegHelper::serializeCodecContext(const AVCodecContext* ctx, QByteArray* data)
 {
     data->clear();
@@ -17,15 +19,15 @@ void QnFfmpegHelper::serializeCodecContext(const AVCodecContext* ctx, QByteArray
     dest.thread_opaque   = NULL;
 
     data->append((const char*) &dest, sizeof(dest));
-    if (ctx->rc_eq) 
+    if (ctx->rc_eq)
         data->append(ctx->rc_eq);
     if (ctx->extradata)
         data->append((const char*) ctx->extradata, ctx->extradata_size);
-    if (ctx->intra_matrix) 
+    if (ctx->intra_matrix)
         data->append((const char*) ctx->intra_matrix, 64 * sizeof(int16_t));
-    if (ctx->inter_matrix) 
+    if (ctx->inter_matrix)
         data->append((const char*) ctx->inter_matrix, 64 * sizeof(int16_t));
-    if (ctx->rc_override) 
+    if (ctx->rc_override)
         data->append((const char*) ctx->rc_override, ctx->rc_override_count * sizeof(*ctx->rc_override));
 }
 
@@ -41,13 +43,13 @@ AVCodecContext* QnFfmpegHelper::deserializeCodecContext(const char* data, int da
     dataLen -= sizeof(AVCodecContext);
     data += sizeof(AVCodecContext);
 
-    if (ctx->rc_eq && dataLen > 0) 
+    if (ctx->rc_eq && dataLen > 0)
     {
-        int len = strnlen(data, dataLen);
-        if (data[len] != 0) 
+        int len = qstrnlen(data, dataLen);
+        if (data[len] != 0)
         {
             qWarning() << Q_FUNC_INFO << __LINE__ << "Too few data for deserialize CodecContext";
-            av_free(ctx); 
+            av_free(ctx);
             return 0;
         }
         ctx->rc_eq = av_strdup(data);
@@ -65,7 +67,7 @@ AVCodecContext* QnFfmpegHelper::deserializeCodecContext(const char* data, int da
         }
         else {
             av_free((void*) ctx->rc_eq);
-            av_free(ctx); 
+            av_free(ctx);
             return 0;
         }
     }
@@ -81,7 +83,7 @@ AVCodecContext* QnFfmpegHelper::deserializeCodecContext(const char* data, int da
         else {
             av_free(ctx->extradata);
             av_free((void*) ctx->rc_eq);
-            av_free(ctx); 
+            av_free(ctx);
             return 0;
         }
     }
@@ -98,7 +100,7 @@ AVCodecContext* QnFfmpegHelper::deserializeCodecContext(const char* data, int da
             av_free(ctx->intra_matrix);
             av_free(ctx->extradata);
             av_free((void*) ctx->rc_eq);
-            av_free(ctx); 
+            av_free(ctx);
             return 0;
         }
     }
@@ -114,7 +116,7 @@ AVCodecContext* QnFfmpegHelper::deserializeCodecContext(const char* data, int da
             av_free(ctx->intra_matrix);
             av_free(ctx->extradata);
             av_free((void*) ctx->rc_eq);
-            av_free(ctx); 
+            av_free(ctx);
             return 0;
         }
     }

@@ -15,7 +15,7 @@ public:
 	explicit QnAbstractStreamDataProvider(QnResourcePtr res);
 	virtual ~QnAbstractStreamDataProvider();
 
-    virtual bool dataCanBeAccepted() const;
+	virtual bool dataCanBeAccepted() const;
 
 	void addDataProcessor(QnAbstractDataConsumer* dp);
 	void removeDataProcessor(QnAbstractDataConsumer* dp);
@@ -23,7 +23,7 @@ public:
 	void pauseDataProcessors();
 	void resumeDataProcessors();
 
-    void setDataRate(qreal rate); // fps for example 
+    void setDataRate(qreal rate); // fps for example
     qreal getDataRate() const;
 
 protected:
@@ -32,9 +32,9 @@ protected:
 
     virtual void disconnectFromResource();
 
-    virtual void run(); 
+    virtual void run();
 
-	void putData(QnAbstractDataPacketPtr data);
+    void putData(QnAbstractDataPacketPtr data);
 
     virtual QnAbstractDataPacketPtr getNextData() = 0;
 
@@ -50,10 +50,9 @@ protected:
     virtual void sleepIfNeeded() = 0;
 
 protected:
-    mutable QMutex m_mtx;
+	mutable QMutex m_mtx;
 	QList<QnAbstractDataConsumer*> m_dataprocessors;
-	
-    qreal m_dataRate;
+	qreal m_dataRate;
 };
 
 #endif //QnAbstractStreamDataProvider_514

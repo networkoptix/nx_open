@@ -13,7 +13,7 @@ QnClientPullStreamProvider(res)
     QSize maxResolution = ceqResource->getMaxSensorSize();
 
     //========this is due to bug in AV firmware;
-    // you cannot set up maxSensorWidth with HTTP. ( you can do it in tftp if you are really want to ). 
+    // you cannot set up maxSensorWidth with HTTP. ( you can do it in tftp if you are really want to ).
     // for now(13 December 2009) if we use HTTP => right should be divisible by 64; bottom - by 32
     // may be while you are looking at this comments bug already fixed.
 
@@ -30,9 +30,9 @@ QnClientPullStreamProvider(res)
 
     m_streamParam.put(QnParam("resolution", "full"));
     m_streamParam.put(QnParam("Quality", "11"));
-    
 
-	setQuality(m_qulity);
+
+    setQuality(m_qulity);
 
 
 
@@ -56,18 +56,18 @@ void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
 	{
 	case QnQualityHighest:
 		if (avRes->isPanoramic())
-            avRes->setParamAsynch("resolution", "full", QnDomainPhysical);
+			avRes->setParamAsynch("resolution", "full", QnDomainPhysical);
 		else
-            m_streamParam.get("resolution").value = "full";
+			m_streamParam.get("resolution").value = "full";
 
 
-		if (avRes->isPanoramic())
+        if (avRes->isPanoramic())
             avRes->setParamAsynch("Quality", "17", QnDomainPhysical); // panoramic
-		else
+        else
             m_streamParam.get("Quality").value = "15";
-		break;
+        break;
 
-	case QnQualityHigh:
+    case QnQualityHigh:
         if (avRes->isPanoramic())
             avRes->setParamAsynch("resolution", "full", QnDomainPhysical);
         else
@@ -79,9 +79,9 @@ void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
         else
             m_streamParam.get("Quality").value = "7";
 
-		break;
+        break;
 
-	case QnQualityNormal:
+    case QnQualityNormal:
 
         if (avRes->isPanoramic())
             avRes->setParamAsynch("resolution", "half", QnDomainPhysical);
@@ -94,7 +94,7 @@ void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
         else
             m_streamParam.get("Quality").value = "13";
 
-	    break;
+        break;
 
 	case QnQualityLow:
 	case QnQualityLowest:
@@ -110,9 +110,11 @@ void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
         else
             m_streamParam.get("Quality").value = "6";
 
-	    break;
-	}
+        break;
 
+	default:
+		break;
+	}
 }
 
 

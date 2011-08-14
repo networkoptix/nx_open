@@ -1,13 +1,15 @@
 #ifndef device_server_h_1658
 #define device_server_h_1658
 
+#include <QtNetwork/QHostAddress>
+
 #include "resource/resource.h"
 
 // this is an interface for resource searcher plug in
 class QnAbstractResourceSearcher
 {
 protected:
-    QnAbstractResourceSearcher();
+	QnAbstractResourceSearcher();
 public:
 	virtual ~QnAbstractResourceSearcher();
 
@@ -20,11 +22,11 @@ public:
     // returns true if should be used;
     bool shouldBeUsed() const;
 
-	// returns all available devices 
+	// returns all available devices
 	virtual QnResourceList findResources() = 0;
-    
-    // is some cases search might take time 
-    //if pleaseStop is called search will be interrupted 
+
+    // is some cases search might take time
+    //if pleaseStop is called search will be interrupted
     void pleaseStop();
 
 protected:
@@ -44,7 +46,7 @@ protected:
 public:
 
     // checks this QHostAddress and creates a QnResource in case of success
-    // this function is designed for manual resource addition 
+    // this function is designed for manual resource addition
     virtual QnResourcePtr checkHostAddr(QHostAddress addr) = 0;
 };
 

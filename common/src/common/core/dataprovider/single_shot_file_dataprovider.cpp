@@ -1,10 +1,12 @@
 #include "single_shot_file_dataprovider.h"
+
+#include <QtCore/QFile>
+
 #include "resources/archive/filetypesupport.h"
 #include "common/bytearray.h"
 #include "datapacket/mediadatapacket.h"
 #include "common/base.h"
 #include "resource/url_resource.h"
-
 
 CLSingleShotFileStreamreader::CLSingleShotFileStreamreader(QnResourcePtr res):
 QnSingleShotStreamreader(res)
@@ -15,7 +17,7 @@ QnSingleShotStreamreader(res)
 
 QnAbstractMediaDataPacketPtr CLSingleShotFileStreamreader::getData()
 {
-    FileTypeSupport fileTypeSupport;
+	FileTypeSupport fileTypeSupport;
 
 	if (!fileTypeSupport.isImageFileExt(m_fileName))
 		return QnAbstractMediaDataPacketPtr(0);
@@ -27,10 +29,10 @@ QnAbstractMediaDataPacketPtr CLSingleShotFileStreamreader::getData()
 	if (!file.open(QIODevice::ReadOnly))
 		return QnAbstractMediaDataPacketPtr(0);
 
-    CodecID compressionType;
+	CodecID compressionType;
 
     QString lowerFileName = m_fileName.toLower();
-    
+
     if (lowerFileName.endsWith(".png"))
         compressionType = CODEC_ID_PNG;
     else if (lowerFileName.endsWith(".jpeg") || lowerFileName.endsWith(".jpg"))
@@ -44,7 +46,7 @@ QnAbstractMediaDataPacketPtr CLSingleShotFileStreamreader::getData()
     else
         return QnAbstractMediaDataPacketPtr(0);
 
-	unsigned int file_size = file.size();
+    unsigned int file_size = file.size();
 
 	QnCompressedVideoDataPtr outData ( new QnCompressedVideoData(CL_MEDIA_ALIGNMENT,file_size) );
 	CLByteArray& data = outData->data;
@@ -56,7 +58,7 @@ QnAbstractMediaDataPacketPtr CLSingleShotFileStreamreader::getData()
 
 	data.done(readed);
 
-    outData->compressionType = compressionType;
+	outData->compressionType = compressionType;
 
 	outData->width = 0; // does not really meter (this is single shot)
 	outData->height = 0; //does not really meter (this is single shot)

@@ -82,7 +82,7 @@ CLCodecType ffmpegCodecIdToInternal(CodecID ffmpeg_video_codec_id)
         break;
 
     case CODEC_ID_AAC:
-        m_audioCodecId = CL_AAC;  // crashes 
+        m_audioCodecId = CL_AAC;  // crashes
         break;
 
     case CODEC_ID_WMAV2:
@@ -101,6 +101,8 @@ CLCodecType ffmpegCodecIdToInternal(CodecID ffmpeg_video_codec_id)
         m_audioCodecId = CL_AMR_NB;
         break;
 
+    default:
+        break;
     }
 
     return m_videoCodecId;
@@ -205,8 +207,9 @@ CodecID internalCodecIdToFfmpeg(CLCodecType internalCodecId)
         codec = (CODEC_ID_AMR_NB);
         break;
 
+    default:
+        break;
     }
 
     return codec;
-
 }

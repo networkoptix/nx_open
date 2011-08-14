@@ -1,11 +1,20 @@
 #include "resource.h"
+
+#include <QtCore/QtConcurrentMap>
+#include <QtCore/QFile>
+#include <QtCore/QTextStream>
+#include <QtCore/QThreadPool>
+
+#include <QtXml/QDomDocument>
+#include <QtXml/QDomElement>
+
 #include "resourcecontrol/resource_command_consumer.h"
 #include "resource_param.h"
 
 static int inst = 0;
 
 QnResourceCommandProcessor& commendProcessor()
-{ 
+{
     static QnResourceCommandProcessor inst;
     return inst;
 }
@@ -15,21 +24,21 @@ QnResourceCommandProcessor& commendProcessor()
 QnResource::QnManufacturesParamsLists QnResource::staticResourcesParamLists; // list of all supported devices params list
 
 
-QnResource::QnResource():
-m_typeFlags(0),
-m_avalable(true),
-m_mutex(QMutex::Recursive)
+QnResource::QnResource()
+	: m_mutex(QMutex::Recursive),
+	m_typeFlags(0),
+	m_avalable(true)
 {
-	++inst;	
+	++inst;
 
-    m_parentId.setEmpty();
-};
+	m_parentId.setEmpty();
+}
 
 QnResource::~QnResource()
 {
-	--inst;	
+	--inst;
 	cl_log.log("inst", inst, cl_logDEBUG1);
-};
+}
 
 void QnResource::addFlag(unsigned long flag)
 {
@@ -194,11 +203,11 @@ bool QnResource::getParam(const QString& name, QnValue& val, QnDomain domain )
 
     QMutexLocker locker(&m_mutex);
 
-    if (setSpecialParam(name, val, domain)) // try special first 
+    if (setSpecialParam(name, val, domain)) // try special first
         return true;
 
 
-    if (domain == QnDomainMemory) 
+    if (domain == QnDomainMemory)
     {
         QnParam& param = getResourceParamList().get(name);
         val = param.value;
@@ -236,8 +245,8 @@ bool QnResource::setParam(const QString& name, const QnValue& val, QnDomain doma
         cl_log.log("setParam: requested param does not exist!", cl_logWARNING);
         return false;
     }
-    
-    
+
+
     QMutexLocker locker(&m_mutex);
     QnParam& param = getResourceParamList().get(name);
 
@@ -247,7 +256,7 @@ bool QnResource::setParam(const QString& name, const QnValue& val, QnDomain doma
         return false;
     }
 
-    
+
     if (domain == QnDomainPhysical)
     {
         if (!setParamPhysical(name, val))
@@ -267,40 +276,36 @@ bool QnResource::setParam(const QString& name, const QnValue& val, QnDomain doma
 
 }
 
+class QnResourceSetParamCommand : public QnResourceCommand
+{
+public:
+    QnResourceSetParamCommand(QnResourcePtr res, const QString& name, const QnValue& val, QnDomain domain):
+      QnResourceCommand(res),
+          m_name(name),
+          m_val(val),
+          m_domain(domain)
+      {}
+
+      virtual void beforeDisconnectFromResource(){}
+
+      void execute()
+      {
+          if (isConnectedToTheResource())
+            m_resource->setParam(m_name, m_val, m_domain);
+      }
+
+private:
+    QString m_name;
+    QnValue m_val;
+    QnDomain m_domain;
+};
+
+typedef QSharedPointer<QnResourceSetParamCommand> QnResourceSetParamCommandPtr;
+
 void QnResource::setParamAsynch(const QString& name, const QnValue& val, QnDomain domain)
 {
-
-    class QnResourceSetParamCommand : public QnResourceCommand
-    {
-    public:
-        QnResourceSetParamCommand(QnResourcePtr res, const QString& name, const QnValue& val, QnDomain domain):
-          QnResourceCommand(res),
-              m_name(name),
-              m_val(val),
-              m_domain(domain)
-          {
-
-          }
-
-          virtual void beforeDisconnectFromResource(){};
-
-          void execute()
-          {
-              if (isConnectedToTheResource())
-                m_resource->setParam(m_name, m_val, m_domain);
-          }
-    private:
-        QString m_name;
-        QnValue m_val;
-        QnDomain m_domain;
-
-    };
-
-    typedef QSharedPointer<QnResourceSetParamCommand> QnResourceSetParamCommandPtr;
-
     QnResourceSetParamCommandPtr command ( new QnResourceSetParamCommand(QnResourcePtr(this), name, val, domain) );
     addCommandToProc(command);
-
 }
 
 bool QnResource::unknownResource() const
@@ -311,7 +316,7 @@ bool QnResource::unknownResource() const
 
 QnParamList& QnResource::getResourceParamList()
 {
-    QMutexLocker locker(&m_mutex);
+	QMutexLocker locker(&m_mutex);
 
 	if (m_resourceParamList.empty())
 		m_resourceParamList = staticResourcesParamLists[manufacture()][m_name];
@@ -321,7 +326,7 @@ QnParamList& QnResource::getResourceParamList()
 
 const QnParamList& QnResource::getResourceParamList() const
 {
-    QMutexLocker locker(&m_mutex);
+	QMutexLocker locker(&m_mutex);
 
 	if (m_resourceParamList.empty())
 		m_resourceParamList = staticResourcesParamLists[manufacture()][m_name];
@@ -356,7 +361,7 @@ bool QnResource::hasSuchConsumer(QnResourceConsumer* consumer) const
 void QnResource::disconnectAllConsumers()
 {
     QMutexLocker locker(&m_consumersMtx);
-  
+
     foreach(QnResourceConsumer* con, m_consumers)
     {
         con->beforeDisconnectFromResource();
@@ -370,29 +375,29 @@ void QnResource::disconnectAllConsumers()
     m_consumers.clear();
 }
 //========================================================================================
-// static 
+// static
 
-void QnResource::startCommandProc() 
+void QnResource::startCommandProc()
 {
     commendProcessor().start();
-};
+}
 
-void QnResource::stopCommandProc() 
+void QnResource::stopCommandProc()
 {
     commendProcessor().stop();
-};
+}
 
-void QnResource::addCommandToProc(QnAbstractDataPacketPtr data) 
+void QnResource::addCommandToProc(QnAbstractDataPacketPtr data)
 {
     commendProcessor().putData(data);
-};
+}
 
-int QnResource::commandProcQueSize() 
+int QnResource::commandProcQueSize()
 {
     return commendProcessor().queueSize();
 }
 
-bool QnResource::commandProcHasSuchResourceInQueue(QnResourcePtr res) 
+bool QnResource::commandProcHasSuchResourceInQueue(QnResourcePtr res)
 {
     return commendProcessor().hasSuchResourceInQueue(res);
 }
@@ -415,7 +420,7 @@ bool QnResource::loadDevicesParam(const QString& fileName)
     int errorColumn;
     QDomDocument doc;
 
-    if (!doc.setContent(&file, &errorStr, &errorLine,&errorColumn)) 
+    if (!doc.setContent(&file, &errorStr, &errorLine,&errorColumn))
     {
         QTextStream str(&error);
         str << "File " << fileName << "; Parse error at line " << errorLine << " column " << errorColumn << " : " << errorStr;
@@ -429,7 +434,7 @@ bool QnResource::loadDevicesParam(const QString& fileName)
 
     QDomNode node = root.firstChild();
 
-    while (!node.isNull()) 
+    while (!node.isNull())
     {
         if (node.toElement().tagName() == "resource")
         {
@@ -488,12 +493,12 @@ bool QnResource::parseResource(const QDomElement &resource)
 
     }
 
-    //global_params 
+    //global_params
     QDomNode node = resource.firstChild();
     if (node.isNull())
     {
         staticResourcesParamLists[manufacture][resourceName] = device_param_list;
-        return true; // just public make sence 
+        return true; // just public make sence
     }
 
     QDomElement element = node.toElement();
@@ -509,7 +514,7 @@ bool QnResource::parseResource(const QDomElement &resource)
     if (element.tagName()=="global_params" )
     {
         QDomNode paramNode = element.firstChild();
-        while (!paramNode .isNull()) 
+        while (!paramNode .isNull())
         {
             if (paramNode.toElement().tagName() == "param")
             {
@@ -671,12 +676,12 @@ struct ResourcesBasicInfoHelper
 
 void getResourcesBasicInfo(QnResourceList& lst, int threads)
 {
-	// cannot make concurrent work with pointer CLDevice* ; => so extra steps needed
+    // cannot make concurrent work with pointer CLDevice* ; => so extra steps needed
     cl_log.log("Getting resource info...", cl_logDEBUG1);
-	QTime time;
-	time.start();
+    QTime time;
+    time.start();
 
-	QList<ResourcesBasicInfoHelper> local_list;
+    QList<ResourcesBasicInfoHelper> local_list;
 
 	QThreadPool* global = QThreadPool::globalInstance();
 	for (int i = 0; i < threads; ++i ) global->releaseThread();
@@ -687,12 +692,12 @@ void getResourcesBasicInfo(QnResourceList& lst, int threads)
 	{
 		cl_log.log("Done. Time elapsed: ", time.elapsed(), cl_logDEBUG1);
 
-		foreach(QnResourcePtr resource, lst)
+        foreach(QnResourcePtr resource, lst)
         {
-			cl_log.log(resource->toString(), cl_logDEBUG1);
+            cl_log.log(resource->toString(), cl_logDEBUG1);
         }
 
-	}
+    }
 
 }
 //==================================================================================================================

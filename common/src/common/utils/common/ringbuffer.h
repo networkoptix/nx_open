@@ -1,6 +1,8 @@
 #ifndef CL_ringbuffer_1842
 #define CL_ringbuffer_1842
 
+#include <QtCore/QMutex>
+
 class CLRingBuffer : public QIODevice
 {
 public:
@@ -14,9 +16,9 @@ public:
       * Reads data and puts it to IOdevice
       */
     qint64 readToIODevice(QIODevice* device, qint64 maxlen);
-	qint64 bytesAvailable() const;
-	qint64 avalable_to_write() const;
-	void clear();
+    qint64 bytesAvailable() const;
+    qint64 avalable_to_write() const;
+    void clear();
     unsigned int capacity() const;
 
 private:
