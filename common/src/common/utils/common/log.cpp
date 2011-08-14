@@ -1,143 +1,171 @@
 #include "log.h"
 
+#include <qplatformdefs.h>
+#include <QtCore/QDateTime>
+#include <QtCore/QFile>
+#include <QtCore/QMutex>
+#include <QtCore/QTextStream>
+#include <QtCore/QThread>
+
 CLLog cl_log;
 
-QString cl_log_msg[] =  { "ALWAYS", "ERROR", "WARNING", "INFO", "DEBUG1", "DEBUG2" };
+static const char *cl_log_msg[] = { "ALWAYS", "ERROR", "WARNING", "INFO", "DEBUG1", "DEBUG2" };
 
-CLLog::CLLog():
-m_loglistner(0)
+class CLLog::Private
 {
+public:
+    quint32 max_file_size;
+    quint8 maxBackupFiles;
+    quint8 cur_num;
+    QString base_name;
+    CLLogLevel loglevel;
 
+    QFile file;
+
+    CLLogListner *loglistner;
+
+    QMutex mutex;
+};
+
+CLLog::CLLog()
+    : d(new Private)
+{
+    d->loglistner = 0;
 }
 
 CLLog::~CLLog()
 {
-
+    delete d;
 }
 
 bool CLLog::create(const QString& base_name,
-				   quint32 max_file_size, 
-					quint8 maxBackupFiles, 
-					CLLogLevel loglevel )
+                   quint32 max_file_size,
+                    quint8 maxBackupFiles,
+                    CLLogLevel loglevel )
 {
-	m_base_name = base_name;
-	m_max_file_size = max_file_size;
-	m_maxBackupFiles = maxBackupFiles;
-	m_cur_num = 0;
+    d->base_name = base_name;
+    d->max_file_size = max_file_size;
+    d->maxBackupFiles = maxBackupFiles;
+    d->cur_num = 0;
 
-	m_loglevel = loglevel;
+    d->loglevel = loglevel;
 
-	m_file.setFileName(currFileName());
+    d->file.setFileName(currFileName());
 
-	return m_file.open(QIODevice::WriteOnly | QIODevice::Append);
+    return d->file.open(QIODevice::WriteOnly | QIODevice::Append);
 
 }
 
 void CLLog::setLogLevel(CLLogLevel loglevel)
 {
-	m_loglevel = loglevel;
+    d->loglevel = loglevel;
+}
+
+CLLogLevel CLLog::getLoglevel()
+{
+    return d->loglevel;
 }
 
 void CLLog::setLoglistner(CLLogListner * loglistner)
 {
-	m_loglistner = loglistner;
+    d->loglistner = loglistner;
 }
 
 void CLLog::log(const QString& msg, int val, CLLogLevel loglevel)
 {
-	if (loglevel > m_loglevel)
-		return;
+    if (loglevel > d->loglevel)
+        return;
 
-	QString str;
-	QTextStream(&str) << msg << val;
+    QString str;
+    QTextStream(&str) << msg << val;
 
-	log(str, loglevel);
+    log(str, loglevel);
 }
 
 void CLLog::log(const QString& msg, qint64 val, CLLogLevel loglevel)
 {
-	if (loglevel > m_loglevel)
-		return;
+    if (loglevel > d->loglevel)
+        return;
 
-	QString str;
-	QTextStream(&str) << msg << val;
+    QString str;
+    QTextStream(&str) << msg << val;
 
-	log(str, loglevel);
+    log(str, loglevel);
 }
 
 
 void CLLog::log(const QString& msg1, const QString& msg2, CLLogLevel loglevel)
 {
-	if (loglevel > m_loglevel)
-		return;
+    if (loglevel > d->loglevel)
+        return;
 
-	QString str;
-	QTextStream(&str) << msg1 << msg2;
+    QString str;
+    QTextStream(&str) << msg1 << msg2;
 
-	log(str, loglevel);
+    log(str, loglevel);
 }
 
 void CLLog::log(const QString& msg1, int val, const QString& msg2, CLLogLevel loglevel)
 {
-	if (loglevel > m_loglevel)
-		return;
+    if (loglevel > d->loglevel)
+        return;
 
-	QString str;
-	QTextStream(&str) << msg1 << val << msg2;
+    QString str;
+    QTextStream(&str) << msg1 << val << msg2;
 
-	log(str, loglevel);
+    log(str, loglevel);
 
 }
 
 void CLLog::log(const QString& msg1, int val, const QString& msg2, int val2, CLLogLevel loglevel)
 {
-	if (loglevel > m_loglevel)
-		return;
+    if (loglevel > d->loglevel)
+        return;
 
-	QString str;
-	QTextStream(&str) << msg1 << val << msg2 << val2;
+    QString str;
+    QTextStream(&str) << msg1 << val << msg2 << val2;
 
-	log(str, loglevel);
+    log(str, loglevel);
 
 }
 
 void CLLog::log(const QString& msg, qreal val, CLLogLevel loglevel)
 {
-	if (loglevel > m_loglevel)
-		return;
+    if (loglevel > d->loglevel)
+        return;
 
-	QString str;
-	QTextStream(&str) << msg << val;
+    QString str;
+    QTextStream(&str) << msg << val;
 
-	log(str, loglevel);
+    log(str, loglevel);
 
 }
 
 void CLLog::log(const QString& msg, CLLogLevel loglevel)
 {
-//	return;
+    if (loglevel > d->loglevel)
+        return;
 
-	if (loglevel > m_loglevel)
-		return;
+    QMutexLocker locker(&d->mutex);
 
-	QMutexLocker mutx(&m_mutex);
+    if (d->loglistner)
+        d->loglistner->onLogMsg(msg);
 
-	if (m_loglistner)
-		m_loglistner->onLogMsg(msg);
+    if (!d->file.isOpen())
+        return;
 
-	if (!m_file.isOpen())
-		return;
-
-	QString th;
+    QString th;
     QTextStream textStream(&th);
-	hex(textStream) << (quint64)QThread::currentThread();
+    hex(textStream) << (quint64)QThread::currentThread();
 
-	QTextStream fstr(&m_file);
-	fstr<< QDateTime::currentDateTime().toString("ddd MMM d yy  hh:mm:ss.zzz") <<	" Thread " << th << " (" <<cl_log_msg[loglevel] <<"): " << msg << "\r\n";
-	fstr.flush();
+    QTextStream fstr(&d->file);
+    fstr << QDateTime::currentDateTime().toString(QLatin1String("ddd MMM d yy  hh:mm:ss.zzz"))
+         << QLatin1String(" Thread ") << th
+         << QLatin1String(" (") << QString::fromAscii(cl_log_msg[loglevel]) << QLatin1String("): ") << msg << QLatin1String("\r\n");
+    fstr.flush();
 
-	if (m_file.size() >= m_max_file_size) 
-		openNextFile();
+    if (d->file.size() >= d->max_file_size)
+        openNextFile();
 
 }
 
@@ -149,65 +177,57 @@ void CLLog::log(CLLogLevel loglevel, const char* format, ...)
     va_list args;
 
     va_start(args, format);
-#ifdef _WIN32
-    vsnprintf_s(buffer, MAX_MESSAGE_SIZE, MAX_MESSAGE_SIZE, format, args);
-#else
-    vsnprintf(buffer, MAX_MESSAGE_SIZE, format, args);
-#endif
 
-    cl_log.log(buffer, loglevel);
+    QT_VSNPRINTF(buffer, MAX_MESSAGE_SIZE, format, args);
+    cl_log.log(QString::fromLocal8Bit(buffer), loglevel);
+
     va_end(args);
 }
 
 void CLLog::openNextFile()
 {
-	m_file.close(); // close current file
+    d->file.close(); // close current file
 
-	int max_existing_num = m_maxBackupFiles;
-	while (max_existing_num)
-	{
-		if (QFile::exists(backupFileName(max_existing_num)))
-			break;
-		--max_existing_num;
-	}
+    int max_existing_num = d->maxBackupFiles;
+    while (max_existing_num)
+    {
+        if (QFile::exists(backupFileName(max_existing_num)))
+            break;
+        --max_existing_num;
+    }
 
-	if (max_existing_num<m_maxBackupFiles) // if we do not need to delete backupfiles
-	{
-		QFile::rename(currFileName(), backupFileName(max_existing_num+1));
-	}
-	else // we need to delete one backup file
-	{
-		QFile::remove(backupFileName(1)); // delete the oldest file
+    if (max_existing_num<d->maxBackupFiles) // if we do not need to delete backupfiles
+    {
+        QFile::rename(currFileName(), backupFileName(max_existing_num+1));
+    }
+    else // we need to delete one backup file
+    {
+        QFile::remove(backupFileName(1)); // delete the oldest file
 
-		for (int i = 2; i <= m_maxBackupFiles; ++i) // shift all file names by one 
-			QFile::rename(backupFileName(i), backupFileName(i-1));
+        for (int i = 2; i <= d->maxBackupFiles; ++i) // shift all file names by one
+            QFile::rename(backupFileName(i), backupFileName(i-1));
 
-		QFile::rename(currFileName(), backupFileName(m_maxBackupFiles)); // move current to the most latest backup
-	}
+        QFile::rename(currFileName(), backupFileName(d->maxBackupFiles)); // move current to the most latest backup
+    }
 
-	m_file.open(QIODevice::WriteOnly | QIODevice::Append);
+    d->file.open(QIODevice::WriteOnly | QIODevice::Append);
 
 }
 
 QString CLLog::currFileName() const
 {
-	return m_base_name + ".log";
+    return d->base_name + QLatin1String(".log");
 }
 
 QString CLLog::backupFileName(quint8 num) const
 {
-	QString result;
-	QTextStream stream(&result);
+    QString result;
+    QTextStream stream(&result);
 
-	char cnum[4];
+    char cnum[4];
 
-#ifdef _WIN32
-	sprintf_s(cnum, 4, "%.3d", num);
-#else
-	snprintf(cnum, 4, "%.3d", num);
-#endif
+    QT_SNPRINTF(cnum, 4, "%.3d", num);
 
-	stream << m_base_name << cnum << ".log";
-	return result;
+    stream << d->base_name << cnum << ".log";
+    return result;
 }
-
