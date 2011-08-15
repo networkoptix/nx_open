@@ -106,6 +106,7 @@ public:
     void wheelEvent(QWheelEvent *);
 protected:
     void paintEvent(QPaintEvent *);
+    void mouseDoubleClickEvent(QMouseEvent *);
     void mouseMoveEvent(QMouseEvent *);
     void mousePressEvent(QMouseEvent *);
     void mouseReleaseEvent(QMouseEvent *);
@@ -318,6 +319,16 @@ void TimeLine::paintEvent(QPaintEvent *ev)
     painter.setPen(QPen(Qt::red, 3));
     xpos = r.left() + m_parent->m_slider->value() * (r.width()-handleThickness-1) / m_parent->sliderLength();
     painter.drawLine(QPoint(xpos, 0), QPoint(xpos, height()));
+}
+
+void TimeLine::mouseDoubleClickEvent(QMouseEvent *)
+{
+    QPropertyAnimation *scaleAnimation = new QPropertyAnimation(m_parent, "scalingFactor");
+    scaleAnimation->setEasingCurve(QEasingCurve::InOutQuad);
+    scaleAnimation->setStartValue(m_parent->scalingFactor());
+    scaleAnimation->setEndValue(2*log(m_parent->maximumValue()/m_parent->minimumRange()));
+    scaleAnimation->setDuration(1000);
+    scaleAnimation->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
 void TimeLine::mouseMoveEvent(QMouseEvent *me)
