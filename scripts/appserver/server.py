@@ -90,8 +90,24 @@ class Server(Resource):
         print >> sio, Resource.__repr__(self),
         return sio.getvalue()
 
+class Layout(Resource):
+    def __init__(self):
+        Resource.__init__(self)
+
+        self.attr_mapping.update({'user_id' : 'user_id', 'background_url' : 'background_url'})
+
+        self.user = ''
+        self.background_url = ''
+
+    def __repr__(self):
+        sio = StringIO()
+        print >> sio, Resource.__repr__(self),
+        print >> sio, ', User: %s\t' % self.user,
+        print >> sio, ', Background: %s\t' % self.background,
+        return sio.getvalue()
+
 def get_object_list(path, Class, args=''):
-    request_str = SERVER+path
+    request_str = SERVER + path
     if args:
         request_str += '?' + args
 
@@ -144,8 +160,7 @@ def add_camera():
     return POST(SERVER + 'camera/', params = {'name' : "new camera", 'server_id' : serverid, 'xtype_id' : typeid}, credentials=CREDENTIALS, async=False)
 
 def reg_server():
-    typeid = list_resource_types()[0].xid
-    return PUT(SERVER + 'server/', params = {'id' : SERVER_ID, 'name' : socket.gethostname()}, credentials=CREDENTIALS, async=False)
+    return PUT(SERVER + 'server/', params = {'id' : SERVER_ID}, credentials=CREDENTIALS, async=False)
 
 def reg_camera(*args):
     typeid = list_resource_types()[0].xid
@@ -175,6 +190,13 @@ def list_resources_as_tree(*args):
     else:
         return get_object_list('resource/tree', Resource)
 
+def add_layout(*args):
+    typeid = list_resource_types()[0].xid
+    return POST(SERVER + 'layout/', params = {'name' : "new layout", 'xtype_id' : typeid}, credentials=CREDENTIALS, async=False)
+
+def list_layouts(*args):
+    return get_object_list('layout', Layout)
+
 COMMANDS = {
   'as'  : add_server,
   'ls'  : list_servers,
@@ -185,8 +207,10 @@ COMMANDS = {
   'lc'  : list_cameras,
 
   'lr'  : list_resources,
-  'lrat'  : list_resources_as_tree,
-
+  'lrat': list_resources_as_tree,
+ 
+  'al'  : add_layout,
+  'll'  : list_layouts,
   'lrt' : list_resource_types,
 }
 
@@ -218,8 +242,20 @@ def read_state():
         if name == 'SERVER_ID':
             SERVER_ID = value.strip()
 
+def scanario1():
+    # register server
+    reg_server()
+
+    resource_types = list_resource_types()
+
+    register_server()
+
 if __name__ == '__main__':
     read_state()
+
+    if len(sys.argv) == 2 and sys.argv[1] == 'test':
+        scenario1()
+        sys.exit(0)
 
     if len(sys.argv) > 1:
         if sys.argv[1] == '-d':
