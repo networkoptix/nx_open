@@ -16,7 +16,7 @@ sys.path.insert(0, '../common')
 
 from convert import index_dirs, index_common
 
-FFMPEG_VERSION = '2011-05-24'
+FFMPEG_VERSION = '2011-07-22'
 
 EXCLUDE_DIRS = ('.svn', 'dxva')
 EXCLUDE_FILES = ('dxva', 'moc_', 'qrc_', 'StdAfx')

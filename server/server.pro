@@ -30,7 +30,7 @@ include( $$PWD/../common/src/common.pri )
 
 win32 {
   INCLUDEPATH += contrib/openal/include
-  LIBS += contrib/openal/bin/win32/OpenAL32.lib
+  LIBS += -Lcontrib/openal/bin/win32 -lOpenAL32
   RC_FILE = server.rc
 }
 
