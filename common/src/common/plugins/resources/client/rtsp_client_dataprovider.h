@@ -10,8 +10,8 @@ class QnRtspClientDataProvider: public QnNavigatedDataProvider
 public:
     QnRtspClientDataProvider(QnResourcePtr res);
     virtual ~QnRtspClientDataProvider();
-protected:
     virtual QnAbstractDataPacketPtr getNextData();
+protected:
     virtual void updateStreamParamsBasedOnQuality(); 
     virtual void channeljumpTo(quint64 mksec, int channel);
 private:

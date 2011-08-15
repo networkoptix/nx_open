@@ -11,6 +11,28 @@
 #include "resource/client/client_media_resource.h"
 #include "resource/video_server.h"
 
+static const QnId TEST_RES_ID("1001");
+
+class TestThread: public QThread
+{
+protected:
+    virtual void run()
+    {
+        QnVideoServer* server = new QnVideoServer();
+        server->setUrl("rtsp://localhost:50000");
+        QnResourcePool::instance().addResource(QnResourcePtr(server));
+        QnClientMediaResource* camera = new QnClientMediaResource();
+        camera->setId(TEST_RES_ID);
+        camera->setParentId(server->getId());
+        QnResourcePool::instance().addResource(QnResourcePtr(camera));
+
+        QnAbstractMediaStreamDataProvider* dp = camera->createMediaProvider();
+        while (1)
+        {
+            QnAbstractDataPacketPtr data = dp->getNextData();
+        }
+    }
+};
  
 int main(int argc, char *argv[])
 {
@@ -51,15 +73,11 @@ int main(int argc, char *argv[])
 
     //QnArchiveResource* res = new QnArchiveResource("e:/Users/roman76r/video/ROCKNROLLA/BDMV/STREAM/00000.m2ts");
     QnArchiveResource* res = new QnArchiveResource("test.flv");
+    res->setId(TEST_RES_ID);
     QnResourcePool::instance().addResource(QnResourcePtr(res));
 
-    QnVideoServer* server = new QnVideoServer();
-    server->setUrl("rtsp://localhost:50000");
-    QnResourcePool::instance().addResource(QnResourcePtr(server));
-    QnClientMediaResource* camera = new QnClientMediaResource();
-    camera->setParentId(server->getId());
-    QnResourcePool::instance().addResource(QnResourcePtr(camera));
-
+    TestThread* testThread = new TestThread();
+    testThread->start();
 	//===========================================================================
 	//IPPH264Decoder::dll.init();
 

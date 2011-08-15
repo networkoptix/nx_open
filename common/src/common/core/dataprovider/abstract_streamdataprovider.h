@@ -25,6 +25,7 @@ public:
 
     void setDataRate(qreal rate); // fps for example
     qreal getDataRate() const;
+    virtual QnAbstractDataPacketPtr getNextData() = 0;
 
 protected:
 
@@ -36,7 +37,6 @@ protected:
 
     void putData(QnAbstractDataPacketPtr data);
 
-    virtual QnAbstractDataPacketPtr getNextData() = 0;
 
     // if function returns false we do not call getNextData
     virtual bool beforeGetData() = 0;

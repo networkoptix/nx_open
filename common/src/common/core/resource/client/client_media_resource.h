@@ -19,7 +19,6 @@ public:
     virtual QString manufacture() const { return m_manufacture; }
 
     virtual bool equalsTo(const QnResourcePtr other) const;
-protected:
     virtual QnAbstractMediaStreamDataProvider* createMediaProvider();
 private:
     QString m_manufacture;

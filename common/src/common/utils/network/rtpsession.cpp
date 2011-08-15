@@ -105,7 +105,7 @@ bool RTPSession::open(const QString& url)
 
     unsigned int port = DEFAULT_RTP_PORT;
 
-    if (!m_tcpSock.connect(mUrl.host().toLatin1().data(), DEFAULT_RTP_PORT))
+    if (!m_tcpSock.connect(mUrl.host().toLatin1().data(), mUrl.port(DEFAULT_RTP_PORT)))
         return false;
 
     if (!sendDescribe())
@@ -541,7 +541,7 @@ bool RTPSession::readTextResponce(QByteArray& response)
     bool readMoreData = false; // try to process existing buffer at first
     while (1)
     {
-        if (readMoreData && !readRAWData())
+        if (readMoreData && readRAWData() == -1)
             return false;
 
         quint8* startPtr = m_responseBuffer;
