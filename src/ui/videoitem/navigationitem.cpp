@@ -2,6 +2,7 @@
 
 #include <QtCore/QString>
 #include <QtCore/QTimerEvent>
+#include <QtGui/QAction>
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QPushButton>
 #include <QtGui/QLabel>
@@ -45,6 +46,12 @@ NavigationWidget::NavigationWidget(QWidget *parent) :
     m_playButton->setFixedSize(54, 51);
     m_playButton->setPixmap(QPixmap(":/skin/play_grey.png"));
     m_playButton->setPressedPixmap(QPixmap(":/skin/play_blue.png"));
+
+    QAction *playAction = new QAction(tr("Play"), m_playButton);
+    playAction->setShortcut(tr("Space"));
+    playAction->setShortcutContext(Qt::ApplicationShortcut);
+    connect(playAction, SIGNAL(triggered()), m_playButton, SLOT(click()));
+    this->addAction(playAction);
 
     m_forwardButton = new MyButton();
     m_forwardButton->setFixedSize(54, 30);

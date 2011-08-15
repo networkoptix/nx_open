@@ -192,6 +192,10 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
     addAction(&cm_start_video_recording);
     connect(&cm_recording_settings, SIGNAL(triggered()), SLOT(recordingSettings()));
 
+    cm_toggle_fullscreen.setShortcut(tr("Alt+Return"));
+    cm_toggle_fullscreen.setShortcutContext(Qt::ApplicationShortcut);
+    addAction(&cm_toggle_fullscreen);
+    connect(&cm_toggle_fullscreen, SIGNAL(triggered()), SLOT(toggleFullScreen()));
 }
 
 GraphicsView::~GraphicsView()
@@ -2705,6 +2709,14 @@ void GraphicsView::recordingSettings()
     PreferencesWindow preferencesDialog;
     preferencesDialog.setCurrentTab(3);
     preferencesDialog.exec();
+}
+
+void GraphicsView::toggleFullScreen()
+{
+    if (!m_selectedWnd)
+        return;
+
+    // dunno how to implement
 }
 
 void GraphicsView::fitInView(int duration, int delay, CLAnimationCurve curve)

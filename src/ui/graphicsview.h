@@ -173,6 +173,7 @@ private slots:
 	void onArrange_helper_finished();
     void toggleRecording();
     void recordingSettings();
+    void toggleFullScreen();
 
 	void on_grid_drop_animation_finished();
 protected:
