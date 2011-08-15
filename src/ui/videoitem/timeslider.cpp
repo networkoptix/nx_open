@@ -418,7 +418,8 @@ TimeSlider::TimeSlider(QWidget *parent) :
     m_delta(0),
 //    m_mode(TimeMode),
     m_animation(new QPropertyAnimation(this, "viewPortPos")),
-    m_centralise(true)
+    m_centralise(true),
+    m_minimumRange(5*1000) // 5 seconds
 {
     qRegisterAnimationInterpolator<qint64>(qint64Interpolator);
 
@@ -537,7 +538,7 @@ void TimeSlider::setScalingFactor(double factor)
 {
     double oldfactor = m_scalingFactor;
     m_scalingFactor = factor > 0 ? factor : 0;
-    if (sliderRange() < 1000)
+    if (sliderRange() < m_minimumRange)
         m_scalingFactor = oldfactor;
     //setViewPortPos(currentValue() - m_slider->value()*delta());
     setViewPortPos(currentValue() - sliderRange()/2);
@@ -648,6 +649,16 @@ int TimeSlider::sliderLength() const
 qint64 TimeSlider::sliderRange()
 {
     return sliderLength()*delta();
+}
+
+qint64 TimeSlider::minimumRange() const
+{
+    return m_minimumRange;
+}
+
+void TimeSlider::setMinimumRange(qint64 r)
+{
+    m_minimumRange = r;
 }
 
 void TimeSlider::updateSlider()

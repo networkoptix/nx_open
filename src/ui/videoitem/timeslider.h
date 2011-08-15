@@ -77,6 +77,9 @@ public:
     qint64 viewPortPos() const;
     qint64 sliderRange();
 
+    qint64 minimumRange() const;
+    void setMinimumRange(qint64);
+
 signals:
     void currentValueChanged(qint64 value);
     void maximumValueChanged(qint64 value);
@@ -112,6 +115,7 @@ private:
 
     QPropertyAnimation *m_animation;
     bool m_centralise;
+    qint64 m_minimumRange;
 
 protected slots:
     void setViewPortPos(qint64 value);
