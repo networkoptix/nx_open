@@ -413,6 +413,10 @@ bool TimeSlider::eventFilter(QObject *target, QEvent *event)
         m_frame->wheelEvent((QWheelEvent*) event);
         return true;
     }
+    if (event->type() == QEvent::MouseButtonDblClick && target == m_slider)
+    {
+        return true;
+    }
     return false;
 }
 
