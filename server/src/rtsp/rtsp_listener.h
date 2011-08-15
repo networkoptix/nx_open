@@ -1,7 +1,7 @@
 #include <QObject>
 #include <QNetworkInterface>
 
-#include "utils/common/base.h"
+#include "common/base.h"
 
 class QnRtspListener: public QObject
 {
