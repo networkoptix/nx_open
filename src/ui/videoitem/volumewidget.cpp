@@ -12,10 +12,13 @@ void MyVolumeSlider::paintEvent(QPaintEvent *)
     QPainter p(this);
 
     int length = abs(maximum() - minimum());
-    double handlePos = (double)(width()-5)*value()/length;
+    double handlePos = (double)(width()-1)*value()/length;
 
     QRect r = contentsRect();
     p.fillRect(rect(), QColor(0,0,0,0));
+
+    p.setPen(QPen(Qt::darkGray, 1));
+    p.drawRect(QRect(r.x(), (height() - gradHeigth)/2 - 1, r.width()-1, gradHeigth + 2));
 
     QLinearGradient linearGrad(QPointF(0, 0), QPointF(handlePos, height()));
     linearGrad.setColorAt(0, QColor(0, 43, 130));
@@ -61,14 +64,13 @@ VolumeWidget::VolumeWidget(QWidget *parent) :
     connect(m_button, SIGNAL(toggled(bool)), SLOT(onButtonChecked()));
 }
 
-void VolumeWidget::paintEvent(QPaintEvent *e)
+void VolumeWidget::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
     static QPixmap pix = QPixmap(":/skin/volume_slider_background.png");
 
     p.drawPixmap(contentsRect(), pix);
     p.end();
-    //    QWidget::paintEvent(e);
 }
 
 void VolumeWidget::onValueChanged(int value)
