@@ -96,7 +96,7 @@ public:
 
     bool mouseOver() const { return m_mouseOver; }
 
-    static const int DEFAULT_HEIGHT = 75;
+    static const int DEFAULT_HEIGHT = 60;
 
 protected:
     void timerEvent(QTimerEvent* event);
