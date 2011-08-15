@@ -14,16 +14,18 @@ struct RtspStatistic {
 class RTPIODevice 
 {
 public:
-    explicit RTPIODevice(RTPSession& owner,  CommunicatingSocket& sock);
+    explicit RTPIODevice(RTPSession& owner);
     virtual ~RTPIODevice();
     virtual qint64	read(char * data, qint64 maxSize );
-   
+    void setTCPMode(bool mode) {m_tcpMode = mode;}
+    void setSocket(CommunicatingSocket* socket) { m_sock = socket; }
 private:
 
-    CommunicatingSocket& m_sock;
+    CommunicatingSocket* m_sock;
     RTPSession& m_owner;
     qint64 m_receivedPackets;
     qint64 m_receivedOctets;
+    bool m_tcpMode;
 };
 
 class RTPSession
@@ -55,6 +57,7 @@ public:
     void setTransport(const QString& transport);
     QString getTrackFormat(int trackNum) const;
 private:
+    int RTPSession::readRAWData();
 
     bool sendDescribe();
     bool sendOptions();
@@ -63,7 +66,8 @@ private:
     bool sendTeardown();
     bool sendKeepAlive();
 
-    bool readResponce(QByteArray& responce);
+    bool readTextResponce(QByteArray& responce);
+    int readBinaryResponce(quint8* data, int maxDataSize);
 
 
     QString extractRTSPParam(const QString& buffer, const QString& paramName);
@@ -73,9 +77,11 @@ private:
     int buildRTCPReport(quint8* dstBuffer, const RtspStatistic* stats);
 private:
 
-    enum {MAX_RESPONCE_LEN	= 1024*8};
+    enum {MAX_RESPONCE_LEN	= 1024*70};
 
-    unsigned char mResponse[MAX_RESPONCE_LEN];
+    //unsigned char m_responseBuffer[MAX_RESPONCE_LEN];
+    quint8* m_responseBuffer;
+    int m_responseBufferLen;
     QByteArray m_sdp;
 
     TCPSocket m_tcpSock;
@@ -95,6 +101,8 @@ private:
     QTime m_keepAliveTime;
    
     QString m_transport;
+
+    friend class RTPIODevice;
 };
 
 #endif //rtp_session_h_1935_h
