@@ -20,7 +20,8 @@ def index_dirs(xdirs, template_file, output_file, use_prefix = False, exclude_di
     if os.path.exists(output_file):
         os.unlink(output_file)
 
-    shutil.copy(template_file, output_file)
+    if os.path.exists(template_file):
+        shutil.copy(template_file, output_file)
 
     headers = []
     sources = []

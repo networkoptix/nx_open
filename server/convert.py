@@ -52,7 +52,7 @@ def setup_ffmpeg():
 
     if not ffmpeg_path:
         print r"""EVE_FFMPEG environment variable is not defined.
-        
+
     Do the following:
     1. Clone repository ssh://hg@vigasin.com/ffmpeg to somewhere, say c:\programming\ffmpeg
     2. Go to c:\programming\ffmpeg and run get_ffmpegs.bat
@@ -121,46 +121,50 @@ def gen_version_h():
 ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release = setup_ffmpeg()
 openal_path = setup_openal()
 
-if os.path.exists('bin'):
-    rmtree('bin')
+destdir = '../bin'
+destdir_debug = destdir + '/debug'
+destdir_release = destdir + '/release'
+
+if os.path.exists(destdir):
+    rmtree(destdir)
 
 if os.path.exists('build'):
     rmtree('build')
 
-os.mkdir('bin')
-os.mkdir('bin/debug')
-os.mkdir('bin/release')
+os.mkdir(destdir)
+os.mkdir(destdir_debug)
+os.mkdir(destdir_release)
 
 os.mkdir('build')
 
-copy_files(ffmpeg_path_debug + '/bin/*-[0-9].dll', 'bin/debug')
-copy_files(ffmpeg_path_debug + '/bin/*-[0-9][0-9].dll', 'bin/debug')
+copy_files(ffmpeg_path_debug + '/bin/*-[0-9].dll', destdir_debug)
+copy_files(ffmpeg_path_debug + '/bin/*-[0-9][0-9].dll', destdir_debug)
 
-copy_files(ffmpeg_path_release + '/bin/*-[0-9].dll', 'bin/release')
-copy_files(ffmpeg_path_release + '/bin/*-[0-9][0-9].dll', 'bin/release')
+copy_files(ffmpeg_path_release + '/bin/*-[0-9].dll', destdir_release)
+copy_files(ffmpeg_path_release + '/bin/*-[0-9][0-9].dll', destdir_release)
 
-copy_files(openal_path + '/*.dll', 'bin/release')
-copy_files(openal_path + '/*.dll', 'bin/debug')
+copy_files(openal_path + '/*.dll', destdir_release)
+copy_files(openal_path + '/*.dll', destdir_debug)
 
-os.mkdir('bin/debug/arecontvision')
-os.mkdir('bin/release/arecontvision')
+os.mkdir(destdir_debug + '/arecontvision')
+os.mkdir(destdir_release + '/arecontvision')
 
-copy_files('resource/arecontvision/*', 'bin/debug/arecontvision')
-copy_files('resource/arecontvision/*', 'bin/release/arecontvision')
+copy_files('resource/arecontvision/*', destdir_debug + '/arecontvision')
+copy_files('resource/arecontvision/*', destdir_release + '/arecontvision')
 
 gen_version_h()
 
 
 index_common()
 
-index_dirs(('src',), 'src/const.pro', 'src/server.pro', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
+index_dirs(('src',), '', 'src/src.pri', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
 
 
 if sys.platform == 'win32':
-    os.system('qmake -tp vc FFMPEG=%s -o src/server.vcproj src/server.pro' % ffmpeg_path)
+    os.system('qmake -tp vc FFMPEG=%s -o server.vcproj server.pro' % ffmpeg_path)
 
 elif sys.platform == 'darwin':
-    if os.path.exists('src/server.xcodeproj'):
-        rmtree('src/server.xcodeproj')
+    if os.path.exists('server.xcodeproj'):
+        rmtree('server.xcodeproj')
 
-    os.system('qmake FFMPEG=%s -o src/server.xcodeproj src/server.pro' % ffmpeg_path)
+    os.system('qmake FFMPEG=%s -o server.xcodeproj server.pro' % ffmpeg_path)

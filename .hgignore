@@ -9,7 +9,6 @@ Release
 *.sln
 *.ncb
 *.suo
-*.pro
 *.user
 *.vcproj
 *.xcodeproj
