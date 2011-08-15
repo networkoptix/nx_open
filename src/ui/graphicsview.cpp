@@ -2575,6 +2575,7 @@ QRegion createRoundRegion(int rSmall, int rLarge, const QRect& rect)
 
 void GraphicsView::toggleRecording()
 {
+#ifdef Q_OS_WIN
     bool recording = cm_start_video_recording.property("recoding").toBool();
 
     VideoRecorderSettings recorderSettings;
@@ -2586,9 +2587,7 @@ void GraphicsView::toggleRecording()
         QAudioDeviceInfo secondAudioDevice = recorderSettings.secondaryAudioDevice();
         int screen = recorderSettings.screen();
 
-#ifdef Q_OS_WIN
         screen = screenToAdapter(screen);
-#endif
 
         VideoRecorderSettings::CaptureMode captureMode = recorderSettings.captureMode();
         VideoRecorderSettings::DecoderQuality decoderQuality = recorderSettings.decoderQuality();
@@ -2599,7 +2598,7 @@ void GraphicsView::toggleRecording()
         s.beginGroup(QLatin1String("videoRecording"));
 
         QString filePath = getTempRecordingDir() + QLatin1String("/video_recording.ts");
-#ifdef Q_OS_WIN
+
         if (m_desktopEncoder)
             delete m_desktopEncoder;
         QSize encodingSize(0,0);
@@ -2635,7 +2634,7 @@ void GraphicsView::toggleRecording()
             m_desktopEncoder = 0;
             return;
         }
-#endif
+
         cm_start_video_recording.setProperty("recoding", true);
 
         QLabel *label = new QLabel;
@@ -2659,13 +2658,13 @@ void GraphicsView::toggleRecording()
         animation->setEndValue(0.0);
         animation->start();
         QTimer::singleShot(3000, label, SLOT(deleteLater()));
+
     }
     else
     {
         // stop capturing
         cm_start_video_recording.setProperty("recoding", QVariant());
 
-#ifdef Q_OS_WIN
         QString recordedFileName = m_desktopEncoder->fileName();
         m_desktopEncoder->stop();
 
@@ -2697,8 +2696,8 @@ void GraphicsView::toggleRecording()
         }
         settings.endGroup();
         settings.sync();
-#endif
     }
+#endif
 }
 
 void GraphicsView::recordingSettings()
