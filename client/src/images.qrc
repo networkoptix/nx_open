@@ -1,5 +1,8 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
+    <file>images/block.png</file>
+    <file>images/close.png</file>
+
     <file>images/1.bmp</file>
     <file>images/1-1-1-1.bmp</file>
     <file>images/1-1-1-4.bmp</file>

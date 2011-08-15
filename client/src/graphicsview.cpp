@@ -11,7 +11,7 @@
 #include <qdebug.h>
 
 #include "animatedwidget.h"
-//#include "layoutitem.h"
+#include "videoitem.h"
 
 static const qreal spacig = 10;
 
@@ -83,13 +83,13 @@ GraphicsView::GraphicsView(QWidget *parent)
         widget->setFlag(QGraphicsItem::ItemIsPanel, false);
         widget->setPos(QPointF(-500, -500));
         scene()->addItem(widget);
-/*
+
         QGraphicsGridLayout *layout = new QGraphicsGridLayout(widget);
         layout->setSpacing(0);
         layout->setContentsMargins(0, 0, 0, 0);
-        LayoutItem *item = new LayoutItem(widget);
+        VideoItem *item = new VideoItem(widget);
         layout->addItem(item, 0, 0, 1, 1, Qt::AlignCenter);
-*/
+
         connect(widget, SIGNAL(clicked()), this, SLOT(itemClicked()));
         connect(widget, SIGNAL(doubleClicked()), this, SLOT(itemDoubleClicked()));
         connect(widget, SIGNAL(destroyed()), this, SLOT(itemDestroyed()));
