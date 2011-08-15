@@ -3,7 +3,7 @@
 
 #include "../media_resource.h"
 
-class QnClientMediaResource: virtual public QnMediaResource
+class QnClientMediaResource: virtual public QnMediaResource, virtual public QnURLResource
 {
 public:
     QnClientMediaResource();

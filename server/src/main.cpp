@@ -22,7 +22,8 @@ protected:
         server->setUrl("rtsp://localhost:50000");
         QnResourcePool::instance().addResource(QnResourcePtr(server));
         QnClientMediaResource* camera = new QnClientMediaResource();
-        camera->setId(TEST_RES_ID);
+        camera->setId(TEST_RES_ID+1);
+        camera->setUrl("test.flv");
         camera->setParentId(server->getId());
         QnResourcePool::instance().addResource(QnResourcePtr(camera));
 

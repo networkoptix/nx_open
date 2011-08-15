@@ -395,6 +395,8 @@ int QnRtspConnectionProcessor::composeSetup()
 int QnRtspConnectionProcessor::composePlay()
 {
     Q_D(QnRtspConnectionProcessor);
+    if (d->mediaRes == 0)
+        return CODE_NOT_FOUND;
     d->dataProvider = d->mediaRes->addMediaProvider();
     if (!d->dataProvider)
         return CODE_INTERNAL_ERROR;

@@ -24,7 +24,12 @@ QnRtspClientDataProvider::QnRtspClientDataProvider(QnResourcePtr res):
     QnURLResourcePtr server = qSharedPointerDynamicCast<QnURLResource>(qnResPool.getResourceById(media->getParentId()));
     if (server == 0)
         return;
-    QString url = server->getUrl() + QString('/') + res->getId().toString();
+    QString url = server->getUrl() + QString('/');
+    QnURLResourcePtr mediaUrl = qSharedPointerDynamicCast<QnURLResource>(qnResPool.getResourceById(res->getId()));
+    if (mediaUrl != 0 && !mediaUrl->getUrl().isEmpty())
+        url += mediaUrl->getUrl();
+    else
+        url += res->getId().toString();
     m_rtspSession.setTransport("TCP");
     m_isOpened = m_rtspSession.open(url);
     m_rtpData = m_rtspSession.play();
@@ -106,6 +111,8 @@ QnAbstractDataPacketPtr QnRtspClientDataProvider::processFFmpegRtpPayload(const 
 QnAbstractDataPacketPtr QnRtspClientDataProvider::getNextData()
 {
     QnAbstractDataPacketPtr result(0);
+    if (!m_rtpData)
+        return result;
     while (1)
     {
         int rtpChannelNum = 0;
