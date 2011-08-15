@@ -50,13 +50,10 @@ def index_dirs(xdirs, template_file, output_file, use_prefix = False, exclude_di
 
     print >> uniclient_pro
     for header in headers:
-        print >> uniclient_pro, "HEADERS += $$PWD/common/%s" % header
+        print >> uniclient_pro, "HEADERS += $$PWD/%s" % header
 
     print >> uniclient_pro
     for cpp in sources:
-        print >> uniclient_pro, "SOURCES += $$PWD/common/%s" % cpp
+        print >> uniclient_pro, "SOURCES += $$PWD/%s" % cpp
 
     uniclient_pro.close()
-
-
-index_dirs(('src/common',), 'src/const.pri', 'src/common.pri')
