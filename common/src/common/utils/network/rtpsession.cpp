@@ -542,6 +542,5 @@ void RTPSession::setTransport(const QString& transport)
 
 QString RTPSession::getTrackFormat(int trackNum) const
 {
-    QMap<int, QString>::const_iterator itr = m_sdpTracks.find(trackNum);
-    return itr != m_sdpTracks.end() ? itr.value() : QString();
+    return m_sdpTracks.value(trackNum);
 }

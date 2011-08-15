@@ -6,11 +6,13 @@
 #include "datapacket/mediadatapacket.h"
 #include "common/base.h"
 
+#include <qdebug.h>
+
 static const int MAX_RTP_BUFFER_SIZE = 65535;
 
 // current implementation for TCP mode only
 
-QnRtspClientDataProvider::QnRtspClientDataProvider(QnResourcePtr res): 
+QnRtspClientDataProvider::QnRtspClientDataProvider(QnResourcePtr res):
     QnNavigatedDataProvider(res),
     m_tcpMode(true)
 {
@@ -71,7 +73,7 @@ QnAbstractDataPacketPtr QnRtspClientDataProvider::processFFmpegRtpPayload(const 
         QnAbstractMediaDataPacketPtr nextPacket = m_nextDataPacket[rtpHeader->ssrc];
         if (nextPacket == 0)
         {
-            if (context->codec_type == AVMEDIA_TYPE_VIDEO) 
+            if (context->codec_type == AVMEDIA_TYPE_VIDEO)
             {
                 quint8 flags = *payload;
                 dataSize--;
@@ -90,7 +92,7 @@ QnAbstractDataPacketPtr QnRtspClientDataProvider::processFFmpegRtpPayload(const 
             }
             m_nextDataPacket[rtpHeader->ssrc] = nextPacket;
         }
-        nextPacket->data.write((const char*)payload, dataSize); 
+        nextPacket->data.write((const char*)payload, dataSize);
         if (rtpHeader->marker)
         {
             result = nextPacket;
@@ -116,7 +118,7 @@ QnAbstractDataPacketPtr QnRtspClientDataProvider::getNextData()
                 continue;
             }
             rtpChannelNum = m_rtpDataBuffer[1];
-            blockSize -= 4; 
+            blockSize -= 4;
             data += 4;
         }
         else {
