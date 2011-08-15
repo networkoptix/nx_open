@@ -9,7 +9,7 @@ class CLVideoCamera;
 class TimeSlider;
 class QGraphicsProxyWidget;
 class VolumeWidget;
-
+class MyTextItem;
 class MyButton : public QAbstractButton
 {
 public:
@@ -128,7 +128,7 @@ private:
     qint64 m_currentTime;
     bool m_mouseOver;
 
-    QGraphicsTextItem *textItem;
+    MyTextItem *textItem;
 };
 
 #endif // NAVIGATIONITEM_H

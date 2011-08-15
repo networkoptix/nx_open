@@ -68,6 +68,7 @@ public:
     QSize minimumSizeHint() const;
 
     bool isMoving() { return m_slider->isSliderDown(); }
+    void setMoving(bool b) { m_slider->setSliderDown(b); }
 
     bool centralise() const { return m_centralise; }
     void setCentralise(bool b) { m_centralise = b; }

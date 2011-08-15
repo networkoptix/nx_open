@@ -16,7 +16,10 @@
 class MyTextItem: public QGraphicsTextItem
 {
 public:
-    MyTextItem(QGraphicsItem * parent = 0) : QGraphicsTextItem(parent) {}
+    MyTextItem(QGraphicsItem * parent = 0) : QGraphicsTextItem(parent), m_widget(0) {}
+
+    void setNavigationWidget(NavigationWidget *widget) { m_widget = widget; }
+
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
     {
         static QPixmap pix(":/skin/time-window.png");
@@ -24,6 +27,31 @@ public:
         painter->drawPixmap((rect.width() - pix.width())/2, rect.y() + (rect.height() - (pix.height() - 10))/2, pix);
         QGraphicsTextItem::paint(painter, option, widget);
     }
+    void mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
+    {
+        if (!m_widget)
+            return;
+
+        QPointF pos = mapToScene(event->pos());
+        qint64 value = m_widget->slider()->currentValue() + (double)m_widget->slider()->sliderRange()/m_widget->slider()->width()*(pos - m_pos).x();
+        m_widget->slider()->setCurrentValue(value);
+        m_pos = pos;
+    }
+
+    void mousePressEvent ( QGraphicsSceneMouseEvent * event )
+    {
+        m_pos = mapToScene(event->pos());
+        m_widget->slider()->setMoving(true);
+    }
+
+    void mouseReleaseEvent ( QGraphicsSceneMouseEvent * event )
+    {
+        m_widget->slider()->setMoving(false);
+    }
+
+private:
+    NavigationWidget *m_widget;
+    QPointF m_pos;
 };
 
 NavigationWidget::NavigationWidget(QWidget *parent) :
@@ -168,6 +196,7 @@ NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
     textItem->setOpacity(0.75);
     textItem->setDefaultTextColor(QColor(63, 159, 216));
     textItem->setVisible(false);
+    textItem->setNavigationWidget(m_widget);
 
     setVideoCamera(0);
     m_sliderIsmoving = true;
@@ -237,7 +266,7 @@ void NavigationItem::updateSlider()
         time = m_camera->currentTime();
 
     m_currentTime = time/1000;
-    m_widget->slider()->setCurrentValue(m_currentTime);
+//    m_widget->slider()->setCurrentValue(m_currentTime);
 
     qreal x = m_widget->slider()->x() + 8 + ((double)(m_widget->slider()->width() - 18)/(m_widget->slider()->sliderRange()))*(m_widget->slider()->currentValue() - m_widget->slider()->viewPortPos()); // fuck you!
     textItem->setPos(x - textItem->boundingRect().width()/2, -40);
