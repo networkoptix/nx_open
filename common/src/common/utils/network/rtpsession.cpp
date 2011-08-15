@@ -33,7 +33,7 @@ qint64	RTPIODevice::read( char * data, qint64 maxSize )
     int readed;
     if (m_tcpMode)
         readed = m_owner.readBinaryResponce((quint8*) data, maxSize); // demux binary data from TCP socket
-    else 
+    else
         readed = m_sock->recv(data, maxSize);
     if (readed > 0)
     {
@@ -230,7 +230,7 @@ RTPIODevice*  RTPSession::sendSetup()
         request += "\r\n";
         request += "User-Agent: Network Optix\r\n";
         request += QString("Transport: RTP/AVP/") + m_transport + QString(";unicast");
-        
+
         if (m_transport == "UDP")
         {
             request += ";client_port=";
@@ -238,7 +238,7 @@ RTPIODevice*  RTPSession::sendSetup()
             request += ',';
             request += QString::number(m_rtcpUdpSock.getLocalPort());
         }
-        else 
+        else
         {
             request += "interleaved=" + QString::number(itr.key()*2) + QString("-") + QString::number(itr.key()*2+1);
             // todo: send TCP transport info here
@@ -256,7 +256,7 @@ RTPIODevice*  RTPSession::sendSetup()
             return 0;
 
 
-        if (!responce.startsWith("RTSP/1.0 200")) 
+        if (!responce.startsWith("RTSP/1.0 200"))
         {
             return 0;
         }
@@ -264,7 +264,7 @@ RTPIODevice*  RTPSession::sendSetup()
 
         QString tmp = extractRTSPParam(responce, "Session:");
 
-        if (tmp.size() > 0) 
+        if (tmp.size() > 0)
         {
             QStringList tmpList = tmp.split(';');
             m_SessionId = tmpList[0];
@@ -512,12 +512,12 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
                 quint16 dataLen = (curPtr[2] << 8) + curPtr[3];
                 if (maxDataSize < dataLen)
                 {
-                    qWarning() << "Too low RTSP receiving buffer. Data can't be demuxed";
+                    qWarning("Too low RTSP receiving buffer. Data can't be demuxed");
                     m_responseBufferLen = 0;
                     return -1;
                 }
                 int dataRest = m_responseBuffer + m_responseBufferLen - curPtr;
-                if (dataLen <= dataRest) 
+                if (dataLen <= dataRest)
                 {
                     memcpy(data, curPtr, dataLen);
                     data += dataLen;
@@ -526,7 +526,7 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
 
                     memmove(curPtr, curPtr + dataLen, m_responseBuffer + m_responseBufferLen - (curPtr+dataLen));
                     m_responseBufferLen -= dataLen;
-                    
+
                     return demuxedCount;
                 }
             }
