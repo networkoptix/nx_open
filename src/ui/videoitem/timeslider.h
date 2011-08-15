@@ -37,8 +37,8 @@ public:
     MySlider(QWidget *parent = 0) : QSlider(parent) {}
 
     void paintEvent(QPaintEvent *ev);
-//    QSize minimumSizeHint() { return QSize(/*QSlider::sizeHint().width()*/200, 16); }
-//    QSize sizeHint() { return QSize(QSlider::sizeHint().width(), 16); }
+    //    QSize minimumSizeHint() { return QSize(/*QSlider::sizeHint().width()*/200, 16); }
+    //    QSize sizeHint() { return QSize(QSlider::sizeHint().width(), 16); }
 };
 
 class TimeSlider : public QWidget
@@ -51,7 +51,7 @@ class TimeSlider : public QWidget
 
     Q_PROPERTY(qint64 viewPortPos READ viewPortPos WRITE setViewPortPos)
 public:
-//    enum Mode { TimeMode, DateMode };
+    //    enum Mode { TimeMode, DateMode };
 
     explicit TimeSlider(QWidget *parent = 0);
     ~TimeSlider() {}
@@ -67,15 +67,15 @@ public:
     QSize sizeHint() const;
     QSize minimumSizeHint() const;
 
-     bool isMoving() { return m_slider->isSliderDown(); }
+    bool isMoving() { return m_slider->isSliderDown(); }
 
-     bool centralise() const { return m_centralise; }
-     void setCentralise(bool b) { m_centralise = b; }
+    bool centralise() const { return m_centralise; }
+    void setCentralise(bool b) { m_centralise = b; }
 
-     int sliderValue() const { return m_slider->value(); }
-     int sliderLength() const;
-     qint64 viewPortPos() const;
-     qint64 sliderRange();
+    int sliderValue() const { return m_slider->value(); }
+    int sliderLength() const;
+    qint64 viewPortPos() const;
+    qint64 sliderRange();
 
 signals:
     void currentValueChanged(qint64 value);
@@ -108,7 +108,7 @@ private:
     bool m_sliderPressed;
     int m_delta;
 
-//    Mode m_mode;
+    //    Mode m_mode;
 
     QPropertyAnimation *m_animation;
     bool m_centralise;

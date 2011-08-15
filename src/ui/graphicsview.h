@@ -29,57 +29,57 @@ class DesktopFileEncoder;
 
 class GraphicsView: public QGraphicsView 
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	enum ViewMode{NormalView, ItemsDonor, ItemsAcceptor};
+    enum ViewMode{NormalView, ItemsDonor, ItemsAcceptor};
 
-	GraphicsView(QWidget* mainWnd);
-	virtual ~GraphicsView();
+    GraphicsView(QWidget* mainWnd);
+    virtual ~GraphicsView();
 
-	void start();
-	void stop();
+    void start();
+    void stop();
 
-	void zoomMin(int duration);
-	void setRealSceneRect(QRect rect);
-	QRect getRealSceneRect() const;
+    void zoomMin(int duration);
+    void setRealSceneRect(QRect rect);
+    QRect getRealSceneRect() const;
 
-	qreal getMinSceneZoom() const;
-	void setMinSceneZoom(qreal z);
+    qreal getMinSceneZoom() const;
+    void setMinSceneZoom(qreal z);
 
-	SceneLayout& getCamLayOut();
+    SceneLayout& getCamLayOut();
 
     QnPageSelector* getPageSelector() const;
 
-	CLAbstractSceneItem* getSelectedItem() const;
+    CLAbstractSceneItem* getSelectedItem() const;
 
-	void setZeroSelection(); 
+    void setZeroSelection();
 
-	qreal getZoom() const;
+    qreal getZoom() const;
 
     bool shouldOptimizeDrawing() const;
 
-	void setAllItemsQuality(CLStreamreader::StreamQuality q, bool increase);
-	void closeAllDlg();
+    void setAllItemsQuality(CLStreamreader::StreamQuality q, bool increase);
+    void closeAllDlg();
 
-	void addjustAllStaticItems();
-	void centerOn(const QPointF &pos);
+    void addjustAllStaticItems();
+    void centerOn(const QPointF &pos);
 
     // moves scene in view coord
     void viewMove(int dx, int dy);
 
-	void initDecoration();
+    void initDecoration();
 
-	void setViewMode(ViewMode mode);
-	ViewMode getViewMode() const;
+    void setViewMode(ViewMode mode);
+    ViewMode getViewMode() const;
 
-	void addStaticItem(CLAbstractUnmovedItem* item, bool connect = true);
-	void removeStaticItem(CLAbstractUnmovedItem* item);
+    void addStaticItem(CLAbstractUnmovedItem* item, bool connect = true);
+    void removeStaticItem(CLAbstractUnmovedItem* item);
 
-	void stopAnimation();
+    void stopAnimation();
 
-	void instantArrange();
+    void instantArrange();
 
-	void updateTransform(qreal angle);
+    void updateTransform(qreal angle);
 
     void goToSteadyMode(bool steady);
 
@@ -91,157 +91,157 @@ public:
     NavigationItem *getNavigationItem();
 
 signals:
-	void scneZoomFinished();
-	void onDecorationPressed(LayoutContent*, QString);
+    void scneZoomFinished();
+    void onDecorationPressed(LayoutContent*, QString);
     void onIntroScreenEscape();
     void onNewLayoutSelected(LayoutContent*, LayoutContent*);
 protected:
-	virtual void wheelEvent ( QWheelEvent * e );
-	void mouseReleaseEvent ( QMouseEvent * e);
-	void mousePressEvent ( QMouseEvent * e);
-	void mouseMoveEvent ( QMouseEvent * e);
-	void mouseDoubleClickEvent ( QMouseEvent * e );
-	void contextMenuEvent ( QContextMenuEvent * event );
+    virtual void wheelEvent ( QWheelEvent * e );
+    void mouseReleaseEvent ( QMouseEvent * e);
+    void mousePressEvent ( QMouseEvent * e);
+    void mouseMoveEvent ( QMouseEvent * e);
+    void mouseDoubleClickEvent ( QMouseEvent * e );
+    void contextMenuEvent ( QContextMenuEvent * event );
 
-	void dragEnterEvent ( QDragEnterEvent * event );
-	void dragMoveEvent ( QDragMoveEvent * event );
-	void dropEvent ( QDropEvent * event );
+    void dragEnterEvent ( QDragEnterEvent * event );
+    void dragMoveEvent ( QDragMoveEvent * event );
+    void dropEvent ( QDropEvent * event );
 
-	virtual void keyPressEvent( QKeyEvent * e );
-	virtual void keyReleaseEvent( QKeyEvent * e );
+    virtual void keyPressEvent( QKeyEvent * e );
+    virtual void keyReleaseEvent( QKeyEvent * e );
 
-	void resizeEvent(QResizeEvent * event);
+    void resizeEvent(QResizeEvent * event);
 
-	//=========================
-	void onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int delay);
-	void toggleFullScreen_helper(CLAbstractSceneItem* new_wnd);
+    //=========================
+    void onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int delay);
+    void toggleFullScreen_helper(CLAbstractSceneItem* new_wnd);
 
-	void onItemFullScreen_helper(CLAbstractSceneItem* wnd, int duration);
-	qreal zoomForFullScreen_helper(QRectF rect) const;
+    void onItemFullScreen_helper(CLAbstractSceneItem* wnd, int duration);
+    qreal zoomForFullScreen_helper(QRectF rect) const;
 
-	void onArrange_helper();
-	void onCircle_helper(bool show=false);
+    void onArrange_helper();
+    void onCircle_helper(bool show=false);
 
-	void show_device_settings_helper(CLDevice* dev);
+    void show_device_settings_helper(CLDevice* dev);
 
-	CLAbstractSceneItem* getLastSelectedItem();
-	void mouseSpeed_helper(qreal& mouse_speed,  int& dx, int&dy, int min_spped, int speed_factor);
-	bool isItemStillExists(const CLAbstractSceneItem* wnd) const;
+    CLAbstractSceneItem* getLastSelectedItem();
+    void mouseSpeed_helper(qreal& mouse_speed,  int& dx, int&dy, int min_spped, int speed_factor);
+    bool isItemStillExists(const CLAbstractSceneItem* wnd) const;
 
-	void drawBackground ( QPainter * painter, const QRectF & rect );
+    void drawBackground ( QPainter * painter, const QRectF & rect );
 
-	void showStop_helper();
+    void showStop_helper();
 
-	//========decorations=====
-	void removeAllStaticItems();
-	void updateDecorations();
-	CLAbstractUnmovedItem* staticItemByName(QString name) const;
-	void recalcSomeParams();
+    //========decorations=====
+    void removeAllStaticItems();
+    void updateDecorations();
+    CLAbstractUnmovedItem* staticItemByName(QString name) const;
+    void recalcSomeParams();
 
-	//========navigation=======
-	void enableMultipleSelection(bool enable, bool unselect = true); 
-	bool isCTRLPressed(const QInputEvent* event) const;
-	bool isALTPressed(const QInputEvent* event) const;
+    //========navigation=======
+    void enableMultipleSelection(bool enable, bool unselect = true);
+    bool isCTRLPressed(const QInputEvent* event) const;
+    bool isALTPressed(const QInputEvent* event) const;
 
 
-	bool isItemFullScreenZoomed(QGraphicsItem* item);
+    bool isItemFullScreenZoomed(QGraphicsItem* item);
 
-	CLAbstractSceneItem* navigationItem(QGraphicsItem* item) const;
+    CLAbstractSceneItem* navigationItem(QGraphicsItem* item) const;
 
-	//=========================
-	void contextMenuHelper_addNewLayout();
-	void contextMenuHelper_chngeLayoutTitle(CLAbstractSceneItem* wnd);
-	void contextMenuHelper_editLayout(CLAbstractSceneItem* wnd);
+    //=========================
+    void contextMenuHelper_addNewLayout();
+    void contextMenuHelper_chngeLayoutTitle(CLAbstractSceneItem* wnd);
+    void contextMenuHelper_editLayout(CLAbstractSceneItem* wnd);
     bool contextMenuHelper_existRecordedVideo(CLVideoCamera* cam);
-	void contextMenuHelper_viewRecordedVideo(CLVideoCamera* cam);
+    void contextMenuHelper_viewRecordedVideo(CLVideoCamera* cam);
     void contextMenuHelper_saveRecordedAs(CLVideoCamera* cam);
-	void contextMenuHelper_openInWebBroser(CLVideoCamera* cam);
-	void contextMenuHelper_Rotation(CLAbstractSceneItem* wnd, qreal angle);
+    void contextMenuHelper_openInWebBroser(CLVideoCamera* cam);
+    void contextMenuHelper_Rotation(CLAbstractSceneItem* wnd, qreal angle);
     void contextMenuHelper_restoreLayout();
     void contextMenuHelper_saveLayout( bool new_name);
-	//==========================
+    //==========================
 
-	void navigation_grid_items_drop_helper();
+    void navigation_grid_items_drop_helper();
 
 public slots:
 
-	void fitInView(int duration = 700 , int delay = 0, CLAnimationCurve curve =  SLOW_END_POW_40);
+    void fitInView(int duration = 700 , int delay = 0, CLAnimationCurve curve =  SLOW_END_POW_40);
 private slots:
-	void onScneZoomFinished();
-	void onSecTimer();
-	void onDecorationItemPressed(QString);
-	void onArrange_helper_finished();
+    void onScneZoomFinished();
+    void onSecTimer();
+    void onDecorationItemPressed(QString);
+    void onArrange_helper_finished();
     void toggleRecording();
     void recordingSettings();
     void toggleFullScreen();
 
-	void on_grid_drop_animation_finished();
+    void on_grid_drop_animation_finished();
 protected:
 
-	QGraphicsScene m_scene;
-	SceneLayout m_camLayout;
+    QGraphicsScene m_scene;
+    SceneLayout m_camLayout;
 
-	int m_xRotate;
-	qreal m_yRotate;
+    int m_xRotate;
+    qreal m_yRotate;
 
-	/**/
+    /**/
 
-	CLSceneMovement m_movement;
-	CLSceneZoom m_scenezoom;
-	CLMouseState m_mousestate;
+    CLSceneMovement m_movement;
+    CLSceneZoom m_scenezoom;
+    CLMouseState m_mousestate;
 
-	qreal m_min_scene_zoom;
+    qreal m_min_scene_zoom;
 
-	int m_rotationCounter;
+    int m_rotationCounter;
 
-	bool m_handScrolling;
-	int m_handMoving;
-	bool mSubItemMoving;
+    bool m_handScrolling;
+    int m_handMoving;
+    bool mSubItemMoving;
 
-	CLAbstractSceneItem* m_selectedWnd;
-	CLAbstractSceneItem* m_last_selectedWnd;
-	CLAbstractSceneItem* m_rotatingWnd;
-	unsigned int m_movingWnd;
+    CLAbstractSceneItem* m_selectedWnd;
+    CLAbstractSceneItem* m_last_selectedWnd;
+    CLAbstractSceneItem* m_rotatingWnd;
+    unsigned int m_movingWnd;
 
-	QRect m_realSceneRect;
+    QRect m_realSceneRect;
 
-	bool m_ignore_release_event, m_ignore_conext_menu_event;
+    bool m_ignore_release_event, m_ignore_conext_menu_event;
 
-	QWidget* mMainWnd;
+    QWidget* mMainWnd;
 
-	CLAbstractDeviceSettingsDlg* mDeviceDlg;
+    CLAbstractDeviceSettingsDlg* mDeviceDlg;
 
-	bool m_drawBkg;
-	CLAnimatedBackGround* m_animated_bckg;
-	QGraphicsPixmapItem* m_logo;
+    bool m_drawBkg;
+    CLAnimatedBackGround* m_animated_bckg;
+    QGraphicsPixmapItem* m_logo;
 
     Show_helper m_show;
 
     CLSteadyMouseAnimation mSteadyShow;
 
-	QTimer m_secTimer;
+    QTimer m_secTimer;
 
-	bool mZerroDistance;
-	qreal m_old_distance;
+    bool mZerroDistance;
+    qreal m_old_distance;
 
-	bool mViewStarted;
+    bool mViewStarted;
     bool mWheelZooming; // this var is to avoid wheel zooming scene center shifts. 
 
-	//====decoration======
-	QList<CLAbstractUnmovedItem*> m_staticItems;
+    //====decoration======
+    QList<CLAbstractUnmovedItem*> m_staticItems;
 
-	//======fps
-	int m_fps_frames;
-	QTime m_fps_time;
+    //======fps
+    int m_fps_frames;
+    QTime m_fps_time;
 
-	ViewMode m_viewMode;
+    ViewMode m_viewMode;
 
-	CLSerachEditItem* m_seachItem;
+    CLSerachEditItem* m_seachItem;
     QnPageSelector* m_pageSelector;
 
-	CLAnimationManager m_animationManager;
+    CLAnimationManager m_animationManager;
 
-	CLGridItem* m_gridItem;
+    CLGridItem* m_gridItem;
 
     bool m_menuIsHere;
 
