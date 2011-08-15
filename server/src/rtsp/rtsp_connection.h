@@ -1,6 +1,6 @@
 #include <QTcpSocket>
 
-#include "utils/common/base.h"
+#include "common/base.h"
 
 class QnRtspConnectionProcessor: public QObject
 {

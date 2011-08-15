@@ -16,3 +16,8 @@ QnAbstractMediaStreamDataProvider* QnClientMediaResource::createMediaProvider()
 {
     return new QnRtspClientDataProvider(QnResourcePool::instance().getResourceById(getId()));
 }
+
+bool QnClientMediaResource::equalsTo(const QnResourcePtr other) const
+{
+    return getId() == other->getId();
+}

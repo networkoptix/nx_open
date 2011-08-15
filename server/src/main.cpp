@@ -8,6 +8,8 @@
 #include "resource/media_resource.h"
 #include "resource/security_cam_resource.h"
 #include "resources/archive/archive_resource.h"
+#include "resource/client/client_media_resource.h"
+#include "resource/video_server.h"
 
  
 int main(int argc, char *argv[])
@@ -50,6 +52,13 @@ int main(int argc, char *argv[])
     //QnArchiveResource* res = new QnArchiveResource("e:/Users/roman76r/video/ROCKNROLLA/BDMV/STREAM/00000.m2ts");
     QnArchiveResource* res = new QnArchiveResource("test.flv");
     QnResourcePool::instance().addResource(QnResourcePtr(res));
+
+    QnVideoServer* server = new QnVideoServer();
+    server->setUrl("rtsp://localhost:50000");
+    QnResourcePool::instance().addResource(QnResourcePtr(server));
+    QnClientMediaResource* camera = new QnClientMediaResource();
+    camera->setParentId(server->getId());
+    QnResourcePool::instance().addResource(QnResourcePtr(camera));
 
 	//===========================================================================
 	//IPPH264Decoder::dll.init();
