@@ -13,7 +13,7 @@ QnURLResource::QnURLResource(const QString& url): m_url(url)
 
 bool QnURLResource::equalsTo(const QnResourcePtr other) const
 {
-    QnUrlResourcePtr r = other.dynamicCast<QnURLResource>();
+    QnURLResourcePtr r = other.dynamicCast<QnURLResource>();
 
     if (!r)
         return false;

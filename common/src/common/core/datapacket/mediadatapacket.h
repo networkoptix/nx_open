@@ -135,7 +135,7 @@ struct QnCompressedAudioData : public QnAbstractMediaDataPacket
     }
 
     //CLCodecAudioFormat format;
-    quint64 duration;
+    //quint64 duration;
 };
 
 typedef QSharedPointer<QnCompressedAudioData> QnCompressedAudioDataPtr;

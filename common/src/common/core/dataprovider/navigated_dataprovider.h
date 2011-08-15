@@ -3,10 +3,10 @@
 
 #include "dataprovider/cpull_media_stream_provider.h"
 
-class QnAbstractArchiveDataProvider: public QnClientPullStreamProvider
+class QnNavigatedDataProvider: public QnClientPullStreamProvider
 {
 public:
-    QnAbstractArchiveDataProvider(QnResourcePtr res);
+    QnNavigatedDataProvider(QnResourcePtr res);
 
     void setSingleShotMode(bool single);
     bool isSingleShotMode() const;

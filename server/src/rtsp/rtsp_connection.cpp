@@ -19,7 +19,7 @@ static const quint8 RTP_FFMPEG_GENERIC_CODE = 102;
 //static const QString RTP_FFMPEG_GENERIC_STR("FFMPEG");
 static const QString RTP_FFMPEG_GENERIC_STR("mpeg4-generic"); // this line for debugging purpose with VLC player
 static const int MAX_QUEUE_SIZE = 15;
-static const int MAX_RTSP_DATA_LEN = 65535 - 4 - RtpHeader::RTP_HEADER_SIZE;
+static const int MAX_RTSP_DATA_LEN = 65535 - 4 - 1 - RtpHeader::RTP_HEADER_SIZE;
 static const int CLOCK_FREQUENCY = 1000;
 static const quint32 BASIC_FFMPEG_SSRC = 20000;
 static const int MAX_CONTEXTS_AT_VIDEO = 8; // max ammount of difference codecContext used for one video channel.
@@ -83,10 +83,18 @@ protected:
         // send data with RTP headers
         const char* curData = media->data.data();
         int sendLen = 0;
+        bool first = true;
         for (int dataRest = media->data.size(); dataRest > 0; dataRest -= sendLen)
         {
             sendLen = qMin(MAX_RTSP_DATA_LEN, dataRest);
-            buildRtspTcpHeader(rtspChannelNum, ssrc, sendLen, sendLen == dataRest);
+            QnCompressedVideoData* video = dynamic_cast<QnCompressedVideoData*> (media.data());
+            buildRtspTcpHeader(rtspChannelNum, ssrc, sendLen + (first && video ? 1 : 0), sendLen >= dataRest);
+            if (first && video)
+            {
+                quint8 flags = video->keyFrame ? 0x80 : 0;
+                m_owner->sendData((const char*) &flags, 1);
+                first = false;
+            }
             m_owner->sendData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
             m_owner->sendData(curData, sendLen);
             curData += sendLen;

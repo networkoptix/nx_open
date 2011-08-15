@@ -1,6 +1,6 @@
-#include "abstract_archive_dataprovider.h"
+#include "navigated_dataprovider.h"
 
-QnAbstractArchiveDataProvider::QnAbstractArchiveDataProvider(QnResourcePtr res):
+QnNavigatedDataProvider::QnNavigatedDataProvider(QnResourcePtr res):
     QnClientPullStreamProvider(res),
     m_lengthMksec(0),
     m_startMksec(0),
@@ -15,24 +15,24 @@ QnAbstractArchiveDataProvider::QnAbstractArchiveDataProvider(QnResourcePtr res):
 
 }
 
-void QnAbstractArchiveDataProvider::updateStreamParamsBasedOnQuality()
+void QnNavigatedDataProvider::updateStreamParamsBasedOnQuality()
 {
 
 }
 
-quint64 QnAbstractArchiveDataProvider::skipFramesToTime() const
+quint64 QnNavigatedDataProvider::skipFramesToTime() const
 {
     QMutexLocker mutex(&m_framesMutex);
     return m_skipFramesToTime;
 }
 
-void QnAbstractArchiveDataProvider::setSkipFramesToTime(quint64 skipFramesToTime)
+void QnNavigatedDataProvider::setSkipFramesToTime(quint64 skipFramesToTime)
 {
     QMutexLocker mutex(&m_framesMutex);
     m_skipFramesToTime = skipFramesToTime;
 }
 
-bool QnAbstractArchiveDataProvider::isSingleShotMode() const
+bool QnNavigatedDataProvider::isSingleShotMode() const
 {
     return m_singleShot;
 }

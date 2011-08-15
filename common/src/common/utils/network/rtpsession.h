@@ -1,5 +1,6 @@
 #ifndef rtp_session_h_1935_h
 #define rtp_session_h_1935_h
+
 #include "socket.h"
 
 #include <QtCore/QDateTime>
@@ -19,11 +20,10 @@ class RTPIODevice
 public:
     explicit RTPIODevice(RTPSession& owner,  CommunicatingSocket& sock);
     virtual ~RTPIODevice();
-    virtual qint64	read(char * data, qint64 maxSize );
 
+    virtual qint64 read(char *data, qint64 maxSize);
 
 private:
-
     CommunicatingSocket& m_sock;
     RTPSession& m_owner;
     qint64 m_receivedPackets;
@@ -55,8 +55,11 @@ public:
 
     bool sendKeepAliveIfNeeded(const RtspStatistic* stats);
     void processRtcpData(const RtspStatistic* stats);
-private:
 
+    void setTransport(const QString& transport);
+    QString getTrackFormat(int trackNum) const;
+
+private:
     bool sendDescribe();
     bool sendOptions();
     RTPIODevice*  sendSetup();
@@ -72,8 +75,8 @@ private:
 
     void parseSDP();
     int buildRTCPReport(quint8* dstBuffer, const RtspStatistic* stats);
-private:
 
+private:
     enum {MAX_RESPONCE_LEN	= 1024*8};
 
     unsigned char mResponse[MAX_RESPONCE_LEN];
@@ -90,12 +93,14 @@ private:
     unsigned int m_csec;
     QString m_SessionId;
     unsigned short m_ServerPort;
-    // format: key - codc name, value - track number
-    QMap<QString, int> m_sdpTracks;
+    // format: key - track number, value - codec name
+    QMap<int, QString> m_sdpTracks;
 
     unsigned int m_TimeOut;
 
     QTime m_keepAliveTime;
+
+    QString m_transport;
 };
 
 #endif //rtp_session_h_1935_h

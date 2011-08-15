@@ -11,7 +11,7 @@
 CLSingleShotFileStreamreader::CLSingleShotFileStreamreader(QnResourcePtr res):
 QnSingleShotStreamreader(res)
 {
-	QnUrlResourcePtr urlRes = res.dynamicCast<QnURLResource>();
+	QnURLResourcePtr urlRes = res.dynamicCast<QnURLResource>();
 	m_fileName = urlRes->getUrl();
 }
 
