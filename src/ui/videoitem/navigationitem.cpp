@@ -202,6 +202,7 @@ void NavigationItem::setVideoCamera(CLVideoCamera *camera)
         setVisible(false);
         if (textItem)
             textItem->setVisible(false);
+        m_widget->slider()->setScalingFactor(0);
     } else {
         setVisible(true);
         CLAbstractArchiveReader *reader = static_cast<CLAbstractArchiveReader*>(m_camera->getStreamreader());
