@@ -9,7 +9,7 @@ void QnFfmpegHelper::serializeCodecContext(const AVCodecContext* ctx, QByteArray
 
     // serialize context in way as avcodec_copy_context is works
     AVCodecContext dest;
-    memcpy(&dest, ctx, sizeof(ctx));
+    memcpy(&dest, ctx, sizeof(AVCodecContext));
     dest.priv_data       = NULL;
     dest.codec           = NULL;
     dest.palctrl         = NULL;
@@ -18,7 +18,7 @@ void QnFfmpegHelper::serializeCodecContext(const AVCodecContext* ctx, QByteArray
     dest.hwaccel         = NULL;
     dest.thread_opaque   = NULL;
 
-    data->append((const char*) &dest, sizeof(dest));
+    data->append((const char*) &dest, sizeof(AVCodecContext));
     if (ctx->rc_eq)
         data->append(ctx->rc_eq);
     if (ctx->extradata)

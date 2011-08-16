@@ -56,18 +56,19 @@ QnAbstractDataPacketPtr QnRtspClientDataProvider::processFFmpegRtpPayload(const 
     RtpHeader* rtpHeader = (RtpHeader*) data;
     const quint8* payload = data + RtpHeader::RTP_HEADER_SIZE;
     dataSize -= RtpHeader::RTP_HEADER_SIZE;
-    bool isCodecContext = rtpHeader->ssrc & 1; // odd numbers - codec context, even numbers - data
+    quint32 ssrc = ntohl(rtpHeader->ssrc);
+    bool isCodecContext = ssrc & 1; // odd numbers - codec context, even numbers - data
     if (isCodecContext)
     {
-        if (!m_contextMap.contains(rtpHeader->ssrc))
+        if (!m_contextMap.contains(ssrc))
         {
             AVCodecContext* context = QnFfmpegHelper::deserializeCodecContext((const char*) payload, dataSize);
             if (context)
-                m_contextMap.insert(rtpHeader->ssrc, context);
+                m_contextMap.insert(ssrc, context);
         }
     }
     else {
-        QMap<int, AVCodecContext*>::iterator itr  = m_contextMap.find(rtpHeader->ssrc + 1);
+        QMap<int, AVCodecContext*>::iterator itr  = m_contextMap.find(ssrc + 1);
         if (itr == m_contextMap.end())
             return result; // not codec context found
         AVCodecContext* context = itr.value();
@@ -75,7 +76,7 @@ QnAbstractDataPacketPtr QnRtspClientDataProvider::processFFmpegRtpPayload(const 
             dataSize -= ntohl(rtpHeader->padding);
         if (dataSize < 1)
             return result;
-        QnAbstractMediaDataPacketPtr nextPacket = m_nextDataPacket[rtpHeader->ssrc];
+        QnAbstractMediaDataPacketPtr nextPacket = m_nextDataPacket[ssrc];
         if (nextPacket == 0)
         {
             if (context->codec_type == AVMEDIA_TYPE_VIDEO)
@@ -95,13 +96,13 @@ QnAbstractDataPacketPtr QnRtspClientDataProvider::processFFmpegRtpPayload(const 
                 qWarning() << "Unsupported RTP media type " << context->codec_type;
                 return result;
             }
-            m_nextDataPacket[rtpHeader->ssrc] = nextPacket;
+            m_nextDataPacket[ssrc] = nextPacket;
         }
         nextPacket->data.write((const char*)payload, dataSize);
         if (rtpHeader->marker)
         {
             result = nextPacket;
-            m_nextDataPacket[rtpHeader->ssrc] = QnAbstractMediaDataPacketPtr(0); // EOF video frame reached
+            m_nextDataPacket[ssrc] = QnAbstractMediaDataPacketPtr(0); // EOF video frame reached
         }
 
     }
@@ -120,7 +121,7 @@ QnAbstractDataPacketPtr QnRtspClientDataProvider::getNextData()
         quint8* data = m_rtpDataBuffer;
         if (m_tcpMode)
         {
-            if (rtpChannelNum < 4) {
+            if (blockSize < 4) {
                 qWarning() << Q_FUNC_INFO << __LINE__ << "strange RTP/TCP packet. len < 4. Ignored";
                 continue;
             }
@@ -131,15 +132,18 @@ QnAbstractDataPacketPtr QnRtspClientDataProvider::getNextData()
         else {
             // todo: extract channel number from UDP ports map
         }
-        const QString& format = m_rtspSession.getTrackFormat(rtpChannelNum);
-        if (format == "FFMPEG")
+        const QString& format = m_rtspSession.getTrackFormat(rtpChannelNum).toLower();
+        if (format == "ffmpeg") {
             result = processFFmpegRtpPayload(data, blockSize);
-        if (result)
-            return result;
+            if (result)
+                break;
+        }
         else {
             qWarning() << Q_FUNC_INFO << __LINE__ << "Only FFMPEG payload format now implemeted. Ask developers to add '" << format << "' format";
+            break;
         }
     }
+    return result;
 }
 
 void QnRtspClientDataProvider::updateStreamParamsBasedOnQuality()

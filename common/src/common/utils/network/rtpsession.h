@@ -20,7 +20,7 @@ class RTPIODevice
 public:
     explicit RTPIODevice(RTPSession& owner);
     virtual ~RTPIODevice();
-    virtual qint64	read(char * data, qint64 maxSize );
+    virtual qint64    read(char * data, qint64 maxSize );
     void setTCPMode(bool mode) {m_tcpMode = mode;}
     void setSocket(CommunicatingSocket* socket) { m_sock = socket; }
 private:
@@ -42,20 +42,20 @@ public:
 
     RTPIODevice* play();
 
-	// returns true if there is no error delivering STOP
-	bool stop();
+    // returns true if there is no error delivering STOP
+    bool stop();
 
 
     // returns true if session is opened
     bool isOpened() const;
 
-	// session timeout in ms
-	unsigned int sessionTimeoutMs();
+    // session timeout in ms
+    unsigned int sessionTimeoutMs();
 
-	const QByteArray& getSdp() const;
+    const QByteArray& getSdp() const;
 
-    bool sendKeepAliveIfNeeded(const RtspStatistic* stats);
-    void processRtcpData(const RtspStatistic* stats);
+    bool sendKeepAliveIfNeeded(const RtspStatistic *stats);
+    void processRtcpData(const RtspStatistic *stats);
 
     void setTransport(const QString& transport);
     QString getTrackFormat(int trackNum) const;
@@ -64,23 +64,23 @@ private:
     int RTPSession::readRAWData();
     bool sendDescribe();
     bool sendOptions();
-    RTPIODevice*  sendSetup();
+    RTPIODevice *sendSetup();
     bool sendPlay();
     bool sendTeardown();
     bool sendKeepAlive();
 
-    bool readTextResponce(QByteArray& responce);
-    int readBinaryResponce(quint8* data, int maxDataSize);
+    bool readTextResponce(QByteArray &responce);
+    int readBinaryResponce(quint8 *data, int maxDataSize);
 
 
-    QString extractRTSPParam(const QString& buffer, const QString& paramName);
-    void updateTransportHeader(QByteArray& responce);
+    QString extractRTSPParam(const QString &buffer, const QString &paramName);
+    void updateTransportHeader(QByteArray &responce);
 
     void parseSDP();
-    int buildRTCPReport(quint8* dstBuffer, const RtspStatistic* stats);
+    int buildRTCPReport(quint8 *dstBuffer, const RtspStatistic *stats);
 
 private:
-    enum {MAX_RESPONCE_LEN	= 1024*70};
+    enum { MAX_RESPONCE_LEN = 1024*70 };
 
     //unsigned char m_responseBuffer[MAX_RESPONCE_LEN];
     quint8* m_responseBuffer;
