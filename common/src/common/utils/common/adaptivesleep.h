@@ -1,8 +1,9 @@
 #ifndef cl_adaptive_sleep_137
 #define cl_adaptive_sleep_137
 
-#include "sleep.h"
+#include <QtCore/QTime>
 
+#include "sleep.h"
 
 class CLAdaptiveSleep
 {
@@ -10,9 +11,7 @@ public:
 	CLAdaptiveSleep(int max_overdraft ):
 	  m_firstTime(true),
 	  m_max_overdraft(max_overdraft)
-	  {
-
-	  };
+	{}
 
 	void sleep(qint64 mksec)
 	{
@@ -47,7 +46,6 @@ public:
 		}
 
 		QnSleep::msleep(havetowait/1000);
-
 	}
 
 	void afterdelay()
@@ -56,12 +54,11 @@ public:
 	}
 
 private:
-	QTime  m_prevEndTime;
+	QTime m_prevEndTime;
 	bool m_firstTime;
 	qint64 m_max_overdraft;
 
 	qint64 m_mod;
-
 };
 
 #endif //cl_adaptive_sleep_137

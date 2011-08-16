@@ -1,4 +1,4 @@
-QT *= network xml
+QT *= multimedia network xml
 
 INCLUDEPATH += $$PWD/common $$PWD/common/core $$PWD/common/utils $$PWD/common/plugins
 
