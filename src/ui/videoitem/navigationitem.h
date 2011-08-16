@@ -47,15 +47,7 @@ public:
     TimeSlider *slider() const;
     QLabel *label() const;
 
-    bool isPlaying() const { return m_playing; }
-    void setPlaying(bool);
-
-private slots:
-    void togglePlayPause();
-
 signals:
-    void pause();
-    void play();
     void rewindBackward();
     void rewindForward();
     void stepBackward();
@@ -66,12 +58,6 @@ protected:
 
 private:
     QHBoxLayout *m_layout;
-    MyButton *m_backwardButton;
-    MyButton *m_playButton;
-    MyButton *m_stepForwardButton;
-    MyButton *m_stepBackwardButton;
-    MyButton *m_forwardButton;
-    bool m_playing;
     QPushButton *m_pauseButton;
     TimeSlider *m_slider;
     QLabel *m_label;
@@ -80,6 +66,7 @@ private:
     friend class NavigationItem;
 };
 
+class ImageButtonItem;
 class NavigationItem : public CLUnMovedInteractiveOpacityItem
 {
     Q_OBJECT
@@ -96,6 +83,9 @@ public:
 
     bool mouseOver() const { return m_mouseOver; }
 
+    bool isPlaying() const { return m_playing; }
+    void setPlaying(bool playing);
+
     static const int DEFAULT_HEIGHT = 60;
 
 protected:
@@ -106,6 +96,7 @@ private slots:
     void onValueChanged(qint64);
     void pause();
     void play();
+    void togglePlayPause();
 
     void rewindBackward();
     void rewindForward();
@@ -122,11 +113,19 @@ protected:
 private:
     QGraphicsProxyWidget *m_proxy;
     NavigationWidget *m_widget;
+    ImageButtonItem *m_stepBackwardButton;
+    ImageButtonItem *m_backwardButton;
+    ImageButtonItem *m_playButton;
+    ImageButtonItem *m_forwardButton;
+    ImageButtonItem *m_stepForwardButton;
+public:
+    QGraphicsWidget *m_graphicsWidget;
     CLVideoCamera* m_camera;
     int m_timerId;
     bool m_sliderIsmoving;
     qint64 m_currentTime;
     bool m_mouseOver;
+    bool m_playing;
 
     MyTextItem *textItem;
 };
