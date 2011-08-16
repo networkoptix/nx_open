@@ -29,13 +29,10 @@ release {
 include( $$PWD/../common/src/common.pri )
 
 win32 {
-  INCLUDEPATH += contrib/openal/include
-  LIBS += -Lcontrib/openal/bin/win32 -lOpenAL32
   RC_FILE = server.rc
 }
 
 mac {
-  LIBS += -framework OpenAL
   QMAKE_POST_LINK += mkdir -p `dirname $(TARGET)`/arecontvision; cp -f ../bin/arecontvision/devices.xml `dirname $(TARGET)`/arecontvision
 
   PRIVATE_FRAMEWORKS.files = resource/arecontvision
