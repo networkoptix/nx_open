@@ -26,6 +26,7 @@ private:
     int composePlay();
     void sendData(const QByteArray& data);
     void sendData(const char* data, int size);
+    void flush();
     QString extractMediaName(const QString& path);
     int extractTrackId(const QString& path);
     int composeTeardown();

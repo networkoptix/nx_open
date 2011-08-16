@@ -75,9 +75,15 @@ void RTPSession::parseSDP()
 
     int mapNum = -1;
     QString codecName;
+    int trackNum = -1;
     foreach(QByteArray line, lines)
     {
         line = line.trimmed().toLower();
+        if (line.startsWith("m=") && trackNum >= 0)
+        {
+            m_sdpTracks.insert(trackNum, codecName);
+            trackNum = -1;
+        }
         if (line.startsWith("a=rtpmap"))
         {
             QList<QByteArray> params = line.split(' ');
@@ -91,11 +97,10 @@ void RTPSession::parseSDP()
             codecName = codecInfo[0];
         }
         else if (line.startsWith("a=control:trackid="))
-        {
-            int trackNum = line.mid(QString("a=control:trackid=").length()).toUInt();
-            m_sdpTracks.insert(trackNum, codecName);
-        }
+            trackNum = line.mid(QString("a=control:trackid=").length()).toUInt();
     }
+    if (trackNum >= 0)
+        m_sdpTracks.insert(trackNum, codecName);
 }
 
 
@@ -496,8 +501,8 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
     bool readMoreData = false; // try to process existing buffer at first
     while (1)
     {
-        if (readMoreData && !readRAWData())
-            return -1;
+        if (readMoreData && readRAWData() < 1)
+            continue;
         int demuxedCount = 0;
         quint8* curPtr = m_responseBuffer;
         for(; curPtr < m_responseBuffer + m_responseBufferLen; curPtr++)
@@ -509,7 +514,7 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
                     m_responseBufferLen = 0;
                     return 0; // corrupt data. just clear buffer
                 }
-                quint16 dataLen = (curPtr[2] << 8) + curPtr[3];
+                quint16 dataLen = (curPtr[2] << 8) + curPtr[3] + 4;
                 if (maxDataSize < dataLen)
                 {
                     qWarning() << "Too low RTSP receiving buffer. Data can't be demuxed";
@@ -517,18 +522,17 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
                     return -1;
                 }
                 int dataRest = m_responseBuffer + m_responseBufferLen - curPtr;
-                if (dataLen <= dataRest) 
-                {
-                    memcpy(data, curPtr, dataLen);
-                    data += dataLen;
-                    demuxedCount += dataLen;
-                    maxDataSize -= dataLen;
+                if (dataRest < dataLen)
+                    continue;
+                memcpy(data, curPtr, dataLen);
+                data += dataLen;
+                demuxedCount += dataLen;
+                maxDataSize -= dataLen;
 
-                    memmove(curPtr, curPtr + dataLen, m_responseBuffer + m_responseBufferLen - (curPtr+dataLen));
-                    m_responseBufferLen -= dataLen;
-                    
-                    return demuxedCount;
-                }
+                memmove(curPtr, curPtr + dataLen, m_responseBuffer + m_responseBufferLen - (curPtr+dataLen));
+                m_responseBufferLen -= dataLen;
+                
+                return demuxedCount;
             }
         }
         readMoreData = true;

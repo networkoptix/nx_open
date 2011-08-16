@@ -16,8 +16,8 @@ static const int CODE_INTERNAL_ERROR = 500;
 
 static const QString ENDL("\r\n");
 static const quint8 RTP_FFMPEG_GENERIC_CODE = 102;
-//static const QString RTP_FFMPEG_GENERIC_STR("FFMPEG");
-static const QString RTP_FFMPEG_GENERIC_STR("mpeg4-generic"); // this line for debugging purpose with VLC player
+static const QString RTP_FFMPEG_GENERIC_STR("FFMPEG");
+//static const QString RTP_FFMPEG_GENERIC_STR("mpeg4-generic"); // this line for debugging purpose with VLC player
 static const int MAX_QUEUE_SIZE = 15;
 static const int MAX_RTSP_DATA_LEN = 65535 - 4 - 1 - RtpHeader::RTP_HEADER_SIZE;
 static const int CLOCK_FREQUENCY = 1000;
@@ -74,7 +74,8 @@ protected:
             QnFfmpegHelper::serializeCodecContext(ctx, &m_codecCtxData);
             buildRtspTcpHeader(rtspChannelNum, ssrc + 1, m_codecCtxData.size(), true); // ssrc+1 - switch data subchannel to context subchannel
             m_owner->sendData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
-            m_owner->sendData(m_codecCtxData.data());
+            m_owner->sendData(m_codecCtxData);
+            m_owner->flush();
             m_ctxSended[rtspChannelNum] << ctx;
         }
         else {
@@ -89,14 +90,15 @@ protected:
             sendLen = qMin(MAX_RTSP_DATA_LEN, dataRest);
             QnCompressedVideoData* video = dynamic_cast<QnCompressedVideoData*> (media.data());
             buildRtspTcpHeader(rtspChannelNum, ssrc, sendLen + (first && video ? 1 : 0), sendLen >= dataRest);
+            m_owner->sendData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
             if (first && video)
             {
                 quint8 flags = video->keyFrame ? 0x80 : 0;
                 m_owner->sendData((const char*) &flags, 1);
                 first = false;
             }
-            m_owner->sendData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
             m_owner->sendData(curData, sendLen);
+            m_owner->flush();
             curData += sendLen;
         }
     }
@@ -147,7 +149,13 @@ void QnRtspConnectionProcessor::sendData(const QByteArray& data)
 void QnRtspConnectionProcessor::sendData(const char* data, int size)
 {
     Q_D(QnRtspConnectionProcessor);
-    d->socket->write(data);
+    d->socket->write(data, size);
+}
+
+void QnRtspConnectionProcessor::flush()
+{
+    Q_D(QnRtspConnectionProcessor);
+    d->socket->flush();
 }
 
 QnRtspConnectionProcessor::QnRtspConnectionProcessor(QTcpSocket* socket):
