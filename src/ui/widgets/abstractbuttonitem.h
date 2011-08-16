@@ -45,13 +45,12 @@
 #include <QtGui/qicon.h>
 #include <QtGui/qkeysequence.h>
 #include <QtGui/qgraphicswidget.h>
-#include <QPainter>
 
 QT_BEGIN_HEADER
 
 QT_BEGIN_NAMESPACE
 
-QT_MODULE(Gui)
+//QT_MODULE(Gui)
 
 class QButtonGroup;
 class AbstractButtonItemPrivate;
@@ -129,8 +128,7 @@ Q_SIGNALS:
     void toggled(bool checked);
 
 protected:
-//    virtual void paintEvent(QPaintEvent *e) = 0;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) { painter->fillRect(boundingRect(), Qt::black); }
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) = 0;
     virtual bool hitButton(const QPointF &pos) const;
     virtual void checkStateSet();
     virtual void nextCheckState();
@@ -148,13 +146,12 @@ protected:
 
 protected:
     AbstractButtonItem(AbstractButtonItemPrivate &dd, QGraphicsWidget* parent = 0);
+    AbstractButtonItemPrivate *d_ptr;
 
 private:
     Q_DECLARE_PRIVATE(AbstractButtonItem)
     Q_DISABLE_COPY(AbstractButtonItem)
     friend class QButtonGroup;
-
-    AbstractButtonItemPrivate *d_ptr;
 };
 
 QT_END_NAMESPACE
