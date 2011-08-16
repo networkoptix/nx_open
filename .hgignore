@@ -16,3 +16,5 @@ server/src/version.h
 client/src/version.h
 .DS_Store
 common/src/common.pri
+appserver/db/appserver.db
+scripts/appserver/server.state
