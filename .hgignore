@@ -3,6 +3,7 @@ syntax: glob
 .idea
 bin
 build
+*-build*
 Debug
 Release
 *.pyc
