@@ -11,7 +11,7 @@ win* {
     INCLUDEPATH += $$PWD/../../contrib/openal/include
     LIBS += -L$$OPENAL_LIBS_PATH -lOpenAL32
 
-    QMAKE_POST_LINK += cp -r $$OPENAL_LIBS_PATH/* $$DESTDIR
+    QMAKE_POST_LINK += cp -r $$OPENAL_LIBS_PATH/*.dll $$DESTDIR
 }
 
 mac {
