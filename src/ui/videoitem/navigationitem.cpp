@@ -266,7 +266,7 @@ void NavigationItem::updateSlider()
         time = m_camera->currentTime();
 
     m_currentTime = time/1000;
-//    m_widget->slider()->setCurrentValue(m_currentTime);
+    m_widget->slider()->setCurrentValue(m_currentTime);
 
     qreal x = m_widget->slider()->x() + 8 + ((double)(m_widget->slider()->width() - 18)/(m_widget->slider()->sliderRange()))*(m_widget->slider()->currentValue() - m_widget->slider()->viewPortPos()); // fuck you!
     textItem->setPos(x - textItem->boundingRect().width()/2, -40);
