@@ -192,7 +192,11 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
     addAction(&cm_start_video_recording);
     connect(&cm_recording_settings, SIGNAL(triggered()), SLOT(recordingSettings()));
 
+#ifdef Q_OS_MAC
+    cm_toggle_fullscreen.setShortcut(tr("Ctrl+F"));
+#else
     cm_toggle_fullscreen.setShortcut(tr("Alt+Return"));
+#endif
     cm_toggle_fullscreen.setShortcutContext(Qt::ApplicationShortcut);
     addAction(&cm_toggle_fullscreen);
     connect(&cm_toggle_fullscreen, SIGNAL(triggered()), SLOT(toggleFullScreen()));
@@ -1920,13 +1924,6 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
             m_show.m_counrer+=10*60*60;
             break;
 
-        case Qt::Key_Escape:
-            if (!mMainWnd->isFullScreen())
-                mMainWnd->showFullScreen();
-            else
-                mMainWnd->showMaximized();
-            break;
-
         case Qt::Key_A:
                 onArrange_helper();
             break;
@@ -2716,7 +2713,12 @@ void GraphicsView::toggleFullScreen()
     if (!m_selectedWnd)
         return;
 
-    // dunno how to implement
+    if (!m_selectedWnd->isFullScreen() || isItemFullScreenZoomed(m_selectedWnd) || !mMainWnd->isFullScreen()) { // if item is not in full screen mode or if it's in FS and zoomed more
+        onItemFullScreen_helper(m_selectedWnd, 800);
+        mMainWnd->showFullScreen();
+    } else {
+        mMainWnd->showMaximized();
+    }
 }
 
 void GraphicsView::fitInView(int duration, int delay, CLAnimationCurve curve)
