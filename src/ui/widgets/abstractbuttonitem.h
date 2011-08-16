@@ -55,7 +55,8 @@ QT_BEGIN_NAMESPACE
 class QButtonGroup;
 class AbstractButtonItemPrivate;
 
-class Q_GUI_EXPORT AbstractButtonItem : public QGraphicsWidget
+//class Q_GUI_EXPORT AbstractButtonItem : public QGraphicsWidget
+class AbstractButtonItem : public QGraphicsWidget
 {
     Q_OBJECT
 

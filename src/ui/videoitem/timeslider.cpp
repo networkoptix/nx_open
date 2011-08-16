@@ -326,7 +326,7 @@ void TimeLine::mouseDoubleClickEvent(QMouseEvent *)
     QPropertyAnimation *scaleAnimation = new QPropertyAnimation(m_parent, "scalingFactor");
     scaleAnimation->setEasingCurve(QEasingCurve::InOutQuad);
     scaleAnimation->setStartValue(m_parent->scalingFactor());
-    scaleAnimation->setEndValue(2*log(m_parent->maximumValue()/m_parent->minimumRange()));
+    scaleAnimation->setEndValue(2*log((double)m_parent->maximumValue()/m_parent->minimumRange()));
     scaleAnimation->setDuration(1000);
     scaleAnimation->start(QAbstractAnimation::DeleteWhenStopped);
 }
