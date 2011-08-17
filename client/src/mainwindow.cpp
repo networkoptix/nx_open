@@ -56,17 +56,13 @@ void MainWindow::boo()
     if (QnClientMediaResourcePtr media = resource.dynamicCast<QnClientMediaResource>())
     {
         QnAbstractMediaStreamDataProvider *msdp = media->createMediaProvider();
-        CLCamDisplay *camDisplay = new CLCamDisplay;
         CLVideoWindowItem *vwi = new CLVideoWindowItem(media->getMediaLayout(), 0, 0, media->getName());
         CLAbstractRenderer *renderer = new CLGLRenderer(vwi);
+        CLCamDisplay *camDisplay = new CLCamDisplay;
         camDisplay->addVideoChannel(0, renderer, false);
-        while (1)
-        {
-            QnAbstractDataPacketPtr data = msdp->getNextData();
-            qApp->processEvents(QEventLoop::AllEvents, 100);
-            camDisplay->putData(data);
-        }
-        camDisplay->deleteLater();
+        msdp->addDataProcessor(camDisplay);
+        msdp->start();
+        camDisplay->start();
     }
 }
 // ###
