@@ -2870,7 +2870,7 @@ void GraphicsView::show_device_settings_helper(CLDevice* dev)
             mDeviceDlg->move(p);
     }
 
-    mDeviceDlg->show();
+    mDeviceDlg->exec();
 }
 
 void GraphicsView::contextMenuHelper_addNewLayout()
