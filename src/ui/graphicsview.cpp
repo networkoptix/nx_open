@@ -2712,14 +2712,13 @@ void GraphicsView::recordingSettings()
 
 void GraphicsView::toggleFullScreen()
 {
-    if (!m_selectedWnd)
-        return;
-
-    if (!m_selectedWnd->isFullScreen() || isItemFullScreenZoomed(m_selectedWnd) || !mMainWnd->isFullScreen()) { // if item is not in full screen mode or if it's in FS and zoomed more
-        onItemFullScreen_helper(m_selectedWnd, 800);
+    if ((m_selectedWnd && (!m_selectedWnd->isFullScreen() || isItemFullScreenZoomed(m_selectedWnd))) || !mMainWnd->isFullScreen()) { // if item is not in full screen mode or if it's in FS and zoomed more
+        if (m_selectedWnd)
+            onItemFullScreen_helper(m_selectedWnd, 800);
         mMainWnd->showFullScreen();
     } else {
-        mMainWnd->showMaximized();
+        mMainWnd->showNormal();
+        mMainWnd->resize(600, 400);
     }
 }
 
