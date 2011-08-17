@@ -40,7 +40,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     QnClientMediaResource *resource = new QnClientMediaResource();
     resource->setId(TEST_RES_ID+1);
-    resource->setUrl("test.flv");
+    resource->setUrl("TC-Outro.mov");
     resource->setParentId(server->getId());
     QnResourcePool::instance().addResource(QnResourcePtr(resource));
 
