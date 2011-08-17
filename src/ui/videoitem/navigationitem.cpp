@@ -96,6 +96,11 @@ NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
     m_graphicsWidget = new QGraphicsWidget(this);
     m_graphicsWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
+    m_graphicsWidget->setAutoFillBackground(true);
+    QPalette pal = m_graphicsWidget->palette();
+    pal.setColor(QPalette::Window, Qt::black);
+    m_graphicsWidget->setPalette(pal);
+
     m_stepBackwardButton = new ImageButtonItem;
     m_stepBackwardButton->addPixmap(QPixmap(":/skin/step_backward_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
     m_stepBackwardButton->addPixmap(QPixmap(":/skin/step_backward_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);

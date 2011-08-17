@@ -195,8 +195,8 @@ double round(double r) {
 
 void TimeLine::drawGradient(QPainter& painter, const QRectF& r)
 {
-    int MAX_COLOR = 128;
-    int MIN_COLOR = 8;
+    int MAX_COLOR = 64+16;
+    int MIN_COLOR = 0;
     for (int i = r.top(); i < r.bottom(); ++i)
     {
         int k = height() - i;
