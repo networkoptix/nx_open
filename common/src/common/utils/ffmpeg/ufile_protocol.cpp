@@ -51,7 +51,8 @@ static int ufile_read(URLContext *context, unsigned char *buf, int size)
 {
     QFile *file = (QFile *)context->priv_data;
 
-    return (int)file->read((char *)buf, size);
+    int rez = (int)file->read((char *)buf, size);
+    return rez;
 }
 
 static URLProtocol ufile_protocol =

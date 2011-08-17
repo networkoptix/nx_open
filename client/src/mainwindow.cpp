@@ -35,7 +35,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 // ### removeme
     QnVideoServer *server = new QnVideoServer();
-    server->setUrl("rtsp://localhost:50000/");
+    server->setUrl("rtsp://localhost:50000");
     QnResourcePool::instance().addResource(QnResourcePtr(server));
 
     QnClientMediaResource *resource = new QnClientMediaResource();

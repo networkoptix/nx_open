@@ -2,6 +2,7 @@
 
 #include <QtCore/QFile>
 #include <QtCore/QMutex>
+#include <QDir>
 
 extern "C" {
 #include <libavutil/avstring.h>
@@ -39,10 +40,13 @@ void QnFFmpeg::initialize()
     if (!ffmpeg_initialized)
     {
         // must be called before using avcodec
-        avcodec_init();
+        av_register_all();
+
 
         // register all the codecs (you can also register only the codec you wish to have smaller code
         avcodec_register_all();
+
+        avcodec_init();
 
         // register URLPrococol to allow ffmpeg use files with non-latin filenames
         av_register_protocol2(&ufile_protocol, sizeof(ufile_protocol));
@@ -110,13 +114,13 @@ void QnFFmpeg::closeCodec(AVCodecContext *context)
 AVFormatContext *QnFFmpeg::openFileContext(const QString &filePath)
 {
     ensureInitialized();
-
     AVFormatContext *fileContext = 0;
-
-    if (av_open_input_file(&fileContext, QFile::encodeName(QLatin1String("ufile:") + filePath).constData(), NULL, 0, NULL) == 0)
+    QString url = QLatin1String("ufile:") + filePath;
+    int err = av_open_input_file(&fileContext, url.toUtf8().constData(), NULL, 0, NULL);
+    if (err >= 0)
     {
         QMutexLocker locker(QnFFmpeg::globalMutex());
-        if (av_find_stream_info(fileContext) == 0)
+        if (av_find_stream_info(fileContext) >= 0)
             return fileContext;
     }
 

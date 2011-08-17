@@ -33,7 +33,8 @@ QnAviArchiveDataProvider::QnAviArchiveDataProvider(QnResourcePtr ptr):
     m_currentPacketIndex(0),
     m_eof(false),
     m_haveSavedPacket(false),
-    m_selectedAudioChannel(0)
+    m_selectedAudioChannel(0),
+    m_realTimeMode(false)
 {
     QnFFmpeg::initialize();
 
@@ -92,7 +93,7 @@ bool QnAviArchiveDataProvider::init()
         return false;
 
     m_initialized = true;
-
+    m_streamTimer.restart();
     return true;
 }
 
@@ -161,7 +162,6 @@ bool QnAviArchiveDataProvider::initCodecs()
     return true;
 }
 
-
 QnAbstractDataPacketPtr QnAviArchiveDataProvider::getNextData()
 {
     if (!m_initialized)
@@ -176,13 +176,6 @@ QnAbstractDataPacketPtr QnAviArchiveDataProvider::getNextData()
 
     if (!m_formatContext || m_videoStreamIndex == -1)
         return QnAbstractDataPacketPtr(0);
-
-	/*
-	if (m_bsleep && !isSingleShotMode() && m_needSleep && !isSkippingFrames())
-	{
-		smartSleep(m_needToSleep);
-	}
-	*/
 
 	{
 		QMutexLocker mutex(&m_cs);
@@ -276,6 +269,14 @@ QnAbstractDataPacketPtr QnAviArchiveDataProvider::getNextData()
 	}
 
 	av_free_packet(&currentPacket());
+    // do not send data as fast as possible, send data at realTime mode
+    if (m_realTimeMode)
+    {
+        qint64 offsetMks = data->timestamp - startMksec();
+        int sleepTime = offsetMks/1000 - m_streamTimer.elapsed();
+        if (sleepTime > 0)
+            msleep(qMin(100, sleepTime));
+    }
 	return data;
 }
 
@@ -410,6 +411,7 @@ void QnAviArchiveDataProvider::channeljumpTo(quint64 mksec, int /*channel*/)
 
     //m_needToSleep = 0;
     m_previousTime = -1;
+    m_streamTimer.restart();
     m_wakeup = true;
 }
 

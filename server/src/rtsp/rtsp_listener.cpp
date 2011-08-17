@@ -13,8 +13,7 @@ struct QnRtspListener::QnRtspListenerPrivate
 
 // ------------------------ QnRtspListener ---------------------------
 
-QnRtspListener::QnRtspListener(const QHostAddress& address, int port)
-    :d_ptr(new QnRtspListenerPrivate())
+QnRtspListener::QnRtspListener(const QHostAddress& address, int port):d_ptr(new QnRtspListenerPrivate())
 {
     Q_D(QnRtspListener);
     connect(&d->serverSocket, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
@@ -34,4 +33,5 @@ void QnRtspListener::onNewConnection()
     Q_D(QnRtspListener);
     QTcpSocket* clientSocket = d->serverSocket.nextPendingConnection();
     d->connections[clientSocket] = new QnRtspConnectionProcessor(clientSocket);
+    qDebug() << "New client connection from " << clientSocket->peerAddress();
 }

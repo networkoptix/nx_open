@@ -79,8 +79,8 @@ int main(int argc, char *argv[])
     res->setId(TEST_RES_ID);
     QnResourcePool::instance().addResource(QnResourcePtr(res));
 
-    TestThread* testThread = new TestThread();
-    testThread->start();
+    //TestThread* testThread = new TestThread();
+    //testThread->start();
 	//===========================================================================
 	//IPPH264Decoder::dll.init();
 

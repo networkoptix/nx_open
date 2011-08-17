@@ -39,7 +39,7 @@ private:
     QnCompressedVideoDataPtr getVideoData(const AVPacket &packet, AVCodecContext *codecContext);
     QnCompressedAudioDataPtr getAudioData(const AVPacket &packet, AVStream *stream);
     bool getNextVideoPacket();
-
+    void smartSleep(qint64 mksec);
 protected:
     qint64 m_currentTime;
     qint64 m_previousTime;
@@ -66,6 +66,8 @@ protected:
     static QSemaphore aviSemaphore ;
     bool m_eof;
     bool m_skippedToTime[CL_MAX_CHANNELS];
+    bool m_realTimeMode;
+    QTime m_streamTimer;
 };
 
 #endif // AVI_ARCHIVE_DATAPROVIDER_H

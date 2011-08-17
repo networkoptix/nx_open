@@ -36,6 +36,8 @@ private:
     int composeTeardown();
     void processRangeHeader();
     void extractNptTime(const QString& strValue, qint64* dst);
+    int composeSetParameter();
+    int composeGetParameter();
 private:
     QN_DECLARE_PRIVATE(QnRtspConnectionProcessor);
     friend class QnRtspDataProcessor;
