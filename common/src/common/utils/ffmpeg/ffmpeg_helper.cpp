@@ -1,9 +1,25 @@
 #include "ffmpeg_helper.h"
+
+#include <QtCore/QByteArray>
+#include <QtCore/QDebug>
+#include <QtCore/QMutex>
+
 #include "libavcodec/avcodec.h"
 
-#include <QtCore/QDebug>
+Q_GLOBAL_STATIC(QMutex, the_ffmpeg_mutex)
 
-void QnFfmpegHelper::serializeCodecContext(const AVCodecContext* ctx, QByteArray* data)
+QMutex *QnFfmpegHelper::global_ffmpeg_mutex()
+{
+    QMutex *global_ffmpeg_mutex = the_ffmpeg_mutex();
+    if (!global_ffmpeg_mutex)
+    {
+        qWarning("QnFfmpegHelper::global_ffmpeg_mutex() was called after the application exit!");
+        global_ffmpeg_mutex = new QMutex; // it's better to leak than to crash, no?
+    }
+    return global_ffmpeg_mutex;
+}
+
+void QnFfmpegHelper::serializeCodecContext(const AVCodecContext *ctx, QByteArray *data)
 {
     data->clear();
 
@@ -31,7 +47,7 @@ void QnFfmpegHelper::serializeCodecContext(const AVCodecContext* ctx, QByteArray
         data->append((const char*) ctx->rc_override, ctx->rc_override_count * sizeof(*ctx->rc_override));
 }
 
-AVCodecContext* QnFfmpegHelper::deserializeCodecContext(const char* data, int dataLen)
+AVCodecContext *QnFfmpegHelper::deserializeCodecContext(const char *data, int dataLen)
 {
     if (dataLen < sizeof(AVCodecContext))
     {

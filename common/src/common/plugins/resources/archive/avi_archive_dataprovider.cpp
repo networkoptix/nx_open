@@ -1,10 +1,11 @@
 #include "avi_archive_dataprovider.h"
+
 #include "resource/url_resource.h"
 #include "datapacket/mediadatapacket.h"
 #include "common/base.h"
 #include "resource/media_resource.h"
+#include "utils/ffmpeg/ffmpeg_helper.h"
 
-extern QMutex global_ffmpeg_mutex;
 QMutex QnAviArchiveDataProvider::avi_mutex;
 QSemaphore QnAviArchiveDataProvider::aviSemaphore(4);
 static const int FFMPEG_PROBE_BUFFER_SIZE = 1024 * 512;
@@ -65,7 +66,7 @@ AVFormatContext* QnAviArchiveDataProvider::getFormatContext()
     }
 
     {
-        QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
+        QMutexLocker global_ffmpeg_locker(QnFfmpegHelper::global_ffmpeg_mutex());
         err = av_find_stream_info(formatContext);
         if (err < 0)
         {
@@ -97,7 +98,7 @@ bool QnAviArchiveDataProvider::init()
     {
         firstInstance = false;
 
-        QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
+        QMutexLocker global_ffmpeg_locker(QnFfmpegHelper::global_ffmpeg_mutex());
 
         av_register_all();
 

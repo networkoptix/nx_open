@@ -4,56 +4,54 @@
 #include "common/sleep.h"
 #include "resource/resource_consumer.h"
 
-QMutex global_ffmpeg_mutex;
-
 QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(QnResourcePtr res):
 QnAbstractStreamDataProvider(res),
 m_qulity(QnQualityLowest)
 {
-	memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame));
+    memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame));
 
     QnMediaResourcePtr mr = getResource().dynamicCast<QnMediaResource>();
 
-	m_NumaberOfVideoChannels = mr->getMediaLayout()->numberOfVideoChannels();
+    m_NumaberOfVideoChannels = mr->getMediaLayout()->numberOfVideoChannels();
 }
 
 QnAbstractMediaStreamDataProvider::~QnAbstractMediaStreamDataProvider()
 {
-	stop();
+    stop();
 }
 
 
 
 void QnAbstractMediaStreamDataProvider::setQuality(QnStreamQuality q)
 {
-    QMutexLocker mtx(&m_mtx);
+	QMutexLocker mtx(&m_mtx);
 	m_qulity = q;
-    updateStreamParamsBasedOnQuality();
-    setNeedKeyData();
+	updateStreamParamsBasedOnQuality();
+	setNeedKeyData();
 }
 
 QnStreamQuality QnAbstractMediaStreamDataProvider::getQuality() const
 {
-    QMutexLocker mtx(&m_mtx);
+	QMutexLocker mtx(&m_mtx);
 	return m_qulity;
 }
 
 void QnAbstractMediaStreamDataProvider::setNeedKeyData()
 {
-    QMutexLocker mtx(&m_mtx);
+	QMutexLocker mtx(&m_mtx);
 	for (int i = 0; i < m_NumaberOfVideoChannels; ++i)
 		m_gotKeyFrame[i] = 0;
 }
 
 bool QnAbstractMediaStreamDataProvider::needKeyData(int channel) const
 {
-    QMutexLocker mtx(&m_mtx);
+	QMutexLocker mtx(&m_mtx);
 	return m_gotKeyFrame[channel]==0;
 }
 
 bool QnAbstractMediaStreamDataProvider::needKeyData() const
 {
-    QMutexLocker mtx(&m_mtx);
+	QMutexLocker mtx(&m_mtx);
 	for (int i = 0; i < m_NumaberOfVideoChannels; ++i)
 		if (m_gotKeyFrame[i]==0)
 			return true;
@@ -111,7 +109,7 @@ bool QnAbstractMediaStreamDataProvider::afterGetData(QnAbstractDataPacketPtr d)
 
     if (videoData && needKeyData())
     {
-        // I do not like; need to do smth with it 
+        // I do not like; need to do smth with it
         if (videoData->keyFrame)
         {
             if (videoData->channelNumber>CL_MAX_CHANNEL_NUMBER-1)
