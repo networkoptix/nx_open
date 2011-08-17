@@ -335,25 +335,42 @@ void GraphicsView::itemDestroyed()
     QTimer::singleShot(250, this, SLOT(relayoutItemsActionTriggered()));
 }
 
+void GraphicsView::mouseReleaseEvent(QMouseEvent *event)
+{
+    QGraphicsView::mouseReleaseEvent(event);
+/*
+    if (scene()->selectedItems().isEmpty())
+    {
+        if (QGraphicsLayout *layout = m_widget->layout())
+        {
+            layout->invalidate();
+            layout->activate();
+        }
+    }*/
+}
+
 void GraphicsView::keyPressEvent(QKeyEvent *event)
 {
     switch (event->key())
     {
-    case Qt::Key_Q:
-    case Qt::Key_W:
-    case Qt::Key_E:
-        {
-            m_widget->setTransformOriginPoint(m_widget->rect().center());
-            m_widget->setRotation(event->key() != Qt::Key_E ? m_widget->rotation() + 10 * (event->key() == Qt::Key_W ? -1 : 1) : 0.0);
-        }
-        break;
-
     case Qt::Key_Plus:
     case Qt::Key_Minus:
     case Qt::Key_Asterisk:
+        if ((event->modifiers() & Qt::KeypadModifier) == Qt::KeypadModifier)
         {
             m_widget->setTransformOriginPoint(m_widget->rect().center());
-            m_widget->setScale(event->key() != Qt::Key_Asterisk ? m_widget->scale() + 0.5 * (event->key() == Qt::Key_Minus ? -1 : 1) : 1.0);
+            if (event->key() == Qt::Key_Asterisk)
+            {
+                m_widget->setRotation(0.0);
+                m_widget->setScale(1.0);
+            }
+            else
+            {
+                if ((event->modifiers() & Qt::AltModifier) == Qt::AltModifier)
+                    m_widget->setRotation(m_widget->rotation() + 15 * (event->key() == Qt::Key_Minus ? -1 : 1));
+                else
+                    m_widget->setScale(m_widget->scale() + 0.25 * (event->key() == Qt::Key_Minus ? -1 : 1));
+            }
         }
         break;
 
@@ -370,10 +387,10 @@ void GraphicsView::keyPressEvent(QKeyEvent *event)
         break;
 
     case Qt::Key_Space:
-        if (m_widget && m_widget->layout())
+        if (QGraphicsLayout *layout = m_widget->layout())
         {
-            m_widget->layout()->invalidate();
-            m_widget->layout()->activate();
+            layout->invalidate();
+            layout->activate();
         }
         break;
 

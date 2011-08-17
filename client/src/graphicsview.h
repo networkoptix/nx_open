@@ -20,6 +20,7 @@ public:
     { return QRect(mapFromScene(rect.topLeft()), mapFromScene(rect.bottomRight())); }
 
 protected:
+    virtual void mouseReleaseEvent(QMouseEvent *);
     virtual void keyPressEvent(QKeyEvent *);
     virtual void keyReleaseEvent(QKeyEvent *);
 
