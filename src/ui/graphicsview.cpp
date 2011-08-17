@@ -362,7 +362,8 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
         return;
 
     if (m_navigationItem ? m_navigationItem->mouseOver() : false) {
-        QGraphicsView::wheelEvent(e);
+        if (!m_navigationItem->ignoreWheel())
+            QGraphicsView::wheelEvent(e);
         return;
     }
 

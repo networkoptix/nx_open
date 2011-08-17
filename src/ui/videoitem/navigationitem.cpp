@@ -92,6 +92,7 @@ NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
     CLUnMovedInteractiveOpacityItem(QString("name:)"), 0, 0.5, 0.95)
 {
     m_playing = false;
+    m_ignoreWheel = false;
 
     m_graphicsWidget = new QGraphicsWidget(this);
     m_graphicsWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -355,12 +356,14 @@ void NavigationItem::stepForward()
 void NavigationItem::hoverEnterEvent(QGraphicsSceneHoverEvent *e)
 {
     m_mouseOver = true;
+    tim.stop();
     CLUnMovedInteractiveOpacityItem::hoverEnterEvent(e);
 }
 
 void NavigationItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *e)
 {
-    m_mouseOver = false;
+    m_ignoreWheel = true;
+    tim.singleShot(500, this, SLOT(resetHover()));
     CLUnMovedInteractiveOpacityItem::hoverLeaveEvent(e);
 }
 
@@ -384,6 +387,12 @@ void NavigationItem::onSliderReleased()
         reader->setSingleShotMode(false);
         m_camera->getCamCamDisplay()->playAudio(true);
     }
+}
+
+void NavigationItem::resetHover()
+{
+    m_mouseOver = false;
+    m_ignoreWheel = false;
 }
 
 void NavigationItem::setPlaying(bool playing)
@@ -415,4 +424,3 @@ void NavigationItem::togglePlayPause()
 {
     setPlaying(!m_playing);
 }
-
