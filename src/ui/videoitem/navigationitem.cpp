@@ -114,6 +114,12 @@ NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
     m_playButton->setMinimumSize(54, 51);
     m_playButton->setMaximumSize(54, 51);
 
+    QAction *playAction = new QAction(tr("Play"), m_playButton);
+    playAction->setShortcut(tr("Space"));
+    playAction->setShortcutContext(Qt::ApplicationShortcut);
+    connect(playAction, SIGNAL(triggered()), m_playButton, SLOT(click()));
+    m_graphicsWidget->addAction(playAction);
+
     m_forwardButton = new ImageButtonItem;
     m_forwardButton->addPixmap(QPixmap(":/skin/forward_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
     m_forwardButton->addPixmap(QPixmap(":/skin/forward_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
