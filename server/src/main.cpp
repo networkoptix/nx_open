@@ -23,7 +23,7 @@ protected:
         QnResourcePool::instance().addResource(QnResourcePtr(server));
         QnClientMediaResource* camera = new QnClientMediaResource();
         camera->setId(TEST_RES_ID+1);
-        camera->setUrl("test.flv");
+        camera->setUrl("TC-Outro.mov");
         camera->setParentId(server->getId());
         QnResourcePool::instance().addResource(QnResourcePtr(camera));
 
@@ -36,7 +36,7 @@ protected:
         }
     }
 };
- 
+
 int main(int argc, char *argv[])
 {
     QnRtspListener listener();
@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
     dataDirectory.mkdir("./log");
 
 
-	if (!cl_log.create("./log/log_file", 1024*1024*10, 5, cl_logDEBUG1))
+    if (!cl_log.create("./log/log_file", 1024*1024*10, 5, cl_logDEBUG1))
     {
         return 0;
     }
@@ -74,13 +74,24 @@ int main(int argc, char *argv[])
 
 	QnResourcePool::instance(); // to initialize net state;
 
-    //QnArchiveResource* res = new QnArchiveResource("e:/Users/roman76r/video/ROCKNROLLA/BDMV/STREAM/00000.m2ts");
-    QnArchiveResource* res = new QnArchiveResource("test.flv");
-    res->setId(TEST_RES_ID);
-    QnResourcePool::instance().addResource(QnResourcePtr(res));
+    {
+        QnArchiveResource* res = new QnArchiveResource("e:/Users/roman76r/video/ROCKNROLLA/BDMV/STREAM/00000.m2ts");
+        res->setId(TEST_RES_ID+-2);
+        QnResourcePool::instance().addResource(QnResourcePtr(res));
+    }
+    {
+        QnArchiveResource* res = new QnArchiveResource("test.flv");
+        res->setId(TEST_RES_ID+-1);
+        QnResourcePool::instance().addResource(QnResourcePtr(res));
+    }
+    {
+        QnArchiveResource* res = new QnArchiveResource("TC-Outro.mov");
+        res->setId(TEST_RES_ID);
+        QnResourcePool::instance().addResource(QnResourcePtr(res));
+    }
 
-    TestThread* testThread = new TestThread();
-    testThread->start();
+/*	TestThread* testThread = new TestThread();
+	testThread->start();*/
 	//===========================================================================
 	//IPPH264Decoder::dll.init();
 
@@ -88,14 +99,14 @@ int main(int argc, char *argv[])
 
 	//============================
 	//QnResourcePool::instance().getDeviceSearcher().addDeviceServer(&QnPlArecontResourceSearcher::instance());
-    //QnResourcePool::instance().getDeviceSearcher().addDeviceServer(&AVigilonDeviceServer::instance());
-    //QnResourcePool::instance().getDeviceSearcher().addDeviceServer(&AndroidDeviceServer::instance());
-    //QnResourcePool::instance().getDeviceSearcher().addDeviceServer(&IQEyeDeviceServer::instance());
+	//QnResourcePool::instance().getDeviceSearcher().addDeviceServer(&AVigilonDeviceServer::instance());
+	//QnResourcePool::instance().getDeviceSearcher().addDeviceServer(&AndroidDeviceServer::instance());
+	//QnResourcePool::instance().getDeviceSearcher().addDeviceServer(&IQEyeDeviceServer::instance());
 
-	//=========================================================
+    //=========================================================
     QnRtspListener rtspServer(QHostAddress::Any, 50000);
 
     app.exec();
 
-	QnResource::stopCommandProc();
+    QnResource::stopCommandProc();
 }
