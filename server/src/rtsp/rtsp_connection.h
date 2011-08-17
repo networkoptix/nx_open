@@ -38,6 +38,8 @@ private:
     void extractNptTime(const QString& strValue, qint64* dst);
     int composeSetParameter();
     int composeGetParameter();
+    int bytesToWrite();
+    QMutex& getSockMutex();
 private:
     QN_DECLARE_PRIVATE(QnRtspConnectionProcessor);
     friend class QnRtspDataProcessor;

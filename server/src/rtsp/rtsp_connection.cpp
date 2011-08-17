@@ -26,6 +26,8 @@ static const quint32 BASIC_FFMPEG_SSRC = 20000;
 static const int MAX_CONTEXTS_AT_VIDEO = 8; // max ammount of difference codecContext used for one video channel.
 static const int RTSP_MIN_SEEK_INTERVAL = 1000 * 30; // 30 ms as min seek interval
 
+static const int MAX_RTSP_WRITE_BUFFER = 1024*1024;
+
 class QnRtspDataProcessor: public QnAbstractDataConsumer
 {
 public:
@@ -77,6 +79,7 @@ protected:
             ssrc += subChannelNumber;
             QnFfmpegHelper::serializeCodecContext(ctx, &m_codecCtxData);
             buildRtspTcpHeader(rtspChannelNum, ssrc + 1, m_codecCtxData.size(), true); // ssrc+1 - switch data subchannel to context subchannel
+            QMutexLocker lock(&m_owner->getSockMutex());
             m_owner->sendData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
             m_owner->sendData(m_codecCtxData);
             m_owner->flush();
@@ -94,6 +97,7 @@ protected:
             sendLen = qMin(MAX_RTSP_DATA_LEN, dataRest);
             QnCompressedVideoData* video = dynamic_cast<QnCompressedVideoData*> (media.data());
             buildRtspTcpHeader(rtspChannelNum, ssrc, sendLen + (first && video ? 1 : 0), sendLen >= dataRest);
+            QMutexLocker lock(&m_owner->getSockMutex());
             m_owner->sendData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
             if (first && video)
             {
@@ -105,6 +109,11 @@ protected:
             m_owner->flush();
             curData += sendLen;
             m_lastSendTime = media->timestamp;
+        }
+        while (m_owner->bytesToWrite() > MAX_RTSP_WRITE_BUFFER)
+        {
+            msleep(50); // wait while client read buffer
+            m_owner->flush();
         }
     }
 private:
@@ -165,6 +174,7 @@ public:
     //qint64 playTime;  // actial playing time
     //QTime playTimer; // play time elapsed
     double rtspScale; // RTSP playing speed (1 - normal speed, 0 - pause, >1 fast forward, <-1 fast back e. t.c.)
+    QMutex sockMutex;
     //State state;
 };
 
@@ -179,6 +189,19 @@ void QnRtspConnectionProcessor::sendData(const char* data, int size)
     Q_D(QnRtspConnectionProcessor);
     d->socket->write(data, size);
 }
+
+int QnRtspConnectionProcessor::bytesToWrite()
+{
+    Q_D(QnRtspConnectionProcessor);
+    return d->socket->bytesToWrite();
+}
+
+QMutex& QnRtspConnectionProcessor::getSockMutex()
+{
+    Q_D(QnRtspConnectionProcessor);
+    return d->sockMutex;
+}
+
 
 void QnRtspConnectionProcessor::flush()
 {
@@ -365,7 +388,9 @@ void QnRtspConnectionProcessor::sendResponse()
     qDebug() << "Server response to " << d->socket->peerAddress();
     qDebug() << response;
 
+    QMutexLocker lock(&d->sockMutex);
     d->socket->write(response);
+    d->socket->flush();
 }
 
 int QnRtspConnectionProcessor::numOfVideoChannels()
@@ -518,8 +543,8 @@ int QnRtspConnectionProcessor::composePlay()
     {
         d->dataProcessor = new QnRtspDataProcessor(this);
         d->dataProvider->addDataProcessor(d->dataProcessor);
-        d->dataProvider->start();
-        d->dataProcessor->start();
+        //d->dataProvider->start();
+        //d->dataProcessor->start();
     }
 
     if (qAbs(d->startTime - getRtspTime()) >= RTSP_MIN_SEEK_INTERVAL)
@@ -640,6 +665,10 @@ void QnRtspConnectionProcessor::processRequest()
     }
     d->responseHeaders.setStatusLine(code, codeToMessage(code), d->requestHeaders.majorVersion(), d->requestHeaders.minorVersion());
     sendResponse();
+    if (d->dataProvider && !d->dataProvider->isRunning())
+        d->dataProvider->start();
+    if (d->dataProcessor && !d->dataProcessor->isRunning())
+        d->dataProcessor->start();
 }
 
 void QnRtspConnectionProcessor::onClientReadyRead()

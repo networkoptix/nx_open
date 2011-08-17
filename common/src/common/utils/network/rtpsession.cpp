@@ -496,6 +496,7 @@ int RTPSession::readRAWData()
 // demux binary data only
 int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
 {
+    quint8* origData = data;
     bool readMoreData = false; // try to process existing buffer at first
     while (1)
     {
@@ -521,7 +522,9 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
                 }
                 int dataRest = m_responseBuffer + m_responseBufferLen - curPtr;
                 if (dataRest < dataLen)
-                    continue;
+                {
+                    break;
+                }
                 memcpy(data, curPtr, dataLen);
                 data += dataLen;
                 demuxedCount += dataLen;
@@ -529,7 +532,10 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
 
                 memmove(curPtr, curPtr + dataLen, m_responseBuffer + m_responseBufferLen - (curPtr+dataLen));
                 m_responseBufferLen -= dataLen;
-
+                if (origData[4] != 0x80)
+                {
+                    int gg = 4;
+                }
                 return demuxedCount;
             }
         }
@@ -541,16 +547,16 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
 bool RTPSession::readTextResponce(QByteArray& response)
 {
     bool readMoreData = false; // try to process existing buffer at first
-    while (1)
+    for (int k = 0; k < 10; ++k) // if binary data ahead text data, read more. read 10 packets at maxumum
     {
         if (readMoreData && readRAWData() == -1)
             return false;
 
         quint8* startPtr = m_responseBuffer;
         quint8* curPtr = m_responseBuffer;
-        for(; curPtr < m_responseBuffer + m_responseBufferLen; curPtr++)
+        for(; curPtr < m_responseBuffer + m_responseBufferLen;)
         {
-            if (*curPtr == '$') // start of binary data
+            if (*curPtr == '$') // start of binary data, skip it
             {
                 response.append(QByteArray::fromRawData((char*)startPtr, curPtr - startPtr));
                 memmove(startPtr, curPtr, m_responseBufferLen - (curPtr - startPtr));
@@ -562,23 +568,31 @@ bool RTPSession::readTextResponce(QByteArray& response)
                 if (dataRest < 4)
                 {
                     readMoreData = true;
-                    continue;
+                    startPtr = 0;
+                    break;
                 }
-                quint16 dataLen = (curPtr[2] << 8) + curPtr[3];
+                quint16 dataLen = (curPtr[2] << 8) + curPtr[3] + 4;
                 if (dataRest < dataLen)
                 {
                     readMoreData = true;
-                    continue;
+                    startPtr = 0;
+                    break;
                 }
                 startPtr += dataLen;
                 curPtr = startPtr;
             }
+            else {
+                curPtr++;
+            }
         }
-        response.append(QByteArray::fromRawData((char*)startPtr, curPtr - startPtr));
-        memmove(startPtr, curPtr, m_responseBufferLen - (curPtr - startPtr));
-        m_responseBufferLen -= curPtr - startPtr;
-        if (!response.isEmpty())
-            return true;
+        if (startPtr)
+        {
+            response.append(QByteArray::fromRawData((char*)startPtr, curPtr - startPtr));
+            memmove(startPtr, curPtr, m_responseBufferLen - (curPtr - startPtr));
+            m_responseBufferLen -= curPtr - startPtr;
+            if (!response.isEmpty())
+                return true;
+        }
         readMoreData = true;
     }
     return false;
