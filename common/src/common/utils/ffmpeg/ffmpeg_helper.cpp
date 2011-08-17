@@ -1,23 +1,6 @@
 #include "ffmpeg_helper.h"
 
-#include <QtCore/QByteArray>
 #include <QtCore/QDebug>
-#include <QtCore/QMutex>
-
-#include "libavcodec/avcodec.h"
-
-Q_GLOBAL_STATIC(QMutex, the_ffmpeg_mutex)
-
-QMutex *QnFfmpegHelper::global_ffmpeg_mutex()
-{
-    QMutex *global_ffmpeg_mutex = the_ffmpeg_mutex();
-    if (!global_ffmpeg_mutex)
-    {
-        qWarning("QnFfmpegHelper::global_ffmpeg_mutex() was called after the application exit!");
-        global_ffmpeg_mutex = new QMutex; // it's better to leak than to crash, no?
-    }
-    return global_ffmpeg_mutex;
-}
 
 void QnFfmpegHelper::serializeCodecContext(const AVCodecContext *ctx, QByteArray *data)
 {

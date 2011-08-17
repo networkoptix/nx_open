@@ -1,32 +1,24 @@
 #include "avi_archive_dataprovider.h"
 
-#include "resource/url_resource.h"
-#include "datapacket/mediadatapacket.h"
+#include "utils/ffmpeg/ffmpeg_global.h"
 #include "common/base.h"
 #include "resource/media_resource.h"
-#include "utils/ffmpeg/ffmpeg_helper.h"
+#include "resource/url_resource.h"
 
 QMutex QnAviArchiveDataProvider::avi_mutex;
 QSemaphore QnAviArchiveDataProvider::aviSemaphore(4);
 static const int FFMPEG_PROBE_BUFFER_SIZE = 1024 * 512;
 
-class QnAviSemaphoreHelpr
+class QnSemaphoreLocker
 {
 public:
-    QnAviSemaphoreHelpr(QSemaphore& sem):
-      m_sem(sem)
-      {
-          m_sem.tryAcquire();
-      }
-
-      ~QnAviSemaphoreHelpr()
-      {
-          m_sem.release();
-      }
+    inline QnSemaphoreLocker(QSemaphore *sem) : m_sem(sem)
+    { m_sem->tryAcquire(); }
+    inline ~QnSemaphoreLocker()
+    { m_sem->release(); }
 
 private:
-    QSemaphore& m_sem;
-
+    QSemaphore *m_sem;
 };
 
 // ---------------------------------- QnAviArchiveDataProvider -----------------------
@@ -43,69 +35,40 @@ QnAviArchiveDataProvider::QnAviArchiveDataProvider(QnResourcePtr ptr):
     m_haveSavedPacket(false),
     m_selectedAudioChannel(0)
 {
-    av_init_packet(&m_packets[0]);
-    av_init_packet(&m_packets[1]);
+    QnFFmpeg::initialize();
+
+    m_packets[0] = new AVPacket;
+    av_init_packet(m_packets[0]);
+    m_packets[1] = new AVPacket;
+    av_init_packet(m_packets[1]);
 }
 
 QnAviArchiveDataProvider::~QnAviArchiveDataProvider()
 {
     destroy();
+
+    delete m_packets[0];
+    delete m_packets[1];
 }
 
-
-AVFormatContext* QnAviArchiveDataProvider::getFormatContext()
+AVFormatContext *QnAviArchiveDataProvider::getFormatContext()
 {
     QSharedPointer<QnURLResource> mediaResource = qSharedPointerDynamicCast<QnURLResource>(m_resource);
-    QString url = QLatin1String("ufile:") + mediaResource->getUrl();
-    AVFormatContext* formatContext;
-    int err = av_open_input_file(&formatContext, url.toUtf8().constData(), NULL, 0, NULL);
-    if (err < 0)
-    {
-        destroy();
-        return 0;
-    }
-
-    {
-        QMutexLocker global_ffmpeg_locker(QnFfmpegHelper::global_ffmpeg_mutex());
-        err = av_find_stream_info(formatContext);
-        if (err < 0)
-        {
-            destroy();
-            return 0;
-        }
-    }
-    return formatContext;
+    const QString url = mediaResource->getUrl();
+    return QnFFmpeg::openFileContext(url);
 }
 
 void QnAviArchiveDataProvider::destroy()
 {
-    if (m_formatContext) // crashes without condition
-    {
-        av_close_input_file(m_formatContext);
-        m_formatContext = 0;
-    }
+    QnFFmpeg::closeFileContext(m_formatContext);
+    m_formatContext = 0;
 
     av_free_packet(&nextPacket());
 }
 
 bool QnAviArchiveDataProvider::init()
 {
-    static bool firstInstance = true;
-
     QMutexLocker mutex(&m_cs);
-
-    if (firstInstance)
-    {
-        firstInstance = false;
-
-        QMutexLocker global_ffmpeg_locker(QnFfmpegHelper::global_ffmpeg_mutex());
-
-        av_register_all();
-
-        extern URLProtocol ufile_protocol;
-
-        av_register_protocol2(&ufile_protocol, sizeof(ufile_protocol));
-    }
 
     m_currentTime = 0;
     m_previousTime = -1;
@@ -125,8 +88,8 @@ bool QnAviArchiveDataProvider::init()
         return false;
 
     // Alloc common resources
-    av_init_packet(&m_packets[0]);
-    av_init_packet(&m_packets[1]);
+    av_init_packet(m_packets[0]);
+    av_init_packet(m_packets[1]);
 
     return true;
 }
@@ -139,10 +102,10 @@ bool QnAviArchiveDataProvider::initCodecs()
 
     for(unsigned i = 0; i < m_formatContext->nb_streams; i++)
     {
-        AVStream *strm= m_formatContext->streams[i];
+        AVStream *strm = m_formatContext->streams[i];
         AVCodecContext *codecContext = strm->codec;
 
-        if(codecContext->codec_type >= (unsigned)AVMEDIA_TYPE_NB)
+        if (codecContext->codec_type >= (unsigned)AVMEDIA_TYPE_NB)
             continue;
 
         if (strm->id && strm->id == lastStreamID)
@@ -170,7 +133,6 @@ bool QnAviArchiveDataProvider::initCodecs()
     if (m_videoStreamIndex != -1)
     {
         CodecID ffmpeg_video_codec_id = m_formatContext->streams[m_videoStreamIndex]->codec->codec_id;
-
         if (ffmpeg_video_codec_id != CODEC_ID_NONE)
         {
             m_videoCodecId = ffmpeg_video_codec_id;
@@ -207,7 +169,7 @@ QnAbstractDataPacketPtr QnAviArchiveDataProvider::getNextData()
 		mFirstTime = false;
 	}
 
-	QnAviSemaphoreHelpr sem(aviSemaphore);
+	QnSemaphoreLocker semlocker(&aviSemaphore);
 
 	if (!m_formatContext || m_videoStreamIndex == -1)
 		return QnAbstractDataPacketPtr(0);
@@ -314,14 +276,14 @@ QnAbstractDataPacketPtr QnAviArchiveDataProvider::getNextData()
 	return data;
 }
 
-AVPacket& QnAviArchiveDataProvider::currentPacket()
+AVPacket &QnAviArchiveDataProvider::currentPacket()
 {
-    return m_packets[m_currentPacketIndex];
+	return *m_packets[m_currentPacketIndex];
 }
 
-AVPacket& QnAviArchiveDataProvider::nextPacket()
+AVPacket &QnAviArchiveDataProvider::nextPacket()
 {
-    return m_packets[m_currentPacketIndex ^ 1];
+	return *m_packets[1 - m_currentPacketIndex];
 }
 
 bool QnAviArchiveDataProvider::getNextPacket(AVPacket& packet)

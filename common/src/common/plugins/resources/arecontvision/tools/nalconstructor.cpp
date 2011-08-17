@@ -1,15 +1,7 @@
 // nalconstructor.cpp : Defines the entry point for the console application.
 //
 
-// These typedefs are already defined in stdint.h included with ffmpeg headers
-#if 0
-typedef signed char int8_t;
-typedef unsigned char   uint8_t;
-typedef short  int16_t;
-typedef unsigned short  uint16_t;
-typedef int  int32_t;
-typedef unsigned   uint32_t;
-#endif
+#include <stdint.h>
 
 typedef struct bs_s
 {
@@ -174,7 +166,7 @@ int create_unit_delimiter(int P, unsigned char* data, int max_datalen)
 }
 //==============================================================================
 int create_sps_pps(
-				   int frameWidth, 
+				   int frameWidth,
 				   int frameHeight,
 				   int deblock_filter,
 				   unsigned char* data, int max_datalen)
@@ -213,8 +205,8 @@ int create_sps_pps(
 	bs_write_ue( &stream, 1 ); // num_ref_frames
 	bs_write( &stream, 1, 0); //gaps_in_frame_num_value_allowed_flag
 
-	int i_mb_width = frameWidth/16; // in first version we belive that width is devided on 16 
-	int i_mb_height = frameHeight/16; // in first version we belive that width is devided on 16 
+	int i_mb_width = frameWidth/16; // in first version we belive that width is devided on 16
+	int i_mb_height = frameHeight/16; // in first version we belive that width is devided on 16
 
 	bs_write_ue( &stream, i_mb_width - 1 );
 	bs_write_ue( &stream, i_mb_height - 1);
@@ -251,7 +243,7 @@ int create_sps_pps(
 	bs_write_se( &stream, 0 ); //pic_init_qs_minus26
 	bs_write_se( &stream, 0 ); //chroma_qp_index_offset
 
-	if (deblock_filter) // if we have deblocking filter 
+	if (deblock_filter) // if we have deblocking filter
 		bs_write( &stream, 1, 0 );
 	else // we have ti disable it in sh
 		bs_write( &stream, 1, 1 );
