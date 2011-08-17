@@ -9,6 +9,11 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(QWidget *parent = 0);
+
+// ### removeme
+public Q_SLOTS:
+    void boo();
+// ###
 };
 
 #endif // MAINWINDOW_H
