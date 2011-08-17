@@ -111,6 +111,7 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
 #ifdef Q_OS_WIN
     ,m_desktopEncoder(0)
 #endif
+    ,m_inputBlocked(false)
 {
     m_timeAfterDoubleClick.restart();
 
@@ -359,6 +360,9 @@ bool GraphicsView::shouldOptimizeDrawing() const
 void GraphicsView::wheelEvent ( QWheelEvent * e )
 {
     if (!mViewStarted)
+        return;
+
+    if (m_inputBlocked)
         return;
 
     if (m_navigationItem ? m_navigationItem->mouseOver() : false) {
@@ -659,6 +663,9 @@ void GraphicsView::stopAnimation()
 void GraphicsView::mousePressEvent ( QMouseEvent * event)
 {
     if (!mViewStarted)
+        return;
+
+    if (m_inputBlocked)
         return;
 
     if (m_timeAfterDoubleClick.elapsed() < doubl_clk_delay)
@@ -1399,7 +1406,10 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
     }
 
     m_menuIsHere = true;
+    m_inputBlocked = true;
+    m_blockingTimer.stop();
     QAction* act = menu.exec(QCursor::pos());
+    m_blockingTimer.singleShot(100, this, SLOT(unblockInput()));
     m_menuIsHere = false;
 
     //=========results===============================
@@ -1633,6 +1643,9 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 void GraphicsView::mouseDoubleClickEvent( QMouseEvent * event )
 {
     if (!mViewStarted)
+        return;
+
+    if (m_inputBlocked)
         return;
 
     m_timeAfterDoubleClick.restart();
@@ -3258,4 +3271,9 @@ void GraphicsView::on_grid_drop_animation_finished()
 void GraphicsView::contextMenuHelper_restoreLayout()
 {
     emit onNewLayoutSelected(0, m_camLayout.getContent());
+}
+
+void GraphicsView::unblockInput()
+{
+    m_inputBlocked = false;
 }

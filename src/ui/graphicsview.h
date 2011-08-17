@@ -176,6 +176,8 @@ private slots:
     void toggleFullScreen();
 
     void on_grid_drop_animation_finished();
+    void unblockInput();
+
 protected:
 
     QGraphicsScene m_scene;
@@ -254,6 +256,8 @@ protected:
 #ifdef Q_OS_WIN
     DesktopFileEncoder* m_desktopEncoder;
 #endif
+    bool m_inputBlocked;
+    QTimer m_blockingTimer;
 };
 
 
