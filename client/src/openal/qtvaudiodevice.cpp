@@ -1,11 +1,13 @@
 #include "qtvaudiodevice.h"
 
-#include <OpenAL/al.h>
-#include <OpenAL/alc.h>
-
 #include <QtCore/QSettings>
 
+#include <QtMultimedia/QAudioFormat>
+
 #include "qtvsound.h"
+
+#include <OpenAL/al.h>
+#include <OpenAL/alc.h>
 
 //#define OPENAL_STATIC
 
@@ -96,18 +98,21 @@ QtvAudioDevice::~QtvAudioDevice()
 #endif
 }
 
-void QtvAudioDevice::setVolume(float value)
+float QtvAudioDevice::volume() const
 {
-    m_settings->setValue("volume", value);
+    float volume = m_settings->value(QLatin1String("volume"), 1.0f).toFloat();
+    return qBound(0.0f, volume, 1.0f);
+}
+
+void QtvAudioDevice::setVolume(float volume)
+{
+    volume = qBound(0.0f, volume, 1.0f);
+
+    m_settings->setValue(QLatin1String("volume"), volume);
     m_settings->sync();
 
     foreach (QtvSound *sound, m_sounds)
-        sound->setVolumeLevel(value > 0 ? value : 0);
-}
-
-float QtvAudioDevice::getVolume() const
-{
-    return m_settings->value("volume", 1.0).toFloat();
+        sound->setVolumeLevel(volume);
 }
 
 void QtvAudioDevice::removeSound(QtvSound *soundObject)
@@ -126,7 +131,8 @@ QtvSound *QtvAudioDevice::addSound(const QAudioFormat &format)
         return 0;
 
     QtvSound *result = new QtvSound(m_device, format);
-    if (!result->isValid()) {
+    if (!result->isValid())
+    {
         delete result;
         return 0;
     }

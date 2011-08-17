@@ -6,7 +6,7 @@
 #include "qtvaudiodevice.h"
 //#include "utils/common/log.h"
 
-QtvSound::QtvSound(ALCdevice* device, const QAudioFormat& audioFormat)
+QtvSound::QtvSound(ALCdevice *device, const QAudioFormat &audioFormat)
 {
     m_audioFormat = audioFormat;
     m_numChannels = audioFormat.channelCount();
@@ -38,7 +38,6 @@ QtvSound::~QtvSound()
 bool QtvSound::setup()
 {
     Q_ASSERT(m_bitsPerSample && m_numChannels && m_size);
-
     if (!m_bitsPerSample || !m_numChannels || !m_size )
         return false;
 
@@ -59,13 +58,7 @@ bool QtvSound::setup()
     return true;
 }
 
-void QtvSound::setVolumeLevel(float value)
-{
-    QMutexLocker lock(&m_mtx);
-    alSourcef(m_source, AL_GAIN, value);
-}
-
-float QtvSound::getVolumeLevel() const
+float QtvSound::volumeLevel() const
 {
     ALfloat volume = 0.0;
     QMutexLocker lock(&m_mtx);
@@ -73,15 +66,22 @@ float QtvSound::getVolumeLevel() const
     return volume;
 }
 
-int QtvSound::getFormat(const QAudioFormat& audioFormat)
+void QtvSound::setVolumeLevel(float volumeLevel)
+{
+    QMutexLocker lock(&m_mtx);
+    alSourcef(m_source, AL_GAIN, volumeLevel);
+}
+
+int QtvSound::getFormat(const QAudioFormat &audioFormat)
 {
     if (audioFormat.sampleType() == QAudioFormat::Float)
         return false;
+
     QByteArray requestFormat;
     int bitsPerSample = audioFormat.sampleSize();
     int numChannels = audioFormat.channelCount();
     int format = 0;
-    switch(numChannels)
+    switch (numChannels)
     {
         case 1:
             if (32 == bitsPerSample)
@@ -106,15 +106,12 @@ int QtvSound::getFormat(const QAudioFormat& audioFormat)
                 format = AL_FORMAT_STEREO8;
             break;
         case 4:
-            requestFormat = "AL_FORMAT_QUAD";
-            requestFormat += QByteArray::number(bitsPerSample);
+            requestFormat = "AL_FORMAT_QUAD" + QByteArray::number(bitsPerSample);
             format = alGetEnumValue(requestFormat);
             break;
         default:
-            requestFormat  = QByteArray("AL_FORMAT_");
-            requestFormat += QByteArray::number(numChannels-1);
-            requestFormat += QByteArray("1CHN");
-            requestFormat += QByteArray::number(bitsPerSample);
+            requestFormat = "AL_FORMAT_" + QByteArray::number(numChannels - 1) +
+                            "1CHN" + QByteArray::number(bitsPerSample);
             format = alGetEnumValue(requestFormat);
             break;
     }
@@ -186,8 +183,8 @@ bool QtvSound::playImpl()
     checkOpenALErrorDebug(m_device);
     // if already playing
     if (AL_PLAYING != state) {
-            float volume = QtvAudioDevice::instance().getVolume();
-            alSourcef(m_source, AL_GAIN, qMax(volume, 0.0f));
+        float volume = QtvAudioDevice::instance().volume();
+        alSourcef(m_source, AL_GAIN, volume);
 
         // If there are Buffers in the Source Queue then the Source was starved of audio
         // data, so needs to be restarted (because there is more audio data to play)
