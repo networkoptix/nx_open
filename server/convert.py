@@ -81,12 +81,6 @@ def setup_ffmpeg():
 
     return ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release
 
-def setup_openal():
-    openal_path = 'contrib/openal/bin/'
-    openal_path += sys.platform
-
-    return openal_path
-
 def gen_version_h():
     version_h = open('src/version.h', 'w')
     print >> version_h, '#ifndef UNIVERSAL_CLIENT_VERSION_H_'
@@ -119,7 +113,6 @@ def gen_version_h():
     print >> version_h, '#endif // UNIVERSAL_CLIENT_VERSION_H_'
 
 ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release = setup_ffmpeg()
-openal_path = setup_openal()
 
 destdir = '../bin'
 destdir_debug = destdir + '/debug'
@@ -142,9 +135,6 @@ copy_files(ffmpeg_path_debug + '/bin/*-[0-9][0-9].dll', destdir_debug)
 
 copy_files(ffmpeg_path_release + '/bin/*-[0-9].dll', destdir_release)
 copy_files(ffmpeg_path_release + '/bin/*-[0-9][0-9].dll', destdir_release)
-
-copy_files(openal_path + '/*.dll', destdir_release)
-copy_files(openal_path + '/*.dll', destdir_debug)
 
 os.mkdir(destdir_debug + '/arecontvision')
 os.mkdir(destdir_release + '/arecontvision')
