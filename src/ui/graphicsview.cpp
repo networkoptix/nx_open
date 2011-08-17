@@ -2185,8 +2185,7 @@ NavigationItem *GraphicsView::getNavigationItem()
         QPoint pos (0, viewport()->height() - m_height);
         m_navigationItem->setStaticPos(pos);
         m_navigationItem->setVisible(false);
-//        m_navigationItem->navigationWidget()->resize(m_width, m_height);
-        m_navigationItem->m_graphicsWidget->resize(m_width, m_height);
+        m_navigationItem->graphicsWidget()->resize(m_width, m_height);
         m_navigationItem->setZValue(INT_MAX);
         m_scene.addItem(m_navigationItem);
 
@@ -2246,8 +2245,7 @@ void GraphicsView::resizeEvent( QResizeEvent * event )
         m_navigationItem->setStaticPos(pos);
 
         QSize s = event->size();
-//        m_navigationItem->navigationWidget()->resize(s.width(), NavigationItem::DEFAULT_HEIGHT);
-        m_navigationItem->m_graphicsWidget->resize(s.width(), NavigationItem::DEFAULT_HEIGHT);
+        m_navigationItem->graphicsWidget()->resize(s.width(), NavigationItem::DEFAULT_HEIGHT);
     }
     updateDecorations();
     recalcSomeParams();

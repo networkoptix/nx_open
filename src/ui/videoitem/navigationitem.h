@@ -53,9 +53,6 @@ signals:
     void stepBackward();
     void stepForward();
 
-protected:
-    void wheelEvent(QWheelEvent *) {} // to fix buuug with scene
-
 private:
     QHBoxLayout *m_layout;
     QPushButton *m_pauseButton;
@@ -75,6 +72,7 @@ public:
     ~NavigationItem();
 
     QWidget *navigationWidget();
+    QGraphicsWidget *graphicsWidget() const { return m_graphicsWidget; }
 
     void setVideoCamera(CLVideoCamera* camera);
 
@@ -106,9 +104,11 @@ private slots:
 
     void onSliderPressed();
     void onSliderReleased();
+
 protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent *);
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *);
+    void wheelEvent(QGraphicsSceneWheelEvent *) {} // to fix buuug with scene
 
 private:
     QGraphicsProxyWidget *m_proxy;
@@ -118,7 +118,6 @@ private:
     ImageButtonItem *m_playButton;
     ImageButtonItem *m_forwardButton;
     ImageButtonItem *m_stepForwardButton;
-public:
     QGraphicsWidget *m_graphicsWidget;
     CLVideoCamera* m_camera;
     int m_timerId;
