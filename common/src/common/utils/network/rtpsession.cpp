@@ -510,8 +510,7 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
             {
                 if (m_responseBuffer + m_responseBufferLen - curPtr < 4)
                 {
-                    m_responseBufferLen = 0;
-                    return 0; // corrupt data. just clear buffer
+                    break; // to few data
                 }
                 quint16 dataLen = (curPtr[2] << 8) + curPtr[3] + 4;
                 if (maxDataSize < dataLen)
