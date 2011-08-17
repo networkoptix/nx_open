@@ -356,6 +356,7 @@ void NavigationItem::stepForward()
 void NavigationItem::hoverEnterEvent(QGraphicsSceneHoverEvent *e)
 {
     m_mouseOver = true;
+    m_ignoreWheel = false;
     tim.stop();
     CLUnMovedInteractiveOpacityItem::hoverEnterEvent(e);
 }
