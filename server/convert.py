@@ -153,8 +153,15 @@ index_dirs(('src',), '', 'src/src.pri', exclude_dirs=EXCLUDE_DIRS, exclude_files
 if sys.platform == 'win32':
     os.system('qmake -tp vc FFMPEG=%s -o server.vcproj server.pro' % ffmpeg_path)
 
+    os.system('qmake -tp vc FFMPEG=%s -o ../client/client.vcproj ../client/client.pro' % ffmpeg_path)
+
 elif sys.platform == 'darwin':
     if os.path.exists('server.xcodeproj'):
         rmtree('server.xcodeproj')
 
     os.system('qmake FFMPEG=%s -o server.xcodeproj server.pro' % ffmpeg_path)
+
+    if os.path.exists('../client/client.xcodeproj'):
+        rmtree('../client/client.xcodeproj')
+
+    os.system('qmake FFMPEG=%s -o ../client/client.xcodeproj ../client/client.pro' % ffmpeg_path)
