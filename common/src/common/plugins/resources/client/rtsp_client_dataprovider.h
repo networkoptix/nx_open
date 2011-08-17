@@ -5,6 +5,8 @@
 #include "network/rtpsession.h"
 #include "resource/client/client_media_resource.h"
 
+struct AVCodecContext;
+
 class QnRtspClientDataProvider: public QnNavigatedDataProvider
 {
 public:
@@ -12,7 +14,7 @@ public:
     virtual ~QnRtspClientDataProvider();
     virtual QnAbstractDataPacketPtr getNextData();
 protected:
-    virtual void updateStreamParamsBasedOnQuality(); 
+    virtual void updateStreamParamsBasedOnQuality();
     virtual void channeljumpTo(quint64 mksec, int channel);
 private:
     QnAbstractDataPacketPtr processFFmpegRtpPayload(const quint8* data, int dataSize);
@@ -26,4 +28,4 @@ private:
     QMap<int, QnAbstractMediaDataPacketPtr> m_nextDataPacket;
 };
 
-#endif
+#endif // __RTSP_CLIENT_DATA_PROVIDER_H

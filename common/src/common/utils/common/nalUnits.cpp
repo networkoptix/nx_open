@@ -149,7 +149,7 @@ int NALUnit::extractUEGolombCode()
 	return (1 << cnt)-1 + bitReader.getBits(cnt);
 }
 
-void NALUnit::writeSEGolombCode(BitStreamWriter& bitWriter, int32_t value)
+void NALUnit::writeSEGolombCode(BitStreamWriter& bitWriter, qint32 value)
 {
 	if (value <= 0)
 		writeUEGolombCode(bitWriter, -value * 2);

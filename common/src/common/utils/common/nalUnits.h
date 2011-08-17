@@ -6,32 +6,32 @@
 #include "common/bitStream.h"
 
 const static int 	Extended_SAR = 255;
-const static double h264_ar_coeff[] = {0.0, 1.0, 12.0/11.0, 	10.0/11.0, 	16.0/11.0, 	40.0/33.0, 	24.0/11.0, 	20.0/11.0, 	
-									  32.0/11.0, 	80.0/33.0, 	18.0/11.0, 	15.0/11.0, 	64.0/33.0, 	160.0/99.0, 4.0/3.0, 	3.0/2.0, 	2.0/1.0};
+const static double h264_ar_coeff[] = {0.0, 1.0, 12.0/11.0, 	10.0/11.0, 	16.0/11.0, 	40.0/33.0, 	24.0/11.0, 	20.0/11.0,
+                                      32.0/11.0, 	80.0/33.0, 	18.0/11.0, 	15.0/11.0, 	64.0/33.0, 	160.0/99.0, 4.0/3.0, 	3.0/2.0, 	2.0/1.0};
 
 enum NALUnitType   {nuUnspecified, nuSliceNonIDR, nuSliceA, nuSliceB, nuSliceC,  // 0..4
-                    nuSliceIDR, nuSEI, nuSPS, nuPPS, nuDelimiter,                // 5..9
+					nuSliceIDR, nuSEI, nuSPS, nuPPS, nuDelimiter,                // 5..9
 					nuEOSeq, nuEOStream, nuFillerData, nuSPSExt, nuReserved1,    // 10..14
 					nuReserved2, nuReserved3, nuReserved4, nuReserved5, nuSliceWithoutPartitioning,  // 15..19
 					nuReserved6, nuReserved7, nuReserved8, nuReserved9, // 20..23
 					STAP_A_PACKET, STAP_B_PACKET, MTAP16_PACKET, MTAP24_PACKET, FU_A_PACKET, FU_B_PACKET,
 					nuDummy
-                   };
+				   };
 
 const static int SEI_MSG_BUFFERING_PERIOD = 0;
 const static int SEI_MSG_PIC_TIMING = 1;
 
 #ifndef __TS_MUXER_COMPILE_MODE
 const static char* NALUnitDescr[30] =
-                   {"nuUnspecified", "nuSliceNonIDR", "nuSliceA", "nuSliceB", "nuSliceC", 
-                    "nuSliceIDR","nuSEI","nuSPS","nuPPS","nuAUD", 
-					"nuEOSeq","nuEOStream","nuFillerData","nuSPSExt","nuReserved1", 
-					"nuReserved2","nuReserved3","nuReserved4","nuReserved5","nuSliceWithoutPartitioning", 
-					"nuReserved6","nuReserved7","nuReserved8"," nuReserved9",
-					// ------------------- additional RTP nal units -------------
-					"STAP-A","STAP-B","MTAP16","MTAP24","FU-A","FU-B"
+                   {"nuUnspecified", "nuSliceNonIDR", "nuSliceA", "nuSliceB", "nuSliceC",
+                    "nuSliceIDR","nuSEI","nuSPS","nuPPS","nuAUD",
+                    "nuEOSeq","nuEOStream","nuFillerData","nuSPSExt","nuReserved1",
+                    "nuReserved2","nuReserved3","nuReserved4","nuReserved5","nuSliceWithoutPartitioning",
+                    "nuReserved6","nuReserved7","nuReserved8"," nuReserved9",
+                    // ------------------- additional RTP nal units -------------
+                    "STAP-A","STAP-B","MTAP16","MTAP24","FU-A","FU-B"
                    };
-                   
+
 #endif
 
 class NALUnit {
@@ -49,8 +49,8 @@ public:
 
 	NALUnit() {m_nalBufferLen = 0; m_nalBuffer = 0;}
 	//NALUnit(const NALUnit& other);
-	virtual ~NALUnit() { 
-		delete [] m_nalBuffer; 
+	virtual ~NALUnit() {
+		delete [] m_nalBuffer;
 	}
 	static quint8* findNextNAL(quint8* buffer, quint8* end);
 	static quint8* findNALWithStartCode(quint8* buffer, quint8* end, bool longCodesAllowed);
@@ -65,7 +65,7 @@ public:
 
 	static int extractUEGolombCode(BitStreamReader& bitReader);
 	static void writeUEGolombCode(BitStreamWriter& bitWriter, quint32 value);
-	void writeSEGolombCode(BitStreamWriter& bitWriter, int32_t value);
+	void writeSEGolombCode(BitStreamWriter& bitWriter, qint32 value);
 	const BitStreamReader& getBitReader() const {return bitReader;}
 	void write_rbsp_trailing_bits(BitStreamWriter& writer);
 	void write_byte_align_bits(BitStreamWriter& writer);
@@ -228,7 +228,7 @@ public:
 
 	QString getStreamDescr();
 	int getWidth() { return pic_width_in_mbs*16 - getCropX();}
-	int getHeight() { 
+	int getHeight() {
 		return (2 - frame_mbs_only_flag) * pic_height_in_map_units*16 - getCropY();
 	}
 	double getFPS() const;
@@ -243,7 +243,7 @@ public:
 		cpb_size_value_minus1 = 0;
 		cbr_flag = 0;
 		num_units_in_tick_bit_pos = -1;
-		//orig_hrd_parameters_present_flag = 
+		//orig_hrd_parameters_present_flag =
 		nal_hrd_parameters_present_flag = -1;
 		vcl_hrd_parameters_present_flag = -1;
 		pic_struct_present_flag = -1;
@@ -347,7 +347,7 @@ public:
 	virtual ~SliceUnit() {
 		;
 	}
-	int deserialize(quint8* buffer, quint8* end, 
+	int deserialize(quint8* buffer, quint8* end,
 							const QMap<quint32, SPSUnit*>& spsMap,
 							const QMap<quint32, PPSUnit*>& ppsMap);
 
@@ -460,7 +460,7 @@ public:
 	void setFrameNum(int num);
 	int deserializeSliceData();
 	int serializeSliceHeader(BitStreamWriter& bitWriter, const QMap<quint32, SPSUnit*>& spsMap,
-                                    const QMap<quint32, PPSUnit*>& ppsMap, quint8* dstBuffer, int dstBufferLen);
+									const QMap<quint32, PPSUnit*>& ppsMap, quint8* dstBuffer, int dstBufferLen);
 private:
 	void write_pred_weight_table(BitStreamWriter& bitWriter);
 	void write_dec_ref_pic_marking(BitStreamWriter& bitWriter);

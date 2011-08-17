@@ -132,8 +132,8 @@ QnAbstractDataPacketPtr QnRtspClientDataProvider::getNextData()
         else {
             // todo: extract channel number from UDP ports map
         }
-        const QString& format = m_rtspSession.getTrackFormat(rtpChannelNum).toLower();
-        if (format == "ffmpeg") {
+        const QString& format = m_rtspSession.getTrackFormat(rtpChannelNum);
+        if (format.toLower() == QLatin1String("ffmpeg")) {
             result = processFFmpegRtpPayload(data, blockSize);
             if (result)
                 break;
@@ -148,10 +148,8 @@ QnAbstractDataPacketPtr QnRtspClientDataProvider::getNextData()
 
 void QnRtspClientDataProvider::updateStreamParamsBasedOnQuality()
 {
-
 }
 
 void QnRtspClientDataProvider::channeljumpTo(quint64 mksec, int channel)
 {
-
 }
