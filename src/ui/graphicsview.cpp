@@ -182,7 +182,7 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
     m_scene.addItem(m_gridItem);
     m_gridItem->setPos(m_camLayout.getGridEngine().getSettings().left, m_camLayout.getGridEngine().getSettings().top);
 
-    setMinimumWidth(600);
+    setMinimumSize(600, 400);
 
     setFrameShape(QFrame::NoFrame);
 
