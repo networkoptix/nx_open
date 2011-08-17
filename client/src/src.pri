@@ -1,7 +1,4 @@
-contains(QT_CONFIG, opengl): QT += opengl
-
-INCLUDEPATH += $$PWD
-DEPENDPATH += $$PWD
+contains(QT_CONFIG, opengl): QT *= opengl
 
 HEADERS += mainwindow.h \
            graphicsview.h
@@ -13,3 +10,8 @@ SOURCES += main.cpp \
 RESOURCES += images.qrc
 
 include( $$PWD/widgets/widgets.pri )
+
+include( $$PWD/videoitem.pri )
+
+INCLUDEPATH += $$PWD
+DEPENDPATH *= $$INCLUDEPATH
