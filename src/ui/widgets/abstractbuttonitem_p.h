@@ -61,7 +61,6 @@ QT_BEGIN_NAMESPACE
 
 class AbstractButtonItemPrivate /*: public QWidgetPrivate*/
 {
-    AbstractButtonItem *q_ptr;
     Q_DECLARE_PUBLIC(AbstractButtonItem)
 public:
     AbstractButtonItemPrivate(AbstractButtonItem *qq, QSizePolicy::ControlType type = QSizePolicy::DefaultType);
@@ -105,6 +104,9 @@ public:
     void emitPressed();
     void emitReleased();
     void emitClicked();
+
+protected:
+    AbstractButtonItem *q_ptr;
 };
 
 QT_END_NAMESPACE

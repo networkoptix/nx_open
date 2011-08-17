@@ -99,6 +99,7 @@ NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
     m_stepBackwardButton = new ImageButtonItem;
     m_stepBackwardButton->addPixmap(QPixmap(":/skin/step_backward_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
     m_stepBackwardButton->addPixmap(QPixmap(":/skin/step_backward_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
+    m_stepBackwardButton->addPixmap(QPixmap(":/skin/step_backward_disabled.png"), ImageButtonItem::Disabled, ImageButtonItem::Background);
     m_stepBackwardButton->setMinimumSize(54, 30);
     m_stepBackwardButton->setMaximumSize(54, 30);
 
@@ -129,6 +130,7 @@ NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
     m_stepForwardButton = new ImageButtonItem;
     m_stepForwardButton->addPixmap(QPixmap(":/skin/step_forward_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
     m_stepForwardButton->addPixmap(QPixmap(":/skin/step_forward_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
+    m_stepForwardButton->addPixmap(QPixmap(":/skin/step_forward_disabled.png"), ImageButtonItem::Disabled, ImageButtonItem::Background);
     m_stepForwardButton->setMinimumSize(54, 30);
     m_stepForwardButton->setMaximumSize(54, 30);
 
