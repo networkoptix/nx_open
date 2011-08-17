@@ -35,7 +35,7 @@ QnAviArchiveDataProvider::QnAviArchiveDataProvider(QnResourcePtr ptr):
     m_formatContext(0),
     m_videoStreamIndex(-1),
     m_audioStreamIndex(-1),
-    mFirstTime(true),
+    m_initialized(false),
     m_bsleep(false),
     m_currentPacketIndex(0),
     m_eof(false),
@@ -126,7 +126,7 @@ bool QnAviArchiveDataProvider::init()
     // Alloc common resources
     av_init_packet(&m_packets[0]);
     av_init_packet(&m_packets[1]);
-
+    m_initialized = true;
     return true;
 }
 
@@ -199,11 +199,10 @@ bool QnAviArchiveDataProvider::initCodecs()
 
 QnAbstractDataPacketPtr QnAviArchiveDataProvider::getNextData()
 {
-	if (mFirstTime)
+	if (!m_initialized)
 	{
 		QMutexLocker mutex(&avi_mutex); // speeds up concurrent reading of lots of files, if files not cashed yet
 		init(); // this is here instead if constructor to unload ui thread
-		mFirstTime = false;
 	}
 
 	QnAviSemaphoreHelpr sem(aviSemaphore);

@@ -55,14 +55,14 @@ public:
    *   @return local address of socket
    *   @exception SocketException thrown if fetch fails
    */
-  std::string getLocalAddress() ;
+  std::string getLocalAddress() const;
 
   /**
    *   Get the local port
    *   @return local port of socket
    *   @exception SocketException thrown if fetch fails
    */
-  unsigned short getLocalPort() ;
+  unsigned short getLocalPort() const;
 
   /**
    *   Set the local port to the specified port and the local address

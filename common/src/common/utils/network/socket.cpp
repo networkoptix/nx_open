@@ -102,7 +102,7 @@ Socket::~Socket() {
   sockDesc = -1;
 }
 
-string Socket::getLocalAddress()
+string Socket::getLocalAddress() const
 {
   sockaddr_in addr;
   unsigned int addr_len = sizeof(addr);
@@ -115,7 +115,7 @@ string Socket::getLocalAddress()
   return inet_ntoa(addr.sin_addr);
 }
 
-unsigned short Socket::getLocalPort()
+unsigned short Socket::getLocalPort() const
 {
   sockaddr_in addr;
   unsigned int addr_len = sizeof(addr);

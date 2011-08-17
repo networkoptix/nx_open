@@ -12,15 +12,16 @@ class QnAviArchiveDataProvider: public QnNavigatedDataProvider
 public:
     QnAviArchiveDataProvider(QnResourcePtr ptr);
     virtual ~QnAviArchiveDataProvider();
+
+    virtual void channeljumpTo(quint64 mksec, int /*channel*/);
+    virtual void setSkipFramesToTime(quint64 skip);
+    virtual bool init();
 protected:
     virtual QnAbstractDataPacketPtr getNextData();
-    virtual bool init();
     virtual void destroy();
     virtual AVFormatContext* getFormatContext();
     virtual qint64 contentLength() const { return m_formatContext->duration; }
     bool initCodecs();
-    virtual void channeljumpTo(quint64 mksec, int /*channel*/);
-    virtual void setSkipFramesToTime(quint64 skip);
 private:
     AVPacket& currentPacket();
     AVPacket& nextPacket();
@@ -44,7 +45,7 @@ protected:
 
     int m_freq;
     int m_channels;
-    bool mFirstTime;
+    bool m_initialized;
     volatile bool m_wakeup;
     bool m_bsleep;
 

@@ -34,7 +34,8 @@ QnMediaResourceLayout* QnMediaResource::getMediaLayout() const
 QnAbstractMediaStreamDataProvider* QnMediaResource::addMediaProvider()
 {
     QnAbstractMediaStreamDataProvider* dp = createMediaProvider();
-    m_streamProviders[m_streamProviders.size()] = dp;
+    if (dp) 
+        m_streamProviders[m_streamProviders.size()] = dp;
     return dp;
 }
 

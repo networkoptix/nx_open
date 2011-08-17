@@ -10,13 +10,13 @@ public:
 
     void setSingleShotMode(bool single);
     bool isSingleShotMode() const;
-protected:
-    virtual void updateStreamParamsBasedOnQuality(); 
 
     virtual void channeljumpTo(quint64 mksec, int channel) = 0;
     quint64 skipFramesToTime() const;
     virtual void setSkipFramesToTime(quint64 skipFramesToTime);
     virtual quint64 startMksec() const { return m_startMksec; }
+protected:
+    virtual void updateStreamParamsBasedOnQuality(); 
 protected:
     quint64 m_lengthMksec;
     quint64 m_startMksec;
@@ -30,5 +30,7 @@ protected:
 private:
     quint64 m_skipFramesToTime;
 };
+
+typedef QSharedPointer<QnNavigatedDataProvider> QnNavigatedDataProviderPtr;
 
 #endif
