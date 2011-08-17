@@ -1,7 +1,7 @@
 TEMPLATE  = app
 TARGET    = client
 DESTDIR   = ../bin
-
+CONFIG -= flat
 CONFIG    *= qt warn_on debug_and_release
 
 #ICON = eve_logo.icns
