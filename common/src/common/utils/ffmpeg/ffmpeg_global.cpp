@@ -2,7 +2,6 @@
 
 #include <QtCore/QFile>
 #include <QtCore/QMutex>
-#include <QDir>
 
 extern "C" {
 #include <libavutil/avstring.h>
@@ -114,10 +113,12 @@ void QnFFmpeg::closeCodec(AVCodecContext *context)
 AVFormatContext *QnFFmpeg::openFileContext(const QString &filePath)
 {
     ensureInitialized();
+
     AVFormatContext *fileContext = 0;
-    QString url = QLatin1String("ufile:") + filePath;
-    int err = av_open_input_file(&fileContext, url.toUtf8().constData(), NULL, 0, NULL);
-    if (err >= 0)
+
+    const QByteArray url = "ufile:" + QFile::encodeName(filePath);
+    int err = av_open_input_file(&fileContext, url.constData(), NULL, 0, NULL);
+    if (err == 0)
     {
         QMutexLocker locker(QnFFmpeg::globalMutex());
         if (av_find_stream_info(fileContext) >= 0)
