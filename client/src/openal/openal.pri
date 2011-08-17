@@ -11,7 +11,12 @@ win* {
     INCLUDEPATH += $$PWD/../../contrib/openal/include
     LIBS += -L$$OPENAL_LIBS_PATH -lOpenAL32
 
-    QMAKE_POST_LINK += cp -r $$OPENAL_LIBS_PATH/*.dll $$DESTDIR
+    OPENAL_LIBS_DESTDIR = $$DESTDIR
+    win32-msvc* {
+        OPENAL_LIBS_PATH ~= s,/,\\,
+        OPENAL_LIBS_DESTDIR ~= s,/,\\,
+    }
+    QMAKE_POST_LINK += $$QMAKE_COPY $$OPENAL_LIBS_PATH$${DIR_SEPARATOR}*.dll $$OPENAL_LIBS_DESTDIR
 }
 
 mac {
