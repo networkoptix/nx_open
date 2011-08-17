@@ -930,14 +930,16 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
     showStop_helper();
 }
 
-void GraphicsView::mouseReleaseEvent ( QMouseEvent * event)
+void GraphicsView::mouseReleaseEvent(QMouseEvent * event)
 {
     if (!mViewStarted)
         return;
 
     if (m_timeAfterDoubleClick.elapsed() < doubl_clk_delay)
+    {
+        QGraphicsView::mouseReleaseEvent(event);
         return; // ignore some accident mouse click accidents after double click
-
+    }
 
     if (onUserInput(true, true))
         return;
