@@ -23,20 +23,23 @@ typedef struct ALCdevice_struct ALCdevice;
 class QtvSound
 {
 public:
-    QtvSound(ALCdevice* device, const QAudioFormat& audioFormat);
+    QtvSound(ALCdevice *device, const QAudioFormat &audioFormat);
     ~QtvSound();
 
     bool isValid() const { return m_isValid; }
 
-    uint playTimeElapsed();
-    void setVolumeLevel(float value); // in range 0..1
-    float getVolumeLevel() const;
+    // in range 0..1
+    float volumeLevel() const;
+    void setVolumeLevel(float volumeLevel);
 
-    bool play(const quint8* data, uint size);
+    uint playTimeElapsed();
+
+    bool play(const quint8 *data, uint size);
     void suspend();
     void resume();
     void clear();
-    static bool isFormatSupported(const QAudioFormat& format);
+
+    static bool isFormatSupported(const QAudioFormat &format);
 
 private:
     uint bufferTime() const;
@@ -45,9 +48,9 @@ private:
     uint bitRate() const;
     bool playImpl();
 
-    static bool outError(int err, const char* strerr);
-    static int checkOpenALErrorDebug(ALCdevice* device);
-    bool internalPlay(const void* data, uint size);
+    static bool outError(int err, const char *strerr);
+    static int checkOpenALErrorDebug(ALCdevice *device);
+    bool internalPlay(const void *data, uint size);
     void clearBuffers(bool clearAll);
 
 private:
@@ -67,8 +70,8 @@ private:
     uint m_bitsPerSample;
     uint m_size;
     bool m_isValid;
-    ALCdevice* m_device;
-    quint8* m_proxyBuffer;
+    ALCdevice *m_device;
+    quint8 *m_proxyBuffer;
     int m_proxyBufferLen;
     bool m_deinitialized;
 
@@ -76,7 +79,7 @@ private:
     void internalClear();
 
 public:
-    static int checkOpenALError(ALCdevice* device);
+    static int checkOpenALError(ALCdevice *device);
 };
 
 #endif // __QTVSOUND_H__

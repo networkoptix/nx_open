@@ -10,11 +10,10 @@
 
 #include <QtCore/QList>
 
-#include <QtMultimedia/QAudioFormat>
-
 typedef struct ALCdevice_struct ALCdevice;
 typedef struct ALCcontext_struct ALCcontext;
 
+class QAudioFormat;
 class QSettings;
 
 class QtvSound;
@@ -27,11 +26,12 @@ public:
     QtvAudioDevice();
     ~QtvAudioDevice();
 
-    QtvSound *addSound(const QAudioFormat& format);
-    void removeSound(QtvSound* soundObject);
+    QtvSound *addSound(const QAudioFormat &format);
+    void removeSound(QtvSound *soundObject);
 
-    void setVolume(float value); // in range 0..1
-    float getVolume() const;
+    // in range 0..1
+    float volume() const;
+    void setVolume(float value);
 
 private:
     QList<QtvSound *> m_sounds;

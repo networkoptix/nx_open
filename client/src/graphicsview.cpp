@@ -65,7 +65,7 @@ GraphicsView::GraphicsView(QWidget *parent)
 
     setAcceptDrops(true);
 
-    setMinimumWidth(600);
+    setMinimumSize(600, 400);
 
     setFrameShape(QFrame::NoFrame);
 
