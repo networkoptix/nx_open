@@ -54,6 +54,8 @@ public:
 
 	}
 
+    virtual bool isPaused() const { return m_onPause; }
+
 	virtual void resume()
 	{
 		m_onPause = false;

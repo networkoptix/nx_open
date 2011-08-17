@@ -14,7 +14,8 @@ static const int MAX_RTP_BUFFER_SIZE = 65535;
 
 QnRtspClientDataProvider::QnRtspClientDataProvider(QnResourcePtr res):
     QnNavigatedDataProvider(res),
-    m_tcpMode(true)
+    m_tcpMode(true),
+    m_rtpData(0)
 {
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
     m_isOpened = false;
@@ -32,7 +33,8 @@ QnRtspClientDataProvider::QnRtspClientDataProvider(QnResourcePtr res):
         url += res->getId().toString();
     m_rtspSession.setTransport("TCP");
     m_isOpened = m_rtspSession.open(url);
-    m_rtpData = m_rtspSession.play();
+    if (m_isOpened)
+        m_rtpData = m_rtspSession.play();
 }
 
 QnRtspClientDataProvider::~QnRtspClientDataProvider()
@@ -111,45 +113,43 @@ QnAbstractDataPacketPtr QnRtspClientDataProvider::processFFmpegRtpPayload(const 
 
 QnAbstractDataPacketPtr QnRtspClientDataProvider::getNextData()
 {
+    // sometime function may return zero packet if no data arrived
     QnAbstractDataPacketPtr result(0);
     if (!m_rtpData)
         return result;
-    while (1)
+
+    int rtpChannelNum = 0;
+    int blockSize  = m_rtpData->read((char*)m_rtpDataBuffer, MAX_RTP_BUFFER_SIZE);
+    if (blockSize < 1)
+        return result;
+    quint8* data = m_rtpDataBuffer;
+    if (m_tcpMode)
     {
-        int rtpChannelNum = 0;
-        int blockSize  = m_rtpData->read((char*)m_rtpDataBuffer, MAX_RTP_BUFFER_SIZE);
-        quint8* data = m_rtpDataBuffer;
-        if (m_tcpMode)
-        {
-            if (blockSize < 4) {
-                qWarning() << Q_FUNC_INFO << __LINE__ << "strange RTP/TCP packet. len < 4. Ignored";
-                continue;
-            }
-            rtpChannelNum = m_rtpDataBuffer[1];
-            blockSize -= 4;
-            data += 4;
+        if (blockSize < 4) {
+            qWarning() << Q_FUNC_INFO << __LINE__ << "strange RTP/TCP packet. len < 4. Ignored";
+            return result;
         }
-        else {
-            // todo: extract channel number from UDP ports map
-        }
-        const QString& format = m_rtspSession.getTrackFormat(rtpChannelNum);
-        if (format.toLower() == QLatin1String("ffmpeg")) {
-            result = processFFmpegRtpPayload(data, blockSize);
-            if (result)
-                break;
-        }
-        else {
-            qWarning() << Q_FUNC_INFO << __LINE__ << "Only FFMPEG payload format now implemeted. Ask developers to add '" << format << "' format";
-            break;
-        }
+        rtpChannelNum = m_rtpDataBuffer[1];
+        blockSize -= 4;
+        data += 4;
     }
+    else {
+        rtpChannelNum = m_rtpData->getSocket()->getLocalPort();
+    }
+    const QString& format = m_rtspSession.getTrackFormat(rtpChannelNum).toLower();
+    if (format == "ffmpeg") 
+        result = processFFmpegRtpPayload(data, blockSize);
+    else 
+        qWarning() << Q_FUNC_INFO << __LINE__ << "Only FFMPEG payload format now implemeted. Ask developers to add '" << format << "' format";
     return result;
 }
 
 void QnRtspClientDataProvider::updateStreamParamsBasedOnQuality()
 {
+
 }
 
 void QnRtspClientDataProvider::channeljumpTo(quint64 mksec, int channel)
 {
+
 }

@@ -31,6 +31,8 @@ protected:
         while (1)
         {
             QnAbstractDataPacketPtr data = dp->getNextData();
+            if (data == 0)
+                msleep(1);
         }
     }
 };
