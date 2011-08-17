@@ -755,6 +755,10 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
     if (!mViewStarted)
         return;
 
+    if (m_timeAfterDoubleClick.elapsed() < doubl_clk_delay)
+        return; // ignore some accident mouse click accidents after double click
+
+
     if (m_gridItem->isVisible() && !isCTRLPressed(event))
         m_gridItem->hideAnimated();
 
