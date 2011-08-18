@@ -5,7 +5,6 @@ SOURCES += $$PWD/ffmpegaudiodecoder.cpp \
         $$PWD/ffmpegvideodecoder.cpp
 
 win32-msvc* {
-    DEFINES += _USE_DXVA
 
     LIBS_PRIVATE += -ld3d9 -ldxva2
 
