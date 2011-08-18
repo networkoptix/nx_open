@@ -12,16 +12,15 @@ class CLVideoWindowItem;
 
 class CLGLRenderer : public CLAbstractRenderer
 {
-public:
+    friend class CLVideoWindowItem;
 
+public:
     enum CLGLDrawHardwareStatus
     {
         CL_GL_NOT_TESTED,
         CL_GL_SUPPORTED,
         CL_GL_NOT_SUPPORTED
     };
-
-    static void clearGarbage();
 
     CLGLRenderer(CLVideoWindowItem *vw);
     ~CLGLRenderer();
@@ -52,8 +51,10 @@ public:
     static bool isPixelFormatSupported(PixelFormat pixfmt);
 
 private:
-    void init(bool msgbox);
     static int gl_status;
+
+    void init(bool msgbox);
+    static void clearGarbage();
 
 private:
 #ifndef Q_OS_WIN
