@@ -13,7 +13,7 @@ static const int MAX_RTCP_PACKET_SIZE = 1024 * 2;
 static const quint32 SSRC_CONST = 0x2a55a9e8;
 static const quint32 CSRC_CONST = 0xe8a9552a;
 
-#define DEBUG_RTSP
+//#define DEBUG_RTSP
 
 RTPIODevice::RTPIODevice(RTPSession& owner):
     m_owner(owner),
@@ -581,7 +581,7 @@ bool RTPSession::readTextResponce(QByteArray& response)
                 response.append(QByteArray::fromRawData((char*)startPtr, curPtr - startPtr));
                 memmove(startPtr, curPtr, m_responseBufferLen - (curPtr - startPtr));
                 m_responseBufferLen -= curPtr - startPtr;
-                if (!response.isEmpty()) 
+                if (!response.isEmpty())
                 {
 #ifdef DEBUG_RTSP
                     WRITE_DEBUG_FILE;
