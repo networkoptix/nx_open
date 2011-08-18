@@ -328,7 +328,6 @@ void CLGLRenderer::init(bool msgbox)
             box->show();
             // ### fix leaking
         }
-
     }
 
     if (m_forceSoftYUV)
@@ -528,14 +527,17 @@ void CLGLRenderer::updateTexture()
     int r_w[3] = { m_width, m_width / 2, m_width / 2 }; // real_width / visable
     int h[3] = { m_height, m_height / 2, m_height / 2 };
 
-    if (m_color == PIX_FMT_YUV422P)
-        h[1] = h[2] = m_height;
-
-    if (m_color == PIX_FMT_YUV444P)
+    switch (m_color)
     {
-        h[1] = h[2] = m_height;
+    case PIX_FMT_YUV444P:
         w[1] = w[2] = m_stride;
         r_w[1] = r_w[2] = m_width;
+    // fall through
+    case PIX_FMT_YUV422P:
+        h[1] = h[2] = m_height;
+        break;
+    default:
+        break;
     }
     //int round_width[3] = {roundUp(w[0]), roundUp(w[1]), roundUp(w[2])};
     //int round_width[3] = {roundUp(r_w[0]), roundUp(r_w[1]), roundUp(r_w[2])};
@@ -668,37 +670,40 @@ void CLGLRenderer::updateTexture()
         }
 
         int lineInPixelsSize = m_stride;
-        if (m_color == PIX_FMT_YUV422P)
+        switch (m_color)
         {
+        case PIX_FMT_YUV422P:
             yuv422_argb32_mmx(pixels, m_arrayPixels[0], m_arrayPixels[2], m_arrayPixels[1],
                               roundUp(r_w[0]),
                               h[0],
                               4 * m_stride,
                               m_stride, m_stride / 2);
-        }
-        else if (m_color == PIX_FMT_YUV420P)
-        {
+            break;
+
+        case PIX_FMT_YUV420P:
             yuv420_argb32_mmx(pixels, m_arrayPixels[0], m_arrayPixels[2], m_arrayPixels[1],
                               roundUp(r_w[0]),
                               h[0],
                               4 * m_stride,
                               m_stride, m_stride / 2);
-        }
-        else if (m_color == PIX_FMT_YUV444P)
-        {
+            break;
+
+        case PIX_FMT_YUV444P:
             yuv444_argb32_mmx(pixels, m_arrayPixels[0], m_arrayPixels[2], m_arrayPixels[1],
                               roundUp(r_w[0]),
                               h[0],
                               4 * m_stride,
                               m_stride, m_stride);
-        }
-        else if (m_color == PIX_FMT_RGB24 || m_color == PIX_FMT_BGR24)
-        {
+            break;
+
+        case PIX_FMT_RGB24:
+        case PIX_FMT_BGR24:
             lineInPixelsSize /= 3;
-        }
-        else
-        {
+            break;
+
+        default:
             lineInPixelsSize /= 4; // RGBA, BGRA
+            break;
         }
 
         glPixelStorei(GL_UNPACK_ROW_LENGTH, lineInPixelsSize);
