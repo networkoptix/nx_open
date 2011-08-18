@@ -12,7 +12,6 @@ extern "C" {
 }
 
 CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale) :
-    m_lightCPUmode(false),
     m_canDownscale(canDownscale),
     m_prevFactor(CLVideoDecoderOutput::factor_1),
     m_scaleFactor(CLVideoDecoderOutput::factor_1),
@@ -27,6 +26,8 @@ CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale) :
 
 CLVideoStreamDisplay::~CLVideoStreamDisplay()
 {
+    QMutexLocker mutex(&m_mtx);
+
     qDeleteAll(m_decoder);
 
     freeScaleContext();
@@ -131,6 +132,12 @@ CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::determineScaleFacto
 
 void CLVideoStreamDisplay::dispay(QnCompressedVideoDataPtr data, bool draw, CLVideoDecoderOutput::downscale_factor force_factor)
 {
+    if (data->compressionType == CODEC_ID_NONE)
+    {
+        cl_log.log(QLatin1String("CLVideoStreamDisplay::dispay: unknown codec type..."), cl_logERROR);
+        return;
+    }
+
     CLVideoData img;
 
     img.inBuffer = (unsigned char*)(data->data.data()); // :-)
@@ -139,28 +146,18 @@ void CLVideoStreamDisplay::dispay(QnCompressedVideoDataPtr data, bool draw, CLVi
     img.useTwice = data->useTwice;
     img.width = data->width;
     img.height = data->height;
+    img.codec = data->compressionType;
 
-    CLAbstractVideoDecoder* dec;
+    CLAbstractVideoDecoder *decoder;
     {
         QMutexLocker mutex(&m_mtx);
 
-        if (data->compressionType == CODEC_ID_NONE)
-        {
-            cl_log.log(QLatin1String("CLVideoStreamDisplay::dispay: unknown codec type..."), cl_logERROR);
-            return;
-        }
-
-        if (m_decoder[data->compressionType]==0)
-        {
-            m_decoder[data->compressionType] = CLVideoDecoderFactory::createDecoder(data->compressionType, data->context);
-            m_decoder[data->compressionType]->setLightCpuMode(m_lightCPUmode);
-        }
-
-        img.codec = data->compressionType;
-        dec = m_decoder[data->compressionType];
+        decoder = m_decoder.value(data->compressionType);
+        if (!decoder)
+            m_decoder.insert(data->compressionType, CLVideoDecoderFactory::createDecoder(data->compressionType, data->context));
     }
 
-    if (!dec || !dec->decode(img))
+    if (!decoder || !decoder->decode(img))
     {
         CL_LOG(cl_logDEBUG2) cl_log.log(QLatin1String("CLVideoStreamDisplay::dispay: decoder cannot decode image..."), cl_logDEBUG2);
         return;
@@ -229,15 +226,6 @@ bool CLVideoStreamDisplay::rescaleFrame(CLVideoDecoderOutput& outFrame, int newW
     m_outFrame.stride3 = m_frameYUV->linesize[2];
 
     return true;
-}
-
-void CLVideoStreamDisplay::setLightCPUMode(bool val)
-{
-    m_lightCPUmode = val;
-    QMutexLocker mutex(&m_mtx);
-
-    foreach (CLAbstractVideoDecoder* decoder, m_decoder)
-        decoder->setLightCpuMode(val);
 }
 
 void CLVideoStreamDisplay::copyImage(bool copy)

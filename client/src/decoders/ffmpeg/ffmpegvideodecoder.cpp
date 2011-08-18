@@ -17,9 +17,6 @@ CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(int codecId, AVCodecContext *codecCon
     m_width(0), m_height(0),
     m_codecId(codecId),
     m_showmotion(false),
-    m_lightCPUMode(false),
-    m_wantEscapeFromLightCPUMode(false),
-    m_lightModeFrameCounter(0),
     m_lastWidth(0)
 {
     QnFFmpeg::initialize();
@@ -145,34 +142,6 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData &data)
 {
     if (!m_context)
         return false;
-
-    if (m_wantEscapeFromLightCPUMode && data.keyFrame)
-    {
-        m_wantEscapeFromLightCPUMode = false;
-        m_lightModeFrameCounter = 0;
-        m_lightCPUMode = false;
-    }
-
-    if (m_lightCPUMode)
-    {
-        if (data.codec == CODEC_ID_MJPEG)
-        {
-            if (m_lightModeFrameCounter < LIGHT_CPU_MODE_FRAME_PERIOD)
-            {
-                ++m_lightModeFrameCounter;
-                return false;
-            }
-            else
-            {
-                m_lightModeFrameCounter = 0;
-            }
-        }
-        else // h.264
-        {
-            if (!data.keyFrame)
-                return false;
-        }
-    }
 
     /*if (width != m_width || height != m_height))
     {
@@ -317,20 +286,6 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData &data)
     //cl_log.log("CLFFmpegVideoDecoder::decode(): cannot decode image!", cl_logWARNING);
 
     return false;
-}
-
-void CLFFmpegVideoDecoder::setLightCpuMode(bool val)
-{
-    if (val)
-    {
-        m_lightCPUMode = true;
-        m_wantEscapeFromLightCPUMode = false;
-        m_lightModeFrameCounter = 0;
-    }
-    else
-    {
-        m_wantEscapeFromLightCPUMode = true;
-    }
 }
 
 void CLFFmpegVideoDecoder::showMotion(bool show)

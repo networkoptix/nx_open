@@ -17,8 +17,6 @@ public:
 
     virtual void showMotion(bool show ) = 0;
 
-    virtual void setLightCpuMode(bool val) = 0;
-
     void setMTDecoding(bool value)
     {
         if (m_mtDecoding != value)

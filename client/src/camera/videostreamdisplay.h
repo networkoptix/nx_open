@@ -27,7 +27,6 @@ public:
     void dispay(QnCompressedVideoDataPtr data, bool draw,
                 CLVideoDecoderOutput::downscale_factor force_factor = CLVideoDecoderOutput::factor_any);
 
-    void setLightCPUMode(bool val);
     void copyImage(bool copy);
 
     CLVideoDecoderOutput::downscale_factor getCurrentDownscaleFactor() const;
@@ -43,7 +42,6 @@ private:
       */
     CLVideoDecoderOutput m_outFrame;
 
-    bool m_lightCPUmode;
     bool m_canDownscale;
 
     CLVideoDecoderOutput::downscale_factor m_prevFactor;
