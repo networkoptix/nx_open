@@ -1401,7 +1401,8 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
             menu.addMenu(&distance_menu);
         }
 
-        menu.addAction(&cm_togglefs);
+//        menu.addAction(&cm_togglefs);
+        menu.addAction(&cm_toggle_fullscreen);
         menu.addAction(&cm_preferences);
         menu.addSeparator();
         menu.addAction(&cm_exit);
