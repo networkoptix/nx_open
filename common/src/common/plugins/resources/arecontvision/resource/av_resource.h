@@ -24,8 +24,6 @@ public:
 
 	virtual bool setHostAddress(const QHostAddress& ip, QnDomain domain);
 
-	bool getBasicInfo();
-
     QString toSearchString() const;
 
 	virtual bool getDescription() {return true;};

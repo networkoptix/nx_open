@@ -21,7 +21,7 @@ QnResourceCommandProcessor& commendProcessor()
 
 
 
-QnResource::QnManufacturesParamsLists QnResource::staticResourcesParamLists; // list of all supported devices params list
+QnResource::QnParamLists QnResource::staticResourcesParamLists; // list of all supported devices params list
 
 
 QnResource::QnResource()
@@ -83,6 +83,19 @@ QnId QnResource::getParentId() const
     return m_parentId;
 }
 
+QnResourceTypeId QnResource::getTypeId() const
+{
+    QMutexLocker locker(&m_mutex);
+    return m_typeId;
+}
+
+void QnResource::setTypeId(const QnResourceTypeId& id)
+{
+    QMutexLocker locker(&m_mutex);
+    m_typeId = id;
+}
+
+
 QDateTime QnResource::getLastDiscoveredTime() const
 {
     QMutexLocker locker(&m_mutex);
@@ -119,10 +132,6 @@ void QnResource::setName(const QString& name)
     m_name = name;
 }
 
-QString QnResource::oemName() const
-{
-    return manufacture();
-}
 
 void QnResource::addTag(const QString& tag)
 {
@@ -319,7 +328,7 @@ QnParamList& QnResource::getResourceParamList()
 	QMutexLocker locker(&m_mutex);
 
 	if (m_resourceParamList.empty())
-		m_resourceParamList = staticResourcesParamLists[manufacture()][m_name];
+		m_resourceParamList = staticResourcesParamLists[getTypeId()];
 
 	return m_resourceParamList;
 }
@@ -329,16 +338,12 @@ const QnParamList& QnResource::getResourceParamList() const
 	QMutexLocker locker(&m_mutex);
 
 	if (m_resourceParamList.empty())
-		m_resourceParamList = staticResourcesParamLists[manufacture()][m_name];
+		m_resourceParamList = staticResourcesParamLists[getTypeId()];
 
 	return m_resourceParamList;
 
 }
 
-QStringList QnResource::supportedResources(QString manufacture)
-{
-    return staticResourcesParamLists[manufacture].keys();
-}
 
 void QnResource::addConsumer(QnResourceConsumer* consumer)
 {
@@ -451,7 +456,6 @@ bool QnResource::loadDevicesParam(const QString& fileName)
 bool QnResource::parseResource(const QDomElement &resource)
 {
     QString error;
-    QString manufacture; //todo
     if (!resource.hasAttribute("id"))
     {
         error = "Cannot find id of the resource.";
@@ -461,10 +465,10 @@ bool QnResource::parseResource(const QDomElement &resource)
 
     QString resourceName = resource.attribute("id");
 
-    QnParamLists::iterator it1 = staticResourcesParamLists[manufacture].find(resourceName);
+    QnParamLists::iterator it1 = staticResourcesParamLists.find(resourceName);
 
 
-    if (it1!=staticResourcesParamLists[manufacture].end())
+    if (it1!=staticResourcesParamLists.end())
     {
         QTextStream str(&error);
         str << "Such resource " << resourceName << " already exists.";
@@ -482,9 +486,9 @@ bool QnResource::parseResource(const QDomElement &resource)
         while(lst_iter.hasNext())
         {
             QString val = lst_iter.next().trimmed();
-            QnParamLists::iterator it1 = staticResourcesParamLists[manufacture].find(val);
+            QnParamLists::iterator it1 = staticResourcesParamLists.find(val);
 
-            if (it1!=staticResourcesParamLists[manufacture].end())
+            if (it1!=staticResourcesParamLists.end())
                 device_param_list.inheritedFrom(it1.value());
             else
                 cl_log.log("Smth wrong with public tag for ", resourceName, cl_logWARNING);
@@ -497,7 +501,7 @@ bool QnResource::parseResource(const QDomElement &resource)
     QDomNode node = resource.firstChild();
     if (node.isNull())
     {
-        staticResourcesParamLists[manufacture][resourceName] = device_param_list;
+        staticResourcesParamLists[resourceName] = device_param_list;
         return true; // just public make sence
     }
 
@@ -524,7 +528,7 @@ bool QnResource::parseResource(const QDomElement &resource)
             paramNode  = paramNode.nextSibling();
         }
 
-        staticResourcesParamLists[manufacture][resourceName] = device_param_list;
+        staticResourcesParamLists[resourceName] = device_param_list;
 
         // move to stream_params
         node = node.nextSibling();
@@ -658,34 +662,34 @@ bool QnResource::parseParam(const QDomElement &element, QnParamList& paramlist)
 
 //========================================================================================
 
-struct ResourcesBasicInfoHelper
+struct ResourcesBeforeUseHelper
 {
-    ResourcesBasicInfoHelper(QnResourcePtr d)
+    ResourcesBeforeUseHelper(QnResourcePtr d)
     {
         resource = d;
     }
 
     void f()
     {
-        resource->getBasicInfo();
+        resource->beforeUse();
     }
 
     QnResourcePtr resource;
 };
 
 
-void getResourcesBasicInfo(QnResourceList& lst, int threads)
+void resourcesBeforeUseHelper(QnResourceList& lst, int threads)
 {
     // cannot make concurrent work with pointer CLDevice* ; => so extra steps needed
-    cl_log.log("Getting resource info...", cl_logDEBUG1);
+    cl_log.log("Calling BeforeUse for resources...", cl_logDEBUG1);
     QTime time;
     time.start();
 
-    QList<ResourcesBasicInfoHelper> local_list;
+    QList<ResourcesBeforeUseHelper> local_list;
 
 	QThreadPool* global = QThreadPool::globalInstance();
 	for (int i = 0; i < threads; ++i ) global->releaseThread();
-	QtConcurrent::blockingMap(local_list, &ResourcesBasicInfoHelper::f);
+	QtConcurrent::blockingMap(local_list, &ResourcesBeforeUseHelper::f);
 	for (int i = 0; i < threads; ++i )global->reserveThread();
 
 	CL_LOG(cl_logDEBUG1)

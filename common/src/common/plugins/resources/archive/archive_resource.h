@@ -13,7 +13,6 @@ public:
     virtual QnStreamQuality getBestQualityForSuchOnScreenSize(QSize size) const { return QnQualityPreSeted; }
 
     virtual QnResourcePtr updateResource() { return QnResourcePtr(this); }
-    virtual bool getBasicInfo() { return true; }
     virtual void beforeUse() {}
 
     virtual QString manufacture() const { return "Archive"; }

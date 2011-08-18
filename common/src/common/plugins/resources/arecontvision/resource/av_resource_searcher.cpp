@@ -25,7 +25,7 @@ QnPlArecontResourceSearcher::QnPlArecontResourceSearcher()
 		{
 			QString msg;
 			QTextStream str(&msg) ;
-			QStringList lst = QnResource::supportedResources(manufacture());
+			QStringList lst;// = QnResource::supportedSuchResourceTypeId(manufacture());
 			str << "Ssupported devices loaded; size = " << lst.size() << ": " << endl << lst.join("\n");
 			cl_log.log(msg, cl_logINFO);
 		}

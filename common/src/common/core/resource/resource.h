@@ -15,7 +15,7 @@ class QnResourceConsumer;
 class QnResource;
 typedef QSharedPointer<QnResource> QnResourcePtr;
 typedef QList<QnResourcePtr> QnResourceList;
-
+typedef QString QnResourceTypeId; 
 
 enum QnDomain
 {
@@ -61,6 +61,12 @@ public:
 	void setParentId(const QnId& parent);
 	QnId getParentId() const;
 
+    // TypeId unique string id for resource with SUCH list of params and CLASS 
+    // in other words TypeId can be used instantiate the right resource  
+    QnResourceTypeId getTypeId() const;
+    void setTypeId(const QnResourceTypeId& id);
+
+
     // this value is updated by discovery process
     QDateTime getLastDiscoveredTime() const;
     void setLastDiscoveredTime(const QDateTime &time);
@@ -73,11 +79,6 @@ public:
 	//Name is class of the devices. like 2105DN; => arecontvision 2 megapixel H.264 day night camera;
 	QString getName() const;
 	void setName(const QString& name);
-
-    // like arecont or iqinvision
-    virtual QString manufacture() const = 0;
-    virtual QString oemName() const;
-
 
     void addTag(const QString& tag);
     void removeTag(const QString& tag);
@@ -116,10 +117,6 @@ public:
     //=============
 
 
-    // gets resource basic info; may be firmware version or so
-    // return false if not accessible
-    virtual bool getBasicInfo() = 0;
-
     // this function must be called before use the resource
     // for example some on some cameras we have to setup sensor geometry and I frame frequency
     virtual void beforeUse() = 0;
@@ -154,18 +151,14 @@ public:
 	static int commandProcQueSize();
 	static bool commandProcHasSuchResourceInQueue(QnResourcePtr res);
 
-	static QStringList supportedResources(QString manufacture);
-
 	static bool loadDevicesParam(const QString& fileName);
 private:
     static bool parseResource(const QDomElement &element);
     static bool parseParam(const QDomElement &element, QnParamList& paramlist);
 
 protected:
-    typedef QMap<QString, QnParamList > QnParamLists;
-    typedef QMap<QString, QnParamLists> QnManufacturesParamsLists;
-
-    static QnManufacturesParamsLists staticResourcesParamLists; // list of all supported resources params list
+    typedef QMap<QnResourceTypeId, QnParamList > QnParamLists;
+    static QnParamLists staticResourcesParamLists; // list of all supported resources params list
 
 protected:
     mutable QMutex m_mutex; // resource mutex for everything
@@ -179,6 +172,9 @@ protected:
 private:
     QnId m_Id; //+
     QnId m_parentId;
+
+    QnResourceTypeId m_typeId;
+
     QStringList m_tags;
     bool m_avalable;
 
