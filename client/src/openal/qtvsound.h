@@ -44,7 +44,7 @@ public:
 private:
     uint bufferTime() const;
     bool setup();
-    static int getFormat(const QAudioFormat& audioFormat);
+    static int getFormat(const QAudioFormat &audioFormat);
     uint bitRate() const;
     bool playImpl();
 
