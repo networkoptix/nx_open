@@ -27,7 +27,7 @@ public:
 
     static int getMaxTextureSize();
 
-    void draw(CLVideoDecoderOutput& image, unsigned int channel);
+    void draw(CLVideoDecoderOutput &image, unsigned int channel);
 
     bool paintEvent(const QRect& r);
 
@@ -47,7 +47,6 @@ public:
         m_saturation = saturation + 1.;
     }
 
-    void copyVideoDataBeforePainting(bool copy);
     static bool isPixelFormatSupported(PixelFormat pixfmt);
 
 private:

@@ -168,12 +168,6 @@ QPointF CLVideoWindowItem::getBestSubItemPos(CLSubItemType type)
     }
 }
 
-void CLVideoWindowItem::copyVideoDataBeforePainting(bool copy)
-{
-    for (unsigned i = 0; i  < m_videonum; ++i)
-        m_gldraw[i]->copyVideoDataBeforePainting(copy);
-}
-
 QRect CLVideoWindowItem::getSubChannelRect(unsigned int channel) const
 {
     if (m_videonum==1) // most case scenario

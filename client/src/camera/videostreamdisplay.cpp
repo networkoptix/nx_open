@@ -224,11 +224,6 @@ bool CLVideoStreamDisplay::rescaleFrame(CLVideoDecoderOutput& outFrame, int newW
     return true;
 }
 
-void CLVideoStreamDisplay::copyImage(bool copy)
-{
-    m_renderer->copyVideoDataBeforePainting(copy);
-}
-
 CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::findScaleFactor(int width, int height, int fitWidth, int fitHeight)
 {
     if (fitWidth * 8 <= width  && fitHeight * 8 <= height)

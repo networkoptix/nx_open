@@ -150,7 +150,6 @@ CLGLRenderer::CLGLRenderer(CLVideoWindowItem *vw) :
     m_gotnewimage(false),
     m_needwait(true),
     m_videowindow(vw),
-    m_abort_drawing(false),
     m_inited(false)
 {
     applyMixerSettings(m_brightness, m_contrast, m_hue, m_saturation);
@@ -390,29 +389,11 @@ void CLGLRenderer::beforeDestroy()
     m_waitCon.wakeOne();
 }
 
-void CLGLRenderer::copyVideoDataBeforePainting(bool copy)
-{
-    m_copyData = copy;
-    m_needwait = !copy;
-    if (copy)
-    {
-        m_abort_drawing = true; // after we cancel wait process we need to abort_draw.
-        m_waitCon.wakeOne();
-    }
-}
-
-void CLGLRenderer::draw(CLVideoDecoderOutput &img, unsigned int channel)
+void CLGLRenderer::draw(CLVideoDecoderOutput &image, unsigned int channel)
 {
     Q_UNUSED(channel);
 
     QMutexLocker locker(&m_mutex);
-
-    m_abort_drawing = false;
-
-    if (m_copyData)
-        CLVideoDecoderOutput::copy(&img, &m_image);
-
-    const CLVideoDecoderOutput &image =  m_copyData ?  m_image : img;
 
     m_stride = image.stride1;
     m_height = image.height;
@@ -843,9 +824,6 @@ bool CLGLRenderer::paintEvent(const QRect &r)
 {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    if (m_abort_drawing)
-        return true;
 
     if (!m_inited)
     {

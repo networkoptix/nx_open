@@ -26,8 +26,6 @@ public:
     void dispay(QnCompressedVideoDataPtr data, bool draw,
                 CLVideoDecoderOutput::downscale_factor force_factor = CLVideoDecoderOutput::factor_any);
 
-    void copyImage(bool copy);
-
     CLVideoDecoderOutput::downscale_factor getCurrentDownscaleFactor() const;
 
 private:
