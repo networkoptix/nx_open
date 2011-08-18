@@ -99,6 +99,7 @@ QnAbstractDataPacketPtr QnRtspClientDataProvider::processFFmpegRtpPayload(const 
                 return result;
             }
             m_nextDataPacket[ssrc] = nextPacket;
+            nextPacket->compressionType = context->codec_id;
         }
         nextPacket->data.write((const char*)payload, dataSize);
         if (rtpHeader->marker)
@@ -137,6 +138,9 @@ QnAbstractDataPacketPtr QnRtspClientDataProvider::getNextData()
         rtpChannelNum = m_rtpData->getSocket()->getLocalPort();
     }
     const QString& format = m_rtspSession.getTrackFormat(rtpChannelNum).toLower();
+    if (format.isNull()) {
+        qWarning() << Q_FUNC_INFO << __LINE__ << "RTP track" << rtpChannelNum << "not found";
+    }
     if (format == "ffmpeg") 
         result = processFFmpegRtpPayload(data, blockSize);
     else 

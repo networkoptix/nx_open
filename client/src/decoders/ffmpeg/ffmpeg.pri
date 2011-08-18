@@ -4,7 +4,7 @@ HEADERS += $$PWD/ffmpegaudiodecoder_p.h \
 SOURCES += $$PWD/ffmpegaudiodecoder.cpp \
         $$PWD/ffmpegvideodecoder.cpp
 
-win32-msvc* {
+win32-msvc*:0 { # disable for now...
     DEFINES += _USE_DXVA
 
     LIBS_PRIVATE += -ld3d9 -ldxva2
