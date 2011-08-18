@@ -1,3 +1,4 @@
+#include <QFile>
 #include "rtpsession.h"
 #include "rtp_stream_parser.h"
 
@@ -12,6 +13,7 @@ static const int MAX_RTCP_PACKET_SIZE = 1024 * 2;
 static const quint32 SSRC_CONST = 0x2a55a9e8;
 static const quint32 CSRC_CONST = 0xe8a9552a;
 
+#define DEBUG_RTSP
 
 RTPIODevice::RTPIODevice(RTPSession& owner):
     m_owner(owner),
@@ -531,10 +533,16 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
 
                 memmove(curPtr, curPtr + dataLen, m_responseBuffer + m_responseBufferLen - (curPtr+dataLen));
                 m_responseBufferLen -= dataLen;
-                if (origData[4] != 0x80)
-                {
-                    int gg = 4;
+#ifdef DEBUG_RTSP
+                static QFile* binaryFile = 0;
+                if (!binaryFile) {
+                    binaryFile = new QFile("c:/binary.rtsp");
+                    binaryFile->open(QFile::WriteOnly);
                 }
+                binaryFile->write((const char*) origData, demuxedCount);
+                binaryFile->flush();
+
+#endif
                 return demuxedCount;
             }
         }
@@ -545,6 +553,19 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
 // demux text data only
 bool RTPSession::readTextResponce(QByteArray& response)
 {
+
+#ifdef DEBUG_RTSP
+    static QFile* textFile = 0;
+#define WRITE_DEBUG_FILE \
+    if (!textFile) { \
+        textFile = new QFile("c:/text.rtsp"); \
+        textFile->open(QFile::WriteOnly); \
+    } \
+    textFile->write(response); \
+    textFile->flush();
+
+#endif
+
     bool readMoreData = false; // try to process existing buffer at first
     for (int k = 0; k < 10; ++k) // if binary data ahead text data, read more. read 10 packets at maxumum
     {
@@ -560,8 +581,13 @@ bool RTPSession::readTextResponce(QByteArray& response)
                 response.append(QByteArray::fromRawData((char*)startPtr, curPtr - startPtr));
                 memmove(startPtr, curPtr, m_responseBufferLen - (curPtr - startPtr));
                 m_responseBufferLen -= curPtr - startPtr;
-                if (!response.isEmpty())
+                if (!response.isEmpty()) 
+                {
+#ifdef DEBUG_RTSP
+                    WRITE_DEBUG_FILE;
+#endif
                     return true;
+                }
 
                 int dataRest = m_responseBuffer + m_responseBufferLen - startPtr;
                 if (dataRest < 4)
@@ -589,8 +615,12 @@ bool RTPSession::readTextResponce(QByteArray& response)
             response.append(QByteArray::fromRawData((char*)startPtr, curPtr - startPtr));
             memmove(startPtr, curPtr, m_responseBufferLen - (curPtr - startPtr));
             m_responseBufferLen -= curPtr - startPtr;
-            if (!response.isEmpty())
+            if (!response.isEmpty()) {
+#ifdef DEBUG_RTSP
+                WRITE_DEBUG_FILE;
+#endif
                 return true;
+            }
         }
         readMoreData = true;
     }
