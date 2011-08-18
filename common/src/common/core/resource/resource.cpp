@@ -37,7 +37,7 @@ QnResource::QnResource()
 QnResource::~QnResource()
 {
 	--inst;
-	cl_log.log("inst", inst, cl_logDEBUG1);
+	//cl_log.log("inst", inst, cl_logDEBUG1);
 }
 
 void QnResource::addFlag(unsigned long flag)

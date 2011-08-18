@@ -35,7 +35,9 @@ CLLog::CLLog()
 
 CLLog::~CLLog()
 {
-    delete d;
+    // Server fails if exit in Ctrl+C in file destructor.
+    // I have commented this line because I am going to refactor ClLog to QDebug() at future
+    //delete d;
 }
 
 bool CLLog::create(const QString& base_name,
