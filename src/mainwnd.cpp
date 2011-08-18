@@ -179,6 +179,7 @@ void MainWnd::handleMessage(const QString& message)
     QStringList files = message.trimmed().split(QLatin1Char('\0'), QString::SkipEmptyParts);
 
     addFilesToCurrentOrNewLayout(files);
+    raise();
     activateWindow();
 }
 
@@ -214,5 +215,6 @@ void MainWnd::dropEvent(QDropEvent *event)
     }
 
     addFilesToCurrentOrNewLayout(files, event->keyboardModifiers() & Qt::AltModifier);
+    raise();
     activateWindow();
 }
