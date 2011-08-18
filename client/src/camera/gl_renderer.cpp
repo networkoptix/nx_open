@@ -154,6 +154,8 @@ CLGLRenderer::CLGLRenderer(CLVideoWindowItem *vw) :
     m_inited(false)
 {
     applyMixerSettings(m_brightness, m_contrast, m_hue, m_saturation);
+
+    (void)CLGLRenderer::getMaxTextureSize();
 }
 
 int CLGLRenderer::checkOpenGLError() const
