@@ -322,9 +322,18 @@ void NavigationItem::rewindForward()
 {
     CLAbstractArchiveReader *reader = static_cast<CLAbstractArchiveReader*>(m_camera->getStreamreader());
 
-    reader->jumpTo(reader->lengthMksec(), true);
+    bool stopped = reader->onPause();
+    if (stopped)
+        play();
+
+    reader->jumpTo(reader->lengthMksec(), false);
     m_camera->streamJump(reader->lengthMksec());
     reader->resumeDataProcessors();
+    if (stopped)
+    {
+        qApp->processEvents();
+        pause();
+    }
 }
 
 void NavigationItem::stepBackward()
