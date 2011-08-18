@@ -15,7 +15,7 @@ class QnResourceConsumer;
 class QnResource;
 typedef QSharedPointer<QnResource> QnResourcePtr;
 typedef QList<QnResourcePtr> QnResourceList;
-typedef QString QnResourceTypeId; 
+typedef QString QnResourceTypeId;
 
 enum QnDomain
 {
@@ -28,8 +28,8 @@ enum QnDomain
 class QnResource : public QObject
 {
     Q_OBJECT
-public:
 
+public:
     enum
     {
         network = 0x01, // resource has ip and mac
@@ -44,8 +44,8 @@ public:
     };
 
 
-	QnResource();
-	virtual ~QnResource();
+    QnResource();
+    virtual ~QnResource();
 
     //returns true if resources are equal to each other
     virtual bool equalsTo(const QnResourcePtr other) const = 0;
@@ -58,11 +58,11 @@ public:
     QnId getId() const;
     void setId(const QnId& id);
 
-	void setParentId(const QnId& parent);
-	QnId getParentId() const;
+    void setParentId(const QnId& parent);
+    QnId getParentId() const;
 
-    // TypeId unique string id for resource with SUCH list of params and CLASS 
-    // in other words TypeId can be used instantiate the right resource  
+    // TypeId unique string id for resource with SUCH list of params and CLASS
+    // in other words TypeId can be used instantiate the right resource
     QnResourceTypeId getTypeId() const;
     void setTypeId(const QnResourceTypeId& id);
 
@@ -76,9 +76,9 @@ public:
     bool available() const;
     void setAvailable(bool av);
 
-	//Name is class of the devices. like 2105DN; => arecontvision 2 megapixel H.264 day night camera;
-	QString getName() const;
-	void setName(const QString& name);
+    //Name is class of the devices. like 2105DN; => arecontvision 2 megapixel H.264 day night camera;
+    QString getName() const;
+    void setName(const QString& name);
 
     void addTag(const QString& tag);
     void removeTag(const QString& tag);
@@ -89,22 +89,22 @@ public:
     virtual QString toSearchString() const;
 
 
-	bool hasSuchParam(const QString& name) const;
+    bool hasSuchParam(const QString& name) const;
 
-	// return true if no error
-	virtual bool getParam(const QString& name, QnValue& val, QnDomain domain);
+    // return true if no error
+    virtual bool getParam(const QString& name, QnValue& val, QnDomain domain);
 
     // same as getParam is invoked in separate thread.
-    // as soon as param changed onParametrChanged signal is emitted
+    // as soon as param changed onParameterChanged signal is emitted
     void getParamAsynch(const QString& name, QnValue& val, QnDomain domain);
 
 
-	// return true if no error
-	virtual bool setParam(const QString& name, const QnValue& val, QnDomain domain);
+    // return true if no error
+    virtual bool setParam(const QString& name, const QnValue& val, QnDomain domain);
 
-	// same as setParam but but returns immediately;
-	// this function leads setParam invoke in separate thread. so no need to make it virtual
-	void setParamAsynch(const QString& name, const QnValue& val, QnDomain domain);
+    // same as setParam but but returns immediately;
+    // this function leads setParam invoke in separate thread. so no need to make it virtual
+    void setParamAsynch(const QString& name, const QnValue& val, QnDomain domain);
 
     //=============
     // some time we can find resource, but cannot request additional information from it ( resource has bad ip for example )
@@ -121,8 +121,8 @@ public:
     // for example some on some cameras we have to setup sensor geometry and I frame frequency
     virtual void beforeUse() = 0;
 
-	QnParamList& getResourceParamList();// returns params that can be changed on device level
-	const QnParamList& getResourceParamList() const;
+    QnParamList& getResourceParamList();// returns params that can be changed on device level
+    const QnParamList& getResourceParamList() const;
 
 
     void addConsumer(QnResourceConsumer* consumer);
@@ -140,18 +140,19 @@ protected:
     // some resources might have special params; to setup such params not usual sceme is used
     // if function returns true setParam does not do usual routine
     virtual bool setSpecialParam(const QString& name, const QnValue& val, QnDomain domain);
-signals:
 
-    void onParametrChanged(QString paramname, QString value);
+Q_SIGNALS:
+    void onParameterChanged(const QString &paramname, const QString &value);
 
 public:
-	static void startCommandProc();
-	static void stopCommandProc();
-	static void addCommandToProc(QnAbstractDataPacketPtr data);
-	static int commandProcQueSize();
-	static bool commandProcHasSuchResourceInQueue(QnResourcePtr res);
+    static void startCommandProc();
+    static void stopCommandProc();
+    static void addCommandToProc(QnAbstractDataPacketPtr data);
+    static int commandProcQueSize();
+    static bool commandProcHasSuchResourceInQueue(QnResourcePtr res);
 
-	static bool loadDevicesParam(const QString& fileName);
+    static bool loadDevicesParam(const QString& fileName);
+
 private:
     static bool parseResource(const QDomElement &element);
     static bool parseParam(const QDomElement &element, QnParamList& paramlist);

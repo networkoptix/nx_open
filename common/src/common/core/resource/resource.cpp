@@ -224,15 +224,11 @@ bool QnResource::getParam(const QString& name, QnValue& val, QnDomain domain )
     }
     else if (domain == QnDomainPhysical)
     {
-        if (getParamPhysical(name, val))
-        {
-            emit onParametrChanged(name, QString(val));
-            return true;
-        }
-        else
-        {
+        if (!getParamPhysical(name, val))
             return false;
-        }
+
+        emit onParameterChanged(name, QString(val));
+        return true;
     }
     else if (domain == QnDomainDatabase)
     {
@@ -279,10 +275,9 @@ bool QnResource::setParam(const QString& name, const QnValue& val, QnDomain doma
         return false;
     }
 
-    emit onParametrChanged(name, QString(val));
+    emit onParameterChanged(name, QString(val));
 
     return true;
-
 }
 
 class QnResourceSetParamCommand : public QnResourceCommand
