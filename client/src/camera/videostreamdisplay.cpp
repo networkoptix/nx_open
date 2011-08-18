@@ -11,7 +11,8 @@ extern "C" {
 #include <libswscale/swscale.h>
 }
 
-CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale) :
+CLVideoStreamDisplay::CLVideoStreamDisplay(CLAbstractRenderer *renderer, bool canDownscale) :
+    m_renderer(renderer),
     m_canDownscale(canDownscale),
     m_prevFactor(CLVideoDecoderOutput::factor_1),
     m_scaleFactor(CLVideoDecoderOutput::factor_1),
@@ -31,11 +32,6 @@ CLVideoStreamDisplay::~CLVideoStreamDisplay()
     qDeleteAll(m_decoder);
 
     freeScaleContext();
-}
-
-void CLVideoStreamDisplay::setDrawer(CLAbstractRenderer* draw)
-{
-    m_draw = draw;
 }
 
 CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::getCurrentDownscaleFactor() const
@@ -82,12 +78,12 @@ void CLVideoStreamDisplay::freeScaleContext()
 
 CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::determineScaleFactor(QnCompressedVideoDataPtr data, const CLVideoData& img, CLVideoDecoderOutput::downscale_factor force_factor)
 {
-    if (m_draw->constantDownscaleFactor())
+    if (m_renderer->constantDownscaleFactor())
        force_factor = CLVideoDecoderOutput::factor_2;
 
     if (force_factor==CLVideoDecoderOutput::factor_any) // if nobody pushing lets peek it
     {
-        QSize on_screen = m_draw->sizeOnScreen(data->channelNumber);
+        QSize on_screen = m_renderer->sizeOnScreen(data->channelNumber);
 
         m_scaleFactor = findScaleFactor(img.outFrame.width, img.outFrame.height, on_screen.width(), on_screen.height());
 
@@ -163,7 +159,7 @@ void CLVideoStreamDisplay::dispay(QnCompressedVideoDataPtr data, bool draw, CLVi
         return;
     }
 
-    if (!draw || !m_draw)
+    if (!draw || !m_renderer)
         return;
 
     int maxTextureSize = CLGLRenderer::getMaxTextureSize();
@@ -176,16 +172,16 @@ void CLVideoStreamDisplay::dispay(QnCompressedVideoDataPtr data, bool draw, CLVi
         (scaleFactor > CLVideoDecoderOutput::factor_1 && !CLVideoDecoderOutput::isPixelFormatSupported(img.outFrame.out_type)))
     {
         rescaleFrame(img.outFrame, img.outFrame.width / scaleFactor, img.outFrame.height / scaleFactor);
-        m_draw->draw(m_outFrame, data->channelNumber);
+        m_renderer->draw(m_outFrame, data->channelNumber);
     }
     else if (scaleFactor > CLVideoDecoderOutput::factor_1)
     {
         CLVideoDecoderOutput::downscale(&img.outFrame, &m_outFrame, scaleFactor); // extra cpu work but less to display( for weak video cards )
-        m_draw->draw(m_outFrame, data->channelNumber);
+        m_renderer->draw(m_outFrame, data->channelNumber);
     }
     else
     {
-        m_draw->draw(img.outFrame, data->channelNumber);
+        m_renderer->draw(img.outFrame, data->channelNumber);
     }
 }
 
@@ -230,7 +226,7 @@ bool CLVideoStreamDisplay::rescaleFrame(CLVideoDecoderOutput& outFrame, int newW
 
 void CLVideoStreamDisplay::copyImage(bool copy)
 {
-    m_draw->copyVideoDataBeforePainting(copy);
+    m_renderer->copyVideoDataBeforePainting(copy);
 }
 
 CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::findScaleFactor(int width, int height, int fitWidth, int fitHeight)

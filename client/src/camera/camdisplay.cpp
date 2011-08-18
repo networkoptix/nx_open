@@ -73,8 +73,7 @@ void CLCamDisplay::addVideoChannel(int index, CLAbstractRenderer *renderer, bool
 {
     Q_ASSERT(index < CL_MAX_CHANNELS);
 
-    m_display[index] = new CLVideoStreamDisplay(canDownscale);
-    m_display[index]->setDrawer(renderer);
+    m_display[index] = new CLVideoStreamDisplay(renderer, canDownscale);
 }
 
 void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep)
