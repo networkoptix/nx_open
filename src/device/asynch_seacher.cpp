@@ -38,8 +38,12 @@ void CLDeviceSearcher::run()
 		CL_LOG(cl_logWARNING) cl_log.log(message ,cl_logWARNING);
 		if (first_time)
 		{
+                    /* Commented as we can't use UI in non-UI thread.
+
 			QMessageBox* box = new QMessageBox(QMessageBox::Warning, tr("Info"), message, QMessageBox::Ok, 0);
-			box->show();
+                        box->show();
+                        */
+
 			// ### fix leaking
 			first_time = false;
 		}
@@ -150,7 +154,7 @@ CLDeviceList CLDeviceSearcher::findNewDevices(bool& ip_finished)
 	// lets form the list of existing IP
 	CLIPList busy_list;
 
-	CLDeviceList bad_ip_list;
+        CLDeviceList bad_ip_list;
 
 	cl_log.log(QLatin1String("Found "), devices.size() + not_network_devices.size(), QLatin1String(" new(!) devices."), cl_logDEBUG1);
 
@@ -376,9 +380,9 @@ void CLDeviceSearcher::fromListToList(CLDeviceList& from, CLDeviceList& to, int 
 
 }
 
-struct T
+struct T2
 {
-	T(CLNetworkDevice* d)
+        T2(CLNetworkDevice* d)
 	{
 		device = d;
 	}
@@ -396,20 +400,20 @@ void CLDeviceSearcher::markConflictingDevices(CLDeviceList& lst, int threads)
 	// cannot make concurrent work with pointer CLDevice* ; => so extra steps needed
 	// this function deals with network devices only
 
-	QList<T> local_list;
+        QList<T2> local_list;
 
 	CLDeviceList::iterator it = lst.begin();
 	while(it!=lst.end())
 	{
 		CLNetworkDevice* device = static_cast<CLNetworkDevice*>(it.value());
-		local_list.push_back(T(device));
+                local_list.push_back(T2(device));
 		++it;
 	}
 
 	QThreadPool* global = QThreadPool::globalInstance();
 
 	for (int i = 0; i < threads; ++i ) global->releaseThread();
-	QtConcurrent::blockingMap(local_list, &T::f);
+        QtConcurrent::blockingMap(local_list, &T2::f);
 	for (int i = 0; i < threads; ++i )global->reserveThread();
 
 }

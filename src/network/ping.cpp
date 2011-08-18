@@ -1,11 +1,16 @@
 #include "ping.h"
 
+#include "base/log.h"
+
 #ifdef Q_OS_WIN
 #include <icmpapi.h>
 #include <stdio.h>
-#include "base/log.h"
 #else
-#include <SystemConfiguration/SCNetworkReachability.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <netinet/ip.h>
+#include <netinet/ip_icmp.h>
 #endif
 
 CLPing::CLPing()
@@ -114,16 +119,117 @@ bool CLPing::ping(const QString& ip, int retry, int timeoutPerRetry, int packetS
 
 #else
 
-bool CLPing::ping(const QString& ip, int /*retry*/, int /*timeoutPerRetry*/, int /*packetSize*/)
+unsigned short checksum(const struct icmp& packet)
 {
-	SCNetworkReachabilityRef target;
-	SCNetworkConnectionFlags flags = 0;
-	Boolean ok;
-	target = SCNetworkReachabilityCreateWithName(NULL, ip.toLatin1().data());
-	ok = SCNetworkReachabilityGetFlags(target, &flags);
-	CFRelease(target);
+    int i, j;
 
-	return ok;
+    for (j = 0, i = 0; i < sizeof(struct icmp) / 2; i++)
+      j += ((quint16 *)&packet)[i];
+    while (j>>16)
+      j = (j & 0xffff) + (j >> 16);
+
+    return (j == 0xffff) ? j : ~j;
+}
+
+bool CLPing::ping(const QString& ip, int retry, int timeoutPerRetry, int packetSize)
+{
+    unsigned short id  = (unsigned short) (arc4random() >> 15);
+
+    int fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP);
+    if (fd == -1)
+    {
+        // cl_log.
+        printf("\tUnable to open handle.\n");
+        return false;
+    }
+
+    struct
+    {
+        struct ip ip;
+        struct icmp icmp;
+    } packet;
+
+
+    memset(&packet.icmp, 0, sizeof(packet.icmp));
+    packet.icmp.icmp_type = ICMP_ECHO;
+    packet.icmp.icmp_id = id;
+    packet.icmp.icmp_cksum = checksum(packet.icmp);
+
+    in_addr_t addr = inet_addr(ip.toLatin1().data());
+    if (addr == INADDR_NONE)
+    {
+        return false;
+    }
+
+    struct sockaddr_in saddr;
+    memset(&saddr, 0, sizeof(saddr));
+
+    saddr.sin_family = AF_INET;
+    saddr.sin_port = 0;
+    saddr.sin_addr.s_addr = addr;
+    saddr.sin_len = sizeof(struct sockaddr_in);
+
+    if (sendto(fd, (void*)&packet.icmp, sizeof (packet.icmp), 0, (sockaddr*)&saddr, sizeof(saddr)) == -1)
+    {
+        close(fd);
+        // cl_log.
+        return false;
+    }
+
+    struct sockaddr_in faddr;
+    socklen_t len = sizeof(faddr);
+
+    memset(&packet, 0, sizeof(packet));
+
+    fd_set rset;
+
+    FD_ZERO(&rset);
+    FD_SET(fd, &rset);
+
+    struct timeval tv;
+
+    int res = 0;
+    for(int i = 0; i < retry; i++)
+    {
+        long usecs = timeoutPerRetry * 1000;
+        tv.tv_usec = usecs % 1000000;
+        tv.tv_sec = usecs / 1000000;
+
+        res = select(fd+1, &rset, NULL, NULL, &tv);
+
+        if (res < 0)
+        {
+            // cl_log
+            close(fd);
+            return false;
+        }
+
+        // Timeout
+        if (res == 0)
+        {
+            continue;
+        }
+
+        // Have data to read
+        if (FD_ISSET(fd, &rset))
+        {
+            res = recvfrom(fd, &packet, sizeof(packet), 0, (struct sockaddr *)&faddr, &len);
+
+            if (res == sizeof(packet) &&
+                    saddr.sin_addr.s_addr == faddr.sin_addr.s_addr &&
+                    packet.icmp.icmp_type == ICMP_ECHOREPLY &&
+                    packet.icmp.icmp_seq == 0 &&
+                    packet.icmp.icmp_id == id)
+            {
+                close(fd);
+                return true;
+            }
+        }
+    }
+
+    close(fd);
+
+    return false;
 }
 
 #endif

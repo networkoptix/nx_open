@@ -87,7 +87,6 @@ win32 {
 }
 
 mac {
-  LIBS += -framework SystemConfiguration
   LIBS += -framework IOKit
   LIBS += -lz -lbz2
 

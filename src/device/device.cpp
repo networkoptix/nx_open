@@ -195,9 +195,9 @@ void CLDevice::addReferences(CLDeviceList& lst)
 
 }
 
-struct T
+struct T1
 {
-	T(CLDevice* d)
+        T1(CLDevice* d)
 	{
 		device = d;
 	}
@@ -218,21 +218,21 @@ void CLDevice::getDevicesBasicInfo(CLDeviceList& lst, int threads)
 	QTime time;
 	time.start();
 
-	QList<T> local_list;
+        QList<T1> local_list;
 
 	CLDeviceList::iterator it = lst.begin();
 	while(it!=lst.end())
 	{
 		CLDevice* device = it.value();
 		if (device->getStatus().checkFlag(CLDeviceStatus::CONFLICTING)==false)
-			local_list.push_back(T(device));
+                        local_list.push_back(T1(device));
 
 		++it;
 	}
 
 	QThreadPool* global = QThreadPool::globalInstance();
 	for (int i = 0; i < threads; ++i ) global->releaseThread();
-	QtConcurrent::blockingMap(local_list, &T::f);
+        QtConcurrent::blockingMap(local_list, &T1::f);
 	for (int i = 0; i < threads; ++i )global->reserveThread();
 
 	CL_LOG(cl_logDEBUG1)
