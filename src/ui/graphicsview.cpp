@@ -1401,7 +1401,6 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
             menu.addMenu(&distance_menu);
         }
 
-//        menu.addAction(&cm_togglefs);
         menu.addAction(&cm_toggle_fullscreen);
         menu.addAction(&cm_preferences);
         menu.addSeparator();
@@ -1422,14 +1421,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
     if (aitem==0) // on void menu
     {
-        if (act== &cm_togglefs)
-        {
-            if (!mMainWnd->isFullScreen())
-                mMainWnd->showFullScreen();
-            else
-                mMainWnd->showMaximized();
-        }
-        else if (act == &cm_preferences)
+        if (act == &cm_preferences)
         {
             PreferencesWindow* preferencesDialog = new PreferencesWindow();
             preferencesDialog->exec();
@@ -2731,9 +2723,14 @@ void GraphicsView::recordingSettings()
 
 void GraphicsView::toggleFullScreen()
 {
-    if ((m_selectedWnd && (!m_selectedWnd->isFullScreen() || isItemFullScreenZoomed(m_selectedWnd))) || !mMainWnd->isFullScreen()) { // if item is not in full screen mode or if it's in FS and zoomed more
-        if (m_selectedWnd)
-            onItemFullScreen_helper(m_selectedWnd, 800);
+    CLAbstractSceneItem *item = m_selectedWnd;
+    QList<CLAbstractSceneItem*> items = m_camLayout.getItemList();
+    if (!item && items.count() == 1)
+        item = items.first();
+
+    if ((item && (!item->isFullScreen() || isItemFullScreenZoomed(item))) || !item->isFullScreen()) { // if item is not in full screen mode or if it's in FS and zoomed more
+        if (item)
+            onItemFullScreen_helper(item, 800);
         mMainWnd->showFullScreen();
     } else {
         mMainWnd->showNormal();
