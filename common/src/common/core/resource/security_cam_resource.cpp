@@ -10,6 +10,12 @@ QnSequrityCamResource::~QnSequrityCamResource()
 
 }
 
+QString QnSequrityCamResource::oemName() const
+{
+    return manufacture();
+}
+
+
 int QnSequrityCamResource::getMaxFps()
 {
     if (hasSuchParam("MaxFPS"))

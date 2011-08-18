@@ -107,12 +107,47 @@ float QtvAudioDevice::volume() const
 void QtvAudioDevice::setVolume(float volume)
 {
     volume = qBound(0.0f, volume, 1.0f);
+    float oldVolume = m_settings->value(QLatin1String("volume"), 1.0f).toFloat();
+    if (volume == oldVolume)
+        return;
+
+    if (volume == 0.0f)
+    {
+        if (oldVolume < volume)
+            return;
+
+        volume = -oldVolume;
+    }
 
     m_settings->setValue(QLatin1String("volume"), volume);
     m_settings->sync();
 
+    volume = qBound(0.0f, volume, 1.0f);
     foreach (QtvSound *sound, m_sounds)
         sound->setVolumeLevel(volume);
+}
+
+bool QtvAudioDevice::isMute() const
+{
+    return volume() == 0.0f;
+}
+
+void QtvAudioDevice::setMute(bool mute)
+{
+    float volume;
+    if (mute)
+    {
+        volume = 0.0f;
+    }
+    else
+    {
+        volume = m_settings->value(QLatin1String("volume"), 1.0f).toFloat();
+        if (volume < 0.0f)
+            volume = -volume;
+        else if (volume == 0.0f)
+            volume = 1.0f;
+    }
+    setVolume(volume);
 }
 
 void QtvAudioDevice::removeSound(QtvSound *soundObject)

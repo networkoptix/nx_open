@@ -11,6 +11,11 @@ public:
     QnSequrityCamResource();
     virtual ~QnSequrityCamResource();
 
+    // like arecont or iqinvision
+    virtual QString manufacture() const = 0;
+    virtual QString oemName() const;
+
+
     virtual int getMaxFps(); // in fact this is const function;
 
     virtual QSize getMaxSensorSize(); // in fact this is const function;

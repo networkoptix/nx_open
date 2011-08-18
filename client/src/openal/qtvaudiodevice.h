@@ -33,6 +33,9 @@ public:
     float volume() const;
     void setVolume(float value);
 
+    bool isMute() const;
+    void setMute(bool mute);
+
 private:
     QList<QtvSound *> m_sounds;
     ALCcontext *m_context;

@@ -156,23 +156,6 @@ bool QnPlAreconVisionResource::setHostAddress(const QHostAddress& ip, QnDomain d
     return QnNetworkResource::setHostAddress(ip, domain);
 }
 
-bool QnPlAreconVisionResource::getBasicInfo()
-{
-    QnValue val;
-    if (!getParam("Firmware version", val, QnDomainPhysical))
-        return false;
-
-    if (!getParam("Image engine", val, QnDomainPhysical ))
-        return false;
-
-    if (!getParam("Net version", val, QnDomainPhysical))
-        return false;
-
-    if (!getDescription())
-        return false;
-
-    return true;
-}
 
 QString QnPlAreconVisionResource::toSearchString() const
 {
@@ -237,6 +220,20 @@ void QnPlAreconVisionResource::beforeUse()
 {
     QRect rect = getCroping(QnDomainMemory);
     setCropingPhysical(rect);
+
+    QnValue val;
+    if (!getParam("Firmware version", val, QnDomainPhysical))
+        return;
+
+    if (!getParam("Image engine", val, QnDomainPhysical ))
+        return;
+
+    if (!getParam("Net version", val, QnDomainPhysical))
+        return;
+
+    if (!getDescription())
+        return;
+
 }
 
 QString QnPlAreconVisionResource::manufacture() const
@@ -382,7 +379,7 @@ bool QnPlAreconVisionResource::setParamPhysical(const QString& name, const QnVal
 
 QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(QString name)
 {
-	QStringList supp = QnResource::supportedResources(ArecontVisionManufacture);
+	QStringList supp ;//= QnResource::supportedSuchResourceTypeId(ArecontVisionManufacture);
 
 	if (!supp.contains(name))
 	{

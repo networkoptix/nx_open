@@ -7,7 +7,6 @@ class QnVideoServer: public QnURLResource
 {
 public:
     virtual QnResourcePtr updateResource() { return QnResourcePtr(this); }
-    virtual bool getBasicInfo() { return true; }
     virtual void beforeUse() {}
 
     virtual QString manufacture() const { return "Video server"; }

@@ -33,8 +33,7 @@ release {
     RCC_DIR = build/release/generated
 }
 
-INCLUDEPATH += $$PWD
-PRECOMPILED_HEADER = StdAfx.h
-PRECOMPILED_SOURCE = StdAfx.cpp
+PRECOMPILED_HEADER = $$PWD/StdAfx.h
+PRECOMPILED_SOURCE = $$PWD/StdAfx.cpp
 
 include( $$PWD/src/src.pri )
