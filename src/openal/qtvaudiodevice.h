@@ -8,33 +8,39 @@
 #ifndef __QTVAUDIODEVICE_H__
 #define __QTVAUDIODEVICE_H__
 
-#include <QList>
-#include <QMutex>
-#include <QSettings>
+#include <QtCore/QList>
 
 typedef struct ALCdevice_struct ALCdevice;
 typedef struct ALCcontext_struct ALCcontext;
+
+class QAudioFormat;
+class QSettings;
+
 class QtvSound;
 
-class QtvAudioDevice {
+class QtvAudioDevice
+{
 public:
+    static QtvAudioDevice &instance();
 
     QtvAudioDevice();
-    static QtvAudioDevice& instance();
     ~QtvAudioDevice();
-    void release();
 
-    QtvSound* addSound(const QAudioFormat& format);
-    void removeSound(QtvSound* soundObject);
+    QtvSound *addSound(const QAudioFormat &format);
+    void removeSound(QtvSound *soundObject);
 
-    void setVolume(float value); // in range 0..1
-    float getVolume() const;
+    // in range 0..1
+    float volume() const;
+    void setVolume(float value);
+
+    bool isMute() const;
+    void setMute(bool mute);
 
 private:
-    QList<QtvSound*> m_sounds;
-    ALCcontext* m_context;
-    ALCdevice* m_device;
-    QSettings m_settings;
+    QList<QtvSound *> m_sounds;
+    ALCcontext *m_context;
+    ALCdevice *m_device;
+    QSettings *m_settings;
 };
 
-#endif
+#endif // __QTVAUDIODEVICE_H__

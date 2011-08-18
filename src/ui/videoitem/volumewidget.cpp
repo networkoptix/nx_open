@@ -41,47 +41,39 @@ VolumeWidget::VolumeWidget(QWidget *parent) :
     m_button->setCheckable(true);
 
     QHBoxLayout *layout = new QHBoxLayout;
-//    layout->setMargin(0);
     layout->setContentsMargins(20, 0, 20, 0);
-    layout->setSpacing(0);
+    layout->setSpacing(3);
     layout->addWidget(m_button);
     layout->addWidget(m_slider);
     setFixedSize(144, 36);
 
     setLayout(layout);
 
-    float volume = QtvAudioDevice::instance().getVolume();
-    if (volume < 0)
-    {
-        m_button->setChecked(true);
-        m_slider->setValue(0);
-    }
-    else
-    {
-        m_slider->setValue(volume*100);
-    }
+    float volume = QtvAudioDevice::instance().volume();
+    m_slider->setValue(volume * 100);
+    m_button->setChecked(QtvAudioDevice::instance().isMute());
+
     connect(m_slider, SIGNAL(valueChanged(int)), SLOT(onValueChanged(int)));
     connect(m_button, SIGNAL(toggled(bool)), SLOT(onButtonChecked()));
 }
 
 void VolumeWidget::paintEvent(QPaintEvent *)
 {
-    QPainter p(this);
     static QPixmap pix = QPixmap(":/skin/volume_slider_background.png");
 
+    QPainter p(this);
     p.drawPixmap(contentsRect(), pix);
-    p.end();
 }
 
 void VolumeWidget::onValueChanged(int value)
 {
-    QtvAudioDevice::instance().setVolume(value/100.0);
+    QtvAudioDevice::instance().setVolume(value / 100.0);
+    m_button->setChecked(QtvAudioDevice::instance().isMute());
 }
 
 void VolumeWidget::onButtonChecked()
 {
-    float volume = QtvAudioDevice::instance().getVolume();
-    if (volume > 0)
-        m_slider->setValue(volume*100);
-    QtvAudioDevice::instance().setVolume(-volume);
+    QtvAudioDevice::instance().setMute(m_button->isChecked());
+    float volume = QtvAudioDevice::instance().volume();
+    m_slider->setValue(volume * 100);
 }
