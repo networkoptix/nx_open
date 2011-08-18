@@ -380,42 +380,24 @@ void CLDeviceSearcher::fromListToList(CLDeviceList& from, CLDeviceList& to, int 
 
 }
 
-struct T2
+namespace
 {
-        T2(CLNetworkDevice* d)
-	{
-		device = d;
-	}
-
-	void f()
-	{
-		device->conflicting();
-	}
-
-	CLNetworkDevice* device;
-};
+    bool IsConflicting(CLDevice* device)
+    {
+        return static_cast<CLNetworkDevice*>(device)->conflicting();
+    }
+}
 
 void CLDeviceSearcher::markConflictingDevices(CLDeviceList& lst, int threads)
 {
 	// cannot make concurrent work with pointer CLDevice* ; => so extra steps needed
 	// this function deals with network devices only
 
-        QList<T2> local_list;
-
-	CLDeviceList::iterator it = lst.begin();
-	while(it!=lst.end())
-	{
-		CLNetworkDevice* device = static_cast<CLNetworkDevice*>(it.value());
-                local_list.push_back(T2(device));
-		++it;
-	}
-
-	QThreadPool* global = QThreadPool::globalInstance();
+        QThreadPool* global = QThreadPool::globalInstance();
 
 	for (int i = 0; i < threads; ++i ) global->releaseThread();
-        QtConcurrent::blockingMap(local_list, &T2::f);
+        QtConcurrent::blockingMap(lst, IsConflicting);
 	for (int i = 0; i < threads; ++i )global->reserveThread();
-
 }
 
 CLDeviceList CLDeviceSearcher::resolveUnknown_helper(CLDeviceList& lst)

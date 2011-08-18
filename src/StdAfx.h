@@ -29,6 +29,8 @@ extern "C" {
 
 #if defined __cplusplus
 // stl headers
+#include <algorithm>
+#include <functional>
 
 // QT headers
 #include <QAction>

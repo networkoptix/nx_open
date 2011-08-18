@@ -195,20 +195,13 @@ void CLDevice::addReferences(CLDeviceList& lst)
 
 }
 
-struct T1
+namespace
 {
-        T1(CLDevice* d)
-	{
-		device = d;
-	}
-
-	void f()
-	{
-		device->getBaseInfo();
-	}
-
-	CLDevice* device;
-};
+    bool NotConflicting(CLDevice* device)
+    {
+        return device->getStatus().checkFlag(CLDeviceStatus::CONFLICTING) == false;
+    }
+}
 
 void CLDevice::getDevicesBasicInfo(CLDeviceList& lst, int threads)
 {
@@ -218,21 +211,13 @@ void CLDevice::getDevicesBasicInfo(CLDeviceList& lst, int threads)
 	QTime time;
 	time.start();
 
-        QList<T1> local_list;
+        QList<CLDevice*> local_list;
 
-	CLDeviceList::iterator it = lst.begin();
-	while(it!=lst.end())
-	{
-		CLDevice* device = it.value();
-		if (device->getStatus().checkFlag(CLDeviceStatus::CONFLICTING)==false)
-                        local_list.push_back(T1(device));
-
-		++it;
-	}
+        std::remove_copy_if(lst.begin(), lst.end(), std::back_inserter(local_list), std::ptr_fun(NotConflicting));
 
 	QThreadPool* global = QThreadPool::globalInstance();
 	for (int i = 0; i < threads; ++i ) global->releaseThread();
-        QtConcurrent::blockingMap(local_list, &T1::f);
+        QtConcurrent::blockingMap(local_list, std::mem_fun(&CLDevice::getBaseInfo));
 	for (int i = 0; i < threads; ++i )global->reserveThread();
 
 	CL_LOG(cl_logDEBUG1)
