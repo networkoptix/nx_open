@@ -179,8 +179,7 @@ void MainWnd::handleMessage(const QString& message)
     QStringList files = message.trimmed().split(QLatin1Char('\0'), QString::SkipEmptyParts);
 
     addFilesToCurrentOrNewLayout(files);
-    raise();
-    activateWindow();
+    activate();
 }
 
 void MainWnd::closeEvent ( QCloseEvent * /*event*/ )
@@ -215,6 +214,15 @@ void MainWnd::dropEvent(QDropEvent *event)
     }
 
     addFilesToCurrentOrNewLayout(files, event->keyboardModifiers() & Qt::AltModifier);
+    activate();
+}
+
+void MainWnd::activate()
+{
+    if (isFullScreen())
+        showFullScreen();
+    else
+        showNormal();
     raise();
     activateWindow();
 }
