@@ -136,7 +136,7 @@ CLGLRenderer::CLGLRenderer(CLVideoWindowItem *vw) :
     isSoftYuv2Rgb(false),
     m_forceSoftYUV(false),
     m_textureUploaded(false),
-    m_stride(0), // in memorry
+    m_stride(0), // in memory
     m_width(0), // visible width
     m_height(0),
     m_stride_old(0),
@@ -150,6 +150,7 @@ CLGLRenderer::CLGLRenderer(CLVideoWindowItem *vw) :
     m_gotnewimage(false),
     m_needwait(true),
     m_videowindow(vw),
+    m_abort_drawing(false),
     m_inited(false)
 {
     applyMixerSettings(m_brightness, m_contrast, m_hue, m_saturation);
@@ -358,6 +359,10 @@ void CLGLRenderer::init(bool msgbox)
 
     glEnable(GL_TEXTURE_2D);
     OGL_CHECK_ERROR("glEnable");
+
+    // Initialize maxTextureSize value. It should be somewhere where GL context
+    // already initialized, otherwise it will return 0.
+    (void)CLGLRenderer::getMaxTextureSize();
 
     gl_status = CL_GL_SUPPORTED;
 }

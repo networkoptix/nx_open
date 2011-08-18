@@ -12,7 +12,6 @@
 #include "resource/client/client_media_resource.h"
 #include "resourcecontrol/resource_pool.h"
 #include "camera/camdisplay.h"
-#include "camera/gl_renderer.h"
 #include "videoitem/video_wnd_item.h"
 
 static const QnId TEST_RES_ID("1001");
@@ -57,9 +56,8 @@ void MainWindow::boo()
     {
         QnAbstractMediaStreamDataProvider *msdp = media->createMediaProvider();
         CLVideoWindowItem *vwi = new CLVideoWindowItem(media->getMediaLayout(), 300, 300, media->getName());
-        CLAbstractRenderer *renderer = new CLGLRenderer(vwi);
         CLCamDisplay *camDisplay = new CLCamDisplay;
-        camDisplay->addVideoChannel(0, renderer, false);
+        camDisplay->addVideoChannel(0, vwi, false);
         msdp->addDataProcessor(camDisplay);
 
         m_view->scene()->addItem(vwi);
