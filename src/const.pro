@@ -16,7 +16,6 @@ CONFIG(debug, debug|release) {
   MOC_DIR = ../build/debug/generated
   UI_DIR = ../build/debug/generated
   RCC_DIR = ../build/debug/generated
-  INCLUDEPATH += $$FFMPEG-debug/include
 }
 
 CONFIG(release, debug|release) {
@@ -25,9 +24,36 @@ CONFIG(release, debug|release) {
   MOC_DIR = ../build/release/generated
   UI_DIR = ../build/release/generated
   RCC_DIR = ../build/release/generated
-  INCLUDEPATH += $$FFMPEG-release/include
 }
 
+
+win32: RC_FILE = uniclient.rc
+
+win* {
+    !contains(QMAKE_HOST.arch, x86_64) {
+        OPENAL_LIBS_PATH = $$PWD/../contrib/openal/bin/win32
+    } else {
+        OPENAL_LIBS_PATH = $$PWD/../contrib/openal/bin/win64
+    }
+
+    INCLUDEPATH += $$PWD/../contrib/openal/include
+    LIBS += -L$$OPENAL_LIBS_PATH -lOpenAL32
+}
+
+mac {
+  LIBS += -framework OpenAL
+}
+
+CONFIG(debug, debug|release) {
+  INCLUDEPATH += $$FFMPEG-debug/include
+  LIBS += -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib
+}
+CONFIG(release, debug|release) {
+  INCLUDEPATH += $$FFMPEG-release/include
+  LIBS += -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib
+}
+
+LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale
 
 win32 {
   win32-msvc* {
@@ -41,33 +67,8 @@ win32 {
       LIBS += -L"$$(DXSDK_DIR)/Lib/x64"
     }
   }
-  INCLUDEPATH += ../contrib/openal/include
-  RC_FILE = uniclient.rc
-}
 
-mac {
-  PRIVATE_FRAMEWORKS.files = ../resource/arecontvision
-  PRIVATE_FRAMEWORKS.path = Contents/MacOS
-  QMAKE_BUNDLE_DATA += PRIVATE_FRAMEWORKS
-}
-
-INCLUDEPATH += $$PWD
-PRECOMPILED_HEADER = StdAfx.h
-PRECOMPILED_SOURCE = StdAfx.cpp
-
-DEFINES += __STDC_CONSTANT_MACROS
-
-RESOURCES += mainwnd.qrc ../build/skin.qrc
-FORMS += mainwnd.ui preferences.ui licensekey.ui recordingsettings.ui
-
-
-win32 {
-  LIBS += ws2_32.lib Iphlpapi.lib Ole32.lib
-  LIBS += avcodec.lib avdevice.lib avfilter.lib avformat.lib avutil.lib swscale.lib
-  QMAKE_LFLAGS_DEBUG += /libpath:$$FFMPEG-debug/bin
-  QMAKE_LFLAGS_RELEASE += /libpath:$$FFMPEG-release/bin
-
-  LIBS += ../contrib/openal/bin/win32/OpenAL32.lib
+  LIBS += -lws2_32 -lIphlpapi -lOle32
 
   asm_sources = base/colorspace_convert/colorspace_rgb_mmx.asm
   SOURCES += $$asm_sources base/colorspace_convert/colorspace.c
@@ -80,17 +81,29 @@ win32 {
   compiler.depends=$$OBJECTS_DIR/${QMAKE_FILE_BASE}.obj
   asm_compiler.variable_out = OBJECTS
   QMAKE_EXTRA_COMPILERS += asm_compiler
-  LIBS += d3d9.lib d3dx9.lib Propsys.lib winmm.lib
+  LIBS += -ld3d9 -ld3dx9 -lPropsys -lwinmm
 
   SOURCES += dsp_effects/speex/preprocess.c dsp_effects/speex/filterbank.c dsp_effects/speex/fftwrap.c dsp_effects/speex/smallft.c  dsp_effects/speex/mdf.c
 }
 
 mac {
   LIBS += -framework SystemConfiguration
-  LIBS += -framework OpenAL
   LIBS += -framework IOKit
-  QMAKE_LFLAGS += -lavcodec.53 -lavdevice.53 -lavfilter.2 -lavformat.53 -lavutil.51 -lswscale.0 -lz -lbz2
-  QMAKE_LFLAGS_DEBUG += -L$$FFMPEG-debug/lib
-  QMAKE_LFLAGS_RELEASE += -L$$FFMPEG-release/lib
+  LIBS += -lz -lbz2
+
+  PRIVATE_FRAMEWORKS.files = ../resource/arecontvision
+  PRIVATE_FRAMEWORKS.path = Contents/MacOS
+  QMAKE_BUNDLE_DATA += PRIVATE_FRAMEWORKS
+
   QMAKE_POST_LINK += mkdir -p `dirname $(TARGET)`/arecontvision; cp -f $$PWD/../resource/arecontvision/devices.xml `dirname $(TARGET)`/arecontvision
 }
+
+INCLUDEPATH += $$PWD
+PRECOMPILED_HEADER = $$PWD/StdAfx.h
+PRECOMPILED_SOURCE = $$PWD/StdAfx.cpp
+
+DEFINES += __STDC_CONSTANT_MACROS
+
+RESOURCES += mainwnd.qrc ../build/skin.qrc
+FORMS += mainwnd.ui preferences.ui licensekey.ui recordingsettings.ui
+
