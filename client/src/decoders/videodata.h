@@ -21,6 +21,20 @@ struct CLVideoDecoderOutput
     CLVideoDecoderOutput();
     ~CLVideoDecoderOutput();
 
+    void clean();
+
+    static void copy(const CLVideoDecoderOutput *src, CLVideoDecoderOutput *dst);
+    static void downscale(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst, downscale_factor factor);
+
+    static bool imagesAreEqual(const CLVideoDecoderOutput *img1, const CLVideoDecoderOutput *img2, unsigned int max_diff);
+
+    static bool isPixelFormatSupported(PixelFormat format);
+
+#if _DEBUG
+    void saveToFile(const char* filename);
+#endif
+
+public:
     PixelFormat out_type;
 
     uchar *C1; // color components
@@ -33,22 +47,6 @@ struct CLVideoDecoderOutput
     int stride1; // image width in memory of C1 component
     int stride2;
     int stride3;
-
-    static void downscale(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst, downscale_factor factor);
-
-    static void copy(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst);
-    static bool imagesAreEqual(const CLVideoDecoderOutput* img1, const CLVideoDecoderOutput* img2, unsigned int max_diff);
-    void saveToFile(const char* filename);
-    void clean();
-    static bool isPixelFormatSupported(PixelFormat format);
-
-private:
-    static void downscalePlate_factor2(uchar *dst, const uchar *src, int src_width, int src_stride, int src_height);
-    static void downscalePlate_factor4(uchar *dst, const uchar *src, int src_width, int src_stride, int src_height);
-    static void downscalePlate_factor8(uchar *dst, const uchar *src, int src_width, int src_stride, int src_height);
-
-    static void copyPlane(uchar *dst, const uchar *src, int width, int dst_stride, int src_stride, int height);
-    static bool equalPlanes(const uchar *plane1, const uchar *plane2, int width, int stride1, int stride2, int height, int max_diff);
 
 private:
     unsigned long m_capacity; // how many bytes are allocated ( if any )
