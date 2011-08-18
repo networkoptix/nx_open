@@ -237,7 +237,8 @@ QnRtspConnectionProcessor::QnRtspConnectionProcessor(QTcpSocket* socket):
     Q_D(QnRtspConnectionProcessor);
     d->socket = socket;
     connect(socket, SIGNAL(connected()), this, SLOT(onClientConnected()));
-    connect(socket, SIGNAL(connected()), this, SLOT(onClientDisconnected()));
+    connect(socket, SIGNAL(disconnected()), this, SLOT(onClientDisconnected()));
+    connect(socket, SIGNAL(disconnected()), this, SLOT(deleteLater()));
     connect(socket, SIGNAL(readyRead()), this, SLOT(onClientReadyRead()));
 }
 
@@ -251,7 +252,6 @@ void QnRtspConnectionProcessor::onClientConnected()
 
 void QnRtspConnectionProcessor::onClientDisconnected()
 {
-    sender()->deleteLater();
 }
 
 bool QnRtspConnectionProcessor::isFullMessage()
