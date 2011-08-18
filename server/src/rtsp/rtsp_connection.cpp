@@ -41,7 +41,7 @@ public:
     }
     qint64 lastSendTime() const { return m_lastSendTime; }
 protected:
-    void buildRtspTcpHeader(quint8 channelNum, quint32 ssrc, quint16 len, int markerBit)
+    void buildRtspTcpHeader(quint8 channelNum, quint32 ssrc, quint16 len, int markerBit, quint32 timestamp)
     {
         m_rtspTcpHeader[0] = '$';
         m_rtspTcpHeader[1] = channelNum;
@@ -55,7 +55,8 @@ protected:
         rtp->marker  =  markerBit; 
         rtp->payloadType = RTP_FFMPEG_GENERIC_CODE;
         rtp->sequence = htons(m_sequence[channelNum]++);
-        rtp->timestamp = htonl(m_timer.elapsed()); 
+        //rtp->timestamp = htonl(m_timer.elapsed()); 
+        rtp->timestamp = htonl(timestamp);
         rtp->ssrc = htonl(ssrc); // source ID
     }
 
@@ -78,7 +79,7 @@ protected:
             subChannelNumber = m_ctxSended[rtspChannelNum].size();
             ssrc += subChannelNumber;
             QnFfmpegHelper::serializeCodecContext(ctx, &m_codecCtxData);
-            buildRtspTcpHeader(rtspChannelNum, ssrc + 1, m_codecCtxData.size(), true); // ssrc+1 - switch data subchannel to context subchannel
+            buildRtspTcpHeader(rtspChannelNum, ssrc + 1, m_codecCtxData.size(), true, 0); // ssrc+1 - switch data subchannel to context subchannel
             QMutexLocker lock(&m_owner->getSockMutex());
             m_owner->sendData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
             m_owner->sendData(m_codecCtxData);
@@ -96,7 +97,7 @@ protected:
         {
             sendLen = qMin(MAX_RTSP_DATA_LEN, dataRest);
             QnCompressedVideoData* video = dynamic_cast<QnCompressedVideoData*> (media.data());
-            buildRtspTcpHeader(rtspChannelNum, ssrc, sendLen + (first && video ? 1 : 0), sendLen >= dataRest);
+            buildRtspTcpHeader(rtspChannelNum, ssrc, sendLen + (first && video ? 1 : 0), sendLen >= dataRest, video->timestamp);
             QMutexLocker lock(&m_owner->getSockMutex());
             m_owner->sendData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
             if (first && video)

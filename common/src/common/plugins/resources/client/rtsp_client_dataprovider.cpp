@@ -7,10 +7,13 @@
 #include "common/base.h"
 
 #include <qdebug.h>
+#include <QFile>
 
 static const int MAX_RTP_BUFFER_SIZE = 65535;
 
 // current implementation for TCP mode only
+
+#define DEBUG_RTSP
 
 QnRtspClientDataProvider::QnRtspClientDataProvider(QnResourcePtr res):
     QnNavigatedDataProvider(res),
@@ -100,6 +103,10 @@ QnAbstractDataPacketPtr QnRtspClientDataProvider::processFFmpegRtpPayload(const 
             }
             m_nextDataPacket[ssrc] = nextPacket;
             nextPacket->compressionType = context->codec_id;
+            nextPacket->timestamp = ntohl(rtpHeader->timestamp);
+            if (nextPacket->timestamp < 0x40000000 && m_prevTimestamp[ssrc] > 0xc0000000)
+                m_timeStampCycles[ssrc]++;
+            nextPacket->timestamp += (m_timeStampCycles[ssrc] << 16);
         }
         nextPacket->data.write((const char*)payload, dataSize);
         if (rtpHeader->marker)
@@ -121,8 +128,22 @@ QnAbstractDataPacketPtr QnRtspClientDataProvider::getNextData()
 
     int rtpChannelNum = 0;
     int blockSize  = m_rtpData->read((char*)m_rtpDataBuffer, MAX_RTP_BUFFER_SIZE);
+
     if (blockSize < 1)
         return result;
+
+#ifdef DEBUG_RTSP
+    static QFile* binaryFile = 0;
+    if (!binaryFile) {
+        binaryFile = new QFile("c:/binary2.rtsp");
+        binaryFile->open(QFile::WriteOnly);
+    }
+    binaryFile->write((const char*) m_rtpDataBuffer, blockSize);
+    binaryFile->flush();
+
+#endif
+
+
     quint8* data = m_rtpDataBuffer;
     if (m_tcpMode)
     {
@@ -141,7 +162,7 @@ QnAbstractDataPacketPtr QnRtspClientDataProvider::getNextData()
     if (format.isNull()) {
         qWarning() << Q_FUNC_INFO << __LINE__ << "RTP track" << rtpChannelNum << "not found";
     }
-    if (format == "ffmpeg") 
+    else if (format == "ffmpeg") 
         result = processFFmpegRtpPayload(data, blockSize);
     else 
         qWarning() << Q_FUNC_INFO << __LINE__ << "Only FFMPEG payload format now implemeted. Ask developers to add '" << format << "' format";

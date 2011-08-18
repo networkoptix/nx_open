@@ -25,6 +25,8 @@ private:
     quint8* m_rtpDataBuffer;
     bool m_tcpMode;
     QMap<int, AVCodecContext*> m_contextMap;
+    QMap<quint32, quint32> m_timeStampCycles;
+    QMap<quint32, quint16> m_prevTimestamp;
     QMap<int, QnAbstractMediaDataPacketPtr> m_nextDataPacket;
 };
 
