@@ -3,6 +3,8 @@
 
 #include <QtGui/QMainWindow>
 
+class GraphicsView;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -14,6 +16,9 @@ public:
 public Q_SLOTS:
     void boo();
 // ###
+
+private:
+    GraphicsView *m_view;
 };
 
 #endif // MAINWINDOW_H

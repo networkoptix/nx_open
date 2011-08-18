@@ -32,16 +32,14 @@ int CLImageItem::width() const
 	qreal ar_f = (qreal)m_max_width/m_max_height;
 
 	if (ar>ar_f) // width > hight; normal scenario; ar = w/h
-	{
 		return m_max_width;
-	}
-	else
-		return m_max_height*aspectRatio();
+
+	return m_max_height*aspectRatio();
 }
 
 float CLImageItem::aspectRatio() const
 {
-	QMutexLocker  locker(&m_mutex_aspect);
+	QMutexLocker locker(&m_mutex_aspect);
 	return m_aspectratio;
 }
 

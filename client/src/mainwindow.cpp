@@ -23,13 +23,13 @@ MainWindow::MainWindow(QWidget *parent)
 {
     setWindowTitle(tr("VMS Client"));
 
-    GraphicsView *view = new GraphicsView(this);
+    m_view = new GraphicsView(this);
 
     QToolBar *toolBar = new QToolBar(this);
-    toolBar->addActions(view->actions());
+    toolBar->addActions(m_view->actions());
     addToolBar(Qt::TopToolBarArea, toolBar);
 
-    setCentralWidget(view);
+    setCentralWidget(m_view);
 
     showMaximized();
 
@@ -40,11 +40,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     QnClientMediaResource *resource = new QnClientMediaResource();
     resource->setId(TEST_RES_ID+1);
-    resource->setUrl("test.flv");
+    resource->setUrl("TC-Outro.mov");
     resource->setParentId(server->getId());
     QnResourcePool::instance().addResource(QnResourcePtr(resource));
 
-    QTimer::singleShot(500, this, SLOT(boo()));
+    QTimer::singleShot(0, this, SLOT(boo()));
 // ###
 }
 
@@ -56,11 +56,15 @@ void MainWindow::boo()
     if (QnClientMediaResourcePtr media = resource.dynamicCast<QnClientMediaResource>())
     {
         QnAbstractMediaStreamDataProvider *msdp = media->createMediaProvider();
-        CLVideoWindowItem *vwi = new CLVideoWindowItem(media->getMediaLayout(), 0, 0, media->getName());
+        CLVideoWindowItem *vwi = new CLVideoWindowItem(media->getMediaLayout(), 300, 300, media->getName());
         CLAbstractRenderer *renderer = new CLGLRenderer(vwi);
         CLCamDisplay *camDisplay = new CLCamDisplay;
         camDisplay->addVideoChannel(0, renderer, false);
         msdp->addDataProcessor(camDisplay);
+
+        m_view->scene()->addItem(vwi);
+        vwi->setPos(-150, 20);
+
         msdp->start();
         camDisplay->start();
     }

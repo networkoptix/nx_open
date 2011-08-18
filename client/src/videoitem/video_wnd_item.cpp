@@ -202,15 +202,19 @@ QRect CLVideoWindowItem::getSubChannelRect(unsigned int channel) const
 
 void CLVideoWindowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget* /*widget*/)
 {
+    QPen oldPen = painter->pen();
+    painter->setPen(QPen(Qt::red));
+    painter->drawRect(QRect(0, 0, width(), height()));
+    painter->setPen(oldPen);
+
     if (m_first_draw)
     {
+        m_first_draw = false;
         return;
     }
 
     if (painter->paintEngine()->type() != QPaintEngine::OpenGL && painter->paintEngine()->type() != QPaintEngine::OpenGL2)
-    {
-        return;
-    }
+        return; // ###
 
     //painter->setClipping(true);
     //painter->setClipRect( option->exposedRect );
