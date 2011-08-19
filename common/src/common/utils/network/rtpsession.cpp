@@ -491,7 +491,20 @@ int RTPSession::readRAWData()
 {
     int readed = m_tcpSock.recv(m_responseBuffer + m_responseBufferLen, MAX_RESPONCE_LEN - m_responseBufferLen);
     if (readed > 0)
+    {
+#ifdef DEBUG_RTSP
+        {
+            static QFile* binaryFile = 0;
+            if (!binaryFile) {
+                binaryFile = new QFile("c:/binary_raw.rtsp");
+                binaryFile->open(QFile::WriteOnly);
+            }
+            binaryFile->write((const char*)m_responseBuffer + m_responseBufferLen, readed);
+            binaryFile->flush();
+        }
+#endif
         m_responseBufferLen += readed;
+    }
     return readed;
 }
 

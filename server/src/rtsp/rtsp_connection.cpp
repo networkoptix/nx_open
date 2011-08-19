@@ -30,20 +30,7 @@ static const int RTSP_MIN_SEEK_INTERVAL = 1000 * 30; // 30 ms as min seek interv
 
 static const int MAX_RTSP_WRITE_BUFFER = 1024*1024;
 
-//#define DEBUG_RTSP
-
-#ifdef DEBUG_RTSP
-static void dumpRtspData(const char* data, int datasize)
-{
-    static QFile* binaryFile = 0;
-    if (!binaryFile) {
-        binaryFile = new QFile("c:/binary_server.rtsp");
-        binaryFile->open(QFile::WriteOnly);
-    }
-    binaryFile->write(data, datasize);
-    binaryFile->flush();
-}
-#endif
+#define DEBUG_RTSP
 
 class QnRtspDataProcessor: public QnAbstractDataConsumer
 {
@@ -109,14 +96,14 @@ protected:
             ssrc += subChannelNumber;
         }
         // send data with RTP headers
+        QnCompressedVideoData *video = media.dynamicCast<QnCompressedVideoData>().data();
         const char* curData = media->data.data();
         int sendLen = 0;
         bool first = true;
         for (int dataRest = media->data.size(); dataRest > 0; dataRest -= sendLen)
         {
             sendLen = qMin(MAX_RTSP_DATA_LEN, dataRest);
-            QnCompressedVideoData* video = dynamic_cast<QnCompressedVideoData*> (media.data());
-            buildRtspTcpHeader(rtspChannelNum, ssrc, sendLen + (first && video ? 1 : 0), sendLen >= dataRest, video->timestamp);
+            buildRtspTcpHeader(rtspChannelNum, ssrc, sendLen + (first && video ? 1 : 0), sendLen >= dataRest ? 1 : 0, video->timestamp);
             QMutexLocker lock(&m_owner->getSockMutex());
             m_owner->sendData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
             if (first && video)
@@ -201,12 +188,6 @@ public:
     //State state;
 };
 
-void QnRtspConnectionProcessor::sendData(const QByteArray& data)
-{
-    Q_D(QnRtspConnectionProcessor);
-    sendData(data.data(), data.size());
-}
-
 void QnRtspConnectionProcessor::sendData(const char* data, int size)
 {
     Q_D(QnRtspConnectionProcessor);
@@ -214,6 +195,17 @@ void QnRtspConnectionProcessor::sendData(const char* data, int size)
     {
         int sended = d->socket->send(data, size);
         if (sended > 0) {
+#ifdef DEBUG_RTSP
+            {
+                static QFile* binaryFile = 0;
+                if (!binaryFile) {
+                    binaryFile = new QFile("c:/binary_server.rtsp");
+                    binaryFile->open(QFile::WriteOnly);
+                }
+                binaryFile->write(data, sended);
+                binaryFile->flush();
+            }
+#endif
             data += sended;
             size -= sended;
         }
@@ -292,12 +284,12 @@ void QnRtspConnectionProcessor::parseRequest()
 
     QList<QByteArray> lines = d->clientRequest.split('\n');
     bool firstLine = true;
-    foreach(const QByteArray& l, lines)
+    foreach (const QByteArray& l, lines)
     {
         QByteArray line = l.trimmed();
         if (line.isEmpty())
             break;
-        else  if (firstLine)
+        if (firstLine)
         {
             QList<QByteArray> params = line.split(' ');
             if (params.size() != 3)
