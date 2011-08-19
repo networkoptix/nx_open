@@ -1,6 +1,11 @@
 #ifndef clgl_renderer_12_29
 #define clgl_renderer_12_29
 
+#include <QtCore/QMutex>
+#include <QtCore/QWaitCondition>
+
+#include <QtOpenGL/qgl.h>
+
 #include "abstractrenderer.h"
 
 class CLVideoWindowItem;
@@ -8,7 +13,6 @@ class CLVideoWindowItem;
 class CLGLRenderer : public CLAbstractRenderer
 {
 public:
-
     enum CLGLDrawHardwareStatus
     {
         CL_GL_NOT_TESTED,
@@ -23,30 +27,24 @@ public:
 
     static int getMaxTextureSize();
 
-    void draw(CLVideoDecoderOutput& image, unsigned int channel);
+    void draw(CLVideoDecoderOutput &image, unsigned int channel);
 
-    bool paintEvent(const QRect& r);
+    bool paintEvent(const QRect &r);
 
     virtual void beforeDestroy();
 
     QSize sizeOnScreen(unsigned int channel) const;
     bool constantDownscaleFactor() const;
 
-    void setOpacity(qreal opacity); 
+    qreal opacity() const;
+    void setOpacity(qreal opacity);
 
-    void applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation)
-    {
-        //let's normalize the values
-        m_brightness = brightness * 128;
-        m_contrast = contrast + 1.;
-        m_hue = hue * 180.;
-        m_saturation = saturation + 1.;
-    }
+    void applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation);
 
     void copyVideoDataBeforePainting(bool copy);
     static bool isPixelFormatSupported(PixelFormat pixfmt);
-private:
 
+private:
     void init(bool msgbox);
     static int gl_status;
 
@@ -80,23 +78,27 @@ private:
         return result;
     }
 
-    void getTextureRect(QRect& drawRect,
-        float textureWidth, float textureHeight,
-        float windowWidth, float windowHeight, const float sar) const;
-
     void drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const float* v_array);
     void updateTexture();
     void setForceSoftYUV(bool value);
     bool isYuvFormat() const;
     int glRGBFormat() const;
+
 private:
     GLint clampConstant;
     bool isNonPower2;
     bool isSoftYuv2Rgb;
 
-    static QMutex m_programMutex; 
+    enum Program
+    {
+        YV12toRGB = 0,
+        YUY2toRGB = 1,
+        ProgramCount = 2
+    };
+
+    static QMutex m_programMutex;
     static bool m_programInited;
-    static GLuint m_program[2];
+    static GLuint m_program[ProgramCount];
     GLuint m_texture[3];
     bool m_forceSoftYUV;
 
@@ -111,16 +113,9 @@ private:
         m_stride_old,
         m_height_old;
 
-    unsigned char*  m_arrayPixels[3];
+    unsigned char *m_arrayPixels[3];
 
     PixelFormat m_color, m_color_old;
-
-    enum Program
-    {
-        YV12toRGB = 0,
-        YUY2toRGB = 1,
-        ProgramCount = 2
-    };
 
     float m_videoCoeffL[4];
     float m_videoCoeffW[4];
@@ -128,29 +123,24 @@ private:
 
     bool m_videoTextureReady;
 
-    qreal m_brightness,
-        m_contrast,
-        m_hue,
-        m_saturation,
-        m_painterOpacity;
+    qreal m_brightness;
+    qreal m_contrast;
+    qreal m_hue;
+    qreal m_saturation;
+    qreal m_painterOpacity;
 
-    mutable QMutex m_mutex; // to avoid call PaintEvent more than once at the same time.
+    mutable QMutex m_mutex; // to avoid call paintEvent() more than once at the same time
     QWaitCondition m_waitCon;
     bool m_gotnewimage;
 
     bool m_needwait;
 
-    CLVideoWindowItem* m_videowindow;
+    CLVideoWindowItem *const m_videowindow;
 
     CLVideoDecoderOutput m_image;
     bool m_abort_drawing;
 
     bool m_do_not_need_to_wait_any_more;
-
-    static QList<GLuint*> mGarbage;
-
-    static GLint ms_maxTextureSize;
-    static QMutex ms_maxTextureSizeMutex;
 
     bool m_inited;
 

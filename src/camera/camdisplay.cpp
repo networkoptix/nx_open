@@ -502,7 +502,7 @@ void CLCamDisplay::enqueueVideo(CLCompressedVideoData* vd)
     if (m_videoQueue[vd->channelNumber].size() > 60 * 6) // I assume we are not gonna buffer
     {
         cl_log.log(QLatin1String("Video buffer overflow!"), cl_logWARNING);
-        m_videoQueue->dequeue()->releaseRef();
+        m_videoQueue[vd->channelNumber].dequeue()->releaseRef();
         // some protection for very large difference between video and audio tracks. Need to improve sync logic for this case (now a lot of glithces)
         m_videoBufferOverflow = true;
     }
