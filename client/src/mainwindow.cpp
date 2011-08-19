@@ -54,17 +54,20 @@ void MainWindow::boo()
     //if (resource->checkFlag(QnResource::playback | QnResource::media | QnResource::video))
     if (QnClientMediaResourcePtr media = resource.dynamicCast<QnClientMediaResource>())
     {
-        QnAbstractMediaStreamDataProvider *msdp = media->createMediaProvider();
         CLVideoWindowItem *vwi = new CLVideoWindowItem(media->getMediaLayout(), 300, 300, media->getName());
         CLCamDisplay *camDisplay = new CLCamDisplay;
-        camDisplay->addVideoChannel(0, vwi, false);
+        int videonum = media->getMediaLayout()->numberOfVideoChannels();
+        for (int i = 0; i < videonum; ++i)
+            camDisplay->addVideoChannel(i, vwi, false/*!singleshot*/);
+
+        QnAbstractMediaStreamDataProvider *msdp = media->createMediaProvider();
         msdp->addDataProcessor(camDisplay);
 
         m_view->scene()->addItem(vwi);
         vwi->setPos(-150, 20);
 
-        msdp->start();
         camDisplay->start();
+        msdp->start();
     }
 }
 // ###

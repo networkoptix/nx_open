@@ -109,14 +109,14 @@ protected:
             ssrc += subChannelNumber;
         }
         // send data with RTP headers
+        QnCompressedVideoData *video = media.dynamicCast<QnCompressedVideoData>().data();
         const char* curData = media->data.data();
         int sendLen = 0;
         bool first = true;
         for (int dataRest = media->data.size(); dataRest > 0; dataRest -= sendLen)
         {
             sendLen = qMin(MAX_RTSP_DATA_LEN, dataRest);
-            QnCompressedVideoData* video = dynamic_cast<QnCompressedVideoData*> (media.data());
-            buildRtspTcpHeader(rtspChannelNum, ssrc, sendLen + (first && video ? 1 : 0), sendLen >= dataRest, video->timestamp);
+            buildRtspTcpHeader(rtspChannelNum, ssrc, sendLen + (first && video ? 1 : 0), sendLen >= dataRest ? 1 : 0, video->timestamp);
             QMutexLocker lock(&m_owner->getSockMutex());
             m_owner->sendData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
             if (first && video)
@@ -201,12 +201,6 @@ public:
     //State state;
 };
 
-void QnRtspConnectionProcessor::sendData(const QByteArray& data)
-{
-    Q_D(QnRtspConnectionProcessor);
-    sendData(data.data(), data.size());
-}
-
 void QnRtspConnectionProcessor::sendData(const char* data, int size)
 {
     Q_D(QnRtspConnectionProcessor);
@@ -214,7 +208,9 @@ void QnRtspConnectionProcessor::sendData(const char* data, int size)
     {
         int sended = d->socket->send(data, size);
         if (sended > 0) {
+#ifdef DEBUG_RTSP
             dumpRtspData(data, sended);
+#endif
             data += sended;
             size -= sended;
         }
@@ -293,12 +289,12 @@ void QnRtspConnectionProcessor::parseRequest()
 
     QList<QByteArray> lines = d->clientRequest.split('\n');
     bool firstLine = true;
-    foreach(const QByteArray& l, lines)
+    foreach (const QByteArray& l, lines)
     {
         QByteArray line = l.trimmed();
         if (line.isEmpty())
             break;
-        else  if (firstLine)
+        if (firstLine)
         {
             QList<QByteArray> params = line.split(' ');
             if (params.size() != 3)
