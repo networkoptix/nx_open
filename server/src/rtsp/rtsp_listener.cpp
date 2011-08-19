@@ -2,7 +2,7 @@
 #include "rtsp_connection.h"
 #include "network/socket.h"
 
-static const int SOCK_TIMEOUT = 1000;
+static const int SOCK_TIMEOUT = 3000;
 // ------------------------ QnRtspListenerPrivate ---------------------------
 
 struct QnRtspListener::QnRtspListenerPrivate
