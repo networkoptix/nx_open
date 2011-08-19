@@ -2738,17 +2738,26 @@ void GraphicsView::recordingSettings()
 void GraphicsView::toggleFullScreen()
 {
     CLAbstractSceneItem *item = m_selectedWnd;
+
     QList<CLAbstractSceneItem*> items = m_camLayout.getItemList();
     if (!item && items.count() == 1)
         item = items.first();
 
-    if ((item && (!item->isFullScreen() || isItemFullScreenZoomed(item))) || !item->isFullScreen()) { // if item is not in full screen mode or if it's in FS and zoomed more
-        if (item)
-            onItemFullScreen_helper(item, 800);
-        mMainWnd->showFullScreen();
-    } else {
+    if (!isItemStillExists(item))
+        item = 0;
+
+    if (mMainWnd->isFullScreen())
+    {
         mMainWnd->showNormal();
         mMainWnd->resize(600, 400);
+    }
+    else
+    {
+        if (item && !item->isFullScreen())
+            onItemFullScreen_helper(item, 800);
+
+        mMainWnd->showFullScreen();
+
     }
 }
 
