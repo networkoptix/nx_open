@@ -3,6 +3,10 @@
 
 #include <QtGui/QGraphicsView>
 
+class QGraphicsWidget;
+
+class AnimatedWidget;
+
 class GraphicsView: public QGraphicsView
 {
     Q_OBJECT
@@ -11,7 +15,11 @@ public:
     GraphicsView(QWidget *parent = 0);
     ~GraphicsView();
 
+    bool isEditMode() const;
+    void setEditMode(bool interactive);
+
     void relayoutItems(int rowCount, int columnCount, const QByteArray &preset = QByteArray());
+    void invalidateLayout();
 
     // helpers
     inline QRectF mapRectToScene(const QRect &rect) const
@@ -36,7 +44,7 @@ private:
 
 private:
     QGraphicsWidget *m_widget;
-    QList<QGraphicsWidget *> m_animatedWidgets;
+    QList<AnimatedWidget *> m_animatedWidgets;
 };
 
 #endif // GRAPHICSVIEW_H

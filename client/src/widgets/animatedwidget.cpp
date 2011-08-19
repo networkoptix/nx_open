@@ -155,14 +155,13 @@ bool AnimatedWidget::isInteractive() const
     return (windowFlags() & Qt::FramelessWindowHint) == 0;
 }
 
-void AnimatedWidget::setInteractive(bool allowed)
+void AnimatedWidget::setInteractive(bool interactive)
 {
-    if (allowed)
+    if (interactive)
         setWindowFlags(windowFlags() & ~Qt::FramelessWindowHint);
     else
         setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
-    setFlag(ItemIsMovable, allowed);
-    setFlag(ItemIsSelectable, allowed);
+    setFlag(ItemIsMovable, interactive);
 }
 
 void AnimatedWidget::setGeometry(const QRectF &rect)
@@ -212,7 +211,7 @@ QVariant AnimatedWidget::itemChange(GraphicsItemChange change, const QVariant &v
                 d->posAnimation->stop();
 
             QGraphicsItem *mouseGrabberItem = scene()->mouseGrabberItem();
-            if (!mouseGrabberItem || (/*mouseGrabberItem != this && !isAncestorOf(mouseGrabberItem) && */!isSelected()))
+            if (!isInteractive() || !isSelected() || !mouseGrabberItem/* || (mouseGrabberItem != this && !isAncestorOf(mouseGrabberItem))*/)
             {
                 d->posAnimation->setEndValue(newPos);
                 d->posAnimation->start();
@@ -231,7 +230,7 @@ QVariant AnimatedWidget::itemChange(GraphicsItemChange change, const QVariant &v
                 d->sizeAnimation->stop();
 
             QGraphicsItem *mouseGrabberItem = scene()->mouseGrabberItem();
-            if (!mouseGrabberItem || (/*mouseGrabberItem != this && !isAncestorOf(mouseGrabberItem) && */!isSelected()))
+            if (!isInteractive() || !isSelected() || !mouseGrabberItem/* || (mouseGrabberItem != this && !isAncestorOf(mouseGrabberItem))*/)
             {
                 d->sizeAnimation->setEndValue(newSize);
                 d->sizeAnimation->start();
@@ -331,13 +330,13 @@ void AnimatedWidget::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 
 void AnimatedWidget::wheelEvent(QGraphicsSceneWheelEvent *event)
 {
-    if (isSelected())
+    if (isInteractive())
     {
         setTransformOriginPoint(rect().center());
-        if (event->buttons() == Qt::NoButton)
-            setScale(scale() + qreal(event->delta()) / 240);
-        else if (event->buttons() == Qt::RightButton)
+        if (event->modifiers() & Qt::AltModifier)
             setRotation(rotation() + ((event->delta() / 8) / 15) * 15);
+        else
+            setScale(scale() + qreal(event->delta()) / 240);
     }
 }
 

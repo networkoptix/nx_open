@@ -80,6 +80,7 @@ GraphicsView::GraphicsView(QWidget *parent)
     for (int i = 0; i < 16; ++i)
     {
         AnimatedWidget *widget = new AnimatedWidget(m_widget);
+        widget->setFlag(QGraphicsItem::ItemIsSelectable, true);
         widget->setFlag(QGraphicsItem::ItemIsPanel, false);
         widget->setPos(QPointF(-500, -500));
         scene()->addItem(widget);
@@ -107,6 +108,17 @@ GraphicsView::GraphicsView(QWidget *parent)
 GraphicsView::~GraphicsView()
 {
     delete m_widget;
+}
+
+bool GraphicsView::isEditMode() const
+{
+    return !m_animatedWidgets.isEmpty() && m_animatedWidgets.first()->isInteractive();
+}
+
+void GraphicsView::setEditMode(bool interactive)
+{
+    foreach (AnimatedWidget *widget, m_animatedWidgets)
+        widget->setInteractive(interactive);
 }
 
 void GraphicsView::createActions()
@@ -217,12 +229,46 @@ void GraphicsView::createActions()
     {
         QByteArray preset =
                 "1111"
+                "1201"
+                "1001"
+                "1111";
+
+        QAction *action = new QAction(QIcon(), tr("1"), this);
+        action->setShortcut(QKeySequence(Qt::Key_F7));
+        action->setShortcutContext(Qt::WindowShortcut);
+        action->setAutoRepeat(false);
+        action->setProperty("rowCount", 4);
+        action->setProperty("columnCount", 4);
+        action->setProperty("preset", preset);
+        connect(action, SIGNAL(triggered()), this, SLOT(relayoutItemsActionTriggered()));
+        addAction(action);
+    }
+    {
+        QByteArray preset =
+                "2020"
+                "0000"
+                "1201"
+                "1001";
+
+        QAction *action = new QAction(QIcon(), tr("2"), this);
+        action->setShortcut(QKeySequence(Qt::Key_F8));
+        action->setShortcutContext(Qt::WindowShortcut);
+        action->setAutoRepeat(false);
+        action->setProperty("rowCount", 4);
+        action->setProperty("columnCount", 4);
+        action->setProperty("preset", preset);
+        connect(action, SIGNAL(triggered()), this, SLOT(relayoutItemsActionTriggered()));
+        addAction(action);
+    }
+    {
+        QByteArray preset =
+                "1111"
                 "1111"
                 "1111"
                 "1111";
 
         QAction *action = new QAction(QIcon(QLatin1String(":/images/4-4-4-4.png")), tr(""), this);
-        action->setShortcut(QKeySequence(Qt::Key_F7));
+        action->setShortcut(QKeySequence(Qt::Key_F9));
         action->setShortcutContext(Qt::WindowShortcut);
         action->setAutoRepeat(false);
         action->setProperty("rowCount", 4);
@@ -250,10 +296,10 @@ void GraphicsView::relayoutItems(int rowCount, int columnCount, const QByteArray
     {
         for (int column = 0; column < columnCount; ++column)
         {
-            const int span = preset.at(row * columnCount + column) - '0';
-            if (span > 0)
+            if (QGraphicsWidget *widget = m_animatedWidgets.value(i, 0))
             {
-                if (QGraphicsWidget *widget = m_animatedWidgets.value(i, 0))
+                const int span = preset.at(row * columnCount + column) - '0';
+                if (span > 0)
                 {
                     layout->addItem(widget, row, column, span, span, Qt::AlignCenter);
                     ++i;
@@ -270,6 +316,17 @@ void GraphicsView::relayoutItems(int rowCount, int columnCount, const QByteArray
     {
         QGraphicsWidget *widget = m_animatedWidgets.at(i++);
         widget->setGeometry(QRectF(QPointF(-500, -500), widget->preferredSize()));
+    }
+}
+
+void GraphicsView::invalidateLayout()
+{
+    if (QGraphicsLayout *layout = m_widget->layout())
+    {
+        /*foreach (AnimatedWidget *widget, m_animatedWidgets)
+            widget->setZValue(m_widget->zValue());*/
+        layout->invalidate();
+        layout->activate();
     }
 }
 
@@ -331,22 +388,16 @@ void GraphicsView::itemDoubleClicked()
 
 void GraphicsView::itemDestroyed()
 {
-    m_animatedWidgets.removeOne(static_cast<QGraphicsWidget *>(sender()));
+    m_animatedWidgets.removeOne(static_cast<AnimatedWidget *>(sender()));
     QTimer::singleShot(250, this, SLOT(relayoutItemsActionTriggered()));
 }
 
 void GraphicsView::mouseReleaseEvent(QMouseEvent *event)
 {
     QGraphicsView::mouseReleaseEvent(event);
-/*
+
     if (scene()->selectedItems().isEmpty())
-    {
-        if (QGraphicsLayout *layout = m_widget->layout())
-        {
-            layout->invalidate();
-            layout->activate();
-        }
-    }*/
+        invalidateLayout();
 }
 
 void GraphicsView::keyPressEvent(QKeyEvent *event)
@@ -376,22 +427,12 @@ void GraphicsView::keyPressEvent(QKeyEvent *event)
 
     case Qt::Key_Control:
         setDragMode(QGraphicsView::RubberBandDrag);
-        foreach (QGraphicsItem *item, items()) // ###
-        {
-            if (item->isWidget())
-            {
-                if (AnimatedWidget *widget = qobject_cast<AnimatedWidget *>(static_cast<QGraphicsWidget *>(item)))
-                    widget->setInteractive(true);
-            }
-        }
+        scene()->clearSelection();
+        setEditMode(true);
         break;
 
     case Qt::Key_Space:
-        if (QGraphicsLayout *layout = m_widget->layout())
-        {
-            layout->invalidate();
-            layout->activate();
-        }
+        invalidateLayout();
         break;
 
     case Qt::Key_Escape:
@@ -417,14 +458,8 @@ void GraphicsView::keyReleaseEvent(QKeyEvent *event)
     {
     case Qt::Key_Control:
         setDragMode(QGraphicsView::NoDrag);
-        foreach (QGraphicsItem *item, items()) // ###
-        {
-            if (item->isWidget())
-            {
-                if (AnimatedWidget *widget = qobject_cast<AnimatedWidget *>(static_cast<QGraphicsWidget *>(item)))
-                    widget->setInteractive(false);
-            }
-        }
+        scene()->clearSelection();
+        setEditMode(false);
         break;
 
     default:
