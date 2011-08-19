@@ -30,7 +30,7 @@ static const int RTSP_MIN_SEEK_INTERVAL = 1000 * 30; // 30 ms as min seek interv
 
 static const int MAX_RTSP_WRITE_BUFFER = 1024*1024;
 
-//#define DEBUG_RTSP
+#define DEBUG_RTSP
 
 #ifdef DEBUG_RTSP
 static void dumpRtspData(const char* data, int datasize)
@@ -214,6 +214,7 @@ void QnRtspConnectionProcessor::sendData(const char* data, int size)
     {
         int sended = d->socket->send(data, size);
         if (sended > 0) {
+            dumpRtspData(data, sended);
             data += sended;
             size -= sended;
         }
