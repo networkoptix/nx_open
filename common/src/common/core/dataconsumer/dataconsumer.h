@@ -6,6 +6,8 @@
 
 class QnAbstractDataConsumer : public QnLongRunnable
 {
+    Q_OBJECT
+
 public:
     QnAbstractDataConsumer(int maxQueueSize);
     virtual ~QnAbstractDataConsumer(){}

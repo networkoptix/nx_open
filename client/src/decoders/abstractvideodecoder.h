@@ -19,9 +19,10 @@ public:
 
     void setMTDecoding(bool value)
     {
-        if (m_mtDecoding != value)
-            m_needRecreate = true;
+        if (m_mtDecoding == value)
+            return;
 
+        m_needRecreate = true;
         m_mtDecoding = value;
     }
 
