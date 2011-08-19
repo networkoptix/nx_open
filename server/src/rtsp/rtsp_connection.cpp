@@ -8,6 +8,7 @@
 #include "network/rtp_stream_parser.h"
 #include "ffmpeg/ffmpeg_helper.h"
 #include "dataprovider/navigated_dataprovider.h"
+#include "network/socket.h"
 
 static const int CODE_OK = 200;
 static const int CODE_NOT_FOUND = 404;
@@ -21,6 +22,7 @@ static const QString RTP_FFMPEG_GENERIC_STR("FFMPEG");
 //static const QString RTP_FFMPEG_GENERIC_STR("mpeg4-generic"); // this line for debugging purpose with VLC player
 static const int MAX_QUEUE_SIZE = 15;
 static const int MAX_RTSP_DATA_LEN = 65535 - 4 - 1 - RtpHeader::RTP_HEADER_SIZE;
+static const int TCP_READ_BUFFER_SIZE = 65536;
 static const int CLOCK_FREQUENCY = 1000;
 static const quint32 BASIC_FFMPEG_SSRC = 20000;
 static const int MAX_CONTEXTS_AT_VIDEO = 8; // max ammount of difference codecContext used for one video channel.
@@ -83,7 +85,7 @@ protected:
             QMutexLocker lock(&m_owner->getSockMutex());
             m_owner->sendData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
             m_owner->sendData(m_codecCtxData);
-            m_owner->flush();
+            //m_owner->flush();
             m_ctxSended[rtspChannelNum] << ctx;
         }
         else {
@@ -107,14 +109,9 @@ protected:
                 first = false;
             }
             m_owner->sendData(curData, sendLen);
-            m_owner->flush();
+            //m_owner->flush();
             curData += sendLen;
             m_lastSendTime = media->timestamp;
-        }
-        while (m_owner->bytesToWrite() > MAX_RTSP_WRITE_BUFFER)
-        {
-            msleep(50); // wait while client read buffer
-            m_owner->flush();
         }
     }
 private:
@@ -125,6 +122,7 @@ private:
     QnRtspConnectionProcessor* m_owner;
     qint64 m_lastSendTime;
     char m_rtspTcpHeader[4 + RtpHeader::RTP_HEADER_SIZE];
+    quint8* tcpReadBuffer;
 };
 
 // ----------------------------- QnRtspConnectionProcessor ----------------------------
@@ -144,19 +142,22 @@ public:
         rtspScale(1.0)
         //state(State_Stopped)
     {
-
+        tcpReadBuffer = new quint8[TCP_READ_BUFFER_SIZE];
     }
 
     ~QnRtspConnectionProcessorPrivate()
     {
+        dataProvider->stop();
+        dataProcessor->stop();
         delete dataProvider;
         delete dataProcessor;
         delete socket;
+        delete [] tcpReadBuffer;
     }
 
     QnAbstractMediaStreamDataProvider* dataProvider;
     QnRtspDataProcessor* dataProcessor;
-    QTcpSocket* socket;
+    TCPSocket* socket;
 
     QHttpRequestHeader requestHeaders;
     QHttpResponseHeader responseHeaders;
@@ -176,25 +177,27 @@ public:
     //QTime playTimer; // play time elapsed
     double rtspScale; // RTSP playing speed (1 - normal speed, 0 - pause, >1 fast forward, <-1 fast back e. t.c.)
     QMutex sockMutex;
+    quint8* tcpReadBuffer;
     //State state;
 };
 
 void QnRtspConnectionProcessor::sendData(const QByteArray& data)
 {
     Q_D(QnRtspConnectionProcessor);
-    d->socket->write(data);
+    sendData(data.data(), data.size());
 }
 
 void QnRtspConnectionProcessor::sendData(const char* data, int size)
 {
     Q_D(QnRtspConnectionProcessor);
-    d->socket->write(data, size);
-}
-
-int QnRtspConnectionProcessor::bytesToWrite()
-{
-    Q_D(QnRtspConnectionProcessor);
-    return d->socket->bytesToWrite();
+    while (!m_needStop && size > 0 && d->socket->isConnected())
+    {
+        int sended = d->socket->send(data, size);
+        if (sended > 0) {
+            data += sended;
+            size -= sended;
+        }
+    }
 }
 
 QMutex& QnRtspConnectionProcessor::getSockMutex()
@@ -203,36 +206,16 @@ QMutex& QnRtspConnectionProcessor::getSockMutex()
     return d->sockMutex;
 }
 
-
-void QnRtspConnectionProcessor::flush()
-{
-    Q_D(QnRtspConnectionProcessor);
-    d->socket->flush();
-}
-
-QnRtspConnectionProcessor::QnRtspConnectionProcessor(QTcpSocket* socket):
+QnRtspConnectionProcessor::QnRtspConnectionProcessor(TCPSocket* socket):
     d_ptr(new QnRtspConnectionProcessorPrivate)
 {
     Q_D(QnRtspConnectionProcessor);
     d->socket = socket;
-    connect(socket, SIGNAL(connected()), this, SLOT(onClientConnected()));
-    connect(socket, SIGNAL(connected()), this, SLOT(onClientDisconnected()));
-    connect(socket, SIGNAL(readyRead()), this, SLOT(onClientReadyRead()));
 }
 
 QnRtspConnectionProcessor::~QnRtspConnectionProcessor()
 {
-
-}
-
-void QnRtspConnectionProcessor::onClientConnected()
-{
-
-}
-
-void QnRtspConnectionProcessor::onClientDisconnected()
-{
-    sender()->deleteLater();
+    delete d_ptr;
 }
 
 bool QnRtspConnectionProcessor::isFullMessage()
@@ -283,7 +266,7 @@ QString QnRtspConnectionProcessor::extractMediaName(const QString& path)
 void QnRtspConnectionProcessor::parseRequest()
 {
     Q_D(QnRtspConnectionProcessor);
-    qDebug() << "Client request from " << d->socket->peerAddress();
+    qDebug() << "Client request from " << d->socket->getPeerAddress();
     qDebug() << d->clientRequest;
 
     QList<QByteArray> lines = d->clientRequest.split('\n');
@@ -386,12 +369,11 @@ void QnRtspConnectionProcessor::sendResponse()
         response += ENDL;
     }
 
-    qDebug() << "Server response to " << d->socket->peerAddress();
+    qDebug() << "Server response to " << d->socket->getPeerAddress();
     qDebug() << response;
 
     QMutexLocker lock(&d->sockMutex);
-    d->socket->write(response);
-    d->socket->flush();
+    d->socket->send(response.data(), response.size());
 }
 
 int QnRtspConnectionProcessor::numOfVideoChannels()
@@ -672,13 +654,20 @@ void QnRtspConnectionProcessor::processRequest()
         d->dataProcessor->start();
 }
 
-void QnRtspConnectionProcessor::onClientReadyRead()
+void QnRtspConnectionProcessor::run()
 {
     Q_D(QnRtspConnectionProcessor);
-    d->clientRequest += d->socket->readAll();
-    if (isFullMessage())
+    while (!m_needStop && d->socket->isConnected())
     {
-        parseRequest();
-        processRequest();
+        int readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
+        if (readed > 0) {
+            d->clientRequest.append((const char*) d->tcpReadBuffer, readed);
+            if (isFullMessage())
+            {
+                parseRequest();
+                processRequest();
+            }
+        }
     }
+    deleteLater();
 }

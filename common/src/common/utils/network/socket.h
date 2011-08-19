@@ -1,7 +1,8 @@
 #ifndef __PRACTICALSOCKET_INCLUDED__
 #define __PRACTICALSOCKET_INCLUDED__
 
-#include <string>            // For std::string
+#include <QString>
+#include <string>            // For QString
 #include <exception>         // For exception class
 
 #ifdef Q_OS_WIN
@@ -23,7 +24,7 @@ public:
    *   @param incSysMsg true if system message (from strerror(errno))
    *   should be postfixed to the user provided message
    */
-  SocketException(const std::string &message, bool inclSysMsg = false) throw();
+  SocketException(const QString &message, bool inclSysMsg = false) throw();
 
   /**
    *   Provided just to guarantee that no exceptions are thrown.
@@ -37,7 +38,7 @@ public:
   const char *what() const throw();
 
 private:
-  std::string userMessage;  // Exception message
+  QString userMessage;  // Exception message
 };
 
 /**
@@ -55,7 +56,14 @@ public:
    *   @return local address of socket
    *   @exception SocketException thrown if fetch fails
    */
-  std::string getLocalAddress() const;
+  QString getLocalAddress() const;
+
+  /**
+   *   Get the peer address
+   *   @return remove address of socket
+   *   @exception SocketException thrown if fetch fails
+   */
+  QString getPeerAddress() const;
 
   /**
    *   Get the local port
@@ -80,7 +88,7 @@ public:
    *   @param localPort local port
    *   @exception SocketException thrown if setting local port or address fails
    */
-  void setLocalAddressAndPort(const std::string &localAddress,
+  void setLocalAddressAndPort(const QString &localAddress,
     unsigned short localPort = 0) ;
 
   /**
@@ -104,8 +112,8 @@ public:
    *   @param service service to resolve (e.g., "http")
    *   @param protocol protocol of service to resolve.  Default is "tcp".
    */
-  static unsigned short resolveService(const std::string &service,
-                                       const std::string &protocol = "tcp");
+  static unsigned short resolveService(const QString &service,
+                                       const QString &protocol = "tcp");
 
 private:
   // Prevent the user from trying to use value semantics on this object
@@ -131,9 +139,10 @@ public:
    *   @param foreignPort foreign port
    *   @return false if unable to establish connection
    */
-  bool connect(const std::string &foreignAddress, unsigned short foreignPort);
+  bool connect(const QString &foreignAddress, unsigned short foreignPort);
 
-  void setTimeOut( unsigned int ms );
+  void setReadTimeOut( unsigned int ms );
+  void setWriteTimeOut( unsigned int ms );
 
   /**
    *   Write the given buffer to this socket.  Call connect() before
@@ -142,7 +151,7 @@ public:
    *   @param bufferLen number of bytes from buffer to be written
    *   @exception SocketException thrown if unable to send data
    */
-  bool send(const void *buffer, int bufferLen) ;
+  int send(const void *buffer, int bufferLen) ;
 
   /**
    *   Read into the given buffer up to bufferLen bytes data from this
@@ -159,7 +168,7 @@ public:
    *   @return foreign address
    *   @exception SocketException thrown if unable to fetch foreign address
    */
-  std::string getForeignAddress() ;
+  QString getForeignAddress() ;
 
   /**
    *   Get the foreign port.  Call connect() before calling recv()
@@ -196,7 +205,7 @@ public:
    *   @param foreignPort foreign port
    *   @exception SocketException thrown if unable to create TCP socket
    */
-  TCPSocket(const std::string &foreignAddress, unsigned short foreignPort)
+  TCPSocket(const QString &foreignAddress, unsigned short foreignPort)
       ;
 
 private:
@@ -231,7 +240,7 @@ public:
    *                   connection requests (default 5)
    *   @exception SocketException thrown if unable to create TCP server socket
    */
-  TCPServerSocket(const std::string &localAddress, unsigned short localPort,
+  TCPServerSocket(const QString &localAddress, unsigned short localPort,
       int queueLen = 5) ;
 
   /**
@@ -269,12 +278,12 @@ public:
    *   @param localPort local port
    *   @exception SocketException thrown if unable to create UDP socket
    */
-  UDPSocket(const std::string &localAddress, unsigned short localPort)
+  UDPSocket(const QString &localAddress, unsigned short localPort)
       ;
 
   ~UDPSocket();
 
-  void setDestAddr(const std::string &foreignAddress, unsigned short foreignPort);
+  void setDestAddr(const QString &foreignAddress, unsigned short foreignPort);
 
   /**
    *   Unset foreign address and port
@@ -305,7 +314,7 @@ public:
    *   @return number of bytes received and -1 for error
    *   @exception SocketException thrown if unable to receive datagram
    */
-  int recvFrom(void *buffer, int bufferLen, std::string &sourceAddress,
+  int recvFrom(void *buffer, int bufferLen, QString &sourceAddress,
                unsigned short &sourcePort) ;
 
   /**
@@ -320,14 +329,14 @@ public:
    *   @param multicastGroup multicast group address to join
    *   @exception SocketException thrown if unable to join group
    */
-  void joinGroup(const std::string &multicastGroup) ;
+  void joinGroup(const QString &multicastGroup) ;
 
   /**
    *   Leave the specified multicast group
    *   @param multicastGroup multicast group address to leave
    *   @exception SocketException thrown if unable to leave group
    */
-  void leaveGroup(const std::string &multicastGroup) ;
+  void leaveGroup(const QString &multicastGroup) ;
 
     bool hasData() const;
 

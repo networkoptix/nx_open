@@ -1,6 +1,6 @@
 #ifndef __SIMPLE_TFTP_CLIENT__1117
 #define __SIMPLE_TFTP_CLIENT__1117
-#include <string>
+#include <QString>
 
 
 class CLByteArray;
@@ -17,10 +17,10 @@ class CLSimpleTFTPClient
 	//2) more friendly with wireless network ( it hates acks).
 
 public:
-	CLSimpleTFTPClient(const std::string& ip, unsigned int timeout, unsigned int retry);
+	CLSimpleTFTPClient(const QString& ip, unsigned int timeout, unsigned int retry);
 	~CLSimpleTFTPClient(){};
 
-	int read(const std::string& fn, CLByteArray& data);
+	int read(const QString& fn, CLByteArray& data);
 	const unsigned char* getLastPacket(int& size) const
 	{
 		size = m_last_packet_size;
@@ -28,7 +28,7 @@ public:
 	}
 
 private:
-	int form_read_request(const std::string& fn, char* buff);
+	int form_read_request(const QString& fn, char* buff);
 	int form_ack(unsigned short blk, char* buff);
 
 private:
@@ -39,7 +39,7 @@ private:
 	int m_retry;
 	int m_timeout;
 	int m_status;
-	std::string m_ip;
+	QString m_ip;
 
 	int m_wish_blk_size;
 	int m_curr_blk_size;

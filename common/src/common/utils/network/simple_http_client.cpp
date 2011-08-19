@@ -13,7 +13,7 @@ m_timeout(timeout),
 m_auth(auth),
 m_connected(false)
 {
-	m_sock.setTimeOut(timeout);
+	m_sock.setReadTimeOut(timeout);
 }
 
 CLSimpleHTTPClient::~CLSimpleHTTPClient()
@@ -74,7 +74,7 @@ CLHttpStatus CLSimpleHTTPClient::openStream(bool recursive)
 
 		os<< "\r\n";
 
-        if (!m_sock.send(request.toLatin1().data(), request.toLatin1().size()))
+        if (m_sock.send(request.toLatin1().data(), request.toLatin1().size()) < 0)
             return CL_HTTP_HOST_NOT_AVAILABLE;
 
 		if (CL_HTTP_HOST_NOT_AVAILABLE==getNextLine())

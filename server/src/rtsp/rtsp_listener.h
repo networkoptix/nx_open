@@ -2,8 +2,9 @@
 #include <QNetworkInterface>
 
 #include "common/base.h"
+#include "common/longrunnable.h"
 
-class QnRtspListener: public QObject
+class QnRtspListener: public QnLongRunnable
 {
     Q_OBJECT
 public:
@@ -11,8 +12,8 @@ public:
 
     explicit QnRtspListener(const QHostAddress& address = QHostAddress::Any, int port = DEFAULT_RTSP_PORT);
     virtual ~QnRtspListener();
-private slots:
-    void onNewConnection();
+protected:
+    virtual void run();
 private:
     QN_DECLARE_PRIVATE(QnRtspListener);
 };

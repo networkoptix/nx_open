@@ -13,7 +13,7 @@ static const int MAX_RTCP_PACKET_SIZE = 1024 * 2;
 static const quint32 SSRC_CONST = 0x2a55a9e8;
 static const quint32 CSRC_CONST = 0xe8a9552a;
 
-//#define DEBUG_RTSP
+#define DEBUG_RTSP
 
 RTPIODevice::RTPIODevice(RTPSession& owner):
     m_owner(owner),
@@ -58,8 +58,8 @@ RTPSession::RTPSession():
     m_rtpIo(*this),
     m_transport("UDP")
 {
-    m_udpSock.setTimeOut(500);
-    m_tcpSock.setTimeOut(3 * 1000);
+    m_udpSock.setReadTimeOut(500);
+    m_tcpSock.setReadTimeOut(3 * 1000);
     m_responseBuffer = new quint8[MAX_RESPONCE_LEN];
     m_responseBufferLen = 0;
 }
@@ -410,7 +410,7 @@ void RTPSession::processRtcpData(const RtspStatistic* stats)
     quint8 sendBuffer[MAX_RTCP_PACKET_SIZE];
     while (m_rtcpUdpSock.hasData())
     {
-        std::string lastReceivedAddr;
+        QString lastReceivedAddr;
         unsigned short lastReceivedPort;
         int readed = m_rtcpUdpSock.recvFrom(rtcpBuffer, sizeof(rtcpBuffer), lastReceivedAddr, lastReceivedPort);
         if (readed > 0)

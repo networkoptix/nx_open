@@ -1,19 +1,16 @@
-#include <QTcpSocket>
-
 #include "common/base.h"
+#include "network/socket.h"
+#include "common/longrunnable.h"
 
-class QnRtspConnectionProcessor: public QObject
+class QnRtspConnectionProcessor: public QnLongRunnable
 {
-    Q_OBJECT
 public:
-    QnRtspConnectionProcessor(QTcpSocket* socket);
+    QnRtspConnectionProcessor(TCPSocket* socket);
     virtual ~QnRtspConnectionProcessor();
 
     qint64 getRtspTime();
-private slots:
-    void onClientReadyRead();
-    void onClientConnected();
-    void onClientDisconnected();
+protected:
+    virtual void run();
 private:
     bool isFullMessage();
     void processRequest();
@@ -30,7 +27,6 @@ private:
     int composePause();
     void sendData(const QByteArray& data);
     void sendData(const char* data, int size);
-    void flush();
     QString extractMediaName(const QString& path);
     int extractTrackId(const QString& path);
     int composeTeardown();
@@ -38,7 +34,6 @@ private:
     void extractNptTime(const QString& strValue, qint64* dst);
     int composeSetParameter();
     int composeGetParameter();
-    int bytesToWrite();
     QMutex& getSockMutex();
 private:
     QN_DECLARE_PRIVATE(QnRtspConnectionProcessor);

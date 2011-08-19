@@ -7,7 +7,7 @@
 
 using namespace std;
 
-CLSimpleTFTPClient::CLSimpleTFTPClient(const std::string& ip, unsigned int timeout, unsigned int retry):
+CLSimpleTFTPClient::CLSimpleTFTPClient(const QString& ip, unsigned int timeout, unsigned int retry):
 m_retry(retry),
 m_ip(ip),
 m_timeout(timeout)
@@ -16,7 +16,7 @@ m_timeout(timeout)
 	m_wish_blk_size  = blk_size;
 }
 
-int CLSimpleTFTPClient::read( const std::string& fn, CLByteArray& data)
+int CLSimpleTFTPClient::read( const QString& fn, CLByteArray& data)
 {
 	m_last_packet_size = 0;
 	char buff_send[1000]; int len_send;
@@ -25,11 +25,11 @@ int CLSimpleTFTPClient::read( const std::string& fn, CLByteArray& data)
 
 	UDPSocket m_sock;
 	m_sock.setDestAddr(m_ip,69);
-	m_sock.setTimeOut(max(m_timeout,1000)); // minimum timeout is 1000 ms
+	m_sock.setReadTimeOut(max(m_timeout,1000)); // minimum timeout is 1000 ms
 
 	len_send = form_read_request(fn, buff_send);
 
-	string temp_cam_addr;
+	QString temp_cam_addr;
 	unsigned short cam_dst_port;
 
 	int oa = 1;
@@ -196,13 +196,13 @@ LAST_PACKET:
 	return len;
 }
 
-int CLSimpleTFTPClient::form_read_request(const std::string& fn, char* buff)
+int CLSimpleTFTPClient::form_read_request(const QString& fn, char* buff)
 {
 	buff[0] = 0; buff[1] = 1; // read request;
 	int len = 2;
 	int req_len = fn.length();
 
-	memcpy(buff+len, fn.c_str(), req_len);	len+=req_len;
+	memcpy(buff+len, fn.toAscii(), req_len);	len+=req_len;
 	buff[len] = 0;	len++;
 
 	memcpy(buff+len, "netascii", 8); len+=8;

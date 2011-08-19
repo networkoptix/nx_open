@@ -1,37 +1,54 @@
-#include <QTcpServer>
-
 #include "rtsp_listener.h"
 #include "rtsp_connection.h"
+#include "network/socket.h"
 
+static const int SOCK_TIMEOUT = 50;
 // ------------------------ QnRtspListenerPrivate ---------------------------
 
 struct QnRtspListener::QnRtspListenerPrivate
 {
-    QTcpServer serverSocket;
-    QMap<QTcpSocket*, QnRtspConnectionProcessor*> connections;
+    TCPServerSocket* serverSocket;
+    //QMap<TCPSocket*, QnRtspConnectionProcessor*> connections;
 };
 
 // ------------------------ QnRtspListener ---------------------------
 
-QnRtspListener::QnRtspListener(const QHostAddress& address, int port):d_ptr(new QnRtspListenerPrivate())
+QnRtspListener::QnRtspListener(const QHostAddress& address, int port):
+    d_ptr(new QnRtspListenerPrivate())
 {
     Q_D(QnRtspListener);
+    d->serverSocket = new TCPServerSocket(address.toString(), port);
+    start();
+    qDebug() << "RTSP server started at " << address << ":" << port;
+    /*
     connect(&d->serverSocket, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
     if (d->serverSocket.listen(address, port))
         qDebug() << "RTSP server started at " << address << ":" << port;
     else
         qWarning() << "Failed to start RTSP server at " << address << ":" << port;
+    */
 }
 
 QnRtspListener::~QnRtspListener()
 {
+    Q_D(QnRtspListener);
+    delete d->serverSocket;
     delete d_ptr;
 }
 
-void QnRtspListener::onNewConnection()
+void QnRtspListener::run()
 {
     Q_D(QnRtspListener);
-    QTcpSocket* clientSocket = d->serverSocket.nextPendingConnection();
-    d->connections[clientSocket] = new QnRtspConnectionProcessor(clientSocket);
-    qDebug() << "New client connection from " << clientSocket->peerAddress();
+    while (!m_needStop)
+    {
+        TCPSocket* clientSocket = d->serverSocket->accept();
+        if (clientSocket) {
+            qDebug() << "New client connection from " << clientSocket->getPeerAddress();
+            clientSocket->setReadTimeOut(SOCK_TIMEOUT);
+            clientSocket->setWriteTimeOut(SOCK_TIMEOUT);
+            QnRtspConnectionProcessor* processor = new QnRtspConnectionProcessor(clientSocket);
+            //d->connections[clientSocket] = processor;
+            processor->start();
+        }
+    }
 }
