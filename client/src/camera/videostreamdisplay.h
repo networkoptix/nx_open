@@ -20,31 +20,27 @@ class CLAbstractVideoDecoder;
 class CLVideoStreamDisplay
 {
 public:
-    CLVideoStreamDisplay(bool can_downscale);
+    CLVideoStreamDisplay(CLAbstractRenderer *renderer, bool can_downscale);
     ~CLVideoStreamDisplay();
 
-    void setDrawer(CLAbstractRenderer* draw);
     void dispay(QnCompressedVideoDataPtr data, bool draw,
                 CLVideoDecoderOutput::downscale_factor force_factor = CLVideoDecoderOutput::factor_any);
 
-    void setLightCPUMode(bool val);
-    void copyImage(bool copy);
-
     CLVideoDecoderOutput::downscale_factor getCurrentDownscaleFactor() const;
 
+    void setMTDecoding(bool value);
+
 private:
+    CLAbstractRenderer *const m_renderer;
+    bool m_canDownscale;
+
     QMutex m_mtx;
     QHash<int, CLAbstractVideoDecoder *> m_decoder; // codec Id -> decoder
-
-    CLAbstractRenderer* m_draw;
 
     /**
       * to reduce image size for weak video cards
       */
     CLVideoDecoderOutput m_outFrame;
-
-    bool m_lightCPUmode;
-    bool m_canDownscale;
 
     CLVideoDecoderOutput::downscale_factor m_prevFactor;
     CLVideoDecoderOutput::downscale_factor m_scaleFactor;

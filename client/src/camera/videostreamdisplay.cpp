@@ -11,8 +11,8 @@ extern "C" {
 #include <libswscale/swscale.h>
 }
 
-CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale) :
-    m_lightCPUmode(false),
+CLVideoStreamDisplay::CLVideoStreamDisplay(CLAbstractRenderer *renderer, bool canDownscale) :
+    m_renderer(renderer),
     m_canDownscale(canDownscale),
     m_prevFactor(CLVideoDecoderOutput::factor_1),
     m_scaleFactor(CLVideoDecoderOutput::factor_1),
@@ -27,14 +27,11 @@ CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale) :
 
 CLVideoStreamDisplay::~CLVideoStreamDisplay()
 {
+    QMutexLocker mutex(&m_mtx);
+
     qDeleteAll(m_decoder);
 
     freeScaleContext();
-}
-
-void CLVideoStreamDisplay::setDrawer(CLAbstractRenderer* draw)
-{
-    m_draw = draw;
 }
 
 CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::getCurrentDownscaleFactor() const
@@ -81,12 +78,12 @@ void CLVideoStreamDisplay::freeScaleContext()
 
 CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::determineScaleFactor(QnCompressedVideoDataPtr data, const CLVideoData& img, CLVideoDecoderOutput::downscale_factor force_factor)
 {
-    if (m_draw->constantDownscaleFactor())
+    if (m_renderer->constantDownscaleFactor())
        force_factor = CLVideoDecoderOutput::factor_2;
 
     if (force_factor==CLVideoDecoderOutput::factor_any) // if nobody pushing lets peek it
     {
-        QSize on_screen = m_draw->sizeOnScreen(data->channelNumber);
+        QSize on_screen = m_renderer->sizeOnScreen(data->channelNumber);
 
         m_scaleFactor = findScaleFactor(img.outFrame.width, img.outFrame.height, on_screen.width(), on_screen.height());
 
@@ -131,6 +128,12 @@ CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::determineScaleFacto
 
 void CLVideoStreamDisplay::dispay(QnCompressedVideoDataPtr data, bool draw, CLVideoDecoderOutput::downscale_factor force_factor)
 {
+    if (data->compressionType == CODEC_ID_NONE)
+    {
+        cl_log.log(QLatin1String("CLVideoStreamDisplay::dispay: unknown codec type..."), cl_logERROR);
+        return;
+    }
+
     CLVideoData img;
 
     img.inBuffer = (unsigned char*)(data->data.data()); // :-)
@@ -139,34 +142,24 @@ void CLVideoStreamDisplay::dispay(QnCompressedVideoDataPtr data, bool draw, CLVi
     img.useTwice = data->useTwice;
     img.width = data->width;
     img.height = data->height;
+    img.codec = data->compressionType;
 
-    CLAbstractVideoDecoder* dec;
+    CLAbstractVideoDecoder *decoder;
     {
         QMutexLocker mutex(&m_mtx);
 
-        if (data->compressionType == CODEC_ID_NONE)
-        {
-            cl_log.log(QLatin1String("CLVideoStreamDisplay::dispay: unknown codec type..."), cl_logERROR);
-            return;
-        }
-
-        if (m_decoder[data->compressionType]==0)
-        {
-            m_decoder[data->compressionType] = CLVideoDecoderFactory::createDecoder(data->compressionType, data->context);
-            m_decoder[data->compressionType]->setLightCpuMode(m_lightCPUmode);
-        }
-
-        img.codec = data->compressionType;
-        dec = m_decoder[data->compressionType];
+        decoder = m_decoder.value(data->compressionType);
+        if (!decoder)
+            m_decoder.insert(data->compressionType, CLVideoDecoderFactory::createDecoder(data->compressionType, data->context));
     }
 
-    if (!dec || !dec->decode(img))
+    if (!decoder || !decoder->decode(img))
     {
         CL_LOG(cl_logDEBUG2) cl_log.log(QLatin1String("CLVideoStreamDisplay::dispay: decoder cannot decode image..."), cl_logDEBUG2);
         return;
     }
 
-    if (!draw || !m_draw)
+    if (!draw || !m_renderer)
         return;
 
     int maxTextureSize = CLGLRenderer::getMaxTextureSize();
@@ -179,16 +172,16 @@ void CLVideoStreamDisplay::dispay(QnCompressedVideoDataPtr data, bool draw, CLVi
         (scaleFactor > CLVideoDecoderOutput::factor_1 && !CLVideoDecoderOutput::isPixelFormatSupported(img.outFrame.out_type)))
     {
         rescaleFrame(img.outFrame, img.outFrame.width / scaleFactor, img.outFrame.height / scaleFactor);
-        m_draw->draw(m_outFrame, data->channelNumber);
+        m_renderer->draw(m_outFrame, data->channelNumber);
     }
     else if (scaleFactor > CLVideoDecoderOutput::factor_1)
     {
         CLVideoDecoderOutput::downscale(&img.outFrame, &m_outFrame, scaleFactor); // extra cpu work but less to display( for weak video cards )
-        m_draw->draw(m_outFrame, data->channelNumber);
+        m_renderer->draw(m_outFrame, data->channelNumber);
     }
     else
     {
-        m_draw->draw(img.outFrame, data->channelNumber);
+        m_renderer->draw(img.outFrame, data->channelNumber);
     }
 }
 
@@ -231,27 +224,22 @@ bool CLVideoStreamDisplay::rescaleFrame(CLVideoDecoderOutput& outFrame, int newW
     return true;
 }
 
-void CLVideoStreamDisplay::setLightCPUMode(bool val)
-{
-    m_lightCPUmode = val;
-    QMutexLocker mutex(&m_mtx);
-
-    foreach (CLAbstractVideoDecoder* decoder, m_decoder)
-        decoder->setLightCpuMode(val);
-}
-
-void CLVideoStreamDisplay::copyImage(bool copy)
-{
-    m_draw->copyVideoDataBeforePainting(copy);
-}
-
 CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::findScaleFactor(int width, int height, int fitWidth, int fitHeight)
 {
-    if (fitWidth * 8 <= width  && fitHeight * 8 <= height)
+    if (fitWidth * 8 <= width && fitHeight * 8 <= height)
         return CLVideoDecoderOutput::factor_8;
-    if (fitWidth * 4 <= width  && fitHeight * 4 <= height)
+
+    if (fitWidth * 4 <= width && fitHeight * 4 <= height)
         return CLVideoDecoderOutput::factor_4;
-    if (fitWidth * 2 <= width  && fitHeight * 2 <= height)
+
+    if (fitWidth * 2 <= width && fitHeight * 2 <= height)
         return CLVideoDecoderOutput::factor_2;
+
     return CLVideoDecoderOutput::factor_1;
+}
+
+void CLVideoStreamDisplay::setMTDecoding(bool value)
+{
+    foreach (CLAbstractVideoDecoder *decoder, m_decoder)
+        decoder->setMTDecoding(value);
 }

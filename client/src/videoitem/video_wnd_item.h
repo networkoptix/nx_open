@@ -36,8 +36,6 @@ public:
 
     virtual bool isZoomable() const;
 
-    void copyVideoDataBeforePainting(bool copy);
-
     virtual void setItemSelected(bool sel, bool animate = true, int delay = 0);
 
     virtual void goToSteadyMode(bool steady, bool instant);

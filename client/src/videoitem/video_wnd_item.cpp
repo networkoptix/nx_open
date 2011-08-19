@@ -31,9 +31,9 @@ CLVideoWindowItem::CLVideoWindowItem(const QnMediaResourceLayout *layout, int ma
     m_type = VIDEO;
     m_arranged = false;
 
-    //we never cache the video
-    //setCacheMode(DeviceCoordinateCache);
-    //setCacheMode(ItemCoordinateCache);
+    // we never cache the video
+    setCacheMode(NoCache);
+
     //setFlag(QGraphicsItem::ItemIsMovable);
 
     for (unsigned i = 0; i  < m_videonum; ++i)
@@ -166,12 +166,6 @@ QPointF CLVideoWindowItem::getBestSubItemPos(CLSubItemType type)
         return QPointF(-1001, -1001);
         break;
     }
-}
-
-void CLVideoWindowItem::copyVideoDataBeforePainting(bool copy)
-{
-    for (unsigned i = 0; i  < m_videonum; ++i)
-        m_gldraw[i]->copyVideoDataBeforePainting(copy);
 }
 
 QRect CLVideoWindowItem::getSubChannelRect(unsigned int channel) const

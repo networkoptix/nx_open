@@ -25,8 +25,6 @@ public:
     bool decode(CLVideoData &data);
     void showMotion(bool show);
 
-    virtual void setLightCpuMode(bool val);
-
 private:
     void resetDecoder();
     void createDecoder();
@@ -50,10 +48,6 @@ private:
 
     int m_codecId;
     bool m_showmotion;
-    bool m_lightCPUMode;
-    bool m_wantEscapeFromLightCPUMode;
-
-    uint m_lightModeFrameCounter;
 
     int m_lastWidth;
 };

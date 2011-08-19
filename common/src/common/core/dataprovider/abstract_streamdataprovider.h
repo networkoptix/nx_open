@@ -5,23 +5,23 @@
 #include "datapacket/datapacket.h"
 #include "resource/resource_consumer.h"
 
-
 class QnAbstractDataConsumer;
-
 
 class QnAbstractStreamDataProvider : public QnLongRunnable, public QnResourceConsumer
 {
+    Q_OBJECT
+
 public:
-	explicit QnAbstractStreamDataProvider(QnResourcePtr res);
-	virtual ~QnAbstractStreamDataProvider();
+    explicit QnAbstractStreamDataProvider(QnResourcePtr res);
+    virtual ~QnAbstractStreamDataProvider();
 
-	virtual bool dataCanBeAccepted() const;
+    virtual bool dataCanBeAccepted() const;
 
-	void addDataProcessor(QnAbstractDataConsumer* dp);
-	void removeDataProcessor(QnAbstractDataConsumer* dp);
+    void addDataProcessor(QnAbstractDataConsumer* dp);
+    void removeDataProcessor(QnAbstractDataConsumer* dp);
 
-	void pauseDataProcessors();
-	void resumeDataProcessors();
+    void pauseDataProcessors();
+    void resumeDataProcessors();
 
     void setDataRate(qreal rate); // fps for example
     qreal getDataRate() const;
@@ -50,9 +50,9 @@ protected:
     virtual void sleepIfNeeded() = 0;
 
 protected:
-	mutable QMutex m_mtx;
-	QList<QnAbstractDataConsumer*> m_dataprocessors;
-	qreal m_dataRate;
+    mutable QMutex m_mtx;
+    QList<QnAbstractDataConsumer*> m_dataprocessors;
+    qreal m_dataRate;
 };
 
 #endif //QnAbstractStreamDataProvider_514

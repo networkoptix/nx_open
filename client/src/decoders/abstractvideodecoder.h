@@ -17,13 +17,12 @@ public:
 
     virtual void showMotion(bool show ) = 0;
 
-    virtual void setLightCpuMode(bool val) = 0;
-
     void setMTDecoding(bool value)
     {
-        if (m_mtDecoding != value)
-            m_needRecreate = true;
+        if (m_mtDecoding == value)
+            return;
 
+        m_needRecreate = true;
         m_mtDecoding = value;
     }
 

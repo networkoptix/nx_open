@@ -6,7 +6,6 @@
 
 class QnRtspListener: public QnLongRunnable
 {
-    Q_OBJECT
 public:
     static const int DEFAULT_RTSP_PORT = 554;
 

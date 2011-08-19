@@ -30,6 +30,21 @@ static const int RTSP_MIN_SEEK_INTERVAL = 1000 * 30; // 30 ms as min seek interv
 
 static const int MAX_RTSP_WRITE_BUFFER = 1024*1024;
 
+//#define DEBUG_RTSP
+
+#ifdef DEBUG_RTSP
+static void dumpRtspData(const char* data, int datasize)
+{
+    static QFile* binaryFile = 0;
+    if (!binaryFile) {
+        binaryFile = new QFile("c:/binary_server.rtsp");
+        binaryFile->open(QFile::WriteOnly);
+    }
+    binaryFile->write(data, datasize);
+    binaryFile->flush();
+}
+#endif
+
 class QnRtspDataProcessor: public QnAbstractDataConsumer
 {
 public:
@@ -42,6 +57,7 @@ public:
         m_timer.start();
     }
     qint64 lastSendTime() const { return m_lastSendTime; }
+
 protected:
     void buildRtspTcpHeader(quint8 channelNum, quint32 ssrc, quint16 len, int markerBit, quint32 timestamp)
     {
@@ -51,13 +67,13 @@ protected:
         *lenPtr = htons(len+sizeof(RtpHeader));
         RtpHeader* rtp = (RtpHeader*) &m_rtspTcpHeader[4];
         rtp->version = RtpHeader::RTP_VERSION;
-        rtp->padding = 0;  
-        rtp->extension = 0; 
-        rtp->CSRCCount = 0;  
-        rtp->marker  =  markerBit; 
+        rtp->padding = 0;
+        rtp->extension = 0;
+        rtp->CSRCCount = 0;
+        rtp->marker  =  markerBit;
         rtp->payloadType = RTP_FFMPEG_GENERIC_CODE;
         rtp->sequence = htons(m_sequence[channelNum]++);
-        //rtp->timestamp = htonl(m_timer.elapsed()); 
+        //rtp->timestamp = htonl(m_timer.elapsed());
         rtp->timestamp = htonl(timestamp);
         rtp->ssrc = htonl(ssrc); // source ID
     }
@@ -88,7 +104,8 @@ protected:
             //m_owner->flush();
             m_ctxSended[rtspChannelNum] << ctx;
         }
-        else {
+        else
+        {
             ssrc += subChannelNumber;
         }
         // send data with RTP headers
@@ -114,6 +131,7 @@ protected:
             m_lastSendTime = media->timestamp;
         }
     }
+
 private:
     QByteArray m_codecCtxData;
     QMap<int, QList<AVCodecContext*> > m_ctxSended;
@@ -168,9 +186,9 @@ public:
     QByteArray clientRequest;
 
     QString sessionId;
-    QnMediaResourcePtr mediaRes; 
+    QnMediaResourcePtr mediaRes;
     // associate trackID with RTP/RTCP ports (for TCP mode ports used as logical channel numbers, see RFC 2326)
-    QMap<int, QPair<int,int> > trackPorts; 
+    QMap<int, QPair<int,int> > trackPorts;
     qint64 startTime; // time from last range header
     qint64 endTime;   // time from last range header
     //qint64 playTime;  // actial playing time
@@ -238,7 +256,7 @@ bool QnRtspConnectionProcessor::isFullMessage()
         {
             if (lRequest[i] >= '0' && lRequest[i] <= '9')
             {
-             if (posStart == -1)   
+             if (posStart == -1)
                  posStart = i;
              posEnd = i;
             }
@@ -298,7 +316,7 @@ void QnRtspConnectionProcessor::parseRequest()
             d->requestHeaders = QHttpRequestHeader(params[0], params[1], major, minor);
             firstLine = false;
         }
-        else 
+        else
         {
             QList<QByteArray> params = line.split(':');
             if (params.size() > 1)
@@ -396,7 +414,7 @@ int QnRtspConnectionProcessor::composeDescribe()
         return CODE_NOT_IMPLEMETED;
 
     QTextStream sdp(&d->responseBody);
-    
+
     QnMediaResourceLayout* layout = d->mediaRes->getMediaLayout();
     int numVideo = layout->numberOfVideoChannels();
     int numAudio = layout->numberOfAudioChannels();
@@ -516,7 +534,7 @@ int QnRtspConnectionProcessor::composePlay()
     //d->playTime = getRtspTime();
     //d->playTimer.restart();
 
-    if (d->dataProvider->isPaused()) 
+    if (d->dataProvider->isPaused())
         d->dataProvider->resume();
 
     if (!d->requestHeaders.value("range").isNull())

@@ -23,7 +23,7 @@ public:
     ~AnimatedWidget();
 
     bool isInteractive() const;
-    void setInteractive(bool allowed);
+    void setInteractive(bool interactive);
 
     void setGeometry(const QRectF &rect);
     QPainterPath opaqueArea() const;
