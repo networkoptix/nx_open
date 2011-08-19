@@ -8,7 +8,7 @@ static const int SOCK_TIMEOUT = 50;
 struct QnRtspListener::QnRtspListenerPrivate
 {
     TCPServerSocket* serverSocket;
-    //QMap<TCPSocket*, QnRtspConnectionProcessor*> connections;
+    QMap<TCPSocket*, QnRtspConnectionProcessor*> connections;
 };
 
 // ------------------------ QnRtspListener ---------------------------
@@ -36,6 +36,21 @@ QnRtspListener::~QnRtspListener()
     delete d_ptr;
 }
 
+void QnRtspListener::removeDisconnectedConnections()
+{
+    Q_D(QnRtspListener);
+    for (QMap<TCPSocket*, QnRtspConnectionProcessor*>::iterator itr = d->connections.begin(); itr != d->connections.end();)
+    {
+        QnRtspConnectionProcessor* processor = itr.value();
+        if (!processor->isRunning()) {
+            delete processor;
+            itr = d->connections.erase(itr);
+        }
+        else 
+            ++itr;
+    }
+}
+
 void QnRtspListener::run()
 {
     Q_D(QnRtspListener);
@@ -47,8 +62,9 @@ void QnRtspListener::run()
             clientSocket->setReadTimeOut(SOCK_TIMEOUT);
             clientSocket->setWriteTimeOut(SOCK_TIMEOUT);
             QnRtspConnectionProcessor* processor = new QnRtspConnectionProcessor(clientSocket);
-            //d->connections[clientSocket] = processor;
+            d->connections[clientSocket] = processor;
             processor->start();
         }
+        removeDisconnectedConnections();
     }
 }

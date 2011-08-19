@@ -165,8 +165,10 @@ public:
 
     ~QnRtspConnectionProcessorPrivate()
     {
-        dataProvider->stop();
-        dataProcessor->stop();
+        if (dataProvider)
+            dataProvider->stop();
+        if (dataProcessor)
+            dataProcessor->stop();
         delete dataProvider;
         delete dataProcessor;
         delete socket;
@@ -233,6 +235,7 @@ QnRtspConnectionProcessor::QnRtspConnectionProcessor(TCPSocket* socket):
 
 QnRtspConnectionProcessor::~QnRtspConnectionProcessor()
 {
+    stop();
     delete d_ptr;
 }
 
@@ -687,5 +690,10 @@ void QnRtspConnectionProcessor::run()
             }
         }
     }
-    deleteLater();
+    if (d->dataProvider)
+        d->dataProvider->stop();
+    if (d->dataProcessor)
+        d->dataProcessor->stop();
+    m_runing = false;
+    //deleteLater(); // does not works for this thread
 }

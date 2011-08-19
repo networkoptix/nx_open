@@ -14,5 +14,7 @@ public:
 protected:
     virtual void run();
 private:
+    void QnRtspListener::removeDisconnectedConnections();
+private:
     QN_DECLARE_PRIVATE(QnRtspListener);
 };
