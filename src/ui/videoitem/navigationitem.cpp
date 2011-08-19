@@ -190,7 +190,7 @@ NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
     setVideoCamera(0);
     m_sliderIsmoving = true;
     m_mouseOver = false;
-    m_ignoreWheel = false;
+    m_active = false;
 }
 
 NavigationItem::~NavigationItem()
@@ -207,6 +207,17 @@ QRectF NavigationItem::boundingRect() const
 {
     return QRectF(0, 0, m_widget->width(), m_widget->height());
 }
+
+bool NavigationItem::isActive() const 
+{ 
+    return m_active; 
+} 
+
+void NavigationItem::setActive(bool active)
+{
+    m_active = active;
+}
+
 
 void NavigationItem::setVideoCamera(CLVideoCamera *camera)
 {
@@ -289,6 +300,7 @@ void NavigationItem::onValueChanged(qint64 time)
 
 void NavigationItem::pause()
 {
+    setActive(true);
     CLAbstractArchiveReader *reader = static_cast<CLAbstractArchiveReader*>(m_camera->getStreamreader());
 
     reader->pause();
@@ -300,6 +312,7 @@ void NavigationItem::pause()
 
 void NavigationItem::play()
 {
+    setActive(true);
     CLAbstractArchiveReader *reader = static_cast<CLAbstractArchiveReader*>(m_camera->getStreamreader());
 
     reader->setSingleShotMode(false);
@@ -311,6 +324,7 @@ void NavigationItem::play()
 
 void NavigationItem::rewindBackward()
 {
+    setActive(true);
     CLAbstractArchiveReader *reader = static_cast<CLAbstractArchiveReader*>(m_camera->getStreamreader());
 
     reader->jumpTo(0, true);
@@ -320,6 +334,7 @@ void NavigationItem::rewindBackward()
 
 void NavigationItem::rewindForward()
 {
+    setActive(true);
     CLAbstractArchiveReader *reader = static_cast<CLAbstractArchiveReader*>(m_camera->getStreamreader());
 
     bool stopped = reader->onPause();
@@ -338,6 +353,7 @@ void NavigationItem::rewindForward()
 
 void NavigationItem::stepBackward()
 {
+    setActive(true);
     CLAbstractArchiveReader *reader = static_cast<CLAbstractArchiveReader*>(m_camera->getStreamreader());
 
     if (!reader->isSkippingFrames() && m_camera->currentTime() != 0)
@@ -355,6 +371,7 @@ void NavigationItem::stepBackward()
 
 void NavigationItem::stepForward()
 {
+    setActive(true);
     CLAbstractArchiveReader *reader = static_cast<CLAbstractArchiveReader*>(m_camera->getStreamreader());
 
     reader->nextFrame();
@@ -362,26 +379,24 @@ void NavigationItem::stepForward()
     m_camera->getCamCamDisplay()->setSingleShotMode(true);
 }
 
+
 void NavigationItem::hoverEnterEvent(QGraphicsSceneHoverEvent *e)
 {
     m_mouseOver = true;
-    m_ignoreWheel = false;
-    tim.stop();
     CLUnMovedInteractiveOpacityItem::hoverEnterEvent(e);
 }
 
 void NavigationItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *e)
 {
-    m_ignoreWheel = true;
-    tim.singleShot(500, this, SLOT(resetHover()));
+    m_mouseOver = false;
     CLUnMovedInteractiveOpacityItem::hoverLeaveEvent(e);
 }
 
-void NavigationItem::resetHover()
+
+void NavigationItem::wheelEvent(QGraphicsSceneWheelEvent *) 
 {
-    m_mouseOver = false;
-    m_ignoreWheel = false;
-}
+    //cl_log.log("wheelEvent", cl_logALWAYS);
+} 
 
 void NavigationItem::onSliderPressed()
 {
@@ -389,10 +404,12 @@ void NavigationItem::onSliderPressed()
     reader->setSingleShotMode(true);
     m_camera->getCamCamDisplay()->playAudio(false);
     m_sliderIsmoving = true;
+    setActive(true);
 }
 
 void NavigationItem::onSliderReleased()
 {
+    setActive(true);
     m_sliderIsmoving = false;
     CLAbstractArchiveReader *reader = static_cast<CLAbstractArchiveReader*>(m_camera->getStreamreader());
     quint64 time = m_widget->slider()->currentValue();
@@ -407,6 +424,8 @@ void NavigationItem::onSliderReleased()
 
 void NavigationItem::setPlaying(bool playing)
 {
+    setActive(true);
+
     if (m_playing == playing)
         return;
 

@@ -365,14 +365,21 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
     if (m_inputBlocked)
         return;
 
-    if (m_navigationItem ? m_navigationItem->mouseOver() : false) {
-        if (!m_navigationItem->ignoreWheel())
-            QGraphicsView::wheelEvent(e);
+    if (onUserInput(true, true))
+        return;
+
+
+    if (m_navigationItem && ( m_navigationItem->mouseOver() || m_navigationItem->isActive()))
+    {
+        // scene should not be zoomed if mouse is over time slider or if time slider is active 
+
+        if (!m_navigationItem->mouseOver() && m_navigationItem->isActive())
+            return; // if mouse is not over time line but time line is still active event must be ignored
+
+        QGraphicsView::wheelEvent(e);
         return;
     }
 
-    if (onUserInput(true, true))
-        return;
 
     showStop_helper();
 
@@ -678,6 +685,13 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 
     if (onUserInput(true, true))
         return;
+
+    if (m_navigationItem && !m_navigationItem->mouseOver() && m_navigationItem->isActive())
+    {
+        // we've got time line; muose is not over timeline. timeline is still active 
+        m_navigationItem->setActive(false);
+        return;
+    }
 
 
     m_yRotate = 0;

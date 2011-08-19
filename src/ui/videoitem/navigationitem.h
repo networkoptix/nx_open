@@ -83,7 +83,9 @@ public:
 
     bool isPlaying() const { return m_playing; }
     void setPlaying(bool playing);
-    bool ignoreWheel() { return m_ignoreWheel; } // for studi users who can't use mouse
+
+    bool isActive() const;
+    void setActive(bool active);
 
     static const int DEFAULT_HEIGHT = 60;
 
@@ -106,12 +108,11 @@ private slots:
     void onSliderPressed();
     void onSliderReleased();
 
-    void resetHover();
 
 protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent *);
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *);
-    void wheelEvent(QGraphicsSceneWheelEvent *) {} // to fix buuug with scene
+    void wheelEvent(QGraphicsSceneWheelEvent *);
 
 private:
     QGraphicsProxyWidget *m_proxy;
@@ -130,8 +131,7 @@ private:
     bool m_playing;
 
     MyTextItem *textItem;
-    QTimer tim;
-    bool m_ignoreWheel;
+    bool m_active;
 };
 
 #endif // NAVIGATIONITEM_H
