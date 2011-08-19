@@ -28,6 +28,8 @@ public:
 
     CLVideoDecoderOutput::downscale_factor getCurrentDownscaleFactor() const;
 
+    void setMTDecoding(bool value);
+
 private:
     CLAbstractRenderer *const m_renderer;
     bool m_canDownscale;

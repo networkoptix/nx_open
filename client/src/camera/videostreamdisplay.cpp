@@ -226,11 +226,20 @@ bool CLVideoStreamDisplay::rescaleFrame(CLVideoDecoderOutput& outFrame, int newW
 
 CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::findScaleFactor(int width, int height, int fitWidth, int fitHeight)
 {
-    if (fitWidth * 8 <= width  && fitHeight * 8 <= height)
+    if (fitWidth * 8 <= width && fitHeight * 8 <= height)
         return CLVideoDecoderOutput::factor_8;
-    if (fitWidth * 4 <= width  && fitHeight * 4 <= height)
+
+    if (fitWidth * 4 <= width && fitHeight * 4 <= height)
         return CLVideoDecoderOutput::factor_4;
-    if (fitWidth * 2 <= width  && fitHeight * 2 <= height)
+
+    if (fitWidth * 2 <= width && fitHeight * 2 <= height)
         return CLVideoDecoderOutput::factor_2;
+
     return CLVideoDecoderOutput::factor_1;
+}
+
+void CLVideoStreamDisplay::setMTDecoding(bool value)
+{
+    foreach (CLAbstractVideoDecoder *decoder, m_decoder)
+        decoder->setMTDecoding(value);
 }

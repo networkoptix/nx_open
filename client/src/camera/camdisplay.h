@@ -12,44 +12,52 @@ class CLAbstractRenderer;
 class CLVideoStreamDisplay;
 class CLAudioStreamDisplay;
 
+/**
+  * Stores CLVideoStreamDisplay for each channel/sensor
+  */
 class CLCamDisplay : public QnAbstractDataConsumer
 {
     Q_OBJECT
 
 public:
-    CLCamDisplay();
-    virtual ~CLCamDisplay();
+    CLCamDisplay(bool generateEndOfStreamSignal = true);
+    ~CLCamDisplay();
 
     void pause();
     void resume();
 
     void addVideoChannel(int index, CLAbstractRenderer *renderer, bool canDownscale);
 
-    void setSingleShotMode(bool single);
-
-    void setRealTimeStreamHint(bool value);
-
-protected:
-    void processData(QnAbstractDataPacketPtr data);
-
-private:
     void display(QnCompressedVideoDataPtr vd, bool sleep);
-    void playAudio(bool play);
 
     bool haveAudio() const;
+    void playAudio(bool play);
+
+    inline quint64 currentTime() const
+    { return m_previousVideoDisplayedTime; }
 
     // schedule to clean up buffers all;
     // schedule - coz I do not want to introduce mutexes
     //I assume that first incoming frame after jump is keyframe
     void jump(qint64 time);
 
+public Q_SLOTS:
+    void setMTDecoding(bool value);
+    void setSingleShotMode(bool value);
+    void setRealTimeStreamHint(bool value);
+
+Q_SIGNALS:
+    void reachedTheEnd();
+
+protected:
+    void processData(QnAbstractDataPacketPtr data);
+
+private:
     // puts in in queue and returns first in queue
     QnCompressedVideoDataPtr nextInOutVideodata(QnCompressedVideoDataPtr incoming, int channel);
 
     // this function doest not changes any quues; it just returns time of next frame been displayed
-    quint64 nextVideoImageTime(QnCompressedVideoDataPtr incoming, int channel) const;
-
-    quint64 nextVideoImageTime(int channel) const;
+    quint64 nextVideoImageTime(int channel, QnCompressedVideoDataPtr incoming = QnCompressedVideoDataPtr()) const;
 
     // this function returns diff between video and audio at any given moment
     qint64 diffBetweenVideoAndAudio(QnCompressedVideoDataPtr incoming, int channel, qint64& duration);
@@ -59,6 +67,8 @@ private:
     void afterJump(qint64 new_time);
 
 private:
+    bool m_generateEndOfStreamSignal;
+
     QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];
 
     CLVideoStreamDisplay* m_display[CL_MAX_CHANNELS];

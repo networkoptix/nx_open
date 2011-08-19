@@ -9,15 +9,16 @@
 // a lot of small audio packets in bluray HD audio codecs. So, previous size 7 is not enought
 #define CL_MAX_DISPLAY_QUEUE_SIZE 15
 #define CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE 120
-#define AUDIO_BUFF_SIZE (4000) // ms
 
+static const int AUDIO_BUFF_SIZE = 4000; // ms
 static const qint64 MIN_VIDEO_DETECT_JUMP_INTERVAL = 100 * 1000; // 100ms
-static const qint64 MIN_AUDIO_DETECT_JUMP_INTERVAL = MIN_VIDEO_DETECT_JUMP_INTERVAL + AUDIO_BUFF_SIZE*1000;
-static const int MAX_VALID_SLEEP_TIME = 1000*1000*5;
+static const qint64 MIN_AUDIO_DETECT_JUMP_INTERVAL = MIN_VIDEO_DETECT_JUMP_INTERVAL + AUDIO_BUFF_SIZE * 1000;
+static const int MAX_VALID_SLEEP_TIME = 1000 * 1000 * 5;
 static const int MAX_VALID_SLEEP_LIVE_TIME = 1000 * 500; // 5 seconds as most long sleep time
 
-CLCamDisplay::CLCamDisplay()
+CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
     : QnAbstractDataConsumer(CL_MAX_DISPLAY_QUEUE_SIZE),
+      m_generateEndOfStreamSignal(generateEndOfStreamSignal),
       m_delay(100*1000), // do not put a big value here to avoid cpu usage in case of zoom out
       m_playAudio(false),
       m_needChangePriority(false),
@@ -96,10 +97,8 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep)
     m_previousVideoTime = currentTime;
 
     //===== to avoid unrelated streams / stop play delays
-    if (needToSleep < 0)
-        needToSleep = 0;
-
-    if (needToSleep > MAX_VALID_SLEEP_TIME) // in case of key frame only and sliding archive slider forward - would not look good; need to do smth
+    // in case of key frame only and sliding archive slider forward - would not look good; need to do smth
+    if (needToSleep < 0 || needToSleep > MAX_VALID_SLEEP_TIME)
         needToSleep = 0;
     //=========
 
@@ -160,12 +159,6 @@ void CLCamDisplay::jump(qint64 time)
     m_singleShotMode = false;
 }
 
-void CLCamDisplay::setSingleShotMode(bool single)
-{
-    m_singleShotMode = single;
-    m_singleShotQuantProcessed = false;
-}
-
 void CLCamDisplay::processData(QnAbstractDataPacketPtr data)
 {
     QnAbstractMediaDataPacketPtr media = data.dynamicCast<QnAbstractMediaDataPacket>();
@@ -192,6 +185,12 @@ void CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         flushCurrentBuffer = true;
     }
 
+    if (m_needChangePriority)
+    {
+        m_needChangePriority = false;
+        setPriority(m_playAudio ? QThread::HighestPriority : QThread::NormalPriority);
+    }
+
     if (m_afterJump)
     {
         qint64 ts = vd? vd->timestamp : ad->timestamp;
@@ -202,15 +201,15 @@ void CLCamDisplay::processData(QnAbstractDataPacketPtr data)
 
         m_afterJump = false;
         // clear everything we can
-//            afterJump(ts);
+        afterJump(ts);
     }
 
     if (ad && !flushCurrentBuffer)
     {
         if (audioParamsChanged)
         {
-//                delete m_audioDisplay;
-//                m_audioDisplay = new CLAudioStreamDisplay(AUDIO_BUFF_SIZE);
+            delete m_audioDisplay;
+            m_audioDisplay = new CLAudioStreamDisplay(AUDIO_BUFF_SIZE);
             m_playingFormat = ad->format;
         }
 
@@ -220,9 +219,7 @@ void CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         // To prevent it, increase jump detection interval for audio
 
         if (ad->timestamp && ad->timestamp - m_lastAudioPacketTime < -MIN_AUDIO_DETECT_JUMP_INTERVAL)
-        {
-//                afterJump(ad->timestamp);
-        }
+            afterJump(ad->timestamp);
 
         m_lastAudioPacketTime = ad->timestamp;
 
@@ -231,7 +228,7 @@ void CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         {
             if (m_audioDisplay->msInBuffer() > AUDIO_BUFF_SIZE)
             {
-                // Audio buffer too large. waiting
+                // audio buffer too large; waiting
                 QnSleep::msleep(40);
             }
 
@@ -244,9 +241,14 @@ void CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         }
     }
 
+    QnCompressedVideoDataPtr vd_copy; // ###
+
     if (vd || flushCurrentBuffer)
     {
         int channel = vd ? vd->channelNumber : 0;
+        if (channel >= CL_MAX_CHANNELS)
+            return;
+
         if (flushCurrentBuffer)
         {
             vd.clear();
@@ -254,13 +256,13 @@ void CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         else
         {
             if (vd->timestamp - m_lastVideoPacketTime < -MIN_VIDEO_DETECT_JUMP_INTERVAL)
-            {
                 afterJump(vd->timestamp);
-            }
             m_lastVideoPacketTime = vd->timestamp;
 
-            if (channel >= CL_MAX_CHANNELS)
-                return;
+            // this is the only point to addreff;
+            // video data can escape from this object only if displayed or in case of clearVideoQueue
+            // so release ref must be in both places
+            vd_copy = vd; // ###
 
             if (m_singleShotMode && m_singleShotQuantProcessed)
             {
@@ -308,8 +310,7 @@ void CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         if (diff >= 2 * videoDuration && m_audioDisplay->msInBuffer() > 0) // factor 2 here is to avoid frequent switch between normal play and fast play
         {
             // video runs faster than audio; need to hold this video frame
-            if (vd)
-                enqueueVideo(vd);
+            enqueueVideo(vd);
             // avoid too fast buffer filling on startup
             qint64 sleepTime = qMin(diff, (m_audioDisplay->msInBuffer() - AUDIO_BUFF_SIZE / 2) * 1000ll);
             sleepTime = qMin(sleepTime, 500 * 1000ll);
@@ -318,23 +319,17 @@ void CLCamDisplay::processData(QnAbstractDataPacketPtr data)
                 m_delay.sleep(sleepTime);
             return;
         }
-
-        //if (diff < 2 * videoDuration) //factor 2 here is to avoid frequent switch between normal play and fast play
-        else
+        else //if (diff < 2 * videoDuration) // factor 2 here is to avoid frequent switch between normal play and fast play
         {
-            // need to draw frame(s); at least one
-
+            // need to draw frame(s), at least one
             QnCompressedVideoDataPtr incoming;
-            if (m_audioDisplay->msInBuffer() < AUDIO_BUFF_SIZE )
+            if (m_audioDisplay->msInBuffer() < AUDIO_BUFF_SIZE)
                 incoming = vd; // process packet
-            else {
-                if (vd)
-                    vd.clear(); // queue too large. postpone packet.
-            }
+            else if (vd)
+                vd.clear(); // queue too large. postpone packet.
 
             int fastFrames = 0;
-
-            while(1)
+            forever
             {
                 //qint64 diff = diffBetweenVideoAndAudio(incoming, channel, videoDuration);
 
@@ -350,32 +345,35 @@ void CLCamDisplay::processData(QnAbstractDataPacketPtr data)
                 display(vd, lastFrameToDisplay && !vd->ignore);
                 m_singleShotQuantProcessed = true;
 
-                if (!lastFrameToDisplay)
-                {
-                    cl_log.log(QLatin1String("FAST PLAY, diff = "), (int)diff / 1000, cl_logDEBUG1);
-                    //cl_log.log("ms audio buff = ", m_audioDisplay->msInBuffer(), cl_logWARNING);
-
-                    ++fastFrames;
-
-                    if (fastFrames == 2) // allow just 2 fast frames at the time
-                        break;
-                }
-
                 if (lastFrameToDisplay)
-                {
                     break;
-                }
+
+                cl_log.log(QLatin1String("FAST PLAY, diff = "), (int)diff / 1000, cl_logDEBUG1);
+                //cl_log.log("ms audio buff = ", m_audioDisplay->msInBuffer(), cl_logWARNING);
+
+                if (++fastFrames == 2) // allow just 2 fast frames at the time
+                    break;
+
                 diff = diffBetweenVideoAndAudio(incoming, channel, videoDuration);
             }
         }
     }
 }
 
-//==========================================================================
+void CLCamDisplay::playAudio(bool play)
+{
+    if (m_playAudio == play)
+        return;
+
+    m_needChangePriority = true;
+    m_playAudio = play;
+    if (!m_playAudio)
+        m_audioDisplay->clearDeviceBuffer();
+}
 
 bool CLCamDisplay::haveAudio() const
 {
-    return (m_playAudio && m_hadAudio) && !m_ignoringVideo && m_audioDisplay->isFormatSupported();
+    return m_playAudio && m_hadAudio && !m_ignoringVideo && m_audioDisplay->isFormatSupported();
 }
 
 QnCompressedVideoDataPtr CLCamDisplay::nextInOutVideodata(QnCompressedVideoDataPtr incoming, int channel)
@@ -383,29 +381,37 @@ QnCompressedVideoDataPtr CLCamDisplay::nextInOutVideodata(QnCompressedVideoDataP
     if (m_videoQueue[channel].isEmpty())
         return incoming;
 
-    if (incoming)
-        enqueueVideo(incoming);
+    enqueueVideo(incoming);
 
     // queue is not empty
     return m_videoQueue[channel].dequeue();
 }
 
-quint64 CLCamDisplay::nextVideoImageTime(QnCompressedVideoDataPtr incoming, int channel) const
+quint64 CLCamDisplay::nextVideoImageTime(int channel, QnCompressedVideoDataPtr incoming) const
 {
     if (m_videoQueue[channel].isEmpty())
-        return incoming ? incoming->timestamp : 0;
+        return m_lastVideoPacketTime;
+
+    if (m_videoBufferOverflow)
+        return 0;
+
+    if (incoming)
+        return incoming->timestamp;
 
     // queue is not empty
     return m_videoQueue[channel].head()->timestamp;
 }
 
-quint64 CLCamDisplay::nextVideoImageTime(int channel) const
+void CLCamDisplay::enqueueVideo(QnCompressedVideoDataPtr vd)
 {
-    if (m_videoQueue[channel].isEmpty())
-        return m_lastVideoPacketTime;
-    if (m_videoBufferOverflow)
-        return 0;
-    return m_videoQueue[channel].head()->timestamp;
+    m_videoQueue[vd->channelNumber].enqueue(vd);
+    if (m_videoQueue[vd->channelNumber].size() > 60 * 6) // I assume we are not gonna buffer
+    {
+        cl_log.log(QLatin1String("Video buffer overflow!"), cl_logWARNING);
+        (void)m_videoQueue[vd->channelNumber].dequeue();
+        // some protection for very large difference between video and audio tracks. Need to improve sync logic for this case (now a lot of glithces)
+        m_videoBufferOverflow = true;
+    }
 }
 
 void CLCamDisplay::clearVideoQueue()
@@ -417,7 +423,7 @@ void CLCamDisplay::clearVideoQueue()
 
 qint64 CLCamDisplay::diffBetweenVideoAndAudio(QnCompressedVideoDataPtr incoming, int channel, qint64& duration)
 {
-    qint64 currentPlayingVideoTime = nextVideoImageTime(incoming, channel);
+    qint64 currentPlayingVideoTime = nextVideoImageTime(channel, incoming);
     qint64 currentPlayingAudioTime = m_lastAudioPacketTime - (quint64)m_audioDisplay->msInBuffer()*1000;
 
     // strongly saning this duration of prev frame; not exact, but I think its fine
@@ -432,18 +438,6 @@ qint64 CLCamDisplay::diffBetweenVideoAndAudio(QnCompressedVideoDataPtr incoming,
     return currentPlayingVideoTime - currentPlayingAudioTime;
 }
 
-void CLCamDisplay::enqueueVideo(QnCompressedVideoDataPtr vd)
-{
-    m_videoQueue[vd->channelNumber].enqueue(vd);
-    if (m_videoQueue[vd->channelNumber].size() > 60 * 6) // I assume we are not gonna buffer
-    {
-        cl_log.log(QLatin1String("Video buffer overflow!"), cl_logWARNING);
-        (void)m_videoQueue->dequeue();
-        // some protection for very large difference between video and audio tracks. Need to improve sync logic for this case (now a lot of glithces)
-        m_videoBufferOverflow = true;
-    }
-}
-
 void CLCamDisplay::afterJump(qint64 newTime)
 {
     cl_log.log(QLatin1String("after jump"), cl_logWARNING);
@@ -454,6 +448,24 @@ void CLCamDisplay::afterJump(qint64 newTime)
     m_previousVideoDisplayedTime = 0;
     clearVideoQueue();
     m_audioDisplay->clearAudioBuffer();
+
+    if (m_generateEndOfStreamSignal)
+        emit reachedTheEnd();
+}
+
+void CLCamDisplay::setMTDecoding(bool value)
+{
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+    {
+        if (m_display[i])
+            m_display[i]->setMTDecoding(value);
+    }
+}
+
+void CLCamDisplay::setSingleShotMode(bool value)
+{
+    m_singleShotMode = value;
+    m_singleShotQuantProcessed = false;
 }
 
 void CLCamDisplay::setRealTimeStreamHint(bool value)

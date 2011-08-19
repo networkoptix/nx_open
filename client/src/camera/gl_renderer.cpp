@@ -125,10 +125,8 @@ static const char yuy2ToRgb[] =
 "END";
 
 int CLGLRenderer::gl_status = CLGLRenderer::CL_GL_NOT_TESTED;
-GLint CLGLRenderer::ms_maxTextureSize = 0;
-QMutex CLGLRenderer::ms_maxTextureSizeMutex;
 
-QList<GLuint*> CLGLRenderer::mGarbage;
+static QList<GLuint *> mGarbage;
 
 CLGLRenderer::CLGLRenderer(CLVideoWindowItem *vw) :
     clampConstant(GL_CLAMP),
@@ -178,18 +176,18 @@ CLGLRenderer::~CLGLRenderer()
         // I do not know why but if I glDeleteTextures here some items on the other view might become green( especially if we animate them a lot )
         // not sure I i do something wrong with opengl or it's bug of QT. for now can not spend much time on it. but it needs to be fixed.
 
-        GLuint* heap = new GLuint[3];
-        memcpy(heap,m_texture,sizeof(m_texture));
-        mGarbage.push_back(heap); // to delete later
+        GLuint *heap = new GLuint[3];
+        memcpy(heap, m_texture, sizeof(m_texture));
+        mGarbage.append(heap); // to delete later
     }
 }
 
 void CLGLRenderer::clearGarbage()
 {
-    foreach(GLuint* heap, mGarbage)
+    foreach (GLuint *heap, mGarbage)
     {
         glDeleteTextures(3, heap);
-        delete[] heap;
+        delete [] heap;
     }
 
     mGarbage.clear();
@@ -319,7 +317,7 @@ void CLGLRenderer::init(bool msgbox)
         // in this first revision we do not support software color transform
         gl_status = CL_GL_NOT_SUPPORTED;
 
-        const QString message = QObject::tr("This software version supports only GPU (not CPU) color transformation. This video card do not supports shaders(GPU transforms). Please contact to developers to get new software version with YUV=>RGB software transform for your video card. Or update your video card:-)");
+        const QString message = QObject::tr("This software version supports only GPU (not CPU) color transformation. This video card do not supports shaders (GPU transforms). Please contact to developers to get new software version with YUV=>RGB software transform for your video card. Or update your video card:-)");
         CL_LOG(cl_logWARNING) cl_log.log(message, cl_logWARNING);
         if (msgbox)
         {
@@ -342,16 +340,16 @@ void CLGLRenderer::init(bool msgbox)
     }
 #endif
 
-    //if (mGarbage.count()<80)
+    //if (mGarbage.size() < 80)
     {
         glGenTextures(3, m_texture);
     }
     /*
     else
     {
-        GLuint* heap = mGarbage.takeFirst();
+        GLuint *heap = mGarbage.takeFirst();
         memcpy(m_texture, heap, sizeof(m_texture));
-        delete heap;
+        delete [] heap;
     }
     */
 
@@ -367,20 +365,23 @@ void CLGLRenderer::init(bool msgbox)
     gl_status = CL_GL_SUPPORTED;
 }
 
+Q_GLOBAL_STATIC(QMutex, maxTextureSizeMutex)
+
 int CLGLRenderer::getMaxTextureSize()
 {
-    if (!ms_maxTextureSize)
+    static GLint maxTextureSize = 0;
+    if (!maxTextureSize)
     {
-        QMutexLocker locker(&ms_maxTextureSizeMutex);
+        QMutexLocker locker(maxTextureSizeMutex());
 
-        if (!ms_maxTextureSize)
+        if (!maxTextureSize)
         {
-            glGetIntegerv(GL_MAX_TEXTURE_SIZE, &ms_maxTextureSize);
-            cl_log.log(QLatin1String("Max Texture size: "), ms_maxTextureSize, cl_logALWAYS);
+            glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
+            cl_log.log(QLatin1String("Max Texture size: "), maxTextureSize, cl_logALWAYS);
         }
     }
 
-    return ms_maxTextureSize;
+    return maxTextureSize;
 }
 
 void CLGLRenderer::beforeDestroy()
@@ -407,7 +408,6 @@ void CLGLRenderer::draw(CLVideoDecoderOutput &image, unsigned int channel)
         m_stride_old = m_stride;
         m_height_old = m_height;
         m_color_old = m_color;
-
     }
 
     m_arrayPixels[0] = image.C1;
@@ -441,7 +441,7 @@ void CLGLRenderer::draw(CLVideoDecoderOutput &image, unsigned int channel)
 
     //cl_log.log("time =", time.elapsed(), cl_logDEBUG1);
 
-    // after paint had hapened
+    // after paint had happened
 
     //paintEvent
 }
@@ -451,12 +451,26 @@ void CLGLRenderer::setForceSoftYUV(bool value)
     m_forceSoftYUV = value;
 }
 
+qreal CLGLRenderer::opacity() const
+{
+    return m_painterOpacity;
+}
+
 void CLGLRenderer::setOpacity(qreal opacity)
 {
     m_painterOpacity = opacity;
 }
 
-int roundUp(int value)
+void CLGLRenderer::applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation)
+{
+    // normalize the values
+    m_brightness = brightness * 128;
+    m_contrast = contrast + 1.0;
+    m_hue = hue * 180.;
+    m_saturation = saturation + 1.0;
+}
+
+static inline int roundUp(int value)
 {
     return value % ROUND_COEFF ? (value + ROUND_COEFF - (value % ROUND_COEFF)) : value;
 }
@@ -520,6 +534,7 @@ void CLGLRenderer::updateTexture()
     default:
         break;
     }
+
     //int round_width[3] = {roundUp(w[0]), roundUp(w[1]), roundUp(w[2])};
     //int round_width[3] = {roundUp(r_w[0]), roundUp(r_w[1]), roundUp(r_w[2])};
 
@@ -740,8 +755,7 @@ void CLGLRenderer::drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const
 
     if (!isSoftYuv2Rgb && isYuvFormat())
     {
-
-        const Program prog =  YV12toRGB ;
+        const Program prog = YV12toRGB;
 
         glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, m_program[prog]);
         OGL_CHECK_ERROR("glBindProgramARB");
@@ -760,9 +774,8 @@ void CLGLRenderer::drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const
         glBindTexture(GL_TEXTURE_2D, tex0);
         OGL_CHECK_ERROR("glBindTexture");
 
-        if (YV12toRGB == prog)
+        if (prog == YV12toRGB)
         {
-
             glActiveTexture(GL_TEXTURE1);
             OGL_CHECK_ERROR("glActiveTexture");
             /**/
@@ -774,9 +787,7 @@ void CLGLRenderer::drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const
             /**/
             glBindTexture(GL_TEXTURE_2D, tex2);
             OGL_CHECK_ERROR("glBindTexture");
-
         }
-        /**/
     }
     else
     {
@@ -809,6 +820,7 @@ void CLGLRenderer::drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const
     }
 }
 
+#if 0
 static inline QRect getTextureRect(float textureWidth, float textureHeight,
                                    float windowWidth, float windowHeight, const float sar)
 {
@@ -819,6 +831,7 @@ static inline QRect getTextureRect(float textureWidth, float textureHeight,
     QRect r(0, 0, windowWidth, windowHeight);
     return r;
 }
+#endif
 
 bool CLGLRenderer::paintEvent(const QRect &r)
 {
@@ -843,11 +856,13 @@ bool CLGLRenderer::paintEvent(const QRect &r)
             updateTexture();
 
         QRect temp(r);
+#if 0
         //temp = QRect(0, 0, m_videowindow->width(), m_videowindow->height());
         //float sar = 1.0f;
         //getTextureRect(temp, m_stride, m_height, temp.width(), temp.height(), sar);
         //m_painterOpacity = 0.3;
         //m_painterOpacity = 1.0;
+#endif
 
         const float v_array[] = { temp.left(), temp.top(), temp.right() + 1, temp.top(), temp.right() + 1, temp.bottom() + 1, temp.left(), temp.bottom() + 1 };
         drawVideoTexture(m_texture[0], m_texture[1], m_texture[2], v_array);

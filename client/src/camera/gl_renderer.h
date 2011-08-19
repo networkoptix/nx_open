@@ -4,7 +4,7 @@
 #include <QtCore/QMutex>
 #include <QtCore/QWaitCondition>
 
-#include <QtOpenGL/QGLWidget>
+#include <QtOpenGL/qgl.h>
 
 #include "abstractrenderer.h"
 
@@ -29,23 +29,17 @@ public:
 
     void draw(CLVideoDecoderOutput &image, unsigned int channel);
 
-    bool paintEvent(const QRect& r);
+    bool paintEvent(const QRect &r);
 
     virtual void beforeDestroy();
 
     QSize sizeOnScreen(unsigned int channel) const;
     bool constantDownscaleFactor() const;
 
+    qreal opacity() const;
     void setOpacity(qreal opacity);
 
-    void applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation)
-    {
-        //let's normalize the values
-        m_brightness = brightness * 128;
-        m_contrast = contrast + 1.;
-        m_hue = hue * 180.;
-        m_saturation = saturation + 1.;
-    }
+    void applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation);
 
     static bool isPixelFormatSupported(PixelFormat pixfmt);
 
@@ -96,27 +90,6 @@ private:
     bool isNonPower2;
     bool isSoftYuv2Rgb;
 
-    static QMutex m_programMutex;
-    static bool m_programInited;
-    static GLuint m_program[2];
-    GLuint m_texture[3];
-    bool m_forceSoftYUV;
-
-    QVector<uchar> yuv2rgbBuffer;
-
-    bool m_textureUploaded;
-
-    int m_stride, // in memorry
-        m_width, // visible width
-        m_height,
-
-        m_stride_old,
-        m_height_old;
-
-    unsigned char*  m_arrayPixels[3];
-
-    PixelFormat m_color, m_color_old;
-
     enum Program
     {
         YV12toRGB = 0,
@@ -124,35 +97,51 @@ private:
         ProgramCount = 2
     };
 
+    static QMutex m_programMutex;
+    static bool m_programInited;
+    static GLuint m_program[ProgramCount];
+    GLuint m_texture[3];
+    bool m_forceSoftYUV;
+
+    QVector<uchar> yuv2rgbBuffer;
+
+    bool m_textureUploaded;
+
+    int m_stride, // in memory
+        m_width, // visible width
+        m_height,
+
+        m_stride_old,
+        m_height_old;
+
+    unsigned char *m_arrayPixels[3];
+
+    PixelFormat m_color, m_color_old;
+
     float m_videoCoeffL[4];
     float m_videoCoeffW[4];
     float m_videoCoeffH[4];
 
     bool m_videoTextureReady;
 
-    qreal m_brightness,
-        m_contrast,
-        m_hue,
-        m_saturation,
-        m_painterOpacity;
+    qreal m_brightness;
+    qreal m_contrast;
+    qreal m_hue;
+    qreal m_saturation;
+    qreal m_painterOpacity;
 
-    mutable QMutex m_mutex; // to avoid call PaintEvent more than once at the same time.
+    mutable QMutex m_mutex; // to avoid call paintEvent() more than once at the same time
     QWaitCondition m_waitCon;
     bool m_gotnewimage;
 
     bool m_needwait;
 
-    CLVideoWindowItem* m_videowindow;
+    CLVideoWindowItem *const m_videowindow;
 
     CLVideoDecoderOutput m_image;
     bool m_abort_drawing;
 
     bool m_do_not_need_to_wait_any_more;
-
-    static QList<GLuint*> mGarbage;
-
-    static GLint ms_maxTextureSize;
-    static QMutex ms_maxTextureSizeMutex;
 
     bool m_inited;
 
