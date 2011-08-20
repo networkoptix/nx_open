@@ -126,7 +126,7 @@ void TimeLine::wheelAnimationFinished()
 void TimeLine::wheelEvent(QWheelEvent *event)
 {
     static const float SCALE_FACTOR = 2000.0;
-    static const int WHEEL_ANIMATION_DURATION = 500;
+    static const int WHEEL_ANIMATION_DURATION = 1000;
     //static const float SCALE_FACTOR = 120.0;
     int delta = event->delta();
     m_opacityAnimation->stop();
@@ -136,21 +136,37 @@ void TimeLine::wheelEvent(QWheelEvent *event)
         m_opacityAnimation->stop();
         m_opacityAnimation->setStartValue(minOpacity());
         m_opacityAnimation->setEndValue(MIN_MIN_OPACITY);
-        m_opacityAnimation->setDuration(500);
+        m_opacityAnimation->setDuration(WHEEL_ANIMATION_DURATION);
         m_opacityAnimation->start();
     }
+
     if (delta != m_prevWheelDelta)
         m_scaleSpeed = 1.0;
+
+    if (delta*m_prevWheelDelta<0 && m_prevWheelDelta!= INT_MAX)
+    {
+        // different directions 
+        m_scaleSpeed = 1;
+        m_wheelAnimation->stop();
+        m_prevWheelDelta = delta;
+        return;
+    }
+
     if (abs(delta) == 120)
     {
-        m_scaleSpeed *= 1.2;
+        m_scaleSpeed *= 1.40;
+        m_scaleSpeed  = qMin(m_scaleSpeed, (float)10.0);
+
         m_wheelAnimation->setEndValue(m_parent->scalingFactor() + delta/SCALE_FACTOR*m_scaleSpeed);
         if (m_wheelAnimation->state() != QPropertyAnimation::Running) 
         {
             m_wheelAnimation->setStartValue(m_parent->scalingFactor());
             m_wheelAnimation->setDuration(WHEEL_ANIMATION_DURATION);
+            m_wheelAnimation->setEasingCurve(QEasingCurve::InOutQuad);
             m_wheelAnimation->start();
-        } else {
+        } 
+        else 
+        {
             m_wheelAnimation->setDuration(m_wheelAnimation->currentTime() + WHEEL_ANIMATION_DURATION);
         }
     }
