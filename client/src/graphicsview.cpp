@@ -80,8 +80,11 @@ GraphicsView::GraphicsView(QWidget *parent)
     for (int i = 0; i < 16; ++i)
     {
         AnimatedWidget *widget = new AnimatedWidget(m_widget);
+        widget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true); // optimization
+//        widget->setFlag(QGraphicsItem::ItemHasNoContents, true); // optimization
         widget->setFlag(QGraphicsItem::ItemIsSelectable, true);
-        widget->setFlag(QGraphicsItem::ItemIsPanel, false);
+        widget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);
+//        widget->setFlag(QGraphicsItem::ItemIsPanel, false);
         widget->setPos(QPointF(-500, -500));
         scene()->addItem(widget);
 
