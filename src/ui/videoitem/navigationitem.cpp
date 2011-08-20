@@ -15,19 +15,50 @@
 #include "util.h"
 #include "../widgets/imagebuttonitem.h"
 
-class MyTextItem: public QGraphicsTextItem
+class MyTextItem: public QGraphicsItem
 {
 public:
-    MyTextItem(QGraphicsItem * parent = 0) : QGraphicsTextItem(parent), m_widget(0) {}
+
+    static int const extra_x = 20;
+    static int const extra_y = 10;
+
+    MyTextItem(QGraphicsItem* parent) : 
+      QGraphicsItem(parent), 
+          m_widget(0) 
+      {
+          setAcceptHoverEvents(true);
+      }
 
     void setNavigationWidget(NavigationWidget *widget) { m_widget = widget; }
+
+    void setText(const QString& text)
+    {
+        m_text = text;
+    }
+
+    QRectF smallRect() const
+    {
+        return QRectF(0,0,50,30);
+    }
+
+
+
+    QRectF boundingRect() const
+    {
+        return smallRect().adjusted(-extra_x,-extra_y,extra_x,extra_y);
+    }
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
     {
         static QPixmap pix(":/skin/time-window.png");
-        QRectF rect = boundingRect();
-        painter->drawPixmap((rect.width() - pix.width())/2, rect.y() + (rect.height() - (pix.height() - 10))/2, pix);
-        QGraphicsTextItem::paint(painter, option, widget);
+        QRectF rect = smallRect();
+
+        painter->drawPixmap( (smallRect().width() - pix.width())/2, 0, pix);
+
+        painter->setPen(QColor(63, 159, 216));
+        painter->setFont(m_font); // default font
+        painter->drawText(0, 0, smallRect().width(), smallRect().height(), Qt::AlignCenter, m_text);
+        //painter->fillRect(boundingRect(), QColor(255,0,0,128));
     }
     void mouseMoveEvent ( QGraphicsSceneMouseEvent * event )
     {
@@ -38,6 +69,12 @@ public:
         qint64 value = m_widget->slider()->currentValue() + (double)m_widget->slider()->sliderRange()/m_widget->slider()->width()*(pos - m_pos).x();
         m_widget->slider()->setCurrentValue(value);
         m_pos = pos;
+    }
+
+    
+    void wheelEvent ( QGraphicsSceneWheelEvent * event )
+    {
+
     }
 
     void mousePressEvent ( QGraphicsSceneMouseEvent * event )
@@ -54,6 +91,8 @@ public:
 private:
     NavigationWidget *m_widget;
     QPointF m_pos;
+    QString m_text;
+    QFont m_font;
 };
 
 NavigationWidget::NavigationWidget(QWidget *parent) :
@@ -68,7 +107,7 @@ NavigationWidget::NavigationWidget(QWidget *parent) :
     m_slider = new TimeSlider;
     m_slider->setObjectName("TimeSlider");
 
-    m_label = new QLabel;
+    m_label = new MyLable;
 
     m_volumeWidget = new VolumeWidget;
     m_layout->addWidget(m_slider);
@@ -181,11 +220,10 @@ NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
     connect(m_widget, SIGNAL(stepBackward()), SLOT(stepBackward()));
     connect(m_widget, SIGNAL(stepForward()), SLOT(stepForward()));
 
-    textItem = new MyTextItem(m_proxy);
-    textItem->setOpacity(0.75);
-    textItem->setDefaultTextColor(QColor(63, 159, 216));
-    textItem->setVisible(false);
-    textItem->setNavigationWidget(m_widget);
+    m_textItem = new MyTextItem(m_proxy);
+    m_textItem->setOpacity(0.75);
+    m_textItem->setVisible(false);
+    m_textItem->setNavigationWidget(m_widget);
 
     setVideoCamera(0);
     m_sliderIsmoving = true;
@@ -228,16 +266,20 @@ void NavigationItem::setVideoCamera(CLVideoCamera *camera)
     m_widget->setMouseTracking(true);
 
     m_camera = camera;
-    if (!camera) {
+
+    if (!camera) 
+    {
         setVisible(false);
-        if (textItem)
-            textItem->setVisible(false);
+        if (m_textItem)
+            m_textItem->setVisible(false);
         m_widget->slider()->setScalingFactor(0);
-    } else {
+    } 
+    else 
+    {
         setVisible(true);
         CLAbstractArchiveReader *reader = static_cast<CLAbstractArchiveReader*>(m_camera->getStreamreader());
         setPlaying(!reader->onPause());
-        textItem->setVisible(true);
+        m_textItem->setVisible(true);
     }
 }
 
@@ -270,8 +312,8 @@ void NavigationItem::updateSlider()
     m_widget->slider()->setCurrentValue(m_currentTime);
 
     qreal x = m_widget->slider()->x() + 8 + ((double)(m_widget->slider()->width() - 18)/(m_widget->slider()->sliderRange()))*(m_widget->slider()->currentValue() - m_widget->slider()->viewPortPos()); // fuck you!
-    textItem->setPos(x - textItem->boundingRect().width()/2, -40);
-    textItem->setPlainText(formatDuration(m_currentTime/1000));
+    m_textItem->setPos(x - m_textItem->smallRect().width()/2, -40);
+    m_textItem->setText(formatDuration(m_currentTime/1000));
     m_widget->label()->setText(formatDuration(length/1000));
 }
 
@@ -281,8 +323,8 @@ void NavigationItem::onValueChanged(qint64 time)
         return;
 
     qreal x = m_widget->slider()->x() + 8 + ((double)(m_widget->slider()->width() - 18)/(m_widget->slider()->sliderRange()))*(m_widget->slider()->currentValue() - m_widget->slider()->viewPortPos()); // fuck you!
-    textItem->setPos(x - textItem->boundingRect().width()/2, -40);
-    textItem->setPlainText(formatDuration(time/1000));
+    m_textItem->setPos(x - m_textItem->smallRect().width()/2, -40);
+    m_textItem->setText(formatDuration(time/1000));
 
     CLAbstractArchiveReader *reader = static_cast<CLAbstractArchiveReader*>(m_camera->getStreamreader());
 
@@ -395,7 +437,7 @@ void NavigationItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *e)
 
 void NavigationItem::wheelEvent(QGraphicsSceneWheelEvent *) 
 {
-    //cl_log.log("wheelEvent", cl_logALWAYS);
+    cl_log.log("wheelEvent", cl_logALWAYS);
 } 
 
 void NavigationItem::onSliderPressed()

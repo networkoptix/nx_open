@@ -183,7 +183,7 @@ void RecordingSettingsWidget::accept()
     settings->setCaptureCursor(ui->captureCursorCheckBox->isChecked());
 
     if (decoderQuality() == VideoRecorderSettings::BestQuality && resolution() == VideoRecorderSettings::ResNative)
-        QMessageBox::information(this, tr("Information"), tr("Very powerful machine is required for such settings"));
+        QMessageBox::information(this, tr("Information"), tr("Very powerful machine is required for BestQuality and Native resolution."));
 }
 
 void RecordingSettingsWidget::onMonitorChanged(int index)

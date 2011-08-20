@@ -10,6 +10,13 @@ class TimeSlider;
 class QGraphicsProxyWidget;
 class VolumeWidget;
 class MyTextItem;
+
+class MyLable : public QLabel
+{
+protected:
+    void wheelEvent ( QWheelEvent * event ){}; // to avoid scene move up and down
+};
+
 class MyButton : public QAbstractButton
 {
 public:
@@ -23,13 +30,18 @@ protected:
     {
         QPainter p(this);
         p.setRenderHint(QPainter::SmoothPixmapTransform, true);
+
         if (!isDown())
             p.drawPixmap(contentsRect(), m_pixmap);
+
         else if (isEnabled())
             p.drawPixmap(contentsRect(), m_pressedPixmap);
+
         if (isChecked())
             p.drawPixmap(contentsRect(), m_checkedPixmap);
     }
+
+    void wheelEvent ( QWheelEvent * event ){}; // to avoid scene move up and down
 
 private:
     QPixmap m_pixmap;
@@ -47,6 +59,12 @@ public:
     TimeSlider *slider() const;
     QLabel *label() const;
 
+protected:
+    void wheelEvent ( QWheelEvent * event )
+    {
+
+    };
+
 signals:
     void rewindBackward();
     void rewindForward();
@@ -55,9 +73,8 @@ signals:
 
 private:
     QHBoxLayout *m_layout;
-    QPushButton *m_pauseButton;
     TimeSlider *m_slider;
-    QLabel *m_label;
+    MyLable *m_label;
     VolumeWidget *m_volumeWidget;
 
     friend class NavigationItem;
@@ -92,6 +109,7 @@ public:
 protected:
     void timerEvent(QTimerEvent* event);
     void updateSlider();
+
 
 private slots:
     void onValueChanged(qint64);
@@ -130,7 +148,7 @@ private:
     bool m_mouseOver;
     bool m_playing;
 
-    MyTextItem *textItem;
+    MyTextItem *m_textItem;
     bool m_active;
 };
 

@@ -23,6 +23,12 @@ public:
     QSize sizeHint() const { return QSize(50, 16); }
     void paintEvent(QPaintEvent *);
 
+protected:
+    void wheelEvent ( QWheelEvent * event )
+    {
+    }; // to avoid scene move up and down
+
+
 signals:
 
 public slots:
