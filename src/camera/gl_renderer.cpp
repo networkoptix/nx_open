@@ -40,8 +40,8 @@
 static const int MAX_SHADER_SIZE = 1024*3;
 static const int ROUND_COEFF = 8;
 
-QVector<quint8> CLGLRenderer::m_staticYFiller;
-QVector<quint8> CLGLRenderer::m_staticUVFiller;
+QVector<uchar> CLGLRenderer::m_staticYFiller;
+QVector<uchar> CLGLRenderer::m_staticUVFiller;
 
 QMutex CLGLRenderer::m_programMutex;
 bool CLGLRenderer::m_programInited = false;
@@ -591,7 +591,7 @@ void CLGLRenderer::updateTexture()
                 // by default uninitialized YUV texture has green color. Fill right and bottom black bars
                 // due to GL_LINEAR filtering, openGL uses some "unvisible" pixels, so it is unvisible pixels MUST be black
                 int fillSize = qMax(round_r_w, h[i]) * ROUND_COEFF;
-                quint8* staticFiller;
+                uchar *staticFiller;
                 if (i == 0)
                 {
                     if (m_staticYFiller.size() < fillSize)
@@ -660,8 +660,8 @@ void CLGLRenderer::updateTexture()
             const int hPow = isNonPower2 ? h[0] : getMinPow2(h[0]);
             // support GL_ARB_texture_non_power_of_two ?
             m_videoCoeffL[0] = 0;
-            m_videoCoeffW[0] =  roundUp(r_w[0]) / (float) wPow;
-            m_videoCoeffH[0] = h[0] / (float) hPow;
+            m_videoCoeffW[0] = roundUp(r_w[0]) / float(wPow);
+            m_videoCoeffH[0] = h[0] / float(hPow);
 
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wPow, hPow, 0, glRGBFormat(), GL_UNSIGNED_BYTE, 0);
             OGL_CHECK_ERROR("glTexImage2D");
@@ -675,13 +675,13 @@ void CLGLRenderer::updateTexture()
             OGL_CHECK_ERROR("glTexParameteri");
         }
 
-        quint8* pixels = m_arrayPixels[0];
+        uchar *pixels = m_arrayPixels[0];
         if (isYuvFormat())
         {
             int size = 4 * m_stride * h[0];
-            if (yuv2rgbBuffer.size() != size)
+            if (yuv2rgbBuffer.size() < size)
                 yuv2rgbBuffer.resize(size);
-            pixels = &yuv2rgbBuffer[0];
+            pixels = yuv2rgbBuffer.data();
         }
 
         int lineInPixelsSize = m_stride;
