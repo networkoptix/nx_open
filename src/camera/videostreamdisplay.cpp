@@ -21,6 +21,8 @@ CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale) :
 
 CLVideoStreamDisplay::~CLVideoStreamDisplay()
 {
+    QMutexLocker _lock(&m_mtx);
+
     foreach(CLAbstractVideoDecoder* decoder, m_decoder)
     {
         delete decoder;
@@ -255,6 +257,8 @@ CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::findScaleFactor(int
 
 void CLVideoStreamDisplay::setMTDecoding(bool value)
 {
+    QMutexLocker _lock(&m_mtx);
+
     foreach(CLAbstractVideoDecoder* decoder, m_decoder)
     {
         decoder->setMTDecoding(value);

@@ -55,6 +55,8 @@ qint64 CLAVIStreamReader::packetTimestamp(AVStream* stream, const AVPacket& pack
 
 CLAVIStreamReader::CLAVIStreamReader(CLDevice* dev ) :
     CLAbstractArchiveReader(dev),
+    m_currentTime(0),
+    m_previousTime(0),
     m_formatContext(0),
     m_videoStreamIndex(-1),
     m_audioStreamIndex(-1),

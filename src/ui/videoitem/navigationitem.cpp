@@ -128,7 +128,8 @@ QLabel * NavigationWidget::label() const
 }
 
 NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
-    CLUnMovedInteractiveOpacityItem(QString("name:)"), 0, 0.5, 0.95)
+    CLUnMovedInteractiveOpacityItem(QString("name:)"), 0, 0.5, 0.95),
+    m_currentTime(0)
 {
     m_playing = false;
 
