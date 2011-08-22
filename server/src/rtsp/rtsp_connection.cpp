@@ -84,6 +84,10 @@ protected:
         int rtspChannelNum = media->channelNumber;
         if (media->dataType == QnAbstractMediaDataPacket::AUDIO)
             rtspChannelNum += m_owner->numOfVideoChannels();
+
+        if (media->flags & QnAbstractMediaDataPacket::MediaFlags_AfterEOF)
+            m_ctxSended.clear();
+
         AVCodecContext* ctx = (AVCodecContext*) media->context;
         if (!ctx)
             return;
@@ -95,7 +99,7 @@ protected:
         if (subChannelNumber == -1)
         {
             subChannelNumber = m_ctxSended[rtspChannelNum].size();
-            ssrc += subChannelNumber;
+            ssrc += subChannelNumber*2;
             QnFfmpegHelper::serializeCodecContext(ctx, &m_codecCtxData);
             buildRtspTcpHeader(rtspChannelNum, ssrc + 1, m_codecCtxData.size(), true, 0); // ssrc+1 - switch data subchannel to context subchannel
             QMutexLocker lock(&m_owner->getSockMutex());
@@ -106,7 +110,7 @@ protected:
         }
         else
         {
-            ssrc += subChannelNumber;
+            ssrc += subChannelNumber*2;
         }
         // send data with RTP headers
         QnCompressedVideoData *video = media.dynamicCast<QnCompressedVideoData>().data();
@@ -687,10 +691,10 @@ void QnRtspConnectionProcessor::run()
             }
         }
     }
-    if (d->dataProvider)
-        d->dataProvider->stop();
     if (d->dataProcessor)
         d->dataProcessor->stop();
+    if (d->dataProvider)
+        d->dataProvider->stop();
     delete d->dataProvider;
     delete d->dataProcessor;
     d->dataProvider = 0;
