@@ -13,7 +13,7 @@ static const int MAX_RTCP_PACKET_SIZE = 1024 * 2;
 static const quint32 SSRC_CONST = 0x2a55a9e8;
 static const quint32 CSRC_CONST = 0xe8a9552a;
 
-#define DEBUG_RTSP
+//#define DEBUG_RTSP
 
 RTPIODevice::RTPIODevice(RTPSession& owner):
     m_owner(owner),

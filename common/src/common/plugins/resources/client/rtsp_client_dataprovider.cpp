@@ -13,7 +13,7 @@ static const int MAX_RTP_BUFFER_SIZE = 65535;
 
 // current implementation for TCP mode only
 
-#define DEBUG_RTSP
+//#define DEBUG_RTSP
 
 QnRtspClientDataProvider::QnRtspClientDataProvider(QnResourcePtr res):
     QnNavigatedDataProvider(res),
@@ -89,7 +89,7 @@ QnAbstractDataPacketPtr QnRtspClientDataProvider::processFFmpegRtpPayload(const 
                 quint8 flags = *payload;
                 dataSize--;
                 payload++;
-                // todo: determine total video frame size here to prevenot bytearray reallocate
+                // todo: determine total video frame size here to prevent bytearray reallocate
                 QnCompressedVideoData* video = new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, dataSize, context);
                 nextPacket = QnCompressedVideoDataPtr(video);
                 video->keyFrame = flags & 0x80;
@@ -175,10 +175,8 @@ QnAbstractDataPacketPtr QnRtspClientDataProvider::getNextData()
 
 void QnRtspClientDataProvider::updateStreamParamsBasedOnQuality()
 {
-
 }
 
 void QnRtspClientDataProvider::channeljumpTo(quint64 mksec, int channel)
 {
-
 }
