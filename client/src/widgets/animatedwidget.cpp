@@ -102,7 +102,6 @@ void AnimatedWidgetPrivate::init()
     q->setAttribute(Qt::WA_DeleteOnClose);
 
     q->setFlag(QGraphicsItem::ItemSendsGeometryChanges);
-    q->setFlag(QGraphicsItem::ItemIgnoresParentOpacity); // optimization (see opaqueArea())
 
     q->setInteractive(false);
 
@@ -164,6 +163,14 @@ void AnimatedWidget::setInteractive(bool interactive)
     setFlag(ItemIsMovable, interactive);
 }
 
+QPainterPath AnimatedWidget::opaqueArea() const
+{
+    if (qFuzzyCompare(effectiveOpacity(), 1.0))
+        return shape(); // optimization
+
+    return QGraphicsWidget::opaqueArea();
+}
+
 void AnimatedWidget::setGeometry(const QRectF &rect)
 {
     if ((flags() & ItemSendsGeometryChanges) == 0)
@@ -187,20 +194,12 @@ void AnimatedWidget::setGeometry(const QRectF &rect)
     itemChange(GraphicsItemChange(ItemSizeHasChanged), newSizeVariant);
 }
 
-QPainterPath AnimatedWidget::opaqueArea() const
-{
-    if ((flags() & ItemIgnoresParentOpacity) && opacity() == 1.0)
-        return shape(); // optimization
-
-    return QGraphicsWidget::opaqueArea();
-}
-
 QVariant AnimatedWidget::itemChange(GraphicsItemChange change, const QVariant &value)
 {
     switch (int(change))
     {
     case ItemFlagsChange:
-        return value.toUInt() | ItemSendsGeometryChanges | ItemUsesExtendedStyleOption;
+        return (value.toUInt() | ItemSendsGeometryChanges | ItemUsesExtendedStyleOption)/* & ~ItemIsPanel*/;
 
     case ItemPositionChange:
         if (!d->inSetGeometry && d->posAnimation && scene())
@@ -211,7 +210,7 @@ QVariant AnimatedWidget::itemChange(GraphicsItemChange change, const QVariant &v
                 d->posAnimation->stop();
 
             QGraphicsItem *mouseGrabberItem = scene()->mouseGrabberItem();
-            if (!isInteractive() || !isSelected() || !mouseGrabberItem/* || (mouseGrabberItem != this && !isAncestorOf(mouseGrabberItem))*/)
+            if (!isInteractive() || (!isSelected() && (!mouseGrabberItem || (mouseGrabberItem != this/* && !isAncestorOf(mouseGrabberItem)*/))))
             {
                 d->posAnimation->setEndValue(newPos);
                 d->posAnimation->start();
@@ -230,7 +229,7 @@ QVariant AnimatedWidget::itemChange(GraphicsItemChange change, const QVariant &v
                 d->sizeAnimation->stop();
 
             QGraphicsItem *mouseGrabberItem = scene()->mouseGrabberItem();
-            if (!isInteractive() || !isSelected() || !mouseGrabberItem/* || (mouseGrabberItem != this && !isAncestorOf(mouseGrabberItem))*/)
+            if (!isInteractive() || (!isSelected() && (!mouseGrabberItem || (mouseGrabberItem != this/* && !isAncestorOf(mouseGrabberItem)*/))))
             {
                 d->sizeAnimation->setEndValue(newSize);
                 d->sizeAnimation->start();
@@ -298,6 +297,33 @@ QVariant AnimatedWidget::itemChange(GraphicsItemChange change, const QVariant &v
     }
 
     return QGraphicsWidget::itemChange(change, value);
+}
+
+bool AnimatedWidget::windowFrameEvent(QEvent *event)
+{
+    if ((flags() & ItemIsPanel))
+    {
+        switch (event->type())
+        {
+        case QEvent::GraphicsSceneMousePress:
+        case QEvent::GraphicsSceneMouseRelease:
+            return QGraphicsWidget::windowFrameEvent(event)
+                   && windowFrameSectionAt(static_cast<QGraphicsSceneMouseEvent *>(event)->pos()) != Qt::TitleBarArea;
+
+        case QEvent::GraphicsSceneMouseMove:
+            if (windowFrameSectionAt(static_cast<QGraphicsSceneMouseEvent *>(event)->pos()) == Qt::TitleBarArea)
+            {
+                event->accept();
+                return false;
+            }
+            break;
+
+        default:
+            break;
+        }
+    }
+
+    return QGraphicsWidget::windowFrameEvent(event);
 }
 
 void AnimatedWidget::mousePressEvent(QGraphicsSceneMouseEvent *event)

@@ -25,8 +25,9 @@ public:
     bool isInteractive() const;
     void setInteractive(bool interactive);
 
-    void setGeometry(const QRectF &rect);
     QPainterPath opaqueArea() const;
+
+    void setGeometry(const QRectF &rect);
 
 Q_SIGNALS:
     void clicked();
@@ -35,6 +36,7 @@ Q_SIGNALS:
 protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 
+    bool windowFrameEvent(QEvent *event);
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
