@@ -1,7 +1,6 @@
 #include "navigated_dataprovider.h"
 
-QnNavigatedDataProvider::QnNavigatedDataProvider(QnResourcePtr res):
-    QnClientPullStreamProvider(res),
+QnNavigatedDataProvider::QnNavigatedDataProvider():
     m_lengthMksec(0),
     m_startMksec(0),
     m_forward(true),

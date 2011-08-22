@@ -13,7 +13,7 @@ struct AVFormatContext;
 struct AVPacket;
 struct AVStream;
 
-class QnAviArchiveDataProvider: public QnNavigatedDataProvider
+class QnAviArchiveDataProvider: public QnNavigatedDataProvider, public QnClientPullStreamProvider
 {
 public:
     QnAviArchiveDataProvider(QnResourcePtr ptr);
@@ -24,6 +24,7 @@ public:
     virtual bool init();
 
 protected:
+    virtual void updateStreamParamsBasedOnQuality(); 
     virtual QnAbstractDataPacketPtr getNextData();
     virtual void destroy();
     virtual AVFormatContext *getFormatContext();

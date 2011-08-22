@@ -9,9 +9,11 @@
 #define DEFAULT_RTP_PORT 554
 #define RESERVED_TIMEOUT_TIME (5*1000)
 
+
 static const int MAX_RTCP_PACKET_SIZE = 1024 * 2;
 static const quint32 SSRC_CONST = 0x2a55a9e8;
 static const quint32 CSRC_CONST = 0xe8a9552a;
+static const int TCP_TIMEOUT = 5 * 1000;
 
 #define DEBUG_RTSP
 
@@ -56,16 +58,17 @@ RTPSession::RTPSession():
     m_udpSock(0),
     m_rtcpUdpSock(0),
     m_rtpIo(*this),
-    m_transport("UDP")
+    m_transport("UDP"),
+    m_tcpSock(0)
 {
     m_udpSock.setReadTimeOut(500);
-    m_tcpSock.setReadTimeOut(3 * 1000);
     m_responseBuffer = new quint8[MAX_RESPONCE_LEN];
     m_responseBufferLen = 0;
 }
 
 RTPSession::~RTPSession()
 {
+    delete m_tcpSock;
     delete [] m_responseBuffer;
 }
 
@@ -110,7 +113,11 @@ bool RTPSession::open(const QString& url)
 
     unsigned int port = DEFAULT_RTP_PORT;
 
-    if (!m_tcpSock.connect(mUrl.host().toLatin1().data(), mUrl.port(DEFAULT_RTP_PORT)))
+    m_tcpSock = new TCPSocket();
+    m_tcpSock->setReadTimeOut(TCP_TIMEOUT);
+    m_tcpSock->setWriteTimeOut(TCP_TIMEOUT);
+
+    if (!m_tcpSock->connect(mUrl.host().toLatin1().data(), mUrl.port(DEFAULT_RTP_PORT)))
         return false;
 
     if (!sendDescribe())
@@ -135,7 +142,7 @@ bool RTPSession::open(const QString& url)
     return true;
 }
 
-RTPIODevice* RTPSession::play()
+RTPIODevice* RTPSession::play(double position, double scale)
 {
     RTPIODevice* ioDevice = sendSetup();
 
@@ -143,7 +150,7 @@ RTPIODevice* RTPSession::play()
         return 0;
 
 
-    if (!sendPlay())
+    if (!sendPlay(position, scale))
         return 0;
 
 
@@ -153,14 +160,16 @@ RTPIODevice* RTPSession::play()
 
 bool RTPSession::stop()
 {
-
+    delete m_tcpSock;
+    m_tcpSock = 0;
+    m_responseBufferLen = 0;
     return true;
 }
 
 
 bool RTPSession::isOpened() const
 {
-    return m_tcpSock.isConnected();
+    return m_tcpSock && m_tcpSock->isConnected();
 }
 
 unsigned int RTPSession::sessionTimeoutMs()
@@ -189,7 +198,7 @@ bool RTPSession::sendDescribe()
 
     //qDebug() << request;
 
-    if (!m_tcpSock.send(request.data(), request.size()))
+    if (!m_tcpSock->send(request.data(), request.size()))
         false;
 
     return true;
@@ -207,7 +216,7 @@ bool RTPSession::sendOptions()
     request += "\r\n\r\n";
 
 
-    if (!m_tcpSock.send(request.data(), request.size()))
+    if (!m_tcpSock->send(request.data(), request.size()))
         false;
 
     return true;
@@ -219,7 +228,7 @@ RTPIODevice*  RTPSession::sendSetup()
     if (m_transport == "UDP")
         m_rtpIo.setSocket(&m_udpSock);
     else
-        m_rtpIo.setSocket(&m_tcpSock);
+        m_rtpIo.setSocket(m_tcpSock);
     for (QMap<int, QString>::iterator itr = m_sdpTracks.begin(); itr != m_sdpTracks.end(); ++itr)
     {
         QByteArray request;
@@ -252,7 +261,7 @@ RTPIODevice*  RTPSession::sendSetup()
 
         //qDebug() << request;
 
-        if (!m_tcpSock.send(request.data(), request.size()))
+        if (!m_tcpSock->send(request.data(), request.size()))
             return 0;
 
         QByteArray responce;
@@ -291,7 +300,7 @@ RTPIODevice*  RTPSession::sendSetup()
     return &m_rtpIo;
 }
 
-bool RTPSession::sendPlay()
+bool RTPSession::sendPlay(double position, double scale)
 {
 
     QByteArray request;
@@ -306,10 +315,12 @@ bool RTPSession::sendPlay()
     request += "Session: ";
     request += m_SessionId;
     request += "\r\n";
-    request += "Range: npt=0.000"; // offset
+    request += "Range: npt=" + QString::number(position);
+    if (scale != 1.0)
+        request += "Scale: " + QString::number(scale);
     request += "-\r\n\r\n";
 
-    if (!m_tcpSock.send(request.data(), request.size()))
+    if (!m_tcpSock->send(request.data(), request.size()))
         return false;
 
 
@@ -342,7 +353,7 @@ bool RTPSession::sendTeardown()
     request += m_SessionId;
     request += "\r\n\r\n";
 
-    if (!m_tcpSock.send(request.data(), request.size()))
+    if (!m_tcpSock->send(request.data(), request.size()))
         false;
 
 
@@ -472,7 +483,7 @@ bool RTPSession::sendKeepAlive()
     //
 
 
-    if (!m_tcpSock.send(request.data(), request.size()))
+    if (!m_tcpSock->send(request.data(), request.size()))
         false;
 
 
@@ -489,7 +500,7 @@ bool RTPSession::sendKeepAlive()
 // read RAW: combination of text and binary data
 int RTPSession::readRAWData()
 {
-    int readed = m_tcpSock.recv(m_responseBuffer + m_responseBufferLen, MAX_RESPONCE_LEN - m_responseBufferLen);
+    int readed = m_tcpSock->recv(m_responseBuffer + m_responseBufferLen, MAX_RESPONCE_LEN - m_responseBufferLen);
     if (readed > 0)
     {
 #ifdef DEBUG_RTSP
@@ -513,7 +524,7 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
 {
     quint8* origData = data;
     bool readMoreData = false; // try to process existing buffer at first
-    while (1)
+    while (m_tcpSock->isConnected())
     {
         if (readMoreData && readRAWData() < 1)
             continue;
@@ -561,6 +572,7 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
         }
         readMoreData = true;
     }
+    return -1;
 }
 
 // demux text data only

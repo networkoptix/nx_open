@@ -41,7 +41,7 @@ public:
     // returns true if stream was opened, false in case of some error
     bool open(const QString& url);
 
-    RTPIODevice* play();
+    RTPIODevice* play(double position = 0, double scale = 1.0);
 
     // returns true if there is no error delivering STOP
     bool stop();
@@ -66,7 +66,7 @@ private:
     bool sendDescribe();
     bool sendOptions();
     RTPIODevice *sendSetup();
-    bool sendPlay();
+    bool sendPlay(double position, double scale);
     bool sendTeardown();
     bool sendKeepAlive();
 
@@ -88,7 +88,7 @@ private:
     int m_responseBufferLen;
     QByteArray m_sdp;
 
-    TCPSocket m_tcpSock;
+    TCPSocket* m_tcpSock;
     UDPSocket m_udpSock;
     UDPSocket m_rtcpUdpSock;
     RTPIODevice m_rtpIo;

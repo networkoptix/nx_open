@@ -24,7 +24,8 @@ private:
 // ---------------------------------- QnAviArchiveDataProvider -----------------------
 
 QnAviArchiveDataProvider::QnAviArchiveDataProvider(QnResourcePtr ptr):
-    QnNavigatedDataProvider(ptr),
+    QnNavigatedDataProvider(),
+    QnClientPullStreamProvider(ptr),
     m_formatContext(0),
     m_videoStreamIndex(-1),
     m_audioStreamIndex(-1),
@@ -422,4 +423,8 @@ void QnAviArchiveDataProvider::setSkipFramesToTime(quint64 skip)
     {
         m_skippedToTime[channel] = (skip == 0);
     }
+}
+
+void QnAviArchiveDataProvider::updateStreamParamsBasedOnQuality()
+{
 }

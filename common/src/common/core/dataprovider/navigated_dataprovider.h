@@ -3,10 +3,10 @@
 
 #include "dataprovider/cpull_media_stream_provider.h"
 
-class QnNavigatedDataProvider: public QnClientPullStreamProvider
+class QnNavigatedDataProvider
 {
 public:
-    QnNavigatedDataProvider(QnResourcePtr res);
+    QnNavigatedDataProvider();
 
     void setSingleShotMode(bool single);
     bool isSingleShotMode() const;
@@ -31,6 +31,6 @@ private:
     quint64 m_skipFramesToTime;
 };
 
-typedef QSharedPointer<QnNavigatedDataProvider> QnNavigatedDataProviderPtr;
+//typedef QSharedPointer<QnNavigatedDataProvider> QnNavigatedDataProviderPtr;
 
 #endif

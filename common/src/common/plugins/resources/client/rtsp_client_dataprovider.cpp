@@ -16,28 +16,14 @@ static const int MAX_RTP_BUFFER_SIZE = 65535;
 #define DEBUG_RTSP
 
 QnRtspClientDataProvider::QnRtspClientDataProvider(QnResourcePtr res):
-    QnNavigatedDataProvider(res),
+    QnNavigatedDataProvider(),
+    QnServerPushDataProvider(res),
     m_tcpMode(true),
-    m_rtpData(0)
+    m_rtpData(0),
+    m_position(0)
 {
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
     m_isOpened = false;
-    QnClientMediaResourcePtr media = res.dynamicCast<QnClientMediaResource>();
-    if (!media)
-        return;
-    QnURLResourcePtr server = qSharedPointerDynamicCast<QnURLResource>(qnResPool.getResourceById(media->getParentId()));
-    if (server == 0)
-        return;
-    QString url = server->getUrl() + QString('/');
-    QnURLResourcePtr mediaUrl = qSharedPointerDynamicCast<QnURLResource>(qnResPool.getResourceById(res->getId()));
-    if (mediaUrl != 0 && !mediaUrl->getUrl().isEmpty())
-        url += mediaUrl->getUrl();
-    else
-        url += res->getId().toString();
-    m_rtspSession.setTransport("TCP");
-    m_isOpened = m_rtspSession.open(url);
-    if (m_isOpened)
-        m_rtpData = m_rtspSession.play();
 }
 
 QnRtspClientDataProvider::~QnRtspClientDataProvider()
@@ -114,6 +100,7 @@ QnAbstractDataPacketPtr QnRtspClientDataProvider::processFFmpegRtpPayload(const 
         {
             result = nextPacket;
             m_nextDataPacket[ssrc] = QnAbstractMediaDataPacketPtr(0); // EOF video frame reached
+            m_position = nextPacket->timestamp;
         }
 
     }
@@ -131,9 +118,12 @@ QnAbstractDataPacketPtr QnRtspClientDataProvider::getNextData()
 
         int rtpChannelNum = 0;
         int blockSize  = m_rtpData->read((char*)m_rtpDataBuffer, MAX_RTP_BUFFER_SIZE);
+        if (blockSize > MAX_RTP_BUFFER_SIZE) {
+            int gg5 = 4;
+        }
 
-        if (blockSize < 1)
-            return result;
+        if (blockSize < 0)
+            return result; // recconect
 
 #ifdef DEBUG_RTSP
         static QFile* binaryFile = 0;
@@ -181,4 +171,38 @@ void QnRtspClientDataProvider::updateStreamParamsBasedOnQuality()
 void QnRtspClientDataProvider::channeljumpTo(quint64 mksec, int channel)
 {
 
+}
+
+void QnRtspClientDataProvider::openStream()
+{
+    QnClientMediaResourcePtr media = m_resource.dynamicCast<QnClientMediaResource>();
+    if (!media)
+        return;
+    QnURLResourcePtr server = qSharedPointerDynamicCast<QnURLResource>(qnResPool.getResourceById(media->getParentId()));
+    if (server == 0)
+        return;
+    m_rtspSession.setTransport("TCP");
+
+    QString url = server->getUrl() + QString('/');
+    QnURLResourcePtr mediaUrl = qSharedPointerDynamicCast<QnURLResource>(qnResPool.getResourceById(m_resource->getId()));
+    if (mediaUrl != 0 && !mediaUrl->getUrl().isEmpty())
+        url += mediaUrl->getUrl();
+    else
+        url += m_resource->getId().toString();
+    m_isOpened = m_rtspSession.open(url);
+    if (m_isOpened) {
+        m_rtpData = m_rtspSession.play(m_position);
+        m_isOpened =  m_rtpData != 0;
+    }
+}
+
+void QnRtspClientDataProvider::closeStream()
+{
+    m_rtspSession.stop();
+    m_rtpData = 0;
+}
+
+bool QnRtspClientDataProvider::isStreamOpened() const
+{
+    return m_rtspSession.isOpened();
 }
