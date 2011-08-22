@@ -2,32 +2,35 @@
 
 #include <QtGui/QApplication>
 #include <QFile>
+#include <QDir>
 #include <QDebug>
+#include "common/log.h"
+#include "common/util.h"
 
-void rtspTest()
-{
-    QFile file("c:/1111/binary_raw.rtsp");
-    file.open(QFile::ReadOnly);
-    QByteArray data = file.readAll();
-    const unsigned char* buff = (const unsigned char*) data.data() + 0x1ea;
-    const unsigned char* buffStart = buff;
-    const unsigned char* bufEnd = (const unsigned char*) buff + data.size();
-    while (buff < bufEnd)
-    {
-        int len = (buff[2] << 8) + buff[3]; 
-        qDebug() << "marker=" << buff[0] << "track=" << (int)buff[1] << "len=" << len;
-        buff += len + 4;
-    }
-}
+const char* const ORGANIZATION_NAME="Network Optix";
+const char* const APPLICATION_NAME="VMS client";
+const char* const APPLICATION_VERSION="0.5.0";
 
 int main(int argc, char **argv)
 {
-    rtspTest();
-
     Q_INIT_RESOURCE(images);
+
+    QApplication::setOrganizationName(QLatin1String(ORGANIZATION_NAME));
+    QApplication::setApplicationName(QLatin1String(APPLICATION_NAME));
+    QApplication::setApplicationVersion(QLatin1String(APPLICATION_VERSION));
 
     QApplication app(argc, argv);
     app.setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
+
+    QString dataLocation = getDataDirectory();
+    QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
+    QDir dataDirectory;
+    dataDirectory.mkpath(dataLocation + QLatin1String("/log"));
+    if (!cl_log.create(dataLocation + QLatin1String("/log/log_file"), 1024*1024*10, 5, cl_logDEBUG1))
+    {
+        app.quit();
+        return 0;
+    }
 
     MainWindow window;
     window.show();

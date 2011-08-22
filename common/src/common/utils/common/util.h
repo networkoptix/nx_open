@@ -25,5 +25,10 @@ QString formatDuration(unsigned duration, unsigned total = 0);
  */
 QString getParamFromString(const QString& str, const QString& param);
 
+/*
+ * Get user data directory. Directory should be available for writing.
+ */
+QString getDataDirectory();
+
 
 #endif // _UNIVERSAL_CLIENT_UTIL_H

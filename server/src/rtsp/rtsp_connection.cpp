@@ -23,7 +23,7 @@ static const QString RTP_FFMPEG_GENERIC_STR("FFMPEG");
 static const int MAX_QUEUE_SIZE = 15;
 static const int MAX_RTSP_DATA_LEN = 65535 - 4 - 1 - RtpHeader::RTP_HEADER_SIZE;
 static const int TCP_READ_BUFFER_SIZE = 65536;
-static const int CLOCK_FREQUENCY = 1000;
+static const int CLOCK_FREQUENCY = 1000000;
 static const quint32 BASIC_FFMPEG_SSRC = 20000;
 static const int MAX_CONTEXTS_AT_VIDEO = 8; // max ammount of difference codecContext used for one video channel.
 static const int RTSP_MIN_SEEK_INTERVAL = 1000 * 30; // 30 ms as min seek interval
@@ -116,7 +116,7 @@ protected:
         for (int dataRest = media->data.size(); dataRest > 0; dataRest -= sendLen)
         {
             sendLen = qMin(MAX_RTSP_DATA_LEN, dataRest);
-            buildRtspTcpHeader(rtspChannelNum, ssrc, sendLen + (first && video ? 1 : 0), sendLen >= dataRest ? 1 : 0, video->timestamp);
+            buildRtspTcpHeader(rtspChannelNum, ssrc, sendLen + (first && video ? 1 : 0), sendLen >= dataRest ? 1 : 0, media->timestamp);
             QMutexLocker lock(&m_owner->getSockMutex());
             m_owner->sendData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
             if (first && video)
@@ -691,6 +691,10 @@ void QnRtspConnectionProcessor::run()
         d->dataProvider->stop();
     if (d->dataProcessor)
         d->dataProcessor->stop();
+    delete d->dataProvider;
+    delete d->dataProcessor;
+    d->dataProvider = 0;
+    d->dataProcessor = 0;
     m_runing = false;
     //deleteLater(); // does not works for this thread
 }

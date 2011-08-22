@@ -89,6 +89,7 @@ QnAbstractDataPacketPtr QnRtspClientDataProvider::processFFmpegRtpPayload(const 
                 quint8 flags = *payload;
                 dataSize--;
                 payload++;
+                // todo: determine total video frame size here to prevenot bytearray reallocate
                 QnCompressedVideoData* video = new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, dataSize, context);
                 nextPacket = QnCompressedVideoDataPtr(video);
                 video->keyFrame = flags & 0x80;
@@ -106,7 +107,7 @@ QnAbstractDataPacketPtr QnRtspClientDataProvider::processFFmpegRtpPayload(const 
             nextPacket->timestamp = ntohl(rtpHeader->timestamp);
             if (nextPacket->timestamp < 0x40000000 && m_prevTimestamp[ssrc] > 0xc0000000)
                 m_timeStampCycles[ssrc]++;
-            nextPacket->timestamp += (m_timeStampCycles[ssrc] << 16);
+            nextPacket->timestamp += ((qint64) m_timeStampCycles[ssrc] << 32);
         }
         nextPacket->data.write((const char*)payload, dataSize);
         if (rtpHeader->marker)
@@ -123,49 +124,52 @@ QnAbstractDataPacketPtr QnRtspClientDataProvider::getNextData()
 {
     // sometime function may return zero packet if no data arrived
     QnAbstractDataPacketPtr result(0);
-    if (!m_rtpData)
-        return result;
+    while (!m_needStop && result == 0)
+    {
+        if (!m_rtpData)
+            return result;
 
-    int rtpChannelNum = 0;
-    int blockSize  = m_rtpData->read((char*)m_rtpDataBuffer, MAX_RTP_BUFFER_SIZE);
+        int rtpChannelNum = 0;
+        int blockSize  = m_rtpData->read((char*)m_rtpDataBuffer, MAX_RTP_BUFFER_SIZE);
 
-    if (blockSize < 1)
-        return result;
+        if (blockSize < 1)
+            return result;
 
 #ifdef DEBUG_RTSP
-    static QFile* binaryFile = 0;
-    if (!binaryFile) {
-        binaryFile = new QFile("c:/binary2.rtsp");
-        binaryFile->open(QFile::WriteOnly);
-    }
-    binaryFile->write((const char*) m_rtpDataBuffer, blockSize);
-    binaryFile->flush();
+        static QFile* binaryFile = 0;
+        if (!binaryFile) {
+            binaryFile = new QFile("c:/binary2.rtsp");
+            binaryFile->open(QFile::WriteOnly);
+        }
+        binaryFile->write((const char*) m_rtpDataBuffer, blockSize);
+        binaryFile->flush();
 
 #endif
 
 
-    quint8* data = m_rtpDataBuffer;
-    if (m_tcpMode)
-    {
-        if (blockSize < 4) {
-            qWarning() << Q_FUNC_INFO << __LINE__ << "strange RTP/TCP packet. len < 4. Ignored";
-            return result;
+        quint8* data = m_rtpDataBuffer;
+        if (m_tcpMode)
+        {
+            if (blockSize < 4) {
+                qWarning() << Q_FUNC_INFO << __LINE__ << "strange RTP/TCP packet. len < 4. Ignored";
+                return result;
+            }
+            rtpChannelNum = m_rtpDataBuffer[1];
+            blockSize -= 4;
+            data += 4;
         }
-        rtpChannelNum = m_rtpDataBuffer[1];
-        blockSize -= 4;
-        data += 4;
+        else {
+            rtpChannelNum = m_rtpData->getSocket()->getLocalPort();
+        }
+        const QString& format = m_rtspSession.getTrackFormat(rtpChannelNum).toLower();
+        if (format.isNull()) {
+            qWarning() << Q_FUNC_INFO << __LINE__ << "RTP track" << rtpChannelNum << "not found";
+        }
+        else if (format == "ffmpeg") 
+            result = processFFmpegRtpPayload(data, blockSize);
+        else 
+            qWarning() << Q_FUNC_INFO << __LINE__ << "Only FFMPEG payload format now implemeted. Ask developers to add '" << format << "' format";
     }
-    else {
-        rtpChannelNum = m_rtpData->getSocket()->getLocalPort();
-    }
-    const QString& format = m_rtspSession.getTrackFormat(rtpChannelNum).toLower();
-    if (format.isNull()) {
-        qWarning() << Q_FUNC_INFO << __LINE__ << "RTP track" << rtpChannelNum << "not found";
-    }
-    else if (format == "ffmpeg") 
-        result = processFFmpegRtpPayload(data, blockSize);
-    else 
-        qWarning() << Q_FUNC_INFO << __LINE__ << "Only FFMPEG payload format now implemeted. Ask developers to add '" << format << "' format";
     return result;
 }
 

@@ -1,5 +1,5 @@
 #include "util.h"
-
+#include <QDesktopServices>
 
 
 QString formatDuration(unsigned duration, unsigned total)
@@ -66,4 +66,9 @@ QString getParamFromString(const QString& str, const QString& param)
     QString result = str.mid(first_index+1, second_index - (first_index+1));
 
     return result;    
+}
+
+QString getDataDirectory()
+{
+    return QDesktopServices::storageLocation(QDesktopServices::DataLocation);
 }
