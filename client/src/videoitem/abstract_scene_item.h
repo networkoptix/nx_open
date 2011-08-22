@@ -48,9 +48,11 @@ public:
     {
         m_needUpdate = val;
 
-        if (m_needUpdate && (isFullScreen() || isItemSelected()))
-            emit onNeedToUpdate(this);
-
+        if (m_needUpdate/* && (isFullScreen() || isItemSelected())*/)
+        {
+            QMetaObject::invokeMethod(this, "onNeedToUpdateItem", Qt::QueuedConnection);
+            //emit onNeedToUpdate(this);
+        }
     }
 
     virtual int height() const;
@@ -86,6 +88,13 @@ protected:
     virtual void mouseReleaseEvent( QGraphicsSceneMouseEvent * event );
     virtual void mousePressEvent ( QGraphicsSceneMouseEvent * event );
     virtual void mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * event );
+
+protected Q_SLOTS:
+    void onNeedToUpdateItem()
+    {
+        needUpdate(false);
+        update();
+    }
 
 protected:
     bool m_arranged;
