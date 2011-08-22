@@ -526,8 +526,8 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
     bool readMoreData = false; // try to process existing buffer at first
     while (m_tcpSock->isConnected())
     {
-        if (readMoreData && readRAWData() < 1)
-            continue;
+        if (readMoreData && readRAWData() < 0)
+            break;
         int demuxedCount = 0;
         quint8* curPtr = m_responseBuffer;
         for(; curPtr < m_responseBuffer + m_responseBufferLen; curPtr++)

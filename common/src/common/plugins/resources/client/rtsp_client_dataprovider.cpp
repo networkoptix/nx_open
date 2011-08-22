@@ -118,12 +118,10 @@ QnAbstractDataPacketPtr QnRtspClientDataProvider::getNextData()
 
         int rtpChannelNum = 0;
         int blockSize  = m_rtpData->read((char*)m_rtpDataBuffer, MAX_RTP_BUFFER_SIZE);
-        if (blockSize > MAX_RTP_BUFFER_SIZE) {
-            int gg5 = 4;
-        }
-
-        if (blockSize < 0)
+        if (blockSize < 0) {
+            m_rtspSession.stop();
             return result; // recconect
+        }
 
 #ifdef DEBUG_RTSP
         static QFile* binaryFile = 0;
