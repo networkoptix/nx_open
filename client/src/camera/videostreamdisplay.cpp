@@ -149,8 +149,11 @@ void CLVideoStreamDisplay::dispay(QnCompressedVideoDataPtr data, bool draw, CLVi
         QMutexLocker mutex(&m_mtx);
 
         decoder = m_decoder.value(data->compressionType);
-        if (!decoder)
-            m_decoder.insert(data->compressionType, CLVideoDecoderFactory::createDecoder(data->compressionType, data->context));
+        if (!decoder) {
+            decoder = CLVideoDecoderFactory::createDecoder(data->compressionType, data->context);
+            if (decoder)
+                m_decoder.insert(data->compressionType, decoder);
+        }
     }
 
     if (!decoder || !decoder->decode(img))
