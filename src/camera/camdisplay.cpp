@@ -7,10 +7,10 @@
 
 #ifdef Q_OS_MAC
 #include <CoreServices/CoreServices.h>
+#endif
 
 QTime CLCamDisplay::ms_activityTime;
 QMutex CLCamDisplay::ms_activityMutex;
-#endif
 
 // a lot of small audio packets in bluray HD audio codecs. So, previous size 7 is not enought
 #define CL_MAX_DISPLAY_QUEUE_SIZE 15
@@ -148,10 +148,9 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
 
         }
 
-#ifdef Q_OS_MAC
         if (draw)
             updateActivity();
-#endif
+
         m_display[channel]->dispay(vd, draw, scaleFactor);
 
         if (!sleep)
@@ -164,7 +163,6 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
     vd->releaseRef();
 }
 
-#ifdef Q_OS_MAC
 void CLCamDisplay::updateActivity()
 {
     QMutexLocker _lock(&ms_activityMutex);
@@ -172,11 +170,16 @@ void CLCamDisplay::updateActivity()
     if (QTime::currentTime() >= ms_activityTime)
     {
         // Update system activity timer once per 20 seconds
+#ifdef Q_OS_MAC
         UpdateSystemActivity(UsrActivity);
+#endif
+
+#ifdef Q_OS_WIN
+        SetThreadExecutionState( ES_DISPLAY_REQUIRED | ES_CONTINUOUS );
+#endif
         ms_activityTime = QTime::currentTime().addSecs(20);
     }
 }
-#endif
 
 void CLCamDisplay::jump(qint64 time)
 {
