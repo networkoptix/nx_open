@@ -506,7 +506,7 @@ void QnRtspConnectionProcessor::processRangeHeader()
     QString rangeStr = d->requestHeaders.value("Range");
     if (rangeStr.isNull())
         return;
-    QStringList rangeType = rangeStr.split("=");
+    QStringList rangeType = rangeStr.trimmed().split("=");
     if (rangeType.size() < 2)
         return;
     if (rangeType[0] == "npt")
@@ -537,8 +537,8 @@ int QnRtspConnectionProcessor::composePlay()
     if (d->dataProvider->isPaused())
         d->dataProvider->resume();
 
-    if (!d->requestHeaders.value("range").isNull())
-        d->rtspScale = d->requestHeaders.value("scale").toDouble();
+    if (!d->requestHeaders.value("Scale").isNull())
+        d->rtspScale = d->requestHeaders.value("Scale").toDouble();
 
     if (!d->dataProcessor)
     {

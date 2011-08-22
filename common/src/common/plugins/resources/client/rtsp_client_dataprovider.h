@@ -26,7 +26,7 @@ private:
 private:
     RTPSession m_rtspSession;
     RTPIODevice* m_rtpData;
-    bool m_isOpened;
+    //bool m_isOpened;
     quint8* m_rtpDataBuffer;
     bool m_tcpMode;
     QMap<int, AVCodecContext*> m_contextMap;

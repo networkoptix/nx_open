@@ -41,7 +41,8 @@ public:
     // returns true if stream was opened, false in case of some error
     bool open(const QString& url);
 
-    RTPIODevice* play(double position = 0, double scale = 1.0);
+    // position at mksec
+    RTPIODevice* play(qint64 position = 0, double scale = 1.0);
 
     // returns true if there is no error delivering STOP
     bool stop();
@@ -66,7 +67,7 @@ private:
     bool sendDescribe();
     bool sendOptions();
     RTPIODevice *sendSetup();
-    bool sendPlay(double position, double scale);
+    bool sendPlay(qint64 position, double scale);
     bool sendTeardown();
     bool sendKeepAlive();
 

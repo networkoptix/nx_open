@@ -142,7 +142,7 @@ bool RTPSession::open(const QString& url)
     return true;
 }
 
-RTPIODevice* RTPSession::play(double position, double scale)
+RTPIODevice* RTPSession::play(qint64 position, double scale)
 {
     RTPIODevice* ioDevice = sendSetup();
 
@@ -300,7 +300,7 @@ RTPIODevice*  RTPSession::sendSetup()
     return &m_rtpIo;
 }
 
-bool RTPSession::sendPlay(double position, double scale)
+bool RTPSession::sendPlay(qint64 position, double scale)
 {
 
     QByteArray request;

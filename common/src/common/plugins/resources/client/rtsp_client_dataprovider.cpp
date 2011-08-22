@@ -23,7 +23,7 @@ QnRtspClientDataProvider::QnRtspClientDataProvider(QnResourcePtr res):
     m_position(0)
 {
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
-    m_isOpened = false;
+    //m_isOpened = false;
 }
 
 QnRtspClientDataProvider::~QnRtspClientDataProvider()
@@ -113,7 +113,7 @@ QnAbstractDataPacketPtr QnRtspClientDataProvider::getNextData()
     QnAbstractDataPacketPtr result(0);
     while (!m_needStop && result == 0)
     {
-        if (!m_rtpData)
+        if (!m_rtpData) 
             return result;
 
         int rtpChannelNum = 0;
@@ -185,10 +185,13 @@ void QnRtspClientDataProvider::openStream()
         url += mediaUrl->getUrl();
     else
         url += m_resource->getId().toString();
-    m_isOpened = m_rtspSession.open(url);
-    if (m_isOpened) {
+    if (m_rtspSession.open(url)) {
         m_rtpData = m_rtspSession.play(m_position);
-        m_isOpened =  m_rtpData != 0;
+        if (!m_rtpData)
+            m_rtspSession.stop();
+    }
+    else {
+        m_rtspSession.stop();
     }
 }
 

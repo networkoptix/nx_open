@@ -422,8 +422,8 @@ void CLGLRenderer::draw(CLVideoDecoderOutput &image, unsigned int channel)
     if (!m_videowindow->isVisible())
         return;
 
-    //m_videowindow->needUpdate(true); // sending paint event
-    m_videowindow->update();
+    m_videowindow->needUpdate(true); // sending paint event
+    //m_videowindow->update();
 
     if (m_needwait)
     {
