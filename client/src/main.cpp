@@ -1,15 +1,16 @@
 #include "mainwindow.h"
 
+#include <QtCore/QFile>
+#include <QtCore/QDir>
+
 #include <QtGui/QApplication>
-#include <QFile>
-#include <QDir>
-#include <QDebug>
+
 #include "common/log.h"
 #include "common/util.h"
 
-const char* const ORGANIZATION_NAME="Network Optix";
-const char* const APPLICATION_NAME="VMS client";
-const char* const APPLICATION_VERSION="0.5.0";
+const char *const ORGANIZATION_NAME = "Network Optix";
+const char *const APPLICATION_NAME = "VMS client";
+const char *const APPLICATION_VERSION = "0.5.0";
 
 int main(int argc, char **argv)
 {
@@ -27,10 +28,7 @@ int main(int argc, char **argv)
     QDir dataDirectory;
     dataDirectory.mkpath(dataLocation + QLatin1String("/log"));
     if (!cl_log.create(dataLocation + QLatin1String("/log/log_file"), 1024*1024*10, 5, cl_logDEBUG1))
-    {
-        app.quit();
         return 0;
-    }
 
     MainWindow window;
     window.show();

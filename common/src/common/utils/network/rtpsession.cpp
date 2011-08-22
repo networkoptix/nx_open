@@ -15,7 +15,7 @@ static const quint32 SSRC_CONST = 0x2a55a9e8;
 static const quint32 CSRC_CONST = 0xe8a9552a;
 static const int TCP_TIMEOUT = 5 * 1000;
 
-#define DEBUG_RTSP
+//#define DEBUG_RTSP
 
 RTPIODevice::RTPIODevice(RTPSession& owner):
     m_owner(owner),
