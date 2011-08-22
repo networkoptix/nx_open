@@ -87,7 +87,7 @@ win32 {
 }
 
 mac {
-  LIBS += -framework IOKit
+  LIBS += -framework IOKit -framework CoreServices
   LIBS += -lz -lbz2
 
   PRIVATE_FRAMEWORKS.files = ../resource/arecontvision

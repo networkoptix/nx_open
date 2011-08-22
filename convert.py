@@ -27,10 +27,10 @@ EXCLUDE_FILES = ('dxva', 'moc_', 'qrc_', 'StdAfx')
 
 if sys.platform == 'win32':
     EXCLUDE_DIRS += ()
-    EXCLUDE_FILES += ()
+    EXCLUDE_FILES += ('_mac',)
 elif sys.platform == 'darwin':
     EXCLUDE_DIRS += ('desktop',)
-    EXCLUDE_FILES += ()
+    EXCLUDE_FILES += ('_win',)
 
 def rmtree(path):
     def on_rm_error( func, path, exc_info):

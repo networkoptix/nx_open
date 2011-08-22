@@ -111,6 +111,15 @@ private:
     CLCodecAudioFormat m_playingFormat;
     int m_playingCompress;
     int m_playingBitrate;
+
+#ifdef Q_OS_MAC
+private:
+    static void updateActivity();
+
+private:
+    static QTime ms_activityTime;
+    static QMutex ms_activityMutex;
+#endif
 };
 
 #endif //clcam_display_h_1211
