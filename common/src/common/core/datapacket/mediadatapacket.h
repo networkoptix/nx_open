@@ -27,7 +27,7 @@ struct QnAbstractMediaDataPacket : public QnAbstractDataPacket
     CLByteArray data;
     DataType dataType;
     int compressionType;
-    quint64 timestamp; // mksec // 10^-6
+    qint64 timestamp; // mksec // 10^-6
     unsigned flags;
     quint32 channelNumber; // video channel number; some devices might have more that one sensor.
     void* context;
