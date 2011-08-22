@@ -315,8 +315,8 @@ int CommunicatingSocket::send(const void *buffer, int bufferLen)
 {
     int sended = ::send(sockDesc, (raw_type *) buffer, bufferLen, 0);
     if (sended < 0) {
-        int errCode = getSystemErrCode();
-        if (errCode != ERR_TIMEOUT)
+        //int errCode = getSystemErrCode();
+        //if (errCode != ERR_TIMEOUT)
             mConnected = false;
     }
     return sended;
@@ -327,8 +327,8 @@ int CommunicatingSocket::recv(void *buffer, int bufferLen)
     int rtn;
   if ((rtn = ::recv(sockDesc, (raw_type *) buffer, bufferLen, 0)) < 0)
   {
-      int errCode = getSystemErrCode();
-      if (errCode != ERR_TIMEOUT)
+      //int errCode = getSystemErrCode();
+      //if (errCode != ERR_TIMEOUT)
 	    mConnected = false;
 	  return -1;
   }
