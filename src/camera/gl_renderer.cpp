@@ -134,9 +134,6 @@ CLGLRenderer::CLGLRenderer(CLVideoWindowItem *vw) :
     isSoftYuv2Rgb(false),
     m_forceSoftYUV(false),
     m_textureUploaded(false),
-    m_stride(0), // in memory
-    m_width(0), // visible width
-    m_height(0),
     m_stride_old(0),
     m_height_old(0),
     m_videoTextureReady(false),
@@ -148,7 +145,8 @@ CLGLRenderer::CLGLRenderer(CLVideoWindowItem *vw) :
     m_gotnewimage(false),
     m_needwait(true),
     m_videowindow(vw),
-    m_inited(false)
+    m_inited(false),
+    m_curImg(0)
 {
     applyMixerSettings(m_brightness, m_contrast, m_hue, m_saturation);
 
@@ -383,86 +381,50 @@ int CLGLRenderer::getMaxTextureSize()
 
 void CLGLRenderer::beforeDestroy()
 {
+    QMutexLocker lock(&m_displaySync);
     m_needwait = false;
-    m_waitCon.wakeOne();
+    if (m_curImg) 
+        m_curImg->setDisplaying(false);
+    m_waitCon.wakeAll();
 }
 
-void CLGLRenderer::copyVideoDataBeforePainting(bool copy)
-{
-    m_copyData = copy;
-    if (copy)
-    {
-        m_abort_drawing = true; // after we cancel wait process we need to abort_draw.
-        m_needwait = false;
-        m_waitCon.wakeOne();
-    }
-    else
-    {
-        m_needwait = true;
-    }
-}
-
-void CLGLRenderer::draw(CLVideoDecoderOutput &img, unsigned int channel)
+void CLGLRenderer::draw(CLVideoDecoderOutput* img, unsigned int channel)
 {
     Q_UNUSED(channel);
 
-    QMutexLocker locker(&m_mutex);
+    QMutexLocker locker(&m_displaySync);
+    //m_abort_drawing = false;
 
-    m_abort_drawing = false;
+    //m_imageList.enqueue(img);
 
-    if (m_copyData)
-        CLVideoDecoderOutput::copy(&img, &m_image);
+    m_curImg = img;
 
-    CLVideoDecoderOutput& image =  m_copyData ?  m_image : img;
-
-    m_stride = image.stride1;
-    m_height = image.height;
-    m_width = image.width;
-
-    m_color = image.out_type;
-
-    if (m_stride != m_stride_old || m_height != m_height_old || m_color != m_color_old)
+    m_curImg->setDisplaying(true);
+    if (m_curImg->linesize[0] != m_stride_old || m_curImg->height != m_height_old || m_curImg->format != m_color_old)
     {
         m_videoTextureReady = false;
-        m_stride_old = m_stride;
-        m_height_old = m_height;
-        m_color_old = m_color;
+        m_stride_old = m_curImg->linesize[0];
+        m_height_old = m_curImg->height;
+        m_color_old = (PixelFormat) m_curImg->format;
     }
 
-    m_arrayPixels[0] = image.C1;
-    m_arrayPixels[1] = image.C2;
-    m_arrayPixels[2] = image.C3;
-
     m_gotnewimage = true;
-
-    //QTime time;
-    //time.restart();
-
     if (!m_videowindow->isVisible())
         return;
 
     m_videowindow->needUpdate(true); // sending paint event
-    //m_videowindow->update();
+}
 
+void CLGLRenderer::waitForFrameDisplayed(int channel)
+{
+    // Sergey: some times It does not wake up after wakeone is called ; is it a bug?
+    // Roman: No. it is invalid use of waitCondition without mutex. bug fixed, timeout removed
     if (m_needwait)
     {
-        m_do_not_need_to_wait_any_more = false;
-
-        while (!m_waitCon.wait(&m_mutex, 50)) // unlock the mutex
-        {
-            if (!m_videowindow->isVisible() || !m_needwait)
-                break;
-
-            if (m_do_not_need_to_wait_any_more)
-                break; // some times It does not wake up after wakeone is called ; is it a bug?
-        }
+        QMutexLocker lock(&m_displaySync);
+        while (m_curImg->isDisplaying())
+            m_waitCon.wait(&m_displaySync, 50);
     }
-
-    //cl_log.log("time =", time.elapsed(), cl_logDEBUG1);
-
-    // after paint had happened
-
-    //paintEvent
 }
 
 void CLGLRenderer::setForceSoftYUV(bool value)
@@ -498,7 +460,7 @@ int CLGLRenderer::glRGBFormat() const
 {
     if (!isYuvFormat())
     {
-        switch (m_color)
+        switch (m_curImg->format)
         {
         case PIX_FMT_RGBA: return GL_RGBA;
         case PIX_FMT_BGRA: return GL_BGRA_EXT;
@@ -530,25 +492,24 @@ bool CLGLRenderer::isPixelFormatSupported(PixelFormat pixfmt)
 
 bool CLGLRenderer::isYuvFormat() const
 {
-    return m_color == PIX_FMT_YUV422P || m_color == PIX_FMT_YUV420P || m_color == PIX_FMT_YUV444P;
+    return m_curImg->format == PIX_FMT_YUV422P || m_curImg->format == PIX_FMT_YUV420P || m_curImg->format == PIX_FMT_YUV444P;
 }
 
 void CLGLRenderer::updateTexture()
 {
     //image.saveToFile("test.yuv");
 
-    int w[3] = { m_stride, m_stride / 2, m_stride / 2 };
-    int r_w[3] = { m_width, m_width / 2, m_width / 2 }; // real_width / visable
-    int h[3] = { m_height, m_height / 2, m_height / 2 };
+    int w[3] = { m_curImg->linesize[0], m_curImg->linesize[1], m_curImg->linesize[2] };
+    int r_w[3] = { m_curImg->width, m_curImg->width / 2, m_curImg->width / 2 }; // real_width / visable
+    int h[3] = { m_curImg->height, m_curImg->height / 2, m_curImg->height / 2 };
 
-    switch (m_color)
+    switch (m_curImg->format)
     {
     case PIX_FMT_YUV444P:
-        w[1] = w[2] = m_stride;
-        r_w[1] = r_w[2] = m_width;
+        r_w[1] = r_w[2] = m_curImg->width;
     // fall through
     case PIX_FMT_YUV422P:
-        h[1] = h[2] = m_height;
+        h[1] = h[2] = m_curImg->height;
         break;
     default:
         break;
@@ -566,7 +527,7 @@ void CLGLRenderer::updateTexture()
         {
             glBindTexture(GL_TEXTURE_2D, m_texture[i]);
             OGL_CHECK_ERROR("glBindTexture");
-            const uchar* pixels = m_arrayPixels[i];
+            const uchar* pixels = m_curImg->data[i];
             if (!m_videoTextureReady)
             {
                 // if support "GL_ARB_texture_non_power_of_two", use default size of texture,
@@ -657,7 +618,7 @@ void CLGLRenderer::updateTexture()
             // else nearest power of two
             int bytesPerPixel = 1;
             if (!isYuvFormat()) {
-                if (m_color == PIX_FMT_RGB24 || m_color == PIX_FMT_BGR24)
+                if (m_curImg->format == PIX_FMT_RGB24 || m_curImg->format == PIX_FMT_BGR24)
                     bytesPerPixel = 3;
                 else
                     bytesPerPixel = 4;
@@ -681,40 +642,40 @@ void CLGLRenderer::updateTexture()
             OGL_CHECK_ERROR("glTexParameteri");
         }
 
-        uchar *pixels = m_arrayPixels[0];
+        uchar *pixels = m_curImg->data[0];
         if (isYuvFormat())
         {
-            int size = 4 * m_stride * h[0];
+            int size = 4 * m_curImg->linesize[0] * h[0];
             if (yuv2rgbBuffer.size() < size)
                 yuv2rgbBuffer.resize(size);
             pixels = yuv2rgbBuffer.data();
         }
 
-        int lineInPixelsSize = m_stride;
-        switch (m_color)
+        int lineInPixelsSize = m_curImg->linesize[0];
+        switch (m_curImg->format)
         {
         case PIX_FMT_YUV422P:
-            yuv422_argb32_mmx(pixels, m_arrayPixels[0], m_arrayPixels[2], m_arrayPixels[1],
+            yuv422_argb32_mmx(pixels, m_curImg->data[0], m_curImg->data[2], m_curImg->data[1],
                               roundUp(r_w[0]),
                               h[0],
-                              4 * m_stride,
-                              m_stride, m_stride / 2);
+                              4 * m_curImg->linesize[0],
+                              m_curImg->linesize[0], m_curImg->linesize[1]);
             break;
 
         case PIX_FMT_YUV420P:
-            yuv420_argb32_mmx(pixels, m_arrayPixels[0], m_arrayPixels[2], m_arrayPixels[1],
+            yuv420_argb32_mmx(pixels, m_curImg->data[0], m_curImg->data[2], m_curImg->data[1],
                               roundUp(r_w[0]),
                               h[0],
-                              4 * m_stride,
-                              m_stride, m_stride / 2);
+                              4 * m_curImg->linesize[0],
+                              m_curImg->linesize[0], m_curImg->linesize[1]);
             break;
 
         case PIX_FMT_YUV444P:
-            yuv444_argb32_mmx(pixels, m_arrayPixels[0], m_arrayPixels[2], m_arrayPixels[1],
+            yuv444_argb32_mmx(pixels, m_curImg->data[0], m_curImg->data[2], m_curImg->data[1],
                               roundUp(r_w[0]),
                               h[0],
-                              4 * m_stride,
-                              m_stride, m_stride);
+                              4 * m_curImg->linesize[0],
+                              m_curImg->linesize[0], m_curImg->linesize[1]);
             break;
 
         case PIX_FMT_RGB24:
@@ -862,7 +823,9 @@ bool CLGLRenderer::paintEvent(const QRect &r)
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    if (m_abort_drawing)
+    //if (m_abort_drawing)
+    //    return true;
+    if (m_curImg == 0)
         return true;
 
     if (!m_inited)
@@ -871,12 +834,12 @@ bool CLGLRenderer::paintEvent(const QRect &r)
         m_inited = true;
     }
 
-    QMutexLocker locker(&m_mutex);
+    QMutexLocker locker(&m_displaySync);
 
-    if (m_stride == 0)
+    if (m_curImg == 0 || m_curImg->linesize[0] == 0)
         return true;
 
-    bool draw = (m_width <= getMaxTextureSize() && m_height <= getMaxTextureSize());
+    bool draw = (m_curImg->width <= getMaxTextureSize() && m_curImg->height <= getMaxTextureSize());
     if (draw)
     {
         if (m_gotnewimage)
@@ -895,8 +858,8 @@ bool CLGLRenderer::paintEvent(const QRect &r)
         drawVideoTexture(m_texture[0], m_texture[1], m_texture[2], v_array);
     }
 
-    m_waitCon.wakeOne();
-    m_do_not_need_to_wait_any_more = true;
+    m_curImg->setDisplaying(false);
+    m_waitCon.wakeAll();
 
     return draw;
 }

@@ -10,7 +10,8 @@ public:
     IPPH264Decoder();
     ~IPPH264Decoder();
 
-    bool decode(CLVideoData &params);
+    virtual bool decode(const CLVideoData& data, CLVideoDecoderOutput* outFrame);
+
 
     void showMotion(bool) {}
     void setLightCpuMode(bool) {}

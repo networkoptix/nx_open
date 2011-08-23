@@ -10,11 +10,13 @@ public:
 
 	virtual ~CLAbstractVideoDecoder(){};
 
+    virtual PixelFormat GetPixelFormat() { return PIX_FMT_NONE; }
+
     /**
       * Decode video frame.
       * Set hardwareAccelerationEnabled flag if hardware acceleration was used
       */
-	virtual bool decode(CLVideoData& )=0;
+    virtual bool decode(const CLVideoData& data, CLVideoDecoderOutput* outFrame) = 0;
 
 	virtual void showMotion(bool show ) = 0;
 
@@ -31,6 +33,8 @@ public:
 
     void setTryHardwareAcceleration(bool tryHardwareAcceleration);
     bool isHardwareAccelerationEnabled() const;
+    virtual int getWidth() const  { return 0; }
+    virtual int getHeight() const { return 0; }
 private:
 	CLAbstractVideoDecoder(const CLAbstractVideoDecoder&) {}
 	CLAbstractVideoDecoder& operator=(const CLAbstractVideoDecoder&) { return *this; }

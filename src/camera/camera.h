@@ -32,7 +32,6 @@ public:
     void streamJump(qint64 time);
 
     void setLightCPUMode(bool val);
-    void copyImage(bool copy);
 
     virtual CLDevice* getDevice() const;
 

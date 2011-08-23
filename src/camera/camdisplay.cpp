@@ -430,13 +430,6 @@ void CLCamDisplay::setLightCPUMode(bool val)
 			m_display[i]->setLightCPUMode(val);
 }
 
-void CLCamDisplay::copyImage(bool copy)
-{
-	for (int i = 0; i< CL_MAX_CHANNELS; ++i)
-		if (m_display[i])
-			m_display[i]->copyImage(copy);
-}
-
 void CLCamDisplay::playAudio(bool play)
 {
 	m_needChangePriority = play != m_playAudio;

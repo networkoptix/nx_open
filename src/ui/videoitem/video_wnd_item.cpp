@@ -138,7 +138,12 @@ void CLVideoWindowItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 	}
 }
 
-void CLVideoWindowItem::draw(CLVideoDecoderOutput& image, unsigned int channel)
+void CLVideoWindowItem::waitForFrameDisplayed(int channel)
+{
+    m_gldraw[channel]->waitForFrameDisplayed(channel);
+}
+
+void CLVideoWindowItem::draw(CLVideoDecoderOutput* image, unsigned int channel)
 {
 	// this is not ui thread
 	m_first_draw = false;
@@ -147,8 +152,8 @@ void CLVideoWindowItem::draw(CLVideoDecoderOutput& image, unsigned int channel)
 
 	//needUpdate(true);
 	QMutexLocker locker(&m_mutex);
-	m_imageWidth = image.width;
-	m_imageHeight = image.height;
+	m_imageWidth = image->width;
+	m_imageHeight = image->height;
 
 	if (m_imageWidth!=m_imageWidth_old || m_imageHeight!=m_imageHeight_old)
 	{
@@ -178,12 +183,6 @@ QPointF CLVideoWindowItem::getBestSubItemPos(CLSubItemType type)
 		return QPointF(-1001, -1001);
 		break;
 	}
-}
-
-void CLVideoWindowItem::copyVideoDataBeforePainting(bool copy)
-{
-	for (unsigned i = 0; i  < m_videonum; ++i)
-		m_gldraw[i]->copyVideoDataBeforePainting(copy);
 }
 
 QRect CLVideoWindowItem::getSubChannelRect(unsigned int channel) const

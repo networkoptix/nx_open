@@ -148,11 +148,6 @@ void CLVideoCamera::setLightCPUMode(bool val)
 	m_camdispay.setLightCPUMode(val);
 }
 
-void CLVideoCamera::copyImage(bool copy)
-{
-	m_camdispay.copyImage(copy);
-}
-
 void CLVideoCamera::setQuality(CLStreamreader::StreamQuality q, bool increase)
 {
 	if (increase && m_reader->getQuality() >= q)

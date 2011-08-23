@@ -11,11 +11,14 @@ CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale) :
     m_prevFactor(CLVideoDecoderOutput::factor_1),
     m_scaleFactor(CLVideoDecoderOutput::factor_1),
     m_previousOnScreenSize(0,0),
-    m_frameYUV(0),
+    m_frameRGBA(0),
     m_buffer(0),
     m_scaleContext(0),
     m_outputWidth(0),
-    m_outputHeight(0)
+    m_outputHeight(0),
+    m_frameQueueIndex(0),
+    m_enableFrameQueue(false),
+    m_queueUsed(false)
 {
 }
 
@@ -33,7 +36,7 @@ CLVideoStreamDisplay::~CLVideoStreamDisplay()
 
 void CLVideoStreamDisplay::setDrawer(CLAbstractRenderer* draw)
 {
-    m_draw = draw;
+    m_drawer = draw;
 }
 
 CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::getCurrentDownscaleFactor() const
@@ -46,7 +49,7 @@ bool CLVideoStreamDisplay::allocScaleContext(const CLVideoDecoderOutput& outFram
     m_outputWidth = newWidth;
     m_outputHeight = newHeight;
 
-    m_scaleContext = sws_getContext(outFrame.width, outFrame.height, outFrame.out_type,
+    m_scaleContext = sws_getContext(outFrame.width, outFrame.height, (PixelFormat) outFrame.format,
                                     m_outputWidth, m_outputHeight, PIX_FMT_RGBA,
                                     SWS_POINT, NULL, NULL, NULL);
 
@@ -56,14 +59,14 @@ bool CLVideoStreamDisplay::allocScaleContext(const CLVideoDecoderOutput& outFram
         return false;
     }
 
-    m_frameYUV = avcodec_alloc_frame();
+    m_frameRGBA = avcodec_alloc_frame();
 
     int numBytes = avpicture_get_size(PIX_FMT_RGBA, m_outputWidth, m_outputHeight);
-    m_outFrame.out_type = PIX_FMT_RGBA;
+    //m_outFrame.out_type = PIX_FMT_RGBA;
 
     m_buffer = (quint8*)av_malloc(numBytes * sizeof(quint8));
 
-    avpicture_fill((AVPicture *)m_frameYUV, m_buffer, PIX_FMT_RGBA, m_outputWidth, m_outputHeight);
+    avpicture_fill((AVPicture *)m_frameRGBA, m_buffer, PIX_FMT_RGBA, m_outputWidth, m_outputHeight);
 
     return true;
 }
@@ -73,21 +76,23 @@ void CLVideoStreamDisplay::freeScaleContext()
 	if (m_scaleContext) {
 		sws_freeContext(m_scaleContext);
 		av_free(m_buffer);
-		av_free(m_frameYUV);
+		av_free(m_frameRGBA);
 		m_scaleContext = 0;
 	}
 }
 
-CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::determineScaleFactor(CLCompressedVideoData* data, const CLVideoData& img, CLVideoDecoderOutput::downscale_factor force_factor)
+CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::determineScaleFactor(CLCompressedVideoData* data, 
+                                                                                  int srcWidth, int srcHeight, 
+                                                                                  CLVideoDecoderOutput::downscale_factor force_factor)
 {
-    if (m_draw->constantDownscaleFactor())
+    if (m_drawer->constantDownscaleFactor())
        force_factor = CLVideoDecoderOutput::factor_2;
 
 	if (force_factor==CLVideoDecoderOutput::factor_any) // if nobody pushing lets peek it
 	{
-		QSize on_screen = m_draw->sizeOnScreen(data->channelNumber);
+		QSize on_screen = m_drawer->sizeOnScreen(data->channelNumber);
 
-		m_scaleFactor = findScaleFactor(img.outFrame.width, img.outFrame.height, on_screen.width(), on_screen.height());
+		m_scaleFactor = findScaleFactor(srcWidth, srcHeight, on_screen.width(), on_screen.height());
 
 		if (m_scaleFactor < m_prevFactor)
 		{
@@ -114,8 +119,8 @@ CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::determineScaleFacto
 
     CLVideoDecoderOutput::downscale_factor rez = m_canDownscale ? qMax(m_scaleFactor, CLVideoDecoderOutput::factor_1) : CLVideoDecoderOutput::factor_1;
     // If there is no scaling needed check if size is greater than maximum allowed image size (maximum texture size for opengl).
-    int newWidth = img.outFrame.width / rez;
-    int newHeight = img.outFrame.height / rez;
+    int newWidth = srcWidth / rez;
+    int newHeight = srcHeight / rez;
     int maxTextureSize = CLGLRenderer::getMaxTextureSize();
     while (maxTextureSize > 0 && newWidth > maxTextureSize || newHeight > maxTextureSize)
     {
@@ -126,8 +131,37 @@ CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::determineScaleFacto
     return rez;
 }
 
+void CLVideoStreamDisplay::waitUndisplayedFrames(int channelNumber)
+{
+    for (int i = 0; i < MAX_FRAME_QUEUE_SIZE; ++i)
+        waitFrame(i, channelNumber);
+}
+
+void CLVideoStreamDisplay::waitFrame(int i, int channelNumber)
+{
+    QMutexLocker lock(&m_drawer->getMutex());
+    while (m_frameQueue[i].isDisplaying())
+        m_drawer->waitForFrameDisplayed(channelNumber);
+}
+
 void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVideoDecoderOutput::downscale_factor force_factor)
 {
+    // use only 1 frame for non selected video
+    bool enableFrameQueue = m_enableFrameQueue;
+    if (!enableFrameQueue && m_queueUsed)
+    {
+        waitUndisplayedFrames(data->channelNumber);
+        m_frameQueueIndex = 0;
+        for (int i = 1; i < MAX_FRAME_QUEUE_SIZE; ++i)
+            m_frameQueue[i].clean();
+        m_queueUsed = false;
+    }
+
+    CLVideoDecoderOutput m_tmpFrame;
+    m_tmpFrame.setUseExternalData(true);
+    //CLVideoDecoderOutput m_frameQueue[FRAME_QUEUE_SIZE];
+
+
 	CLVideoData img;
 
 	img.inBuffer = (unsigned char*)(data->data.data()); // :-)
@@ -147,48 +181,75 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 			return;
 		}
 
-		if (m_decoder[data->compressionType]==0)
+        dec = m_decoder[data->compressionType];
+		if (dec == 0)
 		{
-			m_decoder[data->compressionType] = CLVideoDecoderFactory::createDecoder(data->compressionType, data->context);
-			m_decoder[data->compressionType]->setLightCpuMode(m_lightCPUmode);
+			dec = CLVideoDecoderFactory::createDecoder(data->compressionType, data->context);
+			dec->setLightCpuMode(m_lightCPUmode);
+            m_decoder.insert(data->compressionType, dec);
 		}
+        if (dec == 0) {
+            CL_LOG(cl_logDEBUG2) cl_log.log(QLatin1String("Can't find video decoder"), cl_logDEBUG2);
+            return;
+        }
 
 		img.codec = data->compressionType;
-		dec = m_decoder[data->compressionType];
 	}
 
-	if (!dec || !dec->decode(img))
+    CLVideoDecoderOutput::downscale_factor scaleFactor = determineScaleFactor(data, dec->getWidth(), dec->getHeight(), force_factor);
+    PixelFormat pixFmt = dec->GetPixelFormat();
+    bool useTmpFrame =  !CLGLRenderer::isPixelFormatSupported(pixFmt) ||
+        !CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) || 
+        scaleFactor > CLVideoDecoderOutput::factor_1;
+
+    //waitFrame(m_frameQueueIndex); 
+    CLVideoDecoderOutput& outFrame = m_frameQueue[m_frameQueueIndex];
+    //if (!useTmpFrame && outFrame.getUseExternalData())
+    //    outFrame.clean();
+    if (!useTmpFrame)
+        outFrame.setUseExternalData(!enableFrameQueue);
+	if (!dec || !dec->decode(img, useTmpFrame ? &m_tmpFrame : &outFrame))
 	{
 		CL_LOG(cl_logDEBUG2) cl_log.log(QLatin1String("CLVideoStreamDisplay::dispay: decoder cannot decode image..."), cl_logDEBUG2);
 		return;
 	}
+    if (!data->context) {
+        // for stiil images decoder parameters are not know before decoding, so recalculate parameters
+        // It is got one more data copy from tmpFrame, but for movies we have got valid dst pointer (tmp or not) immediate before decoding
+        // It is necessary for new logic with display queue
+        scaleFactor = determineScaleFactor(data, dec->getWidth(), dec->getHeight(), force_factor);
+        pixFmt = dec->GetPixelFormat();
+    }
 
-	if (!draw || !m_draw)
+	if (!draw || !m_drawer)
 		return;
 
-    int maxTextureSize = CLGLRenderer::getMaxTextureSize();
-    Q_UNUSED(maxTextureSize);
-
-    CLVideoDecoderOutput::downscale_factor scaleFactor = determineScaleFactor(data, img, force_factor);
-
-    if (!CLGLRenderer::isPixelFormatSupported(img.outFrame.out_type) ||
-        scaleFactor > CLVideoDecoderOutput::factor_8 ||
-        (scaleFactor > CLVideoDecoderOutput::factor_1 && !CLVideoDecoderOutput::isPixelFormatSupported(img.outFrame.out_type)))
+    if (useTmpFrame)
     {
-        rescaleFrame(img.outFrame, img.outFrame.width / scaleFactor, img.outFrame.height / scaleFactor);
-        m_draw->draw(m_outFrame, data->channelNumber);
+        if (CLGLRenderer::isPixelFormatSupported(pixFmt) && CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) && scaleFactor <= CLVideoDecoderOutput::factor_8)
+            CLVideoDecoderOutput::downscale(&m_tmpFrame, &outFrame, scaleFactor); // fast scaler
+        else 
+            rescaleFrame(m_tmpFrame, outFrame, m_tmpFrame.width / scaleFactor, m_tmpFrame.height / scaleFactor); // universal scaler
     }
-    else if (scaleFactor > CLVideoDecoderOutput::factor_1)
-    {
-        CLVideoDecoderOutput::downscale(&img.outFrame, &m_outFrame, scaleFactor); // extra cpu work but less to display( for weak video cards )
-        m_draw->draw(m_outFrame, data->channelNumber);
+    if (enableFrameQueue) {
+        // wait previous frame. Renderer does not have queue now, so current version may works only for 2 frames.
+        int prevFrameIdx = m_frameQueueIndex-1;
+        if (prevFrameIdx < 0)
+            prevFrameIdx = MAX_FRAME_QUEUE_SIZE-1;
+        waitFrame(prevFrameIdx, data->channelNumber);
     }
-    else {
-        m_draw->draw(img.outFrame, data->channelNumber);
+    
+    m_drawer->draw(&outFrame, data->channelNumber);
+
+    if (m_enableFrameQueue) {
+        m_frameQueueIndex = (m_frameQueueIndex + 1) % MAX_FRAME_QUEUE_SIZE; // allow frame queue for selected video
+        m_queueUsed = true;
     }
+    else
+        m_drawer->waitForFrameDisplayed(data->channelNumber);
 }
 
-bool CLVideoStreamDisplay::rescaleFrame(CLVideoDecoderOutput& outFrame, int newWidth, int newHeight)
+bool CLVideoStreamDisplay::rescaleFrame(const CLVideoDecoderOutput& srcFrame, CLVideoDecoderOutput& outFrame, int newWidth, int newHeight)
 {
     static const int ROUND_FACTOR = 16;
     // due to openGL requirements chroma MUST be devided by 4, luma MUST be devided by 8
@@ -198,32 +259,32 @@ bool CLVideoStreamDisplay::rescaleFrame(CLVideoDecoderOutput& outFrame, int newW
     if (m_scaleContext != 0 && (m_outputWidth != newWidth || m_outputHeight != newHeight))
     {
         freeScaleContext();
-        if (!allocScaleContext(outFrame, newWidth, newHeight))
+        if (!allocScaleContext(srcFrame, newWidth, newHeight))
             return false;
     }
     else if (m_scaleContext == 0)
     {
-        if (!allocScaleContext(outFrame, newWidth, newHeight))
+        if (!allocScaleContext(srcFrame, newWidth, newHeight))
             return false;
     }
 
-    const quint8* const srcSlice[] = {outFrame.C1, outFrame.C2, outFrame.C3};
-    int srcStride[] = {outFrame.stride1, outFrame.stride2, outFrame.stride3};
+    //const quint8* const srcSlice[] = {srcFrame.C1, srcFrame.C2, srcFrame.C3};
+    //int srcStride[] = {srcFrame.stride1, srcFrame.stride2, srcFrame.stride3};
 
-    sws_scale(m_scaleContext,srcSlice, srcStride, 0,
-        outFrame.height, m_frameYUV->data, m_frameYUV->linesize);
+    sws_scale(m_scaleContext,srcFrame.data, srcFrame.linesize, 0,
+        srcFrame.height, m_frameRGBA->data, m_frameRGBA->linesize);
 
-    m_outFrame.width = m_outputWidth;
-    m_outFrame.height = m_outputHeight;
+    outFrame.width = m_outputWidth;
+    outFrame.height = m_outputHeight;
 
-    m_outFrame.C1 = m_frameYUV->data[0];
-    m_outFrame.C2 = m_frameYUV->data[1];
-    m_outFrame.C3 = m_frameYUV->data[2];
+    outFrame.data[0] = m_frameRGBA->data[0];
+    outFrame.data[1] = m_frameRGBA->data[1];
+    outFrame.data[2] = m_frameRGBA->data[2];
 
-    m_outFrame.stride1 = m_frameYUV->linesize[0];
-    m_outFrame.stride2 = m_frameYUV->linesize[1];
-    m_outFrame.stride3 = m_frameYUV->linesize[2];
-
+    outFrame.linesize[0] = m_frameRGBA->linesize[0];
+    outFrame.linesize[1] = m_frameRGBA->linesize[1];
+    outFrame.linesize[2] = m_frameRGBA->linesize[2];
+    outFrame.format = PIX_FMT_RGBA;
     return true;
 }
 
@@ -236,11 +297,6 @@ void CLVideoStreamDisplay::setLightCPUMode(bool val)
     {
         decoder->setLightCpuMode(val);
     }
-}
-
-void CLVideoStreamDisplay::copyImage(bool copy)
-{
-    m_draw->copyVideoDataBeforePainting(copy);
 }
 
 CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::findScaleFactor(int width, int height, int fitWidth, int fitHeight)
@@ -263,5 +319,5 @@ void CLVideoStreamDisplay::setMTDecoding(bool value)
     {
         decoder->setMTDecoding(value);
     }
+    m_enableFrameQueue = value;
 }
-

@@ -19,7 +19,7 @@ class CLFFmpegVideoDecoder : public CLAbstractVideoDecoder
 {
 public:
 	CLFFmpegVideoDecoder(CodecID codec, AVCodecContext* codecContext = 0);
-	bool decode(CLVideoData& data);
+    bool decode(const CLVideoData& data, CLVideoDecoderOutput* outFrame);
 	~CLFFmpegVideoDecoder();
 
 	void showMotion(bool show);
@@ -30,6 +30,10 @@ public:
     {
         return codecId == CODEC_ID_H264 && width <= 1920 && height <= 1088;
     }
+
+    PixelFormat GetPixelFormat();
+    int getWidth() const  { return c->width;  }
+    int getHeight() const { return c->height; }
 private:
     static AVCodec* findCodec(CodecID codecId);
 
@@ -44,7 +48,7 @@ private:
     static int hwcounter;
 	AVCodec *m_codec;
 	AVCodecContext *c;
-	AVFrame *frame;
+	AVFrame *m_frame;
 	
 	quint8* m_deinterlaceBuffer;
 	AVFrame *m_deinterlacedFrame;
