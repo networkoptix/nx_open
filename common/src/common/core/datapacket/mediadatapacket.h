@@ -41,13 +41,12 @@ typedef QSharedPointer<QnAbstractMediaDataPacket> QnAbstractMediaDataPacketPtr;
 
 struct QnCompressedVideoData : public QnAbstractMediaDataPacket
 {
-    QnCompressedVideoData(unsigned int alignment, unsigned int capacity, void* ctx = 0)
-        : QnAbstractMediaDataPacket(alignment, qMin(capacity, (unsigned int)10 * 1024 * 1024))
+    QnCompressedVideoData(unsigned int alignment, unsigned int capacity, void *ctx = 0)
+        : QnAbstractMediaDataPacket(alignment, qMin(capacity, (unsigned int)10 * 1024 * 1024)),
+          width(0), height(0), keyFrame(false), useTwice(false), ignore(false)
     {
         dataType = VIDEO;
-        useTwice = false;
         context = ctx;
-        ignore = false;
     }
 
     int width;
@@ -63,15 +62,12 @@ typedef QSharedPointer<QnCompressedVideoData> QnCompressedVideoDataPtr;
 class CLCodecAudioFormat: public QAudioFormat
 {
 public:
-    CLCodecAudioFormat():
-      QAudioFormat(),
-          bitrate(0),
-          channel_layout(0),
-          block_align(0)
-      {
-      }
+    CLCodecAudioFormat()
+        : QAudioFormat(),
+          bitrate(0), channel_layout(0), block_align(0)
+      {}
 
-      void fromAvStream(AVCodecContext* c);
+      void fromAvStream(AVCodecContext *context);
 
       QVector<quint8> extraData; // codec extra data
       int bitrate;
@@ -82,8 +78,9 @@ public:
 
 struct QnCompressedAudioData : public QnAbstractMediaDataPacket
 {
-    QnCompressedAudioData (unsigned int alignment, unsigned int capacity, void* ctx)
-        : QnAbstractMediaDataPacket(alignment, capacity)
+    QnCompressedAudioData (unsigned int alignment, unsigned int capacity, void *ctx)
+        : QnAbstractMediaDataPacket(alignment, capacity),
+          duration(0)
     {
         dataType = AUDIO;
         context = ctx;
