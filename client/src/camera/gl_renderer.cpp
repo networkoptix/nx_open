@@ -390,62 +390,6 @@ void CLGLRenderer::beforeDestroy()
     m_waitCon.wakeOne();
 }
 
-void CLGLRenderer::draw(CLVideoDecoderOutput &image, unsigned int channel)
-{
-    Q_UNUSED(channel);
-
-    QMutexLocker locker(&m_mutex);
-
-    m_stride = image.stride1;
-    m_height = image.height;
-    m_width = image.width;
-
-    m_color = image.out_type;
-
-    if (m_stride != m_stride_old || m_height != m_height_old || m_color != m_color_old)
-    {
-        m_videoTextureReady = false;
-        m_stride_old = m_stride;
-        m_height_old = m_height;
-        m_color_old = m_color;
-    }
-
-    m_arrayPixels[0] = image.C1;
-    m_arrayPixels[1] = image.C2;
-    m_arrayPixels[2] = image.C3;
-
-    m_gotnewimage = true;
-
-    //QTime time;
-    //time.restart();
-
-    if (!m_videowindow->isVisible())
-        return;
-
-    m_videowindow->needUpdate(true); // sending paint event
-    //m_videowindow->update();
-
-    if (m_needwait)
-    {
-        m_do_not_need_to_wait_any_more = false;
-
-        while (!m_waitCon.wait(&m_mutex, 50)) // unlock the mutex
-        {
-            if (!m_videowindow->isVisible() || !m_needwait)
-                break;
-
-            if (m_do_not_need_to_wait_any_more)
-                break; // some times It does not wake up after wakeone is called ; is it a bug?
-        }
-    }
-
-    //cl_log.log("time =", time.elapsed(), cl_logDEBUG1);
-
-    // after paint had happened
-
-    //paintEvent
-}
-
 void CLGLRenderer::setForceSoftYUV(bool value)
 {
     m_forceSoftYUV = value;
@@ -818,6 +762,62 @@ void CLGLRenderer::drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const
         glActiveTexture(GL_TEXTURE0);
         OGL_CHECK_ERROR("glActiveTexture");
     }
+}
+
+void CLGLRenderer::draw(CLVideoDecoderOutput &image, unsigned int channel)
+{
+    Q_UNUSED(channel);
+
+    QMutexLocker locker(&m_mutex);
+
+    m_stride = image.stride1;
+    m_height = image.height;
+    m_width = image.width;
+
+    m_color = image.out_type;
+
+    if (m_stride != m_stride_old || m_height != m_height_old || m_color != m_color_old)
+    {
+        m_videoTextureReady = false;
+        m_stride_old = m_stride;
+        m_height_old = m_height;
+        m_color_old = m_color;
+    }
+
+    m_arrayPixels[0] = image.C1;
+    m_arrayPixels[1] = image.C2;
+    m_arrayPixels[2] = image.C3;
+
+    m_gotnewimage = true;
+
+    //QTime time;
+    //time.restart();
+
+    if (!m_videowindow->isVisible())
+        return;
+
+    m_videowindow->needUpdate(true); // sending paint event
+    //m_videowindow->update();
+
+    if (m_needwait)
+    {
+        m_do_not_need_to_wait_any_more = false;
+
+        while (!m_waitCon.wait(&m_mutex, 50)) // unlock the mutex
+        {
+            if (!m_videowindow->isVisible() || !m_needwait)
+                break;
+
+            if (m_do_not_need_to_wait_any_more)
+                break; // some times It does not wake up after wakeone is called ; is it a bug?
+        }
+    }
+
+    //cl_log.log("time =", time.elapsed(), cl_logDEBUG1);
+
+    // after paint had happened
+
+    //paintEvent
 }
 
 #if 0

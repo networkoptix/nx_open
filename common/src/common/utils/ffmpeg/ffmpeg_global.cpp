@@ -41,7 +41,6 @@ void QnFFmpeg::initialize()
         // must be called before using avcodec
         av_register_all();
 
-
         // register all the codecs (you can also register only the codec you wish to have smaller code
         avcodec_register_all();
 

@@ -54,10 +54,11 @@ protected:
 
 private:
     // puts in in queue and returns first in queue
-    QnCompressedVideoDataPtr nextInOutVideodata(QnCompressedVideoDataPtr incoming, int channel);
+    QnCompressedVideoDataPtr nextVideoData(QnCompressedVideoDataPtr incoming, int channel);
 
-    // this function doest not changes any quues; it just returns time of next frame been displayed
-    quint64 nextVideoImageTime(int channel, QnCompressedVideoDataPtr incoming = QnCompressedVideoDataPtr()) const;
+    // these functions doest not changes any queues; it just returns time of next frame being displayed
+    quint64 nextVideoTime(int channel, QnCompressedVideoDataPtr incoming) const;
+    quint64 nextVideoTime(int channel) const;
 
     // this function returns diff between video and audio at any given moment
     qint64 diffBetweenVideoAndAudio(QnCompressedVideoDataPtr incoming, int channel, qint64& duration);

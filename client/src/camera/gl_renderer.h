@@ -27,11 +27,11 @@ public:
 
     static int getMaxTextureSize();
 
+    virtual void beforeDestroy();
+
     void draw(CLVideoDecoderOutput &image, unsigned int channel);
 
     bool paintEvent(const QRect &r);
-
-    virtual void beforeDestroy();
 
     QSize sizeOnScreen(unsigned int channel) const;
     bool constantDownscaleFactor() const;
