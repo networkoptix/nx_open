@@ -655,8 +655,14 @@ void CLGLRenderer::updateTexture()
         {
             // if support "GL_ARB_texture_non_power_of_two", use default size of texture,
             // else nearest power of two
-
-            const int wPow = isNonPower2 ? roundUp(w[0]) : getMinPow2(w[0]);
+            int bytesPerPixel = 1;
+            if (!isYuvFormat()) {
+                if (m_color == PIX_FMT_RGB24 || m_color == PIX_FMT_BGR24)
+                    bytesPerPixel = 3;
+                else
+                    bytesPerPixel = 4;
+            }
+            const int wPow = isNonPower2 ? roundUp(w[0]/bytesPerPixel) : getMinPow2(w[0]/bytesPerPixel);
             const int hPow = isNonPower2 ? h[0] : getMinPow2(h[0]);
             // support GL_ARB_texture_non_power_of_two ?
             m_videoCoeffL[0] = 0;
