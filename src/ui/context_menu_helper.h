@@ -18,6 +18,7 @@ extern QAction cm_save_layout_as;
 extern QAction cm_preferences;
 extern QAction cm_fullscren;
 extern QAction cm_remove_from_layout;
+extern QAction cm_remove_from_disk;
 extern QAction cm_settings;
 extern QAction cm_start_recording;
 extern QAction cm_stop_recording;

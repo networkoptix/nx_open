@@ -203,6 +203,26 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
     connect(&cm_toggle_fullscreen, SIGNAL(triggered()), SLOT(toggleFullScreen()));
 }
 
+void GraphicsView::removeFileDeviceItem(CLDeviceSearcher& deviceSearcher, CLAbstractSceneItem* aitem)
+{
+    CLDevice* device = aitem->getComplicatedItem()->getDevice();
+
+    CLDeviceList& all_devices = deviceSearcher.getAllDevices();
+
+    all_devices.remove(device->getUniqueId());
+
+    QList<CLAbstractSubItemContainer*> lst;
+    lst.push_back(aitem);
+    m_camLayout.removeItems(lst, true);
+
+    if (device->checkDeviceTypeFlag(CLDevice::RECORDED))
+        removeDir(device->getUniqueId());
+    else
+        QFile::remove(device->getUniqueId());
+
+    device->releaseRef();
+}
+
 GraphicsView::~GraphicsView()
 {
     setZeroSelection();
@@ -1255,11 +1275,16 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
             // video item
             menu.addAction(&cm_fullscren);
             menu.addAction(&cm_remove_from_layout);
-            menu.addMenu(&rotation_manu);
 
             video_wnd = static_cast<CLVideoWindowItem*>(aitem);
             cam = video_wnd->getVideoCam();
             dev = cam->getDevice();
+
+            if (dev->associatedWithFile())
+            {
+                menu.addAction(&cm_remove_from_disk);
+            }
+            menu.addMenu(&rotation_manu);
 
             if (dev->checkDeviceTypeFlag(CLDevice::NETWORK))
             {
@@ -1332,18 +1357,27 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
         menu.addAction(&cm_remove_from_layout);
         bool haveAtLeastOneNonrecordingCam = false;
         bool haveAtLeastOneRecordingCam = false;
+        bool allItemsRemovable = true;
 
         foreach(QGraphicsItem* item, m_scene.selectedItems())
         {
-
-            CLAbstractSceneItem* nav_item = navigationItem(item);;
+            CLAbstractSceneItem* nav_item = navigationItem(item);
             if (!nav_item)
+            {
+                allItemsRemovable = false;
                 continue;
+            }
 
             CLAbstractComplicatedItem* ca  = nav_item->getComplicatedItem();
 
             if (!ca)
+            {
+                allItemsRemovable = false;
                 continue;
+            }
+
+            if (!ca->getDevice()->associatedWithFile())
+                allItemsRemovable = false;
 
             if (!ca->getDevice()->checkDeviceTypeFlag(CLDevice::NETWORK))
                 continue;
@@ -1358,6 +1392,9 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
             else
                 haveAtLeastOneNonrecordingCam = true;
         }
+
+        if (allItemsRemovable)
+            menu.addAction(&cm_remove_from_disk);
 
         if (haveAtLeastOneNonrecordingCam)
             menu.addAction(&cm_start_recording);
@@ -1583,6 +1620,18 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
             QList<CLAbstractSubItemContainer*> lst;
             lst.push_back(aitem);
             m_camLayout.removeItems(lst, true);
+        } else if (act == &cm_remove_from_disk)
+        {
+            CLDevice* device = aitem->getComplicatedItem()->getDevice();
+
+            QMessageBox::StandardButton result = YesNoCancel(this, tr("Remove file confirmation"), QString("Are you sure you want to remove file ") + device->getUniqueId() + "?");
+            if (result == QMessageBox::Yes)
+            {
+                CLDeviceSearcher& deviceSearcher = CLDeviceManager::instance().getDeviceSearcher();
+                QMutexLocker lock(&deviceSearcher.all_devices_mtx);
+
+                removeFileDeviceItem(deviceSearcher, aitem);
+            }
         }
     }
     else if (aitem && m_scene.selectedItems().count()>0 )// video item multiple selection
@@ -1599,6 +1648,21 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
             }
 
             m_camLayout.removeItems(lst, true);
+        } else if (act == &cm_remove_from_disk)
+        {
+            QString message;
+            QTextStream(&message) << QString("Are you sure you want to remove ") << m_scene.selectedItems().size() << " files?";
+            QMessageBox::StandardButton result = YesNoCancel(this, "Remove file confirmation", message);
+            if (result == QMessageBox::Yes)
+            {
+                CLDeviceSearcher& deviceSearcher = CLDeviceManager::instance().getDeviceSearcher();
+                QMutexLocker lock(&deviceSearcher.all_devices_mtx);
+
+                foreach (QGraphicsItem *item, m_scene.selectedItems())
+                {
+                    removeFileDeviceItem(deviceSearcher, static_cast<CLAbstractSceneItem*>(item));
+                }
+            }
         }
 
         if (act == &cm_start_recording || act == &cm_stop_recording)

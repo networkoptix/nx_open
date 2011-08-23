@@ -258,6 +258,9 @@ protected:
 #endif
     bool m_inputBlocked;
     QTimer m_blockingTimer;
+
+private:
+    void removeFileDeviceItem(CLDeviceSearcher& deviceSearcher, CLAbstractSceneItem* aitem);
 };
 
 
