@@ -140,6 +140,11 @@ const CLDeviceVideoLayout* CLDevice::getVideoLayout() const
 
 }
 
+bool CLDevice::associatedWithFile() const
+{
+    return checkDeviceTypeFlag(CLDevice::ARCHIVE) || checkDeviceTypeFlag(CLDevice::RECORDED) || checkDeviceTypeFlag(CLDevice::SINGLE_SHOT);
+}
+
 QString CLDevice::toString() const
 {
 	QString result;

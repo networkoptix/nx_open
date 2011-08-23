@@ -110,6 +110,7 @@ public:
 
 	const CLDeviceVideoLayout* getVideoLayout() const;
 
+        bool associatedWithFile() const;
 public:
 	static QStringList supportedDevises();
 

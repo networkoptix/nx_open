@@ -13,6 +13,7 @@ QAction cm_save_layout_as(QObject::tr("Save layout as..."), 0);
 QAction cm_preferences(QObject::tr("Preferences"), 0);
 QAction cm_fullscren(QObject::tr("Fullscreen"), 0);
 QAction cm_remove_from_layout(QObject::tr("Remove"), 0);
+QAction cm_remove_from_disk(QObject::tr("Remove file(s)"), 0);
 QAction cm_settings(QObject::tr("Settings..."), 0);
 QAction cm_start_recording(QObject::tr("Start recording"), 0);
 QAction cm_stop_recording(QObject::tr("Stop recording"), 0);
