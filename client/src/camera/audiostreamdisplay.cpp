@@ -261,7 +261,8 @@ void CLAudioStreamDisplay::playCurrentBuffer()
         if (!decoder)
         {
             decoder = CLAudioDecoderFactory::createDecoder(data);
-            m_decoder[data->compressionType] = decoder;
+            if (decoder)
+                m_decoder[data->compressionType] = decoder;
         }
 
         if (!decoder || !decoder->decode(audio) || audio.outbuf_len == 0)

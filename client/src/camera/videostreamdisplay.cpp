@@ -27,7 +27,7 @@ CLVideoStreamDisplay::CLVideoStreamDisplay(CLAbstractRenderer *renderer, bool ca
 
 CLVideoStreamDisplay::~CLVideoStreamDisplay()
 {
-    QMutexLocker mutex(&m_mtx);
+    QMutexLocker locker(&m_mtx);
 
     qDeleteAll(m_decoder);
 
@@ -146,7 +146,7 @@ void CLVideoStreamDisplay::dispay(QnCompressedVideoDataPtr data, bool draw, CLVi
 
     CLAbstractVideoDecoder *decoder;
     {
-        QMutexLocker mutex(&m_mtx);
+        QMutexLocker locker(&m_mtx);
 
         decoder = m_decoder.value(data->compressionType);
         if (!decoder) {
@@ -243,6 +243,8 @@ CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::findScaleFactor(int
 
 void CLVideoStreamDisplay::setMTDecoding(bool value)
 {
+    QMutexLocker locker(&m_mtx);
+
     foreach (CLAbstractVideoDecoder *decoder, m_decoder)
         decoder->setMTDecoding(value);
 }
