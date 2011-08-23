@@ -66,6 +66,7 @@ void MainWindow::boo()
         m_view->scene()->addItem(vwi);
         vwi->setPos(-150, 20);
 
+        camDisplay->playAudio(true);
         camDisplay->start();
         msdp->start();
     }

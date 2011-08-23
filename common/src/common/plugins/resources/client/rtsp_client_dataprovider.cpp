@@ -83,8 +83,13 @@ QnAbstractDataPacketPtr QnRtspClientDataProvider::processFFmpegRtpPayload(const 
                 video->height = context->coded_height;
             }
             else if (context->codec_type == AVMEDIA_TYPE_AUDIO)
-                nextPacket = QnCompressedAudioDataPtr(new QnCompressedAudioData(CL_MEDIA_ALIGNMENT, dataSize, context));
-            else {
+            {
+                QnCompressedAudioData *audio = new QnCompressedAudioData(CL_MEDIA_ALIGNMENT, dataSize, context);
+                audio->format.fromAvStream(context);
+                nextPacket = QnCompressedAudioDataPtr(audio);
+            }
+            else
+            {
                 qWarning() << "Unsupported RTP media type " << context->codec_type;
                 return result;
             }
