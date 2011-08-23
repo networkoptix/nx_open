@@ -37,7 +37,7 @@ QnRtspClientDataProvider::~QnRtspClientDataProvider()
 
 QnAbstractDataPacketPtr QnRtspClientDataProvider::processFFmpegRtpPayload(const quint8* data, int dataSize)
 {
-    QnAbstractDataPacketPtr result(0);
+    QnAbstractDataPacketPtr result;
     if (dataSize < RtpHeader::RTP_HEADER_SIZE)
     {
         qWarning() << Q_FUNC_INFO << __LINE__ << "strange RTP packet. len < RTP header size. Ignored";
@@ -48,7 +48,7 @@ QnAbstractDataPacketPtr QnRtspClientDataProvider::processFFmpegRtpPayload(const 
     const quint8* payload = data + RtpHeader::RTP_HEADER_SIZE;
     dataSize -= RtpHeader::RTP_HEADER_SIZE;
     quint32 ssrc = ntohl(rtpHeader->ssrc);
-    bool isCodecContext = ssrc & 1; // odd numbers - codec context, even numbers - data
+    const bool isCodecContext = ssrc & 1; // odd numbers - codec context, even numbers - data
     if (isCodecContext)
     {
         if (!m_contextMap.contains(ssrc))
@@ -58,17 +58,18 @@ QnAbstractDataPacketPtr QnRtspClientDataProvider::processFFmpegRtpPayload(const 
                 m_contextMap.insert(ssrc, context);
         }
     }
-    else {
-        QMap<int, AVCodecContext*>::iterator itr  = m_contextMap.find(ssrc + 1);
-        if (itr == m_contextMap.end())
+    else
+    {
+        AVCodecContext *context = m_contextMap.value(ssrc + 1);
+        if (!context)
             return result; // not codec context found
-        AVCodecContext* context = itr.value();
         if (rtpHeader->padding)
             dataSize -= ntohl(rtpHeader->padding);
         if (dataSize < 1)
             return result;
-        QnAbstractMediaDataPacketPtr nextPacket = m_nextDataPacket[ssrc];
-        if (nextPacket == 0)
+
+        QnAbstractMediaDataPacketPtr nextPacket = m_nextDataPacket.value(ssrc);
+        if (!nextPacket)
         {
             if (context->codec_type == AVMEDIA_TYPE_VIDEO)
             {
@@ -76,7 +77,7 @@ QnAbstractDataPacketPtr QnRtspClientDataProvider::processFFmpegRtpPayload(const 
                 dataSize--;
                 payload++;
                 // todo: determine total video frame size here to prevent bytearray reallocate
-                QnCompressedVideoData* video = new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, dataSize, context);
+                QnCompressedVideoData *video = new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, dataSize, context);
                 nextPacket = QnCompressedVideoDataPtr(video);
                 video->keyFrame = flags & 0x80;
                 video->width = context->coded_width;
@@ -107,25 +108,25 @@ QnAbstractDataPacketPtr QnRtspClientDataProvider::processFFmpegRtpPayload(const 
             m_nextDataPacket[ssrc] = QnAbstractMediaDataPacketPtr(0); // EOF video frame reached
             m_position = nextPacket->timestamp;
         }
-
     }
+
     return result;
 }
 
 QnAbstractDataPacketPtr QnRtspClientDataProvider::getNextData()
 {
     // sometime function may return zero packet if no data arrived
-    QnAbstractDataPacketPtr result(0);
-    while (!m_needStop && result == 0)
+    QnAbstractDataPacketPtr result;
+    while (!m_needStop && !result)
     {
-        if (!m_rtpData) 
+        if (!m_rtpData)
             return result;
 
         int rtpChannelNum = 0;
         int blockSize  = m_rtpData->read((char*)m_rtpDataBuffer, MAX_RTP_BUFFER_SIZE);
         if (blockSize < 0) {
             m_rtspSession.stop();
-            return result; // recconect
+            return result; // reconnect
         }
 
 #ifdef DEBUG_RTSP
@@ -154,13 +155,12 @@ QnAbstractDataPacketPtr QnRtspClientDataProvider::getNextData()
         else {
             rtpChannelNum = m_rtpData->getSocket()->getLocalPort();
         }
-        const QString& format = m_rtspSession.getTrackFormat(rtpChannelNum).toLower();
-        if (format.isNull()) {
+        const QString format = m_rtspSession.getTrackFormat(rtpChannelNum).toLower();
+        if (format.isEmpty())
             qWarning() << Q_FUNC_INFO << __LINE__ << "RTP track" << rtpChannelNum << "not found";
-        }
-        else if (format == "ffmpeg") 
+        else if (format == QLatin1String("ffmpeg"))
             result = processFFmpegRtpPayload(data, blockSize);
-        else 
+        else
             qWarning() << Q_FUNC_INFO << __LINE__ << "Only FFMPEG payload format now implemeted. Ask developers to add '" << format << "' format";
     }
     return result;
