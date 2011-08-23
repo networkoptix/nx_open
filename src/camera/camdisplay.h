@@ -69,8 +69,6 @@ private:
     void enqueueVideo(CLCompressedVideoData* vd);
     void afterJump(qint64 new_time);
 
-    static void updateActivity();
-
 private:
 	QQueue<CLCompressedVideoData*> m_videoQueue[CL_MAX_CHANNELS];
 
@@ -114,9 +112,6 @@ private:
     CLCodecAudioFormat m_playingFormat;
     int m_playingCompress;
     int m_playingBitrate;
-
-    static QTime ms_activityTime;
-    static QMutex ms_activityMutex;
 };
 
 #endif //clcam_display_h_1211

@@ -1,16 +1,38 @@
 #include "camdisplay.h"
+
 #include "../data/mediadata.h"
 #include "../device/device_video_layout.h"
 #include "videostreamdisplay.h"
 #include "audiostreamdisplay.h"
 #include "decoders/audio/ffmpeg_audio.h"
 
-#ifdef Q_OS_MAC
+#include <QtCore/QDateTime>
+
+#if defined(Q_OS_MAC)
 #include <CoreServices/CoreServices.h>
+#elif defined(Q_OS_WIN)
+#include <qt_windows.h>
 #endif
 
-QTime CLCamDisplay::ms_activityTime;
-QMutex CLCamDisplay::ms_activityMutex;
+Q_GLOBAL_STATIC(QMutex, activityMutex)
+static qint64 activityTime = 0;
+
+static void updateActivity()
+{
+    QMutexLocker locker(activityMutex());
+
+    if (QDateTime::currentMSecsSinceEpoch() >= activityTime)
+    {
+#ifdef Q_OS_MAC
+        UpdateSystemActivity(UsrActivity);
+#elif defined(Q_OS_WIN)
+        SetThreadExecutionState(ES_DISPLAY_REQUIRED | ES_CONTINUOUS);
+#endif
+        // Update system activity timer once per 20 seconds
+        activityTime = QDateTime::currentMSecsSinceEpoch() + 20000;
+    }
+}
+
 
 // a lot of small audio packets in bluray HD audio codecs. So, previous size 7 is not enought
 #define CL_MAX_DISPLAY_QUEUE_SIZE 15
@@ -161,24 +183,6 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
     }
 
     vd->releaseRef();
-}
-
-void CLCamDisplay::updateActivity()
-{
-    QMutexLocker _lock(&ms_activityMutex);
-
-    if (QTime::currentTime() >= ms_activityTime)
-    {
-        // Update system activity timer once per 20 seconds
-#ifdef Q_OS_MAC
-        UpdateSystemActivity(UsrActivity);
-#endif
-
-#ifdef Q_OS_WIN
-        SetThreadExecutionState( ES_DISPLAY_REQUIRED | ES_CONTINUOUS );
-#endif
-        ms_activityTime = QTime::currentTime().addSecs(20);
-    }
 }
 
 void CLCamDisplay::jump(qint64 time)
