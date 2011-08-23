@@ -69,7 +69,7 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_playingCompress(0),
       m_playingBitrate(0)
 {
-	for (int i = 0; i< CL_MAX_CHANNELS; ++i)
+	for (int i = 0; i < CL_MAX_CHANNELS; ++i)
 		m_display[i] = 0;
 
 	m_audioDisplay = new CLAudioStreamDisplay(AUDIO_BUFF_SIZE);
@@ -77,7 +77,7 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
 
 CLCamDisplay::~CLCamDisplay()
 {
-	for (int i = 0; i< CL_MAX_CHANNELS; ++i)
+	for (int i = 0; i < CL_MAX_CHANNELS; ++i)
 		delete m_display[i];
 
 	clearVideoQueue();
@@ -101,8 +101,9 @@ void CLCamDisplay::resume()
 
 void CLCamDisplay::addVideoChannel(int index, CLAbstractRenderer* vw, bool canDownscale)
 {
-	Q_ASSERT(index<CL_MAX_CHANNELS);
+	Q_ASSERT(index < CL_MAX_CHANNELS);
 
+    delete m_display[index];
 	m_display[index] = new CLVideoStreamDisplay(canDownscale);
 	m_display[index]->setDrawer(vw);
 }
@@ -201,26 +202,26 @@ void CLCamDisplay::setSingleShotMode(bool single)
 
 bool CLCamDisplay::processData(CLAbstractData* data)
 {
+    CLAbstractMediaData* media = dynamic_cast<CLAbstractMediaData*>(data);
+    if (!media)
+        return false;
+
     CLCompressedVideoData *vd = 0;
     CLCompressedAudioData *ad = 0;
-
-    CLAbstractMediaData* md = static_cast<CLAbstractMediaData*>(data);
-    if (md->dataType == CLAbstractMediaData::VIDEO)
+    if (media->dataType == CLAbstractMediaData::VIDEO)
     {
         vd = static_cast<CLCompressedVideoData*>(data);
         m_ignoringVideo = vd->ignore;
     }
-    else if (md->dataType == CLAbstractMediaData::AUDIO)
+    else if (media->dataType == CLAbstractMediaData::AUDIO)
     {
         ad = static_cast<CLCompressedAudioData*>(data);
     }
 
     bool flushCurrentBuffer = false;
-    CLAbstractMediaData* mData = dynamic_cast<CLAbstractMediaData*>(data);
     bool audioParamsChanged = ad && m_playingFormat != ad->format;
-    if (mData &&
-        ((mData->flags & CLAbstractMediaData::MediaFlags_AfterEOF) || audioParamsChanged) &&
-        m_videoQueue->size() > 0)
+    if (((media->flags & CLAbstractMediaData::MediaFlags_AfterEOF) || audioParamsChanged) &&
+        m_videoQueue[0].size() > 0)
     {
         // skip data (play current buffer
         flushCurrentBuffer = true;
@@ -228,10 +229,7 @@ bool CLCamDisplay::processData(CLAbstractData* data)
 
     if (m_needChangePriority)
     {
-        if (m_playAudio)
-            setPriority(QThread::HighestPriority);
-        else
-            setPriority(QThread::NormalPriority);
+        setPriority(m_playAudio ? QThread::HighestPriority : QThread::NormalPriority);
         m_needChangePriority = false;
     }
 
@@ -319,7 +317,7 @@ bool CLCamDisplay::processData(CLAbstractData* data)
         //1) we do not have audio playing;
         if (!haveAudio())
         {
-            qint64 m_videoDuration = m_videoQueue->size() * m_lastNonZerroDuration;
+            qint64 m_videoDuration = m_videoQueue[0].size() * m_lastNonZerroDuration;
             if (vd && m_videoDuration >  1000 * 1000)
             {
                 // skip current video packet, process it latter
@@ -403,54 +401,53 @@ bool CLCamDisplay::processData(CLAbstractData* data)
                     display(vd, lastFrameToDisplay && !vd->ignore);
                     m_singleShotQuantProcessed = true;
 
-                    if (!lastFrameToDisplay)
-                    {
-                        cl_log.log(QLatin1String("FAST PLAY, diff = "), (int)diff / 1000, cl_logDEBUG1);
-                        //cl_log.log("ms audio buff = ", m_audioDisplay->msInBuffer(), cl_logWARNING);
-
-                        ++fastFrames;
-
-                        if (fastFrames == 2) // allow just 2 fast frames at the time
-                            break;
-                    }
-
                     if (lastFrameToDisplay)
-                    {
                         break;
-                    }
+
+                    cl_log.log(QLatin1String("FAST PLAY, diff = "), (int)diff / 1000, cl_logDEBUG1);
+                    //cl_log.log("ms audio buff = ", m_audioDisplay->msInBuffer(), cl_logWARNING);
+
+                    if (++fastFrames == 2) // allow just 2 fast frames at the time
+                        break;
+
                     diff = diffBetweenVideoAndAudio(incoming, channel, videoDuration);
                 }
             }
         }
+
         return result;
     }
+
     return true;
 }
 
 void CLCamDisplay::setLightCPUMode(bool val)
 {
-	for (int i = 0; i< CL_MAX_CHANNELS; ++i)
+	for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+    {
 		if (m_display[i])
 			m_display[i]->setLightCPUMode(val);
+    }
 }
 
 void CLCamDisplay::copyImage(bool copy)
 {
 	for (int i = 0; i< CL_MAX_CHANNELS; ++i)
+    {
 		if (m_display[i])
 			m_display[i]->copyImage(copy);
+    }
 }
 
 void CLCamDisplay::playAudio(bool play)
 {
-	m_needChangePriority = play != m_playAudio;
+    if (m_playAudio == play)
+        return;
 
+	m_needChangePriority = true;
     m_playAudio = play;
-
-    if (!play)
-    {
+    if (!m_playAudio)
         m_audioDisplay->clearDeviceBuffer();
-    }
 }
 
 //==========================================================================
@@ -462,50 +459,42 @@ bool CLCamDisplay::haveAudio() const
 
 CLCompressedVideoData* CLCamDisplay::nextInOutVideodata(CLCompressedVideoData* incoming, int channel)
 {
-	if (!incoming && m_videoQueue[channel].isEmpty())
-		return 0;
-
 	if (m_videoQueue[channel].isEmpty())
 		return incoming;
-	if (incoming)
+
+    if (incoming)
 		enqueueVideo(incoming);
-	// queue is not empty
+
+    // queue is not empty
 	return m_videoQueue[channel].dequeue();
 }
 
 quint64 CLCamDisplay::nextVideoImageTime(CLCompressedVideoData* incoming, int channel) const
 {
-    if (!incoming && m_videoQueue[channel].isEmpty())
-        return 0;
-
     if (m_videoQueue[channel].isEmpty())
-        return incoming->timestamp;
+        return incoming ? incoming->timestamp : 0;
 
     // queue is not empty
     return m_videoQueue[channel].head()->timestamp;
-
 }
 
 quint64 CLCamDisplay::nextVideoImageTime(int channel) const
 {
     if (m_videoQueue[channel].isEmpty())
         return m_lastVideoPacketTime;
-    else if (m_videoBufferOverflow)
+
+    if (m_videoBufferOverflow)
         return 0;
-    else
-        return m_videoQueue[channel].head()->timestamp;
 
-
+    return m_videoQueue[channel].head()->timestamp;
 }
 
 void CLCamDisplay::clearVideoQueue()
 {
-	for (int i = 0; i< CL_MAX_CHANNELS; ++i)
+	for (int i = 0; i < CL_MAX_CHANNELS; ++i)
 	{
 		while (!m_videoQueue[i].isEmpty())
-		{
 			m_videoQueue[i].dequeue()->releaseRef();
-		}
 	}
 	m_videoBufferOverflow = false;
 }
