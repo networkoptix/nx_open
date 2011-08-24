@@ -27,6 +27,21 @@ class QnPageSelector;
 
 class DesktopFileEncoder;
 
+// Temporary code. Do not review.
+class MyFrame : public QFrame
+{
+Q_OBJECT
+public:
+    MyFrame(CLDevice* device);
+
+private:
+    CLDevice* m_device;
+    QLineEdit *line;
+
+private slots:
+    void addTag();
+};
+
 class GraphicsView: public QGraphicsView 
 {
     Q_OBJECT

@@ -29,6 +29,7 @@
 #include "ui/animation/property_animation.h"
 #include "ui/recordingsettingswidget.h"
 #include "videorecordersettings.h"
+#include "base/tagmanager.h"
 
 #include <QtCore/QSettings>
 #include <QtGui/QFileDialog>
@@ -1199,6 +1200,43 @@ void GraphicsView::mouseReleaseEvent(QMouseEvent * event)
     QGraphicsView::mouseReleaseEvent(event);
 }
 
+// Temporary code. Do not review.
+void MyFrame::addTag()
+{
+    TagManager& tagManager = TagManager::instance();
+
+    tagManager.addObjectTag(m_device->getUniqueId(), line->text());
+
+    close();
+    destroy();
+}
+
+MyFrame::MyFrame(CLDevice* device)
+    : m_device(device)
+{
+    setWindowTitle("Tag");
+
+    QHBoxLayout *layout = new QHBoxLayout(this);
+
+    // Add some widgets.
+    line = new QLineEdit();
+
+    QPushButton *hello = new QPushButton(this);
+    hello->setText("Add");
+    hello->resize(150, 25);
+    hello->setFont(QFont("Droid Sans Mono", 12, QFont::Normal));
+
+    // Add the widgets to the layout.
+    layout->addWidget(line);
+    layout->addWidget(hello);
+
+    line->setFocus();
+
+    QObject::connect(hello, SIGNAL(clicked()), this, SLOT(addTag()));
+    QObject::connect(line, SIGNAL(returnPressed()), this, SLOT(addTag()));
+
+}
+
 void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 {
     if (!mViewStarted)
@@ -1276,6 +1314,9 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
     {
         if (aitem->getType() == CLAbstractSceneItem::VIDEO)
         {
+            menu.addAction(&cm_listTags);
+            menu.addAction(&cm_addTag);
+
             // video item
             menu.addAction(&cm_fullscren);
             menu.addAction(&cm_remove_from_layout);
@@ -1549,6 +1590,23 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
             if (act==&cm_fullscren)
                 toggleFullScreen_helper(aitem);
+
+            if (act == &cm_listTags)
+            {
+                TagManager& tagManager = TagManager::instance();
+
+                QStringList tags = tagManager.listObjectTags(dev->getUniqueId());
+
+                UIOKMessage(this, "Tags", "Tags: " + tags.join(","));
+            }
+
+            if (act == &cm_addTag)
+            {
+                // Temporary code. Should have more intuitive UI. Probably no popup dialogs at all.
+                MyFrame *myframe = new MyFrame(dev);
+                myframe->show();
+            }
+
 
             if (act==&cm_settings && dev)
                 show_device_settings_helper(dev);
