@@ -220,13 +220,8 @@ bool CLFFmpegVideoDecoder::decode(const CLVideoData& data, CLVideoDecoderOutput*
     if (!outFrame->getUseExternalData() && 
         (outFrame->width != c->width || outFrame->height != c->height || outFrame->format != c->pix_fmt))
     {
-        outFrame->clean();
-        int numBytes = avpicture_get_size(c->pix_fmt, c->width, c->height);
-        avpicture_fill((AVPicture*) outFrame, (quint8*) av_malloc(numBytes), c->pix_fmt, c->width, c->height);
-        outFrame->width = c->width, 
-        outFrame->height = c->height;
+        outFrame->reallocate(c->width, c->height, c->pix_fmt);
     }
-
     avcodec_decode_video2(c, m_frame, &got_picture, &avpkt);
     if (data.useTwice)
         avcodec_decode_video2(c, m_frame, &got_picture, &avpkt);

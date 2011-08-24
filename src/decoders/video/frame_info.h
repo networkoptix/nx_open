@@ -20,6 +20,7 @@ struct CLVideoDecoderOutput: public AVFrame
     bool getUseExternalData() const { return m_useExternalData; }
     void setDisplaying(bool value) {m_displaying = value; }
     bool isDisplaying() const { return m_displaying; }
+    void reallocate(int newWidth, int newHeight, int format);
 private:
     static void downscalePlate_factor2(unsigned char* dst, const unsigned char* src, int src_width, int src_stride, int src_height);
     static void downscalePlate_factor4(unsigned char* dst, const unsigned char* src, int src_width, int src_stride, int src_height);

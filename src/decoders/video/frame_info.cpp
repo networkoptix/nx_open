@@ -354,6 +354,19 @@ void CLVideoDecoderOutput::copyPlane(unsigned char* dst, const unsigned char* sr
     }
 }
 
+void CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat)
+{
+    clean();
+    setUseExternalData(false);
+    width = newWidth;
+    height = newHeight;
+    format = newFormat;
+
+    int roundWidth = roundUp(width);
+    int numBytes = avpicture_get_size((PixelFormat) format, roundWidth, height);
+    avpicture_fill((AVPicture*) this, (quint8*) av_malloc(numBytes), (PixelFormat) format, roundWidth, height);
+}
+
 void CLVideoDecoderOutput::downscale(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst, downscale_factor factor)
 {
     int src_width = src->width;
@@ -374,34 +387,14 @@ void CLVideoDecoderOutput::downscale(const CLVideoDecoderOutput* src, CLVideoDec
     int scaledWidth = src_width/factor;
     int scaledHeight = src_height/factor;
 
-    int yu_h = dst->height/chroma_v_factor;
-
     if (scaledWidth != dst->width || scaledHeight != dst->height || src->format != dst->format)
-    {
-        // need to realocate dst memory 
-        dst->clean();
-        dst->setUseExternalData(false);
-        int numBytes = avpicture_get_size((PixelFormat) src->format, scaledWidth, scaledHeight);
-        dst->width = scaledWidth;
-        dst->height = scaledHeight;
-        avpicture_fill((AVPicture*) dst, (quint8*) av_malloc(numBytes), (PixelFormat) src->format, scaledWidth, scaledHeight);
-    }
-
-    /*
-    unsigned int new_min_capacity = dst->linesize[0]*dst->height + (dst->linesize[1]+dst->linesize[2])*yu_h;
-    if (dst->getCapacity() != new_min_capacity)
-    {
-        dst->clean();
-        dst->data[0] = (unsigned char*) av_malloc(dst->m_capacity);
-    }
-    dst->data[1] = dst->data[0] + dst->linesize[0]*dst->height;
-    dst->data[2] = dst->data[1] + dst->linesize[1]*yu_h;
-    */
+        dst->reallocate(scaledWidth, scaledHeight, src->format);
 
     int src_yu_h = src_height/chroma_v_factor;
 
     if (factor == factor_1) 
     {
+        int yu_h = src_height/chroma_v_factor;
         for (int i = 0; i < src_height; ++i) 
             memcpy(dst->data[0] + i * dst->linesize[0], src->data[0] + i * src->linesize[0], src_width);
         for (int i = 0; i < yu_h; ++i)
@@ -649,3 +642,4 @@ bool CLVideoDecoderOutput::isPixelFormatSupported(PixelFormat format)
 {
     return format == PIX_FMT_YUV422P || format == PIX_FMT_YUV420P || format == PIX_FMT_YUV444P;
 }
+
