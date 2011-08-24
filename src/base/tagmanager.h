@@ -1,35 +1,17 @@
 #ifndef TAGMANAGER_H
 #define TAGMANAGER_H
 
-#include <QtCore/QMutex>
-
 class TagManager
 {
 public:
-    static TagManager& instance();
+    static QStringList allTags();
 
-    QStringList listAllTags() const;
-
-    QStringList listObjectTags(const QString& object) const;
-    void addObjectTag(const QString& object, const QString& tag);
-    void removeObjectTag(const QString& object, const QString& tag);
+    static QStringList objectTags(const QString &object);
+    static void addObjectTag(const QString &object, const QString &tag);
+    static void removeObjectTag(const QString &object, const QString &tag);
 
 protected:
-    TagManager();
-
-    void load();
-    void save();
-
-private:
-    Q_DISABLE_COPY(TagManager);
-
-    mutable QMutex m_mutex;
-
-    typedef QMap<QString, int> TagsType;
-    typedef QMap<QString, QStringList> ObjectTagsType;
-
-    TagsType m_tags;
-    ObjectTagsType m_objectTags;
+    inline TagManager() {}
 };
 
 #endif // TAGMANAGER_H

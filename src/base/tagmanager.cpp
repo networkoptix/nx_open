@@ -1,113 +1,34 @@
 #include "tagmanager.h"
 
-#include <QtCore/QCoreApplication>
+#include <QtCore/QMap>
+#include <QtCore/QMutex>
 
 #include "base/log.h"
 #include "util.h"
 
-static const char* TAGS_FILENAME = "tags.txt";
+#define TAGS_FILENAME "tags.txt"
 
-Q_GLOBAL_STATIC(QMutex, theInstanceMutex)
-static TagManager *tagManager = 0;
+typedef QMap<QString, int> TagsMap;
+typedef QMap<QString, QStringList> ObjectTagsMap;
 
-static void tagManagerDeleter()
+class TagManagerPrivate : public TagManager
 {
-    delete tagManager;
-    tagManager = 0;
-}
-
-TagManager &TagManager::instance()
-{
-    if (tagManager)
-        return *tagManager;
-
-    QMutexLocker locker(theInstanceMutex());
-
-    // Check second time for case when 1 or more threads waited on mutex in previous line
-    if (!tagManager)
+public:
+    TagManagerPrivate() : TagManager()
     {
-        tagManager = new TagManager();
-        qAddPostRoutine(tagManagerDeleter);
+        load();
     }
 
-    return *tagManager;
-}
+    void load();
+    void save();
 
-TagManager::TagManager()
-{
-    load();
-}
+    QMutex m_mutex;
 
-TagManager::TagManager(const TagManager&)
-{
-}
+    TagsMap m_tags;
+    ObjectTagsMap m_objectTags;
+};
 
-QStringList TagManager::listAllTags() const
-{
-    QMutexLocker locker(&m_mutex);
-
-    return m_tags.keys();
-}
-
-QStringList TagManager::listObjectTags(const QString& object) const
-{
-    QMutexLocker locker(&m_mutex);
-
-    return m_objectTags.value(object);
-}
-
-void TagManager::addObjectTag(const QString& object, const QString& tag)
-{
-    if (tag.trimmed().isEmpty())
-        return;
-
-    QMutexLocker locker(&m_mutex);
-
-    ObjectTagsType::iterator objectTagIter = m_objectTags.find(object);
-    if (objectTagIter == m_objectTags.end())
-    {
-        m_objectTags[object] = QStringList(tag);
-    }
-    else
-    {
-        if (objectTagIter.value().contains(tag))
-            return;
-
-        objectTagIter.value() << tag;
-    }
-
-    ++m_tags[tag];
-
-    save();
-}
-
-void TagManager::removeObjectTag(const QString& object, const QString& tag)
-{
-    if (tag.trimmed().isEmpty())
-        return;
-
-    QMutexLocker locker(&m_mutex);
-
-    int nRemoved = 0;
-    {
-        ObjectTagsType::iterator it = m_objectTags.find(object);
-        if (it == m_objectTags.end())
-            return;
-
-        nRemoved = it.value().removeAll(tag);
-    }
-
-    if (nRemoved > 0)
-    {
-        m_tags[tag] -= nRemoved;
-        if (m_tags[tag] <= 0)
-            m_tags.remove(tag);
-
-        save();
-    }
-}
-
-void TagManager::load()
+void TagManagerPrivate::load()
 {
     QFile file(getDataDirectory() + QLatin1Char('/') + QLatin1String(TAGS_FILENAME));
     if (!file.open(QIODevice::ReadOnly))
@@ -145,16 +66,92 @@ void TagManager::load()
     }
 }
 
-void TagManager::save()
+void TagManagerPrivate::save()
 {
     QFile file(getDataDirectory() + QLatin1Char('/') + QLatin1String(TAGS_FILENAME));
     if (!file.open(QIODevice::WriteOnly))
         return;
 
     QTextStream stream(&file);
-    for (ObjectTagsType::const_iterator it = m_objectTags.constBegin(); it != m_objectTags.constEnd(); ++it)
+    for (ObjectTagsMap::const_iterator it = m_objectTags.constBegin(); it != m_objectTags.constEnd(); ++it)
     {
         stream << it.key().length() << QLatin1Char(' ') << it.key()
                << QLatin1Char(' ') << it.value().join(QLatin1String(",")) << endl;
+    }
+}
+
+Q_GLOBAL_STATIC(TagManagerPrivate, tagManager)
+
+
+QStringList TagManager::allTags()
+{
+    TagManagerPrivate *manager = tagManager();
+
+    QMutexLocker locker(&manager->m_mutex);
+
+    return manager->m_tags.keys();
+}
+
+QStringList TagManager::objectTags(const QString &object)
+{
+    TagManagerPrivate *manager = tagManager();
+
+    QMutexLocker locker(&manager->m_mutex);
+
+    return manager->m_objectTags.value(object);
+}
+
+void TagManager::addObjectTag(const QString& object, const QString& tag)
+{
+    if (tag.trimmed().isEmpty())
+        return;
+
+    TagManagerPrivate *manager = tagManager();
+
+    QMutexLocker locker(&manager->m_mutex);
+
+    ObjectTagsMap::iterator objectTagIter = manager->m_objectTags.find(object);
+    if (objectTagIter == manager->m_objectTags.end())
+    {
+        manager->m_objectTags[object] = QStringList(tag);
+    }
+    else
+    {
+        if (objectTagIter.value().contains(tag))
+            return;
+
+        objectTagIter.value() << tag;
+    }
+
+    ++manager->m_tags[tag];
+
+    manager->save();
+}
+
+void TagManager::removeObjectTag(const QString& object, const QString& tag)
+{
+    if (tag.trimmed().isEmpty())
+        return;
+
+    TagManagerPrivate *manager = tagManager();
+
+    QMutexLocker locker(&manager->m_mutex);
+
+    int nRemoved = 0;
+    {
+        ObjectTagsMap::iterator it = manager->m_objectTags.find(object);
+        if (it == manager->m_objectTags.end())
+            return;
+
+        nRemoved = it.value().removeAll(tag);
+    }
+
+    if (nRemoved > 0)
+    {
+        manager->m_tags[tag] -= nRemoved;
+        if (manager->m_tags[tag] <= 0)
+            manager->m_tags.remove(tag);
+
+        manager->save();
     }
 }

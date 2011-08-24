@@ -396,7 +396,7 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
 
     if (m_navigationItem && ( m_navigationItem->mouseOver() || m_navigationItem->isActive()))
     {
-        // scene should not be zoomed if mouse is over time slider or if time slider is active 
+        // scene should not be zoomed if mouse is over time slider or if time slider is active
 
         if (!m_navigationItem->mouseOver() && m_navigationItem->isActive())
             return; // if mouse is not over time line but time line is still active event must be ignored
@@ -713,7 +713,7 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 
     if (m_navigationItem && !m_navigationItem->mouseOver() && m_navigationItem->isActive())
     {
-        // we've got time line; muose is not over timeline. timeline is still active 
+        // we've got time line; muose is not over timeline. timeline is still active
         m_navigationItem->setActive(false);
         return;
     }
@@ -1203,9 +1203,7 @@ void GraphicsView::mouseReleaseEvent(QMouseEvent * event)
 // Temporary code. Do not review.
 void MyFrame::addTag()
 {
-    TagManager& tagManager = TagManager::instance();
-
-    tagManager.addObjectTag(m_device->getUniqueId(), line->text());
+    TagManager::addObjectTag(m_device->getUniqueId(), line->text());
 
     close();
     destroy();
@@ -1593,9 +1591,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
             if (act == &cm_listTags)
             {
-                TagManager& tagManager = TagManager::instance();
-
-                QStringList tags = tagManager.listObjectTags(dev->getUniqueId());
+                QStringList tags = TagManager::objectTags(dev->getUniqueId());
 
                 UIOKMessage(this, "Tags", "Tags: " + tags.join(","));
             }
