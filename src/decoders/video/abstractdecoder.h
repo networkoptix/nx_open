@@ -6,6 +6,9 @@
 class CLAbstractVideoDecoder
 {
 public:
+    // for movies: full = IPB, fast == IP only, fastest = I only
+    enum DecodeMode {DecodeMode_NotDefined, DecodeMode_Full, DecodeMode_Fast, DecodeMode_Fastest};
+
 	explicit CLAbstractVideoDecoder();
 
 	virtual ~CLAbstractVideoDecoder(){};
@@ -20,7 +23,7 @@ public:
 
 	virtual void showMotion(bool show ) = 0;
 
-	virtual void setLightCpuMode(bool val) = 0;
+	virtual void setLightCpuMode(DecodeMode val) = 0;
 
     void setMTDecoding(bool value)
     {

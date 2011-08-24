@@ -1,4 +1,7 @@
 #include "ffmpeg_helper.h"
+#include "nalUnits.h"
+#include "bitStream.h"
+#include "vc1Parser.h"
 
 static inline QByteArray codecIDToByteArray(CodecID codecID)
 {
@@ -327,4 +330,158 @@ static inline QByteArray codecIDToByteArray(CodecID codecID)
 QString codecIDToString(CodecID codecID)
 {
     return QString::fromLatin1(codecIDToByteArray(codecID));
+}
+
+// ------------------------- FrameTypeExtractor -------------------------
+
+void FrameTypeExtractor::decodeWMVSequence(const quint8* data, int size)
+{
+    m_vcSequence = new VC1SequenceHeader();
+    try {
+        m_vcSequence->vc1_unescape_buffer(data, size);
+        m_vcSequence->decode_sequence_header();
+    } catch (...) {
+        delete m_vcSequence;
+        m_vcSequence = 0;
+    }
+}
+
+FrameTypeExtractor::FrameTypeExtractor(AVCodecContext* context): 
+    m_context(context), 
+    m_codecId(context->codec_id),
+    m_vcSequence(0)
+{
+    if (m_context && context->extradata_size > 0)
+    {
+        quint8* data = context->extradata;
+        if (m_codecId == CODEC_ID_VC1) 
+        {
+            for (int i = 0; i < context->extradata_size-4; ++i)
+            {
+                if (data[i] == 0 && data[i+1] == 0 && data[i+2] == 1 && data[i+3] == VC1_CODE_SEQHDR) 
+                {
+                    decodeWMVSequence(data + i+ 4, context->extradata_size - i - 4);
+                    break;
+                }
+            }
+        }
+        else if (m_codecId == CODEC_ID_WMV1 || m_codecId == CODEC_ID_WMV2 || m_codecId == CODEC_ID_WMV3) 
+        {
+            decodeWMVSequence(data, context->extradata_size);
+        }
+    }
+}
+
+FrameTypeExtractor::~FrameTypeExtractor()
+{
+    delete m_vcSequence;
+};
+
+FrameTypeExtractor::FrameType FrameTypeExtractor::getH264FrameType(const quint8* data, int size)
+{
+    if (size < 1)
+        return UnknownFrameType;
+    quint8 nalType = *data & 0x1f;
+    if (nalType >= nuSliceNonIDR && nalType <= nuSliceIDR)
+    {
+        BitStreamReader bitReader;
+        bitReader.setBuffer(data+1, data + size);
+        try {
+            int first_mb_in_slice = NALUnit::extractUEGolombCode(bitReader);
+            int slice_type = NALUnit::extractUEGolombCode(bitReader);
+            if (slice_type >= 5)
+                slice_type -= 5; // +5 flag is: all other slice at this picture must be same type
+
+            if (slice_type == SliceUnit::I_TYPE || slice_type == SliceUnit::SI_TYPE)
+                return I_Frame;
+            else if (slice_type == SliceUnit::P_TYPE || slice_type == SliceUnit::SP_TYPE)
+                return P_Frame;
+            else if (slice_type == SliceUnit::B_TYPE)
+                return B_Frame;
+            else
+                return UnknownFrameType;
+        } catch(...) {
+            return UnknownFrameType;
+        }
+    }
+}
+
+FrameTypeExtractor::FrameType FrameTypeExtractor::getMpegVideoFrameType(const quint8* data, int size)
+{
+    enum PictureCodingType {PCT_FORBIDDEN, PCT_I_FRAME, PCT_P_FRAME, PCT_B_FRAME, PCT_D_FRAME};
+
+    if (size >= 2) 
+    {
+        int frameType = (data[1] >> 3) & 7;
+        if (frameType == PCT_I_FRAME)
+            return I_Frame;
+        else if (frameType == PCT_P_FRAME)
+            return P_Frame;
+        else if (frameType == PCT_B_FRAME)
+            return B_Frame;
+    }
+    return UnknownFrameType;
+}
+
+FrameTypeExtractor::FrameType FrameTypeExtractor::getWMVFrameType(const quint8* data, int size)
+{
+    if (m_vcSequence) {
+        VC1Frame frame;
+        if (frame.decode_frame_direct(*m_vcSequence, data, data + size) == 0)
+        {
+            if (frame.pict_type == VC_I_TYPE)
+                return I_Frame;
+            else if (frame.pict_type == VC_P_TYPE)
+                return P_Frame;
+            else
+                return B_Frame;
+        }
+    }
+    return UnknownFrameType;
+}
+
+FrameTypeExtractor::FrameType FrameTypeExtractor::getVCFrameType(const quint8* data, int size)
+{
+    if (data[3] == VC1_CODE_FRAME || data[3] == VC1_USER_CODE_FRAME && m_vcSequence)
+        return getWMVFrameType(data+4, size-4);
+    else
+        return UnknownFrameType;
+}
+
+FrameTypeExtractor::FrameType FrameTypeExtractor::getMpeg4FrameType(const quint8* data, int size)
+{
+    enum PictureCodingType {PCT_I_FRAME, PCT_P_FRAME, PCT_B_FRAME, PCT_S_FRAME};
+    if (size >= 1) 
+    {
+        int frameType = data[0] >> 6;
+        if (frameType == PCT_I_FRAME)
+            return I_Frame;
+        else if (frameType == PCT_P_FRAME)
+            return P_Frame;
+        else if (frameType == PCT_B_FRAME)
+            return B_Frame;
+    }
+    return UnknownFrameType;
+}
+
+FrameTypeExtractor::FrameType FrameTypeExtractor::getFrameType(const quint8* data, int dataLen)
+{
+    //quint32 size = ntohl( *((quint32*) data));
+    switch (m_codecId)
+    {
+        case CODEC_ID_H264:
+            return getH264FrameType(data+4, dataLen);
+        case CODEC_ID_MPEG1VIDEO:
+        case CODEC_ID_MPEG2VIDEO:
+            return getMpegVideoFrameType(data+4, dataLen);
+        case CODEC_ID_WMV1:
+        case CODEC_ID_WMV2:
+        case CODEC_ID_WMV3:
+            return getWMVFrameType(data, dataLen);
+        case CODEC_ID_VC1:
+            return getVCFrameType(data, dataLen);
+        case CODEC_ID_MPEG4:
+            return getMpeg4FrameType(data+4, dataLen);
+    }
+    return UnknownFrameType;
 }

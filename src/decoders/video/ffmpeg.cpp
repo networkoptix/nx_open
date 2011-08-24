@@ -3,10 +3,11 @@
 #ifdef _USE_DXVA
 #include "dxva/ffmpeg_callbacks.h"
 #endif
+#include "base/ffmpeg_helper.h"
 
 extern QMutex global_ffmpeg_mutex;
 
-#define LIGHT_CPU_MODE_FRAME_PERIOD 30
+static const int  LIGHT_CPU_MODE_FRAME_PERIOD = 15;
 bool CLFFmpegVideoDecoder::m_first_instance = true;
 int CLFFmpegVideoDecoder::hwcounter = 0;
 
@@ -18,11 +19,12 @@ m_width(0),
 m_height(0),
 m_codecId(codec_id),
 m_showmotion(false),
-m_lightCPUMode(false),
-m_wantEscapeFromLightCPUMode(false),
+m_decodeMode(DecodeMode_Full),
+m_newDecodeMode(DecodeMode_NotDefined),
 m_lightModeFrameCounter(0),
 needResetCodec(false),
-m_lastWidth(0)
+m_lastWidth(0),
+m_frameTypeExtractor(0)
 {
 	if (codecContext)
 	{
@@ -76,6 +78,7 @@ void CLFFmpegVideoDecoder::closeDecoder()
 	av_free(m_deinterlaceBuffer);
 	av_free(m_deinterlacedFrame);
 	av_free(c);
+    delete m_frameTypeExtractor;
 }
 
 void CLFFmpegVideoDecoder::openDecoder()
@@ -87,6 +90,8 @@ void CLFFmpegVideoDecoder::openDecoder()
     if (m_passedContext) {
         avcodec_copy_context(c, m_passedContext);
     }
+
+    m_frameTypeExtractor = new FrameTypeExtractor(c);
 
 #ifdef _USE_DXVA
     if (m_codecId == CODEC_ID_H264)
@@ -153,19 +158,20 @@ bool CLFFmpegVideoDecoder::decode(const CLVideoData& data, CLVideoDecoderOutput*
         return false;
     }
 
-	if (m_wantEscapeFromLightCPUMode && data.keyFrame)
+	if (m_newDecodeMode != DecodeMode_NotDefined && data.keyFrame)
 	{
-		m_wantEscapeFromLightCPUMode = false;
+        m_decodeMode = m_newDecodeMode;
+		m_newDecodeMode = DecodeMode_NotDefined;
 		m_lightModeFrameCounter = 0;
-		m_lightCPUMode = false;
 	}
 
-	if (m_lightCPUMode)
+	if (m_decodeMode > DecodeMode_Full)
 	{
 
 		if (data.codec == CODEC_ID_MJPEG)
 		{
-			if (m_lightModeFrameCounter < LIGHT_CPU_MODE_FRAME_PERIOD )
+            int period = DecodeMode_Fast ? LIGHT_CPU_MODE_FRAME_PERIOD : LIGHT_CPU_MODE_FRAME_PERIOD*2;
+			if (m_lightModeFrameCounter < period)
 			{
 				++m_lightModeFrameCounter;
 				return false;
@@ -174,10 +180,12 @@ bool CLFFmpegVideoDecoder::decode(const CLVideoData& data, CLVideoDecoderOutput*
 				m_lightModeFrameCounter = 0;
 
 		}
-		else // h.264
+		else if (!data.keyFrame)
 		{
-			if (!data.keyFrame)
+			if (m_decodeMode == DecodeMode_Fastest)
 				return false;
+            else if (m_frameTypeExtractor->getFrameType(data.inBuffer, data.bufferLength) == FrameTypeExtractor::B_Frame)
+                return false;
 		}
 	}
 
@@ -300,17 +308,18 @@ PixelFormat CLFFmpegVideoDecoder::GetPixelFormat()
     return c->pix_fmt;
 }
 
-void CLFFmpegVideoDecoder::setLightCpuMode(bool val)
+void CLFFmpegVideoDecoder::setLightCpuMode(CLAbstractVideoDecoder::DecodeMode val)
 {
-	if (val)
+    //val = DecodeMode_Fast; // todo: debug only. remove me!!!
+	if (val >= m_decodeMode)
 	{
-		m_lightCPUMode = true;
-		m_wantEscapeFromLightCPUMode = false;
+        m_decodeMode = val;
+		m_newDecodeMode = DecodeMode_NotDefined;
 		m_lightModeFrameCounter = 0;
 	}
 	else
 	{
-		m_wantEscapeFromLightCPUMode = true;
+		m_newDecodeMode = val;
 	}
 }
 

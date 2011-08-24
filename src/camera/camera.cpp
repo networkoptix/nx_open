@@ -143,7 +143,7 @@ CLStatistics* CLVideoCamera::getStatistics()
 	return m_stat;
 }
 
-void CLVideoCamera::setLightCPUMode(bool val)
+void CLVideoCamera::setLightCPUMode(CLAbstractVideoDecoder::DecodeMode val)
 {
 	m_camdispay.setLightCPUMode(val);
 }

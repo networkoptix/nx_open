@@ -14,7 +14,7 @@ public:
 
 
     void showMotion(bool) {}
-    void setLightCpuMode(bool) {}
+    void setLightCpuMode(DecodeMode) {}
 
 private:
     unsigned long m_decoder;

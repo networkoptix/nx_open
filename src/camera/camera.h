@@ -6,6 +6,7 @@
 #include "../streamreader/streamreader.h"
 #include "videodisplay/complicated_item.h"
 #include "stream_recorder.h"
+#include "decoders/video/abstractdecoder.h"
 
 class CLDevice;
 class CLVideoWindowItem;
@@ -31,7 +32,7 @@ public:
     // this function must be called if stream was interupted or so; to synch audio and video again 
     void streamJump(qint64 time);
 
-    void setLightCPUMode(bool val);
+    void setLightCPUMode(CLAbstractVideoDecoder::DecodeMode val);
 
     virtual CLDevice* getDevice() const;
 
