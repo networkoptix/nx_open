@@ -1,6 +1,8 @@
 #ifndef TAGMANAGER_H
 #define TAGMANAGER_H
 
+#include <QtCore/QMutex>
+
 class TagManager
 {
 public:
@@ -12,14 +14,15 @@ public:
     void addObjectTag(const QString& object, const QString& tag);
     void removeObjectTag(const QString& object, const QString& tag);
 
-private:
+protected:
     TagManager();
-    TagManager(const TagManager&);
 
     void load();
     void save();
 
 private:
+    Q_DISABLE_COPY(TagManager);
+
     mutable QMutex m_mutex;
 
     typedef QMap<QString, int> TagsType;
@@ -27,10 +30,6 @@ private:
 
     TagsType m_tags;
     ObjectTagsType m_objectTags;
-
-private:
-    static QMutex m_initMutex;
-    static TagManager* m_instance;
 };
 
 #endif // TAGMANAGER_H
