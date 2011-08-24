@@ -3,10 +3,6 @@
 
 #include <QtGui/QGraphicsView>
 
-class QGraphicsWidget;
-
-class AnimatedWidget;
-
 class GraphicsView: public QGraphicsView
 {
     Q_OBJECT
@@ -44,7 +40,7 @@ private:
 
 private:
     QGraphicsWidget *m_widget;
-    QList<AnimatedWidget *> m_animatedWidgets;
+    QList<QGraphicsWidget *> m_animatedWidgets;
 };
 
 #endif // GRAPHICSVIEW_H

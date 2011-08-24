@@ -22,6 +22,7 @@ GraphicsView::GraphicsView(QWidget *parent)
     {
         QGraphicsScene *scene = new QGraphicsScene(this);
         scene->setItemIndexMethod(QGraphicsScene::NoIndex);
+        //scene->setStyle(..); // scene-specific style
         setScene(scene);
     }
 
@@ -43,11 +44,11 @@ GraphicsView::GraphicsView(QWidget *parent)
     setRenderHints(QPainter::SmoothPixmapTransform);
 
     setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);
-    //setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
+
+    setOptimizationFlag(QGraphicsView::DontSavePainterState, false); // ### could be optimized
+    setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing);
 
     //setCacheMode(QGraphicsView::CacheBackground); // slows down scene drawing a lot!!!
-
-    setOptimizationFlags(QGraphicsView::DontSavePainterState | QGraphicsView::DontAdjustForAntialiasing);
 
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -80,10 +81,9 @@ GraphicsView::GraphicsView(QWidget *parent)
     for (int i = 0; i < 16; ++i)
     {
         AnimatedWidget *widget = new AnimatedWidget(m_widget);
-        widget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true); // optimization
 //        widget->setFlag(QGraphicsItem::ItemHasNoContents, true); // optimization
+        widget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true); // optimization
         widget->setFlag(QGraphicsItem::ItemIsSelectable, true);
-        widget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);
 //        widget->setFlag(QGraphicsItem::ItemIsPanel, false);
         widget->setPos(QPointF(-500, -500));
         scene()->addItem(widget);
@@ -115,13 +115,13 @@ GraphicsView::~GraphicsView()
 
 bool GraphicsView::isEditMode() const
 {
-    return !m_animatedWidgets.isEmpty() && m_animatedWidgets.first()->isInteractive();
+    return !m_animatedWidgets.isEmpty() && static_cast<AnimatedWidget *>(m_animatedWidgets.first())->isInteractive();
 }
 
 void GraphicsView::setEditMode(bool interactive)
 {
-    foreach (AnimatedWidget *widget, m_animatedWidgets)
-        widget->setInteractive(interactive);
+    foreach (QGraphicsWidget *widget, m_animatedWidgets)
+        static_cast<AnimatedWidget *>(widget)->setInteractive(interactive);
 }
 
 void GraphicsView::createActions()
@@ -326,7 +326,7 @@ void GraphicsView::invalidateLayout()
 {
     if (QGraphicsLayout *layout = m_widget->layout())
     {
-        /*foreach (AnimatedWidget *widget, m_animatedWidgets)
+        /*foreach (QGraphicsWidget *widget, m_animatedWidgets)
             widget->setZValue(m_widget->zValue());*/
         layout->invalidate();
         layout->activate();
@@ -391,7 +391,7 @@ void GraphicsView::itemDoubleClicked()
 
 void GraphicsView::itemDestroyed()
 {
-    m_animatedWidgets.removeOne(static_cast<AnimatedWidget *>(sender()));
+    m_animatedWidgets.removeOne(static_cast<QGraphicsWidget *>(sender()));
     QTimer::singleShot(250, this, SLOT(relayoutItemsActionTriggered()));
 }
 

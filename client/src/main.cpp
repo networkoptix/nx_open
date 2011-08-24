@@ -23,6 +23,8 @@ int main(int argc, char **argv)
     QApplication app(argc, argv);
     app.setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 
+    //app.setStyle(QLatin1String("Bespin"));
+
     QString dataLocation = getDataDirectory();
     QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
     QDir dataDirectory;
