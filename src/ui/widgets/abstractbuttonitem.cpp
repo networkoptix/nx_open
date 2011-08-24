@@ -388,7 +388,7 @@ void AbstractButtonItemPrivate::moveFocus(int key)
     AbstractButtonItem *fb = qobject_cast<AbstractButtonItem *>(f);
     if (!fb || !buttonList.contains(fb))
         return;
-    
+
     AbstractButtonItem *candidate = 0;
     int bestScore = -1;
     QRectF target = f->rect().translated(f->mapToScene(QPoint(0,0)));
@@ -494,7 +494,7 @@ void AbstractButtonItemPrivate::init()
 
     q->setFocusPolicy(Qt::FocusPolicy(q->style()->styleHint(QStyle::SH_Button_FocusPolicy)));
     q->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed, controlType));
-    q->setAttribute(Qt::WA_WState_OwnSizePolicy, false);
+//    q->setAttribute(Qt::WA_WState_OwnSizePolicy, false);
 //    q->setForegroundRole(QPalette::ButtonText);
 //    q->setBackgroundRole(QPalette::Button);
 }
