@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
 
 //    if (!qApp->setStyle(QLatin1String("qtc_xpro2")))
 //    if (!qApp->setStyle(QLatin1String("Bespin")))
-        qApp->setStyle(new ArthurStyle);
+;//        qApp->setStyle(new ArthurStyle);
 
     qApp->setStyleSheet(QLatin1String(
         "QMenu {\n"
