@@ -196,7 +196,11 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
 #ifdef Q_OS_MAC
     cm_toggle_fullscreen.setShortcut(tr("Ctrl+F"));
 #else
-    cm_toggle_fullscreen.setShortcut(tr("Alt+Return"));
+    QList<QKeySequence> shortcuts;
+    shortcuts << tr("Alt+Return") << tr("Esc");
+
+    //cm_toggle_fullscreen.setShortcut(tr("Alt+Return"));
+    cm_toggle_fullscreen.setShortcuts(shortcuts);
 #endif
     cm_toggle_fullscreen.setShortcutContext(Qt::ApplicationShortcut);
     addAction(&cm_toggle_fullscreen);
