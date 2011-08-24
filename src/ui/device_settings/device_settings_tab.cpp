@@ -12,9 +12,10 @@ mHandler(handler),
 mDlg(dlg)
 {
 	setAutoFillBackground(true);
-	QPalette palette;
-	palette.setColor(backgroundRole(), Qt::black);
-	//setPalette(palette); //black
+
+    QPalette pal = palette();
+    pal.setColor(backgroundRole(), Qt::black);
+    //setPalette(pal);
 
 	//QVBoxLayout *mainLayout = new QVBoxLayout;
 

@@ -121,7 +121,6 @@ extern "C" {
 #include <QWaitCondition>
 #include <QWheelEvent>
 #include <QWidget>
-#include <QWindowsStyle>
 #include <QtConcurrentmap>
 #include <QtCore/qmath.h>
 #include <QtDebug>

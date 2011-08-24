@@ -28,7 +28,6 @@
 #include "videoitem/unmoved/multipage/page_selector.h"
 #include "ui/animation/property_animation.h"
 #include "ui/recordingsettingswidget.h"
-#include "ui/device_settings/style.h"
 #include "videorecordersettings.h"
 
 #include <QtCore/QSettings>
@@ -116,6 +115,7 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
     m_timeAfterDoubleClick.restart();
 
     setScene(&m_scene);
+    //scene()->setStyle(..); // scene-specific style
 
     m_camLayout.setView(this);
     m_camLayout.setScene(&m_scene);
@@ -163,9 +163,9 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
 
     //setAlignment(Qt::AlignVCenter);
 
-    QPalette palette;
-    palette.setColor(backgroundRole(), app_bkr_color);
-    setPalette(palette);
+    QPalette pal = palette();
+    pal.setColor(backgroundRole(), app_bkr_color);
+    setPalette(pal);
 
     connect(&m_secTimer, SIGNAL(timeout ()), this , SLOT(onSecTimer()) );
     connect(&m_scenezoom, SIGNAL(finished()), this , SLOT(onScneZoomFinished()) );

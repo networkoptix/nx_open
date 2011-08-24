@@ -75,9 +75,9 @@ m_normalView(0)
 
 	setAutoFillBackground(false);
 
-	QPalette palette;
-	palette.setColor(backgroundRole(), app_bkr_color);
-	setPalette(palette);
+    QPalette pal = palette();
+    pal.setColor(backgroundRole(), app_bkr_color);
+    setPalette(pal);
 
 	//setWindowOpacity(.80);
 

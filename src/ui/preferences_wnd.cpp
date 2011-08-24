@@ -5,7 +5,6 @@
 #include "ui_licensekey.h"
 #include "device/network_device.h"
 #include "version.h"
-#include "device_settings/style.h"
 #include "util.h"
 #include "recordingsettingswidget.h"
 
@@ -15,9 +14,6 @@ extern QString button_home;
 PreferencesWindow::PreferencesWindow() :
     QDialog(0, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint)
 {
-    QStyle *arthurStyle = new ArthurStyle();
-    setStyle(arthurStyle);
-
     setupUi(this);
 
     creditsLabel->setText(creditsLabel->text().replace(QLatin1String("QT_VERSION"), QLatin1String(QT_VERSION_STR)));
