@@ -1462,8 +1462,13 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
     //=========results===============================
 
-    if (act==&cm_exit)
-        QCoreApplication::instance()->exit();
+    if (act == &cm_exit)
+    {
+        QCoreApplication::instance()->exit(0);
+        // Note that unlike the C library function of the same name,
+        // this function *does* return to the caller.
+        return;
+    }
 
     if (aitem==0) // on void menu
     {
