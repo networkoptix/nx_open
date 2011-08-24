@@ -30,8 +30,6 @@ public:
 
 	void setLightCPUMode(bool val);
 
-	void copyImage(bool copy);
-
 	void display(CLCompressedVideoData* vd, bool sleep);
 	void playAudio(bool play);
 
