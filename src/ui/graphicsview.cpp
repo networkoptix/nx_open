@@ -1699,8 +1699,6 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
     }
 
     QGraphicsView::contextMenuEvent(event);
-    /**/
-    qDeleteAll(AudioTracks);
 }
 
 void GraphicsView::mouseDoubleClickEvent( QMouseEvent * event )
