@@ -33,7 +33,7 @@ public:
 	inline quint8* getBuffer() const {return (quint8*) m_initBuffer;}
 	inline unsigned getBitsLeft() const {return m_totalBits;}
 protected:
-	inline void setBuffer(quint8* buffer, quint8* end)
+	inline void setBuffer(const quint8* buffer, const quint8* end)
 	{
 		if (buffer >= end)
 			THROW_BITSTREAM_ERR;
@@ -70,7 +70,7 @@ private:
 			THROW_BITSTREAM_ERR;
 	}
 public:
-	inline void setBuffer(quint8* buffer, quint8* end) {
+	inline void setBuffer(const quint8* buffer, const quint8* end) {
 		BitStream::setBuffer(buffer, end);
 		m_curVal = getCurVal(m_buffer);
 		m_bitLeft = INT_BIT;

@@ -421,7 +421,7 @@ bool CLCamDisplay::processData(CLAbstractData* data)
     return true;
 }
 
-void CLCamDisplay::setLightCPUMode(bool val)
+void CLCamDisplay::setLightCPUMode(CLAbstractVideoDecoder::DecodeMode val)
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
     {

@@ -6,7 +6,7 @@
 #include "gl_renderer.h"
 
 CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale) :
-    m_lightCPUmode(false),
+    m_lightCPUmode(CLAbstractVideoDecoder::DecodeMode_Full),
     m_canDownscale(canDownscale),
     m_prevFactor(CLVideoDecoderOutput::factor_1),
     m_scaleFactor(CLVideoDecoderOutput::factor_1),
@@ -204,8 +204,6 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 
     //waitFrame(m_frameQueueIndex); 
     CLVideoDecoderOutput& outFrame = m_frameQueue[m_frameQueueIndex];
-    //if (!useTmpFrame && outFrame.getUseExternalData())
-    //    outFrame.clean();
     if (!useTmpFrame)
         outFrame.setUseExternalData(!enableFrameQueue);
 	if (!dec || !dec->decode(img, useTmpFrame ? &m_tmpFrame : &outFrame))
@@ -233,9 +231,7 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
     }
     if (enableFrameQueue) {
         // wait previous frame. Renderer does not have queue now, so current version may works only for 2 frames.
-        int prevFrameIdx = m_frameQueueIndex-1;
-        if (prevFrameIdx < 0)
-            prevFrameIdx = MAX_FRAME_QUEUE_SIZE-1;
+        int prevFrameIdx = m_frameQueueIndex > 0 ? m_frameQueueIndex-1 : MAX_FRAME_QUEUE_SIZE-1;
         waitFrame(prevFrameIdx, data->channelNumber);
     }
     
@@ -288,7 +284,7 @@ bool CLVideoStreamDisplay::rescaleFrame(const CLVideoDecoderOutput& srcFrame, CL
     return true;
 }
 
-void CLVideoStreamDisplay::setLightCPUMode(bool val)
+void CLVideoStreamDisplay::setLightCPUMode(CLAbstractVideoDecoder::DecodeMode val)
 {
 	m_lightCPUmode = val;
 	QMutexLocker mutex(&m_mtx);

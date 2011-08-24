@@ -2,6 +2,7 @@
 #define videostreamdisplay_h_2044
 
 #include "../decoders/video/frame_info.h"
+#include "decoders/video/abstractdecoder.h"
 
 class CLAbstractVideoDecoder;
 struct CLCompressedVideoData;
@@ -21,7 +22,7 @@ public:
     void dispay(CLCompressedVideoData* data, bool draw,
                 CLVideoDecoderOutput::downscale_factor force_factor = CLVideoDecoderOutput::factor_any);
 
-    void setLightCPUMode(bool val);
+    void setLightCPUMode(CLAbstractVideoDecoder::DecodeMode val);
 
     CLVideoDecoderOutput::downscale_factor getCurrentDownscaleFactor() const;
 
@@ -43,7 +44,7 @@ private:
     CLVideoDecoderOutput m_frameQueue[MAX_FRAME_QUEUE_SIZE];
     int m_frameQueueIndex;
 
-    bool m_lightCPUmode;
+    CLAbstractVideoDecoder::DecodeMode m_lightCPUmode;
     bool m_canDownscale;
 
     CLVideoDecoderOutput::downscale_factor m_prevFactor;

@@ -6,6 +6,7 @@
 #include "device/device_video_layout.h"
 #include "streamreader/streamreader.h"
 #include "data/mediadata.h"
+#include "decoders/video/abstractdecoder.h"
 
 class CLAbstractRenderer;
 class CLVideoStreamDisplay;
@@ -28,7 +29,7 @@ public:
 	void pause();
 	void resume();
 
-	void setLightCPUMode(bool val);
+	void setLightCPUMode(CLAbstractVideoDecoder::DecodeMode val);
 
 	void display(CLCompressedVideoData* vd, bool sleep);
 	void playAudio(bool play);

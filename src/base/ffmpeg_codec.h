@@ -34,4 +34,5 @@ enum CLCodecType
 CLCodecType ffmpegCodecIdToInternal(CodecID ffmpegVideoCodecId);
 CodecID internalCodecIdToFfmpeg(CLCodecType internalCodecId);
 
+
 #endif // _UNICLIENT_FFMPEG_CODEC_H

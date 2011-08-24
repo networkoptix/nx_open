@@ -846,14 +846,6 @@ bool CLGLRenderer::paintEvent(const QRect &r)
             updateTexture();
 
         QRect temp(r);
-#if 0
-        //temp = QRect(0, 0, m_videowindow->width(), m_videowindow->height());
-        //float sar = 1.0f;
-        //getTextureRect(temp, m_stride, m_height, temp.width(), temp.height(), sar);
-        //m_painterOpacity = 0.3;
-        //m_painterOpacity = 1.0;
-#endif
-
         const float v_array[] = { temp.left(), temp.top(), temp.right() + 1, temp.top(), temp.right() + 1, temp.bottom() + 1, temp.left(), temp.bottom() + 1 };
         drawVideoTexture(m_texture[0], m_texture[1], m_texture[2], v_array);
     }

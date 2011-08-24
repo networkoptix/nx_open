@@ -6,6 +6,7 @@
 #ifdef _USE_DXVA
 #include "dxva/dxva.h"
 #endif
+#include "base/ffmpeg_helper.h"
 
 struct AVCodec;
 struct AVCodecContext;
@@ -24,7 +25,7 @@ public:
 
 	void showMotion(bool show);
 
-	virtual void setLightCpuMode(bool val);
+	virtual void setLightCpuMode(DecodeMode val);
 
     static bool isHardwareAccellerationPossible(CodecID codecId, int width, int height)
     {
@@ -48,6 +49,7 @@ private:
     static int hwcounter;
 	AVCodec *m_codec;
 	AVCodecContext *c;
+    FrameTypeExtractor* m_frameTypeExtractor;
 	AVFrame *m_frame;
 	
 	quint8* m_deinterlaceBuffer;
@@ -63,8 +65,8 @@ private:
 	static bool m_first_instance;
 	CodecID m_codecId;
 	bool m_showmotion;
-	bool m_lightCPUMode;
-	bool m_wantEscapeFromLightCPUMode;
+	CLAbstractVideoDecoder::DecodeMode m_decodeMode;
+	CLAbstractVideoDecoder::DecodeMode m_newDecodeMode;
 
 	unsigned int m_lightModeFrameCounter;
 
