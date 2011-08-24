@@ -28,7 +28,6 @@
 #include "videoitem/unmoved/multipage/page_selector.h"
 #include "ui/animation/property_animation.h"
 #include "ui/recordingsettingswidget.h"
-#include "ui/device_settings/style.h"
 #include "videorecordersettings.h"
 
 #include <QtCore/QSettings>
@@ -116,6 +115,7 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
     m_timeAfterDoubleClick.restart();
 
     setScene(&m_scene);
+    //scene()->setStyle(..); // scene-specific style
 
     m_camLayout.setView(this);
     m_camLayout.setScene(&m_scene);
@@ -163,9 +163,9 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
 
     //setAlignment(Qt::AlignVCenter);
 
-    QPalette palette;
-    palette.setColor(backgroundRole(), app_bkr_color);
-    setPalette(palette);
+    QPalette pal = palette();
+    pal.setColor(backgroundRole(), app_bkr_color);
+    setPalette(pal);
 
     connect(&m_secTimer, SIGNAL(timeout ()), this , SLOT(onSecTimer()) );
     connect(&m_scenezoom, SIGNAL(finished()), this , SLOT(onScneZoomFinished()) );
@@ -196,7 +196,11 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
 #ifdef Q_OS_MAC
     cm_toggle_fullscreen.setShortcut(tr("Ctrl+F"));
 #else
-    cm_toggle_fullscreen.setShortcut(tr("Alt+Return"));
+    QList<QKeySequence> shortcuts;
+    shortcuts << tr("Alt+Return") << tr("Esc");
+
+    //cm_toggle_fullscreen.setShortcut(tr("Alt+Return"));
+    cm_toggle_fullscreen.setShortcuts(shortcuts);
 #endif
     cm_toggle_fullscreen.setShortcutContext(Qt::ApplicationShortcut);
     addAction(&cm_toggle_fullscreen);
@@ -1309,19 +1313,14 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
                 QStringList tracks = reader->getAudioTracksInfo();
                 if (tracks.size() > 1 ) // if we've got more than one channel
                 {
-
-
-                    for (int i = 0; i  < qMin(tracks.size(), MAX_AUDIO_TRACKS); ++i )
+                    for (int i = 0; i < qMin(tracks.size(), MAX_AUDIO_TRACKS); ++i)
                     {
-                        AudioTracks << new QAction(0);
-                        AudioTracks[i]->setCheckable(true);
-                        AudioTracks[i]->setText(QLatin1String("  ") + tracks.at(i));
-                        audioMenu.addAction(AudioTracks[i]);
+                        QAction *audioTrackAction = new QAction(QLatin1String("  ") + tracks.at(i), &audioMenu);
+                        audioTrackAction->setCheckable(true);
+                        audioTrackAction->setChecked(i == reader->getCurrentAudioChannel());
+                        AudioTracks.append(audioTrackAction);
+                        audioMenu.addAction(audioTrackAction);
                     }
-
-                    unsigned int selectedAudio = qMin((unsigned int)MAX_AUDIO_TRACKS-1, reader->getCurrentAudioChannel());
-                    AudioTracks[selectedAudio]->setChecked(true);
-
 
                     menu.addMenu(&audioMenu);
                 }
@@ -1467,8 +1466,13 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
     //=========results===============================
 
-    if (act==&cm_exit)
-        QCoreApplication::instance()->exit();
+    if (act == &cm_exit)
+    {
+        QCoreApplication::instance()->exit(0);
+        // Note that unlike the C library function of the same name,
+        // this function *does* return to the caller.
+        return;
+    }
 
     if (aitem==0) // on void menu
     {
@@ -1520,20 +1524,13 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
             {
                 CLAbstractArchiveReader* reader = static_cast<CLAbstractArchiveReader*>(cam->getStreamreader());
 
-                QStringList tracks = reader->getAudioTracksInfo();
-                if (tracks.size() > 1 ) // if we've got more than one channel
+                for (int i = 0; i < AudioTracks.size(); ++i)
                 {
-                    if (act == AudioTracks[0])
-                        reader->setAudioChannel(0);
-
-                    if (act == AudioTracks[1])
-                        reader->setAudioChannel(1);
-
-                    if (act == AudioTracks[2])
-                        reader->setAudioChannel(2);
-
-                    if (act == AudioTracks[3])
-                        reader->setAudioChannel(3);
+                    if (act == AudioTracks.at(i))
+                    {
+                        reader->setAudioChannel(i);
+                        break;
+                    }
                 }
             }
 
@@ -1620,7 +1617,8 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
             QList<CLAbstractSubItemContainer*> lst;
             lst.push_back(aitem);
             m_camLayout.removeItems(lst, true);
-        } else if (act == &cm_remove_from_disk)
+        }
+        else if (act == &cm_remove_from_disk)
         {
             CLDevice* device = aitem->getComplicatedItem()->getDevice();
 
@@ -1648,7 +1646,8 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
             }
 
             m_camLayout.removeItems(lst, true);
-        } else if (act == &cm_remove_from_disk)
+        }
+        else if (act == &cm_remove_from_disk)
         {
             QString message;
             QTextStream(&message) << QString("Are you sure you want to remove ") << m_scene.selectedItems().size() << " files?";
@@ -1709,8 +1708,6 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
     }
 
     QGraphicsView::contextMenuEvent(event);
-    /**/
-    qDeleteAll(AudioTracks);
 }
 
 void GraphicsView::mouseDoubleClickEvent( QMouseEvent * event )

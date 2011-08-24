@@ -1,7 +1,6 @@
 #include "device_settings_dlg.h"
 #include "device_settings_tab.h"
 #include "../../device/device.h"
-#include "style.h"
 #include "widgets.h"
 #include "settings.h"
 #include "settings_getter.h"
@@ -20,12 +19,9 @@ mDevice(dev)
 
 	resize(width, height);
 
-	QPalette palette;
-	palette.setColor(backgroundRole(), Qt::black);
-	setPalette(palette);
-
-	QStyle *arthurStyle = new ArthurStyle();
-	setStyle(arthurStyle);
+    QPalette pal = palette();
+    pal.setColor(backgroundRole(), Qt::black);
+    setPalette(pal);
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 

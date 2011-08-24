@@ -18,6 +18,7 @@
 #include "device/device_managmen/device_manager.h"
 #include "ui/video_cam_layout/layout_manager.h"
 #include "ui/context_menu_helper.h"
+#include "ui/device_settings/style.h"
 #include "decoders/video/abstractdecoder.h"
 #include "device_plugins/avigilon/devices/avigilon_device_server.h"
 #include "device_plugins/android/devices/android_device_server.h"
@@ -62,16 +63,12 @@ int main(int argc, char *argv[])
 
     EveApplication application(argc, argv);
 
-//    TimeSlider s;
-//    s.setMaximumValue((qint64)411601284504748032LL);
-//    s.show();
-
     QString argsMessage;
     for (int i = 1; i < argc; ++i)
     {
         argsMessage += fromNativePath(QString::fromLocal8Bit(argv[i]));
         if (i < argc-1)
-            argsMessage += QLatin1Char('\0');
+            argsMessage += QLatin1Char('\0'); // ### QString doesn't support \0 in the string
     }
 
     while (application.isRunning())
@@ -140,6 +137,10 @@ int main(int argc, char *argv[])
     //============================
 
     //=========================================================
+
+//    if (!qApp->setStyle(QLatin1String("qtc_xpro2")))
+//    if (!qApp->setStyle(QLatin1String("Bespin")))
+;//        qApp->setStyle(new ArthurStyle);
 
     qApp->setStyleSheet(QLatin1String(
         "QMenu {\n"

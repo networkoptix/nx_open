@@ -21,34 +21,32 @@ m_view(view)
     m_lineEdit->setFocus();
 
 
-	/*/
-	QString style (
+	/*
+    m_lineEdit->setStyleSheet(QLatin1String(
+        "QLineEdit{ border-width: 2px; \n"
+        "color: rgb(255, 255, 255); \n"
+        "background-color: rgb(0, 16, 72);\n"
+        "border-top-color: rgb(255, 255, 255); \n"
+        "border-left-color: rgb(255, 255, 255); \n"
+        "border-right-color: rgb(255, 255, 255); \n"
+        "border-bottom-color: rgb(255, 255, 255); \n"
+        "border-style: solid; \n"
+        //"spacing: 22px; \n"
+        //"margin-top: 3px; \n"
+        //"margin-bottom: 3px; \n"
+        //"padding: 16px; \n"
+        "font-size: 25px; \n"
+        "font-weight: normal; }\n"
+        "QLineEdit:focus{ \n"
+        "color: rgb(255, 255, 255);\n"
+        "border-top-color: rgb(255, 255, 255);\n"
+        "border-left-color: rgb(255, 255, 255); \n"
+        "border-right-color: rgb(255, 255, 255); \n"
+        "border-bottom-color: rgb(255, 255, 255);}"
+    ));
+	*/
 
-		"QLineEdit{ border-width: 2px; \n"
-		"color: rgb(255, 255, 255); \n"
-		"background-color: rgb(0, 16, 72);\n"
-		"border-top-color: rgb(255, 255, 255); \n"
-		"border-left-color: rgb(255, 255, 255); \n"
-		"border-right-color: rgb(255, 255, 255); \n"
-		"border-bottom-color: rgb(255, 255, 255); \n"
-		"border-style: solid; \n"
-		//"spacing: 22px; \n"
-		//"margin-top: 3px; \n"
-		//"margin-bottom: 3px; \n"
-		//"padding: 16px; \n"
-		"font-size: 25px; \n"
-		"font-weight: normal; }\n"
-		"QLineEdit:focus{ \n"
-		"color: rgb(255, 255, 255);\n"
-		"border-top-color: rgb(255, 255, 255);\n"
-		"border-left-color: rgb(255, 255, 255); \n"
-		"border-right-color: rgb(255, 255, 255); \n"
-		"border-bottom-color: rgb(255, 255, 255);}"
-		);
-
-		*/
-
-    QString style = QLatin1String(
+    m_lineEdit->setStyleSheet(QLatin1String(
         "QLineEdit{ border-width: 2px; \n"
         "color: rgb(150,150, 150); \n"
         "background-color: rgb(0, 16, 72);\n"
@@ -69,10 +67,7 @@ m_view(view)
         "border-left-color: rgb(150,150, 150); \n"
         "border-right-color: rgb(150,150, 150); \n"
         "border-bottom-color: rgb(150,150, 150);}"
-    );
-
-
-	m_lineEdit->setStyleSheet(style);
+    ));
 
 	m_height = 40;
 
