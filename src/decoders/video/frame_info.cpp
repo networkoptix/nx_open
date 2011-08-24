@@ -266,64 +266,82 @@ static int roundUp(int value)
     return value / ROUND_FACTOR * ROUND_FACTOR + (value % ROUND_FACTOR ? ROUND_FACTOR : 0);
 }
 
-CLVideoDecoderOutput::CLVideoDecoderOutput() :
-    C1(0), C2(0), C3(0),
-    width(0),
-    height(0),
-    stride1(0),
-    stride2(0),
-    stride3(0),
-    m_capacity(0)
+CLVideoDecoderOutput::CLVideoDecoderOutput()
 {
+    /*
+    width = 0;
+    height = 0;
+    interlaced_frame = 0;
+    format = PIX_FMT_NONE;
+    memset(data, 0, sizeof(data));
+    memset(linesize, 0, sizeof(linesize));
+    */
+    memset(this, 0, sizeof(*this));
 }
 
 CLVideoDecoderOutput::~CLVideoDecoderOutput()
 {
-    if (m_capacity)
+    clean();
+}
+
+void CLVideoDecoderOutput::setUseExternalData(bool value)
+{
+    if (value != m_useExternalData)
         clean();
+    m_useExternalData = value;
 }
 
 void CLVideoDecoderOutput::clean()
 {
-    if (m_capacity)
-    {
-        av_free(C1);
-        C1 = 0;
-        m_capacity = 0;
-    }
+    if (!m_useExternalData && data[0])
+        av_free(data[0]);
+    data[0] = data[1] = data[2] = 0;
+    linesize[0] = linesize[1] = linesize[2] = 0;
+    width = height = 0;
 }
 
 void CLVideoDecoderOutput::copy(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst)
 {
-    if (src->width != dst->width || src->height != dst->height || src->out_type != dst->out_type)
+    if (src->width != dst->width || src->height != dst->height || src->format != dst->format)
     {
         // need to realocate dst memory 
-        dst->clean();
-        dst->stride1 = src->width;
-        dst->stride2 = src->width/2;
-        dst->stride3 = src->width/2;
+        dst->setUseExternalData(false);
+        int numBytes = avpicture_get_size((PixelFormat) src->format, src->width, src->height);
+        avpicture_fill((AVPicture*) dst, (quint8*) av_malloc(numBytes), (PixelFormat) src->format, src->width, src->height);
+
+        /*
+        dst->linesize[0] = src->width;
+        dst->linesize[1] = src->width/2;
+        dst->linesize[2] = src->width/2;
 
         dst->width = src->width;
 
         dst->height = src->height;
-        dst->out_type = src->out_type;
+        dst->format = src->format;
 
-        int yu_h = dst->out_type == PIX_FMT_YUV420P ? dst->height/2 : dst->height;
+        int yu_h = dst->format == PIX_FMT_YUV420P ? dst->height/2 : dst->height;
 
-        dst->m_capacity = dst->stride1*dst->height + (dst->stride2+dst->stride3)*yu_h;
-
-        dst->C1 = (unsigned char*) av_malloc(dst->m_capacity);
-        dst->C2 = dst->C1 + dst->stride1*dst->height;
-        dst->C3 = dst->C2 + dst->stride2*yu_h;
+        dst-data[0] = (unsigned char*) av_malloc(dst->getCapacity());
+        dst->data[1] = dst-data[0] + dst->linesize[0]*dst->height;
+        dst->data[2] = dst-data[1] + dst->linesize[1]*yu_h;
+        */
     }
 
-    int yu_h = dst->out_type == PIX_FMT_YUV420P ? dst->height/2 : dst->height;
+    int yu_h = dst->format == PIX_FMT_YUV420P ? dst->height/2 : dst->height;
 
-    copyPlane(dst->C1, src->C1, dst->stride1, dst->stride1, src->stride1, src->height);
-    copyPlane(dst->C2, src->C2, dst->stride2, dst->stride2, src->stride2, yu_h);
-    copyPlane(dst->C3, src->C3, dst->stride3, dst->stride3, src->stride3, yu_h);
+    copyPlane(dst->data[0], src->data[0], dst->linesize[0], dst->linesize[0], src->linesize[0], src->height);
+    copyPlane(dst->data[1], src->data[1], dst->linesize[1], dst->linesize[1], src->linesize[1], yu_h);
+    copyPlane(dst->data[2], src->data[2], dst->linesize[2], dst->linesize[2], src->linesize[2], yu_h);
 
 }
+
+/*
+int CLVideoDecoderOutput::getCapacity()
+{
+    int yu_h = format == PIX_FMT_YUV420P ? height/2 : height;
+    return linesize[0]*height + (linesize[1] + linesize[2])*yu_h;
+}
+*/
 
 void CLVideoDecoderOutput::copyPlane(unsigned char* dst, const unsigned char* src, int width, int dst_stride,  int src_stride, int height)
 {
@@ -341,40 +359,57 @@ void CLVideoDecoderOutput::downscale(const CLVideoDecoderOutput* src, CLVideoDec
     int src_width = src->width;
     int src_height = src->height;
 
-    const int chroma_h_factor = (src->out_type == PIX_FMT_YUV420P || src->out_type == PIX_FMT_YUV422P) ? 2 : 1;
-    const int chroma_v_factor = (src->out_type == PIX_FMT_YUV420P) ? 2 : 1;
+    const int chroma_h_factor = (src->format == PIX_FMT_YUV420P || src->format == PIX_FMT_YUV422P) ? 2 : 1;
+    const int chroma_v_factor = (src->format == PIX_FMT_YUV420P) ? 2 : 1;
 
     // after downscale chroma_width must be divisible by 4 ( opengl requirements )
     const int mod_w = chroma_h_factor*factor*4;
     if ((src_width%mod_w) != 0)
         src_width = src_width/mod_w*mod_w;
 
-    dst->stride1 = roundUp(src_width/factor);
-    dst->stride2 = dst->stride1 / chroma_h_factor;
-    dst->stride3 = dst->stride2;
+    //dst->linesize[0] = roundUp(src_width/factor);
+    //dst->linesize[1] = dst->linesize[0] / chroma_h_factor;
+    //dst->linesize[2] = dst->linesize[1];
 
-    dst->width = src_width/factor;
-
-    dst->height = src_height/factor;
-    dst->out_type = src->out_type;
+    int scaledWidth = src_width/factor;
+    int scaledHeight = src_height/factor;
 
     int yu_h = dst->height/chroma_v_factor;
 
-    unsigned int new_min_capacity = dst->stride1*dst->height + (dst->stride2+dst->stride3)*yu_h;
-
-    if (dst->m_capacity<new_min_capacity)
+    if (scaledWidth != dst->width || scaledHeight != dst->height || src->format != dst->format)
     {
+        // need to realocate dst memory 
         dst->clean();
-        dst->m_capacity = new_min_capacity;
-        dst->C1 = (unsigned char*) av_malloc(dst->m_capacity);
+        dst->setUseExternalData(false);
+        int numBytes = avpicture_get_size((PixelFormat) src->format, scaledWidth, scaledHeight);
+        dst->width = scaledWidth;
+        dst->height = scaledHeight;
+        avpicture_fill((AVPicture*) dst, (quint8*) av_malloc(numBytes), (PixelFormat) src->format, scaledWidth, scaledHeight);
     }
 
-    dst->C2 = dst->C1 + dst->stride1*dst->height;
-    dst->C3 = dst->C2 + dst->stride2*yu_h;
+    /*
+    unsigned int new_min_capacity = dst->linesize[0]*dst->height + (dst->linesize[1]+dst->linesize[2])*yu_h;
+    if (dst->getCapacity() != new_min_capacity)
+    {
+        dst->clean();
+        dst->data[0] = (unsigned char*) av_malloc(dst->m_capacity);
+    }
+    dst->data[1] = dst->data[0] + dst->linesize[0]*dst->height;
+    dst->data[2] = dst->data[1] + dst->linesize[1]*yu_h;
+    */
 
     int src_yu_h = src_height/chroma_v_factor;
 
-    if (factor == factor_2)
+    if (factor == factor_1) 
+    {
+        for (int i = 0; i < src_height; ++i) 
+            memcpy(dst->data[0] + i * dst->linesize[0], src->data[0] + i * src->linesize[0], src_width);
+        for (int i = 0; i < yu_h; ++i)
+            memcpy(dst->data[1] + i * dst->linesize[1], src->data[1] + i * src->linesize[1], src_width/chroma_h_factor);
+        for (int i = 0; i < yu_h; ++i)
+            memcpy(dst->data[2] + i * dst->linesize[2], src->data[2] + i * src->linesize[2], src_width/chroma_h_factor);
+    }
+    else if (factor == factor_2)
     {
 #ifdef WIN32
 		/*
@@ -385,9 +420,9 @@ void CLVideoDecoderOutput::downscale(const CLVideoDecoderOutput* src, CLVideoDec
 		int g = 0;
 		for (int i = 0; i < 1000; ++i)
 		{
-			downscalePlate_factor2_sse(dst->C1, src_width/2,   src->C1, src_width, src->stride1, src_height);
-			downscalePlate_factor2_sse(dst->C2, src_width/chroma_h_factor/2, src->C2, src_width/chroma_h_factor, src->stride2, src_yu_h);
-			downscalePlate_factor2_sse(dst->C3, src_width/chroma_h_factor/2, src->C3, src_width/chroma_h_factor, src->stride3, src_yu_h);
+			downscalePlate_factor2_sse(dst->data[0], src_width/2,   src->data[0], src_width, src->linesize[0], src_height);
+			downscalePlate_factor2_sse(dst->data[1], src_width/chroma_h_factor/2, src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h);
+			downscalePlate_factor2_sse(dst->data[2], src_width/chroma_h_factor/2, src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h);
 			g+=i;
 		}
 		int e1 = t1.elapsed();
@@ -396,9 +431,9 @@ void CLVideoDecoderOutput::downscale(const CLVideoDecoderOutput* src, CLVideoDec
 		t2.start();
 		for (int i = 0; i < 1000; ++i)
 		{
-			downscalePlate_factor2(dst->C1, src->C1, src_width, src->stride1, src_height);
-			downscalePlate_factor2(dst->C2, src->C2, src_width/chroma_h_factor, src->stride2, src_yu_h);
-			downscalePlate_factor2(dst->C3, src->C3, src_width/chroma_h_factor, src->stride3, src_yu_h);
+			downscalePlate_factor2(dst->data[0], src->data[0], src_width, src->linesize[0], src_height);
+			downscalePlate_factor2(dst->data[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h);
+			downscalePlate_factor2(dst->data[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h);
 			g+=i;
 		}
 		int e2 = t2.elapsed();
@@ -406,37 +441,37 @@ void CLVideoDecoderOutput::downscale(const CLVideoDecoderOutput* src, CLVideoDec
 		cl_log.log("scale factor 2. sse time:", e1, cl_logALWAYS);
 		cl_log.log("-------------------------",  g, cl_logALWAYS);
 		*/
-		downscalePlate_factor2_sse(dst->C1, dst->stride1,   src->C1, src_width, src->stride1, src_height);
-		downscalePlate_factor2_sse(dst->C2, dst->stride2, src->C2, src_width/chroma_h_factor, src->stride2, src_yu_h);
-		downscalePlate_factor2_sse(dst->C3, dst->stride3, src->C3, src_width/chroma_h_factor, src->stride3, src_yu_h);
+		downscalePlate_factor2_sse(dst->data[0], dst->linesize[0],   src->data[0], src_width, src->linesize[0], src_height);
+		downscalePlate_factor2_sse(dst->data[1], dst->linesize[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h);
+		downscalePlate_factor2_sse(dst->data[2], dst->linesize[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h);
 #else
-        downscalePlate_factor2(dst->C1, src->C1, src_width, src->stride1, src_height);
-        downscalePlate_factor2(dst->C2, src->C2, src_width/chroma_h_factor, src->stride2, src_yu_h);
-        downscalePlate_factor2(dst->C3, src->C3, src_width/chroma_h_factor, src->stride3, src_yu_h);
+        downscalePlate_factor2(dst->data[0], src->data[0], src_width, src->linesize[0], src_height);
+        downscalePlate_factor2(dst->data[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h);
+        downscalePlate_factor2(dst->data[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h);
 #endif
     }
     else if(factor == factor_4)
     {
 #ifdef WIN32
-        downscalePlate_factor4_sse(dst->C1, dst->stride1, src->C1, src_width, src->stride1, src->height);
-        downscalePlate_factor4_sse(dst->C2, dst->stride2, src->C2, src_width/chroma_h_factor, src->stride2, src_yu_h);
-        downscalePlate_factor4_sse(dst->C3, dst->stride3, src->C3, src_width/chroma_h_factor, src->stride3, src_yu_h);
+        downscalePlate_factor4_sse(dst->data[0], dst->linesize[0], src->data[0], src_width, src->linesize[0], src->height);
+        downscalePlate_factor4_sse(dst->data[1], dst->linesize[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h);
+        downscalePlate_factor4_sse(dst->data[2], dst->linesize[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h);
 #else
-        downscalePlate_factor4(dst->C1, src->C1, src_width, src->stride1, src->height);
-        downscalePlate_factor4(dst->C2, src->C2, src_width/chroma_h_factor, src->stride2, src_yu_h);
-        downscalePlate_factor4(dst->C3, src->C3, src_width/chroma_h_factor, src->stride3, src_yu_h);
+        downscalePlate_factor4(dst->data[0], src->data[0], src_width, src->linesize[0], src->height);
+        downscalePlate_factor4(dst->data[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h);
+        downscalePlate_factor4(dst->data[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h);
 #endif
     }
     else if(factor == factor_8)
     {
 #ifdef WIN32
-        downscalePlate_factor8_sse(dst->C1, dst->stride1, src->C1, src_width, src->stride1, src->height);
-        downscalePlate_factor8_sse(dst->C2, dst->stride2, src->C2, src_width/chroma_h_factor, src->stride2, src_yu_h);
-        downscalePlate_factor8_sse(dst->C3, dst->stride3, src->C3, src_width/chroma_h_factor, src->stride3, src_yu_h);
+        downscalePlate_factor8_sse(dst->data[0], dst->linesize[0], src->data[0], src_width, src->linesize[0], src->height);
+        downscalePlate_factor8_sse(dst->data[1], dst->linesize[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h);
+        downscalePlate_factor8_sse(dst->data[2], dst->linesize[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h);
 #else
-        downscalePlate_factor8(dst->C1, src->C1, src_width, src->stride1, src->height);
-        downscalePlate_factor8(dst->C2, src->C2, src_width/chroma_h_factor, src->stride2, src_yu_h);
-        downscalePlate_factor8(dst->C3, src->C3, src_width/chroma_h_factor, src->stride3, src_yu_h);
+        downscalePlate_factor8(dst->data[0], src->data[0], src_width, src->linesize[0], src->height);
+        downscalePlate_factor8(dst->data[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h);
+        downscalePlate_factor8(dst->data[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h);
 #endif
     }
 }
@@ -516,18 +551,18 @@ void CLVideoDecoderOutput::downscalePlate_factor8(unsigned char* dst, const unsi
 
 bool CLVideoDecoderOutput::imagesAreEqual(const CLVideoDecoderOutput* img1, const CLVideoDecoderOutput* img2, unsigned int max_diff)
 {
-    if (img1->width!=img2->width || img1->height!=img2->height || img1->out_type != img2->out_type) 
+    if (img1->width!=img2->width || img1->height!=img2->height || img1->format != img2->format) 
         return false;
 
-    if (!equalPlanes(img1->C1, img2->C1, img1->width, img1->stride1, img2->stride1, img1->height, max_diff))
+    if (!equalPlanes(img1->data[0], img2->data[0], img1->width, img1->linesize[0], img2->linesize[0], img1->height, max_diff))
         return false;
 
-    int uv_h = img1->out_type == PIX_FMT_YUV420P ? img1->height/2 : img1->height;
+    int uv_h = img1->format == PIX_FMT_YUV420P ? img1->height/2 : img1->height;
 
-    if (!equalPlanes(img1->C2, img2->C2, img1->width/2, img1->stride2, img2->stride2, uv_h, max_diff))
+    if (!equalPlanes(img1->data[1], img2->data[1], img1->width/2, img1->linesize[1], img2->linesize[1], uv_h, max_diff))
         return false;
 
-    if (!equalPlanes(img1->C3, img2->C3, img1->width/2, img1->stride3, img2->stride3, uv_h, max_diff))
+    if (!equalPlanes(img1->data[2], img2->data[2], img1->width/2, img1->linesize[2], img2->linesize[2], uv_h, max_diff))
         return false;
 
     return true;
@@ -585,27 +620,27 @@ void CLVideoDecoderOutput::saveToFile(const char* filename)
     if (!out) return;
 
     //Y
-    unsigned char* p = C1;
+    unsigned char* p = data[0];
     for (int i = 0; i < height; ++i)
     {
         fwrite(p, 1, width, out);
-        p+=stride1;
+        p+=linesize[0];
     }
 
     //U
-    p = C2;
+    p = data[1];
     for (int i = 0; i < height/2; ++i)
     {
         fwrite(p, 1, width/2, out);
-        p+=stride2;
+        p+=linesize[1];
     }
 
     //V
-    p = C3;
+    p = data[2];
     for (int i = 0; i < height/2; ++i)
     {
         fwrite(p, 1, width/2, out);
-        p+=stride3;
+        p+=linesize[2];
     }
 
 }

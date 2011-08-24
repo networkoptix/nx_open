@@ -7,6 +7,8 @@ class CLAbstractVideoDecoder;
 struct CLCompressedVideoData;
 class CLAbstractRenderer;
 
+static const int MAX_FRAME_QUEUE_SIZE = 2;
+
 /**
   * Display one video stream. Decode the video and pass it to video window.
   */
@@ -20,7 +22,6 @@ public:
                 CLVideoDecoderOutput::downscale_factor force_factor = CLVideoDecoderOutput::factor_any);
 
     void setLightCPUMode(bool val);
-    void copyImage(bool copy);
 
     CLVideoDecoderOutput::downscale_factor getCurrentDownscaleFactor() const;
 
@@ -29,12 +30,18 @@ private:
     QMutex m_mtx;
     QMap<CodecID, CLAbstractVideoDecoder*> m_decoder;
 
-    CLAbstractRenderer* m_draw;
+    CLAbstractRenderer* m_drawer;
 
     /**
       * to reduce image size for weak video cards 
       */
-    CLVideoDecoderOutput m_outFrame;
+
+    AVFrame *m_frameRGBA;
+    //CLVideoDecoderOutput m_outFrame;
+
+    //CLVideoDecoderOutput m_tmpFrame;
+    CLVideoDecoderOutput m_frameQueue[MAX_FRAME_QUEUE_SIZE];
+    int m_frameQueueIndex;
 
     bool m_lightCPUmode;
     bool m_canDownscale;
@@ -43,18 +50,25 @@ private:
     CLVideoDecoderOutput::downscale_factor m_scaleFactor;
     QSize m_previousOnScreenSize;
 
-    AVFrame *m_frameYUV;
     quint8* m_buffer;
     SwsContext *m_scaleContext;
     int m_outputWidth;
     int m_outputHeight;
-
+    bool m_enableFrameQueue;
+    bool m_queueUsed;
 private:
     bool allocScaleContext(const CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);
     void freeScaleContext();
-    bool rescaleFrame(CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);
+    bool rescaleFrame(const CLVideoDecoderOutput& srcFrame, CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);
+
     CLVideoDecoderOutput::downscale_factor findScaleFactor(int width, int height, int fitWidth, int fitHeight);
-    CLVideoDecoderOutput::downscale_factor determineScaleFactor(CLCompressedVideoData* data, const CLVideoData& img, CLVideoDecoderOutput::downscale_factor force_factor);
+    CLVideoDecoderOutput::downscale_factor determineScaleFactor(
+        CLCompressedVideoData* data, 
+        int srcWidth, 
+        int srcHeight, 
+        CLVideoDecoderOutput::downscale_factor force_factor);
+    void waitUndisplayedFrames(int channelNumber);
+    void waitFrame(int i, int channelNumber);
 };
 
 #endif //videostreamdisplay_h_2044

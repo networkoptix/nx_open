@@ -27,7 +27,8 @@ public:
 
     static int getMaxTextureSize();
 
-    void draw(CLVideoDecoderOutput &image, unsigned int channel);
+    void draw(CLVideoDecoderOutput* image, unsigned int channel);
+    virtual void waitForFrameDisplayed(int channel);
 
     bool paintEvent(const QRect &r);
 
@@ -41,7 +42,6 @@ public:
 
     void applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation);
 
-    void copyVideoDataBeforePainting(bool copy);
     static bool isPixelFormatSupported(PixelFormat pixfmt);
 
 private:
@@ -106,16 +106,16 @@ private:
 
     bool m_textureUploaded;
 
-    int m_stride, // in memorry
-        m_width, // visible width
-        m_height,
+    //int m_stride, // in memorry
+    //    m_width, // visible width
+    //    m_height,
 
-        m_stride_old,
-        m_height_old;
+    int m_stride_old;
+    int m_height_old;
 
-    unsigned char *m_arrayPixels[3];
+    //unsigned char *m_arrayPixels[3];
 
-    PixelFormat m_color, m_color_old;
+    PixelFormat m_color_old;
 
     float m_videoCoeffL[4];
     float m_videoCoeffW[4];
@@ -129,18 +129,19 @@ private:
     qreal m_saturation;
     qreal m_painterOpacity;
 
-    mutable QMutex m_mutex; // to avoid call paintEvent() more than once at the same time
-    QWaitCondition m_waitCon;
     bool m_gotnewimage;
 
     bool m_needwait;
 
     CLVideoWindowItem *const m_videowindow;
 
-    CLVideoDecoderOutput m_image;
-    bool m_abort_drawing;
+    //CLVideoDecoderOutput m_image;
+    //QQueue<CLVideoDecoderOutput*> m_imageList;
 
-    bool m_do_not_need_to_wait_any_more;
+    CLVideoDecoderOutput* m_curImg;
+    //bool m_abort_drawing;
+
+    //bool m_do_not_need_to_wait_any_more;
 
     bool m_inited;
 

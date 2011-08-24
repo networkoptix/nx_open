@@ -72,7 +72,7 @@ void CLFFmpegVideoDecoder::closeDecoder()
     m_decoderContext.close();
 #endif
 
-	av_free(frame);
+	av_free(m_frame);
 	av_free(m_deinterlaceBuffer);
 	av_free(m_deinterlacedFrame);
 	av_free(c);
@@ -99,7 +99,7 @@ void CLFFmpegVideoDecoder::openDecoder()
     }
 #endif
 
-	frame = avcodec_alloc_frame();
+	m_frame = avcodec_alloc_frame();
 	m_deinterlacedFrame = avcodec_alloc_frame();
 
 	//if(m_codec->capabilities&CODEC_CAP_TRUNCATED)	c->flags|= CODEC_FLAG_TRUNCATED;
@@ -118,9 +118,7 @@ void CLFFmpegVideoDecoder::openDecoder()
     }
 
 	int numBytes = avpicture_get_size(PIX_FMT_YUV420P, c->width, c->height);
-
 	m_deinterlaceBuffer = (quint8*)av_malloc(numBytes * sizeof(quint8));
-
 	avpicture_fill((AVPicture *)m_deinterlacedFrame, m_deinterlaceBuffer, PIX_FMT_YUV420P, c->width, c->height);
 
 //	avpicture_fill((AVPicture *)picture, m_buffer, PIX_FMT_YUV420P, c->width, c->height);
@@ -145,7 +143,7 @@ void CLFFmpegVideoDecoder::resetDecoder()
 }
 //The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than the actual read bytes because some optimized bitstream readers read 32 or 64 bits at once and could read over the end.
 //The end of the input buffer buf should be set to 0 to ensure that no overreading happens for damaged MPEG streams.
-bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
+bool CLFFmpegVideoDecoder::decode(const CLVideoData& data, CLVideoDecoderOutput* outFrame)
 {
 
 
@@ -183,41 +181,7 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 		}
 	}
 
-	/*
-	if ((data.!=m_width)||(height!=m_height))
-	{
-		m_width = width;
-		m_height = height;
-
-    }
-    */
-
-    /*
-
-	FILE * f = fopen("test.264_", "ab");
-	fwrite(data.inbuf,1,data.buff_len,f);
-	fclose(f);
-
-	static int fn = 0;
-	QString filename = "frame";
-	filename+=QString::number(fn);
-	filename+=".264";
-
-	FILE * f2 = fopen(filename.toLatin1(), "wb");
-	fwrite(data.inbuf,1,data.buff_len,f2);
-	fclose(f2);
-	fn++;
-
-	*/
-
-	// XXX: DEBUG
-
 	bool needResetCodec = false;
-
-    //if (m_lastWidth != 0 && m_lastWidth != data.width)
-    //{
-    //    needResetCodec = true;
-    //}
 
 #ifdef _USE_DXVA
     if (m_decoderContext.isHardwareAcceleration() && !isHardwareAccellerationPossible(data.codec, data.width, data.height))
@@ -232,7 +196,6 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
         needResetCodec = true;
     }
 #endif
-
 
     if(needResetCodec)
     {
@@ -253,39 +216,45 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
     // HACK for CorePNG to decode as normal PNG by default
     avpkt.flags = AV_PKT_FLAG_KEY;
 
-
     int got_picture = 0;
-    avcodec_decode_video2(c, frame, &got_picture, &avpkt);
+    if (!outFrame->getUseExternalData() && 
+        (outFrame->width != c->width || outFrame->height != c->height || outFrame->format != c->pix_fmt))
+    {
+        outFrame->clean();
+        int numBytes = avpicture_get_size(c->pix_fmt, c->width, c->height);
+        avpicture_fill((AVPicture*) outFrame, (quint8*) av_malloc(numBytes), c->pix_fmt, c->width, c->height);
+        outFrame->width = c->width, 
+        outFrame->height = c->height;
+    }
 
+    avcodec_decode_video2(c, m_frame, &got_picture, &avpkt);
     if (data.useTwice)
-        avcodec_decode_video2(c, frame, &got_picture, &avpkt);
+        avcodec_decode_video2(c, m_frame, &got_picture, &avpkt);
 
 	if (got_picture )
 	{
-		AVFrame* outputFrame;
-		if (frame->interlaced_frame && m_mtDecoding)
+        AVFrame* copyFromFrame = m_frame;
+		//AVFrame* outputFrame;
+		if (m_frame->interlaced_frame && m_mtDecoding)
 		{
-			if (avpicture_deinterlace((AVPicture*)m_deinterlacedFrame, (AVPicture*) frame, c->pix_fmt, c->width, c->height) == 0)
-			{
-				outputFrame = m_deinterlacedFrame;
-			}
-			else
-			{
-				outputFrame = frame;
-			}
-
+            if (outFrame->getUseExternalData())
+            {
+			    if (avpicture_deinterlace((AVPicture*)m_deinterlacedFrame, (AVPicture*) m_frame, c->pix_fmt, c->width, c->height) == 0)
+                    copyFromFrame = m_deinterlacedFrame;
+            }
+            else
+                avpicture_deinterlace((AVPicture*) outFrame, (AVPicture*) m_frame, c->pix_fmt, c->width, c->height);
 		}
-		else
-		{
-			outputFrame = frame;
-		}
-
+        else {
+            if (!outFrame->getUseExternalData())
+                av_picture_copy((AVPicture*) outFrame, (AVPicture*) (m_frame), c->pix_fmt, c->width, c->height);
+        }
 
         m_lastWidth = data.width;
 #ifdef _USE_DXVA
         if (m_decoderContext.isHardwareAcceleration())
         {
-            m_decoderContext.extract(frame);
+            m_decoderContext.extract(m_frame);
         }
 #endif
 
@@ -302,58 +271,38 @@ bool CLFFmpegVideoDecoder::decode(CLVideoData& data)
 
 		//if (m_showmotion)
 		//	ff_print_debug_info((MpegEncContext*)(c->priv_data), picture);
-
-		data.outFrame.width = c->width;
-		data.outFrame.height = c->height;
-
-		data.outFrame.C1 = outputFrame->data[0];
-		data.outFrame.C2 = outputFrame->data[1];
-		data.outFrame.C3 = outputFrame->data[2];
-
-		data.outFrame.stride1 = outputFrame->linesize[0];
-		data.outFrame.stride2 = outputFrame->linesize[1];
-		data.outFrame.stride3 = outputFrame->linesize[2];
-
-        if (c->pix_fmt == PIX_FMT_NONE)
-            return false;
-
-        // Filter deprecated pixel formats
-        switch(c->pix_fmt)
+        if (outFrame->getUseExternalData())
         {
-        case PIX_FMT_YUVJ420P:
-            data.outFrame.out_type = PIX_FMT_YUV420P;
-            break;
+		    outFrame->width = c->width;
+		    outFrame->height = c->height;
 
-        case PIX_FMT_YUVJ422P:
-            data.outFrame.out_type = PIX_FMT_YUV422P;
-            break;
+		    outFrame->data[0] = copyFromFrame->data[0];
+		    outFrame->data[1] = copyFromFrame->data[1];
+		    outFrame->data[2] = copyFromFrame->data[2];
 
-        case PIX_FMT_YUVJ444P:
-            data.outFrame.out_type = PIX_FMT_YUV444P;
-            break;
-
-        default:
-            data.outFrame.out_type = c->pix_fmt;
+		    outFrame->linesize[0] = copyFromFrame->linesize[0];
+		    outFrame->linesize[1] = copyFromFrame->linesize[1];
+		    outFrame->linesize[2] = copyFromFrame->linesize[2];
         }
-
-
-		return true;
+        outFrame->format = GetPixelFormat();
+		return c->pix_fmt != PIX_FMT_NONE;
 	}
-	else
-	{
-		/*/
-		// some times decoder wants to delay frame by one; we do not want that
-		avcodec_decode_video(c, picture, &got_picture,0, 0);
-		if (got_picture)
-			goto gotpicture;
+    return false; // no picture decoded at current step
+}
 
-		*/
-
-		//cl_log.log("cannot decode image", cl_logWARNING);
-
-		return false;
-	}
-
+PixelFormat CLFFmpegVideoDecoder::GetPixelFormat()
+{
+    // Filter deprecated pixel formats
+    switch(c->pix_fmt)
+    {
+    case PIX_FMT_YUVJ420P:
+        return PIX_FMT_YUV420P;
+    case PIX_FMT_YUVJ422P:
+        return PIX_FMT_YUV422P;
+    case PIX_FMT_YUVJ444P:
+        return PIX_FMT_YUV444P;
+    }
+    return c->pix_fmt;
 }
 
 void CLFFmpegVideoDecoder::setLightCpuMode(bool val)

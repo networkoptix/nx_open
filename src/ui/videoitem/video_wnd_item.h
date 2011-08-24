@@ -21,7 +21,9 @@ public:
 	CLVideoWindowItem(GraphicsView *view, const CLDeviceVideoLayout *layout, int max_width, int max_height, QString name = QString());
 	virtual ~CLVideoWindowItem();
 
-	void draw(CLVideoDecoderOutput& image, unsigned int channel);
+	virtual void draw(CLVideoDecoderOutput* image, unsigned int channel);
+    virtual void waitForFrameDisplayed(int channel);
+
 
 	CLVideoCamera* getVideoCam() const;
 	float aspectRatio() const;
@@ -43,8 +45,6 @@ public:
 	}
 
 	virtual bool isZoomable() const;
-
-	void copyVideoDataBeforePainting(bool copy);
 
 	virtual void setItemSelected(bool sel, bool animate = true, int delay = 0);
 
