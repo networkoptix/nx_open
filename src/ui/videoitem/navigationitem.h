@@ -2,7 +2,6 @@
 #define NAVIGATIONITEM_H
 
 #include "unmoved/unmoved_interactive_opacity_item.h"
-#include "volumewidget.h"
 
 class QTimerEvent;
 class CLVideoCamera;
@@ -14,7 +13,7 @@ class MyTextItem;
 class MyLable : public QLabel
 {
 protected:
-    void wheelEvent ( QWheelEvent * event ){}; // to avoid scene move up and down
+    void wheelEvent(QWheelEvent *) {} // to avoid scene move up and down
 };
 
 class MyButton : public QAbstractButton
@@ -41,7 +40,7 @@ protected:
             p.drawPixmap(contentsRect(), m_checkedPixmap);
     }
 
-    void wheelEvent ( QWheelEvent * event ){}; // to avoid scene move up and down
+    void wheelEvent(QWheelEvent *) {} // to avoid scene move up and down
 
 private:
     QPixmap m_pixmap;
@@ -60,10 +59,7 @@ public:
     QLabel *label() const;
 
 protected:
-    void wheelEvent ( QWheelEvent * event )
-    {
-
-    };
+    void wheelEvent(QWheelEvent *) {} // to avoid scene move up and down
 
 signals:
     void rewindBackward();

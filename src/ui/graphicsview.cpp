@@ -1,10 +1,11 @@
 #include "graphicsview.h"
-#include "./base/log.h"
-#include "./video_cam_layout/videocamlayout.h"
-#include "../base/rand.h"
+
+#include "base/log.h"
+#include "video_cam_layout/videocamlayout.h"
+#include "base/rand.h"
 #include "camera/camera.h"
 #include "mainwnd.h"
-#include "./animation/animated_bgr.h"
+#include "animation/animated_bgr.h"
 #include "settings.h"
 #include "device_settings/dlg_factory.h"
 #include "device_settings/device_settings_dlg.h"
@@ -28,13 +29,15 @@
 #include "videoitem/unmoved/multipage/page_selector.h"
 #include "ui/animation/property_animation.h"
 #include "ui/recordingsettingswidget.h"
+#include "ui/dialogs/tagseditdialog.h"
 #include "videorecordersettings.h"
 
+#include <QtCore/QPropertyAnimation>
 #include <QtCore/QSettings>
+#include <QtCore/QTimer>
+
 #include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
-#include <QTimer>
-#include <QPropertyAnimation>
 
 #ifdef Q_OS_WIN
 #include <QtCore/QProcess>
@@ -395,7 +398,7 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
 
     if (m_navigationItem && ( m_navigationItem->mouseOver() || m_navigationItem->isActive()))
     {
-        // scene should not be zoomed if mouse is over time slider or if time slider is active 
+        // scene should not be zoomed if mouse is over time slider or if time slider is active
 
         if (!m_navigationItem->mouseOver() && m_navigationItem->isActive())
             return; // if mouse is not over time line but time line is still active event must be ignored
@@ -712,7 +715,7 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 
     if (m_navigationItem && !m_navigationItem->mouseOver() && m_navigationItem->isActive())
     {
-        // we've got time line; muose is not over timeline. timeline is still active 
+        // we've got time line; muose is not over timeline. timeline is still active
         m_navigationItem->setActive(false);
         return;
     }
@@ -1276,6 +1279,8 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
     {
         if (aitem->getType() == CLAbstractSceneItem::VIDEO)
         {
+            menu.addAction(&cm_editTags);
+
             // video item
             menu.addAction(&cm_fullscren);
             menu.addAction(&cm_remove_from_layout);
@@ -1549,6 +1554,16 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
             if (act==&cm_fullscren)
                 toggleFullScreen_helper(aitem);
+
+            if (act == &cm_editTags)
+            {
+                TagsEditDialog dialog(dev->getUniqueId());
+                dialog.setModal(true);
+
+                connect(aitem, SIGNAL(destroyed()), &dialog, SLOT(reject()));
+
+                dialog.exec();
+            }
 
             if (act==&cm_settings && dev)
                 show_device_settings_helper(dev);

@@ -48,7 +48,7 @@ protected:
 	bool isDeviceMeetCriteria(const CLDeviceCriteria& cr, CLDevice* dev) const;
 
 	void addArchiver(QString id);
-    bool match_subfilter(QString dec, QString fltr) const;
+    bool match_subfilter(CLDevice* dev, QString fltr) const;
 
     void getResultFromDirBrowser();
 

@@ -14,6 +14,7 @@
 #include "device_plugins/archive/abstract_archive_stream_reader.h"
 #include "util.h"
 #include "../widgets/imagebuttonitem.h"
+#include "volumewidget.h"
 
 class MyTextItem: public QGraphicsItem
 {

@@ -1,7 +1,8 @@
 #include "volumewidget.h"
 
-#include <QPushButton>
-#include <QHBoxLayout>
+#include <QtGui/QHBoxLayout>
+#include <QtGui/QPushButton>
+
 #include "../../openal/qtvaudiodevice.h"
 #include "timeslider.h"
 
@@ -26,27 +27,27 @@ void MyVolumeSlider::paintEvent(QPaintEvent *)
     p.fillRect(1, (height() - gradHeigth)/2, handlePos+1, gradHeigth, linearGrad);
 }
 
+
 VolumeWidget::VolumeWidget(QWidget *parent) :
-    QWidget(parent),
-    m_slider(new MyVolumeSlider),
-    m_button(new MyButton)
+    QWidget(parent)
 {
-    m_slider->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
+    m_slider = new MyVolumeSlider;
+    m_slider->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     m_slider->setValue(50);
     m_slider->setStyle(SliderProxyStyle::instance());
 
+    m_button = new MyButton;
     m_button->setPixmap(QPixmap(":/skin/unmute.png"));
     m_button->setCheckedPixmap(QPixmap(":/skin/mute.png"));
-    m_button->setMinimumSize(20,20);
+    m_button->setMinimumSize(20, 20);
     m_button->setCheckable(true);
+    m_button->installEventFilter(this);
 
     QHBoxLayout *layout = new QHBoxLayout;
     layout->setContentsMargins(20, 0, 20, 0);
     layout->setSpacing(3);
     layout->addWidget(m_button);
     layout->addWidget(m_slider);
-    setFixedSize(144, 36);
-
     setLayout(layout);
 
     float volume = QtvAudioDevice::instance().volume();
@@ -55,6 +56,21 @@ VolumeWidget::VolumeWidget(QWidget *parent) :
 
     connect(m_slider, SIGNAL(valueChanged(int)), SLOT(onValueChanged(int)));
     connect(m_button, SIGNAL(toggled(bool)), SLOT(onButtonChecked()));
+
+    setFixedSize(144, 36);
+}
+
+bool VolumeWidget::eventFilter(QObject *watched, QEvent *event)
+{
+    if (watched == m_button && event->type() == QEvent::Wheel)
+    {
+        QWheelEvent *wheelEvent = static_cast<QWheelEvent *>(event);
+        QWheelEvent *newEvent = new QWheelEvent(wheelEvent->pos(), wheelEvent->globalPos(), wheelEvent->delta(), wheelEvent->buttons(), wheelEvent->modifiers(), wheelEvent->orientation());
+        QCoreApplication::postEvent(m_slider, newEvent);
+        return true;
+    }
+
+    return QWidget::eventFilter(watched, event);
 }
 
 void VolumeWidget::paintEvent(QPaintEvent *)

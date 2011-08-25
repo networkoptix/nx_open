@@ -9,6 +9,7 @@
 #include "device_plugins/archive/avi_files/avi_bluray_device.h"
 #include "../file_device.h"
 #include "device_plugins/archive/filetypesupport.h"
+#include "base/tagmanager.h"
 
 // Init static variables
 CLDeviceManager* CLDeviceManager::m_Instance = 0;
@@ -301,16 +302,13 @@ bool CLDeviceManager::isDeviceMeetCriteria(const CLDeviceCriteria& cr, CLDevice*
 		if (cr.filter().length()==0)
 			return false;
 
-
-        QString dev_string = dev->toString();
-
         bool matches = false;
 
         QStringList serach_list = cr.filter().split(QLatin1Char('+'), QString::SkipEmptyParts);
         foreach (const QString &sub_filter, serach_list)
         {
             if (serach_list.count()<2 || sub_filter.length()>2)
-                matches |= match_subfilter(dev_string, sub_filter);
+                matches |= match_subfilter(dev, sub_filter);
         }
 
         return matches;
@@ -330,17 +328,18 @@ void CLDeviceManager::addArchiver(QString id)
 
 //=========================================
 
-bool CLDeviceManager::match_subfilter(QString dev, QString fltr) const
+bool CLDeviceManager::match_subfilter(CLDevice* dev, QString fltr) const
 {
+    QStringList deviceTags = TagManager::objectTags(dev->getUniqueId());
+
     QStringList serach_list = fltr.split(QLatin1Char(' '), QString::SkipEmptyParts);
     foreach(const QString &str, serach_list)
     {
-        if (!dev.contains(str, Qt::CaseInsensitive))
+        if (!dev->toString().contains(str, Qt::CaseInsensitive) && !deviceTags.contains(str, Qt::CaseInsensitive))
             return false;
     }
 
     return !serach_list.isEmpty();
-
 }
 
 

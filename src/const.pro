@@ -104,5 +104,5 @@ PRECOMPILED_SOURCE = $$PWD/StdAfx.cpp
 DEFINES += __STDC_CONSTANT_MACROS
 
 RESOURCES += mainwnd.qrc ../build/skin.qrc
-FORMS += mainwnd.ui preferences.ui licensekey.ui recordingsettings.ui
+FORMS += mainwnd.ui preferences.ui licensekey.ui recordingsettings.ui ui/dialogs/tagseditdialog.ui
 
