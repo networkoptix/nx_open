@@ -1,5 +1,6 @@
 #include "tagmanager.h"
 
+#include <QtCore/QHash>
 #include <QtCore/QMap>
 #include <QtCore/QMutex>
 
@@ -9,7 +10,7 @@
 #define TAGS_FILENAME "tags.txt"
 
 typedef QMap<QString, int> TagsMap;
-typedef QMap<QString, QStringList> ObjectTagsMap;
+typedef QHash<QString, QStringList> ObjectTagsMap;
 
 class TagManagerPrivate : public TagManager
 {
@@ -30,12 +31,13 @@ public:
 
 void TagManagerPrivate::load()
 {
-    QFile file(getDataDirectory() + QLatin1Char('/') + QLatin1String(TAGS_FILENAME));
+    const QString fileName = getDataDirectory() + QLatin1Char('/') + QLatin1String(TAGS_FILENAME);
+    QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly))
         return;
 
     QTextStream stream(&file);
-    for (;;)
+    while (!stream.atEnd())
     {
         QString line = stream.readLine().trimmed();
         if (line.isEmpty())
@@ -68,7 +70,8 @@ void TagManagerPrivate::load()
 
 void TagManagerPrivate::save()
 {
-    QFile file(getDataDirectory() + QLatin1Char('/') + QLatin1String(TAGS_FILENAME));
+    const QString fileName = getDataDirectory() + QLatin1Char('/') + QLatin1String(TAGS_FILENAME);
+    QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly))
         return;
 
@@ -101,7 +104,7 @@ QStringList TagManager::objectTags(const QString &object)
     return manager->m_objectTags.value(object);
 }
 
-void TagManager::addObjectTag(const QString& object, const QString& tag)
+void TagManager::addObjectTag(const QString &object, const QString &tag)
 {
     if (tag.trimmed().isEmpty())
         return;
@@ -128,7 +131,7 @@ void TagManager::addObjectTag(const QString& object, const QString& tag)
     manager->save();
 }
 
-void TagManager::removeObjectTag(const QString& object, const QString& tag)
+void TagManager::removeObjectTag(const QString &object, const QString &tag)
 {
     if (tag.trimmed().isEmpty())
         return;

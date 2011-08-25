@@ -27,24 +27,10 @@ class QnPageSelector;
 
 class DesktopFileEncoder;
 
-// Temporary code. Do not review.
-class MyFrame : public QFrame
-{
-Q_OBJECT
-public:
-    MyFrame(CLDevice* device);
-
-private:
-    CLDevice* m_device;
-    QLineEdit *line;
-
-private slots:
-    void addTag();
-};
-
-class GraphicsView: public QGraphicsView 
+class GraphicsView: public QGraphicsView
 {
     Q_OBJECT
+
 public:
     enum ViewMode{NormalView, ItemsDonor, ItemsAcceptor};
 
@@ -242,7 +228,7 @@ protected:
     qreal m_old_distance;
 
     bool mViewStarted;
-    bool mWheelZooming; // this var is to avoid wheel zooming scene center shifts. 
+    bool mWheelZooming; // this var is to avoid wheel zooming scene center shifts.
 
     //====decoration======
     QList<CLAbstractUnmovedItem*> m_staticItems;

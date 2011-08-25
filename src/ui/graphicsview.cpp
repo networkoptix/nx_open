@@ -1,10 +1,11 @@
 #include "graphicsview.h"
-#include "./base/log.h"
-#include "./video_cam_layout/videocamlayout.h"
-#include "../base/rand.h"
+
+#include "base/log.h"
+#include "video_cam_layout/videocamlayout.h"
+#include "base/rand.h"
 #include "camera/camera.h"
 #include "mainwnd.h"
-#include "./animation/animated_bgr.h"
+#include "animation/animated_bgr.h"
 #include "settings.h"
 #include "device_settings/dlg_factory.h"
 #include "device_settings/device_settings_dlg.h"
@@ -28,14 +29,15 @@
 #include "videoitem/unmoved/multipage/page_selector.h"
 #include "ui/animation/property_animation.h"
 #include "ui/recordingsettingswidget.h"
+#include "ui/dialogs/tagseditdialog.h"
 #include "videorecordersettings.h"
-#include "base/tagmanager.h"
 
+#include <QtCore/QPropertyAnimation>
 #include <QtCore/QSettings>
+#include <QtCore/QTimer>
+
 #include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
-#include <QTimer>
-#include <QPropertyAnimation>
 
 #ifdef Q_OS_WIN
 #include <QtCore/QProcess>
@@ -1200,41 +1202,6 @@ void GraphicsView::mouseReleaseEvent(QMouseEvent * event)
     QGraphicsView::mouseReleaseEvent(event);
 }
 
-// Temporary code. Do not review.
-void MyFrame::addTag()
-{
-    TagManager::addObjectTag(m_device->getUniqueId(), line->text());
-
-    close();
-    destroy();
-}
-
-MyFrame::MyFrame(CLDevice* device)
-    : m_device(device)
-{
-    setWindowTitle("Tag");
-
-    QHBoxLayout *layout = new QHBoxLayout(this);
-
-    // Add some widgets.
-    line = new QLineEdit();
-
-    QPushButton *hello = new QPushButton(this);
-    hello->setText("Add");
-    hello->resize(150, 25);
-    hello->setFont(QFont("Droid Sans Mono", 12, QFont::Normal));
-
-    // Add the widgets to the layout.
-    layout->addWidget(line);
-    layout->addWidget(hello);
-
-    line->setFocus();
-
-    QObject::connect(hello, SIGNAL(clicked()), this, SLOT(addTag()));
-    QObject::connect(line, SIGNAL(returnPressed()), this, SLOT(addTag()));
-
-}
-
 void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 {
     if (!mViewStarted)
@@ -1588,21 +1555,6 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
             if (act==&cm_fullscren)
                 toggleFullScreen_helper(aitem);
-
-            if (act == &cm_listTags)
-            {
-                QStringList tags = TagManager::objectTags(dev->getUniqueId());
-
-                UIOKMessage(this, "Tags", "Tags: " + tags.join(","));
-            }
-
-            if (act == &cm_addTag)
-            {
-                // Temporary code. Should have more intuitive UI. Probably no popup dialogs at all.
-                MyFrame *myframe = new MyFrame(dev);
-                myframe->show();
-            }
-
 
             if (act==&cm_settings && dev)
                 show_device_settings_helper(dev);
