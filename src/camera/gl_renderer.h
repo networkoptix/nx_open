@@ -145,6 +145,8 @@ private:
     //bool m_do_not_need_to_wait_any_more;
 
     bool m_inited;
+    int m_videoWidth;
+    int m_videoHeight;
 
     static QVector<uchar> m_staticYFiller;
     static QVector<uchar> m_staticUVFiller;

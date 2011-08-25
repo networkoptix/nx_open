@@ -146,7 +146,10 @@ CLGLRenderer::CLGLRenderer(CLVideoWindowItem *vw) :
     m_needwait(true),
     m_videowindow(vw),
     m_inited(false),
-    m_curImg(0)
+    m_curImg(0),
+    m_videoWidth(0),
+    m_videoHeight(0)
+
 {
     applyMixerSettings(m_brightness, m_contrast, m_hue, m_saturation);
 
@@ -832,16 +835,16 @@ bool CLGLRenderer::paintEvent(const QRect &r)
         init(gl_status == CL_GL_NOT_TESTED);
         m_inited = true;
     }
-    bool draw = false;
+
     {
         QMutexLocker locker(&m_displaySync);
-        if (m_curImg == 0 || m_curImg->linesize[0] == 0)
-            return true;
-        draw = (m_curImg->width <= getMaxTextureSize() && m_curImg->height <= getMaxTextureSize());
-        if (draw && m_gotnewimage)
+        if (m_gotnewimage && m_curImg && m_curImg->linesize[0]) {
+            m_videoWidth = m_curImg->width;
+            m_videoHeight = m_curImg->height;
             updateTexture();
+        }
     }
-
+    bool draw = m_videoWidth > 0 && m_videoHeight > 0 && m_videoWidth <= getMaxTextureSize() && m_videoHeight <= getMaxTextureSize();
     if (draw)
     {
         QRect temp(r);
@@ -850,7 +853,8 @@ bool CLGLRenderer::paintEvent(const QRect &r)
     }
 
     QMutexLocker locker(&m_displaySync);
-    m_curImg->setDisplaying(false);
+    if (m_curImg)
+        m_curImg->setDisplaying(false);
     m_waitCon.wakeAll();
     return draw;
 }

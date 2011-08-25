@@ -18,7 +18,8 @@ CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale) :
     m_outputHeight(0),
     m_frameQueueIndex(0),
     m_enableFrameQueue(false),
-    m_queueUsed(false)
+    m_queueUsed(false),
+    m_needReinitDecoders(false)
 {
 }
 
@@ -157,6 +158,12 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
             m_frameQueue[i].clean();
         m_queueUsed = false;
     }
+    if (m_needReinitDecoders) {
+        QMutexLocker _lock(&m_mtx);
+        foreach(CLAbstractVideoDecoder* decoder, m_decoder)
+            decoder->setMTDecoding(enableFrameQueue);
+        m_needReinitDecoders = false;
+    }
 
     CLVideoDecoderOutput m_tmpFrame;
     m_tmpFrame.setUseExternalData(true);
@@ -291,11 +298,6 @@ CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::findScaleFactor(int
 
 void CLVideoStreamDisplay::setMTDecoding(bool value)
 {
-    QMutexLocker _lock(&m_mtx);
-
-    foreach(CLAbstractVideoDecoder* decoder, m_decoder)
-    {
-        decoder->setMTDecoding(value);
-    }
     m_enableFrameQueue = value;
+    m_needReinitDecoders = true;
 }

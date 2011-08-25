@@ -57,6 +57,7 @@ private:
     int m_outputHeight;
     bool m_enableFrameQueue;
     bool m_queueUsed;
+    bool m_needReinitDecoders;
 private:
     bool allocScaleContext(const CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);
     void freeScaleContext();
