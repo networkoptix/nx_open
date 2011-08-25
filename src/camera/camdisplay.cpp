@@ -44,6 +44,7 @@ static const qint64 MIN_AUDIO_DETECT_JUMP_INTERVAL = MIN_VIDEO_DETECT_JUMP_INTER
 static const int MAX_VALID_SLEEP_TIME = 1000*1000*5;
 static const int MAX_VALID_SLEEP_LIVE_TIME = 1000 * 500; // 5 seconds as most long sleep time
 static const int SLOW_COUNTER_THRESHOLD = 12;
+static const double FPS_EPS = 0.0001;
 
 
 CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
@@ -74,7 +75,7 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_lightCpuMode(CLAbstractVideoDecoder::DecodeMode_Full)
 {
     m_storedMaxQueueSize = m_dataQueue.maxSize();
-    setSpeed(.5);
+    //setSpeed(16);
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         m_display[i] = 0;
 
@@ -146,15 +147,24 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
     if (sleep) 
     {
         int realSleepTime = m_delay.sleep(needToSleep);
-        if (realSleepTime < 0) {
-            if (m_tooSlowCounter < 0)
-                m_tooSlowCounter = 0;
-            m_tooSlowCounter++;
-            if (m_tooSlowCounter == SLOW_COUNTER_THRESHOLD/2) 
-                setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Fast);
-            else if (m_tooSlowCounter == SLOW_COUNTER_THRESHOLD) 
-                setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Fastest);
+        if (qAbs(m_speed) > 1.0 + FPS_EPS) 
+        {
+            if (realSleepTime < 0)
+            {
+                if (m_tooSlowCounter < 0)
+                    m_tooSlowCounter = 0;
+                m_tooSlowCounter++;
+                if (m_tooSlowCounter == SLOW_COUNTER_THRESHOLD/2) 
+                    setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Fast);
+                else if (m_tooSlowCounter == SLOW_COUNTER_THRESHOLD) 
+                    setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Fastest);
+            }
+            else 
+            {
+                m_tooSlowCounter--;
+            }
         }
+        /*
         else if (qAbs(m_speed) <= 1.0) {
             m_tooSlowCounter--;
             if (m_lightCpuMode > CLAbstractVideoDecoder::DecodeMode_Fast && m_tooSlowCounter == SLOW_COUNTER_THRESHOLD/2) 
@@ -162,6 +172,7 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
             else if (m_tooSlowCounter == 0) 
                 setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Full);
         }
+        */
         /*
         if (CLAbstractVideoDecoder::DecodeMode_Fastest && m_tooSlowCounter >= SLOW_COUNTER_THRESHOLD*2) {
             vd->releaseRef();
@@ -249,6 +260,7 @@ void CLCamDisplay::setSpeed(double speed)
         m_dataQueue.setMaxSize(m_storedMaxQueueSize);
     }
     m_tooSlowCounter = 0;
+    setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Full);
     m_speed = speed;
 };
 
@@ -317,7 +329,7 @@ bool CLCamDisplay::processData(CLAbstractData* data)
         m_lastAudioPacketTime = ad->timestamp;
 
         // we synch video to the audio; so just put audio in player with out thinking
-        if (m_playAudio && m_speed == 1)
+        if (m_playAudio && qAbs(m_speed-1.0) < FPS_EPS)
         {
             if (m_audioDisplay->msInBuffer() > AUDIO_BUFF_SIZE)
             {
