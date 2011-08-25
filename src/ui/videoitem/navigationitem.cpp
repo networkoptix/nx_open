@@ -23,9 +23,9 @@ public:
     static int const extra_x = 20;
     static int const extra_y = 10;
 
-    MyTextItem(QGraphicsItem* parent) : 
-      QGraphicsItem(parent), 
-          m_widget(0) 
+    MyTextItem(QGraphicsItem* parent) :
+      QGraphicsItem(parent),
+          m_widget(0)
       {
           setAcceptHoverEvents(true);
       }
@@ -72,7 +72,7 @@ public:
         m_pos = pos;
     }
 
-    
+
     void wheelEvent ( QGraphicsSceneWheelEvent * event )
     {
 
@@ -100,21 +100,21 @@ NavigationWidget::NavigationWidget(QWidget *parent) :
     QWidget(parent)
 {
     setObjectName("NavigationWidget");
-    m_layout = new QHBoxLayout;
-    m_layout->setContentsMargins(10, 0, 10, 0);
-
-    m_layout->setSpacing(10);
 
     m_slider = new TimeSlider;
     m_slider->setObjectName("TimeSlider");
 
     m_label = new MyLable;
 
-    m_volumeWidget = new VolumeWidget;
+    m_volumeWidget = new VolumeWidget(this);
+    m_volumeWidget->setObjectName("VolumeWidget");
+
+    m_layout = new QHBoxLayout;
+    m_layout->setContentsMargins(10, 0, 10, 0);
+    m_layout->setSpacing(10);
     m_layout->addWidget(m_slider);
     m_layout->addWidget(m_label);
     m_layout->addWidget(m_volumeWidget);
-
     setLayout(m_layout);
 }
 
@@ -248,10 +248,10 @@ QRectF NavigationItem::boundingRect() const
     return QRectF(0, 0, m_widget->width(), m_widget->height());
 }
 
-bool NavigationItem::isActive() const 
-{ 
-    return m_active; 
-} 
+bool NavigationItem::isActive() const
+{
+    return m_active;
+}
 
 void NavigationItem::setActive(bool active)
 {
@@ -269,14 +269,14 @@ void NavigationItem::setVideoCamera(CLVideoCamera *camera)
 
     m_camera = camera;
 
-    if (!camera) 
+    if (!camera)
     {
         setVisible(false);
         if (m_textItem)
             m_textItem->setVisible(false);
         m_widget->slider()->setScalingFactor(0);
-    } 
-    else 
+    }
+    else
     {
         setVisible(true);
         CLAbstractArchiveReader *reader = static_cast<CLAbstractArchiveReader*>(m_camera->getStreamreader());
@@ -437,10 +437,10 @@ void NavigationItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *e)
 }
 
 
-void NavigationItem::wheelEvent(QGraphicsSceneWheelEvent *) 
+void NavigationItem::wheelEvent(QGraphicsSceneWheelEvent *)
 {
     cl_log.log("wheelEvent", cl_logALWAYS);
-} 
+}
 
 void NavigationItem::onSliderPressed()
 {

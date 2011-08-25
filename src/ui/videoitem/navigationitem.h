@@ -19,6 +19,8 @@ protected:
 class MyButton : public QAbstractButton
 {
 public:
+    MyButton(QWidget *parent = 0) : QAbstractButton(parent) {}
+
     void setPixmap(const QPixmap &p) { m_pixmap = p; }
     void setPressedPixmap(const QPixmap &p) { m_pressedPixmap = p; }
     void setCheckedPixmap(const QPixmap &p) { m_checkedPixmap = p; }
