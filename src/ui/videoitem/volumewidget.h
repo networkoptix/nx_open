@@ -13,6 +13,7 @@ class MyVolumeSlider : public QSlider
 
 public:
     MyVolumeSlider(QWidget *parent = 0) : QSlider(Qt::Horizontal, parent) {}
+    MyVolumeSlider(Qt::Orientation orientation, QWidget *parent = 0) : QSlider(orientation, parent) {}
 
     void paintEvent(QPaintEvent *ev);
 };
@@ -34,9 +35,8 @@ public Q_SLOTS:
     void onButtonChecked();
 
 protected:
-    bool eventFilter(QObject *watched, QEvent *event);
+    bool eventFilter(QObject *, QEvent *);
     void paintEvent(QPaintEvent *);
-    void wheelEvent(QWheelEvent *) {} // to avoid scene move up and down
 
 private:
     MyVolumeSlider *m_slider;

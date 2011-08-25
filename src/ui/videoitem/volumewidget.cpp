@@ -1,5 +1,7 @@
 #include "volumewidget.h"
 
+#include <QtCore/QCoreApplication>
+
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QPushButton>
 
@@ -12,8 +14,11 @@ void MyVolumeSlider::paintEvent(QPaintEvent *)
 
     QPainter p(this);
 
-    int length = abs(maximum() - minimum());
-    double handlePos = (double)(width()-1)*value()/length;
+    const double handlePos = (double)(width() - 1) * value() / qAbs(maximum() - minimum());
+    /*QStyleOptionSlider slider;
+    initStyleOption(&slider);
+    int available = style()->pixelMetric(QStyle::PM_SliderSpaceAvailable, &slider, this);
+    const double handlePos = (double)QStyle::sliderPositionFromValue(slider.minimum, slider.maximum, slider.sliderValue, available);*/
 
     QRect r = contentsRect();
     p.fillRect(rect(), QColor(0,0,0,0));
@@ -31,12 +36,14 @@ void MyVolumeSlider::paintEvent(QPaintEvent *)
 VolumeWidget::VolumeWidget(QWidget *parent) :
     QWidget(parent)
 {
-    m_slider = new MyVolumeSlider;
+    installEventFilter(this);
+
+    m_slider = new MyVolumeSlider(Qt::Horizontal, this);
     m_slider->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     m_slider->setValue(50);
     m_slider->setStyle(SliderProxyStyle::instance());
 
-    m_button = new MyButton;
+    m_button = new MyButton(this);
     m_button->setPixmap(QPixmap(":/skin/unmute.png"));
     m_button->setCheckedPixmap(QPixmap(":/skin/mute.png"));
     m_button->setMinimumSize(20, 20);
@@ -50,9 +57,10 @@ VolumeWidget::VolumeWidget(QWidget *parent) :
     layout->addWidget(m_slider);
     setLayout(layout);
 
-    float volume = QtvAudioDevice::instance().volume();
+    const float volume = QtvAudioDevice::instance().volume();
     m_slider->setValue(volume * 100);
     m_button->setChecked(QtvAudioDevice::instance().isMute());
+    setToolTip(QString::number(m_slider->value()));
 
     connect(m_slider, SIGNAL(valueChanged(int)), SLOT(onValueChanged(int)));
     connect(m_button, SIGNAL(toggled(bool)), SLOT(onButtonChecked()));
@@ -62,10 +70,14 @@ VolumeWidget::VolumeWidget(QWidget *parent) :
 
 bool VolumeWidget::eventFilter(QObject *watched, QEvent *event)
 {
-    if (watched == m_button && event->type() == QEvent::Wheel)
+    if (watched != m_slider && event->type() == QEvent::Wheel)
     {
+        // adjust and redirect to slider
         QWheelEvent *wheelEvent = static_cast<QWheelEvent *>(event);
-        QWheelEvent *newEvent = new QWheelEvent(wheelEvent->pos(), wheelEvent->globalPos(), wheelEvent->delta(), wheelEvent->buttons(), wheelEvent->modifiers(), wheelEvent->orientation());
+        const QPoint pos = m_slider->geometry().center();
+        QWheelEvent *newEvent = new QWheelEvent(m_slider->mapFromGlobal(pos), pos,
+                                                wheelEvent->delta(), wheelEvent->buttons(),
+                                                wheelEvent->modifiers(), wheelEvent->orientation());
         QCoreApplication::postEvent(m_slider, newEvent);
         return true;
     }
@@ -85,6 +97,12 @@ void VolumeWidget::onValueChanged(int value)
 {
     QtvAudioDevice::instance().setVolume(value / 100.0);
     m_button->setChecked(QtvAudioDevice::instance().isMute());
+
+    setToolTip(m_slider->value() ? QString::number(m_slider->value()) : tr("Muted"));
+    // ###
+    //QHelpEvent event(QEvent::ToolTip, rect().center(), mapToGlobal(rect().center()));
+    QHelpEvent event(QEvent::ToolTip, rect().topLeft(), QCursor::pos());
+    QCoreApplication::sendEvent(this, &event);
 }
 
 void VolumeWidget::onButtonChecked()
