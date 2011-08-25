@@ -12,9 +12,7 @@ QAction cm_save_layout(QObject::tr("Save layout"), 0);
 QAction cm_save_layout_as(QObject::tr("Save layout as..."), 0);
 QAction cm_preferences(QObject::tr("Preferences"), 0);
 
-// Remove it when
-QAction cm_listTags(QObject::tr("List tags"), 0);
-QAction cm_addTag(QObject::tr("Add tag"), 0);
+QAction cm_editTags(QObject::tr("Edit tags..."), 0);
 
 QAction cm_fullscren(QObject::tr("Fullscreen"), 0);
 QAction cm_remove_from_layout(QObject::tr("Remove"), 0);

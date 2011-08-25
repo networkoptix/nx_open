@@ -1279,8 +1279,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
     {
         if (aitem->getType() == CLAbstractSceneItem::VIDEO)
         {
-            menu.addAction(&cm_listTags);
-            menu.addAction(&cm_addTag);
+            menu.addAction(&cm_editTags);
 
             // video item
             menu.addAction(&cm_fullscren);
@@ -1555,6 +1554,16 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
             if (act==&cm_fullscren)
                 toggleFullScreen_helper(aitem);
+
+            if (act == &cm_editTags)
+            {
+                TagsEditDialog dialog(dev->getUniqueId());
+                dialog.setModal(true);
+
+                connect(aitem, SIGNAL(destroyed()), &dialog, SLOT(reject()));
+
+                dialog.exec();
+            }
 
             if (act==&cm_settings && dev)
                 show_device_settings_helper(dev);
