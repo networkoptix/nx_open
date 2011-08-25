@@ -190,7 +190,7 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
         !CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) || 
         scaleFactor > CLVideoDecoderOutput::factor_1;
 
-    if (m_enableFrameQueue) {
+    if (enableFrameQueue) {
         m_frameQueueIndex = (m_frameQueueIndex + 1) % MAX_FRAME_QUEUE_SIZE; // allow frame queue for selected video
         m_queueUsed = true;
     }
@@ -223,7 +223,7 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
     }
     m_drawer->draw(&outFrame, data->channelNumber);
 
-    if (!m_enableFrameQueue) 
+    if (!enableFrameQueue) 
         m_drawer->waitForFrameDisplayed(data->channelNumber);
 }
 
