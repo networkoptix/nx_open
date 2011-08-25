@@ -28,6 +28,11 @@ TagsEditDialog::TagsEditDialog(const QString &objectId, QWidget *parent) :
 
     ui->clearFilterButton->setVisible(!ui->tagsFilterLineEdit->text().isEmpty());
 
+    ui->addTagButton->setIcon(QIcon(QLatin1String(":/skin/plus.png")));
+    ui->addTagsButton->setIcon(QIcon(QLatin1String(":/skin/left-arrow.png")));
+    ui->removeTagsButton->setIcon(QIcon(QLatin1String(":/skin/right-arrow.png")));
+    ui->clearFilterButton->setIcon(QIcon(QLatin1String(":/skin/close2.png")));
+
     connect(ui->tagsFilterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(filterChanged(QString)));
     connect(ui->clearFilterButton, SIGNAL(clicked()), ui->tagsFilterLineEdit, SLOT(clear()));
 
