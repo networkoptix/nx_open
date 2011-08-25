@@ -4,33 +4,14 @@
 class TagManager
 {
 public:
-    static TagManager& instance();
+    static QStringList allTags();
 
-    QStringList listAllTags() const;
+    static QStringList objectTags(const QString &object);
+    static void addObjectTag(const QString &object, const QString &tag);
+    static void removeObjectTag(const QString &object, const QString &tag);
 
-    QStringList listObjectTags(const QString& object) const;
-    void addObjectTag(const QString& object, const QString& tag);
-    void removeObjectTag(const QString& object, const QString& tag);
-
-private:
-    TagManager();
-    TagManager(const TagManager&);
-
-    void load();
-    void save();
-
-private:
-    mutable QMutex m_mutex;
-
-    typedef QMap<QString, int> TagsType;
-    typedef QMap<QString, QStringList> ObjectTagsType;
-
-    TagsType m_tags;
-    ObjectTagsType m_objectTags;
-
-private:
-    static QMutex m_initMutex;
-    static TagManager* m_instance;
+protected:
+    inline TagManager() {}
 };
 
 #endif // TAGMANAGER_H
