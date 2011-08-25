@@ -398,6 +398,7 @@ void CLGLRenderer::draw(CLVideoDecoderOutput* img, unsigned int channel)
     //m_imageList.enqueue(img);
 
     m_curImg = img;
+    m_format = m_curImg->format;
 
     m_curImg->setDisplaying(true);
     if (m_curImg->linesize[0] != m_stride_old || m_curImg->height != m_height_old || m_curImg->format != m_color_old)
@@ -460,7 +461,7 @@ int CLGLRenderer::glRGBFormat() const
 {
     if (!isYuvFormat())
     {
-        switch (m_curImg->format)
+        switch (m_format)
         {
         case PIX_FMT_RGBA: return GL_RGBA;
         case PIX_FMT_BGRA: return GL_BGRA_EXT;
@@ -492,7 +493,7 @@ bool CLGLRenderer::isPixelFormatSupported(PixelFormat pixfmt)
 
 bool CLGLRenderer::isYuvFormat() const
 {
-    return m_curImg->format == PIX_FMT_YUV422P || m_curImg->format == PIX_FMT_YUV420P || m_curImg->format == PIX_FMT_YUV444P;
+    return m_format == PIX_FMT_YUV422P || m_format == PIX_FMT_YUV420P || m_format == PIX_FMT_YUV444P;
 }
 
 void CLGLRenderer::updateTexture()
@@ -825,34 +826,32 @@ bool CLGLRenderer::paintEvent(const QRect &r)
 
     //if (m_abort_drawing)
     //    return true;
-    if (m_curImg == 0)
-        return true;
 
     if (!m_inited)
     {
         init(gl_status == CL_GL_NOT_TESTED);
         m_inited = true;
     }
+    bool draw = false;
+    {
+        QMutexLocker locker(&m_displaySync);
+        if (m_curImg == 0 || m_curImg->linesize[0] == 0)
+            return true;
+        draw = (m_curImg->width <= getMaxTextureSize() && m_curImg->height <= getMaxTextureSize());
+        if (draw && m_gotnewimage)
+            updateTexture();
+    }
 
-    QMutexLocker locker(&m_displaySync);
-
-    if (m_curImg == 0 || m_curImg->linesize[0] == 0)
-        return true;
-
-    bool draw = (m_curImg->width <= getMaxTextureSize() && m_curImg->height <= getMaxTextureSize());
     if (draw)
     {
-        if (m_gotnewimage)
-            updateTexture();
-
         QRect temp(r);
         const float v_array[] = { temp.left(), temp.top(), temp.right() + 1, temp.top(), temp.right() + 1, temp.bottom() + 1, temp.left(), temp.bottom() + 1 };
         drawVideoTexture(m_texture[0], m_texture[1], m_texture[2], v_array);
     }
 
+    QMutexLocker locker(&m_displaySync);
     m_curImg->setDisplaying(false);
     m_waitCon.wakeAll();
-
     return draw;
 }
 

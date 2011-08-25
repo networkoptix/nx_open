@@ -140,15 +140,11 @@ void TagManager::removeObjectTag(const QString &object, const QString &tag)
 
     QMutexLocker locker(&manager->m_mutex);
 
-    int nRemoved = 0;
-    {
-        ObjectTagsMap::iterator it = manager->m_objectTags.find(object);
-        if (it == manager->m_objectTags.end())
-            return;
+    ObjectTagsMap::iterator it = manager->m_objectTags.find(object);
+    if (it == manager->m_objectTags.end())
+        return;
 
-        nRemoved = it.value().removeAll(tag);
-    }
-
+    int nRemoved = it.value().removeAll(tag);
     if (nRemoved > 0)
     {
         manager->m_tags[tag] -= nRemoved;

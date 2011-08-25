@@ -8,7 +8,7 @@ typedef unsigned long (__stdcall *fn_createDecoder)(int);
 static fn_createDecoder ptr_createDecoder = 0;
 typedef void (__stdcall *fn_destroyDecoder)(unsigned long);
 static fn_destroyDecoder ptr_destroyDecoder = 0;
-typedef int (__stdcall *fn_decode)(unsigned long id, const CLVideoData *data, CLVideoDecoderOutput* outFrame);
+typedef int (__stdcall *fn_decode)(unsigned long id, const CLCompressedVideoData *data, CLVideoDecoderOutput* outFrame);
 static fn_decode ptr_decode = 0;
 
 static inline bool resolveIPPDecoder()
@@ -41,7 +41,7 @@ IPPH264Decoder::~IPPH264Decoder()
         ptr_destroyDecoder(m_decoder);
 }
 
-bool IPPH264Decoder::decode(const CLVideoData& data, CLVideoDecoderOutput* outFrame)
+bool IPPH264Decoder::decode(const CLCompressedVideoData& data, CLVideoDecoderOutput* outFrame)
 {
     return m_decoder && ptr_decode(m_decoder, &data, outFrame);
 }

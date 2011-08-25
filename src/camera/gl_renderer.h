@@ -139,6 +139,7 @@ private:
     //QQueue<CLVideoDecoderOutput*> m_imageList;
 
     CLVideoDecoderOutput* m_curImg;
+    int m_format;
     //bool m_abort_drawing;
 
     //bool m_do_not_need_to_wait_any_more;

@@ -68,7 +68,7 @@ private:
         int srcWidth, 
         int srcHeight, 
         CLVideoDecoderOutput::downscale_factor force_factor);
-    void waitUndisplayedFrames(int channelNumber);
+    //void waitUndisplayedFrames(int channelNumber);
     void waitFrame(int i, int channelNumber);
 };
 
