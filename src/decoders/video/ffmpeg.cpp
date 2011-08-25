@@ -148,7 +148,7 @@ void CLFFmpegVideoDecoder::resetDecoder()
 }
 //The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than the actual read bytes because some optimized bitstream readers read 32 or 64 bits at once and could read over the end.
 //The end of the input buffer buf should be set to 0 to ensure that no overreading happens for damaged MPEG streams.
-bool CLFFmpegVideoDecoder::decode(const CLVideoData& data, CLVideoDecoderOutput* outFrame)
+bool CLFFmpegVideoDecoder::decode(const CLCompressedVideoData& data, CLVideoDecoderOutput* outFrame)
 {
 
 
@@ -168,7 +168,7 @@ bool CLFFmpegVideoDecoder::decode(const CLVideoData& data, CLVideoDecoderOutput*
 	if (m_decodeMode > DecodeMode_Full)
 	{
 
-		if (data.codec == CODEC_ID_MJPEG)
+		if (data.compressionType == CODEC_ID_MJPEG)
 		{
             int period = DecodeMode_Fast ? LIGHT_CPU_MODE_FRAME_PERIOD : LIGHT_CPU_MODE_FRAME_PERIOD*2;
 			if (m_lightModeFrameCounter < period)
@@ -184,7 +184,7 @@ bool CLFFmpegVideoDecoder::decode(const CLVideoData& data, CLVideoDecoderOutput*
 		{
 			if (m_decodeMode == DecodeMode_Fastest)
 				return false;
-            else if (m_frameTypeExtractor->getFrameType(data.inBuffer, data.bufferLength) == FrameTypeExtractor::B_Frame)
+            else if (m_frameTypeExtractor->getFrameType((quint8*) data.data.data(), data.data.size()) == FrameTypeExtractor::B_Frame)
                 return false;
 		}
 	}
@@ -219,8 +219,8 @@ bool CLFFmpegVideoDecoder::decode(const CLVideoData& data, CLVideoDecoderOutput*
 
     AVPacket avpkt;
     av_init_packet(&avpkt);
-    avpkt.data = (unsigned char*)data.inBuffer;
-    avpkt.size = data.bufferLength;
+    avpkt.data = (unsigned char*)data.data.data();
+    avpkt.size = data.data.size();
     // HACK for CorePNG to decode as normal PNG by default
     avpkt.flags = AV_PKT_FLAG_KEY;
 

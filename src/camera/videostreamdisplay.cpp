@@ -130,12 +130,13 @@ CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::determineScaleFacto
     }
     return rez;
 }
-
+/*
 void CLVideoStreamDisplay::waitUndisplayedFrames(int channelNumber)
 {
     for (int i = 0; i < MAX_FRAME_QUEUE_SIZE; ++i)
         waitFrame(i, channelNumber);
 }
+*/
 
 void CLVideoStreamDisplay::waitFrame(int i, int channelNumber)
 {
@@ -150,7 +151,7 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
     bool enableFrameQueue = m_enableFrameQueue;
     if (!enableFrameQueue && m_queueUsed)
     {
-        waitUndisplayedFrames(data->channelNumber);
+        waitFrame(m_frameQueueIndex, data->channelNumber);
         m_frameQueueIndex = 0;
         for (int i = 1; i < MAX_FRAME_QUEUE_SIZE; ++i)
             m_frameQueue[i].clean();
@@ -159,17 +160,6 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 
     CLVideoDecoderOutput m_tmpFrame;
     m_tmpFrame.setUseExternalData(true);
-    //CLVideoDecoderOutput m_frameQueue[FRAME_QUEUE_SIZE];
-
-
-	CLVideoData img;
-
-	img.inBuffer = (unsigned char*)(data->data.data()); // :-)
-	img.bufferLength = data->data.size();
-	img.keyFrame = data->keyFrame;
-	img.useTwice = data->useTwice;
-	img.width = data->width;
-	img.height = data->height;
 
 	CLAbstractVideoDecoder* dec;
 	{
@@ -192,8 +182,6 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
             CL_LOG(cl_logDEBUG2) cl_log.log(QLatin1String("Can't find video decoder"), cl_logDEBUG2);
             return;
         }
-
-		img.codec = data->compressionType;
 	}
 
     CLVideoDecoderOutput::downscale_factor scaleFactor = determineScaleFactor(data, dec->getWidth(), dec->getHeight(), force_factor);
@@ -202,11 +190,15 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
         !CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) || 
         scaleFactor > CLVideoDecoderOutput::factor_1;
 
-    //waitFrame(m_frameQueueIndex); 
+    if (m_enableFrameQueue) {
+        m_frameQueueIndex = (m_frameQueueIndex + 1) % MAX_FRAME_QUEUE_SIZE; // allow frame queue for selected video
+        m_queueUsed = true;
+    }
+
     CLVideoDecoderOutput& outFrame = m_frameQueue[m_frameQueueIndex];
     if (!useTmpFrame)
         outFrame.setUseExternalData(!enableFrameQueue);
-	if (!dec || !dec->decode(img, useTmpFrame ? &m_tmpFrame : &outFrame))
+	if (!dec || !dec->decode(*data, useTmpFrame ? &m_tmpFrame : &outFrame))
 	{
 		CL_LOG(cl_logDEBUG2) cl_log.log(QLatin1String("CLVideoStreamDisplay::dispay: decoder cannot decode image..."), cl_logDEBUG2);
 		return;
@@ -229,19 +221,9 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
         else 
             rescaleFrame(m_tmpFrame, outFrame, m_tmpFrame.width / scaleFactor, m_tmpFrame.height / scaleFactor); // universal scaler
     }
-    if (enableFrameQueue) {
-        // wait previous frame. Renderer does not have queue now, so current version may works only for 2 frames.
-        int prevFrameIdx = m_frameQueueIndex > 0 ? m_frameQueueIndex-1 : MAX_FRAME_QUEUE_SIZE-1;
-        waitFrame(prevFrameIdx, data->channelNumber);
-    }
-    
     m_drawer->draw(&outFrame, data->channelNumber);
 
-    if (m_enableFrameQueue) {
-        m_frameQueueIndex = (m_frameQueueIndex + 1) % MAX_FRAME_QUEUE_SIZE; // allow frame queue for selected video
-        m_queueUsed = true;
-    }
-    else
+    if (!m_enableFrameQueue) 
         m_drawer->waitForFrameDisplayed(data->channelNumber);
 }
 

@@ -19,7 +19,7 @@ public:
       * Decode video frame.
       * Set hardwareAccelerationEnabled flag if hardware acceleration was used
       */
-    virtual bool decode(const CLVideoData& data, CLVideoDecoderOutput* outFrame) = 0;
+    virtual bool decode(const CLCompressedVideoData& data, CLVideoDecoderOutput* outFrame) = 0;
 
 	virtual void showMotion(bool show ) = 0;
 

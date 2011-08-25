@@ -20,7 +20,7 @@ class CLFFmpegVideoDecoder : public CLAbstractVideoDecoder
 {
 public:
 	CLFFmpegVideoDecoder(CodecID codec, AVCodecContext* codecContext = 0);
-    bool decode(const CLVideoData& data, CLVideoDecoderOutput* outFrame);
+    bool decode(const CLCompressedVideoData& data, CLVideoDecoderOutput* outFrame);
 	~CLFFmpegVideoDecoder();
 
 	void showMotion(bool show);

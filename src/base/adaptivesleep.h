@@ -15,7 +15,7 @@ public:
 
 	  };
 
-	void sleep(qint64 mksec)
+	int sleep(qint64 mksec)
 	{
 
 		if (m_firstTime)
@@ -44,11 +44,11 @@ public:
 			if (-havetowait > m_max_overdraft)
 				afterdelay();
 
-			return;
+			return havetowait;
 		}
 
 		CLSleep::msleep(havetowait/1000);
-
+        return havetowait;
 	}
 
 	void afterdelay()

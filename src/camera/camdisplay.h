@@ -33,6 +33,7 @@ public:
 
 	void display(CLCompressedVideoData* vd, bool sleep);
 	void playAudio(bool play);
+    void setSpeed(double speed);
 
     // schedule to clean up buffers all; 
     // schedule - coz I do not want to introduce mutexes
@@ -77,6 +78,7 @@ private:
 	CLAdaptiveSleep m_delay;
 
 	bool m_playAudioSet;
+    double m_speed;
 	bool m_playAudio;
     bool m_needChangePriority;
 
@@ -111,6 +113,9 @@ private:
     CLCodecAudioFormat m_playingFormat;
     int m_playingCompress;
     int m_playingBitrate;
+    int m_tooSlowCounter;
+    int m_storedMaxQueueSize;
+    CLAbstractVideoDecoder::DecodeMode m_lightCpuMode;
 };
 
 #endif //clcam_display_h_1211

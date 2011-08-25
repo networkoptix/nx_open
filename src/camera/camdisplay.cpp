@@ -43,12 +43,14 @@ static const qint64 MIN_VIDEO_DETECT_JUMP_INTERVAL = 100 * 1000; // 100ms
 static const qint64 MIN_AUDIO_DETECT_JUMP_INTERVAL = MIN_VIDEO_DETECT_JUMP_INTERVAL + AUDIO_BUFF_SIZE*1000;
 static const int MAX_VALID_SLEEP_TIME = 1000*1000*5;
 static const int MAX_VALID_SLEEP_LIVE_TIME = 1000 * 500; // 5 seconds as most long sleep time
+static const int SLOW_COUNTER_THRESHOLD = 12;
 
 
 CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
     : CLAbstractDataProcessor(CL_MAX_DISPLAY_QUEUE_SIZE),
       m_delay(100*1000), // do not put a big value here to avoid cpu usage in case of zoom out
       m_playAudio(false),
+      m_speed(1.0),
       m_needChangePriority(false),
       m_hadAudio(false),
       m_lastAudioPacketTime(0),
@@ -67,8 +69,12 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_singleShotQuantProcessed(false),
       m_jumpTime(0),
       m_playingCompress(0),
-      m_playingBitrate(0)
+      m_playingBitrate(0),
+      m_tooSlowCounter(0),
+      m_lightCpuMode(CLAbstractVideoDecoder::DecodeMode_Full)
 {
+    m_storedMaxQueueSize = m_dataQueue.maxSize();
+    setSpeed(.5);
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         m_display[i] = 0;
 
@@ -114,10 +120,12 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
     // to avoid cpu usage in case of a lot data in queue(zoomed out on the scene, lets add same delays here )
     quint64 currentTime = vd->timestamp;
 
+
     // in ideal world data comes to queue at the same speed as it goes out
     // but timer on the sender side runs at a bit different rate in comparison to the timer here
     // adaptive delay will not solve all problems => need to minus little appendix based on queue size
-    qint32 needToSleep = currentTime - m_previousVideoTime;
+    qint32 needToSleep = (currentTime - m_previousVideoTime) * 1.0/m_speed;
+
     if (m_isRealTimeSource)
     {
         needToSleep -= (m_dataQueue.size()) * 2 * 1000;
@@ -135,8 +143,32 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
         needToSleep = 0;
     //=========
 
-    if (sleep)
-        m_delay.sleep(needToSleep);
+    if (sleep) 
+    {
+        int realSleepTime = m_delay.sleep(needToSleep);
+        if (realSleepTime < 0) {
+            if (m_tooSlowCounter < 0)
+                m_tooSlowCounter = 0;
+            m_tooSlowCounter++;
+            if (m_tooSlowCounter == SLOW_COUNTER_THRESHOLD/2) 
+                setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Fast);
+            else if (m_tooSlowCounter == SLOW_COUNTER_THRESHOLD) 
+                setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Fastest);
+        }
+        else if (qAbs(m_speed) <= 1.0) {
+            m_tooSlowCounter--;
+            if (m_lightCpuMode > CLAbstractVideoDecoder::DecodeMode_Fast && m_tooSlowCounter == SLOW_COUNTER_THRESHOLD/2) 
+                setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Fast);
+            else if (m_tooSlowCounter == 0) 
+                setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Full);
+        }
+        /*
+        if (CLAbstractVideoDecoder::DecodeMode_Fastest && m_tooSlowCounter >= SLOW_COUNTER_THRESHOLD*2) {
+            vd->releaseRef();
+            return;
+        }
+        */
+    }
 
     int channel = vd->channelNumber;
 
@@ -171,8 +203,15 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
 
         }
 
-        if (draw)
+        if (draw) {
+            /*
+            if (m_lastDisplayTimer.elapsed() < 1000)
+                draw = false;
+            else
+                m_lastDisplayTimer.restart();
+            */
             updateActivity();
+        }
 
         m_display[channel]->dispay(vd, draw, scaleFactor);
 
@@ -199,6 +238,19 @@ void CLCamDisplay::setSingleShotMode(bool single)
     m_singleShotMode = single;
     m_singleShotQuantProcessed = false;
 }
+
+void CLCamDisplay::setSpeed(double speed)
+{
+    if (qAbs(speed) > 1) {
+        m_storedMaxQueueSize = m_dataQueue.maxSize();
+        m_dataQueue.setMaxSize(CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE);
+    }
+    else {
+        m_dataQueue.setMaxSize(m_storedMaxQueueSize);
+    }
+    m_tooSlowCounter = 0;
+    m_speed = speed;
+};
 
 bool CLCamDisplay::processData(CLAbstractData* data)
 {
@@ -265,7 +317,7 @@ bool CLCamDisplay::processData(CLAbstractData* data)
         m_lastAudioPacketTime = ad->timestamp;
 
         // we synch video to the audio; so just put audio in player with out thinking
-        if (m_playAudio)
+        if (m_playAudio && m_speed == 1)
         {
             if (m_audioDisplay->msInBuffer() > AUDIO_BUFF_SIZE)
             {
@@ -423,11 +475,18 @@ bool CLCamDisplay::processData(CLAbstractData* data)
 
 void CLCamDisplay::setLightCPUMode(CLAbstractVideoDecoder::DecodeMode val)
 {
+    if (val == m_lightCpuMode)
+        return;
+
+    cl_log.log("slow queue size=", m_tooSlowCounter, cl_logWARNING);
+    cl_log.log("set CPUMode=", val, cl_logWARNING);
+
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
     {
         if (m_display[i])
             m_display[i]->setLightCPUMode(val);
     }
+    m_lightCpuMode = val;
 }
 
 void CLCamDisplay::playAudio(bool play)
@@ -445,7 +504,7 @@ void CLCamDisplay::playAudio(bool play)
 
 bool CLCamDisplay::haveAudio() const
 {
-    return (m_playAudio && m_hadAudio) && !m_ignoringVideo && m_audioDisplay->isFormatSupported();
+    return (m_playAudio && m_hadAudio && m_speed == 1.0) && !m_ignoringVideo && m_audioDisplay->isFormatSupported();
 }
 
 CLCompressedVideoData* CLCamDisplay::nextInOutVideodata(CLCompressedVideoData* incoming, int channel)
