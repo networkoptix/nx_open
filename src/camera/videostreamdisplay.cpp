@@ -16,6 +16,7 @@ CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale) :
     m_outputWidth(0),
     m_outputHeight(0),
     m_frameQueueIndex(0),
+    m_lastDisplayedIndex(0),
     m_enableFrameQueue(false),
     m_queueUsed(false),
     m_needReinitDecoders(false)
@@ -134,7 +135,7 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
     bool enableFrameQueue = m_enableFrameQueue;
     if (!enableFrameQueue && m_queueUsed)
     {
-        waitFrame(m_frameQueueIndex, data->channelNumber);
+        waitFrame(m_lastDisplayedIndex, data->channelNumber);
         m_frameQueueIndex = 0;
         for (int i = 1; i < MAX_FRAME_QUEUE_SIZE; ++i)
             m_frameQueue[i].clean();
@@ -179,11 +180,6 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
         !CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) || 
         scaleFactor > CLVideoDecoderOutput::factor_1;
 
-    if (enableFrameQueue) {
-        m_frameQueueIndex = (m_frameQueueIndex + 1) % MAX_FRAME_QUEUE_SIZE; // allow frame queue for selected video
-        m_queueUsed = true;
-    }
-
     CLVideoDecoderOutput& outFrame = m_frameQueue[m_frameQueueIndex];
     if (!useTmpFrame)
         outFrame.setUseExternalData(!enableFrameQueue);
@@ -211,6 +207,11 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
             rescaleFrame(m_tmpFrame, outFrame, m_tmpFrame.width / scaleFactor, m_tmpFrame.height / scaleFactor); // universal scaler
     }
     m_drawer->draw(&outFrame, data->channelNumber);
+    m_lastDisplayedIndex = m_frameQueueIndex;
+    if (enableFrameQueue) {
+        m_frameQueueIndex = (m_frameQueueIndex + 1) % MAX_FRAME_QUEUE_SIZE; // allow frame queue for selected video
+        m_queueUsed = true;
+    }
 
     if (!enableFrameQueue) 
         m_drawer->waitForFrameDisplayed(data->channelNumber);

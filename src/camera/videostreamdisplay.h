@@ -39,6 +39,7 @@ private:
 
     CLVideoDecoderOutput m_frameQueue[MAX_FRAME_QUEUE_SIZE];
     int m_frameQueueIndex;
+    int m_lastDisplayedIndex;
 
     CLAbstractVideoDecoder::DecodeMode m_lightCPUmode;
     bool m_canDownscale;
