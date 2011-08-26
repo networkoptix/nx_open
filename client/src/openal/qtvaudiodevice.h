@@ -37,9 +37,10 @@ public:
     void setMute(bool mute);
 
 private:
-    QList<QtvSound *> m_sounds;
-    ALCcontext *m_context;
     ALCdevice *m_device;
+    ALCcontext *m_context;
+    float m_volume;
+    QList<QtvSound *> m_sounds;
     QSettings *m_settings;
 };
 
