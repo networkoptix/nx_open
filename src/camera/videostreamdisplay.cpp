@@ -4,6 +4,7 @@
 #include "../data/mediadata.h"
 #include "abstractrenderer.h"
 #include "gl_renderer.h"
+#include "util.h"
 
 CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale) :
     m_lightCPUmode(CLAbstractVideoDecoder::DecodeMode_Full),
@@ -11,8 +12,6 @@ CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale) :
     m_prevFactor(CLVideoDecoderOutput::factor_1),
     m_scaleFactor(CLVideoDecoderOutput::factor_1),
     m_previousOnScreenSize(0,0),
-    m_frameRGBA(0),
-    m_buffer(0),
     m_scaleContext(0),
     m_outputWidth(0),
     m_outputHeight(0),
@@ -49,35 +48,18 @@ bool CLVideoStreamDisplay::allocScaleContext(const CLVideoDecoderOutput& outFram
 {
     m_outputWidth = newWidth;
     m_outputHeight = newHeight;
-
     m_scaleContext = sws_getContext(outFrame.width, outFrame.height, (PixelFormat) outFrame.format,
                                     m_outputWidth, m_outputHeight, PIX_FMT_RGBA,
                                     SWS_POINT, NULL, NULL, NULL);
-
-    if (m_scaleContext == 0)
-    {
+    if (!m_scaleContext)
         cl_log.log(QLatin1String("Can't get swscale context"), cl_logERROR);
-        return false;
-    }
-
-    m_frameRGBA = avcodec_alloc_frame();
-
-    int numBytes = avpicture_get_size(PIX_FMT_RGBA, m_outputWidth, m_outputHeight);
-    //m_outFrame.out_type = PIX_FMT_RGBA;
-
-    m_buffer = (quint8*)av_malloc(numBytes * sizeof(quint8));
-
-    avpicture_fill((AVPicture *)m_frameRGBA, m_buffer, PIX_FMT_RGBA, m_outputWidth, m_outputHeight);
-
-    return true;
+    return m_scaleContext != 0;
 }
 
 void CLVideoStreamDisplay::freeScaleContext()
 {
 	if (m_scaleContext) {
 		sws_freeContext(m_scaleContext);
-		av_free(m_buffer);
-		av_free(m_frameRGBA);
 		m_scaleContext = 0;
 	}
 }
@@ -253,23 +235,11 @@ bool CLVideoStreamDisplay::rescaleFrame(const CLVideoDecoderOutput& srcFrame, CL
             return false;
     }
 
-    //const quint8* const srcSlice[] = {srcFrame.C1, srcFrame.C2, srcFrame.C3};
-    //int srcStride[] = {srcFrame.stride1, srcFrame.stride2, srcFrame.stride3};
+    if (outFrame.isExternalData() || outFrame.width != newWidth || outFrame.height != newHeight || outFrame.format != PIX_FMT_RGBA)
+        outFrame.reallocate(newWidth, newHeight, PIX_FMT_RGBA);
 
     sws_scale(m_scaleContext,srcFrame.data, srcFrame.linesize, 0,
-        srcFrame.height, m_frameRGBA->data, m_frameRGBA->linesize);
-
-    outFrame.width = m_outputWidth;
-    outFrame.height = m_outputHeight;
-
-    outFrame.data[0] = m_frameRGBA->data[0];
-    outFrame.data[1] = m_frameRGBA->data[1];
-    outFrame.data[2] = m_frameRGBA->data[2];
-
-    outFrame.linesize[0] = m_frameRGBA->linesize[0];
-    outFrame.linesize[1] = m_frameRGBA->linesize[1];
-    outFrame.linesize[2] = m_frameRGBA->linesize[2];
-    outFrame.format = PIX_FMT_RGBA;
+        srcFrame.height, outFrame.data, outFrame.linesize);
     return true;
 }
 

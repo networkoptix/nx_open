@@ -54,5 +54,12 @@ QString formatDuration(unsigned duration, unsigned total = 0);
  */
 QString getParamFromString(const QString& str, const QString& param);
 
+/*
+ * Round value up with step. step must be power of 2
+ * function return rounded value
+ */
+inline int roundUp(int value, int step) {
+    return ((value-1) & ~(step-1)) + step;
+}
 
 #endif // _UNIVERSAL_CLIENT_UTIL_H

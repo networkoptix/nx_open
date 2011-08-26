@@ -17,7 +17,7 @@ struct CLVideoDecoderOutput: public AVFrame
     void clean();
     static bool isPixelFormatSupported(PixelFormat format);
     void setUseExternalData(bool value);
-    bool getUseExternalData() const { return m_useExternalData; }
+    bool isExternalData() const { return m_useExternalData; }
     void setDisplaying(bool value) {m_displaying = value; }
     bool isDisplaying() const { return m_displaying; }
     void reallocate(int newWidth, int newHeight, int format);

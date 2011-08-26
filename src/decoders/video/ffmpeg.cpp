@@ -225,7 +225,7 @@ bool CLFFmpegVideoDecoder::decode(const CLCompressedVideoData& data, CLVideoDeco
     avpkt.flags = AV_PKT_FLAG_KEY;
 
     int got_picture = 0;
-    if (!outFrame->getUseExternalData() && 
+    if (!outFrame->isExternalData() && 
         (outFrame->width != c->width || outFrame->height != c->height || outFrame->format != c->pix_fmt))
     {
         outFrame->reallocate(c->width, c->height, c->pix_fmt);
@@ -240,7 +240,7 @@ bool CLFFmpegVideoDecoder::decode(const CLCompressedVideoData& data, CLVideoDeco
 		//AVFrame* outputFrame;
 		if (m_frame->interlaced_frame && m_mtDecoding)
 		{
-            if (outFrame->getUseExternalData())
+            if (outFrame->isExternalData())
             {
 			    if (avpicture_deinterlace((AVPicture*)m_deinterlacedFrame, (AVPicture*) m_frame, c->pix_fmt, c->width, c->height) == 0)
                     copyFromFrame = m_deinterlacedFrame;
@@ -249,7 +249,7 @@ bool CLFFmpegVideoDecoder::decode(const CLCompressedVideoData& data, CLVideoDeco
                 avpicture_deinterlace((AVPicture*) outFrame, (AVPicture*) m_frame, c->pix_fmt, c->width, c->height);
 		}
         else {
-            if (!outFrame->getUseExternalData())
+            if (!outFrame->isExternalData())
                 av_picture_copy((AVPicture*) outFrame, (AVPicture*) (m_frame), c->pix_fmt, c->width, c->height);
         }
 
@@ -274,7 +274,7 @@ bool CLFFmpegVideoDecoder::decode(const CLCompressedVideoData& data, CLVideoDeco
 
 		//if (m_showmotion)
 		//	ff_print_debug_info((MpegEncContext*)(c->priv_data), picture);
-        if (outFrame->getUseExternalData())
+        if (outFrame->isExternalData())
         {
 		    outFrame->width = c->width;
 		    outFrame->height = c->height;

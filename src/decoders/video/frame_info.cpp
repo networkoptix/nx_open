@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include <stdio.h>
+#include "util.h"
 
 // i am not sure about SSE syntax in 64-bit version, it is need testing. So, define is WIN32, not Q_OS_WIN
 #ifdef WIN32
@@ -261,11 +262,6 @@ static const int ROUND_FACTOR = 1;
 
 #define q_abs(x) ((x) >= 0 ? (x) : (-x))
 
-static int roundUp(int value)
-{
-    return value / ROUND_FACTOR * ROUND_FACTOR + (value % ROUND_FACTOR ? ROUND_FACTOR : 0);
-}
-
 CLVideoDecoderOutput::CLVideoDecoderOutput()
 {
     /*
@@ -362,7 +358,8 @@ void CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat
     height = newHeight;
     format = newFormat;
 
-    int roundWidth = roundUp(width);
+    int rc = 32 >> (newFormat == PIX_FMT_RGBA || newFormat == PIX_FMT_ABGR || newFormat == PIX_FMT_BGRA ? 2 : 0);
+    int roundWidth = roundUp(width, rc);
     int numBytes = avpicture_get_size((PixelFormat) format, roundWidth, height);
     avpicture_fill((AVPicture*) this, (quint8*) av_malloc(numBytes), (PixelFormat) format, roundWidth, height);
 }

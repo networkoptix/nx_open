@@ -37,10 +37,6 @@ private:
       * to reduce image size for weak video cards 
       */
 
-    AVFrame *m_frameRGBA;
-    //CLVideoDecoderOutput m_outFrame;
-
-    //CLVideoDecoderOutput m_tmpFrame;
     CLVideoDecoderOutput m_frameQueue[MAX_FRAME_QUEUE_SIZE];
     int m_frameQueueIndex;
 
@@ -51,7 +47,6 @@ private:
     CLVideoDecoderOutput::downscale_factor m_scaleFactor;
     QSize m_previousOnScreenSize;
 
-    quint8* m_buffer;
     SwsContext *m_scaleContext;
     int m_outputWidth;
     int m_outputHeight;

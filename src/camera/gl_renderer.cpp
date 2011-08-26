@@ -10,6 +10,7 @@
 #include "yuvconvert.h"
 #include "camera.h"
 #include "device/device.h"
+#include "util.h"
 
 #ifndef GL_FRAGMENT_PROGRAM_ARB
 #define GL_FRAGMENT_PROGRAM_ARB           0x8804
@@ -455,11 +456,6 @@ void CLGLRenderer::applyMixerSettings(qreal brightness, qreal contrast, qreal hu
     m_saturation = saturation + 1.0;
 }
 
-static inline int roundUp(int value)
-{
-    return value % ROUND_COEFF ? (value + ROUND_COEFF - (value % ROUND_COEFF)) : value;
-}
-
 int CLGLRenderer::glRGBFormat() const
 {
     if (!isYuvFormat())
@@ -519,9 +515,6 @@ void CLGLRenderer::updateTexture()
         break;
     }
 
-    //int round_width[3] = {roundUp(w[0]), roundUp(w[1]), roundUp(w[2])};
-    //int round_width[3] = {roundUp(r_w[0]), roundUp(r_w[1]), roundUp(r_w[2])};
-
     glEnable(GL_TEXTURE_2D);
     OGL_CHECK_ERROR("glEnable");
     if (!isSoftYuv2Rgb && isYuvFormat())
@@ -536,12 +529,12 @@ void CLGLRenderer::updateTexture()
             {
                 // if support "GL_ARB_texture_non_power_of_two", use default size of texture,
                 // else nearest power of two
-                int wPow = isNonPower2 ? roundUp(w[i]) : getMinPow2(w[i]);
+                int wPow = isNonPower2 ? roundUp(w[i],ROUND_COEFF) : getMinPow2(w[i]);
                 int hPow = isNonPower2 ? h[i] : getMinPow2(h[i]);
                 // support GL_ARB_texture_non_power_of_two ?
 
                 m_videoCoeffL[i] = 0;
-                int round_r_w = roundUp(r_w[i]);
+                int round_r_w = roundUp(r_w[i],ROUND_COEFF);
                 m_videoCoeffW[i] =  round_r_w / (float) wPow;
 
                 m_videoCoeffH[i] = h[i] / (float) hPow;
@@ -599,7 +592,7 @@ void CLGLRenderer::updateTexture()
             glPixelStorei(GL_UNPACK_ROW_LENGTH, w[i]);
             glTexSubImage2D(GL_TEXTURE_2D, 0,
                             0, 0,
-                            roundUp(r_w[i]),
+                            roundUp(r_w[i],ROUND_COEFF),
                             h[i],
                             GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels);
             OGL_CHECK_ERROR("glTexSubImage2D");
@@ -627,11 +620,11 @@ void CLGLRenderer::updateTexture()
                 else
                     bytesPerPixel = 4;
             }
-            const int wPow = isNonPower2 ? roundUp(w[0]/bytesPerPixel) : getMinPow2(w[0]/bytesPerPixel);
+            const int wPow = isNonPower2 ? roundUp(w[0]/bytesPerPixel,ROUND_COEFF) : getMinPow2(w[0]/bytesPerPixel);
             const int hPow = isNonPower2 ? h[0] : getMinPow2(h[0]);
             // support GL_ARB_texture_non_power_of_two ?
             m_videoCoeffL[0] = 0;
-            m_videoCoeffW[0] = roundUp(r_w[0]) / float(wPow);
+            m_videoCoeffW[0] = roundUp(r_w[0],ROUND_COEFF) / float(wPow);
             m_videoCoeffH[0] = h[0] / float(hPow);
 
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wPow, hPow, 0, glRGBFormat(), GL_UNSIGNED_BYTE, 0);
@@ -660,7 +653,7 @@ void CLGLRenderer::updateTexture()
         {
         case PIX_FMT_YUV422P:
             yuv422_argb32_mmx(pixels, m_curImg->data[0], m_curImg->data[2], m_curImg->data[1],
-                              roundUp(r_w[0]),
+                              roundUp(r_w[0],ROUND_COEFF),
                               h[0],
                               4 * m_curImg->linesize[0],
                               m_curImg->linesize[0], m_curImg->linesize[1]);
@@ -668,7 +661,7 @@ void CLGLRenderer::updateTexture()
 
         case PIX_FMT_YUV420P:
             yuv420_argb32_mmx(pixels, m_curImg->data[0], m_curImg->data[2], m_curImg->data[1],
-                              roundUp(r_w[0]),
+                              roundUp(r_w[0],ROUND_COEFF),
                               h[0],
                               4 * m_curImg->linesize[0],
                               m_curImg->linesize[0], m_curImg->linesize[1]);
@@ -676,7 +669,7 @@ void CLGLRenderer::updateTexture()
 
         case PIX_FMT_YUV444P:
             yuv444_argb32_mmx(pixels, m_curImg->data[0], m_curImg->data[2], m_curImg->data[1],
-                              roundUp(r_w[0]),
+                              roundUp(r_w[0],ROUND_COEFF),
                               h[0],
                               4 * m_curImg->linesize[0],
                               m_curImg->linesize[0], m_curImg->linesize[1]);
@@ -696,7 +689,7 @@ void CLGLRenderer::updateTexture()
         OGL_CHECK_ERROR("glPixelStorei");
         glTexSubImage2D(GL_TEXTURE_2D, 0,
             0, 0,
-            roundUp(r_w[0]),
+            roundUp(r_w[0],ROUND_COEFF),
             h[0],
             glRGBFormat(), GL_UNSIGNED_BYTE, pixels);
 
