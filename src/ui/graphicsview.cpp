@@ -1247,28 +1247,6 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
     QMenu audioMenu;
     audioMenu.setTitle(tr("Audio tracks"));
-    /*
-    QAction cmAudio0(0);
-    QAction cmAudio1(0);
-    QAction cmAudio2(0);
-    QAction cmAudio3(0);
-    QAction* AudioTracks[12] = {&cmAudio0, &cmAudio1, &cmAudio2,  &cmAudio3,
-                                &cmAudio4, &cmAudio5, &cmAudio6,  &cmAudio7,
-                                &cmAudio8, &cmAudio9, &cmAudio10, &cmAudio11};
-    cmAudio0.setCheckable(true);
-    cmAudio1.setCheckable(true);
-    cmAudio2.setCheckable(true);
-    cmAudio3.setCheckable(true);
-    */
-    /*
-    QAction* AudioTracks[MAX_AUDIO_TRACKS];
-    for (int i = 0; i < MAX_AUDIO_TRACKS; ++i)
-    {
-        AudioTracks[i] = new QAction(0);
-        AudioTracks[i]->setCheckable(true);
-    }
-    */
-
     QVector<QAction*> AudioTracks;
 
     //===== final menu=====
@@ -1358,10 +1336,10 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
     else if (aitem && m_scene.selectedItems().count()>0)
     {
         // multiple selection
-        menu.addAction(&cm_remove_from_layout);
         bool haveAtLeastOneNonrecordingCam = false;
         bool haveAtLeastOneRecordingCam = false;
         bool allItemsRemovable = true;
+        bool allItemsTaggable = true;
 
         foreach(QGraphicsItem* item, m_scene.selectedItems())
         {
@@ -1369,14 +1347,18 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
             if (!nav_item)
             {
                 allItemsRemovable = false;
+                allItemsTaggable = false;
                 continue;
             }
 
-            CLAbstractComplicatedItem* ca  = nav_item->getComplicatedItem();
+            if (aitem->getType() != CLAbstractSceneItem::VIDEO)
+                allItemsTaggable = false;
 
+            CLAbstractComplicatedItem* ca  = nav_item->getComplicatedItem();
             if (!ca)
             {
                 allItemsRemovable = false;
+                allItemsTaggable = false;
                 continue;
             }
 
@@ -1396,6 +1378,11 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
             else
                 haveAtLeastOneNonrecordingCam = true;
         }
+
+        if (allItemsTaggable)
+            menu.addAction(&cm_editTags);
+
+        menu.addAction(&cm_remove_from_layout);
 
         if (allItemsRemovable)
             menu.addAction(&cm_remove_from_disk);
@@ -1557,7 +1544,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
             if (act == &cm_editTags)
             {
-                TagsEditDialog dialog(dev->getUniqueId());
+                TagsEditDialog dialog(QStringList() << dev->getUniqueId());
                 dialog.setModal(true);
 
                 connect(aitem, SIGNAL(destroyed()), &dialog, SLOT(reject()));
@@ -1649,50 +1636,51 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
     }
     else if (aitem && m_scene.selectedItems().count()>0 )// video item multiple selection
     {
+        QList<CLAbstractSubItemContainer *> selectedItems;
+        foreach (QGraphicsItem *item, m_scene.selectedItems())
+            selectedItems.append(static_cast<CLAbstractSubItemContainer *>(item));
 
-        if (act == &cm_remove_from_layout)
+        if (act == &cm_editTags)
         {
-            QList<CLAbstractSubItemContainer*> lst;
-
-            foreach (QGraphicsItem *item, m_scene.selectedItems())
+            QStringList objectIds;
+            foreach (CLAbstractSubItemContainer *item, selectedItems)
             {
-                CLAbstractSubItemContainer* aitemc = static_cast<CLAbstractSubItemContainer*>(item);
-                lst.push_back(aitemc);
+                CLAbstractSceneItem *aitem = static_cast<CLAbstractSceneItem *>(item);
+                if (aitem->getType() == CLAbstractSceneItem::VIDEO)
+                    objectIds.append(static_cast<CLVideoWindowItem*>(aitem)->getVideoCam()->getDevice()->getUniqueId());
             }
 
-            m_camLayout.removeItems(lst, true);
+            TagsEditDialog dialog(objectIds);
+            dialog.setModal(true);
+
+            dialog.exec();
+        }
+        else if (act == &cm_remove_from_layout)
+        {
+            m_camLayout.removeItems(selectedItems, true);
         }
         else if (act == &cm_remove_from_disk)
         {
-            QString message;
-            QTextStream(&message) << QString("Are you sure you want to remove ") << m_scene.selectedItems().size() << " files?";
-            QMessageBox::StandardButton result = YesNoCancel(this, "Remove file confirmation", message);
-            if (result == QMessageBox::Yes)
+            QString message = tr("Are you sure you want to remove %1 files?").arg(selectedItems.size());
+            if (YesNoCancel(this, tr("Remove file confirmation"), message) == QMessageBox::Yes)
             {
                 CLDeviceSearcher& deviceSearcher = CLDeviceManager::instance().getDeviceSearcher();
                 QMutexLocker lock(&deviceSearcher.all_devices_mtx);
 
-                foreach (QGraphicsItem *item, m_scene.selectedItems())
-                {
+                foreach (CLAbstractSubItemContainer *item, selectedItems)
                     removeFileDeviceItem(deviceSearcher, static_cast<CLAbstractSceneItem*>(item));
-                }
             }
         }
-
-        if (act == &cm_start_recording || act == &cm_stop_recording)
+        else if (act == &cm_start_recording || act == &cm_stop_recording)
         {
-            foreach(QGraphicsItem* item, m_scene.selectedItems())
+            foreach (CLAbstractSubItemContainer *item, selectedItems)
             {
-                CLAbstractSceneItem* nav_item = navigationItem(item);;
+                CLAbstractSceneItem* nav_item = navigationItem(item);
                 if (!nav_item)
                     continue;
 
                 CLAbstractComplicatedItem* ca  = nav_item->getComplicatedItem();
-
-                if (!ca)
-                    continue;
-
-                if (!ca->getDevice()->checkDeviceTypeFlag(CLDevice::NETWORK))
+                if (!ca || !ca->getDevice()->checkDeviceTypeFlag(CLDevice::NETWORK))
                     continue;
 
                 CLVideoCamera* cam = static_cast<CLVideoCamera*>(ca);
@@ -1711,10 +1699,8 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
                     }
 
                     cam->startRecording();
-
                 }
-
-                if (act == &cm_stop_recording)
+                else if (act == &cm_stop_recording)
                 {
                     cam->stopRecording();
                 }
@@ -2073,9 +2059,6 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
                     cam->streamJump(0);
                 }
             }
-
-
-            //if (next_item)
         }
         else if (next_item)
         {

@@ -31,6 +31,9 @@
          </property>
          <item>
           <widget class="QLineEdit" name="newTagLineEdit">
+           <property name="maxLength">
+            <number>50</number>
+           </property>
            <property name="placeholderText">
             <string>New Tag</string>
            </property>
@@ -52,7 +55,7 @@
         </layout>
        </item>
        <item>
-        <widget class="QListView" name="objectTagsListView"/>
+        <widget class="QTreeView" name="objectTagsTreeView"/>
        </item>
       </layout>
      </item>
@@ -139,7 +142,7 @@
         </layout>
        </item>
        <item>
-        <widget class="QListView" name="allTagsListView"/>
+        <widget class="QTreeView" name="allTagsTreeView"/>
        </item>
       </layout>
      </item>
@@ -151,7 +154,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok|QDialogButtonBox::Reset</set>
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok|QDialogButtonBox::RestoreDefaults</set>
      </property>
      <property name="centerButtons">
       <bool>false</bool>
