@@ -1,5 +1,6 @@
 #include "qtvaudiodevice.h"
 
+#include <QtCore/QScopedPointer>
 #include <QtCore/QSettings>
 
 #include <QtMultimedia/QAudioFormat>
@@ -29,9 +30,11 @@ QtvAudioDevice &QtvAudioDevice::instance()
 }
 
 QtvAudioDevice::QtvAudioDevice()
+    : m_device(0), m_context(0), m_volume(1.0)
 {
     m_settings = new QSettings;
     m_settings->beginGroup(QLatin1String("audioControl"));
+    m_volume = m_settings->value(QLatin1String("volume"), 1.0f).toFloat();
 
 #ifdef OPENAL_STATIC
     alc_init();
@@ -73,6 +76,7 @@ QtvAudioDevice::QtvAudioDevice()
 
 QtvAudioDevice::~QtvAudioDevice()
 {
+    m_settings->setValue(QLatin1String("volume"), m_volume);
     m_settings->endGroup();
     delete m_settings;
 
@@ -100,27 +104,24 @@ QtvAudioDevice::~QtvAudioDevice()
 
 float QtvAudioDevice::volume() const
 {
-    float volume = m_settings->value(QLatin1String("volume"), 1.0f).toFloat();
-    return qBound(0.0f, volume, 1.0f);
+    return qBound(0.0f, m_volume, 1.0f);
 }
 
 void QtvAudioDevice::setVolume(float volume)
 {
     volume = qBound(0.0f, volume, 1.0f);
-    float oldVolume = m_settings->value(QLatin1String("volume"), 1.0f).toFloat();
-    if (volume == oldVolume)
+    if (m_volume == volume)
         return;
 
     if (volume == 0.0f)
     {
-        if (oldVolume < volume)
+        if (m_volume < volume)
             return;
 
-        volume = -oldVolume;
+        volume = -m_volume;
     }
 
-    m_settings->setValue(QLatin1String("volume"), volume);
-    m_settings->sync();
+    m_volume = volume;
 
     volume = qBound(0.0f, volume, 1.0f);
     foreach (QtvSound *sound, m_sounds)
@@ -134,20 +135,7 @@ bool QtvAudioDevice::isMute() const
 
 void QtvAudioDevice::setMute(bool mute)
 {
-    float volume;
-    if (mute)
-    {
-        volume = 0.0f;
-    }
-    else
-    {
-        volume = m_settings->value(QLatin1String("volume"), 1.0f).toFloat();
-        if (volume < 0.0f)
-            volume = -volume;
-        else if (volume == 0.0f)
-            volume = 1.0f;
-    }
-    setVolume(volume);
+    setVolume(!mute ? (m_volume < 0.0f ? -m_volume : m_volume) : 0.0f);
 }
 
 void QtvAudioDevice::removeSound(QtvSound *soundObject)
@@ -155,8 +143,7 @@ void QtvAudioDevice::removeSound(QtvSound *soundObject)
     if (!soundObject)
         return;
 
-    bool isRemoved = m_sounds.removeOne(soundObject);
-    Q_ASSERT(isRemoved); Q_UNUSED(isRemoved)
+    m_sounds.removeOne(soundObject);
     delete soundObject;
 }
 
@@ -165,13 +152,13 @@ QtvSound *QtvAudioDevice::addSound(const QAudioFormat &format)
     if (!m_device || !m_context)
         return 0;
 
-    QtvSound *result = new QtvSound(m_device, format);
-    if (!result->isValid())
+    QScopedPointer<QtvSound> sound(new QtvSound(m_device, format));
+    if (sound->isValid())
     {
-        delete result;
-        return 0;
+        sound->setVolumeLevel(m_volume);
+        m_sounds.append(sound.data());
+        return sound.take();
     }
 
-    m_sounds.push_back(result);
-    return result;
+    return 0;
 }
