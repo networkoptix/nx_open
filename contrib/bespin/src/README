@@ -1,0 +1,54 @@
+http://cloudcity.sf.net
+baghira-style@gmx.net (please include "bespin" in subject)
+
+Bespin is a widgetstyle for Qt4, the name is nothing about quantum mechanics,
+but just refers to cloud city (StarWars Episode V: The Empire Strikes Back)
+
+I assume this could trigger some questions, so i'll try to pre-answer them
+
+FAQ:
+
+Q: weren't you supposed to write the Oxygen style (http://www.oxygen-icons.org)?
+A: Yes.
+
+Q: So what...?
+A: Left the team.
+
+Q: Why?
+A: Key reason was that the style as it was was said to be "ugly, unmaintainable"
+and "worst" ever in kdelibs. Someone insinuated i was ignoring the artists.
+Then there were some communication errors, i'm paranoid and now here ;)
+
+Q: Did you have argues with the Oxygen artists/team?
+A: Nope - at least not from my point. Work has allways been respectfull, polite
+and productive (though there were of course discussions)
+
+Q: So did you ignore the artist wishes?
+A: Once again, not from my point of view. I don't know whether it may have
+appeared like that, though. If, it certainly was not intended.
+
+Q: So what's this here?
+A: I wrote a bunch of code and spent a lot of time on this work. It may be "ugly
+and unmaintainable", but i guess that's my problem. Just didn't wanna throw it
+away.
+So i started modifying it just as personal fun-project, there's still a lot of
+oxygen design ideas in it - e.g. some ideas of Nuno that were dropped for
+oxygen.
+
+Q: Did you steal any code from the Oxygen Team?
+A: Every single line is written by my (ok, some are just adjustments of
+QCommonStyle ;P ) i wrote it for Oxygen, but /I/ wrote it.
+
+Q: So why should i use it?
+A: Don't know? Cause you like it? (I guess, if not, just leave it... ;)
+
+Q: But the code is bad...?
+A: Don't know. At least: yes - i do not tend to create very clean code, more
+condensed one.
+However, i assume you're not interested in reading the code but in polishing
+your desktop - that should do. (If not, just make a bug report)
+
+Q: Is this an offense to the Oxygen Team?
+A: Nope. (At least not by intention) I don't feel offended at all.
+(I did NOT leave the Team because of this, but working on your own has its
+advances. E.g. faster decision taking ;)
