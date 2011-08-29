@@ -215,15 +215,12 @@ void SceneLayout::onTimer()
 {
 	if (m_firstTime)
 	{
-		m_view->zoomMin(0);
+		m_firstTime =  false;
+
+        m_view->zoomMin(0);
 
 		m_view->initDecoration();
 		loadContent();
-	}
-
-	if (m_firstTime)
-	{
-		m_firstTime =  false;
 
 		m_view->start();
 	}

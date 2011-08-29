@@ -1098,7 +1098,7 @@ int SliceUnit::deserializeSliceData()
 		if( slice_type  !=  I_TYPE  &&  slice_type  !=  SI_TYPE )
 			if( !pps->entropy_coding_mode_flag ) {
 				mb_skip_run = extractUEGolombCode(); // !!!!!!!!!!!!!
-				int prevMbSkipped = ( mb_skip_run > 0 );
+				prevMbSkipped = ( mb_skip_run > 0 );
 				for(int i = 0; i<mb_skip_run; i++ )
 					CurrMbAddr = NextMbAddress( CurrMbAddr );
 				moreDataFlag = bitReader.getBitsLeft() >= 8;

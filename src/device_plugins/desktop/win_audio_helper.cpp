@@ -131,7 +131,7 @@ QPixmap WinAudioExtendInfo::deviceIcon()
     }
 
     HMODULE library = LoadLibrary((LPCWSTR) params[0].constData());
-    if (library < 0)
+    if (!library)
         return false;
     int resNumber = params[1].toInt();
     if (resNumber < 0) {

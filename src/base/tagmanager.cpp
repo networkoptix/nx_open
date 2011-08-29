@@ -104,6 +104,49 @@ QStringList TagManager::objectTags(const QString &object)
     return manager->m_objectTags.value(object);
 }
 
+void TagManager::setObjectTags(const QString &object, const QStringList &tags)
+{
+    TagManagerPrivate *manager = tagManager();
+
+    QMutexLocker locker(&manager->m_mutex);
+
+    ObjectTagsMap::iterator objectTagIter = manager->m_objectTags.find(object);
+
+    if (objectTagIter != manager->m_objectTags.end())
+    {
+        foreach (const QString &tag, objectTagIter.value())
+        {
+            if (!tags.contains(tag) && objectTagIter.value().removeOne(tag))
+            {
+                if (--manager->m_tags[tag] <= 0)
+                    manager->m_tags.remove(tag);
+            }
+        }
+    }
+
+    foreach (const QString &tag, tags)
+    {
+        if (tag.trimmed().isEmpty())
+            continue;
+
+        if (objectTagIter == manager->m_objectTags.end())
+        {
+            manager->m_objectTags[object] = QStringList(tag);
+        }
+        else
+        {
+            if (objectTagIter.value().contains(tag))
+                continue;
+
+            objectTagIter.value() << tag;
+        }
+
+        ++manager->m_tags[tag];
+    }
+
+    manager->save();
+}
+
 void TagManager::addObjectTag(const QString &object, const QString &tag)
 {
     if (tag.trimmed().isEmpty())
@@ -140,15 +183,13 @@ void TagManager::removeObjectTag(const QString &object, const QString &tag)
 
     QMutexLocker locker(&manager->m_mutex);
 
-    ObjectTagsMap::iterator it = manager->m_objectTags.find(object);
-    if (it == manager->m_objectTags.end())
+    ObjectTagsMap::iterator objectTagIter = manager->m_objectTags.find(object);
+    if (objectTagIter == manager->m_objectTags.end())
         return;
 
-    int nRemoved = it.value().removeAll(tag);
-    if (nRemoved > 0)
+    if (objectTagIter.value().removeOne(tag))
     {
-        manager->m_tags[tag] -= nRemoved;
-        if (manager->m_tags[tag] <= 0)
+        if (--manager->m_tags[tag] <= 0)
             manager->m_tags.remove(tag);
 
         manager->save();

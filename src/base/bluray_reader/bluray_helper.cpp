@@ -571,8 +571,6 @@ void CLPIParser::composeEP_map_for_one_stream_PID(BitStreamWriter& writer, M2TSS
 			if (indexData.m_frameLen > 0) {
 				if (indexData.m_frameLen < 131072)
 					endCode = 1;
-				else if (indexData.m_frameLen < 131072)
-					endCode = 1;
 				else if (indexData.m_frameLen < 262144)
 					endCode = 2;
 				else if (indexData.m_frameLen < 393216)
@@ -1540,7 +1538,7 @@ M2TSStreamInfo::M2TSStreamInfo(const PMTStreamInfo& pmtStreamInfo)
 	m_audio_presentation_type = 0;
 	m_sampling_frequency_index = 0;
 	m_aspect_ratio_index = 3; // 16:9; 2 = 4:3
-	memset(&m_language_code, 0, 4);
+	memset(m_language_code, 0, 4);
 	m_character_code = 0;
 	m_height = 0;
 	m_isSecondary = pmtStreamInfo.m_isSecondary;

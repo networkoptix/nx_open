@@ -512,7 +512,7 @@ void TimeSlider::setCurrentValue(qint64 value)
 
     update();
 
-    if (!m_isUserInput)
+    if (!m_isUserInput && !isMoving())
         centraliseSlider();
 
     emit currentValueChanged(m_currentValue);

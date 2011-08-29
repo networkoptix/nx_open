@@ -743,10 +743,10 @@ static int ifoRead_PGC(ifo_handle_t *ifofile, pgc_t *pgc, unsigned int offset) {
 
   /* verify time (look at print_time) */
   for(i = 0; i < 8; i++)
-    if(!pgc->audio_control[i] & 0x8000) /* The 'is present' bit */
+    if(!(pgc->audio_control[i] & 0x8000)) /* The 'is present' bit */
       CHECK_ZERO(pgc->audio_control[i]);
   for(i = 0; i < 32; i++)
-    if(!pgc->subp_control[i] & 0x80000000) /* The 'is present' bit */
+    if(!(pgc->subp_control[i] & 0x80000000)) /* The 'is present' bit */
       CHECK_ZERO(pgc->subp_control[i]);
   
   /* Check that time is 0:0:0:0 also if nr_of_programs == 0 */
@@ -1756,7 +1756,7 @@ static int ifoRead_PGCIT_internal(ifo_handle_t *ifofile, pgcit_t *pgcit,
   }
   ptr = data;
   for(i = 0; i < pgcit->nr_of_pgci_srp; i++) {
-    memcpy(&pgcit->pgci_srp[i], ptr, PGCI_SRP_SIZE);
+    memcpy(pgcit->pgci_srp + i, ptr, PGCI_SRP_SIZE);
     ptr += PGCI_SRP_SIZE;
     B2N_16(pgcit->pgci_srp[i].ptl_id_mask);
     B2N_32(pgcit->pgci_srp[i].pgc_start_byte);
@@ -1889,7 +1889,7 @@ int ifoRead_PGCI_UT(ifo_handle_t *ifofile) {
   }
   ptr = data;
   for(i = 0; i < pgci_ut->nr_of_lus; i++) {
-    memcpy(&pgci_ut->lu[i], ptr, PGCI_LU_SIZE);
+    memcpy(pgci_ut->lu + i, ptr, PGCI_LU_SIZE);
     ptr += PGCI_LU_SIZE;
     B2N_16(pgci_ut->lu[i].lang_code); 
     B2N_32(pgci_ut->lu[i].lang_start_byte); 

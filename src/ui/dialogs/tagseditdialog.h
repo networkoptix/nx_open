@@ -4,7 +4,7 @@
 #include <QtGui/QDialog>
 
 class QSortFilterProxyModel;
-class QStringListModel;
+class QStandardItemModel;
 
 namespace Ui {
     class TagsEditDialog;
@@ -15,7 +15,7 @@ class TagsEditDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit TagsEditDialog(const QString &objectId, QWidget *parent = 0);
+    explicit TagsEditDialog(const QStringList &objectIds, QWidget *parent = 0);
     ~TagsEditDialog();
 
 public Q_SLOTS:
@@ -25,6 +25,9 @@ public Q_SLOTS:
 protected:
     void changeEvent(QEvent *e);
     void keyPressEvent(QKeyEvent *e);
+    void showEvent(QShowEvent *e);
+
+    void retranslateUi();
 
 private Q_SLOTS:
     void addTag();
@@ -42,10 +45,10 @@ private:
 
     Ui::TagsEditDialog *ui;
 
-    QString m_objectId;
+    QStringList m_objectIds;
 
-    QStringListModel *m_objectTagsModel;
-    QStringListModel *m_allTagsModel;
+    QStandardItemModel *m_objectTagsModel;
+    QStandardItemModel *m_allTagsModel;
     QSortFilterProxyModel *m_allTagsProxyModel;
 };
 

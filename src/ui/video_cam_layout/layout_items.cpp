@@ -53,8 +53,6 @@ LayoutItem::~LayoutItem()
 
 QString LayoutItem::Type2String(Type t)
 {
-	enum Type { DEVICE, BUTTON, LAYOUT, IMAGE, BACKGROUND };
-
 	switch(t)
 	{
 	case DEVICE:
