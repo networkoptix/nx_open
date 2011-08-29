@@ -112,6 +112,7 @@ void CLArchiveStreamReader::init_data()
 		parse_channel_data(channel ,ver, data.data()+4, data.size()-4);
 	}
 
+    /*
 	//=====choosing min time
 	QDateTime min_date_time;
 	bool first = true;
@@ -136,7 +137,10 @@ void CLArchiveStreamReader::init_data()
 
 	for (int channel = 0; channel < m_channel_number; ++channel)
 	{
-		for(int i = 0; i < mMovie[channel].count();++i)
+
+        int count = mMovie[channel].count();
+
+		for(int i = 0; i < count;++i)
 		{
 			ArchiveFrameInfo& info = mMovie[channel][i];
 
@@ -149,6 +153,48 @@ void CLArchiveStreamReader::init_data()
 				m_lengthMksec = time_mks;
 		}
 	}
+    /**/
+
+
+    //=====choosing min time
+    quint64 min_date_time;
+    quint64 time;
+    bool first = true;
+    for (int channel = 0; channel < m_channel_number; ++channel)
+    {
+        if (mMovie[channel].count()==0)
+            continue;
+
+        if (first)
+        {
+            min_date_time = mMovie[channel].at(0).abs_time;
+            first = false;
+        }
+
+        time = mMovie[channel].at(0).abs_time;
+
+        if (time<min_date_time)
+            min_date_time = time;
+    }
+
+    //===========time_ms===================
+
+    for (int channel = 0; channel < m_channel_number; ++channel)
+    {
+
+        int count = mMovie[channel].count();
+        QList<ArchiveFrameInfo>& lst_channel = mMovie[channel];
+
+        for(int i = 0; i < count;++i)
+        {
+            ArchiveFrameInfo& info = lst_channel[i];
+        
+            info.time = info.abs_time - min_date_time;
+
+            if (info.time>m_lengthMksec)
+                m_lengthMksec = info.time;
+        }
+    }
 
 }
 
@@ -456,7 +502,7 @@ int CLArchiveStreamReader::slowest_channel() const
 {
 	//=====find slowest channel ========
 	int slowest_channel = -1;
-	quint64 best_slowest_time = m_forward ? 0xffffffff : 0;
+	quint64 best_slowest_time = m_forward ? 0xffffffffffffffff : 0;
 	for (int channel = 0; channel < m_channel_number; ++channel)
 	{
 
