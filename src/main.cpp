@@ -18,7 +18,6 @@
 #include "device/device_managmen/device_manager.h"
 #include "ui/video_cam_layout/layout_manager.h"
 #include "ui/context_menu_helper.h"
-#include "ui/device_settings/style.h"
 #include "decoders/video/abstractdecoder.h"
 #include "device_plugins/avigilon/devices/avigilon_device_server.h"
 #include "device_plugins/android/devices/android_device_server.h"
@@ -138,9 +137,7 @@ int main(int argc, char *argv[])
 
     //=========================================================
 
-//    if (!qApp->setStyle(QLatin1String("qtc_xpro2")))
-//    if (!qApp->setStyle(QLatin1String("Bespin")))
-;//        qApp->setStyle(new ArthurStyle);
+    qApp->setStyle(QLatin1String("Bespin"));
 
     qApp->setStyleSheet(QLatin1String(
         "QMenu {\n"
