@@ -1,8 +1,10 @@
 #include "picture_image_item.h"
 
+#include <QtCore/QDir>
+#include <QtCore/QFileInfo>
+#include <QtCore/QTimer>
 
-
-extern QPixmap cached(const QString &img);
+#include "ui/ui_common.h"
 
 CLPictureImageItem::CLPictureImageItem(GraphicsView* view, int max_width, int max_height,
 				   QString path,
@@ -13,44 +15,28 @@ m_CurrentIndex(0),
 m_forwardDirection(true)
 {
 
-    if (path.contains(QLatin1String(".png")))
+    if (path.endsWith(QLatin1String(".png")))
     {
-        QPixmap img = cached(path);
-        m_Images.push_back(img);
+        // single image
+        m_Images.append(cached(path));
     }
     else
     {
+        // set of images
         QDir dir(path);
-        if (!dir.exists())
-        {
-            Q_ASSERT(false);
-            return ;
-        }
+        const QStringList filter = QStringList() << QLatin1String("*.png");
+        foreach (const QFileInfo &fi, dir.entryInfoList(filter, QDir::Files, QDir::Name))
+            m_Images.append(cached(fi.absoluteFilePath()));
 
-        dir.setSorting(QDir::Name);
-
-        QStringList filter;
-        filter << QLatin1String("*.png");
-        QStringList list = dir.entryList(filter);
-
-        foreach(QString file, list)
-        {
-            QPixmap img = cached(path + QLatin1Char('/') +  file);
-            m_Images.push_back(img);
-        }
-
-        if (m_Images.count()==0)
-            return;
-
+        if (m_Images.isEmpty())
+            m_Images.append(QPixmap());
     }
 
+    m_CurrentImg = &m_Images.at(0);
 
-
-	m_CurrentImg = &(m_Images.at(0));
-
-	m_imageWidth_old = m_imageWidth = m_CurrentImg->width();
-	m_imageHeight_old = m_imageHeight = m_CurrentImg->height();
-	m_aspectratio = qreal(m_imageWidth)/m_imageHeight;
+    m_imageWidth_old = m_imageWidth = m_CurrentImg->width();
+    m_imageHeight_old = m_imageHeight = m_CurrentImg->height();
+    m_aspectratio = qreal(m_imageWidth)/m_imageHeight;
 
     if (m_Images.count()>1)
     {

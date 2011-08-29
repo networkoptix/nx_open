@@ -1,8 +1,7 @@
-#include "settings.h"
 #include "layout_item.h"
-#include "ui/ui_common.h"
 
-extern QPixmap cached(const QString &img);
+#include "settings.h"
+#include "ui/ui_common.h"
 
 CLLayoutItem::CLLayoutItem(GraphicsView* view, int max_width, int max_height, QString name, QString tooltip):
 CLImageItem(view,max_width,max_height, name),
@@ -49,7 +48,7 @@ QPointF CLLayoutItem::getBestSubItemPos(CLSubItemType type)
 
 void CLLayoutItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    Q_UNUSED(widget);
+	Q_UNUSED(widget);
 
 	/*
 	painter->fillPath(mShadowRectPath, global_shadow_color);

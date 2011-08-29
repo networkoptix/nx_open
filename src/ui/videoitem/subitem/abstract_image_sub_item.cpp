@@ -1,8 +1,8 @@
 #include "abstract_image_sub_item.h"
 
-extern QPixmap cached(const QString &img);
+#include "ui/ui_common.h"
 
-CLImgSubItem::CLImgSubItem(CLAbstractSubItemContainer* parent, const QString& img, CLSubItemType type, 
+CLImgSubItem::CLImgSubItem(CLAbstractSubItemContainer* parent, const QString& img, CLSubItemType type,
 						   qreal opacity, qreal max_opacity, int max_width, int max_height):
 CLAbstractSubItem(parent, opacity, max_opacity)
 {

@@ -4,9 +4,9 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QTimer>
 
-#define OPACITY_TIME 500
+#include "ui/ui_common.h"
 
-extern QPixmap cached(const QString &img);
+#define OPACITY_TIME 500
 
 CLUnMovedPixture::CLUnMovedPixture(QString name, QGraphicsItem* parent, qreal normal_opacity, qreal active_opacity, QString img, int max_width, int max_height, qreal z):
 CLUnMovedInteractiveOpacityItem(name, parent, normal_opacity, active_opacity),
@@ -18,20 +18,15 @@ CLUnMovedInteractiveOpacityItem(name, parent, normal_opacity, active_opacity),
     if (img.endsWith(QLatin1String(".png")))
     {
         // single image
-        QPixmap pimg = cached(img);
-        m_Images.append(pimg);
+        m_Images.append(cached(img));
     }
     else
     {
         // set of images
         QDir dir(img);
-        QStringList filter = QStringList() << QLatin1String("*.png");
-        QFileInfoList entryInfoList = dir.entryInfoList(filter, QDir::Files, QDir::Name);
-        foreach (const QFileInfo &fi, entryInfoList)
-        {
-            QPixmap pimg = cached(fi.absoluteFilePath());
-            m_Images.append(pimg);
-        }
+        const QStringList filter = QStringList() << QLatin1String("*.png");
+        foreach (const QFileInfo &fi, dir.entryInfoList(filter, QDir::Files, QDir::Name))
+            m_Images.append(cached(fi.absoluteFilePath()));
 
         if (m_Images.isEmpty())
             m_Images.append(QPixmap());

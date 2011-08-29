@@ -27,6 +27,7 @@
 #include "device_plugins/archive/archive/archive_stream_reader.h"
 #include "device_plugins/archive/archive/archive_device.h"
 #include "videoitem/unmoved/multipage/page_selector.h"
+#include "ui/ui_common.h"
 #include "ui/animation/property_animation.h"
 #include "ui/recordingsettingswidget.h"
 #include "ui/dialogs/tagseditdialog.h"
@@ -71,7 +72,6 @@ extern int MAX_FPS_selected;
 extern qreal square_ratio;
 extern qreal long_ratio;
 
-extern QPixmap cached(const QString &img);
 extern int limit_val(int val, int min_val, int max_val, bool mirror);
 //==============================================================================
 
@@ -907,7 +907,6 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
             QDrag *drag = new QDrag(this);
             drag->setMimeData(mimeData);
             drag->setPixmap(cached(QLatin1String(":/skin/camera_dd_icon.png")));
-            //drag->setPixmap(cached(":/skin/logo.png"));
 
             drag->exec(Qt::CopyAction);
             m_scene.clearSelection();
