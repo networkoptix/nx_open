@@ -78,7 +78,7 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_lightCpuMode(CLAbstractVideoDecoder::DecodeMode_Full)
 {
     m_storedMaxQueueSize = m_dataQueue.maxSize();
-    setSpeed(10);
+    //setSpeed(10);
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         m_display[i] = 0;
 
