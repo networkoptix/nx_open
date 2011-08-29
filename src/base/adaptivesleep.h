@@ -15,41 +15,38 @@ public:
 
 	  };
 
-	int sleep(qint64 mksec)
-	{
+      void setMaxOverdraft(int max_overdraft) 
+      {
+        m_max_overdraft = max_overdraft;
+        afterdelay();
+      }
 
-		if (m_firstTime)
-		{
-			m_firstTime = false;
-			m_prevEndTime.start();
-			m_mod = 0;
-		}
+      int sleep(qint64 mksec)
+      {
 
-		m_mod += mksec%1000;
-		if (m_mod >= 1000)
-		{
-			mksec+=1000;
-			m_mod-=1000;
-		}
+          if (m_firstTime)
+          {
+              m_firstTime = false;
+              m_prevEndTime.start();
+              m_totalTime = 0;
+          }
 
-		qint64 past = (qint64)m_prevEndTime.elapsed()*1000;
-		//cl_log.log("past = ", (int)past,  cl_logALWAYS);
-		//past*=1000;
+          m_totalTime += mksec;
 
-		qint64 havetowait = mksec - past;
-		m_prevEndTime = m_prevEndTime.addMSecs(mksec/1000);
+          qint64 now = (qint64)m_prevEndTime.elapsed()*1000;
+          qint64 havetowait = m_totalTime - now;
 
-		if (havetowait<=0)
-		{
-			if (-havetowait > m_max_overdraft)
-				afterdelay();
+          if (havetowait<=0)
+          {
+              if (-havetowait > m_max_overdraft && m_max_overdraft > 0)
+                  afterdelay();
+              return havetowait;
+          }
+          CLSleep::msleep(havetowait/1000);
+          return havetowait;
+      }
 
-			return havetowait;
-		}
 
-		CLSleep::msleep(havetowait/1000);
-        return havetowait;
-	}
 
 	void afterdelay()
 	{
@@ -60,8 +57,7 @@ private:
 	QTime  m_prevEndTime;
 	bool m_firstTime;
 	qint64 m_max_overdraft;
-
-	qint64 m_mod;
+    qint64 m_totalTime;
 
 };
 

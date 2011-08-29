@@ -88,6 +88,8 @@ private:
     bool m_hadAudio;
 
     qint64 m_lastAudioPacketTime;
+    int m_totalFrames;
+    int m_iFrames;
     qint64 m_lastVideoPacketTime;
     qint64 m_lastDisplayedVideoTime;
 
