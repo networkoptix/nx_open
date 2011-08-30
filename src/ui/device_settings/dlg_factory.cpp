@@ -1,25 +1,28 @@
 #include "dlg_factory.h"
 
-CLDeviceSettingsDlgFactory& CLDeviceSettingsDlgFactory::instance()
+#include <QtCore/QList>
+
+#include "device_settings_dlg.h"
+
+typedef QList<CLAbstractDlgManufacture *> Manufactures;
+Q_GLOBAL_STATIC(Manufactures, manufactures)
+
+CLAbstractDeviceSettingsDlg *CLDeviceSettingsDlgFactory::createDlg(CLDevice *dev)
 {
-	static CLDeviceSettingsDlgFactory inst;
-	return inst;
+    if (!dev)
+        return 0;
+
+    foreach (CLAbstractDlgManufacture *man, *manufactures())
+    {
+        if (man->canProduceDlg(dev))
+            return man->createDlg(dev);
+    }
+
+    return 0;
 }
 
-CLAbstractDeviceSettingsDlg* CLDeviceSettingsDlgFactory::createDlg(CLDevice* dev)
+void CLDeviceSettingsDlgFactory::registerDlgManufacture(CLAbstractDlgManufacture *manufacture)
 {
-	for (int i = 0; i < mMaunufactures.count();++i)
-	{
-		CLAbstractDlgManufacture* man = mMaunufactures.at(i);
-		if (man->canProduceDlg(dev))
-			return man->createDlg(dev);
-	}
-
-	return 0;
+    if (manufacture)
+        manufactures()->append(manufacture);
 }
-
-void CLDeviceSettingsDlgFactory::registerDlgManufacture(CLAbstractDlgManufacture* manufacture)
-{
-	mMaunufactures.push_back(manufacture);
-}
-

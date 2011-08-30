@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
     CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&DesktopDeviceServer::instance());
 #endif // Q_OS_WIN
 
-    CLDeviceSettingsDlgFactory::instance().registerDlgManufacture(&AreconVisionDlgManufacture::instance());
+    CLDeviceSettingsDlgFactory::registerDlgManufacture(&AreconVisionDlgManufacture::instance());
     //============================
 
     //=========================================================

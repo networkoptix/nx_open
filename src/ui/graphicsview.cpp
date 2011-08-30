@@ -2943,15 +2943,14 @@ void GraphicsView::show_device_settings_helper(CLDevice* dev)
 
     if (!mDeviceDlg)
     {
-        mDeviceDlg = CLDeviceSettingsDlgFactory::instance().createDlg(dev);
+        mDeviceDlg = CLDeviceSettingsDlgFactory::createDlg(dev);
         if (!mDeviceDlg)
             return;
 
         if (open) // was open before
             mDeviceDlg->move(p);
+        mDeviceDlg->exec();
     }
-
-    mDeviceDlg->exec();
 }
 
 void GraphicsView::contextMenuHelper_addNewLayout()

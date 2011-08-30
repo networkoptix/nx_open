@@ -7,23 +7,18 @@ class CLAbstractDeviceSettingsDlg;
 class CLAbstractDlgManufacture
 {
 protected:
-	CLAbstractDlgManufacture(){};
+    virtual ~CLAbstractDlgManufacture() {}
+
 public:
-	virtual CLAbstractDeviceSettingsDlg* createDlg(CLDevice* dev) = 0;
-	virtual bool canProduceDlg(CLDevice* dev) const = 0;
+    virtual CLAbstractDeviceSettingsDlg *createDlg(CLDevice *dev) = 0;
+    virtual bool canProduceDlg(CLDevice *dev) const = 0;
 };
 
 class CLDeviceSettingsDlgFactory
 {
-private:
-	CLDeviceSettingsDlgFactory(){};
 public:
-	static CLDeviceSettingsDlgFactory& instance();
-public:
-	CLAbstractDeviceSettingsDlg* createDlg(CLDevice* dev);
-	void registerDlgManufacture(CLAbstractDlgManufacture* manufacture);
-private:
-	QList<CLAbstractDlgManufacture*> mMaunufactures;
+    static CLAbstractDeviceSettingsDlg *createDlg(CLDevice *dev);
+    static void registerDlgManufacture(CLAbstractDlgManufacture *manufacture);
 };
 
 #endif //dlg_factory__h_1712
