@@ -54,6 +54,8 @@ unsigned int CLByteArray::capacity() const
 
 bool CLByteArray::reallocate(unsigned int new_capacity)
 {
+    Q_ASSERT(capacity > 0);
+
     if (new_capacity < m_size)
     {
         qWarning("CLByteArray::reallocate(): Unable to decrease capacity. "
@@ -61,7 +63,7 @@ bool CLByteArray::reallocate(unsigned int new_capacity)
         return false;
     }
 
-    if (new_capacity + CLBYTEARRAY_PADDING_SIZE <= m_capacity)
+    if (new_capacity <= m_capacity)
         return true;
 
     char *new_data = (char *)qReallocAligned(m_data, new_capacity + CLBYTEARRAY_PADDING_SIZE, m_capacity, m_alignment);
