@@ -422,11 +422,13 @@ void CLGLRenderer::draw(CLVideoDecoderOutput* img, unsigned int channel)
 
 void CLGLRenderer::waitForFrameDisplayed(int channel)
 {
+    Q_UNUSED(channel)
+
     if (m_needwait)
     {
         QMutexLocker lock(&m_displaySync);
         while (m_curImg->isDisplaying())
-            m_waitCon.wait(&m_displaySync, 16); // ### bind to v-sync
+            m_waitCon.wait(&m_displaySync);
     }
 }
 
