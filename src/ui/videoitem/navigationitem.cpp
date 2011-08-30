@@ -13,8 +13,9 @@
 #include "camera/camera.h"
 #include "device_plugins/archive/abstract_archive_stream_reader.h"
 #include "util.h"
-#include "../widgets/imagebuttonitem.h"
-#include "volumewidget.h"
+#include "ui/widgets/imagebuttonitem.h"
+#include "ui/widgets/speedwidget.h"
+#include "ui/widgets/volumewidget.h"
 
 class MyTextItem: public QGraphicsItem
 {
@@ -114,7 +115,20 @@ NavigationWidget::NavigationWidget(QWidget *parent) :
     m_layout->setSpacing(10);
     m_layout->addWidget(m_slider);
     m_layout->addWidget(m_label);
+#if 0
     m_layout->addWidget(m_volumeWidget);
+#else
+    // ### remove
+    SpeedWidget *speedWidget = new SpeedWidget(this);
+    speedWidget->setObjectName("SpeedWidget");
+    connect(speedWidget, SIGNAL(valueChanged(int)), this, SLOT(speedChanged(int))); // ###
+    QVBoxLayout *vlayout = new QVBoxLayout;
+    vlayout->setContentsMargins(0, 0, 0, 0);
+    vlayout->setSpacing(1);
+    vlayout->addWidget(speedWidget, 1, Qt::AlignTop);
+    vlayout->addWidget(m_volumeWidget, 1, Qt::AlignBottom);
+    m_layout->addLayout(vlayout);
+#endif
     setLayout(m_layout);
 }
 
