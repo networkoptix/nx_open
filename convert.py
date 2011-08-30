@@ -112,7 +112,7 @@ def setup_ffmpeg():
 
     if not ffmpeg_path:
         print r"""EVE_FFMPEG environment variable is not defined.
-        
+
     Do the following:
     1. Clone repository ssh://hg@vigasin.com/ffmpeg to somewhere, say c:\programming\ffmpeg
     2. Go to c:\programming\ffmpeg and run get_ffmpegs.bat
@@ -285,3 +285,38 @@ elif sys.platform == 'darwin':
 
     os.system('qmake -spec macx-g++ CONFIG-=release CONFIG+=debug FFMPEG=%s -o build/Makefile.debug src/uniclient.pro' % ffmpeg_path)
     os.system('qmake -spec macx-g++ CONFIG-=debug CONFIG+=release FFMPEG=%s -o build/Makefile.release src/uniclient.pro' % ffmpeg_path)
+
+
+# Bespin
+bespin_path = 'contrib/bespin/bin/'
+### add x86/x64 selector
+if sys.platform == 'win32':
+    bespin = 'msvc-x86'
+elif sys.platform == 'darwin':
+    bespin = 'mac-x64'
+else:
+    bespin = 'linux-x86'
+bespin_path = os.path.join(bespin_path, bespin)
+
+if not os.path.isdir(bespin_path):
+    print >> sys.stdout, "Can't find Bespin style plugin binaries for this platform at %s . rebuilding..." % bespin_path
+
+    tmp_build_dir = 'build/tmp'
+    if os.path.exists(tmp_build_dir):
+        rmtree(tmp_build_dir)
+    os.mkdir(tmp_build_dir)
+
+    if sys.platform == 'win32':
+        os.system('cd %s && qmake -r ../../contrib/bespin/bespin.pro && nmake /S && cd ../..' % tmp_build_dir)
+    else:
+        os.system('cd %s && qmake -r ../../contrib/bespin/bespin.pro && make && cd ../..' % tmp_build_dir)
+
+    if os.path.exists(tmp_build_dir):
+        rmtree(tmp_build_dir)
+
+if os.path.isdir(bespin_path):
+    ### copy bespin_path/* to bin recursively ?
+    os.mkdir('bin/release/styles')
+    os.mkdir('bin/debug/styles')
+    copy_files(bespin_path + '/release/styles/*.dll', 'bin/release/styles')
+    copy_files(bespin_path + '/debug/styles/*.dll', 'bin/debug/styles')

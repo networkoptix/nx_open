@@ -508,6 +508,10 @@ void TimeSlider::setCurrentValue(qint64 value)
     */
     m_currentValue = qMin(value, maximumValue());
 
+    if (m_currentValue < 0)
+        m_currentValue  = 0;
+    
+
     updateSlider();
 
     update();
