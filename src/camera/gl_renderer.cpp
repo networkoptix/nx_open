@@ -387,7 +387,7 @@ void CLGLRenderer::beforeDestroy()
 {
     QMutexLocker lock(&m_displaySync);
     m_needwait = false;
-    if (m_curImg) 
+    if (m_curImg)
         m_curImg->setDisplaying(false);
     m_waitCon.wakeAll();
 }
@@ -422,13 +422,11 @@ void CLGLRenderer::draw(CLVideoDecoderOutput* img, unsigned int channel)
 
 void CLGLRenderer::waitForFrameDisplayed(int channel)
 {
-    // Sergey: some times It does not wake up after wakeone is called ; is it a bug?
-    // Roman: No. it is invalid use of waitCondition without mutex. bug fixed, timeout removed
     if (m_needwait)
     {
         QMutexLocker lock(&m_displaySync);
         while (m_curImg->isDisplaying())
-            m_waitCon.wait(&m_displaySync, 50);
+            m_waitCon.wait(&m_displaySync, 16); // ### bind to v-sync
     }
 }
 
