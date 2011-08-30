@@ -8,7 +8,28 @@
 #include "../../openal/qtvaudiodevice.h"
 #include "timeslider.h"
 
-void MyVolumeSlider::paintEvent(QPaintEvent *)
+StyledSlider::StyledSlider(QWidget *parent)
+    : QSlider(Qt::Horizontal, parent),
+      m_timerId(0)
+{
+}
+
+StyledSlider::StyledSlider(Qt::Orientation orientation, QWidget *parent)
+    : QSlider(orientation, parent),
+      m_timerId(0)
+{
+}
+
+StyledSlider::~StyledSlider()
+{
+    if (m_timerId)
+    {
+        killTimer(m_timerId);
+        m_timerId = 0;
+    }
+}
+
+void StyledSlider::paintEvent(QPaintEvent *)
 {
     static const int gradHeigth = 10;
 
@@ -30,6 +51,33 @@ void MyVolumeSlider::paintEvent(QPaintEvent *)
     linearGrad.setColorAt(0, QColor(0, 43, 130));
     linearGrad.setColorAt(1, QColor(186, 239, 255));
     p.fillRect(1, (height() - gradHeigth)/2, handlePos+1, gradHeigth, linearGrad);
+
+    if (m_timerId)
+    {
+        p.setPen(QPen(palette().color(QPalette::Active, QPalette::HighlightedText), 1));
+        p.drawText(r, Qt::AlignCenter, value() ? QString::number(value()) + QLatin1Char('%') : tr("Muted"));
+    }
+}
+
+void StyledSlider::timerEvent(QTimerEvent *event)
+{
+    if (event->timerId() == m_timerId)
+    {
+        killTimer(m_timerId);
+        m_timerId = 0;
+        update();
+    }
+
+    QSlider::timerEvent(event);
+}
+
+void StyledSlider::sliderChange(SliderChange change)
+{
+    if (m_timerId)
+        killTimer(m_timerId);
+    m_timerId = startTimer(2500);
+
+    QSlider::sliderChange(change);
 }
 
 
@@ -38,8 +86,9 @@ VolumeWidget::VolumeWidget(QWidget *parent) :
 {
     installEventFilter(this);
 
-    m_slider = new MyVolumeSlider(Qt::Horizontal, this);
+    m_slider = new StyledSlider(Qt::Horizontal, this);
     m_slider->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    m_slider->setRange(0, 100);
     m_slider->setValue(50);
     m_slider->setStyle(SliderProxyStyle::instance());
 
@@ -60,7 +109,6 @@ VolumeWidget::VolumeWidget(QWidget *parent) :
     const float volume = QtvAudioDevice::instance().volume();
     m_slider->setValue(volume * 100);
     m_button->setChecked(QtvAudioDevice::instance().isMute());
-    setToolTip(QString::number(m_slider->value()));
 
     connect(m_slider, SIGNAL(valueChanged(int)), SLOT(onValueChanged(int)));
     connect(m_button, SIGNAL(toggled(bool)), SLOT(onButtonChecked()));
@@ -70,7 +118,7 @@ VolumeWidget::VolumeWidget(QWidget *parent) :
 
 bool VolumeWidget::eventFilter(QObject *watched, QEvent *event)
 {
-    if (watched != m_slider && event->type() == QEvent::Wheel)
+    if (/*watched != m_slider && */event->type() == QEvent::Wheel)
     {
         // adjust and redirect to slider
         QWheelEvent *wheelEvent = static_cast<QWheelEvent *>(event);
@@ -97,12 +145,6 @@ void VolumeWidget::onValueChanged(int value)
 {
     QtvAudioDevice::instance().setVolume(value / 100.0);
     m_button->setChecked(QtvAudioDevice::instance().isMute());
-
-    setToolTip(m_slider->value() ? QString::number(m_slider->value()) : tr("Muted"));
-    // ###
-    //QHelpEvent event(QEvent::ToolTip, rect().center(), mapToGlobal(rect().center()));
-    QHelpEvent event(QEvent::ToolTip, rect().topLeft(), QCursor::pos());
-    QCoreApplication::sendEvent(this, &event);
 }
 
 void VolumeWidget::onButtonChecked()

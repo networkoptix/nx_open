@@ -7,15 +7,23 @@
 
 class MyButton;
 
-class MyVolumeSlider : public QSlider
+class StyledSlider : public QSlider
 {
     Q_OBJECT
 
 public:
-    MyVolumeSlider(QWidget *parent = 0) : QSlider(Qt::Horizontal, parent) {}
-    MyVolumeSlider(Qt::Orientation orientation, QWidget *parent = 0) : QSlider(orientation, parent) {}
+    StyledSlider(QWidget *parent = 0);
+    StyledSlider(Qt::Orientation orientation, QWidget *parent = 0);
+    ~StyledSlider();
 
-    void paintEvent(QPaintEvent *ev);
+protected:
+    void paintEvent(QPaintEvent *);
+    void timerEvent(QTimerEvent *);
+
+    void sliderChange(SliderChange change);
+
+private:
+    int m_timerId;
 };
 
 
@@ -39,7 +47,7 @@ protected:
     void paintEvent(QPaintEvent *);
 
 private:
-    MyVolumeSlider *m_slider;
+    StyledSlider *m_slider;
     MyButton *m_button;
 };
 
