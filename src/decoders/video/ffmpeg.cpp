@@ -22,8 +22,6 @@ m_showmotion(false),
 m_decodeMode(DecodeMode_Full),
 m_newDecodeMode(DecodeMode_NotDefined),
 m_lightModeFrameCounter(0),
-needResetCodec(false),
-m_lastWidth(0),
 m_frameTypeExtractor(0)
 {
 	if (codecContext)
@@ -189,27 +187,16 @@ bool CLFFmpegVideoDecoder::decode(const CLCompressedVideoData& data, CLVideoDeco
 		}
 	}
 
-	bool needResetCodec = false;
-
 #ifdef _USE_DXVA
-    if (m_decoderContext.isHardwareAcceleration() && !isHardwareAccellerationPossible(data.codec, data.width, data.height))
-    {
-        m_decoderContext.setHardwareAcceleration(false);
-        needResetCodec = true;
-    }
+    bool needResetCodec = false;
 
-    if (m_tryHardwareAcceleration && !m_decoderContext.isHardwareAcceleration() && isHardwareAccellerationPossible(data.codec, data.width, data.height))
+    if (m_decoderContext.isHardwareAcceleration() && !isHardwareAccellerationPossible(data.codec, data.width, data.height)
+        || m_tryHardwareAcceleration && !m_decoderContext.isHardwareAcceleration() && isHardwareAccellerationPossible(data.codec, data.width, data.height))
     {
-        m_decoderContext.setHardwareAcceleration(true);
-        needResetCodec = true;
+        m_decoderContext.setHardwareAcceleration(!m_decoderContext.isHardwareAcceleration());
+        m_needRecreate = true;
     }
 #endif
-
-    if(needResetCodec)
-    {
-        needResetCodec = false;
-        resetDecoder();
-    }
 
     if (m_needRecreate && data.keyFrame)
     {
@@ -225,19 +212,21 @@ bool CLFFmpegVideoDecoder::decode(const CLCompressedVideoData& data, CLVideoDeco
     avpkt.flags = AV_PKT_FLAG_KEY;
 
     int got_picture = 0;
-    if (!outFrame->isExternalData() && 
-        (outFrame->width != c->width || outFrame->height != c->height || outFrame->format != c->pix_fmt))
-    {
-        outFrame->reallocate(c->width, c->height, c->pix_fmt);
-    }
+
+    // ### handle errors
     avcodec_decode_video2(c, m_frame, &got_picture, &avpkt);
     if (data.useTwice)
         avcodec_decode_video2(c, m_frame, &got_picture, &avpkt);
 
-	if (got_picture )
-	{
+    if (got_picture)
+    {
+        if (!outFrame->isExternalData() &&
+            (outFrame->width != c->width || outFrame->height != c->height || outFrame->format != c->pix_fmt))
+        {
+            outFrame->reallocate(c->width, c->height, c->pix_fmt);
+        }
+
         AVFrame* copyFromFrame = m_frame;
-		//AVFrame* outputFrame;
 		if (m_frame->interlaced_frame && m_mtDecoding)
 		{
             if (outFrame->isExternalData())
@@ -253,27 +242,20 @@ bool CLFFmpegVideoDecoder::decode(const CLCompressedVideoData& data, CLVideoDeco
                 av_picture_copy((AVPicture*) outFrame, (AVPicture*) (m_frame), c->pix_fmt, c->width, c->height);
         }
 
-        m_lastWidth = data.width;
 #ifdef _USE_DXVA
         if (m_decoderContext.isHardwareAcceleration())
-        {
             m_decoderContext.extract(m_frame);
-        }
 #endif
 
+		c->debug_mv = 0;
 		if (m_showmotion)
 		{
 			c->debug_mv = 1;
 			//c->debug |=  FF_DEBUG_QP | FF_DEBUG_SKIP | FF_DEBUG_MB_TYPE | FF_DEBUG_VIS_QP | FF_DEBUG_VIS_MB_TYPE;
 			//c->debug |=  FF_DEBUG_VIS_MB_TYPE;
-		}
-		else
-		{
-			c->debug_mv = 0;
+			//ff_print_debug_info((MpegEncContext*)(c->priv_data), picture);
 		}
 
-		//if (m_showmotion)
-		//	ff_print_debug_info((MpegEncContext*)(c->priv_data), picture);
         if (outFrame->isExternalData())
         {
 		    outFrame->width = c->width;

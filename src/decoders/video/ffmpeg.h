@@ -69,12 +69,6 @@ private:
 	CLAbstractVideoDecoder::DecodeMode m_newDecodeMode;
 
 	unsigned int m_lightModeFrameCounter;
-
-    bool needResetCodec;
-	//===================
-
-    int m_lastWidth;
 };
 
 #endif //cl_ffmpeg_h
-
