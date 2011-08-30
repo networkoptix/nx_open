@@ -211,6 +211,16 @@ bool CLFFmpegVideoDecoder::decode(const CLCompressedVideoData& data, CLVideoDeco
     // HACK for CorePNG to decode as normal PNG by default
     avpkt.flags = AV_PKT_FLAG_KEY;
 
+    // from avcodec_decode_video2() docs:
+    // 1) The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than
+    // the actual read bytes because some optimized bitstream readers read 32 or 64
+    // bits at once and could read over the end.
+    // 2) The end of the input buffer buf should be set to 0 to ensure that
+    // no overreading happens for damaged MPEG streams.
+
+    // 1 is already guaranteed by CLByteArray, let's apply 2 here...
+    memset(avpkt.data + avpkt.size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
+
     int got_picture = 0;
 
     // ### handle errors
