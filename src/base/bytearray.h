@@ -51,24 +51,24 @@ public:
     // this function makes sure that array has capacity to write size bytes
     // returns a pointer
     // this function is used with done()
-    char *prepareToWrite(int size);
+    char *prepareToWrite(unsigned int size);
 
-    void done(int size);
+    void done(unsigned int size);
 
     void ignore_first_bytes(int bytes_to_ignore);
 
     //======
 
     //av cam
-    void removeZerrowsAtTheEnd();
+    void removeZerosAtTheEnd();
 
 private:
     Q_DISABLE_COPY(CLByteArray)
 
-    // this function realocates data and changes capacity.
-    // if new capacity smaller than current size+alignment this function does nothing
-    // return false if can not allocate new memorry
-    bool increase_capacity(unsigned int new_capacity);
+    // this function reallocates data and changes capacity.
+    // if new capacity smaller than current size this function does nothing
+    // return false if can not allocate new memory
+    bool reallocate(unsigned int new_capacity);
 
 private:
     unsigned int m_alignment;

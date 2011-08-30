@@ -2,14 +2,17 @@
 
 #include "log.h"
 
+// same as FF_INPUT_BUFFER_PADDING_SIZE
+#define CLBYTEARRAY_PADDING_SIZE 16
+
 CLByteArray::CLByteArray(unsigned int alignment, unsigned int capacity):
     m_alignment(alignment),
-    m_capacity(capacity + alignment),
+    m_capacity(0),
     m_size(0),
+    m_data(0),
     m_ignore(0)
 {
-    m_data = (char *)qMallocAligned(m_capacity, m_alignment);
-    Q_CHECK_PTR(m_data);
+    reallocate(capacity);
 }
 
 CLByteArray::~CLByteArray()
@@ -49,13 +52,16 @@ unsigned int CLByteArray::capacity() const
     return m_capacity;
 }
 
-bool CLByteArray::increase_capacity(unsigned int new_capacity)
+bool CLByteArray::reallocate(unsigned int new_capacity)
 {
-    new_capacity += m_alignment;
-
-    if (new_capacity < m_size + m_alignment)
+    if (new_capacity < m_size)
+    {
+        qWarning("CLByteArray::reallocate(): Unable to decrease capacity. "
+                 "Did you forget to clean() the buffer?");
         return false;
+    }
 
+    new_capacity += CLBYTEARRAY_PADDING_SIZE;
     if (new_capacity <= m_capacity)
         return true;
 
@@ -74,7 +80,7 @@ unsigned int CLByteArray::write(const char *data, unsigned int size)
 {
     if (size > m_capacity - m_size) // if we do not have enough space
     {
-        if (!increase_capacity(m_capacity * 2 + size))
+        if (!reallocate(m_capacity * 2 + size))
         {
             cl_log.log(QLatin1String("CLByteArray::write(): Unable to increase capacity"), cl_logWARNING);
             return 0;
@@ -92,7 +98,7 @@ unsigned int CLByteArray::write(const char *data, unsigned int size, int abs_shi
 {
     if (size > m_capacity - abs_shift) // if we do not have enough space
     {
-        if (!increase_capacity(m_capacity * 2 + size))
+        if (!reallocate(m_capacity * 2 + size))
         {
             cl_log.log(QLatin1String("CLByteArray::write(): Unable to increase capacity"), cl_logWARNING);
             return 0;
@@ -107,11 +113,11 @@ unsigned int CLByteArray::write(const char *data, unsigned int size, int abs_shi
     return size;
 }
 
-char *CLByteArray::prepareToWrite(int size)
+char *CLByteArray::prepareToWrite(unsigned int size)
 {
     if (size > m_capacity - m_size) // if we do not have enough space
     {
-        if (!increase_capacity(m_capacity * 2 + size))
+        if (!reallocate(m_capacity * 2 + size))
         {
             cl_log.log(QLatin1String("CLByteArray::prepareToWrite(): Unable to increase capacity"), cl_logWARNING);
             return 0;
@@ -121,12 +127,12 @@ char *CLByteArray::prepareToWrite(int size)
     return m_data + m_size;
 }
 
-void CLByteArray::done(int size)
+void CLByteArray::done(unsigned int size)
 {
     m_size += size;
 }
 
-void CLByteArray::removeZerrowsAtTheEnd()
+void CLByteArray::removeZerosAtTheEnd()
 {
     while (m_size>0 && m_data[m_size-1] == 0)
         --m_size;
