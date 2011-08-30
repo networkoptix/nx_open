@@ -61,11 +61,10 @@ bool CLByteArray::reallocate(unsigned int new_capacity)
         return false;
     }
 
-    new_capacity += CLBYTEARRAY_PADDING_SIZE;
-    if (new_capacity <= m_capacity)
+    if (new_capacity + CLBYTEARRAY_PADDING_SIZE <= m_capacity)
         return true;
 
-    char *new_data = (char *)qReallocAligned(m_data, new_capacity, m_capacity, m_alignment);
+    char *new_data = (char *)qReallocAligned(m_data, new_capacity + CLBYTEARRAY_PADDING_SIZE, m_capacity, m_alignment);
     if (!q_check_ptr(new_data))
         return false; // ### would probably crash anyways
 
