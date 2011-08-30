@@ -55,7 +55,7 @@ CLAbstractMediaData* CLAvigilonStreamreader::getNextData()
         }
     }
 
-    img.removeZerrowsAtTheEnd();
+    img.removeZerosAtTheEnd();
 
     //video/H.264I
     videoData->compressionType = CODEC_ID_MJPEG;

@@ -156,7 +156,7 @@ CLAbstractMediaData* AVClientPullSSHTTPStreamreader::getNextData()
 		}
 	}
 
-	img.removeZerrowsAtTheEnd();
+	img.removeZerosAtTheEnd();
 
 	//unit delimetr
 	if (h264)

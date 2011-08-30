@@ -129,7 +129,7 @@ CLAbstractMediaData* AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 		return 0;
 	}
 
-	img.removeZerrowsAtTheEnd();
+	img.removeZerosAtTheEnd();
 
 	int lp_size;
 	const unsigned char* last_packet = tftp_client.getLastPacket(lp_size);
