@@ -384,7 +384,7 @@ void CLVideoDecoderOutput::downscale(const CLVideoDecoderOutput* src, CLVideoDec
     int scaledWidth = src_width/factor;
     int scaledHeight = src_height/factor;
 
-    if (scaledWidth != dst->width || scaledHeight != dst->height || src->format != dst->format)
+    if (scaledWidth != dst->width || scaledHeight != dst->height || src->format != dst->format || dst->isExternalData())
         dst->reallocate(scaledWidth, scaledHeight, src->format);
 
     int src_yu_h = src_height/chroma_v_factor;
