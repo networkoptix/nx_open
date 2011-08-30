@@ -5,81 +5,11 @@
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QPushButton>
 
-#include "../../openal/qtvaudiodevice.h"
-#include "timeslider.h"
+#include "openal/qtvaudiodevice.h"
 
-StyledSlider::StyledSlider(QWidget *parent)
-    : QSlider(Qt::Horizontal, parent),
-      m_timerId(0)
-{
-}
-
-StyledSlider::StyledSlider(Qt::Orientation orientation, QWidget *parent)
-    : QSlider(orientation, parent),
-      m_timerId(0)
-{
-}
-
-StyledSlider::~StyledSlider()
-{
-    if (m_timerId)
-    {
-        killTimer(m_timerId);
-        m_timerId = 0;
-    }
-}
-
-void StyledSlider::paintEvent(QPaintEvent *)
-{
-    static const int gradHeigth = 10;
-
-    QPainter p(this);
-
-    const double handlePos = (double)(width() - 1) * value() / qAbs(maximum() - minimum());
-    /*QStyleOptionSlider slider;
-    initStyleOption(&slider);
-    int available = style()->pixelMetric(QStyle::PM_SliderSpaceAvailable, &slider, this);
-    const double handlePos = (double)QStyle::sliderPositionFromValue(slider.minimum, slider.maximum, slider.sliderValue, available);*/
-
-    QRect r = contentsRect();
-    p.fillRect(rect(), QColor(0,0,0,0));
-
-    p.setPen(QPen(Qt::darkGray, 1));
-    p.drawRect(QRect(r.x(), (height() - gradHeigth)/2 - 1, r.width()-1, gradHeigth + 2));
-
-    QLinearGradient linearGrad(QPointF(0, 0), QPointF(handlePos, height()));
-    linearGrad.setColorAt(0, QColor(0, 43, 130));
-    linearGrad.setColorAt(1, QColor(186, 239, 255));
-    p.fillRect(1, (height() - gradHeigth)/2, handlePos+1, gradHeigth, linearGrad);
-
-    if (m_timerId)
-    {
-        p.setPen(QPen(palette().color(QPalette::Active, QPalette::HighlightedText), 1));
-        p.drawText(r, Qt::AlignCenter, value() ? QString::number(value()) + QLatin1Char('%') : tr("Muted"));
-    }
-}
-
-void StyledSlider::timerEvent(QTimerEvent *event)
-{
-    if (event->timerId() == m_timerId)
-    {
-        killTimer(m_timerId);
-        m_timerId = 0;
-        update();
-    }
-
-    QSlider::timerEvent(event);
-}
-
-void StyledSlider::sliderChange(SliderChange change)
-{
-    if (m_timerId)
-        killTimer(m_timerId);
-    m_timerId = startTimer(2500);
-
-    QSlider::sliderChange(change);
-}
-
+#include "ui/videoitem/navigationitem.h"
+#include "ui/videoitem/timeslider.h" // SliderProxyStyle
+#include "ui/widgets/styledslider.h"
 
 VolumeWidget::VolumeWidget(QWidget *parent) :
     QWidget(parent)
@@ -88,9 +18,8 @@ VolumeWidget::VolumeWidget(QWidget *parent) :
 
     m_slider = new StyledSlider(Qt::Horizontal, this);
     m_slider->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    m_slider->setRange(0, 100);
-    m_slider->setValue(50);
     m_slider->setStyle(SliderProxyStyle::instance());
+    m_slider->setRange(0, 100);
 
     m_button = new MyButton(this);
     m_button->setPixmap(QPixmap(":/skin/unmute.png"));
@@ -114,6 +43,16 @@ VolumeWidget::VolumeWidget(QWidget *parent) :
     connect(m_button, SIGNAL(toggled(bool)), SLOT(onButtonChecked()));
 
     setFixedSize(144, 36);
+}
+
+QSlider *VolumeWidget::slider() const
+{
+    return m_slider;
+}
+
+QSize VolumeWidget::sizeHint() const
+{
+    return QSize(80, 20);
 }
 
 bool VolumeWidget::eventFilter(QObject *watched, QEvent *event)
@@ -144,7 +83,9 @@ void VolumeWidget::paintEvent(QPaintEvent *)
 void VolumeWidget::onValueChanged(int value)
 {
     QtvAudioDevice::instance().setVolume(value / 100.0);
-    m_button->setChecked(QtvAudioDevice::instance().isMute());
+    const bool isMute = QtvAudioDevice::instance().isMute();
+    m_button->setChecked(isMute);
+    m_slider->setValueText(!isMute ? QString::number(value) + QLatin1Char('%') : tr("Muted"));
 }
 
 void VolumeWidget::onButtonChecked()
