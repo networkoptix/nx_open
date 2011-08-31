@@ -109,11 +109,8 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
     m_pageSelector(0),
     m_gridItem(0),
     m_menuIsHere(false),
-    m_lastPressedItem(0)
-#ifdef Q_OS_WIN
-    ,m_desktopEncoder(0)
-#endif
-    ,m_inputBlocked(false)
+    m_lastPressedItem(0),
+    m_inputBlocked(false)
 {
     m_timeAfterDoubleClick.restart();
 
@@ -2632,7 +2629,7 @@ int screenToAdapter(int screen)
 }
 #endif
 
-QRegion createRoundRegion(int rSmall, int rLarge, const QRect& rect)
+static inline QRegion createRoundRegion(int rSmall, int rLarge, const QRect& rect)
 {
     QRegion region;
 
@@ -2663,11 +2660,11 @@ void GraphicsView::toggleRecording()
 {
 #ifdef Q_OS_WIN
     bool recording = cm_start_video_recording.property("recoding").toBool();
-
-    VideoRecorderSettings recorderSettings;
-
     if (!recording)
     {
+        QString filePath = getTempRecordingDir() + QLatin1String("/video_recording.ts");
+
+        VideoRecorderSettings recorderSettings;
 
         QAudioDeviceInfo audioDevice = recorderSettings.primaryAudioDevice();
         QAudioDeviceInfo secondAudioDevice = recorderSettings.secondaryAudioDevice();
@@ -2680,13 +2677,6 @@ void GraphicsView::toggleRecording()
         VideoRecorderSettings::Resolution resolution = recorderSettings.resolution();
         bool captureCursor = recorderSettings.captureCursor();
 
-        QSettings s;
-        s.beginGroup(QLatin1String("videoRecording"));
-
-        QString filePath = getTempRecordingDir() + QLatin1String("/video_recording.ts");
-
-        if (m_desktopEncoder)
-            delete m_desktopEncoder;
         QSize encodingSize(0,0);
         if (resolution == VideoRecorderSettings::ResQuaterNative)
             encodingSize = QSize(-2, -2);
@@ -2709,53 +2699,56 @@ void GraphicsView::toggleRecording()
         else if (captureMode == VideoRecorderSettings::FullScreenNoeroMode)
             grabberCaptureMode = CLScreenGrabber::CaptureMode_DesktopWithoutAero;
 
-        m_desktopEncoder = new DesktopFileEncoder(filePath, screen, audioDevice.isNull() ? 0 : &audioDevice, secondAudioDevice.isNull() ? 0 : &secondAudioDevice, grabberCaptureMode, captureCursor, encodingSize, quality, viewport());
-        QString errorMessage;
-        if (!m_desktopEncoder->start())
+        DesktopFileEncoder *desktopEncoder = new DesktopFileEncoder(filePath, screen, audioDevice.isNull() ? 0 : &audioDevice, secondAudioDevice.isNull() ? 0 : &secondAudioDevice, grabberCaptureMode, captureCursor, encodingSize, quality, viewport());
+        if (!desktopEncoder->start())
         {
-            QMessageBox::warning(this, tr("Warning"), tr("Can't start recording due to following error: %1").arg(m_desktopEncoder->lastErrorStr()));
+            cl_log.log(desktopEncoder->lastErrorStr(), cl_logERROR);
             // show error dialog here
-            cl_log.log(m_desktopEncoder->lastErrorStr(), cl_logERROR);
-            delete m_desktopEncoder;
-            m_desktopEncoder = 0;
+            QMessageBox::warning(this, tr("Warning"), tr("Can't start recording due to following error: %1").arg(desktopEncoder->lastErrorStr()));
+            delete desktopEncoder;
             return;
         }
 
         cm_start_video_recording.setProperty("recoding", true);
+        cm_start_video_recording.setProperty("encoder", QVariant::fromValue(qobject_cast<QObject *>(desktopEncoder)));
 
-        QLabel *label = new QLabel;
-        label->resize(200, 100);
-        label->move(width()/2 - label->width()/2, 300);
+        QLabel *label = new QLabel(viewport());
         label->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool);
+        label->resize(200, 200);
+        label->move((width() - label->width()) / 2, 300);
+        label->setMask(createRoundRegion(18, 18, label->rect()));
         label->setText(tr("Recording started"));
         label->setAlignment(Qt::AlignCenter);
         label->setStyleSheet(QLatin1String("QLabel { font-size:22px; border-width: 2px; border-style: inset; border-color: #535353; border-radius: 18px; background: #212150; color: #a6a6a6; selection-background-color: ltblue }"));
-        int side = qMin(label->width(), label->height());
-        QRegion maskedRegion = createRoundRegion(18, 18, label->rect());
-
-        label->setMask(maskedRegion);
-
         label->setFocusPolicy(Qt::NoFocus);
         label->show();
+
         QPropertyAnimation *animation = new QPropertyAnimation(label, "windowOpacity", label);
         animation->setEasingCurve(QEasingCurve::OutCubic);
         animation->setDuration(3000);
         animation->setStartValue(1.0);
         animation->setEndValue(0.0);
         animation->start();
-        QTimer::singleShot(3000, label, SLOT(deleteLater()));
 
+        connect(animation, SIGNAL(finished()), label, SLOT(deleteLater()));
     }
     else
     {
+        DesktopFileEncoder *desktopEncoder = qobject_cast<DesktopFileEncoder *>(cm_start_video_recording.property("encoder").value<QObject *>());
+
         // stop capturing
         cm_start_video_recording.setProperty("recoding", QVariant());
+        cm_start_video_recording.setProperty("encoder", QVariant());
 
-        QString recordedFileName = m_desktopEncoder->fileName();
-        m_desktopEncoder->stop();
+        if (!desktopEncoder)
+            return;
+
+        QString recordedFileName = desktopEncoder->fileName();
+        desktopEncoder->stop();
 
         QSettings settings;
         settings.beginGroup(QLatin1String("videoRecording"));
+
         QString previousDir = settings.value(QLatin1String("previousDir")).toString();
         QString filePath = QFileDialog::getSaveFileName(this,
                                                         tr("Save Recording As"),
@@ -2764,8 +2757,7 @@ void GraphicsView::toggleRecording()
                                                         0,
                                                         QFileDialog::DontUseNativeDialog);
 
-        delete m_desktopEncoder;
-        m_desktopEncoder = 0;
+        delete desktopEncoder;
 
         if (!filePath.isEmpty()) {
             QFile::remove(filePath);
@@ -2782,8 +2774,8 @@ void GraphicsView::toggleRecording()
         {
             QFile::remove(recordedFileName);
         }
+
         settings.endGroup();
-        settings.sync();
     }
 #endif
 }

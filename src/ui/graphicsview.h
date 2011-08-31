@@ -3,10 +3,10 @@
 
 #include <QtGui/QGraphicsView>
 
-#include "./animation/scene_movement.h"
-#include "./animation/scene_zoom.h"
-#include "./animation/mouse_state.h"
-#include "./animation/animated_show.h"
+#include "animation/scene_movement.h"
+#include "animation/scene_zoom.h"
+#include "animation/mouse_state.h"
+#include "animation/animated_show.h"
 #include "video_cam_layout/videocamlayout.h"
 #include "ui_common.h"
 #include "animation/animation_manager.h"
@@ -24,8 +24,6 @@ class QInputEvent;
 class CLSerachEditItem;
 class CLGridItem;
 class QnPageSelector;
-
-class DesktopFileEncoder;
 
 class GraphicsView: public QGraphicsView
 {
@@ -254,9 +252,6 @@ protected:
 
     QPointer<NavigationItem> m_navigationItem;
 
-#ifdef Q_OS_WIN
-    DesktopFileEncoder* m_desktopEncoder;
-#endif
     bool m_inputBlocked;
     QTimer m_blockingTimer;
 
