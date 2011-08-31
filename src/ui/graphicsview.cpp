@@ -2934,6 +2934,11 @@ void GraphicsView::show_device_settings_helper(CLDevice* dev)
         mDeviceDlg = 0;
         open = true;
     }
+    else if (mDeviceDlg)
+    {
+        mDeviceDlg->exec();
+    }
+
 
     if (!mDeviceDlg)
     {
