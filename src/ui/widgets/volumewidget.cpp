@@ -16,8 +16,8 @@ VolumeWidget::VolumeWidget(QWidget *parent) :
 {
     installEventFilter(this);
 
-    m_slider = new StyledSlider(Qt::Horizontal, this);
-    m_slider->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    m_slider = new StyledSlider(this);
+    m_slider->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
     m_slider->setStyle(SliderProxyStyle::instance());
     m_slider->setRange(0, 100);
 
@@ -31,16 +31,16 @@ VolumeWidget::VolumeWidget(QWidget *parent) :
     QHBoxLayout *layout = new QHBoxLayout;
     layout->setContentsMargins(20, 0, 20, 0);
     layout->setSpacing(3);
-    layout->addWidget(m_button);
-    layout->addWidget(m_slider);
+    layout->addWidget(m_button, 0, Qt::AlignCenter);
+    layout->addWidget(m_slider, 1, Qt::AlignCenter);
     setLayout(layout);
 
     const float volume = QtvAudioDevice::instance().volume();
     m_slider->setValue(volume * 100);
     m_button->setChecked(QtvAudioDevice::instance().isMute());
 
-    connect(m_slider, SIGNAL(valueChanged(int)), SLOT(onValueChanged(int)));
-    connect(m_button, SIGNAL(toggled(bool)), SLOT(onButtonChecked()));
+    connect(m_slider, SIGNAL(valueChanged(int)), this, SLOT(onValueChanged(int)));
+    connect(m_button, SIGNAL(toggled(bool)), this, SLOT(onButtonChecked()));
 
     setFixedSize(144, 36);
 }

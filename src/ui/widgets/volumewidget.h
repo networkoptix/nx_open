@@ -19,13 +19,13 @@ public:
 
     QSize sizeHint() const;
 
-public Q_SLOTS:
-    void onValueChanged(int);
-    void onButtonChecked();
-
 protected:
     bool eventFilter(QObject *, QEvent *);
     void paintEvent(QPaintEvent *);
+
+private Q_SLOTS:
+    void onValueChanged(int);
+    void onButtonChecked();
 
 private:
     StyledSlider *m_slider;

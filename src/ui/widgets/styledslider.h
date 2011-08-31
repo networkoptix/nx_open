@@ -9,7 +9,6 @@ class StyledSlider : public QSlider
 
 public:
     explicit StyledSlider(QWidget *parent = 0);
-    explicit StyledSlider(Qt::Orientation orientation, QWidget *parent = 0);
     ~StyledSlider();
 
     QString valueTex() const;

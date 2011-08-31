@@ -4,6 +4,7 @@
 #include <QtGui/QWidget>
 
 class QSlider;
+class QToolButton;
 
 class StyledSlider;
 
@@ -18,15 +19,21 @@ public:
 
     QSize sizeHint() const;
 
-public Q_SLOTS:
-    void onValueChanged(int);
+Q_SIGNALS:
+    void speedChanged(float newSpeed);
 
 protected:
     bool eventFilter(QObject *, QEvent *);
     void paintEvent(QPaintEvent *);
 
+public Q_SLOTS:
+    void onValueChanged(int);
+    void onButtonClicked();
+
 private:
     StyledSlider *m_slider;
+    QToolButton *m_leftButton;
+    QToolButton *m_rightButton;
 };
 
 #endif // SPEEDWIDGET_H

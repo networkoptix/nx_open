@@ -3,16 +3,13 @@
 #include <QtGui/QGradient>
 #include <QtGui/QPainter>
 
+static const int sliderHeigth = 12;
+
 StyledSlider::StyledSlider(QWidget *parent)
     : QSlider(Qt::Horizontal, parent),
       m_timerId(0)
 {
-}
-
-StyledSlider::StyledSlider(Qt::Orientation orientation, QWidget *parent)
-    : QSlider(orientation, parent),
-      m_timerId(0)
-{
+    setMinimumHeight(sliderHeigth + 2);
 }
 
 StyledSlider::~StyledSlider()
@@ -40,8 +37,6 @@ void StyledSlider::setValueText(const QString &text)
 
 void StyledSlider::paintEvent(QPaintEvent *)
 {
-    static const int gradHeigth = 10;
-
     /*QStyleOptionSlider slider;
     initStyleOption(&slider);
     int available = style()->pixelMetric(QStyle::PM_SliderSpaceAvailable, &slider, this);
@@ -51,20 +46,37 @@ void StyledSlider::paintEvent(QPaintEvent *)
     p.fillRect(rect(), QColor(0, 0, 0, 0));
 
     QRect r = contentsRect();
-    const double handlePos = (double)r.width() * (value() - minimum()) / (maximum() - minimum());
+    if (r.height() > sliderHeigth)
+    {
+        r.moveTop((r.height() - sliderHeigth) / 2);
+        r.setHeight(sliderHeigth);
+    }
+    r.adjust(0, 0, -1, -1);
+
+    const float handlePos = float(value() - minimum()) / (maximum() - minimum());
+
+    QLinearGradient linearGrad(QPointF(0, 0), QPointF(r.width(), 0));
+    linearGrad.setColorAt(0, QColor(0, 43, 130));
+    linearGrad.setColorAt(handlePos, QColor(186, 239, 255));
+    if (!qFuzzyCompare(handlePos, 1.0f))
+    {
+        linearGrad.setColorAt(handlePos + 0.001, QColor(0, 0, 0, 0));
+        linearGrad.setColorAt(1, QColor(0, 0, 0, 0));
+    }
 
     p.setPen(QPen(Qt::darkGray, 1));
-    p.drawRect(QRect(r.x(), (height() - gradHeigth) / 2 - 1, r.width() - 1, gradHeigth + 2));
-
-    QLinearGradient linearGrad(QPointF(0, 0), QPointF(handlePos, height()));
-    linearGrad.setColorAt(0, QColor(0, 43, 130));
-    linearGrad.setColorAt(1, QColor(186, 239, 255));
-    p.fillRect(QRect(r.x() + 1, (height() - gradHeigth) / 2, handlePos, gradHeigth), linearGrad);
+    p.setBrush(linearGrad);
+    p.drawRect(r);
 
     if (m_timerId && !m_text.isEmpty())
     {
+/*        QRect boundingRect = p.boundingRect(r, Qt::TextDontClip | Qt::AlignCenter, m_text);
+        boundingRect.adjust(-3, 1, -2, -1);
+        p.setBrush(palette().color(QPalette::Active, QPalette::Highlight));
+        p.drawRoundedRect(boundingRect, 2, 2);
+*/
         p.setPen(QPen(palette().color(QPalette::Active, QPalette::HighlightedText), 1));
-        p.drawText(r, Qt::AlignCenter, m_text);
+        p.drawText(r, Qt::TextDontClip | Qt::AlignCenter, m_text);
     }
 }
 
