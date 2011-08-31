@@ -19,9 +19,9 @@ mDevice(dev)
 
 	resize(width, height);
 
-    QPalette pal = palette();
-    pal.setColor(backgroundRole(), Qt::black);
-    setPalette(pal);
+    //QPalette pal = palette();
+    //pal.setColor(backgroundRole(), Qt::black);
+    //setPalette(pal);
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 
