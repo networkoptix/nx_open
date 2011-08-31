@@ -2760,7 +2760,9 @@ void GraphicsView::toggleRecording()
         QString filePath = QFileDialog::getSaveFileName(this,
                                                         tr("Save Recording As"),
                                                         previousDir,
-                                                        tr("Transport Stream (*.ts)"));
+                                                        tr("Transport Stream (*.ts)"),
+                                                        0,
+                                                        QFileDialog::DontUseNativeDialog);
 
         delete m_desktopEncoder;
         m_desktopEncoder = 0;
