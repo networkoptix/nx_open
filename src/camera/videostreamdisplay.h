@@ -29,6 +29,10 @@ public:
     void setMTDecoding(bool value);
 
     void setReverseMode(bool value);
+
+    qint64 getLastDisplayedTime() const { return m_lastDisplayedTime; }
+    void setLastDisplayedTime(qint64 value) { m_lastDisplayedTime = value; }
+
 private:
     QMutex m_mtx;
     QMap<CodecID, CLAbstractVideoDecoder*> m_decoder;
@@ -59,6 +63,7 @@ private:
     bool m_reverseMode;
     QQueue<CLVideoDecoderOutput*> m_reverseQueue;
     bool m_flushedBeforeReverseStart;
+    qint64 m_lastDisplayedTime;
 private:
     void reorderPrevFrames();
     bool allocScaleContext(const CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);

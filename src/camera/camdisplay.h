@@ -40,7 +40,8 @@ public:
     //I assume that first incoming frame after jump is keyframe
     void jump(qint64 time); 
 
-	quint64 currentTime() const { return m_previousVideoDisplayedTime; }
+	//quint64 currentTime() const { return m_previousVideoDisplayedTime; }
+    quint64 currentTime() const;
 
     void setMTDecoding(bool value);
 
@@ -96,7 +97,7 @@ private:
     qint64 m_previousVideoTime;
     quint64 m_lastNonZerroDuration;
     qint64 m_lastSleepInterval;
-    quint64 m_previousVideoDisplayedTime;
+    //quint64 m_previousVideoDisplayedTime;
 
     bool m_afterJump;
 

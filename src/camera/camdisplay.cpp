@@ -63,7 +63,7 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_previousVideoTime(0),
       m_lastNonZerroDuration(0),
       m_lastSleepInterval(0),
-      m_previousVideoDisplayedTime(0),
+      //m_previousVideoDisplayedTime(0),
       m_afterJump(false),
       m_displayLasts(0),
       m_ignoringVideo(false),
@@ -211,8 +211,8 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
         bool draw = !vd->ignore && (sleep || (m_displayLasts * 1000 < needToSleep)); // do not draw if computer is very slow and we still wanna sync with audio
 
         // If there are multiple channels for this timestamp use only one of them
-        if (channel == 0 && draw)
-            m_previousVideoDisplayedTime = currentTime;
+        //if (channel == 0 && draw)
+        //    m_previousVideoDisplayedTime = currentTime;
 
         CL_LOG(cl_logDEBUG2)
         {
@@ -618,7 +618,9 @@ void CLCamDisplay::afterJump(qint64 newTime)
     m_lastAudioPacketTime = newTime;
     m_lastVideoPacketTime = newTime;
     m_previousVideoTime = newTime;
-    m_previousVideoDisplayedTime = 0;
+    //m_previousVideoDisplayedTime = 0;
+    m_display[0]->setLastDisplayedTime(0);
+    
     m_totalFrames = 0;
     m_iFrames = 0;
     clearVideoQueue();
@@ -647,4 +649,8 @@ void CLCamDisplay::onRealTimeStreamHint(bool value)
 void CLCamDisplay::onSlowSourceHint()
 {
     m_dataQueue.setMaxSize(CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE);
+}
+
+quint64 CLCamDisplay::currentTime() const { 
+    return m_display[0]->getLastDisplayedTime();
 }

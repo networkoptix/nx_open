@@ -21,7 +21,8 @@ CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale) :
     m_needReinitDecoders(false),
     m_reverseMode(false),
     m_prevFrameToDelete(0),
-    m_flushedBeforeReverseStart(false)
+    m_flushedBeforeReverseStart(false),
+    m_lastDisplayedTime(0)
 {
     for (int i = 0; i < MAX_FRAME_QUEUE_SIZE; ++i)
         m_frameQueue[i] = new CLVideoDecoderOutput();
@@ -198,6 +199,7 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
         CLCompressedVideoData emptyData(1,0);
         CLVideoDecoderOutput* tmpOutFrame = new CLVideoDecoderOutput();
         while (dec->decode(emptyData, tmpOutFrame)) {
+            tmpOutFrame->pts = m_lastDisplayedTime;
             m_reverseQueue.enqueue(tmpOutFrame);
             tmpOutFrame = new CLVideoDecoderOutput();
         }
@@ -240,6 +242,7 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
             rescaleFrame(m_tmpFrame, *outFrame, m_tmpFrame.width / scaleFactor, m_tmpFrame.height / scaleFactor); // universal scaler
     }
     outFrame->flags = data->flags;
+    outFrame->pts = data->timestamp;
     if (m_reverseMode) 
     {
         if (outFrame->flags & AV_REVERSE_BLOCK_START) 
@@ -259,6 +262,7 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 void CLVideoStreamDisplay::processDecodedFrame(int channel, CLVideoDecoderOutput* outFrame, bool enableFrameQueue)
 {
     m_drawer->draw(outFrame, channel);
+    m_lastDisplayedTime = outFrame->pts;
 
     if (enableFrameQueue) {
         m_frameQueueIndex = (m_frameQueueIndex + 1) % MAX_FRAME_QUEUE_SIZE; // allow frame queue for selected video
