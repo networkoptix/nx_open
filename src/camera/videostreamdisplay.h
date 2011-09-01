@@ -30,11 +30,12 @@ public:
 
     void setReverseMode(bool value);
 
-    qint64 getLastDisplayedTime() const { return m_lastDisplayedTime; }
-    void setLastDisplayedTime(qint64 value) { m_lastDisplayedTime = value; }
+    qint64 getLastDisplayedTime() const;
+    void setLastDisplayedTime(qint64 value);
 
 private:
     QMutex m_mtx;
+    mutable QMutex m_timeMutex;
     QMap<CodecID, CLAbstractVideoDecoder*> m_decoder;
 
     CLAbstractRenderer* m_drawer;
@@ -64,6 +65,8 @@ private:
     QQueue<CLVideoDecoderOutput*> m_reverseQueue;
     bool m_flushedBeforeReverseStart;
     qint64 m_lastDisplayedTime;
+    int m_realReverseSize;
+    int m_maxReverseQueueSize;
 private:
     void reorderPrevFrames();
     bool allocScaleContext(const CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);
@@ -77,6 +80,7 @@ private:
         int srcHeight, 
         CLVideoDecoderOutput::downscale_factor force_factor);
     void processDecodedFrame(int channel, CLVideoDecoderOutput* outFrame, bool enableFrameQueue, bool reverseMode);
+    void checkQueueOverflow(CLAbstractVideoDecoder* dec);
 };
 
 #endif //videostreamdisplay_h_2044

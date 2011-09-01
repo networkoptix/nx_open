@@ -6,6 +6,9 @@
 #include "gl_renderer.h"
 #include "util.h"
 
+static const int MAX_REVERSE_QUEUE_SIZE = 1024*1024 * 300; // at bytes
+static const double FPS_EPS = 1e-6;
+
 CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale) :
     m_lightCPUmode(CLAbstractVideoDecoder::DecodeMode_Full),
     m_canDownscale(canDownscale),
@@ -22,7 +25,9 @@ CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale) :
     m_reverseMode(false),
     m_prevFrameToDelete(0),
     m_flushedBeforeReverseStart(false),
-    m_lastDisplayedTime(0)
+    m_lastDisplayedTime(0),
+    m_realReverseSize(0),
+    m_maxReverseQueueSize(-1)
 {
     for (int i = 0; i < MAX_FRAME_QUEUE_SIZE; ++i)
         m_frameQueue[i] = new CLVideoDecoderOutput();
@@ -139,6 +144,63 @@ void CLVideoStreamDisplay::reorderPrevFrames()
     }
 }
 
+void CLVideoStreamDisplay::checkQueueOverflow(CLAbstractVideoDecoder* dec)
+{
+    if (m_maxReverseQueueSize == -1) {
+        int bytesPerPic = avpicture_get_size(dec->getFormat(), dec->getWidth(), dec->getHeight());
+        m_maxReverseQueueSize = MAX_REVERSE_QUEUE_SIZE / bytesPerPic;
+    }
+    
+    if (m_realReverseSize <= m_maxReverseQueueSize)
+        return;
+    // drop some frame at queue. Find max interval contains non-dropped frames (and drop frame from mid of this interval)
+    int maxInterval = -1;
+    int prevIndex = -1;
+    int maxStart = 0;
+
+    for (int i = 0; i < m_reverseQueue.size(); ++i) 
+    {
+        if (m_reverseQueue[i]->data[0])
+        {
+            int start = i;
+            for(; i < m_reverseQueue.size() && m_reverseQueue[i]->data[0]; ++i);
+
+            if (i - start > maxInterval) {
+                maxInterval = i - start;
+                maxStart = start;
+            }
+        }
+    }
+    int index;
+    if (maxInterval == 1) 
+    {
+        // every 2-nd frame already dropped. Change strategy. Increase min hole interval by 1
+        int minHole = INT_MAX;
+        for (int i = m_reverseQueue.size()-1; i >= 0; --i) {
+            if (!m_reverseQueue[i]->data[0])
+            {
+                int start = i;
+                for(; i >= 0 && !m_reverseQueue[i]->data[0]; --i);
+
+                if (start - i < minHole) {
+                    minHole = start - i;
+                    maxStart = i+1;
+                }
+            }
+        }
+        if (maxStart + minHole < m_reverseQueue.size())
+            index = maxStart + minHole; // take right frame from the hole
+        else
+            index = maxStart-1; // take left frame
+    }
+    else {
+        index = maxStart + maxInterval/2;
+    }
+    Q_ASSERT(m_reverseQueue[index]->data[0]);
+    m_reverseQueue[index]->reallocate(0,0,0);
+    m_realReverseSize--;
+}
+
 bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVideoDecoderOutput::downscale_factor force_factor)
 {
     // use only 1 frame for non selected video
@@ -156,9 +218,10 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
     }
     if (!reverseMode && m_reverseQueue.size() > 0) {
         m_drawer->waitForFrameDisplayed(data->channelNumber);
-        for (int i = 0; i < MAX_FRAME_QUEUE_SIZE; ++i)
+        for (int i = 0; i < m_reverseQueue.size(); ++i)
             delete m_reverseQueue[i];
         m_reverseQueue.clear();
+        m_realReverseSize = 0;
     }
 
     if (m_needReinitDecoders) {
@@ -208,9 +271,12 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
     {
         CLCompressedVideoData emptyData(1,0);
         CLVideoDecoderOutput* tmpOutFrame = new CLVideoDecoderOutput();
-        while (dec->decode(emptyData, tmpOutFrame)) {
-            tmpOutFrame->pts = m_lastDisplayedTime;
+        while (dec->decode(emptyData, tmpOutFrame)) 
+        {
+            tmpOutFrame->pts = getLastDisplayedTime();
             m_reverseQueue.enqueue(tmpOutFrame);
+            m_realReverseSize++;
+            checkQueueOverflow(dec);
             tmpOutFrame = new CLVideoDecoderOutput();
         }
         delete tmpOutFrame;
@@ -222,7 +288,10 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 	{
 		//CL_LOG(cl_logDEBUG2) cl_log.log(QLatin1String("CLVideoStreamDisplay::dispay: decoder cannot decode image..."), cl_logDEBUG2);
         if (!m_reverseQueue.isEmpty() && (m_reverseQueue.front()->flags & AV_REVERSE_REORDERED)) {
-            processDecodedFrame(data->channelNumber, m_reverseQueue.dequeue(), enableFrameQueue, reverseMode);
+            outFrame = m_reverseQueue.dequeue();
+            if (outFrame->data[0])
+                m_realReverseSize--;
+            processDecodedFrame(data->channelNumber, outFrame, enableFrameQueue, reverseMode);
             return true;
         }
 		return false;
@@ -255,14 +324,18 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
     outFrame->pts = data->timestamp;
     if (reverseMode) 
     {
-        if (outFrame->flags & AV_REVERSE_BLOCK_START) 
+        if (outFrame->flags & AV_REVERSE_BLOCK_START) {
             reorderPrevFrames();
+        }
         m_reverseQueue.enqueue(outFrame);
-
+        m_realReverseSize++;
+        checkQueueOverflow(dec);
         m_frameQueue[m_frameQueueIndex] = new CLVideoDecoderOutput();
         if (!(m_reverseQueue.front()->flags & AV_REVERSE_REORDERED))
             return false; // frame does not ready. need more frames. does not perform wait
         outFrame = m_reverseQueue.dequeue();
+        if (outFrame->data[0])
+            m_realReverseSize--;
     }
     
     processDecodedFrame(data->channelNumber, outFrame, enableFrameQueue, reverseMode);
@@ -271,21 +344,23 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 
 void CLVideoStreamDisplay::processDecodedFrame(int channel, CLVideoDecoderOutput* outFrame, bool enableFrameQueue, bool reverseMode)
 {
-    m_drawer->draw(outFrame, channel);
-    m_lastDisplayedTime = outFrame->pts;
-
-    if (enableFrameQueue) {
-        m_frameQueueIndex = (m_frameQueueIndex + 1) % MAX_FRAME_QUEUE_SIZE; // allow frame queue for selected video
-        m_queueUsed = true;
+    setLastDisplayedTime(outFrame->pts);
+    if (outFrame->data[0]) {
+        m_drawer->draw(outFrame, channel);
+        if (enableFrameQueue) {
+            m_frameQueueIndex = (m_frameQueueIndex + 1) % MAX_FRAME_QUEUE_SIZE; // allow frame queue for selected video
+            m_queueUsed = true;
+        }
+        if (!enableFrameQueue) 
+            m_drawer->waitForFrameDisplayed(channel);
+        if (reverseMode) {
+            if (m_prevFrameToDelete)
+                delete m_prevFrameToDelete;
+            m_prevFrameToDelete = outFrame;
+        }
     }
-
-    if (!enableFrameQueue) 
-        m_drawer->waitForFrameDisplayed(channel);
-
-    if (reverseMode) {
-        if (m_prevFrameToDelete)
-            delete m_prevFrameToDelete;
-        m_prevFrameToDelete = outFrame;
+    else {
+        delete outFrame;
     }
 }
 
@@ -350,4 +425,16 @@ void CLVideoStreamDisplay::setReverseMode(bool value)
     m_reverseMode = value;
     if (value)
         m_enableFrameQueue = true;
+}
+
+qint64 CLVideoStreamDisplay::getLastDisplayedTime() const 
+{ 
+    QMutexLocker lock(&m_timeMutex);
+    return m_lastDisplayedTime; 
+}
+
+void CLVideoStreamDisplay::setLastDisplayedTime(qint64 value) 
+{ 
+    QMutexLocker lock(&m_timeMutex);
+    m_lastDisplayedTime = value; 
 }

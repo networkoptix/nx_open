@@ -35,6 +35,7 @@ public:
     PixelFormat GetPixelFormat();
     int getWidth() const  { return c->width;  }
     int getHeight() const { return c->height; }
+    virtual PixelFormat getFormat() const { return c->pix_fmt; }
     virtual void flush();
 private:
     static AVCodec* findCodec(CodecID codecId);
