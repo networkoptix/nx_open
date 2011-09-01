@@ -156,7 +156,7 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
     }
     if (!reverseMode && m_reverseQueue.size() > 0) {
         m_drawer->waitForFrameDisplayed(data->channelNumber);
-        for (int i = 0; i < MAX_FRAME_QUEUE_SIZE; ++i)
+        for (int i = 0; i < m_reverseQueue.size(); ++i)
             delete m_reverseQueue[i];
         m_reverseQueue.clear();
     }
