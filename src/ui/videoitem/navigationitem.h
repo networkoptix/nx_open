@@ -3,10 +3,13 @@
 
 #include "unmoved/unmoved_interactive_opacity_item.h"
 
+class QGraphicsProxyWidget;
+class QGraphicsWidget;
+
 class QTimerEvent;
 class CLVideoCamera;
 class TimeSlider;
-class QGraphicsProxyWidget;
+class SpeedWidget;
 class VolumeWidget;
 class MyTextItem;
 
@@ -60,14 +63,14 @@ public:
     TimeSlider *slider() const;
     QLabel *label() const;
 
-protected:
-    void wheelEvent(QWheelEvent *) {} // to avoid scene move up and down
-
-signals:
+Q_SIGNALS:
     void rewindBackward();
     void rewindForward();
     void stepBackward();
     void stepForward();
+
+protected:
+    void wheelEvent(QWheelEvent *) {} // to avoid scene move up and down
 
 private:
     QHBoxLayout *m_layout;
@@ -124,6 +127,7 @@ private slots:
     void onSliderPressed();
     void onSliderReleased();
 
+    void onSpeedChanged(float);
 
 protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent *);
@@ -138,7 +142,9 @@ private:
     ImageButtonItem *m_playButton;
     ImageButtonItem *m_forwardButton;
     ImageButtonItem *m_stepForwardButton;
+    SpeedWidget *m_speedWidget;
     QGraphicsWidget *m_graphicsWidget;
+
     CLVideoCamera* m_camera;
     int m_timerId;
     bool m_sliderIsmoving;

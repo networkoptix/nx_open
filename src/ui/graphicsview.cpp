@@ -47,8 +47,8 @@
 
 extern int  SLOT_WIDTH;
 
-int doubl_clk_delay = qApp->doubleClickInterval();
-int item_select_duration = 800;
+int doubl_clk_delay = qMin(qApp->doubleClickInterval(), 400);
+int item_select_duration = 700;
 int item_hoverevent_duration = 300;
 int scene_zoom_duration = 2500;
 int scene_move_duration = 3000;
@@ -109,14 +109,9 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
     m_pageSelector(0),
     m_gridItem(0),
     m_menuIsHere(false),
-    m_lastPressedItem(0)
-#ifdef Q_OS_WIN
-    ,m_desktopEncoder(0)
-#endif
-    ,m_inputBlocked(false)
+    m_lastPressedItem(0),
+    m_inputBlocked(false)
 {
-    m_timeAfterDoubleClick.restart();
-
     setScene(&m_scene);
     //scene()->setStyle(..); // scene-specific style
 
@@ -251,6 +246,7 @@ GraphicsView::ViewMode GraphicsView::getViewMode() const
 void GraphicsView::start()
 {
     mViewStarted = true;
+    m_ignoreMouse.reset();
 
     m_camLayout.updateSceneRect();
     centerOn(getRealSceneRect().center());
@@ -259,7 +255,7 @@ void GraphicsView::start()
     {
         zoomMin(0);
 
-        int duration = 1000;
+        int duration = 600;
 
         if (m_camLayout.getItemList().count() && m_camLayout.getContent() == CLSceneLayoutManager::instance().startScreenLayoutContent())
             duration/=3;
@@ -345,6 +341,7 @@ void GraphicsView::setZeroSelection(int delay)
     if (m_selectedWnd && m_camLayout.hasSuchItem(m_selectedWnd))
     {
         m_selectedWnd->setItemSelected(false, true,delay);
+        m_ignoreMouse.ignoreNextMs(300);
 
         CLVideoWindowItem* videoItem = 0;
         if ( (videoItem = m_selectedWnd->toVideoItem()) )
@@ -396,6 +393,7 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
         return;
 
 
+    
     if (m_navigationItem && ( m_navigationItem->mouseOver() || m_navigationItem->isActive()))
     {
         // scene should not be zoomed if mouse is over time slider or if time slider is active
@@ -406,6 +404,7 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
         QGraphicsView::wheelEvent(e);
         return;
     }
+    /**/
 
 
     showStop_helper();
@@ -702,8 +701,8 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
     if (m_inputBlocked)
         return;
 
-    if (m_timeAfterDoubleClick.elapsed() < doubl_clk_delay)
-        return; // ignore some accident mouse click accidents after double click
+    if (m_ignoreMouse.shouldIgnore())
+        return; 
 
     m_ignore_release_event = false;
 
@@ -713,12 +712,14 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
     if (onUserInput(true, true))
         return;
 
+    /*
     if (m_navigationItem && !m_navigationItem->mouseOver() && m_navigationItem->isActive())
     {
         // we've got time line; muose is not over timeline. timeline is still active
         m_navigationItem->setActive(false);
         return;
     }
+    /**/
 
 
     m_yRotate = 0;
@@ -804,8 +805,8 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
     if (!mViewStarted)
         return;
 
-    if (m_timeAfterDoubleClick.elapsed() < doubl_clk_delay)
-        return; // ignore some accident mouse click accidents after double click
+    if (m_ignoreMouse.shouldIgnore())  
+        return; 
 
 
     if (m_gridItem->isVisible() && !isCTRLPressed(event))
@@ -975,7 +976,7 @@ void GraphicsView::mouseReleaseEvent(QMouseEvent * event)
     if (!mViewStarted)
         return;
 
-    if (m_timeAfterDoubleClick.elapsed() < doubl_clk_delay)
+    if (m_ignoreMouse.shouldIgnore())
     {
         QGraphicsView::mouseReleaseEvent(event);
         return; // ignore some accident mouse click accidents after double click
@@ -1718,7 +1719,7 @@ void GraphicsView::mouseDoubleClickEvent( QMouseEvent * event )
     if (m_inputBlocked)
         return;
 
-    m_timeAfterDoubleClick.restart();
+    m_ignoreMouse.ignoreNextMs(doubl_clk_delay);
 
     QGraphicsItem *item = itemAt(event->pos());
     CLAbstractSceneItem* aitem = navigationItem(item);
@@ -1755,7 +1756,7 @@ void GraphicsView::mouseDoubleClickEvent( QMouseEvent * event )
         onArrange_helper();
         */
 
-        fitInView(1500, 0, SLOW_START_SLOW_END);
+        fitInView(800, 0, SLOW_START_SLOW_END);
 
         return;
     }
@@ -2409,7 +2410,7 @@ void GraphicsView::toggleFullScreen_helper(CLAbstractSceneItem* wnd)
         // escape FS MODE
         setZeroSelection();
         wnd->setFullScreen(false);
-        fitInView(1000, 0, SLOW_START_SLOW_END);
+        fitInView(800, 0, SLOW_START_SLOW_END);
 
     }
 }
@@ -2456,6 +2457,8 @@ void GraphicsView::onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int de
     qreal zoom = m_scenezoom.scaleTozoom(scale) ;
 
     m_scenezoom.zoom_abs(zoom, item_select_duration, delay, QPoint(0,0), SLOW_START_SLOW_END);
+
+    m_ignoreMouse.ignoreNextMs(item_select_duration + delay);
 
 }
 
@@ -2632,7 +2635,7 @@ int screenToAdapter(int screen)
 }
 #endif
 
-QRegion createRoundRegion(int rSmall, int rLarge, const QRect& rect)
+static inline QRegion createRoundRegion(int rSmall, int rLarge, const QRect& rect)
 {
     QRegion region;
 
@@ -2663,11 +2666,11 @@ void GraphicsView::toggleRecording()
 {
 #ifdef Q_OS_WIN
     bool recording = cm_start_video_recording.property("recoding").toBool();
-
-    VideoRecorderSettings recorderSettings;
-
     if (!recording)
     {
+        QString filePath = getTempRecordingDir() + QLatin1String("/video_recording.ts");
+
+        VideoRecorderSettings recorderSettings;
 
         QAudioDeviceInfo audioDevice = recorderSettings.primaryAudioDevice();
         QAudioDeviceInfo secondAudioDevice = recorderSettings.secondaryAudioDevice();
@@ -2680,13 +2683,6 @@ void GraphicsView::toggleRecording()
         VideoRecorderSettings::Resolution resolution = recorderSettings.resolution();
         bool captureCursor = recorderSettings.captureCursor();
 
-        QSettings s;
-        s.beginGroup(QLatin1String("videoRecording"));
-
-        QString filePath = getTempRecordingDir() + QLatin1String("/video_recording.ts");
-
-        if (m_desktopEncoder)
-            delete m_desktopEncoder;
         QSize encodingSize(0,0);
         if (resolution == VideoRecorderSettings::ResQuaterNative)
             encodingSize = QSize(-2, -2);
@@ -2709,61 +2705,65 @@ void GraphicsView::toggleRecording()
         else if (captureMode == VideoRecorderSettings::FullScreenNoeroMode)
             grabberCaptureMode = CLScreenGrabber::CaptureMode_DesktopWithoutAero;
 
-        m_desktopEncoder = new DesktopFileEncoder(filePath, screen, audioDevice.isNull() ? 0 : &audioDevice, secondAudioDevice.isNull() ? 0 : &secondAudioDevice, grabberCaptureMode, captureCursor, encodingSize, quality, viewport());
-        QString errorMessage;
-        if (!m_desktopEncoder->start())
+        DesktopFileEncoder *desktopEncoder = new DesktopFileEncoder(filePath, screen, audioDevice.isNull() ? 0 : &audioDevice, secondAudioDevice.isNull() ? 0 : &secondAudioDevice, grabberCaptureMode, captureCursor, encodingSize, quality, viewport());
+        if (!desktopEncoder->start())
         {
-            QMessageBox::warning(this, tr("Warning"), tr("Can't start recording due to following error: %1").arg(m_desktopEncoder->lastErrorStr()));
+            cl_log.log(desktopEncoder->lastErrorStr(), cl_logERROR);
             // show error dialog here
-            cl_log.log(m_desktopEncoder->lastErrorStr(), cl_logERROR);
-            delete m_desktopEncoder;
-            m_desktopEncoder = 0;
+            QMessageBox::warning(this, tr("Warning"), tr("Can't start recording due to following error: %1").arg(desktopEncoder->lastErrorStr()));
+            delete desktopEncoder;
             return;
         }
 
         cm_start_video_recording.setProperty("recoding", true);
+        cm_start_video_recording.setProperty("encoder", QVariant::fromValue(qobject_cast<QObject *>(desktopEncoder)));
 
-        QLabel *label = new QLabel;
-        label->resize(200, 100);
-        label->move(width()/2 - label->width()/2, 300);
+        QLabel *label = new QLabel(viewport());
         label->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool);
+        label->resize(200, 200);
+        label->move((width() - label->width()) / 2, 300);
+        label->setMask(createRoundRegion(18, 18, label->rect()));
         label->setText(tr("Recording started"));
         label->setAlignment(Qt::AlignCenter);
         label->setStyleSheet(QLatin1String("QLabel { font-size:22px; border-width: 2px; border-style: inset; border-color: #535353; border-radius: 18px; background: #212150; color: #a6a6a6; selection-background-color: ltblue }"));
-        int side = qMin(label->width(), label->height());
-        QRegion maskedRegion = createRoundRegion(18, 18, label->rect());
-
-        label->setMask(maskedRegion);
-
         label->setFocusPolicy(Qt::NoFocus);
         label->show();
+
         QPropertyAnimation *animation = new QPropertyAnimation(label, "windowOpacity", label);
         animation->setEasingCurve(QEasingCurve::OutCubic);
         animation->setDuration(3000);
         animation->setStartValue(1.0);
         animation->setEndValue(0.0);
         animation->start();
-        QTimer::singleShot(3000, label, SLOT(deleteLater()));
 
+        connect(animation, SIGNAL(finished()), label, SLOT(deleteLater()));
     }
     else
     {
+        DesktopFileEncoder *desktopEncoder = qobject_cast<DesktopFileEncoder *>(cm_start_video_recording.property("encoder").value<QObject *>());
+
         // stop capturing
         cm_start_video_recording.setProperty("recoding", QVariant());
+        cm_start_video_recording.setProperty("encoder", QVariant());
 
-        QString recordedFileName = m_desktopEncoder->fileName();
-        m_desktopEncoder->stop();
+        if (!desktopEncoder)
+            return;
+
+        QString recordedFileName = desktopEncoder->fileName();
+        desktopEncoder->stop();
 
         QSettings settings;
         settings.beginGroup(QLatin1String("videoRecording"));
+
         QString previousDir = settings.value(QLatin1String("previousDir")).toString();
         QString filePath = QFileDialog::getSaveFileName(this,
                                                         tr("Save Recording As"),
                                                         previousDir,
-                                                        tr("Transport Stream (*.ts)"));
+                                                        tr("Transport Stream (*.ts)"),
+                                                        0,
+                                                        QFileDialog::DontUseNativeDialog);
 
-        delete m_desktopEncoder;
-        m_desktopEncoder = 0;
+        delete desktopEncoder;
 
         if (!filePath.isEmpty()) {
             QFile::remove(filePath);
@@ -2780,8 +2780,8 @@ void GraphicsView::toggleRecording()
         {
             QFile::remove(recordedFileName);
         }
+
         settings.endGroup();
-        settings.sync();
     }
 #endif
 }
@@ -2852,6 +2852,8 @@ void GraphicsView::fitInView(int duration, int delay, CLAnimationCurve curve)
     //scale(scl, scl);
 
     m_scenezoom.zoom_abs(zoom, duration, delay, QPoint(0,0), curve);
+
+    m_ignoreMouse.ignoreNextMs(duration + delay);
 }
 
 qreal GraphicsView::zoomForFullScreen_helper(QRectF rect) const
@@ -2903,6 +2905,8 @@ void GraphicsView::onItemFullScreen_helper(CLAbstractSceneItem* wnd, int duratio
     wnd->setItemSelected(true,false); // do not animate
     m_selectedWnd = wnd;
     m_last_selectedWnd = wnd;
+
+    m_ignoreMouse.ignoreNextMs(duration);
 }
 
 void GraphicsView::mouseSpeed_helper(qreal& mouse_speed,  int& dx, int&dy, int min_speed, int speed_factor)
@@ -2940,6 +2944,11 @@ void GraphicsView::show_device_settings_helper(CLDevice* dev)
         mDeviceDlg = 0;
         open = true;
     }
+    else if (mDeviceDlg)
+    {
+        mDeviceDlg->exec();
+    }
+
 
     if (!mDeviceDlg)
     {
@@ -3256,6 +3265,8 @@ void GraphicsView::navigation_grid_items_drop_helper()
 
     QList<QGraphicsItem *> lst = m_scene.selectedItems();
 
+    int duration;
+
     foreach(QGraphicsItem* itm, lst)
     {
         CLAbstractSceneItem* item = navigationItem(itm);
@@ -3286,29 +3297,35 @@ void GraphicsView::navigation_grid_items_drop_helper()
             QPropertyAnimation *anim = AnimationManager::instance().addAnimation(item, "pos");
             anim->setStartValue(item->pos());
             anim->setEndValue(item_newPos);
-            anim->setDuration(1000 + cl_get_random_val(0, 300));
+            duration = 1000 + cl_get_random_val(0, 300);
+            anim->setDuration(duration);
             anim->setEasingCurve(QEasingCurve::InOutBack);
             groupAnimation->addAnimation(anim);
             item->setArranged(false);
+            m_ignoreMouse.ignoreNextMs(duration);
 
             item_to_swap_with->setZValue(global_base_scene_z_level + 1); // this item
             anim = AnimationManager::instance().addAnimation(item_to_swap_with, "pos");
             anim->setStartValue(item_to_swap_with->pos());
             anim->setEndValue(item_to_swap_with_newPos);
-            anim->setDuration(1000 + cl_get_random_val(0, 300));
+            duration = 1000 + cl_get_random_val(0, 300);
+            anim->setDuration(duration);
             anim->setEasingCurve(QEasingCurve::InOutBack);
             groupAnimation->addAnimation(anim);
             item_to_swap_with->setArranged(false);
+            m_ignoreMouse.ignoreNextMs(duration);
         }
         else if (ge.canBeDropedHere(item)) // just adjust the item
         {
             QPropertyAnimation *anim = AnimationManager::instance().addAnimation(item, "pos");
             anim->setStartValue(item->pos());
             anim->setEndValue(ge.adjustedPosForItem(item));
-            anim->setDuration(1000 + cl_get_random_val(0, 300));
+            duration = 1000 + cl_get_random_val(0, 300);
+            anim->setDuration(duration);
             anim->setEasingCurve(QEasingCurve::InOutBack);
             groupAnimation->addAnimation(anim);
             item->setArranged(false);
+            m_ignoreMouse.ignoreNextMs(duration);
         }
         else // item should be moved to original position, and adjust it
         {
@@ -3318,10 +3335,12 @@ void GraphicsView::navigation_grid_items_drop_helper()
             QPropertyAnimation *anim = AnimationManager::instance().addAnimation(item, "pos");
             anim->setStartValue(item->pos());
             anim->setEndValue(ge.adjustedPosForSlot(item, original_slot_x, original_slot_y));
-            anim->setDuration(1000 + cl_get_random_val(0, 300));
+            duration = 1000 + cl_get_random_val(0, 300);
+            anim->setDuration(duration);
             anim->setEasingCurve(QEasingCurve::InOutBack);
             groupAnimation->addAnimation(anim);
             item->setArranged(false);
+            m_ignoreMouse.ignoreNextMs(duration);
         }
     }
 

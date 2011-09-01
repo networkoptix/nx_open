@@ -6,15 +6,16 @@
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QPushButton>
 #include <QtGui/QLabel>
-#include <QtGui/QGraphicsProxyWidget>
 #include <QtGui/QGraphicsLinearLayout>
+#include <QtGui/QGraphicsProxyWidget>
 
 #include "timeslider.h"
 #include "camera/camera.h"
 #include "device_plugins/archive/abstract_archive_stream_reader.h"
 #include "util.h"
-#include "../widgets/imagebuttonitem.h"
-#include "volumewidget.h"
+#include "ui/widgets/imagebuttonitem.h"
+#include "ui/widgets/speedwidget.h"
+#include "ui/widgets/volumewidget.h"
 
 class MyTextItem: public QGraphicsItem
 {
@@ -130,7 +131,7 @@ QLabel * NavigationWidget::label() const
 
 NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
     CLUnMovedInteractiveOpacityItem(QString("name:)"), 0, 0.5, 0.95),
-    m_currentTime(0)
+    m_camera(0), m_currentTime(0)
 {
     m_playing = false;
 
@@ -146,20 +147,20 @@ NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
     m_stepBackwardButton->addPixmap(QPixmap(":/skin/step_backward_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
     m_stepBackwardButton->addPixmap(QPixmap(":/skin/step_backward_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
     m_stepBackwardButton->addPixmap(QPixmap(":/skin/step_backward_disabled.png"), ImageButtonItem::Disabled, ImageButtonItem::Background);
-    m_stepBackwardButton->setMinimumSize(54, 30);
-    m_stepBackwardButton->setMaximumSize(54, 30);
+    m_stepBackwardButton->setMinimumSize(48, 27);
+    m_stepBackwardButton->setMaximumSize(48, 27);
 
     m_backwardButton = new ImageButtonItem;
     m_backwardButton->addPixmap(QPixmap(":/skin/backward_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
     m_backwardButton->addPixmap(QPixmap(":/skin/backward_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
-    m_backwardButton->setMinimumSize(54, 30);
-    m_backwardButton->setMaximumSize(54, 30);
+    m_backwardButton->setMinimumSize(48, 27);
+    m_backwardButton->setMaximumSize(48, 27);
 
     m_playButton = new ImageButtonItem;
     m_playButton->addPixmap(QPixmap(":/skin/play_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
     m_playButton->addPixmap(QPixmap(":/skin/play_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
-    m_playButton->setMinimumSize(54, 51);
-    m_playButton->setMaximumSize(54, 51);
+    m_playButton->setMinimumSize(48, 45);
+    m_playButton->setMaximumSize(48, 45);
 
     QAction *playAction = new QAction(tr("Play"), m_playButton);
     playAction->setShortcut(tr("Space"));
@@ -170,29 +171,50 @@ NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
     m_forwardButton = new ImageButtonItem;
     m_forwardButton->addPixmap(QPixmap(":/skin/forward_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
     m_forwardButton->addPixmap(QPixmap(":/skin/forward_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
-    m_forwardButton->setMinimumSize(54, 30);
-    m_forwardButton->setMaximumSize(54, 30);
+    m_forwardButton->setMinimumSize(48, 27);
+    m_forwardButton->setMaximumSize(48, 27);
 
     m_stepForwardButton = new ImageButtonItem;
     m_stepForwardButton->addPixmap(QPixmap(":/skin/step_forward_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
     m_stepForwardButton->addPixmap(QPixmap(":/skin/step_forward_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
     m_stepForwardButton->addPixmap(QPixmap(":/skin/step_forward_disabled.png"), ImageButtonItem::Disabled, ImageButtonItem::Background);
-    m_stepForwardButton->setMinimumSize(54, 30);
-    m_stepForwardButton->setMaximumSize(54, 30);
+    m_stepForwardButton->setMinimumSize(48, 27);
+    m_stepForwardButton->setMaximumSize(48, 27);
 
-    QGraphicsLinearLayout *linearLayout = new QGraphicsLinearLayout;
-    linearLayout->setContentsMargins(0,0,0,0);
-    linearLayout->addItem(m_stepBackwardButton);
-    linearLayout->setAlignment(m_stepBackwardButton, Qt::AlignHCenter | Qt::AlignVCenter);
-    linearLayout->addItem(m_backwardButton);
-    linearLayout->setAlignment(m_backwardButton, Qt::AlignHCenter | Qt::AlignVCenter);
-    linearLayout->addItem(m_playButton);
-    linearLayout->setAlignment(m_playButton, Qt::AlignHCenter | Qt::AlignVCenter);
-    linearLayout->addItem(m_forwardButton);
-    linearLayout->setAlignment(m_forwardButton, Qt::AlignHCenter | Qt::AlignVCenter);
-    linearLayout->addItem(m_stepForwardButton);
-    linearLayout->setAlignment(m_stepForwardButton, Qt::AlignHCenter | Qt::AlignVCenter);
-    m_graphicsWidget->setLayout(linearLayout);
+    QGraphicsLinearLayout *buttonsLayout = new QGraphicsLinearLayout;
+    buttonsLayout->setContentsMargins(0, 0, 0, 0);
+    buttonsLayout->addItem(m_stepBackwardButton);
+    buttonsLayout->setAlignment(m_stepBackwardButton, Qt::AlignHCenter | Qt::AlignVCenter);
+    buttonsLayout->addItem(m_backwardButton);
+    buttonsLayout->setAlignment(m_backwardButton, Qt::AlignHCenter | Qt::AlignVCenter);
+    buttonsLayout->addItem(m_playButton);
+    buttonsLayout->setAlignment(m_playButton, Qt::AlignHCenter | Qt::AlignVCenter);
+    buttonsLayout->addItem(m_forwardButton);
+    buttonsLayout->setAlignment(m_forwardButton, Qt::AlignHCenter | Qt::AlignVCenter);
+    buttonsLayout->addItem(m_stepForwardButton);
+    buttonsLayout->setAlignment(m_stepForwardButton, Qt::AlignHCenter | Qt::AlignVCenter);
+
+    m_speedWidget = new SpeedWidget;
+    m_speedWidget->setObjectName("SpeedWidget");
+    connect(m_speedWidget, SIGNAL(speedChanged(float)), this, SLOT(onSpeedChanged(float)));
+
+    QGraphicsProxyWidget *speedProxyWidget = new QGraphicsProxyWidget(this);
+    speedProxyWidget->setWidget(m_speedWidget);
+
+    QGraphicsLinearLayout *linearLayoutV = new QGraphicsLinearLayout(Qt::Vertical);
+    linearLayoutV->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+    linearLayoutV->setContentsMargins(0, 0, 0, 0);
+    linearLayoutV->setSpacing(0);
+    linearLayoutV->addItem(buttonsLayout);
+    linearLayoutV->setAlignment(buttonsLayout, Qt::AlignCenter);
+    linearLayoutV->addItem(speedProxyWidget);
+    linearLayoutV->setAlignment(speedProxyWidget, Qt::AlignTop);
+
+    QGraphicsLinearLayout *mainLayout = new QGraphicsLinearLayout;
+    mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout->addItem(linearLayoutV);
+    mainLayout->setAlignment(linearLayoutV, Qt::AlignLeft | Qt::AlignVCenter);
+    m_graphicsWidget->setLayout(mainLayout);
 
     connect(m_stepBackwardButton, SIGNAL(clicked()), SLOT(stepBackward()));
     connect(m_backwardButton, SIGNAL(clicked()), SLOT(rewindBackward()));
@@ -200,8 +222,8 @@ NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
     connect(m_forwardButton, SIGNAL(clicked()), SLOT(rewindForward()));
     connect(m_stepForwardButton, SIGNAL(clicked()), SLOT(stepForward()));
 
-    m_proxy = new QGraphicsProxyWidget();
-    linearLayout->addItem(m_proxy);
+    m_proxy = new QGraphicsProxyWidget(this);
+    mainLayout->addItem(m_proxy);
     m_widget = new NavigationWidget();
     m_graphicsWidget->resize(m_widget->size());
     m_widget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -228,6 +250,7 @@ NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
     m_textItem->setNavigationWidget(m_widget);
 
     setVideoCamera(0);
+
     m_sliderIsmoving = true;
     m_mouseOver = false;
     m_active = false;
@@ -263,25 +286,26 @@ void NavigationItem::setVideoCamera(CLVideoCamera *camera)
 {
     if (m_camera == camera)
         return;
+
     setAcceptHoverEvents(true);
     m_proxy->setAcceptHoverEvents(true);
     m_widget->setMouseTracking(true);
 
     m_camera = camera;
 
-    if (!camera)
+    if (m_camera)
     {
-        setVisible(false);
-        if (m_textItem)
-            m_textItem->setVisible(false);
-        m_widget->slider()->setScalingFactor(0);
+        setVisible(true);
+        m_textItem->setVisible(true);
+
+        CLAbstractArchiveReader *reader = static_cast<CLAbstractArchiveReader*>(m_camera->getStreamreader());
+        setPlaying(!reader->onPause());
     }
     else
     {
-        setVisible(true);
-        CLAbstractArchiveReader *reader = static_cast<CLAbstractArchiveReader*>(m_camera->getStreamreader());
-        setPlaying(!reader->onPause());
-        m_textItem->setVisible(true);
+        setVisible(false);
+        m_textItem->setVisible(false);
+        m_widget->slider()->setScalingFactor(0);
     }
 }
 
@@ -466,6 +490,12 @@ void NavigationItem::onSliderReleased()
         reader->setSingleShotMode(false);
         m_camera->getCamCamDisplay()->playAudio(true);
     }
+}
+
+void NavigationItem::onSpeedChanged(float newSpeed)
+{
+    if (isPlaying())
+        m_camera->getCamCamDisplay()->setSpeed(newSpeed);
 }
 
 void NavigationItem::setPlaying(bool playing)
