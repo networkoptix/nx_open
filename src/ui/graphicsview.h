@@ -11,6 +11,7 @@
 #include "ui_common.h"
 #include "animation/animation_manager.h"
 #include "animation/steady_mouse_animation.h"
+#include "mouse_ignore_helper.h"
 
 class NavigationItem;
 class CLAbstractSceneItem;
@@ -246,7 +247,7 @@ protected:
 
     bool m_menuIsHere;
 
-    QTime m_timeAfterDoubleClick;
+    CLMouseIgnoreHelper m_ignoreMouse;
 
     CLAbstractSceneItem* m_lastPressedItem;
 

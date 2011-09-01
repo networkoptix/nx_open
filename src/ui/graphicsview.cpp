@@ -47,8 +47,8 @@
 
 extern int  SLOT_WIDTH;
 
-int doubl_clk_delay = qApp->doubleClickInterval();
-int item_select_duration = 800;
+int doubl_clk_delay = qMin(qApp->doubleClickInterval(), 400);
+int item_select_duration = 700;
 int item_hoverevent_duration = 300;
 int scene_zoom_duration = 2500;
 int scene_move_duration = 3000;
@@ -112,8 +112,6 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
     m_lastPressedItem(0),
     m_inputBlocked(false)
 {
-    m_timeAfterDoubleClick.restart();
-
     setScene(&m_scene);
     //scene()->setStyle(..); // scene-specific style
 
@@ -248,6 +246,7 @@ GraphicsView::ViewMode GraphicsView::getViewMode() const
 void GraphicsView::start()
 {
     mViewStarted = true;
+    m_ignoreMouse.reset();
 
     m_camLayout.updateSceneRect();
     centerOn(getRealSceneRect().center());
@@ -256,7 +255,7 @@ void GraphicsView::start()
     {
         zoomMin(0);
 
-        int duration = 1000;
+        int duration = 600;
 
         if (m_camLayout.getItemList().count() && m_camLayout.getContent() == CLSceneLayoutManager::instance().startScreenLayoutContent())
             duration/=3;
@@ -342,6 +341,7 @@ void GraphicsView::setZeroSelection()
     if (m_selectedWnd && m_camLayout.hasSuchItem(m_selectedWnd))
     {
         m_selectedWnd->setItemSelected(false);
+        m_ignoreMouse.ignoreNextMs(300);
 
         CLVideoWindowItem* videoItem = 0;
         if ( (videoItem = m_selectedWnd->toVideoItem()) )
@@ -393,6 +393,7 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
         return;
 
 
+    
     if (m_navigationItem && ( m_navigationItem->mouseOver() || m_navigationItem->isActive()))
     {
         // scene should not be zoomed if mouse is over time slider or if time slider is active
@@ -403,6 +404,7 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
         QGraphicsView::wheelEvent(e);
         return;
     }
+    /**/
 
 
     showStop_helper();
@@ -699,8 +701,8 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
     if (m_inputBlocked)
         return;
 
-    if (m_timeAfterDoubleClick.elapsed() < doubl_clk_delay)
-        return; // ignore some accident mouse click accidents after double click
+    if (m_ignoreMouse.shouldIgnore())
+        return; 
 
     m_ignore_release_event = false;
 
@@ -710,12 +712,14 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
     if (onUserInput(true, true))
         return;
 
+    /*
     if (m_navigationItem && !m_navigationItem->mouseOver() && m_navigationItem->isActive())
     {
         // we've got time line; muose is not over timeline. timeline is still active
         m_navigationItem->setActive(false);
         return;
     }
+    /**/
 
 
     m_yRotate = 0;
@@ -801,8 +805,8 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
     if (!mViewStarted)
         return;
 
-    if (m_timeAfterDoubleClick.elapsed() < doubl_clk_delay)
-        return; // ignore some accident mouse click accidents after double click
+    if (m_ignoreMouse.shouldIgnore())  
+        return; 
 
 
     if (m_gridItem->isVisible() && !isCTRLPressed(event))
@@ -972,7 +976,7 @@ void GraphicsView::mouseReleaseEvent(QMouseEvent * event)
     if (!mViewStarted)
         return;
 
-    if (m_timeAfterDoubleClick.elapsed() < doubl_clk_delay)
+    if (m_ignoreMouse.shouldIgnore())
     {
         QGraphicsView::mouseReleaseEvent(event);
         return; // ignore some accident mouse click accidents after double click
@@ -1715,7 +1719,7 @@ void GraphicsView::mouseDoubleClickEvent( QMouseEvent * event )
     if (m_inputBlocked)
         return;
 
-    m_timeAfterDoubleClick.restart();
+    m_ignoreMouse.ignoreNextMs(doubl_clk_delay);
 
     QGraphicsItem *item = itemAt(event->pos());
     CLAbstractSceneItem* aitem = navigationItem(item);
@@ -1752,7 +1756,7 @@ void GraphicsView::mouseDoubleClickEvent( QMouseEvent * event )
         onArrange_helper();
         */
 
-        fitInView(1500, 0, SLOW_START_SLOW_END);
+        fitInView(800, 0, SLOW_START_SLOW_END);
 
         return;
     }
@@ -2406,7 +2410,7 @@ void GraphicsView::toggleFullScreen_helper(CLAbstractSceneItem* wnd)
         // escape FS MODE
         setZeroSelection();
         wnd->setFullScreen(false);
-        fitInView(1000, 0, SLOW_START_SLOW_END);
+        fitInView(800, 0, SLOW_START_SLOW_END);
 
     }
 }
@@ -2453,6 +2457,8 @@ void GraphicsView::onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int de
     qreal zoom = m_scenezoom.scaleTozoom(scale) ;
 
     m_scenezoom.zoom_abs(zoom, item_select_duration, delay, QPoint(0,0), SLOW_START_SLOW_END);
+
+    m_ignoreMouse.ignoreNextMs(item_select_duration + delay);
 
 }
 
@@ -2846,6 +2852,8 @@ void GraphicsView::fitInView(int duration, int delay, CLAnimationCurve curve)
     //scale(scl, scl);
 
     m_scenezoom.zoom_abs(zoom, duration, delay, QPoint(0,0), curve);
+
+    m_ignoreMouse.ignoreNextMs(duration + delay);
 }
 
 qreal GraphicsView::zoomForFullScreen_helper(QRectF rect) const
@@ -2897,6 +2905,8 @@ void GraphicsView::onItemFullScreen_helper(CLAbstractSceneItem* wnd, int duratio
     wnd->setItemSelected(true,false); // do not animate
     m_selectedWnd = wnd;
     m_last_selectedWnd = wnd;
+
+    m_ignoreMouse.ignoreNextMs(duration);
 }
 
 void GraphicsView::mouseSpeed_helper(qreal& mouse_speed,  int& dx, int&dy, int min_speed, int speed_factor)
@@ -3255,6 +3265,8 @@ void GraphicsView::navigation_grid_items_drop_helper()
 
     QList<QGraphicsItem *> lst = m_scene.selectedItems();
 
+    int duration;
+
     foreach(QGraphicsItem* itm, lst)
     {
         CLAbstractSceneItem* item = navigationItem(itm);
@@ -3285,29 +3297,35 @@ void GraphicsView::navigation_grid_items_drop_helper()
             QPropertyAnimation *anim = AnimationManager::instance().addAnimation(item, "pos");
             anim->setStartValue(item->pos());
             anim->setEndValue(item_newPos);
-            anim->setDuration(1000 + cl_get_random_val(0, 300));
+            duration = 1000 + cl_get_random_val(0, 300);
+            anim->setDuration(duration);
             anim->setEasingCurve(QEasingCurve::InOutBack);
             groupAnimation->addAnimation(anim);
             item->setArranged(false);
+            m_ignoreMouse.ignoreNextMs(duration);
 
             item_to_swap_with->setZValue(global_base_scene_z_level + 1); // this item
             anim = AnimationManager::instance().addAnimation(item_to_swap_with, "pos");
             anim->setStartValue(item_to_swap_with->pos());
             anim->setEndValue(item_to_swap_with_newPos);
-            anim->setDuration(1000 + cl_get_random_val(0, 300));
+            duration = 1000 + cl_get_random_val(0, 300);
+            anim->setDuration(duration);
             anim->setEasingCurve(QEasingCurve::InOutBack);
             groupAnimation->addAnimation(anim);
             item_to_swap_with->setArranged(false);
+            m_ignoreMouse.ignoreNextMs(duration);
         }
         else if (ge.canBeDropedHere(item)) // just adjust the item
         {
             QPropertyAnimation *anim = AnimationManager::instance().addAnimation(item, "pos");
             anim->setStartValue(item->pos());
             anim->setEndValue(ge.adjustedPosForItem(item));
-            anim->setDuration(1000 + cl_get_random_val(0, 300));
+            duration = 1000 + cl_get_random_val(0, 300);
+            anim->setDuration(duration);
             anim->setEasingCurve(QEasingCurve::InOutBack);
             groupAnimation->addAnimation(anim);
             item->setArranged(false);
+            m_ignoreMouse.ignoreNextMs(duration);
         }
         else // item should be moved to original position, and adjust it
         {
@@ -3317,10 +3335,12 @@ void GraphicsView::navigation_grid_items_drop_helper()
             QPropertyAnimation *anim = AnimationManager::instance().addAnimation(item, "pos");
             anim->setStartValue(item->pos());
             anim->setEndValue(ge.adjustedPosForSlot(item, original_slot_x, original_slot_y));
-            anim->setDuration(1000 + cl_get_random_val(0, 300));
+            duration = 1000 + cl_get_random_val(0, 300);
+            anim->setDuration(duration);
             anim->setEasingCurve(QEasingCurve::InOutBack);
             groupAnimation->addAnimation(anim);
             item->setArranged(false);
+            m_ignoreMouse.ignoreNextMs(duration);
         }
     }
 
