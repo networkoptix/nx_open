@@ -273,7 +273,7 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
         CLVideoDecoderOutput* tmpOutFrame = new CLVideoDecoderOutput();
         while (dec->decode(emptyData, tmpOutFrame)) 
         {
-            tmpOutFrame->pts = getLastDisplayedTime();
+            tmpOutFrame->pts = AV_NOPTS_VALUE; // unknown
             m_reverseQueue.enqueue(tmpOutFrame);
             m_realReverseSize++;
             checkQueueOverflow(dec);
@@ -344,7 +344,8 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 
 void CLVideoStreamDisplay::processDecodedFrame(int channel, CLVideoDecoderOutput* outFrame, bool enableFrameQueue, bool reverseMode)
 {
-    setLastDisplayedTime(outFrame->pts);
+    if (outFrame->pts != AV_NOPTS_VALUE)
+        setLastDisplayedTime(outFrame->pts);
     if (outFrame->data[0]) {
         m_drawer->draw(outFrame, channel);
         if (enableFrameQueue) {
