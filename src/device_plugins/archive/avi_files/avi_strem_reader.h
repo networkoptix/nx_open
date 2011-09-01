@@ -3,6 +3,7 @@
 
 #include "../abstract_archive_stream_reader.h"
 #include "data/mediadata.h"
+#include "base/ffmpeg_helper.h"
 
 struct AVFormatContext;
 
@@ -19,6 +20,8 @@ public:
     virtual QStringList getAudioTracksInfo() const;
     virtual unsigned int getCurrentAudioChannel() const;
     virtual bool setAudioChannel(unsigned int num);
+    virtual void setReverseMode(bool value);
+    virtual bool isReverseMode() const { return m_reverseMode;}
 protected:
     virtual CLAbstractMediaData* getNextData();
     virtual void channeljumpTo(quint64 mksec, int channel);
@@ -36,6 +39,9 @@ protected:
 protected:
     qint64 m_currentTime;
     qint64 m_previousTime;
+    qint64 m_topIFrameTime;
+    qint64 m_bottomIFrameTime;
+    
 
     AVFormatContext* m_formatContext;
 
@@ -62,6 +68,8 @@ private:
     static QMutex avi_mutex;
     static QSemaphore aviSemaphore ;
     bool m_eof;
+    bool m_reverseMode;
+    FrameTypeExtractor* m_frameTypeExtractor;
 private:
     /**
       * Read next packet from file

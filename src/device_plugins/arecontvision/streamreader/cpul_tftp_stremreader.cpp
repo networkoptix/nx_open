@@ -305,10 +305,13 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 	m_last_cam_width = size.width;
 	m_last_cam_height = size.height;
 
-	videoData->keyFrame = true;
+	videoData->flags |= AV_PKT_FLAG_KEY;
 	if (h264)
 	{
-		videoData->keyFrame = last_packet[iframe_index-1];
+        if (last_packet[iframe_index-1])
+		    videoData->flags |= AV_PKT_FLAG_KEY;
+        else
+            videoData->flags &= ~AV_PKT_FLAG_KEY;
 
 		//==========================================
 		//put unit delimetr at the end of the frame
@@ -320,7 +323,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 		img.write(&c,1); //1
 		c = 0x09;
 		img.write(&c,1); //0x09
-		c = videoData->keyFrame ? 0x10 : 0x30;
+		c = (videoData->flags & AV_PKT_FLAG_KEY) ? 0x10 : 0x30;
 		img.write(&c,1); // 0x10
 
 		//==========================================
@@ -356,7 +359,7 @@ CLAbstractMediaData* AVClientPullSSTFTPStreamreader::getNextData()
 
 		// we also need to put very begining of SH
 		dst[0] = dst[1] = dst[2] = 0; dst[3] = 1;
-		dst[4] = videoData->keyFrame ? 0x65 : 0x41;
+		dst[4] = (videoData->flags & AV_PKT_FLAG_KEY) ? 0x65 : 0x41;
 
 		img.prepareToWrite(8);
 		dst = img.data() + img.size();

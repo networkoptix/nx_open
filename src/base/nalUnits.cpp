@@ -35,7 +35,7 @@ quint8* NALUnit::addStartCode(quint8* buffer, quint8* boundStart)
 	return rez;
 }
 
-quint8* NALUnit::findNextNAL(quint8* buffer, quint8* end)
+const quint8* NALUnit::findNextNAL(const quint8* buffer, const quint8* end)
 {
 	for (buffer += 2; buffer < end;)
 	{

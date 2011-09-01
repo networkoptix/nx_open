@@ -57,7 +57,8 @@ CLAbstractMediaData* CLSingleShotFileStreamreader::getData()
 
 	outData->width = 0; // does not really meter (this is single shot)
 	outData->height = 0; //does not really meter (this is single shot)
-	outData->keyFrame = true;
+	//outData->keyFrame = true;
+    outData->flags |= AV_PKT_FLAG_KEY;
 
 	outData->channelNumber = 0;
 

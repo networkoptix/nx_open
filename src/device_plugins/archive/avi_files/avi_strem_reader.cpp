@@ -7,10 +7,16 @@
 #include <libavformat/avformat.h>
 #include "base/ffmpeg_helper.h"
 #include "decoders/audio/ffmpeg_audio.h"
+#include "decoders/video/frame_info.h"
 
 QMutex CLAVIStreamReader::avi_mutex;
 QSemaphore CLAVIStreamReader::aviSemaphore(4);
 
+
+// used in reverse mode.
+// seek by 1.5secs. It is prevents too fast seeks for short GOP, also some codecs has bagged seek function. Large step prevent seek
+// forward instead seek backward
+static const qint64 BACKWARD_SEEK_STEP =  2000 * 1000; 
 
 class QnAviSemaphoreHelpr
 {
@@ -65,7 +71,11 @@ CLAVIStreamReader::CLAVIStreamReader(CLDevice* dev ) :
     m_currentPacketIndex(0),
     m_eof(false),
     m_haveSavedPacket(false),
-    m_selectedAudioChannel(0)
+    m_selectedAudioChannel(0),
+    m_reverseMode(false),
+    m_topIFrameTime(-1),
+    m_bottomIFrameTime(-1),
+    m_frameTypeExtractor(0)
 {
     // Should init packets here as some times destroy (av_free_packet) could be called before init
     av_init_packet(&m_packets[0]);
@@ -73,6 +83,7 @@ CLAVIStreamReader::CLAVIStreamReader(CLDevice* dev ) :
 
     //init();
 }
+
 
 CLAVIStreamReader::~CLAVIStreamReader()
 {
@@ -160,8 +171,8 @@ bool CLAVIStreamReader::init()
 
 	m_currentTime = 0;
 	m_previousTime = -1;
-	//m_needToSleep = 0;
-	//m_lengthMksec = 0;
+    m_bottomIFrameTime =-1;
+    m_topIFrameTime = -1;
 
     m_formatContext = getFormatContext();
     if (!m_formatContext)
@@ -178,6 +189,10 @@ bool CLAVIStreamReader::init()
     // Alloc common resources
     av_init_packet(&m_packets[0]);
     av_init_packet(&m_packets[1]);
+
+    delete m_frameTypeExtractor;
+    m_frameTypeExtractor = new FrameTypeExtractor(m_formatContext->streams[m_videoStreamIndex]->codec);
+
 
     return true;
 }
@@ -260,12 +275,13 @@ CLCompressedVideoData* CLAVIStreamReader::getVideoData(const AVPacket& packet, A
     data.done(packet.size + extra);
 
     videoData->compressionType = m_videoCodecId;
-    videoData->keyFrame = packet.flags & AV_PKT_FLAG_KEY;
+    //videoData->keyFrame = packet.flags & AV_PKT_FLAG_KEY;
+    videoData->flags = packet.flags;
     videoData->channelNumber = 0;
     videoData->timestamp = m_currentTime;
 
     videoData->useTwice = m_useTwice;
-    if (videoData->keyFrame)
+    if (videoData->flags & AV_PKT_FLAG_KEY)
         m_gotKeyFrame[0] = true;
 
     return videoData;
@@ -359,6 +375,41 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 
 	if (currentPacket().stream_index == m_videoStreamIndex) // in case of video packet
 	{
+        if (m_reverseMode) 
+        {
+            // I have found example where AV_PKT_FLAG_KEY detected very bad.
+            // Same frame sometimes Key sometimes not. It is VC1 codec.
+            // Manual detection for it stream better, but has artefacts too. I thinks some data lost in stream after jump
+            // (after sequence header always P-frame, not I-Frame. But I returns I, because no I frames at all in other case)
+            FrameTypeExtractor::FrameType frameType = m_frameTypeExtractor->getFrameType(currentPacket().data, currentPacket().size);
+            bool isKeyFrame;
+            if (frameType != FrameTypeExtractor::UnknownFrameType)
+                isKeyFrame = frameType == FrameTypeExtractor::I_Frame;
+            else {
+                isKeyFrame =  currentPacket().flags  & AV_PKT_FLAG_KEY;
+            }
+            if (isKeyFrame)
+            {
+                if (m_bottomIFrameTime == -1) {
+                    m_bottomIFrameTime = m_currentTime;
+                    currentPacket().flags |= AV_REVERSE_BLOCK_START;
+                }
+                if (m_currentTime >= m_topIFrameTime) {
+                    av_free_packet(&currentPacket());
+                    qint64 seekTime = m_bottomIFrameTime - BACKWARD_SEEK_STEP;
+                    qint64 tmpVal = m_bottomIFrameTime;
+                    channeljumpTo(seekTime, 0);
+                    m_topIFrameTime = tmpVal;
+                    return getNextData();
+                }
+            }
+            else if (m_bottomIFrameTime == -1) {
+                // invalid seek. must be key frame
+                av_free_packet(&currentPacket());
+                return getNextData();
+            }
+        } 
+
 		m_bsleep = true; // sleep only in case of video
 
         AVCodecContext* codecContext = m_formatContext->streams[m_videoStreamIndex]->codec;
@@ -435,6 +486,8 @@ void CLAVIStreamReader::channeljumpTo(quint64 mksec, int /*channel*/)
 	//m_needToSleep = 0;
 	m_previousTime = -1;
 	m_wakeup = true;
+    m_bottomIFrameTime = -1;
+    m_topIFrameTime = -1;
 }
 
 void CLAVIStreamReader::destroy()
@@ -446,6 +499,8 @@ void CLAVIStreamReader::destroy()
     }
 
     av_free_packet(&nextPacket());
+    delete m_frameTypeExtractor;
+    m_frameTypeExtractor = 0;
 }
 
 bool CLAVIStreamReader::getNextPacket(AVPacket& packet)
@@ -608,4 +663,11 @@ bool CLAVIStreamReader::setAudioChannel(unsigned int num)
         }
     }
     return false;
+}
+
+void CLAVIStreamReader::setReverseMode(bool value)
+{
+    if (value)
+        setSkipFramesToTime(0);
+    m_reverseMode = value;
 }

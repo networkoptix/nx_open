@@ -62,6 +62,7 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_lastDisplayedVideoTime(0),
       m_previousVideoTime(0),
       m_lastNonZerroDuration(0),
+      m_lastSleepInterval(0),
       m_previousVideoDisplayedTime(0),
       m_afterJump(false),
       m_displayLasts(0),
@@ -75,7 +76,8 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_playingCompress(0),
       m_playingBitrate(0),
       m_tooSlowCounter(0),
-      m_lightCpuMode(CLAbstractVideoDecoder::DecodeMode_Full)
+      m_lightCpuMode(CLAbstractVideoDecoder::DecodeMode_Full),
+      m_lastFrameDisplayed(false)
 {
     m_storedMaxQueueSize = m_dataQueue.maxSize();
     //setSpeed(10);
@@ -125,14 +127,19 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
     quint64 currentTime = vd->timestamp;
 
     m_totalFrames++;
-    if (vd->keyFrame)
+    if (vd->flags & AV_PKT_FLAG_KEY)
         m_iFrames++;
 
 
     // in ideal world data comes to queue at the same speed as it goes out
     // but timer on the sender side runs at a bit different rate in comparison to the timer here
     // adaptive delay will not solve all problems => need to minus little appendix based on queue size
-    qint32 needToSleep = (currentTime - m_previousVideoTime) * 1.0/m_speed;
+    qint32 needToSleep;
+    if (vd->flags & AV_REVERSE_BLOCK_START)
+        needToSleep = m_lastSleepInterval;
+    else {
+        needToSleep = m_lastSleepInterval = (currentTime - m_previousVideoTime) * 1.0/qAbs(m_speed);
+    }
 
     if (m_isRealTimeSource)
     {
@@ -153,28 +160,39 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
 
     if (sleep) 
     {
-        int realSleepTime = m_delay.sleep(needToSleep);
-        if (qAbs(m_speed) > 1.0 + FPS_EPS)
+        //QString msg;
+        //QTextStream str(&msg);
+        if (m_lastFrameDisplayed)
         {
-            if (realSleepTime < 0)
+            int realSleepTime = m_delay.sleep(needToSleep);
+            //str << "sleep time: " << needToSleep << "  real:" << realSleepTime;
+            if (qAbs(m_speed) > 1.0 + FPS_EPS)
             {
-                if (realSleepTime > -200*1000 && m_lightCpuMode == CLAbstractVideoDecoder::DecodeMode_Full)
+                if (realSleepTime < 0)
                 {
-                    setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Fast);
+                    if (realSleepTime > -200*1000 && m_lightCpuMode == CLAbstractVideoDecoder::DecodeMode_Full)
+                    {
+                        setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Fast);
+                    }
+                    else if (m_iFrames > 1) {
+                        qint64 avgGopDuration = ((qint64)needToSleep * m_totalFrames)/m_iFrames;
+                        if (realSleepTime < qMin(-400*1000ll, -avgGopDuration))
+                            setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Fastest);
+                        else if (vd->flags & AV_PKT_FLAG_KEY)
+                            setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Fast);
+                    }
                 }
-                else if (m_iFrames > 1) {
-                    qint64 avgGopDuration = ((qint64)needToSleep * m_totalFrames)/m_iFrames;
-                    if (realSleepTime < qMin(-400*1000ll, -avgGopDuration))
-                        setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Fastest);
-                    else if (vd->keyFrame)
+                else if (vd->flags & AV_PKT_FLAG_KEY) {
+                    if (m_lightCpuMode == CLAbstractVideoDecoder::DecodeMode_Fastest)
                         setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Fast);
                 }
             }
-            else if (vd->keyFrame) {
-                if (m_lightCpuMode == CLAbstractVideoDecoder::DecodeMode_Fastest)
-                    setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Fast);
-            }
         }
+        else {
+            //str << "skip sleep";
+        }
+        //str.flush();
+        //cl_log.log(msg, cl_logALWAYS);
     }
     int channel = vd->channelNumber;
 
@@ -219,7 +237,7 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
             updateActivity();
         }
 
-        m_display[channel]->dispay(vd, draw, scaleFactor);
+        m_lastFrameDisplayed = m_display[channel]->dispay(vd, draw, scaleFactor);
 
         if (!sleep)
             m_displayLasts = displayTime.elapsed(); // this is how long would i take to draw frame.
@@ -258,6 +276,10 @@ void CLCamDisplay::setSpeed(double speed)
     }
     m_tooSlowCounter = 0;
     m_speed = speed;
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
+        if (m_display[i])
+            m_display[i]->setReverseMode(speed < 0);
+    }
     setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Full);
 };
 
@@ -276,6 +298,8 @@ bool CLCamDisplay::processData(CLAbstractData* data)
     }
     else if (media->dataType == CLAbstractMediaData::AUDIO)
     {
+        if (m_speed < 0)
+            return true; // ignore audio packet to prevent after jump detection
         ad = static_cast<CLCompressedAudioData*>(data);
     }
 
@@ -355,7 +379,8 @@ bool CLCamDisplay::processData(CLAbstractData* data)
         {
             if (vd->timestamp - m_lastVideoPacketTime < -MIN_VIDEO_DETECT_JUMP_INTERVAL)
             {
-                afterJump(vd->timestamp);
+                if (!(vd->flags & AV_REVERSE_BLOCK_START))
+                    afterJump(vd->timestamp);
             }
             m_lastVideoPacketTime = vd->timestamp;
 
@@ -457,7 +482,6 @@ bool CLCamDisplay::processData(CLAbstractData* data)
 
                     bool lastFrameToDisplay = diff > -2 * videoDuration; //factor 2 here is to avoid frequent switch between normal play and fast play
 
-                    //display(vd, lastFrameToDisplay && !vd->ignore && m_audioDisplay->msInBuffer() >= AUDIO_BUFF_SIZE / 10);
                     m_lastDisplayedVideoTime = vd->timestamp;
                     display(vd, lastFrameToDisplay && !vd->ignore);
                     m_singleShotQuantProcessed = true;
@@ -513,7 +537,7 @@ void CLCamDisplay::playAudio(bool play)
 
 bool CLCamDisplay::haveAudio() const
 {
-    return (m_playAudio && m_hadAudio && m_speed == 1.0) && !m_ignoringVideo && m_audioDisplay->isFormatSupported();
+    return m_playAudio && m_hadAudio && qAbs(m_speed-1.0) < FPS_EPS && !m_ignoringVideo && m_audioDisplay->isFormatSupported();
 }
 
 CLCompressedVideoData* CLCamDisplay::nextInOutVideodata(CLCompressedVideoData* incoming, int channel)
@@ -598,7 +622,6 @@ void CLCamDisplay::afterJump(qint64 newTime)
     m_previousVideoDisplayedTime = 0;
     m_totalFrames = 0;
     m_iFrames = 0;
-
     clearVideoQueue();
     m_audioDisplay->clearAudioBuffer();
 

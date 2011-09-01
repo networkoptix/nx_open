@@ -54,7 +54,7 @@ public:
 	virtual ~NALUnit() { 
 		delete [] m_nalBuffer; 
 	}
-	static quint8* findNextNAL(quint8* buffer, quint8* end);
+	static const quint8* findNextNAL(const quint8* buffer, const quint8* end);
 	static quint8* findNALWithStartCode(quint8* buffer, quint8* end, bool longCodesAllowed);
 	static int encodeNAL(quint8* srcBuffer, quint8* srcEnd, quint8* dstBuffer, size_t dstBufferSize);
 	static int decodeNAL(const quint8* srcBuffer, const quint8* srcEnd, quint8* dstBuffer, size_t dstBufferSize);

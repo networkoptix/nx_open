@@ -35,6 +35,10 @@ public:
 	void addDataProcessor(CLAbstractDataProcessor* dp);
 	void removeDataProcessor(CLAbstractDataProcessor* dp);
 
+    virtual void setReverseMode(bool value) {}
+    virtual bool isReverseMode() const { return false;}
+
+
 	void pauseDataProcessors()
 	{
 		foreach(CLAbstractDataProcessor* dataProcessor, m_dataprocessors) {
@@ -57,6 +61,8 @@ public:
 
 	virtual void setQuality(StreamQuality q);
 	StreamQuality getQuality() const;
+
+    void setSpeed(double value);
 signals:
     void audioParamsChanged(AVCodecContext * codec);
     void videoParamsChanged(AVCodecContext * codec);

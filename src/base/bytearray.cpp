@@ -12,7 +12,8 @@ CLByteArray::CLByteArray(unsigned int alignment, unsigned int capacity):
     m_data(0),
     m_ignore(0)
 {
-    reallocate(capacity);
+    if (capacity > 0)
+        reallocate(capacity);
 }
 
 CLByteArray::~CLByteArray()
@@ -54,7 +55,7 @@ unsigned int CLByteArray::capacity() const
 
 bool CLByteArray::reallocate(unsigned int new_capacity)
 {
-    Q_ASSERT(capacity > 0);
+    Q_ASSERT(new_capacity > 0);
 
     if (new_capacity < m_size)
     {

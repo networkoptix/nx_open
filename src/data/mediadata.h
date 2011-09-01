@@ -45,11 +45,13 @@ struct CLCompressedVideoData : public CLAbstractMediaData
 		useTwice = false;
 		context = ctx;
 		ignore = false;
+        flags = 0;
 	}
 
 	int width;
 	int height;
-	bool keyFrame;
+	//bool keyFrame;
+    int flags;
 	bool useTwice; // some decoders delay video frame by one;
 	quint32 channelNumber; // video channel number; some devices might have more that one sensor.
 	bool ignore;

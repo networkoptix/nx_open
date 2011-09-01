@@ -78,7 +78,7 @@ void CLClientPullStreamreader::run()
 		if (videoData && needKeyData())
 		{
 			// I do not like; need to do smth with it
-			if (videoData->keyFrame)
+			if (videoData->flags & AV_PKT_FLAG_KEY)
 			{
 				if (videoData->channelNumber>CL_MAX_CHANNEL_NUMBER-1)
 				{

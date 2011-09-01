@@ -340,6 +340,8 @@ void NavigationItem::onValueChanged(qint64 time)
         reader->jumpToPreviousFrame(time, true);
 
     m_camera->streamJump(time);
+
+    //reader->setSpeed(-1);
 }
 
 void NavigationItem::pause()

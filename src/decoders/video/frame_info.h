@@ -4,6 +4,9 @@
 #include "data/mediadata.h"
 #include "libavcodec/avcodec.h"
 
+#define AV_REVERSE_BLOCK_START 64
+#define AV_REVERSE_REORDERED   32
+
 struct CLVideoDecoderOutput: public AVFrame
 {
     CLVideoDecoderOutput();
@@ -21,6 +24,8 @@ struct CLVideoDecoderOutput: public AVFrame
     void setDisplaying(bool value) {m_displaying = value; }
     bool isDisplaying() const { return m_displaying; }
     void reallocate(int newWidth, int newHeight, int format);
+public:
+    int flags;
 private:
     static void downscalePlate_factor2(unsigned char* dst, const unsigned char* src, int src_width, int src_stride, int src_height);
     static void downscalePlate_factor4(unsigned char* dst, const unsigned char* src, int src_width, int src_stride, int src_height);
