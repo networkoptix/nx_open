@@ -76,7 +76,7 @@ private:
         int srcWidth, 
         int srcHeight, 
         CLVideoDecoderOutput::downscale_factor force_factor);
-    void processDecodedFrame(int channel, CLVideoDecoderOutput* outFrame, bool enableFrameQueue);
+    void processDecodedFrame(int channel, CLVideoDecoderOutput* outFrame, bool enableFrameQueue, bool reverseMode);
 };
 
 #endif //videostreamdisplay_h_2044

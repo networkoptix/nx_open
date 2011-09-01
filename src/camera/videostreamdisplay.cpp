@@ -142,7 +142,10 @@ void CLVideoStreamDisplay::reorderPrevFrames()
 bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVideoDecoderOutput::downscale_factor force_factor)
 {
     // use only 1 frame for non selected video
-    bool enableFrameQueue = m_enableFrameQueue;
+    bool reverseMode = m_reverseMode;
+    bool enableFrameQueue = reverseMode ? true : m_enableFrameQueue;
+
+
     if (!enableFrameQueue && m_queueUsed)
     {
         m_drawer->waitForFrameDisplayed(data->channelNumber);
@@ -151,6 +154,13 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
             m_frameQueue[i]->clean();
         m_queueUsed = false;
     }
+    if (!reverseMode && m_reverseQueue.size() > 0) {
+        m_drawer->waitForFrameDisplayed(data->channelNumber);
+        for (int i = 0; i < MAX_FRAME_QUEUE_SIZE; ++i)
+            delete m_reverseQueue[i];
+        m_reverseQueue.clear();
+    }
+
     if (m_needReinitDecoders) {
         QMutexLocker _lock(&m_mtx);
         foreach(CLAbstractVideoDecoder* decoder, m_decoder)
@@ -212,7 +222,7 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 	{
 		//CL_LOG(cl_logDEBUG2) cl_log.log(QLatin1String("CLVideoStreamDisplay::dispay: decoder cannot decode image..."), cl_logDEBUG2);
         if (!m_reverseQueue.isEmpty() && (m_reverseQueue.front()->flags & AV_REVERSE_REORDERED)) {
-            processDecodedFrame(data->channelNumber, m_reverseQueue.dequeue(), enableFrameQueue);
+            processDecodedFrame(data->channelNumber, m_reverseQueue.dequeue(), enableFrameQueue, reverseMode);
             return true;
         }
 		return false;
@@ -243,7 +253,7 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
     }
     outFrame->flags = data->flags;
     outFrame->pts = data->timestamp;
-    if (m_reverseMode) 
+    if (reverseMode) 
     {
         if (outFrame->flags & AV_REVERSE_BLOCK_START) 
             reorderPrevFrames();
@@ -255,11 +265,11 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
         outFrame = m_reverseQueue.dequeue();
     }
     
-    processDecodedFrame(data->channelNumber, outFrame, enableFrameQueue);
+    processDecodedFrame(data->channelNumber, outFrame, enableFrameQueue, reverseMode);
     return true;
 }
 
-void CLVideoStreamDisplay::processDecodedFrame(int channel, CLVideoDecoderOutput* outFrame, bool enableFrameQueue)
+void CLVideoStreamDisplay::processDecodedFrame(int channel, CLVideoDecoderOutput* outFrame, bool enableFrameQueue, bool reverseMode)
 {
     m_drawer->draw(outFrame, channel);
     m_lastDisplayedTime = outFrame->pts;
@@ -272,7 +282,7 @@ void CLVideoStreamDisplay::processDecodedFrame(int channel, CLVideoDecoderOutput
     if (!enableFrameQueue) 
         m_drawer->waitForFrameDisplayed(channel);
 
-    if (m_reverseMode) {
+    if (reverseMode) {
         if (m_prevFrameToDelete)
             delete m_prevFrameToDelete;
         m_prevFrameToDelete = outFrame;
@@ -337,7 +347,7 @@ void CLVideoStreamDisplay::setMTDecoding(bool value)
 
 void CLVideoStreamDisplay::setReverseMode(bool value)
 {
+    m_reverseMode = value;
     if (value)
         m_enableFrameQueue = true;
-    m_reverseMode = value;
 }
