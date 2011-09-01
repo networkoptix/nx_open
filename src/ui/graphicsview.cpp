@@ -340,11 +340,11 @@ qreal GraphicsView::getZoom() const
     return m_scenezoom.getZoom();
 }
 
-void GraphicsView::setZeroSelection()
+void GraphicsView::setZeroSelection(int delay)
 {
     if (m_selectedWnd && m_camLayout.hasSuchItem(m_selectedWnd))
     {
-        m_selectedWnd->setItemSelected(false);
+        m_selectedWnd->setItemSelected(false, true,delay);
 
         CLVideoWindowItem* videoItem = 0;
         if ( (videoItem = m_selectedWnd->toVideoItem()) )
@@ -2420,7 +2420,7 @@ void GraphicsView::onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int de
     if (!m_camLayout.getContent()->checkIntereactionFlag(LayoutContent::ItemSelectable))
         return;
 
-    setZeroSelection();
+    setZeroSelection(delay);
 
     m_selectedWnd = new_wnd;
     m_last_selectedWnd = new_wnd;
