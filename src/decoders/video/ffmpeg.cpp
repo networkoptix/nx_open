@@ -173,7 +173,7 @@ bool CLFFmpegVideoDecoder::decode(const CLCompressedVideoData& data, CLVideoDeco
 		m_lightModeFrameCounter = 0;
 	}
 
-	if (m_decodeMode > DecodeMode_Full)
+	if (m_decodeMode > DecodeMode_Full && data.data.data())
 	{
 
 		if (data.compressionType == CODEC_ID_MJPEG)
