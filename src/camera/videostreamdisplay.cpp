@@ -126,15 +126,14 @@ void CLVideoStreamDisplay::reorderPrevFrames()
     // find latest GOP (or several GOP. Decoder can add 1-3 (or even more) gops at once as 1 reverse block)
     for (int i = m_reverseQueue.size()-1; i >= 0; --i) 
     {
+        if (m_reverseQueue[i]->flags & AV_REVERSE_REORDERED)
+            break;
         if ((m_reverseQueue[i]->flags & AV_REVERSE_BLOCK_START) || i == 0) 
         {
-            if (i == 0 && !(m_reverseQueue[i]->flags & AV_REVERSE_BLOCK_START)) {
-                int ffd = 4;
-            }
             std::reverse(m_reverseQueue.begin() + i, m_reverseQueue.end());
             for (int j = i; j < m_reverseQueue.size(); ++j) 
                 m_reverseQueue[j]->flags |= AV_REVERSE_REORDERED;
-            return;
+            break;
         }
     }
 }
@@ -204,6 +203,7 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
         }
         delete tmpOutFrame;
         m_flushedBeforeReverseStart = true;
+        reorderPrevFrames();
     }
 
 	if (!dec || !dec->decode(*data, useTmpFrame ? &m_tmpFrame : outFrame))
