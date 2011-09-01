@@ -179,17 +179,17 @@ CLAbstractMediaData* AVClientPullSSHTTPStreamreader::getNextData()
 	videoData->width = resolutionFULL ? width : width>>1;
 	videoData->height = resolutionFULL ? height : height>>1;
 
-	videoData->keyFrame = true;
+	videoData->flags |= AV_PKT_FLAG_KEY;
 
 	if (h264) // for jpej keyFrame always true
 	{
 		if (!http_client.exist(QLatin1String("Content-Type"))) // very strange
 		{
-			videoData->keyFrame = false;
+			videoData->flags &= ~AV_PKT_FLAG_KEY;
 		}
 		else
 			if (http_client.get(QLatin1String("Content-Type"))==QLatin1String("video/H.264P"))
-				videoData->keyFrame = false;
+				videoData->flags &= ~AV_PKT_FLAG_KEY;
 
 	}
 

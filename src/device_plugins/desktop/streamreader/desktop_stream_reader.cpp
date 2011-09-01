@@ -116,7 +116,8 @@ CLAbstractMediaData* CLDesktopStreamreader::getNextData()
         videoData->width = m_grabber->width();
         videoData->height = m_grabber->height();
         videoData->channelNumber = 0;
-        videoData->keyFrame = m_videoCodecCtx->coded_frame->key_frame;
+        if (m_videoCodecCtx->coded_frame->key_frame)
+            videoData->flags |= AV_PKT_FLAG_KEY;
         videoData->compressionType = m_videoCodecCtx->codec_id;
         videoData->timestamp = m_frame->pts * 1000;
         return videoData;

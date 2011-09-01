@@ -95,6 +95,7 @@ private:
 
     qint64 m_previousVideoTime;
     quint64 m_lastNonZerroDuration;
+    qint64 m_lastSleepInterval;
     quint64 m_previousVideoDisplayedTime;
 
     bool m_afterJump;
@@ -118,6 +119,7 @@ private:
     int m_tooSlowCounter;
     int m_storedMaxQueueSize;
     CLAbstractVideoDecoder::DecodeMode m_lightCpuMode;
+    bool m_lastFrameDisplayed;
 };
 
 #endif //clcam_display_h_1211

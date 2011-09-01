@@ -19,7 +19,7 @@ public:
     CLVideoStreamDisplay(bool can_downscale);
     ~CLVideoStreamDisplay();
     void setDrawer(CLAbstractRenderer* draw);
-    void dispay(CLCompressedVideoData* data, bool draw,
+    bool dispay(CLCompressedVideoData* data, bool draw,
                 CLVideoDecoderOutput::downscale_factor force_factor = CLVideoDecoderOutput::factor_any);
 
     void setLightCPUMode(CLAbstractVideoDecoder::DecodeMode val);
@@ -27,6 +27,8 @@ public:
     CLVideoDecoderOutput::downscale_factor getCurrentDownscaleFactor() const;
 
     void setMTDecoding(bool value);
+
+    void setReverseMode(bool value);
 private:
     QMutex m_mtx;
     QMap<CodecID, CLAbstractVideoDecoder*> m_decoder;
@@ -37,9 +39,9 @@ private:
       * to reduce image size for weak video cards 
       */
 
-    CLVideoDecoderOutput m_frameQueue[MAX_FRAME_QUEUE_SIZE];
+    CLVideoDecoderOutput* m_frameQueue[MAX_FRAME_QUEUE_SIZE];
+    CLVideoDecoderOutput* m_prevFrameToDelete;
     int m_frameQueueIndex;
-    int m_lastDisplayedIndex;
 
     CLAbstractVideoDecoder::DecodeMode m_lightCPUmode;
     bool m_canDownscale;
@@ -54,7 +56,11 @@ private:
     bool m_enableFrameQueue;
     bool m_queueUsed;
     bool m_needReinitDecoders;
+    bool m_reverseMode;
+    QQueue<CLVideoDecoderOutput*> m_reverseQueue;
+    bool m_flushedBeforeReverseStart;
 private:
+    void reorderPrevFrames();
     bool allocScaleContext(const CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);
     void freeScaleContext();
     bool rescaleFrame(const CLVideoDecoderOutput& srcFrame, CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);
@@ -65,8 +71,7 @@ private:
         int srcWidth, 
         int srcHeight, 
         CLVideoDecoderOutput::downscale_factor force_factor);
-    //void waitUndisplayedFrames(int channelNumber);
-    void waitFrame(int i, int channelNumber);
+    void processDecodedFrame(int channel, CLVideoDecoderOutput* outFrame, bool enableFrameQueue);
 };
 
 #endif //videostreamdisplay_h_2044

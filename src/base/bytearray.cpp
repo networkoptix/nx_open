@@ -12,7 +12,8 @@ CLByteArray::CLByteArray(unsigned int alignment, unsigned int capacity):
     m_data(0),
     m_ignore(0)
 {
-    reallocate(capacity);
+    if (capacity > 0)
+        reallocate(capacity);
 }
 
 CLByteArray::~CLByteArray()

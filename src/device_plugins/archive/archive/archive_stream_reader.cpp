@@ -302,14 +302,15 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
 	data.done(readed);
 
 	videoData->compressionType = (CodecID)finfo.codec;
-	videoData->keyFrame = finfo.keyFrame;
+    if (finfo.keyFrame)
+	    videoData->flags |= AV_PKT_FLAG_KEY;
 	videoData->channelNumber = channel;
 	videoData->useTwice = m_useTwice;
 	videoData->timestamp = finfo.time;
 
 	m_useTwice = false;
 
-	if (videoData->keyFrame)
+	if (videoData->flags & AV_PKT_FLAG_KEY)
 		m_gotKeyFrame[channel] = true;
 
 	//=================
@@ -547,7 +548,8 @@ void CLArchiveStreamReader::parse_channel_data(int channel, int data_version, ch
             finfo.codec = internalCodecIdToFfmpeg(CLCodecType(finfo.codec));
         }
 
-		finfo.keyFrame = *((unsigned char*)data); data+=1;
+		finfo.keyFrame = *((unsigned char*)data); 
+        data+=1;
 		finfo.shift = shift;
 		shift+= finfo.size;
 

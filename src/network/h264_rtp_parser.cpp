@@ -305,7 +305,10 @@ CLAbstractMediaData* CLH264RtpParser::getNextData()
 
 
     videoData->channelNumber = 0;
-    videoData->keyFrame = isKeyFrame;
+    if (isKeyFrame)
+        videoData->flags |= AV_PKT_FLAG_KEY;
+    else
+        videoData->flags &= ~AV_PKT_FLAG_KEY;
     videoData->compressionType = CODEC_ID_H264;
     if (rtpHeader)
     {

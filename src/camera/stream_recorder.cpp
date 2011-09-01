@@ -85,7 +85,7 @@ bool CLStreamRecorder::processData(CLAbstractData* data)
 	if (channel>CL_MAX_CHANNELS-1)
 		return true;
 
-	bool keyFrame = vd->keyFrame;
+	bool keyFrame = vd->flags & AV_PKT_FLAG_KEY;
 
 	if (keyFrame)
 		m_gotKeyFrame[channel] = true;

@@ -16,11 +16,15 @@ CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale) :
     m_outputWidth(0),
     m_outputHeight(0),
     m_frameQueueIndex(0),
-    m_lastDisplayedIndex(0),
     m_enableFrameQueue(false),
     m_queueUsed(false),
-    m_needReinitDecoders(false)
+    m_needReinitDecoders(false),
+    m_reverseMode(false),
+    m_prevFrameToDelete(0),
+    m_flushedBeforeReverseStart(false)
 {
+    for (int i = 0; i < MAX_FRAME_QUEUE_SIZE; ++i)
+        m_frameQueue[i] = new CLVideoDecoderOutput();
 }
 
 CLVideoStreamDisplay::~CLVideoStreamDisplay()
@@ -31,8 +35,10 @@ CLVideoStreamDisplay::~CLVideoStreamDisplay()
     {
         delete decoder;
     }
-
     freeScaleContext();
+    for (int i = 0; i < MAX_FRAME_QUEUE_SIZE; ++i)
+        delete m_frameQueue[i];
+    delete m_prevFrameToDelete;
 }
 
 void CLVideoStreamDisplay::setDrawer(CLAbstractRenderer* draw)
@@ -114,31 +120,35 @@ CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::determineScaleFacto
     }
     return rez;
 }
-/*
-void CLVideoStreamDisplay::waitUndisplayedFrames(int channelNumber)
-{
-    for (int i = 0; i < MAX_FRAME_QUEUE_SIZE; ++i)
-        waitFrame(i, channelNumber);
-}
-*/
 
-void CLVideoStreamDisplay::waitFrame(int i, int channelNumber)
+void CLVideoStreamDisplay::reorderPrevFrames()
 {
-    QMutexLocker lock(&m_drawer->getMutex());
-    while (m_frameQueue[i].isDisplaying())
-        m_drawer->waitForFrameDisplayed(channelNumber);
+    // find latest GOP (or several GOP. Decoder can add 1-3 (or even more) gops at once as 1 reverse block)
+    for (int i = m_reverseQueue.size()-1; i >= 0; --i) 
+    {
+        if ((m_reverseQueue[i]->flags & AV_REVERSE_BLOCK_START) || i == 0) 
+        {
+            if (i == 0 && !(m_reverseQueue[i]->flags & AV_REVERSE_BLOCK_START)) {
+                int ffd = 4;
+            }
+            std::reverse(m_reverseQueue.begin() + i, m_reverseQueue.end());
+            for (int j = i; j < m_reverseQueue.size(); ++j) 
+                m_reverseQueue[j]->flags |= AV_REVERSE_REORDERED;
+            return;
+        }
+    }
 }
 
-void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVideoDecoderOutput::downscale_factor force_factor)
+bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVideoDecoderOutput::downscale_factor force_factor)
 {
     // use only 1 frame for non selected video
     bool enableFrameQueue = m_enableFrameQueue;
     if (!enableFrameQueue && m_queueUsed)
     {
-        waitFrame(m_lastDisplayedIndex, data->channelNumber);
+        m_drawer->waitForFrameDisplayed(data->channelNumber);
         m_frameQueueIndex = 0;
         for (int i = 1; i < MAX_FRAME_QUEUE_SIZE; ++i)
-            m_frameQueue[i].clean();
+            m_frameQueue[i]->clean();
         m_queueUsed = false;
     }
     if (m_needReinitDecoders) {
@@ -158,7 +168,7 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 		if (data->compressionType == CODEC_ID_NONE)
 		{
 			cl_log.log(QLatin1String("CLVideoStreamDisplay::dispay: unknown codec type..."), cl_logERROR);
-			return;
+			return true; // true to prevent 100% cpu usage on unknown codec
 		}
 
         dec = m_decoder[data->compressionType];
@@ -170,7 +180,7 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 		}
         if (dec == 0) {
             CL_LOG(cl_logDEBUG2) cl_log.log(QLatin1String("Can't find video decoder"), cl_logDEBUG2);
-            return;
+            return true;
         }
 	}
 
@@ -180,14 +190,37 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
         !CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) || 
         scaleFactor > CLVideoDecoderOutput::factor_1;
 
-    CLVideoDecoderOutput& outFrame = m_frameQueue[m_frameQueueIndex];
+    CLVideoDecoderOutput* outFrame = m_frameQueue[m_frameQueueIndex];
     if (!useTmpFrame)
-        outFrame.setUseExternalData(!enableFrameQueue);
-	if (!dec || !dec->decode(*data, useTmpFrame ? &m_tmpFrame : &outFrame))
+        outFrame->setUseExternalData(!enableFrameQueue);
+
+    if (data->flags & AV_REVERSE_BLOCK_START) 
+    {
+        CLCompressedVideoData emptyData(1,0);
+        CLVideoDecoderOutput* tmpOutFrame = new CLVideoDecoderOutput();
+        while (dec->decode(emptyData, tmpOutFrame)) {
+            m_reverseQueue.enqueue(tmpOutFrame);
+            tmpOutFrame = new CLVideoDecoderOutput();
+        }
+        delete tmpOutFrame;
+        m_flushedBeforeReverseStart = true;
+    }
+
+	if (!dec || !dec->decode(*data, useTmpFrame ? &m_tmpFrame : outFrame))
 	{
-		CL_LOG(cl_logDEBUG2) cl_log.log(QLatin1String("CLVideoStreamDisplay::dispay: decoder cannot decode image..."), cl_logDEBUG2);
-		return;
+		//CL_LOG(cl_logDEBUG2) cl_log.log(QLatin1String("CLVideoStreamDisplay::dispay: decoder cannot decode image..."), cl_logDEBUG2);
+        if (!m_reverseQueue.isEmpty() && (m_reverseQueue.front()->flags & AV_REVERSE_REORDERED)) {
+            processDecodedFrame(data->channelNumber, m_reverseQueue.dequeue(), enableFrameQueue);
+            return true;
+        }
+		return false;
 	}
+
+    if (m_flushedBeforeReverseStart) {
+        data->flags |= AV_REVERSE_BLOCK_START;
+        m_flushedBeforeReverseStart = false;
+    }
+
     if (!data->context) {
         // for stiil images decoder parameters are not know before decoding, so recalculate parameters
         // It is got one more data copy from tmpFrame, but for movies we have got valid dst pointer (tmp or not) immediate before decoding
@@ -197,24 +230,49 @@ void CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
     }
 
 	if (!draw || !m_drawer)
-		return;
+		return true;
 
     if (useTmpFrame)
     {
         if (CLGLRenderer::isPixelFormatSupported(pixFmt) && CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) && scaleFactor <= CLVideoDecoderOutput::factor_8)
-            CLVideoDecoderOutput::downscale(&m_tmpFrame, &outFrame, scaleFactor); // fast scaler
+            CLVideoDecoderOutput::downscale(&m_tmpFrame, outFrame, scaleFactor); // fast scaler
         else 
-            rescaleFrame(m_tmpFrame, outFrame, m_tmpFrame.width / scaleFactor, m_tmpFrame.height / scaleFactor); // universal scaler
+            rescaleFrame(m_tmpFrame, *outFrame, m_tmpFrame.width / scaleFactor, m_tmpFrame.height / scaleFactor); // universal scaler
     }
-    m_drawer->draw(&outFrame, data->channelNumber);
-    m_lastDisplayedIndex = m_frameQueueIndex;
+    outFrame->flags = data->flags;
+    if (m_reverseMode) 
+    {
+        if (outFrame->flags & AV_REVERSE_BLOCK_START) 
+            reorderPrevFrames();
+        m_reverseQueue.enqueue(outFrame);
+
+        m_frameQueue[m_frameQueueIndex] = new CLVideoDecoderOutput();
+        if (!(m_reverseQueue.front()->flags & AV_REVERSE_REORDERED))
+            return false; // frame does not ready. need more frames. does not perform wait
+        outFrame = m_reverseQueue.dequeue();
+    }
+    
+    processDecodedFrame(data->channelNumber, outFrame, enableFrameQueue);
+    return true;
+}
+
+void CLVideoStreamDisplay::processDecodedFrame(int channel, CLVideoDecoderOutput* outFrame, bool enableFrameQueue)
+{
+    m_drawer->draw(outFrame, channel);
+
     if (enableFrameQueue) {
         m_frameQueueIndex = (m_frameQueueIndex + 1) % MAX_FRAME_QUEUE_SIZE; // allow frame queue for selected video
         m_queueUsed = true;
     }
 
     if (!enableFrameQueue) 
-        m_drawer->waitForFrameDisplayed(data->channelNumber);
+        m_drawer->waitForFrameDisplayed(channel);
+
+    if (m_reverseMode) {
+        if (m_prevFrameToDelete)
+            delete m_prevFrameToDelete;
+        m_prevFrameToDelete = outFrame;
+    }
 }
 
 bool CLVideoStreamDisplay::rescaleFrame(const CLVideoDecoderOutput& srcFrame, CLVideoDecoderOutput& outFrame, int newWidth, int newHeight)
@@ -271,4 +329,11 @@ void CLVideoStreamDisplay::setMTDecoding(bool value)
 {
     m_enableFrameQueue = value;
     m_needReinitDecoders = true;
+}
+
+void CLVideoStreamDisplay::setReverseMode(bool value)
+{
+    if (value)
+        m_enableFrameQueue = true;
+    m_reverseMode = value;
 }

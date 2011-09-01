@@ -53,6 +53,16 @@ m_frameTypeExtractor(0)
 
 	openDecoder();
 }
+void CLFFmpegVideoDecoder::flush()
+{
+    //avcodec_flush_buffers(c); // does not flushing output frames
+    int got_picture = 0;
+    AVPacket avpkt;
+    avpkt.data = 0;
+    avpkt.size = 0;
+    while (avcodec_decode_video2(c, m_frame, &got_picture, &avpkt) > 0);
+}
+
 
 AVCodec* CLFFmpegVideoDecoder::findCodec(CodecID codecId)
 {
@@ -156,7 +166,7 @@ bool CLFFmpegVideoDecoder::decode(const CLCompressedVideoData& data, CLVideoDeco
         return false;
     }
 
-	if (m_newDecodeMode != DecodeMode_NotDefined && data.keyFrame)
+	if (m_newDecodeMode != DecodeMode_NotDefined && (data.flags & AV_PKT_FLAG_KEY))
 	{
         m_decodeMode = m_newDecodeMode;
 		m_newDecodeMode = DecodeMode_NotDefined;
@@ -178,7 +188,7 @@ bool CLFFmpegVideoDecoder::decode(const CLCompressedVideoData& data, CLVideoDeco
 				m_lightModeFrameCounter = 0;
 
 		}
-		else if (!data.keyFrame)
+		else if (!(data.flags & AV_PKT_FLAG_KEY))
 		{
 			if (m_decodeMode == DecodeMode_Fastest)
 				return false;
@@ -198,7 +208,7 @@ bool CLFFmpegVideoDecoder::decode(const CLCompressedVideoData& data, CLVideoDeco
     }
 #endif
 
-    if (m_needRecreate && data.keyFrame)
+    if (m_needRecreate && (data.flags & AV_PKT_FLAG_KEY))
     {
         m_needRecreate = false;
         resetDecoder();
@@ -219,7 +229,8 @@ bool CLFFmpegVideoDecoder::decode(const CLCompressedVideoData& data, CLVideoDeco
     // no overreading happens for damaged MPEG streams.
 
     // 1 is already guaranteed by CLByteArray, let's apply 2 here...
-    memset(avpkt.data + avpkt.size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
+    if (avpkt.data)
+        memset(avpkt.data + avpkt.size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
 
     int got_picture = 0;
 

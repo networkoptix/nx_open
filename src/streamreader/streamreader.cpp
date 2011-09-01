@@ -111,6 +111,17 @@ bool CLStreamreader::needKeyData() const
 
 }
 
+void CLStreamreader::setSpeed(double value)
+{
+    QMutexLocker mutex(&m_proc_CS);
+    for (int i = 0; i < m_dataprocessors.size(); ++i)
+    {
+        CLAbstractDataProcessor* dp = m_dataprocessors.at(i);
+        dp->setSpeed(value);
+    }
+    setReverseMode(value < 0);
+}
+
 void CLStreamreader::putData(CLAbstractData* data)
 {
     if (!data)

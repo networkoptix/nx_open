@@ -264,14 +264,6 @@ static const int ROUND_FACTOR = 1;
 
 CLVideoDecoderOutput::CLVideoDecoderOutput()
 {
-    /*
-    width = 0;
-    height = 0;
-    interlaced_frame = 0;
-    format = PIX_FMT_NONE;
-    memset(data, 0, sizeof(data));
-    memset(linesize, 0, sizeof(linesize));
-    */
     memset(this, 0, sizeof(*this));
 }
 

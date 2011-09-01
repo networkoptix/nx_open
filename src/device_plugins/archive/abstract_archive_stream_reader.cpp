@@ -71,7 +71,8 @@ void CLAbstractArchiveReader::jumpTo(quint64 mksec, bool makeshot)
 
 void CLAbstractArchiveReader::jumpToPreviousFrame(quint64 mksec, bool makeshot)
 {
-    setSkipFramesToTime(mksec);
+    if (!isReverseMode())
+        setSkipFramesToTime(mksec);
 
     jumpTo(mksec - 100 * 1000, makeshot);
 }
@@ -86,7 +87,6 @@ quint64 CLAbstractArchiveReader::skipFramesToTime() const
 void CLAbstractArchiveReader::setSkipFramesToTime(quint64 skipFramesToTime)
 {
     QMutexLocker mutex(&m_framesMutex);
-
     m_skipFramesToTime = skipFramesToTime;
 }
 
