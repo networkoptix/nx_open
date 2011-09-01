@@ -140,6 +140,12 @@ int main(int argc, char *argv[])
     qApp->setStyle(QLatin1String("Bespin"));
 
     qApp->setStyleSheet(QLatin1String(
+            "QMenu {\n"
+            "font-family: Bodoni MT;\n"
+            "font-size: 18px;\n"
+            "}"));
+
+    /*qApp->setStyleSheet(QLatin1String(
         "QMenu {\n"
         "background-color: black;\n"
         "font-family: Bodoni MT;\n"
@@ -162,7 +168,7 @@ int main(int argc, char *argv[])
         "QMenu::separator {\n"
         "height: 3px;\n"
         "background: rgb(20, 20, 20);\n"
-        "}"));
+        "}"));*/
 
     /**/
     //=========================================================
