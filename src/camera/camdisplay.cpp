@@ -26,7 +26,15 @@ static void updateActivity()
 #ifdef Q_OS_MAC
         UpdateSystemActivity(UsrActivity);
 #elif defined(Q_OS_WIN)
-        SetThreadExecutionState(ES_DISPLAY_REQUIRED | ES_CONTINUOUS);
+        // disable screen saver ### should we enable it back on exit?
+        static bool screenSaverDisabled = SystemParametersInfo(SPI_SETSCREENSAVEACTIVE, FALSE, 0, SPIF_SENDWININICHANGE);
+        Q_UNUSED(screenSaverDisabled)
+
+        // don't sleep
+        if (QSysInfo::windowsVersion() < QSysInfo::WV_VISTA)
+            SetThreadExecutionState(ES_USER_PRESENT | ES_CONTINUOUS);
+        else
+            SetThreadExecutionState(ES_AWAYMODE_REQUIRED | ES_DISPLAY_REQUIRED | ES_SYSTEM_REQUIRED | ES_CONTINUOUS);
 #endif
         // Update system activity timer once per 20 seconds
         activityTime = QDateTime::currentMSecsSinceEpoch() + 20000;
@@ -157,7 +165,7 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
         needToSleep = 0;
     //=========
 
-    if (sleep) 
+    if (sleep)
     {
         //QString msg;
         //QTextStream str(&msg);
@@ -620,7 +628,7 @@ void CLCamDisplay::afterJump(qint64 newTime)
     m_previousVideoTime = newTime;
     //m_previousVideoDisplayedTime = 0;
     m_display[0]->setLastDisplayedTime(0);
-    
+
     m_totalFrames = 0;
     m_iFrames = 0;
     clearVideoQueue();
@@ -651,6 +659,6 @@ void CLCamDisplay::onSlowSourceHint()
     m_dataQueue.setMaxSize(CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE);
 }
 
-quint64 CLCamDisplay::currentTime() const { 
+quint64 CLCamDisplay::currentTime() const {
     return m_display[0]->getLastDisplayedTime();
 }
