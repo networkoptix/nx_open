@@ -30,6 +30,8 @@ public:
     void nextFrame();
 
     bool setRecordedDataDst(const QString& dst);
+
+    virtual bool isSpeedSupported(double value) const { return value >= 0; }
 protected:
 
 	virtual void channeljumpTo(quint64 mksec, int channel);

@@ -22,6 +22,7 @@ public:
     virtual bool setAudioChannel(unsigned int num);
     virtual void setReverseMode(bool value);
     virtual bool isReverseMode() const { return m_reverseMode;}
+    virtual bool isSpeedSupported(double value) const { return true; }
 protected:
     virtual CLAbstractMediaData* getNextData();
     virtual void channeljumpTo(quint64 mksec, int channel);

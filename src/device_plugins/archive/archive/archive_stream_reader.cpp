@@ -58,7 +58,7 @@ CLArchiveStreamReader::~CLArchiveStreamReader()
 void CLArchiveStreamReader::resume()
 {
 	CLAbstractArchiveReader::resume();
-	m_adaptiveSleep.afterdelay();
+	//m_adaptiveSleep.afterdelay();
 }
 
 bool CLArchiveStreamReader::setRecordedDataDst(const QString& dst)
@@ -195,7 +195,6 @@ void CLArchiveStreamReader::init_data()
                 m_lengthMksec = info.time;
         }
     }
-
 }
 
 quint64 CLArchiveStreamReader::currentTime() const
@@ -268,11 +267,12 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
 	if (m_firsttime)
 	{
 		//init_data();
+        emit realTimeStreamHint(false);
 		m_firsttime = false;
 	}
 
-	if (!isSingleShotMode() && !isSkippingFrames() && !m_nextFrameRequested)
-		m_adaptiveSleep.sleep(m_needToSleep);
+	//if (!isSingleShotMode() && !isSkippingFrames() && !m_nextFrameRequested)
+	//	m_adaptiveSleep.sleep(m_needToSleep);
 
 	// will return next channel ( if channel is finished it will not be selected
 	int channel;
@@ -314,6 +314,7 @@ CLAbstractMediaData* CLArchiveStreamReader::getNextData()
 		m_gotKeyFrame[channel] = true;
 
 	//=================
+    //=================
 
 	m_needToSleep = 0;
 

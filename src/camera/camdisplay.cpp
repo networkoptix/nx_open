@@ -284,6 +284,9 @@ void CLCamDisplay::setSpeed(double speed)
 
 bool CLCamDisplay::processData(CLAbstractData* data)
 {
+    if (qAbs(m_speed) < FPS_EPS)
+        return false;
+
     CLAbstractMediaData* media = dynamic_cast<CLAbstractMediaData*>(data);
     if (!media)
         return false;

@@ -92,7 +92,7 @@ void CLVideoWindowItem::setItemSelected(bool sel, bool animate, int delay )
 
 	if (m_selected)
 	{
-		if (dynamic_cast<CLAVIStreamReader*>(getVideoCam()->getStreamreader()))
+		if (dynamic_cast<CLAbstractArchiveReader*>(getVideoCam()->getStreamreader()))
 		{
 			getVideoCam()->getCamCamDisplay()->setMTDecoding(true);
 		}

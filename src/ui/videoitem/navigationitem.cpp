@@ -496,7 +496,8 @@ void NavigationItem::onSpeedChanged(float newSpeed)
 {
     if (isPlaying()) {
         CLAbstractArchiveReader *reader = static_cast<CLAbstractArchiveReader*>(m_camera->getStreamreader());
-        reader->setSpeed(newSpeed);
+        if (reader->isSpeedSupported(newSpeed))
+            reader->setSpeed(newSpeed);
     }
 }
 
