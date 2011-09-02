@@ -624,6 +624,11 @@ void CLCamDisplay::afterJump(qint64 newTime)
     m_totalFrames = 0;
     m_iFrames = 0;
     clearVideoQueue();
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
+        if (m_display[i])
+            m_display[i]->afterJump();
+    }
+
     m_audioDisplay->clearAudioBuffer();
 
     if (mGenerateEndOfStreamSignal)

@@ -438,14 +438,12 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 			if (m_haveSavedPacket)
 			{
 				quint64 nextPacketTimestamp = packetTimestamp(m_formatContext->streams[m_videoStreamIndex], nextPacket());
-				if (nextPacketTimestamp < skipFramesToTime())
-				{
+				if (!m_reverseMode && nextPacketTimestamp < skipFramesToTime())
 					videoData->ignore = true;
-				}
+                else if (m_reverseMode && nextPacketTimestamp > skipFramesToTime())
+                    videoData->ignore = true;
 				else
-				{
 					setSkipFramesToTime(0);
-				}
 			}
 		}
 
@@ -667,7 +665,5 @@ bool CLAVIStreamReader::setAudioChannel(unsigned int num)
 
 void CLAVIStreamReader::setReverseMode(bool value)
 {
-    if (value)
-        setSkipFramesToTime(0);
     m_reverseMode = value;
 }
