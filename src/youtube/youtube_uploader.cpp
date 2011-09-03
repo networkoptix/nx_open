@@ -15,8 +15,10 @@ private:
     QString m_description;
     QStringList m_tags;
     QString m_category;
+    YouTubeUploader::Privacy m_privacy;
 public:
-    QYoutubeUploadDevice(const QString& fileName, const QString& title, const QString& description, const QStringList& tags, const QString& category)
+    QYoutubeUploadDevice(const QString& fileName, const QString& title, const QString& description, const QStringList& tags, const QString& category,
+        YouTubeUploader::Privacy privacy)
     {
         m_file.setFileName(fileName);
         m_state = State_ProcessPreffix;
@@ -26,6 +28,7 @@ public:
         m_description = description;
         m_tags = tags;
         m_category = category;
+        m_privacy = privacy;
     }
 
     virtual bool reset () {
@@ -81,7 +84,17 @@ public:
                     m_preffix.append(',');
             }
             m_preffix.append("</media:keywords>\r\n");
+
+            if (m_privacy == YouTubeUploader::Privacy_Private) {
+                m_preffix.append("<yt:private/>\r\n");
+            }
+
             m_preffix.append("</media:group>\r\n");
+
+            if (m_privacy == YouTubeUploader::Privacy_Unlisted) {
+                m_preffix.append("<yt:accessControl action=\"list\" permission=\"denied\" />\r\n");
+            }
+
             m_preffix.append("</entry>\r\n");
             m_preffix.append("--f93dcbA3\r\n");
             m_preffix.append("Content-Type: video/mp4\r\n");
@@ -226,13 +239,14 @@ void YouTubeUploader::login()
             this, SLOT(slotSslErrors(QList<QSslError>)));
 }
 
-void YouTubeUploader::uploadFile(const QString& filename, const QString& title, const QString& description, const QStringList& tags, const QString& category)
+void YouTubeUploader::uploadFile(const QString& filename, const QString& title, const QString& description, const QStringList& tags, const QString& category, Privacy privacy)
 {
     m_filename = filename;
     m_title = title;
     m_description = description;
     m_tags = tags;
     m_category = category;
+    m_privacy = privacy;
 
     m_state = State_Unauthorized;
     nextStep();
@@ -250,7 +264,7 @@ void YouTubeUploader::upload()
     request.setRawHeader("Content-Type","multipart/related; boundary=\"f93dcbA3\"");
     request.setRawHeader("Connection","close");
 
-    QYoutubeUploadDevice* uploader = new QYoutubeUploadDevice(m_filename, m_title, m_description, m_tags, m_category);
+    QYoutubeUploadDevice* uploader = new QYoutubeUploadDevice(m_filename, m_title, m_description, m_tags, m_category, m_privacy);
     if (uploader->open(QIODevice::ReadOnly)) {
         request.setRawHeader("Content-Length",QString::number(uploader->size()).toUtf8());
         QNetworkReply *reply = manager->post(request, uploader);

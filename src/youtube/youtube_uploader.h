@@ -14,6 +14,8 @@ public:
     YouTubeUploader(const QString& login, const QString& password);
     virtual ~YouTubeUploader();
 
+    enum Privacy {Privacy_Public, Privacy_Unlisted, Privacy_Private};
+
     /**
       * Upload file to youtube
       *
@@ -24,7 +26,7 @@ public:
       * @param category youtube category. To read available category list use getCategoryList method
       *
       */
-    void uploadFile(const QString& filename, const QString& title, const QString& description, const QStringList& tags, const QString& category);
+    void uploadFile(const QString& filename, const QString& title, const QString& description, const QStringList& tags, const QString& category, Privacy privacy);
 
     /**
     * Read youtube category list
@@ -57,6 +59,7 @@ private:
     QString m_description;
     QStringList m_tags;
     QString m_category;
+    Privacy m_privacy;
     QList<QPair<QString, QString> > m_categoryList;
 
     enum State {State_Unauthorized, State_Authorized, State_Finished, State_Failed};
