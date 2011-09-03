@@ -146,16 +146,17 @@ void CLSerachEditItem::onEditTextChanged (const QString & text)
 	cr.setCriteria(CLDeviceCriteria::FILTER);
 	cr.setFilter(m_lineEdit->text());
 
-	QStringList result;
+        typedef QPair<QString, QString> StringPair;
+        QList<StringPair> result;
 
 	CLDeviceList all_devs =  CLDeviceManager::instance().getDeviceList(cr);
 	foreach(CLDevice* dev, all_devs)
 	{
-		result << dev->toString();
-		dev->releaseRef();
+            result.append(StringPair(dev->toString(), dev->getUniqueId()));
+            dev->releaseRef();
 	}
 
-	m_completer->updateStringLst(result);
+        m_completer->updateStringPairs(result);
 	/**/
 
 }

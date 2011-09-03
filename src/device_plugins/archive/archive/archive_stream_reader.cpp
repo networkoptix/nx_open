@@ -504,8 +504,8 @@ int CLArchiveStreamReader::slowest_channel() const
 {
 	//=====find slowest channel ========
 	int slowest_channel = -1;
-	quint64 best_slowest_time = m_forward ? 0xffffffffffffffff : 0;
-	for (int channel = 0; channel < m_channel_number; ++channel)
+        quint64 best_slowest_time = m_forward ? -1 : 0;
+        for (int channel = 0; channel < m_channel_number; ++channel)
 	{
 
 		if (mFinished[channel])

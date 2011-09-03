@@ -1,5 +1,6 @@
 #include "search_edit.h"
 #include "base/log.h"
+#include "base/tagmanager.h"
 
 CLSerchEditCompleter::CLSerchEditCompleter(QObject * parent):
 QCompleter(parent)
@@ -11,16 +12,27 @@ void CLSerchEditCompleter::filter(const QString &filter)
 {
 	// Do any filtering you like.
 	// Here we just include all items that contain all words.
-	QStringList filtered = m_list;//.filter(word, caseSensitivity());
+        QStringList filtered;
+
+        typedef QPair<QString, QString> StringPair;
 
 	foreach(const QString &word, filter.split(QLatin1Char(' '), QString::SkipEmptyParts))
-		filtered = filtered.filter(word, caseSensitivity());
+        {
+            foreach(const StringPair& item, m_list)
+            {
+                QString deviceTags = TagManager::objectTags(item.second).join("\n");
+                if (item.first.contains(word, caseSensitivity()) || deviceTags.contains(word, caseSensitivity()))
+                {
+                    filtered.append(item.first);
+                }
+            }
+        }
 
 	m_model.setStringList(filtered);
 	complete();
 }
 
-void CLSerchEditCompleter::updateStringLst(QStringList lst)
+void CLSerchEditCompleter::updateStringPairs(const QList<QPair<QString, QString> >& lst)
 {
 	m_list = lst;
 }

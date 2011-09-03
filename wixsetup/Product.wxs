@@ -208,6 +208,12 @@
               <File Id="wrap_oal.dll" Name="wrap_oal.dll" Source="..\contrib\openal\bin\Win32\wrap_oal.dll"/>
             </Component>
             
+            <Directory Id="styles" Name="styles">
+              <Component Id="bespin" Guid="0A5A045F-8D7A-4437-9A81-1CFF73031E2C">
+                <File Id="bespin.dll" Name="bespin.dll" Source="..\contrib\bespin\bin\msvc-x86\release\styles\bespin.dll"/>
+              </Component>
+            </Directory>
+
             <Directory Id="arecontvision" Name="arecontvision">
               <Component Id="arecontvision" Guid="3A62601C-9F6A-45b0-AEFB-8C5DD70437F0">
                 <File Id="devicesxml" Name="devices.xml" Source="../resource/arecontvision/devices.xml"/>
@@ -251,6 +257,7 @@
       <ComponentRef Id="QTLibraries" />
       <ComponentRef Id="OpenAL" />
       <ComponentRef Id='ProgramMenuDir' />
+      <ComponentRef Id="bespin" />
       <ComponentRef Id='Settings'/>
       <ComponentRef Id='arecontvision'/>
       <ComponentRef Id='MediaFolderComponent'/>
