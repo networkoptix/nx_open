@@ -297,7 +297,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_5">
+     <widget class="QWidget" name="licenseTab">
       <attribute name="title">
        <string>License</string>
       </attribute>
