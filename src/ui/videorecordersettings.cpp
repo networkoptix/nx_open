@@ -100,9 +100,14 @@ void VideoRecorderSettings::setDecoderQuality(VideoRecorderSettings::DecoderQual
 
 VideoRecorderSettings::Resolution VideoRecorderSettings::resolution() const
 {
-    if (!settings.contains(QLatin1String("resolution")))
-        return VideoRecorderSettings::ResQuaterNative;
-    return (VideoRecorderSettings::Resolution)settings.value(QLatin1String("resolution")).toInt();
+    Resolution rez = VideoRecorderSettings::ResQuaterNative;
+    if (settings.contains(QLatin1String("resolution")))
+        rez = (VideoRecorderSettings::Resolution)settings.value(QLatin1String("resolution")).toInt();
+#ifdef CL_TRIAL_MODE
+    if ( rez < Res640x480)
+        rez = Res640x480;
+#endif
+    return rez;
 }
 
 void VideoRecorderSettings::setResolution(VideoRecorderSettings::Resolution resolution)

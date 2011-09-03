@@ -32,6 +32,11 @@ RecordingSettingsWidget::RecordingSettingsWidget(QWidget *parent) :
 
     setCaptureMode(settings->captureMode());
     setDecoderQuality(settings->decoderQuality());
+
+#ifdef CL_TRIAL_MODE
+    for (int i = 0; i < (int) VideoRecorderSettings::Res640x480; ++i)
+        ui->resolutionComboBox->removeItem(0);
+#endif
     setResolution(settings->resolution());
 
     QDesktopWidget *desktop = qApp->desktop();
@@ -164,12 +169,20 @@ void RecordingSettingsWidget::setDecoderQuality(VideoRecorderSettings::DecoderQu
 
 VideoRecorderSettings::Resolution RecordingSettingsWidget::resolution() const
 {
-    return (VideoRecorderSettings::Resolution)ui->resolutionComboBox->currentIndex();
+    int index = ui->resolutionComboBox->currentIndex();
+#ifdef CL_TRIAL_MODE
+    index += (int) VideoRecorderSettings::Res640x480; // prev elements is skipped
+#endif
+    return (VideoRecorderSettings::Resolution) index;
 }
 
 void RecordingSettingsWidget::setResolution(VideoRecorderSettings::Resolution r)
 {
+#ifdef CL_TRIAL_MODE
+    ui->resolutionComboBox->setCurrentIndex(r - (int) VideoRecorderSettings::Res640x480);
+#else
     ui->resolutionComboBox->setCurrentIndex(r);
+#endif
 }
 
 void RecordingSettingsWidget::accept()

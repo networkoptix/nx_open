@@ -2692,6 +2692,8 @@ void GraphicsView::toggleRecording()
             encodingSize = QSize(1280, 720);
         else if (resolution == VideoRecorderSettings::Res640x480)
             encodingSize = QSize(640, 480);
+        else if (resolution == VideoRecorderSettings::Res320x240)
+            encodingSize = QSize(320, 240);
 
         float quality = 1.0;
         if (decoderQuality == VideoRecorderSettings::BalancedQuality)
@@ -2704,8 +2706,22 @@ void GraphicsView::toggleRecording()
             grabberCaptureMode = CLScreenGrabber::CaptureMode_DesktopWithAero;
         else if (captureMode == VideoRecorderSettings::FullScreenNoeroMode)
             grabberCaptureMode = CLScreenGrabber::CaptureMode_DesktopWithoutAero;
-
-        DesktopFileEncoder *desktopEncoder = new DesktopFileEncoder(filePath, screen, audioDevice.isNull() ? 0 : &audioDevice, secondAudioDevice.isNull() ? 0 : &secondAudioDevice, grabberCaptureMode, captureCursor, encodingSize, quality, viewport());
+        QPixmap logo;
+#ifdef CL_TRIAL_MODE
+        QString logoName = QString(":/skin/logo_") + QString::number(encodingSize.width()) + QString("_") + QString::number(encodingSize.height()) + QString(".png");
+        logo = QPixmap(logoName);
+#endif
+        DesktopFileEncoder *desktopEncoder = new DesktopFileEncoder(
+                filePath, 
+                screen, 
+                audioDevice.isNull() ? 0 : &audioDevice, 
+                secondAudioDevice.isNull() ? 0 : &secondAudioDevice, 
+                grabberCaptureMode, 
+                captureCursor, 
+                encodingSize, 
+                quality, 
+                viewport(),
+                logo);
         if (!desktopEncoder->start())
         {
             cl_log.log(desktopEncoder->lastErrorStr(), cl_logERROR);

@@ -28,7 +28,8 @@ public:
                         bool captureCursor,
                         const QSize& captureResolution,
                         float encodeQualuty, // in range 0.0 .. 1.0
-                        QWidget* glWidget  // used in application capture mode only
+                        QWidget* glWidget,  // used in application capture mode only
+                        const QPixmap& logo       // logo over video
                        );
     virtual ~DesktopFileEncoder();
     bool start();
@@ -127,7 +128,7 @@ private:
     bool m_videoPacketWrited;
     QString m_lastErrorStr;
     bool m_capturingStopped;
-
+    const QPixmap m_logo;
     friend void QT_WIN_CALLBACK waveInProc(HWAVEIN hWaveIn, UINT uMsg, DWORD dwInstance,  DWORD dwParam1, DWORD dwParam2);
 };
 

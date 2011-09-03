@@ -27,10 +27,13 @@ public:
     PixelFormat format() const { return m_grabber.format(); }
     int width() const          { return m_grabber.width();  }
     int height() const         { return m_grabber.height(); }
+    int screenWidth() const    { return m_grabber.screenWidth(); }
+    int screenHeight() const         { return m_grabber.screenHeight(); }
     qint64 currentTime() const { return m_grabber.currentTime(); }
 
     bool capturedDataToFrame(CLScreenGrabber::CaptureInfo data, AVFrame* frame) { return m_grabber.capturedDataToFrame(data, frame); }
     void stop();
+    void setLogo(const QPixmap& logo) { m_grabber.setLogo(logo); }
 protected:
     virtual void run();
 private:
