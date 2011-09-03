@@ -428,9 +428,9 @@ void CLVideoDecoderOutput::downscale(const CLVideoDecoderOutput* src, CLVideoDec
 		downscalePlate_factor2_sse(dst->data[1], dst->linesize[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h);
 		downscalePlate_factor2_sse(dst->data[2], dst->linesize[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h);
 #else
-        downscalePlate_factor2(dst->data[0], src->data[0], src_width, src->linesize[0], src_height);
-        downscalePlate_factor2(dst->data[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h);
-        downscalePlate_factor2(dst->data[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h);
+        downscalePlate_factor2(dst->data[0], dst->linesize[0], src->data[0], src_width, src->linesize[0], src_height);
+        downscalePlate_factor2(dst->data[1], dst->linesize[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h);
+        downscalePlate_factor2(dst->data[2], dst->linesize[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h);
 #endif
     }
     else if(factor == factor_4)
@@ -440,9 +440,9 @@ void CLVideoDecoderOutput::downscale(const CLVideoDecoderOutput* src, CLVideoDec
         downscalePlate_factor4_sse(dst->data[1], dst->linesize[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h);
         downscalePlate_factor4_sse(dst->data[2], dst->linesize[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h);
 #else
-        downscalePlate_factor4(dst->data[0], src->data[0], src_width, src->linesize[0], src->height);
-        downscalePlate_factor4(dst->data[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h);
-        downscalePlate_factor4(dst->data[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h);
+        downscalePlate_factor4(dst->data[0], dst->linesize[0], src->data[0], src_width, src->linesize[0], src->height);
+        downscalePlate_factor4(dst->data[1], dst->linesize[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h);
+        downscalePlate_factor4(dst->data[2], dst->linesize[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h);
 #endif
     }
     else if(factor == factor_8)
@@ -452,14 +452,14 @@ void CLVideoDecoderOutput::downscale(const CLVideoDecoderOutput* src, CLVideoDec
         downscalePlate_factor8_sse(dst->data[1], dst->linesize[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h);
         downscalePlate_factor8_sse(dst->data[2], dst->linesize[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h);
 #else
-        downscalePlate_factor8(dst->data[0], src->data[0], src_width, src->linesize[0], src->height);
-        downscalePlate_factor8(dst->data[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h);
-        downscalePlate_factor8(dst->data[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h);
+        downscalePlate_factor8(dst->data[0], dst->linesize[0], src->data[0], src_width, src->linesize[0], src->height);
+        downscalePlate_factor8(dst->data[1], dst->linesize[1], src->data[1], src_width/chroma_h_factor, src->linesize[1], src_yu_h);
+        downscalePlate_factor8(dst->data[2], dst->linesize[2], src->data[2], src_width/chroma_h_factor, src->linesize[2], src_yu_h);
 #endif
     }
 }
 
-void CLVideoDecoderOutput::downscalePlate_factor2(unsigned char* dst, const unsigned char* src, int src_width, int src_stride, int src_height)
+void CLVideoDecoderOutput::downscalePlate_factor2(unsigned char* dst, int dstStride, const unsigned char* src, int src_width, int src_stride, int src_height)
 {
     const unsigned char* src_line1 = src;
     const unsigned char* src_line2 = src + src_stride;
@@ -474,6 +474,7 @@ void CLVideoDecoderOutput::downscalePlate_factor2(unsigned char* dst, const unsi
 
             ++dst;
         }
+        dst += dstStride - src_width/2;
 
         src_line1-= src_width;
         src_line1+=(src_stride<<1);
@@ -483,7 +484,7 @@ void CLVideoDecoderOutput::downscalePlate_factor2(unsigned char* dst, const unsi
     }
 }
 
-void CLVideoDecoderOutput::downscalePlate_factor4(unsigned char* dst, const unsigned char* src, int src_width, int src_stride, int src_height)
+void CLVideoDecoderOutput::downscalePlate_factor4(unsigned char* dst,  int dstStride, const unsigned char* src, int src_width, int src_stride, int src_height)
 {
     const unsigned char* src_line1 = src;
     const unsigned char* src_line2 = src + 3*src_stride;
@@ -498,6 +499,7 @@ void CLVideoDecoderOutput::downscalePlate_factor4(unsigned char* dst, const unsi
 
             ++dst;
         }
+        dst += dstStride - src_width/4;
 
         src_line1-= src_width;
         src_line1+=(src_stride<<2);
@@ -508,7 +510,7 @@ void CLVideoDecoderOutput::downscalePlate_factor4(unsigned char* dst, const unsi
 }
 
 
-void CLVideoDecoderOutput::downscalePlate_factor8(unsigned char* dst, const unsigned char* src, int src_width, int src_stride, int src_height)
+void CLVideoDecoderOutput::downscalePlate_factor8(unsigned char* dst,  int dstStride, const unsigned char* src, int src_width, int src_stride, int src_height)
 {
     const unsigned char* src_line1 = src;
     const unsigned char* src_line2 = src + 7*src_stride;
@@ -523,6 +525,7 @@ void CLVideoDecoderOutput::downscalePlate_factor8(unsigned char* dst, const unsi
 
             ++dst;
         }
+        dst += dstStride - src_width/8;
 
         src_line1-= src_width;
         src_line1+=(src_stride<<3);
