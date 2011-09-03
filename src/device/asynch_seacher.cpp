@@ -158,6 +158,9 @@ CLDeviceList CLDeviceSearcher::findNewDevices(bool& ip_finished)
 
 	cl_log.log(QLatin1String("Found "), devices.size() + not_network_devices.size(), QLatin1String(" new(!) devices."), cl_logDEBUG1);
 
+    if (!devices.isEmpty())
+        emit newNetworkDevices();
+
 	CL_LOG(cl_logDEBUG2)
 	{
 		for (CLDeviceList::iterator it = devices.begin(); it != devices.end(); ++it)

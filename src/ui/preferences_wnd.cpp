@@ -30,6 +30,7 @@ PreferencesWindow::PreferencesWindow() :
     updateView();
     updateCameras();
 
+    connect(&CLDeviceManager::instance().getDeviceSearcher(), SIGNAL(newNetworkDevices()), this, SLOT(updateCameras()));
     //setWindowOpacity(.90);
 
     resizeEvent(0);
