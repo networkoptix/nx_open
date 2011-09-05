@@ -14,9 +14,11 @@ public:
     virtual bool canProduceDlg(CLDevice *dev) const = 0;
 };
 
+
 class CLDeviceSettingsDlgFactory
 {
 public:
+    static bool canCreateDlg(CLDevice *dev);
     static CLAbstractDeviceSettingsDlg *createDlg(CLDevice *dev);
     static void registerDlgManufacture(CLAbstractDlgManufacture *manufacture);
 };

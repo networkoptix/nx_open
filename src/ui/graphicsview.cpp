@@ -1319,7 +1319,8 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
                 menu.addAction(&cm_save_recorded_as);
             }
 
-            menu.addAction(&cm_settings);
+            if (CLDeviceSettingsDlgFactory::canCreateDlg(dev))
+                menu.addAction(&cm_settings);
         }
 
         if (aitem->getType()==CLAbstractSceneItem::LAYOUT )
