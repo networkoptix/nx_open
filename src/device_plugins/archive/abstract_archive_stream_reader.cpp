@@ -71,8 +71,7 @@ void CLAbstractArchiveReader::jumpTo(quint64 mksec, bool makeshot)
 
 void CLAbstractArchiveReader::jumpToPreviousFrame(quint64 mksec, bool makeshot)
 {
-    if (!isReverseMode())
-        setSkipFramesToTime(mksec);
+    setSkipFramesToTime(mksec);
 
     jumpTo(mksec - 100 * 1000, makeshot);
 }

@@ -44,6 +44,8 @@ CLVideoStreamDisplay::~CLVideoStreamDisplay()
     freeScaleContext();
     for (int i = 0; i < MAX_FRAME_QUEUE_SIZE; ++i)
         delete m_frameQueue[i];
+    for (int i = 0; i < m_reverseQueue.size(); ++i)
+        delete m_reverseQueue[i];
     delete m_prevFrameToDelete;
 }
 
@@ -216,13 +218,8 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
             m_frameQueue[i]->clean();
         m_queueUsed = false;
     }
-    if (!reverseMode && m_reverseQueue.size() > 0) {
-        m_drawer->waitForFrameDisplayed(data->channelNumber);
-        for (int i = 0; i < m_reverseQueue.size(); ++i)
-            delete m_reverseQueue[i];
-        m_reverseQueue.clear();
-        m_realReverseSize = 0;
-    }
+    if (!reverseMode && m_reverseQueue.size() > 0) 
+        clearReverseQueue();
 
     if (m_needReinitDecoders) {
         QMutexLocker _lock(&m_mtx);
@@ -273,7 +270,7 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
         CLVideoDecoderOutput* tmpOutFrame = new CLVideoDecoderOutput();
         while (dec->decode(emptyData, tmpOutFrame)) 
         {
-            tmpOutFrame->pts = getLastDisplayedTime();
+            tmpOutFrame->pts = AV_NOPTS_VALUE; // unknown
             m_reverseQueue.enqueue(tmpOutFrame);
             m_realReverseSize++;
             checkQueueOverflow(dec);
@@ -344,7 +341,8 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 
 void CLVideoStreamDisplay::processDecodedFrame(int channel, CLVideoDecoderOutput* outFrame, bool enableFrameQueue, bool reverseMode)
 {
-    setLastDisplayedTime(outFrame->pts);
+    if (outFrame->pts != AV_NOPTS_VALUE)
+        setLastDisplayedTime(outFrame->pts);
     if (outFrame->data[0]) {
         m_drawer->draw(outFrame, channel);
         if (enableFrameQueue) {
@@ -437,4 +435,18 @@ void CLVideoStreamDisplay::setLastDisplayedTime(qint64 value)
 { 
     QMutexLocker lock(&m_timeMutex);
     m_lastDisplayedTime = value; 
+}
+
+void CLVideoStreamDisplay::afterJump()
+{
+    clearReverseQueue();
+}
+
+void CLVideoStreamDisplay::clearReverseQueue()
+{
+    m_drawer->waitForFrameDisplayed(0);
+    for (int i = 0; i < m_reverseQueue.size(); ++i)
+        delete m_reverseQueue[i];
+    m_reverseQueue.clear();
+    m_realReverseSize = 0;
 }

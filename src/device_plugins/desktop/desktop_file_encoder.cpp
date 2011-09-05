@@ -360,7 +360,8 @@ DesktopFileEncoder::DesktopFileEncoder (
                    bool captureCursor,
                    const QSize& captureResolution,
                    float encodeQualuty, // in range 0.0 .. 1.0
-                   QWidget* glWidget
+                   QWidget* glWidget,
+                   const QPixmap& logo
                    ):
     CLLongRunnable(),
     m_videoBuf(0),
@@ -388,7 +389,8 @@ DesktopFileEncoder::DesktopFileEncoder (
     m_widget(glWidget),
     m_videoPacketWrited(false),
     m_encodedAudioBuf(0),
-    m_capturingStopped(false)
+    m_capturingStopped(false),
+    m_logo(logo)
 {
     if (audioDevice || audioDevice2)
     {
@@ -431,9 +433,10 @@ int DesktopFileEncoder::calculateBitrate()
     double bitrate = BASE_BITRATE;
 
     bitrate /=  1920.0*1080.0 / m_grabber->width() / m_grabber->height();
-
+    
     bitrate *= m_encodeQualuty;
-
+    if (m_grabber->width() <= 320)
+        bitrate *= 1.5;
     return bitrate;
 }
 
@@ -447,7 +450,7 @@ bool DesktopFileEncoder::init()
             m_captureCursor,
             m_captureResolution,
             m_widget);
-
+    m_grabber->setLogo(m_logo);
     avcodec_init();
     av_register_all();
 
@@ -512,7 +515,7 @@ bool DesktopFileEncoder::init()
     m_videoCodecCtx->bit_rate = calculateBitrate();
     //m_videoCodecCtx->rc_buffer_size = m_videoCodecCtx->bit_rate;
     //m_videoCodecCtx->rc_max_rate = m_videoCodecCtx->bit_rate;
-
+    
     QString codec_prop;
 
     if (videoCodecName != QLatin1String("libx264"))
@@ -543,11 +546,18 @@ bool DesktopFileEncoder::init()
     }
 
 
-    m_videoCodecCtx->sample_aspect_ratio.num = 1;
-    m_videoCodecCtx->sample_aspect_ratio.den = 1;
-    m_videoOutStream->sample_aspect_ratio.den = 1;
-    m_videoOutStream->sample_aspect_ratio.num = 1;
-
+    if (m_captureResolution.width() > 0) 
+    {
+        double srcAspect = m_grabber->screenWidth() / (double) m_grabber->screenHeight();
+        double dstAspect = m_captureResolution.width() / (double) m_captureResolution.height();
+        double sar = srcAspect / dstAspect;
+        m_videoCodecCtx->sample_aspect_ratio = av_d2q(sar, 255);
+    }
+    else {
+        m_videoCodecCtx->sample_aspect_ratio.num = 1;
+        m_videoCodecCtx->sample_aspect_ratio.den = 1;
+    }
+    m_videoOutStream->sample_aspect_ratio = m_videoCodecCtx->sample_aspect_ratio;
 
     if (avcodec_open(m_videoCodecCtx, videoCodec) < 0)
     {

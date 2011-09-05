@@ -45,14 +45,19 @@ public:
     qint64 currentTime() const;
     int refreshRate() const { return m_ddm.RefreshRate;}
     void restartTimer() { m_timer.restart(); }
+    void setLogo(const QPixmap& logo);
+    int screenWidth() const;
+    int screenHeight() const;
 private:
     HRESULT	InitD3D(HWND hWnd);
     bool dataToFrame(quint8* data, int width, int height, AVFrame* pFrame);
     bool direct3DDataToFrame(void* opaque, AVFrame* pFrame);
     Q_INVOKABLE void captureFrameOpenGL(void* opaque);
     void drawCursor(quint32* data, int dataStride, int height, int leftOffset, int topOffset, bool flip) const;
-    void allocateTmpFrame(int width, int height);
+    void drawLogo(quint8* data, int width, int height);
+    void allocateTmpFrame(int width, int height, PixelFormat format, bool useSourceSize);
 private:
+    QPixmap m_logo;
     int m_displayNumber;
 
     IDirect3D9*			m_pD3D;
@@ -83,6 +88,8 @@ private:
     QWidget* m_widget;
     int m_tmpFrameWidth;
     int m_tmpFrameHeight;
+    int m_tmpSrcWidth;
+    int m_tmpSrcHeight;
 };
 
 

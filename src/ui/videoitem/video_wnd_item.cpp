@@ -92,7 +92,7 @@ void CLVideoWindowItem::setItemSelected(bool sel, bool animate, int delay )
 
     if (m_selected)
     {
-        if (dynamic_cast<CLAVIStreamReader*>(getVideoCam()->getStreamreader()))
+        if (dynamic_cast<CLAbstractArchiveReader*>(getVideoCam()->getStreamreader()))
         {
             getVideoCam()->getCamCamDisplay()->setMTDecoding(true);
         }
@@ -193,11 +193,11 @@ QRect CLVideoWindowItem::getSubChannelRect(unsigned int channel) const
     /*
 
     *----*----*
-    |	 |	  |
-    |	 |	  |
+    |    |    |
+    |    |    |
     *----*----*
-    |	 |	  |
-    |	 |	  |
+    |    |    |
+    |    |    |
     *----*----*
 
     */
@@ -214,14 +214,10 @@ QRect CLVideoWindowItem::getSubChannelRect(unsigned int channel) const
 void CLVideoWindowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget* /*widget*/)
 {
     if (m_first_draw)
-    {
         return;
-    }
 
-    if (painter->paintEngine()->type()	!= QPaintEngine::OpenGL && painter->paintEngine()->type()!= QPaintEngine::OpenGL2)
-    {
+    if (painter->paintEngine()->type() != QPaintEngine::OpenGL && painter->paintEngine()->type() != QPaintEngine::OpenGL2)
         return;
-    }
 
     //painter->setClipping(true);
     //painter->setClipRect( option->exposedRect );
@@ -237,13 +233,7 @@ void CLVideoWindowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
 
     for (unsigned i = 0; i  < m_videonum; ++i)
     {
-        if (drawSelection)
-            m_gldraw[i]->setOpacity(0.7);
-        else
-            m_gldraw[i]->setOpacity(1.0);
-
-
-
+        m_gldraw[i]->setOpacity(drawSelection ? 0.7 : 1.0);
         if (!m_gldraw[i]->paintEvent(getSubChannelRect(i)))
             drawGLfailaure(painter);
     }
@@ -395,3 +385,4 @@ float CLVideoWindowItem::aspectRatio() const
     // at this point we assume that all channels have the same aspect ratio;
     return m_aspectratio*m_videolayout->width()/m_videolayout->height();
 }
+

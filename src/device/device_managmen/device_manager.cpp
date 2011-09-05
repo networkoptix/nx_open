@@ -330,7 +330,7 @@ void CLDeviceManager::addArchiver(QString id)
 
 bool CLDeviceManager::match_subfilter(CLDevice* dev, QString fltr) const
 {
-    QStringList deviceTags = TagManager::objectTags(dev->getUniqueId());
+    QString deviceTags = TagManager::objectTags(dev->getUniqueId()).join("\n");
 
     QStringList serach_list = fltr.split(QLatin1Char(' '), QString::SkipEmptyParts);
     foreach(const QString &str, serach_list)

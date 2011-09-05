@@ -156,12 +156,13 @@ void CLLayoutNavigator::onButtonItemPressed(LayoutContent* l, QString itemname )
 
 		if (itemname==button_layout)
 		{
-			if (!Settings::instance().haveValidSerialNumber())
+#ifndef CL_TRIAL_MODE
+                       if (!Settings::instance().haveValidSerialNumber())
 			{
 				UIOKMessage(0, tr("License"), tr("Please enter license key. Press Setup button and go to About section."));
 				return;
 			}
-
+#endif
 			mNewContent = CLSceneLayoutManager::instance().getAllLayoutsContent();
 			goToNewLayoutContent();
 		}

@@ -16,6 +16,10 @@ PreferencesWindow::PreferencesWindow() :
 {
     setupUi(this);
 
+#ifdef CL_TRIAL_MODE
+    tabWidget->removeTab(tabWidget->indexOf(licenseTab));
+#endif
+
     creditsLabel->setText(creditsLabel->text().replace(QLatin1String("QT_VERSION"), QLatin1String(QT_VERSION_STR)));
     Settings::instance().fillData(m_settingsData);
 
@@ -52,7 +56,7 @@ void PreferencesWindow::accept()
 
 void PreferencesWindow::updateView()
 {
-    versionLabel->setText(QLatin1String(APPLICATION_VERSION));
+    versionLabel->setText(QLatin1String(APPLICATION_VERSION) + " (" + QLatin1String(APPLICATION_REVISION) + ")");
     mediaRootLabel->setText(QDir::toNativeSeparators(m_settingsData.mediaRoot));
 
     auxMediaRootsList->clear();

@@ -32,7 +32,7 @@ public:
 
     qint64 getLastDisplayedTime() const;
     void setLastDisplayedTime(qint64 value);
-
+    void afterJump();
 private:
     QMutex m_mtx;
     mutable QMutex m_timeMutex;
@@ -81,6 +81,7 @@ private:
         CLVideoDecoderOutput::downscale_factor force_factor);
     void processDecodedFrame(int channel, CLVideoDecoderOutput* outFrame, bool enableFrameQueue, bool reverseMode);
     void checkQueueOverflow(CLAbstractVideoDecoder* dec);
+    void clearReverseQueue();
 };
 
 #endif //videostreamdisplay_h_2044

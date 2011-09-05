@@ -135,7 +135,7 @@
          <string comment="Use this to change output video resolution"/>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <item>
          <property name="text">
@@ -160,6 +160,11 @@
         <item>
          <property name="text">
           <string>640x480</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>320x240</string>
          </property>
         </item>
        </widget>

@@ -9,10 +9,10 @@ public:
 
 	void filter(const QString &filter);
 
-	void updateStringLst(QStringList lst);
+        void updateStringPairs(const QList<QPair<QString, QString> >&);
 
 private:
-	QStringList m_list;
+        QList<QPair<QString, QString> > m_list;
 	QStringListModel m_model;
 	QString m_word;
 };

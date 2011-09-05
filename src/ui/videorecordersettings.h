@@ -14,7 +14,7 @@ public:
 
     enum CaptureMode { FullScreenMode, FullScreenNoeroMode, WindowMode };
     enum DecoderQuality { BestQuality, BalancedQuality, PerformanceQuality };
-    enum Resolution { ResNative, ResQuaterNative, Res1920x1080, Res1280x720, Res640x480 };
+    enum Resolution { ResNative, ResQuaterNative, Res1920x1080, Res1280x720, Res640x480, Res320x240 };
     Q_ENUMS(CaptureMode)
     Q_ENUMS(DecoderQuality)
     Q_ENUMS(Resolution)

@@ -19,6 +19,7 @@ extern "C" {
 
 typedef DECLSPEC_IMPORT HRESULT (STDAPICALLTYPE *fn_DwmEnableComposition) (UINT uCompositionAction);
 static fn_DwmEnableComposition DwmEnableComposition = 0;
+static const int LOGO_CORNER_OFFSET = 8;
 
 static void toggleAero(bool enable)
 {
@@ -53,7 +54,9 @@ CLScreenGrabber::CLScreenGrabber(int displayNumber, int poolSize, CaptureMode mo
     m_tmpFrameBuffer(0),
     m_widget(widget),
     m_tmpFrameWidth(0),
-    m_tmpFrameHeight(0)
+    m_tmpFrameHeight(0),
+    m_tmpSrcWidth(0),
+    m_tmpSrcHeight(0)
 {
     memset(&m_rect, 0, sizeof(m_rect));
 
@@ -194,17 +197,24 @@ HRESULT	CLScreenGrabber::InitD3D(HWND hWnd)
         else
             m_outHeight = m_captureResolution.height();
 
-        allocateTmpFrame(m_ddm.Width, m_ddm.Height);
+        //allocateTmpFrame(m_ddm.Width, m_ddm.Height);
 
     }
 
     return S_OK;
 }
 
-void CLScreenGrabber::allocateTmpFrame(int width, int height)
+void CLScreenGrabber::allocateTmpFrame(int width, int height, PixelFormat format, bool useSourceSize)
 {
-    m_tmpFrameWidth = width;
-    m_tmpFrameHeight = height;
+    if (useSourceSize) {
+        m_tmpFrameWidth = width;
+        m_tmpFrameHeight = height;
+    }
+    else {
+        m_tmpFrameWidth = m_outWidth;
+        m_tmpFrameHeight = m_outHeight;
+
+    }
 
     if (m_tmpFrame)
     {
@@ -215,15 +225,17 @@ void CLScreenGrabber::allocateTmpFrame(int width, int height)
     }
 
     m_tmpFrame = avcodec_alloc_frame();
-    m_tmpFrame->format = PIX_FMT_YUV420P;
-    int numBytes = avpicture_get_size(PIX_FMT_YUV420P, width, height);
+    m_tmpFrame->format = format;
+    int numBytes = avpicture_get_size(format, m_tmpFrameWidth, m_tmpFrameHeight);
     m_tmpFrameBuffer = (quint8*)av_malloc(numBytes * sizeof(quint8));
-    avpicture_fill((AVPicture *)m_tmpFrame, m_tmpFrameBuffer, PIX_FMT_YUV420P, width, height);
+    avpicture_fill((AVPicture *)m_tmpFrame, m_tmpFrameBuffer, format, m_tmpFrameWidth, m_tmpFrameHeight);
 
     m_scaleContext = sws_getContext(
-        width, height, PIX_FMT_YUV420P,
-        m_outWidth, m_outHeight, PIX_FMT_YUV420P,
+        width, height, format,
+        m_outWidth, m_outHeight, format,
         SWS_BICUBLIN, NULL, NULL, NULL);
+    m_tmpSrcWidth = width;
+    m_tmpSrcHeight = height;
 }
 
 void CLScreenGrabber::captureFrameOpenGL(void* opaque)
@@ -258,7 +270,6 @@ CLScreenGrabber::CaptureInfo CLScreenGrabber::captureFrame()
         QMetaObject::invokeMethod(this, "captureFrameOpenGL", Qt::BlockingQueuedConnection, ret, Q_ARG(void*, &rez));
         if (m_captureCursor)
             drawCursor((quint32*) rez.opaque, rez.w, rez.h, rez.pos.x(), rez.pos.y(), true);
-
     }
     else
     {   // direct3D capture mode
@@ -562,6 +573,19 @@ static inline void xorPixel(quint32* data, int stride, int x, int y, quint32* sr
     data[y*stride+x] ^= *srcPixel;
 }
 
+void CLScreenGrabber::drawLogo(quint8* data, int width, int height)
+{
+    if (m_logo.width() == 0)
+        return;
+    int left = width - m_logo.width() - LOGO_CORNER_OFFSET;
+    int top = m_mode == CaptureMode_Application ? height - m_logo.height() - LOGO_CORNER_OFFSET : LOGO_CORNER_OFFSET;
+    
+    QImage buffer(data, width, height, QImage::Format_ARGB32_Premultiplied);
+    QPainter painter(&buffer);
+    painter.setCompositionMode(QPainter::CompositionMode_SourceOver); // enable alpha blending
+    painter.drawPixmap(QPoint(left, top), m_logo);
+}
+
 void CLScreenGrabber::drawCursor(quint32* data, int width, int height, int leftOffset, int topOffset, bool flip) const
 {
     static const int MAX_CURSOR_SIZE = 64;
@@ -823,19 +847,44 @@ bool CLScreenGrabber::dataToFrame(quint8* data, int width, int height, AVFrame* 
 {
     if (m_needRescale)
     {
-        if (width != m_tmpFrameWidth || height != m_tmpFrameHeight)
-            allocateTmpFrame(width, height);
-        bgra_to_yv12_sse(data, width * 4,
-            m_tmpFrame->data[0], m_tmpFrame->data[1], m_tmpFrame->data[2],
-            m_tmpFrame->linesize[0], m_tmpFrame->linesize[1], width, height, m_mode == CaptureMode_Application);
+        if (m_logo.width() == 0)
+        {
+            if (width != m_tmpFrameWidth || height != m_tmpFrameHeight)
+                allocateTmpFrame(width, height, PIX_FMT_YUV420P, true);
+            bgra_to_yv12_sse(data, width * 4,
+                m_tmpFrame->data[0], m_tmpFrame->data[1], m_tmpFrame->data[2],
+                m_tmpFrame->linesize[0], m_tmpFrame->linesize[1], width, height, m_mode == CaptureMode_Application);
 
-        sws_scale(m_scaleContext,
-            m_tmpFrame->data, m_tmpFrame->linesize,
-            0, m_ddm.Height,
-            pFrame->data, pFrame->linesize);
+            sws_scale(m_scaleContext,
+                m_tmpFrame->data, m_tmpFrame->linesize,
+                0, m_ddm.Height,
+                pFrame->data, pFrame->linesize);
+        }
+        else {
+            // scale before colorspace convert is slower, so use this only for logo mode
+            if (width != m_tmpSrcWidth || height != m_tmpSrcHeight)
+                allocateTmpFrame(width, height, PIX_FMT_RGBA, false);
+            quint8 *dataArray[4];
+            int lineSizeArray[4];
+            dataArray[0] = data;
+            dataArray[1] = dataArray[2] = dataArray[3] = 0;
+            lineSizeArray[0] = width*4;
+            lineSizeArray[1] = lineSizeArray[2] = lineSizeArray[3] = 0;
+            sws_scale(m_scaleContext,
+                dataArray, lineSizeArray,
+                0, m_ddm.Height,
+                m_tmpFrame->data, m_tmpFrame->linesize);
+
+            drawLogo((quint8*) m_tmpFrame->data[0], m_outWidth, m_outHeight);
+
+            bgra_to_yv12_sse(m_tmpFrame->data[0], m_tmpFrame->linesize[0],
+                pFrame->data[0], pFrame->data[1], pFrame->data[2],
+                pFrame->linesize[0], pFrame->linesize[1], m_outWidth, m_outHeight, m_mode == CaptureMode_Application);
+        }
     }
     else
     {
+        drawLogo((quint8*) data, m_ddm.Width, m_ddm.Height);
         bgra_to_yv12_sse(data, m_ddm.Width*4, pFrame->data[0], pFrame->data[1], pFrame->data[2],
                          pFrame->linesize[0], pFrame->linesize[1], width, height, m_mode == CaptureMode_Application);
     }
@@ -868,3 +917,20 @@ int CLScreenGrabber::height() const
     return m_outHeight;
 }
 
+void CLScreenGrabber::setLogo(const QPixmap& logo)
+{
+    if (m_mode == CaptureMode_Application)
+        m_logo = QPixmap::fromImage(logo.toImage().mirrored(false, true));
+    else
+        m_logo = logo;
+}
+
+int CLScreenGrabber::screenWidth() const
+{
+    return m_ddm.Width;
+}
+
+int CLScreenGrabber::screenHeight() const
+{
+    return m_ddm.Height;
+}
