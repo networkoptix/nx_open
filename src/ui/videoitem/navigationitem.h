@@ -61,6 +61,7 @@ public:
     explicit NavigationWidget(QWidget *parent = 0);
 
     TimeSlider *slider() const;
+    VolumeWidget *volumeWidget() const;
     QLabel *label() const;
 
 Q_SIGNALS:
@@ -129,6 +130,9 @@ private slots:
 
     void onSpeedChanged(float);
 
+    void onVolumeLevelChanged(int);
+    void restoreInfoText();
+
 protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent *);
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *);
@@ -154,6 +158,11 @@ private:
 
     MyTextItem *m_textItem;
     bool m_active;
+
+    struct RestoreInfoTextData {
+        QString extraInfoText;
+        QTimer timer;
+    } *restoreInfoTextData;
 };
 
 #endif // NAVIGATIONITEM_H

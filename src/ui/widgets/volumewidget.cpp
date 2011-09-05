@@ -40,7 +40,7 @@ VolumeWidget::VolumeWidget(QWidget *parent) :
     m_button->setChecked(QtvAudioDevice::instance().isMute());
 
     connect(m_slider, SIGNAL(valueChanged(int)), this, SLOT(onValueChanged(int)));
-    connect(m_button, SIGNAL(toggled(bool)), this, SLOT(onButtonChecked()));
+    connect(m_button, SIGNAL(clicked(bool)), this, SLOT(onButtonChecked(bool)));
 
     setFixedSize(144, 36);
 }
@@ -88,9 +88,9 @@ void VolumeWidget::onValueChanged(int value)
     m_slider->setValueText(!isMute ? QString::number(value) + QLatin1Char('%') : tr("Muted"));
 }
 
-void VolumeWidget::onButtonChecked()
+void VolumeWidget::onButtonChecked(bool checked)
 {
-    QtvAudioDevice::instance().setMute(m_button->isChecked());
+    QtvAudioDevice::instance().setMute(checked);
     float volume = QtvAudioDevice::instance().volume();
     m_slider->setValue(volume * 100);
 }

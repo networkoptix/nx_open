@@ -13,6 +13,7 @@
 #include "camera/camera.h"
 #include "device_plugins/archive/abstract_archive_stream_reader.h"
 #include "util.h"
+#include "ui/videoitem/video_wnd_item.h"
 #include "ui/widgets/imagebuttonitem.h"
 #include "ui/widgets/speedwidget.h"
 #include "ui/widgets/volumewidget.h"
@@ -124,6 +125,11 @@ TimeSlider * NavigationWidget::slider() const
     return m_slider;
 }
 
+VolumeWidget *NavigationWidget::volumeWidget() const
+{
+    return m_volumeWidget;
+}
+
 QLabel * NavigationWidget::label() const
 {
     return m_label;
@@ -131,7 +137,8 @@ QLabel * NavigationWidget::label() const
 
 NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
     CLUnMovedInteractiveOpacityItem(QString("name:)"), 0, 0.5, 0.95),
-    m_camera(0), m_currentTime(0)
+    m_camera(0), m_currentTime(0),
+    restoreInfoTextData(0)
 {
     m_playing = false;
 
@@ -236,6 +243,8 @@ NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
     connect(m_widget->slider(), SIGNAL(sliderPressed()), this, SLOT(onSliderPressed()));
     connect(m_widget->slider(), SIGNAL(sliderReleased()), this, SLOT(onSliderReleased()));
 
+    connect(m_widget->volumeWidget()->slider(), SIGNAL(valueChanged(int)), this, SLOT(onVolumeLevelChanged(int)));
+
 
     connect(m_widget, SIGNAL(pause()), SLOT(pause()));
     connect(m_widget, SIGNAL(play()), SLOT(play()));
@@ -290,6 +299,8 @@ void NavigationItem::setVideoCamera(CLVideoCamera *camera)
     setAcceptHoverEvents(true);
     m_proxy->setAcceptHoverEvents(true);
     m_widget->setMouseTracking(true);
+
+    restoreInfoText();
 
     m_camera = camera;
 
@@ -498,6 +509,46 @@ void NavigationItem::onSpeedChanged(float newSpeed)
         CLAbstractArchiveReader *reader = static_cast<CLAbstractArchiveReader*>(m_camera->getStreamreader());
         reader->setSpeed(newSpeed);
     }
+}
+
+void NavigationItem::onVolumeLevelChanged(int newVolumeLevel)
+{
+    if (m_camera && m_camera->getVideoWindow())
+    {
+        CLVideoWindowItem *vwi = m_camera->getVideoWindow();
+
+        if (restoreInfoTextData)
+        {
+            restoreInfoTextData->timer.stop();
+        }
+        else
+        {
+            restoreInfoTextData = new RestoreInfoTextData;
+            restoreInfoTextData->extraInfoText = vwi->extraInfoText();
+            restoreInfoTextData->timer.setSingleShot(true);
+            connect(&restoreInfoTextData->timer, SIGNAL(timeout()), this, SLOT(restoreInfoText()));
+        }
+
+        vwi->setExtraInfoText(tr("[ Volume: %1% ]").arg(newVolumeLevel));
+
+        restoreInfoTextData->timer.start(3000);
+    }
+}
+
+void NavigationItem::restoreInfoText()
+{
+    if (!restoreInfoTextData)
+        return;
+
+    if (m_camera && m_camera->getVideoWindow())
+    {
+        CLVideoWindowItem *vwi = m_camera->getVideoWindow();
+
+        vwi->setExtraInfoText(restoreInfoTextData->extraInfoText);
+    }
+
+    delete restoreInfoTextData;
+    restoreInfoTextData = 0;
 }
 
 void NavigationItem::setPlaying(bool playing)

@@ -25,7 +25,7 @@ protected:
 
 private Q_SLOTS:
     void onValueChanged(int);
-    void onButtonChecked();
+    void onButtonChecked(bool);
 
 private:
     StyledSlider *m_slider;
