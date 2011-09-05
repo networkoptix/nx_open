@@ -4,6 +4,7 @@
 import shutil
 import glob
 import string
+import commands
 
 from version import *
 from genskin import genskin
@@ -33,7 +34,7 @@ elif sys.platform == 'darwin':
     EXCLUDE_FILES += ('_win',)
 
 def rmtree(path):
-    def on_rm_error( func, path, exc_info):
+    def on_rm_error(func, path, exc_info):
         # Dirty windows hack. Sometimes windows list already deleted files/folders.
         # Command line "rmdir /Q /S" also fails. So, just wait while the files really deleted.
         for i in xrange(20):
@@ -179,6 +180,8 @@ def generate_info_plist():
     print >> xout, strings_template.substitute(associations=associations.getvalue(), version=APPLICATION_VERSION)
 
 def gen_version_h():
+    revision = commands.getoutput('hg id -i')
+
     version_h = open('src/version.h', 'w')
     print >> version_h, '#ifndef UNIVERSAL_CLIENT_VERSION_H_'
     print >> version_h, '#define UNIVERSAL_CLIENT_VERSION_H_'
@@ -186,6 +189,7 @@ def gen_version_h():
     print >> version_h, 'const char* const ORGANIZATION_NAME="%s";' % ORGANIZATION_NAME
     print >> version_h, 'const char* const APPLICATION_NAME="%s";' % APPLICATION_NAME
     print >> version_h, 'const char* const APPLICATION_VERSION="%s";' % APPLICATION_VERSION
+    print >> version_h, 'const char* const APPLICATION_REVISION="%s";' % revision
     print >> version_h, ''
 
     print >> version_h, '// There constans are here for windows resouce file.'
@@ -286,7 +290,6 @@ elif sys.platform == 'darwin':
     os.system('qmake -spec macx-g++ CONFIG-=release CONFIG+=debug FFMPEG=%s -o build/Makefile.debug src/uniclient.pro' % ffmpeg_path)
     os.system('qmake -spec macx-g++ CONFIG-=debug CONFIG+=release FFMPEG=%s -o build/Makefile.release src/uniclient.pro' % ffmpeg_path)
 
-
 # Bespin
 bespin_path = 'contrib/bespin/bin/'
 ### add x86/x64 selector
@@ -299,6 +302,9 @@ else:
 bespin_path = os.path.join(bespin_path, bespin)
 
 if not os.path.isdir(bespin_path):
+    # Bespin building is broken
+    sys.exit(0)
+
     print >> sys.stdout, "Can't find Bespin style plugin binaries for this platform at %s . rebuilding..." % bespin_path
 
     tmp_build_dir = 'build/tmp'
