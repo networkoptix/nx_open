@@ -424,7 +424,7 @@ void CLGLRenderer::waitForFrameDisplayed(int channel)
 {
     Q_UNUSED(channel)
 
-    if (m_needwait)
+    if (m_needwait && m_curImg)
     {
         QMutexLocker lock(&m_displaySync);
         while (m_curImg->isDisplaying())
