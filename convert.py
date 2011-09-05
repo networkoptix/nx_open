@@ -4,7 +4,6 @@
 import shutil
 import glob
 import string
-import commands
 
 from version import *
 from genskin import genskin
@@ -180,7 +179,7 @@ def generate_info_plist():
     print >> xout, strings_template.substitute(associations=associations.getvalue(), version=APPLICATION_VERSION)
 
 def gen_version_h():
-    revision = commands.getoutput('hg id -i')
+    revision = os.popen('hg id -i').read().strip()
 
     version_h = open('src/version.h', 'w')
     print >> version_h, '#ifndef UNIVERSAL_CLIENT_VERSION_H_'
