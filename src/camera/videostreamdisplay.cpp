@@ -205,6 +205,7 @@ void CLVideoStreamDisplay::checkQueueOverflow(CLAbstractVideoDecoder* dec)
 
 bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVideoDecoderOutput::downscale_factor force_factor)
 {
+    m_mtx.lock();
     // use only 1 frame for non selected video
     bool reverseMode = m_reverseMode;
     bool enableFrameQueue = reverseMode ? true : m_enableFrameQueue;
@@ -222,7 +223,6 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
         clearReverseQueue();
 
     if (m_needReinitDecoders) {
-        QMutexLocker _lock(&m_mtx);
         foreach(CLAbstractVideoDecoder* decoder, m_decoder)
             decoder->setMTDecoding(enableFrameQueue);
         m_needReinitDecoders = false;
@@ -231,28 +231,25 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
     CLVideoDecoderOutput m_tmpFrame;
     m_tmpFrame.setUseExternalData(true);
 
-	CLAbstractVideoDecoder* dec;
+	if (data->compressionType == CODEC_ID_NONE)
 	{
-		QMutexLocker mutex(&m_mtx);
-
-		if (data->compressionType == CODEC_ID_NONE)
-		{
-			cl_log.log(QLatin1String("CLVideoStreamDisplay::dispay: unknown codec type..."), cl_logERROR);
-			return true; // true to prevent 100% cpu usage on unknown codec
-		}
-
-        dec = m_decoder[data->compressionType];
-		if (dec == 0)
-		{
-			dec = CLVideoDecoderFactory::createDecoder(data->compressionType, data->context);
-			dec->setLightCpuMode(m_lightCPUmode);
-            m_decoder.insert(data->compressionType, dec);
-		}
-        if (dec == 0) {
-            CL_LOG(cl_logDEBUG2) cl_log.log(QLatin1String("Can't find video decoder"), cl_logDEBUG2);
-            return true;
-        }
+		cl_log.log(QLatin1String("CLVideoStreamDisplay::dispay: unknown codec type..."), cl_logERROR);
+        m_mtx.unlock();
+        return true; // true to prevent 100% cpu usage on unknown codec
 	}
+
+    CLAbstractVideoDecoder* dec = m_decoder[data->compressionType];
+	if (dec == 0)
+	{
+		dec = CLVideoDecoderFactory::createDecoder(data->compressionType, data->context);
+		dec->setLightCpuMode(m_lightCPUmode);
+        m_decoder.insert(data->compressionType, dec);
+	}
+    if (dec == 0) {
+        CL_LOG(cl_logDEBUG2) cl_log.log(QLatin1String("Can't find video decoder"), cl_logDEBUG2);
+        m_mtx.unlock();
+        return true;
+    }
 
     CLVideoDecoderOutput::downscale_factor scaleFactor = determineScaleFactor(data, dec->getWidth(), dec->getHeight(), force_factor);
     PixelFormat pixFmt = dec->GetPixelFormat();
@@ -283,7 +280,7 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 
 	if (!dec || !dec->decode(*data, useTmpFrame ? &m_tmpFrame : outFrame))
 	{
-		//CL_LOG(cl_logDEBUG2) cl_log.log(QLatin1String("CLVideoStreamDisplay::dispay: decoder cannot decode image..."), cl_logDEBUG2);
+        m_mtx.unlock();
         if (!m_reverseQueue.isEmpty() && (m_reverseQueue.front()->flags & AV_REVERSE_REORDERED)) {
             outFrame = m_reverseQueue.dequeue();
             if (outFrame->data[0])
@@ -293,6 +290,7 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
         }
 		return false;
 	}
+    m_mtx.unlock();
 
     if (m_flushedBeforeReverseStart) {
         data->flags |= AV_REVERSE_BLOCK_START;
@@ -449,4 +447,51 @@ void CLVideoStreamDisplay::clearReverseQueue()
         delete m_reverseQueue[i];
     m_reverseQueue.clear();
     m_realReverseSize = 0;
+}
+
+QImage CLVideoStreamDisplay::getScreenshot()
+{
+    if (m_decoder.isEmpty())
+        return QImage();
+    CLAbstractVideoDecoder* dec = m_decoder.begin().value();
+    QMutexLocker mutex(&m_mtx);
+    const AVFrame* lastFrame = dec->lastFrame();
+    AVFrame deinterlacedFrame;
+
+    // deinterlace if need
+    if (lastFrame->interlaced_frame)
+    {
+        int numBytes = avpicture_get_size(dec->getFormat(), dec->getWidth(), dec->getHeight());
+        avpicture_fill((AVPicture*)&deinterlacedFrame, (quint8*) av_malloc(numBytes), dec->getFormat(), dec->getWidth(), dec->getHeight());
+        if (avpicture_deinterlace((AVPicture*)&deinterlacedFrame, (AVPicture*) lastFrame, dec->getFormat(), dec->getWidth(), dec->getHeight()) == 0)
+            lastFrame = &deinterlacedFrame;
+    }
+
+    // convert colorSpace
+    SwsContext *convertor;
+    convertor = sws_getContext(dec->getWidth(), dec->getHeight(), dec->getFormat(),
+        dec->getWidth(), dec->getHeight(), PIX_FMT_BGRA,
+        SWS_POINT, NULL, NULL, NULL);
+    if (!convertor) {
+        if (lastFrame->interlaced_frame)
+            av_free(deinterlacedFrame.data[0]);
+        return QImage();
+    }
+
+    int numBytes = avpicture_get_size(PIX_FMT_RGBA, dec->getWidth(), dec->getHeight());
+    AVPicture outPicture; 
+    avpicture_fill( (AVPicture*) &outPicture, (quint8*) av_malloc(numBytes), PIX_FMT_BGRA, dec->getWidth(), dec->getHeight());
+
+    sws_scale(convertor, lastFrame->data, lastFrame->linesize, 
+              0, dec->getHeight(), 
+              outPicture.data, outPicture.linesize);
+    sws_freeContext(convertor);
+    // convert to QImage
+    QImage tmp(outPicture.data[0], dec->getWidth(), dec->getHeight(), outPicture.linesize[0], QImage::Format_ARGB32);
+    QImage rez( dec->getWidth(), dec->getHeight(), QImage::Format_ARGB32);
+    rez = tmp.copy(0,0, dec->getWidth(), dec->getHeight());
+    avpicture_free(&outPicture);
+    if (lastFrame->interlaced_frame)
+        av_free(deinterlacedFrame.data[0]);
+    return rez;
 }

@@ -47,6 +47,8 @@ public:
 
     void setSingleShotMode(bool single);
 
+    QImage getScreenshot();
+
 public slots:
     void onRealTimeStreamHint(bool value);
     void onSlowSourceHint();

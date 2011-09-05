@@ -37,6 +37,7 @@ public:
     int getHeight() const { return c->height; }
     virtual PixelFormat getFormat() const { return c->pix_fmt; }
     virtual void flush();
+    virtual const AVFrame* lastFrame() { return m_frame; }
 private:
     static AVCodec* findCodec(CodecID codecId);
 

@@ -106,7 +106,7 @@ CLCamDisplay::~CLCamDisplay()
 void CLCamDisplay::pause()
 {
     CLAbstractDataProcessor::pause();
-
+ 
     m_audioDisplay->suspend();
 }
 
@@ -114,7 +114,6 @@ void CLCamDisplay::resume()
 {
     m_singleShotMode = false;
     m_audioDisplay->resume();
-
     CLAbstractDataProcessor::resume();
 }
 
@@ -125,6 +124,34 @@ void CLCamDisplay::addVideoChannel(int index, CLAbstractRenderer* vw, bool canDo
     delete m_display[index];
     m_display[index] = new CLVideoStreamDisplay(canDownscale);
     m_display[index]->setDrawer(vw);
+}
+
+QImage CLCamDisplay::getScreenshot()
+{
+    QList<QImage> screens;
+    int totalWidth = 0;
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i) 
+    {
+        if (m_display[i]) {
+            screens << m_display[i]->getScreenshot();
+            totalWidth += screens.last().width();
+        }
+    }
+    if (screens.isEmpty())
+        return QImage();
+    QImage rez(totalWidth, screens.first().height(), QImage::Format_ARGB32);
+    QPainter p(&rez);
+    p.setCompositionMode(QPainter::CompositionMode_Source);
+    int x = 0;
+    foreach(QImage img, screens) 
+    {
+        p.drawImage(QPoint(x, 0), img);
+        x += img.width();
+    }
+    p.end();
+
+    //rez.save("c:/test.jpg");
+    return rez;
 }
 
 void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
