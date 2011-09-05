@@ -381,6 +381,8 @@ void NavigationItem::onValueChanged(qint64 time)
 
 void NavigationItem::pause()
 {
+    m_speedWidget->resetSpeed();
+
     setActive(true);
     CLAbstractArchiveReader *reader = static_cast<CLAbstractArchiveReader*>(m_camera->getStreamreader());
 

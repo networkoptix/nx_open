@@ -17,7 +17,6 @@ SpeedWidget::SpeedWidget(QWidget *parent) :
     m_slider->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
     m_slider->setStyle(SliderProxyStyle::instance());
     m_slider->setRange(-200, 200);
-    m_slider->setValue(10); // 1x
     m_slider->setSingleStep(2);
     m_slider->setPageStep(5);
 m_slider->setMinimumWidth(220); // ### otherwise width bounded to 84... wtf?
@@ -44,6 +43,8 @@ m_slider->setMinimumWidth(220); // ### otherwise width bounded to 84... wtf?
     layout->addWidget(m_slider, 1, Qt::AlignCenter);
     layout->addWidget(m_rightButton, 0, Qt::AlignCenter);
     setLayout(layout);
+
+    resetSpeed();
 }
 
 QSlider *SpeedWidget::slider() const
@@ -54,6 +55,11 @@ QSlider *SpeedWidget::slider() const
 QSize SpeedWidget::sizeHint() const
 {
     return QSize(80, 20);
+}
+
+void SpeedWidget::resetSpeed()
+{
+    m_slider->setValue(10); // 1x
 }
 
 bool SpeedWidget::eventFilter(QObject *watched, QEvent *event)

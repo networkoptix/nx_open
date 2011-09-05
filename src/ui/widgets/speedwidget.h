@@ -19,6 +19,9 @@ public:
 
     QSize sizeHint() const;
 
+public Q_SLOTS:
+    void resetSpeed();
+
 Q_SIGNALS:
     void speedChanged(float newSpeed);
 
@@ -26,7 +29,7 @@ protected:
     bool eventFilter(QObject *, QEvent *);
     void paintEvent(QPaintEvent *);
 
-public Q_SLOTS:
+private Q_SLOTS:
     void onValueChanged(int);
     void onButtonClicked();
 
