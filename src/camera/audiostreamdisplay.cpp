@@ -5,6 +5,7 @@
 #include "base/sleep.h"
 #include "streamreader/streamreader.h"
 #include "audio_device.h"
+#include "settings.h"
 
 #define DEFAULT_AUDIO_FRAME_SIZE (AVCODEC_MAX_AUDIO_FRAME_SIZE*2)
 int  MAX_AUDIO_FRAME_SIZE = DEFAULT_AUDIO_FRAME_SIZE*5;
@@ -60,13 +61,8 @@ CLAudioStreamDisplay::CLAudioStreamDisplay(int bufferMs) :
     m_tooFewDataDetected(true),
     m_isFormatSupported(true),
     m_audioSound(0),
-
     m_downmixing(false),
-#ifdef Q_OS_WIN
-    m_forceDownmix(false),
-#else
-    m_forceDownmix(true), // mac version use SPDIF by default for multichannel audio.
-#endif
+    m_forceDownmix(Settings::instance().downmixAudio()),
     m_sampleConvertMethod(SampleConvert_None),
     m_isConvertMethodInitialized(false)
 {

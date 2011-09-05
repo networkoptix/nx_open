@@ -60,6 +60,8 @@ void Settings::update(const Settings::Data& data)
     setMediaRoot(data.mediaRoot);
     setAuxMediaRoots(data.auxMediaRoots);
     setAllowChangeIP(data.allowChangeIP);
+    m_data.maxVideoItems = data.maxVideoItems;
+    m_data.downmixAudio = data.downmixAudio;
 }
 
 void Settings::load(const QString& fileName)
@@ -91,7 +93,11 @@ void Settings::load(const QString& fileName)
 					else if (xml.name() == QLatin1String("serialNumber"))
 						setSerialNumber(xml.readElementText());
 					else if (xml.name() == QLatin1String("afterFirstRun"))
-						m_data.afterFirstRun = (xml.readElementText() == QLatin1String("true"));
+						m_data.afterFirstRun = xml.readElementText() == QLatin1String("true");
+					else if (xml.name() == QLatin1String("maxVideoItems"))
+						m_data.maxVideoItems = qBound(0, xml.readElementText().toInt(), 32);
+					else if (xml.name() == QLatin1String("downmixAudio"))
+						m_data.downmixAudio = xml.readElementText() == QLatin1String("true");
 				}
 			}
 
@@ -146,12 +152,30 @@ void Settings::save()
 
     stream.writeTextElement(QLatin1String("afterFirstRun"), QLatin1String("true"));
 
+    stream.writeTextElement(QLatin1String("maxVideoItems"), QString::number(m_data.maxVideoItems));
+
+    stream.writeTextElement(QLatin1String("downmixAudio"), m_data.downmixAudio ? QLatin1String("true") : QLatin1String("false"));
+
     stream.writeEndElement(); // config
     stream.writeEndElement(); // settings
 
     stream.writeEndDocument();
 
     settingsFile.close();
+}
+
+int Settings::maxVideoItems() const
+{
+    QReadLocker _lock(&m_RWLock);
+
+    return m_data.maxVideoItems;
+}
+
+bool Settings::downmixAudio() const
+{
+    QReadLocker _lock(&m_RWLock);
+
+    return m_data.downmixAudio;
 }
 
 bool Settings::isAllowChangeIP() const
@@ -233,6 +257,13 @@ void Settings::setAuxMediaRoots(const QStringList& auxMediaRoots)
 
 void Settings::reset()
 {
+    m_data.maxVideoItems = 0;
+#ifdef Q_OS_DARWIN
+    // mac version use SPDIF by default for multichannel audio
+    m_data.downmixAudio = true;
+#else
+    m_data.downmixAudio = false;
+#endif
     m_data.afterFirstRun = false;
     m_data.allowChangeIP = false;
     m_haveValidSerialNumber = false;

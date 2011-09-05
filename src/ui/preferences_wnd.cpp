@@ -27,6 +27,10 @@ PreferencesWindow::PreferencesWindow() :
     videoRecorderWidget = new RecordingSettingsWidget;
     tabWidget->insertTab(3, videoRecorderWidget, tr("Screen Recorder"));
 
+    QPalette palette = restartIsNeededWarningLabel->palette();
+    palette.setColor(QPalette::WindowText, Qt::red);
+    restartIsNeededWarningLabel->setPalette(palette);
+
     updateView();
     updateCameras();
 
@@ -41,6 +45,10 @@ PreferencesWindow::~PreferencesWindow()
 
 void PreferencesWindow::accept()
 {
+    m_settingsData.maxVideoItems = maxVideoItemsSpinBox->value();
+    m_settingsData.downmixAudio = downmixAudioCheckBox->isChecked();
+    m_settingsData.allowChangeIP = allowChangeIPCheckBox->isChecked();
+
     Settings& settings = Settings::instance();
     settings.update(m_settingsData);
     settings.save();
@@ -70,7 +78,7 @@ void PreferencesWindow::updateView()
     if (Settings::instance().haveValidSerialNumber())
     {
         QPalette palette = licenseInfoLabel->palette();
-        palette.setColor(QPalette::Foreground, QColor(0,0,0));
+        palette.setColor(QPalette::Foreground, Qt::black);
         licenseInfoLabel->setPalette(palette);
 
         licenseInfoLabel->setText(tr("You have valid license installed"));
@@ -80,7 +88,7 @@ void PreferencesWindow::updateView()
     else
     {
         QPalette palette = licenseInfoLabel->palette();
-        palette.setColor(QPalette::Foreground, QColor(0xff,00,00));
+        palette.setColor(QPalette::Foreground, Qt::red);
         licenseInfoLabel->setPalette(palette);
 
         licenseInfoLabel->setText(tr("You do not have valid license installed"));
@@ -110,6 +118,10 @@ void PreferencesWindow::updateView()
         cameraStatusLabel->setText(QString());
 
     totalCamerasLabel->setText(QString::fromLatin1("Total %1 cameras detected").arg(m_cameras.size()));
+
+    maxVideoItemsSpinBox->setValue(m_settingsData.maxVideoItems);
+
+    downmixAudioCheckBox->setChecked(m_settingsData.downmixAudio);
 }
 
 void PreferencesWindow::updateCameras()
@@ -199,11 +211,6 @@ void PreferencesWindow::auxMediaFolderRemove()
     }
 
     updateView();
-}
-
-void PreferencesWindow::allowChangeIPChanged()
-{
-    m_settingsData.allowChangeIP = allowChangeIPCheckBox->isChecked();
 }
 
 void PreferencesWindow::cameraSelected(int row)
