@@ -347,7 +347,7 @@ void GraphicsView::setZeroSelection(int delay)
         if ( (videoItem = m_selectedWnd->toVideoItem()) )
         {
             videoItem->showFPS(false);
-            videoItem->setShowImagesize(false);
+            videoItem->setShowImageSize(false);
             videoItem->setShowInfoText(false);
         }
     }
@@ -393,7 +393,7 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
         return;
 
 
-    
+
     if (m_navigationItem && ( m_navigationItem->mouseOver() || m_navigationItem->isActive()))
     {
         // scene should not be zoomed if mouse is over time slider or if time slider is active
@@ -702,7 +702,7 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
         return;
 
     if (m_ignoreMouse.shouldIgnore())
-        return; 
+        return;
 
     m_ignore_release_event = false;
 
@@ -805,8 +805,8 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
     if (!mViewStarted)
         return;
 
-    if (m_ignoreMouse.shouldIgnore())  
-        return; 
+    if (m_ignoreMouse.shouldIgnore())
+        return;
 
 
     if (m_gridItem->isVisible() && !isCTRLPressed(event))
@@ -2437,7 +2437,7 @@ void GraphicsView::onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int de
 
         if (!dev->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT))
         {
-            m_selectedWnd->toVideoItem()->setShowImagesize(true);
+            m_selectedWnd->toVideoItem()->setShowImageSize(true);
         }
 
         if (!dev->checkDeviceTypeFlag(CLDevice::ARCHIVE) && !dev->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT))

@@ -7,53 +7,60 @@
 // I assume that it inherits by video and static_image item
 class CLImageItem : public CLAbstractSceneItem
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	CLImageItem(GraphicsView *view, int max_width, int max_height, QString name = QString());
+    CLImageItem(GraphicsView *view, int max_width, int max_height, QString name = QString());
 
-	virtual int height() const;
-	virtual int width() const;
+    virtual int height() const;
+    virtual int width() const;
 
-	virtual float aspectRatio() const;
-	int imageWidth() const;
-	int imageHeight() const;
+    virtual float aspectRatio() const;
+    QSize imageSize() const;
 
-	void setInfoText(QString text);
+    bool showImageSize() const;
+    void setShowImageSize(bool show);
 
-	void setShowInfoText(bool show);
-	void setShowImagesize(bool show);
+    QString infoText() const;
+    void setInfoText(const QString &text);
 
-signals:
-	void onAspectRatioChanged(CLImageItem* item);
+    bool showInfoText() const;
+    void setShowInfoText(bool show);
+
+    QString extraInfoText() const;
+    void setExtraInfoText(const QString &text);
+
+Q_SIGNALS:
+    void onAspectRatioChanged(CLAbstractSceneItem *item);
 
 protected:
-	virtual void drawStuff(QPainter* painter);
-	virtual void drawInfoText(QPainter* painter);
+    virtual void drawStuff(QPainter* painter);
+    virtual void drawInfoText(QPainter* painter);
 
-	virtual bool wantText() const;
+    virtual bool wantText() const;
 
 protected:
-	mutable QMutex m_mutex;
-	int m_imageWidth;
-	int m_imageHeight;
+    mutable QMutex m_mutex;
+    int m_imageWidth;
+    int m_imageHeight;
 
-	int m_imageWidth_old;
-	int m_imageHeight_old;
+    int m_imageWidth_old;
+    int m_imageHeight_old;
 
-	mutable QMutex m_mutex_aspect;
-	float m_aspectratio;
+    mutable QMutex m_mutex_aspect;
+    float m_aspectratio;
 
-	bool m_showinfotext;
-	bool m_showimagesize;
+    // unprotected
+    bool m_showimagesize;
+    bool m_showinfotext;
 
-	bool m_showing_text; // showing text now
-	QTime m_textTime; // draw text is very very very expensive. so want to delay it a bit
-	bool m_timeStarted;
+    QString m_infoText;
+    QString m_extraInfoText;
 
-	QString m_infoText;
+    bool m_showing_text; // showing text now
+    QTime m_textTime; // draw text is very very very expensive. so want to delay it a bit
+    bool m_timeStarted;
 
-	QFont m_Info_Font;
-
+    QFont m_Info_Font;
 };
 
 #endif //img_item_h_2211

@@ -1,142 +1,162 @@
 #include "img_item.h"
 
+#include <QtGui/QFont>
+#include <QtGui/QFontMetrics>
+#include <QtGui/QPainter>
+
 extern bool global_show_item_text;
 
 CLImageItem::CLImageItem(GraphicsView* view, int max_width, int max_height, QString name)
-	: CLAbstractSceneItem(view, max_width, max_height,name),
-	m_imageWidth(m_max_width),
-	m_imageHeight(m_max_height),
-	m_imageWidth_old(m_max_width),
-	m_imageHeight_old(m_max_height),
-	m_aspectratio((qreal)m_imageWidth/m_imageHeight),
-	m_showinfotext(false),
-	m_showimagesize(false),
-	m_showing_text(false),
-	m_timeStarted(false),
-	m_Info_Font(QLatin1String("times"), 110)
+    : CLAbstractSceneItem(view, max_width, max_height,name),
+    m_imageWidth(m_max_width),
+    m_imageHeight(m_max_height),
+    m_imageWidth_old(m_max_width),
+    m_imageHeight_old(m_max_height),
+    m_aspectratio((qreal)m_imageWidth/m_imageHeight),
+    m_showimagesize(false),
+    m_showinfotext(false),
+    m_showing_text(false),
+    m_timeStarted(false),
+    m_Info_Font(QLatin1String("times"), 110)
 {
-	m_type = IMAGE;
-	m_Info_Font.setWeight(QFont::Bold);
+    m_type = IMAGE;
+    m_Info_Font.setWeight(QFont::Bold);
 }
 
 int CLImageItem::height() const
 {
-	return width()/aspectRatio();
+    return width()/aspectRatio();
 }
 
 int CLImageItem::width() const
 {
-	qreal ar = aspectRatio();
-	qreal ar_f = (qreal)m_max_width/m_max_height;
+    float ar = aspectRatio();
+    float ar_f = (float)m_max_width / m_max_height;
 
-	if (ar>ar_f) // width > hight; normal scenario; ar = w/h
-	{
-		return m_max_width;
-	}
-	else
-		return m_max_height*aspectRatio();
+    // width > hight; normal scenario; ar = w/h
+    return ar > ar_f ? m_max_width : m_max_height * ar;
 }
 
 float CLImageItem::aspectRatio() const
 {
-	QMutexLocker  locker(&m_mutex_aspect);
-	return m_aspectratio;
+    QMutexLocker locker(&m_mutex_aspect);
+    return m_aspectratio;
 }
 
-int CLImageItem::imageWidth() const
+QSize CLImageItem::imageSize() const
 {
-	QMutexLocker locker(&m_mutex);
-	return m_imageWidth;
-
+    QMutexLocker locker(&m_mutex);
+    return QSize(m_imageWidth, m_imageHeight);
 }
 
-int CLImageItem::imageHeight() const
+bool CLImageItem::showImageSize() const
 {
-	QMutexLocker locker(&m_mutex);
-	return m_imageHeight;
+    return m_showimagesize;
 }
 
-void CLImageItem::setInfoText(QString text)
+void CLImageItem::setShowImageSize(bool show)
 {
-	m_infoText = text;
+    m_showimagesize = show;
+}
+
+QString CLImageItem::infoText() const
+{
+    return m_infoText;
+}
+
+void CLImageItem::setInfoText(const QString &text)
+{
+    m_infoText = text;
+}
+
+bool CLImageItem::showInfoText() const
+{
+    return m_showinfotext;
 }
 
 void CLImageItem::setShowInfoText(bool show)
 {
-	m_showinfotext = show;
+    m_showinfotext = show;
 }
 
-void CLImageItem::setShowImagesize(bool show)
+QString CLImageItem::extraInfoText() const
 {
-	m_showimagesize = show;
+    return m_extraInfoText;
+}
+
+void CLImageItem::setExtraInfoText(const QString &text)
+{
+    m_extraInfoText = text;
 }
 
 bool CLImageItem::wantText() const
 {
-	return (m_showinfotext || m_showimagesize);
+    return m_showimagesize || m_showinfotext || !m_extraInfoText.isEmpty();
 }
 
 void CLImageItem::drawStuff(QPainter* painter)
 {
-	if (!wantText())
-	{
-		m_showing_text = false;
-		m_timeStarted = false;
-	}
+    if (!wantText())
+    {
+        m_showing_text = false;
+        m_timeStarted = false;
+    }
+    else if (!m_showing_text)
+    {
+        if (m_timeStarted)
+        {
+            int ms = m_textTime.msecsTo(QTime::currentTime());
+            if (ms>350)
+                m_showing_text = true;
 
-	if (!m_showing_text && wantText())
-	{
-		if (m_timeStarted)
-		{
-			int ms = m_textTime.msecsTo(QTime::currentTime());
-			if (ms>350)
-				m_showing_text = true;
+        }
+        else
+        {
+            m_textTime.restart();
+            m_timeStarted = true;
+        }
+    }
+    //===================================
 
-		}
-		else
-		{
-			m_textTime.restart();
-			m_timeStarted = true;
-		}
-	}
-	//===================================
+    if (m_showing_text)
+        drawInfoText(painter); // ahtung! drawText takes huge(!) ammount of cpu
 
-	if (m_showing_text)
-	{
-		if (m_showinfotext || m_showimagesize)
-		{
-			drawInfoText(painter); // ahtung! drawText takes huge(!) ammount of cpu
-		}
-	}
-
-	if (m_draw_rotation_helper)
-		drawRotationHelper(painter);
-
+    if (m_draw_rotation_helper)
+        drawRotationHelper(painter);
 }
 
 void CLImageItem::drawInfoText(QPainter* painter)
 {
+    // ignore global_show_item_text
+    if (!m_extraInfoText.isEmpty())
+    {
+        painter->setFont(QFont(QLatin1String("Times"), 150));
+        painter->setPen(QColor(218, 180, 130));
 
-	if (!global_show_item_text)
-		return;
+        QRectF r = painter->boundingRect(boundingRect(), Qt::AlignLeft | Qt::AlignTop, m_extraInfoText);
+        r.moveTopLeft(QPointF(5, 5));
+        if (global_show_item_text && (m_showimagesize || m_showinfotext))
+            r.moveTop(20 + QFontMetrics(m_Info_Font).height());
 
-	painter->setFont(m_Info_Font);
-	//painter->setPen(QColor(255,0,0,220));
-	painter->setPen(QColor(30,55,255));
+        painter->drawText(r, m_extraInfoText);
+    }
 
-	QFontMetrics fm(painter->font());
+    if (!global_show_item_text)
+        return;
 
-	QString text;
-	QTextStream str(&text);
+    painter->setFont(m_Info_Font);
+    //painter->setPen(QColor(255,0,0,220));
+    painter->setPen(QColor(30,55,255));
 
-	if (m_showimagesize)
-		str << "(" << imageWidth() << "x" << imageHeight() <<") ";
+    QString text;
+    if (m_showimagesize)
+    {
+        const QSize sz = imageSize();
+        text += QLatin1Char('(') + QString::number(sz.width()) + QLatin1Char('x') + QString::number(sz.height()) + QLatin1String(") ");
+    }
+    if (m_showinfotext)
+        text += m_infoText;
 
-	if (m_showinfotext)
-		str << m_infoText;
-
-	painter->drawText(2,20 + fm.height()/2, text);
-	//painter->drawText(2,20 + 100, text);
-
+    QFontMetrics fm(painter->font());
+    painter->drawText(2, 20 + fm.height() / 2, text);
 }
-

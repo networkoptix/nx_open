@@ -16,77 +16,73 @@ class CLVideoCamera;
 
 class CLVideoWindowItem : public CLImageItem, public CLAbstractRenderer
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	CLVideoWindowItem(GraphicsView *view, const CLDeviceVideoLayout *layout, int max_width, int max_height, QString name = QString());
-	virtual ~CLVideoWindowItem();
+    CLVideoWindowItem(GraphicsView *view, const CLDeviceVideoLayout *layout, int max_width, int max_height, QString name = QString());
+    virtual ~CLVideoWindowItem();
 
-	virtual void draw(CLVideoDecoderOutput* image, unsigned int channel);
+    virtual void draw(CLVideoDecoderOutput* image, unsigned int channel);
     virtual void waitForFrameDisplayed(int channel);
 
 
-	CLVideoCamera* getVideoCam() const;
-	float aspectRatio() const;
+    CLVideoCamera* getVideoCam() const;
+    float aspectRatio() const;
 
-	virtual QSize sizeOnScreen(unsigned int channel) const;
+    virtual QSize sizeOnScreen(unsigned int channel) const;
 
-	virtual bool constantDownscaleFactor() const;
+    virtual bool constantDownscaleFactor() const;
 
-	virtual void beforeDestroy();
+    virtual void beforeDestroy();
 
-	void showFPS(bool show);
-	void setStatistics(CLStatistics * st, unsigned int channel);
+    void showFPS(bool show);
+    void setStatistics(CLStatistics * st, unsigned int channel);
 
-	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 
-	const CLDeviceVideoLayout* getVideoLayout() const
-	{
-		return m_videolayout;
-	}
+    const CLDeviceVideoLayout* getVideoLayout() const
+    {
+        return m_videolayout;
+    }
 
-	virtual bool isZoomable() const;
+    virtual bool isZoomable() const;
 
-	virtual void setItemSelected(bool sel, bool animate = true, int delay = 0);
+    virtual void setItemSelected(bool sel, bool animate = true, int delay = 0);
 
-	virtual void goToSteadyMode(bool steady, bool instant);
-
-signals:
-	void onAspectRatioChanged(CLAbstractSceneItem* item);
+    virtual void goToSteadyMode(bool steady, bool instant);
 
 protected:
 
-	QPointF getBestSubItemPos(CLSubItemType type);
+    QPointF getBestSubItemPos(CLSubItemType type);
 
-	void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
-	void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
+    void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
 
-	virtual bool wantText() const;
+    virtual bool wantText() const;
 
-	virtual void drawStuff(QPainter* painter);
+    virtual void drawStuff(QPainter* painter);
 
-	virtual void drawFPS(QPainter* painter);
-	virtual void drawLostConnection(QPainter* painter);
-	virtual void drawGLfailaure(QPainter* painter);
+    virtual void drawFPS(QPainter* painter);
+    virtual void drawLostConnection(QPainter* painter);
+    virtual void drawGLfailaure(QPainter* painter);
 
-	void saveGLState();
-	void restoreGLState();
+    void saveGLState();
+    void restoreGLState();
 
-	QRect getSubChannelRect(unsigned int channel) const;
+    QRect getSubChannelRect(unsigned int channel) const;
 
 protected:
-	CLGLRenderer* m_gldraw[CL_MAX_CHANNELS];
-	bool m_first_draw;
-	CLStatistics* m_stat[CL_MAX_CHANNELS];
+    CLGLRenderer* m_gldraw[CL_MAX_CHANNELS];
+    bool m_first_draw;
+    CLStatistics* m_stat[CL_MAX_CHANNELS];
 
-	bool m_showfps;
+    bool m_showfps;
 
-	QFont m_FPS_Font;
+    QFont m_FPS_Font;
 
-	int m_opacity;
+    int m_opacity;
 
-	const CLDeviceVideoLayout* m_videolayout;
-	unsigned int m_videonum;
-
+    const CLDeviceVideoLayout* m_videolayout;
+    unsigned int m_videonum;
 };
 
 #endif //clgl_draw_h_20_31
