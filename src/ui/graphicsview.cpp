@@ -2766,6 +2766,8 @@ void GraphicsView::toggleRecording()
         delete desktopEncoder;
 
         if (!filePath.isEmpty()) {
+            if (!filePath.endsWith(QLatin1String(".ts"), Qt::CaseInsensitive))
+                filePath += QLatin1String(".ts");
             QFile::remove(filePath);
             bool result = QFile::rename(recordedFileName, filePath);
             if (!result) {
