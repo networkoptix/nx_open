@@ -39,7 +39,6 @@ private slots:
     void mainMediaFolderBrowse();
     void auxMediaFolderBrowse();
     void auxMediaFolderRemove();
-    void allowChangeIPChanged();
     void cameraSelected(int);
     void enterLicenseClick();
     void auxMediaFolderSelectionChanged();

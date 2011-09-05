@@ -27,6 +27,8 @@ public:
 
     struct Data
     {
+        int maxVideoItems;
+        bool downmixAudio;
         bool allowChangeIP;
         bool afterFirstRun;
         QString mediaRoot;
@@ -39,6 +41,8 @@ public:
     void load(const QString& fileName);
     void save();
 
+    int maxVideoItems() const;
+    bool downmixAudio() const;
     bool isAllowChangeIP() const;
     bool isAfterFirstRun() const;
     QString mediaRoot() const;
