@@ -339,19 +339,18 @@ void NavigationItem::updateSlider()
     qint64 length = reader->lengthMksec()/1000;
     m_widget->slider()->setMaximumValue(length);
 
-    quint64 time;
-    if (reader->isSingleShotMode() || reader->isSkippingFrames() || m_camera->currentTime() == 0)
-        time = reader->currentTime();
-    else
-        time = m_camera->currentTime();
+    
+    quint64 time = m_camera->currentTime();
+    if (time != AV_NOPTS_VALUE)
+    {
+        m_currentTime = time/1000;
+        m_widget->slider()->setCurrentValue(m_currentTime);
 
-    m_currentTime = time/1000;
-    m_widget->slider()->setCurrentValue(m_currentTime);
-
-    qreal x = m_widget->slider()->x() + 8 + ((double)(m_widget->slider()->width() - 18)/(m_widget->slider()->sliderRange()))*(m_widget->slider()->currentValue() - m_widget->slider()->viewPortPos()); // fuck you!
-    m_textItem->setPos(x - m_textItem->smallRect().width()/2, -40);
-    m_textItem->setText(formatDuration(m_currentTime/1000));
-    m_widget->label()->setText(formatDuration(length/1000));
+        qreal x = m_widget->slider()->x() + 8 + ((double)(m_widget->slider()->width() - 18)/(m_widget->slider()->sliderRange()))*(m_widget->slider()->currentValue() - m_widget->slider()->viewPortPos()); // fuck you!
+        m_textItem->setPos(x - m_textItem->smallRect().width()/2, -40);
+        m_textItem->setText(formatDuration(m_currentTime/1000));
+        m_widget->label()->setText(formatDuration(length/1000));
+    }
 }
 
 void NavigationItem::onValueChanged(qint64 time)
