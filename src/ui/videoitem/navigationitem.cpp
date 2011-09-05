@@ -301,6 +301,7 @@ void NavigationItem::setVideoCamera(CLVideoCamera *camera)
     m_widget->setMouseTracking(true);
 
     m_speedWidget->resetSpeed();
+    m_speedWidget->setDisabled(false);
     restoreInfoText();
 
     m_camera = camera;
@@ -380,6 +381,7 @@ void NavigationItem::onValueChanged(qint64 time)
 void NavigationItem::pause()
 {
     m_speedWidget->resetSpeed();
+    m_speedWidget->setDisabled(true);
 
     setActive(true);
     CLAbstractArchiveReader *reader = static_cast<CLAbstractArchiveReader*>(m_camera->getStreamreader());
@@ -393,6 +395,8 @@ void NavigationItem::pause()
 
 void NavigationItem::play()
 {
+    m_speedWidget->setDisabled(false);
+
     setActive(true);
     CLAbstractArchiveReader *reader = static_cast<CLAbstractArchiveReader*>(m_camera->getStreamreader());
 
