@@ -630,7 +630,7 @@ void CLCamDisplay::afterJump(qint64 newTime)
     m_lastVideoPacketTime = newTime;
     m_previousVideoTime = newTime;
     //m_previousVideoDisplayedTime = 0;
-    m_display[0]->setLastDisplayedTime(0);
+    m_display[0]->setLastDisplayedTime(AV_NOPTS_VALUE);
 
     m_totalFrames = 0;
     m_iFrames = 0;
