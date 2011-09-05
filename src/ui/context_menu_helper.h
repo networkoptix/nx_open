@@ -19,7 +19,7 @@ extern QAction cm_preferences;
 
 extern QAction cm_editTags;
 
-extern QAction cm_fullscren;
+extern QAction cm_fullscreen;
 extern QAction cm_remove_from_layout;
 extern QAction cm_remove_from_disk;
 extern QAction cm_settings;

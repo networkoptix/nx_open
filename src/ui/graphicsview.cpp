@@ -1260,7 +1260,8 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
             menu.addAction(&cm_editTags);
 
             // video item
-            menu.addAction(&cm_fullscren);
+            cm_fullscreen.setText(!aitem->isFullScreen() ? QObject::tr("Fullscreen") : QObject::tr("Exit Fullscreen"));
+            menu.addAction(&cm_fullscreen);
             menu.addAction(&cm_remove_from_layout);
 
             video_wnd = static_cast<CLVideoWindowItem*>(aitem);
@@ -1540,7 +1541,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
                 }
             }
 
-            if (act==&cm_fullscren)
+            if (act==&cm_fullscreen)
                 toggleFullScreen_helper(aitem);
 
             if (act == &cm_editTags)
@@ -2818,7 +2819,6 @@ void GraphicsView::toggleFullScreen()
             onItemFullScreen_helper(item, 800);
 
         mMainWnd->showFullScreen();
-
     }
 }
 
