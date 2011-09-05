@@ -3135,14 +3135,15 @@ void GraphicsView::contextMenuHelper_saveRecordedAs(CLVideoCamera* cam)
 
     QString suggetion = (static_cast<CLArchiveDevice*>(cam->getDevice()))->originalName();
 
-    bool ok;
     QString name;
-    while(true)
+    forever
     {
-        name = UIgetText(this, tr("Save recorded video as"), tr("Title:"), suggetion, ok).trimmed();
+        bool ok;
+        name = UIgetText(this, tr("Save recorded video as"), tr("Title:"), suggetion, ok);
         if (!ok)
-            break;
+            return;
 
+        name = name.trimmed();
         if (name.isEmpty())
         {
             UIOKMessage(this, QString(), tr("Please provide a title."));
@@ -3160,7 +3161,6 @@ void GraphicsView::contextMenuHelper_saveRecordedAs(CLVideoCamera* cam)
                 "\\%,\\.,\\+,\\~,\\_"
              "]")), QLatin1String("_"));
 
-
         QDir dir(getRecordingDir() + name);
         if (dir.exists())
         {
@@ -3177,11 +3177,8 @@ void GraphicsView::contextMenuHelper_saveRecordedAs(CLVideoCamera* cam)
         break;
     }
 
-    if (ok)
-    {
-        CLArchiveStreamReader* rreader = static_cast<CLArchiveStreamReader*>(cam->getStreamreader());
-        rreader->setRecordedDataDst(name);
-    }
+    CLArchiveStreamReader *rreader = static_cast<CLArchiveStreamReader *>(cam->getStreamreader());
+    rreader->setRecordedDataDst(name);
 }
 
 void GraphicsView::contextMenuHelper_openInWebBroser(CLVideoCamera* cam)
