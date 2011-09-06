@@ -17,8 +17,8 @@ class GraphicsSliderPrivate : public AbstractGraphicsSliderPrivate
 
 public:
     QStyle::SubControl pressedControl;
-    int tickInterval;
     GraphicsSlider::TickPosition tickPosition;
+    int tickInterval;
     int clickOffset;
 
     void init();
@@ -35,16 +35,17 @@ public:
 void GraphicsSliderPrivate::init()
 {
     Q_Q(GraphicsSlider);
+
     pressedControl = QStyle::SC_None;
-    tickInterval = 0;
     tickPosition = GraphicsSlider::NoTicks;
+    tickInterval = 0;
     hoverControl = QStyle::SC_None;
+
     q->setFocusPolicy(Qt::FocusPolicy(q->style()->styleHint(QStyle::SH_Button_FocusPolicy)));
     QSizePolicy sp(QSizePolicy::Expanding, QSizePolicy::Fixed, QSizePolicy::Slider);
     if (orientation == Qt::Vertical)
         sp.transpose();
     q->setSizePolicy(sp);
-//    q->setAttribute(Qt::WA_WState_OwnSizePolicy, false);
 }
 
 int GraphicsSliderPrivate::pixelPosToRangeValue(int pos) const
