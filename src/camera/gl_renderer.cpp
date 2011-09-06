@@ -837,8 +837,8 @@ bool CLGLRenderer::paintEvent(const QRect &r)
             updateTexture();
         }
     }
-    bool draw = m_videoWidth > 0 && m_videoHeight > 0 && m_videoWidth <= getMaxTextureSize() && m_videoHeight <= getMaxTextureSize();
-    if (draw)
+    bool draw = m_videoWidth <= getMaxTextureSize() && m_videoHeight <= getMaxTextureSize();
+    if (draw && m_videoWidth > 0 && m_videoHeight > 0)
     {
         QRect temp(r);
         const float v_array[] = { temp.left(), temp.top(), temp.right() + 1, temp.top(), temp.right() + 1, temp.bottom() + 1, temp.left(), temp.bottom() + 1 };
