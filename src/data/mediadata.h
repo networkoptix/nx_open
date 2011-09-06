@@ -11,7 +11,7 @@
 
 struct CLAbstractMediaData : public CLAbstractData
 {
-    enum MediaFlags {MediaFlags_None = 0, MediaFlags_AfterEOF = 1};
+    enum MediaFlags {MediaFlags_None = 0, MediaFlags_AfterEOF = 2};
 
 	CLAbstractMediaData(unsigned int alignment, unsigned int capacity)
         : data(alignment, capacity),
@@ -51,7 +51,7 @@ struct CLCompressedVideoData : public CLAbstractMediaData
 	int width;
 	int height;
 	//bool keyFrame;
-    int flags;
+    //int flags;
 	bool useTwice; // some decoders delay video frame by one;
 	quint32 channelNumber; // video channel number; some devices might have more that one sensor.
 	bool ignore;

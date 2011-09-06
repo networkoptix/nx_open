@@ -39,6 +39,7 @@ void GraphicsSliderPrivate::init()
     pressedControl = QStyle::SC_None;
     tickPosition = GraphicsSlider::NoTicks;
     tickInterval = 0;
+    clickOffset = 0;
     hoverControl = QStyle::SC_None;
 
     q->setFocusPolicy(Qt::FocusPolicy(q->style()->styleHint(QStyle::SH_Button_FocusPolicy)));
@@ -51,12 +52,13 @@ void GraphicsSliderPrivate::init()
 int GraphicsSliderPrivate::pixelPosToRangeValue(int pos) const
 {
     Q_Q(const GraphicsSlider);
+
     QStyleOptionSlider opt;
     q->initStyleOption(&opt);
     QRect gr = q->style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderGroove);
     QRect sr = q->style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle);
-    int sliderMin, sliderMax, sliderLength;
 
+    int sliderMin, sliderMax, sliderLength;
     if (orientation == Qt::Horizontal) {
         sliderLength = sr.width();
         sliderMin = gr.x();
@@ -66,13 +68,14 @@ int GraphicsSliderPrivate::pixelPosToRangeValue(int pos) const
         sliderMin = gr.y();
         sliderMax = gr.bottom() - sliderLength + 1;
     }
-    return QStyle::sliderValueFromPosition(minimum, maximum, pos - sliderMin,
-                                           sliderMax - sliderMin, opt.upsideDown);
+
+    return QStyle::sliderValueFromPosition(minimum, maximum, pos - sliderMin, sliderMax - sliderMin, opt.upsideDown);
 }
 
 void GraphicsSliderPrivate::updateHoverControl(const QPoint &pos)
 {
     Q_Q(GraphicsSlider);
+
     QRect lastHoverRect = hoverRect;
     QStyle::SubControl lastHoverControl = hoverControl;
     if (lastHoverControl != newHoverControl(pos)) {
@@ -84,6 +87,7 @@ void GraphicsSliderPrivate::updateHoverControl(const QPoint &pos)
 QStyle::SubControl GraphicsSliderPrivate::newHoverControl(const QPoint &pos)
 {
     Q_Q(GraphicsSlider);
+
     QStyleOptionSlider opt;
     q->initStyleOption(&opt);
     opt.subControls = QStyle::SC_All;
@@ -276,43 +280,39 @@ bool GraphicsSlider::event(QEvent *event)
 void GraphicsSlider::mousePressEvent(QGraphicsSceneMouseEvent *ev)
 {
     Q_D(GraphicsSlider);
+
     if (d->maximum == d->minimum || (ev->buttons() ^ ev->button())) {
         ev->ignore();
         return;
     }
+
 #ifdef QT_KEYPAD_NAVIGATION
     if (QApplication::keypadNavigationEnabled())
         setEditFocus(true);
 #endif
+
+    QStyleOptionSlider opt;
+    initStyleOption(&opt);
+    const QRect sliderRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle);
+    // to take half of the slider off for the setSliderPosition call we use the center - topLeft
+    const QPoint center = sliderRect.center() - sliderRect.topLeft();
+    const int pressValue = d->pixelPosToRangeValue(d->pick(ev->pos().toPoint() - center));
+
     ev->accept();
     if ((ev->button() & style()->styleHint(QStyle::SH_Slider_AbsoluteSetButtons)) != 0) {
-        QStyleOptionSlider opt;
-        initStyleOption(&opt);
-        const QRect sliderRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle);
-        const QPoint center = sliderRect.center() - sliderRect.topLeft();
-        // to take half of the slider off for the setSliderPosition call we use the center - topLeft
-
-        setSliderPosition(d->pixelPosToRangeValue(d->pick(ev->pos().toPoint() - center)));
-        triggerAction(SliderMove);
-        setRepeatAction(SliderNoAction);
         d->pressedControl = QStyle::SC_SliderHandle;
-        update();
+        setSliderPosition(pressValue);
+        triggerAction(SliderMove);
     } else if ((ev->button() & style()->styleHint(QStyle::SH_Slider_PageSetButtons)) != 0) {
-        QStyleOptionSlider opt;
-        initStyleOption(&opt);
         d->pressedControl = style()->hitTestComplexControl(QStyle::CC_Slider, &opt, ev->pos().toPoint());
-        SliderAction action = SliderNoAction;
         if (d->pressedControl == QStyle::SC_SliderGroove) {
-            const QRect sliderRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle);
-            int pressValue = d->pixelPosToRangeValue(d->pick(ev->pos().toPoint() - sliderRect.center() + sliderRect.topLeft()));
             d->pressValue = pressValue;
-            if (pressValue > d->value)
-                action = SliderPageStepAdd;
-            else if (pressValue < d->value)
-                action = SliderPageStepSub;
-            if (action) {
-                triggerAction(action);
-                setRepeatAction(action);
+            if (d->pressValue > d->value) {
+                triggerAction(SliderPageStepAdd);
+                setRepeatAction(SliderPageStepAdd);
+            } else if (d->pressValue < d->value) {
+                triggerAction(SliderPageStepSub);
+                setRepeatAction(SliderPageStepSub);
             }
         }
     } else {
@@ -321,13 +321,10 @@ void GraphicsSlider::mousePressEvent(QGraphicsSceneMouseEvent *ev)
     }
 
     if (d->pressedControl == QStyle::SC_SliderHandle) {
-        QStyleOptionSlider opt;
-        initStyleOption(&opt);
         setRepeatAction(SliderNoAction);
-        QRect sr = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle);
-        d->clickOffset = d->pick(ev->pos().toPoint() - sr.topLeft());
-        update(sr);
+        d->clickOffset = d->pick(center);
         setSliderDown(true);
+        update();
     }
 }
 
@@ -337,16 +334,14 @@ void GraphicsSlider::mousePressEvent(QGraphicsSceneMouseEvent *ev)
 void GraphicsSlider::mouseMoveEvent(QGraphicsSceneMouseEvent *ev)
 {
     Q_D(GraphicsSlider);
+
     if (d->pressedControl != QStyle::SC_SliderHandle) {
         ev->ignore();
         return;
     }
 
     ev->accept();
-    int newPosition = d->pixelPosToRangeValue(d->pick(ev->pos().toPoint()) - d->clickOffset);
-    QStyleOptionSlider opt;
-    initStyleOption(&opt);
-    setSliderPosition(newPosition);
+    setSliderPosition(d->pixelPosToRangeValue(d->pick(ev->pos().toPoint()) - d->clickOffset));
 }
 
 /*!
@@ -355,6 +350,7 @@ void GraphicsSlider::mouseMoveEvent(QGraphicsSceneMouseEvent *ev)
 void GraphicsSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent *ev)
 {
     Q_D(GraphicsSlider);
+
     if (d->pressedControl == QStyle::SC_None || ev->buttons()) {
         ev->ignore();
         return;
@@ -366,6 +362,7 @@ void GraphicsSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent *ev)
     setRepeatAction(SliderNoAction);
     if (oldPressed == QStyle::SC_SliderHandle)
         setSliderDown(false);
+
     QStyleOptionSlider opt;
     initStyleOption(&opt);
     opt.subControls = oldPressed;
@@ -458,7 +455,6 @@ GraphicsSlider::TickPosition GraphicsSlider::tickPosition() const
     return d_func()->tickPosition;
 }
 
-
 /*!
     \property GraphicsSlider::tickInterval
     \brief the interval between tickmarks
@@ -480,15 +476,3 @@ void GraphicsSlider::setTickInterval(int ts)
     d_func()->tickInterval = qMax(0, ts);
     update();
 }
-
-/*!
-    \internal
-
-    Returns the style option for slider.
-*/
-/*Q_GUI_EXPORT QStyleOptionSlider qt_qsliderStyleOption(GraphicsSlider *slider)
-{
-    QStyleOptionSlider sliderOption;
-    slider->initStyleOption(&sliderOption);
-    return sliderOption;
-}*/

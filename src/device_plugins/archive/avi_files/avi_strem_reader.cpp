@@ -51,6 +51,8 @@ qint64 CLAVIStreamReader::packetTimestamp(AVStream* stream, const AVPacket& pack
 
     if (packet.dts != AV_NOPTS_VALUE)
     {
+        if (packet.dts < firstDts)
+            firstDts = 0; // protect for some invalid streams 
         double ttm = timeBase * (packet.dts - firstDts);
         return qint64(1e+6 * ttm);
     }
@@ -396,11 +398,13 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
                     m_bottomIFrameTime = m_currentTime;
                     currentPacket().flags |= AV_REVERSE_BLOCK_START;
                 }
-                if (m_currentTime >= m_topIFrameTime) {
-                    av_free_packet(&currentPacket());
+
+                if (m_currentTime >= m_topIFrameTime) 
+                {
                     qint64 seekTime = qMax(0ll, m_bottomIFrameTime - BACKWARD_SEEK_STEP);
-                    qint64 tmpVal = m_bottomIFrameTime;
                     if (m_currentTime != seekTime) {
+                        av_free_packet(&currentPacket());
+                        qint64 tmpVal = m_bottomIFrameTime;
                         channeljumpTo(seekTime, 0);
                         m_topIFrameTime = tmpVal;
                         return getNextData();

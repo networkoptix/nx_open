@@ -155,10 +155,8 @@ void CLStreamRecorder::onFirstData(CLAbstractData* data)
 
     QFile file(dirHelper() + QLatin1String("/layout.xml"));
     file.open(QIODevice::WriteOnly);
-
-    QTextStream fstr(&file);
-    fstr << doc.toString();
-    fstr.flush();
+    file.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
+    file.write(doc.toString().toUtf8());
 }
 
 //=====================================

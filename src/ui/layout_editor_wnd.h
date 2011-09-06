@@ -6,24 +6,24 @@ class LayoutContent;
 
 class CLLayoutEditorWnd : public QDialog
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	CLLayoutEditorWnd(LayoutContent* contexttoEdit);
-	~CLLayoutEditorWnd();
+    CLLayoutEditorWnd(LayoutContent* contexttoEdit, QWidget *parent = 0);
+    ~CLLayoutEditorWnd();
 private:
 
 private slots:
-	void onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*);
+    void onNewLayoutItemSelected(CLLayoutNavigator*, LayoutContent*);
 private:
-	void closeEvent ( QCloseEvent * event );
-	void resizeEvent ( QResizeEvent * event);
-	void destroyNavigator(CLLayoutNavigator*& nav);
+    void closeEvent ( QCloseEvent * event );
+    void resizeEvent ( QResizeEvent * event);
+    void destroyNavigator(CLLayoutNavigator*& nav);
 private:
 
-	CLLayoutNavigator* m_topView;
-	CLLayoutNavigator* m_bottomView;
-	CLLayoutNavigator* m_editedView;
+    CLLayoutNavigator* m_topView;
+    CLLayoutNavigator* m_bottomView;
+    CLLayoutNavigator* m_editedView;
 
 };
 

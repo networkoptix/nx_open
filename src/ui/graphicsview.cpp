@@ -1279,7 +1279,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
                     menu.addAction(&cm_start_recording);
                 }
 
-                if (contextMenuHelper_existRecordedVideo(cam))
+                if (contextMenuHelper_existRecordedVideo(cam) && !cam->isRecording())
                     menu.addAction(&cm_view_recorded);
 
                 //menu.addAction(&cm_open_web_page);
@@ -1464,9 +1464,8 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
     {
         if (act == &cm_preferences)
         {
-            PreferencesWindow* preferencesDialog = new PreferencesWindow();
-            preferencesDialog->exec();
-            delete preferencesDialog;
+            PreferencesWindow preferencesDialog(this);
+            preferencesDialog.exec();
         }
         else if (act== &cm_fitinview)
         {
@@ -1538,8 +1537,8 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
             if (act == &cm_editTags)
             {
-                TagsEditDialog dialog(QStringList() << dev->getUniqueId());
-                dialog.setModal(true);
+                TagsEditDialog dialog(QStringList() << dev->getUniqueId(), this);
+                dialog.setWindowModality(Qt::ApplicationModal);
 
                 connect(aitem, SIGNAL(destroyed()), &dialog, SLOT(reject()));
 
@@ -1644,8 +1643,8 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
                     objectIds.append(static_cast<CLVideoWindowItem*>(aitem)->getVideoCam()->getDevice()->getUniqueId());
             }
 
-            TagsEditDialog dialog(objectIds);
-            dialog.setModal(true);
+            TagsEditDialog dialog(objectIds, this);
+            dialog.setWindowModality(Qt::ApplicationModal);
 
             dialog.exec();
         }
@@ -2703,14 +2702,14 @@ void GraphicsView::toggleRecording()
         logo = QPixmap(logoName);
 #endif
         DesktopFileEncoder *desktopEncoder = new DesktopFileEncoder(
-                filePath, 
-                screen, 
-                audioDevice.isNull() ? 0 : &audioDevice, 
-                secondAudioDevice.isNull() ? 0 : &secondAudioDevice, 
-                grabberCaptureMode, 
-                captureCursor, 
-                encodingSize, 
-                quality, 
+                filePath,
+                screen,
+                audioDevice.isNull() ? 0 : &audioDevice,
+                secondAudioDevice.isNull() ? 0 : &secondAudioDevice,
+                grabberCaptureMode,
+                captureCursor,
+                encodingSize,
+                quality,
                 viewport(),
                 logo);
         if (!desktopEncoder->start())
@@ -2797,7 +2796,7 @@ void GraphicsView::toggleRecording()
 
 void GraphicsView::recordingSettings()
 {
-    PreferencesWindow preferencesDialog;
+    PreferencesWindow preferencesDialog(this);
     preferencesDialog.setCurrentTab(3);
     preferencesDialog.exec();
 }
@@ -3018,7 +3017,7 @@ void GraphicsView::contextMenuHelper_addNewLayout()
         else if (m_viewMode==NormalView)
         {
             //=======
-            CLLayoutEditorWnd* editor = new CLLayoutEditorWnd(lc);
+            CLLayoutEditorWnd *editor = new CLLayoutEditorWnd(lc, this);
             editor->setWindowModality(Qt::ApplicationModal);
             editor->exec();
             int result = editor->result();
@@ -3099,7 +3098,7 @@ void GraphicsView::contextMenuHelper_editLayout(CLAbstractSceneItem* wnd)
 
     LayoutContent* content_copy = LayoutContent::coppyLayoutContent(content);
 
-    CLLayoutEditorWnd* editor = new CLLayoutEditorWnd(content);
+    CLLayoutEditorWnd* editor = new CLLayoutEditorWnd(content, this);
     editor->setWindowModality(Qt::ApplicationModal);
     editor->exec();
     int result = editor->result();

@@ -13,7 +13,7 @@ class PreferencesWindow : public QDialog, Ui::PreferencesDialog
     Q_OBJECT
 
 public:
-    PreferencesWindow();
+    PreferencesWindow(QWidget *parent = 0);
     ~PreferencesWindow();
 
     void setCurrentTab(int index);

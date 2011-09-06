@@ -16,9 +16,10 @@ class TimeLine;
 class SliderProxyStyle : public QProxyStyle
 {
 public:
-    SliderProxyStyle(): QProxyStyle()
+    SliderProxyStyle(QStyle *baseStyle = 0) : QProxyStyle(baseStyle)
     {
-        setBaseStyle(qApp->style());
+        if (!baseStyle)
+            setBaseStyle(qApp->style());
     }
 
     int styleHint(StyleHint hint, const QStyleOption *option = 0, const QWidget *widget = 0, QStyleHintReturn *returnData = 0) const

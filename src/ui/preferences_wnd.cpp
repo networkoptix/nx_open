@@ -11,8 +11,8 @@
 extern QString button_layout;
 extern QString button_home;
 
-PreferencesWindow::PreferencesWindow() :
-    QDialog(0, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint)
+PreferencesWindow::PreferencesWindow(QWidget *parent) :
+    QDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint)
 {
     setupUi(this);
 

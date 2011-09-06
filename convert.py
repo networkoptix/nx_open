@@ -16,7 +16,7 @@ from string import Template
 os.path = posixpath
 
 if sys.platform == 'win32':
-    FFMPEG_VERSION = '2011-07-22'
+    FFMPEG_VERSION = '2011-08-29'
 else:
     FFMPEG_VERSION = '2011-05-24'
 
