@@ -24,8 +24,7 @@ public:
 
     explicit GraphicsSlider(QGraphicsItem *parent = 0);
     explicit GraphicsSlider(Qt::Orientation orientation, QGraphicsItem *parent = 0);
-
-    ~GraphicsSlider();
+    virtual ~GraphicsSlider();
 
     QSize sizeHint() const;
     QSize minimumSizeHint() const;
@@ -49,8 +48,6 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
 private:
-//    friend Q_GUI_EXPORT QStyleOptionSlider qt_qsliderStyleOption(GraphicsSlider *slider);
-
     Q_DISABLE_COPY(GraphicsSlider)
     Q_DECLARE_PRIVATE(GraphicsSlider)
 };

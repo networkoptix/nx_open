@@ -909,9 +909,10 @@ void AbstractGraphicsSlider::timerEvent(QTimerEvent *e)
 /*!
     \reimp
 */
-void AbstractGraphicsSlider::wheelEvent(QWheelEvent *e)
+void AbstractGraphicsSlider::wheelEvent(QGraphicsSceneWheelEvent *e)
 {
     Q_D(AbstractGraphicsSlider);
-    e->setAccepted(d->scrollByDelta(e->orientation(), e->modifiers(), e->delta()));
+    e->accept();
+    d->scrollByDelta(e->orientation(), e->modifiers(), e->delta());
 }
 #endif

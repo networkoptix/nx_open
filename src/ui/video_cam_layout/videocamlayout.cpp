@@ -52,10 +52,11 @@ m_editable(false)
 	settings.items = &m_items;
 	settings.left = SCENE_LEFT;
 	settings.top = SCENE_TOP;
-	settings.max_items = 3 * QThread::idealThreadCount();
+	settings.max_items = Settings::instance().maxVideoItems();
+    if (settings.max_items == 0) // special case: Auto
+        settings.max_items = 3 * QThread::idealThreadCount();
 
-    settings.max_items = qMin(settings.max_items, 24);
-    settings.max_items = qMax(settings.max_items, 4);
+    settings.max_items = qBound(4, settings.max_items, 32);
 
 	settings.max_rows = 5;
 	settings.slot_width = SLOT_WIDTH;
