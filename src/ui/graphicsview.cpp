@@ -1282,7 +1282,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
                 if (contextMenuHelper_existRecordedVideo(cam))
                     menu.addAction(&cm_view_recorded);
 
-                menu.addAction(&cm_open_web_page);
+                //menu.addAction(&cm_open_web_page);
             }
 
             if (dev->checkDeviceTypeFlag(CLDevice::ARCHIVE))
