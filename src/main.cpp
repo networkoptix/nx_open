@@ -137,7 +137,9 @@ int main(int argc, char *argv[])
 
     //=========================================================
 
+#ifndef Q_OS_DARWIN
     qApp->setStyle(QLatin1String("Bespin"));
+#endif
 
     qApp->setStyleSheet(QLatin1String(
             "QMenu {\n"

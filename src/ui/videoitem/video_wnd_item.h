@@ -50,6 +50,8 @@ public:
 
     virtual void goToSteadyMode(bool steady, bool instant);
 
+    void saveVideoPhoto();
+
 protected:
 
     QPointF getBestSubItemPos(CLSubItemType type);
@@ -83,6 +85,7 @@ protected:
 
     const CLDeviceVideoLayout* m_videolayout;
     unsigned int m_videonum;
+    static QDir m_lastPhotoDir;
 };
 
 #endif //clgl_draw_h_20_31

@@ -29,6 +29,11 @@ bool CLMouseIgnoreHelper::shouldIgnore() const
 void CLMouseIgnoreHelper::ignoreNextMs(int ms)
 {
     ms-=100;
+
+    if (ms > 500)
+        ms = 500; // never wait more than 500 ms 
+
+
     if (ms<0)
         return;
     

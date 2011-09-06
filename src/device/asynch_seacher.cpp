@@ -29,7 +29,13 @@ CLDeviceList CLDeviceSearcher::result()
 void CLDeviceSearcher::run()
 {
 	bool ip_finished;
+
+        int deviceCount = m_result.size();
+
 	m_result = findNewDevices(ip_finished);
+
+        if (deviceCount != m_result.size())
+            emit newNetworkDevices();
 
 	if (ip_finished)
 	{

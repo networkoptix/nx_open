@@ -7,6 +7,8 @@
 #include "device_plugins/archive/avi_files/avi_strem_reader.h"
 
 //(videoCodecCtx && videoCodecCtx->sample_aspect_ratio.num) ? av_q2d(videoCodecCtx->sample_aspect_ratio) : 1.0f;
+QDir CLVideoWindowItem::m_lastPhotoDir;
+
 
 CLVideoWindowItem::CLVideoWindowItem(GraphicsView* view, const CLDeviceVideoLayout* layout, int max_width, int max_height, QString name) :
     CLImageItem(view, max_width, max_height, name),
@@ -86,6 +88,33 @@ void CLVideoWindowItem::goToSteadyMode(bool steady, bool instant)
 
 }
 
+void CLVideoWindowItem::saveVideoPhoto()
+{
+    QImage screenshot = getVideoCam()->getCamCamDisplay()->getScreenshot();
+    QFileDialog dialog(0, tr("Save video screenshot as"), QString());
+    QStringList filters;
+    filters << tr("PNG (*.png)");
+    filters << tr("JPEG (*.jpg)");
+    dialog.setNameFilters(filters);
+    dialog.setOption(QFileDialog::DontUseNativeDialog, true);
+    dialog.setDirectory(m_lastPhotoDir);
+    dialog.setLabelText(QFileDialog::Accept, tr("Save"));
+    if (dialog.exec() && !dialog.selectedFiles().isEmpty()) 
+    {
+        m_lastPhotoDir = dialog.directory();
+        QString selectedFilter = dialog.selectedFilter();
+        QString screenshotName = dialog.selectedFiles()[0];
+        if (!screenshotName.isEmpty()) {
+            if (!screenshotName.endsWith(".png",Qt::CaseInsensitive) && !screenshotName.endsWith(".jpg",Qt::CaseInsensitive))
+            {
+                int extStart = selectedFilter.indexOf('.');
+                screenshotName += selectedFilter.mid(extStart, 4);
+            }
+            screenshot.save(screenshotName);
+        }
+    }
+}
+
 void CLVideoWindowItem::setItemSelected(bool sel, bool animate, int delay )
 {
     CLImageItem::setItemSelected(sel, animate, delay);
@@ -99,6 +128,8 @@ void CLVideoWindowItem::setItemSelected(bool sel, bool animate, int delay )
 
         getVideoCam()->setQuality(CLStreamreader::CLSHighest, true);
         getVideoCam()->getCamCamDisplay()->playAudio(true);
+
+
     }
     else
     {
@@ -106,6 +137,7 @@ void CLVideoWindowItem::setItemSelected(bool sel, bool animate, int delay )
         getVideoCam()->setQuality(CLStreamreader::CLSNormal, false);
         getVideoCam()->getCamCamDisplay()->playAudio(false);
     }
+
 }
 
 void CLVideoWindowItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)

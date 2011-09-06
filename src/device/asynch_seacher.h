@@ -12,6 +12,8 @@ class CLDeviceServer;
 // it will be moved to recorder I guess 
 class CLDeviceSearcher : public QThread
 {
+    Q_OBJECT
+
 	typedef QList<CLDeviceServer*> ServerList;
 
 public:
@@ -34,8 +36,12 @@ public:
 
 	QMutex all_devices_mtx; // this mutex must be used if deal with all_devices
 
+signals:
+    void newNetworkDevices();
+
 protected:
 	virtual void run();
+
 private:
 	// new here means any device BUT any from all_devices with READY flag 
 	CLDeviceList findNewDevices(bool& ip_finished);

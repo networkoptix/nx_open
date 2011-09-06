@@ -51,6 +51,8 @@ qint64 CLAVIStreamReader::packetTimestamp(AVStream* stream, const AVPacket& pack
 
     if (packet.dts != AV_NOPTS_VALUE)
     {
+        if (packet.dts < firstDts)
+            firstDts = 0; // protect for some invalid streams 
         double ttm = timeBase * (packet.dts - firstDts);
         return qint64(1e+6 * ttm);
     }
@@ -179,6 +181,8 @@ bool CLAVIStreamReader::init()
         return false;
 
     m_lengthMksec = contentLength();
+    if (m_lengthMksec == AV_NOPTS_VALUE)
+        m_lengthMksec = 0;
 
     if (m_formatContext->start_time != AV_NOPTS_VALUE)
         m_startMksec = m_formatContext->start_time;
@@ -394,19 +398,18 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
                     m_bottomIFrameTime = m_currentTime;
                     currentPacket().flags |= AV_REVERSE_BLOCK_START;
                 }
-                if (m_currentTime >= m_topIFrameTime) {
+
+                qint64 seekTime = qMax(0ll, m_bottomIFrameTime - BACKWARD_SEEK_STEP);
+                if (m_currentTime >= m_topIFrameTime && m_currentTime != seekTime) {
                     av_free_packet(&currentPacket());
-                    qint64 seekTime = qMax(0ll, m_bottomIFrameTime - BACKWARD_SEEK_STEP);
                     qint64 tmpVal = m_bottomIFrameTime;
-                    if (m_currentTime != seekTime) {
-                        channeljumpTo(seekTime, 0);
-                        m_topIFrameTime = tmpVal;
-                        return getNextData();
-                    }
-                    else {
-                        m_bottomIFrameTime = m_currentTime;
-                        m_topIFrameTime = m_currentTime + BACKWARD_SEEK_STEP;
-                    }
+                    channeljumpTo(seekTime, 0);
+                    m_topIFrameTime = tmpVal;
+                    return getNextData();
+                }
+                else {
+                    m_bottomIFrameTime = m_currentTime;
+                    m_topIFrameTime = m_currentTime + BACKWARD_SEEK_STEP;
                 }
             }
             else if (m_bottomIFrameTime == -1) {
@@ -514,7 +517,8 @@ bool CLAVIStreamReader::getNextPacket(AVPacket& packet)
 		int err = av_read_frame(m_formatContext, &packet);
 		if (err < 0)
 		{
-
+            if (m_lengthMksec < 200 * 1000)
+                msleep(200); // prevent to fast file walk for very short files.
             destroy();
             m_eof = true;
 
