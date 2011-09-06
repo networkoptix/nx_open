@@ -106,8 +106,6 @@ public:
     bool isActive() const;
     void setActive(bool active);
 
-    void saveVideoPhoto();
-
     static const int DEFAULT_HEIGHT = 60;
 
 protected:
@@ -157,7 +155,6 @@ private:
     qint64 m_currentTime;
     bool m_mouseOver;
     bool m_playing;
-    QDir m_lastPhotoDir;
 
     MyTextItem *m_textItem;
     bool m_active;

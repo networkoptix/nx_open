@@ -417,35 +417,6 @@ void NavigationItem::rewindBackward()
     reader->resumeDataProcessors();
 }
 
-void NavigationItem::saveVideoPhoto()
-{
-    QImage screenshot;
-    QString screenshotName;
-    screenshot = m_camera->getCamCamDisplay()->getScreenshot();
-    QFileDialog dialog(0,tr("Save video screenshot as"), QString());
-    QStringList filters;
-    filters << tr("PNG (*.png)");
-    filters << tr("JPEG (*.jpg)");
-    dialog.setNameFilters(filters);
-    dialog.setOption(QFileDialog::DontUseNativeDialog, true);
-    dialog.setDirectory(m_lastPhotoDir);
-    dialog.setLabelText(QFileDialog::Accept, tr("Save"));
-    if (dialog.exec() && !dialog.selectedFiles().isEmpty()) 
-    {
-        m_lastPhotoDir = dialog.directory();
-        QString selectedFilter = dialog.selectedFilter();
-        screenshotName = dialog.selectedFiles()[0];
-        if (!screenshotName.isEmpty()) {
-            if (!screenshotName.endsWith(".png",Qt::CaseInsensitive) && !screenshotName.endsWith(".jpg",Qt::CaseInsensitive))
-            {
-                int extStart = selectedFilter.indexOf('.');
-                screenshotName += selectedFilter.mid(extStart, 4);
-            }
-            screenshot.save(screenshotName);
-        }
-    }
-}
-
 void NavigationItem::rewindForward()
 {
     setActive(true);
