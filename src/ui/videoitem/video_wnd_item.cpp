@@ -121,8 +121,6 @@ void CLVideoWindowItem::setItemSelected(bool sel, bool animate, int delay )
 
     if (m_selected)
     {
-        saveVideoPhoto();
-
         if (dynamic_cast<CLAbstractArchiveReader*>(getVideoCam()->getStreamreader()))
         {
             getVideoCam()->getCamCamDisplay()->setMTDecoding(true);
