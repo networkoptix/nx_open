@@ -11,6 +11,26 @@
 #include "ui/videoitem/timeslider.h" // SliderProxyStyle
 #include "ui/widgets/styledslider.h"
 
+class VolumeSliderProxyStyle : public SliderProxyStyle
+{
+public:
+    VolumeSliderProxyStyle(QStyle *baseStyle = 0) : SliderProxyStyle(baseStyle) {}
+
+    QRect subControlRect(ComplexControl cc, const QStyleOptionComplex *opt, SubControl sc, const QWidget *widget = 0) const
+    {
+        QRect r = SliderProxyStyle::subControlRect(cc, opt, sc, widget);
+        if (cc == CC_Slider && sc == SC_SliderHandle)
+        {
+            if (qstyleoption_cast<const QStyleOptionSlider *>(opt)->orientation == Qt::Horizontal)
+                r.setWidth(3);
+            else
+                r.setHeight(3);
+        }
+        return r;
+    }
+};
+
+
 VolumeWidget::VolumeWidget(QWidget *parent) :
     QWidget(parent)
 {
@@ -18,7 +38,7 @@ VolumeWidget::VolumeWidget(QWidget *parent) :
 
     m_slider = new StyledSlider(this);
     m_slider->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
-    m_slider->setStyle(SliderProxyStyle::instance());
+    m_slider->setStyle(new VolumeSliderProxyStyle);
     m_slider->setRange(0, 100);
 
     m_button = new MyButton(this);
