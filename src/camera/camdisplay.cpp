@@ -416,7 +416,15 @@ bool CLCamDisplay::processData(CLAbstractData* data)
         {
             if (vd->timestamp - m_lastVideoPacketTime < -MIN_VIDEO_DETECT_JUMP_INTERVAL)
             {
-                if (!(vd->flags & AV_REVERSE_BLOCK_START))
+                if (m_speed < 0) 
+                {
+                    if (!(vd->flags & AV_REVERSE_BLOCK_START) && vd->timestamp - m_lastVideoPacketTime < -MIN_VIDEO_DETECT_JUMP_INTERVAL*3)
+                    {
+                        // I have found avi file where sometimes 290 ms between frames. At reverse mode, bad afterJump affect file very strong
+                        afterJump(vd->timestamp); 
+                    }
+                }
+                else
                     afterJump(vd->timestamp);
             }
             m_lastVideoPacketTime = vd->timestamp;

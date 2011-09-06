@@ -399,17 +399,20 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
                     currentPacket().flags |= AV_REVERSE_BLOCK_START;
                 }
 
-                qint64 seekTime = qMax(0ll, m_bottomIFrameTime - BACKWARD_SEEK_STEP);
-                if (m_currentTime >= m_topIFrameTime && m_currentTime != seekTime) {
-                    av_free_packet(&currentPacket());
-                    qint64 tmpVal = m_bottomIFrameTime;
-                    channeljumpTo(seekTime, 0);
-                    m_topIFrameTime = tmpVal;
-                    return getNextData();
-                }
-                else {
-                    m_bottomIFrameTime = m_currentTime;
-                    m_topIFrameTime = m_currentTime + BACKWARD_SEEK_STEP;
+                if (m_currentTime >= m_topIFrameTime) 
+                {
+                    qint64 seekTime = qMax(0ll, m_bottomIFrameTime - BACKWARD_SEEK_STEP);
+                    if (m_currentTime != seekTime) {
+                        av_free_packet(&currentPacket());
+                        qint64 tmpVal = m_bottomIFrameTime;
+                        channeljumpTo(seekTime, 0);
+                        m_topIFrameTime = tmpVal;
+                        return getNextData();
+                    }
+                    else {
+                        m_bottomIFrameTime = m_currentTime;
+                        m_topIFrameTime = m_currentTime + BACKWARD_SEEK_STEP;
+                    }
                 }
             }
             else if (m_bottomIFrameTime == -1) {
