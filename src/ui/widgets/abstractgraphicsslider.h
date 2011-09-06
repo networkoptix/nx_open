@@ -105,7 +105,7 @@ protected:
     void keyPressEvent(QKeyEvent *ev);
     void timerEvent(QTimerEvent *);
 #ifndef QT_NO_WHEELEVENT
-    void wheelEvent(QWheelEvent *e);
+    void wheelEvent(QGraphicsSceneWheelEvent *e);
 #endif
 
 protected:
