@@ -1279,7 +1279,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
                     menu.addAction(&cm_start_recording);
                 }
 
-                if (contextMenuHelper_existRecordedVideo(cam))
+                if (contextMenuHelper_existRecordedVideo(cam) && !cam->isRecording())
                     menu.addAction(&cm_view_recorded);
 
                 //menu.addAction(&cm_open_web_page);
@@ -2703,14 +2703,14 @@ void GraphicsView::toggleRecording()
         logo = QPixmap(logoName);
 #endif
         DesktopFileEncoder *desktopEncoder = new DesktopFileEncoder(
-                filePath, 
-                screen, 
-                audioDevice.isNull() ? 0 : &audioDevice, 
-                secondAudioDevice.isNull() ? 0 : &secondAudioDevice, 
-                grabberCaptureMode, 
-                captureCursor, 
-                encodingSize, 
-                quality, 
+                filePath,
+                screen,
+                audioDevice.isNull() ? 0 : &audioDevice,
+                secondAudioDevice.isNull() ? 0 : &secondAudioDevice,
+                grabberCaptureMode,
+                captureCursor,
+                encodingSize,
+                quality,
                 viewport(),
                 logo);
         if (!desktopEncoder->start())
