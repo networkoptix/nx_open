@@ -109,8 +109,7 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
     m_pageSelector(0),
     m_gridItem(0),
     m_menuIsHere(false),
-    m_lastPressedItem(0),
-    m_inputBlocked(false)
+    m_lastPressedItem(0)
 {
     setScene(&m_scene);
     //scene()->setStyle(..); // scene-specific style
@@ -386,8 +385,6 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
     if (!mViewStarted)
         return;
 
-    if (m_inputBlocked)
-        return;
 
     if (onUserInput(true, true))
         return;
@@ -696,9 +693,6 @@ void GraphicsView::stopAnimation()
 void GraphicsView::mousePressEvent ( QMouseEvent * event)
 {
     if (!mViewStarted)
-        return;
-
-    if (m_inputBlocked)
         return;
 
     if (m_ignoreMouse.shouldIgnore())
@@ -1452,11 +1446,9 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
     }
 
     m_menuIsHere = true;
-    m_inputBlocked = true;
-    m_blockingTimer.stop();
     QAction* act = menu.exec(QCursor::pos());
-    m_blockingTimer.singleShot(100, this, SLOT(unblockInput()));
     m_menuIsHere = false;
+    m_ignoreMouse.ignoreNextMs(500);
 
     //=========results===============================
 
@@ -1716,9 +1708,6 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 void GraphicsView::mouseDoubleClickEvent( QMouseEvent * event )
 {
     if (!mViewStarted)
-        return;
-
-    if (m_inputBlocked)
         return;
 
     m_ignoreMouse.ignoreNextMs(doubl_clk_delay);
@@ -3388,7 +3377,3 @@ void GraphicsView::contextMenuHelper_restoreLayout()
     emit onNewLayoutSelected(0, m_camLayout.getContent());
 }
 
-void GraphicsView::unblockInput()
-{
-    m_inputBlocked = false;
-}
