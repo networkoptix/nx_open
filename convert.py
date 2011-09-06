@@ -295,7 +295,7 @@ bespin_path = 'contrib/bespin/bin/'
 if sys.platform == 'win32':
     bespin = 'msvc-x86'
 elif sys.platform == 'darwin':
-    bespin = 'mac-x64'
+    bespin = 'mac-x86'
 else:
     bespin = 'linux-x86'
 bespin_path = os.path.join(bespin_path, bespin)
@@ -311,14 +311,14 @@ if not os.path.isdir(bespin_path):
     if sys.platform == 'win32':
         os.system('cd %s && qmake -r ../../contrib/bespin/bespin.pro && nmake /S && cd ../..' % tmp_build_dir)
     else:
-        os.system('cd %s && qmake -r ../../contrib/bespin/bespin.pro && make && cd ../..' % tmp_build_dir)
+        os.system('cd %s && qmake -spec macx-g++ CONFIG+=x86 -r ../../contrib/bespin/bespin.pro && make -j8 && cd ../..' % tmp_build_dir)
 
-    if os.path.exists(tmp_build_dir):
-        rmtree(tmp_build_dir)
+#    if os.path.exists(tmp_build_dir):
+#        rmtree(tmp_build_dir)
 
 if os.path.isdir(bespin_path):
     ### copy bespin_path/* to bin recursively ?
     os.mkdir('bin/release/styles')
     os.mkdir('bin/debug/styles')
-    copy_files(bespin_path + '/release/styles/*.dll', 'bin/release/styles')
-    copy_files(bespin_path + '/debug/styles/*.dll', 'bin/debug/styles')
+    copy_files(bespin_path + '/release/styles/*', 'bin/release/styles')
+    copy_files(bespin_path + '/debug/styles/*', 'bin/debug/styles')

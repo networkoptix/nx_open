@@ -34,6 +34,7 @@ PreferencesWindow::PreferencesWindow() :
     updateView();
     updateCameras();
 
+    connect(&CLDeviceManager::instance().getDeviceSearcher(), SIGNAL(newNetworkDevices()), this, SLOT(updateCameras()));
     //setWindowOpacity(.90);
 
     resizeEvent(0);
@@ -130,6 +131,7 @@ void PreferencesWindow::updateCameras()
         CLDeviceSearcher& searcher = CLDeviceManager::instance().getDeviceSearcher();
         QMutexLocker lock(&searcher.all_devices_mtx);
 
+        cl_log.log("Updating camera list", cl_logALWAYS);
         CLDeviceList& devices =  searcher.getAllDevices();
         m_cameras.clear();
         foreach(CLDevice *device, devices.values())

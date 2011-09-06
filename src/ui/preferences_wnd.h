@@ -22,7 +22,6 @@ private:
     void resizeEvent (QResizeEvent * event);
 
     void updateView();
-    void updateCameras();
 
     QString cameraInfoString(CLDevice *device);
 
@@ -35,6 +34,8 @@ private:
     QList<CameraNameAndInfo> m_cameras;
 
 private slots:
+    void updateCameras();
+
     void accept();
     void mainMediaFolderBrowse();
     void auxMediaFolderBrowse();
