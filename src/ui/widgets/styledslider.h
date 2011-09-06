@@ -11,7 +11,7 @@ public:
     explicit StyledSlider(QWidget *parent = 0);
     ~StyledSlider();
 
-    QString valueTex() const;
+    QString valueText() const;
     void setValueText(const QString &text);
 
 protected:

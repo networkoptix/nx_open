@@ -21,7 +21,7 @@ StyledSlider::~StyledSlider()
     }
 }
 
-QString StyledSlider::valueTex() const
+QString StyledSlider::valueText() const
 {
     return m_text;
 }
