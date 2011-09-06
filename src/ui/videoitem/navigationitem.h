@@ -106,7 +106,7 @@ public:
     bool isActive() const;
     void setActive(bool active);
 
-    static const int DEFAULT_HEIGHT = 60;
+    static const int DEFAULT_HEIGHT = 70;
 
 protected:
     void timerEvent(QTimerEvent* event);
