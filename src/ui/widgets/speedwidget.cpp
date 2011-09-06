@@ -47,7 +47,6 @@ SpeedSlider::SpeedSlider(QWidget *parent)
     setRange(0, fixedSpeedSetSize * 10);
     setSingleStep(10);
     setPageStep(10);
-    setTickPosition(QSlider::TicksBelow);
     setTickInterval(10);
 
     resetSpeed();
@@ -135,11 +134,11 @@ SpeedWidget::SpeedWidget(QWidget *parent) :
     installEventFilter(this);
 
     m_slider = new SpeedSlider(this);
-//    m_slider->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
+    m_slider->setTickPosition(QSlider::TicksAbove);
 m_slider->setMinimumWidth(220); // ### otherwise width bounded to 84... wtf?
 
     connect(m_slider, SIGNAL(speedChanged(float)), this, SIGNAL(speedChanged(float)));
-
+/*
     m_leftButton = new QToolButton(this);
     m_leftButton->setIcon(QIcon(QLatin1String(":/skin/left-arrow.png")));
     m_leftButton->setIconSize(QSize(12, 12));
@@ -152,13 +151,13 @@ m_slider->setMinimumWidth(220); // ### otherwise width bounded to 84... wtf?
 
     connect(m_leftButton, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
     connect(m_rightButton, SIGNAL(clicked()), this, SLOT(onButtonClicked()));
-
+*/
     QHBoxLayout *layout = new QHBoxLayout;
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(3);
-    layout->addWidget(m_leftButton, 0, Qt::AlignCenter);
+//    layout->addWidget(m_leftButton, 0, Qt::AlignCenter);
     layout->addWidget(m_slider, 1, Qt::AlignCenter);
-    layout->addWidget(m_rightButton, 0, Qt::AlignCenter);
+//    layout->addWidget(m_rightButton, 0, Qt::AlignCenter);
     setLayout(layout);
 }
 
@@ -194,7 +193,7 @@ void SpeedWidget::paintEvent(QPaintEvent *)
     static QPixmap pix = QPixmap(":/skin/volume_slider_background.png");
 
     QPainter p(this);
-    p.drawPixmap(contentsRect(), pix);
+    p.drawPixmap(rect(), pix);
 }
 
 void SpeedWidget::onButtonClicked()

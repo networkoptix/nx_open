@@ -15,6 +15,9 @@ public:
     MainWnd(int argc, char* argv[], QWidget *parent = 0, Qt::WFlags flags = 0);
     ~MainWnd();
 
+    static void findAcceptedFiles(QStringList& files, const QString& path);
+    static MainWnd* instance() { return m_instance; }
+    void addFilesToCurrentOrNewLayout(const QStringList& files, bool forceNewLayout = false);
 private slots:
     void handleMessage(const QString& message);
 
@@ -25,11 +28,11 @@ private:
     void dragEnterEvent(QDragEnterEvent *event);
     void dropEvent(QDropEvent *event);
 
-    void addFilesToCurrentOrNewLayout(const QStringList& files, bool forceNewLayout = false);
     void activate();
 
 private:
     CLLayoutNavigator* m_normalView;
+    static MainWnd* m_instance;
 };
 
 #endif // MAINWND_H
