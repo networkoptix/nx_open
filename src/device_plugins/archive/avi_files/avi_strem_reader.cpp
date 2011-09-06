@@ -179,6 +179,8 @@ bool CLAVIStreamReader::init()
         return false;
 
     m_lengthMksec = contentLength();
+    if (m_lengthMksec == AV_NOPTS_VALUE)
+        m_lengthMksec = 0;
 
     if (m_formatContext->start_time != AV_NOPTS_VALUE)
         m_startMksec = m_formatContext->start_time;
@@ -514,7 +516,8 @@ bool CLAVIStreamReader::getNextPacket(AVPacket& packet)
 		int err = av_read_frame(m_formatContext, &packet);
 		if (err < 0)
 		{
-
+            if (m_lengthMksec < 200 * 1000)
+                msleep(200); // prevent to fast file walk for very short files.
             destroy();
             m_eof = true;
 
