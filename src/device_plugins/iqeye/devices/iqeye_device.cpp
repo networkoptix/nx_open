@@ -112,12 +112,17 @@ void CLIQEyeDevice::findDevices(CLDeviceList& result)
         QHostAddress groupAddress(QLatin1String("224.0.0.251"));
         quint16 MDNS_PORT = 5353;
 
-        std::string localAddressString = localAddress.toString().toStdString();
-        std::string groupAddressString = groupAddress.toString().toStdString();
+        QUdpSocket sendSocket, recvSocket;
 
-        QUdpSocket udpSocket;
-        udpSocket.bind(localAddress, MDNS_PORT, QUdpSocket::ReuseAddressHint | QUdpSocket::ShareAddress);
-        if (!multicastJoinGroup(udpSocket, groupAddress, localAddress))
+        bool bindSucceeded = sendSocket.bind(localAddress, 0);
+        if (!bindSucceeded)
+            continue;
+
+        bindSucceeded = recvSocket.bind(QHostAddress::Any, MDNS_PORT, QUdpSocket::ReuseAddressHint | QUdpSocket::ShareAddress);
+        if (!bindSucceeded)
+            continue;
+
+        if (!multicastJoinGroup(recvSocket, groupAddress, localAddress))
             continue;
 
         MDNSPacket request;
@@ -128,22 +133,22 @@ void CLIQEyeDevice::findDevices(CLDeviceList& result)
         QByteArray datagram;
         request.toDatagram(datagram);
 
-        udpSocket.writeDatagram(datagram.data(), datagram.size(), groupAddress, MDNS_PORT);
+        sendSocket.writeDatagram(datagram.data(), datagram.size(), groupAddress, MDNS_PORT);
 
         QTime time;
         time.start();
 
         while(time.elapsed() < 150)
         {
-            while (udpSocket.hasPendingDatagrams())
+            while (recvSocket.hasPendingDatagrams())
             {
                 QByteArray responseData;
-                responseData.resize(udpSocket.pendingDatagramSize());
+                responseData.resize(recvSocket.pendingDatagramSize());
 
                 QHostAddress sender;
                 quint16 senderPort;
 
-                udpSocket.readDatagram(responseData.data(), responseData.size(),	&sender, &senderPort);
+                recvSocket.readDatagram(responseData.data(), responseData.size(),	&sender, &senderPort);
                 //cl_log.log(cl_logALWAYS, "size: %d\n", responseData.size());
                 if (senderPort != MDNS_PORT || sender == localAddress)
                     continue;
@@ -206,6 +211,6 @@ void CLIQEyeDevice::findDevices(CLDeviceList& result)
             CLSleep::msleep(2); // to avoid 100% cpu usage
         }
 
-         multicastLeaveGroup(udpSocket, groupAddress);
+         multicastLeaveGroup(recvSocket, groupAddress);
     }
 }

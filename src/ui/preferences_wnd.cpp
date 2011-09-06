@@ -217,6 +217,9 @@ void PreferencesWindow::auxMediaFolderRemove()
 
 void PreferencesWindow::cameraSelected(int row)
 {
+    if (row < 0 || row >= m_cameras.size())
+        return;
+
     cameraInfoLabel->setText(m_cameras[row].second);
 }
 
