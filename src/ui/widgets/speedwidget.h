@@ -1,12 +1,36 @@
 #ifndef SPEEDWIDGET_H
 #define SPEEDWIDGET_H
 
+#include <QtGui/QSlider>
 #include <QtGui/QWidget>
 
-class QSlider;
+class QPropertyAnimation;
 class QToolButton;
 
-class StyledSlider;
+class SpeedSlider : public QSlider
+{
+    Q_OBJECT
+
+public:
+    explicit SpeedSlider(QWidget *parent = 0);
+    ~SpeedSlider();
+
+Q_SIGNALS:
+    void speedChanged(float newSpeed);
+
+public Q_SLOTS:
+    void resetSpeed();
+
+protected:
+    void paintEvent(QPaintEvent *ev);
+    void mouseReleaseEvent(QMouseEvent *ev);
+
+    void sliderChange(SliderChange change);
+
+private:
+    QPropertyAnimation *m_animation;
+};
+
 
 class SpeedWidget : public QWidget
 {
@@ -14,8 +38,6 @@ class SpeedWidget : public QWidget
 
 public:
     explicit SpeedWidget(QWidget *parent = 0);
-
-    QSlider *slider() const;
 
     QSize sizeHint() const;
 
@@ -30,11 +52,10 @@ protected:
     void paintEvent(QPaintEvent *);
 
 private Q_SLOTS:
-    void onValueChanged(int);
     void onButtonClicked();
 
 private:
-    StyledSlider *m_slider;
+    SpeedSlider *m_slider;
     QToolButton *m_leftButton;
     QToolButton *m_rightButton;
 };
