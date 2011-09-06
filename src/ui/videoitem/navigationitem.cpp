@@ -190,16 +190,19 @@ NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
 
     QGraphicsLinearLayout *buttonsLayout = new QGraphicsLinearLayout;
     buttonsLayout->setContentsMargins(0, 0, 0, 0);
-    buttonsLayout->addItem(m_stepBackwardButton);
-    buttonsLayout->setAlignment(m_stepBackwardButton, Qt::AlignHCenter | Qt::AlignVCenter);
+    /*buttonsLayout->addItem(m_stepBackwardButton);
+    buttonsLayout->setAlignment(m_stepBackwardButton, Qt::AlignHCenter | Qt::AlignVCenter);*/
     buttonsLayout->addItem(m_backwardButton);
     buttonsLayout->setAlignment(m_backwardButton, Qt::AlignHCenter | Qt::AlignVCenter);
     buttonsLayout->addItem(m_playButton);
     buttonsLayout->setAlignment(m_playButton, Qt::AlignHCenter | Qt::AlignVCenter);
     buttonsLayout->addItem(m_forwardButton);
     buttonsLayout->setAlignment(m_forwardButton, Qt::AlignHCenter | Qt::AlignVCenter);
-    buttonsLayout->addItem(m_stepForwardButton);
-    buttonsLayout->setAlignment(m_stepForwardButton, Qt::AlignHCenter | Qt::AlignVCenter);
+    /*buttonsLayout->addItem(m_stepForwardButton);
+    buttonsLayout->setAlignment(m_stepForwardButton, Qt::AlignHCenter | Qt::AlignVCenter);*/
+
+    m_stepBackwardButton->hide();
+    m_stepForwardButton->hide();
 
     m_speedWidget = new SpeedWidget;
     m_speedWidget->setObjectName("SpeedWidget");
@@ -212,10 +215,10 @@ NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
     linearLayoutV->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
     linearLayoutV->setContentsMargins(0, 0, 0, 0);
     linearLayoutV->setSpacing(0);
-    linearLayoutV->addItem(buttonsLayout);
-    linearLayoutV->setAlignment(buttonsLayout, Qt::AlignCenter);
     linearLayoutV->addItem(speedProxyWidget);
     linearLayoutV->setAlignment(speedProxyWidget, Qt::AlignTop);
+    linearLayoutV->addItem(buttonsLayout);
+    linearLayoutV->setAlignment(buttonsLayout, Qt::AlignCenter);
 
     QGraphicsLinearLayout *mainLayout = new QGraphicsLinearLayout;
     mainLayout->setContentsMargins(0, 0, 0, 0);
@@ -341,7 +344,7 @@ void NavigationItem::updateSlider()
     qint64 length = reader->lengthMksec()/1000;
     m_widget->slider()->setMaximumValue(length);
 
-    
+
     quint64 time = m_camera->currentTime();
     if (time != AV_NOPTS_VALUE)
     {
