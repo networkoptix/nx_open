@@ -8,7 +8,8 @@ Release
 *.sln
 *.ncb
 *.suo
-*.pro
+src/uniclient.pro
+test/uniclient_tests.pro
 *.user
 src/uniclient.vcproj
 src/uniclient.xcodeproj
