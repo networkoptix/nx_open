@@ -14,7 +14,9 @@
 extern QString button_layout;
 extern QString button_home;
 
-void findAcceptedFiles(QStringList& files, const QString& path)
+MainWnd* MainWnd::m_instance = 0;
+
+void MainWnd::findAcceptedFiles(QStringList& files, const QString& path)
 {
     if (CLAviDvdDevice::isAcceptedUrl(path))
     {
@@ -66,6 +68,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WFlags flags):
 //QMainWindow(parent, flags),
 m_normalView(0)
 {
+    m_instance = this;
     Q_UNUSED(parent);
     Q_UNUSED(flags);
 

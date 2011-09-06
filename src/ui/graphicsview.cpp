@@ -109,8 +109,17 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
     m_pageSelector(0),
     m_gridItem(0),
     m_menuIsHere(false),
-    m_lastPressedItem(0)
+    m_lastPressedItem(0),
+    m_openMediaDialog(0, tr("Open media file"), QString())
 {
+    QStringList filters;
+    filters << tr("Video (*.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)");
+    filters << tr("Pictures (*.jpg *.png *.gif *.bmp *.tiff)");
+    filters << tr("All files (*.*)");
+    m_openMediaDialog.setNameFilters(filters);
+    m_openMediaDialog.setOption(QFileDialog::DontUseNativeDialog, true);
+    m_openMediaDialog.setFileMode(QFileDialog::ExistingFiles);
+
     setScene(&m_scene);
     //scene()->setStyle(..); // scene-specific style
 
@@ -188,6 +197,13 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
     cm_start_video_recording.setShortcuts(QList<QKeySequence>() << tr("Alt+R") << Qt::Key_MediaRecord);
     cm_start_video_recording.setShortcutContext(Qt::ApplicationShortcut);
     addAction(&cm_start_video_recording);
+
+    connect(&cm_open_file, SIGNAL(triggered()), SLOT(onOpenFile()));
+    cm_open_file.setShortcuts(QList<QKeySequence>() << tr("Ctrl+O"));
+    cm_open_file.setShortcutContext(Qt::ApplicationShortcut);
+    addAction(&cm_open_file);
+
+
     connect(&cm_recording_settings, SIGNAL(triggered()), SLOT(recordingSettings()));
 
 #ifdef Q_OS_MAC
@@ -3376,3 +3392,15 @@ void GraphicsView::contextMenuHelper_restoreLayout()
     emit onNewLayoutSelected(0, m_camLayout.getContent());
 }
 
+void GraphicsView::onOpenFile()
+{
+    if (m_openMediaDialog.exec() && !m_openMediaDialog.selectedFiles().isEmpty()) 
+    {
+        QString selectedFilter = m_openMediaDialog.selectedFilter();
+        QStringList srcFiles = m_openMediaDialog.selectedFiles();
+        QStringList dstFiles;
+        foreach (QString file, srcFiles) 
+            MainWnd::findAcceptedFiles(dstFiles, file);
+        MainWnd::instance()->addFilesToCurrentOrNewLayout(dstFiles);
+    }
+}

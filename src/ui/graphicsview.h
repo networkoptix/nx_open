@@ -176,9 +176,10 @@ private slots:
     void toggleFullScreen();
 
     void on_grid_drop_animation_finished();
+    void onOpenFile();
 
 protected:
-
+    QFileDialog m_openMediaDialog;
     QGraphicsScene m_scene;
     SceneLayout m_camLayout;
 
