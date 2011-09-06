@@ -28,6 +28,7 @@ extern QAction cm_start_recording;
 extern QAction cm_stop_recording;
 extern QAction cm_view_recorded;
 extern QAction cm_save_recorded_as;
+extern QAction cm_take_screenshot;
 extern QAction cm_open_web_page;
 
 extern QMenu distance_menu;

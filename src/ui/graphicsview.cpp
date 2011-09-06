@@ -1301,6 +1301,11 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
                 //menu.addAction(&cm_open_web_page);
             }
 
+            if (dev->checkDeviceTypeFlag(CLDevice::NETWORK) || dev->checkDeviceTypeFlag(CLDevice::ARCHIVE) || dev->checkDeviceTypeFlag(CLDevice::RECORDED))
+            {
+                menu.addAction(&cm_take_screenshot);
+            }
+
             if (dev->checkDeviceTypeFlag(CLDevice::ARCHIVE))
             {
                 CLAbstractArchiveReader* reader = static_cast<CLAbstractArchiveReader*>(cam->getStreamreader());
@@ -1585,6 +1590,9 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
             if (act == &cm_save_recorded_as && cam)
                 contextMenuHelper_saveRecordedAs(cam);
+
+            if (act == &cm_take_screenshot && cam)
+                contextMenuHelper_takeScreenshot(cam);
 
             if (act == &cm_open_web_page&& cam)
                 contextMenuHelper_openInWebBroser(cam);
@@ -2774,31 +2782,35 @@ void GraphicsView::toggleRecording()
         QString recordedFileName = desktopEncoder->fileName();
         desktopEncoder->stop();
 
+        QString suggetion = QFileInfo(recordedFileName).fileName();
+        if (suggetion.isEmpty())
+            suggetion = tr("recorded_video");
+
         QSettings settings;
         settings.beginGroup(QLatin1String("videoRecording"));
 
         QString previousDir = settings.value(QLatin1String("previousDir")).toString();
-        QString filePath = QFileDialog::getSaveFileName(this,
-                                                        tr("Save Recording As"),
-                                                        previousDir,
+        QString selectedFilter;
+        QString filePath = QFileDialog::getSaveFileName(this, tr("Save Recording As..."),
+                                                        previousDir + QLatin1Char('/') + suggetion,
                                                         tr("Transport Stream (*.ts)"),
-                                                        0,
+                                                        &selectedFilter,
                                                         QFileDialog::DontUseNativeDialog);
 
         delete desktopEncoder;
 
         if (!filePath.isEmpty()) {
             if (!filePath.endsWith(QLatin1String(".ts"), Qt::CaseInsensitive))
-                filePath += QLatin1String(".ts");
+                filePath += selectedFilter.mid(selectedFilter.indexOf(QLatin1Char('.')), 3);
             QFile::remove(filePath);
-            bool result = QFile::rename(recordedFileName, filePath);
-            if (!result) {
-                // handle error
+            if (!QFile::rename(recordedFileName, filePath))
+            {
+                // ### handle errors
                 QFile::remove(recordedFileName);
             }
             CLDeviceManager::instance().addFiles(QStringList() << filePath);
 
-            settings.setValue(QLatin1String("previousDir"), QFileInfo(filePath).path());
+            settings.setValue(QLatin1String("previousDir"), QFileInfo(filePath).absolutePath());
         }
         else
         {
@@ -3202,6 +3214,44 @@ void GraphicsView::contextMenuHelper_saveRecordedAs(CLVideoCamera* cam)
     rreader->setRecordedDataDst(name);
 }
 
+void GraphicsView::contextMenuHelper_takeScreenshot(CLVideoCamera* cam)
+{
+    QImage screenshot = cam->getCamCamDisplay()->getScreenshot();
+    if (screenshot.isNull())
+        return;
+
+    QString suggetion = tr("screenshot");
+
+    QSettings settings;
+    settings.beginGroup(QLatin1String("screenshots"));
+
+    QString previousDir = settings.value(QLatin1String("previousDir")).toString();
+    QString selectedFilter;
+    QString filePath = QFileDialog::getSaveFileName(this, tr("Save Video Screenshot As..."),
+                                                    previousDir + QLatin1Char('/') + suggetion,
+                                                    tr("PNG Image (*.png);;JPEG Image(*.jpg)"),
+                                                    &selectedFilter,
+                                                    QFileDialog::DontUseNativeDialog);
+
+    if (!filePath.isEmpty()) {
+        if (!filePath.endsWith(QLatin1String(".png"), Qt::CaseInsensitive)
+            && !filePath.endsWith(QLatin1String(".jpg"), Qt::CaseInsensitive))
+        {
+            filePath += selectedFilter.mid(selectedFilter.indexOf(QLatin1Char('.')), 4);
+        }
+        QFile::remove(filePath);
+        if (!screenshot.save(filePath))
+        {
+            // ### handle errors
+        }
+        CLDeviceManager::instance().addFiles(QStringList() << filePath);
+
+        settings.setValue(QLatin1String("previousDir"), QFileInfo(filePath).absolutePath());
+    }
+
+    settings.endGroup();
+}
+
 void GraphicsView::contextMenuHelper_openInWebBroser(CLVideoCamera* cam)
 {
     CLNetworkDevice* net_device = static_cast<CLNetworkDevice*>(cam->getDevice());
@@ -3394,12 +3444,12 @@ void GraphicsView::contextMenuHelper_restoreLayout()
 
 void GraphicsView::onOpenFile()
 {
-    if (m_openMediaDialog.exec() && !m_openMediaDialog.selectedFiles().isEmpty()) 
+    if (m_openMediaDialog.exec() && !m_openMediaDialog.selectedFiles().isEmpty())
     {
         QString selectedFilter = m_openMediaDialog.selectedFilter();
         QStringList srcFiles = m_openMediaDialog.selectedFiles();
         QStringList dstFiles;
-        foreach (QString file, srcFiles) 
+        foreach (QString file, srcFiles)
             MainWnd::findAcceptedFiles(dstFiles, file);
         MainWnd::instance()->addFilesToCurrentOrNewLayout(dstFiles);
     }
