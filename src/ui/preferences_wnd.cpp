@@ -20,7 +20,7 @@ PreferencesWindow::PreferencesWindow(QWidget *parent) :
     tabWidget->removeTab(tabWidget->indexOf(licenseTab));
 #endif
 
-    creditsLabel->setText(creditsLabel->text().replace(QLatin1String("QT_VERSION"), QLatin1String(QT_VERSION_STR)));
+    creditsLabel->setText(creditsLabel->text().replace(QLatin1String("QT_VERSION"), QLatin1String(QT_VERSION_STR)).replace(QLatin1String("FFMPEG_VERSION"), QLatin1String(FFMPEG_VERSION)));
     Settings::instance().fillData(m_settingsData);
 
     setWindowTitle(tr("Preferences Editor"));

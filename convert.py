@@ -13,6 +13,8 @@ from StringIO import StringIO
 from filetypes import all_filetypes, video_filetypes, image_filetypes
 from string import Template
 
+import re
+
 os.path = posixpath
 
 if sys.platform == 'win32':
@@ -181,6 +183,8 @@ def generate_info_plist():
 def gen_version_h():
     revision = os.popen('hg id -i').read().strip()
 
+    ffmpeg_version = re.search(r'(N-[^\s]*)', os.popen(ffmpeg_path_release + '/bin/ffmpeg -version').read()).groups()[0]
+
     version_h = open('src/version.h', 'w')
     print >> version_h, '#ifndef UNIVERSAL_CLIENT_VERSION_H_'
     print >> version_h, '#define UNIVERSAL_CLIENT_VERSION_H_'
@@ -189,6 +193,7 @@ def gen_version_h():
     print >> version_h, 'const char* const APPLICATION_NAME="%s";' % APPLICATION_NAME
     print >> version_h, 'const char* const APPLICATION_VERSION="%s";' % APPLICATION_VERSION
     print >> version_h, 'const char* const APPLICATION_REVISION="%s";' % revision
+    print >> version_h, 'const char* const FFMPEG_VERSION="%s";' % ffmpeg_version
     print >> version_h, ''
 
     print >> version_h, '// There constans are here for windows resouce file.'
