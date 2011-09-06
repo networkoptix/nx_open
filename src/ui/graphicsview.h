@@ -176,7 +176,6 @@ private slots:
     void toggleFullScreen();
 
     void on_grid_drop_animation_finished();
-    void unblockInput();
 
 protected:
 
@@ -253,8 +252,6 @@ protected:
 
     QPointer<NavigationItem> m_navigationItem;
 
-    bool m_inputBlocked;
-    QTimer m_blockingTimer;
 
 private:
     void removeFileDeviceItem(CLDeviceSearcher& deviceSearcher, CLAbstractSceneItem* aitem);

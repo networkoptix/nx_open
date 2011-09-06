@@ -33,6 +33,7 @@ public:
     qint64 getLastDisplayedTime() const;
     void setLastDisplayedTime(qint64 value);
     void afterJump();
+    QImage getScreenshot();
 private:
     QMutex m_mtx;
     mutable QMutex m_timeMutex;
