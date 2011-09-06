@@ -448,9 +448,6 @@ void NavigationItem::saveVideoPhoto()
 
 void NavigationItem::rewindForward()
 {
-    saveVideoPhoto();
-    return;
-
     setActive(true);
     CLAbstractArchiveReader *reader = static_cast<CLAbstractArchiveReader*>(m_camera->getStreamreader());
 
