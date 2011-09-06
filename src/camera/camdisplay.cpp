@@ -112,6 +112,7 @@ void CLCamDisplay::pause()
 
 void CLCamDisplay::resume()
 {
+    m_delay.afterdelay();
     m_singleShotMode = false;
     m_audioDisplay->resume();
     CLAbstractDataProcessor::resume();
@@ -410,6 +411,8 @@ bool CLCamDisplay::processData(CLAbstractData* data)
         int channel = vd ? vd->channelNumber : 0;
         if (flushCurrentBuffer)
         {
+            if (m_singleShotMode && m_singleShotQuantProcessed)
+                return false;
             vd = 0;
         }
         else
