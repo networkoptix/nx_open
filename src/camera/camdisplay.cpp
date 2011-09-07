@@ -143,11 +143,13 @@ QImage CLCamDisplay::getScreenshot()
     QImage rez(totalWidth, screens.first().height(), QImage::Format_ARGB32);
     QPainter p(&rez);
     p.setCompositionMode(QPainter::CompositionMode_Source);
-    int x = 0;
-    foreach(QImage img, screens) 
+    
+    p.drawImage(QPoint(0, 0), screens[0]);
+    int x = screens[0].width();
+    for (int i = screens.size()-1; i > 0; --i)
     {
-        p.drawImage(QPoint(x, 0), img);
-        x += img.width();
+        p.drawImage(QPoint(x, 0), screens[i]);
+        x += screens[i].width();
     }
     p.end();
 
