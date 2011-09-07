@@ -44,7 +44,7 @@ SpeedSlider::SpeedSlider(QWidget *parent)
 //    setMinimumHeight(sliderHeigth + 2);
 
     setStyle(new SpeedSliderProxyStyle);
-    setRange(0, fixedSpeedSetSize * 10);
+    setRange(0, fixedSpeedSetSize * 10 - 1);
     setSingleStep(10);
     setPageStep(10);
     setTickInterval(10);
