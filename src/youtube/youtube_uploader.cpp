@@ -396,7 +396,10 @@ void YouTubeUploader::slotError(QNetworkReply::NetworkError err)
     if (QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender()))
         m_errorString = reply->errorString();
     if (m_state == State_Unauthorized && m_errorString.toLower().contains(QLatin1String("forbidden")))
+    {
         m_errorString = tr("Invalid user name or password");
+        QMetaObject::invokeMethod(this, "authFailed", Qt::QueuedConnection);
+    }
 }
 
 void YouTubeUploader::slotSslErrors(QList<QSslError> list)
@@ -411,6 +414,8 @@ void YouTubeUploader::slotSslErrors(QList<QSslError> list)
     if (!list.isEmpty()) {
         m_errorCode = list[0].error();
         m_errorString = list[0].errorString();
+        if (m_state == State_Unauthorized)
+            QMetaObject::invokeMethod(this, "authFailed", Qt::QueuedConnection);
     }
 }
 
