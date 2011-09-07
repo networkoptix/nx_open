@@ -337,6 +337,11 @@ bool CLCamDisplay::processData(CLAbstractData* data)
         }
     }
 
+    bool isReversePacket = media->flags & AV_REVERSE_PACKET;
+    bool isReverseMode = speed < 0.0;
+    if (isReverseMode != isReversePacket)
+        return true;
+
     bool flushCurrentBuffer = false;
     bool audioParamsChanged = ad && m_playingFormat != ad->format;
     if (((media->flags & CLAbstractMediaData::MediaFlags_AfterEOF) || audioParamsChanged) &&

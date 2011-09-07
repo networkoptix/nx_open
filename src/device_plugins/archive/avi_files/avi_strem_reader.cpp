@@ -78,7 +78,8 @@ CLAVIStreamReader::CLAVIStreamReader(CLDevice* dev ) :
     m_prevReverseMode(false),
     m_topIFrameTime(-1),
     m_bottomIFrameTime(-1),
-    m_frameTypeExtractor(0)
+    m_frameTypeExtractor(0),
+    m_lastGopSeekTime(-1)
 {
     // Should init packets here as some times destroy (av_free_packet) could be called before init
     av_init_packet(&m_packets[0]);
@@ -342,6 +343,7 @@ bool CLAVIStreamReader::getNextVideoPacket()
 
 CLAbstractMediaData* CLAVIStreamReader::getNextData()
 {
+begin_label:
 	if (mFirstTime)
 	{
 		QMutexLocker mutex(&avi_mutex); // speeds up concurrent reading of lots of files, if files not cashed yet
@@ -352,6 +354,7 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
     bool reverseMode = m_reverseMode;
     if (reverseMode != m_prevReverseMode)
     {
+        m_lastGopSeekTime = -1;
         m_prevReverseMode = reverseMode;
         qint64 jumpTime = determineDisplayTime();
         channeljumpTo(jumpTime, 0);
@@ -430,9 +433,16 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
                     if (m_currentTime != seekTime) {
                         av_free_packet(&currentPacket());
                         qint64 tmpVal = m_bottomIFrameTime;
+                        if (m_lastGopSeekTime == 0)
+                            seekTime = m_lengthMksec;
                         channeljumpTo(seekTime, 0);
+                        m_lastGopSeekTime = seekTime;
                         m_topIFrameTime = tmpVal;
-                        return getNextData();
+                        //return getNextData();
+                        if (m_runing)
+                            goto begin_label;
+                        else
+                            return 0;
                     }
                     else {
                         m_bottomIFrameTime = m_currentTime;
@@ -445,7 +455,8 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
                 av_free_packet(&currentPacket());
                 return getNextData();
             }
-        } 
+            currentPacket().flags |= AV_REVERSE_PACKET;
+        }
 
 		m_bsleep = true; // sleep only in case of video
 
@@ -513,9 +524,7 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 void CLAVIStreamReader::channeljumpTo(quint64 mksec, int /*channel*/)
 {
     QMutexLocker mutex(&m_cs);
-
     mksec += startMksec();
-
     avformat_seek_file(m_formatContext, -1, 0, mksec, LLONG_MAX, AVSEEK_FLAG_BACKWARD);
 
 	//m_needToSleep = 0;
