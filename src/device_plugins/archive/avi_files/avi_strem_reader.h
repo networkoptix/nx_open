@@ -72,6 +72,7 @@ private:
     bool m_reverseMode;
     bool m_prevReverseMode;
     FrameTypeExtractor* m_frameTypeExtractor;
+    qint64 m_lastGopSeekTime;
 private:
     /**
       * Read next packet from file
