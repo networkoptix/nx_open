@@ -127,32 +127,9 @@ void CLCamDisplay::addVideoChannel(int index, CLAbstractRenderer* vw, bool canDo
     m_display[index]->setDrawer(vw);
 }
 
-QImage CLCamDisplay::getScreenshot()
+QImage CLCamDisplay::getScreenshot(int channel)
 {
-    QList<QImage> screens;
-    int totalWidth = 0;
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i) 
-    {
-        if (m_display[i]) {
-            screens << m_display[i]->getScreenshot();
-            totalWidth += screens.last().width();
-        }
-    }
-    if (screens.isEmpty())
-        return QImage();
-    QImage rez(totalWidth, screens.first().height(), QImage::Format_ARGB32);
-    QPainter p(&rez);
-    p.setCompositionMode(QPainter::CompositionMode_Source);
-    int x = 0;
-    foreach(QImage img, screens) 
-    {
-        p.drawImage(QPoint(x, 0), img);
-        x += img.width();
-    }
-    p.end();
-
-    //rez.save("c:/test.jpg");
-    return rez;
+    return m_display[channel]->getScreenshot();
 }
 
 void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
@@ -298,8 +275,20 @@ void CLCamDisplay::setSingleShotMode(bool single)
     m_singleShotQuantProcessed = false;
 }
 
-void CLCamDisplay::setSpeed(double speed)
+void CLCamDisplay::setSpeed(float speed)
 {
+    m_speed = speed;
+};
+
+void CLCamDisplay::processNewSpeed(float speed)
+{
+    if (qAbs(speed - 1.0) > FPS_EPS)
+        m_audioDisplay->clearAudioBuffer();
+    if (speed >= 0 && m_prevSpeed < 0 || speed < 0 && m_prevSpeed >= 0)
+    {
+        m_dataQueue.clear();
+        clearVideoQueue();
+    }
     if (qAbs(speed) > 1.0) {
         m_storedMaxQueueSize = m_dataQueue.maxSize();
         m_dataQueue.setMaxSize(CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE);
@@ -310,17 +299,22 @@ void CLCamDisplay::setSpeed(double speed)
         m_delay.setMaxOverdraft(DEFAULT_DELAY_OVERDRAFT);
     }
     m_tooSlowCounter = 0;
-    m_speed = speed;
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
         if (m_display[i])
             m_display[i]->setReverseMode(speed < 0);
     }
     setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Full);
-};
+}
 
 bool CLCamDisplay::processData(CLAbstractData* data)
 {
-    if (qAbs(m_speed) < FPS_EPS)
+    float speed = m_speed;
+    if (m_prevSpeed != speed) {
+        processNewSpeed(speed);
+        m_prevSpeed = speed;
+    }
+
+    if (qAbs(speed) < FPS_EPS)
         return false;
 
     CLAbstractMediaData* media = dynamic_cast<CLAbstractMediaData*>(data);
@@ -336,10 +330,17 @@ bool CLCamDisplay::processData(CLAbstractData* data)
     }
     else if (media->dataType == CLAbstractMediaData::AUDIO)
     {
-        if (m_speed < 0)
-            return true; // ignore audio packet to prevent after jump detection
         ad = static_cast<CLCompressedAudioData*>(data);
+        if (speed < 0) {
+            m_lastAudioPacketTime = ad->timestamp;
+            return true; // ignore audio packet to prevent after jump detection
+        }
     }
+
+    bool isReversePacket = media->flags & AV_REVERSE_PACKET;
+    bool isReverseMode = speed < 0.0;
+    if (isReverseMode != isReversePacket)
+        return true;
 
     bool flushCurrentBuffer = false;
     bool audioParamsChanged = ad && m_playingFormat != ad->format;
@@ -388,7 +389,7 @@ bool CLCamDisplay::processData(CLAbstractData* data)
         m_lastAudioPacketTime = ad->timestamp;
 
         // we synch video to the audio; so just put audio in player with out thinking
-        if (m_playAudio && qAbs(m_speed-1.0) < FPS_EPS)
+        if (m_playAudio && qAbs(speed-1.0) < FPS_EPS)
         {
             if (m_audioDisplay->msInBuffer() > AUDIO_BUFF_SIZE)
             {
@@ -419,7 +420,7 @@ bool CLCamDisplay::processData(CLAbstractData* data)
         {
             if (vd->timestamp - m_lastVideoPacketTime < -MIN_VIDEO_DETECT_JUMP_INTERVAL)
             {
-                if (m_speed < 0) 
+                if (speed < 0) 
                 {
                     if (!(vd->flags & AV_REVERSE_BLOCK_START) && vd->timestamp - m_lastVideoPacketTime < -MIN_VIDEO_DETECT_JUMP_INTERVAL*3)
                     {
@@ -449,7 +450,7 @@ bool CLCamDisplay::processData(CLAbstractData* data)
         // three are 3 possible scenarios:
 
         //1) we do not have audio playing;
-        if (!haveAudio())
+        if (!haveAudio(speed))
         {
             qint64 m_videoDuration = m_videoQueue[0].size() * m_lastNonZerroDuration;
             if (vd && m_videoDuration >  1000 * 1000)
@@ -583,9 +584,9 @@ void CLCamDisplay::playAudio(bool play)
 
 //==========================================================================
 
-bool CLCamDisplay::haveAudio() const
+bool CLCamDisplay::haveAudio(float speed) const
 {
-    return m_playAudio && m_hadAudio && qAbs(m_speed-1.0) < FPS_EPS && !m_ignoringVideo && m_audioDisplay->isFormatSupported();
+    return m_playAudio && m_hadAudio && qAbs(speed-1.0) < FPS_EPS && !m_ignoringVideo && m_audioDisplay->isFormatSupported();
 }
 
 CLCompressedVideoData* CLCamDisplay::nextInOutVideodata(CLCompressedVideoData* incoming, int channel)
@@ -705,6 +706,6 @@ void CLCamDisplay::onSlowSourceHint()
     m_dataQueue.setMaxSize(CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE);
 }
 
-quint64 CLCamDisplay::currentTime() const {
+qint64 CLCamDisplay::currentTime() const {
     return m_display[0]->getLastDisplayedTime();
 }

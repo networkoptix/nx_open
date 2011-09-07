@@ -75,9 +75,11 @@ CLAVIStreamReader::CLAVIStreamReader(CLDevice* dev ) :
     m_haveSavedPacket(false),
     m_selectedAudioChannel(0),
     m_reverseMode(false),
+    m_prevReverseMode(false),
     m_topIFrameTime(-1),
     m_bottomIFrameTime(-1),
-    m_frameTypeExtractor(0)
+    m_frameTypeExtractor(0),
+    m_lastGopSeekTime(-1)
 {
     // Should init packets here as some times destroy (av_free_packet) could be called before init
     av_init_packet(&m_packets[0]);
@@ -327,14 +329,40 @@ bool CLAVIStreamReader::getNextVideoPacket()
     }
 }
 
+ qint64 CLAVIStreamReader::determineDisplayTime()
+ {
+     qint64 rez = 0;
+     QMutexLocker mutex(&m_proc_CS);
+     for (int i = 0; i < m_dataprocessors.size(); ++i)
+     {
+         CLAbstractDataProcessor* dp = m_dataprocessors.at(i);
+         rez = qMax(rez, dp->currentTime());
+     }
+     return rez;
+ }
+
 CLAbstractMediaData* CLAVIStreamReader::getNextData()
 {
+begin_label:
 	if (mFirstTime)
 	{
 		QMutexLocker mutex(&avi_mutex); // speeds up concurrent reading of lots of files, if files not cashed yet
 		init(); // this is here instead if constructor to unload ui thread
 		mFirstTime = false;
 	}
+
+    bool reverseMode = m_reverseMode;
+    if (reverseMode != m_prevReverseMode)
+    {
+        m_lastGopSeekTime = -1;
+        m_prevReverseMode = reverseMode;
+        qint64 jumpTime = determineDisplayTime();
+        channeljumpTo(jumpTime, 0);
+        if (reverseMode)
+            m_topIFrameTime = jumpTime;
+        else
+            setSkipFramesToTime(jumpTime);
+    }
 
 	QnAviSemaphoreHelpr sem(aviSemaphore);
 
@@ -379,7 +407,7 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 
 	if (currentPacket().stream_index == m_videoStreamIndex) // in case of video packet
 	{
-        if (m_reverseMode) 
+        if (reverseMode)
         {
             // I have found example where AV_PKT_FLAG_KEY detected very bad.
             // Same frame sometimes Key sometimes not. It is VC1 codec.
@@ -392,22 +420,29 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
             else {
                 isKeyFrame =  currentPacket().flags  & AV_PKT_FLAG_KEY;
             }
-            if (isKeyFrame)
+            if (isKeyFrame || m_currentTime >= m_topIFrameTime)
             {
                 if (m_bottomIFrameTime == -1) {
                     m_bottomIFrameTime = m_currentTime;
                     currentPacket().flags |= AV_REVERSE_BLOCK_START;
                 }
 
-                if (m_currentTime >= m_topIFrameTime) 
+                if (m_currentTime >= m_topIFrameTime)
                 {
                     qint64 seekTime = qMax(0ll, m_bottomIFrameTime - BACKWARD_SEEK_STEP);
                     if (m_currentTime != seekTime) {
                         av_free_packet(&currentPacket());
                         qint64 tmpVal = m_bottomIFrameTime;
+                        if (m_lastGopSeekTime == 0)
+                            seekTime = m_lengthMksec;
                         channeljumpTo(seekTime, 0);
+                        m_lastGopSeekTime = seekTime;
                         m_topIFrameTime = tmpVal;
-                        return getNextData();
+                        //return getNextData();
+                        if (m_runing)
+                            goto begin_label;
+                        else
+                            return 0;
                     }
                     else {
                         m_bottomIFrameTime = m_currentTime;
@@ -420,7 +455,8 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
                 av_free_packet(&currentPacket());
                 return getNextData();
             }
-        } 
+            currentPacket().flags |= AV_REVERSE_PACKET;
+        }
 
 		m_bsleep = true; // sleep only in case of video
 
@@ -450,9 +486,9 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 			if (m_haveSavedPacket)
 			{
 				quint64 nextPacketTimestamp = packetTimestamp(m_formatContext->streams[m_videoStreamIndex], nextPacket());
-				if (!m_reverseMode && nextPacketTimestamp < skipFramesToTime())
+				if (!reverseMode && nextPacketTimestamp < skipFramesToTime())
 					videoData->ignore = true;
-                else if (m_reverseMode && nextPacketTimestamp > skipFramesToTime())
+                else if (reverseMode && nextPacketTimestamp > skipFramesToTime())
                     videoData->ignore = true;
 				else
 					setSkipFramesToTime(0);
@@ -488,9 +524,7 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
 void CLAVIStreamReader::channeljumpTo(quint64 mksec, int /*channel*/)
 {
     QMutexLocker mutex(&m_cs);
-
     mksec += startMksec();
-
     avformat_seek_file(m_formatContext, -1, 0, mksec, LLONG_MAX, AVSEEK_FLAG_BACKWARD);
 
 	//m_needToSleep = 0;

@@ -2,9 +2,10 @@
 #include "base/log.h"
 
 
+
 CLMouseIgnoreHelper::CLMouseIgnoreHelper()
 {
-    m_timeUpTo.restart();
+    reset();
 }
 
 CLMouseIgnoreHelper::~CLMouseIgnoreHelper()
@@ -14,16 +15,11 @@ CLMouseIgnoreHelper::~CLMouseIgnoreHelper()
 
 bool CLMouseIgnoreHelper::shouldIgnore() const
 {
-    if (QTime::currentTime() < m_timeUpTo)
-    {
-        //
+
+    if (QDateTime::currentMSecsSinceEpoch() < m_timeUpTo  )
         return true;
-    }
     else
-    {
-        //
         return false;
-    }
 }
 
 void CLMouseIgnoreHelper::ignoreNextMs(int ms)
@@ -33,16 +29,15 @@ void CLMouseIgnoreHelper::ignoreNextMs(int ms)
     if (ms > 500)
         ms = 500; // never wait more than 500 ms 
 
-
     if (ms<0)
         return;
     
-    QTime candidate = QTime::currentTime().addMSecs(ms);
+    qint64 candidate = QDateTime::currentMSecsSinceEpoch() + ms;
     if (candidate > m_timeUpTo)
         m_timeUpTo = candidate;
 }
 
 void CLMouseIgnoreHelper::reset()
 {
-    m_timeUpTo = QTime::currentTime();
+    m_timeUpTo = QDateTime::currentMSecsSinceEpoch();
 }

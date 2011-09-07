@@ -1264,6 +1264,8 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
     QMenu menu;
     //menu.setWindowOpacity(global_menu_opacity);
 
+    menu.addAction(&cm_open_file);
+
     if (aitem && m_scene.selectedItems().count()==0) // video wnd and single selection
     {
         if (aitem->getType() == CLAbstractSceneItem::VIDEO)
@@ -1597,8 +1599,8 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
             if (act == &cm_save_recorded_as && cam)
                 contextMenuHelper_saveRecordedAs(cam);
 
-            if (act == &cm_take_screenshot && cam)
-                contextMenuHelper_takeScreenshot(cam);
+            if (act == &cm_take_screenshot && video_wnd)
+                contextMenuHelper_takeScreenshot(video_wnd);
 
             if (act == &cm_upload_youtube && dev)
             {
@@ -3227,9 +3229,9 @@ void GraphicsView::contextMenuHelper_saveRecordedAs(CLVideoCamera* cam)
     rreader->setRecordedDataDst(name);
 }
 
-void GraphicsView::contextMenuHelper_takeScreenshot(CLVideoCamera* cam)
+void GraphicsView::contextMenuHelper_takeScreenshot(CLVideoWindowItem* item)
 {
-    QImage screenshot = cam->getCamCamDisplay()->getScreenshot();
+    QImage screenshot = item->getScreenshot();
     if (screenshot.isNull())
         return;
 

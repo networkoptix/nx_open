@@ -16,7 +16,7 @@ public:
     void reset();
 
 private:
-    QTime m_timeUpTo;
+    qint64 m_timeUpTo;
     
 
 };

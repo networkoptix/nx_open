@@ -70,7 +70,9 @@ private:
     static QSemaphore aviSemaphore ;
     bool m_eof;
     bool m_reverseMode;
+    bool m_prevReverseMode;
     FrameTypeExtractor* m_frameTypeExtractor;
+    qint64 m_lastGopSeekTime;
 private:
     /**
       * Read next packet from file
@@ -110,6 +112,7 @@ private:
 
     AVPacket& currentPacket();
     AVPacket& nextPacket();
+    qint64 determineDisplayTime();
 };
 
 #endif //avi_stream_reader_h1901

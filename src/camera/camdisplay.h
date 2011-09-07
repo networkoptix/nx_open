@@ -33,7 +33,7 @@ public:
 
 	void display(CLCompressedVideoData* vd, bool sleep);
 	void playAudio(bool play);
-    void setSpeed(double speed);
+    void setSpeed(float speed);
 
     // schedule to clean up buffers all; 
     // schedule - coz I do not want to introduce mutexes
@@ -41,13 +41,13 @@ public:
     void jump(qint64 time); 
 
 	//quint64 currentTime() const { return m_previousVideoDisplayedTime; }
-    quint64 currentTime() const;
+    virtual qint64 currentTime() const;
 
     void setMTDecoding(bool value);
 
     void setSingleShotMode(bool single);
 
-    QImage getScreenshot();
+    QImage getScreenshot(int channel);
 
 public slots:
     void onRealTimeStreamHint(bool value);
@@ -55,7 +55,7 @@ public slots:
 signals:
     void reachedTheEnd();
 private:
-	bool haveAudio() const;
+	bool haveAudio(float speed) const;
 
 	// puts in in queue and returns first in queue
 	CLCompressedVideoData* nextInOutVideodata(CLCompressedVideoData* incoming, int channel);
@@ -71,7 +71,7 @@ private:
 	void clearVideoQueue();
     void enqueueVideo(CLCompressedVideoData* vd);
     void afterJump(qint64 new_time);
-
+    void processNewSpeed(float speed);
 private:
 	QQueue<CLCompressedVideoData*> m_videoQueue[CL_MAX_CHANNELS];
 
@@ -81,7 +81,9 @@ private:
 	CLAdaptiveSleep m_delay;
 
 	bool m_playAudioSet;
-    double m_speed;
+    float m_speed;
+    float m_prevSpeed;
+
 	bool m_playAudio;
     bool m_needChangePriority;
 
