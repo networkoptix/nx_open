@@ -81,7 +81,7 @@ win32 {
   compiler.depends=$$OBJECTS_DIR/${QMAKE_FILE_BASE}.obj
   asm_compiler.variable_out = OBJECTS
   QMAKE_EXTRA_COMPILERS += asm_compiler
-  LIBS += -ld3d9 -ld3dx9 -lPropsys -lwinmm
+  LIBS += -ld3d9 -ld3dx9 -lwinmm
 
   SOURCES += dsp_effects/speex/preprocess.c dsp_effects/speex/filterbank.c dsp_effects/speex/fftwrap.c dsp_effects/speex/smallft.c  dsp_effects/speex/mdf.c
 }
