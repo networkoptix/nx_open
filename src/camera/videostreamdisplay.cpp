@@ -23,6 +23,7 @@ CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale) :
     m_queueUsed(false),
     m_needReinitDecoders(false),
     m_reverseMode(false),
+    m_prevReverseMode(false),
     m_prevFrameToDelete(0),
     m_flushedBeforeReverseStart(false),
     m_lastDisplayedTime(0),
@@ -208,6 +209,7 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
     m_mtx.lock();
     // use only 1 frame for non selected video
     bool reverseMode = m_reverseMode;
+
     bool enableFrameQueue = reverseMode ? true : m_enableFrameQueue;
 
 
@@ -219,8 +221,8 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
             m_frameQueue[i]->clean();
         m_queueUsed = false;
     }
-    if (!reverseMode && m_reverseQueue.size() > 0) 
-        clearReverseQueue();
+    //if (!reverseMode && m_reverseQueue.size() > 0) 
+    //    clearReverseQueue();
 
     if (m_needReinitDecoders) {
         foreach(CLAbstractVideoDecoder* decoder, m_decoder)
@@ -251,6 +253,14 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
         return true;
     }
 
+    if (reverseMode != m_prevReverseMode) {
+        clearReverseQueue();
+        CLCompressedVideoData emptyData(1,0);
+        CLVideoDecoderOutput tmpOutFrame;
+        while (dec->decode(emptyData, &tmpOutFrame));
+        m_prevReverseMode = reverseMode;
+    }
+
     CLVideoDecoderOutput::downscale_factor scaleFactor = determineScaleFactor(data, dec->getWidth(), dec->getHeight(), force_factor);
     PixelFormat pixFmt = dec->GetPixelFormat();
     bool useTmpFrame =  !CLGLRenderer::isPixelFormatSupported(pixFmt) ||
@@ -267,11 +277,14 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
         CLVideoDecoderOutput* tmpOutFrame = new CLVideoDecoderOutput();
         while (dec->decode(emptyData, tmpOutFrame)) 
         {
-            tmpOutFrame->pts = AV_NOPTS_VALUE; // unknown
-            m_reverseQueue.enqueue(tmpOutFrame);
-            m_realReverseSize++;
-            checkQueueOverflow(dec);
-            tmpOutFrame = new CLVideoDecoderOutput();
+            //if (!(data->flags & AV_FIRST_REVERSE_PACKET)) 
+            {
+                tmpOutFrame->pts = AV_NOPTS_VALUE; // unknown
+                m_reverseQueue.enqueue(tmpOutFrame);
+                m_realReverseSize++;
+                checkQueueOverflow(dec);
+                tmpOutFrame = new CLVideoDecoderOutput();
+            }
         }
         delete tmpOutFrame;
         m_flushedBeforeReverseStart = true;

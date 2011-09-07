@@ -21,8 +21,8 @@ public:
 	int queueSize() const;
     virtual void setSingleShotMode(bool /*single*/) {}
 
-    virtual void setSpeed(double value) {}
-
+    virtual void setSpeed(float value) {}
+    virtual qint64 currentTime() const { return 0; }
 protected:
 	void run();
         virtual bool processData(CLAbstractData* /*data*/)=0;

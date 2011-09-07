@@ -63,6 +63,7 @@ private:
     bool m_queueUsed;
     bool m_needReinitDecoders;
     bool m_reverseMode;
+    bool m_prevReverseMode;
     QQueue<CLVideoDecoderOutput*> m_reverseQueue;
     bool m_flushedBeforeReverseStart;
     qint64 m_lastDisplayedTime;
