@@ -79,7 +79,7 @@ void YouTubeSettingsWidget::tryAuth()
 
 void YouTubeSettingsWidget::authFailed()
 {
-    ui->authResultLabel->setText(tr("Authentification Failed!"));
+    ui->authResultLabel->setText(tr("Authentication Failed!"));
     ui->tryAuthButton->setEnabled(true);
 
     sender()->deleteLater();
@@ -87,7 +87,7 @@ void YouTubeSettingsWidget::authFailed()
 
 void YouTubeSettingsWidget::authFinished()
 {
-    ui->authResultLabel->setText(tr("Authentification Succeeded"));
+    ui->authResultLabel->setText(tr("Authentication Succeeded"));
     ui->tryAuthButton->setEnabled(true);
 
     sender()->deleteLater();

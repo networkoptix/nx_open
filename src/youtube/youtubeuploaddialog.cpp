@@ -22,8 +22,6 @@ YouTubeUploadDialog::YouTubeUploadDialog(CLDevice *dev, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::YouTubeUploadDialog)
 {
-    setWindowTitle(tr("Upload File to YouTube"));
-
     ui->setupUi(this);
 
     connect(ui->browseButton, SIGNAL(clicked()), this, SLOT(browseFile()));
@@ -53,6 +51,8 @@ YouTubeUploadDialog::YouTubeUploadDialog(CLDevice *dev, QWidget *parent) :
     connect(m_youtubeuploader, SIGNAL(categoryListLoaded()), this, SLOT(categoryListLoaded()));
     connect(m_youtubeuploader, SIGNAL(authFailed()), this, SLOT(authFailed()));
     connect(m_youtubeuploader, SIGNAL(authFinished()), this, SLOT(authFinished()));
+
+    retranslateUi();
 }
 
 YouTubeUploadDialog::~YouTubeUploadDialog()
@@ -99,6 +99,7 @@ void YouTubeUploadDialog::accept()
 
 void YouTubeUploadDialog::retranslateUi()
 {
+    setWindowTitle(tr("Upload File to YouTube"));
     // ### retranslate categories list
 }
 

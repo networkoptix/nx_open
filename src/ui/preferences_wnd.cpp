@@ -15,8 +15,6 @@ extern QString button_home;
 PreferencesWindow::PreferencesWindow(QWidget *parent) :
     QDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint)
 {
-    setWindowTitle(tr("Preferences Editor"));
-
     setupUi(this);
 
 #ifdef CL_TRIAL_MODE
@@ -49,6 +47,8 @@ PreferencesWindow::PreferencesWindow(QWidget *parent) :
     //setWindowOpacity(.90);
 
     resizeEvent(0);
+
+    setWindowTitle(tr("Preferences Editor"));
 }
 
 PreferencesWindow::~PreferencesWindow()
