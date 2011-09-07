@@ -279,7 +279,7 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
         {
             //if (!(data->flags & AV_FIRST_REVERSE_PACKET)) 
             {
-                tmpOutFrame->pts = AV_NOPTS_VALUE; // unknown
+                tmpOutFrame->pts = m_reverseQueue.isEmpty() ? data->timestamp : AV_NOPTS_VALUE;
                 m_reverseQueue.enqueue(tmpOutFrame);
                 m_realReverseSize++;
                 checkQueueOverflow(dec);
