@@ -1263,6 +1263,8 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
     QMenu menu;
     //menu.setWindowOpacity(global_menu_opacity);
 
+    menu.addAction(&cm_open_file);
+
     if (aitem && m_scene.selectedItems().count()==0) // video wnd and single selection
     {
         if (aitem->getType() == CLAbstractSceneItem::VIDEO)
