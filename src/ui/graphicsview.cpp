@@ -31,6 +31,7 @@
 #include "ui/animation/property_animation.h"
 #include "ui/recordingsettingswidget.h"
 #include "ui/dialogs/tagseditdialog.h"
+#include "youtube/youtubeuploaddialog.h"
 #include "videorecordersettings.h"
 
 #include <QtCore/QPropertyAnimation>
@@ -1306,6 +1307,11 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
                 menu.addAction(&cm_take_screenshot);
             }
 
+            if (dev->checkDeviceTypeFlag(CLDevice::ARCHIVE) || dev->checkDeviceTypeFlag(CLDevice::RECORDED))
+            {
+                menu.addAction(&cm_upload_youtube);
+            }
+
             if (dev->checkDeviceTypeFlag(CLDevice::ARCHIVE))
             {
                 CLAbstractArchiveReader* reader = static_cast<CLAbstractArchiveReader*>(cam->getStreamreader());
@@ -1593,6 +1599,13 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
             if (act == &cm_take_screenshot && cam)
                 contextMenuHelper_takeScreenshot(cam);
+
+            if (act == &cm_upload_youtube && dev)
+            {
+                YouTubeUploadDialog dialog(dev, this);
+                dialog.setWindowModality(Qt::ApplicationModal);
+                dialog.exec();
+            }
 
             if (act == &cm_open_web_page&& cam)
                 contextMenuHelper_openInWebBroser(cam);

@@ -1,5 +1,7 @@
 #include "youtube_uploader.h"
-#include <QFile>
+
+#include <QtCore/QFile>
+#include <QtCore/QXmlStreamReader>
 
 class QYoutubeUploadDevice: public QIODevice {
 private:
@@ -37,8 +39,8 @@ public:
         m_postfixPos = 0;
         return m_file.reset();
     }
-    virtual bool isSequential () const { 
-        return false; 
+    virtual bool isSequential () const {
+        return false;
     }
 
     virtual bool waitForReadyRead ( int msecs ) {
@@ -124,7 +126,7 @@ protected:
         return 0;
     }
 
-    virtual qint64 readData (char * data, qint64 maxSize) 
+    virtual qint64 readData (char * data, qint64 maxSize)
     {
         int rez = 0;
         if (m_state == State_ProcessPreffix) {
@@ -138,7 +140,7 @@ protected:
             rez += toSend;
         }
 
-        if (m_state == State_ProcessFile) 
+        if (m_state == State_ProcessFile)
         {
             int readed = m_file.read(data, maxSize);
             if (readed < maxSize)
@@ -175,8 +177,11 @@ void YouTubeUploader::nextStep()
             login();
             break;
         case State_Authorized:
-            upload();
-            break;
+            if (!m_filename.isEmpty()) { // special case: trying auth
+                upload();
+                break;
+            }
+        // fall through
         case State_Finished:
             emit uploadFinished();
             break;
@@ -186,9 +191,8 @@ void YouTubeUploader::nextStep()
     }
 }
 
-YouTubeUploader::YouTubeUploader(const QString& login, const QString& password)
-    : m_login(login),
-    m_password(password),
+YouTubeUploader::YouTubeUploader(QObject *parent)
+    : QObject(parent),
     m_state(State_Unauthorized),
     m_errorCode(0),
     m_categoryReply(0)
@@ -198,11 +202,26 @@ YouTubeUploader::YouTubeUploader(const QString& login, const QString& password)
     readCategoryList();
 }
 
+YouTubeUploader::~YouTubeUploader()
+{
+    manager->deleteLater();
+}
+
+void YouTubeUploader::setLogin(const QString &login)
+{
+    m_login = login;
+}
+
+void YouTubeUploader::setPassword(const QString &password)
+{
+    m_password = password;
+}
+
 void YouTubeUploader::readCategoryList()
 {
     QNetworkRequest request;
     QLocale locale;
-    QString langStr = locale.name(); 
+    QString langStr = locale.name();
     langStr = langStr.replace('_', '-');
     request.setUrl(QUrl(QString("http://gdata.youtube.com/schemas/2007/categories.cat?hl=") + langStr));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
@@ -212,11 +231,6 @@ void YouTubeUploader::readCategoryList()
         this, SLOT(slotError(QNetworkReply::NetworkError)));
     connect(m_categoryReply, SIGNAL(sslErrors(QList<QSslError>)),
         this, SLOT(slotSslErrors(QList<QSslError>)));
-}
-
-YouTubeUploader::~YouTubeUploader()
-{
-    manager->deleteLater();
 }
 
 void YouTubeUploader::login()
@@ -239,6 +253,14 @@ void YouTubeUploader::login()
             this, SLOT(slotSslErrors(QList<QSslError>)));
 }
 
+void YouTubeUploader::tryAuth()
+{
+    m_filename.clear();
+
+    m_state = State_Unauthorized;
+    nextStep();
+}
+
 void YouTubeUploader::uploadFile(const QString& filename, const QString& title, const QString& description, const QStringList& tags, const QString& category, Privacy privacy)
 {
     m_filename = filename;
@@ -257,7 +279,7 @@ void YouTubeUploader::upload()
     QNetworkRequest request;
     request.setUrl(QUrl("http://uploads.gdata.youtube.com/feeds/api/users/default/uploads"));
     request.setRawHeader("Host","uploads.gdata.youtube.com");
-    request.setRawHeader("Authorization","GoogleLogin auth=" + m_auth.toAscii());
+    request.setRawHeader("Authorization","GoogleLogin auth=" + m_auth);
     request.setRawHeader("GData-Version","2");
     request.setRawHeader("X-GData-Key","key=AI39si7gsWbcTytSIdi7qzc9Xr9I-uEU3ewpJJPb47HN2WRhJGIckOKKlw-Su8NwmjKZI96QTCmP2BewWrxTvHijB0M8S3qOsA");
     request.setRawHeader("Slug", m_filename.toUtf8());
@@ -279,22 +301,23 @@ void YouTubeUploader::upload()
     }
     else {
         m_state = State_Failed;
+        m_errorString = uploader->errorString();
+        m_errorCode = 0;
         nextStep();
     }
 }
 
 void YouTubeUploader::parseCategoryXml()
 {
-    QByteArray data = m_categoryReply->readAll();
-    QXmlStreamReader xml(data);
+    QXmlStreamReader xml(m_categoryReply);
     while (!xml.atEnd())
     {
         xml.readNext();
         if (xml.isStartElement()) {
-            if (xml.name() == "category") 
+            if (xml.name() == QLatin1String("category"))
             {
-                QString name = xml.attributes().value("term").toString();
-                QString descr = xml.attributes().value("label").toString();
+                QString name = xml.attributes().value(QLatin1String("term")).toString();
+                QString descr = xml.attributes().value(QLatin1String("label")).toString();
                 m_categoryList << QPair<QString, QString>(name, descr);
             }
         }
@@ -312,10 +335,10 @@ void YouTubeUploader::replyFinished(QNetworkReply* reply)
     }
 
     int  statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-    /*       
+    /*
     qDebug((QString("Code = ") + statusCode);
     if (reply->error() == QNetworkReply::NoError) {
-        foreach(QByteArray header, reply->rawHeaderList())
+        foreach(const QByteArray &header, reply->rawHeaderList())
         {
             qDebug(header + " = " + reply->rawHeader(header));
         }
@@ -329,21 +352,29 @@ void YouTubeUploader::replyFinished(QNetworkReply* reply)
         if (m_state == State_Authorized)
         {
             newState = State_Finished;
-        } 
+        }
         else if (m_state == State_Unauthorized)
         {
-            QList<QByteArray> lines = reply->readAll().split('\n');
-            foreach (QByteArray line, lines)
+            foreach (const QByteArray &line, reply->readAll().split('\n'))
             {
-                int eqPos = line.indexOf('=');
-                if (eqPos != -1 && line.left(eqPos) == "Auth")
+                if (line.startsWith("Auth="))
                 {
-                    m_auth = line.right(line.length() - eqPos -1);
+                    m_auth = line.mid(5);
                     newState = State_Authorized;
+                    break;
                 }
             }
         }
     }
+
+    if (m_state == State_Unauthorized)
+    {
+        if (newState == State_Authorized)
+            QMetaObject::invokeMethod(this, "authFinished", Qt::QueuedConnection);
+        else
+            QMetaObject::invokeMethod(this, "authFailed", Qt::QueuedConnection);
+    }
+
     m_state = newState;
     nextStep();
     reply->deleteLater();
@@ -357,22 +388,22 @@ void YouTubeUploader::slotError(QNetworkReply::NetworkError err)
 {
     if (sender() == m_categoryReply) {
         m_categoryReply->deleteLater();
+        m_categoryReply = 0;
         return;
     }
 
     m_errorCode = err;
-    QNetworkReply* reply = dynamic_cast<QNetworkReply*> (sender());
-    if (reply)
+    if (QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender()))
         m_errorString = reply->errorString();
-    if (m_state == State_Unauthorized && m_errorString.toLower().contains("forbidden"))
-        m_errorString = "Invalid user name or password";
+    if (m_state == State_Unauthorized && m_errorString.toLower().contains(QLatin1String("forbidden")))
+        m_errorString = tr("Invalid user name or password");
 }
-
 
 void YouTubeUploader::slotSslErrors(QList<QSslError> list)
 {
     if (sender() == m_categoryReply) {
         m_categoryReply->deleteLater();
+        m_categoryReply = 0;
         return;
     }
 

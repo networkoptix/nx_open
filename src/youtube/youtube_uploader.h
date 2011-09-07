@@ -9,10 +9,16 @@
 
 class YouTubeUploader : public QObject
 {
-Q_OBJECT
+    Q_OBJECT
+
 public:
-    YouTubeUploader(const QString& login, const QString& password);
+    YouTubeUploader(QObject *parent = 0);
     virtual ~YouTubeUploader();
+
+    void setLogin(const QString &login);
+    void setPassword(const QString &password);
+
+    void tryAuth();
 
     enum Privacy {Privacy_Public, Privacy_Unlisted, Privacy_Private};
 
@@ -28,6 +34,11 @@ public:
       */
     void uploadFile(const QString& filename, const QString& title, const QString& description, const QStringList& tags, const QString& category, Privacy privacy);
 
+    inline QString fileName() const { return m_filename; }
+    inline QString fileTitle() const { return m_title; }
+    inline QString fileDescription() const { return m_description; }
+    inline QStringList fileTags() const { return m_tags; }
+
     /**
     * Read youtube category list
     *
@@ -35,25 +46,33 @@ public:
     *
     */
     QList<QPair<QString, QString> > getCategoryList() const;
-signals:
-    void uploadFinished();
-    void uploadFailed(QString message, int code);
+
+Q_SIGNALS:
+    void authFailed();
+    void authFinished();
+
     void uploadProgress(qint64 bytesSent, qint64 bytesTotal);
+    void uploadFailed(const QString &message, int code);
+    void uploadFinished();
+
     /**
     * Signal is emmited then category list is loaded from youtube. If function getCategoryList is called before this signal, category list is empty (not ready)
     */
     void categoryListLoaded();
-private slots:
+
+private Q_SLOTS:
     void replyFinished(QNetworkReply* reply);
     void slotReadyRead();
     void slotError(QNetworkReply::NetworkError);
     void slotSslErrors(QList<QSslError>);
+
 private:
     void upload();
     void login();
     void nextStep();
     void readCategoryList();
     void parseCategoryXml();
+
 private:
     QString m_title;
     QString m_description;
@@ -64,7 +83,7 @@ private:
 
     enum State {State_Unauthorized, State_Authorized, State_Finished, State_Failed};
     QNetworkAccessManager *manager;
-    QString m_auth;
+    QByteArray m_auth;
     QString m_login;
     QString m_password;
     QString m_filename;
