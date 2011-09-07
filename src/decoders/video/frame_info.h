@@ -4,6 +4,7 @@
 #include "data/mediadata.h"
 #include "libavcodec/avcodec.h"
 
+#define AV_REVERSE_PACKET 128
 #define AV_REVERSE_BLOCK_START 64
 #define AV_REVERSE_REORDERED   32
 

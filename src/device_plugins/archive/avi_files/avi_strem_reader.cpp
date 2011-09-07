@@ -445,7 +445,8 @@ CLAbstractMediaData* CLAVIStreamReader::getNextData()
                 av_free_packet(&currentPacket());
                 return getNextData();
             }
-        } 
+            currentPacket().flags |= AV_REVERSE_PACKET;
+        }
 
 		m_bsleep = true; // sleep only in case of video
 
