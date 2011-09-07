@@ -47,7 +47,7 @@ public:
 
     void setSingleShotMode(bool single);
 
-    QImage getScreenshot();
+    QImage getScreenshot(int channel);
 
 public slots:
     void onRealTimeStreamHint(bool value);

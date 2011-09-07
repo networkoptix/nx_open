@@ -387,3 +387,24 @@ float CLVideoWindowItem::aspectRatio() const
     return m_aspectratio*m_videolayout->width()/m_videolayout->height();
 }
 
+QImage CLVideoWindowItem::getScreenshot()
+{
+    if (getVideoLayout()->numberOfChannels() == 0)
+        return QImage();
+    unsigned width = 0;
+    unsigned height = 0;
+    QList<QImage> screens;
+    for (int i = 0; i < getVideoLayout()->numberOfChannels(); ++i)
+    {
+        screens << getVideoCam()->getCamCamDisplay()->getScreenshot(i);
+        width = qMax(width, (getVideoLayout()->h_position(i)+1)*screens[0].width());
+        height = qMax(height, (getVideoLayout()->v_position(i)+1)*screens[0].height());
+    }
+    QImage rez(width, height, QImage::Format_ARGB32);
+    QPainter p(&rez);
+    p.setCompositionMode(QPainter::CompositionMode_Source);
+    for (int i = 0; i < getVideoLayout()->numberOfChannels(); ++i)
+        p.drawImage(QPoint(getVideoLayout()->h_position(i)*screens[0].width(), getVideoLayout()->v_position(i)*screens[0].height()), screens[i]);
+    p.end();
+    return rez;
+}

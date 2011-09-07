@@ -1591,8 +1591,8 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
             if (act == &cm_save_recorded_as && cam)
                 contextMenuHelper_saveRecordedAs(cam);
 
-            if (act == &cm_take_screenshot && cam)
-                contextMenuHelper_takeScreenshot(cam);
+            if (act == &cm_take_screenshot && video_wnd)
+                contextMenuHelper_takeScreenshot(video_wnd);
 
             if (act == &cm_open_web_page&& cam)
                 contextMenuHelper_openInWebBroser(cam);
@@ -3214,9 +3214,9 @@ void GraphicsView::contextMenuHelper_saveRecordedAs(CLVideoCamera* cam)
     rreader->setRecordedDataDst(name);
 }
 
-void GraphicsView::contextMenuHelper_takeScreenshot(CLVideoCamera* cam)
+void GraphicsView::contextMenuHelper_takeScreenshot(CLVideoWindowItem* item)
 {
-    QImage screenshot = cam->getCamCamDisplay()->getScreenshot();
+    QImage screenshot = item->getScreenshot();
     if (screenshot.isNull())
         return;
 

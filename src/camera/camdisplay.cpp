@@ -127,34 +127,9 @@ void CLCamDisplay::addVideoChannel(int index, CLAbstractRenderer* vw, bool canDo
     m_display[index]->setDrawer(vw);
 }
 
-QImage CLCamDisplay::getScreenshot()
+QImage CLCamDisplay::getScreenshot(int channel)
 {
-    QList<QImage> screens;
-    int totalWidth = 0;
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i) 
-    {
-        if (m_display[i]) {
-            screens << m_display[i]->getScreenshot();
-            totalWidth += screens.last().width();
-        }
-    }
-    if (screens.isEmpty())
-        return QImage();
-    QImage rez(totalWidth, screens.first().height(), QImage::Format_ARGB32);
-    QPainter p(&rez);
-    p.setCompositionMode(QPainter::CompositionMode_Source);
-    
-    p.drawImage(QPoint(0, 0), screens[0]);
-    int x = screens[0].width();
-    for (int i = screens.size()-1; i > 0; --i)
-    {
-        p.drawImage(QPoint(x, 0), screens[i]);
-        x += screens[i].width();
-    }
-    p.end();
-
-    //rez.save("c:/test.jpg");
-    return rez;
+    return m_display[channel]->getScreenshot();
 }
 
 void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
