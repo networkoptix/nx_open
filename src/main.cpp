@@ -54,6 +54,10 @@ void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args
 
 int main(int argc, char *argv[])
 {
+#ifdef Q_OS_WIN
+    AllowSetForegroundWindow(ASFW_ANY);
+#endif
+
 //    av_log_set_callback(decoderLogCallback);
 
     QApplication::setOrganizationName(QLatin1String(ORGANIZATION_NAME));

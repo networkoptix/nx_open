@@ -7,7 +7,7 @@
 
 #include "openal/qtvaudiodevice.h"
 
-#include "ui/videoitem/navigationitem.h"
+#include "ui/videoitem/navigationitem.h" // MyButton
 #include "ui/videoitem/timeslider.h" // SliderProxyStyle
 #include "ui/widgets/styledslider.h"
 

@@ -23,6 +23,7 @@ QAction cm_start_recording(QObject::tr("Start recording"), 0);
 QAction cm_stop_recording(QObject::tr("Stop recording"), 0);
 QAction cm_view_recorded(QObject::tr("View recorded video"), 0);
 QAction cm_save_recorded_as(QObject::tr("Save recorded video as..."), 0);
+QAction cm_take_screenshot(QObject::tr("Take screenshot..."), 0);
 QAction cm_open_web_page(QObject::tr("Open web page(experimental)"), 0);
 
 QAction dis_0(QObject::tr("0%"), 0);

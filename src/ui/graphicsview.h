@@ -155,6 +155,7 @@ protected:
     bool contextMenuHelper_existRecordedVideo(CLVideoCamera* cam);
     void contextMenuHelper_viewRecordedVideo(CLVideoCamera* cam);
     void contextMenuHelper_saveRecordedAs(CLVideoCamera* cam);
+    void contextMenuHelper_takeScreenshot(CLVideoCamera* cam);
     void contextMenuHelper_openInWebBroser(CLVideoCamera* cam);
     void contextMenuHelper_Rotation(CLAbstractSceneItem* wnd, qreal angle);
     void contextMenuHelper_restoreLayout();
