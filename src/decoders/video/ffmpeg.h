@@ -33,9 +33,9 @@ public:
     }
 
     PixelFormat GetPixelFormat();
-    int getWidth() const  { return c->width;  }
-    int getHeight() const { return c->height; }
-    virtual PixelFormat getFormat() const { return c->pix_fmt; }
+    int getWidth() const  { return m_context->width;  }
+    int getHeight() const { return m_context->height; }
+    virtual PixelFormat getFormat() const { return m_context->pix_fmt; }
     virtual void flush();
     virtual const AVFrame* lastFrame() { return m_frame; }
 private:
@@ -51,9 +51,13 @@ private:
 
     static int hwcounter;
 	AVCodec *m_codec;
-	AVCodecContext *c;
+	AVCodecContext *m_context;
     FrameTypeExtractor* m_frameTypeExtractor;
 	AVFrame *m_frame;
+    QImage m_tmpImg;
+    CLVideoDecoderOutput m_tmpQtFrame;
+    bool m_usedQtImage;
+
 	
 	quint8* m_deinterlaceBuffer;
 	AVFrame *m_deinterlacedFrame;

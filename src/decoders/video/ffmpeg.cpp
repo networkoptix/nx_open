@@ -22,7 +22,9 @@ m_showmotion(false),
 m_decodeMode(DecodeMode_Full),
 m_newDecodeMode(DecodeMode_NotDefined),
 m_lightModeFrameCounter(0),
-m_frameTypeExtractor(0)
+m_frameTypeExtractor(0),
+m_deinterlaceBuffer(0),
+m_usedQtImage(false)
 {
 	if (codecContext)
 	{
@@ -60,7 +62,7 @@ void CLFFmpegVideoDecoder::flush()
     AVPacket avpkt;
     avpkt.data = 0;
     avpkt.size = 0;
-    while (avcodec_decode_video2(c, m_frame, &got_picture, &avpkt) > 0);
+    while (avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt) > 0);
 }
 
 
@@ -77,15 +79,16 @@ AVCodec* CLFFmpegVideoDecoder::findCodec(CodecID codecId)
 
 void CLFFmpegVideoDecoder::closeDecoder()
 {
-    avcodec_close(c);
+    avcodec_close(m_context);
 #ifdef _USE_DXVA
     m_decoderContext.close();
 #endif
 
 	av_free(m_frame);
-	av_free(m_deinterlaceBuffer);
+    if (m_deinterlaceBuffer)
+	    av_free(m_deinterlaceBuffer);
 	av_free(m_deinterlacedFrame);
-	av_free(c);
+	av_free(m_context);
     delete m_frameTypeExtractor;
 }
 
@@ -93,22 +96,22 @@ void CLFFmpegVideoDecoder::openDecoder()
 {
     m_codec = findCodec(m_codecId);
 
-    c = avcodec_alloc_context();
+    m_context = avcodec_alloc_context();
 
     if (m_passedContext) {
-        avcodec_copy_context(c, m_passedContext);
+        avcodec_copy_context(m_context, m_passedContext);
     }
 
-    m_frameTypeExtractor = new FrameTypeExtractor(c);
+    m_frameTypeExtractor = new FrameTypeExtractor(m_context);
 
 #ifdef _USE_DXVA
     if (m_codecId == CODEC_ID_H264)
     {
-        c->get_format = FFMpegCallbacks::ffmpeg_GetFormat;
-        c->get_buffer = FFMpegCallbacks::ffmpeg_GetFrameBuf;
-        c->release_buffer = FFMpegCallbacks::ffmpeg_ReleaseFrameBuf;
+        m_context->get_format = FFMpegCallbacks::ffmpeg_GetFormat;
+        m_context->get_buffer = FFMpegCallbacks::ffmpeg_GetFrameBuf;
+        m_context->release_buffer = FFMpegCallbacks::ffmpeg_ReleaseFrameBuf;
 
-        c->opaque = &m_decoderContext;
+        m_context->opaque = &m_decoderContext;
     }
 #endif
 
@@ -119,20 +122,22 @@ void CLFFmpegVideoDecoder::openDecoder()
 
 	//c->debug_mv = 1;
 
-    c->thread_count = qMin(4, QThread::idealThreadCount() + 1);
-    c->thread_type = m_mtDecoding ? FF_THREAD_FRAME : FF_THREAD_SLICE;
+    m_context->thread_count = qMin(4, QThread::idealThreadCount() + 1);
+    m_context->thread_type = m_mtDecoding ? FF_THREAD_FRAME : FF_THREAD_SLICE;
 
 
     cl_log.log(QLatin1String("Creating ") + QLatin1String(m_mtDecoding ? "FRAME threaded decoder" : "SLICE threaded decoder"), cl_logALWAYS);
     // TODO: check return value
-    if (avcodec_open(c, m_codec) < 0)
+    if (avcodec_open(m_context, m_codec) < 0)
     {
         m_codec = 0;
     }
 
-	int numBytes = avpicture_get_size(PIX_FMT_YUV420P, c->width, c->height);
-	m_deinterlaceBuffer = (quint8*)av_malloc(numBytes * sizeof(quint8));
-	avpicture_fill((AVPicture *)m_deinterlacedFrame, m_deinterlaceBuffer, PIX_FMT_YUV420P, c->width, c->height);
+	int numBytes = avpicture_get_size(PIX_FMT_YUV420P, m_context->width, m_context->height);
+    if (numBytes > 0) {
+	    m_deinterlaceBuffer = (quint8*)av_malloc(numBytes * sizeof(quint8));
+	    avpicture_fill((AVPicture *)m_deinterlacedFrame, m_deinterlaceBuffer, PIX_FMT_YUV420P, m_context->width, m_context->height);
+    }
 
 //	avpicture_fill((AVPicture *)picture, m_buffer, PIX_FMT_YUV420P, c->width, c->height);
 }
@@ -235,32 +240,53 @@ bool CLFFmpegVideoDecoder::decode(const CLCompressedVideoData& data, CLVideoDeco
     int got_picture = 0;
 
     // ### handle errors
-    avcodec_decode_video2(c, m_frame, &got_picture, &avpkt);
+    m_context->pix_fmt = PixelFormat(0);
+    avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
     if (data.useTwice)
-        avcodec_decode_video2(c, m_frame, &got_picture, &avpkt);
+        avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
+
+    AVFrame* copyFromFrame = m_frame;
+
+    // sometimes ffmpeg can't decode JPEG files. Try to decode in QT
+    m_usedQtImage = false;
+    if (m_context->codec_id == CODEC_ID_MJPEG && !got_picture) {
+        m_tmpImg.loadFromData(avpkt.data, avpkt.size);
+        if (m_tmpImg.width() > 0 && m_tmpImg.height() > 0) {
+            got_picture = 1;
+            m_tmpQtFrame.setUseExternalData(true);
+            m_tmpQtFrame.format = PIX_FMT_BGRA;
+            m_tmpQtFrame.data[0] = (quint8*) m_tmpImg.constBits();
+            m_tmpQtFrame.data[1] = m_tmpQtFrame.data[2] = m_tmpQtFrame.data[3] = 0;
+            m_tmpQtFrame.linesize[0] = m_tmpImg.bytesPerLine();
+            m_tmpQtFrame.linesize[1] = m_tmpQtFrame.linesize[2] = m_tmpQtFrame.linesize[3] = 0;
+            m_tmpQtFrame.width = m_tmpImg.width();
+            m_tmpQtFrame.height = m_tmpImg.height();
+            copyFromFrame = &m_tmpQtFrame;
+            m_usedQtImage = true;
+        }
+    }
 
     if (got_picture)
     {
         if (!outFrame->isExternalData() &&
-            (outFrame->width != c->width || outFrame->height != c->height || outFrame->format != c->pix_fmt))
+            (outFrame->width != m_context->width || outFrame->height != m_context->height || outFrame->format != m_context->pix_fmt))
         {
-            outFrame->reallocate(c->width, c->height, c->pix_fmt);
+            outFrame->reallocate(m_context->width, m_context->height, m_context->pix_fmt);
         }
 
-        AVFrame* copyFromFrame = m_frame;
 		if (m_frame->interlaced_frame && m_mtDecoding)
 		{
             if (outFrame->isExternalData())
             {
-			    if (avpicture_deinterlace((AVPicture*)m_deinterlacedFrame, (AVPicture*) m_frame, c->pix_fmt, c->width, c->height) == 0)
+			    if (avpicture_deinterlace((AVPicture*)m_deinterlacedFrame, (AVPicture*) m_frame, m_context->pix_fmt, m_context->width, m_context->height) == 0)
                     copyFromFrame = m_deinterlacedFrame;
             }
             else
-                avpicture_deinterlace((AVPicture*) outFrame, (AVPicture*) m_frame, c->pix_fmt, c->width, c->height);
+                avpicture_deinterlace((AVPicture*) outFrame, (AVPicture*) m_frame, m_context->pix_fmt, m_context->width, m_context->height);
 		}
         else {
             if (!outFrame->isExternalData())
-                av_picture_copy((AVPicture*) outFrame, (AVPicture*) (m_frame), c->pix_fmt, c->width, c->height);
+                av_picture_copy((AVPicture*) outFrame, (AVPicture*) (m_frame), m_context->pix_fmt, m_context->width, m_context->height);
         }
 
 #ifdef _USE_DXVA
@@ -268,10 +294,10 @@ bool CLFFmpegVideoDecoder::decode(const CLCompressedVideoData& data, CLVideoDeco
             m_decoderContext.extract(m_frame);
 #endif
 
-		c->debug_mv = 0;
+		m_context->debug_mv = 0;
 		if (m_showmotion)
 		{
-			c->debug_mv = 1;
+			m_context->debug_mv = 1;
 			//c->debug |=  FF_DEBUG_QP | FF_DEBUG_SKIP | FF_DEBUG_MB_TYPE | FF_DEBUG_VIS_QP | FF_DEBUG_VIS_MB_TYPE;
 			//c->debug |=  FF_DEBUG_VIS_MB_TYPE;
 			//ff_print_debug_info((MpegEncContext*)(c->priv_data), picture);
@@ -279,8 +305,8 @@ bool CLFFmpegVideoDecoder::decode(const CLCompressedVideoData& data, CLVideoDeco
 
         if (outFrame->isExternalData())
         {
-		    outFrame->width = c->width;
-		    outFrame->height = c->height;
+		    outFrame->width = m_context->width;
+		    outFrame->height = m_context->height;
 
 		    outFrame->data[0] = copyFromFrame->data[0];
 		    outFrame->data[1] = copyFromFrame->data[1];
@@ -291,15 +317,17 @@ bool CLFFmpegVideoDecoder::decode(const CLCompressedVideoData& data, CLVideoDeco
 		    outFrame->linesize[2] = copyFromFrame->linesize[2];
         }
         outFrame->format = GetPixelFormat();
-		return c->pix_fmt != PIX_FMT_NONE;
+		return m_context->pix_fmt != PIX_FMT_NONE;
 	}
     return false; // no picture decoded at current step
 }
 
 PixelFormat CLFFmpegVideoDecoder::GetPixelFormat()
 {
+    if (m_usedQtImage)
+        return PIX_FMT_BGRA;
     // Filter deprecated pixel formats
-    switch(c->pix_fmt)
+    switch(m_context->pix_fmt)
     {
     case PIX_FMT_YUVJ420P:
         return PIX_FMT_YUV420P;
@@ -308,7 +336,7 @@ PixelFormat CLFFmpegVideoDecoder::GetPixelFormat()
     case PIX_FMT_YUVJ444P:
         return PIX_FMT_YUV444P;
     }
-    return c->pix_fmt;
+    return m_context->pix_fmt;
 }
 
 void CLFFmpegVideoDecoder::setLightCpuMode(CLAbstractVideoDecoder::DecodeMode val)
