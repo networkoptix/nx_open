@@ -271,15 +271,14 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
     if (!useTmpFrame)
         outFrame->setUseExternalData(!enableFrameQueue);
 
-    if (data->flags & AV_REVERSE_BLOCK_START) 
+    if ((data->flags & AV_REVERSE_BLOCK_START) && m_lightCPUmode != CLAbstractVideoDecoder::DecodeMode_Fastest)
     {
         CLCompressedVideoData emptyData(1,0);
         CLVideoDecoderOutput* tmpOutFrame = new CLVideoDecoderOutput();
         while (dec->decode(emptyData, tmpOutFrame)) 
         {
-            //if (!(data->flags & AV_FIRST_REVERSE_PACKET)) 
             {
-                tmpOutFrame->pts = m_reverseQueue.isEmpty() ? data->timestamp : AV_NOPTS_VALUE;
+                tmpOutFrame->pts = AV_NOPTS_VALUE;
                 m_reverseQueue.enqueue(tmpOutFrame);
                 m_realReverseSize++;
                 checkQueueOverflow(dec);
