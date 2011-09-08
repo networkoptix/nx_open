@@ -46,6 +46,19 @@ public:
           return havetowait;
       }
 
+      int addQuant(qint64 mksec)
+      {
+          if (m_firstTime)
+          {
+              m_firstTime = false;
+              m_prevEndTime.start();
+              m_totalTime = 0;
+          }
+          m_totalTime += mksec;
+          qint64 now = (qint64)m_prevEndTime.elapsed()*1000;
+          qint64 havetowait = m_totalTime - now;
+          return havetowait;
+      }
 
 
 	void afterdelay()
