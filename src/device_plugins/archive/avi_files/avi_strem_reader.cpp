@@ -426,7 +426,8 @@ begin_label:
                 isKeyFrame =  currentPacket().flags  & AV_PKT_FLAG_KEY;
             }
             
-            if (m_eof) {
+            if (m_eof || m_currentTime == 0 && m_bottomIFrameTime > AV_REVERSE_BLOCK_START && m_topIFrameTime >= m_bottomIFrameTime) {
+                // seek from EOF to BOF occured
                 m_currentTime = m_topIFrameTime;
                 m_eof = false;
             }
