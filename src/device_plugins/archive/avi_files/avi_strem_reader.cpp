@@ -436,7 +436,7 @@ begin_label:
                         av_free_packet(&currentPacket());
                         qint64 tmpVal = m_bottomIFrameTime;
                         if (m_lastGopSeekTime == 0)
-                            seekTime = m_lengthMksec;
+                            tmpVal = seekTime = m_lengthMksec;
                         channeljumpTo(seekTime, 0);
                         m_lastGopSeekTime = seekTime;
                         m_topIFrameTime = tmpVal;

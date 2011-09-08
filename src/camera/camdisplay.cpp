@@ -49,7 +49,7 @@ static void updateActivity()
 
 static const qint64 MIN_VIDEO_DETECT_JUMP_INTERVAL = 100 * 1000; // 100ms
 static const qint64 MIN_AUDIO_DETECT_JUMP_INTERVAL = MIN_VIDEO_DETECT_JUMP_INTERVAL + AUDIO_BUFF_SIZE*1000;
-static const int MAX_VALID_SLEEP_TIME = 1000*1000*5;
+//static const int MAX_VALID_SLEEP_TIME = 1000*1000*5;
 static const int MAX_VALID_SLEEP_LIVE_TIME = 1000 * 500; // 5 seconds as most long sleep time
 static const int SLOW_COUNTER_THRESHOLD = 24;
 static const double FPS_EPS = 0.0001;

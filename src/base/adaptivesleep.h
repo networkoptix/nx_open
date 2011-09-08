@@ -5,6 +5,8 @@
 
 #include "log.h"
 
+const int MAX_VALID_SLEEP_TIME = 5000000;
+
 class CLAdaptiveSleep
 {
 public:
@@ -42,7 +44,10 @@ public:
                   afterdelay();
               return havetowait;
           }
-          CLSleep::msleep(havetowait/1000);
+          if (havetowait < MAX_VALID_SLEEP_TIME)
+            CLSleep::msleep(havetowait/1000);
+          else
+              afterdelay();
           return havetowait;
       }
 
