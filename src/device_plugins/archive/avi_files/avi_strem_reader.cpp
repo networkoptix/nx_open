@@ -422,13 +422,13 @@ begin_label:
             else {
                 isKeyFrame =  currentPacket().flags  & AV_PKT_FLAG_KEY;
             }
+
             if (isKeyFrame || m_currentTime >= m_topIFrameTime)
             {
                 if (m_bottomIFrameTime == -1) {
                     m_bottomIFrameTime = m_currentTime;
                     currentPacket().flags |= AV_REVERSE_BLOCK_START;
                 }
-
                 if (m_currentTime >= m_topIFrameTime)
                 {
                     qint64 seekTime = qMax(0ll, m_bottomIFrameTime - BACKWARD_SEEK_STEP);
@@ -455,7 +455,11 @@ begin_label:
             else if (m_bottomIFrameTime == -1) {
                 // invalid seek. must be key frame
                 av_free_packet(&currentPacket());
-                return getNextData();
+                //return getNextData();
+                if (m_runing)
+                    goto begin_label;
+                else
+                    return 0;
             }
             currentPacket().flags |= AV_REVERSE_PACKET;
         }
