@@ -99,21 +99,36 @@ NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
     pal.setColor(QPalette::Window, Qt::black);
     m_graphicsWidget->setPalette(pal);
 
+    m_backwardButton = new ImageButtonItem(this);
+    m_backwardButton->addPixmap(QPixmap(":/skin/rewind_backward_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
+    m_backwardButton->addPixmap(QPixmap(":/skin/rewind_backward_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
+    m_backwardButton->setPreferredSize(32, 18);
+
     m_stepBackwardButton = new ImageButtonItem(this);
     m_stepBackwardButton->addPixmap(QPixmap(":/skin/step_backward_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
     m_stepBackwardButton->addPixmap(QPixmap(":/skin/step_backward_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
-    m_stepBackwardButton->addPixmap(QPixmap(":/skin/step_backward_disabled.png"), ImageButtonItem::Disabled, ImageButtonItem::Background);
     m_stepBackwardButton->setPreferredSize(32, 18);
-
-    m_backwardButton = new ImageButtonItem(this);
-    m_backwardButton->addPixmap(QPixmap(":/skin/backward_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
-    m_backwardButton->addPixmap(QPixmap(":/skin/backward_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
-    m_backwardButton->setPreferredSize(32, 18);
 
     m_playButton = new ImageButtonItem(this);
     m_playButton->addPixmap(QPixmap(":/skin/play_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
     m_playButton->addPixmap(QPixmap(":/skin/play_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
     m_playButton->setPreferredSize(32, 30);
+
+    m_stepForwardButton = new ImageButtonItem(this);
+    m_stepForwardButton->addPixmap(QPixmap(":/skin/step_forward_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
+    m_stepForwardButton->addPixmap(QPixmap(":/skin/step_forward_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
+    m_stepForwardButton->setPreferredSize(32, 18);
+
+    m_forwardButton = new ImageButtonItem(this);
+    m_forwardButton->addPixmap(QPixmap(":/skin/rewind_forward_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
+    m_forwardButton->addPixmap(QPixmap(":/skin/rewind_forward_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
+    m_forwardButton->setPreferredSize(32, 18);
+
+    connect(m_backwardButton, SIGNAL(clicked()), this, SLOT(rewindBackward()));
+    connect(m_stepBackwardButton, SIGNAL(clicked()), this, SLOT(stepBackward()));
+    connect(m_playButton, SIGNAL(clicked()), this, SLOT(togglePlayPause()));
+    connect(m_stepForwardButton, SIGNAL(clicked(), this), SLOT(stepForward()));
+    connect(m_forwardButton, SIGNAL(clicked()), this, SLOT(rewindForward()));
 
     QAction *playAction = new QAction(tr("Play"), m_playButton);
     playAction->setShortcut(tr("Space"));
@@ -121,35 +136,18 @@ NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
     connect(playAction, SIGNAL(triggered()), m_playButton, SLOT(click()));
     m_graphicsWidget->addAction(playAction);
 
-    m_forwardButton = new ImageButtonItem(this);
-    m_forwardButton->addPixmap(QPixmap(":/skin/forward_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
-    m_forwardButton->addPixmap(QPixmap(":/skin/forward_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
-    m_forwardButton->setPreferredSize(32, 18);
-
-    m_stepForwardButton = new ImageButtonItem(this);
-    m_stepForwardButton->addPixmap(QPixmap(":/skin/step_forward_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
-    m_stepForwardButton->addPixmap(QPixmap(":/skin/step_forward_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
-    m_stepForwardButton->addPixmap(QPixmap(":/skin/step_forward_disabled.png"), ImageButtonItem::Disabled, ImageButtonItem::Background);
-    m_stepForwardButton->setPreferredSize(32, 18);
-
     QGraphicsLinearLayout *buttonsLayout = new QGraphicsLinearLayout;
     buttonsLayout->setSpacing(2);
-    buttonsLayout->addItem(m_stepBackwardButton);
-    buttonsLayout->setAlignment(m_stepBackwardButton, Qt::AlignHCenter | Qt::AlignBottom);
     buttonsLayout->addItem(m_backwardButton);
     buttonsLayout->setAlignment(m_backwardButton, Qt::AlignHCenter | Qt::AlignBottom);
+    buttonsLayout->addItem(m_stepBackwardButton);
+    buttonsLayout->setAlignment(m_stepBackwardButton, Qt::AlignHCenter | Qt::AlignBottom);
     buttonsLayout->addItem(m_playButton);
     buttonsLayout->setAlignment(m_playButton, Qt::AlignHCenter | Qt::AlignBottom);
-    buttonsLayout->addItem(m_forwardButton);
-    buttonsLayout->setAlignment(m_forwardButton, Qt::AlignHCenter | Qt::AlignBottom);
     buttonsLayout->addItem(m_stepForwardButton);
     buttonsLayout->setAlignment(m_stepForwardButton, Qt::AlignHCenter | Qt::AlignBottom);
-
-    connect(m_stepBackwardButton, SIGNAL(clicked()), this, SLOT(stepBackward()));
-    connect(m_backwardButton, SIGNAL(clicked()), this, SLOT(rewindBackward()));
-    connect(m_playButton, SIGNAL(clicked()), this, SLOT(togglePlayPause()));
-    connect(m_forwardButton, SIGNAL(clicked()), this, SLOT(rewindForward()));
-    connect(m_stepForwardButton, SIGNAL(clicked(), this), SLOT(stepForward()));
+    buttonsLayout->addItem(m_forwardButton);
+    buttonsLayout->setAlignment(m_forwardButton, Qt::AlignHCenter | Qt::AlignBottom);
 
     m_speedSlider = new SpeedSlider(Qt::Horizontal, this);
     m_speedSlider->setObjectName("SpeedSlider");
@@ -562,13 +560,25 @@ void NavigationItem::setPlaying(bool playing)
 
     m_playing = playing;
     if (m_playing) {
+        m_stepBackwardButton->addPixmap(QPixmap(":/skin/backward_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
+        m_stepBackwardButton->addPixmap(QPixmap(":/skin/backward_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
+
         m_playButton->addPixmap(QPixmap(":/skin/pause_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
         m_playButton->addPixmap(QPixmap(":/skin/pause_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
 
+        m_stepForwardButton->addPixmap(QPixmap(":/skin/forward_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
+        m_stepForwardButton->addPixmap(QPixmap(":/skin/forward_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
+
         play();
     } else {
+        m_stepBackwardButton->addPixmap(QPixmap(":/skin/step_backward_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
+        m_stepBackwardButton->addPixmap(QPixmap(":/skin/step_backward_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
+
         m_playButton->addPixmap(QPixmap(":/skin/play_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
         m_playButton->addPixmap(QPixmap(":/skin/play_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
+
+        m_stepForwardButton->addPixmap(QPixmap(":/skin/step_forward_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
+        m_stepForwardButton->addPixmap(QPixmap(":/skin/step_forward_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
 
         pause();
     }

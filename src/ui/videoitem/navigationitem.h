@@ -139,11 +139,11 @@ protected:
 private:
     QGraphicsProxyWidget *m_proxy;
     NavigationWidget *m_widget;
-    ImageButtonItem *m_stepBackwardButton;
     ImageButtonItem *m_backwardButton;
+    ImageButtonItem *m_stepBackwardButton;
     ImageButtonItem *m_playButton;
-    ImageButtonItem *m_forwardButton;
     ImageButtonItem *m_stepForwardButton;
+    ImageButtonItem *m_forwardButton;
     SpeedSlider *m_speedSlider;
     QGraphicsWidget *m_graphicsWidget;
     ImageButtonItem *m_muteButton;
