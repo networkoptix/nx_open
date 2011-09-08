@@ -5,6 +5,8 @@
 
 #include "log.h"
 
+const int MAX_VALID_SLEEP_TIME = 5000000;
+
 class CLAdaptiveSleep
 {
 public:
@@ -42,10 +44,27 @@ public:
                   afterdelay();
               return havetowait;
           }
-          CLSleep::msleep(havetowait/1000);
+          //cl_log.log("sleep time=", havetowait/1000000.0, cl_logALWAYS);
+          if (havetowait < MAX_VALID_SLEEP_TIME)
+            CLSleep::msleep(qMin(havetowait/1000, mksec/800)); // max sleep time is source delay*1.2
+          else
+              afterdelay();
           return havetowait;
       }
 
+      int addQuant(qint64 mksec)
+      {
+          if (m_firstTime)
+          {
+              m_firstTime = false;
+              m_prevEndTime.start();
+              m_totalTime = 0;
+          }
+          m_totalTime += mksec;
+          qint64 now = (qint64)m_prevEndTime.elapsed()*1000;
+          qint64 havetowait = m_totalTime - now;
+          return havetowait;
+      }
 
 
 	void afterdelay()

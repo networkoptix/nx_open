@@ -197,8 +197,10 @@ bool CLAVIStreamReader::init()
     av_init_packet(&m_packets[1]);
 
     delete m_frameTypeExtractor;
-    m_frameTypeExtractor = new FrameTypeExtractor(m_formatContext->streams[m_videoStreamIndex]->codec);
-
+    if (m_videoStreamIndex >= 0)
+        m_frameTypeExtractor = new FrameTypeExtractor(m_formatContext->streams[m_videoStreamIndex]->codec);
+    else
+        m_frameTypeExtractor = 0;
 
     return true;
 }
@@ -420,21 +422,23 @@ begin_label:
             else {
                 isKeyFrame =  currentPacket().flags  & AV_PKT_FLAG_KEY;
             }
+
             if (isKeyFrame || m_currentTime >= m_topIFrameTime)
             {
                 if (m_bottomIFrameTime == -1) {
                     m_bottomIFrameTime = m_currentTime;
                     currentPacket().flags |= AV_REVERSE_BLOCK_START;
                 }
-
                 if (m_currentTime >= m_topIFrameTime)
                 {
                     qint64 seekTime = qMax(0ll, m_bottomIFrameTime - BACKWARD_SEEK_STEP);
                     if (m_currentTime != seekTime) {
                         av_free_packet(&currentPacket());
                         qint64 tmpVal = m_bottomIFrameTime;
-                        if (m_lastGopSeekTime == 0)
+                        if (m_lastGopSeekTime == 0) {
                             seekTime = m_lengthMksec;
+                            tmpVal = m_lengthMksec - 100 * 1000;
+                        }
                         channeljumpTo(seekTime, 0);
                         m_lastGopSeekTime = seekTime;
                         m_topIFrameTime = tmpVal;
@@ -453,7 +457,11 @@ begin_label:
             else if (m_bottomIFrameTime == -1) {
                 // invalid seek. must be key frame
                 av_free_packet(&currentPacket());
-                return getNextData();
+                //return getNextData();
+                if (m_runing)
+                    goto begin_label;
+                else
+                    return 0;
             }
             currentPacket().flags |= AV_REVERSE_PACKET;
         }

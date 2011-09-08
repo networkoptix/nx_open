@@ -197,14 +197,14 @@ YouTubeUploader::YouTubeUploader(QObject *parent)
     m_errorCode(0),
     m_categoryReply(0)
 {
-    manager = new QNetworkAccessManager(this);
-    connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
+    m_manager = new QNetworkAccessManager(this);
+    connect(m_manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
     readCategoryList();
 }
 
 YouTubeUploader::~YouTubeUploader()
 {
-    manager->deleteLater();
+    m_manager->deleteLater();
 }
 
 void YouTubeUploader::setLogin(const QString &login)
@@ -226,7 +226,7 @@ void YouTubeUploader::readCategoryList()
     request.setUrl(QUrl(QString("http://gdata.youtube.com/schemas/2007/categories.cat?hl=") + langStr));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
 
-    m_categoryReply = manager->get(request);
+    m_categoryReply = m_manager->get(request);
     connect(m_categoryReply, SIGNAL(error(QNetworkReply::NetworkError)),
         this, SLOT(slotError(QNetworkReply::NetworkError)));
     connect(m_categoryReply, SIGNAL(sslErrors(QList<QSslError>)),
@@ -245,7 +245,7 @@ void YouTubeUploader::login()
     postData.append("&service=youtube");
     postData.append("&source=EvePlayer");
 
-    QNetworkReply *reply = manager->post(request, postData);
+    QNetworkReply *reply = m_manager->post(request, postData);
     connect(reply, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
     connect(reply, SIGNAL(error(QNetworkReply::NetworkError)),
             this, SLOT(slotError(QNetworkReply::NetworkError)));
@@ -289,7 +289,7 @@ void YouTubeUploader::upload()
     QYoutubeUploadDevice* uploader = new QYoutubeUploadDevice(m_filename, m_title, m_description, m_tags, m_category, m_privacy);
     if (uploader->open(QIODevice::ReadOnly)) {
         request.setRawHeader("Content-Length",QString::number(uploader->size()).toUtf8());
-        QNetworkReply *reply = manager->post(request, uploader);
+        QNetworkReply *reply = m_manager->post(request, uploader);
         uploader->setParent(reply);
 
         connect(reply, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
@@ -401,7 +401,6 @@ void YouTubeUploader::slotError(QNetworkReply::NetworkError err)
         QMetaObject::invokeMethod(this, "authFailed", Qt::QueuedConnection);
     }
 }
-
 void YouTubeUploader::slotSslErrors(QList<QSslError> list)
 {
     if (sender() == m_categoryReply) {

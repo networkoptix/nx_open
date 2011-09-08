@@ -25,6 +25,7 @@ private:
     AVCodecContext* m_context;
     CodecID m_codecId;
     VC1SequenceHeader* m_vcSequence;
+    bool m_dataWithNalPrefixes;
 };
 
 

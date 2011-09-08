@@ -82,7 +82,7 @@ private:
     QList<QPair<QString, QString> > m_categoryList;
 
     enum State {State_Unauthorized, State_Authorized, State_Finished, State_Failed};
-    QNetworkAccessManager *manager;
+    QNetworkAccessManager *m_manager;
     QByteArray m_auth;
     QString m_login;
     QString m_password;

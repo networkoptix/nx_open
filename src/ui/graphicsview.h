@@ -144,7 +144,9 @@ protected:
     bool isALTPressed(const QInputEvent* event) const;
 
 
-    bool isItemFullScreenZoomed(QGraphicsItem* item);
+    bool isItemFullScreenZoomed(QGraphicsItem* item) const;
+    bool isNavigationMode() const;
+    bool mouseIsCloseToNavigationControl(QPoint mpos) const;
 
     CLAbstractSceneItem* navigationItem(QGraphicsItem* item) const;
 
