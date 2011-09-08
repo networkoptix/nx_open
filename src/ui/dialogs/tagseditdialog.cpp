@@ -13,6 +13,8 @@ TagsEditDialog::TagsEditDialog(const QStringList &objectIds, QWidget *parent) :
     ui(new Ui::TagsEditDialog),
     m_objectIds(objectIds)
 {
+    setWindowTitle(tr("Edit File Tags"));
+
     ui->setupUi(this);
 
     m_objectTagsModel = new QStandardItemModel;

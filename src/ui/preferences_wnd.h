@@ -7,6 +7,7 @@
 
 class CLDevice;
 class RecordingSettingsWidget;
+class YouTubeSettingsWidget;
 
 class PreferencesWindow : public QDialog, Ui::PreferencesDialog
 {
@@ -28,6 +29,7 @@ private:
 private:
     Settings::Data m_settingsData;
     RecordingSettingsWidget *videoRecorderWidget;
+    YouTubeSettingsWidget *youTubeSettingsWidget;
 
     typedef QPair<QString, QString> CameraNameAndInfo;
 

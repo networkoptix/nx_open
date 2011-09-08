@@ -31,6 +31,7 @@
 #include "ui/animation/property_animation.h"
 #include "ui/recordingsettingswidget.h"
 #include "ui/dialogs/tagseditdialog.h"
+#include "youtube/youtubeuploaddialog.h"
 #include "videorecordersettings.h"
 
 #include <QtCore/QPropertyAnimation>
@@ -406,7 +407,21 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
         return;
 
 
+    if (isNavigationMode() && m_navigationItem->mouseOver() )
+    {
+        // do not zoom scene if mouse is over m_navigationItem
+        QGraphicsView::wheelEvent(e);
+        return;
+    }
 
+
+    if (isNavigationMode() && mouseIsCloseToNavigationControl(e->pos()) )
+    {
+        // if mouse is just a bit above navogationitm => ignore event
+        return;
+    }
+
+    /*/
     if (m_navigationItem && ( m_navigationItem->mouseOver() || m_navigationItem->isActive()))
     {
         // scene should not be zoomed if mouse is over time slider or if time slider is active
@@ -940,10 +955,10 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 
             ++m_rotationCounter;
 
-            if (m_rotationCounter>1)
+            if (m_rotationCounter>2)
             {
 
-                if (m_rotationCounter==2)
+                if (m_rotationCounter==3)
                 {
                     // at very beginning of the rotation
                     QRectF view_scene = mapToScene(viewport()->rect()).boundingRect(); //viewport in the scene cord
@@ -1018,7 +1033,7 @@ void GraphicsView::mouseReleaseEvent(QMouseEvent * event)
 //    bool right_button = event->button() == Qt::RightButton;
     bool mid_button = event->button() == Qt::MidButton;
     bool handMoving = m_handMoving>2;
-    bool rotating = m_rotationCounter>2;
+    bool rotating = m_rotationCounter>3;
 
     if (left_button) // if left button released
     {
@@ -1166,6 +1181,13 @@ void GraphicsView::mouseReleaseEvent(QMouseEvent * event)
             }
             else if (aitem && aitem==m_selectedWnd && m_selectedWnd->isFullScreen() && aitem->isZoomable()) // else must be here coz onNewItemSelected_helper change things
             {
+
+                if (isNavigationMode() && mouseIsCloseToNavigationControl(event->pos()) )
+                {
+                    // if mouse is just a bit above navogationitm => ignore event
+                    return;
+                }
+
                 QPointF scene_pos = mapToScene(event->pos());
                 int w = mapToScene(viewport()->rect()).boundingRect().width()/2;
                 int h = mapToScene(viewport()->rect()).boundingRect().height()/2;
@@ -1306,6 +1328,11 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
             if (dev->checkDeviceTypeFlag(CLDevice::NETWORK) || dev->checkDeviceTypeFlag(CLDevice::ARCHIVE) || dev->checkDeviceTypeFlag(CLDevice::RECORDED))
             {
                 menu.addAction(&cm_take_screenshot);
+            }
+
+            if (dev->checkDeviceTypeFlag(CLDevice::ARCHIVE) || dev->checkDeviceTypeFlag(CLDevice::RECORDED))
+            {
+                menu.addAction(&cm_upload_youtube);
             }
 
             if (dev->checkDeviceTypeFlag(CLDevice::ARCHIVE))
@@ -1595,6 +1622,13 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
             if (act == &cm_take_screenshot && video_wnd)
                 contextMenuHelper_takeScreenshot(video_wnd);
+
+            if (act == &cm_upload_youtube && dev)
+            {
+                YouTubeUploadDialog dialog(dev, this);
+                dialog.setWindowModality(Qt::ApplicationModal);
+                dialog.exec();
+            }
 
             if (act == &cm_open_web_page&& cam)
                 contextMenuHelper_openInWebBroser(cam);
@@ -2178,7 +2212,7 @@ bool GraphicsView::isALTPressed(const QInputEvent* event) const
     return event->modifiers() & Qt::AltModifier;
 }
 
-bool GraphicsView::isItemFullScreenZoomed(QGraphicsItem* item)
+bool GraphicsView::isItemFullScreenZoomed(QGraphicsItem* item) const 
 {
     QRectF scene_rect =  item->sceneBoundingRect();
     QRect item_view_rect = mapFromScene(scene_rect).boundingRect();
@@ -2187,6 +2221,30 @@ bool GraphicsView::isItemFullScreenZoomed(QGraphicsItem* item)
         return true;
 
     return false;
+}
+
+bool GraphicsView::isNavigationMode() const
+{
+    if (!m_selectedWnd || !isItemStillExists(m_selectedWnd) || !m_navigationItem)
+        return false;
+
+    if (m_selectedWnd->isFullScreen() || isItemFullScreenZoomed(m_selectedWnd ) ) // if full screen or zoomed in a lot
+        return true;
+
+    return false;
+}
+
+bool GraphicsView::mouseIsCloseToNavigationControl(QPoint mpos) const
+{
+    int mouse_y = mpos.y();
+    int navigation_top = viewport()->height() - NavigationItem::DEFAULT_HEIGHT;
+    int navigation_top_gap  = navigation_top - 30;
+
+    if (mouse_y >= navigation_top_gap && mouse_y <= navigation_top)
+        return true;
+
+    return false;
+        
 }
 
 CLAbstractSceneItem* GraphicsView::navigationItem(QGraphicsItem* item) const
@@ -2277,13 +2335,13 @@ NavigationItem *GraphicsView::getNavigationItem()
         m_navigationItem = new NavigationItem();
         m_navigationItem->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
 
-        int m_width = width();
-        int m_height = NavigationItem::DEFAULT_HEIGHT;
+        int lwidth = width();
+        int height = NavigationItem::DEFAULT_HEIGHT;
 
-        QPoint pos (0, viewport()->height() - m_height);
+        QPoint pos (0, viewport()->height() - height);
         m_navigationItem->setStaticPos(pos);
         m_navigationItem->setVisible(false);
-        m_navigationItem->graphicsWidget()->resize(m_width, m_height);
+        m_navigationItem->graphicsWidget()->resize(lwidth, height);
         m_navigationItem->setZValue(INT_MAX);
         m_scene.addItem(m_navigationItem);
 

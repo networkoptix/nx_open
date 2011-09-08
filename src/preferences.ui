@@ -50,30 +50,26 @@
          <property name="title">
           <string>Main Media Folder</string>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout_4">
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
-            <item>
-             <widget class="QLabel" name="mediaRootLabel">
-              <property name="text">
-               <string/>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="browseButton">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>Change...</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <widget class="QLabel" name="mediaRootLabel">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="browseButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Change...</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -179,16 +175,16 @@
              <string>Auto</string>
             </property>
             <property name="minimum">
-             <number>0</number>
+             <number>3</number>
             </property>
             <property name="maximum">
              <number>32</number>
             </property>
             <property name="singleStep">
-             <number>4</number>
+             <number>1</number>
             </property>
             <property name="value">
-             <number>0</number>
+             <number>3</number>
             </property>
            </widget>
           </item>
