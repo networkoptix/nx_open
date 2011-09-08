@@ -48,16 +48,16 @@ qint64 CLAVIStreamReader::packetTimestamp(AVStream* stream, const AVPacket& pack
     double timeBase = av_q2d(stream->time_base);
     qint64 dts = m_videoStreamIndex != -1 ? m_formatContext->streams[m_videoStreamIndex]->first_dts : stream->first_dts;
     qint64 firstDts = (dts == AV_NOPTS_VALUE) ? 0 : dts;
-
-    if (packet.dts != AV_NOPTS_VALUE)
+    qint64 packetTime = packet.dts != AV_NOPTS_VALUE ? packet.dts : packet.pts;
+    if (packetTime != AV_NOPTS_VALUE)
     {
-        if (packet.dts < firstDts)
+        if (packetTime < firstDts)
             firstDts = 0; // protect for some invalid streams 
-        double ttm = timeBase * (packet.dts - firstDts);
+        double ttm = timeBase * (packetTime - firstDts);
         return qint64(1e+6 * ttm);
     }
     else {
-        return firstDts;
+        return m_lastJumpTime;
     }
 }
 
@@ -79,7 +79,8 @@ CLAVIStreamReader::CLAVIStreamReader(CLDevice* dev ) :
     m_topIFrameTime(-1),
     m_bottomIFrameTime(-1),
     m_frameTypeExtractor(0),
-    m_lastGopSeekTime(-1)
+    m_lastGopSeekTime(-1),
+    m_lastJumpTime(0)
 {
     // Should init packets here as some times destroy (av_free_packet) could be called before init
     av_init_packet(&m_packets[0]);
@@ -156,6 +157,7 @@ AVFormatContext* CLAVIStreamReader::getFormatContext()
 
 bool CLAVIStreamReader::init()
 {
+    m_lastJumpTime = 0;
 	static bool firstInstance = true;
 
 	QMutexLocker mutex(&m_cs);
@@ -436,8 +438,7 @@ begin_label:
                         av_free_packet(&currentPacket());
                         qint64 tmpVal = m_bottomIFrameTime;
                         if (m_lastGopSeekTime == 0) {
-                            seekTime = m_lengthMksec;
-                            tmpVal = m_lengthMksec - 100 * 1000;
+                            tmpVal = seekTime = m_lengthMksec - 300 * 1000;
                         }
                         channeljumpTo(seekTime, 0);
                         m_lastGopSeekTime = seekTime;
@@ -540,6 +541,7 @@ void CLAVIStreamReader::channeljumpTo(quint64 mksec, int /*channel*/)
 	m_wakeup = true;
     m_bottomIFrameTime = -1;
     m_topIFrameTime = -1;
+    m_lastJumpTime = mksec;
 }
 
 void CLAVIStreamReader::destroy()
