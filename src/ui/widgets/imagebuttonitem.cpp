@@ -8,13 +8,12 @@ class ImageButtonItemPrivate : public AbstractButtonItemPrivate
     Q_DECLARE_PUBLIC(ImageButtonItem)
 
 public:
-    ImageButtonItemPrivate(ImageButtonItem *qq) : AbstractButtonItemPrivate(qq), hovered(false) {}
-
-public:
-    QPixmap pixmaps[ImageButtonItem::NGroups][ImageButtonItem::Nroles];
-    bool hovered;
+    ImageButtonItemPrivate() : AbstractButtonItemPrivate() {}
 
     QPixmap getPixmap(ImageButtonItem::PixmapGroup group);
+
+private:
+    QPixmap pixmaps[ImageButtonItem::NGroups][ImageButtonItem::Nroles];
 };
 
 QPixmap ImageButtonItemPrivate::getPixmap(ImageButtonItem::PixmapGroup group)
@@ -45,15 +44,13 @@ QPixmap ImageButtonItemPrivate::getPixmap(ImageButtonItem::PixmapGroup group)
 
 
 ImageButtonItem::ImageButtonItem(QGraphicsWidget *parent) :
-    AbstractButtonItem(*new ImageButtonItemPrivate(this), parent)
+    AbstractButtonItem(*new ImageButtonItemPrivate, parent)
 {
-    setAcceptsHoverEvents(true);
 }
 
 ImageButtonItem::ImageButtonItem(AbstractButtonItemPrivate &dd, QGraphicsWidget *parent) :
     AbstractButtonItem(dd, parent)
 {
-    setAcceptsHoverEvents(true);
 }
 
 void ImageButtonItem::addPixmap(const QPixmap &pix, ImageButtonItem::PixmapGroup group, ImageButtonItem::PixmapRole role)
@@ -69,18 +66,4 @@ void ImageButtonItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
     QPixmap pix = d_func()->getPixmap(isEnabled() ? Active : Disabled);
 
     painter->drawPixmap(rect(), pix, QRectF(pix.rect()));
-}
-
-void ImageButtonItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
-{
-    d_func()->hovered = true;
-    AbstractButtonItem::hoverEnterEvent(event);
-    update();
-}
-
-void ImageButtonItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
-{
-    d_func()->hovered = false;
-    AbstractButtonItem::hoverLeaveEvent(event);
-    update();
 }
