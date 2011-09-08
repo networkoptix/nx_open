@@ -349,7 +349,8 @@ void FrameTypeExtractor::decodeWMVSequence(const quint8* data, int size)
 FrameTypeExtractor::FrameTypeExtractor(AVCodecContext* context): 
     m_context(context), 
     m_codecId(context->codec_id),
-    m_vcSequence(0)
+    m_vcSequence(0),
+    m_dataWithNalPrefixes(false)
 {
     if (m_context && context->extradata_size > 0)
     {
@@ -369,6 +370,10 @@ FrameTypeExtractor::FrameTypeExtractor(AVCodecContext* context):
         {
             decodeWMVSequence(data, context->extradata_size);
         }
+        else if (m_codecId == CODEC_ID_H264) {
+            m_dataWithNalPrefixes = context->extradata[0] == 0;
+        }
+
     }
 }
 
@@ -381,14 +386,10 @@ FrameTypeExtractor::FrameType FrameTypeExtractor::getH264FrameType(const quint8*
 {
     if (size < 4)
         return UnknownFrameType;
-    bool dataWithNalPrefixes = false;
-    if (data[0] == 0 && data[1] == 0) {
-         dataWithNalPrefixes = data[2] == 0 && data[3] == 1 || data[2] == 1;
-    }
     const quint8* end = data + size;
     while (data < end)
     {
-        if (dataWithNalPrefixes) {
+        if (m_dataWithNalPrefixes) {
             data = NALUnit::findNextNAL(data, end);
             if (data >= end)
                 break;
@@ -419,7 +420,7 @@ FrameTypeExtractor::FrameType FrameTypeExtractor::getH264FrameType(const quint8*
                 return UnknownFrameType;
             }
         }
-        if (!dataWithNalPrefixes)
+        if (!m_dataWithNalPrefixes)
             break;
     }
     return UnknownFrameType;
