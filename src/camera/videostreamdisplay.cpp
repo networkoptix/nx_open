@@ -288,6 +288,7 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
         delete tmpOutFrame;
         m_flushedBeforeReverseStart = true;
         reorderPrevFrames();
+        dec->resetDecoder();
     }
 
 	if (!dec || !dec->decode(*data, useTmpFrame ? &m_tmpFrame : outFrame))

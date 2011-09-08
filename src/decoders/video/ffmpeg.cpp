@@ -156,8 +156,16 @@ void CLFFmpegVideoDecoder::resetDecoder()
 {
     QMutexLocker mutex(&global_ffmpeg_mutex);
 
-    closeDecoder();
-    openDecoder();
+    //closeDecoder();
+    //openDecoder();
+
+    // I have improved resetDecoder speed (I have left only minimum operations) because of REW. REW calls reset decoder on each GOP.
+    avcodec_close(m_context);
+    if (m_passedContext) 
+        avcodec_copy_context(m_context, m_passedContext);
+    m_context->thread_count = qMin(4, QThread::idealThreadCount() + 1);
+    m_context->thread_type = m_mtDecoding ? FF_THREAD_FRAME : FF_THREAD_SLICE;
+    avcodec_open(m_context, m_codec);
 }
 //The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than the actual read bytes because some optimized bitstream readers read 32 or 64 bits at once and could read over the end.
 //The end of the input buffer buf should be set to 0 to ensure that no overreading happens for damaged MPEG streams.
