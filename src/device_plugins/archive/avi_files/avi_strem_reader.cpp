@@ -177,8 +177,8 @@ bool CLAVIStreamReader::init()
 
 	m_currentTime = 0;
 	m_previousTime = -1;
-    m_bottomIFrameTime =-1;
-    m_topIFrameTime = -1;
+    //m_bottomIFrameTime =-1;
+    //m_topIFrameTime = -1;
 
     m_formatContext = getFormatContext();
     if (!m_formatContext)
@@ -366,6 +366,7 @@ begin_label:
             m_topIFrameTime = jumpTime;
         else
             setSkipFramesToTime(jumpTime);
+        
     }
 
 	QnAviSemaphoreHelpr sem(aviSemaphore);
@@ -424,6 +425,11 @@ begin_label:
             else {
                 isKeyFrame =  currentPacket().flags  & AV_PKT_FLAG_KEY;
             }
+            
+            if (m_eof) {
+                m_currentTime = m_topIFrameTime;
+                m_eof = false;
+            }
 
             if (isKeyFrame || m_currentTime >= m_topIFrameTime)
             {
@@ -438,7 +444,8 @@ begin_label:
                         av_free_packet(&currentPacket());
                         qint64 tmpVal = m_bottomIFrameTime;
                         if (m_lastGopSeekTime == 0) {
-                            tmpVal = seekTime = m_lengthMksec - 300 * 1000;
+                            seekTime = m_lengthMksec - BACKWARD_SEEK_STEP;
+                            tmpVal = m_lengthMksec;
                         }
                         channeljumpTo(seekTime, 0);
                         m_lastGopSeekTime = seekTime;
@@ -535,7 +542,7 @@ void CLAVIStreamReader::channeljumpTo(quint64 mksec, int /*channel*/)
     QMutexLocker mutex(&m_cs);
     mksec += startMksec();
     if (mksec > 0)
-        avformat_seek_file(m_formatContext, -1, 0, mksec, mksec, AVSEEK_FLAG_BACKWARD);
+        avformat_seek_file(m_formatContext, -1, 0, mksec, LLONG_MAX, AVSEEK_FLAG_BACKWARD);
     else {
         // some files can't correctly jump to 0
         destroy();
@@ -546,7 +553,7 @@ void CLAVIStreamReader::channeljumpTo(quint64 mksec, int /*channel*/)
 	m_previousTime = -1;
 	m_wakeup = true;
     m_bottomIFrameTime = -1;
-    m_topIFrameTime = -1;
+    m_topIFrameTime = mksec;
     m_lastJumpTime = mksec;
 }
 
