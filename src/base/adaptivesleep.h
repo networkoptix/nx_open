@@ -46,7 +46,7 @@ public:
           }
           //cl_log.log("sleep time=", havetowait/1000000.0, cl_logALWAYS);
           if (havetowait < MAX_VALID_SLEEP_TIME)
-            CLSleep::msleep(qMin(havetowait/1000, mksec/800)); // max sleep time is source delay*1.2
+            CLSleep::msleep(qMin(havetowait/1000, mksec/1000));
           else
               afterdelay();
           return havetowait;
