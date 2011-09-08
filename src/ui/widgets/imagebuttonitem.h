@@ -23,13 +23,13 @@ public:
         Inactive,
         NGroups
     };
-    explicit ImageButtonItem(QGraphicsWidget *parent = 0);
+    explicit ImageButtonItem(QGraphicsItem *parent = 0);
 
     void addPixmap(const QPixmap &pix, PixmapGroup group, PixmapRole role);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
 protected:
-    explicit ImageButtonItem(AbstractButtonItemPrivate &dd, QGraphicsWidget *parent = 0);
+    explicit ImageButtonItem(AbstractButtonItemPrivate &dd, QGraphicsItem *parent = 0);
 
 private:
     Q_DECLARE_PRIVATE(ImageButtonItem)

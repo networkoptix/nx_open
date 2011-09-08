@@ -26,7 +26,7 @@ class AbstractButtonItem : public QGraphicsWidget
     Q_PROPERTY(bool down READ isDown WRITE setDown DESIGNABLE false)
 
 public:
-    explicit AbstractButtonItem(QGraphicsWidget *parent = 0);
+    explicit AbstractButtonItem(QGraphicsItem *parent = 0);
     ~AbstractButtonItem();
 
     void setText(const QString &text);
@@ -99,7 +99,7 @@ protected:
     void timerEvent(QTimerEvent *e);
 
 protected:
-    AbstractButtonItem(AbstractButtonItemPrivate &dd, QGraphicsWidget *parent = 0);
+    AbstractButtonItem(AbstractButtonItemPrivate &dd, QGraphicsItem *parent = 0);
     const QScopedPointer<AbstractButtonItemPrivate> d_ptr;
 
 private:
