@@ -248,7 +248,8 @@ bool CLFFmpegVideoDecoder::decode(const CLCompressedVideoData& data, CLVideoDeco
     int got_picture = 0;
 
     // ### handle errors
-    m_context->pix_fmt = PixelFormat(0);
+    if (m_context->pix_fmt == -1)
+        m_context->pix_fmt = PixelFormat(0);
     avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
     if (data.useTwice)
         avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
