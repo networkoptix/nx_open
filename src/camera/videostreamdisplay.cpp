@@ -213,7 +213,7 @@ void CLVideoStreamDisplay::checkQueueOverflow(CLAbstractVideoDecoder* dec)
     m_realReverseSize--;
 }
 
-bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVideoDecoderOutput::downscale_factor force_factor)
+CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVideoDecoderOutput::downscale_factor force_factor)
 {
     m_mtx.lock();
     // use only 1 frame for non selected video
@@ -246,7 +246,7 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
 	{
 		cl_log.log(QLatin1String("CLVideoStreamDisplay::dispay: unknown codec type..."), cl_logERROR);
         m_mtx.unlock();
-        return true; // true to prevent 100% cpu usage on unknown codec
+        return Status_Displayed; // true to prevent 100% cpu usage on unknown codec
 	}
 
     CLAbstractVideoDecoder* dec = m_decoder[data->compressionType];
@@ -259,7 +259,7 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
     if (dec == 0) {
         CL_LOG(cl_logDEBUG2) cl_log.log(QLatin1String("Can't find video decoder"), cl_logDEBUG2);
         m_mtx.unlock();
-        return true;
+        return Status_Displayed;
     }
 
     if (reverseMode != m_prevReverseMode) {
@@ -308,9 +308,9 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
             if (outFrame->data[0])
                 m_realReverseSize--;
             processDecodedFrame(data->channelNumber, outFrame, enableFrameQueue, reverseMode);
-            return true;
+            return Status_Displayed;
         }
-		return false;
+		return Status_Skipped;
 	}
     m_mtx.unlock();
 
@@ -328,7 +328,7 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
     }
 
 	if (!draw || !m_drawer)
-		return true;
+		return Status_Displayed;
 
     if (useTmpFrame)
     {
@@ -349,14 +349,14 @@ bool CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVide
         checkQueueOverflow(dec);
         m_frameQueue[m_frameQueueIndex] = new CLVideoDecoderOutput();
         if (!(m_reverseQueue.front()->flags & AV_REVERSE_REORDERED))
-            return false; // frame does not ready. need more frames. does not perform wait
+            return Status_Buffered; // frame does not ready. need more frames. does not perform wait
         outFrame = m_reverseQueue.dequeue();
         if (outFrame->data[0])
             m_realReverseSize--;
     }
     
     processDecodedFrame(data->channelNumber, outFrame, enableFrameQueue, reverseMode);
-    return true;
+    return Status_Displayed;
 }
 
 void CLVideoStreamDisplay::processDecodedFrame(int channel, CLVideoDecoderOutput* outFrame, bool enableFrameQueue, bool reverseMode)

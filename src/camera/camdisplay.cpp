@@ -85,7 +85,7 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_playingBitrate(0),
       m_tooSlowCounter(0),
       m_lightCpuMode(CLAbstractVideoDecoder::DecodeMode_Full),
-      m_lastFrameDisplayed(false)
+      m_lastFrameDisplayed(CLVideoStreamDisplay::Status_Displayed)
 {
     m_storedMaxQueueSize = m_dataQueue.maxSize();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
@@ -172,27 +172,30 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
 
     if (sleep)
     {
-        int realSleepTime = m_lastFrameDisplayed ? m_delay.sleep(needToSleep) : m_delay.addQuant(needToSleep);
-        //str << "sleep time: " << needToSleep << "  real:" << realSleepTime;
-        if (qAbs(m_speed) > 1.0 + FPS_EPS)
+        if (m_lastFrameDisplayed != CLVideoStreamDisplay::Status_Buffered)
         {
-            if (realSleepTime < 0)
+            int realSleepTime = m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed ? m_delay.sleep(needToSleep) : m_delay.addQuant(needToSleep);
+            //str << "sleep time: " << needToSleep << "  real:" << realSleepTime;
+            if (qAbs(m_speed) > 1.0 + FPS_EPS)
             {
-                if (realSleepTime > -200*1000 && m_lightCpuMode == CLAbstractVideoDecoder::DecodeMode_Full)
+                if (realSleepTime < 0)
                 {
-                    setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Fast);
+                    if (realSleepTime > -200*1000 && m_lightCpuMode == CLAbstractVideoDecoder::DecodeMode_Full)
+                    {
+                        setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Fast);
+                    }
+                    else if (m_iFrames > 1) {
+                        qint64 avgGopDuration = ((qint64)needToSleep * m_totalFrames)/m_iFrames;
+                        if (realSleepTime < qMin(-400*1000ll, -avgGopDuration))
+                            setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Fastest);
+                        else if (vd->flags & AV_PKT_FLAG_KEY)
+                            setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Fast);
+                    }
                 }
-                else if (m_iFrames > 1) {
-                    qint64 avgGopDuration = ((qint64)needToSleep * m_totalFrames)/m_iFrames;
-                    if (realSleepTime < qMin(-400*1000ll, -avgGopDuration))
-                        setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Fastest);
-                    else if (vd->flags & AV_PKT_FLAG_KEY)
+                else if (vd->flags & AV_PKT_FLAG_KEY) {
+                    if (m_lightCpuMode == CLAbstractVideoDecoder::DecodeMode_Fastest)
                         setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Fast);
                 }
-            }
-            else if (vd->flags & AV_PKT_FLAG_KEY) {
-                if (m_lightCpuMode == CLAbstractVideoDecoder::DecodeMode_Fastest)
-                    setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Fast);
             }
         }
     }

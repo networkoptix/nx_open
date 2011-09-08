@@ -16,10 +16,12 @@ static const int MAX_FRAME_QUEUE_SIZE = 2;
 class CLVideoStreamDisplay
 {
 public:
+    enum FrameDisplayStatus {Status_Displayed, Status_Skipped, Status_Buffered};
+
     CLVideoStreamDisplay(bool can_downscale);
     ~CLVideoStreamDisplay();
     void setDrawer(CLAbstractRenderer* draw);
-    bool dispay(CLCompressedVideoData* data, bool draw,
+    FrameDisplayStatus dispay(CLCompressedVideoData* data, bool draw,
                 CLVideoDecoderOutput::downscale_factor force_factor = CLVideoDecoderOutput::factor_any);
 
     void setLightCPUMode(CLAbstractVideoDecoder::DecodeMode val);

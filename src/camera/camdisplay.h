@@ -7,6 +7,7 @@
 #include "streamreader/streamreader.h"
 #include "data/mediadata.h"
 #include "decoders/video/abstractdecoder.h"
+#include "videostreamdisplay.h"
 
 class CLAbstractRenderer;
 class CLVideoStreamDisplay;
@@ -124,7 +125,7 @@ private:
     int m_tooSlowCounter;
     int m_storedMaxQueueSize;
     CLAbstractVideoDecoder::DecodeMode m_lightCpuMode;
-    bool m_lastFrameDisplayed;
+    CLVideoStreamDisplay::FrameDisplayStatus m_lastFrameDisplayed;
 };
 
 #endif //clcam_display_h_1211
