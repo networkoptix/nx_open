@@ -303,12 +303,16 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(CLCompress
 	if (!dec || !dec->decode(*data, useTmpFrame ? &m_tmpFrame : outFrame))
 	{
         m_mtx.unlock();
+        if (m_lightCPUmode == CLAbstractVideoDecoder::DecodeMode_Fastest)
+            return Status_Skipped;
         if (!m_reverseQueue.isEmpty() && (m_reverseQueue.front()->flags & AV_REVERSE_REORDERED)) {
             outFrame = m_reverseQueue.dequeue();
             if (outFrame->data[0])
                 m_realReverseSize--;
-            processDecodedFrame(data->channelNumber, outFrame, enableFrameQueue, reverseMode);
-            return Status_Displayed;
+            if (processDecodedFrame(data->channelNumber, outFrame, enableFrameQueue, reverseMode))
+                return Status_Displayed;
+            else
+                return Status_Buffered;
         }
 		return Status_Skipped;
 	}
@@ -357,11 +361,13 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(CLCompress
             m_realReverseSize--;
     }
     
-    processDecodedFrame(data->channelNumber, outFrame, enableFrameQueue, reverseMode);
-    return Status_Displayed;
+    if (processDecodedFrame(data->channelNumber, outFrame, enableFrameQueue, reverseMode))
+        return Status_Displayed;
+    else
+        return Status_Buffered;
 }
 
-void CLVideoStreamDisplay::processDecodedFrame(int channel, CLVideoDecoderOutput* outFrame, bool enableFrameQueue, bool reverseMode)
+bool CLVideoStreamDisplay::processDecodedFrame(int channel, CLVideoDecoderOutput* outFrame, bool enableFrameQueue, bool reverseMode)
 {
     if (outFrame->pts != AV_NOPTS_VALUE)
         setLastDisplayedTime(outFrame->pts);
@@ -378,9 +384,11 @@ void CLVideoStreamDisplay::processDecodedFrame(int channel, CLVideoDecoderOutput
                 delete m_prevFrameToDelete;
             m_prevFrameToDelete = outFrame;
         }
+        return true;
     }
     else {
         delete outFrame;
+        return false;
     }
 }
 

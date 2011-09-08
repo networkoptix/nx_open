@@ -83,7 +83,7 @@ private:
         int srcWidth, 
         int srcHeight, 
         CLVideoDecoderOutput::downscale_factor force_factor);
-    void processDecodedFrame(int channel, CLVideoDecoderOutput* outFrame, bool enableFrameQueue, bool reverseMode);
+    bool processDecodedFrame(int channel, CLVideoDecoderOutput* outFrame, bool enableFrameQueue, bool reverseMode);
     void checkQueueOverflow(CLAbstractVideoDecoder* dec);
     void clearReverseQueue();
 };
