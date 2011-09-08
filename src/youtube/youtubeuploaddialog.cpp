@@ -196,8 +196,5 @@ void YouTubeUploadDialog::authFinished()
     disconnect(m_youtubeuploader, SIGNAL(authFailed()), this, SLOT(authFailed()));
     disconnect(m_youtubeuploader, SIGNAL(authFinished()), this, SLOT(authFinished()));
 
-    if (parent())
-        connect(parent(), SIGNAL(destroyed()), progressDialog, SLOT(deleteLater()));
-
     QDialog::accept();
 }
