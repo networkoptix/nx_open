@@ -534,7 +534,13 @@ void CLAVIStreamReader::channeljumpTo(quint64 mksec, int /*channel*/)
 {
     QMutexLocker mutex(&m_cs);
     mksec += startMksec();
-    avformat_seek_file(m_formatContext, -1, 0, mksec, LLONG_MAX, AVSEEK_FLAG_BACKWARD);
+    if (mksec > 0)
+        avformat_seek_file(m_formatContext, -1, 0, mksec, mksec, AVSEEK_FLAG_BACKWARD);
+    else {
+        // some files can't correctly jump to 0
+        destroy();
+        init();
+    }
 
 	//m_needToSleep = 0;
 	m_previousTime = -1;
