@@ -9,9 +9,9 @@ class QGraphicsWidget;
 class QTimerEvent;
 class CLVideoCamera;
 class TimeSlider;
-class SpeedWidget;
+class SpeedSlider;
+class TimeSliderToolTipItem;
 class VolumeSlider;
-class MyTextItem;
 
 class MyLable : public QLabel
 {
@@ -144,7 +144,7 @@ private:
     ImageButtonItem *m_playButton;
     ImageButtonItem *m_forwardButton;
     ImageButtonItem *m_stepForwardButton;
-    SpeedWidget *m_speedWidget;
+    SpeedSlider *m_speedSlider;
     QGraphicsWidget *m_graphicsWidget;
     ImageButtonItem *m_muteButton;
     VolumeSlider *m_volumeSlider;
@@ -156,7 +156,7 @@ private:
     bool m_mouseOver;
     bool m_playing;
 
-    MyTextItem *m_textItem;
+    TimeSliderToolTipItem *m_timesliderToolTip;
     bool m_active;
 
     struct RestoreInfoTextData {

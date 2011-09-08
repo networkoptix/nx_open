@@ -27,6 +27,8 @@ private Q_SLOTS:
     void onValueChanged(int);
 
 private:
+    Q_DISABLE_COPY(VolumeSlider)
+
     int m_timerId;
     QString m_text;
 };
