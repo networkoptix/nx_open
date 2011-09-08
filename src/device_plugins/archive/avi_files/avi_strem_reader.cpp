@@ -197,8 +197,10 @@ bool CLAVIStreamReader::init()
     av_init_packet(&m_packets[1]);
 
     delete m_frameTypeExtractor;
-    m_frameTypeExtractor = new FrameTypeExtractor(m_formatContext->streams[m_videoStreamIndex]->codec);
-
+    if (m_videoStreamIndex >= 0)
+        m_frameTypeExtractor = new FrameTypeExtractor(m_formatContext->streams[m_videoStreamIndex]->codec);
+    else
+        m_frameTypeExtractor = 0;
 
     return true;
 }
