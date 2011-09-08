@@ -43,12 +43,12 @@ QPixmap ImageButtonItemPrivate::getPixmap(ImageButtonItem::PixmapGroup group)
 }
 
 
-ImageButtonItem::ImageButtonItem(QGraphicsWidget *parent) :
+ImageButtonItem::ImageButtonItem(QGraphicsItem *parent) :
     AbstractButtonItem(*new ImageButtonItemPrivate, parent)
 {
 }
 
-ImageButtonItem::ImageButtonItem(AbstractButtonItemPrivate &dd, QGraphicsWidget *parent) :
+ImageButtonItem::ImageButtonItem(AbstractButtonItemPrivate &dd, QGraphicsItem *parent) :
     AbstractButtonItem(dd, parent)
 {
 }

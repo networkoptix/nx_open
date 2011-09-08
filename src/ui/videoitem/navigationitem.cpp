@@ -16,7 +16,7 @@
 #include "ui/videoitem/video_wnd_item.h"
 #include "ui/widgets/imagebuttonitem.h"
 #include "ui/widgets/speedwidget.h"
-#include "ui/widgets/volumewidget.h"
+#include "ui/widgets/volumeslider.h"
 
 class MyTextItem: public QGraphicsItem
 {
@@ -108,26 +108,17 @@ NavigationWidget::NavigationWidget(QWidget *parent) :
 
     m_label = new MyLable;
 
-    m_volumeWidget = new VolumeWidget(this);
-    m_volumeWidget->setObjectName("VolumeWidget");
-
     m_layout = new QHBoxLayout;
     m_layout->setContentsMargins(10, 0, 10, 0);
     m_layout->setSpacing(10);
     m_layout->addWidget(m_slider);
     m_layout->addWidget(m_label);
-    m_layout->addWidget(m_volumeWidget);
     setLayout(m_layout);
 }
 
 TimeSlider * NavigationWidget::slider() const
 {
     return m_slider;
-}
-
-VolumeWidget *NavigationWidget::volumeWidget() const
-{
-    return m_volumeWidget;
 }
 
 QLabel * NavigationWidget::label() const
@@ -154,20 +145,17 @@ NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
     m_stepBackwardButton->addPixmap(QPixmap(":/skin/step_backward_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
     m_stepBackwardButton->addPixmap(QPixmap(":/skin/step_backward_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
     m_stepBackwardButton->addPixmap(QPixmap(":/skin/step_backward_disabled.png"), ImageButtonItem::Disabled, ImageButtonItem::Background);
-    m_stepBackwardButton->setMinimumSize(48, 27);
-    m_stepBackwardButton->setMaximumSize(48, 27);
+    m_stepBackwardButton->setPreferredSize(32, 18);
 
     m_backwardButton = new ImageButtonItem;
     m_backwardButton->addPixmap(QPixmap(":/skin/backward_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
     m_backwardButton->addPixmap(QPixmap(":/skin/backward_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
-    m_backwardButton->setMinimumSize(48, 27);
-    m_backwardButton->setMaximumSize(48, 27);
+    m_backwardButton->setPreferredSize(32, 18);
 
     m_playButton = new ImageButtonItem;
     m_playButton->addPixmap(QPixmap(":/skin/play_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
     m_playButton->addPixmap(QPixmap(":/skin/play_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
-    m_playButton->setMinimumSize(48, 45);
-    m_playButton->setMaximumSize(48, 45);
+    m_playButton->setPreferredSize(32, 30);
 
     QAction *playAction = new QAction(tr("Play"), m_playButton);
     playAction->setShortcut(tr("Space"));
@@ -178,31 +166,25 @@ NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
     m_forwardButton = new ImageButtonItem;
     m_forwardButton->addPixmap(QPixmap(":/skin/forward_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
     m_forwardButton->addPixmap(QPixmap(":/skin/forward_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
-    m_forwardButton->setMinimumSize(48, 27);
-    m_forwardButton->setMaximumSize(48, 27);
+    m_forwardButton->setPreferredSize(32, 18);
 
     m_stepForwardButton = new ImageButtonItem;
     m_stepForwardButton->addPixmap(QPixmap(":/skin/step_forward_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
     m_stepForwardButton->addPixmap(QPixmap(":/skin/step_forward_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
     m_stepForwardButton->addPixmap(QPixmap(":/skin/step_forward_disabled.png"), ImageButtonItem::Disabled, ImageButtonItem::Background);
-    m_stepForwardButton->setMinimumSize(48, 27);
-    m_stepForwardButton->setMaximumSize(48, 27);
+    m_stepForwardButton->setPreferredSize(32, 18);
 
     QGraphicsLinearLayout *buttonsLayout = new QGraphicsLinearLayout;
-    buttonsLayout->setContentsMargins(0, 0, 0, 0);
-    /*buttonsLayout->addItem(m_stepBackwardButton);
-    buttonsLayout->setAlignment(m_stepBackwardButton, Qt::AlignHCenter | Qt::AlignVCenter);*/
+    buttonsLayout->addItem(m_stepBackwardButton);
+    buttonsLayout->setAlignment(m_stepBackwardButton, Qt::AlignHCenter | Qt::AlignBottom);
     buttonsLayout->addItem(m_backwardButton);
-    buttonsLayout->setAlignment(m_backwardButton, Qt::AlignHCenter | Qt::AlignVCenter);
+    buttonsLayout->setAlignment(m_backwardButton, Qt::AlignHCenter | Qt::AlignBottom);
     buttonsLayout->addItem(m_playButton);
-    buttonsLayout->setAlignment(m_playButton, Qt::AlignHCenter | Qt::AlignVCenter);
+    buttonsLayout->setAlignment(m_playButton, Qt::AlignHCenter | Qt::AlignBottom);
     buttonsLayout->addItem(m_forwardButton);
-    buttonsLayout->setAlignment(m_forwardButton, Qt::AlignHCenter | Qt::AlignVCenter);
-    /*buttonsLayout->addItem(m_stepForwardButton);
-    buttonsLayout->setAlignment(m_stepForwardButton, Qt::AlignHCenter | Qt::AlignVCenter);*/
-
-    m_stepBackwardButton->hide();
-    m_stepForwardButton->hide();
+    buttonsLayout->setAlignment(m_forwardButton, Qt::AlignHCenter | Qt::AlignBottom);
+    buttonsLayout->addItem(m_stepForwardButton);
+    buttonsLayout->setAlignment(m_stepForwardButton, Qt::AlignHCenter | Qt::AlignBottom);
 
     m_speedWidget = new SpeedWidget;
     m_speedWidget->setObjectName("SpeedWidget");
@@ -221,7 +203,7 @@ NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
     linearLayoutV->setAlignment(buttonsLayout, Qt::AlignCenter);
 
     QGraphicsLinearLayout *mainLayout = new QGraphicsLinearLayout;
-    mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout->setContentsMargins(5, 0, 5, 0);
     mainLayout->addItem(linearLayoutV);
     mainLayout->setAlignment(linearLayoutV, Qt::AlignLeft | Qt::AlignVCenter);
     m_graphicsWidget->setLayout(mainLayout);
@@ -246,8 +228,28 @@ NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
     connect(m_widget->slider(), SIGNAL(sliderPressed()), this, SLOT(onSliderPressed()));
     connect(m_widget->slider(), SIGNAL(sliderReleased()), this, SLOT(onSliderReleased()));
 
-    connect(m_widget->volumeWidget()->slider(), SIGNAL(valueChanged(int)), this, SLOT(onVolumeLevelChanged(int)));
+    // ###
+    m_volumeSlider = new VolumeSlider(Qt::Vertical);
+    m_volumeSlider->setObjectName("VolumeSlider");
+    m_volumeSlider->setCursor(Qt::ArrowCursor);
 
+    m_muteButton = new ImageButtonItem(this);
+    m_muteButton->setObjectName("MuteButton");
+    m_muteButton->addPixmap(QPixmap(":/skin/unmute.png"), ImageButtonItem::Active, ImageButtonItem::Background);
+    m_muteButton->addPixmap(QPixmap(":/skin/mute.png"), ImageButtonItem::Active, ImageButtonItem::Checked);
+    m_muteButton->setPreferredSize(20, 20);
+    m_muteButton->setCheckable(true);
+    m_muteButton->setChecked(m_volumeSlider->isMute());
+    m_muteButton->setCursor(Qt::ArrowCursor);
+
+    connect(m_volumeSlider, SIGNAL(valueChanged(int)), this, SLOT(onVolumeLevelChanged(int)));
+    connect(m_muteButton, SIGNAL(clicked(bool)), m_volumeSlider, SLOT(setMute(bool)));
+
+    mainLayout->addItem(m_muteButton);
+    mainLayout->setAlignment(m_muteButton, Qt::AlignRight | Qt::AlignBottom);
+    mainLayout->addItem(m_volumeSlider);
+    mainLayout->setAlignment(m_volumeSlider, Qt::AlignCenter);
+    // ###
 
     connect(m_widget, SIGNAL(pause()), SLOT(pause()));
     connect(m_widget, SIGNAL(play()), SLOT(play()));
@@ -521,6 +523,8 @@ void NavigationItem::onSpeedChanged(float newSpeed)
 
 void NavigationItem::onVolumeLevelChanged(int newVolumeLevel)
 {
+    m_muteButton->setChecked(m_volumeSlider->isMute());
+
     if (m_camera && m_camera->getVideoWindow())
     {
         CLVideoWindowItem *vwi = m_camera->getVideoWindow();
@@ -537,7 +541,7 @@ void NavigationItem::onVolumeLevelChanged(int newVolumeLevel)
             connect(&restoreInfoTextData->timer, SIGNAL(timeout()), this, SLOT(restoreInfoText()));
         }
 
-        vwi->setExtraInfoText(tr("[ Volume: %1% ]").arg(newVolumeLevel));
+        vwi->setExtraInfoText(tr("[ Volume: %1 ]").arg(!m_volumeSlider->isMute() ? QString::number(newVolumeLevel) + QLatin1Char('%') : tr("Muted")));
 
         restoreInfoTextData->timer.start(3000);
     }
