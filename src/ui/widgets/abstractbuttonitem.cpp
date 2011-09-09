@@ -125,7 +125,7 @@ Q_GUI_EXPORT extern bool qt_tab_all_widgets;
 
 AbstractButtonItemPrivate::AbstractButtonItemPrivate(QSizePolicy::ControlType type)
     : q_ptr(0),
-      hovered(false),
+      isUnderMouse(false),
 #ifndef QT_NO_SHORTCUT
     shortcutId(0),
 #endif
@@ -960,22 +960,23 @@ void AbstractButtonItem::toggle()
 }
 
 
-/*! This virtual handler is called when setChecked() was called,
-unless it was called from within nextCheckState(). It allows
-subclasses to reset their intermediate button states.
+/*!
+    This virtual handler is called when setChecked() was called,
+    unless it was called from within nextCheckState(). It allows
+    subclasses to reset their intermediate button states.
 
-\sa nextCheckState()
+    \sa nextCheckState()
  */
 void AbstractButtonItem::checkStateSet()
 {
 }
 
-/*! This virtual handler is called when a button is clicked. The
-default implementation calls setChecked(!isChecked()) if the button
-isCheckable().  It allows subclasses to implement intermediate button
-states.
+/*!
+    This virtual handler is called when a button is clicked. The
+    default implementation calls setChecked(!isChecked()) if the button
+    isCheckable().  It allows subclasses to implement intermediate button states.
 
-\sa checkStateSet()
+    \sa checkStateSet()
 */
 void AbstractButtonItem::nextCheckState()
 {
@@ -984,21 +985,39 @@ void AbstractButtonItem::nextCheckState()
 }
 
 /*!
-Returns true if \a pos is inside the clickable button rectangle;
-otherwise returns false.
+    Returns true if \a pos is inside the clickable button rectangle;
+    otherwise returns false.
 
-By default, the clickable area is the entire widget. Subclasses
-may reimplement this function to provide support for clickable
-areas of different shapes and sizes.
+    By default, the clickable area is the entire widget. Subclasses
+    may reimplement this function to provide support for clickable
+    areas of different shapes and sizes.
 */
 bool AbstractButtonItem::hitButton(const QPointF &pos) const
 {
     return rect().contains(pos);
 }
 
-/*! \reimp */
+/*!
+    \reimp
+*/
+void AbstractButtonItem::initStyleOption(QStyleOption *option) const
+{
+    Q_D(const AbstractButtonItem);
+
+    QGraphicsWidget::initStyleOption(option);
+    // QTBUG-18797: When setting the flag ItemIgnoresTransformations for an item,
+    // it will receive mouse events as if it was transformed by the view.
+    if (d->isUnderMouse)
+        option->state |= QStyle::State_MouseOver;
+}
+
+/*!
+    \reimp
+*/
 bool AbstractButtonItem::event(QEvent *e)
 {
+    Q_D(AbstractButtonItem);
+
     // as opposed to other widgets, disabled buttons accept mouse
     // events. This avoids surprising click-through scenarios
     if (!isEnabled()) {
@@ -1006,21 +1025,33 @@ bool AbstractButtonItem::event(QEvent *e)
         case QEvent::TabletPress:
         case QEvent::TabletRelease:
         case QEvent::TabletMove:
-        case QEvent::MouseButtonPress:
-        case QEvent::MouseButtonRelease:
-        case QEvent::MouseButtonDblClick:
-        case QEvent::MouseMove:
-        case QEvent::HoverMove:
-        case QEvent::HoverEnter:
-        case QEvent::HoverLeave:
+        case QEvent::GraphicsSceneMousePress:
+        case QEvent::GraphicsSceneMouseRelease:
+        case QEvent::GraphicsSceneMouseDoubleClick:
+        case QEvent::GraphicsSceneMouseMove:
+        case QEvent::GraphicsSceneHoverEnter:
+        case QEvent::GraphicsSceneHoverLeave:
+        case QEvent::GraphicsSceneHoverMove:
         case QEvent::ContextMenu:
 #ifndef QT_NO_WHEELEVENT
-        case QEvent::Wheel:
+        case QEvent::GraphicsSceneWheel:
 #endif
             return true;
         default:
             break;
         }
+    }
+
+    switch (e->type()) {
+    case QEvent::GraphicsSceneHoverEnter:
+        d->isUnderMouse = true;
+        break;
+    case QEvent::GraphicsSceneHoverLeave:
+        d->isUnderMouse = false;
+        break;
+
+    default:
+        break;
     }
 
 #ifndef QT_NO_SHORTCUT
@@ -1220,26 +1251,6 @@ void AbstractButtonItem::timerEvent(QTimerEvent *e)
         d->animateTimer.stop();
         d->click();
     }
-}
-
-/*!
-    \reimp
-*/
-void AbstractButtonItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
-{
-    d_func()->hovered = true;
-
-    QGraphicsWidget::hoverEnterEvent(event);
-}
-
-/*!
-    \reimp
-*/
-void AbstractButtonItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
-{
-    d_func()->hovered = false;
-
-    QGraphicsWidget::hoverLeaveEvent(event);
 }
 
 /*!

@@ -25,7 +25,7 @@ public:
 
     AbstractButtonItem *q_ptr;
 
-    bool hovered;
+    bool isUnderMouse;
 
     QString text;
     QIcon icon;

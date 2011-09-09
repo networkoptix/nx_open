@@ -45,7 +45,7 @@ public:
         setOffset(-pixmap().width() / 2, 0);
         setTextFont(QFont()); // default application font
         setTextColor(QColor(63, 159, 216));
-        setTextRect(ToolTipItem::boundingRect().adjusted(5, 5, -5, -15));
+        setTextRect(ToolTipItem::boundingRect().adjusted(5, 5, -5, -13));
     }
 
     inline QRectF boundingRect() const

@@ -85,14 +85,14 @@ protected:
     virtual void checkStateSet();
     virtual void nextCheckState();
 
+    void initStyleOption(QStyleOption *option) const;
+
     bool event(QEvent *e);
     void keyPressEvent(QKeyEvent *e);
     void keyReleaseEvent(QKeyEvent *e);
     void mousePressEvent(QGraphicsSceneMouseEvent * event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *e);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *e);
-    void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
-    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
     void focusInEvent(QFocusEvent *e);
     void focusOutEvent(QFocusEvent *e);
     void changeEvent(QEvent *e);

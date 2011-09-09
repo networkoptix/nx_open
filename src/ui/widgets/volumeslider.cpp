@@ -24,8 +24,6 @@ public:
 };
 
 
-static const int sliderHeigth = 12;
-
 VolumeSlider::VolumeSlider(Qt::Orientation orientation, QGraphicsItem *parent)
     : GraphicsSlider(orientation, parent),
       m_timerId(0)
@@ -73,7 +71,8 @@ void VolumeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     painter->fillRect(rect(), QColor(0, 0, 0, 0));
 
     QRectF r = contentsRect();
-    /*if (r.height() > sliderHeigth)
+    /*static const int sliderHeigth = 12;
+    if (r.height() > sliderHeigth)
     {
         r.moveTop((r.height() - sliderHeigth) / 2);
         r.setHeight(sliderHeigth);
