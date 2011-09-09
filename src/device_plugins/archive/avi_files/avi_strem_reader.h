@@ -74,6 +74,8 @@ private:
     FrameTypeExtractor* m_frameTypeExtractor;
     qint64 m_lastGopSeekTime;
     QVector<qint64> m_lastPacketTimes;
+    bool m_IFrameAfterJumpFound;
+    qint64 m_requiredJumpTime;
 private:
     /**
       * Read next packet from file
@@ -114,6 +116,7 @@ private:
     AVPacket& currentPacket();
     AVPacket& nextPacket();
     qint64 determineDisplayTime();
+    void intChanneljumpTo(quint64 mksec, int channel);
 };
 
 #endif //avi_stream_reader_h1901

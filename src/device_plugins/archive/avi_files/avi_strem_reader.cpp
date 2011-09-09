@@ -77,7 +77,9 @@ CLAVIStreamReader::CLAVIStreamReader(CLDevice* dev ) :
     m_topIFrameTime(-1),
     m_bottomIFrameTime(-1),
     m_frameTypeExtractor(0),
-    m_lastGopSeekTime(-1)
+    m_lastGopSeekTime(-1),
+    m_IFrameAfterJumpFound(false),
+    m_requiredJumpTime(AV_NOPTS_VALUE)
 {
     // Should init packets here as some times destroy (av_free_packet) could be called before init
     av_init_packet(&m_packets[0]);
@@ -351,6 +353,14 @@ bool CLAVIStreamReader::getNextVideoPacket()
 CLAbstractMediaData* CLAVIStreamReader::getNextData()
 {
 begin_label:
+    {
+        QMutexLocker mutex(&m_cs);
+        if (m_requiredJumpTime != AV_NOPTS_VALUE)
+        {
+            intChanneljumpTo(m_requiredJumpTime, 0);
+            m_requiredJumpTime = AV_NOPTS_VALUE;
+        }
+    }
 	if (mFirstTime)
 	{
 		QMutexLocker mutex(&avi_mutex); // speeds up concurrent reading of lots of files, if files not cashed yet
@@ -364,7 +374,7 @@ begin_label:
         m_lastGopSeekTime = -1;
         m_prevReverseMode = reverseMode;
         qint64 jumpTime = determineDisplayTime();
-        channeljumpTo(jumpTime, 0);
+        intChanneljumpTo(jumpTime, 0);
         if (reverseMode)
             m_topIFrameTime = jumpTime;
         else
@@ -457,7 +467,7 @@ begin_label:
                             seekTime = m_lengthMksec - BACKWARD_SEEK_STEP;
                             tmpVal = m_lengthMksec;
                         }
-                        channeljumpTo(seekTime, 0);
+                        intChanneljumpTo(seekTime, 0);
                         m_lastGopSeekTime = seekTime;
                         m_topIFrameTime = tmpVal;
                         //return getNextData();
@@ -488,8 +498,26 @@ begin_label:
 
         AVCodecContext* codecContext = m_formatContext->streams[m_videoStreamIndex]->codec;
         CLCompressedVideoData* videoData = getVideoData(currentPacket(), codecContext);
-
         m_useTwice = false;
+
+        // -------------------------------------------
+        // workaround ffmpeg bugged seek
+        {
+            QMutexLocker mutex(&m_cs);
+            if (currentPacket().flags & AV_PKT_FLAG_KEY)
+                m_IFrameAfterJumpFound = true;
+            if (!reverseMode && !m_IFrameAfterJumpFound)
+            {
+                av_free_packet(&currentPacket());
+                if (m_currentTime >= m_topIFrameTime) // m_topIFrameTime used as jump time
+                    intChanneljumpTo(m_topIFrameTime - BACKWARD_SEEK_STEP, 0);
+                if (m_runing)
+                    goto begin_label;
+                else
+                    return 0;
+            }
+        }
+        // -------------------------------------------
 
 		if (skipFramesToTime())
 		{
@@ -516,8 +544,9 @@ begin_label:
 					videoData->ignore = true;
                 else if (reverseMode && nextPacketTimestamp > skipFramesToTime())
                     videoData->ignore = true;
-				else
+                else {
 					setSkipFramesToTime(0);
+                }
 			}
 		}
 
@@ -547,7 +576,13 @@ begin_label:
 
 }
 
-void CLAVIStreamReader::channeljumpTo(quint64 mksec, int /*channel*/)
+void CLAVIStreamReader::channeljumpTo(quint64 mksec, int channel)
+{
+    QMutexLocker mutex(&m_cs);
+    m_requiredJumpTime = mksec;
+}
+
+void CLAVIStreamReader::intChanneljumpTo(quint64 mksec, int /*channel*/)
 {
     QMutexLocker mutex(&m_cs);
     mksec += startMksec();
@@ -564,6 +599,7 @@ void CLAVIStreamReader::channeljumpTo(quint64 mksec, int /*channel*/)
 	m_wakeup = true;
     m_bottomIFrameTime = -1;
     m_topIFrameTime = mksec;
+    m_IFrameAfterJumpFound = false;
     for(unsigned i = 0; i < m_formatContext->nb_streams; i++) 
         m_lastPacketTimes[i] = mksec;
 }
