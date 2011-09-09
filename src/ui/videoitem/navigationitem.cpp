@@ -34,7 +34,7 @@ protected:
 };
 // ###
 
-
+#if 0
 class SliderToolTipItem : public StyledToolTipItem
 {
 public:
@@ -48,14 +48,14 @@ public:
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event)
     {
-        m_pos = mapToScene(event->pos());
+        m_pos = event->pos();
     }
 
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     {
-        QPointF pos = mapToScene(event->pos());
-        int value = m_slider->value() + qreal(m_slider->maximum() - m_slider->minimum()) / m_slider->boundingRect().width() * (pos - m_pos).x();
-        m_slider->setValue(value);
+        QPointF pos = event->pos();
+        qreal shift = qreal(m_slider->maximum() - m_slider->minimum()) / m_slider->geometry().width() * (pos - m_pos).x();
+        m_slider->setValue(m_slider->value() + shift);
         m_pos = pos;
     }
 
@@ -63,7 +63,7 @@ private:
     AbstractGraphicsSlider *const m_slider;
     QPointF m_pos;
 };
-
+#endif
 
 class TimeSliderToolTipItem : public StyledToolTipItem
 {
@@ -171,7 +171,9 @@ NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
 
     m_speedSlider = new SpeedSlider(Qt::Horizontal, this);
     m_speedSlider->setObjectName("SpeedSlider");
+#if 0
     m_speedSlider->setToolTipItem(new SliderToolTipItem(m_speedSlider));
+#endif
     m_speedSlider->setCursor(Qt::ArrowCursor);
 
     connect(m_speedSlider, SIGNAL(speedChanged(float)), this, SLOT(onSpeedChanged(float)));
@@ -221,7 +223,9 @@ NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
     m_volumeSlider = new VolumeSlider(Qt::Horizontal);
     m_volumeSlider->setObjectName("VolumeSlider");
     m_volumeSlider->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+#if 0
     m_volumeSlider->setToolTipItem(new SliderToolTipItem(m_volumeSlider));
+#endif
     m_volumeSlider->setCursor(Qt::ArrowCursor);
 
     connect(m_muteButton, SIGNAL(clicked(bool)), m_volumeSlider, SLOT(setMute(bool)));
