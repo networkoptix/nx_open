@@ -55,7 +55,7 @@ private:
     Q_INVOKABLE void captureFrameOpenGL(void* opaque);
     void drawCursor(quint32* data, int dataStride, int height, int leftOffset, int topOffset, bool flip) const;
     void drawLogo(quint8* data, int width, int height);
-    void allocateTmpFrame(int width, int height, PixelFormat format, bool useSourceSize);
+    void allocateTmpFrame(int width, int height, PixelFormat format);
 private:
     QPixmap m_logo;
     int m_displayNumber;
@@ -88,8 +88,6 @@ private:
     QWidget* m_widget;
     int m_tmpFrameWidth;
     int m_tmpFrameHeight;
-    int m_tmpSrcWidth;
-    int m_tmpSrcHeight;
 };
 
 

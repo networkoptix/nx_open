@@ -531,6 +531,7 @@ bool DesktopFileEncoder::init()
     else {
         if (m_encodeQualuty <= 0.75)
             codec_prop = QLatin1String("refs=2;me_method=dia;subq=3;me_range=16;g=50;keyint_min=25;sc_threshold=40;i_qfactor=0.71;b_strategy=1;qcomp=0.6;qmin=10;qmax=51;qdiff=4;bf=3");
+        m_videoCodecCtx->gop_size = 50;
     }
 
     QStringList prop_list = codec_prop.split(QLatin1Char(';'), QString::SkipEmptyParts);

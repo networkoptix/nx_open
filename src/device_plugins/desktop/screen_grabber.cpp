@@ -54,9 +54,7 @@ CLScreenGrabber::CLScreenGrabber(int displayNumber, int poolSize, CaptureMode mo
     m_tmpFrameBuffer(0),
     m_widget(widget),
     m_tmpFrameWidth(0),
-    m_tmpFrameHeight(0),
-    m_tmpSrcWidth(0),
-    m_tmpSrcHeight(0)
+    m_tmpFrameHeight(0)
 {
     memset(&m_rect, 0, sizeof(m_rect));
 
@@ -197,24 +195,15 @@ HRESULT	CLScreenGrabber::InitD3D(HWND hWnd)
         else
             m_outHeight = m_captureResolution.height();
 
-        //allocateTmpFrame(m_ddm.Width, m_ddm.Height);
-
     }
 
     return S_OK;
 }
 
-void CLScreenGrabber::allocateTmpFrame(int width, int height, PixelFormat format, bool useSourceSize)
+void CLScreenGrabber::allocateTmpFrame(int width, int height, PixelFormat format)
 {
-    if (useSourceSize) {
-        m_tmpFrameWidth = width;
-        m_tmpFrameHeight = height;
-    }
-    else {
-        m_tmpFrameWidth = m_outWidth;
-        m_tmpFrameHeight = m_outHeight;
-
-    }
+    m_tmpFrameWidth = width;
+    m_tmpFrameHeight = height;
 
     if (m_tmpFrame)
     {
@@ -234,8 +223,6 @@ void CLScreenGrabber::allocateTmpFrame(int width, int height, PixelFormat format
         width, height, format,
         m_outWidth, m_outHeight, format,
         SWS_BICUBLIN, NULL, NULL, NULL);
-    m_tmpSrcWidth = width;
-    m_tmpSrcHeight = height;
 }
 
 void CLScreenGrabber::captureFrameOpenGL(void* opaque)
@@ -847,40 +834,17 @@ bool CLScreenGrabber::dataToFrame(quint8* data, int width, int height, AVFrame* 
 {
     if (m_needRescale)
     {
-        if (m_logo.width() == 0)
-        {
-            if (width != m_tmpFrameWidth || height != m_tmpFrameHeight)
-                allocateTmpFrame(width, height, PIX_FMT_YUV420P, true);
-            bgra_to_yv12_sse(data, width * 4,
-                m_tmpFrame->data[0], m_tmpFrame->data[1], m_tmpFrame->data[2],
-                m_tmpFrame->linesize[0], m_tmpFrame->linesize[1], width, height, m_mode == CaptureMode_Application);
+        if (width != m_tmpFrameWidth || height != m_tmpFrameHeight)
+            allocateTmpFrame(width, height, PIX_FMT_YUV420P);
+        drawLogo((quint8*) data, width, height);
+        bgra_to_yv12_sse(data, width * 4,
+            m_tmpFrame->data[0], m_tmpFrame->data[1], m_tmpFrame->data[2],
+            m_tmpFrame->linesize[0], m_tmpFrame->linesize[1], width, height, m_mode == CaptureMode_Application);
 
-            sws_scale(m_scaleContext,
-                m_tmpFrame->data, m_tmpFrame->linesize,
-                0, m_ddm.Height,
-                pFrame->data, pFrame->linesize);
-        }
-        else {
-            // scale before colorspace convert is slower, so use this only for logo mode
-            if (width != m_tmpSrcWidth || height != m_tmpSrcHeight)
-                allocateTmpFrame(width, height, PIX_FMT_RGBA, false);
-            quint8 *dataArray[4];
-            int lineSizeArray[4];
-            dataArray[0] = data;
-            dataArray[1] = dataArray[2] = dataArray[3] = 0;
-            lineSizeArray[0] = width*4;
-            lineSizeArray[1] = lineSizeArray[2] = lineSizeArray[3] = 0;
-            sws_scale(m_scaleContext,
-                dataArray, lineSizeArray,
-                0, m_ddm.Height,
-                m_tmpFrame->data, m_tmpFrame->linesize);
-
-            drawLogo((quint8*) m_tmpFrame->data[0], m_outWidth, m_outHeight);
-
-            bgra_to_yv12_sse(m_tmpFrame->data[0], m_tmpFrame->linesize[0],
-                pFrame->data[0], pFrame->data[1], pFrame->data[2],
-                pFrame->linesize[0], pFrame->linesize[1], m_outWidth, m_outHeight, m_mode == CaptureMode_Application);
-        }
+        sws_scale(m_scaleContext,
+            m_tmpFrame->data, m_tmpFrame->linesize,
+            0, m_ddm.Height,
+            pFrame->data, pFrame->linesize);
     }
     else
     {
@@ -923,6 +887,7 @@ void CLScreenGrabber::setLogo(const QPixmap& logo)
         m_logo = QPixmap::fromImage(logo.toImage().mirrored(false, true));
     else
         m_logo = logo;
+    m_logo = m_logo.scaledToWidth(screenWidth() * 0.2140, Qt::SmoothTransformation);
 }
 
 int CLScreenGrabber::screenWidth() const

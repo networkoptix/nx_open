@@ -331,6 +331,19 @@ bool CLFFmpegVideoDecoder::decode(const CLCompressedVideoData& data, CLVideoDeco
     return false; // no picture decoded at current step
 }
 
+double CLFFmpegVideoDecoder::getSampleAspectRatio() const
+{
+    if (!m_context)
+        return 1.0;
+
+    double result = av_q2d(m_context->sample_aspect_ratio);
+
+    if (qAbs(result)< 1e-7)
+        result = 1.0; // if sample_aspect_ratio==0 it's unknown based on ffmpeg docs. so we assume it's 1.0 then
+
+    return result;
+}
+
 PixelFormat CLFFmpegVideoDecoder::GetPixelFormat()
 {
     if (m_usedQtImage)
