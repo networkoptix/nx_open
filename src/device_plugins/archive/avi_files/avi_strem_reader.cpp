@@ -54,11 +54,9 @@ qint64 CLAVIStreamReader::packetTimestamp(AVStream* stream, const AVPacket& pack
         if (packetTime < firstDts)
             firstDts = 0; // protect for some invalid streams 
         double ttm = timeBase * (packetTime - firstDts);
-        return qint64(1e+6 * ttm);
+        m_lastPacketTimes[packet.stream_index] = qint64(1e+6 * ttm);
     }
-    else {
-        return m_lastJumpTime;
-    }
+    return m_lastPacketTimes[packet.stream_index];
 }
 
 CLAVIStreamReader::CLAVIStreamReader(CLDevice* dev ) :
@@ -79,8 +77,7 @@ CLAVIStreamReader::CLAVIStreamReader(CLDevice* dev ) :
     m_topIFrameTime(-1),
     m_bottomIFrameTime(-1),
     m_frameTypeExtractor(0),
-    m_lastGopSeekTime(-1),
-    m_lastJumpTime(0)
+    m_lastGopSeekTime(-1)
 {
     // Should init packets here as some times destroy (av_free_packet) could be called before init
     av_init_packet(&m_packets[0]);
@@ -157,7 +154,6 @@ AVFormatContext* CLAVIStreamReader::getFormatContext()
 
 bool CLAVIStreamReader::init()
 {
-    m_lastJumpTime = 0;
 	static bool firstInstance = true;
 
 	QMutexLocker mutex(&m_cs);
@@ -212,7 +208,9 @@ bool CLAVIStreamReader::initCodecs()
     m_videoStreamIndex = -1;
     m_audioStreamIndex = -1;
     int lastStreamID = -1;
-
+    m_lastPacketTimes.resize(m_formatContext->nb_streams);
+    for(unsigned i = 0; i < m_formatContext->nb_streams; i++) 
+        m_lastPacketTimes[i] = 0;
     for(unsigned i = 0; i < m_formatContext->nb_streams; i++)
     {
         AVStream *strm= m_formatContext->streams[i];
@@ -312,6 +310,11 @@ CLCompressedAudioData* CLAVIStreamReader::getAudioData(const AVPacket& packet, A
     audioData->format.fromAvStream(stream->codec);
 
     double time_base = av_q2d(stream->time_base);
+    if (packet.pts == AV_NOPTS_VALUE && packet.dts == AV_NOPTS_VALUE) {
+        // if audio packet is not filled add 15 ms to prev audio frame.
+        // most codecs has at least 15 ms duration
+        m_lastPacketTimes[packet.stream_index] += 15 * 1000;
+    }
     audioData->timestamp = packetTimestamp(stream, packet);
     audioData->duration = qint64(1e+6 * time_base * packet.duration);
 
@@ -383,6 +386,8 @@ begin_label:
 
 	{
 		QMutexLocker mutex(&m_cs);
+        if (skipFramesToTime() != 0)
+            m_lastGopSeekTime = -1; // after user seek
 
         if (m_haveSavedPacket && m_previousTime == -1)
         {
@@ -420,6 +425,7 @@ begin_label:
             // (after sequence header always P-frame, not I-Frame. But I returns I, because no I frames at all in other case)
             FrameTypeExtractor::FrameType frameType = m_frameTypeExtractor->getFrameType(currentPacket().data, currentPacket().size);
             bool isKeyFrame;
+            
             if (frameType != FrameTypeExtractor::UnknownFrameType)
                 isKeyFrame = frameType == FrameTypeExtractor::I_Frame;
             else {
@@ -434,16 +440,19 @@ begin_label:
 
             if (isKeyFrame || m_currentTime >= m_topIFrameTime)
             {
-                if (m_bottomIFrameTime == -1) {
+                if (m_bottomIFrameTime == -1 && m_currentTime < m_topIFrameTime) {
                     m_bottomIFrameTime = m_currentTime;
                     currentPacket().flags |= AV_REVERSE_BLOCK_START;
                 }
                 if (m_currentTime >= m_topIFrameTime)
                 {
-                    qint64 seekTime = qMax(0ll, m_bottomIFrameTime - BACKWARD_SEEK_STEP);
+                    // sometime av_file_ssek doesn't seek to key frame (seek direct to specified position)
+                    // So, no KEY frame may be found after seek. At this case (m_bottomIFrameTime == -1) we increase seek interval
+                    qint64 seekTime = m_bottomIFrameTime != -1 ? m_bottomIFrameTime : (m_lastGopSeekTime != -1 ? m_lastGopSeekTime : m_currentTime-BACKWARD_SEEK_STEP);
+                    seekTime = qMax(0ll, seekTime - BACKWARD_SEEK_STEP);
                     if (m_currentTime != seekTime) {
                         av_free_packet(&currentPacket());
-                        qint64 tmpVal = m_bottomIFrameTime;
+                        qint64 tmpVal = m_bottomIFrameTime != -1 ? m_bottomIFrameTime : m_topIFrameTime;
                         if (m_lastGopSeekTime == 0) {
                             seekTime = m_lengthMksec - BACKWARD_SEEK_STEP;
                             tmpVal = m_lengthMksec;
@@ -555,7 +564,8 @@ void CLAVIStreamReader::channeljumpTo(quint64 mksec, int /*channel*/)
 	m_wakeup = true;
     m_bottomIFrameTime = -1;
     m_topIFrameTime = mksec;
-    m_lastJumpTime = mksec;
+    for(unsigned i = 0; i < m_formatContext->nb_streams; i++) 
+        m_lastPacketTimes[i] = mksec;
 }
 
 void CLAVIStreamReader::destroy()
