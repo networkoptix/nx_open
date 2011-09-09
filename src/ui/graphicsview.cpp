@@ -2787,9 +2787,10 @@ void GraphicsView::toggleRecording()
         else if (captureMode == VideoRecorderSettings::FullScreenNoeroMode)
             grabberCaptureMode = CLScreenGrabber::CaptureMode_DesktopWithoutAero;
         QPixmap logo;
-#ifdef CL_TRIAL_MODE
-        QString logoName = QString(":/skin/logo_") + QString::number(encodingSize.width()) + QString("_") + QString::number(encodingSize.height()) + QString(".png");
-        logo = QPixmap(logoName);
+#if defined(CL_TRIAL_MODE) || defined(CL_FORCE_LOGO)
+        //QString logoName = QString(":/skin/logo_") + QString::number(encodingSize.width()) + QString("_") + QString::number(encodingSize.height()) + QString(".png");
+        QString logoName = QString(":/skin/logo_1920_1080.png");
+        logo = QPixmap(logoName); // hint: comment this line to remove logo
 #endif
         DesktopFileEncoder *desktopEncoder = new DesktopFileEncoder(
                 filePath,

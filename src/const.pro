@@ -107,4 +107,4 @@ RESOURCES += mainwnd.qrc ../build/skin.qrc
 FORMS += mainwnd.ui preferences.ui licensekey.ui recordingsettings.ui ui/dialogs/tagseditdialog.ui \
          youtube/youtubeuploaddialog.ui youtube/youtubesetting.ui
 
-DEFINES += CL_TRIAL_MODE
+DEFINES += CL_TRIAL_MODE CL_FORCE_LOGO
