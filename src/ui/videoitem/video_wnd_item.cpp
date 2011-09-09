@@ -153,7 +153,7 @@ void CLVideoWindowItem::draw(CLVideoDecoderOutput* image, unsigned int channel)
 
     //needUpdate(true);
     QMutexLocker locker(&m_mutex);
-    m_imageWidth = image->width;
+    m_imageWidth = image->width*image->sample_aspect_ratio;
     m_imageHeight = image->height;
 
     if (m_imageWidth!=m_imageWidth_old || m_imageHeight!=m_imageHeight_old)

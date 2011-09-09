@@ -11,7 +11,7 @@ public:
 
     // function shouldIgnore will return true next ms 
     // if the function was called with bigger value followed by small value => small value ignored
-    void ignoreNextMs(int ms);
+    void ignoreNextMs(int ms, bool waitTillTheEnd = false);
 
     void reset();
 

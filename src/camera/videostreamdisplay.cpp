@@ -310,6 +310,9 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(CLCompress
             outFrame = m_reverseQueue.dequeue();
             if (outFrame->data[0])
                 m_realReverseSize--;
+
+            outFrame->sample_aspect_ratio = dec->getSampleAspectRatio();
+
             if (processDecodedFrame(data->channelNumber, outFrame, enableFrameQueue, reverseMode))
                 return Status_Displayed;
             else
@@ -362,6 +365,8 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(CLCompress
             m_realReverseSize--;
     }
     
+    outFrame->sample_aspect_ratio = dec->getSampleAspectRatio();
+
     if (processDecodedFrame(data->channelNumber, outFrame, enableFrameQueue, reverseMode))
         return Status_Displayed;
     else

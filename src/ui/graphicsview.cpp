@@ -737,16 +737,6 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
     if (onUserInput(true, true))
         return;
 
-    /*
-    if (m_navigationItem && !m_navigationItem->mouseOver() && m_navigationItem->isActive())
-    {
-        // we've got time line; muose is not over timeline. timeline is still active
-        m_navigationItem->setActive(false);
-        return;
-    }
-    /**/
-
-
     m_yRotate = 0;
 
     stopAnimation();
@@ -855,9 +845,19 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 
     if (left_button && !isCTRLPressed(event) && !isALTPressed(event))
     {
-        //may be about to scroll the scene
-        m_handScrolling = true;
-        viewport()->setCursor(Qt::ClosedHandCursor);
+        if (aitem)
+        {
+            //may be about to scroll the scene
+            m_handScrolling = true;
+            viewport()->setCursor(Qt::ClosedHandCursor);
+        }
+        else
+        {
+            // don allow to move scene with golding on void space => just for items 
+            m_handScrolling = false;
+            viewport()->setCursor(Qt::OpenHandCursor);
+        }
+
     }
 
     // scene movement
@@ -1185,6 +1185,12 @@ void GraphicsView::mouseReleaseEvent(QMouseEvent * event)
                 if (isNavigationMode() && mouseIsCloseToNavigationControl(event->pos()) )
                 {
                     // if mouse is just a bit above navogationitm => ignore event
+                    return;
+                }
+
+                if (! (event->modifiers() & Qt::ShiftModifier) )
+                {
+                    // if shift is not pressed - do not zoom
                     return;
                 }
 
@@ -3432,7 +3438,7 @@ void GraphicsView::navigation_grid_items_drop_helper()
             anim->setEasingCurve(QEasingCurve::InOutBack);
             groupAnimation->addAnimation(anim);
             item->setArranged(false);
-            m_ignoreMouse.ignoreNextMs(duration);
+            m_ignoreMouse.ignoreNextMs(duration, true);
 
             item_to_swap_with->setZValue(global_base_scene_z_level + 1); // this item
             anim = AnimationManager::instance().addAnimation(item_to_swap_with, "pos");
@@ -3443,7 +3449,7 @@ void GraphicsView::navigation_grid_items_drop_helper()
             anim->setEasingCurve(QEasingCurve::InOutBack);
             groupAnimation->addAnimation(anim);
             item_to_swap_with->setArranged(false);
-            m_ignoreMouse.ignoreNextMs(duration);
+            m_ignoreMouse.ignoreNextMs(duration, true);
         }
         else if (ge.canBeDropedHere(item)) // just adjust the item
         {
@@ -3455,7 +3461,7 @@ void GraphicsView::navigation_grid_items_drop_helper()
             anim->setEasingCurve(QEasingCurve::InOutBack);
             groupAnimation->addAnimation(anim);
             item->setArranged(false);
-            m_ignoreMouse.ignoreNextMs(duration);
+            m_ignoreMouse.ignoreNextMs(duration, true);
         }
         else // item should be moved to original position, and adjust it
         {
@@ -3470,7 +3476,7 @@ void GraphicsView::navigation_grid_items_drop_helper()
             anim->setEasingCurve(QEasingCurve::InOutBack);
             groupAnimation->addAnimation(anim);
             item->setArranged(false);
-            m_ignoreMouse.ignoreNextMs(duration);
+            m_ignoreMouse.ignoreNextMs(duration, true);
         }
     }
 

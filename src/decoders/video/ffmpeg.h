@@ -35,6 +35,7 @@ public:
     PixelFormat GetPixelFormat();
     int getWidth() const  { return m_context->width;  }
     int getHeight() const { return m_context->height; }
+    double getSampleAspectRatio() const;
     virtual PixelFormat getFormat() const { return m_context->pix_fmt; }
     virtual void flush();
     virtual const AVFrame* lastFrame() { return m_frame; }
