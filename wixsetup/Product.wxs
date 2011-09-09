@@ -209,6 +209,11 @@
               <File Id="wrap_oal.dll" Name="wrap_oal.dll" Source="..\contrib\openal\bin\Win32\wrap_oal.dll"/>
             </Component>
             
+            <Component Id="OpenSSL" Guid="85E3A7D4-82AE-45ba-BD50-38ECD08F2256">
+              <File Id="libeay32.dll" Name="libeay32.dll" Source="..\contrib\openssl\libeay32.dll"/>
+              <File Id="ssleay32.dll" Name="ssleay32.dll" Source="..\contrib\openssl\ssleay32.dll"/>
+            </Component>
+
             <Directory Id="styles" Name="styles">
               <Component Id="bespin" Guid="0A5A045F-8D7A-4437-9A81-1CFF73031E2C">
                 <File Id="bespin.dll" Name="bespin.dll" Source="..\contrib\bespin\bin\msvc-x86\release\styles\bespin.dll"/>
@@ -257,6 +262,7 @@
       <ComponentRef Id="FFmpegLibraries"/>
       <ComponentRef Id="QTLibraries" />
       <ComponentRef Id="OpenAL" />
+      <ComponentRef Id="OpenSSL" />
       <ComponentRef Id='ProgramMenuDir' />
       <ComponentRef Id="bespin" />
       <ComponentRef Id='Settings'/>
