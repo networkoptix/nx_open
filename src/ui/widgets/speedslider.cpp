@@ -25,27 +25,27 @@ public:
 };
 
 
-static const int fixedSpeedSet[] = { -160, -80, -40, -20, -15, -10, -5, 5, 10, 15, 20, 40, 80, 160 }; // x10
-static const int fixedSpeedSetSize = sizeof(fixedSpeedSet) / sizeof(fixedSpeedSet[0]);
-static const int fsIndex1x = 8;
-
-//static const int sliderHeigth = 12;
+static const struct SpeedPresets {
+    int size;
+    int defaultIndex;
+    float preset[10];
+} speedPresets[] = {
+    { 10, 5, { -16.0, -8.0, -4.0, -2.0, -1.0, 1.0, 2.0, 4.0, 8.0, 16.0 } },  // LowPrecision
+    { 10, 5, { -2.0, -1.5, -1.0, -0.25, -0.5, 0.25, 0.5, 1.0, 1.5, 2.0 } }   // HighPrecision
+};
 
 SpeedSlider::SpeedSlider(Qt::Orientation orientation, QGraphicsItem *parent)
     : GraphicsSlider(orientation, parent),
-      m_precision(LowPrecision),
+      m_precision(HighPrecision),
       m_animation(0)
 {
-//    setMinimumHeight(sliderHeigth + 2);
-
     setStyle(new SpeedSliderProxyStyle);
-    setRange(0, fixedSpeedSetSize * 10 - 1);
     setSingleStep(10);
     setPageStep(10);
     setTickInterval(10);
     setTickPosition(GraphicsSlider::NoTicks);
 
-    resetSpeed();
+    setPrecision(LowPrecision);
 }
 
 SpeedSlider::~SpeedSlider()
@@ -69,12 +69,15 @@ void SpeedSlider::setPrecision(SpeedSlider::Precision precision)
 
     m_precision = precision;
 
+    // power of 10 in order to allow slider animation
+    setRange(0, speedPresets[int(m_precision)].size * 10 - 1);
+    resetSpeed();
     update();
 }
 
 void SpeedSlider::resetSpeed()
 {
-    setValue(fsIndex1x * 10); // 1x
+    setValue(speedPresets[int(m_precision)].defaultIndex * 10);
 }
 
 void SpeedSlider::stepBackward()
@@ -94,6 +97,7 @@ void SpeedSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
     p.fillRect(rect(), QColor(0, 0, 0, 0));
 
     QRect r = contentsRect();
+    static const int sliderHeigth = 12;
     if (r.height() > sliderHeigth)
     {
         r.moveTop((r.height() - sliderHeigth) / 2);
@@ -122,13 +126,11 @@ void SpeedSlider::sliderChange(SliderChange change)
     GraphicsSlider::sliderChange(change);
 
     int idx = value() / 10; // truncation!
-    Q_ASSERT(idx >= 0 && idx < fixedSpeedSetSize);
-    int value = fixedSpeedSet[idx]; // map to speed * 10
-    if (value > 5 && value < 15)
-        value = 10; // make a gap around 1x
-
-    const float newSpeed = float(value) / 10.0;
-    emit speedChanged(newSpeed);
+    Q_ASSERT(idx >= 0 && idx < speedPresets[int(m_precision)].size);
+    float value = speedPresets[int(m_precision)].preset[idx];
+    if (value > 0.5 && value < 1.5)
+        value = 1.0; // make a gap around 1x
+    emit speedChanged(value);
 }
 
 void SpeedSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
@@ -143,7 +145,7 @@ void SpeedSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         m_animation = new QPropertyAnimation(this, "value", this);
         m_animation->setEasingCurve(QEasingCurve::OutQuad);
         m_animation->setDuration(500);
-        m_animation->setEndValue(fsIndex1x * 10);
+        m_animation->setEndValue(speedPresets[int(m_precision)].defaultIndex * 10);
         m_animation->start();
     }
 }
