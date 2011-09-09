@@ -404,7 +404,7 @@ void NavigationItem::play()
     reader->resume();
     reader->resumeDataProcessors();
 
-    m_camera->getCamCamDisplay()->playAudio(true);
+    m_camera->getCamCamDisplay()->playAudio(m_playing);
 }
 
 void NavigationItem::rewindBackward()
@@ -525,14 +525,9 @@ void NavigationItem::onSpeedChanged(float newSpeed)
         {
             reader->setSpeed(newSpeed);
             if (!qFuzzyIsNull(newSpeed))
-            {
                 play();
-                m_camera->getCamCamDisplay()->playAudio(false);
-            }
             else
-            {
                 pause();
-            }
 
             if (CLVideoWindowItem *vwi = m_camera->getVideoWindow())
             {

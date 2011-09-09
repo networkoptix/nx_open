@@ -614,10 +614,10 @@ void AbstractGraphicsSlider::sliderChange(SliderChange)
     update();
 }
 
-bool AbstractGraphicsSliderPrivate::scrollByDelta(Qt::Orientation orientation, Qt::KeyboardModifiers modifiers, int delta)
+int AbstractGraphicsSliderPrivate::stepsToScrollForDelta(Qt::Orientation orientation, Qt::KeyboardModifiers modifiers, int delta)
 {
-    Q_Q(AbstractGraphicsSlider);
     int stepsToScroll = 0;
+
     // in Qt scrolling to the right gives negative values.
     if (orientation == Qt::Horizontal)
         delta = -delta;
@@ -651,22 +651,12 @@ bool AbstractGraphicsSliderPrivate::scrollByDelta(Qt::Orientation orientation, Q
         stepsToScroll = int(offset_accumulated);
 #endif
         offset_accumulated -= int(offset_accumulated);
-        if (stepsToScroll == 0)
-            return false;
     }
 
     if (invertedControls)
         stepsToScroll = -stepsToScroll;
 
-    int prevValue = value;
-    position = overflowSafeAdd(stepsToScroll); // value will be updated by triggerAction()
-    q->triggerAction(AbstractGraphicsSlider::SliderMove);
-
-    if (prevValue == value) {
-        offset_accumulated = 0;
-        return false;
-    }
-    return true;
+    return stepsToScroll;
 }
 
 /*!
@@ -913,6 +903,14 @@ void AbstractGraphicsSlider::wheelEvent(QGraphicsSceneWheelEvent *e)
 {
     Q_D(AbstractGraphicsSlider);
     e->accept();
-    d->scrollByDelta(e->orientation(), e->modifiers(), e->delta());
+    if (int stepsToScroll = d->stepsToScrollForDelta(e->orientation(), e->modifiers(), e->delta())) {
+        int prevValue = d->value;
+
+        d->position = d->overflowSafeAdd(stepsToScroll); // value will be updated by triggerAction()
+        triggerAction(AbstractGraphicsSlider::SliderMove);
+
+        if (prevValue == d->value)
+            d->offset_accumulated = 0;
+    }
 }
 #endif
