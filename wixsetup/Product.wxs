@@ -23,8 +23,8 @@
     <!--[%LocalAppData]-->
     <Property Id="XMLSETTINGS" Value="%LocalAppData%\$(env.ORGANIZATION_NAME)\$(env.APPLICATION_NAME)\settings.xml" />
     
-    <Binary Id="SETPROPERTIES" SourceFile="SetProperties.vbs" />
-    <CustomAction Id="SetProperties" BinaryKey="SETPROPERTIES" VBScriptCall="SetProperties" Execute="firstSequence" />
+    <Binary Id="SETPROPERTIES" SourceFile="SetProperties.js" />
+    <CustomAction Id="SetProperties" BinaryKey="SETPROPERTIES" JScriptCall="SetProperties" Execute="firstSequence" />
 
 <!-- Custom actions for saving/restoring file associations.
     
