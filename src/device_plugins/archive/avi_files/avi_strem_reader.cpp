@@ -448,7 +448,7 @@ begin_label:
                 {
                     // sometime av_file_ssek doesn't seek to key frame (seek direct to specified position)
                     // So, no KEY frame may be found after seek. At this case (m_bottomIFrameTime == -1) we increase seek interval
-                    qint64 seekTime = m_bottomIFrameTime != -1 ? m_bottomIFrameTime : (m_lastGopSeekTime != -1 ? m_lastGopSeekTime : m_currentTime);
+                    qint64 seekTime = m_bottomIFrameTime != -1 ? m_bottomIFrameTime : (m_lastGopSeekTime != -1 ? m_lastGopSeekTime : m_currentTime-BACKWARD_SEEK_STEP);
                     seekTime = qMax(0ll, seekTime - BACKWARD_SEEK_STEP);
                     if (m_currentTime != seekTime) {
                         av_free_packet(&currentPacket());
