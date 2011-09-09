@@ -32,7 +32,7 @@ public:
 
 	void setLightCPUMode(CLAbstractVideoDecoder::DecodeMode val);
 
-	void display(CLCompressedVideoData* vd, bool sleep);
+	void display(CLCompressedVideoData* vd, bool sleep, double speed);
 	void playAudio(bool play);
     void setSpeed(float speed);
 

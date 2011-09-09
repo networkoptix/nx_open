@@ -132,7 +132,7 @@ QImage CLCamDisplay::getScreenshot(int channel)
     return m_display[channel]->getScreenshot();
 }
 
-void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
+void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep, double speed)
 {
     // simple data provider/streamer/streamreader has the same delay, but who cares ?
     // to avoid cpu usage in case of a lot data in queue(zoomed out on the scene, lets add same delays here )
@@ -150,7 +150,7 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
     if (vd->flags & AV_REVERSE_BLOCK_START)
         needToSleep = m_lastSleepInterval;
     else {
-        needToSleep = m_lastSleepInterval = (currentTime - m_previousVideoTime) * 1.0/qAbs(m_speed);
+        needToSleep = m_lastSleepInterval = (currentTime - m_previousVideoTime) * 1.0/qAbs(speed);
     }
 
     if (m_isRealTimeSource)
@@ -174,9 +174,9 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
     {
         if (m_lastFrameDisplayed != CLVideoStreamDisplay::Status_Buffered)
         {
-            int realSleepTime = m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed ? m_delay.sleep(needToSleep, needToSleep*qAbs(m_speed)*2) : m_delay.addQuant(needToSleep);
+            int realSleepTime = m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed ? m_delay.sleep(needToSleep, needToSleep*qAbs(speed)*2) : m_delay.addQuant(needToSleep);
             //str << "sleep time: " << needToSleep << "  real:" << realSleepTime;
-            if (qAbs(m_speed) > 1.0 + FPS_EPS)
+            if (qAbs(speed) > 1.0 + FPS_EPS)
             {
                 if (realSleepTime < 0)
                 {
@@ -456,7 +456,7 @@ bool CLCamDisplay::processData(CLAbstractData* data)
             if (!vd)
                 return result; // impossible? incoming vd!=0
             m_lastDisplayedVideoTime = vd->timestamp;
-            display(vd, !vd->ignore);
+            display(vd, !vd->ignore, speed);
             m_singleShotQuantProcessed = true;
             return result;
         }
@@ -524,7 +524,7 @@ bool CLCamDisplay::processData(CLAbstractData* data)
                     bool lastFrameToDisplay = diff > -2 * videoDuration; //factor 2 here is to avoid frequent switch between normal play and fast play
 
                     m_lastDisplayedVideoTime = vd->timestamp;
-                    display(vd, lastFrameToDisplay && !vd->ignore);
+                    display(vd, lastFrameToDisplay && !vd->ignore, speed);
                     m_singleShotQuantProcessed = true;
 
                     if (lastFrameToDisplay)
