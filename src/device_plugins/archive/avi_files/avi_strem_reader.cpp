@@ -386,6 +386,8 @@ begin_label:
 
 	{
 		QMutexLocker mutex(&m_cs);
+        if (skipFramesToTime() != 0)
+            m_lastGopSeekTime = -1; // after user seek
 
         if (m_haveSavedPacket && m_previousTime == -1)
         {
