@@ -85,7 +85,7 @@ public:
         }
         q->triggerAction(repeatAction);
     }
-    int stepsToScrollForDelta(Qt::Orientation orientation, Qt::KeyboardModifiers modifiers, int delta);
+    bool scrollByDelta(Qt::Orientation orientation, Qt::KeyboardModifiers modifiers, int delta);
 };
 
 #endif // ABSTRACTGRAPHICSSLIDER_P_H

@@ -614,16 +614,16 @@ void AbstractGraphicsSlider::sliderChange(SliderChange)
     update();
 }
 
-int AbstractGraphicsSliderPrivate::stepsToScrollForDelta(Qt::Orientation orientation, Qt::KeyboardModifiers modifiers, int delta)
+bool AbstractGraphicsSliderPrivate::scrollByDelta(Qt::Orientation orientation, Qt::KeyboardModifiers modifiers, int delta)
 {
+    Q_Q(AbstractGraphicsSlider);
     int stepsToScroll = 0;
-
     // in Qt scrolling to the right gives negative values.
     if (orientation == Qt::Horizontal)
         delta = -delta;
     qreal offset = qreal(delta) / 120;
 
-    if ((modifiers & Qt::ControlModifier) || (modifiers & Qt::ShiftModifier)) {
+    if (modifiers & (Qt::ControlModifier | Qt::ShiftModifier)) {
         // Scroll one page regardless of delta:
         stepsToScroll = qBound(-pageStep, int(offset * pageStep), pageStep);
         offset_accumulated = 0;
@@ -651,12 +651,23 @@ int AbstractGraphicsSliderPrivate::stepsToScrollForDelta(Qt::Orientation orienta
         stepsToScroll = int(offset_accumulated);
 #endif
         offset_accumulated -= int(offset_accumulated);
+        if (stepsToScroll == 0)
+            return false;
     }
 
     if (invertedControls)
         stepsToScroll = -stepsToScroll;
 
-    return stepsToScroll;
+    int prevValue = value;
+    position = overflowSafeAdd(stepsToScroll); // value will be updated by triggerAction()
+    q->triggerAction(AbstractGraphicsSlider::SliderMove);
+
+    if (prevValue == value) {
+        offset_accumulated = 0;
+        return false;
+    }
+
+    return true;
 }
 
 /*!
@@ -903,14 +914,6 @@ void AbstractGraphicsSlider::wheelEvent(QGraphicsSceneWheelEvent *e)
 {
     Q_D(AbstractGraphicsSlider);
     e->accept();
-    if (int stepsToScroll = d->stepsToScrollForDelta(e->orientation(), e->modifiers(), e->delta())) {
-        int prevValue = d->value;
-
-        d->position = d->overflowSafeAdd(stepsToScroll); // value will be updated by triggerAction()
-        triggerAction(AbstractGraphicsSlider::SliderMove);
-
-        if (prevValue == d->value)
-            d->offset_accumulated = 0;
-    }
+    d->scrollByDelta(e->orientation(), e->modifiers(), e->delta());
 }
 #endif

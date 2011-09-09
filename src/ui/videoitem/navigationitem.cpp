@@ -153,7 +153,7 @@ NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
     connect(m_backwardButton, SIGNAL(clicked()), this, SLOT(rewindBackward()));
     connect(m_stepBackwardButton, SIGNAL(clicked()), this, SLOT(stepBackward()));
     connect(m_playButton, SIGNAL(clicked()), this, SLOT(togglePlayPause()));
-    connect(m_stepForwardButton, SIGNAL(clicked(), this), SLOT(stepForward()));
+    connect(m_stepForwardButton, SIGNAL(clicked()), this, SLOT(stepForward()));
     connect(m_forwardButton, SIGNAL(clicked()), this, SLOT(rewindForward()));
 
     QGraphicsLinearLayout *buttonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
@@ -175,6 +175,8 @@ NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
     m_speedSlider->setCursor(Qt::ArrowCursor);
 
     connect(m_speedSlider, SIGNAL(speedChanged(float)), this, SLOT(onSpeedChanged(float)));
+    connect(m_speedSlider, SIGNAL(frameBackward()), this, SLOT(stepBackward()));
+    connect(m_speedSlider, SIGNAL(frameForward()), this, SLOT(stepForward()));
 
     QGraphicsLinearLayout *leftLayoutV = new QGraphicsLinearLayout(Qt::Vertical);
     leftLayoutV->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);

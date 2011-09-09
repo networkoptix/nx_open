@@ -33,10 +33,16 @@ public Q_SLOTS:
 Q_SIGNALS:
     void speedChanged(float newSpeed);
 
+    void frameBackward();
+    void frameForward();
+
 protected:
     void sliderChange(SliderChange change);
 
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+#ifndef QT_NO_WHEELEVENT
+    void wheelEvent(QGraphicsSceneWheelEvent *e);
+#endif
     void timerEvent(QTimerEvent *event);
 
 private Q_SLOTS:

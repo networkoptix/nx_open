@@ -186,6 +186,24 @@ void SpeedSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     }
 }
 
+#ifndef QT_NO_WHEELEVENT
+void SpeedSlider::wheelEvent(QGraphicsSceneWheelEvent *e)
+{
+    if (m_precision == HighPrecision && (e->modifiers() & Qt::ControlModifier) == 0) {
+        int delta = e->delta();
+        // in Qt scrolling to the right gives negative values.
+        if (e->orientation() == Qt::Horizontal)
+            delta = -delta;
+        for (int i = qAbs(delta / 120); i > 0; --i)
+            QMetaObject::invokeMethod(this, delta < 0 ? "frameBackward" : "frameForward", Qt::QueuedConnection);
+        e->accept();
+        return;
+    }
+
+    GraphicsSlider::wheelEvent(e);
+}
+#endif
+
 void SpeedSlider::timerEvent(QTimerEvent *event)
 {
     if (event->timerId() == m_timerId)
