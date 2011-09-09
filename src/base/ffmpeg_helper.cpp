@@ -400,6 +400,8 @@ FrameTypeExtractor::FrameType FrameTypeExtractor::getH264FrameType(const quint8*
         quint8 nalType = *data & 0x1f;
         if (nalType >= nuSliceNonIDR && nalType <= nuSliceIDR)
         {
+            if (nalType == nuSliceIDR)
+                return I_Frame;
             BitStreamReader bitReader;
             bitReader.setBuffer(data+1, end);
             try {
@@ -408,8 +410,8 @@ FrameTypeExtractor::FrameType FrameTypeExtractor::getH264FrameType(const quint8*
                 if (slice_type >= 5)
                     slice_type -= 5; // +5 flag is: all other slice at this picture must be same type
 
-                if (slice_type == SliceUnit::I_TYPE || slice_type == SliceUnit::SI_TYPE)
-                    return I_Frame;
+                if (slice_type == SliceUnit::I_TYPE || slice_type == SliceUnit::SI_TYPE) 
+                    return P_Frame; // fake. It is i-frame, but not IDR, so we can't seek to this time and e.t.c.  // I_Frame;
                 else if (slice_type == SliceUnit::P_TYPE || slice_type == SliceUnit::SP_TYPE)
                     return P_Frame;
                 else if (slice_type == SliceUnit::B_TYPE)

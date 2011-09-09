@@ -205,7 +205,8 @@ bool CLFFmpegVideoDecoder::decode(const CLCompressedVideoData& data, CLVideoDeco
 		{
 			if (m_decodeMode == DecodeMode_Fastest)
 				return false;
-            else if (m_frameTypeExtractor->getFrameType((quint8*) data.data.data(), data.data.size()) == FrameTypeExtractor::B_Frame)
+            else if (m_frameTypeExtractor->getFrameType((quint8*) data.data.data(), data.data.size()) == FrameTypeExtractor::B_Frame &&
+                     data.compressionType != CODEC_ID_H264)
                 return false;
 		}
 	}
