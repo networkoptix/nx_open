@@ -132,7 +132,7 @@ QImage CLCamDisplay::getScreenshot(int channel)
     return m_display[channel]->getScreenshot();
 }
 
-void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep, double speed)
+void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep, float speed)
 {
     // simple data provider/streamer/streamreader has the same delay, but who cares ?
     // to avoid cpu usage in case of a lot data in queue(zoomed out on the scene, lets add same delays here )
