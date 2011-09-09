@@ -94,10 +94,10 @@ public:
 
     bool isDragging() const { return m_dragging; }
     void setMinOpacity(double value)
-    { 
+    {
         if (m_minOpacity != value)
         {
-            m_minOpacity = value; 
+            m_minOpacity = value;
             update();
         }
     }
@@ -145,7 +145,7 @@ void TimeLine::wheelEvent(QWheelEvent *event)
 
     if (delta*m_prevWheelDelta<0 && m_prevWheelDelta!= INT_MAX)
     {
-        // different directions 
+        // different directions
         m_scaleSpeed = 1;
         m_wheelAnimation->stop();
         m_prevWheelDelta = delta;
@@ -158,14 +158,14 @@ void TimeLine::wheelEvent(QWheelEvent *event)
         m_scaleSpeed  = qMin(m_scaleSpeed, (float)10.0);
 
         m_wheelAnimation->setEndValue(m_parent->scalingFactor() + delta/SCALE_FACTOR*m_scaleSpeed);
-        if (m_wheelAnimation->state() != QPropertyAnimation::Running) 
+        if (m_wheelAnimation->state() != QPropertyAnimation::Running)
         {
             m_wheelAnimation->setStartValue(m_parent->scalingFactor());
             m_wheelAnimation->setDuration(WHEEL_ANIMATION_DURATION);
             m_wheelAnimation->setEasingCurve(QEasingCurve::InOutQuad);
             m_wheelAnimation->start();
-        } 
-        else 
+        }
+        else
         {
             m_wheelAnimation->setDuration(m_wheelAnimation->currentTime() + WHEEL_ANIMATION_DURATION);
         }
@@ -182,20 +182,20 @@ void TimeLine::wheelEvent(QWheelEvent *event)
 }
 static const int MAX_LABEL_WIDTH = 64;
 struct IntervalInfo { qint64 interval; int value; const char * name; int count; const char * maxText; };
-static const IntervalInfo intervals[] = 
+static const IntervalInfo intervals[] =
 {
-    {100, 100, "ms", 10, "ms"}, 
+    {100, 100, "ms", 10, "ms"},
     {1000, 1, "s", 60, "59s"},
-    {5*1000, 5, "s", 12, "59s"}, 
-    {10*1000, 10, "s", 6, "59s"}, 
-    {30*1000, 30, "s", 2, "59s"}, 
+    {5*1000, 5, "s", 12, "59s"},
+    {10*1000, 10, "s", 6, "59s"},
+    {30*1000, 30, "s", 2, "59s"},
     {60*1000, 1, "m", 60, "59m"},
     {5*60*1000, 5, "m", 12, "59m"},
-    {10*60*1000, 10, "m", 6, "59m"}, 
-    {30*60*1000, 30, "m", 2, "59m"}, 
+    {10*60*1000, 10, "m", 6, "59m"},
+    {30*60*1000, 30, "m", 2, "59m"},
     {60*60*1000, 1, "h", 24, "59h"},
-    {3*60*60*1000, 3, "h", 8, "59h"}, 
-    {6*60*60*1000, 6, "h", 4, "59h"}, 
+    {3*60*60*1000, 3, "h", 8, "59h"},
+    {6*60*60*1000, 6, "h", 4, "59h"},
     {12*60*60*1000, 12, "h", 2, "59h"},
     {24*60*60*1000, 1, "d", 1, "99d"}
 };
@@ -321,7 +321,7 @@ void TimeLine::paintEvent(QPaintEvent *ev)
                 painter.drawText(2, 0, text);
                 painter.restore();
             }
-            else 
+            else
             {
                 QRectF textRect(xpos - widths[arrayIndex]/2, (r.height() - maxHeight) * lineLen, widths[arrayIndex], 128);
                 if (textRect.left() < 0 && pos == 0)
@@ -352,18 +352,14 @@ void TimeLine::mouseMoveEvent(QMouseEvent *me)
     if (me->buttons() & Qt::LeftButton) {
         // in fact, we need to use (width - slider handle thinkness/2), but it is ok without it
         QPoint dpos = m_previousPos - me->pos();
-
-        if (!m_dragging && abs(dpos.manhattanLength()) < QApplication::startDragDistance())
+        if (!m_dragging && dpos.manhattanLength() < QApplication::startDragDistance())
             return;
 
         m_dragging = true;
         m_previousPos = me->pos();
         length = dpos.x();
 
-        qint64 dtime = round((double) m_parent->sliderRange()/width()*dpos.x());
-
-
-        
+        qint64 dtime = qRound((double) m_parent->sliderRange()/width()*dpos.x());
         if (m_parent->centralise()) {
             if (dtime < 0)
                 dtime = qMax(dtime, -m_parent->viewPortPos());
@@ -374,7 +370,6 @@ void TimeLine::mouseMoveEvent(QMouseEvent *me)
         }
         else
             m_parent->setViewPortPos(m_parent->viewPortPos() + dtime);
-
     }
 }
 
@@ -510,7 +505,7 @@ void TimeSlider::setCurrentValue(qint64 value)
 
     if (m_currentValue < 0)
         m_currentValue  = 0;
-    
+
 
     updateSlider();
 
@@ -630,12 +625,7 @@ void TimeSlider::zoomOut()
 
 void TimeSlider::setViewPortPos(qint64 value)
 {
-    if (value < 0)
-        value = 0;
-    else if (value > maximumValue() - sliderRange())
-        value = maximumValue() - sliderRange();
-
-    m_viewPortPos = value;
+    m_viewPortPos = qBound(qint64(0), value, maximumValue() - sliderRange());
 
     if (m_currentValue < m_viewPortPos)
         setCurrentValue(m_viewPortPos);

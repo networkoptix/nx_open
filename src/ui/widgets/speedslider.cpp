@@ -2,6 +2,8 @@
 
 #include <QtCore/QPropertyAnimation>
 
+#include "tooltipitem.h"
+
 #include "ui/videoitem/timeslider.h" // SliderProxyStyle
 
 class SpeedSliderProxyStyle : public SliderProxyStyle
@@ -25,20 +27,24 @@ public:
 };
 
 
-static const struct SpeedPresets {
+static const struct Preset {
     int size;
     int defaultIndex;
     float preset[10];
-} speedPresets[] = {
+} presets[] = {
     { 10, 5, { -16.0, -8.0, -4.0, -2.0, -1.0, 1.0, 2.0, 4.0, 8.0, 16.0 } },  // LowPrecision
-    { 10, 5, { -2.0, -1.5, -1.0, -0.25, -0.5, 0.25, 0.5, 1.0, 1.5, 2.0 } }   // HighPrecision
+    { 9, 4, { -2.0, -1.0, -0.5, -0.25, 0.0, 0.25, 0.5, 1.0, 2.0 } }          // HighPrecision
 };
 
 SpeedSlider::SpeedSlider(Qt::Orientation orientation, QGraphicsItem *parent)
     : GraphicsSlider(orientation, parent),
       m_precision(HighPrecision),
-      m_animation(0)
+      m_animation(0),
+      m_timerId(0)
 {
+    m_toolTip = new StyledToolTipItem(this);
+    m_toolTip->setVisible(false);
+
     setStyle(new SpeedSliderProxyStyle);
     setSingleStep(10);
     setPageStep(10);
@@ -46,6 +52,8 @@ SpeedSlider::SpeedSlider(Qt::Orientation orientation, QGraphicsItem *parent)
     setTickPosition(GraphicsSlider::NoTicks);
 
     setPrecision(LowPrecision);
+
+    connect(this, SIGNAL(speedChanged(float)), this, SLOT(onSpeedChanged(float)));
 }
 
 SpeedSlider::~SpeedSlider()
@@ -54,6 +62,12 @@ SpeedSlider::~SpeedSlider()
     {
         m_animation->stop();
         delete m_animation;
+    }
+
+    if (m_timerId)
+    {
+        killTimer(m_timerId);
+        m_timerId = 0;
     }
 }
 
@@ -70,14 +84,29 @@ void SpeedSlider::setPrecision(SpeedSlider::Precision precision)
     m_precision = precision;
 
     // power of 10 in order to allow slider animation
-    setRange(0, speedPresets[int(m_precision)].size * 10 - 1);
+    setRange(0, (presets[int(m_precision)].size - 1) * 10);
     resetSpeed();
     update();
 }
 
+void SpeedSlider::setToolTipItem(ToolTipItem *toolTip)
+{
+    if (m_toolTip == toolTip)
+        return;
+
+    delete m_toolTip;
+
+    m_toolTip = toolTip;
+
+    if (m_toolTip) {
+        m_toolTip->setParentItem(this);
+        m_toolTip->setVisible(false);
+    }
+}
+
 void SpeedSlider::resetSpeed()
 {
-    setValue(speedPresets[int(m_precision)].defaultIndex * 10);
+    setValue(presets[int(m_precision)].defaultIndex * 10);
 }
 
 void SpeedSlider::stepBackward()
@@ -125,12 +154,19 @@ void SpeedSlider::sliderChange(SliderChange change)
 {
     GraphicsSlider::sliderChange(change);
 
-    int idx = value() / 10; // truncation!
-    Q_ASSERT(idx >= 0 && idx < speedPresets[int(m_precision)].size);
-    float value = speedPresets[int(m_precision)].preset[idx];
-    if (value > 0.5 && value < 1.5)
-        value = 1.0; // make a gap around 1x
-    emit speedChanged(value);
+    const Preset &preset = presets[int(m_precision)];
+
+    int idx = value() / 10;
+    Q_ASSERT(idx >= 0 && idx < preset.size);
+    float newSpeed = preset.preset[idx];
+
+    int defaultIndex = preset.defaultIndex;
+    if ((presets == 0 || newSpeed > preset.preset[defaultIndex - 1])
+        && (defaultIndex == preset.size - 1 || newSpeed < preset.preset[defaultIndex + 1])) {
+        newSpeed = preset.preset[defaultIndex]; // make a gap around default value
+    }
+
+    emit speedChanged(newSpeed);
 }
 
 void SpeedSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
@@ -145,7 +181,37 @@ void SpeedSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         m_animation = new QPropertyAnimation(this, "value", this);
         m_animation->setEasingCurve(QEasingCurve::OutQuad);
         m_animation->setDuration(500);
-        m_animation->setEndValue(speedPresets[int(m_precision)].defaultIndex * 10);
+        m_animation->setEndValue(presets[int(m_precision)].defaultIndex * 10);
         m_animation->start();
+    }
+}
+
+void SpeedSlider::timerEvent(QTimerEvent *event)
+{
+    if (event->timerId() == m_timerId)
+    {
+        killTimer(m_timerId);
+        m_timerId = 0;
+
+        if (m_toolTip)
+            m_toolTip->setVisible(false);
+    }
+
+    GraphicsSlider::timerEvent(event);
+}
+
+void SpeedSlider::onSpeedChanged(float newSpeed)
+{
+    if (m_timerId)
+        killTimer(m_timerId);
+    m_timerId = startTimer(2500);
+
+    if (m_toolTip) {
+        QStyleOptionSlider opt;
+        initStyleOption(&opt);
+        const QRect sliderRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle);
+        m_toolTip->setPos(sliderRect.center().x(), sliderRect.top() - m_toolTip->boundingRect().height());
+        m_toolTip->setText(!qFuzzyIsNull(newSpeed) ? tr("%1x").arg(newSpeed) : tr("Paused"));
+        m_toolTip->setVisible(true);
     }
 }

@@ -47,9 +47,9 @@ public:
         setTextColor(QColor(63, 159, 216));
         setTextRect(ToolTipItem::boundingRect().adjusted(5, 5, -5, -13));
     }
-
+/*
     inline QRectF boundingRect() const
-    { return ToolTipItem::boundingRect().adjusted(-5, -5, 5, 5); }
+    { return ToolTipItem::boundingRect().adjusted(-5, -5, 5, 5); }*/
 };
 
 #endif // TOOLTIPITEM_H

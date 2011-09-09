@@ -146,7 +146,7 @@ protected:
 
     bool isItemFullScreenZoomed(QGraphicsItem* item) const;
     bool isNavigationMode() const;
-    bool mouseIsCloseToNavigationControl(QPoint mpos) const;
+    bool mouseIsCloseToNavigationControl(const QPoint &mpos) const;
 
     CLAbstractSceneItem* navigationItem(QGraphicsItem* item) const;
 
@@ -170,7 +170,7 @@ public slots:
 
     void fitInView(int duration = 700 , int delay = 0, CLAnimationCurve curve =  SLOW_END_POW_40);
 private slots:
-    void onScneZoomFinished();
+    void onSceneZoomFinished();
     void onSecTimer();
     void onDecorationItemPressed(QString);
     void onArrange_helper_finished();
