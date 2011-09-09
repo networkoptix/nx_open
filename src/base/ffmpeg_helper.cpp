@@ -402,6 +402,10 @@ FrameTypeExtractor::FrameType FrameTypeExtractor::getH264FrameType(const quint8*
         {
             if (nalType == nuSliceIDR)
                 return I_Frame;
+            quint8 nal_ref_idc = (*data >> 5) & 3;
+            if (nal_ref_idc)
+                return P_Frame;
+
             BitStreamReader bitReader;
             bitReader.setBuffer(data+1, end);
             try {
