@@ -28,7 +28,8 @@ CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale) :
     m_flushedBeforeReverseStart(false),
     m_lastDisplayedTime(0),
     m_realReverseSize(0),
-    m_maxReverseQueueSize(-1)
+    m_maxReverseQueueSize(-1),
+    m_timeChangeEnabled(true)
 {
     for (int i = 0; i < MAX_FRAME_QUEUE_SIZE; ++i)
         m_frameQueue[i] = new CLVideoDecoderOutput();
@@ -464,7 +465,21 @@ qint64 CLVideoStreamDisplay::getLastDisplayedTime() const
 void CLVideoStreamDisplay::setLastDisplayedTime(qint64 value) 
 { 
     QMutexLocker lock(&m_timeMutex);
-    m_lastDisplayedTime = value; 
+    if (m_timeChangeEnabled)
+        m_lastDisplayedTime = value; 
+}
+
+void CLVideoStreamDisplay::blockTimeValue(qint64 time)
+{
+    QMutexLocker lock(&m_timeMutex);
+    m_lastDisplayedTime = time;
+    m_timeChangeEnabled = false;
+}
+
+void CLVideoStreamDisplay::unblockTimeValue()
+{
+    QMutexLocker lock(&m_timeMutex);
+    m_timeChangeEnabled = true;
 }
 
 void CLVideoStreamDisplay::afterJump()

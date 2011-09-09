@@ -36,6 +36,8 @@ public:
     void setLastDisplayedTime(qint64 value);
     void afterJump();
     QImage getScreenshot();
+    void blockTimeValue(qint64 time);
+    void unblockTimeValue();
 private:
     QMutex m_mtx;
     mutable QMutex m_timeMutex;
@@ -71,6 +73,7 @@ private:
     qint64 m_lastDisplayedTime;
     int m_realReverseSize;
     int m_maxReverseQueueSize;
+    bool m_timeChangeEnabled;
 private:
     void reorderPrevFrames();
     bool allocScaleContext(const CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);

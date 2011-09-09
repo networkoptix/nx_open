@@ -256,6 +256,8 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
 
 void CLCamDisplay::jump(qint64 time)
 {
+    cl_log.log("jump to ", time, cl_logWARNING);
+    m_display[0]->blockTimeValue(time);
     m_jumpTime = time;
     m_afterJump = true;
     clearUnprocessedData();
@@ -662,7 +664,7 @@ void CLCamDisplay::afterJump(qint64 newTime)
     m_lastVideoPacketTime = newTime;
     m_previousVideoTime = newTime;
     //m_previousVideoDisplayedTime = 0;
-    m_display[0]->setLastDisplayedTime(AV_NOPTS_VALUE);
+    m_display[0]->unblockTimeValue();
 
     m_totalFrames = 0;
     m_iFrames = 0;
