@@ -2,12 +2,12 @@
 #define IMAGEBUTTONITEM_H
 
 #include "abstractbuttonitem.h"
-#include <QPalette>
 
 class ImageButtonItemPrivate;
 class ImageButtonItem : public AbstractButtonItem
 {
     Q_OBJECT
+
 public:
     enum PixmapRole {
         Background,
@@ -23,19 +23,15 @@ public:
         Inactive,
         NGroups
     };
-    explicit ImageButtonItem(QGraphicsWidget *parent = 0);
+    explicit ImageButtonItem(QGraphicsItem *parent = 0);
 
     void addPixmap(const QPixmap &pix, PixmapGroup group, PixmapRole role);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-    void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
-    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
-
-signals:
-
-public slots:
 
 protected:
-    explicit ImageButtonItem(AbstractButtonItemPrivate &dd, QGraphicsWidget *parent = 0);
+    explicit ImageButtonItem(AbstractButtonItemPrivate &dd, QGraphicsItem *parent = 0);
+
+private:
     Q_DECLARE_PRIVATE(ImageButtonItem)
 };
 

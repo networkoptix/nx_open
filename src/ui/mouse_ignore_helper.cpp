@@ -22,12 +22,15 @@ bool CLMouseIgnoreHelper::shouldIgnore() const
         return false;
 }
 
-void CLMouseIgnoreHelper::ignoreNextMs(int ms)
+void CLMouseIgnoreHelper::ignoreNextMs(int ms, bool waitTillTheEnd)
 {
     ms-=100;
 
-    if (ms > 500)
-        ms = 500; // never wait more than 500 ms 
+    if (!waitTillTheEnd)
+    {
+        if (ms > 500)
+            ms = 500; // never wait more than 500 ms 
+    }
 
     if (ms<0)
         return;

@@ -185,9 +185,13 @@ void MainWnd::handleMessage(const QString& message)
     activate();
 }
 
-void MainWnd::closeEvent ( QCloseEvent * /*event*/ )
+void MainWnd::closeEvent(QCloseEvent *e)
 {
+    QWidget::closeEvent(e);
+
     destroyNavigator(m_normalView);
+
+    QCoreApplication::quit();
 }
 
 void MainWnd::destroyNavigator(CLLayoutNavigator*& nav)

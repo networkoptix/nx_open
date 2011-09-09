@@ -233,7 +233,7 @@ void CLGLRenderer::init(bool msgbox)
     QByteArray ext(extensions);
     QByteArray ver(version);
 
-    //version = "1.0.7";
+    //ver = "1.0.7 Microsoft";
     clampConstant = GL_CLAMP;
     if (ext.contains("GL_EXT_texture_edge_clamp"))
     {
@@ -247,10 +247,11 @@ void CLGLRenderer::init(bool msgbox)
     {
         clampConstant = GL_CLAMP_TO_EDGE;
     }
-    else if (ver <= QByteArray("1.1.0"))
+
+    if (ver <= QByteArray("1.1.0"))
     {
         // Microsoft Generic software
-        const QString message = QObject::tr("SLOW_OPENGL");
+        const QString message = QObject::tr("OpenGL driver is not installed or very old. Please update video driver for better perfomance.");
         CL_LOG(cl_logWARNING) cl_log.log(message, cl_logWARNING);
         if (msgbox)
         {
@@ -318,7 +319,7 @@ void CLGLRenderer::init(bool msgbox)
 
         // in this first revision we do not support software color transform
         gl_status = CL_GL_NOT_SUPPORTED;
-
+        /*
         const QString message = QObject::tr("This software version supports only GPU (not CPU) color transformation. This video card do not supports shaders (GPU transforms). Please contact to developers to get new software version with YUV=>RGB software transform for your video card. Or update your video card:-)");
         CL_LOG(cl_logWARNING) cl_log.log(message, cl_logWARNING);
         if (msgbox)
@@ -327,6 +328,7 @@ void CLGLRenderer::init(bool msgbox)
             box->show();
             // ### fix leaking
         }
+        */
     }
 
     if (m_forceSoftYUV)

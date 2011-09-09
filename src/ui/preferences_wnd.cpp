@@ -7,6 +7,7 @@
 #include "version.h"
 #include "util.h"
 #include "recordingsettingswidget.h"
+#include "youtube/youtubesettingswidget.h"
 
 extern QString button_layout;
 extern QString button_home;
@@ -29,13 +30,15 @@ PreferencesWindow::PreferencesWindow(QWidget *parent) :
     creditsLabel->setText(label);
     Settings::instance().fillData(m_settingsData);
 
-    setWindowTitle(tr("Preferences Editor"));
-    videoRecorderWidget = new RecordingSettingsWidget;
-    tabWidget->insertTab(3, videoRecorderWidget, tr("Screen Recorder"));
-
     QPalette palette = restartIsNeededWarningLabel->palette();
     palette.setColor(QPalette::WindowText, Qt::red);
     restartIsNeededWarningLabel->setPalette(palette);
+
+    videoRecorderWidget = new RecordingSettingsWidget;
+    tabWidget->insertTab(3, videoRecorderWidget, tr("Screen Recorder"));
+
+    youTubeSettingsWidget = new YouTubeSettingsWidget;
+    tabWidget->insertTab(5, youTubeSettingsWidget, tr("YouTube"));
 
     updateView();
     updateCameras();
@@ -44,6 +47,8 @@ PreferencesWindow::PreferencesWindow(QWidget *parent) :
     //setWindowOpacity(.90);
 
     resizeEvent(0);
+
+    setWindowTitle(tr("Preferences Editor"));
 }
 
 PreferencesWindow::~PreferencesWindow()
@@ -65,6 +70,7 @@ void PreferencesWindow::accept()
     CLDeviceManager::instance().pleaseCheckDirs(checkLst);
 
     videoRecorderWidget->accept();
+    youTubeSettingsWidget->accept();
 
     QDialog::accept();
 }
@@ -167,19 +173,14 @@ void PreferencesWindow::resizeEvent ( QResizeEvent * /*event*/)
 //    QSize sz = this->size();
 }
 
-QString browseForDirectory()
-{
-    QFileDialog fileDialog;
-    fileDialog.setFileMode(QFileDialog::DirectoryOnly);
-    if (fileDialog.exec())
-        return QDir::toNativeSeparators(fileDialog.selectedFiles().at(0));
-
-    return QString();
-}
-
 void PreferencesWindow::mainMediaFolderBrowse()
 {
-    QString xdir = browseForDirectory();
+    QFileDialog fileDialog(this);
+    fileDialog.setFileMode(QFileDialog::DirectoryOnly);
+    if (!fileDialog.exec())
+        return;
+
+    QString xdir = QDir::toNativeSeparators(fileDialog.selectedFiles().first());
     if (xdir.isEmpty())
         return;
 
@@ -195,7 +196,12 @@ void PreferencesWindow::auxMediaFolderSelectionChanged()
 
 void PreferencesWindow::auxMediaFolderBrowse()
 {
-    QString xdir = browseForDirectory();
+    QFileDialog fileDialog(this);
+    fileDialog.setFileMode(QFileDialog::DirectoryOnly);
+    if (!fileDialog.exec())
+        return;
+
+    QString xdir = QDir::toNativeSeparators(fileDialog.selectedFiles().first());
     if (xdir.isEmpty())
         return;
 
@@ -231,7 +237,7 @@ void PreferencesWindow::cameraSelected(int row)
 
 void PreferencesWindow::enterLicenseClick()
 {
-    QDialog* dialog = new QDialog();
+    QDialog* dialog = new QDialog(this);
     Ui::LicenseKeyDialog uiDialog;
     uiDialog.setupUi(dialog);
 

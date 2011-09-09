@@ -156,8 +156,16 @@ void CLFFmpegVideoDecoder::resetDecoder()
 {
     QMutexLocker mutex(&global_ffmpeg_mutex);
 
-    closeDecoder();
-    openDecoder();
+    //closeDecoder();
+    //openDecoder();
+
+    // I have improved resetDecoder speed (I have left only minimum operations) because of REW. REW calls reset decoder on each GOP.
+    avcodec_close(m_context);
+    if (m_passedContext) 
+        avcodec_copy_context(m_context, m_passedContext);
+    m_context->thread_count = qMin(4, QThread::idealThreadCount() + 1);
+    m_context->thread_type = m_mtDecoding ? FF_THREAD_FRAME : FF_THREAD_SLICE;
+    avcodec_open(m_context, m_codec);
 }
 //The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than the actual read bytes because some optimized bitstream readers read 32 or 64 bits at once and could read over the end.
 //The end of the input buffer buf should be set to 0 to ensure that no overreading happens for damaged MPEG streams.
@@ -240,7 +248,8 @@ bool CLFFmpegVideoDecoder::decode(const CLCompressedVideoData& data, CLVideoDeco
     int got_picture = 0;
 
     // ### handle errors
-    m_context->pix_fmt = PixelFormat(0);
+    if (m_context->pix_fmt == -1)
+        m_context->pix_fmt = PixelFormat(0);
     avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
     if (data.useTwice)
         avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
@@ -320,6 +329,19 @@ bool CLFFmpegVideoDecoder::decode(const CLCompressedVideoData& data, CLVideoDeco
 		return m_context->pix_fmt != PIX_FMT_NONE;
 	}
     return false; // no picture decoded at current step
+}
+
+double CLFFmpegVideoDecoder::getSampleAspectRatio() const
+{
+    if (!m_context)
+        return 1.0;
+
+    double result = av_q2d(m_context->sample_aspect_ratio);
+
+    if (qAbs(result)< 1e-7)
+        result = 1.0; // if sample_aspect_ratio==0 it's unknown based on ffmpeg docs. so we assume it's 1.0 then
+
+    return result;
 }
 
 PixelFormat CLFFmpegVideoDecoder::GetPixelFormat()

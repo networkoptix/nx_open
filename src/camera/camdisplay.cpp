@@ -49,7 +49,7 @@ static void updateActivity()
 
 static const qint64 MIN_VIDEO_DETECT_JUMP_INTERVAL = 100 * 1000; // 100ms
 static const qint64 MIN_AUDIO_DETECT_JUMP_INTERVAL = MIN_VIDEO_DETECT_JUMP_INTERVAL + AUDIO_BUFF_SIZE*1000;
-static const int MAX_VALID_SLEEP_TIME = 1000*1000*5;
+//static const int MAX_VALID_SLEEP_TIME = 1000*1000*5;
 static const int MAX_VALID_SLEEP_LIVE_TIME = 1000 * 500; // 5 seconds as most long sleep time
 static const int SLOW_COUNTER_THRESHOLD = 24;
 static const double FPS_EPS = 0.0001;
@@ -85,7 +85,7 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_playingBitrate(0),
       m_tooSlowCounter(0),
       m_lightCpuMode(CLAbstractVideoDecoder::DecodeMode_Full),
-      m_lastFrameDisplayed(false)
+      m_lastFrameDisplayed(CLVideoStreamDisplay::Status_Displayed)
 {
     m_storedMaxQueueSize = m_dataQueue.maxSize();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
@@ -172,11 +172,9 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
 
     if (sleep)
     {
-        //QString msg;
-        //QTextStream str(&msg);
-        if (m_lastFrameDisplayed)
+        if (m_lastFrameDisplayed != CLVideoStreamDisplay::Status_Buffered)
         {
-            int realSleepTime = m_delay.sleep(needToSleep);
+            int realSleepTime = m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed ? m_delay.sleep(needToSleep) : m_delay.addQuant(needToSleep);
             //str << "sleep time: " << needToSleep << "  real:" << realSleepTime;
             if (qAbs(m_speed) > 1.0 + FPS_EPS)
             {
@@ -200,11 +198,6 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
                 }
             }
         }
-        else {
-            //str << "skip sleep";
-        }
-        //str.flush();
-        //cl_log.log(msg, cl_logALWAYS);
     }
     int channel = vd->channelNumber;
 
@@ -263,6 +256,8 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
 
 void CLCamDisplay::jump(qint64 time)
 {
+    cl_log.log("jump to ", time, cl_logWARNING);
+    m_display[0]->blockTimeValue(time);
     m_jumpTime = time;
     m_afterJump = true;
     clearUnprocessedData();
@@ -669,7 +664,7 @@ void CLCamDisplay::afterJump(qint64 newTime)
     m_lastVideoPacketTime = newTime;
     m_previousVideoTime = newTime;
     //m_previousVideoDisplayedTime = 0;
-    m_display[0]->setLastDisplayedTime(AV_NOPTS_VALUE);
+    m_display[0]->unblockTimeValue();
 
     m_totalFrames = 0;
     m_iFrames = 0;

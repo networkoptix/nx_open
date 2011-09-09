@@ -48,16 +48,16 @@ qint64 CLAVIStreamReader::packetTimestamp(AVStream* stream, const AVPacket& pack
     double timeBase = av_q2d(stream->time_base);
     qint64 dts = m_videoStreamIndex != -1 ? m_formatContext->streams[m_videoStreamIndex]->first_dts : stream->first_dts;
     qint64 firstDts = (dts == AV_NOPTS_VALUE) ? 0 : dts;
-
-    if (packet.dts != AV_NOPTS_VALUE)
+    qint64 packetTime = packet.dts != AV_NOPTS_VALUE ? packet.dts : packet.pts;
+    if (packetTime != AV_NOPTS_VALUE)
     {
-        if (packet.dts < firstDts)
+        if (packetTime < firstDts)
             firstDts = 0; // protect for some invalid streams 
-        double ttm = timeBase * (packet.dts - firstDts);
+        double ttm = timeBase * (packetTime - firstDts);
         return qint64(1e+6 * ttm);
     }
     else {
-        return firstDts;
+        return m_lastJumpTime;
     }
 }
 
@@ -79,7 +79,8 @@ CLAVIStreamReader::CLAVIStreamReader(CLDevice* dev ) :
     m_topIFrameTime(-1),
     m_bottomIFrameTime(-1),
     m_frameTypeExtractor(0),
-    m_lastGopSeekTime(-1)
+    m_lastGopSeekTime(-1),
+    m_lastJumpTime(0)
 {
     // Should init packets here as some times destroy (av_free_packet) could be called before init
     av_init_packet(&m_packets[0]);
@@ -156,6 +157,7 @@ AVFormatContext* CLAVIStreamReader::getFormatContext()
 
 bool CLAVIStreamReader::init()
 {
+    m_lastJumpTime = 0;
 	static bool firstInstance = true;
 
 	QMutexLocker mutex(&m_cs);
@@ -175,8 +177,8 @@ bool CLAVIStreamReader::init()
 
 	m_currentTime = 0;
 	m_previousTime = -1;
-    m_bottomIFrameTime =-1;
-    m_topIFrameTime = -1;
+    //m_bottomIFrameTime =-1;
+    //m_topIFrameTime = -1;
 
     m_formatContext = getFormatContext();
     if (!m_formatContext)
@@ -197,8 +199,10 @@ bool CLAVIStreamReader::init()
     av_init_packet(&m_packets[1]);
 
     delete m_frameTypeExtractor;
-    m_frameTypeExtractor = new FrameTypeExtractor(m_formatContext->streams[m_videoStreamIndex]->codec);
-
+    if (m_videoStreamIndex >= 0)
+        m_frameTypeExtractor = new FrameTypeExtractor(m_formatContext->streams[m_videoStreamIndex]->codec);
+    else
+        m_frameTypeExtractor = 0;
 
     return true;
 }
@@ -362,6 +366,7 @@ begin_label:
             m_topIFrameTime = jumpTime;
         else
             setSkipFramesToTime(jumpTime);
+        
     }
 
 	QnAviSemaphoreHelpr sem(aviSemaphore);
@@ -420,21 +425,29 @@ begin_label:
             else {
                 isKeyFrame =  currentPacket().flags  & AV_PKT_FLAG_KEY;
             }
+            
+            if (m_eof || m_currentTime == 0 && m_bottomIFrameTime > AV_REVERSE_BLOCK_START && m_topIFrameTime >= m_bottomIFrameTime) {
+                // seek from EOF to BOF occured
+                m_currentTime = m_topIFrameTime;
+                m_eof = false;
+            }
+
             if (isKeyFrame || m_currentTime >= m_topIFrameTime)
             {
                 if (m_bottomIFrameTime == -1) {
                     m_bottomIFrameTime = m_currentTime;
                     currentPacket().flags |= AV_REVERSE_BLOCK_START;
                 }
-
                 if (m_currentTime >= m_topIFrameTime)
                 {
                     qint64 seekTime = qMax(0ll, m_bottomIFrameTime - BACKWARD_SEEK_STEP);
                     if (m_currentTime != seekTime) {
                         av_free_packet(&currentPacket());
                         qint64 tmpVal = m_bottomIFrameTime;
-                        if (m_lastGopSeekTime == 0)
-                            seekTime = m_lengthMksec;
+                        if (m_lastGopSeekTime == 0) {
+                            seekTime = m_lengthMksec - BACKWARD_SEEK_STEP;
+                            tmpVal = m_lengthMksec;
+                        }
                         channeljumpTo(seekTime, 0);
                         m_lastGopSeekTime = seekTime;
                         m_topIFrameTime = tmpVal;
@@ -453,7 +466,11 @@ begin_label:
             else if (m_bottomIFrameTime == -1) {
                 // invalid seek. must be key frame
                 av_free_packet(&currentPacket());
-                return getNextData();
+                //return getNextData();
+                if (m_runing)
+                    goto begin_label;
+                else
+                    return 0;
             }
             currentPacket().flags |= AV_REVERSE_PACKET;
         }
@@ -525,13 +542,20 @@ void CLAVIStreamReader::channeljumpTo(quint64 mksec, int /*channel*/)
 {
     QMutexLocker mutex(&m_cs);
     mksec += startMksec();
-    avformat_seek_file(m_formatContext, -1, 0, mksec, LLONG_MAX, AVSEEK_FLAG_BACKWARD);
+    if (mksec > 0)
+        avformat_seek_file(m_formatContext, -1, 0, mksec, LLONG_MAX, AVSEEK_FLAG_BACKWARD);
+    else {
+        // some files can't correctly jump to 0
+        destroy();
+        init();
+    }
 
 	//m_needToSleep = 0;
 	m_previousTime = -1;
 	m_wakeup = true;
     m_bottomIFrameTime = -1;
-    m_topIFrameTime = -1;
+    m_topIFrameTime = mksec;
+    m_lastJumpTime = mksec;
 }
 
 void CLAVIStreamReader::destroy()

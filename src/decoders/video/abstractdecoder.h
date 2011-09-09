@@ -38,9 +38,11 @@ public:
     bool isHardwareAccelerationEnabled() const;
     virtual int getWidth() const  { return 0; }
     virtual int getHeight() const { return 0; }
+    virtual double getSampleAspectRatio() const { return 1; };
     virtual PixelFormat getFormat() const { return PIX_FMT_YUV420P; }
     virtual void flush() {}
     virtual const AVFrame* lastFrame() { return 0; }
+    virtual void resetDecoder() {}
 private:
 	CLAbstractVideoDecoder(const CLAbstractVideoDecoder&) {}
 	CLAbstractVideoDecoder& operator=(const CLAbstractVideoDecoder&) { return *this; }

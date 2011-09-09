@@ -16,10 +16,12 @@ static const int MAX_FRAME_QUEUE_SIZE = 2;
 class CLVideoStreamDisplay
 {
 public:
+    enum FrameDisplayStatus {Status_Displayed, Status_Skipped, Status_Buffered};
+
     CLVideoStreamDisplay(bool can_downscale);
     ~CLVideoStreamDisplay();
     void setDrawer(CLAbstractRenderer* draw);
-    bool dispay(CLCompressedVideoData* data, bool draw,
+    FrameDisplayStatus dispay(CLCompressedVideoData* data, bool draw,
                 CLVideoDecoderOutput::downscale_factor force_factor = CLVideoDecoderOutput::factor_any);
 
     void setLightCPUMode(CLAbstractVideoDecoder::DecodeMode val);
@@ -34,6 +36,8 @@ public:
     void setLastDisplayedTime(qint64 value);
     void afterJump();
     QImage getScreenshot();
+    void blockTimeValue(qint64 time);
+    void unblockTimeValue();
 private:
     QMutex m_mtx;
     mutable QMutex m_timeMutex;
@@ -69,6 +73,7 @@ private:
     qint64 m_lastDisplayedTime;
     int m_realReverseSize;
     int m_maxReverseQueueSize;
+    bool m_timeChangeEnabled;
 private:
     void reorderPrevFrames();
     bool allocScaleContext(const CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);
@@ -81,7 +86,7 @@ private:
         int srcWidth, 
         int srcHeight, 
         CLVideoDecoderOutput::downscale_factor force_factor);
-    void processDecodedFrame(int channel, CLVideoDecoderOutput* outFrame, bool enableFrameQueue, bool reverseMode);
+    bool processDecodedFrame(int channel, CLVideoDecoderOutput* outFrame, bool enableFrameQueue, bool reverseMode);
     void checkQueueOverflow(CLAbstractVideoDecoder* dec);
     void clearReverseQueue();
 };

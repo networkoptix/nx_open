@@ -349,7 +349,8 @@ void FrameTypeExtractor::decodeWMVSequence(const quint8* data, int size)
 FrameTypeExtractor::FrameTypeExtractor(AVCodecContext* context): 
     m_context(context), 
     m_codecId(context->codec_id),
-    m_vcSequence(0)
+    m_vcSequence(0),
+    m_dataWithNalPrefixes(false)
 {
     if (m_context && context->extradata_size > 0)
     {
@@ -369,6 +370,10 @@ FrameTypeExtractor::FrameTypeExtractor(AVCodecContext* context):
         {
             decodeWMVSequence(data, context->extradata_size);
         }
+        else if (m_codecId == CODEC_ID_H264) {
+            m_dataWithNalPrefixes = context->extradata[0] == 0;
+        }
+
     }
 }
 
@@ -379,31 +384,46 @@ FrameTypeExtractor::~FrameTypeExtractor()
 
 FrameTypeExtractor::FrameType FrameTypeExtractor::getH264FrameType(const quint8* data, int size)
 {
-    if (size < 1)
+    if (size < 4)
         return UnknownFrameType;
-    quint8 nalType = *data & 0x1f;
-    if (nalType >= nuSliceNonIDR && nalType <= nuSliceIDR)
+    const quint8* end = data + size;
+    while (data < end)
     {
-        BitStreamReader bitReader;
-        bitReader.setBuffer(data+1, data + size);
-        try {
-            int first_mb_in_slice = NALUnit::extractUEGolombCode(bitReader);
-            int slice_type = NALUnit::extractUEGolombCode(bitReader);
-            if (slice_type >= 5)
-                slice_type -= 5; // +5 flag is: all other slice at this picture must be same type
-
-            if (slice_type == SliceUnit::I_TYPE || slice_type == SliceUnit::SI_TYPE)
-                return I_Frame;
-            else if (slice_type == SliceUnit::P_TYPE || slice_type == SliceUnit::SP_TYPE)
-                return P_Frame;
-            else if (slice_type == SliceUnit::B_TYPE)
-                return B_Frame;
-            else
-                return UnknownFrameType;
-        } catch(...) {
-            return UnknownFrameType;
+        if (m_dataWithNalPrefixes) {
+            data = NALUnit::findNextNAL(data, end);
+            if (data >= end)
+                break;
         }
+        else {
+            data += 4;
+        }
+        quint8 nalType = *data & 0x1f;
+        if (nalType >= nuSliceNonIDR && nalType <= nuSliceIDR)
+        {
+            BitStreamReader bitReader;
+            bitReader.setBuffer(data+1, end);
+            try {
+                int first_mb_in_slice = NALUnit::extractUEGolombCode(bitReader);
+                int slice_type = NALUnit::extractUEGolombCode(bitReader);
+                if (slice_type >= 5)
+                    slice_type -= 5; // +5 flag is: all other slice at this picture must be same type
+
+                if (slice_type == SliceUnit::I_TYPE || slice_type == SliceUnit::SI_TYPE)
+                    return I_Frame;
+                else if (slice_type == SliceUnit::P_TYPE || slice_type == SliceUnit::SP_TYPE)
+                    return P_Frame;
+                else if (slice_type == SliceUnit::B_TYPE)
+                    return B_Frame;
+                else
+                    return UnknownFrameType;
+            } catch(...) {
+                return UnknownFrameType;
+            }
+        }
+        if (!m_dataWithNalPrefixes)
+            break;
     }
+    return UnknownFrameType;
 }
 
 FrameTypeExtractor::FrameType FrameTypeExtractor::getMpegVideoFrameType(const quint8* data, int size)
@@ -515,7 +535,7 @@ FrameTypeExtractor::FrameType FrameTypeExtractor::getFrameType(const quint8* dat
     switch (m_codecId)
     {
         case CODEC_ID_H264:
-            return getH264FrameType(data+4, dataLen-4);
+            return getH264FrameType(data, dataLen);
         case CODEC_ID_MPEG1VIDEO:
         case CODEC_ID_MPEG2VIDEO:
             return getMpegVideoFrameType(data, dataLen);

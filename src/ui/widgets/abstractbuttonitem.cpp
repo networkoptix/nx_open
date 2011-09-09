@@ -1,48 +1,9 @@
-/****************************************************************************
-**
-** Copyright (C) 2011 Nokia Corporation and/or its subsidiary(-ies).
-** All rights reserved.
-** Contact: Nokia Corporation (qt-info@nokia.com)
-**
-** This file is part of the QtGui module of the Qt Toolkit.
-**
-** $QT_BEGIN_LICENSE:LGPL$
-** GNU Lesser General Public License Usage
-** This file may be used under the terms of the GNU Lesser General Public
-** License version 2.1 as published by the Free Software Foundation and
-** appearing in the file LICENSE.LGPL included in the packaging of this
-** file. Please review the following information to ensure the GNU Lesser
-** General Public License version 2.1 requirements will be met:
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
-**
-** In addition, as a special exception, Nokia gives you certain additional
-** rights. These rights are described in the Nokia Qt LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
-**
-** GNU General Public License Usage
-** Alternatively, this file may be used under the terms of the GNU General
-** Public License version 3.0 as published by the Free Software Foundation
-** and appearing in the file LICENSE.GPL included in the packaging of this
-** file. Please review the following information to ensure the GNU General
-** Public License version 3.0 requirements will be met:
-** http://www.gnu.org/copyleft/gpl.html.
-**
-** Other Usage
-** Alternatively, this file may be used in accordance with the terms and
-** conditions contained in a signed written agreement between you and Nokia.
-**
-**
-**
-**
-**
-** $QT_END_LICENSE$
-**
-****************************************************************************/
+#include "abstractbuttonitem.h"
+#include "abstractbuttonitem_p.h"
 
 #include "qabstractbutton.h"
 #include "qabstractitemview.h"
 #include "qbuttongroup.h"
-#include "abstractbuttonitem_p.h"
 #include "qevent.h"
 #include "qpainter.h"
 #include "qapplication.h"
@@ -54,17 +15,15 @@
 #include "qaccessible.h"
 #endif
 
-QT_BEGIN_NAMESPACE
-
 #define AUTO_REPEAT_DELAY  300
 #define AUTO_REPEAT_INTERVAL 100
 
 Q_GUI_EXPORT extern bool qt_tab_all_widgets;
 
 /*!
-    \class QAbstractButton
+    \class AbstractButtonItem
 
-    \brief The QAbstractButton class is the abstract base class of
+    \brief The AbstractButtonItem class is the abstract base class of
     button widgets, providing functionality common to buttons.
 
     \ingroup abstractwidgets
@@ -73,7 +32,7 @@ Q_GUI_EXPORT extern bool qt_tab_all_widgets;
     Subclasses of this class handle user actions, and specify how the button
     is drawn.
 
-    QAbstractButton provides support for both push buttons and checkable
+    AbstractButtonItem provides support for both push buttons and checkable
     (toggle) buttons. Checkable buttons are implemented in the QRadioButton
     and QCheckBox classes. Push buttons are implemented in the
     QPushButton and QToolButton classes; these also provide toggle
@@ -84,7 +43,7 @@ Q_GUI_EXPORT extern bool qt_tab_all_widgets;
     is changed to give the button a "disabled" appearance.
 
     If the button is a text button with a string containing an
-    ampersand ('&'), QAbstractButton automatically creates a shortcut
+    ampersand ('&'), AbstractButtonItem automatically creates a shortcut
     key. For example:
 
     \snippet doc/src/snippets/code/src_gui_widgets_qabstractbutton.cpp 0
@@ -106,7 +65,7 @@ Q_GUI_EXPORT extern bool qt_tab_all_widgets;
     A button can be made the default button in a dialog are provided by
     QPushButton::setDefault() and QPushButton::setAutoDefault().
 
-    QAbstractButton provides most of the states used for buttons:
+    AbstractButtonItem provides most of the states used for buttons:
 
     \list
 
@@ -133,7 +92,7 @@ Q_GUI_EXPORT extern bool qt_tab_all_widgets;
     \e pressed state, then to the \e unchecked state (isChecked() and
     isDown() are both false).
 
-    QAbstractButton provides four signals:
+    AbstractButtonItem provides four signals:
 
     \list 1
 
@@ -150,7 +109,7 @@ Q_GUI_EXPORT extern bool qt_tab_all_widgets;
 
     \endlist
 
-    To subclass QAbstractButton, you must reimplement at least
+    To subclass AbstractButtonItem, you must reimplement at least
     paintEvent() to draw the button's outline and its text or pixmap. It
     is generally advisable to reimplement sizeHint() as well, and
     sometimes hitButton() (to determine whether a button press is within
@@ -164,8 +123,9 @@ Q_GUI_EXPORT extern bool qt_tab_all_widgets;
 // do not use button group for now
 #define QT_NO_BUTTONGROUP
 
-AbstractButtonItemPrivate::AbstractButtonItemPrivate(AbstractButtonItem *qq, QSizePolicy::ControlType type)
-    : q_ptr(qq),
+AbstractButtonItemPrivate::AbstractButtonItemPrivate(QSizePolicy::ControlType type)
+    : q_ptr(0),
+      hovered(false),
 #ifndef QT_NO_SHORTCUT
     shortcutId(0),
 #endif
@@ -177,7 +137,8 @@ AbstractButtonItemPrivate::AbstractButtonItemPrivate(AbstractButtonItem *qq, QSi
     autoRepeatDelay(AUTO_REPEAT_DELAY),
     autoRepeatInterval(AUTO_REPEAT_INTERVAL),
     controlType(type)
-{}
+{
+}
 
 #ifndef QT_NO_BUTTONGROUP
 
@@ -220,8 +181,6 @@ void QButtonGroup::setExclusive(bool exclusive)
     d->exclusive = exclusive;
 }
 
-
-// TODO: Qt 5: Merge with addButton(QAbstractButton *button, int id)
 void QButtonGroup::addButton(AbstractButtonItem *button)
 {
     addButton(button, -1);
@@ -589,17 +548,30 @@ void AbstractButtonItemPrivate::emitReleased()
 /*!
     Constructs an abstract button with a \a parent.
 */
-AbstractButtonItem::AbstractButtonItem(QGraphicsWidget *parent)
-    : QGraphicsWidget(parent),
-      d_ptr(new AbstractButtonItemPrivate(this))
+AbstractButtonItem::AbstractButtonItem(QGraphicsItem *parent)
+    : QGraphicsWidget(parent), d_ptr(new AbstractButtonItemPrivate)
 {
-    Q_D(AbstractButtonItem);
-    d->init();
+    d_ptr->q_ptr = this;
+    d_ptr->init();
+
+    setAcceptsHoverEvents(true);
+}
+
+/*!
+    \internal
+*/
+AbstractButtonItem::AbstractButtonItem(AbstractButtonItemPrivate &dd, QGraphicsItem *parent)
+    : QGraphicsWidget(parent), d_ptr(&dd)
+{
+    d_ptr->q_ptr = this;
+    d_ptr->init();
+
+    setAcceptsHoverEvents(true);
 }
 
 /*!
     Destroys the button.
- */
+*/
  AbstractButtonItem::~AbstractButtonItem()
 {
 #ifndef QT_NO_BUTTONGROUP
@@ -609,34 +581,21 @@ AbstractButtonItem::AbstractButtonItem(QGraphicsWidget *parent)
 #endif
 }
 
-
-/*! \internal
- */
-AbstractButtonItem::AbstractButtonItem(AbstractButtonItemPrivate &dd, QGraphicsWidget *parent)
-    : QGraphicsWidget(parent, 0),
-      d_ptr(&dd)
-{
-    Q_D(AbstractButtonItem);
-    d->init();
-}
-
 /*!
-\property QAbstractButton::text
-\brief the text shown on the button
+    \property AbstractButtonItem::text
+    \brief the text shown on the button
 
-If the button has no text, the text() function will return a an empty
-string.
+    If the button has no text, the text() function will return a an empty string.
 
-If the text contains an ampersand character ('&'), a shortcut is
-automatically created for it. The character that follows the '&' will
-be used as the shortcut key. Any previous shortcut will be
-overwritten, or cleared if no shortcut is defined by the text. See the
-\l {QShortcut#mnemonic}{QShortcut} documentation for details (to
-display an actual ampersand, use '&&').
+    If the text contains an ampersand character ('&'), a shortcut is
+    automatically created for it. The character that follows the '&' will
+    be used as the shortcut key. Any previous shortcut will be
+    overwritten, or cleared if no shortcut is defined by the text. See the
+    \l {QShortcut#mnemonic}{QShortcut} documentation for details (to
+    display an actual ampersand, use '&&').
 
-There is no default text.
+    There is no default text.
 */
-
 void AbstractButtonItem::setText(const QString &text)
 {
     Q_D(AbstractButtonItem);
@@ -663,11 +622,11 @@ QString AbstractButtonItem::text() const
 
 
 /*!
-  \property QAbstractButton::icon
-  \brief the icon shown on the button
+    \property AbstractButtonItem::icon
+    \brief the icon shown on the button
 
-  The icon's default size is defined by the GUI style, but can be
-  adjusted by setting the \l iconSize property.
+    The icon's default size is defined by the GUI style, but can be
+    adjusted by setting the \l iconSize property.
 */
 void AbstractButtonItem::setIcon(const QIcon &icon)
 {
@@ -686,10 +645,9 @@ QIcon AbstractButtonItem::icon() const
 
 #ifndef QT_NO_SHORTCUT
 /*!
-\property QAbstractButton::shortcut
-\brief the mnemonic associated with the button
+    \property AbstractButtonItem::shortcut
+    \brief the mnemonic associated with the button
 */
-
 void AbstractButtonItem::setShortcut(const QKeySequence &key)
 {
     Q_D(AbstractButtonItem);
@@ -707,12 +665,12 @@ QKeySequence AbstractButtonItem::shortcut() const
 #endif // QT_NO_SHORTCUT
 
 /*!
-\property QAbstractButton::checkable
-\brief whether the button is checkable
+    \property AbstractButtonItem::checkable
+    \brief whether the button is checkable
 
-By default, the button is not checkable.
+    By default, the button is not checkable.
 
-\sa checked
+    \sa checked
 */
 void AbstractButtonItem::setCheckable(bool checkable)
 {
@@ -731,12 +689,12 @@ bool AbstractButtonItem::isCheckable() const
 }
 
 /*!
-\property QAbstractButton::checked
-\brief whether the button is checked
+    \property AbstractButtonItem::checked
+    \brief whether the button is checked
 
-Only checkable buttons can be checked. By default, the button is unchecked.
+    Only checkable buttons can be checked. By default, the button is unchecked.
 
-\sa checkable
+    \sa checkable
 */
 void AbstractButtonItem::setChecked(bool checked)
 {
@@ -780,14 +738,13 @@ bool AbstractButtonItem::isChecked() const
 }
 
 /*!
-  \property QAbstractButton::down
-  \brief whether the button is pressed down
+    \property AbstractButtonItem::down
+    \brief whether the button is pressed down
 
-  If this property is true, the button is pressed down. The signals
-  pressed() and clicked() are not emitted if you set this property
-  to true. The default is false.
+    If this property is true, the button is pressed down. The signals
+    pressed() and clicked() are not emitted if you set this property
+    to true. The default is false.
 */
-
 void AbstractButtonItem::setDown(bool down)
 {
     Q_D(AbstractButtonItem);
@@ -808,19 +765,18 @@ bool AbstractButtonItem::isDown() const
 }
 
 /*!
-\property QAbstractButton::autoRepeat
-\brief whether autoRepeat is enabled
+    \property AbstractButtonItem::autoRepeat
+    \brief whether autoRepeat is enabled
 
-If autoRepeat is enabled, then the pressed(), released(), and clicked() signals are emitted at
-regular intervals when the button is down. autoRepeat is off by default.
-The initial delay and the repetition interval are defined in milliseconds by \l
-autoRepeatDelay and \l autoRepeatInterval.
+    If autoRepeat is enabled, then the pressed(), released(), and clicked() signals are emitted at
+    regular intervals when the button is down. autoRepeat is off by default.
+    The initial delay and the repetition interval are defined in milliseconds by \l
+    autoRepeatDelay and \l autoRepeatInterval.
 
-Note: If a button is pressed down by a shortcut key, then auto-repeat is enabled and timed by the
-system and not by this class. The pressed(), released(), and clicked() signals will be emitted
-like in the normal case.
+    Note: If a button is pressed down by a shortcut key, then auto-repeat is enabled and timed by the
+    system and not by this class. The pressed(), released(), and clicked() signals will be emitted
+    like in the normal case.
 */
-
 void AbstractButtonItem::setAutoRepeat(bool autoRepeat)
 {
     Q_D(AbstractButtonItem);
@@ -840,7 +796,7 @@ bool AbstractButtonItem::autoRepeat() const
 }
 
 /*!
-    \property QAbstractButton::autoRepeatDelay
+    \property AbstractButtonItem::autoRepeatDelay
     \brief the initial delay of auto-repetition
     \since 4.2
 
@@ -863,7 +819,7 @@ int AbstractButtonItem::autoRepeatDelay() const
 }
 
 /*!
-    \property QAbstractButton::autoRepeatInterval
+    \property AbstractButtonItem::autoRepeatInterval
     \brief the interval of auto-repetition
     \since 4.2
 
@@ -888,21 +844,21 @@ int AbstractButtonItem::autoRepeatInterval() const
 
 
 /*!
-\property QAbstractButton::autoExclusive
-\brief whether auto-exclusivity is enabled
+    \property AbstractButtonItem::autoExclusive
+    \brief whether auto-exclusivity is enabled
 
-If auto-exclusivity is enabled, checkable buttons that belong to the
-same parent widget behave as if they were part of the same
-exclusive button group. In an exclusive button group, only one button
-can be checked at any time; checking another button automatically
-unchecks the previously checked one.
+    If auto-exclusivity is enabled, checkable buttons that belong to the
+    same parent widget behave as if they were part of the same
+    exclusive button group. In an exclusive button group, only one button
+    can be checked at any time; checking another button automatically
+    unchecks the previously checked one.
 
-The property has no effect on buttons that belong to a button
-group.
+    The property has no effect on buttons that belong to a button
+    group.
 
-autoExclusive is off by default, except for radio buttons.
+    autoExclusive is off by default, except for radio buttons.
 
-\sa QRadioButton
+    \sa QRadioButton
 */
 void AbstractButtonItem::setAutoExclusive(bool autoExclusive)
 {
@@ -991,11 +947,11 @@ void AbstractButtonItem::click()
     }
 }
 
-/*! \fn void QAbstractButton::toggle()
+/*! \fn void AbstractButtonItem::toggle()
 
     Toggles the state of a checkable button.
 
-     \sa checked
+    \sa checked
 */
 void AbstractButtonItem::toggle()
 {
@@ -1266,7 +1222,29 @@ void AbstractButtonItem::timerEvent(QTimerEvent *e)
     }
 }
 
-/*! \reimp */
+/*!
+    \reimp
+*/
+void AbstractButtonItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+{
+    d_func()->hovered = true;
+
+    QGraphicsWidget::hoverEnterEvent(event);
+}
+
+/*!
+    \reimp
+*/
+void AbstractButtonItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+{
+    d_func()->hovered = false;
+
+    QGraphicsWidget::hoverLeaveEvent(event);
+}
+
+/*!
+    \reimp
+*/
 void AbstractButtonItem::focusInEvent(QFocusEvent *e)
 {
     Q_D(AbstractButtonItem);
@@ -1277,7 +1255,9 @@ void AbstractButtonItem::focusInEvent(QFocusEvent *e)
     QGraphicsWidget::focusInEvent(e);
 }
 
-/*! \reimp */
+/*!
+    \reimp
+*/
 void AbstractButtonItem::focusOutEvent(QFocusEvent *e)
 {
     Q_D(AbstractButtonItem);
@@ -1286,7 +1266,9 @@ void AbstractButtonItem::focusOutEvent(QFocusEvent *e)
     QGraphicsWidget::focusOutEvent(e);
 }
 
-/*! \reimp */
+/*!
+    \reimp
+*/
 void AbstractButtonItem::changeEvent(QEvent *e)
 {
     Q_D(AbstractButtonItem);
@@ -1303,12 +1285,7 @@ void AbstractButtonItem::changeEvent(QEvent *e)
 }
 
 /*!
-    \fn void QAbstractButton::paintEvent(QPaintEvent *e)
-    \reimp
-*/
-
-/*!
-    \fn void QAbstractButton::pressed()
+    \fn void AbstractButtonItem::pressed()
 
     This signal is emitted when the button is pressed down.
 
@@ -1316,7 +1293,7 @@ void AbstractButtonItem::changeEvent(QEvent *e)
 */
 
 /*!
-    \fn void QAbstractButton::released()
+    \fn void AbstractButtonItem::released()
 
     This signal is emitted when the button is released.
 
@@ -1324,50 +1301,50 @@ void AbstractButtonItem::changeEvent(QEvent *e)
 */
 
 /*!
-\fn void QAbstractButton::clicked(bool checked)
+    \fn void AbstractButtonItem::clicked(bool checked)
 
-This signal is emitted when the button is activated (i.e. pressed down
-then released while the mouse cursor is inside the button), when the
-shortcut key is typed, or when click() or animateClick() is called.
-Notably, this signal is \e not emitted if you call setDown(),
-setChecked() or toggle().
+    This signal is emitted when the button is activated (i.e. pressed down
+    then released while the mouse cursor is inside the button), when the
+    shortcut key is typed, or when click() or animateClick() is called.
+    Notably, this signal is \e not emitted if you call setDown(),
+    setChecked() or toggle().
 
-If the button is checkable, \a checked is true if the button is
-checked, or false if the button is unchecked.
+    If the button is checkable, \a checked is true if the button is
+    checked, or false if the button is unchecked.
 
-\sa pressed(), released(), toggled()
+    \sa pressed(), released(), toggled()
 */
 
 /*!
-\fn void QAbstractButton::toggled(bool checked)
+    \fn void AbstractButtonItem::toggled(bool checked)
 
-This signal is emitted whenever a checkable button changes its state.
-\a checked is true if the button is checked, or false if the button is
-unchecked.
+    This signal is emitted whenever a checkable button changes its state.
+    \a checked is true if the button is checked, or false if the button is
+    unchecked.
 
-This may be the result of a user action, click() slot activation,
-or because setChecked() was called.
+    This may be the result of a user action, click() slot activation,
+    or because setChecked() was called.
 
-The states of buttons in exclusive button groups are updated before this
-signal is emitted. This means that slots can act on either the "off"
-signal or the "on" signal emitted by the buttons in the group whose
-states have changed.
+    The states of buttons in exclusive button groups are updated before this
+    signal is emitted. This means that slots can act on either the "off"
+    signal or the "on" signal emitted by the buttons in the group whose
+    states have changed.
 
-For example, a slot that reacts to signals emitted by newly checked
-buttons but which ignores signals from buttons that have been unchecked
-can be implemented using the following pattern:
+    For example, a slot that reacts to signals emitted by newly checked
+    buttons but which ignores signals from buttons that have been unchecked
+    can be implemented using the following pattern:
 
-\snippet doc/src/snippets/code/src_gui_widgets_qabstractbutton.cpp 2
+    \snippet doc/src/snippets/code/src_gui_widgets_qabstractbutton.cpp 2
 
-Button groups can be created using the QButtonGroup class, and
-updates to the button states monitored with the
-\l{QButtonGroup::buttonClicked()} signal.
+    Button groups can be created using the QButtonGroup class, and
+    updates to the button states monitored with the
+    \l{QButtonGroup::buttonClicked()} signal.
 
-\sa checked, clicked()
+    \sa checked, clicked()
 */
 
 /*!
-    \property QAbstractButton::iconSize
+    \property AbstractButtonItem::iconSize
     \brief the icon size used for this button.
 
     The default size is defined by the GUI style. This is a maximum
@@ -1396,5 +1373,3 @@ void AbstractButtonItem::setIconSize(const QSize &size)
         update();
     }
 }
-
-QT_END_NAMESPACE

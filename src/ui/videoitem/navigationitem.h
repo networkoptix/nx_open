@@ -9,9 +9,9 @@ class QGraphicsWidget;
 class QTimerEvent;
 class CLVideoCamera;
 class TimeSlider;
-class SpeedWidget;
-class VolumeWidget;
-class MyTextItem;
+class SpeedSlider;
+class TimeSliderToolTipItem;
+class VolumeSlider;
 
 class MyLable : public QLabel
 {
@@ -61,7 +61,6 @@ public:
     explicit NavigationWidget(QWidget *parent = 0);
 
     TimeSlider *slider() const;
-    VolumeWidget *volumeWidget() const;
     QLabel *label() const;
 
 Q_SIGNALS:
@@ -77,7 +76,6 @@ private:
     QHBoxLayout *m_layout;
     TimeSlider *m_slider;
     MyLable *m_label;
-    VolumeWidget *m_volumeWidget;
 
     friend class NavigationItem;
 };
@@ -106,7 +104,7 @@ public:
     bool isActive() const;
     void setActive(bool active);
 
-    static const int DEFAULT_HEIGHT = 70;
+    static const int DEFAULT_HEIGHT = 60;
 
 protected:
     void timerEvent(QTimerEvent* event);
@@ -146,8 +144,10 @@ private:
     ImageButtonItem *m_playButton;
     ImageButtonItem *m_forwardButton;
     ImageButtonItem *m_stepForwardButton;
-    SpeedWidget *m_speedWidget;
+    SpeedSlider *m_speedSlider;
     QGraphicsWidget *m_graphicsWidget;
+    ImageButtonItem *m_muteButton;
+    VolumeSlider *m_volumeSlider;
 
     CLVideoCamera* m_camera;
     int m_timerId;
@@ -156,7 +156,7 @@ private:
     bool m_mouseOver;
     bool m_playing;
 
-    MyTextItem *m_textItem;
+    TimeSliderToolTipItem *m_timesliderToolTip;
     bool m_active;
 
     struct RestoreInfoTextData {
