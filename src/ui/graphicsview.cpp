@@ -175,7 +175,7 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
     setPalette(pal);
 
     connect(&m_secTimer, SIGNAL(timeout ()), this , SLOT(onSecTimer()) );
-    connect(&m_scenezoom, SIGNAL(finished()), this , SLOT(onScneZoomFinished()) );
+    connect(&m_scenezoom, SIGNAL(finished()), this , SLOT(onSceneZoomFinished()));
 
     m_secTimer.setInterval(1000);
     m_secTimer.start();
@@ -406,8 +406,7 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
     if (onUserInput(true, true))
         return;
 
-
-    if (isNavigationMode() && m_navigationItem->mouseOver() )
+    if (m_navigationItem && m_navigationItem->mouseOver())
     {
         // do not zoom scene if mouse is over m_navigationItem
         QGraphicsView::wheelEvent(e);
@@ -415,9 +414,9 @@ void GraphicsView::wheelEvent ( QWheelEvent * e )
     }
 
 
-    if (isNavigationMode() && mouseIsCloseToNavigationControl(e->pos()) )
+    if (isNavigationMode() && mouseIsCloseToNavigationControl(e->pos()))
     {
-        // if mouse is just a bit above navogationitm => ignore event
+        // if mouse is just a bit above navigationitem, don't zoom
         return;
     }
 
@@ -1181,10 +1180,9 @@ void GraphicsView::mouseReleaseEvent(QMouseEvent * event)
             }
             else if (aitem && aitem==m_selectedWnd && m_selectedWnd->isFullScreen() && aitem->isZoomable()) // else must be here coz onNewItemSelected_helper change things
             {
-
-                if (isNavigationMode() && mouseIsCloseToNavigationControl(event->pos()) )
+                if (isNavigationMode() && mouseIsCloseToNavigationControl(event->pos()))
                 {
-                    // if mouse is just a bit above navogationitm => ignore event
+                    // if mouse is just a bit above navigationitem, don't zoom
                     return;
                 }
 
@@ -2032,6 +2030,7 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
 
     CLAbstractSceneItem* last_sel_item = getLastSelectedItem();
 
+
     //===transform=========
     switch (e->key())
     {
@@ -2218,7 +2217,7 @@ bool GraphicsView::isALTPressed(const QInputEvent* event) const
     return event->modifiers() & Qt::AltModifier;
 }
 
-bool GraphicsView::isItemFullScreenZoomed(QGraphicsItem* item) const 
+bool GraphicsView::isItemFullScreenZoomed(QGraphicsItem* item) const
 {
     QRectF scene_rect =  item->sceneBoundingRect();
     QRect item_view_rect = mapFromScene(scene_rect).boundingRect();
@@ -2240,17 +2239,13 @@ bool GraphicsView::isNavigationMode() const
     return false;
 }
 
-bool GraphicsView::mouseIsCloseToNavigationControl(QPoint mpos) const
+bool GraphicsView::mouseIsCloseToNavigationControl(const QPoint &mpos) const
 {
     int mouse_y = mpos.y();
     int navigation_top = viewport()->height() - NavigationItem::DEFAULT_HEIGHT;
     int navigation_top_gap  = navigation_top - 30;
 
-    if (mouse_y >= navigation_top_gap && mouse_y <= navigation_top)
-        return true;
-
-    return false;
-        
+    return mouse_y >= navigation_top_gap && mouse_y <= navigation_top;
 }
 
 CLAbstractSceneItem* GraphicsView::navigationItem(QGraphicsItem* item) const
@@ -2466,7 +2461,7 @@ void GraphicsView::onDecorationItemPressed(QString name)
         emit onDecorationPressed(m_camLayout.getContent(), name);
 }
 
-void GraphicsView::onScneZoomFinished()
+void GraphicsView::onSceneZoomFinished()
 {
     mWheelZooming = false;
     emit scneZoomFinished();

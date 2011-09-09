@@ -3,92 +3,25 @@
 
 #include "unmoved/unmoved_interactive_opacity_item.h"
 
-class QGraphicsProxyWidget;
 class QGraphicsWidget;
-
+class QLabel;
 class QTimerEvent;
+
 class CLVideoCamera;
-class TimeSlider;
+class ImageButtonItem;
 class SpeedSlider;
+class TimeSlider;
 class TimeSliderToolTipItem;
 class VolumeSlider;
 
-class MyLable : public QLabel
-{
-protected:
-    void wheelEvent(QWheelEvent *) {} // to avoid scene move up and down
-};
-
-class MyButton : public QAbstractButton
-{
-public:
-    MyButton(QWidget *parent = 0) : QAbstractButton(parent) {}
-
-    void setPixmap(const QPixmap &p) { m_pixmap = p; }
-    void setPressedPixmap(const QPixmap &p) { m_pressedPixmap = p; }
-    void setCheckedPixmap(const QPixmap &p) { m_checkedPixmap = p; }
-//    QSize sizeHint() const {return m_pixmap.size(); }
-
-protected:
-    void paintEvent(QPaintEvent *)
-    {
-        QPainter p(this);
-        p.setRenderHint(QPainter::SmoothPixmapTransform, true);
-
-        if (!isDown())
-            p.drawPixmap(contentsRect(), m_pixmap);
-
-        else if (isEnabled())
-            p.drawPixmap(contentsRect(), m_pressedPixmap);
-
-        if (isChecked())
-            p.drawPixmap(contentsRect(), m_checkedPixmap);
-    }
-
-    void wheelEvent(QWheelEvent *) {} // to avoid scene move up and down
-
-private:
-    QPixmap m_pixmap;
-    QPixmap m_pressedPixmap;
-    QPixmap m_checkedPixmap;
-};
-
-class NavigationWidget : public QWidget
-{
-    Q_OBJECT
-
-public:
-    explicit NavigationWidget(QWidget *parent = 0);
-
-    TimeSlider *slider() const;
-    QLabel *label() const;
-
-Q_SIGNALS:
-    void rewindBackward();
-    void rewindForward();
-    void stepBackward();
-    void stepForward();
-
-protected:
-    void wheelEvent(QWheelEvent *) {} // to avoid scene move up and down
-
-private:
-    QHBoxLayout *m_layout;
-    TimeSlider *m_slider;
-    MyLable *m_label;
-
-    friend class NavigationItem;
-};
-
-class ImageButtonItem;
 class NavigationItem : public CLUnMovedInteractiveOpacityItem
 {
     Q_OBJECT
+
 public:
     explicit NavigationItem(QGraphicsItem *parent = 0);
     ~NavigationItem();
 
-    QWidget *navigationWidget();
     QGraphicsWidget *graphicsWidget() const { return m_graphicsWidget; }
 
     void setVideoCamera(CLVideoCamera* camera);
@@ -104,12 +37,12 @@ public:
     bool isActive() const;
     void setActive(bool active);
 
-    static const int DEFAULT_HEIGHT = 60;
+    static const int DEFAULT_HEIGHT = 50;
 
 protected:
     void timerEvent(QTimerEvent* event);
+    void updateSliderToolTip(qint64 time);
     void updateSlider();
-
 
 private slots:
     void onValueChanged(qint64);
@@ -134,29 +67,29 @@ private slots:
 protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent *);
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *);
-    void wheelEvent(QGraphicsSceneWheelEvent *);
+    void wheelEvent(QGraphicsSceneWheelEvent *) {} // ### hack to avoid scene move up and down
 
 private:
-    QGraphicsProxyWidget *m_proxy;
-    NavigationWidget *m_widget;
-    ImageButtonItem *m_stepBackwardButton;
+    TimeSlider *m_timeSlider;
     ImageButtonItem *m_backwardButton;
+    ImageButtonItem *m_stepBackwardButton;
     ImageButtonItem *m_playButton;
-    ImageButtonItem *m_forwardButton;
     ImageButtonItem *m_stepForwardButton;
+    ImageButtonItem *m_forwardButton;
     SpeedSlider *m_speedSlider;
     QGraphicsWidget *m_graphicsWidget;
     ImageButtonItem *m_muteButton;
     VolumeSlider *m_volumeSlider;
+    QLabel *m_timeLabel;
 
     CLVideoCamera* m_camera;
     int m_timerId;
-    bool m_sliderIsmoving;
     qint64 m_currentTime;
-    bool m_mouseOver;
     bool m_playing;
+    bool m_sliderIsmoving;
+    bool m_mouseOver;
 
-    TimeSliderToolTipItem *m_timesliderToolTip;
+    TimeSliderToolTipItem *m_timeSliderToolTip;
     bool m_active;
 
     struct RestoreInfoTextData {

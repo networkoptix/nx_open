@@ -5,6 +5,8 @@
 
 class QPropertyAnimation;
 
+class ToolTipItem;
+
 class SpeedSlider : public GraphicsSlider
 {
     Q_OBJECT
@@ -18,6 +20,8 @@ public:
     Precision precision() const;
     void setPrecision(Precision precision);
 
+    void setToolTipItem(ToolTipItem *toolTip);
+
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
 public Q_SLOTS:
@@ -29,16 +33,28 @@ public Q_SLOTS:
 Q_SIGNALS:
     void speedChanged(float newSpeed);
 
+    void frameBackward();
+    void frameForward();
+
 protected:
     void sliderChange(SliderChange change);
 
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+#ifndef QT_NO_WHEELEVENT
+    void wheelEvent(QGraphicsSceneWheelEvent *e);
+#endif
+    void timerEvent(QTimerEvent *event);
+
+private Q_SLOTS:
+    void onSpeedChanged(float newSpeed);
 
 private:
     Q_DISABLE_COPY(SpeedSlider)
 
     Precision m_precision;
     QPropertyAnimation *m_animation;
+    ToolTipItem *m_toolTip;
+    int m_timerId;
 };
 
 #endif // SPEEDSLIDER_H

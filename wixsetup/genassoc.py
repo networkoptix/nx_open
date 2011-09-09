@@ -31,7 +31,7 @@ component_template_string = """     <Component Id="Eve${capitalized_ext}FileAsso
 
 feature_template_string = """
       <Feature Id="Eve${capitalized_ext}FileAssociation"
-               Level="1"
+               Level="${level}"
                AllowAdvertise="no"
                InstallDefault="local"
                Title="${upper_ext} Files (.${ext})"
@@ -65,7 +65,7 @@ def gen_assoc():
 """
 
     for ext, guid in video_filetypes:
-        print >> xout, feature_template.substitute(ext=ext, upper_ext=ext.upper(), capitalized_ext=ext.capitalize())
+        print >> xout, feature_template.substitute(ext=ext, upper_ext=ext.upper(), capitalized_ext=ext.capitalize(), level='1')
 
     print >> xout, '  </Feature>'
 
@@ -77,7 +77,7 @@ def gen_assoc():
 """
 
     for ext, guid in image_filetypes:
-        print >> xout, feature_template.substitute(ext=ext, upper_ext=ext.upper(), capitalized_ext=ext.capitalize())
+        print >> xout, feature_template.substitute(ext=ext, upper_ext=ext.upper(), capitalized_ext=ext.capitalize(), level='2')
     print >> xout, '  </Feature>'
 
     print >> xout, '  </Feature>'

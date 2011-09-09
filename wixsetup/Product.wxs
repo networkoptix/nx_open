@@ -23,8 +23,8 @@
     <!--[%LocalAppData]-->
     <Property Id="XMLSETTINGS" Value="%LocalAppData%\$(env.ORGANIZATION_NAME)\$(env.APPLICATION_NAME)\settings.xml" />
     
-    <Binary Id="SETPROPERTIES" SourceFile="SetProperties.vbs" />
-    <CustomAction Id="SetProperties" BinaryKey="SETPROPERTIES" VBScriptCall="SetProperties" Execute="firstSequence" />
+    <Binary Id="SETPROPERTIES" SourceFile="SetProperties.js" />
+    <CustomAction Id="SetProperties" BinaryKey="SETPROPERTIES" JScriptCall="SetProperties" Execute="firstSequence" />
 
 <!-- Custom actions for saving/restoring file associations.
     
@@ -204,11 +204,24 @@
               <File Id="phonon4" Name="phonon4.dll" Source="C:\Qt\4.7.3\bin\phonon4.dll"/>
             </Component>
 
+            <Directory Id="imageformats" Name="imageformats">
+		<Component Id="imageformats" Guid="29A1DA63-58E5-44ce-9AEF-0D2606D3ECB5">
+                  <File Id="qgif4.dll" Name="qgif4.dll" Source="C:\Qt\4.7.3\plugins\imageformats\qgif4.dll"/>
+                  <File Id="qjpeg4.dll" Name="qjpeg4.dll" Source="C:\Qt\4.7.3\plugins\imageformats\qjpeg4.dll"/>
+                  <File Id="qtiff4.dll" Name="qtiff4.dll" Source="C:\Qt\4.7.3\plugins\imageformats\qtiff4.dll"/>
+                </Component>
+            </Directory>
+
             <Component Id="OpenAL" Guid="5C74B9BD-A9D5-4c91-AE84-EFC2B51D1E12">
               <File Id="OpenAL32.dll" Name="OpenAL32.dll" Source="..\contrib\openal\bin\Win32\OpenAL32.dll"/>
               <File Id="wrap_oal.dll" Name="wrap_oal.dll" Source="..\contrib\openal\bin\Win32\wrap_oal.dll"/>
             </Component>
             
+            <Component Id="OpenSSL" Guid="85E3A7D4-82AE-45ba-BD50-38ECD08F2256">
+              <File Id="libeay32.dll" Name="libeay32.dll" Source="..\contrib\openssl\libeay32.dll"/>
+              <File Id="ssleay32.dll" Name="ssleay32.dll" Source="..\contrib\openssl\ssleay32.dll"/>
+            </Component>
+
             <Directory Id="styles" Name="styles">
               <Component Id="bespin" Guid="0A5A045F-8D7A-4437-9A81-1CFF73031E2C">
                 <File Id="bespin.dll" Name="bespin.dll" Source="..\contrib\bespin\bin\msvc-x86\release\styles\bespin.dll"/>
@@ -256,7 +269,9 @@
       <ComponentRef Id="MainExecutable" />
       <ComponentRef Id="FFmpegLibraries"/>
       <ComponentRef Id="QTLibraries" />
+      <ComponentRef Id="imageformats" />
       <ComponentRef Id="OpenAL" />
+      <ComponentRef Id="OpenSSL" />
       <ComponentRef Id='ProgramMenuDir' />
       <ComponentRef Id="bespin" />
       <ComponentRef Id='Settings'/>

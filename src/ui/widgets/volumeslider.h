@@ -3,6 +3,8 @@
 
 #include "graphicsslider.h"
 
+class ToolTipItem;
+
 class VolumeSlider : public GraphicsSlider
 {
     Q_OBJECT
@@ -13,14 +15,14 @@ public:
 
     bool isMute() const;
 
+    void setToolTipItem(ToolTipItem *toolTip);
+
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
 public Q_SLOTS:
     void setMute(bool mute);
 
 protected:
-    void sliderChange(SliderChange change);
-
     void timerEvent(QTimerEvent *);
 
 private Q_SLOTS:
@@ -29,8 +31,8 @@ private Q_SLOTS:
 private:
     Q_DISABLE_COPY(VolumeSlider)
 
+    ToolTipItem *m_toolTip;
     int m_timerId;
-    QString m_text;
 };
 
 #endif // VOLUMESLIDER_H

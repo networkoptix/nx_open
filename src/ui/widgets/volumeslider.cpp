@@ -1,5 +1,7 @@
 #include "volumeslider.h"
 
+#include "tooltipitem.h"
+
 #include "openal/qtvaudiodevice.h"
 
 #include "ui/videoitem/timeslider.h" // SliderProxyStyle
@@ -24,12 +26,13 @@ public:
 };
 
 
-static const int sliderHeigth = 12;
-
 VolumeSlider::VolumeSlider(Qt::Orientation orientation, QGraphicsItem *parent)
     : GraphicsSlider(orientation, parent),
       m_timerId(0)
 {
+    m_toolTip = new StyledToolTipItem(this);
+    m_toolTip->setVisible(false);
+
     setStyle(new VolumeSliderProxyStyle);
 
     setRange(0, 100);
@@ -58,10 +61,19 @@ void VolumeSlider::setMute(bool mute)
     setValue(QtvAudioDevice::instance().volume() * 100);
 }
 
-void VolumeSlider::onValueChanged(int value)
+void VolumeSlider::setToolTipItem(ToolTipItem *toolTip)
 {
-    QtvAudioDevice::instance().setVolume(value / 100.0);
-    //m_text = !QtvAudioDevice::instance().isMute() ? QString::number(value) + QLatin1Char('%') : tr("Muted");
+    if (m_toolTip == toolTip)
+        return;
+
+    delete m_toolTip;
+
+    m_toolTip = toolTip;
+
+    if (m_toolTip) {
+        m_toolTip->setParentItem(this);
+        m_toolTip->setVisible(false);
+    }
 }
 
 void VolumeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -73,7 +85,8 @@ void VolumeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     painter->fillRect(rect(), QColor(0, 0, 0, 0));
 
     QRectF r = contentsRect();
-    /*if (r.height() > sliderHeigth)
+    /*static const int sliderHeigth = 12;
+    if (r.height() > sliderHeigth)
     {
         r.moveTop((r.height() - sliderHeigth) / 2);
         r.setHeight(sliderHeigth);
@@ -114,28 +127,6 @@ void VolumeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     painter->setPen(QPen(Qt::darkGray, 1));
     painter->setBrush(linearGrad);
     painter->drawRect(r);
-
-#if 0
-    if (m_timerId && !m_text.isEmpty())
-    {
-/*        QRect boundingRect = painter->boundingRect(r, Qt::TextDontClip | Qt::AlignCenter, m_text);
-        boundingRect.adjust(-3, 1, -2, -1);
-        painter->setBrush(palette().color(QPalette::Active, QPalette::Highlight));
-        painter->drawRoundedRect(boundingRect, 2, 2);
-*/
-        painter->setPen(QPen(palette().color(QPalette::Active, QPalette::HighlightedText), 1));
-        painter->drawText(r, Qt::TextDontClip | Qt::AlignCenter, m_text);
-    }
-#endif
-}
-
-void VolumeSlider::sliderChange(SliderChange change)
-{
-    GraphicsSlider::sliderChange(change);
-
-    if (m_timerId)
-        killTimer(m_timerId);
-    m_timerId = startTimer(2500);
 }
 
 void VolumeSlider::timerEvent(QTimerEvent *event)
@@ -144,8 +135,28 @@ void VolumeSlider::timerEvent(QTimerEvent *event)
     {
         killTimer(m_timerId);
         m_timerId = 0;
-        update();
+
+        if (m_toolTip)
+            m_toolTip->setVisible(false);
     }
 
     GraphicsSlider::timerEvent(event);
+}
+
+void VolumeSlider::onValueChanged(int value)
+{
+    QtvAudioDevice::instance().setVolume(value / 100.0);
+
+    if (m_timerId)
+        killTimer(m_timerId);
+    m_timerId = startTimer(2500);
+
+    if (m_toolTip) {
+        QStyleOptionSlider opt;
+        initStyleOption(&opt);
+        const QRect sliderRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle);
+        m_toolTip->setPos(sliderRect.center().x(), sliderRect.top() - m_toolTip->boundingRect().height());
+        m_toolTip->setText(!QtvAudioDevice::instance().isMute() ? tr("%1%").arg(value) : tr("Muted"));
+        m_toolTip->setVisible(true);
+    }
 }

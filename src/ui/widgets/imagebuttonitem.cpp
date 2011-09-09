@@ -26,9 +26,9 @@ QPixmap ImageButtonItemPrivate::getPixmap(ImageButtonItem::PixmapGroup group)
         pix = pixmaps[group][ImageButtonItem::Pressed];
     else if (q->isChecked())
         pix = pixmaps[group][ImageButtonItem::Checked];
-    else if (q->hasFocus())
+    else if (q->hasFocus() && !pixmaps[group][ImageButtonItem::Focus].isNull())
         pix = pixmaps[group][ImageButtonItem::Focus];
-    else if (hovered)
+    else if (isUnderMouse && !pixmaps[group][ImageButtonItem::Hovered].isNull())
         pix = pixmaps[group][ImageButtonItem::Hovered];
     else
         pix = pixmaps[group][ImageButtonItem::Background];

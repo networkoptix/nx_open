@@ -623,7 +623,7 @@ bool AbstractGraphicsSliderPrivate::scrollByDelta(Qt::Orientation orientation, Q
         delta = -delta;
     qreal offset = qreal(delta) / 120;
 
-    if ((modifiers & Qt::ControlModifier) || (modifiers & Qt::ShiftModifier)) {
+    if (modifiers & (Qt::ControlModifier | Qt::ShiftModifier)) {
         // Scroll one page regardless of delta:
         stepsToScroll = qBound(-pageStep, int(offset * pageStep), pageStep);
         offset_accumulated = 0;
@@ -666,6 +666,7 @@ bool AbstractGraphicsSliderPrivate::scrollByDelta(Qt::Orientation orientation, Q
         offset_accumulated = 0;
         return false;
     }
+
     return true;
 }
 
