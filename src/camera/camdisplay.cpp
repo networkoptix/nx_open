@@ -174,7 +174,7 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep)
     {
         if (m_lastFrameDisplayed != CLVideoStreamDisplay::Status_Buffered)
         {
-            int realSleepTime = m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed ? m_delay.sleep(needToSleep) : m_delay.addQuant(needToSleep);
+            int realSleepTime = m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed ? m_delay.sleep(needToSleep, needToSleep*qAbs(m_speed)*2) : m_delay.addQuant(needToSleep);
             //str << "sleep time: " << needToSleep << "  real:" << realSleepTime;
             if (qAbs(m_speed) > 1.0 + FPS_EPS)
             {
