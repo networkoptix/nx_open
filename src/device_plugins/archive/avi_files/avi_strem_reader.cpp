@@ -423,6 +423,7 @@ begin_label:
             // (after sequence header always P-frame, not I-Frame. But I returns I, because no I frames at all in other case)
             FrameTypeExtractor::FrameType frameType = m_frameTypeExtractor->getFrameType(currentPacket().data, currentPacket().size);
             bool isKeyFrame;
+            
             if (frameType != FrameTypeExtractor::UnknownFrameType)
                 isKeyFrame = frameType == FrameTypeExtractor::I_Frame;
             else {
@@ -437,16 +438,19 @@ begin_label:
 
             if (isKeyFrame || m_currentTime >= m_topIFrameTime)
             {
-                if (m_bottomIFrameTime == -1) {
+                if (m_bottomIFrameTime == -1 && m_currentTime < m_topIFrameTime) {
                     m_bottomIFrameTime = m_currentTime;
                     currentPacket().flags |= AV_REVERSE_BLOCK_START;
                 }
                 if (m_currentTime >= m_topIFrameTime)
                 {
-                    qint64 seekTime = qMax(0ll, m_bottomIFrameTime - BACKWARD_SEEK_STEP);
+                    // sometime av_file_ssek doesn't seek to key frame (seek direct to specified position)
+                    // So, no KEY frame may be found after seek. At this case (m_bottomIFrameTime == -1) we increase seek interval
+                    qint64 seekTime = m_bottomIFrameTime != -1 ? m_bottomIFrameTime : (m_lastGopSeekTime != -1 ? m_lastGopSeekTime : m_currentTime);
+                    seekTime = qMax(0ll, seekTime - BACKWARD_SEEK_STEP);
                     if (m_currentTime != seekTime) {
                         av_free_packet(&currentPacket());
-                        qint64 tmpVal = m_bottomIFrameTime;
+                        qint64 tmpVal = m_bottomIFrameTime != -1 ? m_bottomIFrameTime : m_topIFrameTime;
                         if (m_lastGopSeekTime == 0) {
                             seekTime = m_lengthMksec - BACKWARD_SEEK_STEP;
                             tmpVal = m_lengthMksec;
