@@ -228,7 +228,10 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(CLCompress
         m_drawer->waitForFrameDisplayed(data->channelNumber);
         m_frameQueueIndex = 0;
         for (int i = 1; i < MAX_FRAME_QUEUE_SIZE; ++i)
-            m_frameQueue[i]->clean();
+        {
+            if (!m_frameQueue[i]->isExternalData())
+                m_frameQueue[i]->clean();
+        }
         m_queueUsed = false;
     }
     //if (!reverseMode && m_reverseQueue.size() > 0) 
