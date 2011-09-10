@@ -36,7 +36,7 @@ QPointF CLLayoutItem::getBestSubItemPos(CLSubItemType type)
 	switch(type)
 	{
 	case CloseSubItem:
-		return QPointF(width()-1000, 250);
+		return QPointF(width()-700, 170);
 		break;
 
 	default:
@@ -85,10 +85,18 @@ void CLLayoutItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 
 	QRect rect(0, 0, width() , height());
 
+    /*
 	if (m_mouse_over)
 		painter->setPen(QColor(190, 190, 255));
 	else
 		painter->setPen(QColor(150, 150, 255));
+    /**/
+
+    if (m_mouse_over)
+        painter->setPen(QColor(0, 0, 0));
+    else
+        painter->setPen(QColor(30, 30, 130));
+
 
 
 	painter->drawText((width() - rect.width())/2, border,

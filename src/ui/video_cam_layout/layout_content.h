@@ -28,9 +28,9 @@ class LayoutContent : public LayoutButton
 {
 public:
 
-	enum {HomeButton = 0x01, LevelUp = 0x02, BackGroundLogo = 0x04, MagnifyingGlass = 0x08, 
+	enum {SettingButton = 0x01, LevelUp = 0x02, BackGroundLogo = 0x04, MagnifyingGlass = 0x08, 
         SearchEdit = 0x10, SquareLayout = 0x20,  LongLayout = 0x40, SingleLineLayout = 0x80,
-        MultiPageSelection = 0x100};
+        MultiPageSelection = 0x100, ExitButton = 0x200, ToggleFullScreenButton = 0x400};
 	enum {Zoomable = 0x01, SceneMovable = 0x02, ShowAvalable = 0x04, ItemMovable = 0x08, GridEnable = 0x10, ItemRotatable = 0x20, ItemSelectable = 0x40};
 
 	LayoutContent();

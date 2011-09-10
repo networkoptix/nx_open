@@ -11,9 +11,6 @@
 #include "device_plugins/archive/avi_files/avi_bluray_device.h"
 #include "device_plugins/archive/avi_files/avi_dvd_strem_reader.h"
 
-extern QString button_layout;
-extern QString button_home;
-
 MainWnd* MainWnd::m_instance = 0;
 
 void MainWnd::findAcceptedFiles(QStringList& files, const QString& path)
