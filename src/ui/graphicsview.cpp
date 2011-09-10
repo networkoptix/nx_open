@@ -1188,6 +1188,12 @@ void GraphicsView::mouseReleaseEvent(QMouseEvent * event)
                     return;
                 }
 
+                if (! (event->modifiers() & Qt::ShiftModifier) )
+                {
+                    // if shift is not pressed - do not zoom
+                    return;
+                }
+
                 QPointF scene_pos = mapToScene(event->pos());
                 int w = mapToScene(viewport()->rect()).boundingRect().width()/2;
                 int h = mapToScene(viewport()->rect()).boundingRect().height()/2;
