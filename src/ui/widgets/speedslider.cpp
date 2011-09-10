@@ -35,6 +35,8 @@ static const struct Preset {
     { 10, 5, { -16.0, -8.0, -4.0, -2.0, -1.0, 1.0, 2.0, 4.0, 8.0, 16.0 } },  // LowPrecision
     { 9, 4, { -2.0, -1.0, -0.5, -0.25, 0.0, 0.25, 0.5, 1.0, 2.0 } }          // HighPrecision
 };
+static inline int idx2pos(int idx) { return idx * 10 + 5; }
+static inline int pos2idx(int pos) { return pos / 10; }
 
 SpeedSlider::SpeedSlider(Qt::Orientation orientation, QGraphicsItem *parent)
     : GraphicsSlider(orientation, parent),
@@ -92,7 +94,7 @@ void SpeedSlider::setPrecision(SpeedSlider::Precision precision)
     m_precision = precision;
 
     // power of 10 in order to allow slider animation
-    setRange(0, (presets[int(m_precision)].size - 1) * 10);
+    setRange(idx2pos(0), idx2pos(presets[int(m_precision)].size - 1));
     resetSpeed();
 }
 
@@ -113,7 +115,7 @@ void SpeedSlider::setToolTipItem(ToolTipItem *toolTip)
 
 void SpeedSlider::resetSpeed()
 {
-    setSliderPosition(presets[int(m_precision)].defaultIndex * 10);
+    setSliderPosition(idx2pos(presets[int(m_precision)].defaultIndex));
 }
 
 void SpeedSlider::stepBackward()
@@ -164,7 +166,7 @@ void SpeedSlider::sliderChange(SliderChange change)
     if (change == SliderValueChange) {
         const Preset &preset = presets[int(m_precision)];
 
-        int idx = value() / 10;
+        int idx = pos2idx(value());
         Q_ASSERT(idx >= 0 && idx < preset.size);
         float newSpeed = preset.preset[idx];
 
@@ -190,7 +192,7 @@ void SpeedSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         m_animation = new QPropertyAnimation(this, "value", this);
         m_animation->setEasingCurve(QEasingCurve::OutQuad);
         m_animation->setDuration(500);
-        m_animation->setEndValue(presets[int(m_precision)].defaultIndex * 10);
+        m_animation->setEndValue(idx2pos(presets[int(m_precision)].defaultIndex));
         m_animation->start();
     }
 }
@@ -220,7 +222,7 @@ void SpeedSlider::wheelEvent(QGraphicsSceneWheelEvent *e)
     GraphicsSlider::wheelEvent(e);
 
     const int newPosition = sliderPosition();
-    const int defaultPosition = presets[int(m_precision)].defaultIndex * 10;
+    const int defaultPosition = idx2pos(presets[int(m_precision)].defaultIndex);
     if ((oldPosition < defaultPosition && defaultPosition <= newPosition)
         || (oldPosition > defaultPosition && defaultPosition >= newPosition)) {
         setSliderPosition(defaultPosition);
