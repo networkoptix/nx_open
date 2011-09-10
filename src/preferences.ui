@@ -223,7 +223,7 @@
        <item>
         <widget class="QLabel" name="restartIsNeededWarningLabel">
          <property name="text">
-          <string>* Application restart is needed for these options to take into affect</string>
+          <string>* Application restart is needed for these changes to take effect</string>
          </property>
         </widget>
        </item>

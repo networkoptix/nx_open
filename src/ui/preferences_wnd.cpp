@@ -28,10 +28,6 @@ PreferencesWindow::PreferencesWindow(QWidget *parent) :
     creditsLabel->setText(label);
     Settings::instance().fillData(m_settingsData);
 
-    QPalette palette = restartIsNeededWarningLabel->palette();
-    palette.setColor(QPalette::WindowText, Qt::red);
-    restartIsNeededWarningLabel->setPalette(palette);
-
     videoRecorderWidget = new RecordingSettingsWidget;
     tabWidget->insertTab(3, videoRecorderWidget, tr("Screen Recorder"));
 
