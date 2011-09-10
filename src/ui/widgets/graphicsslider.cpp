@@ -55,18 +55,16 @@ int GraphicsSliderPrivate::pixelPosToRangeValue(int pos) const
 
     QStyleOptionSlider opt;
     q->initStyleOption(&opt);
-    QRect gr = q->style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderGroove);
-    QRect sr = q->style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle);
+    QRect grooveRect = q->style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderGroove);
+    QRect handleRect = q->style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle);
 
-    int sliderMin, sliderMax, sliderLength;
+    int sliderMin, sliderMax;
     if (orientation == Qt::Horizontal) {
-        sliderLength = sr.width();
-        sliderMin = gr.x();
-        sliderMax = gr.right() - sliderLength + 1;
+        sliderMin = grooveRect.x();
+        sliderMax = grooveRect.right() - handleRect.width() + 1;
     } else {
-        sliderLength = sr.height();
-        sliderMin = gr.y();
-        sliderMax = gr.bottom() - sliderLength + 1;
+        sliderMin = grooveRect.y();
+        sliderMax = grooveRect.bottom() - handleRect.height() + 1;
     }
 
     return QStyle::sliderValueFromPosition(minimum, maximum, pos - sliderMin, sliderMax - sliderMin, opt.upsideDown);

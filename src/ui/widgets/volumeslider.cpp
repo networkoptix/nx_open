@@ -36,7 +36,7 @@ VolumeSlider::VolumeSlider(Qt::Orientation orientation, QGraphicsItem *parent)
     setStyle(new VolumeSliderProxyStyle);
 
     setRange(0, 100);
-    setValue(QtvAudioDevice::instance().volume() * 100);
+    setSliderPosition(QtvAudioDevice::instance().volume() * 100);
 
     connect(this, SIGNAL(valueChanged(int)), this, SLOT(onValueChanged(int)));
 }
@@ -58,7 +58,7 @@ bool VolumeSlider::isMute() const
 void VolumeSlider::setMute(bool mute)
 {
     QtvAudioDevice::instance().setMute(mute);
-    setValue(QtvAudioDevice::instance().volume() * 100);
+    setSliderPosition(QtvAudioDevice::instance().volume() * 100);
 }
 
 void VolumeSlider::setToolTipItem(ToolTipItem *toolTip)

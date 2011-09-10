@@ -14,12 +14,13 @@ class AbstractGraphicsSlider : public QGraphicsWidget
     Q_PROPERTY(int maximum READ maximum WRITE setMaximum)
     Q_PROPERTY(int singleStep READ singleStep WRITE setSingleStep)
     Q_PROPERTY(int pageStep READ pageStep WRITE setPageStep)
-    Q_PROPERTY(int value READ value WRITE setValue NOTIFY valueChanged USER true)
     Q_PROPERTY(int sliderPosition READ sliderPosition WRITE setSliderPosition NOTIFY sliderMoved)
+    Q_PROPERTY(int value READ value WRITE setValue NOTIFY valueChanged USER true)
     Q_PROPERTY(bool tracking READ hasTracking WRITE setTracking)
     Q_PROPERTY(bool invertedAppearance READ invertedAppearance WRITE setInvertedAppearance)
     Q_PROPERTY(bool invertedControls READ invertedControls WRITE setInvertedControls)
     Q_PROPERTY(bool sliderDown READ isSliderDown WRITE setSliderDown DESIGNABLE false)
+    Q_PROPERTY(bool acceleratedWheeling READ isWheelingAccelerated WRITE setWheelingAccelerated)
 
 public:
     explicit AbstractGraphicsSlider(QGraphicsItem *parent = 0);
@@ -59,6 +60,9 @@ public:
     bool invertedControls() const;
     void setInvertedControls(bool);
 
+    bool isWheelingAccelerated() const;
+    void setWheelingAccelerated(bool);
+
     enum SliderAction {
         SliderNoAction,
         SliderSingleStepAdd,
@@ -87,8 +91,8 @@ Q_SIGNALS:
     void actionTriggered(int action);
 
 protected:
-    void setRepeatAction(SliderAction action, int thresholdTime = 500, int repeatTime = 50);
     SliderAction repeatAction() const;
+    void setRepeatAction(SliderAction action, int thresholdTime = 500, int repeatTime = 50);
 
     enum SliderChange {
         SliderRangeChange,

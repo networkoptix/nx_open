@@ -14,13 +14,15 @@ class AbstractGraphicsSliderPrivate
 
 public:
     AbstractGraphicsSliderPrivate();
-    ~AbstractGraphicsSliderPrivate();
+    virtual ~AbstractGraphicsSliderPrivate();
 
     AbstractGraphicsSlider *q_ptr;
 
     // QTBUG-18797: When setting the flag ItemIgnoresTransformations for an item,
     // it will receive mouse events as if it was transformed by the view.
     bool isUnderMouse;
+
+    Qt::Orientation orientation;
 
     void setSteps(int single, int page);
 
@@ -35,7 +37,7 @@ public:
     uint pressed : 1;
     uint invertedAppearance : 1;
     uint invertedControls : 1;
-    Qt::Orientation orientation;
+    uint acceleratedWheeling : 1;
 
     QBasicTimer repeatActionTimer;
     int repeatActionTime;
@@ -63,7 +65,6 @@ public:
         ;
     }
 
-    virtual int bound(int val) const { return qMax(minimum, qMin(maximum, val)); }
     inline int overflowSafeAdd(int add) const
     {
         int newValue = value + add;

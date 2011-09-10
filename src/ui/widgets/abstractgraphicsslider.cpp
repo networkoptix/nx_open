@@ -52,9 +52,8 @@
     \table
     \header \i Signal \i Emitted when
     \row \i \l valueChanged()
-         \i the value has changed. The \l tracking
-            determines whether this signal is emitted during user
-            interaction.
+         \i the value has changed. The \l tracking determines whether
+            this signal is emitted during user interaction.
     \row \i \l sliderPressed()
          \i the user starts to drag the slider.
     \row \i \l sliderMoved()
@@ -74,7 +73,7 @@
     QStyle::sliderValueFromPosition() help subclasses and styles to map
     screen coordinates to logical range values.
 
-    \sa QAbstractSpinBox, QSlider, QDial, QScrollBar, {Sliders Example}
+    \sa GraphicsSlider
 */
 
 /*!
@@ -116,8 +115,7 @@
 
     This signal is emitted even when tracking is turned off.
 
-    \sa setTracking(), valueChanged(), isSliderDown(),
-    sliderPressed(), sliderReleased()
+    \sa tracking, valueChanged(), sliderDown, sliderPressed(), sliderReleased()
 */
 
 /*!
@@ -126,7 +124,7 @@
     This signal is emitted when the user releases the slider with the
     mouse, or programmatically when setSliderDown(false) is called.
 
-    \sa sliderPressed() sliderMoved() sliderDown
+    \sa sliderPressed(), sliderMoved(), sliderDown
 */
 
 /*!
@@ -169,11 +167,13 @@
 AbstractGraphicsSliderPrivate::AbstractGraphicsSliderPrivate()
     : q_ptr(0),
       isUnderMouse(false),
+      orientation(Qt::Horizontal),
       minimum(0), maximum(99), pageStep(10), value(0), position(0), pressValue(-1),
       singleStep(1), offset_accumulated(0), tracking(true),
       blocktracking(false), pressed(false),
       invertedAppearance(false), invertedControls(false),
-      orientation(Qt::Horizontal), repeatAction(AbstractGraphicsSlider::SliderNoAction)
+      acceleratedWheeling(false),
+      repeatAction(AbstractGraphicsSlider::SliderNoAction)
 #ifdef QT_KEYPAD_NAVIGATION
       , isAutoRepeating(false)
       , repeatMultiplier(1)
@@ -236,8 +236,7 @@ AbstractGraphicsSlider::~AbstractGraphicsSlider()
     \property AbstractGraphicsSlider::orientation
     \brief the orientation of the slider
 
-    The orientation must be \l Qt::Vertical (the default) or \l
-    Qt::Horizontal.
+    The orientation must be \l Qt::Horizontal (the default) or \l Qt::Vertical.
 */
 Qt::Orientation AbstractGraphicsSlider::orientation() const
 {
@@ -268,7 +267,6 @@ void AbstractGraphicsSlider::setOrientation(Qt::Orientation orientation)
     When setting this property, the \l maximum is adjusted if
     necessary to ensure that the range remains valid. Also the
     slider's current value is adjusted to be within the new range.
-
 */
 int AbstractGraphicsSlider::minimum() const
 {
@@ -308,7 +306,7 @@ void AbstractGraphicsSlider::setMaximum(int max)
     If \a max is smaller than \a min, \a min becomes the only legal
     value.
 
-    \sa minimum maximum
+    \sa minimum, maximum
 */
 void AbstractGraphicsSlider::setRange(int min, int max)
 {
@@ -444,7 +442,7 @@ int AbstractGraphicsSlider::sliderPosition() const
 void AbstractGraphicsSlider::setSliderPosition(int position)
 {
     Q_D(AbstractGraphicsSlider);
-    position = d->bound(position);
+    position = qBound(d->minimum, position, d->maximum);
     if (position == d->position)
         return;
     d->position = position;
@@ -474,20 +472,20 @@ int AbstractGraphicsSlider::value() const
 void AbstractGraphicsSlider::setValue(int value)
 {
     Q_D(AbstractGraphicsSlider);
-    value = d->bound(value);
+    value = qBound(d->minimum, value, d->maximum);
     if (d->value == value && d->position == value)
         return;
     d->value = value;
-    if (d->position != value) {
-        d->position = value;
+    if (d->position != d->value) {
+        d->position = d->value;
         if (d->pressed)
-            emit sliderMoved((d->position = value));
+            emit sliderMoved(d->position);
     }
 #ifndef QT_NO_ACCESSIBILITY
     QAccessible::updateAccessibility(this, 0, QAccessible::ValueChanged);
 #endif
     sliderChange(SliderValueChange);
-    emit valueChanged(value);
+    emit valueChanged(d->value);
 }
 
 /*!
@@ -537,9 +535,27 @@ void AbstractGraphicsSlider::setInvertedControls(bool invert)
 }
 
 /*!
-    Triggers a slider \a action.  Possible actions are \l
-    SliderSingleStepAdd, \l SliderSingleStepSub, \l SliderPageStepAdd,
-    \l SliderPageStepSub, \l SliderToMinimum, \l SliderToMaximum, and \l SliderMove.
+    \property AbstractGraphicsSlider::acceleratedWheeling
+    \brief whether or not the scrolling the mouse wheel leads to accelerated moving the value.
+
+    If this property is false, scrolling the mouse wheel won't increase
+    the slider's value more than one page in any case. Otherwise
+    scrolling the mouse wheel will accelerate moving the value.
+*/
+bool AbstractGraphicsSlider::isWheelingAccelerated() const
+{
+    Q_D(const AbstractGraphicsSlider);
+    return d->acceleratedWheeling;
+}
+
+void AbstractGraphicsSlider::setWheelingAccelerated(bool enable)
+{
+    Q_D(AbstractGraphicsSlider);
+    d->acceleratedWheeling = enable;
+}
+
+/*!
+    Triggers a slider \a action.
 
     \sa actionTriggered()
 */
@@ -576,6 +592,17 @@ void AbstractGraphicsSlider::triggerAction(SliderAction action)
 }
 
 /*!
+    Returns the current repeat action.
+
+    \sa setRepeatAction()
+*/
+AbstractGraphicsSlider::SliderAction AbstractGraphicsSlider::repeatAction() const
+{
+    Q_D(const AbstractGraphicsSlider);
+    return d->repeatAction;
+}
+
+/*!
     Sets action \a action to be triggered repetitively in intervals
     of \a repeatTime, after an initial delay of \a thresholdTime.
 
@@ -590,17 +617,6 @@ void AbstractGraphicsSlider::setRepeatAction(SliderAction action, int thresholdT
         d->repeatActionTime = repeatTime;
         d->repeatActionTimer.start(thresholdTime, this);
     }
-}
-
-/*!
-    Returns the current repeat action.
-
-    \sa setRepeatAction()
-*/
-AbstractGraphicsSlider::SliderAction AbstractGraphicsSlider::repeatAction() const
-{
-    Q_D(const AbstractGraphicsSlider);
-    return d->repeatAction;
 }
 
 /*!
@@ -641,15 +657,13 @@ bool AbstractGraphicsSliderPrivate::scrollByDelta(Qt::Orientation orientation, Q
             offset_accumulated = 0;
 
         offset_accumulated += stepsToScrollF;
-#ifndef Q_WS_MAC
-        // Don't scroll more than one page in any case:
-        stepsToScroll = qBound(-pageStep, int(offset_accumulated), pageStep);
-#else
-        // Native UI-elements on Mac can scroll hundreds of lines at a time as
-        // a result of acceleration. So keep the same behaviour in Qt, and
-        // don't restrict stepsToScroll to certain maximum (pageStep):
-        stepsToScroll = int(offset_accumulated);
-#endif
+        if (!acceleratedWheeling) {
+            // Don't scroll more than one page in any case
+            stepsToScroll = qBound(-pageStep, int(offset_accumulated), pageStep);
+        } else {
+            // Make it able scroll hundreds of lines at a time as a result of acceleration
+            stepsToScroll = int(offset_accumulated);
+        }
         offset_accumulated -= int(offset_accumulated);
         if (stepsToScroll == 0)
             return false;
@@ -658,11 +672,11 @@ bool AbstractGraphicsSliderPrivate::scrollByDelta(Qt::Orientation orientation, Q
     if (invertedControls)
         stepsToScroll = -stepsToScroll;
 
-    int prevValue = value;
-    position = overflowSafeAdd(stepsToScroll); // value will be updated by triggerAction()
-    q->triggerAction(AbstractGraphicsSlider::SliderMove);
+    int prevPosition = position;
 
-    if (prevValue == value) {
+    q->setSliderPosition(overflowSafeAdd(stepsToScroll));
+
+    if (prevPosition == position) {
         offset_accumulated = 0;
         return false;
     }
