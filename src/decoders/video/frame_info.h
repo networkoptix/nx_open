@@ -27,6 +27,7 @@ struct CLVideoDecoderOutput: public AVFrame
     void reallocate(int newWidth, int newHeight, int format);
 public:
     int flags;
+    double sample_aspect_ratio; 
 private:
     static void downscalePlate_factor2(unsigned char* dst, int dstStride, const unsigned char* src, int src_width, int src_stride, int src_height);
     static void downscalePlate_factor4(unsigned char* dst, int dstStride, const unsigned char* src, int src_width, int src_stride, int src_height);
@@ -37,6 +38,7 @@ private:
 private:
     bool m_useExternalData; // pointers only copied to this frame
     bool m_displaying;
+    
 };
 
 /*
