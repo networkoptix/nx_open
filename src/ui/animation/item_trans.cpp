@@ -155,7 +155,7 @@ void CLItemTransform::transform_helper()
 	trans.translate(-center.x(), -center.y());
 	*/
 
-	qreal transform_ange = round_angle(m_Zrotation, 1);
+	qreal transform_ange = round_angle(m_Zrotation, 4);
 
 	trans.translate(m_rotatePoint.x(), m_rotatePoint.y());
 	trans.rotate(transform_ange);
