@@ -292,6 +292,7 @@ void CLCamDisplay::processNewSpeed(float speed)
     else {
         m_dataQueue.setMaxSize(m_storedMaxQueueSize);
         m_delay.setMaxOverdraft(DEFAULT_DELAY_OVERDRAFT);
+        m_delay.afterdelay();
     }
     m_tooSlowCounter = 0;
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
