@@ -334,6 +334,8 @@ void NavigationItem::timerEvent(QTimerEvent *event)
 {
     if (event->timerId() == m_timerId)
         updateSlider();
+
+    CLUnMovedInteractiveOpacityItem::timerEvent(event);
 }
 
 void NavigationItem::updateSliderToolTip(qint64 time)
