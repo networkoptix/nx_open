@@ -3,7 +3,7 @@
 QAction cm_exit(QObject::tr("Exit"), 0);
 QAction cm_fitinview(QObject::tr("Fit in View"), 0);
 QAction cm_start_video_recording(QObject::tr("Start/Stop Recording"), 0);
-QAction cm_open_file(QObject::tr("Open media file"), 0);
+QAction cm_open_file(QObject::tr("Open file"), 0);
 QAction cm_recording_settings(QObject::tr("Recording settings"), 0);
 QAction cm_toggle_fullscreen(QObject::tr("Toggle fullscreen"), 0);
 QAction cm_arrange(QObject::tr("Arrange"), 0);

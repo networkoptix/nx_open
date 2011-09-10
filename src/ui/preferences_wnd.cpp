@@ -9,8 +9,6 @@
 #include "recordingsettingswidget.h"
 #include "youtube/youtubesettingswidget.h"
 
-extern QString button_layout;
-extern QString button_home;
 
 PreferencesWindow::PreferencesWindow(QWidget *parent) :
     QDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint)

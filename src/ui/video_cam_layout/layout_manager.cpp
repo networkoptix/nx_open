@@ -11,12 +11,14 @@ mRecordersAndLayouts(0)
 {
 	mAllCustomLayouts = new LayoutContent();
 	mAllCustomLayouts->addDecorationFlag(
-		LayoutContent::HomeButton |
+		LayoutContent::SettingButton |
 		LayoutContent::BackGroundLogo |
 		LayoutContent::MagnifyingGlass |
 		LayoutContent::SquareLayout |
 		LayoutContent::LongLayout |
 		LayoutContent::SingleLineLayout |
+        LayoutContent::ToggleFullScreenButton |
+        LayoutContent::ExitButton |
 		LayoutContent::MultiPageSelection );
 
 	mAllCustomLayouts->setEditable(true);
@@ -24,22 +26,26 @@ mRecordersAndLayouts(0)
 
 	mAllRecorders = new LayoutContent();
 	mAllRecorders->addDecorationFlag(
-		LayoutContent::HomeButton |
+		LayoutContent::SettingButton |
 		LayoutContent::BackGroundLogo |
 		LayoutContent::MagnifyingGlass |
 		LayoutContent::SquareLayout |
 		LayoutContent::LongLayout |
 		LayoutContent::SingleLineLayout |
+        LayoutContent::ToggleFullScreenButton |
+        LayoutContent::ExitButton |
 		LayoutContent::MultiPageSelection);
 
 	mEmptyLayout = getNewEmptyLayoutContent();
 
     mSearchLayout = getNewEmptyLayoutContent(
-        LayoutContent::HomeButton |
+        LayoutContent::SettingButton |
         LayoutContent::BackGroundLogo |
         LayoutContent::SquareLayout |
         LayoutContent::LongLayout |
         LayoutContent::SingleLineLayout |
+        LayoutContent::ToggleFullScreenButton |
+        LayoutContent::ExitButton |
         LayoutContent::MultiPageSelection);
 
 	mSearchLayout->removeDecorationFlag(LayoutContent::MagnifyingGlass);
@@ -250,12 +256,14 @@ LayoutContent* CLSceneLayoutManager::getNewEmptyLayoutContent(unsigned int flags
 {
 	LayoutContent* cont = new LayoutContent();
 	cont->addDecorationFlag(
-		LayoutContent::HomeButton |
+		LayoutContent::SettingButton |
 		LayoutContent::BackGroundLogo |
 		LayoutContent::MagnifyingGlass |
 		LayoutContent::SquareLayout |
 		LayoutContent::LongLayout |
 		LayoutContent::SingleLineLayout |
+        LayoutContent::ToggleFullScreenButton |
+        LayoutContent::ExitButton |
 		LayoutContent::MultiPageSelection | flags);
 
 	CLDeviceCriteria cr(CLDeviceCriteria::STATIC);
@@ -281,13 +289,15 @@ LayoutContent* CLSceneLayoutManager::createRecorderContent(QString id)
 {
 	LayoutContent* cont = new LayoutContent();
 	cont->addDecorationFlag(
-		LayoutContent::HomeButton |
+		LayoutContent::SettingButton |
 		LayoutContent::BackGroundLogo |
 		LayoutContent::MagnifyingGlass |
 		LayoutContent::SquareLayout |
 		LayoutContent::LongLayout |
 		LayoutContent::SingleLineLayout |
 		LayoutContent::MultiPageSelection |
+        LayoutContent::ToggleFullScreenButton |
+        LayoutContent::ExitButton |
 		LayoutContent::LevelUp);
 
 	CLDeviceCriteria cr(CLDeviceCriteria::ALL);
