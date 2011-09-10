@@ -75,15 +75,8 @@ bool CLVideoWindowItem::isZoomable() const
 void CLVideoWindowItem::goToSteadyMode(bool steady, bool instant)
 {
     CLImageItem::goToSteadyMode(steady, instant);
-    if (steady)
-    {
-        scene()->views().at(0)->viewport()->setCursor(Qt::BlankCursor);
-    }
-    else
-    {
-        scene()->views().at(0)->viewport()->setCursor(Qt::OpenHandCursor);
-    }
 
+    scene()->views().at(0)->viewport()->setCursor(steady ? Qt::BlankCursor : Qt::OpenHandCursor);
 }
 
 void CLVideoWindowItem::setItemSelected(bool sel, bool animate, int delay )
@@ -106,7 +99,6 @@ void CLVideoWindowItem::setItemSelected(bool sel, bool animate, int delay )
         getVideoCam()->setQuality(CLStreamreader::CLSNormal, false);
         getVideoCam()->getCamCamDisplay()->playAudio(false);
     }
-
 }
 
 void CLVideoWindowItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
@@ -275,8 +267,8 @@ void CLVideoWindowItem::drawStuff(QPainter* painter)
 
     if (m_stat[0] && m_stat[0]->isConnectioLost())
         drawLostConnection(painter);
-
 }
+
 void CLVideoWindowItem::drawFPS(QPainter* painter)
 {
     painter->setFont(m_FPS_Font);
