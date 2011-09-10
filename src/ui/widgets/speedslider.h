@@ -54,7 +54,9 @@ private:
     Precision m_precision;
     QPropertyAnimation *m_animation;
     ToolTipItem *m_toolTip;
-    int m_timerId;
+    int m_toolTipTimerId;
+    int m_wheelStuckedTimerId;
+    bool m_wheelStucked;
 };
 
 #endif // SPEEDSLIDER_H

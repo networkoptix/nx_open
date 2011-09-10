@@ -28,7 +28,7 @@ public:
 
 VolumeSlider::VolumeSlider(Qt::Orientation orientation, QGraphicsItem *parent)
     : GraphicsSlider(orientation, parent),
-      m_timerId(0)
+      m_toolTipTimerId(0)
 {
     m_toolTip = new StyledToolTipItem(this);
     m_toolTip->setVisible(false);
@@ -43,10 +43,10 @@ VolumeSlider::VolumeSlider(Qt::Orientation orientation, QGraphicsItem *parent)
 
 VolumeSlider::~VolumeSlider()
 {
-    if (m_timerId)
+    if (m_toolTipTimerId)
     {
-        killTimer(m_timerId);
-        m_timerId = 0;
+        killTimer(m_toolTipTimerId);
+        m_toolTipTimerId = 0;
     }
 }
 
@@ -131,10 +131,10 @@ void VolumeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 
 void VolumeSlider::timerEvent(QTimerEvent *event)
 {
-    if (event->timerId() == m_timerId)
+    if (event->timerId() == m_toolTipTimerId)
     {
-        killTimer(m_timerId);
-        m_timerId = 0;
+        killTimer(m_toolTipTimerId);
+        m_toolTipTimerId = 0;
 
         if (m_toolTip)
             m_toolTip->setVisible(false);
@@ -147,9 +147,9 @@ void VolumeSlider::onValueChanged(int value)
 {
     QtvAudioDevice::instance().setVolume(value / 100.0);
 
-    if (m_timerId)
-        killTimer(m_timerId);
-    m_timerId = startTimer(2500);
+    if (m_toolTipTimerId)
+        killTimer(m_toolTipTimerId);
+    m_toolTipTimerId = startTimer(2500);
 
     if (m_toolTip) {
         QStyleOptionSlider opt;

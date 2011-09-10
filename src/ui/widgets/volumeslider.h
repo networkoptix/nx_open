@@ -32,7 +32,7 @@ private:
     Q_DISABLE_COPY(VolumeSlider)
 
     ToolTipItem *m_toolTip;
-    int m_timerId;
+    int m_toolTipTimerId;
 };
 
 #endif // VOLUMESLIDER_H

@@ -40,13 +40,15 @@ SpeedSlider::SpeedSlider(Qt::Orientation orientation, QGraphicsItem *parent)
     : GraphicsSlider(orientation, parent),
       m_precision(HighPrecision),
       m_animation(0),
-      m_timerId(0)
+      m_toolTipTimerId(0),
+      m_wheelStuckedTimerId(0),
+      m_wheelStucked(false)
 {
     m_toolTip = new StyledToolTipItem(this);
     m_toolTip->setVisible(false);
 
     setStyle(new SpeedSliderProxyStyle);
-    setSingleStep(10);
+    setSingleStep(5);
     setPageStep(10);
     setTickInterval(10);
     setTickPosition(GraphicsSlider::NoTicks);
@@ -64,10 +66,16 @@ SpeedSlider::~SpeedSlider()
         delete m_animation;
     }
 
-    if (m_timerId)
+    if (m_toolTipTimerId)
     {
-        killTimer(m_timerId);
-        m_timerId = 0;
+        killTimer(m_toolTipTimerId);
+        m_toolTipTimerId = 0;
+    }
+
+    if (m_wheelStuckedTimerId)
+    {
+        killTimer(m_wheelStuckedTimerId);
+        m_wheelStuckedTimerId = 0;
     }
 }
 
@@ -86,7 +94,6 @@ void SpeedSlider::setPrecision(SpeedSlider::Precision precision)
     // power of 10 in order to allow slider animation
     setRange(0, (presets[int(m_precision)].size - 1) * 10);
     resetSpeed();
-    update();
 }
 
 void SpeedSlider::setToolTipItem(ToolTipItem *toolTip)
@@ -106,17 +113,17 @@ void SpeedSlider::setToolTipItem(ToolTipItem *toolTip)
 
 void SpeedSlider::resetSpeed()
 {
-    setValue(presets[int(m_precision)].defaultIndex * 10);
+    setSliderPosition(presets[int(m_precision)].defaultIndex * 10);
 }
 
 void SpeedSlider::stepBackward()
 {
-    setValue(value() - singleStep());
+    triggerAction(SliderPageStepSub);
 }
 
 void SpeedSlider::stepForward()
 {
-    setValue(value() + singleStep());
+    triggerAction(SliderPageStepAdd);
 }
 
 void SpeedSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -154,19 +161,21 @@ void SpeedSlider::sliderChange(SliderChange change)
 {
     GraphicsSlider::sliderChange(change);
 
-    const Preset &preset = presets[int(m_precision)];
+    if (change == SliderValueChange) {
+        const Preset &preset = presets[int(m_precision)];
 
-    int idx = value() / 10;
-    Q_ASSERT(idx >= 0 && idx < preset.size);
-    float newSpeed = preset.preset[idx];
+        int idx = value() / 10;
+        Q_ASSERT(idx >= 0 && idx < preset.size);
+        float newSpeed = preset.preset[idx];
 
-    int defaultIndex = preset.defaultIndex;
-    if ((presets == 0 || newSpeed > preset.preset[defaultIndex - 1])
-        && (defaultIndex == preset.size - 1 || newSpeed < preset.preset[defaultIndex + 1])) {
-        newSpeed = preset.preset[defaultIndex]; // make a gap around default value
+        int defaultIndex = preset.defaultIndex;
+        if ((defaultIndex == 0 || newSpeed > preset.preset[defaultIndex - 1])
+            && (defaultIndex == preset.size - 1 || newSpeed < preset.preset[defaultIndex + 1])) {
+            newSpeed = preset.preset[defaultIndex]; // make a gap around the default value
+        }
+
+        emit speedChanged(newSpeed);
     }
-
-    emit speedChanged(newSpeed);
 }
 
 void SpeedSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
@@ -189,6 +198,8 @@ void SpeedSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 #ifndef QT_NO_WHEELEVENT
 void SpeedSlider::wheelEvent(QGraphicsSceneWheelEvent *e)
 {
+    e->accept();
+
     if (m_precision == HighPrecision && (e->modifiers() & Qt::ControlModifier) == 0) {
         int delta = e->delta();
         // in Qt scrolling to the right gives negative values.
@@ -196,23 +207,47 @@ void SpeedSlider::wheelEvent(QGraphicsSceneWheelEvent *e)
             delta = -delta;
         for (int i = qAbs(delta / 120); i > 0; --i)
             QMetaObject::invokeMethod(this, delta < 0 ? "frameBackward" : "frameForward", Qt::QueuedConnection);
-        e->accept();
         return;
     }
 
+    if (m_wheelStucked)
+        return;
+
+    // make a gap around the default value
+    setTracking(false);
+    const int oldPosition = sliderPosition();
+
     GraphicsSlider::wheelEvent(e);
+
+    const int newPosition = sliderPosition();
+    const int defaultPosition = presets[int(m_precision)].defaultIndex * 10;
+    if ((oldPosition < defaultPosition && defaultPosition <= newPosition)
+        || (oldPosition > defaultPosition && defaultPosition >= newPosition)) {
+        setSliderPosition(defaultPosition);
+        m_wheelStucked = true;
+        m_wheelStuckedTimerId = startTimer(500);
+    }
+    setTracking(true);
+    triggerAction(SliderMove);
 }
 #endif
 
 void SpeedSlider::timerEvent(QTimerEvent *event)
 {
-    if (event->timerId() == m_timerId)
+    if (event->timerId() == m_toolTipTimerId)
     {
-        killTimer(m_timerId);
-        m_timerId = 0;
+        killTimer(m_toolTipTimerId);
+        m_toolTipTimerId = 0;
 
         if (m_toolTip)
             m_toolTip->setVisible(false);
+    }
+    else if (event->timerId() == m_wheelStuckedTimerId)
+    {
+        killTimer(m_wheelStuckedTimerId);
+        m_wheelStuckedTimerId = 0;
+
+        m_wheelStucked = false;
     }
 
     GraphicsSlider::timerEvent(event);
@@ -220,9 +255,9 @@ void SpeedSlider::timerEvent(QTimerEvent *event)
 
 void SpeedSlider::onSpeedChanged(float newSpeed)
 {
-    if (m_timerId)
-        killTimer(m_timerId);
-    m_timerId = startTimer(2500);
+    if (m_toolTipTimerId)
+        killTimer(m_toolTipTimerId);
+    m_toolTipTimerId = startTimer(2500);
 
     if (m_toolTip) {
         QStyleOptionSlider opt;
