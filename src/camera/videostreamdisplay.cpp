@@ -270,7 +270,8 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(CLCompress
         clearReverseQueue();
         CLCompressedVideoData emptyData(1,0);
         CLVideoDecoderOutput tmpOutFrame;
-        while (dec->decode(emptyData, &tmpOutFrame));
+        //while (dec->decode(emptyData, &tmpOutFrame));
+        dec->resetDecoder();
         m_prevReverseMode = reverseMode;
     }
 
