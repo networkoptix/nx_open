@@ -20,17 +20,16 @@ LayoutContent& startscreen_content()
 
 		instance.setName(start_screen);
 
-        int noLogoWidth = 1500/1.1;
-        int noLogoHeight = 658/1.1;
-        int noLogoLeft = SCENE_LEFT-250;
-        int noLogoTop = SCENE_TOP - 100;
-
-
         int eveLogoWidth = 720*0.5;
         int eveLogoHeight = 475*0.5;
-        int eveLogoLeft = SCENE_LEFT + 260;
-        int eveLogoTop = noLogoTop + noLogoHeight -50;
+        int eveLogoLeft = SCENE_LEFT;
+        int eveLogoTop = SCENE_TOP;
 
+
+        int noLogoWidth = 1500/6.3;
+        int noLogoHeight = 658/6.3;
+        int noLogoLeft = SCENE_LEFT + 50;
+        int noLogoTop = eveLogoTop + 250;
 
 
         int btn_width = 400*0.7;
@@ -46,14 +45,14 @@ LayoutContent& startscreen_content()
         settings.angle = 0;
         settings.coordType = CLBasicLayoutItemSettings::Pixels;
 
-        settings.name = QLatin1String("abc");
+        settings.name = button_layout;
         settings.pos_x = noLogoLeft;
         settings.pos_y = noLogoTop;
         settings.width = noLogoWidth;
         settings.height = noLogoHeight;
         instance.addImage(QLatin1String(":/skin/startscreen/no_logo.png"), QString(), QString(), settings);
 
-        settings.name = button_logo;
+        settings.name = button_layout;
         settings.pos_x = eveLogoLeft;
         settings.pos_y = eveLogoTop;
         settings.width = eveLogoWidth;
@@ -61,29 +60,16 @@ LayoutContent& startscreen_content()
         instance.addImage(QLatin1String(":/skin/startscreen/eve_logo.png"), QString(), QString(), settings);
 
 
-        settings.name = button_layout;
-        settings.pos_x = btn2_left;
-        settings.pos_y = btn_top;
-        settings.width = btn_width;
-        settings.height = btn_height;
-        instance.addImage(QLatin1String(":/skin/startscreen/launch_1.png"), QString(), QString(), settings);
-
-
-        settings.name = button_system;
-        settings.pos_x = btn_left;
-        settings.pos_y = btn_top;
-        settings.width = btn_width;
-        settings.height = btn_height;
-        instance.addImage(QLatin1String(":/skin/startscreen/setup_2.png"), QString(), QString(), settings);
+        //settings.name = button_layout;
 
         CLDeviceCriteria cr(CLDeviceCriteria::STATIC);
 
         CLRectAdjustment adj;
 
-		adj.x1 = 1500;
-		adj.y1 = 1700;
-		adj.x2 = -1500;
-		adj.y2 = -1500;
+		adj.x1 = 1800 + 460;
+		adj.y1 = 1800;
+		adj.x2 = -1800 + 460;
+		adj.y2 = -1800;
 		/**/
 		instance.setRectAdjustment(adj);
 
