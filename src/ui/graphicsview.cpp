@@ -114,7 +114,7 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
     m_gridItem(0),
     m_menuIsHere(false),
     m_lastPressedItem(0),
-    m_openMediaDialog(0, tr("Open media file"), QString())
+    m_openMediaDialog(0, tr("Open file"), QString())
 {
     QStringList filters;
     filters << tr("Video (*.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)");
