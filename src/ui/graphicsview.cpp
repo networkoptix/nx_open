@@ -56,16 +56,19 @@ int scene_move_duration = 3000;
 int item_rotation_duration = 2000;
 qreal selected_item_zoom = 1.63;
 
-int decoration_size = 60;
+int decoration_size = 40;
 
 static const int MAX_AUDIO_TRACKS = 16;
 
-extern QString button_home;
+extern QString button_settings;
 extern QString button_level_up;
 extern QString button_magnifyingglass;
 extern QString button_squarelayout;
 extern QString button_longlayout;
 extern QString button_singleLineLayout;
+extern QString button_toggleFullScreen;
+extern QString button_exit;
+
 
 extern int MAX_FPS_normal;
 extern int MAX_FPS_selected;
@@ -567,9 +570,9 @@ void GraphicsView::initDecoration()
     if (getViewMode()==GraphicsView::ItemsAcceptor && m_camLayout.getContent()->getParent() == CLSceneLayoutManager::instance().getAllLayoutsContent())
         level_up = false;
 
-    bool home = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::HomeButton);
+    bool settings = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::SettingButton);
     if (m_viewMode!=NormalView)
-        home = false;
+        settings = false;
 
     bool magnifyingGlass = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::MagnifyingGlass);
     bool serach = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::SearchEdit);
@@ -577,6 +580,8 @@ void GraphicsView::initDecoration()
     bool long_layout = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::LongLayout);
     bool sigle_line_layout = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::SingleLineLayout);
     bool multiPageSelector = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::MultiPageSelection);
+    bool exitButton = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::ExitButton);
+    bool toggleFullscreen = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::ToggleFullScreenButton);
 
     removeAllStaticItems();
 
@@ -585,10 +590,29 @@ void GraphicsView::initDecoration()
 
     int top_left = 0;
 
-    if (home)
+    if (exitButton)
     {
-        item = new CLUnMovedPixtureButton(button_home, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/home.png"), decoration_size, decoration_size, 255);
+        item = new CLUnMovedPixtureButton(button_exit, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/exit-application.png"), decoration_size, decoration_size, 255);
         item->setStaticPos(QPoint(1,1));
+        addStaticItem(item);
+        top_left+= (decoration_size + 5);
+    }
+
+
+    
+    if (toggleFullscreen)
+    {
+        item = new CLUnMovedPixtureButton(button_toggleFullScreen, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/togglefullscreen.png"), decoration_size, decoration_size, 255);
+        item->setStaticPos(QPoint(1,decoration_size + 5));
+        addStaticItem(item);
+    }
+    /**/
+
+
+    if (settings)
+    {
+        item = new CLUnMovedPixtureButton(button_settings, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/settings.png"), decoration_size, decoration_size, 255);
+        item->setStaticPos(QPoint(top_left,1));
         addStaticItem(item);
         top_left+= (decoration_size + 5);
     }
@@ -1508,6 +1532,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
     if (act == &cm_exit)
     {
+        //mMainWnd->close();
         QCoreApplication::instance()->exit(0);
         // Note that unlike the C library function of the same name,
         // this function *does* return to the caller.
@@ -2438,8 +2463,23 @@ CLAbstractSceneItem* GraphicsView::getLastSelectedItem()
 
 void GraphicsView::onDecorationItemPressed(QString name)
 {
+    if (name == button_exit)
+    {
+        //mMainWnd->close();
+        QCoreApplication::instance()->exit(0);
+        return; // just in case:-)
+    }
 
-    if (name == button_squarelayout)
+    else if (name == button_toggleFullScreen)
+    {
+        toggleFullScreen();
+    }
+    else if (name == button_settings)
+    {
+        PreferencesWindow preferencesDialog(this);
+        preferencesDialog.exec();
+    }
+    else if (name == button_squarelayout)
     {
         m_camLayout.getGridEngine().getSettings().optimal_ratio = square_ratio;
         m_camLayout.getGridEngine().getSettings().max_rows = 5;

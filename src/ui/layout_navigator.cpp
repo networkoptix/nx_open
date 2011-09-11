@@ -13,7 +13,9 @@ QString video_layout = QLatin1String("video layout");
 
 QString button_layout = QLatin1String("layout");
 QString button_logo = QLatin1String("logo");
-QString button_home = QLatin1String("home");
+QString button_settings = QLatin1String("settings");
+QString button_toggleFullScreen = QLatin1String("toggleFullscreen");
+QString button_exit = QLatin1String("exit");
 QString button_system = QLatin1String("system");
 QString button_level_up = QLatin1String("level_up");
 QString button_magnifyingglass = QLatin1String("magnifyingglass");
@@ -98,13 +100,7 @@ void CLLayoutNavigator::goToNewLayoutContent()
 
 void CLLayoutNavigator::onDecorationPressed(LayoutContent* layout, QString itemname)
 {
-	if (itemname==button_home)
-	{
-		mNewContent = CLSceneLayoutManager::instance().startScreenLayoutContent();
-		if (m_mode==NORMAL_ViewMode)
-			goToNewLayoutContent();
-	}
-	else if (itemname==button_level_up)
+	if (itemname==button_level_up)
 	{
 		if (layout->getParent()!=0)
 		{

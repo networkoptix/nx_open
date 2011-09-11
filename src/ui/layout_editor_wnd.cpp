@@ -5,8 +5,8 @@
 #include "ui/video_cam_layout/layout_manager.h"
 #include "ui_common.h"
 
-extern QString button_layout;
-extern QString button_home;
+
+
 
 CLLayoutEditorWnd::CLLayoutEditorWnd(LayoutContent* contexttoEdit, QWidget *parent) :
 QDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint),

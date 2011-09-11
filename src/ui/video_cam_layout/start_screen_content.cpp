@@ -98,7 +98,11 @@ LayoutContent& startscreen_content()
 			LayoutContent::ItemSelectable );
 
 
-		instance.addDecorationFlag(LayoutContent::BackGroundLogo);
+		instance.addDecorationFlag(
+            LayoutContent::BackGroundLogo | 
+            LayoutContent::ExitButton | 
+            LayoutContent::ToggleFullScreenButton | 
+            LayoutContent::SettingButton);
 	}
 
 
