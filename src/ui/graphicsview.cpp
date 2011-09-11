@@ -847,8 +847,8 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
         if (aitem)
         {
             //may be about to scroll the scene
-            m_handScrolling = true;
-            viewport()->setCursor(Qt::ClosedHandCursor);
+            //m_handScrolling = true;
+            //viewport()->setCursor(Qt::ClosedHandCursor);
         }
         else
         {
@@ -1681,7 +1681,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
         {
             CLDevice* device = aitem->getComplicatedItem()->getDevice();
 
-            QMessageBox::StandardButton result = YesNoCancel(this, tr("Remove file confirmation"), QString("Are you sure you want to remove file ") + device->getUniqueId() + "?");
+            QMessageBox::StandardButton result = YesNoCancel(this, tr("Remove file confirmation"), QString("Are you sure you want to delete file ") + device->getUniqueId() + "?");
             if (result == QMessageBox::Yes)
             {
                 CLDeviceSearcher& deviceSearcher = CLDeviceManager::instance().getDeviceSearcher();
@@ -1718,7 +1718,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
         }
         else if (act == &cm_remove_from_disk)
         {
-            QString message = tr("Are you sure you want to remove %1 files?").arg(selectedItems.size());
+            QString message = tr("Are you sure you want to delete %1 files?").arg(selectedItems.size());
             if (YesNoCancel(this, tr("Remove file confirmation"), message) == QMessageBox::Yes)
             {
                 CLDeviceSearcher& deviceSearcher = CLDeviceManager::instance().getDeviceSearcher();
