@@ -767,14 +767,14 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
     stopAnimation();
 
     QGraphicsItem *item = itemAt(event->pos());
+    CLAbstractSceneItem* aitem = navigationItem(item);
 
-    if (item == 0 && m_camLayout.getContent() == CLSceneLayoutManager::instance().startScreenLayoutContent())
+    if (aitem == 0 && item != 0 && m_camLayout.getContent() == CLSceneLayoutManager::instance().startScreenLayoutContent())
     {
+        // if click on void => go to all flders layout
         (static_cast<MainWnd*>(mMainWnd))->goToNewLayoutContent(CLSceneLayoutManager::instance().getAllLayoutsContent());
     }
 
-
-    CLAbstractSceneItem* aitem = navigationItem(item);
 
     m_lastPressedItem = aitem;
 
