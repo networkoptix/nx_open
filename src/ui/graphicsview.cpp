@@ -327,7 +327,7 @@ void GraphicsView::setRealSceneRect(QRect rect)
 {
     m_realSceneRect = rect;
     m_min_scene_zoom = zoomForFullScreen_helper(rect);
-    m_min_scene_zoom-=m_min_scene_zoom/10;
+    m_min_scene_zoom-=m_min_scene_zoom/7;
 }
 
 QRect GraphicsView::getRealSceneRect() const
@@ -402,6 +402,7 @@ bool GraphicsView::shouldOptimizeDrawing() const
 //================================================================
 void GraphicsView::wheelEvent ( QWheelEvent * e )
 {
+    //mwe
     if (!mViewStarted)
         return;
 
@@ -766,6 +767,13 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
     stopAnimation();
 
     QGraphicsItem *item = itemAt(event->pos());
+
+    if (item == 0 && m_camLayout.getContent() == CLSceneLayoutManager::instance().startScreenLayoutContent())
+    {
+        (static_cast<MainWnd*>(mMainWnd))->goToNewLayoutContent(CLSceneLayoutManager::instance().getAllLayoutsContent());
+    }
+
+
     CLAbstractSceneItem* aitem = navigationItem(item);
 
     m_lastPressedItem = aitem;
@@ -775,6 +783,7 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
         QGraphicsView::mousePressEvent(event);
         return;
     }
+
 
     mSubItemMoving = false;
 
@@ -2327,8 +2336,10 @@ void GraphicsView::drawBackground ( QPainter * painter, const QRectF & rect )
     if (diff>1500)
     {
         int fps = m_fps_frames*1000/diff;
-        if (m_viewMode==NormalView)
-            mMainWnd->setWindowTitle(QString::number(fps));
+
+        //if (m_viewMode==NormalView)
+        //    mMainWnd->setWindowTitle(QString::number(fps));
+
         m_fps_frames = 0;
         m_fps_time.restart();
     }

@@ -91,7 +91,7 @@ void CLGridItem::setVisibleAnimated(bool visible, int time_ms)
     m_animation->setDuration(time_ms);
     m_animation->setEasingCurve(QEasingCurve::InOutSine);
     m_animation->setStartValue(opacity());
-    m_animation->setEndValue(visible ? 1.0 : 0.0);
+    m_animation->setEndValue(visible ? 0.5 : 0.0);
     m_animation->start();
 
     connect(m_animation, SIGNAL(finished()), this, SLOT(stopAnimation()));

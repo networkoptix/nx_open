@@ -10,6 +10,7 @@
 #include "device_plugins/archive/avi_files/avi_dvd_device.h"
 #include "device_plugins/archive/avi_files/avi_bluray_device.h"
 #include "device_plugins/archive/avi_files/avi_dvd_strem_reader.h"
+#include "version.h"
 
 MainWnd* MainWnd::m_instance = 0;
 
@@ -71,7 +72,7 @@ m_normalView(0)
 
 	setAcceptDrops(true);
 	//ui.setupUi(this);
-	setWindowTitle(tr("HDWitness"));
+	setWindowTitle(APPLICATION_NAME);
 
 	setAutoFillBackground(false);
 
@@ -172,6 +173,11 @@ void MainWnd::addFilesToCurrentOrNewLayout(const QStringList& files, bool forceN
 
         m_normalView->goToNewLayoutContent(content);
     }
+}
+
+void MainWnd::goToNewLayoutContent(LayoutContent* newl)
+{
+    m_normalView->goToNewLayoutContent(newl);
 }
 
 void MainWnd::handleMessage(const QString& message)

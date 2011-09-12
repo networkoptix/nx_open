@@ -18,6 +18,9 @@ public:
     static void findAcceptedFiles(QStringList& files, const QString& path);
     static MainWnd* instance() { return m_instance; }
     void addFilesToCurrentOrNewLayout(const QStringList& files, bool forceNewLayout = false);
+
+    void goToNewLayoutContent(LayoutContent* newl);
+
 private slots:
     void handleMessage(const QString& message);
 

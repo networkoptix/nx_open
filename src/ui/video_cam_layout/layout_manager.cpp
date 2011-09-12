@@ -21,6 +21,15 @@ mRecordersAndLayouts(0)
         LayoutContent::ExitButton |
 		LayoutContent::MultiPageSelection );
 
+    mAllCustomLayouts->removeIntereactionFlag(
+        LayoutContent::Zoomable |
+        LayoutContent::SceneMovable |
+        LayoutContent::ShowAvalable |
+        LayoutContent::ItemMovable |
+        LayoutContent::GridEnable |
+        LayoutContent::ItemRotatable);
+
+
 	mAllCustomLayouts->setEditable(true);
 	load();
 
