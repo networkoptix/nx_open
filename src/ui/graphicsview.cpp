@@ -604,8 +604,9 @@ void GraphicsView::initDecoration()
     if (toggleFullscreen)
     {
         item = new CLUnMovedPixtureButton(button_toggleFullScreen, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/togglefullscreen.png"), decoration_size, decoration_size, 255);
-        item->setStaticPos(QPoint(1,decoration_size + 5));
+        item->setStaticPos(QPoint(top_left,1));
         addStaticItem(item);
+        top_left+= (decoration_size + 5);
     }
     /**/
 
@@ -769,7 +770,7 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
     QGraphicsItem *item = itemAt(event->pos());
     CLAbstractSceneItem* aitem = navigationItem(item);
 
-    if (aitem == 0 && item != 0 && m_camLayout.getContent() == CLSceneLayoutManager::instance().startScreenLayoutContent())
+    if (event->button() == Qt::LeftButton && aitem == 0 && item != 0 && m_camLayout.getContent() == CLSceneLayoutManager::instance().startScreenLayoutContent())
     {
         // if click on void => go to all flders layout
         (static_cast<MainWnd*>(mMainWnd))->goToNewLayoutContent(CLSceneLayoutManager::instance().getAllLayoutsContent());
@@ -782,6 +783,20 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
     {
         QGraphicsView::mousePressEvent(event);
         return;
+    }
+
+
+    if (aitem && aitem!=m_selectedWnd) // item and left button
+    {
+        // new item selected
+        if (isItemFullScreenZoomed(aitem)) // check if wnd is manually zoomed; without double click
+        {
+            setZeroSelection();
+            m_selectedWnd = aitem;
+            m_last_selectedWnd = aitem;
+            aitem->setItemSelected(true, false);
+            aitem->setFullScreen(true);
+        }
     }
 
 

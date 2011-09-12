@@ -36,7 +36,7 @@ QPointF CLLayoutItem::getBestSubItemPos(CLSubItemType type)
 	switch(type)
 	{
 	case CloseSubItem:
-		return QPointF(width()-700, 170);
+		return QPointF(width() - 350, 1670);
 		break;
 
 	default:
