@@ -199,8 +199,8 @@ protected:
 
     int m_rotationCounter;
 
-    bool m_handScrolling;
-    int m_handMoving;
+    bool m_handMoving;
+    int m_handMovingEventsCounter;
     bool mSubItemMoving;
 
     CLAbstractSceneItem* m_selectedWnd;

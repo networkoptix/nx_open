@@ -89,8 +89,8 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
     m_scenezoom(this),
     m_min_scene_zoom(0.06),
     m_rotationCounter(0),
-    m_handScrolling(false),
-    m_handMoving(0),
+    m_handMoving(false),
+    m_handMovingEventsCounter(0),
     mSubItemMoving(false),
     m_selectedWnd(0),
     m_last_selectedWnd(0),
@@ -746,6 +746,7 @@ void GraphicsView::stopAnimation()
 
 void GraphicsView::mousePressEvent ( QMouseEvent * event)
 {
+    //mpe
     if (!mViewStarted)
         return;
 
@@ -821,8 +822,11 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
     else if (event->button() == Qt::LeftButton && !isCTRLPressed(event) && !isALTPressed(event))
     {
         //may be about to scroll the scene
-        m_handScrolling = true;
-        viewport()->setCursor(Qt::ClosedHandCursor);
+        if (aitem)
+        {
+            m_handMoving = true;
+            viewport()->setCursor(Qt::ClosedHandCursor);
+        }
     }
     else if ((event->button() == Qt::RightButton && !isCTRLPressed(event))
              || (event->button() == Qt::LeftButton && isALTPressed(event)))
@@ -840,6 +844,7 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
 
 void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
+    //mme
     if (!mViewStarted)
         return;
 
@@ -866,25 +871,27 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
     bool left_button = event->buttons() & Qt::LeftButton;
     bool right_button = event->buttons() & Qt::RightButton;
 
+    /*
     if (left_button && !isCTRLPressed(event) && !isALTPressed(event))
     {
         if (aitem)
         {
             //may be about to scroll the scene
-            //m_handScrolling = true;
+            //m_handMoving = true;
             //viewport()->setCursor(Qt::ClosedHandCursor);
         }
         else
         {
             // don allow to move scene with golding on void space => just for items 
-            m_handScrolling = false;
+            m_handMoving = false;
             viewport()->setCursor(Qt::OpenHandCursor);
         }
 
     }
+    /**/
 
     // scene movement
-    if (m_handScrolling && left_button &&     m_camLayout.getContent()->checkIntereactionFlag(LayoutContent::SceneMovable))
+    if (m_handMoving && left_button &&     m_camLayout.getContent()->checkIntereactionFlag(LayoutContent::SceneMovable))
     {
         // this code does not work well QPoint(2,2) depends on veiwport border width or so.
         /*
@@ -900,9 +907,9 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
         QPoint delta = event->pos() - m_mousestate.getLastEventPoint();
         viewMove(delta.x(), delta.y());
 
-        //cl_log.log("==m_handMoving!!!=====", cl_logDEBUG1);
+        //cl_log.log("==m_handMovingEventsCounter!!!=====", cl_logDEBUG1);
 
-        ++m_handMoving;
+        ++m_handMovingEventsCounter;
     }
 
     //item movement
@@ -911,7 +918,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
         if (m_viewMode!=ItemsDonor)
         {
             m_movingWnd++;
-            m_handScrolling = false; // if we pressed CTRL after already moved the scene => stop move the scene and just move items
+            m_handMoving = false; // if we pressed CTRL after already moved the scene => stop move the scene and just move items
 
             QPointF delta = mapToScene(event->pos()) - mapToScene(m_mousestate.getLastEventPoint());
 
@@ -1021,6 +1028,8 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 
 void GraphicsView::mouseReleaseEvent(QMouseEvent * event)
 {
+    //mre
+
     if (!mViewStarted)
         return;
 
@@ -1055,13 +1064,13 @@ void GraphicsView::mouseReleaseEvent(QMouseEvent * event)
     bool left_button = event->button() == Qt::LeftButton;
 //    bool right_button = event->button() == Qt::RightButton;
     bool mid_button = event->button() == Qt::MidButton;
-    bool handMoving = m_handMoving>2;
+    bool handMoving = m_handMovingEventsCounter>2;
     bool rotating = m_rotationCounter>3;
 
     if (left_button) // if left button released
     {
         viewport()->setCursor(Qt::OpenHandCursor);
-        m_handScrolling = false;
+        m_handMoving = false;
     }
 
     //====================================================
@@ -1250,7 +1259,7 @@ void GraphicsView::mouseReleaseEvent(QMouseEvent * event)
 
     if (left_button)
     {
-        m_handMoving = 0;
+        m_handMovingEventsCounter = 0;
     }
 
 //    if (right_button || (left_button && isALTPressed(event)))
@@ -2047,6 +2056,8 @@ void GraphicsView::keyReleaseEvent( QKeyEvent * e )
 
 void GraphicsView::keyPressEvent( QKeyEvent * e )
 {
+    //kpe
+
     if (!mViewStarted)
         return;
 
