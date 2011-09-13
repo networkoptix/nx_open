@@ -770,7 +770,9 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
     QGraphicsItem *item = itemAt(event->pos());
     CLAbstractSceneItem* aitem = navigationItem(item);
 
-    if (event->button() == Qt::LeftButton && aitem == 0 && item != 0 && m_camLayout.getContent() == CLSceneLayoutManager::instance().startScreenLayoutContent())
+    if (event->button() == Qt::LeftButton && 
+        (item == 0 || item == static_cast<QGraphicsItem*>(staticItemByName("background")) )&& 
+        m_camLayout.getContent() == CLSceneLayoutManager::instance().startScreenLayoutContent())
     {
         // if click on void => go to all flders layout
         (static_cast<MainWnd*>(mMainWnd))->goToNewLayoutContent(CLSceneLayoutManager::instance().getAllLayoutsContent());
