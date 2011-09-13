@@ -405,8 +405,11 @@ void YouTubeUploader::slotSslErrors(QList<QSslError> list)
         {
             if (error.error() == QSslError::NoError)
                 reply->ignoreSslErrors();
-            else
+            else {
                 cl_log.log("YouTube SSL error: ", error.errorString(), cl_logWARNING);
+                m_errorCode = error.error();
+                m_errorString = error.errorString();
+            }
         }
     }
 }
