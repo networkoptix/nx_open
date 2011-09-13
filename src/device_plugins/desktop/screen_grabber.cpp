@@ -196,6 +196,7 @@ HRESULT	CLScreenGrabber::InitD3D(HWND hWnd)
             m_outHeight = m_captureResolution.height();
 
     }
+    m_outWidth = m_outWidth & ~7; // round by 8
 
     return S_OK;
 }
@@ -301,6 +302,7 @@ void bgra_to_yv12_sse(quint8* rgba, int xStride, quint8* y, quint8* u, quint8* v
     static const qint16 __declspec(align(16)) uv_b_coeff[] = {-0.071*K, -0.071*K, -0.071*K, -0.071*K,     0.439*K,  0.439*K,  0.439*K,  0.439*K };
 
     int xCount = width  / 8;
+    int xCount2 = xCount;
 
     int rgbaPostOffset = xStride - xCount*32;
     int yPostOffset = yStride - width;
@@ -359,11 +361,11 @@ loop1:
         packssdw xmm0,xmm6 // pack dword to word
         packssdw xmm1,xmm7
 
-        MOVAPS    xmm5, [esi]
-        MOVAPS    xmm6, [esi+16]
+        MOVUPS    xmm5, [esi]
+        MOVUPS    xmm6, [esi+16]
 
-        MOVAPS    xmm3, [esi+edx] // BGRA
-        MOVAPS    xmm7, [esi+edx+16] // BGRA
+        MOVUPS    xmm3, [esi+edx] // BGRA
+        MOVUPS    xmm7, [esi+edx+16] // BGRA
 
         psrlD xmm5, 10 // B
         psrlD xmm6, 10 // B
@@ -384,11 +386,11 @@ loop1:
         // -------------------------------------------------------------------------------------------
 
         // 2,5 - for B
-        MOVAPS    xmm2, [esi+edx]
-        MOVAPS    xmm6, [esi+edx+16]
+        MOVUPS    xmm2, [esi+edx]
+        MOVUPS    xmm6, [esi+edx+16]
 
-        MOVAPS    xmm4, [esi+edx]
-        MOVAPS    xmm7, [esi+edx+16]
+        MOVUPS    xmm4, [esi+edx]
+        MOVUPS    xmm7, [esi+edx+16]
 
         psllD xmm2, 6 // R
         psllD xmm6, 6 // R
@@ -493,9 +495,8 @@ loop1:
         jnz loop1
 
         // ------------------ Y loop
-        push width
+        push xCount2
         pop xCount
-        shr xCount, 3
 
         add esi, edx
         add edi, ebx
@@ -832,14 +833,15 @@ bool CLScreenGrabber::direct3DDataToFrame(void* opaque, AVFrame* pFrame)
 
 bool CLScreenGrabber::dataToFrame(quint8* data, int width, int height, AVFrame* pFrame)
 {
+    drawLogo((quint8*) data, width, height);
+    int roundWidth = width & ~7;
     if (m_needRescale)
     {
-        if (width != m_tmpFrameWidth || height != m_tmpFrameHeight)
-            allocateTmpFrame(width, height, PIX_FMT_YUV420P);
-        drawLogo((quint8*) data, width, height);
+        if (roundWidth != m_tmpFrameWidth || height != m_tmpFrameHeight)
+            allocateTmpFrame(roundWidth, height, PIX_FMT_YUV420P);
         bgra_to_yv12_sse(data, width * 4,
             m_tmpFrame->data[0], m_tmpFrame->data[1], m_tmpFrame->data[2],
-            m_tmpFrame->linesize[0], m_tmpFrame->linesize[1], width, height, m_mode == CaptureMode_Application);
+            m_tmpFrame->linesize[0], m_tmpFrame->linesize[1], roundWidth, height, m_mode == CaptureMode_Application);
 
         sws_scale(m_scaleContext,
             m_tmpFrame->data, m_tmpFrame->linesize,
@@ -848,9 +850,8 @@ bool CLScreenGrabber::dataToFrame(quint8* data, int width, int height, AVFrame* 
     }
     else
     {
-        drawLogo((quint8*) data, m_ddm.Width, m_ddm.Height);
-        bgra_to_yv12_sse(data, m_ddm.Width*4, pFrame->data[0], pFrame->data[1], pFrame->data[2],
-                         pFrame->linesize[0], pFrame->linesize[1], width, height, m_mode == CaptureMode_Application);
+        bgra_to_yv12_sse(data, width*4, pFrame->data[0], pFrame->data[1], pFrame->data[2],
+                         pFrame->linesize[0], pFrame->linesize[1], roundWidth, height, m_mode == CaptureMode_Application);
     }
    return true;
 }
