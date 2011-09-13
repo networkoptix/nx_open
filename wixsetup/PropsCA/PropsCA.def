@@ -3,3 +3,4 @@ LIBRARY	"PropsCA"
 EXPORTS
 
 SetMoviesFolder
+SetProperties
