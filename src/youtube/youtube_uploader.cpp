@@ -2,6 +2,7 @@
 
 #include <QtCore/QFile>
 #include <QtCore/QXmlStreamReader>
+#include "base/log.h"
 
 class QYoutubeUploadDevice: public QIODevice {
 private:
@@ -399,8 +400,15 @@ void YouTubeUploader::slotError(QNetworkReply::NetworkError err)
 void YouTubeUploader::slotSslErrors(QList<QSslError> list)
 {
     QNetworkReply* reply = dynamic_cast<QNetworkReply*>(sender());
-    if (reply) 
-        reply->ignoreSslErrors();
+    if (reply) {
+        foreach(QSslError error, list) 
+        {
+            if (error.error() == QSslError::NoError)
+                reply->ignoreSslErrors();
+            else
+                cl_log.log("YouTube SSL error: ", error.errorString(), cl_logWARNING);
+        }
+    }
 }
 
 QList<QPair<QString, QString> > YouTubeUploader::getCategoryList() const
