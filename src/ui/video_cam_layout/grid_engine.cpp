@@ -138,7 +138,7 @@ QRect CLGridEngine::getGridRect() const
 	CLAbstractSceneItem* item =  getVeryLeftItem();
 
 	if (!item) // nos single video on this lay out
-		return QRect(m_settings.left, m_settings.top, 10, 10 );
+		return QRect(m_settings.left, m_settings.top, 100000, 10000);
 
 	int left = item->mapToScene(item->boundingRect().topLeft()).x();
 
