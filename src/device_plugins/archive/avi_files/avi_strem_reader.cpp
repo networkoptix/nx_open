@@ -17,6 +17,7 @@ QSemaphore CLAVIStreamReader::aviSemaphore(4);
 // seek by 1.5secs. It is prevents too fast seeks for short GOP, also some codecs has bagged seek function. Large step prevent seek
 // forward instead seek backward
 static const qint64 BACKWARD_SEEK_STEP =  2000 * 1000; 
+static const int MAX_KEY_FIND_INTERVAL = 12 * 1000 * 1000;
 
 class QnAviSemaphoreHelpr
 {
@@ -80,6 +81,7 @@ CLAVIStreamReader::CLAVIStreamReader(CLDevice* dev ) :
     m_lastGopSeekTime(-1),
     m_IFrameAfterJumpFound(false),
     m_requiredJumpTime(AV_NOPTS_VALUE),
+    m_lastUIJumpTime(AV_NOPTS_VALUE),
     m_lastFrameDuration(0)
 {
     // Should init packets here as some times destroy (av_free_packet) could be called before init
@@ -359,6 +361,7 @@ begin_label:
         if (m_requiredJumpTime != AV_NOPTS_VALUE)
         {
             intChanneljumpTo(m_requiredJumpTime, 0);
+            m_lastUIJumpTime = m_requiredJumpTime;
             m_requiredJumpTime = AV_NOPTS_VALUE;
         }
     }
@@ -512,18 +515,31 @@ begin_label:
         // -------------------------------------------
         // workaround ffmpeg bugged seek
         {
-            QMutexLocker mutex(&m_cs);
-            if (currentPacket().flags & AV_PKT_FLAG_KEY)
-                m_IFrameAfterJumpFound = true;
-            if (!reverseMode && !m_IFrameAfterJumpFound)
+            if (m_lastUIJumpTime != AV_NOPTS_VALUE)
             {
-                av_free_packet(&currentPacket());
-                if (m_currentTime >= m_topIFrameTime) // m_topIFrameTime used as jump time
-                    intChanneljumpTo(m_topIFrameTime - BACKWARD_SEEK_STEP, 0);
-                if (m_runing)
+                QMutexLocker mutex(&m_cs);
+                if (m_lastUIJumpTime - m_currentTime > MAX_KEY_FIND_INTERVAL) {
+                    av_free_packet(&currentPacket());
+                    intChanneljumpTo(m_lastUIJumpTime, 0);
+                    m_lastUIJumpTime = AV_NOPTS_VALUE;
                     goto begin_label;
-                else
-                    return 0;
+                }
+                else  {
+                    if (currentPacket().flags & AV_PKT_FLAG_KEY) {
+                        m_IFrameAfterJumpFound = true;
+                        m_lastUIJumpTime = AV_NOPTS_VALUE;
+                    }
+                    if (!reverseMode && !m_IFrameAfterJumpFound)
+                    {
+                        av_free_packet(&currentPacket());
+                        if (m_currentTime >= m_topIFrameTime) // m_topIFrameTime used as jump time
+                            intChanneljumpTo(m_topIFrameTime - BACKWARD_SEEK_STEP, 0);
+                        if (m_runing)
+                            goto begin_label;
+                        else
+                            return 0;
+                    }
+                }
             }
         }
         // -------------------------------------------
