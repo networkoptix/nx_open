@@ -3,6 +3,8 @@
 #include <QtCore/QFile>
 #include <QtCore/QXmlStreamReader>
 
+#include "base/log.h"
+
 class QYoutubeUploadDevice: public QIODevice {
 private:
     enum ProcessState { State_ProcessPreffix, State_ProcessFile, State_ProcessPostfix, State_Finished };
@@ -397,6 +399,7 @@ void YouTubeUploader::slotError(QNetworkReply::NetworkError err)
         m_errorString = reply->errorString();
     if (m_state == State_Unauthorized && m_errorString.toLower().contains(QLatin1String("forbidden")))
         m_errorString = tr("Invalid user name or password");
+    cl_log.log(QLatin1String("YouTubeUploader::slotError(): ") + m_errorString, cl_logALWAYS);
 }
 void YouTubeUploader::slotSslErrors(QList<QSslError> list)
 {
@@ -410,6 +413,7 @@ void YouTubeUploader::slotSslErrors(QList<QSslError> list)
     if (!list.isEmpty()) {
         m_errorCode = list[0].error();
         m_errorString = list[0].errorString();
+        cl_log.log(QLatin1String("YouTubeUploader::slotSslErrors(): ") + m_errorString, cl_logALWAYS);
     }
 }
 
