@@ -62,7 +62,7 @@ qint64 CLAVIStreamReader::packetTimestamp(AVStream* stream, const AVPacket& pack
 CLAVIStreamReader::CLAVIStreamReader(CLDevice* dev ) :
     CLAbstractArchiveReader(dev),
     m_currentTime(0),
-    m_previousTime(0),
+    m_previousTime(-1),
     m_formatContext(0),
     m_videoStreamIndex(-1),
     m_audioStreamIndex(-1),
@@ -79,7 +79,8 @@ CLAVIStreamReader::CLAVIStreamReader(CLDevice* dev ) :
     m_frameTypeExtractor(0),
     m_lastGopSeekTime(-1),
     m_IFrameAfterJumpFound(false),
-    m_requiredJumpTime(AV_NOPTS_VALUE)
+    m_requiredJumpTime(AV_NOPTS_VALUE),
+    m_lastFrameDuration(0)
 {
     // Should init packets here as some times destroy (av_free_packet) could be called before init
     av_init_packet(&m_packets[0]);
@@ -201,7 +202,7 @@ bool CLAVIStreamReader::init()
         m_frameTypeExtractor = new FrameTypeExtractor(m_formatContext->streams[m_videoStreamIndex]->codec);
     else
         m_frameTypeExtractor = 0;
-
+    m_lastFrameDuration = 0;
     return true;
 }
 
@@ -418,8 +419,16 @@ begin_label:
 
 		if (currentPacket().stream_index == m_videoStreamIndex) // in case of video packet
 		{
-			m_currentTime =  packetTimestamp(m_formatContext->streams[m_videoStreamIndex], currentPacket());
-			m_previousTime = m_currentTime;
+            m_previousTime = m_currentTime;
+            if (currentPacket().pts == AV_NOPTS_VALUE && currentPacket().dts == AV_NOPTS_VALUE) {
+                m_lastPacketTimes[currentPacket().stream_index] += m_lastFrameDuration;
+                m_currentTime = m_lastPacketTimes[currentPacket().stream_index];
+            }
+            else {
+			    m_currentTime =  packetTimestamp(m_formatContext->streams[m_videoStreamIndex], currentPacket());
+                if (m_previousTime != -1 && m_currentTime != -1 && m_currentTime > m_previousTime && m_currentTime - m_previousTime < 100*1000)
+                    m_lastFrameDuration = m_currentTime - m_previousTime;
+            }
 		}
 	}
 
@@ -585,9 +594,8 @@ void CLAVIStreamReader::channeljumpTo(quint64 mksec, int channel)
 void CLAVIStreamReader::intChanneljumpTo(quint64 mksec, int /*channel*/)
 {
     QMutexLocker mutex(&m_cs);
-    mksec += startMksec();
     if (mksec > 0)
-        avformat_seek_file(m_formatContext, -1, 0, mksec, LLONG_MAX, AVSEEK_FLAG_BACKWARD);
+        avformat_seek_file(m_formatContext, -1, 0, mksec + startMksec(), LLONG_MAX, AVSEEK_FLAG_BACKWARD);
     else {
         // some files can't correctly jump to 0
         destroy();
@@ -600,6 +608,7 @@ void CLAVIStreamReader::intChanneljumpTo(quint64 mksec, int /*channel*/)
     m_bottomIFrameTime = -1;
     m_topIFrameTime = mksec;
     m_IFrameAfterJumpFound = false;
+    m_eof = false;
     for(unsigned i = 0; i < m_formatContext->nb_streams; i++) 
         m_lastPacketTimes[i] = mksec;
 }

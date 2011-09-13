@@ -76,6 +76,7 @@ private:
     QVector<qint64> m_lastPacketTimes;
     bool m_IFrameAfterJumpFound;
     qint64 m_requiredJumpTime;
+    qint64 m_lastFrameDuration;
 private:
     /**
       * Read next packet from file
