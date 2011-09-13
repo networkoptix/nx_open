@@ -81,6 +81,8 @@ void CLUnMovedPixture::setFps(int fps)
 
 void CLUnMovedPixture::setMaxSize(int max_width, int max_height)
 {
+    prepareGeometryChange();
+
     m_width = m_CurrentImg->width();
     m_height = m_CurrentImg->height();
 

@@ -109,7 +109,7 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
     mViewStarted(false),
     mWheelZooming(false),
     m_fps_frames(0),
-    m_seachItem(0),
+    m_searchItem(0),
     m_pageSelector(0),
     m_gridItem(0),
     m_menuIsHere(false),
@@ -559,129 +559,101 @@ void GraphicsView::centerOn(const QPointF &pos)
 
 void GraphicsView::initDecoration()
 {
-    //http://lisenok-kate.livejournal.com/7740.html
+    removeAllStaticItems();
+
+    LayoutContent* content = m_camLayout.getContent();
 
     bool level_up = false;
-
-    if (m_camLayout.getContent()->getParent() ||
-        m_camLayout.getContent() == CLSceneLayoutManager::instance().getSearchLayout()) // if layout has parent add LevelUp decoration
+    if (content->getParent() || content == CLSceneLayoutManager::instance().getSearchLayout()) // if layout has parent add LevelUp decoration
         level_up = true;
 
     // if this is ItemsAcceptor( the layout we are editing now ) and parent is root we should not go to the root
-    if (getViewMode()==GraphicsView::ItemsAcceptor && m_camLayout.getContent()->getParent() == CLSceneLayoutManager::instance().getAllLayoutsContent())
+    if (getViewMode()==GraphicsView::ItemsAcceptor && content->getParent() == CLSceneLayoutManager::instance().getAllLayoutsContent())
         level_up = false;
 
-    bool settings = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::SettingButton);
+    bool settings = content->checkDecorationFlag(LayoutContent::SettingButton);
     if (m_viewMode!=NormalView)
         settings = false;
 
-    bool magnifyingGlass = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::MagnifyingGlass);
-    bool serach = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::SearchEdit);
-    bool square_layout = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::SquareLayout);
-    bool long_layout = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::LongLayout);
-    bool sigle_line_layout = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::SingleLineLayout);
-    bool multiPageSelector = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::MultiPageSelection);
-    bool exitButton = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::ExitButton);
-    bool toggleFullscreen = m_camLayout.getContent()->checkDecorationFlag(LayoutContent::ToggleFullScreenButton);
+    bool magnifyingGlass = content->checkDecorationFlag(LayoutContent::MagnifyingGlass);
+    bool search = content->checkDecorationFlag(LayoutContent::SearchEdit);
+    bool square_layout = content->checkDecorationFlag(LayoutContent::SquareLayout);
+    bool long_layout = content->checkDecorationFlag(LayoutContent::LongLayout);
+    bool sigle_line_layout = content->checkDecorationFlag(LayoutContent::SingleLineLayout);
+    bool multiPageSelector = content->checkDecorationFlag(LayoutContent::MultiPageSelection);
+    bool exitButton = content->checkDecorationFlag(LayoutContent::ExitButton);
+    bool toggleFullscreen = content->checkDecorationFlag(LayoutContent::ToggleFullScreenButton);
 
-    removeAllStaticItems();
-
-    LayoutContent* cont = m_camLayout.getContent();
     CLAbstractUnmovedItem* item;
-
-    int top_left = 0;
 
     if (exitButton)
     {
         item = new CLUnMovedPixtureButton(button_exit, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/exit-application.png"), decoration_size, decoration_size, 255);
-        item->setStaticPos(QPoint(1,1));
         addStaticItem(item);
-        top_left+= (decoration_size + 5);
     }
 
-
-    
     if (toggleFullscreen)
     {
         item = new CLUnMovedPixtureButton(button_toggleFullScreen, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/togglefullscreen.png"), decoration_size, decoration_size, 255);
-        item->setStaticPos(QPoint(top_left,1));
         addStaticItem(item);
-        top_left+= (decoration_size + 5);
     }
-    /**/
-
 
     if (settings)
     {
         item = new CLUnMovedPixtureButton(button_settings, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/settings.png"), decoration_size, decoration_size, 255);
-        item->setStaticPos(QPoint(top_left,1));
         addStaticItem(item);
-        top_left+= (decoration_size + 5);
     }
 
     if (level_up)
     {
         item = new CLUnMovedPixtureButton(button_level_up, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/level-up.png"), decoration_size, decoration_size, 255);
-        item->setStaticPos(QPoint(top_left,1));
         addStaticItem(item);
-        top_left+=decoration_size;
     }
 
-    if (cont->checkDecorationFlag(LayoutContent::BackGroundLogo))
+    if (content->checkDecorationFlag(LayoutContent::BackGroundLogo))
     {
-
         item = new CLUnMovedPixture(QLatin1String("background"), 0, 0.05, 0.05, QLatin1String(":/skin/startscreen/no_logo_bkg.png"), viewport()->width(), viewport()->height(), -100);
-        //item = new CLUnMovedPixture(QLatin1String("background"), 0, 0.03, 0.03, QLatin1String(":/skin/logo"), viewport()->width(), viewport()->height(), -100);
-        item->setStaticPos(QPoint(1,1));
-        addStaticItem(item);
-        /**/
+        addStaticItem(item, false);
     }
 
     if (magnifyingGlass)
     {
         item = new CLUnMovedPixtureButton(button_magnifyingglass, 0,  0.4, 1.0, QLatin1String(":/skin/decorations/search.png"), decoration_size, decoration_size, 255);
-        item->setStaticPos(QPoint((viewport()->width() - decoration_size)/2,0));
         addStaticItem(item);
     }
 
     if (square_layout)
     {
         item = new CLUnMovedPixtureButton(button_squarelayout, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/square-view.png"), decoration_size, decoration_size, 255);
-        item->setStaticPos(QPoint(viewport()->width() - 3.3*decoration_size,1));
         addStaticItem(item);
-        top_left+=(decoration_size+10);
     }
 
     if (long_layout)
     {
         item = new CLUnMovedPixtureButton(button_longlayout, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/horizontal-view.png"), decoration_size, decoration_size, 255);
-        item->setStaticPos(QPoint(viewport()->width() - 2.2*decoration_size+1,1));
         addStaticItem(item);
     }
 
     if (sigle_line_layout)
     {
         item = new CLUnMovedPixtureButton(button_singleLineLayout, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/single-line-view.png"), decoration_size, decoration_size, 255);
-        item->setStaticPos(QPoint(viewport()->width() - 1.1*decoration_size+1,1));
         addStaticItem(item);
     }
 
-    /**/
-
-    if (serach)
+    if (search)
     {
 #ifdef _WIN32
-        m_seachItem = new CLSerachEditItem(this, this, m_camLayout.getContent());
+        m_searchItem = new CLSerachEditItem(this, this, content);
 #else
         // There is a problem on Mac OS X with embedding control into scene.
         // As a temporary solution we are using separate window.
-        m_seachItem = new CLSerachEditItem(this, 0, m_camLayout.getContent());
+        m_searchItem = new CLSerachEditItem(this, 0, content);
 #endif
     }
     else
     {
-        delete m_seachItem;
-        m_seachItem = 0;
+        delete m_searchItem;
+        m_searchItem = 0;
     }
 
     if (multiPageSelector)
@@ -710,7 +682,7 @@ void GraphicsView::addStaticItem(CLAbstractUnmovedItem* item, bool conn)
     item->adjust();
 
     if (conn)
-        connect(item, SIGNAL(onPressed(QString)), this, SLOT(onDecorationItemPressed(QString)));
+        connect(item, SIGNAL(onPressed(QString)), this, SLOT(onDecorationItemPressed(QString)), Qt::QueuedConnection);
 }
 
 void GraphicsView::removeStaticItem(CLAbstractUnmovedItem* item)
@@ -723,9 +695,6 @@ void GraphicsView::removeStaticItem(CLAbstractUnmovedItem* item)
 
 void GraphicsView::removeAllStaticItems()
 {
-    if (m_pageSelector)
-        disconnect(m_pageSelector, SIGNAL(onNewPageSlected(int)), &m_camLayout, SLOT(onNewPageSelected(int)) );
-
     foreach(CLAbstractUnmovedItem* item, m_staticItems)
     {
         scene()->removeItem(item);
@@ -770,12 +739,13 @@ void GraphicsView::mousePressEvent ( QMouseEvent * event)
     QGraphicsItem *item = itemAt(event->pos());
     CLAbstractSceneItem* aitem = navigationItem(item);
 
-    if (event->button() == Qt::LeftButton && 
-        (item == 0 || item == static_cast<QGraphicsItem*>(staticItemByName("background")) )&& 
+    if (event->button() == Qt::LeftButton &&
+        (item == 0 || item == static_cast<QGraphicsItem*>(staticItemByName("background")) )&&
         m_camLayout.getContent() == CLSceneLayoutManager::instance().startScreenLayoutContent())
     {
         // if click on void => go to all flders layout
         (static_cast<MainWnd*>(mMainWnd))->goToNewLayoutContent(CLSceneLayoutManager::instance().getAllLayoutsContent());
+        return;
     }
 
 
@@ -908,7 +878,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
         }
         else
         {
-            // don allow to move scene with golding on void space => just for items 
+            // don allow to move scene with golding on void space => just for items
             m_handMoving = false;
             viewport()->setCursor(Qt::OpenHandCursor);
         }
@@ -1991,21 +1961,19 @@ void GraphicsView::goToSteadyMode(bool steady)
 
     if (steady)
     {
+        if ((m_searchItem && m_searchItem->hasFocus()) || m_menuIsHere)
+        {
+            onUserInput(false, false);
+            return;
+        }
+
         foreach(CLAbstractUnmovedItem* item, m_staticItems)
         {
-
             if (item != bk_item && item->preferNonSteadyMode())
             {
                 onUserInput(false, false);
                 return;
             }
-
-        }
-
-        if ((m_seachItem && m_seachItem->hasFocus()) || m_menuIsHere)
-        {
-            onUserInput(false, false);
-            return;
         }
 
         foreach(CLAbstractUnmovedItem* item, m_staticItems)
@@ -2014,34 +1982,28 @@ void GraphicsView::goToSteadyMode(bool steady)
                 item->hideIfNeeded(500);
         }
 
-        if (m_seachItem && m_seachItem->isVisible())
-            m_seachItem->setVisible(false);
+        if (m_searchItem)
+            m_searchItem->setVisible(false);
 
         if (m_selectedWnd && m_selectedWnd->isFullScreen())
-        {
             m_selectedWnd->goToSteadyMode(true, false);
-        }
     }
     else
     {
-        foreach(CLAbstractUnmovedItem* item, m_staticItems)
+        foreach (CLAbstractUnmovedItem *item, m_staticItems)
         {
             if (item != bk_item)
                 item->show(500);
         }
 
-        if (m_seachItem && !m_seachItem->isVisible())
+        if (m_searchItem)
         {
-            m_seachItem->setVisible(true);
+            m_searchItem->setVisible(true);
+            m_searchItem->setFocus();
         }
 
-        if (m_seachItem)
-            m_seachItem->setFocus();
-
-        if(m_selectedWnd && m_selectedWnd->isFullScreen())
-        {
+        if (m_selectedWnd && m_selectedWnd->isFullScreen())
             m_selectedWnd->goToSteadyMode(false, false);
-        }
     }
 }
 
@@ -2326,6 +2288,7 @@ CLAbstractSceneItem* GraphicsView::navigationItem(QGraphicsItem* item) const
     }
 
     CLAbstractSceneItem* aitem = static_cast<CLAbstractSceneItem*>(topParent);
+
     if (!isItemStillExists(aitem))
         return 0;
 
@@ -2371,7 +2334,7 @@ void GraphicsView::drawBackground ( QPainter * painter, const QRectF & rect )
     if (m_logo) m_logo->setPos(rect.topLeft());
 }
 
-CLAbstractUnmovedItem* GraphicsView::staticItemByName(QString name) const
+CLAbstractUnmovedItem* GraphicsView::staticItemByName(const QString &name) const
 {
     foreach(CLAbstractUnmovedItem* item, m_staticItems)
     {
@@ -2410,7 +2373,7 @@ NavigationItem *GraphicsView::getNavigationItem()
         m_navigationItem->setZValue(INT_MAX);
         m_scene.addItem(m_navigationItem);
 
-        addStaticItem(m_navigationItem);
+        addStaticItem(m_navigationItem, false);
     }
     return m_navigationItem;
 }
@@ -2418,12 +2381,23 @@ NavigationItem *GraphicsView::getNavigationItem()
 void GraphicsView::updateDecorations()
 {
     CLUnMovedPixture* item = static_cast<CLUnMovedPixture*>(staticItemByName(QLatin1String("background")));
-
     if (item)
     {
         item->setMaxSize(viewport()->width(), viewport()->height());
         QSize size = item->getSize();
         item->setStaticPos( QPoint( (viewport()->width() - size.width())/2, (viewport()->height() - size.height())/2 ) );
+    }
+
+    int top_left = 0;
+    QStringList buttonNames = QStringList() << button_exit << button_toggleFullScreen << button_settings << button_level_up;
+    foreach (const QString &buttonName, buttonNames)
+    {
+        item = static_cast<CLUnMovedPixture *>(staticItemByName(buttonName));
+        if (item)
+        {
+            item->setStaticPos(QPoint(top_left, 1));
+            top_left += decoration_size + 5;
+        }
     }
 
     item = static_cast<CLUnMovedPixture*>(staticItemByName(button_magnifyingglass));
@@ -2432,7 +2406,7 @@ void GraphicsView::updateDecorations()
 
     item = static_cast<CLUnMovedPixture*>(staticItemByName(button_squarelayout));
     if (item)
-        item->setStaticPos(QPoint(viewport()->width() - 3.3*decoration_size,1));
+        item->setStaticPos(QPoint(viewport()->width() - 3.3*decoration_size,0));
 
     item = static_cast<CLUnMovedPixture*>(staticItemByName(button_longlayout));
     if (item)
@@ -2444,19 +2418,13 @@ void GraphicsView::updateDecorations()
 
     updatePageSelector();
 
-    if (m_seachItem)
-    {
-        m_seachItem->resize();
-    }
+    if (m_searchItem)
+        m_searchItem->resize();
 }
 
-void GraphicsView::recalcSomeParams()
+void GraphicsView::resizeEvent(QResizeEvent *event)
 {
-}
-
-void GraphicsView::resizeEvent( QResizeEvent * event )
-{
-    Q_UNUSED(event);
+    QGraphicsView::resizeEvent(event);
 
     if (!mViewStarted)
         return;
@@ -2469,7 +2437,6 @@ void GraphicsView::resizeEvent( QResizeEvent * event )
         m_navigationItem->graphicsWidget()->resize(s.width(), NavigationItem::DEFAULT_HEIGHT);
     }
     updateDecorations();
-    recalcSomeParams();
 
     if (m_selectedWnd && m_selectedWnd->isFullScreen())
         onItemFullScreen_helper(m_selectedWnd, 800);
@@ -2480,11 +2447,8 @@ void GraphicsView::resizeEvent( QResizeEvent * event )
         fitInView(1000, 0);
     }
 
-    QList<CLAbstractSceneItem*> lst = m_camLayout.getItemList();
-    foreach (CLAbstractSceneItem* item, lst)
-    {
+    foreach (CLAbstractSceneItem *item, m_camLayout.getItemList())
         item->onResize();
-    }
 }
 
 CLAbstractSceneItem* GraphicsView::getLastSelectedItem()
@@ -2500,7 +2464,7 @@ CLAbstractSceneItem* GraphicsView::getLastSelectedItem()
     return m_camLayout.getGridEngine().getCenterWnd();
 }
 
-void GraphicsView::onDecorationItemPressed(QString name)
+void GraphicsView::onDecorationItemPressed(const QString &name)
 {
     if (name == button_exit)
     {
@@ -2549,10 +2513,8 @@ void GraphicsView::onSceneZoomFinished()
 //=====================================================
 bool GraphicsView::isItemStillExists(const CLAbstractSceneItem* wnd) const
 {
-    if ( m_camLayout.hasSuchItem(wnd) )// if still exists ( in layout)
-        return true;
-
-    return false;
+    // if still exists in layout
+    return m_camLayout.hasSuchItem(wnd);
 }
 
 void GraphicsView::toggleFullScreen_helper(CLAbstractSceneItem* wnd)
@@ -2978,9 +2940,6 @@ void GraphicsView::toggleFullScreen()
     if (!item && items.count() == 1)
         item = items.first();
 
-    if (!isItemStillExists(item))
-        item = 0;
-
     if (mMainWnd->isFullScreen())
     {
         mMainWnd->showNormal();
@@ -2988,7 +2947,7 @@ void GraphicsView::toggleFullScreen()
     }
     else
     {
-        if (item && !item->isFullScreen())
+        if (isItemStillExists(item) && !item->isFullScreen())
             onItemFullScreen_helper(item, 800);
 
         mMainWnd->showFullScreen();
@@ -3052,7 +3011,6 @@ qreal GraphicsView::zoomForFullScreen_helper(QRectF rect) const
 
 void GraphicsView::onItemFullScreen_helper(CLAbstractSceneItem* wnd, int duration)
 {
-
     //wnd->zoom_abs(selected_item_zoom, true);
 
     qreal wnd_zoom = wnd->getZoom();

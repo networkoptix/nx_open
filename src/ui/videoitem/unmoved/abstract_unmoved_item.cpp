@@ -29,13 +29,13 @@ bool CLAbstractUnmovedItem::preferNonSteadyMode() const
 
 void CLAbstractUnmovedItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
-    Q_UNUSED(event);
+    CLAbstractSubItemContainer::hoverEnterEvent(event);
     m_underMouse = true;
 }
 
 void CLAbstractUnmovedItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
-    Q_UNUSED(event);
+    CLAbstractSubItemContainer::hoverLeaveEvent(event);
     m_underMouse = false;
 }
 
@@ -46,13 +46,16 @@ void CLAbstractUnmovedItem::setStaticPos(const QPoint &p)
 
 void CLAbstractUnmovedItem::adjust()
 {
-	if (!m_view)
-		m_view = scene()->views().at(0);
+    if (!scene())
+        return;
 
-	setPos(m_view->mapToScene(m_pos));
+    if (!m_view)
+        m_view = scene()->views().at(0);
+
+    setPos(m_view->mapToScene(m_pos));
 }
 
 QString CLAbstractUnmovedItem::getName() const
 {
-	return m_name;
+    return m_name;
 }

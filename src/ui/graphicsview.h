@@ -135,8 +135,7 @@ protected:
     //========decorations=====
     void removeAllStaticItems();
     void updateDecorations();
-    CLAbstractUnmovedItem* staticItemByName(QString name) const;
-    void recalcSomeParams();
+    CLAbstractUnmovedItem* staticItemByName(const QString &name) const;
 
     //========navigation=======
     void enableMultipleSelection(bool enable, bool unselect = true);
@@ -172,7 +171,7 @@ public slots:
 private slots:
     void onSceneZoomFinished();
     void onSecTimer();
-    void onDecorationItemPressed(QString);
+    void onDecorationItemPressed(const QString &);
     void onArrange_helper_finished();
     void toggleRecording();
     void recordingSettings();
@@ -241,7 +240,7 @@ protected:
 
     ViewMode m_viewMode;
 
-    CLSerachEditItem* m_seachItem;
+    CLSerachEditItem* m_searchItem;
     QnPageSelector* m_pageSelector;
 
     CLAnimationManager m_animationManager;
