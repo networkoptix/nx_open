@@ -1537,10 +1537,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
     if (act == &cm_exit)
     {
-        //mMainWnd->close();
-        QCoreApplication::instance()->exit(0);
-        // Note that unlike the C library function of the same name,
-        // this function *does* return to the caller.
+        mMainWnd->close();
         return;
     }
 
@@ -2468,11 +2465,8 @@ void GraphicsView::onDecorationItemPressed(const QString &name)
 {
     if (name == button_exit)
     {
-        //mMainWnd->close();
-        QCoreApplication::instance()->exit(0);
-        return; // just in case:-)
+        mMainWnd->close();
     }
-
     else if (name == button_toggleFullScreen)
     {
         toggleFullScreen();
@@ -2501,7 +2495,9 @@ void GraphicsView::onDecorationItemPressed(const QString &name)
         onArrange_helper();
     }
     else
+    {
         emit onDecorationPressed(m_camLayout.getContent(), name);
+    }
 }
 
 void GraphicsView::onSceneZoomFinished()

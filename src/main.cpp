@@ -139,6 +139,8 @@ int main(int argc, char *argv[])
     CLDeviceSettingsDlgFactory::registerDlgManufacture(&AreconVisionDlgManufacture::instance());
     //============================
 
+    qApp->setQuitOnLastWindowClosed(true);
+
     //=========================================================
 
 #ifndef Q_OS_DARWIN

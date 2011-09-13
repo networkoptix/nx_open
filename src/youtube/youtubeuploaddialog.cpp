@@ -180,21 +180,23 @@ void YouTubeUploadDialog::authFailed()
 
 void YouTubeUploadDialog::authFinished()
 {
+    disconnect(m_youtubeuploader, SIGNAL(authFailed()), this, SLOT(authFailed()));
+    disconnect(m_youtubeuploader, SIGNAL(authFinished()), this, SLOT(authFinished()));
+
     YouTubeUploadProgressDialog *progressDialog = new YouTubeUploadProgressDialog;
     progressDialog->setAttribute(Qt::WA_DeleteOnClose);
+    progressDialog->setAttribute(Qt::WA_QuitOnClose);
     progressDialog->setWindowFlags(Qt::WindowStaysOnTopHint);
     progressDialog->setWindowTitle(tr("Uploading to YouTube"));
     progressDialog->setLabelText(tr("Uploading \"%1\"...").arg(m_youtubeuploader->fileTitle()));
-    progressDialog->setMinimumDuration(500);
-
-    connect(m_youtubeuploader, SIGNAL(uploadProgress(qint64,qint64)), progressDialog, SLOT(uploadProgress(qint64,qint64)));
-    connect(m_youtubeuploader, SIGNAL(uploadFailed(QString,int)), progressDialog, SLOT(uploadFailed(QString,int)));
-    connect(m_youtubeuploader, SIGNAL(uploadFinished()), progressDialog, SLOT(uploadFinished()));
 
     m_youtubeuploader->setParent(progressDialog);
 
-    disconnect(m_youtubeuploader, SIGNAL(authFailed()), this, SLOT(authFailed()));
-    disconnect(m_youtubeuploader, SIGNAL(authFinished()), this, SLOT(authFinished()));
+    connect(m_youtubeuploader, SIGNAL(uploadProgress(qint64,qint64)), progressDialog, SLOT(uploadProgress(qint64,qint64)), Qt::QueuedConnection);
+    connect(m_youtubeuploader, SIGNAL(uploadFailed(QString,int)), progressDialog, SLOT(uploadFailed(QString,int)));
+    connect(m_youtubeuploader, SIGNAL(uploadFinished()), progressDialog, SLOT(uploadFinished()));
+
+    progressDialog->open();
 
     QDialog::accept();
 }

@@ -70,23 +70,25 @@ m_normalView(0)
     Q_UNUSED(parent);
     Q_UNUSED(flags);
 
-	setAcceptDrops(true);
-	//ui.setupUi(this);
-	setWindowTitle(APPLICATION_NAME);
+    setAcceptDrops(true);
+    //ui.setupUi(this);
+    setWindowTitle(APPLICATION_NAME);
 
-	setAutoFillBackground(false);
+    setAttribute(Qt::WA_QuitOnClose);
+
+    setAutoFillBackground(false);
 
     QPalette pal = palette();
     pal.setColor(backgroundRole(), app_bkr_color);
     setPalette(pal);
 
-	//setWindowOpacity(.80);
+    //setWindowOpacity(.80);
 
-	//=======================================================
+    //=======================================================
 
-	const int min_wisth = 800;
-	setMinimumWidth(min_wisth);
-	setMinimumHeight(min_wisth*3/4);
+    const int min_wisth = 800;
+    setMinimumWidth(min_wisth);
+    setMinimumHeight(min_wisth*3/4);
 
     QStringList files;
     for (int i = 1; i < argc; ++i)
@@ -109,10 +111,10 @@ m_normalView(0)
         }
     }
 
-	//=======add====
-	m_normalView = new CLLayoutNavigator(this, content);
-	QLayout* l = new QHBoxLayout();
-	l->addWidget(&(m_normalView->getView()));
+    //=======add====
+    m_normalView = new CLLayoutNavigator(this, content);
+    QLayout* l = new QHBoxLayout();
+    l->addWidget(&(m_normalView->getView()));
 
     // Can't set 0,0,0,0 on Windows as in fullScreen mode context menu becomes invisible
     // Looks like QT bug: http://bugreports.qt.nokia.com/browse/QTBUG-7556
@@ -122,8 +124,8 @@ m_normalView(0)
     l->setContentsMargins(0, 0, 0, 0);
 #endif
 
-	m_normalView->setMode(NORMAL_ViewMode);
-	m_normalView->getView().setViewMode(GraphicsView::NormalView);
+    m_normalView->setMode(NORMAL_ViewMode);
+    m_normalView->getView().setViewMode(GraphicsView::NormalView);
 
     setLayout(l);
     if (!files.isEmpty())
@@ -134,8 +136,8 @@ m_normalView(0)
 
 MainWnd::~MainWnd()
 {
-	destroyNavigator(m_normalView);
-	CLDeviceManager::instance().getDeviceSearcher().wait();
+    destroyNavigator(m_normalView);
+    CLDeviceManager::instance().getDeviceSearcher().wait();
 }
 
 void MainWnd::addFilesToCurrentOrNewLayout(const QStringList& files, bool forceNewLayout)
@@ -143,9 +145,9 @@ void MainWnd::addFilesToCurrentOrNewLayout(const QStringList& files, bool forceN
     if (files.isEmpty())
         return;
 
-	cl_log.log(QLatin1String("Entering addFilesToCurrentOrNewLayout"), cl_logALWAYS);
+    cl_log.log(QLatin1String("Entering addFilesToCurrentOrNewLayout"), cl_logALWAYS);
 
-	CLDeviceManager::instance().addFiles(files);
+    CLDeviceManager::instance().addFiles(files);
 
     // If current content created by opening files or DND, use it. Otherwise create new one.
     LayoutContent* content = m_normalView->getView().getCamLayOut().getContent();
@@ -193,19 +195,16 @@ void MainWnd::closeEvent(QCloseEvent *e)
     QWidget::closeEvent(e);
 
     destroyNavigator(m_normalView);
-
-    QCoreApplication::quit();
 }
 
 void MainWnd::destroyNavigator(CLLayoutNavigator*& nav)
 {
-	if (nav)
-	{
-		nav->destroy();
-		delete nav;
-		nav = 0;
-	}
-
+    if (nav)
+    {
+        nav->destroy();
+        delete nav;
+        nav = 0;
+    }
 }
 
 void MainWnd::dragEnterEvent(QDragEnterEvent *event)

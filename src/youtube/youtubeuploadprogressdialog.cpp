@@ -7,6 +7,7 @@ YouTubeUploadProgressDialog::YouTubeUploadProgressDialog(QWidget *parent) :
 {
     setAutoClose(false);
     setAutoReset(false);
+    setMinimumDuration(0);
 
     connect(this, SIGNAL(canceled()), this, SLOT(reject()));
 }
@@ -26,10 +27,10 @@ void YouTubeUploadProgressDialog::closeEvent(QCloseEvent *e)
     e->setAccepted(QMessageBox::question(this, tr("Abort uploading?"),
                                          tr("Are you sure you want abort uploading and close dialog?"),
                                          QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel) == QMessageBox::Yes);
-    if (!e->isAccepted())
-        return;
-
-    QProgressDialog::closeEvent(e);
+    if (!e->isAccepted()) {
+        reset();
+        show();
+    }
 }
 
 void YouTubeUploadProgressDialog::uploadProgress(qint64 bytesSent, qint64 bytesTotal)
