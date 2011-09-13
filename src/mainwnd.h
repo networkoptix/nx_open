@@ -2,7 +2,6 @@
 #define MAINWND_H
 
 #include "ui_mainwnd.h"
-#include "ui/ui_common.h"
 
 class CLLayoutNavigator;
 class LayoutContent;
