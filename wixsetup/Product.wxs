@@ -23,9 +23,6 @@
     <!--[%LocalAppData]-->
     <Property Id="XMLSETTINGS" Value="%LocalAppData%\$(env.ORGANIZATION_NAME)\$(env.APPLICATION_NAME)\settings.xml" />
     
-    <Binary Id="SETPROPERTIES" SourceFile="SetProperties.js" />
-    <CustomAction Id="SetProperties" BinaryKey="SETPROPERTIES" JScriptCall="SetProperties" Execute="firstSequence" />
-
 <!-- Custom actions for saving/restoring file associations.
     
     <Binary Id="FILEASSOCBACKUP" SourceFile="FileAssociationsBackup.js"/>
@@ -39,6 +36,7 @@
     <Binary Id="EveAssocCA.dll" SourceFile="EveAssocCA\Release\EveAssocCA.dll" />
 
     <CustomAction Id="SetMoviesFolder" BinaryKey="PropsCA.dll" DllEntry="SetMoviesFolder" />
+    <CustomAction Id="SetProperties" BinaryKey="PropsCA.dll" DllEntry="SetProperties" Execute="firstSequence" />
 
     <Upgrade Id="286227c5-25b4-4796-aa48-2d9822e10b0d">
       <UpgradeVersion
