@@ -229,8 +229,6 @@ void YouTubeUploader::readCategoryList()
     m_categoryReply = m_manager->get(request);
     connect(m_categoryReply, SIGNAL(error(QNetworkReply::NetworkError)),
         this, SLOT(slotError(QNetworkReply::NetworkError)));
-    connect(m_categoryReply, SIGNAL(sslErrors(QList<QSslError>)),
-        this, SLOT(slotSslErrors(QList<QSslError>)));
 }
 
 void YouTubeUploader::login()
@@ -400,17 +398,9 @@ void YouTubeUploader::slotError(QNetworkReply::NetworkError err)
 }
 void YouTubeUploader::slotSslErrors(QList<QSslError> list)
 {
-    if (sender() == m_categoryReply) {
-        m_categoryReply->deleteLater();
-        m_categoryReply = 0;
-        return;
-    }
-
-    m_errorCode = 1;
-    if (!list.isEmpty()) {
-        m_errorCode = list[0].error();
-        m_errorString = list[0].errorString();
-    }
+    QNetworkReply* reply = dynamic_cast<QNetworkReply*>(sender());
+    if (reply) 
+        reply->ignoreSslErrors();
 }
 
 QList<QPair<QString, QString> > YouTubeUploader::getCategoryList() const
