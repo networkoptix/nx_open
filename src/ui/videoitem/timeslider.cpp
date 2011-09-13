@@ -640,7 +640,6 @@ void TimeSlider::onSliderValueChanged(int value)
 {
     if (!m_isUserInput) {
         m_isUserInput = true;
-        qDebug() << m_isUserInput;
         setCurrentValue(fromSlider(value));
         m_isUserInput = false;
     }

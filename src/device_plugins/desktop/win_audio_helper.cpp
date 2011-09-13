@@ -46,7 +46,7 @@ bool WinAudioExtendInfo::getDeviceInfo(IMMDevice *pMMDevice, bool isDefault)
     QByteArray arr = QString::fromUtf16(guidData16).toAscii();
     const char* data8 = arr.constData();
     char guidBuffer[24];
-    sscanf( data8, 
+    sscanf( data8,
         "{%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x}",
         &guidBuffer[0], &guidBuffer[4], &guidBuffer[6],
         &guidBuffer[8],&guidBuffer[9],&guidBuffer[10],&guidBuffer[11],&guidBuffer[12],&guidBuffer[13],&guidBuffer[14],&guidBuffer[15]);
@@ -121,8 +121,6 @@ BOOL CALLBACK enumFunc(HMODULE hModule, LPCTSTR lpszType, LPTSTR lpszName,LONG_P
 
 QPixmap WinAudioExtendInfo::deviceIcon()
 {
-    qDebug() << m_iconPath;
-
     QStringList params = m_iconPath.split(QLatin1Char(','));
     if (params.size() < 2)
         return 0;

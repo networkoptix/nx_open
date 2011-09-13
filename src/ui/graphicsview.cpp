@@ -2774,7 +2774,6 @@ static inline QRegion createRoundRegion(int rSmall, int rLarge, const QRect& rec
         int x = circleX - sqrt((double) rLarge*rLarge - (circleY-y)*(circleY-y)) + 0.5;
         region += QRect(x,y, rect.width()-x*2,1);
     }
-    qDebug() << region;
     return region;
 }
 
