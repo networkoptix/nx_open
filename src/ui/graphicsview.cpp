@@ -230,7 +230,7 @@ void GraphicsView::removeFileDeviceItem(CLDeviceSearcher& deviceSearcher, CLAbst
 
     CLDeviceList& all_devices = deviceSearcher.getAllDevices();
 
-    all_devices.remove(device->getUniqueId());
+    deviceSearcher.removeDeviceUnlocked(device->getUniqueId());
 
     QList<CLAbstractSubItemContainer*> lst;
     lst.push_back(aitem);

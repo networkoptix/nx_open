@@ -121,8 +121,6 @@ public:
 	// will extend the first one and remove all elements from the second one
 	static void mergeLists(CLDeviceList& first, CLDeviceList second);
 
-	static void deleteDevices(CLDeviceList& lst);
-
 	static void addReferences(CLDeviceList& lst);
 
 	static void startCommandProc() {m_commanproc.start();};

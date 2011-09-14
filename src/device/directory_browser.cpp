@@ -4,11 +4,14 @@
 #include "util.h"
 #include "device_plugins/archive/archive/archive_device.h"
 #include "device_plugins/archive/filetypesupport.h"
+#include "device/device_managmen/device_manager.h"
 
 CLDeviceDirectoryBrowser::CLDeviceDirectoryBrowser():
-mNeedStop(false)
+    mNeedStop(false),
+    m_resultMutex(QMutex::Recursive)
 {
-
+    connect(&m_fsWatcher, SIGNAL(directoryChanged(const QString&)), this, SLOT(directoryChanged(const QString&)));
+    connect(this, SIGNAL(reload()), this, SLOT(reloadDirs()));
 }
 
 CLDeviceDirectoryBrowser::~CLDeviceDirectoryBrowser()
@@ -19,26 +22,29 @@ CLDeviceDirectoryBrowser::~CLDeviceDirectoryBrowser()
 
 void CLDeviceDirectoryBrowser::setDirList(QStringList& dirs)
 {
-    mDirsToCheck = dirs;
+    {
+        QMutexLocker _lock(&m_resultMutex);
+        mDirsToCheck = dirs;
+    }
+
+    emit reload();
 }
 
-CLDeviceList CLDeviceDirectoryBrowser::result()
+CLDeviceList CLDeviceDirectoryBrowser::result() const
 {
+    QMutexLocker _lock(&m_resultMutex);
     return mResult;
 }
 
-void CLDeviceDirectoryBrowser::run()
+void CLDeviceDirectoryBrowser::reloadDirs()
 {
-
-    QThread::currentThread()->setPriority(QThread::IdlePriority);
-
     cl_log.log(QLatin1String("Browsing directories...."), cl_logALWAYS);
 
     QTime time;
     time.restart();
 
     mNeedStop = false;
-    mResult.clear();
+    m_tmpResult.clear();
 
     foreach (const QString &dir, mDirsToCheck)
     {
@@ -47,11 +53,26 @@ void CLDeviceDirectoryBrowser::run()
         cl_log.log(QLatin1String("found "), dev_lst.count(), QLatin1String(" devices"), cl_logALWAYS);
 
         foreach (CLDevice *dev, dev_lst)
-            mResult[dev->getUniqueId()] = dev;
+            m_tmpResult[dev->getUniqueId()] = dev;
     }
 
-    cl_log.log(QLatin1String("Done(Browsing directories). Time elapsed = "), time.elapsed(), cl_logALWAYS);
+    {
+        QMutexLocker _lock(&m_resultMutex);
+        mResult = m_tmpResult;
+    }
 
+    m_tmpResult.clear();
+
+    cl_log.log(QLatin1String("Done(Browsing directories). Time elapsed = "), time.elapsed(), cl_logALWAYS);
+}
+
+void CLDeviceDirectoryBrowser::run()
+{
+    QThread::currentThread()->setPriority(QThread::IdlePriority);
+
+    reloadDirs();
+
+    exec();
 }
 
 //=============================================================================================
@@ -67,6 +88,8 @@ CLDeviceList CLDeviceDirectoryBrowser::findDevices(const QString& directory)
     QDir dir(directory);
     if (!dir.exists())
         return result;
+
+    m_fsWatcher.addPath(directory);
 
     FileTypeSupport fileTypeSupport;
 
@@ -109,4 +132,10 @@ CLDeviceList CLDeviceDirectoryBrowser::findDevices(const QString& directory)
     }
 
     return result;
+}
+
+void CLDeviceDirectoryBrowser::directoryChanged(const QString & path)
+{
+    QStringList checkLst(path);
+    CLDeviceManager::instance().pleaseCheckDirs(checkLst, true);
 }

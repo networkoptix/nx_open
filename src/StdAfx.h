@@ -130,5 +130,6 @@ extern "C" {
 #include <QtGui/QResizeEvent>
 #include <QtGui>
 #include <QtOpenGL/QGLWidget>
+#include <QFileSystemWatcher>
 
 #endif
