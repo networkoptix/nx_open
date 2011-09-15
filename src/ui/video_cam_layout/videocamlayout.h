@@ -104,6 +104,7 @@ protected slots:
 	void onVideoTimer();
 
 	void onItemClose(CLAbstractSubItemContainer* item, bool addToremovedLst = true, bool removeFromLayoutcontent = true);
+	void onItemMakeScreenshot(CLAbstractSubItemContainer* item);
 
 	void stop_helper(bool emt = true);
 private:

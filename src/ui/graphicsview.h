@@ -258,6 +258,8 @@ protected:
 
 private:
     void removeFileDeviceItem(CLDeviceSearcher& deviceSearcher, CLAbstractSceneItem* aitem);
+
+    friend class SceneLayout;
 };
 
 
