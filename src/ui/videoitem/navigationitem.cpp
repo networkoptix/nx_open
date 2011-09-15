@@ -16,6 +16,7 @@
 #include "ui/widgets/speedslider.h"
 #include "ui/widgets/volumeslider.h"
 #include "ui/widgets/tooltipitem.h"
+#include "ui/skin.h"
 
 // ### hack to avoid scene move up and down
 class QLabelKillsWheelEvent : public QLabel
@@ -123,32 +124,32 @@ NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
     m_graphicsWidget->setPalette(palette);
 
     m_backwardButton = new ImageButtonItem(this);
-    m_backwardButton->addPixmap(QPixmap(":/skin/rewind_backward_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
-    m_backwardButton->addPixmap(QPixmap(":/skin/rewind_backward_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
+    m_backwardButton->addPixmap(Skin::pixmap(QLatin1String("rewind_backward_grey.png")), ImageButtonItem::Active, ImageButtonItem::Background);
+    m_backwardButton->addPixmap(Skin::pixmap(QLatin1String("rewind_backward_blue.png")), ImageButtonItem::Active, ImageButtonItem::Hovered);
     m_backwardButton->setPreferredSize(32, 18);
     m_backwardButton->setMaximumSize(m_backwardButton->preferredSize());
 
     m_stepBackwardButton = new ImageButtonItem(this);
-    m_stepBackwardButton->addPixmap(QPixmap(":/skin/step_backward_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
-    m_stepBackwardButton->addPixmap(QPixmap(":/skin/step_backward_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
+    m_stepBackwardButton->addPixmap(Skin::pixmap(QLatin1String("step_backward_grey.png")), ImageButtonItem::Active, ImageButtonItem::Background);
+    m_stepBackwardButton->addPixmap(Skin::pixmap(QLatin1String("step_backward_blue.png")), ImageButtonItem::Active, ImageButtonItem::Hovered);
     m_stepBackwardButton->setPreferredSize(32, 18);
     m_stepBackwardButton->setMaximumSize(m_stepBackwardButton->preferredSize());
 
     m_playButton = new ImageButtonItem(this);
-    m_playButton->addPixmap(QPixmap(":/skin/play_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
-    m_playButton->addPixmap(QPixmap(":/skin/play_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
+    m_playButton->addPixmap(Skin::pixmap(QLatin1String("play_grey.png")), ImageButtonItem::Active, ImageButtonItem::Background);
+    m_playButton->addPixmap(Skin::pixmap(QLatin1String("play_blue.png")), ImageButtonItem::Active, ImageButtonItem::Hovered);
     m_playButton->setPreferredSize(32, 30);
     m_playButton->setMaximumSize(m_playButton->preferredSize());
 
     m_stepForwardButton = new ImageButtonItem(this);
-    m_stepForwardButton->addPixmap(QPixmap(":/skin/step_forward_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
-    m_stepForwardButton->addPixmap(QPixmap(":/skin/step_forward_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
+    m_stepForwardButton->addPixmap(Skin::pixmap(QLatin1String("step_forward_grey.png")), ImageButtonItem::Active, ImageButtonItem::Background);
+    m_stepForwardButton->addPixmap(Skin::pixmap(QLatin1String("step_forward_blue.png")), ImageButtonItem::Active, ImageButtonItem::Hovered);
     m_stepForwardButton->setPreferredSize(32, 18);
     m_stepForwardButton->setMaximumSize(m_stepForwardButton->preferredSize());
 
     m_forwardButton = new ImageButtonItem(this);
-    m_forwardButton->addPixmap(QPixmap(":/skin/rewind_forward_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
-    m_forwardButton->addPixmap(QPixmap(":/skin/rewind_forward_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
+    m_forwardButton->addPixmap(Skin::pixmap(QLatin1String("rewind_forward_grey.png")), ImageButtonItem::Active, ImageButtonItem::Background);
+    m_forwardButton->addPixmap(Skin::pixmap(QLatin1String("rewind_forward_blue.png")), ImageButtonItem::Active, ImageButtonItem::Hovered);
     m_forwardButton->setPreferredSize(32, 18);
     m_forwardButton->setMaximumSize(m_forwardButton->preferredSize());
 
@@ -211,8 +212,8 @@ NavigationItem::NavigationItem(QGraphicsItem */*parent*/) :
 
     m_muteButton = new ImageButtonItem(this);
     m_muteButton->setObjectName("MuteButton");
-    m_muteButton->addPixmap(QPixmap(":/skin/unmute.png"), ImageButtonItem::Active, ImageButtonItem::Background);
-    m_muteButton->addPixmap(QPixmap(":/skin/mute.png"), ImageButtonItem::Active, ImageButtonItem::Checked);
+    m_muteButton->addPixmap(Skin::pixmap(QLatin1String("unmute.png")), ImageButtonItem::Active, ImageButtonItem::Background);
+    m_muteButton->addPixmap(Skin::pixmap(QLatin1String("mute.png")), ImageButtonItem::Active, ImageButtonItem::Checked);
     m_muteButton->setPreferredSize(20, 20);
     m_muteButton->setMaximumSize(m_muteButton->preferredSize());
     m_muteButton->setCheckable(true);
@@ -608,27 +609,27 @@ void NavigationItem::setPlaying(bool playing)
     m_playing = playing;
 
     if (m_playing) {
-        m_stepBackwardButton->addPixmap(QPixmap(":/skin/backward_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
-        m_stepBackwardButton->addPixmap(QPixmap(":/skin/backward_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
+        m_stepBackwardButton->addPixmap(Skin::pixmap(QLatin1String("backward_grey.png")), ImageButtonItem::Active, ImageButtonItem::Background);
+        m_stepBackwardButton->addPixmap(Skin::pixmap(QLatin1String("backward_blue.png")), ImageButtonItem::Active, ImageButtonItem::Hovered);
 
-        m_playButton->addPixmap(QPixmap(":/skin/pause_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
-        m_playButton->addPixmap(QPixmap(":/skin/pause_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
+        m_playButton->addPixmap(Skin::pixmap(QLatin1String("pause_grey.png")), ImageButtonItem::Active, ImageButtonItem::Background);
+        m_playButton->addPixmap(Skin::pixmap(QLatin1String("pause_blue.png")), ImageButtonItem::Active, ImageButtonItem::Hovered);
 
-        m_stepForwardButton->addPixmap(QPixmap(":/skin/forward_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
-        m_stepForwardButton->addPixmap(QPixmap(":/skin/forward_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
+        m_stepForwardButton->addPixmap(Skin::pixmap(QLatin1String("forward_grey.png")), ImageButtonItem::Active, ImageButtonItem::Background);
+        m_stepForwardButton->addPixmap(Skin::pixmap(QLatin1String("forward_blue.png")), ImageButtonItem::Active, ImageButtonItem::Hovered);
 
         m_speedSlider->setPrecision(SpeedSlider::LowPrecision);
 
         play();
     } else {
-        m_stepBackwardButton->addPixmap(QPixmap(":/skin/step_backward_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
-        m_stepBackwardButton->addPixmap(QPixmap(":/skin/step_backward_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
+        m_stepBackwardButton->addPixmap(Skin::pixmap(QLatin1String("step_backward_grey.png")), ImageButtonItem::Active, ImageButtonItem::Background);
+        m_stepBackwardButton->addPixmap(Skin::pixmap(QLatin1String("step_backward_blue.png")), ImageButtonItem::Active, ImageButtonItem::Hovered);
 
-        m_playButton->addPixmap(QPixmap(":/skin/play_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
-        m_playButton->addPixmap(QPixmap(":/skin/play_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
+        m_playButton->addPixmap(Skin::pixmap(QLatin1String("play_grey.png")), ImageButtonItem::Active, ImageButtonItem::Background);
+        m_playButton->addPixmap(Skin::pixmap(QLatin1String("play_blue.png")), ImageButtonItem::Active, ImageButtonItem::Hovered);
 
-        m_stepForwardButton->addPixmap(QPixmap(":/skin/step_forward_grey.png"), ImageButtonItem::Active, ImageButtonItem::Background);
-        m_stepForwardButton->addPixmap(QPixmap(":/skin/step_forward_blue.png"), ImageButtonItem::Active, ImageButtonItem::Hovered);
+        m_stepForwardButton->addPixmap(Skin::pixmap(QLatin1String("step_forward_grey.png")), ImageButtonItem::Active, ImageButtonItem::Background);
+        m_stepForwardButton->addPixmap(Skin::pixmap(QLatin1String("step_forward_blue.png")), ImageButtonItem::Active, ImageButtonItem::Hovered);
 
         m_speedSlider->setPrecision(SpeedSlider::HighPrecision);
 

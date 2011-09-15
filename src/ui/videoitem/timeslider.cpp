@@ -12,6 +12,7 @@
 
 #include "base/log.h"
 #include "util.h"
+#include "ui/skin.h"
 
 static const double MAX_MIN_OPACITY = 0.6;
 static const double MIN_MIN_OPACITY = 0.1;
@@ -28,7 +29,7 @@ void MySlider::paintEvent(QPaintEvent *)
     static const int handleSize = 18;
     static const int gradHeigth = 10;
     static const int margins = 5;
-    static const QPixmap pix = QPixmap(":/skin/slider-handle.png").scaled(handleSize, handleSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    static const QPixmap pix = Skin::pixmap(QLatin1String("slider-handle.png")).scaled(handleSize, handleSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
     QPainter p(this);
 

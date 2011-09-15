@@ -1,5 +1,6 @@
 #include "recordingsettingswidget.h"
 #include "ui_recordingsettings.h"
+#include "skin.h"
 
 #include <QtCore/QSettings>
 #include <QtGui/QApplication>
@@ -15,7 +16,7 @@ static const int ICON_SIZE = 32;
 
 void RecordingSettingsWidget::setDefaultSoundIcon(QLabel* l)
 {
-    l->setPixmap(QPixmap(QLatin1String(":/skin/microphone.png")).scaled(ICON_SIZE, ICON_SIZE));
+    l->setPixmap(Skin::pixmap(QLatin1String("microphone.png")).scaled(ICON_SIZE, ICON_SIZE));
 }
 
 RecordingSettingsWidget::RecordingSettingsWidget(QWidget *parent) :

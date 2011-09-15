@@ -1,9 +1,11 @@
 #include "recording_sign_item.h"
 
+#include "ui/skin.h"
+
 QTimer CLRecordingSignItem::mTimer;
 
 CLRecordingSignItem::CLRecordingSignItem(CLAbstractSubItemContainer* parent):
-	CLImgSubItem(parent, QLatin1String(":/skin/try/recording2.png"), RecordingSubItem, 0.6, 0.6, 400, 400)
+	CLImgSubItem(parent, Skin::path(QLatin1String("try/recording2.png")), RecordingSubItem, 0.6, 0.6, 400, 400)
 {
 	if (!mTimer.isActive()) // just for the first instance
 	{
@@ -16,7 +18,7 @@ CLRecordingSignItem::CLRecordingSignItem(CLAbstractSubItemContainer* parent):
 
 CLRecordingSignItem::~CLRecordingSignItem()
 {
-	disconnect(&mTimer, SIGNAL(void timeout()), this, SLOT(void onTimer()));
+	disconnect(&mTimer, SIGNAL(timeout()), this, SLOT(onTimer()));
 }
 
 void CLRecordingSignItem::onTimer()

@@ -2,6 +2,7 @@
 
 #include "settings.h"
 #include "ui/ui_common.h"
+#include "ui/skin.h"
 
 CLLayoutItem::CLLayoutItem(GraphicsView* view, int max_width, int max_height, QString name, QString tooltip):
 CLImageItem(view,max_width,max_height, name),
@@ -11,7 +12,7 @@ mContent(0)
 
     m_type = LAYOUT;
 
-    mPixmap = cached(QLatin1String(":/skin/layout.png"));
+    mPixmap = cached(Skin::path(QLatin1String("layout.png")));
 
     //setMaxSize(max_width, max_height);
 }
