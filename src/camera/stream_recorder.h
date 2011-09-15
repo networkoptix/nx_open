@@ -3,8 +3,10 @@
 
 #include "data/dataprocessor.h"
 #include "device/device_video_layout.h"
+#include "base/bytearray.h"
 class CLDevice;
 class CLByteArray;
+class CLCompressedVideoData;
 
 class CLStreamRecorder : public CLAbstractDataProcessor
 {
@@ -23,12 +25,10 @@ protected:
 	QString filenameHelper(int channel);
 	QString dirHelper();
 
-	void flushChannel(int channel);
-	bool needToFlush(int channel);
-
+    bool initFfmpegContainer(CLCompressedVideoData* mediaData, CLDevice* dev);
+    void correctH264Bitstream(AVPacket& packet);
 protected:
 	CLDevice* m_device;
-
 	CLByteArray* m_data[CL_MAX_CHANNELS];
 	CLByteArray* m_description[CL_MAX_CHANNELS];
 
@@ -39,6 +39,22 @@ protected:
 	FILE* m_descriptionFile[CL_MAX_CHANNELS];
 
 	unsigned int m_version;
+
+private:
+    ByteIOContext* m_iocontext;
+    QFile* m_outputFile;
+    AVFormatContext* m_formatCtx;
+    AVOutputFormat * m_outputCtx;
+    QVector<quint8> m_fileBuffer;
+    CLByteArray m_tmpPacketBuffer;
+    bool m_videoPacketWrited;
+    qint64 m_firstTimestamp;
+private:
+    int initIOContext();
+    qint64 seekPacketImpl(qint64 offset, qint32 whence);
+    qint32 writePacketImpl(quint8* buf, qint32 bufSize);
+    qint32 readPacketImpl(quint8* buf, quint32 bufSize);
+    QByteArray serializeMetadata(const CLDeviceVideoLayout* layout);
 };
 
 #endif //stream_recorder_h_15_14h

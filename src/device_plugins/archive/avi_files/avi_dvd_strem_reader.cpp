@@ -383,8 +383,8 @@ ByteIOContext* CLAVIDvdStreamReader::getIOContext()
 
 qint64 CLAVIDvdStreamReader::findFirstDts(quint8* buffer, int bufSize)
 {
-    quint8* bufferEnd = buffer + bufSize;
-    quint8* curPtr = buffer;
+    const quint8* bufferEnd = buffer + bufSize;
+    const quint8* curPtr = buffer;
     qint64 rez = 0;
     while (rez == 0 && curPtr < bufferEnd)
     {

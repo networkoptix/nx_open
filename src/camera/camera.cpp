@@ -11,7 +11,7 @@ CLVideoCamera::CLVideoCamera(CLDevice* device, CLVideoWindowItem* videovindow, b
     m_device(device),
     m_videovindow(videovindow),
     m_camdispay(generateEndOfStreamSignal),
-    m_recorder(device),
+    m_recorder(0),
     mGenerateEndOfStreamSignal(generateEndOfStreamSignal)
 {
     cl_log.log(QLatin1String("Creating camera for "), m_device->toString(), cl_logDEBUG1);
@@ -82,30 +82,35 @@ void CLVideoCamera::beforestopDispay()
 {
 	m_reader->pleaseStop();
 	m_camdispay.pleaseStop();
-	m_recorder.pleaseStop();
+    if (m_recorder)
+	    m_recorder->pleaseStop();
 	m_videovindow->beforeDestroy();
 }
 
 void CLVideoCamera::startRecording()
 {
 	m_reader->setQuality(CLStreamreader::CLSHighest);
-	m_reader->addDataProcessor(&m_recorder);
+    if (m_recorder == 0)
+        m_recorder = new CLStreamRecorder(m_device);
+	m_reader->addDataProcessor(m_recorder);
 	m_reader->needKeyData();
-	m_recorder.start();
+	m_recorder->start();
 	m_videovindow->addSubItem(RecordingSubItem);
 }
 
 void CLVideoCamera::stopRecording()
 {
-	m_recorder.stop();
-	m_reader->removeDataProcessor(&m_recorder);
+    if (m_recorder) {
+	    m_recorder->stop();
+	    m_reader->removeDataProcessor(m_recorder);
+    }
 	m_reader->setQuality(CLStreamreader::CLSNormal);
 	m_videovindow->removeSubItem(RecordingSubItem);
 }
 
 bool CLVideoCamera::isRecording()
 {
-	return m_recorder.isRunning();
+    return m_recorder ? m_recorder->isRunning() : false;
 }
 
 CLDevice* CLVideoCamera::getDevice() const

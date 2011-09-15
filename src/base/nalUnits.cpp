@@ -51,9 +51,9 @@ const quint8* NALUnit::findNextNAL(const quint8* buffer, const quint8* end)
 	return end;
 }
 
-quint8* NALUnit::findNALWithStartCode(quint8* buffer, quint8* end, bool longCodesAllowed)
+const quint8* NALUnit::findNALWithStartCode(const quint8* buffer, const quint8* end, bool longCodesAllowed)
 {
-	quint8* bufStart = buffer;
+	const quint8* bufStart = buffer;
 	for (buffer += 2; buffer < end;)
 	{
 		if (*buffer > 1)

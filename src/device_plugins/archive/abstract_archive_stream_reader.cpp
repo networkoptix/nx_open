@@ -60,8 +60,10 @@ void CLAbstractArchiveReader::jumpTo(quint64 mksec, bool makeshot)
 
     nextFrame();
 
-    for (int channel = 0; channel  < m_channel_number; ++channel)
-        channeljumpTo(mksec, channel);
+    //for (int channel = 0; channel  < m_channel_number; ++channel)
+        //channeljumpTo(mksec, channel);
+
+    channeljumpTo(mksec, 0);
 
     m_useTwice = true;
 

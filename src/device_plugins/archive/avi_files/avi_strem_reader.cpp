@@ -216,6 +216,9 @@ bool CLAVIStreamReader::initCodecs()
     m_lastPacketTimes.resize(m_formatContext->nb_streams);
     for(unsigned i = 0; i < m_formatContext->nb_streams; i++) 
         m_lastPacketTimes[i] = 0;
+
+    AVDictionaryEntry* entry;
+
     for(unsigned i = 0; i < m_formatContext->nb_streams; i++)
     {
         AVStream *strm= m_formatContext->streams[i];
@@ -233,6 +236,7 @@ bool CLAVIStreamReader::initCodecs()
         case AVMEDIA_TYPE_VIDEO:
             if (m_videoStreamIndex == -1) // Take only first video stream
                 m_videoStreamIndex = i;
+            entry = av_metadata_get(m_formatContext->streams[i]->metadata, "layout", 0, 0);
             break;
 
         case AVMEDIA_TYPE_AUDIO:

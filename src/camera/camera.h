@@ -58,7 +58,7 @@ private:
     CLDevice* m_device;
     CLVideoWindowItem* m_videovindow;
     CLCamDisplay m_camdispay;
-    CLStreamRecorder m_recorder;
+    CLStreamRecorder* m_recorder;
 
     CLStreamreader* m_reader;
 
