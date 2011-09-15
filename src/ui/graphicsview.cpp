@@ -231,7 +231,7 @@ void GraphicsView::removeFileDeviceItem(CLDeviceSearcher& deviceSearcher, CLAbst
 
     CLDeviceList& all_devices = deviceSearcher.getAllDevices();
 
-    all_devices.remove(device->getUniqueId());
+    deviceSearcher.removeDeviceUnlocked(device->getUniqueId());
 
     QList<CLAbstractSubItemContainer*> lst;
     lst.push_back(aitem);
@@ -1709,7 +1709,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
         {
             CLDevice* device = aitem->getComplicatedItem()->getDevice();
 
-            QMessageBox::StandardButton result = YesNoCancel(this, tr("Remove file confirmation"), QString("Are you sure you want to delete file ") + device->getUniqueId() + "?");
+            QMessageBox::StandardButton result = YesNoCancel(this, tr("Delete file confirmation"), QString("Are you sure you want to delete file ") + device->getUniqueId() + "?");
             if (result == QMessageBox::Yes)
             {
                 CLDeviceSearcher& deviceSearcher = CLDeviceManager::instance().getDeviceSearcher();
@@ -1747,7 +1747,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
         else if (act == &cm_remove_from_disk)
         {
             QString message = tr("Are you sure you want to delete %1 files?").arg(selectedItems.size());
-            if (YesNoCancel(this, tr("Remove file confirmation"), message) == QMessageBox::Yes)
+            if (YesNoCancel(this, tr("Delete file confirmation"), message) == QMessageBox::Yes)
             {
                 CLDeviceSearcher& deviceSearcher = CLDeviceManager::instance().getDeviceSearcher();
                 QMutexLocker lock(&deviceSearcher.all_devices_mtx);

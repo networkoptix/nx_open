@@ -17,7 +17,7 @@ QAction cm_editTags(QObject::tr("Edit tags..."), 0);
 
 QAction cm_fullscreen(QObject::tr("Fullscreen"), 0);
 QAction cm_remove_from_layout(QObject::tr("Remove"), 0);
-QAction cm_remove_from_disk(QObject::tr("Remove file(s)"), 0);
+QAction cm_remove_from_disk(QObject::tr("Delete file(s)"), 0);
 QAction cm_settings(QObject::tr("Settings..."), 0);
 QAction cm_start_recording(QObject::tr("Start recording"), 0);
 QAction cm_stop_recording(QObject::tr("Stop recording"), 0);

@@ -74,11 +74,7 @@ CLDeviceManager::~CLDeviceManager()
 	m_timer.stop();
 	m_dev_searcher.wait();
 
-	{
-		QMutexLocker lock(&m_dev_searcher.all_devices_mtx);
-		CLDeviceList& list = m_dev_searcher.getAllDevices();
-		CLDevice::deleteDevices(list);
-	}
+    m_dev_searcher.releaseDevices();
 
 	foreach(CLDevice* dev, mRecDevices)
 	{
@@ -92,10 +88,14 @@ CLDeviceSearcher& CLDeviceManager::getDeviceSearcher()
     return m_dev_searcher;
 }
 
-void CLDeviceManager::pleaseCheckDirs(const QStringList& lst)
+void CLDeviceManager::pleaseCheckDirs(const QStringList& lst, bool append)
 {
     QMutexLocker mutex(&mPleaseCheckDirsLst_cs);
-    mPleaseCheckDirsLst = lst;
+
+    if (append)
+        mPleaseCheckDirsLst += lst;
+    else
+        mPleaseCheckDirsLst = lst;
 }
 
 QStringList CLDeviceManager::getPleaseCheckDirs() const
@@ -115,14 +115,11 @@ void CLDeviceManager::onTimer()
 
 	}
 
-	if (!m_dev_searcher.isRunning() )
+    if (!m_dev_searcher.isRunning())
 	{
 		onNewDevices_helper(m_dev_searcher.result(), QLatin1String(generalArchiverId));
 		m_dev_searcher.start(); // run searcher again ...
 	}
-
-    if (mDirbrowsr.isRunning())
-        return;
 
     if (mNeedresultsFromDirbrowsr)
     {
@@ -139,7 +136,6 @@ void CLDeviceManager::onTimer()
     {
         mNeedresultsFromDirbrowsr = true;
         mDirbrowsr.setDirList(checklist);
-        mDirbrowsr.start();
     }
 
 }
@@ -261,9 +257,7 @@ void CLDeviceManager::onNewDevices_helper(CLDeviceList devices, QString parentId
             //device->setParentId( QString::number(dev_count/dev_per_arch)); // tests
             //++dev_count;
 
-			QMutexLocker lock(&m_dev_searcher.all_devices_mtx);
-			m_dev_searcher.getAllDevices().insert(device->getUniqueId(),device);
-
+            m_dev_searcher.addDevice(device);
 		}
 		else
 		{
@@ -347,6 +341,8 @@ void CLDeviceManager::getResultFromDirBrowser()
 {
     CLDeviceList dev_list = mDirbrowsr.result();
 
+    m_dev_searcher.removeRemoved(mDirbrowsr.directoryList(), mDirbrowsr.result());
+
     {
         // exclude already existing devices
         QMutexLocker lock(&m_dev_searcher.all_devices_mtx);
@@ -364,7 +360,6 @@ void CLDeviceManager::getResultFromDirBrowser()
             it.value()->releaseRef();
             dev_list.erase(it++);
         }
-
     }
 
     onNewDevices_helper(dev_list, QLatin1String(generalArchiverId));

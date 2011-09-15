@@ -36,6 +36,11 @@ public:
 
 	QMutex all_devices_mtx; // this mutex must be used if deal with all_devices
 
+    void releaseDevices();
+    void addDevice(CLDevice* device);
+    void removeDeviceUnlocked(const QString& deviceId);
+    void removeRemoved(QStringList folders, CLDeviceList devices);
+
 signals:
     void newNetworkDevices();
 
@@ -65,13 +70,15 @@ private:
 	CLDeviceList resolveUnknown_helper(CLDeviceList& lst);
 
 private:
-
 	CLDeviceList m_result;
-
 	ServerList m_servers;
 	QMutex m_servers_mtx;
 
 	CLDeviceList all_devices; // this list of ever found devices.
+
+    //Directory name -> children device IDs mapping.
+    typedef QMap<QString, QSet<QString> > DirectoryEntries;
+    DirectoryEntries m_directoryEntries;
 
 	CLNetState m_netState;
 };

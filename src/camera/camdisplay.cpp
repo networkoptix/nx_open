@@ -636,7 +636,7 @@ qint64 CLCamDisplay::diffBetweenVideoAndAudio(CLCompressedVideoData* incoming, i
     if (duration == 0)
         duration = m_lastNonZerroDuration;
     else
-        m_lastNonZerroDuration = duration;
+        m_lastNonZerroDuration = qMax(duration, 1000000ll/60);
 
     // difference between video and audio
     return currentPlayingVideoTime - currentPlayingAudioTime;

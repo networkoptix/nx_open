@@ -37,7 +37,7 @@ public:
 
 	CLDevice* getArchiveDevice(QString id);
 
-    void pleaseCheckDirs(const QStringList& lst);
+    void pleaseCheckDirs(const QStringList& lst, bool append = false);
     QStringList getPleaseCheckDirs() const;
 
     void addFiles(const QStringList& files);

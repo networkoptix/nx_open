@@ -5,23 +5,39 @@
 
 class CLDeviceDirectoryBrowser : public QThread
 {
+Q_OBJECT
+
 public:
-	CLDeviceDirectoryBrowser();
-	virtual ~CLDeviceDirectoryBrowser();
+    CLDeviceDirectoryBrowser();
+    virtual ~CLDeviceDirectoryBrowser();
 
     void setDirList(QStringList& dirs);
-    CLDeviceList result();
+    QStringList directoryList() const { return mDirsToCheck; }
+    CLDeviceList result() const;
+
+signals:
+    void reload();
 
 protected:
     void run();
-    CLDeviceList findDevices(const QString& directory);
 
-protected:
+private:
+    mutable QMutex m_resultMutex;
+
+    QFileSystemWatcher m_fsWatcher;
+
     QStringList mDirsToCheck;
+    CLDeviceList m_tmpResult;
     CLDeviceList mResult;
 
-	volatile bool mNeedStop;
+    volatile bool mNeedStop;
 
+private:
+    CLDeviceList findDevices(const QString& directory);
+
+private slots:
+    void directoryChanged(const QString & path);
+    void reloadDirs();
 };
 
 #endif //directory_browser_h_1708

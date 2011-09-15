@@ -2,7 +2,6 @@
 
 #include <QtCore/QFile>
 #include <QtCore/QXmlStreamReader>
-
 #include "base/log.h"
 
 class QYoutubeUploadDevice: public QIODevice {
@@ -231,8 +230,6 @@ void YouTubeUploader::readCategoryList()
     m_categoryReply = m_manager->get(request);
     connect(m_categoryReply, SIGNAL(error(QNetworkReply::NetworkError)),
         this, SLOT(slotError(QNetworkReply::NetworkError)));
-    connect(m_categoryReply, SIGNAL(sslErrors(QList<QSslError>)),
-        this, SLOT(slotSslErrors(QList<QSslError>)));
 }
 
 void YouTubeUploader::login()
@@ -399,21 +396,21 @@ void YouTubeUploader::slotError(QNetworkReply::NetworkError err)
         m_errorString = reply->errorString();
     if (m_state == State_Unauthorized && m_errorString.toLower().contains(QLatin1String("forbidden")))
         m_errorString = tr("Invalid user name or password");
-    cl_log.log(QLatin1String("YouTubeUploader::slotError(): ") + m_errorString, cl_logALWAYS);
 }
 void YouTubeUploader::slotSslErrors(QList<QSslError> list)
 {
-    if (sender() == m_categoryReply) {
-        m_categoryReply->deleteLater();
-        m_categoryReply = 0;
-        return;
-    }
-
-    m_errorCode = 1;
-    if (!list.isEmpty()) {
-        m_errorCode = list[0].error();
-        m_errorString = list[0].errorString();
-        cl_log.log(QLatin1String("YouTubeUploader::slotSslErrors(): ") + m_errorString, cl_logALWAYS);
+    QNetworkReply* reply = dynamic_cast<QNetworkReply*>(sender());
+    if (reply) {
+        foreach(QSslError error, list) 
+        {
+            if (error.error() == QSslError::NoError)
+                reply->ignoreSslErrors();
+            else {
+                cl_log.log("YouTube SSL error: ", error.errorString(), cl_logWARNING);
+                m_errorCode = error.error();
+                m_errorString = error.errorString();
+            }
+        }
     }
 }
 
