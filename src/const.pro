@@ -108,4 +108,4 @@ FORMS += mainwnd.ui preferences.ui licensekey.ui recordingsettings.ui ui/dialogs
          youtube/youtubeuploaddialog.ui youtube/youtubesetting.ui
 
 DEFINES += CL_TRIAL_MODE CL_FORCE_LOGO
-#DEFINES += CL_DEFAULT_SKIN_PREFIX=\\\":/alternate_skin\\\"
+#DEFINES += CL_DEFAULT_SKIN_PREFIX=\\\"./trinity\\\"
