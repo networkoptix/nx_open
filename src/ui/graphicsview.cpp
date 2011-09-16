@@ -589,7 +589,7 @@ void GraphicsView::initDecoration()
 
     if (exitButton)
     {
-        item = new CLUnMovedPixtureButton(button_exit, 0, global_decoration_opacity, 1.0, Skin::path(QLatin1String("exit-application.png")), decoration_size, decoration_size, 255);
+        item = new CLUnMovedPixtureButton(button_exit, 0, global_decoration_opacity, 1.0, Skin::path(QLatin1String("decorations/exit-application.png")), decoration_size, decoration_size, 255);
         addStaticItem(item);
     }
 
