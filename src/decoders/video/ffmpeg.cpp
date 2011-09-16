@@ -4,12 +4,14 @@
 #include "dxva/ffmpeg_callbacks.h"
 #endif
 #include "base/ffmpeg_helper.h"
+#include "base/nalUnits.h"
 
 extern QMutex global_ffmpeg_mutex;
 
 static const int  LIGHT_CPU_MODE_FRAME_PERIOD = 15;
 bool CLFFmpegVideoDecoder::m_first_instance = true;
 int CLFFmpegVideoDecoder::hwcounter = 0;
+static const quint32 LONG_NAL_PREFIX = htonl(1);
 
 //================================================
 
@@ -24,7 +26,10 @@ m_newDecodeMode(DecodeMode_NotDefined),
 m_lightModeFrameCounter(0),
 m_frameTypeExtractor(0),
 m_deinterlaceBuffer(0),
-m_usedQtImage(false)
+m_usedQtImage(false),
+m_currentWidth(-1),
+m_currentHeight(-1),
+m_checkH264ResolutionChange(false)
 {
 	if (codecContext)
 	{
@@ -124,6 +129,7 @@ void CLFFmpegVideoDecoder::openDecoder()
 
     m_context->thread_count = qMin(4, QThread::idealThreadCount() + 1);
     m_context->thread_type = m_mtDecoding ? FF_THREAD_FRAME : FF_THREAD_SLICE;
+    m_checkH264ResolutionChange = m_mtDecoding && m_context->codec_id == CODEC_ID_H264 && m_context->extradata_size && m_context->extradata[0] == 0; 
 
 
     cl_log.log(QLatin1String("Creating ") + QLatin1String(m_mtDecoding ? "FRAME threaded decoder" : "SLICE threaded decoder"), cl_logALWAYS);
@@ -158,6 +164,7 @@ void CLFFmpegVideoDecoder::resetDecoder()
 
     //closeDecoder();
     //openDecoder();
+    //return;
 
     // I have improved resetDecoder speed (I have left only minimum operations) because of REW. REW calls reset decoder on each GOP.
     avcodec_close(m_context);
@@ -165,6 +172,8 @@ void CLFFmpegVideoDecoder::resetDecoder()
         avcodec_copy_context(m_context, m_passedContext);
     m_context->thread_count = qMin(4, QThread::idealThreadCount() + 1);
     m_context->thread_type = m_mtDecoding ? FF_THREAD_FRAME : FF_THREAD_SLICE;
+    // ensure that it is H.264 with nal prefixes
+    m_checkH264ResolutionChange = m_mtDecoding && m_context->codec_id == CODEC_ID_H264 && m_context->extradata_size && m_context->extradata[0] == 0; 
     avcodec_open(m_context, m_codec);
 }
 //The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than the actual read bytes because some optimized bitstream readers read 32 or 64 bits at once and could read over the end.
@@ -250,6 +259,27 @@ bool CLFFmpegVideoDecoder::decode(const CLCompressedVideoData& data, CLVideoDeco
     // ### handle errors
     if (m_context->pix_fmt == -1)
         m_context->pix_fmt = PixelFormat(0);
+
+    // workaround ffmpeg crush
+    if (m_checkH264ResolutionChange && avpkt.size > 4 && *((quint32*)avpkt.data) == LONG_NAL_PREFIX && (avpkt.data[4]&0x1f) == nuSPS)
+    {
+        SPSUnit sps;
+        const quint8* end = NALUnit::findNALWithStartCode(avpkt.data+4, avpkt.data + avpkt.size, true);
+        sps.decodeBuffer(avpkt.data, end);
+        sps.deserialize();
+        if (m_currentWidth == -1) {
+            m_currentWidth = sps.getWidth();
+            m_currentHeight = sps.getHeight();
+        }
+        else if (sps.getWidth() != m_currentWidth || sps.getHeight() != m_currentHeight)
+        {
+            m_currentWidth = sps.getWidth();
+            m_currentHeight = sps.getHeight();
+            resetDecoder();
+        }
+    }
+    // -------------------------
+
     avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
     if (data.useTwice)
         avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);

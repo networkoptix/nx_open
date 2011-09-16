@@ -62,6 +62,7 @@ private:
 	
 	quint8* m_deinterlaceBuffer;
 	AVFrame *m_deinterlacedFrame;
+    bool m_checkH264ResolutionChange;
 
 #ifdef _USE_DXVA
     DecoderContext m_decoderContext;
@@ -77,6 +78,9 @@ private:
 	CLAbstractVideoDecoder::DecodeMode m_newDecodeMode;
 
 	unsigned int m_lightModeFrameCounter;
+
+    int m_currentWidth;
+    int m_currentHeight;
 };
 
 #endif //cl_ffmpeg_h
