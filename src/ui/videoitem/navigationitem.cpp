@@ -375,6 +375,9 @@ void NavigationItem::onValueChanged(qint64 time)
 
     updateSliderToolTip(time);
 
+    if (m_camera == 0)
+        return;
+
     CLAbstractArchiveReader *reader = static_cast<CLAbstractArchiveReader*>(m_camera->getStreamreader());
     if (reader->isSkippingFrames())
         return;
