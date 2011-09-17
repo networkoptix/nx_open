@@ -1,12 +1,12 @@
-#ifndef iqeye_h_2054_h
-#define iqeye_h_2054_h
+#ifndef axis_h_2054_h
+#define axis_h_2054_h
 #include "device/network_device.h"
 
-class CLIQEyeDevice : public CLNetworkDevice
+class CLAxisDevice : public CLNetworkDevice
 {
 public:
-    CLIQEyeDevice();
-    ~CLIQEyeDevice();
+    CLAxisDevice ();
+    ~CLAxisDevice();
 
     DeviceType getDeviceType() const;
 
@@ -17,7 +17,7 @@ public:
     virtual bool unknownDevice() const;
     CLNetworkDevice* updateDevice();
 
-    
+
 };
 
 #endif //avigilon_h_16_43_h

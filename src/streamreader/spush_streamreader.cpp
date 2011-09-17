@@ -33,6 +33,8 @@ void CLServerPushStreamreader::run()
             {
                 CLSleep::msleep(20); // to avoid large CPU usage
 
+                closeStream(); // to release resources 
+
                 setNeedKeyData();
                 frames_lost++;
                 m_stat[0].onData(0);

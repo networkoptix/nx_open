@@ -21,8 +21,9 @@
 #include "decoders/video/abstractdecoder.h"
 #include "device_plugins/avigilon/devices/avigilon_device_server.h"
 #include "device_plugins/android/devices/android_device_server.h"
-#include "device_plugins/iqeye/devices/iqeye_device_server.h"
 #include "device_plugins/desktop/device/desktop_device_server.h"
+#include "device_plugins/onvif/discovery/onvif_device_server.h"
+
 
 QMutex global_ffmpeg_mutex;
 
@@ -131,7 +132,8 @@ int main(int argc, char *argv[])
     CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
     CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&AVigilonDeviceServer::instance());
     CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&AndroidDeviceServer::instance());
-    CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&IQEyeDeviceServer::instance());
+    //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&IQEyeDeviceServer::instance());
+    CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&OnvifDeviceServer::instance());
 #ifdef Q_OS_WIN
     CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&DesktopDeviceServer::instance());
 #endif // Q_OS_WIN

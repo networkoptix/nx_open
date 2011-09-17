@@ -1,7 +1,7 @@
-#include "iqeye_sp_mjpeg.h"
 #include "device/network_device.h"
 #include "network/simple_http_client.h"
 #include "data/mediadata.h"
+#include "sp_mjpeg.h"
 
 
 extern char jpeg_start[2];
@@ -12,19 +12,20 @@ extern int contain_subst(char *data, int datalen, char *subdata, int subdatalen)
 
 
 
-CLIQEyeMJPEGtreamreader::CLIQEyeMJPEGtreamreader(CLDevice* dev)
+MJPEGtreamreader::MJPEGtreamreader(CLDevice* dev, const QString& requst)
 :CLServerPushStreamreader(dev),
-mHttpClient(0)
+mHttpClient(0),
+m_request(requst)
 {
 
 }
 
-CLIQEyeMJPEGtreamreader::~CLIQEyeMJPEGtreamreader()
+MJPEGtreamreader::~MJPEGtreamreader()
 {
 
 }
 
-CLAbstractMediaData* CLIQEyeMJPEGtreamreader::getNextData()
+CLAbstractMediaData* MJPEGtreamreader::getNextData()
 {
 
     if (!isStreamOpened())
@@ -127,28 +128,28 @@ CLAbstractMediaData* CLIQEyeMJPEGtreamreader::getNextData()
 
 }
 
-void CLIQEyeMJPEGtreamreader::openStream()
+void MJPEGtreamreader::openStream()
 {
     if (isStreamOpened())
         return;
 
-    QString request = QLatin1String("now.jpg?snap=spush?dummy=1305868336917");
+    //QString request = QLatin1String("now.jpg?snap=spush?dummy=1305868336917");
     CLNetworkDevice* ndev = static_cast<CLNetworkDevice*>(m_device);
 
     mHttpClient = new CLSimpleHTTPClient(ndev->getIP(), 80, 2000, ndev->getAuth());
-    mHttpClient->setRequestLine(request);
+    mHttpClient->setRequestLine(m_request);
     mHttpClient->openStream();
 
     mDataRemainedBeginIndex = -1;
 }
 
-void CLIQEyeMJPEGtreamreader::closeStream()
+void MJPEGtreamreader::closeStream()
 {
     delete mHttpClient;
     mHttpClient = 0;
 }
 
-bool CLIQEyeMJPEGtreamreader::isStreamOpened() const
+bool MJPEGtreamreader::isStreamOpened() const
 {
     return ( mHttpClient && mHttpClient->isOpened() );
 }
