@@ -22,7 +22,7 @@ public:
     virtual bool setAudioChannel(unsigned int num);
     virtual void setReverseMode(bool value);
     virtual bool isReverseMode() const { return m_reverseMode;}
-    virtual bool isSpeedSupported(double value) const { return true; }
+    virtual bool isSpeedSupported(double value) const;
 
     CLDeviceVideoLayout* getLayout();
     static bool deserializeLayout(CLCustomDeviceVideoLayout* layout, const QString& layoutStr);
