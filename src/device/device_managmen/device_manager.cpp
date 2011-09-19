@@ -2,7 +2,6 @@
 #include "../asynch_seacher.h"
 #include "settings.h"
 #include "recorder/fake_recorder_device.h"
-#include "device_plugins/archive/archive/archive_device.h"
 #include "util.h"
 #include "device_plugins/archive/avi_files/avi_device.h"
 #include "device_plugins/archive/avi_files/avi_dvd_device.h"
@@ -235,11 +234,11 @@ CLDevice* CLDeviceManager::getRecorderById(QString id)
 
 CLDevice* CLDeviceManager::getArchiveDevice(QString id)
 {
-	QDir dir(id);
-	if (!dir.exists())
+	QFile file(id);
+	if (!file.exists())
 		return 0;
 
-	CLDevice* dev = new CLArchiveDevice(id);
+	CLDevice* dev = new CLAviDevice(id);
 	return dev;
 }
 

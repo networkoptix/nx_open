@@ -13,7 +13,8 @@ class CLStreamRecorder : public CLAbstractDataProcessor
 public:
 	CLStreamRecorder(CLDevice* dev);
 	~CLStreamRecorder();
-
+    static QFileInfoList getRecordedFiles(const QString& deviceId);
+    static QFileInfo getTempFileName(const QString& deviceId);
 protected:
 	virtual bool processData(CLAbstractData* data);
 	virtual void endOfRun();
@@ -54,7 +55,6 @@ private:
     qint64 seekPacketImpl(qint64 offset, qint32 whence);
     qint32 writePacketImpl(quint8* buf, qint32 bufSize);
     qint32 readPacketImpl(quint8* buf, quint32 bufSize);
-    QByteArray serializeMetadata(const CLDeviceVideoLayout* layout);
 };
 
 #endif //stream_recorder_h_15_14h

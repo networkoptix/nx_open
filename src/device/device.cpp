@@ -131,7 +131,7 @@ void CLDevice::setVideoLayout(CLDeviceVideoLayout* layout)
 	m_videolayout = layout;
 }
 
-const CLDeviceVideoLayout* CLDevice::getVideoLayout() const
+const CLDeviceVideoLayout* CLDevice::getVideoLayout(CLStreamreader* reader)
 {
 	if (!m_videolayout)
 		m_videolayout = new CLDefaultDeviceVideoLayout();

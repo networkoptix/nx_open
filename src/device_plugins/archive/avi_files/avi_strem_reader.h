@@ -23,6 +23,10 @@ public:
     virtual void setReverseMode(bool value);
     virtual bool isReverseMode() const { return m_reverseMode;}
     virtual bool isSpeedSupported(double value) const { return true; }
+
+    CLDeviceVideoLayout* getLayout();
+    static bool deserializeLayout(CLCustomDeviceVideoLayout* layout, const QString& layoutStr);
+    static QString serializeLayout(const CLDeviceVideoLayout* layout);
 protected:
     virtual CLAbstractMediaData* getNextData();
     virtual void channeljumpTo(quint64 mksec, int channel);
@@ -37,6 +41,7 @@ protected:
     virtual AVFormatContext* getFormatContext();
     virtual qint64 contentLength() const { return m_formatContext->duration; }
     bool initCodecs();
+    bool openFormatContext();
 protected:
     qint64 m_currentTime;
     qint64 m_previousTime;
@@ -46,7 +51,7 @@ protected:
 
     AVFormatContext* m_formatContext;
 
-    int m_videoStreamIndex;
+    int m_primaryVideoIdx;
     int m_audioStreamIndex;
 
     CodecID m_videoCodecId;
@@ -60,7 +65,7 @@ protected:
     volatile bool m_wakeup;
 
     bool m_bsleep;
-
+    QVector<bool> m_needSetReverseFlag;
 private:
     AVPacket m_packets[2];
     int m_currentPacketIndex;
@@ -78,6 +83,8 @@ private:
     qint64 m_requiredJumpTime;
     qint64 m_lastUIJumpTime;
     qint64 m_lastFrameDuration;
+    CLCustomDeviceVideoLayout* m_layout;
+    QVector<int> m_indexToChannel;
 private:
     /**
       * Read next packet from file
@@ -101,7 +108,7 @@ private:
       *
       * @return created object
       */
-    CLCompressedVideoData* getVideoData(const AVPacket& packet, AVCodecContext* codecContext);
+    CLCompressedVideoData* getVideoData(const AVPacket& packet, AVCodecContext* codecContext, int channel);
 
     /**
       * Create CLCompressedAudioData object and fill it from StreamReader state, packet and AVStream
@@ -119,6 +126,7 @@ private:
     AVPacket& nextPacket();
     qint64 determineDisplayTime();
     void intChanneljumpTo(quint64 mksec, int channel);
+    int streamIndexToChannel(int index);
 };
 
 #endif //avi_stream_reader_h1901

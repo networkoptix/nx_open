@@ -3,6 +3,8 @@
 
 #include "../abstract_archive_device.h"
 
+class CLAVIStreamReader;
+
 class CLAviDevice : public CLAbstractArchiveDevice
 {
 public:
@@ -11,9 +13,7 @@ public:
 
 	virtual CLStreamreader* getDeviceStreamConnection();
 	virtual QString toString() const;
-
-protected:
-
+    virtual const CLDeviceVideoLayout* getVideoLayout(CLStreamreader* reader);
 };
 
 #endif //avi_device_h_1827

@@ -11,6 +11,7 @@
 
 QMutex CLAVIStreamReader::avi_mutex;
 QSemaphore CLAVIStreamReader::aviSemaphore(4);
+static bool firstInstance = true;
 
 
 // used in reverse mode.
@@ -47,7 +48,7 @@ static const int FFMPEG_PROBE_BUFFER_SIZE = 1024 * 512;
 qint64 CLAVIStreamReader::packetTimestamp(AVStream* stream, const AVPacket& packet)
 {
     double timeBase = av_q2d(stream->time_base);
-    qint64 dts = m_videoStreamIndex != -1 ? m_formatContext->streams[m_videoStreamIndex]->first_dts : stream->first_dts;
+    qint64 dts = m_primaryVideoIdx != -1 ? m_formatContext->streams[m_primaryVideoIdx]->first_dts : stream->first_dts;
     qint64 firstDts = (dts == AV_NOPTS_VALUE) ? 0 : dts;
     qint64 packetTime = packet.dts != AV_NOPTS_VALUE ? packet.dts : packet.pts;
     if (packetTime != AV_NOPTS_VALUE)
@@ -65,7 +66,7 @@ CLAVIStreamReader::CLAVIStreamReader(CLDevice* dev ) :
     m_currentTime(0),
     m_previousTime(-1),
     m_formatContext(0),
-    m_videoStreamIndex(-1),
+    m_primaryVideoIdx(-1),
     m_audioStreamIndex(-1),
     mFirstTime(true),
     m_bsleep(false),
@@ -82,12 +83,23 @@ CLAVIStreamReader::CLAVIStreamReader(CLDevice* dev ) :
     m_IFrameAfterJumpFound(false),
     m_requiredJumpTime(AV_NOPTS_VALUE),
     m_lastUIJumpTime(AV_NOPTS_VALUE),
-    m_lastFrameDuration(0)
+    m_lastFrameDuration(0),
+    m_layout(0),
+    m_needSetReverseFlag(false)
 {
     // Should init packets here as some times destroy (av_free_packet) could be called before init
     av_init_packet(&m_packets[0]);
     av_init_packet(&m_packets[1]);
 
+    QMutexLocker mutex(&m_cs);
+    if (firstInstance)
+    {
+        firstInstance = false;
+        QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
+        av_register_all();
+        extern URLProtocol ufile_protocol;
+        av_register_protocol2(&ufile_protocol, sizeof(ufile_protocol));
+    }
     //init();
 }
 
@@ -134,47 +146,89 @@ ByteIOContext* CLAVIStreamReader::getIOContext()
 	return 0;
 }
 
+bool CLAVIStreamReader::openFormatContext()
+{
+    if (m_formatContext == 0) 
+    {
+        QString url = QLatin1String("ufile:") + m_device->getUniqueId();
+        int err = av_open_input_file(&m_formatContext, url.toUtf8().constData(), NULL, 0, NULL);
+        if (err < 0) {
+            destroy();
+            return false;
+        }
+    }
+    return true;
+}
+
+bool CLAVIStreamReader::deserializeLayout(CLCustomDeviceVideoLayout* layout, const QString& layoutStr)
+{
+    QStringList info = layoutStr.split(';');
+    for (int i = 0; i < info.size(); ++i)
+    {
+        QStringList params = info[i].split(',');
+        if (params.size() != 2) {
+            cl_log.log("Invalid layout string stored at file metadata. Ignored.", cl_logWARNING);
+            return false;
+        }
+        if (i == 0) {
+            layout->setWidth(params[0].toInt());
+            layout->setHeight(params[1].toInt());
+        }
+        else {
+            layout->setChannel(params[0].toInt(), params[1].toInt(), i-1);
+        }
+    }
+    return true;
+}
+
+QString CLAVIStreamReader::serializeLayout(const CLDeviceVideoLayout* layout)
+{
+    QString rez;
+    QTextStream ost(&rez);
+    ost << layout->width() << ',' << layout->height();
+    for (int i = 0; i < layout->numberOfChannels(); ++i) {
+        ost << ';' << layout->h_position(i) << ',' << layout->v_position(i);
+    }
+    ost.flush();
+    return rez;
+}
+
+CLDeviceVideoLayout* CLAVIStreamReader::getLayout()
+{
+    if (m_layout == 0)
+    {
+        m_layout = new CLCustomDeviceVideoLayout(1, 1);
+        if (openFormatContext()) 
+        {
+            AVMetadataTag* layoutInfo = av_metadata_get(m_formatContext->metadata,"video_layout", 0, 0);
+            if (layoutInfo)
+                deserializeLayout(m_layout, layoutInfo->value);
+        }
+    }
+    m_needSetReverseFlag.resize(m_layout->numberOfChannels());
+    for (int i = 0; i < m_needSetReverseFlag.size(); ++i)
+        m_needSetReverseFlag[i] = false;
+    return m_layout;
+}
+
 AVFormatContext* CLAVIStreamReader::getFormatContext()
 {
-    QString url = QLatin1String("ufile:") + m_device->getUniqueId();
-    AVFormatContext* formatContext;
-    int err = av_open_input_file(&formatContext, url.toUtf8().constData(), NULL, 0, NULL);
-    if (err < 0)
-    {
-        destroy();
-        return 0;
-    }
-
+    openFormatContext();
     {
         QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
-        err = av_find_stream_info(formatContext);
+        int err = av_find_stream_info(m_formatContext);
         if (err < 0)
         {
             destroy();
             return 0;
         }
     }
-    return formatContext;
+    return m_formatContext;
 }
 
 bool CLAVIStreamReader::init()
 {
-	static bool firstInstance = true;
-
 	QMutexLocker mutex(&m_cs);
-
-	if (firstInstance)
-	{
-		firstInstance = false;
-
-		QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
-
-		av_register_all();
-
-		extern URLProtocol ufile_protocol;
-
-		av_register_protocol2(&ufile_protocol, sizeof(ufile_protocol));
-	}
 
 	m_currentTime = 0;
 	m_previousTime = -1;
@@ -200,8 +254,8 @@ bool CLAVIStreamReader::init()
     av_init_packet(&m_packets[1]);
 
     delete m_frameTypeExtractor;
-    if (m_videoStreamIndex >= 0)
-        m_frameTypeExtractor = new FrameTypeExtractor(m_formatContext->streams[m_videoStreamIndex]->codec);
+    if (m_primaryVideoIdx >= 0)
+        m_frameTypeExtractor = new FrameTypeExtractor(m_formatContext->streams[m_primaryVideoIdx]->codec);
     else
         m_frameTypeExtractor = 0;
     m_lastFrameDuration = 0;
@@ -210,7 +264,7 @@ bool CLAVIStreamReader::init()
 
 bool CLAVIStreamReader::initCodecs()
 {
-    m_videoStreamIndex = -1;
+    m_primaryVideoIdx = -1;
     m_audioStreamIndex = -1;
     int lastStreamID = -1;
     m_lastPacketTimes.resize(m_formatContext->nb_streams);
@@ -234,9 +288,14 @@ bool CLAVIStreamReader::initCodecs()
         switch(codecContext->codec_type)
         {
         case AVMEDIA_TYPE_VIDEO:
-            if (m_videoStreamIndex == -1) // Take only first video stream
-                m_videoStreamIndex = i;
-            entry = av_metadata_get(m_formatContext->streams[i]->metadata, "layout", 0, 0);
+            if (m_primaryVideoIdx == -1) // Take only first video stream
+                m_primaryVideoIdx = i;
+            entry = av_metadata_get(m_formatContext->streams[i]->metadata, "layout_channel", 0, 0);
+            if (entry) {
+                if (m_indexToChannel.size() < i+1)
+                    m_indexToChannel.resize(i+1);
+                m_indexToChannel[i] = QString(entry->value).toInt();
+            }
             break;
 
         case AVMEDIA_TYPE_AUDIO:
@@ -250,9 +309,9 @@ bool CLAVIStreamReader::initCodecs()
         }
     }
 
-    if (m_videoStreamIndex != -1)
+    if (m_primaryVideoIdx != -1)
     {
-        CodecID ffmpeg_video_codec_id = m_formatContext->streams[m_videoStreamIndex]->codec->codec_id;
+        CodecID ffmpeg_video_codec_id = m_formatContext->streams[m_primaryVideoIdx]->codec->codec_id;
 
         if (ffmpeg_video_codec_id != CODEC_ID_NONE)
         {
@@ -263,7 +322,7 @@ bool CLAVIStreamReader::initCodecs()
             destroy();
             return false;
         }
-        emit videoParamsChanged(m_formatContext->streams[m_videoStreamIndex]->codec);
+        emit videoParamsChanged(m_formatContext->streams[m_primaryVideoIdx]->codec);
     }
 
     if (m_audioStreamIndex!=-1)
@@ -280,7 +339,7 @@ bool CLAVIStreamReader::initCodecs()
     return true;
 }
 
-CLCompressedVideoData* CLAVIStreamReader::getVideoData(const AVPacket& packet, AVCodecContext* codecContext)
+CLCompressedVideoData* CLAVIStreamReader::getVideoData(const AVPacket& packet, AVCodecContext* codecContext, int channel)
 {
     int extra = 0;
     CLCompressedVideoData* videoData = new CLCompressedVideoData(CL_MEDIA_ALIGNMENT, packet.size + extra, codecContext);
@@ -294,7 +353,7 @@ CLCompressedVideoData* CLAVIStreamReader::getVideoData(const AVPacket& packet, A
     videoData->compressionType = m_videoCodecId;
     //videoData->keyFrame = packet.flags & AV_PKT_FLAG_KEY;
     videoData->flags = packet.flags;
-    videoData->channelNumber = 0;
+    videoData->channelNumber = channel;
     videoData->timestamp = m_currentTime;
 
     videoData->useTwice = m_useTwice;
@@ -338,7 +397,7 @@ bool CLAVIStreamReader::getNextVideoPacket()
         if (!getNextPacket(nextPacket()))
             return false;
 
-        if (nextPacket().stream_index == m_videoStreamIndex)
+        if (nextPacket().stream_index == m_primaryVideoIdx)
             return true;
 
         av_free_packet(&nextPacket());
@@ -356,6 +415,16 @@ bool CLAVIStreamReader::getNextVideoPacket()
      }
      return rez;
  }
+
+int CLAVIStreamReader::streamIndexToChannel(int index)
+{
+    if (index < m_indexToChannel.size())
+        return m_indexToChannel[index];
+    else if(index == m_primaryVideoIdx)
+        return 0;
+    else
+        return -1;
+}
 
 CLAbstractMediaData* CLAVIStreamReader::getNextData()
 {
@@ -387,12 +456,13 @@ begin_label:
             m_topIFrameTime = jumpTime;
         else
             setSkipFramesToTime(jumpTime);
-        
+        for (int i = 0; i < m_needSetReverseFlag.size(); ++i)
+            m_needSetReverseFlag[i] = false;
     }
 
 	QnAviSemaphoreHelpr sem(aviSemaphore);
 
-	if (!m_formatContext || m_videoStreamIndex == -1)
+	if (!m_formatContext || m_primaryVideoIdx == -1)
 		return 0;
 
 	/*
@@ -401,7 +471,8 @@ begin_label:
 		smartSleep(m_needToSleep);
 	}
 	*/
-
+    int streamIndex = 0;
+    int channel = 0;
 	{
 		QMutexLocker mutex(&m_cs);
         if (skipFramesToTime() != 0)
@@ -424,24 +495,23 @@ begin_label:
 			m_haveSavedPacket = false;
 		}
 
-		if (currentPacket().stream_index == m_videoStreamIndex) // in case of video packet
-		{
-            m_previousTime = m_currentTime;
-            if (currentPacket().pts == AV_NOPTS_VALUE && currentPacket().dts == AV_NOPTS_VALUE) {
-                m_lastPacketTimes[currentPacket().stream_index] += m_lastFrameDuration;
-                m_currentTime = m_lastPacketTimes[currentPacket().stream_index];
-            }
-            else {
-			    m_currentTime =  packetTimestamp(m_formatContext->streams[m_videoStreamIndex], currentPacket());
-                if (m_previousTime != -1 && m_currentTime != -1 && m_currentTime > m_previousTime && m_currentTime - m_previousTime < 100*1000)
-                    m_lastFrameDuration = m_currentTime - m_previousTime;
-            }
-		}
+        streamIndex = currentPacket().stream_index;
+        channel = streamIndexToChannel(streamIndex);
+        m_previousTime = m_currentTime;
+        if (currentPacket().pts == AV_NOPTS_VALUE && currentPacket().dts == AV_NOPTS_VALUE) {
+            m_lastPacketTimes[currentPacket().stream_index] += m_lastFrameDuration;
+            m_currentTime = m_lastPacketTimes[currentPacket().stream_index];
+        }
+        else {
+		    m_currentTime =  packetTimestamp(m_formatContext->streams[m_primaryVideoIdx], currentPacket());
+            if (m_previousTime != -1 && m_currentTime != -1 && m_currentTime > m_previousTime && m_currentTime - m_previousTime < 100*1000)
+                m_lastFrameDuration = m_currentTime - m_previousTime;
+        }
 	}
 
 	CLAbstractMediaData* data = 0;
 
-	if (currentPacket().stream_index == m_videoStreamIndex) // in case of video packet
+	if (channel >= 0) // in case of video packet
 	{
         if (reverseMode)
         {
@@ -469,6 +539,9 @@ begin_label:
                 if (m_bottomIFrameTime == -1 && m_currentTime < m_topIFrameTime) {
                     m_bottomIFrameTime = m_currentTime;
                     currentPacket().flags |= AV_REVERSE_BLOCK_START;
+                    for (int i = 1; i < m_layout->numberOfChannels(); ++i) {
+                        m_needSetReverseFlag[i] = true;
+                    }
                 }
                 if (m_currentTime >= m_topIFrameTime)
                 {
@@ -512,13 +585,13 @@ begin_label:
 
 		m_bsleep = true; // sleep only in case of video
 
-        AVCodecContext* codecContext = m_formatContext->streams[m_videoStreamIndex]->codec;
-        CLCompressedVideoData* videoData = getVideoData(currentPacket(), codecContext);
+        AVCodecContext* codecContext = m_formatContext->streams[streamIndex]->codec;
+        CLCompressedVideoData* videoData = getVideoData(currentPacket(), codecContext, channel);
         m_useTwice = false;
 
         // -------------------------------------------
         // workaround ffmpeg bugged seek
-        {
+        if (channel == 0) {
             if (m_lastUIJumpTime != AV_NOPTS_VALUE)
             {
                 QMutexLocker mutex(&m_cs);
@@ -568,7 +641,7 @@ begin_label:
 
 			if (m_haveSavedPacket)
 			{
-				quint64 nextPacketTimestamp = packetTimestamp(m_formatContext->streams[m_videoStreamIndex], nextPacket());
+				quint64 nextPacketTimestamp = packetTimestamp(m_formatContext->streams[m_primaryVideoIdx], nextPacket());
 				if (!reverseMode && nextPacketTimestamp < skipFramesToTime())
 					videoData->ignore = true;
                 else if (reverseMode && nextPacketTimestamp > skipFramesToTime())
@@ -635,6 +708,7 @@ void CLAVIStreamReader::intChanneljumpTo(quint64 mksec, int /*channel*/)
 
 void CLAVIStreamReader::destroy()
 {
+    m_indexToChannel.clear();
     if (m_formatContext) // crashes without condition
     {
         av_close_input_file(m_formatContext);
@@ -653,7 +727,7 @@ bool CLAVIStreamReader::getNextPacket(AVPacket& packet)
 		int err = av_read_frame(m_formatContext, &packet);
 		if (err < 0)
 		{
-            if (m_lengthMksec < 200 * 1000)
+            if (m_lengthMksec < 1000 * 1000 * 5)
                 msleep(200); // prevent to fast file walk for very short files.
             destroy();
             m_eof = true;
@@ -665,7 +739,7 @@ bool CLAVIStreamReader::getNextPacket(AVPacket& packet)
                 return false;
         }
 
-		if (packet.stream_index != m_videoStreamIndex && packet.stream_index != m_audioStreamIndex)
+		if (streamIndexToChannel(packet.stream_index) == -1 && packet.stream_index != m_audioStreamIndex)
 		{
 			av_free_packet(&packet);
 			continue;

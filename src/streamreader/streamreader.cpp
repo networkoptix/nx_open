@@ -9,7 +9,7 @@ m_qulity(CLSLowest)
 //m_needSleep(true)
 {
 	memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame));
-	m_channel_number = dev->getVideoLayout()->numberOfChannels();
+	m_channel_number = dev->getVideoLayout(0)->numberOfChannels();
 
 	setStreamParams(m_device->getStreamParamList());
 

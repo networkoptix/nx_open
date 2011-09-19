@@ -428,25 +428,27 @@ bool SceneLayout::addDevice(CLDevice* device, bool update_scene_rect, CLBasicLay
 
 		bool introVideo = (m_content == CLSceneLayoutManager::instance().introScreenLayoutContent());
 
-		QSize wnd_size = m_grid.calcDefaultMaxItemSize(device->getVideoLayout());
+        CLStreamreader* reader = device->getDeviceStreamConnection();
+        const CLDeviceVideoLayout* layout = device->getVideoLayout(reader);
+		QSize wnd_size = m_grid.calcDefaultMaxItemSize(layout);
 
 		CLVideoWindowItem* video_wnd = 0;
 
         if (introVideo)
         {
-            video_wnd = new CLIntroVideoitem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height(), device->getUniqueId());
+            video_wnd = new CLIntroVideoitem(m_view, layout, wnd_size.width() , wnd_size.height(), device->getUniqueId());
         }
         else if (device->checkDeviceTypeFlag(CLDevice::ARCHIVE))//&& false) //777
         {
-            video_wnd = new CLVideoWindowArchiveItem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height(), device->getUniqueId());
+            video_wnd = new CLVideoWindowArchiveItem(m_view, layout, wnd_size.width() , wnd_size.height(), device->getUniqueId());
             video_wnd->setEditable(true);
     		GraphicsView *v = (GraphicsView*)m_scene->views().at(0);
             ((CLVideoWindowArchiveItem*)video_wnd)->setNavigationItem(v->getNavigationItem());
         }
         else
-            video_wnd = new CLVideoWindowItem(m_view, device->getVideoLayout(), wnd_size.width() , wnd_size.height(), device->getUniqueId());
+            video_wnd = new CLVideoWindowItem(m_view, layout, wnd_size.width() , wnd_size.height(), device->getUniqueId());
 
-        CLVideoCamera* cam = new CLVideoCamera(device, video_wnd, introVideo);
+        CLVideoCamera* cam = new CLVideoCamera(device, video_wnd, introVideo, reader);
 //        v->navigationItem()->setVideoCamera(cam);
 
         if (introVideo)

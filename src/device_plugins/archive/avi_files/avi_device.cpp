@@ -20,5 +20,13 @@ QString CLAviDevice::toString() const
 
 CLStreamreader* CLAviDevice::getDeviceStreamConnection()
 {
-	return new CLAVIStreamReader(this);
+    return new CLAVIStreamReader(this);
+}
+
+const CLDeviceVideoLayout* CLAviDevice::getVideoLayout(CLStreamreader* reader)
+{
+    if (reader)
+        return static_cast<CLAVIStreamReader*>(reader)->getLayout();
+    else
+        return CLDevice::getVideoLayout(reader);
 }

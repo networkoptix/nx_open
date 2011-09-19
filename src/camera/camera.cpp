@@ -7,16 +7,17 @@
 #include "../device/device.h"
 #include "ui/videoitem/video_wnd_item.h"
 
-CLVideoCamera::CLVideoCamera(CLDevice* device, CLVideoWindowItem* videovindow, bool generateEndOfStreamSignal) :
+CLVideoCamera::CLVideoCamera(CLDevice* device, CLVideoWindowItem* videovindow, bool generateEndOfStreamSignal, CLStreamreader* reader) :
     m_device(device),
     m_videovindow(videovindow),
     m_camdispay(generateEndOfStreamSignal),
     m_recorder(0),
-    mGenerateEndOfStreamSignal(generateEndOfStreamSignal)
+    mGenerateEndOfStreamSignal(generateEndOfStreamSignal),
+    m_reader(reader)
 {
     cl_log.log(QLatin1String("Creating camera for "), m_device->toString(), cl_logDEBUG1);
 
-    int videonum = m_device->getVideoLayout()->numberOfChannels();// how many sensors camera has
+    int videonum = m_device->getVideoLayout(m_reader)->numberOfChannels();// how many sensors camera has
 
     m_stat = new CLStatistics[videonum]; // array of statistics
 
@@ -26,7 +27,6 @@ CLVideoCamera::CLVideoCamera(CLDevice* device, CLVideoWindowItem* videovindow, b
 		m_videovindow->setStatistics(&m_stat[i], i);
 	}
 
-	m_reader = m_device->getDeviceStreamConnection();
 
 	m_reader->addDataProcessor(&m_camdispay);
 	m_reader->setStatistics(m_stat);
@@ -100,7 +100,8 @@ void CLVideoCamera::startRecording()
 
 void CLVideoCamera::stopRecording()
 {
-    if (m_recorder) {
+    if (m_recorder) 
+    {
 	    m_recorder->stop();
 	    m_reader->removeDataProcessor(m_recorder);
     }

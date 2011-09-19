@@ -6,6 +6,7 @@
 #include "streamreader/streamreader.h"
 #include "util.h"
 #include "base/nalUnits.h"
+#include "device_plugins/archive/avi_files/avi_strem_reader.h"
 
 #define FLUSH_SIZE (512*1024)
 static const int DEFAULT_VIDEO_STREAM_ID = 4113;
@@ -119,38 +120,40 @@ void CLStreamRecorder::correctH264Bitstream(AVPacket& packet)
 
 bool CLStreamRecorder::processData(CLAbstractData* data)
 {
-	if (m_firstTime)
-	{
-		m_firstTime = false;
-		onFirstData(data);
-	}
 
-	CLAbstractMediaData* md = static_cast<CLAbstractMediaData*>(data);
-	if (md->dataType != CLAbstractMediaData::VIDEO)
-		return true;
+    if (m_firstTime)
+    {
+        m_firstTime = false;
+        onFirstData(data);
+    }
 
-	CLCompressedVideoData *vd= static_cast<CLCompressedVideoData*>(data);
-	int channel = vd->channelNumber;
+    CLAbstractMediaData* md = static_cast<CLAbstractMediaData*>(data);
+    if (md->dataType != CLAbstractMediaData::VIDEO)
+        return true;
 
-	if (channel>CL_MAX_CHANNELS-1)
-		return true;
+    CLCompressedVideoData *vd= static_cast<CLCompressedVideoData*>(data);
+    int channel = vd->channelNumber;
 
-	bool keyFrame = vd->flags & AV_PKT_FLAG_KEY;
 
-	if (keyFrame)
-		m_gotKeyFrame[channel] = true;
+    if (channel>CL_MAX_CHANNELS-1)
+        return true;
 
-	if (!m_gotKeyFrame[channel]) // did not got key frame so far
-		return true;
+    bool keyFrame = vd->flags & AV_PKT_FLAG_KEY;
 
-	if (m_data[channel]==0)
-		m_data[channel] = new CLByteArray(0, 1024*1024);
+    if (keyFrame)
+        m_gotKeyFrame[channel] = true;
 
-	if (m_description[channel]==0)
-	{
-		m_description[channel] = new CLByteArray(0, 1024);
-		m_description[channel]->write((char*)(&m_version), 4); // version
-	}
+    if (!m_gotKeyFrame[channel]) // did not got key frame so far
+        return true;
+
+    if (m_data[channel]==0)
+        m_data[channel] = new CLByteArray(0, 1024*1024);
+
+    if (m_description[channel]==0)
+    {
+        m_description[channel] = new CLByteArray(0, 1024);
+        m_description[channel]->write((char*)(&m_version), 4); // version
+    }
 
     AVPacket videoPkt;
     av_init_packet(&videoPkt);
@@ -174,7 +177,7 @@ bool CLStreamRecorder::processData(CLAbstractData* data)
         m_videoPacketWrited = true;
     }
 
-	return true;
+    return true;
 }
 
 void CLStreamRecorder::endOfRun()
@@ -272,6 +275,26 @@ qint64 CLStreamRecorder::seekPacketImpl(qint64 offset, qint32 whence)
     return -1;
 }
 
+QFileInfo CLStreamRecorder::getTempFileName(const QString& deviceId)
+{
+    QDir directory(getTempRecordingDir());
+    QStringList filter;
+    filter << deviceId + QString(".*");
+    QFileInfoList list = directory.entryInfoList(filter);
+    if (list.isEmpty())
+        return QString();
+    else
+        return list[0];
+}
+
+QFileInfoList CLStreamRecorder::getRecordedFiles(const QString& dir)
+{
+    QDir directory(dir);
+    QStringList filter;
+    filter << "*.*";
+    return directory.entryInfoList(filter, QDir::Files);
+}
+
 bool CLStreamRecorder::initFfmpegContainer(CLCompressedVideoData* mediaData, CLDevice* dev)
 {
     avcodec_init();
@@ -308,8 +331,13 @@ bool CLStreamRecorder::initFfmpegContainer(CLCompressedVideoData* mediaData, CLD
         cl_log.log("Can't initialize output format parameters for recording video camera", cl_logERROR);
         return false;
     }
+    QString layoutStr = CLAVIStreamReader::serializeLayout(dev->getVideoLayout(0));
+    av_metadata_set2(&m_formatCtx->metadata, "video_layout", layoutStr.toAscii().data(), 0);
+    //m_primaryChannel = mediaData->channelNumber;
+    //av_metadata_set2(&m_formatCtx->metadata, "primary_video", QString::number(m_primaryChannel).toAscii().data(), 0);
 
-    for (unsigned int i = 0; i < dev->getVideoLayout()->numberOfChannels(); ++i) 
+    const CLDeviceVideoLayout* layout = dev->getVideoLayout(0);
+    for (unsigned int i = 0; i < layout->numberOfChannels(); ++i) 
     {
         
         AVStream* videoStream = av_new_stream(m_formatCtx, DEFAULT_VIDEO_STREAM_ID+i);
@@ -337,9 +365,8 @@ bool CLStreamRecorder::initFfmpegContainer(CLCompressedVideoData* mediaData, CLD
         videoStream->sample_aspect_ratio = videoCodecCtx->sample_aspect_ratio;
         videoStream->first_dts = 0;
 
-        const CLDeviceVideoLayout* layout = dev->getVideoLayout();
         QString layoutData = QString::number(layout->v_position(i)) + QString(",") + QString(layout->h_position(i));
-        av_metadata_set2(&videoStream->metadata, "layout", layoutData.toAscii().data(), 0);
+        av_metadata_set2(&videoStream->metadata, "layout_channel", QString::number(i).toAscii().data(), 0);
 
         AVCodec* videoCodec = avcodec_find_encoder(mediaData->compressionType);
         if (avcodec_open(videoCodecCtx, videoCodec) < 0)
@@ -353,56 +380,17 @@ bool CLStreamRecorder::initFfmpegContainer(CLCompressedVideoData* mediaData, CLD
     return true;
 }
 
-QByteArray CLStreamRecorder::serializeMetadata(const CLDeviceVideoLayout* layout)
-{
-    QByteArray rez;
-    rez.append(QDateTime::currentDateTime().toMSecsSinceEpoch());
-    rez.append((quint8) layout->numberOfChannels());
-    for (unsigned int i = 0; i < layout->numberOfChannels(); ++i)
-    {
-        rez.append((quint8) layout->h_position(i));
-        rez.append((quint8)layout->v_position(i));
-    }
-    return rez.toBase64();
-}
-
 void CLStreamRecorder::onFirstData(CLAbstractData* data)
 {
     m_videoPacketWrited = false;
     CLAbstractMediaData* media = static_cast<CLAbstractMediaData*> (data);
     QDir current_dir;
-    current_dir.mkpath(dirHelper());
+    current_dir.mkpath(getTempRecordingDir());
 
     CLStreamreader* reader = data->dataProvider;
     CLDevice* dev = reader->getDevice();
 
     initFfmpegContainer(static_cast<CLCompressedVideoData*>(data), dev);
-
-    QDomDocument doc;
-    QDomElement root = doc.createElement(QLatin1String("layout"));
-    doc.appendChild(root);
-
-    root.setAttribute(QLatin1String("channels"), dev->getVideoLayout()->numberOfChannels());
-    root.setAttribute(QLatin1String("width"), dev->getVideoLayout()->width());
-    root.setAttribute(QLatin1String("height"), dev->getVideoLayout()->height());
-
-    root.setAttribute(QLatin1String("name"), dev->getName() + QDateTime::currentDateTime().toString(QLatin1String(" ddd MMM d yyyy  hh_mm")));
-
-    for (unsigned int i = 0; i < dev->getVideoLayout()->numberOfChannels(); ++i)
-    {
-        QDomElement channel = doc.createElement(QLatin1String("channel"));
-
-        channel.setAttribute(QLatin1String("number"), i);
-        channel.setAttribute(QLatin1String("h_pos"), dev->getVideoLayout()->h_position(i));
-        channel.setAttribute(QLatin1String("v_pos"), dev->getVideoLayout()->v_position(i));
-
-        root.appendChild(channel);
-    }
-
-    QFile file(dirHelper() + QLatin1String("/layout.xml"));
-    file.open(QIODevice::WriteOnly);
-    file.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
-    file.write(doc.toString().toUtf8());
 }
 
 QString CLStreamRecorder::filenameData(int channel)

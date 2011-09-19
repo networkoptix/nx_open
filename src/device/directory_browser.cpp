@@ -2,7 +2,6 @@
 #include "file_device.h"
 #include "device_plugins/archive/avi_files/avi_device.h"
 #include "util.h"
-#include "device_plugins/archive/archive/archive_device.h"
 #include "device_plugins/archive/filetypesupport.h"
 
 CLDeviceDirectoryBrowser::CLDeviceDirectoryBrowser():
@@ -95,7 +94,7 @@ CLDeviceList CLDeviceDirectoryBrowser::findDevices(const QString& directory)
         // if this is recorded clip dir
         foreach (const QFileInfo &fi, sub_dirs)
         {
-            CLDevice *dev = new CLArchiveDevice(fi.absoluteFilePath());
+            CLDevice *dev = new CLAviDevice(fi.absoluteFilePath()); // CLArchiveDevice(fi.absoluteFilePath());
             result[dev->getUniqueId()] = dev;
         }
     }

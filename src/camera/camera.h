@@ -17,7 +17,7 @@ class CLVideoCamera : public QObject, public CLAbstractComplicatedItem
     Q_OBJECT
 public:
     // number of videovindows in array must be the same as device->getNumberOfVideoChannels
-    CLVideoCamera(CLDevice* device, CLVideoWindowItem* videovindow, bool generateEndOfStreamSignal);
+    CLVideoCamera(CLDevice* device, CLVideoWindowItem* videovindow, bool generateEndOfStreamSignal, CLStreamreader* reader);
     virtual ~CLVideoCamera();
 
     virtual void startDispay();

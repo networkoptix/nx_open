@@ -82,6 +82,16 @@ public:
         return m_height;
     }
 
+    virtual void setWidth(int value) 
+    {
+        m_width = value;
+    }
+
+    virtual void setHeight(int value)
+    {
+        m_height = value;
+    }
+
     void setChannel(int h_pos, int v_pos, int channel)
     {
         int index = v_pos*m_width + h_pos;

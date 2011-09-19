@@ -108,9 +108,9 @@ public:
 	// after setVideoLayout is called device is responsable for the destroying the layout 
 	void setVideoLayout(CLDeviceVideoLayout* layout);
 
-	const CLDeviceVideoLayout* getVideoLayout() const;
+	virtual const CLDeviceVideoLayout* getVideoLayout(CLStreamreader* reader);
 
-        bool associatedWithFile() const;
+    bool associatedWithFile() const;
 public:
 	static QStringList supportedDevises();
 
