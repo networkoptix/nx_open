@@ -1,5 +1,7 @@
 #include "start_screen_content.h"
 
+#include "ui/skin.h"
+
 QString start_screen = QLatin1String("start screen");
 
 extern int SCENE_LEFT;
@@ -50,14 +52,14 @@ LayoutContent& startscreen_content()
         settings.pos_y = noLogoTop;
         settings.width = noLogoWidth;
         settings.height = noLogoHeight;
-        instance.addImage(QLatin1String(":/skin/startscreen/no_logo.png"), QString(), QString(), settings);
+        instance.addImage(Skin::path(QLatin1String("startscreen/no_logo.png")), QString(), QString(), settings);
 
         settings.name = button_layout;
         settings.pos_x = eveLogoLeft;
         settings.pos_y = eveLogoTop;
         settings.width = eveLogoWidth;
         settings.height = eveLogoHeight;
-        instance.addImage(QLatin1String(":/skin/startscreen/eve_logo.png"), QString(), QString(), settings);
+        instance.addImage(Skin::path(QLatin1String("startscreen/eve_logo.png")), QString(), QString(), settings);
 
 
         //settings.name = button_layout;

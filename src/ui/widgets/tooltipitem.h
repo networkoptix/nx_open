@@ -34,12 +34,14 @@ private:
 };
 
 
+#include "ui/skin.h"
+
 class StyledToolTipItem: public ToolTipItem
 {
 public:
     StyledToolTipItem(QGraphicsItem *parent = 0) : ToolTipItem(parent)
     {
-        setPixmap(QPixmap(QLatin1String(":/skin/time-window.png")));
+        setPixmap(Skin::path(QLatin1String("time-window.png")));
         setTransformationMode(Qt::FastTransformation);
         setShapeMode(QGraphicsPixmapItem::HeuristicMaskShape);
         setOffset(-pixmap().width() / 2, 0);
@@ -47,9 +49,6 @@ public:
         setTextColor(QColor(63, 159, 216));
         setTextRect(ToolTipItem::boundingRect().adjusted(5, 5, -5, -13));
     }
-/*
-    inline QRectF boundingRect() const
-    { return ToolTipItem::boundingRect().adjusted(-5, -5, 5, 5); }*/
 };
 
 #endif // TOOLTIPITEM_H

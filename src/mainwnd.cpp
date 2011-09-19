@@ -1,10 +1,14 @@
 #include "mainwnd.h"
-#include "ui/video_cam_layout/start_screen_content.h"
-#include "settings.h"
+
+#include <QtCore/QDirIterator>
+#include <QtCore/QFileInfo>
+
 #include "ui/layout_navigator.h"
 #include "ui/video_cam_layout/layout_manager.h"
+#include "ui/video_cam_layout/start_screen_content.h"
 #include "device/directory_browser.h"
 #include "device_plugins/archive/filetypesupport.h"
+#include "settings.h"
 #include "util.h"
 
 #include "device_plugins/archive/avi_files/avi_dvd_device.h"
@@ -22,10 +26,11 @@ void MainWnd::findAcceptedFiles(QStringList& files, const QString& path)
         {
             // open all titles on DVD
             QStringList titles = CLAVIDvdStreamReader::getTitleList(path);
-            foreach(QString title, titles)
+            foreach (const QString &title, titles)
                 files << path + QLatin1String("?title=") + title;
         }
-        else {
+        else
+        {
             files.append(path);
         }
     }
@@ -46,32 +51,25 @@ void MainWnd::findAcceptedFiles(QStringList& files, const QString& path)
                 if (QFileInfo(nextFilename).isFile())
                 {
                     if (fileTypeSupport.isFileSupported(nextFilename))
-                    {
                         files.append(nextFilename);
-                    }
                 }
             }
         }
         else if (fileInfo.isFile())
         {
             if (fileTypeSupport.isFileSupported(path))
-            {
                 files.append(path);
-            }
         }
     }
 }
 
-MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WFlags flags):
-//QMainWindow(parent, flags),
-m_normalView(0)
+MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
+//    : QMainWindow(parent, flags),
+    : QWidget(parent, flags),
+    m_normalView(0)
 {
     m_instance = this;
-    Q_UNUSED(parent);
-    Q_UNUSED(flags);
 
-    setAcceptDrops(true);
-    //ui.setupUi(this);
     setWindowTitle(APPLICATION_NAME);
 
     setAttribute(Qt::WA_QuitOnClose);
@@ -84,6 +82,8 @@ m_normalView(0)
 
     //setWindowOpacity(.80);
 
+    setAcceptDrops(true);
+
     //=======================================================
 
     const int min_wisth = 800;
@@ -92,10 +92,7 @@ m_normalView(0)
 
     QStringList files;
     for (int i = 1; i < argc; ++i)
-    {
-        QString fileName = fromNativePath(QString::fromLocal8Bit(argv[i]));
-        findAcceptedFiles(files, fileName);
-    }
+        findAcceptedFiles(files, fromNativePath(QString::fromLocal8Bit(argv[i])));
 
     LayoutContent* content = 0;
 
@@ -105,29 +102,27 @@ m_normalView(0)
 
         content = CLSceneLayoutManager::instance().getNewEmptyLayoutContent();
 
-        foreach(QString file, files)
-        {
+        foreach (const QString &file, files)
             content->addDevice(file);
-        }
     }
 
     //=======add====
     m_normalView = new CLLayoutNavigator(this, content);
-    QLayout* l = new QHBoxLayout();
-    l->addWidget(&(m_normalView->getView()));
 
+    QLayout *layout = new QHBoxLayout;
+    layout->addWidget(&m_normalView->getView());
     // Can't set 0,0,0,0 on Windows as in fullScreen mode context menu becomes invisible
     // Looks like QT bug: http://bugreports.qt.nokia.com/browse/QTBUG-7556
 #ifdef Q_OS_WIN
-    l->setContentsMargins(0, 1, 0, 0);
+    layout->setContentsMargins(0, 1, 0, 0);
 #else
-    l->setContentsMargins(0, 0, 0, 0);
+    layout->setContentsMargins(0, 0, 0, 0);
 #endif
+    setLayout(layout);
 
     m_normalView->setMode(NORMAL_ViewMode);
     m_normalView->getView().setViewMode(GraphicsView::NormalView);
 
-    setLayout(l);
     if (!files.isEmpty())
         show();
     else
@@ -152,26 +147,25 @@ void MainWnd::addFilesToCurrentOrNewLayout(const QStringList& files, bool forceN
     // If current content created by opening files or DND, use it. Otherwise create new one.
     LayoutContent* content = m_normalView->getView().getCamLayOut().getContent();
 
-    if (!forceNewLayout && content != CLSceneLayoutManager::instance().getSearchLayout() &&
-        content != CLSceneLayoutManager::instance().startScreenLayoutContent())
+    if (!forceNewLayout && content != CLSceneLayoutManager::instance().getSearchLayout()
+        && content != CLSceneLayoutManager::instance().startScreenLayoutContent())
     {
         cl_log.log(QLatin1String("Using old layout, content ") + content->getName(), cl_logALWAYS);
-        foreach(QString file, files)
+        foreach (const QString &file, files)
         {
             m_normalView->getView().getCamLayOut().addDevice(file, true);
             content->addDevice(file);
         }
 
         m_normalView->getView().fitInView(600, 100, SLOW_START_SLOW_END);
-    } else
+    }
+    else
     {
         cl_log.log(QLatin1String("Creating new layout, content ") + content->getName(), cl_logALWAYS);
         content = CLSceneLayoutManager::instance().getNewEmptyLayoutContent();
 
-        foreach(QString file, files)
-        {
+        foreach (const QString &file, files)
             content->addDevice(file);
-        }
 
         m_normalView->goToNewLayoutContent(content);
     }
@@ -215,12 +209,8 @@ void MainWnd::dragEnterEvent(QDragEnterEvent *event)
 void MainWnd::dropEvent(QDropEvent *event)
 {
     QStringList files;
-    foreach (QUrl url, event->mimeData()->urls())
-    {
-        QString filename = url.toLocalFile();
-
-        findAcceptedFiles(files, filename);
-    }
+    foreach (const QUrl &url, event->mimeData()->urls())
+        findAcceptedFiles(files, url.toLocalFile());
 
     addFilesToCurrentOrNewLayout(files, event->keyboardModifiers() & Qt::AltModifier);
     activate();

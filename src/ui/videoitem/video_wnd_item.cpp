@@ -177,13 +177,17 @@ QPointF CLVideoWindowItem::getBestSubItemPos(CLSubItemType type)
     case CloseSubItem:
         return QPointF(width()-310, 20);
 
+    case MakeScreenshotSubItem:
+        return QPointF(width()-310, 320);
+
     case RecordingSubItem:
         return QPointF(-30, 100);
 
     default:
-        return QPointF(-1001, -1001);
         break;
     }
+
+    return QPointF(-1001, -1001);
 }
 
 QRect CLVideoWindowItem::getSubChannelRect(unsigned int channel) const

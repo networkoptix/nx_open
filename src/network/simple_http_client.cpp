@@ -4,6 +4,7 @@
 
 #include <sstream>
 #include "util.h"
+#include "base/log.h"
 
 using namespace std;
 
@@ -19,6 +20,7 @@ CLSimpleHTTPClient::CLSimpleHTTPClient(const QHostAddress& host, int port, unsig
 
 CLSimpleHTTPClient::~CLSimpleHTTPClient()
 {
+    
 }
 
 CLHttpStatus CLSimpleHTTPClient::getNextLine()
@@ -43,6 +45,9 @@ CLHttpStatus CLSimpleHTTPClient::getNextLine()
 		response << curr;
 		prev = curr;
 		++readed;
+
+        if (readed > 2000)
+            break;
 	}
 
 	return CL_HTTP_SUCCESS;
@@ -51,11 +56,13 @@ CLHttpStatus CLSimpleHTTPClient::getNextLine()
 
 CLHttpStatus CLSimpleHTTPClient::openStream(bool recursive)
 {
-
 	try
 	{
+        
 		if (!m_sock.connect(m_host.toString().toLatin1().data(), m_port))
 			return CL_HTTP_HOST_NOT_AVAILABLE;
+
+        
 
 		QString request;
 		QTextStream os(&request);
@@ -74,11 +81,16 @@ CLHttpStatus CLSimpleHTTPClient::openStream(bool recursive)
 
 		os<< "\r\n";
 
+        
         if (!m_sock.send(request.toLatin1().data(), request.toLatin1().size()))
             return CL_HTTP_HOST_NOT_AVAILABLE;
 
+        
+
 		if (CL_HTTP_HOST_NOT_AVAILABLE==getNextLine())
 			return CL_HTTP_HOST_NOT_AVAILABLE;
+
+        
 
 		if (!m_line.contains(QLatin1String("200 OK")))// not ok
 		{

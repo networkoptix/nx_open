@@ -13,9 +13,7 @@
 
 #include <QtMultimedia/QAudioFormat>
 
-#ifdef _WIN32
-#  define OPENAL_WIN32_ONLY
-#endif
+#define OPENAL_NEW_ALGORITHM
 
 class QtvAudioDevice;
 typedef struct ALCdevice_struct ALCdevice;
@@ -57,7 +55,7 @@ private:
     mutable QMutex m_mtx;
     QAudioFormat m_audioFormat;
 
-#ifdef OPENAL_WIN32_ONLY
+#ifdef OPENAL_NEW_ALGORITHM
     uint m_tmpBuffer[1024];
 #else
     QVector<uint> m_buffers;

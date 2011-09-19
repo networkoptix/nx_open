@@ -26,6 +26,7 @@
 #include "util.h"
 #include "videoitem/unmoved/multipage/page_selector.h"
 #include "ui/ui_common.h"
+#include "ui/skin.h"
 #include "ui/animation/property_animation.h"
 #include "ui/recordingsettingswidget.h"
 #include "ui/dialogs/tagseditdialog.h"
@@ -164,7 +165,7 @@ GraphicsView::GraphicsView(QWidget* mainWnd) :
     //http://www.qtcentre.org/threads/24825-Does-qgraphicsscene-schedule-updates-in-a-separate-thread
     m_scene.setItemIndexMethod(QGraphicsScene::NoIndex);
 
-    //setBackgroundBrush(QPixmap(":/skin/logo.png"));
+    //setBackgroundBrush(Skin::pixmap(QLatin1String("logo.png"));
     //m_scene.setItemIndexMethod(QGraphicsScene::NoIndex);
 
     //setTransformationAnchor(QGraphicsView::NoAnchor);
@@ -231,7 +232,7 @@ void GraphicsView::removeFileDeviceItem(CLDeviceSearcher& deviceSearcher, CLAbst
 
     CLDeviceList& all_devices = deviceSearcher.getAllDevices();
 
-    all_devices.remove(device->getUniqueId());
+    deviceSearcher.removeDeviceUnlocked(device->getUniqueId());
 
     QList<CLAbstractSubItemContainer*> lst;
     lst.push_back(aitem);
@@ -589,55 +590,55 @@ void GraphicsView::initDecoration()
 
     if (exitButton)
     {
-        item = new CLUnMovedPixtureButton(button_exit, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/exit-application.png"), decoration_size, decoration_size, 255);
+        item = new CLUnMovedPixtureButton(button_exit, 0, global_decoration_opacity, 1.0, Skin::path(QLatin1String("decorations/exit-application.png")), decoration_size, decoration_size, 255);
         addStaticItem(item);
     }
 
     if (toggleFullscreen)
     {
-        item = new CLUnMovedPixtureButton(button_toggleFullScreen, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/togglefullscreen.png"), decoration_size, decoration_size, 255);
+        item = new CLUnMovedPixtureButton(button_toggleFullScreen, 0, global_decoration_opacity, 1.0, Skin::path(QLatin1String("decorations/togglefullscreen.png")), decoration_size, decoration_size, 255);
         addStaticItem(item);
     }
 
     if (settings)
     {
-        item = new CLUnMovedPixtureButton(button_settings, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/settings.png"), decoration_size, decoration_size, 255);
+        item = new CLUnMovedPixtureButton(button_settings, 0, global_decoration_opacity, 1.0, Skin::path(QLatin1String("decorations/settings.png")), decoration_size, decoration_size, 255);
         addStaticItem(item);
     }
 
     if (level_up)
     {
-        item = new CLUnMovedPixtureButton(button_level_up, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/level-up.png"), decoration_size, decoration_size, 255);
+        item = new CLUnMovedPixtureButton(button_level_up, 0, global_decoration_opacity, 1.0, Skin::path(QLatin1String("decorations/level-up.png")), decoration_size, decoration_size, 255);
         addStaticItem(item);
     }
 
     if (content->checkDecorationFlag(LayoutContent::BackGroundLogo))
     {
-        item = new CLUnMovedPixture(QLatin1String("background"), 0, 0.05, 0.05, QLatin1String(":/skin/startscreen/no_logo_bkg.png"), viewport()->width(), viewport()->height(), -100);
+        item = new CLUnMovedPixture(QLatin1String("background"), 0, 0.05, 0.05, Skin::path(QLatin1String("startscreen/no_logo_bkg.png")), viewport()->width(), viewport()->height(), -100);
         addStaticItem(item, false);
     }
 
     if (magnifyingGlass)
     {
-        item = new CLUnMovedPixtureButton(button_magnifyingglass, 0,  0.4, 1.0, QLatin1String(":/skin/decorations/search.png"), decoration_size, decoration_size, 255);
+        item = new CLUnMovedPixtureButton(button_magnifyingglass, 0, 0.4, 1.0, Skin::path(QLatin1String("decorations/search.png")), decoration_size, decoration_size, 255);
         addStaticItem(item);
     }
 
     if (square_layout)
     {
-        item = new CLUnMovedPixtureButton(button_squarelayout, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/square-view.png"), decoration_size, decoration_size, 255);
+        item = new CLUnMovedPixtureButton(button_squarelayout, 0, global_decoration_opacity, 1.0, Skin::path(QLatin1String("decorations/square-view.png")), decoration_size, decoration_size, 255);
         addStaticItem(item);
     }
 
     if (long_layout)
     {
-        item = new CLUnMovedPixtureButton(button_longlayout, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/horizontal-view.png"), decoration_size, decoration_size, 255);
+        item = new CLUnMovedPixtureButton(button_longlayout, 0, global_decoration_opacity, 1.0, Skin::path(QLatin1String("decorations/horizontal-view.png")), decoration_size, decoration_size, 255);
         addStaticItem(item);
     }
 
     if (sigle_line_layout)
     {
-        item = new CLUnMovedPixtureButton(button_singleLineLayout, 0,  global_decoration_opacity, 1.0, QLatin1String(":/skin/decorations/single-line-view.png"), decoration_size, decoration_size, 255);
+        item = new CLUnMovedPixtureButton(button_singleLineLayout, 0, global_decoration_opacity, 1.0, Skin::path(QLatin1String("decorations/single-line-view.png")), decoration_size, decoration_size, 255);
         addStaticItem(item);
     }
 
@@ -959,7 +960,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 
             QDrag *drag = new QDrag(this);
             drag->setMimeData(mimeData);
-            drag->setPixmap(cached(QLatin1String(":/skin/camera_dd_icon.png")));
+            drag->setPixmap(cached(Skin::path(QLatin1String("camera_dd_icon.png"))));
 
             drag->exec(Qt::CopyAction);
             m_scene.clearSelection();
@@ -1713,7 +1714,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
         {
             CLDevice* device = aitem->getComplicatedItem()->getDevice();
 
-            QMessageBox::StandardButton result = YesNoCancel(this, tr("Remove file confirmation"), QString("Are you sure you want to delete file ") + device->getUniqueId() + "?");
+            QMessageBox::StandardButton result = YesNoCancel(this, tr("Delete file confirmation"), QString("Are you sure you want to delete file ") + device->getUniqueId() + "?");
             if (result == QMessageBox::Yes)
             {
                 CLDeviceSearcher& deviceSearcher = CLDeviceManager::instance().getDeviceSearcher();
@@ -1751,7 +1752,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
         else if (act == &cm_remove_from_disk)
         {
             QString message = tr("Are you sure you want to delete %1 files?").arg(selectedItems.size());
-            if (YesNoCancel(this, tr("Remove file confirmation"), message) == QMessageBox::Yes)
+            if (YesNoCancel(this, tr("Delete file confirmation"), message) == QMessageBox::Yes)
             {
                 CLDeviceSearcher& deviceSearcher = CLDeviceManager::instance().getDeviceSearcher();
                 QMutexLocker lock(&deviceSearcher.all_devices_mtx);
@@ -2824,9 +2825,9 @@ void GraphicsView::toggleRecording()
             grabberCaptureMode = CLScreenGrabber::CaptureMode_DesktopWithoutAero;
         QPixmap logo;
 #if defined(CL_TRIAL_MODE) || defined(CL_FORCE_LOGO)
-        //QString logoName = QString(":/skin/logo_") + QString::number(encodingSize.width()) + QString("_") + QString::number(encodingSize.height()) + QString(".png");
-        QString logoName = QString(":/skin/logo_1920_1080.png");
-        logo = QPixmap(logoName); // hint: comment this line to remove logo
+        //QString logoName = QString("logo_") + QString::number(encodingSize.width()) + QString("_") + QString::number(encodingSize.height()) + QString(".png");
+        QString logoName = QLatin1String("logo_1920_1080.png");
+        logo = Skin::pixmap(logoName); // hint: comment this line to remove logo
 #endif
         DesktopFileEncoder *desktopEncoder = new DesktopFileEncoder(
                 filePath,

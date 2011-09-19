@@ -7,6 +7,7 @@
 #include "../../video_wnd_archive_item.h"
 #include "device_plugins/archive/abstract_archive_stream_reader.h"
 #include "ui/graphicsview.h"
+#include "ui/skin.h"
 #include "util.h"
 
 int FullScreenHight = 35;
@@ -27,8 +28,8 @@ CLArchiveNavigatorItem::CLArchiveNavigatorItem(CLAbstractSubItemContainer* paren
 	mType = ArchiveNavigatorSubItem;
 
 	/*/
-	mPlayItem = new CLImgSubItem(this, ":/skin/try/play2.png", CLAbstractSubItem::Play, 0.7, 1.0, m_height, m_height);
-	mPauseItem = new CLImgSubItem(this, ":/skin/try/pause2.png", CLAbstractSubItem::Pause, 0.7, 1.0, m_height, m_height);
+	mPlayItem = new CLImgSubItem(this, Skin::path(QLatin1String("try/play2.png"), CLAbstractSubItem::Play, 0.7, 1.0, m_height, m_height);
+	mPauseItem = new CLImgSubItem(this, Skin::path(QLatin1String("try/pause2.png"), CLAbstractSubItem::Pause, 0.7, 1.0, m_height, m_height);
 	mPauseItem->setVisible(false);
 
 	mSlider_item = new QGraphicsProxyWidget(this);
@@ -54,17 +55,17 @@ CLArchiveNavigatorItem::CLArchiveNavigatorItem(CLAbstractSubItemContainer* paren
 
 	int button_width = m_height*m_buttonAspectRatio;
 
-	mPlayItem = new CLImgSubItem(this, QLatin1String(":/skin/player/play.png"), PlaySubItem, 0.7, 1.0, button_width, m_height);
-	mPauseItem = new CLImgSubItem(this, QLatin1String(":/skin/player/pause.png"), PauseSubItem, 0.7, 1.0, button_width, m_height);
+	mPlayItem = new CLImgSubItem(this, Skin::path(QLatin1String("player/play.png")), PlaySubItem, 0.7, 1.0, button_width, m_height);
+	mPauseItem = new CLImgSubItem(this, Skin::path(QLatin1String("player/pause.png")), PauseSubItem, 0.7, 1.0, button_width, m_height);
 	mPlayItem->setVisible(false);
 
-	mRewindBackward = new CLImgSubItem(this, QLatin1String(":/skin/player/to_very_beginning.png"), RewindBackwardSubItem, 0.5, 1.0, button_width, m_height);
-	mRewindForward = new CLImgSubItem(this, QLatin1String(":/skin/player/to_very_end.png"), RewindForwardSubItem, 0.5, 1.0, button_width, m_height);
+	mRewindBackward = new CLImgSubItem(this, Skin::path(QLatin1String("player/to_very_beginning.png")), RewindBackwardSubItem, 0.5, 1.0, button_width, m_height);
+	mRewindForward = new CLImgSubItem(this, Skin::path(QLatin1String("player/to_very_end.png")), RewindForwardSubItem, 0.5, 1.0, button_width, m_height);
 
-	mStepForward = new CLImgSubItem(this, QLatin1String(":/skin/player/frame_forward.png"), StepForwardSubItem, 0.5, 1.0, button_width, m_height);
+	mStepForward = new CLImgSubItem(this, Skin::path(QLatin1String("player/frame_forward.png")), StepForwardSubItem, 0.5, 1.0, button_width, m_height);
 	mStepForward->setVisible(false);
 
-	mStepBackward = new CLImgSubItem(this, QLatin1String(":/skin/player/frame_backward.png"), StepBackwardSubItem, 0.5, 1.0, button_width, m_height);
+	mStepBackward = new CLImgSubItem(this, Skin::path(QLatin1String("player/frame_backward.png")), StepBackwardSubItem, 0.5, 1.0, button_width, m_height);
 	mStepBackward->setVisible(false);
 
 	/**/

@@ -448,3 +448,73 @@ CLDeviceList CLDeviceSearcher::resolveUnknown_helper(CLDeviceList& lst)
 	return result;
 
 }
+
+void CLDeviceSearcher::releaseDevices()
+{
+    QMutexLocker lock(&all_devices_mtx);
+    foreach(CLDevice* device, all_devices)
+    {
+        device->releaseRef();
+    }
+}
+
+void CLDeviceSearcher::addDevice(CLDevice* device)
+{
+    const QString& deviceId = device->getUniqueId();
+
+    QMutexLocker lock(&all_devices_mtx);
+    all_devices.insert(device->getUniqueId(), device);
+
+    if (device->getDeviceType() == CLDevice::VIDEODEVICE)
+    {
+        QString dirName = QFileInfo(deviceId).dir().path();
+        DirectoryEntries::iterator iter = m_directoryEntries.find(dirName);
+        if (iter != m_directoryEntries.end())
+        {
+            iter->insert(deviceId);
+        }
+        else
+        {
+            QSet<QString> deviceIds;
+            deviceIds.insert(deviceId);
+            m_directoryEntries.insert(dirName, deviceIds);
+        }
+    }
+}
+
+void CLDeviceSearcher::removeDeviceUnlocked(const QString& deviceId)
+{
+    all_devices.remove(deviceId);
+
+    QString dirName = QFileInfo(deviceId).dir().path();
+    DirectoryEntries::iterator iter = m_directoryEntries.find(dirName);
+    if (iter != m_directoryEntries.end())
+        iter->remove(deviceId);
+}
+
+void CLDeviceSearcher::removeRemoved(QStringList folders, CLDeviceList devices)
+{
+    QMutexLocker lock(&all_devices_mtx);
+
+    QSet<QString> deviceIds;
+
+    foreach (CLDevice* device, devices)
+    {
+        deviceIds.insert(device->getUniqueId());
+    }
+
+    foreach(const QString& folder, folders)
+    {
+        if (m_directoryEntries.contains(folder))
+        {
+            QSet<QString> deviceIdsToRemove = m_directoryEntries[folder];
+            deviceIdsToRemove.subtract(deviceIds);
+            m_directoryEntries[folder].intersect(deviceIds);
+
+            foreach (const QString& deviceId, deviceIdsToRemove)
+            {
+                removeDeviceUnlocked(deviceId);
+            }
+        }
+    }
+}

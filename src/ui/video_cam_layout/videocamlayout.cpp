@@ -552,17 +552,12 @@ bool SceneLayout::addItem(CLAbstractSceneItem* item, bool update_scene_rect, CLB
     item->setPos(m_grid.posFromItemSettings(itemSettings));
     //item->setRotation(itemSettings.angle);
 
-	//=========
-	if (isEditable() || item->isEtitable())
-	{
-		item->addSubItem(CloseSubItem);
-	}
-	//=========
+    if (isEditable() || item->isEtitable())
+        item->addSubItem(CloseSubItem);
+    item->addSubItem(MakeScreenshotSubItem);
 
     if (update_scene_rect)
-    {
         updateSceneRect();
-    }
 
     connect(item, SIGNAL(onAspectRatioChanged(CLAbstractSceneItem*)), this, SLOT(onAspectRatioChanged(CLAbstractSceneItem*)));
 
@@ -579,6 +574,7 @@ bool SceneLayout::addItem(CLAbstractSceneItem* item, bool update_scene_rect, CLB
 	//===========
 	connect(item, SIGNAL(onClose(CLAbstractSubItemContainer*)), this, SLOT(onItemClose(CLAbstractSubItemContainer*)));
 
+	connect(item, SIGNAL(onMakeScreenshot(CLAbstractSubItemContainer*)), this, SLOT(onItemMakeScreenshot(CLAbstractSubItemContainer*)));
 
 	return true;
 }
@@ -737,7 +733,13 @@ void SceneLayout::onItemClose(CLAbstractSubItemContainer* itm, bool addToremoved
 		removeItem(item);
 		delete item;
 	}
+}
 
+void SceneLayout::onItemMakeScreenshot(CLAbstractSubItemContainer* itm)
+{
+	CLAbstractSceneItem* item = static_cast<CLAbstractSceneItem*>(itm);
+	if (item->getType() == CLAbstractSceneItem::VIDEO)
+		m_view->contextMenuHelper_takeScreenshot(static_cast<CLVideoWindowItem *>(item));
 }
 
 void SceneLayout::removeItems(QList<CLAbstractSubItemContainer*> itemlst, bool removeFromLayoutcontent)

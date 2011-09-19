@@ -173,21 +173,6 @@ void CLDevice::mergeLists(CLDeviceList& first, CLDeviceList second)
 	}
 }
 
-void CLDevice::deleteDevices(CLDeviceList& lst)
-{
-	CLDeviceList::iterator it = lst.begin();
-	while (it!=lst.end())
-	{
-		CLDevice* device = it.value();
-		//delete device; //here+
-		device->releaseRef();
-		//lst.erase(it++);
-
-		++it;
-	}
-
-}
-
 void CLDevice::addReferences(CLDeviceList& lst)
 {
 	CLDeviceList::iterator it = lst.begin();

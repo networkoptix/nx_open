@@ -336,7 +336,8 @@ void CLAudioStreamDisplay::downmix(CLAudioData& audio)
 		{
 			Q_ASSERT_X(1 == 0, Q_FUNC_INFO + __LINE__, "invalid sample size");
 		}
-		audio.outbuf_len /= 3;
+		audio.outbuf_len /= audio.format.channelCount();
+        audio.outbuf_len *= 2;
 		audio.format.setChannels(2);
 	}
 }

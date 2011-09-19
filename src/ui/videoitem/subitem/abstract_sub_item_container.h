@@ -3,40 +3,41 @@
 
 class CLAbstractSubItem;
 
-enum CLSubItemType {CloseSubItem, ArchiveNavigatorSubItem, RecordingSubItem, PlaySubItem, PauseSubItem, StepForwardSubItem, StepBackwardSubItem, RewindBackwardSubItem, RewindForwardSubItem};
+enum CLSubItemType { CloseSubItem, ArchiveNavigatorSubItem, RecordingSubItem, PlaySubItem, PauseSubItem, StepForwardSubItem, StepBackwardSubItem, RewindBackwardSubItem, RewindForwardSubItem, MakeScreenshotSubItem };
 
 class CLAbstractSubItemContainer : public QObject, public QGraphicsItem
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	CLAbstractSubItemContainer(QGraphicsItem* parent);
+    CLAbstractSubItemContainer(QGraphicsItem* parent);
 
-	~CLAbstractSubItemContainer();
+    ~CLAbstractSubItemContainer();
 
     QList<CLAbstractSubItem*> subItemList() const;
 
     void addSubItem(CLAbstractSubItem *item);
     void removeSubItem(CLAbstractSubItem *item);
 
-	bool addSubItem(CLSubItemType type);
-	virtual void removeSubItem(CLSubItemType type);
-	virtual QPointF getBestSubItemPos(CLSubItemType type);
+    bool addSubItem(CLSubItemType type);
+    virtual void removeSubItem(CLSubItemType type);
+    virtual QPointF getBestSubItemPos(CLSubItemType type);
 
-	void addToEevntTransparetList(QGraphicsItem* item);
-	bool isInEventTransparetList(QGraphicsItem* item) const;
+    void addToEevntTransparetList(QGraphicsItem* item);
+    bool isInEventTransparetList(QGraphicsItem* item) const;
 
 signals:
-	void onClose(CLAbstractSubItemContainer*);
+    void onClose(CLAbstractSubItemContainer*);
+    void onMakeScreenshot(CLAbstractSubItemContainer*);
 
 public slots:
-	virtual void onResize();
+    virtual void onResize();
 
 protected slots:
-	virtual void onSubItemPressed(CLAbstractSubItem* subitem);
+    virtual void onSubItemPressed(CLAbstractSubItem* subitem);
 
 protected:
 
-	QList<QGraphicsItem*> m_eventtransperent_list;
+    QList<QGraphicsItem*> m_eventtransperent_list;
     QList<CLAbstractSubItem*> m_subItems;
 };
 

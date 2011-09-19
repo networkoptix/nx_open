@@ -1,18 +1,18 @@
-#ifndef cl_iqeye_serverpush_jpeg_1846
-#define cl_iqeye_serverpush_jpeg_1846
+#ifndef cl_mjpeg_dataprovider_h_1140
+#define cl_mjpeg_dataprovider_h_1140
 
 #include "streamreader/spush_streamreader.h"
 #include "network/simple_http_client.h"
 
 
 
-class CLIQEyeMJPEGtreamreader: public CLServerPushStreamreader
+class MJPEGtreamreader: public CLServerPushStreamreader
 {
 private:
     enum {BLOCK_SIZE = 1460};
 public:
-	CLIQEyeMJPEGtreamreader(CLDevice* dev);
-	virtual ~CLIQEyeMJPEGtreamreader();
+	MJPEGtreamreader(CLDevice* dev, const QString& requst);
+	virtual ~MJPEGtreamreader();
 
 protected:
     virtual CLAbstractMediaData* getNextData();
@@ -26,7 +26,9 @@ private:
     int mDataRemainedBeginIndex;
     int mReaded;
 
+    QString m_request;
+
 
 };
 
-#endif //cl_iqeye_serverpush_jpeg_1846
+#endif //cl_mjpeg_dataprovider_h_1140

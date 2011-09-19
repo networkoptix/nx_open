@@ -343,7 +343,7 @@ void CLAbstractSceneItem::drawSteadyWall(QPainter* painter)
 
 void CLAbstractSceneItem::drawShadow(QPainter* painter)
 {
-    if (m_steadyMode)
+    if (m_steadyMode || isFullScreen())
         return; // do not need to draw anything in this mode
 
 	QRect rect1(width(), SHADOW_SIZE, SHADOW_SIZE, height());

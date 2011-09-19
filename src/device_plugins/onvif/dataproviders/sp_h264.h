@@ -7,13 +7,13 @@
 
 class CLRtpStreamParser;
 
-class CLIQEyeH264treamreader: public CLServerPushStreamreader
+class RTPH264Streamreader: public CLServerPushStreamreader
 {
 private:
     enum {BLOCK_SIZE = 1460};
 public:
-	CLIQEyeH264treamreader(CLDevice* dev);
-	virtual ~CLIQEyeH264treamreader();
+	RTPH264Streamreader(CLDevice* dev);
+	virtual ~RTPH264Streamreader();
 
 protected:
     virtual CLAbstractMediaData* getNextData();

@@ -1,23 +1,24 @@
-#include "iqeye_sp_h264.h"
+
 #include "device/network_device.h"
 #include "network/simple_http_client.h"
 #include "data/mediadata.h"
 #include "network/h264_rtp_parser.h"
+#include "sp_h264.h"
 
 
-CLIQEyeH264treamreader::CLIQEyeH264treamreader(CLDevice* dev)
+RTPH264Streamreader::RTPH264Streamreader(CLDevice* dev)
 :CLServerPushStreamreader(dev),
 m_streamParser(0)
 {
 
 }
 
-CLIQEyeH264treamreader::~CLIQEyeH264treamreader()
+RTPH264Streamreader::~RTPH264Streamreader()
 {
     delete m_streamParser;    
 }
 
-CLAbstractMediaData* CLIQEyeH264treamreader::getNextData()
+CLAbstractMediaData* RTPH264Streamreader::getNextData()
 {
 
     if (!isStreamOpened())
@@ -32,7 +33,7 @@ CLAbstractMediaData* CLIQEyeH264treamreader::getNextData()
 
 }
 
-void CLIQEyeH264treamreader::openStream()
+void RTPH264Streamreader::openStream()
 {
     if (isStreamOpened())
         return;
@@ -54,12 +55,12 @@ void CLIQEyeH264treamreader::openStream()
 
 }
 
-void CLIQEyeH264treamreader::closeStream()
+void RTPH264Streamreader::closeStream()
 {
     m_RtpSession.stop();
 }
 
-bool CLIQEyeH264treamreader::isStreamOpened() const
+bool RTPH264Streamreader::isStreamOpened() const
 {
     return m_RtpSession.isOpened();
 }

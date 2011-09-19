@@ -4,6 +4,7 @@
 #include <OpenAL/alc.h>
 
 #include "qtvaudiodevice.h"
+#include "base/sleep.h"
 //#include "base/log.h"
 
 QtvSound::QtvSound(ALCdevice *device, const QAudioFormat &audioFormat)
@@ -131,7 +132,7 @@ uint QtvSound::bufferTime() const
 
 void QtvSound::clearBuffers(bool clearAll)
 {
-#ifdef OPENAL_WIN32_ONLY
+#ifdef OPENAL_NEW_ALGORITHM
     ALint processed = 0;
     if (clearAll)
         alGetSourcei(m_source, AL_BUFFERS_QUEUED, &processed);
@@ -243,7 +244,7 @@ bool QtvSound::internalPlay(const void* data, uint size)
 {
     clearBuffers(false);
     ALuint buf = 0;
-#ifdef OPENAL_WIN32_ONLY
+#ifdef OPENAL_NEW_ALGORITHM
     alGenBuffers(1, &buf);
     checkOpenALErrorDebug(m_device);
 #else
@@ -329,12 +330,17 @@ void QtvSound::internalClear()
 {
     alSourceStop(m_source);
     checkOpenALError(m_device);
+
+#ifdef Q_OS_MAC
+    CLSleep::msleep(bufferTime()/1000);
+#endif
+
     //alSourceRewind(m_source);
     //checkOpenALError(m_device);
     clearBuffers(true);
     alDeleteSources(1, &m_source);
     checkOpenALError(m_device);
-#ifndef OPENAL_WIN32_ONLY
+#ifndef OPENAL_NEW_ALGORITHM
     if (!m_buffers.empty())
     {
         alDeleteBuffers(m_buffers.size(), &m_buffers[0]);
