@@ -64,8 +64,8 @@ void CLBlueBackGround::drawBackground(QPainter * painter, const QRectF & rect )
 	if (rpos<0)
 		rpos = rpos;
 
-	QColor bl(10,10,110+50*rpos,255);
-	//QColor bl(10,100+50*rpos,10,255);
+	QColor bl(10,10,110+50*rpos,255);// NO
+	//QColor bl(0,100+50*rpos,160,255); //trinity
 
 	QPointF center1( rect.center().x() - rpos*rect.width()/2, rect.center().y() );
 	QPointF center2( rect.center().x() + rpos*rect.width()/2, rect.center().y() );
