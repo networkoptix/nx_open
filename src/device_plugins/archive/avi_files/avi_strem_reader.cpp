@@ -84,8 +84,7 @@ CLAVIStreamReader::CLAVIStreamReader(CLDevice* dev ) :
     m_requiredJumpTime(AV_NOPTS_VALUE),
     m_lastUIJumpTime(AV_NOPTS_VALUE),
     m_lastFrameDuration(0),
-    m_layout(0),
-    m_needSetReverseFlag(false)
+    m_layout(0)
 {
     // Should init packets here as some times destroy (av_free_packet) could be called before init
     av_init_packet(&m_packets[0]);
@@ -205,9 +204,6 @@ CLDeviceVideoLayout* CLAVIStreamReader::getLayout()
                 deserializeLayout(m_layout, layoutInfo->value);
         }
     }
-    m_needSetReverseFlag.resize(m_layout->numberOfChannels());
-    for (int i = 0; i < m_needSetReverseFlag.size(); ++i)
-        m_needSetReverseFlag[i] = false;
     return m_layout;
 }
 
@@ -456,8 +452,6 @@ begin_label:
             m_topIFrameTime = jumpTime;
         else
             setSkipFramesToTime(jumpTime);
-        for (int i = 0; i < m_needSetReverseFlag.size(); ++i)
-            m_needSetReverseFlag[i] = false;
     }
 
 	QnAviSemaphoreHelpr sem(aviSemaphore);
@@ -539,9 +533,6 @@ begin_label:
                 if (m_bottomIFrameTime == -1 && m_currentTime < m_topIFrameTime) {
                     m_bottomIFrameTime = m_currentTime;
                     currentPacket().flags |= AV_REVERSE_BLOCK_START;
-                    for (int i = 1; i < m_layout->numberOfChannels(); ++i) {
-                        m_needSetReverseFlag[i] = true;
-                    }
                 }
                 if (m_currentTime >= m_topIFrameTime)
                 {

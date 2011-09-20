@@ -294,7 +294,7 @@ void CLCamDisplay::processNewSpeed(float speed)
     m_tooSlowCounter = 0;
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
         if (m_display[i])
-            m_display[i]->setReverseMode(speed < 0);
+            m_display[i]->setSpeed(speed);
     }
     setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Full);
 }

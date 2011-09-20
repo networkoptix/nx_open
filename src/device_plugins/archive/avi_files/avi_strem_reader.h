@@ -65,7 +65,6 @@ protected:
     volatile bool m_wakeup;
 
     bool m_bsleep;
-    QVector<bool> m_needSetReverseFlag;
 private:
     AVPacket m_packets[2];
     int m_currentPacketIndex;

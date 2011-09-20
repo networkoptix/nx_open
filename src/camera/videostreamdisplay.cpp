@@ -147,7 +147,8 @@ CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale) :
     m_realReverseSize(0),
     m_maxReverseQueueSize(-1),
     m_timeChangeEnabled(true),
-    m_bufferedFrameDisplayer(0)
+    m_bufferedFrameDisplayer(0),
+    m_speed(1.0)
 {
     for (int i = 0; i < MAX_FRAME_QUEUE_SIZE; ++i)
         m_frameQueue[i] = new CLVideoDecoderOutput();
@@ -173,8 +174,6 @@ CLVideoStreamDisplay::~CLVideoStreamDisplay()
 void CLVideoStreamDisplay::setDrawer(CLAbstractRenderer* draw)
 {
     m_drawer = draw;
-    delete m_bufferedFrameDisplayer;
-    m_bufferedFrameDisplayer = new BufferedFrameDisplayer(m_drawer);
 }
 
 CLVideoDecoderOutput::downscale_factor CLVideoStreamDisplay::getCurrentDownscaleFactor() const
@@ -348,7 +347,20 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(CLCompress
     bool reverseMode = m_reverseMode;
 
     bool enableFrameQueue = reverseMode ? true : m_enableFrameQueue;
-
+    if (enableFrameQueue && qAbs(m_speed - 1.0) < FPS_EPS) 
+    {
+        if (!m_bufferedFrameDisplayer)
+            m_bufferedFrameDisplayer = new BufferedFrameDisplayer(m_drawer);
+    }
+    else 
+    {
+        if (m_bufferedFrameDisplayer) 
+        {
+            m_bufferedFrameDisplayer->waitForFramesDisplayed();
+            delete m_bufferedFrameDisplayer;
+            m_bufferedFrameDisplayer = 0;
+        }
+    }
 
     if (!enableFrameQueue && m_queueUsed)
     {
@@ -422,7 +434,7 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(CLCompress
         while (dec->decode(emptyData, tmpOutFrame)) 
         {
             {
-                //tmpOutFrame->pts = AV_NOPTS_VALUE;
+                tmpOutFrame->pkt_dts = AV_NOPTS_VALUE;
                 m_reverseQueue.enqueue(tmpOutFrame);
                 m_realReverseSize++;
                 checkQueueOverflow(dec);
@@ -518,8 +530,12 @@ bool CLVideoStreamDisplay::processDecodedFrame(int channel, CLVideoDecoderOutput
     if (outFrame->pkt_dts != AV_NOPTS_VALUE)
         setLastDisplayedTime(outFrame->pkt_dts);
     if (outFrame->data[0]) {
-        if (enableFrameQueue) {
-            m_bufferedFrameDisplayer->addFrame(outFrame);
+        if (enableFrameQueue) 
+        {
+            if (m_bufferedFrameDisplayer)
+                m_bufferedFrameDisplayer->addFrame(outFrame);
+            else
+                m_drawer->draw(outFrame, channel);
             m_frameQueueIndex = (m_frameQueueIndex + 1) % MAX_FRAME_QUEUE_SIZE; // allow frame queue for selected video
             m_queueUsed = true;
         }
@@ -532,7 +548,7 @@ bool CLVideoStreamDisplay::processDecodedFrame(int channel, CLVideoDecoderOutput
                 delete m_prevFrameToDelete;
             m_prevFrameToDelete = outFrame;
         }
-        return !enableFrameQueue;
+        return !m_bufferedFrameDisplayer;
     }
     else {
         delete outFrame;
@@ -596,9 +612,10 @@ void CLVideoStreamDisplay::setMTDecoding(bool value)
     m_needReinitDecoders = true;
 }
 
-void CLVideoStreamDisplay::setReverseMode(bool value)
+void CLVideoStreamDisplay::setSpeed(float value)
 {
-    m_reverseMode = value;
+    m_speed = value;
+    m_reverseMode = value < 0;
     if (value)
         m_enableFrameQueue = true;
 }

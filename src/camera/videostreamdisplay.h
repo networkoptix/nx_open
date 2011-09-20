@@ -31,8 +31,7 @@ public:
 
     void setMTDecoding(bool value);
 
-    void setReverseMode(bool value);
-
+    void setSpeed(float value);
     qint64 getLastDisplayedTime() const;
     void setLastDisplayedTime(qint64 value);
     void afterJump();
@@ -79,6 +78,7 @@ private:
     bool m_timeChangeEnabled;
     BufferedFrameDisplayer* m_bufferedFrameDisplayer;
 private:
+    float m_speed;
     void reorderPrevFrames();
     bool allocScaleContext(const CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);
     void freeScaleContext();
