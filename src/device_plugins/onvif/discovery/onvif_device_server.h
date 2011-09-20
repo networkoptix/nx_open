@@ -1,7 +1,7 @@
 #ifndef onvif_device_server_h_2054
 #define onvif_device_server_h_2054
 
-#include "device\deviceserver.h"
+#include "device/deviceserver.h"
 
 
 class CLNetworkDevice;
