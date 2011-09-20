@@ -17,7 +17,7 @@ public:
     {
         m_currentTime = AV_NOPTS_VALUE;
         m_expectedTime = AV_NOPTS_VALUE;
-        m_lastDisplayedTime = 0;
+        m_lastDisplayedTime = AV_NOPTS_VALUE;
         start();
     }
     ~BufferedFrameDisplayer() {
@@ -349,14 +349,18 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(CLCompress
     bool enableFrameQueue = reverseMode ? true : m_enableFrameQueue;
     if (enableFrameQueue && qAbs(m_speed - 1.0) < FPS_EPS) 
     {
-        if (!m_bufferedFrameDisplayer)
+        if (!m_bufferedFrameDisplayer) {
+            QMutexLocker lock(&m_timeMutex);
             m_bufferedFrameDisplayer = new BufferedFrameDisplayer(m_drawer);
+        }
     }
     else 
     {
         if (m_bufferedFrameDisplayer) 
         {
             m_bufferedFrameDisplayer->waitForFramesDisplayed();
+            setLastDisplayedTime(m_bufferedFrameDisplayer->getLastDisplayedTime());
+            QMutexLocker lock(&m_timeMutex);
             delete m_bufferedFrameDisplayer;
             m_bufferedFrameDisplayer = 0;
         }
