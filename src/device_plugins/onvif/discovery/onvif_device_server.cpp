@@ -5,6 +5,10 @@
 #include "../../iqeye/devices/iqeye_device.h"
 #include "../../axis/devices/axis_device.h"
 
+#ifdef Q_OS_MAC
+#include <netinet/in.h>
+#include <sys/socket.h>
+#endif
 
 quint16 MDNS_PORT = 5353;
 
