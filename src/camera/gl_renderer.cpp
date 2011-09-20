@@ -251,14 +251,10 @@ void CLGLRenderer::init(bool msgbox)
     if (ver <= QByteArray("1.1.0"))
     {
         // Microsoft Generic software
-        const QString message = QObject::tr("OpenGL driver is not installed or very old. Please update video driver for better perfomance.");
+        const QString message = QObject::tr("OpenGL driver is not installed or outdated. Please update video driver for better perfomance.");
         CL_LOG(cl_logWARNING) cl_log.log(message, cl_logWARNING);
         if (msgbox)
-        {
-            QMessageBox* box = new QMessageBox(QMessageBox::Warning, QObject::tr("Info"), message, QMessageBox::Ok, 0);
-            box->show();
-            // ### fix leaking
-        }
+            QMessageBox::warning(0, QObject::tr("Important Performance Tip"), message, QMessageBox::Ok, QMessageBox::NoButton);
     }
 
     bool error = false;
@@ -319,16 +315,14 @@ void CLGLRenderer::init(bool msgbox)
 
         // in this first revision we do not support software color transform
         gl_status = CL_GL_NOT_SUPPORTED;
-        /*
-        const QString message = QObject::tr("This software version supports only GPU (not CPU) color transformation. This video card do not supports shaders (GPU transforms). Please contact to developers to get new software version with YUV=>RGB software transform for your video card. Or update your video card:-)");
-        CL_LOG(cl_logWARNING) cl_log.log(message, cl_logWARNING);
+
         if (msgbox)
         {
-            QMessageBox* box = new QMessageBox(QMessageBox::Warning, QObject::tr("Info"), message, QMessageBox::Ok, 0);
-            box->show();
-            // ### fix leaking
+            const QString message = QObject::tr("We have detected that your video card drivers may be not installed or out of date.\n"
+                                                "Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.\n"
+                                                "For easy instructions on how to install or update your video driver, follow instruction at http://tribaltrouble.com/driversupport.php");
+            QMessageBox::warning(0, QObject::tr("Important Performance Tip"), message, QMessageBox::Ok, QMessageBox::NoButton);
         }
-        */
     }
 
     if (m_forceSoftYUV)
