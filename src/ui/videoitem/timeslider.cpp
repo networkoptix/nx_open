@@ -251,11 +251,20 @@ void TimeLine::paintEvent(QPaintEvent *ev)
     const int minWidth = 30;
 
     int level = 0;
-    for ( ; minWidth > pixelPerTime*intervals[level].interval && level < arraysize(intervals)-1; level++) {}
+    while (minWidth > pixelPerTime*intervals[level].interval && level < arraysize(intervals)-1)
+        ++level;
 
     unsigned maxLevel = level;
-    for ( ; maxLevel < arraysize(intervals)-1 && intervals[maxLevel].interval <= range; maxLevel++) {}
+    while (maxLevel < arraysize(intervals)-1 && intervals[maxLevel].interval <= range)
+        ++maxLevel;
+
     int maxLen = maxLevel - level;
+
+    double xpos = r.left() - round(pixelPerTime * pos);
+    int outsideCnt = -xpos / (intervals[level].interval * pixelPerTime);
+    xpos += outsideCnt * intervals[level].interval * pixelPerTime;
+    if ((pos+range - intervals[level].interval*outsideCnt) / r.width() <= 1) // abnormally long range
+        return;
 
     QColor color = pal.color(QPalette::Text);
 
@@ -266,7 +275,7 @@ void TimeLine::paintEvent(QPaintEvent *ev)
     for (unsigned i = level; i <= maxLevel; ++i)
     {
         float k = (pixelPerTime*intervals[i].interval - minWidth)/60.0;
-        opacity << qMax(m_minOpacity, qMin(k, 1.0f));
+        opacity << qBound(m_minOpacity, k, 1.0f);
         QFont font = m_parent->font();
         font.setPointSize(font.pointSize() + (i >= maxLevel-1) - (i <= level+1));
         font.setBold(i == maxLevel);
@@ -293,13 +302,11 @@ void TimeLine::paintEvent(QPaintEvent *ev)
         }
     }
     // draw grid
-    double xpos = r.left() - round(pixelPerTime * pos);
-    int outsideCnt = -xpos / (intervals[level].interval * pixelPerTime);
-    xpos += outsideCnt * intervals[level].interval * pixelPerTime;
     for (qint64 curTime = intervals[level].interval*outsideCnt; curTime <= pos+range; curTime += intervals[level].interval)
     {
         int curLevel = level;
-        for ( ; curLevel < arraysize(intervals)-2 && curTime % intervals[curLevel+1].interval == 0; curLevel++) {}
+        while (curLevel < arraysize(intervals)-2 && curTime % intervals[curLevel+1].interval == 0)
+            ++curLevel;
         int arrayIndex = qMin(curLevel-level, opacity.size()-1);
 
         color.setAlphaF(opacity[arrayIndex]);
