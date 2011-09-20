@@ -1614,6 +1614,19 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
                     args << QLatin1String("/select,") << QDir::toNativeSeparators(file);
                     QProcess::startDetached(QLatin1String("explorer.exe"), args);
 #endif
+#ifdef Q_OS_MAC
+                    QString pathIn = QDir::toNativeSeparators(file).replace("\"", "\\\"");
+
+                    QStringList scriptArgs;
+                    scriptArgs << QLatin1String("-e")
+                               << QString::fromLatin1("tell application \"Finder\" to reveal POSIX file \"%1\"")
+                                                     .arg(pathIn);
+                    QProcess::execute(QLatin1String("/usr/bin/osascript"), scriptArgs);
+                    scriptArgs.clear();
+                    scriptArgs << QLatin1String("-e")
+                               << QLatin1String("tell application \"Finder\" to activate");
+                    QProcess::execute("/usr/bin/osascript", scriptArgs);
+#endif
                 }
             }
 
