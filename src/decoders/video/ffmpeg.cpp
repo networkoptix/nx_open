@@ -127,7 +127,7 @@ void CLFFmpegVideoDecoder::openDecoder()
 
 	//c->debug_mv = 1;
 
-    m_context->thread_count = qMin(4, QThread::idealThreadCount() + 1);
+    m_context->thread_count = qMin(5, QThread::idealThreadCount() + 1);
     m_context->thread_type = m_mtDecoding ? FF_THREAD_FRAME : FF_THREAD_SLICE;
     m_checkH264ResolutionChange = m_mtDecoding && m_context->codec_id == CODEC_ID_H264 && m_context->extradata_size && m_context->extradata[0] == 0; 
 
@@ -170,7 +170,7 @@ void CLFFmpegVideoDecoder::resetDecoder()
     avcodec_close(m_context);
     if (m_passedContext) 
         avcodec_copy_context(m_context, m_passedContext);
-    m_context->thread_count = qMin(4, QThread::idealThreadCount() + 1);
+    m_context->thread_count = qMin(5, QThread::idealThreadCount() + 1);
     m_context->thread_type = m_mtDecoding ? FF_THREAD_FRAME : FF_THREAD_SLICE;
     // ensure that it is H.264 with nal prefixes
     m_checkH264ResolutionChange = m_mtDecoding && m_context->codec_id == CODEC_ID_H264 && m_context->extradata_size && m_context->extradata[0] == 0; 
@@ -240,6 +240,7 @@ bool CLFFmpegVideoDecoder::decode(const CLCompressedVideoData& data, CLVideoDeco
     av_init_packet(&avpkt);
     avpkt.data = (unsigned char*)data.data.data();
     avpkt.size = data.data.size();
+    avpkt.dts = avpkt.pts = data.timestamp;
     // HACK for CorePNG to decode as normal PNG by default
     avpkt.flags = AV_PKT_FLAG_KEY;
 
@@ -300,6 +301,7 @@ bool CLFFmpegVideoDecoder::decode(const CLCompressedVideoData& data, CLVideoDeco
             m_tmpQtFrame.linesize[1] = m_tmpQtFrame.linesize[2] = m_tmpQtFrame.linesize[3] = 0;
             m_tmpQtFrame.width = m_tmpImg.width();
             m_tmpQtFrame.height = m_tmpImg.height();
+            m_tmpQtFrame.pkt_dts = data.timestamp;
             copyFromFrame = &m_tmpQtFrame;
             m_usedQtImage = true;
         }
@@ -317,15 +319,21 @@ bool CLFFmpegVideoDecoder::decode(const CLCompressedVideoData& data, CLVideoDeco
 		{
             if (outFrame->isExternalData())
             {
-			    if (avpicture_deinterlace((AVPicture*)m_deinterlacedFrame, (AVPicture*) m_frame, m_context->pix_fmt, m_context->width, m_context->height) == 0)
+                if (avpicture_deinterlace((AVPicture*)m_deinterlacedFrame, (AVPicture*) m_frame, m_context->pix_fmt, m_context->width, m_context->height) == 0) {
+                    m_deinterlacedFrame->pkt_dts = m_frame->pkt_dts;
                     copyFromFrame = m_deinterlacedFrame;
+                }
             }
-            else
+            else {
                 avpicture_deinterlace((AVPicture*) outFrame, (AVPicture*) m_frame, m_context->pix_fmt, m_context->width, m_context->height);
+                outFrame->pkt_dts = m_frame->pkt_dts;
+            }
 		}
         else {
-            if (!outFrame->isExternalData())
+            if (!outFrame->isExternalData()) {
                 av_picture_copy((AVPicture*) outFrame, (AVPicture*) (m_frame), m_context->pix_fmt, m_context->width, m_context->height);
+                outFrame->pkt_dts = m_frame->pkt_dts;
+            }
         }
 
 #ifdef _USE_DXVA
@@ -354,6 +362,7 @@ bool CLFFmpegVideoDecoder::decode(const CLCompressedVideoData& data, CLVideoDeco
 		    outFrame->linesize[0] = copyFromFrame->linesize[0];
 		    outFrame->linesize[1] = copyFromFrame->linesize[1];
 		    outFrame->linesize[2] = copyFromFrame->linesize[2];
+            outFrame->pkt_dts = copyFromFrame->pkt_dts;
         }
         outFrame->format = GetPixelFormat();
 		return m_context->pix_fmt != PIX_FMT_NONE;
