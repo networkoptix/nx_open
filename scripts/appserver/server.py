@@ -118,7 +118,7 @@ def get_object_list(path, Class, args=''):
     object_raw_list = minidom.parseString(xml_string)
 
     objects = []
-    resource_elements = object_raw_list.getElementsByTagName('resource')
+    resource_elements = object_raw_list.getElementsByTagName(path)
     for object_element in resource_elements:
         object_dict = {}
         for child in object_element.childNodes:
@@ -253,6 +253,7 @@ def scanario1():
 if __name__ == '__main__':
     read_state()
 
+    debug = True
     if len(sys.argv) == 2 and sys.argv[1] == 'test':
         scenario1()
         sys.exit(0)
