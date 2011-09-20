@@ -396,7 +396,8 @@ void CLGLRenderer::draw(CLVideoDecoderOutput* img, unsigned int channel)
     //m_abort_drawing = false;
 
     //m_imageList.enqueue(img);
-
+    if (m_curImg)
+        m_curImg->setDisplaying(false);
     m_curImg = img;
     m_format = m_curImg->format;
 
@@ -825,11 +826,13 @@ bool CLGLRenderer::paintEvent(const QRect &r)
         m_inited = true;
     }
 
+    CLVideoDecoderOutput* curImg;
     {
         QMutexLocker locker(&m_displaySync);
-        if (m_gotnewimage && m_curImg && m_curImg->linesize[0]) {
-            m_videoWidth = m_curImg->width;
-            m_videoHeight = m_curImg->height;
+        curImg = m_curImg;
+        if (m_gotnewimage && curImg && curImg->linesize[0]) {
+            m_videoWidth = curImg->width;
+            m_videoHeight = curImg->height;
             updateTexture();
         }
     }
@@ -842,9 +845,10 @@ bool CLGLRenderer::paintEvent(const QRect &r)
     }
 
     QMutexLocker locker(&m_displaySync);
-    if (m_curImg)
-        m_curImg->setDisplaying(false);
-    m_waitCon.wakeAll();
+    if (curImg->isDisplaying()) {
+        curImg->setDisplaying(false);
+        m_waitCon.wakeAll();
+    }
     return draw;
 }
 

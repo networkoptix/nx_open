@@ -103,7 +103,7 @@ protected:
                 m_sync.unlock();
 
                 m_drawer->draw(frame, 0);
-                m_drawer->waitForFrameDisplayed(0);
+                //m_drawer->waitForFrameDisplayed(0);
                 m_queue.pop(frame);
             }
             else {
@@ -425,6 +425,9 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(CLCompress
         scaleFactor > CLVideoDecoderOutput::factor_1;
 
     CLVideoDecoderOutput* outFrame = m_frameQueue[m_frameQueueIndex];
+    if (outFrame->isDisplaying()) 
+        m_drawer->waitForFrameDisplayed(data->channelNumber);
+    
     if (!useTmpFrame)
         outFrame->setUseExternalData(!enableFrameQueue);
 
