@@ -620,7 +620,7 @@ void CLVideoStreamDisplay::setSpeed(float value)
 {
     m_speed = value;
     m_reverseMode = value < 0;
-    if (value)
+    if (m_reverseMode)
         m_enableFrameQueue = true;
 }
 
@@ -643,7 +643,6 @@ void CLVideoStreamDisplay::setLastDisplayedTime(qint64 value)
 void CLVideoStreamDisplay::blockTimeValue(qint64 time)
 {
     QMutexLocker lock(&m_timeMutex);
-    cl_log.log("block time value", time, cl_logALWAYS);
     m_lastDisplayedTime = time;
     if (m_bufferedFrameDisplayer)
         m_bufferedFrameDisplayer->setLastDisplayedTime(time);
