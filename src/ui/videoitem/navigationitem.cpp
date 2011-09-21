@@ -398,7 +398,7 @@ void NavigationItem::pause()
     CLAbstractArchiveReader *reader = static_cast<CLAbstractArchiveReader*>(m_camera->getStreamreader());
 
     reader->pause();
-    m_camera->getCamCamDisplay()->playAudio(false);
+    m_camera->getCamCamDisplay()->pauseAudio();
 
     reader->setSingleShotMode(true);
     m_camera->getCamCamDisplay()->setSingleShotMode(true);

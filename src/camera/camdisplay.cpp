@@ -274,7 +274,7 @@ void CLCamDisplay::setSpeed(float speed)
 
 void CLCamDisplay::processNewSpeed(float speed)
 {
-    if (qAbs(speed - 1.0) > FPS_EPS)
+    if (qAbs(speed - 1.0) > FPS_EPS && qAbs(speed) > FPS_EPS)
         m_audioDisplay->clearAudioBuffer();
     if (speed >= 0 && m_prevSpeed < 0 || speed < 0 && m_prevSpeed >= 0)
     {
@@ -585,6 +585,11 @@ void CLCamDisplay::setLightCPUMode(CLAbstractVideoDecoder::DecodeMode val)
     m_lightCpuMode = val;
 }
 
+void CLCamDisplay::pauseAudio()
+{
+    m_audioDisplay->suspend();
+}
+
 void CLCamDisplay::playAudio(bool play)
 {
     if (m_playAudio == play)
@@ -594,6 +599,8 @@ void CLCamDisplay::playAudio(bool play)
     m_playAudio = play;
     if (!m_playAudio)
         m_audioDisplay->clearDeviceBuffer();
+    else
+        m_audioDisplay->resume();
 }
 
 //==========================================================================
