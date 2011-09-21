@@ -879,7 +879,7 @@ void CLAVIStreamReader::setReverseMode(bool value)
     m_reverseMode = value;
 }
 
-bool CLAVIStreamReader::isSpeedSupported(double value) const
-{ 
-    return value >= 0 || m_layout == 0 || m_layout->numberOfChannels() == 1;
+bool CLAVIStreamReader::isNegativeSpeedSupported() const
+{
+    return !m_layout || m_layout->numberOfChannels() == 1;
 }

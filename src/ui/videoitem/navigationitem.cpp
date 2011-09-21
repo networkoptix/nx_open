@@ -532,10 +532,12 @@ void NavigationItem::onSpeedChanged(float newSpeed)
 {
     if (m_camera) {
         CLAbstractArchiveReader *reader = static_cast<CLAbstractArchiveReader*>(m_camera->getStreamreader());
-        if (reader->isSpeedSupported(newSpeed))
+        if (qFuzzyIsNull(newSpeed))
+            newSpeed = 0.0f;
+        if (newSpeed >= 0.0f || reader->isNegativeSpeedSupported())
         {
             reader->setSpeed(newSpeed);
-            if (!qFuzzyIsNull(newSpeed))
+            if (newSpeed != 0.0f)
                 play();
             else
                 pause();
@@ -558,6 +560,10 @@ void NavigationItem::onSpeedChanged(float newSpeed)
 
                 restoreInfoTextData->timer.start(3000);
             }
+        }
+        else
+        {
+            m_speedSlider->resetSpeed();
         }
     }
 }
