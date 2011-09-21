@@ -360,13 +360,16 @@ void CLVideoDecoderOutput::fillRightEdge()
     quint8 filler = 0;
     int w = width;
     int h = height;
-    for (int i = 0; i < descr->nb_components; ++i)
+    for (int i = 0; i < descr->nb_components && data[i]; ++i)
     {
-        int fillLen = linesize[i] - w;
-        quint8* dst = data[i] + w;
-        for (int y = 0; y < h; ++y) {
-            memset(dst, filler, fillLen);
-            dst += linesize[i];
+        int bpp = descr->comp[i].step_minus1 + 1;
+        int fillLen = linesize[i] - w*bpp;
+        if (fillLen) {
+            quint8* dst = data[i] + w*bpp;
+            for (int y = 0; y < h; ++y) {
+                memset(dst, filler, fillLen);
+                dst += linesize[i];
+            }
         }
         if (i == 0) {
             filler = 0x80;
