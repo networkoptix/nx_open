@@ -25,6 +25,7 @@ struct CLVideoDecoderOutput: public AVFrame
     void setDisplaying(bool value) {m_displaying = value; }
     bool isDisplaying() const { return m_displaying; }
     void reallocate(int newWidth, int newHeight, int format);
+    void reallocate(int newWidth, int newHeight, int newFormat, int lineSizeHint);
 public:
     int flags;
     double sample_aspect_ratio; 

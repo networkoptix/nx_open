@@ -593,7 +593,7 @@ begin_label:
                     goto begin_label;
                 }
                 else  {
-                    if (currentPacket().flags & AV_PKT_FLAG_KEY) {
+                    if (m_currentTime == 0 || currentPacket().flags & AV_PKT_FLAG_KEY) {
                         m_IFrameAfterJumpFound = true;
                         m_lastUIJumpTime = AV_NOPTS_VALUE;
                     }

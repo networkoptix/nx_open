@@ -357,6 +357,20 @@ void CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat
         avpicture_fill((AVPicture*) this, (quint8*) av_malloc(numBytes), (PixelFormat) format, roundWidth, height);
 }
 
+void CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat, int lineSizeHint)
+{
+    clean();
+    setUseExternalData(false);
+    width = newWidth;
+    height = newHeight;
+    format = newFormat;
+
+    int numBytes = avpicture_get_size((PixelFormat) format, lineSizeHint, height);
+    if (numBytes > 0)
+        avpicture_fill((AVPicture*) this, (quint8*) av_malloc(numBytes), (PixelFormat) format, lineSizeHint, height);
+}
+
+
 void CLVideoDecoderOutput::downscale(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst, downscale_factor factor)
 {
     int src_width = src->width;

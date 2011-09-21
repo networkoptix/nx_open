@@ -310,9 +310,10 @@ bool CLFFmpegVideoDecoder::decode(const CLCompressedVideoData& data, CLVideoDeco
     if (got_picture)
     {
         if (!outFrame->isExternalData() &&
-            (outFrame->width != m_context->width || outFrame->height != m_context->height || outFrame->format != m_context->pix_fmt))
+            (outFrame->width != m_context->width || outFrame->height != m_context->height || 
+            outFrame->format != m_context->pix_fmt || outFrame->linesize[0] != m_frame->linesize[0]))
         {
-            outFrame->reallocate(m_context->width, m_context->height, m_context->pix_fmt);
+            outFrame->reallocate(m_context->width, m_context->height, m_context->pix_fmt, m_frame->linesize[0]);
         }
 
 		if (m_frame->interlaced_frame && m_mtDecoding)
@@ -330,8 +331,21 @@ bool CLFFmpegVideoDecoder::decode(const CLCompressedVideoData& data, CLVideoDeco
             }
 		}
         else {
-            if (!outFrame->isExternalData()) {
-                av_picture_copy((AVPicture*) outFrame, (AVPicture*) (m_frame), m_context->pix_fmt, m_context->width, m_context->height);
+            if (!outFrame->isExternalData()) 
+            {
+                if (outFrame->format == PIX_FMT_YUV420P) 
+                {
+                    // optimization
+                    for (int i = 0; i < 3; ++ i) 
+                    {
+                        int h = m_frame->height >> (i > 0 ? 1 : 0);
+                        memcpy(outFrame->data[i], m_frame->data[i], m_frame->linesize[i]* h);
+                    }
+                }
+                else {
+                    av_picture_copy((AVPicture*) outFrame, (AVPicture*) (m_frame), m_context->pix_fmt, m_context->width, m_context->height);
+                }
+
                 outFrame->pkt_dts = m_frame->pkt_dts;
             }
         }
