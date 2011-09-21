@@ -49,11 +49,9 @@ class TimeSlider : public QWidget
     Q_PROPERTY(qint64 maximumValue READ maximumValue WRITE setMaximumValue NOTIFY maximumValueChanged)
     Q_PROPERTY(double scalingFactor READ scalingFactor WRITE setScalingFactor NOTIFY scalingFactorChanged)
     Q_PROPERTY(double minOpacity READ minOpacity WRITE setMinOpacity)
-
     Q_PROPERTY(qint64 viewPortPos READ viewPortPos WRITE setViewPortPos)
-public:
-    //    enum Mode { TimeMode, DateMode };
 
+public:
     explicit TimeSlider(QWidget *parent = 0);
     ~TimeSlider() {}
 
@@ -61,9 +59,6 @@ public:
     qint64 maximumValue() const; // TODO: use min and max, not length
     double scalingFactor() const;
     double minOpacity() const;
-
-//    Mode mode() const;
-//    void setMode(Mode mode);
 
     QSize sizeHint() const;
     QSize minimumSizeHint() const;

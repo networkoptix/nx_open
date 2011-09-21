@@ -76,7 +76,7 @@ quint64 ColdStoreStreamReader::currentTime(void) const
     return 0;
 }
 
-bool ColdStoreStreamReader::isSpeedSupported(double) const
+bool ColdStoreStreamReader::isNegativeSpeedSupported() const
 {
     return false;
 }

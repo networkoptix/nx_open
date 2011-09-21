@@ -15,7 +15,7 @@ public:
 
     virtual CLAbstractMediaData* getNextData();
     quint64 currentTime(void) const;
-    bool isSpeedSupported(double) const;
+    bool isNegativeSpeedSupported() const;
     void channeljumpTo(quint64,int);
 private:
     bool init();

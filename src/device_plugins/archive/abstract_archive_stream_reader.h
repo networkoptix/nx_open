@@ -41,7 +41,7 @@ public:
 
     // sets certain track 
     virtual bool setAudioChannel(unsigned int num);
-    virtual bool isSpeedSupported(double value) const = 0;
+    virtual bool isNegativeSpeedSupported() const = 0;
 protected:
 	virtual void channeljumpTo(quint64 mksec, int channel) = 0;
     quint64 skipFramesToTime() const;
