@@ -10,9 +10,9 @@
 #ifndef __VERACITY_SFS_CLIENT_H
 #define __VERACITY_SFS_CLIENT_H
 
-#if defined VERACITY_WIN32_BUILD
+#if defined Q_OS_WIN
 #include <winsock2.h>
-#elif defined VERACITY_LINUX_BUILD
+#elif defined Q_OS_MAC
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>

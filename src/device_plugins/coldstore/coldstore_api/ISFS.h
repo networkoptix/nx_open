@@ -10,31 +10,17 @@
 #ifndef __VERACITY_ISFS_H
 #define __VERACITY_ISFS_H
 
-#define VERACITY_WIN32_BUILD
-
 namespace Veracity
 {
 	// The following may need to be changed, depending on the compiler being used.
-	#if defined(VERACITY_LINUX_BUILD)
-		#include <stdint.h>
-		typedef				int8_t		s8;
-		typedef				int16_t		s16;
-		typedef				int32_t		s32;
-		typedef				int64_t		s64;
-		typedef				uint8_t		u8;
-		typedef				uint16_t	u16;
-		typedef				uint32_t	u32;
-		typedef				uint64_t	u64;
-	#elif defined(VERACITY_WIN32_BUILD)
-		typedef				__int8		s8;
-		typedef				__int16		s16;
-		typedef				__int32		s32;
-		typedef				__int64		s64;
-		typedef	unsigned	__int8		u8;
-		typedef	unsigned	__int16		u16;
-		typedef	unsigned	__int32		u32;
-		typedef	unsigned	__int64		u64;
-	#endif
+    typedef				qint8		s8;
+    typedef				qint16		s16;
+    typedef				qint32		s32;
+    typedef				qint64		s64;
+    typedef	            quint8		u8;
+    typedef	            quint16		u16;
+    typedef	            quint32		u32;
+    typedef	            quint64		u64;
 
 	class ISFS
 	{
