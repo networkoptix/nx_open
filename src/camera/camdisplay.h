@@ -34,6 +34,7 @@ public:
 
 	void display(CLCompressedVideoData* vd, bool sleep, float speed);
 	void playAudio(bool play);
+    void pauseAudio();
     void setSpeed(float speed);
 
     // schedule to clean up buffers all; 

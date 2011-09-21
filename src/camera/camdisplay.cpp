@@ -170,32 +170,29 @@ void CLCamDisplay::display(CLCompressedVideoData* vd, bool sleep, float speed)
         needToSleep = 0;
     //=========
 
-    if (sleep)
+    if (sleep && m_lastFrameDisplayed != CLVideoStreamDisplay::Status_Buffered)
     {
-        if (m_lastFrameDisplayed != CLVideoStreamDisplay::Status_Buffered)
+        int realSleepTime = m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed ? m_delay.sleep(needToSleep, needToSleep*qAbs(speed)*2) : m_delay.addQuant(needToSleep);
+        //str << "sleep time: " << needToSleep << "  real:" << realSleepTime;
+        if (qAbs(speed) > 1.0 + FPS_EPS)
         {
-            int realSleepTime = m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed ? m_delay.sleep(needToSleep, needToSleep*qAbs(speed)*2) : m_delay.addQuant(needToSleep);
-            //str << "sleep time: " << needToSleep << "  real:" << realSleepTime;
-            if (qAbs(speed) > 1.0 + FPS_EPS)
+            if (realSleepTime < 0)
             {
-                if (realSleepTime < 0)
+                if (realSleepTime > -200*1000 && m_lightCpuMode == CLAbstractVideoDecoder::DecodeMode_Full)
                 {
-                    if (realSleepTime > -200*1000 && m_lightCpuMode == CLAbstractVideoDecoder::DecodeMode_Full)
-                    {
-                        setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Fast);
-                    }
-                    else if (m_iFrames > 1) {
-                        qint64 avgGopDuration = ((qint64)needToSleep * m_totalFrames)/m_iFrames;
-                        if (realSleepTime < qMin(-400*1000ll, -avgGopDuration))
-                            setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Fastest);
-                        else if (vd->flags & AV_PKT_FLAG_KEY)
-                            setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Fast);
-                    }
+                    setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Fast);
                 }
-                else if (vd->flags & AV_PKT_FLAG_KEY) {
-                    if (m_lightCpuMode == CLAbstractVideoDecoder::DecodeMode_Fastest)
+                else if (m_iFrames > 1) {
+                    qint64 avgGopDuration = ((qint64)needToSleep * m_totalFrames)/m_iFrames;
+                    if (realSleepTime < qMin(-400*1000ll, -avgGopDuration))
+                        setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Fastest);
+                    else if (vd->flags & AV_PKT_FLAG_KEY)
                         setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Fast);
                 }
+            }
+            else if (vd->flags & AV_PKT_FLAG_KEY) {
+                if (m_lightCpuMode == CLAbstractVideoDecoder::DecodeMode_Fastest)
+                    setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Fast);
             }
         }
     }
@@ -277,7 +274,7 @@ void CLCamDisplay::setSpeed(float speed)
 
 void CLCamDisplay::processNewSpeed(float speed)
 {
-    if (qAbs(speed - 1.0) > FPS_EPS)
+    if (qAbs(speed - 1.0) > FPS_EPS && qAbs(speed) > FPS_EPS)
         m_audioDisplay->clearAudioBuffer();
     if (speed >= 0 && m_prevSpeed < 0 || speed < 0 && m_prevSpeed >= 0)
     {
@@ -297,7 +294,7 @@ void CLCamDisplay::processNewSpeed(float speed)
     m_tooSlowCounter = 0;
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
         if (m_display[i])
-            m_display[i]->setReverseMode(speed < 0);
+            m_display[i]->setSpeed(speed);
     }
     setLightCPUMode(CLAbstractVideoDecoder::DecodeMode_Full);
 }
@@ -342,6 +339,9 @@ bool CLCamDisplay::processData(CLAbstractData* data)
     {
         // skip data (play current buffer
         flushCurrentBuffer = true;
+    }
+    else if ((media->flags & CLAbstractMediaData::MediaFlags_AfterEOF) && vd) {
+        m_display[vd->channelNumber]->waitForFramesDisplaed();
     }
 
     if (m_needChangePriority)
@@ -457,6 +457,7 @@ bool CLCamDisplay::processData(CLAbstractData* data)
             if (!vd)
                 return result; // impossible? incoming vd!=0
             m_lastDisplayedVideoTime = vd->timestamp;
+            m_display[channel]->setCurrentTime(AV_NOPTS_VALUE);
             display(vd, !vd->ignore, speed);
             m_singleShotQuantProcessed = true;
             return result;
@@ -477,11 +478,29 @@ bool CLCamDisplay::processData(CLAbstractData* data)
         //3) video and audio playing
         else
         {
+            CLCompressedVideoData* incoming = 0;
+            if (m_audioDisplay->msInBuffer() < AUDIO_BUFF_SIZE )
+                incoming = vd; // process packet
+            else {
+                if (vd)
+                    vd->releaseRef(); // queue too large. postpone packet.
+                result = false;
+            }
+
+            vd = nextInOutVideodata(incoming, channel);
+            incoming = 0;
+            if (vd) {
+                m_lastDisplayedVideoTime = vd->timestamp;
+                qint64 currentAudioTime = m_lastAudioPacketTime - (quint64)m_audioDisplay->msInBuffer()*1000;
+                m_display[channel]->setCurrentTime(currentAudioTime);
+                display(vd, !vd->ignore, speed);
+                m_singleShotQuantProcessed = true;
+            }
+
+            /*
             qint64 videoDuration;
             qint64 diff = diffBetweenVideoAndAudio(vd, channel, videoDuration);
             //cl_log.log("diff = ", (int)diff/1000, cl_logALWAYS);
-
-
             if (diff >= 2 * videoDuration && m_audioDisplay->msInBuffer() > 0) //factor 2 here is to avoid frequent switch between normal play and fast play
             {
                 // video runs faster than audio; // need to hold video this frame
@@ -523,6 +542,7 @@ bool CLCamDisplay::processData(CLAbstractData* data)
                         break; // no more video in queue
 
                     bool lastFrameToDisplay = diff > -2 * videoDuration; //factor 2 here is to avoid frequent switch between normal play and fast play
+                    lastFrameToDisplay = true;
 
                     m_lastDisplayedVideoTime = vd->timestamp;
                     display(vd, lastFrameToDisplay && !vd->ignore, speed);
@@ -540,6 +560,7 @@ bool CLCamDisplay::processData(CLAbstractData* data)
                     diff = diffBetweenVideoAndAudio(incoming, channel, videoDuration);
                 }
             }
+            */
         }
 
         return result;
@@ -564,6 +585,11 @@ void CLCamDisplay::setLightCPUMode(CLAbstractVideoDecoder::DecodeMode val)
     m_lightCpuMode = val;
 }
 
+void CLCamDisplay::pauseAudio()
+{
+    m_audioDisplay->suspend();
+}
+
 void CLCamDisplay::playAudio(bool play)
 {
     if (m_playAudio == play)
@@ -573,6 +599,8 @@ void CLCamDisplay::playAudio(bool play)
     m_playAudio = play;
     if (!m_playAudio)
         m_audioDisplay->clearDeviceBuffer();
+    else
+        m_audioDisplay->resume();
 }
 
 //==========================================================================
@@ -662,14 +690,15 @@ void CLCamDisplay::afterJump(qint64 newTime)
     m_lastVideoPacketTime = newTime;
     m_previousVideoTime = newTime;
     //m_previousVideoDisplayedTime = 0;
-    m_display[0]->unblockTimeValue();
 
     m_totalFrames = 0;
     m_iFrames = 0;
     clearVideoQueue();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
-        if (m_display[i])
+        if (m_display[i]) {
             m_display[i]->afterJump();
+            m_display[i]->unblockTimeValue();
+        }
     }
 
     m_audioDisplay->clearAudioBuffer();

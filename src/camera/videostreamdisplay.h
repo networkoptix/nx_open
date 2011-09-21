@@ -7,8 +7,9 @@
 class CLAbstractVideoDecoder;
 struct CLCompressedVideoData;
 class CLAbstractRenderer;
+class BufferedFrameDisplayer;
 
-static const int MAX_FRAME_QUEUE_SIZE = 2;
+static const int MAX_FRAME_QUEUE_SIZE = 8;
 
 /**
   * Display one video stream. Decode the video and pass it to video window.
@@ -30,14 +31,15 @@ public:
 
     void setMTDecoding(bool value);
 
-    void setReverseMode(bool value);
-
+    void setSpeed(float value);
     qint64 getLastDisplayedTime() const;
     void setLastDisplayedTime(qint64 value);
     void afterJump();
     QImage getScreenshot();
     void blockTimeValue(qint64 time);
     void unblockTimeValue();
+    void setCurrentTime(qint64 time);
+    void waitForFramesDisplaed();
 private:
     QMutex m_mtx;
     mutable QMutex m_timeMutex;
@@ -74,7 +76,9 @@ private:
     int m_realReverseSize;
     int m_maxReverseQueueSize;
     bool m_timeChangeEnabled;
+    BufferedFrameDisplayer* m_bufferedFrameDisplayer;
 private:
+    float m_speed;
     void reorderPrevFrames();
     bool allocScaleContext(const CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);
     void freeScaleContext();
