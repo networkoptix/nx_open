@@ -23,6 +23,7 @@
 #include "device_plugins/android/devices/android_device_server.h"
 #include "device_plugins/desktop/device/desktop_device_server.h"
 #include "device_plugins/onvif/discovery/onvif_device_server.h"
+#include "device_plugins/coldstore/coldstore_device_server.h"
 
 
 QMutex global_ffmpeg_mutex;
@@ -95,8 +96,8 @@ int main(int argc, char *argv[])
     }
 
 #ifdef _DEBUG
-     cl_log.setLogLevel(cl_logDEBUG1);
-    //cl_log.setLogLevel(cl_logWARNING);
+     //cl_log.setLogLevel(cl_logDEBUG1);
+    cl_log.setLogLevel(cl_logWARNING);
 #else
     cl_log.setLogLevel(cl_logWARNING);
 #endif
@@ -132,8 +133,10 @@ int main(int argc, char *argv[])
     CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
     CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&AVigilonDeviceServer::instance());
     CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&AndroidDeviceServer::instance());
-    //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&IQEyeDeviceServer::instance());
+        //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&IQEyeDeviceServer::instance());
     CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&OnvifDeviceServer::instance());
+    CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&ColdStoreDeviceServer::instance());
+    
 #ifdef Q_OS_WIN
     CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&DesktopDeviceServer::instance());
 #endif // Q_OS_WIN
