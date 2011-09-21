@@ -111,7 +111,8 @@ protected:
     void mouseMoveEvent(QMouseEvent *);
     void mousePressEvent(QMouseEvent *);
     void mouseReleaseEvent(QMouseEvent *);
-    void drawGradient(QPainter& painter, const QRectF& r);
+
+    void drawGradient(QPainter *painter, const QRectF &r);
 };
 
 void TimeLine::wheelAnimationFinished()
@@ -155,7 +156,7 @@ void TimeLine::wheelEvent(QWheelEvent *event)
 
     if (abs(delta) == 120)
     {
-        m_scaleSpeed *= 1.40;
+        m_scaleSpeed *= 1.40f;
         m_scaleSpeed  = qMin(m_scaleSpeed, (float)10.0);
 
         m_wheelAnimation->setEndValue(m_parent->scalingFactor() + delta/SCALE_FACTOR*m_scaleSpeed);
@@ -181,10 +182,16 @@ void TimeLine::wheelEvent(QWheelEvent *event)
     m_parent->centraliseSlider(); // we need to trigger animation
     m_prevWheelDelta = delta;
 }
+
 static const int MAX_LABEL_WIDTH = 64;
-struct IntervalInfo { qint64 interval; int value; const char * name; int count; const char * maxText; };
-static const IntervalInfo intervals[] =
-{
+
+static const struct IntervalInfo {
+    qint64 interval;
+    int value;
+    const char *name;
+    int count;
+    const char * maxText;
+} intervals[] = {
     {100, 100, "ms", 10, "ms"},
     {1000, 1, "s", 60, "59s"},
     {5*1000, 5, "s", 12, "59s"},
@@ -194,11 +201,11 @@ static const IntervalInfo intervals[] =
     {5*60*1000, 5, "m", 12, "59m"},
     {10*60*1000, 10, "m", 6, "59m"},
     {30*60*1000, 30, "m", 2, "59m"},
-    {60*60*1000, 1, "h", 24, "59h"},
-    {3*60*60*1000, 3, "h", 8, "59h"},
-    {6*60*60*1000, 6, "h", 4, "59h"},
-    {12*60*60*1000, 12, "h", 2, "59h"},
-    {24*60*60*1000, 1, "d", 1, "99d"}
+    {60*60*1000, 1, "h", 24, "24h"},
+    {3*60*60*1000, 3, "h", 8, "24h"},
+    {6*60*60*1000, 6, "h", 4, "24h"},
+    {12*60*60*1000, 12, "h", 2, "24h"},
+    {24*60*60*1000, 1, "d", 30, "30d"}
 };
 
 qint64 roundTime(qint64 msecs, int interval)
@@ -210,7 +217,7 @@ double round(double r) {
     return (r > 0.0) ? floor(r + 0.5) : ceil(r - 0.5);
 }
 
-void TimeLine::drawGradient(QPainter& painter, const QRectF& r)
+void TimeLine::drawGradient(QPainter *painter, const QRectF &r)
 {
     int MAX_COLOR = 64+16;
     int MIN_COLOR = 0;
@@ -220,8 +227,8 @@ void TimeLine::drawGradient(QPainter& painter, const QRectF& r)
         k *= (float) (MAX_COLOR-MIN_COLOR) / (float) height();
         k += MIN_COLOR;
         QColor color(k,k,k,k);
-        painter.setPen(color);
-        painter.drawLine(r.left(), i, r.width(), i);
+        painter->setPen(color);
+        painter->drawLine(r.left(), i, r.width(), i);
     }
 }
 
@@ -241,7 +248,7 @@ void TimeLine::paintEvent(QPaintEvent *ev)
     painter.setPen(pal.color(QPalette::Base));
     const QRect r(handleThickness, frameWidth(), width() - handleThickness, height() - 2*frameWidth());
     painter.drawRect(r);
-    drawGradient(painter, QRect(0, 0, width(), height() - 2*frameWidth()));
+    drawGradient(&painter, QRect(0, 0, width(), height() - 2*frameWidth()));
     painter.setPen(pal.color(QPalette::Text));
 
     const qint64 range = m_parent->sliderRange();
@@ -250,7 +257,7 @@ void TimeLine::paintEvent(QPaintEvent *ev)
 
     const int minWidth = 30;
 
-    int level = 0;
+    unsigned level = 0;
     while (minWidth > pixelPerTime*intervals[level].interval && level < arraysize(intervals)-1)
         ++level;
 
@@ -304,10 +311,10 @@ void TimeLine::paintEvent(QPaintEvent *ev)
     // draw grid
     for (qint64 curTime = intervals[level].interval*outsideCnt; curTime <= pos+range; curTime += intervals[level].interval)
     {
-        int curLevel = level;
+        unsigned curLevel = level;
         while (curLevel < arraysize(intervals)-2 && curTime % intervals[curLevel+1].interval == 0)
             ++curLevel;
-        int arrayIndex = qMin(curLevel-level, opacity.size()-1);
+        int arrayIndex = qMin(curLevel-level, unsigned(opacity.size()-1));
 
         color.setAlphaF(opacity[arrayIndex]);
         painter.setPen(color);
@@ -503,20 +510,9 @@ void TimeSlider::setCurrentValue(qint64 value)
     if (m_currentValue == value)
         return;
 
-    /*
-    if (value < m_viewPortPos)
-        setViewPortPos(value);
-    else if (value > m_viewPortPos + sliderRange())
-        setViewPortPos(value - sliderRange());
-    */
-    m_currentValue = qMin(value, maximumValue());
-
-    if (m_currentValue < 0)
-        m_currentValue  = 0;
-
+    m_currentValue = qBound(qint64(0), value, maximumValue());
 
     updateSlider();
-
     update();
 
     if (!m_isUserInput && !isMoving())
@@ -541,8 +537,8 @@ void TimeSlider::onSliderReleased()
     \property TimeSlider::maximumValue
     \brief the sliders maximum value in milliseconds
 
-    Sliders minimum value is always 0 and can't be less than zero. Maximum value can't be less
-    than 1000ms.
+    Sliders minimum value is always 0 and can't be less than zero. Maximum value
+    can't be less than 1000ms.
 
     \sa TimeSlider::currentValue
 */
@@ -553,14 +549,12 @@ qint64 TimeSlider::maximumValue() const
 
 void TimeSlider::setMaximumValue(qint64 value)
 {
-    if (value < 1000)
-        value = 1000;
-    m_maximumValue = value;
+    m_maximumValue = qBound(quint64(1000), quint64(value), quint64(7*24*60*60*1000));
 }
 
 /*!
     \property TimeSlider::scalingFactor
-    \brief the sliders scaling factr of the time line
+    \brief the scaling factor of the time line
 
     Scaling factor is always great or equal to 0. If factor is 0, slider shows all time line, if
     greater than 0, it exponentially zooms it (visible time is maximumValue/exp(factor/2)).
@@ -575,7 +569,7 @@ double TimeSlider::scalingFactor() const
 void TimeSlider::setScalingFactor(double factor)
 {
     double oldfactor = m_scalingFactor;
-    m_scalingFactor = factor > 0 ? factor : 0;
+    m_scalingFactor = qMin(factor, 0.0);
     if (sliderRange() < m_minimumRange)
         m_scalingFactor = oldfactor;
     //setViewPortPos(currentValue() - m_slider->value()*delta());
@@ -592,23 +586,14 @@ void TimeSlider::setMinOpacity(double value)
     m_frame->setMinOpacity(value);
 }
 
-//TimeSlider::Mode TimeSlider::mode() const
-//{
-//    return m_mode;
-//}
-
 QSize TimeSlider::minimumSizeHint() const
 {
-    int w = m_slider->minimumSizeHint().width();
-    int h = m_slider->minimumSizeHint().height();
-    return QSize(w, h + 40);
+    return m_slider->minimumSizeHint() + QSize(0, 40);
 }
 
 QSize TimeSlider::sizeHint() const
 {
-    int w = m_slider->sizeHint().width();
-    int h = m_slider->sizeHint().height();
-    return QSize(w, h + 40);
+    return m_slider->sizeHint() + QSize(0, 40);
 }
 
 /*!

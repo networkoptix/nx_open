@@ -353,18 +353,20 @@ void NavigationItem::updateSlider()
 
     CLAbstractArchiveReader *reader = static_cast<CLAbstractArchiveReader*>(m_camera->getStreamreader());
 
-    qint64 length = reader->lengthMksec()/1000;
-    m_timeSlider->setMaximumValue(length);
-
-
-    quint64 time = m_camera->currentTime();
-    if (time != AV_NOPTS_VALUE)
+    qint64 length = reader->lengthMksec();
+    if (length != AV_NOPTS_VALUE)
     {
-        m_currentTime = time/1000;
-        m_timeSlider->setCurrentValue(m_currentTime);
+        length /= 1000;
+        m_timeSlider->setMaximumValue(length);
+        m_timeLabel->setText(formatDuration(m_timeSlider->maximumValue() / 1000));
 
-        updateSliderToolTip(m_currentTime);
-        m_timeLabel->setText(formatDuration(length / 1000));
+        quint64 time = m_camera->currentTime();
+        if (time != AV_NOPTS_VALUE)
+        {
+            m_currentTime = time/1000;
+            m_timeSlider->setCurrentValue(m_currentTime);
+            updateSliderToolTip(m_currentTime);
+        }
     }
 }
 
