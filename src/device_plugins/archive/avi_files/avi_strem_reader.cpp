@@ -209,7 +209,7 @@ CLDeviceVideoLayout* CLAVIStreamReader::getLayout()
 
 AVFormatContext* CLAVIStreamReader::getFormatContext()
 {
-    openFormatContext();
+    if (openFormatContext())
     {
         QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
         int err = av_find_stream_info(m_formatContext);
