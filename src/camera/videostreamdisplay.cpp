@@ -6,6 +6,7 @@
 #include "gl_renderer.h"
 #include "util.h"
 #include "base/longrunnable.h"
+#include "base/adaptivesleep.h"
 
 static const int MAX_REVERSE_QUEUE_SIZE = 1024*1024 * 300; // at bytes
 static const double FPS_EPS = 1e-6;
@@ -88,7 +89,12 @@ protected:
                     m_alignedTimer.restart();
                     m_expectedTime = currentTime;
                 }
-                qint64 sleepTime = qMin(frame->pkt_dts - currentTime, 5000000ll);
+                if (frame->pkt_dts - currentTime >  MAX_VALID_SLEEP_TIME) {
+                    currentTime = m_currentTime = m_expectedTime = frame->pkt_dts;
+                    m_alignedTimer.restart();
+                    m_timer.restart();
+                }
+                qint64 sleepTime = frame->pkt_dts - currentTime;
 
                 m_sync.unlock();
 
@@ -505,6 +511,7 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(CLCompress
             if (!rescaleFrame(m_tmpFrame, *outFrame, m_tmpFrame.width / scaleFactor, m_tmpFrame.height / scaleFactor)) // universal scaler
                 return Status_Displayed;
         }
+        outFrame->pkt_dts = m_tmpFrame.pkt_dts;
     }
     outFrame->flags = data->flags;
     //outFrame->pts = data->timestamp;
