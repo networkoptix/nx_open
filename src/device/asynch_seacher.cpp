@@ -465,7 +465,7 @@ void CLDeviceSearcher::addDevice(CLDevice* device)
     QMutexLocker lock(&all_devices_mtx);
     all_devices.insert(device->getUniqueId(), device);
 
-    if (device->getDeviceType() == CLDevice::VIDEODEVICE)
+    if (device->associatedWithFile())
     {
         QString dirName = QFileInfo(deviceId).dir().path();
         DirectoryEntries::iterator iter = m_directoryEntries.find(dirName);
