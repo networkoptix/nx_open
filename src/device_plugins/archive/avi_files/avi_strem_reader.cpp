@@ -583,7 +583,7 @@ begin_label:
         // -------------------------------------------
         // workaround ffmpeg bugged seek
         if (channel == 0) {
-            if (m_lastUIJumpTime != AV_NOPTS_VALUE)
+            if (m_lastUIJumpTime > 0)
             {
                 QMutexLocker mutex(&m_cs);
                 if (m_lastUIJumpTime - m_currentTime > MAX_KEY_FIND_INTERVAL) {
@@ -593,7 +593,7 @@ begin_label:
                     goto begin_label;
                 }
                 else  {
-                    if (m_currentTime == 0 || currentPacket().flags & AV_PKT_FLAG_KEY) {
+                    if (currentPacket().flags & AV_PKT_FLAG_KEY) {
                         m_IFrameAfterJumpFound = true;
                         m_lastUIJumpTime = AV_NOPTS_VALUE;
                     }
