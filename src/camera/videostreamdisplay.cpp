@@ -98,7 +98,6 @@ protected:
 
                 m_sync.unlock();
 
-                cl_log.log("process frame. sleepTime=", sleepTime, cl_logALWAYS);
                 if (sleepTime > 0)
                     msleep(sleepTime/1000);
                 else if (sleepTime < -2000000) {
