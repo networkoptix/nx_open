@@ -106,11 +106,10 @@ bool CLGridEngine::isSpaceAvalable() const
 
 QRect CLGridEngine::gridSlotRect() const
 {
+    if (m_settings.items->isEmpty())
+        return QRect(0,0,0,0);
+
 	CLAbstractSceneItem* item =  getVeryLeftItem();
-
-	if (!item) // nos single video on this lay out
-		return QRect(0,0,0,0);
-
 	int left = item->mapToScene(item->boundingRect().topLeft()).x();
 
 	item =  getVeryTopItem();
@@ -134,12 +133,10 @@ QRect CLGridEngine::gridSlotRect() const
 
 QRect CLGridEngine::getGridRect() const
 {
+    if (m_settings.items->isEmpty())
+        return QRect(m_settings.left, m_settings.top, 100000, 10000);
 
 	CLAbstractSceneItem* item =  getVeryLeftItem();
-
-	if (!item) // nos single video on this lay out
-		return QRect(m_settings.left, m_settings.top, 100000, 10000);
-
 	int left = item->mapToScene(item->boundingRect().topLeft()).x();
 
 	item =  getVeryTopItem();
@@ -483,93 +480,93 @@ CLAbstractSceneItem* CLGridEngine::getNextBottomItem(const CLAbstractSceneItem* 
 
 CLAbstractSceneItem* CLGridEngine::getVeryLeftItem() const
 {
-	CLAbstractSceneItem* result = 0;
+    if (m_settings.items->isEmpty())
+        return 0;
 
-	unsigned int min_val = 0xffffffff; // very big value
+    CLAbstractSceneItem* item = m_settings.items->at(0);
+    qreal min_val = item->sceneBoundingRect().topLeft().x();
+    for (int i = 1; i < m_settings.items->size(); ++i)
+    {
+        qreal val = m_settings.items->at(i)->sceneBoundingRect().topLeft().x();
+        if (val < min_val)
+        {
+            min_val = val;
+            item = m_settings.items->at(i);
+        }
+    }
 
-	foreach (CLAbstractSceneItem* item, *(m_settings.items))
-	{
-		QPointF p = item->mapToScene(item->boundingRect().topLeft());
-		if (p.x() < min_val)
-		{
-			min_val = p.x();
-			result = item;
-		}
-	}
-
-	return result;
+    return item;
 }
 
 CLAbstractSceneItem* CLGridEngine::getVeryTopItem() const
 {
-	CLAbstractSceneItem* result = 0;
+    if (m_settings.items->isEmpty())
+        return 0;
 
-	unsigned int min_val = 0xffffffff; // very big value
+    CLAbstractSceneItem* item = m_settings.items->at(0);
+    qreal min_val = item->sceneBoundingRect().topLeft().y();
+    for (int i = 1; i < m_settings.items->size(); ++i)
+    {
+        qreal val = m_settings.items->at(i)->sceneBoundingRect().topLeft().y();
+        if (val < min_val)
+        {
+            min_val = val;
+            item = m_settings.items->at(i);
+        }
+    }
 
-	foreach (CLAbstractSceneItem* item, *(m_settings.items))
-	{
-		QPointF p = item->mapToScene(item->boundingRect().topLeft());
-		if (p.y() < min_val)
-		{
-			min_val = p.y();
-			result = item;
-		}
-	}
-
-	return result;
+    return item;
 }
 
 CLAbstractSceneItem* CLGridEngine::getVeryRightItem() const
 {
-	CLAbstractSceneItem* result = 0;
+    if (m_settings.items->isEmpty())
+        return 0;
 
-	unsigned int max_val = 0;
+    CLAbstractSceneItem* item = m_settings.items->at(0);
+    qreal min_val = item->sceneBoundingRect().bottomRight().x();
+    for (int i = 1; i < m_settings.items->size(); ++i)
+    {
+        qreal val = m_settings.items->at(i)->sceneBoundingRect().bottomRight().x();
+        if (val > min_val)
+        {
+            min_val = val;
+            item = m_settings.items->at(i);
+        }
+    }
 
-	foreach (CLAbstractSceneItem* item, *(m_settings.items))
-	{
-		QPointF p = item->mapToScene(item->boundingRect().bottomRight());
-		if (p.x() >= max_val)
-		{
-			max_val = p.x();
-			result = item;
-		}
-	}
-
-	return result;
+    return item;
 }
 
 CLAbstractSceneItem* CLGridEngine::getVeryBottomItem() const
 {
-	CLAbstractSceneItem* result = 0;
+    if (m_settings.items->isEmpty())
+        return 0;
 
-	unsigned int max_val = 0;
+    CLAbstractSceneItem* item = m_settings.items->at(0);
+    qreal min_val = item->sceneBoundingRect().bottomRight().y();
+    for (int i = 1; i < m_settings.items->size(); ++i)
+    {
+        qreal val = m_settings.items->at(i)->sceneBoundingRect().bottomRight().y();
+        if (val > min_val)
+        {
+            min_val = val;
+            item = m_settings.items->at(i);
+        }
+    }
 
-	foreach (CLAbstractSceneItem* item, *(m_settings.items))
-	{
-		QPointF p  = item->mapToScene(item->boundingRect().bottomRight());
-		if (p.y() >= max_val)
-		{
-			max_val = p.y();
-			result = item;
-		}
-	}
-
-	return result;
-
+    return item;
 }
 
 QPoint CLGridEngine::getMassCenter() const
 {
-	if (m_settings.items->count()==0)
+    if (m_settings.items->isEmpty())
 		return QPoint(m_settings.left, m_settings.top);
 
 	QPointF result(0.0,0.0);
 
 	foreach (CLAbstractSceneItem* item, *(m_settings.items))
-	{
-		QPointF p  = item->mapToScene(item->boundingRect().center());
-		result+=p;
-	}
+        result += item->sceneBoundingRect().center();
 
 	return QPoint(result.x()/m_settings.items->size(), result.y()/m_settings.items->size());
 
