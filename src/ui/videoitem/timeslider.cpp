@@ -569,7 +569,7 @@ double TimeSlider::scalingFactor() const
 void TimeSlider::setScalingFactor(double factor)
 {
     double oldfactor = m_scalingFactor;
-    m_scalingFactor = qMin(factor, 0.0);
+    m_scalingFactor = qMax(factor, 0.0);
     if (sliderRange() < m_minimumRange)
         m_scalingFactor = oldfactor;
     //setViewPortPos(currentValue() - m_slider->value()*delta());

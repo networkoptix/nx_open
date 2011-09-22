@@ -234,8 +234,7 @@ CLDevice* CLDeviceManager::getArchiveDevice(QString id)
 	if (!file.exists())
 		return 0;
 
-	CLDevice* dev = new CLAviDevice(id);
-	return dev;
+	return createArchiveDevice(id);
 }
 
 void CLDeviceManager::onNewDevices_helper(CLDeviceList devices, QString parentId)
@@ -390,32 +389,26 @@ void CLDeviceManager::addFiles(const QStringList& files)
             continue;
 
 
-        FileTypeSupport fileTypeSupport;
-
-        if (fileTypeSupport.isImageFileExt(xfile))
-        {
-            dev = new CLFileDevice(xfile);
-        }
-        else if (CLAviDvdDevice::isAcceptedUrl(xfile))
-        {
-            dev = new CLAviDvdDevice(xfile);
-        }
-        else if (CLAviBluRayDevice::isAcceptedUrl(xfile))
-        {
-            dev = new CLAviBluRayDevice(xfile);
-        }
-        else if (fileTypeSupport.isMovieFileExt(xfile))
-        {
-            dev = new CLAviDevice(xfile);
-        }
-        else
-        {
-            continue;
-        }
-
-        lst[dev->getUniqueId()] = dev;
+        dev = createArchiveDevice(xfile);
+        if (dev)
+            lst[dev->getUniqueId()] = dev;
     }
 
 
     onNewDevices_helper(lst, QLatin1String(generalArchiverId));
+}
+
+CLDevice* CLDeviceManager::createArchiveDevice(const QString& xfile)
+{
+    FileTypeSupport fileTypeSupport;
+    if (fileTypeSupport.isImageFileExt(xfile))
+        return new CLFileDevice(xfile);
+    else if (CLAviDvdDevice::isAcceptedUrl(xfile))
+        return new CLAviDvdDevice(xfile);
+    else if (CLAviBluRayDevice::isAcceptedUrl(xfile))
+        return new CLAviBluRayDevice(xfile);
+    else if (fileTypeSupport.isMovieFileExt(xfile))
+        return new CLAviDevice(xfile);
+    else
+        return 0;
 }
