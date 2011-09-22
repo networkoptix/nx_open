@@ -10,7 +10,7 @@ public:
 	{
 	}
 
-	virtual void draw(CLVideoDecoderOutput* image, unsigned int channel) = 0;
+	virtual void draw(CLVideoDecoderOutput* image) = 0;
     virtual void waitForFrameDisplayed(int channel) = 0;
 	virtual void beforeDestroy() = 0;
 

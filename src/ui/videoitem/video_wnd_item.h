@@ -21,7 +21,7 @@ public:
     CLVideoWindowItem(GraphicsView *view, const CLDeviceVideoLayout *layout, int max_width, int max_height, QString name = QString());
     virtual ~CLVideoWindowItem();
 
-    virtual void draw(CLVideoDecoderOutput* image, unsigned int channel);
+    virtual void draw(CLVideoDecoderOutput* image);
     virtual void waitForFrameDisplayed(int channel);
 
 

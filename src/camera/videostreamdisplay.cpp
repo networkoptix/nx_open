@@ -108,7 +108,7 @@ protected:
                 m_lastDisplayedTime = frame->pkt_dts;
                 m_sync.unlock();
 
-                m_drawer->draw(frame, 0);
+                m_drawer->draw(frame);
                 //m_drawer->waitForFrameDisplayed(0);
                 m_queue.pop(frame);
             }
@@ -417,9 +417,6 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(CLCompress
 
     if (reverseMode != m_prevReverseMode) {
         clearReverseQueue();
-        CLCompressedVideoData emptyData(1,0);
-        CLVideoDecoderOutput tmpOutFrame;
-        //while (dec->decode(emptyData, &tmpOutFrame));
         dec->resetDecoder();
         m_prevReverseMode = reverseMode;
     }
@@ -431,6 +428,8 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(CLCompress
         scaleFactor > CLVideoDecoderOutput::factor_1;
 
     CLVideoDecoderOutput* outFrame = m_frameQueue[m_frameQueueIndex];
+    outFrame->channel = data->channelNumber;
+
     if (outFrame->isDisplaying()) 
         m_drawer->waitForFrameDisplayed(data->channelNumber);
     
@@ -472,8 +471,7 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(CLCompress
                 m_realReverseSize--;
 
             outFrame->sample_aspect_ratio = dec->getSampleAspectRatio();
-
-            if (processDecodedFrame(data->channelNumber, outFrame, enableFrameQueue, reverseMode))
+            if (processDecodedFrame(outFrame, enableFrameQueue, reverseMode))
                 return Status_Displayed;
             else
                 return Status_Buffered;
@@ -533,13 +531,13 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(CLCompress
     
     outFrame->sample_aspect_ratio = dec->getSampleAspectRatio();
 
-    if (processDecodedFrame(data->channelNumber, outFrame, enableFrameQueue, reverseMode))
+    if (processDecodedFrame(outFrame, enableFrameQueue, reverseMode))
         return Status_Displayed;
     else
         return Status_Buffered;
 }
 
-bool CLVideoStreamDisplay::processDecodedFrame(int channel, CLVideoDecoderOutput* outFrame, bool enableFrameQueue, bool reverseMode)
+bool CLVideoStreamDisplay::processDecodedFrame(CLVideoDecoderOutput* outFrame, bool enableFrameQueue, bool reverseMode)
 {
     if (outFrame->pkt_dts != AV_NOPTS_VALUE)
         setLastDisplayedTime(outFrame->pkt_dts);
@@ -549,13 +547,13 @@ bool CLVideoStreamDisplay::processDecodedFrame(int channel, CLVideoDecoderOutput
             if (m_bufferedFrameDisplayer)
                 m_bufferedFrameDisplayer->addFrame(outFrame);
             else
-                m_drawer->draw(outFrame, channel);
+                m_drawer->draw(outFrame);
             m_frameQueueIndex = (m_frameQueueIndex + 1) % MAX_FRAME_QUEUE_SIZE; // allow frame queue for selected video
             m_queueUsed = true;
         }
         else {
-            m_drawer->draw(outFrame, channel);
-            m_drawer->waitForFrameDisplayed(channel);
+            m_drawer->draw(outFrame);
+            m_drawer->waitForFrameDisplayed(outFrame->channel);
         }
         if (reverseMode) {
             if (m_prevFrameToDelete)
