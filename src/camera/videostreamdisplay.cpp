@@ -33,8 +33,16 @@ public:
 
     void addFrame(CLVideoDecoderOutput* outFrame) 
     {
-        while (m_queue.size() == m_queue.maxSize() && !m_needStop)
-            msleep(1);
+        static const int MAX_QUEUE_TIME = 1000 * 200;
+        bool needWait;
+        do {
+            m_sync.lock();
+            needWait = !m_needStop && (m_queue.size() == m_queue.maxSize() || 
+                        m_queue.size() > 0 && outFrame->pkt_dts - m_queue.front()->pkt_dts >= MAX_QUEUE_TIME);
+            m_sync.unlock();
+            if (needWait) 
+                msleep(1);
+        } while (needWait);
         m_queue.push(outFrame);
     }
 
@@ -110,7 +118,9 @@ protected:
 
                 m_drawer->draw(frame);
                 //m_drawer->waitForFrameDisplayed(0);
+                m_sync.lock();
                 m_queue.pop(frame);
+                m_sync.unlock();
             }
             else {
                 msleep(1);
