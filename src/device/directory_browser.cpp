@@ -9,6 +9,9 @@ CLDeviceDirectoryBrowser::CLDeviceDirectoryBrowser():
     mNeedStop(false),
     m_resultMutex(QMutex::Recursive)
 {
+    start();
+    QObject::moveToThread(this);
+
     connect(&m_fsWatcher, SIGNAL(directoryChanged(const QString&)), this, SLOT(directoryChanged(const QString&)));
     connect(this, SIGNAL(reload()), this, SLOT(reloadDirs()));
 }
