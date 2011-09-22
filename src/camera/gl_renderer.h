@@ -27,7 +27,7 @@ public:
 
     static int getMaxTextureSize();
 
-    void draw(CLVideoDecoderOutput* image, unsigned int channel);
+    void draw(CLVideoDecoderOutput* image);
     virtual void waitForFrameDisplayed(int channel);
 
     bool paintEvent(const QRect &r);

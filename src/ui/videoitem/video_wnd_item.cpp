@@ -144,12 +144,12 @@ void CLVideoWindowItem::waitForFrameDisplayed(int channel)
     m_gldraw[channel]->waitForFrameDisplayed(channel);
 }
 
-void CLVideoWindowItem::draw(CLVideoDecoderOutput* image, unsigned int channel)
+void CLVideoWindowItem::draw(CLVideoDecoderOutput* image)
 {
     // this is not ui thread
     m_first_draw = false;
 
-    m_gldraw[channel]->draw(image, channel); // this function will wait m_gldraw.paintEvent(0);
+    m_gldraw[image->channel]->draw(image); // this function will wait m_gldraw.paintEvent(0);
 
     //needUpdate(true);
     QMutexLocker locker(&m_mutex);

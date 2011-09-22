@@ -388,10 +388,8 @@ void CLGLRenderer::beforeDestroy()
     m_waitCon.wakeAll();
 }
 
-void CLGLRenderer::draw(CLVideoDecoderOutput* img, unsigned int channel)
+void CLGLRenderer::draw(CLVideoDecoderOutput* img)
 {
-    Q_UNUSED(channel);
-
     QMutexLocker locker(&m_displaySync);
     //m_abort_drawing = false;
 
