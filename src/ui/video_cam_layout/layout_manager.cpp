@@ -195,16 +195,12 @@ void CLSceneLayoutManager::save()
 		cl->toXml(doc, root);
 	}
 
-	QString xml = doc.toString();
-
 	QString dataLocation = getDataDirectory();
 	QFile file(dataLocation + QLatin1String("/custom_layouts.xml"));
 	file.open(QIODevice::WriteOnly);
-
-	QTextStream fstr(&file);
-	fstr<< xml;
-	fstr.flush();
-
+    file.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+    file.write(doc.toString().toUtf8());
+    file.close();
 }
 
 LayoutContent* CLSceneLayoutManager::introScreenLayoutContent()
