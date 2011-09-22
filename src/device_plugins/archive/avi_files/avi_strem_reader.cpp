@@ -209,7 +209,7 @@ CLDeviceVideoLayout* CLAVIStreamReader::getLayout()
 
 AVFormatContext* CLAVIStreamReader::getFormatContext()
 {
-    openFormatContext();
+    if (openFormatContext())
     {
         QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
         int err = av_find_stream_info(m_formatContext);
@@ -429,7 +429,7 @@ begin_label:
         QMutexLocker mutex(&m_cs);
         if (m_requiredJumpTime != AV_NOPTS_VALUE)
         {
-            intChanneljumpTo(m_requiredJumpTime, 0);
+            intChanneljumpTo(qMax(0ll,m_requiredJumpTime), 0);
             m_lastUIJumpTime = m_requiredJumpTime;
             m_requiredJumpTime = AV_NOPTS_VALUE;
         }
@@ -583,7 +583,7 @@ begin_label:
         // -------------------------------------------
         // workaround ffmpeg bugged seek
         if (channel == 0) {
-            if (m_lastUIJumpTime != AV_NOPTS_VALUE)
+            if (m_lastUIJumpTime > 0)
             {
                 QMutexLocker mutex(&m_cs);
                 if (m_lastUIJumpTime - m_currentTime > MAX_KEY_FIND_INTERVAL) {

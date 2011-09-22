@@ -4,6 +4,16 @@
 #include <stdio.h>
 #include "util.h"
 
+extern "C" {
+#ifdef WIN32
+#define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
+#endif
+#include "libavutil/pixdesc.h"
+#ifdef WIN32
+#undef AVPixFmtDescriptor
+#endif
+};
+
 // i am not sure about SSE syntax in 64-bit version, it is need testing. So, define is WIN32, not Q_OS_WIN
 #ifdef WIN32
 
@@ -342,6 +352,33 @@ void CLVideoDecoderOutput::copyPlane(unsigned char* dst, const unsigned char* sr
     }
 }
 
+void CLVideoDecoderOutput::fillRightEdge()
+{
+    if (format == -1)
+        return;
+    const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[format];
+    quint8 filler = 0;
+    int w = width;
+    int h = height;
+    for (int i = 0; i < descr->nb_components && data[i]; ++i)
+    {
+        int bpp = descr->comp[i].step_minus1 + 1;
+        int fillLen = linesize[i] - w*bpp;
+        if (fillLen) {
+            quint8* dst = data[i] + w*bpp;
+            for (int y = 0; y < h; ++y) {
+                memset(dst, filler, fillLen);
+                dst += linesize[i];
+            }
+        }
+        if (i == 0) {
+            filler = 0x80;
+            w >>= descr->log2_chroma_w;
+            h >>= descr->log2_chroma_h;
+        }
+    }
+}
+
 void CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat)
 {
     clean();
@@ -353,9 +390,27 @@ void CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat
     int rc = 32 >> (newFormat == PIX_FMT_RGBA || newFormat == PIX_FMT_ABGR || newFormat == PIX_FMT_BGRA ? 2 : 0);
     int roundWidth = roundUp(width, rc);
     int numBytes = avpicture_get_size((PixelFormat) format, roundWidth, height);
-    if (numBytes > 0)
+    if (numBytes > 0) {
         avpicture_fill((AVPicture*) this, (quint8*) av_malloc(numBytes), (PixelFormat) format, roundWidth, height);
+        fillRightEdge();
+    }
 }
+
+void CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat, int lineSizeHint)
+{
+    clean();
+    setUseExternalData(false);
+    width = newWidth;
+    height = newHeight;
+    format = newFormat;
+
+    int numBytes = avpicture_get_size((PixelFormat) format, lineSizeHint, height);
+    if (numBytes > 0) {
+        avpicture_fill((AVPicture*) this, (quint8*) av_malloc(numBytes), (PixelFormat) format, lineSizeHint, height);
+        fillRightEdge();
+    }
+}
+
 
 void CLVideoDecoderOutput::downscale(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst, downscale_factor factor)
 {

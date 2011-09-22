@@ -25,6 +25,7 @@ struct CLVideoDecoderOutput: public AVFrame
     void setDisplaying(bool value) {m_displaying = value; }
     bool isDisplaying() const { return m_displaying; }
     void reallocate(int newWidth, int newHeight, int format);
+    void reallocate(int newWidth, int newHeight, int newFormat, int lineSizeHint);
 public:
     int flags;
     double sample_aspect_ratio; 
@@ -35,6 +36,7 @@ private:
 
     static void copyPlane(unsigned char* dst, const unsigned char* src, int width, int dst_stride, int src_stride, int height);
     static bool equalPlanes(const unsigned char* plane1, const unsigned char* plane2, int width, int stride1, int stride2, int height, int max_diff);
+    void fillRightEdge();
 private:
     bool m_useExternalData; // pointers only copied to this frame
     bool m_displaying;

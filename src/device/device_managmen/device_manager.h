@@ -51,7 +51,7 @@ protected:
     bool match_subfilter(CLDevice* dev, QString fltr) const;
 
     void getResultFromDirBrowser();
-
+    CLDevice* createArchiveDevice(const QString& xfile);
 protected slots:
 	void onTimer();
 
