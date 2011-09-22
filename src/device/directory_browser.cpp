@@ -107,7 +107,7 @@ CLDeviceList CLDeviceDirectoryBrowser::findDevices(const QString& directory)
     foreach (const QFileInfo &fi, dir.entryInfoList(fileTypeSupport.moviesFilter()))
     {
         QString abs_file_name = fi.absoluteFilePath();
-        CLDevice* dev = new CLAviDevice(abs_file_name);
+        CLDevice* dev = CLDeviceManager::instance().getArchiveDevice(abs_file_name);
         result[abs_file_name] = dev;
     }
 
