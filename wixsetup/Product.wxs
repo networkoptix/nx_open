@@ -4,6 +4,14 @@
   <Product Id="*" Name="$(env.APPLICATION_NAME)" Language="1033" Version="$(env.APPLICATION_VERSION)" Manufacturer="$(env.ORGANIZATION_NAME)" UpgradeCode="286227c5-25b4-4796-aa48-2d9822e10b0d">
     <Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="$(env.ORGANIZATION_NAME) $(env.APPLICATION_NAME)(beta) Installer" Manufacturer="$(env.ORGANIZATION_NAME)" InstallPrivileges="elevated"/>
 
+    <?ifdef env.CommonProgramFiles(x86) ?>
+    <!-- Variable is defined, we are building on 64 bit -->
+      <?define commonProgramFiles = "c:\Program Files (x86)\Common Files\" ?>
+    <?else?>
+    <!-- Variable is not defined, we are building on 32 bit -->
+      <?define commonProgramFiles = "c:\Program Files\Common Files\" ?>
+    <?endif?>
+
     <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
     <WixVariable Id="WixUIBannerBmp" Value="Binary\eve\eve_logo-493x58.bmp" />
     <WixVariable Id="WixUIDialogBmp" Value="Binary\eve\eve_logo-493x312.bmp" />
@@ -191,22 +199,22 @@
             </Component>
 
             <Component Id="QTLibraries" Guid="3E273FF1-35A7-44da-864C-61EE9E9B7EA8">
-              <File Id="QtCore4" Name="QtCore4.dll" Source="$(env.QT_HOME)\bin\QtCore4.dll"/>
-              <File Id="QtGui4" Name="QtGui4.dll" Source="$(env.QT_HOME)\bin\QtGui4.dll"/>
-              <File Id="QtMultimedia4" Name="QtMultimedia4.dll" Source="$(env.QT_HOME)\bin\QtMultimedia4.dll"/>
-              <File Id="QtNetwork4" Name="QtNetwork4.dll" Source="$(env.QT_HOME)\bin\QtNetwork4.dll"/>
-              <File Id="QtOpenGL4" Name="QtOpenGL4.dll" Source="$(env.QT_HOME)\bin\QtOpenGL4.dll"/>
-              <File Id="QtWebKit4" Name="QtWebKit4.dll" Source="$(env.QT_HOME)\bin\QtWebKit4.dll"/>
-              <File Id="QtXml4" Name="QtXml4.dll" Source="$(env.QT_HOME)\bin\QtXml4.dll"/>
-              <File Id="QtXmlPatterns4" Name="QtXmlPatterns4.dll" Source="$(env.QT_HOME)\bin\QtXmlPatterns4.dll"/>
-              <File Id="phonon4" Name="phonon4.dll" Source="$(env.QT_HOME)\bin\phonon4.dll"/>
+              <File Id="QtCore4.dll" Name="QtCore4.dll" Source="$(env.QTDIR)\bin\QtCore4.dll"/>
+              <File Id="QtGui4.dll" Name="QtGui4.dll" Source="$(env.QTDIR)\bin\QtGui4.dll"/>
+              <File Id="QtMultimedia4.dll" Name="QtMultimedia4.dll" Source="$(env.QTDIR)\bin\QtMultimedia4.dll"/>
+              <File Id="QtNetwork4.dll" Name="QtNetwork4.dll" Source="$(env.QTDIR)\bin\QtNetwork4.dll"/>
+              <File Id="QtOpenGL4.dll" Name="QtOpenGL4.dll" Source="$(env.QTDIR)\bin\QtOpenGL4.dll"/>
+              <File Id="QtWebKit4.dll" Name="QtWebKit4.dll" Source="$(env.QTDIR)\bin\QtWebKit4.dll"/>
+              <File Id="QtXml4.dll" Name="QtXml4.dll" Source="$(env.QTDIR)\bin\QtXml4.dll"/>
+              <File Id="QtXmlPatterns4.dll" Name="QtXmlPatterns4.dll" Source="$(env.QTDIR)\bin\QtXmlPatterns4.dll"/>
+              <File Id="phonon4.dll" Name="phonon4.dll" Source="$(env.QTDIR)\bin\phonon4.dll"/>
             </Component>
 
             <Directory Id="imageformats" Name="imageformats">
 		<Component Id="imageformats" Guid="29A1DA63-58E5-44ce-9AEF-0D2606D3ECB5">
-                  <File Id="qgif4.dll" Name="qgif4.dll" Source="$(env.QT_HOME)\plugins\imageformats\qgif4.dll"/>
-                  <File Id="qjpeg4.dll" Name="qjpeg4.dll" Source="$(env.QT_HOME)\plugins\imageformats\qjpeg4.dll"/>
-                  <File Id="qtiff4.dll" Name="qtiff4.dll" Source="$(env.QT_HOME)\plugins\imageformats\qtiff4.dll"/>
+                  <File Id="qgif4.dll" Name="qgif4.dll" Source="$(env.QTDIR)\plugins\imageformats\qgif4.dll"/>
+                  <File Id="qjpeg4.dll" Name="qjpeg4.dll" Source="$(env.QTDIR)\plugins\imageformats\qjpeg4.dll"/>
+                  <File Id="qtiff4.dll" Name="qtiff4.dll" Source="$(env.QTDIR)\plugins\imageformats\qtiff4.dll"/>
                 </Component>
             </Directory>
 
@@ -253,8 +261,8 @@
 
 
     <DirectoryRef Id="TARGETDIR">
-      <Merge Id="VCRedist1" SourceFile="$(env.ARCH_PROGRAMFILES)\Common Files\Merge Modules\Microsoft_VC90_CRT_x86.msm" DiskId="1" Language="0"/>
-      <Merge Id="VCRedist2" SourceFile="$(env.ARCH_PROGRAMFILES)\Common Files\Merge Modules\policy_9_0_Microsoft_VC90_CRT_x86.msm" DiskId="1" Language="0"/>
+      <Merge Id="VCRedist1" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC90_CRT_x86.msm" DiskId="1" Language="0"/>
+      <Merge Id="VCRedist2" SourceFile="$(var.commonProgramFiles)Merge Modules\policy_9_0_Microsoft_VC90_CRT_x86.msm" DiskId="1" Language="0"/>
     </DirectoryRef>
 
     <Feature Id="VCRedist" Title="Visual C++ 9.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
