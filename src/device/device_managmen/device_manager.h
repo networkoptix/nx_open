@@ -7,6 +7,7 @@
 #include "../device.h"
 #include "device_criteria.h"
 #include "../directory_browser.h"
+#include "device_plugins/archive/filetypesupport.h"
 
 class CLDevice;
 class CLNetworkDevice;
@@ -28,7 +29,7 @@ public:
 	CLDeviceSearcher& getDeviceSearcher(); 
 
 	CLDeviceList getDeviceList(const CLDeviceCriteria& cr);
-	CLDevice* getDeviceById(QString id);
+	CLDevice* getDeviceById(const QString& id);
 
     CLNetworkDevice* getDeviceByIp(const QHostAddress& ip);
 
@@ -50,11 +51,10 @@ protected:
 	void addArchiver(QString id);
     bool match_subfilter(CLDevice* dev, QString fltr) const;
 
-    void getResultFromDirBrowser();
     CLDevice* createArchiveDevice(const QString& xfile);
 protected slots:
 	void onTimer();
-
+    void getResultFromDirBrowser();
 protected:
 	QTimer m_timer;
 	CLDeviceSearcher m_dev_searcher;
@@ -66,8 +66,7 @@ protected:
     QStringList  mPleaseCheckDirsLst;
 
     CLDeviceDirectoryBrowser mDirbrowsr;
-
-    bool mNeedresultsFromDirbrowsr;
+    FileTypeSupport m_fileTypeSupport;
 };
 
 #endif //device_manager_h_1537_

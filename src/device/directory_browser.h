@@ -17,6 +17,7 @@ public:
 
 signals:
     void reload();
+    void dataReloaded();
 
 protected:
     void run();

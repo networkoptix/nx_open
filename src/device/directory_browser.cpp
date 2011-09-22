@@ -64,6 +64,7 @@ void CLDeviceDirectoryBrowser::reloadDirs()
     }
 
     m_tmpResult.clear();
+    emit dataReloaded();
 
     cl_log.log(QLatin1String("Done(Browsing directories). Time elapsed = "), time.elapsed(), cl_logALWAYS);
 }
@@ -107,7 +108,8 @@ CLDeviceList CLDeviceDirectoryBrowser::findDevices(const QString& directory)
     foreach (const QFileInfo &fi, dir.entryInfoList(fileTypeSupport.moviesFilter()))
     {
         QString abs_file_name = fi.absoluteFilePath();
-        CLDevice* dev = new CLAviDevice(abs_file_name);
+        //CLDevice* dev = new CLAviDevice(abs_file_name);
+        CLDevice* dev = CLDeviceManager::instance().getArchiveDevice(abs_file_name);
         result[abs_file_name] = dev;
     }
 

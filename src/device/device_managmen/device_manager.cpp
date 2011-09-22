@@ -7,8 +7,8 @@
 #include "device_plugins/archive/avi_files/avi_dvd_device.h"
 #include "device_plugins/archive/avi_files/avi_bluray_device.h"
 #include "../file_device.h"
-#include "device_plugins/archive/filetypesupport.h"
 #include "base/tagmanager.h"
+#include "base/sleep.h"
 
 // Init static variables
 CLDeviceManager* CLDeviceManager::m_Instance = 0;
@@ -26,10 +26,11 @@ CLDeviceManager& CLDeviceManager::instance()
 }
 
 CLDeviceManager::CLDeviceManager():
-m_firstTime(true),
-mNeedresultsFromDirbrowsr(false)
+m_firstTime(true)
 {
 	connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimer()));
+    connect(&mDirbrowsr, SIGNAL(dataReloaded()), this, SLOT(getResultFromDirBrowser()));
+
 	m_timer.start(100); // first time should come fast
 
 	addArchiver(QLatin1String(generalArchiverId));
@@ -120,12 +121,14 @@ void CLDeviceManager::onTimer()
 		m_dev_searcher.start(); // run searcher again ...
 	}
 
+    /*
     if (mNeedresultsFromDirbrowsr)
     {
         //mDirbrowsr is not running
         getResultFromDirBrowser();
         mNeedresultsFromDirbrowsr = false;
     }
+    */
 
 
     QStringList checklist = getPleaseCheckDirs();
@@ -133,7 +136,7 @@ void CLDeviceManager::onTimer()
 
     if (checklist.count())
     {
-        mNeedresultsFromDirbrowsr = true;
+        //mNeedresultsFromDirbrowsr = true;
         mDirbrowsr.setDirList(checklist);
     }
 
@@ -188,7 +191,7 @@ CLNetworkDevice* CLDeviceManager::getDeviceByIp(const QHostAddress& ip)
     return 0;
 }
 
-CLDevice* CLDeviceManager::getDeviceById(QString id)
+CLDevice* CLDeviceManager::getDeviceById(const QString& id)
 {
 	QMutexLocker lock(&m_dev_searcher.all_devices_mtx);
 	CLDeviceList& devices =  m_dev_searcher.getAllDevices();
@@ -234,6 +237,7 @@ CLDevice* CLDeviceManager::getArchiveDevice(QString id)
 	if (!file.exists())
 		return 0;
 
+    //return new CLAviDevice(id);
 	return createArchiveDevice(id);
 }
 
@@ -400,14 +404,13 @@ void CLDeviceManager::addFiles(const QStringList& files)
 
 CLDevice* CLDeviceManager::createArchiveDevice(const QString& xfile)
 {
-    FileTypeSupport fileTypeSupport;
-    if (fileTypeSupport.isImageFileExt(xfile))
+    if (m_fileTypeSupport.isImageFileExt(xfile))
         return new CLFileDevice(xfile);
     else if (CLAviDvdDevice::isAcceptedUrl(xfile))
         return new CLAviDvdDevice(xfile);
     else if (CLAviBluRayDevice::isAcceptedUrl(xfile))
         return new CLAviBluRayDevice(xfile);
-    else if (fileTypeSupport.isMovieFileExt(xfile))
+    else if (m_fileTypeSupport.isMovieFileExt(xfile))
         return new CLAviDevice(xfile);
     else
         return 0;
