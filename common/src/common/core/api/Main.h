@@ -11,6 +11,7 @@ enum State
 {
     INITIAL,
     GOT_RESOURCE_TYPES,
+    GOT_SERVER_ID,
     GOT_CAMERAS,
     ADDED_CAMERA
 };
@@ -26,7 +27,9 @@ public:
     void run();
 
 private slots:
+    void eventsReceived(QList<Event*>* events);
     void camerasReceived(int requestId, QList<Camera*>* cameras);
+    void serversReceived(int requestId, QList<Server*>* servers);
     void resourceTypesReceived(int requestId, QList<ResourceType*>* resourceTypes);
     void error(int requestId, QString message);
 
@@ -34,10 +37,13 @@ private:
     void nextStep();
 
 private:
+    QString m_serverId;
+
     SessionManager sm;
     int resourceTypesRequestId;
     int camerasRequestId;
     int addCameraRequestId;
+    int addServerRequestId;
 
     State m_state;
 

@@ -61,6 +61,30 @@ QString Object::toString() const
      return output;
 }
 
+Event::Event()
+{
+    setObjectName("event");
+}
+
+QString Event::code() const
+{
+    return m_code;
+}
+
+void Event::setCode(QString code)
+{
+    m_code = code;
+}
+
+QString Event::body() const
+{
+    return m_body;
+}
+void Event::setBody(QString body)
+{
+    m_body = body;
+}
+
 ResourceType::ResourceType()
 {
     setObjectName("resourceType");
@@ -124,6 +148,21 @@ QString NetworkDevice::url() const
 void NetworkDevice::setUrl(QString url)
 {
     m_url = url;
+}
+
+Server::Server()
+{
+    setObjectName("server");
+}
+
+QString Server::apiUrl() const
+{
+    return m_apiUrl;
+}
+
+void Server::setApiUrl(QString url)
+{
+    m_apiUrl = url;
 }
 
 Camera::Camera()

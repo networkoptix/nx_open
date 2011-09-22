@@ -22,6 +22,26 @@ private:
     QString m_id;
 };
 
+class Event : public Object
+{
+    Q_OBJECT
+    Q_PROPERTY(QString code READ body WRITE setCode)
+    Q_PROPERTY(QString body READ body WRITE setBody)
+
+public:
+    Event();
+
+    QString code() const;
+    void setCode(QString code);
+
+    QString body() const;
+    void setBody(QString body);
+
+private:
+    QString m_code;
+    QString m_body;
+};
+
 class ResourceType : public Object
 {
     Q_OBJECT
@@ -75,6 +95,21 @@ public:
 
 private:
     QString m_url;
+};
+
+class Server : public NetworkDevice
+{
+    Q_OBJECT
+    Q_PROPERTY(QString apiUrl READ url WRITE setApiUrl)
+
+public:
+    Server();
+
+    QString apiUrl() const;
+    void setApiUrl(QString url);
+
+private:
+    QString m_apiUrl;
 };
 
 class Camera : public NetworkDevice

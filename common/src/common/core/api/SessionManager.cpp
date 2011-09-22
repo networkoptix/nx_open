@@ -8,8 +8,10 @@
 SessionManager::SessionManager(const QString& host, const QString& login, const QString& password)
     : m_manager(this),
       m_host(host),
+      m_port(8000),
       m_login(login),
-      m_password(password)
+      m_password(password),
+      m_needEvents(false)
 
 {
     QObject::connect(&m_manager, SIGNAL(finished(QNetworkReply *)),
@@ -18,10 +20,12 @@ SessionManager::SessionManager(const QString& host, const QString& login, const 
 
 void SessionManager::openEventChannel()
 {
+    m_needEvents = true;
+
     QUrl url;
     url.setScheme("http");
     url.setHost(m_host);
-    url.setPort(8088);
+    url.setPort(m_port);
     url.setPath("/api/event/");
 
     QNetworkRequest request;
@@ -30,7 +34,12 @@ void SessionManager::openEventChannel()
                          QByteArray(QString("%1:%2").arg(m_login).arg(m_password).toAscii()).toBase64());
 
     QNetworkReply *reply = m_manager.get(request);
+    m_requestObjectMap[reply] = "event";
+}
 
+void SessionManager::closeEventChannel()
+{
+    m_needEvents = false;
 }
 
 template<class T>
@@ -84,16 +93,33 @@ void SessionManager::slotRequestFinished(QNetworkReply *reply)
             m_requestObjectMap.remove(reply);
         }
 
-        if (objectName == "camera")
+        if (objectName == "event")
+        {
+            if (m_needEvents)
+                openEventChannel();
+
+            QList<Event*> *events = new QList<Event*>();
+            readObjectList<Event>(reply, *events);
+
+            emit eventsReceived(events);
+        } else if (objectName == "camera")
         {
             QList<Camera*> *cameras = new QList<Camera*>();
             readObjectList<Camera>(reply, *cameras);
+
             emit camerasReceived((int)reply, cameras);
         } else if (objectName == "resourceType")
         {
             QList<ResourceType*> *resourceTypes = new QList<ResourceType*>();
             readObjectList<ResourceType>(reply, *resourceTypes);
+
             emit resourceTypesReceived((int)reply, resourceTypes);
+        } else if (objectName == "server")
+        {
+            QList<Server*> *servers = new QList<Server*>();
+            readObjectList<Server>(reply, *servers);
+
+            emit serversReceived((int)reply, servers);
         }
     }
 }
@@ -103,7 +129,7 @@ int SessionManager::getObjectList(QString objectName)
     QUrl url;
     url.setScheme("http");
     url.setHost(m_host);
-    url.setPort(8088);
+    url.setPort(m_port);
     url.setPath(QString("/api/%1/").arg(objectName));
 
     QNetworkRequest request;
@@ -122,7 +148,7 @@ int SessionManager::addObject(const Object& object, const QString& additionalArg
     QUrl url;
     url.setScheme("http");
     url.setHost(m_host);
-    url.setPort(8088);
+    url.setPort(m_port);
     url.setPath(QString("/api/%1/").arg(object.objectName()));
 
     QNetworkRequest request;
@@ -148,6 +174,11 @@ int SessionManager::getResourceTypes()
 int SessionManager::getCameras()
 {
     return getObjectList("camera");
+}
+
+int SessionManager::addServer(const Server& server)
+{
+    return addObject(server);
 }
 
 int SessionManager::addCamera(const Camera& camera, const QString& serverId)
