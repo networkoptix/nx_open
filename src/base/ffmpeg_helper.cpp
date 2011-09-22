@@ -339,7 +339,10 @@ void FrameTypeExtractor::decodeWMVSequence(const quint8* data, int size)
     m_vcSequence = new VC1SequenceHeader();
     try {
         m_vcSequence->vc1_unescape_buffer(data, size);
-        m_vcSequence->decode_sequence_header();
+        if (m_vcSequence->decode_sequence_header() != 0) {
+            delete m_vcSequence;
+            m_vcSequence = 0;
+        }
     } catch (...) {
         delete m_vcSequence;
         m_vcSequence = 0;
