@@ -429,7 +429,7 @@ begin_label:
         QMutexLocker mutex(&m_cs);
         if (m_requiredJumpTime != AV_NOPTS_VALUE)
         {
-            intChanneljumpTo(m_requiredJumpTime, 0);
+            intChanneljumpTo(qMax(0ll,m_requiredJumpTime), 0);
             m_lastUIJumpTime = m_requiredJumpTime;
             m_requiredJumpTime = AV_NOPTS_VALUE;
         }
