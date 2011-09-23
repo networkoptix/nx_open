@@ -358,7 +358,6 @@ void CLVideoStreamDisplay::waitForFramesDisplaed()
 
 CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVideoDecoderOutput::downscale_factor force_factor)
 {
-    m_mtx.lock();
     // use only 1 frame for non selected video
     bool reverseMode = m_reverseMode;
 
@@ -393,10 +392,10 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(CLCompress
         }
         m_queueUsed = false;
     }
-    //if (!reverseMode && m_reverseQueue.size() > 0) 
-    //    clearReverseQueue();
+    
 
     if (m_needReinitDecoders) {
+        QMutexLocker lock(&m_mtx);
         foreach(CLAbstractVideoDecoder* decoder, m_decoder)
             decoder->setMTDecoding(enableFrameQueue);
         m_needReinitDecoders = false;
@@ -408,7 +407,6 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(CLCompress
 	if (data->compressionType == CODEC_ID_NONE)
 	{
 		cl_log.log(QLatin1String("CLVideoStreamDisplay::dispay: unknown codec type..."), cl_logERROR);
-        m_mtx.unlock();
         return Status_Displayed; // true to prevent 100% cpu usage on unknown codec
 	}
 
@@ -421,12 +419,12 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(CLCompress
 	}
     if (dec == 0) {
         CL_LOG(cl_logDEBUG2) cl_log.log(QLatin1String("Can't find video decoder"), cl_logDEBUG2);
-        m_mtx.unlock();
         return Status_Displayed;
     }
 
     if (reverseMode != m_prevReverseMode) {
         clearReverseQueue();
+        QMutexLocker lock(&m_mtx);
         dec->resetDecoder();
         m_prevReverseMode = reverseMode;
     }
@@ -445,6 +443,8 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(CLCompress
     
     if (!useTmpFrame)
         outFrame->setUseExternalData(!enableFrameQueue);
+
+    m_mtx.lock();
 
     if (data->flags & CLAbstractMediaData::MediaFlags_AfterEOF)
         dec->resetDecoder();
