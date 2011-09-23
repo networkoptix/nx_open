@@ -1,0 +1,15 @@
+Version 1.2.5
+
+253 - Video camera recording format is changed from proprietary to standard MKV(Matroska). 
+      Now it can be played in every player (not only in Eve). Improved.
+261 - In some videos green line appeared on the right edge. Fixed.
+269 - The "Open in containing folder" menu item didn't work on Mac. Fixed.
+270 - Videos that require high CPU usage are playing much more smoothier. Improved
+271 - In some files there was long freezes while seeking. Fixed.
+277 - In some videos position was set incorrect when jumping to 0:00. Fixed.
+183 - Video audio/video synchronization. Video was delayed on about 120 ms 
+      in many videos (especially h264). Fixed.
+284 - Fixed  Play/pause behavior. If resuming a paused video it played faster for 
+      a few seconds.
+285 - Layouts fixes: BluRay/DVD disks could not be restored on layouts.
+      Also layouts did not work if items contained localized symbols in their name/path
