@@ -297,7 +297,7 @@ QStringList CLAVIDvdStreamReader::getPlaylist()
 
         if (path.length() == 3 && path.endsWith(QLatin1String(":/")))
             path = path.left(2); // physical mode access under WIN32 expects path in 2-letter format.
-        m_dvdReader = DVDOpen(path.toAscii().constData());
+        m_dvdReader = DVDOpen(path.toLocal8Bit().constData());
         if (!m_dvdReader)
             return rez;
     }
