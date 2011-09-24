@@ -748,6 +748,8 @@ bool CLAVIDvdStreamReader::directSeekToPosition(qint64 pos_mks)
     }
 
     vts_tmap_t* tmap = info->m_ifo_handle->vts_tmapt->tmap;
+    if (tmap->tmu == 0)
+        return false;
     int index = pos_mks / 1000000 / tmap->tmu;
     if (index == 0)
         return seek(0, SEEK_SET);
