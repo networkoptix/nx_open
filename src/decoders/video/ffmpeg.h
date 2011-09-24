@@ -19,7 +19,7 @@ struct MpegEncContext;
 class CLFFmpegVideoDecoder : public CLAbstractVideoDecoder
 {
 public:
-	CLFFmpegVideoDecoder(CodecID codec, AVCodecContext* codecContext = 0);
+	CLFFmpegVideoDecoder(CodecID codec, const CLCompressedVideoData* data);
     bool decode(const CLCompressedVideoData& data, CLVideoDecoderOutput* outFrame);
 	~CLFFmpegVideoDecoder();
 
@@ -40,10 +40,12 @@ public:
     virtual void flush();
     virtual const AVFrame* lastFrame() { return m_frame; }
     virtual void resetDecoder();
+    void determineOptimalThreadType(const CLCompressedVideoData* data);
+    virtual void setMTDecoding(bool value);
 private:
     static AVCodec* findCodec(CodecID codecId);
 
-    void openDecoder();
+    void openDecoder(const CLCompressedVideoData* data);
     void closeDecoder();
 
 
@@ -81,6 +83,10 @@ private:
 
     int m_currentWidth;
     int m_currentHeight;
+
+    qint64 m_totalTime;
+    int m_frameCnt;
+    int m_forceSliceDecoding;
 };
 
 #endif //cl_ffmpeg_h

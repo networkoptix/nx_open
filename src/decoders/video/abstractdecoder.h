@@ -25,7 +25,7 @@ public:
 
 	virtual void setLightCpuMode(DecodeMode val) = 0;
 
-    void setMTDecoding(bool value)
+    virtual void setMTDecoding(bool value)
     {
         if (m_mtDecoding != value)
             m_needRecreate = true;
@@ -59,7 +59,7 @@ class CLVideoDecoderFactory
 {
 public:
 	enum CLCodecManufacture{FFMPEG, INTELIPP};
-	static CLAbstractVideoDecoder* createDecoder(CodecID codec, void* context);
+	static CLAbstractVideoDecoder* createDecoder(const CLCompressedVideoData* data);
 	static void setCodecManufacture(CLCodecManufacture codecman)
 	{
 		m_codecManufacture = codecman;

@@ -10,6 +10,8 @@
 
 static const int MAX_REVERSE_QUEUE_SIZE = 1024*1024 * 300; // at bytes
 static const double FPS_EPS = 1e-6;
+static const int MAX_QUEUE_TIME = 1000 * 200;
+
 
 class BufferedFrameDisplayer: public CLLongRunnable 
 {
@@ -31,19 +33,31 @@ public:
             msleep(1);
     }
 
-    void addFrame(CLVideoDecoderOutput* outFrame) 
+    qint64 bufferedDuration() {
+        QMutexLocker lock(&m_sync);
+        if (m_queue.size() == 0)
+            return 0;
+        else
+            return m_lastQueuedTime - m_queue.front()->pkt_dts;
+    }
+
+    bool addFrame(CLVideoDecoderOutput* outFrame) 
     {
-        static const int MAX_QUEUE_TIME = 1000 * 200;
+        bool wasWaiting = false;
         bool needWait;
         do {
             m_sync.lock();
-            needWait = !m_needStop && (m_queue.size() == m_queue.maxSize() || 
-                        m_queue.size() > 0 && outFrame->pkt_dts - m_queue.front()->pkt_dts >= MAX_QUEUE_TIME);
+            m_lastQueuedTime = outFrame->pkt_dts;
+            needWait = !m_needStop && (m_queue.size() == m_queue.maxSize() 
+                        || m_queue.size() > 0 && outFrame->pkt_dts - m_queue.front()->pkt_dts >= MAX_QUEUE_TIME);
             m_sync.unlock();
-            if (needWait) 
+            if (needWait) {
+                wasWaiting = true;
                 msleep(1);
+            }
         } while (needWait);
         m_queue.push(outFrame);
+        return wasWaiting;
     }
 
     void setCurrentTime(qint64 time) {
@@ -89,6 +103,7 @@ protected:
                 qint64 expectedTime = m_expectedTime  + m_alignedTimer.elapsed()*1000ll;
                 qint64 currentTime = m_currentTime != AV_NOPTS_VALUE ? m_currentTime + m_timer.elapsed()*1000ll : expectedTime;
                 
+                //cl_log.log("djitter:", qAbs(expectedTime - currentTime), cl_logALWAYS);
                 // align to grid
                 if (qAbs(expectedTime - currentTime) < 60000) {
                     currentTime = expectedTime;
@@ -121,6 +136,7 @@ protected:
                 m_sync.lock();
                 m_queue.pop(frame);
                 m_sync.unlock();
+                //cl_log.log("queue size:", m_queue.size(), cl_logALWAYS);
             }
             else {
                 msleep(1);
@@ -130,14 +146,15 @@ protected:
             m_queue.pop(frame);
     }
 private:
+    qint64 m_lastQueuedTime;
     qint64 m_expectedTime;
-    CLNonReferredThreadQueue<CLVideoDecoderOutput*> m_queue;
     QTime m_timer;
     QTime m_alignedTimer;
     CLAbstractRenderer* m_drawer;
     qint64 m_currentTime;
     QMutex m_sync;
     qint64 m_lastDisplayedTime;
+    CLNonReferredThreadQueue<CLVideoDecoderOutput*> m_queue;
 };
 
 // ------------------- CLVideoStreamDisplay --------------------------
@@ -164,7 +181,8 @@ CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale) :
     m_maxReverseQueueSize(-1),
     m_timeChangeEnabled(true),
     m_bufferedFrameDisplayer(0),
-    m_speed(1.0)
+    m_speed(1.0),
+    m_queueWasFilled(false)
 {
     for (int i = 0; i < MAX_FRAME_QUEUE_SIZE; ++i)
         m_frameQueue[i] = new CLVideoDecoderOutput();
@@ -354,6 +372,7 @@ void CLVideoStreamDisplay::waitForFramesDisplaed()
 {
     if (m_bufferedFrameDisplayer)
         m_bufferedFrameDisplayer->waitForFramesDisplayed();
+    m_queueWasFilled = false;
 }
 
 CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(CLCompressedVideoData* data, bool draw, CLVideoDecoderOutput::downscale_factor force_factor)
@@ -368,6 +387,7 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(CLCompress
         if (!m_bufferedFrameDisplayer) {
             QMutexLocker lock(&m_timeMutex);
             m_bufferedFrameDisplayer = new BufferedFrameDisplayer(m_drawer);
+            m_queueWasFilled = false;
         }
     }
     else 
@@ -415,7 +435,7 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(CLCompress
     CLAbstractVideoDecoder* dec = m_decoder[data->compressionType];
 	if (dec == 0)
 	{
-		dec = CLVideoDecoderFactory::createDecoder(data->compressionType, data->context);
+		dec = CLVideoDecoderFactory::createDecoder(data);
 		dec->setLightCpuMode(m_lightCPUmode);
         m_decoder.insert(data->compressionType, dec);
 	}
@@ -481,12 +501,18 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(CLCompress
                 m_realReverseSize--;
 
             outFrame->sample_aspect_ratio = dec->getSampleAspectRatio();
-            if (processDecodedFrame(outFrame, enableFrameQueue, reverseMode))
+            if (processDecodedFrame(dec, outFrame, enableFrameQueue, reverseMode))
                 return Status_Displayed;
             else
                 return Status_Buffered;
         }
-		return Status_Skipped;
+        if (m_bufferedFrameDisplayer) 
+        {
+            dec->setLightCpuMode(CLAbstractVideoDecoder::DecodeMode_Full); // do not skip more 1 frame in a row
+            return Status_Buffered;
+        }
+        else
+		    return Status_Skipped;
 	}
     m_mtx.unlock();
 
@@ -541,21 +567,33 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(CLCompress
     
     outFrame->sample_aspect_ratio = dec->getSampleAspectRatio();
 
-    if (processDecodedFrame(outFrame, enableFrameQueue, reverseMode))
+    if (processDecodedFrame(dec, outFrame, enableFrameQueue, reverseMode))
         return Status_Displayed;
     else
         return Status_Buffered;
 }
 
-bool CLVideoStreamDisplay::processDecodedFrame(CLVideoDecoderOutput* outFrame, bool enableFrameQueue, bool reverseMode)
+bool CLVideoStreamDisplay::processDecodedFrame(CLAbstractVideoDecoder* dec, CLVideoDecoderOutput* outFrame, bool enableFrameQueue, bool reverseMode)
 {
     if (outFrame->pkt_dts != AV_NOPTS_VALUE)
         setLastDisplayedTime(outFrame->pkt_dts);
     if (outFrame->data[0]) {
         if (enableFrameQueue) 
         {
-            if (m_bufferedFrameDisplayer)
-                m_bufferedFrameDisplayer->addFrame(outFrame);
+            if (m_bufferedFrameDisplayer) 
+            {
+                bool wasWaiting = m_bufferedFrameDisplayer->addFrame(outFrame);
+                qint64 bufferedDuration = m_bufferedFrameDisplayer->bufferedDuration();
+                //cl_log.log("buffered duration=", bufferedDuration, cl_logALWAYS);
+                if (wasWaiting) {
+                    dec->setLightCpuMode(CLAbstractVideoDecoder::DecodeMode_Full);
+                    m_queueWasFilled = true;
+                }
+                else {
+                    if (m_queueWasFilled && bufferedDuration <= MAX_QUEUE_TIME/4)
+                        dec->setLightCpuMode(CLAbstractVideoDecoder::DecodeMode_Fast);
+                }
+            }
             else
                 m_drawer->draw(outFrame);
             m_frameQueueIndex = (m_frameQueueIndex + 1) % MAX_FRAME_QUEUE_SIZE; // allow frame queue for selected video
@@ -673,7 +711,6 @@ void CLVideoStreamDisplay::unblockTimeValue()
     if (m_bufferedFrameDisplayer)
         m_bufferedFrameDisplayer->setLastDisplayedTime(m_lastDisplayedTime);
     m_timeChangeEnabled = true;
-    cl_log.log("unblock time value", cl_logALWAYS);
 }
 
 void CLVideoStreamDisplay::afterJump()
@@ -683,6 +720,7 @@ void CLVideoStreamDisplay::afterJump()
         m_bufferedFrameDisplayer->clear();
     //for (QMap<CodecID, CLAbstractVideoDecoder*>::iterator itr = m_decoder.begin(); itr != m_decoder.end(); ++itr)
     //    (*itr)->resetDecoder();
+    m_queueWasFilled = false;
 }
 
 void CLVideoStreamDisplay::clearReverseQueue()

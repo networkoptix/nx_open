@@ -4,7 +4,7 @@
 
 CLVideoDecoderFactory::CLCodecManufacture CLVideoDecoderFactory::m_codecManufacture = FFMPEG;
 
-CLAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder(CodecID codec, void* context)
+CLAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder(const CLCompressedVideoData* data)
 {
 
 	// h264 
@@ -17,7 +17,7 @@ CLAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder(CodecID codec, void
 #endif
 	case FFMPEG:
 	default:
-		return new CLFFmpegVideoDecoder(codec, (AVCodecContext*)context);
+		return new CLFFmpegVideoDecoder(data->compressionType, data);
 	    break;
 	}
 

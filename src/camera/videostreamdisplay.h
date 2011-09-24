@@ -9,7 +9,7 @@ struct CLCompressedVideoData;
 class CLAbstractRenderer;
 class BufferedFrameDisplayer;
 
-static const int MAX_FRAME_QUEUE_SIZE = 8;
+static const int MAX_FRAME_QUEUE_SIZE = 12;
 
 /**
   * Display one video stream. Decode the video and pass it to video window.
@@ -78,6 +78,7 @@ private:
     bool m_timeChangeEnabled;
     BufferedFrameDisplayer* m_bufferedFrameDisplayer;
 private:
+    bool m_queueWasFilled;
     float m_speed;
     void reorderPrevFrames();
     bool allocScaleContext(const CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);
@@ -90,7 +91,7 @@ private:
         int srcWidth, 
         int srcHeight, 
         CLVideoDecoderOutput::downscale_factor force_factor);
-    bool processDecodedFrame(CLVideoDecoderOutput* outFrame, bool enableFrameQueue, bool reverseMode);
+    bool processDecodedFrame(CLAbstractVideoDecoder* dec, CLVideoDecoderOutput* outFrame, bool enableFrameQueue, bool reverseMode);
     void checkQueueOverflow(CLAbstractVideoDecoder* dec);
     void clearReverseQueue();
 };

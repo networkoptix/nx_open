@@ -15,7 +15,27 @@ static const quint32 LONG_NAL_PREFIX = htonl(1);
 
 //================================================
 
-CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, AVCodecContext* codecContext):
+struct FffmpegLog
+{
+    static void av_log_default_callback_impl(void* ptr, int level, const char* fmt, va_list vl)
+    {
+        Q_UNUSED(level)
+            Q_UNUSED(ptr)
+            Q_ASSERT(fmt && "NULL Pointer");
+
+        if (!fmt) {
+            return;
+        }
+        static char strText[1024 + 1];
+        vsnprintf(&strText[0], sizeof(strText) - 1, fmt, vl);
+        va_end(vl);
+
+        qDebug() << "ffmpeg library: " << strText;
+    }
+};
+
+
+CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, const CLCompressedVideoData* data):
 m_passedContext(0),
 m_width(0),
 m_height(0),
@@ -29,13 +49,19 @@ m_deinterlaceBuffer(0),
 m_usedQtImage(false),
 m_currentWidth(-1),
 m_currentHeight(-1),
-m_checkH264ResolutionChange(false)
+m_checkH264ResolutionChange(false),
+m_context(0),
+m_forceSliceDecoding(-1)
 {
+    const AVCodecContext* codecContext = 0;
+    if (data)
+        codecContext = (const AVCodecContext*) data->context;
 	if (codecContext)
 	{
 		m_passedContext = avcodec_alloc_context();
 		avcodec_copy_context(m_passedContext, codecContext);
 	}
+    
 
     // XXX Debug, should be passed in constructor
     m_tryHardwareAcceleration = false; //hwcounter % 2;
@@ -58,7 +84,7 @@ m_checkH264ResolutionChange(false)
 
 	//m_codec = avcodec_find_decoder(CODEC_ID_H264);
 
-	openDecoder();
+	openDecoder(data);
 }
 void CLFFmpegVideoDecoder::flush()
 {
@@ -97,7 +123,46 @@ void CLFFmpegVideoDecoder::closeDecoder()
     delete m_frameTypeExtractor;
 }
 
-void CLFFmpegVideoDecoder::openDecoder()
+void CLFFmpegVideoDecoder::determineOptimalThreadType(const CLCompressedVideoData* data)
+{
+    m_context->thread_count = qMin(4, QThread::idealThreadCount() + 1);
+    if (m_forceSliceDecoding == -1 && data && data->data.data() && m_context->codec_id == CODEC_ID_H264) 
+    {
+        m_forceSliceDecoding = 0;
+        const quint8* curNal = (const quint8*) data->data.data();
+        if (curNal[0] == 0) 
+        {
+            const quint8* end = curNal + data->data.size();
+            for(curNal = NALUnit::findNextNAL(curNal, end); curNal < end; curNal = NALUnit::findNextNAL(curNal, end))
+            {
+                quint8 nalType = *curNal & 0x1f;
+                if (nalType >= nuSliceNonIDR && nalType <= nuSliceIDR) {
+                    BitStreamReader bitReader;
+                    bitReader.setBuffer(curNal+1, end);
+                    try {
+                        int first_mb_in_slice = NALUnit::extractUEGolombCode(bitReader);
+                        if (first_mb_in_slice > 0) {
+                            m_forceSliceDecoding = 1; // multislice frame
+                            break;
+                        }
+                    } catch(...) {
+                        break;
+                    }
+                }
+
+            }
+        }
+    }
+    m_context->thread_type = m_mtDecoding && (m_forceSliceDecoding != 1) ? FF_THREAD_FRAME : FF_THREAD_SLICE;
+
+    if (m_context->codec_id == CODEC_ID_H264 && m_context->thread_type == FF_THREAD_SLICE)
+    {
+        // ignoring deblocking filter type 1 for better perfomace between H264 slices.
+        m_context->flags2 |= CODEC_FLAG2_FAST;
+    }
+}
+
+void CLFFmpegVideoDecoder::openDecoder(const CLCompressedVideoData* data)
 {
     m_codec = findCodec(m_codecId);
 
@@ -126,9 +191,11 @@ void CLFFmpegVideoDecoder::openDecoder()
 	//if(m_codec->capabilities&CODEC_CAP_TRUNCATED)	c->flags|= CODEC_FLAG_TRUNCATED;
 
 	//c->debug_mv = 1;
+    //m_context->debug |= FF_DEBUG_THREADS + FF_DEBUG_PICT_INFO;
+    //av_log_set_callback(FffmpegLog::av_log_default_callback_impl);
 
-    m_context->thread_count = qMin(5, QThread::idealThreadCount() + 1);
-    m_context->thread_type = m_mtDecoding ? FF_THREAD_FRAME : FF_THREAD_SLICE;
+    determineOptimalThreadType(data);
+
     m_checkH264ResolutionChange = m_mtDecoding && m_context->codec_id == CODEC_ID_H264 && m_context->extradata_size && m_context->extradata[0] == 0; 
 
 
@@ -160,6 +227,9 @@ CLFFmpegVideoDecoder::~CLFFmpegVideoDecoder(void)
 
 void CLFFmpegVideoDecoder::resetDecoder()
 {
+    m_totalTime = 0;
+    m_frameCnt = 0;
+
     QMutexLocker mutex(&global_ffmpeg_mutex);
 
     //closeDecoder();
@@ -168,20 +238,22 @@ void CLFFmpegVideoDecoder::resetDecoder()
 
     // I have improved resetDecoder speed (I have left only minimum operations) because of REW. REW calls reset decoder on each GOP.
     avcodec_close(m_context);
-    if (m_passedContext) 
+    if (m_passedContext) {
         avcodec_copy_context(m_context, m_passedContext);
-    m_context->thread_count = qMin(5, QThread::idealThreadCount() + 1);
-    m_context->thread_type = m_mtDecoding ? FF_THREAD_FRAME : FF_THREAD_SLICE;
+    }
+    determineOptimalThreadType(0);
+    //m_context->thread_count = qMin(5, QThread::idealThreadCount() + 1);
+    //m_context->thread_type = m_mtDecoding ? FF_THREAD_FRAME : FF_THREAD_SLICE;
     // ensure that it is H.264 with nal prefixes
     m_checkH264ResolutionChange = m_mtDecoding && m_context->codec_id == CODEC_ID_H264 && m_context->extradata_size && m_context->extradata[0] == 0; 
     avcodec_open(m_context, m_codec);
+    m_context->debug |= FF_DEBUG_THREADS;
+    //m_context->flags2 |= CODEC_FLAG2_FAST;
 }
 //The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than the actual read bytes because some optimized bitstream readers read 32 or 64 bits at once and could read over the end.
 //The end of the input buffer buf should be set to 0 to ensure that no overreading happens for damaged MPEG streams.
 bool CLFFmpegVideoDecoder::decode(const CLCompressedVideoData& data, CLVideoDecoderOutput* outFrame)
 {
-
-
     if (m_codec==0)
     {
         cl_log.log(QLatin1String("decoder not found: m_codec = 0"), cl_logWARNING);
@@ -281,9 +353,16 @@ bool CLFFmpegVideoDecoder::decode(const CLCompressedVideoData& data, CLVideoDeco
     }
     // -------------------------
 
+    QTime t;
+    t.start();
     avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
     if (data.useTwice)
         avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
+    int el = t.elapsed();
+    //cl_log.log("elapsed=", el, cl_logALWAYS);
+    m_totalTime += el;
+    m_frameCnt++;
+    //cl_log.log("avg decode time=", m_totalTime / (float) m_frameCnt, cl_logALWAYS);
 
     AVFrame* copyFromFrame = m_frame;
 
@@ -416,8 +495,10 @@ PixelFormat CLFFmpegVideoDecoder::GetPixelFormat()
 
 void CLFFmpegVideoDecoder::setLightCpuMode(CLAbstractVideoDecoder::DecodeMode val)
 {
-    //val = DecodeMode_Fast; // todo: debug only. remove me!!!
-	if (val >= m_decodeMode)
+    if (m_decodeMode == val)
+        return;
+    //cl_log.log("set cpu mode:", val, cl_logALWAYS);
+	if (val >= m_decodeMode || m_decodeMode < DecodeMode_Fastest)
 	{
         m_decodeMode = val;
 		m_newDecodeMode = DecodeMode_NotDefined;
@@ -432,4 +513,11 @@ void CLFFmpegVideoDecoder::setLightCpuMode(CLAbstractVideoDecoder::DecodeMode va
 void CLFFmpegVideoDecoder::showMotion(bool show)
 {
 		m_showmotion = show;
+}
+
+void CLFFmpegVideoDecoder::setMTDecoding(bool value)
+{
+    if (m_mtDecoding != value && m_forceSliceDecoding != 1)
+        m_needRecreate = true;
+    m_mtDecoding = value;
 }
