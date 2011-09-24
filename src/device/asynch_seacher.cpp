@@ -54,7 +54,7 @@ void CLDeviceSearcher::run()
 			first_time = false;
 		}
 	}
-
+    msleep(500);
 }
 
 CLDeviceList CLDeviceSearcher::findNewDevices(bool& ip_finished)
