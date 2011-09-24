@@ -75,7 +75,7 @@ void CLAbstractArchiveReader::jumpToPreviousFrame(quint64 mksec, bool makeshot)
 {
     setSkipFramesToTime(mksec);
 
-    jumpTo(mksec - 200 * 1000, makeshot);
+    jumpTo(qMax(0ll, (qint64)mksec - 200 * 1000), makeshot);
 }
 
 quint64 CLAbstractArchiveReader::skipFramesToTime() const

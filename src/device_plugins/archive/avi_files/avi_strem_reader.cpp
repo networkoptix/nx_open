@@ -222,6 +222,20 @@ AVFormatContext* CLAVIStreamReader::getFormatContext()
     return m_formatContext;
 }
 
+bool CLAVIStreamReader::initAndKeepAudio()
+{
+    int prevAudioTrack = m_audioStreamIndex;
+    if (!init())
+        return false;
+
+    if (prevAudioTrack != -1 && prevAudioTrack < m_formatContext->nb_streams && 
+        m_formatContext->streams[prevAudioTrack]->codec->codec_type == AVMEDIA_TYPE_AUDIO) 
+    {
+        m_audioStreamIndex = prevAudioTrack;
+    }
+    return true;
+}
+
 bool CLAVIStreamReader::init()
 {
 	QMutexLocker mutex(&m_cs);
@@ -683,7 +697,7 @@ void CLAVIStreamReader::intChanneljumpTo(quint64 mksec, int /*channel*/)
     else {
         // some files can't correctly jump to 0
         destroy();
-        init();
+        initAndKeepAudio();
     }
 
 	//m_needToSleep = 0;
@@ -723,7 +737,7 @@ bool CLAVIStreamReader::getNextPacket(AVPacket& packet)
             destroy();
             m_eof = true;
 
-            if (!init())
+            if (!initAndKeepAudio())
                 return false;
             err = av_read_frame(m_formatContext, &packet);
             if (err < 0)
