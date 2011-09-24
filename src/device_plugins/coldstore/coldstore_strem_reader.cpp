@@ -1,6 +1,7 @@
 #include "coldstore_strem_reader.h"
 #include "coldstore_api/sfs-client.h"
 #include "coldstore_device.h"
+#include "data/mediadata.h"
 
 struct ColdstoreFile
 {
@@ -8,6 +9,14 @@ struct ColdstoreFile
     quint64 ms;
     int channel;
 };
+
+char delimiter[] = {0,0,0,1,9}; 
+const int del_len = 5;
+
+
+extern int contain_subst(char *data, int datalen, char *subdata, int subdatalen);
+
+
 
 void getFiles(QList<ColdstoreFile>& files, const QByteArray& indata)
 {
@@ -65,15 +74,51 @@ CLAbstractMediaData* ColdStoreStreamReader::getNextData()
         if (init())
             m_inited = true;
         else
+        {
             destroy();
+            return 0;
+        }
 
     }
-    return 0;
+
+    QMutexLocker mutex(&m_cs);
+
+    CSFrameInfo fi = m_frameInfo.at(m_curr_frame);
+
+    CLCompressedVideoData* videoData = new CLCompressedVideoData(CL_MEDIA_ALIGNMENT,fi.lenght);
+    CLByteArray& img = videoData->data;
+
+    img.prepareToWrite(fi.lenght);
+    memcpy(img.data(), m_fileContent.data() + fi.shift, fi.lenght);
+    img.done(fi.lenght);
+
+    videoData->compressionType = CODEC_ID_H264 ;
+    videoData->width = 0;
+    videoData->height = 0;
+
+    videoData->channelNumber = 0;
+
+    videoData->timestamp = fi.time;
+
+    if (m_curr_frame == 0)
+        videoData->flags |= AV_PKT_FLAG_KEY;
+
+    ++m_curr_frame;
+
+    if (m_curr_frame == m_frameInfo.size())
+        m_curr_frame = 0;
+
+
+    return videoData;
+    
 }
 
 quint64 ColdStoreStreamReader::currentTime(void) const
 {
-    return 0;
+    QMutexLocker mutex(&m_cs);
+
+    return m_frameInfo.at(m_curr_frame).time;
+
 }
 
 bool ColdStoreStreamReader::isNegativeSpeedSupported() const
@@ -83,7 +128,7 @@ bool ColdStoreStreamReader::isNegativeSpeedSupported() const
 
 void ColdStoreStreamReader::channeljumpTo(quint64,int)
 {
-
+    m_curr_frame = 0;
 }
 //=======================================================================
 bool ColdStoreStreamReader::init()
@@ -134,9 +179,8 @@ bool ColdStoreStreamReader::init()
     getFiles(fileList, resultBA);
 
     ColdstoreFile file = fileList.at(fileList.size()-2);
-    getFileFromeColdStore(file.name, file.ms);
+    return getFileFromeColdStore(file.name, file.ms);
 
-    return true;
 }
 
 void ColdStoreStreamReader::destroy()
@@ -148,9 +192,8 @@ void ColdStoreStreamReader::destroy()
     }
 }
 
-void ColdStoreStreamReader::getFileFromeColdStore(const QString& filename, quint64 time )
+bool ColdStoreStreamReader::getFileFromeColdStore(const QString& filename, quint64 time )
 {
-    
     QByteArray ba = filename.toLocal8Bit();
     char* cfilename = ba.data();
 
@@ -166,28 +209,78 @@ void ColdStoreStreamReader::getFileFromeColdStore(const QString& filename, quint
         &stream_no, 0, 
         &file_size, 
         0,  &time_current) != Veracity::ISFS::STATUS_SUCCESS)
-        return;
+        return false;
     
-    char* buf = new char[file_size];
+    m_fileContent.reserve(file_size);
+    m_fileContent.resize(file_size);
+
+    
     Veracity::u64 data_remaining;
     Veracity::u64 returned_data_length;
     Veracity::u32 result = m_csConnection->Read(stream_no,
-        buf,
+        m_fileContent.data(),
         file_size,
         file_size,
         &returned_data_length,
         &data_remaining);
 
     if (result != Veracity::ISFS::STATUS_SUCCESS)
-        return;
+        return false;
+
+    m_fileContent.resize(returned_data_length);
         
-        
+
     m_csConnection->Close(stream_no);
 
+    /*
     FILE* f = fopen("C:/Users/Sergey/Desktop/tests/test.264", "wb");
-    fwrite(buf, returned_data_length, 1, f);
+    fwrite(m_fileContent.data(), m_fileContent.size(), 1, f);
     fclose(f);
-    
+    /**/
+
+    m_frameInfo.clear();
+    char* data = m_fileContent.data();
+    int dataLeft = m_fileContent.size();
+    int curr_index = 0;
+
+    int framenum = 0;
+    int fps = 2;
+    while(1)
+    {
+        int index = contain_subst(data + curr_index + 1 , dataLeft, delimiter, del_len);
+
+        if (index < 0)
+            break;
+
+        ++index; // to compinsate +1
+
+
+        CSFrameInfo fi;
+
+        fi.lenght = index;
+        fi.shift = curr_index;
+        fi.time = framenum*(1000*1000/fps);
+
+        m_lengthMksec = fi.time;
+
+        m_frameInfo.push_back(fi);
+
+        curr_index += index;
+        dataLeft-= index;
+
+        if (dataLeft<=0)
+            break;
+
+        ++framenum;
+
+    }
+
+    if (framenum==0)
+        return false;
+
+    m_curr_frame = 0;
+
+    return true;
     
 
 }

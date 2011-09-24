@@ -4,6 +4,12 @@
 #include "../archive/abstract_archive_stream_reader.h"
 #include "coldstore_api/ISFS.h"
 
+struct CSFrameInfo
+{
+    unsigned int shift;
+    unsigned int lenght;
+    quint64 time;
+};
 
 
 class ColdStoreStreamReader: public CLAbstractArchiveReader
@@ -21,11 +27,15 @@ private:
     bool init();
     void destroy();
 
-    void getFileFromeColdStore(const QString& filename, quint64 time);
+    bool getFileFromeColdStore(const QString& filename, quint64 time);
 
 private:
     bool m_inited;
     Veracity::ISFS* m_csConnection;
+    QByteArray m_fileContent;
+
+    QList<CSFrameInfo> m_frameInfo;
+    int m_curr_frame;
 
 };
 

@@ -2,11 +2,14 @@
 //
 
 #include "stdafx.h"
+#include <comutil.h>
 #include <objbase.h>
 #include <shobjidl.h>
 #include <atlstr.h>
 #include <shlobj.h>
 #include <msxml2.h>
+
+#include <sys/stat.h>
 
 TCHAR* GetProperty(MSIHANDLE hInstall, LPCWSTR name)
 {
@@ -94,13 +97,26 @@ UINT __stdcall SetProperties(MSIHANDLE hInstall)
         IXMLDOMNode* mediaRootNode;
         pXDN->selectSingleNode(L"/settings/config/mediaRoot", &mediaRootNode);
 
-        BSTR mediaRoot;
+        CComBSTR mediaRoot;
         mediaRootNode->get_text(&mediaRoot);
 
+        //mediaRoot.
         if (mediaRoot)
         {
             WcaLog(LOGMSG_STANDARD, "Old media folder is %s.", mediaRoot);
-            MsiSetProperty(hInstall, L"MEDIAFOLDER", mediaRoot);
+
+            const char* strPath = _com_util::ConvertBSTRToString(mediaRoot);
+
+            struct stat status;
+            stat(strPath, &status );
+            if (status.st_mode & S_IFDIR)
+            {
+                MsiSetProperty(hInstall, L"MEDIAFOLDER", mediaRoot);
+            } else {
+                MsiSetProperty(hInstall, L"MEDIAFOLDER", L"");
+            }
+
+            delete[] strPath; 
         }
     }
 
