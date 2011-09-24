@@ -725,7 +725,7 @@ static int findDirFile(const char *path, const char *file, char *filename)
 {
   QString strPath = QFile::decodeName(path);
   QString strFileName = QFile::decodeName(file).toLower();
-  foreach (const QFileInfo &fi, QDir(strPath).entryList())
+  foreach (const QFileInfo& fi, QDir(strPath).entryInfoList())
   {
       if (fi.fileName().toLower() == strFileName)
       {
