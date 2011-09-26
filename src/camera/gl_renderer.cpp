@@ -812,17 +812,17 @@ static inline QRect getTextureRect(float textureWidth, float textureHeight,
 
 bool CLGLRenderer::paintEvent(const QRect &r)
 {
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    //if (m_abort_drawing)
-    //    return true;
-
     if (!m_inited)
     {
         init(gl_status == CL_GL_NOT_TESTED);
         m_inited = true;
     }
+
+    if (m_painterOpacity < 1.0) {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+
 
     CLVideoDecoderOutput* curImg;
     {
