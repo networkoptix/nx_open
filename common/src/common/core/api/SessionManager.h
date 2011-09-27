@@ -8,6 +8,8 @@
 
 #include "Objects.h"
 
+typedef long RequestId;
+
 class SessionManager : public QObject
 {
     Q_OBJECT
@@ -18,25 +20,31 @@ public:
     void openEventChannel();
     void closeEventChannel();
 
-    int getResourceTypes();
-    int getCameras();
+    RequestId getResourceTypes();
+    RequestId getCameras();
+    RequestId getLayouts();
+    RequestId getServers();
+    RequestId getResources(bool tree);
 
-    int addServer(const Server&);
-    int addCamera(const Camera&, const QString& serverId);
+    RequestId addServer(const Server&);
+    RequestId addLayout(const Layout&);
+    RequestId addCamera(const Camera&, const QString& serverId);
 
 Q_SIGNALS:
     void eventsReceived(QList<Event*>* events);
-    void camerasReceived(int requestId, QList<Camera*>* cameras);
-    void serversReceived(int requestId, QList<Server*>* servers);
-    void resourceTypesReceived(int requestId, QList<ResourceType*>* resourceTypes);
+    void camerasReceived(RequestId requestId, QList<Camera*>* cameras);
+    void serversReceived(RequestId requestId, QList<Server*>* servers);
+    void layoutsReceived(RequestId requestId, QList<Layout*>* servers);
+    void resourceTypesReceived(RequestId requestId, QList<ResourceType*>* resourceTypes);
+    void resourcesReceived(RequestId requestId, QList<Resource*>* resources);
 
     void eventOccured(QString data);
 
     void error(int requestId, QString message);
 
 private:
-    int addObject(const Object& object, const QString& additionalArgs = "");
-    int getObjectList(QString objectName);
+    RequestId addObject(const Object& object, const QString& additionalArgs = "");
+    RequestId getObjectList(QString objectName, bool tree);
 
 private slots:
     void slotRequestFinished(QNetworkReply* reply);

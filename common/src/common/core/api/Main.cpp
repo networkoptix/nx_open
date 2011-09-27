@@ -37,9 +37,11 @@ Client::Client(const QString& host, const QString& login, const QString& passwor
 {
     m_serverId = readServerId();
 
-    connect(&sm, SIGNAL(resourceTypesReceived(int, QList<ResourceType*>*)), this, SLOT(resourceTypesReceived(int, QList<ResourceType*>*)));
-    connect(&sm, SIGNAL(camerasReceived(int, QList<Camera*>*)), this, SLOT(camerasReceived(int, QList<Camera*>*)));
-    connect(&sm, SIGNAL(serversReceived(int, QList<Server*>*)), this, SLOT(serversReceived(int, QList<Server*>*)));
+    connect(&sm, SIGNAL(resourceTypesReceived(RequestId, QList<ResourceType*>*)), this, SLOT(resourceTypesReceived(RequestId, QList<ResourceType*>*)));
+    connect(&sm, SIGNAL(camerasReceived(RequestId, QList<Camera*>*)), this, SLOT(camerasReceived(RequestId, QList<Camera*>*)));
+    connect(&sm, SIGNAL(serversReceived(RequestId, QList<Server*>*)), this, SLOT(serversReceived(RequestId, QList<Server*>*)));
+    connect(&sm, SIGNAL(layoutsReceived(RequestId, QList<Layout*>*)), this, SLOT(layoutsReceived(RequestId, QList<Layout*>*)));
+    connect(&sm, SIGNAL(resourcesReceived(RequestId, QList<Resource*>*)), this, SLOT(resourcesReceived(RequestId, QList<Resource*>*)));
     connect(&sm, SIGNAL(eventsReceived(QList<Event*>*)), this, SLOT(eventsReceived(QList<Event*>*)));
 }
 
@@ -74,7 +76,7 @@ void Client::eventsReceived(QList<Event*>* events)
     delete events;
 }
 
-void Client::camerasReceived(int requestId, QList<Camera*>* cameras)
+void Client::camerasReceived(RequestId requestId, QList<Camera*>* cameras)
 {
     if (requestId == camerasRequestId)
     {
@@ -109,7 +111,7 @@ void Client::camerasReceived(int requestId, QList<Camera*>* cameras)
     }
 }
 
-void Client::serversReceived(int requestId, QList<Server *> *servers)
+void Client::serverAdded(RequestId requestId, QList<Server *> *servers)
 {
     if (requestId != addServerRequestId)
         return;
@@ -130,7 +132,58 @@ void Client::serversReceived(int requestId, QList<Server *> *servers)
     nextStep();
 }
 
-void Client::resourceTypesReceived(int requestId, QList<ResourceType*>* resourceTypes)
+void Client::layoutsReceived(RequestId requestId, QList<Layout *> *layouts)
+{
+    if (requestId != layoutsRequestId)
+        return;
+
+    foreach (Layout* layout, *layouts)
+    {
+        qDebug() << "Layoout: " << layout->name();
+        delete layout;
+    }
+
+    delete layouts;
+
+    m_state = GOT_LAYOUTS;
+    nextStep();
+}
+
+void Client::serversReceived(RequestId requestId, QList<Server *> *servers)
+{
+    if (requestId != serversRequestId)
+        return;
+
+    foreach (Server* server, *servers)
+    {
+        qDebug() << "Server: " << server->name();
+        delete server;
+    }
+
+    delete servers;
+
+    m_state = GOT_SERVERS;
+    nextStep();
+}
+
+void Client::resourcesReceived(RequestId requestId, QList<Resource *> *resources)
+{
+    if (requestId != resourcesRequestId)
+        return;
+
+    foreach (Resource* resource, *resources)
+    {
+        qDebug() << "Resource: " << resource->name();
+        delete resource;
+    }
+
+    delete resources;
+
+    m_state = GOT_RESOURCES;
+    nextStep();
+}
+
+void Client::resourceTypesReceived(RequestId requestId, QList<ResourceType*>* resourceTypes)
 {
     if (requestId != resourceTypesRequestId)
         return;
@@ -149,7 +202,7 @@ void Client::resourceTypesReceived(int requestId, QList<ResourceType*>* resource
     nextStep();
 }
 
-void Client::error(int requestId, QString message)
+void Client::error(RequestId requestId, QString message)
 {
     qDebug("error");
 }
@@ -185,6 +238,18 @@ void Client::nextStep()
         break;
 
     case GOT_CAMERAS:
+        layoutsRequestId = sm.getLayouts();
+        break;
+
+    case GOT_LAYOUTS:
+        serversRequestId = sm.getServers();
+        break;
+
+    case GOT_SERVERS:
+        resourcesRequestId = sm.getResources(true);
+        break;
+
+    case GOT_RESOURCES:
         Camera camera;
         camera.setName("Qt Camera");
         camera.setType(m_resourceTypes->at(0)->id());

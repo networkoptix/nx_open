@@ -42,8 +42,50 @@ void SessionManager::closeEventChannel()
     m_needEvents = false;
 }
 
+bool hasChildElements(QDomNode node)
+{
+    return !node.firstChildElement().isNull();
+}
+
 template<class T>
-void readObjectList(QNetworkReply *reply, QList<T*>& objects)
+void readObjectList(QDomNode node, QList<T*>* objects)
+{
+    QString nodeName = node.nodeName();
+
+    node = node.firstChild();
+    while (!node.isNull())
+    {
+        T *object = new T();
+
+        QDomNode attrNode = node.firstChild();
+        while (!attrNode.isNull())
+        {
+            //qDebug() << "Property Name: " << attrNode.nodeName().toAscii();
+            //qDebug() << "Property Value: " << attrNode.toElement().text();
+
+            QByteArray propertyName = attrNode.nodeName().toAscii();
+
+            if (hasChildElements(attrNode))
+            {
+                QList<T*>* children = new QList<T*>();
+
+                readObjectList<T>(attrNode, children);
+                object->setProperty(propertyName, qVariantFromValue(children));
+            } else
+            {
+                object->setProperty(propertyName, attrNode.toElement().text());
+            }
+
+            attrNode = attrNode.nextSibling();
+        }
+
+        objects->append(object);
+        node = node.nextSibling();
+    }
+}
+
+template<class T>
+void readObjectList(QNetworkReply *reply, QList<T*>* objects)
 {
     QDomDocument doc;
     QXmlInputSource is;
@@ -58,24 +100,9 @@ void readObjectList(QNetworkReply *reply, QList<T*>& objects)
 
     qDebug() << "Raw data: " << is.data();
 
-    QDomNode node = doc.documentElement().firstChild();
-    while (!node.isNull())
-    {
-        T *object = new T();
-
-        QDomNode attrNode = node.firstChild();
-        while (!attrNode.isNull())
-        {
-            //qDebug() << "Property Name: " << attrNode.nodeName().toAscii();
-            //qDebug() << "Property Value: " << attrNode.toElement().text();
-
-            object->setProperty(attrNode.nodeName().toAscii(), attrNode.toElement().text());
-            attrNode = attrNode.nextSibling();
-        }
-
-        objects.append(object);
-        node = node.nextSibling();
-    }
+    QDomNode node = doc.documentElement();
+    QString nodeName = node.nodeName();
+    readObjectList(node, objects);
 }
 
 void SessionManager::slotRequestFinished(QNetworkReply *reply)
@@ -99,38 +126,59 @@ void SessionManager::slotRequestFinished(QNetworkReply *reply)
                 openEventChannel();
 
             QList<Event*> *events = new QList<Event*>();
-            readObjectList<Event>(reply, *events);
+            readObjectList<Event>(reply, events);
 
             emit eventsReceived(events);
         } else if (objectName == "camera")
         {
             QList<Camera*> *cameras = new QList<Camera*>();
-            readObjectList<Camera>(reply, *cameras);
+            readObjectList<Camera>(reply, cameras);
 
-            emit camerasReceived((int)reply, cameras);
+            emit camerasReceived((RequestId)reply, cameras);
         } else if (objectName == "resourceType")
         {
             QList<ResourceType*> *resourceTypes = new QList<ResourceType*>();
-            readObjectList<ResourceType>(reply, *resourceTypes);
+            readObjectList<ResourceType>(reply, resourceTypes);
 
-            emit resourceTypesReceived((int)reply, resourceTypes);
+            emit resourceTypesReceived((RequestId)reply, resourceTypes);
         } else if (objectName == "server")
         {
             QList<Server*> *servers = new QList<Server*>();
-            readObjectList<Server>(reply, *servers);
+            readObjectList<Server>(reply, servers);
 
-            emit serversReceived((int)reply, servers);
+            emit serversReceived((RequestId)reply, servers);
+        } else if (objectName == "layout")
+        {
+            QList<Layout*> *layouts = new QList<Layout*>();
+            readObjectList<Layout>(reply, layouts);
+
+            emit layoutsReceived((RequestId)reply, layouts);
+        } else if (objectName == "resource")
+        {
+            QList<Resource*> *resources = new QList<Resource*>();
+            readObjectList<Resource>(reply, resources);
+
+            emit resourcesReceived((RequestId)reply, resources);
         }
     }
 }
 
-int SessionManager::getObjectList(QString objectName)
+RequestId SessionManager::getObjectList(QString objectName, bool tree)
 {
     QUrl url;
     url.setScheme("http");
     url.setHost(m_host);
     url.setPort(m_port);
-    url.setPath(QString("/api/%1/").arg(objectName));
+    if (tree)
+    {
+        url.setPath(QString("/api/%1/tree/").arg(objectName));
+        url.addQueryItem("id", "3");
+    }
+    else
+    {
+        url.setPath(QString("/api/%1/").arg(objectName));
+    }
+
 
     QNetworkRequest request;
     request.setUrl(url);
@@ -140,10 +188,10 @@ int SessionManager::getObjectList(QString objectName)
     QNetworkReply *reply = m_manager.get(request);
     m_requestObjectMap[reply] = objectName;
 
-    return (int) reply;
+    return (RequestId) reply;
 }
 
-int SessionManager::addObject(const Object& object, const QString& additionalArgs)
+RequestId SessionManager::addObject(const Object& object, const QString& additionalArgs)
 {
     QUrl url;
     url.setScheme("http");
@@ -163,25 +211,45 @@ int SessionManager::addObject(const Object& object, const QString& additionalArg
     QNetworkReply *reply = m_manager.post(request, body);
     m_requestObjectMap[reply] = object.objectName();
 
-    return (int) reply;
+    return (RequestId) reply;
 }
 
-int SessionManager::getResourceTypes()
+RequestId SessionManager::getResourceTypes()
 {
-    return getObjectList("resourceType");
+    return getObjectList("resourceType", false);
 }
 
-int SessionManager::getCameras()
+RequestId SessionManager::getCameras()
 {
-    return getObjectList("camera");
+    return getObjectList("camera", false);
 }
 
-int SessionManager::addServer(const Server& server)
+RequestId SessionManager::getLayouts()
+{
+    return getObjectList("layout", false);
+}
+
+RequestId SessionManager::getServers()
+{
+    return getObjectList("server", false);
+}
+
+RequestId SessionManager::getResources(bool tree)
+{
+    return getObjectList("resource", tree);
+}
+
+RequestId SessionManager::addServer(const Server& server)
 {
     return addObject(server);
 }
 
-int SessionManager::addCamera(const Camera& camera, const QString& serverId)
+RequestId SessionManager::addLayout(const Layout& layout)
+{
+    return addObject(layout);
+}
+
+RequestId SessionManager::addCamera(const Camera& camera, const QString& serverId)
 {
     QString additionalArgs = QString("server_id=%1").arg(serverId);
 
