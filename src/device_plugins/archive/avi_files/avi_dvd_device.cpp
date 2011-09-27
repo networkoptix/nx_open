@@ -47,3 +47,31 @@ bool CLAviDvdDevice::isAcceptedUrl(const QString& url)
     }
     return videoTsFound && validNameFound && vobFound && ifoFound;
 }
+
+QString CLAviDvdDevice::urlToFirstVTS(const QString& url)
+{
+    int titleNum = 1;
+    int titlePos = url.indexOf('?');
+    QString rezUrl = url;
+    if (titlePos >= 0) {
+        QStringList params = url.mid(titlePos+1).split('&');
+        for (int i = 0; i < params.size(); ++i) {
+            QStringList values = params[i].split('=');
+            if (values[0] == "title" && values.size() == 2) 
+            {
+                titleNum = values[1].toInt();
+                break;
+            }
+        }
+        rezUrl = url.left(titlePos);
+    }
+    if (rezUrl.endsWith('/'))
+        rezUrl = rezUrl.left(rezUrl.length()-1);
+    if (!rezUrl.toUpper().endsWith("VIDEO_TS"))
+        rezUrl += "/VIDEO_TS";
+    rezUrl += '/';
+    QString titleStr = QString::number(titleNum);
+    if (titleStr.length() < 2)
+        titleStr = QString("0") + titleStr;
+    return rezUrl + "VTS_" + titleStr + "_1.VOB";
+}

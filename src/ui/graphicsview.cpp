@@ -47,6 +47,7 @@
 #include "device_plugins/archive/abstract_archive_stream_reader.h"
 #include "device_plugins/archive/avi_files/avi_device.h"
 #include "device_plugins/archive/avi_files/avi_strem_reader.h"
+#include "device_plugins/archive/avi_files/avi_dvd_device.h"
 
 extern int  SLOT_WIDTH;
 
@@ -1609,6 +1610,9 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
                 if (act == &cm_open_containing_folder)
                 {
                     QString file = dev->getUniqueId();
+                    CLAviDvdDevice* dvd = dynamic_cast<CLAviDvdDevice*>(dev);
+                    if (dvd)
+                        file = CLAviDvdDevice::urlToFirstVTS(file);
 #ifdef Q_OS_WIN
                     QStringList args;
                     args << QLatin1String("/select,") << QDir::toNativeSeparators(file);

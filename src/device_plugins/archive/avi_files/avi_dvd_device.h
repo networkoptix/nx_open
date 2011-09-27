@@ -11,6 +11,7 @@ public:
 
 	virtual CLStreamreader* getDeviceStreamConnection();
     static bool isAcceptedUrl(const QString& url);
+    static QString urlToFirstVTS(const QString& url);
 };
 
 #endif // __CL_AVI_DVD_DEVICE_H
