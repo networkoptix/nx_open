@@ -843,7 +843,7 @@ bool CLGLRenderer::paintEvent(const QRect &r)
     }
 
     QMutexLocker locker(&m_displaySync);
-    if (curImg && curImg->isDisplaying()) {
+    if (curImg && curImg == m_curImg && curImg->isDisplaying()) {
         curImg->setDisplaying(false);
         m_waitCon.wakeAll();
     }
