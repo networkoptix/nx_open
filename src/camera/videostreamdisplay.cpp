@@ -124,6 +124,10 @@ protected:
                 if (sleepTime > 0) {
                     msleep(sleepTime/1000);
                 }
+                else if (sleepTime < -1000000) {
+                    m_currentTime = m_expectedTime = AV_NOPTS_VALUE;
+                }
+                /*
                 else if (sleepTime < -15000)
                 {
                     if (m_queue.size() > 1 && sleepTime + (m_queue.at(1)->pkt_dts - frame->pkt_dts) <= 0) 
@@ -138,6 +142,7 @@ protected:
                         m_currentTime = m_expectedTime = AV_NOPTS_VALUE;
                     }
                 }
+                */
 
                 m_sync.lock();
                 m_lastDisplayedTime = frame->pkt_dts;
