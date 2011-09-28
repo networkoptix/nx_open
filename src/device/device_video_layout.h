@@ -63,7 +63,7 @@ public:
         m_width(width),
         m_height(height)
     {
-        m_channels = new unsigned int[m_width*m_height];
+        m_channels = new unsigned int[CL_MAX_CHANNELS];
     }
     virtual ~CLCustomDeviceVideoLayout(){}
     //returns number of video channels device has
