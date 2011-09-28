@@ -93,7 +93,7 @@ void CLVideoCamera::startRecording()
     if (m_recorder == 0)
         m_recorder = new CLStreamRecorder(m_device);
 	m_reader->addDataProcessor(m_recorder);
-	m_reader->needKeyData();
+	m_reader->setNeedKeyData();
 	m_recorder->start();
 	m_videovindow->addSubItem(RecordingSubItem);
 }
