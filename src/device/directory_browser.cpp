@@ -115,24 +115,10 @@ CLDeviceList CLDeviceDirectoryBrowser::findDevices(const QString& directory)
 
     // dirs
     QFileInfoList sub_dirs = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::NoSymLinks);
-    if (dir.absolutePath() + QLatin1Char('/') == getRecordingDir()
-        // || dir.absolutePath() + QLatin1Char('/') == getTempRecordingDir() // ignore temp dir
-       )
+    foreach (const QFileInfo &fi, sub_dirs)
     {
-        // if this is recorded clip dir
-        foreach (const QFileInfo &fi, sub_dirs)
-        {
-            CLDevice *dev = new CLAviDevice(fi.absoluteFilePath()); // CLArchiveDevice(fi.absoluteFilePath());
+        foreach (CLDevice *dev, findDevices(fi.absoluteFilePath()))
             result[dev->getUniqueId()] = dev;
-        }
-    }
-    else
-    {
-        foreach (const QFileInfo &fi, sub_dirs)
-        {
-            foreach (CLDevice *dev, findDevices(fi.absoluteFilePath()))
-                result[dev->getUniqueId()] = dev;
-        }
     }
 
     return result;
