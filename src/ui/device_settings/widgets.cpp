@@ -3,23 +3,25 @@
 #include "base/log.h"
 #include "settings.h"
 
-SettingsSlider::SettingsSlider( Qt::Orientation orientation, QWidget * parent):
-QSlider(orientation, parent)
+SettingsSlider::SettingsSlider(Qt::Orientation orientation, QWidget *parent)
+    : QSlider(orientation, parent)
 {
-
 }
 
-void SettingsSlider::keyReleaseEvent ( QKeyEvent * /*event*/ )
+void SettingsSlider::keyReleaseEvent(QKeyEvent *event)
 {
-	emit onKeyReleased();
+    QSlider::keyReleaseEvent(event);
+
+    emit onKeyReleased();
 }
 //==============================================
 
-CLAbstractSettingsWidget::CLAbstractSettingsWidget(QObject* handler, CLDevice*dev, QString group, QString sub_group, QString paramname):
-mDevice(dev),
-mHandler(handler),
-m_group(group),
-m_sub_group(sub_group)
+CLAbstractSettingsWidget::CLAbstractSettingsWidget(QObject* handler, CLDevice*dev, QString group, QString sub_group, QString paramname)
+    : QObject(),
+      mDevice(dev),
+      mHandler(handler),
+      m_group(group),
+      m_sub_group(sub_group)
 {
 	mParam = mDevice->getDeviceParamList().get(paramname);
 
@@ -76,12 +78,10 @@ CLAbstractSettingsWidget(handler, dev, group, sub_group, paramname)
 	//QPalette plt;	plt.setColor(QPalette::WindowText, Qt::white);	checkBox->setPalette(plt);//black
 
 	mWidget = m_checkBox;
-
 }
 
 SettingsOnOffWidget::~SettingsOnOffWidget()
 {
-
 }
 
 void SettingsOnOffWidget::stateChanged(int state)
@@ -92,27 +92,13 @@ void SettingsOnOffWidget::stateChanged(int state)
 		return;
 	}
 
-	QString val;
-
-	if (state == Qt::Checked)
-	{
-		val = (QString)mParam.value.possible_values.front();
-	}
-	else
-	{
-		val = (QString)mParam.value.possible_values.back();
-	}
-
-	setParam_helper(mParam.name,val);
-
+    QString val = state == Qt::Checked ? (QString)mParam.value.possible_values.front() : (QString)mParam.value.possible_values.back();
+    setParam_helper(mParam.name,val);
 }
 
 void SettingsOnOffWidget::updateParam(QString val)
 {
-    if (val==mParam.value.possible_values.front())
-        m_checkBox->setChecked(true); // it emits stateChanged
-    else
-        m_checkBox->setChecked(false); // it emits stateChanged
+    m_checkBox->setChecked(val == mParam.value.possible_values.front()); // emits stateChanged
 }
 
 //==============================================
@@ -133,9 +119,7 @@ CLAbstractSettingsWidget(handler, dev, group, sub_group, paramname)
 	m_slider->setRange(mParam.value.min_val, mParam.value.max_val);
 	m_slider->setValue(mParam.value.value);
 
-	QString str;
-	QTextStream(&str) << mParam.name<< "(" << (QString)mParam.value.value<< ")";
-	groupBox->setTitle(str);
+    groupBox->setTitle(mParam.name + QLatin1Char('(') + (QString)mParam.value.value + QLatin1Char(')'));
 
 	QVBoxLayout *layout = new QVBoxLayout(groupBox);
 	layout->addWidget(m_slider);
@@ -149,9 +133,7 @@ CLAbstractSettingsWidget(handler, dev, group, sub_group, paramname)
 
 void SettingsMinMaxStepWidget::onValChanged(int val)
 {
-	QString str;
-	QTextStream(&str) << mParam.name<< "(" << val << ")";
-	groupBox->setTitle(str);
+    groupBox->setTitle(mParam.name + QLatin1Char('(') + QString::number(val) + QLatin1Char(')'));
 }
 
 void SettingsMinMaxStepWidget::onValChanged()
@@ -192,13 +174,7 @@ CLAbstractSettingsWidget(handler, dev, group, sub_group, paramname)
 		m_radioBtns.push_back(btn);
 
         connect(btn , SIGNAL(clicked()), this, SLOT(onClicked()));
-
     }
-
-	//QPushButton* btnt = new QPushButton("test");
-	//btnt->select
-	//layout->addWidget(btnt);
-
 }
 
 void SettingsEnumerationWidget::onClicked()
