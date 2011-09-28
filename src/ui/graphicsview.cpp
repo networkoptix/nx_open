@@ -3313,7 +3313,6 @@ void GraphicsView::contextMenuHelper_saveRecordedAs(CLVideoCamera* cam)
         }
 
         // make sure we'll be able to create such folder
-        /*
         name.replace(QRegExp(QLatin1String(
              "[^"
                 "A-Z,a-z,0-9,"
@@ -3323,10 +3322,10 @@ void GraphicsView::contextMenuHelper_saveRecordedAs(CLVideoCamera* cam)
                 "\\-,\\#,\\(,\\),"
                 "\\%,\\.,\\+,\\~,\\_"
              "]")), QLatin1String("_"));
-        */
+        
 
         QString dstDir = getRecordingDir() + srcFile.baseName() + QString('/');
-        QFileInfo dstFile(dstDir + suggetion + QString('.') + srcFile.suffix());
+        QFileInfo dstFile(dstDir + name + QString('.') + srcFile.suffix());
         dstFile.dir().mkpath(dstFile.absolutePath());
         if (QFile::exists(dstFile.absoluteFilePath()))
         {
