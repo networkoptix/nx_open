@@ -257,6 +257,7 @@ protected:
 
 
 private:
+    QFileInfoList tmpRecordedFiles(CLVideoCamera* cam);
     void removeFileDeviceItem(CLDeviceSearcher& deviceSearcher, CLAbstractSceneItem* aitem);
 
     friend class SceneLayout;
