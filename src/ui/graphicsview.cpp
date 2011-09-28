@@ -3326,10 +3326,15 @@ void GraphicsView::contextMenuHelper_saveRecordedAs(CLVideoCamera* cam)
         QString dstFileName = dstFile.absoluteFilePath();
         */
         QFile f(srcFile.absoluteFilePath());
-        if (f.copy(dstFileName)) 
+        if (!QFile::exists(dstFileName)) {
+            CLAVIStreamReader *reader = dynamic_cast<CLAVIStreamReader *>(cam->getStreamreader());
+            if (reader)
+                reader->renameFileOnDestroy(dstFileName);
             return;
-        else
+        }
+        else {
             UIOKMessage(this, QString(), tr("Can't save title. Try another name."));
+        }
     }
 }
 

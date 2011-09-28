@@ -106,6 +106,16 @@ CLAVIStreamReader::CLAVIStreamReader(CLDevice* dev ) :
 CLAVIStreamReader::~CLAVIStreamReader()
 {
     destroy();
+    if (!m_onDestroyFileName.isEmpty()) {
+        QFile f(m_device->getUniqueId());
+        if (f.rename(m_onDestroyFileName)) {
+            cl_log.log(QString ("File succesfully renamed from ") + m_device->getUniqueId() + QString(" to ") + m_onDestroyFileName, cl_logINFO);
+        }
+        else {
+            cl_log.log(QString ("Can't rename file from ") + m_device->getUniqueId() + QString(" to ") + m_onDestroyFileName, cl_logERROR);
+        }
+    }
+
 }
 
 void CLAVIStreamReader::previousFrame(quint64 mksec)
@@ -896,4 +906,9 @@ void CLAVIStreamReader::setReverseMode(bool value)
 bool CLAVIStreamReader::isNegativeSpeedSupported() const
 {
     return !m_layout || m_layout->numberOfChannels() == 1;
+}
+
+void CLAVIStreamReader::renameFileOnDestroy(const QString& newFileName)
+{
+    m_onDestroyFileName = newFileName;
 }
