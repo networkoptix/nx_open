@@ -253,16 +253,5 @@ void CLSearchEditItem::onTimer()
 
 void CLSearchEditItem::onLiveButtonClicked()
 {
-    QString text = m_lineEdit->text().trimmed();
-    if (text.compare(tr("live"), Qt::CaseInsensitive) != 0
-        && !text.startsWith(tr("live+"), Qt::CaseInsensitive)
-        && !text.endsWith(tr("+live"), Qt::CaseInsensitive)
-        && !text.contains(tr("+live+"), Qt::CaseInsensitive))
-    {
-        if (!text.isEmpty())
-            text += QLatin1Char('+');
-        text += tr("live");
-    }
-    if (text != m_lineEdit->text())
-        m_lineEdit->setText(text);
+    m_lineEdit->setText(QLatin1String("live"));
 }
