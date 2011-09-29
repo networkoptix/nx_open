@@ -164,6 +164,8 @@ bool CLSearchEditItem::eventFilter(QObject *watched, QEvent *event)
     if (watched != m_lineEdit || event->type() != QEvent::KeyPress)
         return false;
 
+    emit keyPressed();
+
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
 
     keyEvent->accept();

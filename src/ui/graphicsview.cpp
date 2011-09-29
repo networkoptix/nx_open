@@ -674,8 +674,9 @@ void GraphicsView::initDecoration()
             popupItem->setFlag(QGraphicsItem::ItemSendsScenePositionChanges);
             popupItem->setZValue(searchItem->zValue() - 1);
 
-            connect(m_searchItem->lineEdit(), SIGNAL(textChanged(QString)), this, SLOT(adjustSearchItemPopup()), Qt::QueuedConnection);
             connect(searchItem, SIGNAL(visibleChanged()), this, SLOT(adjustSearchItemPopup()), Qt::QueuedConnection);
+            connect(m_searchItem, SIGNAL(keyPressed()), this, SLOT(adjustSearchItemPopup()), Qt::QueuedConnection);
+            connect(m_searchItem->lineEdit(), SIGNAL(textChanged(QString)), this, SLOT(adjustSearchItemPopup()), Qt::QueuedConnection);
         }
 
         m_searchItem->setFocus();
@@ -1106,7 +1107,10 @@ void GraphicsView::mouseReleaseEvent(QMouseEvent * event)
     }
 
     if (m_searchItem && m_searchItem->lineEdit()->completer()->popup()->isVisible())
+    {
         m_searchItem->lineEdit()->completer()->popup()->hide();
+        m_searchItem->clearFocus();
+    }
 
     if (onUserInput(true, true))
         return;
@@ -2048,7 +2052,7 @@ void GraphicsView::goToSteadyMode(bool steady)
 
     if (steady)
     {
-        if ((m_searchItem && m_searchItem->hasFocus()) || m_menuIsHere)
+        if ((m_searchItem && m_searchItem->isVisible() && m_searchItem->hasFocus()) || m_menuIsHere)
         {
             onUserInput(false, false);
             return;
@@ -2070,7 +2074,10 @@ void GraphicsView::goToSteadyMode(bool steady)
         }
 
         if (m_searchItem)
+        {
             m_searchItem->setVisible(false);
+            m_searchItem->clearFocus();
+        }
 
         if (m_selectedWnd && m_selectedWnd->isFullScreen())
             m_selectedWnd->goToSteadyMode(true, false);
@@ -2087,6 +2094,7 @@ void GraphicsView::goToSteadyMode(bool steady)
         {
             m_searchItem->setVisible(true);
             m_searchItem->setFocus();
+            m_searchItem->lineEdit()->selectAll();
         }
 
         if (m_selectedWnd && m_selectedWnd->isFullScreen())
@@ -2136,10 +2144,7 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
     if (!mViewStarted)
         return;
 
-    if (onUserInput(true, true))
-        return;
-
-    if (m_searchItem && scene()->focusItem() == m_searchItem->graphicsProxyWidget())
+    if (m_searchItem && m_searchItem->isVisible() && m_searchItem->hasFocus())
     {
         QApplication::sendEvent(scene(), e);
         return;
@@ -2174,6 +2179,8 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
             break;
 
         case Qt::Key_Control:
+            onUserInput(true, true);
+
             enableMultipleSelection(true);
 
             if (m_camLayout.getContent()->checkIntereactionFlag(LayoutContent::GridEnable))
@@ -2186,7 +2193,7 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
             break;
 
         case Qt::Key_A:
-                onArrange_helper();
+            onArrange_helper();
             break;
     }
 
@@ -2210,8 +2217,10 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
         case Qt::Key_Down:
             next_item = m_camLayout.getGridEngine().getNextBottomItem(last_sel_item);
             break;
-
         }
+
+        if (next_item)
+            onUserInput(true, true);
 
         if (m_camLayout.getGridEngine().getSettings().max_rows==1 && next_item && m_selectedWnd!=0 && m_selectedWnd == last_sel_item && m_selectedWnd->isFullScreen())
         {
@@ -2247,6 +2256,7 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
         {
             case Qt::Key_Enter:
             case Qt::Key_Return:
+                onUserInput(true, true);
                 toggleFullScreen_helper(last_sel_item);
                 break;
         }
@@ -2317,7 +2327,6 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
             m_scenezoom.zoom_abs(-100, 2000, 0); // absolute zoom out
             break;
         }
-
     }
 
     QApplication::sendEvent(scene(), e);

@@ -38,6 +38,9 @@ public:
 
     QLineEdit *lineEdit() const;
 
+Q_SIGNALS:
+    void keyPressed(); // for stupid workaround/hack
+
 protected:
     bool eventFilter(QObject *watched, QEvent *event);
 
