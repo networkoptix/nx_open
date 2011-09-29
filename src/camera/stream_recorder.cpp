@@ -311,7 +311,10 @@ bool CLStreamRecorder::initFfmpegContainer(CLCompressedVideoData* mediaData, CLD
     m_outputCtx = av_guess_format("matroska",NULL,NULL);
 
     if (m_outputCtx == 0)
+    {
+        cl_log.log("av_guess_format failed.", cl_logERROR);
         return false;
+    }
     QString fileExt = QString(m_outputCtx->extensions).split(',')[0];
     fileName += QString(".") + fileExt;
         
@@ -346,6 +349,7 @@ bool CLStreamRecorder::initFfmpegContainer(CLCompressedVideoData* mediaData, CLD
             cl_log.log("Can't allocate output stream for video recording.", cl_logERROR);
             return false;
         }
+
         AVCodecContext* videoCodecCtx = videoStream->codec;
         videoCodecCtx->codec_id = m_outputCtx->video_codec;
         videoCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
@@ -367,13 +371,6 @@ bool CLStreamRecorder::initFfmpegContainer(CLCompressedVideoData* mediaData, CLD
 
         QString layoutData = QString::number(layout->v_position(i)) + QString(",") + QString(layout->h_position(i));
         av_metadata_set2(&videoStream->metadata, "layout_channel", QString::number(i).toAscii().data(), 0);
-
-        AVCodec* videoCodec = avcodec_find_encoder(mediaData->compressionType);
-        if (avcodec_open(videoCodecCtx, videoCodec) < 0)
-        {
-            cl_log.log("Can't initialize video encoder", cl_logERROR);
-            return false;
-        }
     }
 
     av_write_header(m_formatCtx);

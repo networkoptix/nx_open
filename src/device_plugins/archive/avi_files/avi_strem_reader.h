@@ -27,6 +27,8 @@ public:
     CLDeviceVideoLayout* getLayout();
     static bool deserializeLayout(CLCustomDeviceVideoLayout* layout, const QString& layoutStr);
     static QString serializeLayout(const CLDeviceVideoLayout* layout);
+
+    void renameFileOnDestroy(const QString& newFileName);
 protected:
     virtual CLAbstractMediaData* getNextData();
     virtual void channeljumpTo(quint64 mksec, int channel);
@@ -85,6 +87,7 @@ private:
     qint64 m_lastFrameDuration;
     CLCustomDeviceVideoLayout* m_layout;
     QVector<int> m_indexToChannel;
+    QString m_onDestroyFileName;
 private:
     /**
       * Read next packet from file

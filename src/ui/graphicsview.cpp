@@ -1420,7 +1420,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
                     menu.addAction(&cm_start_recording);
                 }
 
-                if (contextMenuHelper_existRecordedVideo(cam) && !cam->isRecording())
+                if (contextMenuHelper_existRecordedVideo(cam) /*&& !cam->isRecording()*/)
                     menu.addAction(&cm_view_recorded);
 
                 //menu.addAction(&cm_open_web_page);
@@ -1460,12 +1460,11 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
                 menu.addAction(&cm_open_containing_folder);
             }
 
-            /*
-            if (dev->checkDeviceTypeFlag(CLDevice::RECORDED) && !dev->getUniqueId().contains(getRecordingDir()))
+            
+            if (dev->getUniqueId().contains(getTempRecordingDir()))
             {
                 menu.addAction(&cm_save_recorded_as);
             }
-            */
 
             if (CLDeviceSettingsDlgFactory::canCreateDlg(dev))
                 menu.addAction(&cm_settings);
@@ -1732,14 +1731,13 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
             if (act == &cm_stop_recording && cam) {
                 cam->stopRecording();
-                contextMenuHelper_saveRecordedAs(cam);
             }
 
             if (act == &cm_view_recorded&& cam)
                 contextMenuHelper_viewRecordedVideo(cam);
 
-            //if (act == &cm_save_recorded_as && cam)
-            //    contextMenuHelper_saveRecordedAs(cam);
+            if (act == &cm_save_recorded_as && cam)
+                contextMenuHelper_saveRecordedAs(cam);
 
             if (act == &cm_take_screenshot && video_wnd)
                 contextMenuHelper_takeScreenshot(video_wnd);
@@ -3327,56 +3325,61 @@ void GraphicsView::contextMenuHelper_editLayout(CLAbstractSceneItem* wnd)
     }
 }
 
+QFileInfoList GraphicsView::tmpRecordedFiles(CLVideoCamera* cam)
+{
+    QDir directory(getTempRecordingDir());
+    QStringList filter;
+    filter << cam->getDevice()->getUniqueId() + QString(".*");
+    return directory.entryInfoList(filter, QDir::Files);
+}
+
 bool GraphicsView::contextMenuHelper_existRecordedVideo(CLVideoCamera* cam)
 {
-    QFileInfoList records = CLStreamRecorder::getRecordedFiles(getRecordingDir() + cam->getDevice()->getUniqueId());
-    return !records.isEmpty();
+    return !tmpRecordedFiles(cam).isEmpty();
 }
 
 void GraphicsView::contextMenuHelper_viewRecordedVideo(CLVideoCamera* cam)
 {
     cam->stopRecording();
-    QFileInfoList records = CLStreamRecorder::getRecordedFiles(getRecordingDir() + cam->getDevice()->getUniqueId());
+
+    QFileInfoList records = tmpRecordedFiles(cam);
 
     QStringList dstFiles;
     foreach(QFileInfo info, records)
     {
         QString id = info.absoluteFilePath();
         MainWnd::findAcceptedFiles(dstFiles, id);
-        //m_camLayout.addDevice(id, true);
-        //m_camLayout.getContent()->addDevice(id);
-        //fitInView(600, 100, SLOW_START_SLOW_END);
+        m_camLayout.addDevice(id, true);
+        CLDevice* dev = CLDeviceManager::instance().getDeviceById(id);
+        dev->addDeviceTypeFlag(CLDevice::RECORDED);
+        m_camLayout.getContent()->addDevice(id);
+        fitInView(600, 100, SLOW_START_SLOW_END);
     }
-    MainWnd::instance()->addFilesToCurrentOrNewLayout(dstFiles);
+    //MainWnd::instance()->addFilesToCurrentOrNewLayout(dstFiles);
 }
 
 void GraphicsView::contextMenuHelper_saveRecordedAs(CLVideoCamera* cam)
 {
     //if (!cam->getDevice()->checkDeviceTypeFlag(CLDevice::RECORDED))
     //    return;
-
-    QFileInfo srcFile = CLStreamRecorder::getTempFileName(cam->getDevice()->getUniqueId());
-    if (!QFile::exists(srcFile.absoluteFilePath()))
-        return;
-
-    QString suggetion = QDateTime::currentDateTime().toString().replace(":", "-"); //srcFile.baseName();
-
-    QString name;
-    forever
+    QFileInfo srcFile = cam->getDevice()->getUniqueId();
+    QDir dstDir;
+    dstDir.mkpath(getRecordingDir() + srcFile.baseName());
+    while (1)
     {
-        bool ok;
-        name = UIgetText(this, tr("Save recorded video as"), tr("Title:"), suggetion, ok);
-        if (!ok) {
-            QFile::remove(srcFile.absoluteFilePath());
+        if (!QFile::exists(srcFile.absoluteFilePath()))
             return;
-        }
 
-        name = name.trimmed();
-        if (name.isEmpty())
-        {
-            UIOKMessage(this, QString(), tr("Please provide a title."));
-            continue;
-        }
+        QString suggetion = QDateTime::currentDateTime().toString().replace(":", "-"); //srcFile.baseName();
+        QString selectedFilter;
+        QString dstFileName = QFileDialog::getSaveFileName(this, tr("Save Recording As..."),
+            getRecordingDir() + srcFile.baseName() + QLatin1Char('/') + suggetion,
+            tr("Matroska (*.mkv)"),
+            &selectedFilter,
+            QFileDialog::DontUseNativeDialog);
+        if (dstFileName.isEmpty())
+            return;
+        dstFileName += selectedFilter.mid(selectedFilter.indexOf(QLatin1Char('.')), 4);
 
         // make sure we'll be able to create such folder
         name.replace(QRegExp(QLatin1String(
@@ -3397,18 +3400,19 @@ void GraphicsView::contextMenuHelper_saveRecordedAs(CLVideoCamera* cam)
             UIOKMessage(this, QString(), tr("Appears this title already exists."));
             continue;
         }
-
         QString dstFileName = dstFile.absoluteFilePath();
-        if (!QFile::rename(srcFile.absoluteFilePath(), dstFileName)) 
-        {
-            UIOKMessage(this, QString(), tr("Can't save title. Try another name."));
-            continue;
+        */
+        QFile f(srcFile.absoluteFilePath());
+        if (!QFile::exists(dstFileName)) {
+            CLAVIStreamReader *reader = dynamic_cast<CLAVIStreamReader *>(cam->getStreamreader());
+            if (reader)
+                reader->renameFileOnDestroy(dstFileName);
+            return;
         }
-        break;
+        else {
+            UIOKMessage(this, QString(), tr("Can't save title. Try another name."));
+        }
     }
-
-    //CLAVIStreamReader *rreader = static_cast<CLAVIStreamReader *>(cam->getStreamreader());
-    //rreader->setRecordedDataDst(name);
 }
 
 void GraphicsView::contextMenuHelper_takeScreenshot(CLVideoWindowItem* item)
