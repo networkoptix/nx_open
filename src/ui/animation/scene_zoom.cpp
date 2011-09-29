@@ -70,7 +70,7 @@ void CLSceneZoom::setZoom(qreal z)
     }
     else // viewMove already called addjustAllStaticItems; do not need to do it second time
     {
-        m_view->addjustAllStaticItems();
+        m_view->adjustAllStaticItems();
     }
 
     //=======================================

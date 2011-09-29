@@ -1,27 +1,59 @@
 #include "search_filter_item.h"
 
-#include "search_edit.h"
+#include <QtGui/QHBoxLayout>
+#include <QtGui/QStringListModel>
+#include <QtGui/QToolButton>
+
+#include "base/tagmanager.h"
 #include "device/device_managmen/device_criteria.h"
 #include "ui/video_cam_layout/layout_content.h"
 #include "ui/graphicsview.h"
-#include <QModelIndex>
+#include "ui/skin.h"
 
-CLSerachEditItem::CLSerachEditItem(GraphicsView* view, QWidget* parent, LayoutContent* sceneContent):
-QWidget(parent, Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint),
-m_sceneContent(sceneContent),
-m_width(100),
-m_height(100),
-m_view(view)
+CLSearchEditCompleter::CLSearchEditCompleter(QObject *parent)
+    : QCompleter(parent)
 {
+    setModel(new QStringListModel(this));
+}
 
-    setFocusPolicy(Qt::NoFocus);
+void CLSearchEditCompleter::filter(const QString &filter)
+{
+    // Do any filtering you like.
+    // Here we just include all items that contain all words.
+    QStringList filtered;
 
-    m_lineEdit = new CLSearchEdit(this);
-    m_lineEdit->setFocusWidget(m_view);
-    m_lineEdit->setFocus();
+    foreach (const QString &word, filter.split(QLatin1Char(' '), QString::SkipEmptyParts))
+    {
+        foreach (const StringPair &item, m_list)
+        {
+            QString deviceTags = TagManager::objectTags(item.second).join(QLatin1String("\n"));
+            if (item.first.contains(word, caseSensitivity()) || deviceTags.contains(word, caseSensitivity()))
+                filtered.append(item.first);
+        }
+    }
+
+    static_cast<QStringListModel *>(model())->setStringList(filtered);
+    complete();
+}
+
+void CLSearchEditCompleter::updateStringPairs(const QList<StringPair> &list)
+{
+    m_list = list;
+}
 
 
-	/*
+CLSearchEditItem::CLSearchEditItem(GraphicsView *view, LayoutContent *sceneContent, QWidget *parent)
+    : QWidget(parent),
+      m_view(view),
+      m_sceneContent(sceneContent)
+{
+    m_lineEdit = new QLineEdit(this);
+    m_lineEdit->setFocusPolicy(Qt::StrongFocus);
+    setFocusProxy(m_lineEdit);
+
+    setStyleSheet(QLatin1String("QWidget { background: transparent; }"));
+
+    /*
     m_lineEdit->setStyleSheet(QLatin1String(
         "QLineEdit{ border-width: 2px; \n"
         "color: rgb(255, 255, 255); \n"
@@ -44,7 +76,7 @@ m_view(view)
         "border-right-color: rgb(255, 255, 255); \n"
         "border-bottom-color: rgb(255, 255, 255);}"
     ));
-	*/
+    */
 
     m_lineEdit->setStyleSheet(QLatin1String(
         "QLineEdit{ border-width: 2px; \n"
@@ -69,118 +101,157 @@ m_view(view)
         "border-bottom-color: rgb(150,150, 150);}"
     ));
 
-	m_height = 40;
+    m_completer = new CLSearchEditCompleter(m_lineEdit);
+    m_completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+    m_completer->setCaseSensitivity(Qt::CaseInsensitive);
+    m_completer->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
+    m_completer->setMaxVisibleItems(10);
 
-	m_completer = new CLSerchEditCompleter(this);
-	m_completer->setMaxVisibleItems(10);
-	m_completer->setCompletionMode(QCompleter::PopupCompletion);
-	m_completer->setCaseSensitivity(Qt::CaseInsensitive);
+    QListView *listView = new QListView;
 
-	m_lstview = new QListView();
-	m_lstview->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	m_lstview->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    listView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    listView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    listView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    listView->setSelectionMode(QAbstractItemView::SingleSelection);
 
-	m_lstview->setStyleSheet(QLatin1String(
-		"color: rgb(150,150, 150);"
-		"background-color: rgb(0, 16, 72);"
-		"selection-color: yellow;"
-		"selection-background-color: blue;"
-		"font-size: 20px; \n"));
+    listView->setStyleSheet(QLatin1String(
+        "color: rgb(150, 150, 150);"
+        "background-color: rgb(0, 16, 72);"
+        "selection-color: yellow;"
+        "selection-background-color: blue;"
+        "font-size: 20px;"));
 
-	m_completer->setPopup(m_lstview);
+    m_completer->setPopup(listView);
 
-	m_lineEdit->setCompleter(m_completer);
-	connect(m_lineEdit, SIGNAL(textChanged(QString)), this, SLOT(onEditTextChanged(QString)));
+    m_lineEdit->setCompleter(m_completer);
 
-	mTimer.setSingleShot(true);
-	mTimer.setInterval(600);
-	connect(&mTimer, SIGNAL(timeout()), this, SLOT(onTimer()) );
+    connect(m_lineEdit, SIGNAL(textChanged(QString)), this, SLOT(onEditTextChanged(QString)));
+    connect(m_completer, SIGNAL(activated(QString)), m_lineEdit, SLOT(selectAll()));
 
-	resize();
+    mTimer.setSingleShot(true);
+    mTimer.setInterval(600);
+    connect(&mTimer, SIGNAL(timeout()), this, SLOT(onTimer()));
 
-	setVisible(true);
+    QToolButton *liveButton = new QToolButton(this);
+    liveButton->setText(tr("Live"));
+    liveButton->setIcon(Skin::icon(QLatin1String("webcam.png")));
+    liveButton->setIconSize(QSize(30, 30));
+
+    connect(liveButton, SIGNAL(clicked()), this, SLOT(onLiveButtonClicked()));
+
+    QHBoxLayout *mainLayout = new QHBoxLayout;
+    mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout->addWidget(m_lineEdit);
+    mainLayout->addWidget(liveButton);
+    setLayout(mainLayout);
+
+    m_lineEdit->installEventFilter(this);
+    m_lineEdit->setFocus();
 }
 
-CLSerachEditItem::~CLSerachEditItem()
+CLSearchEditItem::~CLSearchEditItem()
 {
-
 }
 
-void CLSerachEditItem::setVisible(bool visible)
+QLineEdit *CLSearchEditItem::lineEdit() const
 {
-    QWidget::setVisible(visible);
-    m_lineEdit->setVisible(visible);
-
-    if (!visible)
-        m_lstview->setVisible(visible);
+    return m_lineEdit;
 }
 
-void CLSerachEditItem::resize()
+bool CLSearchEditItem::eventFilter(QObject *watched, QEvent *event)
 {
-	int vpw = 800;
-	if (parentWidget())
-		vpw = parentWidget()->size().width();
+    if (watched != m_lineEdit || event->type() != QEvent::KeyPress)
+        return false;
 
-	m_width = vpw/3;
-	if (m_width < 300)
-		m_width  = 300;
+    QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
 
-	//m_height = m_lineEdit->size().height();
-	m_lineEdit->resize(m_width, m_height);
+    keyEvent->accept();
+    if (m_completer->popup()->isVisible())
+    {
+        // The following keys are forwarded by the completer to the widget
+        switch (keyEvent->key())
+        {
+        case Qt::Key_Escape:
+        case Qt::Key_Tab:
+        case Qt::Key_Backtab:
+            keyEvent->ignore();
+            return false; // Let the completer do default behavior
+        default:
+            break;
+        }
+    }
 
-	move(QPoint(vpw/2 - m_width/2, 0));
-	QWidget::resize(m_width, m_height);
+    if (keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter)
+    {
+        m_view->scene()->clearFocus();
+        //keyEvent->ignore();
+        if (!m_completer->popup()->isVisible())
+        {
+            m_completer->popup()->hide();
+            return true;
+        }
+    }
 
+    const bool isShortcut = (keyEvent->modifiers() & Qt::ControlModifier) && keyEvent->key() == Qt::Key_E;
+    if (isShortcut)
+        return true; // Don't send the shortcut (CTRL-E) to the text edit.
+
+    const bool ctrlOrShift = keyEvent->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier);
+    if (!ctrlOrShift && keyEvent->modifiers() != Qt::NoModifier)
+    {
+        m_completer->popup()->hide();
+        return false;
+    }
+
+    m_completer->filter(m_lineEdit->text());
+    //m_completer->popup()->setCurrentIndex(m_completer->completionModel()->index(0, 0));
+
+    return false;
 }
 
-void CLSerachEditItem::onEditTextChanged (const QString & text)
+void CLSearchEditItem::onEditTextChanged(const QString &text)
 {
-    Q_UNUSED(text);
-
     m_view->onUserInput(true, true);
 
-	mTimer.stop();
-	mTimer.start();
+    mTimer.stop();
+    mTimer.start();
 
-	CLDeviceCriteria cr = m_sceneContent->getDeviceCriteria();
-	cr.setCriteria(CLDeviceCriteria::FILTER);
-	cr.setFilter(m_lineEdit->text());
+    QList<QPair<QString, QString> > stringPairs;
 
-        typedef QPair<QString, QString> StringPair;
-        QList<StringPair> result;
+    CLDeviceCriteria cr = m_sceneContent->getDeviceCriteria();
+    cr.setCriteria(CLDeviceCriteria::FILTER);
+    cr.setFilter(text);
+    foreach (CLDevice* dev, CLDeviceManager::instance().getDeviceList(cr))
+    {
+        stringPairs.append(QPair<QString, QString>(dev->toString(), dev->getUniqueId()));
+        dev->releaseRef();
+    }
 
-	CLDeviceList all_devs =  CLDeviceManager::instance().getDeviceList(cr);
-	foreach(CLDevice* dev, all_devs)
-	{
-            result.append(StringPair(dev->toString(), dev->getUniqueId()));
-            dev->releaseRef();
-	}
-
-        m_completer->updateStringPairs(result);
-	/**/
-
+    m_completer->updateStringPairs(stringPairs);
+    m_completer->filter(text);
 }
 
-void CLSerachEditItem::onTimer()
+void CLSearchEditItem::onTimer()
 {
-	mTimer.stop();
+    const QString text = m_lineEdit->text();
 
-	CLDeviceCriteria cr = m_sceneContent->getDeviceCriteria();
+    mTimer.stop();
 
-    if (m_lineEdit->text().length()>=4)
+    CLDeviceCriteria cr = m_sceneContent->getDeviceCriteria();
+    if (text.length() >= 4)
     {
         cr.setCriteria(CLDeviceCriteria::FILTER);
-        cr.setFilter(m_lineEdit->text());
+        cr.setFilter(text);
     }
     else
+    {
         cr.setCriteria(CLDeviceCriteria::NONE);
-
-
+    }
     m_sceneContent->setDeviceCriteria(cr);
-
 }
 
-bool CLSerachEditItem::hasFocus() const
+void CLSearchEditItem::onLiveButtonClicked()
 {
-    return m_lineEdit->hasFocus();
+    m_lineEdit->setText(QLatin1String("live"));
 }

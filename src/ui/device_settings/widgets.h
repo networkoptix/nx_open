@@ -1,6 +1,8 @@
 #ifndef settings_widgets_h_1820
 #define settings_widgets_h_1820
 
+#include <QtGui/QSlider>
+
 #include "device/param.h"
 #include "base/log.h"
 class CLDevice;
@@ -8,14 +10,16 @@ class QGroupBox;
 
 class SettingsSlider : public QSlider
 {
-	Q_OBJECT
-public:
-	SettingsSlider( Qt::Orientation orientation, QWidget * parent = 0 );
-protected:
-	void keyReleaseEvent ( QKeyEvent * event );
-signals:
-	void onKeyReleased();
+    Q_OBJECT
 
+public:
+    SettingsSlider(Qt::Orientation orientation, QWidget *parent = 0);
+
+Q_SIGNALS:
+    void onKeyReleased();
+
+protected:
+    void keyReleaseEvent(QKeyEvent *event);
 };
 
 //==============================================

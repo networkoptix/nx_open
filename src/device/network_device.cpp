@@ -15,6 +15,7 @@ mAfterRouter(false)
 }
 
 QHostAddress CLNetworkDevice::getIP() const
+
 {
 	QMutexLocker mutex(&m_cs);
 	return m_ip;

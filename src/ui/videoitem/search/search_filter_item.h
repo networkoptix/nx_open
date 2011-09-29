@@ -1,43 +1,59 @@
 #ifndef serach_edit_item_h_2017
 #define serach_edit_item_h_2017
 
+#include <QtCore/QList>
+
+#include <QtGui/QCompleter>
+#include <QtGui/QLineEdit>
+
+class GraphicsView;
 class LayoutContent;
 
-class CLSearchEdit;
-class CLSerchEditCompleter;
-class GraphicsView;
+typedef QPair<QString, QString> StringPair;
 
-class CLSerachEditItem : public QWidget
+class CLSearchEditCompleter : public QCompleter
 {
-	Q_OBJECT
+    Q_OBJECT
+
 public:
-	CLSerachEditItem(GraphicsView* view, QWidget* parent, LayoutContent* sceneContent);
-	~CLSerachEditItem();
-	void resize();
+    CLSearchEditCompleter(QObject *parent);
 
-    void setVisible(bool visible);
+    void filter(const QString &filter);
 
-    bool hasFocus() const;
+    void updateStringPairs(const QList<StringPair> &list);
 
-protected slots:
-	void onEditTextChanged (const QString & text);
-	void onTimer(); 
+private:
+    QList<QPair<QString, QString> > m_list;
+    QString m_word;
+};
 
-protected:    
+
+class CLSearchEditItem : public QWidget
+{
+    Q_OBJECT
+
+public:
+    CLSearchEditItem(GraphicsView *view, LayoutContent *sceneContent, QWidget *parent = 0);
+    ~CLSearchEditItem();
+
+    QLineEdit *lineEdit() const;
 
 protected:
-	LayoutContent* m_sceneContent;
+    bool eventFilter(QObject *watched, QEvent *event);
 
-	int m_width;
-	int m_height;
+private Q_SLOTS:
+    void onEditTextChanged(const QString &text);
+    void onTimer();
 
-	CLSearchEdit* m_lineEdit;
-	CLSerchEditCompleter* m_completer;
-    QListView* m_lstview;
-	QTimer mTimer;
+    void onLiveButtonClicked();
 
-    GraphicsView* m_view;
+private:
+    GraphicsView *m_view;
+    LayoutContent *m_sceneContent;
 
+    QLineEdit *m_lineEdit;
+    CLSearchEditCompleter *m_completer;
+    QTimer mTimer;
 };
 
 #endif //serach_edit_item_h_2017

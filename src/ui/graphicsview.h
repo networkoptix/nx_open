@@ -22,7 +22,7 @@ class CLAbstractDeviceSettingsDlg;
 class CLAbstractUnmovedItem;
 class QParallelAnimationGroup;
 class QInputEvent;
-class CLSerachEditItem;
+class CLSearchEditItem;
 class CLGridItem;
 class QnPageSelector;
 
@@ -61,7 +61,7 @@ public:
     void setAllItemsQuality(CLStreamreader::StreamQuality q, bool increase);
     void closeAllDlg();
 
-    void addjustAllStaticItems();
+    void adjustAllStaticItems();
     void centerOn(const QPointF &pos);
 
     // moves scene in view coord
@@ -166,9 +166,11 @@ protected:
     void navigation_grid_items_drop_helper();
 
 public slots:
-
     void fitInView(int duration = 700 , int delay = 0, CLAnimationCurve curve =  SLOW_END_POW_40);
+
 private slots:
+    void adjustSearchItemPopup();
+
     void onSceneZoomFinished();
     void onSecTimer();
     void onDecorationItemPressed(const QString &);
@@ -240,7 +242,7 @@ protected:
 
     ViewMode m_viewMode;
 
-    CLSerachEditItem* m_searchItem;
+    CLSearchEditItem* m_searchItem;
     QnPageSelector* m_pageSelector;
 
     CLAnimationManager m_animationManager;
