@@ -38,6 +38,7 @@
 #include <QtCore/QTimer>
 
 #include <QtGui/QFileDialog>
+#include <QtGui/QGraphicsProxyWidget>
 #include <QtGui/QMessageBox>
 
 #ifdef Q_OS_WIN
@@ -249,6 +250,18 @@ void GraphicsView::removeFileDeviceItem(CLDeviceSearcher& deviceSearcher, CLAbst
 
 GraphicsView::~GraphicsView()
 {
+    if (m_searchItem)
+    {
+        if (QGraphicsProxyWidget *popupItem = m_searchItem->lineEdit()->completer()->popup()->graphicsProxyWidget())
+        {
+            popupItem->setWidget(0);
+            delete popupItem;
+        }
+
+        delete m_searchItem->graphicsProxyWidget();
+        m_searchItem = 0;
+    }
+
     setZeroSelection();
     stop();
     delete m_animated_bckg;
@@ -489,7 +502,7 @@ void GraphicsView::updateTransform(qreal angle)
     tr.rotate(angle/10.0, Qt::YAxis);
     //tr.rotate(angle/10.0, Qt::XAxis);
     setTransform(tr);
-    addjustAllStaticItems();
+    adjustAllStaticItems();
 }
 
 void GraphicsView::onSecTimer()
@@ -550,13 +563,13 @@ void GraphicsView::viewMove(int dx, int dy)
     if (new_pos.y() >= rsr.top() && new_pos.y() <= rsr.bottom())
         vBar->setValue(vBar->value() - delta.y());
 
-    addjustAllStaticItems();
+    adjustAllStaticItems();
 }
 
 void GraphicsView::centerOn(const QPointF &pos)
 {
     QGraphicsView::centerOn(pos);
-    addjustAllStaticItems();
+    adjustAllStaticItems();
     //viewport()->update();
 }
 
@@ -645,17 +658,37 @@ void GraphicsView::initDecoration()
 
     if (search)
     {
-#ifdef _WIN32
-        m_searchItem = new CLSerachEditItem(this, this, content);
-#else
-        // There is a problem on Mac OS X with embedding control into scene.
-        // As a temporary solution we are using separate window.
-        m_searchItem = new CLSerachEditItem(this, 0, content);
-#endif
+        m_searchItem = new CLSearchEditItem(this, content);
+
+        QGraphicsProxyWidget *searchItem = scene()->addWidget(m_searchItem);
+        searchItem->setCursor(Qt::ArrowCursor);
+        searchItem->setFlag(QGraphicsItem::ItemIgnoresTransformations);
+        searchItem->setFlag(QGraphicsItem::ItemSendsScenePositionChanges);
+        searchItem->setMinimumSize(QSizeF(300, 40));
+        searchItem->setZValue(10);
+
+        if (QGraphicsProxyWidget *popupItem = scene()->addWidget(m_searchItem->lineEdit()->completer()->popup()))
+        {
+            popupItem->setCursor(Qt::ArrowCursor);
+            popupItem->setFlag(QGraphicsItem::ItemIgnoresTransformations);
+            popupItem->setFlag(QGraphicsItem::ItemSendsScenePositionChanges);
+            popupItem->setZValue(searchItem->zValue() - 1);
+
+            connect(m_searchItem->lineEdit(), SIGNAL(textChanged(QString)), this, SLOT(adjustSearchItemPopup()), Qt::QueuedConnection);
+            connect(searchItem, SIGNAL(visibleChanged()), this, SLOT(adjustSearchItemPopup()), Qt::QueuedConnection);
+        }
+
+        m_searchItem->setFocus();
     }
-    else
+    else if (m_searchItem)
     {
-        delete m_searchItem;
+        if (QGraphicsProxyWidget *popupItem = m_searchItem->lineEdit()->completer()->popup()->graphicsProxyWidget())
+        {
+            popupItem->setWidget(0);
+            delete popupItem;
+        }
+
+        delete m_searchItem->graphicsProxyWidget();
         m_searchItem = 0;
     }
 
@@ -669,10 +702,44 @@ void GraphicsView::initDecoration()
     updateDecorations();
 }
 
-void GraphicsView::addjustAllStaticItems()
+void GraphicsView::adjustAllStaticItems()
 {
     foreach (CLAbstractUnmovedItem *item, m_staticItems)
         item->adjust();
+
+    if (m_searchItem)
+    {
+        QGraphicsProxyWidget *searchItem = m_searchItem->graphicsProxyWidget();
+        searchItem->setPreferredSize(viewport()->width() / 3, 40);
+        searchItem->resize(searchItem->preferredSize());
+        searchItem->setPos(mapToScene((viewport()->width() - searchItem->size().width()) / 2, 0));
+
+        adjustSearchItemPopup();
+    }
+}
+
+void GraphicsView::adjustSearchItemPopup()
+{
+    if (!m_searchItem)
+        return;
+
+    if (QGraphicsProxyWidget *popupItem = m_searchItem->lineEdit()->completer()->popup()->graphicsProxyWidget())
+    {
+        QGraphicsProxyWidget *searchItem = m_searchItem->graphicsProxyWidget();
+        if (!searchItem->isVisible())
+        {
+            popupItem->setVisible(false);
+            return;
+        }
+
+        //popupItem->setPos(searchItem->sceneBoundingRect().bottomLeft());
+        QRectF rect = searchItem->sceneBoundingRect();
+        QRect vpRect = QRect(mapFromScene(rect.topLeft()), rect.size().toSize());
+        vpRect.setTop(vpRect.bottom());
+        vpRect.setHeight(popupItem->size().height());
+        rect = QRectF(mapToScene(vpRect.topLeft()), QSizeF(vpRect.size()));
+        popupItem->setGeometry(rect);
+    }
 }
 
 void GraphicsView::addStaticItem(CLAbstractUnmovedItem* item, bool conn)
@@ -2438,8 +2505,7 @@ void GraphicsView::updateDecorations()
 
     updatePageSelector();
 
-    if (m_searchItem)
-        m_searchItem->resize();
+    adjustAllStaticItems();
 }
 
 void GraphicsView::resizeEvent(QResizeEvent *event)
@@ -3322,7 +3388,6 @@ void GraphicsView::contextMenuHelper_saveRecordedAs(CLVideoCamera* cam)
                 "\\-,\\#,\\(,\\),"
                 "\\%,\\.,\\+,\\~,\\_"
              "]")), QLatin1String("_"));
-        
 
         QString dstDir = getRecordingDir() + srcFile.baseName() + QString('/');
         QFileInfo dstFile(dstDir + name + QString('.') + srcFile.suffix());
