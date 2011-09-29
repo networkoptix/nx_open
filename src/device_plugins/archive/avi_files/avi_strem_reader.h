@@ -34,7 +34,6 @@ protected:
     virtual void channeljumpTo(quint64 mksec, int channel);
 
     virtual bool init();
-    bool initAndKeepAudio();
     virtual void destroy();
 
     void smartSleep(qint64 mksec);

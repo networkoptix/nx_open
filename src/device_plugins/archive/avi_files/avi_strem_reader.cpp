@@ -232,20 +232,6 @@ AVFormatContext* CLAVIStreamReader::getFormatContext()
     return m_formatContext;
 }
 
-bool CLAVIStreamReader::initAndKeepAudio()
-{
-    int prevAudioTrack = m_audioStreamIndex;
-    if (!init())
-        return false;
-
-    if (prevAudioTrack != -1 && prevAudioTrack < m_formatContext->nb_streams && 
-        m_formatContext->streams[prevAudioTrack]->codec->codec_type == AVMEDIA_TYPE_AUDIO) 
-    {
-        m_audioStreamIndex = prevAudioTrack;
-    }
-    return true;
-}
-
 bool CLAVIStreamReader::init()
 {
 	QMutexLocker mutex(&m_cs);
@@ -317,17 +303,19 @@ bool CLAVIStreamReader::initCodecs()
                 m_indexToChannel[i] = QString(entry->value).toInt();
             }
             break;
-
+        /*
         case AVMEDIA_TYPE_AUDIO:
             if (m_audioStreamIndex == -1) // Take only first audio stream
                 m_audioStreamIndex = i;
                 m_selectedAudioChannel = 0;
             break;
-
+        */
         default:
             break;
         }
     }
+
+    setAudioChannel(m_selectedAudioChannel);
 
     if (m_primaryVideoIdx != -1)
     {
@@ -707,7 +695,7 @@ void CLAVIStreamReader::intChanneljumpTo(quint64 mksec, int /*channel*/)
     else {
         // some files can't correctly jump to 0
         destroy();
-        initAndKeepAudio();
+        init();
     }
 
 	//m_needToSleep = 0;
@@ -747,7 +735,7 @@ bool CLAVIStreamReader::getNextPacket(AVPacket& packet)
             destroy();
             m_eof = true;
 
-            if (!initAndKeepAudio())
+            if (!init())
                 return false;
             err = av_read_frame(m_formatContext, &packet);
             if (err < 0)
