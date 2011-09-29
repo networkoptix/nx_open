@@ -1105,6 +1105,9 @@ void GraphicsView::mouseReleaseEvent(QMouseEvent * event)
         return; // ignore some accident mouse click accidents after double click
     }
 
+    if (m_searchItem && m_searchItem->lineEdit()->completer()->popup()->isVisible())
+        m_searchItem->lineEdit()->completer()->popup()->hide();
+
     if (onUserInput(true, true))
         return;
 
