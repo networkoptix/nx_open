@@ -8,6 +8,7 @@
 #include "device/device_managmen/device_criteria.h"
 #include "ui/video_cam_layout/layout_content.h"
 #include "ui/graphicsview.h"
+#include "ui/skin.h"
 
 CLSearchEditCompleter::CLSearchEditCompleter(QObject *parent)
     : QCompleter(parent)
@@ -132,6 +133,8 @@ CLSearchEditItem::CLSearchEditItem(GraphicsView *view, LayoutContent *sceneConte
 
     QToolButton *liveButton = new QToolButton(this);
     liveButton->setText(tr("Live"));
+    liveButton->setIcon(Skin::icon(QLatin1String("webcam.png")));
+    liveButton->setIconSize(QSize(30, 30));
     connect(liveButton, SIGNAL(clicked()), this, SLOT(onLiveButtonClicked()));
 
     QHBoxLayout *mainLayout = new QHBoxLayout;
@@ -160,6 +163,7 @@ bool CLSearchEditItem::eventFilter(QObject *watched, QEvent *event)
 
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
 
+    keyEvent->accept();
     if (m_completer->popup()->isVisible())
     {
         // The following keys are forwarded by the completer to the widget
@@ -180,7 +184,10 @@ bool CLSearchEditItem::eventFilter(QObject *watched, QEvent *event)
         m_view->setFocus();
         //keyEvent->ignore();
         if (!m_completer->popup()->isVisible())
+        {
+            m_completer->popup()->hide();
             return true;
+        }
     }
 
     const bool isShortcut = (keyEvent->modifiers() & Qt::ControlModifier) && keyEvent->key() == Qt::Key_E;
