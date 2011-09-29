@@ -25,7 +25,7 @@ public:
     }
 };
 
-Q_GLOBAL_STATIC(VolumeSliderProxyStyle, volumeStyle)
+Q_GLOBAL_STATIC(VolumeSliderProxyStyle, volumeSliderProxyStyle)
 
 
 
@@ -36,7 +36,7 @@ VolumeSlider::VolumeSlider(Qt::Orientation orientation, QGraphicsItem *parent)
     m_toolTip = new StyledToolTipItem(this);
     m_toolTip->setVisible(false);
 
-    setStyle(volumeStyle());
+    setStyle(volumeSliderProxyStyle());
 
     setRange(0, 100);
     setSliderPosition(QtvAudioDevice::instance().volume() * 100);

@@ -26,6 +26,8 @@ public:
     }
 };
 
+Q_GLOBAL_STATIC(SpeedSliderProxyStyle, speedSliderProxyStyle)
+
 
 static const struct Preset {
     int size;
@@ -49,7 +51,7 @@ SpeedSlider::SpeedSlider(Qt::Orientation orientation, QGraphicsItem *parent)
     m_toolTip = new StyledToolTipItem(this);
     m_toolTip->setVisible(false);
 
-    setStyle(new SpeedSliderProxyStyle);
+    setStyle(speedSliderProxyStyle());
     setSingleStep(5);
     setPageStep(10);
     setTickInterval(10);
