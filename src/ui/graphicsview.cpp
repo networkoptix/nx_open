@@ -2136,6 +2136,12 @@ void GraphicsView::keyPressEvent( QKeyEvent * e )
     if (onUserInput(true, true))
         return;
 
+    if (m_searchItem && scene()->focusItem() == m_searchItem->graphicsProxyWidget())
+    {
+        QApplication::sendEvent(scene(), e);
+        return;
+    }
+
     CLAbstractSceneItem* last_sel_item = getLastSelectedItem();
 
 

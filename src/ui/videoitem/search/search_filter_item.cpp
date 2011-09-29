@@ -51,6 +51,8 @@ CLSearchEditItem::CLSearchEditItem(GraphicsView *view, LayoutContent *sceneConte
     m_lineEdit->setFocusPolicy(Qt::StrongFocus);
     setFocusProxy(m_lineEdit);
 
+    setStyleSheet(QLatin1String("QWidget { background: transparent; }"));
+
     /*
     m_lineEdit->setStyleSheet(QLatin1String(
         "QLineEdit{ border-width: 2px; \n"
@@ -135,6 +137,7 @@ CLSearchEditItem::CLSearchEditItem(GraphicsView *view, LayoutContent *sceneConte
     liveButton->setText(tr("Live"));
     liveButton->setIcon(Skin::icon(QLatin1String("webcam.png")));
     liveButton->setIconSize(QSize(30, 30));
+
     connect(liveButton, SIGNAL(clicked()), this, SLOT(onLiveButtonClicked()));
 
     QHBoxLayout *mainLayout = new QHBoxLayout;
@@ -181,7 +184,7 @@ bool CLSearchEditItem::eventFilter(QObject *watched, QEvent *event)
 
     if (keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter)
     {
-        m_view->setFocus();
+        m_view->scene()->clearFocus();
         //keyEvent->ignore();
         if (!m_completer->popup()->isVisible())
         {
