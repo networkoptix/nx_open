@@ -1,28 +1,21 @@
 syntax: glob
 
+.idea
 bin
 build
+*-build*
 Debug
 Release
 *.pyc
 *.sln
 *.ncb
 *.suo
-src/uniclient.pro
-test/uniclient_tests.pro
 *.user
-src/uniclient.vcproj
-src/uniclient.xcodeproj
-src/version.h
-src/ui_mainwnd.h
-src/Info.plist
-test/uniclient_tests.vcproj
-wixsetup/Associations.wxs
-wixsetup/FileExtensions.wxs
-wixsetup/CustomStrings.wxl
+*.vcproj
+*.xcodeproj
+server/src/version.h
+client/src/version.h
 .DS_Store
-src/Info.plist
-macsetup/*.dmg
-src/device_plugins/archive/filetypes.h
-*Makefile*
-EvePlayer-Beta.xcodeproj*
+common/src/common.pri
+appserver/db/appserver.db
+scripts/appserver/server.state

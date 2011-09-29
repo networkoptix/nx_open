@@ -1,0 +1,3 @@
+ORGANIZATION_NAME    = 'Network Optix'
+APPLICATION_NAME     = 'VMS Client'
+APPLICATION_VERSION  = '0.1.0'
