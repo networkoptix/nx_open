@@ -70,7 +70,7 @@ CLHttpStatus CLSimpleHTTPClient::openStream(bool recursive)
 		os << "GET /" << m_request<<" HTTP/1.1\r\n"
 			<< "Host: "<< m_host.toString() << "\r\n";
 
-		if (m_auth.password().length()>0 && mNonce.isEmpty())
+		if (m_auth.user().length()>0 && mNonce.isEmpty())
 		{
 			os << basicAuth() << "\r\n";
 		}
