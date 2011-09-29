@@ -23,6 +23,7 @@ debug {
     MOC_DIR = build/debug/generated
     UI_DIR = build/debug/generated
     RCC_DIR = build/debug/generated
+    CONFIG += console
 }
 
 release {
