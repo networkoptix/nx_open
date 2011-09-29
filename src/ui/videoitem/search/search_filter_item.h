@@ -45,6 +45,8 @@ private Q_SLOTS:
     void onEditTextChanged(const QString &text);
     void onTimer();
 
+    void onLiveButtonClicked();
+
 private:
     GraphicsView *m_view;
     LayoutContent *m_sceneContent;

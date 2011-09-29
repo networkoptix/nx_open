@@ -2,6 +2,7 @@
 
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QStringListModel>
+#include <QtGui/QToolButton>
 
 #include "base/tagmanager.h"
 #include "device/device_managmen/device_criteria.h"
@@ -129,9 +130,14 @@ CLSearchEditItem::CLSearchEditItem(GraphicsView *view, LayoutContent *sceneConte
     mTimer.setInterval(600);
     connect(&mTimer, SIGNAL(timeout()), this, SLOT(onTimer()));
 
+    QToolButton *liveButton = new QToolButton(this);
+    liveButton->setText(tr("Live"));
+    connect(liveButton, SIGNAL(clicked()), this, SLOT(onLiveButtonClicked()));
+
     QHBoxLayout *mainLayout = new QHBoxLayout;
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(m_lineEdit);
+    mainLayout->addWidget(liveButton);
     setLayout(mainLayout);
 
     m_lineEdit->installEventFilter(this);
@@ -233,4 +239,17 @@ void CLSearchEditItem::onTimer()
         cr.setCriteria(CLDeviceCriteria::NONE);
     }
     m_sceneContent->setDeviceCriteria(cr);
+}
+
+void CLSearchEditItem::onLiveButtonClicked()
+{
+    QString text = m_lineEdit->text().trimmed();
+    if (text.compare(tr("live"), Qt::CaseInsensitive) != 0)
+    {
+        if (!text.isEmpty())
+            text += QLatin1Char('+');
+        text += tr("live");
+    }
+    if (text != m_lineEdit->text())
+        m_lineEdit->setText(text);
 }
