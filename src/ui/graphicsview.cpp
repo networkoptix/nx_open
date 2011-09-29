@@ -1460,7 +1460,6 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
                 menu.addAction(&cm_open_containing_folder);
             }
 
-            
             if (dev->getUniqueId().contains(getTempRecordingDir()))
             {
                 menu.addAction(&cm_save_recorded_as);
@@ -3373,26 +3372,15 @@ void GraphicsView::contextMenuHelper_saveRecordedAs(CLVideoCamera* cam)
         QString suggetion = QDateTime::currentDateTime().toString().replace(":", "-"); //srcFile.baseName();
         QString selectedFilter;
         QString dstFileName = QFileDialog::getSaveFileName(this, tr("Save Recording As..."),
-            getRecordingDir() + srcFile.baseName() + QLatin1Char('/') + suggetion,
-            tr("Matroska (*.mkv)"),
-            &selectedFilter,
-            QFileDialog::DontUseNativeDialog);
+                                                           getRecordingDir() + srcFile.baseName() + QLatin1Char('/') + suggetion,
+                                                           tr("Matroska (*.mkv)"),
+                                                           &selectedFilter,
+                                                           QFileDialog::DontUseNativeDialog);
         if (dstFileName.isEmpty())
             return;
         dstFileName += selectedFilter.mid(selectedFilter.indexOf(QLatin1Char('.')), 4);
 
-        // make sure we'll be able to create such folder
-        name.replace(QRegExp(QLatin1String(
-             "[^"
-                "A-Z,a-z,0-9,"
-                "\\^,\\&,\\',\\@,"
-                "\\{,\\},\\[,\\],"
-                "\\,,\\$,\\=,\\!,"
-                "\\-,\\#,\\(,\\),"
-                "\\%,\\.,\\+,\\~,\\_"
-             "]")), QLatin1String("_"));
-
-        QString dstDir = getRecordingDir() + srcFile.baseName() + QString('/');
+        /*
         QFileInfo dstFile(dstDir + name + QString('.') + srcFile.suffix());
         dstFile.dir().mkpath(dstFile.absolutePath());
         if (QFile::exists(dstFile.absoluteFilePath()))
@@ -3403,15 +3391,10 @@ void GraphicsView::contextMenuHelper_saveRecordedAs(CLVideoCamera* cam)
         QString dstFileName = dstFile.absoluteFilePath();
         */
         QFile f(srcFile.absoluteFilePath());
-        if (!QFile::exists(dstFileName)) {
-            CLAVIStreamReader *reader = dynamic_cast<CLAVIStreamReader *>(cam->getStreamreader());
-            if (reader)
-                reader->renameFileOnDestroy(dstFileName);
+        if (f.copy(dstFileName))
             return;
-        }
-        else {
-            UIOKMessage(this, QString(), tr("Can't save title. Try another name."));
-        }
+
+        UIOKMessage(this, QString(), tr("Can't save title. Try another name."));
     }
 }
 
