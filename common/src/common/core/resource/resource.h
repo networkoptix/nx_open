@@ -40,7 +40,9 @@ public:
         video = 0x20,
         audio = 0x40,
         live = 0x80,
-        live_cam = live | video | media | streamprovider
+        live_cam = live | video | media | streamprovider,
+
+
     };
 
 
