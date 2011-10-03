@@ -194,6 +194,13 @@ void AnimatedWidget::setGeometry(const QRectF &rect)
     itemChange(GraphicsItemChange(ItemSizeHasChanged), newSizeVariant);
 }
 
+void AnimatedWidget::updateGeometry()
+{
+    d->inSetGeometry = true;
+    QGraphicsWidget::updateGeometry();
+    d->inSetGeometry = false;
+}
+
 QVariant AnimatedWidget::itemChange(GraphicsItemChange change, const QVariant &value)
 {
     switch (int(change))

@@ -6,6 +6,10 @@
 #include <QPoint>
 #include <QRect>
 
+/* A quick workaround. Remove this once we have a better solution. */
+#undef override
+#define override
+
 class CellLayoutPrivate;
 
 class CellLayout: public QGraphicsLayout 
@@ -40,7 +44,7 @@ public:
      * \param width                     New height of a single cell.
      * \param height                    New width of a single cell.
      */
-    void setCellSize(qreal width, qreal height);
+    inline void setCellSize(qreal width, qreal height);
 
     /**
      * Sets the layout's default spacing, both vertical and horizontal, to spacing.
@@ -74,6 +78,18 @@ public:
     void setHorizontalSpacing(qreal spacing);
 
     /**
+     * \param item                      Item from this layout.
+     * \param alignment                 New alignment for the given item.
+     */
+    void setAlignment(QGraphicsLayoutItem *item, Qt::Alignment alignment);
+
+    /**
+     * \param item                      Item from this layout.
+     * \returns                         Alignment of the given item.
+     */
+    Qt::Alignment alignment(QGraphicsLayoutItem *item) const;
+
+    /**
      * \returns                         Bounds of this cell layout, in cells.
      */
     QRect bounds() const;
@@ -81,16 +97,16 @@ public:
     /**
      * \returns                         Number of the first row of this cell layout.
      */
-    int startRow() const;
+    int firstRow() const;
 
     /**
-     * \returns                         Number of the row past the last row of this cell layout.
+     * \returns                         Number of the last row of this cell layout.
      */
-    int endRow() const;
+    int lastRow() const;
 
     /**
      * Note that rows cannot be enumerated by iterating through the range <tt>[0, rowCount())</tt>.
-     * Use <tt>[startRow(), endRow())</tt> range instead.
+     * Use <tt>[firstRow(), lastRow())</tt> range instead.
      * 
      * \returns                         Number of rows in this cell layout. 
      */
@@ -99,16 +115,16 @@ public:
     /**
      * \returns                         Number of the first column of this cell layout.
      */
-    int startColumn() const;
+    int firstColumn() const;
 
     /**
-     * \returns                         Number of the column past the last column of this cell layout.
+     * \returns                         Number of the last column of this cell layout.
      */
-    int endColumn() const;
+    int lastColumn() const;
 
     /**
      * Note that columns cannot be enumerated by iterating through the range <tt>[0, columnCount())</tt>.
-     * Use <tt>[startColumn(), endColumn())</tt> range instead.
+     * Use <tt>[firstColumn(), lastColumn())</tt> range instead.
      * 
      * \returns                         Number of columns in this cell layout. 
      */
@@ -119,7 +135,7 @@ public:
      * \param row
      * \returns                         Item at given row and column, or NULL if no such item exist.
      */
-    QGraphicsLayoutItem *itemAt(int row, int column) const;
+    inline QGraphicsLayoutItem *itemAt(int row, int column) const;
 
     /**
      * \param cell                      Cell position. Note that x determines column, and y determines row.
@@ -149,7 +165,7 @@ public:
      * \param columnSpan
      * \param alignment                Item alignment.
      */
-    void addItem(QGraphicsLayoutItem *item, int row, int column, int rowSpan, int columnSpan, Qt::Alignment alignment = 0);
+    inline void addItem(QGraphicsLayoutItem *item, int row, int column, int rowSpan, int columnSpan, Qt::Alignment alignment = 0);
 
     /**
      * Adds new item to this cell layout.
@@ -178,10 +194,10 @@ public:
 protected:
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint) const override;
 
-    // TODO: move d_ptr to common base.
-
+protected:
     QScopedPointer<CellLayoutPrivate> d_ptr; 
 
+private:
     Q_DECLARE_PRIVATE(CellLayout);
 };
 

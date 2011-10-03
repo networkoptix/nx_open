@@ -268,21 +268,10 @@ QVariant AnimatedWidget::itemChange(GraphicsItemChange change, const QVariant &v
         {
             const QPointF newPos = value.toPointF();
 
-            if(d->posAnimation->state() != QAbstractAnimation::Stopped && d->posAnimation->endValue().toPointF() == newPos)
+            if (d->posAnimation->state() != QAbstractAnimation::Stopped && d->posAnimation->endValue().toPointF() == newPos)
                 return pos();
 
             d->posAnimation->stop();
-
-            /* NOTE: 
-             * The following code won't work if the animation is not stopped and newPos equals animation's end value.
-             * Thus the early return and the stop() call above.
-             * 
-             * If the current 'real' progress determined by the easing curve lies outside the [0, 1] interval, 
-             * code in QVariantAnimationPrivate::recalculateCurrentInterval goes the wrong path, 
-             * ending up dividing by zero in QVariantAnimationPrivate::setCurrentValueForProgress
-             * and passing the result (1.#INF) to interpolator. 
-             * The result is a graphics item that is positioned at +inf.
-             */
 
             QGraphicsItem *mouseGrabberItem = scene()->mouseGrabberItem();
             if (!isInteractive() || (!isSelected() && (!mouseGrabberItem || (mouseGrabberItem != this/* && !isAncestorOf(mouseGrabberItem)*/))))
@@ -300,8 +289,10 @@ QVariant AnimatedWidget::itemChange(GraphicsItemChange change, const QVariant &v
         {
             const QSizeF newSize = value.toSizeF();
 
-            if (d->sizeAnimation->state() != QAbstractAnimation::Stopped && d->sizeAnimation->endValue().toSizeF() != newSize)
-                d->sizeAnimation->stop();
+            if (d->sizeAnimation->state() != QAbstractAnimation::Stopped && d->sizeAnimation->endValue().toSizeF() == newSize)
+                return size();
+
+            d->sizeAnimation->stop();
 
             QGraphicsItem *mouseGrabberItem = scene()->mouseGrabberItem();
             //if (!isInteractive() || !isSelected() || !mouseGrabberItem/* || (mouseGrabberItem != this && !isAncestorOf(mouseGrabberItem))*/)
@@ -323,8 +314,10 @@ QVariant AnimatedWidget::itemChange(GraphicsItemChange change, const QVariant &v
             {
                 newScale = qBound(1.0, newScale, 5.0);
 
-                if (d->scaleAnimation->state() != QAbstractAnimation::Stopped && d->scaleAnimation->endValue().toReal() != newScale)
-                    d->scaleAnimation->stop();
+                if (d->scaleAnimation->state() != QAbstractAnimation::Stopped && qFuzzyCompare(d->scaleAnimation->endValue().toReal(), newScale))
+                    return scale();
+
+                d->scaleAnimation->stop();
 
                 d->scaleAnimation->setEndValue(newScale);
                 d->scaleAnimation->start();
@@ -340,8 +333,10 @@ QVariant AnimatedWidget::itemChange(GraphicsItemChange change, const QVariant &v
             const qreal newRotation = value.toReal();
             if (qIsFinite(newRotation))
             {
-                if (d->rotationAnimation->state() != QAbstractAnimation::Stopped && d->rotationAnimation->endValue().toReal() != newRotation)
-                    d->rotationAnimation->stop();
+                if (d->rotationAnimation->state() != QAbstractAnimation::Stopped && qFuzzyCompare(d->rotationAnimation->endValue().toReal(), newRotation))
+                    return rotation();
+
+                d->rotationAnimation->stop();
 
                 d->rotationAnimation->setEndValue(newRotation);
                 d->rotationAnimation->start();
@@ -357,8 +352,10 @@ QVariant AnimatedWidget::itemChange(GraphicsItemChange change, const QVariant &v
             const qreal newOpacity = value.toReal();
             if (qIsFinite(newOpacity))
             {
-                if (d->opacityAnimation->state() != QAbstractAnimation::Stopped && d->opacityAnimation->endValue().toReal() != newOpacity)
-                    d->opacityAnimation->stop();
+                if (d->opacityAnimation->state() != QAbstractAnimation::Stopped && qFuzzyCompare(d->opacityAnimation->endValue().toReal(), newOpacity))
+                    return opacity();
+
+                d->opacityAnimation->stop();
 
                 d->opacityAnimation->setEndValue(newOpacity);
                 d->opacityAnimation->start();
@@ -367,53 +364,14 @@ QVariant AnimatedWidget::itemChange(GraphicsItemChange change, const QVariant &v
             return opacity();
         }
         break;
-#if 0
-    case ItemChildAddedChange:
-        value.value<QGraphicsItem *>()->installSceneEventFilter(this);
-        break;
-    case ItemChildRemovedChange:
-        value.value<QGraphicsItem *>()->removeSceneEventFilter(this);
-        break;
-#endif
+
     default:
         break;
     }
 
     return QGraphicsWidget::itemChange(change, value);
 }
-#if 0
-bool AnimatedWidget::sceneEventFilter(QGraphicsItem *watched, QEvent *event)
-{
-    switch (event->type())
-    {
-    case QEvent::GrabMouse:
-        d->childIsGrabberItem = true;
-qWarning() << "sceneEventFilter" << (void*)this << watched << event << event->isAccepted();
-        break;
-    case QEvent::UngrabMouse:
-        d->childIsGrabberItem = false;
-qWarning() << "sceneEventFilter" << (void*)this << watched << event << event->isAccepted();
-        break;
 
-    default:
-        break;
-    }
-
-    return QGraphicsWidget::sceneEventFilter(watched, event);
-}
-
-void AnimatedWidget::grabMouseEvent(QEvent *event)
-{
-qWarning() << "grabMouseEvent" << event;
-    QGraphicsWidget::grabMouseEvent(event);
-}
-
-void AnimatedWidget::ungrabMouseEvent(QEvent *event)
-{
-qWarning() << "ungrabMouseEvent" << event;
-    QGraphicsWidget::ungrabMouseEvent(event);
-}
-#endif
 bool AnimatedWidget::windowFrameEvent(QEvent *event)
 {
     if ((flags() & ItemIsPanel))
@@ -444,7 +402,7 @@ bool AnimatedWidget::windowFrameEvent(QEvent *event)
 void AnimatedWidget::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsWidget::mousePressEvent(event);
-//qWarning() << "mousePressEvent" << event->button() << event->pos();
+
     if (event->button() == Qt::LeftButton && !isInteractive())
         event->accept();
 }
@@ -452,7 +410,7 @@ void AnimatedWidget::mousePressEvent(QGraphicsSceneMouseEvent *event)
 void AnimatedWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsWidget::mouseReleaseEvent(event);
-//qWarning() << "mouseReleaseEvent" << event->button() << event->pos();
+
     if (event->button() == Qt::LeftButton && !isInteractive())
     {
         event->accept();
@@ -463,7 +421,6 @@ void AnimatedWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void AnimatedWidget::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
-//qWarning() << "mouseDoubleClickEvent" << event->button() << event->pos();
     if (event->button() == Qt::LeftButton && !isInteractive())
         QMetaObject::invokeMethod(this, "doubleClicked", Qt::QueuedConnection);
     else

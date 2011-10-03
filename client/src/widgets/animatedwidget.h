@@ -34,6 +34,8 @@ Q_SIGNALS:
     void doubleClicked();
 
 protected:
+    void updateGeometry();
+
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 
     bool windowFrameEvent(QEvent *event);

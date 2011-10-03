@@ -33,6 +33,21 @@ private:
     void ensureBounds() const;
     void ensureEffectiveCellSize() const;
 
+    /**
+     * \param item                      Item to compute geometry for.
+     * \param constraint                Constraints on item geometry.
+     * \param alignment                 Item alignment.
+     * \returns                         Item geometry, computed taking size policy and alignment into account.
+     */
+    static QRectF constrainedGeometry(QGraphicsLayoutItem *item, const QRectF &constraint, Qt::Alignment alignment);
+
+    /**
+     * \param item
+     * \param constraint
+     * \returns                         Effective maximum size of the given item, taking size policy into account.
+     */
+    static QSizeF effectiveMaxSize(QGraphicsLayoutItem *item, const QSizeF &constraint);
+
 private:
     /** Horizontal spacing. */
     qreal verticalSpacing;
