@@ -6,38 +6,39 @@ namespace {
     uint qHash(const QPoint &value) {
         using ::qHash;
 
-        return qHash(value.x()) ^ qHash(value.y());
+        /* 1021 is a prime. */
+        return qHash(value.x() * 1021) + qHash(value.y());
     }
 }
 
-void CellLayoutPrivate::recalculateBounds() 
+void CellLayoutPrivate::ensureBounds() const
 {
+    if(bounds.isValid())
+        return;
+
     bounds = QRect();
 
     foreach(const QRect &rect, rectByItem)
         bounds |= rect;
 }
 
-void CellLayoutPrivate::extendBounds(const QRect &rect)
+void CellLayoutPrivate::ensureEffectiveCellSize() const
 {
-    bounds |= rect;
-}
-
-void CellLayoutPrivate::ensureMinimumCellSize()
-{
-    if(minimumCellSize.isValid())
+    if(effectiveCellSize.isValid())
         return;
 
-    minimumCellSize = QSizeF();
+    effectiveCellSize = cellSize;
 
-    /* NOTE: we also iterate through items that are owned but not managed by this layout. */
     foreach(QGraphicsLayoutItem *item, items) {
         QSizeF size = item->minimumSize();
         QRect cellRect = rectByItem.value(item);
 
-        minimumCellSize = minimumCellSize.expandedTo(QSizeF(
-            size.width()  / cellRect.width(), 
-            size.height() / cellRect.height()
+        if(!cellRect.isValid())
+            continue; /* Skip items that are owned but not managed by this layout. */
+
+        effectiveCellSize = effectiveCellSize.expandedTo(QSizeF(
+            (size.width() - horizontalSpacing * (cellRect.width() - 1))  / cellRect.width(), 
+            (size.height() - verticalSpacing * (cellRect.height() - 1)) / cellRect.height()
         ));
     }
 }
@@ -73,8 +74,7 @@ void CellLayout::setCellSize(const QSizeF &cellSize)
 {
     Q_D(CellLayout);
 
-    d->ensureMinimumCellSize();
-    d->cellSize = cellSize.expandedTo(d->minimumCellSize);
+    d->cellSize = cellSize;
 
     invalidate();
 }
@@ -83,12 +83,16 @@ int CellLayout::startRow() const
 {
     Q_D(const CellLayout);
 
+    d->ensureBounds();
+
     return d->bounds.top();
 }
 
 int CellLayout::endRow() const 
 {
     Q_D(const CellLayout);
+
+    d->ensureBounds();
 
     return d->bounds.top() + d->bounds.height();
 }
@@ -97,12 +101,16 @@ int CellLayout::rowCount() const
 {
     Q_D(const CellLayout);
 
+    d->ensureBounds();
+
     return d->bounds.height();
 }
 
 int CellLayout::startColumn() const 
 {
     Q_D(const CellLayout);
+
+    d->ensureBounds();
 
     return d->bounds.left();
 }
@@ -111,12 +119,16 @@ int CellLayout::endColumn() const
 {
     Q_D(const CellLayout);
 
+    d->ensureBounds();
+
     return d->bounds.left() + d->bounds.width();
 }
 
 int CellLayout::columnCount() const 
 {
     Q_D(const CellLayout);
+
+    d->ensureBounds();
 
     return d->bounds.width();
 }
@@ -200,14 +212,6 @@ void CellLayout::addItem(QGraphicsLayoutItem *item, const QRect &rect)
         for(int c = rect.left(); c <= rect.right(); c++) 
             d->itemByPoint[QPoint(c, r)] = item;
 
-    /* Update bounds. */
-    d->extendBounds(rect);
-
-    /* Update cell size. */
-    d->ensureMinimumCellSize();
-    d->minimumCellSize = d->minimumCellSize.expandedTo(QSizeF(item->minimumWidth() / rect.width(), item->minimumHeight() / rect.height()));
-    d->cellSize = d->cellSize.expandedTo(d->minimumCellSize);
-
     invalidate();
 }
 
@@ -223,19 +227,21 @@ void CellLayout::setGeometry(const QRectF &rect)
     QRectF effectiveRect = rect.adjusted(+left, +top, -right, -bottom);
 
     /* Create shortcuts. */
-    qreal cellWidth = d->cellSize.width();
-    qreal cellHeight = d->cellSize.height();
+    d->ensureEffectiveCellSize();
+    qreal cellWidth = d->effectiveCellSize.width();
+    qreal cellHeight = d->effectiveCellSize.height();
 
     /* Set child items' geometries. Ignore given size. */
+    d->ensureBounds();
     typedef QHash<QGraphicsLayoutItem *, QRect>::const_iterator const_iterator;
     for(const_iterator pos = d->rectByItem.begin(); pos != d->rectByItem.end(); pos++) 
     {
         QRect itemCellRect = pos.value().translated(-d->bounds.topLeft());
         QRectF itemRect(
-            effectiveRect.left() + cellWidth * itemCellRect.left(),
-            effectiveRect.top() + cellHeight * itemCellRect.top(),
-            cellWidth * itemCellRect.width(),
-            cellHeight * itemCellRect.height()
+            effectiveRect.left() + (cellWidth  + d->horizontalSpacing) * itemCellRect.left(),
+            effectiveRect.top()  + (cellHeight + d->verticalSpacing)   * itemCellRect.top(),
+            cellWidth  * itemCellRect.width()  + d->horizontalSpacing * (itemCellRect.width() - 1),
+            cellHeight * itemCellRect.height() + d->verticalSpacing   * (itemCellRect.height() - 1)
         );
 
         pos.key()->setGeometry(itemRect);
@@ -294,14 +300,6 @@ void CellLayout::removeItem(QGraphicsLayoutItem *item)
 
     d->rectByItem.erase(pos);
 
-    /* Recalculate bounds if needed. */
-    if(rect.left() == d->bounds.left() || rect.right() == d->bounds.right() || rect.top() == d->bounds.top() || rect.bottom() == d->bounds.bottom())
-        d->recalculateBounds();
-
-    /* Invalidate minimum cell size. */
-    d->minimumCellSize = QSizeF();
-
-    //updateGeometry(); /* Size hint may have changed. */
     invalidate();
 }
 
@@ -315,9 +313,14 @@ QSizeF CellLayout::sizeHint(Qt::SizeHint which, const QSizeF &/*constraint*/) co
     case Qt::MaximumSize: {
         qreal left, top, right, bottom;
         getContentsMargins(&left, &top, &right, &bottom);
+        d->ensureBounds();
+        d->ensureEffectiveCellSize();
+
+        qreal totalHorizontalSpacing = d->bounds.width()  == 0 ? 0.0 : d->horizontalSpacing * (d->bounds.width()  - 1);
+        qreal totalVerticalSpacing   = d->bounds.height() == 0 ? 0.0 : d->verticalSpacing   * (d->bounds.height() - 1);
         return QSizeF(
-            d->cellSize.width() * d->bounds.width() + left + right, 
-            d->cellSize.height() * d->bounds.height() + top + bottom
+            d->effectiveCellSize.width()  * d->bounds.width()  + totalHorizontalSpacing + left + right, 
+            d->effectiveCellSize.height() * d->bounds.height() + totalVerticalSpacing   + top  + bottom
         );
     }
     case Qt::MinimumDescent:
@@ -326,4 +329,56 @@ QSizeF CellLayout::sizeHint(Qt::SizeHint which, const QSizeF &/*constraint*/) co
         qWarning("CellLayout::sizeHint: unknown size hint value %d.", static_cast<int>(which));
         return QSizeF();
     }
+}
+
+void CellLayout::invalidate() 
+{
+    Q_D(CellLayout);
+
+    QGraphicsLayout::invalidate();
+
+    d->effectiveCellSize = QSizeF();
+    d->bounds = QRect();
+}
+
+void CellLayout::setSpacing(qreal spacing)
+{
+    Q_D(CellLayout);
+
+    d->horizontalSpacing = spacing;
+    d->verticalSpacing = spacing;
+
+    invalidate();
+}
+
+qreal CellLayout::verticalSpacing() const 
+{
+    Q_D(const CellLayout);
+
+    return d->verticalSpacing;
+}
+
+qreal CellLayout::horizontalSpacing() const 
+{
+    Q_D(const CellLayout);
+
+    return d->horizontalSpacing;
+}
+
+void CellLayout::setVerticalSpacing(qreal spacing) 
+{
+    Q_D(CellLayout);
+
+    d->verticalSpacing = spacing;
+
+    invalidate();
+}
+
+void CellLayout::setHorizontalSpacing(qreal spacing) 
+{
+    Q_D(CellLayout);
+
+    d->horizontalSpacing = spacing;
+
+    invalidate();
 }

@@ -14,7 +14,7 @@
 #include "videoitem.h"
 #include "celllayout.h"
 
-static const qreal spacig = 10;
+static const qreal spacing = 10;
 
 GraphicsView::GraphicsView(QWidget *parent)
     : QGraphicsView(parent),
@@ -293,7 +293,7 @@ void GraphicsView::relayoutItems(int rowCount, int columnCount, const QByteArray
     CellLayout *layout = new CellLayout;
     layout->setCellSize(100, 100);
     layout->setContentsMargins(0, 0, 0, 0);
-    //layout->setSpacing(spacig);
+    layout->setSpacing(spacing);
     m_widget->setLayout(layout);
     m_widget->setProperty("preset", preset);
 

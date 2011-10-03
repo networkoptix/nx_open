@@ -24,6 +24,9 @@ public:
     virtual ~CellLayout();
 
     /**
+     * Note that the actual cell size may differ from the one returned by this
+     * function because of the items' size constraints. 
+     *
      * \returns                         Size of a single cell.
      */
     const QSizeF cellSize() const;
@@ -38,6 +41,37 @@ public:
      * \param height                    New width of a single cell.
      */
     void setCellSize(qreal width, qreal height);
+
+    /**
+     * Sets the layout's default spacing, both vertical and horizontal, to spacing.
+     * 
+     * \param spacing                   Spacing value.
+     */
+    void setSpacing(qreal spacing);
+
+    /**
+     * \returns                         Vertical spacing of this layout.
+     */
+    qreal verticalSpacing() const;
+    
+    /**
+     * \returns                         Horizontal spacing of this layout.
+     */
+    qreal horizontalSpacing() const;
+
+    /**
+     * Sets the default vertical spacing for this layout.
+     *
+     * \param spacing                   Vertical spacing value.
+     */
+    void setVerticalSpacing(qreal spacing);
+
+    /**
+     * Sets the default horizontal spacing for this layout.
+     *
+     * \param spacing                   Horizontal spacing value.
+     */
+    void setHorizontalSpacing(qreal spacing);
 
     /**
      * \returns                         Bounds of this cell layout, in cells.
@@ -107,8 +141,6 @@ public:
 
     /**
      * Adds new item to this cell layout. 
-     * 
-     * Updates cell size if the given item doesn't fit.
      *
      * \param item                      Item to add.
      * \param row
@@ -120,8 +152,6 @@ public:
 
     /**
      * Adds new item to this cell layout.
-     * 
-     * Updates cell size if the given item doesn't fit.
      * 
      * \param item                     Item to add.
      * \param rect                     Item position and size, in cells.
@@ -135,6 +165,8 @@ public:
     virtual QGraphicsLayoutItem *itemAt(int index) const override;
 
     virtual void removeAt(int index) override;
+
+    virtual void invalidate() override;
 
     /**
      * \param item                      Item to remove from this cell layout.

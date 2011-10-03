@@ -12,23 +12,27 @@ class CellLayoutPrivate
 {
 public:
     CellLayoutPrivate(): 
-        cellSize(1.0, 1.0)
+        cellSize(1.0, 1.0),
+        verticalSpacing(0.0),
+        horizontalSpacing(0.0)
     {}
 
 protected:
     CellLayout *q_ptr;
 
 private:
-    void recalculateBounds();
-    void extendBounds(const QRect &rect);
-    void ensureMinimumCellSize();
+    void ensureBounds() const;
+    void ensureEffectiveCellSize() const;
 
 private:
+    /** Horizontal spacing. */
+    qreal verticalSpacing;
+
+    /** Vertical spacing. */
+    qreal horizontalSpacing;
+
     /** Size of a single cell. */
     QSizeF cellSize;
-
-    /** Minimal cell size dictated by the items stored in this layout. */
-    QSizeF minimumCellSize;
 
     /** List of all items owned by the layout. */
     QList<QGraphicsLayoutItem *> items;
@@ -39,8 +43,11 @@ private:
     /** Mapping from cell to layout item. */
     QHash<QPoint, QGraphicsLayoutItem *> itemByPoint;
 
+    /** Effective cell size dictated by the items stored in this layout. */
+    mutable QSizeF effectiveCellSize;
+
     /** Actual layout bounds, in cells. */
-    QRect bounds;
+    mutable QRect bounds;
 
 private:
     Q_DECLARE_PUBLIC(CellLayout);
