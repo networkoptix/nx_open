@@ -3,8 +3,6 @@
 
 #include <QtGui/QGraphicsView>
 
-class AnimatedWidget;
-
 class GraphicsView: public QGraphicsView
 {
     Q_OBJECT
@@ -25,30 +23,10 @@ public:
     inline QRect mapRectFromScene(const QRectF &rect) const
     { return QRect(mapFromScene(rect.topLeft()), mapFromScene(rect.bottomRight())); }
 
-Q_SIGNALS:
-
 protected:
-//    virtual void mousePressEvent(QMouseEvent *);
     virtual void mouseReleaseEvent(QMouseEvent *);
-//    virtual void mouseDoubleClickEvent(QMouseEvent *);
-//    virtual void mouseMoveEvent(QMouseEvent *);
-#ifndef QT_NO_WHEELEVENT
-    virtual void wheelEvent(QWheelEvent *);
-#endif
     virtual void keyPressEvent(QKeyEvent *);
     virtual void keyReleaseEvent(QKeyEvent *);
-/*    virtual void resizeEvent(QResizeEvent *);
-#ifndef QT_NO_CONTEXTMENU
-    virtual void contextMenuEvent(QContextMenuEvent *);
-#endif
-#ifndef QT_NO_DRAGANDDROP
-    virtual void dragEnterEvent(QDragEnterEvent *);
-    virtual void dragMoveEvent(QDragMoveEvent *);
-    virtual void dragLeaveEvent(QDragLeaveEvent *);
-    virtual void dropEvent(QDropEvent *);
-#endif*/
-
-    void drawBackground(QPainter *painter, const QRectF &rect);
 
 private Q_SLOTS:
     void relayoutItemsActionTriggered();
@@ -56,15 +34,13 @@ private Q_SLOTS:
     void itemClicked();
     void itemDoubleClicked();
     void itemDestroyed();
-    void sceneSelectionChanged();
 
 private:
     void createActions();
 
 private:
     QGraphicsWidget *m_widget;
-    QList<AnimatedWidget *> m_animatedWidgets;
-    QGraphicsItemGroup *m_selectionGroup;
+    QList<QGraphicsWidget *> m_animatedWidgets;
 };
 
 #endif // GRAPHICSVIEW_H
