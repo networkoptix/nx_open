@@ -3,7 +3,7 @@ contains(QT_CONFIG, opengl): QT *= opengl
 HEADERS += mainwindow.h \
            graphicsview.h
 
-SOURCES += main.cpp \
+SOURCES += client_main.cpp \
            mainwindow.cpp \
            graphicsview.cpp
 

@@ -11,23 +11,22 @@
 #include <qdebug.h>
 
 #include "animatedwidget.h"
-#include "videoitem.h"
+#include "layoutitem.h"
 #include "celllayout.h"
 
-static const qreal spacing = 10;
+static const qreal spacig = 10;
 
 GraphicsView::GraphicsView(QWidget *parent)
     : QGraphicsView(parent),
-      m_widget(0)
+      m_widget(0), m_selectionGroup(0)
 {
     {
         QGraphicsScene *scene = new QGraphicsScene(this);
         scene->setItemIndexMethod(QGraphicsScene::NoIndex);
-        //scene->setStyle(..); // scene-specific style
         setScene(scene);
     }
 
-#ifndef QT_NO_OPENGL
+/*#ifndef QT_NO_OPENGL
     if (QGLFormat::hasOpenGL())
     {
         QGLFormat glFormat(QGL::SampleBuffers);
@@ -36,7 +35,7 @@ GraphicsView::GraphicsView(QWidget *parent)
         setViewport(new QGLWidget(glFormat)); // antialiasing
     }
     else
-#endif
+#endif*/
     {
         setViewport(new QWidget);
     }
@@ -46,10 +45,9 @@ GraphicsView::GraphicsView(QWidget *parent)
 
     setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);
 
-    setOptimizationFlag(QGraphicsView::DontSavePainterState, false); // ### could be optimized
-    setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing);
-
     //setCacheMode(QGraphicsView::CacheBackground); // slows down scene drawing a lot!!!
+
+    setOptimizationFlags(QGraphicsView::DontSavePainterState | QGraphicsView::DontAdjustForAntialiasing);
 
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -75,6 +73,7 @@ GraphicsView::GraphicsView(QWidget *parent)
     createActions();
 
     m_widget = new QGraphicsWidget;
+//    m_widget->setWindowFlags(Qt::Tool);
     m_widget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding, QSizePolicy::GroupBox));
 
     connect(m_widget, SIGNAL(geometryChanged()), this, SLOT(widgetGeometryChanged()), Qt::QueuedConnection);
@@ -82,17 +81,22 @@ GraphicsView::GraphicsView(QWidget *parent)
     for (int i = 0; i < 16; ++i)
     {
         AnimatedWidget *widget = new AnimatedWidget(m_widget);
-//        widget->setFlag(QGraphicsItem::ItemHasNoContents, true); // optimization
         widget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true); // optimization
+//        widget->setFlag(QGraphicsItem::ItemHasNoContents, true); // optimization
         widget->setFlag(QGraphicsItem::ItemIsSelectable, true);
-//        widget->setFlag(QGraphicsItem::ItemIsPanel, false);
+        widget->setFlag(QGraphicsItem::ItemIsFocusable, true);
+        widget->setFlag(QGraphicsItem::ItemIsFocusScope, true);
+        widget->setFlag(QGraphicsItem::ItemIsPanel, false);
+        widget->setFocusPolicy(Qt::TabFocus);
+        widget->setWindowTitle(tr("item # %1").arg(i + 1));
         widget->setPos(QPointF(-500, -500));
         scene()->addItem(widget);
 
         QGraphicsGridLayout *layout = new QGraphicsGridLayout(widget);
         layout->setSpacing(0);
         layout->setContentsMargins(0, 0, 0, 0);
-        VideoItem *item = new VideoItem(widget);
+        LayoutItem *item = new LayoutItem(widget);
+//        item->setFlags(item->flags() | QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
         layout->addItem(item, 0, 0, 1, 1, Qt::AlignCenter);
 
         connect(widget, SIGNAL(clicked()), this, SLOT(itemClicked()));
@@ -107,27 +111,30 @@ GraphicsView::GraphicsView(QWidget *parent)
     m_widget->setGeometry(0, 0, 900, 900);
 
     relayoutItems(4, 4);
+
+//    connect(scene, SIGNAL(selectionChanged()), this, SLOT(sceneSelectionChanged()));
 }
 
 GraphicsView::~GraphicsView()
 {
     delete m_widget;
+    delete m_selectionGroup;
 }
 
 bool GraphicsView::isEditMode() const
 {
-    return !m_animatedWidgets.isEmpty() && static_cast<AnimatedWidget *>(m_animatedWidgets.first())->isInteractive();
+    return !m_animatedWidgets.isEmpty() && m_animatedWidgets.first()->isInteractive();
 }
 
 void GraphicsView::setEditMode(bool interactive)
 {
-    foreach (QGraphicsWidget *widget, m_animatedWidgets)
-        static_cast<AnimatedWidget *>(widget)->setInteractive(interactive);
+    foreach (AnimatedWidget *widget, m_animatedWidgets)
+        widget->setInteractive(interactive);
 }
 
 void GraphicsView::createActions()
 {
-    // ### re-work layout presets format and handler code
+    // ### re-work layout presets format/handler code
     {
         QByteArray preset =
                 "4000"
@@ -289,11 +296,9 @@ void GraphicsView::relayoutItems(int rowCount, int columnCount, const QByteArray
 
     m_widget->setLayout(0);
 
-    //QGraphicsGridLayout *layout = new QGraphicsGridLayout;
-    CellLayout *layout = new CellLayout;
-    layout->setCellSize(100, 100);
+    CellLayout *layout = new CellLayout();
     layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(spacing);
+    layout->setSpacing(spacig);
     m_widget->setLayout(layout);
     m_widget->setProperty("preset", preset);
 
@@ -307,18 +312,24 @@ void GraphicsView::relayoutItems(int rowCount, int columnCount, const QByteArray
                 const int span = preset.at(row * columnCount + column) - '0';
                 if (span > 0)
                 {
-                    //layout->addItem(widget, row, column, span, span, Qt::AlignCenter);
-                    layout->addItem(widget, row, column, span, span);
-                    ++i;
+                    /*if (layout->count())
+                        QGraphicsWidget::setTabOrder(static_cast<QGraphicsWidget *>(layout->itemAt(layout->count() - 1)), widget);*/
+
+                    //if (row >= layout->rowCount() || column >= layout->columnCount() || layout->itemAt(row, column) == 0)
+                    {
+                        layout->addItem(widget, row, column, span, span, Qt::AlignCenter);
+                        ++i;
+                    }
                 }
             }
         }
     }
-    //for (int row = 0; row < layout->rowCount(); ++row)
-        //layout->setRowStretchFactor(row, 10);
-    //for (int column = 0; column < layout->columnCount(); ++column)
-        //layout->setColumnStretchFactor(column, 10);
-
+    /*for (int row = 0; row < layout->rowCount(); ++row)
+        layout->setRowStretchFactor(row, 10);
+    for (int column = 0; column < layout->columnCount(); ++column)
+        layout->setColumnStretchFactor(column, 10);*/
+    /*if (layout->count() > 1)
+        QGraphicsWidget::setTabOrder(static_cast<QGraphicsWidget *>(layout->itemAt(layout->count() - 1)), static_cast<QGraphicsWidget *>(layout->itemAt(0)));*/
     while (i < m_animatedWidgets.size())
     {
         QGraphicsWidget *widget = m_animatedWidgets.at(i++);
@@ -330,7 +341,7 @@ void GraphicsView::invalidateLayout()
 {
     if (QGraphicsLayout *layout = m_widget->layout())
     {
-        /*foreach (QGraphicsWidget *widget, m_animatedWidgets)
+        /*foreach (AnimatedWidget *widget, m_animatedWidgets)
             widget->setZValue(m_widget->zValue());*/
         layout->invalidate();
         layout->activate();
@@ -341,8 +352,6 @@ void GraphicsView::relayoutItemsActionTriggered()
 {
     if (QAction *action = qobject_cast<QAction *>(sender()))
         relayoutItems(action->property("rowCount").toInt(), action->property("columnCount").toInt(), action->property("preset").toByteArray());
-    //else if (QGraphicsGridLayout *layout = static_cast<QGraphicsGridLayout *>(m_widget->layout()))
-        //relayoutItems(layout->rowCount(), layout->columnCount(), m_widget->property("preset").toByteArray());
     else if (CellLayout *layout = static_cast<CellLayout *>(m_widget->layout()))
         relayoutItems(layout->rowCount(), layout->columnCount(), m_widget->property("preset").toByteArray());
 }
@@ -397,9 +406,87 @@ void GraphicsView::itemDoubleClicked()
 
 void GraphicsView::itemDestroyed()
 {
-    m_animatedWidgets.removeOne(static_cast<QGraphicsWidget *>(sender()));
+    m_animatedWidgets.removeOne(static_cast<AnimatedWidget *>(sender()));
     QTimer::singleShot(250, this, SLOT(relayoutItemsActionTriggered()));
 }
+
+void GraphicsView::sceneSelectionChanged()
+{
+#if 0
+    QList<QGraphicsItem *> selectedItems = scene()->selectedItems();
+qWarning() << "selectedItems" << selectedItems;
+    if (!selectedItems.isEmpty())
+    {
+qWarning() << "m_selectionGroup" << m_selectionGroup;
+        if (!m_selectionGroup)
+        {
+            m_selectionGroup = new QGraphicsItemGroup;
+            scene()->addItem(m_selectionGroup);
+        }
+        QList<QGraphicsItem *> grouppedItems = m_selectionGroup->childItems();
+qWarning() << "m_selectionGroup2" << m_selectionGroup;
+qWarning() << "grouppedItems" << grouppedItems;
+/*        // remove deselected items
+        foreach (QGraphicsItem *item, grouppedItems)
+        {
+            if (!selectedItems.contains(item))
+                m_selectionGroup->removeFromGroup(item);
+        }
+*/
+        // add newly selected ones
+        foreach (QGraphicsItem *item, selectedItems)
+        {
+            if (!item->parentItem() && !grouppedItems.contains(item))
+                m_selectionGroup->addToGroup(item);
+        }
+qWarning() << "grouppedItems2" << m_selectionGroup->childItems();
+/*
+        // become empty? go away
+        if (m_selectionGroup->childItems().isEmpty())
+        {
+            scene()->removeItem(m_selectionGroup);
+            delete m_selectionGroup;
+            m_selectionGroup = 0;
+        }
+    }
+    else if (m_selectionGroup)
+    {
+        // same as scene()->destroyItemGroup(m_selectionGroup)
+        foreach (QGraphicsItem *item, m_selectionGroup->children())
+            m_selectionGroup->removeFromGroup(item);
+        scene()->removeItem(m_selectionGroup);
+        delete m_selectionGroup;
+        m_selectionGroup = 0;
+*/    }
+#endif
+}
+
+#ifndef QT_NO_WHEELEVENT
+void GraphicsView::wheelEvent(QWheelEvent *event)
+{
+    if (m_selectionGroup)
+    {
+        m_selectionGroup->setTransformOriginPoint(m_selectionGroup->childrenBoundingRect().center());
+
+        if (event->modifiers() & Qt::ControlModifier)
+        {
+            if (event->modifiers() & Qt::AltModifier)
+            {
+                const qreal angle = m_selectionGroup->rotation() + event->delta() / 8;
+                m_selectionGroup->setRotation(angle);
+            }
+            else
+            {
+                const qreal factor = m_selectionGroup->scale() + qreal(event->delta()) / 250;
+                //if (factor >= 1 && factor <= 5)
+                    m_selectionGroup->setScale(factor);
+            }
+        }
+    }
+
+    QGraphicsView::wheelEvent(event);
+}
+#endif
 
 void GraphicsView::mouseReleaseEvent(QMouseEvent *event)
 {
@@ -441,17 +528,15 @@ void GraphicsView::keyPressEvent(QKeyEvent *event)
         break;
 
     case Qt::Key_Space:
-        invalidateLayout();
+        if (m_widget && m_widget->layout())
+        {
+            m_widget->layout()->invalidate();
+            m_widget->layout()->activate();
+        }
         break;
 
     case Qt::Key_Escape:
-        if (QWidget *window = topLevelWidget()->window())
-        {
-            if (!window->isFullScreen())
-                window->showFullScreen();
-            else
-                window->showMaximized();
-        }
+        invalidateLayout();
         break;
 
     default:
@@ -467,6 +552,19 @@ void GraphicsView::keyReleaseEvent(QKeyEvent *event)
     {
     case Qt::Key_Control:
         setDragMode(QGraphicsView::NoDrag);
+/*        if (m_selectionGroup)
+        {
+            // same as scene()->destroyItemGroup(m_selectionGroup)
+            foreach (QGraphicsItem *item, m_selectionGroup->children())
+                m_selectionGroup->removeFromGroup(item);
+            scene()->removeItem(m_selectionGroup);
+            delete m_selectionGroup;
+            m_selectionGroup = 0;
+        }
+        scene()->clearSelection();
+        break;
+
+    case Qt::Key_Alt:*/
         scene()->clearSelection();
         setEditMode(false);
         break;
@@ -476,4 +574,14 @@ void GraphicsView::keyReleaseEvent(QKeyEvent *event)
     }
 
     QGraphicsView::keyReleaseEvent(event);
+}
+
+void GraphicsView::drawBackground(QPainter *painter, const QRectF &rect)
+{
+/*    static QPixmap logo(":/images/eve_logo.png"); // ### non-POD, initialize somewhere else
+
+    const QRectF viewportSceneRect = mapRectToScene(viewport()->rect());
+qWarning() << "drawBackground" << rect << viewportSceneRect << logo.size();
+
+    painter->drawPixmap(rect.toRect(), logo, logo.rect());*/
 }

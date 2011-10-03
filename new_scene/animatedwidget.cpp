@@ -20,6 +20,8 @@ public:
 
     void init();
 
+    void drawRotationHelper(QPainter *painter, const QPointF &m_rotation_center, const QPointF &m_rotation_hand);
+
     AnimatedWidget *q;
 
     inline QPointF instantPos() const { return q->pos(); }
@@ -105,6 +107,7 @@ void AnimatedWidgetPrivate::init()
 
     q->setInteractive(false);
 
+    //q->setFiltersChildEvents(true); ### investigate
     q->setHandlesChildEvents(true);
 
 
@@ -134,6 +137,58 @@ void AnimatedWidgetPrivate::init()
     opacityAnimation->setDuration(500);
     opacityAnimation->setEasingCurve(QEasingCurve::InOutSine);
     animationGroup->addAnimation(opacityAnimation);
+}
+
+void AnimatedWidgetPrivate::drawRotationHelper(QPainter *painter, const QPointF &m_rotation_center, const QPointF &m_rotation_hand)
+{
+    static QColor color1(255, 0, 0, 250);
+    static QColor color2(255, 0, 0, 100);
+
+    static const int r = 30;
+    static const int penWidth = 6;
+    static const int p_line_len = 220;
+    static const int arrowSize = 30;
+
+    QRadialGradient gradient(m_rotation_center, r);
+    gradient.setColorAt(0, color1);
+    gradient.setColorAt(1, color2);
+
+    painter->save();
+
+    painter->setPen(QPen(color2, 0, Qt::SolidLine));
+
+    painter->setBrush(gradient);
+    painter->drawEllipse(m_rotation_center, r, r);
+
+    painter->setPen(QPen(color2, penWidth, Qt::SolidLine));
+    painter->drawLine(m_rotation_center, m_rotation_hand);
+
+    // building new line
+    QLineF line(m_rotation_hand, m_rotation_center);
+    QLineF line_p = line.unitVector().normalVector();
+    line_p.setLength(p_line_len/2);
+
+    line_p = QLineF(line_p.p2(),line_p.p1());
+    line_p.setLength(p_line_len);
+
+    painter->drawLine(line_p);
+
+    double angle = qAcos(line_p.dx() / line_p.length());
+    if (line_p.dy() >= 0)
+        angle = M_PI * 2 - angle;
+
+    qreal s = 2.5;
+
+    QPointF sourceArrowP1 = line_p.p1() + QPointF(qSin(angle + M_PI / s) * arrowSize, qCos(angle + M_PI / s) * arrowSize);
+    QPointF sourceArrowP2 = line_p.p1() + QPointF(qSin(angle + M_PI - M_PI / s) * arrowSize, qCos(angle + M_PI - M_PI / s) * arrowSize);
+    QPointF destArrowP1 = line_p.p2() + QPointF(qSin(angle - M_PI / s) * arrowSize, qCos(angle - M_PI / s) * arrowSize);
+    QPointF destArrowP2 = line_p.p2() + QPointF(qSin(angle - M_PI + M_PI / s) * arrowSize, qCos(angle - M_PI + M_PI / s) * arrowSize);
+
+    painter->setBrush(color2);
+    painter->drawPolygon(QPolygonF() << line_p.p1() << sourceArrowP1 << sourceArrowP2);
+    painter->drawPolygon(QPolygonF() << line_p.p2() << destArrowP1 << destArrowP2);
+
+    painter->restore();
 }
 
 
@@ -194,6 +249,13 @@ void AnimatedWidget::setGeometry(const QRectF &rect)
     itemChange(GraphicsItemChange(ItemSizeHasChanged), newSizeVariant);
 }
 
+void AnimatedWidget::updateGeometry()
+{
+    d->inSetGeometry = true;
+    QGraphicsWidget::updateGeometry();
+    d->inSetGeometry = false;
+}
+
 QVariant AnimatedWidget::itemChange(GraphicsItemChange change, const QVariant &value)
 {
     switch (int(change))
@@ -242,6 +304,7 @@ QVariant AnimatedWidget::itemChange(GraphicsItemChange change, const QVariant &v
                 d->sizeAnimation->stop();
 
             QGraphicsItem *mouseGrabberItem = scene()->mouseGrabberItem();
+            //if (!isInteractive() || !isSelected() || !mouseGrabberItem/* || (mouseGrabberItem != this && !isAncestorOf(mouseGrabberItem))*/)
             if (!isInteractive() || (!isSelected() && (!mouseGrabberItem || (mouseGrabberItem != this/* && !isAncestorOf(mouseGrabberItem)*/))))
             {
                 d->sizeAnimation->setEndValue(newSize);
@@ -304,14 +367,53 @@ QVariant AnimatedWidget::itemChange(GraphicsItemChange change, const QVariant &v
             return opacity();
         }
         break;
-
+#if 0
+    case ItemChildAddedChange:
+        value.value<QGraphicsItem *>()->installSceneEventFilter(this);
+        break;
+    case ItemChildRemovedChange:
+        value.value<QGraphicsItem *>()->removeSceneEventFilter(this);
+        break;
+#endif
     default:
         break;
     }
 
     return QGraphicsWidget::itemChange(change, value);
 }
+#if 0
+bool AnimatedWidget::sceneEventFilter(QGraphicsItem *watched, QEvent *event)
+{
+    switch (event->type())
+    {
+    case QEvent::GrabMouse:
+        d->childIsGrabberItem = true;
+qWarning() << "sceneEventFilter" << (void*)this << watched << event << event->isAccepted();
+        break;
+    case QEvent::UngrabMouse:
+        d->childIsGrabberItem = false;
+qWarning() << "sceneEventFilter" << (void*)this << watched << event << event->isAccepted();
+        break;
 
+    default:
+        break;
+    }
+
+    return QGraphicsWidget::sceneEventFilter(watched, event);
+}
+
+void AnimatedWidget::grabMouseEvent(QEvent *event)
+{
+qWarning() << "grabMouseEvent" << event;
+    QGraphicsWidget::grabMouseEvent(event);
+}
+
+void AnimatedWidget::ungrabMouseEvent(QEvent *event)
+{
+qWarning() << "ungrabMouseEvent" << event;
+    QGraphicsWidget::ungrabMouseEvent(event);
+}
+#endif
 bool AnimatedWidget::windowFrameEvent(QEvent *event)
 {
     if ((flags() & ItemIsPanel))
@@ -342,7 +444,7 @@ bool AnimatedWidget::windowFrameEvent(QEvent *event)
 void AnimatedWidget::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsWidget::mousePressEvent(event);
-
+//qWarning() << "mousePressEvent" << event->button() << event->pos();
     if (event->button() == Qt::LeftButton && !isInteractive())
         event->accept();
 }
@@ -350,7 +452,7 @@ void AnimatedWidget::mousePressEvent(QGraphicsSceneMouseEvent *event)
 void AnimatedWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsWidget::mouseReleaseEvent(event);
-
+//qWarning() << "mouseReleaseEvent" << event->button() << event->pos();
     if (event->button() == Qt::LeftButton && !isInteractive())
     {
         event->accept();
@@ -361,6 +463,7 @@ void AnimatedWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void AnimatedWidget::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
+//qWarning() << "mouseDoubleClickEvent" << event->button() << event->pos();
     if (event->button() == Qt::LeftButton && !isInteractive())
         QMetaObject::invokeMethod(this, "doubleClicked", Qt::QueuedConnection);
     else
