@@ -5,7 +5,9 @@ HEADERS += mainwindow.h \
            animatedwidget.h \
 #           interactiveitem.h \
 #           chip.h \
-           layoutitem.h
+           layoutitem.h \
+           celllayout.h \
+           celllayout_p.h \
 
 SOURCES += main.cpp \
            mainwindow.cpp \
@@ -13,6 +15,7 @@ SOURCES += main.cpp \
            animatedwidget.cpp \
 #           interactiveitem.cpp \
 #           chip.cpp \
-           layoutitem.cpp
+           layoutitem.cpp \
+           celllayout.cpp \
 
 RESOURCES += images.qrc

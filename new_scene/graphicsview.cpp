@@ -12,6 +12,7 @@
 
 #include "animatedwidget.h"
 #include "layoutitem.h"
+#include "celllayout.h"
 
 static const qreal spacig = 10;
 
@@ -295,7 +296,7 @@ void GraphicsView::relayoutItems(int rowCount, int columnCount, const QByteArray
 
     m_widget->setLayout(0);
 
-    QGraphicsGridLayout *layout = new QGraphicsGridLayout;
+    CellLayout *layout = new CellLayout();
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(spacig);
     m_widget->setLayout(layout);
@@ -316,17 +317,17 @@ void GraphicsView::relayoutItems(int rowCount, int columnCount, const QByteArray
 
                     //if (row >= layout->rowCount() || column >= layout->columnCount() || layout->itemAt(row, column) == 0)
                     {
-                        layout->addItem(widget, row, column, span, span, Qt::AlignCenter);
+                        layout->addItem(widget, row, column, span, span /*, Qt::AlignCenter*/);
                         ++i;
                     }
                 }
             }
         }
     }
-    for (int row = 0; row < layout->rowCount(); ++row)
+    /*for (int row = 0; row < layout->rowCount(); ++row)
         layout->setRowStretchFactor(row, 10);
     for (int column = 0; column < layout->columnCount(); ++column)
-        layout->setColumnStretchFactor(column, 10);
+        layout->setColumnStretchFactor(column, 10);*/
     /*if (layout->count() > 1)
         QGraphicsWidget::setTabOrder(static_cast<QGraphicsWidget *>(layout->itemAt(layout->count() - 1)), static_cast<QGraphicsWidget *>(layout->itemAt(0)));*/
     while (i < m_animatedWidgets.size())
@@ -351,7 +352,7 @@ void GraphicsView::relayoutItemsActionTriggered()
 {
     if (QAction *action = qobject_cast<QAction *>(sender()))
         relayoutItems(action->property("rowCount").toInt(), action->property("columnCount").toInt(), action->property("preset").toByteArray());
-    else if (QGraphicsGridLayout *layout = static_cast<QGraphicsGridLayout *>(m_widget->layout()))
+    else if (CellLayout *layout = static_cast<CellLayout *>(m_widget->layout()))
         relayoutItems(layout->rowCount(), layout->columnCount(), m_widget->property("preset").toByteArray());
 }
 
