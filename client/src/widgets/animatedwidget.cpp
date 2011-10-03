@@ -206,8 +206,21 @@ QVariant AnimatedWidget::itemChange(GraphicsItemChange change, const QVariant &v
         {
             const QPointF newPos = value.toPointF();
 
-            if (d->posAnimation->state() != QAbstractAnimation::Stopped && d->posAnimation->endValue().toPointF() != newPos)
-                d->posAnimation->stop();
+            if(d->posAnimation->state() != QAbstractAnimation::Stopped && d->posAnimation->endValue().toPointF() == newPos)
+                return pos();
+
+            d->posAnimation->stop();
+
+            /* NOTE: 
+             * The following code won't work if the animation is not stopped and newPos equals animation's end value.
+             * Thus the early return and the stop() call above.
+             * 
+             * If the current 'real' progress determined by the easing curve lies outside the [0, 1] interval, 
+             * code in QVariantAnimationPrivate::recalculateCurrentInterval goes the wrong path, 
+             * ending up dividing by zero in QVariantAnimationPrivate::setCurrentValueForProgress
+             * and passing the result (1.#INF) to interpolator. 
+             * The result is a graphics item that is positioned at +inf.
+             */
 
             QGraphicsItem *mouseGrabberItem = scene()->mouseGrabberItem();
             if (!isInteractive() || (!isSelected() && (!mouseGrabberItem || (mouseGrabberItem != this/* && !isAncestorOf(mouseGrabberItem)*/))))
