@@ -147,16 +147,18 @@ public:
      * \param column
      * \param rowSpan
      * \param columnSpan
+     * \param alignment                Item alignment.
      */
-    void addItem(QGraphicsLayoutItem *item, int row, int column, int rowSpan, int columnSpan);
+    void addItem(QGraphicsLayoutItem *item, int row, int column, int rowSpan, int columnSpan, Qt::Alignment alignment = 0);
 
     /**
      * Adds new item to this cell layout.
      * 
      * \param item                     Item to add.
      * \param rect                     Item position and size, in cells.
+     * \param alignment                Item alignment.
      */
-    void addItem(QGraphicsLayoutItem *item, const QRect &rect);
+    void addItem(QGraphicsLayoutItem *item, const QRect &rect, Qt::Alignment alignment = 0);
 
     virtual void setGeometry(const QRectF &rect) override;
 
@@ -189,9 +191,9 @@ inline QGraphicsLayoutItem *CellLayout::itemAt(int row, int column) const
     return itemAt(QPoint(column, row));
 }
 
-inline void CellLayout::addItem(QGraphicsLayoutItem *item, int row, int column, int rowSpan, int columnSpan)
+inline void CellLayout::addItem(QGraphicsLayoutItem *item, int row, int column, int rowSpan, int columnSpan, Qt::Alignment alignment)
 {
-    addItem(item, QRect(row, column, rowSpan, columnSpan));
+    addItem(item, QRect(row, column, rowSpan, columnSpan), alignment);
 }
 
 inline void CellLayout::setCellSize(qreal width, qreal height) 

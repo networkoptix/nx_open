@@ -18,8 +18,8 @@ void CellLayoutPrivate::ensureBounds() const
 
     bounds = QRect();
 
-    foreach(const QRect &rect, rectByItem)
-        bounds |= rect;
+    foreach(const ItemProperties &properties, propertiesByItem)
+        bounds |= properties.rect;
 }
 
 void CellLayoutPrivate::ensureEffectiveCellSize() const
@@ -31,7 +31,7 @@ void CellLayoutPrivate::ensureEffectiveCellSize() const
 
     foreach(QGraphicsLayoutItem *item, items) {
         QSizeF size = item->minimumSize();
-        QRect cellRect = rectByItem.value(item);
+        QRect cellRect = propertiesByItem.value(item).rect;
 
         if(!cellRect.isValid())
             continue; /* Skip items that are owned but not managed by this layout. */
@@ -161,10 +161,10 @@ QRect CellLayout::itemRect(QGraphicsLayoutItem *item) const
 {
     Q_D(const CellLayout);
 
-    return d->rectByItem.value(item, QRect());
+    return d->propertiesByItem.value(item).rect;
 }
 
-void CellLayout::addItem(QGraphicsLayoutItem *item, const QRect &rect)
+void CellLayout::addItem(QGraphicsLayoutItem *item, const QRect &rect, Qt::Alignment alignment)
 {
     Q_D(CellLayout);
 
@@ -207,7 +207,7 @@ void CellLayout::addItem(QGraphicsLayoutItem *item, const QRect &rect)
     }
 
     /* Occupy cells. */
-    d->rectByItem[item] = rect;
+    d->propertiesByItem[item] = ItemProperties(rect, alignment);
     for(int r = rect.top(); r <= rect.bottom(); r++) 
         for(int c = rect.left(); c <= rect.right(); c++) 
             d->itemByPoint[QPoint(c, r)] = item;
@@ -233,10 +233,10 @@ void CellLayout::setGeometry(const QRectF &rect)
 
     /* Set child items' geometries. Ignore given size. */
     d->ensureBounds();
-    typedef QHash<QGraphicsLayoutItem *, QRect>::const_iterator const_iterator;
-    for(const_iterator pos = d->rectByItem.begin(); pos != d->rectByItem.end(); pos++) 
+    typedef QHash<QGraphicsLayoutItem *, ItemProperties>::const_iterator const_iterator;
+    for(const_iterator pos = d->propertiesByItem.begin(); pos != d->propertiesByItem.end(); pos++) 
     {
-        QRect itemCellRect = pos.value().translated(-d->bounds.topLeft());
+        QRect itemCellRect = pos.value().rect.translated(-d->bounds.topLeft());
         QRectF itemRect(
             effectiveRect.left() + (cellWidth  + d->horizontalSpacing) * itemCellRect.left(),
             effectiveRect.top()  + (cellHeight + d->verticalSpacing)   * itemCellRect.top(),
@@ -244,7 +244,11 @@ void CellLayout::setGeometry(const QRectF &rect)
             cellHeight * itemCellRect.height() + d->verticalSpacing   * (itemCellRect.height() - 1)
         );
 
-        pos.key()->setGeometry(itemRect);
+        QGraphicsLayoutItem *item = pos.key();
+
+        /* TODO: respect alignment here. */
+
+        item->setGeometry(itemRect);
     }
 }
 
@@ -292,13 +296,13 @@ void CellLayout::removeItem(QGraphicsLayoutItem *item)
         return;
     }
 
-    const QHash<QGraphicsLayoutItem *, QRect>::iterator pos = d->rectByItem.find(item);
-    QRect rect = *pos;
+    const QHash<QGraphicsLayoutItem *, ItemProperties>::iterator pos = d->propertiesByItem.find(item);
+    QRect rect = pos->rect;
     for(int r = rect.top(); r <= rect.bottom(); r++)
         for(int c = rect.left(); c <= rect.right(); c++)
             d->itemByPoint.remove(QPoint(c, r));
 
-    d->rectByItem.erase(pos);
+    d->propertiesByItem.erase(pos);
 
     invalidate();
 }

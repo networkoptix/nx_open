@@ -316,7 +316,7 @@ void GraphicsView::relayoutItems(int rowCount, int columnCount, const QByteArray
                     /*if (layout->count())
                         QGraphicsWidget::setTabOrder(static_cast<QGraphicsWidget *>(layout->itemAt(layout->count() - 1)), widget);*/
 
-                    layout->addItem(widget, row, column, span, span/*, Qt::AlignCenter*/);
+                    layout->addItem(widget, row, column, span, span, Qt::AlignCenter);
                     ++i;
                 }
             }

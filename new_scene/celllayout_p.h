@@ -8,6 +8,15 @@
 #include <QList>
 #include <QSizeF>
 
+struct ItemProperties {
+    ItemProperties(const QRect &rect, Qt::Alignment alignment): rect(rect), alignment(alignment) {}
+
+    ItemProperties(): alignment(0) {}
+
+    QRect rect;
+    Qt::Alignment alignment;
+};
+
 class CellLayoutPrivate 
 {
 public:
@@ -38,7 +47,7 @@ private:
     QList<QGraphicsLayoutItem *> items;
 
     /** Mapping from item to cell rect that it occupies. */
-    QHash<QGraphicsLayoutItem *, QRect> rectByItem;
+    QHash<QGraphicsLayoutItem *, ItemProperties> propertiesByItem;
 
     /** Mapping from cell to layout item. */
     QHash<QPoint, QGraphicsLayoutItem *> itemByPoint;
