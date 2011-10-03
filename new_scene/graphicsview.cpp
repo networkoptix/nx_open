@@ -317,7 +317,7 @@ void GraphicsView::relayoutItems(int rowCount, int columnCount, const QByteArray
 
                     //if (row >= layout->rowCount() || column >= layout->columnCount() || layout->itemAt(row, column) == 0)
                     {
-                        layout->addItem(widget, row, column, span, span /*, Qt::AlignCenter*/);
+                        layout->addItem(widget, row, column, span, span, Qt::AlignCenter);
                         ++i;
                     }
                 }
