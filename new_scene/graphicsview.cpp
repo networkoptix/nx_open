@@ -512,6 +512,8 @@ void GraphicsView::mousePressEvent(QMouseEvent *event)
     mMousePressPos = event->pos();
     mLastMouseScenePos = mapToScene(event->pos());
 
+    qDebug() << mLastMouseScenePos;
+
     if(event->modifiers() & Qt::ControlModifier) {
         /* Toggle selection of the current item if Ctrl is pressed. This is the
          * behavior that is to be expected. */
@@ -572,6 +574,8 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event) {
     QPointF delta = currentMouseScenePos - mLastMouseScenePos;
     mLastMouseScenePos = currentMouseScenePos;
 
+    qDebug() << mLastMouseScenePos;
+
     /* Drag selected items. */
     foreach(QGraphicsItem *item, scene()->selectedItems()) {
         AnimatedWidget *widget = dynamic_cast<AnimatedWidget *>(item);
@@ -596,20 +600,22 @@ void GraphicsView::mouseReleaseEvent(QMouseEvent *event) {
     if(event->button() != Qt::LeftButton)
         return;
 
-    /* Move selected items back. */
+    if(mDragState == DRAGGING) {
+        /* Move selected items back. */
 
-    CellLayout *layout = static_cast<CellLayout *>(m_widget->layout());
+        CellLayout *layout = static_cast<CellLayout *>(m_widget->layout());
 
-    foreach(QGraphicsItem *item, scene()->selectedItems()) {
-        AnimatedWidget *widget = dynamic_cast<AnimatedWidget *>(item);
-        if(widget == NULL)
-            continue;
+        foreach(QGraphicsItem *item, scene()->selectedItems()) {
+            AnimatedWidget *widget = dynamic_cast<AnimatedWidget *>(item);
+            if(widget == NULL)
+                continue;
 
-        Qt::Alignment alignment = layout->alignment(widget);
-        QRect rect = layout->itemRect(widget);
+            Qt::Alignment alignment = layout->alignment(widget);
+            QRect rect = layout->itemRect(widget);
 
-        layout->removeItem(widget);
-        layout->addItem(widget, rect, alignment);
+            layout->removeItem(widget);
+            layout->addItem(widget, rect, alignment);
+        }
     }
 
     mDragState = INITIAL;

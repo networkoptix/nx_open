@@ -10,3 +10,5 @@ SOURCES += main.cpp \
 RESOURCES += images.qrc
 
 include( $$PWD/widgets/widgets.pri )
+
+CONFIG += console
