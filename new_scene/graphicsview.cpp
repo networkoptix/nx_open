@@ -18,7 +18,8 @@ static const qreal spacing = 10;
 
 GraphicsView::GraphicsView(QWidget *parent)
     : QGraphicsView(parent),
-      m_widget(0)
+      m_widget(0),
+      mDragState(INITIAL)
 {
     {
         QGraphicsScene *scene = new QGraphicsScene(this);
@@ -405,14 +406,6 @@ void GraphicsView::itemDestroyed()
     QTimer::singleShot(250, this, SLOT(relayoutItemsActionTriggered()));
 }
 
-void GraphicsView::mouseReleaseEvent(QMouseEvent *event)
-{
-    QGraphicsView::mouseReleaseEvent(event);
-
-    if (scene()->selectedItems().isEmpty())
-        invalidateLayout();
-}
-
 void GraphicsView::keyPressEvent(QKeyEvent *event)
 {
     switch (event->key())
@@ -481,3 +474,144 @@ void GraphicsView::keyReleaseEvent(QKeyEvent *event)
 
     QGraphicsView::keyReleaseEvent(event);
 }
+
+
+void GraphicsView::mousePressEvent(QMouseEvent *event) 
+{
+    if(mDragState != INITIAL || !isInteractive())
+    {
+        QGraphicsView::mousePressEvent(event);
+        return;
+    }
+
+    if(event->button() != Qt::LeftButton)
+    {
+        QGraphicsView::mousePressEvent(event);
+        return;
+    }
+
+    //QPointF scenePos = mapToScene(event->pos());
+
+    /* Find the item to select. */
+    QGraphicsItem *itemToSelect = NULL;
+    foreach(QGraphicsItem *item, items(event->pos())) 
+    {
+        if(item->flags() & QGraphicsItem::ItemIsSelectable) 
+        {
+            itemToSelect = item;
+            break;
+        }
+    } 
+    if(itemToSelect == NULL)
+    {
+        QGraphicsView::mousePressEvent(event);
+        return;
+    }
+
+    mDragState = PREPAIRING;
+    mMousePressPos = event->pos();
+    mLastMouseScenePos = mapToScene(event->pos());
+
+    if(event->modifiers() & Qt::ControlModifier) {
+        /* Toggle selection of the current item if Ctrl is pressed. This is the
+         * behavior that is to be expected. */
+        itemToSelect->setSelected(!itemToSelect->isSelected());
+    } else {
+        /* Don't clear selection if the item to select is already selected so
+         * that user can drag all selected items by dragging only one of them. */
+        if(!itemToSelect->isSelected()) {
+            scene()->clearSelection();
+            itemToSelect->setSelected(true);
+        }
+    }
+
+    event->accept();
+    QGraphicsView::mousePressEvent(event);
+}
+
+void GraphicsView::mouseMoveEvent(QMouseEvent *event) {
+    if(mDragState == INITIAL || !isInteractive())
+    {
+        QGraphicsView::mouseMoveEvent(event);
+        return;
+    }
+
+    /* Stop dragging if the user has let go of the trigger button (even if we didn't get the release events). */
+    if(!(event->buttons() & Qt::LeftButton)) 
+    {
+        mDragState = INITIAL;
+        QGraphicsView::mouseMoveEvent(event);
+        return;
+    }
+
+    /* Check for drag distance. */
+    if(mDragState == PREPAIRING) 
+    {
+        if((mMousePressPos - event->pos()).manhattanLength() < QApplication::startDragDistance()) 
+        {
+            QGraphicsView::mouseMoveEvent(event);
+            return;
+        }
+        else 
+        {
+            mDragState = DRAGGING;
+
+            /*foreach(QGraphicsItem *item, scene()->selectedItems()) 
+            {
+                AnimatedWidget *widget = dynamic_cast<AnimatedWidget *>(item);
+                if(widget == NULL)
+                    continue;
+
+                static_cast<CellLayout *>(m_widget->layout())->removeItem(widget);
+            }*/
+        }
+    }
+
+    /* Update mouse positions & calculate delta. */
+    QPointF currentMouseScenePos = mapToScene(event->pos());
+    QPointF delta = currentMouseScenePos - mLastMouseScenePos;
+    mLastMouseScenePos = currentMouseScenePos;
+
+    /* Drag selected items. */
+    foreach(QGraphicsItem *item, scene()->selectedItems()) {
+        AnimatedWidget *widget = dynamic_cast<AnimatedWidget *>(item);
+        if(widget != NULL)
+            widget->setProperty("instantPos", item->pos() + delta);
+        else
+            item->setPos(item->pos() + delta);
+    }
+
+    event->accept();
+}
+
+void GraphicsView::mouseReleaseEvent(QMouseEvent *event) {
+    QGraphicsView::mouseReleaseEvent(event);
+
+    if (scene()->selectedItems().isEmpty())
+        invalidateLayout();
+
+    if(mDragState == INITIAL || !isInteractive())
+        return;
+
+    if(event->button() != Qt::LeftButton)
+        return;
+
+    /* Move selected items back. */
+
+    CellLayout *layout = static_cast<CellLayout *>(m_widget->layout());
+
+    foreach(QGraphicsItem *item, scene()->selectedItems()) {
+        AnimatedWidget *widget = dynamic_cast<AnimatedWidget *>(item);
+        if(widget == NULL)
+            continue;
+
+        Qt::Alignment alignment = layout->alignment(widget);
+        QRect rect = layout->itemRect(widget);
+
+        layout->removeItem(widget);
+        layout->addItem(widget, rect, alignment);
+    }
+
+    mDragState = INITIAL;
+    event->accept();
+} 

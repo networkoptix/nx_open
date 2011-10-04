@@ -414,7 +414,7 @@ void AnimatedWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     if (event->button() == Qt::LeftButton && !isInteractive())
     {
         event->accept();
-        if ((event->pos() - event->buttonDownPos(Qt::LeftButton)).manhattanLength() < QApplication::startDragDistance())
+        if ((event->screenPos() - event->buttonDownScreenPos(Qt::LeftButton)).manhattanLength() < QApplication::startDragDistance())
             QMetaObject::invokeMethod(this, "clicked", Qt::QueuedConnection);
     }
 }
