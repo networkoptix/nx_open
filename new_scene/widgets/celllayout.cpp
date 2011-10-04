@@ -369,6 +369,8 @@ void CellLayout::removeItem(QGraphicsLayoutItem *item)
 
     d->propertiesByItem.erase(pos);
 
+    item->setParentLayoutItem(NULL);
+
     invalidate();
 }
 
