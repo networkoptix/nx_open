@@ -3,15 +3,17 @@
 
 #include <QtGui/QGraphicsWidget>
 
+class QAnimationGroup;
+
 class AnimatedWidgetPrivate;
 class AnimatedWidget : public QGraphicsWidget
 {
     Q_OBJECT
     Q_PRIVATE_PROPERTY(d, QPointF instantPos READ instantPos WRITE setInstantPos DESIGNABLE false SCRIPTABLE false FINAL)
     Q_PRIVATE_PROPERTY(d, QSizeF instantSize READ instantSize WRITE setInstantSize DESIGNABLE false SCRIPTABLE false FINAL)
-    Q_PRIVATE_PROPERTY(d, qreal instantScale READ instantScale WRITE setInstantScale DESIGNABLE false SCRIPTABLE false FINAL)
-    Q_PRIVATE_PROPERTY(d, qreal instantRotation READ instantRotation WRITE setInstantRotation DESIGNABLE false SCRIPTABLE false FINAL)
-    Q_PRIVATE_PROPERTY(d, qreal instantOpacity READ instantOpacity WRITE setInstantOpacity DESIGNABLE false SCRIPTABLE false FINAL)
+    Q_PRIVATE_PROPERTY(d, float instantScale READ instantScale WRITE setInstantScale DESIGNABLE false SCRIPTABLE false FINAL)
+    Q_PRIVATE_PROPERTY(d, float instantRotation READ instantRotation WRITE setInstantRotation DESIGNABLE false SCRIPTABLE false FINAL)
+    Q_PRIVATE_PROPERTY(d, float instantOpacity READ instantOpacity WRITE setInstantOpacity DESIGNABLE false SCRIPTABLE false FINAL)
 
 public:
     enum QGraphicsWidgetChange {
@@ -24,6 +26,8 @@ public:
 
     bool isInteractive() const;
     void setInteractive(bool interactive);
+
+    QAnimationGroup *animationGroup() const;
 
     QPainterPath opaqueArea() const;
 

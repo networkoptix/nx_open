@@ -10,8 +10,6 @@
 #include <QtGui/QGraphicsSceneEvent>
 #include <QtGui/QPainter>
 
-#include <qdebug.h>
-
 class AnimatedWidgetPrivate
 {
 public:
@@ -40,24 +38,24 @@ public:
         inSetGeometry = false;
     }
 
-    inline qreal instantScale() const { return q->scale(); }
-    inline void setInstantScale(const qreal &scale)
+    inline float instantScale() const { return q->scale(); }
+    inline void setInstantScale(float scale)
     {
         inSetScale = true;
         q->setScale(scale);
         inSetScale = false;
     }
 
-    inline qreal instantRotation() const { return q->rotation(); }
-    inline void setInstantRotation(const qreal &rotation)
+    inline float instantRotation() const { return q->rotation(); }
+    inline void setInstantRotation(float rotation)
     {
         inSetRotation = true;
         q->setRotation(rotation);
         inSetRotation = false;
     }
 
-    inline qreal instantOpacity() const { return q->opacity(); }
-    inline void setInstantOpacity(const qreal &opacity)
+    inline float instantOpacity() const { return q->opacity(); }
+    inline void setInstantOpacity(float opacity)
     {
         inSetOpacity = true;
         q->setOpacity(opacity);
@@ -218,6 +216,11 @@ void AnimatedWidget::setInteractive(bool interactive)
     setFlag(ItemIsMovable, interactive);
 }
 
+QAnimationGroup *AnimatedWidget::animationGroup() const
+{
+    return d->animationGroup;
+}
+
 QPainterPath AnimatedWidget::opaqueArea() const
 {
     if (qFuzzyCompare(effectiveOpacity(), 1.0))
@@ -309,12 +312,12 @@ QVariant AnimatedWidget::itemChange(GraphicsItemChange change, const QVariant &v
     case ItemScaleChange:
         if (!d->inSetScale && d->scaleAnimation)
         {
-            qreal newScale = value.toReal();
+            float newScale = value.toFloat();
             if (qIsFinite(newScale))
             {
-                newScale = qBound(1.0, newScale, 5.0);
+                newScale = qBound(1.0f, newScale, 5.0f);
 
-                if (d->scaleAnimation->state() != QAbstractAnimation::Stopped && qFuzzyCompare(d->scaleAnimation->endValue().toReal(), newScale))
+                if (d->scaleAnimation->state() != QAbstractAnimation::Stopped && qFuzzyCompare(d->scaleAnimation->endValue().toFloat(), newScale))
                     return scale();
 
                 d->scaleAnimation->stop();
@@ -330,10 +333,10 @@ QVariant AnimatedWidget::itemChange(GraphicsItemChange change, const QVariant &v
     case ItemRotationChange:
         if (!d->inSetRotation && d->rotationAnimation && scene())
         {
-            const qreal newRotation = value.toReal();
+            const float newRotation = value.toFloat();
             if (qIsFinite(newRotation))
             {
-                if (d->rotationAnimation->state() != QAbstractAnimation::Stopped && qFuzzyCompare(d->rotationAnimation->endValue().toReal(), newRotation))
+                if (d->rotationAnimation->state() != QAbstractAnimation::Stopped && qFuzzyCompare(d->rotationAnimation->endValue().toFloat(), newRotation))
                     return rotation();
 
                 d->rotationAnimation->stop();
@@ -349,10 +352,10 @@ QVariant AnimatedWidget::itemChange(GraphicsItemChange change, const QVariant &v
     case ItemOpacityChange:
         if (!d->inSetOpacity && d->opacityAnimation && scene())
         {
-            const qreal newOpacity = value.toReal();
+            const float newOpacity = value.toFloat();
             if (qIsFinite(newOpacity))
             {
-                if (d->opacityAnimation->state() != QAbstractAnimation::Stopped && qFuzzyCompare(d->opacityAnimation->endValue().toReal(), newOpacity))
+                if (d->opacityAnimation->state() != QAbstractAnimation::Stopped && qFuzzyCompare(d->opacityAnimation->endValue().toFloat(), newOpacity))
                     return opacity();
 
                 d->opacityAnimation->stop();
@@ -414,7 +417,7 @@ void AnimatedWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     if (event->button() == Qt::LeftButton && !isInteractive())
     {
         event->accept();
-        if ((event->pos() - event->buttonDownPos(Qt::LeftButton)).manhattanLength() < QApplication::startDragDistance())
+        if ((event->screenPos() - event->buttonDownScreenPos(Qt::LeftButton)).manhattanLength() < QApplication::startDragDistance())
             QMetaObject::invokeMethod(this, "clicked", Qt::QueuedConnection);
     }
 }
@@ -435,7 +438,7 @@ void AnimatedWidget::wheelEvent(QGraphicsSceneWheelEvent *event)
         if (event->modifiers() & Qt::AltModifier)
             setRotation(rotation() + ((event->delta() / 8) / 15) * 15);
         else
-            setScale(scale() + qreal(event->delta()) / 240);
+            setScale(scale() + float(event->delta()) / 240);
     }
 }
 
