@@ -12,6 +12,7 @@
 
 #include "animatedwidget.h"
 #include "celllayout.h"
+#include "centralwidget.h"
 #include "layoutitem.h"
 
 static const qreal spacing = 10;
@@ -74,7 +75,7 @@ GraphicsView::GraphicsView(QWidget *parent)
 
     createActions();
 
-    m_widget = new QGraphicsWidget;
+    m_widget = new CentralWidget;
 //    m_widget->setWindowFlags(Qt::Tool);
     m_widget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding, QSizePolicy::GroupBox));
 
@@ -296,7 +297,7 @@ void GraphicsView::relayoutItems(int rowCount, int columnCount, const QByteArray
     m_widget->setLayout(0);
 
     CellLayout *layout = new CellLayout;
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setContentsMargins(spacing, spacing, spacing, spacing);
     layout->setSpacing(spacing);
     layout->setCellSize(100, 100);
 
