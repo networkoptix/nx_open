@@ -43,6 +43,18 @@ void CellLayoutPrivate::ensureEffectiveCellSize() const
     }
 }
 
+void CellLayoutPrivate::ensureEffectiveGeometry() const
+{
+    Q_Q(const CellLayout);
+
+    if(effectiveGeometry.isValid())
+        return;
+
+    qreal left, top, right, bottom;
+    q->getContentsMargins(&left, &top, &right, &bottom);
+    effectiveGeometry = q->geometry().adjusted(+left, +top, -right, -bottom);
+}
+
 QSizeF CellLayoutPrivate::effectiveMaxSize(QGraphicsLayoutItem *item, const QSizeF &constraint)
 {
     QSizePolicy sizePolicy = item->sizePolicy();
@@ -225,7 +237,7 @@ QSet<QGraphicsLayoutItem *> CellLayout::itemsAt(const QRect &rect) const
     return result;
 }
 
-QRect CellLayout::itemRect(QGraphicsLayoutItem *item) const 
+QRect CellLayout::rect(QGraphicsLayoutItem *item) const 
 {
     Q_D(const CellLayout);
 
@@ -289,12 +301,8 @@ void CellLayout::setGeometry(const QRectF &rect)
 
     QGraphicsLayout::setGeometry(rect);
 
-    /* Adjust for margins. */
-    qreal left, top, right, bottom;
-    getContentsMargins(&left, &top, &right, &bottom);
-    QRectF effectiveRect = rect.adjusted(+left, +top, -right, -bottom);
-
     /* Create shortcuts. */
+    d->ensureEffectiveGeometry();
     d->ensureEffectiveCellSize();
     qreal cellWidth = d->effectiveCellSize.width();
     qreal cellHeight = d->effectiveCellSize.height();
@@ -306,8 +314,8 @@ void CellLayout::setGeometry(const QRectF &rect)
     {
         QRect itemCellRect = pos->rect.translated(-d->bounds.topLeft());
         QRectF cellRect(
-            effectiveRect.left() + (cellWidth  + d->horizontalSpacing) * itemCellRect.left(),
-            effectiveRect.top()  + (cellHeight + d->verticalSpacing)   * itemCellRect.top(),
+            d->effectiveGeometry.left() + (cellWidth  + d->horizontalSpacing) * itemCellRect.left(),
+            d->effectiveGeometry.top()  + (cellHeight + d->verticalSpacing)   * itemCellRect.top(),
             cellWidth  * itemCellRect.width()  + d->horizontalSpacing * (itemCellRect.width() - 1),
             cellHeight * itemCellRect.height() + d->verticalSpacing   * (itemCellRect.height() - 1)
         );
@@ -410,6 +418,7 @@ void CellLayout::invalidate()
 
     d->effectiveCellSize = QSizeF();
     d->bounds = QRect();
+    d->effectiveGeometry = QRectF();
 }
 
 void CellLayout::setSpacing(qreal spacing)
@@ -476,4 +485,25 @@ Qt::Alignment CellLayout::alignment(QGraphicsLayoutItem *item) const
         return 0;
 
     return pos->alignment;
+}
+
+QPoint CellLayout::mapToGrid(QPointF pos) const
+{
+    Q_D(const CellLayout);
+
+    // TODO
+    return QPoint();
+}
+
+QPointF CellLayout::mapFromGrid(QPoint gridPos) const
+{
+    Q_D(const CellLayout);
+
+    d->ensureEffectiveGeometry();
+    d->ensureEffectiveCellSize();
+
+    return QPointF(
+        d->effectiveGeometry.left() + (d->effectiveCellSize.width()  + d->horizontalSpacing) * gridPos.x(),
+        d->effectiveGeometry.top()  + (d->effectiveCellSize.height() + d->verticalSpacing)   * gridPos.y()
+    );
 }

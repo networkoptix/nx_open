@@ -32,6 +32,7 @@ protected:
 private:
     void ensureBounds() const;
     void ensureEffectiveCellSize() const;
+    void ensureEffectiveGeometry() const;
 
     /**
      * \param item                      Item to compute geometry for.
@@ -72,6 +73,9 @@ private:
 
     /** Actual layout bounds, in cells. */
     mutable QRect bounds;
+
+    /** Effective geometry, adjusted for contents margins. */
+    mutable QRectF effectiveGeometry;
 
 private:
     Q_DECLARE_PUBLIC(CellLayout);

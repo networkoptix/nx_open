@@ -613,7 +613,7 @@ void GraphicsView::mouseReleaseEvent(QMouseEvent *event)
                 continue;
 
             const Qt::Alignment alignment = layout->alignment(widget);
-            const QRect rect = layout->itemRect(widget);
+            const QRect rect = layout->rect(widget);
 
             layout->removeItem(widget);
             layout->addItem(widget, rect, alignment);

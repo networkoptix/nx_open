@@ -131,6 +131,19 @@ public:
     int columnCount() const;
 
     /**
+     * \param pos                       Position in parent coordinates to map to grid coordinates.
+     * \returns                         Coordinate of the grid cell that the given
+     *                                  position belongs to. 
+     */
+    QPoint mapToGrid(QPointF pos) const;
+
+    /**
+     * \param gridPos                   Coordinate of the grid cell.
+     * \returns                         Position in parent coordinates of the top left corner of the grid cell.
+     */
+    QPointF mapFromGrid(QPoint gridPos) const;
+
+    /**
      * \param column
      * \param row
      * \returns                         Item at given row and column, or NULL if no such item exist.
@@ -153,7 +166,7 @@ public:
      * \param item                      Layout item.
      * \returns                         Cell region occupied by the given item in this layout, or empty region if none.
      */
-    QRect itemRect(QGraphicsLayoutItem *item) const;
+    QRect rect(QGraphicsLayoutItem *item) const;
 
     /**
      * Adds new item to this cell layout. 
