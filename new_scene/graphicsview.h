@@ -24,9 +24,12 @@ public:
     { return QRect(mapFromScene(rect.topLeft()), mapFromScene(rect.bottomRight())); }
 
 protected:
-    virtual void mouseReleaseEvent(QMouseEvent *);
     virtual void keyPressEvent(QKeyEvent *);
     virtual void keyReleaseEvent(QKeyEvent *);
+
+    virtual void mouseMoveEvent(QMouseEvent *event);
+    virtual void mousePressEvent(QMouseEvent *event);
+    virtual void mouseReleaseEvent(QMouseEvent *event);
 
 private Q_SLOTS:
     void relayoutItemsActionTriggered();
@@ -41,6 +44,16 @@ private:
 private:
     QGraphicsWidget *m_widget;
     QList<QGraphicsWidget *> m_animatedWidgets;
+
+    enum DragState {
+        INITIAL,
+        PREPAIRING,
+        DRAGGING
+    };
+
+    DragState mDragState;
+    QPoint mMousePressPos;
+    QPointF mLastMouseScenePos; 
 };
 
 #endif // GRAPHICSVIEW_H
