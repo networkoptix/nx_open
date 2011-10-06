@@ -38,6 +38,13 @@ private Q_SLOTS:
     void itemDoubleClicked();
     void itemDestroyed();
 
+    void _clicked();
+    void _doubleClicked();
+    void _resizingStarted();
+    void _resizingFinished();
+    void _draggingStarted();
+    void _draggingFinished();
+
 private:
     void createActions();
 

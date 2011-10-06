@@ -1,19 +1,21 @@
 #ifndef ANIMATEDWIDGET_H
 #define ANIMATEDWIDGET_H
 
-#include <QtGui/QGraphicsWidget>
+#include "notifyingwidget.h"
 
 class QAnimationGroup;
 
 class AnimatedWidgetPrivate;
-class AnimatedWidget : public QGraphicsWidget
+class AnimatedWidget : public NotifyingWidget
 {
     Q_OBJECT
-    Q_PRIVATE_PROPERTY(d, QPointF instantPos READ instantPos WRITE setInstantPos DESIGNABLE false SCRIPTABLE false FINAL)
-    Q_PRIVATE_PROPERTY(d, QSizeF instantSize READ instantSize WRITE setInstantSize DESIGNABLE false SCRIPTABLE false FINAL)
-    Q_PRIVATE_PROPERTY(d, float instantScale READ instantScale WRITE setInstantScale DESIGNABLE false SCRIPTABLE false FINAL)
-    Q_PRIVATE_PROPERTY(d, float instantRotation READ instantRotation WRITE setInstantRotation DESIGNABLE false SCRIPTABLE false FINAL)
-    Q_PRIVATE_PROPERTY(d, float instantOpacity READ instantOpacity WRITE setInstantOpacity DESIGNABLE false SCRIPTABLE false FINAL)
+    Q_PRIVATE_PROPERTY(d_func(), QPointF instantPos READ instantPos WRITE setInstantPos DESIGNABLE false SCRIPTABLE false FINAL)
+    Q_PRIVATE_PROPERTY(d_func(), QSizeF instantSize READ instantSize WRITE setInstantSize DESIGNABLE false SCRIPTABLE false FINAL)
+    Q_PRIVATE_PROPERTY(d_func(), float instantScale READ instantScale WRITE setInstantScale DESIGNABLE false SCRIPTABLE false FINAL)
+    Q_PRIVATE_PROPERTY(d_func(), float instantRotation READ instantRotation WRITE setInstantRotation DESIGNABLE false SCRIPTABLE false FINAL)
+    Q_PRIVATE_PROPERTY(d_func(), float instantOpacity READ instantOpacity WRITE setInstantOpacity DESIGNABLE false SCRIPTABLE false FINAL)
+
+    typedef NotifyingWidget base_type;
 
 public:
     enum QGraphicsWidgetChange {
@@ -33,10 +35,6 @@ public:
 
     void setGeometry(const QRectF &rect);
 
-Q_SIGNALS:
-    void clicked();
-    void doubleClicked();
-
 protected:
     void updateGeometry();
 
@@ -49,8 +47,7 @@ protected:
     void wheelEvent(QGraphicsSceneWheelEvent *event);
 
 private:
-    Q_DISABLE_COPY(AnimatedWidget)
-    AnimatedWidgetPrivate *const d;
+    Q_DECLARE_PRIVATE(AnimatedWidget);
 };
 
 #endif // ANIMATEDWIDGET_H
