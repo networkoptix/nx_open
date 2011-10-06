@@ -14,7 +14,7 @@ typedef QSharedPointer<QnNetworkResource> QnNetworkResourcePtr;
 class QnNetworkResource : virtual public QnURLResource
 {
 public:
-    enum
+    enum 
     {
         NotSameLAN = 0x01,
         HasConflicts = 0x02
