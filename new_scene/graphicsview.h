@@ -3,6 +3,8 @@
 
 #include <QtGui/QGraphicsView>
 
+class CentralWidget;
+
 class GraphicsView: public QGraphicsView
 {
     Q_OBJECT
@@ -49,7 +51,7 @@ private:
     void createActions();
 
 private:
-    QGraphicsWidget *m_widget;
+    CentralWidget *m_widget;
     QList<QGraphicsWidget *> m_animatedWidgets;
 
     enum DragState {
@@ -60,7 +62,7 @@ private:
 
     DragState mDragState;
     QPoint mMousePressPos;
-    QPointF mLastMouseScenePos; 
+    QPointF mLastMouseScenePos;
 };
 
 #endif // GRAPHICSVIEW_H

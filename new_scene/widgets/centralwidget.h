@@ -14,12 +14,17 @@ public:
     CentralWidget(QGraphicsItem *parent = 0);
     ~CentralWidget();
 
-    float gridOpacity() const;
-    void setGridOpacity(float opacity);
+    bool isGridVisible() const;
+    void setGridVisible(bool visible, int timeout = 500);
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 
+protected:
+    float gridOpacity() const;
+    void setGridOpacity(float opacity);
+
 private:
+    bool m_gridVisible;
     float m_gridOpacity;
     QPropertyAnimation *m_gridOpacityAnimation;
 };

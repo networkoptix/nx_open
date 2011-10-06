@@ -15,7 +15,8 @@
 
 #include "notifyingwidget.h"
 
-static const qreal spacing = 10;
+static const qreal spacing = 25;
+
 
 GraphicsView::GraphicsView(QWidget *parent)
     : QGraphicsView(parent),
@@ -181,6 +182,7 @@ void GraphicsView::setEditMode(bool interactive)
 {
     foreach (QGraphicsWidget *widget, m_animatedWidgets)
         static_cast<AnimatedWidget *>(widget)->setInteractive(interactive);
+    m_widget->setGridVisible(interactive);
 }
 
 void GraphicsView::createActions()
@@ -350,7 +352,7 @@ void GraphicsView::relayoutItems(int rowCount, int columnCount, const QByteArray
     CellLayout *layout = new CellLayout;
     layout->setContentsMargins(spacing, spacing, spacing, spacing);
     layout->setSpacing(spacing);
-    layout->setCellSize(100, 100);
+    layout->setCellSize(200, 150);
 
     m_widget->setLayout(layout);
     m_widget->setProperty("preset", preset);
