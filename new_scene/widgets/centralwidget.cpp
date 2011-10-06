@@ -62,7 +62,7 @@ void CentralWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
         return;
 
     const QSizeF cellSize = gridLayout->cellSize();
-    const float spacing = gridLayout->verticalSpacing();
+    const float spacing = gridLayout->spacing();
 
     const QRectF r = gridLayout->contentsRect().adjusted(-spacing / 2, -spacing / 2, spacing / 2, spacing / 2);
 

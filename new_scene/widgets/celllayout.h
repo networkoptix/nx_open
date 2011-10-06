@@ -1,23 +1,23 @@
-#ifndef CELL_LAYOUT_H
-#define CELL_LAYOUT_H
+#ifndef CELLLAYOUT_H
+#define CELLLAYOUT_H
 
 #include <QGraphicsLayout>
 #include <QScopedPointer>
 #include <QPoint>
 #include <QRect>
 
-/* A quick workaround. Remove this once we have a better solution. */
+// ### A quick workaround. Remove this once we have a better solution.
 #undef override
 #define override
 
 class CellLayoutPrivate;
 
-class CellLayout: public QGraphicsLayout 
+class CellLayout: public QGraphicsLayout
 {
 public:
     /**
      * Constructor.
-     * 
+     *
      * \param parent                    Parent graphics layout, passed to QGraphicsLayout constructor.
      */
     CellLayout(QGraphicsLayoutItem *parent = NULL);
@@ -29,7 +29,7 @@ public:
 
     /**
      * Note that the actual cell size may differ from the one returned by this
-     * function because of the items' size constraints. 
+     * function because of the items' size constraints.
      *
      * \returns                         Size of a single cell.
      */
@@ -47,47 +47,28 @@ public:
     inline void setCellSize(qreal width, qreal height);
 
     /**
+     * \returns                         Default cell spacing of this layout.
+     */
+    qreal spacing() const;
+
+    /**
      * Sets the layout's default spacing, both vertical and horizontal, to spacing.
-     * 
+     *
      * \param spacing                   Spacing value.
      */
     void setSpacing(qreal spacing);
-
-    /**
-     * \returns                         Vertical spacing of this layout.
-     */
-    qreal verticalSpacing() const;
-    
-    /**
-     * \returns                         Horizontal spacing of this layout.
-     */
-    qreal horizontalSpacing() const;
-
-    /**
-     * Sets the default vertical spacing for this layout.
-     *
-     * \param spacing                   Vertical spacing value.
-     */
-    void setVerticalSpacing(qreal spacing);
-
-    /**
-     * Sets the default horizontal spacing for this layout.
-     *
-     * \param spacing                   Horizontal spacing value.
-     */
-    void setHorizontalSpacing(qreal spacing);
-
-    /**
-     * \param item                      Item from this layout.
-     * \param alignment                 New alignment for the given item.
-     */
-    void setAlignment(QGraphicsLayoutItem *item, Qt::Alignment alignment);
 
     /**
      * \param item                      Item from this layout.
      * \returns                         Alignment of the given item.
      */
     Qt::Alignment alignment(QGraphicsLayoutItem *item) const;
+
+    /**
+     * \param item                      Item from this layout.
+     * \param alignment                 New alignment for the given item.
+     */
+    void setAlignment(QGraphicsLayoutItem *item, Qt::Alignment alignment);
 
     /**
      * \returns                         Bounds of this cell layout, in cells.
@@ -97,51 +78,51 @@ public:
     /**
      * \returns                         Number of the first row of this cell layout.
      */
-    int firstRow() const;
+    inline int firstRow() const;
 
     /**
      * \returns                         Number of the last row of this cell layout.
      */
-    int lastRow() const;
+    inline int lastRow() const;
 
     /**
      * Note that rows cannot be enumerated by iterating through the range <tt>[0, rowCount())</tt>.
      * Use <tt>[firstRow(), lastRow())</tt> range instead.
-     * 
-     * \returns                         Number of rows in this cell layout. 
+     *
+     * \returns                         Number of rows in this cell layout.
      */
-    int rowCount() const;
+    inline int rowCount() const;
 
     /**
      * \returns                         Number of the first column of this cell layout.
      */
-    int firstColumn() const;
+    inline int firstColumn() const;
 
     /**
      * \returns                         Number of the last column of this cell layout.
      */
-    int lastColumn() const;
+    inline int lastColumn() const;
 
     /**
      * Note that columns cannot be enumerated by iterating through the range <tt>[0, columnCount())</tt>.
      * Use <tt>[firstColumn(), lastColumn())</tt> range instead.
-     * 
-     * \returns                         Number of columns in this cell layout. 
+     *
+     * \returns                         Number of columns in this cell layout.
      */
-    int columnCount() const;
+    inline int columnCount() const;
 
     /**
      * \param pos                       Position in parent coordinates to map to grid coordinates.
      * \returns                         Coordinate of the grid cell that the given
-     *                                  position belongs to. 
+     *                                  position belongs to.
      */
-    QPoint mapToGrid(QPointF pos) const;
+    QPoint mapToGrid(const QPointF &pos) const;
 
     /**
      * \param gridPos                   Coordinate of the grid cell.
      * \returns                         Position in parent coordinates of the top left corner of the grid cell.
      */
-    QPointF mapFromGrid(QPoint gridPos) const;
+    QPointF mapFromGrid(const QPoint &gridPos) const;
 
     /**
      * \param column
@@ -169,7 +150,7 @@ public:
     QRect rect(QGraphicsLayoutItem *item) const;
 
     /**
-     * Adds new item to this cell layout. 
+     * Adds new item to this cell layout.
      *
      * \param item                      Item to add.
      * \param row
@@ -178,16 +159,16 @@ public:
      * \param columnSpan
      * \param alignment                Item alignment.
      */
-    inline void addItem(QGraphicsLayoutItem *item, int row, int column, int rowSpan, int columnSpan, Qt::Alignment alignment = 0);
+    inline void addItem(QGraphicsLayoutItem *item, int row, int column, int rowSpan, int columnSpan, Qt::Alignment alignment = Qt::AlignCenter);
 
     /**
      * Adds new item to this cell layout.
-     * 
+     *
      * \param item                     Item to add.
      * \param rect                     Item position and size, in cells.
      * \param alignment                Item alignment.
      */
-    void addItem(QGraphicsLayoutItem *item, const QRect &rect, Qt::Alignment alignment = 0);
+    void addItem(QGraphicsLayoutItem *item, const QRect &rect, Qt::Alignment alignment = Qt::AlignCenter);
 
     virtual void setGeometry(const QRectF &rect) override;
 
@@ -208,26 +189,33 @@ protected:
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint) const override;
 
 protected:
-    QScopedPointer<CellLayoutPrivate> d_ptr; 
+    QScopedPointer<CellLayoutPrivate> d_ptr;
 
 private:
     Q_DECLARE_PRIVATE(CellLayout);
 };
 
+int CellLayout::firstRow() const
+{ return bounds().top(); }
+int CellLayout::lastRow() const
+{ return bounds().bottom(); }
+int CellLayout::rowCount() const
+{ return bounds().height(); }
 
-inline QGraphicsLayoutItem *CellLayout::itemAt(int row, int column) const 
-{
-    return itemAt(QPoint(column, row));
-}
+int CellLayout::firstColumn() const
+{ return bounds().left(); }
+int CellLayout::lastColumn() const
+{ return bounds().right(); }
+int CellLayout::columnCount() const
+{ return bounds().width(); }
+
+inline QGraphicsLayoutItem *CellLayout::itemAt(int row, int column) const
+{ return itemAt(QPoint(column, row)); }
 
 inline void CellLayout::addItem(QGraphicsLayoutItem *item, int row, int column, int rowSpan, int columnSpan, Qt::Alignment alignment)
-{
-    addItem(item, QRect(row, column, rowSpan, columnSpan), alignment);
-}
+{ addItem(item, QRect(row, column, rowSpan, columnSpan), alignment); }
 
-inline void CellLayout::setCellSize(qreal width, qreal height) 
-{
-    setCellSize(QSizeF(width, height));
-}
+inline void CellLayout::setCellSize(qreal width, qreal height)
+{ setCellSize(QSizeF(width, height)); }
 
-#endif // CELL_LAYOUT_H
+#endif // CELLLAYOUT_H

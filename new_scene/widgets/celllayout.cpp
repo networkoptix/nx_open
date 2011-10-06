@@ -1,6 +1,5 @@
 #include "celllayout.h"
 #include "celllayout_p.h"
-#include <cassert>
 
 namespace {
     uint qHash(const QPoint &value) {
@@ -13,32 +12,31 @@ namespace {
 
 void CellLayoutPrivate::ensureBounds() const
 {
-    if(bounds.isValid())
+    if (bounds.isValid())
         return;
 
     bounds = QRect();
-
-    foreach(const ItemProperties &properties, propertiesByItem)
+    foreach (const ItemProperties &properties, propertiesByItem)
         bounds |= properties.rect;
 }
 
 void CellLayoutPrivate::ensureEffectiveCellSize() const
 {
-    if(effectiveCellSize.isValid())
+    if (effectiveCellSize.isValid())
         return;
 
     effectiveCellSize = cellSize;
 
-    foreach(QGraphicsLayoutItem *item, items) {
+    foreach (QGraphicsLayoutItem *item, items) {
         QSizeF size = item->minimumSize();
         QRect cellRect = propertiesByItem.value(item).rect;
 
-        if(!cellRect.isValid())
+        if (!cellRect.isValid())
             continue; /* Skip items that are owned but not managed by this layout. */
 
         effectiveCellSize = effectiveCellSize.expandedTo(QSizeF(
-            (size.width() - horizontalSpacing * (cellRect.width() - 1))  / cellRect.width(), 
-            (size.height() - verticalSpacing * (cellRect.height() - 1)) / cellRect.height()
+            (size.width() - spacing * (cellRect.width() - 1)) / cellRect.width(),
+            (size.height() - spacing * (cellRect.height() - 1)) / cellRect.height()
         ));
     }
 }
@@ -47,7 +45,7 @@ void CellLayoutPrivate::ensureEffectiveGeometry() const
 {
     Q_Q(const CellLayout);
 
-    if(effectiveGeometry.isValid())
+    if (effectiveGeometry.isValid())
         return;
 
     qreal left, top, right, bottom;
@@ -62,7 +60,7 @@ QSizeF CellLayoutPrivate::effectiveMaxSize(QGraphicsLayoutItem *item, const QSiz
 
     bool vGrow = (sizePolicy.verticalPolicy() & QSizePolicy::GrowFlag) == QSizePolicy::GrowFlag;
     bool hGrow = (sizePolicy.horizontalPolicy() & QSizePolicy::GrowFlag) == QSizePolicy::GrowFlag;
-    if (!vGrow || !hGrow) 
+    if (!vGrow || !hGrow)
     {
         QSizeF preferred = item->effectiveSizeHint(Qt::PreferredSize, constraint);
         if (!vGrow)
@@ -82,7 +80,7 @@ QSizeF CellLayoutPrivate::effectiveMaxSize(QGraphicsLayoutItem *item, const QSiz
     return size;
 }
 
-QRectF CellLayoutPrivate::constrainedGeometry(QGraphicsLayoutItem *item, const QRectF &constraint, Qt::Alignment alignment) 
+QRectF CellLayoutPrivate::constrainedGeometry(QGraphicsLayoutItem *item, const QRectF &constraint, Qt::Alignment alignment)
 {
     QSizePolicy sizePolicy = item->sizePolicy();
 
@@ -95,8 +93,8 @@ QRectF CellLayoutPrivate::constrainedGeometry(QGraphicsLayoutItem *item, const Q
 
     /* Adjust for alignment. */
     QPointF pos = constraint.topLeft();
-    
-    switch (alignment & Qt::AlignHorizontal_Mask) 
+
+    switch (alignment & Qt::AlignHorizontal_Mask)
     {
     case Qt::AlignHCenter:
         pos.setX(pos.x() + (constraint.width() - size.width()) / 2);
@@ -108,7 +106,7 @@ QRectF CellLayoutPrivate::constrainedGeometry(QGraphicsLayoutItem *item, const Q
         break;
     }
 
-    switch (alignment & Qt::AlignVertical_Mask) 
+    switch (alignment & Qt::AlignVertical_Mask)
     {
     case Qt::AlignVCenter:
         pos.setY(pos.y() + (constraint.height() - constraint.height()) / 2);
@@ -123,34 +121,34 @@ QRectF CellLayoutPrivate::constrainedGeometry(QGraphicsLayoutItem *item, const Q
     return QRectF(pos, size);
 }
 
-CellLayout::CellLayout(QGraphicsLayoutItem *parent): 
+CellLayout::CellLayout(QGraphicsLayoutItem *parent):
     QGraphicsLayout(parent),
     d_ptr(new CellLayoutPrivate())
 {
     d_ptr->q_ptr = this;
 }
 
-CellLayout::~CellLayout() 
+CellLayout::~CellLayout()
 {
-    for (int i = count() - 1; i >= 0; --i) 
+    for (int i = count() - 1; i >= 0; --i)
     {
         QGraphicsLayoutItem *item = itemAt(i);
         removeAt(i);
 
-        item->setParentLayoutItem(NULL);
+        item->setParentLayoutItem(0);
         if (item->ownedByLayout())
             delete item;
     }
 }
 
-const QSizeF CellLayout::cellSize() const 
+const QSizeF CellLayout::cellSize() const
 {
     Q_D(const CellLayout);
 
     return d->cellSize;
 }
 
-void CellLayout::setCellSize(const QSizeF &cellSize) 
+void CellLayout::setCellSize(const QSizeF &cellSize)
 {
     Q_D(CellLayout);
 
@@ -159,77 +157,31 @@ void CellLayout::setCellSize(const QSizeF &cellSize)
     invalidate();
 }
 
-int CellLayout::firstRow() const 
+QRect CellLayout::bounds() const
 {
     Q_D(const CellLayout);
 
     d->ensureBounds();
 
-    return d->bounds.top();
+    return d->bounds;
 }
 
-int CellLayout::lastRow() const 
+QGraphicsLayoutItem *CellLayout::itemAt(const QPoint &cell) const
 {
     Q_D(const CellLayout);
 
-    d->ensureBounds();
-
-    return d->bounds.bottom();
+    return d->itemByPoint.value(cell, 0);
 }
 
-int CellLayout::rowCount() const 
-{
-    Q_D(const CellLayout);
-
-    d->ensureBounds();
-
-    return d->bounds.height();
-}
-
-int CellLayout::firstColumn() const 
-{
-    Q_D(const CellLayout);
-
-    d->ensureBounds();
-
-    return d->bounds.left();
-}
-
-int CellLayout::lastColumn() const 
-{
-    Q_D(const CellLayout);
-
-    d->ensureBounds();
-
-    return d->bounds.right();
-}
-
-int CellLayout::columnCount() const 
-{
-    Q_D(const CellLayout);
-
-    d->ensureBounds();
-
-    return d->bounds.width();
-}
-
-QGraphicsLayoutItem *CellLayout::itemAt(const QPoint &cell) const 
-{
-    Q_D(const CellLayout);
-
-    return d->itemByPoint.value(cell, NULL);
-}
-
-QSet<QGraphicsLayoutItem *> CellLayout::itemsAt(const QRect &rect) const 
+QSet<QGraphicsLayoutItem *> CellLayout::itemsAt(const QRect &rect) const
 {
     QSet<QGraphicsLayoutItem *> result;
 
-    for(int r = rect.top(); r <= rect.bottom(); r++) 
+    for (int r = rect.top(); r <= rect.bottom(); ++r)
     {
-        for(int c = rect.left(); c <= rect.right(); c++) 
+        for (int c = rect.left(); c <= rect.right(); ++c)
         {
-            QGraphicsLayoutItem *item = itemAt(r, c);
-            if(item != NULL)
+            if (QGraphicsLayoutItem *item = itemAt(r, c))
                 result.insert(item);
         }
     }
@@ -237,7 +189,7 @@ QSet<QGraphicsLayoutItem *> CellLayout::itemsAt(const QRect &rect) const
     return result;
 }
 
-QRect CellLayout::rect(QGraphicsLayoutItem *item) const 
+QRect CellLayout::rect(QGraphicsLayoutItem *item) const
 {
     Q_D(const CellLayout);
 
@@ -248,19 +200,19 @@ void CellLayout::addItem(QGraphicsLayoutItem *item, const QRect &rect, Qt::Align
 {
     Q_D(CellLayout);
 
-    if (!rect.isValid()) 
+    if (!rect.isValid())
     {
         qWarning("CellLayout::addItem: invalid item region (%d, %d, %d, %d).", rect.left(), rect.top(), rect.width(), rect.height());
         return;
     }
 
-    if (item == NULL) 
+    if (!item)
     {
         qWarning("CellLayout::addItem: cannot add NULL item.");
         return;
     }
 
-    if (item == this) 
+    if (item == this)
     {
         qWarning("CellLayout::addItem: cannot add itself.");
         return;
@@ -270,16 +222,16 @@ void CellLayout::addItem(QGraphicsLayoutItem *item, const QRect &rect, Qt::Align
     addChildLayoutItem(item);
     d->items.append(item);
 
-    /* Check that it's going to occupy empty cells only. 
-     * 
+    /* Check that it's going to occupy empty cells only.
+     *
      * Note that QRect::bottom() returns QRect::top() + QRect::height() - 1. Hence the <=. */
-    for(int r = rect.top(); r <= rect.bottom(); r++) 
+    for (int r = rect.top(); r <= rect.bottom(); ++r)
     {
-        for(int c = rect.left(); c <= rect.right(); c++) 
+        for (int c = rect.left(); c <= rect.right(); ++c)
         {
-            QGraphicsLayoutItem *item = itemAt(r, c);
-            if(item != NULL) 
+            if (QGraphicsLayoutItem *item = itemAt(r, c))
             {
+                Q_UNUSED(item)
                 qWarning("CellLayout::addItem: given region is already occupied, cell (%d, %d) is not empty.", c, r);
                 return; /* Now the item is owned but not managed by this layout. */
             }
@@ -288,14 +240,14 @@ void CellLayout::addItem(QGraphicsLayoutItem *item, const QRect &rect, Qt::Align
 
     /* Occupy cells. */
     d->propertiesByItem[item] = ItemProperties(rect, alignment);
-    for(int r = rect.top(); r <= rect.bottom(); r++) 
-        for(int c = rect.left(); c <= rect.right(); c++) 
+    for (int r = rect.top(); r <= rect.bottom(); ++r)
+        for (int c = rect.left(); c <= rect.right(); ++c)
             d->itemByPoint[QPoint(c, r)] = item;
 
     invalidate();
 }
 
-void CellLayout::setGeometry(const QRectF &rect) 
+void CellLayout::setGeometry(const QRectF &rect)
 {
     Q_D(CellLayout);
 
@@ -309,47 +261,49 @@ void CellLayout::setGeometry(const QRectF &rect)
 
     /* Set child items' geometries. Ignore given size. */
     d->ensureBounds();
-    typedef QHash<QGraphicsLayoutItem *, ItemProperties>::const_iterator const_iterator;
-    for(const_iterator pos = d->propertiesByItem.begin(); pos != d->propertiesByItem.end(); pos++) 
+    QHash<QGraphicsLayoutItem *, ItemProperties>::const_iterator it = d->propertiesByItem.constBegin();
+    for ( ; it != d->propertiesByItem.constEnd(); ++it)
     {
-        QRect itemCellRect = pos->rect.translated(-d->bounds.topLeft());
+        QGraphicsLayoutItem *item = it.key();
+        const ItemProperties &itemProps = it.value();
+
+        QRect itemCellRect = itemProps.rect.translated(-d->bounds.topLeft());
         QRectF cellRect(
-            d->effectiveGeometry.left() + (cellWidth  + d->horizontalSpacing) * itemCellRect.left(),
-            d->effectiveGeometry.top()  + (cellHeight + d->verticalSpacing)   * itemCellRect.top(),
-            cellWidth  * itemCellRect.width()  + d->horizontalSpacing * (itemCellRect.width() - 1),
-            cellHeight * itemCellRect.height() + d->verticalSpacing   * (itemCellRect.height() - 1)
+            d->effectiveGeometry.left() + (cellWidth  + d->spacing) * itemCellRect.left(),
+            d->effectiveGeometry.top()  + (cellHeight + d->spacing) * itemCellRect.top(),
+            cellWidth  * itemCellRect.width()  + d->spacing * (itemCellRect.width() - 1),
+            cellHeight * itemCellRect.height() + d->spacing * (itemCellRect.height() - 1)
         );
 
-        QGraphicsLayoutItem *item = pos.key();
-        item->setGeometry(CellLayoutPrivate::constrainedGeometry(item, cellRect, pos->alignment));
+        item->setGeometry(CellLayoutPrivate::constrainedGeometry(item, cellRect, itemProps.alignment));
     }
 }
 
-int CellLayout::count() const 
+int CellLayout::count() const
 {
     Q_D(const CellLayout);
 
     return d->items.size();
 }
 
-QGraphicsLayoutItem *CellLayout::itemAt(int index) const 
+QGraphicsLayoutItem *CellLayout::itemAt(int index) const
 {
     Q_D(const CellLayout);
 
-    if (index < 0 || index >= d->items.size()) 
+    if (index < 0 || index >= d->items.size())
     {
         qWarning("CellLayout::itemAt: invalid index %d.", index);
-        return NULL;
+        return 0;
     }
 
     return d->items[index];
 }
 
-void CellLayout::removeAt(int index) 
+void CellLayout::removeAt(int index)
 {
     Q_D(const CellLayout);
 
-    if (index < 0 || index >= d->items.size()) 
+    if (index < 0 || index >= d->items.size())
     {
         qWarning("CellLayout::removeAt: invalid index %d.", index);
         return;
@@ -358,7 +312,7 @@ void CellLayout::removeAt(int index)
     removeItem(d->items[index]);
 }
 
-void CellLayout::removeItem(QGraphicsLayoutItem *item) 
+void CellLayout::removeItem(QGraphicsLayoutItem *item)
 {
     Q_D(CellLayout);
 
@@ -369,15 +323,15 @@ void CellLayout::removeItem(QGraphicsLayoutItem *item)
         return;
     }
 
-    const QHash<QGraphicsLayoutItem *, ItemProperties>::iterator pos = d->propertiesByItem.find(item);
-    QRect rect = pos->rect;
-    for(int r = rect.top(); r <= rect.bottom(); r++)
-        for(int c = rect.left(); c <= rect.right(); c++)
+    const QHash<QGraphicsLayoutItem *, ItemProperties>::iterator it = d->propertiesByItem.find(item);
+    const QRect &rect = it->rect;
+    for (int r = rect.top(); r <= rect.bottom(); ++r)
+        for (int c = rect.left(); c <= rect.right(); ++c)
             d->itemByPoint.remove(QPoint(c, r));
 
-    d->propertiesByItem.erase(pos);
+    d->propertiesByItem.erase(it);
 
-    item->setParentLayoutItem(NULL);
+    item->setParentLayoutItem(0);
 
     invalidate();
 }
@@ -395,10 +349,10 @@ QSizeF CellLayout::sizeHint(Qt::SizeHint which, const QSizeF &/*constraint*/) co
         d->ensureBounds();
         d->ensureEffectiveCellSize();
 
-        qreal totalHorizontalSpacing = d->bounds.width()  == 0 ? 0.0 : d->horizontalSpacing * (d->bounds.width()  - 1);
-        qreal totalVerticalSpacing   = d->bounds.height() == 0 ? 0.0 : d->verticalSpacing   * (d->bounds.height() - 1);
+        qreal totalHorizontalSpacing = d->bounds.width()  == 0 ? 0.0 : d->spacing * (d->bounds.width()  - 1);
+        qreal totalVerticalSpacing   = d->bounds.height() == 0 ? 0.0 : d->spacing * (d->bounds.height() - 1);
         return QSizeF(
-            d->effectiveCellSize.width()  * d->bounds.width()  + totalHorizontalSpacing + left + right, 
+            d->effectiveCellSize.width()  * d->bounds.width()  + totalHorizontalSpacing + left + right,
             d->effectiveCellSize.height() * d->bounds.height() + totalVerticalSpacing   + top  + bottom
         );
     }
@@ -410,7 +364,7 @@ QSizeF CellLayout::sizeHint(Qt::SizeHint which, const QSizeF &/*constraint*/) co
     }
 }
 
-void CellLayout::invalidate() 
+void CellLayout::invalidate()
 {
     Q_D(CellLayout);
 
@@ -421,58 +375,22 @@ void CellLayout::invalidate()
     d->effectiveGeometry = QRectF();
 }
 
+qreal CellLayout::spacing() const
+{
+    Q_D(const CellLayout);
+
+    return d->spacing;
+}
+
 void CellLayout::setSpacing(qreal spacing)
 {
     Q_D(CellLayout);
 
-    d->horizontalSpacing = spacing;
-    d->verticalSpacing = spacing;
-
-    invalidate();
-}
-
-qreal CellLayout::verticalSpacing() const 
-{
-    Q_D(const CellLayout);
-
-    return d->verticalSpacing;
-}
-
-qreal CellLayout::horizontalSpacing() const 
-{
-    Q_D(const CellLayout);
-
-    return d->horizontalSpacing;
-}
-
-void CellLayout::setVerticalSpacing(qreal spacing) 
-{
-    Q_D(CellLayout);
-
-    d->verticalSpacing = spacing;
-
-    invalidate();
-}
-
-void CellLayout::setHorizontalSpacing(qreal spacing) 
-{
-    Q_D(CellLayout);
-
-    d->horizontalSpacing = spacing;
-
-    invalidate();
-}
-
-void CellLayout::setAlignment(QGraphicsLayoutItem *item, Qt::Alignment alignment)
-{
-    Q_D(CellLayout);
-
-    const QHash<QGraphicsLayoutItem *, ItemProperties>::iterator pos = d->propertiesByItem.find(item);
-    if(pos == d->propertiesByItem.end())
+    if (d->spacing == spacing)
         return;
-    
-    pos->alignment = alignment;
-    
+
+    d->spacing = spacing;
+
     invalidate();
 }
 
@@ -480,14 +398,27 @@ Qt::Alignment CellLayout::alignment(QGraphicsLayoutItem *item) const
 {
     Q_D(const CellLayout);
 
-    const QHash<QGraphicsLayoutItem *, ItemProperties>::const_iterator pos = d->propertiesByItem.find(item);
-    if(pos == d->propertiesByItem.end())
+    const QHash<QGraphicsLayoutItem *, ItemProperties>::const_iterator it = d->propertiesByItem.constFind(item);
+    if (it == d->propertiesByItem.constEnd())
         return 0;
 
-    return pos->alignment;
+    return it->alignment;
 }
 
-QPoint CellLayout::mapToGrid(QPointF pos) const
+void CellLayout::setAlignment(QGraphicsLayoutItem *item, Qt::Alignment alignment)
+{
+    Q_D(CellLayout);
+
+    const QHash<QGraphicsLayoutItem *, ItemProperties>::iterator it = d->propertiesByItem.find(item);
+    if (it == d->propertiesByItem.end())
+        return;
+
+    it->alignment = alignment;
+
+    invalidate();
+}
+
+QPoint CellLayout::mapToGrid(const QPointF &pos) const
 {
     Q_D(const CellLayout);
 
@@ -495,7 +426,7 @@ QPoint CellLayout::mapToGrid(QPointF pos) const
     return QPoint();
 }
 
-QPointF CellLayout::mapFromGrid(QPoint gridPos) const
+QPointF CellLayout::mapFromGrid(const QPoint &gridPos) const
 {
     Q_D(const CellLayout);
 
@@ -503,7 +434,7 @@ QPointF CellLayout::mapFromGrid(QPoint gridPos) const
     d->ensureEffectiveCellSize();
 
     return QPointF(
-        d->effectiveGeometry.left() + (d->effectiveCellSize.width()  + d->horizontalSpacing) * gridPos.x(),
-        d->effectiveGeometry.top()  + (d->effectiveCellSize.height() + d->verticalSpacing)   * gridPos.y()
+        d->effectiveGeometry.left() + (d->effectiveCellSize.width()  + d->spacing) * gridPos.x(),
+        d->effectiveGeometry.top()  + (d->effectiveCellSize.height() + d->spacing) * gridPos.y()
     );
 }

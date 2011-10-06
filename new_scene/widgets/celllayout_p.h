@@ -1,5 +1,5 @@
-#ifndef CELL_LAYOUT_PRIVATE_H
-#define CELL_LAYOUT_PRIVATE_H
+#ifndef CELLLAYOUT_P_H
+#define CELLLAYOUT_P_H
 
 #include "celllayout.h"
 #include <QRect>
@@ -17,13 +17,13 @@ struct ItemProperties {
     Qt::Alignment alignment;
 };
 
-class CellLayoutPrivate 
+
+class CellLayoutPrivate
 {
 public:
-    CellLayoutPrivate(): 
+    CellLayoutPrivate():
         cellSize(1.0, 1.0),
-        verticalSpacing(0.0),
-        horizontalSpacing(0.0)
+        spacing(0.0)
     {}
 
 protected:
@@ -50,11 +50,8 @@ private:
     static QSizeF effectiveMaxSize(QGraphicsLayoutItem *item, const QSizeF &constraint);
 
 private:
-    /** Horizontal spacing. */
-    qreal verticalSpacing;
-
-    /** Vertical spacing. */
-    qreal horizontalSpacing;
+    /** Cell spacing. */
+    qreal spacing;
 
     /** Size of a single cell. */
     QSizeF cellSize;
@@ -82,4 +79,4 @@ private:
 };
 
 
-#endif // CELL_LAYOUT_PRIVATE_H
+#endif // CELLLAYOUT_P_H
