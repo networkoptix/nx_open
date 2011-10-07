@@ -1,14 +1,47 @@
 #include "celllayout.h"
 #include "celllayout_p.h"
 #include <cassert>
+#include <cmath> /* For std::floor, std::ceil. */
 
 namespace {
-    uint qHash(const QPoint &value) {
+    uint qHash(const QPoint &value) 
+    {
         using ::qHash;
 
         /* 1021 is a prime. */
         return qHash(value.x() * 1021) + qHash(value.y());
     }
+
+    QPointF toPoint(const QSizeF &size)
+    {
+        return QPointF(size.width(), size.height());
+    }
+
+    QPoint toPoint(const QSize &size)
+    {
+        return QPoint(size.width(), size.height());
+    }
+
+    QSizeF operator*(const QSizeF &l, const QSizeF &r)
+    {
+        return QSizeF(l.width() * r.width(), l.height() * r.height());
+    }
+
+    QSizeF operator/(const QSizeF &l, const QSizeF &r)
+    {
+        return QSizeF(l.width() / r.width(), l.height() / r.height());
+    }
+
+    QPointF operator*(const QPointF &l, const QPointF &r)
+    {
+        return QPointF(l.x() * r.x(), l.y() * r.y());
+    }
+
+    QPointF operator/(const QPointF &l, const QPointF &r)
+    {
+        return QPointF(l.x() / r.x(), l.y() / r.y());
+    }
+
 }
 
 void CellLayoutPrivate::ensureBounds() const
@@ -36,10 +69,7 @@ void CellLayoutPrivate::ensureEffectiveCellSize() const
         if(!cellRect.isValid())
             continue; /* Skip items that are owned but not managed by this layout. */
 
-        effectiveCellSize = effectiveCellSize.expandedTo(QSizeF(
-            (size.width() - horizontalSpacing * (cellRect.width() - 1))  / cellRect.width(), 
-            (size.height() - verticalSpacing * (cellRect.height() - 1)) / cellRect.height()
-        ));
+        effectiveCellSize = effectiveCellSize.expandedTo((size - spacing * (cellRect.size() - QSize(1, 1))) / cellRect.size());
     }
 }
 
@@ -91,7 +121,7 @@ QRectF CellLayoutPrivate::constrainedGeometry(QGraphicsLayoutItem *item, const Q
     if (sizePolicy.hasHeightForWidth() && size.width() > constraint.width())
         size = effectiveMaxSize(item, QSizeF(constraint.width(), -1));
     /* ### Qt 4.8 will add hasWidthForHeight. */
-    size = size.boundedTo(QSizeF(constraint.width(), constraint.height()));
+    size = size.boundedTo(constraint.size());
 
     /* Adjust for alignment. */
     QPointF pos = constraint.topLeft();
@@ -99,10 +129,10 @@ QRectF CellLayoutPrivate::constrainedGeometry(QGraphicsLayoutItem *item, const Q
     switch (alignment & Qt::AlignHorizontal_Mask) 
     {
     case Qt::AlignHCenter:
-        pos.setX(pos.x() + (constraint.width() - size.width()) / 2);
+        pos.rx() += (constraint.width() - size.width()) / 2;
         break;
     case Qt::AlignRight:
-        pos.setX(pos.x() + constraint.width() - size.width());
+        pos.rx() += constraint.width() - size.width();
         break;
     default:
         break;
@@ -111,16 +141,50 @@ QRectF CellLayoutPrivate::constrainedGeometry(QGraphicsLayoutItem *item, const Q
     switch (alignment & Qt::AlignVertical_Mask) 
     {
     case Qt::AlignVCenter:
-        pos.setY(pos.y() + (constraint.height() - constraint.height()) / 2);
+        pos.ry() += (constraint.height() - constraint.height()) / 2;
         break;
     case Qt::AlignBottom:
-        pos.setY(pos.y() + constraint.height() - size.height());
+        pos.ry() += constraint.height() - size.height();
         break;
     default:
         break;
     }
 
     return QRectF(pos, size);
+}
+
+void CellLayoutPrivate::clearRegion(const QRect &rect)
+{
+    for(int r = rect.top(); r <= rect.bottom(); r++)
+        for(int c = rect.left(); c <= rect.right(); c++)
+            itemByPoint.remove(QPoint(c, r));
+}
+
+void CellLayoutPrivate::fillRection(const QRect &rect, QGraphicsLayoutItem *value)
+{
+    for(int r = rect.top(); r <= rect.bottom(); r++) 
+        for(int c = rect.left(); c <= rect.right(); c++) 
+            itemByPoint[QPoint(c, r)] = value;
+}
+
+bool CellLayoutPrivate::isRegionFilledWith(const QRect &rect, QGraphicsLayoutItem *value0, QGraphicsLayoutItem *value1)
+{
+    for(int r = rect.top(); r <= rect.bottom(); r++) 
+    {
+        for(int c = rect.left(); c <= rect.right(); c++) 
+        {
+            QGraphicsLayoutItem *item = itemByPoint.value(QPoint(c, r), NULL);
+            if(item != value0 && item != value1) 
+                return false;
+        }
+    }
+
+    return true;
+}
+
+bool CellLayoutPrivate::isRegionOccupied(const QRect &rect)
+{
+    return !isRegionFilledWith(rect, NULL, NULL);
 }
 
 CellLayout::CellLayout(QGraphicsLayoutItem *parent): 
@@ -270,27 +334,16 @@ void CellLayout::addItem(QGraphicsLayoutItem *item, const QRect &rect, Qt::Align
     addChildLayoutItem(item);
     d->items.append(item);
 
-    /* Check that it's going to occupy empty cells only. 
-     * 
-     * Note that QRect::bottom() returns QRect::top() + QRect::height() - 1. Hence the <=. */
-    for(int r = rect.top(); r <= rect.bottom(); r++) 
+    /* Check that it's going to occupy empty cells only. */
+    if(d->isRegionOccupied(rect))
     {
-        for(int c = rect.left(); c <= rect.right(); c++) 
-        {
-            QGraphicsLayoutItem *item = itemAt(r, c);
-            if(item != NULL) 
-            {
-                qWarning("CellLayout::addItem: given region is already occupied, cell (%d, %d) is not empty.", c, r);
-                return; /* Now the item is owned but not managed by this layout. */
-            }
-        }
+        qWarning("CellLayout::addItem: given region is already occupied.");
+        return; /* Now the item is owned but not managed by this layout. */
     }
 
     /* Occupy cells. */
     d->propertiesByItem[item] = ItemProperties(rect, alignment);
-    for(int r = rect.top(); r <= rect.bottom(); r++) 
-        for(int c = rect.left(); c <= rect.right(); c++) 
-            d->itemByPoint[QPoint(c, r)] = item;
+    d->fillRection(rect, item);
 
     invalidate();
 }
@@ -301,27 +354,12 @@ void CellLayout::setGeometry(const QRectF &rect)
 
     QGraphicsLayout::setGeometry(rect);
 
-    /* Create shortcuts. */
-    d->ensureEffectiveGeometry();
-    d->ensureEffectiveCellSize();
-    qreal cellWidth = d->effectiveCellSize.width();
-    qreal cellHeight = d->effectiveCellSize.height();
-
     /* Set child items' geometries. Ignore given size. */
-    d->ensureBounds();
     typedef QHash<QGraphicsLayoutItem *, ItemProperties>::const_iterator const_iterator;
-    for(const_iterator pos = d->propertiesByItem.begin(); pos != d->propertiesByItem.end(); pos++) 
+    for(const_iterator pos = d->propertiesByItem.begin(); pos != d->propertiesByItem.end(); pos++)  
     {
-        QRect itemCellRect = pos->rect.translated(-d->bounds.topLeft());
-        QRectF cellRect(
-            d->effectiveGeometry.left() + (cellWidth  + d->horizontalSpacing) * itemCellRect.left(),
-            d->effectiveGeometry.top()  + (cellHeight + d->verticalSpacing)   * itemCellRect.top(),
-            cellWidth  * itemCellRect.width()  + d->horizontalSpacing * (itemCellRect.width() - 1),
-            cellHeight * itemCellRect.height() + d->verticalSpacing   * (itemCellRect.height() - 1)
-        );
-
         QGraphicsLayoutItem *item = pos.key();
-        item->setGeometry(CellLayoutPrivate::constrainedGeometry(item, cellRect, pos->alignment));
+        item->setGeometry(CellLayoutPrivate::constrainedGeometry(item, mapFromGrid(pos->rect), pos->alignment));
     }
 }
 
@@ -370,14 +408,34 @@ void CellLayout::removeItem(QGraphicsLayoutItem *item)
     }
 
     const QHash<QGraphicsLayoutItem *, ItemProperties>::iterator pos = d->propertiesByItem.find(item);
-    QRect rect = pos->rect;
-    for(int r = rect.top(); r <= rect.bottom(); r++)
-        for(int c = rect.left(); c <= rect.right(); c++)
-            d->itemByPoint.remove(QPoint(c, r));
-
+    d->clearRegion(pos->rect);
     d->propertiesByItem.erase(pos);
 
     item->setParentLayoutItem(NULL);
+
+    invalidate();
+}
+
+void CellLayout::moveItem(QGraphicsLayoutItem *item, const QRect &rect)
+{
+    Q_D(CellLayout);
+
+    const QHash<QGraphicsLayoutItem *, ItemProperties>::iterator pos = d->propertiesByItem.find(item);
+    if(pos == d->propertiesByItem.end())
+    {
+        qWarning("CellLayout::moveItem: given item does not belong to this cell layout.");
+        return;
+    }
+
+    if(!d->isRegionFilledWith(rect, NULL, item))
+    {
+        qWarning("CellLayout::moveItem: given region is already occupied.");
+        return;
+    }
+
+    d->clearRegion(pos->rect);
+    d->fillRection(rect, item);
+    pos->rect = rect;
 
     invalidate();
 }
@@ -395,12 +453,7 @@ QSizeF CellLayout::sizeHint(Qt::SizeHint which, const QSizeF &/*constraint*/) co
         d->ensureBounds();
         d->ensureEffectiveCellSize();
 
-        qreal totalHorizontalSpacing = d->bounds.width()  == 0 ? 0.0 : d->horizontalSpacing * (d->bounds.width()  - 1);
-        qreal totalVerticalSpacing   = d->bounds.height() == 0 ? 0.0 : d->verticalSpacing   * (d->bounds.height() - 1);
-        return QSizeF(
-            d->effectiveCellSize.width()  * d->bounds.width()  + totalHorizontalSpacing + left + right, 
-            d->effectiveCellSize.height() * d->bounds.height() + totalVerticalSpacing   + top  + bottom
-        );
+        return mapFromGrid(d->bounds.size()) + QSizeF(left + right, top + bottom);
     }
     case Qt::MinimumDescent:
         return QSizeF(-1.0, -1.0);
@@ -425,8 +478,7 @@ void CellLayout::setSpacing(qreal spacing)
 {
     Q_D(CellLayout);
 
-    d->horizontalSpacing = spacing;
-    d->verticalSpacing = spacing;
+    d->spacing = QSizeF(spacing, spacing);
 
     invalidate();
 }
@@ -435,21 +487,21 @@ qreal CellLayout::verticalSpacing() const
 {
     Q_D(const CellLayout);
 
-    return d->verticalSpacing;
+    return d->spacing.height();
 }
 
 qreal CellLayout::horizontalSpacing() const 
 {
     Q_D(const CellLayout);
 
-    return d->horizontalSpacing;
+    return d->spacing.width();
 }
 
 void CellLayout::setVerticalSpacing(qreal spacing) 
 {
     Q_D(CellLayout);
 
-    d->verticalSpacing = spacing;
+    d->spacing.setHeight(spacing);
 
     invalidate();
 }
@@ -458,7 +510,7 @@ void CellLayout::setHorizontalSpacing(qreal spacing)
 {
     Q_D(CellLayout);
 
-    d->horizontalSpacing = spacing;
+    d->spacing.setWidth(spacing);
 
     invalidate();
 }
@@ -491,8 +543,15 @@ QPoint CellLayout::mapToGrid(QPointF pos) const
 {
     Q_D(const CellLayout);
 
-    // TODO
-    return QPoint();
+    d->ensureEffectiveCellSize();
+
+    /* Compute origin and a unit vectors in the cell-based coordinate system. */
+    QPointF origin = mapFromGrid(QPoint(0, 0)) - toPoint(d->spacing) / 2;
+    QPointF unit = toPoint(d->effectiveCellSize + d->spacing);
+
+    /* Perform coordinate transformation. */
+    pos = (pos - origin) / unit;
+    return QPoint(std::floor(pos.x()), std::floor(pos.y()));
 }
 
 QPointF CellLayout::mapFromGrid(QPoint gridPos) const
@@ -501,9 +560,54 @@ QPointF CellLayout::mapFromGrid(QPoint gridPos) const
 
     d->ensureEffectiveGeometry();
     d->ensureEffectiveCellSize();
+    d->ensureBounds();
 
-    return QPointF(
-        d->effectiveGeometry.left() + (d->effectiveCellSize.width()  + d->horizontalSpacing) * gridPos.x(),
-        d->effectiveGeometry.top()  + (d->effectiveCellSize.height() + d->verticalSpacing)   * gridPos.y()
+    return d->effectiveGeometry.topLeft() + toPoint(d->effectiveCellSize + d->spacing) * (gridPos - d->bounds.topLeft());
+}
+
+QSize CellLayout::mapToGrid(QSizeF size) const
+{
+    Q_D(const CellLayout);
+
+    d->ensureEffectiveCellSize();
+
+    size = (size + d->spacing) / (d->effectiveCellSize + d->spacing);
+    return QSize(std::ceil(size.width()), std::ceil(size.height()));
+}
+
+QSizeF CellLayout::mapFromGrid(QSize size) const
+{
+    Q_D(const CellLayout);
+
+    d->ensureEffectiveCellSize();
+
+    return d->effectiveCellSize * size + (d->spacing * (size - QSize(1, 1))).expandedTo(QSizeF(0, 0));
+}
+
+QRect CellLayout::mapToGrid(QRectF rect) const 
+{
+    Q_D(const CellLayout);
+
+    d->ensureEffectiveCellSize();
+
+    QSize cellSize = mapToGrid(rect.size());
+
+    /* Compute top-left corner of the rect expanded to integer cell size. */
+    QPointF topLeft = rect.center() - toPoint(mapFromGrid(cellSize)) / 2;
+
+    QPoint cellTopLeft = mapToGrid(topLeft + toPoint(d->effectiveCellSize) / 2);
+    return QRect(cellTopLeft, cellSize);
+}
+
+QRectF CellLayout::mapFromGrid(QRect rect) const
+{
+    Q_D(const CellLayout);
+
+    d->ensureEffectiveCellSize();
+
+    return QRectF(
+        mapFromGrid(rect.topLeft()),
+        mapFromGrid(rect.size())
     );
 }
+

@@ -428,9 +428,9 @@ void AnimatedWidget::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void AnimatedWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-#if 0
     base_type::mouseReleaseEvent(event);
 
+#if 0
     if (event->button() == Qt::LeftButton && !isInteractive())
     {
         event->accept();
@@ -442,7 +442,9 @@ void AnimatedWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void AnimatedWidget::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
-#if 0
+#if 1
+    base_type::mouseDoubleClickEvent(event);
+#else
     if (event->button() == Qt::LeftButton && !isInteractive())
         QMetaObject::invokeMethod(this, "doubleClicked", Qt::QueuedConnection);
     else

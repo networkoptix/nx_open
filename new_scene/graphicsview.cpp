@@ -111,6 +111,13 @@ GraphicsView::GraphicsView(QWidget *parent)
         connect(widget, SIGNAL(doubleClicked()), this, SLOT(itemDoubleClicked()));
         connect(widget, SIGNAL(destroyed()), this, SLOT(itemDestroyed()));
 
+        connect(widget, SIGNAL(clicked()), this, SLOT(_clicked()));
+        connect(widget, SIGNAL(doubleClicked()), this, SLOT(_doubleClicked()));
+        connect(widget, SIGNAL(resizingStarted()), this, SLOT(_resizingStarted()));
+        connect(widget, SIGNAL(resizingFinished()), this, SLOT(_resizingFinished()));
+        connect(widget, SIGNAL(draggingStarted()), this, SLOT(_draggingStarted()));
+        connect(widget, SIGNAL(draggingFinished()), this, SLOT(_draggingFinished()));
+
         m_animatedWidgets.append(widget);
     }
 
@@ -162,6 +169,17 @@ void GraphicsView::_resizingStarted() {
 
 void GraphicsView::_resizingFinished() {
     qDebug() << "resizingFinished";
+
+    AnimatedWidget *item = static_cast<AnimatedWidget *>(sender());
+    CellLayout *layout = static_cast<CellLayout *>(m_widget->layout());
+
+    QRect newRect = layout->mapToGrid(item->geometry());
+
+    QSet<QGraphicsLayoutItem *> items = layout->itemsAt(newRect);
+    items.remove(item);
+
+    if(items.empty())
+        layout->moveItem(item, newRect);
 }
 
 void GraphicsView::_draggingStarted() {
@@ -170,6 +188,19 @@ void GraphicsView::_draggingStarted() {
 
 void GraphicsView::_draggingFinished() {
     qDebug() << "draggingFinished";
+
+    // TODO: duplicate code.
+
+    AnimatedWidget *item = static_cast<AnimatedWidget *>(sender());
+    CellLayout *layout = static_cast<CellLayout *>(m_widget->layout());
+
+    QRect newRect = layout->mapToGrid(item->geometry());
+    
+    QSet<QGraphicsLayoutItem *> items = layout->itemsAt(newRect);
+    items.remove(item);
+
+    if(items.empty())
+        layout->moveItem(item, newRect);
 }
 
 

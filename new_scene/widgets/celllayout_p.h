@@ -21,9 +21,7 @@ class CellLayoutPrivate
 {
 public:
     CellLayoutPrivate(): 
-        cellSize(1.0, 1.0),
-        verticalSpacing(0.0),
-        horizontalSpacing(0.0)
+        cellSize(1.0, 1.0)
     {}
 
 protected:
@@ -33,6 +31,11 @@ private:
     void ensureBounds() const;
     void ensureEffectiveCellSize() const;
     void ensureEffectiveGeometry() const;
+
+    void clearRegion(const QRect &rect);
+    void fillRection(const QRect &rect, QGraphicsLayoutItem *value);
+    bool isRegionFilledWith(const QRect &rect, QGraphicsLayoutItem *value0, QGraphicsLayoutItem *value1);
+    bool isRegionOccupied(const QRect &rect);
 
     /**
      * \param item                      Item to compute geometry for.
@@ -50,11 +53,8 @@ private:
     static QSizeF effectiveMaxSize(QGraphicsLayoutItem *item, const QSizeF &constraint);
 
 private:
-    /** Horizontal spacing. */
-    qreal verticalSpacing;
-
-    /** Vertical spacing. */
-    qreal horizontalSpacing;
+    /** Cell spacing. */
+    QSizeF spacing;
 
     /** Size of a single cell. */
     QSizeF cellSize;

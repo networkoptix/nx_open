@@ -133,7 +133,8 @@ public:
     /**
      * \param pos                       Position in parent coordinates to map to grid coordinates.
      * \returns                         Coordinate of the grid cell that the given
-     *                                  position belongs to. 
+     *                                  position belongs to. If the position at spacing region is
+     *                                  given, returns coordinate of the closest grid cell.
      */
     QPoint mapToGrid(QPointF pos) const;
 
@@ -142,6 +143,30 @@ public:
      * \returns                         Position in parent coordinates of the top left corner of the grid cell.
      */
     QPointF mapFromGrid(QPoint gridPos) const;
+
+    /**
+     * \param size                      Size on parent coordinates.
+     * \returns                         Smallest size in grid cells that fits the given size.
+     */
+    QSize mapToGrid(QSizeF size) const;
+
+    /**
+     * \param size                      Size in grid cells.
+     * \returns                         Corresponding size in parent coordinates.
+     */
+    QSizeF mapFromGrid(QSize size) const;
+
+    /**
+     * \param rect                      Rectangle in parent coordinates to map to grid coordinates.
+     * \returns                         Smallest cell rectangle that fits the given rectangle.
+     */
+    QRect mapToGrid(QRectF rect) const;
+
+    /**
+     * \param rect                      Rectangle in grid cells.
+     * \returns                         Corresponding rectangle in parent coordinates.
+     */
+    QRectF mapFromGrid(QRect rect) const;
 
     /**
      * \param column
@@ -203,6 +228,12 @@ public:
      * \param item                      Item to remove from this cell layout.
      */
     void removeItem(QGraphicsLayoutItem *item);
+
+    /**
+     * \param item                      Item to move to a new position.
+     * \param rect                      New position.
+     */
+    void moveItem(QGraphicsLayoutItem *item, const QRect &rect);
 
 protected:
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint) const override;
