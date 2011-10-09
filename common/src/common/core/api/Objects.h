@@ -3,8 +3,10 @@
 
 #include <QObject>
 #include <QString>
+#include <QStringList>
 #include <QList>
 #include <QMetaType>
+#include <QSharedPointer>
 
 class Object : public QObject
 {
@@ -44,11 +46,36 @@ private:
     QString m_body;
 };
 
+class PropertyType : public Object
+{
+    Q_OBJECT
+    Q_PROPERTY(QString name READ name WRITE setName)
+    Q_PROPERTY(QString type READ type WRITE setType)
+public:
+    PropertyType();
+
+    QString name() const;
+    void setName(QString name);
+
+    QString type() const;
+    void setType(QString type);
+
+private:
+    QString m_name;
+    QString m_type;
+};
+
+class ResourceType;
+
+typedef QSharedPointer<ResourceType> ResourceTypePtr;
+
 class ResourceType : public Object
 {
     Q_OBJECT
     Q_PROPERTY(QString name READ name WRITE setName)
     Q_PROPERTY(QString description READ description WRITE setDescription)
+    Q_PROPERTY(QList<PropertyType*>* propertyTypes READ propertyTypes WRITE setPropertyTypes)
+    Q_PROPERTY(QStringList parentIDs READ parentIDs WRITE setParentIDs)
 
 public:
     ResourceType();
@@ -59,9 +86,18 @@ public:
     QString description() const;
     void setDescription(QString description);
 
+    QList<PropertyType*>* propertyTypes() const;
+    void setPropertyTypes(QList<PropertyType*>* propertyTypes);
+
+    QStringList parentIDs() const;
+    void setParentIDs(QStringList parents);
+
 private:
     QString m_name;
     QString m_description;
+
+    QList<PropertyType*>* m_propertyTypes;
+    QStringList m_parentIDs;
 };
 
 class Resource : public Object

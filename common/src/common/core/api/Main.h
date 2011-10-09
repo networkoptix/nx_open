@@ -5,7 +5,7 @@
 #include <QList>
 
 #include "SessionManager.h"
-#include "Objects.h"
+// #include "Objects.h"
 
 enum State
 {
@@ -30,13 +30,14 @@ public:
     void run();
 
 private slots:
-    void eventsReceived(QList<Event*>* events);
-    void camerasReceived(RequestId requestId, QList<Camera*>* cameras);
-    void serverAdded(RequestId requestId, QList<Server *> *servers);
-    void serversReceived(RequestId requestId, QList<Server*>* servers);
-    void layoutsReceived(RequestId requestId, QList<Layout*>* layouts);
-    void resourceTypesReceived(RequestId requestId, QList<ResourceType*>* resourceTypes);
-    void resourcesReceived(RequestId requestId, QList<Resource *> *resources);
+    void eventsReceived(QnApiEventResponsePtr events);
+    void camerasReceived(RequestId requestId, QnApiCameraResponsePtr cameras);
+    void serverAdded(RequestId requestId, QnApiServerResponsePtr servers);
+    void serversReceived(RequestId requestId, QnApiServerResponsePtr servers);
+    void layoutsReceived(RequestId requestId, QnApiLayoutResponsePtr layouts);
+    void resourceTypesReceived(RequestId requestId, QnApiResourceTypeResponsePtr resourceTypes);
+    void resourcesReceived(RequestId requestId, QnApiResourceResponsePtr resources);
+
     void error(RequestId requestId, QString message);
 
 private:
@@ -56,7 +57,7 @@ private:
 
     State m_state;
 
-    QList<ResourceType*>* m_resourceTypes;
+    QnApiResourceTypeResponsePtr m_resourceTypes;
 };
 
 #endif // _MAIN_H

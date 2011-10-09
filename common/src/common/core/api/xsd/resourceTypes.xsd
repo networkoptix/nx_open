@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified"
+           targetNamespace="http://www.networkoptix.com/xsd/api/resourceTypes"
+           xmlns="http://www.networkoptix.com/xsd/api/resourceTypes">
+  <xs:element name="resourceTypes" type="resourceTypes_t"/>
+
+  <xs:complexType name="resourceTypes_t">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" ref="resourceType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="resourceType">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="id" type="xs:integer"/>
+        <xs:element name="name" type="xs:string"/>
+        <xs:element ref="parentIDs" minOccurs="0"/>
+        <xs:element ref="propertyTypes" minOccurs="0"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="parentIDs">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="parentID" type="xs:integer"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="propertyTypes">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="propertyType"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="propertyType">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="description" type="xs:string"/>
+        <xs:element name="xtype" type="xs:string"/>
+        <xs:element name="name" type="xs:string"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

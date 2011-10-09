@@ -97,6 +97,31 @@ void Event::setBody(QString body)
     m_body = body;
 }
 
+PropertyType::PropertyType()
+{
+    setObjectName("propertyType");
+}
+
+QString PropertyType::name() const
+{
+    return m_name;
+}
+
+void PropertyType::setName(QString name)
+{
+    m_name = name;
+}
+
+QString PropertyType::type() const
+{
+    return m_type;
+}
+
+void PropertyType::setType(QString type)
+{
+    m_type = type;
+}
+
 ResourceType::ResourceType()
 {
     setObjectName("resourceType");
@@ -120,6 +145,26 @@ QString ResourceType::description() const
 void ResourceType::setDescription(QString description)
 {
     m_description = description;
+}
+
+QList<PropertyType*>* ResourceType::propertyTypes() const
+{
+    return m_propertyTypes;
+}
+
+void ResourceType::setPropertyTypes(QList<PropertyType*>* propertyTypes)
+{
+    m_propertyTypes = propertyTypes;
+}
+
+QStringList ResourceType::parentIDs() const
+{
+    return m_parentIDs;
+}
+
+void ResourceType::setParentIDs(QStringList parentIDs)
+{
+    m_parentIDs = parentIDs;
 }
 
 Resource::Resource()

@@ -2,8 +2,94 @@
 #include <QNetworkReply>
 #include <QDomDocument>
 #include <QXmlInputSource>
+#include <QSharedPointer>
+#include <ios>
 
 #include "SessionManager.h"
+
+class QStdStreamBuf : public std::streambuf
+{
+public:
+    QStdStreamBuf(QIODevice *dev) : std::streambuf(), m_dev(dev)
+    {
+        // Initialize get pointer.  This should be zero so that underflow is called upon first read.
+        this->setg(0, 0, 0);
+    }
+
+protected:
+virtual std::streamsize xsgetn(std::streambuf::char_type *str, std::streamsize n)
+{
+    return m_dev->read(str, n);
+}
+
+virtual std::streamsize xsputn(const std::streambuf::char_type *str, std::streamsize n)
+{
+    return m_dev->write(str, n);
+}
+
+virtual std::streambuf::pos_type seekoff(std::streambuf::off_type off, std::ios_base::seekdir dir, std::ios_base::openmode /*__mode*/)
+{
+    switch(dir)
+    {
+        case std::ios_base::beg:
+            break;
+        case std::ios_base::end:
+            off = m_dev->size() - off;
+            break;
+        case std::ios_base::cur:
+            off = m_dev->pos() + off;
+            break;
+    }
+    if(m_dev->seek(off))
+        return m_dev->pos();
+    else
+        return std::streambuf::pos_type(std::streambuf::off_type(-1));
+}
+virtual std::streambuf::pos_type seekpos(std::streambuf::pos_type off, std::ios_base::openmode /*__mode*/)
+{
+    if(m_dev->seek(off))
+        return m_dev->pos();
+    else
+        return std::streambuf::pos_type(std::streambuf::off_type(-1));
+}
+
+virtual std::streambuf::int_type underflow()
+{
+    // Read enough bytes to fill the buffer.
+    std::streamsize len = sgetn(m_inbuf, sizeof(m_inbuf)/sizeof(m_inbuf[0]));
+
+    // Since the input buffer content is now valid (or is new)
+    // the get pointer should be initialized (or reset).
+    setg(m_inbuf, m_inbuf, m_inbuf + len);
+
+    // If nothing was read, then the end is here.
+    if(len == 0)
+        return traits_type::eof();
+
+    // Return the first character.
+    return traits_type::not_eof(m_inbuf[0]);
+}
+
+
+private:
+    static const std::streamsize BUFFER_SIZE = 1024;
+    std::streambuf::char_type m_inbuf[BUFFER_SIZE];
+    QIODevice *m_dev;
+};
+
+class QStdIStream : public std::istream
+{
+public:
+    QStdIStream(QIODevice *dev) : std::istream(m_buf = new QStdStreamBuf(dev)) {}
+    virtual ~QStdIStream()
+    {
+        rdbuf(0);
+        delete m_buf;
+    }
+
+private:
+    QStdStreamBuf * m_buf;
+};
 
 SessionManager::SessionManager(const QString& host, const QString& login, const QString& password)
     : m_manager(this),
@@ -120,45 +206,99 @@ void SessionManager::slotRequestFinished(QNetworkReply *reply)
             m_requestObjectMap.remove(reply);
         }
 
+        QStdIStream is(reply);
+
         if (objectName == "event")
         {
             if (m_needEvents)
                 openEventChannel();
 
-            QList<Event*> *events = new QList<Event*>();
-            readObjectList<Event>(reply, events);
+            typedef xsd::api::events::events_t T;
+            QSharedPointer<T> result;
 
-            emit eventsReceived(events);
-        } else if (objectName == "camera")
+            try
+            {
+                result = QSharedPointer<T>(xsd::api::events::events (is, xml_schema::flags::dont_validate).release());
+            } catch (const xml_schema::exception& e)
+            {
+                qDebug(e.what());
+            }
+
+            emit eventsReceived(result);
+        }
+
+        // string -> xsd::api::cameras::cameras_t, xsd::api::cameras::cameras
+
+        if (objectName == "camera")
         {
-            QList<Camera*> *cameras = new QList<Camera*>();
-            readObjectList<Camera>(reply, cameras);
+            typedef xsd::api::cameras::cameras_t T;
+            QSharedPointer<T> result;
 
-            emit camerasReceived((RequestId)reply, cameras);
+            try
+            {
+                result = QSharedPointer<T>(xsd::api::cameras::cameras (is, xml_schema::flags::dont_validate).release());
+            } catch (const xml_schema::exception& e)
+            {
+                qDebug(e.what());
+            }
+
+            emit camerasReceived((RequestId)reply, result);
         } else if (objectName == "resourceType")
         {
-            QList<ResourceType*> *resourceTypes = new QList<ResourceType*>();
-            readObjectList<ResourceType>(reply, resourceTypes);
+            typedef xsd::api::resourceTypes::resourceTypes_t T;
+            QSharedPointer<T> result;
 
-            emit resourceTypesReceived((RequestId)reply, resourceTypes);
+            try
+            {
+                result = QSharedPointer<T>(xsd::api::resourceTypes::resourceTypes (is, xml_schema::flags::dont_validate).release());
+            } catch (const xml_schema::exception& e)
+            {
+                qDebug(e.what());
+            }
+
+            emit resourceTypesReceived((RequestId)reply, result);
         } else if (objectName == "server")
         {
-            QList<Server*> *servers = new QList<Server*>();
-            readObjectList<Server>(reply, servers);
+            typedef xsd::api::servers::servers_t T;
+            QSharedPointer<T> result;
 
-            emit serversReceived((RequestId)reply, servers);
+            try
+            {
+                result = QSharedPointer<T>(xsd::api::servers::servers (is, xml_schema::flags::dont_validate).release());
+            } catch (const xml_schema::exception& e)
+            {
+                qDebug(e.what());
+            }
+
+            emit serversReceived((RequestId)reply, result);
         } else if (objectName == "layout")
         {
-            QList<Layout*> *layouts = new QList<Layout*>();
-            readObjectList<Layout>(reply, layouts);
+            typedef xsd::api::layouts::layouts_t T;
+            QSharedPointer<T> result;
 
-            emit layoutsReceived((RequestId)reply, layouts);
+            try
+            {
+                result = QSharedPointer<T>(xsd::api::layouts::layouts (is, xml_schema::flags::dont_validate).release());
+            } catch (const xml_schema::exception& e)
+            {
+                qDebug(e.what());
+            }
+
+            emit layoutsReceived((RequestId)reply, result);
         } else if (objectName == "resource")
         {
-            QList<Resource*> *resources = new QList<Resource*>();
-            readObjectList<Resource>(reply, resources);
+            typedef xsd::api::resources::resources_t T;
+            QSharedPointer<T> result;
 
-            emit resourcesReceived((RequestId)reply, resources);
+            try
+            {
+                result = QSharedPointer<T>(xsd::api::resources::resources (is, xml_schema::flags::dont_validate).release());
+            } catch (const xml_schema::exception& e)
+            {
+                qDebug(e.what());
+            }
+
+            emit resourcesReceived((RequestId)reply, result);
         }
     }
 }

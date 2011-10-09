@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified"
+           targetNamespace="http://www.networkoptix.com/xsd/api/cameras"
+           xmlns="http://www.networkoptix.com/xsd/api/cameras">
+  <xs:element name="cameras" type="cameras_t"/>
+
+  <xs:complexType name="cameras_t">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" ref="camera"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="camera">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="id" type="xs:integer"/>
+        <xs:element name="name" type="xs:string"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
