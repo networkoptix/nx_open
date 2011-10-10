@@ -10,7 +10,7 @@
 #include <QtGui/QGraphicsSceneEvent>
 #include <QtGui/QPainter>
 
-#include "notifyingwidget_p.h"
+#include "graphicswidget_p.h"
 
 class AnimatedWidgetPrivate: public NotifyingWidgetPrivate
 {

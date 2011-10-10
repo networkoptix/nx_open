@@ -1,7 +1,7 @@
 #ifndef ANIMATEDWIDGET_H
 #define ANIMATEDWIDGET_H
 
-#include "notifyingwidget.h"
+#include "graphicswidget.h"
 
 class QAnimationGroup;
 

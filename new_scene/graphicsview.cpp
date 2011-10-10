@@ -13,7 +13,7 @@
 #include "centralwidget.h"
 #include "layoutitem.h"
 
-#include "notifyingwidget.h"
+#include "graphicswidget.h"
 
 static const qreal spacing = 25;
 

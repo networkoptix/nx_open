@@ -1,7 +1,7 @@
 #ifndef NOTIFYINGWIDGET_PRIVATE_H
 #define NOTIFYINGWIDGET_PRIVATE_H
 
-#include "notifyingwidget.h"
+#include "graphicswidget.h"
 #include <cassert>
 
 class NotifyingWidgetPrivate {

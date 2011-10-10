@@ -1,5 +1,5 @@
-#include "notifyingwidget.h"
-#include "notifyingwidget_p.h"
+#include "graphicswidget.h"
+#include "graphicswidget_p.h"
 #include <cassert>
 #include <QApplication>
 #include <QGraphicsSceneMouseEvent>
