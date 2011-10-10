@@ -1659,7 +1659,11 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
 
     if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
         bool changed = snapshotManager()->isChanged(layout);
+
         resource->setName(name);
+        if(QnWorkbenchLayout::instance(layout))
+            QnWorkbenchLayout::instance(layout)->setName(name); // TODO: hack
+
         if(!changed)
             snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
     } else {
