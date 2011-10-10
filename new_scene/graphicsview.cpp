@@ -13,7 +13,10 @@
 #include "centralwidget.h"
 #include "layoutitem.h"
 
+#include "notifyingwidget.h"
+
 static const qreal spacing = 25;
+
 
 GraphicsView::GraphicsView(QWidget *parent)
     : QGraphicsView(parent),
@@ -83,6 +86,9 @@ GraphicsView::GraphicsView(QWidget *parent)
     for (int i = 0; i < 16; ++i)
     {
         AnimatedWidget *widget = new AnimatedWidget(m_widget);
+
+
+
 //        widget->setFlag(QGraphicsItem::ItemHasNoContents, true); // optimization
         widget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true); // optimization
         widget->setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -105,6 +111,13 @@ GraphicsView::GraphicsView(QWidget *parent)
         connect(widget, SIGNAL(doubleClicked()), this, SLOT(itemDoubleClicked()));
         connect(widget, SIGNAL(destroyed()), this, SLOT(itemDestroyed()));
 
+        connect(widget, SIGNAL(clicked()), this, SLOT(_clicked()));
+        connect(widget, SIGNAL(doubleClicked()), this, SLOT(_doubleClicked()));
+        connect(widget, SIGNAL(resizingStarted()), this, SLOT(_resizingStarted()));
+        connect(widget, SIGNAL(resizingFinished()), this, SLOT(_resizingFinished()));
+        connect(widget, SIGNAL(draggingStarted()), this, SLOT(_draggingStarted()));
+        connect(widget, SIGNAL(draggingFinished()), this, SLOT(_draggingFinished()));
+
         m_animatedWidgets.append(widget);
     }
 
@@ -113,12 +126,83 @@ GraphicsView::GraphicsView(QWidget *parent)
     m_widget->setGeometry(0, 0, 900, 900);
 
     relayoutItems(4, 4);
+
+#if 0
+    NotifyingWidget *ww[2] = {new NotifyingWidget(), new NotifyingWidget()};
+
+    for(int i = 0; i < 2; i++) 
+    {
+        NotifyingWidget *w = ww[i];
+
+        scene()->addItem(w);
+        w->setAutoFillBackground(true);
+        w->setGeometry(50 + i * 150, 50, 100, 100);
+        w->setWindowFlags(Qt::Window);
+        w->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
+
+        connect(w, SIGNAL(clicked()), this, SLOT(_clicked()));
+        connect(w, SIGNAL(doubleClicked()), this, SLOT(_doubleClicked()));
+        connect(w, SIGNAL(resizingStarted()), this, SLOT(_resizingStarted()));
+        connect(w, SIGNAL(resizingFinished()), this, SLOT(_resizingFinished()));
+        connect(w, SIGNAL(draggingStarted()), this, SLOT(_draggingStarted()));
+        connect(w, SIGNAL(draggingFinished()), this, SLOT(_draggingFinished()));
+    }
+#endif
 }
 
 GraphicsView::~GraphicsView()
 {
     delete m_widget;
 }
+
+void GraphicsView::_clicked() {
+    qDebug() << "clicked";
+}
+
+void GraphicsView::_doubleClicked() {
+    qDebug() << "doubleClicked";
+}
+
+void GraphicsView::_resizingStarted() {
+    qDebug() << "resizingStarted";
+}
+
+void GraphicsView::_resizingFinished() {
+    qDebug() << "resizingFinished";
+
+    AnimatedWidget *item = static_cast<AnimatedWidget *>(sender());
+    CellLayout *layout = static_cast<CellLayout *>(m_widget->layout());
+
+    QRect newRect = layout->mapToGrid(item->geometry());
+
+    QSet<QGraphicsLayoutItem *> items = layout->itemsAt(newRect);
+    items.remove(item);
+
+    if(items.empty())
+        layout->moveItem(item, newRect);
+}
+
+void GraphicsView::_draggingStarted() {
+    qDebug() << "draggingStarted";
+}
+
+void GraphicsView::_draggingFinished() {
+    qDebug() << "draggingFinished";
+
+    // TODO: duplicate code.
+
+    AnimatedWidget *item = static_cast<AnimatedWidget *>(sender());
+    CellLayout *layout = static_cast<CellLayout *>(m_widget->layout());
+
+    QRect newRect = layout->mapToGrid(item->geometry());
+    
+    QSet<QGraphicsLayoutItem *> items = layout->itemsAt(newRect);
+    items.remove(item);
+
+    if(items.empty())
+        layout->moveItem(item, newRect);
+}
+
 
 bool GraphicsView::isEditMode() const
 {
@@ -478,6 +562,9 @@ void GraphicsView::keyReleaseEvent(QKeyEvent *event)
 
 void GraphicsView::mousePressEvent(QMouseEvent *event)
 {
+#if 1
+    QGraphicsView::mousePressEvent(event);
+#else
     if(mDragState != INITIAL || !isInteractive())
     {
         QGraphicsView::mousePressEvent(event);
@@ -512,8 +599,6 @@ void GraphicsView::mousePressEvent(QMouseEvent *event)
     mMousePressPos = event->pos();
     mLastMouseScenePos = mapToScene(event->pos());
 
-//    qDebug() << mLastMouseScenePos;
-
     if(event->modifiers() & Qt::ControlModifier) {
         /* Toggle selection of the current item if Ctrl is pressed. This is the
          * behavior that is to be expected. */
@@ -529,10 +614,14 @@ void GraphicsView::mousePressEvent(QMouseEvent *event)
 
     event->accept();
     QGraphicsView::mousePressEvent(event);
+#endif
 }
 
 void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
+#if 1
+    QGraphicsView::mouseMoveEvent(event);
+#else
     if (mDragState == INITIAL || !isInteractive())
     {
         QGraphicsView::mouseMoveEvent(event);
@@ -575,8 +664,6 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
     QPointF delta = currentMouseScenePos - mLastMouseScenePos;
     mLastMouseScenePos = currentMouseScenePos;
 
-//    qDebug() << mLastMouseScenePos;
-
     // Drag selected items.
     foreach(QGraphicsItem *item, scene()->selectedItems()) {
         AnimatedWidget *widget = dynamic_cast<AnimatedWidget *>(item);
@@ -587,6 +674,7 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
     }
 
     event->accept();
+#endif
 }
 
 void GraphicsView::mouseReleaseEvent(QMouseEvent *event)
@@ -596,6 +684,7 @@ void GraphicsView::mouseReleaseEvent(QMouseEvent *event)
     if (scene()->selectedItems().isEmpty())
         invalidateLayout();
 
+#if 0
     if (mDragState == INITIAL || !isInteractive())
         return;
 
@@ -623,4 +712,5 @@ void GraphicsView::mouseReleaseEvent(QMouseEvent *event)
 
     mDragState = INITIAL;
     event->accept();
+#endif
 }

@@ -10,58 +10,60 @@
 #include <QtGui/QGraphicsSceneEvent>
 #include <QtGui/QPainter>
 
-class AnimatedWidgetPrivate
+#include "notifyingwidget_p.h"
+
+class AnimatedWidgetPrivate: public NotifyingWidgetPrivate
 {
 public:
     AnimatedWidgetPrivate();
     ~AnimatedWidgetPrivate();
 
+private:
     void init();
 
     void drawRotationHelper(QPainter *painter, const QPointF &m_rotation_center, const QPointF &m_rotation_hand);
 
-    AnimatedWidget *q;
-
-    inline QPointF instantPos() const { return q->pos(); }
+    inline QPointF instantPos() const { return q_func()->pos(); }
     inline void setInstantPos(const QPointF &pos)
     {
         inSetGeometry = true;
-        q->setPos(pos);
+        q_func()->setPos(pos);
         inSetGeometry = false;
     }
 
-    inline QSizeF instantSize() const { return q->size(); }
+    inline QSizeF instantSize() const { return q_func()->size(); }
     inline void setInstantSize(const QSizeF &size)
     {
         inSetGeometry = true;
-        q->resize(size);
+        q_func()->resize(size);
         inSetGeometry = false;
     }
 
-    inline float instantScale() const { return q->scale(); }
+    inline float instantScale() const { return q_func()->scale(); }
     inline void setInstantScale(float scale)
     {
         inSetScale = true;
-        q->setScale(scale);
+        q_func()->setScale(scale);
         inSetScale = false;
     }
 
-    inline float instantRotation() const { return q->rotation(); }
+    inline float instantRotation() const { return q_func()->rotation(); }
     inline void setInstantRotation(float rotation)
     {
         inSetRotation = true;
-        q->setRotation(rotation);
+        q_func()->setRotation(rotation);
         inSetRotation = false;
     }
 
-    inline float instantOpacity() const { return q->opacity(); }
+    inline float instantOpacity() const { return q_func()->opacity(); }
     inline void setInstantOpacity(float opacity)
     {
         inSetOpacity = true;
-        q->setOpacity(opacity);
+        q_func()->setOpacity(opacity);
         inSetOpacity = false;
     }
 
+private:
     ushort inSetGeometry : 1;
     ushort inSetScale : 1;
     ushort inSetRotation : 1;
@@ -75,6 +77,8 @@ public:
     QPropertyAnimation *scaleAnimation;
     QPropertyAnimation *rotationAnimation;
     QPropertyAnimation *opacityAnimation;
+
+    Q_DECLARE_PUBLIC(AnimatedWidget);
 };
 
 AnimatedWidgetPrivate::AnimatedWidgetPrivate()
@@ -96,6 +100,8 @@ AnimatedWidgetPrivate::~AnimatedWidgetPrivate()
 
 void AnimatedWidgetPrivate::init()
 {
+    Q_Q(AnimatedWidget);
+
     Qt::WindowFlags wFlags = Qt::Window | Qt::FramelessWindowHint;
     //wFlags |= Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint;
     q->setWindowFlags(wFlags);
@@ -107,7 +113,6 @@ void AnimatedWidgetPrivate::init()
 
     //q->setFiltersChildEvents(true); ### investigate
     q->setHandlesChildEvents(true);
-
 
     animationGroup = new QParallelAnimationGroup(q);
 
@@ -191,15 +196,16 @@ void AnimatedWidgetPrivate::drawRotationHelper(QPainter *painter, const QPointF 
 
 
 AnimatedWidget::AnimatedWidget(QGraphicsItem *parent)
-    : QGraphicsWidget(parent), d(new AnimatedWidgetPrivate)
+    : base_type(parent, new AnimatedWidgetPrivate())
 {
-    d->q = this;
+    Q_D(AnimatedWidget);
+
     d->init();
 }
 
 AnimatedWidget::~AnimatedWidget()
 {
-    delete d;
+    return;
 }
 
 bool AnimatedWidget::isInteractive() const
@@ -218,6 +224,8 @@ void AnimatedWidget::setInteractive(bool interactive)
 
 QAnimationGroup *AnimatedWidget::animationGroup() const
 {
+    Q_D(const AnimatedWidget);
+
     return d->animationGroup;
 }
 
@@ -226,7 +234,7 @@ QPainterPath AnimatedWidget::opaqueArea() const
     if (qFuzzyCompare(effectiveOpacity(), 1.0))
         return shape(); // optimization
 
-    return QGraphicsWidget::opaqueArea();
+    return base_type::opaqueArea();
 }
 
 void AnimatedWidget::setGeometry(const QRectF &rect)
@@ -234,7 +242,7 @@ void AnimatedWidget::setGeometry(const QRectF &rect)
     if ((flags() & ItemSendsGeometryChanges) == 0)
     {
         // resize and repositition, if needed
-        QGraphicsWidget::setGeometry(rect);
+        base_type::setGeometry(rect);
         return;
     }
 
@@ -246,7 +254,7 @@ void AnimatedWidget::setGeometry(const QRectF &rect)
         return;
 
     // resize and repositition
-    QGraphicsWidget::setGeometry(newGeom);
+    base_type::setGeometry(newGeom);
 
     // send post-notification
     itemChange(GraphicsItemChange(ItemSizeHasChanged), newSizeVariant);
@@ -254,13 +262,17 @@ void AnimatedWidget::setGeometry(const QRectF &rect)
 
 void AnimatedWidget::updateGeometry()
 {
+    Q_D(AnimatedWidget);
+
     d->inSetGeometry = true;
-    QGraphicsWidget::updateGeometry();
+    base_type::updateGeometry();
     d->inSetGeometry = false;
 }
 
 QVariant AnimatedWidget::itemChange(GraphicsItemChange change, const QVariant &value)
 {
+    Q_D(AnimatedWidget);
+
     switch (int(change))
     {
     case ItemFlagsChange:
@@ -372,18 +384,19 @@ QVariant AnimatedWidget::itemChange(GraphicsItemChange change, const QVariant &v
         break;
     }
 
-    return QGraphicsWidget::itemChange(change, value);
+    return base_type::itemChange(change, value);
 }
 
 bool AnimatedWidget::windowFrameEvent(QEvent *event)
 {
+#if 0
     if ((flags() & ItemIsPanel))
     {
         switch (event->type())
         {
         case QEvent::GraphicsSceneMousePress:
         case QEvent::GraphicsSceneMouseRelease:
-            return QGraphicsWidget::windowFrameEvent(event)
+            return base_type::windowFrameEvent(event)
                    && windowFrameSectionAt(static_cast<QGraphicsSceneMouseEvent *>(event)->pos()) != Qt::TitleBarArea;
 
         case QEvent::GraphicsSceneMouseMove:
@@ -398,36 +411,45 @@ bool AnimatedWidget::windowFrameEvent(QEvent *event)
             break;
         }
     }
+#endif
 
-    return QGraphicsWidget::windowFrameEvent(event);
+    return base_type::windowFrameEvent(event);
 }
 
 void AnimatedWidget::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    QGraphicsWidget::mousePressEvent(event);
+    base_type::mousePressEvent(event);
 
+#if 0
     if (event->button() == Qt::LeftButton && !isInteractive())
         event->accept();
+#endif
 }
 
 void AnimatedWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    QGraphicsWidget::mouseReleaseEvent(event);
+    base_type::mouseReleaseEvent(event);
 
+#if 0
     if (event->button() == Qt::LeftButton && !isInteractive())
     {
         event->accept();
         if ((event->screenPos() - event->buttonDownScreenPos(Qt::LeftButton)).manhattanLength() < QApplication::startDragDistance())
             QMetaObject::invokeMethod(this, "clicked", Qt::QueuedConnection);
     }
+#endif
 }
 
 void AnimatedWidget::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
+#if 1
+    base_type::mouseDoubleClickEvent(event);
+#else
     if (event->button() == Qt::LeftButton && !isInteractive())
         QMetaObject::invokeMethod(this, "doubleClicked", Qt::QueuedConnection);
     else
-        QGraphicsWidget::mouseDoubleClickEvent(event);
+        base_type::mouseDoubleClickEvent(event);
+#endif
 }
 
 void AnimatedWidget::wheelEvent(QGraphicsSceneWheelEvent *event)

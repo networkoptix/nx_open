@@ -29,7 +29,7 @@ public:
 
     /**
      * Note that the actual cell size may differ from the one returned by this
-     * function because of the items' size constraints.
+     * function because of the items' size constraints. 
      *
      * \returns                         Size of a single cell.
      */
@@ -46,29 +46,71 @@ public:
      */
     inline void setCellSize(qreal width, qreal height);
 
-    /**
-     * \returns                         Default cell spacing of this layout.
-     */
-    qreal spacing() const;
+#ifndef QN_NO_CELLLAYOUT_UNIFORM_SPACING
 
     /**
      * Sets the layout's default spacing, both vertical and horizontal, to spacing.
-     *
+     * 
      * \param spacing                   Spacing value.
      */
     void setSpacing(qreal spacing);
 
     /**
-     * \param item                      Item from this layout.
-     * \returns                         Alignment of the given item.
+     * \returns                         Layout spacing.
      */
-    Qt::Alignment alignment(QGraphicsLayoutItem *item) const;
+    qreal spacing() const;
+
+#else
+
+    /**
+     * Sets the layout's spacing.
+     * 
+     * \param spacing                   Spacing value.
+     */
+    void setSpacing(const QSizeF &spacing);
+
+    /**
+     * Sets the default vertical spacing for this layout.
+     *
+     * \param spacing                   Vertical spacing value.
+     */
+    void setVerticalSpacing(qreal spacing);
+
+    /**
+     * Sets the default horizontal spacing for this layout.
+     *
+     * \param spacing                   Horizontal spacing value.
+     */
+    void setHorizontalSpacing(qreal spacing);
+
+    /**
+     * \returns                         Layout spacing.
+     */
+    const QSizeF &spacing() const;
+
+    /**
+     * \returns                         Vertical spacing of this layout.
+     */
+    qreal verticalSpacing() const;
+    
+    /**
+     * \returns                         Horizontal spacing of this layout.
+     */
+    qreal horizontalSpacing() const;
+
+#endif
 
     /**
      * \param item                      Item from this layout.
      * \param alignment                 New alignment for the given item.
      */
     void setAlignment(QGraphicsLayoutItem *item, Qt::Alignment alignment);
+
+    /**
+     * \param item                      Item from this layout.
+     * \returns                         Alignment of the given item.
+     */
+    Qt::Alignment alignment(QGraphicsLayoutItem *item) const;
 
     /**
      * \returns                         Bounds of this cell layout, in cells.
@@ -114,7 +156,8 @@ public:
     /**
      * \param pos                       Position in parent coordinates to map to grid coordinates.
      * \returns                         Coordinate of the grid cell that the given
-     *                                  position belongs to.
+     *                                  position belongs to. If the position at spacing region is
+     *                                  given, returns coordinate of the closest grid cell.
      */
     QPoint mapToGrid(const QPointF &pos) const;
 
@@ -123,6 +166,30 @@ public:
      * \returns                         Position in parent coordinates of the top left corner of the grid cell.
      */
     QPointF mapFromGrid(const QPoint &gridPos) const;
+
+    /**
+     * \param size                      Size on parent coordinates.
+     * \returns                         Smallest size in grid cells that fits the given size.
+     */
+    QSize mapToGrid(const QSizeF &size) const;
+
+    /**
+     * \param gridSize                  Size in grid cells.
+     * \returns                         Corresponding size in parent coordinates.
+     */
+    QSizeF mapFromGrid(const QSize &gridSize) const;
+
+    /**
+     * \param rect                      Rectangle in parent coordinates to map to grid coordinates.
+     * \returns                         Smallest cell rectangle that fits the given rectangle.
+     */
+    QRect mapToGrid(const QRectF &rect) const;
+
+    /**
+     * \param gridRect                  Rectangle in grid cells.
+     * \returns                         Corresponding rectangle in parent coordinates.
+     */
+    QRectF mapFromGrid(const QRect &gridRect) const;
 
     /**
      * \param column
@@ -184,6 +251,12 @@ public:
      * \param item                      Item to remove from this cell layout.
      */
     void removeItem(QGraphicsLayoutItem *item);
+
+    /**
+     * \param item                      Item to move to a new position.
+     * \param rect                      New position.
+     */
+    void moveItem(QGraphicsLayoutItem *item, const QRect &rect);
 
 protected:
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint) const override;
