@@ -93,6 +93,7 @@ GraphicsView::GraphicsView(QWidget *parent)
         widget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true); // optimization
         widget->setFlag(QGraphicsItem::ItemIsSelectable, true);
         widget->setFlag(QGraphicsItem::ItemIsFocusable, true);
+        widget->setExtraFlag(GraphicsWidget::ItemIsResizable, true);
 //        widget->setFlag(QGraphicsItem::ItemIsFocusScope, true);
 //        widget->setFlag(QGraphicsItem::ItemIsPanel, false);
 //        widget->setFocusPolicy(Qt::TabFocus);

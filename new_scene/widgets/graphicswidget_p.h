@@ -1,5 +1,5 @@
-#ifndef NOTIFYINGWIDGET_PRIVATE_H
-#define NOTIFYINGWIDGET_PRIVATE_H
+#ifndef GRAPHICSWIDGET_PRIVATE_H
+#define GRAPHICSWIDGET_PRIVATE_H
 
 #include "graphicswidget.h"
 #include <cassert>
@@ -39,6 +39,8 @@ private:
     bool dragging;
     bool draggingStartedEmitted;
 
+    GraphicsWidget::GraphicsExtraFlags extraFlags;
+
 protected:
     GraphicsWidget *q_ptr;
 
@@ -46,4 +48,4 @@ private:
     Q_DECLARE_PUBLIC(GraphicsWidget);
 };
 
-#endif // NOTIFYINGWIDGET_PRIVATE_H
+#endif // GRAPHICSWIDGET_PRIVATE_H

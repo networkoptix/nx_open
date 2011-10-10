@@ -14,6 +14,33 @@ bool GraphicsWidgetPrivate::isDragGrip(Qt::WindowFrameSection section) const
     return section == Qt::TitleBarArea;
 }
 
+void GraphicsWidgetPrivate::draggingResizingFinished()
+{
+    Q_Q(GraphicsWidget);
+
+    if(resizing) 
+    {
+        resizing = false;
+
+        if(resizingStartedEmitted)
+        {
+            resizingStartedEmitted = false;
+            Q_EMIT q->resizingFinished();
+        }
+    }
+
+    if(dragging)
+    {
+        dragging = false;
+
+        if(draggingStartedEmitted)
+        {
+            draggingStartedEmitted = false;
+            Q_EMIT q->draggingFinished();
+        }
+    }
+}
+
 GraphicsWidget::GraphicsWidget(QGraphicsItem *parent):
     base_type(parent),
     d_ptr(new GraphicsWidgetPrivate(this))
@@ -29,6 +56,36 @@ GraphicsWidget::GraphicsWidget(QGraphicsItem *parent, GraphicsWidgetPrivate *dd)
 GraphicsWidget::~GraphicsWidget()
 {
     return;
+}
+
+GraphicsWidget::GraphicsExtraFlags GraphicsWidget::extraFlags() const
+{
+    return d_func()->extraFlags;
+}
+
+void GraphicsWidget::setExtraFlag(GraphicsExtraFlag flag, bool enabled)
+{
+    Q_D(GraphicsWidget);
+
+    if (enabled)
+        setExtraFlags(d->extraFlags | flag);
+    else
+        setExtraFlags(d->extraFlags & ~flag);
+}
+
+void GraphicsWidget::setExtraFlags(GraphicsExtraFlags flags)
+{
+    Q_D(GraphicsWidget);
+
+    if (d->extraFlags == flags)
+        return;
+
+    flags = GraphicsExtraFlags(itemChange(ItemExtraFlagsChange, quint32(flags)).toUInt());
+    if (d->extraFlags == flags)
+        return;
+
+    d->extraFlags = flags;
+    itemChange(ItemExtraFlagsHaveChanged, quint32(flags));
 }
 
 void GraphicsWidget::mousePressEvent(QGraphicsSceneMouseEvent *event) 
@@ -172,29 +229,14 @@ bool GraphicsWidget::windowFrameEvent(QEvent *event)
     return result;
 }
 
-void GraphicsWidgetPrivate::draggingResizingFinished()
+Qt::WindowFrameSection GraphicsWidget::windowFrameSectionAt(const QPointF &pos) const 
 {
-    Q_Q(GraphicsWidget);
+    Q_D(const GraphicsWidget);
 
-    if(resizing) 
-    {
-        resizing = false;
+    Qt::WindowFrameSection result = base_type::windowFrameSectionAt(pos);
+    
+    if(!(d->extraFlags & ItemIsResizable) && d->isResizeGrip(result))
+        return Qt::NoSection;
 
-        if(resizingStartedEmitted)
-        {
-            resizingStartedEmitted = false;
-            Q_EMIT q->resizingFinished();
-        }
-    }
-
-    if(dragging)
-    {
-        dragging = false;
-
-        if(draggingStartedEmitted)
-        {
-            draggingStartedEmitted = false;
-            Q_EMIT q->draggingFinished();
-        }
-    }
+    return result;
 }
