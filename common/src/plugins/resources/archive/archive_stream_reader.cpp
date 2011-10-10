@@ -709,8 +709,8 @@ begin_label:
         qint64 newTime = m_playbackMaskHelper.findTimeAtPlaybackMask(m_currentData->timestamp, !reverseMode);
         m_playbackMaskSync.unlock();
 
-        if (newTime == DATETIME_NOW) {
-            internalJumpTo(newTime); // seek to end. 
+        if (newTime == DATETIME_NOW || newTime == 0) {
+            internalJumpTo(newTime); // seek to end or BOF.
             return createEmptyPacket(reverseMode); // EOF reached
         }
 
