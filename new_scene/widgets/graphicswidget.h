@@ -8,18 +8,18 @@
 #undef override
 #define override
 
-class NotifyingWidgetPrivate;
+class GraphicsWidgetPrivate;
 
-class NotifyingWidget: public QGraphicsWidget
+class GraphicsWidget: public QGraphicsWidget
 {
     Q_OBJECT;
 
     typedef QGraphicsWidget base_type;
 
 public:
-    NotifyingWidget(QGraphicsItem *parent = NULL);
+    GraphicsWidget(QGraphicsItem *parent = NULL);
 
-    virtual ~NotifyingWidget();
+    virtual ~GraphicsWidget();
 
 signals:
     void clicked();
@@ -30,7 +30,7 @@ signals:
     void draggingFinished();
 
 protected:
-    NotifyingWidget(QGraphicsItem *parent, NotifyingWidgetPrivate *dd);
+    GraphicsWidget(QGraphicsItem *parent, GraphicsWidgetPrivate *dd);
 
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
@@ -39,10 +39,10 @@ protected:
     virtual bool windowFrameEvent(QEvent *event) override;
 
 protected:
-    QScopedPointer<NotifyingWidgetPrivate> d_ptr;
+    QScopedPointer<GraphicsWidgetPrivate> d_ptr;
 
 private:
-    Q_DECLARE_PRIVATE(NotifyingWidget);
+    Q_DECLARE_PRIVATE(GraphicsWidget);
 };
 
 #endif // NOTIFYINGWIDGET_H

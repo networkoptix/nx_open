@@ -4,9 +4,9 @@
 #include "graphicswidget.h"
 #include <cassert>
 
-class NotifyingWidgetPrivate {
+class GraphicsWidgetPrivate {
 public:
-    NotifyingWidgetPrivate(NotifyingWidget *qq):
+    GraphicsWidgetPrivate(GraphicsWidget *qq):
         q_ptr(qq),
         doubleClicked(false),
         resizing(false),
@@ -40,10 +40,10 @@ private:
     bool draggingStartedEmitted;
 
 protected:
-    NotifyingWidget *q_ptr;
+    GraphicsWidget *q_ptr;
 
 private:
-    Q_DECLARE_PUBLIC(NotifyingWidget);
+    Q_DECLARE_PUBLIC(GraphicsWidget);
 };
 
 #endif // NOTIFYINGWIDGET_PRIVATE_H

@@ -12,7 +12,7 @@
 
 #include "graphicswidget_p.h"
 
-class AnimatedWidgetPrivate: public NotifyingWidgetPrivate
+class AnimatedWidgetPrivate: public GraphicsWidgetPrivate
 {
 public:
     AnimatedWidgetPrivate(AnimatedWidget *qq);
@@ -82,7 +82,7 @@ private:
 };
 
 AnimatedWidgetPrivate::AnimatedWidgetPrivate(AnimatedWidget *qq)
-    : NotifyingWidgetPrivate(qq),
+    : GraphicsWidgetPrivate(qq),
       inSetGeometry(false), inSetScale(false), inSetRotation(false), inSetOpacity(false),
       childIsGrabberItem(false),
       animationGroup(0),

@@ -6,7 +6,7 @@
 class QAnimationGroup;
 
 class AnimatedWidgetPrivate;
-class AnimatedWidget : public NotifyingWidget
+class AnimatedWidget : public GraphicsWidget
 {
     Q_OBJECT
     Q_PRIVATE_PROPERTY(d_func(), QPointF instantPos READ instantPos WRITE setInstantPos DESIGNABLE false SCRIPTABLE false FINAL)
@@ -15,7 +15,7 @@ class AnimatedWidget : public NotifyingWidget
     Q_PRIVATE_PROPERTY(d_func(), float instantRotation READ instantRotation WRITE setInstantRotation DESIGNABLE false SCRIPTABLE false FINAL)
     Q_PRIVATE_PROPERTY(d_func(), float instantOpacity READ instantOpacity WRITE setInstantOpacity DESIGNABLE false SCRIPTABLE false FINAL)
 
-    typedef NotifyingWidget base_type;
+    typedef GraphicsWidget base_type;
 
 public:
     enum QGraphicsWidgetChange {
