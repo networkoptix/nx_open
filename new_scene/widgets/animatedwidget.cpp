@@ -15,7 +15,7 @@
 class AnimatedWidgetPrivate: public NotifyingWidgetPrivate
 {
 public:
-    AnimatedWidgetPrivate();
+    AnimatedWidgetPrivate(AnimatedWidget *qq);
     ~AnimatedWidgetPrivate();
 
 private:
@@ -81,8 +81,9 @@ private:
     Q_DECLARE_PUBLIC(AnimatedWidget);
 };
 
-AnimatedWidgetPrivate::AnimatedWidgetPrivate()
-    : inSetGeometry(false), inSetScale(false), inSetRotation(false), inSetOpacity(false),
+AnimatedWidgetPrivate::AnimatedWidgetPrivate(AnimatedWidget *qq)
+    : NotifyingWidgetPrivate(qq),
+      inSetGeometry(false), inSetScale(false), inSetRotation(false), inSetOpacity(false),
       childIsGrabberItem(false),
       animationGroup(0),
       posAnimation(0), sizeAnimation(0), scaleAnimation(0), rotationAnimation(0), opacityAnimation(0)
@@ -196,7 +197,7 @@ void AnimatedWidgetPrivate::drawRotationHelper(QPainter *painter, const QPointF 
 
 
 AnimatedWidget::AnimatedWidget(QGraphicsItem *parent)
-    : base_type(parent, new AnimatedWidgetPrivate())
+    : base_type(parent, new AnimatedWidgetPrivate(this))
 {
     Q_D(AnimatedWidget);
 

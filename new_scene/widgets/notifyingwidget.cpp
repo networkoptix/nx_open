@@ -1,5 +1,6 @@
 #include "notifyingwidget.h"
 #include "notifyingwidget_p.h"
+#include <cassert>
 #include <QApplication>
 #include <QGraphicsSceneMouseEvent>
 
@@ -15,13 +16,15 @@ bool NotifyingWidgetPrivate::isDragGrip(Qt::WindowFrameSection section) const
 
 NotifyingWidget::NotifyingWidget(QGraphicsItem *parent):
     base_type(parent),
-    PimplBase(new NotifyingWidgetPrivate())
+    d_ptr(new NotifyingWidgetPrivate(this))
 {}
 
 NotifyingWidget::NotifyingWidget(QGraphicsItem *parent, NotifyingWidgetPrivate *dd):
     base_type(parent),
-    PimplBase(dd)
-{}
+    d_ptr(dd)
+{
+    assert(dd != NULL);
+}
 
 NotifyingWidget::~NotifyingWidget()
 {

@@ -2,7 +2,7 @@
 #define NOTIFYINGWIDGET_H
 
 #include <QGraphicsWidget>
-#include "pimplbase.h"
+#include <QScopedPointer>
 
 /* A quick workaround. Remove this once we have a better solution. */
 #undef override
@@ -10,7 +10,7 @@
 
 class NotifyingWidgetPrivate;
 
-class NotifyingWidget: public QGraphicsWidget, protected PimplBase
+class NotifyingWidget: public QGraphicsWidget
 {
     Q_OBJECT;
 
@@ -38,7 +38,8 @@ protected:
     virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
     virtual bool windowFrameEvent(QEvent *event) override;
 
-    using PimplBase::d_ptr;
+protected:
+    QScopedPointer<NotifyingWidgetPrivate> d_ptr;
 
 private:
     Q_DECLARE_PRIVATE(NotifyingWidget);

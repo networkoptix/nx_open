@@ -1,18 +1,21 @@
-#ifndef NOTIFYINGWIDGET_P_H
-#define NOTIFYINGWIDGET_P_H
+#ifndef NOTIFYINGWIDGET_PRIVATE_H
+#define NOTIFYINGWIDGET_PRIVATE_H
 
-#include "pimplbase_p.h"
 #include "notifyingwidget.h"
+#include <cassert>
 
-class NotifyingWidgetPrivate: public PimplBasePrivate {
+class NotifyingWidgetPrivate {
 public:
-    NotifyingWidgetPrivate():
+    NotifyingWidgetPrivate(NotifyingWidget *qq):
+        q_ptr(qq),
         doubleClicked(false),
         resizing(false),
         resizingStartedEmitted(false),
         dragging(false),
         draggingStartedEmitted(false)
-    {}
+    {
+        assert(qq != NULL);
+    }
 
 private:
     /**
@@ -36,8 +39,11 @@ private:
     bool dragging;
     bool draggingStartedEmitted;
 
+protected:
+    NotifyingWidget *q_ptr;
+
 private:
     Q_DECLARE_PUBLIC(NotifyingWidget);
 };
 
-#endif // NOTIFYINGWIDGET_P_H
+#endif // NOTIFYINGWIDGET_PRIVATE_H
