@@ -21,12 +21,13 @@ struct ItemProperties {
 class CellLayoutPrivate
 {
 public:
-    CellLayoutPrivate():
+    CellLayoutPrivate(CellLayout *qq):
+        q_ptr(qq),
         cellSize(1.0, 1.0)
     {}
 
 protected:
-    CellLayout *q_ptr;
+    CellLayout *const q_ptr;
 
 private:
     void ensureBounds() const;
@@ -35,8 +36,10 @@ private:
 
     void clearRegion(const QRect &rect);
     void fillRection(const QRect &rect, QGraphicsLayoutItem *value);
-    bool isRegionFilledWith(const QRect &rect, QGraphicsLayoutItem *value0, QGraphicsLayoutItem *value1);
-    bool isRegionOccupied(const QRect &rect);
+    bool isRegionFilledWith(const QRect &rect, QGraphicsLayoutItem *value0, QGraphicsLayoutItem *value1) const;
+    bool isRegionOccupied(const QRect &rect) const;
+
+    void itemsAt(const QRect &rect, QSet<QGraphicsLayoutItem *> *items) const;
 
     /**
      * \param item                      Item to compute geometry for.

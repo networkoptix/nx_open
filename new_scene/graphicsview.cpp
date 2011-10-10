@@ -191,16 +191,31 @@ void GraphicsView::_draggingFinished() {
 
     // TODO: duplicate code.
 
-    AnimatedWidget *item = static_cast<AnimatedWidget *>(sender());
+    AnimatedWidget *draggedItem = static_cast<AnimatedWidget *>(sender());
     CellLayout *layout = static_cast<CellLayout *>(m_widget->layout());
 
-    QRect newRect = layout->mapToGrid(item->geometry());
+    QPoint delta = layout->mapToGrid(draggedItem->geometry()).topLeft() - layout->rect(draggedItem).topLeft();
     
-    QSet<QGraphicsLayoutItem *> items = layout->itemsAt(newRect);
-    items.remove(item);
+    QList<QGraphicsLayoutItem *> items;
+    foreach (QGraphicsItem *item, scene()->selectedItems())
+        if(QGraphicsLayoutItem *layoutItem = dynamic_cast<QGraphicsLayoutItem *>(item))
+            items.push_back(layoutItem);
 
-    if(items.empty())
-        layout->moveItem(item, newRect);
+    QList<QRect> rects;
+    foreach (QGraphicsLayoutItem *layoutItem, items)
+        rects.push_back(layout->rect(layoutItem).adjusted(delta.x(), delta.y(), delta.x(), delta.y()));
+
+    QList<QGraphicsLayoutItem *> replacedItems = layout->itemsAt(rects).subtract(items.toSet()).toList();
+    QList<QRect> replacedRects;
+    foreach (QGraphicsLayoutItem *layoutItem, replacedItems)
+        replacedRects.push_back(layout->rect(layoutItem).adjusted(-delta.x(), -delta.y(), -delta.x(), -delta.y()));
+
+    items.append(replacedItems);
+    rects.append(replacedRects);
+
+    scene()->clearSelection();
+    layout->moveItems(items, rects);
+    layout->activate();
 }
 
 

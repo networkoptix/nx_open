@@ -154,23 +154,23 @@ QRectF CellLayoutPrivate::constrainedGeometry(QGraphicsLayoutItem *item, const Q
 
 void CellLayoutPrivate::clearRegion(const QRect &rect)
 {
-    for(int r = rect.top(); r <= rect.bottom(); r++)
-        for(int c = rect.left(); c <= rect.right(); c++)
+    for (int r = rect.top(); r <= rect.bottom(); r++)
+        for (int c = rect.left(); c <= rect.right(); c++)
             itemByPoint.remove(QPoint(c, r));
 }
 
 void CellLayoutPrivate::fillRection(const QRect &rect, QGraphicsLayoutItem *value)
 {
-    for(int r = rect.top(); r <= rect.bottom(); r++) 
-        for(int c = rect.left(); c <= rect.right(); c++) 
+    for (int r = rect.top(); r <= rect.bottom(); r++) 
+        for (int c = rect.left(); c <= rect.right(); c++) 
             itemByPoint[QPoint(c, r)] = value;
 }
 
-bool CellLayoutPrivate::isRegionFilledWith(const QRect &rect, QGraphicsLayoutItem *value0, QGraphicsLayoutItem *value1)
+bool CellLayoutPrivate::isRegionFilledWith(const QRect &rect, QGraphicsLayoutItem *value0, QGraphicsLayoutItem *value1) const
 {
-    for(int r = rect.top(); r <= rect.bottom(); r++) 
+    for (int r = rect.top(); r <= rect.bottom(); r++) 
     {
-        for(int c = rect.left(); c <= rect.right(); c++) 
+        for (int c = rect.left(); c <= rect.right(); c++) 
         {
             QGraphicsLayoutItem *item = itemByPoint.value(QPoint(c, r), NULL);
             if(item != value0 && item != value1) 
@@ -181,17 +181,31 @@ bool CellLayoutPrivate::isRegionFilledWith(const QRect &rect, QGraphicsLayoutIte
     return true;
 }
 
-bool CellLayoutPrivate::isRegionOccupied(const QRect &rect)
+bool CellLayoutPrivate::isRegionOccupied(const QRect &rect) const
 {
     return !isRegionFilledWith(rect, NULL, NULL);
 }
 
+void CellLayoutPrivate::itemsAt(const QRect &rect, QSet<QGraphicsLayoutItem *> *items) const
+{
+    Q_Q(const CellLayout);
+
+    assert(items != NULL);
+
+    for (int r = rect.top(); r <= rect.bottom(); ++r)
+    {
+        for (int c = rect.left(); c <= rect.right(); ++c)
+        {
+            if (QGraphicsLayoutItem *item = q->itemAt(r, c))
+                items->insert(item);
+        }
+    }
+}
+
 CellLayout::CellLayout(QGraphicsLayoutItem *parent):
     QGraphicsLayout(parent),
-    d_ptr(new CellLayoutPrivate())
-{
-    d_ptr->q_ptr = this;
-}
+    d_ptr(new CellLayoutPrivate(this))
+{}
 
 CellLayout::~CellLayout()
 {
@@ -240,16 +254,23 @@ QGraphicsLayoutItem *CellLayout::itemAt(const QPoint &cell) const
 
 QSet<QGraphicsLayoutItem *> CellLayout::itemsAt(const QRect &rect) const
 {
+    Q_D(const CellLayout);
+
     QSet<QGraphicsLayoutItem *> result;
 
-    for (int r = rect.top(); r <= rect.bottom(); ++r)
-    {
-        for (int c = rect.left(); c <= rect.right(); ++c)
-        {
-            if (QGraphicsLayoutItem *item = itemAt(r, c))
-                result.insert(item);
-        }
-    }
+    d->itemsAt(rect, &result);
+
+    return result;
+}
+
+QSet<QGraphicsLayoutItem *> CellLayout::itemsAt(const QList<QRect> &rects) const
+{
+    Q_D(const CellLayout);
+
+    QSet<QGraphicsLayoutItem *> result;
+
+    foreach (const QRect &rect, rects)
+        d->itemsAt(rect, &result);
 
     return result;
 }
@@ -369,35 +390,97 @@ void CellLayout::removeItem(QGraphicsLayoutItem *item)
     invalidate();
 }
 
-void CellLayout::moveItem(QGraphicsLayoutItem *item, const QRect &rect)
+bool CellLayout::moveItem(QGraphicsLayoutItem *item, const QRect &rect)
 {
     Q_D(CellLayout);
 
-    const QHash<QGraphicsLayoutItem *, ItemProperties>::iterator pos = d->propertiesByItem.find(item);
-    if(pos == d->propertiesByItem.end())
+    const QHash<QGraphicsLayoutItem *, ItemProperties>::iterator it = d->propertiesByItem.find(item);
+    if (it == d->propertiesByItem.end())
     {
         qWarning("CellLayout::moveItem: given item does not belong to this cell layout.");
-        return;
+        return false;
     }
 
-    if(!d->isRegionFilledWith(rect, NULL, item))
-    {
-        qWarning("CellLayout::moveItem: given region is already occupied.");
-        return;
-    }
+    if (!d->isRegionFilledWith(rect, NULL, item))
+        return false;
 
-    d->clearRegion(pos->rect);
+    d->clearRegion(it->rect);
     d->fillRection(rect, item);
-    pos->rect = rect;
+    it->rect = rect;
 
     invalidate();
+}
+
+bool CellLayout::moveItems(const QList<QGraphicsLayoutItem *> &items, const QList<QRect> &rects)
+{
+    Q_D(CellLayout);
+
+    if (items.size() != rects.size())
+    {
+        qWarning("CellLayout::moveItems: sizes of the given containers do not match.");
+        return false;
+    }
+
+    if(items.empty())
+        return true;
+
+    /* Check whether it's our items. */
+    foreach (QGraphicsLayoutItem *item, items) 
+    {
+        if (!d->propertiesByItem.contains(item))
+        {
+            qWarning("CellLayout::moveItems: one of the given items does not belong to this cell layout.");
+            return false;
+        }
+    }
+
+    /* Check whether new positions do not intersect each other. */
+    QSet<QPoint> pointSet;
+    foreach (const QRect &rect, rects)
+    {
+        for (int r = rect.top(); r <= rect.bottom(); r++) 
+        {
+            for (int c = rect.left(); c <= rect.right(); c++) 
+            {
+                QPoint point(c, r);
+
+                if (pointSet.contains(point))
+                    return false;
+
+                pointSet.insert(point);
+            }
+        }
+    }
+
+    /* Check validity of new positions relative to existing items. */
+    QSet<QGraphicsLayoutItem *> replacedItems = itemsAt(rects);
+    foreach (QGraphicsLayoutItem *item, items)
+        replacedItems.remove(item);
+    if(!replacedItems.empty())
+        return false;
+
+    /* Move. */
+    foreach(QGraphicsLayoutItem *item, items)
+        d->clearRegion(d->propertiesByItem[item].rect);
+    for(int i = 0; i < items.size(); i++)
+    {
+        QGraphicsLayoutItem *item = items[i];
+        ItemProperties &properties = d->propertiesByItem[item];
+
+        properties.rect = rects[i];
+        d->fillRection(rects[i], item);
+    }
+
+    invalidate();
+
+    return true;
 }
 
 QSizeF CellLayout::sizeHint(Qt::SizeHint which, const QSizeF &/*constraint*/) const
 {
     Q_D(const CellLayout);
 
-    switch(which) {
+    switch (which) {
     case Qt::MinimumSize:
     case Qt::PreferredSize:
     case Qt::MaximumSize: {
@@ -497,7 +580,7 @@ Qt::Alignment CellLayout::alignment(QGraphicsLayoutItem *item) const
     Q_D(const CellLayout);
 
     const QHash<QGraphicsLayoutItem *, ItemProperties>::const_iterator it = d->propertiesByItem.find(item);
-    if(it == d->propertiesByItem.end())
+    if (it == d->propertiesByItem.end())
         return 0;
 
     return it->alignment;

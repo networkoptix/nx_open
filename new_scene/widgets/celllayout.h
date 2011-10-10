@@ -211,6 +211,12 @@ public:
     QSet<QGraphicsLayoutItem *> itemsAt(const QRect &rect) const;
 
     /**
+     * \param rects                     Several rectangular areas to examine for items, in cells.
+     * \returns                         Set of items in the given areas.
+     */
+    QSet<QGraphicsLayoutItem *> itemsAt(const QList<QRect> &rects) const;
+
+    /**
      * \param item                      Layout item.
      * \returns                         Cell region occupied by the given item in this layout, or empty region if none.
      */
@@ -255,14 +261,22 @@ public:
     /**
      * \param item                      Item to move to a new position.
      * \param rect                      New position.
+     * \returns                         Whether the item was moved.
      */
-    void moveItem(QGraphicsLayoutItem *item, const QRect &rect);
+    bool moveItem(QGraphicsLayoutItem *item, const QRect &rect);
+
+    /**
+     * \param item                      Items to move to new positions.
+     * \param rect                      New positions.
+     * \returns                         Whether the items were moved.
+     */
+    bool moveItems(const QList<QGraphicsLayoutItem *> &items, const QList<QRect> &rects);
 
 protected:
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint) const override;
 
 protected:
-    QScopedPointer<CellLayoutPrivate> d_ptr;
+    const QScopedPointer<CellLayoutPrivate> d_ptr;
 
 private:
     Q_DECLARE_PRIVATE(CellLayout);
