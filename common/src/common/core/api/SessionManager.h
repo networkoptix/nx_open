@@ -5,6 +5,7 @@
 #include <QList>
 #include <QMap>
 #include <QNetworkAccessManager>
+#include <QSharedPointer>
 
 #include "generated/resourceTypes.h"
 #include "generated/resources.h"
@@ -31,26 +32,36 @@ class SessionManager : public QObject
 public:
     SessionManager(const QString& host, const QString& login, const QString& password);
 
+#if 0
     void openEventChannel();
     void closeEventChannel();
+#endif
 
     RequestId getResourceTypes();
-    RequestId getCameras();
-    RequestId getLayouts();
-    RequestId getServers();
+
+#if 0
     RequestId getResources(bool tree);
+
+    RequestId getServers();
+    RequestId getLayouts();
+    RequestId getCameras();
 
     RequestId addServer(const ::xsd::api::servers::server&);
     RequestId addLayout(const ::xsd::api::layouts::layout&);
     RequestId addCamera(const ::xsd::api::cameras::camera&, const QString& serverId);
+#endif
 
 Q_SIGNALS:
-    void eventsReceived(QnApiEventResponsePtr events);
-    void camerasReceived(RequestId requestId, QnApiCameraResponsePtr cameras);
+    void resourceTypesReceived(RequestId requestId, QnApiResourceTypeResponsePtr resourceTypes);
+
+#if 0
+    void resourcesReceived(RequestId requestId, QnApiResourceResponsePtr resources);
+
     void serversReceived(RequestId requestId, QnApiServerResponsePtr servers);
     void layoutsReceived(RequestId requestId, QnApiLayoutResponsePtr servers);
-    void resourceTypesReceived(RequestId requestId, QnApiResourceTypeResponsePtr resourceTypes);
-    void resourcesReceived(RequestId requestId, QnApiResourceResponsePtr resources);
+    void camerasReceived(RequestId requestId, QnApiCameraResponsePtr cameras);
+
+    void eventsReceived(QnApiEventResponsePtr events);
 
     void eventOccured(QString data);
 
@@ -58,6 +69,8 @@ Q_SIGNALS:
 
 private:
     RequestId addObject(const Object& object, const QString& additionalArgs = "");
+#endif
+private:
     RequestId getObjectList(QString objectName, bool tree);
 
 private slots:

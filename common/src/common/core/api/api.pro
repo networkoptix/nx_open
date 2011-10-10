@@ -9,7 +9,8 @@ CONFIG   -= app_bundle
 TEMPLATE = app
 
 SOURCES += SessionManager.cpp Objects.cpp Main.cpp
-HEADERS += SessionManager.h Objects.h Main.h
+HEADERS += SessionManager.h Objects.h Main.h \
+    AppServerConnection.h
 
 QMAKE_CXXFLAGS += -I/Users/ivan/opt/include -I/Users/ivan/sdk/xerces-c-3.1.1-x86-macosx-gcc-4.0/include
 LIBS += -L/Users/ivan/sdk/xerces-c-3.1.1-x86-macosx-gcc-4.0/lib -lxerces-c
@@ -23,3 +24,4 @@ xsd.commands = xsd cxx-tree --output-dir generated --cxx-suffix .cpp --hxx-suffi
 xsd.CONFIG += target_predeps
 xsd.variable_out = GENERATED_SOURCES
 QMAKE_EXTRA_COMPILERS += xsd
+

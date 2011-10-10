@@ -25,7 +25,7 @@
   <xs:element name="parentIDs">
     <xs:complexType>
       <xs:sequence>
-        <xs:element name="parentID" type="xs:integer"/>
+        <xs:element name="parentIDPEN" type="xs:integer" maxOccurs="unbounded"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>

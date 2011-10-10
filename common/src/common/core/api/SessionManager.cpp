@@ -104,6 +104,7 @@ SessionManager::SessionManager(const QString& host, const QString& login, const 
                               SLOT(slotRequestFinished(QNetworkReply *)));
 }
 
+#if 0
 void SessionManager::openEventChannel()
 {
     m_needEvents = true;
@@ -190,15 +191,18 @@ void readObjectList(QNetworkReply *reply, QList<T*>* objects)
     QString nodeName = node.nodeName();
     readObjectList(node, objects);
 }
+#endif
 
 void SessionManager::slotRequestFinished(QNetworkReply *reply)
 {
     qDebug("slotRequestFinished");
 
-    if (reply->error() > 0) {
+    if (reply->error() > 0)
+    {
         qDebug() << reply->errorString();
     }
-    else {
+    else
+    {
         QString objectName;
         if (m_requestObjectMap.contains(reply))
         {
@@ -208,6 +212,23 @@ void SessionManager::slotRequestFinished(QNetworkReply *reply)
 
         QStdIStream is(reply);
 
+        if (objectName == "resourceType")
+        {
+            typedef xsd::api::resourceTypes::resourceTypes_t T;
+            QSharedPointer<T> result;
+
+            try
+            {
+                result = QSharedPointer<T>(xsd::api::resourceTypes::resourceTypes (is, xml_schema::flags::dont_validate).release());
+            } catch (const xml_schema::exception& e)
+            {
+                qDebug(e.what());
+            }
+
+            emit resourceTypesReceived((RequestId)reply, result);
+        }
+
+#if 0
         if (objectName == "event")
         {
             if (m_needEvents)
@@ -243,20 +264,6 @@ void SessionManager::slotRequestFinished(QNetworkReply *reply)
             }
 
             emit camerasReceived((RequestId)reply, result);
-        } else if (objectName == "resourceType")
-        {
-            typedef xsd::api::resourceTypes::resourceTypes_t T;
-            QSharedPointer<T> result;
-
-            try
-            {
-                result = QSharedPointer<T>(xsd::api::resourceTypes::resourceTypes (is, xml_schema::flags::dont_validate).release());
-            } catch (const xml_schema::exception& e)
-            {
-                qDebug(e.what());
-            }
-
-            emit resourceTypesReceived((RequestId)reply, result);
         } else if (objectName == "server")
         {
             typedef xsd::api::servers::servers_t T;
@@ -300,6 +307,7 @@ void SessionManager::slotRequestFinished(QNetworkReply *reply)
 
             emit resourcesReceived((RequestId)reply, result);
         }
+#endif
     }
 }
 
@@ -331,6 +339,7 @@ RequestId SessionManager::getObjectList(QString objectName, bool tree)
     return (RequestId) reply;
 }
 
+#if 0
 RequestId SessionManager::addObject(const Object& object, const QString& additionalArgs)
 {
     QUrl url;
@@ -353,12 +362,14 @@ RequestId SessionManager::addObject(const Object& object, const QString& additio
 
     return (RequestId) reply;
 }
+#endif
 
 RequestId SessionManager::getResourceTypes()
 {
     return getObjectList("resourceType", false);
 }
 
+#if 0
 RequestId SessionManager::getCameras()
 {
     return getObjectList("camera", false);
@@ -395,3 +406,5 @@ RequestId SessionManager::addCamera(const Camera& camera, const QString& serverI
 
     return addObject(camera, additionalArgs);
 }
+
+#endif

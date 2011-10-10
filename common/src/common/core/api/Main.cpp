@@ -38,11 +38,13 @@ Client::Client(const QString& host, const QString& login, const QString& passwor
     m_serverId = readServerId();
 
     connect(&sm, SIGNAL(resourceTypesReceived(RequestId, QnApiResourceTypeResponsePtr)), this, SLOT(resourceTypesReceived(RequestId, QnApiResourceTypeResponsePtr)));
+#if 0
     connect(&sm, SIGNAL(camerasReceived(RequestId, QnApiCameraResponsePtr)), this, SLOT(camerasReceived(RequestId, QnApiCameraResponsePtr)));
     connect(&sm, SIGNAL(serversReceived(RequestId, QnApiServerResponsePtr)), this, SLOT(serversReceived(RequestId, QnApiServerResponsePtr)));
     connect(&sm, SIGNAL(layoutsReceived(RequestId, QnApiLayoutResponsePtr)), this, SLOT(layoutsReceived(RequestId, QnApiLayoutResponsePtr)));
     connect(&sm, SIGNAL(resourcesReceived(RequestId, QnApiResourceResponsePtr)), this, SLOT(resourcesReceived(RequestId, QnApiResourceResponsePtr)));
     connect(&sm, SIGNAL(eventsReceived(QnApiEventResponsePtr)), this, SLOT(eventsReceived(QnApiEventResponsePtr)));
+#endif
 }
 
 Client::~Client()
@@ -194,7 +196,7 @@ void Client::nextStep()
 
     case GOT_RESOURCE_TYPES:
         return;
-
+#if 0
         if (!m_serverId.isEmpty())
         {
             m_state = GOT_SERVER_ID;
@@ -235,6 +237,7 @@ void Client::nextStep()
 
         addCameraRequestId = sm.addCamera(camera, m_serverId);
         break;
+#endif
     }
 }
 
