@@ -1,53 +1,59 @@
-#ifndef GRAPHICSWIDGET_PRIVATE_H
-#define GRAPHICSWIDGET_PRIVATE_H
+#ifndef GRAPHICSWIDGET_P_H
+#define GRAPHICSWIDGET_P_H
 
 #include "graphicswidget.h"
-#include <cassert>
 
-class GraphicsWidgetPrivate {
+class GraphicsWidgetPrivate
+{
+    Q_DECLARE_PUBLIC(GraphicsWidget)
+
 public:
-    GraphicsWidgetPrivate(GraphicsWidget *qq):
-        q_ptr(qq),
+    GraphicsWidgetPrivate() :
+        q_ptr(0),
         doubleClicked(false),
         resizing(false),
         resizingStartedEmitted(false),
         moving(false),
         movingStartedEmitted(false),
-        preDragging(false)
-    {
-        assert(qq != NULL);
-    }
+        preDragging(false),
+        isUnderMouse(false)
+    {}
+    virtual ~GraphicsWidgetPrivate()
+    {}
 
-private:
+protected:
     /**
      * \param section                   Window frame section.
      * \returns                         Whether the given section can be used as a grip for resizing a window.
      */
-    bool isResizeGrip(Qt::WindowFrameSection section) const;
+    bool GraphicsWidgetPrivate::isResizeGrip(Qt::WindowFrameSection section) const
+    { return section != Qt::NoSection && section != Qt::TitleBarArea; }
 
     /**
      * \param section                   Window frame section.
-     * \returns                         Whether the given section can be used as a grip for dragging a window.
+     * \returns                         Whether the given section can be used as a grip for moving a window.
      */
-    bool isMoveGrip(Qt::WindowFrameSection section) const;
+    inline bool GraphicsWidgetPrivate::isMoveGrip(Qt::WindowFrameSection section) const
+    { return section == Qt::TitleBarArea; }
 
     void movingResizingFinished();
-
-private:
-    bool doubleClicked;
-    bool resizing;
-    bool resizingStartedEmitted;
-    bool moving;
-    bool movingStartedEmitted;
-    bool preDragging;
-
-    GraphicsWidget::GraphicsExtraFlags extraFlags;
 
 protected:
     GraphicsWidget *q_ptr;
 
-private:
-    Q_DECLARE_PUBLIC(GraphicsWidget);
+    // packed 32 bit
+    uint doubleClicked : 1;
+    uint resizing : 1;
+    uint resizingStartedEmitted : 1;
+    uint moving : 1;
+    uint movingStartedEmitted : 1;
+    uint preDragging : 1;
+    // QTBUG-18797: When setting the flag ItemIgnoresTransformations for an item,
+    // it will receive mouse events as if it was transformed by the view.
+    uint isUnderMouse : 1;
+    uint reserved : 26;
+
+    GraphicsWidget::GraphicsExtraFlags extraFlags;
 };
 
-#endif // GRAPHICSWIDGET_PRIVATE_H
+#endif // GRAPHICSWIDGET_P_H

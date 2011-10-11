@@ -1,8 +1,9 @@
 #ifndef GRAPHICSWIDGET_H
 #define GRAPHICSWIDGET_H
 
-#include <QGraphicsWidget>
-#include <QScopedPointer>
+#include <QtCore/QScopedPointer>
+
+#include <QtGui/QGraphicsWidget>
 
 /* A quick workaround. Remove this once we have a better solution. */
 #undef override
@@ -12,26 +13,31 @@ class GraphicsWidgetPrivate;
 
 class GraphicsWidget: public QGraphicsWidget
 {
-    Q_OBJECT;
-
-    typedef QGraphicsWidget base_type;
+    Q_OBJECT
 
 public:
     /**
      * Constructor.
-     * 
+     *
      * \param parent                    Parent item for this graphics widget.
      */
     GraphicsWidget(QGraphicsItem *parent = NULL);
+
+    /**
+     * Virtual destructor.
+     */
+    virtual ~GraphicsWidget();
 
     enum GraphicsExtraFlag {
         ItemIsResizable = 0x1,          /**< Whether this item is resizable. */
         ItemIsDraggable = 0x2,          /**< Whether this item is draggable. */
     };
-    Q_DECLARE_FLAGS(GraphicsExtraFlags, GraphicsExtraFlag);
+    Q_DECLARE_FLAGS(GraphicsExtraFlags, GraphicsExtraFlag)
 
-    static const GraphicsItemChange ItemExtraFlagsChange      = static_cast<GraphicsItemChange>(64);
-    static const GraphicsItemChange ItemExtraFlagsHaveChanged = static_cast<GraphicsItemChange>(65);
+    static const GraphicsItemChange ItemSizeChange = static_cast<GraphicsItemChange>(ItemPositionChange + 127);
+    static const GraphicsItemChange ItemSizeHasChanged = static_cast<GraphicsItemChange>(ItemPositionChange + 128);
+    static const GraphicsItemChange ItemExtraFlagsChange = static_cast<GraphicsItemChange>(ItemPositionChange + 129);
+    static const GraphicsItemChange ItemExtraFlagsHasChanged = static_cast<GraphicsItemChange>(ItemPositionChange + 130);
 
     /**
      * \returns                         Flags for this widget.
@@ -49,12 +55,7 @@ public:
      */
     void setExtraFlags(GraphicsExtraFlags flags);
 
-    /**
-     * Virtual destructor.
-     */
-    virtual ~GraphicsWidget();
-
-signals:
+Q_SIGNALS:
     void clicked();
     void doubleClicked();
     void resizingStarted();
@@ -63,17 +64,21 @@ signals:
     void movingFinished();
 
 protected:
-    GraphicsWidget(QGraphicsItem *parent, GraphicsWidgetPrivate *dd);
+    GraphicsWidget(QGraphicsItem *parent, GraphicsWidgetPrivate &dd);
 
-    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
-    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
-    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
-    virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
-    virtual bool windowFrameEvent(QEvent *event) override;
+    void initStyleOption(QStyleOption *option) const;
+
+    bool event(QEvent *event) override;
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
+    bool windowFrameEvent(QEvent *event) override;
 
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
+    Qt::WindowFrameSection windowFrameSectionAt(const QPointF &pos) const override;
 
-    virtual Qt::WindowFrameSection windowFrameSectionAt(const QPointF &pos) const override;
+protected:
     Qt::WindowFrameSection filterWindowFrameSection(Qt::WindowFrameSection section) const;
 
     virtual QDrag *createDrag(QGraphicsSceneMouseEvent *event);
@@ -86,9 +91,10 @@ protected:
     QScopedPointer<GraphicsWidgetPrivate> d_ptr;
 
 private:
-    Q_DECLARE_PRIVATE(GraphicsWidget);
+    Q_DECLARE_PRIVATE(GraphicsWidget)
+    Q_DISABLE_COPY(GraphicsWidget)
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(GraphicsWidget::GraphicsExtraFlags);
+Q_DECLARE_OPERATORS_FOR_FLAGS(GraphicsWidget::GraphicsExtraFlags)
 
 #endif // GRAPHICSWIDGET_H
