@@ -14,8 +14,10 @@
 
 class AnimatedWidgetPrivate: public GraphicsWidgetPrivate
 {
+    Q_DECLARE_PUBLIC(AnimatedWidget)
+
 public:
-    AnimatedWidgetPrivate(AnimatedWidget *qq);
+    AnimatedWidgetPrivate();
     ~AnimatedWidgetPrivate();
 
 private:
@@ -77,12 +79,10 @@ private:
     QPropertyAnimation *scaleAnimation;
     QPropertyAnimation *rotationAnimation;
     QPropertyAnimation *opacityAnimation;
-
-    Q_DECLARE_PUBLIC(AnimatedWidget);
 };
 
-AnimatedWidgetPrivate::AnimatedWidgetPrivate(AnimatedWidget *qq)
-    : GraphicsWidgetPrivate(qq),
+AnimatedWidgetPrivate::AnimatedWidgetPrivate()
+    : GraphicsWidgetPrivate(),
       inSetGeometry(false), inSetScale(false), inSetRotation(false), inSetOpacity(false),
       childIsGrabberItem(false),
       animationGroup(0),
@@ -197,7 +197,7 @@ void AnimatedWidgetPrivate::drawRotationHelper(QPainter *painter, const QPointF 
 
 
 AnimatedWidget::AnimatedWidget(QGraphicsItem *parent)
-    : base_type(parent, new AnimatedWidgetPrivate(this))
+    : base_type(parent, *new AnimatedWidgetPrivate)
 {
     Q_D(AnimatedWidget);
 
@@ -206,7 +206,6 @@ AnimatedWidget::AnimatedWidget(QGraphicsItem *parent)
 
 AnimatedWidget::~AnimatedWidget()
 {
-    return;
 }
 
 bool AnimatedWidget::isInteractive() const
@@ -248,7 +247,7 @@ void AnimatedWidget::setGeometry(const QRectF &rect)
     }
 
     // notify the item that the size is changing
-    const QVariant newSizeVariant(itemChange(GraphicsItemChange(ItemSizeChange), rect.size()));
+    const QVariant newSizeVariant(itemChange(ItemSizeChange, rect.size()));
     const QSizeF newSize = newSizeVariant.toSizeF();
     const QRectF newGeom = QRectF(rect.topLeft(), newSize);
     if (newGeom == geometry())
@@ -258,7 +257,7 @@ void AnimatedWidget::setGeometry(const QRectF &rect)
     base_type::setGeometry(newGeom);
 
     // send post-notification
-    itemChange(GraphicsItemChange(ItemSizeHasChanged), newSizeVariant);
+    itemChange(ItemSizeHasChanged, newSizeVariant);
 }
 
 void AnimatedWidget::updateGeometry()
@@ -274,7 +273,7 @@ QVariant AnimatedWidget::itemChange(GraphicsItemChange change, const QVariant &v
 {
     Q_D(AnimatedWidget);
 
-    switch (int(change))
+    switch (change)
     {
     case ItemFlagsChange:
         return (value.toUInt() | ItemSendsGeometryChanges | ItemUsesExtendedStyleOption)/* & ~ItemIsPanel*/;

@@ -1,39 +1,30 @@
 #include "graphicswidget.h"
 #include "graphicswidget_p.h"
-#include <cassert>
-#include <QApplication>
-#include <QGraphicsSceneMouseEvent>
 
-bool GraphicsWidgetPrivate::isResizeGrip(Qt::WindowFrameSection section) const
-{
-    return section != Qt::NoSection && section != Qt::TitleBarArea;
-}
-
-bool GraphicsWidgetPrivate::isDragGrip(Qt::WindowFrameSection section) const 
-{
-    return section == Qt::TitleBarArea;
-}
+#include <QtGui/QApplication>
+#include <QtGui/QGraphicsSceneEvent>
+#include <QtGui/QStyleOption>
 
 void GraphicsWidgetPrivate::draggingResizingFinished()
 {
     Q_Q(GraphicsWidget);
 
-    if(resizing) 
+    if (resizing)
     {
         resizing = false;
 
-        if(resizingStartedEmitted)
+        if (resizingStartedEmitted)
         {
             resizingStartedEmitted = false;
             Q_EMIT q->resizingFinished();
         }
     }
 
-    if(dragging)
+    if (dragging)
     {
         dragging = false;
 
-        if(draggingStartedEmitted)
+        if (draggingStartedEmitted)
         {
             draggingStartedEmitted = false;
             Q_EMIT q->draggingFinished();
@@ -41,21 +32,22 @@ void GraphicsWidgetPrivate::draggingResizingFinished()
     }
 }
 
-GraphicsWidget::GraphicsWidget(QGraphicsItem *parent):
-    base_type(parent),
-    d_ptr(new GraphicsWidgetPrivate(this))
-{}
 
-GraphicsWidget::GraphicsWidget(QGraphicsItem *parent, GraphicsWidgetPrivate *dd):
-    base_type(parent),
-    d_ptr(dd)
+GraphicsWidget::GraphicsWidget(QGraphicsItem *parent):
+    QGraphicsWidget(parent),
+    d_ptr(new GraphicsWidgetPrivate)
 {
-    assert(dd != NULL);
+    d_ptr->q_ptr = this;
+}
+
+GraphicsWidget::GraphicsWidget(QGraphicsItem *parent, GraphicsWidgetPrivate &dd):
+    QGraphicsWidget(parent), d_ptr(&dd)
+{
+    d_ptr->q_ptr = this;
 }
 
 GraphicsWidget::~GraphicsWidget()
 {
-    return;
 }
 
 GraphicsWidget::GraphicsExtraFlags GraphicsWidget::extraFlags() const
@@ -77,59 +69,92 @@ void GraphicsWidget::setExtraFlags(GraphicsExtraFlags flags)
 {
     Q_D(GraphicsWidget);
 
-    if (d->extraFlags == flags)
-        return;
-
     flags = GraphicsExtraFlags(itemChange(ItemExtraFlagsChange, quint32(flags)).toUInt());
     if (d->extraFlags == flags)
         return;
 
     d->extraFlags = flags;
-    itemChange(ItemExtraFlagsHaveChanged, quint32(flags));
+    itemChange(ItemExtraFlagsHasChanged, quint32(flags));
 }
 
-void GraphicsWidget::mousePressEvent(QGraphicsSceneMouseEvent *event) 
+/*!
+    \reimp
+*/
+void GraphicsWidget::initStyleOption(QStyleOption *option) const
+{
+    Q_D(const GraphicsWidget);
+
+    QGraphicsWidget::initStyleOption(option);
+    // QTBUG-18797: When setting the flag ItemIgnoresTransformations for an item,
+    // it will receive mouse events as if it was transformed by the view.
+    if (d->isUnderMouse)
+        option->state |= QStyle::State_MouseOver;
+}
+
+/*!
+    \reimp
+*/
+bool GraphicsWidget::event(QEvent *event)
 {
     Q_D(GraphicsWidget);
 
-    base_type::mousePressEvent(event);
+    switch (event->type()) {
+    case QEvent::GraphicsSceneHoverEnter:
+        d->isUnderMouse = true;
+        break;
+    case QEvent::GraphicsSceneHoverLeave:
+        d->isUnderMouse = false;
+        break;
 
-    if((flags() & ItemIsMovable) && event->button() == Qt::LeftButton) 
+    default:
+        break;
+    }
+
+    return QGraphicsWidget::event(event);
+}
+
+void GraphicsWidget::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    Q_D(GraphicsWidget);
+
+    QGraphicsWidget::mousePressEvent(event);
+
+    if ((flags() & ItemIsMovable) && event->button() == Qt::LeftButton)
         d->dragging = true;
 
     /* This event must be accepted in order to receive the corresponding mouse release event. */
     event->accept();
 }
 
-void GraphicsWidget::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) 
+void GraphicsWidget::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     Q_D(GraphicsWidget);
 
     /* This will call mousePressEvent. */
-    base_type::mouseDoubleClickEvent(event);
+    QGraphicsWidget::mouseDoubleClickEvent(event);
 
-    if(event->button() == Qt::LeftButton)
+    if (event->button() == Qt::LeftButton)
         d->doubleClicked = true;
 }
 
-void GraphicsWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *event) 
+void GraphicsWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     Q_D(GraphicsWidget);
 
-    if(d->dragging && !d->draggingStartedEmitted)
+    if (d->dragging && !d->draggingStartedEmitted)
     {
         Q_EMIT draggingStarted();
         d->draggingStartedEmitted = true;
     }
 
-    base_type::mouseMoveEvent(event);
+    QGraphicsWidget::mouseMoveEvent(event);
 }
 
-void GraphicsWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) 
+void GraphicsWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     Q_D(GraphicsWidget);
 
-    base_type::mouseReleaseEvent(event);
+    QGraphicsWidget::mouseReleaseEvent(event);
 
     if (event->button() == Qt::LeftButton)
     {
@@ -137,44 +162,37 @@ void GraphicsWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
         if ((event->screenPos() - event->buttonDownScreenPos(Qt::LeftButton)).manhattanLength() < QApplication::startDragDistance())
         {
-            if(d->doubleClicked)
-            {
+            if (d->doubleClicked)
                 Q_EMIT doubleClicked();
-            }
             else
-            {
                 Q_EMIT clicked();
-            }
         }
 
         d->doubleClicked = false;
     }
 }
 
-bool GraphicsWidget::windowFrameEvent(QEvent *event) 
+bool GraphicsWidget::windowFrameEvent(QEvent *event)
 {
     Q_D(GraphicsWidget);
 
     /* Note that default implementation of windowFrameEvent returns false for
      * mouse release events if the mouse is located outside the item's boundaries.
-     * 
+     *
      * Therefore we cannot leave early based on the return value of windowFrameEvent. */
-    bool result = false; 
+    bool result = false;
 
     switch(event->type()) {
-    case QEvent::GraphicsSceneMousePress: 
+    case QEvent::GraphicsSceneMousePress:
     {
-        result = base_type::windowFrameEvent(event);
+        result = QGraphicsWidget::windowFrameEvent(event);
         QGraphicsSceneMouseEvent *e = static_cast<QGraphicsSceneMouseEvent *>(event);
-
         if(e->button() == Qt::LeftButton)
         {
             Qt::WindowFrameSection section = windowFrameSectionAt(e->pos());
-
-            if(d->isResizeGrip(section))
+            if (d->isResizeGrip(section))
                 d->resizing = true;
-            
-            if(d->isDragGrip(section))
+            if (d->isDragGrip(section))
                 d->dragging = true;
         }
 
@@ -182,27 +200,26 @@ bool GraphicsWidget::windowFrameEvent(QEvent *event)
     }
     case QEvent::GraphicsSceneMouseMove:
     {
-        if(d->resizing && !d->resizingStartedEmitted) 
+        if (d->resizing && !d->resizingStartedEmitted)
         {
             Q_EMIT resizingStarted();
             d->resizingStartedEmitted = true;
         }
 
-        if(d->dragging && !d->draggingStartedEmitted)
+        if (d->dragging && !d->draggingStartedEmitted)
         {
             Q_EMIT draggingStarted();
             d->draggingStartedEmitted = true;
         }
 
-        result = base_type::windowFrameEvent(event);
+        result = QGraphicsWidget::windowFrameEvent(event);
         break;
     }
-    case QEvent::GraphicsSceneMouseRelease: 
+    case QEvent::GraphicsSceneMouseRelease:
     {
-        result = base_type::windowFrameEvent(event);
+        result = QGraphicsWidget::windowFrameEvent(event);
         QGraphicsSceneMouseEvent *e = static_cast<QGraphicsSceneMouseEvent *>(event);
-
-        if(e->button() == Qt::LeftButton) {
+        if (e->button() == Qt::LeftButton) {
             if(!d->draggingStartedEmitted && !d->resizingStartedEmitted)
                 Q_EMIT clicked();
 
@@ -213,29 +230,28 @@ bool GraphicsWidget::windowFrameEvent(QEvent *event)
     }
     case QEvent::GraphicsSceneHoverLeave:
     {
-        result = base_type::windowFrameEvent(event);
+        result = QGraphicsWidget::windowFrameEvent(event);
 
-        /* In some cases we won't receive release event for left button, 
+        /* In some cases we won't receive release event for left button,
          * but we still need to emit the signals. */
         d->draggingResizingFinished();
 
         break;
     }
     default:
-        result = base_type::windowFrameEvent(event);
+        result = QGraphicsWidget::windowFrameEvent(event);
         break;
     }
 
     return result;
 }
 
-Qt::WindowFrameSection GraphicsWidget::windowFrameSectionAt(const QPointF &pos) const 
+Qt::WindowFrameSection GraphicsWidget::windowFrameSectionAt(const QPointF &pos) const
 {
     Q_D(const GraphicsWidget);
 
-    Qt::WindowFrameSection result = base_type::windowFrameSectionAt(pos);
-    
-    if(!(d->extraFlags & ItemIsResizable) && d->isResizeGrip(result))
+    Qt::WindowFrameSection result = QGraphicsWidget::windowFrameSectionAt(pos);
+    if (!(d->extraFlags & ItemIsResizable) && d->isResizeGrip(result))
         return Qt::NoSection;
 
     return result;

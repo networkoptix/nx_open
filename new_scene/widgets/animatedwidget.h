@@ -18,11 +18,6 @@ class AnimatedWidget : public GraphicsWidget
     typedef GraphicsWidget base_type;
 
 public:
-    enum QGraphicsWidgetChange {
-        ItemSizeChange = ItemPositionChange + 127,
-        ItemSizeHasChanged
-    };
-
     AnimatedWidget(QGraphicsItem *parent = 0);
     ~AnimatedWidget();
 
@@ -47,7 +42,8 @@ protected:
     void wheelEvent(QGraphicsSceneWheelEvent *event);
 
 private:
-    Q_DECLARE_PRIVATE(AnimatedWidget);
+    Q_DECLARE_PRIVATE(AnimatedWidget)
+    Q_DISABLE_COPY(AnimatedWidget)
 };
 
 #endif // ANIMATEDWIDGET_H
