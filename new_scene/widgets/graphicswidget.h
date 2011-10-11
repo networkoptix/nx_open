@@ -26,11 +26,12 @@ public:
 
     enum GraphicsExtraFlag {
         ItemIsResizable = 0x1,          /**< Whether this item is resizable. */
+        ItemIsDraggable = 0x2,          /**< Whether this item is draggable. */
     };
     Q_DECLARE_FLAGS(GraphicsExtraFlags, GraphicsExtraFlag);
 
-    static const GraphicsItemChange ItemExtraFlagsChange = static_cast<GraphicsItemChange>(128);
-    static const GraphicsItemChange ItemExtraFlagsHaveChanged = static_cast<GraphicsItemChange>(129);
+    static const GraphicsItemChange ItemExtraFlagsChange      = static_cast<GraphicsItemChange>(64);
+    static const GraphicsItemChange ItemExtraFlagsHaveChanged = static_cast<GraphicsItemChange>(65);
 
     /**
      * \returns                         Flags for this widget.
@@ -58,8 +59,8 @@ signals:
     void doubleClicked();
     void resizingStarted();
     void resizingFinished();
-    void draggingStarted();
-    void draggingFinished();
+    void movingStarted();
+    void movingFinished();
 
 protected:
     GraphicsWidget(QGraphicsItem *parent, GraphicsWidgetPrivate *dd);
@@ -70,7 +71,16 @@ protected:
     virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
     virtual bool windowFrameEvent(QEvent *event) override;
 
+    virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
+
     virtual Qt::WindowFrameSection windowFrameSectionAt(const QPointF &pos) const override;
+    Qt::WindowFrameSection filterWindowFrameSection(Qt::WindowFrameSection section) const;
+
+    virtual QDrag *createDrag(QGraphicsSceneMouseEvent *event);
+    virtual void startDrag(QDrag *drag);
+
+private:
+    void drag(QGraphicsSceneMouseEvent *event);
 
 protected:
     QScopedPointer<GraphicsWidgetPrivate> d_ptr;

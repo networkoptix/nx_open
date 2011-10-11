@@ -94,6 +94,7 @@ GraphicsView::GraphicsView(QWidget *parent)
         widget->setFlag(QGraphicsItem::ItemIsSelectable, true);
         widget->setFlag(QGraphicsItem::ItemIsFocusable, true);
         widget->setExtraFlag(GraphicsWidget::ItemIsResizable, true);
+        widget->setExtraFlag(GraphicsWidget::ItemIsDraggable, true);
 //        widget->setFlag(QGraphicsItem::ItemIsFocusScope, true);
 //        widget->setFlag(QGraphicsItem::ItemIsPanel, false);
 //        widget->setFocusPolicy(Qt::TabFocus);
@@ -116,8 +117,8 @@ GraphicsView::GraphicsView(QWidget *parent)
         connect(widget, SIGNAL(doubleClicked()), this, SLOT(_doubleClicked()));
         connect(widget, SIGNAL(resizingStarted()), this, SLOT(_resizingStarted()));
         connect(widget, SIGNAL(resizingFinished()), this, SLOT(_resizingFinished()));
-        connect(widget, SIGNAL(draggingStarted()), this, SLOT(_draggingStarted()));
-        connect(widget, SIGNAL(draggingFinished()), this, SLOT(_draggingFinished()));
+        connect(widget, SIGNAL(movingStarted()), this, SLOT(_draggingStarted()));
+        connect(widget, SIGNAL(movingFinished()), this, SLOT(_draggingFinished()));
 
         m_animatedWidgets.append(widget);
     }

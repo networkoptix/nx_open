@@ -3,18 +3,148 @@
 #include <cassert>
 #include <QApplication>
 #include <QGraphicsSceneMouseEvent>
+#include <QGraphicsScene>
+
+namespace {
+    class DragStore: public QObject {
+    public:
+        DragStore(QObject *parent = NULL): 
+            QObject(parent),
+            m_draggedWidget(NULL)
+        {}
+        
+        static DragStore *dragStoreOf(QObject *object)
+        {
+            assert(object != NULL);
+
+            static const char *const name = "_qn_dragStore";
+
+            DragStore *dragStore = static_cast<DragStore *>(object->findChild<QObject *>(QLatin1String(name)));
+            if(dragStore != NULL)
+                return dragStore;
+
+            dragStore = new DragStore(object);
+            dragStore->setObjectName(QLatin1String(name));
+            return dragStore;
+        }
+
+        void setCurrentDraggedWidget(GraphicsWidget *widget)
+        {
+            m_draggedWidget = widget;
+        }
+
+        GraphicsWidget *currentDraggedWidget() const 
+        {
+            return m_draggedWidget;
+        }
+
+    private:
+        GraphicsWidget *m_draggedWidget;
+    };
+
+
+    class DragFilter: public QObject {
+    public:
+        DragFilter(QObject *parent = NULL):
+            QObject(parent)
+        {}
+
+        static const char *tokenPropertyName() 
+        {
+            return "_qn_dragToken";
+        }
+
+        static QLatin1String tokenMimeType()
+        {
+            return QLatin1String("application/x-qn-graphics-widget-token");
+        }
+
+        static void ensureInstalledAt(QObject *object)
+        {
+            if(object == NULL)
+                return;
+
+            static const char *const name = "_qn_dragFilter";
+
+            DragFilter *dragFilter = static_cast<DragFilter *>(object->findChild<QObject *>(QLatin1String(name)));
+            if(dragFilter != NULL)
+                return;
+
+            dragFilter = new DragFilter(object);
+            dragFilter->setObjectName(QLatin1String(name));
+            object->installEventFilter(dragFilter);
+            return;
+        }
+
+        virtual bool eventFilter(QObject *watched, QEvent *event)
+        {
+            switch(event->type()) 
+            {
+            case QEvent::GraphicsSceneDragEnter:
+                return dragEnterEvent(watched, static_cast<QGraphicsSceneDragDropEvent *>(event));
+            case QEvent::GraphicsSceneDragMove:
+                return dragMoveEvent(watched, static_cast<QGraphicsSceneDragDropEvent *>(event));
+            case QEvent::GraphicsSceneDragLeave:
+                return dragLeaveEvent(watched, static_cast<QGraphicsSceneDragDropEvent *>(event));
+            case QEvent::GraphicsSceneDrop:
+                return dropEvent(watched, static_cast<QGraphicsSceneDragDropEvent *>(event));
+            default:
+                return false;
+            }
+        }
+
+    private:
+        bool dragEnterEvent(QObject *watched, QGraphicsSceneDragDropEvent *event)
+        {
+            DragStore *dragStore = DragStore::dragStoreOf(watched);
+            if(dragStore == NULL)
+                return false;
+
+            GraphicsWidget *widget = dragStore->currentDraggedWidget();
+            if(widget == NULL)
+                return false;
+
+            if(!event->mimeData()->hasFormat(tokenMimeType()))
+                return false;
+
+            QByteArray token = event->mimeData()->data(tokenMimeType());
+            if(token != widget->property(tokenPropertyName()).toByteArray())
+                return false;
+            
+            event->accept();
+            return true;
+        }
+
+        bool dragMoveEvent(QObject *watched, QGraphicsSceneDragDropEvent *event)
+        {
+            return false;
+        }
+
+        bool dragLeaveEvent(QObject *watched, QGraphicsSceneDragDropEvent *event)
+        {
+            return false;
+        }
+
+        bool dropEvent(QObject *watched, QGraphicsSceneDragDropEvent *event)
+        {
+            return false;
+        }
+    };
+
+
+} // anonymous namespace
 
 bool GraphicsWidgetPrivate::isResizeGrip(Qt::WindowFrameSection section) const
 {
     return section != Qt::NoSection && section != Qt::TitleBarArea;
 }
 
-bool GraphicsWidgetPrivate::isDragGrip(Qt::WindowFrameSection section) const 
+bool GraphicsWidgetPrivate::isMoveGrip(Qt::WindowFrameSection section) const 
 {
     return section == Qt::TitleBarArea;
 }
 
-void GraphicsWidgetPrivate::draggingResizingFinished()
+void GraphicsWidgetPrivate::movingResizingFinished()
 {
     Q_Q(GraphicsWidget);
 
@@ -29,14 +159,14 @@ void GraphicsWidgetPrivate::draggingResizingFinished()
         }
     }
 
-    if(dragging)
+    if(moving)
     {
-        dragging = false;
+        moving = false;
 
-        if(draggingStartedEmitted)
+        if(movingStartedEmitted)
         {
-            draggingStartedEmitted = false;
-            Q_EMIT q->draggingFinished();
+            movingStartedEmitted = false;
+            Q_EMIT q->movingFinished();
         }
     }
 }
@@ -94,8 +224,11 @@ void GraphicsWidget::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
     base_type::mousePressEvent(event);
 
-    if((flags() & ItemIsMovable) && event->button() == Qt::LeftButton) 
-        d->dragging = true;
+    if ((flags() & ItemIsMovable) && !(extraFlags() && ItemIsDraggable) && event->button() == Qt::LeftButton) 
+        d->moving = true; 
+
+    if ((extraFlags() & ItemIsDraggable) && event->button() == Qt::LeftButton)
+        d->preDragging = true;
 
     /* This event must be accepted in order to receive the corresponding mouse release event. */
     event->accept();
@@ -108,7 +241,7 @@ void GraphicsWidget::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     /* This will call mousePressEvent. */
     base_type::mouseDoubleClickEvent(event);
 
-    if(event->button() == Qt::LeftButton)
+    if (event->button() == Qt::LeftButton)
         d->doubleClicked = true;
 }
 
@@ -116,10 +249,21 @@ void GraphicsWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     Q_D(GraphicsWidget);
 
-    if(d->dragging && !d->draggingStartedEmitted)
+    if (d->preDragging)
     {
-        Q_EMIT draggingStarted();
-        d->draggingStartedEmitted = true;
+        if ((event->screenPos() - event->buttonDownScreenPos(Qt::LeftButton)).manhattanLength() > QApplication::startDragDistance())
+        {
+            d->preDragging = false;
+            drag(event);
+        }
+
+        return;
+    }
+
+    if(d->moving && !d->movingStartedEmitted)
+    {
+        Q_EMIT movingStarted();
+        d->movingStartedEmitted = true;
     }
 
     base_type::mouseMoveEvent(event);
@@ -133,7 +277,7 @@ void GraphicsWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
     if (event->button() == Qt::LeftButton)
     {
-        d->draggingResizingFinished();
+        d->movingResizingFinished();
 
         if ((event->screenPos() - event->buttonDownScreenPos(Qt::LeftButton)).manhattanLength() < QApplication::startDragDistance())
         {
@@ -174,24 +318,36 @@ bool GraphicsWidget::windowFrameEvent(QEvent *event)
             if(d->isResizeGrip(section))
                 d->resizing = true;
             
-            if(d->isDragGrip(section))
-                d->dragging = true;
+            if(d->isMoveGrip(section))
+            {
+                if(extraFlags() & ItemIsDraggable)
+                {
+                    d->preDragging = true;
+                }
+                else 
+                {
+                    d->moving = true;
+                }
+            }
         }
 
         break;
     }
     case QEvent::GraphicsSceneMouseMove:
     {
+        if(d->preDragging)
+            return false;
+
         if(d->resizing && !d->resizingStartedEmitted) 
         {
             Q_EMIT resizingStarted();
             d->resizingStartedEmitted = true;
         }
 
-        if(d->dragging && !d->draggingStartedEmitted)
+        if(d->moving && !d->movingStartedEmitted)
         {
-            Q_EMIT draggingStarted();
-            d->draggingStartedEmitted = true;
+            Q_EMIT movingStarted();
+            d->movingStartedEmitted = true;
         }
 
         result = base_type::windowFrameEvent(event);
@@ -203,10 +359,10 @@ bool GraphicsWidget::windowFrameEvent(QEvent *event)
         QGraphicsSceneMouseEvent *e = static_cast<QGraphicsSceneMouseEvent *>(event);
 
         if(e->button() == Qt::LeftButton) {
-            if(!d->draggingStartedEmitted && !d->resizingStartedEmitted)
+            if(!d->movingStartedEmitted && !d->resizingStartedEmitted)
                 Q_EMIT clicked();
 
-            d->draggingResizingFinished();
+            d->movingResizingFinished();
         }
 
         break;
@@ -217,7 +373,7 @@ bool GraphicsWidget::windowFrameEvent(QEvent *event)
 
         /* In some cases we won't receive release event for left button, 
          * but we still need to emit the signals. */
-        d->draggingResizingFinished();
+        d->movingResizingFinished();
 
         break;
     }
@@ -229,14 +385,63 @@ bool GraphicsWidget::windowFrameEvent(QEvent *event)
     return result;
 }
 
+QVariant GraphicsWidget::itemChange(GraphicsItemChange change, const QVariant &value) 
+{
+    Q_UNUSED(value);
+
+    if(change == ItemSceneHasChanged)
+        DragFilter::ensureInstalledAt(scene());
+
+    return value;
+}
+
 Qt::WindowFrameSection GraphicsWidget::windowFrameSectionAt(const QPointF &pos) const 
+{
+    return filterWindowFrameSection(base_type::windowFrameSectionAt(pos));
+}
+
+Qt::WindowFrameSection GraphicsWidget::filterWindowFrameSection(Qt::WindowFrameSection section) const
 {
     Q_D(const GraphicsWidget);
 
-    Qt::WindowFrameSection result = base_type::windowFrameSectionAt(pos);
-    
-    if(!(d->extraFlags & ItemIsResizable) && d->isResizeGrip(result))
+    if(!(extraFlags() & ItemIsResizable) && d->isResizeGrip(section))
         return Qt::NoSection;
 
-    return result;
+    if(!(flags() & ItemIsMovable) && d->isMoveGrip(section))
+        return Qt::NoSection;
+
+    return section;
 }
+
+QDrag *GraphicsWidget::createDrag(QGraphicsSceneMouseEvent *event)
+{
+    QDrag *drag = new QDrag(event->widget());
+    
+    QMimeData *mimeData = new QMimeData();
+    drag->setMimeData(mimeData);
+
+    return drag;
+}
+
+void GraphicsWidget::startDrag(QDrag *drag)
+{
+    drag->exec();
+}
+
+void GraphicsWidget::drag(QGraphicsSceneMouseEvent *event)
+{
+    QByteArray token = QString::number(qrand()).toLatin1();
+    setProperty(DragFilter::tokenPropertyName(), token);
+
+    DragStore *dragStore = DragStore::dragStoreOf(scene());
+    dragStore->setCurrentDraggedWidget(this);
+
+    QDrag *drag = createDrag(event);
+    if(drag->mimeData() != NULL)
+        drag->mimeData()->setData(DragFilter::tokenMimeType(), token);
+    startDrag(drag);
+
+    dragStore->setCurrentDraggedWidget(NULL);
+    setProperty(DragFilter::tokenPropertyName(), QVariant());
+}
+
