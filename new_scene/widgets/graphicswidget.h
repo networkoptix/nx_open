@@ -82,7 +82,8 @@ protected:
     Qt::WindowFrameSection filterWindowFrameSection(Qt::WindowFrameSection section) const;
 
     virtual QDrag *createDrag(QGraphicsSceneMouseEvent *event);
-    virtual void startDrag(QDrag *drag);
+    virtual Qt::DropAction startDrag(QDrag *drag);
+    virtual void endDrag(Qt::DropAction dropAction);
 
 private:
     void drag(QGraphicsSceneMouseEvent *event);

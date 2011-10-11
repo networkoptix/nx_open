@@ -94,7 +94,7 @@ GraphicsView::GraphicsView(QWidget *parent)
         widget->setFlag(QGraphicsItem::ItemIsSelectable, true);
         widget->setFlag(QGraphicsItem::ItemIsFocusable, true);
         widget->setExtraFlag(GraphicsWidget::ItemIsResizable, true);
-        //widget->setExtraFlag(GraphicsWidget::ItemIsDraggable, true);
+        widget->setExtraFlag(GraphicsWidget::ItemIsDraggable, true);
 //        widget->setFlag(QGraphicsItem::ItemIsFocusScope, true);
 //        widget->setFlag(QGraphicsItem::ItemIsPanel, false);
 //        widget->setFocusPolicy(Qt::TabFocus);
@@ -186,6 +186,10 @@ void GraphicsView::_resizingFinished() {
 
 void GraphicsView::_draggingStarted() {
     qDebug() << "draggingStarted";
+
+    AnimatedWidget *draggedItem = static_cast<AnimatedWidget *>(sender());
+
+    
 }
 
 void GraphicsView::_draggingFinished() {

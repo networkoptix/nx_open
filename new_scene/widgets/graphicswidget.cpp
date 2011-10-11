@@ -7,75 +7,37 @@
 #include <QtGui/QStyleOption>
 
 namespace {
-    class DragStore: public QObject {
-    public:
-        DragStore(QObject *parent = NULL): 
-            QObject(parent),
-            m_draggedWidget(NULL)
-        {}
-        
-        static DragStore *dragStoreOf(QObject *object)
-        {
-            if(object == NULL)
-                return NULL;
-
-            static const char *const name = "_qn_dragStore";
-
-            DragStore *dragStore = static_cast<DragStore *>(object->findChild<QObject *>(QLatin1String(name)));
-            if(dragStore != NULL)
-                return dragStore;
-
-            dragStore = new DragStore(object);
-            dragStore->setObjectName(QLatin1String(name));
-            return dragStore;
-        }
-
-        void setCurrentDraggedWidget(GraphicsWidget *widget)
-        {
-            m_draggedWidget = widget;
-        }
-
-        GraphicsWidget *currentDraggedWidget() const 
-        {
-            return m_draggedWidget;
-        }
-
-    private:
-        GraphicsWidget *m_draggedWidget;
-    };
-
 
     class DragFilter: public QObject {
     public:
-        DragFilter(QObject *parent = NULL):
-            QObject(parent)
-        {}
-
-        static const char *tokenPropertyName() 
+        DragFilter(QGraphicsScene *scene):
+            QObject(scene)
         {
-            return "_qn_dragToken";
-        }
-
-        static QLatin1String tokenMimeType()
-        {
-            return QLatin1String("application/x-qn-graphics-widget-token");
-        }
-
-        static void ensureInstalledAt(QObject *object)
-        {
-            if(object == NULL)
+            if(scene == NULL)
                 return;
 
-            static const char *const name = "_qn_dragFilter";
+            setObjectName(staticObjectName());
+            scene->installEventFilter(this);
+        }
 
-            DragFilter *dragFilter = static_cast<DragFilter *>(object->findChild<QObject *>(QLatin1String(name)));
-            if(dragFilter != NULL)
+        static void ensureInstalledAt(QGraphicsScene *scene)
+        {
+            if(scene == NULL)
                 return;
 
-            dragFilter = new DragFilter(object);
-            dragFilter->setObjectName(QLatin1String(name));
-            object->installEventFilter(dragFilter);
+            if(scene->findChild<QObject *>(staticObjectName()) != NULL)
+                return;
+
+            new DragFilter(scene);
             return;
+        }
+
+        static DragFilter *dragFilterOf(QGraphicsScene *scene)
+        {
+            if(scene == NULL)
+                return NULL;
+
+            return static_cast<DragFilter *>(scene->findChild<QObject *>(staticObjectName()));
         }
 
         virtual bool eventFilter(QObject *watched, QEvent *event)
@@ -95,42 +57,110 @@ namespace {
             }
         }
 
+        void startDrag(GraphicsWidget *draggerWidget, const QList<QGraphicsItem *> &draggedItems, const QPointF &buttonDownScenePos)
+        {
+            m_draggerWidget = draggerWidget;
+            m_draggedItems = draggedItems;
+            m_initialScenePos = m_lastScenePos = buttonDownScenePos;
+            m_droppedOnSelf = false;
+        }
+
+        void endDrag()
+        {
+            m_draggerWidget = NULL;
+            m_draggedItems.clear();
+        }
+
+        bool droppedOnSelf() const 
+        {
+            return m_droppedOnSelf;
+        }
+
+        QPointF totalDelta() const 
+        {
+            return m_lastScenePos - m_initialScenePos;
+        }
+
     private:
+        static QLatin1String staticObjectName() 
+        {
+            return QLatin1String("_qn_dragFilter");
+        }
+
         bool dragEnterEvent(QObject *watched, QGraphicsSceneDragDropEvent *event)
         {
-            DragStore *dragStore = DragStore::dragStoreOf(watched);
-            if(dragStore == NULL)
+            if(!inLocalDrag())
                 return false;
 
-            GraphicsWidget *widget = dragStore->currentDraggedWidget();
-            if(widget == NULL)
-                return false;
+            event->setProposedAction(Qt::MoveAction);
+            event->acceptProposedAction();
 
-            if(!event->mimeData()->hasFormat(tokenMimeType()))
-                return false;
+            moveItems(event);
 
-            QByteArray token = event->mimeData()->data(tokenMimeType());
-            if(token != widget->property(tokenPropertyName()).toByteArray())
-                return false;
-            
-            event->accept();
             return true;
         }
 
         bool dragMoveEvent(QObject *watched, QGraphicsSceneDragDropEvent *event)
         {
-            return false;
+            if(!inLocalDrag())
+                return false;
+
+            event->setProposedAction(Qt::MoveAction);
+            event->acceptProposedAction();
+
+            moveItems(event);
+
+            return true;
         }
 
         bool dragLeaveEvent(QObject *watched, QGraphicsSceneDragDropEvent *event)
         {
-            return false;
+            if(!inLocalDrag())
+                return false;
+
+            event->setProposedAction(Qt::MoveAction);
+            event->acceptProposedAction();
+
+            moveItems(event);
+
+            return true;
         }
 
         bool dropEvent(QObject *watched, QGraphicsSceneDragDropEvent *event)
         {
-            return false;
+            if(!inLocalDrag())
+                return false;
+
+            event->setProposedAction(Qt::MoveAction);
+            event->acceptProposedAction();
+
+            moveItems(event);
+            m_droppedOnSelf = true;
+
+            return true;
         }
+
+        void moveItems(QGraphicsSceneDragDropEvent *event)
+        {
+            QPointF delta = event->scenePos() - m_lastScenePos;
+
+            foreach(QGraphicsItem *item, m_draggedItems)
+                item->moveBy(delta.x(), delta.y());
+
+            m_lastScenePos = event->scenePos();
+        }
+
+        bool inLocalDrag() const 
+        {
+            return m_draggerWidget != NULL;
+        }
+
+    private:
+        GraphicsWidget *m_draggerWidget;
+        QList<QGraphicsItem *> m_draggedItems;
+        QPointF m_lastScenePos;
+        QPointF m_initialScenePos;
+        bool m_droppedOnSelf;
     };
 
 
@@ -444,25 +474,55 @@ QDrag *GraphicsWidget::createDrag(QGraphicsSceneMouseEvent *event)
     return drag;
 }
 
-void GraphicsWidget::startDrag(QDrag *drag)
+Qt::DropAction GraphicsWidget::startDrag(QDrag *drag)
 {
-    drag->exec();
+    return drag->exec();
+}
+
+void GraphicsWidget::endDrag(Qt::DropAction dropAction)
+{
+    if(dropAction == Qt::MoveAction)
+    {
+        foreach(QGraphicsItem *item, scene()->selectedItems())
+        {
+            if(item == this)
+                continue;
+            
+            delete item;
+        }
+
+        this->deleteLater();
+    } 
 }
 
 void GraphicsWidget::drag(QGraphicsSceneMouseEvent *event)
 {
-    QByteArray token = QString::number(qrand()).toLatin1();
-    setProperty(DragFilter::tokenPropertyName(), token);
+    DragFilter *dragFilter = DragFilter::dragFilterOf(scene());
 
-    DragStore *dragStore = DragStore::dragStoreOf(scene());
-    dragStore->setCurrentDraggedWidget(this);
+    QList<QGraphicsItem *> draggedItems = scene()->selectedItems();
+    if(!draggedItems.contains(this))
+        draggedItems.push_back(this);
+
+    dragFilter->startDrag(this, draggedItems, event->buttonDownScenePos(Qt::LeftButton));
+    
+    Q_EMIT movingStarted();
 
     QDrag *drag = createDrag(event);
-    if(drag->mimeData() != NULL)
-        drag->mimeData()->setData(DragFilter::tokenMimeType(), token);
-    startDrag(drag);
+    Qt::DropAction dropAction = startDrag(drag);
+    if(dragFilter->droppedOnSelf()) 
+    {
+        dropAction = Qt::IgnoreAction;
+    }
+    else if(dropAction != Qt::MoveAction)
+    {
+        QPointF delta = -dragFilter->totalDelta();
+        foreach(QGraphicsItem *item, draggedItems)
+            item->moveBy(delta.x(), delta.y());
+    }
 
-    dragStore->setCurrentDraggedWidget(NULL);
-    setProperty(DragFilter::tokenPropertyName(), QVariant());
+    Q_EMIT movingFinished();
+
+    endDrag(dropAction);
+    dragFilter->endDrag();
 }
 
