@@ -224,7 +224,7 @@ void GraphicsWidget::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
     base_type::mousePressEvent(event);
 
-    if ((flags() & ItemIsMovable) && !(extraFlags() && ItemIsDraggable) && event->button() == Qt::LeftButton) 
+    if ((flags() & ItemIsMovable) && !(extraFlags() & ItemIsDraggable) && event->button() == Qt::LeftButton) 
         d->moving = true; 
 
     if ((extraFlags() & ItemIsDraggable) && event->button() == Qt::LeftButton)
@@ -387,12 +387,10 @@ bool GraphicsWidget::windowFrameEvent(QEvent *event)
 
 QVariant GraphicsWidget::itemChange(GraphicsItemChange change, const QVariant &value) 
 {
-    Q_UNUSED(value);
-
     if(change == ItemSceneHasChanged)
         DragFilter::ensureInstalledAt(scene());
 
-    return value;
+    return base_type::itemChange(change, value);
 }
 
 Qt::WindowFrameSection GraphicsWidget::windowFrameSectionAt(const QPointF &pos) const 

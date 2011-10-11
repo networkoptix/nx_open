@@ -94,7 +94,7 @@ GraphicsView::GraphicsView(QWidget *parent)
         widget->setFlag(QGraphicsItem::ItemIsSelectable, true);
         widget->setFlag(QGraphicsItem::ItemIsFocusable, true);
         widget->setExtraFlag(GraphicsWidget::ItemIsResizable, true);
-        widget->setExtraFlag(GraphicsWidget::ItemIsDraggable, true);
+        //widget->setExtraFlag(GraphicsWidget::ItemIsDraggable, true);
 //        widget->setFlag(QGraphicsItem::ItemIsFocusScope, true);
 //        widget->setFlag(QGraphicsItem::ItemIsPanel, false);
 //        widget->setFocusPolicy(Qt::TabFocus);
@@ -197,7 +197,7 @@ void GraphicsView::_draggingFinished() {
     CellLayout *layout = static_cast<CellLayout *>(m_widget->layout());
 
     QPoint delta = layout->mapToGrid(draggedItem->geometry()).topLeft() - layout->rect(draggedItem).topLeft();
-    
+
     QList<QGraphicsLayoutItem *> items;
     foreach (QGraphicsItem *item, scene()->selectedItems())
         if(QGraphicsLayoutItem *layoutItem = dynamic_cast<QGraphicsLayoutItem *>(item))
