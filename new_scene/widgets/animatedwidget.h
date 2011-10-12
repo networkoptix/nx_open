@@ -9,13 +9,13 @@ class AnimatedWidgetPrivate;
 class AnimatedWidget : public GraphicsWidget
 {
     Q_OBJECT
+    Q_PROPERTY(bool interactive READ isInteractive WRITE setInteractive FINAL)
+    Q_PROPERTY(bool animationsEnabled READ isAnimationsEnabled WRITE setAnimationsEnabled FINAL)
     Q_PRIVATE_PROPERTY(d_func(), QPointF instantPos READ instantPos WRITE setInstantPos DESIGNABLE false SCRIPTABLE false FINAL)
     Q_PRIVATE_PROPERTY(d_func(), QSizeF instantSize READ instantSize WRITE setInstantSize DESIGNABLE false SCRIPTABLE false FINAL)
     Q_PRIVATE_PROPERTY(d_func(), float instantScale READ instantScale WRITE setInstantScale DESIGNABLE false SCRIPTABLE false FINAL)
     Q_PRIVATE_PROPERTY(d_func(), float instantRotation READ instantRotation WRITE setInstantRotation DESIGNABLE false SCRIPTABLE false FINAL)
     Q_PRIVATE_PROPERTY(d_func(), float instantOpacity READ instantOpacity WRITE setInstantOpacity DESIGNABLE false SCRIPTABLE false FINAL)
-
-    typedef GraphicsWidget base_type;
 
 public:
     AnimatedWidget(QGraphicsItem *parent = 0);
@@ -23,6 +23,9 @@ public:
 
     bool isInteractive() const;
     void setInteractive(bool interactive);
+
+    bool isAnimationsEnabled() const;
+    void setAnimationsEnabled(bool enable);
 
     QAnimationGroup *animationGroup() const;
 
