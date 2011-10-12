@@ -146,10 +146,8 @@ namespace {
 
         void moveItems(QGraphicsSceneDragDropEvent *event)
         {
-            QPointF delta = event->scenePos() - m_lastScenePos;
-
             foreach (QGraphicsItem *item, m_draggedItems)
-                item->moveBy(delta.x(), delta.y());
+                item->setPos(item->pos() + item->mapFromScene(event->scenePos()) - item->mapFromScene(m_lastScenePos));
 
             m_lastScenePos = event->scenePos();
         }
@@ -521,7 +519,7 @@ void GraphicsWidget::drag(QGraphicsSceneMouseEvent *event)
     {
         QPointF delta = -dragFilter->totalDelta();
         foreach (QGraphicsItem *item, draggedItems)
-            item->moveBy(delta.x(), delta.y());
+            item->setPos(item->pos() + item->mapFromScene(delta) - item->mapFromScene(QPointF(0, 0)));
     }
 
     Q_EMIT movingFinished();
