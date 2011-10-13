@@ -222,23 +222,30 @@ void GraphicsView::_draggingFinished() {
     QPoint delta = layout->mapToGrid(draggedItem->geometry()).topLeft() - layout->rect(draggedItem).topLeft();
 
     QList<QGraphicsLayoutItem *> items;
+    QList<QRect> rects;
     foreach (QGraphicsItem *item, scene()->selectedItems())
         if(QGraphicsLayoutItem *layoutItem = dynamic_cast<QGraphicsLayoutItem *>(item))
             items.push_back(layoutItem);
     if(!items.contains(draggedItem))
         items.push_back(draggedItem);
 
-    QList<QRect> rects;
-    foreach (QGraphicsLayoutItem *layoutItem, items)
-        rects.push_back(layout->rect(layoutItem).adjusted(delta.x(), delta.y(), delta.x(), delta.y()));
+    QGraphicsLayoutItem *replacedItem = layout->itemAt(layout->mapToGrid(m_widget->mapFromScene(mapToScene(viewport()->mapFromGlobal(QCursor::pos())))));
+    if(items.size() == 1 && replacedItem != NULL) {
+        items.push_back(replacedItem);
+        rects.push_back(layout->rect(replacedItem));
+        rects.push_back(layout->rect(draggedItem));
+    } else {
+        foreach (QGraphicsLayoutItem *layoutItem, items)
+            rects.push_back(layout->rect(layoutItem).adjusted(delta.x(), delta.y(), delta.x(), delta.y()));
 
-    QList<QGraphicsLayoutItem *> replacedItems = layout->itemsAt(rects).subtract(items.toSet()).toList();
-    QList<QRect> replacedRects;
-    foreach (QGraphicsLayoutItem *layoutItem, replacedItems)
-        replacedRects.push_back(layout->rect(layoutItem).adjusted(-delta.x(), -delta.y(), -delta.x(), -delta.y()));
+        QList<QGraphicsLayoutItem *> replacedItems = layout->itemsAt(rects).subtract(items.toSet()).toList();
+        QList<QRect> replacedRects;
+        foreach (QGraphicsLayoutItem *layoutItem, replacedItems)
+            replacedRects.push_back(layout->rect(layoutItem).adjusted(-delta.x(), -delta.y(), -delta.x(), -delta.y()));
 
-    items.append(replacedItems);
-    rects.append(replacedRects);
+        items.append(replacedItems);
+        rects.append(replacedRects);
+    }
 
     layout->moveItems(items, rects);
     layout->invalidate();
