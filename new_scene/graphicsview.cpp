@@ -95,6 +95,7 @@ GraphicsView::GraphicsView(QWidget *parent)
         widget->setFlag(QGraphicsItem::ItemIsFocusable, true);
         widget->setExtraFlag(GraphicsWidget::ItemIsResizable, true);
         widget->setExtraFlag(GraphicsWidget::ItemIsDraggable, true);
+        widget->setAnimationsEnabled(true);
 //        widget->setFlag(QGraphicsItem::ItemIsFocusScope, true);
 //        widget->setFlag(QGraphicsItem::ItemIsPanel, false);
 //        widget->setFocusPolicy(Qt::TabFocus);
@@ -167,6 +168,9 @@ void GraphicsView::_doubleClicked() {
 
 void GraphicsView::_resizingStarted() {
     qDebug() << "resizingStarted";
+
+    AnimatedWidget *item = static_cast<AnimatedWidget *>(sender());
+    item->setAnimationsEnabled(false);
 }
 
 void GraphicsView::_resizingFinished() {
@@ -174,6 +178,8 @@ void GraphicsView::_resizingFinished() {
 
     AnimatedWidget *item = static_cast<AnimatedWidget *>(sender());
     CellLayout *layout = static_cast<CellLayout *>(m_widget->layout());
+
+    item->setAnimationsEnabled(true);
 
     QRect newRect = layout->mapToGrid(item->geometry());
 
@@ -188,8 +194,11 @@ void GraphicsView::_draggingStarted() {
     qDebug() << "draggingStarted";
 
     AnimatedWidget *draggedItem = static_cast<AnimatedWidget *>(sender());
-
     
+    draggedItem->setAnimationsEnabled(false);
+    foreach (QGraphicsItem *item, scene()->selectedItems())
+        if(AnimatedWidget *widget = dynamic_cast<AnimatedWidget *>(item))
+            widget->setAnimationsEnabled(false);
 }
 
 void GraphicsView::_draggingFinished() {
@@ -200,12 +209,19 @@ void GraphicsView::_draggingFinished() {
     AnimatedWidget *draggedItem = static_cast<AnimatedWidget *>(sender());
     CellLayout *layout = static_cast<CellLayout *>(m_widget->layout());
 
+    draggedItem->setAnimationsEnabled(true);
+    foreach (QGraphicsItem *item, scene()->selectedItems())
+        if(AnimatedWidget *widget = dynamic_cast<AnimatedWidget *>(item))
+            widget->setAnimationsEnabled(true);
+
     QPoint delta = layout->mapToGrid(draggedItem->geometry()).topLeft() - layout->rect(draggedItem).topLeft();
 
     QList<QGraphicsLayoutItem *> items;
     foreach (QGraphicsItem *item, scene()->selectedItems())
         if(QGraphicsLayoutItem *layoutItem = dynamic_cast<QGraphicsLayoutItem *>(item))
             items.push_back(layoutItem);
+    if(!items.contains(draggedItem))
+        items.push_back(draggedItem);
 
     QList<QRect> rects;
     foreach (QGraphicsLayoutItem *layoutItem, items)
@@ -219,8 +235,8 @@ void GraphicsView::_draggingFinished() {
     items.append(replacedItems);
     rects.append(replacedRects);
 
-    scene()->clearSelection();
     layout->moveItems(items, rects);
+    layout->invalidate();
     layout->activate();
 }
 

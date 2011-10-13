@@ -65,6 +65,15 @@ private:
         inSetOpacity = false;
     }
 
+    inline void stopAllAnimations()
+    {
+        posAnimation->stop();
+        sizeAnimation->stop();
+        scaleAnimation->stop();
+        rotationAnimation->stop();
+        opacityAnimation->stop();
+    }
+
 private:
     ushort animationsEnabled : 1;
 
@@ -73,7 +82,6 @@ private:
     ushort inSetRotation : 1;
     ushort inSetOpacity : 1;
 
-    QParallelAnimationGroup *animationGroup;
     QPropertyAnimation *posAnimation;
     QPropertyAnimation *sizeAnimation;
     QPropertyAnimation *scaleAnimation;
@@ -85,17 +93,12 @@ AnimatedWidgetPrivate::AnimatedWidgetPrivate()
     : GraphicsWidgetPrivate(),
       animationsEnabled(false),
       inSetGeometry(false), inSetScale(false), inSetRotation(false), inSetOpacity(false),
-      animationGroup(0),
       posAnimation(0), sizeAnimation(0), scaleAnimation(0), rotationAnimation(0), opacityAnimation(0)
 {
 }
 
 AnimatedWidgetPrivate::~AnimatedWidgetPrivate()
 {
-    if (animationGroup) {
-        animationGroup->stop();
-        delete animationGroup;
-    }
 }
 
 void AnimatedWidgetPrivate::init()
@@ -114,32 +117,25 @@ void AnimatedWidgetPrivate::init()
     //q->setFiltersChildEvents(true); ### investigate
     q->setHandlesChildEvents(true);
 
-    animationGroup = new QParallelAnimationGroup(q);
-
-    posAnimation = new QPropertyAnimation(q, "instantPos", animationGroup);
+    posAnimation = new QPropertyAnimation(q, "instantPos", q);
     posAnimation->setDuration(1000);
     posAnimation->setEasingCurve(QEasingCurve::InOutBack);
-    animationGroup->addAnimation(posAnimation);
 
-    sizeAnimation = new QPropertyAnimation(q, "instantSize", animationGroup);
+    sizeAnimation = new QPropertyAnimation(q, "instantSize", q);
     sizeAnimation->setDuration(1000);
     sizeAnimation->setEasingCurve(QEasingCurve::InOutQuint);
-    animationGroup->addAnimation(sizeAnimation);
 
-    scaleAnimation = new QPropertyAnimation(q, "instantScale", animationGroup);
+    scaleAnimation = new QPropertyAnimation(q, "instantScale", q);
     scaleAnimation->setDuration(500);
     scaleAnimation->setEasingCurve(QEasingCurve::InOutBack);
-    animationGroup->addAnimation(scaleAnimation);
 
-    rotationAnimation = new QPropertyAnimation(q, "instantRotation", animationGroup);
+    rotationAnimation = new QPropertyAnimation(q, "instantRotation", q);
     rotationAnimation->setDuration(500);
     rotationAnimation->setEasingCurve(QEasingCurve::InOutBack);
-    animationGroup->addAnimation(rotationAnimation);
 
-    opacityAnimation = new QPropertyAnimation(q, "instantOpacity", animationGroup);
+    opacityAnimation = new QPropertyAnimation(q, "instantOpacity", q);
     opacityAnimation->setDuration(500);
     opacityAnimation->setEasingCurve(QEasingCurve::InOutSine);
-    animationGroup->addAnimation(opacityAnimation);
 }
 
 void AnimatedWidgetPrivate::drawRotationHelper(QPainter *painter, const QPointF &m_rotation_center, const QPointF &m_rotation_hand)
@@ -238,15 +234,9 @@ void AnimatedWidget::setAnimationsEnabled(bool enable)
     d->animationsEnabled = enable;
     if (!d->animationsEnabled) {
         // ### finish active transitions at once?
-        d->animationGroup->stop();
+
+        d->stopAllAnimations();
     }
-}
-
-QAnimationGroup *AnimatedWidget::animationGroup() const
-{
-    Q_D(const AnimatedWidget);
-
-    return d->animationGroup;
 }
 
 QPainterPath AnimatedWidget::opaqueArea() const

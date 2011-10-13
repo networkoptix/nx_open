@@ -42,10 +42,8 @@ namespace {
             return static_cast<DragFilter *>(scene->findChild<QObject *>(staticObjectName()));
         }
 
-        virtual bool eventFilter(QObject *watched, QEvent *event)
+        virtual bool eventFilter(QObject *watched, QEvent *event) override
         {
-            qDebug() << event->type();
-
             switch (event->type()) 
             {
             case QEvent::GraphicsSceneDragEnter:
@@ -61,7 +59,7 @@ namespace {
             }
         }
 
-        void startDrag(GraphicsWidget *draggerWidget, const QList<QGraphicsItem *> &draggedItems, const QPointF &buttonDownScenePos)
+        void dragStarted(GraphicsWidget *draggerWidget, const QList<QGraphicsItem *> &draggedItems, const QPointF &buttonDownScenePos)
         {
             m_draggerWidget = draggerWidget;
             m_draggedItems = draggedItems;
@@ -69,7 +67,7 @@ namespace {
             m_droppedOnSelf = false;
         }
 
-        void endDrag()
+        void dragEnded()
         {
             m_draggerWidget = NULL;
             m_draggedItems.clear();
@@ -504,10 +502,10 @@ void GraphicsWidget::drag(QGraphicsSceneMouseEvent *event)
     QList<QGraphicsItem *> draggedItems = scene()->selectedItems();
     if (!draggedItems.contains(this))
         draggedItems.push_back(this);
-
-    dragFilter->startDrag(this, draggedItems, event->buttonDownScenePos(Qt::LeftButton));
+    dragFilter->dragStarted(this, draggedItems, event->buttonDownScenePos(Qt::LeftButton));
     
-    Q_EMIT movingStarted();
+    if(flags() & ItemIsMovable)
+        Q_EMIT movingStarted();
 
     QDrag *drag = createDrag(event);
     Qt::DropAction dropAction = startDrag(drag);
@@ -521,10 +519,11 @@ void GraphicsWidget::drag(QGraphicsSceneMouseEvent *event)
         foreach (QGraphicsItem *item, draggedItems)
             item->setPos(item->pos() + item->mapFromScene(delta) - item->mapFromScene(QPointF(0, 0)));
     }
-
-    Q_EMIT movingFinished();
-
     endDrag(dropAction);
-    dragFilter->endDrag();
+
+    if(flags() & ItemIsMovable)
+        Q_EMIT movingFinished();
+
+    dragFilter->dragEnded();
 }
 

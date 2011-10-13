@@ -409,6 +409,7 @@ bool CellLayout::moveItem(QGraphicsLayoutItem *item, const QRect &rect)
     it->rect = rect;
 
     invalidate();
+    return true;
 }
 
 bool CellLayout::moveItems(const QList<QGraphicsLayoutItem *> &items, const QList<QRect> &rects)
@@ -619,7 +620,16 @@ QSize CellLayout::mapToGrid(const QSizeF &size) const
     d->ensureEffectiveCellSize();
 
     QSizeF gridSize = (size + d->spacing) / (d->effectiveCellSize + d->spacing);
-    return QSize(std::ceil(gridSize.width()), std::ceil(gridSize.height()));
+    QSizeF ceilGridSize = QSize(std::ceil(gridSize.width()), std::ceil(gridSize.height()));
+
+    /* It may have been rounded up as a result of floating-point precision issues.
+     * Check and fix that. */
+    if(qFuzzyCompare(ceilGridSize.width() - gridSize.width(), 1.0))
+        ceilGridSize.setWidth(ceilGridSize.width() - 1);
+    if(qFuzzyCompare(ceilGridSize.height() - gridSize.height(), 1.0))
+        ceilGridSize.setHeight(ceilGridSize.height() - 1);
+
+    return QSize(ceilGridSize.width(), ceilGridSize.height());
 }
 
 QSizeF CellLayout::mapFromGrid(const QSize &gridSize) const

@@ -27,8 +27,6 @@ public:
     bool isAnimationsEnabled() const;
     void setAnimationsEnabled(bool enable);
 
-    QAnimationGroup *animationGroup() const;
-
     QPainterPath opaqueArea() const;
 
     void setGeometry(const QRectF &rect);
