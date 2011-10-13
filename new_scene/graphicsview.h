@@ -33,6 +33,7 @@ protected:
     virtual void mouseMoveEvent(QMouseEvent *event);
     virtual void mousePressEvent(QMouseEvent *event);
     virtual void mouseReleaseEvent(QMouseEvent *event);
+    virtual void wheelEvent(QWheelEvent *event);
 
 private Q_SLOTS:
     void relayoutItemsActionTriggered();
@@ -55,17 +56,16 @@ private:
     CentralWidget *m_widget;
     QList<QGraphicsWidget *> m_animatedWidgets;
 
-#if 0  
-    enum DragState {
+    enum ScrollState {
         INITIAL,
         PREPAIRING,
-        DRAGGING
+        SCROLLING
     };
 
-    DragState mDragState;
+    ScrollState mState;
     QPoint mMousePressPos;
-    QPointF mLastMouseScenePos;
-#endif
+    QPoint mLastMousePos;
+    QCursor mOriginalCursor; 
 
     AnimatedWidget *m_selectedWidget;
 };

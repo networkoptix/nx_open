@@ -1,5 +1,7 @@
 #include "graphicsview.h"
 
+#include <cmath> /* For std::pow. */
+
 #include <QtCore/QPropertyAnimation>
 
 #include <QtGui/QGraphicsScene>
@@ -523,8 +525,6 @@ void GraphicsView::itemClicked()
         widget->setGeometry(newGeom);
         widget->setZValue(widget->zValue() + 1);
 
-        qDebug("zzz");
-
         m_selectedWidget = widget;
     }
 }
@@ -618,116 +618,57 @@ void GraphicsView::keyReleaseEvent(QKeyEvent *event)
 
 void GraphicsView::mousePressEvent(QMouseEvent *event)
 {
-#if 1
     QGraphicsView::mousePressEvent(event);
-#else
-    if(mDragState != INITIAL || !isInteractive())
-    {
-        QGraphicsView::mousePressEvent(event);
+
+#if 1
+    if(mState != INITIAL)
         return;
-    }
 
-    if(event->button() != Qt::LeftButton)
-    {
-        QGraphicsView::mousePressEvent(event);
+    if(event->button() != Qt::RightButton)
         return;
-    }
 
-    //QPointF scenePos = mapToScene(event->pos());
-
-    /* Find the item to select. */
-    QGraphicsItem *itemToSelect = NULL;
-    foreach(QGraphicsItem *item, items(event->pos()))
-    {
-        if(item->flags() & QGraphicsItem::ItemIsSelectable)
-        {
-            itemToSelect = item;
-            break;
-        }
-    }
-    if(itemToSelect == NULL)
-    {
-        QGraphicsView::mousePressEvent(event);
-        return;
-    }
-
-    mDragState = PREPAIRING;
+    mState = PREPAIRING;
     mMousePressPos = event->pos();
-    mLastMouseScenePos = mapToScene(event->pos());
-
-    if(event->modifiers() & Qt::ControlModifier) {
-        /* Toggle selection of the current item if Ctrl is pressed. This is the
-         * behavior that is to be expected. */
-        itemToSelect->setSelected(!itemToSelect->isSelected());
-    } else {
-        /* Don't clear selection if the item to select is already selected so
-         * that user can drag all selected items by dragging only one of them. */
-        if(!itemToSelect->isSelected()) {
-            scene()->clearSelection();
-            itemToSelect->setSelected(true);
-        }
-    }
+    mLastMousePos = event->pos();
 
     event->accept();
-    QGraphicsView::mousePressEvent(event);
 #endif
 }
 
 void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
-#if 1
     QGraphicsView::mouseMoveEvent(event);
-#else
-    if (mDragState == INITIAL || !isInteractive())
-    {
-        QGraphicsView::mouseMoveEvent(event);
-        return;
-    }
 
-    /* Stop dragging if the user has let go of the trigger button (even if we didn't get the release events). */
-    if (!(event->buttons() & Qt::LeftButton))
-    {
-        mDragState = INITIAL;
-        QGraphicsView::mouseMoveEvent(event);
+#if 1
+    if(mState == INITIAL)
+        return;
+
+    /* Stop scrolling if the user has let go of the trigger button (even if we didn't get the release events). */
+    if(!(event->buttons() & Qt::RightButton)) {
+        if(mState == SCROLLING)
+            viewport()->setCursor(mOriginalCursor);
+        mState = INITIAL;
         return;
     }
 
     /* Check for drag distance. */
-    if (mDragState == PREPAIRING)
-    {
-        if((mMousePressPos - event->pos()).manhattanLength() < QApplication::startDragDistance())
-        {
-            QGraphicsView::mouseMoveEvent(event);
+    if(mState == PREPAIRING) {
+        if((mMousePressPos - event->pos()).manhattanLength() < QApplication::startDragDistance()) {
             return;
-        }
-        else
-        {
-            mDragState = DRAGGING;
-
-            /*foreach (QGraphicsItem *item, scene()->selectedItems())
-            {
-                AnimatedWidget *widget = dynamic_cast<AnimatedWidget *>(item);
-                if(widget == NULL)
-                    continue;
-
-                static_cast<CellLayout *>(m_widget->layout())->removeItem(widget);
-            }*/
+        } else {
+            mOriginalCursor = viewport()->cursor();
+            viewport()->setCursor(Qt::ClosedHandCursor);
+            mState = SCROLLING;
         }
     }
 
-    // Update mouse positions & calculate delta.
-    QPointF currentMouseScenePos = mapToScene(event->pos());
-    QPointF delta = currentMouseScenePos - mLastMouseScenePos;
-    mLastMouseScenePos = currentMouseScenePos;
+    QScrollBar *hBar = horizontalScrollBar();
+    QScrollBar *vBar = verticalScrollBar();
+    QPoint delta = event->pos() - mLastMousePos;
+    hBar->setValue(hBar->value() + (isRightToLeft() ? delta.x() : -delta.x()));
+    vBar->setValue(vBar->value() - delta.y());
 
-    // Drag selected items.
-    foreach(QGraphicsItem *item, scene()->selectedItems()) {
-        AnimatedWidget *widget = dynamic_cast<AnimatedWidget *>(item);
-        if(widget != NULL)
-            widget->setProperty("instantPos", item->pos() + delta);
-        else
-            item->setPos(item->pos() + delta);
-    }
+    mLastMousePos = event->pos();
 
     event->accept();
 #endif
@@ -743,33 +684,34 @@ void GraphicsView::mouseReleaseEvent(QMouseEvent *event)
         m_selectedWidget = NULL;
     }
 
-#if 0
-    if (mDragState == INITIAL || !isInteractive())
+#if 1
+    if(mState == INITIAL)
         return;
 
-    if (event->button() != Qt::LeftButton)
+    if(event->button() != Qt::RightButton)
         return;
 
-    if (mDragState == DRAGGING)
-    {
-        // Move selected items back
-        CellLayout *layout = static_cast<CellLayout *>(m_widget->layout());
+    if(mState == SCROLLING)
+        viewport()->setCursor(mOriginalCursor);
+    mState = INITIAL;
 
-        foreach (QGraphicsItem *item, scene()->selectedItems())
-        {
-            AnimatedWidget *widget = item->isWidget() ? qobject_cast<AnimatedWidget *>(static_cast<QGraphicsWidget *>(item)) : 0;
-            if (!widget)
-                continue;
-
-            const Qt::Alignment alignment = layout->alignment(widget);
-            const QRect rect = layout->rect(widget);
-
-            layout->removeItem(widget);
-            layout->addItem(widget, rect, alignment);
-        }
-    }
-
-    mDragState = INITIAL;
     event->accept();
 #endif
+}
+
+void GraphicsView::wheelEvent(QWheelEvent *event) {
+    /* delta() returns the distance that the wheel is rotated
+     * in eighths (1/8s) of a degree. */
+    qreal degrees = event->delta() / 8.0;
+
+    /* Use 2x scale for 180 degree turn. */
+    qreal scaleFactor = std::pow(2.0, degrees / 180.0);
+
+    /* Scale restoring the transformation anchor. */
+    QGraphicsView::ViewportAnchor oldAnchor = transformationAnchor();
+    setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+    scale(scaleFactor, scaleFactor);
+    setTransformationAnchor(oldAnchor);
+
+    event->accept();
 }
