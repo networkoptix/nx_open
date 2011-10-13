@@ -21,7 +21,10 @@ static const qreal spacing = 25;
 GraphicsView::GraphicsView(QWidget *parent)
     : QGraphicsView(parent),
       m_widget(0),
+      m_selectedWidget(0)
+#if 0
       mDragState(INITIAL)
+#endif
 {
     {
         QGraphicsScene *scene = new QGraphicsScene(this);
@@ -93,8 +96,8 @@ GraphicsView::GraphicsView(QWidget *parent)
         widget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true); // optimization
         widget->setFlag(QGraphicsItem::ItemIsSelectable, true);
         widget->setFlag(QGraphicsItem::ItemIsFocusable, true);
-        widget->setExtraFlag(GraphicsWidget::ItemIsResizable, true);
-        widget->setExtraFlag(GraphicsWidget::ItemIsDraggable, true);
+        //widget->setExtraFlag(GraphicsWidget::ItemIsResizable, true);
+        //widget->setExtraFlag(GraphicsWidget::ItemIsDraggable, true);
         widget->setAnimationsEnabled(true);
 //        widget->setFlag(QGraphicsItem::ItemIsFocusScope, true);
 //        widget->setFlag(QGraphicsItem::ItemIsPanel, false);
@@ -499,14 +502,30 @@ void GraphicsView::widgetGeometryChanged()
 
 void GraphicsView::itemClicked()
 {
-    if (QGraphicsWidget *widget = qobject_cast<QGraphicsWidget *>(sender()))
+    if (AnimatedWidget *widget = qobject_cast<AnimatedWidget *>(sender()))
     {
+        if(widget == m_selectedWidget)
+            return;
+
+        if(m_selectedWidget != NULL) {
+            m_selectedWidget = NULL;
+            invalidateLayout();
+        }
+
+        CellLayout *layout = static_cast<CellLayout *>(m_widget->layout());
+
+        QRectF widgetRect = layout->mapFromGrid(layout->rect(widget));
+
         const QRectF viewportSceneRect = mapRectToScene(viewport()->rect());
-        const QSizeF s = (viewportSceneRect.size() - widget->mapRectToScene(widget->rect()).size() * 2.5) / 2;
+        const QSizeF s = (viewportSceneRect.size() - widget->mapRectToScene(widgetRect).size() * 2.5) / 2;
         const QPointF newPos = viewportSceneRect.topLeft() + QPointF(s.width(), s.height());
-        const QRectF newGeom = QRectF(widget->mapToParent(widget->mapFromScene(newPos)), widget->size() * 2.5);
+        const QRectF newGeom = QRectF(widget->mapToParent(widget->mapFromScene(newPos)), widgetRect.size() * 2.5);
         widget->setGeometry(newGeom);
         widget->setZValue(widget->zValue() + 1);
+
+        qDebug("zzz");
+
+        m_selectedWidget = widget;
     }
 }
 
@@ -718,8 +737,11 @@ void GraphicsView::mouseReleaseEvent(QMouseEvent *event)
 {
     QGraphicsView::mouseReleaseEvent(event);
 
-    if (scene()->selectedItems().isEmpty())
+    if (scene()->selectedItems().isEmpty()) {
         invalidateLayout();
+
+        m_selectedWidget = NULL;
+    }
 
 #if 0
     if (mDragState == INITIAL || !isInteractive())

@@ -390,7 +390,7 @@ bool GraphicsWidget::windowFrameEvent(QEvent *event)
     case QEvent::GraphicsSceneMouseMove:
     {
         if (d->preDragging)
-            return false;
+            return false; /* Handle it at mouseMoveEvent. */
 
         if (d->resizing && !d->resizingStartedEmitted)
         {
