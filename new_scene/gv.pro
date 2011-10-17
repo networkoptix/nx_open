@@ -11,4 +11,8 @@ SOURCES += main.cpp \
 
 RESOURCES += images.qrc
 
+INCLUDEPATH += $$PWD
+
 include( $$PWD/widgets/widgets.pri )
+include( $$PWD/instruments/instruments.pri )
+include( $$PWD/utility/utility.pri )

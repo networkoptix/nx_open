@@ -173,7 +173,7 @@ bool CellLayoutPrivate::isRegionFilledWith(const QRect &rect, QGraphicsLayoutIte
         for (int c = rect.left(); c <= rect.right(); c++) 
         {
             QGraphicsLayoutItem *item = itemByPoint.value(QPoint(c, r), NULL);
-            if(item != value0 && item != value1) 
+            if (item != value0 && item != value1) 
                 return false;
         }
     }
@@ -309,7 +309,7 @@ void CellLayout::addItem(QGraphicsLayoutItem *item, const QRect &rect, Qt::Align
     d->items.append(item);
 
     /* Check that it's going to occupy empty cells only. */
-    if(d->isRegionOccupied(rect))
+    if (d->isRegionOccupied(rect))
     {
         qWarning("CellLayout::addItem: given region is already occupied.");
         return; /* Now the item is owned but not managed by this layout. */
@@ -422,7 +422,7 @@ bool CellLayout::moveItems(const QList<QGraphicsLayoutItem *> &items, const QLis
         return false;
     }
 
-    if(items.empty())
+    if (items.empty())
         return true;
 
     /* Check whether it's our items. */
@@ -457,13 +457,13 @@ bool CellLayout::moveItems(const QList<QGraphicsLayoutItem *> &items, const QLis
     QSet<QGraphicsLayoutItem *> replacedItems = itemsAt(rects);
     foreach (QGraphicsLayoutItem *item, items)
         replacedItems.remove(item);
-    if(!replacedItems.empty())
+    if (!replacedItems.empty())
         return false;
 
     /* Move. */
-    foreach(QGraphicsLayoutItem *item, items)
+    foreach (QGraphicsLayoutItem *item, items)
         d->clearRegion(d->propertiesByItem[item].rect);
-    for(int i = 0; i < items.size(); i++)
+    for (int i = 0; i < items.size(); i++)
     {
         QGraphicsLayoutItem *item = items[i];
         ItemProperties &properties = d->propertiesByItem[item];
@@ -624,9 +624,9 @@ QSize CellLayout::mapToGrid(const QSizeF &size) const
 
     /* It may have been rounded up as a result of floating-point precision issues.
      * Check and fix that. */
-    if(qFuzzyCompare(ceilGridSize.width() - gridSize.width(), 1.0))
+    if (qFuzzyCompare(ceilGridSize.width() - gridSize.width(), 1.0))
         ceilGridSize.setWidth(ceilGridSize.width() - 1);
-    if(qFuzzyCompare(ceilGridSize.height() - gridSize.height(), 1.0))
+    if (qFuzzyCompare(ceilGridSize.height() - gridSize.height(), 1.0))
         ceilGridSize.setHeight(ceilGridSize.height() - 1);
 
     return QSize(ceilGridSize.width(), ceilGridSize.height());

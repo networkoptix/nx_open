@@ -504,7 +504,7 @@ void GraphicsWidget::drag(QGraphicsSceneMouseEvent *event)
         draggedItems.push_back(this);
     dragFilter->dragStarted(this, draggedItems, event->buttonDownScenePos(Qt::LeftButton));
     
-    if(flags() & ItemIsMovable)
+    if (flags() & ItemIsMovable)
         Q_EMIT movingStarted();
 
     QDrag *drag = createDrag(event);
@@ -521,7 +521,7 @@ void GraphicsWidget::drag(QGraphicsSceneMouseEvent *event)
     }
     endDrag(dropAction);
 
-    if(flags() & ItemIsMovable)
+    if (flags() & ItemIsMovable)
         Q_EMIT movingFinished();
 
     dragFilter->dragEnded();

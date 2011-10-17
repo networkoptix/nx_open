@@ -33,6 +33,8 @@ GraphicsView::GraphicsView(QWidget *parent)
         scene->setItemIndexMethod(QGraphicsScene::NoIndex);
         //scene->setStyle(..); // scene-specific style
         setScene(scene);
+
+        setDragMode(QGraphicsView::NoDrag);
     }
 
 #ifndef QT_NO_OPENGL
@@ -138,7 +140,7 @@ GraphicsView::GraphicsView(QWidget *parent)
 #if 0
     NotifyingWidget *ww[2] = {new NotifyingWidget(), new NotifyingWidget()};
 
-    for(int i = 0; i < 2; i++) 
+    for (int i = 0; i < 2; i++) 
     {
         NotifyingWidget *w = ww[i];
 
@@ -191,7 +193,7 @@ void GraphicsView::_resizingFinished() {
     QSet<QGraphicsLayoutItem *> items = layout->itemsAt(newRect);
     items.remove(item);
 
-    if(items.empty())
+    if (items.empty())
         layout->moveItem(item, newRect);
 }
 
@@ -202,7 +204,7 @@ void GraphicsView::_draggingStarted() {
     
     draggedItem->setAnimationsEnabled(false);
     foreach (QGraphicsItem *item, scene()->selectedItems())
-        if(AnimatedWidget *widget = dynamic_cast<AnimatedWidget *>(item))
+        if (AnimatedWidget *widget = dynamic_cast<AnimatedWidget *>(item))
             widget->setAnimationsEnabled(false);
 }
 
@@ -216,7 +218,7 @@ void GraphicsView::_draggingFinished() {
 
     draggedItem->setAnimationsEnabled(true);
     foreach (QGraphicsItem *item, scene()->selectedItems())
-        if(AnimatedWidget *widget = dynamic_cast<AnimatedWidget *>(item))
+        if (AnimatedWidget *widget = dynamic_cast<AnimatedWidget *>(item))
             widget->setAnimationsEnabled(true);
 
     QPoint delta = layout->mapToGrid(draggedItem->geometry()).topLeft() - layout->rect(draggedItem).topLeft();
@@ -224,13 +226,13 @@ void GraphicsView::_draggingFinished() {
     QList<QGraphicsLayoutItem *> items;
     QList<QRect> rects;
     foreach (QGraphicsItem *item, scene()->selectedItems())
-        if(QGraphicsLayoutItem *layoutItem = dynamic_cast<QGraphicsLayoutItem *>(item))
+        if (QGraphicsLayoutItem *layoutItem = dynamic_cast<QGraphicsLayoutItem *>(item))
             items.push_back(layoutItem);
-    if(!items.contains(draggedItem))
+    if (!items.contains(draggedItem))
         items.push_back(draggedItem);
 
     QGraphicsLayoutItem *replacedItem = layout->itemAt(layout->mapToGrid(m_widget->mapFromScene(mapToScene(viewport()->mapFromGlobal(QCursor::pos())))));
-    if(items.size() == 1 && replacedItem != NULL) {
+    if (items.size() == 1 && replacedItem != NULL) {
         items.push_back(replacedItem);
         rects.push_back(layout->rect(replacedItem));
         rects.push_back(layout->rect(draggedItem));
@@ -513,10 +515,10 @@ void GraphicsView::itemClicked()
 {
     if (AnimatedWidget *widget = qobject_cast<AnimatedWidget *>(sender()))
     {
-        if(widget == m_selectedWidget)
+        if (widget == m_selectedWidget)
             return;
 
-        if(m_selectedWidget != NULL) {
+        if (m_selectedWidget != NULL) {
             m_selectedWidget = NULL;
             invalidateLayout();
         }
@@ -579,7 +581,7 @@ void GraphicsView::keyPressEvent(QKeyEvent *event)
         break;
 
     case Qt::Key_Control:
-        setDragMode(QGraphicsView::RubberBandDrag);
+        //setDragMode(QGraphicsView::RubberBandDrag);
         scene()->clearSelection();
         setEditMode(true);
         break;
@@ -626,59 +628,11 @@ void GraphicsView::keyReleaseEvent(QKeyEvent *event)
 void GraphicsView::mousePressEvent(QMouseEvent *event)
 {
     QGraphicsView::mousePressEvent(event);
-
-#if 1
-    if(mState != INITIAL)
-        return;
-
-    if(event->button() != Qt::RightButton)
-        return;
-
-    mState = PREPAIRING;
-    mMousePressPos = event->pos();
-    mLastMousePos = event->pos();
-
-    event->accept();
-#endif
 }
 
 void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
     QGraphicsView::mouseMoveEvent(event);
-
-#if 1
-    if(mState == INITIAL)
-        return;
-
-    /* Stop scrolling if the user has let go of the trigger button (even if we didn't get the release events). */
-    if(!(event->buttons() & Qt::RightButton)) {
-        if(mState == SCROLLING)
-            viewport()->setCursor(mOriginalCursor);
-        mState = INITIAL;
-        return;
-    }
-
-    /* Check for drag distance. */
-    if(mState == PREPAIRING) {
-        if((mMousePressPos - event->pos()).manhattanLength() < QApplication::startDragDistance()) {
-            return;
-        } else {
-            mOriginalCursor = viewport()->cursor();
-            viewport()->setCursor(Qt::ClosedHandCursor);
-            mState = SCROLLING;
-        }
-    }
-
-    QScrollBar *hBar = horizontalScrollBar();
-    QScrollBar *vBar = verticalScrollBar();
-    QPoint delta = event->pos() - mLastMousePos;
-    hBar->setValue(hBar->value() + (isRightToLeft() ? delta.x() : -delta.x()));
-    vBar->setValue(vBar->value() - delta.y());
-
-    mLastMousePos = event->pos();
-
-    event->accept();
-#endif
 }
 
 void GraphicsView::mouseReleaseEvent(QMouseEvent *event)
@@ -691,34 +645,4 @@ void GraphicsView::mouseReleaseEvent(QMouseEvent *event)
         m_selectedWidget = NULL;
     }
 
-#if 1
-    if(mState == INITIAL)
-        return;
-
-    if(event->button() != Qt::RightButton)
-        return;
-
-    if(mState == SCROLLING)
-        viewport()->setCursor(mOriginalCursor);
-    mState = INITIAL;
-
-    event->accept();
-#endif
-}
-
-void GraphicsView::wheelEvent(QWheelEvent *event) {
-    /* delta() returns the distance that the wheel is rotated
-     * in eighths (1/8s) of a degree. */
-    qreal degrees = event->delta() / 8.0;
-
-    /* Use 2x scale for 180 degree turn. */
-    qreal scaleFactor = std::pow(2.0, degrees / 180.0);
-
-    /* Scale restoring the transformation anchor. */
-    QGraphicsView::ViewportAnchor oldAnchor = transformationAnchor();
-    setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
-    scale(scaleFactor, scaleFactor);
-    setTransformationAnchor(oldAnchor);
-
-    event->accept();
 }
