@@ -12,6 +12,7 @@ class QGraphicsItem;
 class RubberBandItem;
 
 class RubberBandInstrument: public Instrument {
+    Q_OBJECT;
 public:
     RubberBandInstrument(QObject *parent);
     virtual ~RubberBandInstrument();
@@ -27,6 +28,9 @@ protected:
 
     static QSet<QGraphicsItem *> toSet(QList<QGraphicsItem *> items);
 
+private slots:
+    void at_scene_selectionChanged();
+
 private:
     enum State {
         INITIAL,
@@ -35,19 +39,25 @@ private:
     };
 
     /** Current state. */
-    State mState;
+    State m_state;
 
     /* Scene position of the last rubber band-related mouse press event. */
-    QPointF mMousePressScenePos;
+    QPointF m_mousePressScenePos;
 
     /** Widget position of the last rubber band-related mouse press event. */
-    QPoint mMousePressPos;
+    QPoint m_mousePressPos;
 
     /* Rubber band item. */
-    QScopedPointer<RubberBandItem> mRubberBand;
+    QScopedPointer<RubberBandItem> m_rubberBand;
 
     /** Set of items that were selected when rubber banding has started. */
-    QSet<QGraphicsItem *> mOriginallySelected;
+    QSet<QGraphicsItem *> m_originallySelected;
+
+    /** Whether the original selection needs to be restored. */
+    bool m_protectSelection;
+
+    /** Whether the control is currently inside selection change handler. */
+    bool m_inSelectionChanged;
 };
 
 #endif // QN_RUBBER_BAND_INSTRUMENT_H

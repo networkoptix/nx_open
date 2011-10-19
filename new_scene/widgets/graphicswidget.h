@@ -5,15 +5,19 @@
 
 #include <QtGui/QGraphicsWidget>
 
+#include <instruments/instrumented.h>
+
 /* A quick workaround. Remove this once we have a better solution. */
 #undef override
 #define override
 
 class GraphicsWidgetPrivate;
 
-class GraphicsWidget: public QGraphicsWidget
+class GraphicsWidget: public Instrumented<QGraphicsWidget>
 {
-    Q_OBJECT
+    Q_OBJECT;
+
+    typedef Instrumented<QGraphicsWidget> base_type;
 
 public:
     /**

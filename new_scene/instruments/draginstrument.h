@@ -17,12 +17,12 @@ protected:
     virtual bool mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) override;
 
 signals:
-    void draggingStarted(QList<QGraphicsItem *> items);
-    void draggingFinished(QList<QGraphicsItem *> items);
+    void draggingStarted(QGraphicsView *view, QList<QGraphicsItem *> items);
+    void draggingFinished(QGraphicsView *view, QList<QGraphicsItem *> items);
 
 private:
-    void startDragging();
-    void stopDragging();
+    void startDragging(QGraphicsView *view);
+    void stopDragging(QGraphicsView *view);
 
 private:
     enum State {
@@ -34,6 +34,7 @@ private:
     State m_state;
     QPoint m_mousePressPos;
     QPointF m_lastMouseScenePos;
+    QGraphicsItem *m_itemToSelect;
 };
 
 #endif // QN_DRAG_INSTRUMENT_H

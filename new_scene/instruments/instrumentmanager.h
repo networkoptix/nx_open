@@ -126,6 +126,13 @@ public:
      */
     const QList<Instrument *> &instruments() const;
 
+    /**
+     * \param scene                    Scene.
+     * \returns                        List of all instrument managers managing
+     *                                 the given scene.
+     */
+    static QList<InstrumentManager *> managersOf(QGraphicsScene *scene);
+
 private slots:
     void at_view_destroyed(QObject *view);
     void at_viewport_destroyed(QObject *viewport);
