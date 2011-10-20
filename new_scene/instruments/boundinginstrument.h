@@ -12,46 +12,66 @@ public:
 
     void setView(QGraphicsView *view);
 
-    void setMoveRect(const QRectF &moveRect, qreal extensionMultiplier);
+    /**
+     * \param moveBounds                Rectangular area to which unobstructed
+     *                                  moving is restricted, in scene coordinates.
+     * \param extension                 Extension of this area, in viewports.
+     */
+    void setMoveBounds(const QRectF &moveBounds, qreal extension);
 
-    void setZoomRect(const QRectF &zoomRect, qreal extensionMultiplier);
+    /**
+     * \param zoomBound                 Maximal size of the viewport to which
+     *                                  unobstructed zooming is restricted,
+     *                                  in scene coordinates.
+     */
+    void setZoomBounds(const QSizeF &zoomBound);
 
-    void setMoveBorder(qreal moveBorder, qreal extensionMultiplier);
+    /**
+     * \param speed                     Move speed, in scene coordinate units per second.
+     * \param extension                 Move speed extension, in viewports per second.
+     */
+    void setMoveSpeed(qreal speed, qreal extension);
 
-    void setZoomBorder(qreal zoomBorder, qreal extensionMultiplier);
+    /**
+     * \param multiplier                Zoom speed, factor per second.
+     */
+    void setZoomSpeed(qreal multiplier);
 
-    void setSpeed(qreal speed, qreal extensionMultiplier);
-
-    void setZoomAnimated(bool zoomAnimated);
-
+    /**
+     * \param moveAnimated              Whether obstructed moving is animated.
+     */
     void setMoveAnimated(bool moveAnimated);
+
+    /**
+     * \param zoomAnimated              Whether obstructed zooming is animated.
+     */
+    void setZoomAnimated(bool zoomAnimated);
 
 protected:
     virtual bool paintEvent(QWidget *viewport, QPaintEvent *event) override;
-    virtual bool resizeEvent(QGraphicsView *view, QResizeEvent *event) override;
 
 private:
     QGraphicsView *m_view;
-    QRectF m_moveRect;
-    QRectF m_zoomRect;
-    qreal m_moveBorder;
-    qreal m_zoomBorder;
-    qreal m_moveRectExtension;
-    qreal m_zoomRectExtension;
-    qreal m_moveBorderExtension;
-    qreal m_zoomBorderExtension;
+
+    QRectF m_moveBounds;
+    qreal m_moveBoundsExtension;
+    qreal m_moveSpeed;
+    qreal m_moveSpeedExtension;
+    
+    QSizeF m_zoomBounds;
+    qreal m_zoomSpeed;
+
     bool m_isZoomAnimated;
     bool m_isMoveAnimated;
-    qreal m_speed;
-    qreal m_speedExtension;
 
-    QTransform m_viewToScene;
-    QRectF m_viewportRect;
+    /** Old viewport-to-scene transformation. */
+    QTransform m_oldViewportToScene;
 
-    QTransform m_oldViewToScene;
-    QRectF m_oldViewportRect;
+    /* Old zoom, relative to zoom bounds. */
+    qreal m_oldZoom;
 
-    bool m_cacheDirty;
+    /* Old viewport center. */
+    QPointF m_oldCenter;
 };
 
 #endif // QN_BOUNDING_INSTRUMENT_H

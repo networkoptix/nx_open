@@ -206,6 +206,11 @@ void SceneController::addView(QGraphicsView *view) {
 
     // TODO
     m_boundingInstrument->setView(view);
+    m_boundingInstrument->setZoomAnimated(false);
+    m_boundingInstrument->setMoveAnimated(false);
+    m_boundingInstrument->setMoveBounds(QRectF(0, 0, 1000, 1000), 0.0);
+    m_boundingInstrument->setZoomBounds(QSizeF(1000, 1000));
+
 
 #ifndef QT_NO_OPENGL
     if (QGLFormat::hasOpenGL()) {

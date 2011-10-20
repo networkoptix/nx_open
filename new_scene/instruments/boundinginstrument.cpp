@@ -1,72 +1,49 @@
 #include "boundinginstrument.h"
 #include <QGraphicsView>
+#include <QScrollBar>
 
 namespace {
-    qreal calculateCorrectionValue(qreal border, qreal normal, qreal newValue, qreal oldValue) {
-        if(border > normal)
-            return -calculateCorrectionValue(-border, -normal, -newValue, -oldValue);
+    qreal calculateCorrection(qreal oldValue, qreal newValue, qreal lowerBound, qreal upperBound) {
+        if(oldValue >= lowerBound && oldValue <= upperBound)
+            return 0.0;
 
-        /* Now we can safely assume that border < normal. */
-
-        if(oldValue > normal) {
-            if(newValue > normal) {
-                return 0.0; /* No correction. */
-            } else {
-                oldValue = normal;
-            }
-        }
-
-        if(oldValue < border)
-            return oldValue - newValue; /* No movement outside the borders. */
-        
-        /* Now oldValue lies in [border, normal]. Map it into [0, 1] segment, 0 at normal, 1 at border. */
-        qreal alpha = (normal - oldValue) / (normal - border);
-
-        qreal correction = (oldValue - newValue) * alpha;
-        if(newValue + correction < border)
-            correction = (oldValue + border) / 2 - newValue;
-
-        return correction;        
+        return (oldValue - newValue) * 0.5;
     }
 
-    void calculateExpansionTranslation(qreal p1, qreal p2, qreal *expansion, qreal *translation) {
-        if(p1 > 0) {
-            if(p2 > 0) {
-                *expansion = 0.0;
-                *translation = qMax(p1, p2);
-            } else {
-                *expansion = qMax(-p1, p2);
-                *translation = p1 + p2;
-            }
-        } else {
-            if(p2 < 0) {
-                *expansion = 0.0;
-                *translation = qMin(p1, p2);
-            } else {
-                *expansion = qMin(-p1, p2);
-                *translation = p1 + p2;
-            }
+    QPointF calculateCorrection(QPointF oldValue, QPointF newValue, QRectF bounds) {
+        return QPointF(
+            calculateCorrection(oldValue.x(), newValue.x(), bounds.left(), bounds.right()),
+            calculateCorrection(oldValue.y(), newValue.y(), bounds.top(),  bounds.bottom())
+        );
+    }
+
+    qreal calculateScale(QSizeF size, QSizeF bounds) {
+        return qMax(size.width() / bounds.width(), size.height() / bounds.height());
+    }
+
+    QRectF truncated(const QRectF &rect) {
+        QRectF result = rect;
+
+        if(result.width() < 0) {
+            result.moveLeft(result.left() + result.width() / 2);
+            result.setWidth(0);
         }
+
+        if(result.height() < 0) {
+            result.moveTop(result.top() + result.height() / 2);
+            result.setHeight(0);
+        }
+
+        return result;
     }
 
 } // anonymous namespace
 
 
 BoundingInstrument::BoundingInstrument(QObject *parent):
-    Instrument(makeSet(), makeSet(QEvent::Resize), makeSet(QEvent::Paint), false, parent),
-    m_view(NULL),
-    m_isZoomAnimated(true),
-    m_isMoveAnimated(true)
+    Instrument(makeSet(), makeSet(), makeSet(QEvent::Paint), false, parent),
+    m_view(NULL)
 {}
-
-void BoundingInstrument::setView(QGraphicsView *view) {
-
-}
-
-
-bool BoundingInstrument::resizeEvent(QGraphicsView *view, QResizeEvent *event) {
-    return false;
-}
 
 bool BoundingInstrument::paintEvent(QWidget *viewport, QPaintEvent *event) {
     if(m_view == NULL)
@@ -75,51 +52,89 @@ bool BoundingInstrument::paintEvent(QWidget *viewport, QPaintEvent *event) {
     if(m_view->viewport() != viewport)
         return false;
 
-    if(m_view->viewportTransform() == m_viewToScene)
+    if(qFuzzyCompare(m_view->viewportTransform(), m_oldViewportToScene))
         return false;
 
-    m_oldViewToScene = m_viewToScene;
-    m_oldViewportRect = m_viewportRect;
+    QTransform viewportToScene = m_view->viewportTransform();
+    QRectF viewportRect = mapRectToScene(m_view, viewport->rect());
+    qreal zoom = calculateScale(viewportRect.size(), m_zoomBounds);
+    QPointF center = viewportRect.center();
 
-    m_viewToScene = m_view->viewportTransform();
-    m_viewportRect = mapRectToScene(m_view, viewport->rect());
-    
-    QRectF moveRect = dilated(m_moveRect, m_moveRectExtension * m_viewportRect.size());
-    QRectF moveBorder = dilated(moveRect, m_moveBorderExtension * m_viewportRect.size() + QSizeF(m_moveBorder, m_moveBorder));
+    /* Calculate move bounds for viewport's center. */
+    QRectF moveBounds = truncated(dilated(m_moveBounds, (m_moveBoundsExtension - 0.5) * viewportRect.size()));
+    qreal zoomBound = 1.0;
 
-    qreal xp1, yp1, xp2, yp2;
-    xp1 = calculateCorrectionValue(moveBorder.left(),   moveRect.left(),   m_viewportRect.left(),   m_oldViewportRect.left());
-    xp2 = calculateCorrectionValue(moveBorder.right(),  moveRect.right(),  m_viewportRect.right(),  m_oldViewportRect.right());
-    yp1 = calculateCorrectionValue(moveBorder.top(),    moveRect.top(),    m_viewportRect.top(),    m_oldViewportRect.top());
-    yp2 = calculateCorrectionValue(moveBorder.bottom(), moveRect.bottom(), m_viewportRect.bottom(), m_oldViewportRect.bottom());
+    /* Calculate correction values. */
+    QPointF centerCorrection = calculateCorrection(m_oldCenter, center, moveBounds);
+    qreal zoomCorrection = calculateCorrection(m_oldZoom, zoom, 0, zoomBound);
 
-    qreal xShrink, yShrink;
-    shrinkAdjust(&xp1, &xp2, &xShrink);
+    /* Apply them. */
+    qreal scale = zoom / (zoom + zoomCorrection);
+
+    QGraphicsView::ViewportAnchor anchor = m_view->transformationAnchor();
+    bool interactive = m_view->isInteractive();
+    m_view->setInteractive(false); /* View will re-fire stored mouse event if we don't do this. */
+    m_view->setTransformationAnchor(QGraphicsView::AnchorViewCenter);
+    m_view->scale(scale, scale);
+    m_view->setTransformationAnchor(anchor);
+    m_view->setInteractive(interactive);
     
-    
+    QScrollBar *hBar = m_view->horizontalScrollBar();
+    QScrollBar *vBar = m_view->verticalScrollBar();
+    QPoint delta = m_view->mapFromScene(-centerCorrection) - m_view->mapFromScene(QPointF(0.0, 0.0));
+    hBar->setValue(hBar->value() + (m_view->isRightToLeft() ? delta.x() : -delta.x()));
+    vBar->setValue(vBar->value() - delta.y());
+
+    m_oldViewportToScene = m_view->viewportTransform();
+    m_oldZoom = zoom + zoomCorrection;
+    m_oldCenter = center + centerCorrection;
+
     return false;
 }
 
-void BoundingInstrument::setMoveRect(const QRectF &moveRect, qreal extensionMultiplier) {
-        
+void BoundingInstrument::setView(QGraphicsView *view) {
+    m_view = view;
+
+    qreal t = 10000000000.0;
+
+    m_moveBounds = QRectF(QPointF(-t, -t), QPointF(t, t));
+    m_moveBoundsExtension = 0.0;
+    m_moveSpeed = 0.0;
+    m_moveSpeedExtension = 1.0;
+
+    m_zoomBounds = QSizeF(t, t);
+    m_zoomSpeed = 2.0;
+
+    m_isZoomAnimated = true;
+    m_isMoveAnimated = true;
+
+    m_oldCenter = QPointF();
+    m_oldViewportToScene = QTransform();
+    m_oldZoom = 1.0;
 }
 
-void BoundingInstrument::setZoomRect(const QRectF &zoomRect, qreal extensionMultiplier) {
-    
+void BoundingInstrument::setMoveBounds(const QRectF &moveBounds, qreal extension) {
+    m_moveBounds = moveBounds;
+    m_moveBoundsExtension = extension;
 }
 
-void BoundingInstrument::setMoveBorder(qreal moveBorder, qreal extensionMultiplier) {
-    
+void BoundingInstrument::setZoomBounds(const QSizeF &zoomBound) {
+    m_zoomBounds = zoomBound;
 }
 
-void BoundingInstrument::setZoomBorder(qreal zoomBorder, qreal extensionMultiplier) {
-    
+void BoundingInstrument::setMoveSpeed(qreal speed, qreal extension) {
+    m_moveSpeed = speed;
+    m_moveSpeedExtension = extension;
 }
 
-void BoundingInstrument::setSpeed(qreal speed, qreal extensionMultiplier) {
-    
+void BoundingInstrument::setZoomSpeed(qreal multiplier) {
+    m_zoomSpeed = multiplier;
 }
 
-void BoundingInstrument::setZoomAnimated(bool animated) {
-    
+void BoundingInstrument::setZoomAnimated(bool zoomAnimated) {
+    m_isZoomAnimated = zoomAnimated;
+}
+
+void BoundingInstrument::setMoveAnimated(bool moveAnimated) {
+    m_isMoveAnimated = moveAnimated;
 }
