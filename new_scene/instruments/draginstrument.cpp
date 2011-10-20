@@ -37,8 +37,8 @@ bool DragInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
             return item->flags() & QGraphicsItem::ItemIsSelectable;
         }
     };
-    QGraphicsItem *itemToSelect = item(view, event->pos(), ItemIsSelectable());
-    if (itemToSelect == NULL)
+    QGraphicsItem *draggedItem = item(view, event->pos(), ItemIsSelectable());
+    if (draggedItem == NULL)
         return false;
 
     m_state = PREPAIRING;
@@ -46,20 +46,13 @@ bool DragInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
     m_lastMouseScenePos = view->mapToScene(event->pos());
 
     if (event->modifiers() & Qt::ControlModifier) {
-        /* Toggle selection of the current item if Ctrl is pressed. This is the
-         * behavior that is to be expected. */
-        itemToSelect->setSelected(!itemToSelect->isSelected());
+        m_itemToSelect = draggedItem;
     } else {
-        /* Don't clear selection if the item to select is already selected so
-         * that user can drag all selected items by dragging only one of them. */
-        if (!itemToSelect->isSelected()) {
-            scene()->clearSelection();
-            itemToSelect->setSelected(true);
-        }
+        m_itemToSelect = NULL;
     }
 
     event->accept();
-    return true;
+    return false;
 }
 
 bool DragInstrument::mouseMoveEvent(QWidget *viewport, QMouseEvent *event) {
@@ -70,7 +63,7 @@ bool DragInstrument::mouseMoveEvent(QWidget *viewport, QMouseEvent *event) {
 
     /* Stop dragging if the user has let go of the trigger button (even if we didn't get the release events). */
     if (!(event->buttons() & Qt::LeftButton)) {
-        stopDragging();
+        stopDragging(view);
         return false;
     }
 
@@ -79,7 +72,7 @@ bool DragInstrument::mouseMoveEvent(QWidget *viewport, QMouseEvent *event) {
         if ((m_mousePressPos - event->pos()).manhattanLength() < QApplication::startDragDistance()) {
             return false;
         } else {
-            startDragging();
+            startDragging(view);
         }
     }
 
@@ -105,20 +98,25 @@ bool DragInstrument::mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) {
     if (event->button() != Qt::LeftButton)
         return false;
 
-    stopDragging();
+    stopDragging(view);
 
     event->accept();
-    return true;
+    return false;
 }
 
-void DragInstrument::startDragging() {
+void DragInstrument::startDragging(QGraphicsView *view) {
     m_state = DRAGGING;
-    emit draggingStarted(scene()->selectedItems());
+
+    if(m_itemToSelect != NULL)
+        m_itemToSelect->setSelected(true);
+
+    emit draggingStarted(view, scene()->selectedItems());
 }
 
-void DragInstrument::stopDragging() {
+void DragInstrument::stopDragging(QGraphicsView *view) {
     if(m_state == DRAGGING)
-        emit draggingFinished(scene()->selectedItems());
+        emit draggingFinished(view, scene()->selectedItems());
+    m_itemToSelect = NULL;
     m_state = INITIAL;
 }
 

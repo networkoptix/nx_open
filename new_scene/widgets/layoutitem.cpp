@@ -39,9 +39,15 @@ void LayoutItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
     gradient.setStart(innerFrame.topLeft());
     gradient.setFinalStop(innerFrame.bottomRight());
     stops.clear();
-    stops << QGradientStop(0.0, QColor(215, 255, 200));
-    stops << QGradientStop(0.5, QColor(102, 176, 54));
-    stops << QGradientStop(1.0, QColor(0, 0,  0));
+    if(isSelected() || (parentItem() != NULL && parentItem()->isSelected())) { // hack hack hack
+        stops << QGradientStop(0.0, QColor(235, 255, 220));
+        stops << QGradientStop(0.5, QColor(122, 216, 74));
+        stops << QGradientStop(1.0, QColor(20, 20,  20));
+    } else {
+        stops << QGradientStop(0.0, QColor(215, 255, 200));
+        stops << QGradientStop(0.5, QColor(102, 176, 54));
+        stops << QGradientStop(1.0, QColor(0, 0,  0));
+    }
     gradient.setStops(stops);
     painter->setBrush(QBrush(gradient));
     painter->drawRoundedRect(innerFrame, 10.0, 10.0);

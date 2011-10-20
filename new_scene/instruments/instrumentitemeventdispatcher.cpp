@@ -49,6 +49,9 @@ void InstrumentItemEventDispatcher::installInstrument(Instrument *instrument) {
         return;
     }
 
+    if(!instrument->watches(Instrument::ITEM))
+        return;
+
     m_instruments.push_back(instrument);
     for (QHash<QGraphicsItem *, QList<Instrument *> >::iterator pos = m_instrumentsByItem.begin(); pos != m_instrumentsByItem.end(); pos++) {
         QGraphicsItem *item = pos.key();
@@ -61,6 +64,9 @@ void InstrumentItemEventDispatcher::installInstrument(Instrument *instrument) {
 
 void InstrumentItemEventDispatcher::uninstallInstrument(Instrument *instrument) {
     assert(instrument != NULL);
+
+    if(!instrument->watches(Instrument::ITEM))
+        return;
 
     int index = m_instruments.lastIndexOf(instrument);
     if (index == -1) {

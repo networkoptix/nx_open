@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QEvent> /* For QEvent::Type. */
 #include <QSet>
+#include "instrumentutility.h"
 
 class QKeyEvent;
 class QMouseEvent;
@@ -42,7 +43,7 @@ class InstrumentItemEventDispatcher;
 template<class T>
 class InstrumentEventDispatcher;
 
-class Instrument: public QObject {
+class Instrument: public QObject, protected InstrumentUtility {
     Q_OBJECT;
 
 public:

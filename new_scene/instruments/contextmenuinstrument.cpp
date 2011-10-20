@@ -29,18 +29,18 @@ bool ContextMenuInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *even
     if (item == NULL)
         return false;
 
-    m_showMenu = true;
+    m_isClick = true;
     m_mousePressPos = event->pos();
 
     return false;
 }
 
 bool ContextMenuInstrument::mouseMoveEvent(QWidget *viewport, QMouseEvent *event) {
-    if (!m_showMenu)
+    if (!m_isClick)
         return false;
 
     if ((m_mousePressPos - event->pos()).manhattanLength() > QApplication::startDragDistance()) {
-        m_showMenu = false;
+        m_isClick = false;
         return false;
     }
 
@@ -51,7 +51,7 @@ bool ContextMenuInstrument::mouseReleaseEvent(QWidget *viewport, QMouseEvent *ev
     if(event->button() != Qt::RightButton)
         return false;
 
-    if(!m_showMenu)
+    if(!m_isClick)
         return false;
 
     m_contextMenu->popup(event->globalPos());

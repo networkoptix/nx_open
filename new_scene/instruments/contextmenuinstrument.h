@@ -22,7 +22,7 @@ protected:
 
 private:
     QPoint m_mousePressPos;
-    bool m_showMenu;
+    bool m_isClick;
     QScopedPointer<QMenu> m_contextMenu;
 };
 

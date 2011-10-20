@@ -195,14 +195,14 @@ void GraphicsWidgetPrivate::movingResizingFinished()
 
 
 GraphicsWidget::GraphicsWidget(QGraphicsItem *parent):
-    QGraphicsWidget(parent),
+    base_type(parent),
     d_ptr(new GraphicsWidgetPrivate)
 {
     d_ptr->q_ptr = this;
 }
 
 GraphicsWidget::GraphicsWidget(QGraphicsItem *parent, GraphicsWidgetPrivate &dd):
-    QGraphicsWidget(parent), d_ptr(&dd)
+    base_type(parent), d_ptr(&dd)
 {
     d_ptr->q_ptr = this;
 }
@@ -245,7 +245,7 @@ void GraphicsWidget::initStyleOption(QStyleOption *option) const
 {
     Q_D(const GraphicsWidget);
 
-    QGraphicsWidget::initStyleOption(option);
+    base_type::initStyleOption(option);
     // QTBUG-18797: When setting the flag ItemIgnoresTransformations for an item,
     // it will receive mouse events as if it was transformed by the view.
     if (d->isUnderMouse)
@@ -271,14 +271,14 @@ bool GraphicsWidget::event(QEvent *event)
         break;
     }
 
-    return QGraphicsWidget::event(event);
+    return base_type::event(event);
 }
 
 void GraphicsWidget::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     Q_D(GraphicsWidget);
 
-    QGraphicsWidget::mousePressEvent(event);
+    base_type::mousePressEvent(event);
 
     if ((flags() & ItemIsMovable) && !(extraFlags() & ItemIsDraggable) && event->button() == Qt::LeftButton) 
         d->moving = true; 
@@ -295,7 +295,7 @@ void GraphicsWidget::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     Q_D(GraphicsWidget);
 
     /* This will call mousePressEvent. */
-    QGraphicsWidget::mouseDoubleClickEvent(event);
+    base_type::mouseDoubleClickEvent(event);
 
     if (event->button() == Qt::LeftButton)
         d->doubleClicked = true;
@@ -322,14 +322,14 @@ void GraphicsWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         d->movingStartedEmitted = true;
     }
 
-    QGraphicsWidget::mouseMoveEvent(event);
+    base_type::mouseMoveEvent(event);
 }
 
 void GraphicsWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     Q_D(GraphicsWidget);
 
-    QGraphicsWidget::mouseReleaseEvent(event);
+    base_type::mouseReleaseEvent(event);
 
     if (event->button() == Qt::LeftButton)
     {
@@ -364,7 +364,7 @@ bool GraphicsWidget::windowFrameEvent(QEvent *event)
     switch (event->type()) {
     case QEvent::GraphicsSceneMousePress:
     {
-        result = QGraphicsWidget::windowFrameEvent(event);
+        result = base_type::windowFrameEvent(event);
         QGraphicsSceneMouseEvent *e = static_cast<QGraphicsSceneMouseEvent *>(event);
 
         if (e->button() == Qt::LeftButton)
@@ -404,12 +404,12 @@ bool GraphicsWidget::windowFrameEvent(QEvent *event)
             d->movingStartedEmitted = true;
         }
 
-        result = QGraphicsWidget::windowFrameEvent(event);
+        result = base_type::windowFrameEvent(event);
         break;
     }
     case QEvent::GraphicsSceneMouseRelease:
     {
-        result = QGraphicsWidget::windowFrameEvent(event);
+        result = base_type::windowFrameEvent(event);
         QGraphicsSceneMouseEvent *e = static_cast<QGraphicsSceneMouseEvent *>(event);
         if (e->button() == Qt::LeftButton) {
             if (!d->movingStartedEmitted && !d->resizingStartedEmitted)
@@ -422,7 +422,7 @@ bool GraphicsWidget::windowFrameEvent(QEvent *event)
     }
     case QEvent::GraphicsSceneHoverLeave:
     {
-        result = QGraphicsWidget::windowFrameEvent(event);
+        result = base_type::windowFrameEvent(event);
 
         /* In some cases we won't receive release event for left button,
          * but we still need to emit the signals. */
@@ -431,7 +431,7 @@ bool GraphicsWidget::windowFrameEvent(QEvent *event)
         break;
     }
     default:
-        result = QGraphicsWidget::windowFrameEvent(event);
+        result = base_type::windowFrameEvent(event);
         break;
     }
 
@@ -443,12 +443,12 @@ QVariant GraphicsWidget::itemChange(GraphicsItemChange change, const QVariant &v
     if (change == ItemSceneHasChanged)
         DragFilter::ensureInstalledAt(scene());
 
-    return QGraphicsWidget::itemChange(change, value);
+    return base_type::itemChange(change, value);
 }
 
 Qt::WindowFrameSection GraphicsWidget::windowFrameSectionAt(const QPointF &pos) const
 {
-    return filterWindowFrameSection(QGraphicsWidget::windowFrameSectionAt(pos));
+    return filterWindowFrameSection(base_type::windowFrameSectionAt(pos));
 }
 
 Qt::WindowFrameSection GraphicsWidget::filterWindowFrameSection(Qt::WindowFrameSection section) const

@@ -4,6 +4,7 @@
 #include "instrument.h"
 
 class WheelZoomInstrument: public Instrument {
+    Q_OBJECT;
 public:
     WheelZoomInstrument(QObject *parent);
 

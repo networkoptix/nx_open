@@ -8,6 +8,14 @@
 #include "instrumenteventdispatcher.h"
 #include "InstrumentItemEventDispatcher.h"
 
+namespace {
+    /** Name of the property to store a list of scene's instrument managers. */
+    const char *managersPropertyName = "_qn_instrumentManagers";
+}
+
+/* For QVariant to work with it. */
+Q_DECLARE_METATYPE(QList<InstrumentManager *>);
+
 InstrumentManagerPrivate::InstrumentManagerPrivate():
     q_ptr(NULL),
     scene(NULL),
@@ -75,6 +83,8 @@ void InstrumentManagerPrivate::uninstallInstrumentInternal(Instrument *instrumen
 }
 
 void InstrumentManagerPrivate::registerSceneInternal(QGraphicsScene *newScene) {
+    Q_Q(InstrumentManager);
+
     /* Update scene and filter item. */
     scene = newScene;
     filterItem = new SceneEventFilterItem();
@@ -86,13 +96,25 @@ void InstrumentManagerPrivate::registerSceneInternal(QGraphicsScene *newScene) {
     foreach (Instrument *instrument, instruments)
         installInstrumentInternal(instrument);
 
+    /* Store self in scene's list of instrument managers. */
+    QList<InstrumentManager *> managers = q->managersOf(scene);
+    managers.push_back(q);
+    scene->setProperty(managersPropertyName, QVariant::fromValue(managers));
+
     /* And only then install event filter. */
     scene->installEventFilter(dispatchers[Instrument::SCENE]);
 }
 
 void InstrumentManagerPrivate::unregisterSceneInternal() {
+    Q_Q(InstrumentManager);
+
     /* First remove event filter. */
     scene->removeEventFilter(dispatchers[Instrument::SCENE]);
+
+    /* Remove self from scene's list of instrument managers. */
+    QList<InstrumentManager *> managers = q->managersOf(scene);
+    managers.removeOne(q);
+    scene->setProperty(managersPropertyName, QVariant::fromValue(managers));
 
     /* Unregister view and items. */
     while(!views.empty())
@@ -147,12 +169,19 @@ void InstrumentManagerPrivate::unregisterViewportInternal(QObject *viewport) {
 
 void InstrumentManagerPrivate::registerItemInternal(QGraphicsItem *item) {
     items.insert(item);
+
+    itemDispatcher->registerItem(item);
+
     item->installSceneEventFilter(filterItem);
 }
 
 void InstrumentManagerPrivate::unregisterItemInternal(QGraphicsItem *item) {
     items.remove(item);
-    item->removeSceneEventFilter(filterItem);
+
+    itemDispatcher->unregisterItem(item);
+
+    if(filterItem != NULL) 
+        item->removeSceneEventFilter(filterItem); /* We may get called from filter item's destructor, hence the check for NULL. */
 }
 
 void InstrumentManagerPrivate::at_view_destroyed(QObject *view) {
@@ -389,3 +418,6 @@ void InstrumentManager::at_viewport_destroyed(QObject *viewport) {
     d_func()->at_viewport_destroyed(viewport);
 }
 
+QList<InstrumentManager *> InstrumentManager::managersOf(QGraphicsScene *scene) {
+    return scene->property(managersPropertyName).value<QList<InstrumentManager *> >();
+}

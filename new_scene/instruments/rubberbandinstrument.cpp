@@ -20,10 +20,10 @@
  */
 class RubberBandItem: public QGraphicsItem {
 public:
-    RubberBandItem(QGraphicsScene *scene = NULL): 
-        QGraphicsItem(NULL, scene),
+    RubberBandItem(): 
+        QGraphicsItem(NULL),
         mViewport(NULL),
-        mRectsDirty(true)
+        mCacheDirty(true)
     {
         setAcceptedMouseButtons(0);
         setEnabled(false);
@@ -130,11 +130,11 @@ protected:
     void updateRects() {
         prepareGeometryChange();
 
-        mRectsDirty = true;
+        mCacheDirty = true;
     }
 
     void ensureRects() const {
-        if (!mRectsDirty)
+        if (!mCacheDirty)
             return;
 
         /* Create scene-to-viewport transformation. */
@@ -142,21 +142,12 @@ protected:
 
         mRubberBandRect = QRectF(mSceneToViewport.map(mOrigin), mSceneToViewport.map(mCorner)).normalized().toRect();
         mBoundingRect = viewportToScene.mapRect(QRectF(mRubberBandRect));
-        mRectsDirty = false;
+        mCacheDirty = false;
     }
 
 private:
     /** Viewport that this rubber band will be drawn at. */
     QWidget *mViewport;
-
-    /** Whether stored rectangles need recalculating. */
-    mutable bool mRectsDirty;
-
-    /** Current rubber band rectangle, in viewport coordinates. */
-    mutable QRect mRubberBandRect;
-
-    /** Bounding rect of the current rubber band rectangle, in scene coordinates. */
-    mutable QRectF mBoundingRect;
 
     /** Origin of the rubber band, in scene coordinates. */
     QPointF mOrigin;
@@ -166,6 +157,15 @@ private:
 
     /** Current viewport-to-scene transformation. */
     QTransform mSceneToViewport;
+
+    /** Whether stored rectangles need recalculating. */
+    mutable bool mCacheDirty;
+
+    /** Current rubber band rectangle, in viewport coordinates. */
+    mutable QRect mRubberBandRect;
+
+    /** Bounding rect of the current rubber band rectangle, in scene coordinates. */
+    mutable QRectF mBoundingRect;
 };
 
 
@@ -187,9 +187,15 @@ RubberBandInstrument::~RubberBandInstrument() {
 }
 
 void RubberBandInstrument::installedNotify() {
-    mState = INITIAL;
+    m_state = INITIAL;
     
-    mRubberBand.reset(new RubberBandItem(scene()));
+    m_rubberBand.reset(new RubberBandItem());
+    scene()->addItem(m_rubberBand.data());
+
+    connect(scene(), SIGNAL(selectionChanged()), this, SLOT(at_scene_selectionChanged()));
+
+    m_inSelectionChanged = false;
+    m_protectSelection = false;
 
     Instrument::installedNotify();
 }
@@ -197,21 +203,23 @@ void RubberBandInstrument::installedNotify() {
 void RubberBandInstrument::aboutToBeUninstalledNotify() {
     if (scene() == NULL) {
         /* Rubber band item will be deleted by scene, just zero the pointer. */
-        mRubberBand.take();
+        m_rubberBand.take();
     } else {
-        mRubberBand.reset();
+        disconnect(scene(), NULL, this, NULL);
+
+        m_rubberBand.reset();
     }
 }
 
 bool RubberBandInstrument::paintEvent(QWidget *viewport, QPaintEvent *) {
-    if (mState != RUBBER_BANDING)
-        return false;
+    if(viewport != m_rubberBand->viewport())
+        return false; /* We are interested only in transformations for the current viewport. */
 
     QGraphicsView *view = this->view(viewport);
-    mRubberBand->setViewportTransform(view->viewportTransform());
+    m_rubberBand->setViewportTransform(view->viewportTransform());
 
     /* Scene mouse position may have changed as a result of transform change. */
-    mRubberBand->setCorner(view->mapToScene(view->mapFromGlobal(QCursor::pos())));
+    m_rubberBand->setCorner(view->mapToScene(view->mapFromGlobal(QCursor::pos())));
 
     return false;
 }
@@ -219,7 +227,7 @@ bool RubberBandInstrument::paintEvent(QWidget *viewport, QPaintEvent *) {
 bool RubberBandInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
     QGraphicsView *view = this->view(viewport);
 
-    if (mState != INITIAL || !view->isInteractive())
+    if (m_state != INITIAL || !view->isInteractive())
         return false;
 
     if (event->button() != Qt::LeftButton)
@@ -235,51 +243,67 @@ bool RubberBandInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event
     if (focusableItem != NULL)
         return false; /* Let default implementation handle it. */
 
-    mState = PREPAIRING;
-    mMousePressPos = event->pos();
-    mMousePressScenePos = view->mapToScene(event->pos());
+    m_state = PREPAIRING;
+    m_mousePressPos = event->pos();
+    m_mousePressScenePos = view->mapToScene(event->pos());
 
     if (!(event->modifiers() & Qt::ShiftModifier))
         scene()->clearSelection();
+    
+    /* Scene may clear selection after a mouse click. We don't allow it. */
+    m_originallySelected = toSet(scene()->selectedItems());
+    m_protectSelection = !m_originallySelected.empty();
 
     event->accept();
     return false;
 }
 
+void RubberBandInstrument::at_scene_selectionChanged() {
+    if(!m_protectSelection)
+        return;
+
+    if(m_inSelectionChanged)
+        return;
+
+    m_inSelectionChanged = true;
+    
+    foreach(QGraphicsItem *item, m_originallySelected)
+        item->setSelected(true);
+
+    m_inSelectionChanged = false;
+    m_protectSelection = false;
+}
+
 bool RubberBandInstrument::mouseMoveEvent(QWidget *viewport, QMouseEvent *event) {
     QGraphicsView *view = this->view(viewport);
 
-    if (mState == INITIAL || !view->isInteractive())
+    if (m_state == INITIAL || !view->isInteractive())
         return false;
 
     /* Stop rubber banding if the user has let go of the trigger button (even if we didn't get the release events). */
     if (!(event->buttons() & Qt::LeftButton)) {
-        mRubberBand->setViewport(NULL);
-        mState = INITIAL;
+        m_rubberBand->setViewport(NULL);
+        m_state = INITIAL;
         return false;
     }
 
     /* Check for drag distance. */
-    if (mState == PREPAIRING) {
-        if ((mMousePressPos - event->pos()).manhattanLength() < QApplication::startDragDistance()) {
+    if (m_state == PREPAIRING) {
+        if ((m_mousePressPos - event->pos()).manhattanLength() < QApplication::startDragDistance()) {
             return false;
         } else {
-            if (event->modifiers() & Qt::ShiftModifier)
-                mOriginallySelected = toSet(scene()->selectedItems());
-            else
-                mOriginallySelected.clear();
-            mState = RUBBER_BANDING;
-            mRubberBand->setViewport(viewport);
-            mRubberBand->setOrigin(mMousePressScenePos);
+            m_state = RUBBER_BANDING;
+            m_rubberBand->setViewport(viewport);
+            m_rubberBand->setOrigin(m_mousePressScenePos);
         }
     }
 
     /* Update rubber band corner. */
-    mRubberBand->setCorner(view->mapToScene(event->pos()));
+    m_rubberBand->setCorner(view->mapToScene(event->pos()));
 
     /* Update selection. */
     QPainterPath selectionArea;
-    selectionArea.addPolygon(view->mapToScene(mRubberBand->rubberBandRect()));
+    selectionArea.addPolygon(view->mapToScene(m_rubberBand->rubberBandRect()));
     selectionArea.closeSubpath();
 
     if (event->modifiers() & Qt::ShiftModifier) {
@@ -288,7 +312,7 @@ bool RubberBandInstrument::mouseMoveEvent(QWidget *viewport, QMouseEvent *event)
 
         /* Unselect all items that went out of rubber band. */
         foreach (QGraphicsItem *item, scene()->selectedItems())
-            if (!newlySelected.contains(item) && !mOriginallySelected.contains(item))
+            if (!newlySelected.contains(item) && !m_originallySelected.contains(item))
                 item->setSelected(false);
 
         /* Select all newly selected items. */
@@ -305,14 +329,14 @@ bool RubberBandInstrument::mouseMoveEvent(QWidget *viewport, QMouseEvent *event)
 bool RubberBandInstrument::mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) {
     QGraphicsView *view = this->view(viewport);
 
-    if (mState == INITIAL || !view->isInteractive())
+    if (m_state == INITIAL || !view->isInteractive())
         return false;
 
     if (event->button() != Qt::LeftButton)
         return false;
 
-    mState = INITIAL;
-    mRubberBand->setViewport(NULL);
+    m_rubberBand->setViewport(NULL);
+    m_state = INITIAL;
 
     event->accept();
     return false;

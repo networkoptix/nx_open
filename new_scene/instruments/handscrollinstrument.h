@@ -5,6 +5,7 @@
 #include "instrument.h"
 
 class HandScrollInstrument: public Instrument {
+    Q_OBJECT;
 public:
     HandScrollInstrument(QObject *parent);
 
