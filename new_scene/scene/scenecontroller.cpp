@@ -132,12 +132,13 @@ SceneController::SceneController(QObject *parent):
     m_manager->registerScene(m_scene);
     ClickInstrument *clickInstrument = new ClickInstrument(this);
     DragInstrument *dragInstrument = new DragInstrument(this);
+    HandScrollInstrument *handScrollInstrument = new HandScrollInstrument(this);
     m_boundingInstrument = new BoundingInstrument(this);
 
     m_manager->installInstrument(new WheelZoomInstrument(this));
     m_manager->installInstrument(dragInstrument);
     m_manager->installInstrument(new RubberBandInstrument(this));
-    m_manager->installInstrument(new HandScrollInstrument(this));
+    m_manager->installInstrument(handScrollInstrument);
     m_manager->installInstrument(new ContextMenuInstrument(this));
     m_manager->installInstrument(clickInstrument);
     m_manager->installInstrument(m_boundingInstrument);
@@ -147,6 +148,9 @@ SceneController::SceneController(QObject *parent):
 
     connect(dragInstrument, SIGNAL(draggingStarted(QGraphicsView *, QList<QGraphicsItem *>)), this, SLOT(at_draggingStarted(QGraphicsView *, QList<QGraphicsItem *>)));
     connect(dragInstrument, SIGNAL(draggingFinished(QGraphicsView *, QList<QGraphicsItem *>)), this, SLOT(at_draggingFinished(QGraphicsView *, QList<QGraphicsItem *>)));
+
+    connect(handScrollInstrument, SIGNAL(scrollingStarted(QGraphicsView *)), m_boundingInstrument, SLOT(dontEnforcePosition(QGraphicsView *)));
+    connect(handScrollInstrument, SIGNAL(scrollingFinished(QGraphicsView *)), m_boundingInstrument, SLOT(enforcePosition(QGraphicsView *)));
 
     /* Create central widget. */
     m_centralWidget = new CentralWidget();
@@ -204,13 +208,12 @@ void SceneController::addView(QGraphicsView *view) {
     view->setScene(m_scene);
     view->setDragMode(QGraphicsView::NoDrag);
 
-    // TODO
-    m_boundingInstrument->setView(view);
-    m_boundingInstrument->setZoomAnimated(false);
-    m_boundingInstrument->setMoveAnimated(false);
-    m_boundingInstrument->setMoveBounds(QRectF(0, 0, 1000, 1000), 0.0);
-    m_boundingInstrument->setZoomBounds(QSizeF(1000, 1000));
-
+    m_boundingInstrument->setSizeEnforced(view, true);
+    m_boundingInstrument->setPositionEnforced(view, true);
+    m_boundingInstrument->setPositionBounds(view, QRectF(0, 0, 1000, 1000), 0.0);
+    m_boundingInstrument->setSizeBounds(view, QSizeF(1000, 1000));
+    m_boundingInstrument->setScalingSpeed(view, 8.0);
+    m_boundingInstrument->setMovementSpeed(view, 4.0);
 
 #ifndef QT_NO_OPENGL
     if (QGLFormat::hasOpenGL()) {

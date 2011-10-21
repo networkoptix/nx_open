@@ -43,8 +43,8 @@ public:
 class SceneEventFilterItem: public QGraphicsItem {
 public:
     SceneEventFilterItem():
-        mEventFilter(NULL),
-        mDestructionListener(NULL)
+        m_eventFilter(NULL),
+        m_destructionListener(NULL)
     {
         setFlags(ItemHasNoContents);
         setAcceptedMouseButtons(0);
@@ -53,8 +53,8 @@ public:
     }
 
     virtual ~SceneEventFilterItem() {
-        if (mDestructionListener != NULL)
-            mDestructionListener->destroyed(this);
+        if (m_destructionListener != NULL)
+            m_destructionListener->destroyed(this);
     }
 
     virtual QRectF boundingRect() const override {
@@ -66,33 +66,33 @@ public:
     }
 
     void setEventFilter(SceneEventFilter *filter) {
-        mEventFilter = filter;
+        m_eventFilter = filter;
     }
 
     SceneEventFilter *eventFilter() const {
-        return mEventFilter;
+        return m_eventFilter;
     }
 
     void setDestructionListener(SceneDestructionListener *listener) {
-        mDestructionListener = listener;
+        m_destructionListener = listener;
     }
 
     SceneDestructionListener *destructionListener() const {
-        return mDestructionListener;
+        return m_destructionListener;
     }
 
 protected:
     virtual bool sceneEventFilter(QGraphicsItem *watched, QEvent *event) override {
-        if (mEventFilter != NULL) {
-            return mEventFilter->sceneEventFilter(watched, event);
+        if (m_eventFilter != NULL) {
+            return m_eventFilter->sceneEventFilter(watched, event);
         } else {
             return false;
         }
     }
 
 private:
-    SceneEventFilter *mEventFilter;
-    SceneDestructionListener *mDestructionListener;
+    SceneEventFilter *m_eventFilter;
+    SceneDestructionListener *m_destructionListener;
 };
 
 
