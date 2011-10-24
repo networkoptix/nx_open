@@ -1,4 +1,5 @@
 #include "scenecontroller.h"
+#include "scenecontroller_p.h"
 #include <cassert>
 #include <QGraphicsScene>
 #include <QGraphicsView>
@@ -115,71 +116,203 @@ namespace {
 
     const qreal spacing = 25;
 
+    /** Size multiplier for focused widgets. */
+    const qreal focusExpansion = 1.5;
+
+    /** Maximal expanded size of a focused widget, relative to viewport size. */
+    const qreal maxExpandedSize = 0.8;
+
+    /** Lower size boundary. */
+    const QSizeF lowerSizeBound = QSizeF(1.0, 1.0);
+
+    const qreal normalZ = 0.0;
+    const qreal focusedZ = 1.0;
+
 } // anonymous namespace
+
+void SceneControllerPrivate::toggleFocus(QGraphicsView *view, AnimatedWidget *widget) {
+    if(widget == focusedWidget) {
+        if(focusedWidget != NULL) {
+            if(focusedExpanded) {
+                focusedContract(view);
+            } else {
+                focusedExpand(view);
+            }
+        }
+    } else {
+        if(focusedWidget != NULL) {
+            if(focusedExpanded)
+                focusedContract(view);
+
+            if(focusedZoomed)
+                focusedUnzoom(view);
+
+            focusedWidget->setZValue(normalZ);
+        }
+
+        focusedWidget = widget;
+        
+        if(focusedWidget != NULL) {
+            focusedWidget->setZValue(focusedZ);
+
+            focusedExpand(view);
+        }
+    }
+}
+
+void SceneControllerPrivate::toggleZoom(QGraphicsView *view, AnimatedWidget *widget) {
+    if(widget == focusedWidget) {
+        if(focusedWidget != NULL) {
+            if(focusedExpanded)
+                focusedContract(view);
+
+            if(focusedZoomed) {
+                focusedUnzoom(view);
+            } else {
+                focusedZoom(view);
+            }
+        }
+    } else {
+        if(focusedWidget != NULL) {
+            if(focusedExpanded)
+                focusedContract(view);
+
+            if(focusedZoomed)
+                focusedUnzoom(view);
+
+            focusedWidget->setZValue(normalZ);
+        }
+
+        focusedWidget = widget;
+
+        if(focusedWidget != NULL) {
+            focusedWidget->setZValue(focusedZ);
+
+            focusedZoom(view);
+        }
+
+    }
+}
+
+void SceneControllerPrivate::focusedExpand(QGraphicsView *view) {
+    assert(focusedWidget != NULL && !focusedExpanded);
+
+    QRectF viewportRect = InstrumentUtility::mapRectToScene(view, view->viewport()->rect());
+    QRectF widgetRect = centralLayout->mapFromGrid(centralLayout->rect(focusedWidget));
+
+    QPointF viewportCenter = viewportRect.center();
+    QPointF widgetCenter = widgetRect.center();
+
+    QSizeF newWidgetSize = widgetRect.size() * focusExpansion;
+    QSizeF maxWidgetSize = viewportRect.size() * maxExpandedSize;
+
+    /* Allow expansion no further than the maximal size, but no less than current size. */
+    newWidgetSize =  InstrumentUtility::bounded(newWidgetSize, maxWidgetSize,     Qt::KeepAspectRatio);
+    newWidgetSize = InstrumentUtility::expanded(newWidgetSize, widgetRect.size(), Qt::KeepAspectRatio);
+
+    /* Calculate expansion values. Expand towards the screen center. */
+    qreal xp1 = 0.0, xp2 = 0.0, yp1 = 0.0, yp2 = 0.0;
+    calculateExpansionValues(widgetRect.left(), widgetRect.right(),  viewportCenter.x(), newWidgetSize.width(),  &xp1, &xp2);
+    calculateExpansionValues(widgetRect.top(),  widgetRect.bottom(), viewportCenter.y(), newWidgetSize.height(), &yp1, &yp2);
+    QRectF newWidgetRect = widgetRect.adjusted(xp1, yp1, xp2, yp2);
+
+    focusedWidget->setGeometry(newWidgetRect);
+    
+    focusedExpanded = true;
+}
+
+void SceneControllerPrivate::focusedContract(QGraphicsView *) {
+    assert(focusedWidget != NULL && focusedExpanded);
+
+    QRectF rect = centralLayout->mapFromGrid(centralLayout->rect(focusedWidget));
+    focusedWidget->setGeometry(rect);
+
+    focusedExpanded = false;
+}
+
+void SceneControllerPrivate::focusedZoom(QGraphicsView *view) {
+    assert(focusedWidget != NULL && !focusedZoomed);
+
+    QRectF rect = centralWidget->mapRectToScene(centralLayout->mapFromGrid(centralLayout->rect(focusedWidget)));
+    boundingInstrument->setPositionBounds(view, rect, 0.0);
+    boundingInstrument->setSizeBounds(view, lowerSizeBound, BoundingInstrument::OutBound, rect.size(), BoundingInstrument::OutBound);
+
+    focusedZoomed = true;
+}
+
+void SceneControllerPrivate::focusedUnzoom(QGraphicsView *) {
+    assert(focusedWidget != NULL && focusedZoomed);
+
+    boundingInstrument->setPositionBounds(NULL, centralWidget->geometry(), 0.0);
+    boundingInstrument->setSizeBounds(NULL, lowerSizeBound, BoundingInstrument::OutBound, centralWidget->size(), BoundingInstrument::OutBound);
+
+    focusedZoomed = false;
+}
 
 SceneController::SceneController(QObject *parent):
     QObject(parent),
-    m_scene(new QGraphicsScene(this)),
-    m_manager(new InstrumentManager(this)),
-    m_centralWidget(NULL),
-    m_centralLayout(NULL),
-    m_focusedWidget(NULL),
-    m_focusedExpanded(false)
+    d_ptr(new SceneControllerPrivate())
 {
-    m_scene->setItemIndexMethod(QGraphicsScene::NoIndex); // TODO: check.
+    Q_D(SceneController);
+
+    const_cast<SceneController *&>(d->q_ptr) = this;
+    d->scene = new QGraphicsScene(this);
+    d->manager = new InstrumentManager(this);
+    
+    d->scene->setItemIndexMethod(QGraphicsScene::NoIndex);
 
     /* Install instruments. */
-    m_manager->registerScene(m_scene);
+    d->manager->registerScene(d->scene);
     ClickInstrument *clickInstrument = new ClickInstrument(this);
     DragInstrument *dragInstrument = new DragInstrument(this);
     HandScrollInstrument *handScrollInstrument = new HandScrollInstrument(this);
-    m_boundingInstrument = new BoundingInstrument(this);
+    d->boundingInstrument = new BoundingInstrument(this);
 
-    m_manager->installInstrument(new WheelZoomInstrument(this));
-    m_manager->installInstrument(dragInstrument);
-    m_manager->installInstrument(new RubberBandInstrument(this));
-    m_manager->installInstrument(handScrollInstrument);
-    m_manager->installInstrument(new ContextMenuInstrument(this));
-    m_manager->installInstrument(clickInstrument);
-    m_manager->installInstrument(m_boundingInstrument);
+    d->manager->installInstrument(new WheelZoomInstrument(this));
+    d->manager->installInstrument(dragInstrument);
+    d->manager->installInstrument(new RubberBandInstrument(this));
+    d->manager->installInstrument(handScrollInstrument);
+    d->manager->installInstrument(new ContextMenuInstrument(this));
+    d->manager->installInstrument(clickInstrument);
+    d->manager->installInstrument(d->boundingInstrument);
 
-    connect(clickInstrument, SIGNAL(clicked(QGraphicsView *, QGraphicsItem *)), this, SLOT(at_clicked(QGraphicsView *, QGraphicsItem *)));
-    connect(clickInstrument, SIGNAL(doubleClicked(QGraphicsView *, QGraphicsItem *)), this, SLOT(at_doubleClicked(QGraphicsView *, QGraphicsItem *)));
-
-    connect(dragInstrument, SIGNAL(draggingStarted(QGraphicsView *, QList<QGraphicsItem *>)), this, SLOT(at_draggingStarted(QGraphicsView *, QList<QGraphicsItem *>)));
-    connect(dragInstrument, SIGNAL(draggingFinished(QGraphicsView *, QList<QGraphicsItem *>)), this, SLOT(at_draggingFinished(QGraphicsView *, QList<QGraphicsItem *>)));
-
-    connect(handScrollInstrument, SIGNAL(scrollingStarted(QGraphicsView *)), m_boundingInstrument, SLOT(dontEnforcePosition(QGraphicsView *)));
-    connect(handScrollInstrument, SIGNAL(scrollingFinished(QGraphicsView *)), m_boundingInstrument, SLOT(enforcePosition(QGraphicsView *)));
+    connect(clickInstrument,      SIGNAL(clicked(QGraphicsView *, QGraphicsItem *)),                 this,                  SLOT(at_clicked(QGraphicsView *, QGraphicsItem *)));
+    connect(clickInstrument,      SIGNAL(doubleClicked(QGraphicsView *, QGraphicsItem *)),           this,                  SLOT(at_doubleClicked(QGraphicsView *, QGraphicsItem *)));
+    connect(dragInstrument,       SIGNAL(draggingStarted(QGraphicsView *, QList<QGraphicsItem *>)),  this,                  SLOT(at_draggingStarted(QGraphicsView *, QList<QGraphicsItem *>)));
+    connect(dragInstrument,       SIGNAL(draggingFinished(QGraphicsView *, QList<QGraphicsItem *>)), this,                  SLOT(at_draggingFinished(QGraphicsView *, QList<QGraphicsItem *>)));
+    connect(handScrollInstrument, SIGNAL(scrollingStarted(QGraphicsView *)),                         d->boundingInstrument, SLOT(dontEnforcePosition(QGraphicsView *)));
+    connect(handScrollInstrument, SIGNAL(scrollingFinished(QGraphicsView *)),                        d->boundingInstrument, SLOT(enforcePosition(QGraphicsView *)));
 
     /* Create central widget. */
-    m_centralWidget = new CentralWidget();
-    m_centralWidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding, QSizePolicy::GroupBox));
-    connect(m_centralWidget, SIGNAL(geometryChanged()), this, SLOT(at_centralWidget_geometryChanged()), Qt::QueuedConnection);
-    m_scene->addItem(m_centralWidget);
+    d->centralWidget = new CentralWidget();
+    d->centralWidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding, QSizePolicy::GroupBox));
+    connect(d->centralWidget, SIGNAL(geometryChanged()), this, SLOT(at_centralWidget_geometryChanged()));
+    d->scene->addItem(d->centralWidget);
 
-    m_centralLayout = new CellLayout();
-    m_centralLayout->setContentsMargins(spacing, spacing, spacing, spacing);
-    m_centralLayout->setSpacing(spacing);
-    m_centralLayout->setCellSize(200, 150);
-    m_centralWidget->setLayout(m_centralLayout);
+    /* Create central layout. */
+    d->centralLayout = new CellLayout();
+    d->centralLayout->setContentsMargins(spacing, spacing, spacing, spacing);
+    d->centralLayout->setSpacing(spacing);
+    d->centralLayout->setCellSize(200, 150);
+    d->centralWidget->setLayout(d->centralLayout);
 
     /* Create items. */
     for (int i = 0; i < 16; ++i) {
-        AnimatedWidget *widget = new AnimatedWidget(m_centralWidget);
+        AnimatedWidget *widget = new AnimatedWidget(d->centralWidget);
 
         widget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true); /* Optimization. */
         widget->setFlag(QGraphicsItem::ItemIsSelectable, true);
         widget->setFlag(QGraphicsItem::ItemIsFocusable, true);
 
         widget->setAnimationsEnabled(true);
-        widget->setWindowTitle(tr("item # %1").arg(i + 1));
+        widget->setWindowTitle(SceneController::tr("item # %1").arg(i + 1));
         widget->setPos(QPointF(-500, -500));
-        
+        widget->setZValue(normalZ);
+
         QGraphicsGridLayout *layout = new QGraphicsGridLayout(widget);
         layout->setSpacing(0);
         layout->setContentsMargins(0, 0, 0, 0);
-        
+
         LayoutItem *item = new LayoutItem(widget);
         layout->addItem(item, 0, 0, 1, 1, Qt::AlignCenter);
         item->setAcceptedMouseButtons(0);
@@ -187,30 +320,24 @@ SceneController::SceneController(QObject *parent):
         connect(widget, SIGNAL(resizingStarted()),  this, SLOT(at_widget_resizingStarted()));
         connect(widget, SIGNAL(resizingFinished()), this, SLOT(at_widget_resizingFinished()));
 
-        /*
-        connect(widget, SIGNAL(clicked()), this, SLOT(itemClicked()));
-        connect(widget, SIGNAL(doubleClicked()), this, SLOT(itemDoubleClicked()));
-        connect(widget, SIGNAL(destroyed()), this, SLOT(itemDestroyed()));
-
-        connect(widget, SIGNAL(clicked()), this, SLOT(_clicked()));
-        connect(widget, SIGNAL(doubleClicked()), this, SLOT(_doubleClicked()));
-        connect(widget, SIGNAL(movingStarted()), this, SLOT(at_draggingStarted()));
-        connect(widget, SIGNAL(movingFinished()), this, SLOT(at_draggingFinished()));
-        */
-
-        m_animatedWidgets.push_back(widget);
+        d->animatedWidgets.push_back(widget);
     }
+}
 
+SceneController::~SceneController() {
+    return;
 }
 
 void SceneController::addView(QGraphicsView *view) {
-    view->setScene(m_scene);
+    Q_D(SceneController);
+
+    view->setScene(d->scene);
     view->setDragMode(QGraphicsView::NoDrag);
 
-    m_boundingInstrument->setSizeEnforced(view, true);
-    m_boundingInstrument->setPositionEnforced(view, true);
-    m_boundingInstrument->setScalingSpeed(view, 8.0);
-    m_boundingInstrument->setMovementSpeed(view, 4.0);
+    d->boundingInstrument->setSizeEnforced(view, true);
+    d->boundingInstrument->setPositionEnforced(view, true);
+    d->boundingInstrument->setScalingSpeed(view, 32.0);
+    d->boundingInstrument->setMovementSpeed(view, 4.0);
 
 #ifndef QT_NO_OPENGL
     if (QGLFormat::hasOpenGL()) {
@@ -260,25 +387,27 @@ void SceneController::addView(QGraphicsView *view) {
         connect(action, SIGNAL(triggered()), this, SLOT(at_relayoutAction_triggered()));
     }
 
-    m_manager->registerView(view);
+    d->manager->registerView(view);
 }
 
 QGraphicsScene *SceneController::scene() const {
-    return m_scene;
+    return d_func()->scene;
 }
 
 SceneController::Mode SceneController::mode() const {
-    return m_mode;
+    return d_func()->mode;
 }
 
 void SceneController::setMode(Mode mode) {
-    if(mode == m_mode)
+    Q_D(SceneController);
+
+    if(mode == d->mode)
         return;
 
-    m_mode = mode;
-    foreach (AnimatedWidget *widget, m_animatedWidgets)
+    d->mode = mode;
+    foreach (AnimatedWidget *widget, d->animatedWidgets)
         widget->setInteractive(mode == EDITING);
-    m_centralWidget->setGridVisible(mode == EDITING);
+    d->centralWidget->setGridVisible(mode == EDITING);
 }
 
 void SceneController::at_relayoutAction_triggered() {
@@ -290,23 +419,26 @@ void SceneController::at_relayoutAction_triggered() {
 }
 
 void SceneController::at_centralWidget_geometryChanged() {
-    QRect bounds = m_centralLayout->bounds();
-    if(bounds == m_centralLayoutBounds)
+    Q_D(SceneController);
+
+    QRect bounds = d->centralLayout->bounds();
+    if(bounds == d->lastCentralLayoutBounds)
         return;
     
-    QPointF sceneDelta = m_centralLayout->mapFromGrid(QPoint(0, 0)) - m_centralLayout->mapFromGrid(m_centralLayoutBounds.topLeft() - bounds.topLeft());
-    m_centralLayoutBounds = bounds;
+    QPointF sceneDelta = d->centralLayout->mapFromGrid(QPoint(0, 0)) - d->centralLayout->mapFromGrid(d->lastCentralLayoutBounds.topLeft() - bounds.topLeft());
+    d->lastCentralLayoutBounds = bounds;
     
-    foreach(AnimatedWidget *animatedWidget, m_animatedWidgets) {
+    foreach(AnimatedWidget *animatedWidget, d->animatedWidgets) {
         animatedWidget->setAnimationsEnabled(false);
         animatedWidget->moveBy(-sceneDelta.x(), -sceneDelta.y());
         animatedWidget->setAnimationsEnabled(true);
     }
-    m_centralWidget->moveBy(sceneDelta.x(), sceneDelta.y());
-    invalidateLayout();
+    d->centralWidget->moveBy(sceneDelta.x(), sceneDelta.y());
+    d->centralLayout->invalidate();
+    d->centralLayout->activate();
 
-    m_boundingInstrument->setPositionBounds(NULL, m_centralWidget->geometry(), 0.0);
-    m_boundingInstrument->setSizeBounds(NULL, QSizeF(100, 100), BoundingInstrument::OutBound, m_centralWidget->size(), BoundingInstrument::OutBound);
+    d->boundingInstrument->setPositionBounds(NULL, d->centralWidget->geometry(), 0.0);
+    d->boundingInstrument->setSizeBounds(NULL, QSizeF(100, 100), BoundingInstrument::OutBound, d->centralWidget->size(), BoundingInstrument::OutBound);
 
 #if 0
     const QRectF viewportSceneRect = mapRectToScene(viewport()->rect());
@@ -338,14 +470,16 @@ void SceneController::at_widget_resizingStarted() {
 }
 
 void SceneController::at_widget_resizingFinished() {
+    Q_D(SceneController);
+
     AnimatedWidget *widget = static_cast<AnimatedWidget *>(sender());
     widget->setAnimationsEnabled(true);
 
-    QRect newRect = m_centralLayout->mapToGrid(widget->geometry());
-    QSet<QGraphicsLayoutItem *> items = m_centralLayout->itemsAt(newRect);
+    QRect newRect = d->centralLayout->mapToGrid(widget->geometry());
+    QSet<QGraphicsLayoutItem *> items = d->centralLayout->itemsAt(newRect);
     items.remove(widget);
     if (items.empty())
-        m_centralLayout->moveItem(widget, newRect);
+        d->centralLayout->moveItem(widget, newRect);
 }
 
 void SceneController::at_draggingStarted(QGraphicsView *, QList<QGraphicsItem *> items) {
@@ -355,6 +489,8 @@ void SceneController::at_draggingStarted(QGraphicsView *, QList<QGraphicsItem *>
 }
 
 void SceneController::at_draggingFinished(QGraphicsView *view, QList<QGraphicsItem *> items) {
+    Q_D(SceneController);
+
     AnimatedWidget *draggedWidget = NULL;
     foreach (QGraphicsItem *item, items) {
         draggedWidget = dynamic_cast<AnimatedWidget *>(item);
@@ -365,7 +501,7 @@ void SceneController::at_draggingFinished(QGraphicsView *view, QList<QGraphicsIt
     if(draggedWidget == NULL)
         return;
 
-    CellLayout *layout = m_centralLayout;
+    CellLayout *layout = d->centralLayout;
     QPoint delta = layout->mapToGrid(draggedWidget->geometry()).topLeft() - layout->rect(draggedWidget).topLeft();
 
     QList<QGraphicsLayoutItem *> layoutItems;
@@ -374,7 +510,7 @@ void SceneController::at_draggingFinished(QGraphicsView *view, QList<QGraphicsIt
         if (QGraphicsLayoutItem *layoutItem = dynamic_cast<QGraphicsLayoutItem *>(item))
             layoutItems.push_back(layoutItem);
 
-    QGraphicsLayoutItem *replacedItem = layout->itemAt(layout->mapToGrid(m_centralWidget->mapFromScene(view->mapToScene(view->mapFromGlobal(QCursor::pos())))));
+    QGraphicsLayoutItem *replacedItem = layout->itemAt(layout->mapToGrid(d->centralWidget->mapFromScene(view->mapToScene(view->mapFromGlobal(QCursor::pos())))));
     if (layoutItems.size() == 1 && replacedItem != NULL) {
         layoutItems.push_back(replacedItem);
         rects.push_back(layout->rect(replacedItem));
@@ -398,110 +534,42 @@ void SceneController::at_draggingFinished(QGraphicsView *view, QList<QGraphicsIt
 }
 
 void SceneController::at_clicked(QGraphicsView *view, QGraphicsItem *item) {
-    AnimatedWidget *widget = dynamic_cast<AnimatedWidget *>(item);
-    if(widget == NULL)
-        return;
-
-    if (widget == m_focusedWidget) {
-        m_focusedExpanded = !m_focusedExpanded;
-        repositionFocusedWidget(view);
-        return;
-    }
-
-    if (m_focusedWidget != NULL) {
-        m_focusedWidget = NULL;
-        invalidateLayout();
-    }
-
-    m_focusedWidget = widget;
-    m_focusedExpanded = true;
-    repositionFocusedWidget(view);
-
-
-/*    if (scene()->selectedItems().isEmpty()) {
-        invalidateLayout();
-
-        m_focusedWidget = NULL;
-    }*/
+    d_func()->toggleFocus(view, dynamic_cast<AnimatedWidget *>(item));
 }
 
-void SceneController::repositionFocusedWidget(QGraphicsView *view) {
-    if(m_focusedExpanded) {
-        QRectF viewportRect = mapRectToScene(view, view->viewport()->rect());
-        QRectF widgetRect = m_centralLayout->mapFromGrid(m_centralLayout->rect(m_focusedWidget));
-
-        QPointF viewportCenter = viewportRect.center();
-        QPointF widgetCenter = widgetRect.center();
-
-        // TODO: move up.
-        static const qreal focusExpansion = 1.5;
-        static const qreal maxExpandedSize = 0.8;
-
-        QSizeF newWidgetSize = widgetRect.size() * focusExpansion;
-        QSizeF maxWidgetSize = viewportRect.size() * maxExpandedSize;
-
-        /* Allow expansion no further than the maximal size, but no less than current size. */
-        newWidgetSize =  bounded(newWidgetSize, maxWidgetSize,     Qt::KeepAspectRatio);
-        newWidgetSize = expanded(newWidgetSize, widgetRect.size(), Qt::KeepAspectRatio);
-        
-        /* Calculate expansion values. Expand towards the screen center. */
-        qreal xp1 = 0.0, xp2 = 0.0, yp1 = 0.0, yp2 = 0.0;
-        calculateExpansionValues(widgetRect.left(), widgetRect.right(),  viewportCenter.x(), newWidgetSize.width(),  &xp1, &xp2);
-        calculateExpansionValues(widgetRect.top(),  widgetRect.bottom(), viewportCenter.y(), newWidgetSize.height(), &yp1, &yp2);
-        QRectF newWidgetRect = widgetRect.adjusted(xp1, yp1, xp2, yp2);
-
-        m_focusedWidget->setGeometry(newWidgetRect);
-        m_focusedWidget->setZValue(m_focusedWidget->zValue() + 1);
-    } else {
-        invalidateLayout();
-    }
+void SceneController::at_doubleClicked(QGraphicsView *view, QGraphicsItem *item) {
+    d_func()->toggleZoom(view, dynamic_cast<AnimatedWidget *>(item));
 }
 
-void SceneController::at_doubleClicked(QGraphicsView *view, QGraphicsItem *item)
-{
-    if (QGraphicsWidget *widget = dynamic_cast<QGraphicsWidget *>(item))
-    {
-        const QRectF viewportSceneRect = view->viewportTransform().inverted().mapRect(view->viewport()->rect()).adjusted(2, 2, -2, -2);
-        const QRectF newGeom = widget->mapRectToParent(widget->mapRectFromScene(viewportSceneRect));
-        widget->setGeometry(newGeom);
-        widget->setZValue(widget->zValue() + 1);
-    }
-}
-
-void SceneController::at_widget_destroyed()
-{
-    m_animatedWidgets.removeOne(static_cast<AnimatedWidget *>(sender()));
-    //QTimer::singleShot(250, this, SLOT(relayoutItemsActionTriggered()));
+void SceneController::at_widget_destroyed() {
+    d_func()->animatedWidgets.removeOne(static_cast<AnimatedWidget *>(sender()));
 }
 
 
 void SceneController::relayoutItems(int rowCount, int columnCount, const QByteArray &preset) {
+    Q_D(SceneController);
+
     QByteArray localPreset = preset.size() == rowCount * columnCount ? preset : QByteArray(rowCount * columnCount, '1');
 
-    while(m_centralLayout->count() != 0)
-        m_centralLayout->removeAt(0);
+    while(d->centralLayout->count() != 0)
+        d->centralLayout->removeAt(0);
 
     int i = 0;
     for (int row = 0; row < rowCount; ++row) {
         for (int column = 0; column < columnCount; ++column) {
-            if (QGraphicsWidget *widget = m_animatedWidgets.value(i, 0)) {
+            if (QGraphicsWidget *widget = d->animatedWidgets.value(i, 0)) {
                 const int span = localPreset.at(row * columnCount + column) - '0';
                 if (span > 0) {
-                    m_centralLayout->addItem(widget, row, column, span, span, Qt::AlignCenter);
+                    d->centralLayout->addItem(widget, row, column, span, span, Qt::AlignCenter);
                     ++i;
                 }
             }
         }
     }
     
-    while (i < m_animatedWidgets.size()) {
-        QGraphicsWidget *widget = m_animatedWidgets.at(i++);
+    while (i < d->animatedWidgets.size()) {
+        QGraphicsWidget *widget = d->animatedWidgets.at(i++);
         widget->setGeometry(QRectF(QPointF(-500, -500), widget->preferredSize()));
     }
-}
-
-void SceneController::invalidateLayout() {
-    m_centralLayout->invalidate();
-    m_centralLayout->activate();
 }
 

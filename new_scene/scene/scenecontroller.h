@@ -2,23 +2,14 @@
 #define QN_SCENE_CONTROLLER_H
 
 #include <QObject>
-#include <QRect>
+#include <QScopedPointer>
 #include <instruments/instrumentutility.h>
 
 class QGraphicsScene;
 class QGraphicsView;
-class QGraphicsWidget;
 class QGraphicsItem;
-class QPoint;
-class QRectF;
-class QRect;
 
-class CellLayout;
-class AnimatedWidget;
-class CentralWidget;
-class InstrumentManager;
-
-class BoundingInstrument;
+class SceneControllerPrivate;
 
 class SceneController: public QObject, protected InstrumentUtility {
     Q_OBJECT;
@@ -30,6 +21,8 @@ public:
 
     SceneController(QObject *parent = NULL);
 
+    virtual ~SceneController();
+
     void addView(QGraphicsView *view);
 
     QGraphicsScene *scene() const;
@@ -40,10 +33,6 @@ public:
 
 protected:
     void relayoutItems(int rowCount, int columnCount, const QByteArray &preset);
-
-    void invalidateLayout();
-
-    void repositionFocusedWidget(QGraphicsView *view);
 
 private slots:
     void at_relayoutAction_triggered();
@@ -61,38 +50,9 @@ private slots:
     void at_widget_destroyed();
     
 private:
-    /** Current mode. */
-    Mode m_mode;
+    QScopedPointer<SceneControllerPrivate> d_ptr;
 
-    /** Graphics scene. */
-    QGraphicsScene *m_scene;
-
-    /** Instrument manager for the scene. */
-    InstrumentManager *m_manager;
-    
-    /** Central widget. */
-    CentralWidget *m_centralWidget;
-
-    /** Layout of the central widget. */
-    CellLayout *m_centralLayout;
-
-    /** Last bounds of central layout. */
-    QRect m_centralLayoutBounds;
-
-    /** All animated widgets. */
-    QList<AnimatedWidget *> m_animatedWidgets;
-
-    /** Bounding instrument. */
-    BoundingInstrument *m_boundingInstrument;
-
-    /** Widget that currently has focus. There can be only one such widget. */
-    AnimatedWidget *m_focusedWidget;
-
-    /** Whether the focused widget is expanded. */
-    bool m_focusedExpanded;
-
-    /** Whether the focused widget is zoomed. */
-    bool m_focusedZoomed;
+    Q_DECLARE_PRIVATE(SceneController);
 };
 
 #endif // QN_SCENE_CONTROLLER_H

@@ -309,7 +309,7 @@ protected:
 
         QRectF sceneRect = m_positionBounds;
 
-        /* Adjust to contain size upper bound. */
+        /* Adjust to include size upper bound. */
         qreal dx = 0.0, dy = 0.0;
         if(sceneRect.width() < m_sizeUpperBounds.width())
             dx = (m_sizeUpperBounds.width() - sceneRect.width()) / 2.0;
@@ -319,6 +319,9 @@ protected:
             
         /* Expand. */
         sceneRect = InstrumentUtility::dilated(sceneRect, sceneRect.size() * 3);
+
+        /* Expand to include current scene rect. */
+        sceneRect = sceneRect.united(m_view->sceneRect());
 
         m_view->setSceneRect(sceneRect);
     }
