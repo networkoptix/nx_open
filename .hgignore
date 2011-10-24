@@ -28,3 +28,4 @@ scripts/appserver/server.state
 eveClient/src/device_plugins/archive/filetypes.h
 eveClient/src/uniclient.pro
 eveClient/test/uniclient_tests.pro
+appserver/protocol/*.py
