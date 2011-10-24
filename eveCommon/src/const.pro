@@ -1,4 +1,11 @@
+TEMPLATE = lib
 QT *= multimedia network xml
+CONFIG += x86 precompile_header
+CONFIG -= flat
+
+INCLUDEPATH += $$PWD
+PRECOMPILED_HEADER = $$PWD/StdAfx.h
+PRECOMPILED_SOURCE = $$PWD/StdAfx.cpp
 
 CONFIG(debug, debug|release) {
   DESTDIR = ../bin/debug
@@ -54,11 +61,6 @@ win32 {
 }
 
 mac {
-    TARGET = consoleapp
-    CONFIG   += console
-    CONFIG   -= app_bundle
-
-
     EVETOOLS_DIR=$$PWD/../../../evetools/mac
     LIBS += -lxerces-c-3.1
 }
@@ -67,14 +69,14 @@ mac {
 QMAKE_CXXFLAGS += -I$$EVETOOLS_DIR/include 
 LIBS += -L$$EVETOOLS_DIR/lib
 
-XSD_FILES = $$PWD/../src/api/xsd/cameras.xsd \
-            $$PWD/../src/api/xsd/layouts.xsd \
-            $$PWD/../src/api/xsd/users.xsd \
-            $$PWD/../src/api/xsd/resourceTypes.xsd \
-            $$PWD/../src/api/xsd/resources.xsd \
-            $$PWD/../src/api/xsd/resourcesEx.xsd \
-            $$PWD/../src/api/xsd/servers.xsd \
-            $$PWD/../src/api/xsd/events.xsd
+XSD_FILES = $$PWD/api/xsd/cameras.xsd \
+            $$PWD/api/xsd/layouts.xsd \
+            $$PWD/api/xsd/users.xsd \
+            $$PWD/api/xsd/resourceTypes.xsd \
+            $$PWD/api/xsd/resources.xsd \
+            $$PWD/api/xsd/resourcesEx.xsd \
+            $$PWD/api/xsd/servers.xsd \
+            $$PWD/api/xsd/events.xsd
 
 xsd.name = Generating code from ${QMAKE_FILE_IN}
 xsd.input = XSD_FILES

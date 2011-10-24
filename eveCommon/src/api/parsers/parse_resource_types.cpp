@@ -1,3 +1,5 @@
+#include <QStringList>
+
 #include "api/parsers/parse_resource_types.h"
 
 void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const QnApiResourceTypes& xsdResourceTypes)

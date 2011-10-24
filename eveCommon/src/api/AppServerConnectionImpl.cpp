@@ -1,11 +1,20 @@
-#include "AppServerConnection.h"
+#include "AppServerConnectionImpl.h"
 
 #include "api/parsers/parse_cameras.h"
 #include "api/parsers/parse_layouts.h"
 #include "api/parsers/parse_servers.h"
 #include "api/parsers/parse_resource_types.h"
 
-QnAppServerAdapter::QnAppServerAdapter(const QString& host, const QString& login, const QString& password)
+#include "api/Types.h"
+#include "api/SessionManager.h"
+
+
+QnAppServerAdapter* createServerAdapter(const QString& host, const QString& login, const QString& password)
+{
+    return new QnAppServerAdapterImpl(host, login, password);
+}
+
+QnAppServerAdapterImpl::QnAppServerAdapterImpl(const QString& host, const QString& login, const QString& password)
     : m_sessionManager(host, login, password)
 {
     connect(&m_sessionManager, SIGNAL(resourceTypesReceived(RequestId, QnApiResourceTypeResponsePtr)),
@@ -21,24 +30,24 @@ QnAppServerAdapter::QnAppServerAdapter(const QString& host, const QString& login
             this, SLOT(xsdError(RequestId, QString)));
 }
 
-RequestId QnAppServerAdapter::getResourceTypes()
+RequestId QnAppServerAdapterImpl::getResourceTypes()
 {
     return m_sessionManager.getResourceTypes();
 }
 
-RequestId QnAppServerAdapter::getResources()
+RequestId QnAppServerAdapterImpl::getResources()
 {
     return m_sessionManager.getResources();
 }
 
-RequestId QnAppServerAdapter::addServer(const QnResource& serverIn)
+RequestId QnAppServerAdapterImpl::addServer(const QnResource& serverIn)
 {
     xsd::api::servers::Server server(serverIn.getId().toString().toStdString(), serverIn.getName().toStdString(), serverIn.getTypeId().toString().toStdString());
 
     return m_sessionManager.addServer(server);
 }
 
-RequestId QnAppServerAdapter::addCamera(const QnResource& cameraIn, const QnId& serverIdIn)
+RequestId QnAppServerAdapterImpl::addCamera(const QnResource& cameraIn, const QnId& serverIdIn)
 {
     xsd::api::cameras::Camera camera(cameraIn.getId().toString().toStdString(),
                                      cameraIn.getName().toStdString(),
@@ -53,7 +62,7 @@ RequestId QnAppServerAdapter::addCamera(const QnResource& cameraIn, const QnId& 
     return m_sessionManager.addCamera(camera);
 }
 
-void QnAppServerAdapter::xsdResourceTypesReceived(RequestId requestId, QnApiResourceTypeResponsePtr xsdResourceTypes)
+void QnAppServerAdapterImpl::xsdResourceTypesReceived(RequestId requestId, QnApiResourceTypeResponsePtr xsdResourceTypes)
 {
     QList<QnResourceTypePtr> resourceTypes;
 
@@ -62,7 +71,7 @@ void QnAppServerAdapter::xsdResourceTypesReceived(RequestId requestId, QnApiReso
     emit resourceTypesReceived(requestId, resourceTypes);
 }
 
-void QnAppServerAdapter::xsdResourcesReceived(RequestId requestId, QnApiResourceResponsePtr xsdResources)
+void QnAppServerAdapterImpl::xsdResourcesReceived(RequestId requestId, QnApiResourceResponsePtr xsdResources)
 {
     QList<QnResourcePtr> resources;
 
@@ -75,7 +84,7 @@ void QnAppServerAdapter::xsdResourcesReceived(RequestId requestId, QnApiResource
     emit resourcesReceived(requestId, resources);
 }
 
-void QnAppServerAdapter::xsdCamerasReceived(RequestId requestId, QnApiCameraResponsePtr xsdCameras)
+void QnAppServerAdapterImpl::xsdCamerasReceived(RequestId requestId, QnApiCameraResponsePtr xsdCameras)
 {
     QList<QnResourcePtr> cameras;
 
@@ -84,7 +93,7 @@ void QnAppServerAdapter::xsdCamerasReceived(RequestId requestId, QnApiCameraResp
     emit camerasReceived(requestId, cameras);
 }
 
-void QnAppServerAdapter::xsdLayoutsReceived(RequestId requestId, QnApiLayoutResponsePtr xsdLayouts)
+void QnAppServerAdapterImpl::xsdLayoutsReceived(RequestId requestId, QnApiLayoutResponsePtr xsdLayouts)
 {
     QList<QnResourcePtr> layouts;
 
@@ -93,7 +102,7 @@ void QnAppServerAdapter::xsdLayoutsReceived(RequestId requestId, QnApiLayoutResp
     emit layoutsReceived(requestId, layouts);
 }
 
-void QnAppServerAdapter::xsdServersReceived(RequestId requestId, QnApiServerResponsePtr xsdServers)
+void QnAppServerAdapterImpl::xsdServersReceived(RequestId requestId, QnApiServerResponsePtr xsdServers)
 {
     QList<QnResourcePtr> servers;
 
@@ -102,7 +111,7 @@ void QnAppServerAdapter::xsdServersReceived(RequestId requestId, QnApiServerResp
     emit serversReceived(requestId, servers);
 }
 
-void QnAppServerAdapter::xsdError(RequestId requestId, QString message)
+void QnAppServerAdapterImpl::xsdError(RequestId requestId, QString message)
 {
     emit error(requestId, message);
 }

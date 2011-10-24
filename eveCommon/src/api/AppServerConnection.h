@@ -4,25 +4,18 @@
 #include "device/resource_type.h"
 #include "device/qnresource.h"
 
-#include "SessionManager.h"
+typedef long RequestId;
 
 class QnAppServerAdapter : public QObject
 {
     Q_OBJECT
 public:
-    QnAppServerAdapter(const QString& host, const QString& login, const QString& password);
+    virtual RequestId getResourceTypes() = 0;
 
-    RequestId getResourceTypes();
+    virtual RequestId getResources() = 0;
 
-    RequestId getServers();
-    RequestId getCameras();
-    RequestId getLayouts();
-
-    RequestId getResources();
-
-    RequestId addServer(const QnResource&);
-    RequestId addCamera(const QnResource&, const QnId& serverId);
-    RequestId addLayout(const QnResource&);
+    virtual RequestId addServer(const QnResource&) = 0;
+    virtual RequestId addCamera(const QnResource&, const QnId& serverId) = 0;
 
 Q_SIGNALS:
     void resourceTypesReceived(RequestId requestId, QList<QnResourceTypePtr> resourceTypes);
@@ -33,18 +26,11 @@ Q_SIGNALS:
 
     void error(RequestId requestId, QString message);
 
-private slots:
-    void xsdResourceTypesReceived(RequestId requestId, QnApiResourceTypeResponsePtr xsdResourceTypes);
-    void xsdResourcesReceived(RequestId requestId, QnApiResourceResponsePtr xsdResources);
-
-    void xsdServersReceived(RequestId requestId, QnApiServerResponsePtr servers);
-    void xsdLayoutsReceived(RequestId requestId, QnApiLayoutResponsePtr layouts);
-    void xsdCamerasReceived(RequestId requestId, QnApiCameraResponsePtr xsdCameras);
-
-    void xsdError(RequestId requestId, QString message);
-
-private:
-    SessionManager m_sessionManager;
+protected:
+    QnAppServerAdapter() {}
+    QnAppServerAdapter(const QnAppServerAdapter&) {}
 };
+
+QnAppServerAdapter* createServerAdapter(const QString& host, const QString& login, const QString& password);
 
 #endif // APPSERVERCONNECTION_H
