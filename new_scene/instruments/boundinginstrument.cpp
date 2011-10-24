@@ -134,11 +134,11 @@ public:
                 logFactor = calculateCorrection(logOldScale, logScale, 0.0, std::numeric_limits<qreal>::max());
             }
 
-            scaleViewport(std::exp(logFactor));
+            InstrumentUtility::scaleViewport(m_view, std::exp(logFactor));
 
             /* Calculate relative correction and move viewport. */
             qreal correction = logFactor / (logScale - logOldScale);
-            moveViewport((m_center - oldCenter) * correction);
+            InstrumentUtility::moveViewport(m_view, (m_center - oldCenter) * correction);
 
             updateParameters();
             ensureParameters();
@@ -148,7 +148,7 @@ public:
         if(!m_centerPositionBounds.contains(m_center) && !qFuzzyCompare(m_center, oldCenter)) {
             QPointF correction = calculateCorrection(oldCenter, m_center, m_centerPositionBounds);
 
-            moveViewport(correction);
+            InstrumentUtility::moveViewport(m_view, correction);
 
             updateParameters();
         }
@@ -176,7 +176,7 @@ public:
                     factor = 1.0 / m_lowerScale;
             }
 
-            scaleViewport(factor);
+            InstrumentUtility::scaleViewport(m_view, factor);
         }
 
         /* Apply move correction. */
@@ -194,7 +194,7 @@ public:
             if(std::abs(delta.y()) > std::abs(direction.y()))
                 delta.ry() = direction.y();
 
-            moveViewport(delta);
+            InstrumentUtility::moveViewport(m_view, delta);
         }
 
         updateParameters();
@@ -278,30 +278,6 @@ protected:
         m_lowerScale = calculateScale(m_sceneViewportRect.size(), m_sizeLowerBounds, m_lowerMode);
         m_center = m_sceneViewportRect.center();
         m_parametersValid = true;
-    }
-
-    void moveViewport(const QPointF &positionDelta) const {
-        assert(m_view != NULL);
-
-        QScrollBar *hBar = m_view->horizontalScrollBar();
-        QScrollBar *vBar = m_view->verticalScrollBar();
-        QPoint delta = (m_sceneToViewport.map(-positionDelta) - m_sceneToViewport.map(QPointF(0.0, 0.0))).toPoint();
-        hBar->setValue(hBar->value() + (m_view->isRightToLeft() ? delta.x() : -delta.x()));
-        vBar->setValue(vBar->value() - delta.y());
-    }
-
-    void scaleViewport(qreal factor) const {
-        assert(m_view != NULL);
-
-        qreal sceneFactor = 1 / factor;
-
-        QGraphicsView::ViewportAnchor anchor = m_view->transformationAnchor();
-        bool interactive = m_view->isInteractive();
-        m_view->setInteractive(false); /* View will re-fire stored mouse event if we don't do this. */
-        m_view->setTransformationAnchor(QGraphicsView::AnchorViewCenter);
-        m_view->scale(sceneFactor, sceneFactor);
-        m_view->setTransformationAnchor(anchor);
-        m_view->setInteractive(interactive);
     }
 
     void updateSceneRect() {

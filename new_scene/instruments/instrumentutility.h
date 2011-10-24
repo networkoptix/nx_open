@@ -7,6 +7,9 @@ class QGraphicsView;
 class QRect;
 class QRectF;
 class QSizeF;
+class QPoint;
+class QPointF;
+class QTransform;
 
 class InstrumentUtility {
 public:
@@ -58,6 +61,40 @@ public:
      * \returns                         Dilated rectangle.
      */
     static QRectF dilated(const QRectF &rect, const QSizeF &amount);
+
+    /**
+     * Moves the given viewport.
+     * 
+     * \param view                      Graphics view to move viewport of.
+     * \param positionDelta             Move delta, in viewport coordinates.
+     */
+    static void moveViewport(QGraphicsView *view, const QPoint &positionDelta);
+
+    /**
+     * Moves the given viewport.
+     * 
+     * \param view                      Graphics view to move viewport of.
+     * \param sceneToViewport           Current scene-to-viewport transform of
+     *                                  the given graphics view.
+     * \param positionDelta             Move delta, in scene coordinates.
+     */
+    static void moveViewport(QGraphicsView *view, const QTransform &sceneToViewport, const QPointF &positionDelta);
+
+    /**
+     * Moves the given viewport.
+     * 
+     * \param view                      Graphics view to move viewport of.
+     * \param positionDelta             Move delta, in scene coordinates.
+     */
+    static void moveViewport(QGraphicsView *view, const QPointF &positionDelta);
+
+    /**
+     * Scales the given viewport.
+     * 
+     * \param view                      Graphics view to scale viewport of.
+     * \param factor                    Viewport scale factor.
+     */
+    static void scaleViewport(QGraphicsView *view, qreal factor);
 
 };
 

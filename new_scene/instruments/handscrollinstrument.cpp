@@ -60,12 +60,7 @@ bool HandScrollInstrument::mouseMoveEvent(QWidget *viewport, QMouseEvent *event)
         }
     }
 
-    QScrollBar *hBar = view->horizontalScrollBar();
-    QScrollBar *vBar = view->verticalScrollBar();
-    QPoint delta = event->pos() - m_lastMousePos;
-    hBar->setValue(hBar->value() + (view->isRightToLeft() ? delta.x() : -delta.x()));
-    vBar->setValue(vBar->value() - delta.y());
-
+    moveViewport(view, -(event->pos() - m_lastMousePos));
     m_lastMousePos = event->pos();
 
     event->accept();

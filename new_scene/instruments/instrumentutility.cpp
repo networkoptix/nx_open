@@ -1,5 +1,7 @@
 #include "instrumentutility.h"
+#include <cassert>
 #include <QGraphicsView>
+#include <QScrollBar>
 
 QRectF InstrumentUtility::mapRectToScene(QGraphicsView *view, const QRect &rect) {
     return view->viewportTransform().inverted().mapRect(rect);
@@ -33,4 +35,35 @@ QSizeF InstrumentUtility::expanded(const QSizeF &size, const QSizeF &minSize, Qt
 
 QRectF InstrumentUtility::dilated(const QRectF &rect, const QSizeF &amount) {
     return rect.adjusted(-amount.width(), -amount.height(), amount.width(), amount.height());
+}
+
+void InstrumentUtility::moveViewport(QGraphicsView *view, const QPoint &positionDelta) {
+    assert(view != NULL);
+
+    QScrollBar *hBar = view->horizontalScrollBar();
+    QScrollBar *vBar = view->verticalScrollBar();
+    hBar->setValue(hBar->value() + (view->isRightToLeft() ? -positionDelta.x() : positionDelta.x()));
+    vBar->setValue(vBar->value() + positionDelta.y());
+}
+
+void InstrumentUtility::moveViewport(QGraphicsView *view, const QTransform &sceneToViewport, const QPointF &positionDelta) {
+    moveViewport(view, (sceneToViewport.map(positionDelta) - sceneToViewport.map(QPointF(0.0, 0.0))).toPoint());
+}
+
+void InstrumentUtility::moveViewport(QGraphicsView *view, const QPointF &positionDelta) {
+    moveViewport(view, view->viewportTransform(), positionDelta);
+}
+
+void InstrumentUtility::scaleViewport(QGraphicsView *view, qreal factor) {
+    assert(view != NULL);
+
+    qreal sceneFactor = 1 / factor;
+
+    QGraphicsView::ViewportAnchor anchor = view->transformationAnchor();
+    bool interactive = view->isInteractive();
+    view->setInteractive(false); /* View will re-fire stored mouse event if we don't do this. */
+    view->setTransformationAnchor(QGraphicsView::AnchorViewCenter);
+    view->scale(sceneFactor, sceneFactor);
+    view->setTransformationAnchor(anchor);
+    view->setInteractive(interactive);
 }
