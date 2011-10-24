@@ -107,6 +107,12 @@ public:
         return m_scene;
     }
 
+    /**
+     * \returns                        Set of all graphics views that this 
+     *                                 instrument watches.
+     */
+    QSet<QGraphicsView *> views() const;
+
 signals:
     /**
      * This signal is emitted whenever the instrument is installed.

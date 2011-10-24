@@ -2,6 +2,7 @@
 #define QN_SCENE_CONTROLLER_H
 
 #include <QObject>
+#include <QRect>
 #include <instruments/instrumentutility.h>
 
 class QGraphicsScene;
@@ -60,13 +61,28 @@ private slots:
     void at_widget_destroyed();
     
 private:
+    /** Current mode. */
     Mode m_mode;
+
+    /** Graphics scene. */
     QGraphicsScene *m_scene;
+
+    /** Instrument manager for the scene. */
     InstrumentManager *m_manager;
+    
+    /** Central widget. */
     CentralWidget *m_centralWidget;
+
+    /** Layout of the central widget. */
     CellLayout *m_centralLayout;
+
+    /** Last bounds of central layout. */
+    QRect m_centralLayoutBounds;
+
+    /** All animated widgets. */
     QList<AnimatedWidget *> m_animatedWidgets;
 
+    /** Bounding instrument. */
     BoundingInstrument *m_boundingInstrument;
 
     /** Widget that currently has focus. There can be only one such widget. */

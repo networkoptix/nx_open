@@ -22,8 +22,12 @@ namespace {
         );
     }
 
-    qreal calculateScale(QSizeF size, QSizeF bounds) {
-        return qMax(size.width() / bounds.width(), size.height() / bounds.height());
+    qreal calculateScale(QSizeF size, QSizeF bounds, BoundingInstrument::BoundingMode mode) {
+        if(mode == BoundingInstrument::InBound) {
+            return qMax(size.width() / bounds.width(), size.height() / bounds.height());
+        } else {
+            return qMin(size.width() / bounds.width(), size.height() / bounds.height());
+        }
     }
 
     QRectF truncated(const QRectF &rect) {
@@ -89,20 +93,16 @@ class BoundingInstrument::ViewData {
 public:
     ViewData(): m_view(NULL) {}
 
-    ViewData(QGraphicsView *view): 
-        m_view(view) 
-    {
-        assert(view != NULL);
-
+    ViewData(QGraphicsView *view): m_view(NULL) {
         qreal t = 1.0e3;
         setPositionBounds(QRectF(QPointF(-t, -t), QPointF(t, t)), 0.0);
         setMovementSpeed(1.0);
-        setSizeBounds(QSizeF(t, t));
+        setSizeBounds(QSizeF(1 / t, 1 / t), OutBound, QSizeF(t, t), InBound);
         setScalingSpeed(1.0);
-        setPositionEnforced(true);
-        setSizeEnforced(true);
+        setPositionEnforced(false);
+        setSizeEnforced(false);
         
-        updateParameters();
+        setView(view);
     }
 
     void correct() {
@@ -113,17 +113,26 @@ public:
 
         ensureParameters();
 
-        qreal oldScale = m_scale;
+        qreal oldUpperScale = m_upperScale;
+        qreal oldLowerScale = m_lowerScale;
         QPointF oldCenter = m_center;
 
         updateParameters();
         ensureParameters();
 
         /* Apply zoom correction. */
-        if(m_scale > 1.0 && !qFuzzyCompare(m_scale, oldScale)) {
-            qreal logOldScale = std::log(oldScale);
-            qreal logScale = std::log(m_scale);
-            qreal logFactor = calculateCorrection(logOldScale, logScale, -std::numeric_limits<qreal>::max(), 0.0);
+        if((m_upperScale > 1.0 || m_lowerScale < 1.0) && !qFuzzyCompare(m_upperScale, oldUpperScale)) {
+            qreal logOldScale = 0.0, logScale = 0.0, logFactor = 0.0;
+
+            if(m_upperScale > 1.0) {
+                logOldScale = std::log(oldUpperScale);
+                logScale = std::log(m_upperScale);
+                logFactor = calculateCorrection(logOldScale, logScale, -std::numeric_limits<qreal>::max(), 0.0);
+            } else {
+                logOldScale = std::log(oldLowerScale);
+                logScale = std::log(m_lowerScale);
+                logFactor = calculateCorrection(logOldScale, logScale, 0.0, std::numeric_limits<qreal>::max());
+            }
 
             scaleViewport(std::exp(logFactor));
 
@@ -138,8 +147,6 @@ public:
         /* Apply center correction. */
         if(!m_centerPositionBounds.contains(m_center) && !qFuzzyCompare(m_center, oldCenter)) {
             QPointF correction = calculateCorrection(oldCenter, m_center, m_centerPositionBounds);
-
-            qDebug("CORRECTION %g %g", correction.x(), correction.y());
 
             moveViewport(correction);
 
@@ -156,10 +163,18 @@ public:
         ensureParameters();
 
         /* Apply zoom correction. */
-        if(m_isSizeEnforced && m_scale > 1.0) {
-            qreal factor = std::exp(-dt * m_logScaleSpeed * speedMultiplier(std::log(m_scale), std::log(2.0)));
-            if(m_scale * factor < 1.0)
-                factor = 1.0 / m_scale;
+        if(m_isSizeEnforced && (m_upperScale > 1.0 || m_lowerScale < 1.0)) {
+            qreal factor = 1.0;
+
+            if(m_upperScale > 1.0) {
+                factor = std::exp(-dt * m_logScaleSpeed * speedMultiplier(std::log(m_upperScale), std::log(2.0)));
+                if(m_upperScale * factor < 1.0)
+                    factor = 1.0 / m_upperScale;
+            } else {
+                factor = std::exp(-dt * m_logScaleSpeed * speedMultiplier(std::log(m_lowerScale), std::log(2.0)));
+                if(m_lowerScale * factor > 1.0)
+                    factor = 1.0 / m_lowerScale;
+            }
 
             scaleViewport(factor);
         }
@@ -185,19 +200,30 @@ public:
         updateParameters();
     }
 
+    QGraphicsView *view() const {
+        return m_view;
+    }
+
     void setPositionBounds(const QRectF &positionBounds, qreal extension) {
         m_positionBounds = positionBounds;
         m_positionBoundsExtension = extension;
 
-        updateSceneRect();
-        invalidateParameters();
+        if(m_view != NULL) {
+            updateSceneRect();
+            invalidateParameters();
+        }
     }
 
-    void setSizeBounds(const QSizeF &sizeBound) {
-        m_sizeBounds = sizeBound;
+    void setSizeBounds(const QSizeF &sizeLowerBound, BoundingMode lowerMode, const QSizeF &sizeUpperBound, BoundingMode upperMode) {
+        m_sizeLowerBounds = sizeLowerBound;
+        m_lowerMode = lowerMode;
+        m_sizeUpperBounds = sizeUpperBound;
+        m_upperMode = upperMode;
 
-        updateSceneRect();
-        invalidateParameters();
+        if(m_view != NULL) {
+            updateSceneRect();
+            invalidateParameters();
+        }
     }
 
     void setMovementSpeed(qreal multiplier) {
@@ -214,6 +240,15 @@ public:
 
     void setSizeEnforced(bool sizeEnforced) {
         m_isSizeEnforced = sizeEnforced;
+    }
+
+    void setView(QGraphicsView *view) {
+        m_view = view;
+
+        if(m_view != NULL) {
+            updateParameters();
+            updateSceneRect();
+        }
     }
 
 protected:
@@ -239,7 +274,8 @@ protected:
 
         m_sceneViewportRect = m_sceneToViewport.inverted().mapRect(QRectF(m_viewportRect));
         m_centerPositionBounds = truncated(InstrumentUtility::dilated(m_positionBounds, (m_positionBoundsExtension - 0.5) * m_sceneViewportRect.size()));
-        m_scale = calculateScale(m_sceneViewportRect.size(), m_sizeBounds);
+        m_upperScale = calculateScale(m_sceneViewportRect.size(), m_sizeUpperBounds, m_upperMode);
+        m_lowerScale = calculateScale(m_sceneViewportRect.size(), m_sizeLowerBounds, m_lowerMode);
         m_center = m_sceneViewportRect.center();
         m_parametersValid = true;
     }
@@ -269,14 +305,16 @@ protected:
     }
 
     void updateSceneRect() {
+        assert(m_view != NULL);
+
         QRectF sceneRect = m_positionBounds;
 
-        /* Adjust to fix size bounds. */
+        /* Adjust to contain size upper bound. */
         qreal dx = 0.0, dy = 0.0;
-        if(sceneRect.width() < m_sizeBounds.width())
-            dx = m_sizeBounds.width() / 2.0;
-        if(sceneRect.height() < m_sizeBounds.height())
-            dy = m_sizeBounds.height() / 2.0;
+        if(sceneRect.width() < m_sizeUpperBounds.width())
+            dx = (m_sizeUpperBounds.width() - sceneRect.width()) / 2.0;
+        if(sceneRect.height() < m_sizeUpperBounds.height())
+            dy = (m_sizeUpperBounds.height() - sceneRect.height()) / 2.0;
         sceneRect.adjust(-dx, -dy, dx, dy);
             
         /* Expand. */
@@ -296,8 +334,17 @@ public:
      * Viewport size is multiplied  by this factor and added to the sides of position boundary. */
     qreal m_positionBoundsExtension;
 
-    /** Viewport size boundary, in scene coordinates. */
-    QSizeF m_sizeBounds;
+    /** Viewport lower size boundary, in scene coordinates. */
+    QSizeF m_sizeLowerBounds;
+
+    /** Scale mode for the lower size boundary. */
+    BoundingInstrument::BoundingMode m_lowerMode;
+
+    /** Viewport upper size boundary, in scene coordinates. */
+    QSizeF m_sizeUpperBounds;
+
+    /** Scale mode for the upper size boundary. */
+    BoundingInstrument::BoundingMode m_upperMode;
 
     /** Movement speed, in viewports. 
      * This is a speed at one viewport away from movement boundary.
@@ -330,8 +377,11 @@ public:
     /** Effective boundary for viewport center. */
     mutable QRectF m_centerPositionBounds;
 
-    /* Viewport scale, relative to size boundary. */
-    mutable qreal m_scale;
+    /* Viewport scale, relative to upper size boundary. */
+    mutable qreal m_upperScale;
+
+    /* Viewport scale, relative to lower size boundary. */    
+    mutable qreal m_lowerScale;
 
     /* Position of viewport center. */
     mutable QPointF m_center;
@@ -344,19 +394,36 @@ BoundingInstrument::BoundingInstrument(QObject *parent):
     m_lastTickTime(0)
 {
     m_timer->setListener(this);
-    m_timer->start();
+
+    m_data[NULL] = new ViewData(NULL);
 }
 
 BoundingInstrument::~BoundingInstrument() {
+    ensureUninstalled();
+}
+
+void BoundingInstrument::installedNotify() {
+    m_timer->start();
+}
+
+void BoundingInstrument::aboutToBeUninstalledNotify() {
+    m_timer->stop();    
+
     foreach(ViewData *d, m_data)
         delete d;
     m_data.clear();
+
+    m_data[NULL] = new ViewData(NULL);
 }
 
 void BoundingInstrument::tick(int currentTime) {
     qreal dt = (currentTime - m_lastTickTime) / 1000.0;
     
-    foreach(ViewData *d, m_data) {
+    foreach(QGraphicsView *view, views()) {
+        ViewData *d = cdata(view);
+        if(d == NULL)
+            continue;
+
         d->correct();
         d->enforce(dt);
     }
@@ -377,8 +444,10 @@ bool BoundingInstrument::paintEvent(QWidget *viewport, QPaintEvent *) {
 BoundingInstrument::ViewData *BoundingInstrument::data(QGraphicsView *view) {
     ViewData *&result = m_data[view];
 
-    if(result == NULL)
-        result = new ViewData(view);
+    if(result == NULL) {
+        result = new ViewData(*m_data[NULL]);
+        result->setView(view);
+    }
 
     return result;
 }
@@ -389,56 +458,56 @@ BoundingInstrument::ViewData *BoundingInstrument::cdata(QGraphicsView *view) con
 
 void BoundingInstrument::setPositionBounds(QGraphicsView *view, const QRectF &positionBounds, qreal extension) {
     if(view == NULL) {
-        qnNullWarning(view);
-        return;
+        foreach(ViewData *d, m_data)
+            d->setPositionBounds(positionBounds, extension);
+    } else {
+        data(view)->setPositionBounds(positionBounds, extension);
     }
-
-    data(view)->setPositionBounds(positionBounds, extension);
 }
 
-void BoundingInstrument::setSizeBounds(QGraphicsView *view, const QSizeF &sizeBound) {
+void BoundingInstrument::setSizeBounds(QGraphicsView *view, const QSizeF &sizeLowerBound, BoundingMode lowerMode, const QSizeF &sizeUpperBound, BoundingMode upperMode) {
     if(view == NULL) {
-        qnNullWarning(view);
-        return;
+        foreach(ViewData *d, m_data)
+            d->setSizeBounds(sizeLowerBound, lowerMode, sizeUpperBound, upperMode);
+    } else {
+        data(view)->setSizeBounds(sizeLowerBound, lowerMode, sizeUpperBound, upperMode);
     }
-
-    data(view)->setSizeBounds(sizeBound);
 }
 
 void BoundingInstrument::setMovementSpeed(QGraphicsView *view, qreal multiplier) {
     if(view == NULL) {
-        qnNullWarning(view);
-        return;
+        foreach(ViewData *d, m_data)
+            d->setMovementSpeed(multiplier);
+    } else {
+        data(view)->setMovementSpeed(multiplier);
     }
-
-    data(view)->setMovementSpeed(multiplier);
 }
 
 void BoundingInstrument::setScalingSpeed(QGraphicsView *view, qreal multiplier) {
     if(view == NULL) {
-        qnNullWarning(view);
-        return;
+        foreach(ViewData *d, m_data)
+            d->setScalingSpeed(multiplier);
+    } else {
+        data(view)->setScalingSpeed(multiplier);
     }
-
-    data(view)->setScalingSpeed(multiplier);
 }
 
 void BoundingInstrument::setPositionEnforced(QGraphicsView *view, bool positionEnforced) {
     if(view == NULL) {
-        qnNullWarning(view);
-        return;
+        foreach(ViewData *d, m_data)
+            d->setPositionEnforced(positionEnforced);
+    } else {
+        data(view)->setPositionEnforced(positionEnforced);
     }
-
-    data(view)->setPositionEnforced(positionEnforced);
 }
 
 void BoundingInstrument::setSizeEnforced(QGraphicsView *view, bool sizeEnforced) {
     if(view == NULL) {
-        qnNullWarning(view);
-        return;
+        foreach(ViewData *d, m_data)
+            d->setSizeEnforced(sizeEnforced);
+    } else {
+        data(view)->setSizeEnforced(sizeEnforced);
     }
-
-    data(view)->setSizeEnforced(sizeEnforced);
 }
 
 void BoundingInstrument::enforcePosition(QGraphicsView *view) {

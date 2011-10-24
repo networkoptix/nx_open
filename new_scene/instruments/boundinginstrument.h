@@ -9,37 +9,51 @@
 class BoundingInstrument: public Instrument, protected AnimationTimerListener {
     Q_OBJECT;
 public:
+    enum BoundingMode {
+        InBound,    /**< Rectangle's size limit is reached when it is contained inside a bounding rectangle touching its sides. */
+        OutBound    /**< Rectangle's size limit is reached when bounding rectangle is contained inside it touching its sides. */
+    };
+
     BoundingInstrument(QObject *parent = NULL);
 
     virtual ~BoundingInstrument();
 
     /**
+     * \param view                      Graphics view to use.
      * \param positionBounds            Rectangular area to which viewport movement is restricted, in scene coordinates.
      * \param extension                 Extension of this area, in viewports.
      */
     void setPositionBounds(QGraphicsView *view, const QRectF &positionBounds, qreal extension);
 
     /**
-     * \param sizeBound                 Size to which viewport scaling is restricted, in scene coordinates.
+     * \param view                      Graphics view to use.
+     * \param sizeLowerBound            Lower bound of viewport size, in scene coordinates.
+     * \param lowerMode                 Mode for the lower bound.
+     * \param sizeUpperBound            Upper bound of viewport size, in scene coordinates.
+     * \param upperMode                 Mode for the upper bound.
      */
-    void setSizeBounds(QGraphicsView *view, const QSizeF &sizeBound);
+    void setSizeBounds(QGraphicsView *view, const QSizeF &sizeLowerBound, BoundingMode lowerMode, const QSizeF &sizeUpperBound, BoundingMode upperMode);
 
     /**
+     * \param view                      Graphics view to use.
      * \param multiplier                Viewport movement speed, in viewports per second.
      */
     void setMovementSpeed(QGraphicsView *view, qreal multiplier);
 
     /**
+     * \param view                      Graphics view to use.
      * \param multiplier                Scale speed, factor per second.
      */
     void setScalingSpeed(QGraphicsView *view, qreal multiplier);
 
     /**
+     * \param view                      Graphics view to use.
      * \param positionEnforced          Whether position boundary is enforced with animation.
      */
     void setPositionEnforced(QGraphicsView *view, bool positionEnforced = true);
 
     /**
+     * \param view                      Graphics view to use.
      * \param sizeEnforced              Whether size boundary is enforced with animation.
      */
     void setSizeEnforced(QGraphicsView *view, bool sizeEnforced = true);
@@ -51,6 +65,9 @@ public slots:
     void dontEnforceSize(QGraphicsView *view);
 
 protected:
+    virtual void installedNotify() override;
+    virtual void aboutToBeUninstalledNotify() override;
+
     virtual bool paintEvent(QWidget *viewport, QPaintEvent *event) override;
 
     virtual void tick(int currentTime) override;

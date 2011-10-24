@@ -58,3 +58,10 @@ QList<QGraphicsItem *> Instrument::items(QGraphicsView *view, const QPoint &view
 }
 
 
+QSet<QGraphicsView *> Instrument::views() const {
+    if(isInstalled()) {
+        return m_manager->views();
+    } else {
+        return QSet<QGraphicsView *>();
+    }
+}

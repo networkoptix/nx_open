@@ -143,8 +143,8 @@ void InstrumentManagerPrivate::registerViewInternal(QGraphicsView *view) {
     registerViewportInternal(view);
 
     /* This one is important. Mouse tracking is disabled by default, so 
-    * instruments won't be getting mouse move events if there are no items 
-    * on the scene. */
+     * instruments won't be getting mouse move events if there are no items 
+     * on the scene. */
     view->viewport()->setMouseTracking(true);
 }
 
@@ -191,9 +191,9 @@ void InstrumentManagerPrivate::at_view_destroyed(QObject *view) {
 
 void InstrumentManagerPrivate::at_viewport_destroyed(QObject *viewport) {
     /* We may get here in two cases:
-    * 
-    * 1. View is being destroyed.
-    * 2. Viewport is being changed. In this case view is alive and we just need to switch to new viewport. */
+     * 
+     * 1. View is being destroyed.
+     * 2. Viewport is being changed. In this case view is alive and we just need to switch to new viewport. */
     QObject *view = viewport->parent();
 
     unregisterViewportInternal(viewport);

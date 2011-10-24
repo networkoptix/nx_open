@@ -201,7 +201,6 @@ SceneController::SceneController(QObject *parent):
         m_animatedWidgets.push_back(widget);
     }
 
-
 }
 
 void SceneController::addView(QGraphicsView *view) {
@@ -210,8 +209,6 @@ void SceneController::addView(QGraphicsView *view) {
 
     m_boundingInstrument->setSizeEnforced(view, true);
     m_boundingInstrument->setPositionEnforced(view, true);
-    m_boundingInstrument->setPositionBounds(view, QRectF(0, 0, 1000, 1000), 0.0);
-    m_boundingInstrument->setSizeBounds(view, QSizeF(1000, 1000));
     m_boundingInstrument->setScalingSpeed(view, 8.0);
     m_boundingInstrument->setMovementSpeed(view, 4.0);
 
@@ -293,7 +290,23 @@ void SceneController::at_relayoutAction_triggered() {
 }
 
 void SceneController::at_centralWidget_geometryChanged() {
-    // ### optimize/re-work
+    QRect bounds = m_centralLayout->bounds();
+    if(bounds == m_centralLayoutBounds)
+        return;
+    
+    QPointF sceneDelta = m_centralLayout->mapFromGrid(QPoint(0, 0)) - m_centralLayout->mapFromGrid(m_centralLayoutBounds.topLeft() - bounds.topLeft());
+    m_centralLayoutBounds = bounds;
+    
+    foreach(AnimatedWidget *animatedWidget, m_animatedWidgets) {
+        animatedWidget->setAnimationsEnabled(false);
+        animatedWidget->moveBy(-sceneDelta.x(), -sceneDelta.y());
+        animatedWidget->setAnimationsEnabled(true);
+    }
+    m_centralWidget->moveBy(sceneDelta.x(), sceneDelta.y());
+    invalidateLayout();
+
+    m_boundingInstrument->setPositionBounds(NULL, m_centralWidget->geometry(), 0.0);
+    m_boundingInstrument->setSizeBounds(NULL, QSizeF(100, 100), BoundingInstrument::OutBound, m_centralWidget->size(), BoundingInstrument::OutBound);
 
 #if 0
     const QRectF viewportSceneRect = mapRectToScene(viewport()->rect());
