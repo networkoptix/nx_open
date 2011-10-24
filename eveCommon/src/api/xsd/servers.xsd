@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
+  targetNamespace="http://www.networkoptix.com/xsd/api/servers"
+  xmlns="http://www.networkoptix.com/xsd/api/servers">
+  <xs:element name="servers" type="Servers"/>
+
+  <xs:complexType name="Servers">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" name="server" type="Server"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="Server">
+    <xs:all>
+      <xs:element name="id" type="xs:string"/>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="typeId" type="xs:string"/>
+    </xs:all>
+  </xs:complexType>
+
+</xs:schema>

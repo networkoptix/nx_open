@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+import os
+import base64
 
 from restclient import *
 from StringIO import StringIO
@@ -6,6 +8,13 @@ from pprint import pprint
 
 from xml.dom import minidom
 import socket, sys
+
+import protocol.cameras
+import protocol.servers
+import protocol.layouts
+import protocol.resourcesEx
+import protocol.resourceTypes
+
 
 SERVER = "http://localhost:8000/api/"
 CREDENTIALS = ("ivan", "225653")
@@ -145,10 +154,52 @@ def get_object_list(path, Class, args=''):
 
     return objects
 
+def request_objects(object):
+    request_str = SERVER + object
+
+    xml_string = GET(request_str, credentials=CREDENTIALS)
+    if debug:
+        print xml_string
+
+    return xml_string
+
+def postRequest():
+    """ Makes POST request to url, and returns a response. """
+    url = 'http://subdomain.harvestapp.com/projects'
+
+    opener = urllib2.build_opener()
+    opener.addheaders = [('Accept', 'application/xml'),
+                                            ('Content-Type', 'application/xml'),
+                                            ('Authorization', 'Basic %s' % base64.encodestring('%s:%s' % (self.username, self.password))[:-1]),
+                                            ('User-Agent', 'Python-urllib/2.6')]
+
+    req = urllib2.Request(url=url, data=payload)
+    assert req.get_method() == 'POST'
+    response = self.opener.open(req)
+    print response.code
+
+    return response
 # Commands
 
 def list_cameras():
-    return get_object_list('camera', Camera)
+    xml_string = request_objects('camera')
+    return protocol.cameras.CreateFromDocument(xml_string)
+
+def list_servers():
+    xml_string = request_objects('server')
+    return protocol.servers.CreateFromDocument(xml_string)
+
+def list_layouts(*args):
+    xml_string = request_objects('layout')
+    return protocol.servers.CreateFromDocument(xml_string)
+
+def list_resource_types():
+    xml_string = request_objects('resourceType')
+    return protocol.resourceTypes.CreateFromDocument(xml_string)
+
+def list_resources():
+    xml_string = request_objects('resourcesEx')
+    return protocol.resourcesEx.CreateFromDocument(xml_string)
 
 def add_server():
     typeid = list_resource_types()[0].xid
@@ -172,46 +223,59 @@ def reg_camera(*args):
 
     return PUT(SERVER + 'camera/', params = params, credentials=CREDENTIALS, async=False)
 
-def list_servers():
-    return get_object_list('server', Server)
-
-def list_resource_types():
-    return get_object_list('resourceType', ResourceType)
-
-def list_resources(*args):
-    if args:
-        return get_object_list('resource', Resource, args[0])
-    else:
-        return get_object_list('resource', Resource)
-
-def list_resources_as_tree(*args):
-    if args:
-        return get_object_list('resource/tree', Resource, args[0])
-    else:
-        return get_object_list('resource/tree', Resource)
-
 def add_layout(*args):
     typeid = list_resource_types()[0].xid
     return POST(SERVER + 'layout/', params = {'name' : "new layout", 'xtype_id' : typeid}, credentials=CREDENTIALS, async=False)
 
-def list_layouts(*args):
-    return get_object_list('layout', Layout)
+# Printers
+
+def print_server(server):
+    print 'Server: ID=%s, Name=%s' % (server.id, server.name)
+
+def print_camera(camera):
+    print 'Camera: ID=%s, Name=%s' % (camera.id, camera.name)
+
+def print_layout(layout):
+    print 'Layout: ID=%s, Name=%s' % (layout.id, layout.name)
+
+def print_resource_type(resource_type):
+    print 'ResourceType: ID=%s, Name=%s' % (resource_type.id, resource_type.name)
+    
+def print_servers(servers):
+    for server in servers.server:
+        print_server(server)
+        
+def print_cameras(cameras):
+    for camera in cameras.camera:
+        print_camera(camera)
+
+def print_layouts(layouts):
+    for layout in layouts.layout:
+        print_layout(layout)
+
+def print_resources(resources):
+    print_servers(resources.servers)
+    print_cameras(resources.cameras)
+    print_layouts(resources.layouts)
+
+def print_resource_types(resource_types):
+    for resource_type in resource_types.resourceType:
+        print_resource_type(resource_type)
 
 COMMANDS = {
-  'as'  : add_server,
-  'ls'  : list_servers,
-  'rs'  : reg_server,
+  'as'  : (add_server, print_servers),
+  'ls'  : (list_servers, print_servers),
+  'rs'  : (reg_server, print_servers),
 
-  'ac'  : add_camera,
-  'rc'  : reg_camera,
-  'lc'  : list_cameras,
+  'ac'  : (add_camera, print_cameras),
+  'rc'  : (reg_camera, print_cameras),
+  'lc'  : (list_cameras, print_cameras),
 
-  'lr'  : list_resources,
-  'lrat': list_resources_as_tree,
- 
-  'al'  : add_layout,
-  'll'  : list_layouts,
-  'lrt' : list_resource_types,
+  'lr'  : (list_resources, print_resources),
+
+  'al'  : (add_layout, print_layouts),
+  'll'  : (list_layouts, print_layouts),
+  'lrt' : (list_resource_types, print_resource_types),
 }
 
 def help():
@@ -234,10 +298,13 @@ def main():
             result = COMMANDS[command[0]]()
             pprint(result)
 
-def read_state():
+def read_server_conf():
     global SERVER_ID
 
-    for line in open('server.state', 'r').readlines():
+    if not os.path.exists('server.conf'):
+        return
+    
+    for line in open('server.conf', 'r').readlines():
         name, value = line.split('=')
         if name == 'SERVER_ID':
             SERVER_ID = value.strip()
@@ -251,35 +318,32 @@ def scanario1():
     register_server()
 
 if __name__ == '__main__':
-    read_state()
+    read_server_conf()
 
     debug = True
     if len(sys.argv) == 2 and sys.argv[1] == 'test':
         scenario1()
         sys.exit(0)
 
+    args = ()
+    
     if len(sys.argv) > 1:
         if sys.argv[1] == '-d':
             debug = True
             command = sys.argv[2]
 
-            args = ()
             if len(sys.argv) > 3:
                 args = sys.argv[3:]
         else:
             debug = False
             command = sys.argv[1]
 
-            args = ()
             if len(sys.argv) > 2:
                 args = sys.argv[2:]
 
         if command in COMMANDS:
-            if args:
-                result = COMMANDS[command](*args)
-            else:
-                result = COMMANDS[command]()
-            pprint(result)
+            result = COMMANDS[command][0](*args)
+            COMMANDS[command][1](result)
         else:
             help()
     else:

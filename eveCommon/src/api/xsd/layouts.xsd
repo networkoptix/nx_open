@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:users="http://www.networkoptix.com/xsd/api/users"
+           xmlns:resources="http://www.networkoptix.com/xsd/api/resources"
+           elementFormDefault="qualified"
+           targetNamespace="http://www.networkoptix.com/xsd/api/layouts"
+           xmlns="http://www.networkoptix.com/xsd/api/layouts">
+  
+  <xs:import namespace="http://www.networkoptix.com/xsd/api/resources" schemaLocation="resources.xsd"/>
+  <xs:import namespace="http://www.networkoptix.com/xsd/api/users" schemaLocation="users.xsd"/>
+  
+  <xs:element name="layouts" type="Layouts"/>
+
+  <xs:complexType name="Layouts">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" name="layout" type="Layout"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="Layout">
+    <xs:all>
+      <xs:element name="id" type="xs:string"/>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="typeId" type="xs:string"/>
+      <xs:element name="status" type="xs:string"/>
+      <xs:element name="background_url" type="xs:string"/>
+      
+      <xs:element name="user" type="users:User"/>
+      <xs:element name="properties" type="resources:Properties" minOccurs="0"/>
+      <xs:element name="contents" type="Contents" minOccurs="0"/>
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:complexType name="Contents">
+    <xs:sequence> 
+      <xs:element maxOccurs="unbounded" name="item" type="Item"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="Item">
+    <xs:all>
+      <xs:element name="resourceId" type="xs:string"/>
+      <xs:element name="left" type="xs:int"/>
+      <xs:element name="top" type="xs:int"/>
+      <xs:element name="right" type="xs:int"/>
+      <xs:element name="bottom" type="xs:int"/>
+      <xs:element name="videoRectLeft" type="xs:int"/>
+      <xs:element name="videoRectTop" type="xs:int"/>
+      <xs:element name="videoRectRight" type="xs:int"/>
+      <xs:element name="videoRectBottom" type="xs:int"/>
+    </xs:all>
+  </xs:complexType>
+</xs:schema>
