@@ -13,6 +13,11 @@ class QTransform;
 
 class InstrumentUtility {
 public:
+    enum BoundingMode {
+        InBound,    /**< Rectangle's size limit is reached when it is contained inside a bounding rectangle touching its sides. */
+        OutBound    /**< Rectangle's size limit is reached when bounding rectangle is contained inside it touching its sides. */
+    };
+
     /**
      * \param view                      Graphics view. Must not be NULL.
      * \param rect                      Rectangle to map to scene.
@@ -91,10 +96,23 @@ public:
     /**
      * Scales the given viewport.
      * 
+     * Note that because of the way scaling is implemented, it may also
+     * involve minor viewport movement.
+     * 
      * \param view                      Graphics view to scale viewport of.
      * \param factor                    Viewport scale factor.
      */
     static void scaleViewport(QGraphicsView *view, qreal factor);
+
+    /**
+     * Calculates the factor by which the given size must be scaled to fit into
+     * the given bounds.
+     * 
+     * \param size                      Size to scale.
+     * \param bounds                    Size bounds.
+     * \param mode                      Bounding mode.
+     */
+    static qreal calculateScale(QSizeF size, QSizeF bounds, BoundingMode mode);
 
 };
 

@@ -9,6 +9,7 @@ class CentralWidget;
 class CellLayout;
 class BoundingInstrument;
 class InstrumentManager;
+class ViewportAnimation;
 
 class SceneControllerPrivate {
 public:
@@ -46,6 +47,9 @@ private:
     /** Graphics scene. */
     QGraphicsScene *scene;
 
+    /** Viewport animation. */
+    ViewportAnimation *viewportAnimation;
+
     /** Instrument manager for the scene. */
     InstrumentManager *manager;
 
@@ -72,6 +76,9 @@ private:
 
     /** Whether the focused widget is zoomed. */
     bool focusedZoomed;
+
+    /** Rectangle to unzoom to. */
+    QRectF unzoomRect;
 
     Q_DECLARE_PUBLIC(SceneController);
 };

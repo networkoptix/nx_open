@@ -22,14 +22,6 @@ namespace {
         );
     }
 
-    qreal calculateScale(QSizeF size, QSizeF bounds, BoundingInstrument::BoundingMode mode) {
-        if(mode == BoundingInstrument::InBound) {
-            return qMax(size.width() / bounds.width(), size.height() / bounds.height());
-        } else {
-            return qMin(size.width() / bounds.width(), size.height() / bounds.height());
-        }
-    }
-
     QRectF truncated(const QRectF &rect) {
         QRectF result = rect;
 

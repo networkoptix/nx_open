@@ -67,3 +67,11 @@ void InstrumentUtility::scaleViewport(QGraphicsView *view, qreal factor) {
     view->setTransformationAnchor(anchor);
     view->setInteractive(interactive);
 }
+
+qreal InstrumentUtility::calculateScale(QSizeF size, QSizeF bounds, BoundingMode mode) {
+    if(mode == InstrumentUtility::InBound) {
+        return qMax(size.width() / bounds.width(), size.height() / bounds.height());
+    } else {
+        return qMin(size.width() / bounds.width(), size.height() / bounds.height());
+    }
+}

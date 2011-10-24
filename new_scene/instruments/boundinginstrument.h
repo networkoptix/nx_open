@@ -9,11 +9,6 @@
 class BoundingInstrument: public Instrument, protected AnimationTimerListener {
     Q_OBJECT;
 public:
-    enum BoundingMode {
-        InBound,    /**< Rectangle's size limit is reached when it is contained inside a bounding rectangle touching its sides. */
-        OutBound    /**< Rectangle's size limit is reached when bounding rectangle is contained inside it touching its sides. */
-    };
-
     BoundingInstrument(QObject *parent = NULL);
 
     virtual ~BoundingInstrument();
