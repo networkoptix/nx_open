@@ -44,8 +44,11 @@ private slots:
     void at_draggingStarted(QGraphicsView *view, QList<QGraphicsItem *> items);
     void at_draggingFinished(QGraphicsView *view, QList<QGraphicsItem *> items);
 
-    void at_clicked(QGraphicsView *view, QGraphicsItem *item);
-    void at_doubleClicked(QGraphicsView *view, QGraphicsItem *item);
+    void at_item_clicked(QGraphicsView *view, QGraphicsItem *item);
+    void at_item_doubleClicked(QGraphicsView *view, QGraphicsItem *item);
+
+    void at_scene_clicked(QGraphicsView *view);
+    void at_scene_doubleClicked(QGraphicsView *view);
 
     void at_widget_destroyed();
 

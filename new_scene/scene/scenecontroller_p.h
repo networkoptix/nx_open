@@ -10,6 +10,8 @@ class AnimatedWidget;
 class CentralWidget;
 class CellLayout;
 class BoundingInstrument;
+class HandScrollInstrument;
+class WheelZoomInstrument;
 class InstrumentManager;
 class SetterAnimation;
 
@@ -32,19 +34,22 @@ public:
     virtual ~SceneControllerPrivate() {}
 
 private:
-    void toggleFocus(QGraphicsView *view, AnimatedWidget *widget);
-    void toggleZoom(QGraphicsView *view, AnimatedWidget *widget);
+    void toggleFocus(AnimatedWidget *widget);
+    void focusedExpand();
+    void focusedContract();
 
-    void addView(QGraphicsView *view);
+    void initZoomAnimation(const QRectF &unzoomed, const QRectF &zoomed);
+    void animateZoomToFocused();
+    void animateZoomToGlobal();
 
-    void focusedExpand(QGraphicsView *view);
-    void focusedContract(QGraphicsView *view);
+    void toggleZoom(AnimatedWidget *widget);
+    void focusedZoom();
+    void focusedUnzoom();
+    void zoomAnimationFinished();
 
-    void toggleFocusedFitting(QGraphicsView *view);
-    void focusedZoom(QGraphicsView *view);
-    void focusedUnzoom(QGraphicsView *view);
-    void initZoomAnimations(const QRectF &unzoomed, const QRectF &zoomed);
-    void finishZoom();
+    void toggleFocusedFitting();
+
+    void fitInView();
 
     QRectF fitInViewRect() const;
     QRectF focusedWidgetRect() const;
@@ -79,6 +84,12 @@ private:
 
     /** Bounding instrument. */
     BoundingInstrument *boundingInstrument;
+
+    /** Hand scroll instrument. */
+    HandScrollInstrument *handScrollInstrument;
+
+    /** Wheel zoom instrument. */
+    WheelZoomInstrument *wheelZoomInstrument;
 
     /** Widget that currently has focus. There can be only one such widget. */
     AnimatedWidget *focusedWidget;

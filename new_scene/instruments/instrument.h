@@ -114,6 +114,9 @@ public:
     QSet<QGraphicsView *> views() const;
 
     /**
+     * Disables or enables this instrument. Note that disabled instruments do
+     * not receive notifications and cannot filter events.
+     *
      * \param enabled                  Whether this instrument is enabled.
      */
     void setEnabled(bool enabled = true);
