@@ -13,9 +13,9 @@ private:
     virtual bool keyReleaseEvent(QGraphicsScene *, QKeyEvent *) override { return true; }
 
     virtual bool mouseMoveEvent(QGraphicsScene *, QGraphicsSceneMouseEvent *) { return true; }
-    virtual bool mousePressEvent(QGraphicsScene *, QGraphicsSceneMouseEvent *) { qDebug("PRESS"); return true; }
-    virtual bool mouseReleaseEvent(QGraphicsScene *, QGraphicsSceneMouseEvent *) { qDebug("RELEASE"); return true; }
-    virtual bool mouseDoubleClickEvent(QGraphicsScene *, QGraphicsSceneMouseEvent *) { qDebug("DBLCLICK"); return true; }
+    virtual bool mousePressEvent(QGraphicsScene *, QGraphicsSceneMouseEvent *) { return true; }
+    virtual bool mouseReleaseEvent(QGraphicsScene *, QGraphicsSceneMouseEvent *) { return true; }
+    virtual bool mouseDoubleClickEvent(QGraphicsScene *, QGraphicsSceneMouseEvent *) { return true; }
 };
 
 #endif // QN_SCENE_INPUT_STOP_INSTRUMENT_H

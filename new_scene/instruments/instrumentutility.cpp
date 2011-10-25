@@ -38,6 +38,10 @@ QRectF InstrumentUtility::dilated(const QRectF &rect, const QSizeF &amount) {
     return rect.adjusted(-amount.width(), -amount.height(), amount.width(), amount.height());
 }
 
+bool InstrumentUtility::contains(const QSizeF &size, const QSizeF &otherSize) {
+    return size.width() > otherSize.width() && size.height() > otherSize.height();
+}
+
 void InstrumentUtility::moveViewport(QGraphicsView *view, const QPoint &positionDelta) {
     assert(view != NULL);
 
@@ -102,7 +106,7 @@ void InstrumentUtility::scaleViewportTo(QGraphicsView *view, const QSizeF &size,
 
     qreal factor = 1.0 / calculateScale(mapRectToScene(view, view->viewport()->rect()).size(), size, mode);
 
-    scaleViewport(view, factor);
+    scaleViewport(view, factor, anchor);
 }
 
 qreal InstrumentUtility::calculateScale(QSizeF size, QSizeF bounds, BoundingMode mode) {

@@ -38,14 +38,6 @@ namespace {
         return result;
     }
 
-    bool qFuzzyIsNull(const QPointF &p) {
-        return ::qFuzzyIsNull(p.x()) && ::qFuzzyIsNull(p.y());
-    }
-
-    bool qFuzzyCompare(const QPointF &l, const QPointF &r) {
-        return ::qFuzzyCompare(l.x(), r.x()) && ::qFuzzyCompare(l.y(), r.y());
-    }
-
     QPointF calculateDistance(const QRectF &from, const QPointF &to) {
         QPointF result(0.0, 0.0);
 

@@ -200,15 +200,10 @@ void SceneControllerPrivate::toggleZoom(QGraphicsView *view, AnimatedWidget *wid
             if(focusedZoomed) {
                 focusedUnzoom(view);
             } else {
-                if(zoomAnimation->state() != QAbstractAnimation::Running)
-                    unzoomRect = InstrumentUtility::mapRectToScene(view, view->viewport()->rect());
                 focusedZoom(view);
             }
         }
     } else {
-        if(!focusedZoomed && zoomAnimation->state() != QAbstractAnimation::Running)
-            unzoomRect = InstrumentUtility::mapRectToScene(view, view->viewport()->rect());
-
         if(focusedWidget != NULL) {
             if(focusedExpanded)
                 focusedContract(view);
@@ -280,8 +275,8 @@ void SceneControllerPrivate::focusedZoom(QGraphicsView *view) {
         zoomAnimation->setDirection(QAbstractAnimation::Forward);
     } else {
         initZoomAnimations(
-            InstrumentUtility::mapRectToScene(view, view->viewport()->rect()),
-            centralWidget->mapRectToScene(centralLayout->mapFromGrid(centralLayout->rect(focusedWidget)))
+            viewportRect(),
+            focusedWidgetRect()
         );
 
         boundingInstrument->disable();
@@ -301,8 +296,8 @@ void SceneControllerPrivate::focusedUnzoom(QGraphicsView *view) {
         zoomAnimation->setDirection(QAbstractAnimation::Backward);
     } else {
         initZoomAnimations(
-            unzoomRect,
-            InstrumentUtility::mapRectToScene(view, view->viewport()->rect())
+            fitInViewRect(),
+            viewportRect()
         );
 
         boundingInstrument->disable();
@@ -315,18 +310,44 @@ void SceneControllerPrivate::focusedUnzoom(QGraphicsView *view) {
     focusedZoomed = false;
 }
 
+void SceneControllerPrivate::toggleFocusedFitting(QGraphicsView *view) {
+    assert(focusedWidget != NULL && focusedZoomed);
+
+    if(zoomAnimation->state() == QAbstractAnimation::Running) {
+        zoomAnimation->setDirection(zoomAnimation->direction() == QAbstractAnimation::Forward ? QAbstractAnimation::Backward : QAbstractAnimation::Forward);
+    } else {
+        initZoomAnimations(
+            viewportRect(),
+            focusedWidgetRect()
+        );
+
+        boundingInstrument->disable();
+
+        zoomAnimation->setCurrentTime(zoomAnimation->duration());
+        zoomAnimation->setDirection(QAbstractAnimation::Forward);
+        zoomAnimation->start();
+    }
+}
+
 void SceneControllerPrivate::finishZoom() {
     boundingInstrument->enable();
 
-    if(focusedZoomed) {
-        QRectF rect = centralWidget->mapRectToScene(centralLayout->mapFromGrid(centralLayout->rect(focusedWidget)));
+    QRectF boundingRect = focusedZoomed ? focusedWidgetRect() : fitInViewRect();
 
-        boundingInstrument->setPositionBounds(view, rect, 0.0);
-        boundingInstrument->setSizeBounds(view, lowerSizeBound, InstrumentUtility::OutBound, rect.size(), InstrumentUtility::OutBound);
-    } else {
-        boundingInstrument->setPositionBounds(NULL, centralWidget->geometry(), 0.0);
-        boundingInstrument->setSizeBounds(NULL, lowerSizeBound, InstrumentUtility::OutBound, centralWidget->size(), InstrumentUtility::OutBound);
-    }
+    boundingInstrument->setPositionBounds(view, boundingRect, 0.0);
+    boundingInstrument->setSizeBounds(view, lowerSizeBound, InstrumentUtility::OutBound, boundingRect.size(), InstrumentUtility::OutBound);
+}
+
+QRectF SceneControllerPrivate::fitInViewRect() const {
+    return centralWidget->geometry();
+}
+
+QRectF SceneControllerPrivate::focusedWidgetRect() const {
+    return centralWidget->mapRectToScene(centralLayout->mapFromGrid(centralLayout->rect(focusedWidget)));
+}
+
+QRectF SceneControllerPrivate::viewportRect() const {
+    return InstrumentUtility::mapRectToScene(view, view->viewport()->rect());
 }
 
 SceneController::SceneController(QGraphicsView *view, QObject *parent):
@@ -354,7 +375,7 @@ SceneController::SceneController(QGraphicsView *view, QObject *parent):
 
     /* Install instruments. */
     d->manager->registerScene(d->scene);
-    ClickInstrument *clickInstrument = new ClickInstrument(this);
+    ClickInstrument *clickInstrument = new ClickInstrument(ClickInstrument::WATCH_ITEM, this);
     DragInstrument *dragInstrument = new DragInstrument(this);
     HandScrollInstrument *handScrollInstrument = new HandScrollInstrument(this);
     d->boundingInstrument = new BoundingInstrument(this);
@@ -633,7 +654,20 @@ void SceneController::at_clicked(QGraphicsView *view, QGraphicsItem *item) {
 }
 
 void SceneController::at_doubleClicked(QGraphicsView *view, QGraphicsItem *item) {
-    d_func()->toggleZoom(view, dynamic_cast<AnimatedWidget *>(item));
+    Q_D(SceneController);
+
+    if(d->focusedZoomed) {
+        QRectF viewportRect = d->viewportRect();
+        QRectF focusedWidgetRect = d->focusedWidgetRect();
+
+        if(InstrumentUtility::contains(focusedWidgetRect.size(), viewportRect.size()) && !qFuzzyCompare(viewportRect, focusedWidgetRect)) {
+            d->toggleFocusedFitting(view);
+        } else {
+            d->toggleZoom(view, dynamic_cast<AnimatedWidget *>(item));
+        }
+    } else {
+        d->toggleZoom(view, dynamic_cast<AnimatedWidget *>(item));
+    }
 }
 
 void SceneController::at_widget_destroyed() {

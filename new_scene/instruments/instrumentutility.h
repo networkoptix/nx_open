@@ -3,12 +3,11 @@
 
 #include <Qt>
 #include <QGraphicsView>
+#include <QPoint>
 
 class QRect;
 class QRectF;
 class QSizeF;
-class QPoint;
-class QPointF;
 class QTransform;
 
 class InstrumentUtility {
@@ -68,6 +67,14 @@ public:
     static QRectF dilated(const QRectF &rect, const QSizeF &amount);
 
     /**
+     * \param size
+     * \param otherSize
+     * \returns                         Whether the given size contains the
+     *                                  other size.
+     */
+    static bool contains(const QSizeF &size, const QSizeF &otherSize);
+
+    /**
      * Moves the given viewport.
      * 
      * \param view                      Graphics view to move viewport of.
@@ -124,5 +131,22 @@ public:
     static qreal calculateScale(QSizeF size, QSizeF bounds, BoundingMode mode);
 
 };
+
+inline bool qFuzzyIsNull(const QPointF &p) {
+    return ::qFuzzyIsNull(p.x()) && ::qFuzzyIsNull(p.y());
+}
+
+inline bool qFuzzyCompare(const QPointF &l, const QPointF &r) {
+    return ::qFuzzyCompare(l.x(), r.x()) && ::qFuzzyCompare(l.y(), r.y());
+}
+
+inline bool qFuzzyCompare(const QRectF &l, const QRectF &r) {
+    return 
+        ::qFuzzyCompare(l.x(), r.x()) && 
+        ::qFuzzyCompare(l.y(), r.y()) && 
+        ::qFuzzyCompare(l.width(), r.width()) &&
+        ::qFuzzyCompare(l.height(), r.height());
+}
+
 
 #endif // QN_INSTRUMENT_UTILITY_H

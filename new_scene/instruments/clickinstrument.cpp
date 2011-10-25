@@ -2,11 +2,23 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QApplication>
 
-ClickInstrument::ClickInstrument(QObject *parent): 
-    Instrument(makeSet(), makeSet(), makeSet(), true, parent) 
+namespace {
+    QEvent::Type sceneEventTypes[] = {
+        QEvent::GraphicsSceneMousePress,
+        QEvent::GraphicsSceneMouseMove,
+        QEvent::GraphicsSceneMouseRelease,
+        QEvent::GraphicsSceneMouseDoubleClick
+    };
+
+} // anonymous namespace
+
+ClickInstrument::ClickInstrument(WatchFlags flags, QObject *parent): 
+    Instrument((flags & WATCH_SCENE) ? makeSet(sceneEventTypes) : makeSet(), makeSet(), makeSet(), flags & WATCH_ITEM, parent),
+    m_itemHandler(this),
+    m_sceneHandler(this)
 {}
 
-bool ClickInstrument::mousePressEvent(QGraphicsItem *, QGraphicsSceneMouseEvent *event) {
+bool detail::ClickInstrumentHandler::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     if (event->button() != Qt::LeftButton)
         return false;
 
@@ -17,7 +29,7 @@ bool ClickInstrument::mousePressEvent(QGraphicsItem *, QGraphicsSceneMouseEvent 
     return false;
 }
 
-bool ClickInstrument::mouseMoveEvent(QGraphicsItem *, QGraphicsSceneMouseEvent *event) {
+bool detail::ClickInstrumentHandler::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
     if (!m_isClick)
         return false;
 
@@ -29,7 +41,7 @@ bool ClickInstrument::mouseMoveEvent(QGraphicsItem *, QGraphicsSceneMouseEvent *
     return false;
 }
 
-bool ClickInstrument::mouseReleaseEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
+bool detail::ClickInstrumentHandler::mouseReleaseEvent(QGraphicsItem *item, QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) {
     if(event->button() != Qt::LeftButton)
         return false;
 
@@ -38,18 +50,26 @@ bool ClickInstrument::mouseReleaseEvent(QGraphicsItem *item, QGraphicsSceneMouse
 
     QGraphicsView *view = NULL;
     if(event->widget() != NULL)
-        view = this->view(event->widget());
+        view = m_instrument->view(event->widget());
 
     if(m_isDoubleClick) {
-        emit doubleClicked(view, item);
+        if(item != NULL)
+            emit m_instrument->doubleClicked(view, item);
+        if(scene != NULL)
+            emit m_instrument->doubleClicked(view);
     } else {
-        emit clicked(view, item);
+        if(item != NULL)
+            emit m_instrument->clicked(view, item);
+        if(scene != NULL)
+            emit m_instrument->clicked(view);
     }
 
+    m_isClick = false;
+    m_isDoubleClick = false;
     return false;
 }
 
-bool ClickInstrument::mouseDoubleClickEvent(QGraphicsItem *, QGraphicsSceneMouseEvent *event) {
+bool detail::ClickInstrumentHandler::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) {
     if(event->button() != Qt::LeftButton)
         return false;
 
@@ -57,4 +77,36 @@ bool ClickInstrument::mouseDoubleClickEvent(QGraphicsItem *, QGraphicsSceneMouse
     m_isDoubleClick = true;
 
     return false;
+}
+
+bool ClickInstrument::mousePressEvent(QGraphicsItem *, QGraphicsSceneMouseEvent *event) {
+    return m_itemHandler.mousePressEvent(event);
+}
+
+bool ClickInstrument::mouseMoveEvent(QGraphicsItem *, QGraphicsSceneMouseEvent *event) {
+    return m_itemHandler.mouseMoveEvent(event);
+}
+
+bool ClickInstrument::mouseReleaseEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
+    return m_itemHandler.mouseReleaseEvent(item, NULL, event);
+}
+
+bool ClickInstrument::mouseDoubleClickEvent(QGraphicsItem *, QGraphicsSceneMouseEvent *event) {
+    return m_itemHandler.mouseDoubleClickEvent(event);
+}
+
+bool ClickInstrument::mousePressEvent(QGraphicsScene *, QGraphicsSceneMouseEvent *event) {
+    return m_sceneHandler.mousePressEvent(event);
+}
+
+bool ClickInstrument::mouseMoveEvent(QGraphicsScene *, QGraphicsSceneMouseEvent *event) {
+    return m_sceneHandler.mouseMoveEvent(event);
+}
+
+bool ClickInstrument::mouseReleaseEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) {
+    return m_sceneHandler.mouseReleaseEvent(NULL, scene, event);
+}
+
+bool ClickInstrument::mouseDoubleClickEvent(QGraphicsScene *, QGraphicsSceneMouseEvent *event) {
+    return m_sceneHandler.mouseDoubleClickEvent(event);
 }

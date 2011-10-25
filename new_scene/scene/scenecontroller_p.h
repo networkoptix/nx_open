@@ -40,10 +40,15 @@ private:
     void focusedExpand(QGraphicsView *view);
     void focusedContract(QGraphicsView *view);
 
+    void toggleFocusedFitting(QGraphicsView *view);
     void focusedZoom(QGraphicsView *view);
     void focusedUnzoom(QGraphicsView *view);
     void initZoomAnimations(const QRectF &unzoomed, const QRectF &zoomed);
     void finishZoom();
+
+    QRectF fitInViewRect() const;
+    QRectF focusedWidgetRect() const;
+    QRectF viewportRect() const;
 
 private:
     SceneController *const q_ptr;
@@ -92,9 +97,6 @@ private:
 
     /** Viewport position animation. */
     SetterAnimation *positionAnimation;
-
-    /** Rectangle to unzoom to. */
-    QRectF unzoomRect;
 
     Q_DECLARE_PUBLIC(SceneController);
 };
