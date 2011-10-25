@@ -1,6 +1,6 @@
 TEMPLATE = lib
 QT *= multimedia network xml
-CONFIG += x86 precompile_header
+CONFIG += x86 precompile_header %BUILDLIB
 CONFIG -= flat
 
 INCLUDEPATH += $$PWD
@@ -45,7 +45,13 @@ win32 {
     INCLUDEPATH += $$PWD/../contrib/ffmpeg-misc-headers-win32
   }
 
-  DEFINES += QN_EXPORT=Q_DECL_EXPORT
+  !staticlib {
+    DEFINES += QN_EXPORT=Q_DECL_EXPORT
+  }
+
+  staticlib {
+    DEFINES += QN_EXPORT=
+  }
 }
 
 mac {

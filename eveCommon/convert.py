@@ -3,6 +3,8 @@
 import shutil, glob, string
 import os, sys, posixpath
 
+import time
+
 from filetypes import all_filetypes, video_filetypes, image_filetypes
 
 os.path = posixpath
@@ -11,6 +13,17 @@ FFMPEG_VERSION = '2011-08-29'
 
 EXCLUDE_DIRS = ('.svn', 'dxva')
 EXCLUDE_FILES = ('dxva', 'moc_', 'qrc_', 'StdAfx')
+
+# Should be 'staticlib' or '' for DLL
+BUILDLIB = 'staticlib'
+# BUILDLIB = ''
+
+def instantiate_pro(profile, params):
+    class T(string.Template):
+        delimiter = '%'
+
+    pro_t = T(open(profile, 'r').read())
+    open(profile, 'w').write(pro_t.substitute(params))
 
 def rmtree(path):
     def on_rm_error(func, path, exc_info):
@@ -130,18 +143,26 @@ def index_dirs(xdirs, template_file, output_file, use_prefix = False, exclude_di
 
     uniclient_pro.close()
 
-index_dirs(('src',), 'src/const.pro', 'src/common.pro', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
+if __name__ == '__main__':
+    if os.path.exists('bin'):
+        rmtree('bin')
 
-ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release = setup_ffmpeg()
+    if os.path.exists('build'):
+        rmtree('build')
 
-gen_filetypes_h()
+    index_dirs(('src',), 'src/const.pro', 'src/common.pro', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
+    instantiate_pro('src/common.pro', {'BUILDLIB': BUILDLIB})
 
-if sys.platform == 'win32':
-    os.system('qmake -tp vc FFMPEG=%s -o src/common.vcproj src/common.pro' % ffmpeg_path)
+    ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release = setup_ffmpeg()
 
-elif sys.platform == 'darwin':
-    if os.path.exists('src/Makefile'):
-        rmtree('src/Makefile')
+    gen_filetypes_h()
 
-    os.system('qmake -spec macx-g++ CONFIG-=release CONFIG+=debug FFMPEG=%s -o build/Makefile.debug src/common.pro' % ffmpeg_path)
-    os.system('qmake -spec macx-g++ CONFIG-=debug CONFIG+=release FFMPEG=%s -o build/Makefile.release src/common.pro' % ffmpeg_path)
+    if sys.platform == 'win32':
+        os.system('qmake -tp vc FFMPEG=%s -o src/common.vcproj src/common.pro' % ffmpeg_path)
+
+    elif sys.platform == 'darwin':
+        if os.path.exists('src/Makefile'):
+            rmtree('src/Makefile')
+
+        os.system('qmake -spec macx-g++ CONFIG-=release CONFIG+=debug FFMPEG=%s -o build/Makefile.debug src/common.pro' % ffmpeg_path)
+        os.system('qmake -spec macx-g++ CONFIG-=debug CONFIG+=release FFMPEG=%s -o build/Makefile.release src/common.pro' % ffmpeg_path)

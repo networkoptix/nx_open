@@ -25,7 +25,11 @@ eveClient/src/version.h
 common/src/common.pri
 appserver/db/appserver.db
 scripts/appserver/server.state
-eveClient/src/device_plugins/archive/filetypes.h
+eveCommon/src/device_plugins/archive/filetypes.h
 eveClient/src/uniclient.pro
 eveClient/test/uniclient_tests.pro
 appserver/protocol/*.py
+eveCommon/src/common.pro
+
+*.pdb
+*.idb
