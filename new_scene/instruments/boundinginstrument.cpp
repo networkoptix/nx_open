@@ -173,20 +173,22 @@ public:
 
         /* Apply move correction. */
         if(m_isPositionEnforced && !m_centerPositionBounds.contains(m_center)) {
-            QPointF speed = m_movementSpeed * toPoint(m_sceneViewportRect.size());
             QPointF direction = -calculateDistance(m_centerPositionBounds, m_center);
-            QPointF delta = QPointF(
-                dt * speed.x() * speedMultiplier(direction.x(), m_sceneViewportRect.width()),
-                dt * speed.y() * speedMultiplier(direction.y(), m_sceneViewportRect.height())
-            );
+            if(!qFuzzyIsNull(direction)) {
+                QPointF speed = m_movementSpeed * toPoint(m_sceneViewportRect.size());
+                QPointF delta = QPointF(
+                    dt * speed.x() * speedMultiplier(direction.x(), m_sceneViewportRect.width()),
+                    dt * speed.y() * speedMultiplier(direction.y(), m_sceneViewportRect.height())
+                );
 
-            if(std::abs(delta.x()) > std::abs(direction.x()))
-                delta.rx() = direction.x();
+                if(std::abs(delta.x()) > std::abs(direction.x()))
+                    delta.rx() = direction.x();
 
-            if(std::abs(delta.y()) > std::abs(direction.y()))
-                delta.ry() = direction.y();
+                if(std::abs(delta.y()) > std::abs(direction.y()))
+                    delta.ry() = direction.y();
 
-            InstrumentUtility::moveViewport(m_view, delta);
+                InstrumentUtility::moveViewport(m_view, delta);
+            }
         }
 
         updateParameters();

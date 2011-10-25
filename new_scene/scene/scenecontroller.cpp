@@ -17,6 +17,8 @@
 #include <instruments/contextmenuinstrument.h>
 #include <instruments/clickinstrument.h>
 #include <instruments/boundinginstrument.h>
+#include <instruments/sceneinputstopinstrument.h>
+#include <instruments/sceneinputforwardinginstrument.h>
 #include <widgets/centralwidget.h>
 #include <widgets/animatedwidget.h>
 #include <widgets/layoutitem.h>
@@ -357,6 +359,8 @@ SceneController::SceneController(QGraphicsView *view, QObject *parent):
     HandScrollInstrument *handScrollInstrument = new HandScrollInstrument(this);
     d->boundingInstrument = new BoundingInstrument(this);
 
+    d->manager->installInstrument(new SceneInputStopInstrument(this));
+    d->manager->installInstrument(new SceneInputForwardingInstrument(this));
     d->manager->installInstrument(new WheelZoomInstrument(this));
     d->manager->installInstrument(dragInstrument);
     d->manager->installInstrument(new RubberBandInstrument(this));
@@ -446,8 +450,8 @@ SceneController::SceneController(QGraphicsView *view, QObject *parent):
     //setCacheMode(QGraphicsView::CacheBackground);
 
     /* We don't need scrollbars & frame. */
-    view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    //view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    //view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setFrameShape(QFrame::NoFrame);
 
     /* Add actions. */

@@ -77,7 +77,7 @@ bool HandScrollInstrument::mouseReleaseEvent(QWidget *viewport, QMouseEvent *eve
     stopScrolling(this->view(viewport));
 
     event->accept();
-    return true;
+    return false;
 }
 
 void HandScrollInstrument::startScrolling(QGraphicsView *view) {

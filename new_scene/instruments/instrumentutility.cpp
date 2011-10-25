@@ -2,6 +2,7 @@
 #include <cassert>
 #include <QGraphicsView>
 #include <QScrollBar>
+#include <QCursor>
 
 QRectF InstrumentUtility::mapRectToScene(QGraphicsView *view, const QRect &rect) {
     return view->viewportTransform().inverted().mapRect(rect);
@@ -40,39 +41,65 @@ QRectF InstrumentUtility::dilated(const QRectF &rect, const QSizeF &amount) {
 void InstrumentUtility::moveViewport(QGraphicsView *view, const QPoint &positionDelta) {
     assert(view != NULL);
 
-    QScrollBar *hBar = view->horizontalScrollBar();
-    QScrollBar *vBar = view->verticalScrollBar();
-    hBar->setValue(hBar->value() + (view->isRightToLeft() ? -positionDelta.x() : positionDelta.x()));
-    vBar->setValue(vBar->value() + positionDelta.y());
-}
-
-void InstrumentUtility::moveViewport(QGraphicsView *view, const QTransform &sceneToViewport, const QPointF &positionDelta) {
-    moveViewport(view, (sceneToViewport.map(positionDelta) - sceneToViewport.map(QPointF(0.0, 0.0))).toPoint());
+    moveViewport(view, view->mapToScene(positionDelta) - view->mapToScene(QPoint(0, 0)));
 }
 
 void InstrumentUtility::moveViewport(QGraphicsView *view, const QPointF &positionDelta) {
-    moveViewport(view, view->viewportTransform(), positionDelta);
+    assert(view != NULL);
+
+    QGraphicsView::ViewportAnchor oldAnchor = view->transformationAnchor();
+    bool oldInteractive = view->isInteractive();
+    view->setInteractive(false); /* View will re-fire stored mouse event if we don't do this. */
+    view->setTransformationAnchor(QGraphicsView::NoAnchor);
+
+    view->translate(-positionDelta.x(), -positionDelta.y());
+
+    view->setTransformationAnchor(oldAnchor);
+    view->setInteractive(oldInteractive);
 }
 
-void InstrumentUtility::moveViewportTo(QGraphicsView *view, const QPointF &position) {
-    view->centerOn(position);
+void InstrumentUtility::moveViewportTo(QGraphicsView *view, const QPointF &centerPosition) {
+    assert(view != NULL);
+
+    moveViewport(view, centerPosition - view->mapToScene(view->viewport()->rect().center()));
 }
 
-void InstrumentUtility::scaleViewport(QGraphicsView *view, qreal factor) {
+namespace {
+    QPointF anchorScenePosition(QGraphicsView *view, QGraphicsView::ViewportAnchor anchor) {
+        switch(anchor) {
+            case QGraphicsView::AnchorViewCenter:
+                return view->mapToScene(view->viewport()->rect().center());
+            case QGraphicsView::AnchorUnderMouse:
+                return view->mapToScene(view->mapFromGlobal(QCursor::pos()));
+            default:
+                return QPointF();
+        }
+    }
+}
+
+void InstrumentUtility::scaleViewport(QGraphicsView *view, qreal factor, QGraphicsView::ViewportAnchor anchor) {
     assert(view != NULL);
 
     qreal sceneFactor = 1 / factor;
 
-    QGraphicsView::ViewportAnchor anchor = view->transformationAnchor();
-    bool interactive = view->isInteractive();
+    QPointF oldAnchorPosition = anchorScenePosition(view, anchor);
+    
+    QGraphicsView::ViewportAnchor oldAnchor = view->transformationAnchor();
+    bool oldInteractive = view->isInteractive();
     view->setInteractive(false); /* View will re-fire stored mouse event if we don't do this. */
-    view->setTransformationAnchor(QGraphicsView::AnchorViewCenter);
+    view->setTransformationAnchor(QGraphicsView::NoAnchor);
+
     view->scale(sceneFactor, sceneFactor);
-    view->setTransformationAnchor(anchor);
-    view->setInteractive(interactive);
+    QPointF delta = anchorScenePosition(view, anchor) - oldAnchorPosition;
+    view->translate(delta.x(), delta.y());
+
+    view->setTransformationAnchor(oldAnchor);
+    view->setInteractive(oldInteractive);
 }
 
-void InstrumentUtility::scaleViewportTo(QGraphicsView *view, const QSizeF &size, BoundingMode mode) {
+void InstrumentUtility::scaleViewportTo(QGraphicsView *view, const QSizeF &size, BoundingMode mode, QGraphicsView::ViewportAnchor anchor) {
+    assert(view != NULL);
+
     qreal factor = 1.0 / calculateScale(mapRectToScene(view, view->viewport()->rect()).size(), size, mode);
 
     scaleViewport(view, factor);
