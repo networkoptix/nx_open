@@ -192,6 +192,11 @@ public:
         updateParameters();
     }
 
+    void update() {
+        updateParameters();
+        updateSceneRect();
+    }
+
     QGraphicsView *view() const {
         return m_view;
     }
@@ -387,16 +392,28 @@ void BoundingInstrument::aboutToBeUninstalledNotify() {
     m_data[NULL] = new ViewData(NULL);
 }
 
-void BoundingInstrument::tick(int currentTime) {
-    qreal dt = (currentTime - m_lastTickTime) / 1000.0;
-    
+void BoundingInstrument::enabledNotify() {
     foreach(QGraphicsView *view, views()) {
         ViewData *d = cdata(view);
         if(d == NULL)
             continue;
 
-        d->correct();
-        d->enforce(dt);
+        d->update();
+    }
+}
+
+void BoundingInstrument::tick(int currentTime) {
+    if(isEnabled()) {
+        qreal dt = (currentTime - m_lastTickTime) / 1000.0;
+
+        foreach(QGraphicsView *view, views()) {
+            ViewData *d = cdata(view);
+            if(d == NULL)
+                continue;
+
+            d->correct();
+            d->enforce(dt);
+        }
     }
 
     m_lastTickTime = currentTime;

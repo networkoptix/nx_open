@@ -54,6 +54,10 @@ void InstrumentUtility::moveViewport(QGraphicsView *view, const QPointF &positio
     moveViewport(view, view->viewportTransform(), positionDelta);
 }
 
+void InstrumentUtility::moveViewportTo(QGraphicsView *view, const QPointF &position) {
+    view->centerOn(position);
+}
+
 void InstrumentUtility::scaleViewport(QGraphicsView *view, qreal factor) {
     assert(view != NULL);
 
@@ -66,6 +70,12 @@ void InstrumentUtility::scaleViewport(QGraphicsView *view, qreal factor) {
     view->scale(sceneFactor, sceneFactor);
     view->setTransformationAnchor(anchor);
     view->setInteractive(interactive);
+}
+
+void InstrumentUtility::scaleViewportTo(QGraphicsView *view, const QSizeF &size, BoundingMode mode) {
+    qreal factor = 1.0 / calculateScale(mapRectToScene(view, view->viewport()->rect()).size(), size, mode);
+
+    scaleViewport(view, factor);
 }
 
 qreal InstrumentUtility::calculateScale(QSizeF size, QSizeF bounds, BoundingMode mode) {

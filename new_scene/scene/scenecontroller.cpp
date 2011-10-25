@@ -8,6 +8,7 @@
 #include <QFile>
 #include <QIcon>
 #include <QAction>
+#include <QParallelAnimationGroup>
 #include <instruments/instrumentmanager.h>
 #include <instruments/handscrollinstrument.h>
 #include <instruments/wheelzoominstrument.h>
@@ -20,7 +21,7 @@
 #include <widgets/animatedwidget.h>
 #include <widgets/layoutitem.h>
 #include <widgets/celllayout.h>
-#include "viewportanimation.h"
+#include "setteranimation.h"
 
 namespace {
     struct LayoutDescription {
@@ -114,6 +115,31 @@ namespace {
         *deltaEnd = newEnd - end;
     }
 
+    class ViewportPositionSetter {
+    public:
+        ViewportPositionSetter(QGraphicsView *view): m_view(view) {}
+
+        void operator()(const QVariant &value) const {
+            InstrumentUtility::moveViewportTo(m_view, value.toPointF());
+        }
+
+    private:
+        QGraphicsView *m_view;
+    };
+
+    class ViewportScaleSetter {
+    public:
+        ViewportScaleSetter(QGraphicsView *view, InstrumentUtility::BoundingMode mode): m_view(view), m_mode(mode) {}
+
+        void operator()(const QVariant &value) const {
+            InstrumentUtility::scaleViewportTo(m_view, value.toSizeF(), m_mode);
+        }
+
+    private:
+        QGraphicsView *m_view;
+        InstrumentUtility::BoundingMode m_mode;
+    };
+
 
     const qreal spacing = 25;
 
@@ -128,6 +154,8 @@ namespace {
 
     const qreal normalZ = 0.0;
     const qreal focusedZ = 1.0;
+
+    const int zoomAnimationDurationMsec = 250;
 
 } // anonymous namespace
 
@@ -170,12 +198,13 @@ void SceneControllerPrivate::toggleZoom(QGraphicsView *view, AnimatedWidget *wid
             if(focusedZoomed) {
                 focusedUnzoom(view);
             } else {
-                unzoomRect = InstrumentUtility::mapRectToScene(view, view->viewport()->rect());
+                if(zoomAnimation->state() != QAbstractAnimation::Running)
+                    unzoomRect = InstrumentUtility::mapRectToScene(view, view->viewport()->rect());
                 focusedZoom(view);
             }
         }
     } else {
-        if(!focusedZoomed)
+        if(!focusedZoomed && zoomAnimation->state() != QAbstractAnimation::Running)
             unzoomRect = InstrumentUtility::mapRectToScene(view, view->viewport()->rect());
 
         if(focusedWidget != NULL) {
@@ -234,12 +263,31 @@ void SceneControllerPrivate::focusedContract(QGraphicsView *) {
     focusedExpanded = false;
 }
 
+void SceneControllerPrivate::initZoomAnimations(const QRectF &unzoomed, const QRectF &zoomed) {
+    scaleAnimation->setStartValue(unzoomed.size());
+    scaleAnimation->setEndValue(zoomed.size());
+
+    positionAnimation->setStartValue(unzoomed.center());
+    positionAnimation->setEndValue(zoomed.center());
+}
+
 void SceneControllerPrivate::focusedZoom(QGraphicsView *view) {
     assert(focusedWidget != NULL && !focusedZoomed);
 
-    QRectF rect = centralWidget->mapRectToScene(centralLayout->mapFromGrid(centralLayout->rect(focusedWidget)));
-    boundingInstrument->setPositionBounds(view, rect, 0.0);
-    boundingInstrument->setSizeBounds(view, lowerSizeBound, InstrumentUtility::OutBound, rect.size(), InstrumentUtility::OutBound);
+    if(zoomAnimation->state() == QAbstractAnimation::Running) {
+        zoomAnimation->setDirection(QAbstractAnimation::Forward);
+    } else {
+        initZoomAnimations(
+            InstrumentUtility::mapRectToScene(view, view->viewport()->rect()),
+            centralWidget->mapRectToScene(centralLayout->mapFromGrid(centralLayout->rect(focusedWidget)))
+        );
+
+        boundingInstrument->disable();
+
+        zoomAnimation->setCurrentTime(0);
+        zoomAnimation->setDirection(QAbstractAnimation::Forward);
+        zoomAnimation->start();
+    }
 
     focusedZoomed = true;
 }
@@ -247,21 +295,39 @@ void SceneControllerPrivate::focusedZoom(QGraphicsView *view) {
 void SceneControllerPrivate::focusedUnzoom(QGraphicsView *view) {
     assert(focusedWidget != NULL && focusedZoomed);
 
-    boundingInstrument->setPositionBounds(NULL, centralWidget->geometry(), 0.0);
-    boundingInstrument->setSizeBounds(NULL, lowerSizeBound, InstrumentUtility::OutBound, centralWidget->size(), InstrumentUtility::OutBound);
+    if(zoomAnimation->state() == QAbstractAnimation::Running) {
+        zoomAnimation->setDirection(QAbstractAnimation::Backward);
+    } else {
+        initZoomAnimations(
+            unzoomRect,
+            InstrumentUtility::mapRectToScene(view, view->viewport()->rect())
+        );
 
-    QRectF viewportRect = InstrumentUtility::mapRectToScene(view, view->viewport()->rect());
-    viewportAnimation->setView(view);
-    viewportAnimation->setDuration(250);
-    viewportAnimation->setPositionDelta(unzoomRect.center() - viewportRect.center());
-    viewportAnimation->setScaleDelta(1.0 / InstrumentUtility::calculateScale(viewportRect.size(), unzoomRect.size(), InstrumentUtility::OutBound));
-    viewportAnimation->setCurrentTime(0);
-    viewportAnimation->start();
+        boundingInstrument->disable();
+
+        zoomAnimation->setCurrentTime(zoomAnimation->duration());
+        zoomAnimation->setDirection(QAbstractAnimation::Backward);
+        zoomAnimation->start();
+    }
 
     focusedZoomed = false;
 }
 
-SceneController::SceneController(QObject *parent):
+void SceneControllerPrivate::finishZoom() {
+    boundingInstrument->enable();
+
+    if(focusedZoomed) {
+        QRectF rect = centralWidget->mapRectToScene(centralLayout->mapFromGrid(centralLayout->rect(focusedWidget)));
+
+        boundingInstrument->setPositionBounds(view, rect, 0.0);
+        boundingInstrument->setSizeBounds(view, lowerSizeBound, InstrumentUtility::OutBound, rect.size(), InstrumentUtility::OutBound);
+    } else {
+        boundingInstrument->setPositionBounds(NULL, centralWidget->geometry(), 0.0);
+        boundingInstrument->setSizeBounds(NULL, lowerSizeBound, InstrumentUtility::OutBound, centralWidget->size(), InstrumentUtility::OutBound);
+    }
+}
+
+SceneController::SceneController(QGraphicsView *view, QObject *parent):
     QObject(parent),
     d_ptr(new SceneControllerPrivate())
 {
@@ -270,8 +336,18 @@ SceneController::SceneController(QObject *parent):
     const_cast<SceneController *&>(d->q_ptr) = this;
     d->scene = new QGraphicsScene(this);
     d->manager = new InstrumentManager(this);
-    d->viewportAnimation = new ViewportAnimation(this);
     
+    d->zoomAnimation = new QParallelAnimationGroup(this);
+    d->scaleAnimation = new SetterAnimation(this);
+    d->positionAnimation = new SetterAnimation(this);
+    d->zoomAnimation->addAnimation(d->scaleAnimation);
+    d->zoomAnimation->addAnimation(d->positionAnimation);
+    d->scaleAnimation->setSetter(ViewportScaleSetter(view, InstrumentUtility::OutBound));
+    d->positionAnimation->setSetter(ViewportPositionSetter(view));
+    d->scaleAnimation->setDuration(zoomAnimationDurationMsec);
+    d->positionAnimation->setDuration(zoomAnimationDurationMsec);
+    connect(d->zoomAnimation, SIGNAL(finished()), this, SLOT(at_zoomAnimation_finished()));
+
     d->scene->setItemIndexMethod(QGraphicsScene::NoIndex);
 
     /* Install instruments. */
@@ -335,15 +411,9 @@ SceneController::SceneController(QObject *parent):
 
         d->animatedWidgets.push_back(widget);
     }
-}
 
-SceneController::~SceneController() {
-    return;
-}
-
-void SceneController::addView(QGraphicsView *view) {
-    Q_D(SceneController);
-
+    /* Initialize view. */
+    d->view = view;
     view->setScene(d->scene);
     view->setDragMode(QGraphicsView::NoDrag);
 
@@ -388,7 +458,7 @@ void SceneController::addView(QGraphicsView *view) {
             action = new QAction(QIcon(QLatin1String(desc->fileName)), tr(""), this);
         else
             action = new QAction(QLatin1String(desc->fileName), this);
-        
+
         action->setShortcut(QKeySequence(Qt::Key_F1 + number++));
         action->setShortcutContext(Qt::WindowShortcut);
         action->setAutoRepeat(false);
@@ -403,8 +473,16 @@ void SceneController::addView(QGraphicsView *view) {
     d->manager->registerView(view);
 }
 
+SceneController::~SceneController() {
+    return;
+}
+
 QGraphicsScene *SceneController::scene() const {
     return d_func()->scene;
+}
+
+QGraphicsView *SceneController::view() const {
+    return d_func()->view;
 }
 
 SceneController::Mode SceneController::mode() const {
@@ -558,6 +636,9 @@ void SceneController::at_widget_destroyed() {
     d_func()->animatedWidgets.removeOne(static_cast<AnimatedWidget *>(sender()));
 }
 
+void SceneController::at_zoomAnimation_finished() {
+    d_func()->finishZoom();
+}
 
 void SceneController::relayoutItems(int rowCount, int columnCount, const QByteArray &preset) {
     Q_D(SceneController);

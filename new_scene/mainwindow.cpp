@@ -15,8 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
     //GraphicsView *view = new GraphicsView(this);
     QGraphicsView *view = new QGraphicsView(this);
 
-    SceneController *controller = new SceneController(this);
-    controller->addView(view);
+    SceneController *controller = new SceneController(view, this);
 
     QToolBar *toolBar = new QToolBar(this);
     toolBar->addActions(view->actions());

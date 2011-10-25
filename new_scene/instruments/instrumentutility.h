@@ -94,6 +94,14 @@ public:
     static void moveViewport(QGraphicsView *view, const QPointF &positionDelta);
 
     /**
+     * Centers the given viewport on the given position.
+     * 
+     * \param view                      Graphics view to center viewport of.
+     * \param position                  Position to center on.
+     */
+    static void moveViewportTo(QGraphicsView *view, const QPointF &position);
+
+    /**
      * Scales the given viewport.
      * 
      * Note that because of the way scaling is implemented, it may also
@@ -103,6 +111,15 @@ public:
      * \param factor                    Viewport scale factor.
      */
     static void scaleViewport(QGraphicsView *view, qreal factor);
+
+    /**
+     * Scales the given viewport to the given size.
+     * 
+     * \param view                      Graphics view to scale viewport of.
+     * \param size                      Size to scale to.
+     * \param mode                      Scale mode.
+     */
+    static void scaleViewportTo(QGraphicsView *view, const QSizeF &size, BoundingMode mode);
 
     /**
      * Calculates the factor by which the given size must be scaled to fit into

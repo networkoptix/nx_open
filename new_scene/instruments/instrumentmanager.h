@@ -14,8 +14,7 @@ class InstrumentManagerPrivate;
 /**
  * Instrument manager ties graphics views and instruments together.
  * 
- * It currently supports single graphics view per instrument manager, but 
- * this may change in the future.
+ * It supports multiple graphics views per instrument manager.
  */
 class InstrumentManager: public QObject {
     Q_OBJECT;

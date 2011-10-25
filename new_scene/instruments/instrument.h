@@ -113,6 +113,20 @@ public:
      */
     QSet<QGraphicsView *> views() const;
 
+    /**
+     * \param enabled                  Whether this instrument is enabled.
+     */
+    void setEnabled(bool enabled = true);
+
+    /**
+     * \returns                        Whether this instrument is enabled.
+     */
+    bool isEnabled() const;
+
+public slots:
+    void enable();
+    void disable();
+
 signals:
     /**
      * This signal is emitted whenever the instrument is installed.
@@ -288,6 +302,16 @@ protected:
     virtual void aboutToBeUninstalledNotify() {}
 
     /**
+     * Extension point for instrument enabling.
+     */
+    virtual void enabledNotify() {}
+
+    /**
+     * Extension point for instrument disabling.
+     */
+    virtual void aboutToBeDisabledNotify() {}
+
+    /**
      * \param item                     Graphics item.
      * \returns                        Whether this instrument is willing to watch
      *                                 events of the given graphics item.
@@ -443,6 +467,7 @@ private:
     QGraphicsScene *m_scene;
     QSet<QEvent::Type> m_watchedEventTypes[WATCHED_OBJECT_TYPE_COUNT];
     bool m_watchesItemEvents;
+    bool m_enabled;
 };
 
 #endif // QN_INSTRUMENT_H

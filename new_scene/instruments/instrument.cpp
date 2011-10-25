@@ -10,7 +10,8 @@ Instrument::Instrument(const QSet<QEvent::Type> &sceneEventTypes, const QSet<QEv
     QObject(parent),
     m_manager(NULL),
     m_scene(NULL),
-    m_watchesItemEvents(watchesItemEvents)
+    m_watchesItemEvents(watchesItemEvents),
+    m_enabled(true)
 {
     m_watchedEventTypes[SCENE]    = sceneEventTypes;
     m_watchedEventTypes[VIEW]     = viewEventTypes;
@@ -64,4 +65,29 @@ QSet<QGraphicsView *> Instrument::views() const {
     } else {
         return QSet<QGraphicsView *>();
     }
+}
+
+void Instrument::setEnabled(bool enabled) {
+    if(m_enabled == enabled)
+        return;
+
+    if(m_enabled)
+        aboutToBeDisabledNotify();
+
+    m_enabled = enabled;
+
+    if(m_enabled)
+        enabledNotify();
+}
+
+bool Instrument::isEnabled() const {
+    return m_enabled;
+}
+
+void Instrument::enable() {
+    setEnabled(true);
+}
+
+void Instrument::disable() {
+    setEnabled(false);
 }

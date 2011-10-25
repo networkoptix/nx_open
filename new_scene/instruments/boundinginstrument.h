@@ -62,6 +62,7 @@ public slots:
 protected:
     virtual void installedNotify() override;
     virtual void aboutToBeUninstalledNotify() override;
+    virtual void enabledNotify() override;
 
     virtual bool paintEvent(QWidget *viewport, QPaintEvent *event) override;
 

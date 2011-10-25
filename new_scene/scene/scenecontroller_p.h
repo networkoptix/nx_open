@@ -4,12 +4,14 @@
 #include "scenecontroller.h"
 #include <QRect>
 
+class QParallelAnimationGroup;
+
 class AnimatedWidget;
 class CentralWidget;
 class CellLayout;
 class BoundingInstrument;
 class InstrumentManager;
-class ViewportAnimation;
+class SetterAnimation;
 
 class SceneControllerPrivate {
 public:
@@ -21,7 +23,10 @@ public:
         centralLayout(NULL),
         focusedWidget(NULL),
         focusedExpanded(false),
-        focusedZoomed(false)
+        focusedZoomed(false),
+        zoomAnimation(NULL),
+        scaleAnimation(NULL),
+        positionAnimation(NULL)
     {}
 
     virtual ~SceneControllerPrivate() {}
@@ -37,6 +42,8 @@ private:
 
     void focusedZoom(QGraphicsView *view);
     void focusedUnzoom(QGraphicsView *view);
+    void initZoomAnimations(const QRectF &unzoomed, const QRectF &zoomed);
+    void finishZoom();
 
 private:
     SceneController *const q_ptr;
@@ -47,8 +54,8 @@ private:
     /** Graphics scene. */
     QGraphicsScene *scene;
 
-    /** Viewport animation. */
-    ViewportAnimation *viewportAnimation;
+    /** Graphics view. */
+    QGraphicsView *view;
 
     /** Instrument manager for the scene. */
     InstrumentManager *manager;
@@ -76,6 +83,15 @@ private:
 
     /** Whether the focused widget is zoomed. */
     bool focusedZoomed;
+
+    /** Viewport animation. */
+    QParallelAnimationGroup *zoomAnimation;
+
+    /** Viewport scale animation. */
+    SetterAnimation *scaleAnimation;
+
+    /** Viewport position animation. */
+    SetterAnimation *positionAnimation;
 
     /** Rectangle to unzoom to. */
     QRectF unzoomRect;

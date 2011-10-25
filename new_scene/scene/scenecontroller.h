@@ -19,13 +19,13 @@ public:
         EDITING
     };
 
-    SceneController(QObject *parent = NULL);
+    SceneController(QGraphicsView *view, QObject *parent = NULL);
 
     virtual ~SceneController();
 
-    void addView(QGraphicsView *view);
-
     QGraphicsScene *scene() const;
+
+    QGraphicsView *view() const;
 
     Mode mode() const;
 
@@ -48,6 +48,8 @@ private slots:
     void at_doubleClicked(QGraphicsView *view, QGraphicsItem *item);
 
     void at_widget_destroyed();
+
+    void at_zoomAnimation_finished();
     
 private:
     QScopedPointer<SceneControllerPrivate> d_ptr;
