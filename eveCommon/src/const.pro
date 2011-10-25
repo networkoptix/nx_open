@@ -37,17 +37,21 @@ CONFIG(release, debug|release) {
 LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale
 
 win32 {
+  INCLUDEPATH += ../contrib/ffmpeg-misc-headers-win32
   LIBS += -lws2_32 -lIphlpapi -lOle32
   win32-msvc* {
     QMAKE_CXXFLAGS += -MP /Fd$$OBJECTS_DIR
     DEFINES += _CRT_SECURE_NO_WARNINGS
     INCLUDEPATH += $$PWD/../contrib/ffmpeg-misc-headers-win32
   }
+
+  DEFINES += QN_EXPORT=Q_DECL_EXPORT
 }
 
 mac {
   LIBS += -framework SystemConfiguration
   LIBS += -lz -lbz2
+  DEFINES += QN_EXPORT=
 }
 
 DEFINES += __STDC_CONSTANT_MACROS

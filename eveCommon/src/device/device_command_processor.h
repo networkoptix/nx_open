@@ -10,7 +10,7 @@
 
 class QnResource;
 
-class QnDeviceCommand : public QnAbstractDataPacket
+class QN_EXPORT QnDeviceCommand : public QnAbstractDataPacket
 {
 public:
 	QnDeviceCommand(QSharedPointer<QnResource> device);
@@ -23,7 +23,7 @@ protected:
 };
 typedef QSharedPointer<QnDeviceCommand> QnDeviceCommandPtr;
 
-class CLDeviceCommandProcessor : public QnAbstractDataConsumer
+class QN_EXPORT CLDeviceCommandProcessor : public QnAbstractDataConsumer
 {
 public:
 	CLDeviceCommandProcessor();

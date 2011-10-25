@@ -8,37 +8,27 @@ char (&ArraySizeHelper(T (&array)[N]))[N];
 /*
  * Remove directory recursively.
  */
-bool removeDir(const QString &dirName);
+QN_EXPORT bool removeDir(const QString &dirName);
 
 /*
  * Convert path from native to inner.
  */
-QString fromNativePath(QString path);
+QN_EXPORT QString fromNativePath(QString path);
 
 /*
  * Get user data directory. Directory should be available for writing.
  */
-QString getDataDirectory();
+QN_EXPORT QString getDataDirectory();
 
 /*
  * Get user movies directory.
  */
-QString getMoviesDirectory();
-
-/*
- * Get temp directory for video recording.
- */
-QString getTempRecordingDir();
-
-/*
- * Get directory to save recorded video.
- */
-QString getRecordingDir();
+QN_EXPORT QString getMoviesDirectory();
 
 /*
  * Get number of digits in decimal representaion of an integer.
  */
-int digitsInNumber(unsigned num);
+QN_EXPORT int digitsInNumber(unsigned num);
 
 /*
  * Format duration like HH:MM:SS/HH:MM:SS
@@ -46,13 +36,13 @@ int digitsInNumber(unsigned num);
  * @param duration duration in seconds
  * @param total duration in seconds
  */
-QString formatDuration(unsigned duration, unsigned total = 0);
+QN_EXPORT QString formatDuration(unsigned duration, unsigned total = 0);
 
 /*
  * Gets param from string;   for example str= {param1="param_val" sdhksjh}
  * function return param_val
  */
-QString getParamFromString(const QString& str, const QString& param);
+QN_EXPORT QString getParamFromString(const QString& str, const QString& param);
 
 /*
  * Round value up with step. step must be power of 2
@@ -62,6 +52,6 @@ inline int roundUp(int value, int step) {
     return ((value-1) & ~(step-1)) + step;
 }
 
-QString strPadLeft(const QString &str, int len, char ch);
+QN_EXPORT QString strPadLeft(const QString &str, int len, char ch);
 
 #endif // _UNIVERSAL_CLIENT_UTIL_H

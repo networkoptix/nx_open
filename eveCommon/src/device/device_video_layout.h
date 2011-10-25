@@ -3,7 +3,7 @@
 
 #define CL_MAX_CHANNELS 4
 
-class QnDeviceLayout
+class QN_EXPORT QnDeviceLayout
 {
 public:
     //returns number of audio or video channels device has

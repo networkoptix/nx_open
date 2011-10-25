@@ -7,7 +7,7 @@
 class QByteArray;
 
 // the purpose of this class is to provide array container for alignment data
-class CLByteArray
+class QN_EXPORT CLByteArray
 {
 public:
     // creates array with alignment and capacity

@@ -6,7 +6,7 @@ struct QnAbstractDataPacket;
 #include "../base/longrunnable.h"
 #include "data.h"
 
-class QnAbstractDataConsumer : public CLLongRunnable
+class QN_EXPORT QnAbstractDataConsumer : public CLLongRunnable
 {
 public:
 	QnAbstractDataConsumer(int maxQueueSize);

@@ -6,7 +6,7 @@
   */
 #define CL_MAX_PING_PACKET 1024 
 
-class CLPing
+class QN_EXPORT CLPing
 {
 public:
 	CLPing();

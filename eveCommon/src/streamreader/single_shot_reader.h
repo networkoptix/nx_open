@@ -10,7 +10,7 @@ struct QnAbstractMediaData;
 // it quits after first getData
 // such reader can be used for photo 
 
-class CLSingleShotStreamreader : public QnAbstractStreamDataProvider
+class QN_EXPORT CLSingleShotStreamreader : public QnAbstractStreamDataProvider
 {
 public:
 	CLSingleShotStreamreader(QnResource* dev );

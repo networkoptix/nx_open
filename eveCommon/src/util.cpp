@@ -1,5 +1,4 @@
 #include "util.h"
-#include "settings.h"
 
 bool removeDir(const QString &dirName)
 {
@@ -43,19 +42,6 @@ QString getDataDirectory()
 QString getMoviesDirectory()
 {
     return QDesktopServices::storageLocation(QDesktopServices::MoviesLocation);
-}
-
-QString getTempRecordingDir()
-{
-    QString path = Settings::instance().mediaRoot() + QLatin1String("/_temp/");
-    if (!QDir(path).exists())
-        QDir().mkpath(path);
-    return path;
-}
-
-QString getRecordingDir()
-{
-    return Settings::instance().mediaRoot() + QLatin1String("/_Recorded/");
 }
 
 QString formatDuration(unsigned duration, unsigned total)

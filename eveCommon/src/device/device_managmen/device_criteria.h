@@ -1,7 +1,7 @@
 #ifndef CLDeviceCriteria_h_2120
 #define CLDeviceCriteria_h_2120
 
-struct CLDeviceCriteria // later
+struct QN_EXPORT CLDeviceCriteria // later
 {
 public:
 	enum CriteriaType 

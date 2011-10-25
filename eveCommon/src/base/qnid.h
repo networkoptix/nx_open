@@ -5,8 +5,6 @@
 #include <QVariant>
 
 
-#define QN_EXPORT // empty define for test purpose only. move  define to .pro file
-
 // This class is going to be exported from our common DLL. So 'QN_EXPORT' MUST be specified after 'class' identifier
 class QN_EXPORT QnId
 {

@@ -13,7 +13,7 @@ struct CLLogListner
 	virtual void onLogMsg(const QString& msg)  = 0;
 };
 
-class CLLog
+class QN_EXPORT CLLog
 {
 public:
 	CLLog();
@@ -58,7 +58,7 @@ private:
 	QMutex m_mutex;
 };
 
-extern CLLog cl_log;
+QN_EXPORT extern CLLog cl_log;
 
 #define CL_LOG(level)\
 	if (level > cl_log.getLoglevel());\

@@ -37,7 +37,7 @@ private:
 
 typedef QSharedPointer<QnResourceType> QnResourceTypePtr;
 
-class QnResourceTypePool
+class QN_EXPORT QnResourceTypePool
 {
 public:
     static QnResourceTypePool* instance();

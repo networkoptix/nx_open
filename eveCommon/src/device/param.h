@@ -5,7 +5,7 @@
 
 #include "base/associativearray.h"
 
-struct QnParamType
+struct QN_EXPORT QnParamType
 {
     enum DataType {None, Value, OnOff, Boolen, MinMaxStep, Enumeration, Button };
 
@@ -37,7 +37,7 @@ struct QnParamType
 };
 typedef QSharedPointer<QnParamType> QnParamTypePtr;
 
-struct QnParam
+struct QN_EXPORT QnParam
 {
     QnParam() {}
     QnParam(QnParamTypePtr paramType) { m_paramType = paramType;}
@@ -60,7 +60,7 @@ private:
     QnValue m_value;
 };
 
-class QnParamList
+class QN_EXPORT QnParamList
 {
 
 public:

@@ -2,7 +2,7 @@
 #define resource_consumer_h_1921
 #include "qnresource.h"
 
-class QnResourceConsumer
+class QN_EXPORT QnResourceConsumer
 {
 public:
     QnResourceConsumer(QnResource* resource);

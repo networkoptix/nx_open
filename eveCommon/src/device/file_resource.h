@@ -3,7 +3,7 @@
 
 #include "qnresource.h"
 
-class QnLocalFileResource : public QnResource
+class QN_EXPORT  QnLocalFileResource : public QnResource
 {
 public:
     QnLocalFileResource(const QString &filename);

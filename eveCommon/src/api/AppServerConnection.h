@@ -6,7 +6,7 @@
 
 typedef long RequestId;
 
-class QnAppServerAdapter : public QObject
+class QN_EXPORT QnAppServerAdapter : public QObject
 {
     Q_OBJECT
 public:
@@ -31,6 +31,6 @@ protected:
     QnAppServerAdapter(const QnAppServerAdapter&) {}
 };
 
-QnAppServerAdapter* createServerAdapter(const QString& host, const QString& login, const QString& password);
+QN_EXPORT QnAppServerAdapter* createServerAdapter(const QString& host, const QString& login, const QString& password);
 
 #endif // APPSERVERCONNECTION_H

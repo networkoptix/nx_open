@@ -1,7 +1,7 @@
 #ifndef uniclient_filetypesupport_h
 #define uniclient_filetypesupport_h
 
-class FileTypeSupport
+class QN_EXPORT FileTypeSupport
 {
 public:
     FileTypeSupport();

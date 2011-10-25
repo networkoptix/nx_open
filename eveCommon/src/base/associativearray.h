@@ -7,7 +7,7 @@
 
 #include <math.h>
 
-class QnValue
+class QN_EXPORT QnValue
 {
 	QString value;
 public:

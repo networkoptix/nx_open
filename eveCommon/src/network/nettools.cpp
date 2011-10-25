@@ -3,8 +3,6 @@
 #include "ping.h"
 #include "netstate.h"
 
-int ping_timeout = 100;
-
 QList<QHostAddress> getAllIPv4Addresses()
 {
     QList<QHostAddress> ipaddrs = QNetworkInterface::allAddresses();

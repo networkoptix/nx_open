@@ -16,7 +16,7 @@ enum QnStatisticsEvent
 	CL_STAT_END// must not be used in onEvent
 };
 
-class QnStatistics
+class QN_EXPORT QnStatistics
 {
 
 	struct EventStat

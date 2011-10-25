@@ -5,7 +5,7 @@
 #include "Types.h"
 #include "AppServerConnection.h"
 
-class QnAppServerAdapterImpl : public QnAppServerAdapter
+class QN_EXPORT QnAppServerAdapterImpl : public QnAppServerAdapter
 {
     Q_OBJECT
 public:

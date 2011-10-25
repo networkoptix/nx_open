@@ -4,7 +4,7 @@
 #include "streamreader/streamreader.h"
 #include "data/dataprocessor.h"
 
-class QnResourceCommand : public QnAbstractDataPacket, public QnResourceConsumer
+class QN_EXPORT QnResourceCommand : public QnAbstractDataPacket, public QnResourceConsumer
 {
 public:
     QnResourceCommand(QnResource* res);
@@ -14,7 +14,7 @@ public:
 
 typedef QSharedPointer<QnResourceCommand> QnResourceCommandPtr;
 
-class QnResourceCommandProcessor : public QnAbstractDataConsumer
+class QN_EXPORT QnResourceCommandProcessor : public QnAbstractDataConsumer
 {
 public:
 	QnResourceCommandProcessor();

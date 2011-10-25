@@ -18,7 +18,7 @@ class CLRecorderDevice;
 
 #define qnResPool QnResourcePool::instance()
 
-class QnResourcePool 
+class QN_EXPORT QnResourcePool 
 {
     QnResourcePool();
     ~QnResourcePool();

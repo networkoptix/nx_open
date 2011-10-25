@@ -4,7 +4,7 @@
 #include <QThread>
 #include <QSemaphore>
 
-class CLLongRunnable : public QThread
+class QN_EXPORT CLLongRunnable : public QThread
 {
     Q_OBJECT
 
