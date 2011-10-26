@@ -33,3 +33,7 @@ eveCommon/src/common.pro
 
 *.pdb
 *.idb
+
+new_scene/debug/*
+new_scene/release/*
+new_scene/Makefile
