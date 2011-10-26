@@ -12,6 +12,7 @@ class CellLayout;
 class BoundingInstrument;
 class HandScrollInstrument;
 class WheelZoomInstrument;
+class DragInstrument;
 class InstrumentManager;
 class SetterAnimation;
 
@@ -90,6 +91,9 @@ private:
 
     /** Wheel zoom instrument. */
     WheelZoomInstrument *wheelZoomInstrument;
+
+    /** Dragging instrument. */
+    DragInstrument *dragInstrument;
 
     /** Widget that currently has focus. There can be only one such widget. */
     AnimatedWidget *focusedWidget;

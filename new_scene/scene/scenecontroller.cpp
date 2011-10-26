@@ -403,7 +403,7 @@ SceneController::SceneController(QGraphicsView *view, QObject *parent):
     d->manager->registerScene(d->scene);
     ClickInstrument *itemClickInstrument = new ClickInstrument(ClickInstrument::WATCH_ITEM, this);
     ClickInstrument *sceneClickInstrument = new ClickInstrument(ClickInstrument::WATCH_SCENE, this);
-    DragInstrument *dragInstrument = new DragInstrument(this);
+    d->dragInstrument = new DragInstrument(this);
     d->handScrollInstrument = new HandScrollInstrument(this);
     d->boundingInstrument = new BoundingInstrument(this);
     d->wheelZoomInstrument = new WheelZoomInstrument(this);
@@ -412,7 +412,7 @@ SceneController::SceneController(QGraphicsView *view, QObject *parent):
     d->manager->installInstrument(sceneClickInstrument);
     d->manager->installInstrument(new SceneInputForwardingInstrument(this));
     d->manager->installInstrument(d->wheelZoomInstrument);
-    d->manager->installInstrument(dragInstrument);
+    d->manager->installInstrument(d->dragInstrument);
     d->manager->installInstrument(new RubberBandInstrument(this));
     d->manager->installInstrument(d->handScrollInstrument);
     d->manager->installInstrument(new ContextMenuInstrument(this));
@@ -423,8 +423,8 @@ SceneController::SceneController(QGraphicsView *view, QObject *parent):
     connect(itemClickInstrument,     SIGNAL(doubleClicked(QGraphicsView *, QGraphicsItem *)),           this,                  SLOT(at_item_doubleClicked(QGraphicsView *, QGraphicsItem *)));
     connect(sceneClickInstrument,    SIGNAL(clicked(QGraphicsView *)),                                  this,                  SLOT(at_scene_clicked(QGraphicsView *)));
     connect(sceneClickInstrument,    SIGNAL(doubleClicked(QGraphicsView *)),                            this,                  SLOT(at_scene_doubleClicked(QGraphicsView *)));
-    connect(dragInstrument,          SIGNAL(draggingStarted(QGraphicsView *, QList<QGraphicsItem *>)),  this,                  SLOT(at_draggingStarted(QGraphicsView *, QList<QGraphicsItem *>)));
-    connect(dragInstrument,          SIGNAL(draggingFinished(QGraphicsView *, QList<QGraphicsItem *>)), this,                  SLOT(at_draggingFinished(QGraphicsView *, QList<QGraphicsItem *>)));
+    connect(d->dragInstrument,       SIGNAL(draggingStarted(QGraphicsView *, QList<QGraphicsItem *>)),  this,                  SLOT(at_draggingStarted(QGraphicsView *, QList<QGraphicsItem *>)));
+    connect(d->dragInstrument,       SIGNAL(draggingFinished(QGraphicsView *, QList<QGraphicsItem *>)), this,                  SLOT(at_draggingFinished(QGraphicsView *, QList<QGraphicsItem *>)));
     connect(d->handScrollInstrument, SIGNAL(scrollingStarted(QGraphicsView *)),                         d->boundingInstrument, SLOT(dontEnforcePosition(QGraphicsView *)));
     connect(d->handScrollInstrument, SIGNAL(scrollingFinished(QGraphicsView *)),                        d->boundingInstrument, SLOT(enforcePosition(QGraphicsView *)));
 
@@ -560,6 +560,9 @@ void SceneController::setMode(Mode mode) {
     foreach (AnimatedWidget *widget, d->animatedWidgets)
         widget->setInteractive(mode == EDITING);
     d->centralWidget->setGridVisible(mode == EDITING);
+
+    d->boundingInstrument->setEnabled(mode == VIEWING);
+    d->dragInstrument->setEnabled(mode == EDITING);
 }
 
 void SceneController::at_relayoutAction_triggered() {
