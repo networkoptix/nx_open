@@ -1,7 +1,7 @@
 #include "resource_consumer.h"
 
 
-QnResourceConsumer::QnResourceConsumer(QnResourcePtr resource):
+QnResourceConsumer::QnResourceConsumer(QnResource* resource):
 m_resource(resource)
 {
     m_resource->addConsumer(this);
@@ -12,7 +12,7 @@ QnResourceConsumer::~QnResourceConsumer()
     disconnectFromResource();
 }
 
-QnResourcePtr QnResourceConsumer::getResource() const
+QnResource* QnResourceConsumer::getResource() const
 {
     return m_resource;
 }
