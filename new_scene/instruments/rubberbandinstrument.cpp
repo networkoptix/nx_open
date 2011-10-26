@@ -171,17 +171,8 @@ private:
     mutable QRectF mBoundingRect;
 };
 
-
-namespace {
-    QEvent::Type viewportEventTypes[] = {
-        QEvent::MouseButtonPress,
-        QEvent::MouseMove,
-        QEvent::MouseButtonRelease
-    };
-}
-
 RubberBandInstrument::RubberBandInstrument(QObject *parent):
-    Instrument(makeSet(), makeSet(), makeSet(viewportEventTypes), false, parent)
+    Instrument(makeSet(), makeSet(), makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease), false, parent)
 {}
 
 RubberBandInstrument::~RubberBandInstrument() {

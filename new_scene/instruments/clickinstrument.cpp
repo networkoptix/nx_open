@@ -2,18 +2,16 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QApplication>
 
-namespace {
-    QEvent::Type sceneEventTypes[] = {
-        QEvent::GraphicsSceneMousePress,
-        QEvent::GraphicsSceneMouseMove,
-        QEvent::GraphicsSceneMouseRelease,
-        QEvent::GraphicsSceneMouseDoubleClick
-    };
-
-} // anonymous namespace
-
 ClickInstrument::ClickInstrument(WatchFlags flags, QObject *parent): 
-    Instrument((flags & WATCH_SCENE) ? makeSet(sceneEventTypes) : makeSet(), makeSet(), makeSet(), flags & WATCH_ITEM, parent),
+    Instrument(
+        (flags & WATCH_SCENE) ? 
+            makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease, QEvent::GraphicsSceneMouseDoubleClick) : 
+            makeSet(), 
+        makeSet(), 
+        makeSet(), 
+        flags & WATCH_ITEM, 
+        parent
+    ),
     m_itemHandler(this),
     m_sceneHandler(this)
 {}

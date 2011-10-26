@@ -4,16 +4,8 @@
 #include <QMouseEvent>
 #include <QApplication>
 
-namespace {
-    QEvent::Type viewportEventTypes[] = {
-        QEvent::MouseButtonPress,
-        QEvent::MouseMove,
-        QEvent::MouseButtonRelease
-    };
-}
-
 DragInstrument::DragInstrument(QObject *parent): 
-    Instrument(makeSet(), makeSet(), makeSet(viewportEventTypes), false, parent) 
+    Instrument(makeSet(), makeSet(), makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease), false, parent) 
 {}
 
 void DragInstrument::installedNotify() {

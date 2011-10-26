@@ -126,27 +126,6 @@ public:
      */
     bool isEnabled() const;
 
-public slots:
-    void enable();
-    void disable();
-
-signals:
-    /**
-     * This signal is emitted whenever the instrument is installed.
-     */
-    void installed();
-
-    /**
-     * This signal is emitted whenever the instrument is about to be uninstalled.
-     */
-    void aboutToBeUninstalled();
-
-protected:
-    friend class InstrumentManagerPrivate; /* Messes with our internals. */
-    template<class T>
-    friend class InstrumentEventDispatcher; /* Calls event handlers. */
-    friend class InstrumentItemEventDispatcher; /* Calls event handlers and isWillingToWatch. */
-
     /**
      * This function is to be used in constructors of derived classes.
      * 
@@ -185,6 +164,40 @@ protected:
     /**
      * This function is to be used in constructors of derived classes.
      * 
+     * \param eventType0               First event type.
+     * \param eventType1               Second event type.
+     * \param eventType2               Third event type.
+     * \returns                        Set constructed from the given event types.
+     */
+    static QSet<QEvent::Type> makeSet(QEvent::Type eventType0, QEvent::Type eventType1, QEvent::Type eventType2) {
+        QSet<QEvent::Type> result;
+        result.insert(eventType0);
+        result.insert(eventType1);
+        result.insert(eventType2);
+        return result;
+    }
+
+    /**
+     * This function is to be used in constructors of derived classes.
+     * 
+     * \param eventType0               First event type.
+     * \param eventType1               Second event type.
+     * \param eventType2               Third event type.
+     * \param eventType2               Fourth event type.
+     * \returns                        Set constructed from the given event types.
+     */
+    static QSet<QEvent::Type> makeSet(QEvent::Type eventType0, QEvent::Type eventType1, QEvent::Type eventType2, QEvent::Type eventType3) {
+        QSet<QEvent::Type> result;
+        result.insert(eventType0);
+        result.insert(eventType1);
+        result.insert(eventType2);
+        result.insert(eventType3);
+        return result;
+    }
+
+    /**
+     * This function is to be used in constructors of derived classes.
+     * 
      * \param eventTypes               Array of event types.
      * \returns                        Set constructed from the given event types.
      */
@@ -195,6 +208,34 @@ protected:
             result.insert(eventTypes[i]);
         return result;
     }
+
+public slots:
+    /**
+     * Enables this instrument.
+     */
+    void enable();
+
+    /**
+     * Disables this instrument.
+     */
+    void disable();
+
+signals:
+    /**
+     * This signal is emitted whenever the instrument is installed.
+     */
+    void installed();
+
+    /**
+     * This signal is emitted whenever the instrument is about to be uninstalled.
+     */
+    void aboutToBeUninstalled();
+
+protected:
+    friend class InstrumentManagerPrivate; /* Messes with our internals. */
+    template<class T>
+    friend class InstrumentEventDispatcher; /* Calls event handlers. */
+    friend class InstrumentItemEventDispatcher; /* Calls event handlers and isWillingToWatch. */
 
     /**
      * Ensure that this instrument is uninstalled.

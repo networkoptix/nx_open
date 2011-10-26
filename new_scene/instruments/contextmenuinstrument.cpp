@@ -5,16 +5,8 @@
 #include <QGraphicsView>
 #include <QApplication>
 
-namespace {
-    QEvent::Type viewportEventTypes[] = {
-        QEvent::MouseButtonPress,
-        QEvent::MouseMove,
-        QEvent::MouseButtonRelease
-    };
-}
-
 ContextMenuInstrument::ContextMenuInstrument(QObject *parent) :
-    Instrument(makeSet(), makeSet(), makeSet(viewportEventTypes), false, parent),
+    Instrument(makeSet(), makeSet(), makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease), false, parent),
     m_contextMenu(new QMenu())
 {}
 
