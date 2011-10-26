@@ -33,9 +33,11 @@ common/src/common.pri
 eveClient/src/Info.plist
 eveClient/src/eveclient.pro
 eveClient/src/version.h
+eveClient/src/Makefile
 
 eveCommon/src/common.pro
 eveCommon/src/device_plugins/archive/filetypes.h
+eveCommon/src/Makefile
 
 scripts/appserver/server.state
 server/src/version.h
