@@ -106,6 +106,7 @@ def index_dirs(xdirs, template_file, output_file, exclude_dirs=(), exclude_files
 
     for xdir in xdirs:
         for root, dirs, files in os.walk(xdir):
+            parent = root[len(xdir):]
             for exclude_dir in exclude_dirs:
                 if exclude_dir in dirs:
                     dirs.remove(exclude_dir)
@@ -115,9 +116,9 @@ def index_dirs(xdirs, template_file, output_file, exclude_dirs=(), exclude_files
                     continue
 
                 if f.endswith('.h'):
-                    headers.append(os.path.join(root, f))
+                    headers.append(os.path.join(parent, f))
                 elif f.endswith('.cpp'):
-                    sources.append(os.path.join(root, f))
+                    sources.append(os.path.join(parent, f))
 
     uniclient_pro = open(output_file, 'a')
 
@@ -142,13 +143,13 @@ if __name__ == '__main__':
     ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release = setup_ffmpeg()
     gen_filetypes_h()
 
-    index_dirs(('src',), 'const.pro', 'common.pro', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
-    instantiate_pro('common.pro', {'BUILDLIB': BUILDLIB, 'FFMPEG' : ffmpeg_path})
+    index_dirs(('src',), 'src/const.pro', 'src/common.pro', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
+    instantiate_pro('src/common.pro', {'BUILDLIB': BUILDLIB, 'FFMPEG' : ffmpeg_path})
 
     if sys.platform == 'win32':
-        os.system('qmake -tp vc -o src/common.vcproj common.pro')
+        os.system('qmake -tp vc -o src/common.vcproj src/common.pro')
 
     elif sys.platform == 'darwin':
         pass
-        os.system('qmake -spec macx-g++ CONFIG-=release CONFIG+=debug -o build/Makefile.debug common.pro')
-        os.system('qmake -spec macx-g++ CONFIG-=debug CONFIG+=release -o build/Makefile.release common.pro')
+        os.system('qmake -spec macx-g++ CONFIG-=release CONFIG+=debug -o build/Makefile.debug src/common.pro')
+        os.system('qmake -spec macx-g++ CONFIG-=debug CONFIG+=release -o build/Makefile.release src/common.pro')
