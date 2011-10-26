@@ -14,8 +14,8 @@ HEADERS += \
   $$PWD/sceneeventfilter.h \
   $$PWD/wheelzoominstrument.h \
   $$PWD/boundinginstrument.h \
-  $$PWD/sceneinputforwardinginstrument.h \
-  $$PWD/sceneinputstopinstrument.h \
+  $$PWD/forwardinginstrument.h \
+  $$PWD/stopinstrument.h \
   $$PWD/transformlistenerinstrument.h \
 
 SOURCES += \
@@ -32,6 +32,5 @@ SOURCES += \
   $$PWD/rubberbandinstrument.cpp \
   $$PWD/wheelzoominstrument.cpp \
   $$PWD/boundinginstrument.cpp \
-  $$PWD/sceneinputforwardinginstrument.cpp \
-  $$PWD/sceneinputstopinstrument.cpp \
+  $$PWD/forwardinginstrument.cpp \
   $$PWD/transformlistenerinstrument.cpp \

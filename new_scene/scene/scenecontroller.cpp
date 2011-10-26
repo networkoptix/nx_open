@@ -17,8 +17,8 @@
 #include <instruments/contextmenuinstrument.h>
 #include <instruments/clickinstrument.h>
 #include <instruments/boundinginstrument.h>
-#include <instruments/sceneinputstopinstrument.h>
-#include <instruments/sceneinputforwardinginstrument.h>
+#include <instruments/stopinstrument.h>
+#include <instruments/forwardinginstrument.h>
 #include <instruments/transformlistenerinstrument.h>
 #include <widgets/centralwidget.h>
 #include <widgets/animatedwidget.h>
@@ -279,7 +279,7 @@ void SceneControllerPrivate::animateZoomToFocused() {
 
     boundingInstrument->disable();
     handScrollInstrument->disable();
-    //wheelZoomInstrument->disable();
+    wheelZoomInstrument->disable();
 
     zoomAnimation->setCurrentTime(0);
     zoomAnimation->setDirection(QAbstractAnimation::Forward);
@@ -294,7 +294,7 @@ void SceneControllerPrivate::animateZoomToGlobal() {
 
     boundingInstrument->disable();
     handScrollInstrument->disable();
-    //wheelZoomInstrument->disable();
+    wheelZoomInstrument->disable();
 
     zoomAnimation->setCurrentTime(zoomAnimation->duration());
     zoomAnimation->setDirection(QAbstractAnimation::Backward);
@@ -304,7 +304,7 @@ void SceneControllerPrivate::animateZoomToGlobal() {
 void SceneControllerPrivate::zoomAnimationFinished() {
     boundingInstrument->enable();
     handScrollInstrument->enable();
-    //wheelZoomInstrument->enable();
+    wheelZoomInstrument->enable();
 
     QRectF boundingRect = focusedZoomed ? focusedWidgetRect() : fitInViewRect();
 
@@ -409,9 +409,16 @@ SceneController::SceneController(QGraphicsView *view, QObject *parent):
     d->boundingInstrument = new BoundingInstrument(this);
     d->wheelZoomInstrument = new WheelZoomInstrument(this);
 
-    d->manager->installInstrument(new SceneInputStopInstrument(this));
+    QEvent::Type sceneEventTypes[] = {
+        QEvent::GraphicsSceneMousePress,
+        QEvent::GraphicsSceneMouseMove,
+        QEvent::GraphicsSceneMouseRelease,
+        QEvent::GraphicsSceneMouseDoubleClick,
+    };
+
+    d->manager->installInstrument(new StopInstrument(Instrument::makeSet(sceneEventTypes), Instrument::makeSet(), Instrument::makeSet(QEvent::Wheel), false, this));
     d->manager->installInstrument(sceneClickInstrument);
-    d->manager->installInstrument(new SceneInputForwardingInstrument(this));
+    d->manager->installInstrument(new ForwardingInstrument(Instrument::makeSet(sceneEventTypes), Instrument::makeSet(), Instrument::makeSet(), false, this));
     d->manager->installInstrument(new TransformListenerInstrument(this));
     d->manager->installInstrument(d->wheelZoomInstrument);
     d->manager->installInstrument(d->dragInstrument);
