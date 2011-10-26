@@ -2,8 +2,6 @@
 
 #include <QtGui/QToolBar>
 
-#include "graphicsview.h"
-
 #include "scene/scenecontroller.h"
 
 
