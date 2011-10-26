@@ -322,6 +322,7 @@ protected:
     virtual bool isWillingToWatch(QGraphicsItem *) const { return false; }
 
     /* Graphics scene event filtering functions. */
+    virtual bool event(QGraphicsScene *, QEvent *);
     virtual bool mouseMoveEvent(QGraphicsScene *, QMouseEvent *) { return false; }
     virtual bool mousePressEvent(QGraphicsScene *, QMouseEvent *) { return false; }
     virtual bool mouseReleaseEvent(QGraphicsScene *, QMouseEvent *) { return false; }
@@ -359,9 +360,9 @@ protected:
     virtual bool mouseDoubleClickEvent(QGraphicsScene *, QGraphicsSceneMouseEvent *) { return false; }
     virtual bool wheelEvent(QGraphicsScene *, QGraphicsSceneWheelEvent *) { return false; }
     virtual bool helpEvent(QGraphicsScene *, QGraphicsSceneHelpEvent *) { return false; }
-    virtual bool event(QGraphicsScene *, QEvent *) { return false; }
 
     /* Graphics view event filtering functions. */
+    virtual bool event(QGraphicsView *, QEvent *);
     virtual bool mouseMoveEvent(QGraphicsView *, QMouseEvent *) { return false; }
     virtual bool mousePressEvent(QGraphicsView *, QMouseEvent *) { return false; }
     virtual bool mouseReleaseEvent(QGraphicsView *, QMouseEvent *) { return false; }
@@ -399,9 +400,9 @@ protected:
     virtual bool mouseDoubleClickEvent(QGraphicsView *, QGraphicsSceneMouseEvent *) { return false; }
     virtual bool wheelEvent(QGraphicsView *, QGraphicsSceneWheelEvent *) { return false; }
     virtual bool helpEvent(QGraphicsView *, QGraphicsSceneHelpEvent *) { return false; }
-    virtual bool event(QGraphicsView *, QEvent *) { return false; }
 
     /* Graphics view's viewport event filtering functions. */
+    virtual bool event(QWidget *, QEvent *);
     virtual bool mouseMoveEvent(QWidget *, QMouseEvent *) { return false; }
     virtual bool mousePressEvent(QWidget *, QMouseEvent *) { return false; }
     virtual bool mouseReleaseEvent(QWidget *, QMouseEvent *) { return false; }
@@ -439,9 +440,9 @@ protected:
     virtual bool mouseDoubleClickEvent(QWidget *, QGraphicsSceneMouseEvent *) { return false; }
     virtual bool wheelEvent(QWidget *, QGraphicsSceneWheelEvent *) { return false; }
     virtual bool helpEvent(QWidget *, QGraphicsSceneHelpEvent *) { return false; }
-    virtual bool event(QWidget *, QEvent *) { return false; }
 
     /* Graphics item event filtering functions. */
+    virtual bool sceneEvent(QGraphicsItem *, QEvent *);
     virtual bool contextMenuEvent(QGraphicsItem *, QGraphicsSceneContextMenuEvent *) { return false; }
     virtual bool dragEnterEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *) { return false; }
     virtual bool dragLeaveEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *) { return false; }
@@ -460,10 +461,14 @@ protected:
     virtual bool mousePressEvent(QGraphicsItem *, QGraphicsSceneMouseEvent *) { return false; }
     virtual bool mouseReleaseEvent(QGraphicsItem *, QGraphicsSceneMouseEvent *) { return false; }
     virtual bool wheelEvent(QGraphicsItem *, QGraphicsSceneWheelEvent *) { return false; }
-    virtual bool sceneEvent(QGraphicsItem *, QEvent *) { return false; }
 
 private:
     QList<QGraphicsItem *> items(QGraphicsView *view, const QPoint &viewPos) const;
+
+    template<class T>
+    bool dispatchEvent(T *watched, QEvent *event);
+
+    bool dispatchEvent(QGraphicsItem *watched, QEvent *event);
 
 private:
     InstrumentManager *m_manager;
