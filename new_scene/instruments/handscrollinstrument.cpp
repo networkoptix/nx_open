@@ -47,9 +47,7 @@ bool HandScrollInstrument::mouseMoveEvent(QWidget *viewport, QMouseEvent *event)
 
     /* Stop scrolling if the user has let go of the trigger button (even if we didn't get the release events). */
     if (!(event->buttons() & Qt::RightButton)) {
-        if (m_state == SCROLLING)
-            viewport->setCursor(m_originalCursor);
-        m_state = INITIAL;
+        stopScrolling(view);
         return false;
     }
 
@@ -58,18 +56,11 @@ bool HandScrollInstrument::mouseMoveEvent(QWidget *viewport, QMouseEvent *event)
         if ((m_mousePressPos - event->pos()).manhattanLength() < QApplication::startDragDistance()) {
             return false;
         } else {
-            m_originalCursor = viewport->cursor();
-            viewport->setCursor(Qt::ClosedHandCursor);
-            m_state = SCROLLING;
+            startScrolling(view);
         }
     }
 
-    QScrollBar *hBar = view->horizontalScrollBar();
-    QScrollBar *vBar = view->verticalScrollBar();
-    QPoint delta = event->pos() - m_lastMousePos;
-    hBar->setValue(hBar->value() + (view->isRightToLeft() ? delta.x() : -delta.x()));
-    vBar->setValue(vBar->value() - delta.y());
-
+    moveViewport(view, -(event->pos() - m_lastMousePos));
     m_lastMousePos = event->pos();
 
     event->accept();
@@ -83,12 +74,27 @@ bool HandScrollInstrument::mouseReleaseEvent(QWidget *viewport, QMouseEvent *eve
     if (event->button() != Qt::RightButton)
         return false;
 
-    if (m_state == SCROLLING)
-        viewport->setCursor(m_originalCursor);
-    m_state = INITIAL;
+    stopScrolling(this->view(viewport));
 
     event->accept();
-    return true;
+    return false;
 }
 
+void HandScrollInstrument::startScrolling(QGraphicsView *view) {
+    m_originalCursor = view->viewport()->cursor();
+    view->viewport()->setCursor(Qt::ClosedHandCursor);
+    m_state = SCROLLING;
+
+    emit scrollingStarted(view);
+}
+
+void HandScrollInstrument::stopScrolling(QGraphicsView *view) {
+    if (m_state == SCROLLING) {
+        emit scrollingFinished(view);
+
+        view->viewport()->setCursor(m_originalCursor);
+    }
+    
+    m_state = INITIAL;
+}
 

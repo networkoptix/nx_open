@@ -4,74 +4,85 @@
 #include "instrument.h"
 #include <QRect>
 #include <QTransform>
+#include "animationtimer.h"
 
-class BoundingInstrument: public Instrument {
+class BoundingInstrument: public Instrument, protected AnimationTimerListener {
     Q_OBJECT;
 public:
     BoundingInstrument(QObject *parent = NULL);
 
-    void setView(QGraphicsView *view);
+    virtual ~BoundingInstrument();
 
     /**
-     * \param moveBounds                Rectangular area to which unobstructed
-     *                                  moving is restricted, in scene coordinates.
+     * \param view                      Graphics view to use.
+     * \param positionBounds            Rectangular area to which viewport movement is restricted, in scene coordinates.
      * \param extension                 Extension of this area, in viewports.
      */
-    void setMoveBounds(const QRectF &moveBounds, qreal extension);
+    void setPositionBounds(QGraphicsView *view, const QRectF &positionBounds, qreal extension);
 
     /**
-     * \param zoomBound                 Maximal size of the viewport to which
-     *                                  unobstructed zooming is restricted,
-     *                                  in scene coordinates.
+     * \param view                      Graphics view to use.
+     * \param sizeLowerBound            Lower bound of viewport size, in scene coordinates.
+     * \param lowerMode                 Mode for the lower bound.
+     * \param sizeUpperBound            Upper bound of viewport size, in scene coordinates.
+     * \param upperMode                 Mode for the upper bound.
      */
-    void setZoomBounds(const QSizeF &zoomBound);
+    void setSizeBounds(QGraphicsView *view, const QSizeF &sizeLowerBound, BoundingMode lowerMode, const QSizeF &sizeUpperBound, BoundingMode upperMode);
 
     /**
-     * \param speed                     Move speed, in scene coordinate units per second.
-     * \param extension                 Move speed extension, in viewports per second.
+     * \param view                      Graphics view to use.
+     * \param multiplier                Viewport movement speed, in viewports per second.
      */
-    void setMoveSpeed(qreal speed, qreal extension);
+    void setMovementSpeed(QGraphicsView *view, qreal multiplier);
 
     /**
-     * \param multiplier                Zoom speed, factor per second.
+     * \param view                      Graphics view to use.
+     * \param multiplier                Scale speed, factor per second.
      */
-    void setZoomSpeed(qreal multiplier);
+    void setScalingSpeed(QGraphicsView *view, qreal multiplier);
 
     /**
-     * \param moveAnimated              Whether obstructed moving is animated.
+     * \param view                      Graphics view to use.
+     * \param positionEnforced          Whether position boundary is enforced with animation.
      */
-    void setMoveAnimated(bool moveAnimated);
+    void setPositionEnforced(QGraphicsView *view, bool positionEnforced = true);
 
     /**
-     * \param zoomAnimated              Whether obstructed zooming is animated.
+     * \param view                      Graphics view to use.
+     * \param sizeEnforced              Whether size boundary is enforced with animation.
      */
-    void setZoomAnimated(bool zoomAnimated);
+    void setSizeEnforced(QGraphicsView *view, bool sizeEnforced = true);
+
+public slots:
+    void enforcePosition(QGraphicsView *view);
+    void dontEnforcePosition(QGraphicsView *view);
+    void enforceSize(QGraphicsView *view);
+    void dontEnforceSize(QGraphicsView *view);
 
 protected:
+    virtual void installedNotify() override;
+    virtual void aboutToBeUninstalledNotify() override;
+    virtual void enabledNotify() override;
+
     virtual bool paintEvent(QWidget *viewport, QPaintEvent *event) override;
 
+    virtual void tick(int currentTime) override;
+
 private:
-    QGraphicsView *m_view;
+    class ViewData;
 
-    QRectF m_moveBounds;
-    qreal m_moveBoundsExtension;
-    qreal m_moveSpeed;
-    qreal m_moveSpeedExtension;
-    
-    QSizeF m_zoomBounds;
-    qreal m_zoomSpeed;
+    ViewData *data(QGraphicsView *view);
+    ViewData *cdata(QGraphicsView *view) const;
 
-    bool m_isZoomAnimated;
-    bool m_isMoveAnimated;
+private:
+    /** View to data mapping. */
+    QHash<QGraphicsView *, ViewData *> m_data;
 
-    /** Old viewport-to-scene transformation. */
-    QTransform m_oldViewportToScene;
+    /** Animation timer. */
+    AnimationTimer *m_timer;
 
-    /* Old zoom, relative to zoom bounds. */
-    qreal m_oldZoom;
-
-    /* Old viewport center. */
-    QPointF m_oldCenter;
+    /** Last animation tick time. */
+    int m_lastTickTime;
 };
 
 #endif // QN_BOUNDING_INSTRUMENT_H

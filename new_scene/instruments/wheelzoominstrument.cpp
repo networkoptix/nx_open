@@ -3,6 +3,7 @@
 #include <QWheelEvent>
 #include <QGraphicsView>
 
+#include <QCursor>
 
 WheelZoomInstrument::WheelZoomInstrument(QObject *parent): 
     Instrument(makeSet(), makeSet(), makeSet(QEvent::Wheel), false, parent) 
@@ -18,9 +19,19 @@ bool WheelZoomInstrument::wheelEvent(QWidget *viewport, QWheelEvent *event) {
 
     /* Scale restoring the transformation anchor. */
     QGraphicsView *view = this->view(viewport);
-    QGraphicsView::ViewportAnchor oldAnchor = view->transformationAnchor();
+    /*QGraphicsView::ViewportAnchor oldAnchor = view->transformationAnchor();
     view->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
     view->scale(scaleFactor, scaleFactor); 
+    view->setTransformationAnchor(oldAnchor);*/
+
+    QPoint cursorPos = viewport->mapFromGlobal(QCursor::pos());
+    QPointF sceneCursorPos = view->mapToScene(cursorPos);
+
+    QGraphicsView::ViewportAnchor oldAnchor = view->transformationAnchor();
+    view->setTransformationAnchor(QGraphicsView::NoAnchor);
+    view->scale(scaleFactor, scaleFactor); 
+    QPointF delta = view->mapToScene(cursorPos) - sceneCursorPos;
+    view->translate(delta.x(), delta.y());
     view->setTransformationAnchor(oldAnchor);
 
     event->accept();

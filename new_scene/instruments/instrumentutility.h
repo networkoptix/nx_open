@@ -2,14 +2,21 @@
 #define QN_INSTRUMENT_UTILITY_H
 
 #include <Qt>
+#include <QGraphicsView>
+#include <QPoint>
 
-class QGraphicsView;
 class QRect;
 class QRectF;
 class QSizeF;
+class QTransform;
 
 class InstrumentUtility {
 public:
+    enum BoundingMode {
+        InBound,    /**< Rectangle's size limit is reached when it is contained inside a bounding rectangle touching its sides. */
+        OutBound    /**< Rectangle's size limit is reached when bounding rectangle is contained inside it touching its sides. */
+    };
+
     /**
      * \param view                      Graphics view. Must not be NULL.
      * \param rect                      Rectangle to map to scene.
@@ -59,6 +66,87 @@ public:
      */
     static QRectF dilated(const QRectF &rect, const QSizeF &amount);
 
+    /**
+     * \param size
+     * \param otherSize
+     * \returns                         Whether the given size contains the
+     *                                  other size.
+     */
+    static bool contains(const QSizeF &size, const QSizeF &otherSize);
+
+    /**
+     * Moves the given viewport.
+     * 
+     * \param view                      Graphics view to move viewport of.
+     * \param positionDelta             Move delta, in viewport coordinates.
+     */
+    static void moveViewport(QGraphicsView *view, const QPoint &positionDelta);
+
+    /**
+     * Moves the given viewport.
+     * 
+     * \param view                      Graphics view to move viewport of.
+     * \param positionDelta             Move delta, in scene coordinates.
+     */
+    static void moveViewport(QGraphicsView *view, const QPointF &positionDelta);
+
+    /**
+     * Centers the given viewport on the given position.
+     * 
+     * \param view                      Graphics view to center viewport of.
+     * \param centerPosition            Position to center on.
+     */
+    static void moveViewportTo(QGraphicsView *view, const QPointF &centerPosition);
+
+    /**
+     * Scales the given viewport.
+     * 
+     * Note that because of the way scaling is implemented, it may also
+     * involve minor viewport movement.
+     * 
+     * \param view                      Graphics view to scale viewport of.
+     * \param factor                    Viewport scale factor.
+     * \param anchor                    Transformation anchor.
+     */
+    static void scaleViewport(QGraphicsView *view, qreal factor, QGraphicsView::ViewportAnchor anchor = QGraphicsView::AnchorViewCenter);
+
+    /**
+     * Scales the given viewport to the given size.
+     * 
+     * \param view                      Graphics view to scale viewport of.
+     * \param size                      Size to scale to.
+     * \param mode                      Scale mode.
+     * \param anchor                    Transformation anchor.
+     */
+    static void scaleViewportTo(QGraphicsView *view, const QSizeF &size, BoundingMode mode, QGraphicsView::ViewportAnchor anchor = QGraphicsView::AnchorViewCenter);
+
+    /**
+     * Calculates the factor by which the given size must be scaled to fit into
+     * the given bounds.
+     * 
+     * \param size                      Size to scale.
+     * \param bounds                    Size bounds.
+     * \param mode                      Bounding mode.
+     */
+    static qreal calculateScale(QSizeF size, QSizeF bounds, BoundingMode mode);
+
 };
+
+inline bool qFuzzyIsNull(const QPointF &p) {
+    return ::qFuzzyIsNull(p.x()) && ::qFuzzyIsNull(p.y());
+}
+
+inline bool qFuzzyCompare(const QPointF &l, const QPointF &r) {
+    return ::qFuzzyCompare(l.x(), r.x()) && ::qFuzzyCompare(l.y(), r.y());
+}
+
+inline bool qFuzzyCompare(const QRectF &l, const QRectF &r) {
+    return 
+        ::qFuzzyCompare(l.x(), r.x()) && 
+        ::qFuzzyCompare(l.y(), r.y()) && 
+        ::qFuzzyCompare(l.width(), r.width()) &&
+        ::qFuzzyCompare(l.height(), r.height());
+}
+
 
 #endif // QN_INSTRUMENT_UTILITY_H

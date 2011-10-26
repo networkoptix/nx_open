@@ -1,14 +1,6 @@
 #include "instrumentitemeventdispatcher.h"
 #include <cassert>
 #include <QMetaType>
-#include <QFocusEvent>
-#include <QInputMethodEvent>
-#include <QKeyEvent>
-#include <QGraphicsSceneContextMenuEvent>
-#include <QGraphicsSceneMouseEvent>
-#include <QGraphicsSceneWheelEvent>
-#include <QGraphicsSceneHoverEvent>
-#include <QGraphicsSceneDragDropEvent>
 #include <utility/Warnings.h>
 #include "instrument.h"
 
@@ -105,46 +97,7 @@ bool InstrumentItemEventDispatcher::sceneEventFilter(QGraphicsItem *watched, QEv
 }
 
 bool InstrumentItemEventDispatcher::dispatch(Instrument *instrument, QGraphicsItem *watched, QEvent *event) {
-    switch (event->type()) {
-    case QEvent::GraphicsSceneContextMenu:
-        return instrument->contextMenuEvent(watched, static_cast<QGraphicsSceneContextMenuEvent *>(event));
-    case QEvent::GraphicsSceneDragEnter:
-        return instrument->dragEnterEvent(watched, static_cast<QGraphicsSceneDragDropEvent *>(event));
-    case QEvent::GraphicsSceneDragLeave:
-        return instrument->dragLeaveEvent(watched, static_cast<QGraphicsSceneDragDropEvent *>(event));
-    case QEvent::GraphicsSceneDragMove:
-        return instrument->dragMoveEvent(watched, static_cast<QGraphicsSceneDragDropEvent *>(event));
-    case QEvent::GraphicsSceneDrop:
-        return instrument->dropEvent(watched, static_cast<QGraphicsSceneDragDropEvent *>(event));
-    case QEvent::FocusIn:
-        return instrument->focusInEvent(watched, static_cast<QFocusEvent *>(event));
-    case QEvent::FocusOut:
-        return instrument->focusOutEvent(watched, static_cast<QFocusEvent *>(event));
-    case QEvent::GraphicsSceneHoverEnter:
-        return instrument->hoverEnterEvent(watched, static_cast<QGraphicsSceneHoverEvent *>(event));
-    case QEvent::GraphicsSceneHoverLeave:
-        return instrument->hoverLeaveEvent(watched, static_cast<QGraphicsSceneHoverEvent *>(event));
-    case QEvent::GraphicsSceneHoverMove:
-        return instrument->hoverMoveEvent(watched, static_cast<QGraphicsSceneHoverEvent *>(event));
-    case QEvent::InputMethod:
-        return instrument->inputMethodEvent(watched, static_cast<QInputMethodEvent *>(event));
-    case QEvent::KeyPress:
-        return instrument->keyPressEvent(watched, static_cast<QKeyEvent *>(event));
-    case QEvent::KeyRelease:
-        return instrument->keyReleaseEvent(watched, static_cast<QKeyEvent *>(event));
-    case QEvent::GraphicsSceneMouseDoubleClick:
-        return instrument->mouseDoubleClickEvent(watched, static_cast<QGraphicsSceneMouseEvent *>(event));
-    case QEvent::GraphicsSceneMouseMove:
-        return instrument->mouseMoveEvent(watched, static_cast<QGraphicsSceneMouseEvent *>(event));
-    case QEvent::GraphicsSceneMousePress:
-        return instrument->mousePressEvent(watched, static_cast<QGraphicsSceneMouseEvent *>(event));
-    case QEvent::GraphicsSceneMouseRelease:
-        return instrument->mouseReleaseEvent(watched, static_cast<QGraphicsSceneMouseEvent *>(event));
-    case QEvent::GraphicsSceneWheel:
-        return instrument->wheelEvent(watched, static_cast<QGraphicsSceneWheelEvent *>(event));
-    default:
-        return instrument->sceneEvent(watched, static_cast<QEvent *>(event));
-    }
+    return instrument->sceneEvent(watched, event);
 }
 
 

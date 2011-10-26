@@ -199,12 +199,16 @@ GraphicsWidget::GraphicsWidget(QGraphicsItem *parent):
     d_ptr(new GraphicsWidgetPrivate)
 {
     d_ptr->q_ptr = this;
+
+    DragFilter::ensureInstalledAt(scene());
 }
 
 GraphicsWidget::GraphicsWidget(QGraphicsItem *parent, GraphicsWidgetPrivate &dd):
     base_type(parent), d_ptr(&dd)
 {
     d_ptr->q_ptr = this;
+
+    DragFilter::ensureInstalledAt(scene());
 }
 
 GraphicsWidget::~GraphicsWidget()

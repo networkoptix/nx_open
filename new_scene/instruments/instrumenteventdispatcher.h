@@ -37,6 +37,9 @@ namespace detail {
                     continue;
                 }
 
+                if (!instrument->isEnabled())
+                    continue;
+
                 if (derived->dispatch(instrument, watched, event)) {
                     result = true;
                     break;

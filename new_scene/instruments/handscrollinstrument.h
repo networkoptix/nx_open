@@ -9,12 +9,20 @@ class HandScrollInstrument: public Instrument {
 public:
     HandScrollInstrument(QObject *parent);
 
+signals:
+    void scrollingStarted(QGraphicsView *view);
+    void scrollingFinished(QGraphicsView *view);
+
 protected:
     virtual void installedNotify() override;
 
     virtual bool mousePressEvent(QWidget *viewport, QMouseEvent *event) override;
     virtual bool mouseMoveEvent(QWidget *viewport, QMouseEvent *event) override;
     virtual bool mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) override;
+
+private:
+    void startScrolling(QGraphicsView *view);
+    void stopScrolling(QGraphicsView *view);
 
 private:
     enum State {

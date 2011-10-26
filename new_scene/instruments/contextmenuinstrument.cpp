@@ -35,7 +35,7 @@ bool ContextMenuInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *even
     return false;
 }
 
-bool ContextMenuInstrument::mouseMoveEvent(QWidget *viewport, QMouseEvent *event) {
+bool ContextMenuInstrument::mouseMoveEvent(QWidget *, QMouseEvent *event) {
     if (!m_isClick)
         return false;
 
@@ -47,7 +47,7 @@ bool ContextMenuInstrument::mouseMoveEvent(QWidget *viewport, QMouseEvent *event
     return false;
 }
 
-bool ContextMenuInstrument::mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) {
+bool ContextMenuInstrument::mouseReleaseEvent(QWidget *, QMouseEvent *event) {
     if(event->button() != Qt::RightButton)
         return false;
 
