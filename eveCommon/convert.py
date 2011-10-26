@@ -132,24 +132,34 @@ def index_dirs(xdirs, template_file, output_file, exclude_dirs=(), exclude_files
 
     uniclient_pro.close()
 
+def convert():
+    oldpwd = os.getcwd()
+    os.chdir(os.path.dirname(os.path.realpath(__file__)))
+
+    try:
+        if os.path.exists('bin'):
+            rmtree('bin')
+
+        if os.path.exists('build'):
+            rmtree('build')
+        os.mkdir('build')
+
+        ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release = setup_ffmpeg()
+        gen_filetypes_h()
+
+        index_dirs(('src',), 'src/const.pro', 'src/common.pro', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
+        instantiate_pro('src/common.pro', {'BUILDLIB': BUILDLIB, 'FFMPEG' : ffmpeg_path})
+
+        if sys.platform == 'win32':
+            os.system('qmake -tp vc -o src/common.vcproj src/common.pro')
+
+        elif sys.platform == 'darwin':
+            pass
+            os.system('qmake -spec macx-g++ CONFIG-=release CONFIG+=debug -o build/Makefile.debug src/common.pro')
+            os.system('qmake -spec macx-g++ CONFIG-=debug CONFIG+=release -o build/Makefile.release src/common.pro')
+    finally:
+        os.chdir(oldpwd)
+    
+
 if __name__ == '__main__':
-    if os.path.exists('bin'):
-        rmtree('bin')
-
-    if os.path.exists('build'):
-        rmtree('build')
-    os.mkdir('build')
-
-    ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release = setup_ffmpeg()
-    gen_filetypes_h()
-
-    index_dirs(('src',), 'src/const.pro', 'src/common.pro', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
-    instantiate_pro('src/common.pro', {'BUILDLIB': BUILDLIB, 'FFMPEG' : ffmpeg_path})
-
-    if sys.platform == 'win32':
-        os.system('qmake -tp vc -o src/common.vcproj src/common.pro')
-
-    elif sys.platform == 'darwin':
-        pass
-        os.system('qmake -spec macx-g++ CONFIG-=release CONFIG+=debug -o build/Makefile.debug src/common.pro')
-        os.system('qmake -spec macx-g++ CONFIG-=debug CONFIG+=release -o build/Makefile.release src/common.pro')
+    convert()
