@@ -3,27 +3,28 @@ QT *= multimedia network xml
 CONFIG += x86 precompile_header %BUILDLIB
 CONFIG -= flat
 
-INCLUDEPATH += $$PWD
-PRECOMPILED_HEADER = $$PWD/StdAfx.h
-PRECOMPILED_SOURCE = $$PWD/StdAfx.cpp
+FFMPEG=%FFMPEG
+INCLUDEPATH += $$PWD/src
+PRECOMPILED_HEADER = $$PWD/src/StdAfx.h
+PRECOMPILED_SOURCE = $$PWD/src/StdAfx.cpp
 
 CONFIG(debug, debug|release) {
-  DESTDIR = ../bin/debug
-  OBJECTS_DIR  = ../build/debug
-  MOC_DIR = ../build/debug/generated
-  UI_DIR = ../build/debug/generated
-  RCC_DIR = ../build/debug/generated
+  DESTDIR = bin/debug
+  OBJECTS_DIR  = build/debug
+  MOC_DIR = build/debug/generated
+  UI_DIR = build/debug/generated
+  RCC_DIR = build/debug/generated
 }
 
 CONFIG(release, debug|release) {
-  DESTDIR = ../bin/release
-  OBJECTS_DIR  = ../build/release
-  MOC_DIR = ../build/release/generated
-  UI_DIR = ../build/release/generated
-  RCC_DIR = ../build/release/generated
+  DESTDIR = bin/release
+  OBJECTS_DIR  = build/release
+  MOC_DIR = build/release/generated
+  UI_DIR = build/release/generated
+  RCC_DIR = build/release/generated
 }
 
-INCLUDEPATH += $$PWD/common $$PWD/common/core $$PWD/common/utils $$PWD/common/plugins
+INCLUDEPATH += $$PWD/src/common $$PWD/src/common/core $$PWD/src/common/utils $$PWD/src/common/plugins
 
 CONFIG(debug, debug|release) {
   INCLUDEPATH += $$FFMPEG-debug/include
@@ -42,7 +43,7 @@ win32 {
   win32-msvc* {
     QMAKE_CXXFLAGS += -MP /Fd$$OBJECTS_DIR
     DEFINES += _CRT_SECURE_NO_WARNINGS
-    INCLUDEPATH += $$PWD/../contrib/ffmpeg-misc-headers-win32
+    INCLUDEPATH += $$PWD/contrib/ffmpeg-misc-headers-win32
   }
 
   !staticlib {
@@ -65,13 +66,13 @@ DEFINES += __STDC_CONSTANT_MACROS
 
 # Clone ssh://hg@vigasin.com/evetools to the same diectory netoptix_vms is located
 win32 {
-    EVETOOLS_DIR=$$PWD/../../../evetools/win32
+    EVETOOLS_DIR=$$PWD/../../evetools/win32
     QMAKE_CXXFLAGS += -Zc:wchar_t
     LIBS += -lxerces-c_3
 }
 
 mac {
-    EVETOOLS_DIR=$$PWD/../../../evetools/mac
+    EVETOOLS_DIR=$$PWD/../../evetools/mac
     LIBS += -lxerces-c-3.1
 }
 
@@ -79,14 +80,14 @@ mac {
 QMAKE_CXXFLAGS += -I$$EVETOOLS_DIR/include 
 LIBS += -L$$EVETOOLS_DIR/lib
 
-XSD_FILES = $$PWD/api/xsd/cameras.xsd \
-            $$PWD/api/xsd/layouts.xsd \
-            $$PWD/api/xsd/users.xsd \
-            $$PWD/api/xsd/resourceTypes.xsd \
-            $$PWD/api/xsd/resources.xsd \
-            $$PWD/api/xsd/resourcesEx.xsd \
-            $$PWD/api/xsd/servers.xsd \
-            $$PWD/api/xsd/events.xsd
+XSD_FILES = $$PWD/src/api/xsd/cameras.xsd \
+            $$PWD/src/api/xsd/layouts.xsd \
+            $$PWD/src/api/xsd/users.xsd \
+            $$PWD/src/api/xsd/resourceTypes.xsd \
+            $$PWD/src/api/xsd/resources.xsd \
+            $$PWD/src/api/xsd/resourcesEx.xsd \
+            $$PWD/src/api/xsd/servers.xsd \
+            $$PWD/src/api/xsd/events.xsd
 
 xsd.name = Generating code from ${QMAKE_FILE_IN}
 xsd.input = XSD_FILES

@@ -87,12 +87,6 @@ def setup_ffmpeg():
 
     return ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release
 
-def index_common():
-    oldpwd = os.getcwd()
-    os.chdir('../eveCommon')
-    index_dirs(('src',), 'src/const.pri', 'src/common.pri')
-    os.chdir(oldpwd)
-
 def is_exclude_file(f, exclude_files):
     for exclude_file in exclude_files:
         if exclude_file in f:
@@ -100,7 +94,7 @@ def is_exclude_file(f, exclude_files):
 
     return False
 
-def index_dirs(xdirs, template_file, output_file, use_prefix = False, exclude_dirs=(), exclude_files=()):
+def index_dirs(xdirs, template_file, output_file, exclude_dirs=(), exclude_files=()):
     if os.path.exists(output_file):
         os.unlink(output_file)
 
@@ -111,25 +105,19 @@ def index_dirs(xdirs, template_file, output_file, use_prefix = False, exclude_di
     sources = []
 
     for xdir in xdirs:
-        prefix = ''
-
-        if use_prefix:
-            prefix = os.path.join('..', xdir) + '/'
-
         for root, dirs, files in os.walk(xdir):
-            parent = root[len(xdir)+1:]
             for exclude_dir in exclude_dirs:
                 if exclude_dir in dirs:
-                    dirs.remove(exclude_dir)    # don't visit SVN directories
+                    dirs.remove(exclude_dir)
 
             for f in files:
                 if is_exclude_file(f, exclude_files):
                     continue
 
                 if f.endswith('.h'):
-                    headers.append(prefix + os.path.join(prefix, parent, f))
+                    headers.append(os.path.join(root, f))
                 elif f.endswith('.cpp'):
-                    sources.append(prefix + os.path.join(prefix, parent, f))
+                    sources.append(os.path.join(root, f))
 
     uniclient_pro = open(output_file, 'a')
 
@@ -149,20 +137,18 @@ if __name__ == '__main__':
 
     if os.path.exists('build'):
         rmtree('build')
-
-    index_dirs(('src',), 'src/const.pro', 'src/common.pro', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
-    instantiate_pro('src/common.pro', {'BUILDLIB': BUILDLIB})
+    os.mkdir('build')
 
     ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release = setup_ffmpeg()
-
     gen_filetypes_h()
 
+    index_dirs(('src',), 'const.pro', 'common.pro', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
+    instantiate_pro('common.pro', {'BUILDLIB': BUILDLIB, 'FFMPEG' : ffmpeg_path})
+
     if sys.platform == 'win32':
-        os.system('qmake -tp vc FFMPEG=%s -o src/common.vcproj src/common.pro' % ffmpeg_path)
+        os.system('qmake -tp vc -o src/common.vcproj common.pro')
 
     elif sys.platform == 'darwin':
-        if os.path.exists('src/Makefile'):
-            rmtree('src/Makefile')
-
-        os.system('qmake -spec macx-g++ CONFIG-=release CONFIG+=debug FFMPEG=%s -o build/Makefile.debug src/common.pro' % ffmpeg_path)
-        os.system('qmake -spec macx-g++ CONFIG-=debug CONFIG+=release FFMPEG=%s -o build/Makefile.release src/common.pro' % ffmpeg_path)
+        pass
+        os.system('qmake -spec macx-g++ CONFIG-=release CONFIG+=debug -o build/Makefile.debug common.pro')
+        os.system('qmake -spec macx-g++ CONFIG-=debug CONFIG+=release -o build/Makefile.release common.pro')
