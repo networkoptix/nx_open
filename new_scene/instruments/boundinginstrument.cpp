@@ -5,6 +5,8 @@
 #include <QGraphicsView>
 #include <QScrollBar>
 #include <utility/warnings.h>
+#include "transformlistenerinstrument.h"
+#include "instrumentmanager.h"
 
 namespace {
 
@@ -359,7 +361,7 @@ public:
 
 
 BoundingInstrument::BoundingInstrument(QObject *parent):
-    Instrument(makeSet(), makeSet(), makeSet(QEvent::Paint), false, parent),
+    Instrument(makeSet(), makeSet(), makeSet(), false, parent),
     m_timer(new AnimationTimer(this)),
     m_lastTickTime(0)
 {
@@ -374,6 +376,14 @@ BoundingInstrument::~BoundingInstrument() {
 
 void BoundingInstrument::installedNotify() {
     m_timer->start();
+
+    TransformListenerInstrument *transformListenerInstrument = manager()->instrument<TransformListenerInstrument>();
+    if(transformListenerInstrument == NULL) {
+        qnWarning("TransformListenerInstrument must be installed before BoundingInstrument");
+        return;
+    }
+
+    connect(transformListenerInstrument, SIGNAL(transformChanged(QGraphicsView *)), this, SLOT(at_transformChanged(QGraphicsView *)));
 }
 
 void BoundingInstrument::aboutToBeUninstalledNotify() {
@@ -413,14 +423,12 @@ void BoundingInstrument::tick(int currentTime) {
     m_lastTickTime = currentTime;
 }
 
-bool BoundingInstrument::paintEvent(QWidget *viewport, QPaintEvent *) {
-    ViewData *d = cdata(this->view(viewport));
+void BoundingInstrument::at_transformChanged(QGraphicsView *view) {
+    ViewData *d = cdata(view);
     if(d == NULL)
-        return false;
+        return;
 
     d->correct();
-
-    return false;
 }
 
 BoundingInstrument::ViewData *BoundingInstrument::data(QGraphicsView *view) {

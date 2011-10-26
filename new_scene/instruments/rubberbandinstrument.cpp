@@ -10,6 +10,9 @@
 #include <QRubberBand>
 #include <QWidget>
 #include <QCursor>
+#include <utility/warnings.h>
+#include "transformlistenerinstrument.h"
+#include "instrumentmanager.h"
 
 /**
  * Item that implements a rubber band. The downside of implementing rubber band
@@ -173,8 +176,7 @@ namespace {
     QEvent::Type viewportEventTypes[] = {
         QEvent::MouseButtonPress,
         QEvent::MouseMove,
-        QEvent::MouseButtonRelease,
-        QEvent::Paint
+        QEvent::MouseButtonRelease
     };
 }
 
@@ -197,7 +199,13 @@ void RubberBandInstrument::installedNotify() {
     m_inSelectionChanged = false;
     m_protectSelection = false;
 
-    Instrument::installedNotify();
+    TransformListenerInstrument *transformListenerInstrument = manager()->instrument<TransformListenerInstrument>();
+    if(transformListenerInstrument == NULL) {
+        qnWarning("TransformListenerInstrument must be installed before RubberBandInstrument");
+        return;
+    }
+
+    connect(transformListenerInstrument, SIGNAL(transformChanged(QGraphicsView *)), this, SLOT(at_transformChanged(QGraphicsView *)));
 }
 
 void RubberBandInstrument::aboutToBeUninstalledNotify() {
@@ -211,17 +219,14 @@ void RubberBandInstrument::aboutToBeUninstalledNotify() {
     }
 }
 
-bool RubberBandInstrument::paintEvent(QWidget *viewport, QPaintEvent *) {
-    if(viewport != m_rubberBand->viewport())
-        return false; /* We are interested only in transformations for the current viewport. */
+void RubberBandInstrument::at_transformChanged(QGraphicsView *view) {
+    if(view->viewport() != m_rubberBand->viewport())
+        return; /* We are interested only in transformations for the current viewport. */
 
-    QGraphicsView *view = this->view(viewport);
     m_rubberBand->setViewportTransform(view->viewportTransform());
 
     /* Scene mouse position may have changed as a result of transform change. */
     m_rubberBand->setCorner(view->mapToScene(view->mapFromGlobal(QCursor::pos())));
-
-    return false;
 }
 
 bool RubberBandInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
@@ -294,6 +299,7 @@ bool RubberBandInstrument::mouseMoveEvent(QWidget *viewport, QMouseEvent *event)
         } else {
             m_state = RUBBER_BANDING;
             m_rubberBand->setViewport(viewport);
+            m_rubberBand->setViewportTransform(view->viewportTransform());
             m_rubberBand->setOrigin(m_mousePressScenePos);
         }
     }

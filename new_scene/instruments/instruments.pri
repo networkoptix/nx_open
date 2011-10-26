@@ -16,6 +16,7 @@ HEADERS += \
   $$PWD/boundinginstrument.h \
   $$PWD/sceneinputforwardinginstrument.h \
   $$PWD/sceneinputstopinstrument.h \
+  $$PWD/transformlistenerinstrument.h \
 
 SOURCES += \
   $$PWD/contextmenuinstrument.cpp \
@@ -33,4 +34,4 @@ SOURCES += \
   $$PWD/boundinginstrument.cpp \
   $$PWD/sceneinputforwardinginstrument.cpp \
   $$PWD/sceneinputstopinstrument.cpp \
-  
+  $$PWD/transformlistenerinstrument.cpp \

@@ -19,6 +19,7 @@
 #include <instruments/boundinginstrument.h>
 #include <instruments/sceneinputstopinstrument.h>
 #include <instruments/sceneinputforwardinginstrument.h>
+#include <instruments/transformlistenerinstrument.h>
 #include <widgets/centralwidget.h>
 #include <widgets/animatedwidget.h>
 #include <widgets/layoutitem.h>
@@ -411,6 +412,7 @@ SceneController::SceneController(QGraphicsView *view, QObject *parent):
     d->manager->installInstrument(new SceneInputStopInstrument(this));
     d->manager->installInstrument(sceneClickInstrument);
     d->manager->installInstrument(new SceneInputForwardingInstrument(this));
+    d->manager->installInstrument(new TransformListenerInstrument(this));
     d->manager->installInstrument(d->wheelZoomInstrument);
     d->manager->installInstrument(d->dragInstrument);
     d->manager->installInstrument(new RubberBandInstrument(this));

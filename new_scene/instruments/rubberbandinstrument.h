@@ -24,12 +24,12 @@ protected:
     virtual bool mousePressEvent(QWidget *viewport, QMouseEvent *event) override;
     virtual bool mouseMoveEvent(QWidget *viewport, QMouseEvent *event) override;
     virtual bool mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) override;
-    virtual bool paintEvent(QWidget *viewport, QPaintEvent *event) override;
 
     static QSet<QGraphicsItem *> toSet(QList<QGraphicsItem *> items);
 
 private slots:
     void at_scene_selectionChanged();
+    void at_transformChanged(QGraphicsView *view);
 
 private:
     enum State {

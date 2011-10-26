@@ -3,12 +3,13 @@
 
 #include <QObject>
 #include <QSet>
+#include <QList>
+#include "instrument.h"
 
 class QGraphicsItem;
 class QGraphicsScene;
 class QGraphicsView;
 
-class Instrument;
 class InstrumentManagerPrivate;
 
 /**
@@ -124,6 +125,25 @@ public:
      *                                 instrument manager.
      */
     const QList<Instrument *> &instruments() const;
+
+    /**
+     * \tparam                         Type of the instrument to get.
+     * \returns                        The first instrument in instrument queue
+     *                                 that has the given type, or NULL if no such
+     *                                 instrument exists.
+     */
+    template<class T>
+    T *instrument() const {
+        const QList<Instrument *> &instruments = this->instruments();
+
+        for (int i = instruments.size() - 1; i >= 0; i--) {
+            T *result = dynamic_cast<T *>(instruments[i]);
+            if(result != NULL)
+                return result;
+        }
+
+        return NULL;
+    }
 
     /**
      * \param scene                    Scene.

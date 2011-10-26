@@ -59,12 +59,13 @@ public slots:
     void enforceSize(QGraphicsView *view);
     void dontEnforceSize(QGraphicsView *view);
 
+private slots:
+    void at_transformChanged(QGraphicsView *view);
+
 protected:
     virtual void installedNotify() override;
     virtual void aboutToBeUninstalledNotify() override;
     virtual void enabledNotify() override;
-
-    virtual bool paintEvent(QWidget *viewport, QPaintEvent *event) override;
 
     virtual void tick(int currentTime) override;
 
