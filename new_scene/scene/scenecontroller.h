@@ -36,6 +36,8 @@ protected:
 
 private slots:
     void at_relayoutAction_triggered();
+    void at_changeModeAction_triggered();
+
     void at_centralWidget_geometryChanged();
 
     void at_widget_resizingStarted();

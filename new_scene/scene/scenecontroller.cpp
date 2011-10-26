@@ -495,15 +495,15 @@ SceneController::SceneController(QGraphicsView *view, QObject *parent):
     view->setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);
 
     /* All our items save and restore painter state. */
-    view->setOptimizationFlag(QGraphicsView::DontSavePainterState); 
+    view->setOptimizationFlag(QGraphicsView::DontSavePainterState, false); /* Can be turned on if we won't be using framed widgets. */ 
     view->setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing);
 
     /* Don't even try to uncomment this one, it slows everything down. */
     //setCacheMode(QGraphicsView::CacheBackground);
 
     /* We don't need scrollbars & frame. */
-    //view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    //view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setFrameShape(QFrame::NoFrame);
 
     /* Add actions. */
@@ -525,6 +525,11 @@ SceneController::SceneController(QGraphicsView *view, QObject *parent):
 
         connect(action, SIGNAL(triggered()), this, SLOT(at_relayoutAction_triggered()));
     }
+
+    /* Add change mode action. */
+    QAction *action = new QAction(tr("+_+"), this);
+    view->addAction(action);
+    connect(action, SIGNAL(triggered()), this, SLOT(at_changeModeAction_triggered()));
 
     d->manager->registerView(view);
 }
@@ -586,29 +591,6 @@ void SceneController::at_centralWidget_geometryChanged() {
 
     d->boundingInstrument->setPositionBounds(NULL, d->centralWidget->geometry(), 0.0);
     d->boundingInstrument->setSizeBounds(NULL, QSizeF(100, 100), InstrumentUtility::OutBound, d->centralWidget->size(), InstrumentUtility::OutBound);
-
-#if 0
-    const QRectF viewportSceneRect = mapRectToScene(viewport()->rect());
-    //const QSizeF s = (viewportSceneRect.size() - m_widget->mapRectToScene(m_widget->rect()).size()) / 2;
-    const QSizeF s = (viewportSceneRect.size() - m_widget->size()) / 2;
-    const QPointF newPos = viewportSceneRect.topLeft() + QPointF(s.width(), s.height());
-
-    QPropertyAnimation *posAnimation = qobject_cast<QPropertyAnimation *>(m_widget->property("animation").value<QObject *>());
-    if (!posAnimation)
-    {
-        posAnimation = new QPropertyAnimation(m_widget, "pos", m_widget);
-        posAnimation->setDuration(150);
-        posAnimation->setEasingCurve(QEasingCurve::Linear);
-        m_widget->setProperty("animation", QVariant::fromValue(qobject_cast<QObject *>(posAnimation)));
-    }
-    if (posAnimation->endValue().toPointF() != newPos)
-    {
-        posAnimation->stop();
-        posAnimation->setEndValue(newPos);
-        posAnimation->start();
-    }
-#endif
-
 }
 
 void SceneController::at_widget_resizingStarted() {
@@ -630,12 +612,16 @@ void SceneController::at_widget_resizingFinished() {
 }
 
 void SceneController::at_draggingStarted(QGraphicsView *, QList<QGraphicsItem *> items) {
+    qDebug("DRAGGING STARTED");
+
     foreach (QGraphicsItem *item, items)
         if (AnimatedWidget *widget = dynamic_cast<AnimatedWidget *>(item))
             widget->setAnimationsEnabled(false);
 }
 
 void SceneController::at_draggingFinished(QGraphicsView *view, QList<QGraphicsItem *> items) {
+    qDebug("DRAGGING FINISHED");
+
     Q_D(SceneController);
 
     AnimatedWidget *draggedWidget = NULL;
@@ -702,7 +688,7 @@ void SceneController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem *item
 }
 
 void SceneController::at_scene_clicked(QGraphicsView *) {
-    qDebug("SCENE CLICKED");
+    d_func()->toggleFocus(NULL);
 }
 
 void SceneController::at_scene_doubleClicked(QGraphicsView *) {
@@ -744,3 +730,6 @@ void SceneController::relayoutItems(int rowCount, int columnCount, const QByteAr
     }
 }
 
+void SceneController::at_changeModeAction_triggered() {
+    setMode(mode() == EDITING ? VIEWING : EDITING);
+}
