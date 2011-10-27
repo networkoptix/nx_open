@@ -1,7 +1,6 @@
 #include "./single_shot_reader.h"
-#include "../base/log.h"
-#include "../data/mediadata.h"
-#include "./device/qnresource.h"
+#include "../resource/resource.h"
+
 
 CLSingleShotStreamreader::CLSingleShotStreamreader(QnResource* dev ):
 QnAbstractStreamDataProvider(dev)

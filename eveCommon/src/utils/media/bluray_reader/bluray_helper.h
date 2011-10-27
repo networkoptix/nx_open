@@ -2,8 +2,9 @@
 #define __BLURAY_HELPER_H
 
 #include <QString>
+#include "../bitStream.h"
 
-#include "base/bitStream.h"
+
 
 class AbstractBlurayStream
 {

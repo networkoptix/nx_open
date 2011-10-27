@@ -1,4 +1,4 @@
-#include "deviceserver.h"
+#include "resourceserver.h"
 
 
 

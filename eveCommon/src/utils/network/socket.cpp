@@ -1,11 +1,11 @@
 #include "socket.h"
+#include "../common/log.h"
 
 #ifdef Q_OS_WIN
 #  include <ws2tcpip.h>
 #  include <iphlpapi.h>
 #endif
 
-#include "base/log.h"
 
 #ifdef Q_OS_WIN
   typedef int socklen_t;
@@ -19,6 +19,7 @@
   #include <unistd.h>          // For close()
   #include <netinet/in.h>      // For sockaddr_in
   #include <fcntl.h>
+#include "../common/log.h"
   typedef void raw_type;       // Type used for raw data on this platform
 #endif
 

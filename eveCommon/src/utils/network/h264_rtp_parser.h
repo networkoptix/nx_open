@@ -5,7 +5,8 @@
 #include <QMap>
 
 #include "rtp_stream_parser.h"
-#include "base/nalUnits.h"
+#include "../media/nalUnits.h"
+
 
 class CLH264RtpParser: public CLRtpStreamParser
 {

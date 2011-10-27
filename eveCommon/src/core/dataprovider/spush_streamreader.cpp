@@ -1,9 +1,6 @@
 #include "spush_streamreader.h"
-#include "base/sleep.h"
-#include "base/log.h"
-#include "data/mediadata.h"
-#include "device/qnresource.h"
-#include "device/device_video_layout.h"
+#include "utils/common/sleep.h"
+
 
 CLServerPushStreamreader::CLServerPushStreamreader(QnResource* dev ):
 QnAbstractMediaStreamDataProvider(dev)

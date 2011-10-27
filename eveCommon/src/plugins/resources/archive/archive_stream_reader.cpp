@@ -1,13 +1,8 @@
 #include "archive_stream_reader.h"
-#include "device/qnresource.h"
-#include "base/ffmpeg_codec.h"
-
-#include "data/mediadata.h"
 #include "stdint.h"
 #include <libavformat/avformat.h>
-#include "base/ffmpeg_helper.h"
-#include "decoders/audio/ffmpeg_audio.h"
-#include "decoders/video/frame_info.h"
+#include "utils/media/frame_info.h"
+
 
 QMutex QnArchiveStreamReader::avi_mutex;
 QSemaphore QnArchiveStreamReader::aviSemaphore(4);

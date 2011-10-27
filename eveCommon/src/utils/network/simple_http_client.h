@@ -2,7 +2,8 @@
 #define __SIMPLE_HTTP_CLIENT__
 
 #include "socket.h"
-#include "base/associativearray.h"
+#include "../common/associativearray.h"
+
 
 enum CLHttpStatus {CL_HTTP_SUCCESS, CL_HTTP_AUTH_REQUIRED, CL_HTTP_HOST_NOT_AVAILABLE};
 

@@ -1,6 +1,6 @@
-#include "dataprocessor.h"
-#include "../base/sleep.h"
-#include "../base/log.h"
+#include "dataconsumer.h"
+#include "utils/common/sleep.h"
+
 
 QnAbstractDataConsumer::QnAbstractDataConsumer(int maxQueueSize)
 	: m_dataQueue(maxQueueSize)

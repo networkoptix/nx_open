@@ -1,12 +1,13 @@
 #include <QtCore/QtConcurrentMap>
 #include <QtCore/QThreadPool>
-
-#include "network/nettools.h"
 #include "asynch_seacher.h"
-#include "network_resource.h"
-#include "base/sleep.h"
-#include "deviceserver.h"
-#include "base/resource_pool.h"
+#include "utils/common/resource_pool.h"
+#include "utils/common/sleep.h"
+#include "resourceserver.h"
+#include "../resource/network_resource.h"
+
+
+
 
 QnResourceDiscoveryManager::QnResourceDiscoveryManager()
 {

@@ -3,8 +3,10 @@
 
 struct QnAbstractDataPacket;
 
-#include "../base/longrunnable.h"
-#include "data.h"
+
+
+#include "utils/common/longrunnable.h"
+#include "../datapacket/datapacket.h"
 
 class QN_EXPORT QnAbstractDataConsumer : public CLLongRunnable
 {

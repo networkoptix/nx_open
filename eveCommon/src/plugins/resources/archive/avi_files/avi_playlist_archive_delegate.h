@@ -4,7 +4,8 @@
 #include <QStringList>
 #include <QFile>
 #include "avi_archive_delegate.h"
-#include "device/device_video_layout.h"
+#include "core/resource/resource_media_layout.h"
+
 
 class QnAVIPlaylistArchiveDelegate : public QnAviArchiveDelegate
 {

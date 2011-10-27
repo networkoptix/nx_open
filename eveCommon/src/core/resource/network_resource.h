@@ -3,13 +3,15 @@
 
 #include <QtNetwork/QAuthenticator>
 #include <QtNetwork/QHostAddress>
-#include "network/mac_address.h"
-#include "device/qnresource.h"
+#include "utils/network/mac_address.h"
+#include "resource.h"
+
+
 
 class QnNetworkResource;
 typedef QSharedPointer<QnNetworkResource> QnNetworkResourcePtr;
 
-class QnNetworkResource : virtual public QnResource
+class QN_EXPORT QnNetworkResource : virtual public QnResource
 {
 public:
     enum QnNetworkStatus

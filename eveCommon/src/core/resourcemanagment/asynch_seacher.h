@@ -2,11 +2,12 @@
 #define cl_asynch_device_sarcher_h_423
 
 #include <QtCore/QThread>
+#include "utils/common/longrunnable.h"
+#include "utils/network/netstate.h"
+#include "core/resource/resource.h"
+#include "utils/network/nettools.h"
 
 
-#include "network/netstate.h"
-#include "network/nettools.h"
-#include "device/qnresource.h"
 
 class QnAbstractResourceSearcher;
 

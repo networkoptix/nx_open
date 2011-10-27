@@ -3,11 +3,9 @@
 
 #include <QVector>
 #include <QAudioFormat>
-#include "data.h"
-#include "base/ffmpeg_codec.h"
-#include "../base/bytearray.h"
-//#include "decoders/audio/ffmpeg_audio.h"
 #include "libavcodec/avcodec.h"
+#include "datapacket.h"
+#include "utils/common/bytearray.h"
 
 struct QnAbstractMediaData : public QnAbstractDataPacket
 {

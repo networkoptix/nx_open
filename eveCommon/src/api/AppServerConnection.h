@@ -1,8 +1,9 @@
 #ifndef APPSERVERCONNECTION_H
 #define APPSERVERCONNECTION_H
 
-#include "device/resource_type.h"
-#include "device/qnresource.h"
+#include "core/resource/resource.h"
+
+
 
 typedef long RequestId;
 

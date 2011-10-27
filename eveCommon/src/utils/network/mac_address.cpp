@@ -1,5 +1,6 @@
 #include "mac_address.h"
-#include "network/nettools.h"
+#include "nettools.h"
+
 
 QnMacAddress::QnMacAddress()
 {

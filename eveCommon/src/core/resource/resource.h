@@ -8,9 +8,10 @@
 #include <QStringList>
 
 #include "param.h"
-#include "device_command_processor.h"
-#include "base/qnid.h"
 #include "resource_type.h"
+#include "utils/common/qnid.h"
+#include "../datapacket/datapacket.h"
+#include "resource_command_processor.h"
 
 
 class QnDeviceCommand;

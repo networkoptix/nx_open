@@ -1,8 +1,11 @@
 #ifndef resource_commendprocessor_h_2221
 #define resource_commendprocessor_h_2221
 
-#include "streamreader/streamreader.h"
-#include "data/dataprocessor.h"
+#include "../datapacket/datapacket.h"
+#include "resource_consumer.h"
+
+
+
 
 class QN_EXPORT QnResourceCommand : public QnAbstractDataPacket, public QnResourceConsumer
 {

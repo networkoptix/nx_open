@@ -1,7 +1,8 @@
 #ifndef __AVI_ARCHIVE_DELEGATE_H
 #define __AVI_ARCHIVE_DELEGATE_H
-#include "data/mediadata.h"
-#include "device_plugins/archive/abstract_archive_delegate.h"
+
+#include "../abstract_archive_delegate.h"
+
 
 class AVFormatContext;
 class CLCustomDeviceVideoLayout;

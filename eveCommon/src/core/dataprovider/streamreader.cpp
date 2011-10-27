@@ -1,7 +1,5 @@
 #include "streamreader.h"
-#include "../base/log.h"
-#include "device/qnresource.h"
-#include "device/device_video_layout.h"
+
 
 QnAbstractStreamDataProvider::QnAbstractStreamDataProvider(QnResource* resource):
     QnResourceConsumer(resource),

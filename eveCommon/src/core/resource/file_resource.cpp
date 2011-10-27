@@ -2,7 +2,7 @@
 
 #include "file_resource.h"
 
-#include "../streamreader/single_shot_file_reader.h"
+#include "../dataprovider/single_shot_file_reader.h"
 
 QnLocalFileResource::QnLocalFileResource(const QString &filename)
 {

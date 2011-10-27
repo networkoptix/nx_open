@@ -3,8 +3,8 @@
 
 #include <QObject>
 #include <QVector>
-#include "data/mediadata.h"
-#include "device/qnresource.h"
+#include "core/resource/resource.h"
+#include "core/datapacket/mediadatapacket.h"
 
 class QnDeviceVideoLayout;
 class QnDeviceAudioLayout;

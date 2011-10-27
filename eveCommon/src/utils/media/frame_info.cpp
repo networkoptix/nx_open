@@ -1,8 +1,11 @@
 #include "frame_info.h"
+#include "../common/util.h"
+#include <emmintrin.h>
+#include "sse_helper.h"
 
 #include <string.h>
 #include <stdio.h>
-#include "util.h"
+
 
 extern "C" {
 #ifdef WIN32
@@ -12,9 +15,10 @@ extern "C" {
 #ifdef WIN32
 #undef AVPixFmtDescriptor
 #endif
+
 };
 
-#include "base/sse_helper.h"
+
 
 const __m128i  sse_00ffw_intrs = _mm_setr_epi32(0x00ff00ff, 0x00ff00ff, 0x00ff00ff, 0x00ff00ff);
 const __m128i  sse_000000ffw_intrs = _mm_setr_epi32(0x000000ff, 0x000000ff, 0x000000ff, 0x000000ff);

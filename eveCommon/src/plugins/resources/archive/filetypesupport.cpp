@@ -1,6 +1,7 @@
 #include "filetypesupport.h"
 #include "filetypes.h"
-#include "util.h"
+#include "utils/common/util.h"
+
 
 FileTypeSupport::FileTypeSupport()
 {

@@ -1,7 +1,9 @@
 #ifndef abstract_archive_device_h1838
 #define abstract_archive_device_h1838
 
-#include "device/media_resource.h"
+#include "core/resource/media_resource.h"
+
+
 
 class QnAbstractArchiveResource : public QnMediaResource
 {

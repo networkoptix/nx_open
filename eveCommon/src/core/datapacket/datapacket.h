@@ -2,7 +2,8 @@
 #define abstract_data_h_1112
 
 #include <QSharedPointer>
-#include "../base/threadqueue.h"
+#include "utils/common/threadqueue.h"
+
 
 class QnAbstractStreamDataProvider;
 

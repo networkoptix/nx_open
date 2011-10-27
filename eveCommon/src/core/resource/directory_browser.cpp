@@ -3,11 +3,10 @@
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 #include <QtCore/QThread>
-#include "device_plugins/archive/filetypesupport.h"
-#include "device_plugins/archive/avi_files/avi_device.h"
-#include "device_plugins/archive/avi_files/avi_bluray_device.h"
-#include "device_plugins/archive/avi_files/avi_dvd_device.h"
-#include "device/file_resource.h"
+#include "plugins/resources/archive/filetypesupport.h"
+#include "file_resource.h"
+#include "plugins/resources/archive/avi_files/avi_dvd_device.h"
+#include "plugins/resources/archive/avi_files/avi_bluray_device.h"
 
 
 QnResourceDirectoryBrowser::QnResourceDirectoryBrowser()

@@ -2,8 +2,9 @@
 #define avi_stream_reader_h1901
 
 #include "abstract_archive_stream_reader.h"
-#include "data/mediadata.h"
-#include "base/ffmpeg_helper.h"
+#include "core/resource/resource_media_layout.h"
+#include "utils/media/ffmpeg_helper.h"
+
 
 struct AVFormatContext;
 

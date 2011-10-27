@@ -1,7 +1,7 @@
 #include "nettools.h"
-#include "../base/log.h"
 #include "ping.h"
 #include "netstate.h"
+#include "../common/log.h"
 
 QList<QHostAddress> getAllIPv4Addresses()
 {

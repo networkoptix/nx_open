@@ -1,7 +1,9 @@
 #include "media_streamdataprovider.h"
-#include "device/media_resource.h"
-#include "device/device_video_layout.h"
-#include "base/sleep.h"
+#include "../resource/resource_media_layout.h"
+#include "../datapacket/mediadatapacket.h"
+#include "utils/common/sleep.h"
+
+
 
 QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(QnResource* res):
 QnAbstractStreamDataProvider(res),

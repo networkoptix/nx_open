@@ -1,7 +1,6 @@
 #ifndef aligned_data_h_1636
 #define aligned_data_h_1636
 
-#include "base/log.h"
 
 class CLAlignedData
 {

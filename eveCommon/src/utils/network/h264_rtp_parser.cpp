@@ -1,6 +1,7 @@
 #include "h264_rtp_parser.h"
 #include "rtp_stream_parser.h"
-#include "network/rtpsession.h"
+#include "rtpsession.h"
+
 
 static const int MAX_RTP_PACKET_SIZE = 1024 * 8;
 static const char H264_NAL_PREFIX[4] = {0x00, 0x00, 0x00, 0x01};

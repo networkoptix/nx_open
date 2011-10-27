@@ -1,7 +1,6 @@
 #include <QMutex>
 
 #include "avi_playlist_archive_delegate.h"
-#include "device/qnresource.h"
 
 extern "C"
 {

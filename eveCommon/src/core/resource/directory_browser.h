@@ -1,7 +1,11 @@
 #ifndef directory_browser_h_1708
 #define directory_browser_h_1708
 
-#include "deviceserver.h"
+#include "../resourcemanagment/resourceserver.h"
+
+
+
+
 
 
 class QnResourceDirectoryBrowser : public QnAbstractFileResourceSearcher

@@ -1,7 +1,8 @@
 #include "network_resource.h"
-#include "network/nettools.h"
-#include "network/ping.h"
-#include "base/sleep.h"
+#include "utils/network/nettools.h"
+#include "utils/common/sleep.h"
+#include "utils/network/ping.h"
+
 
 QnNetworkResource::QnNetworkResource():
 m_networkStatus(0),

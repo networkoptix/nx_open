@@ -1,8 +1,7 @@
 #include "avi_device.h"
-#include "util.h"
 #include "avi_archive_delegate.h"
 #include "../archive_stream_reader.h"
-#include "../rtsp/rtsp_client_archive_delegate.h"
+
 
 QnAviResource::QnAviResource(const QString& file)
 {
@@ -37,21 +36,13 @@ QString QnAviResource::toString() const
 QnAbstractStreamDataProvider* QnAviResource::createDataProvider(ConnectionRole role)
 {
     QnArchiveStreamReader* result = new QnArchiveStreamReader(this);
-    if (role == QnResource::Role_Default) 
-    {
-        if (checkFlag(local))
-            result->setArchiveDelegate(new QnAviArchiveDelegate());
-        else
-            result->setArchiveDelegate(new QnRtspClientArchiveDelegate());
+
+#ifdef RTSP_SERVER_TEST
+    if (role == QnResource::Role_Default && !checkFlag(local)){
+        result->setArchiveDelegate(new QnRtspClientArchiveDelegate());
+        return result;
     }
-    else if (role == QnResource::Role_DirectConnection) {
-        result->setArchiveDelegate(new QnAviArchiveDelegate());
-    }
-    else if (role == QnResource::Role_RemoveConnection) {
-        result->setArchiveDelegate(new QnAviArchiveDelegate());
-    }
-    else {
-        Q_ASSERT_X(1, Q_FUNC_INFO, "Can't instance MediaProvider. Unknown role");
-    }
+#endif
+    result->setArchiveDelegate(new QnAviArchiveDelegate());
     return result;
 }

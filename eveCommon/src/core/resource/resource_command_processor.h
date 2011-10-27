@@ -4,9 +4,10 @@
 #include <QMap>
 #include <QMutex>
 #include <QSharedPointer>
+#include "../datapacket/datapacket.h"
+#include "../dataconsumer/dataconsumer.h"
 
-#include "data/dataprocessor.h"
-#include "data/data.h"
+
 
 class QnResource;
 

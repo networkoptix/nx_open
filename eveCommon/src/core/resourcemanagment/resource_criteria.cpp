@@ -1,4 +1,5 @@
-#include "device_criteria.h"
+#include "resource_criteria.h"
+
 
 //=============================================================
 CLDeviceCriteria::CLDeviceCriteria(CriteriaType cr):

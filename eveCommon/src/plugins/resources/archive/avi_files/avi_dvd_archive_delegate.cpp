@@ -2,14 +2,12 @@
 #include <QFileInfo>
 
 #include "avi_dvd_archive_delegate.h"
-#include "device/qnresource.h"
-#include "base/dvd_reader/dvd_reader.h"
-#include "base/dvd_reader/dvd_udf.h"
-#include "base/dvd_reader/nav_read.h"
-#include "base/dvd_decrypt/dvdcss.h"
-#include "base/pespacket.h"
-#include "base/nalUnits.h"
 #include "avi_dvd_device.h"
+#include "utils/media/dvd_reader/dvd_udf.h"
+#include "utils/media/dvd_reader/ifo_read.h"
+#include "utils/media/dvd_decrypt/dvdcss.h"
+#include "utils/media/pespacket.h"
+#include "utils/media/nalUnits.h"
 
 static const int IO_BLOCK_SIZE = 1024 * 1024;
 static const int IO_SKIP_BLOCK_SIZE = 1024 * 1024;

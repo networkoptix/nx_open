@@ -1,8 +1,10 @@
 #ifndef resource_pool_h_1537
 #define resource_pool_h_1537
 
-#include "device/qnresource.h"
-#include "device/device_managmen/device_criteria.h"
+#include "core/resource/resource.h"
+#include "core/resourcemanagment/resource_criteria.h"
+
+
 
 class QnResource;
 class QnNetworkResource;

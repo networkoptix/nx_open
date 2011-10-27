@@ -1,7 +1,7 @@
 #include "./single_shot_file_reader.h"
-#include "../data/mediadata.h"
-#include "../device/file_resource.h"
-#include "device_plugins/archive/filetypesupport.h"
+#include "../resource/file_resource.h"
+#include "plugins/resources/archive/filetypesupport.h"
+
 
 CLSingleShotFileStreamreader::CLSingleShotFileStreamreader(QnResource* dev ):
 CLSingleShotStreamreader(dev)

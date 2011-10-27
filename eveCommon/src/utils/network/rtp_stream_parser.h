@@ -2,8 +2,10 @@
 #define __RTP_STREAM_PARSER_H
 
 #include <QIODevice>
+#include "core/datapacket/mediadatapacket.h"
 
-#include "data/mediadata.h"
+
+
 class RTPIODevice;
 
 #pragma pack(push, 1)

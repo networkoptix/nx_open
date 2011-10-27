@@ -1,9 +1,9 @@
 #ifndef client_pull_stream_reader_h1226
 #define client_pull_stream_reader_h1226
 
-#include "streamreader/streamreader.h"
-#include "data/mediadata.h"
-#include "streamreader/media_streamdataprovider.h"
+
+#include "core/datapacket/mediadatapacket.h"
+#include "media_streamdataprovider.h"
 
 struct QnAbstractMediaData;
 

@@ -1,11 +1,9 @@
 #include "avi_archive_delegate.h"
-#include "data/mediadata.h"
 #include "stdint.h"
 #include <libavformat/avformat.h>
-#include "base/ffmpeg_helper.h"
-#include "decoders/audio/ffmpeg_audio.h"
-#include "decoders/video/frame_info.h"
-#include "device/device_video_layout.h"
+#include "core/resource/resource_media_layout.h"
+#include "utils/media/ffmpeg_helper.h"
+
 
 extern QMutex global_ffmpeg_mutex;
 

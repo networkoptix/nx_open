@@ -1,18 +1,10 @@
-#include "qnresource.h"
-
-#include "base/log.h"
-#include "network/nettools.h"
-#include "network/ping.h"
-#include "base/sleep.h"
-#include "device_command_processor.h"
-#include "device_video_layout.h"
-#include "base/resource_pool.h"
-#include "streamreader/streamreader.h"
 #include "resource_command_consumer.h"
 #include "resource_consumer.h"
+#include "../dataprovider/streamreader.h"
+#include "file_resource.h"
 
 // Temporary until real ResourceFactory is implemented
-#include "device/file_resource.h"
+
 
 QList<QnResourceFactoryPtr> QnResourceFactoryPool::m_factories;
 

@@ -3,8 +3,9 @@
 
 #include <QStringList>
 #include <QFile>
-
 #include "avi_playlist_archive_delegate.h"
+
+
 
 class QnAVIBlurayArchiveDelegate : public QnAVIPlaylistArchiveDelegate
 {

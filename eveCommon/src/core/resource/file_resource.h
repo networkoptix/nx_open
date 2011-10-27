@@ -1,7 +1,9 @@
 #ifndef file_device_h_227
 #define file_device_h_227
 
-#include "qnresource.h"
+#include "resource.h"
+
+
 
 class QN_EXPORT  QnLocalFileResource : public QnResource
 {

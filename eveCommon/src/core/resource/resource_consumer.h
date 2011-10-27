@@ -1,6 +1,8 @@
 #ifndef resource_consumer_h_1921
 #define resource_consumer_h_1921
-#include "qnresource.h"
+
+#include "resource.h"
+
 
 class QN_EXPORT QnResourceConsumer
 {

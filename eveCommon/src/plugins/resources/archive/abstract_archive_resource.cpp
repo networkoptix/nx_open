@@ -1,4 +1,5 @@
-#include "abstract_archive_device.h"
+#include "abstract_archive_resource.h"
+
 
 QnAbstractArchiveResource::QnAbstractArchiveResource()
 {

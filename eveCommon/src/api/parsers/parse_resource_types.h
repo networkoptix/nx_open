@@ -3,8 +3,9 @@
 
 #include <QList>
 
-#include "device/resource_type.h"
+
 #include "api/Types.h"
+#include "core/resource/resource_type.h"
 
 void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const QnApiResourceTypes& xsdResourceTypes);
 

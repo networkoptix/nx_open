@@ -1,10 +1,10 @@
 #ifndef abstract_archive_stream_reader_h1907
 #define abstract_archive_stream_reader_h1907
 
-#include "streamreader/cpull_stremreader.h"
-#include "device/device_video_layout.h"
-#include "base/adaptivesleep.h"
+
 #include "abstract_archive_delegate.h"
+#include "core/dataprovider/cpull_stremreader.h"
+#include "utils/common/adaptivesleep.h"
 
 class QnAbstractArchiveReader : public CLClientPullStreamreader
 {

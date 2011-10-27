@@ -1,6 +1,6 @@
 #include "ping.h"
+#include "../common/log.h"
 
-#include "base/log.h"
 
 #ifdef Q_OS_WIN
 #include <icmpapi.h>
@@ -12,6 +12,7 @@
 #include <netinet/ip.h>
 #include <netinet/ip_icmp.h>
 #endif
+
 
 CLPing::CLPing()
 {

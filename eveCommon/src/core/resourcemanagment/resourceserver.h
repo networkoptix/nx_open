@@ -2,7 +2,8 @@
 #define device_server_h_1658
 
 #include <QtNetwork/QHostAddress>
-#include "device/qnresource.h"
+#include "core/resource/resource.h"
+
 
 
 

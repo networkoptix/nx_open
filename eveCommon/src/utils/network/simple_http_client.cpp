@@ -3,8 +3,8 @@
 #include <QtCore/QCryptographicHash>
 
 #include <sstream>
-#include "util.h"
-#include "base/log.h"
+#include "../common/util.h"
+
 
 using namespace std;
 

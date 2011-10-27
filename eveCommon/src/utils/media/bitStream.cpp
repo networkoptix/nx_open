@@ -1,4 +1,5 @@
-#include "base/bitstream.h"
+#include "bitStream.h"
+
 
 int BitStream::m_maskInitialized = 0;
 unsigned BitStream::m_masks[INT_BIT + 1];

@@ -2,8 +2,8 @@
 #define __RESOURCE_TYPE_H
 
 #include <QList>
-#include "base/qnid.h"
 #include "param.h"
+#include "utils/common/qnid.h"
 
 class QN_EXPORT QnResourceType
 {

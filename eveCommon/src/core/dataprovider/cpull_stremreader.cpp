@@ -1,9 +1,6 @@
 #include "cpull_stremreader.h"
-#include "base/sleep.h"
-#include "base/log.h"
-#include "data/mediadata.h"
-#include "device/qnresource.h"
-#include "device/device_video_layout.h"
+#include "utils/common/sleep.h"
+
 
 CLClientPullStreamreader::CLClientPullStreamreader(QnResource* dev ):
 QnAbstractMediaStreamDataProvider(dev)

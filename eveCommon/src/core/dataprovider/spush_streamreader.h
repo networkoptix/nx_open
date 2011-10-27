@@ -1,9 +1,10 @@
 #ifndef server_push_stream_reader_h2055
 #define server_push_stream_reader_h2055
 
-#include "streamreader/streamreader.h"
-#include "data/mediadata.h"
+
 #include "media_streamdataprovider.h"
+#include "../datapacket/mediadatapacket.h"
+
 
 struct QnAbstractMediaData;
 

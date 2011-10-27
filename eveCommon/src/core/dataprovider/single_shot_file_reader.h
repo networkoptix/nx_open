@@ -2,7 +2,7 @@
 #define single_shot_file_reader_h_215
 
 #include "single_shot_reader.h"
-#include "data/mediadata.h"
+#include "../datapacket/mediadatapacket.h"
 
 struct QnAbstractMediaData;
 

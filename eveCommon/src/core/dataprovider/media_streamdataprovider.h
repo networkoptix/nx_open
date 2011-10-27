@@ -1,11 +1,12 @@
 #ifndef QnMediaStreamDataProvider_514
 #define QnMediaStreamDataProvider_514
 
-#include "statistics/streamdata_statistics.h"
-#include "streamreader/streamreader.h"
-#include "device/qnresource.h"
-#include "device/param.h"
-#include "device/media_resource.h"
+#include "core/dataprovider/streamreader.h"
+#include "core/dataprovider/streamdata_statistics.h"
+#include "../resource/media_resource.h"
+
+
+
 
 #define CL_MAX_DATASIZE (10*1024*1024) // assume we can never get compressed data with  size greater than this
 #define CL_MAX_CHANNEL_NUMBER (4) 

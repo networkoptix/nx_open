@@ -3,9 +3,12 @@
 
 #include <QStringList>
 #include <QFile>
-
-#include "base/dvd_reader/ifo_read.h"
 #include "avi_playlist_archive_delegate.h"
+#include "utils/media/dvd_reader/ifo_types.h"
+
+
+
+
 
 struct dvd_reader_t;
 

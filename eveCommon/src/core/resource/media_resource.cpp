@@ -1,6 +1,7 @@
 #include "media_resource.h"
-#include "streamreader/media_streamdataprovider.h"
-#include "device/device_video_layout.h"
+#include "resource_media_layout.h"
+#include "../dataprovider/media_streamdataprovider.h"
+
 
 //QnDefaultMediaResourceLayout globalDefaultMediaResourceLayout;
 

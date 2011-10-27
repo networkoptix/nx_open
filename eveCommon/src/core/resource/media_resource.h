@@ -4,8 +4,8 @@
 #include <QMap>
 #include <QSize>
 
-#include "device/qnresource.h"
-#include "data/mediadata.h"
+
+#include "core/resource/resource.h"
 
 class QnAbstractMediaStreamDataProvider;
 class QnDeviceVideoLayout;

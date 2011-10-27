@@ -1,5 +1,5 @@
-#include "device_command_processor.h"
-#include "../device/qnresource.h"
+#include "resource_command_processor.h"
+#include "resource.h"
 
 QnDeviceCommand::QnDeviceCommand(QnResourcePtr device):
 m_device(device)

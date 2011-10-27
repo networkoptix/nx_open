@@ -13,7 +13,8 @@
 #include "dvd_input.h"
 
 #include "dvdread_internal.h"
-#include "base/dvd_decrypt/dvdcss.h"
+#include "../dvd_decrypt/dvdcss.h"
+
 
 /* The DVDinput handle, add stuff here for new input methods. */
 struct dvd_input_s {
@@ -39,7 +40,7 @@ int         (*dvdinput_read)  (dvd_input_t, void *, int, int);
 char *      (*dvdinput_error) (dvd_input_t);
 
 /* linking to libdvdcss */
-#include "base/dvd_decrypt/dvdcss.h"
+
 #define DVDcss_open(a) dvdcss_open((char*)(a))
 #define DVDcss_close   dvdcss_close
 #define DVDcss_seek    dvdcss_seek

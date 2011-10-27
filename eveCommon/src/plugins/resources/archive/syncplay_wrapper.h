@@ -1,7 +1,9 @@
 #ifndef __SYNCPLAY_WRAPPER_H__
 #define __SYNCPLAY_WRAPPER_H__
 
-#include "base/base.h"
+#include "utils/common/base.h"
+
+
 class QnAbstractArchiveReader;
 class QnAbstractArchiveDelegate;
 
