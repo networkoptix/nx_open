@@ -10,68 +10,78 @@
 #include <QtGui/QGraphicsSceneEvent>
 #include <QtGui/QPainter>
 
-#include <qdebug.h>
+#include "graphicswidget_p.h"
 
-class AnimatedWidgetPrivate
+class AnimatedWidgetPrivate: public GraphicsWidgetPrivate
 {
+    Q_DECLARE_PUBLIC(AnimatedWidget)
+
 public:
     AnimatedWidgetPrivate();
     ~AnimatedWidgetPrivate();
 
+private:
     void init();
 
     void drawRotationHelper(QPainter *painter, const QPointF &m_rotation_center, const QPointF &m_rotation_hand);
 
-    AnimatedWidget *q;
-
-    inline QPointF instantPos() const { return q->pos(); }
+    inline QPointF instantPos() const { return q_func()->pos(); }
     inline void setInstantPos(const QPointF &pos)
     {
         inSetGeometry = true;
-        q->setPos(pos);
+        q_func()->setPos(pos);
         inSetGeometry = false;
     }
 
-    inline QSizeF instantSize() const { return q->size(); }
+    inline QSizeF instantSize() const { return q_func()->size(); }
     inline void setInstantSize(const QSizeF &size)
     {
         inSetGeometry = true;
-        q->resize(size);
+        q_func()->resize(size);
         inSetGeometry = false;
     }
 
-    inline qreal instantScale() const { return q->scale(); }
-    inline void setInstantScale(const qreal &scale)
+    inline float instantScale() const { return q_func()->scale(); }
+    inline void setInstantScale(float scale)
     {
         inSetScale = true;
-        q->setScale(scale);
+        q_func()->setScale(scale);
         inSetScale = false;
     }
 
-    inline qreal instantRotation() const { return q->rotation(); }
-    inline void setInstantRotation(const qreal &rotation)
+    inline float instantRotation() const { return q_func()->rotation(); }
+    inline void setInstantRotation(float rotation)
     {
         inSetRotation = true;
-        q->setRotation(rotation);
+        q_func()->setRotation(rotation);
         inSetRotation = false;
     }
 
-    inline qreal instantOpacity() const { return q->opacity(); }
-    inline void setInstantOpacity(const qreal &opacity)
+    inline float instantOpacity() const { return q_func()->opacity(); }
+    inline void setInstantOpacity(float opacity)
     {
         inSetOpacity = true;
-        q->setOpacity(opacity);
+        q_func()->setOpacity(opacity);
         inSetOpacity = false;
     }
+
+    inline void stopAllAnimations()
+    {
+        posAnimation->stop();
+        sizeAnimation->stop();
+        scaleAnimation->stop();
+        rotationAnimation->stop();
+        opacityAnimation->stop();
+    }
+
+private:
+    ushort animationsEnabled : 1;
 
     ushort inSetGeometry : 1;
     ushort inSetScale : 1;
     ushort inSetRotation : 1;
     ushort inSetOpacity : 1;
 
-    ushort childIsGrabberItem : 1;
-
-    QParallelAnimationGroup *animationGroup;
     QPropertyAnimation *posAnimation;
     QPropertyAnimation *sizeAnimation;
     QPropertyAnimation *scaleAnimation;
@@ -80,24 +90,21 @@ public:
 };
 
 AnimatedWidgetPrivate::AnimatedWidgetPrivate()
-    : inSetGeometry(false), inSetScale(false), inSetRotation(false), inSetOpacity(false),
-      childIsGrabberItem(false),
-      animationGroup(0),
+    : GraphicsWidgetPrivate(),
+      animationsEnabled(false),
+      inSetGeometry(false), inSetScale(false), inSetRotation(false), inSetOpacity(false),
       posAnimation(0), sizeAnimation(0), scaleAnimation(0), rotationAnimation(0), opacityAnimation(0)
 {
 }
 
 AnimatedWidgetPrivate::~AnimatedWidgetPrivate()
 {
-    if (animationGroup)
-    {
-        animationGroup->stop();
-        delete animationGroup;
-    }
 }
 
 void AnimatedWidgetPrivate::init()
 {
+    Q_Q(AnimatedWidget);
+
     Qt::WindowFlags wFlags = Qt::Window | Qt::FramelessWindowHint;
     //wFlags |= Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint;
     q->setWindowFlags(wFlags);
@@ -110,33 +117,25 @@ void AnimatedWidgetPrivate::init()
     //q->setFiltersChildEvents(true); ### investigate
     q->setHandlesChildEvents(true);
 
-
-    animationGroup = new QParallelAnimationGroup(q);
-
-    posAnimation = new QPropertyAnimation(q, "instantPos", animationGroup);
+    posAnimation = new QPropertyAnimation(q, "instantPos", q);
     posAnimation->setDuration(1000);
     posAnimation->setEasingCurve(QEasingCurve::InOutBack);
-    animationGroup->addAnimation(posAnimation);
 
-    sizeAnimation = new QPropertyAnimation(q, "instantSize", animationGroup);
+    sizeAnimation = new QPropertyAnimation(q, "instantSize", q);
     sizeAnimation->setDuration(1000);
     sizeAnimation->setEasingCurve(QEasingCurve::InOutQuint);
-    animationGroup->addAnimation(sizeAnimation);
 
-    scaleAnimation = new QPropertyAnimation(q, "instantScale", animationGroup);
+    scaleAnimation = new QPropertyAnimation(q, "instantScale", q);
     scaleAnimation->setDuration(500);
     scaleAnimation->setEasingCurve(QEasingCurve::InOutBack);
-    animationGroup->addAnimation(scaleAnimation);
 
-    rotationAnimation = new QPropertyAnimation(q, "instantRotation", animationGroup);
+    rotationAnimation = new QPropertyAnimation(q, "instantRotation", q);
     rotationAnimation->setDuration(500);
     rotationAnimation->setEasingCurve(QEasingCurve::InOutBack);
-    animationGroup->addAnimation(rotationAnimation);
 
-    opacityAnimation = new QPropertyAnimation(q, "instantOpacity", animationGroup);
+    opacityAnimation = new QPropertyAnimation(q, "instantOpacity", q);
     opacityAnimation->setDuration(500);
     opacityAnimation->setEasingCurve(QEasingCurve::InOutSine);
-    animationGroup->addAnimation(opacityAnimation);
 }
 
 void AnimatedWidgetPrivate::drawRotationHelper(QPainter *painter, const QPointF &m_rotation_center, const QPointF &m_rotation_hand)
@@ -193,15 +192,15 @@ void AnimatedWidgetPrivate::drawRotationHelper(QPainter *painter, const QPointF 
 
 
 AnimatedWidget::AnimatedWidget(QGraphicsItem *parent)
-    : QGraphicsWidget(parent), d(new AnimatedWidgetPrivate)
+    : GraphicsWidget(parent, *new AnimatedWidgetPrivate)
 {
-    d->q = this;
+    Q_D(AnimatedWidget);
+
     d->init();
 }
 
 AnimatedWidget::~AnimatedWidget()
 {
-    delete d;
 }
 
 bool AnimatedWidget::isInteractive() const
@@ -216,6 +215,30 @@ void AnimatedWidget::setInteractive(bool interactive)
     else
         setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
     setFlag(ItemIsMovable, interactive);
+    setExtraFlag(ItemIsDraggable, interactive);
+    setExtraFlag(ItemIsResizable, interactive);
+}
+
+bool AnimatedWidget::isAnimationsEnabled() const
+{
+    Q_D(const AnimatedWidget);
+
+    return d->animationsEnabled;
+}
+
+void AnimatedWidget::setAnimationsEnabled(bool enable)
+{
+    Q_D(AnimatedWidget);
+
+    if (d->animationsEnabled == enable)
+        return;
+
+    d->animationsEnabled = enable;
+    if (!d->animationsEnabled) {
+        // ### finish active transitions at once?
+
+        d->stopAllAnimations();
+    }
 }
 
 QPainterPath AnimatedWidget::opaqueArea() const
@@ -223,98 +246,84 @@ QPainterPath AnimatedWidget::opaqueArea() const
     if (qFuzzyCompare(effectiveOpacity(), 1.0))
         return shape(); // optimization
 
-    return QGraphicsWidget::opaqueArea();
+    return GraphicsWidget::opaqueArea();
 }
 
 void AnimatedWidget::setGeometry(const QRectF &rect)
 {
-    if ((flags() & ItemSendsGeometryChanges) == 0)
-    {
+    if ((flags() & ItemSendsGeometryChanges) == 0) {
         // resize and repositition, if needed
-        QGraphicsWidget::setGeometry(rect);
+        GraphicsWidget::setGeometry(rect);
         return;
     }
 
     // notify the item that the size is changing
-    const QVariant newSizeVariant(itemChange(GraphicsItemChange(ItemSizeChange), rect.size()));
+    const QVariant newSizeVariant(itemChange(ItemSizeChange, rect.size()));
     const QSizeF newSize = newSizeVariant.toSizeF();
     const QRectF newGeom = QRectF(rect.topLeft(), newSize);
     if (newGeom == geometry())
         return;
 
     // resize and repositition
-    QGraphicsWidget::setGeometry(newGeom);
+    GraphicsWidget::setGeometry(newGeom);
 
     // send post-notification
-    itemChange(GraphicsItemChange(ItemSizeHasChanged), newSizeVariant);
+    itemChange(ItemSizeHasChanged, newSizeVariant);
 }
 
 void AnimatedWidget::updateGeometry()
 {
+    Q_D(AnimatedWidget);
+
     d->inSetGeometry = true;
-    QGraphicsWidget::updateGeometry();
+    GraphicsWidget::updateGeometry();
     d->inSetGeometry = false;
 }
 
 QVariant AnimatedWidget::itemChange(GraphicsItemChange change, const QVariant &value)
 {
-    switch (int(change))
-    {
+    Q_D(AnimatedWidget);
+
+    switch (change) {
     case ItemFlagsChange:
         return (value.toUInt() | ItemSendsGeometryChanges | ItemUsesExtendedStyleOption)/* & ~ItemIsPanel*/;
 
     case ItemPositionChange:
-        if (!d->inSetGeometry && d->posAnimation && scene())
-        {
+        if (d->animationsEnabled && !d->inSetGeometry && d->posAnimation) {
             const QPointF newPos = value.toPointF();
-
             if (d->posAnimation->state() != QAbstractAnimation::Stopped && d->posAnimation->endValue().toPointF() == newPos)
                 return pos();
 
             d->posAnimation->stop();
 
-            QGraphicsItem *mouseGrabberItem = scene()->mouseGrabberItem();
-            if (!isInteractive() || (!isSelected() && (!mouseGrabberItem || (mouseGrabberItem != this/* && !isAncestorOf(mouseGrabberItem)*/))))
-            {
-                d->posAnimation->setEndValue(newPos);
-                d->posAnimation->start();
+            d->posAnimation->setEndValue(newPos);
+            d->posAnimation->start();
 
-                return pos();
-            }
+            return pos();
         }
         break;
 
     case ItemSizeChange:
-        if (!d->inSetGeometry && d->sizeAnimation && scene())
-        {
+        if (d->animationsEnabled && !d->inSetGeometry && d->sizeAnimation) {
             const QSizeF newSize = value.toSizeF();
-
             if (d->sizeAnimation->state() != QAbstractAnimation::Stopped && d->sizeAnimation->endValue().toSizeF() == newSize)
                 return size();
 
             d->sizeAnimation->stop();
 
-            QGraphicsItem *mouseGrabberItem = scene()->mouseGrabberItem();
-            //if (!isInteractive() || !isSelected() || !mouseGrabberItem/* || (mouseGrabberItem != this && !isAncestorOf(mouseGrabberItem))*/)
-            if (!isInteractive() || (!isSelected() && (!mouseGrabberItem || (mouseGrabberItem != this/* && !isAncestorOf(mouseGrabberItem)*/))))
-            {
-                d->sizeAnimation->setEndValue(newSize);
-                d->sizeAnimation->start();
+            d->sizeAnimation->setEndValue(newSize);
+            d->sizeAnimation->start();
 
-                return size();
-            }
+            return size();
         }
         break;
 
     case ItemScaleChange:
-        if (!d->inSetScale && d->scaleAnimation)
-        {
-            qreal newScale = value.toReal();
-            if (qIsFinite(newScale))
-            {
-                newScale = qBound(1.0, newScale, 5.0);
-
-                if (d->scaleAnimation->state() != QAbstractAnimation::Stopped && qFuzzyCompare(d->scaleAnimation->endValue().toReal(), newScale))
+        if (d->animationsEnabled && !d->inSetScale && d->scaleAnimation) {
+            float newScale = value.toFloat();
+            if (qIsFinite(newScale)) {
+                newScale = qBound(1.0f, newScale, 5.0f);
+                if (d->scaleAnimation->state() != QAbstractAnimation::Stopped && qFuzzyCompare(d->scaleAnimation->endValue().toFloat(), newScale))
                     return scale();
 
                 d->scaleAnimation->stop();
@@ -328,12 +337,10 @@ QVariant AnimatedWidget::itemChange(GraphicsItemChange change, const QVariant &v
         break;
 
     case ItemRotationChange:
-        if (!d->inSetRotation && d->rotationAnimation && scene())
-        {
-            const qreal newRotation = value.toReal();
-            if (qIsFinite(newRotation))
-            {
-                if (d->rotationAnimation->state() != QAbstractAnimation::Stopped && qFuzzyCompare(d->rotationAnimation->endValue().toReal(), newRotation))
+        if (d->animationsEnabled && !d->inSetRotation && d->rotationAnimation) {
+            const float newRotation = value.toFloat();
+            if (qIsFinite(newRotation)) {
+                if (d->rotationAnimation->state() != QAbstractAnimation::Stopped && qFuzzyCompare(d->rotationAnimation->endValue().toFloat(), newRotation))
                     return rotation();
 
                 d->rotationAnimation->stop();
@@ -347,12 +354,10 @@ QVariant AnimatedWidget::itemChange(GraphicsItemChange change, const QVariant &v
         break;
 
     case ItemOpacityChange:
-        if (!d->inSetOpacity && d->opacityAnimation && scene())
-        {
-            const qreal newOpacity = value.toReal();
-            if (qIsFinite(newOpacity))
-            {
-                if (d->opacityAnimation->state() != QAbstractAnimation::Stopped && qFuzzyCompare(d->opacityAnimation->endValue().toReal(), newOpacity))
+        if (!d->inSetOpacity && d->opacityAnimation) {
+            const float newOpacity = value.toFloat();
+            if (qIsFinite(newOpacity)) {
+                if (d->opacityAnimation->state() != QAbstractAnimation::Stopped && qFuzzyCompare(d->opacityAnimation->endValue().toFloat(), newOpacity))
                     return opacity();
 
                 d->opacityAnimation->stop();
@@ -369,23 +374,21 @@ QVariant AnimatedWidget::itemChange(GraphicsItemChange change, const QVariant &v
         break;
     }
 
-    return QGraphicsWidget::itemChange(change, value);
+    return GraphicsWidget::itemChange(change, value);
 }
 
 bool AnimatedWidget::windowFrameEvent(QEvent *event)
 {
-    if ((flags() & ItemIsPanel))
-    {
-        switch (event->type())
-        {
+#if 0
+    if ((flags() & ItemIsPanel)) {
+        switch (event->type()) {
         case QEvent::GraphicsSceneMousePress:
         case QEvent::GraphicsSceneMouseRelease:
-            return QGraphicsWidget::windowFrameEvent(event)
+            return GraphicsWidget::windowFrameEvent(event)
                    && windowFrameSectionAt(static_cast<QGraphicsSceneMouseEvent *>(event)->pos()) != Qt::TitleBarArea;
 
         case QEvent::GraphicsSceneMouseMove:
-            if (windowFrameSectionAt(static_cast<QGraphicsSceneMouseEvent *>(event)->pos()) == Qt::TitleBarArea)
-            {
+            if (windowFrameSectionAt(static_cast<QGraphicsSceneMouseEvent *>(event)->pos()) == Qt::TitleBarArea) {
                 event->accept();
                 return false;
             }
@@ -395,48 +398,59 @@ bool AnimatedWidget::windowFrameEvent(QEvent *event)
             break;
         }
     }
+#endif
 
-    return QGraphicsWidget::windowFrameEvent(event);
+    return GraphicsWidget::windowFrameEvent(event);
 }
 
 void AnimatedWidget::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    QGraphicsWidget::mousePressEvent(event);
+    GraphicsWidget::mousePressEvent(event);
 
+#if 0
     if (event->button() == Qt::LeftButton && !isInteractive())
         event->accept();
+#endif
 }
 
 void AnimatedWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    QGraphicsWidget::mouseReleaseEvent(event);
+    GraphicsWidget::mouseReleaseEvent(event);
 
-    if (event->button() == Qt::LeftButton && !isInteractive())
-    {
+#if 0
+    if (event->button() == Qt::LeftButton && !isInteractive()) {
         event->accept();
-        if ((event->pos() - event->buttonDownPos(Qt::LeftButton)).manhattanLength() < QApplication::startDragDistance())
+        if ((event->screenPos() - event->buttonDownScreenPos(Qt::LeftButton)).manhattanLength() < QApplication::startDragDistance())
             QMetaObject::invokeMethod(this, "clicked", Qt::QueuedConnection);
     }
+#endif
 }
 
 void AnimatedWidget::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
+#if 1
+    GraphicsWidget::mouseDoubleClickEvent(event);
+#else
     if (event->button() == Qt::LeftButton && !isInteractive())
         QMetaObject::invokeMethod(this, "doubleClicked", Qt::QueuedConnection);
     else
-        QGraphicsWidget::mouseDoubleClickEvent(event);
+        GraphicsWidget::mouseDoubleClickEvent(event);
+#endif
 }
 
 void AnimatedWidget::wheelEvent(QGraphicsSceneWheelEvent *event)
 {
-    if (isInteractive())
-    {
+#if 1
+    GraphicsWidget::wheelEvent(event);
+#else
+    if (isInteractive()) {
         setTransformOriginPoint(rect().center());
         if (event->modifiers() & Qt::AltModifier)
             setRotation(rotation() + ((event->delta() / 8) / 15) * 15);
         else
-            setScale(scale() + qreal(event->delta()) / 240);
+            setScale(scale() + float(event->delta()) / 240);
     }
+#endif
 }
 
 #include "moc_animatedwidget.cpp"

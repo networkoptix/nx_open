@@ -35,7 +35,7 @@ public:
 	void addDataProcessor(QnAbstractDataConsumer* dp);
 	void removeDataProcessor(QnAbstractDataConsumer* dp);
 
-    virtual void setReverseMode(bool value) {}
+    virtual void setReverseMode(bool /*value*/) {}
     virtual bool isReverseMode() const { return false;}
 
     bool isConnectedToTheResource() const;

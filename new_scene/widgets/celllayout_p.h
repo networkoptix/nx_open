@@ -1,5 +1,5 @@
-#ifndef CELL_LAYOUT_PRIVATE_H
-#define CELL_LAYOUT_PRIVATE_H
+#ifndef CELLLAYOUT_P_H
+#define CELLLAYOUT_P_H
 
 #include "celllayout.h"
 #include <QRect>
@@ -17,21 +17,29 @@ struct ItemProperties {
     Qt::Alignment alignment;
 };
 
-class CellLayoutPrivate 
+
+class CellLayoutPrivate
 {
 public:
-    CellLayoutPrivate(): 
-        cellSize(1.0, 1.0),
-        verticalSpacing(0.0),
-        horizontalSpacing(0.0)
+    CellLayoutPrivate(CellLayout *qq):
+        q_ptr(qq),
+        cellSize(1.0, 1.0)
     {}
 
 protected:
-    CellLayout *q_ptr;
+    CellLayout *const q_ptr;
 
 private:
     void ensureBounds() const;
     void ensureEffectiveCellSize() const;
+    void ensureEffectiveGeometry() const;
+
+    void clearRegion(const QRect &rect);
+    void fillRection(const QRect &rect, QGraphicsLayoutItem *value);
+    bool isRegionFilledWith(const QRect &rect, QGraphicsLayoutItem *value0, QGraphicsLayoutItem *value1) const;
+    bool isRegionOccupied(const QRect &rect) const;
+
+    void itemsAt(const QRect &rect, QSet<QGraphicsLayoutItem *> *items) const;
 
     /**
      * \param item                      Item to compute geometry for.
@@ -49,11 +57,8 @@ private:
     static QSizeF effectiveMaxSize(QGraphicsLayoutItem *item, const QSizeF &constraint);
 
 private:
-    /** Horizontal spacing. */
-    qreal verticalSpacing;
-
-    /** Vertical spacing. */
-    qreal horizontalSpacing;
+    /** Cell spacing. */
+    QSizeF spacing;
 
     /** Size of a single cell. */
     QSizeF cellSize;
@@ -73,9 +78,12 @@ private:
     /** Actual layout bounds, in cells. */
     mutable QRect bounds;
 
+    /** Effective geometry, adjusted for contents margins. */
+    mutable QRectF effectiveGeometry;
+
 private:
     Q_DECLARE_PUBLIC(CellLayout);
 };
 
 
-#endif // CELL_LAYOUT_PRIVATE_H
+#endif // CELLLAYOUT_P_H
