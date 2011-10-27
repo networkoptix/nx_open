@@ -59,6 +59,7 @@ mac {
   LIBS += -framework SystemConfiguration
   LIBS += -lz -lbz2
   DEFINES += QN_EXPORT=
+  QMAKE_CXXFLAGS += -msse4.1
 }
 
 DEFINES += __STDC_CONSTANT_MACROS

@@ -36,7 +36,7 @@ eveClient/src/version.h
 eveClient/src/Makefile
 
 eveCommon/src/common.pro
-eveCommon/src/device_plugins/archive/filetypes.h
+eveCommon/src/plugins/resources/archive/filetypes.h
 eveCommon/src/Makefile
 
 scripts/appserver/server.state
