@@ -134,7 +134,7 @@ def index_dirs(xdirs, template_file, output_file, exclude_dirs=(), exclude_files
 
 def convert():
     oldpwd = os.getcwd()
-    os.chdir(os.path.dirname(os.path.realpath(os.getcwd() + "/" + __file__)))
+    os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
     try:
         if os.path.exists('bin'):
