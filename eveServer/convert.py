@@ -6,32 +6,20 @@ import glob
 import string
 
 from version import *
-import os, sys, posixpath
+import os, sys
 import stat, time
 from StringIO import StringIO
 from string import Template
 
-os.path = posixpath
 sys.path.insert(0, '../eveCommon')
 
-from convert import index_dirs, rmtree, setup_ffmpeg, instantiate_pro, BUILDLIB
+from convert import index_dirs, rmtree, setup_ffmpeg, instantiate_pro, copy_files, BUILDLIB
+from convert import convert as convert_common
 
 FFMPEG_VERSION = '2011-08-29'
 
 EXCLUDE_DIRS = ('.svn', 'dxva')
 EXCLUDE_FILES = ('dxva', 'moc_', 'qrc_', 'StdAfx')
-
-def copy_files(src_glob, dst_folder):
-    for fname in glob.iglob(src_glob):
-        shutil.copy(fname, dst_folder)
-
-def link_or_copy(src, dst):
-    try:
-        import win32file
-        win32file.CreateHardLink(dst, src)
-    except:
-        shutil.copy(src, dst)
-
 
 def gen_version_h():
     version_h = open('src/version.h', 'w')
@@ -64,35 +52,33 @@ def gen_version_h():
     print >> version_h, '#define VER_COMPANYDOMAIN_STR       "networkoptix.com"'
     print >> version_h, '#endif // UNIVERSAL_CLIENT_VERSION_H_'
 
+convert_common()
+
 ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release = setup_ffmpeg()
 
-destdir = '../bin'
-destdir_debug = destdir + '/debug'
-destdir_release = destdir + '/release'
-
-if os.path.exists(destdir):
-    rmtree(destdir)
+if os.path.exists('bin'):
+    rmtree('bin')
 
 if os.path.exists('build'):
     rmtree('build')
 
-os.mkdir(destdir)
-os.mkdir(destdir_debug)
-os.mkdir(destdir_release)
+os.mkdir('bin')
+os.mkdir('bin/debug')
+os.mkdir('bin/release')
+os.mkdir('bin/debug-test')
+os.mkdir('bin/release-test')
 
-os.mkdir('build')
+copy_files(ffmpeg_path_debug + '/bin/*-[0-9].dll', 'bin/debug')
+copy_files(ffmpeg_path_debug + '/bin/*-[0-9][0-9].dll', 'bin/debug')
 
-copy_files(ffmpeg_path_debug + '/bin/*-[0-9].dll', destdir_debug)
-copy_files(ffmpeg_path_debug + '/bin/*-[0-9][0-9].dll', destdir_debug)
+copy_files(ffmpeg_path_release + '/bin/*-[0-9].dll', 'bin/release')
+copy_files(ffmpeg_path_release + '/bin/*-[0-9][0-9].dll', 'bin/release')
 
-copy_files(ffmpeg_path_release + '/bin/*-[0-9].dll', destdir_release)
-copy_files(ffmpeg_path_release + '/bin/*-[0-9][0-9].dll', destdir_release)
+os.mkdir('bin/debug/arecontvision')
+os.mkdir('bin/release/arecontvision')
 
-os.mkdir(destdir_debug + '/arecontvision')
-os.mkdir(destdir_release + '/arecontvision')
-
-copy_files('resource/arecontvision/*', destdir_debug + '/arecontvision')
-copy_files('resource/arecontvision/*', destdir_release + '/arecontvision')
+copy_files('resource/arecontvision/*', 'bin/debug/arecontvision')
+copy_files('resource/arecontvision/*', 'bin/release/arecontvision')
 
 gen_version_h()
 
@@ -109,5 +95,5 @@ elif sys.platform == 'darwin':
     if os.path.exists('src/Makefile.release'):
         os.unlink('src/Makefile.release')
 
-    os.system('qmake -spec macx-g++ CONFIG-=release CONFIG+=debug FFMPEG=%s -o build/Makefile.debug src/server.pro' % ffmpeg_path)
-    os.system('qmake -spec macx-g++ CONFIG-=debug CONFIG+=release FFMPEG=%s -o build/Makefile.release src/server.pro' % ffmpeg_path)
+    os.system('qmake -spec macx-g++ CONFIG-=release CONFIG+=debug -o build/Makefile.debug src/server.pro')
+    os.system('qmake -spec macx-g++ CONFIG-=debug CONFIG+=release -o build/Makefile.release src/server.pro')

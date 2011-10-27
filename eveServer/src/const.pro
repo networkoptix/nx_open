@@ -20,6 +20,22 @@ TARGET = Server
 win32: RC_FILE = server.rc
 
 CONFIG(debug, debug|release) {
+  DESTDIR = ../bin/debug
+  OBJECTS_DIR  = ../build/debug
+  MOC_DIR = ../build/debug/generated
+  UI_DIR = ../build/debug/generated
+  RCC_DIR = ../build/debug/generated
+}
+
+CONFIG(release, debug|release) {
+  DESTDIR = ../bin/release
+  OBJECTS_DIR  = ../build/release
+  MOC_DIR = ../build/release/generated
+  UI_DIR = ../build/release/generated
+  RCC_DIR = ../build/release/generated
+}
+
+CONFIG(debug, debug|release) {
   INCLUDEPATH += $$FFMPEG-debug/include
   LIBS += -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib
 }

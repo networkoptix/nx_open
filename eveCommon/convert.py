@@ -18,6 +18,18 @@ EXCLUDE_FILES = ('dxva', 'moc_', 'qrc_', 'StdAfx')
 BUILDLIB = 'staticlib'
 # BUILDLIB = ''
 
+def link_or_copy(src, dst):
+    try:
+        import win32file
+        win32file.CreateHardLink(dst, src)
+    except:
+        shutil.copy(src, dst)
+
+def copy_files(src_glob, dst_folder):
+    for fname in glob.iglob(src_glob):
+        shutil.copy(fname, dst_folder)
+
+
 def qt_path(path):
     return path.replace('\\', '/').lstrip('/')
 
