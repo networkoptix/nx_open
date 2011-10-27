@@ -40,7 +40,7 @@ protected:
     virtual qint32 readPacket(quint8* buf, int size);
     
     // seek to specified position. If functionis not implemeted, ffmpeg seek method is used (may be more slow)
-    virtual bool directSeekToPosition(qint64 pos_mks) { return false;}
+    virtual bool directSeekToPosition(qint64 /*pos_mks*/) { return false;}
 
     virtual void fillAdditionalInfo(CLFileInfo* /*fi*/) {}
     virtual void deleteFileInfo(CLFileInfo* fi);
@@ -51,7 +51,7 @@ protected:
     QVector<CLFileInfo*> m_fileList;   
     bool m_inSeek;
 private:
-    friend class CLAVIPlaylistStreamReaderPriv;
+    friend struct CLAVIPlaylistStreamReaderPriv;
     qint32 writePacket(quint8* buf, int size);
     qint64 seek(qint64 offset, qint32 whence);
     qint64 findFileIndexByTime(quint64 mksec);

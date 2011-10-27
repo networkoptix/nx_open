@@ -8,9 +8,6 @@
 
 
 
-#define CL_MAX_DATASIZE (10*1024*1024) // assume we can never get compressed data with  size greater than this
-#define CL_MAX_CHANNEL_NUMBER (4) 
-
 class QnDeviceVideoLayout;
 class QnDeviceAudioLayout;
 

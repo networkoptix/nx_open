@@ -11,7 +11,7 @@ CLAviDvdDevice::~CLAviDvdDevice()
 {
 }
 
-QnAbstractStreamDataProvider* CLAviDvdDevice::createDataProvider(ConnectionRole role)
+QnAbstractStreamDataProvider* CLAviDvdDevice::createDataProvider(ConnectionRole /*role*/)
 {
     QnArchiveStreamReader* result = new QnArchiveStreamReader(this);
     result->setArchiveDelegate(new QnAVIDvdArchiveDelegate());

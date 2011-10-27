@@ -24,9 +24,10 @@ public:
 
     void setStartDelay(qint64 startDelay);
     qint64 secondTime() const;
-    qint64 internalSeek (qint64 time);
+    qint64 jumpTo (qint64 time, bool makeshot);
 
     virtual AVCodecContext* setAudioChannel(int num);
+    void enableSync(bool value);
 
 private:
     QnArchiveSyncPlayWrapper* m_syncWrapper;
@@ -38,6 +39,7 @@ private:
     qint64 m_startDelay;
     QTime m_initTime;
     QnAbstractArchiveReader* m_reader;
+    bool m_enableSync;
 };
 
 #endif // _SYNC_PLAY_ARCHIVE_DELEGATE_H__

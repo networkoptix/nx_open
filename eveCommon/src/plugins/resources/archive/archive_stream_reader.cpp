@@ -66,16 +66,17 @@ QnArchiveStreamReader::~QnArchiveStreamReader()
     m_frameTypeExtractor = 0;
 }
 
-void QnArchiveStreamReader::previousFrame(quint64 mksec)
+void QnArchiveStreamReader::previousFrame(qint64 mksec)
 {
     jumpToPreviousFrame(mksec, true);
+    QnAbstractArchiveReader::previousFrame(mksec);
 }
 
-quint64 QnArchiveStreamReader::currentTime() const
+qint64 QnArchiveStreamReader::currentTime() const
 {
     QMutexLocker mutex(&m_cs);
 
-    quint64 jumpTime = skipFramesToTime();
+    qint64 jumpTime = skipFramesToTime();
 
 	if (jumpTime)
 		return jumpTime;
@@ -93,7 +94,7 @@ QString QnArchiveStreamReader::serializeLayout(const QnDeviceVideoLayout* layout
     QString rez;
     QTextStream ost(&rez);
     ost << layout->width() << ',' << layout->height();
-    for (int i = 0; i < layout->numberOfChannels(); ++i) {
+    for (unsigned i = 0; i < layout->numberOfChannels(); ++i) {
         ost << ';' << layout->h_position(i) << ',' << layout->v_position(i);
     }
     ost.flush();
@@ -405,7 +406,7 @@ begin_label:
 
 		//=================
 		if (isSingleShotMode() && skipFramesToTime() == 0)
-			pause();
+			CLLongRunnable::pause();
 	}
 
 	if (m_currentData && m_eof)
@@ -419,13 +420,13 @@ begin_label:
 	return m_currentData;
 }
 
-void QnArchiveStreamReader::channeljumpTo(quint64 mksec, int channel)
+void QnArchiveStreamReader::channeljumpTo(qint64 mksec, int channel)
 {
     QMutexLocker mutex(&m_jumpMtx);
     m_requiredJumpTime = mksec;
 }
 
-void QnArchiveStreamReader::intChanneljumpTo(quint64 mksec, int /*channel*/)
+void QnArchiveStreamReader::intChanneljumpTo(qint64 mksec, int /*channel*/)
 {
     QMutexLocker mutex(&m_cs);
     if (mksec > 0) {

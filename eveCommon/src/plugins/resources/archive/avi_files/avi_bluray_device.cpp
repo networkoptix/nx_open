@@ -11,7 +11,7 @@ CLAviBluRayDevice::~CLAviBluRayDevice()
 {
 }
 
-QnAbstractStreamDataProvider* CLAviBluRayDevice::createDataProvider(ConnectionRole role)
+QnAbstractStreamDataProvider* CLAviBluRayDevice::createDataProvider(ConnectionRole /*role*/)
 {
     QnArchiveStreamReader* result = new QnArchiveStreamReader(this);
     result->setArchiveDelegate(new QnAVIBlurayArchiveDelegate());

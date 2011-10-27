@@ -29,7 +29,7 @@ protected:
     virtual bool directSeekToPosition(qint64 pos_mks);
     virtual QStringList getPlaylist(const QString& url);
 private:
-    friend class CLAVIDvdStreamReaderPriv;
+    friend struct CLAVIDvdStreamReaderPriv;
     qint64 seek(qint64 offset, qint32 whence);
     qint32 writePacket(quint8* buf, int size);
     qint64 packetTimestamp(AVStream* stream, const AVPacket& packet);

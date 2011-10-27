@@ -27,6 +27,10 @@
 #include "nav_read.h"
 #include "dvdread_internal.h"
 
+#ifdef _MSC_VER
+#    pragma warning(push, disable: 4018) /* C4018: '?' : signed/unsigned mismatch */
+#endif
+
 void navRead_PCI(pci_t *pci, unsigned char *buffer) {
   int i, j;
 

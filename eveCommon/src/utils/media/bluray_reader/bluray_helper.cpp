@@ -3,6 +3,11 @@
 #include "utils/common/log.h"
 
 
+#ifdef _MSC_VER
+#    pragma warning(disable: 4189) /* C4189: '?' : local variable is initialized but not referenced. */
+#    pragma warning(disable: 4101) /* C4101: '?' : unreferenced local variable. */
+#endif
+
 static const int DEFAULT_PCR_PID = 4097;
 static const int DEFAULT_PMT_PID = 256;
 

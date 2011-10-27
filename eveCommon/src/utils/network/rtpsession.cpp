@@ -136,7 +136,7 @@ bool RTPSession::open(const QString& url)
 {
     mUrl = url;
 
-    unsigned int port = DEFAULT_RTP_PORT;
+    //unsigned int port = DEFAULT_RTP_PORT;
 
     m_tcpSock = new TCPSocket();
     m_tcpSock->setReadTimeOut(TCP_TIMEOUT);
@@ -475,8 +475,8 @@ void RTPSession::processRtcpData(const RtspStatistic* stats)
                 m_rtcpUdpSock.setDestAddr(lastReceivedAddr, lastReceivedPort);
             }
 
-            quint32 timestamp = 0;
-            double nptTime = 0;
+            //quint32 timestamp = 0;
+            //double nptTime = 0;
             if (stats)
             {
                 int outBufSize = buildRTCPReport(sendBuffer, stats);
@@ -611,6 +611,8 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
                 binaryFile->write((const char*) origData, demuxedCount);
                 binaryFile->flush();
 
+#else
+                Q_UNUSED(origData);
 #endif
                 return demuxedCount;
             }

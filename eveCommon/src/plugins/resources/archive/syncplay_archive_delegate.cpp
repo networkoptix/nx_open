@@ -7,7 +7,8 @@ QnSyncPlayArchiveDelegate::QnSyncPlayArchiveDelegate(QnAbstractArchiveReader* re
     m_reader(reader),
     m_syncWrapper(syncWrapper), 
     m_ownerDelegate(ownerDelegate),
-    m_seekTime(AV_NOPTS_VALUE)
+    m_seekTime(AV_NOPTS_VALUE),
+    m_enableSync(true)
 {
 
 }
@@ -17,7 +18,6 @@ QnSyncPlayArchiveDelegate::~QnSyncPlayArchiveDelegate()
     delete m_ownerDelegate;
     m_syncWrapper->erase(this);
 }
-
 
 bool QnSyncPlayArchiveDelegate::open(const QnResource* resource)
 {
@@ -39,16 +39,20 @@ qint64 QnSyncPlayArchiveDelegate::endTime()
     return m_syncWrapper->endTime();
 }
 
-qint64 QnSyncPlayArchiveDelegate::internalSeek (qint64 time)
+qint64 QnSyncPlayArchiveDelegate::jumpTo (qint64 time, bool makeshot)
 {
     QMutexLocker lock(&m_genericMutex);
     m_seekTime = time;
+    m_reader->jumpTo(time, makeshot);
     return time;
 }
 
 qint64 QnSyncPlayArchiveDelegate::seek (qint64 time)
 {
-    return m_syncWrapper->seek(time);
+    //return m_syncWrapper->seek(time);
+    m_seekTime = AV_NOPTS_VALUE;
+    m_tmpData = QnAbstractMediaDataPtr(0);
+    return m_ownerDelegate->seek(time);
 }
 
 QnDeviceVideoLayout* QnSyncPlayArchiveDelegate::getVideoLayout()
@@ -82,11 +86,10 @@ QnAbstractMediaDataPtr QnSyncPlayArchiveDelegate::getNextData()
         if (m_seekTime != AV_NOPTS_VALUE)
         {
             m_tmpData = QnAbstractMediaDataPtr(0);
-            m_ownerDelegate->seek(m_seekTime);
+            //m_ownerDelegate->seek(m_seekTime);
             m_seekTime = AV_NOPTS_VALUE;
         }
     }
-
 
     QnAbstractMediaDataPtr readedData = m_ownerDelegate->getNextData();
     bool isPrimaryVideo = qSharedPointerDynamicCast<QnCompressedVideoData>(readedData) && readedData->channelNumber == 0;
@@ -107,7 +110,8 @@ QnAbstractMediaDataPtr QnSyncPlayArchiveDelegate::getNextData()
         }
     }
 
-    if (m_tmpData && !m_reader->isSingleShotMode())
+    //if (m_tmpData && !m_reader->isSingleShotMode())
+    if (m_tmpData && m_enableSync)
         m_syncWrapper->waitIfNeed(m_reader, m_tmpData->timestamp);
 
     QMutexLocker lock(&m_genericMutex);
@@ -121,4 +125,9 @@ AVCodecContext* QnSyncPlayArchiveDelegate::setAudioChannel(int num)
 {
     // play synchronized movies without audio
     return 0;
+}
+
+void QnSyncPlayArchiveDelegate::enableSync(bool value)
+{
+    m_enableSync = value;
 }

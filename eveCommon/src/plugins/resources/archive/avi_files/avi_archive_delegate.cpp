@@ -251,20 +251,23 @@ bool QnAviArchiveDelegate::findStreams()
     if (!m_streamsFound) 
     {
         QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
-        m_streamsFound = av_find_stream_info(m_formatContext) >= 0;
-        if (m_streamsFound) {
-            if (m_formatContext->start_time != AV_NOPTS_VALUE)
-                m_startMksec = m_formatContext->start_time;
-            if ((m_startMksec == 0 || m_startMksec == AV_NOPTS_VALUE) && m_formatContext->streams > 0 && m_formatContext->streams[0]->first_dts != AV_NOPTS_VALUE)
-            {
-                AVStream* stream = m_formatContext->streams[0];
-                double timeBase = av_q2d(stream->time_base) * 1000000;
-                m_startMksec = stream->first_dts * timeBase;
+        if (!m_streamsFound)
+        {
+            m_streamsFound = av_find_stream_info(m_formatContext) >= 0;
+            if (m_streamsFound) {
+                if (m_formatContext->start_time != AV_NOPTS_VALUE)
+                    m_startMksec = m_formatContext->start_time;
+                if ((m_startMksec == 0 || m_startMksec == AV_NOPTS_VALUE) && m_formatContext->streams > 0 && m_formatContext->streams[0]->first_dts != AV_NOPTS_VALUE)
+                {
+                    AVStream* stream = m_formatContext->streams[0];
+                    double timeBase = av_q2d(stream->time_base) * 1000000;
+                    m_startMksec = stream->first_dts * timeBase;
+                }
+                initLayoutStreams();
             }
-            initLayoutStreams();
-        }
-        else {
-            close();
+            else {
+                close();
+            }
         }
     }
     return m_streamsFound;

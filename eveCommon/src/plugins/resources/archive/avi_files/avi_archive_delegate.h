@@ -4,7 +4,7 @@
 #include "../abstract_archive_delegate.h"
 
 
-class AVFormatContext;
+struct AVFormatContext;
 class CLCustomDeviceVideoLayout;
 class QnAviAudioLayout;
 

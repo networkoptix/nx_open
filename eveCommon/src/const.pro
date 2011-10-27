@@ -3,6 +3,7 @@ QT *= multimedia network xml
 CONFIG += x86 precompile_header %BUILDLIB
 CONFIG -= flat
 
+FFMPEG=%FFMPEG
 INCLUDEPATH += $$PWD
 PRECOMPILED_HEADER = $$PWD/StdAfx.h
 PRECOMPILED_SOURCE = $$PWD/StdAfx.cpp
@@ -42,7 +43,7 @@ win32 {
   win32-msvc* {
     QMAKE_CXXFLAGS += -MP /Fd$$OBJECTS_DIR
     DEFINES += _CRT_SECURE_NO_WARNINGS
-    INCLUDEPATH += $$PWD/../contrib/ffmpeg-misc-headers-win32
+    INCLUDEPATH += $$PWD/contrib/ffmpeg-misc-headers-win32
   }
 
   !staticlib {

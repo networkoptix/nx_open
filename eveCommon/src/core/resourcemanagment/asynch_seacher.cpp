@@ -62,7 +62,7 @@ void QnResourceDiscoveryManager::run()
 QnResourceList QnResourceDiscoveryManager::findNewResources(bool& ip_finished)
 {
     
-    bool allow_to_change_ip = true;
+    //bool allow_to_change_ip = true;
     static const int  threads = 5;
 
     ip_finished = false;

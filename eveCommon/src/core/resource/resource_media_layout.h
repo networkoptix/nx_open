@@ -28,7 +28,7 @@ class QnEmptyAudioLayout: public QnDeviceAudioLayout
 public:
     QnEmptyAudioLayout(): QnDeviceAudioLayout() {}
     virtual unsigned int numberOfChannels() const { return 0; }
-    virtual AudioTrack getAudioTrackInfo(int index) { return AudioTrack(); }
+    virtual AudioTrack getAudioTrackInfo(int /*index*/) { return AudioTrack(); }
 };
 
 class QnDeviceVideoLayout: public QnDeviceLayout

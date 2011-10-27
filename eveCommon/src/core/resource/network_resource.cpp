@@ -22,7 +22,7 @@ void QnNetworkResource::deserialize(const QnResourceParameters& parameters)
     QnResource::deserialize(parameters);
 
     const char* MAC = "mac";
-    const char* URL = "url";
+    //const char* URL = "url";
     const char* LOGIN = "login";
     const char* PASSWORD = "password";
 
@@ -54,7 +54,7 @@ QHostAddress QnNetworkResource::getHostAddress() const
     return m_hostAddr;
 }
 
-bool QnNetworkResource::setHostAddress(const QHostAddress& ip, QnDomain domain )
+bool QnNetworkResource::setHostAddress(const QHostAddress& ip, QnDomain /*domain*/ )
 {
     QMutexLocker mutex(&m_mutex);
     m_hostAddr = ip;

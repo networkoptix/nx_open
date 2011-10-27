@@ -15,9 +15,9 @@ public:
     QnArchiveStreamReader(QnResource* dev);
     virtual ~QnArchiveStreamReader();
 
-    virtual quint64 currentTime() const;
+    virtual qint64 currentTime() const;
 
-    void previousFrame(quint64 mksec);
+    void previousFrame(qint64 mksec);
 
     virtual QStringList getAudioTracksInfo() const;
     virtual unsigned int getCurrentAudioChannel() const;
@@ -36,7 +36,7 @@ public:
     qint64 endTime() const { return m_delegate->endTime(); }
 protected:
     virtual QnAbstractMediaDataPtr getNextData();
-    virtual void channeljumpTo(quint64 mksec, int channel);
+    virtual void channeljumpTo(qint64 mksec, int channel);
 
     virtual bool init();
 
@@ -88,7 +88,7 @@ private:
     QnAbstractMediaDataPtr m_nextData;
 
     qint64 determineDisplayTime();
-    void intChanneljumpTo(quint64 mksec, int channel);
+    void intChanneljumpTo(qint64 mksec, int channel);
     bool getNextVideoPacket();
     void addAudioChannel(QnCompressedAudioDataPtr audio);
     QnAbstractMediaDataPtr getNextPacket();

@@ -23,7 +23,7 @@ public:
     virtual QnDeviceAudioLayout* getAudioLayout(QnAbstractMediaStreamDataProvider* reader);
 
     // size - is size of one channel; we assume all channels have the same size
-    virtual QnStreamQuality getBestQualityForSuchOnScreenSize(const QSize& size) const { return QnQualityNormal; }
+    virtual QnStreamQuality getBestQualityForSuchOnScreenSize(const QSize& /*size*/) const { return QnQualityNormal; }
 
     // returns one image best for such time
     // in case of live video time should be ignored

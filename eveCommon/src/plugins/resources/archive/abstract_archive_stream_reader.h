@@ -8,6 +8,7 @@
 
 class QnAbstractArchiveReader : public CLClientPullStreamreader
 {
+    Q_OBJECT
 public:
 	QnAbstractArchiveReader(QnResource* dev);
 	virtual ~QnAbstractArchiveReader();
@@ -19,7 +20,7 @@ public:
 	        bool isSingleShotMode() const;
 
 
-	virtual quint64 currentTime() const = 0;
+	virtual qint64 currentTime() const = 0;
 	bool isSkippingFrames() const;
 
 	/**
@@ -28,11 +29,11 @@ public:
 	quint64 lengthMksec() const;
     quint64 startMksec() const;
 
-	        virtual void jumpTo(quint64 mksec, bool makeshot);
-	void jumpToPreviousFrame(quint64 mksec, bool makeshot);
+    virtual void jumpTo(qint64 mksec, bool makeshot);
+	void jumpToPreviousFrame(qint64 mksec, bool makeshot);
 
-    virtual void previousFrame(quint64 /*mksec*/) {}
-    virtual void nextFrame() {}
+    virtual void previousFrame(qint64 /*mksec*/);
+    virtual void nextFrame();
 
 
     // gives a list of audio tracks 
@@ -46,10 +47,22 @@ public:
     virtual bool isNegativeSpeedSupported() const = 0;
 
     void setCycleMode(bool value);
+
+    virtual void pause();
+    virtual void resume();
+
+    virtual void setSkipFramesToTime(qint64 skipFramesToTime);
+    qint64 skipFramesToTime() const;
+
+signals:
+    void singleShotModeChanged(bool value);
+    void jumpOccured(qint64 mksec, bool makeshot);
+    void streamPaused();
+    void streamResumed();
+    void nextFrameOccured();
+    void prevFrameOccured();
 protected:
-	virtual void channeljumpTo(quint64 mksec, int channel) = 0;
-    quint64 skipFramesToTime() const;
-    virtual void setSkipFramesToTime(quint64 skipFramesToTime);
+	virtual void channeljumpTo(qint64 mksec, int channel) = 0;
 
 protected:
     bool m_cycleMode;
@@ -66,7 +79,7 @@ protected:
 	bool m_useTwice;
     QnAbstractArchiveDelegate* m_delegate;
 private:
-	quint64 m_skipFramesToTime;
+	qint64 m_skipFramesToTime;
 };
 
 #endif //abstract_archive_stream_reader_h1907

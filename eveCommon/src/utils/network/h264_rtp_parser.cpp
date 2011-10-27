@@ -285,8 +285,8 @@ QnAbstractMediaDataPtr CLH264RtpParser::getNextData()
                     }
                     bytesLeft = 0;
                     break;
-                MTAP16_PACKET:
-                MTAP24_PACKET:
+                case MTAP16_PACKET:
+                case MTAP24_PACKET:
                 default:
                     return QnAbstractMediaDataPtr();
             }

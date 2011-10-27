@@ -247,6 +247,8 @@ bool CommunicatingSocket::connect(const QString &foreignAddress,
       //throw SocketException("Connect failed (connect())", true);
       return false;
   }
+#else
+  Q_UNUSED(connectResult);
 #endif
 
 #ifdef _WIN32

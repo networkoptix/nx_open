@@ -79,7 +79,7 @@ QnAbstractMediaStreamDataProvider* QnMediaResource::getMediaProvider(int number)
     return it.value();
 }
 
-QImage QnMediaResource::getImage(int channnel, QDateTime time, QnStreamQuality quality)
+QImage QnMediaResource::getImage(int /*channnel*/, QDateTime /*time*/, QnStreamQuality /*quality*/)
 {
     return QImage();
 }

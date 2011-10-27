@@ -31,9 +31,10 @@ public:
     virtual QnDeviceVideoLayout* getVideoLayout() = 0;
     virtual QnDeviceAudioLayout* getAudioLayout() = 0;
 
-    virtual AVCodecContext* setAudioChannel(int num)    { return 0; }
+    virtual AVCodecContext* setAudioChannel(int /*num*/) { return 0; }
+    
     // this call inform delegate that reverse mode on/off
-    virtual void onReverseMode(qint64 displayTime, bool value) {}
+    virtual void onReverseMode(qint64 /*displayTime*/, bool /*value*/) {}
 
     Flags getFlags() const { return m_flags; }
 protected:

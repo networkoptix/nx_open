@@ -3,6 +3,11 @@
 #include "bitStream.h"
 #include <QString>
 
+#ifdef _MSC_VER
+#    pragma warning(disable: 4189) /* C4189: '?' : local variable is initialized but not referenced. */
+#    pragma warning(disable: 4101) /* C4101: '?' : unreferenced local variable. */
+#endif
+
 static const double FRAME_RATE_EPS = 3e-5;
 
 void NALUnit::write_rbsp_trailing_bits(BitStreamWriter& writer)

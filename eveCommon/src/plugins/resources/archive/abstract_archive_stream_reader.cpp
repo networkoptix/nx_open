@@ -26,8 +26,9 @@ void QnAbstractArchiveReader::setSingleShotMode(bool single)
     if (!m_singleShot)
     {
         m_adaptiveSleep.afterdelay();
-        resume();
+        CLLongRunnable::resume();
     }
+    emit singleShotModeChanged(single);
 }
 
 bool QnAbstractArchiveReader::isSingleShotMode() const
@@ -41,11 +42,13 @@ quint64 QnAbstractArchiveReader::lengthMksec() const
     return m_lengthMksec;
 }
 
-void QnAbstractArchiveReader::jumpTo(quint64 mksec, bool makeshot)
+void QnAbstractArchiveReader::jumpTo(qint64 mksec, bool makeshot)
 {
+    emit jumpOccured(mksec, makeshot);
+
      //QMutexLocker mutex(&m_cs);
 
-    nextFrame();
+    //nextFrame();
 
     //for (int channel = 0; channel  < m_channel_number; ++channel)
         //channeljumpTo(mksec, channel);
@@ -55,24 +58,24 @@ void QnAbstractArchiveReader::jumpTo(quint64 mksec, bool makeshot)
     m_useTwice = true;
 
     if (makeshot && isSingleShotMode())
-        resume();
+        CLLongRunnable::resume();
 }
 
-void QnAbstractArchiveReader::jumpToPreviousFrame(quint64 mksec, bool makeshot)
+void QnAbstractArchiveReader::jumpToPreviousFrame(qint64 mksec, bool makeshot)
 {
     setSkipFramesToTime(mksec);
 
     jumpTo(qMax(0ll, (qint64)mksec - 200 * 1000), makeshot);
 }
 
-quint64 QnAbstractArchiveReader::skipFramesToTime() const
+qint64 QnAbstractArchiveReader::skipFramesToTime() const
 {
     QMutexLocker mutex(&m_framesMutex);
 
     return m_skipFramesToTime;
 }
 
-void QnAbstractArchiveReader::setSkipFramesToTime(quint64 skipFramesToTime)
+void QnAbstractArchiveReader::setSkipFramesToTime(qint64 skipFramesToTime)
 {
     QMutexLocker mutex(&m_framesMutex);
     m_skipFramesToTime = skipFramesToTime;
@@ -116,4 +119,27 @@ QnAbstractArchiveDelegate* QnAbstractArchiveReader::getArchiveDelegate() const
 void QnAbstractArchiveReader::setCycleMode(bool value)
 {
     m_cycleMode = value;
+}
+
+void QnAbstractArchiveReader::pause()
+{
+    CLClientPullStreamreader::pause();
+    emit streamPaused();
+}
+
+void QnAbstractArchiveReader::resume()
+{
+    CLClientPullStreamreader::resume();
+    emit streamResumed();
+}
+
+void QnAbstractArchiveReader::nextFrame()
+{
+    emit nextFrameOccured();
+    resume();
+}
+
+void QnAbstractArchiveReader::previousFrame(qint64 mksec)
+{
+    emit prevFrameOccured();
 }
