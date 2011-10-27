@@ -43,7 +43,7 @@ def rmtree(path):
         os.unlink(path)
 
 def gen_filetypes_h():
-    filetypes_h = open('src/device_plugins/archive/filetypes.h', 'w')
+    filetypes_h = open('src/plugins/resources/archive/filetypes.h', 'w')
     print >> filetypes_h, '#ifndef UNICLIENT_FILETYPES_H_'
     print >> filetypes_h, '#define UNICLIENT_FILETYPES_H_'
     print >> filetypes_h, '// This file is generated. Edit filetypes.py instead.'
