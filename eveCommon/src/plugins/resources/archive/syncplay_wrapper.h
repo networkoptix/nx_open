@@ -2,19 +2,20 @@
 #define __SYNCPLAY_WRAPPER_H__
 
 #include "utils/common/base.h"
+#include "utils/media/externaltimesource.h"
 
 
 class QnAbstractArchiveReader;
 class QnAbstractArchiveDelegate;
-class CLVideoCamera;
+class QnlTimeSource;
 
-class QnArchiveSyncPlayWrapper: public QObject, public QnCamExternalTimeSource
+class QnArchiveSyncPlayWrapper: public QObject, public QnlTimeSource
 {
     Q_OBJECT
 public:
     QnArchiveSyncPlayWrapper();
     virtual ~QnArchiveSyncPlayWrapper();
-    void addArchiveReader(QnAbstractArchiveReader* reader, CLVideoCamera* cam);
+    void addArchiveReader(QnAbstractArchiveReader* reader, QnlTimeSource* cam);
     void removeArchiveReader(QnAbstractArchiveReader* reader);
 
     virtual qint64 getCurrentTime() const;
@@ -33,6 +34,8 @@ private:
     void waitIfNeed(QnAbstractArchiveReader* reader, qint64 timestamp);
     void onNewDataReaded();
     void erase(QnAbstractArchiveDelegate* value);
+
+    qint64 selfCurrentTime(void) const;
 private:
     friend class QnSyncPlayArchiveDelegate;
     QN_DECLARE_PRIVATE(QnArchiveSyncPlayWrapper);

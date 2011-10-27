@@ -3,12 +3,13 @@
 #include "syncplay_wrapper.h"
 #include "syncplay_archive_delegate.h"
 #include "abstract_archive_stream_reader.h"
+#include "utils/media/externaltimesource.h"
 
 static const qint64 WAIT_EPS = 0; //100 * 1000;
 
 struct ReaderInfo
 {
-    ReaderInfo(QnAbstractArchiveReader* _reader, QnAbstractArchiveDelegate* _oldDelegate, CLVideoCamera* _cam):
+    ReaderInfo(QnAbstractArchiveReader* _reader, QnAbstractArchiveDelegate* _oldDelegate, QnlTimeSource* _cam):
         reader(_reader),
         oldDelegate(_oldDelegate),
         cam(_cam)
@@ -16,7 +17,7 @@ struct ReaderInfo
     }
     QnAbstractArchiveReader* reader;
     QnAbstractArchiveDelegate* oldDelegate;
-    CLVideoCamera* cam;
+    QnlTimeSource* cam;
 };
 
 struct QnArchiveSyncPlayWrapper::QnArchiveSyncPlayWrapperPrivate
@@ -52,13 +53,13 @@ QnArchiveSyncPlayWrapper::~QnArchiveSyncPlayWrapper()
     delete d_ptr;
 }
 
-void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveReader* reader, CLVideoCamera* cam)
+void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveReader* reader, QnlTimeSource* cam)
 {
     Q_D(QnArchiveSyncPlayWrapper);
     if (reader == 0)
         return;
     d->readers << ReaderInfo(reader, reader->getArchiveDelegate(), cam);
-    cam->setExternalTimeSource(this);
+    
 
     reader->setArchiveDelegate(new QnSyncPlayArchiveDelegate(reader, this, reader->getArchiveDelegate()));
     reader->setCycleMode(false);
@@ -241,6 +242,12 @@ void QnArchiveSyncPlayWrapper::erase(QnAbstractArchiveDelegate* value)
         }
     }
 }
+
+qint64 QnArchiveSyncPlayWrapper::selfCurrentTime(void) const
+{
+    return getCurrentTime();
+}
+
 
 qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
 {
