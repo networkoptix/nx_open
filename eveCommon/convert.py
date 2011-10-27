@@ -7,7 +7,7 @@ import time
 
 from filetypes import all_filetypes, video_filetypes, image_filetypes
 
-os.path = posixpath
+# os.path = posixpath
 
 FFMPEG_VERSION = '2011-08-29'
 
@@ -17,6 +17,9 @@ EXCLUDE_FILES = ('dxva', 'moc_', 'qrc_', 'StdAfx')
 # Should be 'staticlib' or '' for DLL
 BUILDLIB = 'staticlib'
 # BUILDLIB = ''
+
+def qt_path(path):
+    return path.replace('\\', '/').lstrip('/')
 
 def instantiate_pro(profile, params):
     class T(string.Template):
@@ -54,7 +57,7 @@ def gen_filetypes_h():
 
 
 def setup_ffmpeg():
-    ffmpeg_path = os.getenv('EVE_FFMPEG').replace('\\', '/')
+    ffmpeg_path = qt_path(os.getenv('EVE_FFMPEG'))
 
     if not ffmpeg_path:
         print r"""EVE_FFMPEG environment variable is not defined.
@@ -73,7 +76,7 @@ def setup_ffmpeg():
         ffmpeg += '-macos'
 
 
-    ffmpeg_path = os.path.join(ffmpeg_path, ffmpeg)
+    ffmpeg_path = posixpath.join(ffmpeg_path, ffmpeg)
     ffmpeg_path_debug = ffmpeg_path + '-debug'
     ffmpeg_path_release = ffmpeg_path + '-release'
 
@@ -124,16 +127,17 @@ def index_dirs(xdirs, template_file, output_file, exclude_dirs=(), exclude_files
 
     print >> uniclient_pro
     for header in headers:
-        print >> uniclient_pro, "HEADERS += $$PWD/%s" % header
+        print >> uniclient_pro, "HEADERS += $$PWD/%s" % qt_path(header)
 
     print >> uniclient_pro
     for cpp in sources:
-        print >> uniclient_pro, "SOURCES += $$PWD/%s" % cpp
+        print >> uniclient_pro, "SOURCES += $$PWD/%s" % qt_path(cpp)
 
     uniclient_pro.close()
 
 def convert():
     oldpwd = os.getcwd()
+    print os.path.realpath(__file__)
     os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
     try:
@@ -154,7 +158,6 @@ def convert():
             os.system('qmake -tp vc -o src/common.vcproj src/common.pro')
 
         elif sys.platform == 'darwin':
-            pass
             os.system('qmake -spec macx-g++ CONFIG-=release CONFIG+=debug -o build/Makefile.debug src/common.pro')
             os.system('qmake -spec macx-g++ CONFIG-=debug CONFIG+=release -o build/Makefile.release src/common.pro')
     finally:
