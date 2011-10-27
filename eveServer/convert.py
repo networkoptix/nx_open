@@ -14,26 +14,12 @@ from string import Template
 os.path = posixpath
 sys.path.insert(0, '../eveCommon')
 
-from convert import index_dirs, index_common
+from convert import index_dirs, rmtree, setup_ffmpeg, instantiate_pro, BUILDLIB
 
 FFMPEG_VERSION = '2011-08-29'
 
 EXCLUDE_DIRS = ('.svn', 'dxva')
 EXCLUDE_FILES = ('dxva', 'moc_', 'qrc_', 'StdAfx')
-
-def rmtree(path):
-    def on_rm_error( func, path, exc_info):
-        # Dirty windows hack. Sometimes windows list already deleted files/folders.
-        # Command line "rmdir /Q /S" also fails. So, just wait while the files really deleted.
-        for i in xrange(20):
-            if not os.listdir(path):
-                break
-
-            time.sleep(1)
-
-        func(path)
-
-    shutil.rmtree(path, onerror = on_rm_error)
 
 def copy_files(src_glob, dst_folder):
     for fname in glob.iglob(src_glob):
@@ -46,40 +32,6 @@ def link_or_copy(src, dst):
     except:
         shutil.copy(src, dst)
 
-
-def setup_ffmpeg():
-    ffmpeg_path = os.getenv('EVE_FFMPEG').replace('\\', '/')
-
-    if not ffmpeg_path:
-        print r"""EVE_FFMPEG environment variable is not defined.
-
-    Do the following:
-    1. Clone repository ssh://hg@vigasin.com/ffmpeg to somewhere, say c:\programming\ffmpeg
-    2. Go to c:\programming\ffmpeg and run get_ffmpegs.bat
-    3. Add system environment variable EVE_FFMPEG with value c:\programming\ffmpeg
-    """
-        sys.exit(1)
-
-    ffmpeg = 'ffmpeg-git-' + FFMPEG_VERSION
-    if sys.platform == 'win32':
-        ffmpeg += '-mingw'
-    else:
-        ffmpeg += '-macos'
-
-
-    ffmpeg_path = os.path.join(ffmpeg_path, ffmpeg)
-    ffmpeg_path_debug = ffmpeg_path + '-debug'
-    ffmpeg_path_release = ffmpeg_path + '-release'
-
-    if not os.path.isdir(ffmpeg_path_debug):
-        print >> sys.stderr, "Can't find directory %s. Make sure variable EVE_FFMPEG is correct." % ffmpeg_path_debug
-        sys.exit(1)
-
-    if not os.path.isdir(ffmpeg_path_release):
-        print >> sys.stderr, "Can't find directory %s. Make sure variable EVE_FFMPEG is correct." % ffmpeg_path_release
-        sys.exit(1)
-
-    return ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release
 
 def gen_version_h():
     version_h = open('src/version.h', 'w')
@@ -144,11 +96,8 @@ copy_files('resource/arecontvision/*', destdir_release + '/arecontvision')
 
 gen_version_h()
 
-
-index_common()
-
 index_dirs(('src',), 'src/const.pro', 'src/server.pro', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
-
+instantiate_pro('src/server.pro', {'BUILDLIB' : BUILDLIB, 'FFMPEG' : ffmpeg_path})
 
 if sys.platform == 'win32':
     os.system('qmake -tp vc FFMPEG=%s -o server.vcproj src/server.pro' % ffmpeg_path)

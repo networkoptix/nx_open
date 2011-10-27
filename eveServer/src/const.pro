@@ -1,5 +1,8 @@
-include(../../eveCommon/src/common.pri)
 INCLUDEPATH += ../../eveCommon/src
+
+win* {
+  INCLUDEPATH += ../../eveCommon/contrib/ffmpeg-misc-headers-win32
+}
 
 QT = core gui network xml opengl multimedia webkit
 CONFIG += x86 precompile_header
@@ -9,9 +12,12 @@ VERSION = 0.0.1
 ICON = eve_logo.icns
 QMAKE_INFO_PLIST = Info.plist
 
+BUILDLIB = %BUILDLIB
+FFMPEG = %FFMPEG
+
 TARGET = Server
 
-win32: RC_FILE = uniclient.rc
+win32: RC_FILE = server.rc
 
 CONFIG(debug, debug|release) {
   INCLUDEPATH += $$FFMPEG-debug/include
@@ -47,7 +53,12 @@ win32 {
 
   LIBS += -ld3d9 -ld3dx9 -lwinmm
 
-  SOURCES += dsp_effects/speex/preprocess.c dsp_effects/speex/filterbank.c dsp_effects/speex/fftwrap.c dsp_effects/speex/smallft.c  dsp_effects/speex/mdf.c
+  SOURCES += 
+
+  # Define QN_EXPORT only if eveCommon build is not static
+  isEmpty(BUILDLIB) { DEFINES += QN_EXPORT=Q_DECL_IMPORT }
+  !isEmpty(BUILDLIB) { DEFINES += QN_EXPORT= }
+
 }
 
 mac {
@@ -60,6 +71,8 @@ mac {
   QMAKE_BUNDLE_DATA += PRIVATE_FRAMEWORKS
 
   QMAKE_POST_LINK += mkdir -p `dirname $(TARGET)`/arecontvision; cp -f $$PWD/../resource/arecontvision/devices.xml `dirname $(TARGET)`/arecontvision
+
+  DEFINES += QN_EXPORT=
 }
 
 INCLUDEPATH += $$PWD
