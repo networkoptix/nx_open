@@ -4,10 +4,9 @@
 #include "abstract_archive_stream_reader.h"
 #include "core/resource/resource_media_layout.h"
 #include "utils/media/ffmpeg_helper.h"
-
+#include <libavformat/avformat.h>
 
 struct AVFormatContext;
-
 
 class QnArchiveStreamReader : public QnAbstractArchiveReader
 {
