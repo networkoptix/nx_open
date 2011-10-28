@@ -65,6 +65,21 @@ public:
 
     bool onPause() const { return m_onPause; }
 
+    void smartSleep(int ms) // not precise 
+    {
+        int n = ms/100;
+        
+        while(!needToStop())
+        {
+            msleep(n);
+        }
+
+        if (!needToStop())
+        {
+            msleep(ms%100);
+        }
+    }
+
 protected:
     bool m_runing;
     volatile bool m_needStop;

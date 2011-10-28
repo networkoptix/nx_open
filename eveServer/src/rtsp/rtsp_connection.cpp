@@ -11,7 +11,7 @@
 #include "core//dataconsumer/dataconsumer.h"
 #include "utils/media/ffmpeg_helper.h"
 #include "core/dataprovider/media_streamdataprovider.h"
-#include "utils/common/resource_pool.h"
+#include "core/resourcemanagment/resource_pool.h"
 #include "core/resource/resource_media_layout.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 

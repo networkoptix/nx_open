@@ -1,8 +1,8 @@
 #include <QFileInfo>
 
 #include "file_resource.h"
+#include "core/dataprovider/single_shot_file_dataprovider.h"
 
-#include "../dataprovider/single_shot_file_reader.h"
 
 QnLocalFileResource::QnLocalFileResource(const QString &filename)
 {

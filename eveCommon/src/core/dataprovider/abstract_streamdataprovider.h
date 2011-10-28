@@ -26,7 +26,6 @@ public:
 
     virtual bool dataCanBeAccepted() const;
 
-	//void setStatistics(QnStatistics* stat);
 	virtual void setStreamParams(QnParamList newParam);
 	QnParamList getStreamParam() const;
 

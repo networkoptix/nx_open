@@ -1,8 +1,9 @@
 #ifndef single_shot_reader_h_105
 #define single_shot_reader_h_105
 
-#include "streamreader.h"
+
 #include "../datapacket/mediadatapacket.h"
+#include "abstract_streamdataprovider.h"
 
 
 struct QnAbstractMediaData;

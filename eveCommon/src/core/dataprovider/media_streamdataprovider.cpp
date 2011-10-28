@@ -92,7 +92,7 @@ bool QnAbstractMediaStreamDataProvider::afterGetData(QnAbstractDataPacketPtr d)
         if (mFramesLost == 4) // if we lost 2 frames => connection is lost for sure (2)
             m_stat[0].onLostConnection();
 
-        CLSleep::msleep(10);
+        QnSleep::msleep(10);
 
         return false;
     }

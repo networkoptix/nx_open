@@ -1,5 +1,5 @@
-#include "./single_shot_reader.h"
 #include "../resource/resource.h"
+#include "single_shot_dataprovider.h"
 
 
 CLSingleShotStreamreader::CLSingleShotStreamreader(QnResource* dev ):

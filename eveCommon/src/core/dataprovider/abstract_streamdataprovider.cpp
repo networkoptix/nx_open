@@ -1,4 +1,4 @@
-#include "streamreader.h"
+#include "abstract_streamdataprovider.h"
 
 
 QnAbstractStreamDataProvider::QnAbstractStreamDataProvider(QnResource* resource):

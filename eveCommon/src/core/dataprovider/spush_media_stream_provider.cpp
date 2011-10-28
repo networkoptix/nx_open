@@ -1,14 +1,15 @@
-#include "cpull_stremreader.h"
+
 #include "utils/common/sleep.h"
+#include "spush_media_stream_provider.h"
 
 
-CLClientPullStreamreader::CLClientPullStreamreader(QnResource* dev ):
+CLServerPushStreamreader::CLServerPushStreamreader(QnResource* dev ):
 QnAbstractMediaStreamDataProvider(dev)
 {
 }
 
 
-void CLClientPullStreamreader::run()
+void CLServerPushStreamreader::run()
 {
 	CL_LOG(cl_logINFO) cl_log.log(QLatin1String("stream reader started."), cl_logINFO);
 
@@ -23,23 +24,28 @@ void CLClientPullStreamreader::run()
 		if (needToStop()) // extra check after pause
 			break;
 
-		// check queue sizes
+        if (!isStreamOpened())
+        {
+            openStream();
+            if (!isStreamOpened())
+            {
+                QnSleep::msleep(20); // to avoid large CPU usage
 
-		if (!dataCanBeAccepted())
-		{
-			CLSleep::msleep(5);
-			continue;
-		}
+                closeStream(); // to release resources 
 
+                setNeedKeyData();
+                frames_lost++;
+                m_stat[0].onData(0);
+                m_stat[0].onEvent(CL_STAT_FRAME_LOST);
 
-		if (QnResource::commandProchasSuchDeviceInQueue(m_resource->getUniqueId())) // if command processor has something in the queue for this device let it go first
-		{
-			CLSleep::msleep(5);
-			continue;
-		}
+                if (frames_lost==4) // if we lost 2 frames => connection is lost for sure (2)
+                    m_stat[0].onLostConnection();
 
-		QnAbstractDataPacketPtr data = getNextData();
-		//continue;
+                continue;
+            }
+        }
+
+        QnAbstractMediaDataPtr data = getNextData();
 
 		if (data==0)
 		{
@@ -50,8 +56,6 @@ void CLClientPullStreamreader::run()
 
 			if (frames_lost==4) // if we lost 2 frames => connection is lost for sure (2)
 				m_stat[0].onLostConnection();
-
-			CLSleep::msleep(30);
 
 			continue;
 		}
@@ -93,10 +97,21 @@ void CLClientPullStreamreader::run()
 		data->dataProvider = this;
 
         if (videoData)
-            m_stat[videoData->channelNumber].onData(videoData->data.size());
+            m_stat[videoData->channelNumber].onData(data->data.size());
 
-		putData(data);
-	}
+        // check queue sizes
+        if (dataCanBeAccepted())
+            putData(data);
+        else
+        {
+            setNeedKeyData();
+        }
 
-	CL_LOG(cl_logINFO) cl_log.log(QLatin1String("stream reader stopped."), cl_logINFO);
+
+    }
+
+    if (isStreamOpened())
+        closeStream();
+
+    CL_LOG(cl_logINFO) cl_log.log(QLatin1String("stream reader stopped."), cl_logINFO);
 }
