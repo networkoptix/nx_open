@@ -19,9 +19,6 @@ public:
     QnMediaResource();
     virtual ~QnMediaResource();
 
-    virtual QnVideoResourceLayout* getVideoLayout(QnAbstractMediaStreamDataProvider* reader);
-    virtual QnResourceAudioLayout* getAudioLayout(QnAbstractMediaStreamDataProvider* reader);
-
     // size - is size of one channel; we assume all channels have the same size
     virtual QnStreamQuality getBestQualityForSuchOnScreenSize(const QSize& /*size*/) const { return QnQualityNormal; }
 

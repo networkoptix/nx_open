@@ -19,21 +19,3 @@ QImage QnMediaResource::getImage(int /*channnel*/, QDateTime /*time*/, QnStreamQ
 {
     return QImage();
 }
-
-QnVideoResourceLayout* QnMediaResource::getVideoLayout(QnAbstractMediaStreamDataProvider* reader)
-{
-    static QnDefaultDeviceVideoLayout defaultLayout;
-    if (reader)
-        return reader->getVideoLayout();
-    else
-        return &defaultLayout;
-}
-
-QnResourceAudioLayout* QnMediaResource::getAudioLayout(QnAbstractMediaStreamDataProvider* reader)
-{
-    static QnEmptyAudioLayout defaultLayout;
-    if (reader)
-        return reader->getAudioLayout();
-    else
-        return &defaultLayout;
-}
