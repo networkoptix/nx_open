@@ -1,10 +1,10 @@
 #include <QtCore/QtConcurrentMap>
 #include <QtCore/QThreadPool>
 #include "asynch_seacher.h"
-#include "utils/common/resource_pool.h"
 #include "utils/common/sleep.h"
 #include "resourceserver.h"
 #include "../resource/network_resource.h"
+#include "resource_pool.h"
 
 
 
@@ -30,12 +30,18 @@ void QnResourceDiscoveryManager::addDeviceServer(QnAbstractResourceSearcher* ser
 	m_searchersList.push_back(serv);
 }
 
-/*
-QnResourceList QnResourceDiscoveryManager::result()
+void QnResourceDiscoveryManager::pleaseStop()
 {
-	return m_result;
+    {
+        QMutexLocker lock(&m_searchersListMtx);
+        foreach(QnAbstractResourceSearcher* searcher, m_searchersList)
+        {
+            searcher->pleaseStop();
+        }
+    }
+
+    CLLongRunnable::pleaseStop();
 }
-/**/
 
 void QnResourceDiscoveryManager::run()
 {
@@ -54,7 +60,7 @@ void QnResourceDiscoveryManager::run()
 
 
         int global_delay_between_search = 1000;
-        CLSleep::sleep(global_delay_between_search);
+        smartSleep(global_delay_between_search);
 
     }
 }
@@ -79,16 +85,20 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool& ip_finished)
     QnResourceList::iterator it;
 
 
+    ResourceSearcherList searchersList;
+    {
+        QMutexLocker lock(&m_searchersListMtx);
+        searchersList = m_searchersList;
+    }
+
+		
+	foreach(QnAbstractResourceSearcher* searcher, searchersList)
 	{
-		QMutexLocker lock(&m_searchersListMtx);
-		foreach(QnAbstractResourceSearcher* searcher, m_searchersList)
-		{
-            if (searcher->shouldBeUsed() && !needToStop())
-            {
-			    QnResourceList temp = searcher->findResources();
-			    resources.append(temp);
-            }
-		}
+        if (searcher->shouldBeUsed() && !needToStop())
+        {
+		    QnResourceList temp = searcher->findResources();
+		    resources.append(temp);
+        }
 	}
 
     //assemble list of existing ip

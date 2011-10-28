@@ -4,7 +4,7 @@
 QnResourcePool::QnResourcePool():
 m_resourcesMtx(QMutex::Recursive)
 {
-
+    qRegisterMetaType<QnResourcePtr>("QnResourcePtr");
 }
 
 QnResourcePool::~QnResourcePool()
@@ -25,6 +25,7 @@ void QnResourcePool::addResource(QnResourcePtr resource)
     if (!resource->getId().isValid())
         resource->setId(QnId::generateSpecialId());
     m_resources[resource->getId()] = resource;
+    emit resourceAdded(resource);
 }
 
 void QnResourcePool::addResources(QnResourceList resources)
@@ -35,6 +36,7 @@ void QnResourcePool::addResources(QnResourceList resources)
         if (!res->getId().isValid())
             res->setId(QnId::generateSpecialId());
         m_resources[res->getId()] = res;
+        emit resourceAdded(res);
     }
 }
 
@@ -42,6 +44,7 @@ void QnResourcePool::removeResource(QnResourcePtr resource)
 {
     QMutexLocker mtx(&m_resourcesMtx);
     m_resources.remove(resource->getId());
+    emit resourceRemoved(resource);
 }
 
 void QnResourcePool::removeResources(QnResourceList resources)
@@ -50,9 +53,9 @@ void QnResourcePool::removeResources(QnResourceList resources)
     foreach(QnResourcePtr res, resources)
     {
         m_resources.remove(res->getId());
+        emit resourceRemoved(res);
     }
 }
-
 
 QnResourcePtr QnResourcePool::getResourceById(const QnId& id) const
 {

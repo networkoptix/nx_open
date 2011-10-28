@@ -19,8 +19,8 @@ BUILDLIB = 'staticlib'
 # BUILDLIB = ''
 
 # Temporary hack for development. There are some problems on mac with debugging static libs.
-if sys.platform == 'darwin':
-    BUILDLIB = ''
+#if sys.platform == 'darwin':
+#    BUILDLIB = ''
 
 def link_or_copy(src, dst):
     try:

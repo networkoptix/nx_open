@@ -1,8 +1,9 @@
 #ifndef single_shot_file_reader_h_215
 #define single_shot_file_reader_h_215
 
-#include "single_shot_reader.h"
+
 #include "../datapacket/mediadatapacket.h"
+#include "single_shot_dataprovider.h"
 
 struct QnAbstractMediaData;
 
@@ -13,7 +14,7 @@ struct QnAbstractMediaData;
 class QN_EXPORT CLSingleShotFileStreamreader : public CLSingleShotStreamreader
 {
 public:
-	CLSingleShotFileStreamreader(QnResource* dev );
+	CLSingleShotFileStreamreader(QnResourcePtr dev );
 	~CLSingleShotFileStreamreader(){stop();}
 
 protected:

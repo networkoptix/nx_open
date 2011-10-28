@@ -20,8 +20,10 @@ class CLRecorderDevice;
 
 #define qnResPool QnResourcePool::instance()
 
-class QN_EXPORT QnResourcePool 
+class QN_EXPORT QnResourcePool: public QObject
 {
+    Q_OBJECT
+
     QnResourcePool();
     ~QnResourcePool();
 public:
@@ -51,6 +53,10 @@ public:
     QStringList allTags() const;
 
     QnResourceList findResourcesByCriteria(const CLDeviceCriteria& cr) const;
+    
+signals:
+    void resourceAdded(QnResourcePtr res);
+    void resourceRemoved(QnResourcePtr res);
 
 private:
     bool isResourceMeetCriteria(const CLDeviceCriteria& cr, QnResourcePtr res) const;

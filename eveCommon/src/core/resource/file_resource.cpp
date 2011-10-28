@@ -1,8 +1,8 @@
 #include <QFileInfo>
 
 #include "file_resource.h"
+#include "core/dataprovider/single_shot_file_dataprovider.h"
 
-#include "../dataprovider/single_shot_file_reader.h"
 
 QnLocalFileResource::QnLocalFileResource(const QString &filename)
 {
@@ -12,9 +12,9 @@ QnLocalFileResource::QnLocalFileResource(const QString &filename)
     addFlag(QnResource::SINGLE_SHOT);
 }
 
-QnAbstractStreamDataProvider* QnLocalFileResource::createDataProvider(ConnectionRole role)
+QnAbstractStreamDataProvider* QnLocalFileResource::createDataProviderInternal(ConnectionRole role)
 {
-    return new CLSingleShotFileStreamreader(this);
+    return new CLSingleShotFileStreamreader(toSharedPointer());
 }
 
 QString QnLocalFileResource::getUniqueId() const

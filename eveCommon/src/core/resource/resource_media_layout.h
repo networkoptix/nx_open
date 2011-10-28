@@ -10,7 +10,7 @@ public:
     virtual unsigned int numberOfChannels() const = 0;
 };
 
-class QnDeviceAudioLayout: public QnDeviceLayout
+class QnResourceAudioLayout: public QnDeviceLayout
 {
 public:
     struct AudioTrack
@@ -23,19 +23,19 @@ public:
     virtual AudioTrack getAudioTrackInfo(int index) = 0;
 };
 
-class QnEmptyAudioLayout: public QnDeviceAudioLayout
+class QnEmptyAudioLayout: public QnResourceAudioLayout
 {
 public:
-    QnEmptyAudioLayout(): QnDeviceAudioLayout() {}
+    QnEmptyAudioLayout(): QnResourceAudioLayout() {}
     virtual unsigned int numberOfChannels() const { return 0; }
     virtual AudioTrack getAudioTrackInfo(int /*index*/) { return AudioTrack(); }
 };
 
-class QnDeviceVideoLayout: public QnDeviceLayout
+class QnVideoResourceLayout: public QnDeviceLayout
 {
 public:
-    QnDeviceVideoLayout() {}
-    virtual ~QnDeviceVideoLayout() {}
+    QnVideoResourceLayout() {}
+    virtual ~QnVideoResourceLayout() {}
 
     // returns maximum width ( in terms of channels 4x1 2x2 1x1 ans so on  )
     virtual unsigned int width() const = 0;
@@ -49,7 +49,7 @@ public:
 };
 
 // this is default DeviceVideoLayout for any camera with only one sensor 
-class QnDefaultDeviceVideoLayout : public QnDeviceVideoLayout
+class QnDefaultDeviceVideoLayout : public QnVideoResourceLayout
 {
 public:
     QnDefaultDeviceVideoLayout() {}
@@ -82,7 +82,7 @@ public:
 
 };
 
-class CLCustomDeviceVideoLayout : public QnDeviceVideoLayout
+class CLCustomDeviceVideoLayout : public QnVideoResourceLayout
 {
 public:
     CLCustomDeviceVideoLayout(int width, int height):

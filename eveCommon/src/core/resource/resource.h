@@ -12,11 +12,12 @@
 #include "utils/common/qnid.h"
 #include "../datapacket/datapacket.h"
 #include "resource_command_processor.h"
+#include <QMetaType>
 
 
 class QnDeviceCommand;
 class QnAbstractStreamDataProvider;
-class QnDeviceVideoLayout;
+class QnVideoResourceLayout;
 class QnResourceConsumer;
 
 // this class and inherited must be very light to create 
@@ -40,7 +41,7 @@ class QN_EXPORT QnResource: public QObject //: public CLRefCounter
     Q_OBJECT
 public:
 
-    enum ConnectionRole {Role_Default, Role_DirectConnection, Role_RemoveConnection, Role_Live, RoleCameraArchive};
+    enum ConnectionRole {Role_Default, Role_PrimariVideo, Role_SecondaryVideo};
 
     enum
     {
@@ -158,7 +159,7 @@ public:
 	//QnParamList& getStreamParamList();// returns params that can be changed on stream level 
 	//const QnParamList& getStreamParamList() const;
 
-	QnAbstractStreamDataProvider* getDeviceStreamConnection(ConnectionRole role);
+	QnAbstractStreamDataProvider* createDataProvider(ConnectionRole role);
 
 	// after setVideoLayout is called device is responsable for the destroying the layout 
 	//void setVideoLayout(CLDeviceVideoLayout* layout);
@@ -176,6 +177,7 @@ public:
     bool hasTag(const QString& tag) const;
     QStringList tagList() const;
 
+    QnResourcePtr toSharedPointer() const;
     void addConsumer(QnResourceConsumer* consumer);
     void removeConsumer(QnResourceConsumer* consumer);
     bool hasSuchConsumer(QnResourceConsumer* consumer) const;
@@ -205,7 +207,7 @@ protected:
     virtual bool setParamPhysical(const QString& name, const QnValue& val);
     bool setSpecialParam(const QString& name, const QnValue& val, QnDomain domain);
 
-    virtual QnAbstractStreamDataProvider* createDataProvider(ConnectionRole role) = 0;
+    virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role) = 0;
 protected:
     //typedef QMap<QnId, QnParamList > QnParamLists; // key - resource type ID
     //static QnParamLists staticResourcesParamLists; // list of all supported resources params list
@@ -258,6 +260,7 @@ public:
 private:
     static QList<QnResourceFactoryPtr> m_factories;
 };
+
 
 // for future use
 class QnRecorder: public QnResource 

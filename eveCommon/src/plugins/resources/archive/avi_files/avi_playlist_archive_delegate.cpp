@@ -34,7 +34,7 @@ QnAVIPlaylistArchiveDelegate::~QnAVIPlaylistArchiveDelegate()
         av_free(m_ioBuffer);
 }
 
-bool QnAVIPlaylistArchiveDelegate::open(const QnResource* resource)
+bool QnAVIPlaylistArchiveDelegate::open(QnResourcePtr resource)
 {
     m_resource = resource;
     return true;
@@ -323,7 +323,7 @@ qint32 QnAVIPlaylistArchiveDelegate::writePacket(quint8* /*buf*/, int /*size*/)
     return 0; // not implemented
 }
 
-QnDeviceVideoLayout* QnAVIPlaylistArchiveDelegate::getVideoLayout()
+QnVideoResourceLayout* QnAVIPlaylistArchiveDelegate::getVideoLayout()
 {
     return &m_defaultVideoLayout;
 }

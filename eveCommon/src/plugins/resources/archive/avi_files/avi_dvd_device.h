@@ -9,9 +9,10 @@ public:
 	CLAviDvdDevice(const QString& file);
 	virtual ~CLAviDvdDevice();
 
-	virtual QnAbstractStreamDataProvider* createDataProvider(ConnectionRole role);
     static bool isAcceptedUrl(const QString& url);
     static QString urlToFirstVTS(const QString& url);
+protected:
+    virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 };
 
 typedef QSharedPointer<CLAviDvdDevice> CLAviDvdDevicePtr;

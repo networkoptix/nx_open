@@ -11,9 +11,9 @@ CLAviBluRayDevice::~CLAviBluRayDevice()
 {
 }
 
-QnAbstractStreamDataProvider* CLAviBluRayDevice::createDataProvider(ConnectionRole /*role*/)
+QnAbstractStreamDataProvider* CLAviBluRayDevice::createDataProviderInternal(ConnectionRole /*role*/)
 {
-    QnArchiveStreamReader* result = new QnArchiveStreamReader(this);
+    QnArchiveStreamReader* result = new QnArchiveStreamReader(toSharedPointer());
     result->setArchiveDelegate(new QnAVIBlurayArchiveDelegate());
     return result;
 }

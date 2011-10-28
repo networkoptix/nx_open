@@ -16,8 +16,9 @@ public:
     inline QString getFileName() const
     { return getUniqueId(); }
 
-    virtual QnAbstractStreamDataProvider* createDataProvider(ConnectionRole role);
     virtual QString getUniqueId() const;
+protected:
+    virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 private:
     QString m_fileName;
 };

@@ -7,11 +7,11 @@
 
 struct QnAbstractMediaData;
 
-class CLClientPullStreamreader : public QnAbstractMediaStreamDataProvider
+class QnClientPullStreamProvider : public QnAbstractMediaStreamDataProvider
 {
 public:
-	CLClientPullStreamreader(QnResource* dev );
-	virtual ~CLClientPullStreamreader(){stop();}
+	QnClientPullStreamProvider(QnResourcePtr dev );
+	virtual ~QnClientPullStreamProvider(){stop();}
 
 protected:
 	virtual QnAbstractMediaDataPtr getNextData() = 0;

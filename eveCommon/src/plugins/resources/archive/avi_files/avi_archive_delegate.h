@@ -14,14 +14,14 @@ public:
     QnAviArchiveDelegate();
     virtual ~QnAviArchiveDelegate();
 
-    virtual bool open(const QnResource* resource);
+    virtual bool open(QnResourcePtr resource);
     virtual void close();
     virtual qint64 startTime();
     virtual qint64 endTime();
     virtual QnAbstractMediaDataPtr getNextData();
     virtual qint64 seek (qint64 time);
-    virtual QnDeviceVideoLayout* getVideoLayout();
-    virtual QnDeviceAudioLayout* getAudioLayout();
+    virtual QnVideoResourceLayout* getVideoLayout();
+    virtual QnResourceAudioLayout* getAudioLayout();
     
     virtual AVCodecContext* setAudioChannel(int num);
 protected:
@@ -34,7 +34,7 @@ private:
     bool deserializeLayout(CLCustomDeviceVideoLayout* layout, const QString& layoutStr);
 protected:
     AVFormatContext* m_formatContext;
-    const QnResource* m_resource;
+    QnResourcePtr m_resource;
     qint64 m_startMksec;
     int m_selectedAudioChannel;
     bool m_initialized;
@@ -43,7 +43,7 @@ private:
     int m_firstVideoIndex;
     bool m_streamsFound;
     CLCustomDeviceVideoLayout* m_videoLayout;
-    QnDeviceAudioLayout* m_audioLayout;
+    QnResourceAudioLayout* m_audioLayout;
     QVector<int> m_indexToChannel;
 
     friend class QnAviAudioLayout;

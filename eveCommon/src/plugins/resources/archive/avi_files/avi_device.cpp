@@ -33,9 +33,9 @@ QString QnAviResource::toString() const
 	return m_name;
 }
 
-QnAbstractStreamDataProvider* QnAviResource::createDataProvider(ConnectionRole role)
+QnAbstractStreamDataProvider* QnAviResource::createDataProviderInternal(ConnectionRole role)
 {
-    QnArchiveStreamReader* result = new QnArchiveStreamReader(this);
+    QnArchiveStreamReader* result = new QnArchiveStreamReader(toSharedPointer());
 
 #ifdef RTSP_SERVER_TEST
     if (role == QnResource::Role_Default && !checkFlag(local)){

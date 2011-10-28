@@ -1,8 +1,9 @@
-#include "spush_streamreader.h"
+
 #include "utils/common/sleep.h"
+#include "spush_media_stream_provider.h"
 
 
-CLServerPushStreamreader::CLServerPushStreamreader(QnResource* dev ):
+CLServerPushStreamreader::CLServerPushStreamreader(QnResourcePtr dev ):
 QnAbstractMediaStreamDataProvider(dev)
 {
 }
@@ -28,7 +29,7 @@ void CLServerPushStreamreader::run()
             openStream();
             if (!isStreamOpened())
             {
-                CLSleep::msleep(20); // to avoid large CPU usage
+                QnSleep::msleep(20); // to avoid large CPU usage
 
                 closeStream(); // to release resources 
 

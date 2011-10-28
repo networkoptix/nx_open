@@ -4,15 +4,14 @@
 #include "abstract_archive_stream_reader.h"
 #include "core/resource/resource_media_layout.h"
 #include "utils/media/ffmpeg_helper.h"
-
+#include <libavformat/avformat.h>
 
 struct AVFormatContext;
-
 
 class QnArchiveStreamReader : public QnAbstractArchiveReader
 {
 public:
-    QnArchiveStreamReader(QnResource* dev);
+    QnArchiveStreamReader(QnResourcePtr dev);
     virtual ~QnArchiveStreamReader();
 
     virtual qint64 currentTime() const;
@@ -26,10 +25,10 @@ public:
     virtual bool isReverseMode() const { return m_reverseMode;}
     virtual bool isNegativeSpeedSupported() const;
 
-    virtual QnDeviceVideoLayout* getVideoLayout();
-    virtual QnDeviceAudioLayout* getAudioLayout();
+    virtual QnVideoResourceLayout* getVideoLayout();
+    virtual QnResourceAudioLayout* getAudioLayout();
     static bool deserializeLayout(CLCustomDeviceVideoLayout* layout, const QString& layoutStr);
-    static QString serializeLayout(const QnDeviceVideoLayout* layout);
+    static QString serializeLayout(const QnVideoResourceLayout* layout);
 
     void renameFileOnDestroy(const QString& newFileName);
     qint64 startTime() const { return m_delegate->startTime(); }
