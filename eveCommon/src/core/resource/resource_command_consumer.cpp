@@ -1,6 +1,6 @@
 #include "resource_command_consumer.h"
 
-QnResourceCommand::QnResourceCommand(QnResource* res):
+QnResourceCommand::QnResourceCommand(QnResourcePtr res):
 QnResourceConsumer(res)
 {
     disconnectFromResource();

@@ -11,7 +11,7 @@ struct QnAbstractMediaData;
 class CLServerPushStreamreader : public QnAbstractMediaStreamDataProvider
 {
 public:
-	CLServerPushStreamreader(QnResource* dev );
+	CLServerPushStreamreader(QnResourcePtr dev );
 	virtual ~CLServerPushStreamreader(){stop();}
 
 protected:

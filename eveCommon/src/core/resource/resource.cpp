@@ -2,6 +2,7 @@
 #include "resource_consumer.h"
 #include "file_resource.h"
 #include "core/dataprovider/abstract_streamdataprovider.h"
+#include "src/core/resourcemanagment/resource_pool.h"
 
 // Temporary until real ResourceFactory is implemented
 
@@ -249,7 +250,7 @@ bool QnResource::setParam(const QString& name, const QnValue& val, QnDomain doma
 class QnResourceSetParamCommand : public QnResourceCommand
 {
 public:
-    QnResourceSetParamCommand(QnResource* res, const QString& name, const QnValue& val, QnDomain domain):
+    QnResourceSetParamCommand(QnResourcePtr res, const QString& name, const QnValue& val, QnDomain domain):
       QnResourceCommand(res),
           m_name(name),
           m_val(val),
@@ -391,6 +392,13 @@ QStringList QnResource::tagList() const
 {
     QMutexLocker locker(&m_mutex);
     return m_tags;
+}
+
+QnResourcePtr QnResource::toSharedPointer() const
+{
+    QnResourcePtr res = qnResPool->getResourceById(getId());
+    Q_ASSERT_X(res != 0, Q_FUNC_INFO, "Resource not found");
+    return res;
 }
 
 void QnResource::addConsumer(QnResourceConsumer* consumer)

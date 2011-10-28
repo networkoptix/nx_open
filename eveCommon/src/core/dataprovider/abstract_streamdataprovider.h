@@ -21,7 +21,7 @@ public:
 
 	//enum QnStreamQuality {CLSLowest, CLSLow, CLSNormal, CLSHigh, CLSHighest};
 
-	explicit QnAbstractStreamDataProvider(QnResource* resource);
+	explicit QnAbstractStreamDataProvider(QnResourcePtr resource);
 	virtual ~QnAbstractStreamDataProvider();
 
     virtual bool dataCanBeAccepted() const;

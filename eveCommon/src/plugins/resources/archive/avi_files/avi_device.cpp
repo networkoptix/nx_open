@@ -35,7 +35,7 @@ QString QnAviResource::toString() const
 
 QnAbstractStreamDataProvider* QnAviResource::createDataProvider(ConnectionRole role)
 {
-    QnArchiveStreamReader* result = new QnArchiveStreamReader(this);
+    QnArchiveStreamReader* result = new QnArchiveStreamReader(toSharedPointer());
 
 #ifdef RTSP_SERVER_TEST
     if (role == QnResource::Role_Default && !checkFlag(local)){

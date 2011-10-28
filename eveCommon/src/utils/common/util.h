@@ -1,6 +1,8 @@
 #ifndef _UNIVERSAL_CLIENT_UTIL_H
 #define _UNIVERSAL_CLIENT_UTIL_H
 
+#include <QString>
+
 template <typename T, size_t N>
 char (&ArraySizeHelper(T (&array)[N]))[N];
 #define arraysize(array) (sizeof(ArraySizeHelper(array)))

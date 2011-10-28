@@ -34,7 +34,7 @@ QnAVIPlaylistArchiveDelegate::~QnAVIPlaylistArchiveDelegate()
         av_free(m_ioBuffer);
 }
 
-bool QnAVIPlaylistArchiveDelegate::open(const QnResource* resource)
+bool QnAVIPlaylistArchiveDelegate::open(QnResourcePtr resource)
 {
     m_resource = resource;
     return true;

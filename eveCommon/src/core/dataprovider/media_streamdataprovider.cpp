@@ -5,12 +5,12 @@
 
 
 
-QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(QnResource* res):
+QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(QnResourcePtr res):
 QnAbstractStreamDataProvider(res),
 m_qulity(QnQualityLowest)
 {
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame));
-    m_mediaResource = dynamic_cast<QnMediaResource*>(res);
+    m_mediaResource = qSharedPointerDynamicCast<QnMediaResource>(res);
     Q_ASSERT(m_mediaResource);
     m_channel_number = m_mediaResource->getVideoLayout(0)->numberOfChannels();
 

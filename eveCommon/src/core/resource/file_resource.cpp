@@ -14,7 +14,7 @@ QnLocalFileResource::QnLocalFileResource(const QString &filename)
 
 QnAbstractStreamDataProvider* QnLocalFileResource::createDataProvider(ConnectionRole role)
 {
-    return new CLSingleShotFileStreamreader(this);
+    return new CLSingleShotFileStreamreader(toSharedPointer());
 }
 
 QString QnLocalFileResource::getUniqueId() const

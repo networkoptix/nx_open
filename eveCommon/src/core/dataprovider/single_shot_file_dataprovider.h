@@ -14,7 +14,7 @@ struct QnAbstractMediaData;
 class QN_EXPORT CLSingleShotFileStreamreader : public CLSingleShotStreamreader
 {
 public:
-	CLSingleShotFileStreamreader(QnResource* dev );
+	CLSingleShotFileStreamreader(QnResourcePtr dev );
 	~CLSingleShotFileStreamreader(){stop();}
 
 protected:

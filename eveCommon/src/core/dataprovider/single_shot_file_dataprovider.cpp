@@ -3,10 +3,10 @@
 #include "single_shot_file_dataprovider.h"
 
 
-CLSingleShotFileStreamreader::CLSingleShotFileStreamreader(QnResource* dev ):
+CLSingleShotFileStreamreader::CLSingleShotFileStreamreader(QnResourcePtr dev ):
 CLSingleShotStreamreader(dev)
 {
-	QnLocalFileResource* device = dynamic_cast<QnLocalFileResource*>(dev);
+	QnLocalFileResourcePtr device = qSharedPointerDynamicCast<QnLocalFileResource>(dev);
 	m_fileName = device->getFileName();
 }
 
