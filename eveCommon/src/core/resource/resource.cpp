@@ -1,7 +1,7 @@
 #include "resource_command_consumer.h"
 #include "resource_consumer.h"
-#include "../dataprovider/streamreader.h"
 #include "file_resource.h"
+#include "core/dataprovider/abstract_streamdataprovider.h"
 
 // Temporary until real ResourceFactory is implemented
 

@@ -1,9 +1,9 @@
 #ifndef QnMediaStreamDataProvider_514
 #define QnMediaStreamDataProvider_514
 
-#include "core/dataprovider/streamreader.h"
 #include "core/dataprovider/streamdata_statistics.h"
 #include "../resource/media_resource.h"
+#include "abstract_streamdataprovider.h"
 
 
 
