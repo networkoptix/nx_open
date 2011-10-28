@@ -2,17 +2,14 @@
 #include <QDir>
 
 #include "version.h"
-#include "libavformat/avio.h"
 #include "utils/common/util.h"
 #include "plugins/resources/archive/avi_files/avi_device.h"
 #include "core/resourcemanagment/asynch_seacher.h"
 #include "core/resourcemanagment/resource_pool.h"
-#include "libavcodec/avcodec.h"
-#include "libavformat/avformat.h"
 
 //#include "device_plugins/arecontvision/devices/av_device_server.h"
 
-#define TEST_RTSP_SERVER
+//#define TEST_RTSP_SERVER
 
 
 QMutex global_ffmpeg_mutex;
@@ -176,13 +173,6 @@ int main(int argc, char *argv[])
     //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
     
-#ifdef Q_OS_WIN
-    QnResourceDiscoveryManager::instance().addDeviceServer(&DesktopDeviceServer::instance());
-#endif // Q_OS_WIN
-
-    CLDeviceSettingsDlgFactory::registerDlgManufacture(&AreconVisionDlgManufacture::instance());
-
-
 #ifdef TEST_RTSP_SERVER
     addTestData();
 #endif
