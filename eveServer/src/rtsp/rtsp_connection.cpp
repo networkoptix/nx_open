@@ -298,7 +298,7 @@ int QnRtspConnectionProcessor::numOfVideoChannels()
     Q_D(QnRtspConnectionProcessor);
     if (!d->mediaRes)
         return -1;
-    QnVideoResourceLayout* layout = d->mediaRes->getVideoLayout(d->dataProvider);
+    QnVideoResourceLayout* layout = d->dataProvider->getVideoLayout();
     return layout ? layout->numberOfChannels() : -1;
 }
 
@@ -318,8 +318,8 @@ int QnRtspConnectionProcessor::composeDescribe()
 
     QTextStream sdp(&d->responseBody);
 
-    QnVideoResourceLayout* videoLayout = d->mediaRes->getVideoLayout(d->dataProvider);
-    QnResourceAudioLayout* audioLayout = d->mediaRes->getAudioLayout(d->dataProvider);
+    QnVideoResourceLayout* videoLayout = d->dataProvider->getVideoLayout();
+    QnResourceAudioLayout* audioLayout = d->dataProvider->getAudioLayout();
     int numVideo = videoLayout->numberOfChannels();
     int numAudio = audioLayout->numberOfChannels();
 
@@ -365,7 +365,7 @@ int QnRtspConnectionProcessor::composeSetup()
         return CODE_NOT_IMPLEMETED;
     int trackId = extractTrackId(d->requestHeaders.path());
 
-    QnVideoResourceLayout* videoLayout = d->mediaRes->getVideoLayout(d->dataProvider);
+    QnVideoResourceLayout* videoLayout = d->dataProvider->getVideoLayout();
     if (trackId >= videoLayout->numberOfChannels()) {
         //QnAbstractMediaStreamDataProvider* dataProvider;
         QnArchiveStreamReader* archiveReader = dynamic_cast<QnArchiveStreamReader*>(d->dataProvider);
