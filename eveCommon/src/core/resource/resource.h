@@ -12,6 +12,7 @@
 #include "utils/common/qnid.h"
 #include "../datapacket/datapacket.h"
 #include "resource_command_processor.h"
+#include <QMetaType>
 
 
 class QnDeviceCommand;
@@ -259,6 +260,7 @@ public:
 private:
     static QList<QnResourceFactoryPtr> m_factories;
 };
+
 
 // for future use
 class QnRecorder: public QnResource 
