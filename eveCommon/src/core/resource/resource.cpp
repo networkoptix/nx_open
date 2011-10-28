@@ -2,7 +2,7 @@
 #include "resource_consumer.h"
 #include "file_resource.h"
 #include "core/dataprovider/abstract_streamdataprovider.h"
-#include "src/core/resourcemanagment/resource_pool.h"
+#include "core/resourcemanagment/resource_pool.h"
 
 // Temporary until real ResourceFactory is implemented
 
@@ -275,7 +275,7 @@ typedef QSharedPointer<QnResourceSetParamCommand> QnResourceSetParamCommandPtr;
 
 void QnResource::setParamAsynch(const QString& name, const QnValue& val, QnDomain domain)
 {
-    QnResourceSetParamCommandPtr command ( new QnResourceSetParamCommand(this, name, val, domain) );
+    QnResourceSetParamCommandPtr command ( new QnResourceSetParamCommand(toSharedPointer(), name, val, domain) );
     addCommandToProc(command);
 }
 

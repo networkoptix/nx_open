@@ -170,8 +170,6 @@ int main(int argc, char *argv[])
     //===========================================================================
     //IPPH264Decoder::dll.init();
 
-    CLVideoDecoderFactory::setCodecManufacture(CLVideoDecoderFactory::FFMPEG);
-
     //============================
     //QnResourceDiscoveryManager::instance()->addDeviceServer(&AVDeviceServer::instance());
     QnResourceDiscoveryManager::instance().start();
