@@ -17,7 +17,7 @@ public:
     virtual QnDeviceVideoLayout* getVideoLayout();
     virtual QnDeviceAudioLayout* getAudioLayout();
 
-	explicit QnAbstractMediaStreamDataProvider(QnResource* res);
+	explicit QnAbstractMediaStreamDataProvider(QnResourcePtr res);
 	virtual ~QnAbstractMediaStreamDataProvider();
 
 
@@ -53,7 +53,7 @@ protected:
     QnParamList m_streamParam;
 
     int mFramesLost;
-    QnMediaResource* m_mediaResource;
+    QnMediaResourcePtr m_mediaResource;
 };
 
 

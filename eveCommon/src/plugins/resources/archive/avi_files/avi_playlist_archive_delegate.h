@@ -13,7 +13,7 @@ public:
 	QnAVIPlaylistArchiveDelegate();
 	virtual ~QnAVIPlaylistArchiveDelegate();
 
-    virtual bool open(const QnResource* resource);
+    virtual bool open(QnResourcePtr resource);
     virtual void close();
     virtual qint64 seek(qint64 time);
     virtual qint64 endTime();

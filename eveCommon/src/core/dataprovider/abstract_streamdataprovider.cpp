@@ -1,7 +1,7 @@
 #include "abstract_streamdataprovider.h"
 
 
-QnAbstractStreamDataProvider::QnAbstractStreamDataProvider(QnResource* resource):
+QnAbstractStreamDataProvider::QnAbstractStreamDataProvider(QnResourcePtr resource):
     QnResourceConsumer(resource),
     m_proc_CS(QMutex::Recursive),
     m_params_CS(QMutex::Recursive)

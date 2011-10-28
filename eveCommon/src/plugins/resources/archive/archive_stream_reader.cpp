@@ -35,7 +35,7 @@ private:
 
 static const int FFMPEG_PROBE_BUFFER_SIZE = 1024 * 512;
 
-QnArchiveStreamReader::QnArchiveStreamReader(QnResource* dev ) :
+QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     QnAbstractArchiveReader(dev),
     m_currentTime(0),
     m_previousTime(-1),

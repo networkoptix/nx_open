@@ -10,7 +10,7 @@ class QnAbstractArchiveReader : public QnClientPullStreamProvider
 {
     Q_OBJECT
 public:
-	QnAbstractArchiveReader(QnResource* dev);
+	QnAbstractArchiveReader(QnResourcePtr dev);
 	virtual ~QnAbstractArchiveReader();
 
     void setArchiveDelegate(QnAbstractArchiveDelegate* contextDelegate);

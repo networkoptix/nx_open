@@ -201,7 +201,7 @@ qint64 QnAviArchiveDelegate::seek(qint64 time)
     return time;
 }
 
-bool QnAviArchiveDelegate::open(const QnResource* resource)
+bool QnAviArchiveDelegate::open(QnResourcePtr resource)
 {
     m_resource = resource;
     if (m_formatContext == 0) 

@@ -14,7 +14,7 @@ public:
     QnAviArchiveDelegate();
     virtual ~QnAviArchiveDelegate();
 
-    virtual bool open(const QnResource* resource);
+    virtual bool open(QnResourcePtr resource);
     virtual void close();
     virtual qint64 startTime();
     virtual qint64 endTime();
@@ -34,7 +34,7 @@ private:
     bool deserializeLayout(CLCustomDeviceVideoLayout* layout, const QString& layoutStr);
 protected:
     AVFormatContext* m_formatContext;
-    const QnResource* m_resource;
+    QnResourcePtr m_resource;
     qint64 m_startMksec;
     int m_selectedAudioChannel;
     bool m_initialized;

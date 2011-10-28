@@ -11,7 +11,7 @@ struct AVFormatContext;
 class QnArchiveStreamReader : public QnAbstractArchiveReader
 {
 public:
-    QnArchiveStreamReader(QnResource* dev);
+    QnArchiveStreamReader(QnResourcePtr dev);
     virtual ~QnArchiveStreamReader();
 
     virtual qint64 currentTime() const;

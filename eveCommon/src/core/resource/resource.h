@@ -176,6 +176,7 @@ public:
     bool hasTag(const QString& tag) const;
     QStringList tagList() const;
 
+    QnResourcePtr toSharedPointer() const;
     void addConsumer(QnResourceConsumer* consumer);
     void removeConsumer(QnResourceConsumer* consumer);
     bool hasSuchConsumer(QnResourceConsumer* consumer) const;

@@ -13,7 +13,7 @@ public:
     QnSyncPlayArchiveDelegate(QnAbstractArchiveReader* reader, QnArchiveSyncPlayWrapper* syncWrapper, QnAbstractArchiveDelegate* ownerDelegate);
     virtual ~QnSyncPlayArchiveDelegate();
 
-    virtual bool open(const QnResource* resource);
+    virtual bool open(QnResourcePtr resource);
     virtual void close();
     virtual qint64 startTime();
     virtual qint64 endTime();

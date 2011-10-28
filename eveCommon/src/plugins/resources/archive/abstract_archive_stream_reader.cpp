@@ -1,6 +1,6 @@
 #include "abstract_archive_stream_reader.h"
 
-QnAbstractArchiveReader::QnAbstractArchiveReader(QnResource* dev ) :
+QnAbstractArchiveReader::QnAbstractArchiveReader(QnResourcePtr dev ) :
     QnClientPullStreamProvider(dev),
     m_lengthMksec(0),
     m_startMksec(0),

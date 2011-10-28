@@ -223,7 +223,7 @@ void QnNetworkResource::getDevicesBasicInfo(QnResourceMap& lst, int threads)
     time.start();
 
 
-    QList<QnResource*> local_list;
+    QList<QnResourcePtr> local_list;
     foreach(QnResourcePtr res, lst.values()) 
     {
         QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);

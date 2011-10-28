@@ -3,7 +3,7 @@
 #include "spush_media_stream_provider.h"
 
 
-CLServerPushStreamreader::CLServerPushStreamreader(QnResource* dev ):
+CLServerPushStreamreader::CLServerPushStreamreader(QnResourcePtr dev ):
 QnAbstractMediaStreamDataProvider(dev)
 {
 }

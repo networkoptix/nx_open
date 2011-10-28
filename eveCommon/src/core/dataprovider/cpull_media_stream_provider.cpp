@@ -2,7 +2,7 @@
 #include "cpull_media_stream_provider.h"
 
 
-QnClientPullStreamProvider::QnClientPullStreamProvider(QnResource* dev ):
+QnClientPullStreamProvider::QnClientPullStreamProvider(QnResourcePtr dev ):
 QnAbstractMediaStreamDataProvider(dev)
 {
 }

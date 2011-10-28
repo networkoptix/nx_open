@@ -19,7 +19,7 @@ QnSyncPlayArchiveDelegate::~QnSyncPlayArchiveDelegate()
     m_syncWrapper->erase(this);
 }
 
-bool QnSyncPlayArchiveDelegate::open(const QnResource* resource)
+bool QnSyncPlayArchiveDelegate::open(QnResourcePtr resource)
 {
     return m_ownerDelegate->open(resource);
 }
