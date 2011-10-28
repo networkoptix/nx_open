@@ -27,14 +27,14 @@ void CLClientPullStreamreader::run()
 
 		if (!dataCanBeAccepted())
 		{
-			CLSleep::msleep(5);
+			QnSleep::msleep(5);
 			continue;
 		}
 
 
 		if (QnResource::commandProchasSuchDeviceInQueue(m_resource->getUniqueId())) // if command processor has something in the queue for this device let it go first
 		{
-			CLSleep::msleep(5);
+			QnSleep::msleep(5);
 			continue;
 		}
 
@@ -51,7 +51,7 @@ void CLClientPullStreamreader::run()
 			if (frames_lost==4) // if we lost 2 frames => connection is lost for sure (2)
 				m_stat[0].onLostConnection();
 
-			CLSleep::msleep(30);
+			QnSleep::msleep(30);
 
 			continue;
 		}

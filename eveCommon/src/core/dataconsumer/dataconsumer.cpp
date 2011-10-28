@@ -41,7 +41,7 @@ void QnAbstractDataConsumer::run()
 		if (!get)
 		{
 			CL_LOG(cl_logDEBUG2) cl_log.log(QLatin1String("queue is empty "), (int)(long)(&m_dataQueue),cl_logDEBUG2);
-			CLSleep::msleep(10);
+			QnSleep::msleep(10);
 			continue;
 		}
 		while(!needToStop())
@@ -49,7 +49,7 @@ void QnAbstractDataConsumer::run()
 			if (processData(data))
 				break;
 			else
-				CLSleep::msleep(1);
+				QnSleep::msleep(1);
 		}
 		//cl_log.log("queue size = ", m_dataQueue.size(),cl_logALWAYS);
 	}
