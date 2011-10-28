@@ -1,8 +1,17 @@
 #include "scene_utility.h"
 #include <cassert>
+#include <cmath> /* For std::sqrt. */
 #include <QGraphicsView>
 #include <QScrollBar>
 #include <QCursor>
+
+qreal QnSceneUtility::length(const QPointF &point) {
+    return std::sqrt(point.x() * point.x() + point.y() * point.y());
+}
+
+qreal QnSceneUtility::length(const QSizeF &size) {
+    return std::sqrt(size.width() * size.width() + size.height() * size.height());
+}
 
 QRectF QnSceneUtility::mapRectToScene(QGraphicsView *view, const QRect &rect) {
     return view->viewportTransform().inverted().mapRect(rect);

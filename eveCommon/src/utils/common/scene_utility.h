@@ -4,6 +4,7 @@
 #include <Qt>
 #include <QGraphicsView>
 #include <QPoint>
+#include <QSize>
 
 class QRect;
 class QRectF;
@@ -12,6 +13,26 @@ class QTransform;
 
 class QnSceneUtility {
 public:
+    /**
+     * \param                           Size.
+     * \returns                         Given size converted to a point.
+     */
+    static QPointF toPoint(const QSizeF &size) {
+        return QPointF(size.width(), size.height());
+    }
+
+    /**
+     * \param                           Size.
+     * \returns                         Given size converted to a point.
+     */
+    static QPoint toPoint(const QSize &size) {
+        return QPoint(size.width(), size.height());
+    }
+
+    static qreal length(const QPointF &point);
+
+    static qreal length(const QSizeF &size);
+
     /**
      * \param view                      Graphics view. Must not be NULL.
      * \param rect                      Rectangle to map to scene.
