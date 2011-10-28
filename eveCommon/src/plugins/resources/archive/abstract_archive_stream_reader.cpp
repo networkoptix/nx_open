@@ -1,7 +1,7 @@
 #include "abstract_archive_stream_reader.h"
 
 QnAbstractArchiveReader::QnAbstractArchiveReader(QnResource* dev ) :
-    CLClientPullStreamreader(dev),
+    QnClientPullStreamProvider(dev),
     m_lengthMksec(0),
     m_startMksec(0),
     m_singleShot(false),
@@ -123,13 +123,13 @@ void QnAbstractArchiveReader::setCycleMode(bool value)
 
 void QnAbstractArchiveReader::pause()
 {
-    CLClientPullStreamreader::pause();
+    QnClientPullStreamProvider::pause();
     emit streamPaused();
 }
 
 void QnAbstractArchiveReader::resume()
 {
-    CLClientPullStreamreader::resume();
+    QnClientPullStreamProvider::resume();
     emit streamResumed();
 }
 

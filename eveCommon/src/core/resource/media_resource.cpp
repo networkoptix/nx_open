@@ -15,12 +15,6 @@ QnMediaResource::~QnMediaResource()
 {
 }
 
-/*
-QnMediaResourceLayout* QnMediaResource::getMediaLayout() const
-{
-    return &globalDefaultMediaResourceLayout;
-}
-*/
 
 QnAbstractMediaStreamDataProvider* QnMediaResource::createMediaProvider(ConnectionRole role)
 {

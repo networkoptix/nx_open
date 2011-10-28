@@ -2,13 +2,13 @@
 #include "cpull_media_stream_provider.h"
 
 
-CLClientPullStreamreader::CLClientPullStreamreader(QnResource* dev ):
+QnClientPullStreamProvider::QnClientPullStreamProvider(QnResource* dev ):
 QnAbstractMediaStreamDataProvider(dev)
 {
 }
 
 
-void CLClientPullStreamreader::run()
+void QnClientPullStreamProvider::run()
 {
 	CL_LOG(cl_logINFO) cl_log.log(QLatin1String("stream reader started."), cl_logINFO);
 

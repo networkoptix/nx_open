@@ -6,7 +6,7 @@
 #include "utils/common/adaptivesleep.h"
 #include "core/dataprovider/cpull_media_stream_provider.h"
 
-class QnAbstractArchiveReader : public CLClientPullStreamreader
+class QnAbstractArchiveReader : public QnClientPullStreamProvider
 {
     Q_OBJECT
 public:
