@@ -75,6 +75,7 @@ win32 {
   isEmpty(BUILDLIB) { DEFINES += QN_EXPORT=Q_DECL_IMPORT }
   !isEmpty(BUILDLIB) { DEFINES += QN_EXPORT= }
 
+  DEFINES += __STDC_CONSTANT_MACROS
 }
 
 mac {

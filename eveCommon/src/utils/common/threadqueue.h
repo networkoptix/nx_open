@@ -2,6 +2,7 @@
 #define cl_ThreadQueue_h_2236 
 
 #include <QQueue>
+#include <QSemaphore>
 
 #include "log.h"
 
