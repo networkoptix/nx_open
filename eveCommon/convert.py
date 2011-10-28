@@ -31,7 +31,10 @@ def copy_files(src_glob, dst_folder):
 
 
 def qt_path(path):
-    return path.replace('\\', '/').lstrip('/')
+    qtpath = path.replace('\\', '/')
+    if sys.platform == 'win32':
+        qtpath = qtpath.lstrip('/')
+    return qtpath
 
 def instantiate_pro(profile, params):
     class T(string.Template):
@@ -149,7 +152,6 @@ def index_dirs(xdirs, template_file, output_file, exclude_dirs=(), exclude_files
 
 def convert():
     oldpwd = os.getcwd()
-    print os.path.realpath(__file__)
     os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
     try:
