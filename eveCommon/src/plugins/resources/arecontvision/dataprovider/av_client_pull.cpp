@@ -13,6 +13,8 @@ QnClientPullStreamProvider(res)
     // for now(13 December 2009) if we use HTTP => right should be divisible by 64; bottom - by 32
     // may be while you are looking at this comments bug already fixed.
 
+    /*
+
     maxResolution.rwidth() = maxResolution.width()/64*64;
     maxResolution.rheight() = maxResolution.height()/32*32;
 
@@ -26,6 +28,8 @@ QnClientPullStreamProvider(res)
 
     m_streamParam.put(QnParam("resolution", "full"));
     m_streamParam.put(QnParam("Quality", "11"));
+
+    /**/
 
 
     setQuality(m_qulity);
@@ -42,7 +46,7 @@ QnPlAVClinetPullStreamReader::~QnPlAVClinetPullStreamReader()
 void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
 {
 
-    QMutexLocker mtx(&m_mtx);
+    //QMutexLocker mtx(&m_mtx);
 
     QnPlAreconVisionResourcePtr avRes = getResource().dynamicCast<QnPlAreconVisionResource>();
     QnStreamQuality q = getQuality();
@@ -54,26 +58,26 @@ void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
 		if (avRes->isPanoramic())
 			avRes->setParamAsynch("resolution", "full", QnDomainPhysical);
 		else
-			m_streamParam.get("resolution").value = "full";
+			m_streamParam.get("resolution").setValue("full");
 
 
         if (avRes->isPanoramic())
             avRes->setParamAsynch("Quality", "17", QnDomainPhysical); // panoramic
         else
-            m_streamParam.get("Quality").value = "15";
+            m_streamParam.get("Quality").setValue("15");
         break;
 
     case QnQualityHigh:
         if (avRes->isPanoramic())
             avRes->setParamAsynch("resolution", "full", QnDomainPhysical);
         else
-            m_streamParam.get("resolution").value = "full";
+            m_streamParam.get("resolution").setValue("full");
 
 
         if (avRes->isPanoramic())
             avRes->setParamAsynch("Quality", "11", QnDomainPhysical); // panoramic
         else
-            m_streamParam.get("Quality").value = "7";
+            m_streamParam.get("Quality").setValue("7");
 
         break;
 
@@ -82,13 +86,13 @@ void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
         if (avRes->isPanoramic())
             avRes->setParamAsynch("resolution", "half", QnDomainPhysical);
         else
-            m_streamParam.get("resolution").value = "half";
+            m_streamParam.get("resolution").setValue("half");
 
 
         if (avRes->isPanoramic())
             avRes->setParamAsynch("Quality", "15", QnDomainPhysical); // panoramic
         else
-            m_streamParam.get("Quality").value = "13";
+            m_streamParam.get("Quality").setValue("13");
 
         break;
 
@@ -98,13 +102,13 @@ void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
         if (avRes->isPanoramic())
             avRes->setParamAsynch("resolution", "half", QnDomainPhysical);
         else
-            m_streamParam.get("resolution").value = "half";
+            m_streamParam.get("resolution").setValue("half");
 
 
         if (avRes->isPanoramic())
             avRes->setParamAsynch("Quality", "11", QnDomainPhysical); // panoramic
         else
-            m_streamParam.get("Quality").value = "6";
+            m_streamParam.get("Quality").setValue("6");
 
         break;
 

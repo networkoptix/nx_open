@@ -78,7 +78,7 @@ QImage QnMediaResource::getImage(int /*channnel*/, QDateTime /*time*/, QnStreamQ
     return QImage();
 }
 
-QnDeviceVideoLayout* QnMediaResource::getVideoLayout(QnAbstractMediaStreamDataProvider* reader)
+QnVideoResourceLayout* QnMediaResource::getVideoLayout(QnAbstractMediaStreamDataProvider* reader)
 {
     static QnDefaultDeviceVideoLayout defaultLayout;
     if (reader)
@@ -87,7 +87,7 @@ QnDeviceVideoLayout* QnMediaResource::getVideoLayout(QnAbstractMediaStreamDataPr
         return &defaultLayout;
 }
 
-QnDeviceAudioLayout* QnMediaResource::getAudioLayout(QnAbstractMediaStreamDataProvider* reader)
+QnResourceAudioLayout* QnMediaResource::getAudioLayout(QnAbstractMediaStreamDataProvider* reader)
 {
     static QnEmptyAudioLayout defaultLayout;
     if (reader)

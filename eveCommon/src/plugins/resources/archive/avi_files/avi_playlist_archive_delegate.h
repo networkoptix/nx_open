@@ -17,7 +17,7 @@ public:
     virtual void close();
     virtual qint64 seek(qint64 time);
     virtual qint64 endTime();
-    virtual QnDeviceVideoLayout* getVideoLayout();
+    virtual QnVideoResourceLayout* getVideoLayout();
 
     static QString addDirPath(const QString sourceDir, const QString& postfix);
 protected:

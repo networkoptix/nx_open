@@ -6,8 +6,10 @@
 
 #include "av_resource.h"
 #include "../tools/AVJpegHeader.h"
-#include "network/nettools.h"
-#include "common/sleep.h"
+#include "utils/network/nettools.h"
+#include "utils/common/sleep.h"
+#include "core/resource/network_resource.h"
+
 
 #define CL_BROAD_CAST_RETRY 3
 
@@ -19,7 +21,8 @@ QnPlArecontResourceSearcher::QnPlArecontResourceSearcher()
 	AVJpeg::Header::Initialize("ArecontVision", "CamLabs", "ArecontVision");
 
 	QString error;
-	if (QnResource::loadDevicesParam(QCoreApplication::applicationDirPath() + "/arecontvision/devices.xml"))
+	//if (QnResource::loadDevicesParam(QCoreApplication::applicationDirPath() + "/arecontvision/devices.xml"))
+    if (0) //todo
 	{
 		CL_LOG(cl_logINFO)
 		{
@@ -156,8 +159,20 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
 				resource->setMAC(mac);
 				resource->setDiscoveryAddr( ipaddrs.at(i) );
 
-                if (hasEqualResource(result, resource))
-                    continue; // already has such
+
+                bool need_to_continue = false;
+                foreach(QnResourcePtr res, result)
+                {
+                    if (res->getUniqueId() == resource->getUniqueId())
+                    {
+                        need_to_continue = true; //already has such
+                        break;
+                    }
+
+                }
+
+                if (need_to_continue)
+                    continue; 
 
 				result.push_back(resource);
 			}

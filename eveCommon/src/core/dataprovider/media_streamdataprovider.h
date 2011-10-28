@@ -8,14 +8,14 @@
 
 
 
-class QnDeviceVideoLayout;
-class QnDeviceAudioLayout;
+class QnVideoResourceLayout;
+class QnResourceAudioLayout;
 
 class QnAbstractMediaStreamDataProvider : public QnAbstractStreamDataProvider
 {
 public:
-    virtual QnDeviceVideoLayout* getVideoLayout();
-    virtual QnDeviceAudioLayout* getAudioLayout();
+    virtual QnVideoResourceLayout* getVideoLayout();
+    virtual QnResourceAudioLayout* getAudioLayout();
 
 	explicit QnAbstractMediaStreamDataProvider(QnResourcePtr res);
 	virtual ~QnAbstractMediaStreamDataProvider();

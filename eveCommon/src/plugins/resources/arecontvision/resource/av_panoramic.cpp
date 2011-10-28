@@ -1,6 +1,7 @@
 #include "av_resource.h"
 #include "av_panoramic.h"
 #include "../dataprovider/panoramic_cpul_tftp_dataprovider.h"
+#include "core/resource/resource_media_layout.h"
 
 
 class AVVideoLayout180 : public QnVideoResourceLayout
@@ -9,15 +10,11 @@ public:
 	AVVideoLayout180(){};
 	virtual ~AVVideoLayout180(){};
 	//returns number of video channels device has
-	virtual unsigned int numberOfVideoChannels() const
+	virtual unsigned int numberOfChannels() const
 	{
 		return 4;
 	}
 
-    virtual unsigned int numberOfAudioChannels() const
-    {
-        return 1;
-    }
 
 	virtual unsigned int width() const 
 	{
@@ -56,13 +53,14 @@ public:
 
 };
 
-class AVVideoLayout360 : public QnMediaResourceLayout
+class AVVideoLayout360 : public QnVideoResourceLayout
 {
 public:
 	AVVideoLayout360(){};
 	virtual ~AVVideoLayout360(){};
 	//returns number of video channels device has
-	virtual unsigned int numberOfVideoChannels() const
+    
+	virtual unsigned int numberOfChannels() const
 	{
 		return 4;
 	}
@@ -140,16 +138,16 @@ bool CLArecontPanoramicDevice::setParamPhysical(const QString& name, const QnVal
 {
     QnParam& param = getResourceParamList().get(name);
 
-    if (param.paramNetHelper.isEmpty()) // check if we have paramNetHelper command for this param
+    if (param.netHelper().isEmpty()) // check if we have paramNetHelper command for this param
         return false;
 
-	if (param.type==QnParam::None || param.type==QnParam::Button) 
+	if (param.type()==QnParamType::None || param.type()==QnParamType::Button) 
 	{
 		CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
 		QString request;
 
 		QTextStream str(&request);
-		str << "set?" << param.paramNetHelper;
+		str << "set?" << param.netHelper();
 
 		connection.setRequestLine(request);
 
@@ -165,7 +163,7 @@ bool CLArecontPanoramicDevice::setParamPhysical(const QString& name, const QnVal
 			QString request;
 
 			QTextStream str(&request);
-			str << "set" << i << "?" << param.paramNetHelper;
+			str << "set" << i << "?" << param.netHelper();
 			str << "=" << (QString)val;
 
 			connection.setRequestLine(request);

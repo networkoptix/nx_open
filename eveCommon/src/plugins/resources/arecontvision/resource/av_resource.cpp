@@ -2,7 +2,7 @@
 #include "av_resource.h"
 #include "av_panoramic.h"
 #include "av_singesensor.h"
-#include "resourcecontrol/resource_command_consumer.h"
+#include "core/resource/resource_command_consumer.h"
 
 #include <QtNetwork/QUdpSocket>
 
@@ -11,10 +11,13 @@
 #elif defined(QT_LINUXBASE)
 #  include <arpa/inet.h>
 #endif
+#include "utils/network/nettools.h"
+#include "utils/network/ping.h"
+
 
 const char* ArecontVisionManufacture = "ArecontVision";
 
-extern int ping_timeout;
+
 
 QnPlAreconVisionResource::QnPlAreconVisionResource()
 {
@@ -121,8 +124,8 @@ bool QnPlAreconVisionResource::setHostAddress(const QHostAddress& ip, QnDomain d
     {
         QUdpSocket sock;
 
-        sock.bind(m_localAddress , 0); // address usesd to find cam
-        QString m_local_adssr_srt = m_localAddress.toString(); // debug only
+        sock.bind(getDiscoveryAddr() , 0); // address usesd to find cam
+        QString m_local_adssr_srt = getDiscoveryAddr().toString(); // debug only
         QString new_ip_srt = ip.toString(); // debug only
 
         QByteArray basic_str = "Arecont_Vision-AV2000\2";
@@ -158,9 +161,9 @@ QString QnPlAreconVisionResource::toSearchString() const
 {
     QString result;
 
-    QString firmware = getResourceParamList().get("Firmware version").value;
-    QString hardware = getResourceParamList().get("Image engine").value;
-    QString net = getResourceParamList().get("Net version").value;
+    QString firmware = getResourceParamList().get("Firmware version").value();
+    QString hardware = getResourceParamList().get("Image engine").value();
+    QString net = getResourceParamList().get("Net version").value();
 
     QTextStream t(&result);
     t<< QnNetworkResource::toSearchString() <<" live fw=" << firmware << " hw=" << hardware << " net=" << net;
@@ -207,7 +210,7 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
 	result->setHostAddress(getHostAddress(), QnDomainMemory);
 	result->setMAC(getMAC());
 	result->setId(getId());
-	result->setNetworkStatus(m_networkStatus);
+	
 
 
 	return result;
@@ -308,7 +311,7 @@ bool QnPlAreconVisionResource::getParamPhysical(const QString& name, QnValue& va
 
     //================================================
     QnParam& param = getResourceParamList().get(name);
-    if (param.paramNetHelper.isEmpty()) // check if we have paramNetHelper
+    if (param.netHelper().isEmpty()) // check if we have paramNetHelper
     {
         //cl_log.log("cannot find http command for such param!", cl_logWARNING);
         return false;
@@ -318,7 +321,7 @@ bool QnPlAreconVisionResource::getParamPhysical(const QString& name, QnValue& va
 
     QString request;
 
-    QTextStream(&request) << "get?" << param.paramNetHelper;
+    QTextStream(&request) << "get?" << param.netHelper();
 
     connection.setRequestLine(request);
 
@@ -340,9 +343,9 @@ bool QnPlAreconVisionResource::getParamPhysical(const QString& name, QnValue& va
 
     QByteArray rarray = response.mid(index+1);
 
-    param.value = QString(rarray.data());
+    param.setValue(QString(rarray.data()));
 
-    val = param.value;
+    val = param.value();
     return true;
 
 }
@@ -351,7 +354,7 @@ bool QnPlAreconVisionResource::setParamPhysical(const QString& name, const QnVal
 {
     QnParam& param = getResourceParamList().get(name);
 
-    if (param.paramNetHelper.isEmpty()) // check if we have paramNetHelper command for this param
+    if (param.netHelper().isEmpty()) // check if we have paramNetHelper command for this param
         return false;
 
     CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
@@ -359,8 +362,8 @@ bool QnPlAreconVisionResource::setParamPhysical(const QString& name, const QnVal
     QString request;
 
     QTextStream str(&request);
-    str << "set?" << param.paramNetHelper;
-    if (param.type!=QnParam::None && param.type!=QnParam::Button)
+    str << "set?" << param.netHelper();
+    if (param.type()!=QnParamType::None && param.type()!=QnParamType::Button)
         str << "=" << (QString)val;
 
     connection.setRequestLine(request);

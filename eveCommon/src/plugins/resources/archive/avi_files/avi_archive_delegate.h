@@ -20,8 +20,8 @@ public:
     virtual qint64 endTime();
     virtual QnAbstractMediaDataPtr getNextData();
     virtual qint64 seek (qint64 time);
-    virtual QnDeviceVideoLayout* getVideoLayout();
-    virtual QnDeviceAudioLayout* getAudioLayout();
+    virtual QnVideoResourceLayout* getVideoLayout();
+    virtual QnResourceAudioLayout* getAudioLayout();
     
     virtual AVCodecContext* setAudioChannel(int num);
 protected:
@@ -43,7 +43,7 @@ private:
     int m_firstVideoIndex;
     bool m_streamsFound;
     CLCustomDeviceVideoLayout* m_videoLayout;
-    QnDeviceAudioLayout* m_audioLayout;
+    QnResourceAudioLayout* m_audioLayout;
     QVector<int> m_indexToChannel;
 
     friend class QnAviAudioLayout;

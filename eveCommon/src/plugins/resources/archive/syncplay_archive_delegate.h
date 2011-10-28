@@ -19,8 +19,8 @@ public:
     virtual qint64 endTime();
     virtual QnAbstractMediaDataPtr getNextData();
     virtual qint64 seek (qint64 time);
-    virtual QnDeviceVideoLayout* getVideoLayout();
-    virtual QnDeviceAudioLayout* getAudioLayout();
+    virtual QnVideoResourceLayout* getVideoLayout();
+    virtual QnResourceAudioLayout* getAudioLayout();
 
     void setStartDelay(qint64 startDelay);
     qint64 secondTime() const;

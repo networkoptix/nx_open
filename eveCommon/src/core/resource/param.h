@@ -40,6 +40,7 @@ typedef QSharedPointer<QnParamType> QnParamTypePtr;
 struct QN_EXPORT QnParam
 {
     QnParam() {}
+    QnParam(QnValue val){m_value = val;};
     QnParam(QnParamTypePtr paramType) { m_paramType = paramType;}
 
     bool setValue(QnValue val); // safe way to set value
@@ -55,6 +56,7 @@ struct QN_EXPORT QnParam
     const QList<QnValue>& possibleValues() const { return m_paramType->possible_values; }
     const QString& description() const { return m_paramType->description; }
     const bool isReadOnly() const { return m_paramType->readonly; }
+    const QString netHelper() const { return m_paramType->paramNetHelper; }
 private:
     QnParamTypePtr m_paramType;
     QnValue m_value;

@@ -88,7 +88,7 @@ ByteIOContext* QnArchiveStreamReader::getIOContext()
 	return 0;
 }
 
-QString QnArchiveStreamReader::serializeLayout(const QnDeviceVideoLayout* layout)
+QString QnArchiveStreamReader::serializeLayout(const QnVideoResourceLayout* layout)
 {
     QString rez;
     QTextStream ost(&rez);
@@ -100,13 +100,13 @@ QString QnArchiveStreamReader::serializeLayout(const QnDeviceVideoLayout* layout
     return rez;
 }
 
-QnDeviceVideoLayout* QnArchiveStreamReader::getVideoLayout()
+QnVideoResourceLayout* QnArchiveStreamReader::getVideoLayout()
 {
     m_delegate->open(m_resource);
     return m_delegate->getVideoLayout();
 }
 
-QnDeviceAudioLayout* QnArchiveStreamReader::getAudioLayout()
+QnResourceAudioLayout* QnArchiveStreamReader::getAudioLayout()
 {
     m_delegate->open(m_resource);
     return m_delegate->getAudioLayout();

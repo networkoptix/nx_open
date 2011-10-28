@@ -140,13 +140,13 @@ bool QnAbstractMediaStreamDataProvider::afterGetData(QnAbstractDataPacketPtr d)
 
 }
 
-QnDeviceVideoLayout* QnAbstractMediaStreamDataProvider:: getVideoLayout()
+QnVideoResourceLayout* QnAbstractMediaStreamDataProvider:: getVideoLayout()
 {
     static QnDefaultDeviceVideoLayout videolayout;
     return &videolayout;
 }
 
-QnDeviceAudioLayout* QnAbstractMediaStreamDataProvider:: getAudioLayout()
+QnResourceAudioLayout* QnAbstractMediaStreamDataProvider:: getAudioLayout()
 {
     static QnEmptyAudioLayout audiolayout;
     return &audiolayout;

@@ -8,8 +8,8 @@
 #include "core/resource/resource.h"
 
 class QnAbstractMediaStreamDataProvider;
-class QnDeviceVideoLayout;
-class QnDeviceAudioLayout;
+class QnVideoResourceLayout;
+class QnResourceAudioLayout;
 
 enum QnStreamQuality {QnQualityLowest, QnQualityLow, QnQualityNormal, QnQualityHigh, QnQualityHighest, QnQualityPreSeted};
 
@@ -19,8 +19,8 @@ public:
     QnMediaResource();
     virtual ~QnMediaResource();
 
-    virtual QnDeviceVideoLayout* getVideoLayout(QnAbstractMediaStreamDataProvider* reader);
-    virtual QnDeviceAudioLayout* getAudioLayout(QnAbstractMediaStreamDataProvider* reader);
+    virtual QnVideoResourceLayout* getVideoLayout(QnAbstractMediaStreamDataProvider* reader);
+    virtual QnResourceAudioLayout* getAudioLayout(QnAbstractMediaStreamDataProvider* reader);
 
     // size - is size of one channel; we assume all channels have the same size
     virtual QnStreamQuality getBestQualityForSuchOnScreenSize(const QSize& /*size*/) const { return QnQualityNormal; }

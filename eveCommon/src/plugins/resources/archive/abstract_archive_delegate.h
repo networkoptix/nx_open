@@ -6,8 +6,8 @@
 #include "core/resource/resource.h"
 #include "core/datapacket/mediadatapacket.h"
 
-class QnDeviceVideoLayout;
-class QnDeviceAudioLayout;
+class QnVideoResourceLayout;
+class QnResourceAudioLayout;
 
 class QnAbstractArchiveDelegate: public QObject
 {
@@ -28,8 +28,8 @@ public:
     virtual qint64 endTime() = 0;
     virtual QnAbstractMediaDataPtr getNextData() = 0;
     virtual qint64 seek (qint64 time) = 0;
-    virtual QnDeviceVideoLayout* getVideoLayout() = 0;
-    virtual QnDeviceAudioLayout* getAudioLayout() = 0;
+    virtual QnVideoResourceLayout* getVideoLayout() = 0;
+    virtual QnResourceAudioLayout* getAudioLayout() = 0;
 
     virtual AVCodecContext* setAudioChannel(int /*num*/) { return 0; }
     

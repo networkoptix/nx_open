@@ -16,7 +16,7 @@
 
 class QnDeviceCommand;
 class QnAbstractStreamDataProvider;
-class QnDeviceVideoLayout;
+class QnVideoResourceLayout;
 class QnResourceConsumer;
 
 // this class and inherited must be very light to create 
