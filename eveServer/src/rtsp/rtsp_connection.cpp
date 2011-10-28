@@ -16,6 +16,7 @@
 #include "plugins/resources/archive/archive_stream_reader.h"
 
 #include "utils/network/tcp_connection_priv.h"
+#include "plugins/resources/archive/abstract_archive_delegate.h"
 
 
 static const quint8 RTP_FFMPEG_GENERIC_CODE = 102;
@@ -299,7 +300,7 @@ int QnRtspConnectionProcessor::numOfVideoChannels()
     Q_D(QnRtspConnectionProcessor);
     if (!d->mediaRes)
         return -1;
-    QnDeviceVideoLayout* layout = d->mediaRes->getVideoLayout(d->dataProvider);
+    QnVideoResourceLayout* layout = d->mediaRes->getVideoLayout(d->dataProvider);
     return layout ? layout->numberOfChannels() : -1;
 }
 
@@ -319,8 +320,8 @@ int QnRtspConnectionProcessor::composeDescribe()
 
     QTextStream sdp(&d->responseBody);
 
-    QnDeviceVideoLayout* videoLayout = d->mediaRes->getVideoLayout(d->dataProvider);
-    QnDeviceAudioLayout* audioLayout = d->mediaRes->getAudioLayout(d->dataProvider);
+    QnVideoResourceLayout* videoLayout = d->mediaRes->getVideoLayout(d->dataProvider);
+    QnResourceAudioLayout* audioLayout = d->mediaRes->getAudioLayout(d->dataProvider);
     int numVideo = videoLayout->numberOfChannels();
     int numAudio = audioLayout->numberOfChannels();
 
@@ -366,7 +367,7 @@ int QnRtspConnectionProcessor::composeSetup()
         return CODE_NOT_IMPLEMETED;
     int trackId = extractTrackId(d->requestHeaders.path());
 
-    QnDeviceVideoLayout* videoLayout = d->mediaRes->getVideoLayout(d->dataProvider);
+    QnVideoResourceLayout* videoLayout = d->mediaRes->getVideoLayout(d->dataProvider);
     if (trackId >= videoLayout->numberOfChannels()) {
         //QnAbstractMediaStreamDataProvider* dataProvider;
         QnArchiveStreamReader* archiveReader = dynamic_cast<QnArchiveStreamReader*>(d->dataProvider);
