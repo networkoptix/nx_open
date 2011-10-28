@@ -29,8 +29,6 @@ static const int RTSP_MIN_SEEK_INTERVAL = 1000 * 30; // 30 ms as min seek interv
 
 static const int MAX_RTSP_WRITE_BUFFER = 1024*1024;
 
-static const int LIVECAM_STREAMING_ID = 0;
-
 class QnTcpListener;
 
 //#define DEBUG_RTSP
@@ -375,7 +373,6 @@ int QnRtspConnectionProcessor::composeSetup()
             archiveReader->setAudioChannel(trackId - videoLayout->numberOfChannels());
     }
 
-
     if (trackId >= 0)
     {
         QStringList transportInfo = transport.split(';');
@@ -459,13 +456,7 @@ void QnRtspConnectionProcessor::createDataProvider()
 {
     Q_D(QnRtspConnectionProcessor);
     if (!d->dataProvider)
-    {
-        if (d->mediaRes->checkFlag(QnResource::live))
-            d->dataProvider = d->mediaRes->acquireMediaProvider(LIVECAM_STREAMING_ID, QnResource::Role_DirectConnection);
-        else
-            d->dataProvider = d->mediaRes->createMediaProvider(QnResource::Role_DirectConnection);
-
-    }
+        d->dataProvider = dynamic_cast<QnAbstractMediaStreamDataProvider*> (d->mediaRes->createDataProvider(QnResource::Role_PrimariVideo));
 }
 
 int QnRtspConnectionProcessor::composePlay()

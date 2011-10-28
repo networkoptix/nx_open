@@ -15,7 +15,7 @@ public:
 
     void deserialize(const QnResourceParameters&);
 
-    virtual QnAbstractStreamDataProvider* createDataProvider(ConnectionRole role);
+    virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 	virtual QString toString() const;
     virtual int getStreamDataProvidersMaxAmount() const { return INT_MAX; }
 };

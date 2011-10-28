@@ -33,7 +33,7 @@ QString QnAviResource::toString() const
 	return m_name;
 }
 
-QnAbstractStreamDataProvider* QnAviResource::createDataProvider(ConnectionRole role)
+QnAbstractStreamDataProvider* QnAviResource::createDataProviderInternal(ConnectionRole role)
 {
     QnArchiveStreamReader* result = new QnArchiveStreamReader(toSharedPointer());
 

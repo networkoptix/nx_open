@@ -9,7 +9,7 @@ class CLArecontPanoramicDevice : public QnPlAreconVisionResource
 public:
 	CLArecontPanoramicDevice(const QString& name);
 	bool getDescription();
-	virtual QnAbstractMediaStreamDataProvider* getDeviceStreamConnection();
+	virtual QnAbstractMediaStreamDataProvider* createDataProviderInternal();
 
 	virtual bool hasTestPattern() const;
 protected:

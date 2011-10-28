@@ -436,7 +436,7 @@ void QnResource::disconnectAllConsumers()
     m_consumers.clear();
 }
 
-QnAbstractStreamDataProvider* QnResource::getDeviceStreamConnection(ConnectionRole role)
+QnAbstractStreamDataProvider* QnResource::createDataProvider(ConnectionRole role)
 {
     QnAbstractStreamDataProvider* dataProvider = createDataProvider(role);
     if (dataProvider)

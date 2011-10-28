@@ -10,10 +10,10 @@ class CLArecontSingleSensorDevice : public QnPlAreconVisionResource
 public:
 	CLArecontSingleSensorDevice(const QString& name);
 	bool getDescription();
-	virtual QnAbstractMediaStreamDataProvider* createMediaProvider();
 
 	virtual bool hasTestPattern() const;
-
+protected:
+    virtual QnAbstractMediaStreamDataProvider* createMediaProvider();
 protected:
 	bool m_hastestPattern;
 
