@@ -135,7 +135,7 @@ public:
 
     // same as setParam but but returns immediately;
     // this function leads setParam invoke in separate thread. so no need to make it virtual
-    void setParamAsynch(const QString& name, const QnValue& val, QnDomain domain = QnDomainPhysical);
+    void setParamAsynch(const QString& name, const QnValue& val, QnDomain domain );
 
     // ==============================================================================
 
@@ -202,7 +202,7 @@ protected:
 
     // should just do physical job( network or so ) do not care about memory domain
     virtual bool setParamPhysical(const QString& name, const QnValue& val);
-    bool setSpecialParam(const QString& name, const QnValue& val, QnDomain domain);
+    virtual bool setSpecialParam(const QString& name, const QnValue& val, QnDomain domain);
 
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role) = 0;
 protected:
