@@ -7,6 +7,8 @@
 #include "core/resourcemanagment/asynch_seacher.h"
 #include "core/resourcemanagment/resource_pool.h"
 #include "rtsp/rtsp_listener.h"
+#include "plugins/resources/arecontvision/resource/av_resource_searcher.h"
+#include "recorder/recording_manager.h"
 
 //#include "device_plugins/arecontvision/devices/av_device_server.h"
 
@@ -169,13 +171,15 @@ int main(int argc, char *argv[])
     //IPPH264Decoder::dll.init();
 
     //============================
-    //QnResourceDiscoveryManager::instance()->addDeviceServer(&AVDeviceServer::instance());
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().start();
     //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
     
-    QnRtspListener rtspListener;
+    QnRtspListener rtspListener(QHostAddress::Any, 50000);
     rtspListener.start();
+    QnRecordingManager recorder;
+    recorder.start();
 
 #ifdef TEST_RTSP_SERVER
     addTestData();

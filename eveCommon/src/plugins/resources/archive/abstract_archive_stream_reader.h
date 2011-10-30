@@ -53,7 +53,8 @@ public:
 
     virtual void setSkipFramesToTime(qint64 skipFramesToTime);
     qint64 skipFramesToTime() const;
-
+    qint64 startTime() const { return m_delegate->startTime(); }
+    qint64 endTime() const { return m_delegate->endTime(); }
 signals:
     void singleShotModeChanged(bool value);
     void jumpOccured(qint64 mksec, bool makeshot);

@@ -41,7 +41,7 @@ class QN_EXPORT QnResource: public QObject //: public CLRefCounter
     Q_OBJECT
 public:
 
-    enum ConnectionRole {Role_Default, Role_PrimariVideo, Role_SecondaryVideo};
+    enum ConnectionRole {Role_Default, Role_PrimariVideo, Role_SecondaryVideo, Role_Archive};
 
     enum
     {
@@ -237,6 +237,9 @@ private:
     mutable QnParamList m_streamParamList; //-  
     mutable QMutex m_consumersMtx;
     QSet<QnResourceConsumer*> m_consumers;
+
+    typedef QMap<ConnectionRole, QnAbstractStreamDataProvider*> ProvidersMap;
+    ProvidersMap m_providerByRole;
 };
 
 class QnResourceFactory

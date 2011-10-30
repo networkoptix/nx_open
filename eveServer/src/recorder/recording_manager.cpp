@@ -1,32 +1,45 @@
 #include "recording_manager.h"
 #include "core/resourcemanagment/resource_pool.h"
+#include "core/resourcemanagment/security_cam_resource.h"
+#include "recording/stream_recorder.h"
+#include "core/dataprovider/media_streamdataprovider.h"
+
+static const int TRUNCATE_INTERVAL = 15; // seconds
 
 QnRecordingManager::QnRecordingManager()
 {
-    connect(qnResPool, SIGNAL(resourceAdded(QnResourcePtr res)), this, SLOT(onNewResource(QnResourcePtr)));
-    connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr res)), this, SLOT(onRemoveResource(QnResourcePtr)));
+}
+
+QnRecordingManager::~QnRecordingManager()
+{
+}
+
+void QnRecordingManager::start()
+{
+    connect(qnResPool, SIGNAL(resourceAdded(QnResourcePtr)), this, SLOT(onNewResource(QnResourcePtr)));
+    connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(onRemoveResource(QnResourcePtr)));
 }
 
 void QnRecordingManager::onNewResource(QnResourcePtr res)
 {
-    /*
     QnSequrityCamResourcePtr camera = qSharedPointerDynamicCast<QnSequrityCamResource>(res);
     if (camera)
     {   
-        res->acquireMediaProvider(Provider_Primary);
+        QnAbstractMediaStreamDataProvider* reader = dynamic_cast<QnAbstractMediaStreamDataProvider*>(res->getDataProvider(QnResource::Role_PrimariVideo));
+        reader->setQuality(QnQualityHighest);
 
-        m_reader->setQuality(QnQualityHighest);
-        if (m_recorder == 0) {
-            m_recorder = new QnStreamRecorder(m_device);
-            m_recorder->setTruncateInterval(15);
-            connect(m_recorder, SIGNAL(recordingFailed(QString)), this, SIGNAL(recordingFailed(QString)));
-        }
-        m_reader->addDataProcessor(m_recorder);
-        m_reader->setNeedKeyData();
-        m_recorder->start();
-        m_videovindow->addSubItem(RecordingSubItem);
+        QnStreamRecorder* recorder = new QnStreamRecorder(res);
+        recorder->setTruncateInterval(TRUNCATE_INTERVAL);
+        connect(recorder, SIGNAL(recordingFailed(QString)), this, SIGNAL(recordingFailed(QString)));
+        reader->addDataProcessor(recorder);
+        reader->setNeedKeyData();
+        recorder->start();
     }
-    */
+}
+
+void QnRecordingManager::recordingFailed(QString errMessage)
+{
+
 }
 
 void QnRecordingManager::onRemoveResource(QnResourcePtr res)
