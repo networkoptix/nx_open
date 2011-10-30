@@ -3,7 +3,8 @@
 
 
 QnAbstractResourceSearcher::QnAbstractResourceSearcher():
-m_shouldStop(false)
+m_shouldStop(false),
+m_sholudbeUsed(true)
 {
 
 }

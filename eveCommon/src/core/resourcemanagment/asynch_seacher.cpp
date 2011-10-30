@@ -264,7 +264,7 @@ struct check_if_accessible_STRUCT
         if (acc)
         {
             if (m_isSameSubnet) // if same subnet
-                acc = resourceNet->conflicting();
+                acc = !(resourceNet->conflicting());
             else
                 acc = resourceNet->isResourceAccessible();
         }

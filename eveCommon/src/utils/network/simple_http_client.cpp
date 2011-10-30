@@ -55,20 +55,22 @@ CLHttpStatus CLSimpleHTTPClient::getNextLine()
 
 }
 
-CLHttpStatus CLSimpleHTTPClient::openStream(bool recursive)
+CLHttpStatus CLSimpleHTTPClient::doGET(const QString& requestStr, bool recursive)
 {
 	try
 	{
-        
-		if (!m_sock.connect(m_host.toString().toLatin1().data(), m_port))
-			return CL_HTTP_HOST_NOT_AVAILABLE;
-
-        
+        if (!m_connected)
+        {
+            if (!m_sock.connect(m_host.toString().toLatin1().data(), m_port))
+            {
+                return CL_HTTP_HOST_NOT_AVAILABLE;
+            }
+        }
 
 		QString request;
 		QTextStream os(&request);
 
-		os << "GET /" << m_request<<" HTTP/1.1\r\n"
+        os << "GET /" << requestStr<<" HTTP/1.1\r\n"
 			<< "Host: "<< m_host.toString() << "\r\n";
 
 		if (m_auth.user().length()>0 && mNonce.isEmpty())
@@ -77,22 +79,24 @@ CLHttpStatus CLSimpleHTTPClient::openStream(bool recursive)
 		}
 		else if (m_auth.password().length()>0 && !mNonce.isEmpty())
 		{
-			os << digestAccess();
+            os << digestAccess(request);
 		}
 
 		os<< "\r\n";
-
         
         if (!m_sock.send(request.toLatin1().data(), request.toLatin1().size()))
-            return CL_HTTP_HOST_NOT_AVAILABLE;
+        {
+            qDebug() << "OpenStream1";
 
-        
+            return CL_HTTP_HOST_NOT_AVAILABLE;
+        }
 
 		if (CL_HTTP_HOST_NOT_AVAILABLE==getNextLine())
+        {
 			return CL_HTTP_HOST_NOT_AVAILABLE;
+        }
 
         
-
 		if (!m_line.contains(QLatin1String("200 OK")))// not ok
 		{
 			m_connected = false;
@@ -102,7 +106,7 @@ CLHttpStatus CLSimpleHTTPClient::openStream(bool recursive)
                 getAuthInfo();
 
                 if (recursive)
-                    return openStream(false);
+                    return doGET(request, false);
                 else
                     return CL_HTTP_AUTH_REQUIRED;
             }
@@ -155,6 +159,19 @@ CLHttpStatus CLSimpleHTTPClient::openStream(bool recursive)
 		return CL_HTTP_HOST_NOT_AVAILABLE;
 	}
 
+}
+
+void CLSimpleHTTPClient::readAll(QByteArray& data)
+{
+    static const unsigned long BUFSIZE = 1024;
+
+    int nRead;
+
+    char buf[BUFSIZE];
+    while ((nRead = read(buf, BUFSIZE)) > 0)
+    {
+        data.append(buf, nRead);
+    }
 }
 
 long CLSimpleHTTPClient::read(char* data, unsigned long max_len)
@@ -222,12 +239,12 @@ QString CLSimpleHTTPClient::basicAuth() const
     return base64;
 }
 
-QString CLSimpleHTTPClient::digestAccess() const
+QString CLSimpleHTTPClient::digestAccess(const QString& request) const
 {
     QString HA1= m_auth.user() + QLatin1Char(':') + mRealm + QLatin1Char(':') + m_auth.password();
     HA1 = QString::fromAscii(QCryptographicHash::hash(HA1.toAscii(), QCryptographicHash::Md5).toHex().constData());
 
-    QString HA2 = QLatin1String("GET:/") + m_request;
+    QString HA2 = QLatin1String("GET:/") + request;
     HA2 = QString::fromAscii(QCryptographicHash::hash(HA2.toAscii(), QCryptographicHash::Md5).toHex().constData());
 
     QString response = HA1 + QLatin1Char(':') + mNonce + QLatin1Char(':') + HA2;
@@ -238,7 +255,7 @@ QString CLSimpleHTTPClient::digestAccess() const
     QString result;
     QTextStream str(&result);
 
-    str << "Authorization: Digest username=\"" << m_auth.user() << "\",realm=\"" << mRealm << "\",nonce=\"" << mNonce << "\",uri=\"/" << m_request << "\",response=\"" << response << "\"\r\n";
+    str << "Authorization: Digest username=\"" << m_auth.user() << "\",realm=\"" << mRealm << "\",nonce=\"" << mNonce << "\",uri=\"/" << request << "\",response=\"" << response << "\"\r\n";
 
     return result;
 }

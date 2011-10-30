@@ -14,10 +14,10 @@ public:
 	CLSimpleHTTPClient(const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth);
 	~CLSimpleHTTPClient();
 
-	void setRequestLine(const QString& request){m_request = request;};
+    CLHttpStatus doGET(const QString& request, bool recursive = true);
+    bool isOpened()const{return m_connected;}
 
-	CLHttpStatus openStream(bool recursive = true);
-	bool isOpened()const{return m_connected;} ;
+    void readAll(QByteArray& data);
 
 	long read(char* data, unsigned long max_len);
 
@@ -41,7 +41,7 @@ private:
     void getAuthInfo();
 
     QString basicAuth() const;
-    QString digestAccess() const;
+    QString digestAccess(const QString&) const;
 
 private:
     QString m_line;
@@ -49,7 +49,6 @@ private:
 	QHostAddress m_host;
 	int m_port;
 
-	QString m_request;
 	QString m_contentType;
 	unsigned int m_contentLen;
     unsigned int m_readed;
