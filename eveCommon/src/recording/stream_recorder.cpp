@@ -245,3 +245,8 @@ void QnStreamRecorder::setTruncateInterval(int seconds)
 {
     m_currentChunkLen = m_truncateInterval = seconds * 1000000ll;
 }
+
+void QnStreamRecorder::setFileName(const QString& fileName)
+{
+    m_fileName = fileName;
+}
