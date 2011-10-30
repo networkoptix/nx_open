@@ -157,6 +157,7 @@ public:
 	//const QnParamList& getDeviceParamList() const;
 	QnAbstractStreamDataProvider* createDataProvider(ConnectionRole role);
 
+    // returns existing data provider; if thre is no such => creates it 
     QnAbstractStreamDataProvider* getDataProvider(ConnectionRole role);
 
 
