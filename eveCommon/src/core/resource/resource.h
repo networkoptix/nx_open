@@ -155,11 +155,10 @@ public:
 
 	//QnParamList& getDeviceParamList();// returns params that can be changed on device level
 	//const QnParamList& getDeviceParamList() const;
-
 	QnAbstractStreamDataProvider* createDataProvider(ConnectionRole role);
 
-	// after setVideoLayout is called device is responsable for the destroying the layout 
-	//void setVideoLayout(CLDeviceVideoLayout* layout);
+    QnAbstractStreamDataProvider* getDataProvider(ConnectionRole role);
+
 
 	//virtual const CLDeviceVideoLayout* getVideoLayout(QnAbstractStreamDataProvider* reader);
 
