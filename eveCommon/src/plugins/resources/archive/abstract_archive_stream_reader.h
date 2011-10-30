@@ -3,14 +3,14 @@
 
 
 #include "abstract_archive_delegate.h"
-#include "core/dataprovider/cpull_stremreader.h"
 #include "utils/common/adaptivesleep.h"
+#include "core/dataprovider/cpull_media_stream_provider.h"
 
-class QnAbstractArchiveReader : public CLClientPullStreamreader
+class QnAbstractArchiveReader : public QnClientPullStreamProvider
 {
     Q_OBJECT
 public:
-	QnAbstractArchiveReader(QnResource* dev);
+	QnAbstractArchiveReader(QnResourcePtr dev);
 	virtual ~QnAbstractArchiveReader();
 
     void setArchiveDelegate(QnAbstractArchiveDelegate* contextDelegate);
@@ -53,7 +53,8 @@ public:
 
     virtual void setSkipFramesToTime(qint64 skipFramesToTime);
     qint64 skipFramesToTime() const;
-
+    qint64 startTime() const { return m_delegate->startTime(); }
+    qint64 endTime() const { return m_delegate->endTime(); }
 signals:
     void singleShotModeChanged(bool value);
     void jumpOccured(qint64 mksec, bool makeshot);

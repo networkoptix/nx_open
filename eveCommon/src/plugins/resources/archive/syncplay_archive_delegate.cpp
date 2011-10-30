@@ -19,7 +19,7 @@ QnSyncPlayArchiveDelegate::~QnSyncPlayArchiveDelegate()
     m_syncWrapper->erase(this);
 }
 
-bool QnSyncPlayArchiveDelegate::open(const QnResource* resource)
+bool QnSyncPlayArchiveDelegate::open(QnResourcePtr resource)
 {
     return m_ownerDelegate->open(resource);
 }
@@ -55,12 +55,12 @@ qint64 QnSyncPlayArchiveDelegate::seek (qint64 time)
     return m_ownerDelegate->seek(time);
 }
 
-QnDeviceVideoLayout* QnSyncPlayArchiveDelegate::getVideoLayout()
+QnVideoResourceLayout* QnSyncPlayArchiveDelegate::getVideoLayout()
 {
     return m_ownerDelegate->getVideoLayout();
 }
 
-QnDeviceAudioLayout* QnSyncPlayArchiveDelegate::getAudioLayout()
+QnResourceAudioLayout* QnSyncPlayArchiveDelegate::getAudioLayout()
 {
     return m_ownerDelegate->getAudioLayout();
 }

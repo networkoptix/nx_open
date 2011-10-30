@@ -1,6 +1,5 @@
 #include "archive_stream_reader.h"
 #include "stdint.h"
-#include <libavformat/avformat.h>
 #include "utils/media/frame_info.h"
 
 
@@ -36,7 +35,7 @@ private:
 
 static const int FFMPEG_PROBE_BUFFER_SIZE = 1024 * 512;
 
-QnArchiveStreamReader::QnArchiveStreamReader(QnResource* dev ) :
+QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     QnAbstractArchiveReader(dev),
     m_currentTime(0),
     m_previousTime(-1),
@@ -89,7 +88,7 @@ ByteIOContext* QnArchiveStreamReader::getIOContext()
 	return 0;
 }
 
-QString QnArchiveStreamReader::serializeLayout(const QnDeviceVideoLayout* layout)
+QString QnArchiveStreamReader::serializeLayout(const QnVideoResourceLayout* layout)
 {
     QString rez;
     QTextStream ost(&rez);
@@ -101,13 +100,13 @@ QString QnArchiveStreamReader::serializeLayout(const QnDeviceVideoLayout* layout
     return rez;
 }
 
-QnDeviceVideoLayout* QnArchiveStreamReader::getVideoLayout()
+QnVideoResourceLayout* QnArchiveStreamReader::getVideoLayout()
 {
     m_delegate->open(m_resource);
     return m_delegate->getVideoLayout();
 }
 
-QnDeviceAudioLayout* QnArchiveStreamReader::getAudioLayout()
+QnResourceAudioLayout* QnArchiveStreamReader::getAudioLayout()
 {
     m_delegate->open(m_resource);
     return m_delegate->getAudioLayout();

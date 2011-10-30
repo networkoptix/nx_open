@@ -1,6 +1,9 @@
 #ifndef cl_net_state_439
 #define cl_net_state_439
 
+#include <QHostAddress>
+#include <QNetworkAddressEntry>
+
 struct CLSubNetState
 {
 	QHostAddress minHostAddress;

@@ -7,10 +7,10 @@
 class QN_EXPORT QnResourceConsumer
 {
 public:
-    QnResourceConsumer(QnResource* resource);
+    QnResourceConsumer(QnResourcePtr resource);
     virtual ~QnResourceConsumer();
 
-    QnResource* getResource() const;
+    QnResourcePtr getResource() const;
 
     bool isConnectedToTheResource() const;
 
@@ -18,7 +18,7 @@ public:
     virtual void disconnectFromResource();
 
 protected:
-    QnResource* m_resource;
+    QnResourcePtr m_resource;
 };
 
 #endif //resource_consumer_h_1921

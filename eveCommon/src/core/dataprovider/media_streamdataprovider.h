@@ -1,23 +1,20 @@
 #ifndef QnMediaStreamDataProvider_514
 #define QnMediaStreamDataProvider_514
 
-#include "core/dataprovider/streamreader.h"
 #include "core/dataprovider/streamdata_statistics.h"
 #include "../resource/media_resource.h"
+#include "abstract_streamdataprovider.h"
 
-
-
-
-class QnDeviceVideoLayout;
-class QnDeviceAudioLayout;
+class QnVideoResourceLayout;
+class QnResourceAudioLayout;
 
 class QnAbstractMediaStreamDataProvider : public QnAbstractStreamDataProvider
 {
 public:
-    virtual QnDeviceVideoLayout* getVideoLayout();
-    virtual QnDeviceAudioLayout* getAudioLayout();
+    virtual QnVideoResourceLayout* getVideoLayout();
+    virtual QnResourceAudioLayout* getAudioLayout();
 
-	explicit QnAbstractMediaStreamDataProvider(QnResource* res);
+	explicit QnAbstractMediaStreamDataProvider(QnResourcePtr res);
 	virtual ~QnAbstractMediaStreamDataProvider();
 
 
@@ -53,7 +50,7 @@ protected:
     QnParamList m_streamParam;
 
     int mFramesLost;
-    QnMediaResource* m_mediaResource;
+    QnMediaResourcePtr m_mediaResource;
 };
 
 

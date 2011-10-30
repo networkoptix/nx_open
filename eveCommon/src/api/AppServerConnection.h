@@ -1,37 +1,25 @@
-#ifndef APPSERVERCONNECTION_H
-#define APPSERVERCONNECTION_H
+#ifndef APPSERVERCONNECTIONIMPL_H
+#define APPSERVERCONNECTIONIMPL_H
 
+#include "core/resource/resource_type.h"
 #include "core/resource/resource.h"
 
+class SessionManager;
 
-
-typedef long RequestId;
-
-class QN_EXPORT QnAppServerAdapter : public QObject
+class QN_EXPORT QnAppServerConnection
 {
-    Q_OBJECT
 public:
-    virtual RequestId getResourceTypes() = 0;
+    QnAppServerConnection(const QHostAddress& host, const QAuthenticator& auth);
 
-    virtual RequestId getResources() = 0;
+    int getResourceTypes(QList<QnResourceTypePtr>& resourceTypes);
 
-    virtual RequestId addServer(const QnResource&) = 0;
-    virtual RequestId addCamera(const QnResource&, const QnId& serverId) = 0;
+    int getResources(QList<QnResourcePtr>& resources);
 
-Q_SIGNALS:
-    void resourceTypesReceived(RequestId requestId, QList<QnResourceTypePtr> resourceTypes);
-    void resourcesReceived(RequestId requestId, QList<QnResourcePtr> resources);
-    void serversReceived(RequestId requestId, QList<QnResourcePtr> servers);
-    void layoutsReceived(RequestId requestId, QList<QnResourcePtr> layouts);
-    void camerasReceived(RequestId requestId, QList<QnResourcePtr> cameras);
+    int addServer(const QnResource&, QList<QnResourcePtr>& servers);
+    int addCamera(const QnResource&, const QnId& serverId, QList<QnResourcePtr>& cameras);
 
-    void error(RequestId requestId, QString message);
-
-protected:
-    QnAppServerAdapter() {}
-    QnAppServerAdapter(const QnAppServerAdapter&) {}
+private:
+    QSharedPointer<SessionManager> m_sessionManager;
 };
 
-QN_EXPORT QnAppServerAdapter* createServerAdapter(const QString& host, const QString& login, const QString& password);
-
-#endif // APPSERVERCONNECTION_H
+#endif // APPSERVERCONNECTIONIMPL_H

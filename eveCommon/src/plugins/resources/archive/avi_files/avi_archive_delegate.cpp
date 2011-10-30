@@ -7,11 +7,11 @@
 
 extern QMutex global_ffmpeg_mutex;
 
-class QnAviAudioLayout: public QnDeviceAudioLayout
+class QnAviAudioLayout: public QnResourceAudioLayout
 {
 public:
     QnAviAudioLayout(QnAviArchiveDelegate* owner):
-        QnDeviceAudioLayout(),
+        QnResourceAudioLayout(),
         m_owner(owner)
     {
 
@@ -38,9 +38,9 @@ public:
         return audioNum;
     }
 
-    virtual QnDeviceAudioLayout::AudioTrack getAudioTrackInfo(int index) 
+    virtual QnResourceAudioLayout::AudioTrack getAudioTrackInfo(int index) 
     {
-        QnDeviceAudioLayout::AudioTrack result;
+        QnResourceAudioLayout::AudioTrack result;
         AVFormatContext* formatContext = m_owner->getFormatContext();
         if (formatContext == 0)
             return result;
@@ -201,7 +201,7 @@ qint64 QnAviArchiveDelegate::seek(qint64 time)
     return time;
 }
 
-bool QnAviArchiveDelegate::open(const QnResource* resource)
+bool QnAviArchiveDelegate::open(QnResourcePtr resource)
 {
     m_resource = resource;
     if (m_formatContext == 0) 
@@ -224,7 +224,7 @@ void QnAviArchiveDelegate::close()
     m_startMksec = 0;
 }
 
-QnDeviceVideoLayout* QnAviArchiveDelegate::getVideoLayout()
+QnVideoResourceLayout* QnAviArchiveDelegate::getVideoLayout()
 {
     if (!m_initialized) {
         return 0;
@@ -239,7 +239,7 @@ QnDeviceVideoLayout* QnAviArchiveDelegate::getVideoLayout()
     return m_videoLayout;
 }
 
-QnDeviceAudioLayout* QnAviArchiveDelegate::getAudioLayout()
+QnResourceAudioLayout* QnAviArchiveDelegate::getAudioLayout()
 {
     return m_audioLayout;
 }

@@ -1,5 +1,5 @@
-#ifndef device_h_1051
-#define device_h_1051
+#ifndef __RESOURCE_H__
+#define __RESOURCE_H__
 
 #include <QSharedPointer>
 #include <QMap>
@@ -12,11 +12,12 @@
 #include "utils/common/qnid.h"
 #include "../datapacket/datapacket.h"
 #include "resource_command_processor.h"
+#include <QMetaType>
 
 
 class QnDeviceCommand;
 class QnAbstractStreamDataProvider;
-class QnDeviceVideoLayout;
+class QnVideoResourceLayout;
 class QnResourceConsumer;
 
 // this class and inherited must be very light to create 
@@ -40,7 +41,7 @@ class QN_EXPORT QnResource: public QObject //: public CLRefCounter
     Q_OBJECT
 public:
 
-    enum ConnectionRole {Role_Default, Role_DirectConnection, Role_RemoveConnection, Role_Live, RoleCameraArchive};
+    enum ConnectionRole {Role_Default, Role_LiveVideo, Role_Archive};
 
     enum
     {
@@ -154,14 +155,7 @@ public:
 
 	//QnParamList& getDeviceParamList();// returns params that can be changed on device level
 	//const QnParamList& getDeviceParamList() const;
-
-	//QnParamList& getStreamParamList();// returns params that can be changed on stream level 
-	//const QnParamList& getStreamParamList() const;
-
-	QnAbstractStreamDataProvider* getDeviceStreamConnection(ConnectionRole role);
-
-	// after setVideoLayout is called device is responsable for the destroying the layout 
-	//void setVideoLayout(CLDeviceVideoLayout* layout);
+	QnAbstractStreamDataProvider* createDataProvider(ConnectionRole role);
 
 	//virtual const CLDeviceVideoLayout* getVideoLayout(QnAbstractStreamDataProvider* reader);
 
@@ -176,6 +170,7 @@ public:
     bool hasTag(const QString& tag) const;
     QStringList tagList() const;
 
+    QnResourcePtr toSharedPointer() const;
     void addConsumer(QnResourceConsumer* consumer);
     void removeConsumer(QnResourceConsumer* consumer);
     bool hasSuchConsumer(QnResourceConsumer* consumer) const;
@@ -205,7 +200,7 @@ protected:
     virtual bool setParamPhysical(const QString& name, const QnValue& val);
     bool setSpecialParam(const QString& name, const QnValue& val, QnDomain domain);
 
-    virtual QnAbstractStreamDataProvider* createDataProvider(ConnectionRole role) = 0;
+    virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role) = 0;
 protected:
     //typedef QMap<QnId, QnParamList > QnParamLists; // key - resource type ID
     //static QnParamLists staticResourcesParamLists; // list of all supported resources params list
@@ -238,6 +233,7 @@ private:
     mutable QnParamList m_streamParamList; //-  
     mutable QMutex m_consumersMtx;
     QSet<QnResourceConsumer*> m_consumers;
+
 };
 
 class QnResourceFactory
@@ -259,10 +255,11 @@ private:
     static QList<QnResourceFactoryPtr> m_factories;
 };
 
+
 // for future use
 class QnRecorder: public QnResource 
 {
 
 };
 
-#endif
+#endif // __RESOURCE_H__

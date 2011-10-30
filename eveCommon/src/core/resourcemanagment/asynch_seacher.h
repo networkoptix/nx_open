@@ -28,6 +28,8 @@ public:
     //QnResourceList result();
     void addDeviceServer(QnAbstractResourceSearcher* serv);
 
+    virtual void pleaseStop();
+
     CLNetState& getNetState()
     {
         return m_netState;

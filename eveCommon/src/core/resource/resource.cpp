@@ -1,7 +1,8 @@
 #include "resource_command_consumer.h"
 #include "resource_consumer.h"
-#include "../dataprovider/streamreader.h"
 #include "file_resource.h"
+#include "core/dataprovider/abstract_streamdataprovider.h"
+#include "core/resourcemanagment/resource_pool.h"
 
 // Temporary until real ResourceFactory is implemented
 
@@ -249,7 +250,7 @@ bool QnResource::setParam(const QString& name, const QnValue& val, QnDomain doma
 class QnResourceSetParamCommand : public QnResourceCommand
 {
 public:
-    QnResourceSetParamCommand(QnResource* res, const QString& name, const QnValue& val, QnDomain domain):
+    QnResourceSetParamCommand(QnResourcePtr res, const QString& name, const QnValue& val, QnDomain domain):
       QnResourceCommand(res),
           m_name(name),
           m_val(val),
@@ -274,7 +275,7 @@ typedef QSharedPointer<QnResourceSetParamCommand> QnResourceSetParamCommandPtr;
 
 void QnResource::setParamAsynch(const QString& name, const QnValue& val, QnDomain domain)
 {
-    QnResourceSetParamCommandPtr command ( new QnResourceSetParamCommand(this, name, val, domain) );
+    QnResourceSetParamCommandPtr command ( new QnResourceSetParamCommand(toSharedPointer(), name, val, domain) );
     addCommandToProc(command);
 }
 
@@ -393,6 +394,13 @@ QStringList QnResource::tagList() const
     return m_tags;
 }
 
+QnResourcePtr QnResource::toSharedPointer() const
+{
+    QnResourcePtr res = qnResPool->getResourceById(getId());
+    Q_ASSERT_X(res != 0, Q_FUNC_INFO, "Resource not found");
+    return res;
+}
+
 void QnResource::addConsumer(QnResourceConsumer* consumer)
 {
     QMutexLocker locker(&m_consumersMtx);
@@ -428,9 +436,9 @@ void QnResource::disconnectAllConsumers()
     m_consumers.clear();
 }
 
-QnAbstractStreamDataProvider* QnResource::getDeviceStreamConnection(ConnectionRole role)
+QnAbstractStreamDataProvider* QnResource::createDataProvider(ConnectionRole role)
 {
-    QnAbstractStreamDataProvider* dataProvider = createDataProvider(role);
+    QnAbstractStreamDataProvider* dataProvider = createDataProviderInternal(role);
     if (dataProvider)
         addConsumer(dataProvider);
     return dataProvider;

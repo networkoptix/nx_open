@@ -13,14 +13,14 @@ public:
     QnSyncPlayArchiveDelegate(QnAbstractArchiveReader* reader, QnArchiveSyncPlayWrapper* syncWrapper, QnAbstractArchiveDelegate* ownerDelegate);
     virtual ~QnSyncPlayArchiveDelegate();
 
-    virtual bool open(const QnResource* resource);
+    virtual bool open(QnResourcePtr resource);
     virtual void close();
     virtual qint64 startTime();
     virtual qint64 endTime();
     virtual QnAbstractMediaDataPtr getNextData();
     virtual qint64 seek (qint64 time);
-    virtual QnDeviceVideoLayout* getVideoLayout();
-    virtual QnDeviceAudioLayout* getAudioLayout();
+    virtual QnVideoResourceLayout* getVideoLayout();
+    virtual QnResourceAudioLayout* getAudioLayout();
 
     void setStartDelay(qint64 startDelay);
     qint64 secondTime() const;

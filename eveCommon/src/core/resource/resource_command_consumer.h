@@ -10,7 +10,7 @@
 class QN_EXPORT QnResourceCommand : public QnAbstractDataPacket, public QnResourceConsumer
 {
 public:
-    QnResourceCommand(QnResource* res);
+    QnResourceCommand(QnResourcePtr res);
     virtual ~QnResourceCommand();
     virtual void execute() = 0;
 };

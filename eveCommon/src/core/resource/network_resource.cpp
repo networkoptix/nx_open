@@ -184,7 +184,7 @@ bool QnNetworkResource::conflicting()
         return true;
     }
 
-    CLSleep::msleep(10);
+    QnSleep::msleep(10);
 
     CLPing ping;
     if (!ping.ping(getHostAddress().toString(), 2, ping_timeout)) // I do not know how else to solve this problem. but getMacByIP do not creates any ARP record 
@@ -223,7 +223,7 @@ void QnNetworkResource::getDevicesBasicInfo(QnResourceMap& lst, int threads)
     time.start();
 
 
-    QList<QnResource*> local_list;
+    QList<QnResourcePtr> local_list;
     foreach(QnResourcePtr res, lst.values()) 
     {
         QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
