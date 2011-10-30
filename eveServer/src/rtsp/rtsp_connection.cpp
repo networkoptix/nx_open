@@ -16,6 +16,7 @@
 #include "plugins/resources/archive/archive_stream_reader.h"
 
 #include "utils/network/tcp_connection_priv.h"
+#include "plugins/resources/archive/abstract_archive_delegate.h"
 
 
 static const quint8 RTP_FFMPEG_GENERIC_CODE = 102;
@@ -27,8 +28,6 @@ static const int CLOCK_FREQUENCY = 1000000;
 static const int RTSP_MIN_SEEK_INTERVAL = 1000 * 30; // 30 ms as min seek interval
 
 static const int MAX_RTSP_WRITE_BUFFER = 1024*1024;
-
-static const int LIVECAM_STREAMING_ID = 0;
 
 class QnTcpListener;
 
@@ -299,7 +298,7 @@ int QnRtspConnectionProcessor::numOfVideoChannels()
     Q_D(QnRtspConnectionProcessor);
     if (!d->mediaRes)
         return -1;
-    QnDeviceVideoLayout* layout = d->mediaRes->getVideoLayout(d->dataProvider);
+    QnVideoResourceLayout* layout = d->dataProvider->getVideoLayout();
     return layout ? layout->numberOfChannels() : -1;
 }
 
@@ -319,8 +318,8 @@ int QnRtspConnectionProcessor::composeDescribe()
 
     QTextStream sdp(&d->responseBody);
 
-    QnDeviceVideoLayout* videoLayout = d->mediaRes->getVideoLayout(d->dataProvider);
-    QnDeviceAudioLayout* audioLayout = d->mediaRes->getAudioLayout(d->dataProvider);
+    QnVideoResourceLayout* videoLayout = d->dataProvider->getVideoLayout();
+    QnResourceAudioLayout* audioLayout = d->dataProvider->getAudioLayout();
     int numVideo = videoLayout->numberOfChannels();
     int numAudio = audioLayout->numberOfChannels();
 
@@ -366,14 +365,13 @@ int QnRtspConnectionProcessor::composeSetup()
         return CODE_NOT_IMPLEMETED;
     int trackId = extractTrackId(d->requestHeaders.path());
 
-    QnDeviceVideoLayout* videoLayout = d->mediaRes->getVideoLayout(d->dataProvider);
+    QnVideoResourceLayout* videoLayout = d->dataProvider->getVideoLayout();
     if (trackId >= videoLayout->numberOfChannels()) {
         //QnAbstractMediaStreamDataProvider* dataProvider;
         QnArchiveStreamReader* archiveReader = dynamic_cast<QnArchiveStreamReader*>(d->dataProvider);
         if (archiveReader)
             archiveReader->setAudioChannel(trackId - videoLayout->numberOfChannels());
     }
-
 
     if (trackId >= 0)
     {
@@ -458,13 +456,7 @@ void QnRtspConnectionProcessor::createDataProvider()
 {
     Q_D(QnRtspConnectionProcessor);
     if (!d->dataProvider)
-    {
-        if (d->mediaRes->checkFlag(QnResource::live))
-            d->dataProvider = d->mediaRes->acquireMediaProvider(LIVECAM_STREAMING_ID, QnResource::Role_DirectConnection);
-        else
-            d->dataProvider = d->mediaRes->createMediaProvider(QnResource::Role_DirectConnection);
-
-    }
+        d->dataProvider = dynamic_cast<QnAbstractMediaStreamDataProvider*> (d->mediaRes->createDataProvider(QnResource::Role_PrimariVideo));
 }
 
 int QnRtspConnectionProcessor::composePlay()

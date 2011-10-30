@@ -44,9 +44,8 @@ CLHttpStatus QnPlAreconVisionResource::getRegister(int page, int num, int& val)
 	QTextStream(&req) << "getreg?page=" << page << "&reg=" << num;
 
 	CLSimpleHTTPClient http(getHostAddress(), 80,getNetworkTimeout(), getAuth());
-	http.setRequestLine(req);
 
-	CLHttpStatus result = http.openStream();
+    CLHttpStatus result = http.doGET(req);
 
 	if (result!=CL_HTTP_SUCCESS)
 		return result;
@@ -76,9 +75,8 @@ CLHttpStatus QnPlAreconVisionResource::setRegister(int page, int num, int val)
     QTextStream(&req) << "setreg?page=" << page << "&reg=" << num << "&val=" << val;
 
     CLSimpleHTTPClient http(getHostAddress(), 80,getNetworkTimeout(), getAuth());
-    http.setRequestLine(req);
 
-    CLHttpStatus result = http.openStream();
+    CLHttpStatus result = http.doGET(req);
 
     return result;
 
@@ -323,9 +321,7 @@ bool QnPlAreconVisionResource::getParamPhysical(const QString& name, QnValue& va
 
     QTextStream(&request) << "get?" << param.netHelper();
 
-    connection.setRequestLine(request);
-
-    if (connection.openStream()!=CL_HTTP_SUCCESS)
+    if (connection.doGET(request)!=CL_HTTP_SUCCESS)
         return false;
 
     char c_response[200];
@@ -366,10 +362,8 @@ bool QnPlAreconVisionResource::setParamPhysical(const QString& name, const QnVal
     if (param.type()!=QnParamType::None && param.type()!=QnParamType::Button)
         str << "=" << (QString)val;
 
-    connection.setRequestLine(request);
-
-    if (connection.openStream()!=CL_HTTP_SUCCESS)
-        if (connection.openStream()!=CL_HTTP_SUCCESS) // try twice.
+    if (connection.doGET(request)!=CL_HTTP_SUCCESS)
+        if (connection.doGET(request)!=CL_HTTP_SUCCESS) // try twice.
             return false;
 
 

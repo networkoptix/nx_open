@@ -124,8 +124,7 @@ QnAbstractMediaDataPtr  AVClientPullSSHTTPStreamreader::getNextData()
 
 	CLSimpleHTTPClient http_client(getResource().dynamicCast<QnPlAreconVisionResource>()->getHostAddress(), m_port, m_timeout, m_auth);
 
-	http_client.setRequestLine(request);
-	http_client.openStream();
+    http_client.doGET(request);
 
 	if (!http_client.isOpened())
 		return QnAbstractMediaDataPtr(0);

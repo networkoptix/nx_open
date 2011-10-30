@@ -1,8 +1,8 @@
 #include "media_streamdataprovider.h"
-#include "../resource/resource_media_layout.h"
-#include "../datapacket/mediadatapacket.h"
+#include "core/resource/resource_media_layout.h"
+#include "core/datapacket/mediadatapacket.h"
 #include "utils/common/sleep.h"
-
+#include "core/resource/resource_media_layout.h"
 
 
 QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(QnResourcePtr res):
@@ -12,7 +12,7 @@ m_qulity(QnQualityLowest)
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame));
     m_mediaResource = qSharedPointerDynamicCast<QnMediaResource>(res);
     Q_ASSERT(m_mediaResource);
-    m_channel_number = m_mediaResource->getVideoLayout(0)->numberOfChannels();
+    m_channel_number = 1;
 
     //QnMediaResourcePtr mr = getResource().dynamicCast<QnMediaResource>();
     //m_NumaberOfVideoChannels = mr->getMediaLayout()->numberOfVideoChannels();
@@ -42,7 +42,7 @@ QnStreamQuality QnAbstractMediaStreamDataProvider::getQuality() const
 void QnAbstractMediaStreamDataProvider::setNeedKeyData()
 {
 	QMutexLocker mtx(&m_proc_CS);
-	for (unsigned i = 0; i < m_mediaResource->getVideoLayout(this)->numberOfChannels(); ++i)
+	for (unsigned i = 0; i < getVideoLayout()->numberOfChannels(); ++i)
 		m_gotKeyFrame[i] = 0;
 }
 
@@ -56,7 +56,7 @@ bool QnAbstractMediaStreamDataProvider::needKeyData() const
 {
 	QMutexLocker mtx(&m_proc_CS);
     QnAbstractMediaStreamDataProvider* tmp = const_cast<QnAbstractMediaStreamDataProvider*>(this);
-	for (unsigned i = 0; i < m_mediaResource->getVideoLayout(tmp)->numberOfChannels(); ++i)
+	for (unsigned i = 0; i < tmp->getVideoLayout()->numberOfChannels(); ++i)
 		if (m_gotKeyFrame[i]==0)
 			return true;
 

@@ -123,7 +123,7 @@ bool CLArecontPanoramicDevice::getDescription()
 	return true;
 }
 
-QnAbstractMediaStreamDataProvider* CLArecontPanoramicDevice::getDeviceStreamConnection()
+QnAbstractMediaStreamDataProvider* CLArecontPanoramicDevice::createDataProviderInternal()
 {
 	cl_log.log("Creating streamreader for ", getHostAddress().toString(), cl_logDEBUG1);
 	return new AVPanoramicClientPullSSTFTPStreamreader(QnResourcePtr(this));
@@ -149,10 +149,8 @@ bool CLArecontPanoramicDevice::setParamPhysical(const QString& name, const QnVal
 		QTextStream str(&request);
 		str << "set?" << param.netHelper();
 
-		connection.setRequestLine(request);
-
-		if (connection.openStream()!=CL_HTTP_SUCCESS)
-			if (connection.openStream()!=CL_HTTP_SUCCESS) // try twice.
+        if (connection.doGET(request)!=CL_HTTP_SUCCESS)
+            if (connection.doGET(request)!=CL_HTTP_SUCCESS) // try twice.
 				return false;
 	}
 	else
@@ -166,10 +164,8 @@ bool CLArecontPanoramicDevice::setParamPhysical(const QString& name, const QnVal
 			str << "set" << i << "?" << param.netHelper();
 			str << "=" << (QString)val;
 
-			connection.setRequestLine(request);
-
-			if (connection.openStream()!=CL_HTTP_SUCCESS)
-				if (connection.openStream()!=CL_HTTP_SUCCESS) // try twice.
+            if (connection.doGET(request)!=CL_HTTP_SUCCESS)
+                if (connection.doGET(request)!=CL_HTTP_SUCCESS) // try twice.
 					return false;
 		}
 

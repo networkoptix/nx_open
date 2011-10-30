@@ -18,6 +18,10 @@ EXCLUDE_FILES = ('dxva', 'moc_', 'qrc_', 'StdAfx')
 BUILDLIB = 'staticlib'
 # BUILDLIB = ''
 
+# Temporary hack for development. There are some problems on mac with debugging static libs.
+#if sys.platform == 'darwin':
+#    BUILDLIB = ''
+
 def link_or_copy(src, dst):
     try:
         import win32file

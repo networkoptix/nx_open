@@ -8,20 +8,12 @@
 
 #include "SessionManager.h"
 
-SessionManager::SessionManager(const QString& host, const QString& login, const QString& password)
-    : m_manager(this),
-      m_host(host),
-      m_port(8000),
-      m_login(login),
-      m_password(password),
-      m_needEvents(false)
-
+SessionManager::SessionManager(const QHostAddress& host, const QAuthenticator& auth)
+    : m_client(host, 8000, 10000, auth)
 {
-    QObject::connect(&m_manager, SIGNAL(finished(QNetworkReply *)),
-                              SLOT(slotRequestFinished(QNetworkReply *)));
 }
 
-RequestId SessionManager::addServer(const ::xsd::api::servers::Server& server)
+int SessionManager::addServer(const ::xsd::api::servers::Server& server, QnApiServerResponsePtr& serversPtr)
 {
     std::ostringstream os;
 
@@ -29,10 +21,24 @@ RequestId SessionManager::addServer(const ::xsd::api::servers::Server& server)
     servers.server().push_back(server);
     ::xsd::api::servers::servers(os, servers);
 
-    return addObject("server", os.str().c_str());
+    QByteArray reply;
+    int status = addObject("server", os.str().c_str(), reply);
+
+    try
+    {
+        QTextStream stream(reply);
+        QStdIStream is(stream.device());
+
+        serversPtr = QnApiServerResponsePtr(xsd::api::servers::servers (is, xml_schema::flags::dont_validate).release());
+    } catch (const xml_schema::exception& e)
+    {
+        qDebug(e.what());
+    }
+
+    return status;
 }
 
-RequestId SessionManager::addCamera(const ::xsd::api::cameras::Camera& camera)
+int SessionManager::addCamera(const ::xsd::api::cameras::Camera& camera, QnApiCameraResponsePtr& camerasPtr)
 {
     std::ostringstream os;
 
@@ -40,36 +46,24 @@ RequestId SessionManager::addCamera(const ::xsd::api::cameras::Camera& camera)
     cameras.camera().push_back(camera);
     ::xsd::api::cameras::cameras(os, cameras);
 
-    return addObject("camera", os.str().c_str());
+    QByteArray reply;
+    int status = addObject("camera", os.str().c_str(), reply);
+
+    try
+    {
+        QTextStream stream(reply);
+        QStdIStream is(stream.device());
+
+        camerasPtr = QnApiCameraResponsePtr(xsd::api::cameras::cameras (is, xml_schema::flags::dont_validate).release());
+    } catch (const xml_schema::exception& e)
+    {
+        qDebug(e.what());
+    }
+
+    return status;
 }
 
 #if 0
-void SessionManager::openEventChannel()
-{
-    m_needEvents = true;
-
-    QUrl url;
-    url.setScheme("http");
-    url.setHost(m_host);
-    url.setPort(m_port);
-    url.setPath("/api/event/");
-
-    QNetworkRequest request;
-    request.setUrl(url);
-    request.setRawHeader("Authorization", "Basic " +
-                         QByteArray(QString("%1:%2").arg(m_login).arg(m_password).toAscii()).toBase64());
-
-    QNetworkReply *reply = m_manager.get(request);
-    m_requestObjectMap[reply] = "event";
-}
-
-void SessionManager::closeEventChannel()
-{
-    m_needEvents = false;
-}
-
-#endif
-
 void SessionManager::slotRequestFinished(QNetworkReply *reply)
 {
     qDebug("slotRequestFinished");
@@ -93,68 +87,13 @@ void SessionManager::slotRequestFinished(QNetworkReply *reply)
 
         QStdIStream is(reply);
 
-        if (objectName == "resourceType")
-        {
-            typedef xsd::api::resourceTypes::ResourceTypes T;
-            QSharedPointer<T> result;
-
-            try
-            {
-                result = QSharedPointer<T>(xsd::api::resourceTypes::resourceTypes (is, xml_schema::flags::dont_validate).release());
-            } catch (const xml_schema::exception& e)
-            {
-                qDebug(e.what());
-            }
-
-            emit resourceTypesReceived((RequestId)reply, result);
-        }
-
-        if (objectName == "camera")
-        {
-            typedef xsd::api::cameras::Cameras T;
-            QSharedPointer<T> result;
-
-            try
-            {
-                result = QSharedPointer<T>(xsd::api::cameras::cameras (is, xml_schema::flags::dont_validate).release());
-            } catch (const xml_schema::exception& e)
-            {
-                qDebug(e.what());
-            }
-
-            emit camerasReceived((RequestId)reply, result);
-        }
-
         if (objectName == "resourceEx")
         {
             typedef xsd::api::resourcesEx::Resources T;
             QSharedPointer<T> result;
 
-            try
-            {
-                result = QSharedPointer<T>(xsd::api::resourcesEx::resourcesEx (is, xml_schema::flags::dont_validate).release());
-            } catch (const xml_schema::exception& e)
-            {
-                qDebug(e.what());
-            }
 
             emit resourcesReceived((RequestId)reply, result);
-        }
-
-        if (objectName == "server")
-        {
-            typedef xsd::api::servers::Servers T;
-            QSharedPointer<T> result;
-
-            try
-            {
-                result = QSharedPointer<T>(xsd::api::servers::servers (is, xml_schema::flags::dont_validate).release());
-            } catch (const xml_schema::exception& e)
-            {
-                qDebug(e.what());
-            }
-
-            emit serversReceived((RequestId)reply, result);
         }
 
         if (objectName == "layout")
@@ -174,60 +113,65 @@ void SessionManager::slotRequestFinished(QNetworkReply *reply)
         }
     }
 }
+#endif
 
-RequestId SessionManager::getObjectList(QString objectName, bool tree)
+int SessionManager::getObjectList(QString objectName, QByteArray& reply)
 {
-    QUrl url;
-    url.setScheme("http");
-    url.setHost(m_host);
-    url.setPort(m_port);
-    if (tree)
+    qDebug() << "getOL";
+    m_client.doGET(QString("api/%1/").arg(objectName));
+
+    qDebug() << "Connected: " << m_client.isOpened();
+
+    m_client.readAll(reply);
+
+    qDebug() << "Reply: " << reply.data();
+
+    return 0;
+}
+
+int SessionManager::addObject(const QString& objectName, const QByteArray& body, QByteArray& response)
+{
+    m_client.doGET(QString("/api/%1/").arg(objectName));
+
+    return 0;
+}
+
+int SessionManager::getResourceTypes(QnApiResourceTypeResponsePtr& resourceTypes)
+{
+    QByteArray reply;
+
+    int status = getObjectList("resourceType", reply);
+
+    try
     {
-        url.setPath(QString("/api/%1/tree/").arg(objectName));
-        url.addQueryItem("id", "3");
-    }
-    else
+        QTextStream stream(reply);
+        QStdIStream is(stream.device());
+
+        resourceTypes = QnApiResourceTypeResponsePtr(xsd::api::resourceTypes::resourceTypes (is, xml_schema::flags::dont_validate).release());
+    } catch (const xml_schema::exception& e)
     {
-        url.setPath(QString("/api/%1/").arg(objectName));
+        qDebug(e.what());
     }
 
-
-    QNetworkRequest request;
-    request.setUrl(url);
-    request.setRawHeader("Authorization", "Basic " +
-                         QByteArray(QString("%1:%2").arg(m_login).arg(m_password).toAscii()).toBase64());
-
-    QNetworkReply *reply = m_manager.get(request);
-    m_requestObjectMap[reply] = objectName;
-
-    return (RequestId) reply;
+    return status;
 }
 
-RequestId SessionManager::addObject(const QString& objectName, const QByteArray& body)
+int SessionManager::getResources(QnApiResourceResponsePtr& resources)
 {
-    QUrl url;
-    url.setScheme("http");
-    url.setHost(m_host);
-    url.setPort(m_port);
-    url.setPath(QString("/api/%1/").arg(objectName));
+    QByteArray reply;
 
-    QNetworkRequest request;
-    request.setUrl(url);
-    request.setRawHeader("Authorization", "Basic " +
-                         QByteArray(QString("%1:%2").arg(m_login).arg(m_password).toAscii()).toBase64());
+    int status = getObjectList("resourceEx", reply);
 
-    QNetworkReply *reply = m_manager.post(request, body);
-    m_requestObjectMap[reply] = objectName;
+    try
+    {
+        QTextStream stream(reply);
+        QStdIStream is(stream.device());
 
-    return (RequestId) reply;
-}
+        resources = QnApiResourceResponsePtr(xsd::api::resourcesEx::resourcesEx (is, xml_schema::flags::dont_validate).release());
+    } catch (const xml_schema::exception& e)
+    {
+        qDebug(e.what());
+    }
 
-RequestId SessionManager::getResourceTypes()
-{
-    return getObjectList("resourceType", false);
-}
-
-RequestId SessionManager::getResources()
-{
-    return getObjectList("resourceEx", false);
+    return status;
 }

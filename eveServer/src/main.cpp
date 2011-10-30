@@ -6,6 +6,7 @@
 #include "plugins/resources/archive/avi_files/avi_device.h"
 #include "core/resourcemanagment/asynch_seacher.h"
 #include "core/resourcemanagment/resource_pool.h"
+#include "rtsp/rtsp_listener.h"
 
 //#include "device_plugins/arecontvision/devices/av_device_server.h"
 
@@ -173,6 +174,9 @@ int main(int argc, char *argv[])
     //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
     
+    QnRtspListener rtspListener;
+    rtspListener.start();
+
 #ifdef TEST_RTSP_SERVER
     addTestData();
 #endif

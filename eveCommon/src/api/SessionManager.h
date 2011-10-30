@@ -3,53 +3,31 @@
 
 #include <QString>
 #include <QList>
-#include <QMap>
-#include <QNetworkAccessManager>
+#include <QAuthenticator>
 #include <QSharedPointer>
 
+#include "utils/network/simple_http_client.h"
 #include "api/Types.h"
 
-typedef long RequestId;
-
-class SessionManager : public QObject
+class SessionManager
 {
-    Q_OBJECT
 public:
-    SessionManager(const QString& host, const QString& login, const QString& password);
+    SessionManager(const QHostAddress& host, const QAuthenticator& auth);
 
-    RequestId getResourceTypes();
-    RequestId getResources();
+    int getResourceTypes(QnApiResourceTypeResponsePtr& resourceTypes);
+    int getResources(QnApiResourceResponsePtr& resources);
 
-    RequestId addServer(const ::xsd::api::servers::Server&);
-    RequestId addCamera(const ::xsd::api::cameras::Camera&);
-
-private:
-    RequestId addObject(const QString& objectName, const QByteArray& body);
-
-Q_SIGNALS:
-    void resourceTypesReceived(RequestId requestId, QnApiResourceTypeResponsePtr resourceTypes);
-    void resourcesReceived(RequestId requestId, QnApiResourceResponsePtr resources);
-    void camerasReceived(RequestId requestId, QnApiCameraResponsePtr cameras);
-    void serversReceived(RequestId requestId, QnApiServerResponsePtr cameras);
-    void layoutsReceived(RequestId requestId, QnApiLayoutResponsePtr cameras);
-
-    void error(RequestId requestId, QString message);
+    int addServer(const ::xsd::api::servers::Server&, QnApiServerResponsePtr& servers);
+    int addCamera(const ::xsd::api::cameras::Camera&, QnApiCameraResponsePtr& cameras);
 
 private:
-    RequestId getObjectList(QString objectName, bool tree);
-
-private slots:
-    void slotRequestFinished(QNetworkReply* reply);
+    int addObject(const QString& objectName, const QByteArray& body, QByteArray& response);
 
 private:
-    QMap<QNetworkReply*, QString> m_requestObjectMap;
+    int getObjectList(QString objectName, QByteArray& reply);
 
-    QNetworkAccessManager m_manager;
-
-    QString m_host;
-    int m_port;
-    QString m_login;
-    QString m_password;
+private:
+    CLSimpleHTTPClient m_client;
 
     bool m_needEvents;
 };

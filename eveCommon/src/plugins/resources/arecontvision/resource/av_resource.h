@@ -48,7 +48,7 @@ public:
     virtual int getStreamDataProvidersMaxAmount() const;
     virtual QnAbstractMediaStreamDataProvider* createMediaProvider();
 
-    virtual QnAbstractStreamDataProvider* createDataProvider(ConnectionRole role){return 0;};
+    virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role){return 0;};
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames 
     virtual void setCropingPhysical(QRect croping);

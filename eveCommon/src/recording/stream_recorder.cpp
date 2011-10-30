@@ -172,13 +172,13 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         return false;
     }
     QnMediaResourcePtr mediaDev = qSharedPointerDynamicCast<QnMediaResource>(resource);
-    QString layoutStr = QnArchiveStreamReader::serializeLayout(mediaDev->getVideoLayout(mediaProvider));
+    QString layoutStr = QnArchiveStreamReader::serializeLayout(mediaProvider->getVideoLayout());
     av_metadata_set2(&m_formatCtx->metadata, "video_layout", layoutStr.toAscii().data(), 0);
-    QnResourceAudioLayout* audioLayout = mediaDev->getAudioLayout(mediaProvider);
+    QnResourceAudioLayout* audioLayout = mediaProvider->getAudioLayout();
 
     m_formatCtx->start_time = mediaData->timestamp;
 
-    const QnVideoResourceLayout* layout = mediaDev->getVideoLayout(mediaProvider);
+    const QnVideoResourceLayout* layout = mediaProvider->getVideoLayout();
     for (unsigned int i = 0; i < layout->numberOfChannels(); ++i) 
     {
         AVStream* videoStream = av_new_stream(m_formatCtx, DEFAULT_VIDEO_STREAM_ID+i);

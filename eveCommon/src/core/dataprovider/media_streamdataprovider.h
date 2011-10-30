@@ -5,9 +5,6 @@
 #include "../resource/media_resource.h"
 #include "abstract_streamdataprovider.h"
 
-
-
-
 class QnVideoResourceLayout;
 class QnResourceAudioLayout;
 

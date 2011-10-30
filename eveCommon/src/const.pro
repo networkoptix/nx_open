@@ -56,7 +56,7 @@ win32 {
 }
 
 mac {
-  LIBS += -framework SystemConfiguration
+  LIBS += -framework IOKit
   LIBS += -lz -lbz2
   DEFINES += QN_EXPORT=
   QMAKE_CXXFLAGS += -msse4.1
