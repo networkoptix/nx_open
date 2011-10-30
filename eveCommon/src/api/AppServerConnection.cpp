@@ -19,7 +19,8 @@ int QnAppServerConnection::getResourceTypes(QList<QnResourceTypePtr>& resourceTy
 
     int status = m_sessionManager->getResourceTypes(xsdResourceTypes);
 
-    parseResourceTypes(resourceTypes, xsdResourceTypes->resourceType());
+    if (!xsdResourceTypes.isNull())
+        parseResourceTypes(resourceTypes, xsdResourceTypes->resourceType());
 
     return status;
 }
