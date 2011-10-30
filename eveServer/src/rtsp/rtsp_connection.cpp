@@ -206,25 +206,30 @@ public:
 
     QnRtspConnectionProcessorPrivate():
         QnTCPConnectionProcessor::QnTCPConnectionProcessorPrivate(),
-        dataProvider(0),
+        liveDP(0),
+        archiveDP(0),
         dataProcessor(0),
         startTime(0),
         endTime(0),
-        rtspScale(1.0)
+        rtspScale(1.0),
+        liveMode(0)
     {
     }
 
     ~QnRtspConnectionProcessorPrivate()
     {
-        if (dataProvider)
-            dataProvider->stop();
+        if (archiveDP)
+            archiveDP->stop();
         if (dataProcessor)
             dataProcessor->stop();
-        delete dataProvider;
+        delete archiveDP;
         delete dataProcessor;
     }
 
-    QnAbstractMediaStreamDataProvider* dataProvider;
+    QnAbstractMediaStreamDataProvider* liveDP;
+    QnAbstractArchiveReader* archiveDP;
+    bool liveMode;
+
     QnRtspDataConsumer* dataProcessor;
 
     QString sessionId;
@@ -298,7 +303,8 @@ int QnRtspConnectionProcessor::numOfVideoChannels()
     Q_D(QnRtspConnectionProcessor);
     if (!d->mediaRes)
         return -1;
-    QnVideoResourceLayout* layout = d->dataProvider->getVideoLayout();
+    QnAbstractMediaStreamDataProvider* currentDP = d->liveMode ? d->liveDP : d->archiveDP;
+    QnVideoResourceLayout* layout = currentDP->getVideoLayout();
     return layout ? layout->numberOfChannels() : -1;
 }
 
@@ -309,7 +315,8 @@ int QnRtspConnectionProcessor::composeDescribe()
         return CODE_NOT_FOUND;
 
     createDataProvider();
-    if (!d->dataProvider)
+    QnAbstractMediaStreamDataProvider* currentDP = d->liveMode ? d->liveDP : d->archiveDP;
+    if (!currentDP)
         return CODE_NOT_FOUND;
 
     QString acceptMethods = d->requestHeaders.value("Accept");
@@ -318,17 +325,16 @@ int QnRtspConnectionProcessor::composeDescribe()
 
     QTextStream sdp(&d->responseBody);
 
-    QnVideoResourceLayout* videoLayout = d->dataProvider->getVideoLayout();
-    QnResourceAudioLayout* audioLayout = d->dataProvider->getAudioLayout();
+    QnVideoResourceLayout* videoLayout = currentDP->getVideoLayout();
+    QnResourceAudioLayout* audioLayout = currentDP->getAudioLayout();
     int numVideo = videoLayout->numberOfChannels();
     int numAudio = audioLayout->numberOfChannels();
 
-    QnArchiveStreamReader* archiveReader = dynamic_cast<QnArchiveStreamReader*>(d->dataProvider);
-    if (archiveReader) {
+    if (d->archiveDP) {
         QString range = "npt=";
-        range += QString::number(archiveReader->startTime()/1000000.0);
+        range += QString::number(d->archiveDP->startTime()/1000000.0);
         range += "-";
-        range += QString::number(archiveReader->endTime()/1000000.0);
+        range += QString::number(d->archiveDP->endTime()/1000000.0);
         d->responseHeaders.addValue("Range", range);
     }
 
@@ -365,12 +371,12 @@ int QnRtspConnectionProcessor::composeSetup()
         return CODE_NOT_IMPLEMETED;
     int trackId = extractTrackId(d->requestHeaders.path());
 
-    QnVideoResourceLayout* videoLayout = d->dataProvider->getVideoLayout();
+    QnAbstractMediaStreamDataProvider* currentDP = d->liveMode ? d->liveDP : d->archiveDP;
+    QnVideoResourceLayout* videoLayout = currentDP->getVideoLayout();
     if (trackId >= videoLayout->numberOfChannels()) {
         //QnAbstractMediaStreamDataProvider* dataProvider;
-        QnArchiveStreamReader* archiveReader = dynamic_cast<QnArchiveStreamReader*>(d->dataProvider);
-        if (archiveReader)
-            archiveReader->setAudioChannel(trackId - videoLayout->numberOfChannels());
+        if (d->archiveDP)
+            d->archiveDP->setAudioChannel(trackId - videoLayout->numberOfChannels());
     }
 
     if (trackId >= 0)
@@ -391,9 +397,10 @@ int QnRtspConnectionProcessor::composeSetup()
 int QnRtspConnectionProcessor::composePause()
 {
     Q_D(QnRtspConnectionProcessor);
-    if (!d->dataProvider)
-        return CODE_NOT_FOUND;
-    d->dataProvider->pause();
+    //if (!d->dataProvider)
+    //    return CODE_NOT_FOUND;
+    if (d->archiveDP)
+        d->archiveDP->pause();
 
     //d->playTime += d->rtspScale * d->playTimer.elapsed()*1000;
     d->rtspScale = 0;
@@ -417,7 +424,9 @@ qint64 QnRtspConnectionProcessor::getRtspTime()
 
 void QnRtspConnectionProcessor::extractNptTime(const QString& strValue, qint64* dst)
 {
-    if (strValue == "now")
+    Q_D(QnRtspConnectionProcessor);
+    d->liveMode = strValue == "now";
+    if (d->liveMode)
     {
         *dst = getRtspTime();
     }
@@ -455,8 +464,10 @@ void QnRtspConnectionProcessor::parseRangeHeader(const QString& rangeStr, qint64
 void QnRtspConnectionProcessor::createDataProvider()
 {
     Q_D(QnRtspConnectionProcessor);
-    if (!d->dataProvider)
-        d->dataProvider = dynamic_cast<QnAbstractMediaStreamDataProvider*> (d->mediaRes->createDataProvider(QnResource::Role_PrimariVideo));
+    if (!d->liveDP)
+        d->liveDP = dynamic_cast<QnAbstractMediaStreamDataProvider*> (d->mediaRes->getDataProvider(QnResource::Role_PrimariVideo));
+    if (!d->archiveDP)
+        d->archiveDP = dynamic_cast<QnAbstractArchiveReader*> (d->mediaRes->createDataProvider(QnResource::Role_Archive));
 }
 
 int QnRtspConnectionProcessor::composePlay()
@@ -465,36 +476,44 @@ int QnRtspConnectionProcessor::composePlay()
     if (d->mediaRes == 0)
         return CODE_NOT_FOUND;
     createDataProvider();
-    if (!d->dataProvider)
-        return CODE_NOT_FOUND;
 
-    d->dataProvider->pause();
+    if (d->archiveDP)
+        d->archiveDP->pause();
+
+    QnAbstractMediaStreamDataProvider* currentDP = d->liveMode ? d->liveDP : d->archiveDP;
+    if (!currentDP)
+        return CODE_NOT_FOUND;
 
     if (!d->requestHeaders.value("Scale").isNull())
         d->rtspScale = d->requestHeaders.value("Scale").toDouble();
 
-    if (!d->dataProcessor) {
-        d->dataProcessor = new QnRtspDataConsumer(this);
-        d->dataProvider->addDataProcessor(d->dataProcessor);
-    }
+    if (d->liveDP && !d->liveMode)
+        d->liveDP->removeDataProcessor(d->dataProcessor);
 
-    QnArchiveStreamReader* archiveProvider = dynamic_cast<QnArchiveStreamReader*> (d->dataProvider);
+    if (!d->dataProcessor) 
+        d->dataProcessor = new QnRtspDataConsumer(this);
+    
+    currentDP->addDataProcessor(d->dataProcessor);
+    
+
+    //QnArchiveStreamReader* archiveProvider = dynamic_cast<QnArchiveStreamReader*> (d->dataProvider);
     if (qAbs(d->startTime - getRtspTime()) >= RTSP_MIN_SEEK_INTERVAL)
     {
-        if (archiveProvider)
+        if (d->archiveDP)
         {
             d->dataProcessor->clearUnprocessedData();
             d->dataProcessor->setWaitBOF(d->startTime, true); // ignore rest packets before new position
-            archiveProvider->jumpTo(d->startTime, true);
+            d->archiveDP->jumpTo(d->startTime, true);
         }
         else {
             qWarning() << "Seek operation not supported for dataProvider" << d->mediaRes->getId();
         }
     }
-    archiveProvider->setReverseMode(d->rtspScale < 0);
-    
-    d->dataProvider->resume();
 
+    if (!d->liveMode) {
+        d->archiveDP->setReverseMode(d->rtspScale < 0);
+        d->archiveDP->resume();
+    }
     return CODE_OK;
 }
 
@@ -503,10 +522,10 @@ int QnRtspConnectionProcessor::composeTeardown()
     Q_D(QnRtspConnectionProcessor);
     d->mediaRes = QnMediaResourcePtr(0);
 
-    delete d->dataProvider;
+    delete d->archiveDP;
     delete d->dataProcessor;
 
-    d->dataProvider = 0;
+    d->archiveDP = 0;
     d->dataProcessor = 0;
     d->rtspScale = 1.0;
     d->startTime = d->endTime = 0;
@@ -583,8 +602,9 @@ void QnRtspConnectionProcessor::processRequest()
         code = composeSetParameter();
     }
     sendResponse(code);
-    if (d->dataProvider && !d->dataProvider->isRunning())
-        d->dataProvider->start();
+    QnAbstractStreamDataProvider* currentDP = d->liveMode ? d->liveDP : d->archiveDP;
+    if (currentDP && !currentDP->isRunning())
+        currentDP->start();
     if (d->dataProcessor && !d->dataProcessor->isRunning())
         d->dataProcessor->start();
 }
@@ -606,11 +626,12 @@ void QnRtspConnectionProcessor::run()
     }
     if (d->dataProcessor)
         d->dataProcessor->stop();
-    if (d->dataProvider)
-        d->dataProvider->stop();
-    delete d->dataProvider;
+    if (d->archiveDP)
+        d->archiveDP->stop();
+    delete d->archiveDP;
     delete d->dataProcessor;
-    d->dataProvider = 0;
+    d->archiveDP = 0;
+    d->liveDP = 0;
     d->dataProcessor = 0;
     m_runing = false;
     //deleteLater(); // does not works for this thread

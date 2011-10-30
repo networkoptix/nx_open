@@ -23,7 +23,7 @@ class CLRecorderDevice;
 class QN_EXPORT QnResourcePool: public QObject
 {
     Q_OBJECT
-
+public:
     QnResourcePool();
     ~QnResourcePool();
 public:

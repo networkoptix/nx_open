@@ -8,6 +8,9 @@ static const int SOCK_TIMEOUT = 5000;
 class QnTcpListener::QnTcpListenerPrivate
 {
 public:
+    QnTcpListenerPrivate() {
+        serverSocket = 0;
+    }
     TCPServerSocket* serverSocket;
     QMap<TCPSocket*, CLLongRunnable*> connections;
 };
@@ -18,16 +21,14 @@ QnTcpListener::QnTcpListener(const QHostAddress& address, int port):
     d_ptr(new QnTcpListenerPrivate())
 {
     Q_D(QnTcpListener);
-    d->serverSocket = new TCPServerSocket(address.toString(), port);
-    start();
-    qDebug() << "RTSP server started at " << address << ":" << port;
-    /*
-    connect(&d->serverSocket, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
-    if (d->serverSocket.listen(address, port))
+    try {
+        d->serverSocket = new TCPServerSocket(address.toString(), port);
+        start();
         qDebug() << "RTSP server started at " << address << ":" << port;
-    else
-        qWarning() << "Failed to start RTSP server at " << address << ":" << port;
-    */
+    }
+    catch(SocketException& e) {
+        qWarning() << "Can't start RTSP listener at address" << address << ":" << port;
+    }
 }
 
 QnTcpListener::~QnTcpListener()

@@ -142,10 +142,8 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     QString fileExt = QString(outputCtx->extensions).split(',')[0];
 
     QFileInfo fi(m_device->getUniqueId());
-    if (m_truncateInterval == 0)  {
-        m_fileName = getTempRecordingDir() + fi.baseName();
-    }
-    else {
+    if (m_fileName.isEmpty())
+    {
         m_fileName = qnStorage->getFileName(m_currentDateTime, fi.baseName());
     }
 

@@ -41,7 +41,7 @@ class QN_EXPORT QnResource: public QObject //: public CLRefCounter
     Q_OBJECT
 public:
 
-    enum ConnectionRole {Role_Default, Role_PrimariVideo, Role_SecondaryVideo};
+    enum ConnectionRole {Role_Default, Role_PrimariVideo, Role_SecondaryVideo, Role_Archive};
 
     enum
     {
@@ -159,7 +159,11 @@ public:
 	//QnParamList& getStreamParamList();// returns params that can be changed on stream level 
 	//const QnParamList& getStreamParamList() const;
 
+    // create new dataProvider
 	QnAbstractStreamDataProvider* createDataProvider(ConnectionRole role);
+
+    // Create only one dataProvider per role. Return exists provider for same role if exists
+    QnAbstractStreamDataProvider* getDataProvider(ConnectionRole role);
 
 	// after setVideoLayout is called device is responsable for the destroying the layout 
 	//void setVideoLayout(CLDeviceVideoLayout* layout);
@@ -240,6 +244,9 @@ private:
     mutable QnParamList m_streamParamList; //-  
     mutable QMutex m_consumersMtx;
     QSet<QnResourceConsumer*> m_consumers;
+
+    typedef QMap<ConnectionRole, QnAbstractStreamDataProvider*> ProvidersMap;
+    ProvidersMap m_providerByRole;
 };
 
 class QnResourceFactory

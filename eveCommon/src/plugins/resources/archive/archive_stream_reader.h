@@ -31,8 +31,6 @@ public:
     static QString serializeLayout(const QnVideoResourceLayout* layout);
 
     void renameFileOnDestroy(const QString& newFileName);
-    qint64 startTime() const { return m_delegate->startTime(); }
-    qint64 endTime() const { return m_delegate->endTime(); }
 protected:
     virtual QnAbstractMediaDataPtr getNextData();
     virtual void channeljumpTo(qint64 mksec, int channel);

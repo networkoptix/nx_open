@@ -15,6 +15,8 @@ public:
     * Start new file approx. every N seconds
     */
     void setTruncateInterval(int seconds);
+
+    void setFileName(const QString& fileName);
 signals:
     void recordingFailed(QString errMessage);
     void recordingStarted();
