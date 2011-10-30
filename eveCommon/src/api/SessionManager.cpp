@@ -117,14 +117,13 @@ void SessionManager::slotRequestFinished(QNetworkReply *reply)
 
 int SessionManager::getObjectList(QString objectName, QByteArray& reply)
 {
-    qDebug() << "getOL";
     m_client.doGET(QString("api/%1/").arg(objectName));
 
-    qDebug() << "Connected: " << m_client.isOpened();
+//    qDebug() << "Connected: " << m_client.isOpened();
 
     m_client.readAll(reply);
 
-    qDebug() << "Reply: " << reply.data();
+//    qDebug() << "Reply: " << reply.data();
 
     return 0;
 }
