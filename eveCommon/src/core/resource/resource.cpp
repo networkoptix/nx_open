@@ -436,21 +436,6 @@ void QnResource::disconnectAllConsumers()
     m_consumers.clear();
 }
 
-QnAbstractStreamDataProvider* QnResource::getDataProvider(ConnectionRole role)
-{
-    QMutexLocker locker(&m_consumersMtx);
-
-    ProvidersMap::iterator itr = m_providerByRole.find(role);
-    if (itr != m_providerByRole.end()) {
-        return itr.value();
-    }
-    else {
-        QnAbstractStreamDataProvider* result = createDataProvider(role);
-        m_providerByRole.insert(role, result);
-        return result;
-    }
-}
-
 QnAbstractStreamDataProvider* QnResource::createDataProvider(ConnectionRole role)
 {
     QnAbstractStreamDataProvider* dataProvider = createDataProviderInternal(role);

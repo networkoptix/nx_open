@@ -17,6 +17,7 @@
 
 #include "utils/network/tcp_connection_priv.h"
 #include "plugins/resources/archive/abstract_archive_delegate.h"
+#include "camera/camera_pool.h"
 
 
 static const quint8 RTP_FFMPEG_GENERIC_CODE = 102;
@@ -464,8 +465,11 @@ void QnRtspConnectionProcessor::parseRangeHeader(const QString& rangeStr, qint64
 void QnRtspConnectionProcessor::createDataProvider()
 {
     Q_D(QnRtspConnectionProcessor);
-    if (!d->liveDP)
-        d->liveDP = dynamic_cast<QnAbstractMediaStreamDataProvider*> (d->mediaRes->getDataProvider(QnResource::Role_PrimariVideo));
+    if (!d->liveDP) {
+        QnVideoCamera* camera = qnCameraPool->getVideoCamera(d->mediaRes);
+        if (camera)
+            d->liveDP = camera->getLiveReader();
+    }
     if (!d->archiveDP)
         d->archiveDP = dynamic_cast<QnAbstractArchiveReader*> (d->mediaRes->createDataProvider(QnResource::Role_Archive));
 }

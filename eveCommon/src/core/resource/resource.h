@@ -1,5 +1,5 @@
-#ifndef device_h_1051
-#define device_h_1051
+#ifndef __RESOURCE_H__
+#define __RESOURCE_H__
 
 #include <QSharedPointer>
 #include <QMap>
@@ -41,7 +41,7 @@ class QN_EXPORT QnResource: public QObject //: public CLRefCounter
     Q_OBJECT
 public:
 
-    enum ConnectionRole {Role_Default, Role_PrimariVideo, Role_SecondaryVideo, Role_Archive};
+    enum ConnectionRole {Role_Default, Role_LiveVideo, Role_Archive};
 
     enum
     {
@@ -157,10 +157,6 @@ public:
 	//const QnParamList& getDeviceParamList() const;
 	QnAbstractStreamDataProvider* createDataProvider(ConnectionRole role);
 
-    // returns existing data provider; if thre is no such => creates it 
-    QnAbstractStreamDataProvider* getDataProvider(ConnectionRole role);
-
-
 	//virtual const CLDeviceVideoLayout* getVideoLayout(QnAbstractStreamDataProvider* reader);
 
     bool associatedWithFile() const;
@@ -238,8 +234,6 @@ private:
     mutable QMutex m_consumersMtx;
     QSet<QnResourceConsumer*> m_consumers;
 
-    typedef QMap<ConnectionRole, QnAbstractStreamDataProvider*> ProvidersMap;
-    ProvidersMap m_providerByRole;
 };
 
 class QnResourceFactory
@@ -268,4 +262,4 @@ class QnRecorder: public QnResource
 
 };
 
-#endif
+#endif // __RESOURCE_H__
