@@ -7,7 +7,7 @@ QnAbstractStreamDataProvider::QnAbstractStreamDataProvider(QnResourcePtr resourc
     m_params_CS(QMutex::Recursive)
 //m_needSleep(true)
 {
-	//setStreamParams(m_device->getStreamParamList());
+
 }
 
 QnAbstractStreamDataProvider::~QnAbstractStreamDataProvider()
@@ -32,35 +32,6 @@ bool QnAbstractStreamDataProvider::dataCanBeAccepted() const
     return result;
 }
 
-
-/*
-void QnAbstractStreamDataProvider::setStatistics(QnStatistics* stat)
-{
-	m_stat = stat;
-}
-
-void QnAbstractStreamDataProvider::setQuality(QnStreamQuality q)
-{
-	m_qulity = q;
-}
-
-QnStreamQuality QnAbstractStreamDataProvider::getQuality() const
-{
-	return m_qulity;
-}
-*/
-
-void QnAbstractStreamDataProvider::setStreamParams(QnParamList newParam)
-{
-	QMutexLocker mutex(&m_params_CS);
-	m_streamParam = newParam;
-}	
-
-QnParamList QnAbstractStreamDataProvider::getStreamParam() const
-{
-	QMutexLocker mutex(&m_params_CS);
-	return m_streamParam;
-}
 
 void QnAbstractStreamDataProvider::addDataProcessor(QnAbstractDataConsumer* dp)
 {

@@ -26,9 +26,6 @@ public:
 
     virtual bool dataCanBeAccepted() const;
 
-	virtual void setStreamParams(QnParamList newParam);
-	QnParamList getStreamParam() const;
-
 	void addDataProcessor(QnAbstractDataConsumer* dp);
 	void removeDataProcessor(QnAbstractDataConsumer* dp);
 
