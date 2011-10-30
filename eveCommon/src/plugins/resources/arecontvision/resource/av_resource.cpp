@@ -108,7 +108,7 @@ typedef QSharedPointer<QnPlArecontResourceSetRegCommand> QnPlArecontResourceSetR
 
 CLHttpStatus QnPlAreconVisionResource::setRegister_asynch(int page, int num, int val)
 {
-    QnPlArecontResourceSetRegCommandPtr command ( new QnPlArecontResourceSetRegCommand(QnResourcePtr(this), page, num, val) );
+    QnPlArecontResourceSetRegCommandPtr command ( new QnPlArecontResourceSetRegCommand(toSharedPointer(), page, num, val) );
     addCommandToProc(command);
     return CL_HTTP_SUCCESS;
 

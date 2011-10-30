@@ -48,7 +48,7 @@ public:
     virtual int getStreamDataProvidersMaxAmount() const;
     virtual QnAbstractMediaStreamDataProvider* createMediaProvider();
 
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role){return 0;};
+    
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames 
     virtual void setCropingPhysical(QRect croping);
@@ -56,6 +56,8 @@ public:
     //virtual QnMediaInfo getMediaInfo() const;
 
 protected:
+    virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role){return 0;};
+
     // should change value in memory domain 
     virtual bool getParamPhysical(const QString& name, QnValue& val);
 
