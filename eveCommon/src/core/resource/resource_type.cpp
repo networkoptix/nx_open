@@ -26,7 +26,7 @@ QnResourceTypePool* QnResourceTypePool::instance()
     return inst();
 }
 
-QnResourceTypePtr QnResourceTypePool::getResourceType(const QnId& id)
+QnResourceTypePtr QnResourceTypePool::getResourceType(const QnId& id) const
 {
     QMutexLocker lock(&m_mutex);
     QnResourceTypeMap::iterator itr = m_resourceTypeMap.find(id);
@@ -37,4 +37,14 @@ void QnResourceTypePool::addResourceType(QnResourceTypePtr resourceType)
 {
     QMutexLocker lock(&m_mutex);
     m_resourceTypeMap.insert(resourceType->getId(), resourceType);
+}
+
+QnId QnResourceTypePool::getResourceTypeId(const QString& manufacture, const QString& name) const
+{
+    QMutexLocker lock(&m_mutex);
+    foreach(QnResourceTypePtr rt, m_resourceTypeMap)
+    {
+        if (rt->getName() == name)// && rt->getManufacture()==manufacture)
+            return rt->getId();
+    }
 }

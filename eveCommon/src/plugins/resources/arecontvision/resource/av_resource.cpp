@@ -21,7 +21,9 @@ const char* ArecontVisionManufacture = "ArecontVision";
 
 QnPlAreconVisionResource::QnPlAreconVisionResource()
 {
-
+    QMutexLocker locker(&m_mutex);
+    getTypeId(qnResTypePool->getResourceTypeId("AVUNKNOWN", "ArecontVision"));
+ 
 }
 
 bool QnPlAreconVisionResource::isPanoramic() const
