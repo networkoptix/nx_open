@@ -3,6 +3,7 @@
 #include "core/resourcemanagment/security_cam_resource.h"
 #include "recording/stream_recorder.h"
 #include "core/dataprovider/media_streamdataprovider.h"
+#include "camera/camera_pool.h"
 
 static const int TRUNCATE_INTERVAL = 15; // seconds
 
@@ -22,12 +23,10 @@ void QnRecordingManager::start()
 
 void QnRecordingManager::onNewResource(QnResourcePtr res)
 {
-    QnSequrityCamResourcePtr camera = qSharedPointerDynamicCast<QnSequrityCamResource>(res);
-    if (camera)
-    {   
-        QnAbstractMediaStreamDataProvider* reader = dynamic_cast<QnAbstractMediaStreamDataProvider*>(res->getDataProvider(QnResource::Role_PrimariVideo));
-        reader->setQuality(QnQualityHighest);
-
+    QnVideoCamera* camera = qnCameraPool->getVideoCamera(res);
+    if (camera) 
+    {
+        QnAbstractMediaStreamDataProvider* reader = camera->getLiveReader();
         QnStreamRecorder* recorder = new QnStreamRecorder(res);
         recorder->setTruncateInterval(TRUNCATE_INTERVAL);
         connect(recorder, SIGNAL(recordingFailed(QString)), this, SIGNAL(recordingFailed(QString)));
