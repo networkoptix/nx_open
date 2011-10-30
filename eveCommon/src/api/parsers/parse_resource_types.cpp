@@ -18,6 +18,8 @@ void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const QnApiReso
 
         resourceType->setId(i->id().c_str());
         resourceType->setName(i->name().c_str());
+        if (i->manufacture().present())
+            resourceType->setManufacture(i->manufacture()->c_str());
 
         if (i->parentIDs().present())
         {
