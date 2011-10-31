@@ -123,10 +123,10 @@ bool CLArecontPanoramicDevice::getDescription()
 	return true;
 }
 
-QnAbstractMediaStreamDataProvider* CLArecontPanoramicDevice::createDataProviderInternal()
+QnAbstractStreamDataProvider* CLArecontPanoramicDevice::createDataProviderInternal(ConnectionRole role)
 {
 	cl_log.log("Creating streamreader for ", getHostAddress().toString(), cl_logDEBUG1);
-	return new AVPanoramicClientPullSSTFTPStreamreader(QnResourcePtr(this));
+	return new AVPanoramicClientPullSSTFTPStreamreader(toSharedPointer());
 }
 
 bool CLArecontPanoramicDevice::hasTestPattern() const

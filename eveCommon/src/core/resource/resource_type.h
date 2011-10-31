@@ -24,6 +24,7 @@ public:
     void setManufacture(const QString& value) { m_manufacture = value; }
     QString getManufacture() const { return m_manufacture;}
 
+
     void addAdditionalParent(const QnId& parent);
     QList<QnId> allParentList() const;
 
@@ -46,10 +47,13 @@ class QN_EXPORT QnResourceTypePool
 public:
     static QnResourceTypePool* instance();
 
-    QnResourceTypePtr getResourceType(const QnId& id);
+    QnResourceTypePtr getResourceType(const QnId& id) const;
     void addResourceType(QnResourceTypePtr resourceType);
+
+    QnId getResourceTypeId(const QString& manufacture, const QString& name) const;
+
 private:
-    QMutex m_mutex;
+    mutable QMutex m_mutex;
     typedef QMap<QnId, QnResourceTypePtr> QnResourceTypeMap;
     QnResourceTypeMap m_resourceTypeMap;
 };

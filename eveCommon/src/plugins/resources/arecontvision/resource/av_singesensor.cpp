@@ -32,10 +32,10 @@ bool CLArecontSingleSensorDevice::getDescription()
 	return true;
 }
 
-QnAbstractMediaStreamDataProvider* CLArecontSingleSensorDevice::createMediaProvider()
+QnAbstractStreamDataProvider* CLArecontSingleSensorDevice::createDataProviderInternal(ConnectionRole role)
 {
 	cl_log.log("Creating streamreader for ", getHostAddress().toString(), cl_logDEBUG1);
-	return new AVClientPullSSTFTPStreamreader(QnResourcePtr(this));
+	return new AVClientPullSSTFTPStreamreader(toSharedPointer());
 }
 
 bool CLArecontSingleSensorDevice::hasTestPattern() const
