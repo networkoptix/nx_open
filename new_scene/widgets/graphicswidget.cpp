@@ -44,7 +44,7 @@ namespace {
 
         virtual bool eventFilter(QObject *watched, QEvent *event) override
         {
-            switch (event->type()) 
+            switch (event->type())
             {
             case QEvent::GraphicsSceneDragEnter:
                 return dragEnterEvent(watched, static_cast<QGraphicsSceneDragDropEvent *>(event));
@@ -73,18 +73,18 @@ namespace {
             m_draggedItems.clear();
         }
 
-        bool droppedOnSelf() const 
+        bool droppedOnSelf() const
         {
             return m_droppedOnSelf;
         }
 
-        QPointF totalDelta() const 
+        QPointF totalDelta() const
         {
             return m_lastScenePos - m_initialScenePos;
         }
 
     private:
-        static QLatin1String staticObjectName() 
+        static QLatin1String staticObjectName()
         {
             return QLatin1String("_qn_dragFilter");
         }
@@ -150,7 +150,7 @@ namespace {
             m_lastScenePos = event->scenePos();
         }
 
-        bool inLocalDrag() const 
+        bool inLocalDrag() const
         {
             return m_draggerWidget != NULL;
         }
@@ -194,19 +194,22 @@ void GraphicsWidgetPrivate::movingResizingFinished()
 }
 
 
-GraphicsWidget::GraphicsWidget(QGraphicsItem *parent):
-    base_type(parent),
-    d_ptr(new GraphicsWidgetPrivate)
+GraphicsWidget::GraphicsWidget(QGraphicsItem *parent, Qt::WindowFlags f) :
+    base_type(parent, f), d_ptr(new GraphicsWidgetPrivate)
 {
     d_ptr->q_ptr = this;
+
+    setAcceptHoverEvents(true);
 
     DragFilter::ensureInstalledAt(scene());
 }
 
-GraphicsWidget::GraphicsWidget(QGraphicsItem *parent, GraphicsWidgetPrivate &dd):
-    base_type(parent), d_ptr(&dd)
+GraphicsWidget::GraphicsWidget(GraphicsWidgetPrivate &dd, QGraphicsItem *parent, Qt::WindowFlags f) :
+    base_type(parent, f), d_ptr(&dd)
 {
     d_ptr->q_ptr = this;
+
+    setAcceptHoverEvents(true);
 
     DragFilter::ensureInstalledAt(scene());
 }
@@ -284,8 +287,8 @@ void GraphicsWidget::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
     base_type::mousePressEvent(event);
 
-    if ((flags() & ItemIsMovable) && !(extraFlags() & ItemIsDraggable) && event->button() == Qt::LeftButton) 
-        d->moving = true; 
+    if ((flags() & ItemIsMovable) && !(extraFlags() & ItemIsDraggable) && event->button() == Qt::LeftButton)
+        d->moving = true;
 
     if ((extraFlags() & ItemIsDraggable) && event->button() == Qt::LeftButton)
         d->preDragging = true;
@@ -382,7 +385,7 @@ bool GraphicsWidget::windowFrameEvent(QEvent *event)
                 {
                     d->preDragging = true;
                 }
-                else 
+                else
                 {
                     d->moving = true;
                 }
@@ -442,7 +445,7 @@ bool GraphicsWidget::windowFrameEvent(QEvent *event)
     return result;
 }
 
-QVariant GraphicsWidget::itemChange(GraphicsItemChange change, const QVariant &value) 
+QVariant GraphicsWidget::itemChange(GraphicsItemChange change, const QVariant &value)
 {
     if (change == ItemSceneHasChanged)
         DragFilter::ensureInstalledAt(scene());
@@ -471,7 +474,7 @@ Qt::WindowFrameSection GraphicsWidget::filterWindowFrameSection(Qt::WindowFrameS
 QDrag *GraphicsWidget::createDrag(QGraphicsSceneMouseEvent *event)
 {
     QDrag *drag = new QDrag(event->widget());
-    
+
     QMimeData *mimeData = new QMimeData();
     drag->setMimeData(mimeData);
 
@@ -491,12 +494,12 @@ void GraphicsWidget::endDrag(Qt::DropAction dropAction)
         {
             if (item == this)
                 continue;
-            
+
             delete item;
         }
 
         this->deleteLater();
-    } 
+    }
 }
 
 void GraphicsWidget::drag(QGraphicsSceneMouseEvent *event)
@@ -507,13 +510,13 @@ void GraphicsWidget::drag(QGraphicsSceneMouseEvent *event)
     if (!draggedItems.contains(this))
         draggedItems.push_back(this);
     dragFilter->dragStarted(this, draggedItems, event->buttonDownScenePos(Qt::LeftButton));
-    
+
     if (flags() & ItemIsMovable)
         Q_EMIT movingStarted();
 
     QDrag *drag = createDrag(event);
     Qt::DropAction dropAction = startDrag(drag);
-    if (dragFilter->droppedOnSelf()) 
+    if (dragFilter->droppedOnSelf())
     {
         dropAction = Qt::IgnoreAction;
     }

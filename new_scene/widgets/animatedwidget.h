@@ -42,6 +42,9 @@ protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
     void wheelEvent(QGraphicsSceneWheelEvent *event);
 
+protected:
+    AnimatedWidget(AnimatedWidgetPrivate &dd, QGraphicsItem *parent);
+
 private:
     Q_DECLARE_PRIVATE(AnimatedWidget)
     Q_DISABLE_COPY(AnimatedWidget)
