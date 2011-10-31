@@ -6,6 +6,7 @@
 #include <QFile>
 #include <QMutex>
 #include "device_file_catalog.h"
+#include "core/resource/qnstorage.h"
 
 // This class used for extract chunk sequence from storage
 class QnChunkSequence: public QObject
@@ -37,7 +38,7 @@ public:
     QnStorageManager();
     virtual ~QnStorageManager();
     static QnStorageManager* instance();
-    void addRecordRoot(int key, const QString& path);
+    void addStorage(QnStoragePtr storage);
 
 
     QString getFileName(const qint64& fileDate, const QString& uniqId);
@@ -46,15 +47,15 @@ public:
     QList<ChunkMap::iterator> findFirstChunks(const QnResourceList& resList, qint64 startTime, qint64 endTime);
 
     static QString dateTimeStr(qint64 dateTimeMks);
-    QMap<int, QString> storageRoots() const { return m_storageRoots; }
+    QMap<int, QnStoragePtr> storageRoots() const { return m_storageRoots; }
     DeviceFileCatalogPtr getFileCatalog(const QnResourcePtr resource);
 private:
-    QMap<int, QString> m_storageRoots;
+    QMap<int, QnStoragePtr> m_storageRoots;
     typedef QMap<QnResourcePtr, DeviceFileCatalogPtr> FileCatalogMap;
     FileCatalogMap m_devFileCatalog;
     QMutex m_mutex;
 };
 
-#define qnStorage QnStorageManager::instance()
+#define qnStorageMan QnStorageManager::instance()
 
 #endif // __STORAGE_MANAGER_H__

@@ -9,6 +9,7 @@
 #include "rtsp/rtsp_listener.h"
 #include "plugins/resources/arecontvision/resource/av_resource_searcher.h"
 #include "recorder/recording_manager.h"
+#include "recording/storage_manager.h"
 
 //#include "device_plugins/arecontvision/devices/av_device_server.h"
 
@@ -96,6 +97,26 @@ void addTestData()
 }
 #endif
 
+void serverInit()
+{
+#ifdef TEST_RTSP_SERVER
+    addTestData();
+#endif
+
+    QnRtspListener rtspListener(QHostAddress::Any, 50000);
+    rtspListener.start();
+
+    QnStoragePtr storage0(new QnStorage());
+    storage0->setUrl("c:/records");
+    storage0->setIndex(0);
+    qnResPool->addResource(storage0);
+    qnStorageMan->addStorage(storage0);
+
+    QnRecordingManager recorder;
+    recorder.start();
+
+}
+
 #ifndef API_TEST_MAIN
 int main(int argc, char *argv[])
 {
@@ -176,14 +197,7 @@ int main(int argc, char *argv[])
     //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
     
-    QnRtspListener rtspListener(QHostAddress::Any, 50000);
-    rtspListener.start();
-    QnRecordingManager recorder;
-    recorder.start();
-
-#ifdef TEST_RTSP_SERVER
-    addTestData();
-#endif
+    serverInit();
 
     int result = application.exec();
 
