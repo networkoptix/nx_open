@@ -31,6 +31,7 @@
     <xs:all>
         <xs:element name="id" type="idtype"/>
         <xs:element name="name" type="xs:string"/>
+        <xs:element name="manufacture" type="xs:string" minOccurs="0"/>
         <xs:element name="parentIDs" type="ParentIDs" minOccurs="0"/>
         <xs:element name="propertyTypes" type="PropertyTypes" minOccurs="0"/>
     </xs:all>
@@ -72,7 +73,7 @@
       <xs:element name="ui" type="xs:boolean" minOccurs="0"/>
       <xs:element name="readonly" type="xs:boolean" minOccurs="0"/>
 
-      <xs:element name="http" type="xs:string" minOccurs="0"/>
+      <xs:element name="netHelper" type="xs:string" minOccurs="0"/>
     </xs:all>
   </xs:complexType>
 </xs:schema>

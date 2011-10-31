@@ -69,9 +69,10 @@ public:
     {
         int n = ms/100;
         
-        while(!needToStop())
+        for (int i = 0; i < n; ++i)
         {
-            msleep(n);
+            if (!needToStop())
+                msleep(100);
         }
 
         if (!needToStop())

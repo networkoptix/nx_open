@@ -179,8 +179,6 @@ bool QnResource::getParam(const QString& name, QnValue& val, QnDomain domain )
 
     QMutexLocker locker(&m_mutex);
 
-    if (setSpecialParam(name, val, domain)) // try special first
-        return true;
 
 
     if (domain == QnDomainMemory)
@@ -297,6 +295,7 @@ QnParamList& QnResource::getResourceParamList() const
             {
                 QnParam newParam(paramType);
                 newParam.setValue(paramType->default_value);
+                cl_log.log(newParam.toDebugString(), cl_logALWAYS); // debug
                 m_resourceParamList.put(newParam);
             }
         }

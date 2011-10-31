@@ -21,7 +21,9 @@ const char* ArecontVisionManufacture = "ArecontVision";
 
 QnPlAreconVisionResource::QnPlAreconVisionResource()
 {
-
+    QMutexLocker locker(&m_mutex);
+    setTypeId(qnResTypePool->getResourceTypeId("ArecontVision", "ArecontVision_Abstract"));
+ 
 }
 
 bool QnPlAreconVisionResource::isPanoramic() const
@@ -108,7 +110,7 @@ typedef QSharedPointer<QnPlArecontResourceSetRegCommand> QnPlArecontResourceSetR
 
 CLHttpStatus QnPlAreconVisionResource::setRegister_asynch(int page, int num, int val)
 {
-    QnPlArecontResourceSetRegCommandPtr command ( new QnPlArecontResourceSetRegCommand(QnResourcePtr(this), page, num, val) );
+    QnPlArecontResourceSetRegCommandPtr command ( new QnPlArecontResourceSetRegCommand(toSharedPointer(), page, num, val) );
     addCommandToProc(command);
     return CL_HTTP_SUCCESS;
 
@@ -282,6 +284,8 @@ void QnPlAreconVisionResource::setIframeDistance(int frames, int timems)
 
 void QnPlAreconVisionResource::setCropingPhysical(QRect croping)
 {
+    return;
+
     QnValue maxSensorWidth;
     QnValue maxSensorHight;
     getParam("MaxSensorWidth", maxSensorWidth, QnDomainMemory);
@@ -373,18 +377,23 @@ bool QnPlAreconVisionResource::setParamPhysical(const QString& name, const QnVal
 
 QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(QString name)
 {
-	QStringList supp ;//= QnResource::supportedSuchResourceTypeId(ArecontVisionManufacture);
-
-	if (!supp.contains(name))
+    QnId rt = qnResTypePool->getResourceTypeId(ArecontVisionManufacture, name);
+    if (!rt.isValid())
 	{
 		cl_log.log("Unsupported resource found(!!!): ", name, cl_logERROR);
 		return 0;
 	}
 
+    QnPlAreconVisionResource* res = 0;
+
 	if (isPanoramic(name))
-		return new  CLArecontPanoramicDevice(name);
+		res = new CLArecontPanoramicResource(name);
 	else
-		return new CLArecontSingleSensorDevice(name);
+		res = new CLArecontSingleSensorResource(name);
+
+    res->setTypeId(rt);
+
+    return res;
 }
 
 

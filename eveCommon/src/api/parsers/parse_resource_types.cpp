@@ -18,6 +18,8 @@ void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const QnApiReso
 
         resourceType->setId(i->id().c_str());
         resourceType->setName(i->name().c_str());
+        if (i->manufacture().present())
+            resourceType->setManufacture(i->manufacture()->c_str());
 
         if (i->parentIDs().present())
         {
@@ -74,8 +76,8 @@ void parseResourceTypes(QList<QnResourceTypePtr>& resourceTypes, const QnApiReso
                 if (propertyTypesIter->default_value().present())
                     param->default_value = (*propertyTypesIter->default_value()).c_str();
 
-                if (propertyTypesIter->http().present())
-                    param->paramNetHelper = (*propertyTypesIter->http()).c_str();
+                if (propertyTypesIter->netHelper().present())
+                    param->paramNetHelper = (*propertyTypesIter->netHelper()).c_str();
 
                 if (propertyTypesIter->group().present())
                     param->group = (*propertyTypesIter->group()).c_str();

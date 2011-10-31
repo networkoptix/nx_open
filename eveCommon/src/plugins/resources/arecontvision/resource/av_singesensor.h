@@ -5,15 +5,15 @@
 
 
 
-class CLArecontSingleSensorDevice : public QnPlAreconVisionResource
+class CLArecontSingleSensorResource : public QnPlAreconVisionResource
 {
 public:
-	CLArecontSingleSensorDevice(const QString& name);
+	CLArecontSingleSensorResource(const QString& name);
 	bool getDescription();
 
 	virtual bool hasTestPattern() const;
 protected:
-    virtual QnAbstractMediaStreamDataProvider* createMediaProvider();
+    virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 protected:
 	bool m_hastestPattern;
 

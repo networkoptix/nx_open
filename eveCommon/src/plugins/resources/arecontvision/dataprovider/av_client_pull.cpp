@@ -46,6 +46,8 @@ QnPlAVClinetPullStreamReader::~QnPlAVClinetPullStreamReader()
 void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
 {
 
+    return;
+
     //QMutexLocker mtx(&m_mtx);
 
     QnPlAreconVisionResourcePtr avRes = getResource().dynamicCast<QnPlAreconVisionResource>();

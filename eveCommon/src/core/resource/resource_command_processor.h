@@ -16,10 +16,10 @@ class QN_EXPORT QnDeviceCommand : public QnAbstractDataPacket
 public:
 	QnDeviceCommand(QSharedPointer<QnResource> device);
 	virtual ~QnDeviceCommand();
-	QSharedPointer<QnResource> getDevice() const;
+	QSharedPointer<QnResource> getResource() const;
 	virtual void execute() = 0;
 protected:
-	QSharedPointer<QnResource> m_device;
+	QSharedPointer<QnResource> m_resource;
 
 };
 typedef QSharedPointer<QnDeviceCommand> QnDeviceCommandPtr;
