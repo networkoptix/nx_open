@@ -73,7 +73,7 @@
       <xs:element name="ui" type="xs:boolean" minOccurs="0"/>
       <xs:element name="readonly" type="xs:boolean" minOccurs="0"/>
 
-      <xs:element name="http" type="xs:string" minOccurs="0"/>
+      <xs:element name="netHelper" type="xs:string" minOccurs="0"/>
     </xs:all>
   </xs:complexType>
 </xs:schema>
