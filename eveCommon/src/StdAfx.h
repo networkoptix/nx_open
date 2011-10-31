@@ -134,3 +134,5 @@ extern "C" {
 #include <QFileSystemWatcher>
 
 #endif
+
+//#include "resourceTypes.h"

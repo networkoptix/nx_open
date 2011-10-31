@@ -22,7 +22,7 @@ const char* ArecontVisionManufacture = "ArecontVision";
 QnPlAreconVisionResource::QnPlAreconVisionResource()
 {
     QMutexLocker locker(&m_mutex);
-    getTypeId(qnResTypePool->getResourceTypeId("AVUNKNOWN", "ArecontVision"));
+    setTypeId(qnResTypePool->getResourceTypeId("ArecontVision", "ArecontVision_Abstract"));
  
 }
 
