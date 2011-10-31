@@ -21,6 +21,8 @@ public:
 
 	long read(char* data, unsigned long max_len);
 
+    void close();
+
 	QString getContentType() const 
 	{
 		return m_contentType;
@@ -37,7 +39,9 @@ public:
 
 
 private:
-	CLHttpStatus getNextLine();
+    void initSocket();
+
+    CLHttpStatus getNextLine();
     void getAuthInfo();
 
     QString basicAuth() const;
@@ -53,7 +57,9 @@ private:
 	unsigned int m_contentLen;
     unsigned int m_readed;
 
-	TCPSocket m_sock;
+    typedef QSharedPointer<TCPSocket> TCPSocketPtr;
+
+    TCPSocketPtr m_sock;
 	bool m_connected;
 
 	unsigned int m_timeout;
