@@ -110,31 +110,31 @@ public:
 AVVideoLayout360 avVideoLayout360;
 AVVideoLayout180 avVideoLayout180;
 
-CLArecontPanoramicDevice::CLArecontPanoramicDevice(const QString& name):
+CLArecontPanoramicResource::CLArecontPanoramicResource(const QString& name):
 m_hastestPattern(false)
 {
     setName(name);
 }
 
 
-bool CLArecontPanoramicDevice::getDescription()
+bool CLArecontPanoramicResource::getDescription()
 {
 	m_description = "";
 	return true;
 }
 
-QnAbstractStreamDataProvider* CLArecontPanoramicDevice::createDataProviderInternal(ConnectionRole role)
+QnAbstractStreamDataProvider* CLArecontPanoramicResource::createDataProviderInternal(ConnectionRole role)
 {
 	cl_log.log("Creating streamreader for ", getHostAddress().toString(), cl_logDEBUG1);
 	return new AVPanoramicClientPullSSTFTPStreamreader(toSharedPointer());
 }
 
-bool CLArecontPanoramicDevice::hasTestPattern() const
+bool CLArecontPanoramicResource::hasTestPattern() const
 {
 	return m_hastestPattern;
 }
 
-bool CLArecontPanoramicDevice::setParamPhysical(const QString& name, const QnValue& val )
+bool CLArecontPanoramicResource::setParamPhysical(const QString& name, const QnValue& val )
 {
     QnParam& param = getResourceParamList().get(name);
 
@@ -175,7 +175,7 @@ bool CLArecontPanoramicDevice::setParamPhysical(const QString& name, const QnVal
 
 }
 
-bool CLArecontPanoramicDevice::setSpecialParam(const QString& name, const QnValue& val, QnDomain domain)
+bool CLArecontPanoramicResource::setSpecialParam(const QString& name, const QnValue& val, QnDomain domain)
 {
 
 	if (QnPlAreconVisionResource::setSpecialParam(name, val, domain))
@@ -204,7 +204,7 @@ bool CLArecontPanoramicDevice::setSpecialParam(const QString& name, const QnValu
 }
 
 //=======================================================================
-bool CLArecontPanoramicDevice::setResolution(bool full)
+bool CLArecontPanoramicResource::setResolution(bool full)
 {
 	int value = full ? 15 : 0; // all sensors to full/half resolution
 
@@ -214,7 +214,7 @@ bool CLArecontPanoramicDevice::setResolution(bool full)
 	return true;
 }
 
-bool CLArecontPanoramicDevice::setCamQulity(int q)
+bool CLArecontPanoramicResource::setCamQulity(int q)
 {
 	if (CL_HTTP_SUCCESS!=setRegister(3, 0xED, q)) // FULL RES QULITY
 		return false;

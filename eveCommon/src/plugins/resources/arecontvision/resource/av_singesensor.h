@@ -5,10 +5,10 @@
 
 
 
-class CLArecontSingleSensorDevice : public QnPlAreconVisionResource
+class CLArecontSingleSensorResource : public QnPlAreconVisionResource
 {
 public:
-	CLArecontSingleSensorDevice(const QString& name);
+	CLArecontSingleSensorResource(const QString& name);
 	bool getDescription();
 
 	virtual bool hasTestPattern() const;

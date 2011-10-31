@@ -4,10 +4,10 @@
 #include "av_resource.h"
 
 
-class CLArecontPanoramicDevice : public QnPlAreconVisionResource
+class CLArecontPanoramicResource : public QnPlAreconVisionResource
 {
 public:
-	CLArecontPanoramicDevice(const QString& name);
+	CLArecontPanoramicResource(const QString& name);
 	bool getDescription();
 
 	virtual bool hasTestPattern() const;

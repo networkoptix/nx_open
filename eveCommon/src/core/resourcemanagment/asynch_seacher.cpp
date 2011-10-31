@@ -234,12 +234,15 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool& ip_finished)
         if (res->unknownResource())
         {
             QnResourcePtr updetedRes = res->updateResource();
-            swapList.push_back(updetedRes);
+
+            if (updetedRes)
+                swapList.push_back(updetedRes);
         }
         else
             swapList.push_back(res);
     }
 
+    resources = swapList;
 
 	return resources;
 }
