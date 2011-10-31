@@ -38,7 +38,7 @@ void QnStreamRecorder::cleanup()
         {
             av_metadata_set2(&m_formatCtx->metadata, "start_time", QString::number(m_prevDateTime/1000).toAscii().data(), 0);
             av_metadata_set2(&m_formatCtx->metadata, "end_time", QString::number(m_currentDateTime/1000).toAscii().data(), 0);
-            qnStorage->addFileInfo(m_prevDateTime, m_currentDateTime, m_fileName);
+            qnStorageMan->addFileInfo(m_prevDateTime, m_currentDateTime, m_fileName);
         }
 
         if (m_packetWrited)
@@ -144,7 +144,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     QFileInfo fi(m_device->getUniqueId());
     if (m_fileName.isEmpty())
     {
-        m_fileName = qnStorage->getFileName(m_currentDateTime, fi.baseName());
+        m_fileName = qnStorageMan->getFileName(m_currentDateTime, fi.baseName());
     }
 
     m_fileName += QString(".") + fileExt;
