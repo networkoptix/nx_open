@@ -142,11 +142,10 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     QString fileExt = QString(outputCtx->extensions).split(',')[0];
 
     QFileInfo fi(m_device->getUniqueId());
-    if (m_fileName.isEmpty())
-    {
+    if (m_fixedFileName.isEmpty())
         m_fileName = qnStorageMan->getFileName(m_currentDateTime, fi.baseName());
-    }
-
+    else
+        m_fileName = m_fixedFileName;
     m_fileName += QString(".") + fileExt;
     QString url = QString("ufile:") + m_fileName;
     int err = avformat_alloc_output_context2(&m_formatCtx, outputCtx, 0, url.toUtf8().constData());
@@ -248,5 +247,5 @@ void QnStreamRecorder::setTruncateInterval(int seconds)
 
 void QnStreamRecorder::setFileName(const QString& fileName)
 {
-    m_fileName = fileName;
+    m_fixedFileName = fileName;
 }

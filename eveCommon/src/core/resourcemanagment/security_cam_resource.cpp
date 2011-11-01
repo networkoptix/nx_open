@@ -1,7 +1,9 @@
 #include "security_cam_resource.h"
+#include "plugins/resources/archive/archive_stream_reader.h"
 
 QnSequrityCamResource::QnSequrityCamResource()
 {
+    m_dpFactory = 0;
     addFlag(QnResource::live_cam);
 }
 
@@ -56,3 +58,17 @@ void QnSequrityCamResource::setCroping(QRect croping, QnDomain domain)
     setCropingPhysical(croping);
 }
 
+QnAbstractStreamDataProvider* QnSequrityCamResource::createDataProviderInternal(QnResource::ConnectionRole role)
+{
+    if (role == QnResource::Role_LiveVideo || role == QnResource::Role_Default)
+        return createLiveDataProvider();
+    else if (m_dpFactory)
+        m_dpFactory->createDataProviderInternal(toSharedPointer(), role);
+    else
+        return 0;
+}
+
+void QnSequrityCamResource::setDataProviderFactory(QnDataProviderFactory* dpFactory)
+{
+    m_dpFactory = dpFactory;
+}

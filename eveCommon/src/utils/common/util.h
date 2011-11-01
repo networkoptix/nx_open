@@ -56,4 +56,6 @@ inline unsigned int roundUp(unsigned int value, int step) {
 
 QN_EXPORT QString strPadLeft(const QString &str, int len, char ch);
 
+QN_EXPORT QString closeDirPath(const QString& value);
+
 #endif // _UNIVERSAL_CLIENT_UTIL_H

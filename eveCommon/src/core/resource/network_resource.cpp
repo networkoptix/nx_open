@@ -71,6 +71,7 @@ void  QnNetworkResource::setMAC(QnMacAddress mac)
 {
     QMutexLocker mutex(&m_mutex);
     m_macAddress = mac;
+    setUrl(m_macAddress.toString());
 }
 
 void QnNetworkResource::setAuth(const QString& user, QString password)

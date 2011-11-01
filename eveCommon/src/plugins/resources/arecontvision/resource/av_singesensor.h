@@ -13,7 +13,7 @@ public:
 
 	virtual bool hasTestPattern() const;
 protected:
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
+    virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 protected:
 	bool m_hastestPattern;
 

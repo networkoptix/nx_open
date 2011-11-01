@@ -18,7 +18,7 @@ bool CLArecontPanoramicResource::getDescription()
 	return true;
 }
 
-QnAbstractStreamDataProvider* CLArecontPanoramicResource::createDataProviderInternal(ConnectionRole role)
+QnAbstractStreamDataProvider* CLArecontPanoramicResource::createLiveDataProvider()
 {
 	cl_log.log("Creating streamreader for ", getHostAddress().toString(), cl_logDEBUG1);
 	return new AVPanoramicClientPullSSTFTPStreamreader(toSharedPointer());

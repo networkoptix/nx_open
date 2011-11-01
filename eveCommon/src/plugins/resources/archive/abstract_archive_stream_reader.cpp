@@ -143,3 +143,16 @@ void QnAbstractArchiveReader::previousFrame(qint64 mksec)
 {
     emit prevFrameOccured();
 }
+
+
+qint64 QnAbstractArchiveReader::startTime() const 
+{ 
+    m_delegate->open(m_resource);
+    return m_delegate->startTime(); 
+}
+
+qint64 QnAbstractArchiveReader::endTime() const 
+{ 
+    m_delegate->open(m_resource);
+    return m_delegate->endTime(); 
+}
