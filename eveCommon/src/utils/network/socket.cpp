@@ -23,8 +23,6 @@
   typedef void raw_type;       // Type used for raw data on this platform
 #endif
 
-using namespace std;
-
 #ifdef WIN32
 static bool initialized = false;
 static const int ERR_TIMEOUT = WSAETIMEDOUT;
