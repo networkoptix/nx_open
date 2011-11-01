@@ -15,13 +15,19 @@ CLSimpleHTTPClient::CLSimpleHTTPClient(const QHostAddress& host, int port, unsig
     m_timeout(timeout),
     m_auth(auth)
 {
-    m_sock.setReadTimeOut(timeout);
-    m_sock.setWriteTimeOut(timeout);
+    initSocket();
+}
+
+void CLSimpleHTTPClient::initSocket()
+{
+    m_sock = TCPSocketPtr(new TCPSocket());
+
+    m_sock->setReadTimeOut(m_timeout);
+    m_sock->setWriteTimeOut(m_timeout);
 }
 
 CLSimpleHTTPClient::~CLSimpleHTTPClient()
 {
-    
 }
 
 CLHttpStatus CLSimpleHTTPClient::getNextLine()
@@ -34,7 +40,7 @@ CLHttpStatus CLSimpleHTTPClient::getNextLine()
 
 	while(1)
 	{
-		if (m_sock.recv(&curr,1)<0)
+        if (m_sock->recv(&curr,1)<0)
 			return CL_HTTP_HOST_NOT_AVAILABLE;
 
 		if (prev=='\r' && curr == '\n')
@@ -61,7 +67,7 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QString& requestStr, bool recursive
 	{
         if (!m_connected)
         {
-            if (!m_sock.connect(m_host.toString().toLatin1().data(), m_port))
+            if (!m_sock->connect(m_host.toString().toLatin1().data(), m_port))
             {
                 return CL_HTTP_HOST_NOT_AVAILABLE;
             }
@@ -84,7 +90,7 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QString& requestStr, bool recursive
 
 		os<< "\r\n";
         
-        if (!m_sock.send(request.toLatin1().data(), request.toLatin1().size()))
+        if (!m_sock->send(request.toLatin1().data(), request.toLatin1().size()))
         {
             qDebug() << "OpenStream1";
 
@@ -99,7 +105,7 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QString& requestStr, bool recursive
         
 		if (!m_line.contains(QLatin1String("200 OK")))// not ok
 		{
-			m_connected = false;
+            close();
 
             if (m_line.contains(QLatin1String("401 Unauthorized")))
             {
@@ -155,10 +161,16 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QString& requestStr, bool recursive
 	}
 	catch (...)
 	{
-		m_connected = false;
+        close();
 		return CL_HTTP_HOST_NOT_AVAILABLE;
 	}
 
+}
+
+void CLSimpleHTTPClient::close()
+{
+    initSocket();
+    m_connected = false;
 }
 
 void CLSimpleHTTPClient::readAll(QByteArray& data)
@@ -179,11 +191,11 @@ long CLSimpleHTTPClient::read(char* data, unsigned long max_len)
 	if (!m_connected) return -1;
 
 	int readed = 0;
-	readed = m_sock.recv(data, max_len);
+    readed = m_sock->recv(data, max_len);
 
 
 	if (readed<=0)
-		m_connected = false;
+        close();
 
 	m_readed+=readed;
 

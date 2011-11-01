@@ -2,6 +2,7 @@
 
 #include "api/parsers/parse_cameras.h"
 #include "api/parsers/parse_layouts.h"
+#include "api/parsers/parse_users.h"
 #include "api/parsers/parse_servers.h"
 #include "api/parsers/parse_resource_types.h"
 
@@ -31,11 +32,12 @@ int QnAppServerConnection::getResources(QList<QnResourcePtr>& resources)
 
     int status = m_sessionManager->getResources(xsdResources);
 
-    if (xsdResources->cameras().present())
-        parseCameras(resources, (*xsdResources->cameras()).camera());
-
-    if (xsdResources->layouts().present())
-        parseLayouts(resources, (*xsdResources->layouts()).layout());
+    if (!xsdResources.isNull())
+    {
+        parseCameras(resources, xsdResources->cameras().camera());
+        parseLayouts(resources, xsdResources->layouts().layout());
+        parseUsers(resources, xsdResources->users().user());
+    }
 
     return status;
 }
@@ -62,8 +64,9 @@ int QnAppServerConnection::addCamera(const QnResource& cameraIn, const QnId& ser
                                      "url",
                                      "mac",
                                      "login",
-                                     "password",
-                                     serverIdIn.toString().toInt());
+                                     "password");
+
+    camera.parentID(serverIdIn.toString().toInt());
 
     QnApiCameraResponsePtr xsdCameras;
 

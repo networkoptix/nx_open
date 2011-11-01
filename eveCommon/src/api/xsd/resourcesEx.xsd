@@ -16,10 +16,10 @@
 
   <xs:complexType name="Resources">
     <xs:all>
-      <xs:element name="cameras" type="cameras:Cameras" minOccurs="0"/>
-      <xs:element name="layouts" type="layouts:Layouts" minOccurs="0"/>
-      <xs:element name="servers" type="servers:Servers" minOccurs="0"/>
-      <xs:element name="users" type="users:Users" minOccurs="0"/>
+      <xs:element name="cameras" type="cameras:Cameras"/>
+      <xs:element name="layouts" type="layouts:Layouts"/>
+      <xs:element name="servers" type="servers:Servers"/>
+      <xs:element name="users" type="users:Users"/>
     </xs:all>
   </xs:complexType>
 
