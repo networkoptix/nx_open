@@ -42,7 +42,7 @@ private:
     qint64 m_currentDateTime;
     qint64 m_prevDateTime;
     QString m_fileName;
-
+    QString m_fixedFileName;
 };
 
 #endif //_STREAM_RECORDER_H__

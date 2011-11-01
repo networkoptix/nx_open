@@ -49,6 +49,7 @@ public:
 
     QnResourceTypePtr getResourceType(const QnId& id) const;
     void addResourceType(QnResourceTypePtr resourceType);
+    void addResourceTypeList(const QList<QnResourceTypePtr>& resourceType);
 
     QnId getResourceTypeId(const QString& manufacture, const QString& name) const;
 

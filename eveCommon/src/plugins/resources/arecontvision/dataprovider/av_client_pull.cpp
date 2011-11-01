@@ -4,6 +4,8 @@
 QnPlAVClinetPullStreamReader::QnPlAVClinetPullStreamReader(QnResourcePtr res):
 QnClientPullStreamProvider(res)
 {
+    return;
+
     QnSequrityCamResourcePtr ceqResource = getResource().dynamicCast<QnSequrityCamResource>();
 
     QSize maxResolution = ceqResource->getMaxSensorSize();

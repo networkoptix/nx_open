@@ -114,3 +114,11 @@ QString strPadLeft(const QString &str, int len, char ch)
         return QString(diff, QLatin1Char(ch)) + str;
     return str;
 }
+
+QString closeDirPath(const QString& value)
+{
+    if (value.endsWith('/'))
+        return value;
+    else
+        return value + QString('/');
+}

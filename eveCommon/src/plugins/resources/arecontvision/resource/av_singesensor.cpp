@@ -32,7 +32,7 @@ bool CLArecontSingleSensorResource::getDescription()
 	return true;
 }
 
-QnAbstractStreamDataProvider* CLArecontSingleSensorResource::createDataProviderInternal(ConnectionRole role)
+QnAbstractStreamDataProvider* CLArecontSingleSensorResource::createLiveDataProvider()
 {
 	cl_log.log("Creating streamreader for ", getHostAddress().toString(), cl_logDEBUG1);
 	return new AVClientPullSSTFTPStreamreader(toSharedPointer());

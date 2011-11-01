@@ -44,6 +44,24 @@ CONFIG(release, debug|release) {
   LIBS += -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib
 }
 
+win32 {
+    EVETOOLS_DIR=$$PWD/../../../evetools/win32
+    QMAKE_CXXFLAGS += -Zc:wchar_t
+    LIBS += -lxerces-c_3
+
+    # Define QN_EXPORT only if eveCommon build is not static
+    isEmpty(BUILDLIB) { DEFINES += QN_EXPORT=Q_DECL_IMPORT }
+    !isEmpty(BUILDLIB) { DEFINES += QN_EXPORT= }
+}
+
+mac {
+    EVETOOLS_DIR=$$PWD/../../../evetools/mac
+    LIBS += -lxerces-c-3.1
+    DEFINES += QN_EXPORT=
+}
+
+LIBS += -L$$EVETOOLS_DIR/lib
+
 LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale
 
 win32 {

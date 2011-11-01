@@ -56,7 +56,7 @@ public:
     //virtual QnMediaInfo getMediaInfo() const;
 
 protected:
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role){return 0;};
+    virtual QnAbstractStreamDataProvider* createLiveDataProvider() { return 0; }
 
     // should change value in memory domain 
     virtual bool getParamPhysical(const QString& name, QnValue& val);

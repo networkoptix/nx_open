@@ -13,7 +13,7 @@ from string import Template
 
 sys.path.insert(0, '../eveCommon')
 
-from convert import index_dirs, rmtree, setup_ffmpeg, instantiate_pro, copy_files, BUILDLIB
+from convert import index_dirs, rmtree, setup_ffmpeg, instantiate_pro, copy_files, BUILDLIB, setup_tools
 from convert import convert as convert_common
 
 FFMPEG_VERSION = '2011-08-29'
@@ -55,6 +55,7 @@ def gen_version_h():
 convert_common()
 
 ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release = setup_ffmpeg()
+tools_path = setup_tools()
 
 if os.path.exists('bin'):
     rmtree('bin')
@@ -68,6 +69,8 @@ os.mkdir('bin/release')
 os.mkdir('bin/debug-test')
 os.mkdir('bin/release-test')
 
+os.mkdir('build')
+
 copy_files(ffmpeg_path_debug + '/bin/*-[0-9].dll', 'bin/debug')
 copy_files(ffmpeg_path_debug + '/bin/*-[0-9][0-9].dll', 'bin/debug')
 
@@ -80,13 +83,16 @@ os.mkdir('bin/release/arecontvision')
 copy_files('resource/arecontvision/*', 'bin/debug/arecontvision')
 copy_files('resource/arecontvision/*', 'bin/release/arecontvision')
 
+copy_files(tools_path + '/bin/*.dll', 'bin/release')
+copy_files(tools_path + '/bin/*.dll', 'bin/debug')
+
 gen_version_h()
 
 index_dirs(('src',), 'src/const.pro', 'src/server.pro', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
 instantiate_pro('src/server.pro', {'BUILDLIB' : BUILDLIB, 'FFMPEG' : ffmpeg_path})
 
 if sys.platform == 'win32':
-    os.system('qmake -tp vc FFMPEG=%s -o server.vcproj src/server.pro' % ffmpeg_path)
+    os.system('qmake -tp vc -o src/server.vcproj src/server.pro')
 
 elif sys.platform == 'darwin':
     if os.path.exists('src/Makefile.debug'):

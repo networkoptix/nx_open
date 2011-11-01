@@ -9,4 +9,10 @@ class Class##Private; \
     Class##Private* d_ptr; \
     Q_DECLARE_PRIVATE(Class);
 
+#define QN_DECLARE_PRIVATE_DERIVED(Class) \
+class Class##Private; \
+    Q_DECLARE_PRIVATE(Class);
+
+
+
 #endif //cl_common_h1003

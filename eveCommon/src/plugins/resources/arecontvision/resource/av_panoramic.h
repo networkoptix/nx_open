@@ -16,7 +16,7 @@ protected:
     virtual bool setParamPhysical(const QString& name, const QnValue& val);
     virtual bool setSpecialParam(const QString& name, const QnValue& val, QnDomain domain);
 
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
+    virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
 private:
 	bool setResolution(bool full);

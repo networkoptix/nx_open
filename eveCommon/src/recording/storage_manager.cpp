@@ -41,7 +41,7 @@ QString QnStorageManager::dateTimeStr(qint64 dateTimeMks)
 
 QString QnStorageManager::getFileName(const qint64& dateTime, const QString& uniqId)
 {
-    QString base = m_storageRoots.begin().value()->getUrl();
+    QString base = closeDirPath(m_storageRoots.begin().value()->getUrl());
     
     QString text = base + uniqId + QString("/") + dateTimeStr(dateTime);
     QDir dir(text);
@@ -69,11 +69,12 @@ bool QnStorageManager::addFileInfo(const qint64& startDate, const qint64& endDat
     QMutexLocker lock(&m_mutex);
     for(QMap<int, QnStoragePtr>::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
     {
-        QString root = itr.value()->getUrl();
-        if (fileName.startsWith(root)) 
+        QString root = closeDirPath(itr.value()->getUrl());
+        if (fileName.startsWith(root))
         {
-            const QString url = fileName.mid(root.length(), fileName.indexOf('/', root.length()+1) - root.length());
-            QnResourcePtr resource = qnResPool->getResourceByUrl(url);
+            QString url = fileName.mid(root.length(), fileName.indexOf('/', root.length()+1) - root.length());
+            url = QFileInfo(url).baseName();
+            QnResourcePtr resource = qnResPool->getResourceByUniqId(url);
             DeviceFileCatalogPtr catalog = getFileCatalog(resource);
             if (catalog == 0)
                 return false;

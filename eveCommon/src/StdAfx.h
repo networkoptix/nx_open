@@ -134,6 +134,3 @@ extern "C" {
 #include <QFileSystemWatcher>
 
 #endif
-
-
-

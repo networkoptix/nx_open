@@ -6,7 +6,7 @@ DeviceFileCatalog::DeviceFileCatalog(QnResourcePtr resource):
 m_firstDeleteCount(0),
 m_resource(resource)
 {
-    QString devTitleFile = qnStorageMan->storageRoots()[0]->getUrl() + QFileInfo(resource->getUrl()).baseName() + QString("/title.csv");
+    QString devTitleFile = closeDirPath(qnStorageMan->storageRoots()[0]->getUrl()) + QFileInfo(resource->getUrl()).baseName() + QString("/title.csv");
     m_file.setFileName(devTitleFile);
     QDir dir;
     dir.mkpath(QFileInfo(devTitleFile).absolutePath());
@@ -29,7 +29,7 @@ m_resource(resource)
 
 bool DeviceFileCatalog::fileExists(const Chunk& chunk)
 {
-    QString prefix = qnStorageMan->storageRoots()[chunk.storageIndex]->getUrl() + QFileInfo(m_resource->getUrl()).baseName() + QString('/');
+    QString prefix = closeDirPath(qnStorageMan->storageRoots()[chunk.storageIndex]->getUrl()) + QFileInfo(m_resource->getUrl()).baseName() + QString('/');
 
 
     QDateTime fileDate = QDateTime::fromMSecsSinceEpoch(chunk.startTime/1000);
@@ -165,7 +165,7 @@ int DeviceFileCatalog::findFileIndex(qint64 startTime) const
 QString DeviceFileCatalog::fullFileName(const Chunk& chunk) const
 {
     QMutexLocker lock(&m_mutex);
-    return qnStorageMan->storageRoots()[chunk.storageIndex]->getUrl() + 
+    return closeDirPath(qnStorageMan->storageRoots()[chunk.storageIndex]->getUrl()) + 
                 QFileInfo(m_resource->getUrl()).baseName() + QString('/') +
                 QnStorageManager::dateTimeStr(chunk.startTime) + 
                 strPadLeft(QString::number(chunk.fileIndex), 3, '0') + 
