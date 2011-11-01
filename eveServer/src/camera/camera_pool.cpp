@@ -43,3 +43,13 @@ QnVideoCamera* QnVideoCameraPool::getVideoCamera(QnResourcePtr res)
         return itr.value();
     }
 }
+
+void QnVideoCameraPool::removeVideoCamera(QnResourcePtr res)
+{
+    QMutexLocker lock(&m_staticMtx);
+    CameraMap::iterator itr = m_cameras.find(res);
+    if (itr == m_cameras.end())
+        return;
+    delete itr.value();
+    m_cameras.erase(itr);
+}

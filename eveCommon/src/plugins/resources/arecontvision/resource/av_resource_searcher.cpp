@@ -92,8 +92,8 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
 		// collecting response
 		QTime time;
 		time.start();
-
-		while(time.elapsed()<150)
+        QnSleep::msleep(150); // to avoid 100% cpu usage
+		//while(time.elapsed()<150)
 		{
 			while (sock.hasPendingDatagrams())
 			{
@@ -177,7 +177,7 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
 				result.push_back(resource);
 			}
 
-			QnSleep::msleep(2); // to avoid 100% cpu usage
+			//QnSleep::msleep(2); // to avoid 100% cpu usage
 
 		}
 

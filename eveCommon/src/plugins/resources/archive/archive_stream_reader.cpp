@@ -131,7 +131,7 @@ bool QnArchiveStreamReader::init()
     // Alloc common resources
     m_lastFrameDuration = 0;
 
-    emit realTimeStreamHint(false);
+    emit realTimeStreamHint(m_delegate->isRealTimeSource());
     if (m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_SlowSource)
         emit slowSourceHint();
 
@@ -266,10 +266,10 @@ begin_label:
             FrameTypeExtractor::FrameType frameType = FrameTypeExtractor::UnknownFrameType;
             if (videoData->context)
             {
-                if (m_frameTypeExtractor == 0 || videoData->context != m_frameTypeExtractor->getContext()) 
+                if (m_frameTypeExtractor == 0 || videoData->context->ctx() != m_frameTypeExtractor->getContext()) 
                 {
                     delete m_frameTypeExtractor;
-                    m_frameTypeExtractor = new FrameTypeExtractor((AVCodecContext*) videoData->context);
+                    m_frameTypeExtractor = new FrameTypeExtractor((AVCodecContext*) videoData->context->ctx());
                 }
 
                 frameType = m_frameTypeExtractor->getFrameType((quint8*) videoData->data.data(), videoData->data.size());
