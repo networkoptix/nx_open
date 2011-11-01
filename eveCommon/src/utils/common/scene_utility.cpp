@@ -4,6 +4,7 @@
 #include <QGraphicsView>
 #include <QScrollBar>
 #include <QCursor>
+#include <utils/common/checked_cast.h>
 
 qreal QnSceneUtility::length(const QPointF &point) {
     return std::sqrt(point.x() * point.x() + point.y() * point.y());
@@ -124,4 +125,10 @@ void QnSceneUtility::scaleViewportTo(QGraphicsView *view, const QSizeF &size, Qt
     qreal factor = scaleFactor(mapRectToScene(view, view->viewport()->rect()).size(), size, mode);
 
     scaleViewport(view, factor, anchor);
+}
+
+QGraphicsView *QnSceneUtility::view(QWidget *viewport) {
+    assert(viewport != NULL);
+
+    return checked_cast<QGraphicsView *>(viewport->parent());
 }

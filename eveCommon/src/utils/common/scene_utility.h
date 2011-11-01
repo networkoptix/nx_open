@@ -140,6 +140,12 @@ public:
      */
     static void scaleViewportTo(QGraphicsView *view, const QSizeF &size, Qt::AspectRatioMode mode, QGraphicsView::ViewportAnchor anchor = QGraphicsView::AnchorViewCenter);
 
+    /**
+     * \param viewport                 Viewport. Must not be NULL and must actually be a viewport.
+     * \returns                        Graphics view of the given viewport.
+     */
+    static QGraphicsView *view(QWidget *viewport);
+
 };
 
 inline bool qFuzzyIsNull(const QPointF &p) {
