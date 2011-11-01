@@ -4,7 +4,6 @@
 QnPlAVClinetPullStreamReader::QnPlAVClinetPullStreamReader(QnResourcePtr res):
 QnClientPullMediaStreamProvider(res)
 {
-    return;
 
     QnSequrityCamResourcePtr ceqResource = getResource().dynamicCast<QnSequrityCamResource>();
 
