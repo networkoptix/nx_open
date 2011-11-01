@@ -6,7 +6,7 @@
 
   <xs:complexType name="Servers">
     <xs:sequence>
-      <xs:element maxOccurs="unbounded" name="server" type="Server"/>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="server" type="Server"/>
     </xs:sequence>
   </xs:complexType>
 

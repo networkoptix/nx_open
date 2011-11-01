@@ -3,6 +3,7 @@
 #include "../resource/av_resource.h"
 #include "../tools/simple_tftp_client.h"
 #include "../tools/AVJpegHeader.h"
+#include "core/resource/resource_media_layout.h"
 
 //======================================================
 
@@ -13,6 +14,114 @@ extern int create_sps_pps(
 				   unsigned char* data, int max_datalen);
 
 extern AVLastPacketSize ExtractSize(const unsigned char* arr);
+
+
+class AVVideoLayout180 : public QnVideoResourceLayout
+{
+public:
+    AVVideoLayout180(){};
+    virtual ~AVVideoLayout180(){};
+    //returns number of video channels device has
+    virtual unsigned int numberOfChannels() const
+    {
+        return 4;
+    }
+
+
+    virtual unsigned int width() const 
+    {
+        return 4;
+    }
+
+    virtual unsigned int height() const 
+    {
+        return 1;
+    }
+
+    virtual unsigned int h_position(unsigned int channel) const
+    {
+        switch(channel)
+        {
+        case 0:
+            return 0;
+
+        case 1:
+            return 2;
+
+        case 2:
+            return 3;
+
+        case 3:
+            return 1;
+        default:
+            return 0;
+        }
+    }
+
+    virtual unsigned int v_position(unsigned int channel) const
+    {
+        return 0;
+    }
+
+};
+
+class AVVideoLayout360 : public QnVideoResourceLayout
+{
+public:
+    AVVideoLayout360(){};
+    virtual ~AVVideoLayout360(){};
+    //returns number of video channels device has
+
+    virtual unsigned int numberOfChannels() const
+    {
+        return 4;
+    }
+
+    virtual unsigned int numberOfAudioChannels() const
+    {
+        return 1;
+    }
+
+    virtual unsigned int width() const 
+    {
+        return 4;
+    }
+
+    virtual unsigned int height() const 
+    {
+        return 1;
+    }
+
+    virtual unsigned int h_position(unsigned int channel) const
+    {
+        switch(channel)
+        {
+        case 0:
+            return 0;
+
+        case 1:
+            return 3;
+
+        case 2:
+            return 2;
+
+        case 3:
+            return 1;
+        default:
+            return 0;
+        }
+    }
+
+    virtual unsigned int v_position(unsigned int channel) const
+    {
+        return 0;
+    }
+
+};
+
+AVVideoLayout360 avVideoLayout360;
+AVVideoLayout180 avVideoLayout180;
+
 
 //=========================================================
 
@@ -30,7 +139,18 @@ QnPlAVClinetPullStreamReader(res)
     m_dualsensor = avRes->isDualSensor();
     m_name = avRes->getName();
 
+    if (res->getName().contains("8180") || res->getName().contains("8185"))
+        m_vrl = &avVideoLayout180;
+    else
+        m_vrl = &avVideoLayout360;
 
+
+
+}
+
+QnVideoResourceLayout* AVPanoramicClientPullSSTFTPStreamreader::getVideoLayout()
+{
+    return m_vrl;
 }
 
 QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
@@ -259,6 +379,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 
 bool AVPanoramicClientPullSSTFTPStreamreader::needKeyData() const
 {
+    QMutexLocker mtx(&m_proc_CS);
 	for (int i = 0; i < 4; ++i)
 		if (m_gotKeyFrame[i]<2)  // due to bug of AV panoramic H.264 cam. cam do not send frame with diff resolution of resolution changed. first I frame comes with old resolution
 			return true;

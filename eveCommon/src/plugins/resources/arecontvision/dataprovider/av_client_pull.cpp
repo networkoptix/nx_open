@@ -2,7 +2,7 @@
 #include "../resource/av_resource.h"
 
 QnPlAVClinetPullStreamReader::QnPlAVClinetPullStreamReader(QnResourcePtr res):
-QnClientPullStreamProvider(res)
+QnClientPullMediaStreamProvider(res)
 {
     return;
 
