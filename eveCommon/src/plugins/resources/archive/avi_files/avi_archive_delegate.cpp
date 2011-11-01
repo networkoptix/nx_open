@@ -224,10 +224,13 @@ void QnAviArchiveDelegate::close()
     m_startMksec = 0;
 }
 
+static QnDefaultDeviceVideoLayout defaultVideoLayout;
+
 QnVideoResourceLayout* QnAviArchiveDelegate::getVideoLayout()
 {
-    if (!m_initialized) {
-        return 0;
+    if (!m_initialized) 
+    {
+        return &defaultVideoLayout;
     }
     if (m_videoLayout == 0)
     {

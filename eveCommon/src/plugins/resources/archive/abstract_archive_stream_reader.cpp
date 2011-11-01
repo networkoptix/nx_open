@@ -1,7 +1,7 @@
 #include "abstract_archive_stream_reader.h"
 
 QnAbstractArchiveReader::QnAbstractArchiveReader(QnResourcePtr dev ) :
-    QnClientPullStreamProvider(dev),
+    QnClientPullMediaStreamProvider(dev),
     m_lengthMksec(0),
     m_startMksec(0),
     m_singleShot(false),
@@ -123,13 +123,13 @@ void QnAbstractArchiveReader::setCycleMode(bool value)
 
 void QnAbstractArchiveReader::pause()
 {
-    QnClientPullStreamProvider::pause();
+    QnClientPullMediaStreamProvider::pause();
     emit streamPaused();
 }
 
 void QnAbstractArchiveReader::resume()
 {
-    QnClientPullStreamProvider::resume();
+    QnClientPullMediaStreamProvider::resume();
     emit streamResumed();
 }
 
@@ -142,4 +142,17 @@ void QnAbstractArchiveReader::nextFrame()
 void QnAbstractArchiveReader::previousFrame(qint64 mksec)
 {
     emit prevFrameOccured();
+}
+
+
+qint64 QnAbstractArchiveReader::startTime() const 
+{ 
+    m_delegate->open(m_resource);
+    return m_delegate->startTime(); 
+}
+
+qint64 QnAbstractArchiveReader::endTime() const 
+{ 
+    m_delegate->open(m_resource);
+    return m_delegate->endTime(); 
 }

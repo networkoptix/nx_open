@@ -13,7 +13,7 @@
 
   <xs:complexType name="Layouts">
     <xs:sequence>
-      <xs:element maxOccurs="unbounded" name="layout" type="Layout"/>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="layout" type="Layout"/>
     </xs:sequence>
   </xs:complexType>
 

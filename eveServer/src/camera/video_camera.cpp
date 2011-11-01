@@ -24,6 +24,7 @@ QnAbstractMediaStreamDataProvider* QnVideoCamera::getLiveReader()
     if (!m_reader) {
         m_reader = dynamic_cast<QnAbstractMediaStreamDataProvider*> (m_resource->createDataProvider(QnResource::Role_LiveVideo));
         m_reader->setQuality(QnQualityHighest);
+        m_reader->start();
     }
     return m_reader;
 }

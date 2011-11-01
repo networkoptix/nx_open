@@ -1,13 +1,13 @@
 #include "av_singesensor.h"
 #include "../dataprovider/cpul_tftp_dataprovider.h"
 
-CLArecontSingleSensorDevice::CLArecontSingleSensorDevice(const QString& name):
+CLArecontSingleSensorResource::CLArecontSingleSensorResource(const QString& name):
 m_hastestPattern(true)
 {
     setName(name);
 }
 
-bool CLArecontSingleSensorDevice::getDescription()
+bool CLArecontSingleSensorResource::getDescription()
 {
 
 	char buff[65];
@@ -32,13 +32,13 @@ bool CLArecontSingleSensorDevice::getDescription()
 	return true;
 }
 
-QnAbstractMediaStreamDataProvider* CLArecontSingleSensorDevice::createMediaProvider()
+QnAbstractStreamDataProvider* CLArecontSingleSensorResource::createLiveDataProvider()
 {
 	cl_log.log("Creating streamreader for ", getHostAddress().toString(), cl_logDEBUG1);
-	return new AVClientPullSSTFTPStreamreader(QnResourcePtr(this));
+	return new AVClientPullSSTFTPStreamreader(toSharedPointer());
 }
 
-bool CLArecontSingleSensorDevice::hasTestPattern() const
+bool CLArecontSingleSensorResource::hasTestPattern() const
 {
 	return m_hastestPattern;
 }

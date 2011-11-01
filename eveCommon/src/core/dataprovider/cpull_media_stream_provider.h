@@ -7,11 +7,11 @@
 
 struct QnAbstractMediaData;
 
-class QnClientPullStreamProvider : public QnAbstractMediaStreamDataProvider
+class QnClientPullMediaStreamProvider : public QnAbstractMediaStreamDataProvider
 {
 public:
-	QnClientPullStreamProvider(QnResourcePtr dev );
-	virtual ~QnClientPullStreamProvider(){stop();}
+	QnClientPullMediaStreamProvider(QnResourcePtr dev );
+	virtual ~QnClientPullMediaStreamProvider(){stop();}
 
 protected:
 	virtual QnAbstractMediaDataPtr getNextData() = 0;

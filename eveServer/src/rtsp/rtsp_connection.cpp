@@ -18,6 +18,7 @@
 #include "utils/network/tcp_connection_priv.h"
 #include "plugins/resources/archive/abstract_archive_delegate.h"
 #include "camera/camera_pool.h"
+#include "utils/network/rtpsession.h"
 
 
 static const quint8 RTP_FFMPEG_GENERIC_CODE = 102;
@@ -123,7 +124,8 @@ protected:
         quint32 ssrc = BASIC_FFMPEG_SSRC + rtspChannelNum * MAX_CONTEXTS_AT_VIDEO*2;
 
         ssrc += media->subChannelNumber*2;
-        if (ctx && !m_ctxSended[rtspChannelNum].contains(media->subChannelNumber))
+        int subChannelNumber = media->subChannelNumber;
+        if (ctx && !m_ctxSended[rtspChannelNum].contains(subChannelNumber))
         {
             QByteArray codecCtxData;
             QnFfmpegHelper::serializeCodecContext(ctx, &codecCtxData);
@@ -213,18 +215,30 @@ public:
         startTime(0),
         endTime(0),
         rtspScale(1.0),
-        liveMode(0)
+        liveMode(false)
     {
     }
-
-    ~QnRtspConnectionProcessorPrivate()
+    void deleteDP()
     {
         if (archiveDP)
             archiveDP->stop();
         if (dataProcessor)
             dataProcessor->stop();
+
+        if (liveDP)
+            liveDP->removeDataProcessor(dataProcessor);
+        if (archiveDP)
+            archiveDP->removeDataProcessor(dataProcessor);
         delete archiveDP;
         delete dataProcessor;
+        archiveDP = 0;
+        dataProcessor = 0;
+    }
+
+
+    ~QnRtspConnectionProcessorPrivate()
+    {
+        deleteDP();
     }
 
     QnAbstractMediaStreamDataProvider* liveDP;
@@ -316,9 +330,6 @@ int QnRtspConnectionProcessor::composeDescribe()
         return CODE_NOT_FOUND;
 
     createDataProvider();
-    QnAbstractMediaStreamDataProvider* currentDP = d->liveMode ? d->liveDP : d->archiveDP;
-    if (!currentDP)
-        return CODE_NOT_FOUND;
 
     QString acceptMethods = d->requestHeaders.value("Accept");
     if (acceptMethods.indexOf("sdp") == -1)
@@ -326,16 +337,16 @@ int QnRtspConnectionProcessor::composeDescribe()
 
     QTextStream sdp(&d->responseBody);
 
-    QnVideoResourceLayout* videoLayout = currentDP->getVideoLayout();
-    QnResourceAudioLayout* audioLayout = currentDP->getAudioLayout();
-    int numVideo = videoLayout->numberOfChannels();
-    int numAudio = audioLayout->numberOfChannels();
+    QnVideoResourceLayout* videoLayout = d->liveDP->getVideoLayout();
+    QnResourceAudioLayout* audioLayout = d->liveDP->getAudioLayout();
+    int numVideo = videoLayout ? videoLayout->numberOfChannels() : 1;
+    int numAudio = audioLayout ? audioLayout->numberOfChannels() : 0;
 
     if (d->archiveDP) {
         QString range = "npt=";
-        range += QString::number(d->archiveDP->startTime()/1000000.0);
+        range += QString::number(d->archiveDP->startTime());
         range += "-";
-        range += QString::number(d->archiveDP->endTime()/1000000.0);
+        range += QString::number(d->archiveDP->endTime());
         d->responseHeaders.addValue("Range", range);
     }
 
@@ -429,7 +440,8 @@ void QnRtspConnectionProcessor::extractNptTime(const QString& strValue, qint64* 
     d->liveMode = strValue == "now";
     if (d->liveMode)
     {
-        *dst = getRtspTime();
+        //*dst = getRtspTime();
+        *dst = RTPSession::RTSP_NOW;
     }
     else {
         double val = strValue.toDouble();
@@ -457,8 +469,10 @@ void QnRtspConnectionProcessor::parseRangeHeader(const QString& rangeStr, qint64
         QStringList values = rangeType[1].split("-");
 
         extractNptTime(values[0], startTime);
-        if (values.size() > 1)
+        if (values.size() > 1 && !values[1].isEmpty())
             extractNptTime(values[1], endTime);
+        else
+            *endTime = RTPSession::RTSP_NOW;
     }
 }
 
@@ -470,8 +484,9 @@ void QnRtspConnectionProcessor::createDataProvider()
         if (camera)
             d->liveDP = camera->getLiveReader();
     }
-    if (!d->archiveDP)
+    if (!d->archiveDP) {
         d->archiveDP = dynamic_cast<QnAbstractArchiveReader*> (d->mediaRes->createDataProvider(QnResource::Role_Archive));
+    }
 }
 
 int QnRtspConnectionProcessor::composePlay()
@@ -526,11 +541,8 @@ int QnRtspConnectionProcessor::composeTeardown()
     Q_D(QnRtspConnectionProcessor);
     d->mediaRes = QnMediaResourcePtr(0);
 
-    delete d->archiveDP;
-    delete d->dataProcessor;
+    d->deleteDP();
 
-    d->archiveDP = 0;
-    d->dataProcessor = 0;
     d->rtspScale = 1.0;
     d->startTime = d->endTime = 0;
 

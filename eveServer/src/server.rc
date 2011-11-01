@@ -1,4 +1,3 @@
-IDI_ICON1               ICON    DISCARDABLE     "eve_logo.ico"
 
 #include <windows.h>
 #include "version.h"

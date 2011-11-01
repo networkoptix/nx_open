@@ -92,7 +92,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 				(h264 && !m_streamParam.exists("streamID")) || (h264 && !m_streamParam.exists("Bitrate")))
 			{
 				cl_log.log("Erorr!!! parameter is missing in stream params.", cl_logERROR);
-				return QnAbstractMediaDataPtr(0);
+				//return QnAbstractMediaDataPtr(0);
 			}
 
 			//=========
@@ -182,7 +182,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 	os<< quality << ";doublescan=0" << ";ssn=" << streamID;
 
 	//h264?res=full;x0=0;y0=0;x1=1600;y1=1184;qp=27;doublescan=0;iframe=0;ssn=574;netasciiblksize1450
-	//image?res=full;x0=0;y0=0;x1=1600;y1=1184;quality=10;doublescan=0;ssn=4184;
+	request = "image?res=full;x0=0;y0=0;x1=800;y1=600;quality=10;doublescan=0;ssn=4184;";
 
 	if (h264)
 	{

@@ -24,19 +24,24 @@ public:
     void setManufacture(const QString& value) { m_manufacture = value; }
     QString getManufacture() const { return m_manufacture;}
 
+
     void addAdditionalParent(const QnId& parent);
     QList<QnId> allParentList() const;
 
     void addParamType(QnParamTypePtr param);
 
-    const QList<QnParamTypePtr>& paramTypeList() const { return m_paramTypeList; }
+    const QList<QnParamTypePtr>& paramTypeList() const;
 private:
     QnId m_id;
     QnId m_parentId;
     QString m_name;
     QString m_manufacture;
     QList<QnId> m_additionalParentList;
-    QList<QnParamTypePtr> m_paramTypeList;
+
+    typedef QList<QnParamTypePtr> ParamTypeList;
+    ParamTypeList m_paramTypeList;
+
+    mutable QSharedPointer<ParamTypeList> m_allParamTypeListCache;
 };
 
 typedef QSharedPointer<QnResourceType> QnResourceTypePtr;
@@ -46,10 +51,14 @@ class QN_EXPORT QnResourceTypePool
 public:
     static QnResourceTypePool* instance();
 
-    QnResourceTypePtr getResourceType(const QnId& id);
+    QnResourceTypePtr getResourceType(const QnId& id) const;
     void addResourceType(QnResourceTypePtr resourceType);
+    void addResourceTypeList(const QList<QnResourceTypePtr>& resourceType);
+
+    QnId getResourceTypeId(const QString& manufacture, const QString& name) const;
+
 private:
-    QMutex m_mutex;
+    mutable QMutex m_mutex;
     typedef QMap<QnId, QnResourceTypePtr> QnResourceTypeMap;
     QnResourceTypeMap m_resourceTypeMap;
 };

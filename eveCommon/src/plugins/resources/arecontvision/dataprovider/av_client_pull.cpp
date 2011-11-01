@@ -2,8 +2,9 @@
 #include "../resource/av_resource.h"
 
 QnPlAVClinetPullStreamReader::QnPlAVClinetPullStreamReader(QnResourcePtr res):
-QnClientPullStreamProvider(res)
+QnClientPullMediaStreamProvider(res)
 {
+
     QnSequrityCamResourcePtr ceqResource = getResource().dynamicCast<QnSequrityCamResource>();
 
     QSize maxResolution = ceqResource->getMaxSensorSize();
@@ -45,6 +46,8 @@ QnPlAVClinetPullStreamReader::~QnPlAVClinetPullStreamReader()
 
 void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
 {
+
+    return;
 
     //QMutexLocker mtx(&m_mtx);
 

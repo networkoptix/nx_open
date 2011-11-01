@@ -57,6 +57,12 @@ struct QN_EXPORT QnParam
     const QString& description() const { return m_paramType->description; }
     const bool isReadOnly() const { return m_paramType->readonly; }
     const QString netHelper() const { return m_paramType->paramNetHelper; }
+
+    QString toDebugString() const
+    {
+        return name() + QString(" ") + m_paramType->default_value;
+    }
+
 private:
     QnParamTypePtr m_paramType;
     QnValue m_value;

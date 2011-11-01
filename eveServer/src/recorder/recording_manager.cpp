@@ -4,6 +4,8 @@
 #include "recording/stream_recorder.h"
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "camera/camera_pool.h"
+#include "device_plugins/server_archive/server_archive_delegate.h"
+#include "plugins/resources/archive/archive_stream_reader.h"
 
 static const int TRUNCATE_INTERVAL = 15; // seconds
 
@@ -26,6 +28,8 @@ void QnRecordingManager::onNewResource(QnResourcePtr res)
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(res);
     if (camera) 
     {
+        QnSequrityCamResourcePtr cameraRes = qSharedPointerDynamicCast<QnSequrityCamResource>(res);
+        cameraRes->setDataProviderFactory(QnServerDataProviderFactory::instance());
         QnAbstractMediaStreamDataProvider* reader = camera->getLiveReader();
         QnStreamRecorder* recorder = new QnStreamRecorder(res);
         recorder->setTruncateInterval(TRUNCATE_INTERVAL);
@@ -44,4 +48,22 @@ void QnRecordingManager::recordingFailed(QString errMessage)
 void QnRecordingManager::onRemoveResource(QnResourcePtr res)
 {
 
+}
+
+// --------------------- QnServerDataProviderFactory -------------------
+Q_GLOBAL_STATIC(QnServerDataProviderFactory, inst);
+
+QnAbstractStreamDataProvider* QnServerDataProviderFactory::createDataProviderInternal(QnResourcePtr res, QnResource::ConnectionRole role)
+{
+    if (role == QnResource::Role_Archive) 
+    {
+        QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(res);
+        archiveReader->setArchiveDelegate(new QnServerArchiveDelegate());
+        return archiveReader;
+    }
+}
+
+QnServerDataProviderFactory* QnServerDataProviderFactory::instance()
+{
+    return inst();
 }

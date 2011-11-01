@@ -1,7 +1,7 @@
 #include "tcp_listener.h"
 #include "socket.h"
 
-static const int SOCK_TIMEOUT = 5000;
+static const int SOCK_TIMEOUT = 5000 * 1000;
 
 // ------------------------ QnRtspListenerPrivate ---------------------------
 

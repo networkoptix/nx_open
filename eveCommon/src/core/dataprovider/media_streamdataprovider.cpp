@@ -42,7 +42,8 @@ QnStreamQuality QnAbstractMediaStreamDataProvider::getQuality() const
 void QnAbstractMediaStreamDataProvider::setNeedKeyData()
 {
 	QMutexLocker mtx(&m_proc_CS);
-	for (unsigned i = 0; i < getVideoLayout()->numberOfChannels(); ++i)
+    int channel_num = getVideoLayout()->numberOfChannels();
+	for (unsigned i = 0; i < channel_num; ++i)
 		m_gotKeyFrame[i] = 0;
 }
 
@@ -56,7 +57,8 @@ bool QnAbstractMediaStreamDataProvider::needKeyData() const
 {
 	QMutexLocker mtx(&m_proc_CS);
     QnAbstractMediaStreamDataProvider* tmp = const_cast<QnAbstractMediaStreamDataProvider*>(this);
-	for (unsigned i = 0; i < tmp->getVideoLayout()->numberOfChannels(); ++i)
+    int channel_num = tmp->getVideoLayout()->numberOfChannels();
+	for (unsigned i = 0; i < channel_num; ++i)
 		if (m_gotKeyFrame[i]==0)
 			return true;
 

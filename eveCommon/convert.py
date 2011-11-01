@@ -22,6 +22,19 @@ BUILDLIB = 'staticlib'
 if sys.platform == 'darwin':
     BUILDLIB = ''
 
+def setup_tools():
+    tools_path = '../../evetools'
+    if not os.path.isdir(tools_path):
+        print 'Please clone ssh://hg@vigasin.com/evetools to ../..'
+        sys.exit(1)
+
+    if sys.platform == 'darwin':
+        platform = 'mac'
+    else:
+        platform = 'win32'
+
+    return os.path.join(tools_path, platform)
+
 def link_or_copy(src, dst):
     try:
         import win32file

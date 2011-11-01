@@ -11,9 +11,9 @@ QnStorageManager::QnStorageManager()
 {
 }
 
-void QnStorageManager::addRecordRoot(int key, const QString& path)
+void QnStorageManager::addStorage(QnStoragePtr storage)
 {
-    m_storageRoots.insert(key, path);
+    m_storageRoots.insert(storage->getIndex(), storage);
 }
 
 QnStorageManager::~QnStorageManager()
@@ -41,7 +41,7 @@ QString QnStorageManager::dateTimeStr(qint64 dateTimeMks)
 
 QString QnStorageManager::getFileName(const qint64& dateTime, const QString& uniqId)
 {
-    QString base = m_storageRoots.begin().value();
+    QString base = closeDirPath(m_storageRoots.begin().value()->getUrl());
     
     QString text = base + uniqId + QString("/") + dateTimeStr(dateTime);
     QDir dir(text);
@@ -67,13 +67,14 @@ DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QnResourcePtr resour
 bool QnStorageManager::addFileInfo(const qint64& startDate, const qint64& endDate, const QString& fileName)
 {
     QMutexLocker lock(&m_mutex);
-    for(QMap<int, QString>::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
+    for(QMap<int, QnStoragePtr>::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
     {
-        QString root = itr.value();
-        if (fileName.startsWith(root)) 
+        QString root = closeDirPath(itr.value()->getUrl());
+        if (fileName.startsWith(root))
         {
-            const QString url = fileName.mid(root.length(), fileName.indexOf('/', root.length()+1) - root.length());
-            QnResourcePtr resource = qnResPool->getResourceByUrl(url);
+            QString url = fileName.mid(root.length(), fileName.indexOf('/', root.length()+1) - root.length());
+            url = QFileInfo(url).baseName();
+            QnResourcePtr resource = qnResPool->getResourceByUniqId(url);
             DeviceFileCatalogPtr catalog = getFileCatalog(resource);
             if (catalog == 0)
                 return false;
@@ -106,8 +107,8 @@ QnChunkSequence::QnChunkSequence(const QnResourceList& resList, qint64 startTime
 void QnChunkSequence::addResource(QnResourcePtr res)
 {
     CacheInfo info;
-    QString root = qnStorage->storageRoots()[0]; // index stored at primary storage
-    info.m_catalog = qnStorage->getFileCatalog(res);
+    QString root = qnStorageMan->storageRoots()[0]->getUrl(); // index stored at primary storage
+    info.m_catalog = qnStorageMan->getFileCatalog(res);
     connect(info.m_catalog.data(), SIGNAL(firstDataRemoved(int)), this, SLOT(onFirstDataRemoved(int)));
     info.m_startTime = m_startTime;
     info.m_index = -1;

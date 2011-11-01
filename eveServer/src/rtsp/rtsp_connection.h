@@ -35,7 +35,7 @@ private:
     int composeGetParameter();
     void createDataProvider();
 private:
-    QN_DECLARE_PRIVATE(QnRtspConnectionProcessor);
+    QN_DECLARE_PRIVATE_DERIVED(QnRtspConnectionProcessor);
     friend class QnRtspDataConsumer;
 };
 

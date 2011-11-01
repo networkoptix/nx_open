@@ -2,7 +2,7 @@
 #include "resource.h"
 
 QnDeviceCommand::QnDeviceCommand(QnResourcePtr device):
-m_device(device)
+m_resource(device)
 {
 }
 
@@ -10,9 +10,9 @@ QnDeviceCommand::~QnDeviceCommand()
 {
 };
 
-QnResourcePtr QnDeviceCommand::getDevice() const
+QnResourcePtr QnDeviceCommand::getResource() const
 {
-	return m_device;
+	return m_resource;
 }
 
 CLDeviceCommandProcessor::CLDeviceCommandProcessor():
@@ -31,7 +31,7 @@ bool CLDeviceCommandProcessor::processData(QnAbstractDataPacketPtr data)
 	QnDeviceCommandPtr command = qSharedPointerDynamicCast<QnDeviceCommand>(data);
 	command->execute();
 
-	QnResourcePtr dev = command->getDevice();
+	QnResourcePtr dev = command->getResource();
 	QMutexLocker mutex(&m_cs);
 	Q_ASSERT(mDevicesQue.contains(dev));
 	Q_ASSERT(mDevicesQue[dev]>0);
@@ -55,16 +55,16 @@ bool CLDeviceCommandProcessor::hasSuchDeviceInQueue(const QString& uniqId) const
 void CLDeviceCommandProcessor::putData(QnAbstractDataPacketPtr data)
 {
 	QnDeviceCommandPtr command = qSharedPointerDynamicCast<QnDeviceCommand>(data);
-	QnResourcePtr dev = command->getDevice();
+	QnResourcePtr res = command->getResource();
 
 	QMutexLocker mutex(&m_cs);
-	if (!mDevicesQue.contains(dev))
+	if (!mDevicesQue.contains(res))
 	{
-		mDevicesQue[dev] = 1;
+		mDevicesQue[res] = 1;
 	}
 	else
 	{
-		mDevicesQue[dev]++;
+		mDevicesQue[res]++;
 	}
 
 	QnAbstractDataConsumer::putData(data);
