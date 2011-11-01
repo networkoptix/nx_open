@@ -192,10 +192,19 @@ void AnimatedWidgetPrivate::drawRotationHelper(QPainter *painter, const QPointF 
 
 
 AnimatedWidget::AnimatedWidget(QGraphicsItem *parent)
-    : GraphicsWidget(parent, *new AnimatedWidgetPrivate)
+    : GraphicsWidget(*new AnimatedWidgetPrivate, parent)
 {
     Q_D(AnimatedWidget);
+    d->init();
+}
 
+/*!
+    \internal
+*/
+AnimatedWidget::AnimatedWidget(AnimatedWidgetPrivate &dd, QGraphicsItem *parent)
+    : GraphicsWidget(dd, parent)
+{
+    Q_D(AnimatedWidget);
     d->init();
 }
 

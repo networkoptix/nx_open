@@ -25,7 +25,7 @@ public:
      *
      * \param parent                    Parent item for this graphics widget.
      */
-    GraphicsWidget(QGraphicsItem *parent = NULL);
+    GraphicsWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags wFlags = 0);
 
     /**
      * Virtual destructor.
@@ -68,8 +68,6 @@ Q_SIGNALS:
     void movingFinished();
 
 protected:
-    GraphicsWidget(QGraphicsItem *parent, GraphicsWidgetPrivate &dd);
-
     void initStyleOption(QStyleOption *option) const;
 
     bool event(QEvent *event) override;
@@ -90,9 +88,11 @@ protected:
     virtual void endDrag(Qt::DropAction dropAction);
 
 private:
-    void drag(QGraphicsSceneMouseEvent *event);
+    void drag(QGraphicsSceneMouseEvent *event); // ### move to GraphicsWidgetPrivate
 
 protected:
+    GraphicsWidget(GraphicsWidgetPrivate &dd, QGraphicsItem *parent, Qt::WindowFlags wFlags = 0);
+
     QScopedPointer<GraphicsWidgetPrivate> d_ptr;
 
 private:
