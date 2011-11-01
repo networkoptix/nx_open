@@ -113,7 +113,7 @@ void QnNetworkResource::setDiscoveryAddr(QHostAddress addr)
 QString QnNetworkResource::toString() const
 {
     QString result;
-    QTextStream(&result) << getName() << "(" << getHostAddress().toString() << ")";
+    QTextStream(&result) << getName() << "(" << getHostAddress().toString() << ") live";
     return result;
 }
 

@@ -30,14 +30,18 @@ public:
 
     void addParamType(QnParamTypePtr param);
 
-    const QList<QnParamTypePtr>& paramTypeList() const { return m_paramTypeList; }
+    const QList<QnParamTypePtr>& paramTypeList() const;
 private:
     QnId m_id;
     QnId m_parentId;
     QString m_name;
     QString m_manufacture;
     QList<QnId> m_additionalParentList;
-    QList<QnParamTypePtr> m_paramTypeList;
+
+    typedef QList<QnParamTypePtr> ParamTypeList;
+    ParamTypeList m_paramTypeList;
+
+    mutable QSharedPointer<ParamTypeList> m_allParamTypeListCache;
 };
 
 typedef QSharedPointer<QnResourceType> QnResourceTypePtr;

@@ -34,7 +34,7 @@ int QnSequrityCamResource::getMaxFps()
 QSize QnSequrityCamResource::getMaxSensorSize()
 {
 
-    if (hasSuchParam("MaxSensorWidth") || hasSuchParam("MaxSensorHeight"))
+    if (!hasSuchParam("MaxSensorWidth") || !hasSuchParam("MaxSensorHeight"))
     {
         Q_ASSERT(false);
         return QSize(0,0);

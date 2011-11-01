@@ -20,6 +20,41 @@ void QnResourceType::addParamType(QnParamTypePtr param)
     m_paramTypeList.append(param);
 }
 
+const QList<QnParamTypePtr>& QnResourceType::paramTypeList() const
+{
+    if (!m_allParamTypeListCache.isNull())
+        return *(m_allParamTypeListCache.data());
+
+    m_allParamTypeListCache = QSharedPointer<ParamTypeList>(new ParamTypeList());
+
+    ParamTypeList paramTypeList = ParamTypeList();
+
+    paramTypeList += m_paramTypeList;
+
+    foreach(const QnId& parentId, allParentList())
+    {
+        QnResourceTypePtr parent = qnResTypePool->getResourceType(parentId);
+
+        if (!parent.isNull())
+            paramTypeList += parent->paramTypeList();
+    }
+
+    QSet<QString> paramTypeNames;
+
+    QList<QnParamTypePtr>::iterator it = paramTypeList.begin();
+    for (; it != paramTypeList.end(); ++it)
+    {
+        const QnParamTypePtr& paramType = *it;
+
+        if (!paramTypeNames.contains(paramType->name))
+        {
+            m_allParamTypeListCache->append(paramType);
+            paramTypeNames.insert(paramType->name);
+        }
+    }
+
+    return *m_allParamTypeListCache.data();
+}
 // =============================== QnResourceTypePool ========================
 
 QnResourceTypePool* QnResourceTypePool::instance()
@@ -30,7 +65,7 @@ QnResourceTypePool* QnResourceTypePool::instance()
 QnResourceTypePtr QnResourceTypePool::getResourceType(const QnId& id) const
 {
     QMutexLocker lock(&m_mutex);
-    QnResourceTypeMap::iterator itr = m_resourceTypeMap.find(id);
+    QnResourceTypeMap::const_iterator itr = m_resourceTypeMap.find(id);
     return itr != m_resourceTypeMap.end() ? itr.value() : QnResourceTypePtr();
 }
 
