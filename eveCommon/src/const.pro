@@ -69,6 +69,7 @@ DEFINES += __STDC_CONSTANT_MACROS
 win32 {
     EVETOOLS_DIR=$$PWD/../../../evetools/win32
     QMAKE_CXXFLAGS += -Zc:wchar_t
+    QMAKE_CXXFLAGS -= -Zc:wchar_t-
     LIBS += -lxerces-c_3
 }
 
