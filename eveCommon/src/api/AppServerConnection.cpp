@@ -48,11 +48,13 @@ int QnAppServerConnection::addServer(const QnResource& serverIn, QList<QnResourc
 
     QnApiServerResponsePtr xsdServers;
 
-    int status = m_sessionManager->addServer(server, xsdServers);
+    if (m_sessionManager->addServer(server, xsdServers) == 0)
+    {
+        parseServers(servers, xsdServers->server());
+        return 0;
+    }
 
-    parseServers(servers, xsdServers->server());
-
-    return status;
+    return 1;
 }
 
 int QnAppServerConnection::addCamera(const QnResource& cameraIn, const QnId& serverIdIn, QList<QnResourcePtr>& cameras)
@@ -70,9 +72,11 @@ int QnAppServerConnection::addCamera(const QnResource& cameraIn, const QnId& ser
 
     QnApiCameraResponsePtr xsdCameras;
 
-    int status = m_sessionManager->addCamera(camera, xsdCameras);
+    if (m_sessionManager->addCamera(camera, xsdCameras) == 0)
+    {
+        parseCameras(cameras, xsdCameras->camera());
+        return 0;
+    }
 
-    parseCameras(cameras, xsdCameras->camera());
-
-    return status;
+    return 1;
 }
