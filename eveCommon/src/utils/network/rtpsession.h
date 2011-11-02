@@ -35,9 +35,6 @@ private:
 class RTPSession
 {
 public:
-
-    static const qint64 RTSP_NOW = AV_NOPTS_VALUE;
-
     struct SDPTrackInfo
     {
         SDPTrackInfo() {}

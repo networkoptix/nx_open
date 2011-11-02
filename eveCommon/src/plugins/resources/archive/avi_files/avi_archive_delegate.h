@@ -32,6 +32,7 @@ protected:
     AVFormatContext* getFormatContext();
 private:
     bool deserializeLayout(CLCustomDeviceVideoLayout* layout, const QString& layoutStr);
+    QnMediaContextPtr getCodecContext(AVStream* stream);
 protected:
     AVFormatContext* m_formatContext;
     QnResourcePtr m_resource;
@@ -45,6 +46,8 @@ private:
     CLCustomDeviceVideoLayout* m_videoLayout;
     QnResourceAudioLayout* m_audioLayout;
     QVector<int> m_indexToChannel;
+
+    QList<QnMediaContextPtr> m_contexts;
 
     friend class QnAviAudioLayout;
 };

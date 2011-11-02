@@ -102,9 +102,9 @@ unsigned int CLByteArray::write(const char *data, unsigned int size)
 
 unsigned int CLByteArray::write(const char *data, unsigned int size, int abs_shift)
 {
-    if (size > m_capacity - abs_shift) // if we do not have enough space
+    if (size+abs_shift > m_capacity) // if we do not have enough space
     {
-        if (!reallocate(m_capacity * 2 + size))
+        if (!reallocate(qMax(m_capacity * 2 + size, size + abs_shift)))
         {
             cl_log.log(QLatin1String("CLByteArray::write(): Unable to increase capacity"), cl_logWARNING);
             return 0;

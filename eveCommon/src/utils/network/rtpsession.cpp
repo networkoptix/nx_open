@@ -5,6 +5,7 @@
 #if defined(Q_OS_WIN)
 #  include <winsock2.h>
 #endif
+#include "utils/common/util.h"
 
 #define DEFAULT_RTP_PORT 554
 #define RESERVED_TIMEOUT_TIME (5*1000)
@@ -125,9 +126,15 @@ void RTPSession::parseRangeHeader(const QString& rangeStr)
 
         double val = values[0].toDouble();
         m_startTime = val < 1000000 ? val * 1000000.0 : val;
-        if (values.size() > 1) {
-            val = values[1].toDouble();
-            m_endTime = val < 1000000 ? val * 1000000.0 : val;
+        if (values.size() > 1) 
+        {
+            if (values[1] == "now") {
+                m_endTime = DATETIME_NOW;
+            }
+            else {
+                val = values[1].toDouble();
+                m_endTime = val < 1000000 ? val * 1000000.0 : val;
+            }
         }
     }
 }
@@ -352,7 +359,7 @@ bool RTPSession::sendPlay(qint64 position, double scale)
     request += "Session: ";
     request += m_SessionId;
     request += "\r\n";
-    if (position != RTSP_NOW)
+    if (position != DATETIME_NOW)
         request += "Range: npt=" + QString::number(position);
     else
         request += "Range: npt=now";
