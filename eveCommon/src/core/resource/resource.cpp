@@ -153,17 +153,17 @@ bool QnResource::hasSuchParam(const QString& name) const
     return getResourceParamList().exists(name);
 }
 
-bool QnResource::getParamPhysical(const QString& name, QnValue& val)
+bool QnResource::getParamPhysical(const QString& /*name*/, QnValue& /*val*/)
 {
     return false;
 }
 
-bool QnResource::setParamPhysical(const QString& name, const QnValue& val)
+bool QnResource::setParamPhysical(const QString& /*name*/, const QnValue& /*val*/)
 {
     return false;
 }
 
-bool QnResource::setSpecialParam(const QString& name, const QnValue& val, QnDomain domain)
+bool QnResource::setSpecialParam(const QString& /*name*/, const QnValue& /*val*/, QnDomain /*domain*/)
 {
     return false;
 }

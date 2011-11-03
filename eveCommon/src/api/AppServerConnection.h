@@ -11,6 +11,8 @@ class QN_EXPORT QnAppServerConnection
 public:
     QnAppServerConnection(const QHostAddress& host, const QAuthenticator& auth);
 
+    ~QnAppServerConnection();
+
     int getResourceTypes(QList<QnResourceTypePtr>& resourceTypes);
 
     int getResources(QList<QnResourcePtr>& resources);

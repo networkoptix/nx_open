@@ -7,7 +7,7 @@ template <typename T, size_t N>
 char (&ArraySizeHelper(T (&array)[N]))[N];
 #define arraysize(array) (sizeof(ArraySizeHelper(array)))
 
-static const qint64 DATETIME_NOW = 1000000 * 3600*10; //0x7fffffffffffffffll;
+static const qint64 DATETIME_NOW = 1000000ll * 3600ll * 10ll; //0x7fffffffffffffffll;
 
 /*
  * Remove directory recursively.

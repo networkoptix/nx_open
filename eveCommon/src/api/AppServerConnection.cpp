@@ -14,6 +14,10 @@ QnAppServerConnection::QnAppServerConnection(const QHostAddress& host, const QAu
 {
 }
 
+QnAppServerConnection::~QnAppServerConnection()
+{
+}
+
 int QnAppServerConnection::getResourceTypes(QList<QnResourceTypePtr>& resourceTypes)
 {
     QnApiResourceTypeResponsePtr xsdResourceTypes;
