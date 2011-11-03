@@ -101,17 +101,17 @@ public:
      * Moves the given viewport.
      * 
      * \param view                      Graphics view to move viewport of.
-     * \param positionDelta             Move delta, in viewport coordinates.
+     * \param viewportPositionDelta     Move delta, in viewport coordinates.
      */
-    static void moveViewport(QGraphicsView *view, const QPoint &positionDelta);
+    static void moveViewport(QGraphicsView *view, const QPoint &viewportPositionDelta);
 
     /**
      * Moves the given viewport.
      * 
      * \param view                      Graphics view to move viewport of.
-     * \param positionDelta             Move delta, in scene coordinates.
+     * \param scenePositionDelta        Move delta, in scene coordinates.
      */
-    static void moveViewport(QGraphicsView *view, const QPointF &positionDelta);
+    static void moveViewport(QGraphicsView *view, const QPointF &scenePositionDelta);
 
     /**
      * Centers the given viewport on the given position.

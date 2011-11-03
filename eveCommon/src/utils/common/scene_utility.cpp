@@ -60,13 +60,13 @@ bool QnSceneUtility::contains(const QSizeF &size, const QSizeF &otherSize) {
     return size.width() > otherSize.width() && size.height() > otherSize.height();
 }
 
-void QnSceneUtility::moveViewport(QGraphicsView *view, const QPoint &positionDelta) {
+void QnSceneUtility::moveViewport(QGraphicsView *view, const QPoint &viewportPositionDelta) {
     assert(view != NULL);
 
-    moveViewport(view, view->mapToScene(positionDelta) - view->mapToScene(QPoint(0, 0)));
+    moveViewport(view, view->mapToScene(viewportPositionDelta) - view->mapToScene(QPoint(0, 0)));
 }
 
-void QnSceneUtility::moveViewport(QGraphicsView *view, const QPointF &positionDelta) {
+void QnSceneUtility::moveViewport(QGraphicsView *view, const QPointF &scenePositionDelta) {
     assert(view != NULL);
 
     QGraphicsView::ViewportAnchor oldAnchor = view->transformationAnchor();
@@ -74,7 +74,7 @@ void QnSceneUtility::moveViewport(QGraphicsView *view, const QPointF &positionDe
     view->setInteractive(false); /* View will re-fire stored mouse event if we don't do this. */
     view->setTransformationAnchor(QGraphicsView::NoAnchor);
 
-    view->translate(-positionDelta.x(), -positionDelta.y());
+    view->translate(-scenePositionDelta.x(), -scenePositionDelta.y());
 
     view->setTransformationAnchor(oldAnchor);
     view->setInteractive(oldInteractive);
