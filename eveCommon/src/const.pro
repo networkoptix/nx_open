@@ -42,7 +42,17 @@ win32 {
   LIBS += -lws2_32 -lIphlpapi -lOle32
   win32-msvc* {
     QMAKE_CXXFLAGS += -MP /Fd$$OBJECTS_DIR
+
+    # Don't warn for deprecated 'unsecure' CRT functions.
     DEFINES += _CRT_SECURE_NO_WARNINGS
+
+    # Don't warn for deprecated POSIX functions.
+    DEFINES += _CRT_NONSTDC_NO_DEPRECATE 
+
+    # Disable warning C4250: 'Derived' : inherits 'Base::method' via dominance.
+    # It is buggy, as described in http://connect.microsoft.com/VisualStudio/feedback/details/101259/disable-warning-c4250-class1-inherits-class2-member-via-dominance-when-weak-member-is-a-pure-virtual-function
+    QMAKE_CXXFLAGS += /wd4250
+
     INCLUDEPATH += $$PWD/contrib/ffmpeg-misc-headers-win32
   }
 

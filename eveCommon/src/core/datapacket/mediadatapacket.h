@@ -7,7 +7,8 @@
 #include "datapacket.h"
 #include "utils/common/bytearray.h"
 
-class AVCodecContext;
+struct AVCodecContext;
+
 class QnMediaContext
 {
 public:
