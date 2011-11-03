@@ -2,7 +2,7 @@
 
 
 QnResourceConsumer::QnResourceConsumer(QnResourcePtr resource):
-m_resource(resource)
+    m_resource(resource)
 {
     m_resource->addConsumer(this);
 }
