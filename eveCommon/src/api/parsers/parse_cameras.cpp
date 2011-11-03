@@ -1,6 +1,8 @@
 #include "api/parsers/parse_cameras.h"
 
-void parseCameras(QList<QnResourcePtr>& cameras, const QnApiCameras& xsdCameras)
+#include "core/resourcemanagment/asynch_seacher.h"
+
+void parseCameras(QList<QnResourcePtr>& cameras, const QnApiCameras& xsdCameras, QnResourceFactory& resourceFactory)
 {
     using xsd::api::cameras::Cameras;
     using xsd::api::resources::Properties;
@@ -19,7 +21,7 @@ void parseCameras(QList<QnResourcePtr>& cameras, const QnApiCameras& xsdCameras)
         parameters["login"] = i->login().c_str();
         parameters["password"] = i->password().c_str();
 
-        QnResourcePtr camera = QnResourceFactoryPool::createResource(i->typeId().c_str(), parameters);
+        QnResourcePtr camera = resourceFactory.createResource(i->typeId().c_str(), parameters);
         QnParamList& paramList = camera->getResourceParamList();
 
         if (i->properties().present())

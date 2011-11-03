@@ -9,8 +9,9 @@
 #include "api/Types.h"
 #include "api/SessionManager.h"
 
-QnAppServerConnection::QnAppServerConnection(const QHostAddress& host, const QAuthenticator& auth)
-    : m_sessionManager(new SessionManager(host, auth))
+QnAppServerConnection::QnAppServerConnection(const QHostAddress& host, const QAuthenticator& auth, QnResourceFactory& resourceFactory)
+    : m_sessionManager(new SessionManager(host, auth)),
+      m_resourceFactory(resourceFactory)
 {
 }
 
@@ -38,9 +39,9 @@ int QnAppServerConnection::getResources(QList<QnResourcePtr>& resources)
 
     if (!xsdResources.isNull())
     {
-        parseCameras(resources, xsdResources->cameras().camera());
-        parseLayouts(resources, xsdResources->layouts().layout());
-        parseUsers(resources, xsdResources->users().user());
+        parseCameras(resources, xsdResources->cameras().camera(), m_resourceFactory);
+        parseLayouts(resources, xsdResources->layouts().layout(), m_resourceFactory);
+        parseUsers(resources, xsdResources->users().user(), m_resourceFactory);
     }
 
     return status;
@@ -54,7 +55,7 @@ int QnAppServerConnection::addServer(const QnResource& serverIn, QList<QnResourc
 
     if (m_sessionManager->addServer(server, xsdServers) == 0)
     {
-        parseServers(servers, xsdServers->server());
+        parseServers(servers, xsdServers->server(), m_resourceFactory);
         return 0;
     }
 
@@ -78,7 +79,7 @@ int QnAppServerConnection::addCamera(const QnResource& cameraIn, const QnId& ser
 
     if (m_sessionManager->addCamera(camera, xsdCameras) == 0)
     {
-        parseCameras(cameras, xsdCameras->camera());
+        parseCameras(cameras, xsdCameras->camera(), m_resourceFactory);
         return 0;
     }
 

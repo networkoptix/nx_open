@@ -9,7 +9,7 @@ class SessionManager;
 class QN_EXPORT QnAppServerConnection
 {
 public:
-    QnAppServerConnection(const QHostAddress& host, const QAuthenticator& auth);
+    QnAppServerConnection(const QHostAddress& host, const QAuthenticator& auth, QnResourceFactory& resourceFactory);
 
     ~QnAppServerConnection();
 
@@ -22,6 +22,8 @@ public:
 
 private:
     QSharedPointer<SessionManager> m_sessionManager;
+    QnResourceFactory& m_resourceFactory;
+
 };
 
 #endif // APPSERVERCONNECTIONIMPL_H

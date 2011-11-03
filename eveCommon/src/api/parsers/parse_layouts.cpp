@@ -1,6 +1,8 @@
 #include "api/parsers/parse_layouts.h"
 
-void parseLayouts(QList<QnResourcePtr>& layouts, const QnApiLayouts& xsdLayouts)
+#include "core/resourcemanagment/asynch_seacher.h"
+
+void parseLayouts(QList<QnResourcePtr>& layouts, const QnApiLayouts& xsdLayouts, QnResourceFactory& resourceFactory)
 {
     using xsd::api::layouts::Layouts;
     using xsd::api::resourceTypes::ParentIDs;
@@ -13,7 +15,7 @@ void parseLayouts(QList<QnResourcePtr>& layouts, const QnApiLayouts& xsdLayouts)
         parameters["id"] = i->id().c_str();
         parameters["name"] = i->name().c_str();
 
-        QnResourcePtr layout = QnResourceFactoryPool::createResource(i->typeId().c_str(), parameters);
+        QnResourcePtr layout = resourceFactory.createResource(i->typeId().c_str(), parameters);
 
         layouts.append(layout);
     }

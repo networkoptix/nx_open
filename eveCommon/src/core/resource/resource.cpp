@@ -7,8 +7,6 @@
 // Temporary until real ResourceFactory is implemented
 
 
-QList<QnResourceFactoryPtr> QnResourceFactoryPool::m_factories;
-
 CLDeviceCommandProcessor QnResource::m_commanproc;
 
 QnResourceType::QnResourceType()
@@ -441,50 +439,4 @@ QnAbstractStreamDataProvider* QnResource::createDataProvider(ConnectionRole role
     if (dataProvider)
         addConsumer(dataProvider);
     return dataProvider;
-}
-
-QnResourcePtr QnResourceFactory::createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters)
-{
-    return createResource(qnResTypePool->getResourceType(resourceTypeId), parameters);
-}
-
-QnResourcePtr QnResourceFactory::createResource(QnResourceTypePtr resourceType, const QnResourceParameters& parameters)
-{
-    qDebug() << "Creating resource with typeId" << resourceType->getName();
-
-    for (QnResourceParameters::const_iterator ci = parameters.begin(); ci != parameters.end(); ci++)
-    {
-        qDebug() << ci.key() << " = " << ci.value();
-    }
-
-    // Stub. Should be implemented by concrete plugin.
-    QnResourcePtr resource(new QnLocalFileResource(""));
-    resource->deserialize(parameters);
-
-    resource->setTypeId(resourceType->getId());
-
-    return resource;
-}
-
-QnResourcePtr QnResourceFactoryPool::createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters)
-{
-    return createResource(qnResTypePool->getResourceType(resourceTypeId), parameters);
-}
-
-QnResourcePtr QnResourceFactoryPool::createResource(QnResourceTypePtr resourceType, const QnResourceParameters& parameters)
-{
-    if (m_factories.isEmpty())
-        m_factories.append(QnResourceFactoryPtr(new QnResourceFactory()));
-
-    QnResourcePtr result;
-
-    foreach(QnResourceFactoryPtr factory, m_factories)
-    {
-        result = factory->createResource(resourceType, parameters);
-
-        if (!result.isNull())
-            return result;
-    }
-
-    return result;
 }

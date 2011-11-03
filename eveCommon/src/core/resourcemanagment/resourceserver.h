@@ -8,7 +8,7 @@
 
 
 // this is an interface for resource searcher plug in
-class QnAbstractResourceSearcher
+class QnAbstractResourceSearcher : public QnResourceFactory
 {
 protected:
     QnAbstractResourceSearcher();
@@ -26,6 +26,8 @@ public:
 
     // returns all available devices
     virtual QnResourceList findResources() = 0;
+
+    virtual bool isResourceTypeSupported(const QnId& resourceTypeId) const = 0;
 
     // is some cases search might take time
     //if pleaseStop is called search will be interrupted
@@ -57,9 +59,9 @@ public:
 class QnAbstractFileResourceSearcher : virtual public QnAbstractResourceSearcher
 {
 protected:
-    QnAbstractFileResourceSearcher(){};
-public:
+    QnAbstractFileResourceSearcher() {}
 
+public:
     // sets the Path check List
     void setPathCheckList(const QStringList& paths);
     void clearPathCheckList();
@@ -68,11 +70,10 @@ public:
 
 protected:
     QStringList getPathCheckList() const;
+
 protected:
     mutable QMutex m_mutex;
     QStringList m_pathListToCheck;
 };
-
-
 
 #endif //device_server_h_1658
