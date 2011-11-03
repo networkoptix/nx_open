@@ -56,13 +56,13 @@ CLHttpStatus QnPlAreconVisionResource::getRegister(int page, int num, int& val)
 	int result_size =  http.read(c_response,sizeof(c_response));
 
 	if (result_size <0)
-		return CL_HTTP_HOST_NOT_AVAILABLE;
+		return CL_TRANSPORT_ERROR;
 
 	QByteArray arr = QByteArray::fromRawData(c_response, result_size); // QByteArray  will not copy data
 
 	int index = arr.indexOf('=');
 	if (index==-1)
-		return CL_HTTP_HOST_NOT_AVAILABLE;
+		return CL_TRANSPORT_ERROR;
 
 	QByteArray cnum = arr.mid(index+1);
 	val = cnum.toInt();

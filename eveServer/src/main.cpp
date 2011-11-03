@@ -198,8 +198,7 @@ int main(int argc, char *argv[])
     qnResPool->addResource(storage0);
     qnStorageMan->addStorage(storage0);
 
-    QnRecordingManager recorder;
-    recorder.start();
+    QnRecordingManager::instance()->start();
     // ------------------------------------------
 
 

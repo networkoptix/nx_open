@@ -60,7 +60,7 @@ struct QN_EXPORT QnParam
 
     QString toDebugString() const
     {
-        return name() + QString(" ") + m_paramType->default_value;
+        return name() + QString(" ") + QString(m_paramType->default_value);
     }
 
 private:

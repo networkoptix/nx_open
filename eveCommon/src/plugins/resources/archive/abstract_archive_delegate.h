@@ -37,6 +37,7 @@ public:
     virtual void onReverseMode(qint64 /*displayTime*/, bool /*value*/) {}
 
     Flags getFlags() const { return m_flags; }
+    virtual bool isRealTimeSource() const { return false; }
 protected:
     Flags m_flags;
 };

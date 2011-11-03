@@ -19,6 +19,8 @@
 #include "plugins/resources/archive/abstract_archive_delegate.h"
 #include "camera/camera_pool.h"
 #include "utils/network/rtpsession.h"
+#include "recorder/recording_manager.h"
+#include "utils/common/util.h"
 
 
 static const quint8 RTP_FFMPEG_GENERIC_CODE = 102;
@@ -74,9 +76,10 @@ public:
         return m_lastSendTime; 
     }
 
+private:
+    QMap<CodecID, QnMediaContextPtr> m_generatedContext;
+
 protected:
-
-
     void buildRtspTcpHeader(quint8 channelNum, quint32 ssrc, quint16 len, int markerBit, quint32 timestamp)
     {
         m_rtspTcpHeader[0] = '$';
@@ -94,6 +97,16 @@ protected:
         //rtp->timestamp = htonl(m_timer.elapsed());
         rtp->timestamp = htonl(timestamp);
         rtp->ssrc = htonl(ssrc); // source ID
+    }
+
+    QnMediaContextPtr getGeneratedContext(CodecID compressionType)
+    {
+        QMap<CodecID, QnMediaContextPtr>::iterator itr = m_generatedContext.find(compressionType);
+        if (itr != m_generatedContext.end())
+            return itr.value();
+        QnMediaContextPtr result(new QnMediaContext(compressionType));
+        m_generatedContext.insert(compressionType, result);
+        return result;
     }
 
     virtual bool processData(QnAbstractDataPacketPtr data)
@@ -114,7 +127,6 @@ protected:
         m_waitBOF = false;
 
 
-        AVCodecContext* ctx = (AVCodecContext*) media->context;
         //if (!ctx)
         //    return true;
 
@@ -125,15 +137,23 @@ protected:
 
         ssrc += media->subChannelNumber*2;
         int subChannelNumber = media->subChannelNumber;
-        if (ctx && !m_ctxSended[rtspChannelNum].contains(subChannelNumber))
+
+        QList<QnMediaContextPtr>& ctxData = m_ctxSended[rtspChannelNum];
+        while (ctxData.size() <= subChannelNumber)
+            ctxData << QnMediaContextPtr(0);
+
+        QnMediaContextPtr currentContext = media->context;
+        if (currentContext == 0)
+            currentContext = getGeneratedContext(media->compressionType);
+        if (ctxData[subChannelNumber] == 0 || !ctxData[subChannelNumber]->equalTo(currentContext.data()))
         {
+            ctxData[subChannelNumber] = currentContext;
             QByteArray codecCtxData;
-            QnFfmpegHelper::serializeCodecContext(ctx, &codecCtxData);
+            QnFfmpegHelper::serializeCodecContext(currentContext->ctx(), &codecCtxData);
             buildRtspTcpHeader(rtspChannelNum, ssrc + 1, codecCtxData.size(), true, 0); // ssrc+1 - switch data subchannel to context subchannel
             QMutexLocker lock(&m_owner->getSockMutex());
             m_owner->sendData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
             m_owner->sendData(codecCtxData);
-            m_ctxSended[rtspChannelNum] << media->subChannelNumber;
         }
         /*
         int subChannelNumber = ctx ? m_ctxSended[rtspChannelNum].indexOf(ctx) : 0;
@@ -181,15 +201,16 @@ protected:
             m_owner->sendData(curData, sendLen);
             //m_owner->flush();
             curData += sendLen;
-            m_lastSendTime = media->timestamp;
+            if (m_lastSendTime != DATETIME_NOW)
+                m_lastSendTime = media->timestamp;
         }
         return true;
     }
 
 private:
     QByteArray m_codecCtxData;
-    //QMap<int, QList<AVCodecContext*> > m_ctxSended;
-    QMap<int, QList<int> > m_ctxSended;
+    QMap<int, QList<QnMediaContextPtr> > m_ctxSended;
+    //QMap<int, QList<int> > m_ctxSended;
     QTime m_timer;
     quint16 m_sequence[256];
     QnRtspConnectionProcessor* m_owner;
@@ -346,7 +367,10 @@ int QnRtspConnectionProcessor::composeDescribe()
         QString range = "npt=";
         range += QString::number(d->archiveDP->startTime());
         range += "-";
-        range += QString::number(d->archiveDP->endTime());
+        if (QnRecordingManager::instance()->isCameraRecoring(d->mediaRes))
+            range += "now";
+        else
+            range += QString::number(d->archiveDP->endTime());
         d->responseHeaders.addValue("Range", range);
     }
 
@@ -441,7 +465,7 @@ void QnRtspConnectionProcessor::extractNptTime(const QString& strValue, qint64* 
     if (d->liveMode)
     {
         //*dst = getRtspTime();
-        *dst = RTPSession::RTSP_NOW;
+        *dst = DATETIME_NOW;
     }
     else {
         double val = strValue.toDouble();
@@ -472,7 +496,7 @@ void QnRtspConnectionProcessor::parseRangeHeader(const QString& rangeStr, qint64
         if (values.size() > 1 && !values[1].isEmpty())
             extractNptTime(values[1], endTime);
         else
-            *endTime = RTPSession::RTSP_NOW;
+            *endTime = DATETIME_NOW;
     }
 }
 
@@ -516,7 +540,10 @@ int QnRtspConnectionProcessor::composePlay()
     
 
     //QnArchiveStreamReader* archiveProvider = dynamic_cast<QnArchiveStreamReader*> (d->dataProvider);
-    if (qAbs(d->startTime - getRtspTime()) >= RTSP_MIN_SEEK_INTERVAL)
+    if (d->liveMode) {
+        d->dataProcessor->setWaitBOF(d->startTime, false); // ignore rest packets before new position
+    }
+    else if (qAbs(d->startTime - getRtspTime()) >= RTSP_MIN_SEEK_INTERVAL)
     {
         if (d->archiveDP)
         {
@@ -640,15 +667,9 @@ void QnRtspConnectionProcessor::run()
             }
         }
     }
-    if (d->dataProcessor)
-        d->dataProcessor->stop();
-    if (d->archiveDP)
-        d->archiveDP->stop();
-    delete d->archiveDP;
-    delete d->dataProcessor;
-    d->archiveDP = 0;
-    d->liveDP = 0;
-    d->dataProcessor = 0;
+
+    d->deleteDP();
+
     m_runing = false;
     //deleteLater(); // does not works for this thread
 }
