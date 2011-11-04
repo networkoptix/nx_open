@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
     QAuthenticator auth;
     auth.setUser("appserver");
     auth.setPassword("123");
-    QnAppServerConnection appServerConnection(host, auth);
+    QnAppServerConnection appServerConnection(host, auth, QnResourceDiscoveryManager::instance());
 
 
     QList<QnResourceTypePtr> resourceTypeList;
