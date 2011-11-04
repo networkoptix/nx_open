@@ -5,6 +5,6 @@
 #include "api/Types.h"
 #include "core/resource/resource.h"
 
-void parseLayouts(QList<QnResourcePtr>& layouts, const QnApiLayouts& xsdLayouts);
+void parseLayouts(QList<QnResourcePtr>& layouts, const QnApiLayouts& xsdLayouts, QnResourceFactory& resourceFactory);
 
 #endif // _eve_parse_layouts_

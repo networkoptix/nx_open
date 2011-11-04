@@ -20,8 +20,9 @@ struct ReaderInfo
     QnlTimeSource* cam;
 };
 
-struct QnArchiveSyncPlayWrapper::QnArchiveSyncPlayWrapperPrivate
+class QnArchiveSyncPlayWrapper::QnArchiveSyncPlayWrapperPrivate
 {
+public:
     QnArchiveSyncPlayWrapperPrivate()
     {
         blockSingleShotSignal = false;

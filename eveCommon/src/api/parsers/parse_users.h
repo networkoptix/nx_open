@@ -4,6 +4,6 @@
 #include "api/Types.h"
 #include "core/resource/resource.h"
 
-void parseUsers(QList<QnResourcePtr>& users, const QnApiUsers& xsdUsers);
+void parseUsers(QList<QnResourcePtr>& users, const QnApiUsers& xsdUsers, QnResourceFactory& resourceFactory);
 
 #endif // _eve_parse_users_

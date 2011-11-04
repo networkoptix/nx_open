@@ -239,22 +239,8 @@ private:
 class QnResourceFactory
 {
 public:
-    // We'll add arg const QnPropertyList&
-    QnResourcePtr createResource(QnResourceTypePtr resourceType, const QnResourceParameters& parameters);
-    QnResourcePtr createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters);
+    virtual QnResourcePtr createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters) = 0;
 };
-typedef QSharedPointer<QnResourceFactory> QnResourceFactoryPtr;
-
-class QnResourceFactoryPool
-{
-public:
-    static QnResourcePtr createResource(QnResourceTypePtr resourceType, const QnResourceParameters& parameters);
-    static QnResourcePtr createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters);
-
-private:
-    static QList<QnResourceFactoryPtr> m_factories;
-};
-
 
 // for future use
 class QnRecorder: public QnResource 

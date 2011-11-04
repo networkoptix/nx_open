@@ -17,6 +17,34 @@ QnResourceDirectoryBrowser::~QnResourceDirectoryBrowser()
 {
 }
 
+bool QnResourceDirectoryBrowser::isResourceTypeSupported(const QnId& resourceTypeId) const
+{
+    QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
+    if (resourceType.isNull())
+        return false;
+
+    return resourceType->getName() == "PENIS";
+}
+
+QnResourcePtr QnResourceDirectoryBrowser::createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters)
+{
+    QnResourcePtr result;
+
+    if (!isResourceTypeSupported(resourceTypeId))
+    {
+        return result;
+    }
+
+    if (parameters.contains("file"))
+    {
+        result = createArchiveResource(parameters["file"]);
+        result->setTypeId(resourceTypeId);
+        result->deserialize(parameters);
+    }
+
+    return result;
+}
+
 QString QnResourceDirectoryBrowser::manufacture() const
 {
     return QLatin1String("DirectoryBrowser");

@@ -1,6 +1,8 @@
 #include "api/parsers/parse_resources.h"
 
-void parseResources(QList<QnResourcePtr>& resources, const QnApiResources& xsdResources)
+#include "core/resourcemanagment/asynch_seacher.h"
+
+void parseResources(QList<QnResourcePtr>& resources, const QnApiResources& xsdResources, QnResourceFactory& resourceFactory)
 {
     using xsd::api::resources::Resources;
 
@@ -10,7 +12,7 @@ void parseResources(QList<QnResourcePtr>& resources, const QnApiResources& xsdRe
         parameters["id"] = i->id().c_str();
         parameters["name"] = i->name().c_str();
 
-        QnResourcePtr resource = QnResourceFactoryPool::createResource(i->typeId().c_str(), parameters);
+        QnResourcePtr resource = resourceFactory.createResource(i->typeId().c_str(), parameters);
 
         resources.append(resource);
     }

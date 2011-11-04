@@ -1,6 +1,8 @@
 #include "AVJpegHeader.h"
 #include <string>
 
+#undef HIBYTE
+#undef LOBYTE
 #define HIBYTE(w) ((unsigned char)((((unsigned long)(w)) >> 8) & 0xff))
 #define LOBYTE(w) ((unsigned char)(((unsigned long)(w)) & 0xff))
 

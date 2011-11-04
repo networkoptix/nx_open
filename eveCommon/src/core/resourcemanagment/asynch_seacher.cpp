@@ -30,6 +30,27 @@ void QnResourceDiscoveryManager::addDeviceServer(QnAbstractResourceSearcher* ser
 	m_searchersList.push_back(serv);
 }
 
+QnResourcePtr QnResourceDiscoveryManager::createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters)
+{
+    QnResourcePtr result;
+
+    ResourceSearcherList searchersList;
+    {
+        QMutexLocker lock(&m_searchersListMtx);
+        searchersList = m_searchersList;
+    }
+
+    foreach(QnAbstractResourceSearcher* searcher, searchersList)
+    {
+        result = searcher->createResource(resourceTypeId, parameters);
+
+        if (!result.isNull())
+            break;
+    }
+
+    return result;
+}
+
 void QnResourceDiscoveryManager::pleaseStop()
 {
     {

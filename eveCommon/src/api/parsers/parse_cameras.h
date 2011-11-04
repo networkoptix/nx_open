@@ -4,6 +4,6 @@
 #include "api/Types.h"
 #include "core/resource/resource.h"
 
-void parseCameras(QList<QnResourcePtr>& cameras, const QnApiCameras& xsdCameras);
+void parseCameras(QList<QnResourcePtr>& cameras, const QnApiCameras& xsdCameras, QnResourceFactory& resourceFactory);
 
 #endif // _eve_parse_cameras_
