@@ -98,7 +98,7 @@ void QnTCPConnectionProcessor::parseRequest()
         {
             QList<QByteArray> params = line.split(':');
             if (params.size() > 1)
-                d->requestHeaders.addValue(params[0], params[1]);
+                d->requestHeaders.addValue(params[0].trimmed(), params[1].trimmed());
         }
     }
     QByteArray delimiter = "\n";

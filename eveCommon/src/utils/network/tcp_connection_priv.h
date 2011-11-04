@@ -2,8 +2,21 @@ static const int TCP_READ_BUFFER_SIZE = 65536;
 static const QString ENDL("\r\n");
 
 #include <QHttpRequestHeader>
+#include "tcp_connection_processor.h"
+
+static const QByteArray STATIC_UNAUTHORIZED_HTML("\
+        <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd\">\
+        <HTML>\
+        <HEAD>\
+        <TITLE>Error</TITLE>\
+        <META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=ISO-8859-1\">\
+        </HEAD>\
+        <BODY><H1>401 Unauthorized.</H1></BODY>\
+        </HTML>"
+);
 
 static const int CODE_OK = 200;
+static const int CODE_AUTH_REQUIRED = 401;
 static const int CODE_NOT_FOUND = 404;
 static const int CODE_INVALID_PARAMETER = 451;
 static const int CODE_NOT_IMPLEMETED = 501;
