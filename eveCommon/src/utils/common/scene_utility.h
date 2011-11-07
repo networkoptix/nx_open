@@ -156,6 +156,10 @@ inline bool qFuzzyCompare(const QPointF &l, const QPointF &r) {
     return ::qFuzzyCompare(l.x(), r.x()) && ::qFuzzyCompare(l.y(), r.y());
 }
 
+inline bool qFuzzyCompare(const QSizeF &l, const QSizeF &r) {
+    return ::qFuzzyCompare(l.width(), r.width()) && ::qFuzzyCompare(l.height(), r.height());
+}
+
 inline bool qFuzzyCompare(const QRectF &l, const QRectF &r) {
     return 
         ::qFuzzyCompare(l.x(), r.x()) && 
