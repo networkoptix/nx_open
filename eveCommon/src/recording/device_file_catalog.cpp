@@ -1,12 +1,15 @@
 #include "device_file_catalog.h"
 #include "storage_manager.h"
 #include "utils/common/util.h"
+#include "file_deletor.h"
 
-DeviceFileCatalog::DeviceFileCatalog(QnResourcePtr resource): 
-m_firstDeleteCount(0),
-m_resource(resource)
+DeviceFileCatalog::DeviceFileCatalog(QnResourcePtr resource):
+    m_firstDeleteCount(0),
+    m_resource(resource),
+    m_mutex(QMutex::Recursive),
+    m_duplicateName(false)
 {
-    QString devTitleFile = closeDirPath(qnStorageMan->storageRoots()[0]->getUrl()) + QFileInfo(resource->getUrl()).baseName() + QString("/title.csv");
+    QString devTitleFile = baseRoot(resource) + QString("/title.csv");
     m_file.setFileName(devTitleFile);
     QDir dir;
     dir.mkpath(QFileInfo(devTitleFile).absolutePath());
@@ -19,12 +22,26 @@ m_resource(resource)
     if (m_file.size() == 0) 
     {
         QTextStream str(&m_file);
-        str << "start; duration; storage; index\n"; // write CSV header
+        str << "start; storage; index; duration\n"; // write CSV header
         str.flush();
     }
     else {
         deserializeTitleFile();
     }
+}
+
+QString DeviceFileCatalog::baseRoot(QnResourcePtr resource)
+{
+    if (qnStorageMan->storageRoots().isEmpty())
+        return QString();
+    else {
+        return closeDirPath(qnStorageMan->storageRoots().begin().value()->getUrl()) + QFileInfo(resource->getUrl()).baseName();
+    }
+};
+
+bool DeviceFileCatalog::lastFileDuplicateName() const
+{
+    return m_duplicateName;
 }
 
 bool DeviceFileCatalog::fileExists(const Chunk& chunk)
@@ -74,7 +91,27 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
         m_existFileList = dir.entryList(QDir::Files);
     }
     QString fName = strPadLeft(QString::number(chunk.fileIndex), 3, '0') + QString(".mkv");
-    return m_existFileList.contains(fName);
+    if (!m_existFileList.contains(fName))
+        return false;
+
+    m_duplicateName = fName == m_prevFileName;
+    m_prevFileName = fName;
+    return true;
+}
+
+qint64 DeviceFileCatalog::getFileDuration(const QString& fileName)
+{
+    qint64 rez = 0;
+    AVFormatContext* formatContext;
+    QString url = QLatin1String("ufile:") + fileName;
+    if (av_open_input_file(&formatContext, url.toUtf8().constData(), NULL, 0, NULL) >= 0)
+    {
+        if (formatContext->duration != AV_NOPTS_VALUE)
+            rez = formatContext->duration;
+        av_close_input_file(formatContext);
+        return rez;
+    }
+    return rez;
 }
 
 void DeviceFileCatalog::deserializeTitleFile()
@@ -82,10 +119,6 @@ void DeviceFileCatalog::deserializeTitleFile()
     QMutexLocker lock(&m_mutex);
     bool needRewriteFile = false;
     QFile newFile(m_file.fileName() + QString(".tmp"));
-    bool useNewFile = newFile.open(QFile::WriteOnly);
-    QTextStream str(&newFile);
-    if (useNewFile)
-        str << "start; duration; storage; index\n"; // write CSV header
 
     m_file.readLine(); // read header
     QByteArray line;
@@ -95,20 +128,39 @@ void DeviceFileCatalog::deserializeTitleFile()
         if (fields.size() < 3)
             continue;
         qint64 startTime = fields[0].toLongLong();
-        Chunk chunk(startTime, fields[1].toInt(), fields[2].toInt(), fields[3].trimmed().toInt());
-        if (fileExists(chunk)) {
-            ChunkMap::iterator itr = qUpperBound(m_chunks.begin(), m_chunks.end(), startTime);
-            m_chunks.insert(itr, chunk);
-            if (useNewFile)
-                str << chunk.startTime << ';' << chunk.duration << ';' << chunk.storageIndex << ';' << chunk.fileIndex << '\n';
+        int duration = fields[3].trimmed().toInt();
+        Chunk chunk(startTime, fields[1].toInt(), fields[2].toInt(), duration);
+        if (fields[3].trimmed().isEmpty()) 
+        {
+            // duration unknown. server restart occured. Duration for chunk is unknown
+            needRewriteFile = true;
+            chunk.duration = getFileDuration(fullFileName(chunk));
+        }
+        if (fileExists(chunk)) 
+        {
+            if (lastFileDuplicateName()) {
+                m_chunks.last() = chunk;
+                needRewriteFile = true;
+            }       
+            else {
+                ChunkMap::iterator itr = qUpperBound(m_chunks.begin(), m_chunks.end(), startTime);
+                m_chunks.insert(itr, chunk);
+            }
         }
         else {
             needRewriteFile = true;
         }
     } while (!line.isEmpty());
-    str.flush();
     newFile.close();
-    if (useNewFile && needRewriteFile) {
+    if (needRewriteFile && newFile.open(QFile::WriteOnly))
+    {
+        QTextStream str(&newFile);
+        str << "start; storage; index; duration\n"; // write CSV header
+
+        foreach(Chunk chunk, m_chunks)
+            str << chunk.startTime  << ';' << chunk.storageIndex << ';' << chunk.fileIndex << ';' << chunk.duration << '\n';
+        str.flush();
+
         m_file.close();
         newFile.close();
         if (m_file.remove())
@@ -125,18 +177,36 @@ void DeviceFileCatalog::addRecord(const Chunk& chunk)
     ChunkMap::iterator itr = qUpperBound(m_chunks.begin(), m_chunks.end(), chunk.startTime);
     m_chunks.insert(itr, chunk);
     QTextStream str(&m_file);
-    str << chunk.startTime << ';' << chunk.duration << ';' << chunk.storageIndex << ';' << chunk.fileIndex << '\n';
+
+    str << chunk.startTime << ';' << chunk.storageIndex << ';' << chunk.fileIndex << ';';
+    if (chunk.duration >= 0)
+        str << chunk.duration  << '\n';
     str.flush();
 }
 
-void DeviceFileCatalog::deleteFirstRecord()
+void DeviceFileCatalog::updateDuration(int duration)
 {
     QMutexLocker lock(&m_mutex);
+    m_chunks.last().duration = duration;
+    QTextStream str(&m_file);
+    str << duration  << '\n';
+    str.flush();
+}
+
+bool DeviceFileCatalog::deleteFirstRecord()
+{
+    QMutexLocker lock(&m_mutex);
+    if (m_chunks.isEmpty())
+        return false;
 
     static const int DELETE_COEFF = 1000;
 
-    if (m_firstDeleteCount < m_chunks.size())
+    if (m_firstDeleteCount < m_chunks.size()) 
+    {
+        QString delFileName = fullFileName(m_chunks[m_firstDeleteCount]);
+        qnFileDeletor->deleteFile(delFileName);
         m_firstDeleteCount++;
+    }
     else {
         m_firstDeleteCount = 0;
         emit firstDataRemoved(m_chunks.size());
@@ -147,6 +217,7 @@ void DeviceFileCatalog::deleteFirstRecord()
         m_chunks.erase(m_chunks.begin(), m_chunks.begin() + DELETE_COEFF);
         m_firstDeleteCount = 0;
     }
+    return true;
 }
 
 int DeviceFileCatalog::findFileIndex(qint64 startTime) const
@@ -158,7 +229,11 @@ int DeviceFileCatalog::findFileIndex(qint64 startTime) const
 
     ChunkMap::const_iterator itr = qUpperBound(m_chunks.begin() + m_firstDeleteCount, m_chunks.end(), startTime);
     if (itr > m_chunks.begin())
+    {
         --itr;
+         if (itr->startTime + itr->duration < startTime && itr < m_chunks.end()-1)
+             ++itr;
+    }
     return itr - m_chunks.begin();
 }
 
@@ -187,7 +262,7 @@ qint64 DeviceFileCatalog::maxTime() const
     if (m_chunks.isEmpty())
         return AV_NOPTS_VALUE;
     else
-        return m_chunks.last().startTime + m_chunks.last().duration;
+        return m_chunks.last().startTime + qMax(0, m_chunks.last().duration);
 }
 
 DeviceFileCatalog::Chunk DeviceFileCatalog::chunkAt(int index) const
@@ -195,6 +270,15 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkAt(int index) const
     QMutexLocker lock(&m_mutex);
     return m_chunks.at(index);
 }
+
+qint64 DeviceFileCatalog::firstTime() const
+{
+    if (m_firstDeleteCount >= m_chunks.size())
+        return AV_NOPTS_VALUE;
+    else
+        return m_chunks[m_firstDeleteCount].startTime;
+}
+
 
 bool operator < (qint64 first, const DeviceFileCatalog::Chunk& other)
 { 
@@ -210,3 +294,4 @@ bool operator < (const DeviceFileCatalog::Chunk& first, const DeviceFileCatalog:
 { 
     return first.startTime < other.startTime; 
 }
+

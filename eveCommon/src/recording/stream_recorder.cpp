@@ -38,14 +38,16 @@ void QnStreamRecorder::cleanup()
         {
             av_metadata_set2(&m_formatCtx->metadata, "start_time", QString::number(m_prevDateTime/1000).toAscii().data(), 0);
             av_metadata_set2(&m_formatCtx->metadata, "end_time", QString::number(m_currentDateTime/1000).toAscii().data(), 0);
-            qnStorageMan->addFileInfo(m_prevDateTime, m_currentDateTime, m_fileName);
+            //qnStorageMan->addFileInfo(m_prevDateTime, m_currentDateTime, m_fileName);
+            qnStorageMan->fileFinished(m_currentDateTime - m_prevDateTime, m_fileName);
         }
 
         if (m_packetWrited)
             av_write_trailer(m_formatCtx);
         for (unsigned i = 0; i < m_formatCtx->nb_streams; ++i)
             avcodec_close(m_formatCtx->streams[i]->codec);
-        avio_close(m_formatCtx->pb);
+        if (m_formatCtx->pb)
+            avio_close(m_formatCtx->pb);
         avformat_free_context(m_formatCtx);
         m_formatCtx = 0;
     }
@@ -74,6 +76,7 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
             m_needStop = true;
             return false;
         }
+
         m_firstTime = false;
         emit recordingStarted();
     }
@@ -154,6 +157,10 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         m_lastErrMessage = QString("Can't create output file '") + m_fileName + QString("' for video recording.");
         cl_log.log(m_lastErrMessage, cl_logERROR);
         return false;
+    }
+
+    if (m_truncateInterval > 0) {
+        qnStorageMan->fileStarted(m_currentDateTime, m_fileName);
     }
 
     outputCtx->video_codec = mediaData->compressionType;

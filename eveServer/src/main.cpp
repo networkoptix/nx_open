@@ -12,6 +12,7 @@
 #include "recording/storage_manager.h"
 #include "api/AppServerConnection.h"
 #include <QAuthenticator>
+#include "recording/file_deletor.h"
 
 //#include "device_plugins/arecontvision/devices/av_device_server.h"
 
@@ -192,11 +193,15 @@ int main(int argc, char *argv[])
     QnRtspListener rtspListener(QHostAddress::Any, 50000);
     rtspListener.start();
 
+
     QnStoragePtr storage0(new QnStorage());
     storage0->setUrl("g:/records");
     storage0->setIndex(0);
+    storage0->setSpaceLimit(238500ll * 1000 * 1024);
     qnResPool->addResource(storage0);
     qnStorageMan->addStorage(storage0);
+
+    QnFileDeletor fileDeletor(storage0->getUrl()); // constructor got root folder for temp files
 
     QnRecordingManager::instance()->start();
     // ------------------------------------------

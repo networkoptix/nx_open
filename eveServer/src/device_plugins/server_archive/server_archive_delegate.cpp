@@ -71,7 +71,8 @@ qint64 QnServerArchiveDelegate::seek(qint64 time)
         if (!switchToChunk(newChunk))
             return -1;
     }
-    return m_currentChunk.startTime + m_aviDelegate->seek(time - m_currentChunk.startTime);
+    qint64 chunkOffset = qMax(time - m_currentChunk.startTime, 0ll);
+    return m_currentChunk.startTime + m_aviDelegate->seek(chunkOffset);
 }
 
 QnAbstractMediaDataPtr QnServerArchiveDelegate::getNextData()

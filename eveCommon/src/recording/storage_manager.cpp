@@ -7,7 +7,8 @@ Q_GLOBAL_STATIC(QnStorageManager, inst)
 
 // -------------------- QnStorageManager --------------------
 
-QnStorageManager::QnStorageManager()
+QnStorageManager::QnStorageManager():
+    m_mutex(QMutex::Recursive)
 {
 }
 
@@ -39,9 +40,63 @@ QString QnStorageManager::dateTimeStr(qint64 dateTimeMks)
     return text;
 }
 
+void QnStorageManager::clearSpace(QnStoragePtr storage)
+{
+    if (storage->getSpaceLimit() == 0)
+        return; // unlimited
+
+
+    QString dir = storage->getUrl();
+
+    while (getDiskFreeSpace(dir) < storage->getSpaceLimit())
+    {
+        qint64 minTime = 0x7fffffffffffffffll;
+        QnResourcePtr camera;
+        DeviceFileCatalogPtr catalog;
+        {
+            QMutexLocker lock(&m_mutex);
+            for (FileCatalogMap::Iterator itr = m_devFileCatalog.begin(); itr != m_devFileCatalog.end(); ++itr)
+            {
+                qint64 firstTime = itr.value()->firstTime();
+                if (firstTime != AV_NOPTS_VALUE && firstTime < minTime)
+                {
+                    minTime = itr.value()->firstTime();
+                    camera = itr.key();
+                }
+            }
+            if (camera != 0)
+                catalog = getFileCatalog(camera);
+        }
+        if (catalog != 0)
+            catalog->deleteFirstRecord();
+        else
+            break; // nothing to delete
+    }
+}
+
+QnStoragePtr QnStorageManager::getOptimalStorageRoot()
+{
+    QMutexLocker lock(&m_mutex);
+    QnStoragePtr result;
+    qint64 minFreeSpace = 0x7fffffffffffffffll;
+    for (StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
+    {
+        qint64 freeSpace = getDiskFreeSpace(itr.value()->getUrl());
+        if (freeSpace < minFreeSpace)
+        {
+            minFreeSpace = freeSpace;
+            result = itr.value();
+        }
+    }
+    return result;
+}
+
 QString QnStorageManager::getFileName(const qint64& dateTime, const QString& uniqId)
 {
-    QString base = closeDirPath(m_storageRoots.begin().value()->getUrl());
+    QnStoragePtr storage = getOptimalStorageRoot();
+    QnResourcePtr camera = qnResPool->getResourceByUrl(uniqId);
+    Q_ASSERT(camera != 0);
+    QString base = closeDirPath(storage->getUrl());
     
     QString text = base + uniqId + QString("/") + dateTimeStr(dateTime);
     QDir dir(text);
@@ -50,21 +105,23 @@ QString QnStorageManager::getFileName(const qint64& dateTime, const QString& uni
     if (!list.isEmpty()) {
         fileNum = list.last().baseName().toInt() + 1;
     }
+    clearSpace(storage);
     return text + strPadLeft(QString::number(fileNum), 3, '0');
 }
 
-DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QnResourcePtr resource)
+DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QnResourcePtr camera)
 {
-    DeviceFileCatalogPtr fileCatalog = m_devFileCatalog[resource];
+    QMutexLocker lock(&m_mutex);
+    DeviceFileCatalogPtr fileCatalog = m_devFileCatalog[camera];
     if (fileCatalog == 0)
     {
-        fileCatalog = DeviceFileCatalogPtr(new DeviceFileCatalog(resource));
-        m_devFileCatalog[resource] = fileCatalog;
+        fileCatalog = DeviceFileCatalogPtr(new DeviceFileCatalog(camera));
+        m_devFileCatalog[camera] = fileCatalog;
     }
     return fileCatalog;
 }
 
-bool QnStorageManager::addFileInfo(const qint64& startDate, const qint64& endDate, const QString& fileName)
+bool QnStorageManager::fileFinished(int duration, const QString& fileName)
 {
     QMutexLocker lock(&m_mutex);
     for(QMap<int, QnStoragePtr>::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
@@ -74,13 +131,35 @@ bool QnStorageManager::addFileInfo(const qint64& startDate, const qint64& endDat
         {
             QString url = fileName.mid(root.length(), fileName.indexOf('/', root.length()+1) - root.length());
             url = QFileInfo(url).baseName();
-            QnResourcePtr resource = qnResPool->getResourceByUniqId(url);
-            DeviceFileCatalogPtr catalog = getFileCatalog(resource);
+            QnResourcePtr camera = qnResPool->getResourceByUniqId(url);
+            DeviceFileCatalogPtr catalog = getFileCatalog(camera);
             if (catalog == 0)
                 return false;
             QFileInfo fi(fileName);
-            catalog->addRecord(DeviceFileCatalog::Chunk(startDate, endDate - startDate, itr.key(), fi.baseName().toInt()));
-            break;
+            catalog->updateDuration(duration);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool QnStorageManager::fileStarted(const qint64& startDate, const QString& fileName)
+{
+    QMutexLocker lock(&m_mutex);
+    for(QMap<int, QnStoragePtr>::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
+    {
+        QString root = closeDirPath(itr.value()->getUrl());
+        if (fileName.startsWith(root))
+        {
+            QString url = fileName.mid(root.length(), fileName.indexOf('/', root.length()+1) - root.length());
+            url = QFileInfo(url).baseName();
+            QnResourcePtr camera = qnResPool->getResourceByUniqId(url);
+            DeviceFileCatalogPtr catalog = getFileCatalog(camera);
+            if (catalog == 0)
+                return false;
+            QFileInfo fi(fileName);
+            catalog->addRecord(DeviceFileCatalog::Chunk(startDate, itr.key(), fi.baseName().toInt(), -1));
+            return true;
         }
     }
     return false;
@@ -107,7 +186,7 @@ QnChunkSequence::QnChunkSequence(const QnResourceList& resList, qint64 startTime
 void QnChunkSequence::addResource(QnResourcePtr res)
 {
     CacheInfo info;
-    QString root = qnStorageMan->storageRoots()[0]->getUrl(); // index stored at primary storage
+    QString root = qnStorageMan->storageRoots().begin().value()->getUrl(); // index stored at primary storage
     info.m_catalog = qnStorageMan->getFileCatalog(res);
     connect(info.m_catalog.data(), SIGNAL(firstDataRemoved(int)), this, SLOT(onFirstDataRemoved(int)));
     info.m_startTime = m_startTime;
