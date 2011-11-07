@@ -84,8 +84,8 @@ bool QnAbstractStreamDataProvider::isConnectedToTheResource() const
 void QnAbstractStreamDataProvider::disconnectFromResource()
 {
     stop();
+    
     QnResourceConsumer::disconnectFromResource();
-    //m_device->removeConsumer(this);
 }
 
 void QnAbstractStreamDataProvider::beforeDisconnectFromResource()
