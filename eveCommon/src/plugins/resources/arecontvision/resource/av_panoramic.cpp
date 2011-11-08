@@ -8,6 +8,10 @@
 CLArecontPanoramicResource::CLArecontPanoramicResource(const QString& name)
 {
     setName(name);
+    if (name.contains("8180") || name.contains("8185"))
+        m_vrl = &avVideoLayout180;
+    else
+        m_vrl = &avVideoLayout360;
 }
 
 
@@ -114,4 +118,9 @@ bool CLArecontPanoramicResource::setCamQulity(int q)
 
 	return false;
 
+}
+
+const QnVideoResourceLayout* CLArecontPanoramicResource::getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
+{
+    return m_vrl;
 }

@@ -20,7 +20,7 @@ public:
         QString description;
     };
 
-    virtual AudioTrack getAudioTrackInfo(int index) = 0;
+    virtual AudioTrack getAudioTrackInfo(int index) const = 0;
 };
 
 class QnEmptyAudioLayout: public QnResourceAudioLayout
@@ -28,7 +28,7 @@ class QnEmptyAudioLayout: public QnResourceAudioLayout
 public:
     QnEmptyAudioLayout(): QnResourceAudioLayout() {}
     virtual unsigned int numberOfChannels() const { return 0; }
-    virtual AudioTrack getAudioTrackInfo(int /*index*/) { return AudioTrack(); }
+    virtual AudioTrack getAudioTrackInfo(int /*index*/) const { return AudioTrack(); }
 };
 
 class QnVideoResourceLayout: public QnDeviceLayout

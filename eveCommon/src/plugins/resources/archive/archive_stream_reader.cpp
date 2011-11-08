@@ -100,13 +100,13 @@ QString QnArchiveStreamReader::serializeLayout(const QnVideoResourceLayout* layo
     return rez;
 }
 
-QnVideoResourceLayout* QnArchiveStreamReader::getVideoLayout()
+const QnVideoResourceLayout* QnArchiveStreamReader::getDPVideoLayout() const
 {
     m_delegate->open(m_resource);
     return m_delegate->getVideoLayout();
 }
 
-QnResourceAudioLayout* QnArchiveStreamReader::getAudioLayout()
+const QnResourceAudioLayout* QnArchiveStreamReader::getDPAudioLayout() const
 {
     m_delegate->open(m_resource);
     return m_delegate->getAudioLayout();

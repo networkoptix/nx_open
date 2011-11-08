@@ -5,7 +5,7 @@ struct QnRestGUIRequestHandler::QnRestGUIRequestHandlerPrivate
 {
     QnRestGUIRequestHandlerPrivate(): result(0), body(0), code(0) {}
 
-    QnParamList params;
+    QnRequestParamList params;
     QByteArray* result;
     const QByteArray* body;
     int code;
@@ -22,7 +22,7 @@ QnRestGUIRequestHandler::~QnRestGUIRequestHandler()
     delete d_ptr;
 }
 
-int QnRestGUIRequestHandler::executeGet(const QnParamList& params, QByteArray& result)
+int QnRestGUIRequestHandler::executeGet(const QnRequestParamList& params, QByteArray& result)
 {
     Q_D(QnRestGUIRequestHandler);
     d->params = params;
@@ -32,7 +32,7 @@ int QnRestGUIRequestHandler::executeGet(const QnParamList& params, QByteArray& r
     return d->code;
 }
 
-int QnRestGUIRequestHandler::executePost(const QnParamList& params, const QByteArray& body, QByteArray& result)
+int QnRestGUIRequestHandler::executePost(const QnRequestParamList& params, const QByteArray& body, QByteArray& result)
 {
     Q_D(QnRestGUIRequestHandler);
     d->params = params;

@@ -25,12 +25,13 @@ public:
     virtual bool isReverseMode() const { return m_reverseMode;}
     virtual bool isNegativeSpeedSupported() const;
 
-    virtual QnVideoResourceLayout* getVideoLayout();
-    virtual QnResourceAudioLayout* getAudioLayout();
+    virtual const QnVideoResourceLayout* getDPVideoLayout() const;
+    virtual const QnResourceAudioLayout* getDPAudioLayout() const;
     static bool deserializeLayout(CLCustomDeviceVideoLayout* layout, const QString& layoutStr);
     static QString serializeLayout(const QnVideoResourceLayout* layout);
 
     void renameFileOnDestroy(const QString& newFileName);
+
 protected:
     virtual QnAbstractMediaDataPtr getNextData();
     virtual void channeljumpTo(qint64 mksec, int channel);

@@ -17,8 +17,6 @@ public:
 		stop();
 	}
 
-    QnVideoResourceLayout* getVideoLayout();
-
 protected:
 	virtual QnAbstractMediaDataPtr getNextData();
     
@@ -36,8 +34,6 @@ protected:
     bool m_panoramic;
     bool m_dualsensor;
     QString m_name;
-
-    QnVideoResourceLayout* m_vrl;
 };
 
 #endif //cpull_httpreader_1119

@@ -139,18 +139,6 @@ bool QnAbstractMediaStreamDataProvider::afterGetData(QnAbstractDataPacketPtr d)
 
 }
 
-QnVideoResourceLayout* QnAbstractMediaStreamDataProvider:: getVideoLayout()
-{
-    static QnDefaultDeviceVideoLayout videolayout;
-    return &videolayout;
-}
-
-QnResourceAudioLayout* QnAbstractMediaStreamDataProvider:: getAudioLayout()
-{
-    static QnEmptyAudioLayout audiolayout;
-    return &audiolayout;
-}
-
 const QnStatistics* QnAbstractMediaStreamDataProvider:: getStatistics(int channel) const
 {
     return &m_stat[channel];
