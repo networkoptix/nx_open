@@ -61,6 +61,7 @@ public:
     {
         memset(m_sequence, 0, sizeof(m_sequence));
         m_timer.start();
+        m_overflowOccured = false;
     }
     //qint64 lastSendTime() const { return m_lastSendTime; }
     void setLastSendTime(qint64 time) { m_lastSendTime = time; }
@@ -74,6 +75,11 @@ public:
 
     virtual qint64 currentTime() const { 
         return m_lastSendTime; 
+    }
+
+    virtual bool canAcceptData() const
+    {
+        return true;
     }
 
 private:
@@ -112,6 +118,20 @@ protected:
     virtual bool processData(QnAbstractDataPacketPtr data)
     {
         QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
+        if (!media)
+            return true;
+        if (m_dataQueue.size() >= m_dataQueue.maxSize())
+        {
+            // buffer overflow
+            m_overflowOccured = true;
+            return true;
+        }
+        if (m_overflowOccured && !(media->flags & AV_PKT_FLAG_KEY))
+        {
+            return true;
+        }
+        m_overflowOccured = false;
+
         int rtspChannelNum = media->channelNumber;
         if (media->dataType == QnAbstractMediaData::AUDIO)
             rtspChannelNum += m_owner->numOfVideoChannels();
@@ -219,6 +239,7 @@ private:
     quint8* tcpReadBuffer;
     QMutex m_mutex;
     bool m_waitBOF;
+    bool m_overflowOccured;
 };
 
 // ----------------------------- QnRtspConnectionProcessorPrivate ----------------------------
@@ -340,7 +361,7 @@ int QnRtspConnectionProcessor::numOfVideoChannels()
     if (!d->mediaRes)
         return -1;
     QnAbstractMediaStreamDataProvider* currentDP = d->liveMode ? d->liveDP : d->archiveDP;
-    QnVideoResourceLayout* layout = currentDP->getVideoLayout();
+    const QnVideoResourceLayout* layout = d->mediaRes->getVideoLayout(currentDP);
     return layout ? layout->numberOfChannels() : -1;
 }
 
@@ -358,8 +379,9 @@ int QnRtspConnectionProcessor::composeDescribe()
 
     QTextStream sdp(&d->responseBody);
 
-    QnVideoResourceLayout* videoLayout = d->liveDP->getVideoLayout();
-    QnResourceAudioLayout* audioLayout = d->liveDP->getAudioLayout();
+    
+    const QnVideoResourceLayout* videoLayout = d->mediaRes->getVideoLayout(d->liveDP);
+    const QnResourceAudioLayout* audioLayout = d->mediaRes->getAudioLayout(d->liveDP);
     int numVideo = videoLayout ? videoLayout->numberOfChannels() : 1;
     int numAudio = audioLayout ? audioLayout->numberOfChannels() : 0;
 
@@ -408,7 +430,7 @@ int QnRtspConnectionProcessor::composeSetup()
     int trackId = extractTrackId(d->requestHeaders.path());
 
     QnAbstractMediaStreamDataProvider* currentDP = d->liveMode ? d->liveDP : d->archiveDP;
-    QnVideoResourceLayout* videoLayout = currentDP->getVideoLayout();
+    const QnVideoResourceLayout* videoLayout = d->mediaRes->getVideoLayout(currentDP);
     if (trackId >= videoLayout->numberOfChannels()) {
         //QnAbstractMediaStreamDataProvider* dataProvider;
         if (d->archiveDP)

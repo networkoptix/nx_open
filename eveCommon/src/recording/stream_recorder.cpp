@@ -38,14 +38,16 @@ void QnStreamRecorder::cleanup()
         {
             av_metadata_set2(&m_formatCtx->metadata, "start_time", QString::number(m_prevDateTime/1000).toAscii().data(), 0);
             av_metadata_set2(&m_formatCtx->metadata, "end_time", QString::number(m_currentDateTime/1000).toAscii().data(), 0);
-            qnStorageMan->addFileInfo(m_prevDateTime, m_currentDateTime, m_fileName);
+            //qnStorageMan->addFileInfo(m_prevDateTime, m_currentDateTime, m_fileName);
+            qnStorageMan->fileFinished(m_currentDateTime - m_prevDateTime, m_fileName);
         }
 
         if (m_packetWrited)
             av_write_trailer(m_formatCtx);
         for (unsigned i = 0; i < m_formatCtx->nb_streams; ++i)
             avcodec_close(m_formatCtx->streams[i]->codec);
-        avio_close(m_formatCtx->pb);
+        if (m_formatCtx->pb)
+            avio_close(m_formatCtx->pb);
         avformat_free_context(m_formatCtx);
         m_formatCtx = 0;
     }
@@ -74,6 +76,7 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
             m_needStop = true;
             return false;
         }
+
         m_firstTime = false;
         emit recordingStarted();
     }
@@ -156,6 +159,10 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         return false;
     }
 
+    if (m_truncateInterval > 0) {
+        qnStorageMan->fileStarted(m_currentDateTime, m_fileName);
+    }
+
     outputCtx->video_codec = mediaData->compressionType;
     
     QnAbstractMediaStreamDataProvider* mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider*> (mediaData->dataProvider);
@@ -169,13 +176,13 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         return false;
     }
     QnMediaResourcePtr mediaDev = qSharedPointerDynamicCast<QnMediaResource>(resource);
-    QString layoutStr = QnArchiveStreamReader::serializeLayout(mediaProvider->getVideoLayout());
+    QString layoutStr = QnArchiveStreamReader::serializeLayout(mediaDev->getVideoLayout(mediaProvider));
     av_metadata_set2(&m_formatCtx->metadata, "video_layout", layoutStr.toAscii().data(), 0);
-    QnResourceAudioLayout* audioLayout = mediaProvider->getAudioLayout();
+    const QnResourceAudioLayout* audioLayout = mediaDev->getAudioLayout(mediaProvider);
 
     m_formatCtx->start_time = mediaData->timestamp;
 
-    const QnVideoResourceLayout* layout = mediaProvider->getVideoLayout();
+    const QnVideoResourceLayout* layout = mediaDev->getVideoLayout(mediaProvider);
     for (unsigned int i = 0; i < layout->numberOfChannels(); ++i) 
     {
         AVStream* videoStream = av_new_stream(m_formatCtx, DEFAULT_VIDEO_STREAM_ID+i);

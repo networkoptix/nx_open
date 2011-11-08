@@ -25,6 +25,10 @@ public:
     // returns one image best for such time
     // in case of live video time should be ignored
     virtual QImage getImage(int channnel, QDateTime time, QnStreamQuality quality);
+
+    // resource can use DataProvider for addition info (optional)
+    virtual const QnVideoResourceLayout* getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0);
+    virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0);
 };
 
 typedef QSharedPointer<QnMediaResource> QnMediaResourcePtr;

@@ -19,3 +19,15 @@ QImage QnMediaResource::getImage(int /*channnel*/, QDateTime /*time*/, QnStreamQ
 {
     return QImage();
 }
+
+static QnDefaultDeviceVideoLayout videoLayout;
+const QnVideoResourceLayout* QnMediaResource::getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
+{
+    return &videoLayout;
+}
+
+static QnEmptyAudioLayout audioLayout;
+const QnResourceAudioLayout* QnMediaResource::getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
+{
+    return &audioLayout;
+}
