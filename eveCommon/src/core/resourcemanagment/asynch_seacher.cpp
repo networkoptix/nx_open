@@ -30,6 +30,12 @@ void QnResourceDiscoveryManager::addDeviceServer(QnAbstractResourceSearcher* ser
 	m_searchersList.push_back(serv);
 }
 
+void QnResourceDiscoveryManager::addResourceProcessor(QnResourceProcessor* processor)
+{
+    QMutexLocker lock(&m_searchersListMtx);
+    m_resourceProcessors.push_back(processor);
+}
+
 QnResourcePtr QnResourceDiscoveryManager::createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters)
 {
     QnResourcePtr result;
@@ -77,17 +83,17 @@ void QnResourceDiscoveryManager::run()
             CL_LOG(cl_logWARNING) cl_log.log(message ,cl_logWARNING);
         }
 
-        QnResourcePool::instance()->addResources(result);
-
+        foreach(QnResourceProcessor* processor, m_resourceProcessors)
+        {
+            processor->processResources(result);
+        }
         foreach(QnResourcePtr res, result)
         {
             res->setStatus(QnResource::Online);
         }
 
-
         int global_delay_between_search = 1000;
         smartSleep(global_delay_between_search);
-
     }
 }
 
@@ -127,6 +133,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool& ip_finished)
         }
 	}
 
+    qDebug() << resources.size();
     //assemble list of existing ip
 
     // from pool
@@ -231,6 +238,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool& ip_finished)
 		cl_log.log("Done. Time elapsed: ", time.elapsed(), cl_logDEBUG1);
 
 
+
     // lets remove still not accessible resources 
     it = resources.begin();
     while (it!=resources.end())
@@ -270,6 +278,8 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool& ip_finished)
 
     resources = swapList;
 
+    qDebug() << "Returning " << resources.size() << " resources";
+
 	return resources;
 }
 
@@ -288,7 +298,7 @@ struct check_if_accessible_STRUCT
 
     void f()
     {
-        bool acc = resourceNet->checkFlag(QnNetworkResource::BadHostAddr); // bad ip already 
+        bool acc = resourceNet->checkNetworkStatus(QnNetworkResource::BadHostAddr); // bad ip already
 
         if (acc)
         {

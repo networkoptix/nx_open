@@ -22,6 +22,9 @@ void parseCameras(QList<QnResourcePtr>& cameras, const QnApiCameras& xsdCameras,
         parameters["password"] = i->password().c_str();
 
         QnResourcePtr camera = resourceFactory.createResource(i->typeId().c_str(), parameters);
+        if (camera.isNull())
+            continue;
+
         QnParamList& paramList = camera->getResourceParamList();
 
         if (i->properties().present())

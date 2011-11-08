@@ -43,3 +43,7 @@ eveCommon/src/Makefile
 
 scripts/appserver/server.state
 server/src/version.h
+
+eveServer/src/server.pro
+eveServer/src/version.h
+eveServer/src/Makefile

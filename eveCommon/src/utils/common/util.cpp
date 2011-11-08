@@ -1,5 +1,9 @@
 #include "utils/common/util.h"
 
+#ifdef Q_OS_MAC
+#include <sys/statvfs.h>
+#endif
+
 bool removeDir(const QString &dirName)
 {
     bool result = true;
