@@ -46,3 +46,21 @@ QnAbstractStreamDataProvider* QnAviResource::createDataProviderInternal(Connecti
     result->setArchiveDelegate(new QnAviArchiveDelegate());
     return result;
 }
+
+const QnVideoResourceLayout* QnAviResource::getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
+{
+    const QnArchiveStreamReader* archiveReader = dynamic_cast<const QnArchiveStreamReader*> (dataProvider);
+    if (archiveReader)
+        archiveReader->getDPVideoLayout();
+    else
+        return QnMediaResource::getVideoLayout();
+}
+
+const QnResourceAudioLayout* QnAviResource::getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
+{
+    const QnArchiveStreamReader* archiveReader = dynamic_cast<const QnArchiveStreamReader*> (dataProvider);
+    if (archiveReader)
+        archiveReader->getDPAudioLayout();
+    else
+        return QnMediaResource::getAudioLayout();
+}

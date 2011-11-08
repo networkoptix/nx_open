@@ -16,113 +16,6 @@ extern int create_sps_pps(
 extern AVLastPacketSize ExtractSize(const unsigned char* arr);
 
 
-class AVVideoLayout180 : public QnVideoResourceLayout
-{
-public:
-    AVVideoLayout180(){};
-    virtual ~AVVideoLayout180(){};
-    //returns number of video channels device has
-    virtual unsigned int numberOfChannels() const
-    {
-        return 4;
-    }
-
-
-    virtual unsigned int width() const 
-    {
-        return 4;
-    }
-
-    virtual unsigned int height() const 
-    {
-        return 1;
-    }
-
-    virtual unsigned int h_position(unsigned int channel) const
-    {
-        switch(channel)
-        {
-        case 0:
-            return 0;
-
-        case 1:
-            return 2;
-
-        case 2:
-            return 3;
-
-        case 3:
-            return 1;
-        default:
-            return 0;
-        }
-    }
-
-    virtual unsigned int v_position(unsigned int channel) const
-    {
-        return 0;
-    }
-
-};
-
-class AVVideoLayout360 : public QnVideoResourceLayout
-{
-public:
-    AVVideoLayout360(){};
-    virtual ~AVVideoLayout360(){};
-    //returns number of video channels device has
-
-    virtual unsigned int numberOfChannels() const
-    {
-        return 4;
-    }
-
-    virtual unsigned int numberOfAudioChannels() const
-    {
-        return 1;
-    }
-
-    virtual unsigned int width() const 
-    {
-        return 4;
-    }
-
-    virtual unsigned int height() const 
-    {
-        return 1;
-    }
-
-    virtual unsigned int h_position(unsigned int channel) const
-    {
-        switch(channel)
-        {
-        case 0:
-            return 0;
-
-        case 1:
-            return 3;
-
-        case 2:
-            return 2;
-
-        case 3:
-            return 1;
-        default:
-            return 0;
-        }
-    }
-
-    virtual unsigned int v_position(unsigned int channel) const
-    {
-        return 0;
-    }
-
-};
-
-AVVideoLayout360 avVideoLayout360;
-AVVideoLayout180 avVideoLayout180;
-
-
 //=========================================================
 
 AVPanoramicClientPullSSTFTPStreamreader ::AVPanoramicClientPullSSTFTPStreamreader(QnResourcePtr res):
@@ -139,18 +32,6 @@ QnPlAVClinetPullStreamReader(res)
     m_dualsensor = avRes->isDualSensor();
     m_name = avRes->getName();
 
-    if (res->getName().contains("8180") || res->getName().contains("8185"))
-        m_vrl = &avVideoLayout180;
-    else
-        m_vrl = &avVideoLayout360;
-
-
-
-}
-
-QnVideoResourceLayout* AVPanoramicClientPullSSTFTPStreamreader::getVideoLayout()
-{
-    return m_vrl;
 }
 
 QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()

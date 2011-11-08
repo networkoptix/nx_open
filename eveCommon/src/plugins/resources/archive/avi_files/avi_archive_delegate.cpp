@@ -38,7 +38,7 @@ public:
         return audioNum;
     }
 
-    virtual QnResourceAudioLayout::AudioTrack getAudioTrackInfo(int index) 
+    virtual QnResourceAudioLayout::AudioTrack getAudioTrackInfo(int index) const
     {
         QnResourceAudioLayout::AudioTrack result;
         AVFormatContext* formatContext = m_owner->getFormatContext();

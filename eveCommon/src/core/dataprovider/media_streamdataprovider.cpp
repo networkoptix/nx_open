@@ -42,7 +42,7 @@ QnStreamQuality QnAbstractMediaStreamDataProvider::getQuality() const
 void QnAbstractMediaStreamDataProvider::setNeedKeyData()
 {
 	QMutexLocker mtx(&m_proc_CS);
-    int channel_num = getVideoLayout()->numberOfChannels();
+    int channel_num = m_mediaResource->getVideoLayout()->numberOfChannels();
 	for (unsigned i = 0; i < channel_num; ++i)
 		m_gotKeyFrame[i] = 0;
 }
@@ -56,8 +56,7 @@ bool QnAbstractMediaStreamDataProvider::needKeyData(int channel) const
 bool QnAbstractMediaStreamDataProvider::needKeyData() const
 {
 	QMutexLocker mtx(&m_proc_CS);
-    QnAbstractMediaStreamDataProvider* tmp = const_cast<QnAbstractMediaStreamDataProvider*>(this);
-    int channel_num = tmp->getVideoLayout()->numberOfChannels();
+    int channel_num = m_mediaResource->getVideoLayout(this)->numberOfChannels();
 	for (unsigned i = 0; i < channel_num; ++i)
 		if (m_gotKeyFrame[i]==0)
 			return true;
@@ -140,18 +139,6 @@ bool QnAbstractMediaStreamDataProvider::afterGetData(QnAbstractDataPacketPtr d)
 
     return true;
 
-}
-
-QnVideoResourceLayout* QnAbstractMediaStreamDataProvider:: getVideoLayout()
-{
-    static QnDefaultDeviceVideoLayout videolayout;
-    return &videolayout;
-}
-
-QnResourceAudioLayout* QnAbstractMediaStreamDataProvider:: getAudioLayout()
-{
-    static QnEmptyAudioLayout audiolayout;
-    return &audiolayout;
 }
 
 const QnStatistics* QnAbstractMediaStreamDataProvider:: getStatistics(int channel) const
