@@ -7,7 +7,7 @@
 // Temporary until real ResourceFactory is implemented
 
 
-CLDeviceCommandProcessor QnResource::m_commanproc;
+QnResourceCommandProcessor QnResource::m_commanproc;
 
 QnResourceType::QnResourceType()
 {
@@ -27,7 +27,8 @@ QnResourceType::~QnResourceType()
 QnResource::QnResource():
 m_flags(0),
 m_avalable(true),
-m_mutex(QMutex::Recursive)
+m_mutex(QMutex::Recursive),
+m_status(Offline)
 {
 }
 
@@ -86,26 +87,6 @@ void QnResource::setName(const QString& name)
 	m_name = name;
 }
 
-/*
-QnParamList& QnResource::getDeviceParamList()
-{
-    QMutexLocker locker(&m_mutex);
-	if (m_resourceParamList.empty())
-		m_resourceParamList = static_device_list[m_name];
-
-	return m_resourceParamList;
-}
-
-const QnParamList& QnResource::getDeviceParamList() const
-{
-    QMutexLocker locker(&m_mutex);
-	if (m_resourceParamList.empty())
-		m_resourceParamList = static_device_list[m_name];
-
-	return m_resourceParamList;
-
-}
-*/
 
 bool QnResource::checkFlag(unsigned long flag) const
 {
@@ -257,8 +238,8 @@ public:
 
       void execute()
       {
-          //if (m_resource->hasSuchConsumer() isConnectedToTheResource())
-            m_resource->setParam(m_name, m_val, m_domain);
+            if (isConnectedToTheResource())
+                m_resource->setParam(m_name, m_val, m_domain);
       }
 
 private:
@@ -314,6 +295,29 @@ void QnResource::setTypeId(const QnId& id)
     m_typeId = id;
 }
 
+void QnResource::setStatus(QnResource::Status status)
+{
+    QMutexLocker locker(&m_mutex);
+
+    if (m_status == status) // if status did not changed => do nothing 
+        return;
+
+    if (m_status == Offline && status == Online)
+        beforeUse();
+
+    Status old_status = m_status;
+    m_status = status;
+
+    emit onStatusChanged(old_status, m_status);
+}
+
+QnResource::Status QnResource::getStatus() const
+{
+    QMutexLocker locker(&m_mutex);
+    return m_status;
+}
+
+
 QDateTime QnResource::getLastDiscoveredTime() const
 {
     QMutexLocker locker(&m_mutex);
@@ -326,16 +330,6 @@ void QnResource::setLastDiscoveredTime(const QDateTime &time)
     m_lastDiscoveredTime = time;
 }
 
-
-bool QnResource::available() const
-{
-    return m_avalable;
-}
-
-void QnResource::setAvailable(bool av)
-{
-    m_avalable = av;
-}
 
 
 QnId QnResource::getId() const

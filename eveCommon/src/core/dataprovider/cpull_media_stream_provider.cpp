@@ -13,7 +13,6 @@ void QnClientPullMediaStreamProvider::run()
 	CL_LOG(cl_logINFO) cl_log.log(QLatin1String("stream reader started."), cl_logINFO);
 
 	setNeedKeyData();
-	m_resource->beforeUse();
 
 	int frames_lost = 0;
 
@@ -32,7 +31,7 @@ void QnClientPullMediaStreamProvider::run()
 		}
 
 
-		if (QnResource::commandProchasSuchDeviceInQueue(m_resource->getUniqueId())) // if command processor has something in the queue for this device let it go first
+		if (QnResource::commandProchasSuchDeviceInQueue(m_resource)) // if command processor has something in the queue for this device let it go first
 		{
 			QnSleep::msleep(5);
 			continue;
@@ -49,22 +48,26 @@ void QnClientPullMediaStreamProvider::run()
 			m_stat[0].onEvent(CL_STAT_FRAME_LOST);
 
 			if (frames_lost==4) // if we lost 2 frames => connection is lost for sure (2)
+            {
+                getResource()->setStatus(QnResource::Offline);
 				m_stat[0].onLostConnection();
+            }
 
 			QnSleep::msleep(30);
 
 			continue;
 		}
 
+        getResource()->setStatus(QnResource::Online);
+
 		QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
+        
 
 		if (frames_lost>0) // we are alive again
 		{
 			if (frames_lost>=4)
 			{
 				m_stat[0].onEvent(CL_STAT_CAMRESETED);
-
-				m_resource->beforeUse();
 			}
 
 			frames_lost = 0;

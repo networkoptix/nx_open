@@ -47,10 +47,6 @@ public:
     
     virtual QImage getImage(int channnel, QDateTime time, QnStreamQuality quality);
 
-    virtual int getStreamDataProvidersMaxAmount() const;
-    virtual QnAbstractMediaStreamDataProvider* createMediaProvider();
-
-    
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames 
     virtual void setCropingPhysical(QRect croping);

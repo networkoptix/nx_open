@@ -34,7 +34,7 @@ protected:
     // if function returns false we do not put result into the queues
     virtual bool afterGetData(QnAbstractDataPacketPtr data);
 
-    virtual void updateStreamParamsBasedOnQuality() {}
+    virtual void updateStreamParamsBasedOnQuality(){};
 
 protected:
     int m_channel_number;
@@ -44,7 +44,6 @@ protected:
 	int m_gotKeyFrame[CL_MAX_CHANNEL_NUMBER];
 	//int m_NumaberOfVideoChannels;
 	QnStreamQuality m_qulity;
-    QnParamList m_streamParam;
 
     int mFramesLost;
     QnMediaResourcePtr m_mediaResource;

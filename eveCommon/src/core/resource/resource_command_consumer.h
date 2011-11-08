@@ -3,6 +3,8 @@
 
 #include "../datapacket/datapacket.h"
 #include "resource_consumer.h"
+#include "../dataconsumer/dataconsumer.h"
+#include "utils/common/qnid.h"
 
 
 
@@ -13,6 +15,7 @@ public:
     QnResourceCommand(QnResourcePtr res);
     virtual ~QnResourceCommand();
     virtual void execute() = 0;
+    virtual void beforeDisconnectFromResource();
 };
 
 typedef QSharedPointer<QnResourceCommand> QnResourceCommandPtr;

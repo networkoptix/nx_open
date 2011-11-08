@@ -11,11 +11,9 @@ public:
 	CLArecontSingleSensorResource(const QString& name);
 	bool getDescription();
 
-	virtual bool hasTestPattern() const;
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
-protected:
-	bool m_hastestPattern;
+	
 
 };
 

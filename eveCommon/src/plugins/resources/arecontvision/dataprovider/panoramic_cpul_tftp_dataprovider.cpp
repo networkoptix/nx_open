@@ -65,7 +65,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 				return QnAbstractMediaDataPtr(0);
 			}
 
-			streamID = m_streamParam.get("streamID").value();
+			streamID = m_streamParam.get("streamID");
 
 		}
 
@@ -260,7 +260,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 
 bool AVPanoramicClientPullSSTFTPStreamreader::needKeyData() const
 {
-    QMutexLocker mtx(&m_proc_CS);
+    QMutexLocker mtx(&m_mutex);
 	for (int i = 0; i < 4; ++i)
 		if (m_gotKeyFrame[i]<2)  // due to bug of AV panoramic H.264 cam. cam do not send frame with diff resolution of resolution changed. first I frame comes with old resolution
 			return true;

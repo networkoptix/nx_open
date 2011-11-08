@@ -1,8 +1,7 @@
 #include "av_singesensor.h"
 #include "../dataprovider/cpul_tftp_dataprovider.h"
 
-CLArecontSingleSensorResource::CLArecontSingleSensorResource(const QString& name):
-m_hastestPattern(true)
+CLArecontSingleSensorResource::CLArecontSingleSensorResource(const QString& name)
 {
     setName(name);
 }
@@ -38,7 +37,3 @@ QnAbstractStreamDataProvider* CLArecontSingleSensorResource::createLiveDataProvi
 	return new AVClientPullSSTFTPStreamreader(toSharedPointer());
 }
 
-bool CLArecontSingleSensorResource::hasTestPattern() const
-{
-	return m_hastestPattern;
-}

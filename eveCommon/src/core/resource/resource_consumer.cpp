@@ -1,4 +1,5 @@
 #include "resource_consumer.h"
+#include "resource.h"
 
 
 QnResourceConsumer::QnResourceConsumer(QnResourcePtr resource):

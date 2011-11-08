@@ -27,7 +27,7 @@ QnAbstractMediaStreamDataProvider::~QnAbstractMediaStreamDataProvider()
 
 void QnAbstractMediaStreamDataProvider::setQuality(QnStreamQuality q)
 {
-	QMutexLocker mtx(&m_proc_CS);
+	QMutexLocker mtx(&m_mutex);
 	m_qulity = q;
 	updateStreamParamsBasedOnQuality();
 	//setNeedKeyData();
@@ -35,27 +35,27 @@ void QnAbstractMediaStreamDataProvider::setQuality(QnStreamQuality q)
 
 QnStreamQuality QnAbstractMediaStreamDataProvider::getQuality() const
 {
-	QMutexLocker mtx(&m_proc_CS);
+	QMutexLocker mtx(&m_mutex);
 	return m_qulity;
 }
 
 void QnAbstractMediaStreamDataProvider::setNeedKeyData()
 {
-	QMutexLocker mtx(&m_proc_CS);
-    int channel_num = m_mediaResource->getVideoLayout()->numberOfChannels();
+	QMutexLocker mtx(&m_mutex);
+    int channel_num = m_mediaResource->getVideoLayout(this)->numberOfChannels();
 	for (unsigned i = 0; i < channel_num; ++i)
 		m_gotKeyFrame[i] = 0;
 }
 
 bool QnAbstractMediaStreamDataProvider::needKeyData(int channel) const
 {
-	QMutexLocker mtx(&m_proc_CS);
+	QMutexLocker mtx(&m_mutex);
 	return m_gotKeyFrame[channel]==0;
 }
 
 bool QnAbstractMediaStreamDataProvider::needKeyData() const
 {
-	QMutexLocker mtx(&m_proc_CS);
+	QMutexLocker mtx(&m_mutex);
     int channel_num = m_mediaResource->getVideoLayout(this)->numberOfChannels();
 	for (unsigned i = 0; i < channel_num; ++i)
 		if (m_gotKeyFrame[i]==0)
@@ -68,7 +68,6 @@ bool QnAbstractMediaStreamDataProvider::needKeyData() const
 void QnAbstractMediaStreamDataProvider::beforeRun()
 {
     setNeedKeyData();
-    m_mediaResource->beforeUse();
     mFramesLost = 0;
 }
 
@@ -105,8 +104,6 @@ bool QnAbstractMediaStreamDataProvider::afterGetData(QnAbstractDataPacketPtr d)
         if (mFramesLost >= 4)
         {
             m_stat[0].onEvent(CL_STAT_CAMRESETED);
-
-            m_mediaResource->beforeUse(); // must be resource reseted
         }
 
         mFramesLost = 0;

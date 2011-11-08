@@ -10,7 +10,6 @@ public:
 	CLArecontPanoramicResource(const QString& name);
 	bool getDescription();
 
-	virtual bool hasTestPattern() const;
     virtual const QnVideoResourceLayout* getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0);
 protected:
 
@@ -24,7 +23,6 @@ private:
 	bool setCamQulity(int q);
 
 protected:
-	bool m_hastestPattern;
     QnVideoResourceLayout* m_vrl;
 };
 

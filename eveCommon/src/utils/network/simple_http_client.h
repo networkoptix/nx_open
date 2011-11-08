@@ -14,7 +14,7 @@ enum CLHttpStatus
     CL_TRANSPORT_ERROR = -1
 };
 
-class CLSimpleHTTPClient : public CLAssociativeArray
+class CLSimpleHTTPClient : public QnAssociativeArray
 {
     enum {Basic , Digestaccess };
 public:	

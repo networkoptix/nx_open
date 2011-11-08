@@ -64,22 +64,22 @@ QnAbstractMediaDataPtr  AVClientPullSSHTTPStreamreader::getNextData()
 			}
 
 			//=========
-			left = m_streamParam.get("image_left").value();
-			top = m_streamParam.get("image_top").value();
-			right = m_streamParam.get("image_right").value();
-			bottom = m_streamParam.get("image_bottom").value();
+			left = m_streamParam.get("image_left");
+			top = m_streamParam.get("image_top");
+			right = m_streamParam.get("image_right");
+			bottom = m_streamParam.get("image_bottom");
 
 			width = right - left;
 			height = bottom - top;
 
-			quality = m_streamParam.get("Quality").value();
+			quality = m_streamParam.get("Quality");
 			//quality = getQuality();
 
-			resolutionFULL = (m_streamParam.get("resolution").value() == QString("full"));
+			resolutionFULL = (m_streamParam.get("resolution") == QString("full"));
 			streamID = 0;
 			if (h264)
 			{
-				streamID = m_streamParam.get("streamID").value();
+				streamID = m_streamParam.get("streamID");
 				//bitrate = m_streamParam.get("Bitrate").value.value;
 				bitrate = getBitrate();
 			}
@@ -177,7 +177,7 @@ QnAbstractMediaDataPtr  AVClientPullSSHTTPStreamreader::getNextData()
 
 	if (h264) // for jpej keyFrame always true
 	{
-		if (!http_client.exist("Content-Type")) // very strange
+		if (!http_client.exists("Content-Type")) // very strange
 		{
 			videoData->flags &= ~AV_PKT_FLAG_KEY;
 		}

@@ -1,4 +1,5 @@
 #include "resource_command_consumer.h"
+#include "resource.h"
 
 QnResourceCommand::QnResourceCommand(QnResourcePtr res):
 QnResourceConsumer(res)
@@ -10,6 +11,11 @@ QnResourceCommand::~QnResourceCommand()
 {
 
 };
+
+void QnResourceCommand::beforeDisconnectFromResource()
+{
+    disconnectFromResource();
+}
 
 /////////////////////
 

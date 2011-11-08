@@ -4,7 +4,6 @@
 #include "core/resource/resource_media_layout.h"
 
 
-
 class AVVideoLayout180 : public QnVideoResourceLayout
 {
 public:
@@ -112,8 +111,8 @@ AVVideoLayout360 avVideoLayout360;
 AVVideoLayout180 avVideoLayout180;
 
 
-CLArecontPanoramicResource::CLArecontPanoramicResource(const QString& name):
-m_hastestPattern(false)
+
+CLArecontPanoramicResource::CLArecontPanoramicResource(const QString& name)
 {
     setName(name);
     if (name.contains("8180") || name.contains("8185"))
@@ -135,10 +134,6 @@ QnAbstractStreamDataProvider* CLArecontPanoramicResource::createLiveDataProvider
 	return new AVPanoramicClientPullSSTFTPStreamreader(toSharedPointer());
 }
 
-bool CLArecontPanoramicResource::hasTestPattern() const
-{
-	return m_hastestPattern;
-}
 
 bool CLArecontPanoramicResource::setParamPhysical(const QString& name, const QnValue& val )
 {

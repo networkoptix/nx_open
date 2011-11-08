@@ -3,11 +3,15 @@
 
 #include "utils/common/longrunnable.h"
 #include "../resource/resource_consumer.h"
+#include "../datapacket/datapacket.h"
+#include "../resource/param.h"
+#include "../dataconsumer/dataconsumer.h"
 
 
 
 class QnAbstractStreamDataProvider;
 class QnResource;
+class QnAbstractDataConsumer;
 
 #define CL_MAX_DATASIZE (10*1024*1024) // assume we can never get compressed data with  size greater than this
 #define CL_MAX_CHANNEL_NUMBER (10) 
@@ -64,18 +68,10 @@ protected:
 protected:
 
 	QList<QnAbstractDataConsumer*> m_dataprocessors;
-	mutable QMutex m_proc_CS;
+	
 
-	mutable QMutex m_params_CS;
-	QnParamList m_streamParam;
-
-	//QnStatistics* m_stat;
-
-	//int m_gotKeyFrame[CL_MAX_CHANNEL_NUMBER];
-
-	//QnStreamQuality m_qulity;
-
-	//volatile bool m_needSleep;
+	mutable QMutex m_mutex;
+	QnAssociativeArray m_streamParam;
 
 };
 

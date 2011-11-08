@@ -1,11 +1,10 @@
 #include "abstract_streamdataprovider.h"
+#include "../resource/resource.h"
 
 
 QnAbstractStreamDataProvider::QnAbstractStreamDataProvider(QnResourcePtr resource):
     QnResourceConsumer(resource),
-    m_proc_CS(QMutex::Recursive),
-    m_params_CS(QMutex::Recursive)
-//m_needSleep(true)
+    m_mutex(QMutex::Recursive)
 {
 
 }
@@ -35,7 +34,7 @@ bool QnAbstractStreamDataProvider::dataCanBeAccepted() const
 
 void QnAbstractStreamDataProvider::addDataProcessor(QnAbstractDataConsumer* dp)
 {
-	QMutexLocker mutex(&m_proc_CS);
+	QMutexLocker mutex(&m_mutex);
 
 	if (!m_dataprocessors.contains(dp))
     {
@@ -48,13 +47,13 @@ void QnAbstractStreamDataProvider::addDataProcessor(QnAbstractDataConsumer* dp)
 
 void QnAbstractStreamDataProvider::removeDataProcessor(QnAbstractDataConsumer* dp)
 {
-	QMutexLocker mutex(&m_proc_CS);
+	QMutexLocker mutex(&m_mutex);
 	m_dataprocessors.removeOne(dp);
 }
 
 void QnAbstractStreamDataProvider::setSpeed(double value)
 {
-    QMutexLocker mutex(&m_proc_CS);
+    QMutexLocker mutex(&m_mutex);
     for (int i = 0; i < m_dataprocessors.size(); ++i)
     {
         QnAbstractDataConsumer* dp = m_dataprocessors.at(i);
@@ -68,7 +67,7 @@ void QnAbstractStreamDataProvider::putData(QnAbstractDataPacketPtr data)
     if (!data)
         return;
 
-	QMutexLocker mutex(&m_proc_CS);
+	QMutexLocker mutex(&m_mutex);
 	for (int i = 0; i < m_dataprocessors.size(); ++i)
 	{
 		QnAbstractDataConsumer* dp = m_dataprocessors.at(i);
