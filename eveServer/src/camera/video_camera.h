@@ -1,6 +1,7 @@
 #ifndef __VIDEO_CAMERA_H__
 #define __VIDEO_CAMERA_H__
 
+#include "core/resource/resource.h"
 #include "core/resource/resource_consumer.h"
 
 class QnAbstractMediaStreamDataProvider;
