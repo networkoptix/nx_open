@@ -180,7 +180,7 @@ int main(int argc, char *argv[])
     addTestData();
 #endif
 
-    QHostAddress host("127.0.0.1");
+    QHostAddress host("10.0.2.3");
     QAuthenticator auth;
     auth.setUser("appserver");
     auth.setPassword("123");
