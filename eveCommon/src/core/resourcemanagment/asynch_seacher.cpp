@@ -87,6 +87,7 @@ void QnResourceDiscoveryManager::run()
         {
             processor->processResources(result);
         }
+
         foreach(QnResourcePtr res, result)
         {
             res->setStatus(QnResource::Online);
@@ -298,7 +299,7 @@ struct check_if_accessible_STRUCT
 
     void f()
     {
-        bool acc = resourceNet->checkNetworkStatus(QnNetworkResource::BadHostAddr); // bad ip already
+        bool acc = !resourceNet->checkNetworkStatus(QnNetworkResource::BadHostAddr); // bad ip already
 
         if (acc)
         {

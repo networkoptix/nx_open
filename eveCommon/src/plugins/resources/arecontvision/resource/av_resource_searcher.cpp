@@ -147,8 +147,9 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
 				/*/
 
 				// in any case let's HTTP do it's job at very end of discovery
-				QnNetworkResourcePtr resource ( new QnPlAreconVisionResource() );
+				QnNetworkResourcePtr resource( new QnPlAreconVisionResource() );
 				//resource->setName("AVUNKNOWN");
+                resource->setTypeId(qnResTypePool->getResourceTypeId(QnPlAreconVisionResource::MANUFACTURE, "ArecontVision_Abstract"));
 
 				if (resource==0)
 					continue;
