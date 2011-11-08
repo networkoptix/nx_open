@@ -22,34 +22,39 @@ void QnResourceType::addParamType(QnParamTypePtr param)
 
 const QList<QnParamTypePtr>& QnResourceType::paramTypeList() const
 {
-    if (!m_allParamTypeListCache.isNull())
-        return *(m_allParamTypeListCache.data());
-
-    m_allParamTypeListCache = QSharedPointer<ParamTypeList>(new ParamTypeList());
-
-    ParamTypeList paramTypeList = ParamTypeList();
-
-    paramTypeList += m_paramTypeList;
-
-    foreach(const QnId& parentId, allParentList())
+    if (m_allParamTypeListCache.isNull())
     {
-        QnResourceTypePtr parent = qnResTypePool->getResourceType(parentId);
+        QMutexLocker _lock(&m_allParamTypeListCacheMutex);
 
-        if (!parent.isNull())
-            paramTypeList += parent->paramTypeList();
-    }
+        if (!m_allParamTypeListCache.isNull())
+            return *(m_allParamTypeListCache.data());
 
-    QSet<QString> paramTypeNames;
+        m_allParamTypeListCache = QSharedPointer<ParamTypeList>(new ParamTypeList());
 
-    QList<QnParamTypePtr>::iterator it = paramTypeList.begin();
-    for (; it != paramTypeList.end(); ++it)
-    {
-        const QnParamTypePtr& paramType = *it;
+        ParamTypeList paramTypeList = ParamTypeList();
 
-        if (!paramTypeNames.contains(paramType->name))
+        paramTypeList += m_paramTypeList;
+
+        foreach(const QnId& parentId, allParentList())
         {
-            m_allParamTypeListCache->append(paramType);
-            paramTypeNames.insert(paramType->name);
+            QnResourceTypePtr parent = qnResTypePool->getResourceType(parentId);
+
+            if (!parent.isNull())
+                paramTypeList += parent->paramTypeList();
+        }
+
+        QSet<QString> paramTypeNames;
+
+        QList<QnParamTypePtr>::iterator it = paramTypeList.begin();
+        for (; it != paramTypeList.end(); ++it)
+        {
+            const QnParamTypePtr& paramType = *it;
+
+            if (!paramTypeNames.contains(paramType->name))
+            {
+                m_allParamTypeListCache->append(paramType);
+                paramTypeNames.insert(paramType->name);
+            }
         }
     }
 

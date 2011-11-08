@@ -41,6 +41,7 @@ private:
     typedef QList<QnParamTypePtr> ParamTypeList;
     ParamTypeList m_paramTypeList;
 
+    mutable QMutex m_allParamTypeListCacheMutex;
     mutable QSharedPointer<ParamTypeList> m_allParamTypeListCache;
 };
 

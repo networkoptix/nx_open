@@ -90,7 +90,9 @@ void QnResourceDiscoveryManager::run()
 
         foreach(QnResourcePtr res, result)
         {
-            res->setStatus(QnResource::Online);
+            QnResourcePtr resource = qnResPool->getResourceByUniqId(res->getUniqueId());
+            if (!resource.isNull())
+                resource->setStatus(QnResource::Online);
         }
 
         int global_delay_between_search = 1000;

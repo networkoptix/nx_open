@@ -47,9 +47,13 @@ int QnAppServerConnection::getResources(QList<QnResourcePtr>& resources)
     return status;
 }
 
-int QnAppServerConnection::addServer(const QnResource& serverIn, QList<QnResourcePtr>& servers)
+int QnAppServerConnection::addServer(const QnServer& serverIn, QList<QnServerPtr>& servers)
 {
-    xsd::api::servers::Server server(serverIn.getId().toString().toStdString(), serverIn.getName().toStdString(), serverIn.getTypeId().toString().toStdString());
+    xsd::api::servers::Server server(serverIn.getId().toString().toStdString(),
+                                     serverIn.getName().toStdString(),
+                                     serverIn.getTypeId().toString().toStdString(),
+                                     serverIn.getUrl().toStdString(),
+                                     serverIn.getMAC().toString().toStdString());
 
     QnApiServerResponsePtr xsdServers;
 
@@ -62,16 +66,16 @@ int QnAppServerConnection::addServer(const QnResource& serverIn, QList<QnResourc
     return 1;
 }
 
-int QnAppServerConnection::addCamera(const QnResource& cameraIn, const QnId& serverIdIn, QList<QnResourcePtr>& cameras)
+int QnAppServerConnection::addCamera(const QnNetworkResource& cameraIn, const QnId& serverIdIn, QList<QnResourcePtr>& cameras)
 {
     xsd::api::cameras::Camera camera(cameraIn.getId().toString().toStdString(),
                                      cameraIn.getName().toStdString(),
                                      cameraIn.getTypeId().toString().toStdString(),
                                      "1",
-                                     "url",
-                                     "mac",
-                                     "login",
-                                     "password");
+                                     cameraIn.getUrl().toStdString(),
+                                     cameraIn.getMAC().toString().toStdString(),
+                                     cameraIn.getAuth().user().toStdString(),
+                                     cameraIn.getAuth().password().toStdString());
 
     camera.parentID(serverIdIn.toString().toInt());
 

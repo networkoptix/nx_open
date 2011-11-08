@@ -2,7 +2,7 @@
 
 #include "core/resourcemanagment/asynch_seacher.h"
 
-void parseServers(QList<QnResourcePtr>& servers, const QnApiServers& xsdServers, QnResourceFactory& resourceFactory)
+void parseServers(QList<QnServerPtr>& servers, const QnApiServers& xsdServers, QnResourceFactory& resourceFactory)
 {
     using xsd::api::servers::Servers;
     using xsd::api::resourceTypes::ParentIDs;
@@ -11,11 +11,10 @@ void parseServers(QList<QnResourcePtr>& servers, const QnApiServers& xsdServers,
 
     for (Servers::server_const_iterator i (xsdServers.begin()); i != xsdServers.end(); ++i)
     {
-        QnResourceParameters parameters;
-        parameters["id"] = i->id().c_str();
-        parameters["name"] = i->name().c_str();
-
-        QnResourcePtr server = resourceFactory.createResource(i->typeId().c_str(), parameters);
+        QnServerPtr server(new QnServer(i->name().c_str()));
+        server->setId(i->id().c_str());
+        server->setUrl(i->id().c_str());
+        server->setMAC(QString(i->mac().c_str()));
 
         servers.append(server);
     }

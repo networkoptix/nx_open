@@ -15,11 +15,14 @@
 #include <QAuthenticator>
 #include "recording/file_deletor.h"
 #include "rest/server/rest_server.h"
+#include "core/resource/server.h"
 
 //#include "device_plugins/arecontvision/devices/av_device_server.h"
 
 //#define TEST_RTSP_SERVER
 
+
+QnId serverId;
 
 QMutex global_ffmpeg_mutex;
 
@@ -43,6 +46,33 @@ void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args
     }
 
     cl_log.log(QLatin1String("FFMPEG "), QString::fromLocal8Bit(szMsg), cl_logERROR);
+}
+
+// XXX: This it temprorary functions for reading/writing our server id.
+// Later this code will be moved to settings handling class.
+QString readServerId()
+{
+    QString result;
+
+    QFile file("server.id");
+    if (!file.open (QIODevice::ReadOnly))
+        return result;
+
+    QTextStream stream ( &file );
+    QString line;
+    result = stream.readAll();
+    file.close();
+
+    return result;
+}
+
+void writeServerId(const QString& serverId)
+{
+    QFile file("server.id");
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out(&file);
+    out << serverId;
+    file.close();
 }
 
 #ifndef UNICLIENT_TESTS
@@ -102,6 +132,29 @@ void addTestData()
 }
 #endif
 
+
+void registerServer(QnAppServerConnection& appServerConnection)
+{
+    QString myAddress = "10.0.2.119";
+
+    QNetworkInterface networkInterface = QNetworkInterface::interfaceFromName(myAddress);
+    QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
+
+    serverId = readServerId();
+    if (!serverId.isValid())
+    {
+        QnServer server(networkInterface.hardwareAddress());
+
+        server.setMAC(networkInterface.hardwareAddress());
+        server.setUrl(myAddress);
+
+        QnServerList servers;
+        appServerConnection.addServer(server, servers);
+
+        serverId = servers.at(0)->getId();
+        writeServerId(serverId.toString());
+    }
+}
 
 #ifndef API_TEST_MAIN
 int main(int argc, char *argv[])
@@ -186,11 +239,13 @@ int main(int argc, char *argv[])
     auth.setPassword("123");
     QnAppServerConnection appServerConnection(host, auth, QnResourceDiscoveryManager::instance());
 
-    QnAppserverResourceProcessor processor("28", host, auth, QnResourceDiscoveryManager::instance());
-
     QList<QnResourceTypePtr> resourceTypeList;
     appServerConnection.getResourceTypes(resourceTypeList);
     qnResTypePool->addResourceTypeList(resourceTypeList);
+
+    registerServer(appServerConnection);
+
+    QnAppserverResourceProcessor processor(serverId, host, auth, QnResourceDiscoveryManager::instance());
 
     QnRtspListener rtspListener(QHostAddress::Any, 50000);
     rtspListener.start();
