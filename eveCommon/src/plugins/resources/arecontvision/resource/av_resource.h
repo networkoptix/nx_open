@@ -58,7 +58,7 @@ public:
     //virtual QnMediaInfo getMediaInfo() const;
 
 protected:
-    virtual QnAbstractStreamDataProvider* createLiveDataProvider() { Q_ASSERT_X(false, Q_FUNC_INFO, "QnPlAreconVisionResource is abstract."); }
+    virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
     // should change value in memory domain 
     virtual bool getParamPhysical(const QString& name, QnValue& val);
