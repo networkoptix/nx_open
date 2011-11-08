@@ -134,6 +134,17 @@ qint64 QnAviArchiveDelegate::endTime()
     return contentLength();
 }
 
+QnMediaContextPtr QnAviArchiveDelegate::getCodecContext(AVStream* stream)
+{
+    while (m_contexts.size() <= stream->index)
+        m_contexts << QnMediaContextPtr(0);
+
+    if (m_contexts[stream->index] == 0)
+        m_contexts[stream->index] = QnMediaContextPtr(new QnMediaContext(stream->codec));
+
+    return m_contexts[stream->index];
+}
+
 QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
 {
     if (!findStreams())
@@ -159,7 +170,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
                     av_free_packet(&packet);
                     continue;
                 }
-                videoData = new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, packet.size, stream->codec);
+                videoData = new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, packet.size, getCodecContext(stream));
                 videoData->channelNumber = m_indexToChannel[stream->index]; // [packet.stream_index]; // defalut value
                 data = QnAbstractMediaDataPtr(videoData);
                 break;
@@ -169,7 +180,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
                     continue;
                 }
 
-                audioData = new QnCompressedAudioData(CL_MEDIA_ALIGNMENT, packet.size, stream->codec);
+                audioData = new QnCompressedAudioData(CL_MEDIA_ALIGNMENT, packet.size, getCodecContext(stream));
                 audioData->format.fromAvStream(stream->codec);
                 time_base = av_q2d(stream->time_base)*1e+6;
                 audioData->duration = qint64(time_base * packet.duration);

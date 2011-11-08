@@ -122,3 +122,33 @@ QString closeDirPath(const QString& value)
     else
         return value + QString('/');
 }
+#ifdef Q_OS_WIN32
+qint64 getDiskFreeSpace(const QString& root)
+{
+    quint64 freeBytesAvailableToCaller = -1;
+    quint64 totalNumberOfBytes = -1;
+    quint64 totalNumberOfFreeBytes = -1;
+    BOOL rez = GetDiskFreeSpaceEx(
+        (LPCWSTR) root.data(), // pointer to the directory name
+        (PULARGE_INTEGER) &freeBytesAvailableToCaller, // receives the number of bytes on disk available to the caller
+        (PULARGE_INTEGER) &totalNumberOfBytes, // receives the number of bytes on disk
+        (PULARGE_INTEGER) &totalNumberOfFreeBytes // receives the free bytes on disk
+        );
+    return totalNumberOfFreeBytes;
+};
+#else 
+qint64 getDiskFreeSpace(const QString& root) {
+    struct statvfs buf;
+    if (statvfs(root.toUtf8().data(), &buf) == 0)
+    {
+        qint64 disk_size = buf.f_blocks * (qint64) buf.f_bsize;
+        qint64 free = buf.f_bfree * (qint64) buf.f_bsize;
+        qint64 used = disk_size - free;
+
+        return free;
+    }
+    else {
+        return -1;
+    }
+}
+#endif

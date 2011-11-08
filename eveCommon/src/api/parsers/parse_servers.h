@@ -4,6 +4,6 @@
 #include "api/Types.h"
 #include "core/resource/resource.h"
 
-void parseServers(QList<QnResourcePtr>& servers, const QnApiServers& xsdServers);
+void parseServers(QList<QnResourcePtr>& servers, const QnApiServers& xsdServers, QnResourceFactory& resourceFactory);
 
 #endif // _eve_parse_servers_

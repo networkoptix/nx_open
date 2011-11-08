@@ -5,7 +5,14 @@
 #include "../common/associativearray.h"
 
 
-enum CLHttpStatus {CL_HTTP_SUCCESS, CL_HTTP_AUTH_REQUIRED, CL_HTTP_HOST_NOT_AVAILABLE};
+enum CLHttpStatus
+{
+    CL_HTTP_SUCCESS = 200,
+    CL_HTTP_BAD_REQUEST = 400,
+    CL_HTTP_AUTH_REQUIRED = 401,
+
+    CL_TRANSPORT_ERROR = -1
+};
 
 class CLSimpleHTTPClient : public QnAssociativeArray
 {
@@ -15,6 +22,8 @@ public:
 	~CLSimpleHTTPClient();
 
     CLHttpStatus doGET(const QString& request, bool recursive = true);
+    CLHttpStatus doPOST(const QString& request, const QString& body);
+
     bool isOpened()const{return m_connected;}
 
     void readAll(QByteArray& data);
@@ -46,6 +55,8 @@ private:
 
     QString basicAuth() const;
     QString digestAccess(const QString&) const;
+
+    int readHeaders();
 
 private:
     QString m_line;

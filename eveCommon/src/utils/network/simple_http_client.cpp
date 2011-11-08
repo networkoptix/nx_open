@@ -41,7 +41,7 @@ CLHttpStatus CLSimpleHTTPClient::getNextLine()
 	while(1)
 	{
         if (m_sock->recv(&curr,1)<0)
-			return CL_HTTP_HOST_NOT_AVAILABLE;
+            return CL_TRANSPORT_ERROR;
 
 		if (prev=='\r' && curr == '\n')
 			break;
@@ -61,6 +61,137 @@ CLHttpStatus CLSimpleHTTPClient::getNextLine()
 
 }
 
+CLHttpStatus CLSimpleHTTPClient::doPOST(const QString& requestStr, const QString& body)
+{
+    try
+    {
+        if (!m_connected)
+        {
+            if (!m_sock->connect(m_host.toString().toLatin1().data(), m_port))
+            {
+                return CL_TRANSPORT_ERROR;
+            }
+        }
+
+        QString request;
+        QTextStream os(&request);
+
+        os << "POST /" << requestStr<<" HTTP/1.1\r\n"
+            << "Host: "<< m_host.toString() << "\r\n"
+            << "User-Agent: Simple HTTP Client 1.0\r\n"
+            << "Accept: */*\r\n"
+            << "Content-Type: application/x-www-form-urlencoded\r\n";
+
+        if (m_auth.user().length()>0 && mNonce.isEmpty())
+        {
+            os << basicAuth() << "\r\n";
+        }
+        else if (m_auth.password().length()>0 && !mNonce.isEmpty())
+        {
+            os << digestAccess(request);
+        }
+
+        os << "Content-Length: " << body.length() << "\r\n";
+        os << "\r\n";
+
+        os << body;
+
+        if (!m_sock->send(request.toLatin1().data(), request.toLatin1().size()))
+        {
+            return CL_TRANSPORT_ERROR;
+        }
+
+        if (CL_TRANSPORT_ERROR==getNextLine())
+        {
+            return CL_TRANSPORT_ERROR;
+        }
+
+        QStringList strings = m_line.split(" ");
+        if (strings.size() < 2)
+        {
+            close();
+            return CL_TRANSPORT_ERROR;
+        }
+
+        int responseCode = strings[1].toInt();
+
+        switch(responseCode)
+        {
+            case CL_HTTP_SUCCESS:
+            case CL_HTTP_BAD_REQUEST:
+            {
+                break;
+            }
+
+            case CL_HTTP_AUTH_REQUIRED:
+            {
+                getAuthInfo();
+                return CL_HTTP_AUTH_REQUIRED;
+            }
+
+            default:
+            {
+                close();
+                return CL_TRANSPORT_ERROR;
+            }
+        }
+
+        if (readHeaders() == CL_TRANSPORT_ERROR)
+            return CL_TRANSPORT_ERROR;
+
+        m_connected = true;
+
+        // Http statuses: OK or BAD_REQUEST
+        return (CLHttpStatus) responseCode;
+
+    }
+    catch (...)
+    {
+        close();
+        return CL_TRANSPORT_ERROR;
+    }
+}
+
+int CLSimpleHTTPClient::readHeaders()
+{
+    m_contentType.clear();
+    m_contentLen = 0;
+
+    int pos;
+
+    while(1)
+    {
+
+        pos = -1;
+
+        if (CL_TRANSPORT_ERROR==getNextLine())
+            return CL_TRANSPORT_ERROR;
+
+        if (m_line.length()<3)// last line before data
+            break;
+
+        //Content-Type
+        //ContentLength
+
+        pos  = m_line.indexOf(QLatin1Char(':'));
+
+        if (pos>=0)
+        {
+            QString name = m_line.left(pos).trimmed();
+            QString val = m_line.mid(pos+1, m_line.length()- (pos + 1 ) );
+            CLAssociativeArray::put(name, val );
+            if (name==QLatin1String("Content-Length"))
+            {
+                m_contentLen = val.toInt();
+                m_readed = 0;
+            }
+        }
+
+    }
+
+    return 0;
+}
+
 CLHttpStatus CLSimpleHTTPClient::doGET(const QString& requestStr, bool recursive)
 {
 	try
@@ -69,7 +200,7 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QString& requestStr, bool recursive
         {
             if (!m_sock->connect(m_host.toString().toLatin1().data(), m_port))
             {
-                return CL_HTTP_HOST_NOT_AVAILABLE;
+                return CL_TRANSPORT_ERROR;
             }
         }
 
@@ -94,12 +225,12 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QString& requestStr, bool recursive
         {
             qDebug() << "OpenStream1";
 
-            return CL_HTTP_HOST_NOT_AVAILABLE;
+            return CL_TRANSPORT_ERROR;
         }
 
-		if (CL_HTTP_HOST_NOT_AVAILABLE==getNextLine())
+        if (CL_TRANSPORT_ERROR==getNextLine())
         {
-			return CL_HTTP_HOST_NOT_AVAILABLE;
+            return CL_TRANSPORT_ERROR;
         }
 
         
@@ -117,54 +248,23 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QString& requestStr, bool recursive
                     return CL_HTTP_AUTH_REQUIRED;
             }
 
-			return CL_HTTP_HOST_NOT_AVAILABLE;
+            return CL_TRANSPORT_ERROR;
 		}
 
-		m_contentType.clear();
-		m_contentLen = 0;
+        if (readHeaders() == CL_TRANSPORT_ERROR)
+            return CL_TRANSPORT_ERROR;
 
-		int pos;
-
-		while(1)
-		{
-
-			pos = -1;
-
-			if (CL_HTTP_HOST_NOT_AVAILABLE==getNextLine())
-				return CL_HTTP_HOST_NOT_AVAILABLE;
-
-			if (m_line.length()<3)// last line before data
-				break;
-
-			//Content-Type
-			//ContentLength
-
-			pos  = m_line.indexOf(QLatin1Char(':'));
-
-			if (pos>=0)
-			{
-				QString name = m_line.left(pos).trimmed();
-				QString val = m_line.mid(pos+1, m_line.length()- (pos + 1 ) );
-				QnAssociativeArray::put(name, val );
-				if (name==QLatin1String("Content-Length"))
-				{
-					m_contentLen = val.toInt();
-					m_readed = 0;
-				}
-			}
-
-		}
-
+				CLAssociativeArray::put(name, val );
 		m_connected = true;
+
 		return CL_HTTP_SUCCESS;
 
 	}
 	catch (...)
 	{
         close();
-		return CL_HTTP_HOST_NOT_AVAILABLE;
+        return CL_TRANSPORT_ERROR;
 	}
-
 }
 
 void CLSimpleHTTPClient::close()
@@ -216,7 +316,7 @@ void CLSimpleHTTPClient::getAuthInfo()
 
         pos = -1;
 
-        if (CL_HTTP_HOST_NOT_AVAILABLE==getNextLine())
+        if (CL_TRANSPORT_ERROR==getNextLine())
             return;
 
         if (m_line.length()<3)// last line before data

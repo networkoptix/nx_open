@@ -3,7 +3,6 @@
 QnAbstractArchiveReader::QnAbstractArchiveReader(QnResourcePtr dev ) :
     QnClientPullMediaStreamProvider(dev),
     m_lengthMksec(0),
-    m_startMksec(0),
     m_singleShot(false),
     m_adaptiveSleep(20 * 1000),
     m_needToSleep(0),

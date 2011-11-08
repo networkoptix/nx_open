@@ -15,6 +15,7 @@ public:
     virtual ~QnVideoCameraPool();
 
     QnVideoCamera* getVideoCamera(QnResourcePtr res);
+    void removeVideoCamera(QnResourcePtr res);
 private:
     QnVideoCameraPool();
 private:

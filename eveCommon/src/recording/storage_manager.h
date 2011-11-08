@@ -42,18 +42,21 @@ public:
 
 
     QString getFileName(const qint64& fileDate, const QString& uniqId);
-    bool addFileInfo(const qint64& startDate, const qint64& endDate, const QString& fileName);
-
-    QList<ChunkMap::iterator> findFirstChunks(const QnResourceList& resList, qint64 startTime, qint64 endTime);
+    bool fileStarted(const qint64& startDate, const QString& fileName);
+    bool fileFinished(int duration, const QString& fileName);
 
     static QString dateTimeStr(qint64 dateTimeMks);
     QMap<int, QnStoragePtr> storageRoots() const { return m_storageRoots; }
     DeviceFileCatalogPtr getFileCatalog(const QnResourcePtr resource);
 private:
-    QMap<int, QnStoragePtr> m_storageRoots;
+    QnStoragePtr getOptimalStorageRoot();
+    void clearSpace(QnStoragePtr storage);
+private:
+    typedef QMap<int, QnStoragePtr> StorageMap;
+    StorageMap m_storageRoots;
     typedef QMap<QnResourcePtr, DeviceFileCatalogPtr> FileCatalogMap;
     FileCatalogMap m_devFileCatalog;
-    QMutex m_mutex;
+    mutable QMutex m_mutex;
 };
 
 #define qnStorageMan QnStorageManager::instance()

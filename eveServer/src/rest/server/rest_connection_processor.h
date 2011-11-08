@@ -11,12 +11,11 @@ class QnRestConnectionProcessor: public QnTCPConnectionProcessor
 public:
     QnRestConnectionProcessor(TCPSocket* socket, QnTcpListener* owner);
     virtual ~QnRestConnectionProcessor();
-
-
+    
 protected:
     void run();
 private:
-    QN_DECLARE_PRIVATE(QnRestConnectionProcessor);
+    QN_DECLARE_PRIVATE_DERIVED(QnRestConnectionProcessor);
 };
 
 #endif // _REST_CONNECTION_PROCESSOR_H__

@@ -41,6 +41,7 @@ protected:
 protected:
     GraphicsWidget *q_ptr;
 
+private:
     // packed 32 bit
     uint doubleClicked : 1;
     uint resizing : 1;

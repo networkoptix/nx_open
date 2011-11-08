@@ -7,12 +7,29 @@
 #include "datapacket.h"
 #include "utils/common/bytearray.h"
 
+struct AVCodecContext;
+
+class QnMediaContext
+{
+public:
+    QnMediaContext(AVCodecContext* ctx);
+    QnMediaContext(CodecID codecId);
+    QnMediaContext(const quint8* payload, int dataSize);
+    ~QnMediaContext();
+    AVCodecContext* ctx() const;
+    bool equalTo(QnMediaContext* other) const;
+private:
+    AVCodecContext* m_ctx;
+};
+typedef QSharedPointer<QnMediaContext> QnMediaContextPtr;
+
 struct QnAbstractMediaData : public QnAbstractDataPacket
 {
     enum MediaFlags {MediaFlags_None = 0, 
                      //MediaFlags_Key = 1,
                      MediaFlags_AfterEOF = 2,
-                     MediaFlags_BOF = 4
+                     MediaFlags_BOF = 4,
+                     MediaFlags_LIVE = 8,
                     };
 
 	QnAbstractMediaData(unsigned int alignment, unsigned int capacity)
@@ -38,7 +55,8 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
     unsigned flags;
     quint32 channelNumber;     // video or audio channel number; some devices might have more that one sensor.
     quint32 subChannelNumber; // video camera can provide combination of different context at single channel (H.264 hi-res and low-res for example)
-    void* context;
+    //void* context;
+    QnMediaContextPtr context;
 private:
 	QnAbstractMediaData() : 
        data(0,1){};
@@ -47,7 +65,7 @@ typedef QSharedPointer<QnAbstractMediaData> QnAbstractMediaDataPtr;
 
 struct QnCompressedVideoData : public QnAbstractMediaData
 {
-	QnCompressedVideoData(unsigned int alignment, unsigned int capacity, void* ctx = 0)
+	QnCompressedVideoData(unsigned int alignment, unsigned int capacity, QnMediaContextPtr ctx = QnMediaContextPtr(0))
         : QnAbstractMediaData(alignment, qMin(capacity, (unsigned int)10 * 1024 * 1024))
 	{
 		dataType = VIDEO;
@@ -135,7 +153,7 @@ public:
 
 struct QnCompressedAudioData : public QnAbstractMediaData
 {
-	QnCompressedAudioData (unsigned int alignment, unsigned int capacity, void* ctx = 0)
+	QnCompressedAudioData (unsigned int alignment, unsigned int capacity, QnMediaContextPtr ctx = QnMediaContextPtr(0))
         : QnAbstractMediaData(alignment, capacity)
 	{
 		dataType = AUDIO;

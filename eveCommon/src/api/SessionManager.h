@@ -21,7 +21,7 @@ public:
     int addCamera(const ::xsd::api::cameras::Camera&, QnApiCameraResponsePtr& cameras);
 
 private:
-    int addObject(const QString& objectName, const QByteArray& body, QByteArray& response);
+    CLHttpStatus addObject(const QString& objectName, const QByteArray& body, QByteArray& response);
 
 private:
     int getObjectList(QString objectName, QByteArray& reply);

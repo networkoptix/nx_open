@@ -32,8 +32,10 @@ common/src/common.pri
 
 eveClient/src/Info.plist
 eveClient/src/eveclient.pro
+eveClient/src/common.pro
 eveClient/src/version.h
 eveClient/src/Makefile
+eveClient/src/ipch
 
 eveCommon/src/common.pro
 eveCommon/src/plugins/resources/archive/filetypes.h

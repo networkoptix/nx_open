@@ -92,8 +92,8 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
 		// collecting response
 		QTime time;
 		time.start();
-
-		while(time.elapsed()<150)
+        QnSleep::msleep(150); // to avoid 100% cpu usage
+		//while(time.elapsed()<150)
 		{
 			while (sock.hasPendingDatagrams())
 			{
@@ -177,7 +177,7 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
 				result.push_back(resource);
 			}
 
-			QnSleep::msleep(2); // to avoid 100% cpu usage
+			//QnSleep::msleep(2); // to avoid 100% cpu usage
 
 		}
 
@@ -191,6 +191,23 @@ QnPlArecontResourceSearcher& QnPlArecontResourceSearcher::instance()
 {
 	static QnPlArecontResourceSearcher inst;
 	return inst;
+}
+
+QnResourcePtr QnPlArecontResourceSearcher::createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters)
+{
+    QnNetworkResourcePtr result(new QnPlAreconVisionResource());
+    result->deserialize(parameters);
+
+    return result;
+}
+
+bool QnPlArecontResourceSearcher::isResourceTypeSupported(const QnId& resourceTypeId) const
+{
+    QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
+    if (resourceType.isNull())
+        return false;
+
+    return resourceType->getManufacture() == manufacture();
 }
 
 QnResourcePtr QnPlArecontResourceSearcher::checkHostAddr(QHostAddress addr)

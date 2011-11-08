@@ -567,6 +567,16 @@ void QnFfmpegHelper::serializeCodecContext(const AVCodecContext *ctx, QByteArray
     // serialize context in way as avcodec_copy_context is works
     AVCodecContext dest;
     memcpy(&dest, ctx, sizeof(AVCodecContext));
+
+    dest.av_class = NULL;
+    dest.get_buffer = NULL;
+    dest.reget_buffer = NULL;
+    dest.get_format = NULL;
+    dest.release_buffer = NULL;
+    dest.execute = NULL;
+    dest.execute2 = NULL;
+
+
     dest.priv_data       = NULL;
     dest.codec           = NULL;
     dest.palctrl         = NULL;
@@ -595,8 +605,20 @@ AVCodecContext *QnFfmpegHelper::deserializeCodecContext(const char *data, int da
         qWarning() << Q_FUNC_INFO << __LINE__ << "Too few data for deserialize CodecContext";
         return 0;
     }
-    AVCodecContext* ctx = (AVCodecContext*) av_malloc(sizeof(AVCodecContext));
+    AVCodecContext* ctx = (AVCodecContext*) avcodec_alloc_context();
+    AVCodecContext tmp;
+    memcpy(&tmp, ctx, sizeof(AVCodecContext));
     memcpy(ctx, data, sizeof(AVCodecContext));
+
+    ctx->av_class = tmp.av_class;
+    ctx->get_buffer = tmp.get_buffer;
+    ctx->reget_buffer = tmp.reget_buffer;
+    ctx->get_format = tmp.get_format;
+    ctx->release_buffer = tmp.release_buffer;
+    ctx->execute = tmp.execute;
+    ctx->execute2 = tmp.execute2;
+
+
     dataLen -= sizeof(AVCodecContext);
     data += sizeof(AVCodecContext);
 

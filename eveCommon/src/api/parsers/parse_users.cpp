@@ -1,6 +1,8 @@
 #include "api/parsers/parse_users.h"
 
-void parseUsers(QList<QnResourcePtr>& users, const QnApiUsers& xsdUsers)
+#include "core/resource/resource.h"
+
+void parseUsers(QList<QnResourcePtr>& users, const QnApiUsers& xsdUsers, QnResourceFactory& resourceFactory)
 {
     using xsd::api::users::Users;
     using xsd::api::resourceTypes::ParentIDs;
@@ -13,7 +15,7 @@ void parseUsers(QList<QnResourcePtr>& users, const QnApiUsers& xsdUsers)
         parameters["id"] = i->id().c_str();
         parameters["name"] = i->name().c_str();
 
-        QnResourcePtr user = QnResourceFactoryPool::createResource(i->typeId().c_str(), parameters);
+        QnResourcePtr user = resourceFactory.createResource(i->typeId().c_str(), parameters);
 
         users.append(user);
     }

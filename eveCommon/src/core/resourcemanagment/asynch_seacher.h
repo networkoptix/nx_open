@@ -14,7 +14,7 @@ class QnAbstractResourceSearcher;
 // this class just searches for new resources
 // it uses others plugins 
 // it puts result into resource pool
-class QnResourceDiscoveryManager : public CLLongRunnable
+class QnResourceDiscoveryManager : public CLLongRunnable, public QnResourceFactory
 {
     typedef QList<QnAbstractResourceSearcher*> ResourceSearcherList;
 
@@ -28,6 +28,8 @@ public:
     //QnResourceList result();
     void addDeviceServer(QnAbstractResourceSearcher* serv);
 
+    QnResourcePtr createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters);
+
     virtual void pleaseStop();
 
     CLNetState& getNetState()
@@ -38,6 +40,7 @@ public:
 protected:
     QnResourceDiscoveryManager();
     virtual void run();
+
 private:
     // returns new resources( not from pool) or updates some in resource pool
     QnResourceList findNewResources(bool& ip_finished);
@@ -46,10 +49,7 @@ private:
 
     void resovle_conflicts(QnResourceList& device_list, const CLIPList& busy_list, bool& ip_finished);
 
-    
-
 private:
-
     ResourceSearcherList m_searchersList;
     QMutex m_searchersListMtx;
 

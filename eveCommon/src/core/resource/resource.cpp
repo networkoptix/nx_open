@@ -134,17 +134,17 @@ bool QnResource::hasSuchParam(const QString& name) const
     return getResourceParamList().exists(name);
 }
 
-bool QnResource::getParamPhysical(const QString& name, QnValue& val)
+bool QnResource::getParamPhysical(const QString& /*name*/, QnValue& /*val*/)
 {
     return false;
 }
 
-bool QnResource::setParamPhysical(const QString& name, const QnValue& val)
+bool QnResource::setParamPhysical(const QString& /*name*/, const QnValue& /*val*/)
 {
     return false;
 }
 
-bool QnResource::setSpecialParam(const QString& name, const QnValue& val, QnDomain domain)
+bool QnResource::setSpecialParam(const QString& /*name*/, const QnValue& /*val*/, QnDomain /*domain*/)
 {
     return false;
 }
@@ -435,50 +435,4 @@ QnAbstractStreamDataProvider* QnResource::createDataProvider(ConnectionRole role
     if (dataProvider)
         addConsumer(dataProvider);
     return dataProvider;
-}
-
-QnResourcePtr QnResourceFactory::createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters)
-{
-    return createResource(qnResTypePool->getResourceType(resourceTypeId), parameters);
-}
-
-QnResourcePtr QnResourceFactory::createResource(QnResourceTypePtr resourceType, const QnResourceParameters& parameters)
-{
-    qDebug() << "Creating resource with typeId" << resourceType->getName();
-
-    for (QnResourceParameters::const_iterator ci = parameters.begin(); ci != parameters.end(); ci++)
-    {
-        qDebug() << ci.key() << " = " << ci.value();
-    }
-
-    // Stub. Should be implemented by concrete plugin.
-    QnResourcePtr resource(new QnLocalFileResource(""));
-    resource->deserialize(parameters);
-
-    resource->setTypeId(resourceType->getId());
-
-    return resource;
-}
-
-QnResourcePtr QnResourceFactoryPool::createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters)
-{
-    return createResource(qnResTypePool->getResourceType(resourceTypeId), parameters);
-}
-
-QnResourcePtr QnResourceFactoryPool::createResource(QnResourceTypePtr resourceType, const QnResourceParameters& parameters)
-{
-    if (m_factories.isEmpty())
-        m_factories.append(QnResourceFactoryPtr(new QnResourceFactory()));
-
-    QnResourcePtr result;
-
-    foreach(QnResourceFactoryPtr factory, m_factories)
-    {
-        result = factory->createResource(resourceType, parameters);
-
-        if (!result.isNull())
-            return result;
-    }
-
-    return result;
 }
