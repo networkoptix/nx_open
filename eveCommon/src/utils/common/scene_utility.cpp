@@ -15,7 +15,7 @@ qreal QnSceneUtility::length(const QSizeF &size) {
 }
 
 QRectF QnSceneUtility::mapRectToScene(QGraphicsView *view, const QRect &rect) {
-    return view->viewportTransform().inverted().mapRect(rect);
+    return view->viewportTransform().inverted().mapRect(QRectF(rect));
 }
 
 QRect QnSceneUtility::mapRectFromScene(QGraphicsView *view, const QRectF &rect) {
