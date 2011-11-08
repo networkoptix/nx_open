@@ -7,8 +7,6 @@
 // Temporary until real ResourceFactory is implemented
 
 
-QList<QnResourceFactoryPtr> QnResourceFactoryPool::m_factories;
-
 QnResourceCommandProcessor QnResource::m_commanproc;
 
 QnResourceType::QnResourceType()
