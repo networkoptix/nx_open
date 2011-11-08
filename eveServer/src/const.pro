@@ -37,11 +37,11 @@ CONFIG(release, debug|release) {
 
 CONFIG(debug, debug|release) {
   INCLUDEPATH += $$FFMPEG-debug/include
-  LIBS += -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib
+  LIBS += -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib -L$$PWD/../../eveCommon/bin/debug -lcommon
 }
 CONFIG(release, debug|release) {
   INCLUDEPATH += $$FFMPEG-release/include
-  LIBS += -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib
+  LIBS += -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib -L$$PWD/../../eveCommon/bin/release -lcommon
 }
 
 win32 {
@@ -100,13 +100,7 @@ mac {
   LIBS += -framework IOKit -framework CoreServices
   LIBS += -lz -lbz2
 
-  QMAKE_CXXFLAGS += -msse4.1 -DAPI_TEST_MAIN
-  PRIVATE_FRAMEWORKS.files = ../resource/arecontvision
-  PRIVATE_FRAMEWORKS.path = Contents/MacOS
-  QMAKE_BUNDLE_DATA += PRIVATE_FRAMEWORKS
-
-  QMAKE_POST_LINK += mkdir -p `dirname $(TARGET)`/arecontvision; cp -f $$PWD/../resource/arecontvision/devices.xml `dirname $(TARGET)`/arecontvision
-
+  QMAKE_CXXFLAGS += -msse4.1
   DEFINES += QN_EXPORT=
 }
 

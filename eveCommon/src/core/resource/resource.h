@@ -242,6 +242,12 @@ public:
     virtual QnResourcePtr createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters) = 0;
 };
 
+class QnResourceProcessor
+{
+public:
+    virtual void processResources(const QnResourceList& resources) = 0;
+};
+
 // for future use
 class QnRecorder: public QnResource 
 {

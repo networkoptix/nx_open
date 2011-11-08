@@ -13,8 +13,6 @@
 
 #define CL_BROAD_CAST_RETRY 3
 
-extern const char* ArecontVisionManufacture;
-
 QnPlArecontResourceSearcher::QnPlArecontResourceSearcher()
 {
 	// everything related to Arecont must be initialized here
@@ -49,7 +47,7 @@ QnPlArecontResourceSearcher::QnPlArecontResourceSearcher()
 
 QString QnPlArecontResourceSearcher::manufacture() const
 {
-	return ArecontVisionManufacture;
+    return QnPlAreconVisionResource::MANUFACTURE;
 }
 
 // returns all available devices
@@ -195,7 +193,28 @@ QnPlArecontResourceSearcher& QnPlArecontResourceSearcher::instance()
 
 QnResourcePtr QnPlArecontResourceSearcher::createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters)
 {
-    QnNetworkResourcePtr result(new QnPlAreconVisionResource());
+    QnNetworkResourcePtr result;
+
+    QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
+
+    if (resourceType.isNull())
+    {
+        qDebug() << "No resource type for ID = " << resourceTypeId;
+
+        return result;
+    }
+
+    if (resourceType->getManufacture() != manufacture())
+    {
+        qDebug() << "Manufature " << resourceType->getManufacture() << " != " << manufacture();
+
+        return result;
+    }
+
+    result = QnNetworkResourcePtr(QnPlAreconVisionResource::createResourceByTypeId(resourceTypeId));
+    result->setTypeId(resourceTypeId);
+
+    qDebug() << "RTID" << resourceTypeId.toString() << ", Parameters: " << parameters;
     result->deserialize(parameters);
 
     return result;

@@ -17,6 +17,9 @@ void parseUsers(QList<QnResourcePtr>& users, const QnApiUsers& xsdUsers, QnResou
 
         QnResourcePtr user = resourceFactory.createResource(i->typeId().c_str(), parameters);
 
+        if (user.isNull())
+            continue;
+
         users.append(user);
     }
 }

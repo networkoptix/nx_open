@@ -14,16 +14,10 @@
 #include "utils/network/nettools.h"
 #include "utils/network/ping.h"
 
-
-const char* ArecontVisionManufacture = "ArecontVision";
-
-
+const char* QnPlAreconVisionResource::MANUFACTURE = "ArecontVision";
 
 QnPlAreconVisionResource::QnPlAreconVisionResource()
 {
-    QMutexLocker locker(&m_mutex);
-    setTypeId(qnResTypePool->getResourceTypeId("ArecontVision", "ArecontVision_Abstract"));
- 
 }
 
 bool QnPlAreconVisionResource::isPanoramic() const
@@ -238,7 +232,7 @@ void QnPlAreconVisionResource::beforeUse()
 
 QString QnPlAreconVisionResource::manufacture() const
 {
-    return ArecontVisionManufacture;
+    return MANUFACTURE;
 }
 
 bool QnPlAreconVisionResource::isResourceAccessible()
@@ -369,25 +363,37 @@ bool QnPlAreconVisionResource::setParamPhysical(const QString& name, const QnVal
 
 QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(QString name)
 {
-    QnId rt = qnResTypePool->getResourceTypeId(ArecontVisionManufacture, name);
+    QnId rt = qnResTypePool->getResourceTypeId(MANUFACTURE, name);
     if (!rt.isValid())
 	{
 		cl_log.log("Unsupported resource found(!!!): ", name, cl_logERROR);
 		return 0;
 	}
 
+    return createResourceByTypeId(rt);
+}
+
+QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(const QnId& rt)
+{
+    QnResourceTypePtr resourceType = qnResTypePool->getResourceType(rt);
+
+    if (resourceType.isNull() || (resourceType->getManufacture() != MANUFACTURE))
+    {
+        cl_log.log("Can't create AV Resource. Resource type is invalid.", rt.toString(), cl_logERROR);
+        return 0;
+    }
+
     QnPlAreconVisionResource* res = 0;
 
-	if (isPanoramic(name))
-		res = new CLArecontPanoramicResource(name);
-	else
-		res = new CLArecontSingleSensorResource(name);
+    if (isPanoramic(resourceType->getName()))
+        res = new CLArecontPanoramicResource(resourceType->getName());
+    else
+        res = new CLArecontSingleSensorResource(resourceType->getName());
 
     res->setTypeId(rt);
 
     return res;
 }
-
 
 
 bool QnPlAreconVisionResource::isPanoramic(QString name)

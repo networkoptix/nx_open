@@ -1,6 +1,9 @@
 #ifndef APPSERVERCONNECTIONIMPL_H
 #define APPSERVERCONNECTIONIMPL_H
 
+#include <QHostAddress>
+#include <QAuthenticator>
+
 #include "core/resource/resource_type.h"
 #include "core/resource/resource.h"
 

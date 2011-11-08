@@ -11,6 +11,7 @@
 #include "recorder/recording_manager.h"
 #include "recording/storage_manager.h"
 #include "api/AppServerConnection.h"
+#include "appserver/processor.h"
 #include <QAuthenticator>
 
 //#include "device_plugins/arecontvision/devices/av_device_server.h"
@@ -177,17 +178,17 @@ int main(int argc, char *argv[])
     addTestData();
 #endif
 
-    QHostAddress host("10.0.2.3");
+    QHostAddress host("127.0.0.1");
     QAuthenticator auth;
     auth.setUser("appserver");
     auth.setPassword("123");
     QnAppServerConnection appServerConnection(host, auth, QnResourceDiscoveryManager::instance());
 
+    QnAppserverResourceProcessor processor("28", host, auth, QnResourceDiscoveryManager::instance());
 
     QList<QnResourceTypePtr> resourceTypeList;
     appServerConnection.getResourceTypes(resourceTypeList);
     qnResTypePool->addResourceTypeList(resourceTypeList);
-
 
     QnRtspListener rtspListener(QHostAddress::Any, 50000);
     rtspListener.start();
@@ -206,6 +207,7 @@ int main(int argc, char *argv[])
     //IPPH264Decoder::dll.init();
 
     //============================
+    QnResourceDiscoveryManager::instance().addResourceProcessor(&processor);
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().start();
     //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());

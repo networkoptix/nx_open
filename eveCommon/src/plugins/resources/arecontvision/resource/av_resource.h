@@ -16,6 +16,8 @@ class QDomElement;
 class QnPlAreconVisionResource : public QnNetworkResource, public QnSequrityCamResource
 {
 public:
+    static const char* MANUFACTURE;
+
     QnPlAreconVisionResource();
 
     CLHttpStatus getRegister(int page, int num, int& val);
@@ -56,7 +58,7 @@ public:
     //virtual QnMediaInfo getMediaInfo() const;
 
 protected:
-    virtual QnAbstractStreamDataProvider* createLiveDataProvider() { return 0; }
+    virtual QnAbstractStreamDataProvider* createLiveDataProvider() { Q_ASSERT_X(false, Q_FUNC_INFO, "QnPlAreconVisionResource is abstract."); }
 
     // should change value in memory domain 
     virtual bool getParamPhysical(const QString& name, QnValue& val);
@@ -64,7 +66,9 @@ protected:
     // should just do physical job( network or so ) do not care about memory domain
     virtual bool setParamPhysical(const QString& name, const QnValue& val);
 public:
-	static QnPlAreconVisionResource* createResourceByName(QString name);
+    static QnPlAreconVisionResource* createResourceByName(QString name);
+    static QnPlAreconVisionResource* createResourceByTypeId(const QnId& rt);
+
     static bool isPanoramic(QString name);
 
 protected:

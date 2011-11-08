@@ -17,6 +17,9 @@ void parseLayouts(QList<QnResourcePtr>& layouts, const QnApiLayouts& xsdLayouts,
 
         QnResourcePtr layout = resourceFactory.createResource(i->typeId().c_str(), parameters);
 
+        if (layout.isNull())
+            continue;
+
         layouts.append(layout);
     }
 }
