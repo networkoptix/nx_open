@@ -14,7 +14,6 @@ void CLServerPushStreamreader::run()
 	CL_LOG(cl_logINFO) cl_log.log(QLatin1String("stream reader started."), cl_logINFO);
 
 	setNeedKeyData();
-	m_resource->beforeUse();
 
 	int frames_lost = 0;
 
@@ -39,7 +38,10 @@ void CLServerPushStreamreader::run()
                 m_stat[0].onEvent(CL_STAT_FRAME_LOST);
 
                 if (frames_lost==4) // if we lost 2 frames => connection is lost for sure (2)
+                {
                     m_stat[0].onLostConnection();
+                    getResource()->setStatus(QnResource::Offline);
+                }
 
                 continue;
             }
@@ -55,10 +57,15 @@ void CLServerPushStreamreader::run()
 			m_stat[0].onEvent(CL_STAT_FRAME_LOST);
 
 			if (frames_lost==4) // if we lost 2 frames => connection is lost for sure (2)
+            {
 				m_stat[0].onLostConnection();
+                getResource()->setStatus(QnResource::Offline);
+            }
 
 			continue;
 		}
+
+        getResource()->setStatus(QnResource::Online);
 
 		QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
 
@@ -67,8 +74,6 @@ void CLServerPushStreamreader::run()
 			if (frames_lost>=4)
 			{
 				m_stat[0].onEvent(CL_STAT_CAMRESETED);
-
-				m_resource->beforeUse();
 			}
 
 			frames_lost = 0;

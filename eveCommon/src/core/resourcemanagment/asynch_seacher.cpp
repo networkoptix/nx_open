@@ -58,6 +58,11 @@ void QnResourceDiscoveryManager::run()
 
         QnResourcePool::instance()->addResources(result);
 
+        foreach(QnResourcePtr res, result)
+        {
+            res->setStatus(QnResource::Online);
+        }
+
 
         int global_delay_between_search = 1000;
         smartSleep(global_delay_between_search);

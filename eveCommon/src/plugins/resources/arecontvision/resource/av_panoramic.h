@@ -10,7 +10,6 @@ public:
 	CLArecontPanoramicResource(const QString& name);
 	bool getDescription();
 
-	virtual bool hasTestPattern() const;
 protected:
 
     virtual bool setParamPhysical(const QString& name, const QnValue& val);
@@ -22,8 +21,7 @@ private:
 	bool setResolution(bool full);
 	bool setCamQulity(int q);
 
-protected:
-	bool m_hastestPattern;
+
 
 };
 

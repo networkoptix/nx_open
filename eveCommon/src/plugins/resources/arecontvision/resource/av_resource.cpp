@@ -94,10 +94,12 @@ public:
           m_val(val)
       {}
 
-      void beforeDisconnectFromResource(){}
 
       void execute()
       {
+          if (!isConnectedToTheResource())
+              return;
+
           getResource().dynamicCast<QnPlAreconVisionResource>()->setRegister(m_page,m_reg,m_val);
       }
 private:
@@ -267,15 +269,7 @@ QImage QnPlAreconVisionResource::getImage(int channnel, QDateTime time, QnStream
     return QImage();
 }
 
-int QnPlAreconVisionResource::getStreamDataProvidersMaxAmount() const
-{
-    return 0;
-}
 
-QnAbstractMediaStreamDataProvider* QnPlAreconVisionResource::createMediaProvider()
-{
-    return 0;
-}
 
 void QnPlAreconVisionResource::setIframeDistance(int frames, int timems)
 {
@@ -284,8 +278,6 @@ void QnPlAreconVisionResource::setIframeDistance(int frames, int timems)
 
 void QnPlAreconVisionResource::setCropingPhysical(QRect croping)
 {
-    return;
-
     QnValue maxSensorWidth;
     QnValue maxSensorHight;
     getParam("MaxSensorWidth", maxSensorWidth, QnDomainMemory);

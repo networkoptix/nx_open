@@ -77,20 +77,20 @@ public:
 
 };
 
-class CLAssociativeArray
+class QnAssociativeArray
 {
 
 	typedef QMap<QString, QString> MAP;
 	MAP map;
 
 public:
-	CLAssociativeArray(){};
+	QnAssociativeArray(){};
 	void put(const QString& key, const QnValue& value)
 	{
 		map[key] = (QString) value;
 	}
 
-	bool exist(const QString& key) const
+	bool exists(const QString& key) const
 	{
 		MAP::const_iterator it = map.find(key);
 		return (it!=map.end());
@@ -114,5 +114,7 @@ public:
 			return QnValue(it.value());
 	}
 };
+
+
 
 #endif //cl_AssociativeArray_933

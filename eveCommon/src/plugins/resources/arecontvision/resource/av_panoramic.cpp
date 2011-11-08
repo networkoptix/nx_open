@@ -5,8 +5,7 @@
 
 
 
-CLArecontPanoramicResource::CLArecontPanoramicResource(const QString& name):
-m_hastestPattern(false)
+CLArecontPanoramicResource::CLArecontPanoramicResource(const QString& name)
 {
     setName(name);
 }
@@ -24,10 +23,6 @@ QnAbstractStreamDataProvider* CLArecontPanoramicResource::createLiveDataProvider
 	return new AVPanoramicClientPullSSTFTPStreamreader(toSharedPointer());
 }
 
-bool CLArecontPanoramicResource::hasTestPattern() const
-{
-	return m_hastestPattern;
-}
 
 bool CLArecontPanoramicResource::setParamPhysical(const QString& name, const QnValue& val )
 {

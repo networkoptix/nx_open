@@ -141,7 +141,7 @@ bool QnArchiveStreamReader::init()
  qint64 QnArchiveStreamReader::determineDisplayTime()
  {
      qint64 rez = 0;
-     QMutexLocker mutex(&m_proc_CS);
+     QMutexLocker mutex(&m_mutex);
      for (int i = 0; i < m_dataprocessors.size(); ++i)
      {
          QnAbstractDataConsumer* dp = m_dataprocessors.at(i);

@@ -145,7 +145,7 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QString& requestStr, bool recursive
 			{
 				QString name = m_line.left(pos).trimmed();
 				QString val = m_line.mid(pos+1, m_line.length()- (pos + 1 ) );
-				CLAssociativeArray::put(name, val );
+				QnAssociativeArray::put(name, val );
 				if (name==QLatin1String("Content-Length"))
 				{
 					m_contentLen = val.toInt();

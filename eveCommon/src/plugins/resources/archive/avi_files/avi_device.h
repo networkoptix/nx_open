@@ -17,7 +17,7 @@ public:
 
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 	virtual QString toString() const;
-    virtual int getStreamDataProvidersMaxAmount() const { return INT_MAX; }
+
 };
 
 typedef QSharedPointer<QnAviResource> QnAviResourcePtr;

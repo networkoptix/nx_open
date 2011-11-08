@@ -11,11 +11,11 @@
 #include "resource_type.h"
 #include "utils/common/qnid.h"
 #include "../datapacket/datapacket.h"
-#include "resource_command_processor.h"
 #include <QMetaType>
+#include "resource_command_consumer.h"
 
 
-class QnDeviceCommand;
+class QnResourceCommand;
 class QnAbstractStreamDataProvider;
 class QnVideoResourceLayout;
 class QnResourceConsumer;
@@ -23,7 +23,7 @@ class QnResourceConsumer;
 // this class and inherited must be very light to create 
 class QnResource;
 
-typedef QSharedPointer<QnResource> QnResourcePtr;
+//typedef QSharedPointer<QnResource> QnResourcePtr;
 typedef QList<QnResourcePtr> QnResourceList;
 //typedef QMap<QString, QnResourcePtr> QnResourceMap;
 
@@ -42,6 +42,8 @@ class QN_EXPORT QnResource: public QObject //: public CLRefCounter
 public:
 
     enum ConnectionRole {Role_Default, Role_LiveVideo, Role_Archive};
+
+    enum Status {Online, Offline};
 
     enum
     {
@@ -90,6 +92,9 @@ public:
     QnId getTypeId() const;
     void setTypeId(const QnId& id);
 
+    void setStatus(Status status);
+    Status getStatus() const;
+
 
     // flags like network media and so on
     bool checkFlag(unsigned long flag) const;
@@ -105,12 +110,6 @@ public:
     // this value is updated by discovery process
     QDateTime getLastDiscoveredTime() const;
     void setLastDiscoveredTime(const QDateTime &time);
-
-    // if resource physically removed from system - becomes unavailable
-    // we even do not need to try setparam or so
-    bool available() const;
-    void setAvailable(bool av);
-
 
 
 	virtual QString toString() const;
@@ -179,6 +178,7 @@ public:
 
 Q_SIGNALS:
     void onParameterChanged(const QString &paramname, const QString &value);
+    void onStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
 
 public:
 
@@ -191,7 +191,7 @@ public:
 	static void stopCommandProc() {m_commanproc.stop();};
     static void addCommandToProc(QnAbstractDataPacketPtr data) {m_commanproc.putData(data);};
 	static int commandProcQueSize() {return m_commanproc.queueSize();}
-	static bool commandProchasSuchDeviceInQueue(const QString& uniqId) {return m_commanproc.hasSuchDeviceInQueue(uniqId);}
+	static bool commandProchasSuchDeviceInQueue(QnResourcePtr res) {return m_commanproc.hasSuchResourceInQueue(res);}
 protected:
     // should change value in memory domain
     virtual bool getParamPhysical(const QString& name, QnValue& val);
@@ -207,7 +207,7 @@ protected:
 
 	// this is thread to process commands like setparam
 
-	static CLDeviceCommandProcessor m_commanproc;
+	static QnResourceCommandProcessor m_commanproc;
 
 protected:
     mutable QMutex m_mutex;
@@ -228,6 +228,8 @@ private:
     bool m_avalable;
 
     QString m_url; //-
+
+    Status m_status;
     
 
     mutable QnParamList m_streamParamList; //-  

@@ -70,36 +70,25 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 
 	int bitrate;
 
-	bool h264;
+	bool h264 =  isH264();
 
 	{
-			//QMutexLocker mutex(&m_mutex);
-
-			h264 = isH264();//false;
-
-			/*
-			if (m_streamParam.exists("Codec")) // cam is not jpeg only
-			{
-				CLParam codec = m_streamParam.get("Codec");
-				if (codec.value.value != QString("JPEG"))
-					h264 = true;
-			}
-			/**/
+            QMutexLocker mutex(&m_mutex);
 
 			if (!m_streamParam.exists("Quality") || !m_streamParam.exists("resolution") || 
 				!m_streamParam.exists("image_left") || !m_streamParam.exists("image_top") ||
 				!m_streamParam.exists("image_right") || !m_streamParam.exists("image_bottom") ||
-				(h264 && !m_streamParam.exists("streamID")) || (h264 && !m_streamParam.exists("Bitrate")))
+				(h264 && !m_streamParam.exists("streamID")))
 			{
 				cl_log.log("Erorr!!! parameter is missing in stream params.", cl_logERROR);
 				//return QnAbstractMediaDataPtr(0);
 			}
 
 			//=========
-			left = m_streamParam.get("image_left").value();
-			top = m_streamParam.get("image_top").value();
-			right = m_streamParam.get("image_right").value();
-			bottom = m_streamParam.get("image_bottom").value();
+			left = m_streamParam.get("image_left");
+			top = m_streamParam.get("image_top");
+			right = m_streamParam.get("image_right");
+			bottom = m_streamParam.get("image_bottom");
 
 			if (m_dualsensor && m_black_white) //3130 || 3135
 			{
@@ -129,10 +118,10 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 			if (m_last_cam_height==0)
 				m_last_cam_height= height;
 
-			quality = m_streamParam.get("Quality").value();
+			quality = m_streamParam.get("Quality");
 			//quality = getQuality();
 
-			resolutionFULL = (m_streamParam.get("resolution").value() == QString("full"));
+			resolutionFULL = (m_streamParam.get("resolution") == QString("full"));
 
 			streamID = 0;
 			if (h264)
@@ -149,7 +138,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 					setNeedKeyData();
 				}
 
-				streamID = m_streamParam.get("streamID").value();
+				streamID = m_streamParam.get("streamID");
 				//bitrate = m_streamParam.get("Bitrate").value.value;
 				bitrate = getBitrate();
 			}
@@ -182,7 +171,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 	os<< quality << ";doublescan=0" << ";ssn=" << streamID;
 
 	//h264?res=full;x0=0;y0=0;x1=1600;y1=1184;qp=27;doublescan=0;iframe=0;ssn=574;netasciiblksize1450
-	request = "image?res=full;x0=0;y0=0;x1=800;y1=600;quality=10;doublescan=0;ssn=4184;";
+	//request = "image?res=full;x0=0;y0=0;x1=800;y1=600;quality=10;doublescan=0;ssn=4184;";
 
 	if (h264)
 	{
