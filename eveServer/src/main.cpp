@@ -13,6 +13,7 @@
 #include "api/AppServerConnection.h"
 #include <QAuthenticator>
 #include "recording/file_deletor.h"
+#include "rest/server/rest_server.h"
 
 //#include "device_plugins/arecontvision/devices/av_device_server.h"
 
@@ -192,6 +193,8 @@ int main(int argc, char *argv[])
 
     QnRtspListener rtspListener(QHostAddress::Any, 50000);
     rtspListener.start();
+
+    QnRestServer restServer(QHostAddress::Any, DEFAULT_REST_PORT);
 
 
     QnStoragePtr storage0(new QnStorage());

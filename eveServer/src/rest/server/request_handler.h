@@ -8,13 +8,13 @@
 #include <QByteArray>
 #include "utils/common/base.h"
 
-typedef QList<QPair<QString, QString> > QnParamList;
+typedef QList<QPair<QString, QString> > QnRequestParamList;
 
 class QnRestRequestHandler: public QObject
 {
 public:
-    virtual int executeGet(const QnParamList& params, QByteArray& result) = 0;
-    virtual int executePost(const QnParamList& params, const QByteArray& body, QByteArray& result) = 0;
+    virtual int executeGet(const QnRequestParamList& params, QByteArray& result) = 0;
+    virtual int executePost(const QnRequestParamList& params, const QByteArray& body, QByteArray& result) = 0;
     virtual QString description() const { return QString(); }
 };
 
@@ -24,11 +24,11 @@ class QnRestGUIRequestHandler: public QnRestRequestHandler
 public:
     QnRestGUIRequestHandler();
     virtual ~QnRestGUIRequestHandler();
-    virtual int executeGet(const QnParamList& params, QByteArray& result);
-    virtual int executePost(const QnParamList& params, const QByteArray& body, QByteArray& result);
+    virtual int executeGet(const QnRequestParamList& params, QByteArray& result);
+    virtual int executePost(const QnRequestParamList& params, const QByteArray& body, QByteArray& result);
 protected:
-    virtual int executeGetGUI(const QnParamList& params, QByteArray& result) = 0;
-    virtual int executePostGUI(const QnParamList& params, const QByteArray& body, QByteArray& result) = 0;
+    virtual int executeGetGUI(const QnRequestParamList& params, QByteArray& result) = 0;
+    virtual int executePostGUI(const QnRequestParamList& params, const QByteArray& body, QByteArray& result) = 0;
 private:
     Q_INVOKABLE void methodExecutor();
 protected:
