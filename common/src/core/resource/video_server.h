@@ -14,6 +14,7 @@ public:
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 
     void setApiUrl(const QString& restUrl);
+    QString getApiUrl() const;
 
     QnVideoServerConnectionPtr apiConnection();
 

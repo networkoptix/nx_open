@@ -52,7 +52,8 @@ int QnAppServerConnection::addServer(const QnVideoServer& serverIn, QnVideoServe
     xsd::api::servers::Server server(serverIn.getId().toString().toStdString(),
                                      serverIn.getName().toStdString(),
                                      serverIn.getTypeId().toString().toStdString(),
-                                     serverIn.getUrl().toStdString());
+                                     serverIn.getUrl().toStdString(),
+                                     serverIn.getApiUrl().toStdString());
 
     QnApiServerResponsePtr xsdServers;
 

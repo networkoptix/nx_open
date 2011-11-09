@@ -31,8 +31,14 @@ void QnVideoServer::setApiUrl(const QString& restUrl)
     m_apiUrl = restUrl;
     QUrl u(restUrl);
     QAuthenticator auth;
+    auth.setUser(u.userName());
     auth.setPassword(u.password());
     m_restConnection = QnVideoServerConnectionPtr(new QnVideoServerConnection(QHostAddress(u.host()), u.port(), auth));
+}
+
+QString QnVideoServer::getApiUrl() const
+{
+    return m_apiUrl;
 }
 
 QnVideoServerConnectionPtr QnVideoServer::apiConnection()
