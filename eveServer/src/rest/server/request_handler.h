@@ -10,12 +10,20 @@
 
 typedef QList<QPair<QString, QString> > QnRequestParamList;
 
+class TCPSocket;
 class QnRestRequestHandler: public QObject
 {
 public:
-    virtual int executeGet(const QnRequestParamList& params, QByteArray& result) = 0;
-    virtual int executePost(const QnRequestParamList& params, const QByteArray& body, QByteArray& result) = 0;
-    virtual QString description() const { return QString(); }
+    virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result) = 0;
+    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result) = 0;
+
+    // incoming connection socket
+    virtual QString description(TCPSocket* tcpSocket) const { return QString(); }
+    friend class QnRestServer;
+protected:
+    void setPath(const QString& path) { m_path = path; }
+protected:
+    QString m_path;
 };
 
 class QnRestGUIRequestHandler: public QnRestRequestHandler
@@ -24,11 +32,11 @@ class QnRestGUIRequestHandler: public QnRestRequestHandler
 public:
     QnRestGUIRequestHandler();
     virtual ~QnRestGUIRequestHandler();
-    virtual int executeGet(const QnRequestParamList& params, QByteArray& result);
-    virtual int executePost(const QnRequestParamList& params, const QByteArray& body, QByteArray& result);
+    virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result);
+    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result);
 protected:
-    virtual int executeGetGUI(const QnRequestParamList& params, QByteArray& result) = 0;
-    virtual int executePostGUI(const QnRequestParamList& params, const QByteArray& body, QByteArray& result) = 0;
+    virtual int executeGetGUI(const QString& path, const QnRequestParamList& params, QByteArray& result) = 0;
+    virtual int executePostGUI(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result) = 0;
 private:
     Q_INVOKABLE void methodExecutor();
 protected:

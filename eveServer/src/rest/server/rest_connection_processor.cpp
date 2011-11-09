@@ -67,20 +67,21 @@ void QnRestConnectionProcessor::run()
             data = data.replace("+", "%20");
             QUrl url = QUrl::fromEncoded(data);
 
-            QnRestRequestHandler* handler = static_cast<QnRestServer*>(d->owner)->findHandler(url.path());
             d->responseBody.clear();
             int rez = CODE_OK;
             QByteArray encoding = "application/xml";
+
+            QnRestRequestHandler* handler = static_cast<QnRestServer*>(d->owner)->findHandler(url.path());
             if (handler) 
             {
                 QList<QPair<QString, QString> > params = url.queryItems();
                 if (d->owner->authenticate(d->requestHeaders, d->responseHeaders))
                 {
                     if (d->requestHeaders.method().toUpper() == "GET") {
-                        rez = handler->executeGet(params, d->responseBody);
+                        rez = handler->executeGet(url.path(), params, d->responseBody);
                     }
                     else if (d->requestHeaders.method().toUpper() == "POST") {
-                        rez = handler->executePost(params, d->requestBody, d->responseBody);
+                        rez = handler->executePost(url.path(), params, d->requestBody, d->responseBody);
                     }
                     else {
                         qWarning() << "Unknown REST method " << d->requestHeaders.method();
@@ -111,12 +112,15 @@ void QnRestConnectionProcessor::run()
                 for(QnRestServer::Handlers::const_iterator itr = allHandlers.begin(); itr != allHandlers.end(); ++itr)
                 {
                     QString str = itr.key();
-                    d->responseBody.append("<TR><TD>");
-                    d->responseBody.append(str.toAscii());
-                    d->responseBody.append("<TD>");
-                    d->responseBody.append(itr.value()->description());
-                    d->responseBody.append("</TD>");
-                    d->responseBody.append("</TD></TR>\n");
+                    if (str.startsWith("api/"))
+                    {
+                        d->responseBody.append("<TR><TD>");
+                        d->responseBody.append(str.toAscii());
+                        d->responseBody.append("<TD>");
+                        d->responseBody.append(itr.value()->description(d->socket));
+                        d->responseBody.append("</TD>");
+                        d->responseBody.append("</TD></TR>\n");
+                    }
                 }
                 d->responseBody.append("</TABLE>\n");
 

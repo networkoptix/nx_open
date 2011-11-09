@@ -23,14 +23,22 @@ CLLongRunnable* QnRestServer::createRequestProcessor(TCPSocket* clientSocket, Qn
 void QnRestServer::registerHandler(const QString& path, QnRestRequestHandler* handler)
 {
     m_handlers.insert(path, handler);
+    handler->setPath(path);
 }
 
 QnRestRequestHandler* QnRestServer::findHandler(QString path)
 {
     if (path.startsWith('/'))
         path = path.mid(1);
-    Handlers::iterator i = m_handlers.find(path);
-    return i != m_handlers.end() ? i.value() : 0;
+
+    for (Handlers::iterator i = m_handlers.begin();i != m_handlers.end(); ++i)
+    {
+        QRegExp expr(i.key(), Qt::CaseSensitive, QRegExp::Wildcard);
+        if (expr.indexIn(path) != -1)
+            return i.value();
+    }
+
+    return 0;
 }
 
 const QnRestServer::Handlers& QnRestServer::allHandlers() const

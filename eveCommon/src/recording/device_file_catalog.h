@@ -26,6 +26,16 @@ public:
         int duration; // chunk duration at ms
     };
 
+    struct TimePeriod
+    {
+        TimePeriod(): startTime(0), duration(0) {}
+        TimePeriod(qint64 _startTime, qint64 _duration): startTime(_startTime), duration(_duration) {}
+
+        qint64 startTime;
+        qint64 duration;
+    };
+    typedef QVector<TimePeriod> TimePeriodList;
+
     DeviceFileCatalog(QnResourcePtr resource);
     void deserializeTitleFile();
     void addRecord(const Chunk& chunk);
@@ -39,13 +49,19 @@ public:
     bool fileExists(const Chunk& chunk);
     bool lastFileDuplicateName() const;
     qint64 firstTime() const;
+
+    // Detail level determine time duration (at mks) visible at 1 screen pixel
+    // All infornation less than detail level is discarded
+    typedef QVector<Chunk> ChunkMap;
+
+    TimePeriodList getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel);
 private:
     QString baseRoot(QnResourcePtr resource);
     qint64 getFileDuration(const QString& fileName);
 private:
     mutable QMutex m_mutex;
     QFile m_file;
-    QVector<Chunk> m_chunks; // key = chunk startTime at ms
+    QVector<Chunk> m_chunks; 
     int m_firstDeleteCount;
     QnResourcePtr m_resource;
 
@@ -55,7 +71,6 @@ private:
     QString m_prevFileName;
 };
 
-typedef QVector<DeviceFileCatalog::Chunk> ChunkMap;
 typedef QSharedPointer<DeviceFileCatalog> DeviceFileCatalogPtr;
 
 bool operator < (const DeviceFileCatalog::Chunk& first, const DeviceFileCatalog::Chunk& other);

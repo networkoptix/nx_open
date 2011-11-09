@@ -273,12 +273,37 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkAt(int index) const
 
 qint64 DeviceFileCatalog::firstTime() const
 {
+    QMutexLocker lock(&m_mutex);
     if (m_firstDeleteCount >= m_chunks.size())
         return AV_NOPTS_VALUE;
     else
         return m_chunks[m_firstDeleteCount].startTime;
 }
 
+DeviceFileCatalog::TimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel)
+{
+    QMutexLocker lock(&m_mutex);
+    TimePeriodList result;
+    ChunkMap::const_iterator itr = qLowerBound(m_chunks.begin() + m_firstDeleteCount, m_chunks.end(), startTime);
+    if (itr == m_chunks.end())
+        return result;
+
+    int firstIndex = itr - m_chunks.begin();
+    result << TimePeriod(m_chunks[firstIndex].startTime, m_chunks[firstIndex].duration);
+
+    for (int i = firstIndex+1; i < m_chunks.size() && m_chunks[i].startTime < endTime; ++i)
+    {
+        TimePeriod& last = result.last();
+        if (qAbs(last.startTime + last.duration - m_chunks[i].startTime) <= detailLevel)
+            last.duration = m_chunks[i].startTime - last.startTime + m_chunks[i].duration;
+        else {
+            if (last.duration < detailLevel)
+                result.pop_back();
+            result << TimePeriod(m_chunks[i].startTime, m_chunks[i].duration);
+        }
+    }
+    return result;
+}
 
 bool operator < (qint64 first, const DeviceFileCatalog::Chunk& other)
 { 

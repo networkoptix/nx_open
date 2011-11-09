@@ -8,6 +8,7 @@ struct QnRestGUIRequestHandler::QnRestGUIRequestHandlerPrivate
     QnRequestParamList params;
     QByteArray* result;
     const QByteArray* body;
+    QString path;
     int code;
     QString method;
 };
@@ -22,7 +23,7 @@ QnRestGUIRequestHandler::~QnRestGUIRequestHandler()
     delete d_ptr;
 }
 
-int QnRestGUIRequestHandler::executeGet(const QnRequestParamList& params, QByteArray& result)
+int QnRestGUIRequestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result)
 {
     Q_D(QnRestGUIRequestHandler);
     d->params = params;
@@ -32,12 +33,13 @@ int QnRestGUIRequestHandler::executeGet(const QnRequestParamList& params, QByteA
     return d->code;
 }
 
-int QnRestGUIRequestHandler::executePost(const QnRequestParamList& params, const QByteArray& body, QByteArray& result)
+int QnRestGUIRequestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result)
 {
     Q_D(QnRestGUIRequestHandler);
     d->params = params;
     d->result = &result;
     d->body = &body;
+    d->path = path;
     d->method = "POST";
     QMetaObject::invokeMethod(this, "methodExecutor", Qt::BlockingQueuedConnection);
     return d->code;
@@ -47,9 +49,9 @@ void QnRestGUIRequestHandler::methodExecutor()
 {
     Q_D(QnRestGUIRequestHandler);
     if (d->method == "GET")
-        d->code = executeGetGUI(d->params, *d->result);
+        d->code = executeGetGUI(d->path, d->params, *d->result);
     else if (d->method == "POST")
-        d->code = executePostGUI(d->params, *d->body, *d->result);
+        d->code = executePostGUI(d->path, d->params, *d->body, *d->result);
     else 
         qWarning() << "Unknown execute method " << d->method;
 }

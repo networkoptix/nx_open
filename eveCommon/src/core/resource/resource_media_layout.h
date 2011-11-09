@@ -2,6 +2,7 @@
 #define device_video_layout_h_2143
 
 #define CL_MAX_CHANNELS 4
+#include <QVector>
 
 class QN_EXPORT QnDeviceLayout
 {
@@ -89,7 +90,7 @@ public:
         m_width(width),
         m_height(height)
     {
-        m_channels = new unsigned int[CL_MAX_CHANNELS];
+        m_channels.resize(width*height);
     }
     virtual ~CLCustomDeviceVideoLayout(){}
     //returns number of video channels device has
@@ -151,7 +152,7 @@ public:
 
 protected:
 
-    unsigned int* m_channels;
+    QVector<int> m_channels;
     int m_width;
     int m_height;
 };
