@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XMLSpy v2011 rel. 2 (http://www.altova.com) by TeaM DJiNN (TeaM DJiNN) -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.networkoptix.com/xsd/api/recordedTimePeriods" targetNamespace="http://www.networkoptix.com/xsd/api/recordedTimePeriods" elementFormDefault="qualified">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.networkoptix.com/xsd/api/timePeriodList" targetNamespace="http://www.networkoptix.com/xsd/api/timePeriodList"  elementFormDefault="qualified" attributeFormDefault="unqualified">
+
 	<xs:element name="TimePeriodList">
 		<xs:annotation>
 			<xs:documentation>Comment describing your root element</xs:documentation>

@@ -133,9 +133,8 @@ QString serverId()
 void registerServer(QnAppServerConnection& appServerConnection, const QString& myAddress)
 {
     QSettings settings;
-    QString serverId = settings.value("serverId", "").toString();
 
-    if (serverId.isEmpty())
+    if (serverId().isEmpty())
     {
         QString myMac = localMac(myAddress);
 
@@ -149,8 +148,7 @@ void registerServer(QnAppServerConnection& appServerConnection, const QString& m
 
         Q_ASSERT(!servers.isEmpty());
 
-        serverId = servers.at(0)->getId();
-        settings.setValue("serverId", serverId);
+        settings.setValue("serverId", servers.at(0)->getId().toString());
     }
 }
 
@@ -244,7 +242,7 @@ int main(int argc, char *argv[])
     QAuthenticator auth;
     auth.setUser("appserver");
     auth.setPassword("123");
-    QnAppServerConnection appServerConnection(host, auth, QnResourceDiscoveryManager::instance());
+    QnAppServerConnection appServerConnection(host, port, auth, QnResourceDiscoveryManager::instance());
 
     QList<QnResourceTypePtr> resourceTypeList;
     appServerConnection.getResourceTypes(resourceTypeList);
@@ -252,7 +250,7 @@ int main(int argc, char *argv[])
 
     registerServer(appServerConnection, localAddress(appserverAddress));
 
-    QnAppserverResourceProcessor processor(serverId, host, port, auth, QnResourceDiscoveryManager::instance());
+    QnAppserverResourceProcessor processor(QnId(serverId), host, port, auth, QnResourceDiscoveryManager::instance());
 
     QnRtspListener rtspListener(QHostAddress::Any, 50000);
     rtspListener.start();
