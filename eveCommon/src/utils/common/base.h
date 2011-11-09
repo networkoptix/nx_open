@@ -13,6 +13,6 @@ class Class##Private; \
 class Class##Private; \
     Q_DECLARE_PRIVATE(Class);
 
-
+typedef QList<QPair<QString, QString> > QnRequestParamList;
 
 #endif //cl_common_h1003

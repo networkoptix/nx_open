@@ -7,10 +7,10 @@
 #include "api/parsers/parse_resource_types.h"
 
 #include "api/Types.h"
-#include "api/SessionManager.h"
+#include "api/AppSessionManager.h"
 
-QnAppServerConnection::QnAppServerConnection(const QHostAddress& host, const QAuthenticator& auth, QnResourceFactory& resourceFactory)
-    : m_sessionManager(new SessionManager(host, auth)),
+QnAppServerConnection::QnAppServerConnection(const QHostAddress& host, int port, const QAuthenticator& auth, QnResourceFactory& resourceFactory)
+    :m_sessionManager(new AppSessionManager(host, port, auth)),
       m_resourceFactory(resourceFactory)
 {
 }

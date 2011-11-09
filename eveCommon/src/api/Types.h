@@ -9,6 +9,9 @@
 #include "xsd_servers.h"
 #include "xsd_users.h"
 #include "xsd_events.h"
+#include "xsd_RecordedTimePeriods.h"
+
+// for appServer methods
 
 typedef xsd::cxx::tree::sequence<xsd::api::resourceTypes::ResourceType>  QnApiResourceTypes;
 typedef xsd::cxx::tree::sequence<xsd::api::resources::Resource>          QnApiResources;
@@ -27,6 +30,9 @@ typedef QSharedPointer<xsd::api::users::Users>                           QnApiUs
 typedef QSharedPointer<xsd::api::servers::Servers>                       QnApiServerResponsePtr;
 
 typedef QSharedPointer<xsd::api::events::events_t>                       QnApiEventResponsePtr;
+
+// for video server methods
+typedef QSharedPointer<xsd::api::timePeriodList::TimePeriodList>           QnApiTimePeriodListResponsePtr;
 
 
 #endif // _EVE_TYPES_H

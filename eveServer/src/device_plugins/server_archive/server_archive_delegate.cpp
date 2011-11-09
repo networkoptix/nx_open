@@ -38,9 +38,11 @@ bool QnServerArchiveDelegate::open(QnResourcePtr resource)
     if (m_opened)
         return true;
 
-    m_resource = qnResPool->getResourceById(resource->getId());
-    m_catalog = qnStorageMan->getFileCatalog(m_resource);
-    m_chunkSequence = new QnChunkSequence(m_resource, 0);
+    m_resource = resource;
+    QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
+    Q_ASSERT(netResource != 0);
+    m_catalog = qnStorageMan->getFileCatalog(netResource);
+    m_chunkSequence = new QnChunkSequence(netResource, 0);
     m_currentChunk = m_chunkSequence->getNextChunk(m_resource);
     QString url = m_catalog->fullFileName(m_currentChunk);
     m_fileRes = QnAviResourcePtr(new QnAviResource(url));

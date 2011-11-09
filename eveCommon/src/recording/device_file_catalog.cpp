@@ -3,7 +3,7 @@
 #include "utils/common/util.h"
 #include "file_deletor.h"
 
-DeviceFileCatalog::DeviceFileCatalog(QnResourcePtr resource):
+DeviceFileCatalog::DeviceFileCatalog(QnNetworkResourcePtr resource):
     m_firstDeleteCount(0),
     m_resource(resource),
     m_mutex(QMutex::Recursive),
@@ -30,12 +30,13 @@ DeviceFileCatalog::DeviceFileCatalog(QnResourcePtr resource):
     }
 }
 
-QString DeviceFileCatalog::baseRoot(QnResourcePtr resource)
+QString DeviceFileCatalog::baseRoot(QnNetworkResourcePtr resource)
 {
     if (qnStorageMan->storageRoots().isEmpty())
         return QString();
-    else {
-        return closeDirPath(qnStorageMan->storageRoots().begin().value()->getUrl()) + QFileInfo(resource->getUrl()).baseName();
+    else 
+    {
+        return closeDirPath(qnStorageMan->storageRoots().begin().value()->getUrl()) + resource->getMAC().toString();
     }
 };
 
@@ -46,7 +47,7 @@ bool DeviceFileCatalog::lastFileDuplicateName() const
 
 bool DeviceFileCatalog::fileExists(const Chunk& chunk)
 {
-    QString prefix = closeDirPath(qnStorageMan->storageRoots()[chunk.storageIndex]->getUrl()) + QFileInfo(m_resource->getUrl()).baseName() + QString('/');
+    QString prefix = closeDirPath(qnStorageMan->storageRoots()[chunk.storageIndex]->getUrl()) + m_resource->getMAC().toString() + QString('/');
 
 
     QDateTime fileDate = QDateTime::fromMSecsSinceEpoch(chunk.startTime/1000);
@@ -241,7 +242,7 @@ QString DeviceFileCatalog::fullFileName(const Chunk& chunk) const
 {
     QMutexLocker lock(&m_mutex);
     return closeDirPath(qnStorageMan->storageRoots()[chunk.storageIndex]->getUrl()) + 
-                QFileInfo(m_resource->getUrl()).baseName() + QString('/') +
+                m_resource->getMAC().toString() + QString('/') +
                 QnStorageManager::dateTimeStr(chunk.startTime) + 
                 strPadLeft(QString::number(chunk.fileIndex), 3, '0') + 
                 QString(".mkv");
@@ -294,7 +295,8 @@ DeviceFileCatalog::TimePeriodList DeviceFileCatalog::getTimePeriods(qint64 start
     for (int i = firstIndex+1; i < m_chunks.size() && m_chunks[i].startTime < endTime; ++i)
     {
         TimePeriod& last = result.last();
-        if (qAbs(last.startTime + last.duration - m_chunks[i].startTime) <= detailLevel)
+        qint64 ggC = m_chunks[i].startTime;
+        if (qAbs(last.startTime + last.duration - m_chunks[i].startTime) <= detailLevel && m_chunks[i].duration != -1)
             last.duration = m_chunks[i].startTime - last.startTime + m_chunks[i].duration;
         else {
             if (last.duration < detailLevel)

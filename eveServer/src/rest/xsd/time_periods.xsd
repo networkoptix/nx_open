@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2011 rel. 2 (http://www.altova.com) by TeaM DJiNN (TeaM DJiNN) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.networkoptix.com/xsd/api/recordedTimePeriods" targetNamespace="http://www.networkoptix.com/xsd/api/recordedTimePeriods" elementFormDefault="qualified">
+	<xs:element name="TimePeriodList">
+		<xs:annotation>
+			<xs:documentation>Comment describing your root element</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="TimePeriod">
+					<xs:complexType>
+						<xs:attribute name="startTime" type="xs:long"/>
+						<xs:attribute name="duration" type="xs:long"/>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

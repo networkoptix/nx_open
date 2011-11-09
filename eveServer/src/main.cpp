@@ -67,8 +67,6 @@ QString localMac(const QString& myAddress)
     return "";
 }
 
-QAuthenticator auth;
-
 #ifndef UNICLIENT_TESTS
 
 void ffmpegInit()
@@ -241,6 +239,9 @@ int main(int argc, char *argv[])
     QString appserverAddress = QSettings().value("appserverAddress", "10.0.2.3").toString();
 
     QHostAddress host(appserverAddress);
+    
+    int port = 8000;
+    QAuthenticator auth;
     auth.setUser("appserver");
     auth.setPassword("123");
     QnAppServerConnection appServerConnection(host, auth, QnResourceDiscoveryManager::instance());
@@ -251,7 +252,7 @@ int main(int argc, char *argv[])
 
     registerServer(appServerConnection, localAddress(appserverAddress));
 
-    QnAppserverResourceProcessor processor(serverId(), host, auth, QnResourceDiscoveryManager::instance());
+    QnAppserverResourceProcessor processor(serverId, host, port, auth, QnResourceDiscoveryManager::instance());
 
     QnRtspListener rtspListener(QHostAddress::Any, 50000);
     rtspListener.start();

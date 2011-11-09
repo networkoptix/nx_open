@@ -8,7 +8,6 @@
 #include <QByteArray>
 #include "utils/common/base.h"
 
-typedef QList<QPair<QString, QString> > QnRequestParamList;
 
 class TCPSocket;
 class QnRestRequestHandler: public QObject

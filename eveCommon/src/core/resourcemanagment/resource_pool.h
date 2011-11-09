@@ -3,8 +3,7 @@
 
 #include "core/resource/resource.h"
 #include "core/resourcemanagment/resource_criteria.h"
-
-
+#include "core/resource/network_resource.h"
 
 class QnResource;
 class QnNetworkResource;
@@ -45,6 +44,8 @@ public:
 
 
     QnResourcePtr getResourceByUrl(const QString& url) const;
+
+    QnNetworkResourcePtr getNetResourceByMac(const QString& mac) const;
 
     // returns list of resources with such flag
     QnResourceList getResourcesWithFlag(unsigned long flag);

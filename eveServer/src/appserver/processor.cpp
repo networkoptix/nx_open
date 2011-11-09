@@ -2,8 +2,8 @@
 
 #include "core/resourcemanagment/resource_pool.h"
 
-QnAppserverResourceProcessor::QnAppserverResourceProcessor(const QnId& serverId, const QHostAddress& host, const QAuthenticator& auth, QnResourceFactory& resourceFactory)
-    : m_appServer(host, auth, resourceFactory),
+QnAppserverResourceProcessor::QnAppserverResourceProcessor(const QnId& serverId, const QHostAddress& host, int port, const QAuthenticator& auth, QnResourceFactory& resourceFactory)
+    : m_appServer(host, port, auth, resourceFactory),
       m_serverId(serverId)
 {
 }

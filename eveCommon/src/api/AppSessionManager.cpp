@@ -6,14 +6,14 @@
 
 #include "QStdIStream.h"
 
-#include "SessionManager.h"
+#include "AppSessionManager.h"
 
-SessionManager::SessionManager(const QHostAddress& host, const QAuthenticator& auth)
-    : m_client(host, 8000, 10000, auth)
+AppSessionManager::AppSessionManager(const QHostAddress& host, int port, const QAuthenticator& auth)
+    : SessionManager(host, port, auth)
 {
 }
 
-int SessionManager::addServer(const ::xsd::api::servers::Server& server, QnApiServerResponsePtr& serversPtr)
+int AppSessionManager::addServer(const ::xsd::api::servers::Server& server, QnApiServerResponsePtr& serversPtr)
 {
     std::ostringstream os;
 
@@ -43,7 +43,7 @@ int SessionManager::addServer(const ::xsd::api::servers::Server& server, QnApiSe
     return 1;
 }
 
-int SessionManager::addCamera(const ::xsd::api::cameras::Camera& camera, QnApiCameraResponsePtr& camerasPtr)
+int AppSessionManager::addCamera(const ::xsd::api::cameras::Camera& camera, QnApiCameraResponsePtr& camerasPtr)
 {
     std::ostringstream os;
 
@@ -125,17 +125,7 @@ void SessionManager::slotRequestFinished(QNetworkReply *reply)
 }
 #endif
 
-int SessionManager::getObjectList(QString objectName, QByteArray& reply)
-{
-    CLHttpStatus status = m_client.doGET(QString("api/%1/").arg(objectName));
-
-    if (status == CL_HTTP_SUCCESS || status == CL_HTTP_BAD_REQUEST)
-        m_client.readAll(reply);
-
-    return 0;
-}
-
-CLHttpStatus SessionManager::addObject(const QString& objectName, const QByteArray& body, QByteArray& reply)
+CLHttpStatus AppSessionManager::addObject(const QString& objectName, const QByteArray& body, QByteArray& reply)
 {
     CLHttpStatus status = m_client.doPOST(QString("api/%1/").arg(objectName), body);
 
@@ -145,11 +135,11 @@ CLHttpStatus SessionManager::addObject(const QString& objectName, const QByteArr
     return status;
 }
 
-int SessionManager::getResourceTypes(QnApiResourceTypeResponsePtr& resourceTypes)
+int AppSessionManager::getResourceTypes(QnApiResourceTypeResponsePtr& resourceTypes)
 {
     QByteArray reply;
 
-    if(getObjectList("resourceType", reply) == 0)
+    if(sendGetRequest("resourceType", reply) == 0)
     {
         try
         {
@@ -168,11 +158,11 @@ int SessionManager::getResourceTypes(QnApiResourceTypeResponsePtr& resourceTypes
     return 1;
 }
 
-int SessionManager::getResources(QnApiResourceResponsePtr& resources)
+int AppSessionManager::getResources(QnApiResourceResponsePtr& resources)
 {
     QByteArray reply;
 
-    if (getObjectList("resourceEx", reply) == 0)
+    if (sendGetRequest("resourceEx", reply) == 0)
     {
         try
         {
