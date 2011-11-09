@@ -1,5 +1,7 @@
 #include <QApplication>
 #include <QDir>
+#include <QSettings>
+#include <QUdpSocket>
 
 #include "version.h"
 #include "utils/common/util.h"
@@ -21,8 +23,6 @@
 
 //#define TEST_RTSP_SERVER
 
-
-QnId serverId;
 
 QMutex global_ffmpeg_mutex;
 
@@ -48,32 +48,25 @@ void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args
     cl_log.log(QLatin1String("FFMPEG "), QString::fromLocal8Bit(szMsg), cl_logERROR);
 }
 
-// XXX: This it temprorary functions for reading/writing our server id.
-// Later this code will be moved to settings handling class.
-QString readServerId()
+QString localAddress(const QString& target)
 {
-    QString result;
-
-    QFile file("server.id");
-    if (!file.open (QIODevice::ReadOnly))
-        return result;
-
-    QTextStream stream ( &file );
-    QString line;
-    result = stream.readAll();
-    file.close();
-
-    return result;
+    QUdpSocket socket;
+    socket.connectToHost(target, 53);
+    return socket.localAddress().toString();
 }
 
-void writeServerId(const QString& serverId)
+QString localMac(const QString& myAddress)
 {
-    QFile file("server.id");
-    file.open(QIODevice::WriteOnly | QIODevice::Text);
-    QTextStream out(&file);
-    out << serverId;
-    file.close();
+    foreach(QNetworkInterface interface, QNetworkInterface::allInterfaces())
+    {
+        if (interface.allAddresses().contains(QHostAddress(myAddress)))
+            return interface.hardwareAddress();
+    }
+
+    return "";
 }
+
+QAuthenticator auth;
 
 #ifndef UNICLIENT_TESTS
 
@@ -133,26 +126,36 @@ void addTestData()
 #endif
 
 
-void registerServer(QnAppServerConnection& appServerConnection)
+QString serverId()
 {
-    QString myAddress = "10.0.2.119";
+    return QSettings().value("serverId").toString();
+}
 
-    QNetworkInterface networkInterface = QNetworkInterface::interfaceFromName(myAddress);
-    QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
+void registerServer(QnAppServerConnection& appServerConnection, const QString& myAddress)
+{
+    QSettings settings;
+    QString serverId = settings.value("serverId", "").toString();
 
-    serverId = readServerId();
-    if (!serverId.isValid())
+    if (serverId.isEmpty())
     {
-        QnServer server(networkInterface.hardwareAddress());
+        QString myMac = localMac(myAddress);
 
-        server.setMAC(networkInterface.hardwareAddress());
+        QnServer server(myMac);
+
+        server.setMAC(myMac);
         server.setUrl(myAddress);
 
         QnServerList servers;
         appServerConnection.addServer(server, servers);
 
-        serverId = servers.at(0)->getId();
-        writeServerId(serverId.toString());
+        if (servers.isEmpty())
+        {
+            cl_log.log("Can't register server", cl_logALWAYS);
+            return;
+        }
+
+        serverId = servers.at(0)->getId().toString();
+        settings.setValue("serverId", serverId);
     }
 }
 
@@ -233,8 +236,12 @@ int main(int argc, char *argv[])
     addTestData();
 #endif
 
-    QHostAddress host("10.0.2.3");
-    QAuthenticator auth;
+//    QSettings settings;
+//    settings.setValue("appserverAddress", "127.0.0.1");
+
+    QString appserverAddress = QSettings().value("appserverAddress", "10.0.2.3").toString();
+
+    QHostAddress host(appserverAddress);
     auth.setUser("appserver");
     auth.setPassword("123");
     QnAppServerConnection appServerConnection(host, auth, QnResourceDiscoveryManager::instance());
@@ -243,9 +250,9 @@ int main(int argc, char *argv[])
     appServerConnection.getResourceTypes(resourceTypeList);
     qnResTypePool->addResourceTypeList(resourceTypeList);
 
-    registerServer(appServerConnection);
+    registerServer(appServerConnection, localAddress(appserverAddress));
 
-    QnAppserverResourceProcessor processor(serverId, host, auth, QnResourceDiscoveryManager::instance());
+    QnAppserverResourceProcessor processor(serverId(), host, auth, QnResourceDiscoveryManager::instance());
 
     QnRtspListener rtspListener(QHostAddress::Any, 50000);
     rtspListener.start();
