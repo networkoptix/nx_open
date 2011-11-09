@@ -11,7 +11,7 @@ import stat, time
 from StringIO import StringIO
 from string import Template
 
-sys.path.insert(0, '../eveCommon')
+sys.path.insert(0, '../common')
 
 from convert import index_dirs, rmtree, setup_ffmpeg, instantiate_pro, copy_files, BUILDLIB, setup_tools
 from convert import convert as convert_common
@@ -90,7 +90,7 @@ copy_files(tools_path + '/bin/*.dll', 'bin/debug')
 gen_version_h()
 
 index_dirs(('src',), 'src/const.pro', 'src/server.pro', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
-instantiate_pro('src/server.pro', {'BUILDLIB' : BUILDLIB, 'FFMPEG' : ffmpeg_path})
+instantiate_pro('src/server.pro', {'BUILDLIB' : BUILDLIB, 'FFMPEG' : ffmpeg_path, 'EVETOOLS_DIR' : tools_path})
 
 if sys.platform == 'win32':
     os.system('qmake -tp vc -o src/server.vcproj src/server.pro')

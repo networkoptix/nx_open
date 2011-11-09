@@ -15,7 +15,7 @@ from string import Template
 import re
 
 # os.path = posixpath
-sys.path.insert(0, os.path.join('..', 'eveCommon'))
+sys.path.insert(0, os.path.join('..', 'common'))
   
 from convert import index_dirs, setup_ffmpeg, gen_filetypes_h, rmtree, instantiate_pro, BUILDLIB, qt_path, copy_files, setup_tools
 from convert import convert as convert_common
@@ -165,7 +165,7 @@ gen_version_h()
 genskin()
 
 index_dirs(('src',), 'src/const.pro', 'src/eveclient.pro', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
-instantiate_pro('src/eveclient.pro', {'BUILDLIB' : BUILDLIB, 'FFMPEG' : ffmpeg_path})
+instantiate_pro('src/eveclient.pro', {'BUILDLIB' : BUILDLIB, 'FFMPEG' : ffmpeg_path, 'EVETOOLS_DIR' : tools_path})
 # index_dirs(('src', 'test'), 'test/const.pro', 'test/eveclient_tests.pro', True, exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
 
 if sys.platform == 'win32':

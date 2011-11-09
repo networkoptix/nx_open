@@ -3,7 +3,9 @@ QT *= multimedia network xml
 CONFIG += x86 precompile_header %BUILDLIB
 CONFIG -= flat
 
-FFMPEG=%FFMPEG
+FFMPEG = %FFMPEG
+EVETOOLS_DIR = %EVETOOLS_DIR
+
 INCLUDEPATH += $$PWD
 PRECOMPILED_HEADER = $$PWD/StdAfx.h
 PRECOMPILED_SOURCE = $$PWD/StdAfx.cpp
@@ -77,14 +79,12 @@ DEFINES += __STDC_CONSTANT_MACROS
 
 # Clone ssh://hg@vigasin.com/evetools to the same diectory netoptix_vms is located
 win32 {
-    EVETOOLS_DIR=$$PWD/../../../evetools/win32
     QMAKE_CXXFLAGS += -Zc:wchar_t
     QMAKE_CXXFLAGS -= -Zc:wchar_t-
     LIBS += -lxerces-c_3
 }
 
 mac {
-    EVETOOLS_DIR=$$PWD/../../../evetools/mac
     LIBS += -lxerces-c-3.1
 }
 

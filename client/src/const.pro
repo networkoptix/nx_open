@@ -1,7 +1,7 @@
-INCLUDEPATH += ../../eveCommon/src
+INCLUDEPATH += ../../common/src
 
 win* {
-  INCLUDEPATH += ../../eveCommon/contrib/ffmpeg-misc-headers-win32
+  INCLUDEPATH += ../../common/contrib/ffmpeg-misc-headers-win32
 }
 
 QT = core gui network xml opengl multimedia webkit
@@ -16,6 +16,7 @@ TARGET = EvePlayer-Beta
 
 BUILDLIB = %BUILDLIB
 FFMPEG = %FFMPEG
+EVETOOLS_DIR = %EVETOOLS_DIR
 
 include(../contrib/qtsingleapplication/src/qtsingleapplication.pri)
 
@@ -59,18 +60,16 @@ mac {
 
 # Clone ssh://hg@vigasin.com/evetools to the same diectory netoptix_vms is located
 win32 {
-    EVETOOLS_DIR=$$PWD/../../../evetools/win32
     QMAKE_CXXFLAGS += -Zc:wchar_t
     QMAKE_CXXFLAGS -= -Zc:wchar_t-
     LIBS += -lxerces-c_3
 
-    # Define QN_EXPORT only if eveCommon build is not static
+    # Define QN_EXPORT only if common build is not static
     isEmpty(BUILDLIB) { DEFINES += QN_EXPORT=Q_DECL_IMPORT }
     !isEmpty(BUILDLIB) { DEFINES += QN_EXPORT= }
 }
 
 mac {
-    EVETOOLS_DIR=$$PWD/../../../evetools/mac
     LIBS += -lxerces-c-3.1
     DEFINES += QN_EXPORT=
 }
@@ -79,11 +78,11 @@ LIBS += -L$$EVETOOLS_DIR/lib
 
 CONFIG(debug) {
   INCLUDEPATH += $$FFMPEG-debug/include
-  LIBS += -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib -L$$PWD/../../eveCommon/bin/debug -lcommon
+  LIBS += -L$$FFMPEG-debug/bin -L$$FFMPEG-debug/lib -L$$PWD/../../common/bin/debug -lcommon
 }
 CONFIG(release) {
   INCLUDEPATH += $$FFMPEG-release/include
-  LIBS += -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib -L$$PWD/../../eveCommon/bin/release -lcommon
+  LIBS += -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib -L$$PWD/../../common/bin/release -lcommon
 }
 
 LIBS += -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale

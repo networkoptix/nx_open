@@ -30,20 +30,20 @@ build
 client/src/version.h
 common/src/common.pri
 
-eveClient/src/Info.plist
-eveClient/src/eveclient.pro
-eveClient/src/common.pro
-eveClient/src/version.h
-eveClient/src/Makefile
-eveClient/src/ipch
+client/src/Info.plist
+client/src/eveclient.pro
+client/src/common.pro
+client/src/version.h
+client/src/Makefile
+client/src/ipch
 
-eveCommon/src/common.pro
-eveCommon/src/plugins/resources/archive/filetypes.h
-eveCommon/src/Makefile
+common/src/common.pro
+common/src/plugins/resources/archive/filetypes.h
+common/src/Makefile
 
 scripts/appserver/server.state
 server/src/version.h
 
-eveServer/src/server.pro
-eveServer/src/version.h
-eveServer/src/Makefile
+server/src/server.pro
+server/src/version.h
+server/src/Makefile

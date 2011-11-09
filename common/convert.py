@@ -23,9 +23,14 @@ if sys.platform == 'darwin':
     BUILDLIB = ''
 
 def setup_tools():
-    tools_path = '../../evetools'
+    tools_path = os.getenv('EVE_TOOLS')
+
+    if not tools_path or not os.path.isdir(tools_path):
+        tools_path = os.path.join('..', '..', 'evetools')
+
+    tools_path = os.path.abspath(tools_path)
     if not os.path.isdir(tools_path):
-        print 'Please clone ssh://hg@vigasin.com/evetools to ../..'
+        print 'Please clone ssh://hg@vigasin.com/evetools to ../.. or to directory referenced by EVE_TOOLS env variable'
         sys.exit(1)
 
     if sys.platform == 'darwin':
@@ -33,7 +38,7 @@ def setup_tools():
     else:
         platform = 'win32'
 
-    return os.path.join(tools_path, platform)
+    return qt_path(os.path.join(tools_path, platform))
 
 def link_or_copy(src, dst):
     try:
@@ -48,6 +53,9 @@ def copy_files(src_glob, dst_folder):
 
 
 def qt_path(path):
+    if not path:
+        return path
+
     qtpath = path.replace('\\', '/')
     if sys.platform == 'win32':
         qtpath = qtpath.lstrip('/')
@@ -221,9 +229,10 @@ def convert():
 
         ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release = setup_ffmpeg()
         gen_filetypes_h()
+        tools_path = setup_tools()
 
         index_dirs(('src',), 'src/const.pro', 'src/common.pro', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
-        instantiate_pro('src/common.pro', {'BUILDLIB': BUILDLIB, 'FFMPEG' : ffmpeg_path})
+        instantiate_pro('src/common.pro', {'BUILDLIB': BUILDLIB, 'FFMPEG' : ffmpeg_path, 'EVETOOLS_DIR' : tools_path})
 
         if sys.platform == 'win32':
             os.system('qmake -tp vc -o src/common.vcproj src/common.pro')
