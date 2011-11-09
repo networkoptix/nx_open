@@ -54,8 +54,6 @@ win32 {
     # Disable warning C4250: 'Derived' : inherits 'Base::method' via dominance.
     # It is buggy, as described in http://connect.microsoft.com/VisualStudio/feedback/details/101259/disable-warning-c4250-class1-inherits-class2-member-via-dominance-when-weak-member-is-a-pure-virtual-function
     QMAKE_CXXFLAGS += /wd4250
-
-    INCLUDEPATH += $$PWD/contrib/ffmpeg-misc-headers-win32
   }
 
   !staticlib {
