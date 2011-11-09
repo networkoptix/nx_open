@@ -10,6 +10,7 @@
 int VideoServerSessionManager::getTimePeriods(const QnRequestParamList& params, QnApiTimePeriodListResponsePtr& timePeriodList)
 {
     QByteArray reply;
+    /*
     if(sendGetRequest("RecordedTimePeriods", params, reply) == 0)
     {
         try
@@ -25,5 +26,6 @@ int VideoServerSessionManager::getTimePeriods(const QnRequestParamList& params, 
             qDebug(e.what());
         }
     }
+    */
     return 1;
 }
