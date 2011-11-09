@@ -16,7 +16,7 @@ BUILDLIB = %BUILDLIB
 FFMPEG = %FFMPEG
 EVETOOLS_DIR = %EVETOOLS_DIR
 
-TARGET = Server
+TARGET = server
 
 win32: RC_FILE = server.rc
 
