@@ -7,7 +7,7 @@
 #include "core/resource/resource_type.h"
 #include "core/resource/resource.h"
 #include "core/resource/network_resource.h"
-#include "core/resource/server.h"
+#include "core/resource/video_server.h"
 
 class AppSessionManager;
 
@@ -22,7 +22,7 @@ public:
 
     int getResources(QList<QnResourcePtr>& resources);
 
-    int addServer(const QnServer&, QList<QnServerPtr>& servers);
+    int addServer(const QnVideoServer&, QnVideoServerList& servers);
     int addCamera(const QnNetworkResource&, const QnId& serverId, QList<QnResourcePtr>& cameras);
 
 private:

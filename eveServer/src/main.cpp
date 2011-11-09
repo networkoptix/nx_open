@@ -16,6 +16,7 @@
 #include "recording/file_deletor.h"
 #include "rest/server/rest_server.h"
 #include "rest/handlers/recorded_chunks.h"
+#include "core/resource/video_server.h"
 
 //#include "device_plugins/arecontvision/devices/av_device_server.h"
 
@@ -143,12 +144,12 @@ void registerServer(QnAppServerConnection& appServerConnection)
     serverId = readServerId();
     if (!serverId.isValid())
     {
-        QnServer server(networkInterface.hardwareAddress());
+        QnVideoServer server;
+        server.setName(QString("Server ") + myAddress);
 
-        server.setMAC(networkInterface.hardwareAddress());
         server.setUrl(myAddress);
 
-        QnServerList servers;
+        QnVideoServerList servers;
         appServerConnection.addServer(server, servers);
         Q_ASSERT(!servers.isEmpty());
         serverId = servers.at(0)->getId();

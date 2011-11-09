@@ -32,7 +32,7 @@ typedef QSharedPointer<xsd::api::servers::Servers>                       QnApiSe
 typedef QSharedPointer<xsd::api::events::events_t>                       QnApiEventResponsePtr;
 
 // for video server methods
-typedef QSharedPointer<xsd::api::timePeriodList::TimePeriodList>           QnApiTimePeriodListResponsePtr;
+typedef QSharedPointer<xsd::api::recordedTimePeriods::RecordedTimePeriods>           QnApiRecordedTimePeriodsResponsePtr;
 
 
 #endif // _EVE_TYPES_H

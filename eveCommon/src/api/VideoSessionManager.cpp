@@ -7,10 +7,18 @@
 #include "QStdIStream.h"
 #include "AppSessionManager.h"
 
-int VideoServerSessionManager::getTimePeriods(const QnRequestParamList& params, QnApiTimePeriodListResponsePtr& timePeriodList)
+VideoServerSessionManager::VideoServerSessionManager(const QHostAddress& host, int port, const QAuthenticator& auth):
+    SessionManager(host, port, auth)
 {
+
+}
+
+int VideoServerSessionManager::recordedTimePeriods(const QnRequestParamList& params, QnApiRecordedTimePeriodsResponsePtr& timePeriodList)
+{
+    using xsd::api::recordedTimePeriods::recordedTimePeriods;
+
     QByteArray reply;
-    /*
+
     if(sendGetRequest("RecordedTimePeriods", params, reply) == 0)
     {
         try
@@ -18,7 +26,7 @@ int VideoServerSessionManager::getTimePeriods(const QnRequestParamList& params, 
             QTextStream stream(reply);
             QStdIStream is(stream.device());
 
-            QnApiTimePeriodListResponsePtr timePeriodList = QnApiResourceTypeResponsePtr(xsd::api::timePeriodList::TimePeriodList (is, xml_schema::flags::dont_validate).release());
+            timePeriodList = QnApiRecordedTimePeriodsResponsePtr(recordedTimePeriods (is, xml_schema::flags::dont_validate).release());
 
             return 0;
         } catch (const xml_schema::exception& e)
@@ -26,6 +34,5 @@ int VideoServerSessionManager::getTimePeriods(const QnRequestParamList& params, 
             qDebug(e.what());
         }
     }
-    */
     return 1;
 }

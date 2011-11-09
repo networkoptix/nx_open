@@ -41,11 +41,11 @@ QString QnStorageManager::dateTimeStr(qint64 dateTimeMks)
     return text;
 }
 
-DeviceFileCatalog::TimePeriodList QnStorageManager::getRecordedPeriods(QnResourceList resList, qint64 startTime, qint64 endTime, qint64 detailLevel)
+QnTimePeriodList QnStorageManager::getRecordedPeriods(QnResourceList resList, qint64 startTime, qint64 endTime, qint64 detailLevel)
 {
     QMutexLocker lock(&m_mutex);
-    DeviceFileCatalog::TimePeriodList result;
-    QList<QVector<DeviceFileCatalog::TimePeriod> > cameras;
+    QnTimePeriodList result;
+    QList<QVector<QnTimePeriod> > cameras;
     for (int i = 0; i < resList.size(); ++i)
     {
         QnNetworkResourcePtr camera = qSharedPointerDynamicCast<QnNetworkResource> (resList[i]);
@@ -76,7 +76,7 @@ DeviceFileCatalog::TimePeriodList QnStorageManager::getRecordedPeriods(QnResourc
                 result << cameras[minIndex][0];
             }
             else {
-                DeviceFileCatalog::TimePeriod& last = result.last();
+                QnTimePeriod& last = result.last();
                 if (last.startTime <= minStartTime && last.startTime+last.duration > minStartTime)
                     last.duration = qMax(last.duration, minStartTime + cameras[minIndex][0].duration - last.startTime);
                 else

@@ -48,7 +48,7 @@ public:
     static QString dateTimeStr(qint64 dateTimeMks);
     QMap<int, QnStoragePtr> storageRoots() const { return m_storageRoots; }
     DeviceFileCatalogPtr getFileCatalog(const QnNetworkResourcePtr resource);
-    DeviceFileCatalog::TimePeriodList getRecordedPeriods(QnResourceList resList, qint64 startTime, qint64 endTime, qint64 detailLevel);
+    QnTimePeriodList getRecordedPeriods(QnResourceList resList, qint64 startTime, qint64 endTime, qint64 detailLevel);
 private:
     QnStoragePtr getOptimalStorageRoot();
     void clearSpace(QnStoragePtr storage);
