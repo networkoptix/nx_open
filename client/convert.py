@@ -164,19 +164,19 @@ gen_version_h()
 
 genskin()
 
-index_dirs(('src',), 'src/const.pro', 'src/eveclient.pro', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
-instantiate_pro('src/eveclient.pro', {'BUILDLIB' : BUILDLIB, 'FFMPEG' : ffmpeg_path, 'EVETOOLS_DIR' : tools_path})
-# index_dirs(('src', 'test'), 'test/const.pro', 'test/eveclient_tests.pro', True, exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
+index_dirs(('src',), 'src/const.pro', 'src/client.pro', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
+instantiate_pro('src/client.pro', {'BUILDLIB' : BUILDLIB, 'FFMPEG' : ffmpeg_path, 'EVETOOLS_DIR' : tools_path})
+# index_dirs(('src', 'test'), 'test/const.pro', 'test/client_tests.pro', True, exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
 
 if sys.platform == 'win32':
-    os.system('qmake -tp vc -o src/eveclient.vcproj src/eveclient.pro')
-#    os.system('qmake -tp vc -o test/eveclient_tests.vcproj test/eveclient_tests.pro')
+    os.system('qmake -tp vc -o src/client.vcproj src/client.pro')
+#    os.system('qmake -tp vc -o test/client_tests.vcproj test/client_tests.pro')
 
 elif sys.platform == 'darwin':
     generate_info_plist()
 
-    os.system('qmake -spec macx-g++ CONFIG-=release CONFIG+=debug -o build/Makefile.debug src/eveclient.pro')
-    os.system('qmake -spec macx-g++ CONFIG-=debug CONFIG+=release -o build/Makefile.release src/eveclient.pro')
+    os.system('qmake -spec macx-g++ CONFIG-=release CONFIG+=debug -o build/Makefile.debug src/client.pro')
+    os.system('qmake -spec macx-g++ CONFIG-=debug CONFIG+=release -o build/Makefile.release src/client.pro')
 
 if sys.platform == 'win32':
     # Bespin. By now only for windows.

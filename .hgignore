@@ -31,7 +31,7 @@ client/src/version.h
 common/src/common.pri
 
 client/src/Info.plist
-client/src/eveclient.pro
+client/src/client.pro
 client/src/common.pro
 client/src/version.h
 client/src/Makefile
