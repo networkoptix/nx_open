@@ -1,4 +1,5 @@
 #include "video_server.h"
+#include <QUrl>
 
 QnVideoServer::QnVideoServer():
     QnResource()
@@ -24,6 +25,21 @@ QnAbstractStreamDataProvider* QnVideoServer::createDataProviderInternal(Connecti
 {
     return 0;
 }
+
+void QnVideoServer::setApiUrl(const QString& restUrl)
+{
+    m_apiUrl = restUrl;
+    QUrl u(restUrl);
+    QAuthenticator auth;
+    auth.setPassword(u.password());
+    m_restConnection = QnVideoServerConnectionPtr(new QnVideoServerConnection(QHostAddress(u.host()), u.port(), auth));
+}
+
+QnVideoServerConnectionPtr QnVideoServer::apiConnection()
+{
+    return m_restConnection;
+}
+
 
 #if 0
 void QnVideoServer::startRTSPListener(const QHostAddress& address, int port)

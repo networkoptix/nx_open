@@ -1,10 +1,12 @@
 #ifndef __VIDEO_SERVER_CONNECTION_H_
 #define __VIDEO_SERVER_CONNECTION_H_
 
-#include "VideoSessionManager.h"
+#include <QSharedPointer>
+#include <QAuthenticator>
 #include "recording/device_file_catalog.h"
 #include "core/resource/network_resource.h"
 
+class VideoServerSessionManager;
 class QN_EXPORT QnVideoServerConnection
 {
 public:
@@ -13,7 +15,9 @@ public:
     QnTimePeriodList recordedTimePeriods(const QnNetworkResourceList& list, qint64 startTime, qint64 endTime, qint64 detail);
 
 private:
-    VideoServerSessionManager m_sessionManager;
+    QSharedPointer<VideoServerSessionManager> m_sessionManager;
 };
+
+typedef QSharedPointer<QnVideoServerConnection> QnVideoServerConnectionPtr;
 
 #endif // __VIDEO_SERVER_CONNECTION_H_

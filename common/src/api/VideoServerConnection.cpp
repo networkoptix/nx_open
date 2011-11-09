@@ -1,8 +1,9 @@
 #include "VideoServerConnection.h"
 #include "xsd_RecordedTimePeriods.h"
+#include "VideoSessionManager.h"
 
 QnVideoServerConnection::QnVideoServerConnection(const QHostAddress& host, int port, const QAuthenticator& auth):
-    m_sessionManager(host, port, auth)
+    m_sessionManager( new VideoServerSessionManager(host, port, auth))
 {
 
 }
@@ -22,7 +23,7 @@ QnTimePeriodList QnVideoServerConnection::recordedTimePeriods(const QnNetworkRes
     params << QnRequestParam("endTime", QString::number(endTime));
     params << QnRequestParam("detail", QString::number(detail));
 
-    m_sessionManager.recordedTimePeriods(params, timePeriodList);
+    m_sessionManager->recordedTimePeriods(params, timePeriodList);
 
     for (RecordedTimePeriods::timePeriod_const_iterator i = timePeriodList->timePeriod().begin(); i != timePeriodList->timePeriod().end(); ++i)
     {

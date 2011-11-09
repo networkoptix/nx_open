@@ -3,9 +3,7 @@
 
 #include <QSharedPointer>
 #include "core/resource/resource.h"
-
-
-//class QnRtspListener;
+#include "api/VideoServerConnection.h"
 
 class QnVideoServer: public QnResource
 {
@@ -14,12 +12,14 @@ public:
     virtual ~QnVideoServer();
     virtual QString getUniqueId() const;
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
-#if 0
-    void startRTSPListener(const QHostAddress& address = QHostAddress::Any, int port = 50000);
-    void stopRTSPListener();
+
+    void setApiUrl(const QString& restUrl);
+
+    QnVideoServerConnectionPtr apiConnection();
+
 private:
-    QnRtspListener* m_rtspListener;
-#endif
+    QnVideoServerConnectionPtr m_restConnection;
+    QString m_apiUrl;
 };
 
 typedef QSharedPointer<QnVideoServer> QnVideoServerPtr;
