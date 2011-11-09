@@ -10,6 +10,7 @@
 
 class QnNetworkResource;
 typedef QSharedPointer<QnNetworkResource> QnNetworkResourcePtr;
+typedef QList<QnNetworkResourcePtr> QnNetworkResourceList;
 
 class QN_EXPORT QnNetworkResource : virtual public QnResource
 {
@@ -85,7 +86,7 @@ private:
     QAuthenticator m_auth;
     bool m_authenticated;
 
-    QHostAddress m_hostAddr;
+    //QHostAddress m_hostAddr;
     QnMacAddress m_macAddress;
 
 

@@ -38,13 +38,13 @@ int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestP
     bool urlFound = false;
     for (int i = 0; i < params.size(); ++i)
     {
-        if (params[i].first == "url")
+        if (params[i].first == "mac")
         {
             urlFound = true;
-            QString url = params[i].second.trimmed();
-            QnResourcePtr res = qnResPool->getResourceByUrl(url);
+            QString mac = params[i].second.trimmed();
+            QnResourcePtr res = qnResPool->getNetResourceByMac(mac);
             if (res == 0)
-                errStr += QByteArray("Resource with URL '") + url.toUtf8() + QByteArray("' not found. \n");
+                errStr += QByteArray("Resource with mac '") + mac.toUtf8() + QByteArray("' not found. \n");
             else 
                 resList << res;
         }
@@ -59,7 +59,7 @@ int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestP
             detailLevel = params[i].second.toLongLong();
     }
     if (!urlFound)
-        errStr += "Parameter url must be provided. \n";
+        errStr += "Parameter mac must be provided. \n";
     if (startTime < 0)
         errStr += "Parameter startTime must be provided. \n";
     if (endTime < 0)
@@ -81,7 +81,10 @@ int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestP
 
     foreach(DeviceFileCatalog::TimePeriod period, periods)
     {
-        result.append(QString("<TimePeriod startTime=\"%1\" duration=\"%2\" />\n").arg(period.startTime).arg(period.duration));
+        qint64 duration = period.duration;
+        if (duration == -1)
+            duration = QDateTime::currentDateTime().toMSecsSinceEpoch()*1000ll - period.startTime;
+        result.append(QString("<TimePeriod startTime=\"%1\" duration=\"%2\" />\n").arg(period.startTime).arg(duration));
     }
     result.append("</TimePeriodList>\n");
 
@@ -97,7 +100,7 @@ QString QnRecordedChunkListHandler::description(TCPSocket* tcpSocket) const
 {
     QString rez;
     rez += "Return recorded chunk info by specified cameras\n";
-    rez += "<BR>Param <b>url</b> - camera URL (same as MAC at current version). Param can be repeated several times for many cameras.";
+    rez += "<BR>Param <b>mac</b> - camera mac. Param can be repeated several times for many cameras.";
     rez += "<BR>Param <b>startTime</b> - Time interval start. ms since 1970 UTC or string at format 'YYYY-MM-DDThh24:mi:ss.ms', format auto detected)";
     rez += "<BR>Param <b>endTime</b> - Time interval end (same format, see above)";
     rez += "<BR>Param <b>detail</b> - Chunk detail level. Time periods/chunks less than detal level is discarded. You can use detail level as amount of mks per screen pixel";

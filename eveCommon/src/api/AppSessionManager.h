@@ -1,5 +1,5 @@
-#ifndef _SESSION_MANAGER_H
-#define _SESSION_MANAGER_H
+#ifndef _APP_SESSION_MANAGER_H
+#define _APP_SESSION_MANAGER_H
 
 #include <QString>
 #include <QList>
@@ -8,11 +8,12 @@
 
 #include "utils/network/simple_http_client.h"
 #include "api/Types.h"
+#include "SessionManager.h"
 
-class SessionManager
+class AppSessionManager: public SessionManager
 {
 public:
-    SessionManager(const QHostAddress& host, const QAuthenticator& auth);
+    AppSessionManager(const QHostAddress& host, int port, const QAuthenticator& auth);
 
     int getResourceTypes(QnApiResourceTypeResponsePtr& resourceTypes);
     int getResources(QnApiResourceResponsePtr& resources);
@@ -23,13 +24,6 @@ public:
 private:
     CLHttpStatus addObject(const QString& objectName, const QByteArray& body, QByteArray& response);
 
-private:
-    int getObjectList(QString objectName, QByteArray& reply);
-
-private:
-    CLSimpleHTTPClient m_client;
-
-    bool m_needEvents;
 };
 
-#endif // _SESSION_MANAGER_H
+#endif // _APP_SESSION_MANAGER_H

@@ -63,6 +63,11 @@ CLHttpStatus CLSimpleHTTPClient::getNextLine()
 
 CLHttpStatus CLSimpleHTTPClient::doPOST(const QString& requestStr, const QString& body)
 {
+    return doPOST(requestStr.toUtf8(), body);
+}
+
+CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QString& body)
+{
     try
     {
         if (!m_connected)
@@ -193,6 +198,11 @@ int CLSimpleHTTPClient::readHeaders()
 }
 
 CLHttpStatus CLSimpleHTTPClient::doGET(const QString& requestStr, bool recursive)
+{
+    return doGET(requestStr.toUtf8(), recursive);
+}
+
+CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recursive)
 {
 	try
 	{

@@ -24,6 +24,9 @@ public:
     CLHttpStatus doGET(const QString& request, bool recursive = true);
     CLHttpStatus doPOST(const QString& request, const QString& body);
 
+    CLHttpStatus doGET(const QByteArray& request, bool recursive = true);
+    CLHttpStatus doPOST(const QByteArray& request, const QString& body);
+
     bool isOpened()const{return m_connected;}
 
     void readAll(QByteArray& data);

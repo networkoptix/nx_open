@@ -236,10 +236,11 @@ int main(int argc, char *argv[])
 #endif
 
     QHostAddress host("10.0.2.3");
+    int port = 8000;
     QAuthenticator auth;
     auth.setUser("appserver");
     auth.setPassword("123");
-    QnAppServerConnection appServerConnection(host, auth, QnResourceDiscoveryManager::instance());
+    QnAppServerConnection appServerConnection(host, port, auth, QnResourceDiscoveryManager::instance());
 
     QList<QnResourceTypePtr> resourceTypeList;
     appServerConnection.getResourceTypes(resourceTypeList);
@@ -247,7 +248,7 @@ int main(int argc, char *argv[])
 
     registerServer(appServerConnection);
 
-    QnAppserverResourceProcessor processor(serverId, host, auth, QnResourceDiscoveryManager::instance());
+    QnAppserverResourceProcessor processor(serverId, host, port, auth, QnResourceDiscoveryManager::instance());
 
     QnRtspListener rtspListener(QHostAddress::Any, 50000);
     rtspListener.start();

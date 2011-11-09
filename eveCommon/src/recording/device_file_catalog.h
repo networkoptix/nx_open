@@ -7,6 +7,7 @@
 #include <QMap>
 #include <QSharedPointer>
 #include "core/resource/resource.h"
+#include "core/resource/network_resource.h"
 
 class DeviceFileCatalog: public QObject
 {
@@ -36,7 +37,7 @@ public:
     };
     typedef QVector<TimePeriod> TimePeriodList;
 
-    DeviceFileCatalog(QnResourcePtr resource);
+    DeviceFileCatalog(QnNetworkResourcePtr resource);
     void deserializeTitleFile();
     void addRecord(const Chunk& chunk);
     void updateDuration(int duration);
@@ -56,14 +57,14 @@ public:
 
     TimePeriodList getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel);
 private:
-    QString baseRoot(QnResourcePtr resource);
+    QString baseRoot(QnNetworkResourcePtr resource);
     qint64 getFileDuration(const QString& fileName);
 private:
     mutable QMutex m_mutex;
     QFile m_file;
     QVector<Chunk> m_chunks; 
     int m_firstDeleteCount;
-    QnResourcePtr m_resource;
+    QnNetworkResourcePtr m_resource;
 
     QPair<int, bool> m_prevParts[4];
     QStringList m_existFileList;

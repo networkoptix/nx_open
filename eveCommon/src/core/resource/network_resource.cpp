@@ -51,13 +51,15 @@ bool QnNetworkResource::equalsTo(const  QnResourcePtr other) const
 QHostAddress QnNetworkResource::getHostAddress() const
 {
     QMutexLocker mutex(&m_mutex);
-    return m_hostAddr;
+    //return m_hostAddr;
+    return QHostAddress(getUrl());
 }
 
 bool QnNetworkResource::setHostAddress(const QHostAddress& ip, QnDomain /*domain*/ )
 {
     QMutexLocker mutex(&m_mutex);
-    m_hostAddr = ip;
+    //m_hostAddr = ip;
+    setUrl(ip.toString());
     return true;
 }
 
@@ -71,7 +73,6 @@ void  QnNetworkResource::setMAC(QnMacAddress mac)
 {
     QMutexLocker mutex(&m_mutex);
     m_macAddress = mac;
-    setUrl(m_macAddress.toString());
 }
 
 void QnNetworkResource::setAuth(const QString& user, QString password)

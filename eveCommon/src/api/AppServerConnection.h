@@ -9,12 +9,12 @@
 #include "core/resource/network_resource.h"
 #include "core/resource/server.h"
 
-class SessionManager;
+class AppSessionManager;
 
 class QN_EXPORT QnAppServerConnection
 {
 public:
-    QnAppServerConnection(const QHostAddress& host, const QAuthenticator& auth, QnResourceFactory& resourceFactory);
+    QnAppServerConnection(const QHostAddress& host, int port, const QAuthenticator& auth, QnResourceFactory& resourceFactory);
 
     ~QnAppServerConnection();
 
@@ -26,7 +26,7 @@ public:
     int addCamera(const QnNetworkResource&, const QnId& serverId, QList<QnResourcePtr>& cameras);
 
 private:
-    QSharedPointer<SessionManager> m_sessionManager;
+    QSharedPointer<AppSessionManager> m_sessionManager;
     QnResourceFactory& m_resourceFactory;
 
 };
