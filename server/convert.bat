@@ -1,1 +1,1 @@
-@start /B /WAIT convert.py
+@start /B /WAIT convert.py -parents

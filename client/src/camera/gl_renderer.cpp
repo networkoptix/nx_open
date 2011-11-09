@@ -4,12 +4,11 @@
 //#include <QtCore/QTime>
 
 #include <QtGui/QMessageBox>
-
-#include "core/resource/resource.h"
-#include "utils/common/log.h"
-
-#include "videoitem/video_wnd_item.h"
+#include "ui/videoitem/video_wnd_item.h"
 #include "yuvconvert.h"
+#include "camera.h"
+#include "utils/common/util.h"
+#include "utils/media/sse_helper.h"
 
 #ifndef GL_FRAGMENT_PROGRAM_ARB
 #define GL_FRAGMENT_PROGRAM_ARB           0x8804
@@ -37,8 +36,8 @@
 # define GL_TEXTURE2    0x84C2
 #endif
 
-static const int MAX_SHADER_SIZE = 1024*3;
-static const int ROUND_COEFF = 8;
+static const unsigned int MAX_SHADER_SIZE = 1024*3;
+static const unsigned int ROUND_COEFF = 8;
 
 QVector<uchar> CLGLRenderer::m_staticYFiller;
 QVector<uchar> CLGLRenderer::m_staticUVFiller;
@@ -134,9 +133,6 @@ CLGLRenderer::CLGLRenderer(CLVideoWindowItem *vw) :
     isSoftYuv2Rgb(false),
     m_forceSoftYUV(false),
     m_textureUploaded(false),
-    m_stride(0), // in memory
-    m_width(0), // visible width
-    m_height(0),
     m_stride_old(0),
     m_height_old(0),
     m_videoTextureReady(false),
@@ -148,7 +144,11 @@ CLGLRenderer::CLGLRenderer(CLVideoWindowItem *vw) :
     m_gotnewimage(false),
     m_needwait(true),
     m_videowindow(vw),
-    m_inited(false)
+    m_inited(false),
+    m_curImg(0),
+    m_videoWidth(0),
+    m_videoHeight(0)
+
 {
     applyMixerSettings(m_brightness, m_contrast, m_hue, m_saturation);
 
@@ -231,7 +231,7 @@ void CLGLRenderer::init(bool msgbox)
     QByteArray ext(extensions);
     QByteArray ver(version);
 
-    //version = "1.0.7";
+    //ver = "1.0.7 Microsoft";
     clampConstant = GL_CLAMP;
     if (ext.contains("GL_EXT_texture_edge_clamp"))
     {
@@ -245,17 +245,14 @@ void CLGLRenderer::init(bool msgbox)
     {
         clampConstant = GL_CLAMP_TO_EDGE;
     }
-    else if (ver <= QByteArray("1.1.0"))
+
+    if (ver <= QByteArray("1.1.0"))
     {
         // Microsoft Generic software
-        const QString message = QObject::tr("SLOW_OPENGL");
+        const QString message = QObject::tr("OpenGL driver is not installed or outdated. Please update video driver for better perfomance.");
         CL_LOG(cl_logWARNING) cl_log.log(message, cl_logWARNING);
         if (msgbox)
-        {
-            QMessageBox* box = new QMessageBox(QMessageBox::Warning, QObject::tr("Info"), message, QMessageBox::Ok, 0);
-            box->show();
-            // ### fix leaking
-        }
+            QMessageBox::warning(0, QObject::tr("Important Performance Tip"), message, QMessageBox::Ok, QMessageBox::NoButton);
     }
 
     bool error = false;
@@ -317,13 +314,12 @@ void CLGLRenderer::init(bool msgbox)
         // in this first revision we do not support software color transform
         gl_status = CL_GL_NOT_SUPPORTED;
 
-        const QString message = QObject::tr("This software version supports only GPU (not CPU) color transformation. This video card do not supports shaders (GPU transforms). Please contact to developers to get new software version with YUV=>RGB software transform for your video card. Or update your video card:-)");
-        CL_LOG(cl_logWARNING) cl_log.log(message, cl_logWARNING);
         if (msgbox)
         {
-            QMessageBox* box = new QMessageBox(QMessageBox::Warning, QObject::tr("Info"), message, QMessageBox::Ok, 0);
-            box->show();
-            // ### fix leaking
+            const QString message = QObject::tr("We have detected that your video card drivers may be not installed or out of date.\n"
+                                                "Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.\n"
+                                                "For easy instructions on how to install or update your video driver, follow instruction at http://tribaltrouble.com/driversupport.php");
+            QMessageBox::warning(0, QObject::tr("Important Performance Tip"), message, QMessageBox::Ok, QMessageBox::NoButton);
         }
     }
 
@@ -358,11 +354,8 @@ void CLGLRenderer::init(bool msgbox)
     glEnable(GL_TEXTURE_2D);
     OGL_CHECK_ERROR("glEnable");
 
-    // Initialize maxTextureSize value. It should be somewhere where GL context
-    // already initialized, otherwise it will return 0.
-    (void)CLGLRenderer::getMaxTextureSize();
-
     gl_status = CL_GL_SUPPORTED;
+
 }
 
 Q_GLOBAL_STATIC(QMutex, maxTextureSizeMutex)
@@ -386,8 +379,53 @@ int CLGLRenderer::getMaxTextureSize()
 
 void CLGLRenderer::beforeDestroy()
 {
+    QMutexLocker lock(&m_displaySync);
     m_needwait = false;
-    m_waitCon.wakeOne();
+    if (m_curImg)
+        m_curImg->setDisplaying(false);
+    m_waitCon.wakeAll();
+}
+
+void CLGLRenderer::draw(CLVideoDecoderOutput* img)
+{
+    QMutexLocker locker(&m_displaySync);
+    //m_abort_drawing = false;
+
+    //m_imageList.enqueue(img);
+    if (m_curImg)
+        m_curImg->setDisplaying(false);
+    m_curImg = img;
+    m_format = m_curImg->format;
+
+    m_curImg->setDisplaying(true);
+    if (m_curImg->linesize[0] != m_stride_old || m_curImg->height != m_height_old || m_curImg->format != m_color_old)
+    {
+        m_videoTextureReady = false;
+        m_stride_old = m_curImg->linesize[0];
+        m_height_old = m_curImg->height;
+        m_color_old = (PixelFormat) m_curImg->format;
+    }
+
+    m_gotnewimage = true;
+    if (!m_videowindow->isVisible())
+        return;
+
+    m_videowindow->needUpdate(true); // sending paint event
+}
+
+void CLGLRenderer::waitForFrameDisplayed(int channel)
+{
+    Q_UNUSED(channel)
+
+    if (m_needwait && m_curImg)
+    {
+        QMutexLocker lock(&m_displaySync);
+        while (m_curImg->isDisplaying()) 
+        {
+            m_waitCon.wait(&m_displaySync, 50);
+            //break;
+        }
+    }
 }
 
 void CLGLRenderer::setForceSoftYUV(bool value)
@@ -414,16 +452,11 @@ void CLGLRenderer::applyMixerSettings(qreal brightness, qreal contrast, qreal hu
     m_saturation = saturation + 1.0;
 }
 
-static inline int roundUp(int value)
-{
-    return value % ROUND_COEFF ? (value + ROUND_COEFF - (value % ROUND_COEFF)) : value;
-}
-
 int CLGLRenderer::glRGBFormat() const
 {
     if (!isYuvFormat())
     {
-        switch (m_color)
+        switch (m_format)
         {
         case PIX_FMT_RGBA: return GL_RGBA;
         case PIX_FMT_BGRA: return GL_BGRA_EXT;
@@ -455,32 +488,28 @@ bool CLGLRenderer::isPixelFormatSupported(PixelFormat pixfmt)
 
 bool CLGLRenderer::isYuvFormat() const
 {
-    return m_color == PIX_FMT_YUV422P || m_color == PIX_FMT_YUV420P || m_color == PIX_FMT_YUV444P;
+    return m_format == PIX_FMT_YUV422P || m_format == PIX_FMT_YUV420P || m_format == PIX_FMT_YUV444P;
 }
 
 void CLGLRenderer::updateTexture()
 {
     //image.saveToFile("test.yuv");
 
-    int w[3] = { m_stride, m_stride / 2, m_stride / 2 };
-    int r_w[3] = { m_width, m_width / 2, m_width / 2 }; // real_width / visable
-    int h[3] = { m_height, m_height / 2, m_height / 2 };
+    unsigned int w[3] = { m_curImg->linesize[0], m_curImg->linesize[1], m_curImg->linesize[2] };
+    unsigned int r_w[3] = { m_curImg->width, m_curImg->width / 2, m_curImg->width / 2 }; // real_width / visable
+    unsigned int h[3] = { m_curImg->height, m_curImg->height / 2, m_curImg->height / 2 };
 
-    switch (m_color)
+    switch (m_curImg->format)
     {
     case PIX_FMT_YUV444P:
-        w[1] = w[2] = m_stride;
-        r_w[1] = r_w[2] = m_width;
+        r_w[1] = r_w[2] = m_curImg->width;
     // fall through
     case PIX_FMT_YUV422P:
-        h[1] = h[2] = m_height;
+        h[1] = h[2] = m_curImg->height;
         break;
     default:
         break;
     }
-
-    //int round_width[3] = {roundUp(w[0]), roundUp(w[1]), roundUp(w[2])};
-    //int round_width[3] = {roundUp(r_w[0]), roundUp(r_w[1]), roundUp(r_w[2])};
 
     glEnable(GL_TEXTURE_2D);
     OGL_CHECK_ERROR("glEnable");
@@ -491,17 +520,17 @@ void CLGLRenderer::updateTexture()
         {
             glBindTexture(GL_TEXTURE_2D, m_texture[i]);
             OGL_CHECK_ERROR("glBindTexture");
-            const uchar *pixels = m_arrayPixels[i];
+            const uchar* pixels = m_curImg->data[i];
             if (!m_videoTextureReady)
             {
                 // if support "GL_ARB_texture_non_power_of_two", use default size of texture,
                 // else nearest power of two
-                int wPow = isNonPower2 ? roundUp(w[i]) : getMinPow2(w[i]);
-                int hPow = isNonPower2 ? h[i] : getMinPow2(h[i]);
+                unsigned int wPow = isNonPower2 ? roundUp(w[i],ROUND_COEFF) : getMinPow2(w[i]);
+                unsigned int hPow = isNonPower2 ? h[i] : getMinPow2(h[i]);
                 // support GL_ARB_texture_non_power_of_two ?
 
                 m_videoCoeffL[i] = 0;
-                int round_r_w = roundUp(r_w[i]);
+                unsigned int round_r_w = roundUp(r_w[i],ROUND_COEFF);
                 m_videoCoeffW[i] =  round_r_w / (float) wPow;
 
                 m_videoCoeffH[i] = h[i] / (float) hPow;
@@ -559,7 +588,7 @@ void CLGLRenderer::updateTexture()
             glPixelStorei(GL_UNPACK_ROW_LENGTH, w[i]);
             glTexSubImage2D(GL_TEXTURE_2D, 0,
                             0, 0,
-                            roundUp(r_w[i]),
+                            roundUp(r_w[i],ROUND_COEFF),
                             h[i],
                             GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels);
             OGL_CHECK_ERROR("glTexSubImage2D");
@@ -582,16 +611,16 @@ void CLGLRenderer::updateTexture()
             // else nearest power of two
             int bytesPerPixel = 1;
             if (!isYuvFormat()) {
-                if (m_color == PIX_FMT_RGB24 || m_color == PIX_FMT_BGR24)
+                if (m_curImg->format == PIX_FMT_RGB24 || m_curImg->format == PIX_FMT_BGR24)
                     bytesPerPixel = 3;
                 else
                     bytesPerPixel = 4;
             }
-            const int wPow = isNonPower2 ? roundUp(w[0] / bytesPerPixel) : getMinPow2(w[0] / bytesPerPixel);
+            const int wPow = isNonPower2 ? roundUp(w[0]/bytesPerPixel,ROUND_COEFF) : getMinPow2(w[0]/bytesPerPixel);
             const int hPow = isNonPower2 ? h[0] : getMinPow2(h[0]);
             // support GL_ARB_texture_non_power_of_two ?
             m_videoCoeffL[0] = 0;
-            m_videoCoeffW[0] = roundUp(r_w[0]) / float(wPow);
+            m_videoCoeffW[0] = roundUp(r_w[0],ROUND_COEFF) / float(wPow);
             m_videoCoeffH[0] = h[0] / float(hPow);
 
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wPow, hPow, 0, glRGBFormat(), GL_UNSIGNED_BYTE, 0);
@@ -606,40 +635,58 @@ void CLGLRenderer::updateTexture()
             OGL_CHECK_ERROR("glTexParameteri");
         }
 
-        uchar *pixels = m_arrayPixels[0];
+        uchar *pixels = m_curImg->data[0];
         if (isYuvFormat())
         {
-            int size = 4 * m_stride * h[0];
+            int size = 4 * m_curImg->linesize[0] * h[0];
             if (yuv2rgbBuffer.size() < size)
                 yuv2rgbBuffer.resize(size);
             pixels = yuv2rgbBuffer.data();
         }
 
-        int lineInPixelsSize = m_stride;
-        switch (m_color)
+        int lineInPixelsSize = m_curImg->linesize[0];
+        switch (m_curImg->format)
         {
-        case PIX_FMT_YUV422P:
-            yuv422_argb32_mmx(pixels, m_arrayPixels[0], m_arrayPixels[2], m_arrayPixels[1],
-                              roundUp(r_w[0]),
-                              h[0],
-                              4 * m_stride,
-                              m_stride, m_stride / 2);
+        case PIX_FMT_YUV420P:
+            if (useSSE2())
+            {
+                yuv420_argb32_sse_intr(pixels, m_curImg->data[0], m_curImg->data[2], m_curImg->data[1],
+                    roundUp(r_w[0],ROUND_COEFF),
+                    h[0],
+                    4 * m_curImg->linesize[0],
+                    m_curImg->linesize[0], m_curImg->linesize[1], m_painterOpacity*255);
+            }
+            else {
+                cl_log.log("CPU does not contains SSE2 module. Color space convert is not implemented", cl_logWARNING);
+            }
             break;
 
-        case PIX_FMT_YUV420P:
-            yuv420_argb32_mmx(pixels, m_arrayPixels[0], m_arrayPixels[2], m_arrayPixels[1],
-                              roundUp(r_w[0]),
-                              h[0],
-                              4 * m_stride,
-                              m_stride, m_stride / 2);
+        case PIX_FMT_YUV422P:
+            if (useSSE2())
+            {
+                yuv422_argb32_sse_intr(pixels, m_curImg->data[0], m_curImg->data[2], m_curImg->data[1],
+                    roundUp(r_w[0],ROUND_COEFF),
+                    h[0],
+                    4 * m_curImg->linesize[0],
+                    m_curImg->linesize[0], m_curImg->linesize[1], m_painterOpacity*255);
+            }
+            else {
+                cl_log.log("CPU does not contains SSE2 module. Color space convert is not implemented", cl_logWARNING);
+            }
             break;
 
         case PIX_FMT_YUV444P:
-            yuv444_argb32_mmx(pixels, m_arrayPixels[0], m_arrayPixels[2], m_arrayPixels[1],
-                              roundUp(r_w[0]),
-                              h[0],
-                              4 * m_stride,
-                              m_stride, m_stride);
+            if (useSSE2())
+            {
+                yuv444_argb32_sse_intr(pixels, m_curImg->data[0], m_curImg->data[2], m_curImg->data[1],
+                    roundUp(r_w[0],ROUND_COEFF),
+                    h[0],
+                    4 * m_curImg->linesize[0],
+                    m_curImg->linesize[0], m_curImg->linesize[1], m_painterOpacity*255);
+            }
+            else {
+                cl_log.log("CPU does not contains SSE2 module. Color space convert is not implemented", cl_logWARNING);
+            }
             break;
 
         case PIX_FMT_RGB24:
@@ -656,20 +703,19 @@ void CLGLRenderer::updateTexture()
         OGL_CHECK_ERROR("glPixelStorei");
         glTexSubImage2D(GL_TEXTURE_2D, 0,
             0, 0,
-            roundUp(r_w[0]),
+            roundUp(r_w[0],ROUND_COEFF),
             h[0],
             glRGBFormat(), GL_UNSIGNED_BYTE, pixels);
 
         OGL_CHECK_ERROR("glTexSubImage2D");
         glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
         OGL_CHECK_ERROR("glPixelStorei");
-#if 0
-        if (m_videowindow->getVideoCam()->getDevice()->checkDeviceTypeFlag(CLDevice::SINGLE_SHOT))
+
+        if (m_videowindow->getVideoCam()->getDevice()->checkFlag(QnResource::SINGLE_SHOT))
         {
             // free memory immediately for still images
             yuv2rgbBuffer.clear();
         }
-#endif
     }
 
     //glDisable(GL_TEXTURE_2D);
@@ -770,62 +816,6 @@ void CLGLRenderer::drawVideoTexture(GLuint tex0, GLuint tex1, GLuint tex2, const
     }
 }
 
-void CLGLRenderer::draw(CLVideoDecoderOutput &image, unsigned int channel)
-{
-    Q_UNUSED(channel);
-
-    QMutexLocker locker(&m_mutex);
-
-    m_stride = image.stride1;
-    m_height = image.height;
-    m_width = image.width;
-
-    m_color = image.out_type;
-
-    if (m_stride != m_stride_old || m_height != m_height_old || m_color != m_color_old)
-    {
-        m_videoTextureReady = false;
-        m_stride_old = m_stride;
-        m_height_old = m_height;
-        m_color_old = m_color;
-    }
-
-    m_arrayPixels[0] = image.C1;
-    m_arrayPixels[1] = image.C2;
-    m_arrayPixels[2] = image.C3;
-
-    m_gotnewimage = true;
-
-    //QTime time;
-    //time.restart();
-
-    if (!m_videowindow->isVisible())
-        return;
-
-    m_videowindow->needUpdate(true); // sending paint event
-    //m_videowindow->update();
-
-    if (m_needwait)
-    {
-        m_do_not_need_to_wait_any_more = false;
-
-        while (!m_waitCon.wait(&m_mutex, 50)) // unlock the mutex
-        {
-            if (!m_videowindow->isVisible() || !m_needwait)
-                break;
-
-            if (m_do_not_need_to_wait_any_more)
-                break; // some times It does not wake up after wakeone is called ; is it a bug?
-        }
-    }
-
-    //cl_log.log("time =", time.elapsed(), cl_logDEBUG1);
-
-    // after paint had happened
-
-    //paintEvent
-}
-
 #if 0
 static inline QRect getTextureRect(float textureWidth, float textureHeight,
                                    float windowWidth, float windowHeight, const float sar)
@@ -841,42 +831,41 @@ static inline QRect getTextureRect(float textureWidth, float textureHeight,
 
 bool CLGLRenderer::paintEvent(const QRect &r)
 {
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
     if (!m_inited)
     {
         init(gl_status == CL_GL_NOT_TESTED);
         m_inited = true;
     }
 
-    QMutexLocker locker(&m_mutex);
+    if (m_painterOpacity < 1.0) {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
 
-    if (m_stride == 0)
-        return true;
 
-    bool draw = (m_width <= getMaxTextureSize() && m_height <= getMaxTextureSize());
-    if (draw)
+    CLVideoDecoderOutput* curImg;
     {
-        if (m_gotnewimage)
+        QMutexLocker locker(&m_displaySync);
+        curImg = m_curImg;
+        if (m_gotnewimage && curImg && curImg->linesize[0]) {
+            m_videoWidth = curImg->width;
+            m_videoHeight = curImg->height;
             updateTexture();
-
+        }
+    }
+    bool draw = m_videoWidth <= getMaxTextureSize() && m_videoHeight <= getMaxTextureSize();
+    if (draw && m_videoWidth > 0 && m_videoHeight > 0)
+    {
         QRect temp(r);
-#if 0
-        //temp = QRect(0, 0, m_videowindow->width(), m_videowindow->height());
-        //float sar = 1.0f;
-        //getTextureRect(temp, m_stride, m_height, temp.width(), temp.height(), sar);
-        //m_painterOpacity = 0.3;
-        //m_painterOpacity = 1.0;
-#endif
-
         const float v_array[] = { temp.left(), temp.top(), temp.right() + 1, temp.top(), temp.right() + 1, temp.bottom() + 1, temp.left(), temp.bottom() + 1 };
         drawVideoTexture(m_texture[0], m_texture[1], m_texture[2], v_array);
     }
 
-    m_waitCon.wakeOne();
-    m_do_not_need_to_wait_any_more = true;
-
+    QMutexLocker locker(&m_displaySync);
+    if (curImg && curImg == m_curImg && curImg->isDisplaying()) {
+        curImg->setDisplaying(false);
+        m_waitCon.wakeAll();
+    }
     return draw;
 }
 

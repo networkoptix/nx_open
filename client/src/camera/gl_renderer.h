@@ -12,8 +12,6 @@ class CLVideoWindowItem;
 
 class CLGLRenderer : public CLAbstractRenderer
 {
-    friend class CLVideoWindowItem;
-
 public:
     enum CLGLDrawHardwareStatus
     {
@@ -22,16 +20,19 @@ public:
         CL_GL_NOT_SUPPORTED
     };
 
+    static void clearGarbage();
+
     CLGLRenderer(CLVideoWindowItem *vw);
     ~CLGLRenderer();
 
     static int getMaxTextureSize();
 
-    virtual void beforeDestroy();
-
-    void draw(CLVideoDecoderOutput &image, unsigned int channel);
+    void draw(CLVideoDecoderOutput* image);
+    virtual void waitForFrameDisplayed(int channel);
 
     bool paintEvent(const QRect &r);
+
+    virtual void beforeDestroy();
 
     QSize sizeOnScreen(unsigned int channel) const;
     bool constantDownscaleFactor() const;
@@ -44,10 +45,8 @@ public:
     static bool isPixelFormatSupported(PixelFormat pixfmt);
 
 private:
-    static int gl_status;
-
     void init(bool msgbox);
-    static void clearGarbage();
+    static int gl_status;
 
 private:
 #ifndef Q_OS_WIN
@@ -70,9 +69,9 @@ private:
 
     int checkOpenGLError() const;
 
-    int getMinPow2(int value) const
+    unsigned int getMinPow2(unsigned int value) const
     {
-        int result = 1;
+        unsigned int result = 1;
         while (value > result)
             result<<=1;
 
@@ -107,16 +106,16 @@ private:
 
     bool m_textureUploaded;
 
-    int m_stride, // in memory
-        m_width, // visible width
-        m_height,
+    //int m_stride, // in memorry
+    //    m_width, // visible width
+    //    m_height,
 
-        m_stride_old,
-        m_height_old;
+    int m_stride_old;
+    int m_height_old;
 
-    unsigned char *m_arrayPixels[3];
+    //unsigned char *m_arrayPixels[3];
 
-    PixelFormat m_color, m_color_old;
+    PixelFormat m_color_old;
 
     float m_videoCoeffL[4];
     float m_videoCoeffW[4];
@@ -130,20 +129,24 @@ private:
     qreal m_saturation;
     qreal m_painterOpacity;
 
-    mutable QMutex m_mutex; // to avoid call paintEvent() more than once at the same time
-    QWaitCondition m_waitCon;
     bool m_gotnewimage;
 
     bool m_needwait;
 
     CLVideoWindowItem *const m_videowindow;
 
-    CLVideoDecoderOutput m_image;
-    bool m_abort_drawing;
+    //CLVideoDecoderOutput m_image;
+    //QQueue<CLVideoDecoderOutput*> m_imageList;
 
-    bool m_do_not_need_to_wait_any_more;
+    CLVideoDecoderOutput* m_curImg;
+    int m_format;
+    //bool m_abort_drawing;
+
+    //bool m_do_not_need_to_wait_any_more;
 
     bool m_inited;
+    int m_videoWidth;
+    int m_videoHeight;
 
     static QVector<uchar> m_staticYFiller;
     static QVector<uchar> m_staticUVFiller;

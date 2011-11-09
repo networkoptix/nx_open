@@ -6,80 +6,20 @@ import glob
 import string
 
 from version import *
-import os, sys, posixpath
+import os, sys
 import stat, time
 from StringIO import StringIO
 from string import Template
 
-os.path = posixpath
-sys.path.insert(0, '../common')
+sys.path.insert(0, '../eveCommon')
 
-from convert import index_dirs, index_common
+from convert import index_dirs, rmtree, setup_ffmpeg, instantiate_pro, copy_files, BUILDLIB, setup_tools
+from convert import convert as convert_common
 
-FFMPEG_VERSION = '2011-07-22'
+FFMPEG_VERSION = '2011-08-29'
 
 EXCLUDE_DIRS = ('.svn', 'dxva')
 EXCLUDE_FILES = ('dxva', 'moc_', 'qrc_', 'StdAfx')
-
-def rmtree(path):
-    def on_rm_error( func, path, exc_info):
-        # Dirty windows hack. Sometimes windows list already deleted files/folders.
-        # Command line "rmdir /Q /S" also fails. So, just wait while the files really deleted.
-        for i in xrange(20):
-            if not os.listdir(path):
-                break
-
-            time.sleep(1)
-
-        func(path)
-
-    shutil.rmtree(path, onerror = on_rm_error)
-
-def copy_files(src_glob, dst_folder):
-    for fname in glob.iglob(src_glob):
-        shutil.copy(fname, dst_folder)
-
-def link_or_copy(src, dst):
-    try:
-        import win32file
-        win32file.CreateHardLink(dst, src)
-    except:
-        shutil.copy(src, dst)
-
-
-def setup_ffmpeg():
-    ffmpeg_path = os.getenv('EVE_FFMPEG').replace('\\', '/')
-
-    if not ffmpeg_path:
-        print r"""EVE_FFMPEG environment variable is not defined.
-
-    Do the following:
-    1. Clone repository ssh://hg@vigasin.com/ffmpeg to somewhere, say c:\programming\ffmpeg
-    2. Go to c:\programming\ffmpeg and run get_ffmpegs.bat
-    3. Add system environment variable EVE_FFMPEG with value c:\programming\ffmpeg
-    """
-        sys.exit(1)
-
-    ffmpeg = 'ffmpeg-git-' + FFMPEG_VERSION
-    if sys.platform == 'win32':
-        ffmpeg += '-mingw'
-    else:
-        ffmpeg += '-macos'
-
-
-    ffmpeg_path = os.path.join(ffmpeg_path, ffmpeg)
-    ffmpeg_path_debug = ffmpeg_path + '-debug'
-    ffmpeg_path_release = ffmpeg_path + '-release'
-
-    if not os.path.isdir(ffmpeg_path_debug):
-        print >> sys.stderr, "Can't find directory %s. Make sure variable EVE_FFMPEG is correct." % ffmpeg_path_debug
-        sys.exit(1)
-
-    if not os.path.isdir(ffmpeg_path_release):
-        print >> sys.stderr, "Can't find directory %s. Make sure variable EVE_FFMPEG is correct." % ffmpeg_path_release
-        sys.exit(1)
-
-    return ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release
 
 def gen_version_h():
     version_h = open('src/version.h', 'w')
@@ -112,56 +52,55 @@ def gen_version_h():
     print >> version_h, '#define VER_COMPANYDOMAIN_STR       "networkoptix.com"'
     print >> version_h, '#endif // UNIVERSAL_CLIENT_VERSION_H_'
 
+if len(sys.argv) == 2 and sys.argv[1] == '-parents':
+    convert_common()
+
 ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release = setup_ffmpeg()
+tools_path = setup_tools()
 
-destdir = '../bin'
-destdir_debug = destdir + '/debug'
-destdir_release = destdir + '/release'
-
-if os.path.exists(destdir):
-    rmtree(destdir)
+if os.path.exists('bin'):
+    rmtree('bin')
 
 if os.path.exists('build'):
     rmtree('build')
 
-os.mkdir(destdir)
-os.mkdir(destdir_debug)
-os.mkdir(destdir_release)
+os.mkdir('bin')
+os.mkdir('bin/debug')
+os.mkdir('bin/release')
+os.mkdir('bin/debug-test')
+os.mkdir('bin/release-test')
 
 os.mkdir('build')
 
-copy_files(ffmpeg_path_debug + '/bin/*-[0-9].dll', destdir_debug)
-copy_files(ffmpeg_path_debug + '/bin/*-[0-9][0-9].dll', destdir_debug)
+copy_files(ffmpeg_path_debug + '/bin/*-[0-9].dll', 'bin/debug')
+copy_files(ffmpeg_path_debug + '/bin/*-[0-9][0-9].dll', 'bin/debug')
 
-copy_files(ffmpeg_path_release + '/bin/*-[0-9].dll', destdir_release)
-copy_files(ffmpeg_path_release + '/bin/*-[0-9][0-9].dll', destdir_release)
+copy_files(ffmpeg_path_release + '/bin/*-[0-9].dll', 'bin/release')
+copy_files(ffmpeg_path_release + '/bin/*-[0-9][0-9].dll', 'bin/release')
 
-os.mkdir(destdir_debug + '/arecontvision')
-os.mkdir(destdir_release + '/arecontvision')
+os.mkdir('bin/debug/arecontvision')
+os.mkdir('bin/release/arecontvision')
 
-copy_files('resource/arecontvision/*', destdir_debug + '/arecontvision')
-copy_files('resource/arecontvision/*', destdir_release + '/arecontvision')
+copy_files('resource/arecontvision/*', 'bin/debug/arecontvision')
+copy_files('resource/arecontvision/*', 'bin/release/arecontvision')
+
+copy_files(tools_path + '/bin/*.dll', 'bin/release')
+copy_files(tools_path + '/bin/*.dll', 'bin/debug')
 
 gen_version_h()
 
-
-index_common()
-
-index_dirs(('src',), '', 'src/src.pri', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
-
+index_dirs(('src',), 'src/const.pro', 'src/server.pro', exclude_dirs=EXCLUDE_DIRS, exclude_files=EXCLUDE_FILES)
+instantiate_pro('src/server.pro', {'BUILDLIB' : BUILDLIB, 'FFMPEG' : ffmpeg_path})
 
 if sys.platform == 'win32':
-    os.system('qmake -tp vc FFMPEG=%s -o server.vcproj server.pro' % ffmpeg_path)
-
-    os.system('qmake -tp vc FFMPEG=%s -o ../client/client.vcproj ../client/client.pro' % ffmpeg_path)
+    os.system('qmake -tp vc -o src/server.vcproj src/server.pro')
 
 elif sys.platform == 'darwin':
-    if os.path.exists('server.xcodeproj'):
-        rmtree('server.xcodeproj')
+    if os.path.exists('src/Makefile.debug'):
+        os.unlink('src/Makefile.debug')
 
-    os.system('qmake FFMPEG=%s -o server.xcodeproj server.pro' % ffmpeg_path)
+    if os.path.exists('src/Makefile.release'):
+        os.unlink('src/Makefile.release')
 
-    if os.path.exists('../client/client.xcodeproj'):
-        rmtree('../client/client.xcodeproj')
-
-    os.system('qmake FFMPEG=%s -o ../client/client.xcodeproj ../client/client.pro' % ffmpeg_path)
+    os.system('qmake -spec macx-g++ CONFIG-=release CONFIG+=debug -o build/Makefile.debug src/server.pro')
+    os.system('qmake -spec macx-g++ CONFIG-=debug CONFIG+=release -o build/Makefile.release src/server.pro')
