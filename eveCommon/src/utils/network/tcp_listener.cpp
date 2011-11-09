@@ -98,4 +98,3 @@ void QnTcpListener::run()
         removeDisconnectedConnections();
     }
 }
-

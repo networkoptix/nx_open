@@ -134,5 +134,3 @@ extern "C" {
 #include <QFileSystemWatcher>
 
 #endif
-
-//#include "cameras.h"

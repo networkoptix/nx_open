@@ -15,7 +15,7 @@
 #include <QAuthenticator>
 #include "recording/file_deletor.h"
 #include "rest/server/rest_server.h"
-#include "core/resource/server.h"
+#include "rest/handlers/recorded_chunks.h"
 
 //#include "device_plugins/arecontvision/devices/av_device_server.h"
 
@@ -135,7 +135,7 @@ void addTestData()
 
 void registerServer(QnAppServerConnection& appServerConnection)
 {
-    QString myAddress = "10.0.2.119";
+    QString myAddress = "10.0.2.24";
 
     QNetworkInterface networkInterface = QNetworkInterface::interfaceFromName(myAddress);
     QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
@@ -150,7 +150,7 @@ void registerServer(QnAppServerConnection& appServerConnection)
 
         QnServerList servers;
         appServerConnection.addServer(server, servers);
-
+        Q_ASSERT(!servers.isEmpty());
         serverId = servers.at(0)->getId();
         writeServerId(serverId.toString());
     }
@@ -159,6 +159,8 @@ void registerServer(QnAppServerConnection& appServerConnection)
 #ifndef API_TEST_MAIN
 int main(int argc, char *argv[])
 {
+    Q_INIT_RESOURCE(api);
+
 //    av_log_set_callback(decoderLogCallback);
 
     QApplication::setOrganizationName(QLatin1String(ORGANIZATION_NAME));
@@ -251,12 +253,14 @@ int main(int argc, char *argv[])
     rtspListener.start();
 
     QnRestServer restServer(QHostAddress::Any, DEFAULT_REST_PORT);
-
+    restServer.registerHandler("api/RecordedTimePeriods", new QnRecordedChunkListHandler());
+    restServer.registerHandler("xsd/*", new QnXsdHelperHandler());
 
     QnStoragePtr storage0(new QnStorage());
     storage0->setUrl("g:/records");
     storage0->setIndex(0);
-    storage0->setSpaceLimit(238500ll * 1000 * 1024);
+    //storage0->setSpaceLimit(238500ll * 1000 * 1024);
+    storage0->setSpaceLimit(100ll * 1000 * 1024);
     qnResPool->addResource(storage0);
     qnStorageMan->addStorage(storage0);
 

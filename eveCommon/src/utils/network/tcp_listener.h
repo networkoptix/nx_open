@@ -18,6 +18,7 @@ public:
 
     explicit QnTcpListener(const QHostAddress& address, int port);
     virtual ~QnTcpListener();
+
 protected:
     virtual void run();
     virtual CLLongRunnable* createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner) = 0;

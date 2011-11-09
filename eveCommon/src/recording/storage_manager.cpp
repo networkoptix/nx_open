@@ -1,6 +1,7 @@
 #include "storage_manager.h"
 #include "utils/common/util.h"
 #include "core/resourcemanagment/resource_pool.h"
+#include "core/resource/resource.h"
 
 
 Q_GLOBAL_STATIC(QnStorageManager, inst)
@@ -38,6 +39,50 @@ QString QnStorageManager::dateTimeStr(qint64 dateTimeMks)
     str << strPadLeft(QString::number(fileDate.time().hour()), 2, '0') << '/';
     str.flush();
     return text;
+}
+
+DeviceFileCatalog::TimePeriodList QnStorageManager::getRecordedPeriods(QnResourceList resList, qint64 startTime, qint64 endTime, qint64 detailLevel)
+{
+    QMutexLocker lock(&m_mutex);
+    DeviceFileCatalog::TimePeriodList result;
+    QList<QVector<DeviceFileCatalog::TimePeriod> > cameras;
+    for (int i = 0; i < resList.size(); ++i)
+    {
+        DeviceFileCatalogPtr catalog = getFileCatalog(resList[i]);
+        if (catalog) 
+            cameras << catalog->getTimePeriods(startTime, endTime, detailLevel);
+    }
+
+    int minIndex = 0;
+    while (minIndex != -1)
+    {
+        qint64 minStartTime = 0x7fffffffffffffffll;
+        minIndex = -1;
+        for (int i = 0; i < cameras.size(); ++i) {
+            if (!cameras[i].isEmpty() && cameras[i][0].startTime < minStartTime) {
+                minIndex = i;
+                minStartTime = cameras[i][0].startTime;
+            }
+        }
+
+        if (minIndex >= 0)
+        {
+            // add chunk to merged data
+            if (result.isEmpty()) {
+                result << cameras[minIndex][0];
+            }
+            else {
+                DeviceFileCatalog::TimePeriod& last = result.last();
+                if (last.startTime <= minStartTime && last.startTime+last.duration > minStartTime)
+                    last.duration = qMax(last.duration, minStartTime + cameras[minIndex][0].duration - last.startTime);
+                else
+                    result << cameras[minIndex][0];
+            } 
+            cameras[minIndex].pop_front();
+        }
+    }
+
+    return result;
 }
 
 void QnStorageManager::clearSpace(QnStoragePtr storage)
