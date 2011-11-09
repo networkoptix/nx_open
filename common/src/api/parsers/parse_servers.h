@@ -3,8 +3,8 @@
 
 #include "api/Types.h"
 #include "core/resource/resource.h"
-#include "core/resource/server.h"
+#include "core/resource/video_server.h"
 
-void parseServers(QList<QnServerPtr>& servers, const QnApiServers& xsdServers, QnResourceFactory& resourceFactory);
+void parseServers(QList<QnVideoServerPtr>& servers, const QnApiServers& xsdServers, QnResourceFactory& resourceFactory);
 
 #endif // _eve_parse_servers_

@@ -9,6 +9,16 @@
 #include "core/resource/resource.h"
 #include "core/resource/network_resource.h"
 
+struct QnTimePeriod
+{
+    QnTimePeriod(): startTime(0), duration(0) {}
+    QnTimePeriod(qint64 _startTime, qint64 _duration): startTime(_startTime), duration(_duration) {}
+
+    qint64 startTime;
+    qint64 duration;
+};
+typedef QVector<QnTimePeriod> QnTimePeriodList;
+
 class DeviceFileCatalog: public QObject
 {
     Q_OBJECT
@@ -26,16 +36,6 @@ public:
         quint16 fileIndex;
         int duration; // chunk duration at ms
     };
-
-    struct TimePeriod
-    {
-        TimePeriod(): startTime(0), duration(0) {}
-        TimePeriod(qint64 _startTime, qint64 _duration): startTime(_startTime), duration(_duration) {}
-
-        qint64 startTime;
-        qint64 duration;
-    };
-    typedef QVector<TimePeriod> TimePeriodList;
 
     DeviceFileCatalog(QnNetworkResourcePtr resource);
     void deserializeTitleFile();
@@ -55,7 +55,7 @@ public:
     // All infornation less than detail level is discarded
     typedef QVector<Chunk> ChunkMap;
 
-    TimePeriodList getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel);
+    QnTimePeriodList getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel);
 private:
     QString baseRoot(QnNetworkResourcePtr resource);
     qint64 getFileDuration(const QString& fileName);

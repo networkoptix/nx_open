@@ -98,7 +98,7 @@ XSD_FILES = $$PWD/api/xsd/cameras.xsd \
             $$PWD/api/xsd/resourcesEx.xsd \
             $$PWD/api/xsd/servers.xsd \
             $$PWD/api/xsd/events.xsd \
-            $$PWD/api/xsd/videoserver/RecordedTimePeriods.xsd
+            $$PWD/api/xsd/videoserver/recordedTimePeriods.xsd
 
 xsd2.name = Generating code from ${QMAKE_FILE_IN}
 xsd2.input = XSD_FILES

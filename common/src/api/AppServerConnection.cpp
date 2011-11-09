@@ -47,13 +47,12 @@ int QnAppServerConnection::getResources(QList<QnResourcePtr>& resources)
     return status;
 }
 
-int QnAppServerConnection::addServer(const QnServer& serverIn, QList<QnServerPtr>& servers)
+int QnAppServerConnection::addServer(const QnVideoServer& serverIn, QnVideoServerList& servers)
 {
     xsd::api::servers::Server server(serverIn.getId().toString().toStdString(),
                                      serverIn.getName().toStdString(),
                                      serverIn.getTypeId().toString().toStdString(),
-                                     serverIn.getUrl().toStdString(),
-                                     serverIn.getMAC().toString().toStdString());
+                                     serverIn.getUrl().toStdString());
 
     QnApiServerResponsePtr xsdServers;
 

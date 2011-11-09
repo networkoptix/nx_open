@@ -75,18 +75,18 @@ int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestP
         return CODE_INVALID_PARAMETER;
     }
 
-    DeviceFileCatalog::TimePeriodList periods = qnStorageMan->getRecordedPeriods(resList, startTime, endTime, detailLevel);
+    QnTimePeriodList periods = qnStorageMan->getRecordedPeriods(resList, startTime, endTime, detailLevel);
 
-    result.append("<TimePeriodList xmlns=\"http://www.networkoptix.com/xsd/api/recordedTimePeriods\">\n");
+    result.append("<recordedTimePeriods xmlns=\"http://www.networkoptix.com/xsd/api/recordedTimePeriods\">\n");
 
-    foreach(DeviceFileCatalog::TimePeriod period, periods)
+    foreach(QnTimePeriod period, periods)
     {
         qint64 duration = period.duration;
         if (duration == -1)
             duration = QDateTime::currentDateTime().toMSecsSinceEpoch()*1000ll - period.startTime;
-        result.append(QString("<TimePeriod startTime=\"%1\" duration=\"%2\" />\n").arg(period.startTime).arg(duration));
+        result.append(QString("<timePeriod startTime=\"%1\" duration=\"%2\" />\n").arg(period.startTime).arg(duration));
     }
-    result.append("</TimePeriodList>\n");
+    result.append("</recordedTimePeriods>\n");
 
     return CODE_OK;
 }

@@ -74,10 +74,11 @@ void Client::ensureServerRegistered()
         return;
     }
 
-    QnServer server("server");
+    QnVideoServer server;
+    server.setName("server");
     server.setTypeId(QnId("2"));
 
-    QList<QnServerPtr> servers;
+    QnVideoServerList servers;
     m_appServer->addServer(server, servers);
 
         qDebug("server received");

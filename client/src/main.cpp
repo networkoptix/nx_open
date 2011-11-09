@@ -25,13 +25,13 @@
 #include "api/AppServerConnection.h"
 #include "device_plugins/server_camera/server_camera.h"
 #include "device_plugins/server_camera/appserver.h"
-#include "device/video_server.h"
 
 #include "core/resource/file_resource.h"
 
 #define TEST_RTSP_SERVER
 
 #include "ui/scene/scenecontroller.h"
+#include "core/resource/video_server.h"
 
 
 
