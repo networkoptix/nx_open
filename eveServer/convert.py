@@ -52,7 +52,7 @@ def gen_version_h():
     print >> version_h, '#define VER_COMPANYDOMAIN_STR       "networkoptix.com"'
     print >> version_h, '#endif // UNIVERSAL_CLIENT_VERSION_H_'
 
-if sys.platform == 'win32':
+if len(sys.argv) == 2 and sys.argv[1] == '-parents':
     convert_common()
 
 ffmpeg_path, ffmpeg_path_debug, ffmpeg_path_release = setup_ffmpeg()
