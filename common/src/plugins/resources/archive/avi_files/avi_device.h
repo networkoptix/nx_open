@@ -18,8 +18,8 @@ public:
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 	virtual QString toString() const;
 
-    virtual const QnVideoResourceLayout* getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0) const;
-    virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0) const;
+    virtual const QnVideoResourceLayout* getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0) const override;
+    virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0) const override;
 };
 
 typedef QSharedPointer<QnAviResource> QnAviResourcePtr;
