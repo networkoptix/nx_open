@@ -209,17 +209,19 @@ qreal QnDisplaySynchronizer::layerFrontZ(Layer layer) const {
 }
 
 QnDisplaySynchronizer::Layer QnDisplaySynchronizer::entityLayer(QnDisplayEntity *entity) const {
-    if(entity->isPinned()) {
-        if(entity != m_state->selectedEntity() && entity != m_state->zoomedEntity()) {
-            return PINNED_LAYER;
+    if(entity == m_state->zoomedEntity()) {
+        return ZOOMED_LAYER;
+    } else if(entity->isPinned()) {
+        if(entity == m_state->selectedEntity()) {
+            return PINNED_SELECTED_LAYER;
         } else {
-            return PINNED_RAISED_LAYER;
+            return PINNED_LAYER;
         }
     } else {
-        if(entity != m_state->selectedEntity() && entity != m_state->zoomedEntity()) {
-            return UNPINNED_LAYER;
+        if(entity == m_state->selectedEntity()) {
+            return UNPINNED_SELECTED_LAYER;
         } else {
-            return UNPINNED_RAISED_LAYER;
+            return UNPINNED_LAYER;
         }
     }
 }

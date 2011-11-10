@@ -28,9 +28,11 @@ public:
     enum Layer {
         BACK_LAYER,
         PINNED_LAYER,
-        PINNED_RAISED_LAYER,
+        PINNED_SELECTED_LAYER,
         UNPINNED_LAYER,
-        UNPINNED_RAISED_LAYER,
+        UNPINNED_SELECTED_LAYER,
+        PRE_ZOOMED_LAYER,
+        ZOOMED_LAYER,
         FRONT_LAYER
     };
 

@@ -45,7 +45,7 @@ namespace {
     }
 }
 
-void QnPolygonalShadowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+void QnPolygonalShadowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     ensureParameters();
 
     QColor transparent = m_color;

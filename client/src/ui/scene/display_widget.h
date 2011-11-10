@@ -12,6 +12,9 @@ class QnPolygonalShadowItem;
 
 class QnDisplayWidget: public GraphicsWidget, public QnPolygonalShapeProvider {
     Q_OBJECT;
+    Q_PROPERTY(QColor frameColor READ frameColor WRITE setFrameColor);
+    Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth);
+    Q_PROPERTY(QPointF shadowDisplacement READ shadowDisplacement WRITE setShadowDisplacement)
 
     typedef GraphicsWidget base_type;
 

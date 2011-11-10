@@ -21,7 +21,7 @@ ArchiveDropInstrument::ArchiveDropInstrument(QnDisplayState *state, QObject *par
     }
 }
 
-bool ArchiveDropInstrument::dragEnterEvent(QWidget *viewport, QDragEnterEvent *event) {
+bool ArchiveDropInstrument::dragEnterEvent(QWidget * /*viewport*/, QDragEnterEvent *event) {
     if(m_state == NULL)
         return false;
 
@@ -35,7 +35,7 @@ bool ArchiveDropInstrument::dragEnterEvent(QWidget *viewport, QDragEnterEvent *e
     return true;
 }
 
-bool ArchiveDropInstrument::dragMoveEvent(QWidget *viewport, QDragMoveEvent *event) {
+bool ArchiveDropInstrument::dragMoveEvent(QWidget * /*viewport*/, QDragMoveEvent *event) {
     if(m_state == NULL)
         return false;
 
@@ -46,7 +46,7 @@ bool ArchiveDropInstrument::dragMoveEvent(QWidget *viewport, QDragMoveEvent *eve
     return true;
 }
 
-bool ArchiveDropInstrument::dragLeaveEvent(QWidget *viewport, QDragLeaveEvent *event) {
+bool ArchiveDropInstrument::dragLeaveEvent(QWidget * /*viewport*/, QDragLeaveEvent * /*event*/) {
     if(m_state == NULL)
         return false;
 

@@ -190,7 +190,7 @@ void QnDisplayWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * 
     painter->endNativePainting();
 }
 
-void QnDisplayWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override {
+void QnDisplayWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override {
     QSizeF size = this->size();
     qreal w = size.width();
     qreal h = size.height();

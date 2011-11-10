@@ -29,7 +29,7 @@ bool ActivityListenerInstrument::event(QWidget *, QEvent *) {
     return false;
 }
 
-void ActivityListenerInstrument::timerEvent(QTimerEvent *event) {
+void ActivityListenerInstrument::timerEvent(QTimerEvent *) {
     killTimer(m_currentTimer);
     m_currentTimer = 0;
 
