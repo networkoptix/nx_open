@@ -186,8 +186,12 @@ begin_label:
         // this is here instead if constructor to unload ui thread
 		if (init()) 
 		    mFirstTime = false;
-        else
+        else {
+            // If media data can't be opened wait 1 second and try again
+            for (int i = 0; i < 100 && !m_needStop; ++i)
+                QnSleep::msleep(10);
             return QnAbstractMediaDataPtr();
+        }
 	}
 
     bool reverseMode = m_reverseMode;

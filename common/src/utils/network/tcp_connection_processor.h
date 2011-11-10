@@ -16,6 +16,7 @@ public:
     virtual ~QnTCPConnectionProcessor();
 
 protected:
+    virtual void pleaseStop();
     virtual void parseRequest();
     QMutex& getSockMutex();
     QString extractPath() const;

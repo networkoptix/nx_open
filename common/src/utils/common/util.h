@@ -62,4 +62,6 @@ QN_EXPORT QString closeDirPath(const QString& value);
 
 QN_EXPORT qint64 getDiskFreeSpace(const QString& root);
 
+static const qint64 INT64_MAX = 0x7fffffffffffffffll;
+
 #endif // _UNIVERSAL_CLIENT_UTIL_H
