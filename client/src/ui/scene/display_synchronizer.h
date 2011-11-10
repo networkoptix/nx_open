@@ -23,12 +23,14 @@ class QnDisplaySynchronizer: public QObject, protected AnimationTimerListener, p
     Q_OBJECT;
 public:
     /**
-     * Display synchronizer assigns items to layers.
+     * Layer of an item.
      */
     enum Layer {
         BACK_LAYER,
         PINNED_LAYER,
+        PINNED_RAISED_LAYER,
         UNPINNED_LAYER,
+        UNPINNED_RAISED_LAYER,
         FRONT_LAYER
     };
 
@@ -60,8 +62,6 @@ public:
 
     QRectF viewportGeometry() const;
 
-    void synchronize(QnDisplayEntity *entity);
-
     void fitInView();
 
     void bringToFront(const QList<QGraphicsItem *> &items);
@@ -69,6 +69,15 @@ public:
     void bringToFront(QGraphicsItem *item);
 
     void bringToFront(QnDisplayEntity *entity);
+
+    Layer layer(QGraphicsItem *item);
+
+    void setLayer(QGraphicsItem *item, Layer layer);
+
+    void synchronize(QnDisplayEntity *entity, bool animate = true);
+    
+    void synchronize(QnDisplayWidget *widget, bool animate = true);
+
 
 public slots:
     void disableViewportChanges();
@@ -84,12 +93,18 @@ signals:
 protected:
     virtual void tick(int currentTime) override;
     
-    QnWidgetAnimator *newWidgetAnimator(QnDisplayWidget *widget);
-    
-    void updateWidgetGeometry(QnDisplayEntity *entity, bool animate);
+    QnWidgetAnimator *animator(QnDisplayWidget *widget);
+
+    void synchronizeGeometry(QnDisplayEntity *entity, bool animate);
+    void synchronizeGeometry(QnDisplayWidget *widget, bool animate);
+    void synchronizeLayer(QnDisplayEntity *entity);
+    void synchronizeLayer(QnDisplayWidget *widget);
+
+    qreal layerFrontZ(Layer layer) const;
+    Layer entityLayer(QnDisplayEntity *entity) const;
 
 protected slots:
-    void updateSceneBounds();
+    void synchronizeSceneBounds();
 
     void at_model_entityAdded(QnDisplayEntity *entity);
     void at_model_entityAboutToBeRemoved(QnDisplayEntity *entity);
@@ -98,31 +113,39 @@ protected slots:
     void at_state_selectedEntityChanged(QnDisplayEntity *oldSelectedEntity, QnDisplayEntity *newSelectedEntity);
     void at_state_zoomedEntityChanged(QnDisplayEntity *oldZoomedEntity, QnDisplayEntity *newZoomedEntity);
 
-    void at_entity_geometryUpdated(const QRect &oldGeometry, const QRect &newGeometry);
-    void at_entity_geometryDeltaUpdated();
-    void at_entity_rotationUpdated();
+    void at_entity_geometryChanged();
+    void at_entity_geometryDeltaChanged();
+    void at_entity_rotationChanged();
+    void at_entity_flagsChanged();
 
     void at_viewport_transformationChanged();
 
 private:
-    struct EntityData {
-        EntityData(): widget(NULL), animator(NULL) {}
-        EntityData(QnDisplayWidget *widget, QnWidgetAnimator *animator): widget(widget), animator(animator) {}
+    struct ItemProperties {
+        ItemProperties(): animator(NULL), layer(BACK_LAYER) {}
 
-        QnDisplayWidget *widget;
         QnWidgetAnimator *animator;
+        Layer layer;
     };
 
+private:
     QnDisplayState *m_state;
     InstrumentManager *m_manager;
     QGraphicsScene *m_scene;
     QGraphicsView *m_view;
-    QHash<QnDisplayEntity *, EntityData> m_dataByEntity;
+    
     QnViewportAnimator *m_viewportAnimator;
     AnimationTimer *m_updateTimer;
     BoundingInstrument *m_boundingInstrument;
     TransformListenerInstrument *m_transformListenerInstrument;
 
+    /** Entity to widget mapping. */
+    QHash<QnDisplayEntity *, QnDisplayWidget *> m_widgetByEntity;
+
+    /** Item to item properties mapping. */
+    QHash<QGraphicsItem *, ItemProperties> m_propertiesByItem;
+
+    /** Current front z displacement value. */
     qreal m_frontZ;
 };
 

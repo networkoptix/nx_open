@@ -35,11 +35,13 @@ client/src/client.pro
 client/src/common.pro
 client/src/version.h
 client/src/Makefile
+client/src/client.mak*
 client/src/ipch
 
 common/src/common.pro
 common/src/plugins/resources/archive/filetypes.h
 common/src/Makefile
+common/src/common.mak*
 
 scripts/appserver/server.state
 server/src/version.h

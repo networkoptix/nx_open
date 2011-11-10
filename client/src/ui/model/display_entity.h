@@ -47,12 +47,12 @@ public:
     /**
      * \returns                         Resource associated with this entity.
      */
-    const QnResource *resource() const;
+    QnResource *resource() const;
 
     /**
      * \returns                         Media resource associated with this entity, if any.
      */
-    const QnMediaResource *mediaResource() const;
+    QnMediaResource *mediaResource() const;
 
     /**
      * \returns                         Data provider associated with this entity.

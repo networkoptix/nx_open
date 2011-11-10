@@ -43,12 +43,12 @@ void QnDisplayEntity::ensureRemoved() {
         m_model->removeEntity(this);
 }
 
-const QnResource *QnDisplayEntity::resource() const {
+QnResource *QnDisplayEntity::resource() const {
     return getResource().data();
 }
 
-const QnMediaResource *QnDisplayEntity::mediaResource() const {
-    return dynamic_cast<const QnMediaResource *>(resource()); // TODO: remove dynamic_cast.
+QnMediaResource *QnDisplayEntity::mediaResource() const {
+    return dynamic_cast<QnMediaResource *>(resource()); // TODO: remove dynamic_cast.
 }
 
 void QnDisplayEntity::beforeDisconnectFromResource() {

@@ -51,7 +51,6 @@ QnDisplayWidget::QnDisplayWidget(QnDisplayEntity *entity, QGraphicsItem *parent)
     shadow->setParent(this);
     shadow->setColor(global_shadow_color);
     shadow->setShapeProvider(this);
-    connect(this, SIGNAL(geometryChanged()), this, SLOT(invalidateShadowShape()));
     setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
     setShadowDisplacement(defaultShadowDisplacement);
     invalidateShadowShape();
@@ -141,6 +140,12 @@ QVariant QnDisplayWidget::itemChange(GraphicsItemChange change, const QVariant &
     }
 
     return base_type::itemChange(change, value);
+}
+
+void QnDisplayWidget::resizeEvent(QGraphicsSceneResizeEvent *event) override {
+    invalidateShadowShape();
+
+    base_type::resizeEvent(event);
 }
 
 QRectF QnDisplayWidget::channelRect(int channel) const {

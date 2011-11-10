@@ -75,19 +75,18 @@ public:
      */
     void setShadowDisplacement(const QPointF &displacement);
 
-protected slots:
-    void invalidateShadowShape();
-
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual Qt::WindowFrameSection windowFrameSectionAt(const QPointF &pos) const override;
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
+    virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
 
     virtual QPolygonF provideShape() override;
 
     void updateShadowZ();
     void updateShadowPos();
+    void invalidateShadowShape();
 
 private:
     /**

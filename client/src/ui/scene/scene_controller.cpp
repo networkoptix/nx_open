@@ -158,7 +158,10 @@ void QnSceneController::at_widget_resizingFinished() {
 void QnSceneController::at_draggingStarted(QGraphicsView *, QList<QGraphicsItem *> items) {
     qDebug("DRAGGING STARTED");
 
-    qDebug("Z: %g", items[0]->zValue());
+    foreach(QGraphicsItem *item, items) {
+        m_synchronizer->bringToFront(item);
+        m_synchronizer->setLayer(item, QnDisplaySynchronizer::FRONT_LAYER);
+    }
 }
 
 void QnSceneController::at_draggingFinished(QGraphicsView *view, QList<QGraphicsItem *> items) {
@@ -184,10 +187,6 @@ void QnSceneController::at_draggingFinished(QGraphicsView *view, QList<QGraphics
 
     bool success = false;
     if(delta == QPoint(0, 0)) {
-        /* Just re-sync if not moving anywhere. */
-        foreach(QnDisplayEntity *entity, entities)
-            m_synchronizer->synchronize(entity);
-        
         success = true;
     } else {
         QList<QRect> geometries;
@@ -235,17 +234,16 @@ void QnSceneController::at_draggingFinished(QGraphicsView *view, QList<QGraphics
         }
 
         success = m_state->model()->moveEntities(entities, geometries);
-        if(!success) {
-            /* Re-sync everything. */
-            foreach(QnDisplayEntity *entity, entities)
-                m_synchronizer->synchronize(entity);
-        }
     }
 
     /* Adjust geometry deltas if everything went fine. */
     if(success)
         foreach(QnDisplayWidget *widget, widgets)
             updateGeometryDelta(widget);
+
+    /* Re-sync everything. */
+    foreach(QnDisplayEntity *entity, entities)
+        m_synchronizer->synchronize(entity);
 }
 
 void QnSceneController::at_item_clicked(QGraphicsView *, QGraphicsItem *item) {

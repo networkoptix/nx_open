@@ -63,6 +63,7 @@ void QnPolygonalShadowItem::paint(QPainter *painter, const QStyleOptionGraphicsI
     glEnd();
 
     /* Draw soft band. */
+    // TODO
     /*
     if(!qFuzzyIsNull(m_softWidth)) {
         QPointF dx(m_softWidth, 0), dy(0, m_softWidth);
@@ -86,6 +87,8 @@ void QnPolygonalShadowItem::paint(QPainter *painter, const QStyleOptionGraphicsI
 void QnPolygonalShadowItem::invalidateShape() {
     m_shapeValid = false;
     m_parametersValid = false;
+
+    qDebug("invalidateShape");
 }
 
 void QnPolygonalShadowItem::ensureParameters() const {
