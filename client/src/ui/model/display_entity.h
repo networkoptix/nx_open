@@ -6,8 +6,10 @@
 #include <core/resource/resource_consumer.h>
 
 class QnDisplayModel;
+class QnMediaResource;
 class QnAbstractArchiveReader;
 class QnAbstractMediaStreamDataProvider;
+class QnAbstractStreamDataProvider;
 class CLCamDisplay;
 
 /**
@@ -45,15 +47,25 @@ public:
     /**
      * \returns                         Resource associated with this entity.
      */
-    const QnResource *resource() const {
-        return getResource().data();
-    }
+    const QnResource *resource() const;
+
+    /**
+     * \returns                         Media resource associated with this entity, if any.
+     */
+    const QnMediaResource *mediaResource() const;
 
     /**
      * \returns                         Data provider associated with this entity.
      */
     QnAbstractStreamDataProvider *dataProvider() const {
-        return m_reader;
+        return m_dataProvider;
+    }
+
+    /**
+     * \returns                         Media data provider associated with this entity, if any.
+     */
+    QnAbstractMediaStreamDataProvider *mediaProvider() const {
+        return m_mediaProvider;
     }
 
     /**
@@ -203,10 +215,13 @@ private:
     qreal m_rotation;
 
     /** Data provider for the associated resource. */
-    QnAbstractStreamDataProvider *m_reader;
+    QnAbstractStreamDataProvider *m_dataProvider;
+
+    /** Media data provider, if any. */
+    QnAbstractMediaStreamDataProvider *m_mediaProvider;
 
     /** Archive data provider, if any. */
-    QnAbstractArchiveReader *m_archiveReader;
+    QnAbstractArchiveReader *m_archiveProvider;
 
     /** Camera display, if any. */
     QScopedPointer<CLCamDisplay> m_camDisplay;

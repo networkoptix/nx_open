@@ -39,7 +39,7 @@ QnDisplayWidget::QnDisplayWidget(QnDisplayEntity *entity, QGraphicsItem *parent)
     m_frameWidth(0.0)
 {
     /* Set up video rendering. */
-    m_resourceLayout = dynamic_cast<QnAbstractMediaStreamDataProvider *>(entity->dataProvider())->getVideoLayout();
+    m_resourceLayout = entity->mediaResource()->getVideoLayout(entity->mediaProvider());
     m_channelCount = m_resourceLayout->numberOfChannels();
     m_renderer = new QnDisplayWidgetRenderer(m_channelCount, this);
     for(int i = 0; i < m_channelCount; i++)

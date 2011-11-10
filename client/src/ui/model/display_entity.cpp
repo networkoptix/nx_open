@@ -14,22 +14,23 @@ QnDisplayEntity::QnDisplayEntity(const QnResourcePtr &resource, QObject *parent)
     m_model(NULL),
     m_flags(Pinned),
     m_rotation(0.0),
-    m_reader(NULL),
-    m_archiveReader(NULL)
+    m_dataProvider(NULL),
+    m_mediaProvider(NULL),
+    m_archiveProvider(NULL)
 {
     assert(!resource.isNull());
 
-    m_reader = resource->createDataProvider(QnResource::Role_Default);
-    m_archiveReader = dynamic_cast<QnAbstractArchiveReader *>(m_reader);
+    m_dataProvider = resource->createDataProvider(QnResource::Role_Default);
+    m_archiveProvider = dynamic_cast<QnAbstractArchiveReader *>(m_dataProvider);
 
-    QnAbstractMediaStreamDataProvider *mediaReader = dynamic_cast<QnAbstractMediaStreamDataProvider *>(m_reader);
-    if(mediaReader != NULL) {
+    m_mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider *>(m_dataProvider);
+    if(m_mediaProvider != NULL) {
         m_camDisplay.reset(new CLCamDisplay(false));
 
-        mediaReader->addDataProcessor(m_camDisplay.data());
+        m_mediaProvider->addDataProcessor(m_camDisplay.data());
     }
 
-    m_reader->start();
+    m_dataProvider->start();
     m_camDisplay->start();
 }
 
@@ -42,12 +43,20 @@ void QnDisplayEntity::ensureRemoved() {
         m_model->removeEntity(this);
 }
 
+const QnResource *QnDisplayEntity::resource() const {
+    return getResource().data();
+}
+
+const QnMediaResource *QnDisplayEntity::mediaResource() const {
+    return dynamic_cast<const QnMediaResource *>(resource()); // TODO: remove dynamic_cast.
+}
+
 void QnDisplayEntity::beforeDisconnectFromResource() {
-    static_cast<QnResourceConsumer *>(m_reader)->beforeDisconnectFromResource();
+    static_cast<QnResourceConsumer *>(m_dataProvider)->beforeDisconnectFromResource();
 }
 
 void QnDisplayEntity::disconnectFromResource() {
-    static_cast<QnResourceConsumer *>(m_reader)->disconnectFromResource();
+    static_cast<QnResourceConsumer *>(m_dataProvider)->disconnectFromResource();
 
     QnResourceConsumer::disconnectFromResource();
 }
@@ -124,41 +133,41 @@ void QnDisplayEntity::setRotation(qreal rotation) {
 }
 
 qint64 QnDisplayEntity::lengthUSec() const {
-    return m_archiveReader == NULL ? -1 : m_archiveReader->lengthMksec();
+    return m_archiveProvider == NULL ? -1 : m_archiveProvider->lengthMksec();
 }
 
 qint64 QnDisplayEntity::currentTimeUSec() const {
-    return m_archiveReader == NULL ? -1 : m_archiveReader->currentTime();
+    return m_archiveProvider == NULL ? -1 : m_archiveProvider->currentTime();
 }
 
 void QnDisplayEntity::setCurrentTimeUSec(qint64 usec) const {
-    if(m_archiveReader == NULL) {
+    if(m_archiveProvider == NULL) {
         qnWarning("Resource '%1' does not support changing current time.", resource()->getUniqueId());
         return;
     }
 
-    m_archiveReader->previousFrame(usec);
+    m_archiveProvider->previousFrame(usec);
 }
 
 void QnDisplayEntity::play() {
-    if(m_archiveReader == NULL)
+    if(m_archiveProvider == NULL)
         return;
 
-    m_archiveReader->resume();
-    m_archiveReader->setSingleShotMode(false);
-    m_archiveReader->resumeDataProcessors();
+    m_archiveProvider->resume();
+    m_archiveProvider->setSingleShotMode(false);
+    m_archiveProvider->resumeDataProcessors();
 
     //if (m_graphicsWidget->isSelected() || !m_playing)
     //    m_camera->getCamCamDisplay()->playAudio(m_playing);
 }
 
 void QnDisplayEntity::pause() {
-    if(m_archiveReader == NULL)
+    if(m_archiveProvider == NULL)
         return;
 
-    m_archiveReader->pause();
-    m_archiveReader->setSingleShotMode(true);
-    m_archiveReader->pauseDataProcessors();
+    m_archiveProvider->pause();
+    m_archiveProvider->setSingleShotMode(true);
+    m_archiveProvider->pauseDataProcessors();
     
     //m_camera->getCamCamDisplay()->pauseAudio();
 }

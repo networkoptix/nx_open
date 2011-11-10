@@ -20,8 +20,8 @@ public:
     virtual QString manufacture() const;
     virtual void setIframeDistance(int frames, int timems);
 
-    virtual const QnVideoResourceLayout* getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0);
-    virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0);
+    virtual const QnVideoResourceLayout* getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0) const;
+    virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0) const;
 protected:
     virtual QString getUniqueId() const;
     virtual void setCropingPhysical(QRect croping);
