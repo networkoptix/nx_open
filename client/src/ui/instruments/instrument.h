@@ -213,7 +213,7 @@ public:
      * \param eventType0               First event type.
      * \param eventType1               Second event type.
      * \param eventType2               Third event type.
-     * \param eventType2               Fourth event type.
+     * \param eventType3               Fourth event type.
      * \returns                        Set constructed from the given event types.
      */
     static EventTypeSet makeSet(QEvent::Type eventType0, QEvent::Type eventType1, QEvent::Type eventType2, QEvent::Type eventType3) {
@@ -222,6 +222,26 @@ public:
         result.insert(eventType1);
         result.insert(eventType2);
         result.insert(eventType3);
+        return result;
+    }
+
+    /**
+     * This function is to be used in constructors of derived classes.
+     * 
+     * \param eventType0               First event type.
+     * \param eventType1               Second event type.
+     * \param eventType2               Third event type.
+     * \param eventType3               Fourth event type.
+     * \param eventType4               Fifth event type.
+     * \returns                        Set constructed from the given event types.
+     */
+    static EventTypeSet makeSet(QEvent::Type eventType0, QEvent::Type eventType1, QEvent::Type eventType2, QEvent::Type eventType3, QEvent::Type eventType4) {
+        EventTypeSet result;
+        result.insert(eventType0);
+        result.insert(eventType1);
+        result.insert(eventType2);
+        result.insert(eventType3);
+        result.insert(eventType4);
         return result;
     }
 
