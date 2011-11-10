@@ -1,0 +1,89 @@
+#ifndef CELLLAYOUT_P_H
+#define CELLLAYOUT_P_H
+
+#include "celllayout.h"
+#include <QRect>
+#include <QPoint>
+#include <QHash>
+#include <QList>
+#include <QSizeF>
+
+struct ItemProperties {
+    ItemProperties(const QRect &rect, Qt::Alignment alignment): rect(rect), alignment(alignment) {}
+
+    ItemProperties(): alignment(0) {}
+
+    QRect rect;
+    Qt::Alignment alignment;
+};
+
+
+class CellLayoutPrivate
+{
+public:
+    CellLayoutPrivate(CellLayout *qq):
+        q_ptr(qq),
+        cellSize(1.0, 1.0)
+    {}
+
+protected:
+    CellLayout *const q_ptr;
+
+private:
+    void ensureBounds() const;
+    void ensureEffectiveCellSize() const;
+    void ensureEffectiveGeometry() const;
+
+    void clearRegion(const QRect &rect);
+    void fillRection(const QRect &rect, QGraphicsLayoutItem *value);
+    bool isRegionFilledWith(const QRect &rect, QGraphicsLayoutItem *value0, QGraphicsLayoutItem *value1) const;
+    bool isRegionOccupied(const QRect &rect) const;
+
+    void itemsAt(const QRect &rect, QSet<QGraphicsLayoutItem *> *items) const;
+
+    /**
+     * \param item                      Item to compute geometry for.
+     * \param constraint                Constraints on item geometry.
+     * \param alignment                 Item alignment.
+     * \returns                         Item geometry, computed taking size policy and alignment into account.
+     */
+    static QRectF constrainedGeometry(QGraphicsLayoutItem *item, const QRectF &constraint, Qt::Alignment alignment);
+
+    /**
+     * \param item
+     * \param constraint
+     * \returns                         Effective maximum size of the given item, taking size policy into account.
+     */
+    static QSizeF effectiveMaxSize(QGraphicsLayoutItem *item, const QSizeF &constraint);
+
+private:
+    /** Cell spacing. */
+    QSizeF spacing;
+
+    /** Size of a single cell. */
+    QSizeF cellSize;
+
+    /** List of all items owned by the layout. */
+    QList<QGraphicsLayoutItem *> items;
+
+    /** Mapping from item to cell rect that it occupies. */
+    QHash<QGraphicsLayoutItem *, ItemProperties> propertiesByItem;
+
+    /** Mapping from cell to layout item. */
+    QHash<QPoint, QGraphicsLayoutItem *> itemByPoint;
+
+    /** Effective cell size dictated by the items stored in this layout. */
+    mutable QSizeF effectiveCellSize;
+
+    /** Actual layout bounds, in cells. */
+    mutable QRect bounds;
+
+    /** Effective geometry, adjusted for contents margins. */
+    mutable QRectF effectiveGeometry;
+
+private:
+    Q_DECLARE_PUBLIC(CellLayout);
+};
+
+
+#endif // CELLLAYOUT_P_H

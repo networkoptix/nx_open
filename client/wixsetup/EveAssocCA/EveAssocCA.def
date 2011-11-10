@@ -1,0 +1,7 @@
+LIBRARY	"EveAssocCA"
+
+EXPORTS
+
+SetDefaultAssociations
+SaveAssociations
+RestoreAssociations

@@ -1,0 +1,27 @@
+#ifndef __RECORDED_CHUNKS_H__
+#define __RECORDED_CHUNKS_H__
+
+#include "rest/server/request_handler.h"
+
+class QnRestXsdHelpHandler: public QnRestRequestHandler
+{
+protected:
+    QString getXsdUrl(TCPSocket* tcpSocket) const;
+};
+
+class QnRecordedChunkListHandler: public QnRestXsdHelpHandler
+{
+    virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result);
+    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result);
+    virtual QString description(TCPSocket* tcpSocket) const;
+private:
+    qint64 parseDateTime(const QString& dateTime);
+};
+
+class QnXsdHelperHandler: public QnRestRequestHandler
+{
+    virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result);
+    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result);
+};
+
+#endif // __RECORD_CHUNKS_H__

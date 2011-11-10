@@ -1,18 +1,15 @@
 #ifndef videostreamdisplay_h_2044
 #define videostreamdisplay_h_2044
 
-#include <QtCore/QHash>
-#include <QtCore/QMutex>
-#include <QtCore/QSize>
 
-#include "core/datapacket/mediadatapacket.h"
-#include "decoders/videodata.h"
+#include "decoders/video/abstractdecoder.h"
 
-struct AVFrame;
-struct SwsContext;
-
+class QnAbstractVideoDecoder;
+struct QnCompressedVideoData;
 class CLAbstractRenderer;
-class CLAbstractVideoDecoder;
+class BufferedFrameDisplayer;
+
+static const int MAX_FRAME_QUEUE_SIZE = 12;
 
 /**
   * Display one video stream. Decode the video and pass it to video window.
@@ -20,44 +17,83 @@ class CLAbstractVideoDecoder;
 class CLVideoStreamDisplay
 {
 public:
-    CLVideoStreamDisplay(CLAbstractRenderer *renderer, bool can_downscale);
-    ~CLVideoStreamDisplay();
+    enum FrameDisplayStatus {Status_Displayed, Status_Skipped, Status_Buffered};
 
-    void dispay(QnCompressedVideoDataPtr data, bool draw,
+    CLVideoStreamDisplay(bool can_downscale);
+    ~CLVideoStreamDisplay();
+    void setDrawer(CLAbstractRenderer* draw);
+    FrameDisplayStatus dispay(QnCompressedVideoDataPtr data, bool draw,
                 CLVideoDecoderOutput::downscale_factor force_factor = CLVideoDecoderOutput::factor_any);
+
+    void setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val);
 
     CLVideoDecoderOutput::downscale_factor getCurrentDownscaleFactor() const;
 
     void setMTDecoding(bool value);
 
+    void setSpeed(float value);
+    qint64 getLastDisplayedTime() const;
+    void setLastDisplayedTime(qint64 value);
+    void afterJump();
+    QImage getScreenshot();
+    void blockTimeValue(qint64 time);
+    void unblockTimeValue();
+    void setCurrentTime(qint64 time);
+    void waitForFramesDisplaed();
 private:
-    CLAbstractRenderer *const m_renderer;
-    bool m_canDownscale;
-
     QMutex m_mtx;
-    QHash<int, CLAbstractVideoDecoder *> m_decoder; // codec Id -> decoder
+    mutable QMutex m_timeMutex;
+    QMap<CodecID, QnAbstractVideoDecoder*> m_decoder;
+
+    CLAbstractRenderer* m_drawer;
 
     /**
-      * to reduce image size for weak video cards
+      * to reduce image size for weak video cards 
       */
-    CLVideoDecoderOutput m_outFrame;
+
+    CLVideoDecoderOutput* m_frameQueue[MAX_FRAME_QUEUE_SIZE];
+    CLVideoDecoderOutput* m_prevFrameToDelete;
+    int m_frameQueueIndex;
+
+    QnAbstractVideoDecoder::DecodeMode m_lightCPUmode;
+    bool m_canDownscale;
 
     CLVideoDecoderOutput::downscale_factor m_prevFactor;
     CLVideoDecoderOutput::downscale_factor m_scaleFactor;
     QSize m_previousOnScreenSize;
 
-    AVFrame *m_frameYUV;
-    quint8* m_buffer;
     SwsContext *m_scaleContext;
     int m_outputWidth;
     int m_outputHeight;
-
+    bool m_enableFrameQueue;
+    bool m_queueUsed;
+    bool m_needReinitDecoders;
+    bool m_reverseMode;
+    bool m_prevReverseMode;
+    QQueue<CLVideoDecoderOutput*> m_reverseQueue;
+    bool m_flushedBeforeReverseStart;
+    qint64 m_lastDisplayedTime;
+    int m_realReverseSize;
+    int m_maxReverseQueueSize;
+    bool m_timeChangeEnabled;
+    BufferedFrameDisplayer* m_bufferedFrameDisplayer;
 private:
+    bool m_queueWasFilled;
+    float m_speed;
+    void reorderPrevFrames();
     bool allocScaleContext(const CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);
     void freeScaleContext();
-    bool rescaleFrame(CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);
+    bool rescaleFrame(const CLVideoDecoderOutput& srcFrame, CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);
+
     CLVideoDecoderOutput::downscale_factor findScaleFactor(int width, int height, int fitWidth, int fitHeight);
-    CLVideoDecoderOutput::downscale_factor determineScaleFactor(QnCompressedVideoDataPtr data, const CLVideoData& img, CLVideoDecoderOutput::downscale_factor force_factor);
+    CLVideoDecoderOutput::downscale_factor determineScaleFactor(
+        QnCompressedVideoDataPtr data, 
+        int srcWidth, 
+        int srcHeight, 
+        CLVideoDecoderOutput::downscale_factor force_factor);
+    bool processDecodedFrame(QnAbstractVideoDecoder* dec, CLVideoDecoderOutput* outFrame, bool enableFrameQueue, bool reverseMode);
+    void checkQueueOverflow(QnAbstractVideoDecoder* dec);
+    void clearReverseQueue();
 };
 
 #endif //videostreamdisplay_h_2044

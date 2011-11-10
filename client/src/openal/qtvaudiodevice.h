@@ -1,5 +1,5 @@
 /*
-* qtvaudiodevice.h
+* qtvaudioqnresource.h
 *
 *  Created on: Jun 2009
 *      Author: ascii zhot
