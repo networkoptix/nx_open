@@ -23,6 +23,7 @@ public:
     static void clearGarbage();
 
     CLGLRenderer(CLVideoWindowItem *vw);
+    CLGLRenderer();
     ~CLGLRenderer();
 
     static int getMaxTextureSize();
@@ -30,7 +31,7 @@ public:
     void draw(CLVideoDecoderOutput* image);
     virtual void waitForFrameDisplayed(int channel);
 
-    bool paintEvent(const QRect &r);
+    bool paintEvent(const QRectF &r);
 
     virtual void beforeDestroy();
 
@@ -45,6 +46,7 @@ public:
     static bool isPixelFormatSupported(PixelFormat pixfmt);
 
 private:
+    void construct();
     void init(bool msgbox);
     static int gl_status;
 
@@ -85,6 +87,9 @@ private:
     int glRGBFormat() const;
 
 private:
+    mutable QMutex m_displaySync; // to avoid call paintEvent() more than once at the same time
+    QWaitCondition m_waitCon;
+
     GLint clampConstant;
     bool isNonPower2;
     bool isSoftYuv2Rgb;

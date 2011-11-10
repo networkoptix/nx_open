@@ -22,7 +22,7 @@ public:
      * 
      * \param image                     New video frame.
      */
-	virtual void draw(CLVideoDecoderOutput* image) = 0;
+	virtual void draw(CLVideoDecoderOutput *image) = 0;
 
     /**
      * This function is supposed to be called from <i>decoding</i> thread.
@@ -52,10 +52,6 @@ public:
      * \returns                         Whether the downscale factor is forced x2 constant.
      */
     virtual bool constantDownscaleFactor() const = 0;
-
-protected:
-    mutable QMutex m_displaySync; // to avoid call paintEvent() more than once at the same time
-    QWaitCondition m_waitCon;
 };
 
 #endif //clgl_draw_h_20_31

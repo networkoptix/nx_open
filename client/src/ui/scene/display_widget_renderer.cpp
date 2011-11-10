@@ -1,0 +1,90 @@
+#include "display_widget_renderer.h"
+#include <QMutexLocker>
+#include <utils/common/warnings.h>
+#include <camera/gl_renderer.h>
+
+QnDisplayWidgetRenderer::QnDisplayWidgetRenderer(int channelCount, QObject *parent):
+    QObject(parent),
+    m_decodingThread(NULL)
+{
+    for(int i = 0; i < channelCount; i++)
+        m_channelRenderers.push_back(new CLGLRenderer());
+}
+
+void QnDisplayWidgetRenderer::beforeDestroy() {
+    checkThread(false);
+
+    foreach(CLGLRenderer *renderer, m_channelRenderers)
+        renderer->beforeDestroy();
+
+    foreach(CLGLRenderer *renderer, m_channelRenderers)
+        delete renderer;
+}
+
+QnDisplayWidgetRenderer::~QnDisplayWidgetRenderer() {
+    return;
+}
+
+CLGLRenderer *QnDisplayWidgetRenderer::channelRenderer(int channel) const {
+    /* Renderers are not changed after this object is constructed, so no
+     * synchronization is needed here. */
+    return m_channelRenderers[channel];
+}
+
+void QnDisplayWidgetRenderer::checkThread(bool inDecodingThread) const {
+#ifdef _DEBUG
+    if(inDecodingThread) {
+        if(m_decodingThread == NULL) {
+            m_decodingThread = QThread::currentThread();
+            return;
+        }
+
+        if(m_decodingThread != QThread::currentThread())
+            qnWarning("This function is supposed to be called from decoding thread only.");
+    } else {
+        if(thread() != QThread::currentThread())
+            qnWarning("This function is supposed to be called from GUI thread only.");
+    }
+#endif
+}
+
+void QnDisplayWidgetRenderer::draw(CLVideoDecoderOutput *image) {
+    checkThread(true);
+
+    // m_first_draw = false;
+
+    m_channelRenderers[image->channel]->draw(image);
+
+    QSize sourceSize = QSize(image->width * image->sample_aspect_ratio, image->height);
+    
+    if(m_sourceSize != sourceSize) {
+        m_sourceSize = sourceSize;
+        emit sourceSizeChanged(sourceSize);
+    }
+}
+
+void QnDisplayWidgetRenderer::waitForFrameDisplayed(int channel) {
+    checkThread(true);
+
+    m_channelRenderers[channel]->waitForFrameDisplayed(channel);
+}
+
+QSize QnDisplayWidgetRenderer::sizeOnScreen(unsigned int /*channel*/) const {
+    checkThread(true);
+
+    QMutexLocker locker(&m_mutex);
+    
+    return m_channelScreenSize;
+}
+
+void QnDisplayWidgetRenderer::setChannelScreenSize(const QSize &screenSize) {
+    QMutexLocker locker(&m_mutex);
+
+    m_channelScreenSize = screenSize;
+}
+
+bool QnDisplayWidgetRenderer::constantDownscaleFactor() const {
+    checkThread(true);
+
+    return false;
+}
