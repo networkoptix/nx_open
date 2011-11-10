@@ -1,0 +1,40 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<!--
+    Example pom for delegating maven goals to msbuild so it builds the "solution"
+ 
+    A solution can be a group of projects, but here we only have one.
+    It should also be possible to have one maven project per solution project, 
+    and have a parent pom to deletegate the build.
+  -->
+
+	<groupId>com.networkoptix.hdwitness-vms</groupId>
+	<version>0.1-SNAPSHOT</version>
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>hdwitness-vms</artifactId>
+	<packaging>pom</packaging>
+	<name>VMS</name>
+	<properties>
+		<msbuild.exe>C:\WINDOWS\Microsoft.NET\Framework\v3.5\msbuild.exe</msbuild.exe>
+		<msbuild.configuration>Release</msbuild.configuration>
+	</properties>
+    <modules>
+        <module>common</module>
+		<module>appserver</module>
+		<module>server</module>
+		<module>client</module>
+    </modules>
+	<profiles>
+		<profile>
+			<id>windows</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+				<os>
+					<family>Windows</family>
+				</os>
+			</activation>
+			<properties>
+				<platform>windows</platform>
+			</properties>
+		</profile>
+	</profiles>	
+</project>
