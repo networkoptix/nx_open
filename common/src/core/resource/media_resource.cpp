@@ -15,19 +15,19 @@ QnMediaResource::~QnMediaResource()
 {
 }
 
-QImage QnMediaResource::getImage(int /*channnel*/, QDateTime /*time*/, QnStreamQuality /*quality*/)
+QImage QnMediaResource::getImage(int /*channnel*/, QDateTime /*time*/, QnStreamQuality /*quality*/) const
 {
     return QImage();
 }
 
 static QnDefaultDeviceVideoLayout videoLayout;
-const QnVideoResourceLayout* QnMediaResource::getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
+const QnVideoResourceLayout* QnMediaResource::getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider) const
 {
     return &videoLayout;
 }
 
 static QnEmptyAudioLayout audioLayout;
-const QnResourceAudioLayout* QnMediaResource::getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
+const QnResourceAudioLayout* QnMediaResource::getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider) const
 {
     return &audioLayout;
 }

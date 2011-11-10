@@ -47,7 +47,7 @@ QnAbstractStreamDataProvider* QnAviResource::createDataProviderInternal(Connecti
     return result;
 }
 
-const QnVideoResourceLayout* QnAviResource::getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
+const QnVideoResourceLayout* QnAviResource::getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider) const
 {
     const QnArchiveStreamReader* archiveReader = dynamic_cast<const QnArchiveStreamReader*> (dataProvider);
     if (archiveReader)
@@ -56,7 +56,7 @@ const QnVideoResourceLayout* QnAviResource::getVideoLayout(const QnAbstractMedia
         return QnMediaResource::getVideoLayout();
 }
 
-const QnResourceAudioLayout* QnAviResource::getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
+const QnResourceAudioLayout* QnAviResource::getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider) const
 {
     const QnArchiveStreamReader* archiveReader = dynamic_cast<const QnArchiveStreamReader*> (dataProvider);
     if (archiveReader)
