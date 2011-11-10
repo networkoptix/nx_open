@@ -31,6 +31,7 @@ bool QnRtspClientArchiveDelegate::open(QnResourcePtr resource)
 {
     if (m_opened)
         return true;
+    m_resource = resource;
     QnResourcePtr server = qnResPool->getResourceById(resource->getParentId());
     if (server == 0)
         return false;
@@ -56,6 +57,12 @@ bool QnRtspClientArchiveDelegate::open(QnResourcePtr resource)
     return m_opened;
 }
 
+void QnRtspClientArchiveDelegate::beforeClose()
+{
+    if (m_rtpData)
+        m_rtpData->getSocket()->close();
+}
+
 void QnRtspClientArchiveDelegate::close()
 {
     m_rtspSession.stop();
@@ -79,11 +86,19 @@ qint64 QnRtspClientArchiveDelegate::endTime()
     return m_rtspSession.endTime();
 }
 
+void QnRtspClientArchiveDelegate::reopen()
+{
+    close();
+    if (m_resource)
+        open(m_resource);
+}
+
 QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
 {
     // sometime function may return zero packet if no data arrived
     QnAbstractMediaDataPtr result;
-    while (!result)
+    int errCnt = 0;
+    while(!result)
     {
         if (!m_rtpData)
             return result;
@@ -94,6 +109,12 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
             m_rtspSession.stop();
             return result; // reconnect
         }
+        else if (blockSize == 0) {
+            errCnt++;
+            if (errCnt == 10)
+                break;
+        }
+        errCnt = 0;
 
 #ifdef DEBUG_RTSP
         static QFile* binaryFile = 0;
@@ -129,7 +150,8 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
         else
             qWarning() << Q_FUNC_INFO << __LINE__ << "Only FFMPEG payload format now implemeted. Ask developers to add '" << format << "' format";
     }
-    
+    if (!result)
+        reopen();
   
     return result;
 }

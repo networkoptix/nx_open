@@ -27,6 +27,8 @@ public:
 
     int getServers(QnResourceList& servers);
 
+    bool isConnected() const;
+
 private:
     QSharedPointer<AppSessionManager> m_sessionManager;
     QnResourceFactory& m_resourceFactory;

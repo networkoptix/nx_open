@@ -63,7 +63,7 @@ signals:
     void prevFrameOccured();
 protected:
 	virtual void channeljumpTo(qint64 mksec, int channel) = 0;
-
+    virtual void pleaseStop();
 protected:
     bool m_cycleMode;
 	quint64 m_lengthMksec;

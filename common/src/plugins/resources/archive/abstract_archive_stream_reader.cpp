@@ -155,3 +155,10 @@ qint64 QnAbstractArchiveReader::endTime() const
     m_delegate->open(m_resource);
     return m_delegate->endTime(); 
 }
+
+void QnAbstractArchiveReader::pleaseStop()
+{
+    QnClientPullMediaStreamProvider::pleaseStop();
+    if (m_delegate)
+        m_delegate->beforeClose();
+}

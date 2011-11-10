@@ -15,6 +15,11 @@ QnAppServerConnection::QnAppServerConnection(const QHostAddress& host, int port,
 {
 }
 
+bool QnAppServerConnection::isConnected() const
+{
+    return true;
+}
+
 QnAppServerConnection::~QnAppServerConnection()
 {
 }

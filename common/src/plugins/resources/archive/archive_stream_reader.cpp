@@ -3,35 +3,11 @@
 #include "utils/media/frame_info.h"
 
 
-QMutex QnArchiveStreamReader::avi_mutex;
-QSemaphore QnArchiveStreamReader::aviSemaphore(4);
-
 // used in reverse mode.
 // seek by 1.5secs. It is prevents too fast seeks for short GOP, also some codecs has bagged seek function. Large step prevent seek
 // forward instead seek backward
 static const int MAX_KEY_FIND_INTERVAL = 10 * 1000 * 1000;
 static const qint64 BACKWARD_SEEK_STEP =  2000 * 1000; 
-
-class QnAviSemaphoreHelpr
-{
-public:
-    QnAviSemaphoreHelpr(QSemaphore& sem):
-      m_sem(sem)
-      {
-          m_sem.tryAcquire();
-      }
-
-    ~QnAviSemaphoreHelpr()
-    {
-        m_sem.release();
-    }
-
-private:
-    QSemaphore& m_sem;
-
-};
-
-
 
 static const int FFMPEG_PROBE_BUFFER_SIZE = 1024 * 512;
 
@@ -57,7 +33,16 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_selectedAudioChannel(0)
 {
     // Should init packets here as some times destroy (av_free_packet) could be called before init
+    //connect(dev.data(), SIGNAL(onStatusChanged(QnResource::Status, QnResource::Status)), this, SLOT(onStatusChanged(QnResource::Status, QnResource::Status)));
 }
+
+/*
+QnArchiveStreamReader::onStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus)
+{
+    if (newStatus == QnResource::Offline)
+        m_delegate->close();
+}
+*/
 
 QnArchiveStreamReader::~QnArchiveStreamReader()
 {
@@ -182,14 +167,11 @@ begin_label:
     }
 	if (mFirstTime)
 	{
-		QMutexLocker mutex(&avi_mutex); // speeds up concurrent reading of lots of files, if files not cashed yet
         // this is here instead if constructor to unload ui thread
 		if (init()) 
 		    mFirstTime = false;
         else {
             // If media data can't be opened wait 1 second and try again
-            for (int i = 0; i < 100 && !m_needStop; ++i)
-                QnSleep::msleep(10);
             return QnAbstractMediaDataPtr();
         }
 	}
@@ -210,8 +192,6 @@ begin_label:
                 setSkipFramesToTime(displayTime);
         }
     }
-
-	QnAviSemaphoreHelpr sem(aviSemaphore);
 
     QnCompressedVideoDataPtr videoData;
 	{
@@ -453,11 +433,11 @@ void QnArchiveStreamReader::intChanneljumpTo(qint64 mksec, int /*channel*/)
 QnAbstractMediaDataPtr QnArchiveStreamReader::getNextPacket()
 {
     QnAbstractMediaDataPtr result;
-	while (1)
+	while (!m_needStop)
 	{
 		result = m_delegate->getNextData();
 
-		if (result == 0 && m_cycleMode)
+		if (result == 0 && m_cycleMode && !m_needStop)
 		{
             if (m_lengthMksec < 1000 * 1000 * 5)
                 msleep(200); // prevent to fast file walk for very short files.

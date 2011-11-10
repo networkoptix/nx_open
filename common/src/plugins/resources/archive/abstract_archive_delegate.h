@@ -38,6 +38,7 @@ public:
 
     Flags getFlags() const { return m_flags; }
     virtual bool isRealTimeSource() const { return false; }
+    virtual void beforeClose() {}
 protected:
     Flags m_flags;
 };

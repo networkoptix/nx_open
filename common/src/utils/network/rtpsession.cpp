@@ -14,7 +14,7 @@
 static const int MAX_RTCP_PACKET_SIZE = 1024 * 2;
 static const quint32 SSRC_CONST = 0x2a55a9e8;
 static const quint32 CSRC_CONST = 0xe8a9552a;
-//static const int TCP_TIMEOUT = 5 * 1000 * 1000;
+static const int TCP_TIMEOUT = 5 * 1000 * 1000;
 
 //#define DEBUG_RTSP
 
@@ -146,8 +146,8 @@ bool RTPSession::open(const QString& url)
     //unsigned int port = DEFAULT_RTP_PORT;
 
     m_tcpSock = new TCPSocket();
-    //m_tcpSock->setReadTimeOut(TCP_TIMEOUT);
-    //m_tcpSock->setWriteTimeOut(TCP_TIMEOUT);
+    m_tcpSock->setReadTimeOut(TCP_TIMEOUT);
+    m_tcpSock->setWriteTimeOut(TCP_TIMEOUT);
 
     if (!m_tcpSock->connect(mUrl.host().toLatin1().data(), mUrl.port(DEFAULT_RTP_PORT)))
         return false;
@@ -578,8 +578,11 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
         return -1;
     while (m_tcpSock->isConnected())
     {
-        if (readMoreData && readRAWData() < 0)
-            break;
+        if (readMoreData) {
+             int readed = readRAWData();
+            if (readed <= 0)
+                return readed;
+        }
         int demuxedCount = 0;
         quint8* curPtr = m_responseBuffer;
         for(; curPtr < m_responseBuffer + m_responseBufferLen; curPtr++)

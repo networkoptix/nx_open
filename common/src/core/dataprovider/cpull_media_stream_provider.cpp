@@ -42,6 +42,9 @@ void QnClientPullMediaStreamProvider::run()
 
 		if (data==0)
 		{
+            if (m_needStop)
+                continue;
+
 			setNeedKeyData();
 			frames_lost++;
 			m_stat[0].onData(0);
@@ -53,7 +56,13 @@ void QnClientPullMediaStreamProvider::run()
 				m_stat[0].onLostConnection();
             }
 
-			QnSleep::msleep(30);
+            if (getResource()->getStatus() == QnResource::Offline) {
+                for (int i = 0; i < 100 && !m_needStop; ++i)
+                    QnSleep::msleep(10);
+            }
+            else {
+                QnSleep::msleep(30);
+            }
 
 			continue;
 		}

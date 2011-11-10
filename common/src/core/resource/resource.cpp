@@ -261,7 +261,7 @@ bool QnResource::unknownResource() const
     return getName().isEmpty();
 }
 
-
+/*
 QnParamList& QnResource::getResourceParamList() const
 {
     QMutexLocker locker(&m_mutex);
@@ -279,6 +279,38 @@ QnParamList& QnResource::getResourceParamList() const
             }
         }
     }
+    return m_resourceParamList;
+}
+*/
+
+QnParamList& QnResource::getResourceParamList() const
+{
+    QnId restypeid;
+    {
+        QMutexLocker locker(&m_mutex);
+        if (!m_resourceParamList.empty())
+            return m_resourceParamList;
+        restypeid = m_typeId;
+    }
+
+    QnParamList resourceParamList;
+
+    QnResourceTypePtr resType = qnResTypePool->getResourceType(restypeid);
+    if (resType) {
+        const QList<QnParamTypePtr>& paramTypes = resType->paramTypeList();
+        foreach(QnParamTypePtr paramType, paramTypes)
+        {
+            QnParam newParam(paramType);
+            newParam.setValue(paramType->default_value);
+            cl_log.log(newParam.toDebugString(), cl_logALWAYS); // debug
+            resourceParamList.put(newParam);
+        }
+
+        QMutexLocker locker(&m_mutex);
+        if (m_resourceParamList.empty()) 
+            m_resourceParamList = resourceParamList;
+    }
+
     return m_resourceParamList;
 }
 

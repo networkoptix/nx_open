@@ -111,6 +111,7 @@ protected:
         if (itr != m_generatedContext.end())
             return itr.value();
         QnMediaContextPtr result(new QnMediaContext(compressionType));
+        AVCodecContext* ctx = result->ctx();
         m_generatedContext.insert(compressionType, result);
         return result;
     }
@@ -538,6 +539,7 @@ void QnRtspConnectionProcessor::createDataProvider()
 
 int QnRtspConnectionProcessor::composePlay()
 {
+
     Q_D(QnRtspConnectionProcessor);
     if (d->mediaRes == 0)
         return CODE_NOT_FOUND;
@@ -558,7 +560,7 @@ int QnRtspConnectionProcessor::composePlay()
 
     if (!d->dataProcessor) 
         d->dataProcessor = new QnRtspDataConsumer(this);
-    
+
     currentDP->addDataProcessor(d->dataProcessor);
     
 
@@ -678,8 +680,10 @@ void QnRtspConnectionProcessor::processRequest()
 void QnRtspConnectionProcessor::run()
 {
     Q_D(QnRtspConnectionProcessor);
+    QTime t;
     while (!m_needStop && d->socket->isConnected())
     {
+        t.restart();
         int readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
         if (readed > 0) {
             d->clientRequest.append((const char*) d->tcpReadBuffer, readed);
@@ -689,12 +693,15 @@ void QnRtspConnectionProcessor::run()
                 processRequest();
             }
         }
-        else
+        else if (t.elapsed() < 2)
+        {
+            // recv return 0 bytes imediatly, so client has closed socket
             break;
+        }
     }
 
     d->deleteDP();
-
+    d->socket->close();
     m_runing = false;
     //deleteLater(); // does not works for this thread
 }

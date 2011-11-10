@@ -17,6 +17,7 @@ QnAbstractStreamDataProvider::~QnAbstractStreamDataProvider()
 bool QnAbstractStreamDataProvider::dataCanBeAccepted() const
 {
     // need to read only if all queues has more space and at least one queue is exist
+    QMutexLocker mutex(&m_mutex);
     bool result = false;
     for (int i = 0; i < m_dataprocessors.size(); ++i)
     {

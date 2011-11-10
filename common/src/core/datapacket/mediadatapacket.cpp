@@ -3,6 +3,8 @@
 #include "libavformat/avformat.h"
 #include "utils/media/ffmpeg_helper.h"
 
+extern QMutex global_ffmpeg_mutex;
+
 QnMediaContext::QnMediaContext(AVCodecContext* ctx)
 {
     m_ctx = avcodec_alloc_context();
@@ -13,6 +15,7 @@ QnMediaContext::QnMediaContext(CodecID codecId)
 {
     if (codecId != CODEC_ID_NONE)
     {
+        QMutexLocker mutex(&global_ffmpeg_mutex);
         m_ctx = avcodec_alloc_context();
         AVCodec* codec = avcodec_find_decoder(codecId);
         avcodec_open(m_ctx, codec);
