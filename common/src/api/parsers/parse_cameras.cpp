@@ -20,6 +20,8 @@ void parseCameras(QList<QnResourcePtr>& cameras, const QnApiCameras& xsdCameras,
         parameters["mac"] = i->mac().c_str();
         parameters["login"] = i->login().c_str();
         parameters["password"] = i->password().c_str();
+        if (i->parentID().present())
+            parameters["parentId"] = (*i->parentID()).c_str();
 
         QnResourcePtr camera = resourceFactory.createResource(i->typeId().c_str(), parameters);
         if (camera.isNull())

@@ -78,7 +78,7 @@ int QnAppServerConnection::addCamera(const QnNetworkResource& cameraIn, const Qn
                                      cameraIn.getAuth().user().toStdString(),
                                      cameraIn.getAuth().password().toStdString());
 
-    camera.parentID(serverIdIn.toString().toInt());
+    camera.parentID(serverIdIn.toString().toStdString());
 
     QnApiCameraResponsePtr xsdCameras;
 
