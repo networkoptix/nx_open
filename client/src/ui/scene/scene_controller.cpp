@@ -204,7 +204,7 @@ void QnSceneController::at_draggingFinished(QGraphicsView *view, QList<QGraphics
             if(replacedEntity != NULL && replacedEntity != draggedEntity && draggedEntity->isPinned()) {
                 QSizeF draggedSize = draggedEntity->geometry().size();
                 QSizeF replacedSize = replacedEntity->geometry().size();
-                if(replacedSize.width() >= draggedSize.width() && replacedSize.height() >= draggedSize.width()) {
+                if(replacedSize.width() >= draggedSize.width() && replacedSize.height() >= draggedSize.height()) {
                     entities.push_back(replacedEntity);
                     geometries.push_back(replacedEntity->geometry());
                     geometries.push_back(draggedEntity->geometry());
