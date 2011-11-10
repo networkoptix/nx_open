@@ -25,6 +25,8 @@ public:
     int addServer(const QnVideoServer&, QnVideoServerList& servers);
     int addCamera(const QnNetworkResource&, const QnId& serverId, QList<QnResourcePtr>& cameras);
 
+    int getServers(QnResourceList& servers);
+
 private:
     QSharedPointer<AppSessionManager> m_sessionManager;
     QnResourceFactory& m_resourceFactory;
