@@ -24,6 +24,7 @@
 
 //#define TEST_RTSP_SERVER
 
+static const int DEFAUT_RTSP_PORT = 50000;
 
 QMutex global_ffmpeg_mutex;
 
@@ -139,7 +140,8 @@ void registerServer(QnAppServerConnection& appServerConnection, const QString& m
         QnVideoServer server;
         server.setName(QString("Server ") + myAddress);
 
-        server.setUrl(myAddress);
+        server.setUrl(QString("rtsp://") + myAddress + QString(':') + QString::number(DEFAUT_RTSP_PORT));
+        server.setApiUrl(QString("http://") + myAddress + QString(':') + QString::number(DEFAULT_REST_PORT));
 
         QnVideoServerList servers;
         appServerConnection.addServer(server, servers);
@@ -250,7 +252,7 @@ int main(int argc, char *argv[])
 
     QnAppserverResourceProcessor processor(QnId(serverId()), host, port, auth, QnResourceDiscoveryManager::instance());
 
-    QnRtspListener rtspListener(QHostAddress::Any, 50000);
+    QnRtspListener rtspListener(QHostAddress::Any, DEFAUT_RTSP_PORT);
     rtspListener.start();
 
     QnRestServer restServer(QHostAddress::Any, DEFAULT_REST_PORT);

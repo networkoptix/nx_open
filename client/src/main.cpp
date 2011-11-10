@@ -83,8 +83,15 @@ void addTestData()
     
     QnVideoServerPtr server(new QnVideoServer());
     server->setUrl("rtsp://localhost:50000");
+    server->setApiUrl("rtsp://localhost:8080");
     //server->startRTSPListener();
     qnResPool->addResource(QnResourcePtr(server));
+
+    QnServerCameraPtr testCamera(new QnServerCamera());
+    testCamera->setParentId(server->getId());
+    testCamera->setMAC(QnMacAddress("00-1A-07-00-A5-76"));
+    testCamera->setName("testCamera");
+    qnResPool->addResource(QnResourcePtr(testCamera));
 
     /*
     QnAviResourcePtr resource(new QnAviResource("E:/Users/roman76r/video/ROCKNROLLA/BDMV/STREAM/00000.m2ts"));
@@ -103,12 +110,6 @@ void addTestData()
     qnResPool->addResource(QnResourcePtr(testCamera));
     */
 
-    QnServerCameraPtr testCamera(new QnServerCamera());
-    testCamera->setParentId(server->getId());
-    testCamera->setMAC(QnMacAddress("00-1A-07-00-9A-2F"));
-    testCamera->setName("testCamera");
-    //qnResPool->addResource(QnResourcePtr(testCamera));
-
     
     addTestFile("e:/Users/roman76r/blake/3PM PRIVATE SESSION, HOLLYWOOD Jayme.flv", "q1");
     addTestFile("e:/Users/roman76r/blake/8 FEATURE PREMIERE_Paid Companions_Bottled-Up_h.wmv", "q2");
@@ -124,6 +125,15 @@ void addTestData()
     resource2->setParentId(server->getId());
     qnResPool->addResource(QnResourcePtr(resource2));
     */
+
+    QnNetworkResourceList testList;
+    testList << testCamera;
+    QnTimePeriodList periods = server->apiConnection()->recordedTimePeriods(testList);
+    for (int i = 0; i < periods.size(); ++i)
+    {
+        qDebug() << periods[i].startTime << ' ' << periods[i].duration;
+    }
+
 }
 #endif
 
@@ -237,7 +247,7 @@ int main(int argc, char *argv[])
         qDebug() << "Can't get resource types";
     }
 
-    qApp->exit();
+    //qApp->exit();
 
     QnResource::startCommandProc();
 

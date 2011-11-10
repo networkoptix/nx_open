@@ -37,13 +37,12 @@ bool QnRtspClientArchiveDelegate::open(QnResourcePtr resource)
     m_rtspSession.setTransport("TCP");
 
     QString url = server->getUrl() + QString('/');
-    /*
-    if (!resource->getId().isValid())
-        url += resource->getUrl();
+    QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
+    if (netResource != 0)
+        url += netResource->getMAC().toString();
     else
-        url += resource->getId().toString();
-    */
-    url += resource->getUrl();
+        url += resource->getUrl();
+
     if (m_rtspSession.open(url)) 
     {
         m_rtpData = m_rtspSession.play(m_position);

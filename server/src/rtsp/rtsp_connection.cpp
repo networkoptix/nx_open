@@ -321,9 +321,10 @@ void QnRtspConnectionProcessor::parseRequest()
         QString resId = extractPath();
         if (resId.startsWith('/'))
             resId = resId.mid(1);
-        QnResourcePtr resource = qnResPool->getResourceById(resId);
-        if (resource == 0)
-            resource = qnResPool->getResourceByUrl(resId);
+        QnResourcePtr resource = qnResPool->getResourceByUrl(resId);
+        if (resource == 0) {
+            resource = qnResPool->getNetResourceByMac(resId);
+        }
         d->mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
     }
     d->clientRequest.clear();
@@ -688,6 +689,8 @@ void QnRtspConnectionProcessor::run()
                 processRequest();
             }
         }
+        else
+            break;
     }
 
     d->deleteDP();

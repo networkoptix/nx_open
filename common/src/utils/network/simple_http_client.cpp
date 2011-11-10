@@ -6,6 +6,8 @@
 #include "../common/util.h"
 
 
+static const int MAX_LINE_LENGTH = 1024*16;
+
 using namespace std;
 
 CLSimpleHTTPClient::CLSimpleHTTPClient(const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth):
@@ -53,7 +55,7 @@ CLHttpStatus CLSimpleHTTPClient::getNextLine()
 		prev = curr;
 		++readed;
 
-        if (readed > 2000)
+        if (readed > MAX_LINE_LENGTH)
             break;
 	}
 

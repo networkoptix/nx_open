@@ -90,3 +90,9 @@ int QnAppServerConnection::addCamera(const QnNetworkResource& cameraIn, const Qn
 
     return 1;
 }
+
+int QnAppServerConnection::getServers(QnResourceList& servers)
+{
+    // todo: implement me
+    return 0;
+}

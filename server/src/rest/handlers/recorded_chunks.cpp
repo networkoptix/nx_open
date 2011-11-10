@@ -23,11 +23,11 @@ qint64 QnRecordedChunkListHandler::parseDateTime(const QString& dateTime)
         QStringList dateTimeParts = dateTime.split('.');
         QDateTime tmpDateTime = QDateTime::fromString(dateTimeParts[0], Qt::ISODate);
         if (dateTimeParts.size() > 1)
-            tmpDateTime = tmpDateTime.addMSecs(dateTimeParts[1].toInt());
+            tmpDateTime = tmpDateTime.addMSecs(dateTimeParts[1].toInt()/1000);
         return tmpDateTime.toMSecsSinceEpoch() * 1000;
     }
     else
-        return dateTime.toLongLong() * 1000;
+        return dateTime.toLongLong();
 }
 
 int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result)
@@ -101,11 +101,11 @@ QString QnRecordedChunkListHandler::description(TCPSocket* tcpSocket) const
     QString rez;
     rez += "Return recorded chunk info by specified cameras\n";
     rez += "<BR>Param <b>mac</b> - camera mac. Param can be repeated several times for many cameras.";
-    rez += "<BR>Param <b>startTime</b> - Time interval start. ms since 1970 UTC or string at format 'YYYY-MM-DDThh24:mi:ss.ms', format auto detected)";
+    rez += "<BR>Param <b>startTime</b> - Time interval start. mks since 1970 UTC or string at format 'YYYY-MM-DDThh24:mi:ss.mks', format auto detected)";
     rez += "<BR>Param <b>endTime</b> - Time interval end (same format, see above)";
     rez += "<BR>Param <b>detail</b> - Chunk detail level. Time periods/chunks less than detal level is discarded. You can use detail level as amount of mks per screen pixel";
 
-    rez += "<BR><b>Return</b> XML</b> - with chunks merged by all cameras. <a href=\"";
+    rez += "<BR><b>Return</b> XML</b> - with chunks merged by all cameras. Returned time and duration at mks. <a href=\"";
     rez += getXsdUrl(tcpSocket);
     return rez;
 }
