@@ -8,7 +8,7 @@
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "camera/video_camera.h"
 
-static const int TRUNCATE_INTERVAL = 15; // seconds
+static const int TRUNCATE_INTERVAL = 60; // seconds
 
 QnRecordingManager::QnRecordingManager()
 {

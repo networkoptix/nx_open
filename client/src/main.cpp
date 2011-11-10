@@ -32,6 +32,7 @@
 
 #include "ui/scene/scenecontroller.h"
 #include "core/resource/video_server.h"
+#include "core/resource/qnstorage.h"
 
 
 
@@ -80,7 +81,7 @@ void addTestFile(const QString& fileName, const QString& resId)
 
 void addTestData()
 {
-    
+    /*
     QnVideoServerPtr server(new QnVideoServer());
     server->setUrl("rtsp://localhost:50000");
     server->setApiUrl("rtsp://localhost:8080");
@@ -92,6 +93,7 @@ void addTestData()
     testCamera->setMAC(QnMacAddress("00-1A-07-00-A5-76"));
     testCamera->setName("testCamera");
     qnResPool->addResource(QnResourcePtr(testCamera));
+    */
 
     /*
     QnAviResourcePtr resource(new QnAviResource("E:/Users/roman76r/video/ROCKNROLLA/BDMV/STREAM/00000.m2ts"));
@@ -125,7 +127,8 @@ void addTestData()
     resource2->setParentId(server->getId());
     qnResPool->addResource(QnResourcePtr(resource2));
     */
-
+    
+    /*
     QnNetworkResourceList testList;
     testList << testCamera;
     QnTimePeriodList periods = server->apiConnection()->recordedTimePeriods(testList);
@@ -133,6 +136,7 @@ void addTestData()
     {
         qDebug() << periods[i].startTime << ' ' << periods[i].duration;
     }
+    */
 
 }
 #endif
@@ -244,7 +248,16 @@ int main(int argc, char *argv[])
 #endif
     } else
     {
-        qDebug() << "Can't get resource types";
+        qDebug() << "Can't get resource types from Application server";
+    }
+    QnResourceList resources;
+    if (appServerConnection.getResources(resources) == 0)
+    {
+        qnResPool->addResources(resources);
+        qDebug() << "Got" << resources.size() << "resources";
+    } else
+    {
+        qDebug() << "Can't get resource from Application server";
     }
 
     //qApp->exit();

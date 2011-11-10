@@ -86,6 +86,30 @@ public:
 class CLCustomDeviceVideoLayout : public QnVideoResourceLayout
 {
 public:
+    static CLCustomDeviceVideoLayout* fromString(const QString& value)
+    {
+        QStringList params = value.split(';');
+        int width = 1;
+        int height = 1;
+        QStringList sensors;
+        for (int i = 0; i < params.size(); ++i)
+        {
+            QStringList values = params[i].split('=');
+            if (values.size() < 2)
+                continue;
+            if (values[0] == "width")
+                width = values[1].toInt();
+            else if (values[0] == "height")
+                height = values[1].toInt();
+            else if (values[0] == "sensors") 
+                sensors = values[1].split(',');
+        }
+        CLCustomDeviceVideoLayout* result = new CLCustomDeviceVideoLayout(width, height);
+        for (int i = 0; i < sensors.size(); ++i)
+            result->setChannel(i, sensors[i].toInt());
+        return result;
+    }
+
     CLCustomDeviceVideoLayout(int width, int height):
         m_width(width),
         m_height(height)
@@ -125,6 +149,13 @@ public:
         if (index>=m_width*m_height)
             return;
 
+        m_channels[index] = channel;
+    }
+
+    void setChannel(int index, int channel)
+    {
+        if (index>=m_width*m_height)
+            return;
         m_channels[index] = channel;
     }
 

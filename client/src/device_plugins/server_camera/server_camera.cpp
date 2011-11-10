@@ -38,13 +38,13 @@ void QnServerCamera::setCropingPhysical(QRect croping)
 
 }
 
-const QnVideoResourceLayout* QnServerCamera::getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider) const
+const QnVideoResourceLayout* QnServerCamera::getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider) 
 {
     // todo: layout must be loaded in resourceParams
     return QnMediaResource::getVideoLayout();
 }
 
-const QnResourceAudioLayout* QnServerCamera::getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider) const
+const QnResourceAudioLayout* QnServerCamera::getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider) 
 {
     // todo: layout must be loaded in resourceParams
     return QnMediaResource::getAudioLayout();
