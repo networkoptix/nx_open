@@ -1,8 +1,9 @@
 #include "api/parsers/parse_servers.h"
 
 #include "core/resourcemanagment/asynch_seacher.h"
-
-void parseServers(QList<QnVideoServerPtr>& servers, const QnApiServers& xsdServers, QnResourceFactory& resourceFactory)
+/*
+template <class ResourcePtr>
+void parseServers(QList<ResourcePtr>& servers, const QnApiServers& xsdServers, QnResourceFactory& resourceFactory)
 {
     using xsd::api::servers::Servers;
     using xsd::api::resourceTypes::ParentIDs;
@@ -19,4 +20,4 @@ void parseServers(QList<QnVideoServerPtr>& servers, const QnApiServers& xsdServe
 
         servers.append(server);
     }
-}
+}*/

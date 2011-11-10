@@ -28,6 +28,7 @@ public:
 private:
     QSharedPointer<AppSessionManager> m_sessionManager;
     QnResourceFactory& m_resourceFactory;
+    QnVideoServerFactory m_serverFactory;
 
 };
 

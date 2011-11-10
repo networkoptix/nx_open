@@ -40,6 +40,7 @@ int QnAppServerConnection::getResources(QList<QnResourcePtr>& resources)
     if (!xsdResources.isNull())
     {
         parseCameras(resources, xsdResources->cameras().camera(), m_resourceFactory);
+        parseServers(resources, xsdResources->servers().server(), m_serverFactory);
         parseLayouts(resources, xsdResources->layouts().layout(), m_resourceFactory);
         parseUsers(resources, xsdResources->users().user(), m_resourceFactory);
     }
