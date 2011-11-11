@@ -31,6 +31,7 @@ QnUiLayoutItem::QnUiLayoutItem(const QnResourcePtr &resource, QObject *parent):
     }
 
     m_dataProvider->start();
+
     m_camDisplay->start();
 }
 

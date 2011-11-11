@@ -52,6 +52,22 @@ QSizeF QnSceneUtility::expanded(const QSizeF &size, const QSizeF &minSize, Qt::A
     return size * factor;
 }
 
+QSizeF QnSceneUtility::expanded(qreal aspectRatio, const QSizeF &minSize, Qt::AspectRatioMode mode) {
+    if(mode == Qt::IgnoreAspectRatio)
+        return minSize;
+
+    bool expanding = mode == Qt::KeepAspectRatioByExpanding;
+    bool greaterAspectRatio = minSize.width() / minSize.height() > aspectRatio;
+
+    QSizeF result = minSize;
+    if(expanding ^ greaterAspectRatio) {
+        result.setWidth(result.height() * aspectRatio);
+    } else {
+        result.setHeight(result.width() / aspectRatio);
+    }
+    return result;
+}
+
 QRectF QnSceneUtility::dilated(const QRectF &rect, const QSizeF &amount) {
     return rect.adjusted(-amount.width(), -amount.height(), amount.width(), amount.height());
 }

@@ -3,6 +3,7 @@
 #include <QPainter>
 #include <utils/common/warnings.h>
 #include <utils/common/qt_opengl.h>
+#include <utils/common/scene_utility.h>
 #include <core/resource/resource_media_layout.h>
 #include <core/dataprovider/media_streamdataprovider.h>
 #include <camera/gl_renderer.h>
@@ -36,15 +37,9 @@ QnDisplayWidget::QnDisplayWidget(QnUiLayoutItem *entity, QGraphicsItem *parent):
     m_resourceLayout(NULL),
     m_channelCount(0),
     m_renderer(NULL),
+    m_aspectRatio(0.0),
     m_frameWidth(0.0)
 {
-    /* Set up video rendering. */
-    m_resourceLayout = entity->mediaResource()->getVideoLayout(entity->mediaProvider());
-    m_channelCount = m_resourceLayout->numberOfChannels();
-    m_renderer = new QnDisplayWidgetRenderer(m_channelCount, this);
-    for(int i = 0; i < m_channelCount; i++)
-        m_entity->camDisplay()->addVideoChannel(i, m_renderer, true);
-
     /* Set up shadow. */
     m_shadow = QWeakPointer<QnPolygonalShadowItem>(new QnPolygonalShadowItem());
     QnPolygonalShadowItem *shadow = m_shadow.data();
@@ -58,6 +53,14 @@ QnDisplayWidget::QnDisplayWidget(QnUiLayoutItem *entity, QGraphicsItem *parent):
     /* Set up frame. */
     setFrameColor(defaultFrameColor);
     setFrameWidth(defaultFrameWidth);
+
+    /* Set up video rendering. */
+    m_resourceLayout = entity->mediaResource()->getVideoLayout(entity->mediaProvider());
+    m_channelCount = m_resourceLayout->numberOfChannels();
+    m_renderer = new QnDisplayWidgetRenderer(m_channelCount, this);
+    connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_sourceSizeChanged(const QSize &)));
+    for(int i = 0; i < m_channelCount; i++)
+        m_entity->camDisplay()->addVideoChannel(i, m_renderer, true);
 }
 
 QnDisplayWidget::~QnDisplayWidget() {
@@ -112,6 +115,35 @@ void QnDisplayWidget::updateShadowZ() {
 void QnDisplayWidget::updateShadowPos() {
     if(!m_shadow.isNull())
         m_shadow.data()->setPos(mapToScene(0.0, 0.0) + m_shadowDisplacement);
+}
+
+void QnDisplayWidget::setGeometry(const QRectF &geometry) {
+    if(qFuzzyIsNull(m_aspectRatio)) {
+        base_type::setGeometry(geometry);
+        return;
+    }
+
+    qreal aspectRatio = geometry.width() / geometry.height();
+    if(qFuzzyCompare(m_aspectRatio, aspectRatio)) {
+        base_type::setGeometry(geometry);
+        return;
+    }
+
+    //QRectF oldGeometry = this->geometry();
+    
+    QSizeF newSize = QnSceneUtility::expanded(m_aspectRatio, geometry.size(), Qt::KeepAspectRatio);
+    base_type::setGeometry(QRectF(geometry.topLeft(), newSize));
+}
+
+void QnDisplayWidget::at_sourceSizeChanged(const QSize &size) {
+    qreal oldAspectRatio = m_aspectRatio;
+    qreal newAspectRatio = static_cast<qreal>(size.width() * m_resourceLayout->width()) / (size.height() * m_resourceLayout->height());
+    if(qFuzzyCompare(oldAspectRatio, newAspectRatio))
+        return;
+
+    m_aspectRatio = newAspectRatio;
+    setGeometry(geometry());
+    emit aspectRatioChanged(oldAspectRatio, newAspectRatio);
 }
 
 QVariant QnDisplayWidget::itemChange(GraphicsItemChange change, const QVariant &value) {

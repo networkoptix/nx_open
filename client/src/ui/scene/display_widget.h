@@ -78,6 +78,18 @@ public:
      */
     void setShadowDisplacement(const QPointF &displacement);
 
+    virtual void setGeometry(const QRectF &geometry) override;
+
+    /**
+     * \returns                         Aspect ratio of this widget. 
+     */
+    qreal aspectRatio() const {
+        return m_aspectRatio;
+    }
+
+signals:
+    void aspectRatioChanged(qreal oldAspectRatio, qreal newAspectRatio);
+
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -90,6 +102,9 @@ protected:
     void updateShadowZ();
     void updateShadowPos();
     void invalidateShadowShape();
+
+private slots:
+    void at_sourceSizeChanged(const QSize &size);
 
 private:
     /**
@@ -110,6 +125,9 @@ private:
 
     /** Associated renderer. */
     QnDisplayWidgetRenderer *m_renderer;
+
+    /** Aspect ratio, free if zero. */
+    qreal m_aspectRatio;
 
     /** Cached size of a single media channel, in screen coordinates. */
     QSize m_channelScreenSize;

@@ -72,14 +72,23 @@ public:
     static QSizeF bounded(const QSizeF &size, const QSizeF &maxSize, Qt::AspectRatioMode mode);
 
     /**
-     * Expands the given size, so that a rectangle of given size would include
-     * a rectangle of size minSize.
+     * Expands the given size to given minSize.
      * 
      * \param size                      Size to expand.
      * \param maxSize                   Minimal size. 
      * \param mode                      Aspect ratio mode.
      */
     static QSizeF expanded(const QSizeF &size, const QSizeF &minSize, Qt::AspectRatioMode mode);
+
+    /**
+     * Expands an infinitely small size with the given aspect ratio (width to
+     * height ratio) to given minSize.
+     * 
+     * \param aspectRatio               Aspect ratio.
+     * \param minSize                   Minimal size.
+     * \param mode                      Aspect ratio mode.
+     */
+    static QSizeF expanded(qreal aspectRatio, const QSizeF &minSize, Qt::AspectRatioMode mode);
 
     /**
      * Dilates the given rectangle by the given amount.
