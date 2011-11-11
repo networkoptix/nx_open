@@ -104,7 +104,7 @@ private:
     int m_responseBufferLen;
     QByteArray m_sdp;
 
-    TCPSocket* m_tcpSock;
+    TCPSocket m_tcpSock;
     UDPSocket m_udpSock;
     UDPSocket m_rtcpUdpSock;
     RTPIODevice m_rtpIo;

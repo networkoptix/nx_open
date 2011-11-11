@@ -81,23 +81,28 @@ static void fillAddr(const QString &address, unsigned short port,
 // Socket Code
 
 Socket::Socket(int type, int protocol)  {
-  #ifdef WIN32
+    createSocket(type, protocol);
+}
+
+void Socket::createSocket(int type, int protocol)
+{
+#ifdef WIN32
     if (!initialized) {
-      WORD wVersionRequested;
-      WSADATA wsaData;
+        WORD wVersionRequested;
+        WSADATA wsaData;
 
-      wVersionRequested = MAKEWORD(2, 0);              // Request WinSock v2.0
-      if (WSAStartup(wVersionRequested, &wsaData) != 0) {  // Load WinSock DLL
-        throw SocketException("Unable to load WinSock DLL");
-      }
-      initialized = true;
+        wVersionRequested = MAKEWORD(2, 0);              // Request WinSock v2.0
+        if (WSAStartup(wVersionRequested, &wsaData) != 0) {  // Load WinSock DLL
+            throw SocketException("Unable to load WinSock DLL");
+        }
+        initialized = true;
     }
-  #endif
+#endif
 
-  // Make a new socket
-  if ((sockDesc = socket(PF_INET, type, protocol)) < 0) {
-    throw SocketException("Socket creation failed (socket())", true);
-  }
+    // Make a new socket
+    if ((sockDesc = socket(PF_INET, type, protocol)) < 0) {
+        throw SocketException("Socket creation failed (socket())", true);
+    }
 }
 
 Socket::Socket(int sockDesc) {
@@ -117,6 +122,12 @@ void Socket::close()
 #endif
     sockDesc = -1;
 }
+
+bool Socket::isClosed() const
+{
+    return sockDesc == -1;
+}
+
 
 QString Socket::getLocalAddress() const
 {
@@ -224,7 +235,6 @@ bool CommunicatingSocket::connect(const QString &foreignAddress,
     unsigned short foreignPort)
 {
   // Get the address of the requested host
-
     mConnected = false;
 
   sockaddr_in destAddr;
@@ -373,6 +383,19 @@ TCPSocket::TCPSocket(const QString &foreignAddress, unsigned short foreignPort)
      : CommunicatingSocket(SOCK_STREAM, IPPROTO_TCP) {
   connect(foreignAddress, foreignPort);
 }
+
+bool TCPSocket::reopen()
+{
+    close();
+    try {
+        createSocket(SOCK_STREAM, IPPROTO_TCP);
+        return true;
+    }
+    catch(...) {
+        return false;
+    }
+}
+
 
 TCPSocket::TCPSocket(int newConnSD) : CommunicatingSocket(newConnSD) {
 }
@@ -555,3 +578,4 @@ bool UDPSocket::hasData() const
     }
     return true;
 }
+
