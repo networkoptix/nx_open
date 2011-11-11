@@ -303,18 +303,19 @@ void QnResource::setTypeId(const QnId& id)
 
 void QnResource::setStatus(QnResource::Status status)
 {
-    QMutexLocker locker(&m_mutex);
-
     if (m_status == status) // if status did not changed => do nothing 
         return;
 
     if (m_status == Offline && status == Online)
         beforeUse();
 
-    Status old_status = m_status;
-    m_status = status;
-
-    emit onStatusChanged(old_status, m_status);
+    Status old_status;
+    {
+        QMutexLocker locker(&m_mutex);
+        old_status = m_status;
+        m_status = status;
+    }
+    emit onStatusChanged(old_status, status);
 }
 
 QnResource::Status QnResource::getStatus() const
