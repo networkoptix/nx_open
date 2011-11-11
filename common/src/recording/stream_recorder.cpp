@@ -9,8 +9,10 @@
 static const int DEFAULT_VIDEO_STREAM_ID = 4113;
 static const int DEFAULT_AUDIO_STREAM_ID = 4352;
 
+static const int STORE_QUEUE_SIZE = 300;
+
 QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
-QnAbstractDataConsumer(15),
+QnAbstractDataConsumer(STORE_QUEUE_SIZE),
 m_device(dev),
 m_firstTime(true),
 m_packetWrited(false),
