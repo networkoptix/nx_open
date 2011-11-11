@@ -41,7 +41,7 @@ QnDisplayWidget::QnDisplayWidget(QnUiLayoutItem *entity, QGraphicsItem *parent):
     m_frameWidth(0.0)
 {
     /* Set up shadow. */
-    m_shadow = QWeakPointer<QnPolygonalShadowItem>(new QnPolygonalShadowItem());
+    m_shadow = new QnPolygonalShadowItem();
     QnPolygonalShadowItem *shadow = m_shadow.data();
     shadow->setParent(this);
     shadow->setColor(global_shadow_color);
@@ -66,8 +66,10 @@ QnDisplayWidget::QnDisplayWidget(QnUiLayoutItem *entity, QGraphicsItem *parent):
 QnDisplayWidget::~QnDisplayWidget() {
     m_renderer->beforeDestroy();
     
-    if(!m_shadow.isNull()) 
+    if(!m_shadow.isNull()) {
         m_shadow.data()->setShapeProvider(NULL);
+        delete m_shadow.data();
+    }
 }
 
 void QnDisplayWidget::setFrameWidth(qreal frameWidth) {
@@ -118,8 +120,9 @@ void QnDisplayWidget::updateShadowPos() {
 }
 
 void QnDisplayWidget::setGeometry(const QRectF &geometry) {
-    qDebug("setGeometry %g %g %g %g", geometry.left(), geometry.top(), geometry.width(), geometry.height());
-
+    /* Unfortunately, widgets with constant aspect ratio cannot be implemented
+     * using size hints. So here is a workaround. */
+    
     if(qFuzzyIsNull(m_aspectRatio)) {
         base_type::setGeometry(geometry);
         return;
@@ -151,7 +154,6 @@ void QnDisplayWidget::setGeometry(const QRectF &geometry) {
         newTop = geometry.top();
     }
 
-    qDebug("setGeometryBase %g %g %g %g", newLeft, newTop, newSize.width(), newSize.height());
     base_type::setGeometry(QRectF(QPointF(newLeft, newTop), newSize));
 }
 

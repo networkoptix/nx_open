@@ -36,9 +36,9 @@ private:
     };
 
     State m_state;
-    QGraphicsView *m_view;
     QPoint m_mousePressPos;
     QPointF m_lastMouseScenePos;
+    QWeakPointer<QGraphicsView> m_view;
     QGraphicsItem *m_itemToSelect;
 };
 

@@ -15,8 +15,7 @@ namespace {
 
 DragInstrument::DragInstrument(QObject *parent): 
     Instrument(makeSet(), makeSet(), makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease), makeSet(), parent),
-    m_state(INITIAL),
-    m_view(NULL)
+    m_state(INITIAL)
 {}
 
 DragInstrument::~DragInstrument() {
@@ -25,7 +24,7 @@ DragInstrument::~DragInstrument() {
 
 void DragInstrument::installedNotify() {
     m_state = INITIAL;
-    m_view = NULL;
+    m_view.clear();
 
     Instrument::installedNotify();
 }
@@ -134,9 +133,9 @@ void DragInstrument::startDragging(QGraphicsView *view) {
 
 void DragInstrument::stopDragging() {
     if(m_state == DRAGGING)
-        emit draggingFinished(m_view, scene() == NULL ? QList<QGraphicsItem *>() : scene()->selectedItems());
+        emit draggingFinished(m_view.data(), scene() == NULL ? QList<QGraphicsItem *>() : scene()->selectedItems());
     m_state = INITIAL;
-    m_view = NULL;
+    m_view.clear();
 }
 
 
