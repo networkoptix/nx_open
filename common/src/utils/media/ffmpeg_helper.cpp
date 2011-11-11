@@ -3,6 +3,8 @@
 #include "bitStream.h"
 #include "vc1Parser.h"
 
+extern QMutex global_ffmpeg_mutex;
+
 static inline QByteArray codecIDToByteArray(CodecID codecID)
 {
     switch(codecID)
@@ -605,6 +607,9 @@ AVCodecContext *QnFfmpegHelper::deserializeCodecContext(const char *data, int da
         qWarning() << Q_FUNC_INFO << __LINE__ << "Too few data for deserialize CodecContext";
         return 0;
     }
+
+    QMutexLocker lock(&global_ffmpeg_mutex);
+    
     AVCodecContext* ctx = (AVCodecContext*) avcodec_alloc_context();
     AVCodecContext tmp;
     memcpy(&tmp, ctx, sizeof(AVCodecContext));

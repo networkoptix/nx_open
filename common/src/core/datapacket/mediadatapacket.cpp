@@ -7,6 +7,7 @@ extern QMutex global_ffmpeg_mutex;
 
 QnMediaContext::QnMediaContext(AVCodecContext* ctx)
 {
+    QMutexLocker mutex(&global_ffmpeg_mutex);
     m_ctx = avcodec_alloc_context();
     avcodec_copy_context(m_ctx, ctx);
 }
@@ -30,6 +31,7 @@ QnMediaContext::QnMediaContext(const quint8* payload, int dataSize)
 
 QnMediaContext::~QnMediaContext()
 {
+    QMutexLocker mutex(&global_ffmpeg_mutex);
     avcodec_close(m_ctx);
     av_free(m_ctx);
 }
