@@ -36,6 +36,20 @@ public:
             return Qt::LeftButton;
         return QProxyStyle::styleHint(hint, option, widget, returnData);
     }
+
+    QRect subControlRect(ComplexControl cc, const QStyleOptionComplex *opt, SubControl sc, const QWidget *widget = 0) const
+    {
+        QRect r = QProxyStyle::subControlRect(cc, opt, sc, widget);
+        if (cc == CC_Slider && sc == SC_SliderHandle)
+        {
+            int side = qMin(r.width(), r.height());
+            if (qstyleoption_cast<const QStyleOptionSlider *>(opt)->orientation == Qt::Horizontal)
+                r.setWidth(side);
+            else
+                r.setHeight(side);
+        }
+        return r;
+    }
 };
 
 Q_GLOBAL_STATIC_WITH_ARGS(SliderProxyStyle, sliderProxyStyle, (QStyleFactory::create(qApp->style()->objectName())))
@@ -66,45 +80,44 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     Q_UNUSED(option)
     Q_UNUSED(widget)
 
-    static const int handleSize = 18;
-    static const int gradHeigth = 14;
-    static const int margins = 3;
-    static const QPixmap pix = Skin::pixmap(QLatin1String("slider-handle.png")).scaled(handleSize, handleSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    QStyleOptionSlider opt;
+    initStyleOption(&opt);
+    const QRect handleRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle);
 
-    int length = qAbs(maximum() - minimum());
-    double handlePos = (double)(width()-handleSize)*value()/length;
+    static const QPixmap pix = Skin::pixmap(QLatin1String("slider-handle.png")).scaled(handleRect.width(), handleRect.height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
     QRectF r = contentsRect();
+
 #ifdef Q_OS_WIN
     painter->fillRect(rect(), QColor(128,128,128,128));
 #endif
     painter->setPen(QPen(Qt::gray, 2));
-    painter->drawRect(QRectF(0, margins, r.width(), r.height() - 2*margins));
+    painter->drawRect(r);
 
     painter->setPen(QPen(Qt::darkGray, 1));
-    painter->drawRect(QRectF(0, margins, r.width(), r.height() - 2*margins));
+    painter->drawRect(r);
 
     painter->setPen(QPen(QColor(0, 87, 207), 2));
-    painter->drawRect(QRectF(0, margins, handlePos + handleSize/2, r.height() - 2*margins));
+    r.setRight(handleRect.center().x());
+    painter->drawRect(r);
 
-    QLinearGradient linearGrad(QPointF(0, 0), QPointF(handlePos, height()));
+    QLinearGradient linearGrad(r.topLeft(), r.bottomRight());
     linearGrad.setColorAt(0, QColor(0, 43, 130));
     linearGrad.setColorAt(1, QColor(186, 239, 255));
-    painter->fillRect(0, (height() - gradHeigth)/2, handlePos + handleSize/2, gradHeigth, linearGrad);
+    painter->fillRect(r, linearGrad);
 
-    painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
-    QRect handleRect(handlePos/* - handleSize/2*/, 0, handleSize, handleSize);
-    painter->drawPixmap(handleRect, pix);
+    painter->drawPixmap(handleRect, pix, QRectF(pix.rect()));
 }
 
 void MySlider::onValueChanged(int value)
 {
     if (m_toolTip) {
+        m_toolTip->setText(toolTip());
+
         QStyleOptionSlider opt;
         initStyleOption(&opt);
-        const QRect sliderRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle);
-        m_toolTip->setPos(sliderRect.center().x(), sliderRect.top() - m_toolTip->boundingRect().height());
-        m_toolTip->setText(toolTip());
+        const QRect handleRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle);
+        m_toolTip->setPos(handleRect.center().x(), handleRect.top() - m_toolTip->boundingRect().height());
     }
 }
 
@@ -471,8 +484,9 @@ void TimeLine::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *)
 
 TimeSlider::TimeSlider(QGraphicsItem *parent) :
     QGraphicsWidget(parent),
-    m_currentValue(0),
+    m_minimumValue(0),
     m_maximumValue(1000*10), // 10 sec
+    m_currentValue(0),
     m_viewPortPos(0),
     m_scalingFactor(0),
     m_isUserInput(false),
@@ -489,6 +503,7 @@ TimeSlider::TimeSlider(QGraphicsItem *parent) :
 
     m_slider = new MySlider(this);
     m_slider->setOrientation(Qt::Horizontal);
+    m_slider->setContentsMargins(0, 4, 0, 4);
     m_slider->setMaximum(1000);
     m_slider->installEventFilter(this);
 
@@ -542,7 +557,7 @@ void TimeSlider::setCurrentValue(qint64 value)
     if (m_currentValue == value)
         return;
 
-    m_currentValue = qBound(qint64(0), value, maximumValue());
+    m_currentValue = qBound(m_minimumValue, value, m_maximumValue);
 
     updateSlider();
     update();
@@ -566,13 +581,30 @@ void TimeSlider::onSliderReleased()
 }
 
 /*!
+    \property TimeSlider::minimumValue
+    \brief the sliders minimum value in milliseconds
+
+    Minimum value can't be greater than maximum value.
+
+    \sa currentValue
+*/
+qint64 TimeSlider::minimumValue() const
+{
+    return m_minimumValue;
+}
+
+void TimeSlider::setMinimumValue(qint64 value)
+{
+    m_minimumValue = qMin(value, m_maximumValue);
+}
+
+/*!
     \property TimeSlider::maximumValue
     \brief the sliders maximum value in milliseconds
 
-    Sliders minimum value is always 0 and can't be less than zero. Maximum value
-    can't be less than 1000ms.
+    Maximum value can't be less than minimum value.
 
-    \sa TimeSlider::currentValue
+    \sa currentValue
 */
 qint64 TimeSlider::maximumValue() const
 {
@@ -589,7 +621,7 @@ void TimeSlider::setMaximumValue(qint64 value)
     \property TimeSlider::scalingFactor
     \brief the scaling factor of the time line
 
-    Scaling factor is always great or equal to 0. If factor is 0, slider shows all time line, if
+    Scaling factor is always greater or equal to 0. If factor is 0, slider shows all time line, if
     greater than 0, it exponentially zooms it (visible time is maximumValue/exp(factor/2)).
 
     \sa TimeSlider::currentValue
@@ -629,39 +661,6 @@ int TimeSlider::sliderValue() const
     return m_slider->value();
 }
 
-/*!
-    Increases scale factor by 1.0
-
-    \sa zoomOut(), TimeSlider::scalingFactor
-*/
-void TimeSlider::zoomIn()
-{
-    setScalingFactor(scalingFactor() + 1);
-}
-
-/*!
-    Decreases scale factor by 1.0
-
-    \sa zoomIn(), TimeSlider::scalingFactor
-*/
-void TimeSlider::zoomOut()
-{
-    setScalingFactor(scalingFactor() - 1);
-}
-
-void TimeSlider::setViewPortPos(qint64 value)
-{
-    m_viewPortPos = qBound(qint64(0), value, maximumValue() - sliderRange());
-
-    if (m_currentValue < m_viewPortPos)
-        setCurrentValue(m_viewPortPos);
-    else if (m_currentValue > m_viewPortPos + sliderRange())
-        setCurrentValue(m_viewPortPos + sliderRange());
-
-    updateSlider();
-    update();
-}
-
 void TimeSlider::onSliderValueChanged(int value)
 {
     if (!m_isUserInput) {
@@ -676,19 +675,32 @@ qint64 TimeSlider::viewPortPos() const
     return m_viewPortPos;
 }
 
-double TimeSlider::delta() const
+void TimeSlider::setViewPortPos(qint64 value)
 {
-    return ((1.0/sliderLength())*maximumValue())/exp(scalingFactor()/2);
+    m_viewPortPos = qBound(m_minimumValue, value, m_maximumValue - sliderRange());
+
+    if (m_currentValue < m_viewPortPos)
+        setCurrentValue(m_viewPortPos);
+    else if (m_currentValue > m_viewPortPos + sliderRange())
+        setCurrentValue(m_viewPortPos + sliderRange());
+
+    updateSlider();
+    update();
 }
 
-double TimeSlider::fromSlider(int value)
+float TimeSlider::delta() const
 {
-    return viewPortPos() + (value)*delta();
+    return ((1.0/sliderLength())*(m_maximumValue - m_minimumValue))/exp(scalingFactor()/2);
 }
 
-int TimeSlider::toSlider(double value)
+qint64 TimeSlider::fromSlider(int value)
 {
-    return (value - viewPortPos())/delta();
+    return (m_viewPortPos + value)*delta();
+}
+
+int TimeSlider::toSlider(qint64 value)
+{
+    return (value - m_viewPortPos)/delta();
 }
 
 int TimeSlider::sliderLength() const
@@ -731,7 +743,7 @@ void TimeSlider::centraliseSlider()
         }
         else if (m_animation->state() != QPropertyAnimation::Running /*&& !m_sliderPressed*/) {
             qint64 newViewortPos = m_currentValue - sliderRange()/2; // center
-            newViewortPos = qBound(qint64(0), newViewortPos, maximumValue() - sliderRange());
+            newViewortPos = qBound(m_minimumValue, newViewortPos, m_maximumValue - sliderRange());
             if (qAbs(newViewortPos - m_viewPortPos) < 2*delta()) {
                 setViewPortPos(m_currentValue - sliderRange()/2);
                 return;

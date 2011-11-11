@@ -50,8 +50,10 @@ public:
 
     void setToolTipItem(ToolTipItem *toolTip);
 
+    // TODO: use min and max, not length
+    qint64 minimumValue() const;
+    qint64 maximumValue() const;
     qint64 currentValue() const;
-    qint64 maximumValue() const; // TODO: use min and max, not length
     float scalingFactor() const;
 
     bool isMoving() const;
@@ -69,12 +71,15 @@ public:
     void setMinimumRange(qint64);
 
 public Q_SLOTS:
-    void setCurrentValue(qint64 value);
+    void setMinimumValue(qint64 value);
     void setMaximumValue(qint64 value);
+    void setCurrentValue(qint64 value);
     void setScalingFactor(float factor);
 
-    void zoomIn();
-    void zoomOut();
+    inline void zoomIn()
+    { setScalingFactor(scalingFactor() + 1); }
+    inline void zoomOut()
+    { setScalingFactor(scalingFactor() - 1); }
 
 Q_SIGNALS:
     void currentValueChanged(qint64 value);
@@ -96,10 +101,10 @@ private Q_SLOTS:
     void onWheelAnimationFinished();
 
 private:
-    double delta() const;
+    float delta() const;
 
-    double fromSlider(int value);
-    int toSlider(double value);
+    qint64 fromSlider(int value);
+    int toSlider(qint64 value);
 
     void updateSlider();
     void centraliseSlider();
@@ -108,8 +113,9 @@ private:
     MySlider *m_slider;
     TimeLine *m_timeLine;
 
-    qint64 m_currentValue;
+    qint64 m_minimumValue;
     qint64 m_maximumValue;
+    qint64 m_currentValue;
     qint64 m_viewPortPos;
 
     float m_scalingFactor;
