@@ -112,6 +112,7 @@ void QnSceneController::at_widgetAdded(QnDisplayWidget *widget) {
     connect(widget, SIGNAL(resizingFinished()), this, SLOT(at_widget_resizingFinished()));
 
     connect(widget, SIGNAL(resizingStarted()),  m_dragInstrument, SLOT(stopCurrentOperation()));
+    //connect(widget, SIGNAL(resizingStarted()),  m_rubberBandInstrument, SLOT(stopCurrentOperation()));
 }
 
 void QnSceneController::updateGeometryDelta(QnDisplayWidget *widget) {

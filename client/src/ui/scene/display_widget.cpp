@@ -129,10 +129,27 @@ void QnDisplayWidget::setGeometry(const QRectF &geometry) {
         return;
     }
 
-    //QRectF oldGeometry = this->geometry();
-    
+    /* Calculate actual new size. */
     QSizeF newSize = QnSceneUtility::expanded(m_aspectRatio, geometry.size(), Qt::KeepAspectRatio);
-    base_type::setGeometry(QRectF(geometry.topLeft(), newSize));
+
+    /* Find anchor point and calculate new position. */
+    QRectF oldGeometry = this->geometry();
+
+    qreal newLeft;
+    if(qFuzzyCompare(oldGeometry.right(), geometry.right())) {
+        newLeft = oldGeometry.right() - newSize.width();
+    } else {
+        newLeft = geometry.left();
+    }
+
+    qreal newTop;
+    if(qFuzzyCompare(oldGeometry.bottom(), geometry.bottom())) {
+        newTop = oldGeometry.bottom() - newSize.height();
+    } else {
+        newTop = geometry.top();
+    }
+
+    base_type::setGeometry(QRectF(QPointF(newLeft, newTop), newSize));
 }
 
 void QnDisplayWidget::at_sourceSizeChanged(const QSize &size) {
@@ -264,43 +281,56 @@ namespace {
         }
     }
 
+    inline Qt::WindowFrameSection sweep(const QRectF &outerGeometry, const QRectF &innerGeometry, const QPointF &pos) {
+        /* Shortcuts for position. */
+        qreal x = pos.x();
+        qreal y = pos.y();
+
+        /* Border shortcuts. */
+        qreal x0 = outerGeometry.left();
+        qreal x1 = innerGeometry.left();
+        qreal x2 = innerGeometry.right();
+        qreal x3 = outerGeometry.right();
+        qreal y0 = outerGeometry.top();
+        qreal y1 = innerGeometry.top();
+        qreal y2 = innerGeometry.bottom();
+        qreal y3 = outerGeometry.bottom();
+
+        /* Sweep. */
+        if(x < x1) {
+            if(x < x0) {
+                return Qt::NoSection;
+            } else {
+                return sweep(y, y0, y1, y2, y3, Qt::TopLeftSection, Qt::LeftSection, Qt::BottomLeftSection);
+            }
+        } else {
+            if(x < x2) {
+                return sweep(y, y0, y1, y2, y3, Qt::TopSection, Qt::NoSection, Qt::BottomSection);
+            } else if(x < x3) {
+                return sweep(y, y0, y1, y2, y3, Qt::TopRightSection, Qt::RightSection, Qt::BottomRightSection);
+            } else {
+                return Qt::NoSection;
+            }
+        }
+    }
 }
 
 Qt::WindowFrameSection QnDisplayWidget::windowFrameSectionAt(const QPointF &pos) const override {
     QSizeF size = this->size();
 
-    /* Shortcuts for position. */
-    qreal x = pos.x();
-    qreal y = pos.y();
-
-    /* Calculate extended frame width. */
     qreal fe = m_frameWidth * frameExtensionMultiplier;
-    qreal fw = m_frameWidth;
-
-    /* Calculate border values. */
-    qreal x0 = -fw - fe;
-    qreal x1 = fe;
-    qreal x2 = size.width() - fe;
-    qreal x3 = size.width() + fw + fe;
-    qreal y0 = -fw -fe;
-    qreal y1 = fe;
-    qreal y2 = size.height() - fe;
-    qreal y3 = size.height() + fw + fe;
-
-    /* Sweep. */
-    if(x < x1) {
-        if(x < x0) {
-            return Qt::NoSection;
-        } else {
-            return sweep(y, y0, y1, y2, y3, Qt::TopLeftSection, Qt::LeftSection, Qt::BottomLeftSection);
-        }
+    Qt::WindowFrameSection result = sweep(windowFrameRect().adjusted(-fe, -fe, fe, fe), rect().adjusted(fe, fe, -fe, -fe), pos);
+    if(qFuzzyIsNull(m_aspectRatio)) {
+        return result;
     } else {
-        if(x < x2) {
-            return sweep(y, y0, y1, y2, y3, Qt::TopSection, Qt::NoSection, Qt::BottomSection);
-        } else if(x < x3) {
-            return sweep(y, y0, y1, y2, y3, Qt::TopRightSection, Qt::RightSection, Qt::BottomRightSection);
-        } else {
+        switch(result) {
+        case Qt::LeftSection:
+        case Qt::RightSection:
+        case Qt::TopSection:
+        case Qt::BottomSection:
             return Qt::NoSection;
+        default:
+            return result;
         }
     }
 }
