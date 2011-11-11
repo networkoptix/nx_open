@@ -109,6 +109,7 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
     av_init_packet(&avPkt);
         AVStream* stream = m_formatCtx->streams[channel];
     AVRational srcRate = {1, 1000000};
+    Q_ASSERT(stream->time_base.num && stream->time_base.den);
     avPkt.pts = av_rescale_q(md->timestamp, srcRate, stream->time_base);
     if(md->flags & AV_PKT_FLAG_KEY)
         avPkt.flags |= AV_PKT_FLAG_KEY;

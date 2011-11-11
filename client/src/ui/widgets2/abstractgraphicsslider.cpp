@@ -287,7 +287,7 @@ void AbstractGraphicsSlider::setRange(int min, int max)
     d->maximum = qMax(min, max);
     if (oldMin != d->minimum || oldMax != d->maximum) {
         sliderChange(SliderRangeChange);
-        emit rangeChanged(d->minimum, d->maximum);
+        Q_EMIT rangeChanged(d->minimum, d->maximum);
         setValue(d->value); // re-bound
     }
 }
@@ -388,9 +388,9 @@ void AbstractGraphicsSlider::setSliderDown(bool down)
 
     if (doEmit) {
         if (down)
-            emit sliderPressed();
+            Q_EMIT sliderPressed();
         else
-            emit sliderReleased();
+            Q_EMIT sliderReleased();
     }
 
     if (!down && d->position != d->value)
@@ -419,7 +419,7 @@ void AbstractGraphicsSlider::setSliderPosition(int position)
     if (!d->tracking)
         update();
     if (d->pressed)
-        emit sliderMoved(position);
+        Q_EMIT sliderMoved(position);
     if (d->tracking && !d->blocktracking)
         triggerAction(SliderMove);
 }
@@ -449,13 +449,13 @@ void AbstractGraphicsSlider::setValue(int value)
     if (d->position != d->value) {
         d->position = d->value;
         if (d->pressed)
-            emit sliderMoved(d->position);
+            Q_EMIT sliderMoved(d->position);
     }
 #ifndef QT_NO_ACCESSIBILITY
     QAccessible::updateAccessibility(this, 0, QAccessible::ValueChanged);
 #endif
     sliderChange(SliderValueChange);
-    emit valueChanged(d->value);
+    Q_EMIT valueChanged(d->value);
 }
 
 /*!
@@ -556,7 +556,7 @@ void AbstractGraphicsSlider::triggerAction(SliderAction action)
     case SliderNoAction:
         break;
     };
-    emit actionTriggered(action);
+    Q_EMIT actionTriggered(action);
     d->blocktracking = false;
     setValue(d->position);
 }
