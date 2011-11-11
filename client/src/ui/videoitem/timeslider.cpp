@@ -308,7 +308,7 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     const QPalette pal = m_parent->palette();
     painter->setBrush(pal.brush(QPalette::Base));
     painter->setPen(pal.color(QPalette::Base));
-    const QRectF r(handleThickness, frameWidth(), rect().width() - handleThickness * 2, rect().height() - 2*frameWidth());
+    const QRectF r(handleThickness, 0, rect().width() - handleThickness * 2, rect().height() - 2*frameWidth());
     painter->drawRect(r);
     drawGradient(painter, QRectF(0, 0, rect().width(), rect().height() - 2*frameWidth()), rect().height());
     painter->setPen(pal.color(QPalette::Text));
@@ -387,9 +387,9 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         painter->setFont(fonts[arrayIndex]);
 
         const IntervalInfo &interval = intervals[curLevel];
-        const float lineLen = qMin(float(curLevel-level+1) / maxLen, 1.0f) * (r.height() - maxHeight - 3);
+        const float lineLen = qMin(float(curLevel-level+1) / maxLen, 1.0f);
         if (lineLen >= 0.5f)
-            painter->drawLine(QPointF(xpos, 0), QPointF(xpos, lineLen));
+            painter->drawLine(QPointF(xpos, 0), QPointF(xpos, (r.height() - maxHeight - 3) * lineLen));
 
         const int labelNumber = (curTime/interval.interval)%interval.count;
         const QString text = QString::number(interval.value*labelNumber) + QLatin1String(interval.name);
