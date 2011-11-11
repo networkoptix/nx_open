@@ -14,17 +14,32 @@ namespace {
 } // anonymous namespace
 
 DragInstrument::DragInstrument(QObject *parent): 
-    Instrument(makeSet(), makeSet(), makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease), makeSet(), parent) 
+    Instrument(makeSet(), makeSet(), makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease), makeSet(), parent),
+    m_state(INITIAL),
+    m_view(NULL)
 {}
+
+DragInstrument::~DragInstrument() {
+    ensureUninstalled();
+}
 
 void DragInstrument::installedNotify() {
     m_state = INITIAL;
+    m_view = NULL;
 
     Instrument::installedNotify();
 }
 
-void DragInstrument::stopCurrentOperation() {
-    m_state = INITIAL;
+void DragInstrument::aboutToBeUninstalledNotify() {
+    Instrument::aboutToBeUninstalledNotify();
+
+    stopDragging();
+}
+
+void DragInstrument::aboutToBeDisabledNotify() {
+    Instrument::aboutToBeDisabledNotify();
+
+    stopDragging();
 }
 
 bool DragInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
@@ -64,7 +79,7 @@ bool DragInstrument::mouseMoveEvent(QWidget *viewport, QMouseEvent *event) {
 
     /* Stop dragging if the user has let go of the trigger button (even if we didn't get the release events). */
     if (!(event->buttons() & Qt::LeftButton)) {
-        stopDragging(view);
+        stopDragging();
         return false;
     }
 
@@ -99,7 +114,7 @@ bool DragInstrument::mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) {
     if (event->button() != Qt::LeftButton)
         return false;
 
-    stopDragging(view);
+    stopDragging();
 
     event->accept();
     return false;
@@ -107,6 +122,7 @@ bool DragInstrument::mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) {
 
 void DragInstrument::startDragging(QGraphicsView *view) {
     m_state = DRAGGING;
+    m_view = view;
 
     if(m_itemToSelect != NULL) {
         m_itemToSelect->setSelected(true);
@@ -116,10 +132,11 @@ void DragInstrument::startDragging(QGraphicsView *view) {
     emit draggingStarted(view, scene()->selectedItems());
 }
 
-void DragInstrument::stopDragging(QGraphicsView *view) {
+void DragInstrument::stopDragging() {
     if(m_state == DRAGGING)
-        emit draggingFinished(view, scene()->selectedItems());
+        emit draggingFinished(m_view, scene() == NULL ? QList<QGraphicsItem *>() : scene()->selectedItems());
     m_state = INITIAL;
+    m_view = NULL;
 }
 
 

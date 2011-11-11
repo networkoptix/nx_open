@@ -20,6 +20,7 @@ public:
 protected:
     virtual void installedNotify() override;
     virtual void aboutToBeUninstalledNotify() override;
+    virtual void aboutToBeDisabledNotify() override;
 
     virtual bool mousePressEvent(QWidget *viewport, QMouseEvent *event) override;
     virtual bool mouseMoveEvent(QWidget *viewport, QMouseEvent *event) override;

@@ -58,6 +58,7 @@ QnSceneController::QnSceneController(QnDisplaySynchronizer *synchronizer, QObjec
     ClickInstrument *sceneClickInstrument = new ClickInstrument(ClickInstrument::WATCH_SCENE, this);
     m_handScrollInstrument = new HandScrollInstrument(this);
     m_wheelZoomInstrument = new WheelZoomInstrument(this);
+    m_rubberBandInstrument = new RubberBandInstrument(this);
 
     m_dragInstrument = new DragInstrument(this);
     m_view->setDragMode(QGraphicsView::NoDrag);
@@ -81,7 +82,7 @@ QnSceneController::QnSceneController(QnDisplaySynchronizer *synchronizer, QObjec
     m_manager->installInstrument(new TransformListenerInstrument(this));
     m_manager->installInstrument(m_wheelZoomInstrument);
     m_manager->installInstrument(m_dragInstrument);
-    m_manager->installInstrument(new RubberBandInstrument(this));
+    m_manager->installInstrument(m_rubberBandInstrument);
     m_manager->installInstrument(m_handScrollInstrument);
     m_manager->installInstrument(new ContextMenuInstrument(this));
     m_manager->installInstrument(itemClickInstrument);
@@ -108,11 +109,12 @@ QnSceneController::~QnSceneController() {
 }
 
 void QnSceneController::at_widgetAdded(QnDisplayWidget *widget) {
-    connect(widget, SIGNAL(resizingStarted()),  this, SLOT(at_widget_resizingStarted()));
-    connect(widget, SIGNAL(resizingFinished()), this, SLOT(at_widget_resizingFinished()));
-
-    connect(widget, SIGNAL(resizingStarted()),  m_dragInstrument, SLOT(stopCurrentOperation()));
-    //connect(widget, SIGNAL(resizingStarted()),  m_rubberBandInstrument, SLOT(stopCurrentOperation()));
+    connect(widget, SIGNAL(resizingStarted()),  this,                   SLOT(at_widget_resizingStarted()));
+    connect(widget, SIGNAL(resizingFinished()), this,                   SLOT(at_widget_resizingFinished()));
+    connect(widget, SIGNAL(resizingStarted()),  m_dragInstrument,       SLOT(recursiveDisable()));
+    connect(widget, SIGNAL(resizingFinished()), m_dragInstrument,       SLOT(recursiveEnable()));
+    connect(widget, SIGNAL(resizingStarted()),  m_rubberBandInstrument, SLOT(recursiveDisable()));
+    connect(widget, SIGNAL(resizingFinished()), m_rubberBandInstrument, SLOT(recursiveEnable()));
 }
 
 void QnSceneController::updateGeometryDelta(QnDisplayWidget *widget) {

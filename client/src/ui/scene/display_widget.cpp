@@ -118,6 +118,8 @@ void QnDisplayWidget::updateShadowPos() {
 }
 
 void QnDisplayWidget::setGeometry(const QRectF &geometry) {
+    qDebug("setGeometry %g %g %g %g", geometry.left(), geometry.top(), geometry.width(), geometry.height());
+
     if(qFuzzyIsNull(m_aspectRatio)) {
         base_type::setGeometry(geometry);
         return;
@@ -149,6 +151,7 @@ void QnDisplayWidget::setGeometry(const QRectF &geometry) {
         newTop = geometry.top();
     }
 
+    qDebug("setGeometryBase %g %g %g %g", newLeft, newTop, newSize.width(), newSize.height());
     base_type::setGeometry(QRectF(QPointF(newLeft, newTop), newSize));
 }
 

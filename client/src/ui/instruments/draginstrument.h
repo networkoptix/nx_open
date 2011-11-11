@@ -8,15 +8,13 @@ class DragInstrument: public Instrument {
     Q_OBJECT;
 public:
     DragInstrument(QObject *parent);
-
-public slots:
-    /**
-     * Stops a drag operation that is in progress or being prepared, if any.
-     */
-    void stopCurrentOperation();
+    virtual ~DragInstrument();
 
 protected:
     virtual void installedNotify() override;
+    virtual void aboutToBeUninstalledNotify() override;
+
+    virtual void aboutToBeDisabledNotify() override;
 
     virtual bool mousePressEvent(QWidget *viewport, QMouseEvent *event) override;
     virtual bool mouseMoveEvent(QWidget *viewport, QMouseEvent *event) override;
@@ -28,7 +26,7 @@ signals:
 
 private:
     void startDragging(QGraphicsView *view);
-    void stopDragging(QGraphicsView *view);
+    void stopDragging();
 
 private:
     enum State {
@@ -38,6 +36,7 @@ private:
     };
 
     State m_state;
+    QGraphicsView *m_view;
     QPoint m_mousePressPos;
     QPointF m_lastMouseScenePos;
     QGraphicsItem *m_itemToSelect;

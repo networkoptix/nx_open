@@ -13,6 +13,7 @@ class InstrumentManager;
 class HandScrollInstrument;
 class WheelZoomInstrument;
 class DragInstrument;
+class RubberBandInstrument;
 
 class QnDisplaySynchronizer;
 class QnDisplayState;
@@ -70,6 +71,9 @@ private:
 
     /** Dragging instrument. */
     DragInstrument *m_dragInstrument;
+
+    /** Rubber band instrument. */
+    RubberBandInstrument *m_rubberBandInstrument;
 };
 
 #endif // QN_SCENE_CONTROLLER_H

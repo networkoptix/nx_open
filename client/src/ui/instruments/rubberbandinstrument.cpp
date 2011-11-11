@@ -216,6 +216,12 @@ void RubberBandInstrument::aboutToBeUninstalledNotify() {
     }
 }
 
+void RubberBandInstrument::aboutToBeDisabledNotify() {
+    if(!m_rubberBand.isNull())
+        m_rubberBand->setViewport(NULL);
+    m_state = INITIAL;
+}
+
 bool RubberBandInstrument::paintEvent(QWidget *viewport, QPaintEvent *) {
     if(viewport != m_rubberBand->viewport())
         return false; /* We are interested only in transformations for the current viewport. */
