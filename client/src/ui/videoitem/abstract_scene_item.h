@@ -1,0 +1,169 @@
+#ifndef _abstarct_scene_item_h_1641
+#define _abstarct_scene_item_h_1641
+
+#include "../animation/item_trans.h"
+#include "subitem/abstract_sub_item.h"
+#include "subitem/abstract_sub_item_container.h"
+
+class GraphicsView;
+class CLVideoWindowItem;
+class CLAbstractSubItem;
+class CLAbstractComplicatedItem;
+
+class CLAbstractSceneItem : public CLAbstractSubItemContainer
+{
+	Q_OBJECT
+	Q_PROPERTY(QPointF pos READ pos WRITE setPos)
+	Q_PROPERTY(qreal rotation	READ getRotation WRITE setRotation)
+	Q_PROPERTY(int steadycolor	READ steadyBlackColor WRITE setSteadyBlackColor)
+
+public:
+	enum CLSceneItemType { VIDEO, IMAGE, BUTTON, RECORDER, LAYOUT };
+
+	CLAbstractSceneItem(GraphicsView *view, int max_width, int max_height, QString name = QString());
+	virtual ~CLAbstractSceneItem();
+
+	CLVideoWindowItem* toVideoItem() const;
+
+	bool isEtitable() const;
+	void setEditable(bool editable);
+
+	// returns true of added
+
+	QString getName() const;
+	void setName(const QString& name);
+
+	CLSceneItemType getType() const;
+	void setType(CLSceneItemType t);
+
+	CLAbstractComplicatedItem* getComplicatedItem() const;
+	virtual void setComplicatedItem(CLAbstractComplicatedItem* complicatedItem);
+
+	void setMaxSize(QSize size);
+	QSize getMaxSize() const;
+
+	virtual bool isZoomable() const;
+
+	virtual QSize onScreenSize() const;
+
+	virtual QRectF boundingRect() const;
+
+	bool needUpdate() const
+	{
+		return m_needUpdate;
+	}
+
+	void needUpdate(bool val)
+	{
+		m_needUpdate = val;
+
+        if (m_needUpdate && (isFullScreen() || isItemSelected()))
+            emit onNeedToUpdate(this);
+
+    }
+
+	virtual int height() const;
+	virtual int width() const;
+
+	virtual void setItemSelected(bool sel, bool animate = true, int delay = 0);
+	bool isItemSelected() const;
+
+	void zoom_abs(qreal z, int duration, int delay );
+	void z_rotate_delta(const QPointF &center, qreal angle, int duration, int delay );
+	void z_rotate_abs(const QPointF &center, qreal angle, int duration, int delay);
+
+	qreal getZoom() const;
+
+	qreal getRotation() const;
+	void setRotation(qreal angle);
+
+	void stop_animation();
+
+	virtual void setFullScreen(bool full);
+	bool isFullScreen() const;
+
+	void setArranged(bool arr);
+	bool isArranged() const;
+
+	//==========grid editing ==================
+	//flag is used to draw selection with different color. true if item is selected and can be drop on top of the other in case of mouse release
+	void setCanDrop(bool val);
+	QPointF getOriginalPos() const;
+	void setOriginalPos(const QPointF &pos);
+	bool getOriginallyArranged() const;
+	void setOriginallyArranged(bool val);
+
+	//====rotation=======
+	void drawRotationHelper(bool val);
+	void setRotationPointCenter(const QPointF &center);
+	QPointF getRotationPointCenter() const;
+	void setRotationPointHand(const QPointF &point);
+
+	//== steady mode
+
+    virtual void goToSteadyMode(bool steady, bool instant);
+    int steadyBlackColor() const;
+    void setSteadyBlackColor(int color);
+
+public slots:
+
+signals:
+	void onPressed(CLAbstractSceneItem*);
+	void onDoubleClick(CLAbstractSceneItem*);
+	void onFullScreen(CLAbstractSceneItem*);
+	void onSelected(CLAbstractSceneItem*);
+	void onNeedToUpdate(CLAbstractSceneItem*);
+
+protected slots:
+		void stopSteadyAnimation();
+
+protected:
+    void drawShadow(QPainter* painter);
+    void drawSteadyWall(QPainter* painter);
+
+    void drawRotationHelper(QPainter* painter);
+
+	virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
+	virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
+	virtual void mouseReleaseEvent( QGraphicsSceneMouseEvent * event );
+	virtual void mousePressEvent ( QGraphicsSceneMouseEvent * event );
+	virtual void mouseDoubleClickEvent ( QGraphicsSceneMouseEvent * event );
+
+protected:
+    bool m_arranged;
+    bool m_fullscreen; // could be only if m_selected
+    bool m_selected;
+
+	bool m_mouse_over;
+	bool m_zoomOnhover;
+
+	int m_z;
+	CLItemTransform m_animationTransform;
+	GraphicsView* m_view;
+
+	int m_max_width, m_max_height;
+
+	CLSceneItemType m_type;
+	QString mName;
+
+	//rotation
+	bool m_draw_rotation_helper;
+	QPointF m_rotation_center;
+	QPointF m_rotation_hand;
+
+    bool m_editable;
+    bool m_needUpdate;
+    CLAbstractComplicatedItem* m_complicatedItem;
+
+    bool m_can_be_droped; // flag is used to draw selection. true if item is selected and can be drop on top of the other in case of mouse release
+
+	QPointF m_originalPos;
+	bool m_originallyArranged;
+
+    // steady mode
+    bool m_steadyMode; // in steady mode nothing should be on the screen but item itself
+    QPropertyAnimation* m_steady_animation;
+    int m_steady_black_color;
+};
+
+#endif //_abstarct_scene_item_h_1641
