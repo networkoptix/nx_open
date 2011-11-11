@@ -15,11 +15,14 @@ void parseCameras(QList<QnResourcePtr>& cameras, const QnApiCameras& xsdCameras,
         QnResourceParameters parameters;
         parameters["id"] = i->id().c_str();
         parameters["name"] = i->name().c_str();
-        parameters["status"] = i->status().c_str();
         parameters["url"] = i->url().c_str();
         parameters["mac"] = i->mac().c_str();
         parameters["login"] = i->login().c_str();
         parameters["password"] = i->password().c_str();
+
+        if (i->status().present())
+            parameters["status"] = (*i->status()).c_str();
+
         if (i->parentID().present())
             parameters["parentId"] = (*i->parentID()).c_str();
 

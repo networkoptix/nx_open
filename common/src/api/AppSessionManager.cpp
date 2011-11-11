@@ -127,12 +127,17 @@ void SessionManager::slotRequestFinished(QNetworkReply *reply)
 
 CLHttpStatus AppSessionManager::addObject(const QString& objectName, const QByteArray& body, QByteArray& reply)
 {
-    CLHttpStatus status = m_client.doPOST(QString("api/%1/").arg(objectName), body);
+    QTextStream stream(&reply);
+    m_httpClient.syncPost(QString("api/%1/").arg(objectName), body, stream.device());
 
-    if (status == CL_HTTP_SUCCESS || status == CL_HTTP_BAD_REQUEST)
-        m_client.readAll(reply);
+    // CLHttpStatus status = m_client.doPOST(QString("api/%1/").arg(objectName), body);
 
-    return status;
+    // if (status == CL_HTTP_SUCCESS || status == CL_HTTP_BAD_REQUEST)
+        stream.readAll();
+        // m_client.readAll(reply);
+
+    return CL_HTTP_SUCCESS;
+    // return status;
 }
 
 int AppSessionManager::getResourceTypes(QnApiResourceTypeResponsePtr& resourceTypes)
