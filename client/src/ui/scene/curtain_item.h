@@ -8,7 +8,7 @@ class QnCurtainItem: public QGraphicsObject {
     Q_PROPERTY(QColor color READ color WRITE setColor);
 
 public:
-    QnCurtainItem(QGraphicsItem *parent);
+    QnCurtainItem(QGraphicsItem *parent = NULL);
 
     virtual QRectF boundingRect() const override;
 

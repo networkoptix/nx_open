@@ -44,7 +44,8 @@ protected slots:
 
     // TODO: remove
     void at_widgetAdded(QnDisplayWidget *widget);
-    
+   
+
 private:
     /** Display synchronizer. */
     QnDisplaySynchronizer *m_synchronizer;

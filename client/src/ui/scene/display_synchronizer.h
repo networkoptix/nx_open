@@ -12,12 +12,15 @@ class QGraphicsView;
 class InstrumentManager;
 class BoundingInstrument;
 class TransformListenerInstrument;
+class ActivityListenerInstrument;
 
 class QnDisplayState;
 class QnUiLayoutItem;
 class QnDisplayWidget;
 class QnViewportAnimator;
 class QnWidgetAnimator;
+class QnCurtainAnimator;
+class QnCurtainItem;
 
 class QnDisplaySynchronizer: public QObject, protected AnimationTimerListener, protected QnSceneUtility {
     Q_OBJECT;
@@ -31,7 +34,7 @@ public:
         PINNED_SELECTED_LAYER,
         UNPINNED_LAYER,
         UNPINNED_SELECTED_LAYER,
-        PRE_ZOOMED_LAYER,
+        CURTAIN_LAYER,
         ZOOMED_LAYER,
         FRONT_LAYER
     };
@@ -122,6 +125,12 @@ protected slots:
 
     void at_viewport_transformationChanged();
 
+    void at_activityStopped();
+    void at_activityStarted();
+
+    void at_curtained();
+    void at_uncurtained();
+
 private:
     struct ItemProperties {
         ItemProperties(): animator(NULL), layer(BACK_LAYER) {}
@@ -149,6 +158,15 @@ private:
 
     /** Current front z displacement value. */
     qreal m_frontZ;
+
+    /** Activity listener instrument. */
+    ActivityListenerInstrument *m_activityListenerInstrument;
+
+    /** Curtain item. */
+    QnCurtainItem *m_curtainItem;
+
+    /** Curtain animator. */
+    QnCurtainAnimator *m_curtainAnimator;
 };
 
 #endif // QN_DISPLAY_SYNCHRONIZER_H

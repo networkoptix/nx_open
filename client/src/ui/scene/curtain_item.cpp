@@ -7,13 +7,16 @@ QnCurtainItem::QnCurtainItem(QGraphicsItem *parent):
 {
     qreal d = std::numeric_limits<qreal>::max() / 4;
     m_boundingRect = QRectF(QPointF(-d, -d), QPoint(d, d));
+
+    setAcceptedMouseButtons(0);
+    setEnabled(false);
 }
 
 QRectF QnCurtainItem::boundingRect() const {
     return m_boundingRect;
 }
 
-void QnCurtainItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
+void QnCurtainItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget) {
     painter->beginNativePainting();
     glPushMatrix();
     glLoadIdentity();
@@ -24,10 +27,7 @@ void QnCurtainItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, Q
 
     glBegin(GL_QUADS);
     glColor(m_color);
-    glVertex2d(-1.0, -1.0);
-    glVertex2d( 1.0, -1.0);
-    glVertex2d( 1.0,  1.0);
-    glVertex2d(-1.0,  1.0);
+    glVertices(widget->geometry());
     glEnd();
 
     glPopAttrib();

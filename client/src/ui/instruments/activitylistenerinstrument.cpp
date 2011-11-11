@@ -19,6 +19,20 @@ ActivityListenerInstrument::ActivityListenerInstrument(int activityTimeoutMSec, 
     }
 }
 
+void ActivityListenerInstrument::enabledNotify() {
+    if(m_currentTimer == 0)
+        m_currentTimer = startTimer(m_activityTimeoutMSec);
+}
+
+void ActivityListenerInstrument::aboutToBeDisabledNotify() {
+    activityDetected();
+
+    if(m_currentTimer != 0) {
+        killTimer(m_currentTimer);
+        m_currentTimer = 0;
+    }
+}
+
 bool ActivityListenerInstrument::event(QGraphicsView *, QEvent *) {
     activityDetected();
     return false;

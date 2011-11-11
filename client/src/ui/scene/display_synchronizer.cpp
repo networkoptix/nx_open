@@ -7,11 +7,14 @@
 #include <ui/instruments/instrumentmanager.h>
 #include <ui/instruments/boundinginstrument.h>
 #include <ui/instruments/transformlistenerinstrument.h>
+#include <ui/instruments/activitylistenerinstrument.h>
 #include <utils/common/warnings.h>
 #include "display_state.h"
 #include "display_widget.h"
 #include "display_grid_mapper.h"
 #include "widget_animator.h"
+#include "curtain_item.h"
+#include "curtain_animator.h"
 
 namespace {
     void calculateExpansionValues(qreal start, qreal end, qreal center, qreal newLength, qreal *deltaStart, qreal *deltaEnd) {
@@ -110,15 +113,29 @@ QnDisplaySynchronizer::QnDisplaySynchronizer(QnDisplayState *state, QGraphicsSce
     /* Create and configure instruments. */
     m_boundingInstrument = new BoundingInstrument(this);
     m_transformListenerInstrument = new TransformListenerInstrument(this);
+    m_activityListenerInstrument = new ActivityListenerInstrument(1000, this);
     m_manager->installInstrument(m_transformListenerInstrument);
     m_manager->installInstrument(m_boundingInstrument);
+    m_manager->installInstrument(m_activityListenerInstrument);
 
     m_boundingInstrument->setSizeEnforced(view, true);
     m_boundingInstrument->setPositionEnforced(view, true);
     m_boundingInstrument->setScalingSpeed(view, 32.0);
     m_boundingInstrument->setMovementSpeed(view, 4.0);
 
+    m_activityListenerInstrument->recursiveDisable();
+
     connect(m_transformListenerInstrument, SIGNAL(transformChanged(QGraphicsView *)), this, SLOT(at_viewport_transformationChanged()));
+    connect(m_activityListenerInstrument,  SIGNAL(activityStopped()),                 this, SLOT(at_activityStopped()));
+    connect(m_activityListenerInstrument,  SIGNAL(activityStarted()),                 this, SLOT(at_activityStarted()));
+
+    /* Set up curtain. */
+    m_curtainItem = new QnCurtainItem();
+    m_scene->addItem(m_curtainItem);
+    setLayer(m_curtainItem, CURTAIN_LAYER);
+    m_curtainAnimator = new QnCurtainAnimator(m_curtainItem, 1000, this);
+    connect(m_curtainAnimator, SIGNAL(curtained()),     this, SLOT(at_curtained()));
+    connect(m_curtainAnimator, SIGNAL(uncurtained()),   this, SLOT(at_uncurtained()));
 
     /* Configure animator. */
     m_viewportAnimator->setMovementSpeed(4.0);
@@ -142,6 +159,12 @@ QnDisplaySynchronizer::QnDisplaySynchronizer(QnDisplayState *state, QGraphicsSce
     m_updateTimer = new AnimationTimer(this);
     m_updateTimer->setListener(this);
     m_updateTimer->start();
+
+    /* Fire signals if needed. */
+    if(m_state->zoomedEntity() != NULL)
+        at_state_zoomedEntityChanged(NULL, m_state->zoomedEntity());
+    if(m_state->selectedEntity() != NULL)
+        at_state_selectedEntityChanged(NULL, m_state->selectedEntity());
 }
 
 QnDisplaySynchronizer::~QnDisplaySynchronizer() {
@@ -436,12 +459,17 @@ void QnDisplaySynchronizer::at_state_selectedEntityChanged(QnUiLayoutItem *oldSe
 }
 
 void QnDisplaySynchronizer::at_state_zoomedEntityChanged(QnUiLayoutItem *oldZoomedEntity, QnUiLayoutItem *newZoomedEntity) {
-    if(oldZoomedEntity != NULL)
+    if(oldZoomedEntity != NULL) {
         synchronize(oldZoomedEntity, true);
+        
+        m_activityListenerInstrument->recursiveDisable();
+    }
 
     if(newZoomedEntity != NULL) {
         bringToFront(newZoomedEntity);
         synchronize(newZoomedEntity, true);
+
+        m_activityListenerInstrument->recursiveEnable();
 
         m_viewportAnimator->moveTo(zoomedEntityGeometry(), zoomAnimationDurationMsec);
     } else {
@@ -473,4 +501,27 @@ void QnDisplaySynchronizer::at_entity_rotationChanged() {
 
 void QnDisplaySynchronizer::at_entity_flagsChanged() {
     synchronizeLayer(static_cast<QnUiLayoutItem *>(sender()));
+}
+
+void QnDisplaySynchronizer::at_activityStopped() {
+    m_curtainAnimator->curtain(m_widgetByEntity[m_state->zoomedEntity()]);
+}
+
+void QnDisplaySynchronizer::at_activityStarted() {
+    m_curtainAnimator->uncurtain();
+}
+
+void QnDisplaySynchronizer::at_curtained() {
+    foreach(QnDisplayWidget *widget, m_widgetByEntity)
+        if(widget->entity() != m_state->zoomedEntity())
+            widget->hide();
+
+    m_view->viewport()->setCursor(QCursor(Qt::BlankCursor));
+}
+
+void QnDisplaySynchronizer::at_uncurtained() {
+    foreach(QnDisplayWidget *widget, m_widgetByEntity)
+        widget->show();
+
+    m_view->viewport()->setCursor(QCursor(Qt::ArrowCursor));
 }

@@ -7,7 +7,10 @@ QnPolygonalShadowItem::QnPolygonalShadowItem(QGraphicsItem *parent):
     m_color(QColor(Qt::black)),
     m_shapeValid(true),
     m_parametersValid(false)
-{}
+{
+    setAcceptedMouseButtons(0);
+    setEnabled(false);
+}
 
 QRectF QnPolygonalShadowItem::boundingRect() const {
     ensureParameters();
