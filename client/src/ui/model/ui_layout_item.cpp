@@ -1,4 +1,4 @@
-#include "display_entity.h"
+#include "ui_layout_item.h"
 #include <cassert>
 #include <core/dataprovider/media_streamdataprovider.h>
 #include <core/resource/resource_media_layout.h>
@@ -6,12 +6,12 @@
 #include <camera/camdisplay.h>
 #include <utils/common/scene_utility.h>
 #include <utils/common/warnings.h>
-#include "display_model.h"
+#include "ui_layout.h"
 
-QnDisplayEntity::QnDisplayEntity(const QnResourcePtr &resource, QObject *parent): 
+QnUiLayoutItem::QnUiLayoutItem(const QnResourcePtr &resource, QObject *parent): 
     QObject(parent), 
     QnResourceConsumer(resource),
-    m_model(NULL),
+    m_layout(NULL),
     m_flags(Pinned),
     m_rotation(0.0),
     m_dataProvider(NULL),
@@ -34,42 +34,42 @@ QnDisplayEntity::QnDisplayEntity(const QnResourcePtr &resource, QObject *parent)
     m_camDisplay->start();
 }
 
-QnDisplayEntity::~QnDisplayEntity() {
+QnUiLayoutItem::~QnUiLayoutItem() {
     ensureRemoved();
 }
 
-void QnDisplayEntity::ensureRemoved() {
-    if(m_model != NULL)
-        m_model->removeEntity(this);
+void QnUiLayoutItem::ensureRemoved() {
+    if(m_layout != NULL)
+        m_layout->removeItem(this);
 }
 
-QnResource *QnDisplayEntity::resource() const {
+QnResource *QnUiLayoutItem::resource() const {
     return getResource().data();
 }
 
-QnMediaResource *QnDisplayEntity::mediaResource() const {
+QnMediaResource *QnUiLayoutItem::mediaResource() const {
     return dynamic_cast<QnMediaResource *>(resource()); // TODO: remove dynamic_cast.
 }
 
-void QnDisplayEntity::beforeDisconnectFromResource() {
+void QnUiLayoutItem::beforeDisconnectFromResource() {
     static_cast<QnResourceConsumer *>(m_dataProvider)->beforeDisconnectFromResource();
 }
 
-void QnDisplayEntity::disconnectFromResource() {
+void QnUiLayoutItem::disconnectFromResource() {
     static_cast<QnResourceConsumer *>(m_dataProvider)->disconnectFromResource();
 
     QnResourceConsumer::disconnectFromResource();
 }
 
-bool QnDisplayEntity::setGeometry(const QRect &geometry) {
-    if(m_model != NULL)
-        return m_model->moveEntity(this, geometry);
+bool QnUiLayoutItem::setGeometry(const QRect &geometry) {
+    if(m_layout != NULL)
+        return m_layout->moveItem(this, geometry);
 
     setGeometryInternal(geometry);
     return true;
 }
 
-void QnDisplayEntity::setGeometryInternal(const QRect &geometry) {
+void QnUiLayoutItem::setGeometryInternal(const QRect &geometry) {
     if(m_geometry == geometry)
         return;
 
@@ -79,7 +79,7 @@ void QnDisplayEntity::setGeometryInternal(const QRect &geometry) {
     emit geometryChanged(oldGeometry, m_geometry);
 }
 
-bool QnDisplayEntity::setGeometryDelta(const QRectF &geometryDelta) {
+bool QnUiLayoutItem::setGeometryDelta(const QRectF &geometryDelta) {
     if(isPinned())
         return false;
 
@@ -93,36 +93,36 @@ bool QnDisplayEntity::setGeometryDelta(const QRectF &geometryDelta) {
     return true;
 }
 
-bool QnDisplayEntity::setFlag(EntityFlag flag, bool value) {
+bool QnUiLayoutItem::setFlag(ItemFlag flag, bool value) {
     if(checkFlag(flag) == value)
         return true;
 
-    if(m_model != NULL) {
+    if(m_layout != NULL) {
         if(flag == Pinned && value)
-            return m_model->pinEntity(this, m_geometry);
+            return m_layout->pinItem(this, m_geometry);
 
         if(flag == Pinned && !value)
-            return m_model->unpinEntity(this);
+            return m_layout->unpinItem(this);
     }
     
     setFlagInternal(flag, value);
     return true;
 }
 
-void QnDisplayEntity::setFlagInternal(EntityFlag flag, bool value) {
+void QnUiLayoutItem::setFlagInternal(ItemFlag flag, bool value) {
     if(checkFlag(flag) == value)
         return;
 
     if(flag == Pinned && value)
-        setGeometryDelta(QRectF()); /* Pinned entities cannot have non-zero geometry delta. */
+        setGeometryDelta(QRectF()); /* Pinned items cannot have non-zero geometry delta. */
 
-    EntityFlags oldFlags = m_flags;
+    ItemFlags oldFlags = m_flags;
     m_flags = value ? (m_flags | flag) : (m_flags & ~flag);
 
     emit flagsChanged(oldFlags, m_flags);
 }
 
-void QnDisplayEntity::setRotation(qreal rotation) {
+void QnUiLayoutItem::setRotation(qreal rotation) {
     if(qFuzzyCompare(m_rotation, rotation))
         return;
 
@@ -132,15 +132,15 @@ void QnDisplayEntity::setRotation(qreal rotation) {
     emit rotationChanged(oldRotation, m_rotation);
 }
 
-qint64 QnDisplayEntity::lengthUSec() const {
+qint64 QnUiLayoutItem::lengthUSec() const {
     return m_archiveProvider == NULL ? -1 : m_archiveProvider->lengthMksec();
 }
 
-qint64 QnDisplayEntity::currentTimeUSec() const {
+qint64 QnUiLayoutItem::currentTimeUSec() const {
     return m_archiveProvider == NULL ? -1 : m_archiveProvider->currentTime();
 }
 
-void QnDisplayEntity::setCurrentTimeUSec(qint64 usec) const {
+void QnUiLayoutItem::setCurrentTimeUSec(qint64 usec) const {
     if(m_archiveProvider == NULL) {
         qnWarning("Resource '%1' does not support changing current time.", resource()->getUniqueId());
         return;
@@ -149,7 +149,7 @@ void QnDisplayEntity::setCurrentTimeUSec(qint64 usec) const {
     m_archiveProvider->previousFrame(usec);
 }
 
-void QnDisplayEntity::play() {
+void QnUiLayoutItem::play() {
     if(m_archiveProvider == NULL)
         return;
 
@@ -161,7 +161,7 @@ void QnDisplayEntity::play() {
     //    m_camera->getCamCamDisplay()->playAudio(m_playing);
 }
 
-void QnDisplayEntity::pause() {
+void QnUiLayoutItem::pause() {
     if(m_archiveProvider == NULL)
         return;
 

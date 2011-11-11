@@ -3,9 +3,9 @@
 
 #include <QObject>
 
-class QnDisplayModel;
+class QnUiLayout;
 class QnDisplayGridMapper;
-class QnDisplayEntity;
+class QnUiLayoutItem;
 
 class QnDisplayState: public QObject {
     Q_OBJECT;
@@ -15,11 +15,11 @@ public:
         EDITING
     };
 
-    QnDisplayState(QnDisplayModel *model, QObject *parent = NULL);
+    QnDisplayState(QnUiLayout *model, QObject *parent = NULL);
 
     virtual ~QnDisplayState();
 
-    QnDisplayModel *model() const {
+    QnUiLayout *model() const {
         return m_model;
     }
 
@@ -33,32 +33,32 @@ public:
     
     void setMode(Mode mode);
 
-    QnDisplayEntity *selectedEntity() const {
+    QnUiLayoutItem *selectedEntity() const {
         return m_selectedEntity;
     }
 
-    void setSelectedEntity(QnDisplayEntity *entity);
+    void setSelectedEntity(QnUiLayoutItem *entity);
 
-    QnDisplayEntity *zoomedEntity() const {
+    QnUiLayoutItem *zoomedEntity() const {
         return m_zoomedEntity;
     }
 
-    void setZoomedEntity(QnDisplayEntity *entity);
+    void setZoomedEntity(QnUiLayoutItem *entity);
 
 signals:
     void modeChanged();
-    void selectedEntityChanged(QnDisplayEntity *oldSelectedEntity, QnDisplayEntity *newSelectedEntity);
-    void zoomedEntityChanged(QnDisplayEntity *oldZoomedEntity, QnDisplayEntity *newZoomedEntity);
+    void selectedEntityChanged(QnUiLayoutItem *oldSelectedEntity, QnUiLayoutItem *newSelectedEntity);
+    void zoomedEntityChanged(QnUiLayoutItem *oldZoomedEntity, QnUiLayoutItem *newZoomedEntity);
 
 private slots:
-    void at_entity_aboutToBeRemoved(QnDisplayEntity *entity);
+    void at_entity_aboutToBeRemoved(QnUiLayoutItem *entity);
 
 private:
-    QnDisplayModel *m_model;
+    QnUiLayout *m_model;
     QnDisplayGridMapper *m_gridMapper;
     Mode m_mode;
-    QnDisplayEntity *m_selectedEntity;
-    QnDisplayEntity *m_zoomedEntity;
+    QnUiLayoutItem *m_selectedEntity;
+    QnUiLayoutItem *m_zoomedEntity;
 };
 
 #endif // QN_DISPLAY_STATE_H

@@ -7,8 +7,8 @@
 #include <plugins/resources/archive/filetypesupport.h>
 #include <ui/scene/display_state.h>
 #include <ui/scene/display_grid_mapper.h>
-#include <ui/model/display_model.h>
-#include <ui/model/display_entity.h>
+#include <ui/model/ui_layout.h>
+#include <ui/model/ui_layout_item.h>
 #include <utils/common/warnings.h>
 
 ArchiveDropInstrument::ArchiveDropInstrument(QnDisplayState *state, QObject *parent):
@@ -65,14 +65,14 @@ bool ArchiveDropInstrument::dropEvent(QWidget *viewport, QDropEvent *event) {
 
     QRect geometry(m_state->gridMapper()->mapToGrid(view(viewport)->mapToScene(event->pos())), QSize(1, 1));
     foreach(QnResourcePtr resource, resources) {
-        QnDisplayEntity *entity = new QnDisplayEntity(resource);
+        QnUiLayoutItem *entity = new QnUiLayoutItem(resource);
         entity->setGeometry(geometry);
 
-        m_state->model()->addEntity(entity);
+        m_state->model()->addItem(entity);
         if(!entity->isPinned()) {
             /* Place already taken, pick closest one. */
             QRect newGeometry = m_state->model()->closestFreeSlot(geometry.topLeft(), geometry.size());
-            m_state->model()->pinEntity(entity, newGeometry);
+            m_state->model()->pinItem(entity, newGeometry);
         }
     }
 

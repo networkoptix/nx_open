@@ -7,7 +7,7 @@
 #include <core/dataprovider/media_streamdataprovider.h>
 #include <camera/gl_renderer.h>
 #include <camera/camdisplay.h>
-#include <ui/model/display_entity.h>
+#include <ui/model/ui_layout_item.h>
 #include <settings.h>
 #include "display_widget_renderer.h"
 #include "polygonal_shadow_item.h"
@@ -30,7 +30,7 @@ namespace {
     QPointF defaultShadowDisplacement = QPointF(5.0, 5.0);
 }
 
-QnDisplayWidget::QnDisplayWidget(QnDisplayEntity *entity, QGraphicsItem *parent):
+QnDisplayWidget::QnDisplayWidget(QnUiLayoutItem *entity, QGraphicsItem *parent):
     base_type(parent),
     m_entity(entity),
     m_resourceLayout(NULL),

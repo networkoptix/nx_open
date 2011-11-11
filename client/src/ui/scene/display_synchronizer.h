@@ -14,7 +14,7 @@ class BoundingInstrument;
 class TransformListenerInstrument;
 
 class QnDisplayState;
-class QnDisplayEntity;
+class QnUiLayoutItem;
 class QnDisplayWidget;
 class QnViewportAnimator;
 class QnWidgetAnimator;
@@ -56,7 +56,7 @@ public:
         return m_view;
     }
 
-    QRectF entityGeometry(QnDisplayEntity *entity) const;
+    QRectF entityGeometry(QnUiLayoutItem *entity) const;
 
     QRectF zoomedEntityGeometry() const;
 
@@ -70,13 +70,13 @@ public:
 
     void bringToFront(QGraphicsItem *item);
 
-    void bringToFront(QnDisplayEntity *entity);
+    void bringToFront(QnUiLayoutItem *entity);
 
     Layer layer(QGraphicsItem *item);
 
     void setLayer(QGraphicsItem *item, Layer layer);
 
-    void synchronize(QnDisplayEntity *entity, bool animate = true);
+    void synchronize(QnUiLayoutItem *entity, bool animate = true);
     
     void synchronize(QnDisplayWidget *widget, bool animate = true);
 
@@ -97,23 +97,23 @@ protected:
     
     QnWidgetAnimator *animator(QnDisplayWidget *widget);
 
-    void synchronizeGeometry(QnDisplayEntity *entity, bool animate);
+    void synchronizeGeometry(QnUiLayoutItem *entity, bool animate);
     void synchronizeGeometry(QnDisplayWidget *widget, bool animate);
-    void synchronizeLayer(QnDisplayEntity *entity);
+    void synchronizeLayer(QnUiLayoutItem *entity);
     void synchronizeLayer(QnDisplayWidget *widget);
 
     qreal layerFrontZ(Layer layer) const;
-    Layer entityLayer(QnDisplayEntity *entity) const;
+    Layer entityLayer(QnUiLayoutItem *entity) const;
 
 protected slots:
     void synchronizeSceneBounds();
 
-    void at_model_entityAdded(QnDisplayEntity *entity);
-    void at_model_entityAboutToBeRemoved(QnDisplayEntity *entity);
+    void at_model_entityAdded(QnUiLayoutItem *entity);
+    void at_model_entityAboutToBeRemoved(QnUiLayoutItem *entity);
     
     void at_state_modeChanged();
-    void at_state_selectedEntityChanged(QnDisplayEntity *oldSelectedEntity, QnDisplayEntity *newSelectedEntity);
-    void at_state_zoomedEntityChanged(QnDisplayEntity *oldZoomedEntity, QnDisplayEntity *newZoomedEntity);
+    void at_state_selectedEntityChanged(QnUiLayoutItem *oldSelectedEntity, QnUiLayoutItem *newSelectedEntity);
+    void at_state_zoomedEntityChanged(QnUiLayoutItem *oldZoomedEntity, QnUiLayoutItem *newZoomedEntity);
 
     void at_entity_geometryChanged();
     void at_entity_geometryDeltaChanged();
@@ -142,7 +142,7 @@ private:
     TransformListenerInstrument *m_transformListenerInstrument;
 
     /** Entity to widget mapping. */
-    QHash<QnDisplayEntity *, QnDisplayWidget *> m_widgetByEntity;
+    QHash<QnUiLayoutItem *, QnDisplayWidget *> m_widgetByEntity;
 
     /** Item to item properties mapping. */
     QHash<QGraphicsItem *, ItemProperties> m_propertiesByItem;
