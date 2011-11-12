@@ -99,7 +99,7 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
         if (m_truncateInterval > 0 && md->timestamp - m_firstTimestamp > m_currentChunkLen)
         {
             m_currentChunkLen += m_truncateInterval - (md->timestamp - m_firstTimestamp);
-            while (m_currentChunkLen < 0)
+            while (m_currentChunkLen <= 0)
                 m_currentChunkLen += m_truncateInterval;
             cl_log.log("chunkLen=" , m_currentChunkLen/1000000.0, cl_logALWAYS);
             m_prevDateTime = m_currentDateTime;
