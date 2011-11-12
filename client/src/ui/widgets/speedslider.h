@@ -22,8 +22,6 @@ public:
 
     void setToolTipItem(ToolTipItem *toolTip);
 
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-
 public Q_SLOTS:
     void resetSpeed();
 
