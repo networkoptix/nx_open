@@ -78,6 +78,8 @@ void QnRtspClientArchiveDelegate::deleteContexts()
 
 qint64 QnRtspClientArchiveDelegate::startTime()
 {
+    // uncoment it for large interval test:
+    //return m_rtspSession.startTime()- 1000000ll * 3600 * 24 * 400; // 400 days
     return m_rtspSession.startTime();
 }
 

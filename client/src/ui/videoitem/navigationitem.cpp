@@ -347,21 +347,17 @@ void NavigationItem::updateSlider()
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader *>(m_camera->getStreamreader());
     if (reader->lengthMksec() != AV_NOPTS_VALUE) {
         m_timeSlider->setMinimumValue(reader->startTime() / 1000);
-        m_timeSlider->setMaximumValue(reader->endTime() / 1000);
+        m_timeSlider->setMaximumValue(reader->endTime() != DATETIME_NOW ? reader->endTime() / 1000 : DATETIME_NOW);
         if (m_timeSlider->minimumValue() == 0)
             m_timeLabel->setText(formatDuration(m_timeSlider->length() / 1000));
         else
             m_timeLabel->setText(QString());//###QDateTime::fromMSecsSinceEpoch(m_timeSlider->maximumValue()).toString(Qt::SystemLocaleShortDate));
 
-        bool isRealTimeMode = m_camera->getCamCamDisplay()->isRealTimeSource();
-        if (!isRealTimeMode)
+        quint64 time = m_camera->getCurrentTime();
+        if (time != AV_NOPTS_VALUE)
         {
-            quint64 time = m_camera->getCurrentTime();
-            if (time != AV_NOPTS_VALUE)
-            {
-                m_currentTime = time/1000;
-                m_timeSlider->setCurrentValue(m_currentTime);
-            }
+            m_currentTime = time/1000;
+            m_timeSlider->setCurrentValue(m_currentTime);
         }
     }
 }

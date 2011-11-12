@@ -260,22 +260,44 @@ static const struct IntervalInfo {
     const char *name;
     int count;
     const char * maxText;
-} intervals[] = {
-    {100, 100, "ms", 10, "ms"},
-    {1000, 1, "s", 60, "59s"},
-    {5*1000, 5, "s", 12, "59s"},
-    {10*1000, 10, "s", 6, "59s"},
-    {30*1000, 30, "s", 2, "59s"},
-    {60*1000, 1, "m", 60, "59m"},
-    {5*60*1000, 5, "m", 12, "59m"},
-    {10*60*1000, 10, "m", 6, "59m"},
-    {30*60*1000, 30, "m", 2, "59m"},
-    {60*60*1000, 1, "h", 24, "24h"},
-    {3*60*60*1000, 3, "h", 8, "24h"},
-    {6*60*60*1000, 6, "h", 4, "24h"},
-    {12*60*60*1000, 12, "h", 2, "24h"},
-    {24*60*60*1000, 1, "d", 99, "31.12"} // special case
+
+    bool (*isTimeAccepted) (const IntervalInfo& interval, qint64 time);
 };
+
+bool isTimeAcceptedStd(const IntervalInfo& interval, qint64 time)
+{
+    return time % interval.interval  == 0;
+}
+
+bool isTimeAcceptedForMonth(const IntervalInfo& interval, qint64 time)
+{
+    return QDateTime::fromMSecsSinceEpoch(time).date().day() == 1;
+}
+
+bool isTimeAcceptedForYear(const IntervalInfo& interval, qint64 time)
+{
+    return QDateTime::fromMSecsSinceEpoch(time).date().dayOfYear() == 1;
+}
+
+IntervalInfo intervals[] = {
+    {100, 100, "ms", 10, "ms", isTimeAcceptedStd},
+    {1000, 1, "s", 60, "59s", isTimeAcceptedStd},
+    {5*1000, 5, "s", 12, "59s", isTimeAcceptedStd},
+    {10*1000, 10, "s", 6, "59s", isTimeAcceptedStd},
+    {30*1000, 30, "s", 2, "59s", isTimeAcceptedStd},
+    {60*1000, 1, "m", 60, "59m", isTimeAcceptedStd},
+    {5*60*1000, 5, "m", 12, "59m", isTimeAcceptedStd},
+    {10*60*1000, 10, "m", 6, "59m", isTimeAcceptedStd},
+    {30*60*1000, 30, "m", 2, "59m", isTimeAcceptedStd},
+    {60*60*1000, 1, "h", 24, "24h", isTimeAcceptedStd},
+    {3*60*60*1000, 3, "h", 8, "24h", isTimeAcceptedStd},
+    {6*60*60*1000, 6, "h", 4, "24h", isTimeAcceptedStd},
+    {12*60*60*1000, 12, "h", 2, "24h", isTimeAcceptedStd},
+    {24*60*60*1000, 1, "dd MMM", 99, "dd MMM", isTimeAcceptedStd}, // FIRST_DATE_INDEX here
+    {24*60*60*1000*30ll, 1, "MMMM", 99, "September", isTimeAcceptedForMonth}, 
+    {24*60*60*1000*30*12ll, 1, "yyyy", 99, "2011", isTimeAcceptedForYear}
+};
+static const int FIRST_DATE_INDEX = 13; // use date's labels with this index and above
 
 static inline qint64 roundTime(qint64 msecs, int interval)
 {
@@ -320,7 +342,7 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     const int minWidth = 30;
 
     unsigned level = 0;
-    while (minWidth > pixelPerTime*intervals[level].interval && level < arraysize(intervals)-1)
+    while (minWidth > pixelPerTime*intervals[level].interval && level < FIRST_DATE_INDEX)
         ++level;
 
     unsigned maxLevel = level;
@@ -378,8 +400,11 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     for (qint64 curTime = intervals[level].interval*outsideCnt; curTime <= pos+range; curTime += intervals[level].interval)
     {
         unsigned curLevel = level;
-        while (curLevel < arraysize(intervals)-2 && curTime % intervals[curLevel+1].interval == 0)
+        //while (curLevel < maxLevel && curTime % intervals[curLevel+1].interval == 0)
+        //    ++curLevel;
+        while (curLevel < maxLevel && intervals[curLevel+1].isTimeAccepted(intervals[curLevel+1], curTime))
             ++curLevel;
+
         const int arrayIndex = qMin(curLevel-level, unsigned(opacity.size()-1));
 
         color.setAlphaF(opacity[arrayIndex]);
@@ -391,12 +416,19 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         if (lineLen >= 0.5f)
             painter->drawLine(QPointF(xpos, 0), QPointF(xpos, (r.height() - maxHeight - 3) * lineLen));
 
-        const int labelNumber = (curTime/interval.interval)%interval.count;
-        const QString text = QString::number(interval.value*labelNumber) + QLatin1String(interval.name);
+        QString text;
+        if (curLevel < FIRST_DATE_INDEX)
+        {
+            const int labelNumber = (curTime/interval.interval)%interval.count;
+            text = QString::number(interval.value*labelNumber) + QLatin1String(interval.name);
+        }
+        else {
+            text = QDateTime::fromMSecsSinceEpoch(curTime).toString(interval.name);
+        }
 
         if (widths[arrayIndex] > 0)
         {
-            if (curLevel == 0 || (curLevel == arraysize(intervals) - 1 && m_parent->minimumValue() != 0))
+            if (curLevel == 0 /*|| (curLevel == arraysize(intervals) - 1 && m_parent->minimumValue() != 0) */)
             {
                 painter->save();
                 painter->translate(xpos-3, (r.height() - maxHeight) * lineLen);
@@ -558,7 +590,7 @@ void TimeSlider::setToolTipItem(ToolTipItem *toolTip)
 */
 qint64 TimeSlider::length() const
 {
-    return m_maximumValue - m_minimumValue;
+    return maximumValue() - m_minimumValue;
 }
 
 /*!
@@ -595,7 +627,7 @@ void TimeSlider::setMinimumValue(qint64 value)
 */
 qint64 TimeSlider::maximumValue() const
 {
-    return m_maximumValue;
+    return m_maximumValue == DATETIME_NOW ? QDateTime::currentDateTime().toMSecsSinceEpoch() : m_maximumValue;
 }
 
 void TimeSlider::setMaximumValue(qint64 value)
@@ -629,7 +661,7 @@ void TimeSlider::setCurrentValue(qint64 value)
     if (value == DATETIME_NOW)
         return; // ###
 
-    value = qBound(m_minimumValue, value, m_maximumValue);
+    value = qBound(m_minimumValue, value, maximumValue());
     if (m_currentValue == value)
         return;
 
@@ -699,7 +731,7 @@ qint64 TimeSlider::viewPortPos() const
 
 void TimeSlider::setViewPortPos(qint64 value)
 {
-    m_viewPortPos = qBound(m_minimumValue, value, m_maximumValue - sliderRange());
+    m_viewPortPos = qBound(m_minimumValue, value, maximumValue() - sliderRange());
 
     if (m_currentValue < m_viewPortPos) {
         setCurrentValue(m_viewPortPos);
@@ -763,7 +795,7 @@ void TimeSlider::centraliseSlider()
         }
         else if (m_animation->state() != QPropertyAnimation::Running /*&& !m_slider->isSliderDown()*/) {
             qint64 newViewortPos = m_currentValue - sliderRange()/2; // center
-            newViewortPos = qBound(m_minimumValue, newViewortPos, m_maximumValue - sliderRange());
+            newViewortPos = qBound(m_minimumValue, newViewortPos, maximumValue() - sliderRange());
             if (qAbs(newViewortPos - m_viewPortPos) < 2*delta()) {
                 setViewPortPos(m_currentValue - sliderRange()/2);
                 return;
