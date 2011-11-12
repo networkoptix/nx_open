@@ -396,6 +396,9 @@ protected:
     virtual void aboutToBeDisabledNotify() {}
 
     /**
+     * Note that the instrument framework assumes that throughout the lifetime of 
+     * an instrument this function always returns the same value given the same parameters.
+     * 
      * \param item                     Graphics item.
      * \returns                        Whether this instrument is willing to watch
      *                                 events of the given graphics item.
@@ -403,6 +406,9 @@ protected:
     virtual bool isWillingToWatch(QGraphicsItem *) const { return true; }
 
     /**
+     * Note that the instrument framework assumes that throughout the lifetime of 
+     * an instrument this function always returns the same value given the same parameters.
+     *
      * \param view                     Graphics view.
      * \returns                        Whether this instrument is willing to watch
      *                                 events of the given graphics view.
