@@ -750,7 +750,7 @@ float TimeSlider::delta() const
 
 qint64 TimeSlider::fromSlider(int value)
 {
-    return (m_viewPortPos + value) * delta();
+    return m_viewPortPos + value * delta();
 }
 
 int TimeSlider::toSlider(qint64 value)

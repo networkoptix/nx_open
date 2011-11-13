@@ -32,8 +32,10 @@ QnMediaContext::QnMediaContext(const quint8* payload, int dataSize)
 QnMediaContext::~QnMediaContext()
 {
     QMutexLocker mutex(&global_ffmpeg_mutex);
-    avcodec_close(m_ctx);
-    av_free(m_ctx);
+    if (m_ctx) {
+        avcodec_close(m_ctx);
+        av_free(m_ctx);
+    }
 }
 
 AVCodecContext* QnMediaContext::ctx() const

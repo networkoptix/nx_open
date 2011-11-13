@@ -64,6 +64,7 @@ void QnServerArchiveDelegate::close()
 
 qint64 QnServerArchiveDelegate::seek(qint64 time)
 {
+    cl_log.log("serverArchiveDelegate. jump to ",QDateTime::fromMSecsSinceEpoch(time/1000).toString(), cl_logALWAYS);
     DeviceFileCatalog::Chunk newChunk = m_chunkSequence->getNextChunk(m_resource, time);
     if (m_currentChunk.startTime == -1)
         return -1;

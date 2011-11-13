@@ -269,7 +269,10 @@ qint64 DeviceFileCatalog::maxTime() const
 DeviceFileCatalog::Chunk DeviceFileCatalog::chunkAt(int index) const
 {
     QMutexLocker lock(&m_mutex);
-    return m_chunks.at(index);
+    if (index < m_chunks.size())
+        return m_chunks.at(index);
+    else
+        return DeviceFileCatalog::Chunk();
 }
 
 qint64 DeviceFileCatalog::firstTime() const
