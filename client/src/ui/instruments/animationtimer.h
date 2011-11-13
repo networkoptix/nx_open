@@ -3,6 +3,8 @@
 
 #include <QAbstractAnimation>
 
+class AnimationTimer;
+
 /**
  * Interface for detached animation processing. 
  * 
@@ -10,7 +12,21 @@
  */
 class AnimationTimerListener {
 public:
+    AnimationTimerListener();
+
+    virtual ~AnimationTimerListener();
+
+protected:
     virtual void tick(int currentTime) = 0;
+
+    AnimationTimer *timer() const {
+        return m_timer;
+    }
+
+private:
+    friend class AnimationTimer;
+
+    AnimationTimer *m_timer;
 };
 
 
@@ -20,32 +36,23 @@ public:
  */
 class AnimationTimer: public QAbstractAnimation {
 public:
-    AnimationTimer(QObject *parent = NULL): 
-        QAbstractAnimation(parent),
-        m_listener(NULL)
-    {}
+    AnimationTimer(QObject *parent = NULL);
+
+    virtual ~AnimationTimer();
 
     AnimationTimerListener *listener() const {
         return m_listener;
     }
 
-    void setListener(AnimationTimerListener *listener) {
-        m_listener = listener;
-    }
+    void setListener(AnimationTimerListener *listener);
 
-    virtual int duration() const override {
-        return -1; /* Animation will run until stopped. The current time will increase indefinitely. */
-    }
+    virtual int duration() const override;
 
 protected:
-    virtual void updateCurrentTime(int currentTime) override {
-        if(m_listener != NULL)   
-            m_listener->tick(currentTime);
-    }
+    virtual void updateCurrentTime(int currentTime) override;
 
 private:
     AnimationTimerListener *m_listener;
 };
-
 
 #endif // QN_ANIMATION_TIMER_H
