@@ -3,6 +3,7 @@
 
 #include <QWeakPointer>
 #include <ui/widgets2/graphicswidget.h>
+#include <ui/instruments/constrainedresizable.h>
 #include "polygonal_shadow_item.h"
 
 class QnDisplayWidgetRenderer;
@@ -10,7 +11,7 @@ class QnVideoResourceLayout;
 class QnUiLayoutItem;
 class QnPolygonalShadowItem;
 
-class QnDisplayWidget: public GraphicsWidget, public QnPolygonalShapeProvider {
+class QnDisplayWidget: public GraphicsWidget, public QnPolygonalShapeProvider, public ConstrainedResizable {
     Q_OBJECT;
     Q_PROPERTY(QColor frameColor READ frameColor WRITE setFrameColor);
     Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth);
@@ -96,8 +97,11 @@ protected:
     virtual Qt::WindowFrameSection windowFrameSectionAt(const QPointF &pos) const override;
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
     virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
+    virtual bool windowFrameEvent(QEvent *event) override;
 
     virtual QPolygonF provideShape() override;
+
+    virtual QSizeF constrainedSize(const QSizeF constraint) const override;
 
     void updateShadowZ();
     void updateShadowPos();

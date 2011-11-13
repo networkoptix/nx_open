@@ -78,6 +78,10 @@ void Instrument::ensureUninstalled() {
 }
 
 QList<QGraphicsItem *> Instrument::items(QGraphicsView *view, const QPoint &viewPos) const {
+    return items(view, view->mapToScene(viewPos));
+}
+
+QList<QGraphicsItem *> Instrument::items(QGraphicsView *view, const QPointF &scenePos) const {
     if (m_scene == NULL) {
         if (!isInstalled()) {
             qnWarning("Instrument is not installed.");
@@ -88,7 +92,13 @@ QList<QGraphicsItem *> Instrument::items(QGraphicsView *view, const QPoint &view
         return QList<QGraphicsItem *>();
     }
 
-    return m_scene->items(view->mapToScene(QRect(viewPos, QSize(1, 1))), Qt::IntersectsItemShape, Qt::DescendingOrder, view->viewportTransform());
+    /* Note that it would be more correct to use view->mapToScene(QRect(viewPos, QSize(1, 1))). 
+     * However, this is not the way it is implemented in Qt, so we have no other options but to mimic Qt behavior. */
+    QRectF pointRect = QRectF(scenePos, QSizeF(1, 1));
+    if (!view->isTransformed())
+        return m_scene->items(pointRect, Qt::IntersectsItemShape, Qt::DescendingOrder);
+    
+    return m_scene->items(pointRect, Qt::IntersectsItemShape, Qt::DescendingOrder, view->viewportTransform());
 }
 
 QList<QGraphicsItem *> Instrument::items(const QGraphicsSceneMouseEvent *event) const {
@@ -105,14 +115,14 @@ QList<QGraphicsItem *> Instrument::items(const QGraphicsSceneMouseEvent *event) 
     }
 
     /* It is not clear whether event->widget() may not be a graphics view's viewport,
-     * so we use dynamic_cast to feel safe. */
+     * so we use qobject_cast to feel safe. */
     QWidget *viewport = event->widget();
-    QGraphicsView *view = viewport == NULL ? NULL : dynamic_cast<QGraphicsView *>(viewport->parent());
+    QGraphicsView *view = viewport == NULL ? NULL : qobject_cast<QGraphicsView *>(viewport->parent());
 
     if(view == NULL) {
         return m_scene->items(event->scenePos(), Qt::IntersectsItemShape, Qt::DescendingOrder, QTransform());
     } else {
-        return this->items(view, viewport->mapFromGlobal(event->screenPos()));
+        return this->items(view, event->scenePos());
     }
 }
 

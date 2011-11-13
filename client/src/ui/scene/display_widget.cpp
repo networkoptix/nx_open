@@ -61,6 +61,10 @@ QnDisplayWidget::QnDisplayWidget(QnUiLayoutItem *entity, QGraphicsItem *parent):
     connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_sourceSizeChanged(const QSize &)));
     for(int i = 0; i < m_channelCount; i++)
         m_entity->camDisplay()->addVideoChannel(i, m_renderer, true);
+
+    QSizePolicy sp;
+    sp.setHeightForWidth(true);
+    setSizePolicy(sp);
 }
 
 QnDisplayWidget::~QnDisplayWidget() {
@@ -121,7 +125,7 @@ void QnDisplayWidget::updateShadowPos() {
 
 void QnDisplayWidget::setGeometry(const QRectF &geometry) {
     /* Unfortunately, widgets with constant aspect ratio cannot be implemented
-     * using size hints. So here is a workaround. */
+     * using size hints. So here is one of the workarounds. */
     
     if(qFuzzyIsNull(m_aspectRatio)) {
         base_type::setGeometry(geometry);
@@ -135,7 +139,7 @@ void QnDisplayWidget::setGeometry(const QRectF &geometry) {
     }
 
     /* Calculate actual new size. */
-    QSizeF newSize = QnSceneUtility::expanded(m_aspectRatio, geometry.size(), Qt::KeepAspectRatio);
+    QSizeF newSize = constrainedSize(geometry.size());
 
     /* Find anchor point and calculate new position. */
     QRectF oldGeometry = this->geometry();
@@ -155,6 +159,13 @@ void QnDisplayWidget::setGeometry(const QRectF &geometry) {
     }
 
     base_type::setGeometry(QRectF(QPointF(newLeft, newTop), newSize));
+}
+
+QSizeF QnDisplayWidget::constrainedSize(const QSizeF constraint) const {
+    if(qFuzzyIsNull(m_aspectRatio))
+        return constraint;
+
+    return QnSceneUtility::expanded(m_aspectRatio, constraint, Qt::KeepAspectRatio);
 }
 
 void QnDisplayWidget::at_sourceSizeChanged(const QSize &size) {
@@ -268,75 +279,77 @@ void QnDisplayWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGrap
 }
 
 namespace {
-    inline Qt::WindowFrameSection sweep(qreal v, qreal v0, qreal v1, qreal v2, qreal v3, Qt::WindowFrameSection fs1, Qt::WindowFrameSection fs2, Qt::WindowFrameSection fs3) {
-        if(v < v1) {
-            if(v < v0) {
-                return Qt::NoSection;
-            } else {
-                return fs1;
-            }
+    inline Qt::WindowFrameSection sweep(qreal v, qreal v0, qreal v1, Qt::WindowFrameSection fs0, Qt::WindowFrameSection fs1, Qt::WindowFrameSection fs2) {
+        if(v < v0) {
+            return fs0;
         } else {
-            if(v < v2) {
-                return fs2;
-            } else if(v < v3) {
-                return fs3;
+            if(v < v1) {
+                return fs1;
             } else {
-                return Qt::NoSection;
+                return fs2;
             }
         }
     }
 
-    inline Qt::WindowFrameSection sweep(const QRectF &outerGeometry, const QRectF &innerGeometry, const QPointF &pos) {
+    inline Qt::WindowFrameSection sweep(const QRectF &geometry, const QPointF &pos) {
         /* Shortcuts for position. */
         qreal x = pos.x();
         qreal y = pos.y();
 
         /* Border shortcuts. */
-        qreal x0 = outerGeometry.left();
-        qreal x1 = innerGeometry.left();
-        qreal x2 = innerGeometry.right();
-        qreal x3 = outerGeometry.right();
-        qreal y0 = outerGeometry.top();
-        qreal y1 = innerGeometry.top();
-        qreal y2 = innerGeometry.bottom();
-        qreal y3 = outerGeometry.bottom();
+        qreal x0 = geometry.left();
+        qreal x1 = geometry.right();
+        qreal y0 = geometry.top();
+        qreal y1 = geometry.bottom();
 
         /* Sweep. */
-        if(x < x1) {
-            if(x < x0) {
-                return Qt::NoSection;
-            } else {
-                return sweep(y, y0, y1, y2, y3, Qt::TopLeftSection, Qt::LeftSection, Qt::BottomLeftSection);
-            }
+        if(x < x0) {
+            return sweep(y, y0, y1, Qt::TopLeftSection, Qt::LeftSection, Qt::BottomLeftSection);
         } else {
-            if(x < x2) {
-                return sweep(y, y0, y1, y2, y3, Qt::TopSection, Qt::NoSection, Qt::BottomSection);
-            } else if(x < x3) {
-                return sweep(y, y0, y1, y2, y3, Qt::TopRightSection, Qt::RightSection, Qt::BottomRightSection);
+            if(x < x1) {
+                return sweep(y, y0, y1, Qt::TopSection, Qt::NoSection, Qt::BottomSection);
             } else {
-                return Qt::NoSection;
+                return sweep(y, y0, y1, Qt::TopRightSection, Qt::RightSection, Qt::BottomRightSection);
             }
         }
     }
 }
 
 Qt::WindowFrameSection QnDisplayWidget::windowFrameSectionAt(const QPointF &pos) const override {
-    QSizeF size = this->size();
-
     qreal fe = m_frameWidth * frameExtensionMultiplier;
-    Qt::WindowFrameSection result = sweep(windowFrameRect().adjusted(-fe, -fe, fe, fe), rect().adjusted(fe, fe, -fe, -fe), pos);
-    if(qFuzzyIsNull(m_aspectRatio)) {
-        return result;
-    } else {
+    Qt::WindowFrameSection result = sweep(rect().adjusted(fe, fe, -fe, -fe), pos);
+    
+    /* This widget does not have side frame sections in case aspect ratio is set. */
+    if(!qFuzzyIsNull(m_aspectRatio)) {
         switch(result) {
         case Qt::LeftSection:
         case Qt::RightSection:
         case Qt::TopSection:
         case Qt::BottomSection:
-            return Qt::NoSection;
+            result = Qt::NoSection;
+            break;
         default:
-            return result;
+            break;
         }
     }
+
+    return result;
 }
 
+bool QnDisplayWidget::windowFrameEvent(QEvent *event) {
+    bool result = base_type::windowFrameEvent(event);
+
+    if(event->type() == QEvent::GraphicsSceneHoverMove) {
+        QGraphicsSceneHoverEvent *e = static_cast<QGraphicsSceneHoverEvent *>(event);
+
+        /* Qt does not unset a cursor unless mouse pointer leaves widget's frame. 
+         * 
+         * As this widget may not have a frame section associated with some parts of
+         * its frame, cursor must be unset manually. */
+        Qt::WindowFrameSection section = windowFrameSectionAt(e->pos());
+        if(section == Qt::NoSection)
+            unsetCursor();
+    }
+
+    return result;
+}

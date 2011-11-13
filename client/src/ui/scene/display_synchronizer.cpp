@@ -252,7 +252,7 @@ QnDisplaySynchronizer::Layer QnDisplaySynchronizer::entityLayer(QnUiLayoutItem *
 QRectF QnDisplaySynchronizer::entityGeometry(QnUiLayoutItem *entity) const {
     QRectF geometry = m_state->gridMapper()->mapFromGrid(entity->geometry());
 
-    QnDisplayWidget *widget = m_widgetByEntity[entity];
+    //QnDisplayWidget *widget = m_widgetByEntity[entity];
 
 
     QSizeF step = m_state->gridMapper()->step();

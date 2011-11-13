@@ -1,4 +1,5 @@
 #include "resizinginstrument.h"
+#include "constrainedresizable.h"
 
 namespace {
     struct ItemIsWidget: public std::unary_function<QGraphicsItem *, bool> {
@@ -62,6 +63,9 @@ bool ResizingInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
 
     /* Find the item to resize. */
     QGraphicsWidget *widget = static_cast<QGraphicsWidget *>(item(view, event->pos(), ItemIsWidget()));
+
+    qDebug("WIDGET = %x", widget);
+
     if (widget == NULL)
         return false;
 
@@ -80,6 +84,7 @@ bool ResizingInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
     m_section = section;
     m_view = view;
     m_widget = widget;
+    m_resizable = dynamic_cast<ConstrainedResizable *>(widget);
 
     emit resizingProcessStarted(view, widget);
 
@@ -118,70 +123,140 @@ bool ResizingInstrument::mouseMoveEvent(QWidget *viewport, QMouseEvent *event) {
     QPointF currentMouseScenePos = view->mapToScene(event->pos());
     m_lastMouseScenePos = currentMouseScenePos;
 
-    /* Resize widget. */
+    /* Prepare shortcuts. */
     QGraphicsWidget *widget = m_widget.data();
+    const QRectF &startGeometry = m_startGeometry;
+
+    /* Calculate new geometry. */
     QLineF delta(widget->mapFromScene(m_mousePressScenePos), widget->mapFromScene(currentMouseScenePos));
     QLineF parentDelta(widget->mapToParent(delta.p1()), widget->mapToParent(delta.p2()));
     QLineF parentXDelta(widget->mapToParent(QPointF(delta.p1().x(), 0)), widget->mapToParent(QPointF(delta.p2().x(), 0)));
     QLineF parentYDelta(widget->mapToParent(QPointF(0, delta.p1().y())), widget->mapToParent(QPointF(0, delta.p2().y())));
-
+    
     QRectF newGeometry;
     switch (m_section) {
     case Qt::LeftSection:
         newGeometry = QRectF(
-            m_startGeometry.topLeft() + QPointF(parentXDelta.dx(), parentXDelta.dy()),
-            m_startGeometry.size() - QSizeF(delta.dx(), delta.dy())
+            startGeometry.topLeft() + QPointF(parentXDelta.dx(), parentXDelta.dy()),
+            startGeometry.size() - QSizeF(delta.dx(), delta.dy())
         );
         break;
     case Qt::TopLeftSection:
         newGeometry = QRectF(
-            m_startGeometry.topLeft() + QPointF(parentDelta.dx(), parentDelta.dy()),
-            m_startGeometry.size() - QSizeF(delta.dx(), delta.dy())
+            startGeometry.topLeft() + QPointF(parentDelta.dx(), parentDelta.dy()),
+            startGeometry.size() - QSizeF(delta.dx(), delta.dy())
         );
         break;
     case Qt::TopSection:
         newGeometry = QRectF(
-            m_startGeometry.topLeft() + QPointF(parentYDelta.dx(), parentYDelta.dy()),
-            m_startGeometry.size() - QSizeF(0, delta.dy())
+            startGeometry.topLeft() + QPointF(parentYDelta.dx(), parentYDelta.dy()),
+            startGeometry.size() - QSizeF(0, delta.dy())
         );
         break;
     case Qt::TopRightSection:
         newGeometry = QRectF(
-            m_startGeometry.topLeft() + QPointF(parentYDelta.dx(), parentYDelta.dy()),
-            m_startGeometry.size() - QSizeF(-delta.dx(), delta.dy())
+            startGeometry.topLeft() + QPointF(parentYDelta.dx(), parentYDelta.dy()),
+            startGeometry.size() - QSizeF(-delta.dx(), delta.dy())
         );
         break;
     case Qt::RightSection:
         newGeometry = QRectF(
-            m_startGeometry.topLeft(),
-            m_startGeometry.size() + QSizeF(delta.dx(), 0)
+            startGeometry.topLeft(),
+            startGeometry.size() + QSizeF(delta.dx(), 0)
         );
         break;
     case Qt::BottomRightSection:
         newGeometry = QRectF(
-            m_startGeometry.topLeft(),
-            m_startGeometry.size() + QSizeF(delta.dx(), delta.dy())
+            startGeometry.topLeft(),
+            startGeometry.size() + QSizeF(delta.dx(), delta.dy())
         );
         break;
     case Qt::BottomSection:
         newGeometry = QRectF(
-            m_startGeometry.topLeft(),
-            m_startGeometry.size() + QSizeF(0, delta.dy())
+            startGeometry.topLeft(),
+            startGeometry.size() + QSizeF(0, delta.dy())
         );
         break;
     case Qt::BottomLeftSection:
         newGeometry = QRectF(
-            m_startGeometry.topLeft() + QPointF(parentXDelta.dx(), parentXDelta.dy()),
-            m_startGeometry.size() - QSizeF(delta.dx(), -delta.dy())
+            startGeometry.topLeft() + QPointF(parentXDelta.dx(), parentXDelta.dy()),
+            startGeometry.size() - QSizeF(delta.dx(), -delta.dy())
         );
         break;
     default:
         break;
     }
 
-    /* TODO: we completely ignore size hints. Well, whatever. */
+    /* Adjust for size hints. */
+    QSizeF minSize = widget->effectiveSizeHint(Qt::MinimumSize);
+    QSizeF maxSize = widget->effectiveSizeHint(Qt::MaximumSize);
+    QSizeF size = QSizeF(
+        qBound(minSize.width(), newGeometry.width(), maxSize.width()),
+        qBound(minSize.height(), newGeometry.height(), maxSize.height())
+    );
+    /* We don't handle heightForWidth. */
 
-    newGeometry = newGeometry.normalized();
+    /* Ok, we cheat here a bit. When passing constraint to effectiveSizeHint 
+     * function, either width or height must not be set. If both are set, then 
+     * you get your constraint back and the control never reaches the virtual
+     * sizeHint function. 
+     * 
+     * That is, there is no simple way to implement constant aspect ratio 
+     * resizing using Qt-supplied functionality. So we introduce a separate 
+     * interface for that. */
+    if(m_resizable != NULL)
+        size = m_resizable->constrainedSize(size);
+
+    switch (m_section) {
+    case Qt::LeftSection:
+        newGeometry = QRectF(
+            startGeometry.right() - size.width(), 
+            startGeometry.top(),
+            size.width(),
+            startGeometry.height()
+        );
+        break;
+    case Qt::TopLeftSection:
+        newGeometry = QRectF(
+            startGeometry.right() - size.width(), 
+            startGeometry.bottom() - size.height(),
+            size.width(), 
+            size.height()
+        );
+        break;
+    case Qt::TopSection:
+        newGeometry = QRectF(
+            startGeometry.left(), 
+            startGeometry.bottom() - size.height(),
+            startGeometry.width(), 
+            size.height()
+        );
+        break;
+    case Qt::TopRightSection:
+        newGeometry.setTop(startGeometry.bottom() - size.height());
+        newGeometry.setWidth(size.width());
+        break;
+    case Qt::RightSection:
+        newGeometry.setWidth(size.width());
+        break;
+    case Qt::BottomRightSection:
+        newGeometry.setWidth(size.width());
+        newGeometry.setHeight(size.height());
+        break;
+    case Qt::BottomSection:
+        newGeometry.setHeight(size.height());
+        break;
+    case Qt::BottomLeftSection:
+        newGeometry = QRectF(
+            startGeometry.right() - size.width(), 
+            startGeometry.top(),
+            size.width(), 
+            size.height()
+        );
+        break;
+    default:
+        break;
+    }
 
     widget->setGeometry(newGeometry);
 
@@ -224,4 +299,5 @@ void ResizingInstrument::stopResizing() {
     m_state = INITIAL;
     m_view.clear();
     m_widget.clear();
+    m_resizable = NULL;
 }

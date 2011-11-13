@@ -4,6 +4,8 @@
 #include "instrument.h"
 #include <QWeakPointer>
 
+class ConstrainedResizable;
+
 /**
  * This instrument implements resizing of QGraphicsWidget. 
  * Unlike default resizing algorithm, it allows resizing to non-integer sizes.
@@ -64,6 +66,7 @@ private:
     Qt::WindowFrameSection m_section;
     QWeakPointer<QGraphicsView> m_view;
     QWeakPointer<QGraphicsWidget> m_widget;
+    ConstrainedResizable *m_resizable;
 };
 
 #endif // QN_RESIZING_INSTRUMENT_H

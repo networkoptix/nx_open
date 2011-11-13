@@ -90,8 +90,6 @@ void QnPolygonalShadowItem::paint(QPainter *painter, const QStyleOptionGraphicsI
 void QnPolygonalShadowItem::invalidateShape() {
     m_shapeValid = false;
     m_parametersValid = false;
-
-    qDebug("invalidateShape");
 }
 
 void QnPolygonalShadowItem::ensureParameters() const {

@@ -93,7 +93,6 @@ public:
      * \param viewportEventTypes       Set of viewport event types that this instrument watches.
      * \param itemEventTypes           Set of item event types that this instrument watches.
      * \param parent                   Parent of this Instrument.
-     *                                 Must not be NULL.
      */
     Instrument(const EventTypeSet &sceneEventTypes, const EventTypeSet &viewEventTypes, const EventTypeSet &viewportEventTypes, const EventTypeSet &itemEventTypes, QObject *parent);
 
@@ -558,6 +557,7 @@ protected:
 
 private:
     QList<QGraphicsItem *> items(QGraphicsView *view, const QPoint &viewPos) const;
+    QList<QGraphicsItem *> items(QGraphicsView *view, const QPointF &scenePos) const;
     QList<QGraphicsItem *> items(const QGraphicsSceneMouseEvent *event) const;
 
     template<class Condition>
