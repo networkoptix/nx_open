@@ -44,6 +44,11 @@ protected slots:
     void at_scene_clicked(QGraphicsView *view);
     void at_scene_doubleClicked(QGraphicsView *view);
 
+    
+    void at_viewportGrabbed();
+    void at_viewportUngrabbed();
+
+
 private:
     /** Display synchronizer. */
     QnDisplaySynchronizer *m_synchronizer;

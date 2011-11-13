@@ -10,8 +10,8 @@ public:
         Instrument(viewportEventTypes, viewEventTypes, sceneEventTypes, itemEventTypes, parent)
     {}
 
-    ForwardingInstrument(WatchedType watchedType, const EventTypeSet &eventTypes, QObject *parent):
-        Instrument(watchedType, eventTypes, parent)
+    ForwardingInstrument(WatchedType type, const EventTypeSet &eventTypes, QObject *parent):
+        Instrument(type, eventTypes, parent)
     {}
 
 

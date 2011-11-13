@@ -44,18 +44,18 @@ Instrument::Instrument(const EventTypeSet &viewportEventTypes, const EventTypeSe
     m_watchedEventTypes[ITEM]     = itemEventTypes;
 }
 
-Instrument::Instrument(WatchedType watchedType, const EventTypeSet &eventTypes, QObject *parent):
+Instrument::Instrument(WatchedType type, const EventTypeSet &eventTypes, QObject *parent):
     QObject(parent)
 {
     initialize();
 
-    if(watchedType < 0 || watchedType >= WATCHED_TYPE_COUNT) {
-        qnWarning("Invalid watched type %1", watchedType);
+    if(type < 0 || type >= WATCHED_TYPE_COUNT) {
+        qnWarning("Invalid watched type %1", type);
 
         return;
     }
 
-    m_watchedEventTypes[watchedType] = eventTypes;
+    m_watchedEventTypes[type] = eventTypes;
 }
 
 void Instrument::initialize() {

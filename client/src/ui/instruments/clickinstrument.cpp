@@ -2,20 +2,13 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QApplication>
 
-ClickInstrument::ClickInstrument(WatchFlags flags, QObject *parent): 
+ClickInstrument::ClickInstrument(WatchedType watchedType, QObject *parent): 
     Instrument(
-        makeSet(), 
-        makeSet(), 
-        (flags & WATCH_SCENE) ? 
-            makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease, QEvent::GraphicsSceneMouseDoubleClick) : 
-            makeSet(), 
-        (flags & WATCH_ITEM) ? 
-            makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease, QEvent::GraphicsSceneMouseDoubleClick) : 
-            makeSet(), 
+        watchedType,
+        makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease, QEvent::GraphicsSceneMouseDoubleClick),
         parent
     ),
-    m_itemHandler(this),
-    m_sceneHandler(this)
+    m_handler(this)
 {}
 
 bool detail::ClickInstrumentHandler::mousePressEvent(QGraphicsSceneMouseEvent *event) {
@@ -80,33 +73,33 @@ bool detail::ClickInstrumentHandler::mouseDoubleClickEvent(QGraphicsSceneMouseEv
 }
 
 bool ClickInstrument::mousePressEvent(QGraphicsItem *, QGraphicsSceneMouseEvent *event) {
-    return m_itemHandler.mousePressEvent(event);
+    return m_handler.mousePressEvent(event);
 }
 
 bool ClickInstrument::mouseMoveEvent(QGraphicsItem *, QGraphicsSceneMouseEvent *event) {
-    return m_itemHandler.mouseMoveEvent(event);
+    return m_handler.mouseMoveEvent(event);
 }
 
 bool ClickInstrument::mouseReleaseEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
-    return m_itemHandler.mouseReleaseEvent(item, NULL, event);
+    return m_handler.mouseReleaseEvent(item, NULL, event);
 }
 
 bool ClickInstrument::mouseDoubleClickEvent(QGraphicsItem *, QGraphicsSceneMouseEvent *event) {
-    return m_itemHandler.mouseDoubleClickEvent(event);
+    return m_handler.mouseDoubleClickEvent(event);
 }
 
 bool ClickInstrument::mousePressEvent(QGraphicsScene *, QGraphicsSceneMouseEvent *event) {
-    return m_sceneHandler.mousePressEvent(event);
+    return m_handler.mousePressEvent(event);
 }
 
 bool ClickInstrument::mouseMoveEvent(QGraphicsScene *, QGraphicsSceneMouseEvent *event) {
-    return m_sceneHandler.mouseMoveEvent(event);
+    return m_handler.mouseMoveEvent(event);
 }
 
 bool ClickInstrument::mouseReleaseEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) {
-    return m_sceneHandler.mouseReleaseEvent(NULL, scene, event);
+    return m_handler.mouseReleaseEvent(NULL, scene, event);
 }
 
 bool ClickInstrument::mouseDoubleClickEvent(QGraphicsScene *, QGraphicsSceneMouseEvent *event) {
-    return m_sceneHandler.mouseDoubleClickEvent(event);
+    return m_handler.mouseDoubleClickEvent(event);
 }

@@ -99,11 +99,11 @@ public:
     /**
      * Constructor.
      * 
-     * \param watchedType              Type of the objects that this instrument watches.
+     * \param type                     Type of the objects that this instrument watches.
      * \param eventTypes               Set of event types that this instrument watches.
      * \param parent                   Parent of this instrument.
      */
-    Instrument(WatchedType watchedType, const EventTypeSet &eventTypes, QObject *parent);
+    Instrument(WatchedType type, const EventTypeSet &eventTypes, QObject *parent);
 
     /**
      * Virtual destructor.

@@ -12,7 +12,7 @@
 #include <utils/common/warnings.h>
 
 ArchiveDropInstrument::ArchiveDropInstrument(QnDisplayState *state, QObject *parent):
-    Instrument(makeSet(QEvent::DragEnter, QEvent::DragMove, QEvent::DragLeave, QEvent::Drop), makeSet(), makeSet(), makeSet(), parent),
+    Instrument(VIEWPORT, makeSet(QEvent::DragEnter, QEvent::DragMove, QEvent::DragLeave, QEvent::Drop), parent),
     m_state(state)
 {
     if(state == NULL) {

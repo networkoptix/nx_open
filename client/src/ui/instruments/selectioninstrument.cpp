@@ -10,7 +10,7 @@ namespace {
 } // anonymous namespace
 
 SelectionInstrument::SelectionInstrument(QObject *parent):
-    Instrument(makeSet(), makeSet(), makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseRelease), makeSet(), parent)
+    Instrument(SCENE, makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseRelease), parent)
 {}
 
 bool SelectionInstrument::mousePressEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) {

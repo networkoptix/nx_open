@@ -55,8 +55,8 @@ QnSceneController::QnSceneController(QnDisplaySynchronizer *synchronizer, QObjec
     m_view(synchronizer->view())
 {
     /* Install and configure instruments. */
-    ClickInstrument *itemClickInstrument = new ClickInstrument(ClickInstrument::WATCH_ITEM, this);
-    ClickInstrument *sceneClickInstrument = new ClickInstrument(ClickInstrument::WATCH_SCENE, this);
+    ClickInstrument *itemClickInstrument = new ClickInstrument(Instrument::ITEM, this);
+    ClickInstrument *sceneClickInstrument = new ClickInstrument(Instrument::SCENE, this);
     m_handScrollInstrument = new HandScrollInstrument(this);
     m_wheelZoomInstrument = new WheelZoomInstrument(this);
     m_rubberBandInstrument = new RubberBandInstrument(this);
@@ -74,22 +74,21 @@ QnSceneController::QnSceneController(QnDisplaySynchronizer *synchronizer, QObjec
         QEvent::GraphicsSceneMouseDoubleClick
     );
 
-    QSet<QEvent::Type> noEventTypes = Instrument::makeSet();
-
     /* Item instruments. */
-    m_manager->installInstrument(new StopInstrument(noEventTypes, noEventTypes, noEventTypes, mouseEventTypes, this));
-    m_manager->installInstrument(new ForwardingInstrument(noEventTypes, noEventTypes, noEventTypes, mouseEventTypes, this));
+    m_manager->installInstrument(new StopInstrument(Instrument::ITEM, mouseEventTypes, this));
+    m_manager->installInstrument(new ForwardingInstrument(Instrument::ITEM, mouseEventTypes, this));
     m_manager->installInstrument(itemClickInstrument);
 
     /* Scene instruments. */
-    m_manager->installInstrument(new StopInstrument(noEventTypes, noEventTypes, mouseEventTypes, noEventTypes, this));
-    m_manager->installInstrument(new SelectionInstrument(this));
-    m_manager->installInstrument(new ForwardingInstrument(noEventTypes, noEventTypes, mouseEventTypes, noEventTypes, this));
-
-    /* Viewport instruments. */
-    m_manager->installInstrument(new StopInstrument(Instrument::makeSet(QEvent::Wheel), noEventTypes, noEventTypes, noEventTypes, this));
-    m_manager->installInstrument(m_resizingInstrument);
+    m_manager->installInstrument(new StopInstrument(Instrument::SCENE, mouseEventTypes, this));
     m_manager->installInstrument(sceneClickInstrument);
+    m_manager->installInstrument(new StopAcceptedInstrument(Instrument::SCENE, mouseEventTypes, this));
+    m_manager->installInstrument(new SelectionInstrument(this));
+    m_manager->installInstrument(new ForwardingInstrument(Instrument::SCENE, mouseEventTypes, this));
+
+    /* View/viewport instruments. */
+    m_manager->installInstrument(new StopInstrument(Instrument::VIEWPORT, Instrument::makeSet(QEvent::Wheel), this));
+    m_manager->installInstrument(m_resizingInstrument);
     m_manager->installInstrument(new TransformListenerInstrument(this));
     m_manager->installInstrument(m_wheelZoomInstrument);
     m_manager->installInstrument(m_dragInstrument);
@@ -116,6 +115,10 @@ QnSceneController::QnSceneController(QnDisplaySynchronizer *synchronizer, QObjec
     connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *)),m_dragInstrument,       SLOT(recursiveEnable()));
     connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *)), m_rubberBandInstrument, SLOT(recursiveDisable()));
     connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *)),m_rubberBandInstrument, SLOT(recursiveEnable()));
+
+    connect(m_synchronizer,             SIGNAL(viewportGrabbed()),                                          this, SLOT(at_viewportGrabbed()));
+    connect(m_synchronizer,             SIGNAL(viewportUngrabbed()),                                        this, SLOT(at_viewportUngrabbed()));
+
 }
 
 QnSceneController::~QnSceneController() {
@@ -141,8 +144,10 @@ void QnSceneController::updateGeometryDelta(QnDisplayWidget *widget) {
     widget->entity()->setGeometryDelta(geometryDelta);
 }
 
-void QnSceneController::at_resizingStarted(QGraphicsView *, QGraphicsWidget *) {
+void QnSceneController::at_resizingStarted(QGraphicsView *, QGraphicsWidget *item) {
     qDebug("RESIZING STARTED");
+
+    m_synchronizer->bringToFront(item);
 }
 
 void QnSceneController::at_resizingFinished(QGraphicsView *view, QGraphicsWidget *item) {
@@ -255,6 +260,8 @@ void QnSceneController::at_draggingFinished(QGraphicsView *view, QList<QGraphics
 }
 
 void QnSceneController::at_item_clicked(QGraphicsView *, QGraphicsItem *item) {
+    qDebug("CLICKED");
+
     QnDisplayWidget *widget = dynamic_cast<QnDisplayWidget *>(item);
     if(widget == NULL)
         return;
@@ -264,6 +271,8 @@ void QnSceneController::at_item_clicked(QGraphicsView *, QGraphicsItem *item) {
 }
 
 void QnSceneController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem *item) {
+    qDebug("DOUBLE CLICKED");
+
     QnDisplayWidget *widget = dynamic_cast<QnDisplayWidget *>(item);
     if(widget == NULL)
         return;
@@ -286,11 +295,22 @@ void QnSceneController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem *it
 }
 
 void QnSceneController::at_scene_clicked(QGraphicsView *) {
+    qDebug("SCENE CLICKED");
+
     m_state->setSelectedEntity(NULL);
 }
 
 void QnSceneController::at_scene_doubleClicked(QGraphicsView *) {
+    qDebug("SCENE DOUBLE CLICKED");
+
     m_state->setZoomedEntity(NULL);
     m_synchronizer->fitInView();
 }
 
+void QnSceneController::at_viewportGrabbed() {
+    qDebug("VIEWPORT GRABBED");
+}
+
+void QnSceneController::at_viewportUngrabbed() {
+    qDebug("VIEWPORT UNGRABBED");
+}

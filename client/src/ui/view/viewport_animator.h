@@ -62,14 +62,6 @@ public:
      */
     bool isAnimating() const;
 
-#if 0
-public slots:
-    /** 
-     * Reverses the current animation. Does nothing if no animation is running.
-     */
-    void reverse();
-#endif
-
 signals:
     void animationStarted();
 
@@ -77,6 +69,7 @@ signals:
 
 private slots:
     void at_view_destroyed();
+    void at_animationGroup_stateChanged(QAbstractAnimation::State oldState, QAbstractAnimation::State newState);
 
 private:
     /** Current graphics view. */

@@ -14,7 +14,7 @@ namespace {
 } // anonymous namespace
 
 DragInstrument::DragInstrument(QObject *parent): 
-    Instrument(makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease), makeSet(), makeSet(), makeSet(), parent),
+    Instrument(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease), parent),
     m_state(INITIAL)
 {}
 

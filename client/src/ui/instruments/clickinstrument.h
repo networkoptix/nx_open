@@ -29,14 +29,12 @@ namespace detail {
 class ClickInstrument: public Instrument {
     Q_OBJECT;
 public:
-    enum WatchFlag {
-        WATCH_SCENE = 0x1, /** Watch scene clicks. */
-        WATCH_ITEM = 0x2   /** Watch item clicks. */
-    };
-
-    Q_DECLARE_FLAGS(WatchFlags, WatchFlag);
-
-    ClickInstrument(WatchFlags flags, QObject *parent = NULL);
+    /**
+     * \param watchedType               Type of click events that this instrument will watch.
+     *                                  Note that only SCENE and ITEM types are supported.
+     * \param parent                    Parent object for this instrument.
+     */
+    ClickInstrument(WatchedType watchedType, QObject *parent = NULL);
 
 signals:
     void clicked(QGraphicsView *view, QGraphicsItem *item);
@@ -61,9 +59,7 @@ protected:
 private:
     friend class detail::ClickInstrumentHandler;
 
-    detail::ClickInstrumentHandler m_itemHandler, m_sceneHandler;
+    detail::ClickInstrumentHandler m_handler;
 };
-
-Q_DECLARE_OPERATORS_FOR_FLAGS(ClickInstrument::WatchFlags);
 
 #endif // QN_CLICK_INSTRUMENT_H

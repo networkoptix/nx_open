@@ -6,7 +6,7 @@
 #include <QApplication>
 
 HandScrollInstrument::HandScrollInstrument(QObject *parent):
-    Instrument(makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease), makeSet(), makeSet(), makeSet(), parent)
+    Instrument(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease), parent)
 {}
 
 void HandScrollInstrument::installedNotify() {

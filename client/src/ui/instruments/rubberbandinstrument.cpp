@@ -186,7 +186,7 @@ private:
 };
 
 RubberBandInstrument::RubberBandInstrument(QObject *parent):
-    Instrument(makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), makeSet(), makeSet(), makeSet(), parent)
+    Instrument(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent)
 {}
 
 RubberBandInstrument::~RubberBandInstrument() {

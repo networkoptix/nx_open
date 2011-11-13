@@ -65,11 +65,19 @@ QnViewportAnimator::QnViewportAnimator(QGraphicsView *view, QObject *parent):
     m_animationGroup->addAnimation(m_scaleAnimation);
     m_animationGroup->addAnimation(m_positionAnimation);
     
-    connect(m_animationGroup, SIGNAL(finished()), this, SIGNAL(animationFinished()));
+    connect(m_animationGroup, SIGNAL(stateChanged(QAbstractAnimation::State, QAbstractAnimation::State)), this, SLOT(at_animationGroup_stateChanged(QAbstractAnimation::State, QAbstractAnimation::State)));
 }
 
 void QnViewportAnimator::at_view_destroyed() {
     m_view = NULL;
+}
+
+void QnViewportAnimator::at_animationGroup_stateChanged(QAbstractAnimation::State newState, QAbstractAnimation::State oldState) {
+    if(newState == QAbstractAnimation::Stopped) {
+        emit animationFinished();
+    } else if(oldState == QAbstractAnimation::Stopped) {
+        emit animationStarted();
+    }
 }
 
 void QnViewportAnimator::moveTo(const QRectF &rect, int timeLimitMsecs) {

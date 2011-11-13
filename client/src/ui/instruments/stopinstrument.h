@@ -10,8 +10,8 @@ public:
         Instrument(viewportEventTypes, viewEventTypes, sceneEventTypes, itemEventTypes, parent)
     {}
 
-    StopInstrument(WatchedType watchedType, const EventTypeSet &eventTypes, QObject *parent = NULL):
-        Instrument(watchedType, eventTypes, parent)
+    StopInstrument(WatchedType type, const EventTypeSet &eventTypes, QObject *parent = NULL):
+        Instrument(type, eventTypes, parent)
     {}
 
 private:
