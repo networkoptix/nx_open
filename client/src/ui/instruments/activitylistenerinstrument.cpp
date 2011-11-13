@@ -3,9 +3,9 @@
 
 ActivityListenerInstrument::ActivityListenerInstrument(int activityTimeoutMSec, QObject *parent):
     Instrument(
-        makeSet(), 
-        makeSet(QEvent::KeyPress, QEvent::KeyRelease), 
         makeSet(QEvent::Wheel, QEvent::MouseButtonPress, QEvent::MouseButtonDblClick, QEvent::MouseMove, QEvent::MouseButtonRelease), 
+        makeSet(QEvent::KeyPress, QEvent::KeyRelease), 
+        makeSet(), 
         makeSet(), 
         parent
     ),

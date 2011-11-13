@@ -73,9 +73,9 @@ public:
      * Enumeration for different types of objects that can be watched by an instrument.
      */
     enum WatchedType {
-        SCENE,
-        VIEW,
         VIEWPORT,
+        VIEW,
+        SCENE,
         ITEM,
         WATCHED_TYPE_COUNT
     };
@@ -88,13 +88,22 @@ public:
      * When installed, instrument will watch the given set of event types for 
      * each watched type. 
      * 
-     * \param sceneEventTypes          Set of scene event types that this instrument watches.
-     * \param viewEventTypes           Set of view event types that this instrument watches.
      * \param viewportEventTypes       Set of viewport event types that this instrument watches.
+     * \param viewEventTypes           Set of view event types that this instrument watches.
+     * \param sceneEventTypes          Set of scene event types that this instrument watches.
      * \param itemEventTypes           Set of item event types that this instrument watches.
-     * \param parent                   Parent of this Instrument.
+     * \param parent                   Parent of this instrument.
      */
-    Instrument(const EventTypeSet &sceneEventTypes, const EventTypeSet &viewEventTypes, const EventTypeSet &viewportEventTypes, const EventTypeSet &itemEventTypes, QObject *parent);
+    Instrument(const EventTypeSet &viewportEventTypes, const EventTypeSet &viewEventTypes, const EventTypeSet &sceneEventTypes, const EventTypeSet &itemEventTypes, QObject *parent);
+
+    /**
+     * Constructor.
+     * 
+     * \param watchedType              Type of the objects that this instrument watches.
+     * \param eventTypes               Set of event types that this instrument watches.
+     * \param parent                   Parent of this instrument.
+     */
+    Instrument(WatchedType watchedType, const EventTypeSet &eventTypes, QObject *parent);
 
     /**
      * Virtual destructor.
@@ -556,6 +565,8 @@ protected:
     virtual bool wheelEvent(QGraphicsItem *, QGraphicsSceneWheelEvent *) { return false; }
 
 private:
+    void initialize();
+
     QList<QGraphicsItem *> items(QGraphicsView *view, const QPoint &viewPos) const;
     QList<QGraphicsItem *> items(QGraphicsView *view, const QPointF &scenePos) const;
     QList<QGraphicsItem *> items(const QGraphicsSceneMouseEvent *event) const;

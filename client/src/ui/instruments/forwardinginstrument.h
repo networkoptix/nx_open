@@ -6,9 +6,14 @@
 class ForwardingInstrument: public Instrument {
     Q_OBJECT;
 public:
-    ForwardingInstrument(const EventTypeSet &sceneEventTypes, const EventTypeSet &viewEventTypes, const EventTypeSet &viewportEventTypes, const EventTypeSet &itemEventTypes, QObject *parent):
-        Instrument(sceneEventTypes, viewEventTypes, viewportEventTypes, itemEventTypes, parent)
+    ForwardingInstrument(const EventTypeSet &viewportEventTypes, const EventTypeSet &viewEventTypes, const EventTypeSet &sceneEventTypes, const EventTypeSet &itemEventTypes, QObject *parent):
+        Instrument(viewportEventTypes, viewEventTypes, sceneEventTypes, itemEventTypes, parent)
     {}
+
+    ForwardingInstrument(WatchedType watchedType, const EventTypeSet &eventTypes, QObject *parent):
+        Instrument(watchedType, eventTypes, parent)
+    {}
+
 
 protected:
     virtual bool event(QGraphicsScene *, QEvent *) override;

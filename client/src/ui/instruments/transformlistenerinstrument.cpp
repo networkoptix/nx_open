@@ -1,7 +1,7 @@
 #include "transformlistenerinstrument.h"
 
 TransformListenerInstrument::TransformListenerInstrument(QObject *parent): 
-    Instrument(makeSet(), makeSet(), makeSet(QEvent::Paint), makeSet(), parent)
+    Instrument(makeSet(QEvent::Paint), makeSet(), makeSet(), makeSet(), parent)
 {}
 
 bool TransformListenerInstrument::paintEvent(QWidget *viewport, QPaintEvent *) {

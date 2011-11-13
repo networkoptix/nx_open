@@ -4,7 +4,7 @@
 #include <QGraphicsView>
 
 WheelZoomInstrument::WheelZoomInstrument(QObject *parent): 
-    Instrument(makeSet(), makeSet(), makeSet(QEvent::Wheel), makeSet(), parent) 
+    Instrument(makeSet(QEvent::Wheel), makeSet(), makeSet(), makeSet(), parent) 
 {}
 
 bool WheelZoomInstrument::wheelEvent(QWidget *viewport, QWheelEvent *event) {

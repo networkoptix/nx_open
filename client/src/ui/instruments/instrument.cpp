@@ -33,16 +33,35 @@
 #include "instrumentmanager.h"
 
 
-Instrument::Instrument(const EventTypeSet &sceneEventTypes, const EventTypeSet &viewEventTypes, const EventTypeSet &viewportEventTypes, const EventTypeSet &itemEventTypes, QObject *parent):
-    QObject(parent),
-    m_manager(NULL),
-    m_scene(NULL),
-    m_disabledCounter(0)
+Instrument::Instrument(const EventTypeSet &viewportEventTypes, const EventTypeSet &viewEventTypes, const EventTypeSet &sceneEventTypes, const EventTypeSet &itemEventTypes, QObject *parent):
+    QObject(parent)
 {
-    m_watchedEventTypes[SCENE]    = sceneEventTypes;
-    m_watchedEventTypes[VIEW]     = viewEventTypes;
+    initialize();
+
     m_watchedEventTypes[VIEWPORT] = viewportEventTypes;
+    m_watchedEventTypes[VIEW]     = viewEventTypes;
+    m_watchedEventTypes[SCENE]    = sceneEventTypes;
     m_watchedEventTypes[ITEM]     = itemEventTypes;
+}
+
+Instrument::Instrument(WatchedType watchedType, const EventTypeSet &eventTypes, QObject *parent):
+    QObject(parent)
+{
+    initialize();
+
+    if(watchedType < 0 || watchedType >= WATCHED_TYPE_COUNT) {
+        qnWarning("Invalid watched type %1", watchedType);
+
+        return;
+    }
+
+    m_watchedEventTypes[watchedType] = eventTypes;
+}
+
+void Instrument::initialize() {
+    m_manager = NULL;
+    m_scene = NULL;
+    m_disabledCounter = 0;
 }
 
 Instrument::~Instrument() {
@@ -50,7 +69,7 @@ Instrument::~Instrument() {
 }
 
 bool Instrument::watches(WatchedType type) const {
-    if (type < 0 || type > WATCHED_TYPE_COUNT) {
+    if (type < 0 || type >= WATCHED_TYPE_COUNT) {
         qnWarning("Invalid watched type %1", type);
         return false;
     }
@@ -63,7 +82,7 @@ namespace {
 }
 
 const Instrument::EventTypeSet &Instrument::watchedEventTypes(WatchedType type) const {
-    if (type < 0 || type > WATCHED_TYPE_COUNT) {
+    if (type < 0 || type >= WATCHED_TYPE_COUNT) {
         qnWarning("Invalid watched type %1", type);
         
         return *globalEmptyEventTypeSet();

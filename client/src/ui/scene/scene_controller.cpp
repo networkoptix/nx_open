@@ -82,12 +82,12 @@ QnSceneController::QnSceneController(QnDisplaySynchronizer *synchronizer, QObjec
     m_manager->installInstrument(itemClickInstrument);
 
     /* Scene instruments. */
-    m_manager->installInstrument(new StopInstrument(mouseEventTypes, noEventTypes, noEventTypes, noEventTypes, this));
+    m_manager->installInstrument(new StopInstrument(noEventTypes, noEventTypes, mouseEventTypes, noEventTypes, this));
     m_manager->installInstrument(new SelectionInstrument(this));
-    m_manager->installInstrument(new ForwardingInstrument(mouseEventTypes, noEventTypes, noEventTypes, noEventTypes, this));
+    m_manager->installInstrument(new ForwardingInstrument(noEventTypes, noEventTypes, mouseEventTypes, noEventTypes, this));
 
     /* Viewport instruments. */
-    m_manager->installInstrument(new StopInstrument(noEventTypes, noEventTypes, Instrument::makeSet(QEvent::Wheel), noEventTypes, this));
+    m_manager->installInstrument(new StopInstrument(Instrument::makeSet(QEvent::Wheel), noEventTypes, noEventTypes, noEventTypes, this));
     m_manager->installInstrument(m_resizingInstrument);
     m_manager->installInstrument(sceneClickInstrument);
     m_manager->installInstrument(new TransformListenerInstrument(this));

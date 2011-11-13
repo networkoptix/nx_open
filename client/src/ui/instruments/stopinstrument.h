@@ -6,8 +6,12 @@
 class StopInstrument: public Instrument {
     Q_OBJECT;
 public:
-    StopInstrument(const EventTypeSet &sceneEventTypes, const EventTypeSet &viewEventTypes, const EventTypeSet &viewportEventTypes, const EventTypeSet &itemEventTypes, QObject *parent):
-        Instrument(sceneEventTypes, viewEventTypes, viewportEventTypes, itemEventTypes, parent)
+    StopInstrument(const EventTypeSet &viewportEventTypes, const EventTypeSet &viewEventTypes, const EventTypeSet &sceneEventTypes, const EventTypeSet &itemEventTypes, QObject *parent):
+        Instrument(viewportEventTypes, viewEventTypes, sceneEventTypes, itemEventTypes, parent)
+    {}
+
+    StopInstrument(WatchedType watchedType, const EventTypeSet &eventTypes, QObject *parent = NULL):
+        Instrument(watchedType, eventTypes, parent)
     {}
 
 private:

@@ -359,7 +359,7 @@ public:
 
 
 BoundingInstrument::BoundingInstrument(QObject *parent):
-    Instrument(makeSet(), makeSet(), makeSet(QEvent::Paint), makeSet(), parent),
+    Instrument(makeSet(QEvent::Paint), makeSet(), makeSet(), makeSet(), parent),
     m_timer(new AnimationTimer(this)),
     m_lastTickTime(0)
 {

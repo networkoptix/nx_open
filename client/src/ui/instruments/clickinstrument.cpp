@@ -4,11 +4,11 @@
 
 ClickInstrument::ClickInstrument(WatchFlags flags, QObject *parent): 
     Instrument(
+        makeSet(), 
+        makeSet(), 
         (flags & WATCH_SCENE) ? 
             makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease, QEvent::GraphicsSceneMouseDoubleClick) : 
             makeSet(), 
-        makeSet(), 
-        makeSet(), 
         (flags & WATCH_ITEM) ? 
             makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease, QEvent::GraphicsSceneMouseDoubleClick) : 
             makeSet(), 
