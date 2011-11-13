@@ -32,8 +32,8 @@ protected:
     void updateGeometryDelta(QnDisplayWidget *widget);
 
 protected slots:
-    void at_widget_resizingStarted();
-    void at_widget_resizingFinished();
+    void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget);
+    void at_resizingFinished(QGraphicsView *view, QGraphicsWidget *widget);
 
     void at_draggingStarted(QGraphicsView *view, QList<QGraphicsItem *> items);
     void at_draggingFinished(QGraphicsView *view, QList<QGraphicsItem *> items);
@@ -43,10 +43,6 @@ protected slots:
 
     void at_scene_clicked(QGraphicsView *view);
     void at_scene_doubleClicked(QGraphicsView *view);
-
-    // TODO: remove
-    void at_widgetAdded(QnDisplayWidget *widget);
-   
 
 private:
     /** Display synchronizer. */

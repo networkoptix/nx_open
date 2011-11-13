@@ -184,8 +184,8 @@ void AnimatedWidget::setInteractive(bool interactive)
     else
         setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
     setFlag(ItemIsMovable, interactive);
-    setExtraFlag(ItemIsDraggable, interactive);
-    setExtraFlag(ItemIsResizable, interactive);
+    //setExtraFlag(ItemIsDraggable, interactive);
+    //setExtraFlag(ItemIsResizable, interactive);
 }
 
 bool AnimatedWidget::isAnimationsEnabled() const

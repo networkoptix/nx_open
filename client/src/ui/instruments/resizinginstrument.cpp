@@ -63,9 +63,6 @@ bool ResizingInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
 
     /* Find the item to resize. */
     QGraphicsWidget *widget = static_cast<QGraphicsWidget *>(item(view, event->pos(), ItemIsWidget()));
-
-    qDebug("WIDGET = %x", widget);
-
     if (widget == NULL)
         return false;
 

@@ -91,9 +91,6 @@ public slots:
 signals:
     void viewportGrabbed();
     void viewportUngrabbed();
-    
-    // TODO: remove
-    void widgetAdded(QnDisplayWidget *widget);
 
 protected:
     virtual void tick(int currentTime) override;
@@ -111,17 +108,17 @@ protected:
 protected slots:
     void synchronizeSceneBounds();
 
-    void at_model_entityAdded(QnUiLayoutItem *entity);
-    void at_model_entityAboutToBeRemoved(QnUiLayoutItem *entity);
+    void at_model_itemAdded(QnUiLayoutItem *entity);
+    void at_model_itemAboutToBeRemoved(QnUiLayoutItem *entity);
     
     void at_state_modeChanged();
     void at_state_selectedEntityChanged(QnUiLayoutItem *oldSelectedEntity, QnUiLayoutItem *newSelectedEntity);
     void at_state_zoomedEntityChanged(QnUiLayoutItem *oldZoomedEntity, QnUiLayoutItem *newZoomedEntity);
 
-    void at_entity_geometryChanged();
-    void at_entity_geometryDeltaChanged();
-    void at_entity_rotationChanged();
-    void at_entity_flagsChanged();
+    void at_item_geometryChanged();
+    void at_item_geometryDeltaChanged();
+    void at_item_rotationChanged();
+    void at_item_flagsChanged();
 
     void at_viewport_transformationChanged();
 

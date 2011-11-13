@@ -148,12 +148,12 @@ QnDisplaySynchronizer::QnDisplaySynchronizer(QnDisplayState *state, QGraphicsSce
 
     /* Subscribe to state changes and create items. */
     connect(m_state,          SIGNAL(modeChanged()),                                                this, SLOT(at_state_modeChanged()));
-    connect(m_state,          SIGNAL(selectedEntityChanged(QnUiLayoutItem *, QnUiLayoutItem *)),  this, SLOT(at_state_selectedEntityChanged(QnUiLayoutItem *, QnUiLayoutItem *)));
-    connect(m_state,          SIGNAL(zoomedEntityChanged(QnUiLayoutItem *, QnUiLayoutItem *)),    this, SLOT(at_state_zoomedEntityChanged(QnUiLayoutItem *, QnUiLayoutItem *)));
-    connect(m_state->model(), SIGNAL(itemAdded(QnUiLayoutItem *)),                               this, SLOT(at_model_entityAdded(QnUiLayoutItem *)));
-    connect(m_state->model(), SIGNAL(itemAboutToBeRemoved(QnUiLayoutItem *)),                    this, SLOT(at_model_entityAboutToBeRemoved(QnUiLayoutItem *)));
+    connect(m_state,          SIGNAL(selectedEntityChanged(QnUiLayoutItem *, QnUiLayoutItem *)),    this, SLOT(at_state_selectedEntityChanged(QnUiLayoutItem *, QnUiLayoutItem *)));
+    connect(m_state,          SIGNAL(zoomedEntityChanged(QnUiLayoutItem *, QnUiLayoutItem *)),      this, SLOT(at_state_zoomedEntityChanged(QnUiLayoutItem *, QnUiLayoutItem *)));
+    connect(m_state->model(), SIGNAL(itemAdded(QnUiLayoutItem *)),                                  this, SLOT(at_model_itemAdded(QnUiLayoutItem *)));
+    connect(m_state->model(), SIGNAL(itemAboutToBeRemoved(QnUiLayoutItem *)),                       this, SLOT(at_model_itemAboutToBeRemoved(QnUiLayoutItem *)));
     foreach(QnUiLayoutItem *entity, m_state->model()->items())
-        at_model_entityAdded(entity);
+        at_model_itemAdded(entity);
 
     /* Configure viewport updates. */
     m_updateTimer = new AnimationTimer(this);
@@ -169,7 +169,7 @@ QnDisplaySynchronizer::QnDisplaySynchronizer(QnDisplayState *state, QGraphicsSce
 
 QnDisplaySynchronizer::~QnDisplaySynchronizer() {
     foreach(QnUiLayoutItem *entity, m_state->model()->items())
-        at_model_entityAboutToBeRemoved(entity);
+        at_model_itemAboutToBeRemoved(entity);
 }
 
 
@@ -398,7 +398,7 @@ void QnDisplaySynchronizer::tick(int /*currentTime*/) {
     m_view->viewport()->update();
 }
 
-void QnDisplaySynchronizer::at_model_entityAdded(QnUiLayoutItem *entity) {
+void QnDisplaySynchronizer::at_model_itemAdded(QnUiLayoutItem *entity) {
     QnDisplayWidget *widget = new QnDisplayWidget(entity);
     m_scene->addItem(widget);
 
@@ -408,7 +408,6 @@ void QnDisplaySynchronizer::at_model_entityAdded(QnUiLayoutItem *entity) {
 
     widget->setFlag(QGraphicsItem::ItemIsMovable, true);
     widget->setWindowFlags(Qt::Window);
-    widget->setExtraFlag(GraphicsWidget::ItemIsResizable);
 
     /* Unsetting this flag is VERY important. If it is set, graphics scene
      * will mess with widget's z value and bring it to front every time 
@@ -418,21 +417,19 @@ void QnDisplaySynchronizer::at_model_entityAdded(QnUiLayoutItem *entity) {
      * because the latter automatically sets the former. */
     widget->setFlag(QGraphicsItem::ItemIsPanel, false);
 
-    connect(entity, SIGNAL(geometryChanged(const QRect &, const QRect &)),          this, SLOT(at_entity_geometryChanged()));
-    connect(entity, SIGNAL(geometryDeltaChanged(const QRectF &, const QRectF &)),   this, SLOT(at_entity_geometryDeltaChanged()));
-    connect(entity, SIGNAL(rotationChanged(qreal, qreal)),                          this, SLOT(at_entity_rotationChanged()));
-    connect(entity, SIGNAL(flagsChanged(EntityFlags, EntityFlags)),                 this, SLOT(at_entity_flagsChanged()));
+    connect(entity, SIGNAL(geometryChanged(const QRect &, const QRect &)),          this, SLOT(at_item_geometryChanged()));
+    connect(entity, SIGNAL(geometryDeltaChanged(const QRectF &, const QRectF &)),   this, SLOT(at_item_geometryDeltaChanged()));
+    connect(entity, SIGNAL(rotationChanged(qreal, qreal)),                          this, SLOT(at_item_rotationChanged()));
+    connect(entity, SIGNAL(flagsChanged(ItemFlags, ItemFlags)),                     this, SLOT(at_item_flagsChanged()));
 
     m_widgetByEntity.insert(entity, widget);
 
     synchronize(widget, false);
     synchronizeSceneBounds();
     bringToFront(widget);
-
-    emit widgetAdded(widget);
 }
 
-void QnDisplaySynchronizer::at_model_entityAboutToBeRemoved(QnUiLayoutItem *entity) {
+void QnDisplaySynchronizer::at_model_itemAboutToBeRemoved(QnUiLayoutItem *entity) {
     disconnect(entity, NULL, this, NULL);
 
     QnDisplayWidget *widget = m_widgetByEntity[entity];
@@ -489,20 +486,20 @@ void QnDisplaySynchronizer::at_viewport_transformationChanged() {
     }
 }
 
-void QnDisplaySynchronizer::at_entity_geometryChanged() {
+void QnDisplaySynchronizer::at_item_geometryChanged() {
     synchronizeGeometry(static_cast<QnUiLayoutItem *>(sender()), true);
     synchronizeSceneBounds();
 }
 
-void QnDisplaySynchronizer::at_entity_geometryDeltaChanged() {
+void QnDisplaySynchronizer::at_item_geometryDeltaChanged() {
     synchronizeGeometry(static_cast<QnUiLayoutItem *>(sender()), true);
 }
 
-void QnDisplaySynchronizer::at_entity_rotationChanged() {
+void QnDisplaySynchronizer::at_item_rotationChanged() {
     synchronizeGeometry(static_cast<QnUiLayoutItem *>(sender()), true);
 }
 
-void QnDisplaySynchronizer::at_entity_flagsChanged() {
+void QnDisplaySynchronizer::at_item_flagsChanged() {
     synchronizeLayer(static_cast<QnUiLayoutItem *>(sender()));
 }
 

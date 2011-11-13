@@ -24,6 +24,8 @@ QnCurtainAnimator::QnCurtainAnimator(QnCurtainItem *curtain, int durationMSec, Q
         m_durationMSec = 1; /* Instant color change. */
     }
 
+    setProperty("frameColor", QColor());
+
     connect(m_curtain, SIGNAL(destroyed()), this, SLOT(at_curtain_destroyed()));
     m_curtain->hide();
 
