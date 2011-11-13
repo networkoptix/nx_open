@@ -12,6 +12,7 @@ public:
     virtual ~QnRtspConnectionProcessor();
     qint64 getRtspTime();
     void setRtspTime(qint64 time);
+    void switchToLive();
 protected:
     virtual void run();
 private:

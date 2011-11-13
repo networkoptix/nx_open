@@ -551,7 +551,7 @@ TimeSlider::TimeSlider(QGraphicsItem *parent) :
     m_slider = new MySlider(this);
     m_slider->setOrientation(Qt::Horizontal);
     m_slider->setContentsMargins(0, 4, 0, 4);
-    m_slider->setMaximum(1000);
+    m_slider->setMaximum(10000);
     m_slider->installEventFilter(this);
 
     m_slider->setStyle(sliderProxyStyle());

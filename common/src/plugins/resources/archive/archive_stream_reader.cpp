@@ -437,18 +437,27 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextPacket()
 	{
 		result = m_delegate->getNextData();
 
-		if (result == 0 && m_cycleMode && !m_needStop)
+		if (result == 0 && !m_needStop)
 		{
-            if (m_lengthMksec < 1000 * 1000 * 5)
-                msleep(200); // prevent to fast file walk for very short files.
-            m_delegate->close();
-            m_eof = true;
+            if (m_cycleMode)
+            {
+                if (m_lengthMksec < 1000 * 1000 * 5)
+                    msleep(200); // prevent to fast file walk for very short files.
+                m_delegate->close();
+                m_eof = true;
 
-            if (!init())
-                return QnAbstractMediaDataPtr();
-            result = m_delegate->getNextData();
-            if (result == 0)
-                return result;
+                if (!init())
+                    return QnAbstractMediaDataPtr();
+                result = m_delegate->getNextData();
+                if (result == 0)
+                    return result;
+            }
+            else if (!m_eof)
+            {
+                QnAbstractMediaDataPtr rez(new QnEmptyMediaData());
+                return rez;
+                m_eof = true;
+            }
         }
 		break;
 	}
