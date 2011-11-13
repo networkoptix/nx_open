@@ -67,7 +67,7 @@ QnSceneController::QnSceneController(QnDisplaySynchronizer *synchronizer, QObjec
     
     m_view->viewport()->setAcceptDrops(true);
 
-    QSet<QEvent::Type> sceneEventTypes = Instrument::makeSet(
+    QSet<QEvent::Type> mouseEventTypes = Instrument::makeSet(
         QEvent::GraphicsSceneMousePress,
         QEvent::GraphicsSceneMouseMove,
         QEvent::GraphicsSceneMouseRelease,
@@ -76,19 +76,26 @@ QnSceneController::QnSceneController(QnDisplaySynchronizer *synchronizer, QObjec
 
     QSet<QEvent::Type> noEventTypes = Instrument::makeSet();
 
-    m_manager->installInstrument(m_resizingInstrument);
-    m_manager->installInstrument(new StopInstrument(sceneEventTypes, noEventTypes, Instrument::makeSet(QEvent::Wheel), noEventTypes, this));
-    m_manager->installInstrument(sceneClickInstrument);
-    m_manager->installInstrument(new StopAcceptedInstrument(sceneEventTypes, noEventTypes, noEventTypes, noEventTypes, this));
+    /* Item instruments. */
+    m_manager->installInstrument(new StopInstrument(noEventTypes, noEventTypes, noEventTypes, mouseEventTypes, this));
+    m_manager->installInstrument(new ForwardingInstrument(noEventTypes, noEventTypes, noEventTypes, mouseEventTypes, this));
+    m_manager->installInstrument(itemClickInstrument);
+
+    /* Scene instruments. */
+    m_manager->installInstrument(new StopInstrument(mouseEventTypes, noEventTypes, noEventTypes, noEventTypes, this));
     m_manager->installInstrument(new SelectionInstrument(this));
-    m_manager->installInstrument(new ForwardingInstrument(sceneEventTypes, noEventTypes, noEventTypes, noEventTypes, this));
+    m_manager->installInstrument(new ForwardingInstrument(mouseEventTypes, noEventTypes, noEventTypes, noEventTypes, this));
+
+    /* Viewport instruments. */
+    m_manager->installInstrument(new StopInstrument(noEventTypes, noEventTypes, Instrument::makeSet(QEvent::Wheel), noEventTypes, this));
+    m_manager->installInstrument(m_resizingInstrument);
+    m_manager->installInstrument(sceneClickInstrument);
     m_manager->installInstrument(new TransformListenerInstrument(this));
     m_manager->installInstrument(m_wheelZoomInstrument);
     m_manager->installInstrument(m_dragInstrument);
     m_manager->installInstrument(m_rubberBandInstrument);
     m_manager->installInstrument(m_handScrollInstrument);
     m_manager->installInstrument(new ContextMenuInstrument(this));
-    m_manager->installInstrument(itemClickInstrument);
     m_manager->installInstrument(new ArchiveDropInstrument(m_state, this));
 
     connect(itemClickInstrument,        SIGNAL(clicked(QGraphicsView *, QGraphicsItem *)),                  this,                   SLOT(at_item_clicked(QGraphicsView *, QGraphicsItem *)));

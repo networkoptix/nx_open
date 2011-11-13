@@ -405,8 +405,9 @@ void QnDisplaySynchronizer::at_model_itemAdded(QnUiLayoutItem *entity) {
     widget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true); /* Optimization. */
     widget->setFlag(QGraphicsItem::ItemIsSelectable, true);
     widget->setFlag(QGraphicsItem::ItemIsFocusable, true);
-
     widget->setFlag(QGraphicsItem::ItemIsMovable, true);
+
+    widget->setFocusPolicy(Qt::StrongFocus);
     widget->setWindowFlags(Qt::Window);
 
     /* Unsetting this flag is VERY important. If it is set, graphics scene

@@ -61,10 +61,6 @@ QnDisplayWidget::QnDisplayWidget(QnUiLayoutItem *entity, QGraphicsItem *parent):
     connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_sourceSizeChanged(const QSize &)));
     for(int i = 0; i < m_channelCount; i++)
         m_entity->camDisplay()->addVideoChannel(i, m_renderer, true);
-
-    QSizePolicy sp;
-    sp.setHeightForWidth(true);
-    setSizePolicy(sp);
 }
 
 QnDisplayWidget::~QnDisplayWidget() {
@@ -253,6 +249,12 @@ void QnDisplayWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * 
         }
     }
     painter->endNativePainting();
+
+
+    if(isSelected()) {
+        painter->setPen(QPen(Qt::green, 0));
+        painter->drawRect(rect());
+    }
 }
 
 void QnDisplayWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override {
