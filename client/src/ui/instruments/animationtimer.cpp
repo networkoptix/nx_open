@@ -20,7 +20,7 @@ AnimationTimer::~AnimationTimer() {
 }
 
 void AnimationTimer::setListener(AnimationTimerListener *listener) {
-    if(m_listener->m_timer != NULL) {
+    if(listener != NULL && listener->m_timer != NULL) {
         qnWarning("Given listener is already assigned to a timer.");
         return;
     }

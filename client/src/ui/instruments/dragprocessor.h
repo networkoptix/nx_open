@@ -56,6 +56,10 @@ public:
 
     virtual ~DragProcessor();
 
+    State state() const {
+        return m_state;
+    }
+
     Flags flags() const {
         return m_flags;
     }
@@ -76,6 +80,30 @@ public:
     void mouseMoveEvent(QWidget *viewport, QMouseEvent *event);
     void mouseReleaseEvent(QWidget *viewport, QMouseEvent *event);
     void paintEvent(QWidget *viewport, QPaintEvent *event);
+
+    const QPoint &mousePressPos() const {
+        return m_mousePressPos;
+    }
+
+    const QPoint &lastMousePos() const {
+        return m_lastMousePos;
+    }
+
+    const QPoint &mousePos() const {
+        return m_mousePos;
+    }
+
+    const QPointF &mousePressScenePos() const {
+        return m_mousePressScenePos;
+    }
+
+    const QPointF &lastMouseScenePos() const {
+        return m_lastMouseScenePos;
+    }
+
+    const QPointF &mouseScenePos() const {
+        return m_mouseScenePos;
+    }
 
 protected:
     virtual void timerEvent(QTimerEvent *event) override;

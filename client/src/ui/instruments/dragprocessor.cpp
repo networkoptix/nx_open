@@ -142,7 +142,7 @@ void DragProcessor::drag(QGraphicsView *view, const QPoint &pos) {
 }
 
 void DragProcessor::setHandler(DragProcessHandler *handler) {
-    if(handler->m_processor != NULL) {
+    if(handler != NULL && handler->m_processor != NULL) {
         qnWarning("Given listener is already assigned to a processor.");
         return;
     }
