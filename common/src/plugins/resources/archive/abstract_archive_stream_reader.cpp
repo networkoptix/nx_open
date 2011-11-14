@@ -163,3 +163,8 @@ void QnAbstractArchiveReader::pleaseStop()
     if (m_delegate)
         m_delegate->beforeClose();
 }
+
+bool QnAbstractArchiveReader::open()
+{
+    return m_delegate ? m_delegate->open(m_resource) : false;
+}

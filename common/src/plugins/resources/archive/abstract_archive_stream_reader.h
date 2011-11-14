@@ -20,6 +20,9 @@ public:
 	        bool isSingleShotMode() const;
 
 
+    // Manual open. Open will be called automatically on first data access
+    bool open();
+
 	virtual qint64 currentTime() const = 0;
 	bool isSkippingFrames() const;
 

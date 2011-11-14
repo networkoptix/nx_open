@@ -407,6 +407,7 @@ int QnRtspConnectionProcessor::composeDescribe()
 
     if (d->archiveDP) {
         QString range = "npt=";
+        d->archiveDP->open();
         range += QString::number(d->archiveDP->startTime());
         range += "-";
         if (QnRecordingManager::instance()->isCameraRecoring(d->mediaRes))
