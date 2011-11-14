@@ -77,7 +77,6 @@ int QnAppServerConnection::addCamera(const QnNetworkResource& cameraIn, const Qn
     xsd::api::cameras::Camera camera(cameraIn.getId().toString().toStdString(),
                                      cameraIn.getName().toStdString(),
                                      cameraIn.getTypeId().toString().toStdString(),
-                                     "1",
                                      cameraIn.getUrl().toStdString(),
                                      cameraIn.getMAC().toString().toStdString(),
                                      cameraIn.getAuth().user().toStdString(),
