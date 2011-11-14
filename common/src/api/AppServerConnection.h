@@ -29,11 +29,12 @@ public:
 
     bool isConnected() const;
 
+    QString getLastError() const;
+
 private:
     QSharedPointer<AppSessionManager> m_sessionManager;
     QnResourceFactory& m_resourceFactory;
     QnVideoServerFactory m_serverFactory;
-
 };
 
 #endif // APPSERVERCONNECTIONIMPL_H

@@ -100,3 +100,8 @@ int QnAppServerConnection::getServers(QnResourceList& servers)
     // todo: implement me
     return 0;
 }
+
+QString QnAppServerConnection::getLastError() const
+{
+    return m_sessionManager->getLastError();
+}

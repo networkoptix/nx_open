@@ -243,7 +243,11 @@ int main(int argc, char *argv[])
     QnAppServerConnection appServerConnection(host, port, auth, QnResourceDiscoveryManager::instance());
 
     QList<QnResourceTypePtr> resourceTypeList;
-    appServerConnection.getResourceTypes(resourceTypeList);
+    if (appServerConnection.getResourceTypes(resourceTypeList) != 0)
+    {
+        qDebug() << "Can't get resource types: " << appServerConnection.getLastError();
+    }
+
     qnResTypePool->addResourceTypeList(resourceTypeList);
 
     registerServer(appServerConnection, localAddress(appserverAddress));

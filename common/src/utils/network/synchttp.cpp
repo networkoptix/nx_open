@@ -1,9 +1,21 @@
 #include "synchttp.h"
 
-int SyncHTTP::syncGet (const QString & path, QIODevice *to)
+SyncHTTP::SyncHTTP (const QHostAddress & hostName, quint16 port, QAuthenticator auth)
+    : requestID(0),
+      status(false),
+      m_hostName(hostName),
+      m_port(port)
 {
-    // moveToThread(this);
+    m_credentials = auth.user() + ":" + auth.password();
+    m_credentials = "Basic " + m_credentials.toAscii().toBase64();
+}
 
+SyncHTTP::~SyncHTTP ()
+{
+}
+
+int SyncHTTP::syncGet (const QString& path, QIODevice* to)
+{
     m_httpClient = QSharedPointer<QNetworkAccessManager>(new QNetworkAccessManager());
     loop = QSharedPointer<QEventLoop>(new QEventLoop());
 
@@ -18,13 +30,15 @@ int SyncHTTP::syncGet (const QString & path, QIODevice *to)
 
     QNetworkRequest request(qurl);
 
-    request.setRawHeader(QByteArray("Authorization"),m_credentials.toAscii());
+    request.setRawHeader(QByteArray("Authorization"), m_credentials.toAscii());
 
-    ///connect the requestFinished signal to our finished slot
+    //connect the finished signal to our finished slot
     connect(m_httpClient.data(),SIGNAL(finished (QNetworkReply*)),SLOT(finished (QNetworkReply*)));
-    /// start the request and store the requestID
+
+    // start the request and store the requestID
     requestID = m_httpClient->get(request);
-    /// block until the request is finished
+
+    // block until the request is finished
     loop->exec();
 
     to->write(requestID->readAll());
@@ -34,10 +48,8 @@ int SyncHTTP::syncGet (const QString & path, QIODevice *to)
 }
 
 /// send POST request and wait until finished
-int SyncHTTP::syncPost ( const QString & path, QIODevice * data, QIODevice * to )
+int SyncHTTP::syncPost (const QString & path, QIODevice * data, QIODevice * to)
 {
-//    moveToThread(QThread::currentThread());
-
     m_httpClient = QSharedPointer<QNetworkAccessManager>(new QNetworkAccessManager());
     loop = QSharedPointer<QEventLoop>(new QEventLoop());
 
@@ -54,15 +66,39 @@ int SyncHTTP::syncPost ( const QString & path, QIODevice * data, QIODevice * to 
 
     request.setRawHeader(QByteArray("Authorization"),m_credentials.toAscii());
 
-    ///connect the requestFinished signal to our finished slot
+    // connect the finished signal to our finished slot
     connect(m_httpClient.data(),SIGNAL(finished (QNetworkReply*)),SLOT(finished (QNetworkReply*)));
-    /// start the request and store the requestID
+
+    // start the request and store the requestID
     requestID = m_httpClient->post(request, data);
-    /// block until the request is finished
+
+    // block until the request is finished
     loop->exec();
 
     to->write(requestID->readAll());
 
-    /// return the request status
+    // return the request status
     return status;
+}
+
+int SyncHTTP::syncPost (const QString& path, const QByteArray& data, QIODevice* to)
+{
+    /// create io device from QByteArray
+    QBuffer buffer;
+    buffer.setData(data);
+    return syncPost(path,&buffer,to);
+}
+
+void SyncHTTP::finished (QNetworkReply* reply)
+{
+    /// check to see if it's the request we made
+    if(reply != requestID)
+        return;
+
+    /// set status of the request
+    status = reply->error();
+    /// end the loop
+    loop->exit();
+
+    QObject::disconnect(this);
 }

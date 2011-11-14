@@ -10,14 +10,19 @@ public:
     SessionManager(const QHostAddress& host, quint16 port, const QAuthenticator& auth);
     virtual ~SessionManager();
 
+    QByteArray getLastError();
+
     void setAddEndShash(bool value);
+
 protected:
     int sendGetRequest(QString objectName, QByteArray& reply);
     int sendGetRequest(QString objectName, QnRequestParamList, QByteArray& reply);
 
+    QByteArray formatNetworkError(int error);
 protected:
     SyncHTTP m_httpClient;
-    // CLSimpleHTTPClient m_client;
+    QByteArray m_lastError;
+
     bool m_addEndShash;
 };
 

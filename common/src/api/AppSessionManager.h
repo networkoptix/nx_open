@@ -22,8 +22,7 @@ public:
     int addCamera(const ::xsd::api::cameras::Camera&, QnApiCameraResponsePtr& cameras);
 
 private:
-    CLHttpStatus addObject(const QString& objectName, const QByteArray& body, QByteArray& response);
-
+    int addObject(const QString& objectName, const QByteArray& body, QByteArray& response);
 };
 
 #endif // _APP_SESSION_MANAGER_H
