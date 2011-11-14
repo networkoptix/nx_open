@@ -7,8 +7,6 @@ template <typename T, size_t N>
 char (&ArraySizeHelper(T (&array)[N]))[N];
 #define arraysize(array) (sizeof(ArraySizeHelper(array)))
 
-static const qint64 DATETIME_NOW = 10 * 3600 * 1000000ll; //0x7fffffffffffffffll;
-
 /*
  * Remove directory recursively.
  */
@@ -61,5 +59,11 @@ QN_EXPORT QString strPadLeft(const QString &str, int len, char ch);
 QN_EXPORT QString closeDirPath(const QString& value);
 
 QN_EXPORT qint64 getDiskFreeSpace(const QString& root);
+
+#ifndef INT64_MAX
+static const qint64 INT64_MAX = 0x7fffffffffffffffll;
+#endif
+
+static const qint64 DATETIME_NOW = INT64_MAX;
 
 #endif // _UNIVERSAL_CLIENT_UTIL_H

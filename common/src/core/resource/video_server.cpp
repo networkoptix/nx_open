@@ -46,6 +46,13 @@ QnVideoServerConnectionPtr QnVideoServer::apiConnection()
     return m_restConnection;
 }
 
+QnResourcePtr QnVideoServerFactory::createResource(const QnId &resourceTypeId, const QnResourceParameters &parameters)
+{
+    QnResourcePtr result(new QnVideoServer());
+    result->deserialize(parameters);
+
+    return result;
+}
 
 #if 0
 void QnVideoServer::startRTSPListener(const QHostAddress& address, int port)

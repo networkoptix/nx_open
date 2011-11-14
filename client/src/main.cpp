@@ -27,7 +27,6 @@
 #include "device_plugins/server_camera/appserver.h"
 
 #include "core/resource/file_resource.h"
-#include "core/resource/video_server.h"
 
 #define TEST_RTSP_SERVER
 
@@ -37,6 +36,9 @@
 #include "ui/view/blue_background_painter.h"
 #include "ui/scene/display_state.h"
 #include "ui/scene/display_synchronizer.h"
+
+#include "core/resource/video_server.h"
+#include "core/resource/qnstorage.h"
 
 
 
@@ -85,11 +87,19 @@ void addTestFile(const QString& fileName, const QString& resId)
 
 void addTestData()
 {
-    
+    /*
     QnVideoServerPtr server(new QnVideoServer());
     server->setUrl("rtsp://localhost:50000");
+    server->setApiUrl("rtsp://localhost:8080");
     //server->startRTSPListener();
     qnResPool->addResource(QnResourcePtr(server));
+
+    QnServerCameraPtr testCamera(new QnServerCamera());
+    testCamera->setParentId(server->getId());
+    testCamera->setMAC(QnMacAddress("00-1A-07-00-A5-76"));
+    testCamera->setName("testCamera");
+    qnResPool->addResource(QnResourcePtr(testCamera));
+    */
 
     /*
     QnAviResourcePtr resource(new QnAviResource("E:/Users/roman76r/video/ROCKNROLLA/BDMV/STREAM/00000.m2ts"));
@@ -108,19 +118,13 @@ void addTestData()
     qnResPool->addResource(QnResourcePtr(testCamera));
     */
 
-    QnServerCameraPtr testCamera(new QnServerCamera());
-    testCamera->setParentId(server->getId());
-    testCamera->setMAC(QnMacAddress("00-1A-07-00-9A-2F"));
-    testCamera->setName("testCamera");
-    //qnResPool->addResource(QnResourcePtr(testCamera));
-
-    
+    /*
     addTestFile("e:/Users/roman76r/blake/3PM PRIVATE SESSION, HOLLYWOOD Jayme.flv", "q1");
     addTestFile("e:/Users/roman76r/blake/8 FEATURE PREMIERE_Paid Companions_Bottled-Up_h.wmv", "q2");
     addTestFile("e:/Users/roman76r/blake/9  FEATURE PREMIERE_Paid Compan_Afternoon Whores.wmv", "q3");
     addTestFile("e:/Users/roman76r/blake/A CUT ABOVE Aria & Justine.flv", "q4");
     addTestFile("e:/Users/roman76r/blake/A DOLL'S LIFE Jacqueline, Nika & Jade.flv", "q5");
-    
+    */
 
     /*
     QnAviResourcePtr resource2(new QnAviResource("C:/Users/physic/Videos/HighDef_-_Audio_-_Japan.avi"));
@@ -129,6 +133,17 @@ void addTestData()
     resource2->setParentId(server->getId());
     qnResPool->addResource(QnResourcePtr(resource2));
     */
+    
+    /*
+    QnNetworkResourceList testList;
+    testList << testCamera;
+    QnTimePeriodList periods = server->apiConnection()->recordedTimePeriods(testList);
+    for (int i = 0; i < periods.size(); ++i)
+    {
+        qDebug() << periods[i].startTime << ' ' << periods[i].duration;
+    }
+    */
+
 }
 #endif
 
@@ -239,10 +254,19 @@ int main(int argc, char *argv[])
 #endif
     } else
     {
-        qDebug() << "Can't get resource types";
+        qDebug() << "Can't get resource types from Application server";
+    }
+    QnResourceList resources;
+    if (appServerConnection.getResources(resources) == 0)
+    {
+        qnResPool->addResources(resources);
+        qDebug() << "Got" << resources.size() << "resources";
+    } else
+    {
+        qDebug() << "Can't get resource from Application server";
     }
 
-    qApp->exit();
+    //qApp->exit();
 
     QnResource::startCommandProc();
 
@@ -259,8 +283,11 @@ int main(int argc, char *argv[])
     QnResourceDiscoveryManager::instance().addResourceProcessor(&serverCameraProcessor);
 
     //============================
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
-    QnResourceDiscoveryManager::instance().start();
+    if (!appServerConnection.isConnected())
+    {
+        QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
+        QnResourceDiscoveryManager::instance().start();
+    }
     //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
     

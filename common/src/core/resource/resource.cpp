@@ -34,7 +34,6 @@ m_status(Offline)
 
 QnResource::~QnResource()
 {
-    QMutexLocker locker(&m_mutex);
     disconnectAllConsumers();
 }
 
@@ -114,7 +113,6 @@ bool QnResource::associatedWithFile() const
 
 QString QnResource::toString() const
 {
-    QMutexLocker locker(&m_mutex);
 	QString result;
 	QTextStream(&result) << getName() << "  " <<  getUniqueId();
 	return result;
@@ -128,7 +126,6 @@ QString QnResource::toSearchString() const
 
 bool QnResource::hasSuchParam(const QString& name) const
 {
-    QMutexLocker locker(&m_mutex);
     return getResourceParamList().exists(name);
 }
 
@@ -156,13 +153,11 @@ bool QnResource::getParam(const QString& name, QnValue& val, QnDomain domain )
         return false;
     }
 
-    QMutexLocker locker(&m_mutex);
-
-
 
     if (domain == QnDomainMemory)
     {
         QnParam& param = getResourceParamList().get(name);
+        QMutexLocker locker(&m_mutex);
         val = param.value();
         return true;
     }
@@ -196,7 +191,6 @@ bool QnResource::setParam(const QString& name, const QnValue& val, QnDomain doma
     }
 
 
-    QMutexLocker locker(&m_mutex);
     QnParam& param = getResourceParamList().get(name);
 
     if (param.isReadOnly())
@@ -213,12 +207,14 @@ bool QnResource::setParam(const QString& name, const QnValue& val, QnDomain doma
     }
 
     // QnDomainMemory
-    if (!param.setValue(val))
     {
-        cl_log.log("cannot set such param!", cl_logWARNING);
-        return false;
+        QMutexLocker locker(&m_mutex);
+        if (!param.setValue(val))
+        {
+            cl_log.log("cannot set such param!", cl_logWARNING);
+            return false;
+        }
     }
-
     emit onParameterChanged(name, QString(val));
 
     return true;
@@ -261,24 +257,34 @@ bool QnResource::unknownResource() const
     return getName().isEmpty();
 }
 
-
 QnParamList& QnResource::getResourceParamList() const
 {
-    QMutexLocker locker(&m_mutex);
-    if (m_resourceParamList.empty()) 
+    QnId restypeid;
     {
-        QnResourceTypePtr resType = qnResTypePool->getResourceType(m_typeId);
-        if (resType) {
-            const QList<QnParamTypePtr>& paramTypes = resType->paramTypeList();
-            foreach(QnParamTypePtr paramType, paramTypes)
-            {
-                QnParam newParam(paramType);
-                newParam.setValue(paramType->default_value);
-                cl_log.log(newParam.toDebugString(), cl_logALWAYS); // debug
-                m_resourceParamList.put(newParam);
-            }
-        }
+        QMutexLocker locker(&m_mutex);
+        if (!m_resourceParamList.empty())
+            return m_resourceParamList;
+        restypeid = m_typeId;
     }
+
+    QnParamList resourceParamList;
+
+    QnResourceTypePtr resType = qnResTypePool->getResourceType(restypeid);
+    if (resType) {
+        const QList<QnParamTypePtr>& paramTypes = resType->paramTypeList();
+        foreach(QnParamTypePtr paramType, paramTypes)
+        {
+            QnParam newParam(paramType);
+            newParam.setValue(paramType->default_value);
+            cl_log.log(newParam.toDebugString(), cl_logALWAYS); // debug
+            resourceParamList.put(newParam);
+        }
+
+        QMutexLocker locker(&m_mutex);
+        if (m_resourceParamList.empty()) 
+            m_resourceParamList = resourceParamList;
+    }
+
     return m_resourceParamList;
 }
 
@@ -297,18 +303,19 @@ void QnResource::setTypeId(const QnId& id)
 
 void QnResource::setStatus(QnResource::Status status)
 {
-    QMutexLocker locker(&m_mutex);
-
     if (m_status == status) // if status did not changed => do nothing 
         return;
 
     if (m_status == Offline && status == Online)
         beforeUse();
 
-    Status old_status = m_status;
-    m_status = status;
-
-    emit onStatusChanged(old_status, m_status);
+    Status old_status;
+    {
+        QMutexLocker locker(&m_mutex);
+        old_status = m_status;
+        m_status = status;
+    }
+    emit onStatusChanged(old_status, status);
 }
 
 QnResource::Status QnResource::getStatus() const

@@ -227,7 +227,7 @@ bool CLArecontPanoramicResource::setCamQulity(int q)
 
 }
 
-const QnVideoResourceLayout* CLArecontPanoramicResource::getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider) const
+const QnVideoResourceLayout* CLArecontPanoramicResource::getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
 {
     return m_vrl;
 }

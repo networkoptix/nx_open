@@ -19,7 +19,7 @@ int VideoServerSessionManager::recordedTimePeriods(const QnRequestParamList& par
 
     QByteArray reply;
 
-    if(sendGetRequest("RecordedTimePeriods", params, reply) == 0)
+    if(sendGetRequest("api/RecordedTimePeriods", params, reply) == 0)
     {
         try
         {

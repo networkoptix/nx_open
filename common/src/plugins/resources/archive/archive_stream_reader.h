@@ -66,7 +66,6 @@ protected:
 
 private:
     int m_selectedAudioChannel;
-    static QMutex avi_mutex;
     static QSemaphore aviSemaphore ;
     bool m_eof;
     bool m_reverseMode;

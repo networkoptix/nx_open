@@ -64,23 +64,6 @@ m_forceSliceDecoding(-1)
     m_tryHardwareAcceleration = false; //hwcounter % 2;
 
     QMutexLocker mutex(&global_ffmpeg_mutex);
-
-	if (m_first_instance)
-	{
-		m_first_instance = false;
-
-		// must be called before using avcodec
-		avcodec_init();
-
-		// register all the codecs (you can also register only the m_codec you wish to have smaller code
-		avcodec_register_all();
-
-		cl_log.log(QLatin1String("FFMEG version = "), (int)avcodec_version(), cl_logALWAYS) ;
-
-	}
-
-	//m_codec = avcodec_find_decoder(CODEC_ID_H264);
-
 	openDecoder(data);
 }
 void CLFFmpegVideoDecoder::flush()
@@ -201,7 +184,9 @@ void CLFFmpegVideoDecoder::openDecoder(const QnCompressedVideoDataPtr data)
     if (avcodec_open(m_context, m_codec) < 0)
     {
         m_codec = 0;
+        Q_ASSERT_X(1, Q_FUNC_INFO, "Can't open decoder");
     }
+    Q_ASSERT(m_context->codec);
 
 	int numBytes = avpicture_get_size(PIX_FMT_YUV420P, m_context->width, m_context->height);
     if (numBytes > 0) {
@@ -346,7 +331,7 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, CLVideoDe
         }
     }
     // -------------------------
-
+    Q_ASSERT(m_context->codec);
     avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
     if (data->useTwice)
         avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);

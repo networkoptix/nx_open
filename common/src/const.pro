@@ -110,3 +110,8 @@ QMAKE_EXTRA_COMPILERS += xsd2
 
 #RESOURCES += api/xsd/api.qrc
 RESOURCES += $${MOC_DIR}/api.qrc
+
+# Define override specifier.
+OVERRIDE_DEFINITION = "override="
+win32-msvc*:OVERRIDE_DEFINITION = "override=override"
+DEFINES += $$OVERRIDE_DEFINITION

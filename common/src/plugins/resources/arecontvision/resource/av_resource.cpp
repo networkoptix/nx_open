@@ -287,7 +287,6 @@ void QnPlAreconVisionResource::setCropingPhysical(QRect croping)
 //===============================================================================================================================
 bool QnPlAreconVisionResource::getParamPhysical(const QString& name, QnValue& val)
 {
-    QMutexLocker locker(&m_mutex);
 
     //================================================
     QnParam& param = getResourceParamList().get(name);
@@ -321,6 +320,7 @@ bool QnPlAreconVisionResource::getParamPhysical(const QString& name, QnValue& va
 
     QByteArray rarray = response.mid(index+1);
 
+    QMutexLocker locker(&m_mutex);
     param.setValue(QString(rarray.data()));
 
     val = param.value();

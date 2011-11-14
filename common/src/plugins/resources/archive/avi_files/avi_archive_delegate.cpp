@@ -7,6 +7,28 @@
 
 extern QMutex global_ffmpeg_mutex;
 
+QSemaphore QnAviArchiveDelegate::aviSemaphore(4);
+class QnAviSemaphoreHelpr
+{
+public:
+    QnAviSemaphoreHelpr(QSemaphore& sem):
+      m_sem(sem)
+      {
+          m_sem.tryAcquire();
+      }
+
+      ~QnAviSemaphoreHelpr()
+      {
+          m_sem.release();
+      }
+
+private:
+    QSemaphore& m_sem;
+
+};
+
+
+
 class QnAviAudioLayout: public QnResourceAudioLayout
 {
 public:
@@ -147,6 +169,8 @@ QnMediaContextPtr QnAviArchiveDelegate::getCodecContext(AVStream* stream)
 
 QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
 {
+    QnAviSemaphoreHelpr sem(aviSemaphore);
+
     if (!findStreams())
         return QnAbstractMediaDataPtr();
 

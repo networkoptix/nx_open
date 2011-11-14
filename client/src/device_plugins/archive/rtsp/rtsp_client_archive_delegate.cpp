@@ -31,19 +31,19 @@ bool QnRtspClientArchiveDelegate::open(QnResourcePtr resource)
 {
     if (m_opened)
         return true;
+    m_resource = resource;
     QnResourcePtr server = qnResPool->getResourceById(resource->getParentId());
     if (server == 0)
         return false;
     m_rtspSession.setTransport("TCP");
 
     QString url = server->getUrl() + QString('/');
-    /*
-    if (!resource->getId().isValid())
-        url += resource->getUrl();
+    QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
+    if (netResource != 0)
+        url += netResource->getMAC().toString();
     else
-        url += resource->getId().toString();
-    */
-    url += resource->getUrl();
+        url += resource->getUrl();
+
     if (m_rtspSession.open(url)) 
     {
         m_rtpData = m_rtspSession.play(m_position);
@@ -55,6 +55,12 @@ bool QnRtspClientArchiveDelegate::open(QnResourcePtr resource)
     }
     m_opened = m_rtspSession.isOpened();
     return m_opened;
+}
+
+void QnRtspClientArchiveDelegate::beforeClose()
+{
+    if (m_rtpData)
+        m_rtpData->getSocket()->close();
 }
 
 void QnRtspClientArchiveDelegate::close()
@@ -72,6 +78,8 @@ void QnRtspClientArchiveDelegate::deleteContexts()
 
 qint64 QnRtspClientArchiveDelegate::startTime()
 {
+    // uncoment it for large interval test:
+    //return m_rtspSession.startTime()- 1000000ll * 3600 * 24 * 400; // 400 days
     return m_rtspSession.startTime();
 }
 
@@ -80,11 +88,19 @@ qint64 QnRtspClientArchiveDelegate::endTime()
     return m_rtspSession.endTime();
 }
 
+void QnRtspClientArchiveDelegate::reopen()
+{
+    close();
+    if (m_resource)
+        open(m_resource);
+}
+
 QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
 {
     // sometime function may return zero packet if no data arrived
     QnAbstractMediaDataPtr result;
-    while (!result)
+    int errCnt = 0;
+    while(!result)
     {
         if (!m_rtpData)
             return result;
@@ -95,6 +111,12 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
             m_rtspSession.stop();
             return result; // reconnect
         }
+        else if (blockSize == 0) {
+            errCnt++;
+            if (errCnt == 10)
+                break;
+        }
+        errCnt = 0;
 
 #ifdef DEBUG_RTSP
         static QFile* binaryFile = 0;
@@ -130,7 +152,8 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
         else
             qWarning() << Q_FUNC_INFO << __LINE__ << "Only FFMPEG payload format now implemeted. Ask developers to add '" << format << "' format";
     }
-    
+    if (!result)
+        reopen();
   
     return result;
 }

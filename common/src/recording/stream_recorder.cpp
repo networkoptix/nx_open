@@ -9,8 +9,12 @@
 static const int DEFAULT_VIDEO_STREAM_ID = 4113;
 static const int DEFAULT_AUDIO_STREAM_ID = 4352;
 
+static const int STORE_QUEUE_SIZE = 30;
+
+extern QMutex global_ffmpeg_mutex;
+
 QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
-QnAbstractDataConsumer(15),
+QnAbstractDataConsumer(STORE_QUEUE_SIZE),
 m_device(dev),
 m_firstTime(true),
 m_packetWrited(false),
@@ -43,6 +47,8 @@ void QnStreamRecorder::cleanup()
 
         if (m_packetWrited)
             av_write_trailer(m_formatCtx);
+
+        QMutexLocker mutex(&global_ffmpeg_mutex);
         for (unsigned i = 0; i < m_formatCtx->nb_streams; ++i)
             avcodec_close(m_formatCtx->streams[i]->codec);
         if (m_formatCtx->pb)
@@ -93,7 +99,9 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
         if (m_truncateInterval > 0 && md->timestamp - m_firstTimestamp > m_currentChunkLen)
         {
             m_currentChunkLen += m_truncateInterval - (md->timestamp - m_firstTimestamp);
-            
+            while (m_currentChunkLen <= 0)
+                m_currentChunkLen += m_truncateInterval;
+            cl_log.log("chunkLen=" , m_currentChunkLen/1000000.0, cl_logALWAYS);
             m_prevDateTime = m_currentDateTime;
             m_currentDateTime = md->timestamp;
             cleanup();
@@ -105,8 +113,9 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
 
     AVPacket avPkt;
     av_init_packet(&avPkt);
-        AVStream* stream = m_formatCtx->streams[channel];
+    AVStream* stream = m_formatCtx->streams[channel];
     AVRational srcRate = {1, 1000000};
+    Q_ASSERT(stream->time_base.num && stream->time_base.den);
     avPkt.pts = av_rescale_q(md->timestamp, srcRate, stream->time_base);
     if(md->flags & AV_PKT_FLAG_KEY)
         avPkt.flags |= AV_PKT_FLAG_KEY;
@@ -155,6 +164,8 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     }
     m_fileName += QString(".") + fileExt;
     QString url = QString("ufile:") + m_fileName;
+
+    QMutexLocker mutex(&global_ffmpeg_mutex);
     int err = avformat_alloc_output_context2(&m_formatCtx, outputCtx, 0, url.toUtf8().constData());
 
     if (err < 0) {

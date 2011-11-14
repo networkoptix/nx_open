@@ -191,3 +191,11 @@ QString QnTCPConnectionProcessor::codeToMessage(int code)
     }
     return QString ();
 }
+
+void QnTCPConnectionProcessor::pleaseStop()
+{
+    Q_D(QnTCPConnectionProcessor);
+    if (d->socket)
+        d->socket->close();
+    CLLongRunnable::pleaseStop();
+}

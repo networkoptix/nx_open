@@ -50,6 +50,7 @@ private:
     QList<QnMediaContextPtr> m_contexts;
 
     friend class QnAviAudioLayout;
+    static QSemaphore aviSemaphore;
 };
 
 #endif

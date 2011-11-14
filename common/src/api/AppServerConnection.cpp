@@ -15,6 +15,11 @@ QnAppServerConnection::QnAppServerConnection(const QHostAddress& host, int port,
 {
 }
 
+bool QnAppServerConnection::isConnected() const
+{
+    return true;
+}
+
 QnAppServerConnection::~QnAppServerConnection()
 {
 }
@@ -40,6 +45,7 @@ int QnAppServerConnection::getResources(QList<QnResourcePtr>& resources)
     if (!xsdResources.isNull())
     {
         parseCameras(resources, xsdResources->cameras().camera(), m_resourceFactory);
+        parseServers(resources, xsdResources->servers().server(), m_serverFactory);
         parseLayouts(resources, xsdResources->layouts().layout(), m_resourceFactory);
         parseUsers(resources, xsdResources->users().user(), m_resourceFactory);
     }
@@ -77,7 +83,7 @@ int QnAppServerConnection::addCamera(const QnNetworkResource& cameraIn, const Qn
                                      cameraIn.getAuth().user().toStdString(),
                                      cameraIn.getAuth().password().toStdString());
 
-    camera.parentID(serverIdIn.toString().toInt());
+    camera.parentID(serverIdIn.toString().toStdString());
 
     QnApiCameraResponsePtr xsdCameras;
 
@@ -88,4 +94,10 @@ int QnAppServerConnection::addCamera(const QnNetworkResource& cameraIn, const Qn
     }
 
     return 1;
+}
+
+int QnAppServerConnection::getServers(QnResourceList& servers)
+{
+    // todo: implement me
+    return 0;
 }

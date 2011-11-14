@@ -14,7 +14,7 @@
 static const int MAX_RTCP_PACKET_SIZE = 1024 * 2;
 static const quint32 SSRC_CONST = 0x2a55a9e8;
 static const quint32 CSRC_CONST = 0xe8a9552a;
-static const int TCP_TIMEOUT = 5 * 1000 * 1000;
+static const int TCP_TIMEOUT = 5 * 1000;
 
 //#define DEBUG_RTSP
 
@@ -60,10 +60,9 @@ RTPSession::RTPSession():
     m_rtcpUdpSock(0),
     m_rtpIo(*this),
     m_transport("UDP"),
-    m_tcpSock(0),
     m_selectedAudioChannel(0),
-    m_startTime(0),
-    m_endTime(0),
+    m_startTime(AV_NOPTS_VALUE),
+    m_endTime(AV_NOPTS_VALUE),
     m_scale(1.0)
 {
     m_udpSock.setReadTimeOut(500);
@@ -73,7 +72,7 @@ RTPSession::RTPSession():
 
 RTPSession::~RTPSession()
 {
-    delete m_tcpSock;
+    m_tcpSock.close();
     delete [] m_responseBuffer;
 }
 
@@ -145,12 +144,14 @@ bool RTPSession::open(const QString& url)
 
     //unsigned int port = DEFAULT_RTP_PORT;
 
-    m_tcpSock = new TCPSocket();
-    m_tcpSock->setReadTimeOut(TCP_TIMEOUT);
-    m_tcpSock->setWriteTimeOut(TCP_TIMEOUT);
+    if (m_tcpSock.isClosed())
+        m_tcpSock.reopen();
 
-    if (!m_tcpSock->connect(mUrl.host().toLatin1().data(), mUrl.port(DEFAULT_RTP_PORT)))
+    if (!m_tcpSock.connect(mUrl.host().toLatin1().data(), mUrl.port(DEFAULT_RTP_PORT)))
         return false;
+
+    m_tcpSock.setReadTimeOut(TCP_TIMEOUT);
+    m_tcpSock.setWriteTimeOut(TCP_TIMEOUT);
 
     if (!sendDescribe())
         return false;
@@ -198,8 +199,9 @@ RTPIODevice* RTPSession::play(qint64 position, double scale)
 
 bool RTPSession::stop()
 {
-    delete m_tcpSock;
-    m_tcpSock = 0;
+    //delete m_tcpSock;
+    //m_tcpSock = 0;
+    m_tcpSock.close();
     m_responseBufferLen = 0;
     return true;
 }
@@ -207,7 +209,7 @@ bool RTPSession::stop()
 
 bool RTPSession::isOpened() const
 {
-    return m_tcpSock && m_tcpSock->isConnected();
+    return m_tcpSock.isConnected();
 }
 
 unsigned int RTPSession::sessionTimeoutMs()
@@ -236,7 +238,7 @@ bool RTPSession::sendDescribe()
 
     //qDebug() << request;
 
-    if (!m_tcpSock->send(request.data(), request.size()))
+    if (!m_tcpSock.send(request.data(), request.size()))
         false;
 
     return true;
@@ -245,6 +247,7 @@ bool RTPSession::sendDescribe()
 
 bool RTPSession::sendOptions()
 {
+
     QByteArray request;
     request += "OPTIONS ";
     request += mUrl.toString();
@@ -254,7 +257,7 @@ bool RTPSession::sendOptions()
     request += "\r\n\r\n";
 
 
-    if (!m_tcpSock->send(request.data(), request.size()))
+    if (!m_tcpSock.send(request.data(), request.size()))
         false;
 
     return true;
@@ -263,11 +266,12 @@ bool RTPSession::sendOptions()
 
 RTPIODevice*  RTPSession::sendSetup()
 {
+
     int audioNum = 0;
     if (m_transport == "UDP")
         m_rtpIo.setSocket(&m_udpSock);
     else
-        m_rtpIo.setSocket(m_tcpSock);
+        m_rtpIo.setSocket(&m_tcpSock);
     for (QMap<int, SDPTrackInfo>::iterator itr = m_sdpTracks.begin(); itr != m_sdpTracks.end(); ++itr)
     {
         if (getTrackType(itr.key()) == "audio") 
@@ -306,7 +310,7 @@ RTPIODevice*  RTPSession::sendSetup()
 
         //qDebug() << request;
 
-        if (!m_tcpSock->send(request.data(), request.size()))
+        if (!m_tcpSock.send(request.data(), request.size()))
             return 0;
 
         QByteArray responce;
@@ -347,6 +351,7 @@ RTPIODevice*  RTPSession::sendSetup()
 
 bool RTPSession::sendPlay(qint64 position, double scale)
 {
+
     QByteArray request;
     QByteArray responce;
 
@@ -369,7 +374,7 @@ bool RTPSession::sendPlay(qint64 position, double scale)
     
     request += "\r\n";
 
-    if (!m_tcpSock->send(request.data(), request.size()))
+    if (!m_tcpSock.send(request.data(), request.size()))
         return false;
 
 
@@ -391,6 +396,7 @@ bool RTPSession::sendPlay(qint64 position, double scale)
 
 bool RTPSession::sendTeardown()
 {
+
     QByteArray request;
     QByteArray responce;
     request += "TEARDOWN ";
@@ -403,7 +409,7 @@ bool RTPSession::sendTeardown()
     request += m_SessionId;
     request += "\r\n\r\n";
 
-    if (!m_tcpSock->send(request.data(), request.size()))
+    if (!m_tcpSock.send(request.data(), request.size()))
         false;
 
 
@@ -515,7 +521,6 @@ bool RTPSession::sendKeepAliveIfNeeded(const RtspStatistic* stats)
 
 bool RTPSession::sendKeepAlive()
 {
-
     QByteArray request;
     QByteArray responce;
     request += "GET_PARAMETER ";
@@ -533,7 +538,7 @@ bool RTPSession::sendKeepAlive()
     //
 
 
-    if (!m_tcpSock->send(request.data(), request.size()))
+    if (!m_tcpSock.send(request.data(), request.size()))
         false;
 
 
@@ -550,21 +555,11 @@ bool RTPSession::sendKeepAlive()
 // read RAW: combination of text and binary data
 int RTPSession::readRAWData()
 {
-    int readed = m_tcpSock->recv(m_responseBuffer + m_responseBufferLen, MAX_RESPONCE_LEN - m_responseBufferLen);
+    int readed = m_tcpSock.recv(m_responseBuffer + m_responseBufferLen, MAX_RESPONCE_LEN - m_responseBufferLen);
     if (readed > 0)
     {
-#ifdef DEBUG_RTSP
-        {
-            static QFile* binaryFile = 0;
-            if (!binaryFile) {
-                binaryFile = new QFile("c:/binary_raw.rtsp");
-                binaryFile->open(QFile::WriteOnly);
-            }
-            binaryFile->write((const char*)m_responseBuffer + m_responseBufferLen, readed);
-            binaryFile->flush();
-        }
-#endif
         m_responseBufferLen += readed;
+        Q_ASSERT( m_responseBufferLen <= MAX_RESPONCE_LEN);
     }
     return readed;
 }
@@ -572,24 +567,21 @@ int RTPSession::readRAWData()
 // demux binary data only
 int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
 {
-    quint8* origData = data;
-    bool readMoreData = false; // try to process existing buffer at first
-    if (!m_tcpSock)
-        return -1;
-    while (m_tcpSock->isConnected())
+    while (m_tcpSock.isConnected())
     {
-        if (readMoreData && readRAWData() < 0)
-            break;
-        int demuxedCount = 0;
-        quint8* curPtr = m_responseBuffer;
-        for(; curPtr < m_responseBuffer + m_responseBufferLen; curPtr++)
+         int readed = readRAWData();
+
+         //readed = qMax(readed, 0);
+
+         if (readed <= 0)
+            return readed;
+
+        quint8* bEnd = m_responseBuffer + m_responseBufferLen;
+        for(quint8* curPtr = m_responseBuffer; curPtr < bEnd-4; curPtr++)
         {
             if (*curPtr == '$') // start of binary data
             {
-                if (m_responseBuffer + m_responseBufferLen - curPtr < 4)
-                {
-                    break; // to few data
-                }
+                int dataRest = bEnd - curPtr;
                 quint16 dataLen = (curPtr[2] << 8) + curPtr[3] + 4;
                 if (maxDataSize < dataLen)
                 {
@@ -597,34 +589,17 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
                     m_responseBufferLen = 0;
                     return -1;
                 }
-                int dataRest = m_responseBuffer + m_responseBufferLen - curPtr;
+
                 if (dataRest < dataLen)
-                {
                     break;
-                }
+
                 memcpy(data, curPtr, dataLen);
-                data += dataLen;
-                demuxedCount += dataLen;
-                maxDataSize -= dataLen;
-
-                memmove(curPtr, curPtr + dataLen, m_responseBuffer + m_responseBufferLen - (curPtr+dataLen));
+                memmove(curPtr, curPtr + dataLen, dataRest - dataLen);
                 m_responseBufferLen -= dataLen;
-#ifdef DEBUG_RTSP
-                static QFile* binaryFile = 0;
-                if (!binaryFile) {
-                    binaryFile = new QFile("c:/binary.rtsp");
-                    binaryFile->open(QFile::WriteOnly);
-                }
-                binaryFile->write((const char*) origData, demuxedCount);
-                binaryFile->flush();
 
-#else
-                Q_UNUSED(origData);
-#endif
-                return demuxedCount;
+                return dataLen;
             }
         }
-        readMoreData = true;
     }
     return -1;
 }
@@ -632,18 +607,6 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
 // demux text data only
 bool RTPSession::readTextResponce(QByteArray& response)
 {
-
-#ifdef DEBUG_RTSP
-    static QFile* textFile = 0;
-#define WRITE_DEBUG_FILE \
-    if (!textFile) { \
-        textFile = new QFile("c:/text.rtsp"); \
-        textFile->open(QFile::WriteOnly); \
-    } \
-    textFile->write(response); \
-    textFile->flush();
-
-#endif
 
     bool readMoreData = false; // try to process existing buffer at first
     for (int k = 0; k < 10; ++k) // if binary data ahead text data, read more. read 10 packets at maxumum
@@ -662,9 +625,6 @@ bool RTPSession::readTextResponce(QByteArray& response)
                 m_responseBufferLen -= curPtr - startPtr;
                 if (!response.isEmpty())
                 {
-#ifdef DEBUG_RTSP
-                    WRITE_DEBUG_FILE;
-#endif
                     return true;
                 }
 
@@ -696,9 +656,6 @@ bool RTPSession::readTextResponce(QByteArray& response)
 
             m_responseBufferLen -= curPtr - startPtr;
             if (!response.isEmpty()) {
-#ifdef DEBUG_RTSP
-                WRITE_DEBUG_FILE;
-#endif
                 return true;
             }
         }

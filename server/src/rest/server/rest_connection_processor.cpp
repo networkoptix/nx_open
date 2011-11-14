@@ -133,6 +133,6 @@ void QnRestConnectionProcessor::run()
         if (d->requestHeaders.value("Connection") != QString("keep-alive"))
             break;
     }
-
+    d->socket->close();
     m_runing = false;
 }

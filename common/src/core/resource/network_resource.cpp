@@ -50,14 +50,14 @@ bool QnNetworkResource::equalsTo(const  QnResourcePtr other) const
 
 QHostAddress QnNetworkResource::getHostAddress() const
 {
-    QMutexLocker mutex(&m_mutex);
+    //QMutexLocker mutex(&m_mutex);
     //return m_hostAddr;
     return QHostAddress(getUrl());
 }
 
 bool QnNetworkResource::setHostAddress(const QHostAddress& ip, QnDomain /*domain*/ )
 {
-    QMutexLocker mutex(&m_mutex);
+    //QMutexLocker mutex(&m_mutex);
     //m_hostAddr = ip;
     setUrl(ip.toString());
     return true;

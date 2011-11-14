@@ -23,7 +23,7 @@ public:
     virtual qint64    read(char * data, qint64 maxSize );
     void setTCPMode(bool mode) {m_tcpMode = mode;}
     void setSocket(CommunicatingSocket* socket) { m_sock = socket; }
-    const CommunicatingSocket* getSocket() const { return m_sock; }
+    CommunicatingSocket* getSocket() const { return m_sock; }
 private:
     CommunicatingSocket* m_sock;
     RTPSession& m_owner;
@@ -104,7 +104,7 @@ private:
     int m_responseBufferLen;
     QByteArray m_sdp;
 
-    TCPSocket* m_tcpSock;
+    TCPSocket m_tcpSock;
     UDPSocket m_udpSock;
     UDPSocket m_rtcpUdpSock;
     RTPIODevice m_rtpIo;

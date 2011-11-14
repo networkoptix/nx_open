@@ -30,10 +30,12 @@ public:
     virtual void onReverseMode(qint64 displayTime, bool value);
 
     virtual bool isRealTimeSource() const { return m_position == DATETIME_NOW; }
+    virtual void beforeClose();
 protected:
 private:
     QnAbstractDataPacketPtr processFFmpegRtpPayload(const quint8* data, int dataSize);
     void deleteContexts();
+    void reopen();
 private:
     RTPSession m_rtspSession;
     RTPIODevice* m_rtpData;
@@ -47,6 +49,7 @@ private:
     QnDefaultDeviceVideoLayout m_defaultVideoLayout;
     bool m_opened;
     qint64 m_lastRtspTime;
+    QnResourcePtr m_resource;
 };
 
 #endif

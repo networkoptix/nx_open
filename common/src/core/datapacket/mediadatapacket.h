@@ -63,6 +63,14 @@ private:
 };
 typedef QSharedPointer<QnAbstractMediaData> QnAbstractMediaDataPtr;
 
+struct QnEmptyMediaData : public QnAbstractMediaData
+{
+    QnEmptyMediaData(): QnAbstractMediaData(16,0)
+    {
+    }
+};
+
+
 struct QnCompressedVideoData : public QnAbstractMediaData
 {
 	QnCompressedVideoData(unsigned int alignment, unsigned int capacity, QnMediaContextPtr ctx = QnMediaContextPtr(0))

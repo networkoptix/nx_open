@@ -8,7 +8,7 @@
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "camera/video_camera.h"
 
-static const int TRUNCATE_INTERVAL = 15; // seconds
+static const int TRUNCATE_INTERVAL = 60; // seconds
 
 QnRecordingManager::QnRecordingManager()
 {
@@ -88,9 +88,11 @@ QnAbstractStreamDataProvider* QnServerDataProviderFactory::createDataProviderInt
     if (role == QnResource::Role_Archive) 
     {
         QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(res);
+        archiveReader->setCycleMode(false);
         archiveReader->setArchiveDelegate(new QnServerArchiveDelegate());
         return archiveReader;
     }
+    return 0;
 }
 
 QnServerDataProviderFactory* QnServerDataProviderFactory::instance()

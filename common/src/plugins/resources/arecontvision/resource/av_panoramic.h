@@ -10,7 +10,7 @@ public:
 	CLArecontPanoramicResource(const QString& name);
 	bool getDescription();
 
-    virtual const QnVideoResourceLayout* getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0) const override;
+    virtual const QnVideoResourceLayout* getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0) override;
 protected:
 
     virtual bool setParamPhysical(const QString& name, const QnValue& val);

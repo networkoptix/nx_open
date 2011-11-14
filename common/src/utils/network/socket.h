@@ -52,6 +52,7 @@ public:
   ~Socket();
 
   void close();
+  bool isClosed() const;
 
   /**
    *   Get the local address
@@ -116,7 +117,8 @@ public:
    */
   static unsigned short resolveService(const QString &service,
                                        const QString &protocol = "tcp");
-
+protected:
+    void createSocket(int type, int protocol);
 private:
   // Prevent the user from trying to use value semantics on this object
   Socket(const Socket &sock);
@@ -207,8 +209,9 @@ public:
    *   @param foreignPort foreign port
    *   @exception SocketException thrown if unable to create TCP socket
    */
-  TCPSocket(const QString &foreignAddress, unsigned short foreignPort)
-      ;
+  TCPSocket(const QString &foreignAddress, unsigned short foreignPort);
+
+  bool reopen();
 
 private:
   // Access for TCPServerSocket::accept() connection creation
