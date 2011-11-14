@@ -27,6 +27,8 @@
 #include <ui/model/resource_item_model.h>
 #include <ui/model/layout_grid_mapper.h>
 
+#include <file_processor.h>
+
 #include "display_state.h"
 #include "layout_display.h"
 
@@ -45,7 +47,7 @@ QnDisplayController::QnDisplayController(QnLayoutDisplay *synchronizer, QObject 
     m_wheelZoomInstrument = new WheelZoomInstrument(this);
     m_rubberBandInstrument = new RubberBandInstrument(this);
     m_resizingInstrument = new ResizingInstrument(this);
-    m_archiveDropInstrument = new ArchiveDropInstrument(m_state, this);
+    m_archiveDropInstrument = new ArchiveDropInstrument(this, this);
 
     m_dragInstrument = new DragInstrument(this);
     m_view->setDragMode(QGraphicsView::NoDrag);
@@ -106,6 +108,54 @@ QnDisplayController::QnDisplayController(QnLayoutDisplay *synchronizer, QObject 
 
 QnDisplayController::~QnDisplayController() {
     return;
+}
+
+void QnDisplayController::drop(const QUrl &url, const QPoint &gridPos, bool checkUrls) {
+    drop(url.toLocalFile(), gridPos, checkUrls);
+}
+
+void QnDisplayController::drop(const QList<QUrl> &urls, const QPoint &gridPos, bool checkUrls) {
+    QList<QString> files;
+    foreach(const QUrl &url, urls)
+        files.push_back(url.toLocalFile());
+    drop(files, gridPos, checkUrls);
+}
+
+void QnDisplayController::drop(const QString &file, const QPoint &gridPos, bool checkFiles) {
+    QList<QString> files;
+    files.push_back(file);
+    drop(files, gridPos, checkFiles);
+}
+
+void QnDisplayController::drop(const QList<QString> &files, const QPoint &gridPos, bool checkFiles) {
+    if(!checkFiles) {
+        dropInternal(files, gridPos);
+    } else {
+        QStringList checkedFiles;
+        foreach(const QString &file, files)
+            QnFileProcessor::findAcceptedFiles(file, &checkedFiles);
+        if(files.empty())
+            return;
+
+        dropInternal(checkedFiles, gridPos);
+    }
+}
+
+void QnDisplayController::dropInternal(const QList<QString> &files, const QPoint &gridPos) {
+    QnResourceList resources = QnFileProcessor::creareResourcesForFiles(files);
+
+    QRect geometry(gridPos, QSize(1, 1));
+    foreach(QnResourcePtr resource, resources) {
+        QnLayoutItemModel *item = new QnLayoutItemModel(resource->getUniqueId());
+        item->setGeometry(geometry);
+
+        m_state->model()->addItem(item);
+        if(!item->isPinned()) {
+            /* Place already taken, pick closest one. */
+            QRect newGeometry = m_state->model()->closestFreeSlot(geometry.topLeft(), geometry.size());
+            m_state->model()->pinItem(item, newGeometry);
+        }
+    }
 }
 
 void QnDisplayController::updateGeometryDelta(QnDisplayWidget *widget) {

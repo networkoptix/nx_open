@@ -22,6 +22,11 @@ class QnWidgetAnimator;
 class QnCurtainAnimator;
 class QnCurtainItem;
 
+/**
+ * This class ties a display state, a scene and a view together.
+ * 
+ * It presents some low-level functions for viewport and item manipulation.
+ */
 class QnLayoutDisplay: public QObject, protected AnimationTimerListener, protected QnSceneUtility {
     Q_OBJECT;
 public:

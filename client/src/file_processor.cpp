@@ -1,6 +1,8 @@
 #include "file_processor.h"
 #include <QDirIterator>
 #include <QFileInfo>
+#include <core/resource/directory_browser.h>
+#include <core/resourcemanagment/resource_pool.h>
 #include <plugins/resources/archive/avi_files/avi_dvd_device.h>
 #include <plugins/resources/archive/avi_files/avi_bluray_device.h>
 #include <plugins/resources/archive/avi_files/avi_dvd_archive_delegate.h>
@@ -42,3 +44,29 @@ void QnFileProcessor::findAcceptedFiles(const QString &path, QStringList *list) 
         }
     }
 }
+
+QStringList QnFileProcessor::findAcceptedFiles(const QString &path) {
+    QStringList result;
+    findAcceptedFiles(path, &result);
+    return result;
+}
+
+void QnFileProcessor::findAcceptedFiles(const QList<QUrl> &urls, QStringList *list) {
+    foreach (const QUrl &url, urls)
+        QnFileProcessor::findAcceptedFiles(url.toLocalFile(), list);
+}
+
+QStringList QnFileProcessor::findAcceptedFiles(const QList<QUrl> &urls) {
+    QStringList result;
+    findAcceptedFiles(urls, &result);
+    return result;
+}
+
+QnResourceList QnFileProcessor::creareResourcesForFiles(const QStringList &files) {
+    QnResourceList result = QnResourceDirectoryBrowser::instance().checkFiles(files);
+
+    qnResPool->addResources(result);
+
+    return result;
+}
+

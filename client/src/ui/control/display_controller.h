@@ -21,6 +21,12 @@ class QnLayoutDisplay;
 class QnDisplayState;
 class QnDisplayWidget;
 
+
+/**
+ * This class implements default scene manipulation logic. 
+ * 
+ * It also presents some functions for high-level scene content manipulation.
+ */
 class QnDisplayController: public QObject, protected QnSceneUtility {
     Q_OBJECT;
 public:
@@ -28,10 +34,15 @@ public:
 
     virtual ~QnDisplayController();
 
-    ArchiveDropInstrument *archiveDropInstrument() const {
-        return m_archiveDropInstrument; 
+    QnDisplayState *state() const {
+        return m_state;
     }
-    
+
+    void drop(const QUrl &url, const QPoint &gridPos, bool checkUrls = true);
+    void drop(const QList<QUrl> &urls, const QPoint &gridPos, bool checkUrls = true);
+    void drop(const QString &file, const QPoint &gridPos, bool checkFiles = true);
+    void drop(const QList<QString> &files, const QPoint &gridPos, bool checkFiles = true);
+
 protected:
     void updateGeometryDelta(QnDisplayWidget *widget);
 
@@ -50,6 +61,9 @@ protected slots:
 
     void at_viewportGrabbed();
     void at_viewportUngrabbed();
+
+private:
+    void dropInternal(const QList<QString> &files, const QPoint &gridPos);
 
 private:
     /** Display synchronizer. */

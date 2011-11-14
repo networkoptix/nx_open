@@ -3,14 +3,12 @@
 
 #include "instrument.h"
 
-class QnDisplayState;
+class QnDisplayController;
 
 class ArchiveDropInstrument: public Instrument {
     Q_OBJECT;
 public:
-    ArchiveDropInstrument(QnDisplayState *state, QObject *parent = NULL);
-
-    void drop(QGraphicsView *view, const QUrl &url, QPoint &pos);
+    ArchiveDropInstrument(QnDisplayController *controller, QObject *parent = NULL);
 
 protected:
     virtual bool dragEnterEvent(QWidget *viewport, QDragEnterEvent *event) override;
@@ -23,7 +21,7 @@ private:
 
 private:
     QStringList m_files;
-    QnDisplayState *m_state;
+    QnDisplayController *m_controller;
 };
 
 #endif // QN_ARCHIVE_DROP_INSTRUMENT_H

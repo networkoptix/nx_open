@@ -76,7 +76,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     /* Process input files. */
     QStringList files;
     for (int i = 1; i < argc; ++i)
-        controller->archiveDropInstrument()->drop(view, QUrl::fromLocalFile(fromNativePath(QString::fromLocal8Bit(argv[i]))), view->rect().center());
+        controller->drop(fromNativePath(QString::fromLocal8Bit(argv[i])), QPoint(0, 0));
 
     /*
     QnFileProcessor::findAcceptedFiles(, &files);
