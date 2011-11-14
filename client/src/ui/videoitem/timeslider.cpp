@@ -167,7 +167,8 @@ public:
         GraphicsFrame(parent), m_parent(parent),
         m_dragging(false),
         m_scaleSpeed(1.0),
-        m_prevWheelDelta(INT_MAX)
+        m_prevWheelDelta(INT_MAX),
+        m_cachedXPos(-INT64_MAX)
     {
         setFlag(QGraphicsItem::ItemClipsToShape); // ### paints out of shape, bitch
 
@@ -202,15 +203,16 @@ private:
     QPropertyAnimation *m_lineAnimation;
     QPropertyAnimation *m_wheelAnimation;
     bool m_dragging;
-    float m_scaleSpeed;
+    double m_scaleSpeed;
     int m_prevWheelDelta;
+    double m_cachedXPos;
 };
 
 void TimeLine::wheelEvent(QGraphicsSceneWheelEvent *event)
 {
-    static const float SCALE_FACTOR = 2000.0;
+    static const double SCALE_FACTOR = 2000.0;
     static const int WHEEL_ANIMATION_DURATION = 1000;
-    //static const float SCALE_FACTOR = 120.0;
+    //static const double SCALE_FACTOR = 120.0;
     int delta = event->delta();
     if (delta != m_prevWheelDelta)
         m_scaleSpeed = 1.0;
@@ -226,7 +228,7 @@ void TimeLine::wheelEvent(QGraphicsSceneWheelEvent *event)
 
     if (qAbs(delta) == 120)
     {
-        m_scaleSpeed = qMin(m_scaleSpeed * 1.4f, 10.0f);
+        m_scaleSpeed = qMin(m_scaleSpeed * 1.4, (double)10.0);
 
         m_wheelAnimation->setEndValue(m_parent->scalingFactor() + delta/SCALE_FACTOR*m_scaleSpeed);
         if (m_wheelAnimation->state() != QPropertyAnimation::Running)
@@ -337,7 +339,7 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
     const qint64 range = m_parent->sliderRange();
     const qint64 pos = m_parent->viewPortPos();
-    const float pixelPerTime = r.width() / range;
+    const double pixelPerTime = r.width() / range;
 
     const int minWidth = 30;
 
@@ -351,11 +353,16 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
     int maxLen = maxLevel - level;
 
-    float xpos = r.left() - qRound(pixelPerTime * pos);
+    double xpos = r.left() - qRound64(pixelPerTime * pos);
     int outsideCnt = -xpos / (intervals[level].interval * pixelPerTime);
     xpos += outsideCnt * intervals[level].interval * pixelPerTime;
     if ((pos+range - intervals[level].interval*outsideCnt) / r.width() <= 1) // abnormally long range
         return;
+
+    if (qAbs(m_cachedXPos - xpos) < 1.0) 
+        xpos = m_cachedXPos;
+    else
+        m_cachedXPos = xpos;
 
     QColor color = pal.color(QPalette::Text);
 
@@ -393,7 +400,7 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         widths << textWidth;
         if (textWidth > 0 && maxHeight < metric.height())
             maxHeight = metric.height();
-        opacity << qBound(MAX_MIN_OPACITY, (pixelPerTime*interval.interval - minWidth)/60.0f, 1.0f);
+        opacity << qBound(MAX_MIN_OPACITY, float(pixelPerTime*interval.interval - minWidth)/60.0f, 1.0f);
     }
 
     // draw grid
@@ -685,15 +692,15 @@ void TimeSlider::setCurrentValue(qint64 value)
 
     \sa TimeSlider::currentValue
 */
-float TimeSlider::scalingFactor() const
+double TimeSlider::scalingFactor() const
 {
     return m_scalingFactor;
 }
 
-void TimeSlider::setScalingFactor(float factor)
+void TimeSlider::setScalingFactor(double factor)
 {
-    float oldfactor = m_scalingFactor;
-    m_scalingFactor = qMax(factor, 0.0f);
+    double oldfactor = m_scalingFactor;
+    m_scalingFactor = qMax(factor, (double)0.0);
     if (sliderRange() < m_minimumRange)
         m_scalingFactor = oldfactor;
     //setViewPortPos(currentValue() - m_slider->value()*delta());
@@ -743,7 +750,7 @@ void TimeSlider::setViewPortPos(qint64 value)
     }
 }
 
-float TimeSlider::delta() const
+double TimeSlider::delta() const
 {
     return ((1.0f/(m_slider->maximum() - m_slider->minimum()))*length())/qExp(scalingFactor()/2);
 }
