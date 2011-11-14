@@ -3,6 +3,19 @@
 
 #include <QSizeF>
 
+/**
+ * This class is a workaround for a lack of mechanisms that would allow to 
+ * create widgets with constant aspect ratio. 
+ * 
+ * Default sizeHint / sizePolicy system cannot help here because when passing 
+ * constraint to effectiveSizeHint function, either width or height must not be set. 
+ * If both are set, then you get your constraint back and the control never 
+ * reaches the virtual sizeHint function. 
+ * 
+ * That is, there is no simple way to implement constant aspect ratio 
+ * resizing using Qt-supplied functionality. So we introduce a separate 
+ * interface for that.
+ */
 class ConstrainedResizable {
 public:
     /**

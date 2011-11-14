@@ -19,13 +19,9 @@ protected:
     virtual bool mouseMoveEvent(QWidget *viewport, QMouseEvent *event) override;
     virtual bool mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) override;
 
-    virtual void startDrag(QGraphicsView *view) override;
-    virtual void drag(QGraphicsView *view) override;
-    virtual void finishDrag(QGraphicsView *view) override;
-
-private:
-    void startScrolling(QGraphicsView *view);
-    void stopScrolling(QGraphicsView *view);
+    virtual void startDrag() override;
+    virtual void drag() override;
+    virtual void finishDrag() override;
 
 private:
     QCursor m_originalCursor;

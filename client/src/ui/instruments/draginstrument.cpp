@@ -14,37 +14,19 @@ namespace {
 } // anonymous namespace
 
 DragInstrument::DragInstrument(QObject *parent): 
-    Instrument(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease), parent),
-    m_state(INITIAL)
+    DragProcessingInstrument(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent)
 {}
 
 DragInstrument::~DragInstrument() {
     ensureUninstalled();
 }
 
-void DragInstrument::installedNotify() {
-    m_state = INITIAL;
-    m_view.clear();
-
-    Instrument::installedNotify();
-}
-
-void DragInstrument::aboutToBeUninstalledNotify() {
-    Instrument::aboutToBeUninstalledNotify();
-
-    stopDragging();
-}
-
-void DragInstrument::aboutToBeDisabledNotify() {
-    Instrument::aboutToBeDisabledNotify();
-
-    stopDragging();
-}
-
 bool DragInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
-    QGraphicsView *view = this->view(viewport);
+    if(!processor()->isWaiting())
+        return false;
 
-    if (m_state != INITIAL || !view->isInteractive())
+    QGraphicsView *view = this->view(viewport);
+    if (!view->isInteractive())
         return false;
 
     if (event->button() != Qt::LeftButton)
@@ -55,10 +37,6 @@ bool DragInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
     if (draggedItem == NULL)
         return false;
 
-    m_state = PREPAIRING;
-    m_mousePressPos = event->pos();
-    m_lastMouseScenePos = view->mapToScene(event->pos());
-
     /* If a user tries to ctrl-drag an item, we should select it when dragging starts. */
     if (event->modifiers() & Qt::ControlModifier) {
         m_itemToSelect = draggedItem;
@@ -66,76 +44,50 @@ bool DragInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
         m_itemToSelect = NULL;
     }
 
+    processor()->mousePressEvent(viewport, event);
+
     event->accept();
     return false;
 }
 
 bool DragInstrument::mouseMoveEvent(QWidget *viewport, QMouseEvent *event) {
-    QGraphicsView *view = this->view(viewport);
-
-    if (m_state == INITIAL || !view->isInteractive())
-        return false;
-
-    /* Stop dragging if the user has let go of the trigger button (even if we didn't get the release events). */
-    if (!(event->buttons() & Qt::LeftButton)) {
-        stopDragging();
-        return false;
-    }
-
-    /* Check for drag distance. */
-    if (m_state == PREPAIRING) {
-        if ((m_mousePressPos - event->pos()).manhattanLength() < QApplication::startDragDistance()) {
-            return false;
-        } else {
-            startDragging(view);
-        }
-    }
-
-    /* Update mouse positions & calculate delta. */
-    QPointF currentMouseScenePos = view->mapToScene(event->pos());
-    QPointF delta = currentMouseScenePos - m_lastMouseScenePos;
-    m_lastMouseScenePos = currentMouseScenePos;
-
-    /* Drag selected items. */
-    foreach (QGraphicsItem *item, scene()->selectedItems())
-        item->setPos(item->pos() + delta);
-
-    event->accept();
-    return false; /* Let other instruments receive mouse move events too! */
-}
-
-bool DragInstrument::mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) {
-    QGraphicsView *view = this->view(viewport);
-
-    if (m_state == INITIAL || !view->isInteractive())
-        return false;
-
-    if (event->button() != Qt::LeftButton)
-        return false;
-
-    stopDragging();
+    processor()->mouseMoveEvent(viewport, event);
 
     event->accept();
     return false;
 }
 
-void DragInstrument::startDragging(QGraphicsView *view) {
-    m_state = DRAGGING;
-    m_view = view;
+bool DragInstrument::mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) {
+    processor()->mouseReleaseEvent(viewport, event);
 
+    event->accept();
+    return false;
+}
+
+bool DragInstrument::paintEvent(QWidget *viewport, QPaintEvent *event) {
+    processor()->paintEvent(viewport, event);
+
+    return false;
+}
+
+void DragInstrument::startDrag() {
     if(m_itemToSelect != NULL) {
         m_itemToSelect->setSelected(true);
         m_itemToSelect = NULL;
     }
 
-    emit draggingStarted(view, scene()->selectedItems());
+    emit draggingStarted(processor()->view(), scene()->selectedItems());
 }
 
-void DragInstrument::stopDragging() {
-    if(m_state == DRAGGING)
-        emit draggingFinished(m_view.data(), scene() == NULL ? QList<QGraphicsItem *>() : scene()->selectedItems());
-    m_state = INITIAL;
-    m_view.clear();
+void DragInstrument::drag() {
+    QPointF delta = processor()->mouseScenePos() - processor()->lastMouseScenePos();
+
+    /* Drag selected items. */
+    foreach (QGraphicsItem *item, scene()->selectedItems())
+        item->setPos(item->pos() + delta);
 }
 
+void DragInstrument::finishDrag() {
+    emit draggingFinished(processor()->view(), scene() == NULL ? QList<QGraphicsItem *>() : scene()->selectedItems());
+}
 

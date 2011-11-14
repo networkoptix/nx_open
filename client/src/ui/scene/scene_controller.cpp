@@ -13,7 +13,6 @@
 #include <ui/instruments/wheelzoominstrument.h>
 #include <ui/instruments/rubberbandinstrument.h>
 #include <ui/instruments/draginstrument.h>
-#include <ui/instruments/contextmenuinstrument.h>
 #include <ui/instruments/clickinstrument.h>
 #include <ui/instruments/boundinginstrument.h>
 #include <ui/instruments/stopinstrument.h>
@@ -55,8 +54,8 @@ QnSceneController::QnSceneController(QnDisplaySynchronizer *synchronizer, QObjec
     m_view(synchronizer->view())
 {
     /* Install and configure instruments. */
-    ClickInstrument *itemClickInstrument = new ClickInstrument(Instrument::ITEM, this);
-    ClickInstrument *sceneClickInstrument = new ClickInstrument(Instrument::SCENE, this);
+    ClickInstrument *itemClickInstrument = new ClickInstrument(Qt::LeftButton, Instrument::ITEM, this);
+    ClickInstrument *sceneClickInstrument = new ClickInstrument(Qt::LeftButton, Instrument::SCENE, this);
     m_handScrollInstrument = new HandScrollInstrument(this);
     m_wheelZoomInstrument = new WheelZoomInstrument(this);
     m_rubberBandInstrument = new RubberBandInstrument(this);
@@ -94,31 +93,29 @@ QnSceneController::QnSceneController(QnDisplaySynchronizer *synchronizer, QObjec
     m_manager->installInstrument(m_dragInstrument);
     m_manager->installInstrument(m_rubberBandInstrument);
     m_manager->installInstrument(m_handScrollInstrument);
-    m_manager->installInstrument(new ContextMenuInstrument(this));
     m_manager->installInstrument(new ArchiveDropInstrument(m_state, this));
 
-    connect(itemClickInstrument,        SIGNAL(clicked(QGraphicsView *, QGraphicsItem *)),                  this,                   SLOT(at_item_clicked(QGraphicsView *, QGraphicsItem *)));
-    connect(itemClickInstrument,        SIGNAL(doubleClicked(QGraphicsView *, QGraphicsItem *)),            this,                   SLOT(at_item_doubleClicked(QGraphicsView *, QGraphicsItem *)));
-    connect(sceneClickInstrument,       SIGNAL(clicked(QGraphicsView *)),                                   this,                   SLOT(at_scene_clicked(QGraphicsView *)));
-    connect(sceneClickInstrument,       SIGNAL(doubleClicked(QGraphicsView *)),                             this,                   SLOT(at_scene_doubleClicked(QGraphicsView *)));
-    connect(m_dragInstrument,           SIGNAL(draggingStarted(QGraphicsView *, QList<QGraphicsItem *>)),   this,                   SLOT(at_draggingStarted(QGraphicsView *, QList<QGraphicsItem *>)));
-    connect(m_dragInstrument,           SIGNAL(draggingFinished(QGraphicsView *, QList<QGraphicsItem *>)),  this,                   SLOT(at_draggingFinished(QGraphicsView *, QList<QGraphicsItem *>)));
-    connect(m_resizingInstrument,       SIGNAL(resizingStarted(QGraphicsView *, QGraphicsWidget *)),        this,                   SLOT(at_resizingStarted(QGraphicsView *, QGraphicsWidget *)));
-    connect(m_resizingInstrument,       SIGNAL(resizingFinished(QGraphicsView *, QGraphicsWidget *)),       this,                   SLOT(at_resizingFinished(QGraphicsView *, QGraphicsWidget *)));
-    connect(m_handScrollInstrument,     SIGNAL(scrollingStarted(QGraphicsView *)),                          m_synchronizer,         SLOT(disableViewportChanges()));
-    connect(m_handScrollInstrument,     SIGNAL(scrollingFinished(QGraphicsView *)),                         m_synchronizer,         SLOT(enableViewportChanges()));
-    connect(m_synchronizer,             SIGNAL(viewportGrabbed()),                                          m_handScrollInstrument, SLOT(recursiveDisable()));
-    connect(m_synchronizer,             SIGNAL(viewportUngrabbed()),                                        m_handScrollInstrument, SLOT(recursiveEnable()));
-    connect(m_synchronizer,             SIGNAL(viewportGrabbed()),                                          m_wheelZoomInstrument,  SLOT(recursiveDisable()));
-    connect(m_synchronizer,             SIGNAL(viewportUngrabbed()),                                        m_wheelZoomInstrument,  SLOT(recursiveEnable()));
-    connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *)), m_dragInstrument,       SLOT(recursiveDisable()));
-    connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *)),m_dragInstrument,       SLOT(recursiveEnable()));
-    connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *)), m_rubberBandInstrument, SLOT(recursiveDisable()));
-    connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *)),m_rubberBandInstrument, SLOT(recursiveEnable()));
+    connect(itemClickInstrument,        SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const QPoint &)),      this,                   SLOT(at_item_clicked(QGraphicsView *, QGraphicsItem *)));
+    connect(itemClickInstrument,        SIGNAL(doubleClicked(QGraphicsView *, QGraphicsItem *, const QPoint &)),this,                   SLOT(at_item_doubleClicked(QGraphicsView *, QGraphicsItem *)));
+    connect(sceneClickInstrument,       SIGNAL(clicked(QGraphicsView *, const QPoint &)),                       this,                   SLOT(at_scene_clicked(QGraphicsView *)));
+    connect(sceneClickInstrument,       SIGNAL(doubleClicked(QGraphicsView *, const QPoint &)),                 this,                   SLOT(at_scene_doubleClicked(QGraphicsView *)));
+    connect(m_dragInstrument,           SIGNAL(draggingStarted(QGraphicsView *, QList<QGraphicsItem *>)),       this,                   SLOT(at_draggingStarted(QGraphicsView *, QList<QGraphicsItem *>)));
+    connect(m_dragInstrument,           SIGNAL(draggingFinished(QGraphicsView *, QList<QGraphicsItem *>)),      this,                   SLOT(at_draggingFinished(QGraphicsView *, QList<QGraphicsItem *>)));
+    connect(m_resizingInstrument,       SIGNAL(resizingStarted(QGraphicsView *, QGraphicsWidget *)),            this,                   SLOT(at_resizingStarted(QGraphicsView *, QGraphicsWidget *)));
+    connect(m_resizingInstrument,       SIGNAL(resizingFinished(QGraphicsView *, QGraphicsWidget *)),           this,                   SLOT(at_resizingFinished(QGraphicsView *, QGraphicsWidget *)));
+    connect(m_handScrollInstrument,     SIGNAL(scrollingStarted(QGraphicsView *)),                              m_synchronizer,         SLOT(disableViewportChanges()));
+    connect(m_handScrollInstrument,     SIGNAL(scrollingFinished(QGraphicsView *)),                             m_synchronizer,         SLOT(enableViewportChanges()));
+    connect(m_synchronizer,             SIGNAL(viewportGrabbed()),                                              m_handScrollInstrument, SLOT(recursiveDisable()));
+    connect(m_synchronizer,             SIGNAL(viewportUngrabbed()),                                            m_handScrollInstrument, SLOT(recursiveEnable()));
+    connect(m_synchronizer,             SIGNAL(viewportGrabbed()),                                              m_wheelZoomInstrument,  SLOT(recursiveDisable()));
+    connect(m_synchronizer,             SIGNAL(viewportUngrabbed()),                                            m_wheelZoomInstrument,  SLOT(recursiveEnable()));
+    connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *)),     m_dragInstrument,       SLOT(recursiveDisable()));
+    connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *)),    m_dragInstrument,       SLOT(recursiveEnable()));
+    connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *)),     m_rubberBandInstrument, SLOT(recursiveDisable()));
+    connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *)),    m_rubberBandInstrument, SLOT(recursiveEnable()));
 
-    connect(m_synchronizer,             SIGNAL(viewportGrabbed()),                                          this, SLOT(at_viewportGrabbed()));
-    connect(m_synchronizer,             SIGNAL(viewportUngrabbed()),                                        this, SLOT(at_viewportUngrabbed()));
-
+    connect(m_synchronizer,             SIGNAL(viewportGrabbed()),                                              this, SLOT(at_viewportGrabbed()));
+    connect(m_synchronizer,             SIGNAL(viewportUngrabbed()),                                            this, SLOT(at_viewportUngrabbed()));
 }
 
 QnSceneController::~QnSceneController() {
@@ -150,7 +147,7 @@ void QnSceneController::at_resizingStarted(QGraphicsView *, QGraphicsWidget *ite
     m_synchronizer->bringToFront(item);
 }
 
-void QnSceneController::at_resizingFinished(QGraphicsView *view, QGraphicsWidget *item) {
+void QnSceneController::at_resizingFinished(QGraphicsView *, QGraphicsWidget *item) {
     qDebug("RESIZING FINISHED");
 
     QnDisplayWidget *widget = dynamic_cast<QnDisplayWidget *>(item);

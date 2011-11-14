@@ -186,7 +186,7 @@ private:
 };
 
 RubberBandInstrument::RubberBandInstrument(QObject *parent):
-    Instrument(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent)
+    DragProcessingInstrument(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent)
 {}
 
 RubberBandInstrument::~RubberBandInstrument() {
@@ -194,8 +194,6 @@ RubberBandInstrument::~RubberBandInstrument() {
 }
 
 void RubberBandInstrument::installedNotify() {
-    m_state = INITIAL;
-    
     m_rubberBand.reset(new RubberBandItem());
     scene()->addItem(m_rubberBand.data());
 
@@ -203,9 +201,13 @@ void RubberBandInstrument::installedNotify() {
 
     m_inSelectionChanged = false;
     m_protectSelection = false;
+
+    DragProcessingInstrument::installedNotify();
 }
 
 void RubberBandInstrument::aboutToBeUninstalledNotify() {
+    DragProcessingInstrument::aboutToBeUninstalledNotify();
+
     if (scene() == NULL) {
         /* Rubber band item will be deleted by scene, just zero the pointer. */
         m_rubberBand.take();
@@ -216,13 +218,7 @@ void RubberBandInstrument::aboutToBeUninstalledNotify() {
     }
 }
 
-void RubberBandInstrument::aboutToBeDisabledNotify() {
-    if(!m_rubberBand.isNull())
-        m_rubberBand->setViewport(NULL);
-    m_state = INITIAL;
-}
-
-bool RubberBandInstrument::paintEvent(QWidget *viewport, QPaintEvent *) {
+bool RubberBandInstrument::paintEvent(QWidget *viewport, QPaintEvent *event) {
     if(viewport != m_rubberBand->viewport())
         return false; /* We are interested only in transformations for the current viewport. */
 
@@ -234,15 +230,17 @@ bool RubberBandInstrument::paintEvent(QWidget *viewport, QPaintEvent *) {
     m_rubberBand->setViewportTransform(sceneToViewport);
 
     /* Scene mouse position may have changed as a result of transform change. */
-    m_rubberBand->setCorner(view->mapToScene(view->mapFromGlobal(QCursor::pos())));
+    processor()->paintEvent(viewport, event);
 
     return false;
 }
 
 bool RubberBandInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
+    if(!processor()->isWaiting())
+        return false;
+    
     QGraphicsView *view = this->view(viewport);
-
-    if (m_state != INITIAL || !view->isInteractive())
+    if (!view->isInteractive())
         return false;
 
     if (event->button() != Qt::LeftButton)
@@ -253,10 +251,7 @@ bool RubberBandInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event
     if (focusableItem != NULL)
         return false; /* Let default implementation handle it. */
 
-    m_state = PREPAIRING;
-    m_mousePressPos = event->pos();
-    m_mousePressScenePos = view->mapToScene(event->pos());
-
+    /* Ok to go. */
     if (!(event->modifiers() & Qt::ShiftModifier))
         scene()->clearSelection();
     
@@ -264,6 +259,8 @@ bool RubberBandInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event
     m_originallySelected = toSet(scene()->selectedItems());
     m_protectSelection = !m_originallySelected.empty();
 
+    processor()->mousePressEvent(viewport, event);
+        
     event->accept();
     return false;
 }
@@ -285,39 +282,37 @@ void RubberBandInstrument::at_scene_selectionChanged() {
 }
 
 bool RubberBandInstrument::mouseMoveEvent(QWidget *viewport, QMouseEvent *event) {
-    QGraphicsView *view = this->view(viewport);
+    processor()->mouseMoveEvent(viewport, event);
 
-    if (m_state == INITIAL || !view->isInteractive())
-        return false;
+    event->accept();
+    return false;
+}
 
-    /* Stop rubber banding if the user has let go of the trigger button (even if we didn't get the release events). */
-    if (!(event->buttons() & Qt::LeftButton)) {
-        m_rubberBand->setViewport(NULL);
-        m_state = INITIAL;
-        return false;
-    }
+bool RubberBandInstrument::mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) {
+    processor()->mouseReleaseEvent(viewport, event);
 
-    /* Check for drag distance. */
-    if (m_state == PREPAIRING) {
-        if ((m_mousePressPos - event->pos()).manhattanLength() < QApplication::startDragDistance()) {
-            return false;
-        } else {
-            m_state = RUBBER_BANDING;
-            m_rubberBand->setViewport(viewport);
-            m_rubberBand->setViewportTransform(view->viewportTransform());
-            m_rubberBand->setOrigin(m_mousePressScenePos);
-        }
-    }
+    event->accept();
+    return false;
+}
+
+void RubberBandInstrument::startDrag() {
+    m_rubberBand->setViewport(processor()->view()->viewport());
+    m_rubberBand->setViewportTransform(processor()->view()->viewportTransform());
+    m_rubberBand->setOrigin(processor()->mousePressScenePos());
+}
+
+void RubberBandInstrument::drag() {
+    QGraphicsView *view = processor()->view();
 
     /* Update rubber band corner. */
-    m_rubberBand->setCorner(view->mapToScene(event->pos()));
+    m_rubberBand->setCorner(processor()->mouseScenePos());
 
     /* Update selection. */
     QPainterPath selectionArea;
     selectionArea.addPolygon(view->mapToScene(m_rubberBand->rubberBandRect()));
     selectionArea.closeSubpath();
 
-    if (event->modifiers() & Qt::ShiftModifier) {
+    if (processor()->modifiers() & Qt::ShiftModifier) {
         /* TODO: this can be implemented more efficiently using intersection of several regions. */
         QSet<QGraphicsItem *> newlySelected = toSet(scene()->items(selectionArea, view->rubberBandSelectionMode(), Qt::DescendingOrder, view->viewportTransform()));
 
@@ -332,25 +327,10 @@ bool RubberBandInstrument::mouseMoveEvent(QWidget *viewport, QMouseEvent *event)
     } else {
         scene()->setSelectionArea(selectionArea, view->rubberBandSelectionMode(), view->viewportTransform());
     }
-
-    event->accept();
-    return false; /* Let other instruments receive mouse move events too! */
 }
 
-bool RubberBandInstrument::mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) {
-    QGraphicsView *view = this->view(viewport);
-
-    if (m_state == INITIAL || !view->isInteractive())
-        return false;
-
-    if (event->button() != Qt::LeftButton)
-        return false;
-
+void RubberBandInstrument::finishDrag() {
     m_rubberBand->setViewport(NULL);
-    m_state = INITIAL;
-
-    event->accept();
-    return false;
 }
 
 QSet<QGraphicsItem *> RubberBandInstrument::toSet(QList<QGraphicsItem *> items) {

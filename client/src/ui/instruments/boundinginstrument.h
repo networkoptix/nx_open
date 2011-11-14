@@ -1,9 +1,9 @@
 #ifndef QN_BOUNDING_INSTRUMENT_H
 #define QN_BOUNDING_INSTRUMENT_H
 
-#include "instrument.h"
 #include <QRect>
 #include <QTransform>
+#include "instrument.h"
 #include "animationtimer.h"
 
 class BoundingInstrument: public Instrument, protected AnimationTimerListener {

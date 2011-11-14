@@ -1,8 +1,8 @@
 #ifndef QN_RESIZING_INSTRUMENT_H
 #define QN_RESIZING_INSTRUMENT_H
 
-#include "instrument.h"
 #include <QWeakPointer>
+#include "dragprocessinginstrument.h"
 
 class ConstrainedResizable;
 
@@ -26,7 +26,7 @@ class ConstrainedResizable;
  * releases the mouse button before moving the mouse pointer several pixels away.
  * In this case resizingStarted() signal will not be emitted.
  */
-class ResizingInstrument: public Instrument {
+class ResizingInstrument: public DragProcessingInstrument {
     Q_OBJECT;
 public:
     ResizingInstrument(QObject *parent = NULL);
@@ -39,32 +39,21 @@ signals:
     void resizingProcessFinished(QGraphicsView *view, QGraphicsWidget *widget);
 
 protected:
-    virtual void installedNotify() override;
-    virtual void aboutToBeUninstalledNotify() override;
-    virtual void aboutToBeDisabledNotify() override;
-
     virtual bool mousePressEvent(QWidget *viewport, QMouseEvent *event) override;
     virtual bool mouseMoveEvent(QWidget *viewport, QMouseEvent *event) override;
     virtual bool mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) override;
+    virtual bool paintEvent(QWidget *viewport, QPaintEvent *event) override;
+
+    virtual void startDragProcess() override;
+    virtual void startDrag() override;
+    virtual void drag() override;
+    virtual void finishDrag() override;
+    virtual void finishDragProcess() override;
 
 private:
-    void startResizing();
-    void stopResizing();
-
-private:
-    enum State {
-        INITIAL,
-        PREPAIRING,
-        RESIZING
-    };
-
-    State m_state;
-    QPoint m_mousePressPos;
-    QPointF m_mousePressScenePos;
-    QPointF m_lastMouseScenePos;
     QRectF m_startGeometry;
+    bool m_resizingStartedEmitted;
     Qt::WindowFrameSection m_section;
-    QWeakPointer<QGraphicsView> m_view;
     QWeakPointer<QGraphicsWidget> m_widget;
     ConstrainedResizable *m_resizable;
 };

@@ -5,13 +5,13 @@
 #include <QPoint>
 #include <QRect>
 #include <QSet>
-#include "instrument.h"
+#include "dragprocessinginstrument.h"
 
 class QGraphicsItem;
 
 class RubberBandItem;
 
-class RubberBandInstrument: public Instrument {
+class RubberBandInstrument: public DragProcessingInstrument {
     Q_OBJECT;
 public:
     RubberBandInstrument(QObject *parent);
@@ -20,12 +20,15 @@ public:
 protected:
     virtual void installedNotify() override;
     virtual void aboutToBeUninstalledNotify() override;
-    virtual void aboutToBeDisabledNotify() override;
 
     virtual bool mousePressEvent(QWidget *viewport, QMouseEvent *event) override;
     virtual bool mouseMoveEvent(QWidget *viewport, QMouseEvent *event) override;
     virtual bool mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) override;
     virtual bool paintEvent(QWidget *viewport, QPaintEvent *event) override;
+
+    virtual void startDrag() override;
+    virtual void drag() override;
+    virtual void finishDrag() override;
 
     static QSet<QGraphicsItem *> toSet(QList<QGraphicsItem *> items);
 
@@ -33,21 +36,6 @@ private slots:
     void at_scene_selectionChanged();
 
 private:
-    enum State {
-        INITIAL,
-        PREPAIRING,
-        RUBBER_BANDING
-    };
-
-    /** Current state. */
-    State m_state;
-
-    /* Scene position of the last rubber band-related mouse press event. */
-    QPointF m_mousePressScenePos;
-
-    /** Widget position of the last rubber band-related mouse press event. */
-    QPoint m_mousePressPos;
-
     /* Rubber band item. */
     QScopedPointer<RubberBandItem> m_rubberBand;
 

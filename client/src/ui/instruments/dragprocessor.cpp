@@ -1,5 +1,12 @@
 #include "dragprocessor.h"
+#include <cassert>
 #include <QApplication>
+#include <QMouseEvent>
+#include <QGraphicsSceneMouseEvent>
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QGraphicsItem>
+#include <QGraphicsObject>
 #include <utils/common/warnings.h>
 
 DragProcessHandler::DragProcessHandler():
@@ -13,9 +20,11 @@ DragProcessHandler::~DragProcessHandler() {
 
 DragProcessor::DragProcessor(QObject *parent):
     QObject(parent),
+    m_modifiers(0),
     m_handler(NULL),
-    m_state(INITIAL),
-    m_dragTimerId(0)
+    m_state(WAITING),
+    m_dragTimerId(0),
+    m_transitionCounter(0)
 {}
 
 DragProcessor::~DragProcessor() {
@@ -23,122 +32,7 @@ DragProcessor::~DragProcessor() {
 }
 
 void DragProcessor::reset() {
-    transition(INITIAL);
-}
-
-void DragProcessor::startDragTimer() {
-    killDragTimer();
-
-    m_dragTimerId = startTimer(QApplication::startDragTime());
-}
-
-void DragProcessor::killDragTimer() {
-    if(m_dragTimerId == 0)
-        return;
-
-    killTimer(m_dragTimerId);
-    m_dragTimerId = 0;
-}
-
-void DragProcessor::checkThread(QWidget *viewport) {
-#ifdef _DEBUG
-    if(viewport == NULL) {
-        qnNullCritical(viewport);
-        return;
-    }
-
-    if(viewport->thread() != thread()) {
-        qnCritical("Processing an event for a viewport from another thread.");
-        return;
-    }
-#endif
-}
-
-void DragProcessor::transition(QGraphicsView *view, State state) {
-    switch(state) {
-    case INITIAL:
-        switch(m_state) {
-        case PREPAIRING:
-            if(m_handler != NULL)
-                m_handler->finishDragProcess(view);
-            killDragTimer();
-            break;
-        case DRAGGING:
-            if(m_handler != NULL) {
-                m_handler->finishDrag(view);
-                m_handler->finishDragProcess(view);
-            }
-            break;
-        default:
-            return;
-        }
-        m_triggerButton = Qt::NoButton;
-        m_view.clear();
-        break;
-    case PREPAIRING:
-        switch(m_state) {
-        case INITIAL:
-            if(m_handler != NULL)
-                m_handler->startDragProcess(view);
-            break;
-        case DRAGGING:
-            if(m_handler != NULL)
-                m_handler->finishDrag(view);
-            break;
-        default:
-            return;
-        }
-        startDragTimer();
-        m_view = view;
-        break;
-    case DRAGGING:
-        switch(m_state) {
-        case INITIAL:
-            if(m_handler != NULL) {
-                m_handler->startDragProcess(view);
-                m_handler->startDrag(view);
-            }
-            break;
-        case PREPAIRING:
-            if(m_handler != NULL)
-                m_handler->startDrag(view);
-            killDragTimer();
-            break;
-        default:
-            return;
-        }
-        m_view = view;
-        break;
-    default:
-        return;
-    }
-
-    m_state = state;
-}
-
-void DragProcessor::transition(State state) {
-    QGraphicsView *view = m_view.data();
-    if(view == NULL) {
-        transition(view, INITIAL);
-        return;
-    }
-
-    transition(view, state);
-}
-
-void DragProcessor::drag(QGraphicsView *view, const QPoint &pos) {
-    m_mousePos = pos;
-    m_mouseScenePos = view->mapToScene(pos);
-
-    if(!(m_flags & DONT_COMPRESS))
-        if(m_mousePos == m_lastMousePos && qFuzzyCompare(m_mouseScenePos, m_lastMouseScenePos))
-            return;
-
-    if(m_handler != NULL)
-        m_handler->drag(view);
-
-    m_lastMousePos = m_mousePos;
-    m_lastMouseScenePos = m_mouseScenePos;
+    transition(static_cast<QMouseEvent *>(NULL), WAITING);
 }
 
 void DragProcessor::setHandler(DragProcessHandler *handler) {
@@ -158,76 +52,344 @@ void DragProcessor::setHandler(DragProcessHandler *handler) {
         m_handler->m_processor = this;
 }
 
-void DragProcessor::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
-    checkThread(viewport);
+void DragProcessor::startDragTimer() {
+    killDragTimer();
 
-    QGraphicsView *view = this->view(viewport);
+    m_dragTimerId = startTimer(QApplication::startDragTime());
+}
 
-    if(m_state == INITIAL) {
+void DragProcessor::killDragTimer() {
+    if(m_dragTimerId == 0)
+        return;
+
+    killTimer(m_dragTimerId);
+    m_dragTimerId = 0;
+}
+
+void DragProcessor::checkThread(QObject *object) {
+#ifdef _DEBUG
+    if(object == NULL) {
+        qnNullCritical(object);
+        return;
+    }
+
+    if(object->thread() != thread()) {
+        qnCritical("Processing an event for an object from another thread.");
+        return;
+    }
+#endif
+}
+
+void DragProcessor::checkThread(QGraphicsItem *item) {
+#ifdef _DEBUG
+    if(item == NULL) {
+        qnNullCritical(item);
+        return;
+    }
+
+    QGraphicsObject *object = item->toGraphicsObject();
+    if(object != NULL)
+        checkThread(static_cast<QObject *>(object));
+#endif
+}
+
+void DragProcessor::preprocessEvent(QGraphicsSceneMouseEvent *event) {
+    m_modifiers = event->modifiers();
+}
+
+void DragProcessor::preprocessEvent(QMouseEvent *event) {
+    m_modifiers = event->modifiers();
+}
+
+template<class Event>
+void DragProcessor::transitionInternal(Event *event, State newState) {
+    m_transitionCounter++;
+    int transitionCounter = m_transitionCounter;
+
+    if(event != NULL)
+        preprocessEvent(event);
+
+    /* Note that handler may trigger another transition. */
+    switch(newState) {
+    case WAITING:
+        switch(m_state) {
+        case PREPAIRING:
+            killDragTimer();
+            m_state = newState;
+            if(m_handler != NULL)
+                m_handler->finishDragProcess();
+            break;
+        case DRAGGING:
+            if(m_handler != NULL) {
+                m_state = PREPAIRING;
+                m_handler->finishDrag();
+                if(transitionCounter == m_transitionCounter) {
+                    m_state = WAITING;
+                    m_handler->finishDragProcess();
+                }
+            } else {
+                m_state = newState;
+            }
+            break;
+        default:
+            return;
+        }
+        if(transitionCounter == m_transitionCounter) {
+            m_triggerButton = Qt::NoButton;
+            m_viewport = NULL;
+            m_object.clear();
+            m_view = NULL;
+            m_scene = NULL;
+            m_item = NULL;
+        }
+        break;
+    case PREPAIRING:
+        startDragTimer();
+        switch(m_state) {
+        case WAITING:
+            m_state = newState;
+            if(m_handler != NULL)
+                m_handler->startDragProcess();
+            break;
+        case DRAGGING:
+            m_state = newState;
+            if(m_handler != NULL)
+                m_handler->finishDrag();
+            break;
+        default:
+            return;
+        }
+        break;
+    case DRAGGING:
+        switch(m_state) {
+        case WAITING:
+            if(m_handler != NULL) {
+                m_state = PREPAIRING;
+                m_handler->startDragProcess();
+                if(transitionCounter == m_transitionCounter) {
+                    m_state = DRAGGING;
+                    m_handler->startDrag();
+                }
+            } else {
+                m_state = newState;
+            }
+            break;
+        case PREPAIRING:
+            m_state = newState;
+            killDragTimer();
+            if(m_handler != NULL)
+                m_handler->startDrag();
+            break;
+        default:
+            return;
+        }
+        break;
+    default:
+        return;
+    }
+}
+
+template<class Event>
+void DragProcessor::transition(Event *event, State state) {
+    if(m_object.isNull()) {
+        m_viewport = NULL;
+        m_view = NULL;
+        m_scene = NULL;
+        m_item = NULL;
+        transitionInternal(event, WAITING);
+        return;
+    }
+
+    transitionInternal(event, state);
+}
+
+template<class Event>
+void DragProcessor::transition(Event *event, QGraphicsView *view, State state) {
+    m_object = view;
+    m_view = view;
+    m_scene = NULL;
+    m_item = NULL;
+
+    transitionInternal(event, state);
+}
+
+template<class Event>
+void DragProcessor::transition(Event *event, QGraphicsScene *scene, State state) {
+    m_object = scene;
+    m_view = NULL;
+    m_scene = scene;
+    m_item = NULL;
+
+    transitionInternal(event, state);
+}
+
+template<class Event>
+void DragProcessor::transition(Event *event, QGraphicsItem *item, State state) {
+    QGraphicsObject *object = item->toGraphicsObject();
+    if(object != NULL)
+        m_object = object;
+    else
+        m_object = this; /* Unsafe, but we have no other options. */
+    m_view = NULL;
+    m_scene = NULL;
+    m_item = item;
+
+    transitionInternal(event, state);
+}
+
+QPoint DragProcessor::screenPos(QGraphicsView *, QMouseEvent *event) {
+    return event->globalPos();
+}
+
+template<class T>
+QPoint DragProcessor::screenPos(T *, QGraphicsSceneMouseEvent *event) {
+    return event->screenPos();
+}
+
+QPointF DragProcessor::scenePos(QGraphicsView *view, QMouseEvent *event) {
+    return view->mapToScene(event->pos());
+}
+
+template<class T>
+QPointF DragProcessor::scenePos(T *, QGraphicsSceneMouseEvent *event) {
+    return event->scenePos();
+}
+
+template<class T, class Event>
+void DragProcessor::mousePressEventInternal(T *object, Event *event) {
+    checkThread(object);
+
+    if(m_state == WAITING) {
         m_triggerButton = event->button();
-        m_lastMousePos = m_mousePressPos = event->pos();
-        m_lastMouseScenePos = m_mousePressScenePos = view->mapToScene(event->pos());
+        m_lastMouseScreenPos = m_mousePressScreenPos = screenPos(object, event);
+        m_lastMouseScenePos = m_mousePressScenePos = scenePos(object, event);
 
-        transition(view, PREPAIRING);
+        transition(event, object, PREPAIRING);
     } else {
-        drag(view, event->pos());
+        if(m_state == DRAGGING)
+            drag(screenPos(object, event), scenePos(object, event));
 
         /* Stop scrolling if the user has let go of the trigger button (even if we didn't get the release event). */
         if(!(event->buttons() & m_triggerButton))
-            transition(view, INITIAL);
+            transition(event, object, WAITING);
     }
 }
 
 void DragProcessor::timerEvent(QTimerEvent *) {
-    transition(DRAGGING);
+    transition(static_cast<QMouseEvent *>(NULL), DRAGGING);
 }
 
-void DragProcessor::mouseMoveEvent(QWidget *viewport, QMouseEvent *event) {
-    checkThread(viewport);
+template<class T, class Event>
+void DragProcessor::mouseMoveEventInternal(T *object, Event *event) {
+    checkThread(object);
 
-    if (m_state == INITIAL)
+    if (m_state == WAITING)
         return;
-
-    QGraphicsView *view = this->view(viewport);
 
     /* Stop scrolling if the user has let go of the trigger button (even if we didn't get the release event). */
     if (!(event->buttons() & m_triggerButton)) {
-        transition(view, INITIAL);
+        transition(event, object, WAITING);
         return;
     }
 
     /* Check for drag distance. */
     if (m_state == PREPAIRING) {
-        if ((m_mousePressPos - event->pos()).manhattanLength() < QApplication::startDragDistance()) {
+        if ((m_mousePressScreenPos - screenPos(object, event)).manhattanLength() < QApplication::startDragDistance()) {
             return;
         } else {
-            transition(view, DRAGGING);
+            transition(event, object, DRAGGING);
         }
     }
 
     /* Perform drag operation. */
-    drag(view, event->pos());
+    if(m_state == DRAGGING)
+        drag(screenPos(object, event), scenePos(object, event));
+}
+
+void DragProcessor::drag(const QPoint &screenPos, const QPointF &scenePos) {
+    assert(m_state == DRAGGING);
+
+    m_mouseScreenPos = screenPos;
+    m_mouseScenePos = scenePos;
+
+    if(!(m_flags & DONT_COMPRESS))
+        if(m_mouseScreenPos == m_lastMouseScreenPos && qFuzzyCompare(m_mouseScenePos, m_lastMouseScenePos))
+            return;
+
+    if(m_handler != NULL)
+        m_handler->drag();
+
+    m_lastMouseScreenPos = m_mouseScreenPos;
+    m_lastMouseScenePos = m_mouseScenePos;
+}
+
+template<class T, class Event>
+void DragProcessor::mouseReleaseEventInternal(T *object, Event *event) {
+    checkThread(object);
+
+    if (m_state == WAITING)
+        return;
+
+    if(m_state == DRAGGING)
+        drag(screenPos(object, event), scenePos(object, event));
+
+    if(event->button() == m_triggerButton) {
+        transition(event, object, WAITING);
+        return;
+    }
+}
+
+void DragProcessor::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
+    m_viewport = viewport;
+
+    mousePressEventInternal(this->view(viewport), event);
+}
+
+void DragProcessor::mouseMoveEvent(QWidget *viewport, QMouseEvent *event) {
+    mouseMoveEventInternal(this->view(viewport), event);
 }
 
 void DragProcessor::mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) {
-    checkThread(viewport);
-
-    if (m_state == INITIAL)
-        return;
-
-    QGraphicsView *view = this->view(viewport);
-
-    drag(view, event->pos());
-
-    if(event->button() == m_triggerButton) {
-        transition(view, INITIAL);
-        return;
-    }
+    mouseReleaseEventInternal(this->view(viewport), event);
 }
 
 void DragProcessor::paintEvent(QWidget *viewport, QPaintEvent *) {
     checkThread(viewport);
 
-    drag(this->view(viewport), viewport->mapFromGlobal(QCursor::pos()));
+    if(m_state == DRAGGING && viewport == m_viewport) {
+        QPoint screenPos = QCursor::pos();
+        drag(screenPos, this->view(viewport)->mapToScene(viewport->mapFromGlobal(screenPos)));
+    }
 }
 
+void DragProcessor::mousePressEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) {
+    m_viewport = event->widget();
+
+    mousePressEventInternal(scene, event);
+}
+
+void DragProcessor::mouseMoveEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) {
+    mouseMoveEventInternal(scene, event);
+}
+
+void DragProcessor::mouseReleaseEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) {
+    mouseReleaseEventInternal(scene, event);
+}
+
+void DragProcessor::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
+    m_viewport = event->widget();
+
+    mousePressEventInternal(item, event);
+}
+
+void DragProcessor::mouseMoveEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
+    mouseMoveEventInternal(item, event);
+}
+
+void DragProcessor::mouseReleaseEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
+    mouseReleaseEventInternal(item, event);
+}
+
+QPoint DragProcessor::mouseViewportPos() const {
+    return view()->viewport()->mapFromGlobal(mouseScreenPos());
+}

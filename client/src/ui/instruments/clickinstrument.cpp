@@ -2,104 +2,130 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QApplication>
 
-ClickInstrument::ClickInstrument(WatchedType watchedType, QObject *parent): 
-    Instrument(
+ClickInstrument::ClickInstrument(Qt::MouseButton button, WatchedType watchedType, QObject *parent): 
+    DragProcessingInstrument(
         watchedType,
         makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease, QEvent::GraphicsSceneMouseDoubleClick),
         parent
     ),
-    m_handler(this)
-{}
+    m_button(button)
+{
+    finishDragProcess();
+}
 
-bool detail::ClickInstrumentHandler::mousePressEvent(QGraphicsSceneMouseEvent *event) {
-    if (event->button() != Qt::LeftButton)
+ClickInstrument::~ClickInstrument() {
+    ensureUninstalled();
+}
+
+template<class T>
+bool ClickInstrument::mousePressEventInternal(T *object, QGraphicsSceneMouseEvent *event) {
+    if (event->button() != m_button)
         return false;
 
     m_isClick = true;
     m_isDoubleClick = false;
-    m_mousePressPos = event->screenPos();
 
+    processor()->mousePressEvent(object, event);
     return false;
 }
 
-bool detail::ClickInstrumentHandler::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
-    if (!m_isClick)
-        return false;
-
-    if ((m_mousePressPos - event->screenPos()).manhattanLength() > QApplication::startDragDistance()) {
-        m_isClick = false;
-        return false;
-    }
-
-    return false;
-}
-
-bool detail::ClickInstrumentHandler::mouseReleaseEvent(QGraphicsItem *item, QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) {
-    if(event->button() != Qt::LeftButton)
-        return false;
-
-    if(!m_isClick)
-        return false;
-
-    QGraphicsView *view = NULL;
-    if(event->widget() != NULL)
-        view = m_instrument->view(event->widget());
-
-    if(m_isDoubleClick) {
-        if(item != NULL)
-            emit m_instrument->doubleClicked(view, item);
-        if(scene != NULL)
-            emit m_instrument->doubleClicked(view);
-    } else {
-        if(item != NULL)
-            emit m_instrument->clicked(view, item);
-        if(scene != NULL)
-            emit m_instrument->clicked(view);
-    }
-
-    m_isClick = false;
-    m_isDoubleClick = false;
-    return false;
-}
-
-bool detail::ClickInstrumentHandler::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) {
-    if(event->button() != Qt::LeftButton)
+template<class T>
+bool ClickInstrument::mouseDoubleClickEventInternal(T *object, QGraphicsSceneMouseEvent *event) {
+    if(event->button() != m_button)
         return false;
 
     m_isClick = true;
     m_isDoubleClick = true;
 
+    processor()->mousePressEvent(object, event);
     return false;
 }
 
-bool ClickInstrument::mousePressEvent(QGraphicsItem *, QGraphicsSceneMouseEvent *event) {
-    return m_handler.mousePressEvent(event);
+template<class T>
+bool ClickInstrument::mouseMoveEventInternal(T *object, QGraphicsSceneMouseEvent *event) {
+    if (!m_isClick)
+        return false;
+
+    processor()->mouseMoveEvent(object, event);
+    return false;
 }
 
-bool ClickInstrument::mouseMoveEvent(QGraphicsItem *, QGraphicsSceneMouseEvent *event) {
-    return m_handler.mouseMoveEvent(event);
+template<class T>
+bool ClickInstrument::mouseReleaseEventInternal(T *object, QGraphicsSceneMouseEvent *event) {
+    if(event->button() != m_button)
+        return false;
+
+    if(!m_isClick)
+        return false;
+    
+    /* Note that qobject_cast is for a reason here. There are no guarantees
+     * regarding the widget stored in the supplied event. */
+    QGraphicsView *view = NULL;
+    if(event->widget() != NULL)
+        view = qobject_cast<QGraphicsView *>(event->widget()->parent()); 
+    emitSignals(view, object, event);
+
+    m_isClick = false;
+    m_isDoubleClick = false;
+
+    processor()->mouseReleaseEvent(object, event);
+    return false;
+}
+
+void ClickInstrument::emitSignals(QGraphicsView *view, QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
+    if(m_isDoubleClick) {
+        emit doubleClicked(view, item, event->screenPos());
+    } else {
+        emit clicked(view, item, event->screenPos());
+    }
+}
+
+void ClickInstrument::emitSignals(QGraphicsView *view, QGraphicsScene *, QGraphicsSceneMouseEvent *event) {
+    if(m_isDoubleClick) {
+        emit doubleClicked(view, event->screenPos());
+    } else {
+        emit clicked(view, event->screenPos());
+    }
+}
+
+void ClickInstrument::startDrag() {
+    processor()->reset();
+}
+
+void ClickInstrument::finishDragProcess() {
+    m_isClick = false;
+    m_isDoubleClick = false;
+}
+
+bool ClickInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
+    return mousePressEventInternal(item, event);
+}
+
+bool ClickInstrument::mouseDoubleClickEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
+    return mouseDoubleClickEventInternal(item, event);
+}
+
+bool ClickInstrument::mouseMoveEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
+    return mouseMoveEventInternal(item, event);
 }
 
 bool ClickInstrument::mouseReleaseEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
-    return m_handler.mouseReleaseEvent(item, NULL, event);
+    return mouseReleaseEventInternal(item, event);
 }
 
-bool ClickInstrument::mouseDoubleClickEvent(QGraphicsItem *, QGraphicsSceneMouseEvent *event) {
-    return m_handler.mouseDoubleClickEvent(event);
+bool ClickInstrument::mousePressEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) {
+    return mousePressEventInternal(scene, event);
 }
 
-bool ClickInstrument::mousePressEvent(QGraphicsScene *, QGraphicsSceneMouseEvent *event) {
-    return m_handler.mousePressEvent(event);
+bool ClickInstrument::mouseDoubleClickEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) {
+    return mouseDoubleClickEventInternal(scene, event);
 }
 
-bool ClickInstrument::mouseMoveEvent(QGraphicsScene *, QGraphicsSceneMouseEvent *event) {
-    return m_handler.mouseMoveEvent(event);
+bool ClickInstrument::mouseMoveEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) {
+    return mouseMoveEventInternal(scene, event);
 }
 
 bool ClickInstrument::mouseReleaseEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) {
-    return m_handler.mouseReleaseEvent(NULL, scene, event);
+    return mouseReleaseEventInternal(scene, event);
 }
 
-bool ClickInstrument::mouseDoubleClickEvent(QGraphicsScene *, QGraphicsSceneMouseEvent *event) {
-    return m_handler.mouseDoubleClickEvent(event);
-}

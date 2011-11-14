@@ -14,12 +14,14 @@ HandScrollInstrument::~HandScrollInstrument() {
 }
 
 bool HandScrollInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
+    if(!processor()->isWaiting())
+        return false;
+
     if (event->button() != Qt::RightButton)
         return false;
 
     processor()->mousePressEvent(viewport, event);
 
-    // TODO: check this /* If we accept the event here we will block right-click. So don't accept it. */
     event->accept();
     return false;
 }
@@ -38,21 +40,20 @@ bool HandScrollInstrument::mouseReleaseEvent(QWidget *viewport, QMouseEvent *eve
     return false;
 }
 
-void HandScrollInstrument::startDrag(QGraphicsView *view) {
-    m_originalCursor = view->viewport()->cursor();
-    view->viewport()->setCursor(Qt::ClosedHandCursor);
+void HandScrollInstrument::startDrag() {
+    m_originalCursor = processor()->view()->viewport()->cursor();
+    processor()->view()->viewport()->setCursor(Qt::ClosedHandCursor);
 
-    emit scrollingStarted(view);
+    emit scrollingStarted(processor()->view());
 }
 
-void HandScrollInstrument::drag(QGraphicsView *view) {
-    moveViewport(view, -(processor()->mousePos() - processor()->lastMousePos()));
-
+void HandScrollInstrument::drag() {
+    moveViewport(processor()->view(), -(processor()->mouseScreenPos() - processor()->lastMouseScreenPos()));
 }
 
-void HandScrollInstrument::finishDrag(QGraphicsView *view) {
-    emit scrollingFinished(view);
+void HandScrollInstrument::finishDrag() {
+    emit scrollingFinished(processor()->view());
 
-    view->viewport()->setCursor(m_originalCursor);
+    processor()->view()->viewport()->setCursor(m_originalCursor);
 }
 

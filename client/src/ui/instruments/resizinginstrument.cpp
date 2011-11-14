@@ -32,30 +32,19 @@ namespace {
 } // anonymous namespace
 
 ResizingInstrument::ResizingInstrument(QObject *parent):
-    Instrument(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease), parent),
-    m_state(INITIAL)
+    DragProcessingInstrument(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent)
 {}
 
 ResizingInstrument::~ResizingInstrument() {
     ensureUninstalled();
 }
 
-void ResizingInstrument::installedNotify() {
-    m_state = INITIAL;
-}
-
-void ResizingInstrument::aboutToBeUninstalledNotify() {
-    
-}
-
-void ResizingInstrument::aboutToBeDisabledNotify() {
-
-}
-
 bool ResizingInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
+    if(!processor()->isWaiting())
+        return false;
+    
     QGraphicsView *view = this->view(viewport);
-
-    if (m_state != INITIAL || !view->isInteractive())
+    if (!view->isInteractive())
         return false;
 
     if (event->button() != Qt::LeftButton)
@@ -73,59 +62,70 @@ bool ResizingInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
     if(!isResizeGrip(section))
         return false;
 
-    m_state = PREPAIRING;
-    m_mousePressPos = event->pos();
-    m_mousePressScenePos = scenePos;
-    m_lastMouseScenePos = scenePos;
+    /* Ok to go. */
     m_startGeometry = widget->geometry();
     m_section = section;
-    m_view = view;
     m_widget = widget;
     m_resizable = dynamic_cast<ConstrainedResizable *>(widget);
 
-    emit resizingProcessStarted(view, widget);
+    processor()->mousePressEvent(viewport, event);
 
     event->accept();
     return true; /* We don't want default event handlers to kick in. */
 }
 
 bool ResizingInstrument::mouseMoveEvent(QWidget *viewport, QMouseEvent *event) {
-    QGraphicsView *view = this->view(viewport);
+    processor()->mouseMoveEvent(viewport, event);
+    
+    event->accept();
+    return false;
+}
 
-    if (m_state == INITIAL || !view->isInteractive())
-        return false;
+bool ResizingInstrument::mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) {
+    processor()->mouseReleaseEvent(viewport, event);
 
-    /* Stop resizing if the user has let go of the trigger button (even if we didn't get the release events). */
-    if (!(event->buttons() & Qt::LeftButton)) {
-        stopResizing();
-        return false;
+    event->accept();
+    return false;
+}
+
+bool ResizingInstrument::paintEvent(QWidget *viewport, QPaintEvent *event) {
+    processor()->paintEvent(viewport, event);
+
+    return false;
+}
+
+void ResizingInstrument::startDragProcess() {
+    emit resizingProcessStarted(processor()->view(), m_widget.data());
+}
+
+void ResizingInstrument::startDrag() {
+    m_resizingStartedEmitted = false;
+
+    if(m_widget.isNull()) {
+        /** Whoops, already destroyed. */
+        processor()->reset();
+        return;
     }
 
-    /* Check for drag distance. */
-    if (m_state == PREPAIRING) {
-        if ((m_mousePressPos - event->pos()).manhattanLength() < QApplication::startDragDistance()) {
-            return false;
-        } else {
-            startResizing();
-        }
-    }
+    emit resizingStarted(processor()->view(), m_widget.data());
+    m_resizingStartedEmitted = true;
+}
 
+void ResizingInstrument::drag() {
     /* Stop resizing if widget was destroyed. */
     if(m_widget.isNull()) {
-        stopResizing();
-        return false;
+        processor()->reset();
+        return;
     }
 
-    /* Update mouse positions & calculate delta. */
-    QPointF currentMouseScenePos = view->mapToScene(event->pos());
-    m_lastMouseScenePos = currentMouseScenePos;
+    qDebug("TROLOLO %g %g", processor()->mouseScenePos().x(), processor()->mouseScenePos().y());
 
     /* Prepare shortcuts. */
     QGraphicsWidget *widget = m_widget.data();
     const QRectF &startGeometry = m_startGeometry;
 
     /* Calculate new geometry. */
-    QLineF delta(widget->mapFromScene(m_mousePressScenePos), widget->mapFromScene(currentMouseScenePos));
+    QLineF delta(widget->mapFromScene(processor()->mousePressScenePos()), widget->mapFromScene(processor()->mouseScenePos()));
     QLineF parentDelta(widget->mapToParent(delta.p1()), widget->mapToParent(delta.p2()));
     QLineF parentXDelta(widget->mapToParent(QPointF(delta.p1().x(), 0)), widget->mapToParent(QPointF(delta.p2().x(), 0)));
     QLineF parentYDelta(widget->mapToParent(QPointF(0, delta.p1().y())), widget->mapToParent(QPointF(0, delta.p2().y())));
@@ -193,14 +193,6 @@ bool ResizingInstrument::mouseMoveEvent(QWidget *viewport, QMouseEvent *event) {
     );
     /* We don't handle heightForWidth. */
 
-    /* Ok, we cheat here a bit. When passing constraint to effectiveSizeHint 
-     * function, either width or height must not be set. If both are set, then 
-     * you get your constraint back and the control never reaches the virtual
-     * sizeHint function. 
-     * 
-     * That is, there is no simple way to implement constant aspect ratio 
-     * resizing using Qt-supplied functionality. So we introduce a separate 
-     * interface for that. */
     if(m_resizable != NULL)
         size = m_resizable->constrainedSize(size);
 
@@ -256,45 +248,16 @@ bool ResizingInstrument::mouseMoveEvent(QWidget *viewport, QMouseEvent *event) {
     }
 
     widget->setGeometry(newGeometry);
-
-    event->accept();
-    return false; /* Let other instruments receive mouse move events too! */
 }
 
-bool ResizingInstrument::mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) {
-    QGraphicsView *view = this->view(viewport);
+void ResizingInstrument::finishDrag() {
+    if(m_resizingStartedEmitted)
+        emit resizingFinished(processor()->view(), m_widget.data());
 
-    if (m_state == INITIAL || !view->isInteractive())
-        return false;
-
-    if (event->button() != Qt::LeftButton)
-        return false;
-
-    stopResizing();
-
-    event->accept();
-    return true;
-}
-
-void ResizingInstrument::startResizing() {
-    if(m_widget.isNull() || m_view.isNull()) {
-        /* Whoops, already destroyed. */
-        stopResizing();
-        return;
-    }
-
-    m_state = RESIZING;
-
-    emit resizingStarted(m_view.data(), m_widget.data());
-}
-
-void ResizingInstrument::stopResizing() {
-    if(m_state >= PREPAIRING)
-        emit resizingProcessFinished(m_view.data(), m_widget.data());
-    if(m_state == RESIZING)
-        emit resizingFinished(m_view.data(), m_widget.data());
-    m_state = INITIAL;
-    m_view.clear();
     m_widget.clear();
     m_resizable = NULL;
+}
+
+void ResizingInstrument::finishDragProcess() {
+    emit resizingProcessFinished(processor()->view(), m_widget.data());
 }

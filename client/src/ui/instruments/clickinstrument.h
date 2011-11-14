@@ -1,65 +1,64 @@
 #ifndef QN_CLICK_INSTRUMENT_H
 #define QN_CLICK_INSTRUMENT_H
 
-#include "instrument.h"
 #include <QPoint>
+#include "dragprocessinginstrument.h"
 
-class ClickInstrument;
-
-namespace detail {
-    class ClickInstrumentHandler {
-    public:
-        ClickInstrumentHandler(ClickInstrument *instrument): m_instrument(instrument), m_isClick(false), m_isDoubleClick(false) {}
-
-        bool mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
-        bool mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-        bool mousePressEvent(QGraphicsSceneMouseEvent *event);
-        bool mouseReleaseEvent(QGraphicsItem *item, QGraphicsScene *scene, QGraphicsSceneMouseEvent *event);
-
-    private:
-        ClickInstrument *m_instrument;
-        QPoint m_mousePressPos;
-        bool m_isClick;
-        bool m_isDoubleClick;
-    };
-
-} // namespace detail
-
-
-class ClickInstrument: public Instrument {
+class ClickInstrument: public DragProcessingInstrument {
     Q_OBJECT;
 public:
     /**
+     * \param button                    Mouse button to handle.
      * \param watchedType               Type of click events that this instrument will watch.
      *                                  Note that only SCENE and ITEM types are supported.
      * \param parent                    Parent object for this instrument.
      */
-    ClickInstrument(WatchedType watchedType, QObject *parent = NULL);
+    ClickInstrument(Qt::MouseButton button, WatchedType watchedType, QObject *parent = NULL);
+    virtual ~ClickInstrument();
 
 signals:
-    void clicked(QGraphicsView *view, QGraphicsItem *item);
-    void doubleClicked(QGraphicsView *view, QGraphicsItem *item);
+    void clicked(QGraphicsView *view, QGraphicsItem *item, const QPoint &screenPos);
+    void doubleClicked(QGraphicsView *view, QGraphicsItem *item, const QPoint &screenPos);
 
-    void clicked(QGraphicsView *view);
-    void doubleClicked(QGraphicsView *view);
+    void clicked(QGraphicsView *view, const QPoint &screenPos);
+    void doubleClicked(QGraphicsView *view, const QPoint &screenPos);
 
 protected:
+    virtual bool mousePressEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) override;
     virtual bool mouseDoubleClickEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) override;
     virtual bool mouseMoveEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) override;
-    virtual bool mousePressEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) override;
     virtual bool mouseReleaseEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) override;
 
+    virtual bool mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override;
     virtual bool mouseDoubleClickEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override;
     virtual bool mouseMoveEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override;
-    virtual bool mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override;
     virtual bool mouseReleaseEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override;
 
     virtual bool isWillingToWatch(QGraphicsItem *) const override { return true; }
 
-private:
-    friend class detail::ClickInstrumentHandler;
+    virtual void startDrag() override;
+    virtual void finishDragProcess() override;
 
-    detail::ClickInstrumentHandler m_handler;
+private:
+    template<class T>
+    bool mousePressEventInternal(T *object, QGraphicsSceneMouseEvent *event);
+
+    template<class T>
+    bool mouseDoubleClickEventInternal(T *object, QGraphicsSceneMouseEvent *event);
+
+    template<class T>
+    bool mouseMoveEventInternal(T *object, QGraphicsSceneMouseEvent *event);
+
+    template<class T>
+    bool mouseReleaseEventInternal(T *object, QGraphicsSceneMouseEvent *event);
+
+    void emitSignals(QGraphicsView *view, QGraphicsItem *item, QGraphicsSceneMouseEvent *event);
+    void emitSignals(QGraphicsView *view, QGraphicsScene *scene, QGraphicsSceneMouseEvent *event);
+
+private:
+    Qt::MouseButton m_button;
+    bool m_isClick;
+    bool m_isDoubleClick;
 };
 
 #endif // QN_CLICK_INSTRUMENT_H
