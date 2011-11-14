@@ -61,8 +61,8 @@ RTPSession::RTPSession():
     m_rtpIo(*this),
     m_transport("UDP"),
     m_selectedAudioChannel(0),
-    m_startTime(0),
-    m_endTime(0),
+    m_startTime(AV_NOPTS_VALUE),
+    m_endTime(AV_NOPTS_VALUE),
     m_scale(1.0)
 {
     m_udpSock.setReadTimeOut(500);

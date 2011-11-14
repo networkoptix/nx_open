@@ -345,9 +345,12 @@ void NavigationItem::updateSlider()
         return;
 
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader *>(m_camera->getStreamreader());
-    if (reader->lengthMksec() != AV_NOPTS_VALUE) {
-        m_timeSlider->setMinimumValue(reader->startTime() / 1000);
-        m_timeSlider->setMaximumValue(reader->endTime() != DATETIME_NOW ? reader->endTime() / 1000 : DATETIME_NOW);
+    qint64 startTime = reader->startTime();
+    qint64 endTime = reader->endTime();
+    if (startTime != AV_NOPTS_VALUE && endTime != AV_NOPTS_VALUE) 
+    {
+        m_timeSlider->setMinimumValue(startTime / 1000);
+        m_timeSlider->setMaximumValue(endTime != DATETIME_NOW ? endTime / 1000 : DATETIME_NOW);
         if (m_timeSlider->minimumValue() == 0)
             m_timeLabel->setText(formatDuration(m_timeSlider->length() / 1000));
         else
