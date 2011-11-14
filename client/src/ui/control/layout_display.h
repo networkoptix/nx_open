@@ -59,15 +59,20 @@ public:
         return m_view;
     }
 
-    QRectF entityGeometry(QnLayoutItemModel *entity) const;
+    QnDisplayWidget *widget(QnLayoutItemModel *item) const;
 
-    QRectF zoomedEntityGeometry() const;
+
+    QRectF itemGeometry(QnLayoutItemModel *item) const;
+
+    QRectF zoomedItemGeometry() const;
 
     QRectF boundingGeometry() const;
 
     QRectF viewportGeometry() const;
 
+
     void fitInView();
+
 
     void bringToFront(const QList<QGraphicsItem *> &items);
 
@@ -75,9 +80,11 @@ public:
 
     void bringToFront(QnLayoutItemModel *entity);
 
+
     Layer layer(QGraphicsItem *item);
 
     void setLayer(QGraphicsItem *item, Layer layer);
+
 
     void synchronize(QnLayoutItemModel *entity, bool animate = true);
     
@@ -141,11 +148,6 @@ private:
     InstrumentManager *m_manager;
     QGraphicsScene *m_scene;
     QGraphicsView *m_view;
-    
-    QnViewportAnimator *m_viewportAnimator;
-    AnimationTimer *m_updateTimer;
-    BoundingInstrument *m_boundingInstrument;
-    TransformListenerInstrument *m_transformListenerInstrument;
 
     /** Entity to widget mapping. */
     QHash<QnLayoutItemModel *, QnDisplayWidget *> m_widgetByEntity;
@@ -156,8 +158,20 @@ private:
     /** Current front z displacement value. */
     qreal m_frontZ;
 
+    /** Timer that is used to update the viewport. */
+    AnimationTimer *m_updateTimer;
+
+    /** Transformation listener instrument. */
+    TransformListenerInstrument *m_transformListenerInstrument;
+
     /** Activity listener instrument. */
     ActivityListenerInstrument *m_activityListenerInstrument;
+
+    /** Bounding instrument. */
+    BoundingInstrument *m_boundingInstrument;
+
+    /** Viewport animator. */
+    QnViewportAnimator *m_viewportAnimator;
 
     /** Curtain item. */
     QnCurtainItem *m_curtainItem;

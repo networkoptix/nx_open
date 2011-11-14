@@ -194,7 +194,7 @@ void QnLayoutDisplay::enableViewportChanges() {
 
 void QnLayoutDisplay::fitInView() {
     if(m_state->zoomedEntity() != NULL) {
-        m_viewportAnimator->moveTo(zoomedEntityGeometry(), zoomAnimationDurationMsec);
+        m_viewportAnimator->moveTo(zoomedItemGeometry(), zoomAnimationDurationMsec);
     } else {
         m_viewportAnimator->moveTo(boundingGeometry(), zoomAnimationDurationMsec);
     }
@@ -255,14 +255,11 @@ QnLayoutDisplay::Layer QnLayoutDisplay::entityLayer(QnLayoutItemModel *entity) c
     }
 }
 
-QRectF QnLayoutDisplay::entityGeometry(QnLayoutItemModel *entity) const {
-    QRectF geometry = m_state->gridMapper()->mapFromGrid(entity->geometry());
-
-    //QnDisplayWidget *widget = m_widgetByEntity[entity];
-
+QRectF QnLayoutDisplay::itemGeometry(QnLayoutItemModel *item) const {
+    QRectF geometry = m_state->gridMapper()->mapFromGrid(item->geometry());
 
     QSizeF step = m_state->gridMapper()->step();
-    QRectF delta = entity->geometryDelta();
+    QRectF delta = item->geometryDelta();
     geometry = QRectF(
         geometry.left()   + delta.left()   * step.width(),
         geometry.top()    + delta.top()    * step.height(),
@@ -277,11 +274,11 @@ QRectF QnLayoutDisplay::boundingGeometry() const {
     return m_state->gridMapper()->mapFromGrid(m_state->model()->boundingRect().adjusted(-1, -1, 1, 1));
 }
 
-QRectF QnLayoutDisplay::zoomedEntityGeometry() const {
+QRectF QnLayoutDisplay::zoomedItemGeometry() const {
     if(m_state->zoomedEntity() == NULL)
         return QRectF();
 
-    return entityGeometry(m_state->zoomedEntity());
+    return itemGeometry(m_state->zoomedEntity());
 }
 
 QRectF QnLayoutDisplay::viewportGeometry() const {
@@ -308,7 +305,7 @@ void QnLayoutDisplay::synchronizeGeometry(QnLayoutItemModel *entity, bool animat
 void QnLayoutDisplay::synchronizeGeometry(QnDisplayWidget *widget, bool animate) {
     QnLayoutItemModel *entity = widget->item();
 
-    QRectF geometry = entityGeometry(entity);
+    QRectF geometry = itemGeometry(entity);
 
     /* Adjust for selection. */
     if(entity == m_state->selectedEntity() && entity != m_state->zoomedEntity()) {
@@ -360,7 +357,7 @@ void QnLayoutDisplay::synchronizeLayer(QnDisplayWidget *widget) {
 }
 
 void QnLayoutDisplay::synchronizeSceneBounds() {
-    QRectF boundingRect = m_state->zoomedEntity() != NULL ? zoomedEntityGeometry() : boundingGeometry();
+    QRectF boundingRect = m_state->zoomedEntity() != NULL ? zoomedItemGeometry() : boundingGeometry();
 
     m_boundingInstrument->setPositionBounds(m_view, boundingRect, 0.0);
     m_boundingInstrument->setSizeBounds(m_view, viewportLowerSizeBound, Qt::KeepAspectRatioByExpanding, boundingRect.size(), Qt::KeepAspectRatioByExpanding);
@@ -478,7 +475,7 @@ void QnLayoutDisplay::at_state_zoomedEntityChanged(QnLayoutItemModel *oldZoomedE
 
         m_activityListenerInstrument->recursiveEnable();
 
-        m_viewportAnimator->moveTo(zoomedEntityGeometry(), zoomAnimationDurationMsec);
+        m_viewportAnimator->moveTo(zoomedItemGeometry(), zoomAnimationDurationMsec);
     } else {
         m_viewportAnimator->moveTo(boundingGeometry(), zoomAnimationDurationMsec);
     }

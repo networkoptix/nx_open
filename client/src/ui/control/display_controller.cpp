@@ -263,7 +263,7 @@ void QnDisplayController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem *
     QnLayoutItemModel *entity = widget->item();
     if(m_state->zoomedEntity() == entity) {
         QRectF viewportGeometry = m_synchronizer->viewportGeometry();
-        QRectF zoomedEntityGeometry = m_synchronizer->zoomedEntityGeometry();
+        QRectF zoomedEntityGeometry = m_synchronizer->zoomedItemGeometry();
 
         if(contains(zoomedEntityGeometry.size(), viewportGeometry.size()) && !qFuzzyCompare(viewportGeometry, zoomedEntityGeometry)) {
             m_state->setZoomedEntity(NULL);
