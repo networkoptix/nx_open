@@ -49,3 +49,5 @@ server/src/version.h
 server/src/server.pro
 server/src/version.h
 server/src/Makefile
+
+winbuild/msvc2010/setup.bat
