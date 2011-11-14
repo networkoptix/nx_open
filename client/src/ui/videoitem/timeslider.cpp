@@ -337,8 +337,16 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     drawGradient(painter, QRectF(0, 0, rect().width(), rect().height() - 2*frameWidth()), rect().height());
     painter->setPen(pal.color(QPalette::Text));
 
+    qint64 timezoneOffset = 0;
+    if (m_parent->minimumValue() != 0) {
+        QDateTime dt1 = QDateTime::currentDateTime();
+        QDateTime dt2 = dt1.toUTC();
+        dt1.setTimeSpec(Qt::UTC);
+        timezoneOffset = dt2.secsTo(dt1) * 1000ll;
+    }
+
     const qint64 range = m_parent->sliderRange();
-    const qint64 pos = m_parent->viewPortPos();
+    const qint64 pos = m_parent->viewPortPos() + timezoneOffset;
     const double pixelPerTime = r.width() / range;
 
     const int minWidth = 30;
@@ -404,11 +412,10 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     }
 
     // draw grid
+
     for (qint64 curTime = intervals[level].interval*outsideCnt; curTime <= pos+range; curTime += intervals[level].interval)
     {
         unsigned curLevel = level;
-        //while (curLevel < maxLevel && curTime % intervals[curLevel+1].interval == 0)
-        //    ++curLevel;
         while (curLevel < maxLevel && intervals[curLevel+1].isTimeAccepted(intervals[curLevel+1], curTime))
             ++curLevel;
 
