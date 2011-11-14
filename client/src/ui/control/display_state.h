@@ -3,9 +3,9 @@
 
 #include <QObject>
 
-class QnUiLayout;
-class QnDisplayGridMapper;
-class QnUiLayoutItem;
+class QnLayoutModel;
+class QnLayoutGridMapper;
+class QnLayoutItemModel;
 
 class QnDisplayState: public QObject {
     Q_OBJECT;
@@ -15,15 +15,15 @@ public:
         EDITING
     };
 
-    QnDisplayState(QnUiLayout *model, QObject *parent = NULL);
+    QnDisplayState(QnLayoutModel *model, QObject *parent = NULL);
 
     virtual ~QnDisplayState();
 
-    QnUiLayout *model() const {
+    QnLayoutModel *model() const {
         return m_model;
     }
 
-    QnDisplayGridMapper *gridMapper() const {
+    QnLayoutGridMapper *gridMapper() const {
         return m_gridMapper;
     }
 
@@ -33,32 +33,32 @@ public:
     
     void setMode(Mode mode);
 
-    QnUiLayoutItem *selectedEntity() const {
+    QnLayoutItemModel *selectedEntity() const {
         return m_selectedEntity;
     }
 
-    void setSelectedEntity(QnUiLayoutItem *entity);
+    void setSelectedEntity(QnLayoutItemModel *entity);
 
-    QnUiLayoutItem *zoomedEntity() const {
+    QnLayoutItemModel *zoomedEntity() const {
         return m_zoomedEntity;
     }
 
-    void setZoomedEntity(QnUiLayoutItem *entity);
+    void setZoomedEntity(QnLayoutItemModel *entity);
 
 signals:
     void modeChanged();
-    void selectedEntityChanged(QnUiLayoutItem *oldSelectedEntity, QnUiLayoutItem *newSelectedEntity);
-    void zoomedEntityChanged(QnUiLayoutItem *oldZoomedEntity, QnUiLayoutItem *newZoomedEntity);
+    void selectedEntityChanged(QnLayoutItemModel *oldSelectedEntity, QnLayoutItemModel *newSelectedEntity);
+    void zoomedEntityChanged(QnLayoutItemModel *oldZoomedEntity, QnLayoutItemModel *newZoomedEntity);
 
 private slots:
-    void at_entity_aboutToBeRemoved(QnUiLayoutItem *entity);
+    void at_entity_aboutToBeRemoved(QnLayoutItemModel *entity);
 
 private:
-    QnUiLayout *m_model;
-    QnDisplayGridMapper *m_gridMapper;
+    QnLayoutModel *m_model;
+    QnLayoutGridMapper *m_gridMapper;
     Mode m_mode;
-    QnUiLayoutItem *m_selectedEntity;
-    QnUiLayoutItem *m_zoomedEntity;
+    QnLayoutItemModel *m_selectedEntity;
+    QnLayoutItemModel *m_zoomedEntity;
 };
 
 #endif // QN_DISPLAY_STATE_H

@@ -6,9 +6,9 @@
 #include <utils/common/matrix_map.h>
 #include <utils/common/rect_set.h>
 
-class QnUiLayoutItem;
+class QnLayoutItemModel;
 
-class QnUiLayout: public QObject {
+class QnLayoutModel: public QObject {
     Q_OBJECT;
 public:
     /**
@@ -16,12 +16,12 @@ public:
      * 
      * \param parent                    Parent object for this ui layout.
      */
-    QnUiLayout(QObject *parent = NULL);
+    QnLayoutModel(QObject *parent = NULL);
 
     /**
      * Virtual destructor.
      */
-    virtual ~QnUiLayout();
+    virtual ~QnLayoutModel();
 
     /**
      * Adds the given item to this layout. This layout takes ownership of the
@@ -33,7 +33,7 @@ public:
      * 
      * \param item                      Item to add.
      */
-    void addItem(QnUiLayoutItem *item);
+    void addItem(QnLayoutItemModel *item);
 
     /**
      * Removes the given item from this layout. Item's ownership is passed
@@ -41,57 +41,57 @@ public:
      * 
      * \param item                      Item to remove
      */
-    void removeItem(QnUiLayoutItem *item);
+    void removeItem(QnLayoutItemModel *item);
     
     /**
      * \param item                      Item to move to a new position.
      * \param geometry                  New position.
      * \returns                         Whether the item was moved.
      */
-    bool moveItem(QnUiLayoutItem *item, const QRect &geometry);
+    bool moveItem(QnLayoutItemModel *item, const QRect &geometry);
 
     /**
      * \param items                     Items to move to new positions.
      * \param geometries                New positions.
      * \returns                         Whether the items were moved.
      */
-    bool moveItems(const QList<QnUiLayoutItem *> &items, const QList<QRect> &geometries);
+    bool moveItems(const QList<QnLayoutItemModel *> &items, const QList<QRect> &geometries);
 
     /**
      * \param item                      Item to pin.
      * \param geometry                  Position to pin to.
      * \returns                         Whether the item was pinned.
      */
-    bool pinItem(QnUiLayoutItem *item, const QRect &geometry);
+    bool pinItem(QnLayoutItemModel *item, const QRect &geometry);
 
     /**
      * \param item                      Item to unpin.
      * \returns                         Whether the item was unpinned.
      */
-    bool unpinItem(QnUiLayoutItem *item);
+    bool unpinItem(QnLayoutItemModel *item);
 
     /**
      * \param position                  Position to get item at.
      * \returns                         Item at the given position, or NULL if the given position is empty.
      */
-    QnUiLayoutItem *item(const QPoint &position) const;
+    QnLayoutItemModel *item(const QPoint &position) const;
 
     /**
      * \param region                    Region to get items at.
      * \returns                         Set of items at the given region.
      */
-    QSet<QnUiLayoutItem *> items(const QRect &region) const;
+    QSet<QnLayoutItemModel *> items(const QRect &region) const;
 
     /**
      * \param regions                   Regions to get items at.
      * \returns                         Set of items at the given regions.
      */
-    QSet<QnUiLayoutItem *> items(const QList<QRect> &regions) const;
+    QSet<QnLayoutItemModel *> items(const QList<QRect> &regions) const;
 
     /**
      * \returns                         All items of this model.
      */
-    const QSet<QnUiLayoutItem *> &items() const {
+    const QSet<QnLayoutItemModel *> &items() const {
         return m_items;
     }
 
@@ -116,15 +116,15 @@ public:
     QRect closestFreeSlot(const QPoint &pos, const QSize &size) const;
 
 signals:
-    void itemAdded(QnUiLayoutItem *item);
-    void itemAboutToBeRemoved(QnUiLayoutItem *item);
+    void itemAdded(QnLayoutItemModel *item);
+    void itemAboutToBeRemoved(QnLayoutItemModel *item);
 
 private:
-    void moveItemInternal(QnUiLayoutItem *item, const QRect &geometry);
+    void moveItemInternal(QnLayoutItemModel *item, const QRect &geometry);
 
 private:
-    QSet<QnUiLayoutItem *> m_items;
-    QnMatrixMap<QnUiLayoutItem *> m_itemMap;
+    QSet<QnLayoutItemModel *> m_items;
+    QnMatrixMap<QnLayoutItemModel *> m_itemMap;
     QnRectSet m_rectSet;
 };
 

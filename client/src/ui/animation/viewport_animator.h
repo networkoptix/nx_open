@@ -22,7 +22,7 @@ public:
 
     /**
      * Starts animated move of a viewport to the given rect. When animation
-     * finished, viewport's bounding rect will include the given rect.
+     * finishes, viewport's bounding rect will include the given rect.
      * 
      * Note that this function animates position and scale only. It does not
      * take rotation and more complex transformations into account.

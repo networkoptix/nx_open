@@ -1,10 +1,10 @@
 #include "archivedropinstrument.h"
 #include <core/resource/directory_browser.h>
 #include <core/resourcemanagment/resource_pool.h>
-#include <ui/scene/display_state.h>
-#include <ui/scene/display_grid_mapper.h>
-#include <ui/model/ui_layout.h>
-#include <ui/model/ui_layout_item.h>
+#include <ui/control/display_state.h>
+#include <ui/model/layout_grid_mapper.h>
+#include <ui/model/layout_model.h>
+#include <ui/model/resource_item_model.h>
 #include <utils/common/warnings.h>
 #include <file_processor.h>
 
@@ -75,7 +75,7 @@ bool ArchiveDropInstrument::dropInternal(QGraphicsView *view, const QStringList 
 
     QRect geometry(m_state->gridMapper()->mapToGrid(view->mapToScene(pos)), QSize(1, 1));
     foreach(QnResourcePtr resource, resources) {
-        QnUiLayoutItem *item = new QnUiLayoutItem(resource->getUniqueId());
+        QnLayoutItemModel *item = new QnLayoutItemModel(resource->getUniqueId());
         item->setGeometry(geometry);
 
         m_state->model()->addItem(item);

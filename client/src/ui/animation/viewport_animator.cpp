@@ -3,7 +3,7 @@
 #include <limits>
 #include <utils/common/scene_utility.h>
 #include <utils/common/warnings.h>
-#include <ui/animation/setter_animation.h>
+#include "setter_animation.h"
 
 namespace {
     class ViewportPositionSetter {

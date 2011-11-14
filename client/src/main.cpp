@@ -30,13 +30,6 @@
 
 #define TEST_RTSP_SERVER
 
-#include "ui/scene/scene_controller.h"
-#include "ui/model/ui_layout.h"
-#include "ui/view/graphics_view.h"
-#include "ui/view/blue_background_painter.h"
-#include "ui/scene/display_state.h"
-#include "ui/scene/display_synchronizer.h"
-
 #include "core/resource/video_server.h"
 #include "core/resource/qnstorage.h"
 

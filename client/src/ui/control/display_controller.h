@@ -1,5 +1,5 @@
-#ifndef QN_SCENE_CONTROLLER_H
-#define QN_SCENE_CONTROLLER_H
+#ifndef QN_DISPLAY_CONTROLLER_H
+#define QN_DISPLAY_CONTROLLER_H
 
 #include <QObject>
 #include <QScopedPointer>
@@ -17,16 +17,16 @@ class RubberBandInstrument;
 class ResizingInstrument;
 class ArchiveDropInstrument;
 
-class QnDisplaySynchronizer;
+class QnLayoutDisplay;
 class QnDisplayState;
 class QnDisplayWidget;
 
-class QnSceneController: public QObject, protected QnSceneUtility {
+class QnDisplayController: public QObject, protected QnSceneUtility {
     Q_OBJECT;
 public:
-    QnSceneController(QnDisplaySynchronizer *synchronizer, QObject *parent = NULL);
+    QnDisplayController(QnLayoutDisplay *synchronizer, QObject *parent = NULL);
 
-    virtual ~QnSceneController();
+    virtual ~QnDisplayController();
 
     ArchiveDropInstrument *archiveDropInstrument() const {
         return m_archiveDropInstrument; 
@@ -53,7 +53,7 @@ protected slots:
 
 private:
     /** Display synchronizer. */
-    QnDisplaySynchronizer *m_synchronizer;
+    QnLayoutDisplay *m_synchronizer;
 
     /** Display state. */
     QnDisplayState *m_state;
@@ -86,4 +86,4 @@ private:
     ArchiveDropInstrument *m_archiveDropInstrument;
 };
 
-#endif // QN_SCENE_CONTROLLER_H
+#endif // QN_DISPLAY_CONTROLLER_H

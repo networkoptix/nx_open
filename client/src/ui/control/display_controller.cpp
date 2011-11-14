@@ -1,51 +1,36 @@
-#include "scene_controller.h"
+#include "display_controller.h"
 #include <cassert>
 #include <QGraphicsScene>
 #include <QGraphicsView>
-#include <QGraphicsGridLayout>
 #include <QGLWidget>
-#include <QFile>
-#include <QIcon>
-#include <QAction>
-#include <QParallelAnimationGroup>
-#include <ui/instruments/instrumentmanager.h>
-#include <ui/instruments/handscrollinstrument.h>
-#include <ui/instruments/wheelzoominstrument.h>
-#include <ui/instruments/rubberbandinstrument.h>
-#include <ui/instruments/draginstrument.h>
-#include <ui/instruments/clickinstrument.h>
-#include <ui/instruments/boundinginstrument.h>
-#include <ui/instruments/stopinstrument.h>
-#include <ui/instruments/stopacceptedinstrument.h>
-#include <ui/instruments/forwardinginstrument.h>
-#include <ui/instruments/transformlistenerinstrument.h>
-#include <ui/instruments/selectioninstrument.h>
-#include <ui/instruments/archivedropinstrument.h>
-#include <ui/instruments/resizinginstrument.h>
-#include <ui/widgets2/centralwidget.h>
-#include <ui/widgets2/animatedwidget.h>
-#include <ui/widgets2/layoutitem.h>
-#include <ui/widgets2/celllayout.h>
-#include <ui/view/viewport_animator.h>
 
-#include "display_widget.h"
-#include <core/resource/resource_media_layout.h>
-#include <camera/camdisplay.h>
-#include <camera/camera.h>
-#include <core/resource/resource.h>
-#include <core/resource/directory_browser.h>
-#include <core/resourcemanagment/resource_pool.h>
-#include <core/dataprovider/media_streamdataprovider.h>
+#include <ui/animation/viewport_animator.h>
 
-#include <ui/model/ui_layout.h>
-#include <ui/model/ui_layout_item.h>
+#include <ui/graphics/instruments/instrumentmanager.h>
+#include <ui/graphics/instruments/handscrollinstrument.h>
+#include <ui/graphics/instruments/wheelzoominstrument.h>
+#include <ui/graphics/instruments/rubberbandinstrument.h>
+#include <ui/graphics/instruments/draginstrument.h>
+#include <ui/graphics/instruments/clickinstrument.h>
+#include <ui/graphics/instruments/boundinginstrument.h>
+#include <ui/graphics/instruments/stopinstrument.h>
+#include <ui/graphics/instruments/stopacceptedinstrument.h>
+#include <ui/graphics/instruments/forwardinginstrument.h>
+#include <ui/graphics/instruments/transformlistenerinstrument.h>
+#include <ui/graphics/instruments/selectioninstrument.h>
+#include <ui/graphics/instruments/archivedropinstrument.h>
+#include <ui/graphics/instruments/resizinginstrument.h>
+
+#include <ui/graphics/items/display_widget.h>
+
+#include <ui/model/layout_model.h>
+#include <ui/model/resource_item_model.h>
+#include <ui/model/layout_grid_mapper.h>
 
 #include "display_state.h"
-#include "display_widget.h"
-#include "display_synchronizer.h"
-#include "display_grid_mapper.h"
+#include "layout_display.h"
 
-QnSceneController::QnSceneController(QnDisplaySynchronizer *synchronizer, QObject *parent):
+QnDisplayController::QnDisplayController(QnLayoutDisplay *synchronizer, QObject *parent):
     QObject(parent),
     m_synchronizer(synchronizer),
     m_state(synchronizer->state()),
@@ -119,11 +104,11 @@ QnSceneController::QnSceneController(QnDisplaySynchronizer *synchronizer, QObjec
     connect(m_synchronizer,             SIGNAL(viewportUngrabbed()),                                            this, SLOT(at_viewportUngrabbed()));
 }
 
-QnSceneController::~QnSceneController() {
+QnDisplayController::~QnDisplayController() {
     return;
 }
 
-void QnSceneController::updateGeometryDelta(QnDisplayWidget *widget) {
+void QnDisplayController::updateGeometryDelta(QnDisplayWidget *widget) {
     if(widget->item()->isPinned())
         return;
 
@@ -142,13 +127,13 @@ void QnSceneController::updateGeometryDelta(QnDisplayWidget *widget) {
     widget->item()->setGeometryDelta(geometryDelta);
 }
 
-void QnSceneController::at_resizingStarted(QGraphicsView *, QGraphicsWidget *item) {
+void QnDisplayController::at_resizingStarted(QGraphicsView *, QGraphicsWidget *item) {
     qDebug("RESIZING STARTED");
 
     m_synchronizer->bringToFront(item);
 }
 
-void QnSceneController::at_resizingFinished(QGraphicsView *, QGraphicsWidget *item) {
+void QnDisplayController::at_resizingFinished(QGraphicsView *, QGraphicsWidget *item) {
     qDebug("RESIZING FINISHED");
 
     QnDisplayWidget *widget = dynamic_cast<QnDisplayWidget *>(item);
@@ -156,7 +141,7 @@ void QnSceneController::at_resizingFinished(QGraphicsView *, QGraphicsWidget *it
         return;
 
     QRect newRect = m_state->gridMapper()->mapToGrid(widget->geometry());
-    QSet<QnUiLayoutItem *> entities = m_state->model()->items(newRect);
+    QSet<QnLayoutItemModel *> entities = m_state->model()->items(newRect);
     entities.remove(widget->item());
     if (entities.empty()) {
         widget->item()->setGeometry(newRect);
@@ -166,21 +151,21 @@ void QnSceneController::at_resizingFinished(QGraphicsView *, QGraphicsWidget *it
     m_synchronizer->synchronize(widget->item());
 }
 
-void QnSceneController::at_draggingStarted(QGraphicsView *, QList<QGraphicsItem *> items) {
+void QnDisplayController::at_draggingStarted(QGraphicsView *, QList<QGraphicsItem *> items) {
     qDebug("DRAGGING STARTED");
 
     foreach(QGraphicsItem *item, items) {
         m_synchronizer->bringToFront(item);
-        m_synchronizer->setLayer(item, QnDisplaySynchronizer::FRONT_LAYER);
+        m_synchronizer->setLayer(item, QnLayoutDisplay::FRONT_LAYER);
     }
 }
 
-void QnSceneController::at_draggingFinished(QGraphicsView *view, QList<QGraphicsItem *> items) {
+void QnDisplayController::at_draggingFinished(QGraphicsView *view, QList<QGraphicsItem *> items) {
     qDebug("DRAGGING FINISHED");
 
     /* Get entities and drag delta. */
     QList<QnDisplayWidget *> widgets;
-    QList<QnUiLayoutItem *> entities;
+    QList<QnLayoutItemModel *> entities;
     QPoint delta;
     foreach (QGraphicsItem *item, items) {
         QnDisplayWidget *widget = dynamic_cast<QnDisplayWidget *>(item);
@@ -205,11 +190,11 @@ void QnSceneController::at_draggingFinished(QGraphicsView *view, QList<QGraphics
 
         /* Handle single widget case. */
         if(entities.size() == 1) {
-            QnUiLayoutItem *draggedEntity = entities[0];
+            QnLayoutItemModel *draggedEntity = entities[0];
 
             /* Find entity that dragged entity was dropped on. */ 
             QPoint cursorPos = QCursor::pos();
-            QnUiLayoutItem *replacedEntity = m_state->model()->item(m_state->gridMapper()->mapToGrid(view->mapToScene(view->mapFromGlobal(cursorPos))));
+            QnLayoutItemModel *replacedEntity = m_state->model()->item(m_state->gridMapper()->mapToGrid(view->mapToScene(view->mapFromGlobal(cursorPos))));
 
             /* Switch places if dropping smaller one on a bigger one. */
             if(replacedEntity != NULL && replacedEntity != draggedEntity && draggedEntity->isPinned()) {
@@ -227,16 +212,16 @@ void QnSceneController::at_draggingFinished(QGraphicsView *view, QList<QGraphics
         /* Handle all other cases. */
         if(!finished) {
             QList<QRect> replacedGeometries;
-            foreach (QnUiLayoutItem *entity, entities) {
+            foreach (QnLayoutItemModel *entity, entities) {
                 QRect geometry = entity->geometry().adjusted(delta.x(), delta.y(), delta.x(), delta.y());
                 geometries.push_back(geometry);
                 if(entity->isPinned())
                     replacedGeometries.push_back(geometry);
             }
 
-            QList<QnUiLayoutItem *> replacedEntities = m_state->model()->items(replacedGeometries).subtract(entities.toSet()).toList();
+            QList<QnLayoutItemModel *> replacedEntities = m_state->model()->items(replacedGeometries).subtract(entities.toSet()).toList();
             replacedGeometries.clear();
-            foreach (QnUiLayoutItem *entity, replacedEntities)
+            foreach (QnLayoutItemModel *entity, replacedEntities)
                 replacedGeometries.push_back(entity->geometry().adjusted(-delta.x(), -delta.y(), -delta.x(), -delta.y()));
 
             entities.append(replacedEntities);
@@ -253,29 +238,29 @@ void QnSceneController::at_draggingFinished(QGraphicsView *view, QList<QGraphics
             updateGeometryDelta(widget);
 
     /* Re-sync everything. */
-    foreach(QnUiLayoutItem *entity, entities)
+    foreach(QnLayoutItemModel *entity, entities)
         m_synchronizer->synchronize(entity);
 }
 
-void QnSceneController::at_item_clicked(QGraphicsView *, QGraphicsItem *item) {
+void QnDisplayController::at_item_clicked(QGraphicsView *, QGraphicsItem *item) {
     qDebug("CLICKED");
 
     QnDisplayWidget *widget = dynamic_cast<QnDisplayWidget *>(item);
     if(widget == NULL)
         return;
 
-    QnUiLayoutItem *entity = widget->item();
+    QnLayoutItemModel *entity = widget->item();
     m_state->setSelectedEntity(m_state->selectedEntity() == entity ? NULL : entity);
 }
 
-void QnSceneController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem *item) {
+void QnDisplayController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem *item) {
     qDebug("DOUBLE CLICKED");
 
     QnDisplayWidget *widget = dynamic_cast<QnDisplayWidget *>(item);
     if(widget == NULL)
         return;
 
-    QnUiLayoutItem *entity = widget->item();
+    QnLayoutItemModel *entity = widget->item();
     if(m_state->zoomedEntity() == entity) {
         QRectF viewportGeometry = m_synchronizer->viewportGeometry();
         QRectF zoomedEntityGeometry = m_synchronizer->zoomedEntityGeometry();
@@ -292,23 +277,23 @@ void QnSceneController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem *it
     }
 }
 
-void QnSceneController::at_scene_clicked(QGraphicsView *) {
+void QnDisplayController::at_scene_clicked(QGraphicsView *) {
     qDebug("SCENE CLICKED");
 
     m_state->setSelectedEntity(NULL);
 }
 
-void QnSceneController::at_scene_doubleClicked(QGraphicsView *) {
+void QnDisplayController::at_scene_doubleClicked(QGraphicsView *) {
     qDebug("SCENE DOUBLE CLICKED");
 
     m_state->setZoomedEntity(NULL);
     m_synchronizer->fitInView();
 }
 
-void QnSceneController::at_viewportGrabbed() {
+void QnDisplayController::at_viewportGrabbed() {
     qDebug("VIEWPORT GRABBED");
 }
 
-void QnSceneController::at_viewportUngrabbed() {
+void QnDisplayController::at_viewportUngrabbed() {
     qDebug("VIEWPORT UNGRABBED");
 }

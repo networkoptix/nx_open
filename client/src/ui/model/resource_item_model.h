@@ -4,13 +4,13 @@
 #include <QObject>
 #include <QScopedPointer>
 
-class QnUiLayout;
-class QnUiDisplay;
+class QnLayoutModel;
+class QnResourceDisplay;
 
 /**
- * Single ui layout item. Video, image, folder, or anything else.
+ * Layout item model. Video, image, folder, or anything else.
  */
-class QnUiLayoutItem: public QObject {
+class QnLayoutItemModel: public QObject {
     Q_OBJECT;
     Q_FLAGS(ItemFlag ItemFlags);
 public:
@@ -25,17 +25,17 @@ public:
      * \param resourceUniqueId          Unique identifier of a resource.
      * \param parent                    Parent of this object.                
      */
-    QnUiLayoutItem(const QString &resourceUniqueId, QObject *parent = NULL);
+    QnLayoutItemModel(const QString &resourceUniqueId, QObject *parent = NULL);
 
     /**
      * Virtual destructor.
      */
-    virtual ~QnUiLayoutItem();
+    virtual ~QnLayoutItemModel();
 
     /**
      * \returns                         Layout that this item belongs to, if any.
      */
-    QnUiLayout *layout() const {
+    QnLayoutModel *layout() const {
         return m_layout;
     }
 
@@ -133,12 +133,12 @@ public:
      * 
      * \returns                         Newly created display, or NULL if display cannot be created.
      */
-    QnUiDisplay *createDisplay(QObject *parent = NULL);
+    QnResourceDisplay *createDisplay(QObject *parent = NULL);
 
 signals:
     void geometryChanged(const QRect &oldGeometry, const QRect &newGeometry);
     void geometryDeltaChanged(const QRectF &oldGeometryDelta, const QRectF &newGeometryDelta);
-    void flagsChanged(QnUiLayoutItem::ItemFlags oldFlags, QnUiLayoutItem::ItemFlags newFlags);
+    void flagsChanged(QnLayoutItemModel::ItemFlags oldFlags, QnLayoutItemModel::ItemFlags newFlags);
     void rotationChanged(qreal oldRotation, qreal newRotation);
 
 protected:
@@ -152,10 +152,10 @@ protected:
     void setFlagInternal(ItemFlag flag, bool value);
 
 private:
-    friend class QnUiLayout;
+    friend class QnLayoutModel;
 
     /** Layout that this item belongs to. */
-    QnUiLayout *m_layout;
+    QnLayoutModel *m_layout;
 
     /** Unique identifier of a resource associated with this item. */
     QString m_resourceUniqueId;
@@ -173,6 +173,6 @@ private:
     qreal m_rotation;
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnUiLayoutItem::ItemFlags);
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnLayoutItemModel::ItemFlags);
 
 #endif // QN_UI_LAYOUT_ITEM_H

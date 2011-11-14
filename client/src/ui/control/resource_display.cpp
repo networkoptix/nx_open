@@ -1,4 +1,4 @@
-#include "ui_display.h"
+#include "resource_display.h"
 #include <cassert>
 #include <core/dataprovider/media_streamdataprovider.h>
 #include <core/resource/resource_media_layout.h>
@@ -7,7 +7,7 @@
 #include <utils/common/warnings.h>
 
 
-QnUiDisplay::QnUiDisplay(const QnResourcePtr &resource, QObject *parent):
+QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *parent):
     QObject(parent),
     QnResourceConsumer(resource)
 {
@@ -26,40 +26,40 @@ QnUiDisplay::QnUiDisplay(const QnResourcePtr &resource, QObject *parent):
     }
 }
 
-QnResource *QnUiDisplay::resource() const {
+QnResource *QnResourceDisplay::resource() const {
     return getResource().data();
 }
 
-QnMediaResource *QnUiDisplay::mediaResource() const {
+QnMediaResource *QnResourceDisplay::mediaResource() const {
     return dynamic_cast<QnMediaResource *>(resource()); // TODO: remove dynamic_cast.
 }
 
-void QnUiDisplay::beforeDisconnectFromResource() {
+void QnResourceDisplay::beforeDisconnectFromResource() {
     static_cast<QnResourceConsumer *>(m_dataProvider)->beforeDisconnectFromResource();
 }
 
-void QnUiDisplay::disconnectFromResource() {
+void QnResourceDisplay::disconnectFromResource() {
     static_cast<QnResourceConsumer *>(m_dataProvider)->disconnectFromResource();
 
     QnResourceConsumer::disconnectFromResource();
 }
 
-void QnUiDisplay::start() {
+void QnResourceDisplay::start() {
     m_dataProvider->start();
 
     if(!m_camDisplay.isNull())
         m_camDisplay->start();
 }
 
-qint64 QnUiDisplay::lengthUSec() const {
+qint64 QnResourceDisplay::lengthUSec() const {
     return m_archiveProvider == NULL ? -1 : m_archiveProvider->lengthMksec();
 }
 
-qint64 QnUiDisplay::currentTimeUSec() const {
+qint64 QnResourceDisplay::currentTimeUSec() const {
     return m_archiveProvider == NULL ? -1 : m_archiveProvider->currentTime();
 }
 
-void QnUiDisplay::setCurrentTimeUSec(qint64 usec) const {
+void QnResourceDisplay::setCurrentTimeUSec(qint64 usec) const {
     if(m_archiveProvider == NULL) {
         qnWarning("Resource '%1' does not support changing current time.", resource()->getUniqueId());
         return;
@@ -68,7 +68,7 @@ void QnUiDisplay::setCurrentTimeUSec(qint64 usec) const {
     m_archiveProvider->previousFrame(usec);
 }
 
-void QnUiDisplay::play() {
+void QnResourceDisplay::play() {
     if(m_archiveProvider == NULL)
         return;
 
@@ -80,7 +80,7 @@ void QnUiDisplay::play() {
     //    m_camera->getCamCamDisplay()->playAudio(m_playing);
 }
 
-void QnUiDisplay::pause() {
+void QnResourceDisplay::pause() {
     if(m_archiveProvider == NULL)
         return;
 

@@ -4,7 +4,7 @@
 #include "video_cam_layout/videocamlayout.h"
 #include "camera/camera.h"
 #include "mainwnd.h"
-#include "view/blue_background_painter.h"
+#include "graphics/view/blue_background_painter.h"
 #include "settings.h"
 #include "device_settings/dlg_factory.h"
 #include "device_settings/device_settings_dlg.h"

@@ -5,7 +5,7 @@
 
 #include <QtGui/QGraphicsWidget>
 
-#include <ui/instruments/instrumented.h>
+#include <ui/graphics/instruments/instrumented.h>
 
 /* A quick workaround. Remove this once we have a better solution. */
 #undef override

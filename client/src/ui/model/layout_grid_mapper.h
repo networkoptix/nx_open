@@ -7,12 +7,12 @@
 #include <QPoint>
 #include <utils/common/scene_utility.h>
 
-class QnDisplayGridMapper: public QObject, protected QnSceneUtility {
+class QnLayoutGridMapper: public QObject, protected QnSceneUtility {
     Q_OBJECT;
 public:
-    QnDisplayGridMapper(QObject *parent = NULL);
+    QnLayoutGridMapper(QObject *parent = NULL);
 
-    virtual ~QnDisplayGridMapper();
+    virtual ~QnLayoutGridMapper();
 
     /**
      * \returns                         Origin of the grid coordinate system.

@@ -1,20 +1,20 @@
 #include "display_state.h"
 #include <cassert>
 #include <utils/common/warnings.h>
-#include <ui/model/ui_layout.h>
-#include <ui/model/ui_layout_item.h>
-#include "display_grid_mapper.h"
+#include <ui/model/layout_model.h>
+#include <ui/model/layout_grid_mapper.h>
+#include <ui/model/resource_item_model.h>
 
-QnDisplayState::QnDisplayState(QnUiLayout *model, QObject *parent):
+QnDisplayState::QnDisplayState(QnLayoutModel *model, QObject *parent):
     QObject(parent),
     m_model(model),
-    m_gridMapper(new QnDisplayGridMapper(this)),
+    m_gridMapper(new QnLayoutGridMapper(this)),
     m_selectedEntity(NULL),
     m_zoomedEntity(NULL)
 {
     assert(model != NULL);
 
-    connect(model, SIGNAL(itemAboutToBeRemoved(QnUiLayoutItem *)), this, SLOT(at_entity_aboutToBeRemoved(QnUiLayoutItem *)));
+    connect(model, SIGNAL(itemAboutToBeRemoved(QnLayoutItemModel *)), this, SLOT(at_entity_aboutToBeRemoved(QnLayoutItemModel *)));
 }    
 
 QnDisplayState::~QnDisplayState() {
@@ -30,7 +30,7 @@ void QnDisplayState::setMode(Mode mode) {
     emit modeChanged();
 }
 
-void QnDisplayState::setSelectedEntity(QnUiLayoutItem *entity) {
+void QnDisplayState::setSelectedEntity(QnLayoutItemModel *entity) {
     if(m_selectedEntity == entity)
         return;
 
@@ -39,13 +39,13 @@ void QnDisplayState::setSelectedEntity(QnUiLayoutItem *entity) {
         return;
     }
 
-    QnUiLayoutItem *oldSelectedEntity = m_selectedEntity;
+    QnLayoutItemModel *oldSelectedEntity = m_selectedEntity;
     m_selectedEntity = entity;
     
     emit selectedEntityChanged(oldSelectedEntity, m_selectedEntity);
 }
 
-void QnDisplayState::setZoomedEntity(QnUiLayoutItem *entity) {
+void QnDisplayState::setZoomedEntity(QnLayoutItemModel *entity) {
     if(m_zoomedEntity == entity)
         return;
 
@@ -54,13 +54,13 @@ void QnDisplayState::setZoomedEntity(QnUiLayoutItem *entity) {
         return;
     }
 
-    QnUiLayoutItem *oldZoomedEntity = m_zoomedEntity;
+    QnLayoutItemModel *oldZoomedEntity = m_zoomedEntity;
     m_zoomedEntity = entity;
 
     emit zoomedEntityChanged(oldZoomedEntity, m_zoomedEntity);
 }
 
-void QnDisplayState::at_entity_aboutToBeRemoved(QnUiLayoutItem *entity) {
+void QnDisplayState::at_entity_aboutToBeRemoved(QnLayoutItemModel *entity) {
     if(entity == m_selectedEntity)
         setSelectedEntity(NULL);
 

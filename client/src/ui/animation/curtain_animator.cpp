@@ -2,9 +2,9 @@
 #include <cassert>
 #include <QPropertyAnimation>
 #include <QParallelAnimationGroup>
+#include <ui/graphics/items/curtain_item.h>
+#include <ui/graphics/items/display_widget.h>
 #include <utils/common/warnings.h>
-#include "curtain_item.h"
-#include "display_widget.h"
 
 QnCurtainAnimator::QnCurtainAnimator(QnCurtainItem *curtain, int durationMSec, QObject *parent):
     QObject(parent),

@@ -1,12 +1,12 @@
-#include "ui_layout_item.h"
+#include "resource_item_model.h"
 #include <cassert>
 #include <utils/common/scene_utility.h>
 #include <core/resource/resource.h>
 #include <core/resourcemanagment/resource_pool.h>
-#include "ui_layout.h"
-#include "ui_display.h"
+#include <ui/control/resource_display.h>
+#include "layout_model.h"
 
-QnUiLayoutItem::QnUiLayoutItem(const QString &resourceUniqueId, QObject *parent): 
+QnLayoutItemModel::QnLayoutItemModel(const QString &resourceUniqueId, QObject *parent): 
     QObject(parent), 
     m_resourceUniqueId(resourceUniqueId),
     m_layout(NULL),
@@ -14,16 +14,16 @@ QnUiLayoutItem::QnUiLayoutItem(const QString &resourceUniqueId, QObject *parent)
     m_rotation(0.0)
 {}
 
-QnUiLayoutItem::~QnUiLayoutItem() {
+QnLayoutItemModel::~QnLayoutItemModel() {
     ensureRemoved();
 }
 
-void QnUiLayoutItem::ensureRemoved() {
+void QnLayoutItemModel::ensureRemoved() {
     if(m_layout != NULL)
         m_layout->removeItem(this);
 }
 
-bool QnUiLayoutItem::setGeometry(const QRect &geometry) {
+bool QnLayoutItemModel::setGeometry(const QRect &geometry) {
     if(m_layout != NULL)
         return m_layout->moveItem(this, geometry);
 
@@ -31,7 +31,7 @@ bool QnUiLayoutItem::setGeometry(const QRect &geometry) {
     return true;
 }
 
-void QnUiLayoutItem::setGeometryInternal(const QRect &geometry) {
+void QnLayoutItemModel::setGeometryInternal(const QRect &geometry) {
     if(m_geometry == geometry)
         return;
 
@@ -41,7 +41,7 @@ void QnUiLayoutItem::setGeometryInternal(const QRect &geometry) {
     emit geometryChanged(oldGeometry, m_geometry);
 }
 
-bool QnUiLayoutItem::setGeometryDelta(const QRectF &geometryDelta) {
+bool QnLayoutItemModel::setGeometryDelta(const QRectF &geometryDelta) {
     if(isPinned())
         return false;
 
@@ -55,7 +55,7 @@ bool QnUiLayoutItem::setGeometryDelta(const QRectF &geometryDelta) {
     return true;
 }
 
-bool QnUiLayoutItem::setFlag(ItemFlag flag, bool value) {
+bool QnLayoutItemModel::setFlag(ItemFlag flag, bool value) {
     if(checkFlag(flag) == value)
         return true;
 
@@ -71,7 +71,7 @@ bool QnUiLayoutItem::setFlag(ItemFlag flag, bool value) {
     return true;
 }
 
-void QnUiLayoutItem::setFlagInternal(ItemFlag flag, bool value) {
+void QnLayoutItemModel::setFlagInternal(ItemFlag flag, bool value) {
     if(checkFlag(flag) == value)
         return;
 
@@ -84,7 +84,7 @@ void QnUiLayoutItem::setFlagInternal(ItemFlag flag, bool value) {
     emit flagsChanged(oldFlags, m_flags);
 }
 
-void QnUiLayoutItem::setRotation(qreal rotation) {
+void QnLayoutItemModel::setRotation(qreal rotation) {
     if(qFuzzyCompare(m_rotation, rotation))
         return;
 
@@ -94,9 +94,9 @@ void QnUiLayoutItem::setRotation(qreal rotation) {
     emit rotationChanged(oldRotation, m_rotation);
 }
 
-QnUiDisplay *QnUiLayoutItem::createDisplay(QObject *parent) {
+QnResourceDisplay *QnLayoutItemModel::createDisplay(QObject *parent) {
     QnResourcePtr resource = qnResPool->getResourceByUniqId(m_resourceUniqueId);
     if(resource.isNull())
         return NULL;
-    return new QnUiDisplay(resource, parent);
+    return new QnResourceDisplay(resource, parent);
 }

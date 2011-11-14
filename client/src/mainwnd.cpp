@@ -7,15 +7,15 @@
 #include <ui/video_cam_layout/layout_manager.h>
 #include <ui/video_cam_layout/start_screen_content.h>
 
-#include <ui/view/graphics_view.h>
-#include <ui/view/blue_background_painter.h>
+#include <ui/graphics/view/graphics_view.h>
+#include <ui/graphics/view/blue_background_painter.h>
 
-#include <ui/instruments/archivedropinstrument.h>
+#include <ui/graphics/instruments/archivedropinstrument.h>
 
-#include <ui/model/ui_layout.h>
-#include <ui/scene/scene_controller.h>
-#include <ui/scene/display_synchronizer.h>
-#include <ui/scene/display_state.h>
+#include <ui/model/layout_model.h>
+#include <ui/control/display_controller.h>
+#include <ui/control/layout_display.h>
+#include <ui/control/display_state.h>
 
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
@@ -68,10 +68,10 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
 
     /* Set up model & control machinery. */
-    QnUiLayout *uiLayout = new QnUiLayout(this);
+    QnLayoutModel *uiLayout = new QnLayoutModel(this);
     QnDisplayState *state = new QnDisplayState(uiLayout, this);
-    QnDisplaySynchronizer *synchronizer = new QnDisplaySynchronizer(state, scene, view, this);
-    QnSceneController *controller = new QnSceneController(synchronizer, this);
+    QnLayoutDisplay *synchronizer = new QnLayoutDisplay(state, scene, view, this);
+    QnDisplayController *controller = new QnDisplayController(synchronizer, this);
 
     /* Process input files. */
     QStringList files;

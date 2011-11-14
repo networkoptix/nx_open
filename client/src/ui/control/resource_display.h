@@ -10,7 +10,7 @@ class QnAbstractMediaStreamDataProvider;
 class QnAbstractStreamDataProvider;
 class CLCamDisplay;
 
-class QnUiDisplay: public QObject, protected QnResourceConsumer {
+class QnResourceDisplay: public QObject, protected QnResourceConsumer {
     Q_OBJECT;
 public:
     /**
@@ -19,7 +19,7 @@ public:
      * \param resource                  Resource that this item is associated with. Must not be NULL.
      * \param parent                    Parent of this object.                
      */
-    QnUiDisplay(const QnResourcePtr &resource, QObject *parent = NULL);
+    QnResourceDisplay(const QnResourcePtr &resource, QObject *parent = NULL);
 
     /**
      * \returns                         Resource associated with this item.

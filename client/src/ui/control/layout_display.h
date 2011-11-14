@@ -2,7 +2,7 @@
 #define QN_DISPLAY_SYNCHRONIZER_H
 
 #include <QObject>
-#include <ui/instruments/animationtimer.h>
+#include <ui/graphics/instruments/animationtimer.h>
 #include <utils/common/scene_utility.h>
 #include <utils/common/rect_set.h>
 
@@ -15,14 +15,14 @@ class TransformListenerInstrument;
 class ActivityListenerInstrument;
 
 class QnDisplayState;
-class QnUiLayoutItem;
+class QnLayoutItemModel;
 class QnDisplayWidget;
 class QnViewportAnimator;
 class QnWidgetAnimator;
 class QnCurtainAnimator;
 class QnCurtainItem;
 
-class QnDisplaySynchronizer: public QObject, protected AnimationTimerListener, protected QnSceneUtility {
+class QnLayoutDisplay: public QObject, protected AnimationTimerListener, protected QnSceneUtility {
     Q_OBJECT;
 public:
     /**
@@ -39,9 +39,9 @@ public:
         FRONT_LAYER
     };
 
-    QnDisplaySynchronizer(QnDisplayState *state, QGraphicsScene *scene, QGraphicsView *view, QObject *parent = NULL);
+    QnLayoutDisplay(QnDisplayState *state, QGraphicsScene *scene, QGraphicsView *view, QObject *parent = NULL);
 
-    virtual ~QnDisplaySynchronizer();
+    virtual ~QnLayoutDisplay();
 
     QnDisplayState *state() const {
         return m_state;
@@ -59,7 +59,7 @@ public:
         return m_view;
     }
 
-    QRectF entityGeometry(QnUiLayoutItem *entity) const;
+    QRectF entityGeometry(QnLayoutItemModel *entity) const;
 
     QRectF zoomedEntityGeometry() const;
 
@@ -73,13 +73,13 @@ public:
 
     void bringToFront(QGraphicsItem *item);
 
-    void bringToFront(QnUiLayoutItem *entity);
+    void bringToFront(QnLayoutItemModel *entity);
 
     Layer layer(QGraphicsItem *item);
 
     void setLayer(QGraphicsItem *item, Layer layer);
 
-    void synchronize(QnUiLayoutItem *entity, bool animate = true);
+    void synchronize(QnLayoutItemModel *entity, bool animate = true);
     
     void synchronize(QnDisplayWidget *widget, bool animate = true);
 
@@ -97,23 +97,23 @@ protected:
     
     QnWidgetAnimator *animator(QnDisplayWidget *widget);
 
-    void synchronizeGeometry(QnUiLayoutItem *entity, bool animate);
+    void synchronizeGeometry(QnLayoutItemModel *entity, bool animate);
     void synchronizeGeometry(QnDisplayWidget *widget, bool animate);
-    void synchronizeLayer(QnUiLayoutItem *entity);
+    void synchronizeLayer(QnLayoutItemModel *entity);
     void synchronizeLayer(QnDisplayWidget *widget);
 
     qreal layerFrontZ(Layer layer) const;
-    Layer entityLayer(QnUiLayoutItem *entity) const;
+    Layer entityLayer(QnLayoutItemModel *entity) const;
 
 protected slots:
     void synchronizeSceneBounds();
 
-    void at_model_itemAdded(QnUiLayoutItem *entity);
-    void at_model_itemAboutToBeRemoved(QnUiLayoutItem *entity);
+    void at_model_itemAdded(QnLayoutItemModel *entity);
+    void at_model_itemAboutToBeRemoved(QnLayoutItemModel *entity);
     
     void at_state_modeChanged();
-    void at_state_selectedEntityChanged(QnUiLayoutItem *oldSelectedEntity, QnUiLayoutItem *newSelectedEntity);
-    void at_state_zoomedEntityChanged(QnUiLayoutItem *oldZoomedEntity, QnUiLayoutItem *newZoomedEntity);
+    void at_state_selectedEntityChanged(QnLayoutItemModel *oldSelectedEntity, QnLayoutItemModel *newSelectedEntity);
+    void at_state_zoomedEntityChanged(QnLayoutItemModel *oldZoomedEntity, QnLayoutItemModel *newZoomedEntity);
 
     void at_item_geometryChanged();
     void at_item_geometryDeltaChanged();
@@ -148,7 +148,7 @@ private:
     TransformListenerInstrument *m_transformListenerInstrument;
 
     /** Entity to widget mapping. */
-    QHash<QnUiLayoutItem *, QnDisplayWidget *> m_widgetByEntity;
+    QHash<QnLayoutItemModel *, QnDisplayWidget *> m_widgetByEntity;
 
     /** Item to item properties mapping. */
     QHash<QGraphicsItem *, ItemProperties> m_propertiesByItem;

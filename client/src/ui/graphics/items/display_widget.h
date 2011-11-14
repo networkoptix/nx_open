@@ -3,13 +3,13 @@
 
 #include <QWeakPointer>
 #include <ui/widgets2/graphicswidget.h>
-#include <ui/instruments/constrainedresizable.h>
+#include <ui/graphics/instruments/constrainedresizable.h>
 #include "polygonal_shadow_item.h"
 
 class QnDisplayWidgetRenderer;
 class QnVideoResourceLayout;
-class QnUiLayoutItem;
-class QnUiDisplay;
+class QnLayoutItemModel;
+class QnResourceDisplay;
 class QnPolygonalShadowItem;
 
 class QnDisplayWidget: public GraphicsWidget, public QnPolygonalShapeProvider, public ConstrainedResizable {
@@ -21,21 +21,21 @@ class QnDisplayWidget: public GraphicsWidget, public QnPolygonalShapeProvider, p
     typedef GraphicsWidget base_type;
 
 public:
-    QnDisplayWidget(QnUiLayoutItem *item, QGraphicsItem *parent = NULL);
+    QnDisplayWidget(QnLayoutItemModel *item, QGraphicsItem *parent = NULL);
 
     virtual ~QnDisplayWidget();
 
     /**
      * \returns                         Entity associated with this widget.
      */
-    QnUiLayoutItem *item() const {
+    QnLayoutItemModel *item() const {
         return m_item;
     }
 
     /**
      * \returns                         Display associated with this widget. 
      */
-    QnUiDisplay *display() const {
+    QnResourceDisplay *display() const {
         return m_display;
     }
 
@@ -127,10 +127,10 @@ private:
 
 private:
     /** Layout item. */
-    QnUiLayoutItem *m_item;
+    QnLayoutItemModel *m_item;
 
     /** Display. */
-    QnUiDisplay *m_display;
+    QnResourceDisplay *m_display;
 
     /** Resource layout of this display widget. */
     const QnVideoResourceLayout *m_resourceLayout;
