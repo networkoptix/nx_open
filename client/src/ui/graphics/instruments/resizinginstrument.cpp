@@ -1,5 +1,5 @@
 #include "resizinginstrument.h"
-#include "constrainedresizable.h"
+#include <ui/common/constrained_resizable.h>
 
 namespace {
     struct ItemIsWidget: public std::unary_function<QGraphicsItem *, bool> {

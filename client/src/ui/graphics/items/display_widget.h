@@ -3,7 +3,7 @@
 
 #include <QWeakPointer>
 #include <ui/widgets2/graphicswidget.h>
-#include <ui/graphics/instruments/constrainedresizable.h>
+#include <ui/common/constrained_resizable.h>
 #include "polygonal_shadow_item.h"
 
 class QnDisplayWidgetRenderer;

@@ -2,7 +2,7 @@
 #define QN_DISPLAY_SYNCHRONIZER_H
 
 #include <QObject>
-#include <ui/graphics/instruments/animationtimer.h>
+#include <ui/animation/animation_timer.h>
 #include <utils/common/scene_utility.h>
 #include <utils/common/rect_set.h>
 

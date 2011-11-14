@@ -3,8 +3,8 @@
 
 #include <QRect>
 #include <QTransform>
+#include <ui/animation/animation_timer.h>
 #include "instrument.h"
-#include "animationtimer.h"
 
 class BoundingInstrument: public Instrument, protected AnimationTimerListener {
     Q_OBJECT;
