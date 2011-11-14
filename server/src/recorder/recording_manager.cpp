@@ -88,9 +88,11 @@ QnAbstractStreamDataProvider* QnServerDataProviderFactory::createDataProviderInt
     if (role == QnResource::Role_Archive) 
     {
         QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(res);
+        archiveReader->setCycleMode(false);
         archiveReader->setArchiveDelegate(new QnServerArchiveDelegate());
         return archiveReader;
     }
+    return 0;
 }
 
 QnServerDataProviderFactory* QnServerDataProviderFactory::instance()

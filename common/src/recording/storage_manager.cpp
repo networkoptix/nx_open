@@ -15,6 +15,7 @@ QnStorageManager::QnStorageManager():
 
 void QnStorageManager::addStorage(QnStoragePtr storage)
 {
+    QMutexLocker lock(&m_mutex);
     m_storageRoots.insert(storage->getIndex(), storage);
 }
 
@@ -303,8 +304,14 @@ DeviceFileCatalog::Chunk QnChunkSequence::getNextChunk(QnResourcePtr res, qint64
     if (info.m_index != -1) 
     {
         DeviceFileCatalog::Chunk chunk = info.m_catalog->chunkAt(info.m_index);
-        info.m_startTime = chunk.startTime;
-        info.m_index++;
+        if (chunk.startTime != -1) {
+            info.m_startTime = chunk.startTime;
+            info.m_index++;
+        }
+        else {
+            // todo: switch to live here
+            chunk = chunk;
+        }
         return chunk;
     }
     return DeviceFileCatalog::Chunk();

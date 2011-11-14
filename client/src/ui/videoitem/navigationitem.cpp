@@ -344,25 +344,23 @@ void NavigationItem::updateSlider()
     if (m_timeSlider->isMoving())
         return;
 
-    QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
-
-    qint64 length = reader->lengthMksec();
-    if (length != AV_NOPTS_VALUE)
+    QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader *>(m_camera->getStreamreader());
+    qint64 startTime = reader->startTime();
+    qint64 endTime = reader->endTime();
+    if (startTime != AV_NOPTS_VALUE && endTime != AV_NOPTS_VALUE) 
     {
-        length /= 1000;
-        m_timeSlider->setMaximumValue(length);
-        m_timeLabel->setText(formatDuration(m_timeSlider->maximumValue() / 1000));
+        m_timeSlider->setMinimumValue(startTime / 1000);
+        m_timeSlider->setMaximumValue(endTime != DATETIME_NOW ? endTime / 1000 : DATETIME_NOW);
+        if (m_timeSlider->minimumValue() == 0)
+            m_timeLabel->setText(formatDuration(m_timeSlider->length() / 1000));
+        else
+            m_timeLabel->setText(QString());//###QDateTime::fromMSecsSinceEpoch(m_timeSlider->maximumValue()).toString(Qt::SystemLocaleShortDate));
 
-        bool isRealTimeMode = m_camera->getCamCamDisplay()->isRealTimeSource();
-
-        if (!isRealTimeMode)
+        quint64 time = m_camera->getCurrentTime();
+        if (time != AV_NOPTS_VALUE)
         {
-            quint64 time = m_camera->getCurrentTime();
-            if (time != AV_NOPTS_VALUE)
-            {
-                m_currentTime = time/1000;
-                m_timeSlider->setCurrentValue(m_currentTime);
-            }
+            m_currentTime = time/1000;
+            m_timeSlider->setCurrentValue(m_currentTime);
         }
     }
 }
@@ -512,9 +510,7 @@ void NavigationItem::onSliderReleased()
     setActive(true);
     m_sliderIsmoving = false;
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
-    quint64 time = m_timeSlider->currentValue();
-
-    reader->previousFrame(time*1000);
+    reader->previousFrame(m_timeSlider->currentValue() * 1000);
     if (isPlaying())
     {
         reader->setSingleShotMode(false);

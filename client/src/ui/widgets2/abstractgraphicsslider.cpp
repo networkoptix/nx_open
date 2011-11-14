@@ -9,6 +9,7 @@
 #include <QtGui/QStyleOption>
 
 #include <limits.h>
+#include "utils/common/util.h"
 
 /*!
     \class AbstractGraphicsSlider
@@ -261,7 +262,8 @@ void AbstractGraphicsSlider::setMinimum(int min)
 int AbstractGraphicsSlider::maximum() const
 {
     Q_D(const AbstractGraphicsSlider);
-    return d->maximum;
+    
+    return d->maximum == DATETIME_NOW ? QDateTime::currentDateTime().toMSecsSinceEpoch() : d->maximum;
 }
 
 void AbstractGraphicsSlider::setMaximum(int max)

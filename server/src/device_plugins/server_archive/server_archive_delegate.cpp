@@ -64,6 +64,7 @@ void QnServerArchiveDelegate::close()
 
 qint64 QnServerArchiveDelegate::seek(qint64 time)
 {
+    cl_log.log("serverArchiveDelegate. jump to ",QDateTime::fromMSecsSinceEpoch(time/1000).toString(), cl_logALWAYS);
     DeviceFileCatalog::Chunk newChunk = m_chunkSequence->getNextChunk(m_resource, time);
     if (m_currentChunk.startTime == -1)
         return -1;
@@ -82,32 +83,12 @@ QnAbstractMediaDataPtr QnServerArchiveDelegate::getNextData()
     QnAbstractMediaDataPtr data = m_aviDelegate->getNextData();
     if (!data)
     {
-        /*
-        // some optimization: return fake data to inform next time (end if GOP detected, data is not need really. So, we does not opening AVI file)
-        if (m_reverseMode)
-        {
-            qint64 nextTime = m_chunkSequence->nextChunkStartTime(m_resource);
-            if (nextTime != -1) {
-                QnCompressedVideoData* vd = new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, 0, 0);
-                vd->flags |= AV_PKT_FLAG_KEY;
-                vd->timestamp = nextTime;
-                data = QnAbstractMediaDataPtr(vd);
-                return data;
-            }
-        }
-        */
-        if (!switchToChunk(m_chunkSequence->getNextChunk(m_resource)))
-            return QnAbstractMediaDataPtr();
-        /*
-        if (!m_reverseMode && !switchToChunk(m_chunkSequence->getNextChunk(m_resource)))
-            return QnAbstractMediaDataPtr();
-
-        else if (m_reverseMode && !switchToChunk(m_chunkSequence->getPrevChunk(m_resource)))
-            return QnAbstractMediaDataPtr();
-
-        if (m_reverseMode)
-            m_aviDelegate->seek(m_currentChunk.duration - BACKWARD_SEEK_STEP);
-        */
+        DeviceFileCatalog::Chunk chunk;
+        do {
+            chunk = m_chunkSequence->getNextChunk(m_resource);
+            if (chunk.startTime == -1)
+                return QnAbstractMediaDataPtr(); // EOF
+        } while (!switchToChunk(chunk));
         data = m_aviDelegate->getNextData();
     }
     if (data) {

@@ -136,11 +136,13 @@ public:
     virtual void setWidth(int value) 
     {
         m_width = value;
+        m_channels.resize(m_width*m_height);
     }
 
     virtual void setHeight(int value)
     {
         m_height = value;
+        m_channels.resize(m_width*m_height);
     }
 
     void setChannel(int h_pos, int v_pos, int channel)
