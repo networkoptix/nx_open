@@ -15,6 +15,7 @@ QnStorageManager::QnStorageManager():
 
 void QnStorageManager::addStorage(QnStoragePtr storage)
 {
+    QMutexLocker lock(&m_mutex);
     m_storageRoots.insert(storage->getIndex(), storage);
 }
 

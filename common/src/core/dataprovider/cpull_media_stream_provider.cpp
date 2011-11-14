@@ -50,7 +50,7 @@ void QnClientPullMediaStreamProvider::run()
 			m_stat[0].onData(0);
 			m_stat[0].onEvent(CL_STAT_FRAME_LOST);
 
-			if (frames_lost==4) // if we lost 2 frames => connection is lost for sure (2)
+			if (frames_lost % 4 == 0) // if we lost 4 frames => connection is lost for sure (4)
             {
                 getResource()->setStatus(QnResource::Offline);
 				m_stat[0].onLostConnection();

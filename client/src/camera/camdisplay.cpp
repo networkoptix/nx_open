@@ -98,6 +98,7 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
 CLCamDisplay::~CLCamDisplay()
 {
     Q_ASSERT(!m_runing);
+    stop();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         delete m_display[i];
 
