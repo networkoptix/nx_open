@@ -65,14 +65,14 @@ bool ArchiveDropInstrument::dropEvent(QWidget *viewport, QDropEvent *event) {
 
     QRect geometry(m_state->gridMapper()->mapToGrid(view(viewport)->mapToScene(event->pos())), QSize(1, 1));
     foreach(QnResourcePtr resource, resources) {
-        QnUiLayoutItem *entity = new QnUiLayoutItem(resource);
-        entity->setGeometry(geometry);
+        QnUiLayoutItem *item = new QnUiLayoutItem(resource->getUniqueId());
+        item->setGeometry(geometry);
 
-        m_state->model()->addItem(entity);
-        if(!entity->isPinned()) {
+        m_state->model()->addItem(item);
+        if(!item->isPinned()) {
             /* Place already taken, pick closest one. */
             QRect newGeometry = m_state->model()->closestFreeSlot(geometry.topLeft(), geometry.size());
-            m_state->model()->pinItem(entity, newGeometry);
+            m_state->model()->pinItem(item, newGeometry);
         }
     }
 

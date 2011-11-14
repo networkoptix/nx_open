@@ -300,7 +300,7 @@ void QnDisplaySynchronizer::synchronizeGeometry(QnUiLayoutItem *entity, bool ani
 }
 
 void QnDisplaySynchronizer::synchronizeGeometry(QnDisplayWidget *widget, bool animate) {
-    QnUiLayoutItem *entity = widget->entity();
+    QnUiLayoutItem *entity = widget->item();
 
     QRectF geometry = entityGeometry(entity);
 
@@ -350,7 +350,7 @@ void QnDisplaySynchronizer::synchronizeLayer(QnUiLayoutItem *entity) {
 }
 
 void QnDisplaySynchronizer::synchronizeLayer(QnDisplayWidget *widget) {
-    setLayer(widget, entityLayer(widget->entity()));
+    setLayer(widget, entityLayer(widget->item()));
 }
 
 void QnDisplaySynchronizer::synchronizeSceneBounds() {
@@ -514,7 +514,7 @@ void QnDisplaySynchronizer::at_activityStarted() {
 
 void QnDisplaySynchronizer::at_curtained() {
     foreach(QnDisplayWidget *widget, m_widgetByEntity)
-        if(widget->entity() != m_state->zoomedEntity())
+        if(widget->item() != m_state->zoomedEntity())
             widget->hide();
 
     m_view->viewport()->setCursor(QCursor(Qt::BlankCursor));

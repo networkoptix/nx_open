@@ -3,19 +3,14 @@
 
 #include <QObject>
 #include <QScopedPointer>
-#include <core/resource/resource_consumer.h>
 
 class QnUiLayout;
-class QnMediaResource;
-class QnAbstractArchiveReader;
-class QnAbstractMediaStreamDataProvider;
-class QnAbstractStreamDataProvider;
-class CLCamDisplay;
+class QnUiDisplay;
 
 /**
  * Single ui layout item. Video, image, folder, or anything else.
  */
-class QnUiLayoutItem: public QObject, protected QnResourceConsumer {
+class QnUiLayoutItem: public QObject {
     Q_OBJECT;
     Q_FLAGS(ItemFlag ItemFlags);
 public:
@@ -27,10 +22,10 @@ public:
     /**
      * Constructor.
      * 
-     * \param resource                  Resource that this item is associated with. Must not be NULL.
+     * \param resourceUniqueId          Unique identifier of a resource.
      * \param parent                    Parent of this object.                
      */
-    QnUiLayoutItem(const QnResourcePtr &resource, QObject *parent = NULL);
+    QnUiLayoutItem(const QString &resourceUniqueId, QObject *parent = NULL);
 
     /**
      * Virtual destructor.
@@ -45,34 +40,10 @@ public:
     }
 
     /**
-     * \returns                         Resource associated with this item.
+     * \returns                         Unique identifier of a resource associated with this item. 
      */
-    QnResource *resource() const;
-
-    /**
-     * \returns                         Media resource associated with this item, if any.
-     */
-    QnMediaResource *mediaResource() const;
-
-    /**
-     * \returns                         Data provider associated with this item.
-     */
-    QnAbstractStreamDataProvider *dataProvider() const {
-        return m_dataProvider;
-    }
-
-    /**
-     * \returns                         Media data provider associated with this item, if any.
-     */
-    QnAbstractMediaStreamDataProvider *mediaProvider() const {
-        return m_mediaProvider;
-    }
-
-    /**
-     * \returns                         Camera display associated with this item, if any.
-     */
-    CLCamDisplay *camDisplay() const {
-        return m_camDisplay.data();
+    const QString &resourceUniqueId() const {
+        return m_resourceUniqueId;
     }
 
     /**
@@ -158,28 +129,16 @@ public:
     void setRotation(qreal rotation);
 
     /**
-     * \returns                         Length of this item, in microseconds. If the length is not defined, returns -1.
+     * Creates a display for this item. Caller is responsible for deleting it.
+     * 
+     * \returns                         Newly created display, or NULL if display cannot be created.
      */
-    qint64 lengthUSec() const;
-
-    /**
-     * \returns                         Current time of this item, in microseconds. If the time is not defined, returns -1.
-     */
-    qint64 currentTimeUSec() const;
-
-    /**
-     * \param usec                      New current time for this item, in microseconds.
-     */
-    void setCurrentTimeUSec(qint64 usec) const;
-
-    void play();
-
-    void pause();
+    QnUiDisplay *createDisplay(QObject *parent = NULL);
 
 signals:
     void geometryChanged(const QRect &oldGeometry, const QRect &newGeometry);
     void geometryDeltaChanged(const QRectF &oldGeometryDelta, const QRectF &newGeometryDelta);
-    void flagsChanged(ItemFlags oldFlags, ItemFlags newFlags);
+    void flagsChanged(QnUiLayoutItem::ItemFlags oldFlags, QnUiLayoutItem::ItemFlags newFlags);
     void rotationChanged(qreal oldRotation, qreal newRotation);
 
 protected:
@@ -192,15 +151,14 @@ protected:
     
     void setFlagInternal(ItemFlag flag, bool value);
 
-    virtual void beforeDisconnectFromResource() override;
-
-    virtual void disconnectFromResource() override;
-
 private:
     friend class QnUiLayout;
 
     /** Layout that this item belongs to. */
     QnUiLayout *m_layout;
+
+    /** Unique identifier of a resource associated with this item. */
+    QString m_resourceUniqueId;
 
     /** Grid-relative geometry of an item, in grid cells. */
     QRect m_geometry;
@@ -213,18 +171,6 @@ private:
 
     /** Rotation, in degrees. */
     qreal m_rotation;
-
-    /** Data provider for the associated resource. */
-    QnAbstractStreamDataProvider *m_dataProvider;
-
-    /** Media data provider, if any. */
-    QnAbstractMediaStreamDataProvider *m_mediaProvider;
-
-    /** Archive data provider, if any. */
-    QnAbstractArchiveReader *m_archiveProvider;
-
-    /** Camera display, if any. */
-    QScopedPointer<CLCamDisplay> m_camDisplay;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnUiLayoutItem::ItemFlags);

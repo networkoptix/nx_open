@@ -9,6 +9,7 @@
 #include <camera/gl_renderer.h>
 #include <camera/camdisplay.h>
 #include <ui/model/ui_layout_item.h>
+#include <ui/model/ui_display.h>
 #include <settings.h>
 #include "display_widget_renderer.h"
 #include "polygonal_shadow_item.h"
@@ -19,6 +20,8 @@ namespace {
 
     /** Default frame color. */
     QColor defaultFrameColor = QColor(128, 128, 128, 196);
+
+    QColor selectedFrameColorMixIn = QColor(255, 255, 255, 0);
 
     /** Frame extension multiplier determines the width of frame extension relative
      * to frame width.
@@ -31,9 +34,9 @@ namespace {
     QPointF defaultShadowDisplacement = QPointF(5.0, 5.0);
 }
 
-QnDisplayWidget::QnDisplayWidget(QnUiLayoutItem *entity, QGraphicsItem *parent):
+QnDisplayWidget::QnDisplayWidget(QnUiLayoutItem *item, QGraphicsItem *parent):
     base_type(parent),
-    m_entity(entity),
+    m_item(item),
     m_resourceLayout(NULL),
     m_channelCount(0),
     m_renderer(NULL),
@@ -55,12 +58,15 @@ QnDisplayWidget::QnDisplayWidget(QnUiLayoutItem *entity, QGraphicsItem *parent):
     setFrameWidth(defaultFrameWidth);
 
     /* Set up video rendering. */
-    m_resourceLayout = entity->mediaResource()->getVideoLayout(entity->mediaProvider());
+    m_display = item->createDisplay(this);
+    m_resourceLayout = m_display->mediaResource()->getVideoLayout(m_display->mediaProvider());
     m_channelCount = m_resourceLayout->numberOfChannels();
     m_renderer = new QnDisplayWidgetRenderer(m_channelCount, this);
     connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_sourceSizeChanged(const QSize &)));
     for(int i = 0; i < m_channelCount; i++)
-        m_entity->camDisplay()->addVideoChannel(i, m_renderer, true);
+        m_display->camDisplay()->addVideoChannel(i, m_renderer, true);
+
+    m_display->start();
 }
 
 QnDisplayWidget::~QnDisplayWidget() {
@@ -249,12 +255,6 @@ void QnDisplayWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * 
         }
     }
     painter->endNativePainting();
-
-
-    if(isSelected()) {
-        painter->setPen(QPen(Qt::green, 0));
-        painter->drawRect(rect());
-    }
 }
 
 void QnDisplayWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override {
@@ -263,13 +263,21 @@ void QnDisplayWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGrap
     qreal h = size.height();
     qreal fw = m_frameWidth;
 
+    /* Prepare color. */
+    QColor color = m_frameColor;
+    if(isSelected()) {
+        color.setRed  ((color.red()   + selectedFrameColorMixIn.red())   / 2);
+        color.setGreen((color.green() + selectedFrameColorMixIn.green()) / 2);
+        color.setBlue ((color.blue()  + selectedFrameColorMixIn.blue())  / 2);
+    }
+
     /* Note that we use OpenGL drawing functions here for a reason.
      * If drawing with QPainter, off-by-one pixel errors may occur as video is drawn via OpenGL. */
     painter->beginNativePainting();
     glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
     glEnable(GL_BLEND); 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
-    glColor(m_frameColor);
+    glColor(color);
     glBegin(GL_QUADS);
     glVertices(QRectF(-fw,     -fw,     w + fw * 2,  fw));
     glVertices(QRectF(-fw,     h,       w + fw * 2,  fw));

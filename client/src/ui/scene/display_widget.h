@@ -9,6 +9,7 @@
 class QnDisplayWidgetRenderer;
 class QnVideoResourceLayout;
 class QnUiLayoutItem;
+class QnUiDisplay;
 class QnPolygonalShadowItem;
 
 class QnDisplayWidget: public GraphicsWidget, public QnPolygonalShapeProvider, public ConstrainedResizable {
@@ -20,15 +21,22 @@ class QnDisplayWidget: public GraphicsWidget, public QnPolygonalShapeProvider, p
     typedef GraphicsWidget base_type;
 
 public:
-    QnDisplayWidget(QnUiLayoutItem *entity, QGraphicsItem *parent = NULL);
+    QnDisplayWidget(QnUiLayoutItem *item, QGraphicsItem *parent = NULL);
 
     virtual ~QnDisplayWidget();
 
     /**
      * \returns                         Entity associated with this widget.
      */
-    QnUiLayoutItem *entity() const {
-        return m_entity;
+    QnUiLayoutItem *item() const {
+        return m_item;
+    }
+
+    /**
+     * \returns                         Display associated with this widget. 
+     */
+    QnUiDisplay *display() const {
+        return m_display;
     }
 
     /**
@@ -118,8 +126,11 @@ private:
     QRectF channelRect(int channel) const;
 
 private:
-    /** Display entity. */
-    QnUiLayoutItem *m_entity;
+    /** Layout item. */
+    QnUiLayoutItem *m_item;
+
+    /** Display. */
+    QnUiDisplay *m_display;
 
     /** Resource layout of this display widget. */
     const QnVideoResourceLayout *m_resourceLayout;

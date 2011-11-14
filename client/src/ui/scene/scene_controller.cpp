@@ -123,12 +123,12 @@ QnSceneController::~QnSceneController() {
 }
 
 void QnSceneController::updateGeometryDelta(QnDisplayWidget *widget) {
-    if(widget->entity()->isPinned())
+    if(widget->item()->isPinned())
         return;
 
     QRectF widgetGeometry = widget->geometry();
 
-    QRectF gridGeometry = m_state->gridMapper()->mapFromGrid(widget->entity()->geometry());
+    QRectF gridGeometry = m_state->gridMapper()->mapFromGrid(widget->item()->geometry());
 
     QSizeF step = m_state->gridMapper()->step();
     QRectF geometryDelta = QRectF(
@@ -138,7 +138,7 @@ void QnSceneController::updateGeometryDelta(QnDisplayWidget *widget) {
         (widgetGeometry.height() - gridGeometry.height()) / step.height()
     );
 
-    widget->entity()->setGeometryDelta(geometryDelta);
+    widget->item()->setGeometryDelta(geometryDelta);
 }
 
 void QnSceneController::at_resizingStarted(QGraphicsView *, QGraphicsWidget *item) {
@@ -156,13 +156,13 @@ void QnSceneController::at_resizingFinished(QGraphicsView *, QGraphicsWidget *it
 
     QRect newRect = m_state->gridMapper()->mapToGrid(widget->geometry());
     QSet<QnUiLayoutItem *> entities = m_state->model()->items(newRect);
-    entities.remove(widget->entity());
+    entities.remove(widget->item());
     if (entities.empty()) {
-        widget->entity()->setGeometry(newRect);
+        widget->item()->setGeometry(newRect);
         updateGeometryDelta(widget);
     }
 
-    m_synchronizer->synchronize(widget->entity());
+    m_synchronizer->synchronize(widget->item());
 }
 
 void QnSceneController::at_draggingStarted(QGraphicsView *, QList<QGraphicsItem *> items) {
@@ -187,10 +187,10 @@ void QnSceneController::at_draggingFinished(QGraphicsView *view, QList<QGraphics
             continue;
 
         if(entities.empty())
-            delta = m_state->gridMapper()->mapToGrid(widget->geometry()).topLeft() - widget->entity()->geometry().topLeft();
+            delta = m_state->gridMapper()->mapToGrid(widget->geometry()).topLeft() - widget->item()->geometry().topLeft();
 
         widgets.push_back(widget);
-        entities.push_back(widget->entity());
+        entities.push_back(widget->item());
     }
     if(entities.empty())
         return;
@@ -263,7 +263,7 @@ void QnSceneController::at_item_clicked(QGraphicsView *, QGraphicsItem *item) {
     if(widget == NULL)
         return;
 
-    QnUiLayoutItem *entity = widget->entity();
+    QnUiLayoutItem *entity = widget->item();
     m_state->setSelectedEntity(m_state->selectedEntity() == entity ? NULL : entity);
 }
 
@@ -274,7 +274,7 @@ void QnSceneController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem *it
     if(widget == NULL)
         return;
 
-    QnUiLayoutItem *entity = widget->entity();
+    QnUiLayoutItem *entity = widget->item();
     if(m_state->zoomedEntity() == entity) {
         QRectF viewportGeometry = m_synchronizer->viewportGeometry();
         QRectF zoomedEntityGeometry = m_synchronizer->zoomedEntityGeometry();
