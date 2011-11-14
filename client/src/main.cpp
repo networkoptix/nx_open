@@ -361,25 +361,6 @@ int main(int argc, char *argv[])
 
     initContextMenu();
     
-#if 1
-    QWidget *widget = new QWidget();
-    QHBoxLayout *layout = new QHBoxLayout(widget);
-    layout->setContentsMargins(0, 0, 0, 0);
-    QGraphicsScene *scene = new QGraphicsScene(widget);
-    QnGraphicsView *view = new QnGraphicsView(scene);
-
-    QnBlueBackgroundPainter *backgroundPainter = new QnBlueBackgroundPainter(120.0);
-    view->installLayerPainter(backgroundPainter, QGraphicsScene::BackgroundLayer);
-
-    QnUiLayout *model = new QnUiLayout();
-    QnDisplayState *state = new QnDisplayState(model);
-    QnDisplaySynchronizer *synchronizer = new QnDisplaySynchronizer(state, scene, view);
-    QnSceneController *controller = new QnSceneController(synchronizer);
-    layout->addWidget(view);
-    widget->resize(800, 600);
-    widget->show();
-
-#else
     MainWnd mainWindow(argc, argv);
     mainWindow.show();
 
@@ -389,7 +370,6 @@ int main(int argc, char *argv[])
 
     QObject::connect(&application, SIGNAL(messageReceived(const QString&)),
         &mainWindow, SLOT(handleMessage(const QString&)));
-#endif
 
     int result = application.exec();
 

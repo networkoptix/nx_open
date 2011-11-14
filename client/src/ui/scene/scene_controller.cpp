@@ -60,6 +60,7 @@ QnSceneController::QnSceneController(QnDisplaySynchronizer *synchronizer, QObjec
     m_wheelZoomInstrument = new WheelZoomInstrument(this);
     m_rubberBandInstrument = new RubberBandInstrument(this);
     m_resizingInstrument = new ResizingInstrument(this);
+    m_archiveDropInstrument = new ArchiveDropInstrument(m_state, this);
 
     m_dragInstrument = new DragInstrument(this);
     m_view->setDragMode(QGraphicsView::NoDrag);
@@ -93,7 +94,7 @@ QnSceneController::QnSceneController(QnDisplaySynchronizer *synchronizer, QObjec
     m_manager->installInstrument(m_dragInstrument);
     m_manager->installInstrument(m_rubberBandInstrument);
     m_manager->installInstrument(m_handScrollInstrument);
-    m_manager->installInstrument(new ArchiveDropInstrument(m_state, this));
+    m_manager->installInstrument(m_archiveDropInstrument);
 
     connect(itemClickInstrument,        SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const QPoint &)),      this,                   SLOT(at_item_clicked(QGraphicsView *, QGraphicsItem *)));
     connect(itemClickInstrument,        SIGNAL(doubleClicked(QGraphicsView *, QGraphicsItem *, const QPoint &)),this,                   SLOT(at_item_doubleClicked(QGraphicsView *, QGraphicsItem *)));

@@ -1,7 +1,10 @@
 #ifndef MAINWND_H
 #define MAINWND_H
 
+#include <QScopedPointer>
 #include "ui_mainwnd.h"
+
+class QnBlueBackgroundPainter;
 
 class CLLayoutNavigator;
 class LayoutContent;
@@ -12,10 +15,9 @@ class MainWnd : public QWidget
 
 public:
     MainWnd(int argc, char* argv[], QWidget *parent = 0, Qt::WFlags flags = 0);
-    ~MainWnd();
+    virtual ~MainWnd();
 
-    static void findAcceptedFiles(QStringList& files, const QString& path);
-    static MainWnd* instance() { return m_instance; }
+    static MainWnd* instance() { return s_instance; }
     void addFilesToCurrentOrNewLayout(const QStringList& files, bool forceNewLayout = false);
 
     void goToNewLayoutContent(LayoutContent* newl);
@@ -24,17 +26,20 @@ private slots:
     void handleMessage(const QString& message);
 
 private:
-    void closeEvent ( QCloseEvent * event );
+    void closeEvent(QCloseEvent *event);
     void destroyNavigator(CLLayoutNavigator*& nav);
 
+#if 0
     void dragEnterEvent(QDragEnterEvent *event);
     void dropEvent(QDropEvent *event);
+#endif
 
     void activate();
 
 private:
+    QScopedPointer<QnBlueBackgroundPainter> m_backgroundPainter;
     CLLayoutNavigator* m_normalView;
-    static MainWnd* m_instance;
+    static MainWnd *s_instance;
 };
 
 #endif // MAINWND_H

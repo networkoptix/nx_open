@@ -15,6 +15,7 @@ class WheelZoomInstrument;
 class DragInstrument;
 class RubberBandInstrument;
 class ResizingInstrument;
+class ArchiveDropInstrument;
 
 class QnDisplaySynchronizer;
 class QnDisplayState;
@@ -27,6 +28,9 @@ public:
 
     virtual ~QnSceneController();
 
+    ArchiveDropInstrument *archiveDropInstrument() const {
+        return m_archiveDropInstrument; 
+    }
     
 protected:
     void updateGeometryDelta(QnDisplayWidget *widget);
@@ -77,6 +81,9 @@ private:
 
     /** Resizing instrument. */
     ResizingInstrument *m_resizingInstrument;
+
+    /** Archive drop instrument. */
+    ArchiveDropInstrument *m_archiveDropInstrument;
 };
 
 #endif // QN_SCENE_CONTROLLER_H

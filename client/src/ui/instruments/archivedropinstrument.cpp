@@ -1,15 +1,12 @@
 #include "archivedropinstrument.h"
 #include <core/resource/directory_browser.h>
 #include <core/resourcemanagment/resource_pool.h>
-#include <plugins/resources/archive/avi_files/avi_dvd_device.h>
-#include <plugins/resources/archive/avi_files/avi_bluray_device.h>
-#include <plugins/resources/archive/avi_files/avi_dvd_archive_delegate.h>
-#include <plugins/resources/archive/filetypesupport.h>
 #include <ui/scene/display_state.h>
 #include <ui/scene/display_grid_mapper.h>
 #include <ui/model/ui_layout.h>
 #include <ui/model/ui_layout_item.h>
 #include <utils/common/warnings.h>
+#include <file_processor.h>
 
 ArchiveDropInstrument::ArchiveDropInstrument(QnDisplayState *state, QObject *parent):
     Instrument(VIEWPORT, makeSet(QEvent::DragEnter, QEvent::DragMove, QEvent::DragLeave, QEvent::Drop), parent),
@@ -21,13 +18,22 @@ ArchiveDropInstrument::ArchiveDropInstrument(QnDisplayState *state, QObject *par
     }
 }
 
+void ArchiveDropInstrument::drop(QGraphicsView *view, const QUrl &url, QPoint &pos) {
+    QStringList files;
+    QnFileProcessor::findAcceptedFiles(url.toLocalFile(), &files);
+    if(m_files.empty())
+        return;
+
+    dropInternal(view, files, pos);
+}
+
 bool ArchiveDropInstrument::dragEnterEvent(QWidget * /*viewport*/, QDragEnterEvent *event) {
     if(m_state == NULL)
         return false;
 
     m_files.clear();
     foreach (const QUrl &url, event->mimeData()->urls())
-        findAcceptedFiles(url.toLocalFile());
+        QnFileProcessor::findAcceptedFiles(url.toLocalFile(), &m_files);
     if (m_files.empty())
         return false;
 
@@ -57,13 +63,17 @@ bool ArchiveDropInstrument::dragLeaveEvent(QWidget * /*viewport*/, QDragLeaveEve
 }
 
 bool ArchiveDropInstrument::dropEvent(QWidget *viewport, QDropEvent *event) {
+    return dropInternal(view(viewport), m_files, event->pos());
+}
+
+bool ArchiveDropInstrument::dropInternal(QGraphicsView *view, const QStringList &files, const QPoint &pos) {
     if(m_state == NULL)
         return false;
 
-    QnResourceList resources = QnResourceDirectoryBrowser::instance().checkFiles(m_files);
+    QnResourceList resources = QnResourceDirectoryBrowser::instance().checkFiles(files);
     qnResPool->addResources(resources);
 
-    QRect geometry(m_state->gridMapper()->mapToGrid(view(viewport)->mapToScene(event->pos())), QSize(1, 1));
+    QRect geometry(m_state->gridMapper()->mapToGrid(view->mapToScene(pos)), QSize(1, 1));
     foreach(QnResourcePtr resource, resources) {
         QnUiLayoutItem *item = new QnUiLayoutItem(resource->getUniqueId());
         item->setGeometry(geometry);
@@ -77,35 +87,4 @@ bool ArchiveDropInstrument::dropEvent(QWidget *viewport, QDropEvent *event) {
     }
 
     return true;
-}
-
-void ArchiveDropInstrument::findAcceptedFiles(const QString &path) {
-    if (CLAviDvdDevice::isAcceptedUrl(path)) {
-        if (path.indexOf(QLatin1Char('?')) == -1) {
-            /* Open all titles on a DVD. */
-            QStringList titles = QnAVIDvdArchiveDelegate::getTitleList(path);
-            foreach (const QString &title, titles)
-                m_files.push_back(path + QLatin1String("?title=") + title);
-        } else {
-            m_files.push_back(path);
-        }
-    } else if (CLAviBluRayDevice::isAcceptedUrl(path)) {
-        m_files.push_back(path);
-    } else {
-        FileTypeSupport fileTypeSupport;
-        QFileInfo fileInfo(path);
-        if (fileInfo.isDir()) {
-            QDirIterator i(path, QDirIterator::Subdirectories);
-            while (i.hasNext()) {
-                QString nextFilename = i.next();
-                if (QFileInfo(nextFilename).isFile()) {
-                    if (fileTypeSupport.isFileSupported(nextFilename))
-                        m_files.push_back(nextFilename);
-                }
-            }
-        } else if (fileInfo.isFile()) {
-            if (fileTypeSupport.isFileSupported(path))
-                m_files.push_back(path);
-        }
-    }
 }

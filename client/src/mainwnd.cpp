@@ -1,104 +1,85 @@
 #include "mainwnd.h"
 
-#include <QtCore/QDirIterator>
-#include <QtCore/QFileInfo>
+#include <core/resource/directory_browser.h>
+#include <core/resourcemanagment/resource_pool.h>
 
-#include "ui/layout_navigator.h"
-#include "ui/video_cam_layout/layout_manager.h"
-#include "ui/video_cam_layout/start_screen_content.h"
+#include <ui/layout_navigator.h>
+#include <ui/video_cam_layout/layout_manager.h>
+#include <ui/video_cam_layout/start_screen_content.h>
+
+#include <ui/view/graphics_view.h>
+#include <ui/view/blue_background_painter.h>
+
+#include <ui/instruments/archivedropinstrument.h>
+
+#include <ui/model/ui_layout.h>
+#include <ui/scene/scene_controller.h>
+#include <ui/scene/display_synchronizer.h>
+#include <ui/scene/display_state.h>
+
+#include <utils/common/util.h>
+#include <utils/common/warnings.h>
+
+#include "file_processor.h"
 #include "settings.h"
-
-
 #include "version.h"
-#include "plugins/resources/archive/avi_files/avi_dvd_device.h"
-#include "plugins/resources/archive/avi_files/avi_dvd_archive_delegate.h"
-#include "plugins/resources/archive/avi_files/avi_bluray_device.h"
-#include "plugins/resources/archive/filetypesupport.h"
-#include "core/resource/directory_browser.h"
-#include "utils/common/util.h"
-#include "core/resourcemanagment/resource_pool.h"
 
 
-
-MainWnd* MainWnd::m_instance = 0;
-
-void MainWnd::findAcceptedFiles(QStringList& files, const QString& path)
-{
-    if (CLAviDvdDevice::isAcceptedUrl(path))
-    {
-        if (path.indexOf(QLatin1Char('?')) == -1)
-        {
-            // open all titles on DVD
-            QStringList titles = QnAVIDvdArchiveDelegate::getTitleList(path);
-            foreach (const QString &title, titles)
-                files << path + QLatin1String("?title=") + title;
-        }
-        else
-        {
-            files.append(path);
-        }
-    }
-    else if (CLAviBluRayDevice::isAcceptedUrl(path))
-    {
-        files.append(path);
-    }
-    else
-    {
-        FileTypeSupport fileTypeSupport;
-        QFileInfo fileInfo(path);
-        if (fileInfo.isDir())
-        {
-            QDirIterator iter(path, QDirIterator::Subdirectories);
-            while (iter.hasNext())
-            {
-                QString nextFilename = iter.next();
-                if (QFileInfo(nextFilename).isFile())
-                {
-                    if (fileTypeSupport.isFileSupported(nextFilename))
-                        files.append(nextFilename);
-                }
-            }
-        }
-        else if (fileInfo.isFile())
-        {
-            if (fileTypeSupport.isFileSupported(path))
-                files.append(path);
-        }
-    }
-}
+MainWnd *MainWnd::s_instance = 0;
 
 MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
-//    : QMainWindow(parent, flags),
     : QWidget(parent, flags),
     m_normalView(0)
 {
-    m_instance = this;
-
+    if(s_instance != NULL)
+        qnWarning("Several instances of main window created, expect problems.");
+    else
+        s_instance = this;
+    
+    /* Set up QWidget. */
     setWindowTitle(APPLICATION_NAME);
-
     setAttribute(Qt::WA_QuitOnClose);
-
     setAutoFillBackground(false);
+    setAcceptDrops(true);
 
     QPalette pal = palette();
     pal.setColor(backgroundRole(), app_bkr_color);
     setPalette(pal);
 
-    //setWindowOpacity(.80);
+    const int min_width = 800;
+    setMinimumWidth(min_width);
+    setMinimumHeight(min_width * 3 / 4);
 
-    setAcceptDrops(true);
+    /* Set up UI. */
+    QGraphicsScene *scene = new QGraphicsScene(this);
+    QnGraphicsView *view = new QnGraphicsView(scene, this);
 
-    //=======================================================
+    QHBoxLayout *layout = new QHBoxLayout(this);
+    /* Can't set 0,0,0,0 on Windows as in fullScreen mode context menu becomes invisible.
+     * Looks like a QT bug: http://bugreports.qt.nokia.com/browse/QTBUG-7556 */
+#ifdef Q_OS_WIN
+    layout->setContentsMargins(0, 1, 0, 0);
+#else
+    layout->setContentsMargins(0, 0, 0, 0);
+#endif
+    layout->addWidget(view);
 
-    const int min_wisth = 800;
-    setMinimumWidth(min_wisth);
-    setMinimumHeight(min_wisth*3/4);
+    m_backgroundPainter.reset(new QnBlueBackgroundPainter(120.0));
+    view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
 
+    /* Set up model & control machinery. */
+    QnUiLayout *uiLayout = new QnUiLayout(this);
+    QnDisplayState *state = new QnDisplayState(uiLayout, this);
+    QnDisplaySynchronizer *synchronizer = new QnDisplaySynchronizer(state, scene, view, this);
+    QnSceneController *controller = new QnSceneController(synchronizer, this);
+
+    /* Process input files. */
     QStringList files;
     for (int i = 1; i < argc; ++i)
-        findAcceptedFiles(files, fromNativePath(QString::fromLocal8Bit(argv[i])));
+        controller->archiveDropInstrument()->drop(view, QUrl::fromLocalFile(fromNativePath(QString::fromLocal8Bit(argv[i]))), view->rect().center());
 
-    LayoutContent* content = 0;
+    /*
+    QnFileProcessor::findAcceptedFiles(, &files);
 
     if (!files.isEmpty())
     {
@@ -110,28 +91,22 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
         foreach (const QString &file, files)
             content->addDevice(file);
     }
+    */
 
+    /*
     //=======add====
-    m_normalView = new CLLayoutNavigator(this, content);
+    //m_normalView = new CLLayoutNavigator(this, content);
 
-    QLayout *layout = new QHBoxLayout;
-    layout->addWidget(&m_normalView->getView());
-    // Can't set 0,0,0,0 on Windows as in fullScreen mode context menu becomes invisible
-    // Looks like QT bug: http://bugreports.qt.nokia.com/browse/QTBUG-7556
-#ifdef Q_OS_WIN
-    layout->setContentsMargins(0, 1, 0, 0);
-#else
-    layout->setContentsMargins(0, 0, 0, 0);
-#endif
-    setLayout(layout);
+    //m_normalView->setMode(NORMAL_ViewMode);
+    //m_normalView->getView().setViewMode(GraphicsView::NormalView);
+    */
 
-    m_normalView->setMode(NORMAL_ViewMode);
-    m_normalView->getView().setViewMode(GraphicsView::NormalView);
-
+#if 0
     if (!files.isEmpty())
         show();
     else
         showFullScreen();
+#endif
 }
 
 MainWnd::~MainWnd()
@@ -206,6 +181,7 @@ void MainWnd::destroyNavigator(CLLayoutNavigator*& nav)
     }
 }
 
+#if 0
 void MainWnd::dragEnterEvent(QDragEnterEvent *event)
 {
     event->acceptProposedAction();
@@ -220,6 +196,7 @@ void MainWnd::dropEvent(QDropEvent *event)
     addFilesToCurrentOrNewLayout(files, event->keyboardModifiers() & Qt::AltModifier);
     activate();
 }
+#endif
 
 void MainWnd::activate()
 {
