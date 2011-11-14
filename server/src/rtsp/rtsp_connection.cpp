@@ -133,6 +133,8 @@ protected:
 
         if (media->flags & QnAbstractMediaData::MediaFlags_AfterEOF)
         {
+            m_overflowOccured = false;
+            m_dataQueue.clear();
             m_owner->switchToLive(); // it is archive EOF
             return true;
         }
