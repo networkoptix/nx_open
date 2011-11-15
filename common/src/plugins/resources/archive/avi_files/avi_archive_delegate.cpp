@@ -404,6 +404,8 @@ AVCodecContext* QnAviArchiveDelegate::setAudioChannel(int num)
 {
     if (!m_formatContext)
         return 0;
+    if (!m_streamsFound && !findStreams()) 
+        return 0;
     // convert num to absolute track number
     m_audioStreamIndex = -1;
     int lastStreamID = -1;
