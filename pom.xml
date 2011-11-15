@@ -6,7 +6,7 @@
     It should also be possible to have one maven project per solution project, 
     and have a parent pom to deletegate the build.
   -->
-
+<!--test message-->
 	<groupId>com.networkoptix.hdwitness-vms</groupId>
 	<version>0.1-SNAPSHOT</version>
 	<modelVersion>4.0.0</modelVersion>
