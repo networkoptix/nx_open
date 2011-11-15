@@ -201,7 +201,7 @@ QnWidgetAnimator *QnLayoutDisplay::animator(QnDisplayWidget *widget) {
         return properties.animator;
 
     /* Create if it's not there. */
-    properties.animator = new QnWidgetAnimator(widget, widget);
+    properties.animator = new QnWidgetAnimator(widget, "enclosingGeometry", "rotation", widget);
     properties.animator->setMovementSpeed(4.0);
     properties.animator->setScalingSpeed(32.0);
     properties.animator->setRotationSpeed(720.0);
@@ -289,7 +289,7 @@ QnLayoutDisplay::Layer QnLayoutDisplay::entityLayer(QnLayoutItemModel *item) con
     }
 }
 
-QRectF QnLayoutDisplay::itemBoundingGeometry(QnLayoutItemModel *item) const {
+QRectF QnLayoutDisplay::itemEnclosingGeometry(QnLayoutItemModel *item) const {
     assert(item != NULL && item->layout() == m_state->layout());
 
     QRectF result = m_state->mapper()->mapFromGrid(item->geometry());
@@ -306,10 +306,12 @@ QRectF QnLayoutDisplay::itemBoundingGeometry(QnLayoutItemModel *item) const {
     return result;
 }
 
-QRectF QnLayoutDisplay::itemGeometry(QnLayoutItemModel *item) const {
+QRectF QnLayoutDisplay::itemGeometry(QnLayoutItemModel *item, QRectF *enclosingGeometry) const {
     assert(item != NULL && item->layout() == m_state->layout());
 
-    QRectF result = itemBoundingGeometry(item);
+    QRectF result = itemEnclosingGeometry(item);
+    if(enclosingGeometry != NULL)
+        *enclosingGeometry = result;
 
     QnDisplayWidget *widget = this->widget(item);
     if(!widget->hasAspectRatio())
@@ -346,11 +348,11 @@ void QnLayoutDisplay::synchronizeGeometry(QnLayoutItemModel *item, bool animate)
 void QnLayoutDisplay::synchronizeGeometry(QnDisplayWidget *widget, bool animate) {
     QnLayoutItemModel *item = widget->item();
 
-    QRectF geometry = itemGeometry(item);
+    QRectF enclosingGeometry = itemEnclosingGeometry(item);
 
     /* Adjust for selection. */
     if(item == m_state->selectedItem() && item != m_state->zoomedItem()) {
-        QPointF geometryCenter = geometry.center();
+        QPointF geometryCenter = enclosingGeometry.center();
         QTransform transform;
         transform.translate(geometryCenter.x(), geometryCenter.y());
         transform.rotate(-item->rotation());
@@ -358,33 +360,36 @@ void QnLayoutDisplay::synchronizeGeometry(QnDisplayWidget *widget, bool animate)
 
         QRectF viewportGeometry = transform.mapRect(mapRectToScene(m_view, m_view->viewport()->rect()));
 
-        QSizeF newWidgetSize = geometry.size() * focusExpansion;
+        QSizeF newWidgetSize = enclosingGeometry.size() * focusExpansion;
         QSizeF maxWidgetSize = viewportGeometry.size() * maxExpandedSize;
         QPointF viewportCenter = viewportGeometry.center();
 
         /* Allow expansion no further than the maximal size, but no less than current size. */
         newWidgetSize =  bounded(newWidgetSize, maxWidgetSize,   Qt::KeepAspectRatio);
-        newWidgetSize = expanded(newWidgetSize, geometry.size(), Qt::KeepAspectRatio);
+        newWidgetSize = expanded(newWidgetSize, enclosingGeometry.size(), Qt::KeepAspectRatio);
 
         /* Calculate expansion values. Expand towards the screen center. */
         qreal xp1 = 0.0, xp2 = 0.0, yp1 = 0.0, yp2 = 0.0;
-        calculateExpansionValues(geometry.left(), geometry.right(),  viewportCenter.x(), newWidgetSize.width(),  &xp1, &xp2);
-        calculateExpansionValues(geometry.top(),  geometry.bottom(), viewportCenter.y(), newWidgetSize.height(), &yp1, &yp2);
+        calculateExpansionValues(enclosingGeometry.left(), enclosingGeometry.right(),  viewportCenter.x(), newWidgetSize.width(),  &xp1, &xp2);
+        calculateExpansionValues(enclosingGeometry.top(),  enclosingGeometry.bottom(), viewportCenter.y(), newWidgetSize.height(), &yp1, &yp2);
 
-        geometry = geometry.adjusted(xp1, yp1, xp2, yp2);
+        enclosingGeometry = enclosingGeometry.adjusted(xp1, yp1, xp2, yp2);
     }
 
     /* Update Z value. */
     if(item == m_state->selectedItem() || item == m_state->zoomedItem())
         bringToFront(widget);
     
+    /* Update enclosing aspect ratio. */
+    widget->setEnclosingAspectRatio(enclosingGeometry.width() / enclosingGeometry.height());
+
     /* Move! */
     QnWidgetAnimator *animator = this->animator(widget);
     if(animate) {
-        animator->moveTo(geometry, item->rotation(), widgetAnimationDurationMsec);
+        animator->moveTo(enclosingGeometry, item->rotation(), widgetAnimationDurationMsec);
     } else {
         animator->stopAnimation();
-        widget->setGeometry(geometry);
+        widget->setEnclosingGeometry(enclosingGeometry);
         widget->setRotation(item->rotation());
     }
 }

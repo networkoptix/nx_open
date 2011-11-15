@@ -243,7 +243,11 @@ int main(int argc, char *argv[])
     QnAppServerConnection appServerConnection(host, port, auth, QnResourceDiscoveryManager::instance());
 
     QList<QnResourceTypePtr> resourceTypeList;
-    appServerConnection.getResourceTypes(resourceTypeList);
+    if (appServerConnection.getResourceTypes(resourceTypeList) != 0)
+    {
+        qDebug() << "Can't get resource types: " << appServerConnection.getLastError();
+    }
+
     qnResTypePool->addResourceTypeList(resourceTypeList);
 
     registerServer(appServerConnection, localAddress(appserverAddress));
@@ -256,6 +260,19 @@ int main(int argc, char *argv[])
     QnRestServer restServer(QHostAddress::Any, DEFAULT_REST_PORT);
     restServer.registerHandler("api/RecordedTimePeriods", new QnRecordedChunkListHandler());
     restServer.registerHandler("xsd/*", new QnXsdHelperHandler());
+
+#if 0
+    // Get storages sample code.
+    QnResourceList storages;
+    appServerConnection.getStorages(storages);
+
+    foreach (QnResourcePtr resource, storages)
+    {
+        QnStoragePtr storage = resource.dynamicCast<QnStorage>();
+
+        qDebug() << "Storage: " << storage->getMaxStoreTime() << storage->getIndex();
+    }
+#endif
 
     QnStoragePtr storage0(new QnStorage());
     storage0->setUrl("g:/records");

@@ -70,22 +70,23 @@ public:
     QnDisplayWidget *widget(QnLayoutItemModel *item) const;
 
     /**
-     * \param item                      Item to get bounding geometry for. Must not be NULL.
-     * \returns                         Given item's bounding geometry in scene 
+     * \param item                      Item to get enclosing geometry for. Must not be NULL.
+     * \returns                         Given item's enclosing geometry in scene 
      *                                  coordinates as defined by the model.
      *                                  Note that actual geometry may differ because of
      *                                  aspect ration constraints.
      */
-    QRectF itemBoundingGeometry(QnLayoutItemModel *item) const;
+    QRectF itemEnclosingGeometry(QnLayoutItemModel *item) const;
 
     /**
      * \param item                      Item to get geometry for. Must not be NULL.
-     * \returns                         Given item's geometry in scene coordinates,
+     * \param[out] enclosingGeometry    Item's enclosing geometry.
+     * \returns                         Item's geometry in scene coordinates,
      *                                  taking aspect ratio constraints into account.
      *                                  Note that actual geometry of the item's widget
      *                                  may differ because of manual dragging / resizing / etc...
      */
-    QRectF itemGeometry(QnLayoutItemModel *item) const;
+    QRectF itemGeometry(QnLayoutItemModel *item, QRectF *enclosingGeometry = NULL) const;
 
     /**
      * \returns                         Bounding geometry of current layout.
@@ -135,7 +136,6 @@ protected:
     void synchronizeGeometry(QnDisplayWidget *widget, bool animate);
     void synchronizeLayer(QnLayoutItemModel *item);
     void synchronizeLayer(QnDisplayWidget *widget);
-    //void synchronizeAspectRatio();
 
     qreal layerFrontZ(Layer layer) const;
     Layer entityLayer(QnLayoutItemModel *entity) const;

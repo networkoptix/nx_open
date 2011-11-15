@@ -62,7 +62,7 @@ QString QnServerCamera::getUniqueId() const
 {
     QnResourcePtr server = qnResPool->getResourceById(getParentId());
     if (server)
-        return server->getUniqueId() + QString('-') + getUrl();
+        return server->getUniqueId() + QString('-') + getMAC().toString();
     else
         return QString("Server camera ") + getUrl();
 }
@@ -76,6 +76,10 @@ QnResourcePtr QnServerCameraFactory::createResource(const QnId& resourceTypeId, 
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
 
     if (resourceType.isNull())
+        return resource;
+
+    // Currently we support only cameras.
+    if (!resourceType->isCamera())
         return resource;
 
     resource = QnResourcePtr(new QnServerCamera());

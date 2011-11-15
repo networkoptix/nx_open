@@ -1,4 +1,5 @@
 #include "abstract_archive_stream_reader.h"
+#include "utils/common/util.h"
 
 QnAbstractArchiveReader::QnAbstractArchiveReader(QnResourcePtr dev ) :
     QnClientPullMediaStreamProvider(dev),
@@ -63,9 +64,12 @@ void QnAbstractArchiveReader::jumpTo(qint64 mksec, bool makeshot)
 
 void QnAbstractArchiveReader::jumpToPreviousFrame(qint64 mksec, bool makeshot)
 {
-    setSkipFramesToTime(mksec);
-
-    jumpTo(qMax(0ll, (qint64)mksec - 200 * 1000), makeshot);
+    if (mksec != DATETIME_NOW) {
+        setSkipFramesToTime(mksec);
+        jumpTo(qMax(0ll, (qint64)mksec - 200 * 1000), makeshot);
+    }
+    else
+        jumpTo(mksec, makeshot);
 }
 
 qint64 QnAbstractArchiveReader::skipFramesToTime() const
@@ -162,4 +166,9 @@ void QnAbstractArchiveReader::pleaseStop()
     QnClientPullMediaStreamProvider::pleaseStop();
     if (m_delegate)
         m_delegate->beforeClose();
+}
+
+bool QnAbstractArchiveReader::open()
+{
+    return m_delegate ? m_delegate->open(m_resource) : false;
 }

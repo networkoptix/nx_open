@@ -9,7 +9,7 @@
 static const int DEFAULT_VIDEO_STREAM_ID = 4113;
 static const int DEFAULT_AUDIO_STREAM_ID = 4352;
 
-static const int STORE_QUEUE_SIZE = 30;
+static const int STORE_QUEUE_SIZE = 50;
 
 extern QMutex global_ffmpeg_mutex;
 

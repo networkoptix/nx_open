@@ -15,9 +15,11 @@ public:
      * Constructor.
      * 
      * \param widget                    Widget that this animator will be assigned to.
+     * \param geometryPropertyName      Property name for changing widget's geometry.
+     * \param rotationPropertyName      Property name for changing widget's rotation.
      * \param parent                    Parent object.
      */
-    QnWidgetAnimator(QGraphicsWidget *widget, QObject *parent = NULL);
+    QnWidgetAnimator(QGraphicsWidget *widget, const QByteArray &geometryPropertyName, const QByteArray &rotationPropertyName, QObject *parent = NULL);
 
     /**
      * Starts animated move of a widget to the given position.

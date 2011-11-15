@@ -22,9 +22,9 @@ int AppSessionManager::addServer(const ::xsd::api::servers::Server& server, QnAp
     ::xsd::api::servers::servers(os, servers);
 
     QByteArray reply;
-    CLHttpStatus status = addObject("server", os.str().c_str(), reply);
 
-    if (status == CL_HTTP_SUCCESS)
+    int status = addObject("server", os.str().c_str(), reply);
+    if (status == 0)
     {
         try
         {
@@ -36,11 +36,14 @@ int AppSessionManager::addServer(const ::xsd::api::servers::Server& server, QnAp
             return 0;
         } catch (const xml_schema::exception& e)
         {
+            m_lastError = e.what();
+
             qDebug(e.what());
+            return -1;
         }
     }
 
-    return 1;
+    return status;
 }
 
 int AppSessionManager::addCamera(const ::xsd::api::cameras::Camera& camera, QnApiCameraResponsePtr& camerasPtr)
@@ -52,9 +55,9 @@ int AppSessionManager::addCamera(const ::xsd::api::cameras::Camera& camera, QnAp
     ::xsd::api::cameras::cameras(os, cameras);
 
     QByteArray reply;
-    CLHttpStatus status = addObject("camera", os.str().c_str(), reply);
 
-    if (status == CL_HTTP_SUCCESS)
+    int status = addObject("camera", os.str().c_str(), reply);
+    if (status == 0)
     {
         try
         {
@@ -66,71 +69,27 @@ int AppSessionManager::addCamera(const ::xsd::api::cameras::Camera& camera, QnAp
             return 0;
         } catch (const xml_schema::exception& e)
         {
+            m_lastError = e.what();
+
             qDebug(e.what());
+            return -1;
         }
     }
 
-    return 1;
+    return status;
 }
 
-#if 0
-void SessionManager::slotRequestFinished(QNetworkReply *reply)
+int AppSessionManager::addObject(const QString& objectName, const QByteArray& body, QByteArray& reply)
 {
-    qDebug("slotRequestFinished");
+    QTextStream stream(&reply);
 
-    if (reply->error() > 0)
+    int status = m_httpClient.syncPost(QString("api/%1/").arg(objectName), body, stream.device());
+    stream.readAll();
+
+    if (status != 0)
     {
-        QString message;
-        QTextStream stream(&message);
-
-        stream << reply->errorString() << reply->readAll();
-        emit error((RequestId)reply, message);
+        m_lastError = formatNetworkError(status) + reply;
     }
-    else
-    {
-        QString objectName;
-        if (m_requestObjectMap.contains(reply))
-        {
-            objectName = m_requestObjectMap[reply];
-            m_requestObjectMap.remove(reply);
-        }
-
-        QStdIStream is(reply);
-
-        if (objectName == "resourceEx")
-        {
-            typedef xsd::api::resourcesEx::Resources T;
-            QSharedPointer<T> result;
-
-
-            emit resourcesReceived((RequestId)reply, result);
-        }
-
-        if (objectName == "layout")
-        {
-            typedef xsd::api::layouts::Layouts T;
-            QSharedPointer<T> result;
-
-            try
-            {
-                result = QSharedPointer<T>(xsd::api::layouts::layouts (is, xml_schema::flags::dont_validate).release());
-            } catch (const xml_schema::exception& e)
-            {
-                qDebug(e.what());
-            }
-
-            emit layoutsReceived((RequestId)reply, result);
-        }
-    }
-}
-#endif
-
-CLHttpStatus AppSessionManager::addObject(const QString& objectName, const QByteArray& body, QByteArray& reply)
-{
-    CLHttpStatus status = m_client.doPOST(QString("api/%1/").arg(objectName), body);
-
-    if (status == CL_HTTP_SUCCESS || status == CL_HTTP_BAD_REQUEST)
-        m_client.readAll(reply);
 
     return status;
 }
@@ -139,7 +98,8 @@ int AppSessionManager::getResourceTypes(QnApiResourceTypeResponsePtr& resourceTy
 {
     QByteArray reply;
 
-    if(sendGetRequest("resourceType", reply) == 0)
+    int status = sendGetRequest("resourceType", reply);
+    if(status == 0)
     {
         try
         {
@@ -151,18 +111,49 @@ int AppSessionManager::getResourceTypes(QnApiResourceTypeResponsePtr& resourceTy
             return 0;
         } catch (const xml_schema::exception& e)
         {
+            m_lastError = e.what();
+
             qDebug(e.what());
+            return -1;
         }
     }
 
-    return 1;
+    return status;
+}
+
+int AppSessionManager::getStorages(QnApiStorageResponsePtr& storages)
+{
+    QByteArray reply;
+
+    int status = sendGetRequest("storage", reply);
+    if (status == 0)
+    {
+        try
+        {
+            QTextStream stream(reply);
+            QStdIStream is(stream.device());
+
+            storages = QnApiStorageResponsePtr(xsd::api::storages::storages (is, xml_schema::flags::dont_validate).release());
+
+            return 0;
+        } catch (const xml_schema::exception& e)
+        {
+            m_lastError = e.what();
+
+            qDebug(e.what());
+            return -1;
+        }
+    }
+
+    return status;
 }
 
 int AppSessionManager::getResources(QnApiResourceResponsePtr& resources)
 {
     QByteArray reply;
 
-    if (sendGetRequest("resourceEx", reply) == 0)
+    int status = sendGetRequest("resourceEx", reply);
+    if (status == 0)
     {
         try
         {
@@ -174,9 +165,12 @@ int AppSessionManager::getResources(QnApiResourceResponsePtr& resources)
             return 0;
         } catch (const xml_schema::exception& e)
         {
+            m_lastError = e.what();
+
             qDebug(e.what());
+            return -1;
         }
     }
 
-    return 1;
+    return status;
 }

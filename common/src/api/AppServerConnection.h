@@ -26,14 +26,16 @@ public:
     int addCamera(const QnNetworkResource&, const QnId& serverId, QList<QnResourcePtr>& cameras);
 
     int getServers(QnResourceList& servers);
+    int getStorages(QnResourceList& storages);
 
     bool isConnected() const;
+
+    QString getLastError() const;
 
 private:
     QSharedPointer<AppSessionManager> m_sessionManager;
     QnResourceFactory& m_resourceFactory;
     QnVideoServerFactory m_serverFactory;
-
 };
 
 #endif // APPSERVERCONNECTIONIMPL_H

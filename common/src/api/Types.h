@@ -9,6 +9,7 @@
 #include "xsd_servers.h"
 #include "xsd_users.h"
 #include "xsd_events.h"
+#include "xsd_storages.h"
 #include "xsd_RecordedTimePeriods.h"
 
 // for appServer methods
@@ -20,6 +21,7 @@ typedef xsd::cxx::tree::sequence<xsd::api::cameras::Camera>              QnApiCa
 typedef xsd::cxx::tree::sequence<xsd::api::layouts::Layout>              QnApiLayouts;
 typedef xsd::cxx::tree::sequence<xsd::api::users::User>                  QnApiUsers;
 typedef xsd::cxx::tree::sequence<xsd::api::servers::Server>              QnApiServers;
+typedef xsd::cxx::tree::sequence<xsd::api::storages::Storage>            QnApiStorages;
 
 typedef QSharedPointer<xsd::api::resourceTypes::ResourceTypes>           QnApiResourceTypeResponsePtr;
 typedef QSharedPointer<xsd::api::resourcesEx::Resources>                 QnApiResourceResponsePtr;
@@ -28,6 +30,7 @@ typedef QSharedPointer<xsd::api::cameras::Cameras>                       QnApiCa
 typedef QSharedPointer<xsd::api::layouts::Layouts>                       QnApiLayoutResponsePtr;
 typedef QSharedPointer<xsd::api::users::Users>                           QnApiUserResponsePtr;
 typedef QSharedPointer<xsd::api::servers::Servers>                       QnApiServerResponsePtr;
+typedef QSharedPointer<xsd::api::storages::Storages>                     QnApiStorageResponsePtr;
 
 typedef QSharedPointer<xsd::api::events::events_t>                       QnApiEventResponsePtr;
 

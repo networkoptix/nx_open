@@ -18,12 +18,13 @@ public:
     int getResourceTypes(QnApiResourceTypeResponsePtr& resourceTypes);
     int getResources(QnApiResourceResponsePtr& resources);
 
+    int getStorages(QnApiStorageResponsePtr& resources);
+
     int addServer(const ::xsd::api::servers::Server&, QnApiServerResponsePtr& servers);
     int addCamera(const ::xsd::api::cameras::Camera&, QnApiCameraResponsePtr& cameras);
 
 private:
-    CLHttpStatus addObject(const QString& objectName, const QByteArray& body, QByteArray& response);
-
+    int addObject(const QString& objectName, const QByteArray& body, QByteArray& response);
 };
 
 #endif // _APP_SESSION_MANAGER_H

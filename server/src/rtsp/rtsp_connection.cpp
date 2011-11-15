@@ -133,6 +133,8 @@ protected:
 
         if (media->flags & QnAbstractMediaData::MediaFlags_AfterEOF)
         {
+            m_overflowOccured = false;
+            m_dataQueue.clear();
             m_owner->switchToLive(); // it is archive EOF
             return true;
         }
@@ -407,6 +409,7 @@ int QnRtspConnectionProcessor::composeDescribe()
 
     if (d->archiveDP) {
         QString range = "npt=";
+        d->archiveDP->open();
         range += QString::number(d->archiveDP->startTime());
         range += "-";
         if (QnRecordingManager::instance()->isCameraRecoring(d->mediaRes))

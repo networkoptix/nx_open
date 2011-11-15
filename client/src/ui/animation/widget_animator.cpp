@@ -5,7 +5,7 @@
 #include <QParallelAnimationGroup>
 #include <utils/common/warnings.h>
 
-QnWidgetAnimator::QnWidgetAnimator(QGraphicsWidget *widget, QObject *parent):
+QnWidgetAnimator::QnWidgetAnimator(QGraphicsWidget *widget, const QByteArray &geometryPropertyName, const QByteArray &rotationPropertyName, QObject *parent):
     QObject(parent),
     m_widget(widget),
     m_movementSpeed(1.0),
@@ -30,11 +30,11 @@ QnWidgetAnimator::QnWidgetAnimator(QGraphicsWidget *widget, QObject *parent):
 
     m_geometryAnimation = new QPropertyAnimation(this);
     m_geometryAnimation->setTargetObject(m_widget);
-    m_geometryAnimation->setPropertyName("geometry");
+    m_geometryAnimation->setPropertyName(geometryPropertyName);
 
     m_rotationAnimation = new QPropertyAnimation(this);
     m_rotationAnimation->setTargetObject(m_widget);
-    m_rotationAnimation->setPropertyName("rotation");
+    m_rotationAnimation->setPropertyName(rotationPropertyName);
 
     m_animationGroup = new QParallelAnimationGroup(this);
     m_animationGroup->addAnimation(m_geometryAnimation);

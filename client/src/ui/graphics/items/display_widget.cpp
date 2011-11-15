@@ -104,6 +104,16 @@ QRectF QnDisplayWidget::enclosingGeometry() const {
     return expanded(m_enclosingAspectRatio, geometry(), Qt::KeepAspectRatioByExpanding);
 }
 
+void QnDisplayWidget::setEnclosingGeometry(const QRectF &enclosingGeometry) {
+    m_enclosingAspectRatio = enclosingGeometry.width() / enclosingGeometry.height();
+
+    if(hasAspectRatio()) {
+        setGeometry(expanded(m_aspectRatio, enclosingGeometry, Qt::KeepAspectRatio));
+    } else {
+        setGeometry(enclosingGeometry);
+    }
+}
+
 QPolygonF QnDisplayWidget::provideShape() {
     QTransform transform;
     QPointF zero = mapToScene(0.0, 0.0);
@@ -191,6 +201,8 @@ void QnDisplayWidget::at_sourceSizeChanged(const QSize &size) {
     QRectF enclosingGeometry = this->enclosingGeometry();
     m_aspectRatio = newAspectRatio;
     setGeometry(expanded(m_aspectRatio, enclosingGeometry, Qt::KeepAspectRatio));
+
+    qDebug("aspectRatioChanged(%g, %g)", oldAspectRatio, newAspectRatio);
 
     emit aspectRatioChanged(oldAspectRatio, newAspectRatio);
 }

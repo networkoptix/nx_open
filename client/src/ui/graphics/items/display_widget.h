@@ -17,7 +17,9 @@ class QnDisplayWidget: public GraphicsWidget, public QnPolygonalShapeProvider, p
     Q_OBJECT;
     Q_PROPERTY(QColor frameColor READ frameColor WRITE setFrameColor);
     Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth);
-    Q_PROPERTY(QPointF shadowDisplacement READ shadowDisplacement WRITE setShadowDisplacement)
+    Q_PROPERTY(QPointF shadowDisplacement READ shadowDisplacement WRITE setShadowDisplacement);
+    Q_PROPERTY(QRectF enclosingGeometry READ enclosingGeometry WRITE setEnclosingGeometry);
+    Q_PROPERTY(qreal enclosingAspectRatio READ enclosingAspectRatio WRITE setEnclosingAspectRatio);
 
     typedef GraphicsWidget base_type;
 
@@ -124,10 +126,14 @@ public:
     void setEnclosingAspectRatio(qreal enclosingAspectRatio);
 
     /**
-     * \returns                         Geometry of enclosing rectangle for this widget.
+     * \returns                         Geometry of the enclosing rectangle for this widget.
      */
     QRectF enclosingGeometry() const;
 
+    /**
+     * \param enclosingGeometry         Geometry of the enclosing rectangle for this widget.
+     */
+    void setEnclosingGeometry(const QRectF &enclosingGeometry);
 
 signals:
     void aspectRatioChanged(qreal oldAspectRatio, qreal newAspectRatio);
