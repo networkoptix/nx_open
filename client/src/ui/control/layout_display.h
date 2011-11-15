@@ -64,15 +64,37 @@ public:
         return m_view;
     }
 
+    /**
+     * \param item                      Item to get widget for. Must not be NULL.
+     */
     QnDisplayWidget *widget(QnLayoutItemModel *item) const;
 
+    /**
+     * \param item                      Item to get bounding geometry for. Must not be NULL.
+     * \returns                         Given item's bounding geometry in scene 
+     *                                  coordinates as defined by the model.
+     *                                  Note that actual geometry may differ because of
+     *                                  aspect ration constraints.
+     */
+    QRectF itemBoundingGeometry(QnLayoutItemModel *item) const;
 
+    /**
+     * \param item                      Item to get geometry for. Must not be NULL.
+     * \returns                         Given item's geometry in scene coordinates,
+     *                                  taking aspect ratio constraints into account.
+     *                                  Note that actual geometry of the item's widget
+     *                                  may differ because of manual dragging / resizing / etc...
+     */
     QRectF itemGeometry(QnLayoutItemModel *item) const;
 
-    QRectF zoomedItemGeometry() const;
+    /**
+     * \returns                         Bounding geometry of current layout.
+     */
+    QRectF layoutBoundingGeometry() const;
 
-    QRectF boundingGeometry() const;
-
+    /**
+     * \returns                         Current viewport geometry, in scene coordinates.
+     */
     QRectF viewportGeometry() const;
 
 
@@ -83,7 +105,7 @@ public:
 
     void bringToFront(QGraphicsItem *item);
 
-    void bringToFront(QnLayoutItemModel *entity);
+    void bringToFront(QnLayoutItemModel *item);
 
 
     Layer layer(QGraphicsItem *item);
@@ -91,7 +113,7 @@ public:
     void setLayer(QGraphicsItem *item, Layer layer);
 
 
-    void synchronize(QnLayoutItemModel *entity, bool animate = true);
+    void synchronize(QnLayoutItemModel *item, bool animate = true);
     
     void synchronize(QnDisplayWidget *widget, bool animate = true);
 
@@ -109,10 +131,11 @@ protected:
     
     QnWidgetAnimator *animator(QnDisplayWidget *widget);
 
-    void synchronizeGeometry(QnLayoutItemModel *entity, bool animate);
+    void synchronizeGeometry(QnLayoutItemModel *item, bool animate);
     void synchronizeGeometry(QnDisplayWidget *widget, bool animate);
-    void synchronizeLayer(QnLayoutItemModel *entity);
+    void synchronizeLayer(QnLayoutItemModel *item);
     void synchronizeLayer(QnDisplayWidget *widget);
+    //void synchronizeAspectRatio();
 
     qreal layerFrontZ(Layer layer) const;
     Layer entityLayer(QnLayoutItemModel *entity) const;
@@ -120,12 +143,12 @@ protected:
 protected slots:
     void synchronizeSceneBounds();
 
-    void at_model_itemAdded(QnLayoutItemModel *entity);
-    void at_model_itemAboutToBeRemoved(QnLayoutItemModel *entity);
+    void at_model_itemAdded(QnLayoutItemModel *item);
+    void at_model_itemAboutToBeRemoved(QnLayoutItemModel *item);
     
     void at_state_modeChanged();
-    void at_state_selectedEntityChanged(QnLayoutItemModel *oldSelectedEntity, QnLayoutItemModel *newSelectedEntity);
-    void at_state_zoomedEntityChanged(QnLayoutItemModel *oldZoomedEntity, QnLayoutItemModel *newZoomedEntity);
+    void at_state_selectedItemChanged(QnLayoutItemModel *oldSelectedItem, QnLayoutItemModel *newSelectedItem);
+    void at_state_zoomedItemChanged(QnLayoutItemModel *oldZoomedItem, QnLayoutItemModel *newZoomedItem);
 
     void at_item_geometryChanged();
     void at_item_geometryDeltaChanged();
@@ -155,7 +178,7 @@ private:
     QGraphicsView *m_view;
 
     /** Entity to widget mapping. */
-    QHash<QnLayoutItemModel *, QnDisplayWidget *> m_widgetByEntity;
+    QHash<QnLayoutItemModel *, QnDisplayWidget *> m_widgetByItem;
 
     /** Item to item properties mapping. */
     QHash<QGraphicsItem *, ItemProperties> m_propertiesByItem;

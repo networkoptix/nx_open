@@ -77,8 +77,8 @@ QnLayoutDisplay::QnLayoutDisplay(QnDisplayState *state, QGraphicsScene *scene, Q
     assert(state != NULL && scene != NULL && view != NULL);
 
     /* Provide some meaningful defaults for the grid. */
-    m_state->gridMapper()->setCellSize(defaultCellSize);
-    m_state->gridMapper()->setSpacing(defaultSpacing);
+    m_state->mapper()->setCellSize(defaultCellSize);
+    m_state->mapper()->setSpacing(defaultSpacing);
 
     /* Prepare manager. */
     m_manager->registerScene(scene);
@@ -131,35 +131,35 @@ QnLayoutDisplay::QnLayoutDisplay(QnDisplayState *state, QGraphicsScene *scene, Q
 
     m_activityListenerInstrument->recursiveDisable();
 
-    connect(m_transformListenerInstrument, SIGNAL(transformChanged(QGraphicsView *)), this, SLOT(at_viewport_transformationChanged()));
-    connect(m_activityListenerInstrument,  SIGNAL(activityStopped()),                 this, SLOT(at_activityStopped()));
-    connect(m_activityListenerInstrument,  SIGNAL(activityStarted()),                 this, SLOT(at_activityStarted()));
+    connect(m_transformListenerInstrument, SIGNAL(transformChanged(QGraphicsView *)),                   this,                   SLOT(at_viewport_transformationChanged()));
+    connect(m_activityListenerInstrument,  SIGNAL(activityStopped()),                                   this,                   SLOT(at_activityStopped()));
+    connect(m_activityListenerInstrument,  SIGNAL(activityStarted()),                                   this,                   SLOT(at_activityStarted()));
 
     /* Set up curtain. */
     m_curtainItem = new QnCurtainItem();
     m_scene->addItem(m_curtainItem);
     setLayer(m_curtainItem, CURTAIN_LAYER);
     m_curtainAnimator = new QnCurtainAnimator(m_curtainItem, 1000, this);
-    connect(m_curtainAnimator, SIGNAL(curtained()),     this, SLOT(at_curtained()));
-    connect(m_curtainAnimator, SIGNAL(uncurtained()),   this, SLOT(at_uncurtained()));
+    connect(m_curtainAnimator,  SIGNAL(curtained()),                                                    this,                   SLOT(at_curtained()));
+    connect(m_curtainAnimator,  SIGNAL(uncurtained()),                                                  this,                   SLOT(at_uncurtained()));
 
     /* Configure animator. */
     m_viewportAnimator->setMovementSpeed(4.0);
     m_viewportAnimator->setScalingSpeed(32.0);
-    connect(m_viewportAnimator, SIGNAL(animationStarted()),  this,                 SIGNAL(viewportGrabbed()));
-    connect(m_viewportAnimator, SIGNAL(animationStarted()),  m_boundingInstrument, SLOT(recursiveDisable()));
-    connect(m_viewportAnimator, SIGNAL(animationFinished()), this,                 SIGNAL(viewportUngrabbed()));
-    connect(m_viewportAnimator, SIGNAL(animationFinished()), m_boundingInstrument, SLOT(recursiveEnable()));
-    connect(m_viewportAnimator, SIGNAL(animationFinished()), this,                 SLOT(synchronizeSceneBounds()));
+    connect(m_viewportAnimator, SIGNAL(animationStarted()),                                             this,                   SIGNAL(viewportGrabbed()));
+    connect(m_viewportAnimator, SIGNAL(animationStarted()),                                             m_boundingInstrument,   SLOT(recursiveDisable()));
+    connect(m_viewportAnimator, SIGNAL(animationFinished()),                                            this,                   SIGNAL(viewportUngrabbed()));
+    connect(m_viewportAnimator, SIGNAL(animationFinished()),                                            m_boundingInstrument,   SLOT(recursiveEnable()));
+    connect(m_viewportAnimator, SIGNAL(animationFinished()),                                            this,                   SLOT(synchronizeSceneBounds()));
 
     /* Subscribe to state changes and create items. */
-    connect(m_state,          SIGNAL(modeChanged()),                                                this, SLOT(at_state_modeChanged()));
-    connect(m_state,          SIGNAL(selectedEntityChanged(QnLayoutItemModel *, QnLayoutItemModel *)),    this, SLOT(at_state_selectedEntityChanged(QnLayoutItemModel *, QnLayoutItemModel *)));
-    connect(m_state,          SIGNAL(zoomedEntityChanged(QnLayoutItemModel *, QnLayoutItemModel *)),      this, SLOT(at_state_zoomedEntityChanged(QnLayoutItemModel *, QnLayoutItemModel *)));
-    connect(m_state->model(), SIGNAL(itemAdded(QnLayoutItemModel *)),                                  this, SLOT(at_model_itemAdded(QnLayoutItemModel *)));
-    connect(m_state->model(), SIGNAL(itemAboutToBeRemoved(QnLayoutItemModel *)),                       this, SLOT(at_model_itemAboutToBeRemoved(QnLayoutItemModel *)));
-    foreach(QnLayoutItemModel *entity, m_state->model()->items())
-        at_model_itemAdded(entity);
+    connect(m_state,            SIGNAL(modeChanged()),                                                  this,                   SLOT(at_state_modeChanged()));
+    connect(m_state,            SIGNAL(selectedItemChanged(QnLayoutItemModel *, QnLayoutItemModel *)),  this,                   SLOT(at_state_selectedItemChanged(QnLayoutItemModel *, QnLayoutItemModel *)));
+    connect(m_state,            SIGNAL(zoomedItemChanged(QnLayoutItemModel *, QnLayoutItemModel *)),    this,                   SLOT(at_state_zoomedItemChanged(QnLayoutItemModel *, QnLayoutItemModel *)));
+    connect(m_state->layout(),  SIGNAL(itemAdded(QnLayoutItemModel *)),                                 this,                   SLOT(at_model_itemAdded(QnLayoutItemModel *)));
+    connect(m_state->layout(),  SIGNAL(itemAboutToBeRemoved(QnLayoutItemModel *)),                      this,                   SLOT(at_model_itemAboutToBeRemoved(QnLayoutItemModel *)));
+    foreach(QnLayoutItemModel *item, m_state->layout()->items())
+        at_model_itemAdded(item);
 
     /* Configure viewport updates. */
     m_updateTimer = new AnimationTimer(this);
@@ -167,200 +167,15 @@ QnLayoutDisplay::QnLayoutDisplay(QnDisplayState *state, QGraphicsScene *scene, Q
     m_updateTimer->start();
 
     /* Fire signals if needed. */
-    if(m_state->zoomedEntity() != NULL)
-        at_state_zoomedEntityChanged(NULL, m_state->zoomedEntity());
-    if(m_state->selectedEntity() != NULL)
-        at_state_selectedEntityChanged(NULL, m_state->selectedEntity());
+    if(m_state->zoomedItem() != NULL)
+        at_state_zoomedItemChanged(NULL, m_state->zoomedItem());
+    if(m_state->selectedItem() != NULL)
+        at_state_selectedItemChanged(NULL, m_state->selectedItem());
 }
 
 QnLayoutDisplay::~QnLayoutDisplay() {
-    foreach(QnLayoutItemModel *entity, m_state->model()->items())
-        at_model_itemAboutToBeRemoved(entity);
-}
-
-
-// -------------------------------------------------------------------------- //
-// QnLayoutDisplay :: mutators
-// -------------------------------------------------------------------------- //
-void QnLayoutDisplay::disableViewportChanges() {
-    m_boundingInstrument->dontEnforcePosition(m_view);
-    m_boundingInstrument->dontEnforceSize(m_view);
-}
-
-void QnLayoutDisplay::enableViewportChanges() {
-    m_boundingInstrument->enforcePosition(m_view);
-    m_boundingInstrument->enforceSize(m_view);
-}
-
-void QnLayoutDisplay::fitInView() {
-    if(m_state->zoomedEntity() != NULL) {
-        m_viewportAnimator->moveTo(zoomedItemGeometry(), zoomAnimationDurationMsec);
-    } else {
-        m_viewportAnimator->moveTo(boundingGeometry(), zoomAnimationDurationMsec);
-    }
-}
-
-void QnLayoutDisplay::bringToFront(const QList<QGraphicsItem *> &items) {
-    foreach(QGraphicsItem *item, items)
-        bringToFront(item);
-}
-
-void QnLayoutDisplay::bringToFront(QGraphicsItem *item) {
-    if(item == NULL) {
-        qnNullWarning(item);
-        return;
-    }
-
-    m_frontZ += zStep;
-    item->setZValue(layerFrontZ(layer(item)));
-}
-
-void QnLayoutDisplay::bringToFront(QnLayoutItemModel *entity) {
-    if(entity == NULL) {
-        qnNullWarning(entity);
-        return;
-    }
-
-    if(entity->layout() != m_state->model()) {
-        qnWarning("Cannot bring to front an entity from another model.");
-        return;
-    }
-
-    bringToFront(m_widgetByEntity[entity]);
-}
-
-
-// -------------------------------------------------------------------------- //
-// QnLayoutDisplay :: calculators
-// -------------------------------------------------------------------------- //
-qreal QnLayoutDisplay::layerFrontZ(Layer layer) const {
-    return m_frontZ + layer * layerZSize;
-}
-
-QnLayoutDisplay::Layer QnLayoutDisplay::entityLayer(QnLayoutItemModel *entity) const {
-    if(entity == m_state->zoomedEntity()) {
-        return ZOOMED_LAYER;
-    } else if(entity->isPinned()) {
-        if(entity == m_state->selectedEntity()) {
-            return PINNED_SELECTED_LAYER;
-        } else {
-            return PINNED_LAYER;
-        }
-    } else {
-        if(entity == m_state->selectedEntity()) {
-            return UNPINNED_SELECTED_LAYER;
-        } else {
-            return UNPINNED_LAYER;
-        }
-    }
-}
-
-QRectF QnLayoutDisplay::itemGeometry(QnLayoutItemModel *item) const {
-    QRectF geometry = m_state->gridMapper()->mapFromGrid(item->geometry());
-
-    QSizeF step = m_state->gridMapper()->step();
-    QRectF delta = item->geometryDelta();
-    geometry = QRectF(
-        geometry.left()   + delta.left()   * step.width(),
-        geometry.top()    + delta.top()    * step.height(),
-        geometry.width()  + delta.width()  * step.width(),
-        geometry.height() + delta.height() * step.height()
-    );
-
-    return geometry;
-}
-
-QRectF QnLayoutDisplay::boundingGeometry() const {
-    return m_state->gridMapper()->mapFromGrid(m_state->model()->boundingRect().adjusted(-1, -1, 1, 1));
-}
-
-QRectF QnLayoutDisplay::zoomedItemGeometry() const {
-    if(m_state->zoomedEntity() == NULL)
-        return QRectF();
-
-    return itemGeometry(m_state->zoomedEntity());
-}
-
-QRectF QnLayoutDisplay::viewportGeometry() const {
-    return mapRectToScene(m_view, m_view->viewport()->rect());
-}
-
-
-// -------------------------------------------------------------------------- //
-// QnLayoutDisplay :: synchronizers
-// -------------------------------------------------------------------------- //
-void QnLayoutDisplay::synchronize(QnLayoutItemModel *entity, bool animate) {
-    synchronize(m_widgetByEntity[entity], animate);
-}
-
-void QnLayoutDisplay::synchronize(QnDisplayWidget *widget, bool animate) {
-    synchronizeGeometry(widget, animate);
-    synchronizeLayer(widget);
-}
-
-void QnLayoutDisplay::synchronizeGeometry(QnLayoutItemModel *entity, bool animate) {
-    synchronizeGeometry(m_widgetByEntity[entity], animate);
-}
-
-void QnLayoutDisplay::synchronizeGeometry(QnDisplayWidget *widget, bool animate) {
-    QnLayoutItemModel *entity = widget->item();
-
-    QRectF geometry = itemGeometry(entity);
-
-    /* Adjust for selection. */
-    if(entity == m_state->selectedEntity() && entity != m_state->zoomedEntity()) {
-        QPointF geometryCenter = geometry.center();
-        QTransform transform;
-        transform.translate(geometryCenter.x(), geometryCenter.y());
-        transform.rotate(-entity->rotation());
-        transform.translate(-geometryCenter.x(), -geometryCenter.y());
-
-        QRectF viewportGeometry = transform.mapRect(mapRectToScene(m_view, m_view->viewport()->rect()));
-
-        QSizeF newWidgetSize = geometry.size() * focusExpansion;
-        QSizeF maxWidgetSize = viewportGeometry.size() * maxExpandedSize;
-        QPointF viewportCenter = viewportGeometry.center();
-
-        /* Allow expansion no further than the maximal size, but no less than current size. */
-        newWidgetSize =  bounded(newWidgetSize, maxWidgetSize,   Qt::KeepAspectRatio);
-        newWidgetSize = expanded(newWidgetSize, geometry.size(), Qt::KeepAspectRatio);
-
-        /* Calculate expansion values. Expand towards the screen center. */
-        qreal xp1 = 0.0, xp2 = 0.0, yp1 = 0.0, yp2 = 0.0;
-        calculateExpansionValues(geometry.left(), geometry.right(),  viewportCenter.x(), newWidgetSize.width(),  &xp1, &xp2);
-        calculateExpansionValues(geometry.top(),  geometry.bottom(), viewportCenter.y(), newWidgetSize.height(), &yp1, &yp2);
-
-        geometry = geometry.adjusted(xp1, yp1, xp2, yp2);
-    }
-
-    /* Update Z value. */
-    if(entity == m_state->selectedEntity() || entity == m_state->zoomedEntity())
-        bringToFront(widget);
-    
-    /* Move! */
-    QnWidgetAnimator *animator = this->animator(widget);
-    if(animate) {
-        animator->moveTo(geometry, entity->rotation(), widgetAnimationDurationMsec);
-    } else {
-        animator->stopAnimation();
-        widget->setGeometry(geometry);
-        widget->setRotation(entity->rotation());
-    }
-}
-
-void QnLayoutDisplay::synchronizeLayer(QnLayoutItemModel *entity) {
-    synchronizeLayer(m_widgetByEntity[entity]);
-}
-
-void QnLayoutDisplay::synchronizeLayer(QnDisplayWidget *widget) {
-    setLayer(widget, entityLayer(widget->item()));
-}
-
-void QnLayoutDisplay::synchronizeSceneBounds() {
-    QRectF boundingRect = m_state->zoomedEntity() != NULL ? zoomedItemGeometry() : boundingGeometry();
-
-    m_boundingInstrument->setPositionBounds(m_view, boundingRect, 0.0);
-    m_boundingInstrument->setSizeBounds(m_view, viewportLowerSizeBound, Qt::KeepAspectRatioByExpanding, boundingRect.size(), Qt::KeepAspectRatioByExpanding);
+    foreach(QnLayoutItemModel *item, m_state->layout()->items())
+        at_model_itemAboutToBeRemoved(item);
 }
 
 
@@ -393,6 +208,206 @@ QnWidgetAnimator *QnLayoutDisplay::animator(QnDisplayWidget *widget) {
     return properties.animator;
 }
 
+QnDisplayWidget *QnLayoutDisplay::widget(QnLayoutItemModel *item) const {
+    return m_widgetByItem[item];
+}
+
+
+// -------------------------------------------------------------------------- //
+// QnLayoutDisplay :: mutators
+// -------------------------------------------------------------------------- //
+void QnLayoutDisplay::disableViewportChanges() {
+    m_boundingInstrument->dontEnforcePosition(m_view);
+    m_boundingInstrument->dontEnforceSize(m_view);
+}
+
+void QnLayoutDisplay::enableViewportChanges() {
+    m_boundingInstrument->enforcePosition(m_view);
+    m_boundingInstrument->enforceSize(m_view);
+}
+
+void QnLayoutDisplay::fitInView() {
+    if(m_state->zoomedItem() != NULL) {
+        m_viewportAnimator->moveTo(itemGeometry(m_state->zoomedItem()), zoomAnimationDurationMsec);
+    } else {
+        m_viewportAnimator->moveTo(layoutBoundingGeometry(), zoomAnimationDurationMsec);
+    }
+}
+
+void QnLayoutDisplay::bringToFront(const QList<QGraphicsItem *> &items) {
+    foreach(QGraphicsItem *item, items)
+        bringToFront(item);
+}
+
+void QnLayoutDisplay::bringToFront(QGraphicsItem *item) {
+    if(item == NULL) {
+        qnNullWarning(item);
+        return;
+    }
+
+    m_frontZ += zStep;
+    item->setZValue(layerFrontZ(layer(item)));
+}
+
+void QnLayoutDisplay::bringToFront(QnLayoutItemModel *item) {
+    if(item == NULL) {
+        qnNullWarning(item);
+        return;
+    }
+
+    if(item->layout() != m_state->layout()) {
+        qnWarning("Cannot bring to front an item from another layout.");
+        return;
+    }
+
+    bringToFront(m_widgetByItem[item]);
+}
+
+
+// -------------------------------------------------------------------------- //
+// QnLayoutDisplay :: calculators
+// -------------------------------------------------------------------------- //
+qreal QnLayoutDisplay::layerFrontZ(Layer layer) const {
+    return m_frontZ + layer * layerZSize;
+}
+
+QnLayoutDisplay::Layer QnLayoutDisplay::entityLayer(QnLayoutItemModel *item) const {
+    if(item == m_state->zoomedItem()) {
+        return ZOOMED_LAYER;
+    } else if(item->isPinned()) {
+        if(item == m_state->selectedItem()) {
+            return PINNED_SELECTED_LAYER;
+        } else {
+            return PINNED_LAYER;
+        }
+    } else {
+        if(item == m_state->selectedItem()) {
+            return UNPINNED_SELECTED_LAYER;
+        } else {
+            return UNPINNED_LAYER;
+        }
+    }
+}
+
+QRectF QnLayoutDisplay::itemBoundingGeometry(QnLayoutItemModel *item) const {
+    assert(item != NULL && item->layout() == m_state->layout());
+
+    QRectF result = m_state->mapper()->mapFromGrid(item->geometry());
+
+    QSizeF step = m_state->mapper()->step();
+    QRectF delta = item->geometryDelta();
+    result = QRectF(
+        result.left()   + delta.left()   * step.width(),
+        result.top()    + delta.top()    * step.height(),
+        result.width()  + delta.width()  * step.width(),
+        result.height() + delta.height() * step.height()
+    );
+
+    return result;
+}
+
+QRectF QnLayoutDisplay::itemGeometry(QnLayoutItemModel *item) const {
+    assert(item != NULL && item->layout() == m_state->layout());
+
+    QRectF result = itemBoundingGeometry(item);
+
+    QnDisplayWidget *widget = this->widget(item);
+    if(!widget->hasAspectRatio())
+        return result;
+
+    QSizeF resultSize = expanded(widget->aspectRatio(), result.size(), Qt::KeepAspectRatio);
+    return QRectF(
+        result.center() - toPoint(resultSize) / 2,
+        resultSize
+    );
+}
+
+QRectF QnLayoutDisplay::layoutBoundingGeometry() const {
+    return m_state->mapper()->mapFromGrid(m_state->layout()->boundingRect().adjusted(-1, -1, 1, 1));
+}
+
+QRectF QnLayoutDisplay::viewportGeometry() const {
+    return mapRectToScene(m_view, m_view->viewport()->rect());
+}
+
+
+// -------------------------------------------------------------------------- //
+// QnLayoutDisplay :: synchronizers
+// -------------------------------------------------------------------------- //
+void QnLayoutDisplay::synchronize(QnLayoutItemModel *item, bool animate) {
+    synchronize(m_widgetByItem[item], animate);
+}
+
+void QnLayoutDisplay::synchronize(QnDisplayWidget *widget, bool animate) {
+    synchronizeGeometry(widget, animate);
+    synchronizeLayer(widget);
+}
+
+void QnLayoutDisplay::synchronizeGeometry(QnLayoutItemModel *item, bool animate) {
+    synchronizeGeometry(m_widgetByItem[item], animate);
+}
+
+void QnLayoutDisplay::synchronizeGeometry(QnDisplayWidget *widget, bool animate) {
+    QnLayoutItemModel *item = widget->item();
+
+    QRectF geometry = itemGeometry(item);
+
+    /* Adjust for selection. */
+    if(item == m_state->selectedItem() && item != m_state->zoomedItem()) {
+        QPointF geometryCenter = geometry.center();
+        QTransform transform;
+        transform.translate(geometryCenter.x(), geometryCenter.y());
+        transform.rotate(-item->rotation());
+        transform.translate(-geometryCenter.x(), -geometryCenter.y());
+
+        QRectF viewportGeometry = transform.mapRect(mapRectToScene(m_view, m_view->viewport()->rect()));
+
+        QSizeF newWidgetSize = geometry.size() * focusExpansion;
+        QSizeF maxWidgetSize = viewportGeometry.size() * maxExpandedSize;
+        QPointF viewportCenter = viewportGeometry.center();
+
+        /* Allow expansion no further than the maximal size, but no less than current size. */
+        newWidgetSize =  bounded(newWidgetSize, maxWidgetSize,   Qt::KeepAspectRatio);
+        newWidgetSize = expanded(newWidgetSize, geometry.size(), Qt::KeepAspectRatio);
+
+        /* Calculate expansion values. Expand towards the screen center. */
+        qreal xp1 = 0.0, xp2 = 0.0, yp1 = 0.0, yp2 = 0.0;
+        calculateExpansionValues(geometry.left(), geometry.right(),  viewportCenter.x(), newWidgetSize.width(),  &xp1, &xp2);
+        calculateExpansionValues(geometry.top(),  geometry.bottom(), viewportCenter.y(), newWidgetSize.height(), &yp1, &yp2);
+
+        geometry = geometry.adjusted(xp1, yp1, xp2, yp2);
+    }
+
+    /* Update Z value. */
+    if(item == m_state->selectedItem() || item == m_state->zoomedItem())
+        bringToFront(widget);
+    
+    /* Move! */
+    QnWidgetAnimator *animator = this->animator(widget);
+    if(animate) {
+        animator->moveTo(geometry, item->rotation(), widgetAnimationDurationMsec);
+    } else {
+        animator->stopAnimation();
+        widget->setGeometry(geometry);
+        widget->setRotation(item->rotation());
+    }
+}
+
+void QnLayoutDisplay::synchronizeLayer(QnLayoutItemModel *item) {
+    synchronizeLayer(m_widgetByItem[item]);
+}
+
+void QnLayoutDisplay::synchronizeLayer(QnDisplayWidget *widget) {
+    setLayer(widget, entityLayer(widget->item()));
+}
+
+void QnLayoutDisplay::synchronizeSceneBounds() {
+    QRectF boundingRect = m_state->zoomedItem() != NULL ? itemGeometry(m_state->zoomedItem()) : layoutBoundingGeometry();
+
+    m_boundingInstrument->setPositionBounds(m_view, boundingRect, 0.0);
+    m_boundingInstrument->setSizeBounds(m_view, viewportLowerSizeBound, Qt::KeepAspectRatioByExpanding, boundingRect.size(), Qt::KeepAspectRatioByExpanding);
+}
+
 
 // -------------------------------------------------------------------------- //
 // QnLayoutDisplay :: handlers
@@ -401,8 +416,8 @@ void QnLayoutDisplay::tick(int /*currentTime*/) {
     m_view->viewport()->update();
 }
 
-void QnLayoutDisplay::at_model_itemAdded(QnLayoutItemModel *entity) {
-    QnDisplayWidget *widget = new QnDisplayWidget(entity);
+void QnLayoutDisplay::at_model_itemAdded(QnLayoutItemModel *item) {
+    QnDisplayWidget *widget = new QnDisplayWidget(item);
     m_scene->addItem(widget);
 
     widget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true); /* Optimization. */
@@ -421,23 +436,23 @@ void QnLayoutDisplay::at_model_itemAdded(QnLayoutItemModel *entity) {
      * because the latter automatically sets the former. */
     widget->setFlag(QGraphicsItem::ItemIsPanel, false);
 
-    connect(entity, SIGNAL(geometryChanged(const QRect &, const QRect &)),          this, SLOT(at_item_geometryChanged()));
-    connect(entity, SIGNAL(geometryDeltaChanged(const QRectF &, const QRectF &)),   this, SLOT(at_item_geometryDeltaChanged()));
-    connect(entity, SIGNAL(rotationChanged(qreal, qreal)),                          this, SLOT(at_item_rotationChanged()));
-    connect(entity, SIGNAL(flagsChanged(ItemFlags, ItemFlags)),                     this, SLOT(at_item_flagsChanged()));
+    connect(item, SIGNAL(geometryChanged(const QRect &, const QRect &)),          this, SLOT(at_item_geometryChanged()));
+    connect(item, SIGNAL(geometryDeltaChanged(const QRectF &, const QRectF &)),   this, SLOT(at_item_geometryDeltaChanged()));
+    connect(item, SIGNAL(rotationChanged(qreal, qreal)),                          this, SLOT(at_item_rotationChanged()));
+    connect(item, SIGNAL(flagsChanged(ItemFlags, ItemFlags)),                     this, SLOT(at_item_flagsChanged()));
 
-    m_widgetByEntity.insert(entity, widget);
+    m_widgetByItem.insert(item, widget);
 
     synchronize(widget, false);
     synchronizeSceneBounds();
     bringToFront(widget);
 }
 
-void QnLayoutDisplay::at_model_itemAboutToBeRemoved(QnLayoutItemModel *entity) {
-    disconnect(entity, NULL, this, NULL);
+void QnLayoutDisplay::at_model_itemAboutToBeRemoved(QnLayoutItemModel *item) {
+    disconnect(item, NULL, this, NULL);
 
-    QnDisplayWidget *widget = m_widgetByEntity[entity];
-    m_widgetByEntity.remove(entity);
+    QnDisplayWidget *widget = m_widgetByItem[item];
+    m_widgetByItem.remove(item);
 
     delete widget;
 
@@ -452,40 +467,40 @@ void QnLayoutDisplay::at_state_modeChanged() {
     }
 }
 
-void QnLayoutDisplay::at_state_selectedEntityChanged(QnLayoutItemModel *oldSelectedEntity, QnLayoutItemModel *newSelectedEntity) {
-    if(oldSelectedEntity != NULL)
-        synchronize(oldSelectedEntity, true);
+void QnLayoutDisplay::at_state_selectedItemChanged(QnLayoutItemModel *oldSelectedItem, QnLayoutItemModel *newSelectedItem) {
+    if(oldSelectedItem != NULL)
+        synchronize(oldSelectedItem, true);
 
-    if(newSelectedEntity != NULL) {
-        bringToFront(newSelectedEntity);
-        synchronize(newSelectedEntity, true);
+    if(newSelectedItem != NULL) {
+        bringToFront(newSelectedItem);
+        synchronize(newSelectedItem, true);
     }
 }
 
-void QnLayoutDisplay::at_state_zoomedEntityChanged(QnLayoutItemModel *oldZoomedEntity, QnLayoutItemModel *newZoomedEntity) {
-    if(oldZoomedEntity != NULL) {
-        synchronize(oldZoomedEntity, true);
+void QnLayoutDisplay::at_state_zoomedItemChanged(QnLayoutItemModel *oldZoomedItem, QnLayoutItemModel *newZoomedItem) {
+    if(oldZoomedItem != NULL) {
+        synchronize(oldZoomedItem, true);
         
         m_activityListenerInstrument->recursiveDisable();
     }
 
-    if(newZoomedEntity != NULL) {
-        bringToFront(newZoomedEntity);
-        synchronize(newZoomedEntity, true);
+    if(newZoomedItem != NULL) {
+        bringToFront(newZoomedItem);
+        synchronize(newZoomedItem, true);
 
         m_activityListenerInstrument->recursiveEnable();
 
-        m_viewportAnimator->moveTo(zoomedItemGeometry(), zoomAnimationDurationMsec);
+        m_viewportAnimator->moveTo(itemGeometry(m_state->zoomedItem()), zoomAnimationDurationMsec);
     } else {
-        m_viewportAnimator->moveTo(boundingGeometry(), zoomAnimationDurationMsec);
+        m_viewportAnimator->moveTo(layoutBoundingGeometry(), zoomAnimationDurationMsec);
     }
 
     synchronizeSceneBounds();
 }
 
 void QnLayoutDisplay::at_viewport_transformationChanged() {
-    if(m_state->selectedEntity() != NULL) {
-        QnDisplayWidget *widget = m_widgetByEntity[m_state->selectedEntity()];
+    if(m_state->selectedItem() != NULL) {
+        QnDisplayWidget *widget = m_widgetByItem[m_state->selectedItem()];
         synchronizeGeometry(widget, animator(widget)->isAnimating());
     }
 }
@@ -508,7 +523,7 @@ void QnLayoutDisplay::at_item_flagsChanged() {
 }
 
 void QnLayoutDisplay::at_activityStopped() {
-    m_curtainAnimator->curtain(m_widgetByEntity[m_state->zoomedEntity()]);
+    m_curtainAnimator->curtain(m_widgetByItem[m_state->zoomedItem()]);
 }
 
 void QnLayoutDisplay::at_activityStarted() {
@@ -516,15 +531,15 @@ void QnLayoutDisplay::at_activityStarted() {
 }
 
 void QnLayoutDisplay::at_curtained() {
-    foreach(QnDisplayWidget *widget, m_widgetByEntity)
-        if(widget->item() != m_state->zoomedEntity())
+    foreach(QnDisplayWidget *widget, m_widgetByItem)
+        if(widget->item() != m_state->zoomedItem())
             widget->hide();
 
     m_view->viewport()->setCursor(QCursor(Qt::BlankCursor));
 }
 
 void QnLayoutDisplay::at_uncurtained() {
-    foreach(QnDisplayWidget *widget, m_widgetByEntity)
+    foreach(QnDisplayWidget *widget, m_widgetByItem)
         widget->show();
 
     m_view->viewport()->setCursor(QCursor(Qt::ArrowCursor));

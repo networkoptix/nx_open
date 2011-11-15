@@ -40,7 +40,7 @@ QnDisplayWidget::QnDisplayWidget(QnLayoutItemModel *item, QGraphicsItem *parent)
     m_resourceLayout(NULL),
     m_channelCount(0),
     m_renderer(NULL),
-    m_aspectRatio(0.0),
+    m_aspectRatio(-1.0),
     m_frameWidth(0.0)
 {
     /* Set up shadow. */
@@ -129,7 +129,8 @@ void QnDisplayWidget::setGeometry(const QRectF &geometry) {
     /* Unfortunately, widgets with constant aspect ratio cannot be implemented
      * using size hints. So here is one of the workarounds. */
     
-    if(qFuzzyIsNull(m_aspectRatio)) {
+#if 0
+    if(!hasAspectRatio()) {
         base_type::setGeometry(geometry);
         return;
     }
@@ -161,10 +162,13 @@ void QnDisplayWidget::setGeometry(const QRectF &geometry) {
     }
 
     base_type::setGeometry(QRectF(QPointF(newLeft, newTop), newSize));
+#endif
+
+    return base_type::setGeometry(geometry);
 }
 
 QSizeF QnDisplayWidget::constrainedSize(const QSizeF constraint) const {
-    if(qFuzzyIsNull(m_aspectRatio))
+    if(!hasAspectRatio())
         return constraint;
 
     return QnSceneUtility::expanded(m_aspectRatio, constraint, Qt::KeepAspectRatio);
@@ -329,8 +333,8 @@ Qt::WindowFrameSection QnDisplayWidget::windowFrameSectionAt(const QPointF &pos)
     qreal fe = m_frameWidth * frameExtensionMultiplier;
     Qt::WindowFrameSection result = sweep(rect().adjusted(fe, fe, -fe, -fe), pos);
     
-    /* This widget does not have side frame sections in case aspect ratio is set. */
-    if(!qFuzzyIsNull(m_aspectRatio)) {
+    /* This widget has no side frame sections in case aspect ratio is set. */
+    if(hasAspectRatio()) {
         switch(result) {
         case Qt::LeftSection:
         case Qt::RightSection:

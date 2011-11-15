@@ -19,12 +19,12 @@ public:
 
     virtual ~QnDisplayState();
 
-    QnLayoutModel *model() const {
+    QnLayoutModel *layout() const {
         return m_model;
     }
 
-    QnLayoutGridMapper *gridMapper() const {
-        return m_gridMapper;
+    QnLayoutGridMapper *mapper() const {
+        return m_mapper;
     }
 
     Mode mode() const {
@@ -33,32 +33,32 @@ public:
     
     void setMode(Mode mode);
 
-    QnLayoutItemModel *selectedEntity() const {
-        return m_selectedEntity;
+    QnLayoutItemModel *selectedItem() const {
+        return m_selectedItem;
     }
 
-    void setSelectedEntity(QnLayoutItemModel *entity);
+    void setSelectedItem(QnLayoutItemModel *item);
 
-    QnLayoutItemModel *zoomedEntity() const {
-        return m_zoomedEntity;
+    QnLayoutItemModel *zoomedItem() const {
+        return m_zoomedItem;
     }
 
-    void setZoomedEntity(QnLayoutItemModel *entity);
+    void setZoomedItem(QnLayoutItemModel *item);
 
 signals:
     void modeChanged();
-    void selectedEntityChanged(QnLayoutItemModel *oldSelectedEntity, QnLayoutItemModel *newSelectedEntity);
-    void zoomedEntityChanged(QnLayoutItemModel *oldZoomedEntity, QnLayoutItemModel *newZoomedEntity);
+    void selectedItemChanged(QnLayoutItemModel *oldSelectedEntity, QnLayoutItemModel *newSelectedEntity);
+    void zoomedItemChanged(QnLayoutItemModel *oldZoomedEntity, QnLayoutItemModel *newZoomedEntity);
 
 private slots:
-    void at_entity_aboutToBeRemoved(QnLayoutItemModel *entity);
+    void at_item_aboutToBeRemoved(QnLayoutItemModel *item);
 
 private:
     QnLayoutModel *m_model;
-    QnLayoutGridMapper *m_gridMapper;
+    QnLayoutGridMapper *m_mapper;
     Mode m_mode;
-    QnLayoutItemModel *m_selectedEntity;
-    QnLayoutItemModel *m_zoomedEntity;
+    QnLayoutItemModel *m_selectedItem;
+    QnLayoutItemModel *m_zoomedItem;
 };
 
 #endif // QN_DISPLAY_STATE_H

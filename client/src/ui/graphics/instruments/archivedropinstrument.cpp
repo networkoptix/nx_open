@@ -52,5 +52,5 @@ bool ArchiveDropInstrument::dropEvent(QWidget *viewport, QDropEvent *event) {
     if(m_controller == NULL)
         return false;
 
-    m_controller->drop(m_files, m_controller->state()->gridMapper()->mapToGrid(view(viewport)->mapToScene(event->pos())), false);
+    m_controller->drop(m_files, m_controller->state()->mapper()->mapToGrid(view(viewport)->mapToScene(event->pos())), false);
 }

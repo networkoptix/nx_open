@@ -91,9 +91,18 @@ public:
 
     /**
      * \returns                         Aspect ratio of this widget. 
+     *                                  Negative value will be returned if this 
+     *                                  widget does not have aspect ratio.
      */
     qreal aspectRatio() const {
         return m_aspectRatio;
+    }
+
+    /**
+     * \returns                         Whether this widget has an aspect ratio.
+     */
+    bool hasAspectRatio() const {
+        return m_aspectRatio > 0.0;
     }
 
 signals:
@@ -141,7 +150,7 @@ private:
     /** Associated renderer. */
     QnDisplayWidgetRenderer *m_renderer;
 
-    /** Aspect ratio, free if zero. */
+    /** Aspect ratio. Negative value means that aspect ratio is not enforced. */
     qreal m_aspectRatio;
 
     /** Cached size of a single media channel, in screen coordinates. */

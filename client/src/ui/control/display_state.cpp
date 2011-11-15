@@ -8,13 +8,13 @@
 QnDisplayState::QnDisplayState(QnLayoutModel *model, QObject *parent):
     QObject(parent),
     m_model(model),
-    m_gridMapper(new QnLayoutGridMapper(this)),
-    m_selectedEntity(NULL),
-    m_zoomedEntity(NULL)
+    m_mapper(new QnLayoutGridMapper(this)),
+    m_selectedItem(NULL),
+    m_zoomedItem(NULL)
 {
     assert(model != NULL);
 
-    connect(model, SIGNAL(itemAboutToBeRemoved(QnLayoutItemModel *)), this, SLOT(at_entity_aboutToBeRemoved(QnLayoutItemModel *)));
+    connect(model, SIGNAL(itemAboutToBeRemoved(QnLayoutItemModel *)), this, SLOT(at_item_aboutToBeRemoved(QnLayoutItemModel *)));
 }    
 
 QnDisplayState::~QnDisplayState() {
@@ -30,40 +30,40 @@ void QnDisplayState::setMode(Mode mode) {
     emit modeChanged();
 }
 
-void QnDisplayState::setSelectedEntity(QnLayoutItemModel *entity) {
-    if(m_selectedEntity == entity)
+void QnDisplayState::setSelectedItem(QnLayoutItemModel *item) {
+    if(m_selectedItem == item)
         return;
 
-    if(entity != NULL && entity->layout() != m_model) {
-        qnWarning("Cannot select an entity from another model.");
+    if(item != NULL && item->layout() != m_model) {
+        qnWarning("Cannot select an item from another layout.");
         return;
     }
 
-    QnLayoutItemModel *oldSelectedEntity = m_selectedEntity;
-    m_selectedEntity = entity;
+    QnLayoutItemModel *oldSelectedItem = m_selectedItem;
+    m_selectedItem = item;
     
-    emit selectedEntityChanged(oldSelectedEntity, m_selectedEntity);
+    emit selectedItemChanged(oldSelectedItem, m_selectedItem);
 }
 
-void QnDisplayState::setZoomedEntity(QnLayoutItemModel *entity) {
-    if(m_zoomedEntity == entity)
+void QnDisplayState::setZoomedItem(QnLayoutItemModel *item) {
+    if(m_zoomedItem == item)
         return;
 
-    if(entity != NULL && entity->layout() != m_model) {
-        qnWarning("Cannot zoom to an entity from another model.");
+    if(item != NULL && item->layout() != m_model) {
+        qnWarning("Cannot zoom to an item from another layout.");
         return;
     }
 
-    QnLayoutItemModel *oldZoomedEntity = m_zoomedEntity;
-    m_zoomedEntity = entity;
+    QnLayoutItemModel *oldZoomedItem = m_zoomedItem;
+    m_zoomedItem = item;
 
-    emit zoomedEntityChanged(oldZoomedEntity, m_zoomedEntity);
+    emit zoomedItemChanged(oldZoomedItem, m_zoomedItem);
 }
 
-void QnDisplayState::at_entity_aboutToBeRemoved(QnLayoutItemModel *entity) {
-    if(entity == m_selectedEntity)
-        setSelectedEntity(NULL);
+void QnDisplayState::at_item_aboutToBeRemoved(QnLayoutItemModel *item) {
+    if(item == m_selectedItem)
+        setSelectedItem(NULL);
 
-    if(entity == m_zoomedEntity)
-        setZoomedEntity(NULL);
+    if(item == m_zoomedItem)
+        setZoomedItem(NULL);
 }
