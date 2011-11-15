@@ -67,12 +67,12 @@ public:
     }
 
     /**
-     * \param item                      Item to get widget for. Must not be NULL.
+     * \param item                      Item to get widget for.
      */
     QnDisplayWidget *widget(QnLayoutItemModel *item) const;
 
     /**
-     * \param item                      Item to get enclosing geometry for. Must not be NULL.
+     * \param item                      Item to get enclosing geometry for.
      * \returns                         Given item's enclosing geometry in scene 
      *                                  coordinates as defined by the model.
      *                                  Note that actual geometry may differ because of
@@ -81,7 +81,7 @@ public:
     QRectF itemEnclosingGeometry(QnLayoutItemModel *item) const;
 
     /**
-     * \param item                      Item to get geometry for. Must not be NULL.
+     * \param item                      Item to get geometry for.
      * \param[out] enclosingGeometry    Item's enclosing geometry.
      * \returns                         Item's geometry in scene coordinates,
      *                                  taking aspect ratio constraints into account.
@@ -111,7 +111,7 @@ public:
     void bringToFront(QnLayoutItemModel *item);
 
 
-    Layer layer(QGraphicsItem *item);
+    Layer layer(QGraphicsItem *item) const;
 
     void setLayer(QGraphicsItem *item, Layer layer);
 
@@ -138,18 +138,19 @@ protected:
     void synchronizeGeometry(QnDisplayWidget *widget, bool animate);
     void synchronizeLayer(QnLayoutItemModel *item);
     void synchronizeLayer(QnDisplayWidget *widget);
+    void synchronizeSceneBounds();
 
-    qreal layerFrontZ(Layer layer) const;
-    Layer entityLayer(QnLayoutItemModel *entity) const;
+    qreal layerFront(Layer layer) const;
+    Layer synchronizedLayer(QnLayoutItemModel *item) const;
 
     void addItemInternal(QnLayoutItemModel *item);
     void removeItemInternal(QnLayoutItemModel *item);
 
 protected slots:
-    void synchronizeSceneBounds();
+    void at_viewport_animationFinished();
 
-    void at_model_itemAdded(QnLayoutItemModel *item);
-    void at_model_itemAboutToBeRemoved(QnLayoutItemModel *item);
+    void at_layout_itemAdded(QnLayoutItemModel *item);
+    void at_layout_itemAboutToBeRemoved(QnLayoutItemModel *item);
     
     void at_state_aboutToBeDestroyed();
     void at_state_modeChanged();
