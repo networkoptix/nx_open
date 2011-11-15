@@ -14,7 +14,13 @@ class QnCurtainAnimator: public QObject {
     Q_OBJECT;
 
 public:
-    QnCurtainAnimator(QnCurtainItem *curtain, int durationMSec, QObject *parent = NULL);
+    QnCurtainAnimator(int durationMSec, QObject *parent = NULL);
+
+    QnCurtainItem *curtainItem() const {
+        return m_curtain;
+    }
+
+    void setCurtainItem(QnCurtainItem *curtain);
 
     void curtain(QnDisplayWidget *frontWidget = NULL);
 

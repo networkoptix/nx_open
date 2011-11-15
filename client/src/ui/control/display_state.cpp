@@ -5,22 +5,41 @@
 #include <ui/model/layout_grid_mapper.h>
 #include <ui/model/resource_item_model.h>
 
-QnDisplayState::QnDisplayState(QnLayoutModel *model, QObject *parent):
+QnDisplayState::QnDisplayState(QObject *parent):
     QObject(parent),
-    m_model(model),
+    m_layout(NULL),
     m_mapper(new QnLayoutGridMapper(this)),
     m_selectedItem(NULL),
     m_zoomedItem(NULL)
-{
-    assert(model != NULL);
-
-    connect(model, SIGNAL(itemAboutToBeRemoved(QnLayoutItemModel *)), this, SLOT(at_item_aboutToBeRemoved(QnLayoutItemModel *)));
-}    
+{}    
 
 QnDisplayState::~QnDisplayState() {
     bool signalsBlocked = blockSignals(false);
     emit aboutToBeDestroyed();
     blockSignals(signalsBlocked);
+}
+
+void QnDisplayState::setLayout(QnLayoutModel *layout) {
+    if(layout == m_layout)
+        return;
+
+    QnLayoutModel *oldLayout = m_layout;
+
+    if(m_layout != NULL) {
+        setSelectedItem(NULL);
+        setZoomedItem(NULL);
+
+        disconnect(m_layout, NULL, this, NULL);
+    }
+
+    m_layout = layout;
+
+    if(m_layout != NULL) {
+        connect(m_layout, SIGNAL(itemAboutToBeRemoved(QnLayoutItemModel *)),    this, SLOT(at_item_aboutToBeRemoved(QnLayoutItemModel *)));
+        connect(m_layout, SIGNAL(aboutToBeDestroyed()),                         this, SLOT(at_layout_aboutToBeDestroyed()));
+    }
+
+    emit layoutChanged(oldLayout, m_layout);
 }
 
 void QnDisplayState::setMode(Mode mode) {
@@ -36,7 +55,7 @@ void QnDisplayState::setSelectedItem(QnLayoutItemModel *item) {
     if(m_selectedItem == item)
         return;
 
-    if(item != NULL && item->layout() != m_model) {
+    if(item != NULL && item->layout() != m_layout) {
         qnWarning("Cannot select an item from another layout.");
         return;
     }
@@ -51,7 +70,7 @@ void QnDisplayState::setZoomedItem(QnLayoutItemModel *item) {
     if(m_zoomedItem == item)
         return;
 
-    if(item != NULL && item->layout() != m_model) {
+    if(item != NULL && item->layout() != m_layout) {
         qnWarning("Cannot zoom to an item from another layout.");
         return;
     }
@@ -68,4 +87,8 @@ void QnDisplayState::at_item_aboutToBeRemoved(QnLayoutItemModel *item) {
 
     if(item == m_zoomedItem)
         setZoomedItem(NULL);
+}
+
+void QnDisplayState::at_layout_aboutToBeDestroyed() {
+    setLayout(NULL);
 }

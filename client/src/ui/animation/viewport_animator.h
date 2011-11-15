@@ -18,7 +18,16 @@ public:
      * \param view                      View that this viewport animator will be assigned to.
      * \param parent                    Parent object.
      */
-    QnViewportAnimator(QGraphicsView *view, QObject *parent = NULL);
+    QnViewportAnimator(QObject *parent = NULL);
+
+    /**
+     * \returns                         View that this viewport animator is assigned to.
+     */
+    QGraphicsView *view() const {
+        return m_view;
+    }
+
+    void setView(QGraphicsView *view);
 
     /**
      * Starts animated move of a viewport to the given rect. When animation
@@ -41,11 +50,6 @@ public:
      * \returns                         Viewport scaling speed, factor per second.
      */
     qreal scalingSpeed() const;
-
-    /**
-     * \returns                         View that this viewport animator is assigned to.
-     */
-    QGraphicsView *view() const;
 
     /**
      * \param multiplier                Viewport movement speed, in viewports per second.

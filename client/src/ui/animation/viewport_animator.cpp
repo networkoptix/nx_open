@@ -34,42 +34,53 @@ namespace {
 } // anonymous namespace
 
 
-QnViewportAnimator::QnViewportAnimator(QGraphicsView *view, QObject *parent):
+QnViewportAnimator::QnViewportAnimator(QObject *parent):
     QObject(parent),
-    m_view(view),
+    m_view(NULL),
     m_movementSpeed(1.0),
     m_logScalingSpeed(std::log(2.0)),
     m_animationGroup(NULL),
     m_scaleAnimation(NULL),
     m_positionAnimation(NULL)
 {
-    if(view == NULL) {
-        qnNullWarning(view);
-        return;
-    }
-
-    if(view->thread() != thread()) {
-        qnWarning("Cannot create an animator for a graphics view in another thread.");
-        return;
-    }
-
-    connect(m_view, SIGNAL(destroyed()), this, SLOT(at_view_destroyed()));
-
-    m_scaleAnimation = new SetterAnimation(this);
-    m_scaleAnimation->setSetter(ViewportScaleSetter(view, Qt::KeepAspectRatioByExpanding));
-
-    m_positionAnimation = new SetterAnimation(this);
-    m_positionAnimation->setSetter(ViewportPositionSetter(view));
-
     m_animationGroup = new QParallelAnimationGroup(this);
-    m_animationGroup->addAnimation(m_scaleAnimation);
-    m_animationGroup->addAnimation(m_positionAnimation);
-    
     connect(m_animationGroup, SIGNAL(stateChanged(QAbstractAnimation::State, QAbstractAnimation::State)), this, SLOT(at_animationGroup_stateChanged(QAbstractAnimation::State, QAbstractAnimation::State)));
 }
 
+void QnViewportAnimator::setView(QGraphicsView *view) {
+    if(m_view != NULL) {
+        m_animationGroup->stop();
+
+        delete m_scaleAnimation;
+        m_scaleAnimation = NULL;
+
+        delete m_positionAnimation;
+        m_positionAnimation = NULL;
+    }
+
+    m_view = view;
+
+    if(m_view != NULL) {
+        if(m_view->thread() != thread()) {
+            qnWarning("Cannot create an animator for a graphics view in another thread.");
+            return;
+        }
+
+        connect(m_view, SIGNAL(destroyed()), this, SLOT(at_view_destroyed()));
+
+        m_scaleAnimation = new SetterAnimation(this);
+        m_scaleAnimation->setSetter(ViewportScaleSetter(view, Qt::KeepAspectRatioByExpanding));
+
+        m_positionAnimation = new SetterAnimation(this);
+        m_positionAnimation->setSetter(ViewportPositionSetter(view));
+
+        m_animationGroup->addAnimation(m_scaleAnimation);
+        m_animationGroup->addAnimation(m_positionAnimation);
+    }
+}
+
 void QnViewportAnimator::at_view_destroyed() {
-    m_view = NULL;
+    setView(NULL);
 }
 
 void QnViewportAnimator::at_animationGroup_stateChanged(QAbstractAnimation::State newState, QAbstractAnimation::State oldState) {
@@ -137,10 +148,6 @@ void QnViewportAnimator::reverse() {
     m_animationGroup->setDirection(m_animationGroup->direction() == QAbstractAnimation::Forward ? QAbstractAnimation::Backward : QAbstractAnimation::Forward);
 }
 #endif
-
-QGraphicsView *QnViewportAnimator::view() const {
-    return m_view;
-}
 
 qreal QnViewportAnimator::movementSpeed() const {
     return m_movementSpeed;

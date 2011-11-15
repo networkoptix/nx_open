@@ -18,8 +18,10 @@ class ResizingInstrument;
 class ArchiveDropInstrument;
 
 class QnLayoutDisplay;
+class QnLayoutModel;
 class QnDisplayState;
 class QnDisplayWidget;
+class QnLayoutGridMapper;
 
 
 /**
@@ -34,9 +36,11 @@ public:
 
     virtual ~QnDisplayController();
 
-    QnDisplayState *state() const {
-        return m_state;
-    }
+    QnDisplayState *state() const;
+
+    QnLayoutModel *layout() const;
+
+    QnLayoutGridMapper *mapper() const;
 
     void drop(const QUrl &url, const QPoint &gridPos, bool checkUrls = true);
     void drop(const QList<QUrl> &urls, const QPoint &gridPos, bool checkUrls = true);
@@ -69,17 +73,8 @@ private:
     /** Display synchronizer. */
     QnLayoutDisplay *m_synchronizer;
 
-    /** Display state. */
-    QnDisplayState *m_state;
-
     /** Instrument manager for the scene. */ 
     InstrumentManager *m_manager;
-
-    /** Graphics scene. */
-    QGraphicsScene *m_scene;
-
-    /** Graphics view. */
-    QGraphicsView *m_view;
 
     /** Hand scroll instrument. */
     HandScrollInstrument *m_handScrollInstrument;

@@ -15,13 +15,15 @@ public:
         EDITING
     };
 
-    QnDisplayState(QnLayoutModel *model, QObject *parent = NULL);
+    QnDisplayState(QObject *parent = NULL);
 
     virtual ~QnDisplayState();
 
     QnLayoutModel *layout() const {
-        return m_model;
+        return m_layout;
     }
+
+    void setLayout(QnLayoutModel *layout);
 
     QnLayoutGridMapper *mapper() const {
         return m_mapper;
@@ -48,14 +50,16 @@ public:
 signals:
     void aboutToBeDestroyed();
     void modeChanged();
+    void layoutChanged(QnLayoutModel *oldLayout, QnLayoutModel *newLayout);
     void selectedItemChanged(QnLayoutItemModel *oldSelectedEntity, QnLayoutItemModel *newSelectedEntity);
     void zoomedItemChanged(QnLayoutItemModel *oldZoomedEntity, QnLayoutItemModel *newZoomedEntity);
 
 private slots:
     void at_item_aboutToBeRemoved(QnLayoutItemModel *item);
+    void at_layout_aboutToBeDestroyed();
 
 private:
-    QnLayoutModel *m_model;
+    QnLayoutModel *m_layout;
     QnLayoutGridMapper *m_mapper;
     Mode m_mode;
     QnLayoutItemModel *m_selectedItem;

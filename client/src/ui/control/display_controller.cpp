@@ -35,10 +35,7 @@
 QnDisplayController::QnDisplayController(QnLayoutDisplay *synchronizer, QObject *parent):
     QObject(parent),
     m_synchronizer(synchronizer),
-    m_state(synchronizer->state()),
-    m_manager(synchronizer->manager()),
-    m_scene(synchronizer->scene()),
-    m_view(synchronizer->view())
+    m_manager(synchronizer->manager())
 {
     /* Install and configure instruments. */
     ClickInstrument *itemClickInstrument = new ClickInstrument(Qt::LeftButton, Instrument::ITEM, this);
@@ -50,9 +47,6 @@ QnDisplayController::QnDisplayController(QnLayoutDisplay *synchronizer, QObject 
     m_archiveDropInstrument = new ArchiveDropInstrument(this, this);
 
     m_dragInstrument = new DragInstrument(this);
-    m_view->setDragMode(QGraphicsView::NoDrag);
-    
-    m_view->viewport()->setAcceptDrops(true);
 
     QSet<QEvent::Type> mouseEventTypes = Instrument::makeSet(
         QEvent::GraphicsSceneMousePress,
@@ -110,6 +104,26 @@ QnDisplayController::~QnDisplayController() {
     return;
 }
 
+QnDisplayState *QnDisplayController::state() const {
+    return m_synchronizer->state();
+}
+
+QnLayoutModel *QnDisplayController::layout() const {
+    QnDisplayState *state = this->state();
+    if(state == NULL)
+        return NULL;
+
+    return state->layout();
+}
+
+QnLayoutGridMapper *QnDisplayController::mapper() const {
+    QnDisplayState *state = this->state();
+    if(state == NULL)
+        return NULL;
+
+    return state->mapper();
+}
+
 void QnDisplayController::drop(const QUrl &url, const QPoint &gridPos, bool checkUrls) {
     drop(url.toLocalFile(), gridPos, checkUrls);
 }
@@ -142,6 +156,10 @@ void QnDisplayController::drop(const QList<QString> &files, const QPoint &gridPo
 }
 
 void QnDisplayController::dropInternal(const QList<QString> &files, const QPoint &gridPos) {
+    QnLayoutModel *layout = this->layout();
+    if(layout == NULL)
+        return;
+
     QnResourceList resources = QnFileProcessor::creareResourcesForFiles(files);
 
     QRect geometry(gridPos, QSize(1, 1));
@@ -149,11 +167,11 @@ void QnDisplayController::dropInternal(const QList<QString> &files, const QPoint
         QnLayoutItemModel *item = new QnLayoutItemModel(resource->getUniqueId());
         item->setGeometry(geometry);
 
-        m_state->layout()->addItem(item);
+        layout->addItem(item);
         if(!item->isPinned()) {
             /* Place already taken, pick closest one. */
-            QRect newGeometry = m_state->layout()->closestFreeSlot(geometry.topLeft(), geometry.size());
-            m_state->layout()->pinItem(item, newGeometry);
+            QRect newGeometry = layout->closestFreeSlot(geometry.topLeft(), geometry.size());
+            layout->pinItem(item, newGeometry);
         }
     }
 }
@@ -164,9 +182,9 @@ void QnDisplayController::updateGeometryDelta(QnDisplayWidget *widget) {
 
     QRectF widgetGeometry = widget->geometry();
 
-    QRectF gridGeometry = m_state->mapper()->mapFromGrid(widget->item()->geometry());
+    QRectF gridGeometry = mapper()->mapFromGrid(widget->item()->geometry());
 
-    QSizeF step = m_state->mapper()->step();
+    QSizeF step = mapper()->step();
     QRectF geometryDelta = QRectF(
         (widgetGeometry.left()   - gridGeometry.left())   / step.width(),
         (widgetGeometry.top()    - gridGeometry.top())    / step.height(),
@@ -190,8 +208,8 @@ void QnDisplayController::at_resizingFinished(QGraphicsView *, QGraphicsWidget *
     if(widget == NULL)
         return;
 
-    QRect newRect = m_state->mapper()->mapToGrid(widget->geometry());
-    QSet<QnLayoutItemModel *> entities = m_state->layout()->items(newRect);
+    QRect newRect = mapper()->mapToGrid(widget->geometry());
+    QSet<QnLayoutItemModel *> entities = layout()->items(newRect);
     entities.remove(widget->item());
     if (entities.empty()) {
         widget->item()->setGeometry(newRect);
@@ -223,7 +241,7 @@ void QnDisplayController::at_draggingFinished(QGraphicsView *view, QList<QGraphi
             continue;
 
         if(models.empty())
-            delta = m_state->mapper()->mapToGrid(widget->geometry()).topLeft() - widget->item()->geometry().topLeft();
+            delta = mapper()->mapToGrid(widget->geometry()).topLeft() - widget->item()->geometry().topLeft();
 
         widgets.push_back(widget);
         models.push_back(widget->item());
@@ -244,7 +262,7 @@ void QnDisplayController::at_draggingFinished(QGraphicsView *view, QList<QGraphi
 
             /* Find item that dragged item was dropped on. */ 
             QPoint cursorPos = QCursor::pos();
-            QnLayoutItemModel *replacedModel = m_state->layout()->item(m_state->mapper()->mapToGrid(view->mapToScene(view->mapFromGlobal(cursorPos))));
+            QnLayoutItemModel *replacedModel = layout()->item(mapper()->mapToGrid(view->mapToScene(view->mapFromGlobal(cursorPos))));
 
             /* Switch places if dropping smaller one on a bigger one. */
             if(replacedModel != NULL && replacedModel != draggedModel && draggedModel->isPinned()) {
@@ -269,7 +287,7 @@ void QnDisplayController::at_draggingFinished(QGraphicsView *view, QList<QGraphi
                     replacedGeometries.push_back(geometry);
             }
 
-            QList<QnLayoutItemModel *> replacedModels = m_state->layout()->items(replacedGeometries).subtract(models.toSet()).toList();
+            QList<QnLayoutItemModel *> replacedModels = layout()->items(replacedGeometries).subtract(models.toSet()).toList();
             replacedGeometries.clear();
             foreach (QnLayoutItemModel *model, replacedModels)
                 replacedGeometries.push_back(model->geometry().adjusted(-delta.x(), -delta.y(), -delta.x(), -delta.y()));
@@ -279,7 +297,7 @@ void QnDisplayController::at_draggingFinished(QGraphicsView *view, QList<QGraphi
             finished = true;
         }
 
-        success = m_state->layout()->moveItems(models, geometries);
+        success = layout()->moveItems(models, geometries);
     }
 
     /* Adjust geometry deltas if everything went fine. */
@@ -300,7 +318,7 @@ void QnDisplayController::at_item_clicked(QGraphicsView *, QGraphicsItem *item) 
         return;
 
     QnLayoutItemModel *model = widget->item();
-    m_state->setSelectedItem(m_state->selectedItem() == model ? NULL : model);
+    state()->setSelectedItem(state()->selectedItem() == model ? NULL : model);
 }
 
 void QnDisplayController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem *item) {
@@ -311,32 +329,34 @@ void QnDisplayController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem *
         return;
 
     QnLayoutItemModel *model = widget->item();
-    if(m_state->zoomedItem() == model) {
+    if(state()->zoomedItem() == model) {
         QRectF viewportGeometry = m_synchronizer->viewportGeometry();
-        QRectF zoomedItemGeometry = m_synchronizer->itemGeometry(m_state->zoomedItem());
+        QRectF zoomedItemGeometry = m_synchronizer->itemGeometry(state()->zoomedItem());
 
         if(contains(zoomedItemGeometry.size(), viewportGeometry.size()) && !qFuzzyCompare(viewportGeometry, zoomedItemGeometry)) {
-            m_state->setZoomedItem(NULL);
-            m_state->setZoomedItem(model);
+            state()->setZoomedItem(NULL);
+            state()->setZoomedItem(model);
         } else {
-            m_state->setZoomedItem(NULL);
-            m_state->setSelectedItem(NULL);
+            state()->setZoomedItem(NULL);
+            state()->setSelectedItem(NULL);
         }
     } else {
-        m_state->setZoomedItem(model);
+        state()->setZoomedItem(model);
     }
 }
 
 void QnDisplayController::at_scene_clicked(QGraphicsView *) {
-    qDebug("SCENE CLICKED");
+    if(state() == NULL)
+        return;
 
-    m_state->setSelectedItem(NULL);
+    state()->setSelectedItem(NULL);
 }
 
 void QnDisplayController::at_scene_doubleClicked(QGraphicsView *) {
-    qDebug("SCENE DOUBLE CLICKED");
+    if(state() == NULL)
+        return;
 
-    m_state->setZoomedItem(NULL);
+    state()->setZoomedItem(NULL);
     m_synchronizer->fitInView();
 }
 

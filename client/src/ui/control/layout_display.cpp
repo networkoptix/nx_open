@@ -62,53 +62,18 @@ namespace {
 
 } // anonymous namespace
 
-QnLayoutDisplay::QnLayoutDisplay(QGraphicsScene *scene, QGraphicsView *view, QObject *parent):
+QnLayoutDisplay::QnLayoutDisplay(QObject *parent):
     QObject(parent),
-    m_state(NULL),
     m_manager(new InstrumentManager(this)),
-    m_scene(scene),
-    m_view(view),
-    m_viewportAnimator(new QnViewportAnimator(view, this)),
-    m_frontZ(0.0)
+    m_state(NULL),
+    m_layout(NULL),
+    m_scene(NULL),
+    m_view(NULL),
+    m_viewportAnimator(NULL),
+    m_curtainAnimator(NULL),
+    m_frontZ(0.0),
+    m_dummyScene(new QGraphicsScene(this))
 {
-    assert(scene != NULL && view != NULL);
-
-    /* Prepare manager. */
-    m_manager->registerScene(scene);
-    m_manager->registerView(view);
-    
-    /* Scene indexing will only slow everything down. */ 
-    scene->setItemIndexMethod(QGraphicsScene::NoIndex);
-
-    /* Configure OpenGL */
-    if (!QGLFormat::hasOpenGL()) {
-        qnCritical("Software rendering is not supported.");
-    } else {
-        QGLFormat glFormat;
-        glFormat.setOption(QGL::SampleBuffers); /* Multisampling. */
-        glFormat.setSwapInterval(1); /* Turn vsync on. */
-        view->setViewport(new QGLWidget(glFormat));
-    }
-
-    /* Turn on antialiasing at QPainter level. */
-    view->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing); 
-    view->setRenderHints(QPainter::SmoothPixmapTransform);
-
-    /* In OpenGL mode this one seems to be ignored, but it will help in software mode. */
-    view->setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);
-
-    /* All our items save and restore painter state. */
-    view->setOptimizationFlag(QGraphicsView::DontSavePainterState, false); /* Can be turned on if we won't be using framed widgets. */ 
-    view->setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing);
-
-    /* Don't even try to uncomment this one, it slows everything down. */
-    //setCacheMode(QGraphicsView::CacheBackground);
-
-    /* We don't need scrollbars & frame. */
-    view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    view->setFrameShape(QFrame::NoFrame);
-
     /* Create and configure instruments. */
     m_boundingInstrument = new BoundingInstrument(this);
     m_transformListenerInstrument = new TransformListenerInstrument(this);
@@ -117,26 +82,23 @@ QnLayoutDisplay::QnLayoutDisplay(QGraphicsScene *scene, QGraphicsView *view, QOb
     m_manager->installInstrument(m_boundingInstrument);
     m_manager->installInstrument(m_activityListenerInstrument);
 
-    m_boundingInstrument->setSizeEnforced(view, true);
-    m_boundingInstrument->setPositionEnforced(view, true);
-    m_boundingInstrument->setScalingSpeed(view, 32.0);
-    m_boundingInstrument->setMovementSpeed(view, 4.0);
-
     m_activityListenerInstrument->recursiveDisable();
 
     connect(m_transformListenerInstrument, SIGNAL(transformChanged(QGraphicsView *)),                   this,                   SLOT(at_viewport_transformationChanged()));
     connect(m_activityListenerInstrument,  SIGNAL(activityStopped()),                                   this,                   SLOT(at_activityStopped()));
     connect(m_activityListenerInstrument,  SIGNAL(activityStarted()),                                   this,                   SLOT(at_activityStarted()));
 
-    /* Set up curtain. */
-    m_curtainItem = new QnCurtainItem();
-    m_scene->addItem(m_curtainItem);
-    setLayer(m_curtainItem, CURTAIN_LAYER);
-    m_curtainAnimator = new QnCurtainAnimator(m_curtainItem, 1000, this);
+    /* Configure viewport updates. */
+    m_updateTimer = new AnimationTimer(this);
+    m_updateTimer->setListener(this);
+
+    /* Create curtain animator. */
+    m_curtainAnimator = new QnCurtainAnimator(1000, this);
     connect(m_curtainAnimator,  SIGNAL(curtained()),                                                    this,                   SLOT(at_curtained()));
     connect(m_curtainAnimator,  SIGNAL(uncurtained()),                                                  this,                   SLOT(at_uncurtained()));
 
-    /* Configure animator. */
+    /* Create viewport animator. */
+    m_viewportAnimator = new QnViewportAnimator(this);
     m_viewportAnimator->setMovementSpeed(4.0);
     m_viewportAnimator->setScalingSpeed(32.0);
     connect(m_viewportAnimator, SIGNAL(animationStarted()),                                             this,                   SIGNAL(viewportGrabbed()));
@@ -144,24 +106,20 @@ QnLayoutDisplay::QnLayoutDisplay(QGraphicsScene *scene, QGraphicsView *view, QOb
     connect(m_viewportAnimator, SIGNAL(animationFinished()),                                            this,                   SIGNAL(viewportUngrabbed()));
     connect(m_viewportAnimator, SIGNAL(animationFinished()),                                            m_boundingInstrument,   SLOT(recursiveEnable()));
     connect(m_viewportAnimator, SIGNAL(animationFinished()),                                            this,                   SLOT(at_viewport_animationFinished()));
-
-
-    /* Configure viewport updates. */
-    m_updateTimer = new AnimationTimer(this);
-    m_updateTimer->setListener(this);
-    m_updateTimer->start();
-
 }
 
 QnLayoutDisplay::~QnLayoutDisplay() {
+    return;
 }
 
 void QnLayoutDisplay::setState(QnDisplayState *state) {
+    if(m_state == state)
+        return;
+
     if(m_state != NULL) {
         disconnect(m_state, NULL, this, NULL);
 
-        foreach(QnLayoutItemModel *item, m_state->layout()->items())
-            removeItemInternal(item);
+        at_state_layoutChanged(m_layout, NULL);
     }
 
     m_state = state;
@@ -172,20 +130,119 @@ void QnLayoutDisplay::setState(QnDisplayState *state) {
         connect(m_state,            SIGNAL(modeChanged()),                                                  this,                   SLOT(at_state_modeChanged()));
         connect(m_state,            SIGNAL(selectedItemChanged(QnLayoutItemModel *, QnLayoutItemModel *)),  this,                   SLOT(at_state_selectedItemChanged(QnLayoutItemModel *, QnLayoutItemModel *)));
         connect(m_state,            SIGNAL(zoomedItemChanged(QnLayoutItemModel *, QnLayoutItemModel *)),    this,                   SLOT(at_state_zoomedItemChanged(QnLayoutItemModel *, QnLayoutItemModel *)));
-        connect(m_state->layout(),  SIGNAL(itemAdded(QnLayoutItemModel *)),                                 this,                   SLOT(at_layout_itemAdded(QnLayoutItemModel *)));
-        connect(m_state->layout(),  SIGNAL(itemAboutToBeRemoved(QnLayoutItemModel *)),                      this,                   SLOT(at_layout_itemAboutToBeRemoved(QnLayoutItemModel *)));
+        connect(m_state,            SIGNAL(layoutChanged(QnLayoutModel *, QnLayoutModel *)),                this,                   SLOT(at_state_layoutChanged(QnLayoutModel *, QnLayoutModel *)));
         
-        /* Create items. */
-        foreach(QnLayoutItemModel *item, m_state->layout()->items())
-            addItemInternal(item);
-
         /* Fire signals if needed. */
+        at_state_layoutChanged(m_layout, m_state->layout());
         if(m_state->zoomedItem() != NULL)
             at_state_zoomedItemChanged(NULL, m_state->zoomedItem());
         if(m_state->selectedItem() != NULL)
             at_state_selectedItemChanged(NULL, m_state->selectedItem());
-
+        
         synchronizeSceneBounds();
+    }
+}
+
+void QnLayoutDisplay::setScene(QGraphicsScene *scene) {
+    if(m_scene == scene)
+        return;
+
+    if(m_scene != NULL) {
+        m_manager->unregisterScene(m_scene);
+        
+        disconnect(m_scene, NULL, this, NULL);
+        m_propertiesByItem.clear();
+
+        /* Clear curtain. */
+        if(!m_curtainItem.isNull()) {
+            delete m_curtainItem.data();
+            m_curtainItem.clear();
+        }
+        m_curtainAnimator->setCurtainItem(NULL);
+    }
+    
+    m_scene = scene;
+
+    if(m_scene != NULL) {
+        m_manager->registerScene(m_scene);
+        
+        connect(m_scene, SIGNAL(destroyed()), this, SLOT(at_scene_destroyed()));
+
+        /* Scene indexing will only slow everything down. */ 
+        m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
+        
+        /* Set up curtain. */
+        m_curtainItem = new QnCurtainItem();
+        m_scene->addItem(m_curtainItem.data());
+        setLayer(m_curtainItem.data(), CURTAIN_LAYER);
+        m_curtainAnimator->setCurtainItem(m_curtainItem.data());
+    }
+}
+
+
+void QnLayoutDisplay::setView(QGraphicsView *view) {
+    if(m_view != NULL) {
+        m_manager->unregisterView(m_view);
+        
+        disconnect(m_view, NULL, this, NULL);
+
+        m_viewportAnimator->setView(NULL);
+
+        /* Stop viewport updates. */
+        m_updateTimer->stop();
+    }
+
+    m_view = view;
+
+    if(m_view != NULL) {
+        m_manager->registerView(m_view);
+
+        connect(m_view, SIGNAL(destroyed()), this, SLOT(at_view_destroyed()));
+
+        /* Configure OpenGL */
+        if (!QGLFormat::hasOpenGL()) {
+            qnCritical("Software rendering is not supported.");
+        } else {
+            QGLFormat glFormat;
+            glFormat.setOption(QGL::SampleBuffers); /* Multisampling. */
+            glFormat.setSwapInterval(1); /* Turn vsync on. */
+            m_view->setViewport(new QGLWidget(glFormat));
+        }
+
+        /* Turn on antialiasing at QPainter level. */
+        m_view->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing); 
+        m_view->setRenderHints(QPainter::SmoothPixmapTransform);
+
+        /* In OpenGL mode this one seems to be ignored, but it will help in software mode. */
+        m_view->setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);
+
+        /* All our items save and restore painter state. */
+        m_view->setOptimizationFlag(QGraphicsView::DontSavePainterState, false); /* Can be turned on if we won't be using framed widgets. */ 
+        m_view->setOptimizationFlag(QGraphicsView::DontAdjustForAntialiasing);
+
+        /* Don't even try to uncomment this one, it slows everything down. */
+        //m_view->setCacheMode(QGraphicsView::CacheBackground);
+
+        /* We don't need scrollbars & frame. */
+        m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        m_view->setFrameShape(QFrame::NoFrame);
+
+        /* This may be needed by other instruments. */
+        m_view->setDragMode(QGraphicsView::NoDrag);
+        m_view->viewport()->setAcceptDrops(true);
+
+        /* Configure bounding instrument. */
+        m_boundingInstrument->setSizeEnforced(m_view, true);
+        m_boundingInstrument->setPositionEnforced(m_view, true);
+        m_boundingInstrument->setScalingSpeed(m_view, 32.0);
+        m_boundingInstrument->setMovementSpeed(m_view, 4.0);
+
+        /* Configure viewport animator. */
+        m_viewportAnimator->setView(m_view);
+
+        /* Start viewport updates. */
+        m_updateTimer->start();
     }
 }
 
@@ -280,7 +337,10 @@ void QnLayoutDisplay::bringToFront(QnLayoutItemModel *item) {
 
 void QnLayoutDisplay::addItemInternal(QnLayoutItemModel *item) {
     QnDisplayWidget *widget = new QnDisplayWidget(item);
-    m_scene->addItem(widget);
+    widget->setParent(this); /* Just to feel totally safe and not to leak memory no matter what happens. */
+
+    if(m_scene != NULL)
+        m_scene->addItem(widget);
 
     widget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true); /* Optimization. */
     widget->setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -307,13 +367,20 @@ void QnLayoutDisplay::addItemInternal(QnLayoutItemModel *item) {
 
     synchronize(widget, false);
     bringToFront(widget);
+
+    connect(widget, SIGNAL(destroyed()), this, SLOT(at_widget_destroyed()));
 }
 
 void QnLayoutDisplay::removeItemInternal(QnLayoutItemModel *item) {
     disconnect(item, NULL, this, NULL);
 
     QnDisplayWidget *widget = m_widgetByItem[item];
+    if(widget == NULL)
+        return;
+
     m_widgetByItem.remove(item);
+
+    disconnect(widget, NULL, this, NULL);
 
     delete widget;
 }
@@ -390,14 +457,18 @@ QRectF QnLayoutDisplay::itemGeometry(QnLayoutItemModel *item, QRectF *enclosingG
 }
 
 QRectF QnLayoutDisplay::layoutBoundingGeometry() const {
-    if(m_state == NULL)
+    if(m_layout == NULL)
         return QRectF();
 
-    return m_state->mapper()->mapFromGrid(m_state->layout()->boundingRect().adjusted(-1, -1, 1, 1));
+    return m_state->mapper()->mapFromGrid(m_layout->boundingRect().adjusted(-1, -1, 1, 1));
 }
 
 QRectF QnLayoutDisplay::viewportGeometry() const {
-    return mapRectToScene(m_view, m_view->viewport()->rect());
+    if(m_view == NULL) {
+        return QRectF();
+    } else {
+        return mapRectToScene(m_view, m_view->viewport()->rect());
+    }
 }
 
 
@@ -441,7 +512,7 @@ void QnLayoutDisplay::synchronizeGeometry(QnDisplayWidget *widget, bool animate)
     QRectF enclosingGeometry = itemEnclosingGeometry(item);
 
     /* Adjust for selection. */
-    if(item == m_state->selectedItem() && item != m_state->zoomedItem()) {
+    if(item == m_state->selectedItem() && item != m_state->zoomedItem() && m_view != NULL) {
         QPointF geometryCenter = enclosingGeometry.center();
         QTransform transform;
         transform.translate(geometryCenter.x(), geometryCenter.y());
@@ -505,6 +576,8 @@ void QnLayoutDisplay::synchronizeSceneBounds() {
 // QnLayoutDisplay :: handlers
 // -------------------------------------------------------------------------- //
 void QnLayoutDisplay::tick(int /*currentTime*/) {
+    assert(m_view != NULL);
+
     m_view->viewport()->update();
 }
 
@@ -566,6 +639,24 @@ void QnLayoutDisplay::at_state_zoomedItemChanged(QnLayoutItemModel *oldZoomedIte
     synchronizeSceneBounds();
 }
 
+void QnLayoutDisplay::at_state_layoutChanged(QnLayoutModel *, QnLayoutModel *newLayout) {
+    if(m_layout != NULL) {
+        foreach(QnLayoutItemModel *item, m_layout->items())
+            removeItemInternal(item);
+    }
+
+    m_layout = newLayout;
+
+    if(m_layout != NULL) {
+        connect(m_layout,  SIGNAL(itemAdded(QnLayoutItemModel *)),                                 this,                   SLOT(at_layout_itemAdded(QnLayoutItemModel *)));
+        connect(m_layout,  SIGNAL(itemAboutToBeRemoved(QnLayoutItemModel *)),                      this,                   SLOT(at_layout_itemAboutToBeRemoved(QnLayoutItemModel *)));
+
+        /* Create items. */
+        foreach(QnLayoutItemModel *item, m_layout->items())
+            addItemInternal(item);
+    }
+}
+
 void QnLayoutDisplay::at_viewport_transformationChanged() {
     if(m_state != NULL && m_state->selectedItem() != NULL) {
         QnDisplayWidget *widget = this->widget(m_state->selectedItem());
@@ -609,12 +700,29 @@ void QnLayoutDisplay::at_curtained() {
         if(widget->item() != m_state->zoomedItem())
             widget->hide();
 
-    m_view->viewport()->setCursor(QCursor(Qt::BlankCursor));
+    if(m_view != NULL)
+        m_view->viewport()->setCursor(QCursor(Qt::BlankCursor));
 }
 
 void QnLayoutDisplay::at_uncurtained() {
     foreach(QnDisplayWidget *widget, m_widgetByItem)
         widget->show();
 
-    m_view->viewport()->setCursor(QCursor(Qt::ArrowCursor));
+    if(m_view != NULL)
+        m_view->viewport()->setCursor(QCursor(Qt::ArrowCursor));
+}
+
+void QnLayoutDisplay::at_widget_destroyed() {
+    /* Holy crap! Somebody's destroying our widgets. Disconnect from the scene. */
+    m_widgetByItem.clear();
+    setScene(NULL);
+}
+
+void QnLayoutDisplay::at_scene_destroyed() {
+    m_widgetByItem.clear();
+    setScene(NULL);
+}
+
+void QnLayoutDisplay::at_view_destroyed() {
+    setView(NULL);
 }

@@ -21,6 +21,7 @@ class QnViewportAnimator;
 class QnWidgetAnimator;
 class QnCurtainAnimator;
 class QnCurtainItem;
+class QnLayoutModel;
 
 /**
  * This class ties a display state, a scene and a view together.
@@ -44,9 +45,13 @@ public:
         FRONT_LAYER
     };
 
-    QnLayoutDisplay(QGraphicsScene *scene, QGraphicsView *view, QObject *parent = NULL);
+    QnLayoutDisplay(QObject *parent = NULL);
 
     virtual ~QnLayoutDisplay();
+
+    InstrumentManager *manager() const {
+        return m_manager;
+    }
 
     QnDisplayState *state() const {
         return m_state;
@@ -54,17 +59,17 @@ public:
 
     void setState(QnDisplayState *state);
 
-    InstrumentManager *manager() const {
-        return m_manager;
-    }
-
     QGraphicsScene *scene() const {
         return m_scene;
     }
 
+    void setScene(QGraphicsScene *scene);
+
     QGraphicsView *view() const {
         return m_view;
     }
+
+    void setView(QGraphicsView *view);
 
     /**
      * \param item                      Item to get widget for.
@@ -156,6 +161,7 @@ protected slots:
     void at_state_modeChanged();
     void at_state_selectedItemChanged(QnLayoutItemModel *oldSelectedItem, QnLayoutItemModel *newSelectedItem);
     void at_state_zoomedItemChanged(QnLayoutItemModel *oldZoomedItem, QnLayoutItemModel *newZoomedItem);
+    void at_state_layoutChanged(QnLayoutModel *oldLayout, QnLayoutModel *newLayout);
 
     void at_item_geometryChanged();
     void at_item_geometryDeltaChanged();
@@ -170,6 +176,10 @@ protected slots:
     void at_curtained();
     void at_uncurtained();
 
+    void at_widget_destroyed();
+    void at_scene_destroyed();
+    void at_view_destroyed();
+
 private:
     struct ItemProperties {
         ItemProperties(): animator(NULL), layer(BACK_LAYER) {}
@@ -180,6 +190,7 @@ private:
 
 private:
     QnDisplayState *m_state;
+    QnLayoutModel *m_layout;
     QGraphicsScene *m_scene;
     QGraphicsView *m_view;
 
@@ -211,10 +222,13 @@ private:
     QnViewportAnimator *m_viewportAnimator;
 
     /** Curtain item. */
-    QnCurtainItem *m_curtainItem;
+    QWeakPointer<QnCurtainItem> m_curtainItem;
 
     /** Curtain animator. */
     QnCurtainAnimator *m_curtainAnimator;
+
+    /** Stored dummy scene. */
+    QGraphicsScene *m_dummyScene;
 };
 
 #endif // QN_DISPLAY_SYNCHRONIZER_H

@@ -73,11 +73,14 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
    
     const QSizeF defaultCellSize = QSizeF(150.0, 100.0);
     const QSizeF defaultSpacing = QSizeF(25.0, 25.0);
-    QnDisplayState *state = new QnDisplayState(model, this);
+    QnDisplayState *state = new QnDisplayState(this);
+    state->setLayout(model);
     state->mapper()->setCellSize(defaultCellSize);
     state->mapper()->setSpacing(defaultSpacing);
 
-    QnLayoutDisplay *display = new QnLayoutDisplay(scene, view, this);
+    QnLayoutDisplay *display = new QnLayoutDisplay(this);
+    display->setScene(scene);
+    display->setView(view);
     display->setState(state);
 
     QnDisplayController *controller = new QnDisplayController(display, this);

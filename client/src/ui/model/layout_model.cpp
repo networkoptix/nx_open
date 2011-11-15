@@ -9,6 +9,10 @@ QnLayoutModel::QnLayoutModel(QObject *parent):
 
 QnLayoutModel::~QnLayoutModel() {
     clear();
+
+    bool signalsBlocked = blockSignals(false);
+    emit aboutToBeDestroyed();
+    blockSignals(signalsBlocked);
 }
 
 void QnLayoutModel::clear() {

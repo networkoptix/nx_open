@@ -116,6 +116,7 @@ public:
     QRect closestFreeSlot(const QPoint &pos, const QSize &size) const;
 
 signals:
+    void aboutToBeDestroyed();
     void itemAdded(QnLayoutItemModel *item);
     void itemAboutToBeRemoved(QnLayoutItemModel *item);
 

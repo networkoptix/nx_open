@@ -6,31 +6,24 @@
 #include <ui/graphics/items/display_widget.h>
 #include <utils/common/warnings.h>
 
-QnCurtainAnimator::QnCurtainAnimator(QnCurtainItem *curtain, int durationMSec, QObject *parent):
+QnCurtainAnimator::QnCurtainAnimator(int durationMSec, QObject *parent):
     QObject(parent),
-    m_curtain(curtain),
+    m_curtain(NULL),
     m_curtained(false),
     m_durationMSec(durationMSec),
     m_animationGroup(NULL),
     m_borderColorAnimation(NULL)
 {
-    if(curtain == NULL) {
-        qnNullWarning(curtain);
-        return;
-    }
-
     if(durationMSec < 0) {
         qnWarning("Invalid animation duration '%1'", durationMSec);
         m_durationMSec = 1; /* Instant color change. */
     }
 
     setProperty("frameColor", QColor());
-
-    connect(m_curtain, SIGNAL(destroyed()), this, SLOT(at_curtain_destroyed()));
-    m_curtain->hide();
+    setProperty("color", QColor());
 
     m_curtainColorAnimation = new QPropertyAnimation(this);
-    m_curtainColorAnimation->setTargetObject(m_curtain);
+    m_curtainColorAnimation->setTargetObject(this);
     m_curtainColorAnimation->setPropertyName("color");
     m_curtainColorAnimation->setDuration(m_durationMSec);
 
@@ -38,7 +31,6 @@ QnCurtainAnimator::QnCurtainAnimator(QnCurtainItem *curtain, int durationMSec, Q
     m_borderColorAnimation->setTargetObject(this);
     m_borderColorAnimation->setPropertyName("frameColor");
     m_borderColorAnimation->setDuration(m_durationMSec);
-    setProperty("frameColor", QColor());
 
     m_animationGroup = new QParallelAnimationGroup(this);
     m_animationGroup->addAnimation(m_curtainColorAnimation);
@@ -47,8 +39,27 @@ QnCurtainAnimator::QnCurtainAnimator(QnCurtainItem *curtain, int durationMSec, Q
     connect(m_animationGroup, SIGNAL(finished()), this, SLOT(at_animation_finished()));
 }
 
+void QnCurtainAnimator::setCurtainItem(QnCurtainItem *curtain) {
+    if(m_curtain != NULL) {
+        m_animationGroup->stop();
+
+        disconnect(m_curtain, NULL, this, NULL);
+
+        m_curtainColorAnimation->setTargetObject(this);
+    }
+
+    m_curtain = curtain;
+
+    if(m_curtain != NULL) {
+        m_curtainColorAnimation->setTargetObject(m_curtain);
+
+        connect(m_curtain, SIGNAL(destroyed()), this, SLOT(at_curtain_destroyed()));
+        m_curtain->hide();
+    }
+}
+
 void QnCurtainAnimator::at_curtain_destroyed() {
-    m_curtain = NULL;
+    setCurtainItem(NULL);
 }
 
 void QnCurtainAnimator::at_animation_finished() {
