@@ -256,7 +256,7 @@ void TimeLine::wheelEvent(QGraphicsSceneWheelEvent *event)
 
 static const int MAX_LABEL_WIDTH = 64;
 
-static const struct IntervalInfo {
+struct IntervalInfo {
     qint64 interval;
     int value;
     const char *name;

@@ -10,6 +10,7 @@
 QnResourceCommandProcessor QnResource::m_commanproc;
 
 QnResourceType::QnResourceType()
+    : m_isCameraSet(false)
 {
 }
 
