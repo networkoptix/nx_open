@@ -24,6 +24,7 @@ public:
     void setManufacture(const QString& value) { m_manufacture = value; }
     QString getManufacture() const { return m_manufacture;}
 
+    bool isCamera() const;
 
     void addAdditionalParent(const QnId& parent);
     QList<QnId> allParentList() const;
@@ -43,6 +44,9 @@ private:
 
     mutable QMutex m_allParamTypeListCacheMutex;
     mutable QSharedPointer<ParamTypeList> m_allParamTypeListCache;
+
+    mutable bool m_isCamera;
+    mutable bool m_isCameraSet;
 };
 
 typedef QSharedPointer<QnResourceType> QnResourceTypePtr;

@@ -78,6 +78,10 @@ QnResourcePtr QnServerCameraFactory::createResource(const QnId& resourceTypeId, 
     if (resourceType.isNull())
         return resource;
 
+    // Currently we support only cameras.
+    if (!resourceType->isCamera())
+        return resource;
+
     resource = QnResourcePtr(new QnServerCamera());
     resource->setTypeId(resourceTypeId);
     resource->deserialize(parameters);

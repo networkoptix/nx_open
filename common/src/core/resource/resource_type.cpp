@@ -3,6 +3,36 @@
 
 Q_GLOBAL_STATIC(QnResourceTypePool, inst)
 
+bool QnResourceType::isCamera() const
+{
+    if (m_isCameraSet)
+        return m_isCamera;
+
+    if (m_name == "Camera")
+    {
+        m_isCamera = true;
+        m_isCameraSet = true;
+    }
+
+    foreach (QnId parentId, allParentList())
+    {
+        if (parentId.isValid())
+        {
+            QnResourceTypePtr parent = qnResTypePool->getResourceType(parentId);
+            if (parent->isCamera())
+            {
+                m_isCamera = true;
+                m_isCameraSet = true;
+            }
+        }
+    }
+
+    m_isCamera = false;
+    m_isCameraSet = true;
+
+    return m_isCamera;
+}
+
 void QnResourceType::addAdditionalParent(const QnId& parent) 
 {
     if (parent != m_parentId)
