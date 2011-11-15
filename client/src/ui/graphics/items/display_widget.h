@@ -9,7 +9,7 @@
 
 class QnDisplayWidgetRenderer;
 class QnVideoResourceLayout;
-class QnLayoutItemModel;
+class QnWorkbenchItem;
 class QnResourceDisplay;
 class QnPolygonalShadowItem;
 
@@ -24,14 +24,14 @@ class QnDisplayWidget: public GraphicsWidget, public QnPolygonalShapeProvider, p
     typedef GraphicsWidget base_type;
 
 public:
-    QnDisplayWidget(QnLayoutItemModel *item, QGraphicsItem *parent = NULL);
+    QnDisplayWidget(QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
 
     virtual ~QnDisplayWidget();
 
     /**
      * \returns                         Entity associated with this widget.
      */
-    QnLayoutItemModel *item() const {
+    QnWorkbenchItem *item() const {
         return m_item;
     }
 
@@ -166,7 +166,7 @@ private:
 
 private:
     /** Layout item. */
-    QnLayoutItemModel *m_item;
+    QnWorkbenchItem *m_item;
 
     /** Display. */
     QnResourceDisplay *m_display;

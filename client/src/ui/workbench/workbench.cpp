@@ -1,29 +1,29 @@
-#include "display_state.h"
+#include "workbench.h"
 #include <cassert>
 #include <utils/common/warnings.h>
-#include <ui/model/layout_model.h>
-#include <ui/model/layout_grid_mapper.h>
-#include <ui/model/resource_item_model.h>
+#include "workbench_layout.h"
+#include "workbench_grid_mapper.h"
+#include "workbench_item.h"
 
-QnDisplayState::QnDisplayState(QObject *parent):
+QnWorkbench::QnWorkbench(QObject *parent):
     QObject(parent),
     m_layout(NULL),
-    m_mapper(new QnLayoutGridMapper(this)),
+    m_mapper(new QnWorkbenchGridMapper(this)),
     m_selectedItem(NULL),
     m_zoomedItem(NULL)
 {}    
 
-QnDisplayState::~QnDisplayState() {
+QnWorkbench::~QnWorkbench() {
     bool signalsBlocked = blockSignals(false);
     emit aboutToBeDestroyed();
     blockSignals(signalsBlocked);
 }
 
-void QnDisplayState::setLayout(QnLayoutModel *layout) {
+void QnWorkbench::setLayout(QnWorkbenchLayout *layout) {
     if(layout == m_layout)
         return;
 
-    QnLayoutModel *oldLayout = m_layout;
+    QnWorkbenchLayout *oldLayout = m_layout;
 
     if(m_layout != NULL) {
         setSelectedItem(NULL);
@@ -35,14 +35,14 @@ void QnDisplayState::setLayout(QnLayoutModel *layout) {
     m_layout = layout;
 
     if(m_layout != NULL) {
-        connect(m_layout, SIGNAL(itemAboutToBeRemoved(QnLayoutItemModel *)),    this, SLOT(at_item_aboutToBeRemoved(QnLayoutItemModel *)));
+        connect(m_layout, SIGNAL(itemAboutToBeRemoved(QnWorkbenchItem *)),    this, SLOT(at_item_aboutToBeRemoved(QnWorkbenchItem *)));
         connect(m_layout, SIGNAL(aboutToBeDestroyed()),                         this, SLOT(at_layout_aboutToBeDestroyed()));
     }
 
     emit layoutChanged(oldLayout, m_layout);
 }
 
-void QnDisplayState::setMode(Mode mode) {
+void QnWorkbench::setMode(Mode mode) {
     if(m_mode == mode)
         return;
 
@@ -51,7 +51,7 @@ void QnDisplayState::setMode(Mode mode) {
     emit modeChanged();
 }
 
-void QnDisplayState::setSelectedItem(QnLayoutItemModel *item) {
+void QnWorkbench::setSelectedItem(QnWorkbenchItem *item) {
     if(m_selectedItem == item)
         return;
 
@@ -60,13 +60,13 @@ void QnDisplayState::setSelectedItem(QnLayoutItemModel *item) {
         return;
     }
 
-    QnLayoutItemModel *oldSelectedItem = m_selectedItem;
+    QnWorkbenchItem *oldSelectedItem = m_selectedItem;
     m_selectedItem = item;
     
     emit selectedItemChanged(oldSelectedItem, m_selectedItem);
 }
 
-void QnDisplayState::setZoomedItem(QnLayoutItemModel *item) {
+void QnWorkbench::setZoomedItem(QnWorkbenchItem *item) {
     if(m_zoomedItem == item)
         return;
 
@@ -75,13 +75,13 @@ void QnDisplayState::setZoomedItem(QnLayoutItemModel *item) {
         return;
     }
 
-    QnLayoutItemModel *oldZoomedItem = m_zoomedItem;
+    QnWorkbenchItem *oldZoomedItem = m_zoomedItem;
     m_zoomedItem = item;
 
     emit zoomedItemChanged(oldZoomedItem, m_zoomedItem);
 }
 
-void QnDisplayState::at_item_aboutToBeRemoved(QnLayoutItemModel *item) {
+void QnWorkbench::at_item_aboutToBeRemoved(QnWorkbenchItem *item) {
     if(item == m_selectedItem)
         setSelectedItem(NULL);
 
@@ -89,6 +89,6 @@ void QnDisplayState::at_item_aboutToBeRemoved(QnLayoutItemModel *item) {
         setZoomedItem(NULL);
 }
 
-void QnDisplayState::at_layout_aboutToBeDestroyed() {
+void QnWorkbench::at_layout_aboutToBeDestroyed() {
     setLayout(NULL);
 }

@@ -1,13 +1,13 @@
-#include "layout_model.h"
+#include "workbench_layout.h"
 #include <utils/common/warnings.h>
-#include "resource_item_model.h"
+#include "workbench_item.h"
 
-QnLayoutModel::QnLayoutModel(QObject *parent):
+QnWorkbenchLayout::QnWorkbenchLayout(QObject *parent):
     QObject(parent)
 {}
 
 
-QnLayoutModel::~QnLayoutModel() {
+QnWorkbenchLayout::~QnWorkbenchLayout() {
     clear();
 
     bool signalsBlocked = blockSignals(false);
@@ -15,16 +15,16 @@ QnLayoutModel::~QnLayoutModel() {
     blockSignals(signalsBlocked);
 }
 
-void QnLayoutModel::clear() {
+void QnWorkbenchLayout::clear() {
     while(!m_items.empty()) {
-        QnLayoutItemModel *item = *m_items.begin();
+        QnWorkbenchItem *item = *m_items.begin();
 
         removeItem(item);
         delete item;
     }
 }
 
-void QnLayoutModel::addItem(QnLayoutItemModel *item) {
+void QnWorkbenchLayout::addItem(QnWorkbenchItem *item) {
     if(item == NULL) {
         qnNullWarning(item);
         return;
@@ -34,7 +34,7 @@ void QnLayoutModel::addItem(QnLayoutItemModel *item) {
         item->layout()->removeItem(item);
 
     if(item->isPinned() && m_itemMap.isOccupied(item->geometry())) 
-        item->setFlag(QnLayoutItemModel::Pinned, false);
+        item->setFlag(QnWorkbenchItem::Pinned, false);
 
     item->m_layout = this;
     m_items.insert(item);
@@ -45,7 +45,7 @@ void QnLayoutModel::addItem(QnLayoutItemModel *item) {
     emit itemAdded(item);
 }
 
-void QnLayoutModel::removeItem(QnLayoutItemModel *item) {
+void QnWorkbenchLayout::removeItem(QnWorkbenchItem *item) {
     if(item == NULL) {
         qnNullWarning(item);
         return;
@@ -65,7 +65,7 @@ void QnLayoutModel::removeItem(QnLayoutItemModel *item) {
     m_items.remove(item);
 }
 
-bool QnLayoutModel::moveItem(QnLayoutItemModel *item, const QRect &geometry) {
+bool QnWorkbenchLayout::moveItem(QnWorkbenchItem *item, const QRect &geometry) {
     if(item->layout() != this) {
         qnWarning("Cannot move an item that does not belong to this layout.");
         return false;
@@ -84,13 +84,13 @@ bool QnLayoutModel::moveItem(QnLayoutItemModel *item, const QRect &geometry) {
     return true;
 }
 
-void QnLayoutModel::moveItemInternal(QnLayoutItemModel *item, const QRect &geometry) {
+void QnWorkbenchLayout::moveItemInternal(QnWorkbenchItem *item, const QRect &geometry) {
     m_rectSet.remove(item->geometry());
     m_rectSet.insert(geometry);
     item->setGeometryInternal(geometry);
 }
 
-bool QnLayoutModel::moveItems(const QList<QnLayoutItemModel *> &items, const QList<QRect> &geometries) {
+bool QnWorkbenchLayout::moveItems(const QList<QnWorkbenchItem *> &items, const QList<QRect> &geometries) {
     if (items.size() != geometries.size()) {
         qnWarning("Sizes of the given containers do not match.");
         return false;
@@ -100,7 +100,7 @@ bool QnLayoutModel::moveItems(const QList<QnLayoutItemModel *> &items, const QLi
         return true;
 
     /* Check whether it's our items. */
-    foreach (QnLayoutItemModel *item, items) {
+    foreach (QnWorkbenchItem *item, items) {
         if (item->layout() != this) {
             qnWarning("One of the given items does not belong to this layout.");
             return false;
@@ -127,24 +127,24 @@ bool QnLayoutModel::moveItems(const QList<QnLayoutItemModel *> &items, const QLi
     }
 
     /* Check validity of new positions relative to existing items. */
-    QSet<QnLayoutItemModel *> replacedItems;
+    QSet<QnWorkbenchItem *> replacedItems;
     for(int i = 0; i < items.size(); i++) {
         if(!items[i]->isPinned())
             continue;
 
         m_itemMap.values(geometries[i], &replacedItems);
     }
-    foreach (QnLayoutItemModel *item, items)
+    foreach (QnWorkbenchItem *item, items)
         replacedItems.remove(item);
     if (!replacedItems.empty())
         return false;
 
     /* Move. */
-    foreach (QnLayoutItemModel *item, items)
+    foreach (QnWorkbenchItem *item, items)
         if(item->isPinned())
             m_itemMap.clear(item->geometry());
     for (int i = 0; i < items.size(); i++) {
-        QnLayoutItemModel *item = items[i];
+        QnWorkbenchItem *item = items[i];
 
         if(item->isPinned())
             m_itemMap.fill(geometries[i], item);
@@ -154,7 +154,7 @@ bool QnLayoutModel::moveItems(const QList<QnLayoutItemModel *> &items, const QLi
     return true;
 }
 
-bool QnLayoutModel::pinItem(QnLayoutItemModel *item, const QRect &geometry) {
+bool QnWorkbenchLayout::pinItem(QnWorkbenchItem *item, const QRect &geometry) {
     if(item->layout() != this) {
         qnWarning("Cannot pin an item that does not belong to this layout");
         return false;
@@ -168,11 +168,11 @@ bool QnLayoutModel::pinItem(QnLayoutItemModel *item, const QRect &geometry) {
 
     m_itemMap.fill(geometry, item);
     moveItemInternal(item, geometry);
-    item->setFlagInternal(QnLayoutItemModel::Pinned, true);
+    item->setFlagInternal(QnWorkbenchItem::Pinned, true);
     return true;
 }
 
-bool QnLayoutModel::unpinItem(QnLayoutItemModel *item) {
+bool QnWorkbenchLayout::unpinItem(QnWorkbenchItem *item) {
     if(item->layout() != this) {
         qnWarning("Cannot unpin an item that does not belong to this layout");
         return false;
@@ -182,24 +182,24 @@ bool QnLayoutModel::unpinItem(QnLayoutItemModel *item) {
         return true;
 
     m_itemMap.clear(item->geometry());
-    item->setFlagInternal(QnLayoutItemModel::Pinned, false);
+    item->setFlagInternal(QnWorkbenchItem::Pinned, false);
     return true;
 }
 
-QnLayoutItemModel *QnLayoutModel::item(const QPoint &position) const {
+QnWorkbenchItem *QnWorkbenchLayout::item(const QPoint &position) const {
     return m_itemMap.value(position, NULL);
 }
 
-QSet<QnLayoutItemModel *> QnLayoutModel::items(const QRect &region) const {
+QSet<QnWorkbenchItem *> QnWorkbenchLayout::items(const QRect &region) const {
     return m_itemMap.values(region);
 }
 
-QSet<QnLayoutItemModel *> QnLayoutModel::items(const QList<QRect> &regions) const {
+QSet<QnWorkbenchItem *> QnWorkbenchLayout::items(const QList<QRect> &regions) const {
     return m_itemMap.values(regions);
 }
 
 namespace {
-    bool isFree(const QnMatrixMap<QnLayoutItemModel *> &map, const QPoint &pos, const QSize &size, int dr, int dc, QRect *result) {
+    bool isFree(const QnMatrixMap<QnWorkbenchItem *> &map, const QPoint &pos, const QSize &size, int dr, int dc, QRect *result) {
         QRect rect = QRect(pos + QPoint(dc, dr), size);
 
         if(!map.isOccupied(rect)) {
@@ -211,7 +211,7 @@ namespace {
     }
 }
 
-QRect QnLayoutModel::closestFreeSlot(const QPoint &pos, const QSize &size) const {
+QRect QnWorkbenchLayout::closestFreeSlot(const QPoint &pos, const QSize &size) const {
     QRect result;
 
     for(int l = 0; ; l++) {

@@ -1,5 +1,5 @@
-#ifndef QN_DISPLAY_CONTROLLER_H
-#define QN_DISPLAY_CONTROLLER_H
+#ifndef QN_WORKBENCH_CONTROLLER_H
+#define QN_WORKBENCH_CONTROLLER_H
 
 #include <QObject>
 #include <QScopedPointer>
@@ -17,11 +17,11 @@ class RubberBandInstrument;
 class ResizingInstrument;
 class ArchiveDropInstrument;
 
-class QnLayoutDisplay;
-class QnLayoutModel;
-class QnDisplayState;
+class QnWorkbenchManager;
+class QnWorkbenchLayout;
+class QnWorkbench;
 class QnDisplayWidget;
-class QnLayoutGridMapper;
+class QnWorkbenchGridMapper;
 
 
 /**
@@ -29,18 +29,18 @@ class QnLayoutGridMapper;
  * 
  * It also presents some functions for high-level scene content manipulation.
  */
-class QnDisplayController: public QObject, protected QnSceneUtility {
+class QnWorkbenchController: public QObject, protected QnSceneUtility {
     Q_OBJECT;
 public:
-    QnDisplayController(QnLayoutDisplay *synchronizer, QObject *parent = NULL);
+    QnWorkbenchController(QnWorkbenchManager *synchronizer, QObject *parent = NULL);
 
-    virtual ~QnDisplayController();
+    virtual ~QnWorkbenchController();
 
-    QnDisplayState *state() const;
+    QnWorkbench *state() const;
 
-    QnLayoutModel *layout() const;
+    QnWorkbenchLayout *layout() const;
 
-    QnLayoutGridMapper *mapper() const;
+    QnWorkbenchGridMapper *mapper() const;
 
     void drop(const QUrl &url, const QPoint &gridPos, bool checkUrls = true);
     void drop(const QList<QUrl> &urls, const QPoint &gridPos, bool checkUrls = true);
@@ -71,7 +71,7 @@ private:
 
 private:
     /** Display synchronizer. */
-    QnLayoutDisplay *m_synchronizer;
+    QnWorkbenchManager *m_synchronizer;
 
     /** Instrument manager for the scene. */ 
     InstrumentManager *m_manager;
@@ -95,4 +95,4 @@ private:
     ArchiveDropInstrument *m_archiveDropInstrument;
 };
 
-#endif // QN_DISPLAY_CONTROLLER_H
+#endif // QN_WORKBENCH_CONTROLLER_H

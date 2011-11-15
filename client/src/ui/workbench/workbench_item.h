@@ -1,16 +1,16 @@
-#ifndef QN_UI_LAYOUT_ITEM_H
-#define QN_UI_LAYOUT_ITEM_H
+#ifndef QN_WORKBENCH_ITEM_H
+#define QN_WORKBENCH_ITEM_H
 
 #include <QObject>
 #include <QScopedPointer>
 
-class QnLayoutModel;
+class QnWorkbenchLayout;
 class QnResourceDisplay;
 
 /**
  * Layout item model. Video, image, folder, or anything else.
  */
-class QnLayoutItemModel: public QObject {
+class QnWorkbenchItem: public QObject {
     Q_OBJECT;
     Q_FLAGS(ItemFlag ItemFlags);
 public:
@@ -25,17 +25,17 @@ public:
      * \param resourceUniqueId          Unique identifier of a resource.
      * \param parent                    Parent of this object.                
      */
-    QnLayoutItemModel(const QString &resourceUniqueId, QObject *parent = NULL);
+    QnWorkbenchItem(const QString &resourceUniqueId, QObject *parent = NULL);
 
     /**
      * Virtual destructor.
      */
-    virtual ~QnLayoutItemModel();
+    virtual ~QnWorkbenchItem();
 
     /**
      * \returns                         Layout that this item belongs to, if any.
      */
-    QnLayoutModel *layout() const {
+    QnWorkbenchLayout *layout() const {
         return m_layout;
     }
 
@@ -133,12 +133,13 @@ public:
      * 
      * \returns                         Newly created display, or NULL if display cannot be created.
      */
-    QnResourceDisplay *createDisplay(QObject *parent = NULL);
+    QnResourceDisplay *createDisplay(QObject *parent = NULL); // TODO: move out?
+
 
 signals:
     void geometryChanged(const QRect &oldGeometry, const QRect &newGeometry);
     void geometryDeltaChanged(const QRectF &oldGeometryDelta, const QRectF &newGeometryDelta);
-    void flagsChanged(QnLayoutItemModel::ItemFlags oldFlags, QnLayoutItemModel::ItemFlags newFlags);
+    void flagsChanged(QnWorkbenchItem::ItemFlags oldFlags, QnWorkbenchItem::ItemFlags newFlags);
     void rotationChanged(qreal oldRotation, qreal newRotation);
 
 protected:
@@ -152,10 +153,10 @@ protected:
     void setFlagInternal(ItemFlag flag, bool value);
 
 private:
-    friend class QnLayoutModel;
+    friend class QnWorkbenchLayout;
 
     /** Layout that this item belongs to. */
-    QnLayoutModel *m_layout;
+    QnWorkbenchLayout *m_layout;
 
     /** Unique identifier of a resource associated with this item. */
     QString m_resourceUniqueId;
@@ -173,6 +174,6 @@ private:
     qreal m_rotation;
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnLayoutItemModel::ItemFlags);
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchItem::ItemFlags);
 
-#endif // QN_UI_LAYOUT_ITEM_H
+#endif // QN_WORKBENCH_ITEM_H

@@ -1,4 +1,4 @@
-#include "layout_grid_mapper.h"
+#include "workbench_grid_mapper.h"
 
 namespace {
     QSizeF operator*(const QSizeF &l, const QSizeF &r)
@@ -22,18 +22,18 @@ namespace {
     }
 }
 
-QnLayoutGridMapper::QnLayoutGridMapper(QObject *parent):
+QnWorkbenchGridMapper::QnWorkbenchGridMapper(QObject *parent):
     QObject(parent),
     m_origin(0.0, 0.0),
     m_cellSize(1.0, 1.0),
     m_spacing(0.0, 0.0)
 {}
 
-QnLayoutGridMapper::~QnLayoutGridMapper() {
+QnWorkbenchGridMapper::~QnWorkbenchGridMapper() {
     return;
 }
 
-void QnLayoutGridMapper::setOrigin(const QPointF &origin) {
+void QnWorkbenchGridMapper::setOrigin(const QPointF &origin) {
     if(qFuzzyCompare(origin, m_origin))
         return;
 
@@ -43,7 +43,7 @@ void QnLayoutGridMapper::setOrigin(const QPointF &origin) {
     emit originChanged(oldOrigin, m_origin);
 }
 
-void QnLayoutGridMapper::setCellSize(const QSizeF &cellSize) {
+void QnWorkbenchGridMapper::setCellSize(const QSizeF &cellSize) {
     if(qFuzzyCompare(cellSize, m_cellSize))
         return;
 
@@ -53,7 +53,7 @@ void QnLayoutGridMapper::setCellSize(const QSizeF &cellSize) {
     emit cellSizeChanged(oldCellSize, m_cellSize);
 }
 
-void QnLayoutGridMapper::setSpacing(const QSizeF &spacing) {
+void QnWorkbenchGridMapper::setSpacing(const QSizeF &spacing) {
     if(qFuzzyCompare(spacing, m_spacing))
         return;
 
@@ -63,15 +63,15 @@ void QnLayoutGridMapper::setSpacing(const QSizeF &spacing) {
     emit spacingChanged(oldSpacing, m_spacing);
 }
 
-void QnLayoutGridMapper::setVerticalSpacing(qreal spacing) {
+void QnWorkbenchGridMapper::setVerticalSpacing(qreal spacing) {
     setSpacing(QSizeF(m_spacing.width(), spacing));
 }
 
-void QnLayoutGridMapper::setHorizontalSpacing(qreal spacing) {
+void QnWorkbenchGridMapper::setHorizontalSpacing(qreal spacing) {
     setSpacing(QSizeF(spacing, m_spacing.height()));
 }
 
-QPoint QnLayoutGridMapper::mapToGrid(const QPointF &pos) const {
+QPoint QnWorkbenchGridMapper::mapToGrid(const QPointF &pos) const {
     /* Compute origin and a unit vectors in the cell-based coordinate system. */
     QPointF origin = mapFromGrid(QPoint(0, 0)) - toPoint(m_spacing) / 2;
     QPointF unit = toPoint(m_cellSize + m_spacing);
@@ -81,11 +81,11 @@ QPoint QnLayoutGridMapper::mapToGrid(const QPointF &pos) const {
     return QPoint(std::floor(gridPos.x()), std::floor(gridPos.y()));
 }
 
-QPointF QnLayoutGridMapper::mapFromGrid(const QPoint &gridPos) const {
+QPointF QnWorkbenchGridMapper::mapFromGrid(const QPoint &gridPos) const {
     return m_origin + toPoint(m_cellSize + m_spacing) * gridPos;
 }
 
-QSize QnLayoutGridMapper::mapToGrid(const QSizeF &size) const {
+QSize QnWorkbenchGridMapper::mapToGrid(const QSizeF &size) const {
     QSizeF gridSize = (size + m_spacing) / (m_cellSize + m_spacing);
     QSizeF ceilGridSize = QSize(std::ceil(gridSize.width()), std::ceil(gridSize.height()));
 
@@ -99,11 +99,11 @@ QSize QnLayoutGridMapper::mapToGrid(const QSizeF &size) const {
     return QSize(ceilGridSize.width(), ceilGridSize.height());
 }
 
-QSizeF QnLayoutGridMapper::mapFromGrid(const QSize &gridSize) const {
+QSizeF QnWorkbenchGridMapper::mapFromGrid(const QSize &gridSize) const {
     return m_cellSize * gridSize + (m_spacing * (gridSize - QSize(1, 1))).expandedTo(QSizeF(0, 0));
 }
 
-QRect QnLayoutGridMapper::mapToGrid(const QRectF &rect) const {
+QRect QnWorkbenchGridMapper::mapToGrid(const QRectF &rect) const {
     QSize gridSize = mapToGrid(rect.size());
 
     /* Compute top-left corner of the rect expanded to integer cell size. */
@@ -113,7 +113,7 @@ QRect QnLayoutGridMapper::mapToGrid(const QRectF &rect) const {
     return QRect(gridTopLeft, gridSize);
 }
 
-QRectF QnLayoutGridMapper::mapFromGrid(const QRect &gridRect) const {
+QRectF QnWorkbenchGridMapper::mapFromGrid(const QRect &gridRect) const {
     return QRectF(
         mapFromGrid(gridRect.topLeft()),
         mapFromGrid(gridRect.size())

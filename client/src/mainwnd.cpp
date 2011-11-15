@@ -12,11 +12,11 @@
 
 #include <ui/graphics/instruments/archivedropinstrument.h>
 
-#include <ui/model/layout_model.h>
-#include <ui/model/layout_grid_mapper.h>
-#include <ui/control/display_controller.h>
-#include <ui/control/layout_display.h>
-#include <ui/control/display_state.h>
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_controller.h>
+#include <ui/workbench/workbench_grid_mapper.h>
+#include <ui/workbench/workbench_layout.h>
+#include <ui/workbench/workbench_manager.h>
 
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
@@ -69,21 +69,21 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
 
     /* Set up model & control machinery. */
-    QnLayoutModel *model = new QnLayoutModel(this);
+    QnWorkbenchLayout *model = new QnWorkbenchLayout(this);
    
     const QSizeF defaultCellSize = QSizeF(150.0, 100.0);
     const QSizeF defaultSpacing = QSizeF(25.0, 25.0);
-    QnDisplayState *state = new QnDisplayState(this);
+    QnWorkbench *state = new QnWorkbench(this);
     state->setLayout(model);
     state->mapper()->setCellSize(defaultCellSize);
     state->mapper()->setSpacing(defaultSpacing);
 
-    QnLayoutDisplay *display = new QnLayoutDisplay(this);
+    QnWorkbenchManager *display = new QnWorkbenchManager(this);
     display->setScene(scene);
     display->setView(view);
-    display->setState(state);
+    display->setWorkbench(state);
 
-    QnDisplayController *controller = new QnDisplayController(display, this);
+    QnWorkbenchController *controller = new QnWorkbenchController(display, this);
 
     /* Process input files. */
     QStringList files;

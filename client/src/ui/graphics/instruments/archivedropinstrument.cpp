@@ -1,11 +1,11 @@
 #include "archivedropinstrument.h"
-#include <ui/control/display_controller.h>
-#include <ui/control/display_state.h>
-#include <ui/model/layout_grid_mapper.h>
+#include <ui/workbench/workbench_controller.h>
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_grid_mapper.h>
 #include <utils/common/warnings.h>
 #include <file_processor.h>
 
-ArchiveDropInstrument::ArchiveDropInstrument(QnDisplayController *controller, QObject *parent):
+ArchiveDropInstrument::ArchiveDropInstrument(QnWorkbenchController *controller, QObject *parent):
     Instrument(VIEWPORT, makeSet(QEvent::DragEnter, QEvent::DragMove, QEvent::DragLeave, QEvent::Drop), parent),
     m_controller(controller)
 {

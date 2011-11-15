@@ -1,9 +1,6 @@
 #include "display_widget_renderer.h"
 #include <QMutexLocker>
-#include <core/resource/resource_media_layout.h>
 #include <camera/gl_renderer.h>
-#include <camera/camdisplay.h>
-#include <ui/control/resource_display.h>
 #include <utils/common/warnings.h>
 
 QnDisplayWidgetRenderer::QnDisplayWidgetRenderer(int channelCount, QObject *parent):

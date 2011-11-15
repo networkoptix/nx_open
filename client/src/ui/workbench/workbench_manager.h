@@ -1,5 +1,5 @@
-#ifndef QN_DISPLAY_SYNCHRONIZER_H
-#define QN_DISPLAY_SYNCHRONIZER_H
+#ifndef QN_WORKBENCH_MANAGER_H
+#define QN_WORKBENCH_MANAGER_H
 
 #include <QObject>
 #include <ui/animation/animation_timer.h>
@@ -14,21 +14,21 @@ class BoundingInstrument;
 class TransformListenerInstrument;
 class ActivityListenerInstrument;
 
-class QnDisplayState;
-class QnLayoutItemModel;
+class QnWorkbench;
+class QnWorkbenchItem;
+class QnWorkbenchLayout;
 class QnDisplayWidget;
 class QnViewportAnimator;
 class QnWidgetAnimator;
 class QnCurtainAnimator;
 class QnCurtainItem;
-class QnLayoutModel;
 
 /**
- * This class ties a display state, a scene and a view together.
+ * This class ties a workbench, a scene and a view together.
  * 
  * It presents some low-level functions for viewport and item manipulation.
  */
-class QnLayoutDisplay: public QObject, protected AnimationTimerListener, protected QnSceneUtility {
+class QnWorkbenchManager: public QObject, protected AnimationTimerListener, protected QnSceneUtility {
     Q_OBJECT;
 public:
     /**
@@ -45,19 +45,19 @@ public:
         FRONT_LAYER
     };
 
-    QnLayoutDisplay(QObject *parent = NULL);
+    QnWorkbenchManager(QObject *parent = NULL);
 
-    virtual ~QnLayoutDisplay();
+    virtual ~QnWorkbenchManager();
 
     InstrumentManager *manager() const {
         return m_manager;
     }
 
-    QnDisplayState *state() const {
-        return m_state;
+    QnWorkbench *workbench() const {
+        return m_workbench;
     }
 
-    void setState(QnDisplayState *state);
+    void setWorkbench(QnWorkbench *workbench);
 
     QGraphicsScene *scene() const {
         return m_scene;
@@ -74,7 +74,7 @@ public:
     /**
      * \param item                      Item to get widget for.
      */
-    QnDisplayWidget *widget(QnLayoutItemModel *item) const;
+    QnDisplayWidget *widget(QnWorkbenchItem *item) const;
 
     /**
      * \param item                      Item to get enclosing geometry for.
@@ -83,7 +83,7 @@ public:
      *                                  Note that actual geometry may differ because of
      *                                  aspect ration constraints.
      */
-    QRectF itemEnclosingGeometry(QnLayoutItemModel *item) const;
+    QRectF itemEnclosingGeometry(QnWorkbenchItem *item) const;
 
     /**
      * \param item                      Item to get geometry for.
@@ -93,7 +93,7 @@ public:
      *                                  Note that actual geometry of the item's widget
      *                                  may differ because of manual dragging / resizing / etc...
      */
-    QRectF itemGeometry(QnLayoutItemModel *item, QRectF *enclosingGeometry = NULL) const;
+    QRectF itemGeometry(QnWorkbenchItem *item, QRectF *enclosingGeometry = NULL) const;
 
     /**
      * \returns                         Bounding geometry of current layout.
@@ -113,7 +113,7 @@ public:
 
     void bringToFront(QGraphicsItem *item);
 
-    void bringToFront(QnLayoutItemModel *item);
+    void bringToFront(QnWorkbenchItem *item);
 
 
     Layer layer(QGraphicsItem *item) const;
@@ -121,7 +121,7 @@ public:
     void setLayer(QGraphicsItem *item, Layer layer);
 
 
-    void synchronize(QnLayoutItemModel *item, bool animate = true);
+    void synchronize(QnWorkbenchItem *item, bool animate = true);
     
     void synchronize(QnDisplayWidget *widget, bool animate = true);
 
@@ -139,29 +139,29 @@ protected:
     
     QnWidgetAnimator *animator(QnDisplayWidget *widget);
 
-    void synchronizeGeometry(QnLayoutItemModel *item, bool animate);
+    void synchronizeGeometry(QnWorkbenchItem *item, bool animate);
     void synchronizeGeometry(QnDisplayWidget *widget, bool animate);
-    void synchronizeLayer(QnLayoutItemModel *item);
+    void synchronizeLayer(QnWorkbenchItem *item);
     void synchronizeLayer(QnDisplayWidget *widget);
     void synchronizeSceneBounds();
 
     qreal layerFront(Layer layer) const;
-    Layer synchronizedLayer(QnLayoutItemModel *item) const;
+    Layer synchronizedLayer(QnWorkbenchItem *item) const;
 
-    void addItemInternal(QnLayoutItemModel *item);
-    void removeItemInternal(QnLayoutItemModel *item);
+    void addItemInternal(QnWorkbenchItem *item);
+    void removeItemInternal(QnWorkbenchItem *item);
 
 protected slots:
     void at_viewport_animationFinished();
 
-    void at_layout_itemAdded(QnLayoutItemModel *item);
-    void at_layout_itemAboutToBeRemoved(QnLayoutItemModel *item);
+    void at_layout_itemAdded(QnWorkbenchItem *item);
+    void at_layout_itemAboutToBeRemoved(QnWorkbenchItem *item);
     
     void at_state_aboutToBeDestroyed();
     void at_state_modeChanged();
-    void at_state_selectedItemChanged(QnLayoutItemModel *oldSelectedItem, QnLayoutItemModel *newSelectedItem);
-    void at_state_zoomedItemChanged(QnLayoutItemModel *oldZoomedItem, QnLayoutItemModel *newZoomedItem);
-    void at_state_layoutChanged(QnLayoutModel *oldLayout, QnLayoutModel *newLayout);
+    void at_state_selectedItemChanged(QnWorkbenchItem *oldSelectedItem, QnWorkbenchItem *newSelectedItem);
+    void at_state_zoomedItemChanged(QnWorkbenchItem *oldZoomedItem, QnWorkbenchItem *newZoomedItem);
+    void at_state_layoutChanged(QnWorkbenchLayout *oldLayout, QnWorkbenchLayout *newLayout);
 
     void at_item_geometryChanged();
     void at_item_geometryDeltaChanged();
@@ -189,8 +189,8 @@ private:
     };
 
 private:
-    QnDisplayState *m_state;
-    QnLayoutModel *m_layout;
+    QnWorkbench *m_workbench;
+    QnWorkbenchLayout *m_layout;
     QGraphicsScene *m_scene;
     QGraphicsView *m_view;
 
@@ -198,7 +198,7 @@ private:
     InstrumentManager *m_manager;
 
     /** Entity to widget mapping. */
-    QHash<QnLayoutItemModel *, QnDisplayWidget *> m_widgetByItem;
+    QHash<QnWorkbenchItem *, QnDisplayWidget *> m_widgetByItem;
 
     /** Item to item properties mapping. */
     QHash<QGraphicsItem *, ItemProperties> m_propertiesByItem;
@@ -231,4 +231,4 @@ private:
     QGraphicsScene *m_dummyScene;
 };
 
-#endif // QN_DISPLAY_SYNCHRONIZER_H
+#endif // QN_WORKBENCH_MANAGER_H

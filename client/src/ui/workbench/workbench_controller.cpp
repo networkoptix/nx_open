@@ -1,4 +1,4 @@
-#include "display_controller.h"
+#include "workbench_controller.h"
 #include <cassert>
 #include <QGraphicsScene>
 #include <QGraphicsView>
@@ -23,16 +23,16 @@
 
 #include <ui/graphics/items/display_widget.h>
 
-#include <ui/model/layout_model.h>
-#include <ui/model/resource_item_model.h>
-#include <ui/model/layout_grid_mapper.h>
-
 #include <file_processor.h>
 
-#include "display_state.h"
-#include "layout_display.h"
+#include "workbench_layout.h"
+#include "workbench_item.h"
+#include "workbench_grid_mapper.h"
+#include "workbench.h"
+#include "workbench_manager.h"
 
-QnDisplayController::QnDisplayController(QnLayoutDisplay *synchronizer, QObject *parent):
+
+QnWorkbenchController::QnWorkbenchController(QnWorkbenchManager *synchronizer, QObject *parent):
     QObject(parent),
     m_synchronizer(synchronizer),
     m_manager(synchronizer->manager())
@@ -100,48 +100,48 @@ QnDisplayController::QnDisplayController(QnLayoutDisplay *synchronizer, QObject 
     connect(m_synchronizer,             SIGNAL(viewportUngrabbed()),                                            this, SLOT(at_viewportUngrabbed()));
 }
 
-QnDisplayController::~QnDisplayController() {
+QnWorkbenchController::~QnWorkbenchController() {
     return;
 }
 
-QnDisplayState *QnDisplayController::state() const {
-    return m_synchronizer->state();
+QnWorkbench *QnWorkbenchController::state() const {
+    return m_synchronizer->workbench();
 }
 
-QnLayoutModel *QnDisplayController::layout() const {
-    QnDisplayState *state = this->state();
+QnWorkbenchLayout *QnWorkbenchController::layout() const {
+    QnWorkbench *state = this->state();
     if(state == NULL)
         return NULL;
 
     return state->layout();
 }
 
-QnLayoutGridMapper *QnDisplayController::mapper() const {
-    QnDisplayState *state = this->state();
+QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
+    QnWorkbench *state = this->state();
     if(state == NULL)
         return NULL;
 
     return state->mapper();
 }
 
-void QnDisplayController::drop(const QUrl &url, const QPoint &gridPos, bool checkUrls) {
+void QnWorkbenchController::drop(const QUrl &url, const QPoint &gridPos, bool checkUrls) {
     drop(url.toLocalFile(), gridPos, checkUrls);
 }
 
-void QnDisplayController::drop(const QList<QUrl> &urls, const QPoint &gridPos, bool checkUrls) {
+void QnWorkbenchController::drop(const QList<QUrl> &urls, const QPoint &gridPos, bool checkUrls) {
     QList<QString> files;
     foreach(const QUrl &url, urls)
         files.push_back(url.toLocalFile());
     drop(files, gridPos, checkUrls);
 }
 
-void QnDisplayController::drop(const QString &file, const QPoint &gridPos, bool checkFiles) {
+void QnWorkbenchController::drop(const QString &file, const QPoint &gridPos, bool checkFiles) {
     QList<QString> files;
     files.push_back(file);
     drop(files, gridPos, checkFiles);
 }
 
-void QnDisplayController::drop(const QList<QString> &files, const QPoint &gridPos, bool checkFiles) {
+void QnWorkbenchController::drop(const QList<QString> &files, const QPoint &gridPos, bool checkFiles) {
     if(!checkFiles) {
         dropInternal(files, gridPos);
     } else {
@@ -155,8 +155,8 @@ void QnDisplayController::drop(const QList<QString> &files, const QPoint &gridPo
     }
 }
 
-void QnDisplayController::dropInternal(const QList<QString> &files, const QPoint &gridPos) {
-    QnLayoutModel *layout = this->layout();
+void QnWorkbenchController::dropInternal(const QList<QString> &files, const QPoint &gridPos) {
+    QnWorkbenchLayout *layout = this->layout();
     if(layout == NULL)
         return;
 
@@ -164,7 +164,7 @@ void QnDisplayController::dropInternal(const QList<QString> &files, const QPoint
 
     QRect geometry(gridPos, QSize(1, 1));
     foreach(QnResourcePtr resource, resources) {
-        QnLayoutItemModel *item = new QnLayoutItemModel(resource->getUniqueId());
+        QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId());
         item->setGeometry(geometry);
 
         layout->addItem(item);
@@ -176,7 +176,7 @@ void QnDisplayController::dropInternal(const QList<QString> &files, const QPoint
     }
 }
 
-void QnDisplayController::updateGeometryDelta(QnDisplayWidget *widget) {
+void QnWorkbenchController::updateGeometryDelta(QnDisplayWidget *widget) {
     if(widget->item()->isPinned())
         return;
 
@@ -195,13 +195,13 @@ void QnDisplayController::updateGeometryDelta(QnDisplayWidget *widget) {
     widget->item()->setGeometryDelta(geometryDelta);
 }
 
-void QnDisplayController::at_resizingStarted(QGraphicsView *, QGraphicsWidget *item) {
+void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget *item) {
     qDebug("RESIZING STARTED");
 
     m_synchronizer->bringToFront(item);
 }
 
-void QnDisplayController::at_resizingFinished(QGraphicsView *, QGraphicsWidget *item) {
+void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget *item) {
     qDebug("RESIZING FINISHED");
 
     QnDisplayWidget *widget = dynamic_cast<QnDisplayWidget *>(item);
@@ -209,7 +209,7 @@ void QnDisplayController::at_resizingFinished(QGraphicsView *, QGraphicsWidget *
         return;
 
     QRect newRect = mapper()->mapToGrid(widget->geometry());
-    QSet<QnLayoutItemModel *> entities = layout()->items(newRect);
+    QSet<QnWorkbenchItem *> entities = layout()->items(newRect);
     entities.remove(widget->item());
     if (entities.empty()) {
         widget->item()->setGeometry(newRect);
@@ -219,21 +219,21 @@ void QnDisplayController::at_resizingFinished(QGraphicsView *, QGraphicsWidget *
     m_synchronizer->synchronize(widget->item());
 }
 
-void QnDisplayController::at_draggingStarted(QGraphicsView *, QList<QGraphicsItem *> items) {
+void QnWorkbenchController::at_draggingStarted(QGraphicsView *, QList<QGraphicsItem *> items) {
     qDebug("DRAGGING STARTED");
 
     foreach(QGraphicsItem *item, items) {
         m_synchronizer->bringToFront(item);
-        m_synchronizer->setLayer(item, QnLayoutDisplay::FRONT_LAYER);
+        m_synchronizer->setLayer(item, QnWorkbenchManager::FRONT_LAYER);
     }
 }
 
-void QnDisplayController::at_draggingFinished(QGraphicsView *view, QList<QGraphicsItem *> items) {
+void QnWorkbenchController::at_draggingFinished(QGraphicsView *view, QList<QGraphicsItem *> items) {
     qDebug("DRAGGING FINISHED");
 
     /* Get models and drag delta. */
     QList<QnDisplayWidget *> widgets;
-    QList<QnLayoutItemModel *> models;
+    QList<QnWorkbenchItem *> models;
     QPoint delta;
     foreach (QGraphicsItem *item, items) {
         QnDisplayWidget *widget = dynamic_cast<QnDisplayWidget *>(item);
@@ -258,11 +258,11 @@ void QnDisplayController::at_draggingFinished(QGraphicsView *view, QList<QGraphi
 
         /* Handle single widget case. */
         if(models.size() == 1) {
-            QnLayoutItemModel *draggedModel = models[0];
+            QnWorkbenchItem *draggedModel = models[0];
 
             /* Find item that dragged item was dropped on. */ 
             QPoint cursorPos = QCursor::pos();
-            QnLayoutItemModel *replacedModel = layout()->item(mapper()->mapToGrid(view->mapToScene(view->mapFromGlobal(cursorPos))));
+            QnWorkbenchItem *replacedModel = layout()->item(mapper()->mapToGrid(view->mapToScene(view->mapFromGlobal(cursorPos))));
 
             /* Switch places if dropping smaller one on a bigger one. */
             if(replacedModel != NULL && replacedModel != draggedModel && draggedModel->isPinned()) {
@@ -280,16 +280,16 @@ void QnDisplayController::at_draggingFinished(QGraphicsView *view, QList<QGraphi
         /* Handle all other cases. */
         if(!finished) {
             QList<QRect> replacedGeometries;
-            foreach (QnLayoutItemModel *model, models) {
+            foreach (QnWorkbenchItem *model, models) {
                 QRect geometry = model->geometry().adjusted(delta.x(), delta.y(), delta.x(), delta.y());
                 geometries.push_back(geometry);
                 if(model->isPinned())
                     replacedGeometries.push_back(geometry);
             }
 
-            QList<QnLayoutItemModel *> replacedModels = layout()->items(replacedGeometries).subtract(models.toSet()).toList();
+            QList<QnWorkbenchItem *> replacedModels = layout()->items(replacedGeometries).subtract(models.toSet()).toList();
             replacedGeometries.clear();
-            foreach (QnLayoutItemModel *model, replacedModels)
+            foreach (QnWorkbenchItem *model, replacedModels)
                 replacedGeometries.push_back(model->geometry().adjusted(-delta.x(), -delta.y(), -delta.x(), -delta.y()));
 
             models.append(replacedModels);
@@ -306,29 +306,29 @@ void QnDisplayController::at_draggingFinished(QGraphicsView *view, QList<QGraphi
             updateGeometryDelta(widget);
 
     /* Re-sync everything. */
-    foreach(QnLayoutItemModel *model, models)
+    foreach(QnWorkbenchItem *model, models)
         m_synchronizer->synchronize(model);
 }
 
-void QnDisplayController::at_item_clicked(QGraphicsView *, QGraphicsItem *item) {
+void QnWorkbenchController::at_item_clicked(QGraphicsView *, QGraphicsItem *item) {
     qDebug("CLICKED");
 
     QnDisplayWidget *widget = dynamic_cast<QnDisplayWidget *>(item);
     if(widget == NULL)
         return;
 
-    QnLayoutItemModel *model = widget->item();
+    QnWorkbenchItem *model = widget->item();
     state()->setSelectedItem(state()->selectedItem() == model ? NULL : model);
 }
 
-void QnDisplayController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem *item) {
+void QnWorkbenchController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem *item) {
     qDebug("DOUBLE CLICKED");
 
     QnDisplayWidget *widget = dynamic_cast<QnDisplayWidget *>(item);
     if(widget == NULL)
         return;
 
-    QnLayoutItemModel *model = widget->item();
+    QnWorkbenchItem *model = widget->item();
     if(state()->zoomedItem() == model) {
         QRectF viewportGeometry = m_synchronizer->viewportGeometry();
         QRectF zoomedItemGeometry = m_synchronizer->itemGeometry(state()->zoomedItem());
@@ -345,14 +345,14 @@ void QnDisplayController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem *
     }
 }
 
-void QnDisplayController::at_scene_clicked(QGraphicsView *) {
+void QnWorkbenchController::at_scene_clicked(QGraphicsView *) {
     if(state() == NULL)
         return;
 
     state()->setSelectedItem(NULL);
 }
 
-void QnDisplayController::at_scene_doubleClicked(QGraphicsView *) {
+void QnWorkbenchController::at_scene_doubleClicked(QGraphicsView *) {
     if(state() == NULL)
         return;
 
@@ -360,10 +360,10 @@ void QnDisplayController::at_scene_doubleClicked(QGraphicsView *) {
     m_synchronizer->fitInView();
 }
 
-void QnDisplayController::at_viewportGrabbed() {
+void QnWorkbenchController::at_viewportGrabbed() {
     qDebug("VIEWPORT GRABBED");
 }
 
-void QnDisplayController::at_viewportUngrabbed() {
+void QnWorkbenchController::at_viewportUngrabbed() {
     qDebug("VIEWPORT UNGRABBED");
 }

@@ -1,12 +1,12 @@
-#include "resource_item_model.h"
+#include "workbench_item.h"
 #include <cassert>
 #include <utils/common/scene_utility.h>
 #include <core/resource/resource.h>
 #include <core/resourcemanagment/resource_pool.h>
-#include <ui/control/resource_display.h>
-#include "layout_model.h"
+#include <camera/resource_display.h>
+#include "workbench_layout.h"
 
-QnLayoutItemModel::QnLayoutItemModel(const QString &resourceUniqueId, QObject *parent): 
+QnWorkbenchItem::QnWorkbenchItem(const QString &resourceUniqueId, QObject *parent): 
     QObject(parent), 
     m_resourceUniqueId(resourceUniqueId),
     m_layout(NULL),
@@ -14,16 +14,16 @@ QnLayoutItemModel::QnLayoutItemModel(const QString &resourceUniqueId, QObject *p
     m_rotation(0.0)
 {}
 
-QnLayoutItemModel::~QnLayoutItemModel() {
+QnWorkbenchItem::~QnWorkbenchItem() {
     ensureRemoved();
 }
 
-void QnLayoutItemModel::ensureRemoved() {
+void QnWorkbenchItem::ensureRemoved() {
     if(m_layout != NULL)
         m_layout->removeItem(this);
 }
 
-bool QnLayoutItemModel::setGeometry(const QRect &geometry) {
+bool QnWorkbenchItem::setGeometry(const QRect &geometry) {
     if(m_layout != NULL)
         return m_layout->moveItem(this, geometry);
 
@@ -31,7 +31,7 @@ bool QnLayoutItemModel::setGeometry(const QRect &geometry) {
     return true;
 }
 
-void QnLayoutItemModel::setGeometryInternal(const QRect &geometry) {
+void QnWorkbenchItem::setGeometryInternal(const QRect &geometry) {
     if(m_geometry == geometry)
         return;
 
@@ -41,7 +41,7 @@ void QnLayoutItemModel::setGeometryInternal(const QRect &geometry) {
     emit geometryChanged(oldGeometry, m_geometry);
 }
 
-bool QnLayoutItemModel::setGeometryDelta(const QRectF &geometryDelta) {
+bool QnWorkbenchItem::setGeometryDelta(const QRectF &geometryDelta) {
     if(isPinned())
         return false;
 
@@ -55,7 +55,7 @@ bool QnLayoutItemModel::setGeometryDelta(const QRectF &geometryDelta) {
     return true;
 }
 
-bool QnLayoutItemModel::setFlag(ItemFlag flag, bool value) {
+bool QnWorkbenchItem::setFlag(ItemFlag flag, bool value) {
     if(checkFlag(flag) == value)
         return true;
 
@@ -71,7 +71,7 @@ bool QnLayoutItemModel::setFlag(ItemFlag flag, bool value) {
     return true;
 }
 
-void QnLayoutItemModel::setFlagInternal(ItemFlag flag, bool value) {
+void QnWorkbenchItem::setFlagInternal(ItemFlag flag, bool value) {
     if(checkFlag(flag) == value)
         return;
 
@@ -84,7 +84,7 @@ void QnLayoutItemModel::setFlagInternal(ItemFlag flag, bool value) {
     emit flagsChanged(oldFlags, m_flags);
 }
 
-void QnLayoutItemModel::setRotation(qreal rotation) {
+void QnWorkbenchItem::setRotation(qreal rotation) {
     if(qFuzzyCompare(m_rotation, rotation))
         return;
 
@@ -94,7 +94,7 @@ void QnLayoutItemModel::setRotation(qreal rotation) {
     emit rotationChanged(oldRotation, m_rotation);
 }
 
-QnResourceDisplay *QnLayoutItemModel::createDisplay(QObject *parent) {
+QnResourceDisplay *QnWorkbenchItem::createDisplay(QObject *parent) {
     QnResourcePtr resource = qnResPool->getResourceByUniqId(m_resourceUniqueId);
     if(resource.isNull())
         return NULL;

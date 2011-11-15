@@ -1,12 +1,11 @@
 #include "display_widget.h"
 #include <cassert>
 #include <QPainter>
+#include <core/resource/resource_media_layout.h>
+#include <ui/workbench/workbench_item.h>
+#include <camera/resource_display.h>
 #include <utils/common/warnings.h>
 #include <utils/common/qt_opengl.h>
-#include <core/resource/resource_media_layout.h>
-#include <core/dataprovider/media_streamdataprovider.h>
-#include <ui/model/resource_item_model.h>
-#include <ui/control/resource_display.h>
 #include <settings.h>
 #include "display_widget_renderer.h"
 #include "polygonal_shadow_item.h"
@@ -31,7 +30,7 @@ namespace {
     QPointF defaultShadowDisplacement = QPointF(5.0, 5.0);
 }
 
-QnDisplayWidget::QnDisplayWidget(QnLayoutItemModel *item, QGraphicsItem *parent):
+QnDisplayWidget::QnDisplayWidget(QnWorkbenchItem *item, QGraphicsItem *parent):
     base_type(parent),
     m_item(item),
     m_videoLayout(NULL),

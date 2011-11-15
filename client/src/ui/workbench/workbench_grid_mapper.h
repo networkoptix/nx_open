@@ -1,5 +1,5 @@
-#ifndef QN_DISPLAY_GRID_MAPPER_H
-#define QN_DISPLAY_GRID_MAPPER_H
+#ifndef QN_WORKBENCH_GRID_MAPPER_H
+#define QN_WORKBENCH_GRID_MAPPER_H
 
 #include <QObject>
 #include <QSize>
@@ -7,12 +7,12 @@
 #include <QPoint>
 #include <utils/common/scene_utility.h>
 
-class QnLayoutGridMapper: public QObject, protected QnSceneUtility {
+class QnWorkbenchGridMapper: public QObject, protected QnSceneUtility {
     Q_OBJECT;
 public:
-    QnLayoutGridMapper(QObject *parent = NULL);
+    QnWorkbenchGridMapper(QObject *parent = NULL);
 
-    virtual ~QnLayoutGridMapper();
+    virtual ~QnWorkbenchGridMapper();
 
     /**
      * \returns                         Origin of the grid coordinate system.
@@ -145,4 +145,4 @@ private:
 };
 
 
-#endif // QN_DISPLAY_GRID_MAPPER_H
+#endif // QN_WORKBENCH_GRID_MAPPER_H
