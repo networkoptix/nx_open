@@ -57,14 +57,41 @@ QSizeF QnSceneUtility::expanded(qreal aspectRatio, const QSizeF &minSize, Qt::As
         return minSize;
 
     bool expanding = mode == Qt::KeepAspectRatioByExpanding;
-    bool greaterAspectRatio = minSize.width() / minSize.height() > aspectRatio;
+    bool toGreaterAspectRatio = minSize.width() / minSize.height() > aspectRatio;
 
     QSizeF result = minSize;
-    if(expanding ^ greaterAspectRatio) {
+    if(expanding ^ toGreaterAspectRatio) {
         result.setWidth(result.height() * aspectRatio);
     } else {
         result.setHeight(result.width() / aspectRatio);
     }
+    return result;
+}
+
+QRectF QnSceneUtility::expanded(qreal aspectRatio, const QRectF &minRect, Qt::AspectRatioMode mode, Qt::Alignment alignment) {
+    if(mode == Qt::IgnoreAspectRatio)
+        return minRect;
+
+    QSizeF newSize = expanded(aspectRatio, minRect.size(), mode);
+    QRectF result;
+    result.setSize(newSize);
+
+    if(alignment & Qt::AlignHCenter) {
+        result.moveLeft(minRect.left() + (minRect.width() - newSize.width()) / 2);
+    } else if(alignment & Qt::AlignRight) {
+        result.moveRight(minRect.right());
+    } else {
+        result.moveLeft(minRect.left());
+    }
+
+    if(alignment & Qt::AlignVCenter) {
+        result.moveTop(minRect.top() + (minRect.height() - newSize.height()) / 2);
+    } else if(alignment & Qt::AlignBottom) {
+        result.moveBottom(minRect.bottom());
+    } else {
+        result.moveTop(minRect.top());
+    }
+
     return result;
 }
 

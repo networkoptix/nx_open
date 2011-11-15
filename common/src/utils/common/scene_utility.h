@@ -82,13 +82,24 @@ public:
 
     /**
      * Expands an infinitely small size with the given aspect ratio (width to
-     * height ratio) to given minSize.
+     * height ratio) to given minimal size.
      * 
      * \param aspectRatio               Aspect ratio.
      * \param minSize                   Minimal size.
      * \param mode                      Aspect ratio mode.
      */
     static QSizeF expanded(qreal aspectRatio, const QSizeF &minSize, Qt::AspectRatioMode mode);
+
+    /**
+     * Expands an infinitely small rectangle with the given aspect ratio (width to
+     * height ratio) to given minimal rectangle.
+     * 
+     * \param aspectRatio               Aspect ratio.
+     * \param minRect                   Minimal rectangle.
+     * \param mode                      Aspect ratio mode.
+     * \param alignment                 Alignment of the result relative to minimal rectangle.
+     */
+    static QRectF expanded(qreal aspectRatio, const QRectF &minRect, Qt::AspectRatioMode mode, Qt::Alignment alignment = Qt::AlignCenter);
 
     /**
      * Dilates the given rectangle by the given amount.

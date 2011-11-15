@@ -4,6 +4,7 @@
 #include <QWeakPointer>
 #include <ui/widgets2/graphicswidget.h>
 #include <ui/common/constrained_resizable.h>
+#include <utils/common/scene_utility.h>
 #include "polygonal_shadow_item.h"
 
 class QnDisplayWidgetRenderer;
@@ -12,7 +13,7 @@ class QnLayoutItemModel;
 class QnResourceDisplay;
 class QnPolygonalShadowItem;
 
-class QnDisplayWidget: public GraphicsWidget, public QnPolygonalShapeProvider, public ConstrainedResizable {
+class QnDisplayWidget: public GraphicsWidget, public QnPolygonalShapeProvider, public ConstrainedResizable, protected QnSceneUtility {
     Q_OBJECT;
     Q_PROPERTY(QColor frameColor READ frameColor WRITE setFrameColor);
     Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth);
@@ -105,6 +106,29 @@ public:
         return m_aspectRatio > 0.0;
     }
 
+    /**
+     * Every widget is considered inscribed into an enclosing rectangle with a 
+     * fixed aspect ratio. When aspect ratio of a widget changes, actual geometry
+     * of its enclosing rectangle is recalculated, and this widget is re-inscribed
+     * into it.
+     *
+     * \returns                         Aspect ratio of the enclosing rectangle for this widget. 
+     */
+    qreal enclosingAspectRatio() const {
+        return m_enclosingAspectRatio;
+    }
+
+    /**
+     * \param enclosingAspectRatio      New enclosing aspect ratio.
+     */
+    void setEnclosingAspectRatio(qreal enclosingAspectRatio);
+
+    /**
+     * \returns                         Geometry of enclosing rectangle for this widget.
+     */
+    QRectF enclosingGeometry() const;
+
+
 signals:
     void aspectRatioChanged(qreal oldAspectRatio, qreal newAspectRatio);
 
@@ -152,6 +176,9 @@ private:
 
     /** Aspect ratio. Negative value means that aspect ratio is not enforced. */
     qreal m_aspectRatio;
+
+    /** Aspect ratio of the virtual enclosing rectangle. */
+    qreal m_enclosingAspectRatio;
 
     /** Cached size of a single media channel, in screen coordinates. */
     QSize m_channelScreenSize;

@@ -315,11 +315,7 @@ QRectF QnLayoutDisplay::itemGeometry(QnLayoutItemModel *item) const {
     if(!widget->hasAspectRatio())
         return result;
 
-    QSizeF resultSize = expanded(widget->aspectRatio(), result.size(), Qt::KeepAspectRatio);
-    return QRectF(
-        result.center() - toPoint(resultSize) / 2,
-        resultSize
-    );
+    return expanded(widget->aspectRatio(), result, Qt::KeepAspectRatio);
 }
 
 QRectF QnLayoutDisplay::layoutBoundingGeometry() const {

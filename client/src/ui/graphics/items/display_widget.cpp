@@ -3,7 +3,6 @@
 #include <QPainter>
 #include <utils/common/warnings.h>
 #include <utils/common/qt_opengl.h>
-#include <utils/common/scene_utility.h>
 #include <core/resource/resource_media_layout.h>
 #include <core/dataprovider/media_streamdataprovider.h>
 #include <camera/gl_renderer.h>
@@ -41,6 +40,7 @@ QnDisplayWidget::QnDisplayWidget(QnLayoutItemModel *item, QGraphicsItem *parent)
     m_channelCount(0),
     m_renderer(NULL),
     m_aspectRatio(-1.0),
+    m_enclosingAspectRatio(1.0),
     m_frameWidth(0.0)
 {
     /* Set up shadow. */
@@ -94,6 +94,14 @@ void QnDisplayWidget::setShadowDisplacement(const QPointF &displacement) {
     m_shadowDisplacement = displacement;
 
     updateShadowPos();
+}
+
+void QnDisplayWidget::setEnclosingAspectRatio(qreal enclosingAspectRatio) {
+    m_enclosingAspectRatio = enclosingAspectRatio;
+}
+
+QRectF QnDisplayWidget::enclosingGeometry() const {
+    return expanded(m_enclosingAspectRatio, geometry(), Qt::KeepAspectRatioByExpanding);
 }
 
 QPolygonF QnDisplayWidget::provideShape() {
@@ -171,7 +179,7 @@ QSizeF QnDisplayWidget::constrainedSize(const QSizeF constraint) const {
     if(!hasAspectRatio())
         return constraint;
 
-    return QnSceneUtility::expanded(m_aspectRatio, constraint, Qt::KeepAspectRatio);
+    return expanded(m_aspectRatio, constraint, Qt::KeepAspectRatio);
 }
 
 void QnDisplayWidget::at_sourceSizeChanged(const QSize &size) {
@@ -180,8 +188,10 @@ void QnDisplayWidget::at_sourceSizeChanged(const QSize &size) {
     if(qFuzzyCompare(oldAspectRatio, newAspectRatio))
         return;
 
+    QRectF enclosingGeometry = this->enclosingGeometry();
     m_aspectRatio = newAspectRatio;
-    setGeometry(geometry());
+    setGeometry(expanded(m_aspectRatio, enclosingGeometry, Qt::KeepAspectRatio));
+
     emit aspectRatioChanged(oldAspectRatio, newAspectRatio);
 }
 
