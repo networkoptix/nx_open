@@ -8,7 +8,9 @@ class QnMediaResource;
 class QnAbstractArchiveReader;
 class QnAbstractMediaStreamDataProvider;
 class QnAbstractStreamDataProvider;
+class QnVideoResourceLayout;
 class CLCamDisplay;
+class CLLongRunnable;
 
 class QnResourceDisplay: public QObject, protected QnResourceConsumer {
     Q_OBJECT;
@@ -20,6 +22,11 @@ public:
      * \param parent                    Parent of this object.                
      */
     QnResourceDisplay(const QnResourcePtr &resource, QObject *parent = NULL);
+
+    /**
+     * Virtual destructor. 
+     */
+    virtual ~QnResourceDisplay();
 
     /**
      * \returns                         Resource associated with this item.
@@ -49,8 +56,13 @@ public:
      * \returns                         Camera display associated with this item, if any.
      */
     CLCamDisplay *camDisplay() const {
-        return m_camDisplay.data();
+        return m_camDisplay;
     }
+
+    /**
+     * \returns                         Video resource layout, if any, 
+     */
+    const QnVideoResourceLayout *videoLayout() const;
 
     /**
      * \returns                         Length of this item, in microseconds. If the length is not defined, returns -1.
@@ -73,12 +85,17 @@ public:
 
     void pause();
 
-protected:
     virtual void beforeDisconnectFromResource() override;
 
     virtual void disconnectFromResource() override;
 
 private:
+    void cleanUp(CLLongRunnable *runnable) const;
+
+private:
+    /** Media resource, if any. */
+    QnMediaResource *m_mediaResource;
+
     /** Data provider for the associated resource. */
     QnAbstractStreamDataProvider *m_dataProvider;
 
@@ -89,7 +106,7 @@ private:
     QnAbstractArchiveReader *m_archiveProvider;
 
     /** Camera display, if any. */
-    QScopedPointer<CLCamDisplay> m_camDisplay;
+    CLCamDisplay *m_camDisplay;
 };
 
 #endif // QN_UI_DISPLAY_H

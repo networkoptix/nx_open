@@ -2,6 +2,7 @@
 #include <cassert>
 #include <core/dataprovider/media_streamdataprovider.h>
 #include <core/resource/resource_media_layout.h>
+#include <core/resource/media_resource.h>
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
 #include <camera/camdisplay.h>
 #include <utils/common/warnings.h>
@@ -9,20 +10,44 @@
 
 QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *parent):
     QObject(parent),
-    QnResourceConsumer(resource)
+    QnResourceConsumer(resource),
+    m_dataProvider(NULL),
+    m_mediaProvider(NULL),
+    m_archiveProvider(NULL),
+    m_camDisplay(NULL)
 {
     assert(!resource.isNull());
 
-    // TODO: leaking resources here.
+    m_mediaResource = dynamic_cast<QnMediaResource *>(resource.data());
 
     m_dataProvider = resource->createDataProvider(QnResource::Role_Default);
-    m_archiveProvider = dynamic_cast<QnAbstractArchiveReader *>(m_dataProvider);
+    if(m_dataProvider != NULL) {
+        connect(m_dataProvider, SIGNAL(finished()), m_dataProvider, SLOT(deleteLater()));
 
-    m_mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider *>(m_dataProvider);
-    if(m_mediaProvider != NULL) {
-        m_camDisplay.reset(new CLCamDisplay(false));
+        m_archiveProvider = dynamic_cast<QnAbstractArchiveReader *>(m_dataProvider);
 
-        m_mediaProvider->addDataProcessor(m_camDisplay.data());
+        m_mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider *>(m_dataProvider);
+        if(m_mediaProvider != NULL) {
+            m_camDisplay = new CLCamDisplay(false);
+            connect(m_camDisplay, SIGNAL(finished()), m_camDisplay, SLOT(deleteLater()));
+
+            m_mediaProvider->addDataProcessor(m_camDisplay);
+        }
+    }
+}
+
+QnResourceDisplay::~QnResourceDisplay() {
+    disconnectFromResource();
+}
+
+void QnResourceDisplay::cleanUp(CLLongRunnable *runnable) const {
+    if(runnable == NULL)
+        return;
+
+    if(runnable->isRunning()) {
+        runnable->pleaseStop();
+    } else {
+        runnable->deleteLater();
     }
 }
 
@@ -31,23 +56,42 @@ QnResource *QnResourceDisplay::resource() const {
 }
 
 QnMediaResource *QnResourceDisplay::mediaResource() const {
-    return dynamic_cast<QnMediaResource *>(resource()); // TODO: remove dynamic_cast.
+    return resource() == NULL ? NULL : m_mediaResource;
 }
 
 void QnResourceDisplay::beforeDisconnectFromResource() {
     static_cast<QnResourceConsumer *>(m_dataProvider)->beforeDisconnectFromResource();
+
+    if(m_mediaProvider != NULL)
+        m_mediaProvider->removeDataProcessor(m_camDisplay);
+
+    cleanUp(m_dataProvider);
+    cleanUp(m_camDisplay);
 }
 
 void QnResourceDisplay::disconnectFromResource() {
     static_cast<QnResourceConsumer *>(m_dataProvider)->disconnectFromResource();
 
+    m_mediaResource = NULL;
+
     QnResourceConsumer::disconnectFromResource();
 }
 
-void QnResourceDisplay::start() {
-    m_dataProvider->start();
+const QnVideoResourceLayout *QnResourceDisplay::videoLayout() const {
+    if(m_mediaProvider == NULL)
+        return NULL;
 
-    if(!m_camDisplay.isNull())
+    if(m_mediaResource == NULL)
+        return NULL;
+
+    return m_mediaResource->getVideoLayout(m_mediaProvider);
+}
+
+void QnResourceDisplay::start() {
+    if(m_dataProvider != NULL)
+        m_dataProvider->start();
+
+    if(m_camDisplay != NULL)
         m_camDisplay->start();
 }
 

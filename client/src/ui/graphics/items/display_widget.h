@@ -172,7 +172,7 @@ private:
     QnResourceDisplay *m_display;
 
     /** Resource layout of this display widget. */
-    const QnVideoResourceLayout *m_resourceLayout;
+    const QnVideoResourceLayout *m_videoLayout;
 
     /** Number of media channels. */
     int m_channelCount;

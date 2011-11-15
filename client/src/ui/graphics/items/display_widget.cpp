@@ -5,8 +5,6 @@
 #include <utils/common/qt_opengl.h>
 #include <core/resource/resource_media_layout.h>
 #include <core/dataprovider/media_streamdataprovider.h>
-#include <camera/gl_renderer.h>
-#include <camera/camdisplay.h>
 #include <ui/model/resource_item_model.h>
 #include <ui/control/resource_display.h>
 #include <settings.h>
@@ -36,7 +34,7 @@ namespace {
 QnDisplayWidget::QnDisplayWidget(QnLayoutItemModel *item, QGraphicsItem *parent):
     base_type(parent),
     m_item(item),
-    m_resourceLayout(NULL),
+    m_videoLayout(NULL),
     m_channelCount(0),
     m_renderer(NULL),
     m_aspectRatio(-1.0),
@@ -59,17 +57,19 @@ QnDisplayWidget::QnDisplayWidget(QnLayoutItemModel *item, QGraphicsItem *parent)
 
     /* Set up video rendering. */
     m_display = item->createDisplay(this);
-    m_resourceLayout = m_display->mediaResource()->getVideoLayout(m_display->mediaProvider());
-    m_channelCount = m_resourceLayout->numberOfChannels();
-    m_renderer = new QnDisplayWidgetRenderer(m_channelCount, this);
+    m_videoLayout = m_display->videoLayout();
+    m_channelCount = m_videoLayout->numberOfChannels();
+    
+    m_renderer = new QnDisplayWidgetRenderer(m_display);
     connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_sourceSizeChanged(const QSize &)));
-    for(int i = 0; i < m_channelCount; i++)
-        m_display->camDisplay()->addVideoChannel(i, m_renderer, true);
 
     m_display->start();
 }
 
 QnDisplayWidget::~QnDisplayWidget() {
+    m_display->beforeDisconnectFromResource();
+    m_display->disconnectFromResource();
+
     m_renderer->beforeDestroy();
     
     if(!m_shadow.isNull()) {
@@ -194,7 +194,7 @@ QSizeF QnDisplayWidget::constrainedSize(const QSizeF constraint) const {
 
 void QnDisplayWidget::at_sourceSizeChanged(const QSize &size) {
     qreal oldAspectRatio = m_aspectRatio;
-    qreal newAspectRatio = static_cast<qreal>(size.width() * m_resourceLayout->width()) / (size.height() * m_resourceLayout->height());
+    qreal newAspectRatio = static_cast<qreal>(size.width() * m_videoLayout->width()) / (size.height() * m_videoLayout->height());
     if(qFuzzyCompare(oldAspectRatio, newAspectRatio))
         return;
 
@@ -244,12 +244,12 @@ QRectF QnDisplayWidget::channelRect(int channel) const {
         return QRectF(QPointF(0.0, 0.0), size());
 
     QSizeF size = this->size();
-    qreal w = size.width() / m_resourceLayout->width();
-    qreal h = size.height() / m_resourceLayout->height();
+    qreal w = size.width() / m_videoLayout->width();
+    qreal h = size.height() / m_videoLayout->height();
 
     return QRectF(
-        w * m_resourceLayout->v_position(channel), 
-        h * m_resourceLayout->h_position(channel), 
+        w * m_videoLayout->v_position(channel), 
+        h * m_videoLayout->h_position(channel), 
         w, 
         h
     );
@@ -263,7 +263,7 @@ void QnDisplayWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * 
 
     /* Update screen size of a single channel. */
     QSizeF itemScreenSize = painter->combinedTransform().mapRect(boundingRect()).size();
-    QSize channelScreenSize = QSizeF(itemScreenSize.width() / m_resourceLayout->width(), itemScreenSize.height() / m_resourceLayout->height()).toSize();
+    QSize channelScreenSize = QSizeF(itemScreenSize.width() / m_videoLayout->width(), itemScreenSize.height() / m_videoLayout->height()).toSize();
     if(channelScreenSize != m_channelScreenSize) {
         m_channelScreenSize = channelScreenSize;
         m_renderer->setChannelScreenSize(m_channelScreenSize);
@@ -271,13 +271,8 @@ void QnDisplayWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * 
     
     /* Draw content. */
     painter->beginNativePainting();
-    for(int i = 0; i < m_channelCount; i++) {
-        CLGLRenderer *renderer = m_renderer->channelRenderer(i);
-
-        if(!renderer->paintEvent(channelRect(i))) {
-          /* TODO: Failure */
-        }
-    }
+    for(int i = 0; i < m_channelCount; i++)
+        m_renderer->paint(i, channelRect(i));
     painter->endNativePainting();
 }
 

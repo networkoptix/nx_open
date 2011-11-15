@@ -63,8 +63,6 @@ void QnLayoutModel::removeItem(QnLayoutItemModel *item) {
     m_rectSet.remove(item->geometry());
     item->m_layout = NULL;
     m_items.remove(item);
-
-    delete item;
 }
 
 bool QnLayoutModel::moveItem(QnLayoutItemModel *item, const QRect &geometry) {

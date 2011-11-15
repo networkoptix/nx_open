@@ -7,11 +7,12 @@
 class QThread;
 
 class CLGLRenderer;
+class QnResourceDisplay;
 
 class QnDisplayWidgetRenderer: public QObject, public CLAbstractRenderer {
     Q_OBJECT;
 public:
-    QnDisplayWidgetRenderer(int channelCount, QObject *parent = NULL);
+    QnDisplayWidgetRenderer(QnResourceDisplay *display, QObject *parent = NULL);
 
     virtual ~QnDisplayWidgetRenderer();
 
@@ -27,7 +28,7 @@ public:
 
     void setChannelScreenSize(const QSize &screenSize);
 
-    CLGLRenderer *channelRenderer(int channel) const;
+    bool paint(int channel, const QRectF &rect);
 
 signals:
     /**
@@ -41,6 +42,9 @@ private:
     void checkThread(bool inDecodingThread) const;
 
 private:
+    /** Display. */
+    QnResourceDisplay *m_display;
+
     /** Renderers that are used to render the channels. */
     QList<CLGLRenderer *> m_channelRenderers;
 
@@ -50,7 +54,7 @@ private:
     /** Display thread that this channelRenderer is associated with. Used only in debug for error checking. */
     mutable QThread *m_decodingThread;
 
-    /** Mutex that is used for screen size synchronization. */
+    /** Mutex that is used for synchronization. */
     mutable QMutex m_mutex;
 
     /** Current screen size of a single channel, in pixels. */

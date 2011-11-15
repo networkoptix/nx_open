@@ -1,14 +1,22 @@
 #include "display_widget_renderer.h"
 #include <QMutexLocker>
-#include <utils/common/warnings.h>
+#include <core/resource/resource_media_layout.h>
 #include <camera/gl_renderer.h>
+#include <camera/camdisplay.h>
+#include <ui/control/resource_display.h>
+#include <utils/common/warnings.h>
 
-QnDisplayWidgetRenderer::QnDisplayWidgetRenderer(int channelCount, QObject *parent):
+QnDisplayWidgetRenderer::QnDisplayWidgetRenderer(QnResourceDisplay *display, QObject *parent):
     QObject(parent),
+    m_display(display),
     m_decodingThread(NULL)
 {
-    for(int i = 0; i < channelCount; i++)
-        m_channelRenderers.push_back(new CLGLRenderer());
+    int channelCount = m_display->videoLayout()->numberOfChannels();
+    for(int i = 0; i < channelCount; i++) {
+        CLGLRenderer *renderer = new CLGLRenderer();
+        m_channelRenderers.push_back(renderer);
+        display->camDisplay()->addVideoChannel(i, this, true);
+    }
 }
 
 void QnDisplayWidgetRenderer::beforeDestroy() {
@@ -16,19 +24,19 @@ void QnDisplayWidgetRenderer::beforeDestroy() {
 
     foreach(CLGLRenderer *renderer, m_channelRenderers)
         renderer->beforeDestroy();
-
-    foreach(CLGLRenderer *renderer, m_channelRenderers)
-        delete renderer;
 }
 
 QnDisplayWidgetRenderer::~QnDisplayWidgetRenderer() {
-    return;
+    checkThread(false);
+
+    foreach(CLGLRenderer *renderer, m_channelRenderers)
+        delete renderer;
+
+    m_channelRenderers.clear();
 }
 
-CLGLRenderer *QnDisplayWidgetRenderer::channelRenderer(int channel) const {
-    /* Renderers are not changed after this object is constructed, so no
-     * synchronization is needed here. */
-    return m_channelRenderers[channel];
+bool QnDisplayWidgetRenderer::paint(int channel, const QRectF &rect) {
+    return m_channelRenderers[channel]->paintEvent(rect);
 }
 
 void QnDisplayWidgetRenderer::checkThread(bool inDecodingThread) const {
@@ -50,8 +58,6 @@ void QnDisplayWidgetRenderer::checkThread(bool inDecodingThread) const {
 
 void QnDisplayWidgetRenderer::draw(CLVideoDecoderOutput *image) {
     checkThread(true);
-
-    // m_first_draw = false;
 
     m_channelRenderers[image->channel]->draw(image);
 
