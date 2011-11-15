@@ -118,8 +118,6 @@ void ResizingInstrument::drag() {
         return;
     }
 
-    qDebug("TROLOLO %g %g", processor()->mouseScenePos().x(), processor()->mouseScenePos().y());
-
     /* Prepare shortcuts. */
     QGraphicsWidget *widget = m_widget.data();
     const QRectF &startGeometry = m_startGeometry;
