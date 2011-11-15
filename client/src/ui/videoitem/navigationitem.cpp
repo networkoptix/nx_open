@@ -311,6 +311,8 @@ void NavigationItem::setVideoCamera(CLVideoCamera *camera)
 
     m_speedSlider->resetSpeed();
     restoreInfoText();
+    if (m_camera)
+        m_camera->getCamCamDisplay()->disconnect(m_speedSlider, SLOT(onLiveMode(bool)));
 
     m_camera = camera;
 
@@ -319,6 +321,9 @@ void NavigationItem::setVideoCamera(CLVideoCamera *camera)
         setVisible(true);
 
         QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
+
+        connect(m_camera->getCamCamDisplay(), SIGNAL(liveMode(bool)), m_speedSlider, SLOT(onLiveMode(bool)));
+
         setPlaying(!reader->onPause());
     }
     else

@@ -318,15 +318,19 @@ void CLCamDisplay::processNewSpeed(float speed)
 
 bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
 {
+    QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
+    if (!media)
+        return false;
+
+    bool mediaIsLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
+    if (mediaIsLive != m_isRealTimeSource)
+        onRealTimeStreamHint(mediaIsLive);
+
     float speed = m_speed;
     if (m_prevSpeed != speed) {
         processNewSpeed(speed);
         m_prevSpeed = speed;
     }
-
-    QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
-    if (!media)
-        return false;
 
     QnCompressedVideoDataPtr vd = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
     QnCompressedAudioDataPtr ad = qSharedPointerDynamicCast<QnCompressedAudioData>(data);
@@ -652,6 +656,9 @@ void CLCamDisplay::setMTDecoding(bool value)
 void CLCamDisplay::onRealTimeStreamHint(bool value)
 {
     m_isRealTimeSource = value;
+    emit liveMode(m_isRealTimeSource);
+    if (m_isRealTimeSource)
+        m_speed = 1.0f;
 }
 
 void CLCamDisplay::onSlowSourceHint()

@@ -151,6 +151,9 @@ protected:
         }
         m_overflowOccured = false;
 
+        if (m_owner->isLiveDP(media->dataProvider))
+            media->flags |= QnAbstractMediaData::MediaFlags_LIVE;
+
         int rtspChannelNum = media->channelNumber;
         if (media->dataType == QnAbstractMediaData::AUDIO)
             rtspChannelNum += m_owner->numOfVideoChannels();
@@ -297,7 +300,6 @@ public:
         dataProcessor = 0;
     }
 
-
     ~QnRtspConnectionProcessorPrivate()
     {
         deleteDP();
@@ -328,6 +330,12 @@ QnRtspConnectionProcessor::QnRtspConnectionProcessor(TCPSocket* socket, QnTcpLis
 
 QnRtspConnectionProcessor::~QnRtspConnectionProcessor()
 {
+}
+
+bool QnRtspConnectionProcessor::isLiveDP(QnAbstractStreamDataProvider* dp)
+{
+    Q_D(QnRtspConnectionProcessor);
+    return dp == d->liveDP;
 }
 
 void QnRtspConnectionProcessor::parseRequest()

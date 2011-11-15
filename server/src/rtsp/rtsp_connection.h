@@ -5,6 +5,8 @@
 #include "utils/network/ffmpeg_sdp.h"
 #include "utils/network/tcp_connection_processor.h"
 
+class QnAbstractStreamDataProvider;
+
 class QnRtspConnectionProcessor: public QnTCPConnectionProcessor
 {
 public:
@@ -35,6 +37,7 @@ private:
     int composeSetParameter();
     int composeGetParameter();
     void createDataProvider();
+    bool isLiveDP(QnAbstractStreamDataProvider* dp);
 private:
     QN_DECLARE_PRIVATE_DERIVED(QnRtspConnectionProcessor);
     friend class QnRtspDataConsumer;
