@@ -121,6 +121,33 @@ int AppSessionManager::getResourceTypes(QnApiResourceTypeResponsePtr& resourceTy
     return status;
 }
 
+int AppSessionManager::getStorages(QnApiStorageResponsePtr& storages)
+{
+    QByteArray reply;
+
+    int status = sendGetRequest("storage", reply);
+    if (status == 0)
+    {
+        try
+        {
+            QTextStream stream(reply);
+            QStdIStream is(stream.device());
+
+            storages = QnApiStorageResponsePtr(xsd::api::storages::storages (is, xml_schema::flags::dont_validate).release());
+
+            return 0;
+        } catch (const xml_schema::exception& e)
+        {
+            m_lastError = e.what();
+
+            qDebug(e.what());
+            return -1;
+        }
+    }
+
+    return status;
+}
+
 int AppSessionManager::getResources(QnApiResourceResponsePtr& resources)
 {
     QByteArray reply;

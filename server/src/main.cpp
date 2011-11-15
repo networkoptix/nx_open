@@ -261,6 +261,19 @@ int main(int argc, char *argv[])
     restServer.registerHandler("api/RecordedTimePeriods", new QnRecordedChunkListHandler());
     restServer.registerHandler("xsd/*", new QnXsdHelperHandler());
 
+#if 0
+    // Get storages sample code.
+    QnResourceList storages;
+    appServerConnection.getStorages(storages);
+
+    foreach (QnResourcePtr resource, storages)
+    {
+        QnStoragePtr storage = resource.dynamicCast<QnStorage>();
+
+        qDebug() << "Storage: " << storage->getMaxStoreTime() << storage->getIndex();
+    }
+#endif
+
     QnStoragePtr storage0(new QnStorage());
     storage0->setUrl("g:/records");
     storage0->setIndex(0);

@@ -5,6 +5,7 @@
 #include "api/parsers/parse_users.h"
 #include "api/parsers/parse_servers.h"
 #include "api/parsers/parse_resource_types.h"
+#include "api/parsers/parse_storages.h"
 
 #include "api/Types.h"
 #include "api/AppSessionManager.h"
@@ -99,6 +100,20 @@ int QnAppServerConnection::getServers(QnResourceList& servers)
 {
     // todo: implement me
     return 0;
+}
+
+int QnAppServerConnection::getStorages(QnResourceList& storages)
+{
+    QnApiStorageResponsePtr xsdStorages;
+
+    int status = m_sessionManager->getStorages(xsdStorages);
+
+    if (!xsdStorages.isNull())
+    {
+        parseStorages(storages, xsdStorages->storage(), m_resourceFactory);
+    }
+
+    return status;
 }
 
 QString QnAppServerConnection::getLastError() const
