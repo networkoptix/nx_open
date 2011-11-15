@@ -84,6 +84,9 @@ void QnResourceDisplay::disconnectFromResource() {
     cleanUp(m_dataProvider);
     cleanUp(m_camDisplay);
 
+    foreach(detail::QnRendererGuard *guard, m_guards)
+        guard->renderer()->beforeDestroy();
+
     if(!m_started)
         foreach(detail::QnRendererGuard *guard, m_guards)
             delete guard;

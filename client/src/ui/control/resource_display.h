@@ -23,6 +23,10 @@ namespace detail {
 
         ~QnRendererGuard();
 
+        CLAbstractRenderer *renderer() const {
+            return m_renderer;
+        }
+
     private:
         CLAbstractRenderer *m_renderer;
     };

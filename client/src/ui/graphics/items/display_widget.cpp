@@ -69,8 +69,6 @@ QnDisplayWidget::QnDisplayWidget(QnLayoutItemModel *item, QGraphicsItem *parent)
 
 QnDisplayWidget::~QnDisplayWidget() {
     delete m_display;
-
-    m_renderer->beforeDestroy();
     
     if(!m_shadow.isNull()) {
         m_shadow.data()->setShapeProvider(NULL);
