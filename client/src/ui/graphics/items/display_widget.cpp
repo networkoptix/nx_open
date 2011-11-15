@@ -60,15 +60,15 @@ QnDisplayWidget::QnDisplayWidget(QnLayoutItemModel *item, QGraphicsItem *parent)
     m_videoLayout = m_display->videoLayout();
     m_channelCount = m_videoLayout->numberOfChannels();
     
-    m_renderer = new QnDisplayWidgetRenderer(m_display);
+    m_renderer = new QnDisplayWidgetRenderer(m_channelCount);
     connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_sourceSizeChanged(const QSize &)));
+    m_display->addRenderer(m_renderer);
 
     m_display->start();
 }
 
 QnDisplayWidget::~QnDisplayWidget() {
-    m_display->beforeDisconnectFromResource();
-    m_display->disconnectFromResource();
+    delete m_display;
 
     m_renderer->beforeDestroy();
     

@@ -11,6 +11,22 @@ class QnAbstractStreamDataProvider;
 class QnVideoResourceLayout;
 class CLCamDisplay;
 class CLLongRunnable;
+class CLAbstractRenderer;
+
+namespace detail {
+    class QnRendererGuard: public QObject {
+        Q_OBJECT;
+    public:
+        QnRendererGuard(CLAbstractRenderer *renderer): 
+            m_renderer(renderer) 
+        {}
+
+        ~QnRendererGuard();
+
+    private:
+        CLAbstractRenderer *m_renderer;
+    };
+} // namespace detail
 
 class QnResourceDisplay: public QObject, protected QnResourceConsumer {
     Q_OBJECT;
@@ -53,13 +69,6 @@ public:
     }
 
     /**
-     * \returns                         Camera display associated with this item, if any.
-     */
-    CLCamDisplay *camDisplay() const {
-        return m_camDisplay;
-    }
-
-    /**
      * \returns                         Video resource layout, if any, 
      */
     const QnVideoResourceLayout *videoLayout() const;
@@ -85,6 +94,12 @@ public:
 
     void pause();
 
+    /**
+     * \param renderer                  Renderer to assign to this display. Ownership of the renderer is transferred to this display. 
+     */
+    void addRenderer(CLAbstractRenderer *renderer);
+
+protected:
     virtual void beforeDisconnectFromResource() override;
 
     virtual void disconnectFromResource() override;
@@ -107,6 +122,12 @@ private:
 
     /** Camera display, if any. */
     CLCamDisplay *m_camDisplay;
+
+    /** Whether this display was started. */
+    bool m_started;
+
+    /** List of associated renderer guards. */
+    QList<detail::QnRendererGuard *> m_guards;
 };
 
 #endif // QN_UI_DISPLAY_H

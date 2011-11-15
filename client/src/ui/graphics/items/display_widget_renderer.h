@@ -12,7 +12,7 @@ class QnResourceDisplay;
 class QnDisplayWidgetRenderer: public QObject, public CLAbstractRenderer {
     Q_OBJECT;
 public:
-    QnDisplayWidgetRenderer(QnResourceDisplay *display, QObject *parent = NULL);
+    QnDisplayWidgetRenderer(int channelCount, QObject *parent = NULL);
 
     virtual ~QnDisplayWidgetRenderer();
 
@@ -42,9 +42,6 @@ private:
     void checkThread(bool inDecodingThread) const;
 
 private:
-    /** Display. */
-    QnResourceDisplay *m_display;
-
     /** Renderers that are used to render the channels. */
     QList<CLGLRenderer *> m_channelRenderers;
 

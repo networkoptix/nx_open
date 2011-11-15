@@ -15,6 +15,8 @@ struct CLVideoDecoderOutput;
 class CLAbstractRenderer
 {
 public:
+    
+
     /**
      * This function is supposed to be called from <i>decoding</i> thread.
      * It notifies the derived class that a new frame is available for display.

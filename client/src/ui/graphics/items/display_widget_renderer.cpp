@@ -6,17 +6,12 @@
 #include <ui/control/resource_display.h>
 #include <utils/common/warnings.h>
 
-QnDisplayWidgetRenderer::QnDisplayWidgetRenderer(QnResourceDisplay *display, QObject *parent):
+QnDisplayWidgetRenderer::QnDisplayWidgetRenderer(int channelCount, QObject *parent):
     QObject(parent),
-    m_display(display),
     m_decodingThread(NULL)
 {
-    int channelCount = m_display->videoLayout()->numberOfChannels();
-    for(int i = 0; i < channelCount; i++) {
-        CLGLRenderer *renderer = new CLGLRenderer();
-        m_channelRenderers.push_back(renderer);
-        display->camDisplay()->addVideoChannel(i, this, true);
-    }
+    for(int i = 0; i < channelCount; i++)
+        m_channelRenderers.push_back(new CLGLRenderer());
 }
 
 void QnDisplayWidgetRenderer::beforeDestroy() {
@@ -36,6 +31,8 @@ QnDisplayWidgetRenderer::~QnDisplayWidgetRenderer() {
 }
 
 bool QnDisplayWidgetRenderer::paint(int channel, const QRectF &rect) {
+    checkThread(false);
+
     return m_channelRenderers[channel]->paintEvent(rect);
 }
 

@@ -5,8 +5,12 @@
 #include <core/resource/media_resource.h>
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
 #include <camera/camdisplay.h>
+#include <camera/abstractrenderer.h>
 #include <utils/common/warnings.h>
 
+detail::QnRendererGuard::~QnRendererGuard() {
+    delete m_renderer;
+}
 
 QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *parent):
     QObject(parent),
@@ -14,7 +18,8 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
     m_dataProvider(NULL),
     m_mediaProvider(NULL),
     m_archiveProvider(NULL),
-    m_camDisplay(NULL)
+    m_camDisplay(NULL),
+    m_started(false)
 {
     assert(!resource.isNull());
 
@@ -37,6 +42,7 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
 }
 
 QnResourceDisplay::~QnResourceDisplay() {
+    beforeDisconnectFromResource();
     disconnectFromResource();
 }
 
@@ -44,7 +50,7 @@ void QnResourceDisplay::cleanUp(CLLongRunnable *runnable) const {
     if(runnable == NULL)
         return;
 
-    if(runnable->isRunning()) {
+    if(m_started) {
         runnable->pleaseStop();
     } else {
         runnable->deleteLater();
@@ -60,19 +66,35 @@ QnMediaResource *QnResourceDisplay::mediaResource() const {
 }
 
 void QnResourceDisplay::beforeDisconnectFromResource() {
+    if(m_dataProvider == NULL)
+        return;
+
     static_cast<QnResourceConsumer *>(m_dataProvider)->beforeDisconnectFromResource();
+}
+
+void QnResourceDisplay::disconnectFromResource() {
+    if(m_dataProvider == NULL)
+        return; 
+
+    static_cast<QnResourceConsumer *>(m_dataProvider)->disconnectFromResource();
 
     if(m_mediaProvider != NULL)
         m_mediaProvider->removeDataProcessor(m_camDisplay);
 
     cleanUp(m_dataProvider);
     cleanUp(m_camDisplay);
-}
 
-void QnResourceDisplay::disconnectFromResource() {
-    static_cast<QnResourceConsumer *>(m_dataProvider)->disconnectFromResource();
+    if(!m_started)
+        foreach(detail::QnRendererGuard *guard, m_guards)
+            delete guard;
 
     m_mediaResource = NULL;
+
+    m_dataProvider = NULL;
+    m_mediaProvider = NULL;
+    m_archiveProvider = NULL;
+
+    m_camDisplay = NULL;
 
     QnResourceConsumer::disconnectFromResource();
 }
@@ -88,6 +110,8 @@ const QnVideoResourceLayout *QnResourceDisplay::videoLayout() const {
 }
 
 void QnResourceDisplay::start() {
+    m_started = true;
+
     if(m_dataProvider != NULL)
         m_dataProvider->start();
 
@@ -134,3 +158,18 @@ void QnResourceDisplay::pause() {
 
     //m_camera->getCamCamDisplay()->pauseAudio();
 }
+
+void QnResourceDisplay::addRenderer(CLAbstractRenderer *renderer) {
+    if(m_camDisplay == NULL) {
+        delete renderer;
+        return;
+    }
+
+    int channelCount = videoLayout()->numberOfChannels();
+    for(int i = 0; i < channelCount; i++)
+        m_camDisplay->addVideoChannel(i, renderer, true);
+
+    m_guards.push_back(new detail::QnRendererGuard(renderer));
+    connect(m_camDisplay, SIGNAL(finished()), m_guards.back(), SLOT(deleteLater()));
+}
+
