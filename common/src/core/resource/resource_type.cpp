@@ -12,6 +12,8 @@ bool QnResourceType::isCamera() const
     {
         m_isCamera = true;
         m_isCameraSet = true;
+
+        return m_isCamera;
     }
 
     foreach (QnId parentId, allParentList())
@@ -23,6 +25,8 @@ bool QnResourceType::isCamera() const
             {
                 m_isCamera = true;
                 m_isCameraSet = true;
+
+                return m_isCamera;
             }
         }
     }
