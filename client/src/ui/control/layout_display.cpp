@@ -50,9 +50,6 @@ namespace {
     /** Viewport lower size boundary, in scene coordinates. */
     const QSizeF viewportLowerSizeBound = QSizeF(1.0, 1.0);
 
-    const QSizeF defaultCellSize = QSizeF(150.0, 100.0);
-    const QSizeF defaultSpacing = QSizeF(25.0, 25.0);
-
     const int widgetAnimationDurationMsec = 250;
     const int zoomAnimationDurationMsec = 250;
 
@@ -65,20 +62,16 @@ namespace {
 
 } // anonymous namespace
 
-QnLayoutDisplay::QnLayoutDisplay(QnDisplayState *state, QGraphicsScene *scene, QGraphicsView *view, QObject *parent):
+QnLayoutDisplay::QnLayoutDisplay(QGraphicsScene *scene, QGraphicsView *view, QObject *parent):
     QObject(parent),
-    m_state(state),
+    m_state(NULL),
     m_manager(new InstrumentManager(this)),
     m_scene(scene),
     m_view(view),
     m_viewportAnimator(new QnViewportAnimator(view, this)),
     m_frontZ(0.0)
 {
-    assert(state != NULL && scene != NULL && view != NULL);
-
-    /* Provide some meaningful defaults for the grid. */
-    m_state->mapper()->setCellSize(defaultCellSize);
-    m_state->mapper()->setSpacing(defaultSpacing);
+    assert(scene != NULL && view != NULL);
 
     /* Prepare manager. */
     m_manager->registerScene(scene);
@@ -152,32 +145,49 @@ QnLayoutDisplay::QnLayoutDisplay(QnDisplayState *state, QGraphicsScene *scene, Q
     connect(m_viewportAnimator, SIGNAL(animationFinished()),                                            m_boundingInstrument,   SLOT(recursiveEnable()));
     connect(m_viewportAnimator, SIGNAL(animationFinished()),                                            this,                   SLOT(synchronizeSceneBounds()));
 
-    /* Subscribe to state changes and create items. */
-    connect(m_state,            SIGNAL(modeChanged()),                                                  this,                   SLOT(at_state_modeChanged()));
-    connect(m_state,            SIGNAL(selectedItemChanged(QnLayoutItemModel *, QnLayoutItemModel *)),  this,                   SLOT(at_state_selectedItemChanged(QnLayoutItemModel *, QnLayoutItemModel *)));
-    connect(m_state,            SIGNAL(zoomedItemChanged(QnLayoutItemModel *, QnLayoutItemModel *)),    this,                   SLOT(at_state_zoomedItemChanged(QnLayoutItemModel *, QnLayoutItemModel *)));
-    connect(m_state->layout(),  SIGNAL(itemAdded(QnLayoutItemModel *)),                                 this,                   SLOT(at_model_itemAdded(QnLayoutItemModel *)));
-    connect(m_state->layout(),  SIGNAL(itemAboutToBeRemoved(QnLayoutItemModel *)),                      this,                   SLOT(at_model_itemAboutToBeRemoved(QnLayoutItemModel *)));
-    foreach(QnLayoutItemModel *item, m_state->layout()->items())
-        at_model_itemAdded(item);
 
     /* Configure viewport updates. */
     m_updateTimer = new AnimationTimer(this);
     m_updateTimer->setListener(this);
     m_updateTimer->start();
 
-    /* Fire signals if needed. */
-    if(m_state->zoomedItem() != NULL)
-        at_state_zoomedItemChanged(NULL, m_state->zoomedItem());
-    if(m_state->selectedItem() != NULL)
-        at_state_selectedItemChanged(NULL, m_state->selectedItem());
 }
 
 QnLayoutDisplay::~QnLayoutDisplay() {
-    foreach(QnLayoutItemModel *item, m_state->layout()->items())
-        at_model_itemAboutToBeRemoved(item);
 }
 
+void QnLayoutDisplay::setState(QnDisplayState *state) {
+    if(m_state != NULL) {
+        disconnect(m_state, NULL, this, NULL);
+
+        foreach(QnLayoutItemModel *item, m_state->layout()->items())
+            removeItemInternal(item);
+    }
+
+    m_state = state;
+
+    if(m_state != NULL) {
+        /* Subscribe to state changes. */
+        connect(m_state,            SIGNAL(aboutToBeDestroyed()),                                           this,                   SLOT(at_state_aboutToBeDestroyed()));
+        connect(m_state,            SIGNAL(modeChanged()),                                                  this,                   SLOT(at_state_modeChanged()));
+        connect(m_state,            SIGNAL(selectedItemChanged(QnLayoutItemModel *, QnLayoutItemModel *)),  this,                   SLOT(at_state_selectedItemChanged(QnLayoutItemModel *, QnLayoutItemModel *)));
+        connect(m_state,            SIGNAL(zoomedItemChanged(QnLayoutItemModel *, QnLayoutItemModel *)),    this,                   SLOT(at_state_zoomedItemChanged(QnLayoutItemModel *, QnLayoutItemModel *)));
+        connect(m_state->layout(),  SIGNAL(itemAdded(QnLayoutItemModel *)),                                 this,                   SLOT(at_model_itemAdded(QnLayoutItemModel *)));
+        connect(m_state->layout(),  SIGNAL(itemAboutToBeRemoved(QnLayoutItemModel *)),                      this,                   SLOT(at_model_itemAboutToBeRemoved(QnLayoutItemModel *)));
+        
+        /* Create items. */
+        foreach(QnLayoutItemModel *item, m_state->layout()->items())
+            addItemInternal(item);
+
+        /* Fire signals if needed. */
+        if(m_state->zoomedItem() != NULL)
+            at_state_zoomedItemChanged(NULL, m_state->zoomedItem());
+        if(m_state->selectedItem() != NULL)
+            at_state_selectedItemChanged(NULL, m_state->selectedItem());
+    }
+
+    synchronizeSceneBounds();
+}
 
 // -------------------------------------------------------------------------- //
 // QnLayoutDisplay :: item properties
@@ -261,6 +271,46 @@ void QnLayoutDisplay::bringToFront(QnLayoutItemModel *item) {
     }
 
     bringToFront(m_widgetByItem[item]);
+}
+
+void QnLayoutDisplay::addItemInternal(QnLayoutItemModel *item) {
+    QnDisplayWidget *widget = new QnDisplayWidget(item);
+    m_scene->addItem(widget);
+
+    widget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true); /* Optimization. */
+    widget->setFlag(QGraphicsItem::ItemIsSelectable, true);
+    widget->setFlag(QGraphicsItem::ItemIsFocusable, true);
+    widget->setFlag(QGraphicsItem::ItemIsMovable, true);
+
+    widget->setFocusPolicy(Qt::StrongFocus);
+    widget->setWindowFlags(Qt::Window);
+
+    /* Unsetting this flag is VERY important. If it is set, graphics scene
+     * will mess with widget's z value and bring it to front every time 
+     * it is clicked. This will wreak havoc in our layered system.
+     * 
+     * Note that this flag must be unset after Qt::Window window flag is set
+     * because the latter automatically sets the former. */
+    widget->setFlag(QGraphicsItem::ItemIsPanel, false);
+
+    connect(item, SIGNAL(geometryChanged(const QRect &, const QRect &)),                            this, SLOT(at_item_geometryChanged()));
+    connect(item, SIGNAL(geometryDeltaChanged(const QRectF &, const QRectF &)),                     this, SLOT(at_item_geometryDeltaChanged()));
+    connect(item, SIGNAL(rotationChanged(qreal, qreal)),                                            this, SLOT(at_item_rotationChanged()));
+    connect(item, SIGNAL(flagsChanged(QnLayoutItemModel::ItemFlags, QnLayoutItemModel::ItemFlags)), this, SLOT(at_item_flagsChanged()));
+
+    m_widgetByItem.insert(item, widget);
+
+    synchronize(widget, false);
+    bringToFront(widget);
+}
+
+void QnLayoutDisplay::removeItemInternal(QnLayoutItemModel *item) {
+    disconnect(item, NULL, this, NULL);
+
+    QnDisplayWidget *widget = m_widgetByItem[item];
+    m_widgetByItem.remove(item);
+
+    delete widget;
 }
 
 
@@ -403,10 +453,12 @@ void QnLayoutDisplay::synchronizeLayer(QnDisplayWidget *widget) {
 }
 
 void QnLayoutDisplay::synchronizeSceneBounds() {
-    QRectF boundingRect = m_state->zoomedItem() != NULL ? itemGeometry(m_state->zoomedItem()) : layoutBoundingGeometry();
-
-    m_boundingInstrument->setPositionBounds(m_view, boundingRect, 0.0);
-    m_boundingInstrument->setSizeBounds(m_view, viewportLowerSizeBound, Qt::KeepAspectRatioByExpanding, boundingRect.size(), Qt::KeepAspectRatioByExpanding);
+    if(m_state == NULL) 
+        return;
+    
+    QRectF rect = m_state->zoomedItem() != NULL ? itemGeometry(m_state->zoomedItem()) : layoutBoundingGeometry();
+    m_boundingInstrument->setPositionBounds(m_view, rect, 0.0);
+    m_boundingInstrument->setSizeBounds(m_view, viewportLowerSizeBound, Qt::KeepAspectRatioByExpanding, rect.size(), Qt::KeepAspectRatioByExpanding);
 }
 
 
@@ -418,46 +470,17 @@ void QnLayoutDisplay::tick(int /*currentTime*/) {
 }
 
 void QnLayoutDisplay::at_model_itemAdded(QnLayoutItemModel *item) {
-    QnDisplayWidget *widget = new QnDisplayWidget(item);
-    m_scene->addItem(widget);
-
-    widget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true); /* Optimization. */
-    widget->setFlag(QGraphicsItem::ItemIsSelectable, true);
-    widget->setFlag(QGraphicsItem::ItemIsFocusable, true);
-    widget->setFlag(QGraphicsItem::ItemIsMovable, true);
-
-    widget->setFocusPolicy(Qt::StrongFocus);
-    widget->setWindowFlags(Qt::Window);
-
-    /* Unsetting this flag is VERY important. If it is set, graphics scene
-     * will mess with widget's z value and bring it to front every time 
-     * it is clicked. This will wreak havoc in our layered system.
-     * 
-     * Note that this flag must be unset after Qt::Window window flag is set
-     * because the latter automatically sets the former. */
-    widget->setFlag(QGraphicsItem::ItemIsPanel, false);
-
-    connect(item, SIGNAL(geometryChanged(const QRect &, const QRect &)),          this, SLOT(at_item_geometryChanged()));
-    connect(item, SIGNAL(geometryDeltaChanged(const QRectF &, const QRectF &)),   this, SLOT(at_item_geometryDeltaChanged()));
-    connect(item, SIGNAL(rotationChanged(qreal, qreal)),                          this, SLOT(at_item_rotationChanged()));
-    connect(item, SIGNAL(flagsChanged(ItemFlags, ItemFlags)),                     this, SLOT(at_item_flagsChanged()));
-
-    m_widgetByItem.insert(item, widget);
-
-    synchronize(widget, false);
+    addItemInternal(item);
     synchronizeSceneBounds();
-    bringToFront(widget);
 }
 
 void QnLayoutDisplay::at_model_itemAboutToBeRemoved(QnLayoutItemModel *item) {
-    disconnect(item, NULL, this, NULL);
-
-    QnDisplayWidget *widget = m_widgetByItem[item];
-    m_widgetByItem.remove(item);
-
-    delete widget;
-
+    removeItemInternal(item);
     synchronizeSceneBounds();
+}
+
+void QnLayoutDisplay::at_state_aboutToBeDestroyed() {
+    setState(NULL);
 }
 
 void QnLayoutDisplay::at_state_modeChanged() {

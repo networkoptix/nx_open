@@ -202,8 +202,6 @@ void QnDisplayWidget::at_sourceSizeChanged(const QSize &size) {
     m_aspectRatio = newAspectRatio;
     setGeometry(expanded(m_aspectRatio, enclosingGeometry, Qt::KeepAspectRatio));
 
-    qDebug("aspectRatioChanged(%g, %g)", oldAspectRatio, newAspectRatio);
-
     emit aspectRatioChanged(oldAspectRatio, newAspectRatio);
 }
 

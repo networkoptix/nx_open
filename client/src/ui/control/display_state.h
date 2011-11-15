@@ -46,6 +46,7 @@ public:
     void setZoomedItem(QnLayoutItemModel *item);
 
 signals:
+    void aboutToBeDestroyed();
     void modeChanged();
     void selectedItemChanged(QnLayoutItemModel *oldSelectedEntity, QnLayoutItemModel *newSelectedEntity);
     void zoomedItemChanged(QnLayoutItemModel *oldZoomedEntity, QnLayoutItemModel *newZoomedEntity);

@@ -44,13 +44,15 @@ public:
         FRONT_LAYER
     };
 
-    QnLayoutDisplay(QnDisplayState *state, QGraphicsScene *scene, QGraphicsView *view, QObject *parent = NULL);
+    QnLayoutDisplay(QGraphicsScene *scene, QGraphicsView *view, QObject *parent = NULL);
 
     virtual ~QnLayoutDisplay();
 
     QnDisplayState *state() const {
         return m_state;
     }
+
+    void setState(QnDisplayState *state);
 
     InstrumentManager *manager() const {
         return m_manager;
@@ -140,12 +142,16 @@ protected:
     qreal layerFrontZ(Layer layer) const;
     Layer entityLayer(QnLayoutItemModel *entity) const;
 
+    void addItemInternal(QnLayoutItemModel *item);
+    void removeItemInternal(QnLayoutItemModel *item);
+
 protected slots:
     void synchronizeSceneBounds();
 
     void at_model_itemAdded(QnLayoutItemModel *item);
     void at_model_itemAboutToBeRemoved(QnLayoutItemModel *item);
     
+    void at_state_aboutToBeDestroyed();
     void at_state_modeChanged();
     void at_state_selectedItemChanged(QnLayoutItemModel *oldSelectedItem, QnLayoutItemModel *newSelectedItem);
     void at_state_zoomedItemChanged(QnLayoutItemModel *oldZoomedItem, QnLayoutItemModel *newZoomedItem);
@@ -173,9 +179,11 @@ private:
 
 private:
     QnDisplayState *m_state;
-    InstrumentManager *m_manager;
     QGraphicsScene *m_scene;
     QGraphicsView *m_view;
+
+    /** Instrument manager owned by this display. */
+    InstrumentManager *m_manager;
 
     /** Entity to widget mapping. */
     QHash<QnLayoutItemModel *, QnDisplayWidget *> m_widgetByItem;

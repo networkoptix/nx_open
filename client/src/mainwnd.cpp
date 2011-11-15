@@ -13,6 +13,7 @@
 #include <ui/graphics/instruments/archivedropinstrument.h>
 
 #include <ui/model/layout_model.h>
+#include <ui/model/layout_grid_mapper.h>
 #include <ui/control/display_controller.h>
 #include <ui/control/layout_display.h>
 #include <ui/control/display_state.h>
@@ -68,10 +69,18 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
 
     /* Set up model & control machinery. */
-    QnLayoutModel *uiLayout = new QnLayoutModel(this);
-    QnDisplayState *state = new QnDisplayState(uiLayout, this);
-    QnLayoutDisplay *synchronizer = new QnLayoutDisplay(state, scene, view, this);
-    QnDisplayController *controller = new QnDisplayController(synchronizer, this);
+    QnLayoutModel *model = new QnLayoutModel(this);
+   
+    const QSizeF defaultCellSize = QSizeF(150.0, 100.0);
+    const QSizeF defaultSpacing = QSizeF(25.0, 25.0);
+    QnDisplayState *state = new QnDisplayState(model, this);
+    state->mapper()->setCellSize(defaultCellSize);
+    state->mapper()->setSpacing(defaultSpacing);
+
+    QnLayoutDisplay *display = new QnLayoutDisplay(scene, view, this);
+    display->setState(state);
+
+    QnDisplayController *controller = new QnDisplayController(display, this);
 
     /* Process input files. */
     QStringList files;

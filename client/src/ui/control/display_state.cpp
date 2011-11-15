@@ -18,7 +18,9 @@ QnDisplayState::QnDisplayState(QnLayoutModel *model, QObject *parent):
 }    
 
 QnDisplayState::~QnDisplayState() {
-    return;
+    bool signalsBlocked = blockSignals(false);
+    emit aboutToBeDestroyed();
+    blockSignals(signalsBlocked);
 }
 
 void QnDisplayState::setMode(Mode mode) {
