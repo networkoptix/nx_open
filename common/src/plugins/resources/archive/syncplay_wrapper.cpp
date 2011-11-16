@@ -257,7 +257,7 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
     qint64 val = 0;
     foreach(ReaderInfo info, d->readers)
     {
-        val = qMax(info.cam->selfCurrentTime(), 0ll);
+        val = qMax(info.cam->selfCurrentTime(), val);
     }
     return val;
 }
