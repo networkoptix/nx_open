@@ -567,16 +567,17 @@ int RTPSession::readRAWData()
 // demux binary data only
 int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
 {
+    bool readMore = false;
     while (m_tcpSock.isConnected())
     {
-         int readed = readRAWData();
-
-         //readed = qMax(readed, 0);
-
-         if (readed <= 0)
-            return readed;
+        if (readMore) {
+             int readed = readRAWData();
+             if (readed <= 0)
+                return readed;
+        }
 
         quint8* bEnd = m_responseBuffer + m_responseBufferLen;
+
         for(quint8* curPtr = m_responseBuffer; curPtr < bEnd-4; curPtr++)
         {
             if (*curPtr == '$') // start of binary data
@@ -600,6 +601,7 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
                 return dataLen;
             }
         }
+        readMore = true;
     }
     return -1;
 }

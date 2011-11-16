@@ -154,6 +154,17 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
 {
 begin_label:
     bool BOF = false;
+	if (mFirstTime)
+	{
+        // this is here instead if constructor to unload ui thread
+		if (init()) 
+		    mFirstTime = false;
+        else {
+            // If media data can't be opened wait 1 second and try again
+            return QnAbstractMediaDataPtr();
+        }
+	}
+
     {
         QMutexLocker mutex(&m_jumpMtx);
         if (m_requiredJumpTime != AV_NOPTS_VALUE)
@@ -165,16 +176,6 @@ begin_label:
             BOF = true;
         }
     }
-	if (mFirstTime)
-	{
-        // this is here instead if constructor to unload ui thread
-		if (init()) 
-		    mFirstTime = false;
-        else {
-            // If media data can't be opened wait 1 second and try again
-            return QnAbstractMediaDataPtr();
-        }
-	}
 
     bool reverseMode = m_reverseMode;
     bool delegateForNegativeSpeed = m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanProcessNegativeSpeed;

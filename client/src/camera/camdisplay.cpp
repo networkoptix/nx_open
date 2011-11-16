@@ -345,6 +345,8 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
             return true; // ignore audio packet to prevent after jump detection
         }
     }
+    else
+        return true;
 
     bool isReversePacket = media->flags & AV_REVERSE_PACKET;
     bool isReverseMode = speed < 0.0;

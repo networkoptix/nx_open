@@ -93,6 +93,8 @@ QnAbstractMediaDataPtr QnServerArchiveDelegate::getNextData()
     }
     if (data) {
         data->timestamp +=m_currentChunk.startTime;
+
+        //cl_log.log("serverArchiveDelegate. dataTime= ",QDateTime::fromMSecsSinceEpoch(data->timestamp/1000).toString(), cl_logALWAYS);
     }
     return data;
 }

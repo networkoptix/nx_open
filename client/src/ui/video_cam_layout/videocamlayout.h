@@ -117,6 +117,7 @@ private:
 	// removes devices;
 	bool removeDevices(QList<CLAbstractComplicatedItem*> lst, bool removeFromLayoutcontent); 
 
+    void disconnectFromSyncPlay(CLAbstractComplicatedItem* devitem);
 	//================================================
 private:
 
