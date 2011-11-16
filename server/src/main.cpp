@@ -291,6 +291,7 @@ int main(int argc, char *argv[])
         qnResPool->addResource(storage);
         qnStorageMan->addStorage(storage);
     }
+    qnStorageMan->loadFullFileCatalog();
 
     QDir stateDirectory;
     stateDirectory.mkpath(dataLocation + QLatin1String("/state"));

@@ -121,10 +121,15 @@ QString strPadLeft(const QString &str, int len, char ch)
 
 QString closeDirPath(const QString& value)
 {
-    if (value.endsWith('/'))
-        return value;
+    QString tmp = value;
+    for (int i = 0; i < tmp.size(); ++i) {
+        if (tmp[i] == '\\')
+            tmp[i] = '/';
+    }
+    if (tmp.endsWith('/'))
+        return tmp;
     else
-        return value + QString('/');
+        return tmp + QString('/');
 }
 #ifdef Q_OS_WIN32
 qint64 getDiskFreeSpace(const QString& root)

@@ -46,16 +46,17 @@ public:
     bool fileFinished(int duration, const QString& fileName);
 
     static QString dateTimeStr(qint64 dateTimeMks);
-    const QMap<int, QnStoragePtr>& storageRoots() const { return m_storageRoots; }
-    DeviceFileCatalogPtr getFileCatalog(const QnNetworkResourcePtr resource);
+    QnStoragePtr storageRoot(int storage_index) const { return m_storageRoots.value(storage_index); }
+    DeviceFileCatalogPtr getFileCatalog(const QString& mac);
     QnTimePeriodList getRecordedPeriods(QnResourceList resList, qint64 startTime, qint64 endTime, qint64 detailLevel);
+    void loadFullFileCatalog();
 private:
     QnStoragePtr getOptimalStorageRoot();
     void clearSpace(QnStoragePtr storage);
 private:
     typedef QMap<int, QnStoragePtr> StorageMap;
     StorageMap m_storageRoots;
-    typedef QMap<QnNetworkResourcePtr, DeviceFileCatalogPtr> FileCatalogMap;
+    typedef QMap<QString, DeviceFileCatalogPtr> FileCatalogMap;
     FileCatalogMap m_devFileCatalog;
     mutable QMutex m_mutex;
 };
