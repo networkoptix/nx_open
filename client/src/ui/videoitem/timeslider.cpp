@@ -139,7 +139,7 @@ void MySlider::sliderChange(SliderChange change)
         QStyleOptionSlider opt;
         initStyleOption(&opt);
         const QRect handleRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle);
-        m_toolTip->setPos(handleRect.center().x(), handleRect.top() - m_toolTip->boundingRect().height());
+        m_toolTip->setPos(handleRect.center().x(), handleRect.top());
     }
 }
 
