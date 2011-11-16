@@ -3,51 +3,65 @@
 
 #include <QtGui/QGraphicsPixmapItem>
 
-class ToolTipItem: public QGraphicsPixmapItem
+class ToolTipItem: public QGraphicsItem
 {
 public:
     ToolTipItem(QGraphicsItem *parent = 0);
-    ToolTipItem(const QPixmap &pixmap, QGraphicsItem *parent = 0);
 
-    QString text() const;
+    const QString &text() const;
     void setText(const QString &text);
 
-    QFont textFont() const;
-    void setTextFont(const QFont &font);
+    const QFont &font() const;
+    void setFont(const QFont &font);
 
-    QColor textColor() const;
-    void setTextColor(const QColor &color);
+    const QPen &textPen() const;
+    void setTextPen(const QPen &textPen);
 
-    QRectF textRect() const;
-    void setTextRect(const QRectF &rect);
+    const QPen &borderPen() const;
+    void setBorderPen(const QPen &borderPen);
 
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    const QBrush &brush() const;
+    void setBrush(const QBrush &brush);
+
+    virtual QRectF boundingRect() const override;
+    virtual QPainterPath shape() const override;
 
 protected:
-    void wheelEvent(QGraphicsSceneWheelEvent *event);
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+
+    virtual void wheelEvent(QGraphicsSceneWheelEvent *event) override;
+
+    virtual void updateParameters(QPainterPath *borderShape, QRectF *contentRect) const;
 
 private:
+    void ensureParameters() const;
+    void invalidateParameters();
+    void updateTextSize();
+
+private:
+    mutable QPainterPath m_itemShape, m_borderShape;
+    mutable QRectF m_boundingRect, m_contentRect;
+    mutable bool m_parametersValid;
+
+    QPen m_borderPen;
+    QPen m_textPen;
+    QBrush m_brush;
+    
     QString m_text;
-    QFont m_textFont;
-    QColor m_textColor;
-    QRectF m_textRect;
+    QSize m_textSize;
+    QFont m_font;
 };
 
-
-#include "ui/skin.h"
 
 class StyledToolTipItem: public ToolTipItem
 {
 public:
     StyledToolTipItem(QGraphicsItem *parent = 0) : ToolTipItem(parent)
     {
-        setPixmap(Skin::path(QLatin1String("time-window.png")));
-        setTransformationMode(Qt::FastTransformation);
-        setShapeMode(QGraphicsPixmapItem::HeuristicMaskShape);
-        setOffset(-pixmap().width() / 2, 0);
-        setTextFont(QFont()); // default application font
-        setTextColor(QColor(63, 159, 216));
-        setTextRect(ToolTipItem::boundingRect().adjusted(5, 5, -5, -13));
+        setFont(QFont()); /* Default application font. */
+        setTextPen(QColor(63, 159, 216));
+        setBrush(QColor(0, 0, 0, 255));
+        setBorderPen(QPen(QColor(203, 210, 233, 128), 0.7));
     }
 };
 
