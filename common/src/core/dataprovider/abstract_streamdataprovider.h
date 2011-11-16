@@ -63,7 +63,7 @@ signals:
 	void realTimeStreamHint(bool value);
     void slowSourceHint();
 protected:
-	void putData(QnAbstractDataPacketPtr data);
+	virtual void putData(QnAbstractDataPacketPtr data);
     void beforeDisconnectFromResource();
 protected:
 

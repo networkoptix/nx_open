@@ -46,7 +46,7 @@ public:
     bool fileFinished(int duration, const QString& fileName);
 
     static QString dateTimeStr(qint64 dateTimeMks);
-    QMap<int, QnStoragePtr> storageRoots() const { return m_storageRoots; }
+    const QMap<int, QnStoragePtr>& storageRoots() const { return m_storageRoots; }
     DeviceFileCatalogPtr getFileCatalog(const QnNetworkResourcePtr resource);
     QnTimePeriodList getRecordedPeriods(QnResourceList resList, qint64 startTime, qint64 endTime, qint64 detailLevel);
 private:

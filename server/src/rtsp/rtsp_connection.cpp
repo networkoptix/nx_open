@@ -26,7 +26,7 @@
 static const quint8 RTP_FFMPEG_GENERIC_CODE = 102;
 static const QString RTP_FFMPEG_GENERIC_STR("FFMPEG");
 //static const QString RTP_FFMPEG_GENERIC_STR("mpeg4-generic"); // this line for debugging purpose with VLC player
-static const int MAX_QUEUE_SIZE = 15;
+static const int MAX_QUEUE_SIZE = 60;
 static const int MAX_RTSP_DATA_LEN = 65535 - 4 - RtpHeader::RTP_HEADER_SIZE;
 static const int CLOCK_FREQUENCY = 1000000;
 static const int RTSP_MIN_SEEK_INTERVAL = 1000 * 30; // 30 ms as min seek interval
@@ -58,12 +58,22 @@ public:
       m_owner(owner),
       m_lastSendTime(0),
       m_waitBOF(false),
-      m_liveMode(false)
+      m_liveMode(false),
+      m_pauseNetwork(false)
     {
         memset(m_sequence, 0, sizeof(m_sequence));
         m_timer.start();
-        m_overflowOccured = false;
     }
+
+    void pauseNetwork()
+    {
+        m_pauseNetwork = true;
+    }
+    void resumeNetwork()
+    {
+        m_pauseNetwork = false;
+    }
+
     //qint64 lastSendTime() const { return m_lastSendTime; }
     void setLastSendTime(qint64 time) { m_lastSendTime = time; }
     void setWaitBOF(qint64 newTime, bool value) 
@@ -76,6 +86,23 @@ public:
 
     virtual qint64 currentTime() const { 
         return m_lastSendTime; 
+    }
+
+    virtual void putData(QnAbstractDataPacketPtr data)
+    {
+        m_dataQueue.push(data);
+        if (m_dataQueue.size() > m_dataQueue.maxSize())
+        {
+            QnAbstractDataPacketPtr tmp;
+            m_dataQueue.pop(tmp);
+            while (m_dataQueue.size() > 0) 
+            {
+                if (qSharedPointerDynamicCast<QnAbstractMediaData>(m_dataQueue.front())->flags & AV_PKT_FLAG_KEY) 
+                    break;
+                else 
+                    m_dataQueue.pop(tmp);
+            }
+        }
     }
 
     virtual bool canAcceptData() const
@@ -127,29 +154,19 @@ protected:
 
     virtual bool processData(QnAbstractDataPacketPtr data)
     {
+        if (m_pauseNetwork)
+            return false; // does not ready to process data. please wait
+
         QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
         if (!media)
             return true;
 
         if (media->flags & QnAbstractMediaData::MediaFlags_AfterEOF)
         {
-            m_overflowOccured = false;
             m_dataQueue.clear();
             m_owner->switchToLive(); // it is archive EOF
             return true;
         }
-
-        if (m_dataQueue.size() >= m_dataQueue.maxSize())
-        {
-            // buffer overflow
-            m_overflowOccured = true;
-            return true;
-        }
-        if (m_overflowOccured && !(media->flags & AV_PKT_FLAG_KEY))
-        {
-            return true;
-        }
-        m_overflowOccured = false;
 
         if (m_owner->isLiveDP(media->dataProvider))
             media->flags |= QnAbstractMediaData::MediaFlags_LIVE;
@@ -195,6 +212,7 @@ protected:
             buildRtspTcpHeader(rtspChannelNum, ssrc + 1, codecCtxData.size(), true, 0); // ssrc+1 - switch data subchannel to context subchannel
             QMutexLocker lock(&m_owner->getSockMutex());
             m_owner->sendData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
+            Q_ASSERT(!codecCtxData.isEmpty());
             m_owner->sendData(codecCtxData);
         }
         /*
@@ -240,6 +258,7 @@ protected:
                 }
                 headerSize = 0;
             }
+            Q_ASSERT(sendLen > 0);
             m_owner->sendData(curData, sendLen);
             //m_owner->flush();
             curData += sendLen;
@@ -261,8 +280,8 @@ private:
     quint8* tcpReadBuffer;
     QMutex m_mutex;
     bool m_waitBOF;
-    bool m_overflowOccured;
     bool m_liveMode;
+    bool m_pauseNetwork;
 };
 
 // ----------------------------- QnRtspConnectionProcessorPrivate ----------------------------
@@ -578,7 +597,7 @@ int QnRtspConnectionProcessor::composePlay()
         d->dataProcessor = new QnRtspDataConsumer(this);
     else 
         d->dataProcessor->clearUnprocessedData();
-    d->dataProcessor->pause();
+    //d->dataProcessor->pause();
 
     if (d->liveMode && d->archiveDP)
         d->archiveDP->stop();
@@ -616,7 +635,7 @@ int QnRtspConnectionProcessor::composePlay()
     }
     currentDP->start();
     d->dataProcessor->start();
-    d->dataProcessor->resume();
+    //d->dataProcessor->resume();
 
     return CODE_OK;
 }
@@ -667,6 +686,10 @@ void QnRtspConnectionProcessor::processRequest()
     Q_D(QnRtspConnectionProcessor);
     QMutexLocker lock(&d->mutex);
 
+    if (d->dataProcessor)
+        d->dataProcessor->pauseNetwork();
+
+
     QString method = d->requestHeaders.method();
     if (method != "OPTIONS" && d->sessionId.isEmpty())
         generateSessionId();
@@ -705,7 +728,8 @@ void QnRtspConnectionProcessor::processRequest()
         code = composeSetParameter();
     }
     sendResponse(code);
-
+    if (d->dataProcessor)
+        d->dataProcessor->resumeNetwork();
 }
 
 void QnRtspConnectionProcessor::run()

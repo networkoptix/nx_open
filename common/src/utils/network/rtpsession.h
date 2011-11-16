@@ -97,7 +97,7 @@ private:
     int buildRTCPReport(quint8 *dstBuffer, const RtspStatistic *stats);
     void parseRangeHeader(const QString& rangeStr);
 private:
-    enum { MAX_RESPONCE_LEN = 1024*70 };
+    enum { MAX_RESPONCE_LEN = 1024*150 };
 
     //unsigned char m_responseBuffer[MAX_RESPONCE_LEN];
     quint8* m_responseBuffer;
