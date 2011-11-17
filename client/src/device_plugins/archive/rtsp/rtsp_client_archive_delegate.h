@@ -50,6 +50,7 @@ private:
     bool m_opened;
     qint64 m_lastRtspTime;
     QnResourcePtr m_resource;
+    bool m_waitBOF;
 };
 
 #endif

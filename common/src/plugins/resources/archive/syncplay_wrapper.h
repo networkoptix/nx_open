@@ -24,6 +24,7 @@ public slots:
     void onConsumerBlocksReader(QnAbstractStreamDataProvider* reader, bool value);
 private slots:
     void onSingleShotModeChanged(bool value);
+    void onBeforeJump(qint64 mksec, bool makeshot);
     void onJumpOccured(qint64 mksec, bool makeshot);
     void onStreamPaused();
     void onStreamResumed();

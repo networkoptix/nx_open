@@ -8,7 +8,6 @@ QnAbstractArchiveReader::QnAbstractArchiveReader(QnResourcePtr dev ) :
     m_adaptiveSleep(20 * 1000),
     m_needToSleep(0),
     m_cs(QMutex::Recursive),
-    m_useTwice(false),
     m_skipFramesToTime(0),
     m_delegate(0),
     m_cycleMode(true),
@@ -44,7 +43,7 @@ quint64 QnAbstractArchiveReader::lengthMksec() const
     return m_lengthMksec;
 }
 
-void QnAbstractArchiveReader::jumpTo(qint64 mksec, bool makeshot)
+void QnAbstractArchiveReader::jumpTo(qint64 mksec, bool makeshot, qint64 skipTime)
 {
 
      //QMutexLocker mutex(&m_cs);
@@ -56,12 +55,11 @@ void QnAbstractArchiveReader::jumpTo(qint64 mksec, bool makeshot)
 
     if (mksec != m_lastJumpTime) 
     {
-        channeljumpTo(mksec, 0);
+        emit beforeJump(mksec, makeshot);
+        channeljumpTo(mksec, 0, skipTime);
         emit jumpOccured(mksec, makeshot);
     }
     m_lastJumpTime = mksec;
-
-    m_useTwice = true;
 
     if (makeshot && isSingleShotMode())
         CLLongRunnable::resume();
@@ -69,9 +67,11 @@ void QnAbstractArchiveReader::jumpTo(qint64 mksec, bool makeshot)
 
 void QnAbstractArchiveReader::jumpToPreviousFrame(qint64 mksec, bool makeshot)
 {
-    if (mksec != DATETIME_NOW) {
-        setSkipFramesToTime(mksec);
-        jumpTo(qMax(0ll, (qint64)mksec - 200 * 1000), makeshot);
+    if (mksec != DATETIME_NOW) 
+    {
+        //setSkipFramesToTime(mksec);
+        //jumpTo(qMax(0ll, (qint64)mksec - 200 * 1000), makeshot);
+        jumpTo(qMax(0ll, mksec - 200 * 1000), makeshot, mksec);
     }
     else
         jumpTo(mksec, makeshot);
