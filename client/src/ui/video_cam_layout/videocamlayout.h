@@ -4,6 +4,7 @@
 
 #include "grid_engine.h"
 #include "core/resource/resource.h"
+#include "camera/abstractrenderer.h"
 
 class CLAbstractSceneItem;
 class CLVideoWindowItem;
@@ -92,8 +93,7 @@ signals:
 	void onNewLayoutSelected(LayoutContent* curr, LayoutContent* newl);
 	void onNewLayoutItemSelected(LayoutContent* newl);
     void reachedTheEnd();
-
-    
+    void consumerBlocksReader(QnAbstractStreamDataProvider* dataProvider, bool value);
 protected slots:
 
     void onNewPageSelected(int page); 
@@ -113,6 +113,7 @@ protected slots:
 	void onItemMakeScreenshot(CLAbstractSubItemContainer* item);
 
 	void stop_helper(bool emt = true);
+    void onDisplayingStateChanged(CLAbstractRenderer* renderer, bool value);
 private:
 	// remove item from lay out
 	void removeItem(CLAbstractSceneItem* item, bool update_scene_rect = true);

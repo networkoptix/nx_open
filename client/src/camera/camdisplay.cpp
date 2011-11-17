@@ -320,7 +320,11 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
 {
     QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
     if (!media)
-        return false;
+        return true;
+    if(m_afterJump && !(media->flags & QnAbstractMediaData::MediaFlags_BOF))
+    {
+        return true; // skip data
+    }
 
     bool mediaIsLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
     if (mediaIsLive != m_isRealTimeSource)

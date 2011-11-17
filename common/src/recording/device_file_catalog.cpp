@@ -244,7 +244,7 @@ qint64 DeviceFileCatalog::minTime() const
     if (m_chunks.isEmpty())
         return AV_NOPTS_VALUE;
     else
-        return m_chunks[0].startTime;
+        return m_chunks[m_firstDeleteCount].startTime;
 }
 
 qint64 DeviceFileCatalog::maxTime() const

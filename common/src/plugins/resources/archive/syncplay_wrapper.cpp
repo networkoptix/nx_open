@@ -12,12 +12,14 @@ struct ReaderInfo
     ReaderInfo(QnAbstractArchiveReader* _reader, QnAbstractArchiveDelegate* _oldDelegate, QnlTimeSource* _cam):
         reader(_reader),
         oldDelegate(_oldDelegate),
-        cam(_cam)
+        cam(_cam),
+        enabled(true)
     {
     }
     QnAbstractArchiveReader* reader;
     QnAbstractArchiveDelegate* oldDelegate;
     QnlTimeSource* cam;
+    bool enabled;
 };
 
 class QnArchiveSyncPlayWrapper::QnArchiveSyncPlayWrapperPrivate
@@ -77,10 +79,10 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveReader* reader,
 void QnArchiveSyncPlayWrapper::onNextPrevFrameOccured()
 {
     Q_D(QnArchiveSyncPlayWrapper);
-    foreach(ReaderInfo info, d->readers)
+    foreach(const ReaderInfo& info, d->readers)
     {
         QnSyncPlayArchiveDelegate* syncDelegate = static_cast<QnSyncPlayArchiveDelegate*> (info.reader->getArchiveDelegate());
-        syncDelegate->enableSync(true);
+        syncDelegate->enableSync(info.enabled);
     }
 }
 
@@ -118,10 +120,10 @@ void QnArchiveSyncPlayWrapper::onSingleShotModeChanged(bool value)
     if (d->blockSingleShotSignal)
         return;
     d->blockSingleShotSignal = true;
-    foreach(ReaderInfo info, d->readers)
+    foreach(const ReaderInfo& info, d->readers)
     {
         QnSyncPlayArchiveDelegate* syncDelegate = static_cast<QnSyncPlayArchiveDelegate*> (info.reader->getArchiveDelegate());
-        syncDelegate->enableSync(!value);
+        syncDelegate->enableSync(!value && info.enabled);
 
         if (info.reader != sender())
             info.reader->setSingleShotMode(value);
@@ -254,10 +256,26 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
 {
     Q_D(const QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->syncMutex);
-    qint64 val = 0;
+    qint64 val = AV_NOPTS_VALUE;
     foreach(ReaderInfo info, d->readers)
     {
-        val = qMax(info.cam->selfCurrentTime(), 0ll);
+        qint64 camTime = info.cam->selfCurrentTime();
+        if (camTime != AV_NOPTS_VALUE)
+            val = qMax(camTime, val);
     }
     return val;
+}
+
+void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvider* reader, bool value)
+{
+    Q_D(QnArchiveSyncPlayWrapper);
+    for (int i = 0; i < d->readers.size(); ++i)
+    {
+        if (d->readers[i].reader == reader) {
+            d->readers[i].enabled = !value;
+            QnSyncPlayArchiveDelegate* syncDelegate = static_cast<QnSyncPlayArchiveDelegate*> (d->readers[i].reader->getArchiveDelegate());
+            if (!d->readers[i].enabled)
+                syncDelegate->enableSync(false);
+        }
+    }
 }

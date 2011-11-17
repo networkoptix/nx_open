@@ -40,6 +40,7 @@ private:
     QTime m_initTime;
     QnAbstractArchiveReader* m_reader;
     bool m_enableSync;
+    bool m_liveMode;
 };
 
 #endif // _SYNC_PLAY_ARCHIVE_DELEGATE_H__

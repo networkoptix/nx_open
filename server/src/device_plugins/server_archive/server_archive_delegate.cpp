@@ -43,13 +43,8 @@ bool QnServerArchiveDelegate::open(QnResourcePtr resource)
     Q_ASSERT(netResource != 0);
     m_catalog = qnStorageMan->getFileCatalog(netResource->getMAC().toString());
     m_chunkSequence = new QnChunkSequence(netResource, 0);
-    m_currentChunk = m_chunkSequence->getNextChunk(m_resource);
-    QString url = m_catalog->fullFileName(m_currentChunk);
-    m_fileRes = QnAviResourcePtr(new QnAviResource(url));
-    m_opened = m_aviDelegate->open(m_fileRes);
-    if (m_opened)
-        m_aviDelegate->setAudioChannel(m_selectedAudioChannel);
-    return m_opened;
+
+    return true;
 }
 
 void QnServerArchiveDelegate::close()
@@ -66,8 +61,6 @@ qint64 QnServerArchiveDelegate::seek(qint64 time)
 {
     cl_log.log("serverArchiveDelegate. jump to ",QDateTime::fromMSecsSinceEpoch(time/1000).toString(), cl_logALWAYS);
     DeviceFileCatalog::Chunk newChunk = m_chunkSequence->getNextChunk(m_resource, time);
-    if (m_currentChunk.startTime == -1)
-        return -1;
 
     if (newChunk.startTime != m_currentChunk.startTime)
     {

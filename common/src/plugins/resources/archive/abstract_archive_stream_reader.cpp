@@ -11,7 +11,8 @@ QnAbstractArchiveReader::QnAbstractArchiveReader(QnResourcePtr dev ) :
     m_useTwice(false),
     m_skipFramesToTime(0),
     m_delegate(0),
-    m_cycleMode(true)
+    m_cycleMode(true),
+    m_lastJumpTime(AV_NOPTS_VALUE)
 {
 }
 
@@ -45,7 +46,6 @@ quint64 QnAbstractArchiveReader::lengthMksec() const
 
 void QnAbstractArchiveReader::jumpTo(qint64 mksec, bool makeshot)
 {
-    emit jumpOccured(mksec, makeshot);
 
      //QMutexLocker mutex(&m_cs);
 
@@ -54,7 +54,12 @@ void QnAbstractArchiveReader::jumpTo(qint64 mksec, bool makeshot)
     //for (int channel = 0; channel  < m_channel_number; ++channel)
         //channeljumpTo(mksec, channel);
 
-    channeljumpTo(mksec, 0);
+    if (mksec != m_lastJumpTime) 
+    {
+        channeljumpTo(mksec, 0);
+        emit jumpOccured(mksec, makeshot);
+    }
+    m_lastJumpTime = mksec;
 
     m_useTwice = true;
 

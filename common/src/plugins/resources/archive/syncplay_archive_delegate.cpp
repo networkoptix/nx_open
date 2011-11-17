@@ -2,13 +2,15 @@
 #include "syncplay_wrapper.h"
 #include "abstract_archive_delegate.h"
 #include "abstract_archive_stream_reader.h"
+#include "utils/common/util.h"
 
 QnSyncPlayArchiveDelegate::QnSyncPlayArchiveDelegate(QnAbstractArchiveReader* reader, QnArchiveSyncPlayWrapper* syncWrapper, QnAbstractArchiveDelegate* ownerDelegate):
     m_reader(reader),
     m_syncWrapper(syncWrapper), 
     m_ownerDelegate(ownerDelegate),
     m_seekTime(AV_NOPTS_VALUE),
-    m_enableSync(true)
+    m_enableSync(true),
+    m_liveMode(true)
 {
 
 }
@@ -52,6 +54,7 @@ qint64 QnSyncPlayArchiveDelegate::seek (qint64 time)
     //return m_syncWrapper->seek(time);
     m_seekTime = AV_NOPTS_VALUE;
     m_tmpData = QnAbstractMediaDataPtr(0);
+    m_liveMode = time == DATETIME_NOW;
     return m_ownerDelegate->seek(time);
 }
 
@@ -83,7 +86,7 @@ QnAbstractMediaDataPtr QnSyncPlayArchiveDelegate::getNextData()
 {
     {
         QMutexLocker lock(&m_genericMutex);
-        if (m_seekTime != AV_NOPTS_VALUE)
+        if (m_seekTime != AV_NOPTS_VALUE) 
         {
             m_tmpData = QnAbstractMediaDataPtr(0);
             //m_ownerDelegate->seek(m_seekTime);
@@ -111,7 +114,7 @@ QnAbstractMediaDataPtr QnSyncPlayArchiveDelegate::getNextData()
     }
 
     //if (m_tmpData && !m_reader->isSingleShotMode())
-    if (m_tmpData && m_enableSync)
+    if (m_tmpData && m_enableSync && !m_liveMode)
         m_syncWrapper->waitIfNeed(m_reader, m_tmpData->timestamp);
 
     QMutexLocker lock(&m_genericMutex);
