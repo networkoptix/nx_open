@@ -3,6 +3,7 @@
 
 #include "utils/common/base.h"
 #include "utils/media/externaltimesource.h"
+#include "core/dataprovider/abstract_streamdataprovider.h"
 
 
 class QnAbstractArchiveReader;
@@ -19,7 +20,8 @@ public:
     void removeArchiveReader(QnAbstractArchiveReader* reader);
 
     virtual qint64 getCurrentTime() const;
-
+public slots:
+    void onConsumerBlocksReader(QnAbstractStreamDataProvider* reader, bool value);
 private slots:
     void onSingleShotModeChanged(bool value);
     void onJumpOccured(qint64 mksec, bool makeshot);

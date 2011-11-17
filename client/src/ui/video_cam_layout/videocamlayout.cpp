@@ -69,6 +69,8 @@ m_renderWatcher(new QnRenderWatcher(this))
 
 	m_grid.setSettings(settings);
     m_syncPlay = new QnArchiveSyncPlayWrapper();
+    connect(renderWatcher(), SIGNAL(displayingStateChanged(CLAbstractRenderer*, bool)), this, SLOT(onDisplayingStateChanged(CLAbstractRenderer*, bool)));
+    connect(this, SIGNAL(consumerBlocksReader(QnAbstractStreamDataProvider*, bool)), m_syncPlay, SLOT(onConsumerBlocksReader(QnAbstractStreamDataProvider*, bool)));
 }
 
 SceneLayout::~SceneLayout()
@@ -404,6 +406,19 @@ bool SceneLayout::addDevice(QString uniqueid, bool update_scene_rect, CLBasicLay
 	return addDevice(dev, update_scene_rect, itemSettings);
 }
 
+void SceneLayout::onDisplayingStateChanged(CLAbstractRenderer* renderer, bool value)
+{
+    foreach(CLAbstractComplicatedItem* item, m_deviceitems)
+    {
+        CLVideoCamera* cam = dynamic_cast<CLVideoCamera*>(item);
+        if (cam && cam->getVideoWindow() == renderer)
+        {
+            emit consumerBlocksReader(cam->getStreamreader(), !value);
+            break;
+        }
+    }
+}
+
 //#include "../../ui/videoitem/navigationitem.h"
 bool SceneLayout::addDevice(QnResourcePtr device, bool update_scene_rect, CLBasicLayoutItemSettings itemSettings)
 {
@@ -457,8 +472,8 @@ bool SceneLayout::addDevice(QnResourcePtr device, bool update_scene_rect, CLBasi
         {
             QnAbstractArchiveReader* archiveReader = dynamic_cast<QnAbstractArchiveReader*>(mediaReader);
             if (archiveReader) {
-                //m_syncPlay->addArchiveReader(archiveReader, cam);
-                //cam->setExternalTimeSource(m_syncPlay);
+                m_syncPlay->addArchiveReader(archiveReader, cam);
+                cam->setExternalTimeSource(m_syncPlay);
             }
         }
 
