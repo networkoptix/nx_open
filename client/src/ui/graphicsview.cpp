@@ -3,6 +3,7 @@
 
 #include "video_cam_layout/videocamlayout.h"
 #include "camera/camera.h"
+#include "camera/render_watcher.h"
 #include "mainwnd.h"
 #include "view/blue_background_painter.h"
 #include "settings.h"
@@ -76,6 +77,7 @@ static const int MAX_AUDIO_TRACKS = 16;
 extern QString button_settings;
 extern QString button_level_up;
 extern QString button_magnifyingglass;
+extern QString button_searchlive;
 extern QString button_squarelayout;
 extern QString button_longlayout;
 extern QString button_singleLineLayout;
@@ -251,17 +253,17 @@ void GraphicsView::removeFileDeviceItem(CLAbstractSceneItem* aitem)
 
 GraphicsView::~GraphicsView()
 {
-    if (m_searchItem)
+#if 0
+    if (QGraphicsProxyWidget *popupItem = m_searchItem->lineEdit()->completer()->popup()->graphicsProxyWidget())
     {
-        if (QGraphicsProxyWidget *popupItem = m_searchItem->lineEdit()->completer()->popup()->graphicsProxyWidget())
-        {
-            popupItem->setWidget(0);
-            delete popupItem;
-        }
-
-        delete m_searchItem->graphicsProxyWidget();
-        m_searchItem = 0;
+        popupItem->setWidget(0);
+        delete popupItem;
     }
+
+    delete m_searchItem->graphicsProxyWidget();
+#else
+    delete m_searchItem;
+#endif
 
     setZeroSelection();
     stop();
@@ -659,6 +661,22 @@ void GraphicsView::initDecoration()
 
     if (search)
     {
+#if 1
+#ifdef Q_OS_WIN
+        m_searchItem = new CLSearchEditItem(this, content, this);
+#else
+        // There is a problem on Mac OS X with embedding control into scene.
+        // As a temporary solution we are using separate window.
+        m_searchItem = new CLSearchEditItem(this, content, 0);
+        m_searchItem->setWindowFlags(/*Qt::ToolTip | */Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint);
+
+        connect(mMainWnd, SIGNAL(mainWindowClosed()), m_searchItem, SLOT(deleteLater()));
+#endif
+        m_searchItem->show();
+
+        item = new CLUnMovedPixtureButton(button_searchlive, 0, global_decoration_opacity, 1.0, Skin::path(QLatin1String("webcam.png")), decoration_size * 0.8, decoration_size * 0.8, 255);
+        addStaticItem(item);
+#else
         m_searchItem = new CLSearchEditItem(this, content);
 
         QGraphicsProxyWidget *searchItem = scene()->addWidget(m_searchItem);
@@ -679,18 +697,22 @@ void GraphicsView::initDecoration()
             connect(m_searchItem, SIGNAL(keyPressed()), this, SLOT(adjustSearchItemPopup()), Qt::QueuedConnection);
             connect(m_searchItem->lineEdit(), SIGNAL(textChanged(QString)), this, SLOT(adjustSearchItemPopup()), Qt::QueuedConnection);
         }
-
+#endif
         m_searchItem->setFocus();
     }
     else if (m_searchItem)
     {
+#if 0
         if (QGraphicsProxyWidget *popupItem = m_searchItem->lineEdit()->completer()->popup()->graphicsProxyWidget())
         {
             popupItem->setWidget(0);
             delete popupItem;
         }
-    
+
         delete m_searchItem->graphicsProxyWidget();
+#else
+        delete m_searchItem;
+#endif
         m_searchItem = 0;
     }
 
@@ -708,18 +730,34 @@ void GraphicsView::adjustAllStaticItems()
 {
     foreach (CLAbstractUnmovedItem *item, m_staticItems)
         item->adjust();
-        
+
     if (m_searchItem)
     {
+#if 1
+        m_searchItem->resize(viewport()->width() / 3, 40);
+        QPoint newPos((viewport()->width() - m_searchItem->width()) / 2, 0);
+
+        if (CLAbstractUnmovedItem *button = static_cast<CLUnMovedPixture *>(staticItemByName(button_searchlive)))
+        {
+            button->setStaticPos(newPos + QPoint(0, 3));
+            newPos.rx() += button->boundingRect().width() + 5;
+        }
+
+        if (!m_searchItem->parentWidget())
+            newPos += viewport()->mapToGlobal(QPoint(0, 0));
+        m_searchItem->move(newPos);
+#else
         QGraphicsProxyWidget *searchItem = m_searchItem->graphicsProxyWidget();
         searchItem->setPreferredSize(viewport()->width() / 3, 40);
         searchItem->resize(searchItem->preferredSize());
         searchItem->setPos(mapToScene((viewport()->width() - searchItem->size().width()) / 2, 0));
 
         adjustSearchItemPopup();
+#endif
     }
 }
 
+#if 0
 void GraphicsView::adjustSearchItemPopup()
 {
     if (!m_searchItem)
@@ -743,6 +781,7 @@ void GraphicsView::adjustSearchItemPopup()
         popupItem->setGeometry(rect);
     }
 }
+#endif
 
 void GraphicsView::addStaticItem(CLAbstractUnmovedItem* item, bool conn)
 {
@@ -1843,7 +1882,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
                 CLAbstractComplicatedItem* ca  = nav_item->getComplicatedItem();
 
                 CLVideoCamera* cam = dynamic_cast<CLVideoCamera*>(ca);
-                if (cam) 
+                if (cam)
                 {
                     if (act == &cm_start_recording)
                     {
@@ -2507,6 +2546,16 @@ void GraphicsView::updateDecorations()
     adjustAllStaticItems();
 }
 
+bool GraphicsView::eventFilter(QObject *watched, QEvent *event)
+{
+#ifndef Q_OS_WIN
+    if (event->type() == QEvent::Move)
+        updateDecorations();
+#endif
+
+    return QGraphicsView::eventFilter(watched, event);
+}
+
 void GraphicsView::resizeEvent(QResizeEvent *event)
 {
     QGraphicsView::resizeEvent(event);
@@ -2563,6 +2612,10 @@ void GraphicsView::onDecorationItemPressed(const QString &name)
     {
         PreferencesWindow preferencesDialog(this);
         preferencesDialog.exec();
+    }
+    else if (name == button_searchlive)
+    {
+        m_searchItem->lineEdit()->setText(QLatin1String("live"));
     }
     else if (name == button_squarelayout)
     {
@@ -2977,7 +3030,7 @@ void GraphicsView::toggleRecording()
 
         QString previousDir = settings.value(QLatin1String("previousDir")).toString();
         QString selectedFilter;
-        while (1) 
+        while (1)
         {
             QString filePath = QFileDialog::getSaveFileName(this, tr("Save Recording As..."),
                 previousDir + QLatin1Char('/') + suggetion,
@@ -3394,7 +3447,7 @@ void GraphicsView::contextMenuHelper_saveRecordedAs(CLVideoCamera* cam)
         if (dstFileName.isEmpty())
             return;
         dstFileName += selectedFilter.mid(selectedFilter.indexOf(QLatin1Char('.')), 4);
-        
+
         /*
         QFileInfo dstFile(dstDir + name + QString('.') + srcFile.suffix());
         dstFile.dir().mkpath(dstFile.absolutePath());
@@ -3656,4 +3709,12 @@ void GraphicsView::onOpenFile()
             MainWnd::findAcceptedFiles(dstFiles, file);
         MainWnd::instance()->addFilesToCurrentOrNewLayout(dstFiles);
     }
+}
+
+void GraphicsView::paintEvent(QPaintEvent *event) {
+    m_camLayout.renderWatcher()->startDisplay();
+
+    QGraphicsView::paintEvent(event);
+
+    m_camLayout.renderWatcher()->finishDisplay();
 }

@@ -15,14 +15,7 @@ struct CLVideoDecoderOutput;
 class CLAbstractRenderer
 {
 public:
-    /**
-     * This function is supposed to be called from <i>decoding</i> thread.
-     * It notifies the derived class that a new frame is available for display.
-     * It is up to derived class to supply this new frame to the <i>rendering</i> thread.
-     * 
-     * \param image                     New video frame.
-     */
-	virtual void draw(CLVideoDecoderOutput* image) = 0;
+    CLAbstractRenderer(): m_displayCounter(0) {}
 
     /**
      * This function is supposed to be called from <i>decoding</i> thread.
@@ -31,6 +24,18 @@ public:
      * \param channel                   Channel number.
      */
     virtual void waitForFrameDisplayed(int channel) = 0;
+
+    /**
+     * This function is supposed to be called from <i>rendering</i> thread.
+     * It notifies the <i>decoding</i> thread that the current frame was rendered.
+     * 
+     * 
+     */
+    void frameDisplayed() {
+        m_displayCounter++;
+
+        doFrameDisplayed();
+    }
 
     /**
      * This function may be called from any thread.
@@ -53,9 +58,33 @@ public:
      */
     virtual bool constantDownscaleFactor() const = 0;
 
+    /**
+     * This function is supposed to be called from <i>decoding</i> thread.
+     * It notifies the derived class that a new frame is available for display.
+     * It is up to derived class to supply this new frame to the <i>rendering</i> thread.
+     * 
+     * \param image                     New video frame.
+     */
+    virtual void draw(CLVideoDecoderOutput *image) = 0;
+
+    /**
+     * \returns                         Value of this renderer's display counter.
+     *                                  This counter is incremented each time a frame
+     *                                  is rendered.
+     */
+    int displayCounter() const {
+        return m_displayCounter;
+    }
+
+protected:
+    virtual void doFrameDisplayed() {} // Not used for now.
+
 protected:
     mutable QMutex m_displaySync; // to avoid call paintEvent() more than once at the same time
     QWaitCondition m_waitCon;
+
+private:
+    int m_displayCounter;
 };
 
 #endif //clgl_draw_h_20_31

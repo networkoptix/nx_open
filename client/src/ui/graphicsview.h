@@ -102,6 +102,7 @@ protected:
     void mouseMoveEvent ( QMouseEvent * e);
     void mouseDoubleClickEvent ( QMouseEvent * e );
     void contextMenuEvent ( QContextMenuEvent * event );
+    virtual void paintEvent(QPaintEvent *event);
 
     void dragEnterEvent ( QDragEnterEvent * event );
     void dragMoveEvent ( QDragMoveEvent * event );
@@ -110,6 +111,7 @@ protected:
     virtual void keyPressEvent( QKeyEvent * e );
     virtual void keyReleaseEvent( QKeyEvent * e );
 
+    bool eventFilter(QObject *watched, QEvent *event);
     void resizeEvent(QResizeEvent * event);
 
     //=========================
@@ -166,9 +168,11 @@ protected:
     void navigation_grid_items_drop_helper();
 
 public slots:
-    void adjustSearchItemPopup();
     void fitInView(int duration = 700 , int delay = 0, CLAnimationCurve curve =  SLOW_END_POW_40);
 private slots:
+#if 0
+    void adjustSearchItemPopup();
+#endif
     void onSceneZoomFinished();
     void onSecTimer();
     void onDecorationItemPressed(const QString &);

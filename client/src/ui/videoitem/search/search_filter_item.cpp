@@ -135,18 +135,18 @@ CLSearchEditItem::CLSearchEditItem(GraphicsView *view, LayoutContent *sceneConte
     mTimer.setSingleShot(true);
     mTimer.setInterval(600);
     connect(&mTimer, SIGNAL(timeout()), this, SLOT(onTimer()));
-
+/*
     QToolButton *liveButton = new QToolButton(this);
     liveButton->setText(tr("Live"));
     liveButton->setIcon(Skin::icon(QLatin1String("webcam.png")));
     liveButton->setIconSize(QSize(30, 30));
 
     connect(liveButton, SIGNAL(clicked()), this, SLOT(onLiveButtonClicked()));
-
+*/
     QHBoxLayout *mainLayout = new QHBoxLayout;
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(m_lineEdit);
-    mainLayout->addWidget(liveButton);
+//    mainLayout->addWidget(liveButton);
     setLayout(mainLayout);
 
     m_lineEdit->installEventFilter(this);
@@ -233,7 +233,7 @@ void CLSearchEditItem::onEditTextChanged(const QString &text)
     typedef QPair<QString, QString> StringPair;
     QList<StringPair> result;
 
-	QnResourceList all_devs =  qnResPool->findResourcesByCriteria(cr);
+    QnResourceList all_devs =  qnResPool->findResourcesByCriteria(cr);
     foreach(QnResourcePtr dev, all_devs)
     {
             result.append(StringPair(dev->toString(), dev->getUniqueId()));

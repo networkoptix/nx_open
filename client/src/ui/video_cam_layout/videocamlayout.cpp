@@ -21,6 +21,7 @@
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
+#include "camera/render_watcher.h"
 
 int  SLOT_WIDTH = 640*10;
 int  SLOT_HEIGHT = SLOT_WIDTH*3/4;
@@ -42,7 +43,8 @@ m_scene(0),
 m_firstTime(true),
 m_isRunning(false),
 m_editable(false),
-m_syncPlay(0)
+m_syncPlay(0),
+m_renderWatcher(new QnRenderWatcher(this))
 {
 	connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimer()));
 
@@ -586,6 +588,10 @@ bool SceneLayout::addItem(CLAbstractSceneItem* item, bool update_scene_rect, CLB
 	connect(item, SIGNAL(onClose(CLAbstractSubItemContainer*)), this, SLOT(onItemClose(CLAbstractSubItemContainer*)));
 
 	connect(item, SIGNAL(onMakeScreenshot(CLAbstractSubItemContainer*)), this, SLOT(onItemMakeScreenshot(CLAbstractSubItemContainer*)));
+
+    CLAbstractRenderer *renderer = dynamic_cast<CLAbstractRenderer *>(item);
+    if(renderer != NULL)
+        m_renderWatcher->registerRenderer(renderer, item);
 
 	return true;
 }

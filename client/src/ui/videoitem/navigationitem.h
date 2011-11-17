@@ -42,7 +42,8 @@ protected:
     void timerEvent(QTimerEvent* event);
     void updateSlider();
 
-private slots:
+private Q_SLOTS:
+    void onLiveModeChanged(bool value);
     void onValueChanged(qint64);
     void pause();
     void play();
