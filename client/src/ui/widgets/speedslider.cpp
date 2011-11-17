@@ -145,12 +145,6 @@ void SpeedSlider::stepForward()
     triggerAction(SliderPageStepAdd);
 }
 
-void SpeedSlider::onLiveMode(bool value)
-{
-    if (value)
-        resetSpeed();
-}
-
 void SpeedSlider::sliderChange(SliderChange change)
 {
     GraphicsSlider::sliderChange(change);

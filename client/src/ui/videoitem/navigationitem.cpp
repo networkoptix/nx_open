@@ -311,8 +311,9 @@ void NavigationItem::setVideoCamera(CLVideoCamera *camera)
 
     m_speedSlider->resetSpeed();
     restoreInfoText();
+
     if (m_camera)
-        m_camera->getCamCamDisplay()->disconnect(m_speedSlider, SLOT(onLiveMode(bool)));
+        disconnect(m_camera->getCamCamDisplay(), SIGNAL(liveMode(bool)), this, SLOT(onLiveModeChanged(bool)));
 
     m_camera = camera;
 
@@ -322,7 +323,7 @@ void NavigationItem::setVideoCamera(CLVideoCamera *camera)
 
         QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
 
-        connect(m_camera->getCamCamDisplay(), SIGNAL(liveMode(bool)), m_speedSlider, SLOT(onLiveMode(bool)));
+        connect(m_camera->getCamCamDisplay(), SIGNAL(liveMode(bool)), this, SLOT(onLiveModeChanged(bool)));
 
         setPlaying(!reader->onPause());
     }
@@ -331,6 +332,12 @@ void NavigationItem::setVideoCamera(CLVideoCamera *camera)
         setVisible(false);
         m_timeSlider->setScalingFactor(0);
     }
+}
+
+void NavigationItem::onLiveModeChanged(bool value)
+{
+    if (value)
+        m_speedSlider->resetSpeed();
 }
 
 void NavigationItem::timerEvent(QTimerEvent *event)
@@ -352,7 +359,7 @@ void NavigationItem::updateSlider()
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader *>(m_camera->getStreamreader());
     qint64 startTime = reader->startTime();
     qint64 endTime = reader->endTime();
-    if (startTime != AV_NOPTS_VALUE && endTime != AV_NOPTS_VALUE) 
+    if (startTime != AV_NOPTS_VALUE && endTime != AV_NOPTS_VALUE)
     {
         m_timeSlider->setMinimumValue(startTime / 1000);
         m_timeSlider->setMaximumValue(endTime != DATETIME_NOW ? endTime / 1000 : DATETIME_NOW);

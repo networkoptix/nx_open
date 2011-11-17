@@ -27,7 +27,7 @@ public Q_SLOTS:
 
     void stepBackward();
     void stepForward();
-    void onLiveMode(bool value);
+
 Q_SIGNALS:
     void speedChanged(float newSpeed);
 

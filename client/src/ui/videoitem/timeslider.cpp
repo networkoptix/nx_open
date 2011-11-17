@@ -296,7 +296,7 @@ IntervalInfo intervals[] = {
     {6*60*60*1000, 6, "h", 4, "24h", isTimeAcceptedStd},
     {12*60*60*1000, 12, "h", 2, "24h", isTimeAcceptedStd},
     {24*60*60*1000, 1, "dd MMM", 99, "dd MMM", isTimeAcceptedStd}, // FIRST_DATE_INDEX here
-    {24*60*60*1000*30ll, 1, "MMMM", 99, "September", isTimeAcceptedForMonth}, 
+    {24*60*60*1000*30ll, 1, "MMMM", 99, "September", isTimeAcceptedForMonth},
     {24*60*60*1000*30*12ll, 1, "yyyy", 99, "2011", isTimeAcceptedForYear}
 };
 static const int FIRST_DATE_INDEX = 13; // use date's labels with this index and above
@@ -367,7 +367,7 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     if ((pos+range - intervals[level].interval*outsideCnt) / r.width() <= 1) // abnormally long range
         return;
 
-    if (qAbs(m_cachedXPos - xpos) < 1.0) 
+    if (qAbs(m_cachedXPos - xpos) < 1.0)
         xpos = m_cachedXPos;
     else
         m_cachedXPos = xpos;
@@ -412,7 +412,6 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     }
 
     // draw grid
-
     for (qint64 curTime = intervals[level].interval*outsideCnt; curTime <= pos+range; curTime += intervals[level].interval)
     {
         unsigned curLevel = level;
@@ -436,7 +435,8 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
             const int labelNumber = (curTime/interval.interval)%interval.count;
             text = QString::number(interval.value*labelNumber) + QLatin1String(interval.name);
         }
-        else {
+        else
+        {
             text = QDateTime::fromMSecsSinceEpoch(curTime).toString(interval.name);
         }
 
