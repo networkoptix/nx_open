@@ -37,6 +37,7 @@ public:
     void setCentralise(bool b) { m_centralise = b; }
 
     qint64 sliderRange();
+    qint64 viewPortPos() const;
 
     qint64 minimumRange() const;
     void setMinimumRange(qint64);
@@ -79,7 +80,6 @@ private:
     qint64 fromSlider(int value);
     int toSlider(qint64 value);
 
-    qint64 viewPortPos() const;
     void setViewPortPos(qint64 value);
 
     void updateSlider();

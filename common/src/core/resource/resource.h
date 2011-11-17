@@ -59,12 +59,12 @@ public:
 
         local = 0x200,    // local client resource
         server = 0x400,   // server resource
-        remove = 0x800,   // remove (server) resource
+        remote = 0x800,   // remote (server) resource
 
         live_cam = live | video | media | streamprovider,
         local_live_cam = live_cam | local |  network,
-        server_live_cam = live_cam | remove , // | NETWORK,
-        server_archive = remove | video | media | audio | streamprovider,
+        server_live_cam = live_cam | remote , // | NETWORK,
+        server_archive = remote | video | media | audio | streamprovider,
         ARCHIVE = url | local | video | media | audio | streamprovider,     // local media file
         SINGLE_SHOT = url | local | media | still_image | streamprovider    // local still image file
     };
@@ -97,6 +97,7 @@ public:
 
 
     // flags like network media and so on
+    unsigned long flags() const;
     bool checkFlag(unsigned long flag) const;
     void addFlag(unsigned long flag);
     void removeFlag(unsigned long flag);
