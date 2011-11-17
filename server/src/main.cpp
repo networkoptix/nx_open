@@ -251,7 +251,7 @@ int main(int argc, char *argv[])
 
     qnResTypePool->addResourceTypeList(resourceTypeList);
 
-    registerServer(appServerConnection, localAddress(appserverAddress));
+    registerServer(appServerConnection, localAddress(appserverUrl.host()));
 
     QnAppserverResourceProcessor processor(QnId(serverId()), host, port, auth, QnResourceDiscoveryManager::instance());
 
