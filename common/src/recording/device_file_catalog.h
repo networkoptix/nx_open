@@ -37,7 +37,7 @@ public:
         int duration; // chunk duration at ms
     };
 
-    DeviceFileCatalog(QnNetworkResourcePtr resource);
+    DeviceFileCatalog(const QString& macAddress);
     void deserializeTitleFile();
     void addRecord(const Chunk& chunk);
     void updateDuration(int duration);
@@ -57,14 +57,13 @@ public:
 
     QnTimePeriodList getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel);
 private:
-    QString baseRoot(QnNetworkResourcePtr resource);
     qint64 getFileDuration(const QString& fileName);
 private:
     mutable QMutex m_mutex;
     QFile m_file;
     QVector<Chunk> m_chunks; 
     int m_firstDeleteCount;
-    QnNetworkResourcePtr m_resource;
+    QString m_macAddress;
 
     QPair<int, bool> m_prevParts[4];
     QStringList m_existFileList;

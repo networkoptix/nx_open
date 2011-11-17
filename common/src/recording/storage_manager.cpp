@@ -13,6 +13,16 @@ QnStorageManager::QnStorageManager():
 {
 }
 
+void QnStorageManager::loadFullFileCatalog()
+{
+    QDir dir(closeDirPath(getDataDirectory()) + QString("record_catalog"));
+    QFileInfoList list = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
+    foreach(QFileInfo fi, list)
+    {
+        getFileCatalog(fi.fileName());
+    }
+}
+
 void QnStorageManager::addStorage(QnStoragePtr storage)
 {
     QMutexLocker lock(&m_mutex);
@@ -52,7 +62,7 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(QnResourceList resList, qi
         QnNetworkResourcePtr camera = qSharedPointerDynamicCast<QnNetworkResource> (resList[i]);
         if (camera) 
         {
-            DeviceFileCatalogPtr catalog = getFileCatalog(camera);
+            DeviceFileCatalogPtr catalog = getFileCatalog(camera->getMAC().toString());
             if (catalog) 
                 cameras << catalog->getTimePeriods(startTime, endTime, detailLevel);
         }
@@ -100,7 +110,7 @@ void QnStorageManager::clearSpace(QnStoragePtr storage)
     while (getDiskFreeSpace(dir) < storage->getSpaceLimit())
     {
         qint64 minTime = 0x7fffffffffffffffll;
-        QnNetworkResourcePtr camera;
+        QString mac;
         DeviceFileCatalogPtr catalog;
         {
             QMutexLocker lock(&m_mutex);
@@ -110,11 +120,11 @@ void QnStorageManager::clearSpace(QnStoragePtr storage)
                 if (firstTime != AV_NOPTS_VALUE && firstTime < minTime)
                 {
                     minTime = itr.value()->firstTime();
-                    camera = itr.key();
+                    mac = itr.key();
                 }
             }
-            if (camera != 0)
-                catalog = getFileCatalog(camera);
+            if (!mac.isEmpty())
+                catalog = getFileCatalog(mac);
         }
         if (catalog != 0)
             catalog->deleteFirstRecord();
@@ -157,14 +167,14 @@ QString QnStorageManager::getFileName(const qint64& dateTime, const QnNetworkRes
     return text + strPadLeft(QString::number(fileNum), 3, '0');
 }
 
-DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QnNetworkResourcePtr camera)
+DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QString& mac)
 {
     QMutexLocker lock(&m_mutex);
-    DeviceFileCatalogPtr fileCatalog = m_devFileCatalog[camera];
+    DeviceFileCatalogPtr fileCatalog = m_devFileCatalog[mac];
     if (fileCatalog == 0)
     {
-        fileCatalog = DeviceFileCatalogPtr(new DeviceFileCatalog(camera));
-        m_devFileCatalog[camera] = fileCatalog;
+        fileCatalog = DeviceFileCatalogPtr(new DeviceFileCatalog(mac));
+        m_devFileCatalog[mac] = fileCatalog;
     }
     return fileCatalog;
 }
@@ -179,11 +189,11 @@ bool QnStorageManager::fileFinished(int duration, const QString& fileName)
         {
             QString mac = fileName.mid(root.length(), fileName.indexOf('/', root.length()+1) - root.length());
             mac = QFileInfo(mac).baseName();
-            QnNetworkResourcePtr camera = qnResPool->getNetResourceByMac(mac);
-            if (!camera) {
-                return false;
-            }
-            DeviceFileCatalogPtr catalog = getFileCatalog(camera);
+            //QnNetworkResourcePtr camera = qnResPool->getNetResourceByMac(mac);
+            //if (!camera) {
+            //    return false;
+            //}
+            DeviceFileCatalogPtr catalog = getFileCatalog(mac);
             if (catalog == 0)
                 return false;
             QFileInfo fi(fileName);
@@ -204,10 +214,10 @@ bool QnStorageManager::fileStarted(const qint64& startDate, const QString& fileN
         {
             QString mac = fileName.mid(root.length(), fileName.indexOf('/', root.length()+1) - root.length());
             mac = QFileInfo(mac).baseName();
-            QnNetworkResourcePtr camera = qnResPool->getNetResourceByMac(mac);
-            if (!camera)
-                return false;
-            DeviceFileCatalogPtr catalog = getFileCatalog(camera);
+            //QnNetworkResourcePtr camera = qnResPool->getNetResourceByMac(mac);
+            //if (!camera)
+            //    return false;
+            DeviceFileCatalogPtr catalog = getFileCatalog(mac);
             if (catalog == 0)
                 return false;
             QFileInfo fi(fileName);
@@ -239,8 +249,8 @@ QnChunkSequence::QnChunkSequence(const QnNetworkResourceList& resList, qint64 st
 void QnChunkSequence::addResource(QnNetworkResourcePtr res)
 {
     CacheInfo info;
-    QString root = qnStorageMan->storageRoots().begin().value()->getUrl(); // index stored at primary storage
-    info.m_catalog = qnStorageMan->getFileCatalog(res);
+    //QString root = qnStorageMan->storageRoots().begin().value()->getUrl(); // index stored at primary storage
+    info.m_catalog = qnStorageMan->getFileCatalog(res->getMAC().toString());
     connect(info.m_catalog.data(), SIGNAL(firstDataRemoved(int)), this, SLOT(onFirstDataRemoved(int)));
     info.m_startTime = m_startTime;
     info.m_index = -1;
