@@ -102,6 +102,7 @@ protected:
     void mouseMoveEvent ( QMouseEvent * e);
     void mouseDoubleClickEvent ( QMouseEvent * e );
     void contextMenuEvent ( QContextMenuEvent * event );
+    virtual void paintEvent(QPaintEvent *event);
 
     void dragEnterEvent ( QDragEnterEvent * event );
     void dragMoveEvent ( QDragMoveEvent * event );

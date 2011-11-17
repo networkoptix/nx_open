@@ -417,14 +417,10 @@ void CLGLRenderer::waitForFrameDisplayed(int channel)
 {
     Q_UNUSED(channel)
 
-    if (m_needwait && m_curImg)
+    QMutexLocker lock(&m_displaySync);
+    while (m_needwait && m_curImg && m_curImg->isDisplaying()) 
     {
-        QMutexLocker lock(&m_displaySync);
-        while (m_curImg->isDisplaying()) 
-        {
-            m_waitCon.wait(&m_displaySync, 50);
-            //break;
-        }
+        m_waitCon.wait(&m_displaySync);
     }
 }
 
@@ -866,6 +862,9 @@ bool CLGLRenderer::paintEvent(const QRect &r)
         curImg->setDisplaying(false);
         m_waitCon.wakeAll();
     }
+
+    frameDisplayed();
+
     return draw;
 }
 

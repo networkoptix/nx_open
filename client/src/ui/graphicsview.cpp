@@ -3,6 +3,7 @@
 
 #include "video_cam_layout/videocamlayout.h"
 #include "camera/camera.h"
+#include "camera/render_watcher.h"
 #include "mainwnd.h"
 #include "view/blue_background_painter.h"
 #include "settings.h"
@@ -3708,4 +3709,12 @@ void GraphicsView::onOpenFile()
             MainWnd::findAcceptedFiles(dstFiles, file);
         MainWnd::instance()->addFilesToCurrentOrNewLayout(dstFiles);
     }
+}
+
+void GraphicsView::paintEvent(QPaintEvent *event) {
+    m_camLayout.renderWatcher()->startDisplay();
+
+    QGraphicsView::paintEvent(event);
+
+    m_camLayout.renderWatcher()->finishDisplay();
 }
