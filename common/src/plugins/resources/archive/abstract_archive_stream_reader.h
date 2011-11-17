@@ -82,6 +82,7 @@ protected:
     QnAbstractArchiveDelegate* m_delegate;
 private:
 	qint64 m_skipFramesToTime;
+    qint64 m_lastJumpTime;
 };
 
 #endif //abstract_archive_stream_reader_h1907

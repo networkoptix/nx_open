@@ -254,10 +254,12 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
 {
     Q_D(const QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->syncMutex);
-    qint64 val = 0;
+    qint64 val = AV_NOPTS_VALUE;
     foreach(ReaderInfo info, d->readers)
     {
-        val = qMax(info.cam->selfCurrentTime(), val);
+        qint64 camTime = info.cam->selfCurrentTime();
+        if (camTime != AV_NOPTS_VALUE)
+            val = qMax(camTime, val);
     }
     return val;
 }
