@@ -24,7 +24,7 @@ public:
 
     void setStartDelay(qint64 startDelay);
     qint64 secondTime() const;
-    qint64 jumpTo (qint64 time, bool makeshot);
+    qint64 jumpToPreviousFrame (qint64 time, bool makeshot);
 
     virtual AVCodecContext* setAudioChannel(int num);
     void enableSync(bool value);

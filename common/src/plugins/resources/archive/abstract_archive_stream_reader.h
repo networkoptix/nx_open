@@ -31,7 +31,7 @@ public:
       */
 	quint64 lengthMksec() const;
 
-    virtual void jumpTo(qint64 mksec, bool makeshot);
+    virtual void jumpTo(qint64 mksec, bool makeshot, qint64 skipTime = 0);
 	void jumpToPreviousFrame(qint64 mksec, bool makeshot);
 
     virtual void previousFrame(qint64 /*mksec*/);
@@ -53,19 +53,20 @@ public:
     virtual void pause();
     virtual void resume();
 
-    virtual void setSkipFramesToTime(qint64 skipFramesToTime);
     qint64 skipFramesToTime() const;
     qint64 startTime() const;
     qint64 endTime() const;
 signals:
     void singleShotModeChanged(bool value);
+    void beforeJump(qint64 mksec, bool makeshot);
     void jumpOccured(qint64 mksec, bool makeshot);
     void streamPaused();
     void streamResumed();
     void nextFrameOccured();
     void prevFrameOccured();
 protected:
-	virtual void channeljumpTo(qint64 mksec, int channel) = 0;
+    virtual void setSkipFramesToTime(qint64 skipFramesToTime);
+	virtual void channeljumpTo(qint64 mksec, int channel, qint64 borderTime) = 0;
     virtual void pleaseStop();
 protected:
     bool m_cycleMode;
@@ -78,7 +79,6 @@ protected:
 	mutable QMutex m_cs;
     mutable QMutex m_framesMutex;
 
-	bool m_useTwice;
     QnAbstractArchiveDelegate* m_delegate;
 private:
 	qint64 m_skipFramesToTime;
