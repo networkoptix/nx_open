@@ -22,7 +22,7 @@ void QnRenderWatcher::registerRenderer(CLAbstractRenderer *renderer, QObject *li
         return;
     }
 
-    m_infoByRenderer[renderer] = Info(0, true, lifetime);
+    m_infoByRenderer[renderer] = Info(0, false, lifetime);
     m_rendererByLifetime[lifetime] = renderer;
 
     connect(lifetime, SIGNAL(destroyed()), this, SLOT(at_lifetime_destroyed()));

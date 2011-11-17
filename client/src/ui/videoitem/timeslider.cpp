@@ -797,6 +797,9 @@ void TimeSlider::setViewPortPos(qint64 value)
     }
 }
 
+/*!
+    \returns Milliseconds per one unit of the underlying slider.
+*/
 double TimeSlider::delta() const
 {
     return ((1.0f/(m_slider->maximum() - m_slider->minimum()))*length())/qExp(scalingFactor()/2);
@@ -812,6 +815,9 @@ int TimeSlider::toSlider(qint64 value)
     return (value - m_viewPortPos) / delta();
 }
 
+/*!
+    \returns Slider range in milliseconds. 
+*/
 qint64 TimeSlider::sliderRange()
 {
     return (m_slider->maximum() - m_slider->minimum())*delta();
