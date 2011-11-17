@@ -136,6 +136,17 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool& ip_finished)
         }
 	}
 
+    //excluding already existing resources 
+    it = resources.begin();
+    while (it!=resources.end())
+    {
+        if (QnResourcePool::instance()->hasSuchResouce( (*it)->getUniqueId() ))
+            it = resources.erase(it);
+        else
+            ++it;
+    }
+
+
     qDebug() << resources.size();
     //assemble list of existing ip
 
@@ -193,15 +204,6 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool& ip_finished)
     check_if_accessible(resources, threads);
 
     
-    //excluding already existing resources 
-    it = resources.begin();
-    while (it!=resources.end())
-    {
-        if (QnResourcePool::instance()->hasSuchResouce( (*it)->getUniqueId() ))
-            it = resources.erase(it);
-        else
-            ++it;
-    }
             
     //========================================================
     // now we've got only new resources.

@@ -318,15 +318,19 @@ void CLCamDisplay::processNewSpeed(float speed)
 
 bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
 {
+    QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
+    if (!media)
+        return false;
+
+    bool mediaIsLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
+    if (mediaIsLive != m_isRealTimeSource)
+        onRealTimeStreamHint(mediaIsLive);
+
     float speed = m_speed;
     if (m_prevSpeed != speed) {
         processNewSpeed(speed);
         m_prevSpeed = speed;
     }
-
-    QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
-    if (!media)
-        return false;
 
     QnCompressedVideoDataPtr vd = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
     QnCompressedAudioDataPtr ad = qSharedPointerDynamicCast<QnCompressedAudioData>(data);
@@ -341,6 +345,8 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
             return true; // ignore audio packet to prevent after jump detection
         }
     }
+    else
+        return true;
 
     bool isReversePacket = media->flags & AV_REVERSE_PACKET;
     bool isReverseMode = speed < 0.0;
@@ -658,6 +664,9 @@ void CLCamDisplay::setMTDecoding(bool value)
 void CLCamDisplay::onRealTimeStreamHint(bool value)
 {
     m_isRealTimeSource = value;
+    emit liveMode(m_isRealTimeSource);
+    if (m_isRealTimeSource)
+        m_speed = 1.0f;
 }
 
 void CLCamDisplay::onSlowSourceHint()

@@ -19,10 +19,22 @@
 
 #include <qmath.h>
 
-static const float MIN_MIN_OPACITY = 0.1f;
-static const float MAX_MIN_OPACITY = 0.6f;
-static const float MIN_FONT_SIZE = 4.0;
+namespace {
+    QVariant qint64Interpolator(const qint64 &start, const qint64 &end, qreal progress)
+    {
+        return start + double(end - start) * progress;
+    }
 
+    const float MIN_MIN_OPACITY = 0.1f;
+    const float MAX_MIN_OPACITY = 0.6f;
+    const float MIN_FONT_SIZE = 4.0;
+    
+}
+
+
+// -------------------------------------------------------------------------- //
+// SliderProxyStyle 
+// -------------------------------------------------------------------------- //
 class SliderProxyStyle : public QProxyStyle
 {
 public:
@@ -57,6 +69,9 @@ public:
 Q_GLOBAL_STATIC_WITH_ARGS(SliderProxyStyle, sliderProxyStyle, (QStyleFactory::create(qApp->style()->objectName())))
 
 
+// -------------------------------------------------------------------------- //
+// MySlider 
+// -------------------------------------------------------------------------- //
 class MySlider : public GraphicsSlider
 {
     friend class TimeSlider; // ### for sizeHint()
@@ -68,18 +83,27 @@ public:
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
+    const QRect &handleRect() const;
+
 protected:
     void sliderChange(SliderChange change);
 
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 
 private:
+    void invalidateHandleRect();
+    void ensureHandleRect() const;
+
+private:
     ToolTipItem *m_toolTip;
+    mutable QRect m_handleRect;
+    mutable bool m_handleRectValid;
 };
 
 MySlider::MySlider(QGraphicsItem *parent)
     : GraphicsSlider(parent),
-      m_toolTip(0)
+      m_toolTip(0),
+      m_handleRectValid(false)
 {
     setToolTipItem(new StyledToolTipItem);
 }
@@ -102,11 +126,9 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     Q_UNUSED(option)
     Q_UNUSED(widget)
 
-    QStyleOptionSlider opt;
-    initStyleOption(&opt);
-    const QRect handleRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle);
+    ensureHandleRect();
 
-    static const QPixmap pix = Skin::pixmap(QLatin1String("slider-handle.png")).scaled(handleRect.width(), handleRect.height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    static const QPixmap pix = Skin::pixmap(QLatin1String("slider-handle.png")).scaled(m_handleRect.width(), m_handleRect.height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
     QRectF r = contentsRect();
 
@@ -120,7 +142,7 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     painter->drawRect(r);
 
     painter->setPen(QPen(QColor(0, 87, 207), 2));
-    r.setRight(handleRect.center().x());
+    r.setRight(m_handleRect.center().x());
     painter->drawRect(r);
 
     QLinearGradient linearGrad(r.topLeft(), r.bottomRight());
@@ -128,7 +150,7 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     linearGrad.setColorAt(1, QColor(186, 239, 255));
     painter->fillRect(r, linearGrad);
 
-    painter->drawPixmap(handleRect, pix, QRectF(pix.rect()));
+    painter->drawPixmap(m_handleRect, pix, QRectF(pix.rect()));
 }
 
 void MySlider::sliderChange(SliderChange change)
@@ -136,10 +158,9 @@ void MySlider::sliderChange(SliderChange change)
     GraphicsSlider::sliderChange(change);
 
     if (change == SliderValueChange && m_toolTip) {
-        QStyleOptionSlider opt;
-        initStyleOption(&opt);
-        const QRect handleRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle);
-        m_toolTip->setPos(handleRect.center().x(), handleRect.top() - m_toolTip->boundingRect().height());
+        invalidateHandleRect();
+        ensureHandleRect();
+        m_toolTip->setPos(m_handleRect.center().x(), m_handleRect.top());
     }
 }
 
@@ -151,13 +172,34 @@ QVariant MySlider::itemChange(GraphicsItemChange change, const QVariant &value)
     return GraphicsSlider::itemChange(change, value);
 }
 
-
-QVariant qint64Interpolator(const qint64 &start, const qint64 &end, qreal progress)
+void MySlider::invalidateHandleRect() 
 {
-    return start + double(end - start) * progress;
+    m_handleRectValid = false;
+}
+
+void MySlider::ensureHandleRect() const
+{
+    if(m_handleRectValid)
+        return;
+
+    QStyleOptionSlider opt;
+    initStyleOption(&opt);
+    m_handleRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle);
+}
+
+const QRect &MySlider::handleRect() const 
+{
+    ensureHandleRect();
+
+    return m_handleRect;
 }
 
 
+
+
+// -------------------------------------------------------------------------- //
+// TimeLine
+// -------------------------------------------------------------------------- //
 class TimeLine : public GraphicsFrame
 {
     friend class TimeSlider; // ### for wheelEvent()
@@ -296,7 +338,7 @@ IntervalInfo intervals[] = {
     {6*60*60*1000, 6, "h", 4, "24h", isTimeAcceptedStd},
     {12*60*60*1000, 12, "h", 2, "24h", isTimeAcceptedStd},
     {24*60*60*1000, 1, "dd MMM", 99, "dd MMM", isTimeAcceptedStd}, // FIRST_DATE_INDEX here
-    {24*60*60*1000*30ll, 1, "MMMM", 99, "September", isTimeAcceptedForMonth}, 
+    {24*60*60*1000*30ll, 1, "MMMM", 99, "September", isTimeAcceptedForMonth},
     {24*60*60*1000*30*12ll, 1, "yyyy", 99, "2011", isTimeAcceptedForYear}
 };
 static const int FIRST_DATE_INDEX = 13; // use date's labels with this index and above
@@ -323,16 +365,12 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 {
     GraphicsFrame::paint(painter, option, widget);
 
-    int handleThickness = qApp->style()->pixelMetric(QStyle::PM_SliderControlThickness);
-    /*if (handleThickness == 0)
-        handleThickness = qApp->style()->pixelMetric(QStyle::PM_SliderThickness);
-    handleThickness /= 4;*/
-    handleThickness = 8;
+    qreal halfHandleThickness = m_parent->m_slider->handleRect().width() / 2.0;
 
     const QPalette pal = m_parent->palette();
     painter->setBrush(pal.brush(QPalette::Base));
     painter->setPen(pal.color(QPalette::Base));
-    const QRectF r(handleThickness, 0, rect().width() - handleThickness * 2, rect().height() - 2*frameWidth());
+    const QRectF r(halfHandleThickness, 0, rect().width() - halfHandleThickness * 2, rect().height() - 2*frameWidth());
     painter->drawRect(r);
     drawGradient(painter, QRectF(0, 0, rect().width(), rect().height() - 2*frameWidth()), rect().height());
     painter->setPen(pal.color(QPalette::Text));
@@ -367,7 +405,7 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     if ((pos+range - intervals[level].interval*outsideCnt) / r.width() <= 1) // abnormally long range
         return;
 
-    if (qAbs(m_cachedXPos - xpos) < 1.0) 
+    if (qAbs(m_cachedXPos - xpos) < 1.0)
         xpos = m_cachedXPos;
     else
         m_cachedXPos = xpos;
@@ -412,7 +450,6 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     }
 
     // draw grid
-
     for (qint64 curTime = intervals[level].interval*outsideCnt; curTime <= pos+range; curTime += intervals[level].interval)
     {
         unsigned curLevel = level;
@@ -436,7 +473,8 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
             const int labelNumber = (curTime/interval.interval)%interval.count;
             text = QString::number(interval.value*labelNumber) + QLatin1String(interval.name);
         }
-        else {
+        else
+        {
             text = QDateTime::fromMSecsSinceEpoch(curTime).toString(interval.name);
         }
 
@@ -463,7 +501,7 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
     // draw cursor vertical line
     painter->setPen(QPen(Qt::red, 3));
-    xpos = r.left() + m_parent->m_slider->value() * (r.width()-handleThickness-1) / (m_parent->m_slider->maximum() - m_parent->m_slider->minimum());
+    xpos = r.left() + m_parent->m_slider->value() * r.width() / (m_parent->m_slider->maximum() - m_parent->m_slider->minimum());
     painter->drawLine(QLineF(xpos, 0, xpos, rect().height()));
 }
 
@@ -535,6 +573,9 @@ void TimeLine::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *)
 }
 
 
+// -------------------------------------------------------------------------- //
+// TimeSlider
+// -------------------------------------------------------------------------- //
 /*!
     \class TimeSlider
     \brief The TimeSlider class allows to navigate over time line.
@@ -543,7 +584,6 @@ void TimeLine::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *)
     on scalingFactor. Also TimeSlider allows to zoom in/out scale of time line, which allows to
     navigate more accurate.
 */
-
 TimeSlider::TimeSlider(QGraphicsItem *parent) :
     GraphicsWidget(parent),
     m_minimumValue(0),

@@ -154,7 +154,7 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
 				if (resource==0)
 					continue;
 
-				resource->setHostAddress(sender, QnDomainPhysical);
+				resource->setHostAddress(sender, QnDomainMemory);
 				resource->setMAC(mac);
 				resource->setDiscoveryAddr( ipaddrs.at(i) );
 

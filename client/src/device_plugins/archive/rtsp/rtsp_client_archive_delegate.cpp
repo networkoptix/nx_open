@@ -115,6 +115,8 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
             errCnt++;
             if (errCnt == 10)
                 break;
+            else
+                continue;
         }
         errCnt = 0;
 
@@ -161,6 +163,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
 qint64 QnRtspClientArchiveDelegate::seek(qint64 time)
 {
     deleteContexts(); // context is going to create again on first data after SEEK, so ignore rest of data before seek
+    m_position = time;
     m_rtspSession.sendPlay(time, m_rtspSession.getScale());
     return time;
 }

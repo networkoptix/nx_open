@@ -16,6 +16,7 @@ class LayoutContent;
 class CLAbstractComplicatedItem;
 class CLAbstractSubItemContainer;
 class QnArchiveSyncPlayWrapper;
+class QnRenderWatcher;
 
 class SceneLayout : public QObject
 {
@@ -80,6 +81,11 @@ public:
 
     void removeItems(QList<CLAbstractSubItemContainer*> itemlst, bool removeFromLayoutcontent);
 
+
+    QnRenderWatcher *renderWatcher() const {
+        return m_renderWatcher;
+    }
+
 signals:
 	void stoped(LayoutContent* l);
 	void onItemPressed(LayoutContent* l, QString itemname);
@@ -117,6 +123,7 @@ private:
 	// removes devices;
 	bool removeDevices(QList<CLAbstractComplicatedItem*> lst, bool removeFromLayoutcontent); 
 
+    void disconnectFromSyncPlay(CLAbstractComplicatedItem* devitem);
 	//================================================
 private:
 
@@ -146,6 +153,8 @@ private:
 	CLGridEngine m_grid;
 
     QnArchiveSyncPlayWrapper* m_syncPlay;
+
+    QnRenderWatcher *m_renderWatcher;
 };
 
 //===================================================================

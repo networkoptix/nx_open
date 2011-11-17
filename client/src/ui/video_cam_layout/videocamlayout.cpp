@@ -21,6 +21,7 @@
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
+#include "camera/render_watcher.h"
 
 int  SLOT_WIDTH = 640*10;
 int  SLOT_HEIGHT = SLOT_WIDTH*3/4;
@@ -42,7 +43,8 @@ m_scene(0),
 m_firstTime(true),
 m_isRunning(false),
 m_editable(false),
-m_syncPlay(0)
+m_syncPlay(0),
+m_renderWatcher(new QnRenderWatcher(this))
 {
 	connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimer()));
 
@@ -66,6 +68,7 @@ m_syncPlay(0)
 	settings.optimal_ratio = square_ratio;
 
 	m_grid.setSettings(settings);
+    m_syncPlay = new QnArchiveSyncPlayWrapper();
 }
 
 SceneLayout::~SceneLayout()
@@ -74,6 +77,7 @@ SceneLayout::~SceneLayout()
 
 	//delete[] m_potantial_x;
 	//delete[] m_potantial_y;
+    delete m_syncPlay;
 }
 
 void SceneLayout::setContent(LayoutContent* cont)
@@ -126,6 +130,16 @@ void SceneLayout::start()
 	m_isRunning = true;
 }
 
+void SceneLayout::disconnectFromSyncPlay(CLAbstractComplicatedItem* devitem)
+{
+    CLVideoCamera* cam = dynamic_cast<CLVideoCamera*>(devitem);
+    if (cam) {
+        QnAbstractArchiveReader* archiveReader = dynamic_cast<QnAbstractArchiveReader*>(cam->getStreamreader());
+        if (archiveReader)
+            m_syncPlay->removeArchiveReader(archiveReader);
+    }
+};
+
 void SceneLayout::stop_helper(bool emt)
 {
 	m_deletedIds.clear();
@@ -148,6 +162,8 @@ void SceneLayout::stop_helper(bool emt)
 		// after we can wait for each thread to stop
 		cl_log.log(QLatin1String("About to shutdown device "), (int)(long)devitem, QLatin1String("\r\n"), cl_logDEBUG1);
 		devitem->stopDispay();
+
+        disconnectFromSyncPlay(devitem);
 
 		QnResourcePtr dev = devitem->getDevice();
 		CLAbstractSceneItem* item = devitem->getSceneItem();
@@ -412,10 +428,6 @@ bool SceneLayout::addDevice(QnResourcePtr device, bool update_scene_rect, CLBasi
 
 		bool introVideo = (m_content == CLSceneLayoutManager::instance().introScreenLayoutContent());
 
-#ifdef SYNC_PLAY_TEST
-        if (m_syncPlay == 0)
-           m_syncPlay = new QnArchiveSyncPlayWrapper();
-#endif
         QnAbstractStreamDataProvider* reader = device->createDataProvider(QnResource::Role_Default);
         QnAbstractMediaStreamDataProvider* mediaReader = dynamic_cast<QnAbstractMediaStreamDataProvider*>(reader);
         Q_ASSERT(mediaReader);
@@ -441,10 +453,13 @@ bool SceneLayout::addDevice(QnResourcePtr device, bool update_scene_rect, CLBasi
             video_wnd = new CLVideoWindowItem(m_view, layout, wnd_size.width() , wnd_size.height(), device->getUniqueId());
 
         CLVideoCamera* cam = new CLVideoCamera(qSharedPointerDynamicCast<QnMediaResource>(device), video_wnd, introVideo, mediaReader);
-        if (m_syncPlay) 
+        if (device->checkFlag(QnResource::live_cam)) 
         {
-            m_syncPlay->addArchiveReader(dynamic_cast<QnAbstractArchiveReader*>(mediaReader), cam);
-            cam->setExternalTimeSource(m_syncPlay);
+            QnAbstractArchiveReader* archiveReader = dynamic_cast<QnAbstractArchiveReader*>(mediaReader);
+            if (archiveReader) {
+                //m_syncPlay->addArchiveReader(archiveReader, cam);
+                //cam->setExternalTimeSource(m_syncPlay);
+            }
         }
 
 //        v->navigationItem()->setVideoCamera(cam);
@@ -574,6 +589,10 @@ bool SceneLayout::addItem(CLAbstractSceneItem* item, bool update_scene_rect, CLB
 
 	connect(item, SIGNAL(onMakeScreenshot(CLAbstractSubItemContainer*)), this, SLOT(onItemMakeScreenshot(CLAbstractSubItemContainer*)));
 
+    CLAbstractRenderer *renderer = dynamic_cast<CLAbstractRenderer *>(item);
+    if(renderer != NULL)
+        m_renderWatcher->registerRenderer(renderer, item);
+
 	return true;
 }
 
@@ -696,6 +715,8 @@ void SceneLayout::onItemClose(CLAbstractSubItemContainer* itm, bool addToremoved
 
 		devitem->beforestopDispay();
 		devitem->stopDispay();
+        disconnectFromSyncPlay(devitem);
+
 		QnResourcePtr dev =  devitem->getDevice();
 
         if (addToremovedLst)

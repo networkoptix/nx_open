@@ -3,13 +3,13 @@
 #include "utils/common/util.h"
 #include "file_deletor.h"
 
-DeviceFileCatalog::DeviceFileCatalog(QnNetworkResourcePtr resource):
+DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress):
     m_firstDeleteCount(0),
-    m_resource(resource),
+    m_macAddress(macAddress),
     m_mutex(QMutex::Recursive),
     m_duplicateName(false)
 {
-    QString devTitleFile = baseRoot(resource) + QString("/title.csv");
+    QString devTitleFile = closeDirPath(getDataDirectory()) + QString("record_catalog/") + m_macAddress + QString("/title.csv");
     m_file.setFileName(devTitleFile);
     QDir dir;
     dir.mkpath(QFileInfo(devTitleFile).absolutePath());
@@ -30,16 +30,6 @@ DeviceFileCatalog::DeviceFileCatalog(QnNetworkResourcePtr resource):
     }
 }
 
-QString DeviceFileCatalog::baseRoot(QnNetworkResourcePtr resource)
-{
-    if (qnStorageMan->storageRoots().isEmpty())
-        return QString();
-    else 
-    {
-        return closeDirPath(qnStorageMan->storageRoots().begin().value()->getUrl()) + resource->getMAC().toString();
-    }
-};
-
 bool DeviceFileCatalog::lastFileDuplicateName() const
 {
     return m_duplicateName;
@@ -47,7 +37,7 @@ bool DeviceFileCatalog::lastFileDuplicateName() const
 
 bool DeviceFileCatalog::fileExists(const Chunk& chunk)
 {
-    QString prefix = closeDirPath(qnStorageMan->storageRoots()[chunk.storageIndex]->getUrl()) + m_resource->getMAC().toString() + QString('/');
+    QString prefix = closeDirPath(qnStorageMan->storageRoot(chunk.storageIndex)->getUrl()) + m_macAddress + QString('/');
 
 
     QDateTime fileDate = QDateTime::fromMSecsSinceEpoch(chunk.startTime/1000);
@@ -241,8 +231,8 @@ int DeviceFileCatalog::findFileIndex(qint64 startTime) const
 QString DeviceFileCatalog::fullFileName(const Chunk& chunk) const
 {
     QMutexLocker lock(&m_mutex);
-    return closeDirPath(qnStorageMan->storageRoots()[chunk.storageIndex]->getUrl()) + 
-                m_resource->getMAC().toString() + QString('/') +
+    return closeDirPath(qnStorageMan->storageRoot(chunk.storageIndex)->getUrl()) + 
+                m_macAddress + QString('/') +
                 QnStorageManager::dateTimeStr(chunk.startTime) + 
                 strPadLeft(QString::number(chunk.fileIndex), 3, '0') + 
                 QString(".mkv");

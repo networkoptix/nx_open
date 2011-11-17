@@ -261,28 +261,41 @@ int main(int argc, char *argv[])
     restServer.registerHandler("api/RecordedTimePeriods", new QnRecordedChunkListHandler());
     restServer.registerHandler("xsd/*", new QnXsdHelperHandler());
 
-#if 0
     // Get storages sample code.
     QnResourceList storages;
     appServerConnection.getStorages(storages);
 
+    bool storageAdded = false;
     foreach (QnResourcePtr resource, storages)
     {
         QnStoragePtr storage = resource.dynamicCast<QnStorage>();
-
-        qDebug() << "Storage: " << storage->getMaxStoreTime() << storage->getIndex();
+        if (storage->getParentId().toString() == serverId())
+        {
+            storageAdded = true;
+            qnResPool->addResource(storage);
+            qnStorageMan->addStorage(storage);
+        }
     }
-#endif
 
-    QnStoragePtr storage0(new QnStorage());
-    storage0->setUrl("g:/records");
-    storage0->setIndex(0);
-    //storage0->setSpaceLimit(238500ll * 1000 * 1024);
-    storage0->setSpaceLimit(100ll * 1000 * 1024);
-    qnResPool->addResource(storage0);
-    qnStorageMan->addStorage(storage0);
+    if (!storageAdded)
+    {
+        QString errorMessage = QString("AppServer has no storages defined. Go to http://%1:%2/admin and add storage for server ID=%3").arg(host.toString()).arg(port).arg(serverId());
+        qDebug() << errorMessage;
+        cl_log.log(errorMessage, cl_logERROR);
+        QnStoragePtr storage(new QnStorage());
+        storage->setUrl("c:/records");
+        storage->setIndex(0);
+        //storage0->setSpaceLimit(238500ll * 1000 * 1024);
+        storage->setSpaceLimit(100ll * 1000 * 1024);
 
-    QnFileDeletor fileDeletor(storage0->getUrl()); // constructor got root folder for temp files
+        qnResPool->addResource(storage);
+        qnStorageMan->addStorage(storage);
+    }
+    qnStorageMan->loadFullFileCatalog();
+
+    QDir stateDirectory;
+    stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
+    QnFileDeletor fileDeletor(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
 
     QnRecordingManager::instance()->start();
     // ------------------------------------------

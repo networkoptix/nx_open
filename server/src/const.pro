@@ -21,6 +21,7 @@ TARGET = server
 win32: RC_FILE = server.rc
 
 CONFIG(debug, debug|release) {
+  CONFIG += console
   DESTDIR = ../bin/debug
   OBJECTS_DIR  = ../build/debug
   MOC_DIR = ../build/debug/generated

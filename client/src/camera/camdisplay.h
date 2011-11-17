@@ -59,6 +59,7 @@ public slots:
     void onPrevFrameOccured();
 signals:
     void reachedTheEnd();
+    void liveMode(bool value);
 private:
 	bool haveAudio(float speed) const;
 
