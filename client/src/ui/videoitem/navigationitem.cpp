@@ -462,12 +462,14 @@ void NavigationItem::play()
     setActive(true);
 
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
-    qint64 seekTime = AV_NOPTS_VALUE;
     if (reader->onPause() && reader->isRealTimeSource())
-        seekTime = reader->currentTime();
-    reader->resumeMedia();
-    if (seekTime != AV_NOPTS_VALUE)
-        reader->jumpToPreviousFrame(seekTime, true);
+    {
+        reader->resumeMedia();
+        reader->jumpToPreviousFrame(reader->currentTime(), true);
+    }
+    else {
+      reader->resumeMedia();
+    }
 
     if (m_graphicsWidget->isSelected() || !m_playing)
         m_camera->getCamCamDisplay()->playAudio(m_playing);
