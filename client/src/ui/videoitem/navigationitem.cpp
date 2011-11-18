@@ -380,9 +380,9 @@ void NavigationItem::updateSlider()
 }
 
 void NavigationItem::updatePeriodList() {
-    qint64 w = m_timeSlider->sliderRange();
-    qint64 t = m_timeSlider->viewPortPos();
-    if(m_timePeriod.startTime <= t && t + w <= m_timePeriod.startTime + m_timePeriod.duration)
+    qint64 w = m_timeSlider->sliderRange() * 1000;
+    qint64 t = m_timeSlider->viewPortPos() * 1000;
+    if(m_timePeriod.startTimeUSec <= t && t + w <= m_timePeriod.startTimeUSec + m_timePeriod.durationUSec)
         return;
     
     QnResourcePtr resource = m_camera->getStreamreader()->getResource();
@@ -406,18 +406,18 @@ void NavigationItem::updatePeriodList() {
     QnVideoServerConnectionPtr connection = serverResource->apiConnection();
     if(connection.isNull())
         return;
-
-    const qint64 oneHour = 60 * 60 * 1000;
+    
+    const qint64 oneHour = 60ll * 60ll * 1000ll * 1000ll;
     if(w < oneHour)
         w = oneHour;
 
     QnNetworkResourceList resources;
     resources.push_back(networkResource); // TODO
+    
+    m_timePeriod.startTimeUSec = t - w;
+    m_timePeriod.durationUSec = w * 3;
 
-    m_timePeriod.startTime = t - w;
-    m_timePeriod.duration = w * 3;
-
-    QnTimePeriodList timePeriods = connection->recordedTimePeriods(resources, m_timePeriod.startTime, m_timePeriod.startTime + m_timePeriod.duration, 1);
+    QnTimePeriodList timePeriods = connection->recordedTimePeriods(resources, m_timePeriod.startTimeUSec, m_timePeriod.startTimeUSec + m_timePeriod.durationUSec, 1);
     m_timeSlider->setTimePeriodList(timePeriods);
 }
 

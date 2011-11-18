@@ -17,11 +17,7 @@ int SyncHTTP::syncGet (const QString& path, QIODevice* to)
     QNetworkAccessManager accessManager;
     QEventLoop loop;
 
-    QUrl qurl;
-    qurl.setScheme("http");
-    qurl.setHost(m_hostName.toString());
-    qurl.setPort(m_port);
-    qurl.setPath(path);
+    QUrl qurl("http://" + m_hostName.toString() + ":" + QString::number(m_port) + "/" + path);
 
     QNetworkRequest request(qurl);
 
@@ -50,11 +46,7 @@ int SyncHTTP::syncPost (const QString & path, QIODevice * data, QIODevice * to)
     QNetworkAccessManager accessManager;
     QEventLoop loop;
 
-    QUrl qurl;
-    qurl.setScheme("http");
-    qurl.setHost(m_hostName.toString());
-    qurl.setPort(m_port);
-    qurl.setPath(path);
+    QUrl qurl("http://" + m_hostName.toString() + ":" + QString::number(m_port) + "/" + path);
 
     QNetworkRequest request(qurl);
 

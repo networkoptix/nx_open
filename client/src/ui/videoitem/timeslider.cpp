@@ -167,16 +167,21 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         // TODO: use lower_bound here and draw only what is actually needed.
         foreach(const QnTimePeriod &period, m_parent->timePeriodList())
         {
-            qreal left = x + static_cast<qreal>(period.startTime - pos) / range * w;
-            qreal right = x + static_cast<qreal>(period.duration + period.duration - pos) / range * w;
-
+            qreal left = x + static_cast<qreal>(period.startTimeUSec / 1000 - pos) / range * w;
             left = qMax(left, contentsRect.left());
-            right = qMin(right, contentsRect.right());
+
+            qreal right;
+            if(period.durationUSec == -1) {
+                right = contentsRect.right();
+            } else {
+                right = x + static_cast<qreal>((period.startTimeUSec + period.durationUSec) / 1000 - pos) / range * w;
+                right = qMin(right, contentsRect.right());
+            }
 
             if(left > right)
                 continue;
 
-            painter->fillRect(left, contentsRect.top(), left - right, contentsRect.height(), QColor(255,255,255,64));
+            painter->fillRect(left, contentsRect.top(), right - left, contentsRect.height(), QColor(255,255,255,64));
         }
     }
 
