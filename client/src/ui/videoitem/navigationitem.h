@@ -57,7 +57,8 @@ private Q_SLOTS:
     void stepBackward();
     void stepForward();
 
-    void jumpToLive();
+    void jumpToLiveToggled(bool toggled);
+    void jumpOccured(qint64 mksec);
 
     void onSliderPressed();
     void onSliderReleased();

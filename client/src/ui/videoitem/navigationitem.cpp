@@ -157,7 +157,9 @@ NavigationItem::NavigationItem(QGraphicsItem * /*parent*/) :
 
     m_jumpToLiveButton = new ImageButton(this);
     m_jumpToLiveButton->addPixmap(Skin::pixmap(QLatin1String("rewind_forward_grey.png")), ImageButton::Active, ImageButton::Background);
-    m_jumpToLiveButton->addPixmap(Skin::pixmap(QLatin1String("rewind_forward_blue.png")), ImageButton::Active, ImageButton::Hovered);
+    m_jumpToLiveButton->addPixmap(Skin::pixmap(QLatin1String("rewind_forward_blue.png")), ImageButton::Active, ImageButton::Checked);
+    m_jumpToLiveButton->addPixmap(Skin::pixmap(QLatin1String("rewind_forward_blue.png")), ImageButton::Active, ImageButton::Pressed);
+    m_jumpToLiveButton->setCheckable(true);
     m_jumpToLiveButton->setPreferredSize(32, 18);
     m_jumpToLiveButton->setMaximumSize(m_jumpToLiveButton->preferredSize());
 
@@ -166,7 +168,8 @@ NavigationItem::NavigationItem(QGraphicsItem * /*parent*/) :
     connect(m_playButton, SIGNAL(clicked()), this, SLOT(togglePlayPause()));
     connect(m_stepForwardButton, SIGNAL(clicked()), this, SLOT(stepForward()));
     connect(m_forwardButton, SIGNAL(clicked()), this, SLOT(rewindForward()));
-    connect(m_jumpToLiveButton, SIGNAL(clicked()), this, SLOT(jumpToLive()));
+    connect(m_jumpToLiveButton, SIGNAL(clicked()), m_jumpToLiveButton, SLOT(toggle()));  /* Workaround for the flawed implementation. */
+    connect(m_jumpToLiveButton, SIGNAL(toggled(bool)), this, SLOT(jumpToLiveToggled(bool)));
 
     QGraphicsLinearLayout *buttonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     buttonsLayout->setSpacing(2);
@@ -323,8 +326,9 @@ void NavigationItem::setVideoCamera(CLVideoCamera *camera)
     m_speedSlider->resetSpeed();
     restoreInfoText();
 
-    if (m_camera)
-        disconnect(m_camera->getCamCamDisplay(), SIGNAL(liveMode(bool)), this, SLOT(onLiveModeChanged(bool)));
+    if (m_camera) {
+        disconnect(m_camera->getCamCamDisplay(), NULL, this, NULL);
+    }
 
     m_camera = camera;
 
@@ -335,6 +339,7 @@ void NavigationItem::setVideoCamera(CLVideoCamera *camera)
         QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
 
         connect(m_camera->getCamCamDisplay(), SIGNAL(liveMode(bool)), this, SLOT(onLiveModeChanged(bool)));
+        connect(m_camera->getStreamreader(), SIGNAL(jumpOccured(qint64, bool)), this, SLOT(jumpOccured(qint64)));
 
         setPlaying(!reader->onPause());
     }
@@ -453,8 +458,19 @@ void NavigationItem::onValueChanged(qint64 time)
     //m_camera->streamJump(time);
 }
 
-void NavigationItem::jumpToLive() 
+void NavigationItem::jumpOccured(qint64 mksec) 
 {
+    m_jumpToLiveButton->setChecked(mksec == DATETIME_NOW); // TODO: doesn't work.
+}
+
+void NavigationItem::jumpToLiveToggled(bool toggled) 
+{
+    if(!toggled)
+        return;
+
+    if (m_camera == NULL)
+        return;
+
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
 
     reader->jumpToPreviousFrame(DATETIME_NOW , true);
