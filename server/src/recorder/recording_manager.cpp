@@ -16,12 +16,24 @@ QnRecordingManager::QnRecordingManager()
 
 QnRecordingManager::~QnRecordingManager()
 {
+    stop();
 }
 
 void QnRecordingManager::start()
 {
     connect(qnResPool, SIGNAL(resourceAdded(QnResourcePtr)), this, SLOT(onNewResource(QnResourcePtr)));
     connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(onRemoveResource(QnResourcePtr)));
+}
+
+void QnRecordingManager::stop()
+{
+    foreach(QnStreamRecorder* recorder, m_recordMap.values())
+        recorder->pleaseStop();
+    foreach(QnStreamRecorder* recorder, m_recordMap.values()) {
+        recorder->stop();
+        delete recorder;
+    }
+    m_recordMap.clear();
 }
 
 void QnRecordingManager::onNewResource(QnResourcePtr res)
