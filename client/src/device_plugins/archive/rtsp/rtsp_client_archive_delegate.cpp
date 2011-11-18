@@ -14,7 +14,8 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate():
     m_tcpMode(true),
     m_rtpData(0),
     m_position(DATETIME_NOW),
-    m_opened(false)
+    m_opened(false),
+    m_waitBOF(false)
 {
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
     m_flags |= Flag_SlowSource;
@@ -59,12 +60,14 @@ bool QnRtspClientArchiveDelegate::open(QnResourcePtr resource)
 
 void QnRtspClientArchiveDelegate::beforeClose()
 {
+    m_waitBOF = false;
     if (m_rtpData)
         m_rtpData->getSocket()->close();
 }
 
 void QnRtspClientArchiveDelegate::close()
 {
+    m_waitBOF = false;
     m_rtspSession.stop();
     m_rtpData = 0;
     deleteContexts();
@@ -153,6 +156,14 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
         }
         else
             qWarning() << Q_FUNC_INFO << __LINE__ << "Only FFMPEG payload format now implemeted. Ask developers to add '" << format << "' format";
+
+        if (result && m_waitBOF)
+        {
+            if (result->flags & QnAbstractMediaData::MediaFlags_BOF)
+                m_waitBOF = false;
+            else
+                result.clear();
+        }
     }
     if (!result)
         reopen();
@@ -165,6 +176,7 @@ qint64 QnRtspClientArchiveDelegate::seek(qint64 time)
     deleteContexts(); // context is going to create again on first data after SEEK, so ignore rest of data before seek
     m_position = time;
     m_rtspSession.sendPlay(time, m_rtspSession.getScale());
+    m_waitBOF = true;
     return time;
 }
 

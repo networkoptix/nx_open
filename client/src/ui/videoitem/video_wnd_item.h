@@ -51,6 +51,7 @@ public:
 
     virtual void goToSteadyMode(bool steady, bool instant);
     QImage getScreenshot();
+    bool contains(CLAbstractRenderer* renderer) const;
 protected:
 
     QPointF getBestSubItemPos(CLSubItemType type);

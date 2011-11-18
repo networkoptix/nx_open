@@ -2,6 +2,7 @@
 #include <QDir>
 #include <QSettings>
 #include <QUdpSocket>
+#include <QUrl>
 
 #include "version.h"
 #include "utils/common/util.h"
@@ -232,11 +233,11 @@ int main(int argc, char *argv[])
 //    QSettings settings;
 //    settings.setValue("appserverAddress", "127.0.0.1");
 
-    QString appserverAddress = QSettings().value("appserverAddress", "10.0.2.3").toString();
+    QUrl appserverUrl = QUrl(QSettings().value("appserverUrl", QLatin1String(DEFAULT_APPSERVER_URL)).toString());
 
-    QHostAddress host(appserverAddress);
-    
-    int port = 8000;
+    QHostAddress host(appserverUrl.host());
+    int port = appserverUrl.port();
+
     QAuthenticator auth;
     auth.setUser("appserver");
     auth.setPassword("123");
@@ -250,7 +251,7 @@ int main(int argc, char *argv[])
 
     qnResTypePool->addResourceTypeList(resourceTypeList);
 
-    registerServer(appServerConnection, localAddress(appserverAddress));
+    registerServer(appServerConnection, localAddress(appserverUrl.host()));
 
     QnAppserverResourceProcessor processor(QnId(serverId()), host, port, auth, QnResourceDiscoveryManager::instance());
 

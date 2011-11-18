@@ -79,7 +79,7 @@ class MySlider : public GraphicsSlider
     friend class TimeSlider; // ### for sizeHint()
 
 public:
-    MySlider(QGraphicsItem *parent = 0);
+    MySlider(TimeSlider *parent);
 
     void setToolTipItem(ToolTipItem *toolTip);
 
@@ -97,13 +97,15 @@ private:
     void ensureHandleRect() const;
 
 private:
+    TimeSlider *m_parent;
     ToolTipItem *m_toolTip;
     mutable QRect m_handleRect;
     mutable bool m_handleRectValid;
 };
 
-MySlider::MySlider(QGraphicsItem *parent)
+MySlider::MySlider(TimeSlider *parent)
     : GraphicsSlider(parent),
+      m_parent(parent),
       m_toolTip(0),
       m_handleRectValid(false)
 {
@@ -151,6 +153,33 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     linearGrad.setColorAt(0, QColor(0, 43, 130));
     linearGrad.setColorAt(1, QColor(186, 239, 255));
     painter->fillRect(r, linearGrad);
+
+    /* Draw time periods. */
+    if(!m_parent->timePeriodList().empty())
+    {
+        const qint64 range = m_parent->sliderRange();
+        const qint64 pos = m_parent->viewPortPos() /*+ timezoneOffset*/;
+
+        QRectF contentsRect = this->contentsRect();
+        qreal x = contentsRect.left() + m_handleRect.width() / 2;
+        qreal w = contentsRect.width() - m_handleRect.width();
+
+        // TODO: use lower_bound here and draw only what is actually needed.
+        foreach(const QnTimePeriod &period, m_parent->timePeriodList())
+        {
+            qreal left = x + static_cast<qreal>(period.startTime - pos) / range * w;
+            qreal right = x + static_cast<qreal>(period.duration + period.duration - pos) / range * w;
+
+            left = qMax(left, contentsRect.left());
+            right = qMin(right, contentsRect.right());
+
+            if(left > right)
+                continue;
+
+            painter->fillRect(left, contentsRect.top(), left - right, contentsRect.height(), QColor(255,255,255,64));
+        }
+    }
+
 
     painter->drawPixmap(m_handleRect, pix, QRectF(pix.rect()));
 }
@@ -803,6 +832,9 @@ void TimeSlider::setViewPortPos(qint64 value)
     }
 }
 
+/*!
+    \returns Milliseconds per one unit of the underlying slider.
+*/
 double TimeSlider::delta() const
 {
     return ((1.0f/(m_slider->maximum() - m_slider->minimum()))*length())/qExp(scalingFactor()/2);
@@ -818,7 +850,10 @@ int TimeSlider::toSlider(qint64 value)
     return (value - m_viewPortPos) / delta();
 }
 
-qint64 TimeSlider::sliderRange()
+/*!
+    \returns Slider range in milliseconds.
+*/
+qint64 TimeSlider::sliderRange() const
 {
     return (m_slider->maximum() - m_slider->minimum())*delta();
 }

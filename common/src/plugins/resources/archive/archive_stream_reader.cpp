@@ -30,7 +30,10 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_requiredJumpTime(AV_NOPTS_VALUE),
     m_lastUIJumpTime(AV_NOPTS_VALUE),
     m_lastFrameDuration(0),
-    m_selectedAudioChannel(0)
+    m_selectedAudioChannel(0),
+    m_BOF(false),
+    m_tmpSkipFramesToTime(AV_NOPTS_VALUE)
+
 {
     // Should init packets here as some times destroy (av_free_packet) could be called before init
     //connect(dev.data(), SIGNAL(onStatusChanged(QnResource::Status, QnResource::Status)), this, SLOT(onStatusChanged(QnResource::Status, QnResource::Status)));
@@ -153,12 +156,13 @@ bool QnArchiveStreamReader::getNextVideoPacket()
 QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
 {
 begin_label:
-    bool BOF = false;
 	if (mFirstTime)
 	{
         // this is here instead if constructor to unload ui thread
-		if (init()) 
+        if (init()) {
+            m_BOF = true;
 		    mFirstTime = false;
+        }
         else {
             // If media data can't be opened wait 1 second and try again
             return QnAbstractMediaDataPtr();
@@ -171,9 +175,10 @@ begin_label:
         {
             m_lastGopSeekTime = -1;
             intChanneljumpTo(m_requiredJumpTime, 0);
+            setSkipFramesToTime(m_tmpSkipFramesToTime);
             m_lastUIJumpTime = m_requiredJumpTime;
             m_requiredJumpTime = AV_NOPTS_VALUE;
-            BOF = true;
+            m_BOF = true;
         }
     }
 
@@ -319,7 +324,6 @@ begin_label:
             videoData->flags |= AV_REVERSE_PACKET;
         }
 
-        m_useTwice = false;
 
         /*
         // -------------------------------------------
@@ -383,6 +387,16 @@ begin_label:
                 else if (reverseMode && m_nextData->timestamp > skipFramesToTime())
                     videoData->ignore = true;
                 else {
+                    if (skipFramesToTime() != 0) 
+                    {
+                        QString msg;
+                        QTextStream str(&msg);
+                        str << "no more ignore. curTime=" << QDateTime::fromMSecsSinceEpoch(m_nextData->timestamp/1000).toString() 
+                            << " borderTime=" << QDateTime::fromMSecsSinceEpoch(skipFramesToTime()/1000).toString();
+                        str.flush();
+                        cl_log.log(msg, cl_logWARNING);
+                        str.flush();
+                    }
 					setSkipFramesToTime(0);
                 }
 			}
@@ -398,16 +412,19 @@ begin_label:
 		m_currentData->flags |= QnAbstractMediaData::MediaFlags_AfterEOF;
 		m_eof = false;
 	}
-    if (BOF)
+    if (m_BOF) {
         m_currentData->flags |= QnAbstractMediaData::MediaFlags_BOF;        
+        m_BOF = false;
+    }
 
 	return m_currentData;
 }
 
-void QnArchiveStreamReader::channeljumpTo(qint64 mksec, int channel)
+void QnArchiveStreamReader::channeljumpTo(qint64 mksec, int channel, qint64 skipTime)
 {
     QMutexLocker mutex(&m_jumpMtx);
     m_requiredJumpTime = mksec;
+    m_tmpSkipFramesToTime = skipTime;
 }
 
 void QnArchiveStreamReader::intChanneljumpTo(qint64 mksec, int /*channel*/)

@@ -2,6 +2,7 @@
 #define TIMESLIDER_H
 
 #include "ui/widgets2/graphicswidget.h"
+#include <recording/device_file_catalog.h> /* For QnTimePeriodList. */
 
 class QPropertyAnimation;
 
@@ -35,10 +36,14 @@ public:
     bool centralise() const { return m_centralise; }
     void setCentralise(bool b) { m_centralise = b; }
 
-    qint64 sliderRange();
+    qint64 sliderRange() const;
+    qint64 viewPortPos() const;
 
     qint64 minimumRange() const;
     void setMinimumRange(qint64);
+
+    const QnTimePeriodList &timePeriodList() const { return m_timePeriodList; }
+    void setTimePeriodList(const QnTimePeriodList &timePeriodList) { m_timePeriodList = timePeriodList; }
 
 public Q_SLOTS:
     void setMinimumValue(qint64 value);
@@ -75,7 +80,6 @@ private:
     qint64 fromSlider(int value);
     int toSlider(qint64 value);
 
-    qint64 viewPortPos() const;
     void setViewPortPos(qint64 value);
 
     void updateSlider();
@@ -97,7 +101,10 @@ private:
     QPropertyAnimation *m_animation;
     bool m_centralise;
 
+    QnTimePeriodList m_timePeriodList;
+
     friend class TimeLine;
+    friend class MySlider;
 };
 
 #endif // TIMESLIDER_H

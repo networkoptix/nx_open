@@ -17,8 +17,10 @@ QString QnAppServerResourceSearcher::manufacture() const
 
 QnResourceList QnAppServerResourceSearcher::findResources()
 {
-    QHostAddress host(QSettings().value("appserverAddress", "10.0.2.3").toString());
-    int port = 8000;
+    QUrl appserverUrl = QUrl(QSettings().value("appserverUrl", QLatin1String(DEFAULT_APPSERVER_URL)).toString());
+    QHostAddress host(appserverUrl.host());
+    int port = appserverUrl.port();
+
     QAuthenticator auth;
     auth.setUser("appserver");
     auth.setPassword("123");

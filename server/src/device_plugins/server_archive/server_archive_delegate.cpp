@@ -60,6 +60,8 @@ void QnServerArchiveDelegate::close()
 qint64 QnServerArchiveDelegate::seek(qint64 time)
 {
     cl_log.log("serverArchiveDelegate. jump to ",QDateTime::fromMSecsSinceEpoch(time/1000).toString(), cl_logALWAYS);
+    QTime t;
+    t.start();
     DeviceFileCatalog::Chunk newChunk = m_chunkSequence->getNextChunk(m_resource, time);
 
     if (newChunk.startTime != m_currentChunk.startTime)
@@ -68,7 +70,9 @@ qint64 QnServerArchiveDelegate::seek(qint64 time)
             return -1;
     }
     qint64 chunkOffset = qMax(time - m_currentChunk.startTime, 0ll);
-    return m_currentChunk.startTime + m_aviDelegate->seek(chunkOffset);
+    qint64 rez = m_currentChunk.startTime + m_aviDelegate->seek(chunkOffset);
+    cl_log.log("jump time ", t.elapsed(), cl_logALWAYS);
+    return rez;
 }
 
 QnAbstractMediaDataPtr QnServerArchiveDelegate::getNextData()

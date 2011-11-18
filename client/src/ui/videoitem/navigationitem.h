@@ -2,6 +2,7 @@
 #define NAVIGATIONITEM_H
 
 #include "unmoved/unmoved_interactive_opacity_item.h"
+#include <recording/device_file_catalog.h> /* For QnTimePeriod. */
 
 class QGraphicsWidget;
 class QLabel;
@@ -41,6 +42,7 @@ public:
 protected:
     void timerEvent(QTimerEvent* event);
     void updateSlider();
+    void updatePeriodList();
 
 private Q_SLOTS:
     void onLiveModeChanged(bool value);
@@ -89,6 +91,8 @@ private:
     bool m_mouseOver;
 
     bool m_active;
+
+    QnTimePeriod m_timePeriod;
 
     struct RestoreInfoTextData {
         QString extraInfoText;
