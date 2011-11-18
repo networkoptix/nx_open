@@ -9,8 +9,7 @@ QnSyncPlayArchiveDelegate::QnSyncPlayArchiveDelegate(QnAbstractArchiveReader* re
     m_syncWrapper(syncWrapper), 
     m_ownerDelegate(ownerDelegate),
     m_seekTime(AV_NOPTS_VALUE),
-    m_enableSync(true),
-    m_liveMode(true)
+    m_enableSync(true)
 {
 
 }
@@ -64,7 +63,6 @@ qint64 QnSyncPlayArchiveDelegate::seek (qint64 time)
     //return m_syncWrapper->seek(time);
     //m_seekTime = AV_NOPTS_VALUE;
     m_tmpData = QnAbstractMediaDataPtr(0);
-    m_liveMode = time == DATETIME_NOW;
     return m_ownerDelegate->seek(time);
 }
 
@@ -143,14 +141,19 @@ QnAbstractMediaDataPtr QnSyncPlayArchiveDelegate::getNextData()
         }
     }
 
-    //if (m_tmpData && !m_reader->isSingleShotMode())
-    if (m_tmpData && m_enableSync && !m_liveMode && vd && vd->timestamp >= m_reader->skipFramesToTime())
-        m_syncWrapper->waitIfNeed(m_reader, m_tmpData->timestamp);
+    QnAbstractMediaDataPtr rez;
+    {
+        QMutexLocker lock(&m_genericMutex);
+        rez = m_tmpData;
+        m_tmpData = readedData;
+        m_syncWrapper->onNewDataReaded();
+    }
 
-    QMutexLocker lock(&m_genericMutex);
-    QnAbstractMediaDataPtr rez = m_tmpData;
-    m_tmpData = readedData;
-    m_syncWrapper->onNewDataReaded();
+    //if (m_tmpData && !m_reader->isSingleShotMode())
+    if (m_tmpData && m_enableSync && vd && vd->timestamp >= m_reader->skipFramesToTime() &&
+        !(vd->flags & QnAbstractMediaData::MediaFlags_LIVE) && qAbs(m_reader->getSpeed()) < 1.001)
+        m_syncWrapper->waitIfNeed(m_reader, rez->timestamp);
+
     return rez;
 }
 

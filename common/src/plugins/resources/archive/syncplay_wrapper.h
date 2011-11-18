@@ -29,6 +29,7 @@ private slots:
     void onStreamPaused();
     void onStreamResumed();
     void onNextPrevFrameOccured();
+    void onSpeedChanged(double value);
 private:
     qint64 minTime() const;
     qint64 endTime() const;

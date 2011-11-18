@@ -55,6 +55,7 @@ public:
     void setNeedSleep(bool sleep);
 
     void setSpeed(double value);
+    double getSpeed() const;
 
     void disconnectFromResource();
 signals:
@@ -62,6 +63,7 @@ signals:
     void videoParamsChanged(AVCodecContext * codec);
 	void realTimeStreamHint(bool value);
     void slowSourceHint();
+    void speedChanged(double value);
 protected:
 	virtual void putData(QnAbstractDataPacketPtr data);
     void beforeDisconnectFromResource();
@@ -72,6 +74,7 @@ protected:
 
 	mutable QMutex m_mutex;
 	QnAssociativeArray m_streamParam;
+    double m_speed;
 
 };
 

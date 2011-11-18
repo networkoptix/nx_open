@@ -5,6 +5,8 @@
 #include "abstract_archive_stream_reader.h"
 #include "utils/media/externaltimesource.h"
 
+static const qint64 SYNC_EPS = 1000 * 1000;
+
 struct ReaderInfo
 {
     ReaderInfo(QnAbstractArchiveReader* _reader, QnAbstractArchiveDelegate* _oldDelegate, QnlTimeSource* _cam):
@@ -73,6 +75,8 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveReader* reader,
     connect(reader, SIGNAL(streamResumed()), this, SLOT(onStreamResumed()), Qt::DirectConnection);
     connect(reader, SIGNAL(nextFrameOccured()), this, SLOT(onNextPrevFrameOccured()), Qt::DirectConnection);
     connect(reader, SIGNAL(prevFrameOccured()), this, SLOT(onNextPrevFrameOccured()), Qt::DirectConnection);
+
+    connect(reader, SIGNAL(speedChanged(double)), this, SLOT(onSpeedChanged(double)), Qt::DirectConnection);
 }
 
 void QnArchiveSyncPlayWrapper::onNextPrevFrameOccured()
@@ -95,6 +99,20 @@ void QnArchiveSyncPlayWrapper::onStreamResumed()
     {
         if (info.reader != sender())
             info.reader->resumeMedia();
+    }
+    d->blockPausePlaySignal = false;
+}
+
+void QnArchiveSyncPlayWrapper::onSpeedChanged(double value)
+{
+    Q_D(QnArchiveSyncPlayWrapper);
+    if (d->blockPausePlaySignal)
+        return;
+    d->blockPausePlaySignal = true;
+    foreach(ReaderInfo info, d->readers)
+    {
+        if (info.reader != sender())
+            info.reader->setSpeed(value);
     }
     d->blockPausePlaySignal = false;
 }
@@ -233,15 +251,17 @@ void QnArchiveSyncPlayWrapper::waitIfNeed(QnAbstractArchiveReader* reader, qint6
 {
     Q_D(QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->syncMutex);
+    // +SYNC_EPS
     while (!reader->needToStop() && timestamp > secondTime()) // time of second(next) frame is less than it time.
     {
         //QString msg;
         //QTextStream str(&msg);
-        //str << "waiting. curTime=" << QDateTime::fromMSecsSinceEpoch(timestamp/1000).toString() << " secondtime=" << QDateTime::fromMSecsSinceEpoch(secondTime()/1000).toString();
+        //str << "waiting. curTime=" << QDateTime::fromMSecsSinceEpoch(timestamp/1000).toString("hh:mm:ss.zzz") << 
+        //       " secondtime=" << QDateTime::fromMSecsSinceEpoch(secondTime()/1000).toString("hh:mm:ss.zzz");
         //str.flush();
         //cl_log.log(msg, cl_logWARNING);
 
-        d->syncCond.wait(&d->syncMutex, 10);
+        d->syncCond.wait(&d->syncMutex, 50);
     }
 }
 
