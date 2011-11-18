@@ -59,16 +59,20 @@ void QnArchiveStreamReader::previousFrame(qint64 mksec)
     QnAbstractArchiveReader::previousFrame(mksec);
 }
 
+
+void QnArchiveStreamReader::setCurrentTime(qint64 value)
+{
+    QMutexLocker mutex(&m_framesMutex);
+    m_currentTime = value;
+}
+
 qint64 QnArchiveStreamReader::currentTime() const
 {
-    QMutexLocker mutex(&m_cs);
-
-    qint64 jumpTime = skipFramesToTime();
-
-	if (jumpTime)
-		return jumpTime;
-
-	return m_currentTime;
+    QMutexLocker mutex(&m_framesMutex);
+	if (m_skipFramesToTime)
+		return m_skipFramesToTime;
+    else
+	    return m_currentTime;
 }
 
 ByteIOContext* QnArchiveStreamReader::getIOContext()
@@ -102,9 +106,9 @@ const QnResourceAudioLayout* QnArchiveStreamReader::getDPAudioLayout() const
 
 bool QnArchiveStreamReader::init()
 {
+    setCurrentTime(0);
 	QMutexLocker mutex(&m_cs);
 
-	m_currentTime = 0;
 	m_previousTime = -1;
 
     if (!m_delegate->open(m_resource))
@@ -225,8 +229,9 @@ begin_label:
         videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(m_currentData);
         m_previousTime = m_currentTime;
 
-        if (m_currentData->timestamp != AV_NOPTS_VALUE) 
-            m_currentTime =  m_currentData->timestamp;
+        if (m_currentData->timestamp != AV_NOPTS_VALUE) {
+            setCurrentTime(m_currentData->timestamp);
+        }
 
         /*
         while (m_currentData->stream_index >= m_lastPacketTimes.size())
@@ -272,9 +277,10 @@ begin_label:
                 isKeyFrame =  m_currentData->flags  & AV_PKT_FLAG_KEY;
             }
             
-            if (m_eof || m_currentTime == 0 && m_bottomIFrameTime > AV_REVERSE_BLOCK_START && m_topIFrameTime >= m_bottomIFrameTime) {
+            if (m_eof || m_currentTime == 0 && m_bottomIFrameTime > AV_REVERSE_BLOCK_START && m_topIFrameTime >= m_bottomIFrameTime) 
+            {
                 // seek from EOF to BOF occured
-                m_currentTime = m_topIFrameTime;
+                setCurrentTime(m_topIFrameTime);
                 m_eof = false;
             }
 

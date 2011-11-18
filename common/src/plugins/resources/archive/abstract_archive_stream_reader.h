@@ -83,8 +83,8 @@ protected:
     mutable QMutex m_framesMutex;
 
     QnAbstractArchiveDelegate* m_delegate;
+    qint64 m_skipFramesToTime;
 private:
-	qint64 m_skipFramesToTime;
     qint64 m_lastJumpTime;
 };
 

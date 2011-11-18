@@ -464,7 +464,7 @@ void NavigationItem::play()
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     qint64 seekTime = AV_NOPTS_VALUE;
     if (reader->onPause() && reader->isRealTimeSource())
-        seekTime = reader->currentTime();
+        seekTime = m_camera->getCamCamDisplay()->currentTime();
     reader->resumeMedia();
     if (seekTime != AV_NOPTS_VALUE)
         reader->jumpToPreviousFrame(seekTime, true);

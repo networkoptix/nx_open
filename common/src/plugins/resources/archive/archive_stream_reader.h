@@ -43,6 +43,7 @@ protected:
     virtual qint64 contentLength() const { return m_delegate->endTime() - m_delegate->startTime(); }
     bool initCodecs();
     bool openFormatContext();
+    void setCurrentTime(qint64 value);
 protected:
     qint64 m_currentTime;
     qint64 m_previousTime;
