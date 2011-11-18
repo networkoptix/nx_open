@@ -88,14 +88,14 @@ private:
     qint64 m_maximumValue;
     qint64 m_currentValue;
     qint64 m_viewPortPos;
-
+    qint64 m_minimumRange;
     double m_scalingFactor;
-    bool m_isUserInput;
     int m_delta;
+
+    bool m_isUserInput;
 
     QPropertyAnimation *m_animation;
     bool m_centralise;
-    qint64 m_minimumRange;
 
     friend class TimeLine;
 };
