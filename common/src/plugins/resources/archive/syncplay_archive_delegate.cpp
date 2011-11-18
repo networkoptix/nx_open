@@ -46,6 +46,11 @@ qint64 QnSyncPlayArchiveDelegate::endTime()
     return m_syncWrapper->endTime();
 }
 
+bool QnSyncPlayArchiveDelegate::isRealTimeSource() const 
+{ 
+    return m_ownerDelegate->isRealTimeSource();
+}
+
 qint64 QnSyncPlayArchiveDelegate::jumpToPreviousFrame (qint64 time, bool makeshot)
 {
     QMutexLocker lock(&m_genericMutex);

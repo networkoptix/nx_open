@@ -139,6 +139,13 @@ void QnAbstractArchiveReader::pause()
 void QnAbstractArchiveReader::resume()
 {
     QnClientPullMediaStreamProvider::resume();
+}
+
+void QnAbstractArchiveReader::resumeMedia()
+{
+    setSingleShotMode(false);
+    resume();
+    resumeDataProcessors();
     emit streamResumed();
 }
 
@@ -177,3 +184,9 @@ bool QnAbstractArchiveReader::open()
 {
     return m_delegate ? m_delegate->open(m_resource) : false;
 }
+
+bool QnAbstractArchiveReader::isRealTimeSource() const
+{
+    return m_delegate->isRealTimeSource();
+}
+

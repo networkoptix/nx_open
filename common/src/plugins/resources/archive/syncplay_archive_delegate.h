@@ -22,6 +22,7 @@ public:
     virtual qint64 seek (qint64 time);
     virtual QnVideoResourceLayout* getVideoLayout();
     virtual QnResourceAudioLayout* getAudioLayout();
+    virtual bool isRealTimeSource() const;
 
     void setStartDelay(qint64 startDelay);
     qint64 secondTime() const;

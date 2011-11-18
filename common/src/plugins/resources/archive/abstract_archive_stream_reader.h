@@ -51,11 +51,12 @@ public:
     void setCycleMode(bool value);
 
     virtual void pause();
-    virtual void resume();
+    void resumeMedia();
 
     qint64 skipFramesToTime() const;
     qint64 startTime() const;
     qint64 endTime() const;
+    bool isRealTimeSource() const;
 signals:
     void singleShotModeChanged(bool value);
     void beforeJump(qint64 mksec, bool makeshot);
@@ -65,6 +66,8 @@ signals:
     void nextFrameOccured();
     void prevFrameOccured();
 protected:
+    virtual void resume();
+
     virtual void setSkipFramesToTime(qint64 skipFramesToTime);
 	virtual void channeljumpTo(qint64 mksec, int channel, qint64 borderTime) = 0;
     virtual void pleaseStop();

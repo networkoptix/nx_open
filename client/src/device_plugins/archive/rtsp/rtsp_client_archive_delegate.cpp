@@ -15,7 +15,8 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate():
     m_rtpData(0),
     m_position(DATETIME_NOW),
     m_opened(false),
-    m_waitBOF(false)
+    m_waitBOF(false),
+    m_lastPacketFlags(-1)
 {
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
     m_flags |= Flag_SlowSource;
@@ -70,6 +71,7 @@ void QnRtspClientArchiveDelegate::close()
     m_waitBOF = false;
     m_rtspSession.stop();
     m_rtpData = 0;
+    m_lastPacketFlags = -1;
     deleteContexts();
     m_opened = false;
 }
@@ -167,7 +169,8 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
     }
     if (!result)
         reopen();
-  
+    if (result)
+        m_lastPacketFlags = result->flags;
     return result;
 }
 
@@ -303,4 +306,12 @@ void QnRtspClientArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
 {
     int sign = value ? -1 : 1;
     m_rtspSession.sendPlay(displayTime, /*RTPSession::RTSP_NOW*/ qAbs(m_rtspSession.getScale()) * sign);
+}
+
+bool QnRtspClientArchiveDelegate::isRealTimeSource() const 
+{ 
+    if (m_lastPacketFlags == -1)
+        return m_position == DATETIME_NOW; 
+    else
+        return m_lastPacketFlags & QnAbstractMediaData::MediaFlags_LIVE;
 }
