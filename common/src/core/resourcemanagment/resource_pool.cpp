@@ -1,7 +1,10 @@
 #include "resource_pool.h"
 
-QnResourcePool::QnResourcePool():
-m_resourcesMtx(QMutex::Recursive)
+Q_GLOBAL_STATIC(QnResourcePool, globalResourcePool)
+
+
+QnResourcePool::QnResourcePool() :
+    m_resourcesMtx(QMutex::Recursive)
 {
     qRegisterMetaType<QnResourcePtr>("QnResourcePtr");
     qRegisterMetaType<QnResource::Status>("QnResource::Status");
@@ -11,78 +14,78 @@ QnResourcePool::~QnResourcePool()
 {
 }
 
-
-QnResourcePool* QnResourcePool::instance()
+QnResourcePool *QnResourcePool::instance()
 {
-    static QnResourcePool inst;
-    return &inst;
+    return globalResourcePool();
 }
-
 
 void QnResourcePool::addResource(QnResourcePtr resource)
 {
     {
-        QMutexLocker mtx(&m_resourcesMtx);
+        QMutexLocker locker(&m_resourcesMtx);
         if (!resource->getId().isValid())
             resource->setId(QnId::generateSpecialId());
         m_resources[resource->getId()] = resource;
     }
-    emit resourceAdded(resource);
+    Q_EMIT resourceAdded(resource);
 }
 
-void QnResourcePool::addResources(QnResourceList resources)
+void QnResourcePool::addResources(const QnResourceList &resources)
 {
+    foreach (QnResourcePtr res, resources)
     {
-        QMutexLocker mtx(&m_resourcesMtx);
-        foreach(QnResourcePtr res, resources)
-        {
-            if (!res->getId().isValid())
-                res->setId(QnId::generateSpecialId());
-            m_resources[res->getId()] = res;
-        }
+        if (!res->getId().isValid())
+            res->setId(QnId::generateSpecialId());
     }
-    foreach(QnResourcePtr res, resources)
-        emit resourceAdded(res);
+    {
+        QMutexLocker locker(&m_resourcesMtx);
+        foreach (QnResourcePtr res, resources)
+            m_resources[res->getId()] = res;
+    }
+    foreach (QnResourcePtr res, resources)
+        Q_EMIT resourceAdded(res);
 }
 
 void QnResourcePool::removeResource(QnResourcePtr resource)
 {
+    int removed;
     {
-        QMutexLocker mtx(&m_resourcesMtx);
-        m_resources.remove(resource->getId());
+        QMutexLocker locker(&m_resourcesMtx);
+        removed = m_resources.remove(resource->getId());
     }
-    emit resourceRemoved(resource);
+    if (removed != 0)
+        Q_EMIT resourceRemoved(resource);
 }
 
-void QnResourcePool::removeResources(QnResourceList resources)
+void QnResourcePool::removeResources(const QnResourceList &resources)
 {
+    QnResourceList removedResources;
     {
-        QMutexLocker mtx(&m_resourcesMtx);
-        foreach(QnResourcePtr res, resources)
+        QMutexLocker locker(&m_resourcesMtx);
+        foreach (QnResourcePtr res, resources)
         {
-            m_resources.remove(res->getId());
+            if (m_resources.remove(res->getId()) != 0)
+                removedResources.append(res);
         }
     }
-    foreach(QnResourcePtr res, resources)
-    {
-        emit resourceRemoved(res);
-    }
+    foreach (QnResourcePtr res, removedResources)
+        Q_EMIT resourceRemoved(res);
 }
 
 QnResourcePtr QnResourcePool::getResourceById(const QnId& id) const
 {
-    QMutexLocker mtx(&m_resourcesMtx);
-    ResourceMap::const_iterator it = m_resources.find(id);
-    if (it == m_resources.end())
-        return QnResourcePtr(0);
+    QMutexLocker locker(&m_resourcesMtx);
+    ResourceMap::const_iterator it = m_resources.constFind(id);
+    if (it != m_resources.constEnd())
+        return it.value();
 
-    return it.value();
+    return QnResourcePtr(0);
 }
 
 QnResourcePtr QnResourcePool::getResourceByUrl(const QString& url) const
 {
-    QMutexLocker mtx(&m_resourcesMtx);
-    foreach(QnResourcePtr lres, m_resources)
+    QMutexLocker locker(&m_resourcesMtx);
+    foreach (QnResourcePtr lres, m_resources)
     {
         if (lres->getUrl() ==  url)
             return lres;
@@ -94,8 +97,8 @@ QnResourcePtr QnResourcePool::getResourceByUrl(const QString& url) const
 
 QnNetworkResourcePtr QnResourcePool::getNetResourceByMac(const QString& mac) const
 {
-    QMutexLocker mtx(&m_resourcesMtx);
-    foreach(QnResourcePtr lres, m_resources)
+    QMutexLocker locker(&m_resourcesMtx);
+    foreach (QnResourcePtr lres, m_resources)
     {
         QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(lres);
         if (netResource != 0 && netResource->getMAC().toString() ==  mac)
@@ -108,8 +111,8 @@ QnNetworkResourcePtr QnResourcePool::getNetResourceByMac(const QString& mac) con
 
 QnResourcePtr QnResourcePool::getResourceByUniqId(const QString& id) const
 {
-    QMutexLocker mtx(&m_resourcesMtx);
-    foreach(QnResourcePtr lres, m_resources)
+    QMutexLocker locker(&m_resourcesMtx);
+    foreach (QnResourcePtr lres, m_resources)
     {
         if (lres->getUniqueId() ==  id)
             return lres;
@@ -121,10 +124,10 @@ QnResourcePtr QnResourcePool::getResourceByUniqId(const QString& id) const
 
 bool QnResourcePool::hasSuchResouce(const QString& uniqid) const
 {
-    QMutexLocker mtx(&m_resourcesMtx);
-    foreach(QnResourcePtr lres, m_resources)
+    QMutexLocker locker(&m_resourcesMtx);
+    foreach (QnResourcePtr lres, m_resources)
     {
-        if (lres->getUniqueId() ==  uniqid)
+        if (lres->getUniqueId() == uniqid)
             return true;
     }
 
@@ -133,16 +136,16 @@ bool QnResourcePool::hasSuchResouce(const QString& uniqid) const
 
 QnResourceList QnResourcePool::getResources() const
 {
-    QMutexLocker mtx(&m_resourcesMtx);
+    QMutexLocker locker(&m_resourcesMtx);
     return m_resources.values();
 }
 
 QnResourceList QnResourcePool::getResourcesWithFlag(unsigned long flag)
 {
     QnResourceList result;
-    QMutexLocker mtx(&m_resourcesMtx);
 
-    foreach(QnResourcePtr res, m_resources)
+    QMutexLocker locker(&m_resourcesMtx);
+    foreach (QnResourcePtr res, m_resources)
     {
         if (res->checkFlag(flag))
             result.push_back(res);
@@ -156,11 +159,10 @@ QStringList QnResourcePool::allTags() const
 {
     QStringList result;
 
-    QMutexLocker mtx(&m_resourcesMtx);
-    foreach(QnResourcePtr resource, m_resources.values())
-    {
-        result << resource->tagList();        
-    }
+    QMutexLocker locker(&m_resourcesMtx);
+    foreach (QnResourcePtr resource, m_resources.values())
+        result << resource->tagList();
+
     return result;
 }
 
@@ -168,20 +170,18 @@ QnResourceList QnResourcePool::findResourcesByCriteria(const CLDeviceCriteria& c
 {
     QnResourceList result;
 
-    if (cr.getCriteria() == CLDeviceCriteria::STATIC || cr.getCriteria() == CLDeviceCriteria::NONE )
+    if (cr.getCriteria() != CLDeviceCriteria::STATIC && cr.getCriteria() != CLDeviceCriteria::NONE)
     {
-        return result; // empty
-    }
-    else
-    {
-        QMutexLocker lock(&m_resourcesMtx);
+        QMutexLocker locker(&m_resourcesMtx);
         foreach (QnResourcePtr resource, m_resources)
         {
             if (isResourceMeetCriteria(cr, resource))
                 result.push_back(resource);
         }
-        return result;
+
     }
+
+    return result;
 }
 
 

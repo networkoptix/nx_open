@@ -16,7 +16,8 @@ public:
         moving(false),
         movingStartedEmitted(false),
         preDragging(false),
-        isUnderMouse(false)
+        isUnderMouse(false),
+        extraFlags(0)
     {}
     virtual ~GraphicsWidgetPrivate()
     {}
