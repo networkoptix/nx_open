@@ -15,6 +15,7 @@ public:
 
     virtual bool open(QnResourcePtr resource);
     virtual void close();
+    virtual void beforeClose();
     virtual qint64 startTime();
     virtual qint64 endTime();
     virtual QnAbstractMediaDataPtr getNextData();
