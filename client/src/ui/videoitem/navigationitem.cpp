@@ -155,11 +155,18 @@ NavigationItem::NavigationItem(QGraphicsItem * /*parent*/) :
     m_forwardButton->setPreferredSize(32, 18);
     m_forwardButton->setMaximumSize(m_forwardButton->preferredSize());
 
+    m_jumpToLiveButton = new ImageButton(this);
+    m_jumpToLiveButton->addPixmap(Skin::pixmap(QLatin1String("rewind_forward_grey.png")), ImageButton::Active, ImageButton::Background);
+    m_jumpToLiveButton->addPixmap(Skin::pixmap(QLatin1String("rewind_forward_blue.png")), ImageButton::Active, ImageButton::Hovered);
+    m_jumpToLiveButton->setPreferredSize(32, 18);
+    m_jumpToLiveButton->setMaximumSize(m_jumpToLiveButton->preferredSize());
+
     connect(m_backwardButton, SIGNAL(clicked()), this, SLOT(rewindBackward()));
     connect(m_stepBackwardButton, SIGNAL(clicked()), this, SLOT(stepBackward()));
     connect(m_playButton, SIGNAL(clicked()), this, SLOT(togglePlayPause()));
     connect(m_stepForwardButton, SIGNAL(clicked()), this, SLOT(stepForward()));
     connect(m_forwardButton, SIGNAL(clicked()), this, SLOT(rewindForward()));
+    connect(m_jumpToLiveButton, SIGNAL(clicked()), this, SLOT(jumpToLive()));
 
     QGraphicsLinearLayout *buttonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     buttonsLayout->setSpacing(2);
@@ -246,6 +253,8 @@ NavigationItem::NavigationItem(QGraphicsItem * /*parent*/) :
     rightLayoutH->setSpacing(3);
     rightLayoutH->addItem(timeLabelProxyWidget);
     rightLayoutH->setAlignment(timeLabelProxyWidget, Qt::AlignLeft | Qt::AlignVCenter);
+    rightLayoutH->addItem(m_jumpToLiveButton);
+    rightLayoutH->setAlignment(m_jumpToLiveButton, Qt::AlignCenter);
     rightLayoutH->addItem(m_muteButton);
     rightLayoutH->setAlignment(m_muteButton, Qt::AlignRight | Qt::AlignVCenter);
 
@@ -442,6 +451,13 @@ void NavigationItem::onValueChanged(qint64 time)
         reader->jumpToPreviousFrame(time, true);
 
     //m_camera->streamJump(time);
+}
+
+void NavigationItem::jumpToLive() 
+{
+    QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
+
+    reader->jumpToPreviousFrame(DATETIME_NOW , true);
 }
 
 void NavigationItem::pause()

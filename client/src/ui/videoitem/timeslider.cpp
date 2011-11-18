@@ -357,22 +357,22 @@ bool isTimeAcceptedForYear(const IntervalInfo& interval, qint64 time)
 }
 
 IntervalInfo intervals[] = {
-    {100, 100, "ms", 10, "ms", isTimeAcceptedStd},
-    {1000, 1, "s", 60, "59s", isTimeAcceptedStd},
-    {5*1000, 5, "s", 12, "59s", isTimeAcceptedStd},
-    {10*1000, 10, "s", 6, "59s", isTimeAcceptedStd},
-    {30*1000, 30, "s", 2, "59s", isTimeAcceptedStd},
-    {60*1000, 1, "m", 60, "59m", isTimeAcceptedStd},
-    {5*60*1000, 5, "m", 12, "59m", isTimeAcceptedStd},
-    {10*60*1000, 10, "m", 6, "59m", isTimeAcceptedStd},
-    {30*60*1000, 30, "m", 2, "59m", isTimeAcceptedStd},
-    {60*60*1000, 1, "h", 24, "24h", isTimeAcceptedStd},
-    {3*60*60*1000, 3, "h", 8, "24h", isTimeAcceptedStd},
-    {6*60*60*1000, 6, "h", 4, "24h", isTimeAcceptedStd},
-    {12*60*60*1000, 12, "h", 2, "24h", isTimeAcceptedStd},
-    {24*60*60*1000, 1, "dd MMM", 99, "dd MMM", isTimeAcceptedStd}, // FIRST_DATE_INDEX here
-    {24*60*60*1000*30ll, 1, "MMMM", 99, "September", isTimeAcceptedForMonth},
-    {24*60*60*1000*30*12ll, 1, "yyyy", 99, "2011", isTimeAcceptedForYear}
+    {100ll, 100, "ms", 10, "ms", isTimeAcceptedStd},
+    {1000ll, 1, "s", 60, "59s", isTimeAcceptedStd},
+    {5ll*1000, 5, "s", 12, "59s", isTimeAcceptedStd},
+    {10ll*1000, 10, "s", 6, "59s", isTimeAcceptedStd},
+    {30ll*1000, 30, "s", 2, "59s", isTimeAcceptedStd},
+    {60ll*1000, 1, "m", 60, "59m", isTimeAcceptedStd},
+    {5ll*60*1000, 5, "m", 12, "59m", isTimeAcceptedStd},
+    {10ll*60*1000, 10, "m", 6, "59m", isTimeAcceptedStd},
+    {30ll*60*1000, 30, "m", 2, "59m", isTimeAcceptedStd},
+    {60ll*60*1000, 1, "h", 24, "24h", isTimeAcceptedStd},
+    {3ll*60*60*1000, 3, "h", 8, "24h", isTimeAcceptedStd},
+    {6ll*60*60*1000, 6, "h", 4, "24h", isTimeAcceptedStd},
+    {12ll*60*60*1000, 12, "h", 2, "24h", isTimeAcceptedStd},
+    {24ll*60*60*1000, 1, "dd MMM", 99, "dd MMM", isTimeAcceptedStd}, // FIRST_DATE_INDEX here
+    {24ll*60*60*1000*30, 1, "MMMM", 99, "September", isTimeAcceptedForMonth},
+    {24ll*60*60*1000*30*12, 1, "yyyy", 99, "2011", isTimeAcceptedForYear}
 };
 static const int FIRST_DATE_INDEX = 13; // use date's labels with this index and above
 

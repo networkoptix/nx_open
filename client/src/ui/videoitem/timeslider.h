@@ -45,6 +45,8 @@ public:
     const QnTimePeriodList &timePeriodList() const { return m_timePeriodList; }
     void setTimePeriodList(const QnTimePeriodList &timePeriodList) { m_timePeriodList = timePeriodList; }
 
+    bool isAtEnd();
+
 public Q_SLOTS:
     void setMinimumValue(qint64 value);
     void setMaximumValue(qint64 value);

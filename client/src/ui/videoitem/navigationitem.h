@@ -57,6 +57,8 @@ private Q_SLOTS:
     void stepBackward();
     void stepForward();
 
+    void jumpToLive();
+
     void onSliderPressed();
     void onSliderReleased();
 
@@ -82,6 +84,8 @@ private:
     ImageButton *m_muteButton;
     VolumeSlider *m_volumeSlider;
     QLabel *m_timeLabel;
+
+    ImageButton *m_jumpToLiveButton;
 
     CLVideoCamera* m_camera;
     int m_timerId;
