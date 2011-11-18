@@ -15,7 +15,7 @@ class GraphicsWidgetPrivate;
 
 class GraphicsWidget: public Instrumented<QGraphicsWidget>
 {
-    Q_OBJECT;
+    Q_OBJECT
 
     typedef Instrumented<QGraphicsWidget> base_type;
 
@@ -34,7 +34,7 @@ public:
 
     enum GraphicsExtraFlag {
         ItemIsResizable = 0x1,          /**< Whether this item is resizable. */
-        ItemIsDraggable = 0x2,          /**< Whether this item is draggable. */
+        ItemIsDraggable = 0x2           /**< Whether this item is draggable. */
     };
     Q_DECLARE_FLAGS(GraphicsExtraFlags, GraphicsExtraFlag)
 

@@ -36,7 +36,8 @@ public:
     bool centralise() const { return m_centralise; }
     void setCentralise(bool b) { m_centralise = b; }
 
-    qint64 sliderRange();
+    qint64 sliderRange() const;
+    qint64 viewPortPos() const;
 
     qint64 minimumRange() const;
     void setMinimumRange(qint64);
@@ -79,7 +80,6 @@ private:
     qint64 fromSlider(int value);
     int toSlider(qint64 value);
 
-    qint64 viewPortPos() const;
     void setViewPortPos(qint64 value);
 
     void updateSlider();
@@ -92,14 +92,14 @@ private:
     qint64 m_maximumValue;
     qint64 m_currentValue;
     qint64 m_viewPortPos;
-
+    qint64 m_minimumRange;
     double m_scalingFactor;
-    bool m_isUserInput;
     int m_delta;
+
+    bool m_isUserInput;
 
     QPropertyAnimation *m_animation;
     bool m_centralise;
-    qint64 m_minimumRange;
 
     QnTimePeriodList m_timePeriodList;
 

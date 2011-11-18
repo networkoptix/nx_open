@@ -66,4 +66,6 @@ static const qint64 INT64_MAX = 0x7fffffffffffffffll;
 
 static const qint64 DATETIME_NOW = INT64_MAX;
 
+static const char *DEFAULT_APPSERVER_URL = "http://127.0.0.1:8000";
+
 #endif // _UNIVERSAL_CLIENT_UTIL_H

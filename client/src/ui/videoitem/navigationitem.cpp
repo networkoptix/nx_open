@@ -7,6 +7,8 @@
 #include <QtGui/QGraphicsProxyWidget>
 #include <QtGui/QLabel>
 
+#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource/video_server.h>
 #include "timeslider.h"
 #include "camera/camera.h"
 #include "ui/videoitem/video_wnd_item.h"
@@ -377,6 +379,48 @@ void NavigationItem::updateSlider()
     }
 }
 
+void NavigationItem::updatePeriodList() {
+    qint64 w = m_timeSlider->sliderRange() * 1000;
+    qint64 t = m_timeSlider->viewPortPos() * 1000;
+    if(m_timePeriod.startTimeUSec <= t && t + w <= m_timePeriod.startTimeUSec + m_timePeriod.durationUSec)
+        return;
+    
+    QnResourcePtr resource = m_camera->getStreamreader()->getResource();
+    if(!resource->checkFlag(QnResource::live))
+        return;
+
+    /* Cast just to feel safe. */
+    QnNetworkResourcePtr networkResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
+    if(networkResource.isNull()) 
+        return;
+
+    QnResourcePtr parentResource = qnResPool->getResourceById(networkResource->getParentId());
+    //if(!parentResource->checkFlag(QnResource::server)) // TODO: doesn't work
+    //    return; 
+
+    /* Cast just to feel safe. */
+    QnVideoServerPtr serverResource = qSharedPointerDynamicCast<QnVideoServer>(parentResource);
+    if(serverResource.isNull())
+        return;
+
+    QnVideoServerConnectionPtr connection = serverResource->apiConnection();
+    if(connection.isNull())
+        return;
+    
+    const qint64 oneHour = 60ll * 60ll * 1000ll * 1000ll;
+    if(w < oneHour)
+        w = oneHour;
+
+    QnNetworkResourceList resources;
+    resources.push_back(networkResource); // TODO
+    
+    m_timePeriod.startTimeUSec = t - w;
+    m_timePeriod.durationUSec = w * 3;
+
+    QnTimePeriodList timePeriods = connection->recordedTimePeriods(resources, m_timePeriod.startTimeUSec, m_timePeriod.startTimeUSec + m_timePeriod.durationUSec, 1);
+    m_timeSlider->setTimePeriodList(timePeriods);
+}
+
 void NavigationItem::onValueChanged(qint64 time)
 {
     if (m_currentTime == time)
@@ -384,6 +428,8 @@ void NavigationItem::onValueChanged(qint64 time)
 
     if (m_camera == 0)
         return;
+
+    updatePeriodList();
 
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     if (reader->isSkippingFrames())
