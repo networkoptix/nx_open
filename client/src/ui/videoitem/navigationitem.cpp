@@ -417,7 +417,8 @@ void NavigationItem::updatePeriodList() {
     m_timePeriod.startTime = t - w;
     m_timePeriod.duration = w * 3;
 
-    m_timeSlider->setTimePeriodList(connection->recordedTimePeriods(resources, m_timePeriod.startTime, m_timePeriod.startTime + m_timePeriod.duration, 1));
+    QnTimePeriodList timePeriods = connection->recordedTimePeriods(resources, m_timePeriod.startTime, m_timePeriod.startTime + m_timePeriod.duration, 1);
+    m_timeSlider->setTimePeriodList(timePeriods);
 }
 
 void NavigationItem::onValueChanged(qint64 time)
