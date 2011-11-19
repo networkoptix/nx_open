@@ -155,21 +155,12 @@ NavigationItem::NavigationItem(QGraphicsItem * /*parent*/) :
     m_forwardButton->setPreferredSize(32, 18);
     m_forwardButton->setMaximumSize(m_forwardButton->preferredSize());
 
-    m_jumpToLiveButton = new ImageButton(this);
-    m_jumpToLiveButton->addPixmap(Skin::pixmap(QLatin1String("rewind_forward_grey.png")), ImageButton::Active, ImageButton::Background);
-    m_jumpToLiveButton->addPixmap(Skin::pixmap(QLatin1String("rewind_forward_blue.png")), ImageButton::Active, ImageButton::Checked);
-    m_jumpToLiveButton->addPixmap(Skin::pixmap(QLatin1String("rewind_forward_blue.png")), ImageButton::Active, ImageButton::Pressed);
-    m_jumpToLiveButton->setCheckable(true);
-    m_jumpToLiveButton->setPreferredSize(32, 18);
-    m_jumpToLiveButton->setMaximumSize(m_jumpToLiveButton->preferredSize());
 
     connect(m_backwardButton, SIGNAL(clicked()), this, SLOT(rewindBackward()));
     connect(m_stepBackwardButton, SIGNAL(clicked()), this, SLOT(stepBackward()));
     connect(m_playButton, SIGNAL(clicked()), this, SLOT(togglePlayPause()));
     connect(m_stepForwardButton, SIGNAL(clicked()), this, SLOT(stepForward()));
     connect(m_forwardButton, SIGNAL(clicked()), this, SLOT(rewindForward()));
-    connect(m_jumpToLiveButton, SIGNAL(clicked()), m_jumpToLiveButton, SLOT(toggle()));  /* Workaround for the flawed implementation. */
-    connect(m_jumpToLiveButton, SIGNAL(toggled(bool)), this, SLOT(jumpToLiveToggled(bool)));
 
     QGraphicsLinearLayout *buttonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     buttonsLayout->setSpacing(2);
@@ -209,6 +200,8 @@ NavigationItem::NavigationItem(QGraphicsItem * /*parent*/) :
     m_timeSlider->setToolTipItem(new TimeSliderToolTipItem(m_timeSlider));
     m_timeSlider->setCursor(Qt::ArrowCursor);
     m_graphicsWidget->resize(m_timeSlider->size());
+
+    m_timeSlider->setEndSize(10);
 
     {
         QPalette palette = m_timeSlider->palette();
@@ -256,8 +249,6 @@ NavigationItem::NavigationItem(QGraphicsItem * /*parent*/) :
     rightLayoutH->setSpacing(3);
     rightLayoutH->addItem(timeLabelProxyWidget);
     rightLayoutH->setAlignment(timeLabelProxyWidget, Qt::AlignLeft | Qt::AlignVCenter);
-    rightLayoutH->addItem(m_jumpToLiveButton);
-    rightLayoutH->setAlignment(m_jumpToLiveButton, Qt::AlignCenter);
     rightLayoutH->addItem(m_muteButton);
     rightLayoutH->setAlignment(m_muteButton, Qt::AlignRight | Qt::AlignVCenter);
 
@@ -449,31 +440,17 @@ void NavigationItem::onValueChanged(qint64 time)
     if (reader->isSkippingFrames())
         return;
 
-    time *= 1000;
-    if (m_timeSlider->isMoving())
-        reader->jumpTo(time, true);
-    else
-        reader->jumpToPreviousFrame(time, true);
+    if(m_timeSlider->isAtEnd()) {
+        qDebug("END!!");
 
-    //m_camera->streamJump(time);
-}
-
-void NavigationItem::jumpOccured(qint64 mksec) 
-{
-    m_jumpToLiveButton->setChecked(mksec == DATETIME_NOW); // TODO: doesn't work.
-}
-
-void NavigationItem::jumpToLiveToggled(bool toggled) 
-{
-    if(!toggled)
-        return;
-
-    if (m_camera == NULL)
-        return;
-
-    QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
-
-    reader->jumpToPreviousFrame(DATETIME_NOW , true);
+        reader->jumpToPreviousFrame(DATETIME_NOW, true);
+    } else {
+        time *= 1000;
+        if (m_timeSlider->isMoving())
+            reader->jumpTo(time, true);
+        else
+            reader->jumpToPreviousFrame(time, true);
+    }
 }
 
 void NavigationItem::pause()

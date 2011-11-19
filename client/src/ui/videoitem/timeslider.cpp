@@ -87,6 +87,10 @@ public:
 
     const QRect &handleRect() const;
 
+    bool isAtEnd() const;
+
+    void setEndSize(int size);
+
 protected:
     void sliderChange(SliderChange change);
 
@@ -101,15 +105,27 @@ private:
     ToolTipItem *m_toolTip;
     mutable QRect m_handleRect;
     mutable bool m_handleRectValid;
+    int m_endSize;
 };
 
 MySlider::MySlider(TimeSlider *parent)
     : GraphicsSlider(parent),
       m_parent(parent),
       m_toolTip(0),
-      m_handleRectValid(false)
+      m_handleRectValid(false),
+      m_endSize(0)
 {
     setToolTipItem(new StyledToolTipItem);
+}
+
+bool MySlider::isAtEnd() const 
+{
+    return value() > maximum() - m_endSize;
+}
+
+void MySlider::setEndSize(int size)
+{
+    m_endSize = size;
 }
 
 void MySlider::setToolTipItem(ToolTipItem *toolTip)
@@ -185,6 +201,14 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         }
     }
 
+    r = contentsRect();
+    qreal l = r.left() + QStyle::sliderPositionFromValue(minimum(), maximum(), maximum() - m_endSize, r.width());
+    r = QRectF(l, r.top(), r.right() - l, r.height());
+    
+    linearGrad = QLinearGradient(r.topLeft(), r.topRight());
+    linearGrad.setColorAt(0, QColor(0, 255, 0, 0));
+    linearGrad.setColorAt(1, QColor(0, 255, 0, 128));
+    painter->fillRect(r, linearGrad);
 
     painter->drawPixmap(m_handleRect, pix, QRectF(pix.rect()));
 }
@@ -634,7 +658,8 @@ TimeSlider::TimeSlider(QGraphicsItem *parent) :
     m_scalingFactor(0.0),
     m_delta(0),
     m_isUserInput(false),
-    m_centralise(true)
+    m_centralise(true),
+    m_endSize(0.0)
 {
     setAcceptHoverEvents(true);
 
@@ -809,6 +834,16 @@ void TimeSlider::setMoving(bool b)
     m_slider->setSliderDown(b);
 }
 
+bool TimeSlider::isAtEnd() 
+{
+    return m_slider->isAtEnd();
+}
+
+void TimeSlider::setEndSize(qreal size)
+{
+    m_endSize = size;
+}
+
 void TimeSlider::onSliderValueChanged(int value)
 {
     if (!m_isUserInput && !isMoving()) {
@@ -937,3 +972,13 @@ bool TimeSlider::eventFilter(QObject *target, QEvent *event)
 
     return GraphicsWidget::eventFilter(target, event);
 }
+
+void TimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) 
+{
+    m_slider->setEndSize(m_endSize * (m_slider->maximum() - m_slider->minimum()) / (m_slider->size().width())); // Hack hack hack
+
+    GraphicsWidget::paint(painter, option, widget);
+}
+
+
+
