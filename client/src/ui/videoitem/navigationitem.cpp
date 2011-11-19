@@ -227,6 +227,15 @@ NavigationItem::NavigationItem(QGraphicsItem * /*parent*/) :
     m_muteButton->setChecked(m_volumeSlider->isMute());
     m_muteButton->setCursor(Qt::ArrowCursor);
 
+    m_liveButton = new ImageButton(this);
+    //m_liveButton->addPixmap(Skin::pixmap(QLatin1String("live.png")), ImageButton::Active, ImageButton::Background);
+    m_liveButton->addPixmap(Skin::pixmap(QLatin1String("live.png")), ImageButton::Disabled, ImageButton::Background);
+    m_liveButton->setPreferredSize(20, 20);
+    m_liveButton->setMaximumSize(m_liveButton->preferredSize());
+    m_liveButton->setEnabled(false);
+    m_liveButton->setCursor(Qt::ArrowCursor);
+    m_liveButton->hide();
+
     m_volumeSlider = new VolumeSlider(Qt::Horizontal);
     m_volumeSlider->setObjectName("VolumeSlider");
     m_volumeSlider->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
@@ -249,6 +258,8 @@ NavigationItem::NavigationItem(QGraphicsItem * /*parent*/) :
     rightLayoutH->setSpacing(3);
     rightLayoutH->addItem(timeLabelProxyWidget);
     rightLayoutH->setAlignment(timeLabelProxyWidget, Qt::AlignLeft | Qt::AlignVCenter);
+    rightLayoutH->addItem(m_liveButton);
+    rightLayoutH->setAlignment(m_liveButton, Qt::AlignCenter);
     rightLayoutH->addItem(m_muteButton);
     rightLayoutH->setAlignment(m_muteButton, Qt::AlignRight | Qt::AlignVCenter);
 
@@ -381,6 +392,8 @@ void NavigationItem::updateSlider()
             m_currentTime = time/1000;
             m_timeSlider->setCurrentValue(m_currentTime);
         }
+
+        m_liveButton->setVisible(m_timeSlider->isAtEnd());
     }
 }
 
@@ -448,12 +461,16 @@ void NavigationItem::smartSeek(qint64 timeMSec)
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     if(m_timeSlider->isAtEnd()) {
         reader->jumpToPreviousFrame(DATETIME_NOW, true);
+
+        m_liveButton->show();
     } else {
         timeMSec *= 1000;
         if (m_timeSlider->isMoving())
             reader->jumpTo(timeMSec, true);
         else
             reader->jumpToPreviousFrame(timeMSec, true);
+
+        m_liveButton->hide();
     }
 }
 
@@ -478,7 +495,8 @@ void NavigationItem::play()
     if (reader->onPause() && reader->isRealTimeSource())
     {
         reader->resumeMedia();
-        reader->jumpToPreviousFrame(m_camera->getCamCamDisplay()->currentTime(), true);
+
+        smartSeek(m_camera->getCamCamDisplay()->currentTime() / 1000);
     }
     else {
       reader->resumeMedia();

@@ -79,6 +79,7 @@ private:
     ImageButton *m_playButton;
     ImageButton *m_stepForwardButton;
     ImageButton *m_forwardButton;
+    ImageButton *m_liveButton;
     SpeedSlider *m_speedSlider;
     QGraphicsWidget *m_graphicsWidget;
     ImageButton *m_muteButton;
