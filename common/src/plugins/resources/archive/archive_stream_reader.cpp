@@ -421,6 +421,8 @@ begin_label:
     if (m_BOF) {
         m_currentData->flags |= QnAbstractMediaData::MediaFlags_BOF;        
         m_BOF = false;
+
+        cl_log.log("set BOF flag", cl_logALWAYS);
     }
 
 	return m_currentData;

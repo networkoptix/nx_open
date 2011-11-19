@@ -59,7 +59,8 @@ public:
       m_lastSendTime(0),
       m_waitBOF(false),
       m_liveMode(false),
-      m_pauseNetwork(false)
+      m_pauseNetwork(false),
+      m_gotLivePacket(false)
     {
         memset(m_sequence, 0, sizeof(m_sequence));
         m_timer.start();
@@ -82,6 +83,7 @@ public:
         m_waitBOF = value; 
         m_lastSendTime = newTime;
         m_ctxSended.clear();
+        m_gotLivePacket = false;
     }
 
     virtual qint64 currentTime() const { 
@@ -120,6 +122,7 @@ public:
 
 private:
     QMap<CodecID, QnMediaContextPtr> m_generatedContext;
+    bool m_gotLivePacket;
 
 protected:
     void buildRtspTcpHeader(quint8 channelNum, quint32 ssrc, quint16 len, int markerBit, quint32 timestamp)
@@ -168,8 +171,12 @@ protected:
             return true;
         }
 
-        if (m_owner->isLiveDP(media->dataProvider))
+        if (m_owner->isLiveDP(media->dataProvider)) {
             media->flags |= QnAbstractMediaData::MediaFlags_LIVE;
+            if (!m_gotLivePacket)
+                media->flags |= QnAbstractMediaData::MediaFlags_BOF;
+            m_gotLivePacket = true;
+        }
 
         int rtspChannelNum = media->channelNumber;
         if (media->dataType == QnAbstractMediaData::AUDIO)
@@ -299,7 +306,8 @@ public:
         startTime(0),
         endTime(0),
         rtspScale(1.0),
-        liveMode(false)
+        liveMode(false),
+        gotLivePacket(false)
     {
     }
     void deleteDP()
@@ -338,6 +346,7 @@ public:
     qint64 endTime;   // time from last range header
     double rtspScale; // RTSP playing speed (1 - normal speed, 0 - pause, >1 fast forward, <-1 fast back e. t.c.)
     QMutex mutex;
+    bool gotLivePacket;
 };
 
 // ----------------------------- QnRtspConnectionProcessor ----------------------------

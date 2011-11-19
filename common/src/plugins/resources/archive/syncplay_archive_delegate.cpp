@@ -85,7 +85,7 @@ qint64 QnSyncPlayArchiveDelegate::secondTime() const
 {
     QMutexLocker lock(&m_genericMutex);
     QnCompressedVideoDataPtr vd = qSharedPointerDynamicCast<QnCompressedVideoData>(m_tmpData);
-    if (vd && vd->timestamp >= m_reader->skipFramesToTime() && m_seekTime == AV_NOPTS_VALUE)
+    if (vd && !(vd->flags & QnAbstractMediaData::MediaFlags_LIVE) && vd->timestamp >= m_reader->skipFramesToTime() && m_seekTime == AV_NOPTS_VALUE)
         return m_tmpData->timestamp;
     else
         return AV_NOPTS_VALUE;
