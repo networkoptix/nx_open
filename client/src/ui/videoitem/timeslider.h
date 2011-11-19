@@ -46,6 +46,7 @@ public:
     void setTimePeriodList(const QnTimePeriodList &timePeriodList) { m_timePeriodList = timePeriodList; }
 
     bool isAtEnd();
+    void setEndSize(qreal size); 
 
 public Q_SLOTS:
     void setMinimumValue(qint64 value);
@@ -69,7 +70,8 @@ Q_SIGNALS:
 protected:
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
 
-    bool eventFilter(QObject *target, QEvent *event);
+    virtual bool eventFilter(QObject *target, QEvent *event) override;
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override; 
 
 private Q_SLOTS:
     void onSliderValueChanged(int value);
@@ -104,6 +106,8 @@ private:
     bool m_centralise;
 
     QnTimePeriodList m_timePeriodList;
+
+    qreal m_endSize;
 
     friend class TimeLine;
     friend class MySlider;
