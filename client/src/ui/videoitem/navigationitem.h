@@ -44,6 +44,8 @@ protected:
     void updateSlider();
     void updatePeriodList();
 
+    void smartSeek(qint64 timeMSec);
+
 private Q_SLOTS:
     void onLiveModeChanged(bool value);
     void onValueChanged(qint64);

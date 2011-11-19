@@ -440,16 +440,20 @@ void NavigationItem::onValueChanged(qint64 time)
     if (reader->isSkippingFrames())
         return;
 
-    if(m_timeSlider->isAtEnd()) {
-        qDebug("END!!");
+    smartSeek(time);
+}
 
+void NavigationItem::smartSeek(qint64 timeMSec) 
+{
+    QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
+    if(m_timeSlider->isAtEnd()) {
         reader->jumpToPreviousFrame(DATETIME_NOW, true);
     } else {
-        time *= 1000;
+        timeMSec *= 1000;
         if (m_timeSlider->isMoving())
-            reader->jumpTo(time, true);
+            reader->jumpTo(timeMSec, true);
         else
-            reader->jumpToPreviousFrame(time, true);
+            reader->jumpToPreviousFrame(timeMSec, true);
     }
 }
 
@@ -583,12 +587,13 @@ void NavigationItem::onSliderReleased()
     setActive(true);
     m_sliderIsmoving = false;
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
-    reader->previousFrame(m_timeSlider->currentValue() * 1000);
+    smartSeek(m_timeSlider->currentValue());
     if (isPlaying())
     {
         reader->setSingleShotMode(false);
         m_camera->getCamCamDisplay()->playAudio(true);
     }
+
 }
 
 void NavigationItem::onSpeedChanged(float newSpeed)
