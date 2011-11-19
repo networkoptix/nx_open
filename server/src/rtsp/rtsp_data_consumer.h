@@ -27,6 +27,8 @@ public:
     virtual bool canAcceptData() const;
     void setLiveMode(bool value);
     void copyLastGopFromCamera();
+    void lockDataQueue();
+    void unlockDataQueue();
 protected:
     void buildRtspTcpHeader(quint8 channelNum, quint32 ssrc, quint16 len, int markerBit, quint32 timestamp);
     QnMediaContextPtr getGeneratedContext(CodecID compressionType);
@@ -47,6 +49,7 @@ private:
     bool m_waitBOF;
     bool m_liveMode;
     bool m_pauseNetwork;
+    QMutex m_dataQueueMtx;
 };
 
 #endif // __RTSP_DATA_CONSUMER_H__

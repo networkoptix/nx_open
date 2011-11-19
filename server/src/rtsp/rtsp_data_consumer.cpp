@@ -57,6 +57,7 @@ qint64 QnRtspDataConsumer::currentTime() const
 
 void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
 {
+    QMutexLocker lock(&m_dataQueueMtx);
     m_dataQueue.push(data);
     if (m_dataQueue.size() > m_dataQueue.maxSize()*1.5) // additional space for archiveData (when archive->live switch occured, archive ordinary using all dataQueue size)
     {
@@ -213,6 +214,16 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
             m_lastSendTime = media->timestamp;
     }
     return true;
+}
+
+void QnRtspDataConsumer::lockDataQueue()
+{
+    m_dataQueueMtx.lock();
+}
+
+void QnRtspDataConsumer::unlockDataQueue()
+{
+    m_dataQueueMtx.unlock();
 }
 
 void QnRtspDataConsumer::copyLastGopFromCamera()

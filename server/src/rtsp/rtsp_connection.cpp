@@ -365,12 +365,15 @@ int QnRtspConnectionProcessor::composePlay()
 
 
     d->dataProcessor->setLiveMode(d->liveMode);
+    if (d->liveMode)
+        d->dataProcessor->lockDataQueue();
     currentDP->addDataProcessor(d->dataProcessor);
     
     //QnArchiveStreamReader* archiveProvider = dynamic_cast<QnArchiveStreamReader*> (d->dataProvider);
     if (d->liveMode) {
-        d->dataProcessor->setWaitBOF(d->startTime, false); // ignore rest packets before new position
         d->dataProcessor->copyLastGopFromCamera();
+        d->dataProcessor->unlockDataQueue();
+        d->dataProcessor->setWaitBOF(d->startTime, false); // ignore rest packets before new position
     }
     else if (qAbs(d->startTime - getRtspTime()) >= RTSP_MIN_SEEK_INTERVAL)
     {
