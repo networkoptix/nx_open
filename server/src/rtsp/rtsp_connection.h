@@ -4,6 +4,7 @@
 #include <QMutex>
 #include "utils/network/ffmpeg_sdp.h"
 #include "utils/network/tcp_connection_processor.h"
+#include "core/resource/media_resource.h"
 
 class QnAbstractStreamDataProvider;
 
@@ -15,6 +16,7 @@ public:
     qint64 getRtspTime();
     void setRtspTime(qint64 time);
     void switchToLive();
+    QnMediaResourcePtr getResource() const;
 protected:
     virtual void run();
 private:
@@ -38,6 +40,7 @@ private:
     int composeGetParameter();
     void createDataProvider();
     bool isLiveDP(QnAbstractStreamDataProvider* dp);
+    void putLastIFrameToQueue();
 private:
     QN_DECLARE_PRIVATE_DERIVED(QnRtspConnectionProcessor);
     friend class QnRtspDataConsumer;

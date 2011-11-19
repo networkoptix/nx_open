@@ -20,6 +20,8 @@
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "utils/common/util.h"
 
+static const int SLIDER_NOW_AREA_WIDTH = 30;
+
 // ### hack to avoid scene move up and down
 class QLabelKillsWheelEvent : public QLabel
 {
@@ -201,7 +203,7 @@ NavigationItem::NavigationItem(QGraphicsItem * /*parent*/) :
     m_timeSlider->setCursor(Qt::ArrowCursor);
     m_graphicsWidget->resize(m_timeSlider->size());
 
-    m_timeSlider->setEndSize(10);
+    m_timeSlider->setEndSize(SLIDER_NOW_AREA_WIDTH);
 
     {
         QPalette palette = m_timeSlider->palette();
