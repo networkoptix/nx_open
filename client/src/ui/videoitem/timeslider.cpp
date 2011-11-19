@@ -916,10 +916,14 @@ void TimeSlider::updateSlider()
         m_isUserInput = false;
     }
 
-    if (m_minimumValue == 0)
-        m_slider->setToolTip(formatDuration(m_currentValue / 1000));
-    else
-        m_slider->setToolTip(QDateTime::fromMSecsSinceEpoch(m_currentValue).toString(Qt::SystemLocaleShortDate));
+    if(isAtEnd()) {
+        m_slider->setToolTip("Live");
+    } else {
+        if (m_minimumValue == 0)
+            m_slider->setToolTip(formatDuration(m_currentValue / 1000));
+        else
+            m_slider->setToolTip(QDateTime::fromMSecsSinceEpoch(m_currentValue).toString(Qt::SystemLocaleShortDate));
+    }
 }
 
 void TimeSlider::centraliseSlider()

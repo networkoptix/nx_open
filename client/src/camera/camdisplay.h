@@ -41,7 +41,9 @@ public:
     // schedule - coz I do not want to introduce mutexes
     //I assume that first incoming frame after jump is keyframe
 
-	//quint64 currentTime() const { return m_previousVideoDisplayedTime; }
+	/**
+	 * \returns                         Current time in microseconds.
+	 */
     virtual qint64 currentTime() const;
 
     void setMTDecoding(bool value);
