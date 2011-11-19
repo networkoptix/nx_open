@@ -343,8 +343,10 @@ int QnRtspConnectionProcessor::composePlay()
         return CODE_NOT_FOUND;
     createDataProvider();
 
-    if (!d->dataProcessor) 
+    if (!d->dataProcessor) {
         d->dataProcessor = new QnRtspDataConsumer(this);
+        d->dataProcessor->pauseNetwork();
+    }
     else 
         d->dataProcessor->clearUnprocessedData();
     //d->dataProcessor->pause();
