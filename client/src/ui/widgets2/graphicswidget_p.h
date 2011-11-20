@@ -10,8 +10,7 @@ class GraphicsWidgetPrivate
 public:
     GraphicsWidgetPrivate() :
         q_ptr(0),
-        isUnderMouse(false),
-        extraFlags(0)
+        isUnderMouse(false)
     {}
 
     virtual ~GraphicsWidgetPrivate() {}

@@ -143,9 +143,7 @@ void QnResourceDisplay::play() {
     if(m_archiveProvider == NULL)
         return;
 
-    m_archiveProvider->resume();
-    m_archiveProvider->setSingleShotMode(false);
-    m_archiveProvider->resumeDataProcessors();
+    m_archiveProvider->resumeMedia();
 
     //if (m_graphicsWidget->isSelected() || !m_playing)
     //    m_camera->getCamCamDisplay()->playAudio(m_playing);
