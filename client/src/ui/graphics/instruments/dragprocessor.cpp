@@ -103,6 +103,7 @@ void DragProcessor::preprocessEvent(QMouseEvent *event) {
 
 template<class Event>
 void DragProcessor::transitionInternal(Event *event, State newState) {
+    /* This code lets us detect nested transitions. */
     m_transitionCounter++;
     int transitionCounter = m_transitionCounter;
 
@@ -124,6 +125,7 @@ void DragProcessor::transitionInternal(Event *event, State newState) {
                 m_state = PREPAIRING;
                 m_handler->finishDrag();
                 if(transitionCounter == m_transitionCounter) {
+                    /* No nested transitions => go on. */
                     m_state = WAITING;
                     m_handler->finishDragProcess();
                 }
@@ -135,6 +137,7 @@ void DragProcessor::transitionInternal(Event *event, State newState) {
             return;
         }
         if(transitionCounter == m_transitionCounter) {
+            /* No nested transitions => clean everything up. */
             m_triggerButton = Qt::NoButton;
             m_viewport = NULL;
             m_object.clear();
@@ -167,6 +170,7 @@ void DragProcessor::transitionInternal(Event *event, State newState) {
                 m_state = PREPAIRING;
                 m_handler->startDragProcess();
                 if(transitionCounter == m_transitionCounter) {
+                    /* No nested transitions => go on. */
                     m_state = DRAGGING;
                     m_handler->startDrag();
                 }

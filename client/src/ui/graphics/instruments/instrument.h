@@ -65,6 +65,55 @@ namespace detail {
 } // namespace detail
 
 
+/**
+ * <tt>Instrument</tt> is a base class for detached event processing on a graphics scene,
+ * its views and items.
+ * 
+ * Each instrument supplies a set of event types that it is willing to watch 
+ * for each of the watched types. These sets are supplied through the
+ * <tt>Instrument</tt>'s constructor.
+ * 
+ * As addition and removal of graphics items to and from the scene cannot be 
+ * automatically detected, items must either inherit from <tt>Instrumented</tt> 
+ * class, or be registered and unregistered manually.
+ * 
+ * Scene and its views must always be registered manually. They will be 
+ * unregistered upon destruction, so there is no need to unregister them
+ * manually.
+ * 
+ * Instrument provides several extension points for the derived classes to 
+ * track its current state. Instrument state consists of:
+ * <ul>
+ * <li>Installed bit, accessed via <tt>isInstalled()</tt> function. 
+ *     If not installed, instrument does not receive events and has no
+ *     associated scene, views or items.
+ *     Derived classes can track changes of this bit by reimplementing 
+ *     <tt>installedNotify()</tt> and <tt>aboutToBeUninstalledNotify()</tt> functions. </li>
+ * <li>Enabled bit, accessed via <tt>isEnabled()</tt> function. 
+ *     If not enabled, instrument does not receive events. However, it still
+ *     can access its associated scene, views and items.
+ *     Derived classes can track changes of this bit by reimplementing
+ *     <tt>enabledNotify()</tt> and <tt>aboutToBeDisabledNotify()</tt> functions. </li>
+ * </ul>
+ * 
+ * Note that when uninstalled, instrument is always considered disabled. Upon
+ * installation it restores its enabled state. This means that if the instrument
+ * is installed and then uninstalled, the following notifications functions will 
+ * be called:
+ * <ol>
+ * <li><tt>installedNotify()</tt></li>
+ * <li><tt>enabledNotify()</tt></li>
+ * <li><tt>aboutToBeDisabledNotify()</tt></li>
+ * <li><tt>aboutToBeUninstalledNotify()</tt></li>
+ * <ol>
+ * 
+ * This is why in most cases it is enough for the derived class to
+ * reimplement only <tt>aboutToBeDisabledNotify()</tt> function.
+ * 
+ * Note that it is a <b>must</b> to call <tt>ensureUninstalled()</tt> function
+ * inside derived class's destructor if it reimplements either 
+ * <tt>aboutToBeDisabledNotify()</tt> or <tt>aboutToBeUninstalledNotify()</tt>.
+ */
 class Instrument: public QObject, protected QnSceneUtility {
     Q_OBJECT;
 
@@ -73,10 +122,10 @@ public:
      * Enumeration for different types of objects that can be watched by an instrument.
      */
     enum WatchedType {
-        VIEWPORT,
-        VIEW,
-        SCENE,
-        ITEM,
+        VIEWPORT,      /**< Viewport. */
+        VIEW,          /**< Graphics view. */
+        SCENE,         /**< Graphics scene. */
+        ITEM,          /**< Graphics item. */
         WATCHED_TYPE_COUNT
     };
 
@@ -382,6 +431,8 @@ protected:
      * Extension point for instrument installation.
      * 
      * It is guaranteed that scene will not be NULL inside this call.
+     * 
+     * Note that <tt>enabledNotify()</tt> will be called right after this call.
      */
     virtual void installedNotify() {}
 
@@ -390,6 +441,8 @@ protected:
      * 
      * Scene may be NULL inside this call, which would mean that scene is being
      * destroyed.
+     * 
+     * Note that </tt>aboutToBeDisabledNotify()</tt> will be called right before this call.
      */
     virtual void aboutToBeUninstalledNotify() {}
 

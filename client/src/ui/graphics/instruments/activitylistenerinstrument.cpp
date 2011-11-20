@@ -19,6 +19,10 @@ ActivityListenerInstrument::ActivityListenerInstrument(int activityTimeoutMSec, 
     }
 }
 
+ActivityListenerInstrument::~ActivityListenerInstrument() {
+    ensureUninstalled();
+}
+
 void ActivityListenerInstrument::enabledNotify() {
     if(m_currentTimer == 0)
         m_currentTimer = startTimer(m_activityTimeoutMSec);

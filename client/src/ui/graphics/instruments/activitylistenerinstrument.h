@@ -3,16 +3,27 @@
 
 #include "instrument.h"
 
+/**
+ * This instrument makes it possible to listen to user activity.
+ * 
+ * If the user didn't use the mouse or keyboard for the given amount of time,
+ * <tt>activityStopped()</tt> signal is emitted. When the user starts using
+ * mouse or keyboard again, <tt>activityStarted()</tt> signal is emitted.
+ * 
+ * 
+ */
 class ActivityListenerInstrument: public Instrument {
     Q_OBJECT;
 public:
     ActivityListenerInstrument(int activityTimeoutMSec, QObject *parent = NULL);
+    virtual ~ActivityListenerInstrument();
 
 signals:
     void activityStopped();
     void activityStarted();
 
 protected:
+    virtual void aboutToBeUninstalledNotify() override;
     virtual void enabledNotify() override;
     virtual void aboutToBeDisabledNotify() override;
 
