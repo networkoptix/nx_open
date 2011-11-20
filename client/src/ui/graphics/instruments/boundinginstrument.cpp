@@ -381,7 +381,8 @@ void BoundingInstrument::enabledNotify() {
         d->update();
     }
 
-    m_lastTickTime = m_timer->currentTime();
+    m_lastTickTime = 0;
+    m_timer->setCurrentTime(0); /* This call will invoke tick(), so we must set m_lastTickTime beforehand. */
     m_timer->start();
 }
 

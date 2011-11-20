@@ -125,11 +125,11 @@ void QnWorkbenchManager::setWorkbench(QnWorkbench *workbench) {
 
     if(m_workbench != NULL) {
         /* Subscribe to workbench changes. */
-        connect(m_workbench,            SIGNAL(aboutToBeDestroyed()),                                           this,                   SLOT(at_state_aboutToBeDestroyed()));
-        connect(m_workbench,            SIGNAL(modeChanged()),                                                  this,                   SLOT(at_state_modeChanged()));
+        connect(m_workbench,            SIGNAL(aboutToBeDestroyed()),                                       this,                   SLOT(at_state_aboutToBeDestroyed()));
+        connect(m_workbench,            SIGNAL(modeChanged()),                                              this,                   SLOT(at_state_modeChanged()));
         connect(m_workbench,            SIGNAL(selectedItemChanged(QnWorkbenchItem *, QnWorkbenchItem *)),  this,                   SLOT(at_state_selectedItemChanged(QnWorkbenchItem *, QnWorkbenchItem *)));
         connect(m_workbench,            SIGNAL(zoomedItemChanged(QnWorkbenchItem *, QnWorkbenchItem *)),    this,                   SLOT(at_state_zoomedItemChanged(QnWorkbenchItem *, QnWorkbenchItem *)));
-        connect(m_workbench,            SIGNAL(layoutChanged(QnWorkbenchLayout *, QnWorkbenchLayout *)),                this,                   SLOT(at_state_layoutChanged(QnWorkbenchLayout *, QnWorkbenchLayout *)));
+        connect(m_workbench,            SIGNAL(layoutChanged(QnWorkbenchLayout *, QnWorkbenchLayout *)),    this,                   SLOT(at_state_layoutChanged(QnWorkbenchLayout *, QnWorkbenchLayout *)));
         
         /* Fire signals if needed. */
         at_state_layoutChanged(m_layout, m_workbench->layout());
