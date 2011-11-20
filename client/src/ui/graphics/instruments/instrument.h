@@ -471,36 +471,36 @@ protected:
      * \returns                        Whether this instrument is willing to watch
      *                                 events of the given viewport.
      */
-    virtual bool registeredNotify(QWidget *viewport) const { Q_UNUSED(viewport); return true; }
+    virtual bool registeredNotify(QWidget *viewport) { Q_UNUSED(viewport); return true; }
 
     /**
      * \param viewport                 Viewport that was previously registered with this instrument.
      */
-    virtual void unregisteredNotify(QWidget *viewport) const { Q_UNUSED(viewport); }
+    virtual void unregisteredNotify(QWidget *viewport) { Q_UNUSED(viewport); }
 
     /**
      * \param view                     Graphics view.
      * \returns                        Whether this instrument is willing to watch
      *                                 events of the given graphics view.
      */
-    virtual bool registeredNotify(QGraphicsView *view) const { Q_UNUSED(view); return true; }
+    virtual bool registeredNotify(QGraphicsView *view) { Q_UNUSED(view); return true; }
 
     /**
      * \param view                     Graphics view that was previously registered with this instrument.
      */
-    virtual void unregisteredNotify(QGraphicsView *view) const { Q_UNUSED(view); }
+    virtual void unregisteredNotify(QGraphicsView *view) { Q_UNUSED(view); }
 
     /**
      * \param item                     Graphics item.
      * \returns                        Whether this instrument is willing to watch
      *                                 events of the given graphics item.
      */
-    virtual bool registeredNotify(QGraphicsItem *item) const { Q_UNUSED(item); return true; }
+    virtual bool registeredNotify(QGraphicsItem *item) { Q_UNUSED(item); return true; }
 
     /**
      * \param item                     Graphics item that was previously registered with this instrument.
      */
-    virtual void unregisteredNotify(QGraphicsItem *item) const { Q_UNUSED(item); }
+    virtual void unregisteredNotify(QGraphicsItem *item) { Q_UNUSED(item); }
 
     /* Graphics scene event filtering functions. */
     virtual bool event(QGraphicsScene *, QEvent *);

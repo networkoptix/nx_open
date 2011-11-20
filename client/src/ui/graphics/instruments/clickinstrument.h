@@ -39,7 +39,7 @@ protected:
     virtual bool mouseMoveEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override;
     virtual bool mouseReleaseEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override;
 
-    virtual bool registeredNotify(QGraphicsItem *) const override { return true; }
+    virtual bool registeredNotify(QGraphicsItem *) override { return true; }
 
     virtual void startDrag() override;
     virtual void finishDragProcess() override;

@@ -4,6 +4,7 @@
 #include <limits>
 #include <QGraphicsView>
 #include <QScrollBar>
+#include <utils/common/warnings.h>
 #include "instrumentmanager.h"
 
 namespace {
@@ -370,16 +371,15 @@ BoundingInstrument::BoundingInstrument(QObject *parent):
 
 BoundingInstrument::~BoundingInstrument() {
     ensureUninstalled();
+
+    foreach(ViewData *data, m_data)
+        delete data;
 }
 
 void BoundingInstrument::enabledNotify() {
-    foreach(QGraphicsView *view, views()) {
-        ViewData *d = cdata(view);
-        if(d == NULL)
-            continue;
-
-        d->update();
-    }
+    foreach(ViewData *d, m_data)
+        if(d->view() != NULL)
+            d->update();
 
     m_lastTickTime = 0;
     m_timer->setCurrentTime(0); /* This call will invoke tick(), so we must set m_lastTickTime beforehand. */
@@ -390,12 +390,30 @@ void BoundingInstrument::aboutToBeDisabledNotify() {
     m_timer->stop();    
 }
 
+bool BoundingInstrument::registeredNotify(QGraphicsView *view) {
+    ViewData *&d = m_data[view];
+
+    assert(d == NULL);
+
+    d = new ViewData(*m_data[NULL]);
+    d->setView(view);
+
+    return true;
+}
+
+void BoundingInstrument::unregisteredNotify(QGraphicsView *view) {
+    ViewData *d = m_data.take(view);
+    
+    assert(d != NULL);
+
+    delete d;
+}
+
 void BoundingInstrument::tick(int currentTime) {
     qreal dt = (currentTime - m_lastTickTime) / 1000.0;
 
-    foreach(QGraphicsView *view, views()) {
-        ViewData *d = cdata(view);
-        if(d == NULL)
+    foreach(ViewData *d, m_data) {
+        if(d->view() == NULL)
             continue;
 
         d->correct();
@@ -408,7 +426,7 @@ void BoundingInstrument::tick(int currentTime) {
 bool BoundingInstrument::paintEvent(QWidget *viewport, QPaintEvent *) {
     QGraphicsView *view = this->view(viewport);
 
-    ViewData *d = cdata(view);
+    ViewData *d = m_data.value(view, NULL);
     if(d == NULL)
         return false;
 
@@ -417,27 +435,20 @@ bool BoundingInstrument::paintEvent(QWidget *viewport, QPaintEvent *) {
     return false;
 }
 
-BoundingInstrument::ViewData *BoundingInstrument::data(QGraphicsView *view) {
-    ViewData *&result = m_data[view];
-
-    if(result == NULL) {
-        result = new ViewData(*m_data[NULL]);
-        result->setView(view);
-    }
-
-    return result;
-}
-
-BoundingInstrument::ViewData *BoundingInstrument::cdata(QGraphicsView *view) const {
-    return m_data.value(view, NULL);
+BoundingInstrument::ViewData *BoundingInstrument::checkView(QGraphicsView *view) const {
+    ViewData *d = m_data.value(view, NULL);
+    if(d == NULL)
+        qnWarning("Given graphics view is not registered with this bounding instrument.");
+    
+    return d;
 }
 
 void BoundingInstrument::setPositionBounds(QGraphicsView *view, const QRectF &positionBounds, qreal extension) {
     if(view == NULL) {
         foreach(ViewData *d, m_data)
             d->setPositionBounds(positionBounds, extension);
-    } else {
-        data(view)->setPositionBounds(positionBounds, extension);
+    } else if(ViewData *d = checkView(view)) {
+        d->setPositionBounds(positionBounds, extension);
     }
 }
 
@@ -445,8 +456,8 @@ void BoundingInstrument::setSizeBounds(QGraphicsView *view, const QSizeF &sizeLo
     if(view == NULL) {
         foreach(ViewData *d, m_data)
             d->setSizeBounds(sizeLowerBound, lowerMode, sizeUpperBound, upperMode);
-    } else {
-        data(view)->setSizeBounds(sizeLowerBound, lowerMode, sizeUpperBound, upperMode);
+    } else if(ViewData *d = checkView(view)) {
+        d->setSizeBounds(sizeLowerBound, lowerMode, sizeUpperBound, upperMode);
     }
 }
 
@@ -454,8 +465,8 @@ void BoundingInstrument::setMovementSpeed(QGraphicsView *view, qreal multiplier)
     if(view == NULL) {
         foreach(ViewData *d, m_data)
             d->setMovementSpeed(multiplier);
-    } else {
-        data(view)->setMovementSpeed(multiplier);
+    } else if(ViewData *d = checkView(view)) {
+        d->setMovementSpeed(multiplier);
     }
 }
 
@@ -463,8 +474,8 @@ void BoundingInstrument::setScalingSpeed(QGraphicsView *view, qreal multiplier) 
     if(view == NULL) {
         foreach(ViewData *d, m_data)
             d->setScalingSpeed(multiplier);
-    } else {
-        data(view)->setScalingSpeed(multiplier);
+    } else if(ViewData *d = checkView(view)) {
+        d->setScalingSpeed(multiplier);
     }
 }
 
@@ -472,8 +483,8 @@ void BoundingInstrument::setPositionEnforced(QGraphicsView *view, bool positionE
     if(view == NULL) {
         foreach(ViewData *d, m_data)
             d->setPositionEnforced(positionEnforced);
-    } else {
-        data(view)->setPositionEnforced(positionEnforced);
+    } else if(ViewData *d = checkView(view)) {
+        d->setPositionEnforced(positionEnforced);
     }
 }
 
@@ -481,8 +492,8 @@ void BoundingInstrument::setSizeEnforced(QGraphicsView *view, bool sizeEnforced)
     if(view == NULL) {
         foreach(ViewData *d, m_data)
             d->setSizeEnforced(sizeEnforced);
-    } else {
-        data(view)->setSizeEnforced(sizeEnforced);
+    } else if(ViewData *d = checkView(view)) {
+        d->setSizeEnforced(sizeEnforced);
     }
 }
 

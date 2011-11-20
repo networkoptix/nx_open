@@ -63,6 +63,9 @@ protected:
     virtual void enabledNotify() override;
     virtual void aboutToBeDisabledNotify() override;
 
+    virtual bool registeredNotify(QGraphicsView *view) override;
+    virtual void unregisteredNotify(QGraphicsView *view) override;
+
     virtual bool paintEvent(QWidget *viewport, QPaintEvent *event) override;
 
     virtual void tick(int currentTime) override;
@@ -70,8 +73,7 @@ protected:
 private:
     class ViewData;
 
-    ViewData *data(QGraphicsView *view);
-    ViewData *cdata(QGraphicsView *view) const;
+    ViewData *checkView(QGraphicsView *view) const;
 
 private:
     /** View to data mapping. */
