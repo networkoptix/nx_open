@@ -231,6 +231,13 @@ bool CommunicatingSocket::isConnected() const
     return mConnected;
 }
 
+void CommunicatingSocket::close()
+{
+    Socket::close();
+    mConnected = false;
+}
+
+
 bool CommunicatingSocket::connect(const QString &foreignAddress,
     unsigned short foreignPort)
 {

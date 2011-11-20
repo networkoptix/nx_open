@@ -52,6 +52,7 @@ private:
     QnResourcePtr m_resource;
     bool m_waitBOF;
     int m_lastPacketFlags;
+    bool m_closing;
 };
 
 #endif
