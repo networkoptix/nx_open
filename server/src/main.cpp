@@ -20,6 +20,7 @@
 #include "rest/server/rest_server.h"
 #include "rest/handlers/recorded_chunks.h"
 #include "core/resource/video_server.h"
+#include <signal.h>
 
 //#include "device_plugins/arecontvision/devices/av_device_server.h"
 
@@ -104,9 +105,33 @@ void registerServer(QnAppServerConnection& appServerConnection, const QString& m
     settings.setValue("serverId", servers.at(0)->getId().toString());
 }
 
+void stopServer(int signal)
+{
+    QnResource::stopCommandProc();
+    QnResourceDiscoveryManager::instance().stop();
+    QnRecordingManager::instance()->stop();
+}
+
+#ifdef WIN32
+#include <windows.h>
+#include <stdio.h> 
+BOOL WINAPI stopServer_WIN(DWORD dwCtrlType)
+{
+    stopServer(dwCtrlType);
+    return true;
+}
+#endif
+
 #ifndef API_TEST_MAIN
 int main(int argc, char *argv[])
 {
+#ifdef WIN32
+    SetConsoleCtrlHandler(stopServer_WIN, true);
+#endif    
+    signal(SIGINT, stopServer);
+    signal(SIGABRT, stopServer);
+    signal(SIGTERM, stopServer);
+
     Q_INIT_RESOURCE(api);
 
 //    av_log_set_callback(decoderLogCallback);
@@ -266,10 +291,8 @@ int main(int argc, char *argv[])
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
     
     int result = application.exec();
-
-    QnResource::stopCommandProc();
-    QnResourceDiscoveryManager::instance().stop();
-    QnRecordingManager::instance()->stop();
+    
+    stopServer(0);
 
     return result;
 }
