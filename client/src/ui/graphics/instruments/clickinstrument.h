@@ -4,6 +4,11 @@
 #include <QPoint>
 #include "dragprocessinginstrument.h"
 
+/**
+ * This instrument listens to click events and emits corresponding signals
+ * when the mouse button is released. Note that it uses application's 
+ * start drag distance to distinguish click from a drag.
+ */
 class ClickInstrument: public DragProcessingInstrument {
     Q_OBJECT;
 public:
@@ -34,7 +39,7 @@ protected:
     virtual bool mouseMoveEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override;
     virtual bool mouseReleaseEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override;
 
-    virtual bool isWillingToWatch(QGraphicsItem *) const override { return true; }
+    virtual bool registeredNotify(QGraphicsItem *) const override { return true; }
 
     virtual void startDrag() override;
     virtual void finishDragProcess() override;

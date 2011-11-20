@@ -201,8 +201,8 @@ public:
     QSet<QGraphicsView *> views() const;
 
     /**
-     * Disables or enables this instrument. Note that disabled instruments do
-     * not receive notifications and cannot filter events.
+     * Disables or enables this instrument. Note that disabled instruments 
+     * cannot filter events.
      *
      * \param enabled                  Whether this instrument is enabled.
      */
@@ -350,10 +350,20 @@ signals:
      */
     void aboutToBeUninstalled();
 
+    /**
+     * This signal is emitted whenever the instrument is enabled. 
+     */
+    void enabled();
+
+    /**
+     * This signal is emitted whenever the instrument is disabled.
+     */
+    void aboutToBeDisabled();
+
 protected:
     friend class InstrumentManagerPrivate; /* Messes with our internals. */
     template<class T>
-    friend class InstrumentEventDispatcher; /* Calls event handlers and isWillingToWatch. */
+    friend class InstrumentEventDispatcher; /* Calls event handlers and itemRegisteredNotify. */
 
 
     /**
@@ -426,6 +436,16 @@ protected:
     GraphicsItem *item(QGraphicsView *view, const QPoint &viewPos) const {
         return this->item<GraphicsItem>(view, viewPos, detail::AlwaysTrue());
     }
+    
+    /**
+     * Extension point for instrument enabling.
+     */
+    virtual void enabledNotify() {}
+
+    /**
+     * Extension point for instrument disabling.
+     */
+    virtual void aboutToBeDisabledNotify() {}
 
     /**
      * Extension point for instrument installation.
@@ -447,34 +467,40 @@ protected:
     virtual void aboutToBeUninstalledNotify() {}
 
     /**
-     * Extension point for instrument enabling.
-     */
-    virtual void enabledNotify() {}
-
-    /**
-     * Extension point for instrument disabling.
-     */
-    virtual void aboutToBeDisabledNotify() {}
-
-    /**
-     * Note that the instrument framework assumes that throughout the lifetime of 
-     * an instrument this function always returns the same value given the same parameters.
-     * 
-     * \param item                     Graphics item.
+     * \param viewport                 Viewport of a graphics view.
      * \returns                        Whether this instrument is willing to watch
-     *                                 events of the given graphics item.
+     *                                 events of the given viewport.
      */
-    virtual bool isWillingToWatch(QGraphicsItem *) const { return true; }
+    virtual bool registeredNotify(QWidget *viewport) const { Q_UNUSED(viewport); return true; }
 
     /**
-     * Note that the instrument framework assumes that throughout the lifetime of 
-     * an instrument this function always returns the same value given the same parameters.
-     *
+     * \param viewport                 Viewport that was previously registered with this instrument.
+     */
+    virtual void unregisteredNotify(QWidget *viewport) const { Q_UNUSED(viewport); }
+
+    /**
      * \param view                     Graphics view.
      * \returns                        Whether this instrument is willing to watch
      *                                 events of the given graphics view.
      */
-    virtual bool isWillingToWatch(QGraphicsView *) const { return true; }
+    virtual bool registeredNotify(QGraphicsView *view) const { Q_UNUSED(view); return true; }
+
+    /**
+     * \param view                     Graphics view that was previously registered with this instrument.
+     */
+    virtual void unregisteredNotify(QGraphicsView *view) const { Q_UNUSED(view); }
+
+    /**
+     * \param item                     Graphics item.
+     * \returns                        Whether this instrument is willing to watch
+     *                                 events of the given graphics item.
+     */
+    virtual bool registeredNotify(QGraphicsItem *item) const { Q_UNUSED(item); return true; }
+
+    /**
+     * \param item                     Graphics item that was previously registered with this instrument.
+     */
+    virtual void unregisteredNotify(QGraphicsItem *item) const { Q_UNUSED(item); }
 
     /* Graphics scene event filtering functions. */
     virtual bool event(QGraphicsScene *, QEvent *);
@@ -639,6 +665,8 @@ private:
     bool dispatchEvent(QGraphicsItem *watched, QEvent *event);
 
     void adjustDisabledCounter(int amount);
+
+    void sendInstalledNotifications(bool installed);
 
 private:
     InstrumentManager *m_manager;

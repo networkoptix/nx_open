@@ -3,6 +3,9 @@
 
 #include "instrument.h"
 
+/**
+ * This instrument stops event processing. 
+ */
 class StopInstrument: public Instrument {
     Q_OBJECT;
 public:

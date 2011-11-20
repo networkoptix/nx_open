@@ -59,8 +59,7 @@ void InstrumentManagerPrivate::installInstrumentInternal(Instrument *instrument)
     itemDispatcher->installInstrument(instrument);
 
     /* Notify. */
-    instrument->installedNotify();
-    emit instrument->installed();
+    instrument->sendInstalledNotifications(true);
 }
 
 void InstrumentManagerPrivate::uninstallInstrumentInternal(Instrument *instrument) {
@@ -69,8 +68,7 @@ void InstrumentManagerPrivate::uninstallInstrumentInternal(Instrument *instrumen
         instrument->m_scene = NULL;
 
     /* Notify. */
-    emit instrument->aboutToBeUninstalled();
-    instrument->aboutToBeUninstalledNotify();
+    instrument->sendInstalledNotifications(false);
 
     /* Uninstall instrument. */
     sceneDispatcher->uninstallInstrument(instrument);

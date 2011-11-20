@@ -60,9 +60,8 @@ public slots:
     void dontEnforceSize(QGraphicsView *view);
 
 protected:
-    virtual void installedNotify() override;
-    virtual void aboutToBeUninstalledNotify() override;
     virtual void enabledNotify() override;
+    virtual void aboutToBeDisabledNotify() override;
 
     virtual bool paintEvent(QWidget *viewport, QPaintEvent *event) override;
 

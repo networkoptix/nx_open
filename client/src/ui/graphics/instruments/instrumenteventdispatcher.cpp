@@ -25,8 +25,10 @@ InstrumentEventDispatcher<T>::InstrumentEventDispatcher(QObject *parent):
 
 template<class T>
 void InstrumentEventDispatcher<T>::installInstrumentInternal(Instrument *instrument, T *target) {
-    if(!isWillingToWatch(instrument, target))
+    if(!registeredNotify(instrument, target))
         return;
+
+    m_instrumentTargets.insert(qMakePair(instrument, target));
 
     foreach(QEvent::Type eventType, instrument->watchedEventTypes(TARGET_TYPE))
         m_instrumentsByTarget[qMakePair(target, eventType)].push_back(instrument);
@@ -34,8 +36,13 @@ void InstrumentEventDispatcher<T>::installInstrumentInternal(Instrument *instrum
 
 template<class T>
 void InstrumentEventDispatcher<T>::uninstallInstrumentInternal(Instrument *instrument, T *target) {
-    if(!isWillingToWatch(instrument, target))
+    QSet<QPair<Instrument *, T*> >::iterator pos = m_instrumentTargets.find(qMakePair(instrument, target));
+    if(pos == m_instrumentTargets.end())
         return;
+
+    unregisteredNotify(instrument, target);
+
+    m_instrumentTargets.erase(pos);
 
     foreach(QEvent::Type eventType, instrument->watchedEventTypes(TARGET_TYPE)) {
         QList<Instrument *> &list = m_instrumentsByTarget[qMakePair(target, eventType)];

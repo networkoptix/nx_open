@@ -23,7 +23,6 @@ signals:
     void activityStarted();
 
 protected:
-    virtual void aboutToBeUninstalledNotify() override;
     virtual void enabledNotify() override;
     virtual void aboutToBeDisabledNotify() override;
 

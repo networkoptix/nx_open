@@ -372,20 +372,6 @@ BoundingInstrument::~BoundingInstrument() {
     ensureUninstalled();
 }
 
-void BoundingInstrument::installedNotify() {
-    m_timer->start();
-}
-
-void BoundingInstrument::aboutToBeUninstalledNotify() {
-    m_timer->stop();    
-
-    foreach(ViewData *d, m_data)
-        delete d;
-    m_data.clear();
-
-    m_data[NULL] = new ViewData(NULL);
-}
-
 void BoundingInstrument::enabledNotify() {
     foreach(QGraphicsView *view, views()) {
         ViewData *d = cdata(view);
@@ -394,20 +380,25 @@ void BoundingInstrument::enabledNotify() {
 
         d->update();
     }
+
+    m_lastTickTime = m_timer->currentTime();
+    m_timer->start();
+}
+
+void BoundingInstrument::aboutToBeDisabledNotify() {
+    m_timer->stop();    
 }
 
 void BoundingInstrument::tick(int currentTime) {
-    if(isEnabled()) {
-        qreal dt = (currentTime - m_lastTickTime) / 1000.0;
+    qreal dt = (currentTime - m_lastTickTime) / 1000.0;
 
-        foreach(QGraphicsView *view, views()) {
-            ViewData *d = cdata(view);
-            if(d == NULL)
-                continue;
+    foreach(QGraphicsView *view, views()) {
+        ViewData *d = cdata(view);
+        if(d == NULL)
+            continue;
 
-            d->correct();
-            d->enforce(dt);
-        }
+        d->correct();
+        d->enforce(dt);
     }
 
     m_lastTickTime = currentTime;

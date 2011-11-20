@@ -96,20 +96,22 @@ private:
         return instrument->sceneEvent(target, event);
     }
 
-    bool isWillingToWatch(Instrument *, QGraphicsScene *) const {
+    bool registeredNotify(Instrument *, QGraphicsScene *) const {
         return true;
     }
 
-    bool isWillingToWatch(Instrument *instrument, QGraphicsView *target) const {
-        return instrument->isWillingToWatch(target);
+    template<class T>
+    bool registeredNotify(Instrument *instrument, T *target) const {
+        return instrument->registeredNotify(target);
     }
 
-    bool isWillingToWatch(Instrument *instrument, QWidget *target) const {
-        return instrument->isWillingToWatch(Instrument::view(target));
+    void unregisteredNotify(Instrument *, QGraphicsScene *) const {
+        return;
     }
 
-    bool isWillingToWatch(Instrument *instrument, QGraphicsItem *target) const {
-        return instrument->isWillingToWatch(target);
+    template<class T>
+    void unregisteredNotify(Instrument *instrument, T *target) const {
+        return instrument->unregisteredNotify(target);
     }
 
 protected:
@@ -121,6 +123,9 @@ protected:
 
     /** List of all installed instruments, in installation order. */
     QList<Instrument *> m_instruments;
+
+    /** Set of all functional instrument-target pairs. */
+    QSet<QPair<Instrument *, T*> > m_instrumentTargets;
 
     /** Target to instruments mapping. */
     QHash<QPair<T *, QEvent::Type>, QList<Instrument *> > m_instrumentsByTarget;

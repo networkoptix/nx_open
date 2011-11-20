@@ -3,6 +3,9 @@
 
 #include "instrument.h"
 
+/**
+ * This instrument forwards the events to the target object. 
+ */
 class ForwardingInstrument: public Instrument {
     Q_OBJECT;
 public:
@@ -13,7 +16,6 @@ public:
     ForwardingInstrument(WatchedType type, const EventTypeSet &eventTypes, QObject *parent):
         Instrument(type, eventTypes, parent)
     {}
-
 
 protected:
     virtual bool event(QGraphicsScene *, QEvent *) override;

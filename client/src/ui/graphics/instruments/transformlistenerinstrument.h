@@ -5,6 +5,10 @@
 #include <QHash>
 #include <QTransform>
 
+/**
+ * This instrument listens to view transformation changes and notifies about
+ * them via <tt>transformChanged</tt> signal.
+ */
 class TransformListenerInstrument: public Instrument {
     Q_OBJECT;
 public:

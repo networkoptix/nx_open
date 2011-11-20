@@ -3,6 +3,9 @@
 
 #include "instrument.h"
 
+/**
+ * This instrument stops processing of accepted events. 
+ */
 class StopAcceptedInstrument: public Instrument {
     Q_OBJECT;
 public:

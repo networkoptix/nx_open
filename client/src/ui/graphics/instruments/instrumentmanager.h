@@ -13,7 +13,7 @@ class QGraphicsView;
 class InstrumentManagerPrivate;
 
 /**
- * Instrument manager ties graphics views and instruments together.
+ * Instrument manager ties graphics scene, views and items and instruments together.
  * 
  * It supports multiple graphics views per instrument manager.
  */

@@ -159,12 +159,12 @@ void Instrument::adjustDisabledCounter(int amount) {
     if(newDisabledCounter < 0)
         newDisabledCounter = 0;
 
-    if(oldDisabledCounter == 0 && newDisabledCounter > 0)
+    if(oldDisabledCounter == 0 && newDisabledCounter > 0 && isInstalled())
         aboutToBeDisabledNotify();
 
     m_disabledCounter = newDisabledCounter;
 
-    if(oldDisabledCounter > 0 && newDisabledCounter == 0)
+    if(oldDisabledCounter > 0 && newDisabledCounter == 0 && isInstalled())
         enabledNotify();
 }
 
@@ -177,7 +177,7 @@ void Instrument::setEnabled(bool enabled) {
 }
 
 bool Instrument::isEnabled() const {
-    return m_disabledCounter == 0;
+    return m_disabledCounter == 0 && isInstalled();
 }
 
 void Instrument::enable() {
@@ -194,6 +194,26 @@ void Instrument::recursiveEnable() {
 
 void Instrument::recursiveDisable() {
     adjustDisabledCounter(1);
+}
+
+void Instrument::sendInstalledNotifications(bool installed) {
+    assert(isInstalled()); /* Must be actually installed. */
+
+    if(installed) {
+        installedNotify();
+        emit this->installed();
+        if(isEnabled()) {
+            enabledNotify();
+            emit enabled();
+        }
+    } else {
+        if(isEnabled()) {
+            emit aboutToBeDisabled();
+            aboutToBeDisabledNotify();
+        }
+        emit aboutToBeUninstalled();
+        aboutToBeUninstalledNotify();
+    }
 }
 
 bool Instrument::event(QGraphicsScene *watched, QEvent *event) {

@@ -20,15 +20,7 @@ public:
     }
 
 protected:
-    virtual void aboutToBeUninstalledNotify() override {
-        Instrument::aboutToBeUninstalledNotify();
-
-        processor()->reset();
-    }
-
     virtual void aboutToBeDisabledNotify() override {
-        Instrument::aboutToBeDisabledNotify();
-
         processor()->reset();
     }
 
