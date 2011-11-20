@@ -6,6 +6,7 @@
 #include "utils/media/ffmpeg_helper.h"
 #include "utils/network/ffmpeg_sdp.h"
 #include "utils/common/util.h"
+#include "utils/common/sleep.h"
 
 static const int MAX_RTP_BUFFER_SIZE = 65535;
 
@@ -14,7 +15,10 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate():
     m_tcpMode(true),
     m_rtpData(0),
     m_position(DATETIME_NOW),
-    m_opened(false)
+    m_opened(false),
+    m_waitBOF(false),
+    m_lastPacketFlags(-1),
+    m_closing(false)
 {
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
     m_flags |= Flag_SlowSource;
@@ -31,6 +35,7 @@ bool QnRtspClientArchiveDelegate::open(QnResourcePtr resource)
 {
     if (m_opened)
         return true;
+    m_closing = false;
     m_resource = resource;
     QnResourcePtr server = qnResPool->getResourceById(resource->getParentId());
     if (server == 0)
@@ -59,14 +64,18 @@ bool QnRtspClientArchiveDelegate::open(QnResourcePtr resource)
 
 void QnRtspClientArchiveDelegate::beforeClose()
 {
+    m_waitBOF = false;
+    m_closing = true;
     if (m_rtpData)
         m_rtpData->getSocket()->close();
 }
 
 void QnRtspClientArchiveDelegate::close()
 {
+    m_waitBOF = false;
     m_rtspSession.stop();
     m_rtpData = 0;
+    m_lastPacketFlags = -1;
     deleteContexts();
     m_opened = false;
 }
@@ -91,6 +100,10 @@ qint64 QnRtspClientArchiveDelegate::endTime()
 void QnRtspClientArchiveDelegate::reopen()
 {
     close();
+
+    for (int i = 0; i < 50 && !m_closing; ++i)
+        QnSleep::msleep(10);
+
     if (m_resource)
         open(m_resource);
 }
@@ -102,14 +115,18 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
     int errCnt = 0;
     while(!result)
     {
-        if (!m_rtpData)
+        if (!m_rtpData){
+            //m_rtspSession.stop(); // reconnect
+            reopen();
             return result;
+        }
 
         int rtpChannelNum = 0;
         int blockSize  = m_rtpData->read((char*)m_rtpDataBuffer, MAX_RTP_BUFFER_SIZE);
         if (blockSize < 0) {
-            m_rtspSession.stop();
-            return result; // reconnect
+            //m_rtspSession.stop(); // reconnect
+            reopen();
+            return result; 
         }
         else if (blockSize == 0) {
             errCnt++;
@@ -153,10 +170,19 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
         }
         else
             qWarning() << Q_FUNC_INFO << __LINE__ << "Only FFMPEG payload format now implemeted. Ask developers to add '" << format << "' format";
+
+        if (result && m_waitBOF)
+        {
+            if (result->flags & QnAbstractMediaData::MediaFlags_BOF)
+                m_waitBOF = false;
+            else
+                result.clear();
+        }
     }
     if (!result)
         reopen();
-  
+    if (result)
+        m_lastPacketFlags = result->flags;
     return result;
 }
 
@@ -165,6 +191,7 @@ qint64 QnRtspClientArchiveDelegate::seek(qint64 time)
     deleteContexts(); // context is going to create again on first data after SEEK, so ignore rest of data before seek
     m_position = time;
     m_rtspSession.sendPlay(time, m_rtspSession.getScale());
+    m_waitBOF = true;
     return time;
 }
 
@@ -291,4 +318,12 @@ void QnRtspClientArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
 {
     int sign = value ? -1 : 1;
     m_rtspSession.sendPlay(displayTime, /*RTPSession::RTSP_NOW*/ qAbs(m_rtspSession.getScale()) * sign);
+}
+
+bool QnRtspClientArchiveDelegate::isRealTimeSource() const 
+{ 
+    if (m_lastPacketFlags == -1)
+        return m_position == DATETIME_NOW; 
+    else
+        return m_lastPacketFlags & QnAbstractMediaData::MediaFlags_LIVE;
 }

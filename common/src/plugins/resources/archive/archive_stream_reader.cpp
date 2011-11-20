@@ -30,7 +30,10 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_requiredJumpTime(AV_NOPTS_VALUE),
     m_lastUIJumpTime(AV_NOPTS_VALUE),
     m_lastFrameDuration(0),
-    m_selectedAudioChannel(0)
+    m_selectedAudioChannel(0),
+    m_BOF(false),
+    m_tmpSkipFramesToTime(AV_NOPTS_VALUE)
+
 {
     // Should init packets here as some times destroy (av_free_packet) could be called before init
     //connect(dev.data(), SIGNAL(onStatusChanged(QnResource::Status, QnResource::Status)), this, SLOT(onStatusChanged(QnResource::Status, QnResource::Status)));
@@ -56,16 +59,20 @@ void QnArchiveStreamReader::previousFrame(qint64 mksec)
     QnAbstractArchiveReader::previousFrame(mksec);
 }
 
+
+void QnArchiveStreamReader::setCurrentTime(qint64 value)
+{
+    QMutexLocker mutex(&m_framesMutex);
+    m_currentTime = value;
+}
+
 qint64 QnArchiveStreamReader::currentTime() const
 {
-    QMutexLocker mutex(&m_cs);
-
-    qint64 jumpTime = skipFramesToTime();
-
-	if (jumpTime)
-		return jumpTime;
-
-	return m_currentTime;
+    QMutexLocker mutex(&m_framesMutex);
+	if (m_skipFramesToTime)
+		return m_skipFramesToTime;
+    else
+	    return m_currentTime;
 }
 
 ByteIOContext* QnArchiveStreamReader::getIOContext()
@@ -99,9 +106,9 @@ const QnResourceAudioLayout* QnArchiveStreamReader::getDPAudioLayout() const
 
 bool QnArchiveStreamReader::init()
 {
+    setCurrentTime(0);
 	QMutexLocker mutex(&m_cs);
 
-	m_currentTime = 0;
 	m_previousTime = -1;
 
     if (!m_delegate->open(m_resource))
@@ -153,12 +160,13 @@ bool QnArchiveStreamReader::getNextVideoPacket()
 QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
 {
 begin_label:
-    bool BOF = false;
 	if (mFirstTime)
 	{
         // this is here instead if constructor to unload ui thread
-		if (init()) 
+        if (init()) {
+            m_BOF = true;
 		    mFirstTime = false;
+        }
         else {
             // If media data can't be opened wait 1 second and try again
             return QnAbstractMediaDataPtr();
@@ -171,9 +179,10 @@ begin_label:
         {
             m_lastGopSeekTime = -1;
             intChanneljumpTo(m_requiredJumpTime, 0);
+            setSkipFramesToTime(m_tmpSkipFramesToTime);
             m_lastUIJumpTime = m_requiredJumpTime;
             m_requiredJumpTime = AV_NOPTS_VALUE;
-            BOF = true;
+            m_BOF = true;
         }
     }
 
@@ -220,8 +229,9 @@ begin_label:
         videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(m_currentData);
         m_previousTime = m_currentTime;
 
-        if (m_currentData->timestamp != AV_NOPTS_VALUE) 
-            m_currentTime =  m_currentData->timestamp;
+        if (m_currentData->timestamp != AV_NOPTS_VALUE) {
+            setCurrentTime(m_currentData->timestamp);
+        }
 
         /*
         while (m_currentData->stream_index >= m_lastPacketTimes.size())
@@ -267,9 +277,10 @@ begin_label:
                 isKeyFrame =  m_currentData->flags  & AV_PKT_FLAG_KEY;
             }
             
-            if (m_eof || m_currentTime == 0 && m_bottomIFrameTime > AV_REVERSE_BLOCK_START && m_topIFrameTime >= m_bottomIFrameTime) {
+            if (m_eof || m_currentTime == 0 && m_bottomIFrameTime > AV_REVERSE_BLOCK_START && m_topIFrameTime >= m_bottomIFrameTime) 
+            {
                 // seek from EOF to BOF occured
-                m_currentTime = m_topIFrameTime;
+                setCurrentTime(m_topIFrameTime);
                 m_eof = false;
             }
 
@@ -319,7 +330,6 @@ begin_label:
             videoData->flags |= AV_REVERSE_PACKET;
         }
 
-        m_useTwice = false;
 
         /*
         // -------------------------------------------
@@ -383,6 +393,16 @@ begin_label:
                 else if (reverseMode && m_nextData->timestamp > skipFramesToTime())
                     videoData->ignore = true;
                 else {
+                    if (skipFramesToTime() != 0) 
+                    {
+                        QString msg;
+                        QTextStream str(&msg);
+                        str << "no more ignore. curTime=" << QDateTime::fromMSecsSinceEpoch(m_nextData->timestamp/1000).toString() 
+                            << " borderTime=" << QDateTime::fromMSecsSinceEpoch(skipFramesToTime()/1000).toString();
+                        str.flush();
+                        cl_log.log(msg, cl_logWARNING);
+                        str.flush();
+                    }
 					setSkipFramesToTime(0);
                 }
 			}
@@ -398,16 +418,21 @@ begin_label:
 		m_currentData->flags |= QnAbstractMediaData::MediaFlags_AfterEOF;
 		m_eof = false;
 	}
-    if (BOF)
+    if (m_BOF) {
         m_currentData->flags |= QnAbstractMediaData::MediaFlags_BOF;        
+        m_BOF = false;
+
+        cl_log.log("set BOF flag", cl_logALWAYS);
+    }
 
 	return m_currentData;
 }
 
-void QnArchiveStreamReader::channeljumpTo(qint64 mksec, int channel)
+void QnArchiveStreamReader::channeljumpTo(qint64 mksec, int channel, qint64 skipTime)
 {
     QMutexLocker mutex(&m_jumpMtx);
     m_requiredJumpTime = mksec;
+    m_tmpSkipFramesToTime = skipTime;
 }
 
 void QnArchiveStreamReader::intChanneljumpTo(qint64 mksec, int /*channel*/)

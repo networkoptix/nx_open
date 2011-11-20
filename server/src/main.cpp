@@ -2,6 +2,7 @@
 #include <QDir>
 #include <QSettings>
 #include <QUdpSocket>
+#include <QUrl>
 
 #include "version.h"
 #include "utils/common/util.h"
@@ -78,53 +79,6 @@ void ffmpegInit()
     extern URLProtocol ufile_protocol;
     av_register_protocol2(&ufile_protocol, sizeof(ufile_protocol));
 }
-
-#ifdef TEST_RTSP_SERVER
-
-void addTestFile(const QString& fileName, const QString& resId)
-{
-    QnAviResourcePtr resource(new QnAviResource(fileName));
-    qnResPool->addResource(QnResourcePtr(resource));
-}
-
-void addTestData()
-{
-    /*
-    QnVideoServerPtr server(new QnVideoServer());
-    server->setUrl("rtsp://localhost:50000");
-    server->startRTSPListener();
-    qnResPool->addResource(QnResourcePtr(server));
-
-    QnAviResourcePtr resource(new QnAviResource("E:/Users/roman76r/video/ROCKNROLLA/BDMV/STREAM/00000.m2ts"));
-    resource->removeFlag(QnResource::local); // to initialize access to resource throught RTSP server
-    resource->addFlag(QnResource::remove); // to initialize access to resource throught RTSP server
-    resource->setParentId(server->getId());
-    qnResPool->addResource(QnResourcePtr(resource));
-
-    QnFakeCameraPtr testCamera(new QnFakeCamera());
-    testCamera->setParentId(server->getId());
-    testCamera->setMAC(QnMacAddress("00000"));
-    testCamera->setUrl("00000");
-    testCamera->setName("testCamera");
-    qnResPool->addResource(QnResourcePtr(testCamera));
-    */
-
-    addTestFile("e:/Users/roman76r/blake/3PM PRIVATE SESSION, HOLLYWOOD Jayme.flv", "q1");
-    addTestFile("e:/Users/roman76r/blake/8 FEATURE PREMIERE_Paid Companions_Bottled-Up_h.wmv", "q2");
-    addTestFile("e:/Users/roman76r/blake/9  FEATURE PREMIERE_Paid Compan_Afternoon Whores.wmv", "q3");
-    addTestFile("e:/Users/roman76r/blake/A CUT ABOVE Aria & Justine.flv", "q4");
-    addTestFile("e:/Users/roman76r/blake/A DOLL'S LIFE Jacqueline, Nika & Jade.flv", "q5");
-
-    /*
-    QnAviResourcePtr resource2(new QnAviResource("C:/Users/physic/Videos/HighDef_-_Audio_-_Japan.avi"));
-    resource2->removeFlag(QnResource::local); // to initialize access to resource throught RTSP server
-    resource2->addFlag(QnResource::remove); // to initialize access to resource throught RTSP server
-    resource2->setParentId(server->getId());
-    qnResPool->addResource(QnResourcePtr(resource2));
-    */
-}
-#endif
-
 
 QString serverId()
 {
@@ -232,11 +186,11 @@ int main(int argc, char *argv[])
 //    QSettings settings;
 //    settings.setValue("appserverAddress", "127.0.0.1");
 
-    QString appserverAddress = QSettings().value("appserverAddress", "10.0.2.3").toString();
+    QUrl appserverUrl = QUrl(QSettings().value("appserverUrl", QLatin1String(DEFAULT_APPSERVER_URL)).toString());
 
-    QHostAddress host(appserverAddress);
-    
-    int port = 8000;
+    QHostAddress host(appserverUrl.host());
+    int port = appserverUrl.port();
+
     QAuthenticator auth;
     auth.setUser("appserver");
     auth.setPassword("123");
@@ -250,7 +204,7 @@ int main(int argc, char *argv[])
 
     qnResTypePool->addResourceTypeList(resourceTypeList);
 
-    registerServer(appServerConnection, localAddress(appserverAddress));
+    registerServer(appServerConnection, localAddress(appserverUrl.host()));
 
     QnAppserverResourceProcessor processor(QnId(serverId()), host, port, auth, QnResourceDiscoveryManager::instance());
 
@@ -315,6 +269,7 @@ int main(int argc, char *argv[])
 
     QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance().stop();
+    QnRecordingManager::instance()->stop();
 
     return result;
 }

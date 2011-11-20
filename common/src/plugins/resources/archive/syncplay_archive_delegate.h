@@ -15,16 +15,18 @@ public:
 
     virtual bool open(QnResourcePtr resource);
     virtual void close();
+    virtual void beforeClose();
     virtual qint64 startTime();
     virtual qint64 endTime();
     virtual QnAbstractMediaDataPtr getNextData();
     virtual qint64 seek (qint64 time);
     virtual QnVideoResourceLayout* getVideoLayout();
     virtual QnResourceAudioLayout* getAudioLayout();
+    virtual bool isRealTimeSource() const;
 
     void setStartDelay(qint64 startDelay);
     qint64 secondTime() const;
-    qint64 jumpTo (qint64 time, bool makeshot);
+    qint64 jumpToPreviousFrame (qint64 time, bool makeshot);
 
     virtual AVCodecContext* setAudioChannel(int num);
     void enableSync(bool value);

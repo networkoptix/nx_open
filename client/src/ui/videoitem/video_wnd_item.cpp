@@ -416,3 +416,13 @@ QImage CLVideoWindowItem::getScreenshot()
     p.end();
     return rez;
 }
+
+bool CLVideoWindowItem::contains(CLAbstractRenderer* renderer)  const
+{
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+    {
+        if (m_gldraw[i] == renderer)
+            return true;
+    }
+    return false;
+}

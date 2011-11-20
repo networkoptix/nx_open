@@ -7,6 +7,8 @@
 #include <QtGui/QGraphicsProxyWidget>
 #include <QtGui/QLabel>
 
+#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource/video_server.h>
 #include "timeslider.h"
 #include "camera/camera.h"
 #include "ui/videoitem/video_wnd_item.h"
@@ -17,6 +19,8 @@
 #include "ui/skin.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "utils/common/util.h"
+
+static const int SLIDER_NOW_AREA_WIDTH = 30;
 
 // ### hack to avoid scene move up and down
 class QLabelKillsWheelEvent : public QLabel
@@ -153,6 +157,7 @@ NavigationItem::NavigationItem(QGraphicsItem * /*parent*/) :
     m_forwardButton->setPreferredSize(32, 18);
     m_forwardButton->setMaximumSize(m_forwardButton->preferredSize());
 
+
     connect(m_backwardButton, SIGNAL(clicked()), this, SLOT(rewindBackward()));
     connect(m_stepBackwardButton, SIGNAL(clicked()), this, SLOT(stepBackward()));
     connect(m_playButton, SIGNAL(clicked()), this, SLOT(togglePlayPause()));
@@ -198,6 +203,8 @@ NavigationItem::NavigationItem(QGraphicsItem * /*parent*/) :
     m_timeSlider->setCursor(Qt::ArrowCursor);
     m_graphicsWidget->resize(m_timeSlider->size());
 
+    m_timeSlider->setEndSize(SLIDER_NOW_AREA_WIDTH);
+
     {
         QPalette palette = m_timeSlider->palette();
         palette.setColor(QPalette::Window, QColor(15, 15, 15));
@@ -222,6 +229,15 @@ NavigationItem::NavigationItem(QGraphicsItem * /*parent*/) :
     m_muteButton->setChecked(m_volumeSlider->isMute());
     m_muteButton->setCursor(Qt::ArrowCursor);
 
+    m_liveButton = new ImageButton(this);
+    //m_liveButton->addPixmap(Skin::pixmap(QLatin1String("live.png")), ImageButton::Active, ImageButton::Background);
+    m_liveButton->addPixmap(Skin::pixmap(QLatin1String("live.png")), ImageButton::Disabled, ImageButton::Background);
+    m_liveButton->setPreferredSize(20, 20);
+    m_liveButton->setMaximumSize(m_liveButton->preferredSize());
+    m_liveButton->setEnabled(false);
+    m_liveButton->setCursor(Qt::ArrowCursor);
+    m_liveButton->hide();
+
     m_volumeSlider = new VolumeSlider(Qt::Horizontal);
     m_volumeSlider->setObjectName("VolumeSlider");
     m_volumeSlider->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
@@ -244,6 +260,8 @@ NavigationItem::NavigationItem(QGraphicsItem * /*parent*/) :
     rightLayoutH->setSpacing(3);
     rightLayoutH->addItem(timeLabelProxyWidget);
     rightLayoutH->setAlignment(timeLabelProxyWidget, Qt::AlignLeft | Qt::AlignVCenter);
+    rightLayoutH->addItem(m_liveButton);
+    rightLayoutH->setAlignment(m_liveButton, Qt::AlignCenter);
     rightLayoutH->addItem(m_muteButton);
     rightLayoutH->setAlignment(m_muteButton, Qt::AlignRight | Qt::AlignVCenter);
 
@@ -312,8 +330,9 @@ void NavigationItem::setVideoCamera(CLVideoCamera *camera)
     m_speedSlider->resetSpeed();
     restoreInfoText();
 
-    if (m_camera)
-        disconnect(m_camera->getCamCamDisplay(), SIGNAL(liveMode(bool)), this, SLOT(onLiveModeChanged(bool)));
+    if (m_camera) {
+        disconnect(m_camera->getCamCamDisplay(), NULL, this, NULL);
+    }
 
     m_camera = camera;
 
@@ -324,6 +343,7 @@ void NavigationItem::setVideoCamera(CLVideoCamera *camera)
         QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
 
         connect(m_camera->getCamCamDisplay(), SIGNAL(liveMode(bool)), this, SLOT(onLiveModeChanged(bool)));
+        connect(m_camera->getStreamreader(), SIGNAL(jumpOccured(qint64, bool)), this, SLOT(jumpOccured(qint64)));
 
         setPlaying(!reader->onPause());
     }
@@ -374,7 +394,51 @@ void NavigationItem::updateSlider()
             m_currentTime = time/1000;
             m_timeSlider->setCurrentValue(m_currentTime);
         }
+
+        m_liveButton->setVisible(m_timeSlider->isAtEnd());
     }
+}
+
+void NavigationItem::updatePeriodList() {
+    qint64 w = m_timeSlider->sliderRange() * 1000;
+    qint64 t = m_timeSlider->viewPortPos() * 1000;
+    if(m_timePeriod.startTimeUSec <= t && t + w <= m_timePeriod.startTimeUSec + m_timePeriod.durationUSec)
+        return;
+    
+    QnResourcePtr resource = m_camera->getStreamreader()->getResource();
+    if(!resource->checkFlag(QnResource::live))
+        return;
+
+    /* Cast just to feel safe. */
+    QnNetworkResourcePtr networkResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
+    if(networkResource.isNull()) 
+        return;
+
+    QnResourcePtr parentResource = qnResPool->getResourceById(networkResource->getParentId());
+    //if(!parentResource->checkFlag(QnResource::server)) // TODO: doesn't work
+    //    return; 
+
+    /* Cast just to feel safe. */
+    QnVideoServerPtr serverResource = qSharedPointerDynamicCast<QnVideoServer>(parentResource);
+    if(serverResource.isNull())
+        return;
+
+    QnVideoServerConnectionPtr connection = serverResource->apiConnection();
+    if(connection.isNull())
+        return;
+    
+    const qint64 oneHour = 60ll * 60ll * 1000ll * 1000ll;
+    if(w < oneHour)
+        w = oneHour;
+
+    QnNetworkResourceList resources;
+    resources.push_back(networkResource); // TODO
+    
+    m_timePeriod.startTimeUSec = t - w;
+    m_timePeriod.durationUSec = w * 3;
+
+    QnTimePeriodList timePeriods = connection->recordedTimePeriods(resources, m_timePeriod.startTimeUSec, m_timePeriod.startTimeUSec + m_timePeriod.durationUSec, 1);
+    m_timeSlider->setTimePeriodList(timePeriods);
 }
 
 void NavigationItem::onValueChanged(qint64 time)
@@ -385,17 +449,31 @@ void NavigationItem::onValueChanged(qint64 time)
     if (m_camera == 0)
         return;
 
+    updatePeriodList();
+
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     if (reader->isSkippingFrames())
         return;
 
-    time *= 1000;
-    if (m_timeSlider->isMoving())
-        reader->jumpTo(time, true);
-    else
-        reader->jumpToPreviousFrame(time, true);
+    smartSeek(time);
+}
 
-    //m_camera->streamJump(time);
+void NavigationItem::smartSeek(qint64 timeMSec) 
+{
+    QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
+    if(m_timeSlider->isAtEnd()) {
+        reader->jumpToPreviousFrame(DATETIME_NOW, true);
+
+        m_liveButton->show();
+    } else {
+        timeMSec *= 1000;
+        if (m_timeSlider->isMoving())
+            reader->jumpTo(timeMSec, true);
+        else
+            reader->jumpToPreviousFrame(timeMSec, true);
+
+        m_liveButton->hide();
+    }
 }
 
 void NavigationItem::pause()
@@ -416,9 +494,16 @@ void NavigationItem::play()
     setActive(true);
 
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
-    reader->setSingleShotMode(false);
-    reader->resume();
-    reader->resumeDataProcessors();
+    if (reader->onPause() && reader->isRealTimeSource())
+    {
+        reader->resumeMedia();
+
+        smartSeek(m_camera->getCamCamDisplay()->currentTime() / 1000);
+    }
+    else {
+      reader->resumeMedia();
+    }
+
     if (m_graphicsWidget->isSelected() || !m_playing)
         m_camera->getCamCamDisplay()->playAudio(m_playing);
 }
@@ -522,12 +607,13 @@ void NavigationItem::onSliderReleased()
     setActive(true);
     m_sliderIsmoving = false;
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
-    reader->previousFrame(m_timeSlider->currentValue() * 1000);
+    smartSeek(m_timeSlider->currentValue());
     if (isPlaying())
     {
         reader->setSingleShotMode(false);
         m_camera->getCamCamDisplay()->playAudio(true);
     }
+
 }
 
 void NavigationItem::onSpeedChanged(float newSpeed)

@@ -51,7 +51,7 @@ public:
    */
   ~Socket();
 
-  void close();
+  virtual void close();
   bool isClosed() const;
 
   /**
@@ -144,7 +144,7 @@ public:
    *   @return false if unable to establish connection
    */
   bool connect(const QString &foreignAddress, unsigned short foreignPort);
-
+  virtual void close();
   void setReadTimeOut( unsigned int ms );
   void setWriteTimeOut( unsigned int ms );
 

@@ -1,9 +1,7 @@
 #include "synchttp.h"
 
 SyncHTTP::SyncHTTP (const QHostAddress & hostName, quint16 port, QAuthenticator auth)
-    : requestID(0),
-      status(false),
-      m_hostName(hostName),
+    : m_hostName(hostName),
       m_port(port)
 {
     m_credentials = auth.user() + ":" + auth.password();
@@ -16,69 +14,59 @@ SyncHTTP::~SyncHTTP ()
 
 int SyncHTTP::syncGet (const QString& path, QIODevice* to)
 {
-    m_httpClient = QSharedPointer<QNetworkAccessManager>(new QNetworkAccessManager());
-    loop = QSharedPointer<QEventLoop>(new QEventLoop());
+    QNetworkAccessManager accessManager;
+    QEventLoop loop;
 
-    loop->moveToThread(QThread::currentThread());
-    m_httpClient->moveToThread(QThread::currentThread());
-
-    QUrl qurl;
-    qurl.setScheme("http");
-    qurl.setHost(m_hostName.toString());
-    qurl.setPort(m_port);
-    qurl.setPath(path);
+    QUrl qurl("http://" + m_hostName.toString() + ":" + QString::number(m_port) + "/" + path);
 
     QNetworkRequest request(qurl);
 
     request.setRawHeader(QByteArray("Authorization"), m_credentials.toAscii());
 
-    //connect the finished signal to our finished slot
-    connect(m_httpClient.data(),SIGNAL(finished (QNetworkReply*)),SLOT(finished (QNetworkReply*)));
+    connect(&accessManager, SIGNAL(finished(QNetworkReply*)), &loop, SLOT(quit()));
 
-    // start the request and store the requestID
-    requestID = m_httpClient->get(request);
+    // start the request 
+    QScopedPointer<QNetworkReply> reply(accessManager.get(request));
 
     // block until the request is finished
-    loop->exec();
+    loop.exec();
 
-    to->write(requestID->readAll());
+    // set status of the request
+    int error = reply->error();
 
-    /// return the request status
-    return status;
+    to->write(reply->readAll());
+
+    // return the request status
+    return error;
 }
 
 /// send POST request and wait until finished
 int SyncHTTP::syncPost (const QString & path, QIODevice * data, QIODevice * to)
 {
-    m_httpClient = QSharedPointer<QNetworkAccessManager>(new QNetworkAccessManager());
-    loop = QSharedPointer<QEventLoop>(new QEventLoop());
+    QNetworkAccessManager accessManager;
+    QEventLoop loop;
 
-    loop->moveToThread(QThread::currentThread());
-    m_httpClient->moveToThread(QThread::currentThread());
-
-    QUrl qurl;
-    qurl.setScheme("http");
-    qurl.setHost(m_hostName.toString());
-    qurl.setPort(m_port);
-    qurl.setPath(path);
+    QUrl qurl("http://" + m_hostName.toString() + ":" + QString::number(m_port) + "/" + path);
 
     QNetworkRequest request(qurl);
 
-    request.setRawHeader(QByteArray("Authorization"),m_credentials.toAscii());
+    request.setRawHeader(QByteArray("Authorization"), m_credentials.toAscii());
 
-    // connect the finished signal to our finished slot
-    connect(m_httpClient.data(),SIGNAL(finished (QNetworkReply*)),SLOT(finished (QNetworkReply*)));
+    connect(&accessManager, SIGNAL(finished(QNetworkReply*)), &loop, SLOT(quit()));
 
-    // start the request and store the requestID
-    requestID = m_httpClient->post(request, data);
+    // start the request 
+    QScopedPointer<QNetworkReply> reply(accessManager.post(request, data));
 
     // block until the request is finished
-    loop->exec();
+    loop.exec();
 
-    to->write(requestID->readAll());
+    // set status of the request
+    int error = reply->error();
+
+    to->write(reply->readAll());
 
     // return the request status
-    return status;
+    return error;
 }
 
 int SyncHTTP::syncPost (const QString& path, const QByteArray& data, QIODevice* to)
@@ -89,16 +77,3 @@ int SyncHTTP::syncPost (const QString& path, const QByteArray& data, QIODevice* 
     return syncPost(path,&buffer,to);
 }
 
-void SyncHTTP::finished (QNetworkReply* reply)
-{
-    /// check to see if it's the request we made
-    if(reply != requestID)
-        return;
-
-    /// set status of the request
-    status = reply->error();
-    /// end the loop
-    loop->exit();
-
-    QObject::disconnect(this);
-}

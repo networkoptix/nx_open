@@ -2,6 +2,7 @@
 #define TIMESLIDER_H
 
 #include "ui/widgets2/graphicswidget.h"
+#include <recording/device_file_catalog.h> /* For QnTimePeriodList. */
 
 class QPropertyAnimation;
 
@@ -35,10 +36,17 @@ public:
     bool centralise() const { return m_centralise; }
     void setCentralise(bool b) { m_centralise = b; }
 
-    qint64 sliderRange();
+    qint64 sliderRange() const;
+    qint64 viewPortPos() const;
 
     qint64 minimumRange() const;
     void setMinimumRange(qint64);
+
+    const QnTimePeriodList &timePeriodList() const { return m_timePeriodList; }
+    void setTimePeriodList(const QnTimePeriodList &timePeriodList) { m_timePeriodList = timePeriodList; }
+
+    bool isAtEnd();
+    void setEndSize(qreal size); 
 
 public Q_SLOTS:
     void setMinimumValue(qint64 value);
@@ -62,7 +70,8 @@ Q_SIGNALS:
 protected:
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
 
-    bool eventFilter(QObject *target, QEvent *event);
+    virtual bool eventFilter(QObject *target, QEvent *event) override;
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override; 
 
 private Q_SLOTS:
     void onSliderValueChanged(int value);
@@ -75,7 +84,6 @@ private:
     qint64 fromSlider(int value);
     int toSlider(qint64 value);
 
-    qint64 viewPortPos() const;
     void setViewPortPos(qint64 value);
 
     void updateSlider();
@@ -88,16 +96,21 @@ private:
     qint64 m_maximumValue;
     qint64 m_currentValue;
     qint64 m_viewPortPos;
-
+    qint64 m_minimumRange;
     double m_scalingFactor;
-    bool m_isUserInput;
     int m_delta;
+
+    bool m_isUserInput;
 
     QPropertyAnimation *m_animation;
     bool m_centralise;
-    qint64 m_minimumRange;
+
+    QnTimePeriodList m_timePeriodList;
+
+    qreal m_endSize;
 
     friend class TimeLine;
+    friend class MySlider;
 };
 
 #endif // TIMESLIDER_H

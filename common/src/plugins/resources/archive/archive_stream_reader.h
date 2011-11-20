@@ -34,7 +34,7 @@ public:
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData();
-    virtual void channeljumpTo(qint64 mksec, int channel);
+    virtual void channeljumpTo(qint64 mksec, int channel, qint64 skipTime);
 
     virtual bool init();
 
@@ -43,6 +43,7 @@ protected:
     virtual qint64 contentLength() const { return m_delegate->endTime() - m_delegate->startTime(); }
     bool initCodecs();
     bool openFormatContext();
+    void setCurrentTime(qint64 value);
 protected:
     qint64 m_currentTime;
     qint64 m_previousTime;
@@ -63,6 +64,7 @@ protected:
     bool mFirstTime;
 
     volatile bool m_wakeup;
+    qint64 m_tmpSkipFramesToTime;
 
 private:
     int m_selectedAudioChannel;
@@ -79,6 +81,7 @@ private:
     qint64 m_lastUIJumpTime;
     qint64 m_lastFrameDuration;
     QString m_onDestroyFileName;
+    bool m_BOF;
 private:
     QMutex m_jumpMtx;
     QnAbstractMediaDataPtr m_currentData;

@@ -74,9 +74,9 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(QnResourceList resList, qi
         qint64 minStartTime = 0x7fffffffffffffffll;
         minIndex = -1;
         for (int i = 0; i < cameras.size(); ++i) {
-            if (!cameras[i].isEmpty() && cameras[i][0].startTime < minStartTime) {
+            if (!cameras[i].isEmpty() && cameras[i][0].startTimeUSec < minStartTime) {
                 minIndex = i;
-                minStartTime = cameras[i][0].startTime;
+                minStartTime = cameras[i][0].startTimeUSec;
             }
         }
 
@@ -88,8 +88,8 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(QnResourceList resList, qi
             }
             else {
                 QnTimePeriod& last = result.last();
-                if (last.startTime <= minStartTime && last.startTime+last.duration > minStartTime)
-                    last.duration = qMax(last.duration, minStartTime + cameras[minIndex][0].duration - last.startTime);
+                if (last.startTimeUSec <= minStartTime && last.startTimeUSec+last.durationUSec > minStartTime)
+                    last.durationUSec = qMax(last.durationUSec, minStartTime + cameras[minIndex][0].durationUSec - last.startTimeUSec);
                 else
                     result << cameras[minIndex][0];
             } 

@@ -16,6 +16,7 @@ public:
     virtual ~QnRecordingManager();
 
     void start();
+    void stop();
     bool isCameraRecoring(QnResourcePtr camera);
 private slots:
     void onNewResource(QnResourcePtr res);

@@ -425,9 +425,7 @@ void CLArchiveNavigatorItem::onSubItemPressed(CLAbstractSubItem* subitem)
 		mStepBackward->setVisible(false);
 		mStepForward->setVisible(false);
 
-        m_reader->setSingleShotMode(false);
-        m_reader->resume();
-        m_reader->resumeDataProcessors();
+        m_reader->resumeMedia();
 
         m_videoCamera->getCamCamDisplay()->playAudio(true);
 

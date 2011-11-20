@@ -11,6 +11,7 @@
 // This class used for extract chunk sequence from storage
 class QnChunkSequence: public QObject
 {
+    Q_OBJECT
 public:
     QnChunkSequence(const QnNetworkResourcePtr res, qint64 startTime);
     QnChunkSequence(const QnNetworkResourceList& resList, qint64 startTime);

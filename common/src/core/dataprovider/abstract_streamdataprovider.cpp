@@ -6,7 +6,7 @@ QnAbstractStreamDataProvider::QnAbstractStreamDataProvider(QnResourcePtr resourc
     QnResourceConsumer(resource),
     m_mutex(QMutex::Recursive)
 {
-
+    m_speed = 1.0;
 }
 
 QnAbstractStreamDataProvider::~QnAbstractStreamDataProvider()
@@ -47,15 +47,23 @@ void QnAbstractStreamDataProvider::removeDataProcessor(QnAbstractDataConsumer* d
 	m_dataprocessors.removeOne(dp);
 }
 
+double QnAbstractStreamDataProvider::getSpeed() const
+{
+    QMutexLocker mutex(&m_mutex);
+    return m_speed;
+}
+
 void QnAbstractStreamDataProvider::setSpeed(double value)
 {
     QMutexLocker mutex(&m_mutex);
+    m_speed = value;
     for (int i = 0; i < m_dataprocessors.size(); ++i)
     {
         QnAbstractDataConsumer* dp = m_dataprocessors.at(i);
         dp->setSpeed(value);
     }
     setReverseMode(value < 0);
+    emit speedChanged(value);
 }
 
 void QnAbstractStreamDataProvider::putData(QnAbstractDataPacketPtr data)

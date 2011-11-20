@@ -8,10 +8,10 @@ QnAbstractArchiveReader::QnAbstractArchiveReader(QnResourcePtr dev ) :
     m_adaptiveSleep(20 * 1000),
     m_needToSleep(0),
     m_cs(QMutex::Recursive),
-    m_useTwice(false),
     m_skipFramesToTime(0),
     m_delegate(0),
-    m_cycleMode(true)
+    m_cycleMode(true),
+    m_lastJumpTime(AV_NOPTS_VALUE)
 {
 }
 
@@ -43,9 +43,8 @@ quint64 QnAbstractArchiveReader::lengthMksec() const
     return m_lengthMksec;
 }
 
-void QnAbstractArchiveReader::jumpTo(qint64 mksec, bool makeshot)
+void QnAbstractArchiveReader::jumpTo(qint64 mksec, bool makeshot, qint64 skipTime)
 {
-    emit jumpOccured(mksec, makeshot);
 
      //QMutexLocker mutex(&m_cs);
 
@@ -54,9 +53,13 @@ void QnAbstractArchiveReader::jumpTo(qint64 mksec, bool makeshot)
     //for (int channel = 0; channel  < m_channel_number; ++channel)
         //channeljumpTo(mksec, channel);
 
-    channeljumpTo(mksec, 0);
-
-    m_useTwice = true;
+    if (mksec != m_lastJumpTime) 
+    {
+        emit beforeJump(mksec, makeshot);
+        channeljumpTo(mksec, 0, skipTime);
+        emit jumpOccured(mksec, makeshot);
+    }
+    m_lastJumpTime = mksec;
 
     if (makeshot && isSingleShotMode())
         CLLongRunnable::resume();
@@ -64,9 +67,11 @@ void QnAbstractArchiveReader::jumpTo(qint64 mksec, bool makeshot)
 
 void QnAbstractArchiveReader::jumpToPreviousFrame(qint64 mksec, bool makeshot)
 {
-    if (mksec != DATETIME_NOW) {
-        setSkipFramesToTime(mksec);
-        jumpTo(qMax(0ll, (qint64)mksec - 200 * 1000), makeshot);
+    if (mksec != DATETIME_NOW) 
+    {
+        //setSkipFramesToTime(mksec);
+        //jumpTo(qMax(0ll, (qint64)mksec - 200 * 1000), makeshot);
+        jumpTo(qMax(0ll, mksec - 200 * 1000), makeshot, mksec);
     }
     else
         jumpTo(mksec, makeshot);
@@ -134,6 +139,13 @@ void QnAbstractArchiveReader::pause()
 void QnAbstractArchiveReader::resume()
 {
     QnClientPullMediaStreamProvider::resume();
+}
+
+void QnAbstractArchiveReader::resumeMedia()
+{
+    setSingleShotMode(false);
+    resume();
+    resumeDataProcessors();
     emit streamResumed();
 }
 
@@ -172,3 +184,9 @@ bool QnAbstractArchiveReader::open()
 {
     return m_delegate ? m_delegate->open(m_resource) : false;
 }
+
+bool QnAbstractArchiveReader::isRealTimeSource() const
+{
+    return m_delegate->isRealTimeSource();
+}
+

@@ -87,6 +87,11 @@ void QnResource::setName(const QString& name)
 	m_name = name;
 }
 
+unsigned long QnResource::flags() const 
+{
+    QMutexLocker locker(&m_mutex);
+    return m_flags;
+}
 
 bool QnResource::checkFlag(unsigned long flag) const
 {

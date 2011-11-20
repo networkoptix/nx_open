@@ -56,11 +56,13 @@ void QnClientPullMediaStreamProvider::run()
 				m_stat[0].onLostConnection();
             }
 
+            /*
             if (getResource()->getStatus() == QnResource::Offline) {
                 for (int i = 0; i < 100 && !m_needStop; ++i)
                     QnSleep::msleep(10);
             }
-            else {
+            else */
+            {
                 QnSleep::msleep(30);
             }
 

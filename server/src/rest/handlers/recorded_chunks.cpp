@@ -80,12 +80,7 @@ int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestP
     result.append("<recordedTimePeriods xmlns=\"http://www.networkoptix.com/xsd/api/recordedTimePeriods\">\n");
 
     foreach(QnTimePeriod period, periods)
-    {
-        qint64 duration = period.duration;
-        if (duration == -1)
-            duration = QDateTime::currentDateTime().toMSecsSinceEpoch()*1000ll - period.startTime;
-        result.append(QString("<timePeriod startTime=\"%1\" duration=\"%2\" />\n").arg(period.startTime).arg(duration));
-    }
+        result.append(QString("<timePeriod startTime=\"%1\" duration=\"%2\" />\n").arg(period.startTimeUSec).arg(period.durationUSec));
     result.append("</recordedTimePeriods>\n");
 
     return CODE_OK;
@@ -101,11 +96,11 @@ QString QnRecordedChunkListHandler::description(TCPSocket* tcpSocket) const
     QString rez;
     rez += "Return recorded chunk info by specified cameras\n";
     rez += "<BR>Param <b>mac</b> - camera mac. Param can be repeated several times for many cameras.";
-    rez += "<BR>Param <b>startTime</b> - Time interval start. mks since 1970 UTC or string at format 'YYYY-MM-DDThh24:mi:ss.mks', format auto detected)";
-    rez += "<BR>Param <b>endTime</b> - Time interval end (same format, see above)";
-    rez += "<BR>Param <b>detail</b> - Chunk detail level. Time periods/chunks less than detal level is discarded. You can use detail level as amount of mks per screen pixel";
+    rez += "<BR>Param <b>startTime</b> - Time interval start. Microseconds since 1970 UTC or string in format 'YYYY-MM-DDThh24:mi:ss.zzz'. format is auto detected.";
+    rez += "<BR>Param <b>endTime</b> - Time interval end (same format, see above).";
+    rez += "<BR>Param <b>detail</b> - Chunk detail level, in microseconds. Time periods/chunks that are shorter than the detail level are discarded. You can use detail level as amount of microseconds per screen pixel.";
 
-    rez += "<BR><b>Return</b> XML</b> - with chunks merged by all cameras. Returned time and duration at mks. <a href=\"";
+    rez += "<BR><b>Return</b> XML</b> - with chunks merged for all cameras. Returned time and duration in microseconds. <a href=\"";
     rez += getXsdUrl(tcpSocket);
     return rez;
 }

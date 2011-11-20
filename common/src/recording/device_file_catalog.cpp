@@ -244,7 +244,7 @@ qint64 DeviceFileCatalog::minTime() const
     if (m_chunks.isEmpty())
         return AV_NOPTS_VALUE;
     else
-        return m_chunks[0].startTime;
+        return m_chunks[m_firstDeleteCount].startTime;
 }
 
 qint64 DeviceFileCatalog::maxTime() const
@@ -289,10 +289,10 @@ QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endT
     {
         QnTimePeriod& last = result.last();
         qint64 ggC = m_chunks[i].startTime;
-        if (qAbs(last.startTime + last.duration - m_chunks[i].startTime) <= detailLevel && m_chunks[i].duration != -1)
-            last.duration = m_chunks[i].startTime - last.startTime + m_chunks[i].duration;
+        if (qAbs(last.startTimeUSec + last.durationUSec - m_chunks[i].startTime) <= detailLevel && m_chunks[i].duration != -1)
+            last.durationUSec = m_chunks[i].startTime - last.startTimeUSec + m_chunks[i].duration;
         else {
-            if (last.duration < detailLevel)
+            if (last.durationUSec < detailLevel)
                 result.pop_back();
             result << QnTimePeriod(m_chunks[i].startTime, m_chunks[i].duration);
         }

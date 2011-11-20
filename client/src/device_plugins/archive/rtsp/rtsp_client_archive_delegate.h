@@ -29,7 +29,7 @@ public:
 
     virtual void onReverseMode(qint64 displayTime, bool value);
 
-    virtual bool isRealTimeSource() const { return m_position == DATETIME_NOW; }
+    virtual bool isRealTimeSource() const;
     virtual void beforeClose();
 protected:
 private:
@@ -50,6 +50,9 @@ private:
     bool m_opened;
     qint64 m_lastRtspTime;
     QnResourcePtr m_resource;
+    bool m_waitBOF;
+    int m_lastPacketFlags;
+    bool m_closing;
 };
 
 #endif

@@ -20,20 +20,22 @@
 #include <qmath.h>
 
 namespace {
-    QVariant qint64Interpolator(const qint64 &start, const qint64 &end, qreal progress)
-    {
-        return start + double(end - start) * progress;
-    }
 
-    const float MIN_MIN_OPACITY = 0.1f;
-    const float MAX_MIN_OPACITY = 0.6f;
-    const float MIN_FONT_SIZE = 4.0;
-    
+QVariant qint64Interpolator(const qint64 &start, const qint64 &end, qreal progress)
+{
+    return start + double(end - start) * progress;
+}
+
+static const float MIN_MIN_OPACITY = 0.1f;
+static const float MAX_MIN_OPACITY = 0.6f;
+static const float MIN_FONT_SIZE = 4.0f;
+static const int MAX_LABEL_WIDTH = 64;
+
 }
 
 
 // -------------------------------------------------------------------------- //
-// SliderProxyStyle 
+// SliderProxyStyle
 // -------------------------------------------------------------------------- //
 class SliderProxyStyle : public QProxyStyle
 {
@@ -70,20 +72,24 @@ Q_GLOBAL_STATIC_WITH_ARGS(SliderProxyStyle, sliderProxyStyle, (QStyleFactory::cr
 
 
 // -------------------------------------------------------------------------- //
-// MySlider 
+// MySlider
 // -------------------------------------------------------------------------- //
 class MySlider : public GraphicsSlider
 {
     friend class TimeSlider; // ### for sizeHint()
 
 public:
-    MySlider(QGraphicsItem *parent = 0);
+    MySlider(TimeSlider *parent);
 
     void setToolTipItem(ToolTipItem *toolTip);
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
     const QRect &handleRect() const;
+
+    bool isAtEnd() const;
+
+    void setEndSize(int size);
 
 protected:
     void sliderChange(SliderChange change);
@@ -95,17 +101,31 @@ private:
     void ensureHandleRect() const;
 
 private:
+    TimeSlider *m_parent;
     ToolTipItem *m_toolTip;
     mutable QRect m_handleRect;
     mutable bool m_handleRectValid;
+    int m_endSize;
 };
 
-MySlider::MySlider(QGraphicsItem *parent)
+MySlider::MySlider(TimeSlider *parent)
     : GraphicsSlider(parent),
+      m_parent(parent),
       m_toolTip(0),
-      m_handleRectValid(false)
+      m_handleRectValid(false),
+      m_endSize(0)
 {
     setToolTipItem(new StyledToolTipItem);
+}
+
+bool MySlider::isAtEnd() const 
+{
+    return value() > maximum() - m_endSize;
+}
+
+void MySlider::setEndSize(int size)
+{
+    m_endSize = size;
 }
 
 void MySlider::setToolTipItem(ToolTipItem *toolTip)
@@ -150,6 +170,46 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     linearGrad.setColorAt(1, QColor(186, 239, 255));
     painter->fillRect(r, linearGrad);
 
+    /* Draw time periods. */
+    if(!m_parent->timePeriodList().empty())
+    {
+        const qint64 range = m_parent->sliderRange();
+        const qint64 pos = m_parent->viewPortPos() /*+ timezoneOffset*/;
+
+        QRectF contentsRect = this->contentsRect();
+        qreal x = contentsRect.left() + m_handleRect.width() / 2;
+        qreal w = contentsRect.width() - m_handleRect.width();
+
+        // TODO: use lower_bound here and draw only what is actually needed.
+        foreach(const QnTimePeriod &period, m_parent->timePeriodList())
+        {
+            qreal left = x + static_cast<qreal>(period.startTimeUSec / 1000 - pos) / range * w;
+            left = qMax(left, contentsRect.left());
+
+            qreal right;
+            if(period.durationUSec == -1) {
+                right = contentsRect.right();
+            } else {
+                right = x + static_cast<qreal>((period.startTimeUSec + period.durationUSec) / 1000 - pos) / range * w;
+                right = qMin(right, contentsRect.right());
+            }
+
+            if(left > right)
+                continue;
+
+            painter->fillRect(left, contentsRect.top(), right - left, contentsRect.height(), QColor(255,255,255,64));
+        }
+    }
+
+    r = contentsRect();
+    qreal l = r.left() + QStyle::sliderPositionFromValue(minimum(), maximum(), maximum() - m_endSize, r.width());
+    r = QRectF(l, r.top(), r.right() - l, r.height());
+    
+    linearGrad = QLinearGradient(r.topLeft(), r.topRight());
+    linearGrad.setColorAt(0, QColor(0, 255, 0, 0));
+    linearGrad.setColorAt(1, QColor(0, 255, 0, 128));
+    painter->fillRect(r, linearGrad);
+
     painter->drawPixmap(m_handleRect, pix, QRectF(pix.rect()));
 }
 
@@ -172,7 +232,7 @@ QVariant MySlider::itemChange(GraphicsItemChange change, const QVariant &value)
     return GraphicsSlider::itemChange(change, value);
 }
 
-void MySlider::invalidateHandleRect() 
+void MySlider::invalidateHandleRect()
 {
     m_handleRectValid = false;
 }
@@ -187,14 +247,12 @@ void MySlider::ensureHandleRect() const
     m_handleRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle);
 }
 
-const QRect &MySlider::handleRect() const 
+const QRect &MySlider::handleRect() const
 {
     ensureHandleRect();
 
     return m_handleRect;
 }
-
-
 
 
 // -------------------------------------------------------------------------- //
@@ -222,7 +280,8 @@ public:
         connect(m_wheelAnimation, SIGNAL(finished()), m_parent, SLOT(onWheelAnimationFinished()));
     }
 
-    bool isDragging() const { return m_dragging; }
+    inline bool isDragging() const { return m_dragging; }
+    void setDragging(bool dragging) { m_dragging = dragging; }
 
     void wheelAnimationFinished()
     {
@@ -240,7 +299,7 @@ protected:
 
 private:
     TimeSlider *m_parent;
-    QPoint m_previousPos;
+    QPointF m_previousPos;
     int m_length;
     QPropertyAnimation *m_lineAnimation;
     QPropertyAnimation *m_wheelAnimation;
@@ -296,8 +355,6 @@ void TimeLine::wheelEvent(QGraphicsSceneWheelEvent *event)
     m_prevWheelDelta = delta;
 }
 
-static const int MAX_LABEL_WIDTH = 64;
-
 struct IntervalInfo {
     qint64 interval;
     int value;
@@ -310,7 +367,7 @@ struct IntervalInfo {
 
 bool isTimeAcceptedStd(const IntervalInfo& interval, qint64 time)
 {
-    return time % interval.interval  == 0;
+    return time % interval.interval == 0;
 }
 
 bool isTimeAcceptedForMonth(const IntervalInfo& interval, qint64 time)
@@ -324,22 +381,22 @@ bool isTimeAcceptedForYear(const IntervalInfo& interval, qint64 time)
 }
 
 IntervalInfo intervals[] = {
-    {100, 100, "ms", 10, "ms", isTimeAcceptedStd},
-    {1000, 1, "s", 60, "59s", isTimeAcceptedStd},
-    {5*1000, 5, "s", 12, "59s", isTimeAcceptedStd},
-    {10*1000, 10, "s", 6, "59s", isTimeAcceptedStd},
-    {30*1000, 30, "s", 2, "59s", isTimeAcceptedStd},
-    {60*1000, 1, "m", 60, "59m", isTimeAcceptedStd},
-    {5*60*1000, 5, "m", 12, "59m", isTimeAcceptedStd},
-    {10*60*1000, 10, "m", 6, "59m", isTimeAcceptedStd},
-    {30*60*1000, 30, "m", 2, "59m", isTimeAcceptedStd},
-    {60*60*1000, 1, "h", 24, "24h", isTimeAcceptedStd},
-    {3*60*60*1000, 3, "h", 8, "24h", isTimeAcceptedStd},
-    {6*60*60*1000, 6, "h", 4, "24h", isTimeAcceptedStd},
-    {12*60*60*1000, 12, "h", 2, "24h", isTimeAcceptedStd},
-    {24*60*60*1000, 1, "dd MMM", 99, "dd MMM", isTimeAcceptedStd}, // FIRST_DATE_INDEX here
-    {24*60*60*1000*30ll, 1, "MMMM", 99, "September", isTimeAcceptedForMonth},
-    {24*60*60*1000*30*12ll, 1, "yyyy", 99, "2011", isTimeAcceptedForYear}
+    {100ll, 100, "ms", 10, "ms", isTimeAcceptedStd},
+    {1000ll, 1, "s", 60, "59s", isTimeAcceptedStd},
+    {5ll*1000, 5, "s", 12, "59s", isTimeAcceptedStd},
+    {10ll*1000, 10, "s", 6, "59s", isTimeAcceptedStd},
+    {30ll*1000, 30, "s", 2, "59s", isTimeAcceptedStd},
+    {60ll*1000, 1, "m", 60, "59m", isTimeAcceptedStd},
+    {5ll*60*1000, 5, "m", 12, "59m", isTimeAcceptedStd},
+    {10ll*60*1000, 10, "m", 6, "59m", isTimeAcceptedStd},
+    {30ll*60*1000, 30, "m", 2, "59m", isTimeAcceptedStd},
+    {60ll*60*1000, 1, "h", 24, "24h", isTimeAcceptedStd},
+    {3ll*60*60*1000, 3, "h", 8, "24h", isTimeAcceptedStd},
+    {6ll*60*60*1000, 6, "h", 4, "24h", isTimeAcceptedStd},
+    {12ll*60*60*1000, 12, "h", 2, "24h", isTimeAcceptedStd},
+    {24ll*60*60*1000, 1, "dd MMM", 99, "dd MMM", isTimeAcceptedStd}, // FIRST_DATE_INDEX here
+    {24ll*60*60*1000*30, 1, "MMMM", 99, "September", isTimeAcceptedForMonth},
+    {24ll*60*60*1000*30*12, 1, "yyyy", 99, "2011", isTimeAcceptedForYear}
 };
 static const int FIRST_DATE_INDEX = 13; // use date's labels with this index and above
 
@@ -389,11 +446,11 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
     const int minWidth = 30;
 
-    unsigned level = 0;
+    int level = 0;
     while (minWidth > pixelPerTime*intervals[level].interval && level < FIRST_DATE_INDEX)
         ++level;
 
-    unsigned maxLevel = level;
+    int maxLevel = level;
     while (maxLevel < arraysize(intervals)-1 && intervals[maxLevel].interval <= range)
         ++maxLevel;
 
@@ -416,7 +473,7 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     int maxHeight = 0;
     QVector<int> widths;
     QVector<QFont> fonts;
-    for (unsigned i = level; i <= maxLevel; ++i)
+    for (int i = level; i <= maxLevel; ++i)
     {
         const IntervalInfo &interval = intervals[i];
         const QString text = QLatin1String(interval.maxText);
@@ -452,11 +509,11 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     // draw grid
     for (qint64 curTime = intervals[level].interval*outsideCnt; curTime <= pos+range; curTime += intervals[level].interval)
     {
-        unsigned curLevel = level;
+        int curLevel = level;
         while (curLevel < maxLevel && intervals[curLevel+1].isTimeAccepted(intervals[curLevel+1], curTime))
             ++curLevel;
 
-        const int arrayIndex = qMin(curLevel-level, unsigned(opacity.size()-1));
+        const int arrayIndex = qMin(curLevel-level, opacity.size() - 1);
 
         color.setAlphaF(opacity[arrayIndex]);
         painter->setPen(color);
@@ -508,10 +565,12 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 void TimeLine::mousePressEvent(QGraphicsSceneMouseEvent *me)
 {
     if (me->button() == Qt::LeftButton) {
+        me->accept();
         m_lineAnimation->stop();
-        m_parent->m_slider->setSliderDown(true);
-        m_parent->setCurrentValue(m_parent->viewPortPos() + (m_parent->sliderRange() / rect().width()) * me->pos().x());
-        m_previousPos = me->screenPos();
+        if (qFuzzyIsNull(m_parent->scalingFactor()))
+            m_parent->setCurrentValue(m_parent->viewPortPos() + qRound64((double(m_parent->sliderRange()) / rect().width()) * me->pos().x()));
+        m_parent->setMoving(true);
+        m_previousPos = me->pos();
         m_length = 0;
     }
 }
@@ -519,17 +578,22 @@ void TimeLine::mousePressEvent(QGraphicsSceneMouseEvent *me)
 void TimeLine::mouseMoveEvent(QGraphicsSceneMouseEvent *me)
 {
     if (me->buttons() & Qt::LeftButton) {
+        me->accept();
+
+        const bool bUnscaled = qFuzzyIsNull(m_parent->scalingFactor());
         // in fact, we need to use (width - slider handle thinkness/2), but it is ok without it
-        const QPoint dpos = me->screenPos() - m_previousPos;
-        if (!m_dragging && dpos.manhattanLength() < QApplication::startDragDistance())
+        const QPointF dpos = bUnscaled ? me->pos() - m_previousPos : m_previousPos - me->pos();
+        if (!isDragging() && qAbs(dpos.x()) < QApplication::startDragDistance())
             return;
 
-        m_dragging = true;
-        m_previousPos = me->screenPos();
+        setDragging(true);
+        m_previousPos = me->pos();
         m_length = dpos.x();
 
-        qint64 dtime = (m_parent->sliderRange() / rect().width()) * dpos.x();
-        if (m_parent->centralise()) {
+        qint64 dtime = qRound64((double(m_parent->sliderRange()) / rect().width()) * dpos.x());
+        if (bUnscaled) {
+            m_parent->setCurrentValue(qBound(m_parent->viewPortPos(), m_parent->currentValue() + dtime, m_parent->viewPortPos() + m_parent->sliderRange()));
+        } else if (m_parent->centralise()) {
             dtime = dtime < 0 ? qMax(dtime, -m_parent->viewPortPos())
                               : qMin(dtime, m_parent->maximumValue() - (m_parent->viewPortPos() + m_parent->sliderRange()));
             m_parent->setCurrentValue(m_parent->currentValue() + dtime);
@@ -542,23 +606,23 @@ void TimeLine::mouseMoveEvent(QGraphicsSceneMouseEvent *me)
 void TimeLine::mouseReleaseEvent(QGraphicsSceneMouseEvent *me)
 {
     if (me->button() == Qt::LeftButton) {
-        if (m_dragging) {
-            m_dragging = false;
+        me->accept();
+        if (isDragging()) {
+            setDragging(false);
 
             if (qAbs(m_length) > 5) {
                 int dx = m_length*2/**(35.0/t.elapsed())*/;
 
                 m_lineAnimation->setStartValue(m_parent->viewPortPos());
                 m_lineAnimation->setEasingCurve(QEasingCurve::OutQuad);
-                m_lineAnimation->setEndValue(m_parent->viewPortPos() + (m_parent->sliderRange() / rect().width()) * dx);
+                m_lineAnimation->setEndValue(m_parent->viewPortPos() + qRound64((double(m_parent->sliderRange()) / rect().width()) * dx));
                 m_lineAnimation->setDuration(1000);
                 //m_lineAnimation->start();
             }
         } else {
-            qint64 time = m_parent->viewPortPos() + qRound((double)m_parent->sliderRange()/rect().width()*me->pos().x());
-            m_parent->setCurrentValue(time);
+            m_parent->setCurrentValue(m_parent->viewPortPos() + qRound64((double(m_parent->sliderRange()) / rect().width()) * me->pos().x()));
         }
-        m_parent->m_slider->setSliderDown(false);
+        m_parent->setMoving(false);
     }
 }
 
@@ -590,11 +654,12 @@ TimeSlider::TimeSlider(QGraphicsItem *parent) :
     m_maximumValue(10 * 1000), // 10 sec
     m_currentValue(0),
     m_viewPortPos(0),
-    m_scalingFactor(0),
-    m_isUserInput(false),
+    m_minimumRange(5 * 1000), // 5 sec
+    m_scalingFactor(0.0),
     m_delta(0),
+    m_isUserInput(false),
     m_centralise(true),
-    m_minimumRange(5 * 1000) // 5 sec
+    m_endSize(0.0)
 {
     setAcceptHoverEvents(true);
 
@@ -712,8 +777,8 @@ qint64 TimeSlider::currentValue() const
 
 void TimeSlider::setCurrentValue(qint64 value)
 {
-    if (value == DATETIME_NOW)
-        return; // ###
+/*    if (value == DATETIME_NOW)
+        return; // ###*/
 
     value = qBound(m_minimumValue, value, maximumValue());
     if (m_currentValue == value)
@@ -724,7 +789,7 @@ void TimeSlider::setCurrentValue(qint64 value)
     updateSlider();
     update();
 
-    if (!m_isUserInput && !isMoving())
+    if (!m_isUserInput/* && !isMoving()*/)
         centraliseSlider();
 
     Q_EMIT currentValueChanged(m_currentValue);
@@ -747,7 +812,7 @@ double TimeSlider::scalingFactor() const
 void TimeSlider::setScalingFactor(double factor)
 {
     double oldfactor = m_scalingFactor;
-    m_scalingFactor = qMax(factor, (double)0.0);
+    m_scalingFactor = qMax(factor, double(0.0));
     if (sliderRange() < m_minimumRange)
         m_scalingFactor = oldfactor;
     //setViewPortPos(currentValue() - m_slider->value()*delta());
@@ -769,9 +834,19 @@ void TimeSlider::setMoving(bool b)
     m_slider->setSliderDown(b);
 }
 
+bool TimeSlider::isAtEnd() 
+{
+    return m_slider->isAtEnd();
+}
+
+void TimeSlider::setEndSize(qreal size)
+{
+    m_endSize = size;
+}
+
 void TimeSlider::onSliderValueChanged(int value)
 {
-    if (!m_isUserInput) {
+    if (!m_isUserInput && !isMoving()) {
         m_isUserInput = true;
         setCurrentValue(fromSlider(value));
         m_isUserInput = false;
@@ -797,6 +872,9 @@ void TimeSlider::setViewPortPos(qint64 value)
     }
 }
 
+/*!
+    \returns Milliseconds per one unit of the underlying slider.
+*/
 double TimeSlider::delta() const
 {
     return ((1.0f/(m_slider->maximum() - m_slider->minimum()))*length())/qExp(scalingFactor()/2);
@@ -812,7 +890,10 @@ int TimeSlider::toSlider(qint64 value)
     return (value - m_viewPortPos) / delta();
 }
 
-qint64 TimeSlider::sliderRange()
+/*!
+    \returns Slider range in milliseconds.
+*/
+qint64 TimeSlider::sliderRange() const
 {
     return (m_slider->maximum() - m_slider->minimum())*delta();
 }
@@ -835,32 +916,39 @@ void TimeSlider::updateSlider()
         m_isUserInput = false;
     }
 
-    if (m_minimumValue == 0)
-        m_slider->setToolTip(formatDuration(m_currentValue / 1000));
-    else
-        m_slider->setToolTip(QDateTime::fromMSecsSinceEpoch(m_currentValue).toString(Qt::SystemLocaleShortDate));
+    if(isAtEnd()) {
+        m_slider->setToolTip("Live");
+    } else {
+        if (m_minimumValue == 0)
+            m_slider->setToolTip(formatDuration(m_currentValue / 1000));
+        else
+            m_slider->setToolTip(QDateTime::fromMSecsSinceEpoch(m_currentValue).toString(Qt::SystemLocaleShortDate));
+    }
 }
 
 void TimeSlider::centraliseSlider()
 {
-    if (m_centralise) {
-        if (m_timeLine->isDragging() || (!m_slider->isSliderDown() && m_animation->state() != QAbstractAnimation::Running /*&& !m_userInput*/)) {
+    if (!m_centralise)
+        return;
+
+    if (m_timeLine->isDragging() || (!isMoving() && m_animation->state() != QAbstractAnimation::Running /*&& !m_userInput*/))
+    {
+        setViewPortPos(m_currentValue - sliderRange()/2);
+    }
+    else if (m_animation->state() != QPropertyAnimation::Running /*&& !isMoving()*/)
+    {
+        qint64 newViewortPos = m_currentValue - sliderRange()/2; // center
+        newViewortPos = qBound(m_minimumValue, newViewortPos, maximumValue() - sliderRange());
+        if (qAbs(newViewortPos - m_viewPortPos) < 2*delta()) {
             setViewPortPos(m_currentValue - sliderRange()/2);
+            return;
         }
-        else if (m_animation->state() != QPropertyAnimation::Running /*&& !m_slider->isSliderDown()*/) {
-            qint64 newViewortPos = m_currentValue - sliderRange()/2; // center
-            newViewortPos = qBound(m_minimumValue, newViewortPos, maximumValue() - sliderRange());
-            if (qAbs(newViewortPos - m_viewPortPos) < 2*delta()) {
-                setViewPortPos(m_currentValue - sliderRange()/2);
-                return;
-            }
-            m_animation->stop();
-            m_animation->setDuration(500);
-            m_animation->setEasingCurve(QEasingCurve::InOutQuad);
-            m_animation->setStartValue(m_viewPortPos);
-            m_animation->setEndValue(newViewortPos);
-            m_animation->start();
-        }
+        m_animation->stop();
+        m_animation->setDuration(500);
+        m_animation->setEasingCurve(QEasingCurve::InOutQuad);
+        m_animation->setStartValue(m_viewPortPos);
+        m_animation->setEndValue(newViewortPos);
+        m_animation->start();
     }
 }
 
@@ -888,3 +976,13 @@ bool TimeSlider::eventFilter(QObject *target, QEvent *event)
 
     return GraphicsWidget::eventFilter(target, event);
 }
+
+void TimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) 
+{
+    m_slider->setEndSize(m_endSize * (m_slider->maximum() - m_slider->minimum()) / (m_slider->size().width())); // Hack hack hack
+
+    GraphicsWidget::paint(painter, option, widget);
+}
+
+
+

@@ -34,21 +34,7 @@ public:
     int syncPost ( const QString & path, QIODevice * data, QIODevice * to );
     int syncPost ( const QString & path, const QByteArray& data, QIODevice * to = 0 );
 
-protected slots:
-    virtual void finished (QNetworkReply* reply);
-
 private:
-    QSharedPointer<QNetworkAccessManager> m_httpClient;
-
-    /// id of current request
-    QNetworkReply* requestID;
-
-    /// error status of current request
-    int status;
-
-    /// event loop used to block until request finished
-    QSharedPointer<QEventLoop> loop;
-
     QHostAddress m_hostName;
     quint16 m_port;
     QString m_credentials;

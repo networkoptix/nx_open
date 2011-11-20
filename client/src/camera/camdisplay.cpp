@@ -255,11 +255,14 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
 void CLCamDisplay::jump(qint64 time)
 {
-    cl_log.log("jump to ", time, cl_logWARNING);
+    if (time < 1000000ll * 100000)
+        cl_log.log("jump to ", time, cl_logWARNING);
+    else
+        cl_log.log("jump to ", QDateTime::fromMSecsSinceEpoch(time/1000).toString(), cl_logWARNING);
     m_display[0]->blockTimeValue(time);
     m_jumpTime = time;
     m_afterJump = true;
-    clearUnprocessedData();
+    //clearUnprocessedData();
     m_singleShotMode = false;
 }
 
@@ -320,7 +323,11 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
 {
     QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
     if (!media)
-        return false;
+        return true;
+    if(m_afterJump && !(media->flags & QnAbstractMediaData::MediaFlags_BOF))
+    {
+        return true; // skip data
+    }
 
     bool mediaIsLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
     if (mediaIsLive != m_isRealTimeSource)
