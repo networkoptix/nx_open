@@ -21,10 +21,10 @@ QnResourcePool *QnResourcePool::instance()
 
 void QnResourcePool::addResource(QnResourcePtr resource)
 {
+    if (!resource->getId().isValid())
+        resource->setId(QnId::generateSpecialId());
     {
         QMutexLocker locker(&m_resourcesMtx);
-        if (!resource->getId().isValid())
-            resource->setId(QnId::generateSpecialId());
         m_resources[resource->getId()] = resource;
     }
     Q_EMIT resourceAdded(resource);
@@ -32,18 +32,18 @@ void QnResourcePool::addResource(QnResourcePtr resource)
 
 void QnResourcePool::addResources(const QnResourceList &resources)
 {
-    foreach (QnResourcePtr res, resources)
+    foreach (QnResourcePtr resource, resources)
     {
-        if (!res->getId().isValid())
-            res->setId(QnId::generateSpecialId());
+        if (!resource->getId().isValid())
+            resource->setId(QnId::generateSpecialId());
     }
     {
         QMutexLocker locker(&m_resourcesMtx);
-        foreach (QnResourcePtr res, resources)
-            m_resources[res->getId()] = res;
+        foreach (QnResourcePtr resource, resources)
+            m_resources[resource->getId()] = resource;
     }
-    foreach (QnResourcePtr res, resources)
-        Q_EMIT resourceAdded(res);
+    foreach (QnResourcePtr resource, resources)
+        Q_EMIT resourceAdded(resource);
 }
 
 void QnResourcePool::removeResource(QnResourcePtr resource)
