@@ -10,7 +10,6 @@
 
 static const int MAX_QUEUE_SIZE = 60;
 //static const QString RTP_FFMPEG_GENERIC_STR("mpeg4-generic"); // this line for debugging purpose with VLC player
-static const int MAX_RTSP_DATA_LEN = 65535 - 4 - RtpHeader::RTP_HEADER_SIZE;
 
 static const int MAX_RTSP_WRITE_BUFFER = 1024*1024;
 
@@ -223,6 +222,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         Q_ASSERT(sendLen > 0);
         m_owner->sendData(curData, sendLen);
         curData += sendLen;
+
     }
     return true;
 }
