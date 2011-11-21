@@ -4,6 +4,7 @@
 #include "syncplay_archive_delegate.h"
 #include "abstract_archive_stream_reader.h"
 #include "utils/media/externaltimesource.h"
+#include "utils/common/util.h"
 
 static const qint64 SYNC_EPS = 1000 * 1000;
 
@@ -30,6 +31,7 @@ public:
         blockSingleShotSignal = false;
         blockJumpSignal = false;
         blockPausePlaySignal = false;
+        lastJumpTime = DATETIME_NOW;
     }
 
     QList<ReaderInfo> readers;
@@ -41,6 +43,7 @@ public:
     bool blockSingleShotSignal;
     bool blockJumpSignal;
     bool blockPausePlaySignal;
+    qint64 lastJumpTime;
 };
 
 // ------------------- QnArchiveSyncPlayWrapper ----------------------------
@@ -155,6 +158,7 @@ void QnArchiveSyncPlayWrapper::onBeforeJump(qint64 mksec, bool makeshot)
     if (d->blockJumpSignal)
         return;
     d->blockJumpSignal = true;
+    d->lastJumpTime = mksec;
     foreach(ReaderInfo info, d->readers)
     {
         QnSyncPlayArchiveDelegate* syncDelegate = static_cast<QnSyncPlayArchiveDelegate*> (info.reader->getArchiveDelegate());
@@ -326,7 +330,8 @@ void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvid
                 qint64 time = getCurrentTime();
                 d->blockJumpSignal = true;
                 //d->readers[i].reader->setSkipFramesToTime(time);
-                syncDelegate->jumpToPreviousFrame(time, true);
+                if (d->lastJumpTime != DATETIME_NOW)
+                    syncDelegate->jumpToPreviousFrame(time, true);
                 d->blockJumpSignal = false;
                 // resume display
             }
