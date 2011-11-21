@@ -319,7 +319,7 @@ void GraphicsView::stop()
 {
     mViewStarted = false;
     stopAnimation(); // stops animation
-    setZeroSelection();
+    setZeroSelection(0, true);
     closeAllDlg();
 }
 
@@ -2073,7 +2073,7 @@ bool GraphicsView::onUserInput(bool go_unsteady, bool escapeFromintro)
 }
 
 void GraphicsView::deviceAdded(const QnResourcePtr &device) {
-    if(dynamic_cast<QnSequrityCamResource *>(device.data())) {
+    if(m_navigationItem && dynamic_cast<QnSequrityCamResource *>(device.data())) {
         m_navigationItem->show(500);
         m_navigationItem->setVisible(true);
     }
