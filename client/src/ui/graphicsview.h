@@ -52,7 +52,7 @@ public:
 
     CLAbstractSceneItem* getSelectedItem() const;
 
-    void setZeroSelection(int delay = 0);
+    void setZeroSelection(int delay = 0, bool force = false);
 
     qreal getZoom() const;
 
@@ -89,6 +89,8 @@ public:
     void updatePageSelector();
 
     NavigationItem *getNavigationItem();
+
+    void deviceAdded(const QnResourcePtr &device);
 
 signals:
     void scneZoomFinished();
