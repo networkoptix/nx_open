@@ -138,8 +138,9 @@ void InstrumentManagerPrivate::unregisterSceneInternal() {
 
     /* Clear scene and filter item. */
     scene = NULL;
-    if (filterItem != NULL) {
-        delete filterItem; /* We may get called from filter item's destructor, hence the check for NULL. */
+    if (filterItem != NULL) { /* We may get called from filter item's destructor, hence the check for NULL. */
+        filterItem->setDestructionListener(NULL);
+        delete filterItem; 
         filterItem = NULL;
     }
 }

@@ -5,6 +5,7 @@
 #include <ui/animation/animation_timer.h>
 #include <utils/common/scene_utility.h>
 #include <utils/common/rect_set.h>
+#include "workbench.h"
 
 class QGraphicsScene;
 class QGraphicsView;
@@ -121,10 +122,17 @@ public:
      */
     void setScene(QGraphicsScene *scene);
 
+    /**
+     * \returns                         Current graphics view of this workbench manager. 
+     *                                  May be NULL.
+     */
     QGraphicsView *view() const {
         return m_view;
     }
 
+    /**
+     * \param view                      New view for this workbench manager.
+     */
     void setView(QGraphicsView *view);
 
     /**
@@ -182,10 +190,6 @@ public:
     void synchronize(QnDisplayWidget *widget, bool animate = true);
 
 
-public slots:
-    void disableViewportChanges();
-    void enableViewportChanges();
-
 signals:
     void viewportGrabbed();
     void viewportUngrabbed();
@@ -207,20 +211,21 @@ protected:
     void addItemInternal(QnWorkbenchItem *item);
     void removeItemInternal(QnWorkbenchItem *item);
 
-    void changeZoomedItem(QnWorkbenchItem *item);
-    void changeSelectedItem(QnWorkbenchItem *item);
+    void deinitSceneWorkbench();
+    void initSceneWorkbench();
+
+    void initBoundingInstrument();
 
 protected slots:
     void at_viewport_animationFinished();
 
-    void at_state_itemAdded(QnWorkbenchItem *item);
-    void at_state_itemAboutToBeRemoved(QnWorkbenchItem *item);
+    void at_workbench_itemAdded(QnWorkbenchItem *item);
+    void at_workbench_itemAboutToBeRemoved(QnWorkbenchItem *item);
     
-    void at_state_aboutToBeDestroyed();
-    void at_state_modeChanged();
-    void at_state_selectedItemChanged();
-    void at_state_zoomedItemChanged();
-    void at_state_layoutChanged();
+    void at_workbench_aboutToBeDestroyed();
+    void at_workbench_modeChanged();
+    void at_workbench_selectedItemChanged();
+    void at_workbench_zoomedItemChanged();
 
     void at_item_geometryChanged();
     void at_item_geometryDeltaChanged();
@@ -276,6 +281,9 @@ private:
 
     /** Currently zoomed item. */
     QnWorkbenchItem *m_zoomedItem;
+
+    /** Current workbench mode. */
+    QnWorkbench::Mode m_mode;
 
 
     /* Instruments. */

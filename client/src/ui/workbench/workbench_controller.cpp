@@ -85,8 +85,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchManager *synchronizer, Q
     connect(m_dragInstrument,           SIGNAL(draggingFinished(QGraphicsView *, QList<QGraphicsItem *>)),      this,                   SLOT(at_draggingFinished(QGraphicsView *, QList<QGraphicsItem *>)));
     connect(m_resizingInstrument,       SIGNAL(resizingStarted(QGraphicsView *, QGraphicsWidget *)),            this,                   SLOT(at_resizingStarted(QGraphicsView *, QGraphicsWidget *)));
     connect(m_resizingInstrument,       SIGNAL(resizingFinished(QGraphicsView *, QGraphicsWidget *)),           this,                   SLOT(at_resizingFinished(QGraphicsView *, QGraphicsWidget *)));
-    connect(m_handScrollInstrument,     SIGNAL(scrollingStarted(QGraphicsView *)),                              m_synchronizer,         SLOT(disableViewportChanges()));
-    connect(m_handScrollInstrument,     SIGNAL(scrollingFinished(QGraphicsView *)),                             m_synchronizer,         SLOT(enableViewportChanges()));
+    connect(m_handScrollInstrument,     SIGNAL(scrollingStarted(QGraphicsView *)),                              m_synchronizer->boundingInstrument(), SLOT(dontEnforcePosition(QGraphicsView *)));
+    connect(m_handScrollInstrument,     SIGNAL(scrollingFinished(QGraphicsView *)),                             m_synchronizer->boundingInstrument(), SLOT(enforcePosition(QGraphicsView *)));
     connect(m_synchronizer,             SIGNAL(viewportGrabbed()),                                              m_handScrollInstrument, SLOT(recursiveDisable()));
     connect(m_synchronizer,             SIGNAL(viewportUngrabbed()),                                            m_handScrollInstrument, SLOT(recursiveEnable()));
     connect(m_synchronizer,             SIGNAL(viewportGrabbed()),                                              m_wheelZoomInstrument,  SLOT(recursiveDisable()));

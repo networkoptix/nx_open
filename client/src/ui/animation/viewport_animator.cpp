@@ -92,10 +92,8 @@ void QnViewportAnimator::at_animationGroup_stateChanged(QAbstractAnimation::Stat
 }
 
 void QnViewportAnimator::moveTo(const QRectF &rect, int timeLimitMsecs) {
-    if(m_view == NULL) {
-        qnWarning("Cannot move a viewport of a NULL view.");
+    if(m_view == NULL)
         return;
-    }
 
     if(timeLimitMsecs == -1)
         timeLimitMsecs = std::numeric_limits<int>::max();

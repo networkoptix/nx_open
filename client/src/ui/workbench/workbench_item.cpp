@@ -35,10 +35,9 @@ void QnWorkbenchItem::setGeometryInternal(const QRect &geometry) {
     if(m_geometry == geometry)
         return;
 
-    QRect oldGeometry = m_geometry;
     m_geometry = geometry;
 
-    emit geometryChanged(oldGeometry, m_geometry);
+    emit geometryChanged();
 }
 
 bool QnWorkbenchItem::setGeometryDelta(const QRectF &geometryDelta) {
@@ -48,10 +47,9 @@ bool QnWorkbenchItem::setGeometryDelta(const QRectF &geometryDelta) {
     if(qFuzzyCompare(m_geometryDelta, geometryDelta))
         return true;
 
-    QRectF oldGeometryDelta = m_geometryDelta;
     m_geometryDelta = geometryDelta;
 
-    emit geometryDeltaChanged(oldGeometryDelta, m_geometryDelta);
+    emit geometryDeltaChanged();
     return true;
 }
 
@@ -78,20 +76,18 @@ void QnWorkbenchItem::setFlagInternal(ItemFlag flag, bool value) {
     if(flag == Pinned && value)
         setGeometryDelta(QRectF()); /* Pinned items cannot have non-zero geometry delta. */
 
-    ItemFlags oldFlags = m_flags;
     m_flags = value ? (m_flags | flag) : (m_flags & ~flag);
 
-    emit flagsChanged(oldFlags, m_flags);
+    emit flagsChanged();
 }
 
 void QnWorkbenchItem::setRotation(qreal rotation) {
     if(qFuzzyCompare(m_rotation, rotation))
         return;
 
-    qreal oldRotation = m_rotation;
     m_rotation = rotation;
 
-    emit rotationChanged(oldRotation, m_rotation);
+    emit rotationChanged();
 }
 
 QnResourceDisplay *QnWorkbenchItem::createDisplay(QObject *parent) {
