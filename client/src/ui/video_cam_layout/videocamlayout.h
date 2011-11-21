@@ -39,7 +39,7 @@ public:
 	bool isContentChanged() const;
 	void setContentChanged(bool changed);
 
-    
+    bool hasLiveCameras() const;
 
 	//================================================
 
