@@ -8,9 +8,7 @@
  * 
  * If the user didn't use the mouse or keyboard for the given amount of time,
  * <tt>activityStopped()</tt> signal is emitted. When the user starts using
- * mouse or keyboard again, <tt>activityStarted()</tt> signal is emitted.
- * 
- * 
+ * mouse or keyboard again, <tt>activityResumed()</tt> signal is emitted.
  */
 class ActivityListenerInstrument: public Instrument {
     Q_OBJECT;
@@ -18,9 +16,13 @@ public:
     ActivityListenerInstrument(int activityTimeoutMSec, QObject *parent = NULL);
     virtual ~ActivityListenerInstrument();
 
+    int activityTimeoutMsed() const {
+        return m_activityTimeoutMSec;
+    }
+
 signals:
     void activityStopped();
-    void activityStarted();
+    void activityResumed();
 
 protected:
     virtual void enabledNotify() override;

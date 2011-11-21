@@ -8,6 +8,12 @@
 
 class QnWorkbenchItem;
 
+/**
+ * Layout of a workbench. 
+ * 
+ * Contains workbench items and information on their positions. Provides the
+ * necessary functions for moving items around.
+ */
 class QnWorkbenchLayout: public QObject {
     Q_OBJECT;
 public:

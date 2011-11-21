@@ -45,24 +45,80 @@ public:
         FRONT_LAYER
     };
 
+    /**
+     * Constructor.
+     * 
+     * \param parent                    Parent object for this workbench manager.
+     */
     QnWorkbenchManager(QObject *parent = NULL);
 
+    /**
+     * Virtual destructor.
+     */
     virtual ~QnWorkbenchManager();
 
+    /**
+     * \returns                         Instrument manager owned by this workbench manager. 
+     */
     InstrumentManager *manager() const {
         return m_manager;
     }
 
+    /**
+     * \returns                         Bounding instrument used by this workbench manager.
+     */
+    BoundingInstrument *boundingInstrument() const {
+        return m_boundingInstrument;
+    }
+
+    /**
+     * \returns                         Transformation listener instrument used by this workbench manager.
+     */
+    TransformListenerInstrument *transformationListenerInstrument() const {
+        return m_transformListenerInstrument;
+    }
+
+    /**
+     * \returns                         Activity listener instrument used by this workbench manager.
+     */
+    ActivityListenerInstrument *activityListenerInstrument() const {
+        return m_activityListenerInstrument;
+    }
+
+    /**
+     * Note that this function never returns NULL.
+     * 
+     * \returns                         Current workbench of this workbench manager. 
+     */
     QnWorkbench *workbench() const {
         return m_workbench;
     }
 
+    /**
+     * Note that workbench manager does not take ownership of the supplied workbench.
+     *
+     * \param workbench                 New workbench for this workbench manager.
+     *                                  If NULL is supplied, an empty workbench
+     *                                  owned by this workbench manager is used.
+     */
     void setWorkbench(QnWorkbench *workbench);
 
+    /**
+     * Note that this function never returns NULL.
+     *
+     * \returns                         Current scene of this workbench manager.
+     */
     QGraphicsScene *scene() const {
         return m_scene;
     }
 
+    /**
+     * Note that workbench manager does not take ownership of the supplied scene.
+     *
+     * \param scene                     New scene for this workbench manager.
+     *                                  If NULL is supplied, an empty scene
+     *                                  owned by this workbench manager is used.
+     */
     void setScene(QGraphicsScene *scene);
 
     QGraphicsView *view() const {
@@ -151,17 +207,20 @@ protected:
     void addItemInternal(QnWorkbenchItem *item);
     void removeItemInternal(QnWorkbenchItem *item);
 
+    void changeZoomedItem(QnWorkbenchItem *item);
+    void changeSelectedItem(QnWorkbenchItem *item);
+
 protected slots:
     void at_viewport_animationFinished();
 
-    void at_layout_itemAdded(QnWorkbenchItem *item);
-    void at_layout_itemAboutToBeRemoved(QnWorkbenchItem *item);
+    void at_state_itemAdded(QnWorkbenchItem *item);
+    void at_state_itemAboutToBeRemoved(QnWorkbenchItem *item);
     
     void at_state_aboutToBeDestroyed();
     void at_state_modeChanged();
-    void at_state_selectedItemChanged(QnWorkbenchItem *oldSelectedItem, QnWorkbenchItem *newSelectedItem);
-    void at_state_zoomedItemChanged(QnWorkbenchItem *oldZoomedItem, QnWorkbenchItem *newZoomedItem);
-    void at_state_layoutChanged(QnWorkbenchLayout *oldLayout, QnWorkbenchLayout *newLayout);
+    void at_state_selectedItemChanged();
+    void at_state_zoomedItemChanged();
+    void at_state_layoutChanged();
 
     void at_item_geometryChanged();
     void at_item_geometryDeltaChanged();
@@ -189,15 +248,21 @@ private:
     };
 
 private:
+    /* Directly visible state */
+
+    /** Current workbench. */
     QnWorkbench *m_workbench;
-    QnWorkbenchLayout *m_layout;
+
+    /** Current scene. */
     QGraphicsScene *m_scene;
+
+    /** Current view. */
     QGraphicsView *m_view;
 
-    /** Instrument manager owned by this display. */
-    InstrumentManager *m_manager;
 
-    /** Entity to widget mapping. */
+    /* Internal state. */
+
+    /** Item to widget mapping. */
     QHash<QnWorkbenchItem *, QnDisplayWidget *> m_widgetByItem;
 
     /** Item to item properties mapping. */
@@ -206,8 +271,17 @@ private:
     /** Current front z displacement value. */
     qreal m_frontZ;
 
-    /** Timer that is used to update the viewport. */
-    AnimationTimer *m_updateTimer;
+    /** Currently selected item. */
+    QnWorkbenchItem *m_selectedItem;
+
+    /** Currently zoomed item. */
+    QnWorkbenchItem *m_zoomedItem;
+
+
+    /* Instruments. */
+
+    /** Instrument manager owned by this workbench manager. */
+    InstrumentManager *m_manager;
 
     /** Transformation listener instrument. */
     TransformListenerInstrument *m_transformListenerInstrument;
@@ -218,6 +292,12 @@ private:
     /** Bounding instrument. */
     BoundingInstrument *m_boundingInstrument;
 
+
+    /* Animation-related stuff. */
+
+    /** Timer that is used to update the viewport. */
+    AnimationTimer *m_updateTimer;
+
     /** Viewport animator. */
     QnViewportAnimator *m_viewportAnimator;
 
@@ -227,8 +307,14 @@ private:
     /** Curtain animator. */
     QnCurtainAnimator *m_curtainAnimator;
 
+
+    /* Helpers. */
+
     /** Stored dummy scene. */
     QGraphicsScene *m_dummyScene;
+
+    /** Stored dummy workbench. */
+    QnWorkbench *m_dummyWorkbench;
 };
 
 #endif // QN_WORKBENCH_MANAGER_H

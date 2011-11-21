@@ -57,7 +57,7 @@ void ActivityListenerInstrument::timerEvent(QTimerEvent *) {
 
 void ActivityListenerInstrument::activityDetected() {
     if(!m_active) {
-        emit activityStarted();
+        emit activityResumed();
         m_active = true;
     }
 

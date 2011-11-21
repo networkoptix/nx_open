@@ -7,39 +7,61 @@
 
 QnWorkbench::QnWorkbench(QObject *parent):
     QObject(parent),
+    m_mode(VIEWING),
     m_layout(NULL),
+    m_dummyLayout(new QnWorkbenchLayout(this)),
     m_mapper(new QnWorkbenchGridMapper(this)),
     m_selectedItem(NULL),
     m_zoomedItem(NULL)
-{}    
+{
+    setLayout(m_dummyLayout);
+}    
 
 QnWorkbench::~QnWorkbench() {
+    m_dummyLayout = NULL;
+    clear();
+
     bool signalsBlocked = blockSignals(false);
     emit aboutToBeDestroyed();
     blockSignals(signalsBlocked);
 }
 
+void QnWorkbench::clear() {
+    setMode(VIEWING);
+    setLayout(NULL);
+}
+
 void QnWorkbench::setLayout(QnWorkbenchLayout *layout) {
-    if(layout == m_layout)
+    if(m_layout == layout)
         return;
 
-    QnWorkbenchLayout *oldLayout = m_layout;
-
+    /* Clean up old layout. 
+     * It may be NULL only when this function is called from constructor. */
     if(m_layout != NULL) {
-        setSelectedItem(NULL);
-        setZoomedItem(NULL);
+        foreach(QnWorkbenchItem *item, m_layout->items())
+            at_layout_itemAboutToBeRemoved(item);
 
         disconnect(m_layout, NULL, this, NULL);
     }
 
+    /* Prepare new layout. */
     m_layout = layout;
-
-    if(m_layout != NULL) {
-        connect(m_layout, SIGNAL(itemAboutToBeRemoved(QnWorkbenchItem *)),    this, SLOT(at_item_aboutToBeRemoved(QnWorkbenchItem *)));
-        connect(m_layout, SIGNAL(aboutToBeDestroyed()),                         this, SLOT(at_layout_aboutToBeDestroyed()));
+    if(m_layout == NULL && m_dummyLayout != NULL) {
+        m_dummyLayout->clear();
+        m_layout = m_dummyLayout;
     }
+    emit layoutChanged();
 
-    emit layoutChanged(oldLayout, m_layout);
+    /* Set up new layout. 
+     * It may be NULL only when this function is called from destructor. */
+    if(m_layout != NULL) {
+        connect(m_layout, SIGNAL(itemAdded(QnWorkbenchItem *)),             this, SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
+        connect(m_layout, SIGNAL(itemAboutToBeRemoved(QnWorkbenchItem *)),  this, SLOT(at_layout_itemAboutToBeRemoved(QnWorkbenchItem *)));
+        connect(m_layout, SIGNAL(aboutToBeDestroyed()),                     this, SLOT(at_layout_aboutToBeDestroyed()));
+
+        foreach(QnWorkbenchItem *item, m_layout->items())
+            at_layout_itemAdded(item);
+    }
 }
 
 void QnWorkbench::setMode(Mode mode) {
@@ -60,10 +82,9 @@ void QnWorkbench::setSelectedItem(QnWorkbenchItem *item) {
         return;
     }
 
-    QnWorkbenchItem *oldSelectedItem = m_selectedItem;
     m_selectedItem = item;
     
-    emit selectedItemChanged(oldSelectedItem, m_selectedItem);
+    emit selectedItemChanged();
 }
 
 void QnWorkbench::setZoomedItem(QnWorkbenchItem *item) {
@@ -75,18 +96,23 @@ void QnWorkbench::setZoomedItem(QnWorkbenchItem *item) {
         return;
     }
 
-    QnWorkbenchItem *oldZoomedItem = m_zoomedItem;
     m_zoomedItem = item;
 
-    emit zoomedItemChanged(oldZoomedItem, m_zoomedItem);
+    emit zoomedItemChanged();
 }
 
-void QnWorkbench::at_item_aboutToBeRemoved(QnWorkbenchItem *item) {
+void QnWorkbench::at_layout_itemAdded(QnWorkbenchItem *item) {
+    emit itemAdded(item);
+}
+
+void QnWorkbench::at_layout_itemAboutToBeRemoved(QnWorkbenchItem *item) {
     if(item == m_selectedItem)
         setSelectedItem(NULL);
 
     if(item == m_zoomedItem)
         setZoomedItem(NULL);
+
+    emit itemAboutToBeRemoved(item);
 }
 
 void QnWorkbench::at_layout_aboutToBeDestroyed() {

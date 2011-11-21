@@ -65,13 +65,13 @@ QnWorkbenchManager::QnWorkbenchManager(QObject *parent):
     QObject(parent),
     m_manager(new InstrumentManager(this)),
     m_workbench(NULL),
-    m_layout(NULL),
     m_scene(NULL),
     m_view(NULL),
     m_viewportAnimator(NULL),
     m_curtainAnimator(NULL),
     m_frontZ(0.0),
-    m_dummyScene(new QGraphicsScene(this))
+    m_dummyScene(new QGraphicsScene(this)),
+    m_dummyWorkbench(new QnWorkbench(this))
 {
     /* Create and configure instruments. */
     m_boundingInstrument = new BoundingInstrument(this);
@@ -85,7 +85,7 @@ QnWorkbenchManager::QnWorkbenchManager(QObject *parent):
 
     connect(m_transformListenerInstrument, SIGNAL(transformChanged(QGraphicsView *)),                   this,                   SLOT(at_viewport_transformationChanged()));
     connect(m_activityListenerInstrument,  SIGNAL(activityStopped()),                                   this,                   SLOT(at_activityStopped()));
-    connect(m_activityListenerInstrument,  SIGNAL(activityStarted()),                                   this,                   SLOT(at_activityStarted()));
+    connect(m_activityListenerInstrument,  SIGNAL(activityResumed()),                                   this,                   SLOT(at_activityStarted()));
 
     /* Configure viewport updates. */
     m_updateTimer = new AnimationTimer(this);
@@ -105,39 +105,63 @@ QnWorkbenchManager::QnWorkbenchManager(QObject *parent):
     connect(m_viewportAnimator, SIGNAL(animationFinished()),                                            this,                   SIGNAL(viewportUngrabbed()));
     connect(m_viewportAnimator, SIGNAL(animationFinished()),                                            m_boundingInstrument,   SLOT(recursiveEnable()));
     connect(m_viewportAnimator, SIGNAL(animationFinished()),                                            this,                   SLOT(at_viewport_animationFinished()));
+
+    /* Set up defaults. */
+    setWorkbench(m_dummyWorkbench);
+    setScene(m_dummyScene);
 }
 
 QnWorkbenchManager::~QnWorkbenchManager() {
-    return;
+    m_dummyWorkbench = NULL;
+    setWorkbench(NULL);
+
+    m_dummyScene = NULL;
+    setScene(NULL);
 }
 
 void QnWorkbenchManager::setWorkbench(QnWorkbench *workbench) {
     if(m_workbench == workbench)
         return;
 
+    /* Clean up old workbench. 
+     * It may be NULL only when this function is called from constructor. */
     if(m_workbench != NULL) {
         disconnect(m_workbench, NULL, this, NULL);
 
-        at_state_layoutChanged(m_layout, NULL);
+        foreach(QnWorkbenchItem *item, m_workbench->layout()->items())
+            removeItemInternal(item);
+
+        m_selectedItem = m_zoomedItem = NULL;
     }
 
+    /* Prepare new workbench. */
     m_workbench = workbench;
+    if(m_workbench == NULL && m_dummyWorkbench != NULL) {
+        m_dummyWorkbench->clear();
+        m_workbench = m_dummyWorkbench;
+    }
 
+    /* Set up new workbench. 
+     * It may be NULL only when this function is called from destructor. */
     if(m_workbench != NULL) {
-        /* Subscribe to workbench changes. */
-        connect(m_workbench,            SIGNAL(aboutToBeDestroyed()),                                       this,                   SLOT(at_state_aboutToBeDestroyed()));
-        connect(m_workbench,            SIGNAL(modeChanged()),                                              this,                   SLOT(at_state_modeChanged()));
-        connect(m_workbench,            SIGNAL(selectedItemChanged(QnWorkbenchItem *, QnWorkbenchItem *)),  this,                   SLOT(at_state_selectedItemChanged(QnWorkbenchItem *, QnWorkbenchItem *)));
-        connect(m_workbench,            SIGNAL(zoomedItemChanged(QnWorkbenchItem *, QnWorkbenchItem *)),    this,                   SLOT(at_state_zoomedItemChanged(QnWorkbenchItem *, QnWorkbenchItem *)));
-        connect(m_workbench,            SIGNAL(layoutChanged(QnWorkbenchLayout *, QnWorkbenchLayout *)),    this,                   SLOT(at_state_layoutChanged(QnWorkbenchLayout *, QnWorkbenchLayout *)));
-        
+        connect(m_workbench,            SIGNAL(aboutToBeDestroyed()),                   this,                   SLOT(at_state_aboutToBeDestroyed()));
+        connect(m_workbench,            SIGNAL(modeChanged()),                          this,                   SLOT(at_state_modeChanged()));
+        connect(m_workbench,            SIGNAL(selectedItemChanged()),                  this,                   SLOT(at_state_selectedItemChanged()));
+        connect(m_workbench,            SIGNAL(zoomedItemChanged()),                    this,                   SLOT(at_state_zoomedItemChanged()));
+        connect(m_workbench,            SIGNAL(itemAdded(QnWorkbenchItem *)),           this,                   SLOT(at_state_itemAdded(QnWorkbenchItem *)));
+        connect(m_workbench,            SIGNAL(itemAboutToBeRemoved(QnWorkbenchItem *)),this,                   SLOT(at_state_itemAboutToBeRemoved(QnWorkbenchItem *)));
+
+        /* Create items. */
+        foreach(QnWorkbenchItem *item, m_workbench->layout()->items())
+            addItemInternal(item);
+
         /* Fire signals if needed. */
-        at_state_layoutChanged(m_layout, m_workbench->layout());
+        at_state_modeChanged();
         if(m_workbench->zoomedItem() != NULL)
-            at_state_zoomedItemChanged(NULL, m_workbench->zoomedItem());
+            changeZoomedItem(m_workbench->zoomedItem());
         if(m_workbench->selectedItem() != NULL)
-            at_state_selectedItemChanged(NULL, m_workbench->selectedItem());
-        
+            changeSelectedItem(m_workbench->selectedItem());
+
         synchronizeSceneBounds();
     }
 }
@@ -146,6 +170,8 @@ void QnWorkbenchManager::setScene(QGraphicsScene *scene) {
     if(m_scene == scene)
         return;
 
+    /* Clean up old scene.
+     * It may be NULL only when this function is called from constructor. */
     if(m_scene != NULL) {
         m_manager->unregisterScene(m_scene);
         
@@ -160,16 +186,23 @@ void QnWorkbenchManager::setScene(QGraphicsScene *scene) {
         m_curtainAnimator->setCurtainItem(NULL);
     }
     
+    /* Prepare new scene. */ 
     m_scene = scene;
+    if(m_scene == NULL && m_dummyScene != NULL) {
+        m_dummyScene->clear();
+        m_scene = m_dummyScene;
+    }
 
+    /* Set up new scene. 
+     * It may be NULL only when this function is called from destructor. */
     if(m_scene != NULL) {
         m_manager->registerScene(m_scene);
-        
+
         connect(m_scene, SIGNAL(destroyed()), this, SLOT(at_scene_destroyed()));
 
         /* Scene indexing will only slow everything down. */ 
         m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
-        
+
         /* Set up curtain. */
         m_curtainItem = new QnCurtainItem();
         m_scene->addItem(m_curtainItem.data());
@@ -177,7 +210,6 @@ void QnWorkbenchManager::setScene(QGraphicsScene *scene) {
         m_curtainAnimator->setCurtainItem(m_curtainItem.data());
     }
 }
-
 
 void QnWorkbenchManager::setView(QGraphicsView *view) {
     if(m_view != NULL) {
@@ -338,8 +370,7 @@ void QnWorkbenchManager::addItemInternal(QnWorkbenchItem *item) {
     QnDisplayWidget *widget = new QnDisplayWidget(item);
     widget->setParent(this); /* Just to feel totally safe and not to leak memory no matter what happens. */
 
-    if(m_scene != NULL)
-        m_scene->addItem(widget);
+    m_scene->addItem(widget);
 
     widget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true); /* Optimization. */
     widget->setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -357,10 +388,10 @@ void QnWorkbenchManager::addItemInternal(QnWorkbenchItem *item) {
      * because the latter automatically sets the former. */
     widget->setFlag(QGraphicsItem::ItemIsPanel, false);
 
-    connect(item, SIGNAL(geometryChanged(const QRect &, const QRect &)),                            this, SLOT(at_item_geometryChanged()));
-    connect(item, SIGNAL(geometryDeltaChanged(const QRectF &, const QRectF &)),                     this, SLOT(at_item_geometryDeltaChanged()));
-    connect(item, SIGNAL(rotationChanged(qreal, qreal)),                                            this, SLOT(at_item_rotationChanged()));
-    connect(item, SIGNAL(flagsChanged(QnWorkbenchItem::ItemFlags, QnWorkbenchItem::ItemFlags)), this, SLOT(at_item_flagsChanged()));
+    connect(item, SIGNAL(geometryChanged()),        this, SLOT(at_item_geometryChanged()));
+    connect(item, SIGNAL(geometryDeltaChanged()),   this, SLOT(at_item_geometryDeltaChanged()));
+    connect(item, SIGNAL(rotationChanged()),        this, SLOT(at_item_rotationChanged()));
+    connect(item, SIGNAL(flagsChanged()),           this, SLOT(at_item_flagsChanged()));
 
     m_widgetByItem.insert(item, widget);
 
@@ -585,12 +616,12 @@ void QnWorkbenchManager::at_viewport_animationFinished() {
         synchronizeSceneBounds();
 }
 
-void QnWorkbenchManager::at_layout_itemAdded(QnWorkbenchItem *item) {
+void QnWorkbenchManager::at_state_itemAdded(QnWorkbenchItem *item) {
     addItemInternal(item);
     synchronizeSceneBounds();
 }
 
-void QnWorkbenchManager::at_layout_itemAboutToBeRemoved(QnWorkbenchItem *item) {
+void QnWorkbenchManager::at_state_itemAboutToBeRemoved(QnWorkbenchItem *item) {
     removeItemInternal(item);
     synchronizeSceneBounds();
 }
@@ -607,30 +638,34 @@ void QnWorkbenchManager::at_state_modeChanged() {
     }
 }
 
-void QnWorkbenchManager::at_state_selectedItemChanged(QnWorkbenchItem *oldSelectedItem, QnWorkbenchItem *newSelectedItem) {
-    if(oldSelectedItem != NULL)
-        synchronize(oldSelectedItem, true);
+void QnWorkbenchManager::at_state_selectedItemChanged() {
+    if(m_selectedItem != NULL)
+        synchronize(m_selectedItem, true);
 
-    if(newSelectedItem != NULL) {
-        bringToFront(newSelectedItem);
-        synchronize(newSelectedItem, true);
+    m_selectedItem = m_workbench->selectedItem();
+
+    if(m_selectedItem != NULL) {
+        bringToFront(m_selectedItem);
+        synchronize(m_selectedItem, true);
     }
 }
 
-void QnWorkbenchManager::at_state_zoomedItemChanged(QnWorkbenchItem *oldZoomedItem, QnWorkbenchItem *newZoomedItem) {
-    if(oldZoomedItem != NULL) {
-        synchronize(oldZoomedItem, true);
+void QnWorkbenchManager::at_state_zoomedItemChanged() {
+    if(m_zoomedItem != NULL) {
+        synchronize(m_zoomedItem, true);
         
         m_activityListenerInstrument->recursiveDisable();
     }
 
-    if(newZoomedItem != NULL) {
-        bringToFront(newZoomedItem);
-        synchronize(newZoomedItem, true);
+    m_zoomedItem = m_workbench->zoomedItem();
+
+    if(m_zoomedItem != NULL) {
+        bringToFront(m_zoomedItem);
+        synchronize(m_zoomedItem, true);
 
         m_activityListenerInstrument->recursiveEnable();
 
-        m_viewportAnimator->moveTo(itemGeometry(m_workbench->zoomedItem()), zoomAnimationDurationMsec);
+        m_viewportAnimator->moveTo(itemGeometry(m_zoomedItem), zoomAnimationDurationMsec);
     } else {
         m_viewportAnimator->moveTo(layoutBoundingGeometry(), zoomAnimationDurationMsec);
     }
@@ -638,23 +673,6 @@ void QnWorkbenchManager::at_state_zoomedItemChanged(QnWorkbenchItem *oldZoomedIt
     synchronizeSceneBounds();
 }
 
-void QnWorkbenchManager::at_state_layoutChanged(QnWorkbenchLayout *, QnWorkbenchLayout *newLayout) {
-    if(m_layout != NULL) {
-        foreach(QnWorkbenchItem *item, m_layout->items())
-            removeItemInternal(item);
-    }
-
-    m_layout = newLayout;
-
-    if(m_layout != NULL) {
-        connect(m_layout,  SIGNAL(itemAdded(QnWorkbenchItem *)),                                 this,                   SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
-        connect(m_layout,  SIGNAL(itemAboutToBeRemoved(QnWorkbenchItem *)),                      this,                   SLOT(at_layout_itemAboutToBeRemoved(QnWorkbenchItem *)));
-
-        /* Create items. */
-        foreach(QnWorkbenchItem *item, m_layout->items())
-            addItemInternal(item);
-    }
-}
 
 void QnWorkbenchManager::at_viewport_transformationChanged() {
     if(m_workbench != NULL && m_workbench->selectedItem() != NULL) {
@@ -725,3 +743,4 @@ void QnWorkbenchManager::at_scene_destroyed() {
 void QnWorkbenchManager::at_view_destroyed() {
     setView(NULL);
 }
+

@@ -137,10 +137,10 @@ public:
 
 
 signals:
-    void geometryChanged(const QRect &oldGeometry, const QRect &newGeometry);
-    void geometryDeltaChanged(const QRectF &oldGeometryDelta, const QRectF &newGeometryDelta);
-    void flagsChanged(QnWorkbenchItem::ItemFlags oldFlags, QnWorkbenchItem::ItemFlags newFlags);
-    void rotationChanged(qreal oldRotation, qreal newRotation);
+    void geometryChanged();
+    void geometryDeltaChanged();
+    void flagsChanged();
+    void rotationChanged();
 
 protected:
     /**
