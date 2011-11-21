@@ -16,6 +16,7 @@ class DragInstrument;
 class RubberBandInstrument;
 class ResizingInstrument;
 class ArchiveDropInstrument;
+class UiElementsInstrument;
 
 class QnWorkbenchManager;
 class QnWorkbenchLayout;
@@ -93,6 +94,9 @@ private:
 
     /** Archive drop instrument. */
     ArchiveDropInstrument *m_archiveDropInstrument;
+
+    /** Ui elements instrument. */
+    UiElementsInstrument *m_uiElementsInstrument;
 };
 
 #endif // QN_WORKBENCH_CONTROLLER_H

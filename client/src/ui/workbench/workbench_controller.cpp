@@ -20,6 +20,7 @@
 #include <ui/graphics/instruments/selectioninstrument.h>
 #include <ui/graphics/instruments/archivedropinstrument.h>
 #include <ui/graphics/instruments/resizinginstrument.h>
+#include <ui/graphics/instruments/uielementsinstrument.h>
 
 #include <ui/graphics/items/display_widget.h>
 
@@ -45,6 +46,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchManager *synchronizer, Q
     m_rubberBandInstrument = new RubberBandInstrument(this);
     m_resizingInstrument = new ResizingInstrument(this);
     m_archiveDropInstrument = new ArchiveDropInstrument(this, this);
+    m_uiElementsInstrument = new UiElementsInstrument(this);
 
     m_dragInstrument = new DragInstrument(this);
 
@@ -76,6 +78,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchManager *synchronizer, Q
     m_manager->installInstrument(m_rubberBandInstrument);
     m_manager->installInstrument(m_handScrollInstrument);
     m_manager->installInstrument(m_archiveDropInstrument);
+    m_manager->installInstrument(m_uiElementsInstrument);
 
     connect(itemClickInstrument,        SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const QPoint &)),      this,                   SLOT(at_item_clicked(QGraphicsView *, QGraphicsItem *)));
     connect(itemClickInstrument,        SIGNAL(doubleClicked(QGraphicsView *, QGraphicsItem *, const QPoint &)),this,                   SLOT(at_item_doubleClicked(QGraphicsView *, QGraphicsItem *)));
@@ -95,6 +98,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchManager *synchronizer, Q
     connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *)),    m_dragInstrument,       SLOT(recursiveEnable()));
     connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *)),     m_rubberBandInstrument, SLOT(recursiveDisable()));
     connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *)),    m_rubberBandInstrument, SLOT(recursiveEnable()));
+    connect(m_synchronizer->transformationListenerInstrument(), SIGNAL(transformChanged(QGraphicsView *)),      m_uiElementsInstrument, SLOT(adjustPosition(QGraphicsView *)));
 
     connect(m_synchronizer,             SIGNAL(viewportGrabbed()),                                              this, SLOT(at_viewportGrabbed()));
     connect(m_synchronizer,             SIGNAL(viewportUngrabbed()),                                            this, SLOT(at_viewportUngrabbed()));

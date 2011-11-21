@@ -36,14 +36,15 @@ public:
      * Layer of an item.
      */
     enum Layer {
-        BACK_LAYER,
-        PINNED_LAYER,
-        PINNED_SELECTED_LAYER,
-        UNPINNED_LAYER,
-        UNPINNED_SELECTED_LAYER,
-        CURTAIN_LAYER,
-        ZOOMED_LAYER,
-        FRONT_LAYER
+        BACK_LAYER,                 /**< Back layer. */
+        PINNED_LAYER,               /**< Layer for pinned items. */
+        PINNED_SELECTED_LAYER,      /**< Layer for pinned items that are selected. */
+        UNPINNED_LAYER,             /**< Layer for unpinned items. */
+        UNPINNED_SELECTED_LAYER,    /**< Layer for unpinned items that are selected. */
+        CURTAIN_LAYER,              /**< Layer for curtain that blacks out the background when an item is zoomed. */
+        ZOOMED_LAYER,               /**< Layer for zoomed items. */
+        FRONT_LAYER,                /**< Topmost layer for items. Items that are being dragged, resized or manipulated in any other way are to be placed here. */
+        UI_ELEMENTS_LAYER,          /**< Layer for ui elements, i.e. close button, navigation bar, etc... */
     };
 
     /**
