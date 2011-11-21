@@ -24,6 +24,8 @@ INCLUDEPATH += $$PWD
 PRECOMPILED_HEADER = $$PWD/StdAfx.h
 PRECOMPILED_SOURCE = $$PWD/StdAfx.cpp
 
+QMAKE_CXXFLAGS += -I$$EVETOOLS_DIR/include
+
 CONFIG(debug, debug|release) {
   CONFIG += console
   DESTDIR = ../bin/debug
