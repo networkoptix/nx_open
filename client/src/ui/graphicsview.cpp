@@ -2474,11 +2474,10 @@ void GraphicsView::updatePageSelector()
 {
     if (m_pageSelector)
     {
-        int viewPoertWidth = viewport()->width();
-        int itemWidth = m_pageSelector->boundingRect().width();
-        int itemHeight = m_pageSelector->boundingRect().height();
+        const QRect viewportRect = viewport()->rect();
+        const QRectF itemRect = m_pageSelector->boundingRect();
 
-        m_pageSelector->setStaticPos(QPoint( (viewPoertWidth -  itemWidth) / 2 , viewport()->height() - itemHeight - 15 ));
+        m_pageSelector->setStaticPos(QPoint((viewportRect.width() - itemRect.width()) / 2, viewportRect.height() - itemRect.height() - 15));
     }
 }
 
@@ -2486,15 +2485,9 @@ NavigationItem *GraphicsView::getNavigationItem()
 {
     if (!m_navigationItem) {
         m_navigationItem = new NavigationItem();
-        m_navigationItem->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
-
-        int lwidth = width();
-        int height = NavigationItem::DEFAULT_HEIGHT;
-
-        QPoint pos (0, viewport()->height() - height);
-        m_navigationItem->setStaticPos(pos);
+        m_navigationItem->setStaticPos(QPoint(0, viewport()->height() - NavigationItem::DEFAULT_HEIGHT));
         m_navigationItem->setVisible(false);
-        m_navigationItem->graphicsWidget()->resize(lwidth, height);
+        m_navigationItem->graphicsWidget()->resize(width(), NavigationItem::DEFAULT_HEIGHT);
         m_navigationItem->setZValue(INT_MAX);
         scene()->addItem(m_navigationItem);
 
@@ -2564,19 +2557,18 @@ void GraphicsView::resizeEvent(QResizeEvent *event)
         return;
 
     if (m_navigationItem) {
-        QPoint pos (0, viewport()->height() - NavigationItem::DEFAULT_HEIGHT);
-        m_navigationItem->setStaticPos(pos);
-
-        QSize s = event->size();
-        m_navigationItem->graphicsWidget()->resize(s.width(), NavigationItem::DEFAULT_HEIGHT);
+        m_navigationItem->setStaticPos(QPoint(0, viewport()->height() - NavigationItem::DEFAULT_HEIGHT));
+        m_navigationItem->graphicsWidget()->resize(event->size().width(), NavigationItem::DEFAULT_HEIGHT);
     }
     updateDecorations();
 
     if (m_selectedWnd && m_selectedWnd->isFullScreen())
-        onItemFullScreen_helper(m_selectedWnd, 800);
-    else
-        //fitInView(getRealSceneRect(),Qt::KeepAspectRatio);
     {
+        onItemFullScreen_helper(m_selectedWnd, 800);
+    }
+    else
+    {
+        //fitInView(getRealSceneRect(),Qt::KeepAspectRatio);
         centerOn(getRealSceneRect().center());
         fitInView(1000, 0);
     }
@@ -2656,21 +2648,21 @@ bool GraphicsView::isItemStillExists(const CLAbstractSceneItem* wnd) const
 
 void GraphicsView::toggleFullScreen_helper(CLAbstractSceneItem* wnd)
 {
-    if (!wnd->isFullScreen() || isItemFullScreenZoomed(wnd) ) // if item is not in full screen mode or if it's in FS and zoomed more
+    if (!wnd->isFullScreen() || isItemFullScreenZoomed(wnd)) // if item is not in full screen mode or if it's in FS and zoomed more
+    {
         onItemFullScreen_helper(wnd, 800);
+    }
     else
     {
         // escape FS MODE
         setZeroSelection();
         wnd->setFullScreen(false);
         fitInView(800, 0, SLOW_START_SLOW_END);
-
     }
 }
 
 void GraphicsView::onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int delay)
 {
-
     if (!m_camLayout.getContent()->checkIntereactionFlag(LayoutContent::ItemSelectable))
         return;
 
@@ -2712,7 +2704,6 @@ void GraphicsView::onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int de
     m_scenezoom.zoom_abs(zoom, item_select_duration, delay, QPoint(0,0), SLOW_START_SLOW_END);
 
     m_ignoreMouse.ignoreNextMs(item_select_duration + delay);
-
 }
 
 void GraphicsView::onCircle_helper(bool show)
@@ -2778,7 +2769,6 @@ void GraphicsView::onCircle_helper(bool show)
     groupAnimation->start();
     groupAnimation->setDeleteAfterFinished(true);
     m_animationManager.registerAnimation(groupAnimation);
-
 }
 
 void GraphicsView::instantArrange()
@@ -2846,7 +2836,6 @@ void GraphicsView::onArrange_helper()
     groupAnimation->start();
     groupAnimation->setDeleteAfterFinished(true);
     m_animationManager.registerAnimation(groupAnimation);
-
 }
 
 void GraphicsView::onArrange_helper_finished()
@@ -2857,7 +2846,6 @@ void GraphicsView::onArrange_helper_finished()
         CLAbstractSceneItem* item = ipos.item;
         item->setArranged(true);
     }
-
 }
 
 #ifdef Q_OS_WIN
@@ -3097,7 +3085,6 @@ void GraphicsView::toggleFullScreen()
     {
         if (isItemStillExists(item) && !item->isFullScreen())
             onItemFullScreen_helper(item, 800);
-
         mMainWnd->showFullScreen();
     }
 }
@@ -3191,7 +3178,7 @@ void GraphicsView::onItemFullScreen_helper(CLAbstractSceneItem* wnd, int duratio
     m_ignoreMouse.ignoreNextMs(duration);
 }
 
-void GraphicsView::mouseSpeed_helper(qreal& mouse_speed,  int& dx, int&dy, int min_speed, int speed_factor)
+void GraphicsView::mouseSpeed_helper(qreal& mouse_speed, int& dx, int&dy, int min_speed, int speed_factor)
 {
     dx = 0; dy = 0;
 
@@ -3464,7 +3451,7 @@ void GraphicsView::contextMenuHelper_saveRecordedAs(CLVideoCamera* cam)
             return;
 
         UIOKMessage(this, QString(), tr("Can't save title. Try another name."));
-  }
+    }
 }
 
 void GraphicsView::contextMenuHelper_takeScreenshot(CLVideoWindowItem* item)
@@ -3683,12 +3670,10 @@ void GraphicsView::navigation_grid_items_drop_helper()
 
 void GraphicsView::on_grid_drop_animation_finished()
 {
-    QList<CLAbstractSceneItem*> lst = m_camLayout.getItemList();
-
-    foreach(CLAbstractSceneItem* itm, lst)
+    foreach (CLAbstractSceneItem *item, m_camLayout.getItemList())
     {
-        itm->setZValue(global_base_scene_z_level);
-        itm->setArranged(true);
+        item->setZValue(global_base_scene_z_level);
+        item->setArranged(true);
     }
     m_camLayout.updateSceneRect();
 }
@@ -3711,7 +3696,8 @@ void GraphicsView::onOpenFile()
     }
 }
 
-void GraphicsView::paintEvent(QPaintEvent *event) {
+void GraphicsView::paintEvent(QPaintEvent *event)
+{
     m_camLayout.renderWatcher()->startDisplay();
 
     QGraphicsView::paintEvent(event);

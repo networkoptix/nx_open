@@ -18,7 +18,9 @@ public:
 
     void setToolTipItem(ToolTipItem *toolTip);
 
+#if 0
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+#endif
 
 public Q_SLOTS:
     void setMute(bool mute);
