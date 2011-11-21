@@ -687,6 +687,8 @@ void CLCamDisplay::onSlowSourceHint()
 qint64 CLCamDisplay::currentTime() const 
 {
     qint64 result = m_display[0]->getLastDisplayedTime();
+    if (result == AV_NOPTS_VALUE)
+        return result;
     for (int i = 1; i < CL_MAX_CHANNELS; ++i) {
         if (m_display[i])
             result = qMax(result, m_display[i]->getLastDisplayedTime());
