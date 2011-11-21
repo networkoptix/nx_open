@@ -1,12 +1,12 @@
 #ifndef MAINWND_H
 #define MAINWND_H
 
-#include "ui_mainwnd.h"
+#include <QtGui/QMainWindow>
 
 class CLLayoutNavigator;
 class LayoutContent;
 
-class MainWnd : public QWidget
+class MainWnd : public QMainWindow
 {
     Q_OBJECT
 
@@ -21,6 +21,7 @@ public:
     void goToNewLayoutContent(LayoutContent* newl);
 
 private slots:
+    void itemActivated(uint resourceId);
     void handleMessage(const QString& message);
 
 private:

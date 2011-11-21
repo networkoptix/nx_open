@@ -4,6 +4,7 @@ ToolTipItem::ToolTipItem(QGraphicsItem *parent):
     QGraphicsItem(parent),
     m_parametersValid(false)
 {
+    setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
 }
 
 const QString &ToolTipItem::text() const
@@ -20,7 +21,7 @@ void ToolTipItem::setText(const QString &text)
     updateTextSize();
 }
 
-const QFont &ToolTipItem::font() const 
+const QFont &ToolTipItem::font() const
 {
     return m_font;
 }
@@ -58,7 +59,7 @@ void ToolTipItem::setBorderPen(const QPen &borderPen)
     invalidateParameters();
 }
 
-const QBrush &ToolTipItem::brush() const 
+const QBrush &ToolTipItem::brush() const
 {
     return m_brush;
 }
@@ -68,22 +69,25 @@ void ToolTipItem::setBrush(const QBrush &brush)
     m_brush = brush;
 }
 
-QRectF ToolTipItem::boundingRect() const 
+QRectF ToolTipItem::boundingRect() const
 {
     ensureParameters();
 
     return m_boundingRect;
 }
 
-QPainterPath ToolTipItem::shape() const 
+QPainterPath ToolTipItem::shape() const
 {
     ensureParameters();
 
     return m_itemShape;
 }
 
-void ToolTipItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) 
+void ToolTipItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    Q_UNUSED(option)
+    Q_UNUSED(widget)
+
     ensureParameters();
 
     /* Draw background. */
@@ -99,7 +103,7 @@ void ToolTipItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
     painter->drawPath(m_borderShape);
 }
 
-void ToolTipItem::wheelEvent(QGraphicsSceneWheelEvent *event) 
+void ToolTipItem::wheelEvent(QGraphicsSceneWheelEvent *event)
 {
     event->ignore();
 
@@ -115,7 +119,7 @@ void ToolTipItem::updateTextSize() {
     invalidateParameters();
 }
 
-namespace 
+namespace
 {
     static const qreal roundingRadius = 5.0;
     static const qreal padding = -2.0;
@@ -134,7 +138,7 @@ void ToolTipItem::updateParameters(QPainterPath *borderShape, QRectF *contentRec
     *borderShape = QPainterPath();
     borderShape->moveTo(0.0, 0.0);
     borderShape->lineTo(arrowWidth / 2, -arrowHeight);
-    
+
     borderShape->lineTo( hw,                  -arrowHeight);
     borderShape->arcTo(QRectF( hw,                  -arrowHeight                            - roundingRadius, roundingRadius, roundingRadius), 270, 90);
     borderShape->lineTo( hw + roundingRadius, -arrowHeight - paddingSize.height() -     roundingRadius);
@@ -143,7 +147,7 @@ void ToolTipItem::updateParameters(QPainterPath *borderShape, QRectF *contentRec
     borderShape->arcTo(QRectF(-hw - roundingRadius, -arrowHeight - paddingSize.height() - 2 * roundingRadius, roundingRadius, roundingRadius), 90, 90);
     borderShape->lineTo(-hw - roundingRadius, -arrowHeight);
     borderShape->arcTo(QRectF(-hw - roundingRadius, -arrowHeight                            - roundingRadius, roundingRadius, roundingRadius), 180, 90);
-    
+
     borderShape->lineTo(-arrowWidth / 2, -arrowHeight);
     borderShape->closeSubpath();
 
@@ -156,7 +160,7 @@ void ToolTipItem::ensureParameters() const
         return;
 
     updateParameters(&m_borderShape, &m_contentRect);
-    
+
     if(m_borderPen.isCosmetic()) {
         m_itemShape = m_borderShape;
     } else {
@@ -166,7 +170,7 @@ void ToolTipItem::ensureParameters() const
         m_itemShape.addPath(m_borderShape);
         m_itemShape = m_itemShape.simplified();
     }
-    
+
     m_boundingRect = m_itemShape.boundingRect();
 
     m_parametersValid = true;

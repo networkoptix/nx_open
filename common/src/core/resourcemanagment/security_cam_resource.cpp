@@ -63,7 +63,7 @@ QnAbstractStreamDataProvider* QnSequrityCamResource::createDataProviderInternal(
     if (role == QnResource::Role_LiveVideo || role == QnResource::Role_Default)
         return createLiveDataProvider();
     else if (m_dpFactory)
-        m_dpFactory->createDataProviderInternal(toSharedPointer(), role);
+        return m_dpFactory->createDataProviderInternal(toSharedPointer(), role);
     else
         return 0;
 }
