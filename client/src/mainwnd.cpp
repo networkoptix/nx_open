@@ -5,6 +5,7 @@
 
 #include <QtGui/QDockWidget>
 #include <QtGui/QTabWidget>
+#include <QtGui/QToolBar>
 
 #include "ui/context_menu_helper.h"
 #include "ui/layout_navigator.h"
@@ -141,6 +142,14 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     navigationDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
     navigationDock->setWidget(navigationWidget);
     addDockWidget(Qt::LeftDockWidgetArea, navigationDock);
+
+
+    // toolbars
+    QToolBar *toolBar = new QToolBar(this);
+    toolBar->addAction(&cm_exit);
+    toolBar->addAction(&cm_toggle_fullscreen);
+    toolBar->addAction(&cm_preferences);
+    addToolBar(Qt::TopToolBarArea, toolBar);
 
 
     if (!files.isEmpty())
