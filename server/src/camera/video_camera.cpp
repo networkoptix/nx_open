@@ -46,8 +46,10 @@ void QnVideoCamera::putData(QnAbstractDataPacketPtr data)
     QMutexLocker lock(&m_queueMtx);
     if (media->flags & AV_PKT_FLAG_KEY)
         m_dataQueue.clear();
-    if (m_dataQueue.size() < m_dataQueue.maxSize())
+    if (m_dataQueue.size() < m_dataQueue.maxSize()) {
+        media->flags |= QnAbstractMediaData::MediaFlags_LIVE;
         QnAbstractDataConsumer::putData(data);
+    }
 }
 
 bool QnVideoCamera::processData(QnAbstractDataPacketPtr /*data*/)

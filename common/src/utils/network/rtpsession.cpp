@@ -614,7 +614,8 @@ bool RTPSession::readTextResponce(QByteArray& response)
 {
 
     bool readMoreData = false; // try to process existing buffer at first
-    for (int k = 0; k < 10; ++k) // if binary data ahead text data, read more. read 10 packets at maxumum
+    //for (int k = 0; k < 10; ++k) // if binary data ahead text data, read more. read 10 packets at maxumum
+    while (m_responseBufferLen < MAX_RESPONCE_LEN)
     {
         if (readMoreData && readRAWData() == -1)
             return false;
