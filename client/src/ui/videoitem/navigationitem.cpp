@@ -389,8 +389,7 @@ void NavigationItem::updateSlider()
             m_currentTime = time/1000;
             m_timeSlider->setCurrentValue(m_currentTime);
         }
-
-        m_liveButton->setVisible(m_timeSlider->isAtEnd());
+        m_liveButton->setVisible(!reader->onPause() && m_camera->getCamCamDisplay()->isRealTimeSource());
     }
 }
 
@@ -480,6 +479,7 @@ void NavigationItem::pause()
 
     reader->pause();
     m_camera->getCamCamDisplay()->pauseAudio();
+    m_liveButton->hide();
 
     reader->setSingleShotMode(true);
     //m_camera->getCamCamDisplay()->setSingleShotMode(true);
@@ -490,9 +490,13 @@ void NavigationItem::play()
     setActive(true);
 
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
-    reader->resumeMedia();
-    if (reader->onPause() && reader->isRealTimeSource())
-        smartSeek(m_camera->getCamCamDisplay()->currentTime() / 1000);
+    if (reader->onPause() && reader->isRealTimeSource()) {
+        reader->resumeMedia();
+        reader->jumpToPreviousFrame(m_camera->getCamCamDisplay()->currentTime(), true);
+    }
+    else {
+        reader->resumeMedia();
+    }
 
     if (!m_playing)
         m_camera->getCamCamDisplay()->playAudio(m_playing);
