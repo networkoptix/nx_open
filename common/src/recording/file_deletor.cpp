@@ -26,12 +26,7 @@ bool QnFileDeletor::internalDeleteFile(const QString& fileName)
     while(1) 
     {
         QDir dir (dirName);
-        if (dir.exists() && dir.count() <= 2)
-        {
-            if (!dir.rmdir(dirName))
-                break;
-        }
-        else
+        if (!dir.rmdir(dirName))
             break;
         dirName = dirName.left(dirName.lastIndexOf('/'));
     }
