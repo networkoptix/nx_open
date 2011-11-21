@@ -241,7 +241,7 @@ QString DeviceFileCatalog::fullFileName(const Chunk& chunk) const
 qint64 DeviceFileCatalog::minTime() const
 {
     QMutexLocker lock(&m_mutex);
-    if (m_chunks.isEmpty())
+    if (m_chunks.isEmpty() || m_firstDeleteCount >= m_chunks.size())
         return AV_NOPTS_VALUE;
     else
         return m_chunks[m_firstDeleteCount].startTime;
