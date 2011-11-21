@@ -158,9 +158,13 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
     if (m_isRealTimeSource)
     {
+        if (m_dataQueue.size() > 0)
+            needToSleep /= 2*m_dataQueue.size();
+        /*
         needToSleep -= (m_dataQueue.size()) * 2 * 1000;
         if (needToSleep > MAX_VALID_SLEEP_LIVE_TIME)
             needToSleep = 0;
+        */
     }
 
     m_previousVideoTime = currentTime;
