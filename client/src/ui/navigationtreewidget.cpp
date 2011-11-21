@@ -8,6 +8,21 @@
 #include "ui/skin.h"
 #include "ui/models/resourcemodel.h"
 
+class NavigationTreeSortFilterProxyModel : public QSortFilterProxyModel
+{
+public:
+    NavigationTreeSortFilterProxyModel(QObject *parent = 0)
+        : QSortFilterProxyModel(parent)
+    {}
+
+protected:
+    bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
+    {
+        return !source_parent.isValid() || QSortFilterProxyModel::filterAcceptsRow(source_row, source_parent);
+    }
+};
+
+
 NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
     : QWidget(parent)
 {
@@ -27,16 +42,20 @@ NavigationTreeWidget::NavigationTreeWidget(QWidget *parent)
 
     m_model = new ResourceModel(m_navigationTreeView);
 
-    m_proxyModel = new QSortFilterProxyModel(m_model);
+    m_proxyModel = new NavigationTreeSortFilterProxyModel(m_model);
     m_proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    m_proxyModel->setFilterKeyColumn(-1);
+    m_proxyModel->setFilterRole(Qt::UserRole + 2);
+    m_proxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
+    m_proxyModel->setDynamicSortFilter(true);
     m_proxyModel->setSourceModel(m_model);
 
     m_navigationTreeView->setModel(m_proxyModel);
     m_navigationTreeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     m_navigationTreeView->setAllColumnsShowFocus(true);
     m_navigationTreeView->setRootIsDecorated(true);
-    m_navigationTreeView->setHeaderHidden(true);
-    m_navigationTreeView->setSortingEnabled(false);
+    m_navigationTreeView->setHeaderHidden(true); // ###
+    m_navigationTreeView->setSortingEnabled(false); // ###
     m_navigationTreeView->setUniformRowHeights(true);
     m_navigationTreeView->setWordWrap(false);
 
@@ -69,7 +88,7 @@ void NavigationTreeWidget::filterChanged(const QString &filter)
     else
     {
         m_clearFilterButton->hide();
-        m_proxyModel->setFilterFixedString(filter);
+        m_proxyModel->invalidate();
     }
 }
 

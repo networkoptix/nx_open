@@ -11,14 +11,16 @@ ResourceModel::ResourceModel(QObject *parent)
         const uint serverId = server->getId().hash();
 
         QStandardItem *root = new QStandardItem(QIcon(), server->getName());
-        root->setData(serverId);
+        root->setData(serverId, Qt::UserRole + 1);
+        root->setData(server->toSearchString(), Qt::UserRole + 2);
         root->setEditable(false);
         foreach (QnResourcePtr resource, qnResPool->getResources())
         {
             if (resource->getParentId().hash() == serverId && !resource->checkFlag(QnResource::server))
             {
                 QStandardItem *child = new QStandardItem(QIcon(), resource->getName());
-                child->setData(resource->getId().hash());
+                child->setData(resource->getId().hash(), Qt::UserRole + 1);
+                child->setData(resource->toSearchString(), Qt::UserRole + 2);
                 child->setEditable(false);
                 child->setIcon(resource->checkFlag(QnResource::live_cam) ? Skin::icon(QLatin1String("webcam.png")) : Skin::icon(QLatin1String("layout.png")));
                 root->appendRow(child);
@@ -51,14 +53,16 @@ void ResourceModel::addResource(QnResourcePtr resource)
     if (resource->checkFlag(QnResource::server))
     {
         QStandardItem *root = new QStandardItem(QIcon(), resource->getName());
-        root->setData(resource->getId().hash());
+        root->setData(resource->getId().hash(), Qt::UserRole + 1);
+        root->setData(resource->toSearchString(), Qt::UserRole + 2);
         root->setEditable(false);
         appendRow(root);
     }
     else if (QStandardItem *root = itemFromResourceId(parentId))
     {
         QStandardItem *child = new QStandardItem(QIcon(), resource->getName());
-        child->setData(resource->getId().hash());
+        child->setData(resource->getId().hash(), Qt::UserRole + 1);
+        child->setData(resource->toSearchString(), Qt::UserRole + 2);
         child->setEditable(false);
         child->setIcon(resource->checkFlag(QnResource::live_cam) ? Skin::icon(QLatin1String("webcam.png")) : Skin::icon(QLatin1String("layout.png")));
         root->appendRow(child);
