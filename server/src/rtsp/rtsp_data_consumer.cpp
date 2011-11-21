@@ -6,6 +6,7 @@
 #include "utils/media/ffmpeg_helper.h"
 #include "camera/video_camera.h"
 #include "camera/camera_pool.h"
+#include "utils/common/sleep.h"
 
 static const int MAX_QUEUE_SIZE = 60;
 //static const QString RTP_FFMPEG_GENERIC_STR("mpeg4-generic"); // this line for debugging purpose with VLC player
@@ -143,12 +144,14 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     if (media->dataType == QnAbstractMediaData::AUDIO)
         rtspChannelNum += m_owner->numOfVideoChannels();
 
-    QMutexLocker lock(&m_mutex);
+    //QMutexLocker lock(&m_mutex);
+    m_mutex.lock();
     if (media->flags & QnAbstractMediaData::MediaFlags_AfterEOF)
         m_ctxSended.clear();
 
     if (m_waitBOF && !(media->flags & QnAbstractMediaData::MediaFlags_BOF))
     {
+        m_mutex.unlock();
         return true; // ignore data
     }
     m_waitBOF = false;
@@ -189,8 +192,19 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     const char* curData = media->data.data();
     int sendLen = 0;
     int headerSize = 4 + (video ? 4 : 0);
+
+    if (m_lastSendTime != DATETIME_NOW)
+        m_lastSendTime = media->timestamp;
+
+    m_mutex.unlock();
+
     for (int dataRest = media->data.size(); dataRest > 0; dataRest -= sendLen)
     {
+        while (m_pauseNetwork && !m_needStop)
+        {
+            QnSleep::msleep(1);
+        }
+
         sendLen = qMin(MAX_RTSP_DATA_LEN-headerSize, dataRest);
         buildRtspTcpHeader(rtspChannelNum, ssrc, sendLen + headerSize, sendLen >= dataRest ? 1 : 0, media->timestamp);
         QMutexLocker lock(&m_owner->getSockMutex());
@@ -208,10 +222,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         }
         Q_ASSERT(sendLen > 0);
         m_owner->sendData(curData, sendLen);
-        //m_owner->flush();
         curData += sendLen;
-        if (m_lastSendTime != DATETIME_NOW)
-            m_lastSendTime = media->timestamp;
     }
     return true;
 }
