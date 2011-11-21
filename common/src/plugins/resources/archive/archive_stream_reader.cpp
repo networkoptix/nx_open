@@ -179,6 +179,7 @@ begin_label:
         {
             m_lastGopSeekTime = -1;
             intChanneljumpTo(m_requiredJumpTime, 0);
+            emit jumpOccured(m_requiredJumpTime);
             setSkipFramesToTime(m_tmpSkipFramesToTime);
             m_lastUIJumpTime = m_requiredJumpTime;
             m_requiredJumpTime = AV_NOPTS_VALUE;

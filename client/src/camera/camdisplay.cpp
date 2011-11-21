@@ -158,9 +158,13 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
     if (m_isRealTimeSource)
     {
+        if (m_dataQueue.size() > 0)
+            needToSleep /= 2*m_dataQueue.size();
+        /*
         needToSleep -= (m_dataQueue.size()) * 2 * 1000;
         if (needToSleep > MAX_VALID_SLEEP_LIVE_TIME)
             needToSleep = 0;
+        */
     }
 
     m_previousVideoTime = currentTime;
@@ -253,7 +257,16 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
 }
 
-void CLCamDisplay::jump(qint64 time)
+void CLCamDisplay::onBeforeJump(qint64 time, bool makeshot)
+{
+    if (time < 1000000ll * 100000)
+        cl_log.log("before jump to ", time, cl_logWARNING);
+    else
+        cl_log.log("before jump to ", QDateTime::fromMSecsSinceEpoch(time/1000).toString(), cl_logWARNING);
+    m_display[0]->blockTimeValue(time);
+}
+
+void CLCamDisplay::onJumpOccured(qint64 time)
 {
     if (time < 1000000ll * 100000)
         cl_log.log("jump to ", time, cl_logWARNING);
@@ -678,6 +691,8 @@ void CLCamDisplay::onSlowSourceHint()
 qint64 CLCamDisplay::currentTime() const 
 {
     qint64 result = m_display[0]->getLastDisplayedTime();
+    if (result == AV_NOPTS_VALUE)
+        return result;
     for (int i = 1; i < CL_MAX_CHANNELS; ++i) {
         if (m_display[i])
             result = qMax(result, m_display[i]->getLastDisplayedTime());

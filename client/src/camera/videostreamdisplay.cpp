@@ -396,7 +396,7 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
     bool reverseMode = m_reverseMode;
 
     bool enableFrameQueue = reverseMode ? true : m_enableFrameQueue;
-    if (enableFrameQueue && qAbs(m_speed - 1.0) < FPS_EPS) 
+    if (enableFrameQueue && qAbs(m_speed - 1.0) < FPS_EPS && !(data->flags & QnAbstractMediaData::MediaFlags_LIVE))
     {
         if (!m_bufferedFrameDisplayer) {
             QMutexLocker lock(&m_timeMutex);

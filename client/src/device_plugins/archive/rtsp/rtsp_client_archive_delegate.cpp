@@ -59,6 +59,10 @@ bool QnRtspClientArchiveDelegate::open(QnResourcePtr resource)
         m_rtspSession.stop();
     }
     m_opened = m_rtspSession.isOpened();
+    if (!m_opened) {
+        for (int i = 0; i < 50 && !m_closing; ++i)
+            QnSleep::msleep(10);
+    }
     return m_opened;
 }
 

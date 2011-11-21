@@ -448,13 +448,14 @@ void NavigationItem::onValueChanged(qint64 time)
     if (m_camera == 0)
         return;
 
-    updatePeriodList();
 
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     if (reader->isSkippingFrames())
         return;
 
     smartSeek(time);
+
+    updatePeriodList();
 }
 
 void NavigationItem::smartSeek(qint64 timeMSec) 
