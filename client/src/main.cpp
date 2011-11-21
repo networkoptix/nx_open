@@ -127,7 +127,7 @@ void addTestData()
     resource2->setParentId(server->getId());
     qnResPool->addResource(QnResourcePtr(resource2));
     */
-    
+
     /*
     QnNetworkResourceList testList;
     testList << testCamera;
@@ -206,6 +206,9 @@ int main(int argc, char *argv[])
     settings.save();
 
     cl_log.log(QLatin1String("Using ") + settings.mediaRoot() + QLatin1String(" as media root directory"), cl_logALWAYS);
+
+    // ### local (aka "dummy") video server resource
+    qnResPool->addResource(QnResourcePtr(new QnLocalVideoServer));
 
     QUrl appserverUrl = QUrl(QSettings().value("appserverUrl", QLatin1String(DEFAULT_APPSERVER_URL)).toString());
     QHostAddress host(appserverUrl.host());
@@ -286,7 +289,7 @@ int main(int argc, char *argv[])
     }
     //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
-    
+
 #ifdef Q_OS_WIN
     QnResourceDiscoveryManager::instance().addDeviceServer(&DesktopDeviceServer::instance());
 #endif // Q_OS_WIN
@@ -356,7 +359,7 @@ int main(int argc, char *argv[])
     //=========================================================
 
     initContextMenu();
-    
+
 #if 0
     QWidget *widget = new QWidget();
     QHBoxLayout *layout = new QHBoxLayout(widget);

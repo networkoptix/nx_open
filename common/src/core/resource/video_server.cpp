@@ -1,11 +1,38 @@
 #include "video_server.h"
-#include <QUrl>
+
+#include <QtCore/QUrl>
+
+QnLocalVideoServer::QnLocalVideoServer()
+    : QnResource()
+{
+    //setTypeId(qnResTypePool->getResourceTypeId("", QLatin1String("LocalServer")));
+    addFlag(server | local);
+    setName(QLatin1String("Local"));
+    setId(QnId());
+}
+
+QnLocalVideoServer::~QnLocalVideoServer()
+{
+}
+
+QString QnLocalVideoServer::getUniqueId() const
+{
+    return QLatin1String("LocalServer");
+}
+
+QnAbstractStreamDataProvider *QnLocalVideoServer::createDataProviderInternal(ConnectionRole role)
+{
+    Q_UNUSED(role)
+    return 0;
+}
+
 
 QnVideoServer::QnVideoServer():
     QnResource()
     //,m_rtspListener(0)
 {
-    setTypeId(qnResTypePool->getResourceTypeId("", "Server"));
+    setTypeId(qnResTypePool->getResourceTypeId("", QLatin1String("Server")));
+    addFlag(server | remote);
 }
 
 QnVideoServer::~QnVideoServer()
@@ -18,7 +45,7 @@ QString QnVideoServer::getUniqueId() const
     QnVideoServer* nonConstThis = const_cast<QnVideoServer*> (this);
     if (!getId().isValid())
         nonConstThis->setId(QnId::generateSpecialId());
-    return QString("Server ") + getId().toString();
+    return QLatin1String("Server ") + getId().toString();
 }
 
 QnAbstractStreamDataProvider* QnVideoServer::createDataProviderInternal(ConnectionRole /*role*/)

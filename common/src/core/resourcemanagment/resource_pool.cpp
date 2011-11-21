@@ -26,6 +26,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
     foreach (QnResourcePtr resource, resources)
     {
         if (!resource->getId().isValid())
+        if (!resource->checkFlag(QnResource::server | QnResource::local)) // ### hack. remove?
             resource->setId(QnId::generateSpecialId());
     }
 
