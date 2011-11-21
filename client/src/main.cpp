@@ -207,64 +207,6 @@ int main(int argc, char *argv[])
 
     cl_log.log(QLatin1String("Using ") + settings.mediaRoot() + QLatin1String(" as media root directory"), cl_logALWAYS);
 
-    // ### local (aka "dummy") video server resource
-    qnResPool->addResource(QnResourcePtr(new QnLocalVideoServer));
-
-    QUrl appserverUrl = QUrl(QSettings().value("appserverUrl", QLatin1String(DEFAULT_APPSERVER_URL)).toString());
-    QHostAddress host(appserverUrl.host());
-    int port = appserverUrl.port();
-
-    QAuthenticator auth;
-    auth.setUser("appserver");
-    auth.setPassword("123");
-    QnAppServerConnection appServerConnection(host, port, auth, QnServerCameraFactory::instance());
-
-
-    QList<QnResourceTypePtr> resourceTypeList;
-    if (appServerConnection.getResourceTypes(resourceTypeList) == 0)
-    {
-        qnResTypePool->addResourceTypeList(resourceTypeList);
-        qDebug() << "Got " << resourceTypeList.size() << " resource types";
-
-        // The following code works. Commented just to not create new entities on each run.
-#if 0
-        QnLocalFileResource server("server name");
-        QList<QnResourcePtr> servers;
-
-        if (appServerConnection.addServer(server, servers) == 0)
-        {
-            qDebug() << "Added server";
-        } else
-        {
-            qDebug() << "Can't add server";
-        }
-
-        QnLocalFileResource camera("server name");
-        camera.setTypeId(QnId("17"));
-        QList<QnResourcePtr> cameras;
-
-        if (appServerConnection.addCamera(camera, servers[0]->getId(), cameras) == 0)
-        {
-            qDebug() << "Added camera";
-        } else
-        {
-            qDebug() << "Can't add camera";
-        }
-#endif
-    } else
-    {
-        qDebug() << "Can't get resource types from Application server";
-    }
-    QnResourceList resources;
-    if (appServerConnection.getResources(resources) == 0)
-    {
-        qnResPool->addResources(resources);
-        qDebug() << "Got" << resources.size() << "resources";
-    } else
-    {
-        qDebug() << "Can't get resource from Application server";
-    }
-
     //qApp->exit();
 
     QnResource::startCommandProc();
@@ -275,18 +217,20 @@ int main(int argc, char *argv[])
     //===========================================================================
     //IPPH264Decoder::dll.init();
 
+
+    // ### local (aka "dummy") video server resource
+    qnResPool->addResource(QnResourcePtr(new QnLocalVideoServer));
+
+
     CLVideoDecoderFactory::setCodecManufacture(CLVideoDecoderFactory::FFMPEG);
 
     QnServerCameraProcessor serverCameraProcessor;
-
     QnResourceDiscoveryManager::instance().addResourceProcessor(&serverCameraProcessor);
 
     //============================
-    if (!appServerConnection.isConnected())
-    {
-        QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
-        QnResourceDiscoveryManager::instance().start();
-    }
+    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
+    QnResourceDiscoveryManager::instance().start();
+
     //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
 

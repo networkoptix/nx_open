@@ -346,11 +346,11 @@ void GraphicsWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         {
             if (d->doubleClicked)
             {
-                Q_EMIT doubleClicked();
+                //Q_EMIT doubleClicked();
             }
             else
             {
-                Q_EMIT clicked();
+                //Q_EMIT clicked();
             }
         }
 
@@ -422,7 +422,7 @@ bool GraphicsWidget::windowFrameEvent(QEvent *event)
         QGraphicsSceneMouseEvent *e = static_cast<QGraphicsSceneMouseEvent *>(event);
         if (e->button() == Qt::LeftButton) {
             if (!d->movingStartedEmitted && !d->resizingStartedEmitted)
-                Q_EMIT clicked();
+                //Q_EMIT clicked();
 
             d->movingResizingFinished();
         }

@@ -33,6 +33,7 @@
 #include "youtube/youtubeuploaddialog.h"
 #include "videorecordersettings.h"
 #include "core/resourcemanagment/resource_pool.h"
+#include "core/resourcemanagment/security_cam_resource.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "plugins/resources/archive/avi_files/avi_dvd_device.h"
 #include "utils/common/rand.h"
@@ -318,7 +319,7 @@ void GraphicsView::stop()
 {
     mViewStarted = false;
     stopAnimation(); // stops animation
-    setZeroSelection();
+    setZeroSelection(0, true);
     closeAllDlg();
 }
 
@@ -374,8 +375,11 @@ qreal GraphicsView::getZoom() const
     return m_scenezoom.getZoom();
 }
 
-void GraphicsView::setZeroSelection(int delay)
+void GraphicsView::setZeroSelection(int delay, bool force)
 {
+    if(!force && m_camLayout.hasLiveCameras())
+        return;
+
     if (m_selectedWnd && m_camLayout.hasSuchItem(m_selectedWnd))
     {
         m_selectedWnd->setItemSelected(false, true,delay);
@@ -2068,6 +2072,15 @@ bool GraphicsView::onUserInput(bool go_unsteady, bool escapeFromintro)
     return false;
 }
 
+void GraphicsView::deviceAdded(const QnResourcePtr &resource)
+{
+    if (m_navigationItem && qSharedPointerDynamicCast<QnSequrityCamResource>(resource))
+    {
+        m_navigationItem->show(500);
+        m_navigationItem->setVisible(true);
+    }
+}
+
 void GraphicsView::goToSteadyMode(bool steady)
 {
     CLUnMovedPixture* bk_item = static_cast<CLUnMovedPixture*>(staticItemByName(QLatin1String("background")));
@@ -2080,7 +2093,7 @@ void GraphicsView::goToSteadyMode(bool steady)
             return;
         }
 
-        foreach(CLAbstractUnmovedItem* item, m_staticItems)
+        foreach (CLAbstractUnmovedItem *item, m_staticItems)
         {
             if (item != bk_item && item->preferNonSteadyMode())
             {
@@ -2089,10 +2102,15 @@ void GraphicsView::goToSteadyMode(bool steady)
             }
         }
 
-        foreach(CLAbstractUnmovedItem* item, m_staticItems)
+        foreach (CLAbstractUnmovedItem *item, m_staticItems)
         {
-            if (item != bk_item)
-                item->hideIfNeeded(500);
+            if (item == bk_item)
+                continue;
+
+            if(item == m_navigationItem.data() && m_camLayout.hasLiveCameras())
+                continue;
+
+            item->hideIfNeeded(500);
         }
 
         if (m_searchItem)
@@ -2666,7 +2684,7 @@ void GraphicsView::onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int de
     if (!m_camLayout.getContent()->checkIntereactionFlag(LayoutContent::ItemSelectable))
         return;
 
-    setZeroSelection(delay);
+    setZeroSelection(delay, true);
 
     m_selectedWnd = new_wnd;
     m_last_selectedWnd = new_wnd;

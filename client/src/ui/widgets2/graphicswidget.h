@@ -60,8 +60,8 @@ public:
     void setExtraFlags(GraphicsExtraFlags flags);
 
 Q_SIGNALS:
-    void clicked();
-    void doubleClicked();
+    //void clicked();
+    //void doubleClicked();
     void resizingStarted();
     void resizingFinished();
     void movingStarted();

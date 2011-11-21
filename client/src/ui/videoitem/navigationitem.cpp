@@ -339,7 +339,6 @@ void NavigationItem::setVideoCamera(CLVideoCamera *camera)
         QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
 
         connect(m_camera->getCamCamDisplay(), SIGNAL(liveMode(bool)), this, SLOT(onLiveModeChanged(bool)));
-        connect(m_camera->getStreamreader(), SIGNAL(jumpOccured(qint64, bool)), this, SLOT(jumpOccured(qint64)));
 
         setPlaying(!reader->onPause());
     }
@@ -445,13 +444,14 @@ void NavigationItem::onValueChanged(qint64 time)
     if (m_camera == 0)
         return;
 
-    updatePeriodList();
 
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     if (reader->isSkippingFrames())
         return;
 
     smartSeek(time);
+
+    updatePeriodList();
 }
 
 void NavigationItem::smartSeek(qint64 timeMSec)

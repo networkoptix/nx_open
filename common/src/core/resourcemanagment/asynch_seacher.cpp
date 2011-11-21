@@ -5,6 +5,8 @@
 #include "resourceserver.h"
 #include "../resource/network_resource.h"
 #include "resource_pool.h"
+#include "utils/common/util.h"
+#include "api/AppServerConnection.h"
 
 
 
@@ -70,8 +72,46 @@ void QnResourceDiscoveryManager::pleaseStop()
     CLLongRunnable::pleaseStop();
 }
 
+bool QnResourceDiscoveryManager::getResourceTypes()
+{
+    QUrl appserverUrl = QUrl(QSettings().value("appserverUrl", QLatin1String(DEFAULT_APPSERVER_URL)).toString());
+    QHostAddress host(appserverUrl.host());
+    int port = appserverUrl.port();
+
+    QAuthenticator auth;
+    auth.setUser("appserver");
+    auth.setPassword("123");
+
+    QnDummyResourceFactory dummyFactory;
+    QnAppServerConnection appServerConnection(host, port, auth, dummyFactory);
+
+    QList<QnResourceTypePtr> resourceTypeList;
+    if (appServerConnection.getResourceTypes(resourceTypeList) == 0)
+    {
+        qnResTypePool->addResourceTypeList(resourceTypeList);
+        qDebug() << "Got " << resourceTypeList.size() << " resource types";
+    } else
+    {
+        qDebug() << "Can't get resource types from Application server";
+
+        return false;
+    }
+
+    return true;
+}
+
 void QnResourceDiscoveryManager::run()
 {
+    bool gotResourceTypes = false;
+
+    while(!needToStop() && !gotResourceTypes)
+    {
+        gotResourceTypes = getResourceTypes();
+
+        int global_delay_between_search = 1000;
+        smartSleep(global_delay_between_search);
+    }
+
 	while(!needToStop())
     {
         bool ip_finished;

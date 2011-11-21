@@ -53,7 +53,8 @@ public:
     QImage getScreenshot(int channel);
     bool isRealTimeSource() const { return m_isRealTimeSource; }
 public slots:
-    void jump(qint64 time); 
+    void onBeforeJump(qint64 time, bool makeshot);
+    void onJumpOccured(qint64 time); 
     void onRealTimeStreamHint(bool value);
     void onSlowSourceHint();
     void onReaderPaused();
