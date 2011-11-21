@@ -253,7 +253,16 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
 }
 
-void CLCamDisplay::jump(qint64 time)
+void CLCamDisplay::onBeforeJump(qint64 time, bool makeshot)
+{
+    if (time < 1000000ll * 100000)
+        cl_log.log("before jump to ", time, cl_logWARNING);
+    else
+        cl_log.log("before jump to ", QDateTime::fromMSecsSinceEpoch(time/1000).toString(), cl_logWARNING);
+    m_display[0]->blockTimeValue(time);
+}
+
+void CLCamDisplay::onJumpOccured(qint64 time)
 {
     if (time < 1000000ll * 100000)
         cl_log.log("jump to ", time, cl_logWARNING);

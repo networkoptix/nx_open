@@ -57,7 +57,6 @@ void QnAbstractArchiveReader::jumpTo(qint64 mksec, bool makeshot, qint64 skipTim
     {
         emit beforeJump(mksec, makeshot);
         channeljumpTo(mksec, 0, skipTime);
-        emit jumpOccured(mksec, makeshot);
     }
     m_lastJumpTime = mksec;
 

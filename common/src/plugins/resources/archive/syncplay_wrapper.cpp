@@ -72,7 +72,7 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveReader* reader,
 
     connect(reader, SIGNAL(singleShotModeChanged(bool)), this, SLOT(onSingleShotModeChanged(bool)), Qt::DirectConnection);
     connect(reader, SIGNAL(beforeJump(qint64, bool)), this, SLOT(onBeforeJump(qint64, bool)), Qt::DirectConnection);
-    connect(reader, SIGNAL(jumpOccured(qint64, bool)), this, SLOT(onJumpOccured(qint64, bool)), Qt::DirectConnection);
+    connect(reader, SIGNAL(jumpOccured(qint64)), this, SLOT(onJumpOccured(qint64)), Qt::DirectConnection);
 
     connect(reader, SIGNAL(streamPaused()), this, SLOT(onStreamPaused()), Qt::DirectConnection);
     connect(reader, SIGNAL(streamResumed()), this, SLOT(onStreamResumed()), Qt::DirectConnection);
@@ -163,41 +163,26 @@ void QnArchiveSyncPlayWrapper::onBeforeJump(qint64 mksec, bool makeshot)
     {
         QnSyncPlayArchiveDelegate* syncDelegate = static_cast<QnSyncPlayArchiveDelegate*> (info.reader->getArchiveDelegate());
         syncDelegate->enableSync(false);
-        d->syncCond.wakeAll();
+        if (info.reader != sender() && info.enabled)
+        {
+            syncDelegate->jumpToPreviousFrame(mksec, makeshot);
+        }
     }
+    d->syncCond.wakeAll();
     d->blockJumpSignal = false;
 }
 
-void QnArchiveSyncPlayWrapper::onJumpOccured(qint64 mksec, bool makeshot)
+void QnArchiveSyncPlayWrapper::onJumpOccured(qint64 mksec)
 {
     Q_D(QnArchiveSyncPlayWrapper);
     if (d->blockJumpSignal)
         return;
     d->blockJumpSignal = true;
 
-    /*
-    qint64 skipFramesToTime = 0;
-    foreach(ReaderInfo info, d->readers)
-    {
-        if (info.reader == sender())
-        {
-            skipFramesToTime = info.reader->skipFramesToTime();
-            break;
-        }
-    }
-    */
-
     foreach(ReaderInfo info, d->readers)
     {
         QnSyncPlayArchiveDelegate* syncDelegate = static_cast<QnSyncPlayArchiveDelegate*> (info.reader->getArchiveDelegate());
-        //if (info.reader->isSingleShotMode())
-        //    syncDelegate->enableSync(false);
         syncDelegate->enableSync(info.enabled && !info.reader->isSingleShotMode());
-        if (info.reader != sender() && info.enabled)
-        {
-            //info.reader->setSkipFramesToTime(skipFramesToTime);
-            syncDelegate->jumpToPreviousFrame(mksec, makeshot);
-        }
     }
     d->blockJumpSignal = false;
     d->syncCond.wakeAll();

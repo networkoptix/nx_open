@@ -25,7 +25,7 @@ public slots:
 private slots:
     void onSingleShotModeChanged(bool value);
     void onBeforeJump(qint64 mksec, bool makeshot);
-    void onJumpOccured(qint64 mksec, bool makeshot);
+    void onJumpOccured(qint64 mksec);
     void onStreamPaused();
     void onStreamResumed();
     void onNextPrevFrameOccured();
