@@ -111,11 +111,20 @@ NavigationItem::NavigationItem(QGraphicsItem * /*parent*/) :
     CLUnMovedInteractiveOpacityItem(QString("name:)"), 0, 0.5, 0.95),
     m_camera(0), m_currentTime(0),
     m_playing(false),
-    m_sliderIsmoving(true),
     m_mouseOver(false),
-    m_active(false),
     restoreInfoTextData(0)
 {
+    setFlag(QGraphicsItem::ItemIsMovable, false);
+    setFlag(QGraphicsItem::ItemIsSelectable, false);
+    setFlag(QGraphicsItem::ItemIsFocusable, false);
+    setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
+    setFlag(QGraphicsItem::ItemHasNoContents, true);
+    setFlag(QGraphicsItem::ItemIsPanel, true);
+
+    setAcceptHoverEvents(true);
+
+    setCursor(Qt::ArrowCursor);
+
     m_graphicsWidget = new QGraphicsWidgetKillsWheelEvent(this);
     m_graphicsWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_graphicsWidget->setCursor(Qt::ArrowCursor);
@@ -296,9 +305,6 @@ NavigationItem::NavigationItem(QGraphicsItem * /*parent*/) :
     m_graphicsWidget->addAction(playAction);
 
     setVideoCamera(0);
-
-    setAcceptHoverEvents(true);
-    setCursor(Qt::ArrowCursor);
 }
 
 NavigationItem::~NavigationItem()
@@ -309,17 +315,7 @@ NavigationItem::~NavigationItem()
 
 QRectF NavigationItem::boundingRect() const
 {
-    return m_timeSlider->boundingRect();
-}
-
-bool NavigationItem::isActive() const
-{
-    return m_active;
-}
-
-void NavigationItem::setActive(bool active)
-{
-    m_active = active;
+    return m_graphicsWidget->boundingRect();
 }
 
 void NavigationItem::setVideoCamera(CLVideoCamera *camera)
@@ -393,8 +389,7 @@ void NavigationItem::updateSlider()
             m_currentTime = time/1000;
             m_timeSlider->setCurrentValue(m_currentTime);
         }
-
-        m_liveButton->setVisible(m_timeSlider->isAtEnd());
+        m_liveButton->setVisible(!reader->onPause() && m_camera->getCamCamDisplay()->isRealTimeSource());
     }
 }
 
@@ -403,19 +398,19 @@ void NavigationItem::updatePeriodList() {
     qint64 t = m_timeSlider->viewPortPos() * 1000;
     if(m_timePeriod.startTimeUSec <= t && t + w <= m_timePeriod.startTimeUSec + m_timePeriod.durationUSec)
         return;
-    
+
     QnResourcePtr resource = m_camera->getStreamreader()->getResource();
     if(!resource->checkFlag(QnResource::live))
         return;
 
     /* Cast just to feel safe. */
     QnNetworkResourcePtr networkResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
-    if(networkResource.isNull()) 
+    if(networkResource.isNull())
         return;
 
     QnResourcePtr parentResource = qnResPool->getResourceById(networkResource->getParentId());
     //if(!parentResource->checkFlag(QnResource::server)) // TODO: doesn't work
-    //    return; 
+    //    return;
 
     /* Cast just to feel safe. */
     QnVideoServerPtr serverResource = qSharedPointerDynamicCast<QnVideoServer>(parentResource);
@@ -425,14 +420,14 @@ void NavigationItem::updatePeriodList() {
     QnVideoServerConnectionPtr connection = serverResource->apiConnection();
     if(connection.isNull())
         return;
-    
+
     const qint64 oneHour = 60ll * 60ll * 1000ll * 1000ll;
     if(w < oneHour)
         w = oneHour;
 
     QnNetworkResourceList resources;
     resources.push_back(networkResource); // TODO
-    
+
     m_timePeriod.startTimeUSec = t - w;
     m_timePeriod.durationUSec = w * 3;
 
@@ -458,7 +453,7 @@ void NavigationItem::onValueChanged(qint64 time)
     updatePeriodList();
 }
 
-void NavigationItem::smartSeek(qint64 timeMSec) 
+void NavigationItem::smartSeek(qint64 timeMSec)
 {
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     if(m_timeSlider->isAtEnd()) {
@@ -484,6 +479,7 @@ void NavigationItem::pause()
 
     reader->pause();
     m_camera->getCamCamDisplay()->pauseAudio();
+    m_liveButton->hide();
 
     reader->setSingleShotMode(true);
     //m_camera->getCamCamDisplay()->setSingleShotMode(true);
@@ -494,17 +490,15 @@ void NavigationItem::play()
     setActive(true);
 
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
-    if (reader->onPause() && reader->isRealTimeSource())
-    {
+    if (reader->onPause() && reader->isRealTimeSource()) {
         reader->resumeMedia();
-
-        smartSeek(m_camera->getCamCamDisplay()->currentTime() / 1000);
+        reader->jumpToPreviousFrame(m_camera->getCamCamDisplay()->currentTime(), true);
     }
     else {
-      reader->resumeMedia();
+        reader->resumeMedia();
     }
 
-    if (m_graphicsWidget->isSelected() || !m_playing)
+    if (!m_playing)
         m_camera->getCamCamDisplay()->playAudio(m_playing);
 }
 
@@ -598,14 +592,12 @@ void NavigationItem::onSliderPressed()
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     reader->setSingleShotMode(true);
     m_camera->getCamCamDisplay()->playAudio(false);
-    m_sliderIsmoving = true;
     setActive(true);
 }
 
 void NavigationItem::onSliderReleased()
 {
     setActive(true);
-    m_sliderIsmoving = false;
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     smartSeek(m_timeSlider->currentValue());
     if (isPlaying())
@@ -613,7 +605,6 @@ void NavigationItem::onSliderReleased()
         reader->setSingleShotMode(false);
         m_camera->getCamCamDisplay()->playAudio(true);
     }
-
 }
 
 void NavigationItem::onSpeedChanged(float newSpeed)

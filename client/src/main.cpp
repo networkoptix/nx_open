@@ -219,10 +219,14 @@ int main(int argc, char *argv[])
     //===========================================================================
     //IPPH264Decoder::dll.init();
 
+
+    // ### local (aka "dummy") video server resource
+    qnResPool->addResource(QnResourcePtr(new QnLocalVideoServer));
+
+
     CLVideoDecoderFactory::setCodecManufacture(CLVideoDecoderFactory::FFMPEG);
 
     QnServerCameraProcessor serverCameraProcessor;
-
     QnResourceDiscoveryManager::instance().addResourceProcessor(&serverCameraProcessor);
 
     //============================

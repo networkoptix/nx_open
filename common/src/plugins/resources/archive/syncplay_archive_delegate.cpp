@@ -101,7 +101,20 @@ QnAbstractMediaDataPtr QnSyncPlayArchiveDelegate::getNextData()
         mediaData = qSharedPointerDynamicCast<QnAbstractMediaData>(readedData);
     } while (m_seekTime != AV_NOPTS_VALUE && mediaData && !(mediaData->flags & QnAbstractMediaData::MediaFlags_BOF));
     */
+
+    // reduce delay for single video
+    if (m_tmpData && (m_tmpData->flags & QnAbstractMediaData::MediaFlags_LIVE)) 
+    {
+        QnAbstractMediaDataPtr result = m_tmpData;
+        m_tmpData.clear();
+        return result;
+    }
+
     QnAbstractMediaDataPtr readedData = m_ownerDelegate->getNextData();
+    if (!m_tmpData && readedData && (readedData->flags & QnAbstractMediaData::MediaFlags_LIVE)) 
+    {
+        return readedData;
+    }
 
     {
         QMutexLocker lock(&m_genericMutex);

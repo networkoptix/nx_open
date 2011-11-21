@@ -92,9 +92,9 @@ void VolumeSlider::setToolTipItem(ToolTipItem *toolTip)
     }
 }
 
+#if 0
 void VolumeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    GraphicsSlider::paint(painter, option, widget); return;
     Q_UNUSED(option)
     Q_UNUSED(widget)
 
@@ -144,6 +144,7 @@ void VolumeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     painter->setBrush(linearGrad);
     painter->drawRect(r);
 }
+#endif
 
 void VolumeSlider::timerEvent(QTimerEvent *event)
 {

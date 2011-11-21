@@ -1,5 +1,7 @@
 #include "context_menu_helper.h"
 
+#include "ui/skin.h"
+
 QAction cm_exit(QObject::tr("Exit"), 0);
 QAction cm_fitinview(QObject::tr("Fit in View"), 0);
 QAction cm_start_video_recording(QObject::tr("Start/Stop Recording"), 0);
@@ -50,6 +52,10 @@ QAction cm_open_containing_folder(QObject::tr("Open in containing folder..."), 0
 
 void initContextMenu()
 {
+    cm_exit.setIcon(Skin::icon(QLatin1String("decorations/exit-application.png")));
+    cm_toggle_fullscreen.setIcon(Skin::icon(QLatin1String("decorations/togglefullscreen.png")));
+    cm_preferences.setIcon(Skin::icon(QLatin1String("decorations/settings.png")));
+
     dis_0.setData(0.0);
     dis_5.setData(0.05);
     dis_10.setData(0.10);

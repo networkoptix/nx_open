@@ -1,6 +1,8 @@
 #ifndef context_menu_helper_h_1250
 #define context_menu_helper_h_1250
 
+#include <QtGui/QAction>
+
 void initContextMenu();
 
 extern QAction cm_exit;

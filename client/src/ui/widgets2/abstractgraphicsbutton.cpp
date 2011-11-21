@@ -1,18 +1,19 @@
 #include "abstractgraphicsbutton.h"
 #include "abstractgraphicsbutton_p.h"
 
-#include "qabstractbutton.h"
-#include "qabstractitemview.h"
-#include "qevent.h"
-#include "qpainter.h"
-#include "qapplication.h"
-#include "qstyle.h"
-#include "qaction.h"
-#include <QPointer>
-#include <QGraphicsSceneMouseEvent>
+#include <QtCore/QEvent>
+#include <QtCore/QPointer>
+
+#include <QtGui/QAbstractButton>
+#include <QtGui/QAbstractItemView>
 #ifndef QT_NO_ACCESSIBILITY
-#include "qaccessible.h"
+#  include <QtGui/QAccessible>
 #endif
+#include <QtGui/QAction>
+#include <QtGui/QApplication>
+#include <QtGui/QGraphicsSceneEvent>
+#include <QtGui/QPainter>
+#include <QtGui/QStyle>
 
 #define AUTO_REPEAT_DELAY  300
 #define AUTO_REPEAT_INTERVAL 100
@@ -793,7 +794,6 @@ bool AbstractGraphicsButton::autoRepeat() const
 
     \sa autoRepeat, autoRepeatInterval
 */
-
 void AbstractGraphicsButton::setAutoRepeatDelay(int autoRepeatDelay)
 {
     Q_D(AbstractGraphicsButton);
@@ -816,7 +816,6 @@ int AbstractGraphicsButton::autoRepeatDelay() const
 
     \sa autoRepeat, autoRepeatDelay
 */
-
 void AbstractGraphicsButton::setAutoRepeatInterval(int autoRepeatInterval)
 {
     Q_D(AbstractGraphicsButton);
@@ -828,8 +827,6 @@ int AbstractGraphicsButton::autoRepeatInterval() const
     Q_D(const AbstractGraphicsButton);
     return d->autoRepeatInterval;
 }
-
-
 
 /*!
     \property AbstractGraphicsButton::autoExclusive
@@ -877,18 +874,17 @@ GraphicsButtonGroup *AbstractGraphicsButton::group() const
 #endif // QT_NO_GRAPHICSBUTTONGROUP
 
 /*!
-Performs an animated click: the button is pressed immediately, and
-released \a msec milliseconds later (the default is 100 ms).
+    Performs an animated click: the button is pressed immediately, and
+    released \a msec milliseconds later (the default is 100 ms).
 
-Calling this function again before the button was released will reset
-the release timer.
+    Calling this function again before the button was released will reset
+    the release timer.
 
-All signals associated with a click are emitted as appropriate.
+    All signals associated with a click are emitted as appropriate.
 
-This function does nothing if the button is \link setEnabled()
-disabled. \endlink
+    This function does nothing if the button is \link setEnabled() disabled. \endlink
 
-\sa click()
+    \sa click()
 */
 void AbstractGraphicsButton::animateClick(int msec)
 {
@@ -906,17 +902,15 @@ void AbstractGraphicsButton::animateClick(int msec)
 }
 
 /*!
-Performs a click.
+    Performs a click.
 
-All the usual signals associated with a click are emitted as
-appropriate. If the button is checkable, the state of the button is
-toggled.
+    All the usual signals associated with a click are emitted as appropriate.
+    If the button is checkable, the state of the button is toggled.
 
-This function does nothing if the button is \link setEnabled()
-disabled. \endlink
+    This function does nothing if the button is \link setEnabled() disabled. \endlink
 
-\sa animateClick()
- */
+    \sa animateClick()
+*/
 void AbstractGraphicsButton::click()
 {
     if (!isEnabled())
@@ -1035,7 +1029,9 @@ bool AbstractGraphicsButton::event(QEvent *e)
     return GraphicsWidget::event(e);
 }
 
-/*! \reimp */
+/*!
+    \reimp
+*/
 void AbstractGraphicsButton::mousePressEvent(QGraphicsSceneMouseEvent * e)
 {
     Q_D(AbstractGraphicsButton);
@@ -1055,7 +1051,9 @@ void AbstractGraphicsButton::mousePressEvent(QGraphicsSceneMouseEvent * e)
     }
 }
 
-/*! \reimp */
+/*!
+    \reimp
+*/
 void AbstractGraphicsButton::mouseReleaseEvent(QGraphicsSceneMouseEvent *e)
 {
     Q_D(AbstractGraphicsButton);
@@ -1081,7 +1079,9 @@ void AbstractGraphicsButton::mouseReleaseEvent(QGraphicsSceneMouseEvent *e)
     }
 }
 
-/*! \reimp */
+/*!
+    \reimp
+*/
 void AbstractGraphicsButton::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
 {
     Q_D(AbstractGraphicsButton);
@@ -1104,7 +1104,9 @@ void AbstractGraphicsButton::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
     }
 }
 
-/*! \reimp */
+/*!
+    \reimp
+*/
 void AbstractGraphicsButton::keyPressEvent(QKeyEvent *e)
 {
     Q_D(AbstractGraphicsButton);
