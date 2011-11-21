@@ -137,6 +137,9 @@ QImage CLCamDisplay::getScreenshot(int channel)
 
 void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 {
+//    cl_log.log("queueSize=", m_dataQueue.size(), cl_logALWAYS);
+//    cl_log.log(QDateTime::fromMSecsSinceEpoch(vd->timestamp/1000).toString("hh.mm.ss.zzz"), cl_logALWAYS);
+
     // simple data provider/streamer/streamreader has the same delay, but who cares ?
     // to avoid cpu usage in case of a lot data in queue(zoomed out on the scene, lets add same delays here )
     quint64 currentTime = vd->timestamp;

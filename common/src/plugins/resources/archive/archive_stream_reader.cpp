@@ -1,6 +1,7 @@
 #include "archive_stream_reader.h"
 #include "stdint.h"
 #include "utils/media/frame_info.h"
+#include "avi_files/avi_archive_delegate.h"
 
 
 // used in reverse mode.
@@ -336,7 +337,7 @@ begin_label:
         // -------------------------------------------
         // workaround ffmpeg bugged seek
         // todo: move it code to AVI delegate
-        if (videoData->channelNumber == 0) 
+        if (videoData->channelNumber == 0 && dynamic_cast<QnAviArchiveDelegate*>(m_delegate))
         {
             if (m_lastUIJumpTime != AV_NOPTS_VALUE)
             {
