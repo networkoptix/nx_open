@@ -21,12 +21,12 @@ QnResourcePool *QnResourcePool::instance()
 
 void QnResourcePool::addResources(const QnResourceList &resources)
 {
-    QnResourceList newResources;
+    ResourceMap newResources; // sort by id
 
     foreach (QnResourcePtr resource, resources)
     {
         if (!resource->getId().isValid())
-        if (!resource->checkFlag(QnResource::server | QnResource::local)) // ### hack. remove?
+        if (!resource->checkFlag(QnResource::server | QnResource::local)) // ### hack - the LocalServer is a fake (invalid) resource
             resource->setId(QnId::generateSpecialId());
     }
 
@@ -38,12 +38,12 @@ void QnResourcePool::addResources(const QnResourceList &resources)
             if (!m_resources.contains(resId))
             {
                 m_resources.insert(resId, resource);
-                newResources.append(resource);
+                newResources.insert(resId, resource);
             }
         }
     }
 
-    foreach (QnResourcePtr resource, newResources)
+    foreach (QnResourcePtr resource, newResources.values())
         Q_EMIT resourceAdded(resource);
 }
 

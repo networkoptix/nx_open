@@ -48,7 +48,14 @@ void ResourceModel::addResource(QnResourcePtr resource)
         parentId = 0;
     else if (resource->checkFlag(QnResource::remote))
         parentId = resource->getParentId().hash();
-    if (QStandardItem *root = itemFromResourceId(parentId))
+    if (resource->checkFlag(QnResource::server))
+    {
+        QStandardItem *root = new QStandardItem(QIcon(), resource->getName());
+        root->setData(resource->getId().hash());
+        root->setEditable(false);
+        appendRow(root);
+    }
+    else if (QStandardItem *root = itemFromResourceId(parentId))
     {
         QStandardItem *child = new QStandardItem(QIcon(), resource->getName());
         child->setData(resource->getId().hash());
