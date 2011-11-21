@@ -184,6 +184,7 @@ public:
 
     void setLayer(QGraphicsItem *item, Layer layer);
 
+    void setLayer(const QList<QGraphicsItem *> &items, Layer layer);
 
     void synchronize(QnWorkbenchItem *item, bool animate = true);
     

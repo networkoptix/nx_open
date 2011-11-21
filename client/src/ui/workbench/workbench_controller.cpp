@@ -222,10 +222,9 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget
 void QnWorkbenchController::at_draggingStarted(QGraphicsView *, QList<QGraphicsItem *> items) {
     qDebug("DRAGGING STARTED");
 
-    foreach(QGraphicsItem *item, items) {
-        m_synchronizer->bringToFront(item);
-        m_synchronizer->setLayer(item, QnWorkbenchManager::FRONT_LAYER);
-    }
+    /* Bring to front preserving relative order. */
+    m_synchronizer->bringToFront(items);
+    m_synchronizer->setLayer(items, QnWorkbenchManager::FRONT_LAYER);
 }
 
 void QnWorkbenchController::at_draggingFinished(QGraphicsView *view, QList<QGraphicsItem *> items) {

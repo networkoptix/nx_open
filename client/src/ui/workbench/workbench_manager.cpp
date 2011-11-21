@@ -340,6 +340,11 @@ void QnWorkbenchManager::setLayer(QGraphicsItem *item, Layer layer) {
     item->setZValue(layer * layerZSize + fmod(item->zValue(), layerZSize));
 }
 
+void QnWorkbenchManager::setLayer(const QList<QGraphicsItem *> &items, Layer layer) {
+    foreach(QGraphicsItem *item, items)
+        setLayer(item, layer);
+}
+
 QnWidgetAnimator *QnWorkbenchManager::animator(QnDisplayWidget *widget) {
     ItemProperties &properties = m_propertiesByItem[widget];
     if(properties.animator != NULL)
