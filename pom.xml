@@ -23,6 +23,9 @@
 		<module>server</module>
 		<module>client</module>
     </modules>
+	<build>
+		<defaultGoal>package</defaultGoal>
+	</build>
 	<profiles>
 		<profile>
 			<id>windows</id>
