@@ -3,31 +3,26 @@
 #include <limits>
 #include <utils/common/scene_utility.h>
 #include <utils/common/warnings.h>
+#include <utils/common/checked_cast.h>
 #include "setter_animation.h"
 
 namespace {
     class ViewportPositionSetter {
     public:
-        ViewportPositionSetter(QGraphicsView *view): m_view(view) {}
-
-        void operator()(const QVariant &value) const {
-            QnSceneUtility::moveViewportTo(m_view, value.toPointF());
+        void operator()(QObject *view, const QVariant &value) const {
+            QnSceneUtility::moveViewportTo(checked_cast<QGraphicsView *>(view), value.toPointF());
         }
-
-    private:
-        QGraphicsView *m_view;
     };
 
     class ViewportScaleSetter {
     public:
-        ViewportScaleSetter(QGraphicsView *view, Qt::AspectRatioMode mode): m_view(view), m_mode(mode) {}
+        ViewportScaleSetter(Qt::AspectRatioMode mode): m_mode(mode) {}
 
-        void operator()(const QVariant &value) const {
-            QnSceneUtility::scaleViewportTo(m_view, value.toSizeF(), m_mode);
+        void operator()(QObject *view, const QVariant &value) const {
+            QnSceneUtility::scaleViewportTo(checked_cast<QGraphicsView *>(view), value.toSizeF(), m_mode);
         }
 
     private:
-        QGraphicsView *m_view;
         Qt::AspectRatioMode m_mode;
     };
 
@@ -69,10 +64,12 @@ void QnViewportAnimator::setView(QGraphicsView *view) {
         connect(m_view, SIGNAL(destroyed()), this, SLOT(at_view_destroyed()));
 
         m_scaleAnimation = new SetterAnimation(this);
-        m_scaleAnimation->setSetter(ViewportScaleSetter(view, Qt::KeepAspectRatioByExpanding));
+        m_scaleAnimation->setSetter(newSetter(ViewportScaleSetter(Qt::KeepAspectRatioByExpanding)));
+        m_scaleAnimation->setTargetObject(view);
 
         m_positionAnimation = new SetterAnimation(this);
-        m_positionAnimation->setSetter(ViewportPositionSetter(view));
+        m_positionAnimation->setSetter(newSetter(ViewportPositionSetter()));
+        m_positionAnimation->setTargetObject(view);
 
         m_animationGroup->addAnimation(m_scaleAnimation);
         m_animationGroup->addAnimation(m_positionAnimation);
