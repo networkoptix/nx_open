@@ -16,6 +16,7 @@ public:
 private:
     void processPostponedFiles();
     void postponeFile(const QString& fileName);
+    bool internalDeleteFile(const QString& fileName);
 private:
     mutable QMutex m_mutex;
     QString m_mediaRoot;
