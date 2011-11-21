@@ -108,8 +108,11 @@ void QnResourceDiscoveryManager::run()
     {
         gotResourceTypes = getResourceTypes();
 
-        int global_delay_between_search = 1000;
-        smartSleep(global_delay_between_search);
+        if (!gotResourceTypes)
+        {
+            int global_delay_between_search = 1000;
+            smartSleep(global_delay_between_search);
+        }
     }
 
 	while(!needToStop())

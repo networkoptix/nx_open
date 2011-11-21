@@ -34,7 +34,7 @@
 #include "core/resource/video_server.h"
 #include "core/resource/qnstorage.h"
 
-
+#include <xercesc/util/PlatformUtils.hpp>
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -144,6 +144,8 @@ void addTestData()
 #ifndef API_TEST_MAIN
 int main(int argc, char *argv[])
 {
+    xercesc::XMLPlatformUtils::Initialize ();
+
 #ifdef Q_OS_WIN
     AllowSetForegroundWindow(ASFW_ANY);
 #endif
@@ -327,6 +329,8 @@ int main(int argc, char *argv[])
 
     QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance().stop();
+
+    xercesc::XMLPlatformUtils::Terminate();
 
     return result;
 }

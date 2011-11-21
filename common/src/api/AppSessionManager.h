@@ -25,6 +25,9 @@ public:
 
 private:
     int addObject(const QString& objectName, const QByteArray& body, QByteArray& response);
+
+private:
+    static const unsigned long XSD_FLAGS = xml_schema::flags::dont_initialize | xml_schema::flags::dont_validate;
 };
 
 #endif // _APP_SESSION_MANAGER_H
