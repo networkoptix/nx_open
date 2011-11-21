@@ -14,7 +14,7 @@
 			<xs:element name="url" type="xs:string"/>
 			<xs:element name="typeId" type="xs:string"/>
 			<xs:element name="parentId" type="xs:string" minOccurs="0"/>
-			<xs:element name="spaceLimit" type="xs:int"/>
+			<xs:element name="spaceLimit" type="xs:long"/>
 			<xs:element name="time" type="xs:int"/>
 			<xs:element name="index" type="xs:short"/>
 		</xs:all>
