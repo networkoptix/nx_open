@@ -343,7 +343,6 @@ void NavigationItem::setVideoCamera(CLVideoCamera *camera)
         QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
 
         connect(m_camera->getCamCamDisplay(), SIGNAL(liveMode(bool)), this, SLOT(onLiveModeChanged(bool)));
-        connect(m_camera->getStreamreader(), SIGNAL(jumpOccured(qint64, bool)), this, SLOT(jumpOccured(qint64)));
 
         setPlaying(!reader->onPause());
     }
