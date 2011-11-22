@@ -2,6 +2,13 @@
 
 #include "SessionManager.h"
 
+void detail::SessionManagerReplyForwarder::at_replyReceived(QNetworkReply *reply) {
+    QScopedPointer<QNetworkReply> guard(reply);
+
+    emit finished(reply->error(), reply->readAll());
+}
+
+
 SessionManager::SessionManager(const QHostAddress& host, quint16 port, const QAuthenticator& auth)
     : m_httpClient(host, port, auth)
 {
@@ -12,12 +19,12 @@ SessionManager::~SessionManager()
 {
 }
 
-int SessionManager::sendGetRequest(QString objectName, QByteArray& reply)
+int SessionManager::sendGetRequest(const QString &objectName, QByteArray& reply)
 {
     return sendGetRequest(objectName, QnRequestParamList(), reply);
 }
 
-int SessionManager::sendGetRequest(QString objectName, QnRequestParamList params, QByteArray& reply)
+int SessionManager::sendGetRequest(const QString &objectName, const QnRequestParamList &params, QByteArray& reply)
 {
     m_lastError.clear();
 
@@ -33,13 +40,18 @@ int SessionManager::sendGetRequest(QString objectName, QnRequestParamList params
     }
 
     QString dd = url.toString();
-    QTextStream stream(&reply);
+    QBuffer buffer(&reply);
 
-    int status = m_httpClient.syncGet(QByteArray("api/") + url.toEncoded(), stream.device());
+    int status = m_httpClient.syncGet(QByteArray("api/") + url.toEncoded(), &buffer);
     if (status != 0)
         m_lastError = formatNetworkError(status) + reply;
 
     return status;
+}
+
+void SessionManager::sendGetRequest(const QString &objectName, const QnRequestParamList &params, QObject *target, const char *slot)
+{
+
 }
 
 void SessionManager::setAddEndShash(bool value)
