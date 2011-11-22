@@ -19,6 +19,7 @@
 #include "ui/skin.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "utils/common/util.h"
+#include "utils/common/warnings.h"
 
 static const int SLIDER_NOW_AREA_WIDTH = 30;
 
@@ -443,7 +444,6 @@ void NavigationItem::onValueChanged(qint64 time)
     if (m_camera == 0)
         return;
 
-
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     if (reader->isSkippingFrames())
         return;
@@ -589,6 +589,12 @@ void NavigationItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *e)
 
 void NavigationItem::onSliderPressed()
 {
+    if(m_camera == NULL) {
+        qnWarning("Camera is NULL, something is wrong.");
+        return;
+    }
+        
+
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     reader->setSingleShotMode(true);
     m_camera->getCamCamDisplay()->playAudio(false);
@@ -597,6 +603,11 @@ void NavigationItem::onSliderPressed()
 
 void NavigationItem::onSliderReleased()
 {
+    if(m_camera == NULL) {
+        qnWarning("Camera is NULL, something is wrong.");
+        return;
+    }
+
     setActive(true);
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     smartSeek(m_timeSlider->currentValue());

@@ -506,7 +506,7 @@ bool SceneLayout::addDevice(QnResourcePtr device, bool update_scene_rect, CLBasi
 		cam->setQuality(QnQualityLow, true);
 		cam->startDispay();
 
-        m_view->deviceAdded(device);
+        m_view->deviceAdded(device, video_wnd);
 		return true;
 	}
 
@@ -536,7 +536,7 @@ bool SceneLayout::addDevice(QnResourcePtr device, bool update_scene_rect, CLBasi
 		m_deviceitems.push_back(recd);
 		recd->start();
 
-        m_view->deviceAdded(device);
+        m_view->deviceAdded(device, NULL);
 		return true;
 	}
 

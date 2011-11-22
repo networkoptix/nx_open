@@ -28,6 +28,8 @@ public:
 
     void setVideoCamera(CLVideoCamera* camera);
 
+    CLVideoCamera *videoCamera() const { return m_camera; }
+
     void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) {}
     QRectF boundingRect() const;
 
