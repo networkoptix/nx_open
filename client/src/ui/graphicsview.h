@@ -90,7 +90,7 @@ public:
 
     NavigationItem *getNavigationItem();
 
-    void deviceAdded(const QnResourcePtr &device);
+    void deviceAdded(const QnResourcePtr &device, CLVideoWindowItem *item);
 
 signals:
     void scneZoomFinished();
