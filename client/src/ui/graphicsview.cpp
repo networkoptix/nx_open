@@ -2690,7 +2690,9 @@ void GraphicsView::onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int de
     if (!m_camLayout.getContent()->checkIntereactionFlag(LayoutContent::ItemSelectable))
         return;
 
-    CLVideoCamera *lastVideoCamera = m_navigationItem->videoCamera();
+    CLVideoCamera *lastVideoCamera = 0;
+    if (m_navigationItem)
+        lastVideoCamera = m_navigationItem->videoCamera();
 
     setZeroSelection(delay, true);
 
