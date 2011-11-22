@@ -86,7 +86,8 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_playingBitrate(0),
       m_tooSlowCounter(0),
       m_lightCpuMode(QnAbstractVideoDecoder::DecodeMode_Full),
-      m_lastFrameDisplayed(CLVideoStreamDisplay::Status_Displayed)
+      m_lastFrameDisplayed(CLVideoStreamDisplay::Status_Displayed),
+      m_realTimeHurryUp(0)
 {
     m_storedMaxQueueSize = m_dataQueue.maxSize();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
@@ -153,6 +154,14 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
     // but timer on the sender side runs at a bit different rate in comparison to the timer here
     // adaptive delay will not solve all problems => need to minus little appendix based on queue size
     qint32 needToSleep;
+
+    /*
+    if (vd->flags & QnAbstractMediaData::MediaFlags_LIVE)
+    {
+        needToSleep = vd->timestamp - QDateTime::currentDateTime().toMSecsSinceEpoch()*1000;
+    }
+    else 
+    */
     if (vd->flags & AV_REVERSE_BLOCK_START)
         needToSleep = m_lastSleepInterval;
     else {
@@ -161,8 +170,25 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
     if (m_isRealTimeSource)
     {
-        if (m_dataQueue.size() > 0)
-            needToSleep /= 2*m_dataQueue.size();
+        //sleep = false;
+        
+        if (m_dataQueue.size() > 0) {
+            sleep = false;
+            m_realTimeHurryUp = 5;
+        }
+        else if (m_realTimeHurryUp)
+        {
+            m_realTimeHurryUp--;
+            if (m_realTimeHurryUp)
+                sleep = false;
+            else {
+                m_delay.afterdelay();
+                m_delay.addQuant(-needToSleep);
+                m_realTimeHurryUp = false;
+            }
+        }
+        
+       
         /*
         needToSleep -= (m_dataQueue.size()) * 2 * 1000;
         if (needToSleep > MAX_VALID_SLEEP_LIVE_TIME)
@@ -183,6 +209,7 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
     if (sleep && m_lastFrameDisplayed != CLVideoStreamDisplay::Status_Buffered)
     {
         int realSleepTime = m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed ? m_delay.sleep(needToSleep, needToSleep*qAbs(speed)*2) : m_delay.addQuant(needToSleep);
+        //cl_log.log("real sleepTime=", realSleepTime, cl_logALWAYS);
         //str << "sleep time: " << needToSleep << "  real:" << realSleepTime;
         if (qAbs(speed) > 1.0 + FPS_EPS)
         {
@@ -676,6 +703,7 @@ void CLCamDisplay::setMTDecoding(bool value)
     }
     if (value)
         setSpeed(m_speed); // decoder now faster. reinit speed statistics
+    m_realTimeHurryUp = 5;
 }
 
 void CLCamDisplay::onRealTimeStreamHint(bool value)

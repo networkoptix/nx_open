@@ -8,7 +8,7 @@
 #include "camera/camera_pool.h"
 #include "utils/common/sleep.h"
 
-static const int MAX_QUEUE_SIZE = 60;
+static const int MAX_QUEUE_SIZE = 15;
 //static const QString RTP_FFMPEG_GENERIC_STR("mpeg4-generic"); // this line for debugging purpose with VLC player
 
 static const int MAX_RTSP_WRITE_BUFFER = 1024*1024;

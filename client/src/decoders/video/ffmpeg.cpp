@@ -105,7 +105,11 @@ void CLFFmpegVideoDecoder::closeDecoder()
 
 void CLFFmpegVideoDecoder::determineOptimalThreadType(const QnCompressedVideoDataPtr data)
 {
-    m_context->thread_count = qMin(4, QThread::idealThreadCount() + 1);
+    if (m_context->thread_count == 1) {
+        m_context->thread_count = qMin(4, QThread::idealThreadCount() + 1);
+        if (data && (data->flags & QnAbstractMediaData::MediaFlags_LIVE))
+            m_context->thread_count = qMin(2, m_context->thread_count); // reduce live delay
+    }
     if (m_forceSliceDecoding == -1 && data && data->data.data() && m_context->codec_id == CODEC_ID_H264) 
     {
         m_forceSliceDecoding = 0;
@@ -176,7 +180,7 @@ void CLFFmpegVideoDecoder::openDecoder(const QnCompressedVideoDataPtr data)
 
     determineOptimalThreadType(data);
 
-    m_checkH264ResolutionChange = m_mtDecoding && m_context->codec_id == CODEC_ID_H264 && m_context->extradata_size && m_context->extradata[0] == 0; 
+    m_checkH264ResolutionChange = m_mtDecoding && m_context->codec_id == CODEC_ID_H264 && (!m_context->extradata_size || m_context->extradata[0] == 0);
 
 
     cl_log.log(QLatin1String("Creating ") + QLatin1String(m_mtDecoding ? "FRAME threaded decoder" : "SLICE threaded decoder"), cl_logALWAYS);
@@ -224,7 +228,7 @@ void CLFFmpegVideoDecoder::resetDecoder()
     //m_context->thread_count = qMin(5, QThread::idealThreadCount() + 1);
     //m_context->thread_type = m_mtDecoding ? FF_THREAD_FRAME : FF_THREAD_SLICE;
     // ensure that it is H.264 with nal prefixes
-    m_checkH264ResolutionChange = m_mtDecoding && m_context->codec_id == CODEC_ID_H264 && m_context->extradata_size && m_context->extradata[0] == 0; 
+    m_checkH264ResolutionChange = m_mtDecoding && m_context->codec_id == CODEC_ID_H264 && (!m_context->extradata_size || m_context->extradata[0] == 0); 
     avcodec_open(m_context, m_codec);
     //m_context->debug |= FF_DEBUG_THREADS;
     //m_context->flags2 |= CODEC_FLAG2_FAST;
@@ -333,8 +337,8 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, CLVideoDe
     // -------------------------
     Q_ASSERT(m_context->codec);
     avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
-    if (data->useTwice)
-        avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
+    //if (data->useTwice)
+    //    avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
 
     AVFrame* copyFromFrame = m_frame;
 

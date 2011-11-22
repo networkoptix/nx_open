@@ -582,6 +582,8 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
     
     outFrame->sample_aspect_ratio = dec->getSampleAspectRatio();
 
+    //cl_log.log(QDateTime::fromMSecsSinceEpoch(data->timestamp/1000).toString("hh.mm.ss.zzz"), cl_logALWAYS);
+
     if (processDecodedFrame(dec, outFrame, enableFrameQueue, reverseMode))
         return Status_Displayed;
     else
