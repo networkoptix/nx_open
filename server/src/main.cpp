@@ -22,6 +22,8 @@
 #include "core/resource/video_server.h"
 #include <signal.h>
 
+#include <xercesc/util/PlatformUtils.hpp>
+
 //#include "device_plugins/arecontvision/devices/av_device_server.h"
 
 //#define TEST_RTSP_SERVER
@@ -125,6 +127,8 @@ BOOL WINAPI stopServer_WIN(DWORD dwCtrlType)
 #ifndef API_TEST_MAIN
 int main(int argc, char *argv[])
 {
+    xercesc::XMLPlatformUtils::Initialize ();
+
 #ifdef WIN32
     SetConsoleCtrlHandler(stopServer_WIN, true);
 #endif    
@@ -293,6 +297,8 @@ int main(int argc, char *argv[])
     int result = application.exec();
     
     stopServer(0);
+
+    xercesc::XMLPlatformUtils::Terminate ();
 
     return result;
 }

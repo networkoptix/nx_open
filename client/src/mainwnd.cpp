@@ -6,10 +6,15 @@
 #include <ui/layout_navigator.h>
 #include <ui/video_cam_layout/layout_manager.h>
 #include <ui/video_cam_layout/start_screen_content.h>
+#include <QtGui/QDockWidget>
+#include <QtGui/QTabWidget>
+#include <QtGui/QToolBar>
+
+#include "ui/context_menu_helper.h"
+#include "ui/navigationtreewidget.h"
 
 #include <ui/graphics/view/graphics_view.h>
 #include <ui/graphics/view/blue_background_painter.h>
-
 #include <ui/graphics/instruments/archivedropinstrument.h>
 
 #include <ui/workbench/workbench.h>
@@ -17,10 +22,8 @@
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_manager.h>
-
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
-
 #include "file_processor.h"
 #include "settings.h"
 #include "version.h"
@@ -29,8 +32,8 @@
 MainWnd *MainWnd::s_instance = 0;
 
 MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
-    : QWidget(parent, flags),
-    m_normalView(0)
+    : QMainWindow(parent, flags),
+      m_normalView(0)
 {
     if(s_instance != NULL)
         qnWarning("Several instances of main window created, expect problems.");
@@ -112,8 +115,37 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     //m_normalView->setMode(NORMAL_ViewMode);
     //m_normalView->getView().setViewMode(GraphicsView::NormalView);
     */
+    QTabWidget *tabWidget = new QTabWidget(this);
+    tabWidget->addTab(&m_normalView->getView(), QIcon(), tr("Scene"));
+    tabWidget->addTab(new QWidget(tabWidget), QIcon(), tr("Grid/Properies"));
+    // Can't set 0,0,0,0 on Windows as in fullScreen mode context menu becomes invisible
+    // QT bug: http://bugreports.qt.nokia.com/browse/QTBUG-7556
+    tabWidget->setContentsMargins(0, 1, 0, 0);
+    tabWidget->setContentsMargins(0, 0, 0, 0);
+    setCentralWidget(tabWidget);
 
 #if 0
+
+    // dock widgets
+    NavigationTreeWidget *navigationWidget = new NavigationTreeWidget(tabWidget);
+
+    connect(navigationWidget, SIGNAL(activated(uint)), this, SLOT(itemActivated(uint)));
+
+    QDockWidget *navigationDock = new QDockWidget(tr("Navigation"), this);
+    navigationDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    navigationDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
+    navigationDock->setWidget(navigationWidget);
+    addDockWidget(Qt::LeftDockWidgetArea, navigationDock);
+
+
+    // toolbars
+    QToolBar *toolBar = new QToolBar(this);
+    toolBar->addAction(&cm_exit);
+    toolBar->addAction(&cm_toggle_fullscreen);
+    toolBar->addAction(&cm_preferences);
+    addToolBar(Qt::TopToolBarArea, toolBar);
+
+
     if (!files.isEmpty())
         show();
     else
@@ -124,6 +156,20 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
 MainWnd::~MainWnd()
 {
     destroyNavigator(m_normalView);
+}
+
+void MainWnd::itemActivated(uint resourceId)
+{
+    // ### rewrite from scratch ;)
+    QnResourcePtr resource = qnResPool->getResourceById(QnId(QString::number(resourceId)));
+    if (resource && resource->checkFlag(QnResource::url))
+    {
+        const QString file = resource->getUrl();
+
+        m_normalView->getView().getCamLayOut().addDevice(file, true);
+        m_normalView->getView().getCamLayOut().getContent()->addDevice(file);
+        m_normalView->getView().fitInView(600, 100, SLOW_START_SLOW_END);
+    }
 }
 
 void MainWnd::addFilesToCurrentOrNewLayout(const QStringList& files, bool forceNewLayout)
@@ -178,7 +224,7 @@ void MainWnd::handleMessage(const QString& message)
 
 void MainWnd::closeEvent(QCloseEvent *e)
 {
-    QWidget::closeEvent(e);
+    QMainWindow::closeEvent(e);
 
     destroyNavigator(m_normalView);
 }

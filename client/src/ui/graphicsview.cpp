@@ -33,6 +33,7 @@
 #include "youtube/youtubeuploaddialog.h"
 #include "videorecordersettings.h"
 #include "core/resourcemanagment/resource_pool.h"
+#include "core/resourcemanagment/security_cam_resource.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "plugins/resources/archive/avi_files/avi_dvd_device.h"
 #include "utils/common/rand.h"
@@ -319,7 +320,7 @@ void GraphicsView::stop()
 {
     mViewStarted = false;
     stopAnimation(); // stops animation
-    setZeroSelection();
+    setZeroSelection(0, true);
     closeAllDlg();
 }
 
@@ -375,8 +376,11 @@ qreal GraphicsView::getZoom() const
     return m_scenezoom.getZoom();
 }
 
-void GraphicsView::setZeroSelection(int delay)
+void GraphicsView::setZeroSelection(int delay, bool force)
 {
+    if(!force && m_camLayout.hasLiveCameras())
+        return;
+
     if (m_selectedWnd && m_camLayout.hasSuchItem(m_selectedWnd))
     {
         m_selectedWnd->setItemSelected(false, true,delay);
@@ -2069,6 +2073,21 @@ bool GraphicsView::onUserInput(bool go_unsteady, bool escapeFromintro)
     return false;
 }
 
+void GraphicsView::deviceAdded(const QnResourcePtr &resource, CLVideoWindowItem *item)
+{
+    if (m_navigationItem && qSharedPointerDynamicCast<QnSequrityCamResource>(resource))
+    {
+        m_navigationItem->show(500);
+        m_navigationItem->setVisible(true);
+
+        if(item != NULL) {
+            CLVideoCamera *cam = item->getVideoCam();
+            if(cam != NULL)
+                onNewItemSelected_helper(item, 0);
+        }
+    }
+}
+
 void GraphicsView::goToSteadyMode(bool steady)
 {
     CLUnMovedPixture* bk_item = static_cast<CLUnMovedPixture*>(staticItemByName(QLatin1String("background")));
@@ -2081,7 +2100,7 @@ void GraphicsView::goToSteadyMode(bool steady)
             return;
         }
 
-        foreach(CLAbstractUnmovedItem* item, m_staticItems)
+        foreach (CLAbstractUnmovedItem *item, m_staticItems)
         {
             if (item != bk_item && item->preferNonSteadyMode())
             {
@@ -2090,10 +2109,15 @@ void GraphicsView::goToSteadyMode(bool steady)
             }
         }
 
-        foreach(CLAbstractUnmovedItem* item, m_staticItems)
+        foreach (CLAbstractUnmovedItem *item, m_staticItems)
         {
-            if (item != bk_item)
-                item->hideIfNeeded(500);
+            if (item == bk_item)
+                continue;
+
+            if(item == m_navigationItem.data() && m_camLayout.hasLiveCameras())
+                continue;
+
+            item->hideIfNeeded(500);
         }
 
         if (m_searchItem)
@@ -2475,11 +2499,10 @@ void GraphicsView::updatePageSelector()
 {
     if (m_pageSelector)
     {
-        int viewPoertWidth = viewport()->width();
-        int itemWidth = m_pageSelector->boundingRect().width();
-        int itemHeight = m_pageSelector->boundingRect().height();
+        const QRect viewportRect = viewport()->rect();
+        const QRectF itemRect = m_pageSelector->boundingRect();
 
-        m_pageSelector->setStaticPos(QPoint( (viewPoertWidth -  itemWidth) / 2 , viewport()->height() - itemHeight - 15 ));
+        m_pageSelector->setStaticPos(QPoint((viewportRect.width() - itemRect.width()) / 2, viewportRect.height() - itemRect.height() - 15));
     }
 }
 
@@ -2487,15 +2510,9 @@ NavigationItem *GraphicsView::getNavigationItem()
 {
     if (!m_navigationItem) {
         m_navigationItem = new NavigationItem();
-        m_navigationItem->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
-
-        int lwidth = width();
-        int height = NavigationItem::DEFAULT_HEIGHT;
-
-        QPoint pos (0, viewport()->height() - height);
-        m_navigationItem->setStaticPos(pos);
+        m_navigationItem->setStaticPos(QPoint(0, viewport()->height() - NavigationItem::DEFAULT_HEIGHT));
         m_navigationItem->setVisible(false);
-        m_navigationItem->graphicsWidget()->resize(lwidth, height);
+        m_navigationItem->graphicsWidget()->resize(width(), NavigationItem::DEFAULT_HEIGHT);
         m_navigationItem->setZValue(INT_MAX);
         scene()->addItem(m_navigationItem);
 
@@ -2565,19 +2582,18 @@ void GraphicsView::resizeEvent(QResizeEvent *event)
         return;
 
     if (m_navigationItem) {
-        QPoint pos (0, viewport()->height() - NavigationItem::DEFAULT_HEIGHT);
-        m_navigationItem->setStaticPos(pos);
-
-        QSize s = event->size();
-        m_navigationItem->graphicsWidget()->resize(s.width(), NavigationItem::DEFAULT_HEIGHT);
+        m_navigationItem->setStaticPos(QPoint(0, viewport()->height() - NavigationItem::DEFAULT_HEIGHT));
+        m_navigationItem->graphicsWidget()->resize(event->size().width(), NavigationItem::DEFAULT_HEIGHT);
     }
     updateDecorations();
 
     if (m_selectedWnd && m_selectedWnd->isFullScreen())
-        onItemFullScreen_helper(m_selectedWnd, 800);
-    else
-        //fitInView(getRealSceneRect(),Qt::KeepAspectRatio);
     {
+        onItemFullScreen_helper(m_selectedWnd, 800);
+    }
+    else
+    {
+        //fitInView(getRealSceneRect(),Qt::KeepAspectRatio);
         centerOn(getRealSceneRect().center());
         fitInView(1000, 0);
     }
@@ -2657,25 +2673,27 @@ bool GraphicsView::isItemStillExists(const CLAbstractSceneItem* wnd) const
 
 void GraphicsView::toggleFullScreen_helper(CLAbstractSceneItem* wnd)
 {
-    if (!wnd->isFullScreen() || isItemFullScreenZoomed(wnd) ) // if item is not in full screen mode or if it's in FS and zoomed more
+    if (!wnd->isFullScreen() || isItemFullScreenZoomed(wnd)) // if item is not in full screen mode or if it's in FS and zoomed more
+    {
         onItemFullScreen_helper(wnd, 800);
+    }
     else
     {
         // escape FS MODE
         setZeroSelection();
         wnd->setFullScreen(false);
         fitInView(800, 0, SLOW_START_SLOW_END);
-
     }
 }
 
 void GraphicsView::onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int delay)
 {
-
     if (!m_camLayout.getContent()->checkIntereactionFlag(LayoutContent::ItemSelectable))
         return;
 
-    setZeroSelection(delay);
+    CLVideoCamera *lastVideoCamera = m_navigationItem->videoCamera();
+
+    setZeroSelection(delay, true);
 
     m_selectedWnd = new_wnd;
     m_last_selectedWnd = new_wnd;
@@ -2684,6 +2702,9 @@ void GraphicsView::onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int de
 
     m_selectedWnd->setItemSelected(true, true, delay);
 
+    if(m_camLayout.hasLiveCameras() && m_navigationItem->videoCamera() == NULL && lastVideoCamera != NULL) // Hack hack hack
+        m_navigationItem->setVideoCamera(lastVideoCamera);
+    
     if (m_selectedWnd->toVideoItem())
     {
 
@@ -2713,7 +2734,6 @@ void GraphicsView::onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int de
     m_scenezoom.zoom_abs(zoom, item_select_duration, delay, QPoint(0,0), SLOW_START_SLOW_END);
 
     m_ignoreMouse.ignoreNextMs(item_select_duration + delay);
-
 }
 
 void GraphicsView::onCircle_helper(bool show)
@@ -2779,7 +2799,6 @@ void GraphicsView::onCircle_helper(bool show)
     groupAnimation->start();
     groupAnimation->setDeleteAfterFinished(true);
     m_animationManager.registerAnimation(groupAnimation);
-
 }
 
 void GraphicsView::instantArrange()
@@ -2847,7 +2866,6 @@ void GraphicsView::onArrange_helper()
     groupAnimation->start();
     groupAnimation->setDeleteAfterFinished(true);
     m_animationManager.registerAnimation(groupAnimation);
-
 }
 
 void GraphicsView::onArrange_helper_finished()
@@ -2858,7 +2876,6 @@ void GraphicsView::onArrange_helper_finished()
         CLAbstractSceneItem* item = ipos.item;
         item->setArranged(true);
     }
-
 }
 
 #ifdef Q_OS_WIN
@@ -3098,7 +3115,6 @@ void GraphicsView::toggleFullScreen()
     {
         if (isItemStillExists(item) && !item->isFullScreen())
             onItemFullScreen_helper(item, 800);
-
         mMainWnd->showFullScreen();
     }
 }
@@ -3192,7 +3208,7 @@ void GraphicsView::onItemFullScreen_helper(CLAbstractSceneItem* wnd, int duratio
     m_ignoreMouse.ignoreNextMs(duration);
 }
 
-void GraphicsView::mouseSpeed_helper(qreal& mouse_speed,  int& dx, int&dy, int min_speed, int speed_factor)
+void GraphicsView::mouseSpeed_helper(qreal& mouse_speed, int& dx, int&dy, int min_speed, int speed_factor)
 {
     dx = 0; dy = 0;
 
@@ -3466,7 +3482,7 @@ void GraphicsView::contextMenuHelper_saveRecordedAs(CLVideoCamera* cam)
             return;
 
         UIOKMessage(this, QString(), tr("Can't save title. Try another name."));
-  }
+    }
 }
 
 void GraphicsView::contextMenuHelper_takeScreenshot(CLVideoWindowItem* item)
@@ -3685,12 +3701,10 @@ void GraphicsView::navigation_grid_items_drop_helper()
 
 void GraphicsView::on_grid_drop_animation_finished()
 {
-    QList<CLAbstractSceneItem*> lst = m_camLayout.getItemList();
-
-    foreach(CLAbstractSceneItem* itm, lst)
+    foreach (CLAbstractSceneItem *item, m_camLayout.getItemList())
     {
-        itm->setZValue(global_base_scene_z_level);
-        itm->setArranged(true);
+        item->setZValue(global_base_scene_z_level);
+        item->setArranged(true);
     }
     m_camLayout.updateSceneRect();
 }
@@ -3713,7 +3727,8 @@ void GraphicsView::onOpenFile()
     }
 }
 
-void GraphicsView::paintEvent(QPaintEvent *event) {
+void GraphicsView::paintEvent(QPaintEvent *event)
+{
     m_camLayout.renderWatcher()->startDisplay();
 
     QGraphicsView::paintEvent(event);

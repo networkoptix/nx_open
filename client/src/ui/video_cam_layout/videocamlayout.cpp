@@ -22,6 +22,7 @@
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "camera/render_watcher.h"
+#include "core/resourcemanagment/security_cam_resource.h"
 
 int  SLOT_WIDTH = 640*10;
 int  SLOT_HEIGHT = SLOT_WIDTH*3/4;
@@ -115,6 +116,21 @@ bool SceneLayout::isContentChanged() const
 void SceneLayout::setContentChanged(bool changed)
 {
 	m_contentchanged = changed;
+}
+
+bool SceneLayout::hasLiveCameras() const {
+    foreach(CLAbstractComplicatedItem* devitem, m_deviceitems) 
+    {
+        QnResourcePtr resourceGuard = devitem->getDevice();
+        QnResource *resource = resourceGuard.data();
+        if(resource == NULL)
+            continue;
+
+        if(dynamic_cast<QnSequrityCamResource *>(resource))
+            return true;
+    }
+
+    return false;
 }
 
 void SceneLayout::start()
@@ -490,6 +506,7 @@ bool SceneLayout::addDevice(QnResourcePtr device, bool update_scene_rect, CLBasi
 		cam->setQuality(QnQualityLow, true);
 		cam->startDispay();
 
+        m_view->deviceAdded(device, video_wnd);
 		return true;
 	}
 
@@ -519,6 +536,7 @@ bool SceneLayout::addDevice(QnResourcePtr device, bool update_scene_rect, CLBasi
 		m_deviceitems.push_back(recd);
 		recd->start();
 
+        m_view->deviceAdded(device, NULL);
 		return true;
 	}
 

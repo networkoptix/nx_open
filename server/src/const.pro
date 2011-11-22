@@ -46,6 +46,8 @@ CONFIG(release, debug|release) {
   LIBS += -L$$FFMPEG-release/bin -L$$FFMPEG-release/lib -L$$PWD/../../common/bin/release -lcommon
 }
 
+QMAKE_CXXFLAGS += -I$$EVETOOLS_DIR/include
+
 win32 {
     QMAKE_CXXFLAGS += -Zc:wchar_t
     LIBS += -lxerces-c_3

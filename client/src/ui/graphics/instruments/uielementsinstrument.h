@@ -23,7 +23,7 @@ protected:
     virtual void installedNotify();
     virtual void uninstalledNotify();
 
-    virtual void resizeEvent(QWidget *viewport, QResizeEvent *event);
+    //virtual bool resizeEvent(QWidget *viewport, QResizeEvent *event) override;
 
 private:
     QWeakPointer<QGraphicsWidget> m_widget;

@@ -60,7 +60,7 @@ public:
 signals:
     void singleShotModeChanged(bool value);
     void beforeJump(qint64 mksec, bool makeshot);
-    void jumpOccured(qint64 mksec, bool makeshot);
+    void jumpOccured(qint64 mksec);
     void streamPaused();
     void streamResumed();
     void nextFrameOccured();

@@ -10,7 +10,6 @@
 
 static const int MAX_QUEUE_SIZE = 60;
 //static const QString RTP_FFMPEG_GENERIC_STR("mpeg4-generic"); // this line for debugging purpose with VLC player
-static const int MAX_RTSP_DATA_LEN = 65535 - 4 - RtpHeader::RTP_HEADER_SIZE;
 
 static const int MAX_RTSP_WRITE_BUFFER = 1024*1024;
 
@@ -58,6 +57,10 @@ qint64 QnRtspDataConsumer::currentTime() const
 
 void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
 {
+//    cl_log.log("queueSize=", m_dataQueue.size(), cl_logALWAYS);
+//    QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
+//    cl_log.log(QDateTime::fromMSecsSinceEpoch(media->timestamp/1000).toString("hh.mm.ss.zzz"), cl_logALWAYS);
+
     QMutexLocker lock(&m_dataQueueMtx);
     m_dataQueue.push(data);
     if (m_dataQueue.size() > m_dataQueue.maxSize()*1.5) // additional space for archiveData (when archive->live switch occured, archive ordinary using all dataQueue size)
@@ -223,6 +226,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         Q_ASSERT(sendLen > 0);
         m_owner->sendData(curData, sendLen);
         curData += sendLen;
+
     }
     return true;
 }

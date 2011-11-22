@@ -6,6 +6,7 @@
 #  include <winsock2.h>
 #endif
 #include "utils/common/util.h"
+#include "../common/sleep.h"
 
 #define DEFAULT_RTP_PORT 554
 #define RESERVED_TIMEOUT_TIME (5*1000)
@@ -68,7 +69,7 @@ RTPSession::RTPSession():
     m_scale(1.0)
 {
     m_udpSock.setReadTimeOut(500);
-    m_responseBuffer = new quint8[MAX_RESPONCE_LEN];
+    m_responseBuffer = new quint8[RTSP_BUFFER_LEN];
     m_responseBufferLen = 0;
 }
 
@@ -558,11 +559,11 @@ bool RTPSession::sendKeepAlive()
 // read RAW: combination of text and binary data
 int RTPSession::readRAWData()
 {
-    int readed = m_tcpSock.recv(m_responseBuffer + m_responseBufferLen, MAX_RESPONCE_LEN - m_responseBufferLen);
+    int readed = m_tcpSock.recv(m_responseBuffer + m_responseBufferLen, qMin(RTSP_BUFFER_LEN - m_responseBufferLen, MAX_RTSP_DATA_LEN));
     if (readed > 0)
     {
         m_responseBufferLen += readed;
-        Q_ASSERT( m_responseBufferLen <= MAX_RESPONCE_LEN);
+        Q_ASSERT( m_responseBufferLen <= RTSP_BUFFER_LEN);
     }
     return readed;
 }
@@ -615,7 +616,7 @@ bool RTPSession::readTextResponce(QByteArray& response)
 
     bool readMoreData = false; // try to process existing buffer at first
     //for (int k = 0; k < 10; ++k) // if binary data ahead text data, read more. read 10 packets at maxumum
-    while (m_responseBufferLen < MAX_RESPONCE_LEN)
+    while (m_responseBufferLen < RTSP_BUFFER_LEN)
     {
         if (readMoreData && readRAWData() == -1)
             return false;
@@ -666,6 +667,7 @@ bool RTPSession::readTextResponce(QByteArray& response)
             }
         }
         readMoreData = true;
+        QnSleep::msleep(1);
     }
     return false;
 }

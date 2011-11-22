@@ -19,7 +19,7 @@ int AppSessionManager::addServer(const ::xsd::api::servers::Server& server, QnAp
 
     ::xsd::api::servers::Servers servers;
     servers.server().push_back(server);
-    ::xsd::api::servers::servers(os, servers);
+    ::xsd::api::servers::servers(os, servers, ::xml_schema::namespace_infomap (), "UTF-8", XSD_FLAGS);
 
     QByteArray reply;
 
@@ -31,7 +31,7 @@ int AppSessionManager::addServer(const ::xsd::api::servers::Server& server, QnAp
             QTextStream stream(reply);
             QStdIStream is(stream.device());
 
-            serversPtr = QnApiServerResponsePtr(xsd::api::servers::servers (is, xml_schema::flags::dont_validate).release());
+            serversPtr = QnApiServerResponsePtr(xsd::api::servers::servers (is, XSD_FLAGS).release());
 
             return 0;
         } catch (const xml_schema::exception& e)
@@ -52,7 +52,7 @@ int AppSessionManager::addCamera(const ::xsd::api::cameras::Camera& camera, QnAp
 
     ::xsd::api::cameras::Cameras cameras;
     cameras.camera().push_back(camera);
-    ::xsd::api::cameras::cameras(os, cameras);
+    ::xsd::api::cameras::cameras(os, cameras, ::xml_schema::namespace_infomap (), "UTF-8", XSD_FLAGS);
 
     QByteArray reply;
 
@@ -64,7 +64,7 @@ int AppSessionManager::addCamera(const ::xsd::api::cameras::Camera& camera, QnAp
             QTextStream stream(reply);
             QStdIStream is(stream.device());
 
-            camerasPtr = QnApiCameraResponsePtr(xsd::api::cameras::cameras (is, xml_schema::flags::dont_validate).release());
+            camerasPtr = QnApiCameraResponsePtr(xsd::api::cameras::cameras (is, XSD_FLAGS).release());
 
             return 0;
         } catch (const xml_schema::exception& e)
@@ -106,7 +106,7 @@ int AppSessionManager::getResourceTypes(QnApiResourceTypeResponsePtr& resourceTy
             QTextStream stream(reply);
             QStdIStream is(stream.device());
 
-            resourceTypes = QnApiResourceTypeResponsePtr(xsd::api::resourceTypes::resourceTypes (is, xml_schema::flags::dont_validate).release());
+            resourceTypes = QnApiResourceTypeResponsePtr(xsd::api::resourceTypes::resourceTypes (is, XSD_FLAGS).release());
 
             return 0;
         } catch (const xml_schema::exception& e)
@@ -133,7 +133,7 @@ int AppSessionManager::getStorages(QnApiStorageResponsePtr& storages)
             QTextStream stream(reply);
             QStdIStream is(stream.device());
 
-            storages = QnApiStorageResponsePtr(xsd::api::storages::storages (is, xml_schema::flags::dont_validate).release());
+            storages = QnApiStorageResponsePtr(xsd::api::storages::storages (is, XSD_FLAGS).release());
 
             return 0;
         } catch (const xml_schema::exception& e)
@@ -160,7 +160,7 @@ int AppSessionManager::getResources(QnApiResourceResponsePtr& resources)
             QTextStream stream(reply);
             QStdIStream is(stream.device());
 
-            resources = QnApiResourceResponsePtr(xsd::api::resourcesEx::resourcesEx (is, xml_schema::flags::dont_validate).release());
+            resources = QnApiResourceResponsePtr(xsd::api::resourcesEx::resourcesEx (is, XSD_FLAGS).release());
 
             return 0;
         } catch (const xml_schema::exception& e)

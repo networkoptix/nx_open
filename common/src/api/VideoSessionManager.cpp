@@ -26,7 +26,7 @@ int VideoServerSessionManager::recordedTimePeriods(const QnRequestParamList& par
             QTextStream stream(reply);
             QStdIStream is(stream.device());
 
-            timePeriodList = QnApiRecordedTimePeriodsResponsePtr(recordedTimePeriods (is, xml_schema::flags::dont_validate).release());
+            timePeriodList = QnApiRecordedTimePeriodsResponsePtr(recordedTimePeriods (is, XSD_FLAGS).release());
 
             return 0;
         } catch (const xml_schema::exception& e)

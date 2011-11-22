@@ -65,29 +65,29 @@ void QnResource::deserialize(const QnResourceParameters& parameters)
 void QnResource::setParentId(const QnId& parent)
 {
     QMutexLocker locker(&m_mutex);
-	m_parentId = parent;
+    m_parentId = parent;
 }
 
 QnId QnResource::getParentId() const
 {
     QMutexLocker locker(&m_mutex);
-	return m_parentId;
+    return m_parentId;
 }
 
 
 QString QnResource::getName() const
 {
     QMutexLocker locker(&m_mutex);
-	return m_name;
+    return m_name;
 }
 
 void QnResource::setName(const QString& name)
 {
     QMutexLocker locker(&m_mutex);
-	m_name = name;
+    m_name = name;
 }
 
-unsigned long QnResource::flags() const 
+unsigned long QnResource::flags() const
 {
     QMutexLocker locker(&m_mutex);
     return m_flags;
@@ -95,20 +95,20 @@ unsigned long QnResource::flags() const
 
 bool QnResource::checkFlag(unsigned long flag) const
 {
-	QMutexLocker locker(&m_mutex);
+    QMutexLocker locker(&m_mutex);
     return (m_flags & flag) == flag;
 }
 
 void QnResource::addFlag(unsigned long flag)
 {
     QMutexLocker locker(&m_mutex);
-	m_flags |= flag;
+    m_flags |= flag;
 }
 
 void QnResource::removeFlag(unsigned long flag)
 {
     QMutexLocker locker(&m_mutex);
-	m_flags &= ~flag;
+    m_flags &= ~flag;
 }
 
 bool QnResource::associatedWithFile() const
@@ -119,9 +119,7 @@ bool QnResource::associatedWithFile() const
 
 QString QnResource::toString() const
 {
-	QString result;
-	QTextStream(&result) << getName() << "  " <<  getUniqueId();
-	return result;
+    return getName() + QLatin1String("  ") + getUniqueId();
 }
 
 QString QnResource::toSearchString() const
@@ -287,7 +285,7 @@ QnParamList& QnResource::getResourceParamList() const
         }
 
         QMutexLocker locker(&m_mutex);
-        if (m_resourceParamList.empty()) 
+        if (m_resourceParamList.empty())
             m_resourceParamList = resourceParamList;
     }
 
@@ -309,7 +307,7 @@ void QnResource::setTypeId(const QnId& id)
 
 void QnResource::setStatus(QnResource::Status status)
 {
-    if (m_status == status) // if status did not changed => do nothing 
+    if (m_status == status) // if status did not changed => do nothing
         return;
 
     if (m_status == Offline && status == Online)
@@ -355,16 +353,16 @@ void QnResource::setId(const QnId& id) {
     m_id = id;
 }
 
-QString QnResource::getUrl() const 
-{ 
+QString QnResource::getUrl() const
+{
     QMutexLocker locker(&m_mutex);
-    return m_url; 
+    return m_url;
 }
 
-void QnResource::setUrl(const QString& value) 
-{ 
+void QnResource::setUrl(const QString& value)
+{
     QMutexLocker locker(&m_mutex);
-    m_url = value; 
+    m_url = value;
 }
 
 void QnResource::addTag(const QString& tag)

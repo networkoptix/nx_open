@@ -24,6 +24,8 @@ INCLUDEPATH += $$PWD
 PRECOMPILED_HEADER = $$PWD/StdAfx.h
 PRECOMPILED_SOURCE = $$PWD/StdAfx.cpp
 
+QMAKE_CXXFLAGS += -I$$EVETOOLS_DIR/include
+
 CONFIG(debug, debug|release) {
   CONFIG += console
   DESTDIR = ../bin/debug
@@ -95,7 +97,7 @@ win32 {
     DEFINES += _CRT_SECURE_NO_WARNINGS
 
     # Don't warn for deprecated POSIX functions.
-    DEFINES += _CRT_NONSTDC_NO_DEPRECATE 
+    DEFINES += _CRT_NONSTDC_NO_DEPRECATE
 
     # Disable warning C4250: 'Derived' : inherits 'Base::method' via dominance.
     # It is buggy, as described in http://connect.microsoft.com/VisualStudio/feedback/details/101259/disable-warning-c4250-class1-inherits-class2-member-via-dominance-when-weak-member-is-a-pure-virtual-function
@@ -121,7 +123,7 @@ mac {
   LIBS += -framework IOKit -framework CoreServices
   LIBS += -lz -lbz2
 
-  QMAKE_CXXFLAGS += -msse4.1 
+  QMAKE_CXXFLAGS += -msse4.1
   PRIVATE_FRAMEWORKS.files = ../resource/arecontvision
   PRIVATE_FRAMEWORKS.path = Contents/MacOS
   QMAKE_BUNDLE_DATA += PRIVATE_FRAMEWORKS
@@ -138,8 +140,8 @@ INCLUDEPATH += $$PWD
 PRECOMPILED_HEADER = $$PWD/StdAfx.h
 PRECOMPILED_SOURCE = $$PWD/StdAfx.cpp
 
-RESOURCES += mainwnd.qrc ../build/skin.qrc
-FORMS += mainwnd.ui preferences.ui licensekey.ui recordingsettings.ui ui/dialogs/tagseditdialog.ui \
+RESOURCES += ../build/skin.qrc
+FORMS += preferences.ui licensekey.ui recordingsettings.ui ui/dialogs/tagseditdialog.ui \
          youtube/youtubeuploaddialog.ui youtube/youtubesetting.ui
 
 DEFINES += CL_TRIAL_MODE CL_FORCE_LOGO

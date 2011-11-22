@@ -245,6 +245,11 @@ public:
     virtual QnResourcePtr createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters) = 0;
 };
 
+class QnDummyResourceFactory : public QnResourceFactory
+{
+    QnResourcePtr createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters) {return QnResourcePtr();}
+};
+
 class QnResourceProcessor
 {
 public:

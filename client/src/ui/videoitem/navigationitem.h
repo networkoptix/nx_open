@@ -1,6 +1,8 @@
 #ifndef NAVIGATIONITEM_H
 #define NAVIGATIONITEM_H
 
+#include <QtCore/QTimer>
+
 #include "unmoved/unmoved_interactive_opacity_item.h"
 #include <recording/device_file_catalog.h> /* For QnTimePeriod. */
 
@@ -26,18 +28,19 @@ public:
 
     void setVideoCamera(CLVideoCamera* camera);
 
+    CLVideoCamera *videoCamera() const { return m_camera; }
+
     void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *) {}
     QRectF boundingRect() const;
 
-    bool mouseOver() const { return m_mouseOver; }
+    inline bool mouseOver() const { return m_mouseOver; }
 
-    bool isPlaying() const { return m_playing; }
-    void setPlaying(bool playing);
-
-    bool isActive() const;
-    void setActive(bool active);
+    inline bool isPlaying() const { return m_playing; }
 
     static const int DEFAULT_HEIGHT = 60;
+
+public Q_SLOTS:
+    void setPlaying(bool playing);
 
 protected:
     void timerEvent(QTimerEvent* event);
@@ -48,7 +51,6 @@ protected:
 
 private Q_SLOTS:
     void onLiveModeChanged(bool value);
-    void onValueChanged(qint64);
     void pause();
     void play();
     void togglePlayPause();
@@ -61,10 +63,12 @@ private Q_SLOTS:
 
     void onSliderPressed();
     void onSliderReleased();
+    void onValueChanged(qint64);
 
     void onSpeedChanged(float);
 
     void onVolumeLevelChanged(int);
+
     void restoreInfoText();
 
 protected:
@@ -90,10 +94,7 @@ private:
     int m_timerId;
     qint64 m_currentTime;
     bool m_playing;
-    bool m_sliderIsmoving;
     bool m_mouseOver;
-
-    bool m_active;
 
     QnTimePeriod m_timePeriod;
 

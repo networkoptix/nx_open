@@ -19,6 +19,7 @@ protected:
     int sendGetRequest(QString objectName, QnRequestParamList, QByteArray& reply);
 
     QByteArray formatNetworkError(int error);
+
 protected:
     SyncHTTP m_httpClient;
     QByteArray m_lastError;

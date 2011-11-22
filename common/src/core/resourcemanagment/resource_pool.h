@@ -30,24 +30,26 @@ public:
 public:
     static QnResourcePool *instance();
 
-    void addResource(QnResourcePtr resource);
     void addResources(const QnResourceList &resources);
+    inline void addResource(QnResourcePtr resource)
+    { addResources(QnResourceList() << resource); }
 
-    void removeResource(QnResourcePtr resource);
     void removeResources(const QnResourceList &resources);
+    inline void removeResource(QnResourcePtr resource)
+    { removeResources(QnResourceList() << resource); }
 
     QnResourceList getResources() const;
 
-    QnResourcePtr getResourceById(const QnId& id) const;
+    QnResourcePtr getResourceById(const QnId &id) const;
 
-    QnResourcePtr getResourceByUniqId(const QString& id) const;
+    QnResourcePtr getResourceByUniqId(const QString &id) const;
 
-    bool hasSuchResouce(const QString& uniqid) const;
+    bool hasSuchResouce(const QString &uniqid) const;
 
 
-    QnResourcePtr getResourceByUrl(const QString& url) const;
+    QnResourcePtr getResourceByUrl(const QString &url) const;
 
-    QnNetworkResourcePtr getNetResourceByMac(const QString& mac) const;
+    QnNetworkResourcePtr getNetResourceByMac(const QString &mac) const;
 
     // returns list of resources with such flag
     QnResourceList getResourcesWithFlag(unsigned long flag);
@@ -55,15 +57,15 @@ public:
 
     QStringList allTags() const;
 
-    QnResourceList findResourcesByCriteria(const CLDeviceCriteria& cr) const;
+    QnResourceList findResourcesByCriteria(const CLDeviceCriteria &cr) const;
 
 Q_SIGNALS:
     void resourceAdded(QnResourcePtr res);
     void resourceRemoved(QnResourcePtr res);
 
 private:
-    bool isResourceMeetCriteria(const CLDeviceCriteria& cr, QnResourcePtr res) const;
-    bool match_subfilter(QnResourcePtr resource, const QString& fltr) const;
+    bool isResourceMeetCriteria(const CLDeviceCriteria &cr, QnResourcePtr res) const;
+    bool match_subfilter(QnResourcePtr resource, const QString &fltr) const;
 
 private:
     mutable QMutex m_resourcesMtx;
