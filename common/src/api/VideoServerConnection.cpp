@@ -12,6 +12,11 @@ QnTimePeriodList QnVideoServerConnection::recordedTimePeriods(const QnNetworkRes
 {
     using namespace xsd::api::recordedTimePeriods;
 
+    QStringList idList;
+    foreach(const QnNetworkResourcePtr &resource, list)
+        idList.push_back(resource->getUniqueId());
+    qDebug() << idList;
+
     QnTimePeriodList result;
     QnApiRecordedTimePeriodsResponsePtr timePeriodList;
     QnRequestParamList params;

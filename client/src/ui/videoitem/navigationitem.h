@@ -47,7 +47,7 @@ public Q_SLOTS:
 protected:
     void timerEvent(QTimerEvent* event);
     void updateSlider();
-    void updatePeriodList();
+    void updatePeriodList(bool force);
 
     void smartSeek(qint64 timeMSec);
     void setActualCamera(CLVideoCamera *camera);
