@@ -5,10 +5,41 @@
 
 #include "unmoved/unmoved_interactive_opacity_item.h"
 #include <recording/device_file_catalog.h> /* For QnTimePeriod. */
+#include <api/VideoServerConnection.h>
+
+namespace detail {
+    class QnTimePeriodUpdater: public QObject {
+        Q_OBJECT;
+    public:
+        QnTimePeriodUpdater(QObject *parent = NULL): QObject(parent), m_updatePending(false), m_updateNeeded(false) {}
+
+        void update(const QnVideoServerConnectionPtr &connection, const QnNetworkResourceList &networkResources, const QnTimePeriod &timePeriod);
+
+    signals:
+        void ready(const QnTimePeriodList &timePeriods);
+
+    private slots:
+        void at_replyReceived(const QnTimePeriodList &timePeriods);
+
+    private:
+        void sendRequest();
+
+    private:
+        QnVideoServerConnectionPtr m_connection;
+        QnNetworkResourceList m_networkResources;
+        QnTimePeriod m_timePeriod;
+        bool m_updatePending;
+        bool m_updateNeeded;
+    };
+
+}
+
 
 class QGraphicsWidget;
 class QLabel;
 class QTimerEvent;
+
+class QnVideoServerConnection;
 
 class CLVideoCamera;
 class ImageButton;
@@ -53,6 +84,8 @@ protected:
     void setActualCamera(CLVideoCamera *camera);
     void updateActualCamera();
 
+    void updateTimePeriods(const QnVideoServerConnection *connection, const QnNetworkResourceList &resources);
+
 private Q_SLOTS:
     void onLiveModeChanged(bool value);
     void pause();
@@ -74,6 +107,9 @@ private Q_SLOTS:
     void onVolumeLevelChanged(int);
 
     void restoreInfoText();
+    
+    void onTimePeriodUpdaterReady(const QnTimePeriodList &timePeriods);
+    
 
 protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent *);
@@ -103,6 +139,8 @@ private:
     bool m_mouseOver;
 
     QnTimePeriod m_timePeriod;
+
+    detail::QnTimePeriodUpdater *m_timePeriodUpdater;
 
     struct RestoreInfoTextData {
         QString extraInfoText;

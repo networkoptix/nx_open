@@ -12,7 +12,7 @@ CLAnimation::CLAnimation(GraphicsView* gview):
 	//connect(&m_timeline, SIGNAL(valueChanged(qreal)), this, SLOT(valueChanged(qreal)));
 	//connect(&m_timeline, SIGNAL(finished()), this, SLOT(onFinished()));
 }
-
+    
 CLAnimation::~CLAnimation()
 {
 	stopAnimation();
