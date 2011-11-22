@@ -90,8 +90,11 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(QnResourceList resList, qi
                 QnTimePeriod& last = result.last();
                 if (last.startTimeUSec <= minStartTime && last.startTimeUSec+last.durationUSec > minStartTime)
                     last.durationUSec = qMax(last.durationUSec, minStartTime + cameras[minIndex][0].durationUSec - last.startTimeUSec);
-                else
+                else {
                     result << cameras[minIndex][0];
+                    if (cameras[minIndex][0].durationUSec == -1)
+                        break;
+                }
             } 
             cameras[minIndex].pop_front();
         }
