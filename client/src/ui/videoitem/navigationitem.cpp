@@ -21,6 +21,40 @@
 #include "utils/common/util.h"
 #include "utils/common/warnings.h"
 
+void detail::QnTimePeriodUpdater::update(const QnVideoServerConnectionPtr &connection, const QnNetworkResourceList &networkResources, const QnTimePeriod &timePeriod) 
+{
+    m_connection = connection;
+    m_networkResources = networkResources;
+    m_timePeriod = timePeriod;
+
+    if(m_updatePending) {
+        m_updateNeeded = true;
+        return;
+    }
+
+    sendRequest();
+}
+
+void detail::QnTimePeriodUpdater::at_replyReceived(const QnTimePeriodList &timePeriods) 
+{
+    if(m_updateNeeded) {
+        /* The data we got has already expired... resend the request. */
+        sendRequest(); 
+        return;
+    }
+
+    m_updatePending = false;
+    emit ready(timePeriods);
+}
+
+void detail::QnTimePeriodUpdater::sendRequest() 
+{
+    m_updateNeeded = false;
+    m_updatePending = true;
+    m_connection->asyncRecordedTimePeriods(m_networkResources, m_timePeriod.startTimeUSec, m_timePeriod.startTimeUSec + m_timePeriod.durationUSec, 1, this, SLOT(at_replyReceived(const QnTimePeriodList &)));
+}
+
+
 static const int SLIDER_NOW_AREA_WIDTH = 30;
 
 // ### hack to avoid scene move up and down
@@ -125,6 +159,9 @@ NavigationItem::NavigationItem(QGraphicsItem * /*parent*/) :
     setAcceptHoverEvents(true);
 
     setCursor(Qt::ArrowCursor);
+
+    m_timePeriodUpdater = new detail::QnTimePeriodUpdater(this);
+    connect(m_timePeriodUpdater, SIGNAL(ready(const QnTimePeriodList &)), this, SLOT(onTimePeriodUpdaterReady(const QnTimePeriodList &)));
 
     m_graphicsWidget = new QGraphicsWidgetKillsWheelEvent(this);
     m_graphicsWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -481,8 +518,11 @@ void NavigationItem::updatePeriodList(bool force) {
 
     QnTimePeriodList timePeriods;
     if(!connection.isNull())
-        timePeriods = connection->recordedTimePeriods(resources, m_timePeriod.startTimeUSec, m_timePeriod.startTimeUSec + m_timePeriod.durationUSec, 1);
+        m_timePeriodUpdater->update(connection, resources, m_timePeriod);
+}
 
+void NavigationItem::onTimePeriodUpdaterReady(const QnTimePeriodList &timePeriods) 
+{
     m_timeSlider->setTimePeriodList(timePeriods);
 }
 

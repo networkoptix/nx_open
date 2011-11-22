@@ -7,32 +7,63 @@
 #include "QStdIStream.h"
 #include "AppSessionManager.h"
 
-VideoServerSessionManager::VideoServerSessionManager(const QHostAddress& host, int port, const QAuthenticator& auth):
-    SessionManager(host, port, auth)
-{
+namespace {
+    const unsigned long XSD_FLAGS = xml_schema::flags::dont_initialize | xml_schema::flags::dont_validate;
 
+    int parseRecordedTimePeriods(const QByteArray &reply, QnApiRecordedTimePeriodsResponsePtr *result) 
+    {
+        using xsd::api::recordedTimePeriods::recordedTimePeriods;
+
+        try {
+            QByteArray localReply = reply;
+            QBuffer buffer(&localReply);
+            buffer.open(QIODevice::ReadOnly);
+
+            QStdIStream is(&buffer);
+
+            *result = QnApiRecordedTimePeriodsResponsePtr(recordedTimePeriods(is, XSD_FLAGS).release());
+
+            return 0;
+        } catch (const xml_schema::exception& e) {
+            qDebug(e.what());
+
+            return 1;
+        }
+    }
+
+} // anonymous namespace
+
+
+void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int status, const QByteArray &reply) 
+{
+    QnApiRecordedTimePeriodsResponsePtr result;
+    if(status == 0)
+        status = parseRecordedTimePeriods(reply, &result);
+
+    emit finished(status, result);
+
+    deleteLater();
+}
+
+VideoServerSessionManager::VideoServerSessionManager(const QHostAddress& host, int port, const QAuthenticator& auth, QObject *parent):
+    SessionManager(host, port, auth, parent)
+{
 }
 
 int VideoServerSessionManager::recordedTimePeriods(const QnRequestParamList& params, QnApiRecordedTimePeriodsResponsePtr& timePeriodList)
 {
-    using xsd::api::recordedTimePeriods::recordedTimePeriods;
-
     QByteArray reply;
+    if(sendGetRequest("api/RecordedTimePeriods", params, reply) != 0)
+        return 1;
 
-    if(sendGetRequest("api/RecordedTimePeriods", params, reply) == 0)
-    {
-        try
-        {
-            QTextStream stream(reply);
-            QStdIStream is(stream.device());
-
-            timePeriodList = QnApiRecordedTimePeriodsResponsePtr(recordedTimePeriods (is, XSD_FLAGS).release());
-
-            return 0;
-        } catch (const xml_schema::exception& e)
-        {
-            qDebug(e.what());
-        }
-    }
-    return 1;
+    return parseRecordedTimePeriods(reply, &timePeriodList);
 }
+
+void VideoServerSessionManager::asyncRecordedTimePeriods(const QnRequestParamList& params, QObject *target, const char *slot) 
+{
+    detail::VideoServerSessionManagerReplyProcessor *processor = new detail::VideoServerSessionManagerReplyProcessor();
+    connect(processor, SIGNAL(finished(int, const QnApiRecordedTimePeriodsResponsePtr &)), target, slot);
+
+    sendAsyncGetRequest("api/RecordedTimePeriods", params, processor, SLOT(at_replyReceived(int, const QByteArray &)));
+}
+

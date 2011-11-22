@@ -5,26 +5,24 @@
 #ifndef ETKSYNCHTTP_H
 #define ETKSYNCHTTP_H
 
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
-
-#include <QEventLoop>
-#include <QBuffer>
 #include <QAuthenticator>
-#include <QNetworkRequest>
-#include <QThread>
+#include <QHostAddress>
+
+class QIODevice;
+class QByteArray;
 
 /**
  * Provide a synchronous api over QHttp
  * Uses a QEventLoop to block until the request is completed
+ * 
  * @author Iulian M <eti@erata.net>
  * Improved by Ivan Vigasin <ivigasin@networkoptix.com>.
-*/
+ */
 class SyncHTTP : public QObject
 {
 Q_OBJECT
 public:
-    SyncHTTP(const QHostAddress &hostName, quint16 port = 80, QAuthenticator auth = QAuthenticator());
+    SyncHTTP(const QHostAddress &hostName, quint16 port = 80, const QAuthenticator &auth = QAuthenticator());
     virtual ~SyncHTTP();
 
     /**

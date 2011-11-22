@@ -1,4 +1,7 @@
 #include "synchttp.h"
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
 
 namespace {
     struct Poster {
@@ -14,7 +17,7 @@ namespace {
     };
 }
 
-SyncHTTP::SyncHTTP (const QHostAddress & hostName, quint16 port, QAuthenticator auth)
+SyncHTTP::SyncHTTP (const QHostAddress & hostName, quint16 port, const QAuthenticator &auth)
     : m_hostName(hostName),
       m_port(port)
 {
