@@ -507,57 +507,53 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     }
 
     // draw grid
-    double lastXPos = xpos;
     for (qint64 curTime = intervals[level].interval*outsideCnt; curTime <= pos+range; curTime += intervals[level].interval)
     {
-        if(xpos - lastXPos > 0.5f) {
-            int curLevel = level;
-            while (curLevel < maxLevel && intervals[curLevel+1].isTimeAccepted(intervals[curLevel+1], curTime))
-                ++curLevel;
+        int curLevel = level;
+        while (curLevel < maxLevel && intervals[curLevel+1].isTimeAccepted(intervals[curLevel+1], curTime))
+            ++curLevel;
 
-            const int arrayIndex = qMin(curLevel-level, opacity.size() - 1);
+        const int arrayIndex = qMin(curLevel-level, opacity.size() - 1);
 
-            color.setAlphaF(opacity[arrayIndex]);
-            painter->setPen(color);
-            painter->setFont(fonts[arrayIndex]);
+        color.setAlphaF(opacity[arrayIndex]);
+        painter->setPen(color);
+        painter->setFont(fonts[arrayIndex]);
 
-            const IntervalInfo &interval = intervals[curLevel];
-            const float lineLen = qMin(float(curLevel-level+1) / maxLen, 1.0f);
-            if (lineLen >= 0.5f)
-                painter->drawLine(QPointF(xpos, 0), QPointF(xpos, (r.height() - maxHeight - 3) * lineLen));
+        const IntervalInfo &interval = intervals[curLevel];
+        const float lineLen = qMin(float(curLevel-level+1) / maxLen, 1.0f);
+        if (lineLen >= 0.5f)
+            painter->drawLine(QPointF(xpos, 0), QPointF(xpos, (r.height() - maxHeight - 3) * lineLen));
 
-            QString text;
-            if (curLevel < FIRST_DATE_INDEX)
+        QString text;
+        if (curLevel < FIRST_DATE_INDEX)
+        {
+            const int labelNumber = (curTime/interval.interval)%interval.count;
+            text = QString::number(interval.value*labelNumber) + QLatin1String(interval.name);
+        }
+        else
+        {
+            text = QDateTime::fromMSecsSinceEpoch(curTime).toString(interval.name);
+        }
+
+        if (widths[arrayIndex] > 0)
+        {
+            if (curLevel == 0 /*|| (curLevel == arraysize(intervals) - 1 && m_parent->minimumValue() != 0) */)
             {
-                const int labelNumber = (curTime/interval.interval)%interval.count;
-                text = QString::number(interval.value*labelNumber) + QLatin1String(interval.name);
+                painter->save();
+                painter->translate(xpos-3, (r.height() - maxHeight) * lineLen);
+                painter->rotate(90);
+                painter->drawText(2, 0, curLevel == 0 ? text : QDateTime::fromMSecsSinceEpoch(curTime).toString(Qt::ISODate));
+                painter->restore();
             }
             else
             {
-                text = QDateTime::fromMSecsSinceEpoch(curTime).toString(interval.name);
-            }
-
-            if (widths[arrayIndex] > 0)
-            {
-                if (curLevel == 0 /*|| (curLevel == arraysize(intervals) - 1 && m_parent->minimumValue() != 0) */)
-                {
-                    painter->save();
-                    painter->translate(xpos-3, (r.height() - maxHeight) * lineLen);
-                    painter->rotate(90);
-                    painter->drawText(2, 0, curLevel == 0 ? text : QDateTime::fromMSecsSinceEpoch(curTime).toString(Qt::ISODate));
-                    painter->restore();
-                }
-                else
-                {
-                    QRectF textRect(xpos - widths[arrayIndex]/2, (r.height() - maxHeight) * lineLen, widths[arrayIndex], 128);
-                    if (textRect.left() < 0 && pos == 0)
-                        textRect.setLeft(0);
-                    painter->drawText(textRect, Qt::AlignHCenter, text);
-                }
+                QRectF textRect(xpos - widths[arrayIndex]/2, (r.height() - maxHeight) * lineLen, widths[arrayIndex], 128);
+                if (textRect.left() < 0 && pos == 0)
+                    textRect.setLeft(0);
+                painter->drawText(textRect, Qt::AlignHCenter, text);
             }
         }
-
-        lastXPos = xpos;
+        
         xpos += intervals[level].interval * pixelPerTime;
     }
 

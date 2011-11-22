@@ -126,6 +126,11 @@ private:
 
     void disconnectFromSyncPlay(CLAbstractComplicatedItem* devitem);
 	//================================================
+
+
+    void addDeviceNavigation(CLAbstractSceneItem* item);
+    void removeDeviceNavigation(CLAbstractSceneItem* item);
+
 private:
 
 	QList<CLAbstractSceneItem*> m_items;

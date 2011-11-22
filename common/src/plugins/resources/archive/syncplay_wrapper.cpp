@@ -192,8 +192,11 @@ qint64 QnArchiveSyncPlayWrapper::minTime() const
 {
     Q_D(const QnArchiveSyncPlayWrapper);
     qint64 result = 0x7fffffffffffffffULL;
-    foreach(ReaderInfo info, d->readers)
-        result = qMin(result, info.oldDelegate->startTime());
+    foreach(ReaderInfo info, d->readers) {
+        qint64 startTime = info.oldDelegate->startTime();
+        if(startTime != AV_NOPTS_VALUE)
+            result = qMin(result, startTime);
+    }
     return result;
 }
 
@@ -201,8 +204,11 @@ qint64 QnArchiveSyncPlayWrapper::endTime() const
 {
     Q_D(const QnArchiveSyncPlayWrapper);
     qint64 result = 0;
-    foreach(ReaderInfo info, d->readers)
-        result = qMax(result, info.oldDelegate->endTime());
+    foreach(ReaderInfo info, d->readers) {
+        qint64 endTime = info.oldDelegate->endTime();
+        if(endTime != AV_NOPTS_VALUE)
+            result = qMax(result, endTime);
+    }
     return result;
 }
 

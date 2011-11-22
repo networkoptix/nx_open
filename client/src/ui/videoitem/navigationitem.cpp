@@ -110,7 +110,7 @@ private:
 
 NavigationItem::NavigationItem(QGraphicsItem * /*parent*/) :
     CLUnMovedInteractiveOpacityItem(QString("name:)"), 0, 0.5, 0.95),
-    m_camera(0), m_currentTime(0),
+    m_camera(0), m_forcedCamera(0), m_currentTime(0),
     m_playing(false),
     m_mouseOver(false),
     restoreInfoTextData(0)
@@ -319,9 +319,50 @@ QRectF NavigationItem::boundingRect() const
     return m_graphicsWidget->boundingRect();
 }
 
-void NavigationItem::setVideoCamera(CLVideoCamera *camera)
+void NavigationItem::setVideoCamera(CLVideoCamera* camera) {
+    if (m_forcedCamera == camera)
+        return;
+
+    m_forcedCamera = camera;
+
+    updateActualCamera();
+}
+
+void NavigationItem::addReserveCamera(CLVideoCamera* camera) {
+    if(camera == NULL)
+        return;
+
+    m_reserveCameras.insert(camera);
+
+    updateActualCamera();
+}
+
+void NavigationItem::removeReserveCamera(CLVideoCamera* camera) {
+    m_reserveCameras.remove(camera);
+
+    updateActualCamera();
+}
+
+void NavigationItem::updateActualCamera() {
+    if(m_forcedCamera != NULL) {
+        setActualCamera(m_forcedCamera);
+        return;
+    }
+
+    if(m_reserveCameras.contains(m_camera))
+        return;
+
+    if(m_reserveCameras.empty()) {
+        setActualCamera(NULL);
+        return;
+    }
+
+    setActualCamera(*m_reserveCameras.begin());
+}
+
+void NavigationItem::setActualCamera(CLVideoCamera *camera)
 {
-    if (m_camera == camera)
+    if(m_camera == camera)
         return;
 
     m_speedSlider->resetSpeed();
@@ -350,6 +391,7 @@ void NavigationItem::setVideoCamera(CLVideoCamera *camera)
     }
 }
 
+
 void NavigationItem::onLiveModeChanged(bool value)
 {
     if (value)
@@ -375,6 +417,9 @@ void NavigationItem::updateSlider()
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader *>(m_camera->getStreamreader());
     qint64 startTime = reader->startTime();
     qint64 endTime = reader->endTime();
+
+    qDebug() << m_camera << startTime << endTime;
+
     if (startTime != AV_NOPTS_VALUE && endTime != AV_NOPTS_VALUE)
     {
         m_timeSlider->setMinimumValue(startTime / 1000);

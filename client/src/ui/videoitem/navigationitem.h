@@ -27,6 +27,8 @@ public:
     QGraphicsWidget *graphicsWidget() const { return m_graphicsWidget; }
 
     void setVideoCamera(CLVideoCamera* camera);
+    void addReserveCamera(CLVideoCamera* camera);
+    void removeReserveCamera(CLVideoCamera* camera);
 
     CLVideoCamera *videoCamera() const { return m_camera; }
 
@@ -48,6 +50,8 @@ protected:
     void updatePeriodList();
 
     void smartSeek(qint64 timeMSec);
+    void setActualCamera(CLVideoCamera *camera);
+    void updateActualCamera();
 
 private Q_SLOTS:
     void onLiveModeChanged(bool value);
@@ -90,7 +94,9 @@ private:
     VolumeSlider *m_volumeSlider;
     QLabel *m_timeLabel;
 
-    CLVideoCamera* m_camera;
+    CLVideoCamera *m_camera;
+    CLVideoCamera *m_forcedCamera;
+    QSet<CLVideoCamera *> m_reserveCameras;
     int m_timerId;
     qint64 m_currentTime;
     bool m_playing;
