@@ -24,15 +24,45 @@ class SyncHTTP : public QObject
 {
 Q_OBJECT
 public:
-    SyncHTTP (const QHostAddress & hostName, quint16 port = 80, QAuthenticator auth = QAuthenticator());
-    virtual ~SyncHTTP ();
+    SyncHTTP(const QHostAddress &hostName, quint16 port = 80, QAuthenticator auth = QAuthenticator());
+    virtual ~SyncHTTP();
 
-    // send GET request and wait until finished
-    int syncGet (const QString & path, QIODevice *to);
+    /**
+     * Send GET request and wait until finished.
+     */
+    int syncGet(const QString &path, QIODevice *to);
 
-    // send POST request and wait until finished
-    int syncPost ( const QString & path, QIODevice * data, QIODevice * to );
-    int syncPost ( const QString & path, const QByteArray& data, QIODevice * to = 0 );
+    /**
+     * Send POST request and wait until finished. 
+     */
+    int syncPost(const QString &path, QIODevice *data, QIODevice *to);
+
+    /**
+     * Send POST request and wait until finished. 
+     */
+    int syncPost(const QString &path, const QByteArray &data, QIODevice *to);
+
+    /**
+     * Send asynchronous GET request. Given slot should take a pointer to QNetworkReply.
+     */
+    void asyncGet(const QString &path, QObject *target, const char *slot);
+
+    /**
+     * Send asynchronous POST request. Given slot should take a pointer to QNetworkReply.
+     */
+    void asyncPost(const QString &path, QIODevice *data, QObject *target, const char *slot);
+
+    /**
+     * Send asynchronous POST request. Given slot should take a pointer to QNetworkReply.
+     */
+    void asyncPost(const QString &path, const QByteArray &data, QObject *target, const char *slot);
+
+protected:
+    template<class Sender>
+    int syncRequest(const Sender &sender, const QString &path, QIODevice *data, QIODevice *to);
+
+    template<class Sender>
+    void asyncRequest(const Sender &sender, const QString &path, QIODevice *data, QObject *target, const char *slot);
 
 private:
     QHostAddress m_hostName;
