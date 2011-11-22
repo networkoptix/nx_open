@@ -34,7 +34,7 @@ private:
     qint64 minTime() const;
     qint64 endTime() const;
     //qint64 seek (qint64 time);
-    qint64 secondTime() const;
+    qint64 secondTime(QnAbstractArchiveReader* reader) const;
     void waitIfNeed(QnAbstractArchiveReader* reader, qint64 timestamp);
     void onNewDataReaded();
     void erase(QnAbstractArchiveDelegate* value);
