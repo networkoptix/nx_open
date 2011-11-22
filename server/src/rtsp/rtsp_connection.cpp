@@ -382,8 +382,8 @@ int QnRtspConnectionProcessor::composePlay()
         if (d->archiveDP)
         {
             //d->dataProcessor->clearUnprocessedData();
-            d->dataProcessor->setWaitBOF(d->startTime, true); // ignore rest packets before new position
-            d->archiveDP->jumpTo(d->startTime, true);
+            if (d->archiveDP->jumpTo(d->startTime, true))
+                d->dataProcessor->setWaitBOF(d->startTime, true); // ignore rest packets before new position
         }
         else {
             qWarning() << "Seek operation not supported for dataProvider" << d->mediaRes->getId();
