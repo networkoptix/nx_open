@@ -23,6 +23,8 @@ public:
     virtual QnVideoResourceLayout* getVideoLayout();
     virtual QnResourceAudioLayout* getAudioLayout();
     virtual bool isRealTimeSource() const;
+    virtual void onReverseMode(qint64 /*displayTime*/, bool /*value*/);
+
 
     void setStartDelay(qint64 startDelay);
     qint64 secondTime() const;

@@ -43,17 +43,10 @@ quint64 QnAbstractArchiveReader::lengthMksec() const
     return m_lengthMksec;
 }
 
-void QnAbstractArchiveReader::jumpTo(qint64 mksec, bool makeshot, qint64 skipTime)
+bool QnAbstractArchiveReader::jumpTo(qint64 mksec, bool makeshot, qint64 skipTime)
 {
-
-     //QMutexLocker mutex(&m_cs);
-
-    //nextFrame();
-
-    //for (int channel = 0; channel  < m_channel_number; ++channel)
-        //channeljumpTo(mksec, channel);
-
-    if (mksec != m_lastJumpTime) 
+    bool needJump = mksec != m_lastJumpTime;
+    if (needJump) 
     {
         emit beforeJump(mksec, makeshot);
         channeljumpTo(mksec, 0, skipTime);
@@ -62,6 +55,7 @@ void QnAbstractArchiveReader::jumpTo(qint64 mksec, bool makeshot, qint64 skipTim
 
     if (makeshot && isSingleShotMode())
         CLLongRunnable::resume();
+    return needJump;
 }
 
 void QnAbstractArchiveReader::jumpToPreviousFrame(qint64 mksec, bool makeshot)

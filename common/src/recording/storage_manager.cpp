@@ -274,6 +274,7 @@ void QnChunkSequence::onFirstDataRemoved(int n)
     }
 }
 
+/*
 DeviceFileCatalog::Chunk QnChunkSequence::getPrevChunk(QnResourcePtr res)
 {
     QMap<QnResourcePtr, CacheInfo>::iterator resourceItr = m_cache.find(res);
@@ -296,8 +297,9 @@ DeviceFileCatalog::Chunk QnChunkSequence::getPrevChunk(QnResourcePtr res)
     }
     return DeviceFileCatalog::Chunk();
 }
+*/
 
-DeviceFileCatalog::Chunk QnChunkSequence::getNextChunk(QnResourcePtr res, qint64 time)
+DeviceFileCatalog::Chunk QnChunkSequence::findChunk(QnResourcePtr res, qint64 time, DeviceFileCatalog::FindMethod findMethod)
 {
     QMap<QnResourcePtr, CacheInfo>::iterator resourceItr = m_cache.find(res);
     if (resourceItr == m_cache.end())
@@ -311,7 +313,7 @@ DeviceFileCatalog::Chunk QnChunkSequence::getNextChunk(QnResourcePtr res, qint64
     }
     // we can reset index in any time if we are going to search from begin again
     if (info.m_index == -1) {
-        info.m_index = info.m_catalog->findFileIndex(info.m_startTime);
+        info.m_index = info.m_catalog->findFileIndex(info.m_startTime, findMethod);
     }
 
     if (info.m_index != -1) 
@@ -319,15 +321,6 @@ DeviceFileCatalog::Chunk QnChunkSequence::getNextChunk(QnResourcePtr res, qint64
         DeviceFileCatalog::Chunk chunk = info.m_catalog->chunkAt(info.m_index);
         if (chunk.startTime != -1) 
         {
-			/*
-            QString msg;
-            QTextStream str(&msg);
-            str << " found chunk. Chunk startTime=" << QDateTime::fromMSecsSinceEpoch(chunk.startTime/1000).toString();
-            str.flush();
-            cl_log.log(msg, cl_logWARNING);
-            str.flush();
-			*/
-
             info.m_startTime = chunk.startTime;
             info.m_index++;
         }
@@ -338,6 +331,11 @@ DeviceFileCatalog::Chunk QnChunkSequence::getNextChunk(QnResourcePtr res, qint64
         return chunk;
     }
     return DeviceFileCatalog::Chunk();
+}
+
+DeviceFileCatalog::Chunk QnChunkSequence::getNextChunk(QnResourcePtr res)
+{
+    return findChunk(res, -1, DeviceFileCatalog::OnRecordHole_NextChunk);
 }
 
 qint64 QnChunkSequence::nextChunkStartTime(QnResourcePtr res)
