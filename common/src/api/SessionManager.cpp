@@ -5,7 +5,8 @@
 void detail::SessionManagerReplyForwarder::at_replyReceived(QNetworkReply *reply) {
     QScopedPointer<QNetworkReply> guard(reply);
 
-    emit finished(reply->error(), reply->readAll());
+    
+
 }
 
 
@@ -39,8 +40,8 @@ int SessionManager::sendGetRequest(const QString &objectName, const QnRequestPar
         url.addQueryItem(params[i].first, params[i].second);
     }
 
-    QString dd = url.toString();
     QBuffer buffer(&reply);
+    buffer.open(QIODevice::WriteOnly);
 
     int status = m_httpClient.syncGet(QByteArray("api/") + url.toEncoded(), &buffer);
     if (status != 0)
