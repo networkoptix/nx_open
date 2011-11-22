@@ -473,12 +473,17 @@ void NavigationItem::updateSlider()
             m_timeSlider->setCurrentValue(m_currentTime);
         }
         m_liveButton->setVisible(!reader->onPause() && m_camera->getCamCamDisplay()->isRealTimeSource());
+
+        updatePeriodList(false);
     }
 }
 
 void NavigationItem::updatePeriodList(bool force) {
     qint64 w = m_timeSlider->sliderRange() * 1000;
     qint64 t = m_timeSlider->viewPortPos() * 1000;
+    if(t < 0)
+        return; /* TODO: why? */
+
     if(!force && m_timePeriod.startTimeUSec <= t && t + w <= m_timePeriod.startTimeUSec + m_timePeriod.durationUSec)
         return;
 
@@ -545,6 +550,8 @@ void NavigationItem::onValueChanged(qint64 time)
 
 void NavigationItem::smartSeek(qint64 timeMSec)
 {
+    //qDebug() << timeMSec;
+
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     if(m_timeSlider->isAtEnd()) {
         reader->jumpToPreviousFrame(DATETIME_NOW, true);
