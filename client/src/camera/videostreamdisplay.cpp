@@ -191,7 +191,7 @@ CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale) :
     m_prevReverseMode(false),
     m_prevFrameToDelete(0),
     m_flushedBeforeReverseStart(false),
-    m_lastDisplayedTime(0),
+    m_lastDisplayedTime(AV_NOPTS_VALUE),
     m_realReverseSize(0),
     m_maxReverseQueueSize(-1),
     m_timeChangeEnabled(true),
