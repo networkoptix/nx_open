@@ -2,7 +2,7 @@
 #include <QGraphicsWidget>
 
 UiElementsInstrument::UiElementsInstrument(QObject *parent):
-    Instrument(Instrument::VIEWPORT, makeSet(QEvent::Resize), parent) 
+    Instrument(Instrument::VIEWPORT, makeSet(QEvent::Paint), parent) 
 {}
 
 UiElementsInstrument::~UiElementsInstrument() {
