@@ -110,7 +110,7 @@ private:
 
 NavigationItem::NavigationItem(QGraphicsItem * /*parent*/) :
     CLUnMovedInteractiveOpacityItem(QString("name:)"), 0, 0.5, 0.95),
-    m_camera(0), m_currentTime(0),
+    m_camera(0), m_forcedCamera(0), m_currentTime(0),
     m_playing(false),
     m_mouseOver(false),
     restoreInfoTextData(0)
@@ -319,9 +319,52 @@ QRectF NavigationItem::boundingRect() const
     return m_graphicsWidget->boundingRect();
 }
 
-void NavigationItem::setVideoCamera(CLVideoCamera *camera)
+void NavigationItem::setVideoCamera(CLVideoCamera* camera) {
+    if (m_forcedCamera == camera)
+        return;
+
+    m_forcedCamera = camera;
+
+    updateActualCamera();
+}
+
+void NavigationItem::addReserveCamera(CLVideoCamera* camera) {
+    if(camera == NULL)
+        return;
+
+    m_reserveCameras.insert(camera);
+
+    updateActualCamera();
+    updatePeriodList(true);
+}
+
+void NavigationItem::removeReserveCamera(CLVideoCamera* camera) {
+    m_reserveCameras.remove(camera);
+
+    updateActualCamera();
+    updatePeriodList(true);
+}
+
+void NavigationItem::updateActualCamera() {
+    if(m_forcedCamera != NULL) {
+        setActualCamera(m_forcedCamera);
+        return;
+    }
+
+    if(m_reserveCameras.contains(m_camera))
+        return;
+
+    if(m_reserveCameras.empty()) {
+        setActualCamera(NULL);
+        return;
+    }
+
+    setActualCamera(*m_reserveCameras.begin());
+}
+
+void NavigationItem::setActualCamera(CLVideoCamera *camera)
 {
-    if (m_camera == camera)
+    if(m_camera == camera)
         return;
 
     m_speedSlider->resetSpeed();
@@ -350,6 +393,7 @@ void NavigationItem::setVideoCamera(CLVideoCamera *camera)
     }
 }
 
+
 void NavigationItem::onLiveModeChanged(bool value)
 {
     if (value)
@@ -375,6 +419,7 @@ void NavigationItem::updateSlider()
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader *>(m_camera->getStreamreader());
     qint64 startTime = reader->startTime();
     qint64 endTime = reader->endTime();
+
     if (startTime != AV_NOPTS_VALUE && endTime != AV_NOPTS_VALUE)
     {
         m_timeSlider->setMinimumValue(startTime / 1000);
@@ -394,45 +439,50 @@ void NavigationItem::updateSlider()
     }
 }
 
-void NavigationItem::updatePeriodList() {
+void NavigationItem::updatePeriodList(bool force) {
     qint64 w = m_timeSlider->sliderRange() * 1000;
     qint64 t = m_timeSlider->viewPortPos() * 1000;
-    if(m_timePeriod.startTimeUSec <= t && t + w <= m_timePeriod.startTimeUSec + m_timePeriod.durationUSec)
+    if(!force && m_timePeriod.startTimeUSec <= t && t + w <= m_timePeriod.startTimeUSec + m_timePeriod.durationUSec)
         return;
 
-    QnResourcePtr resource = m_camera->getStreamreader()->getResource();
-    if(!resource->checkFlag(QnResource::live))
-        return;
+    QnNetworkResourceList resources;
+    QnVideoServerConnectionPtr connection;
+    foreach(CLVideoCamera *camera, m_reserveCameras) {
+        QnNetworkResourcePtr networkResource = qSharedPointerDynamicCast<QnNetworkResource>(camera->getDevice());
+        if(networkResource.isNull())
+            continue;
 
-    /* Cast just to feel safe. */
-    QnNetworkResourcePtr networkResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
-    if(networkResource.isNull())
-        return;
+        resources.push_back(networkResource);
+        
+        if(!connection.isNull())
+            continue;
 
-    QnResourcePtr parentResource = qnResPool->getResourceById(networkResource->getParentId());
-    //if(!parentResource->checkFlag(QnResource::server)) // TODO: doesn't work
-    //    return;
+        QnVideoServerPtr serverResource = qSharedPointerDynamicCast<QnVideoServer>(qnResPool->getResourceById(networkResource->getParentId()));
+        if(serverResource.isNull())
+            continue;
 
-    /* Cast just to feel safe. */
-    QnVideoServerPtr serverResource = qSharedPointerDynamicCast<QnVideoServer>(parentResource);
-    if(serverResource.isNull())
-        return;
+        QnVideoServerConnectionPtr serverConnection = serverResource->apiConnection();
+        if(serverConnection.isNull())
+            continue;
 
-    QnVideoServerConnectionPtr connection = serverResource->apiConnection();
-    if(connection.isNull())
-        return;
+        connection = serverConnection;
+    }
 
+    /* Request interval no shorter than 1 hour. */
     const qint64 oneHour = 60ll * 60ll * 1000ll * 1000ll;
     if(w < oneHour)
         w = oneHour;
 
-    QnNetworkResourceList resources;
-    resources.push_back(networkResource); // TODO
-
+    /* It is important to update the stored interval BEFORE sending request to 
+     * the server. Request is blocking and starts an event loop, so we may get 
+     * into this method again. */
     m_timePeriod.startTimeUSec = t - w;
     m_timePeriod.durationUSec = w * 3;
 
-    QnTimePeriodList timePeriods = connection->recordedTimePeriods(resources, m_timePeriod.startTimeUSec, m_timePeriod.startTimeUSec + m_timePeriod.durationUSec, 1);
+    QnTimePeriodList timePeriods;
+    if(!connection.isNull())
+        timePeriods = connection->recordedTimePeriods(resources, m_timePeriod.startTimeUSec, m_timePeriod.startTimeUSec + m_timePeriod.durationUSec, 1);
+
     m_timeSlider->setTimePeriodList(timePeriods);
 }
 
@@ -450,7 +500,7 @@ void NavigationItem::onValueChanged(qint64 time)
 
     smartSeek(time);
 
-    updatePeriodList();
+    updatePeriodList(false);
 }
 
 void NavigationItem::smartSeek(qint64 timeMSec)

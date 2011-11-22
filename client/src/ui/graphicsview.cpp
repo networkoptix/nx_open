@@ -319,7 +319,7 @@ void GraphicsView::stop()
 {
     mViewStarted = false;
     stopAnimation(); // stops animation
-    setZeroSelection(0, true);
+    setZeroSelection();
     closeAllDlg();
 }
 
@@ -375,11 +375,8 @@ qreal GraphicsView::getZoom() const
     return m_scenezoom.getZoom();
 }
 
-void GraphicsView::setZeroSelection(int delay, bool force)
+void GraphicsView::setZeroSelection(int delay)
 {
-    if(!force && m_camLayout.hasLiveCameras())
-        return;
-
     if (m_selectedWnd && m_camLayout.hasSuchItem(m_selectedWnd))
     {
         m_selectedWnd->setItemSelected(false, true,delay);
@@ -2072,21 +2069,6 @@ bool GraphicsView::onUserInput(bool go_unsteady, bool escapeFromintro)
     return false;
 }
 
-void GraphicsView::deviceAdded(const QnResourcePtr &resource, CLVideoWindowItem *item)
-{
-    if (m_navigationItem && qSharedPointerDynamicCast<QnSequrityCamResource>(resource))
-    {
-        m_navigationItem->show(500);
-        m_navigationItem->setVisible(true);
-
-        if(item != NULL) {
-            CLVideoCamera *cam = item->getVideoCam();
-            if(cam != NULL)
-                onNewItemSelected_helper(item, 0);
-        }
-    }
-}
-
 void GraphicsView::goToSteadyMode(bool steady)
 {
     CLUnMovedPixture* bk_item = static_cast<CLUnMovedPixture*>(staticItemByName(QLatin1String("background")));
@@ -2690,11 +2672,7 @@ void GraphicsView::onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int de
     if (!m_camLayout.getContent()->checkIntereactionFlag(LayoutContent::ItemSelectable))
         return;
 
-    CLVideoCamera *lastVideoCamera = 0;
-    if (m_navigationItem)
-        lastVideoCamera = m_navigationItem->videoCamera();
-
-    setZeroSelection(delay, true);
+    setZeroSelection(delay);
 
     m_selectedWnd = new_wnd;
     m_last_selectedWnd = new_wnd;
@@ -2703,9 +2681,6 @@ void GraphicsView::onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int de
 
     m_selectedWnd->setItemSelected(true, true, delay);
 
-    if(m_camLayout.hasLiveCameras() && m_navigationItem->videoCamera() == NULL && lastVideoCamera != NULL) // Hack hack hack
-        m_navigationItem->setVideoCamera(lastVideoCamera);
-    
     if (m_selectedWnd->toVideoItem())
     {
 

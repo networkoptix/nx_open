@@ -119,22 +119,28 @@ void RTPSession::parseSDP()
 
 void RTPSession::parseRangeHeader(const QString& rangeStr)
 {
-    QStringList rangeType = rangeStr.trimmed().split("=");
+    QStringList rangeType = rangeStr.trimmed().split(QChar('='));
     if (rangeType.size() < 2)
         return;
     if (rangeType[0] == "npt")
     {
-        QStringList values = rangeType[1].split("-");
+        int index = rangeType[1].lastIndexOf(QChar('-'));
+        QString start = rangeType[1].mid(0, index);
+        QString end = rangeType[1].mid(index + 1);
+        if(start.endsWith(QChar('-'))) {
+            start = start.left(start.size() - 1);
+            end = QChar('-') + end;
+        }
 
-        double val = values[0].toDouble();
+        double val = start.toDouble();
         m_startTime = val < 1000000 ? val * 1000000.0 : val;
-        if (values.size() > 1) 
+        if (index > 0) 
         {
-            if (values[1] == "now") {
+            if (end == "now") {
                 m_endTime = DATETIME_NOW;
             }
             else {
-                val = values[1].toDouble();
+                val = end.toDouble();
                 m_endTime = val < 1000000 ? val * 1000000.0 : val;
             }
         }

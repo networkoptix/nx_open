@@ -18,7 +18,7 @@ PreferencesWindow::PreferencesWindow(QWidget *parent) :
     QDialog(parent, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint)
 {
     setupUi(this);
-
+    
 #ifdef CL_TRIAL_MODE
     tabWidget->removeTab(tabWidget->indexOf(licenseTab));
 #endif

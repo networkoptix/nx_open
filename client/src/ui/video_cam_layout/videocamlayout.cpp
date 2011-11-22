@@ -13,6 +13,7 @@
 #include "ui/videoitem/video_wnd_archive_item.h"
 #include "ui/videoitem/picture_image_item.h"
 #include "ui/videoitem/intro_video_wnd.h"
+#include "ui/videoitem/navigationitem.h"
 #include "layout_items.h"
 #include "ui/videoitem/unmoved/multipage/page_selector.h"
 #include "core/resourcemanagment/resource_pool.h"
@@ -185,6 +186,8 @@ void SceneLayout::stop_helper(bool emt)
 
 		QnResourcePtr dev = devitem->getDevice();
 		CLAbstractSceneItem* item = devitem->getSceneItem();
+
+        removeDeviceNavigation(item);
 
 		m_scene->removeItem(item);
 
@@ -435,6 +438,37 @@ void SceneLayout::onDisplayingStateChanged(CLAbstractRenderer* renderer, bool va
     }
 }
 
+void SceneLayout::addDeviceNavigation(CLAbstractSceneItem* item) {
+    if(m_view == NULL || m_view->getNavigationItem() == NULL)
+        return;
+
+    CLVideoWindowItem *videoItem = dynamic_cast<CLVideoWindowItem *>(item);
+    if(videoItem == NULL)
+        return;
+
+    if(!dynamic_cast<QnSequrityCamResource *>(videoItem->getComplicatedItem()->getDevice().data()))
+        return;
+
+    //m_navigationItem->show(500);
+    //m_navigationItem->setVisible(true);
+
+    m_view->getNavigationItem()->addReserveCamera(videoItem->getVideoCam());
+}
+
+void SceneLayout::removeDeviceNavigation(CLAbstractSceneItem* item) {
+    if(m_view == NULL || m_view->getNavigationItem() == NULL)
+        return;
+
+    CLVideoWindowItem *videoItem = dynamic_cast<CLVideoWindowItem *>(item);
+    if(videoItem == NULL)
+        return;
+
+    if(!dynamic_cast<QnSequrityCamResource *>(videoItem->getComplicatedItem()->getDevice().data()))
+        return;
+
+    m_view->getNavigationItem()->removeReserveCamera(videoItem->getVideoCam());
+}
+
 //#include "../../ui/videoitem/navigationitem.h"
 bool SceneLayout::addDevice(QnResourcePtr device, bool update_scene_rect, CLBasicLayoutItemSettings itemSettings)
 {
@@ -506,7 +540,7 @@ bool SceneLayout::addDevice(QnResourcePtr device, bool update_scene_rect, CLBasi
 		cam->setQuality(QnQualityLow, true);
 		cam->startDispay();
 
-        m_view->deviceAdded(device, video_wnd);
+        addDeviceNavigation(video_wnd);
 		return true;
 	}
 
@@ -536,7 +570,6 @@ bool SceneLayout::addDevice(QnResourcePtr device, bool update_scene_rect, CLBasi
 		m_deviceitems.push_back(recd);
 		recd->start();
 
-        m_view->deviceAdded(device, NULL);
 		return true;
 	}
 
@@ -705,6 +738,7 @@ void SceneLayout::onItemClose(CLAbstractSubItemContainer* itm, bool addToremoved
 
 	CLAbstractSceneItem* item = static_cast<CLAbstractSceneItem*>(itm);
 
+    //m_view->getNavigationItem()->removeReserveCamera()
 	m_view->stopAnimation();
 	m_view->setZeroSelection();
 	item->stop_animation();
@@ -741,6 +775,8 @@ void SceneLayout::onItemClose(CLAbstractSubItemContainer* itm, bool addToremoved
 
 	}
 	//===============
+
+    removeDeviceNavigation(item);
 
 	if (item->getComplicatedItem())
 	{

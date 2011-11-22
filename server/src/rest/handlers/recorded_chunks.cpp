@@ -35,6 +35,7 @@ int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestP
     qint64 startTime = -1, endTime = 1, detailLevel = -1;
     QList<QnResourcePtr> resList;
     QByteArray errStr;
+    QByteArray errStrMac;
     bool urlFound = false;
     for (int i = 0; i < params.size(); ++i)
     {
@@ -44,7 +45,7 @@ int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestP
             QString mac = params[i].second.trimmed();
             QnResourcePtr res = qnResPool->getNetResourceByMac(mac);
             if (res == 0)
-                errStr += QByteArray("Resource with mac '") + mac.toUtf8() + QByteArray("' not found. \n");
+                errStrMac += QByteArray("Resource with mac '") + mac.toUtf8() + QByteArray("' not found. \n");
             else 
                 resList << res;
         }
@@ -66,6 +67,9 @@ int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestP
         errStr += "Parameter endTime must be provided. \n";
     if (detailLevel < 0)
         errStr += "Parameter detail must be provided. \n";
+
+    if (resList.isEmpty())
+        errStr += errStrMac;
 
     if (!errStr.isEmpty())
     {

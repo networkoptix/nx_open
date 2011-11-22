@@ -553,6 +553,7 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
                 painter->drawText(textRect, Qt::AlignHCenter, text);
             }
         }
+        
         xpos += intervals[level].interval * pixelPerTime;
     }
 
