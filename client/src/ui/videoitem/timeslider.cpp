@@ -197,7 +197,7 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
             if(left > right)
                 continue;
 
-            painter->fillRect(left, contentsRect.top(), right - left, contentsRect.height(), QColor(255,255,255,64));
+            painter->fillRect(left, contentsRect.top(), right - left, contentsRect.height(), QColor(255, 0, 0, 96));
         }
     }
 
