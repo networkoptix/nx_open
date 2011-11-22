@@ -319,7 +319,7 @@ void GraphicsView::stop()
 {
     mViewStarted = false;
     stopAnimation(); // stops animation
-    setZeroSelection(0, true);
+    setZeroSelection();
     closeAllDlg();
 }
 
@@ -375,11 +375,8 @@ qreal GraphicsView::getZoom() const
     return m_scenezoom.getZoom();
 }
 
-void GraphicsView::setZeroSelection(int delay, bool force)
+void GraphicsView::setZeroSelection(int delay)
 {
-    if(!force && m_camLayout.hasLiveCameras())
-        return;
-
     if (m_selectedWnd && m_camLayout.hasSuchItem(m_selectedWnd))
     {
         m_selectedWnd->setItemSelected(false, true,delay);
@@ -2081,8 +2078,8 @@ void GraphicsView::deviceAdded(const QnResourcePtr &resource, CLVideoWindowItem 
 
         if(item != NULL) {
             CLVideoCamera *cam = item->getVideoCam();
-            if(cam != NULL)
-                onNewItemSelected_helper(item, 0);
+            /*if(cam != NULL)
+                onNewItemSelected_helper(item, 0);*/
         }
     }
 }
@@ -2694,7 +2691,7 @@ void GraphicsView::onNewItemSelected_helper(CLAbstractSceneItem* new_wnd, int de
     if (m_navigationItem)
         lastVideoCamera = m_navigationItem->videoCamera();
 
-    setZeroSelection(delay, true);
+    setZeroSelection(delay);
 
     m_selectedWnd = new_wnd;
     m_last_selectedWnd = new_wnd;

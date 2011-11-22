@@ -52,7 +52,7 @@ public:
 
     CLAbstractSceneItem* getSelectedItem() const;
 
-    void setZeroSelection(int delay = 0, bool force = false);
+    void setZeroSelection(int delay = 0);
 
     qreal getZoom() const;
 
