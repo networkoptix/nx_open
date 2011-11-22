@@ -1,4 +1,5 @@
 #include "workbench_grid_mapper.h"
+#include <cmath>
 
 namespace {
     QSizeF operator*(const QSizeF &l, const QSizeF &r)

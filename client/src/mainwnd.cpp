@@ -54,19 +54,9 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     setMinimumWidth(min_width);
     setMinimumHeight(min_width * 3 / 4);
 
-    /* Set up UI. */
+    /* Set up scene & view. */
     QGraphicsScene *scene = new QGraphicsScene(this);
     QnGraphicsView *view = new QnGraphicsView(scene, this);
-
-    QHBoxLayout *layout = new QHBoxLayout(this);
-    /* Can't set 0,0,0,0 on Windows as in fullScreen mode context menu becomes invisible.
-     * Looks like a QT bug: http://bugreports.qt.nokia.com/browse/QTBUG-7556 */
-#ifdef Q_OS_WIN
-    layout->setContentsMargins(0, 1, 0, 0);
-#else
-    layout->setContentsMargins(0, 0, 0, 0);
-#endif
-    layout->addWidget(view);
 
     m_backgroundPainter.reset(new QnBlueBackgroundPainter(120.0));
     view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
@@ -93,38 +83,15 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     for (int i = 1; i < argc; ++i)
         controller->drop(fromNativePath(QString::fromLocal8Bit(argv[i])), QPoint(0, 0));
 
-    /*
-    QnFileProcessor::findAcceptedFiles(, &files);
-
-    if (!files.isEmpty())
-    {
-        QnResourceList rlst = QnResourceDirectoryBrowser::instance().checkFiles(files);
-        qnResPool->addResources(rlst);
-
-        content = CLSceneLayoutManager::instance().getNewEmptyLayoutContent();
-
-        foreach (const QString &file, files)
-            content->addDevice(file);
-    }
-    */
-
-    /*
-    //=======add====
-    //m_normalView = new CLLayoutNavigator(this, content);
-
-    //m_normalView->setMode(NORMAL_ViewMode);
-    //m_normalView->getView().setViewMode(GraphicsView::NormalView);
-    */
+    /* Prepare UI. */
     QTabWidget *tabWidget = new QTabWidget(this);
-    tabWidget->addTab(&m_normalView->getView(), QIcon(), tr("Scene"));
+    tabWidget->addTab(view, QIcon(), tr("Scene"));
     tabWidget->addTab(new QWidget(tabWidget), QIcon(), tr("Grid/Properies"));
     // Can't set 0,0,0,0 on Windows as in fullScreen mode context menu becomes invisible
     // QT bug: http://bugreports.qt.nokia.com/browse/QTBUG-7556
     tabWidget->setContentsMargins(0, 1, 0, 0);
     tabWidget->setContentsMargins(0, 0, 0, 0);
     setCentralWidget(tabWidget);
-
-#if 0
 
     // dock widgets
     NavigationTreeWidget *navigationWidget = new NavigationTreeWidget(tabWidget);
@@ -145,7 +112,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     toolBar->addAction(&cm_preferences);
     addToolBar(Qt::TopToolBarArea, toolBar);
 
-
+#if 0
     if (!files.isEmpty())
         show();
     else
