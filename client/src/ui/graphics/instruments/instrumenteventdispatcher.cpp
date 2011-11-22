@@ -24,14 +24,14 @@ InstrumentEventDispatcher<T>::InstrumentEventDispatcher(QObject *parent):
 {}
 
 template<class T>
-void InstrumentEventDispatcher<T>::installInstrumentInternal(Instrument *instrument, T *target) {
+void InstrumentEventDispatcher<T>::installInstrumentInternal(Instrument *instrument, T *target, InstallationMode::Mode mode) {
     if(!registeredNotify(instrument, target))
         return;
 
     m_instrumentTargets.insert(qMakePair(instrument, target));
 
     foreach(QEvent::Type eventType, instrument->watchedEventTypes(TARGET_TYPE))
-        m_instrumentsByTarget[qMakePair(target, eventType)].push_back(instrument);
+        insertInstrument(instrument, mode, &m_instrumentsByTarget[qMakePair(target, eventType)]);
 }
 
 template<class T>
@@ -59,7 +59,7 @@ void InstrumentEventDispatcher<T>::uninstallInstrumentInternal(Instrument *instr
 }
 
 template<class T>
-void InstrumentEventDispatcher<T>::installInstrument(Instrument *instrument) {
+void InstrumentEventDispatcher<T>::installInstrument(Instrument *instrument, InstallationMode::Mode mode) {
     assert(instrument != NULL);
 
     if (m_instruments.contains(instrument)) {
@@ -72,11 +72,11 @@ void InstrumentEventDispatcher<T>::installInstrument(Instrument *instrument) {
         return;
     }
 
-    m_instruments.push_back(instrument);
+    insertInstrument(instrument, mode, &m_instruments);
 
     if(instrument->watches(TARGET_TYPE))
         foreach(T *target, m_targets)
-            installInstrumentInternal(instrument, target);
+            installInstrumentInternal(instrument, target, mode);
 }
 
 template<class T>
@@ -107,7 +107,7 @@ void InstrumentEventDispatcher<T>::registerTarget(T *target) {
     m_targets.insert(target);
 
     foreach(Instrument *instrument, m_instruments)
-        installInstrumentInternal(instrument, target);
+        installInstrumentInternal(instrument, target, INSTALL_LAST);
 }
 
 template<class T>

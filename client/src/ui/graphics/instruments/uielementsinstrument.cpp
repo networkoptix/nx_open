@@ -14,17 +14,6 @@ void UiElementsInstrument::installedNotify() {
     widget->setFlag(QGraphicsItem::ItemIgnoresTransformations);
     scene()->addItem(widget);
 
-    QGraphicsLinearLayout *layout = new QGraphicsLinearLayout();
-    widget->setLayout(layout);
-
-    
-    QLabel *label = new QLabel("123412341234234");
-    QGraphicsProxyWidget *ww = new QGraphicsProxyWidget();
-    ww->setWidget(label);
-
-    layout->addItem(ww);
-    layout->setAlignment(ww, Qt::AlignCenter);
-
     m_widget = widget;
 }
 
@@ -35,11 +24,16 @@ void UiElementsInstrument::uninstalledNotify() {
     }
 }
 
-void UiElementsInstrument::adjustPosition(QGraphicsView *view) {
+bool UiElementsInstrument::paintEvent(QWidget *viewport, QPaintEvent *event) {
     QGraphicsWidget *widget = m_widget.data();
     if(widget == NULL)
-        return;
+        return false;
 
-    widget->resize(view->viewport()->size());
-    widget->setPos(view->mapToScene(0, 0));
+    QGraphicsView *view = this->view(viewport);
+
+    QRectF newGeometry = QRectF(view->mapToScene(0, 0), viewport->size());
+    if(!qFuzzyCompare(newGeometry, widget->geometry()))
+        widget->setGeometry(newGeometry);
+
+    return false;
 }

@@ -2,6 +2,7 @@
 #define QN_INSTRUMENT_MANAGER_P_H
 
 #include "sceneeventfilter.h" /* For SceneDestructionListener and SceneEventFilterItem. */
+#include "installationmode.h"
 
 template<class T>
 class InstrumentEventDispatcher;
@@ -17,7 +18,7 @@ private:
 
     void init();
 
-    void installInstrumentInternal(Instrument *instrument);
+    void installInstrumentInternal(Instrument *instrument, InstallationMode::Mode mode);
 
     void uninstallInstrumentInternal(Instrument *instrument);
 

@@ -5,6 +5,7 @@
 #include <QSet>
 #include <QList>
 #include "instrument.h"
+#include "installationmode.h"
 
 class QGraphicsItem;
 class QGraphicsScene;
@@ -17,9 +18,8 @@ class InstrumentManagerPrivate;
  * 
  * It supports multiple graphics views per instrument manager.
  */
-class InstrumentManager: public QObject {
+class InstrumentManager: public QObject, public InstallationMode {
     Q_OBJECT;
-
 public:
     /**
      * Constructor.
@@ -39,9 +39,10 @@ public:
      * Installs the given instrument to the associated graphics view.
      * 
      * \param instrument               Instrument to install.
+     * \param mode                     Where to install the given instrument.
      * \returns                        Whether the instrument was successfully installed.
      */
-    bool installInstrument(Instrument *instrument);
+    bool installInstrument(Instrument *instrument, InstallationMode::Mode mode = INSTALL_LAST);
 
     /**
      * Uninstalls the given instrument from the associated graphics view.
@@ -162,5 +163,11 @@ private:
 private:
     Q_DECLARE_PRIVATE(InstrumentManager);
 };
+
+
+namespace detail {
+
+} // namespace detail
+
 
 #endif // QN_INSTRUMENT_MANAGER_H

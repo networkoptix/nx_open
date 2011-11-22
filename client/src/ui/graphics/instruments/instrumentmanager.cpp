@@ -47,16 +47,16 @@ void InstrumentManagerPrivate::destroyed(SceneEventFilterItem *item) {
     sceneIsBeingDestroyed = false;
 }
 
-void InstrumentManagerPrivate::installInstrumentInternal(Instrument *instrument) {
+void InstrumentManagerPrivate::installInstrumentInternal(Instrument *instrument, InstallationMode::Mode mode) {
     /* Initialize instrument. */
     instrument->m_scene = scene;
     instrument->m_manager = q_func();
 
     /* Install instrument. */
-    sceneDispatcher->installInstrument(instrument);
-    viewDispatcher->installInstrument(instrument);
-    viewportDispatcher->installInstrument(instrument);
-    itemDispatcher->installInstrument(instrument);
+    sceneDispatcher->installInstrument(instrument, mode);
+    viewDispatcher->installInstrument(instrument, mode);
+    viewportDispatcher->installInstrument(instrument, mode);
+    itemDispatcher->installInstrument(instrument, mode);
 
     /* Notify. */
     instrument->sendInstalledNotifications(true);
@@ -95,7 +95,7 @@ void InstrumentManagerPrivate::registerSceneInternal(QGraphicsScene *newScene) {
 
     /* Install instruments. */
     foreach (Instrument *instrument, instruments)
-        installInstrumentInternal(instrument);
+        installInstrumentInternal(instrument, InstallationMode::INSTALL_LAST);
 
     /* Store self in scene's list of instrument managers. */
     QList<InstrumentManager *> managers = q->managersOf(scene);
@@ -258,7 +258,7 @@ const QList<Instrument *> &InstrumentManager::instruments() const {
     return d_func()->instruments;
 }
 
-bool InstrumentManager::installInstrument(Instrument *instrument) {
+bool InstrumentManager::installInstrument(Instrument *instrument, InstallationMode::Mode mode) {
     Q_D(InstrumentManager);
 
     if (instrument == NULL) {
@@ -276,13 +276,18 @@ bool InstrumentManager::installInstrument(Instrument *instrument) {
         return false;
     }
 
+    if (mode != INSTALL_FIRST && mode != INSTALL_LAST) {
+        qnWarning("Unknown installation mode '%1'.", static_cast<int>(mode));
+        return false;
+    }
+
     /* Update local records. */
-    d->instruments.push_back(instrument);
+    insertInstrument(instrument, mode, &d->instruments);
 
     if (d->scene == NULL)
         return true; /* We'll register it for real once we have the scene. */
 
-    d->installInstrumentInternal(instrument);
+    d->installInstrumentInternal(instrument, mode);
     return true;
 }
 
@@ -438,4 +443,22 @@ void InstrumentManager::at_viewport_destroyed(QObject *viewport) {
 
 QList<InstrumentManager *> InstrumentManager::managersOf(QGraphicsScene *scene) {
     return scene->property(managersPropertyName).value<QList<InstrumentManager *> >();
+}
+
+
+void InstallationMode::insertInstrument(Instrument *instrument, InstallationMode::Mode mode, QList<Instrument *> *target) {
+    assert(instrument != NULL && target != NULL);
+
+    switch(mode) {
+    case InstrumentManager::INSTALL_FIRST:
+        target->push_front(instrument);
+        return;
+    case InstrumentManager::INSTALL_LAST:
+        target->push_back(instrument);
+        return;
+    default:
+        qnWarning("Unknown instrument installation mode '%1', using INSTALL_LAST instead.", static_cast<int>(mode));
+        insertInstrument(instrument, InstrumentManager::INSTALL_LAST, target);
+        return;
+    }
 }

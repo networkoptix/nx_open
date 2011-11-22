@@ -16,14 +16,11 @@ public:
     UiElementsInstrument(QObject *parent);
     virtual ~UiElementsInstrument();
 
-public slots:
-    void adjustPosition(QGraphicsView *view);
-
 protected:
     virtual void installedNotify();
     virtual void uninstalledNotify();
 
-    //virtual bool resizeEvent(QWidget *viewport, QResizeEvent *event) override;
+    virtual bool paintEvent(QWidget *viewport, QPaintEvent *event) override;
 
 private:
     QWeakPointer<QGraphicsWidget> m_widget;

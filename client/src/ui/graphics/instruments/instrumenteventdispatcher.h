@@ -9,6 +9,7 @@
 #include <QPair>
 #include "instrument.h"
 #include "sceneeventfilter.h"
+#include "installationmode.h"
 
 template<class T>
 class InstrumentEventDispatcherBase: public QObject {
@@ -40,7 +41,7 @@ public:
  *                                   before being passed to instruments.
  */
 template<class T>
-class InstrumentEventDispatcher: public InstrumentEventDispatcherBase<T> {
+class InstrumentEventDispatcher: public InstrumentEventDispatcherBase<T>, public InstallationMode {
     typedef InstrumentEventDispatcherBase<T> base_type;
 
     friend class base_type; /* Calls dispatch. */
@@ -58,7 +59,7 @@ public:
     /**
      * \param instrument               Instrument to install. Must not be NULL.
      */
-    void installInstrument(Instrument *instrument);
+    void installInstrument(Instrument *instrument, InstallationMode::Mode mode);
 
     /**
      * \param instrument               Instrument to uninstall. Must not be NULL.
@@ -83,7 +84,7 @@ protected:
     bool dispatch(T *target, QEvent *event);
 
 private:
-    void installInstrumentInternal(Instrument *instrument, T *target);
+    void installInstrumentInternal(Instrument *instrument, T *target, InstallationMode::Mode mode);
 
     void uninstallInstrumentInternal(Instrument *instrument, T *target);
 
