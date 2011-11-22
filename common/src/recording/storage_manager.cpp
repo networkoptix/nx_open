@@ -90,8 +90,11 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(QnResourceList resList, qi
                 QnTimePeriod& last = result.last();
                 if (last.startTimeUSec <= minStartTime && last.startTimeUSec+last.durationUSec > minStartTime)
                     last.durationUSec = qMax(last.durationUSec, minStartTime + cameras[minIndex][0].durationUSec - last.startTimeUSec);
-                else
+                else {
                     result << cameras[minIndex][0];
+                    if (cameras[minIndex][0].durationUSec == -1)
+                        break;
+                }
             } 
             cameras[minIndex].pop_front();
         }
@@ -314,7 +317,17 @@ DeviceFileCatalog::Chunk QnChunkSequence::getNextChunk(QnResourcePtr res, qint64
     if (info.m_index != -1) 
     {
         DeviceFileCatalog::Chunk chunk = info.m_catalog->chunkAt(info.m_index);
-        if (chunk.startTime != -1) {
+        if (chunk.startTime != -1) 
+        {
+			/*
+            QString msg;
+            QTextStream str(&msg);
+            str << " found chunk. Chunk startTime=" << QDateTime::fromMSecsSinceEpoch(chunk.startTime/1000).toString();
+            str.flush();
+            cl_log.log(msg, cl_logWARNING);
+            str.flush();
+			*/
+
             info.m_startTime = chunk.startTime;
             info.m_index++;
         }

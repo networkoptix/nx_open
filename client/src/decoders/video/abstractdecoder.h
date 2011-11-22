@@ -44,7 +44,7 @@ public:
     virtual PixelFormat getFormat() const { return PIX_FMT_YUV420P; }
     virtual void flush() {}
     virtual const AVFrame* lastFrame() { return 0; }
-    virtual void resetDecoder() {}
+    virtual void resetDecoder(QnCompressedVideoDataPtr data) {}
 private:
 	QnAbstractVideoDecoder(const QnAbstractVideoDecoder&) {}
 	QnAbstractVideoDecoder& operator=(const QnAbstractVideoDecoder&) { return *this; }

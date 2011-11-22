@@ -40,9 +40,9 @@ public:
     virtual PixelFormat getFormat() const { return m_context->pix_fmt; }
     virtual void flush();
     virtual const AVFrame* lastFrame() { return m_frame; }
-    virtual void resetDecoder();
     void determineOptimalThreadType(const QnCompressedVideoDataPtr data);
     virtual void setMTDecoding(bool value);
+    virtual void resetDecoder(QnCompressedVideoDataPtr data);
 private:
     static AVCodec* findCodec(CodecID codecId);
 

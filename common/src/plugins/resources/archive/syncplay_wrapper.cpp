@@ -226,13 +226,13 @@ qint64 QnArchiveSyncPlayWrapper::seek (qint64 time)
 }
 */
 
-qint64 QnArchiveSyncPlayWrapper::secondTime() const
+qint64 QnArchiveSyncPlayWrapper::secondTime(QnAbstractArchiveReader* reader) const
 {
     Q_D(const QnArchiveSyncPlayWrapper);
     qint64 rez = 0x7fffffffffffffffll;
     foreach(ReaderInfo info, d->readers)
     {
-        if (!info.enabled)
+        if (!info.enabled || info.reader == reader) // skip self and disabled
             continue;
         QnSyncPlayArchiveDelegate* syncDelegate = static_cast<QnSyncPlayArchiveDelegate*> (info.reader->getArchiveDelegate());
         qint64 val = syncDelegate->secondTime();
@@ -247,7 +247,7 @@ void QnArchiveSyncPlayWrapper::waitIfNeed(QnAbstractArchiveReader* reader, qint6
     Q_D(QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->syncMutex);
     // +SYNC_EPS
-    while (!reader->needToStop() && timestamp > secondTime()) // time of second(next) frame is less than it time.
+    while (!reader->needToStop() && timestamp > secondTime(reader)) // time of second(next) frame is less than it time.
     {
         //QString msg;
         //QTextStream str(&msg);
