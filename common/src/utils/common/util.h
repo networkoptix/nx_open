@@ -70,5 +70,7 @@ static const char *DEFAULT_APPSERVER_URL = "http://127.0.0.1:8000";
 
 static const int MAX_RTSP_DATA_LEN = 65535 - 16;
 
+static const qint64 BACKWARD_SEEK_STEP =  2000 * 1000; 
+
 
 #endif // _UNIVERSAL_CLIENT_UTIL_H

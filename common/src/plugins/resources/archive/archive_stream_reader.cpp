@@ -9,7 +9,6 @@
 // seek by 1.5secs. It is prevents too fast seeks for short GOP, also some codecs has bagged seek function. Large step prevent seek
 // forward instead seek backward
 static const int MAX_KEY_FIND_INTERVAL = 10 * 1000 * 1000;
-static const qint64 BACKWARD_SEEK_STEP =  2000 * 1000; 
 
 static const int FFMPEG_PROBE_BUFFER_SIZE = 1024 * 512;
 

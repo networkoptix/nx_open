@@ -211,7 +211,7 @@ bool DeviceFileCatalog::deleteFirstRecord()
     return true;
 }
 
-int DeviceFileCatalog::findFileIndex(qint64 startTime) const
+int DeviceFileCatalog::findFileIndex(qint64 startTime, FindMethod method) const
 {
 /*
     QString msg;
@@ -230,7 +230,7 @@ int DeviceFileCatalog::findFileIndex(qint64 startTime) const
     if (itr > m_chunks.begin())
     {
         --itr;
-         if (itr->startTime + itr->duration < startTime && itr < m_chunks.end()-1)
+         if (method == OnRecordHole_NextChunk && itr->startTime + itr->duration < startTime && itr < m_chunks.end()-1)
              ++itr;
     }
     return itr - m_chunks.begin();

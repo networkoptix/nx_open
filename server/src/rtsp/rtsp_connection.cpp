@@ -377,16 +377,15 @@ int QnRtspConnectionProcessor::composePlay()
         d->dataProcessor->unlockDataQueue();
         d->dataProcessor->setWaitBOF(d->startTime, false); // ignore rest packets before new position
     }
-    else if (qAbs(d->startTime - getRtspTime()) >= RTSP_MIN_SEEK_INTERVAL)
+    else if (d->archiveDP) 
     {
-        if (d->archiveDP)
+        d->archiveDP->setReverseMode(d->rtspScale < 0);
+        if (qAbs(d->startTime - getRtspTime()) >= RTSP_MIN_SEEK_INTERVAL)
+        
         {
             //d->dataProcessor->clearUnprocessedData();
             if (d->archiveDP->jumpTo(d->startTime, true))
                 d->dataProcessor->setWaitBOF(d->startTime, true); // ignore rest packets before new position
-        }
-        else {
-            qWarning() << "Seek operation not supported for dataProvider" << d->mediaRes->getId();
         }
     }
     currentDP->start();

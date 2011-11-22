@@ -11,7 +11,7 @@ QnSyncPlayArchiveDelegate::QnSyncPlayArchiveDelegate(QnAbstractArchiveReader* re
     m_seekTime(AV_NOPTS_VALUE),
     m_enableSync(true)
 {
-
+    m_flags = ownerDelegate->getFlags();
 }
 
 QnSyncPlayArchiveDelegate::~QnSyncPlayArchiveDelegate()
@@ -48,6 +48,11 @@ qint64 QnSyncPlayArchiveDelegate::endTime()
 bool QnSyncPlayArchiveDelegate::isRealTimeSource() const 
 { 
     return m_ownerDelegate->isRealTimeSource();
+}
+
+void QnSyncPlayArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
+{
+    m_ownerDelegate->onReverseMode(displayTime, value);
 }
 
 qint64 QnSyncPlayArchiveDelegate::jumpToPreviousFrame (qint64 time, bool makeshot)

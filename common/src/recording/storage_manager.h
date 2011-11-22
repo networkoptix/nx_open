@@ -15,9 +15,10 @@ class QnChunkSequence: public QObject
 public:
     QnChunkSequence(const QnNetworkResourcePtr res, qint64 startTime);
     QnChunkSequence(const QnNetworkResourceList& resList, qint64 startTime);
-    DeviceFileCatalog::Chunk getNextChunk(QnResourcePtr res, qint64 time = -1);
+    DeviceFileCatalog::Chunk findChunk(QnResourcePtr res, qint64 time, DeviceFileCatalog::FindMethod findMethod);
+    DeviceFileCatalog::Chunk getNextChunk(QnResourcePtr res);
     qint64 nextChunkStartTime(QnResourcePtr res);
-    DeviceFileCatalog::Chunk getPrevChunk(QnResourcePtr res);
+    //DeviceFileCatalog::Chunk getPrevChunk(QnResourcePtr res);
 private slots:
     void onFirstDataRemoved(int n);
 private:

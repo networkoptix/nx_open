@@ -219,10 +219,13 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 {
                     setLightCPUMode(QnAbstractVideoDecoder::DecodeMode_Fast);
                 }
+
                 else if (m_iFrames > 1) {
                     qint64 avgGopDuration = ((qint64)needToSleep * m_totalFrames)/m_iFrames;
                     if (realSleepTime < qMin(-400*1000ll, -avgGopDuration))
-                        setLightCPUMode(QnAbstractVideoDecoder::DecodeMode_Fastest);
+                    {
+                        ; //setLightCPUMode(QnAbstractVideoDecoder::DecodeMode_Fastest);
+                    }
                     else if (vd->flags & AV_PKT_FLAG_KEY)
                         setLightCPUMode(QnAbstractVideoDecoder::DecodeMode_Fast);
                 }
