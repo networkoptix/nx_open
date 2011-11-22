@@ -107,8 +107,6 @@ void CLFFmpegVideoDecoder::determineOptimalThreadType(const QnCompressedVideoDat
 {
     if (m_context->thread_count == 1) {
         m_context->thread_count = qMin(4, QThread::idealThreadCount() + 1);
-        if (data && (data->flags & QnAbstractMediaData::MediaFlags_LIVE))
-            m_context->thread_count = qMin(2, m_context->thread_count); // reduce live delay
     }
     if (m_forceSliceDecoding == -1 && data && data->data.data() && m_context->codec_id == CODEC_ID_H264) 
     {
@@ -137,7 +135,8 @@ void CLFFmpegVideoDecoder::determineOptimalThreadType(const QnCompressedVideoDat
             }
         }
     }
-    m_context->thread_type = m_mtDecoding && (m_forceSliceDecoding != 1) ? FF_THREAD_FRAME : FF_THREAD_SLICE;
+    bool isLive = data && (data->flags & QnAbstractMediaData::MediaFlags_LIVE);
+    m_context->thread_type = m_mtDecoding && (m_forceSliceDecoding != 1) && !isLive ? FF_THREAD_FRAME : FF_THREAD_SLICE;
 
     if (m_context->codec_id == CODEC_ID_H264 && m_context->thread_type == FF_THREAD_SLICE)
     {
@@ -211,7 +210,7 @@ CLFFmpegVideoDecoder::~CLFFmpegVideoDecoder(void)
 		avcodec_close(m_passedContext);
 }
 
-void CLFFmpegVideoDecoder::resetDecoder()
+void CLFFmpegVideoDecoder::resetDecoder(QnCompressedVideoDataPtr data)
 {
     QMutexLocker mutex(&global_ffmpeg_mutex);
 
@@ -224,7 +223,7 @@ void CLFFmpegVideoDecoder::resetDecoder()
     if (m_passedContext) {
         avcodec_copy_context(m_context, m_passedContext);
     }
-    determineOptimalThreadType(QnCompressedVideoDataPtr());
+    determineOptimalThreadType(data);
     //m_context->thread_count = qMin(5, QThread::idealThreadCount() + 1);
     //m_context->thread_type = m_mtDecoding ? FF_THREAD_FRAME : FF_THREAD_SLICE;
     // ensure that it is H.264 with nal prefixes
@@ -288,7 +287,7 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, CLVideoDe
     if (m_needRecreate && (data->flags & AV_PKT_FLAG_KEY))
     {
         m_needRecreate = false;
-        resetDecoder();
+        resetDecoder(data);
     }
 
     AVPacket avpkt;
@@ -331,7 +330,7 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, CLVideoDe
         {
             m_currentWidth = sps.getWidth();
             m_currentHeight = sps.getHeight();
-            resetDecoder();
+            resetDecoder(data);
         }
     }
     // -------------------------
