@@ -44,6 +44,8 @@ UiElementsInstrument::UiElementsInstrument(QObject *parent):
     widget->setParent(this);
     widget->setFlag(QGraphicsItem::ItemIgnoresTransformations);
     m_widget = widget;
+
+    connect(widget, SIGNAL(zChanged()), this, SLOT(at_widget_zValueChanged()));
 }
 
 UiElementsInstrument::~UiElementsInstrument() {
@@ -52,28 +54,36 @@ UiElementsInstrument::~UiElementsInstrument() {
 
 void UiElementsInstrument::installedNotify() {
     DestructionGuardItem *guard = new DestructionGuardItem();
-    guard->setGuarded(m_widget.data());
+    guard->setGuarded(widget());
     guard->setPos(0.0, 0.0);
     scene()->addItem(guard);
 
     m_guard = guard;
+    
+    at_widget_zValueChanged();
 }
 
 void UiElementsInstrument::uninstalledNotify() {
-    if(!m_guard.isNull())
-        delete m_guard.data();
+    if(guard() != NULL)
+        delete guard();
 }
 
 bool UiElementsInstrument::paintEvent(QWidget *viewport, QPaintEvent *event) {
-    QGraphicsWidget *widget = m_widget.data();
-    if(widget == NULL)
+    if(widget() == NULL)
         return false;
 
     QGraphicsView *view = this->view(viewport);
 
     QRectF newGeometry = QRectF(view->mapToScene(0, 0), viewport->size());
-    if(!qFuzzyCompare(newGeometry, widget->geometry()))
-        widget->setGeometry(newGeometry);
+    if(!qFuzzyCompare(newGeometry, widget()->geometry()))
+        widget()->setGeometry(newGeometry);
 
     return false;
+}
+
+void UiElementsInstrument::at_widget_zValueChanged() {
+    if(guard() == NULL || widget() == NULL) 
+        return;
+
+    guard()->setZValue(widget()->zValue());
 }

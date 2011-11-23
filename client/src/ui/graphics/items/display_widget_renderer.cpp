@@ -34,7 +34,7 @@ bool QnDisplayWidgetRenderer::paint(int channel, const QRectF &rect) {
 }
 
 void QnDisplayWidgetRenderer::checkThread(bool inDecodingThread) const {
-#ifdef _DEBUG
+#ifdef _DEBUG________________
     if(inDecodingThread) {
         if(m_decodingThread == NULL) {
             m_decodingThread = QThread::currentThread();

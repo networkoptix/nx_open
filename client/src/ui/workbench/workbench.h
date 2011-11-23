@@ -16,6 +16,17 @@ class QnWorkbenchItem;
  * 
  * It also ensures that current layout is never NULL by replacing NULL layout 
  * supplied by the user with internally stored empty layout.
+ * 
+ * Workbench state consists of:
+ * <ul>
+ * <li>Mode that determines which actions are allowed for workbench users.</>
+ * <li>A layout that defines how items are placed.</li>
+ * <li>A grid mapper that maps integer layout coordinates into floating-point
+ *     surface coordinates.</li>
+ * <li>Currently raised item - an item that is enlarged and is shown on top of other items.</li>
+ * <li>Currently zoomed item - an item that is shown in full screen.</li>
+ * <li>Currently focused item - an item that is manipulated by ui controls, such as play/pause buttons.</li>
+ * </ul>
  */
 class QnWorkbench: public QObject {
     Q_OBJECT;
@@ -83,16 +94,16 @@ public:
     void setMode(Mode mode);
 
     /**
-     * \returns                         Currently selected item.
+     * \returns                         Currently raised item.
      */
-    QnWorkbenchItem *selectedItem() const {
-        return m_selectedItem;
+    QnWorkbenchItem *raisedItem() const {
+        return m_raisedItem;
     }
 
     /**
-     * \param item                      New selected item for this workbench.
+     * \param item                      New raised item for this workbench.
      */
-    void setSelectedItem(QnWorkbenchItem *item);
+    void setRaisedItem(QnWorkbenchItem *item);
 
     /**
      * \returns                         Currently zoomed item.
@@ -105,6 +116,18 @@ public:
      * \param item                      New zoomed item for this workbench.
      */
     void setZoomedItem(QnWorkbenchItem *item);
+
+    /**
+     * \returns                         Item that has focus. 
+     */
+    QnWorkbenchItem *focusedItem() const {
+        return m_focusedItem;
+    }
+
+    /**
+     * \param item                      New focused item for this workbench.
+     */
+    void setFocusedItem(QnWorkbenchItem *item);
 
 signals:
     /**
@@ -119,14 +142,19 @@ signals:
     void modeChanged();
 
     /**
-     * This signal is emitted whenever the selected item of this workbench changes. 
+     * This signal is emitted whenever the raised item of this workbench changes. 
      */
-    void selectedItemChanged();
+    void raisedItemChanged();
 
     /**
      * This signal is emitted whenever the zoomed item of this workbench changes.
      */
     void zoomedItemChanged();
+
+    /**
+     * This signal is emitted whenever the focused item of this workbench changes. 
+     */
+    void focusedItemChanged();
 
     /**
      * This signal is emitted whenever the layout of this workbench changes.
@@ -169,11 +197,14 @@ private:
     /** Current mode. */
     Mode m_mode;
 
-    /** Currently selected item. NULL if none. */
-    QnWorkbenchItem *m_selectedItem;
+    /** Currently raised item. NULL if none. */
+    QnWorkbenchItem *m_raisedItem;
 
     /** Currently zoomed item. NULL if none. */
     QnWorkbenchItem *m_zoomedItem;
+
+    /** Item that currently has focus. NULL if none. */
+    QnWorkbenchItem *m_focusedItem;
 
     /** Stored dummy layout. It is used to ensure that current layout is never NULL. */
     QnWorkbenchLayout *m_dummyLayout;

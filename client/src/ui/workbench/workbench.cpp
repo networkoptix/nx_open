@@ -11,8 +11,9 @@ QnWorkbench::QnWorkbench(QObject *parent):
     m_layout(NULL),
     m_dummyLayout(new QnWorkbenchLayout(this)),
     m_mapper(new QnWorkbenchGridMapper(this)),
-    m_selectedItem(NULL),
-    m_zoomedItem(NULL)
+    m_raisedItem(NULL),
+    m_zoomedItem(NULL),
+    m_focusedItem(NULL)
 {
     setLayout(m_dummyLayout);
 }    
@@ -74,18 +75,18 @@ void QnWorkbench::setMode(Mode mode) {
     emit modeChanged();
 }
 
-void QnWorkbench::setSelectedItem(QnWorkbenchItem *item) {
-    if(m_selectedItem == item)
+void QnWorkbench::setRaisedItem(QnWorkbenchItem *item) {
+    if(m_raisedItem == item)
         return;
 
     if(item != NULL && item->layout() != m_layout) {
-        qnWarning("Cannot select an item from another layout.");
+        qnWarning("Cannot raise an item from another layout.");
         return;
     }
 
-    m_selectedItem = item;
+    m_raisedItem = item;
     
-    emit selectedItemChanged();
+    emit raisedItemChanged();
 }
 
 void QnWorkbench::setZoomedItem(QnWorkbenchItem *item) {
@@ -102,16 +103,33 @@ void QnWorkbench::setZoomedItem(QnWorkbenchItem *item) {
     emit zoomedItemChanged();
 }
 
+void QnWorkbench::setFocusedItem(QnWorkbenchItem *item) {
+    if(m_focusedItem == item)
+        return;
+
+    if(item != NULL && item->layout() != m_layout) {
+        qnWarning("Cannot focus an item from another layout.");
+        return;
+    }
+
+    m_focusedItem = item;
+
+    emit focusedItemChanged();
+}
+
 void QnWorkbench::at_layout_itemAdded(QnWorkbenchItem *item) {
     emit itemAdded(item);
 }
 
 void QnWorkbench::at_layout_itemAboutToBeRemoved(QnWorkbenchItem *item) {
-    if(item == m_selectedItem)
-        setSelectedItem(NULL);
+    if(item == m_raisedItem)
+        setRaisedItem(NULL);
 
     if(item == m_zoomedItem)
         setZoomedItem(NULL);
+
+    if(item == m_focusedItem)
+        setFocusedItem(NULL);
 
     emit itemAboutToBeRemoved(item);
 }

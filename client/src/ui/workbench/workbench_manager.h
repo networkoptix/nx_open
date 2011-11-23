@@ -19,10 +19,14 @@ class QnWorkbench;
 class QnWorkbenchItem;
 class QnWorkbenchLayout;
 class QnDisplayWidget;
+class QnResourceDisplay;
 class QnViewportAnimator;
 class QnWidgetAnimator;
 class QnCurtainAnimator;
 class QnCurtainItem;
+
+class CLVideoCamera;
+class CLCamDisplay;
 
 /**
  * This class ties a workbench, a scene and a view together.
@@ -38,9 +42,9 @@ public:
     enum Layer {
         BACK_LAYER,                 /**< Back layer. */
         PINNED_LAYER,               /**< Layer for pinned items. */
-        PINNED_SELECTED_LAYER,      /**< Layer for pinned items that are selected. */
+        PINNED_RAISED_LAYER,        /**< Layer for pinned items that are raised. */
         UNPINNED_LAYER,             /**< Layer for unpinned items. */
-        UNPINNED_SELECTED_LAYER,    /**< Layer for unpinned items that are selected. */
+        UNPINNED_RAISED_LAYER,      /**< Layer for unpinned items that are raised. */
         CURTAIN_LAYER,              /**< Layer for curtain that blacks out the background when an item is zoomed. */
         ZOOMED_LAYER,               /**< Layer for zoomed items. */
         FRONT_LAYER,                /**< Topmost layer for items. Items that are being dragged, resized or manipulated in any other way are to be placed here. */
@@ -141,6 +145,12 @@ public:
      */
     QnDisplayWidget *widget(QnWorkbenchItem *item) const;
 
+    QnResourceDisplay *display(QnWorkbenchItem *item) const;
+
+    CLVideoCamera *camera(QnWorkbenchItem *item) const;
+
+    CLCamDisplay *camDisplay(QnWorkbenchItem *item) const;
+
     /**
      * \param item                      Item to get enclosing geometry for.
      * \returns                         Given item's enclosing geometry in scene 
@@ -226,7 +236,7 @@ protected slots:
     
     void at_workbench_aboutToBeDestroyed();
     void at_workbench_modeChanged();
-    void at_workbench_selectedItemChanged();
+    void at_workbench_raisedItemChanged();
     void at_workbench_zoomedItemChanged();
 
     void at_item_geometryChanged();
@@ -278,8 +288,8 @@ private:
     /** Current front z displacement value. */
     qreal m_frontZ;
 
-    /** Currently selected item. */
-    QnWorkbenchItem *m_selectedItem;
+    /** Currently raised item. */
+    QnWorkbenchItem *m_raisedItem;
 
     /** Currently zoomed item. */
     QnWorkbenchItem *m_zoomedItem;

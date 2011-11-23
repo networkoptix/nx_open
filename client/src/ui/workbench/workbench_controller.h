@@ -18,10 +18,13 @@ class ResizingInstrument;
 class ArchiveDropInstrument;
 class UiElementsInstrument;
 
+class NavigationItem;
+
 class QnWorkbenchManager;
 class QnWorkbenchLayout;
 class QnWorkbench;
 class QnDisplayWidget;
+class QnWorkbenchItem;
 class QnWorkbenchGridMapper;
 
 
@@ -67,6 +70,8 @@ protected slots:
     void at_viewportGrabbed();
     void at_viewportUngrabbed();
 
+    void at_workbench_focusedItemChanged();
+
 private:
     void dropInternal(const QList<QString> &files, const QPoint &gridPos);
 
@@ -97,6 +102,12 @@ private:
 
     /** Ui elements instrument. */
     UiElementsInstrument *m_uiElementsInstrument;
+
+    /** Focused item. */
+    QnWorkbenchItem *m_focusedItem;
+
+    /** Navigation item. */
+    NavigationItem *m_navigationItem;
 };
 
 #endif // QN_WORKBENCH_CONTROLLER_H

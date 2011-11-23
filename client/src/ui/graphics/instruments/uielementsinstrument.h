@@ -32,6 +32,14 @@ protected:
 
     virtual bool paintEvent(QWidget *viewport, QPaintEvent *event) override;
 
+private slots:
+    void at_widget_zValueChanged();
+
+private:
+    DestructionGuardItem *guard() const {
+        return m_guard.data();
+    }
+
 private:
     QWeakPointer<DestructionGuardItem> m_guard;
     QWeakPointer<QGraphicsWidget> m_widget;

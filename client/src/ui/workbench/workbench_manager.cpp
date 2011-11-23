@@ -4,6 +4,9 @@
 
 #include <functional> /* For std::binary_function. */
 
+#include <camera/resource_display.h>
+#include <camera/camera.h>
+
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/widget_animator.h>
 #include <ui/animation/curtain_animator.h>
@@ -72,7 +75,7 @@ QnWorkbenchManager::QnWorkbenchManager(QObject *parent):
     m_viewportAnimator(NULL),
     m_curtainAnimator(NULL),
     m_zoomedItem(NULL),
-    m_selectedItem(NULL),
+    m_raisedItem(NULL),
     m_mode(QnWorkbench::VIEWING),
     m_frontZ(0.0),
     m_dummyScene(new QGraphicsScene(this)),
@@ -185,9 +188,9 @@ void QnWorkbenchManager::deinitSceneWorkbench() {
     foreach(QnWorkbenchItem *item, m_workbench->layout()->items())
         removeItemInternal(item);
 
-    m_selectedItem = m_zoomedItem = NULL;
+    m_raisedItem = m_zoomedItem = NULL;
 
-    assert(m_selectedItem == NULL);
+    assert(m_raisedItem == NULL);
     assert(m_zoomedItem == NULL);
     assert(m_mode == QnWorkbench::VIEWING);
 }
@@ -219,7 +222,7 @@ void QnWorkbenchManager::initSceneWorkbench() {
     /* Init workbench. */
     connect(m_workbench,            SIGNAL(aboutToBeDestroyed()),                   this,                   SLOT(at_workbench_aboutToBeDestroyed()));
     connect(m_workbench,            SIGNAL(modeChanged()),                          this,                   SLOT(at_workbench_modeChanged()));
-    connect(m_workbench,            SIGNAL(selectedItemChanged()),                  this,                   SLOT(at_workbench_selectedItemChanged()));
+    connect(m_workbench,            SIGNAL(raisedItemChanged()),                  this,                   SLOT(at_workbench_raisedItemChanged()));
     connect(m_workbench,            SIGNAL(zoomedItemChanged()),                    this,                   SLOT(at_workbench_zoomedItemChanged()));
     connect(m_workbench,            SIGNAL(itemAdded(QnWorkbenchItem *)),           this,                   SLOT(at_workbench_itemAdded(QnWorkbenchItem *)));
     connect(m_workbench,            SIGNAL(itemAboutToBeRemoved(QnWorkbenchItem *)),this,                   SLOT(at_workbench_itemAboutToBeRemoved(QnWorkbenchItem *)));
@@ -231,7 +234,7 @@ void QnWorkbenchManager::initSceneWorkbench() {
     /* Fire signals if needed. */
     if(m_workbench->mode() != m_mode)
         at_workbench_modeChanged();
-    at_workbench_selectedItemChanged();
+    at_workbench_raisedItemChanged();
     at_workbench_zoomedItemChanged();
 
     synchronizeSceneBounds();
@@ -362,6 +365,30 @@ QnDisplayWidget *QnWorkbenchManager::widget(QnWorkbenchItem *item) const {
     return m_widgetByItem[item];
 }
 
+QnResourceDisplay *QnWorkbenchManager::display(QnWorkbenchItem *item) const {
+    QnDisplayWidget *widget = this->widget(item);
+    if(widget == NULL)
+        return NULL;
+
+    return widget->display();
+}
+
+CLVideoCamera *QnWorkbenchManager::camera(QnWorkbenchItem *item) const {
+    QnResourceDisplay *display = this->display(item);
+    if(display == NULL)
+        return NULL;
+
+    return display->camera();
+}
+
+CLCamDisplay *QnWorkbenchManager::camDisplay(QnWorkbenchItem *item) const {
+    CLVideoCamera *camera = this->camera(item);
+    if(camera == NULL)
+        return NULL;
+
+    return camera->getCamCamDisplay();
+}
+
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchManager :: mutators
@@ -472,14 +499,14 @@ QnWorkbenchManager::Layer QnWorkbenchManager::synchronizedLayer(QnWorkbenchItem 
     if(item == m_zoomedItem) {
         return ZOOMED_LAYER;
     } else if(item->isPinned()) {
-        if(item == m_selectedItem) {
-            return PINNED_SELECTED_LAYER;
+        if(item == m_raisedItem) {
+            return PINNED_RAISED_LAYER;
         } else {
             return PINNED_LAYER;
         }
     } else {
-        if(item == m_selectedItem) {
-            return UNPINNED_SELECTED_LAYER;
+        if(item == m_raisedItem) {
+            return UNPINNED_RAISED_LAYER;
         } else {
             return UNPINNED_LAYER;
         }
@@ -570,8 +597,8 @@ void QnWorkbenchManager::synchronizeGeometry(QnDisplayWidget *widget, bool anima
 
     QRectF enclosingGeometry = itemEnclosingGeometry(item);
 
-    /* Adjust for selection. */
-    if(item == m_selectedItem && item != m_zoomedItem && m_view != NULL) {
+    /* Adjust for raise. */
+    if(item == m_raisedItem && item != m_zoomedItem && m_view != NULL) {
         QPointF geometryCenter = enclosingGeometry.center();
         QTransform transform;
         transform.translate(geometryCenter.x(), geometryCenter.y());
@@ -597,7 +624,7 @@ void QnWorkbenchManager::synchronizeGeometry(QnDisplayWidget *widget, bool anima
     }
 
     /* Update Z value. */
-    if(item == m_selectedItem || item == m_zoomedItem)
+    if(item == m_raisedItem || item == m_zoomedItem)
         bringToFront(widget);
     
     /* Update enclosing aspect ratio. */
@@ -671,15 +698,15 @@ void QnWorkbenchManager::at_workbench_modeChanged() {
     }
 }
 
-void QnWorkbenchManager::at_workbench_selectedItemChanged() {
-    QnWorkbenchItem *oldSelectedItem = m_selectedItem;
-    m_selectedItem = m_workbench->selectedItem();
+void QnWorkbenchManager::at_workbench_raisedItemChanged() {
+    QnWorkbenchItem *oldRaisedItem = m_raisedItem;
+    m_raisedItem = m_workbench->raisedItem();
 
-    if(oldSelectedItem != NULL)
-        synchronize(oldSelectedItem);
-    if(m_selectedItem != NULL) {
-        bringToFront(m_selectedItem);
-        synchronize(m_selectedItem, true);
+    if(oldRaisedItem != NULL)
+        synchronize(oldRaisedItem);
+    if(m_raisedItem != NULL) {
+        bringToFront(m_raisedItem);
+        synchronize(m_raisedItem, true);
     }
 }
 
@@ -709,10 +736,10 @@ void QnWorkbenchManager::at_workbench_zoomedItemChanged() {
 
 
 void QnWorkbenchManager::at_viewport_transformationChanged() {
-    if(m_selectedItem == NULL)
+    if(m_raisedItem == NULL)
         return;
 
-    QnDisplayWidget *widget = this->widget(m_selectedItem);
+    QnDisplayWidget *widget = this->widget(m_raisedItem);
     synchronizeGeometry(widget, animator(widget)->isAnimating());
 }
 

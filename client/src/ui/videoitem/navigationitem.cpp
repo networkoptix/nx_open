@@ -147,6 +147,7 @@ NavigationItem::NavigationItem(QGraphicsItem * /*parent*/) :
     m_camera(0), m_forcedCamera(0), m_currentTime(0),
     m_playing(false),
     m_mouseOver(false),
+    m_controlAudio(true),
     restoreInfoTextData(0)
 {
     setFlag(QGraphicsItem::ItemIsMovable, false);
