@@ -45,6 +45,7 @@ public:
 
     static bool isPixelFormatSupported(PixelFormat pixfmt);
 
+    QString getTimeText() const;
 private:
     void construct();
     void init(bool msgbox);
@@ -152,6 +153,7 @@ private:
     bool m_inited;
     int m_videoWidth;
     int m_videoHeight;
+    QString m_timeText;
 
     static QVector<uchar> m_staticYFiller;
     static QVector<uchar> m_staticUVFiller;

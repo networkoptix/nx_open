@@ -51,7 +51,6 @@ public:
 
     void setQuality(QnStreamQuality q, bool increase);
     virtual qint64 getCurrentTime() const override;
-    virtual qint64 selfCurrentTime() const override;
 
     void setExternalTimeSource(QnlTimeSource* value) { m_extTimeSrc = value; }
 
