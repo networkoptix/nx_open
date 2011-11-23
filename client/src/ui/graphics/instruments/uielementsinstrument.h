@@ -5,16 +5,26 @@
 #include <QWeakPointer>
 
 class QGraphicsWidget;
+class DestructionGuardItem;
+
 
 /**
- * Note that even though this instrument works with multiple views, it is not
- * suited to be used like that.
+ * Note that even though this instrument works fine with multiple views, 
+ * it is not suited to be used like that.
  */
 class UiElementsInstrument: public Instrument {
     Q_OBJECT;
 public:
     UiElementsInstrument(QObject *parent);
     virtual ~UiElementsInstrument();
+
+    /**
+     * \returns                         Widget that this instrument works with.
+     *                                  Is never NULL, unless explicitly deleted by user.
+     */
+    QGraphicsWidget *widget() const {
+        return m_widget.data();
+    }
 
 protected:
     virtual void installedNotify();
@@ -23,6 +33,7 @@ protected:
     virtual bool paintEvent(QWidget *viewport, QPaintEvent *event) override;
 
 private:
+    QWeakPointer<DestructionGuardItem> m_guard;
     QWeakPointer<QGraphicsWidget> m_widget;
 };
 

@@ -107,24 +107,16 @@ QnWorkbenchController::~QnWorkbenchController() {
     return;
 }
 
-QnWorkbench *QnWorkbenchController::state() const {
+QnWorkbench *QnWorkbenchController::workbench() const {
     return m_synchronizer->workbench();
 }
 
 QnWorkbenchLayout *QnWorkbenchController::layout() const {
-    QnWorkbench *state = this->state();
-    if(state == NULL)
-        return NULL;
-
-    return state->layout();
+    return m_synchronizer->workbench()->layout();
 }
 
 QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
-    QnWorkbench *state = this->state();
-    if(state == NULL)
-        return NULL;
-
-    return state->mapper();
+    return m_synchronizer->workbench()->mapper();
 }
 
 void QnWorkbenchController::drop(const QUrl &url, const QPoint &gridPos, bool checkUrls) {
@@ -320,7 +312,7 @@ void QnWorkbenchController::at_item_clicked(QGraphicsView *, QGraphicsItem *item
         return;
 
     QnWorkbenchItem *model = widget->item();
-    state()->setSelectedItem(state()->selectedItem() == model ? NULL : model);
+    workbench()->setSelectedItem(workbench()->selectedItem() == model ? NULL : model);
 }
 
 void QnWorkbenchController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem *item) {
@@ -331,34 +323,34 @@ void QnWorkbenchController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem
         return;
 
     QnWorkbenchItem *model = widget->item();
-    if(state()->zoomedItem() == model) {
+    if(workbench()->zoomedItem() == model) {
         QRectF viewportGeometry = m_synchronizer->viewportGeometry();
-        QRectF zoomedItemGeometry = m_synchronizer->itemGeometry(state()->zoomedItem());
+        QRectF zoomedItemGeometry = m_synchronizer->itemGeometry(workbench()->zoomedItem());
 
         if(contains(zoomedItemGeometry.size(), viewportGeometry.size()) && !qFuzzyCompare(viewportGeometry, zoomedItemGeometry)) {
-            state()->setZoomedItem(NULL);
-            state()->setZoomedItem(model);
+            workbench()->setZoomedItem(NULL);
+            workbench()->setZoomedItem(model);
         } else {
-            state()->setZoomedItem(NULL);
-            state()->setSelectedItem(NULL);
+            workbench()->setZoomedItem(NULL);
+            workbench()->setSelectedItem(NULL);
         }
     } else {
-        state()->setZoomedItem(model);
+        workbench()->setZoomedItem(model);
     }
 }
 
 void QnWorkbenchController::at_scene_clicked(QGraphicsView *) {
-    if(state() == NULL)
+    if(workbench() == NULL)
         return;
 
-    state()->setSelectedItem(NULL);
+    workbench()->setSelectedItem(NULL);
 }
 
 void QnWorkbenchController::at_scene_doubleClicked(QGraphicsView *) {
-    if(state() == NULL)
+    if(workbench() == NULL)
         return;
 
-    state()->setZoomedItem(NULL);
+    workbench()->setZoomedItem(NULL);
     m_synchronizer->fitInView();
 }
 

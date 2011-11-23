@@ -37,7 +37,7 @@ public:
 
     virtual ~QnWorkbenchController();
 
-    QnWorkbench *state() const;
+    QnWorkbench *workbench() const;
 
     QnWorkbenchLayout *layout() const;
 
