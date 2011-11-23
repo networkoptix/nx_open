@@ -150,6 +150,8 @@ private:
 
     QnCompressedVideoDataPtr m_nextPacket;
     QnCompressedVideoDataPtr m_currentPacket;
+    QTime m_delayTimer;
+    bool m_frameDelayed;
 };
 
 #endif //clcam_display_h_1211
