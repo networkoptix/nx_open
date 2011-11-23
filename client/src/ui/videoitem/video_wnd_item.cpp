@@ -243,6 +243,19 @@ void CLVideoWindowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
         m_gldraw[i]->setOpacity(drawSelection ? 0.7 : 1.0);
         if (!m_gldraw[i]->paintEvent(getSubChannelRect(i)))
             drawGLfailaure(painter);
+        else {
+            QString timeText = m_gldraw[i]->getTimeText();
+            if (!timeText.isEmpty())
+            {
+                QFont font;
+                font.setPixelSize(128);
+                QFontMetrics metric(font);
+                QSize size = metric.size(Qt::TextSingleLine, timeText);
+                painter->setFont(font);
+                painter->drawText(width() - size.width() - 8, height() - size.height() - 8, timeText);
+            }
+
+        }
     }
 
     // restore the GL state that QPainter expects

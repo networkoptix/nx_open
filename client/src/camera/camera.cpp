@@ -53,14 +53,8 @@ qint64 CLVideoCamera::getCurrentTime() const
     if (m_extTimeSrc)
 	    return m_extTimeSrc->getCurrentTime();
     else
-        return m_camdispay.currentTime();
+        return m_camdispay.getCurrentTime();
 }
-
-qint64 CLVideoCamera::selfCurrentTime() const
-{
-    return m_camdispay.currentTime();
-}
-
 
 /*
 void CLVideoCamera::streamJump(qint64 time)

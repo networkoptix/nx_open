@@ -722,7 +722,7 @@ void CLCamDisplay::onSlowSourceHint()
     m_dataQueue.setMaxSize(CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE);
 }
 
-qint64 CLCamDisplay::currentTime() const 
+qint64 CLCamDisplay::getCurrentTime() const 
 {
     qint64 result = m_display[0]->getLastDisplayedTime();
     if (result == AV_NOPTS_VALUE)

@@ -301,7 +301,7 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
     {
         if (!info.enabled) 
             continue;
-        qint64 camTime = info.cam->selfCurrentTime();
+        qint64 camTime = info.cam->getCurrentTime();
         if (camTime != AV_NOPTS_VALUE)
             val = qMax(camTime, val);
     }

@@ -847,6 +847,11 @@ bool CLGLRenderer::paintEvent(const QRect &r)
             m_videoWidth = curImg->width;
             m_videoHeight = curImg->height;
             updateTexture();
+            m_timeText.clear();
+            if (curImg->pkt_dts > 1000000ll * 3600*24)
+            {
+                m_timeText = QDateTime::fromMSecsSinceEpoch(curImg->pkt_dts/1000).toString("hh.mm.ss.zzz");
+            }
         }
     }
     bool draw = m_videoWidth <= getMaxTextureSize() && m_videoHeight <= getMaxTextureSize();
@@ -877,3 +882,10 @@ bool CLGLRenderer::constantDownscaleFactor() const
 {
     return m_videowindow->constantDownscaleFactor();
 }
+
+QString CLGLRenderer::getTimeText() const
+{
+    QMutexLocker locker(&m_displaySync);
+    return m_timeText;
+}
+
