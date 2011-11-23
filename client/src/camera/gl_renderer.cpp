@@ -149,6 +149,7 @@ CLGLRenderer::CLGLRenderer(CLVideoWindowItem *vw) :
     m_videoWidth(0),
     m_videoHeight(0),
     m_noVideo(false)
+
 {
     applyMixerSettings(m_brightness, m_contrast, m_hue, m_saturation);
 

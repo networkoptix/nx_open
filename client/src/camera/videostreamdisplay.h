@@ -41,6 +41,7 @@ public:
     void setCurrentTime(qint64 time);
     void waitForFramesDisplaed();
     void onNoVideo();
+    void canUseBufferedFrameDisplayer(bool value);
 private:
     QMutex m_mtx;
     mutable QMutex m_timeMutex;
@@ -78,6 +79,7 @@ private:
     int m_maxReverseQueueSize;
     bool m_timeChangeEnabled;
     BufferedFrameDisplayer* m_bufferedFrameDisplayer;
+    bool m_canUseBufferedFrameDisplayer;
 private:
     bool m_queueWasFilled;
     float m_speed;

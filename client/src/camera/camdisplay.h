@@ -45,8 +45,6 @@ public:
 	/**
 	 * \returns                         Current time in microseconds.
 	 */
-    virtual qint64 getDisplayedTime() const;
-
     virtual qint64 getCurrentTime() const;
     virtual qint64 getNextTime() const;
 
@@ -57,7 +55,9 @@ public:
     QImage getScreenshot(int channel);
     bool isRealTimeSource() const { return m_isRealTimeSource; }
 
-    void setExternalTimeSource(QnlTimeSource* value) { m_extTimeSrc = value; }
+    void setExternalTimeSource(QnlTimeSource* value);
+
+    virtual void putData(QnAbstractDataPacketPtr data);
 
 public slots:
     void onBeforeJump(qint64 time, bool makeshot);
@@ -85,7 +85,8 @@ private:
     void enqueueVideo(QnCompressedVideoDataPtr vd);
     void afterJump(qint64 new_time);
     void processNewSpeed(float speed);
-    bool useSync(const QnCompressedVideoDataPtr data) const;
+    bool useSync(QnCompressedVideoDataPtr vd);
+    void safeSleep(qint64 value);
 private:
 	QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];
 
@@ -143,15 +144,10 @@ private:
     int m_realTimeHurryUp;
     QnlTimeSource* m_extTimeSrc;
     
-    qint64 m_nextTime;
+    //qint64 m_nextTime;
     mutable QMutex m_timeMutex;
-    bool m_firstDelayCycle;
-    bool m_blockTimeValue;
-
-    QnCompressedVideoDataPtr m_nextPacket;
-    QnCompressedVideoDataPtr m_currentPacket;
-    QTime m_delayTimer;
-    bool m_frameDelayed;
+    bool m_useMtDecoding;
+    //bool m_firstDelayCycle;
 };
 
 #endif //clcam_display_h_1211

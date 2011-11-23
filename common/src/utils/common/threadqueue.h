@@ -40,13 +40,10 @@ public:
         return true;
     }
 
-    T front() const
+    T front()
     {
         QMutexLocker mutex(&m_cs);
-        if (m_queue.size() > 0)
-            return m_queue.front();  
-        else
-            return T();
+        return m_queue.front();  
     }
 
     T at(int i)
