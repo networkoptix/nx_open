@@ -37,7 +37,7 @@ void DragProcessor::reset() {
 
 void DragProcessor::setHandler(DragProcessHandler *handler) {
     if(handler != NULL && handler->m_processor != NULL) {
-        qnWarning("Given listener is already assigned to a processor.");
+        qnWarning("Given handler is already assigned to a processor.");
         return;
     }
 
