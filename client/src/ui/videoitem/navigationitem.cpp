@@ -449,7 +449,7 @@ void NavigationItem::updateSlider()
 {
     if (!m_camera)
         return;
-
+    
     if (m_timeSlider->isMoving())
         return;
 
