@@ -197,7 +197,7 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
             if(left > right)
                 continue;
 
-            painter->fillRect(left, contentsRect.top(), right - left, contentsRect.height(), QColor(255,255,255,64));
+            painter->fillRect(left, contentsRect.top(), right - left, contentsRect.height(), QColor(255, 0, 0, 96));
         }
     }
 
@@ -521,8 +521,7 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
         const IntervalInfo &interval = intervals[curLevel];
         const float lineLen = qMin(float(curLevel-level+1) / maxLen, 1.0f);
-        if (lineLen >= 0.5f)
-            painter->drawLine(QPointF(xpos, 0), QPointF(xpos, (r.height() - maxHeight - 3) * lineLen));
+        painter->drawLine(QPointF(xpos, 0), QPointF(xpos, (r.height() - maxHeight - 3) * lineLen));
 
         QString text;
         if (curLevel < FIRST_DATE_INDEX)
