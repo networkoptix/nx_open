@@ -59,6 +59,7 @@ qint64 QnSyncPlayArchiveDelegate::jumpToPreviousFrame (qint64 time, bool makesho
 {
     QMutexLocker lock(&m_genericMutex);
     m_seekTime = time;
+    m_tmpData.clear();
     m_reader->jumpToPreviousFrame(time, makeshot);
     return time;
 }
@@ -67,7 +68,7 @@ qint64 QnSyncPlayArchiveDelegate::seek (qint64 time)
 {
     //return m_syncWrapper->seek(time);
     //m_seekTime = AV_NOPTS_VALUE;
-    m_tmpData = QnAbstractMediaDataPtr(0);
+    m_tmpData.clear();
     return m_ownerDelegate->seek(time);
 }
 
