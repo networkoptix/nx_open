@@ -2,6 +2,7 @@
 #define _SYNC_PLAY_ARCHIVE_DELEGATE_H__
 
 #include "abstract_archive_delegate.h"
+#include "utils/media/externaltimesource.h"
 
 class QnAbstractArchiveReader;
 class QnArchiveSyncPlayWrapper;
@@ -10,7 +11,7 @@ class QnAbstractArchiveDelegate;
 class QnSyncPlayArchiveDelegate: public QnAbstractArchiveDelegate
 {
 public:
-    QnSyncPlayArchiveDelegate(QnAbstractArchiveReader* reader, QnArchiveSyncPlayWrapper* syncWrapper, QnAbstractArchiveDelegate* ownerDelegate);
+    QnSyncPlayArchiveDelegate(QnAbstractArchiveReader* reader, QnArchiveSyncPlayWrapper* syncWrapper, QnAbstractArchiveDelegate* ownerDelegate, QnlTimeSource* display);
     virtual ~QnSyncPlayArchiveDelegate();
 
     virtual bool open(QnResourcePtr resource);
@@ -36,14 +37,15 @@ public:
 private:
     QnArchiveSyncPlayWrapper* m_syncWrapper;
     QnAbstractArchiveDelegate* m_ownerDelegate;
-    QnAbstractMediaDataPtr m_tmpData;
-    qint64 m_seekTime;
+    //QnAbstractMediaDataPtr m_tmpData;
+    //qint64 m_seekTime;
 
     mutable QMutex m_genericMutex;
     qint64 m_startDelay;
     QTime m_initTime;
     QnAbstractArchiveReader* m_reader;
     bool m_enableSync;
+    QnlTimeSource* m_display;
 };
 
 #endif // _SYNC_PLAY_ARCHIVE_DELEGATE_H__

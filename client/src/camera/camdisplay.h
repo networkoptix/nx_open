@@ -46,6 +46,7 @@ public:
 	 * \returns                         Current time in microseconds.
 	 */
     virtual qint64 getCurrentTime() const;
+    virtual qint64 getNextTime() const;
 
     void setMTDecoding(bool value);
 
@@ -53,6 +54,9 @@ public:
 
     QImage getScreenshot(int channel);
     bool isRealTimeSource() const { return m_isRealTimeSource; }
+
+    void setExternalTimeSource(QnlTimeSource* value) { m_extTimeSrc = value; }
+
 public slots:
     void onBeforeJump(qint64 time, bool makeshot);
     void onJumpOccured(qint64 time); 
@@ -134,6 +138,10 @@ private:
     QnAbstractVideoDecoder::DecodeMode m_lightCpuMode;
     CLVideoStreamDisplay::FrameDisplayStatus m_lastFrameDisplayed;
     int m_realTimeHurryUp;
+    QnlTimeSource* m_extTimeSrc;
+    
+    qint64 m_nextTime;
+    mutable QMutex m_timeMutex;
 };
 
 #endif //clcam_display_h_1211

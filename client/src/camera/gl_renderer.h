@@ -45,6 +45,9 @@ public:
     static bool isPixelFormatSupported(PixelFormat pixfmt);
 
     QString getTimeText() const;
+    bool isNoVideo() const;
+
+    void onNoVideo();
 private:
     void init(bool msgbox);
     static int gl_status;
@@ -152,6 +155,7 @@ private:
 
     static QVector<uchar> m_staticYFiller;
     static QVector<uchar> m_staticUVFiller;
+    bool m_noVideo;
 };
 
 #endif //clgl_renderer_12_29

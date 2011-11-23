@@ -40,6 +40,7 @@ public:
     void unblockTimeValue();
     void setCurrentTime(qint64 time);
     void waitForFramesDisplaed();
+    void onNoVideo();
 private:
     QMutex m_mtx;
     mutable QMutex m_timeMutex;

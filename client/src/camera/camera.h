@@ -16,7 +16,7 @@ class CLVideoWindowItem;
 class CLAbstractSceneItem;
 
 
-class CLVideoCamera : public QObject, public CLAbstractComplicatedItem, public QnlTimeSource
+class CLVideoCamera : public QObject, public CLAbstractComplicatedItem
 {
     Q_OBJECT
 public:

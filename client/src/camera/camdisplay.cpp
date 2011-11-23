@@ -12,6 +12,7 @@
 #elif defined(Q_OS_WIN)
 #include <qt_windows.h>
 #endif
+#include "utils/common/util.h"
 
 Q_GLOBAL_STATIC(QMutex, activityMutex)
 static qint64 activityTime = 0;
@@ -87,7 +88,9 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_tooSlowCounter(0),
       m_lightCpuMode(QnAbstractVideoDecoder::DecodeMode_Full),
       m_lastFrameDisplayed(CLVideoStreamDisplay::Status_Displayed),
-      m_realTimeHurryUp(0)
+      m_realTimeHurryUp(0),
+      m_extTimeSrc(0),
+      m_nextTime(AV_NOPTS_VALUE)
 {
     m_storedMaxQueueSize = m_dataQueue.maxSize();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
@@ -297,6 +300,8 @@ void CLCamDisplay::onBeforeJump(qint64 time, bool makeshot)
     else
         cl_log.log("before jump to ", QDateTime::fromMSecsSinceEpoch(time/1000).toString(), cl_logWARNING);
     m_display[0]->blockTimeValue(time);
+    QMutexLocker lock(&m_timeMutex);
+    m_nextTime = AV_NOPTS_VALUE;
 }
 
 void CLCamDisplay::onJumpOccured(qint64 time)
@@ -400,6 +405,36 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
     }
     else
         return true;
+
+
+    // ---------------------- check for external sync
+    m_timeMutex.lock();
+
+    if (vd->flags & (QnAbstractMediaData::MediaFlags_BOF | QnAbstractMediaData::MediaFlags_LIVE))
+    {
+        m_nextTime = AV_NOPTS_VALUE;
+    }
+    else {
+        m_nextTime = vd->timestamp;
+    }
+    m_timeMutex.unlock();
+
+    if (m_extTimeSrc) {
+        qint64 nextTime = m_extTimeSrc->getNextTime();
+        if (nextTime != AV_NOPTS_VALUE && vd->timestamp > nextTime)
+        {
+            if (nextTime - vd->timestamp > MAX_FRAME_DURATION)
+            {
+                for (int i = 1; i < CL_MAX_CHANNELS; ++i) {
+                    if (m_display[i])
+                        m_display[i]->onNoVideo();
+                }
+            }
+            return false; // wait for sync with other cameras. waiting
+        }
+    }
+    // ----------------------
+
 
     bool isReversePacket = media->flags & AV_REVERSE_PACKET;
     bool isReverseMode = speed < 0.0;
@@ -732,4 +767,10 @@ qint64 CLCamDisplay::getCurrentTime() const
             result = qMax(result, m_display[i]->getLastDisplayedTime());
     }
     return result;
+}
+
+qint64 CLCamDisplay::getNextTime() const 
+{
+    QMutexLocker lock(&m_timeMutex);
+    return m_nextTime;
 }

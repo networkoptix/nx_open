@@ -67,7 +67,7 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveReader* reader,
     d->readers << ReaderInfo(reader, reader->getArchiveDelegate(), cam);
     
 
-    reader->setArchiveDelegate(new QnSyncPlayArchiveDelegate(reader, this, reader->getArchiveDelegate()));
+    reader->setArchiveDelegate(new QnSyncPlayArchiveDelegate(reader, this, reader->getArchiveDelegate(), cam));
     reader->setCycleMode(false);
 
     connect(reader, SIGNAL(singleShotModeChanged(bool)), this, SLOT(onSingleShotModeChanged(bool)), Qt::DirectConnection);
@@ -234,6 +234,25 @@ qint64 QnArchiveSyncPlayWrapper::seek (qint64 time)
 }
 */
 
+qint64 QnArchiveSyncPlayWrapper::getNextTime() const
+{
+    Q_D(const QnArchiveSyncPlayWrapper);
+    qint64 rez = AV_NOPTS_VALUE;
+    foreach(ReaderInfo info, d->readers)
+    {
+        if (!info.enabled) // skip self and disabled
+            continue;
+        QnSyncPlayArchiveDelegate* syncDelegate = static_cast<QnSyncPlayArchiveDelegate*> (info.reader->getArchiveDelegate());
+        qint64 val = syncDelegate->secondTime();
+        if (rez == AV_NOPTS_VALUE)
+            rez = val;
+        else if (val != AV_NOPTS_VALUE)
+            rez = qMin(rez, val);
+    }
+    return rez;
+}
+
+/*
 qint64 QnArchiveSyncPlayWrapper::secondTime(QnAbstractArchiveReader* reader) const
 {
     Q_D(const QnArchiveSyncPlayWrapper);
@@ -249,7 +268,9 @@ qint64 QnArchiveSyncPlayWrapper::secondTime(QnAbstractArchiveReader* reader) con
     }
     return rez;
 }
+*/
 
+/*
 void QnArchiveSyncPlayWrapper::waitIfNeed(QnAbstractArchiveReader* reader, qint64 timestamp)
 {
     Q_D(QnArchiveSyncPlayWrapper);
@@ -267,6 +288,7 @@ void QnArchiveSyncPlayWrapper::waitIfNeed(QnAbstractArchiveReader* reader, qint6
         d->syncCond.wait(&d->syncMutex, 50);
     }
 }
+*/
 
 void QnArchiveSyncPlayWrapper::onNewDataReaded()
 {

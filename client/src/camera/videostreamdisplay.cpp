@@ -740,6 +740,11 @@ void CLVideoStreamDisplay::afterJump()
     m_queueWasFilled = false;
 }
 
+void CLVideoStreamDisplay::onNoVideo()
+{
+    m_drawer->onNoVideo();
+}
+
 void CLVideoStreamDisplay::clearReverseQueue()
 {
     m_drawer->waitForFrameDisplayed(0);

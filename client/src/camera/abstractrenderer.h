@@ -76,6 +76,11 @@ public:
         return m_displayCounter;
     }
 
+    /**
+     * Inform drawer about video is temporary absent
+     */
+    virtual void onNoVideo() {}
+
 protected:
     virtual void doFrameDisplayed() {} // Not used for now.
 

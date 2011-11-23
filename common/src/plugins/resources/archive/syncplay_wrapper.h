@@ -20,6 +20,8 @@ public:
     void removeArchiveReader(QnAbstractArchiveReader* reader);
 
     virtual qint64 getCurrentTime() const;
+    virtual qint64 getNextTime() const;
+
 public slots:
     void onConsumerBlocksReader(QnAbstractStreamDataProvider* reader, bool value);
 private slots:
@@ -34,8 +36,8 @@ private:
     qint64 minTime() const;
     qint64 endTime() const;
     //qint64 seek (qint64 time);
-    qint64 secondTime(QnAbstractArchiveReader* reader) const;
-    void waitIfNeed(QnAbstractArchiveReader* reader, qint64 timestamp);
+    qint64 secondTime() const;
+    //void waitIfNeed(QnAbstractArchiveReader* reader, qint64 timestamp);
     void onNewDataReaded();
     void erase(QnAbstractArchiveDelegate* value);
 
