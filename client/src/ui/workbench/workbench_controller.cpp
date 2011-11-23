@@ -109,10 +109,13 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchManager *synchronizer, Q
     NavigationItem *navigationItem = new NavigationItem();
 
     QGraphicsLinearLayout *verticalLayout = new QGraphicsLinearLayout(Qt::Vertical);
+    verticalLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
     m_uiElementsInstrument->widget()->setLayout(verticalLayout);
 
-    verticalLayout->addStretch(1);
-    verticalLayout->addItem(navigationItem);
+    verticalLayout->addStretch(100);
+    
+    navigationItem->setParentItem(m_uiElementsInstrument->widget());
+    verticalLayout->addItem(navigationItem->graphicsWidget());
 }
 
 QnWorkbenchController::~QnWorkbenchController() {
