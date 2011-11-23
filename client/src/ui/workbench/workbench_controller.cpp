@@ -106,13 +106,13 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchManager *synchronizer, Q
     connect(m_synchronizer,             SIGNAL(viewportUngrabbed()),                                            this, SLOT(at_viewportUngrabbed()));
 
     /* Create controls. */
-#if 0
     NavigationItem *navigationItem = new NavigationItem();
 
-    QGraphicsLinearLayout *verticalLayout = new
+    QGraphicsLinearLayout *verticalLayout = new QGraphicsLinearLayout(Qt::Vertical);
+    m_uiElementsInstrument->widget()->setLayout(verticalLayout);
 
-    m_uiElementsInstrument->widget()
-#endif
+    verticalLayout->addStretch(1);
+    verticalLayout->addItem(navigationItem);
 }
 
 QnWorkbenchController::~QnWorkbenchController() {
