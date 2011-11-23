@@ -45,6 +45,8 @@ public:
 	/**
 	 * \returns                         Current time in microseconds.
 	 */
+    virtual qint64 getDisplayedTime() const;
+
     virtual qint64 getCurrentTime() const;
     virtual qint64 getNextTime() const;
 
@@ -83,6 +85,7 @@ private:
     void enqueueVideo(QnCompressedVideoDataPtr vd);
     void afterJump(qint64 new_time);
     void processNewSpeed(float speed);
+    bool useSync(const QnCompressedVideoDataPtr data) const;
 private:
 	QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];
 
@@ -142,6 +145,11 @@ private:
     
     qint64 m_nextTime;
     mutable QMutex m_timeMutex;
+    bool m_firstDelayCycle;
+    bool m_blockTimeValue;
+
+    QnCompressedVideoDataPtr m_nextPacket;
+    QnCompressedVideoDataPtr m_currentPacket;
 };
 
 #endif //clcam_display_h_1211

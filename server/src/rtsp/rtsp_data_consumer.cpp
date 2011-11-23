@@ -228,7 +228,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         curData += sendLen;
 
     }
-    Q_ASSERT(!(m_waitBOF && (media->flags & QnAbstractMediaData::MediaFlags_BOF)));
+    //Q_ASSERT(!(m_waitBOF && (media->flags & QnAbstractMediaData::MediaFlags_BOF)));
 
     return true;
 }
