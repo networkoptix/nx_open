@@ -33,6 +33,9 @@
 #include "workbench_manager.h"
 
 
+#include <ui/videoitem/navigationitem.h>
+
+
 QnWorkbenchController::QnWorkbenchController(QnWorkbenchManager *synchronizer, QObject *parent):
     QObject(parent),
     m_synchronizer(synchronizer),
@@ -101,6 +104,15 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchManager *synchronizer, Q
 
     connect(m_synchronizer,             SIGNAL(viewportGrabbed()),                                              this, SLOT(at_viewportGrabbed()));
     connect(m_synchronizer,             SIGNAL(viewportUngrabbed()),                                            this, SLOT(at_viewportUngrabbed()));
+
+    /* Create controls. */
+#if 0
+    NavigationItem *navigationItem = new NavigationItem();
+
+    QGraphicsLinearLayout *verticalLayout = new
+
+    m_uiElementsInstrument->widget()
+#endif
 }
 
 QnWorkbenchController::~QnWorkbenchController() {
