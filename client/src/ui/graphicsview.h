@@ -152,7 +152,6 @@ protected:
     CLAbstractSceneItem* navigationItem(QGraphicsItem* item) const;
 
     //=========================
-    void contextMenuHelper_addNewLayout();
     void contextMenuHelper_chngeLayoutTitle(CLAbstractSceneItem* wnd);
     void contextMenuHelper_editLayout(CLAbstractSceneItem* wnd);
     bool contextMenuHelper_existRecordedVideo(CLVideoCamera* cam);
@@ -161,7 +160,6 @@ protected:
     void contextMenuHelper_takeScreenshot(CLVideoWindowItem* item);
     void contextMenuHelper_openInWebBroser(CLVideoCamera* cam);
     void contextMenuHelper_Rotation(CLAbstractSceneItem* wnd, qreal angle);
-    void contextMenuHelper_restoreLayout();
     void contextMenuHelper_saveLayout( bool new_name);
     //==========================
 
@@ -177,9 +175,12 @@ private slots:
     void onSecTimer();
     void onDecorationItemPressed(const QString &);
     void onArrange_helper_finished();
+    void onPreferences_helper();
     void toggleRecording();
     void recordingSettings();
     void toggleFullScreen();
+    void contextMenuHelper_addNewLayout();
+    void contextMenuHelper_restoreLayout();
 
     void on_grid_drop_animation_finished();
     void onOpenFile();
