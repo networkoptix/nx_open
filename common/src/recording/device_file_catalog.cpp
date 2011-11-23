@@ -211,8 +211,16 @@ bool DeviceFileCatalog::deleteFirstRecord()
     return true;
 }
 
-int DeviceFileCatalog::findFileIndex(qint64 startTime) const
+int DeviceFileCatalog::findFileIndex(qint64 startTime, FindMethod method) const
 {
+/*
+    QString msg;
+    QTextStream str(&msg);
+    str << " find chunk for time=" << QDateTime::fromMSecsSinceEpoch(startTime/1000).toString();
+    str.flush();
+    cl_log.log(msg, cl_logWARNING);
+    str.flush();
+*/
     QMutexLocker lock(&m_mutex);
 
     if (m_chunks.isEmpty())
@@ -222,7 +230,7 @@ int DeviceFileCatalog::findFileIndex(qint64 startTime) const
     if (itr > m_chunks.begin())
     {
         --itr;
-         if (itr->startTime + itr->duration < startTime && itr < m_chunks.end()-1)
+         if (method == OnRecordHole_NextChunk && itr->startTime + itr->duration < startTime && itr < m_chunks.end()-1)
              ++itr;
     }
     return itr - m_chunks.begin();

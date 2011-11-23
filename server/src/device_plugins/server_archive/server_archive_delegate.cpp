@@ -1,9 +1,6 @@
 #include "server_archive_delegate.h"
 #include "core/resourcemanagment/resource_pool.h"
-
-//extern const qint64 BACKWARD_SEEK_STEP;
-static const qint64 BACKWARD_SEEK_STEP =  2000 * 1000; 
-
+#include "utils/common/util.h"
 
 
 QnServerArchiveDelegate::QnServerArchiveDelegate(): 
@@ -59,19 +56,25 @@ void QnServerArchiveDelegate::close()
 
 qint64 QnServerArchiveDelegate::seek(qint64 time)
 {
-    cl_log.log("serverArchiveDelegate. jump to ",QDateTime::fromMSecsSinceEpoch(time/1000).toString(), cl_logALWAYS);
+    cl_log.log("serverArchiveDelegate. jump to ",QDateTime::fromMSecsSinceEpoch(time/1000).toString("hh.mm.ss.zzz"), cl_logALWAYS);
     QTime t;
     t.start();
-    DeviceFileCatalog::Chunk newChunk = m_chunkSequence->getNextChunk(m_resource, time);
+
+    DeviceFileCatalog::Chunk newChunk = m_chunkSequence->findChunk(m_resource, time, 
+        m_reverseMode ? DeviceFileCatalog::OnRecordHole_PrevChunk : DeviceFileCatalog::OnRecordHole_NextChunk);
 
     if (newChunk.startTime != m_currentChunk.startTime)
     {
         if (!switchToChunk(newChunk))
             return -1;
     }
-    qint64 chunkOffset = qMax(time - m_currentChunk.startTime, 0ll);
-    qint64 rez = m_currentChunk.startTime + m_aviDelegate->seek(chunkOffset);
-    cl_log.log("jump time ", t.elapsed(), cl_logALWAYS);
+
+    qint64 chunkOffset = qBound(0ll, time - m_currentChunk.startTime, m_currentChunk.duration - BACKWARD_SEEK_STEP);
+    qint64 seekRez = m_aviDelegate->seek(chunkOffset);
+    if (seekRez == -1)
+        return seekRez;
+    qint64 rez = m_currentChunk.startTime + seekRez;
+    //cl_log.log("jump time ", t.elapsed(), cl_logALWAYS);
     return rez;
 }
 

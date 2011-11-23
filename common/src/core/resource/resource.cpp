@@ -280,7 +280,7 @@ QnParamList& QnResource::getResourceParamList() const
         {
             QnParam newParam(paramType);
             newParam.setValue(paramType->default_value);
-            cl_log.log(newParam.toDebugString(), cl_logALWAYS); // debug
+            //cl_log.log(newParam.toDebugString(), cl_logALWAYS); // debug
             resourceParamList.put(newParam);
         }
 

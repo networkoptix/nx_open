@@ -11,7 +11,7 @@ QnSyncPlayArchiveDelegate::QnSyncPlayArchiveDelegate(QnAbstractArchiveReader* re
     m_seekTime(AV_NOPTS_VALUE),
     m_enableSync(true)
 {
-
+    m_flags = ownerDelegate->getFlags();
 }
 
 QnSyncPlayArchiveDelegate::~QnSyncPlayArchiveDelegate()
@@ -50,10 +50,16 @@ bool QnSyncPlayArchiveDelegate::isRealTimeSource() const
     return m_ownerDelegate->isRealTimeSource();
 }
 
+void QnSyncPlayArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
+{
+    m_ownerDelegate->onReverseMode(displayTime, value);
+}
+
 qint64 QnSyncPlayArchiveDelegate::jumpToPreviousFrame (qint64 time, bool makeshot)
 {
     QMutexLocker lock(&m_genericMutex);
     m_seekTime = time;
+    m_tmpData.clear();
     m_reader->jumpToPreviousFrame(time, makeshot);
     return time;
 }
@@ -62,7 +68,7 @@ qint64 QnSyncPlayArchiveDelegate::seek (qint64 time)
 {
     //return m_syncWrapper->seek(time);
     //m_seekTime = AV_NOPTS_VALUE;
-    m_tmpData = QnAbstractMediaDataPtr(0);
+    m_tmpData.clear();
     return m_ownerDelegate->seek(time);
 }
 
@@ -85,10 +91,18 @@ qint64 QnSyncPlayArchiveDelegate::secondTime() const
 {
     QMutexLocker lock(&m_genericMutex);
     QnCompressedVideoDataPtr vd = qSharedPointerDynamicCast<QnCompressedVideoData>(m_tmpData);
-    if (vd && !(vd->flags & QnAbstractMediaData::MediaFlags_LIVE) && vd->timestamp >= m_reader->skipFramesToTime() && m_seekTime == AV_NOPTS_VALUE)
+    if (vd 
+        && !(vd->flags & QnAbstractMediaData::MediaFlags_LIVE) 
+        && !(vd->flags & QnAbstractMediaData::MediaFlags_BOF) 
+        && vd->timestamp >= m_reader->skipFramesToTime() 
+        && m_seekTime == AV_NOPTS_VALUE)
+    {
         return m_tmpData->timestamp;
-    else
+    }
+    else 
+    {
         return AV_NOPTS_VALUE;
+    }
 }
 
 QnAbstractMediaDataPtr QnSyncPlayArchiveDelegate::getNextData()

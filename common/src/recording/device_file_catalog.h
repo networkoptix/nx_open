@@ -43,12 +43,14 @@ public:
         int duration; // chunk duration at ms
     };
 
+    enum FindMethod {OnRecordHole_NextChunk, OnRecordHole_PrevChunk};
+
     DeviceFileCatalog(const QString& macAddress);
     void deserializeTitleFile();
     void addRecord(const Chunk& chunk);
     void updateDuration(int duration);
     bool deleteFirstRecord();
-    int findFileIndex(qint64 startTime) const;
+    int findFileIndex(qint64 startTime, FindMethod method) const;
     QString fullFileName(const Chunk& chunk) const;
     Chunk chunkAt(int index) const;
     qint64 minTime() const;

@@ -8,7 +8,7 @@
 #include "camera/camera_pool.h"
 #include "utils/common/sleep.h"
 
-static const int MAX_QUEUE_SIZE = 60;
+static const int MAX_QUEUE_SIZE = 15;
 //static const QString RTP_FFMPEG_GENERIC_STR("mpeg4-generic"); // this line for debugging purpose with VLC player
 
 static const int MAX_RTSP_WRITE_BUFFER = 1024*1024;
@@ -55,6 +55,10 @@ qint64 QnRtspDataConsumer::currentTime() const
     return m_lastSendTime; 
 }
 
+bool removeItemsCondition(const QnAbstractDataPacketPtr& data)
+{
+    return !(qSharedPointerDynamicCast<QnAbstractMediaData>(data)->flags & AV_PKT_FLAG_KEY);
+}
 void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
 {
 //    cl_log.log("queueSize=", m_dataQueue.size(), cl_logALWAYS);
@@ -63,17 +67,13 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
 
     QMutexLocker lock(&m_dataQueueMtx);
     m_dataQueue.push(data);
-    if (m_dataQueue.size() > m_dataQueue.maxSize()*1.5) // additional space for archiveData (when archive->live switch occured, archive ordinary using all dataQueue size)
+    QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
+    //if (m_dataQueue.size() > m_dataQueue.maxSize()*1.5) // additional space for archiveData (when archive->live switch occured, archive ordinary using all dataQueue size)
+    if ((media->flags & AV_PKT_FLAG_KEY) && m_dataQueue.size() > m_dataQueue.maxSize() || m_dataQueue.size() > 100)
     {
         QnAbstractDataPacketPtr tmp;
         m_dataQueue.pop(tmp);
-        while (m_dataQueue.size() > 0) 
-        {
-            if (qSharedPointerDynamicCast<QnAbstractMediaData>(m_dataQueue.front())->flags & AV_PKT_FLAG_KEY) 
-                break;
-            else 
-                m_dataQueue.pop(tmp);
-        }
+        m_dataQueue.removeFrontByCondition(removeItemsCondition);
     }
 }
 
@@ -228,6 +228,8 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         curData += sendLen;
 
     }
+    Q_ASSERT(!(m_waitBOF && (media->flags & QnAbstractMediaData::MediaFlags_BOF)));
+
     return true;
 }
 

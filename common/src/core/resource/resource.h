@@ -247,7 +247,7 @@ public:
 
 class QnDummyResourceFactory : public QnResourceFactory
 {
-    QnResourcePtr createResource(const QnId& resourceTypeId, const QnResourceParameters& parameters) {return QnResourcePtr();}
+    QnResourcePtr createResource(const QnId& /*resourceTypeId*/, const QnResourceParameters& /*parameters*/) { return QnResourcePtr(); }
 };
 
 class QnResourceProcessor

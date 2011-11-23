@@ -191,7 +191,7 @@ CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale) :
     m_prevReverseMode(false),
     m_prevFrameToDelete(0),
     m_flushedBeforeReverseStart(false),
-    m_lastDisplayedTime(0),
+    m_lastDisplayedTime(AV_NOPTS_VALUE),
     m_realReverseSize(0),
     m_maxReverseQueueSize(-1),
     m_timeChangeEnabled(true),
@@ -460,7 +460,7 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
     if (reverseMode != m_prevReverseMode) {
         clearReverseQueue();
         QMutexLocker lock(&m_mtx);
-        dec->resetDecoder();
+        dec->resetDecoder(data);
         m_prevReverseMode = reverseMode;
     }
 
@@ -482,7 +482,7 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
     m_mtx.lock();
 
     if (data->flags & QnAbstractMediaData::MediaFlags_AfterEOF)
-        dec->resetDecoder();
+        dec->resetDecoder(data);
 
     if ((data->flags & AV_REVERSE_BLOCK_START) && m_lightCPUmode != QnAbstractVideoDecoder::DecodeMode_Fastest)
     {
@@ -501,7 +501,7 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
         delete tmpOutFrame;
         m_flushedBeforeReverseStart = true;
         reorderPrevFrames();
-        dec->resetDecoder();
+        dec->resetDecoder(data);
     }
 
     CLVideoDecoderOutput* decodeToFrame = useTmpFrame ? &m_tmpFrame : outFrame;
@@ -581,6 +581,8 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
     }
     
     outFrame->sample_aspect_ratio = dec->getSampleAspectRatio();
+
+    //cl_log.log(QDateTime::fromMSecsSinceEpoch(data->timestamp/1000).toString("hh.mm.ss.zzz"), cl_logALWAYS);
 
     if (processDecodedFrame(dec, outFrame, enableFrameQueue, reverseMode))
         return Status_Displayed;

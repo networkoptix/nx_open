@@ -2,13 +2,13 @@
 #include "stdint.h"
 #include "utils/media/frame_info.h"
 #include "avi_files/avi_archive_delegate.h"
+#include "utils/common/util.h"
 
 
 // used in reverse mode.
 // seek by 1.5secs. It is prevents too fast seeks for short GOP, also some codecs has bagged seek function. Large step prevent seek
 // forward instead seek backward
 static const int MAX_KEY_FIND_INTERVAL = 10 * 1000 * 1000;
-static const qint64 BACKWARD_SEEK_STEP =  2000 * 1000; 
 
 static const int FFMPEG_PROBE_BUFFER_SIZE = 1024 * 512;
 
@@ -297,12 +297,16 @@ begin_label:
                     // sometime av_file_ssek doesn't seek to key frame (seek direct to specified position)
                     // So, no KEY frame may be found after seek. At this case (m_bottomIFrameTime == -1) we increase seek interval
                     qint64 seekTime = m_bottomIFrameTime != -1 ? m_bottomIFrameTime : (m_lastGopSeekTime != -1 ? m_lastGopSeekTime : m_currentTime-BACKWARD_SEEK_STEP);
-                    seekTime = qMax(0ll, seekTime - BACKWARD_SEEK_STEP);
+                    seekTime = qMax(m_delegate->startTime(), seekTime - BACKWARD_SEEK_STEP);
                     if (m_currentTime != seekTime) {
                         m_currentData = QnAbstractMediaDataPtr();
                         qint64 tmpVal = m_bottomIFrameTime != -1 ? m_bottomIFrameTime : m_topIFrameTime;
-                        if (m_lastGopSeekTime == 0) {
-                            seekTime = m_lengthMksec - BACKWARD_SEEK_STEP;
+                        if (m_lastGopSeekTime == m_delegate->startTime()) 
+                        {
+                            if (m_delegate->endTime() != DATETIME_NOW)
+                                seekTime = m_delegate->endTime() - BACKWARD_SEEK_STEP;
+                            else
+                                seekTime = QDateTime::currentDateTime().toMSecsSinceEpoch()*1000 - BACKWARD_SEEK_STEP;
                             tmpVal = m_lengthMksec;
                         }
                         intChanneljumpTo(seekTime, 0);
@@ -391,7 +395,18 @@ begin_label:
 			if (m_nextData)
 			{
 				if (!reverseMode && m_nextData->timestamp < skipFramesToTime())
+                {
+				/*
+                    QString msg;
+                    QTextStream str(&msg);
+                    str << " ignore data. curTime=" << QDateTime::fromMSecsSinceEpoch(m_nextData->timestamp/1000).toString() 
+                        << " borderTime=" << QDateTime::fromMSecsSinceEpoch(skipFramesToTime()/1000).toString();
+                    str.flush();
+                    cl_log.log(msg, cl_logWARNING);
+                    str.flush();
+				*/
 					videoData->ignore = true;
+                }
                 else if (reverseMode && m_nextData->timestamp > skipFramesToTime())
                     videoData->ignore = true;
                 else {

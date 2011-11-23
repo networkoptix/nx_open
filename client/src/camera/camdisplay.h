@@ -132,6 +132,7 @@ private:
     int m_storedMaxQueueSize;
     QnAbstractVideoDecoder::DecodeMode m_lightCpuMode;
     CLVideoStreamDisplay::FrameDisplayStatus m_lastFrameDisplayed;
+    int m_realTimeHurryUp;
 };
 
 #endif //clcam_display_h_1211

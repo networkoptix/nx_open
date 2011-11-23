@@ -21,6 +21,40 @@
 #include "utils/common/util.h"
 #include "utils/common/warnings.h"
 
+void detail::QnTimePeriodUpdater::update(const QnVideoServerConnectionPtr &connection, const QnNetworkResourceList &networkResources, const QnTimePeriod &timePeriod) 
+{
+    m_connection = connection;
+    m_networkResources = networkResources;
+    m_timePeriod = timePeriod;
+
+    if(m_updatePending) {
+        m_updateNeeded = true;
+        return;
+    }
+
+    sendRequest();
+}
+
+void detail::QnTimePeriodUpdater::at_replyReceived(const QnTimePeriodList &timePeriods) 
+{
+    if(m_updateNeeded) {
+        /* The data we got has already expired... resend the request. */
+        sendRequest(); 
+        return;
+    }
+
+    m_updatePending = false;
+    emit ready(timePeriods);
+}
+
+void detail::QnTimePeriodUpdater::sendRequest() 
+{
+    m_updateNeeded = false;
+    m_updatePending = true;
+    m_connection->asyncRecordedTimePeriods(m_networkResources, m_timePeriod.startTimeUSec, m_timePeriod.startTimeUSec + m_timePeriod.durationUSec, 1, this, SLOT(at_replyReceived(const QnTimePeriodList &)));
+}
+
+
 static const int SLIDER_NOW_AREA_WIDTH = 30;
 
 // ### hack to avoid scene move up and down
@@ -110,7 +144,7 @@ private:
 
 NavigationItem::NavigationItem(QGraphicsItem * /*parent*/) :
     CLUnMovedInteractiveOpacityItem(QString("name:)"), 0, 0.5, 0.95),
-    m_camera(0), m_currentTime(0),
+    m_camera(0), m_forcedCamera(0), m_currentTime(0),
     m_playing(false),
     m_mouseOver(false),
     restoreInfoTextData(0)
@@ -125,6 +159,9 @@ NavigationItem::NavigationItem(QGraphicsItem * /*parent*/) :
     setAcceptHoverEvents(true);
 
     setCursor(Qt::ArrowCursor);
+
+    m_timePeriodUpdater = new detail::QnTimePeriodUpdater(this);
+    connect(m_timePeriodUpdater, SIGNAL(ready(const QnTimePeriodList &)), this, SLOT(onTimePeriodUpdaterReady(const QnTimePeriodList &)));
 
     m_graphicsWidget = new QGraphicsWidgetKillsWheelEvent(this);
     m_graphicsWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -319,9 +356,52 @@ QRectF NavigationItem::boundingRect() const
     return m_graphicsWidget->boundingRect();
 }
 
-void NavigationItem::setVideoCamera(CLVideoCamera *camera)
+void NavigationItem::setVideoCamera(CLVideoCamera* camera) {
+    if (m_forcedCamera == camera)
+        return;
+
+    m_forcedCamera = camera;
+
+    updateActualCamera();
+}
+
+void NavigationItem::addReserveCamera(CLVideoCamera* camera) {
+    if(camera == NULL)
+        return;
+
+    m_reserveCameras.insert(camera);
+
+    updateActualCamera();
+    updatePeriodList(true);
+}
+
+void NavigationItem::removeReserveCamera(CLVideoCamera* camera) {
+    m_reserveCameras.remove(camera);
+
+    updateActualCamera();
+    updatePeriodList(true);
+}
+
+void NavigationItem::updateActualCamera() {
+    if(m_forcedCamera != NULL) {
+        setActualCamera(m_forcedCamera);
+        return;
+    }
+
+    if(m_reserveCameras.contains(m_camera))
+        return;
+
+    if(m_reserveCameras.empty()) {
+        setActualCamera(NULL);
+        return;
+    }
+
+    setActualCamera(*m_reserveCameras.begin());
+}
+
+void NavigationItem::setActualCamera(CLVideoCamera *camera)
 {
-    if (m_camera == camera)
+    if(m_camera == camera)
         return;
 
     m_speedSlider->resetSpeed();
@@ -350,6 +430,7 @@ void NavigationItem::setVideoCamera(CLVideoCamera *camera)
     }
 }
 
+
 void NavigationItem::onLiveModeChanged(bool value)
 {
     if (value)
@@ -368,13 +449,14 @@ void NavigationItem::updateSlider()
 {
     if (!m_camera)
         return;
-
+    
     if (m_timeSlider->isMoving())
         return;
 
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader *>(m_camera->getStreamreader());
     qint64 startTime = reader->startTime();
     qint64 endTime = reader->endTime();
+
     if (startTime != AV_NOPTS_VALUE && endTime != AV_NOPTS_VALUE)
     {
         m_timeSlider->setMinimumValue(startTime / 1000);
@@ -391,48 +473,61 @@ void NavigationItem::updateSlider()
             m_timeSlider->setCurrentValue(m_currentTime);
         }
         m_liveButton->setVisible(!reader->onPause() && m_camera->getCamCamDisplay()->isRealTimeSource());
+
+        updatePeriodList(false);
     }
 }
 
-void NavigationItem::updatePeriodList() {
+void NavigationItem::updatePeriodList(bool force) {
     qint64 w = m_timeSlider->sliderRange() * 1000;
     qint64 t = m_timeSlider->viewPortPos() * 1000;
-    if(m_timePeriod.startTimeUSec <= t && t + w <= m_timePeriod.startTimeUSec + m_timePeriod.durationUSec)
+    if(t < 0)
+        return; /* TODO: why? */
+
+    if(!force && m_timePeriod.startTimeUSec <= t && t + w <= m_timePeriod.startTimeUSec + m_timePeriod.durationUSec)
         return;
 
-    QnResourcePtr resource = m_camera->getStreamreader()->getResource();
-    if(!resource->checkFlag(QnResource::live))
-        return;
+    QnNetworkResourceList resources;
+    QnVideoServerConnectionPtr connection;
+    foreach(CLVideoCamera *camera, m_reserveCameras) {
+        QnNetworkResourcePtr networkResource = qSharedPointerDynamicCast<QnNetworkResource>(camera->getDevice());
+        if(networkResource.isNull())
+            continue;
 
-    /* Cast just to feel safe. */
-    QnNetworkResourcePtr networkResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
-    if(networkResource.isNull())
-        return;
+        resources.push_back(networkResource);
+        
+        if(!connection.isNull())
+            continue;
 
-    QnResourcePtr parentResource = qnResPool->getResourceById(networkResource->getParentId());
-    //if(!parentResource->checkFlag(QnResource::server)) // TODO: doesn't work
-    //    return;
+        QnVideoServerPtr serverResource = qSharedPointerDynamicCast<QnVideoServer>(qnResPool->getResourceById(networkResource->getParentId()));
+        if(serverResource.isNull())
+            continue;
 
-    /* Cast just to feel safe. */
-    QnVideoServerPtr serverResource = qSharedPointerDynamicCast<QnVideoServer>(parentResource);
-    if(serverResource.isNull())
-        return;
+        QnVideoServerConnectionPtr serverConnection = serverResource->apiConnection();
+        if(serverConnection.isNull())
+            continue;
 
-    QnVideoServerConnectionPtr connection = serverResource->apiConnection();
-    if(connection.isNull())
-        return;
+        connection = serverConnection;
+    }
 
+    /* Request interval no shorter than 1 hour. */
     const qint64 oneHour = 60ll * 60ll * 1000ll * 1000ll;
     if(w < oneHour)
         w = oneHour;
 
-    QnNetworkResourceList resources;
-    resources.push_back(networkResource); // TODO
-
+    /* It is important to update the stored interval BEFORE sending request to 
+     * the server. Request is blocking and starts an event loop, so we may get 
+     * into this method again. */
     m_timePeriod.startTimeUSec = t - w;
     m_timePeriod.durationUSec = w * 3;
 
-    QnTimePeriodList timePeriods = connection->recordedTimePeriods(resources, m_timePeriod.startTimeUSec, m_timePeriod.startTimeUSec + m_timePeriod.durationUSec, 1);
+    QnTimePeriodList timePeriods;
+    if(!connection.isNull())
+        m_timePeriodUpdater->update(connection, resources, m_timePeriod);
+}
+
+void NavigationItem::onTimePeriodUpdaterReady(const QnTimePeriodList &timePeriods) 
+{
     m_timeSlider->setTimePeriodList(timePeriods);
 }
 
@@ -450,11 +545,13 @@ void NavigationItem::onValueChanged(qint64 time)
 
     smartSeek(time);
 
-    updatePeriodList();
+    updatePeriodList(false);
 }
 
 void NavigationItem::smartSeek(qint64 timeMSec)
 {
+    //qDebug() << timeMSec;
+
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     if(m_timeSlider->isAtEnd()) {
         reader->jumpToPreviousFrame(DATETIME_NOW, true);

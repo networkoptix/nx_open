@@ -191,19 +191,33 @@ void QnArchiveSyncPlayWrapper::onJumpOccured(qint64 mksec)
 qint64 QnArchiveSyncPlayWrapper::minTime() const
 {
     Q_D(const QnArchiveSyncPlayWrapper);
-    qint64 result = 0x7fffffffffffffffULL;
-    foreach(ReaderInfo info, d->readers)
-        result = qMin(result, info.oldDelegate->startTime());
-    return result;
+    
+    qint64 result = INT64_MAX;
+    bool found = false;
+    foreach(ReaderInfo info, d->readers) {
+        qint64 startTime = info.oldDelegate->startTime();
+        if(startTime != AV_NOPTS_VALUE) {
+            result = qMin(result, startTime);
+            found = true;
+        }
+    }
+    return found ? result : AV_NOPTS_VALUE;
 }
 
 qint64 QnArchiveSyncPlayWrapper::endTime() const
 {
     Q_D(const QnArchiveSyncPlayWrapper);
+
     qint64 result = 0;
-    foreach(ReaderInfo info, d->readers)
-        result = qMax(result, info.oldDelegate->endTime());
-    return result;
+    bool found = false;
+    foreach(ReaderInfo info, d->readers) {
+        qint64 endTime = info.oldDelegate->endTime();
+        if(endTime != AV_NOPTS_VALUE) {
+            result = qMax(result, endTime);
+            found = true;
+        }
+    }
+    return found ? result : AV_NOPTS_VALUE;
 }
 
 /*
@@ -220,13 +234,13 @@ qint64 QnArchiveSyncPlayWrapper::seek (qint64 time)
 }
 */
 
-qint64 QnArchiveSyncPlayWrapper::secondTime() const
+qint64 QnArchiveSyncPlayWrapper::secondTime(QnAbstractArchiveReader* reader) const
 {
     Q_D(const QnArchiveSyncPlayWrapper);
     qint64 rez = 0x7fffffffffffffffll;
     foreach(ReaderInfo info, d->readers)
     {
-        if (!info.enabled)
+        if (!info.enabled || info.reader == reader) // skip self and disabled
             continue;
         QnSyncPlayArchiveDelegate* syncDelegate = static_cast<QnSyncPlayArchiveDelegate*> (info.reader->getArchiveDelegate());
         qint64 val = syncDelegate->secondTime();
@@ -241,7 +255,7 @@ void QnArchiveSyncPlayWrapper::waitIfNeed(QnAbstractArchiveReader* reader, qint6
     Q_D(QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->syncMutex);
     // +SYNC_EPS
-    while (!reader->needToStop() && timestamp > secondTime()) // time of second(next) frame is less than it time.
+    while (!reader->needToStop() && timestamp > secondTime(reader)) // time of second(next) frame is less than it time.
     {
         //QString msg;
         //QTextStream str(&msg);

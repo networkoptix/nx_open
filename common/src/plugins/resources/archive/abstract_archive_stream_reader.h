@@ -31,7 +31,7 @@ public:
       */
 	quint64 lengthMksec() const;
 
-    virtual void jumpTo(qint64 mksec, bool makeshot, qint64 skipTime = 0);
+    virtual bool jumpTo(qint64 mksec, bool makeshot, qint64 skipTime = 0);
 	void jumpToPreviousFrame(qint64 mksec, bool makeshot);
 
     virtual void previousFrame(qint64 /*mksec*/);

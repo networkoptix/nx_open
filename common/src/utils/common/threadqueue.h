@@ -12,6 +12,7 @@ static const qint32 MAX_THREAD_QUEUE_SIZE = 256;
 #define INFINITE            0xFFFFFFFF  // Infinite timeout
 #endif
 
+
 template <typename T>
 class CLThreadQueue
 {
@@ -65,6 +66,14 @@ public:
         }
 
         return false;
+    }
+
+    template <class ConditionFunc>
+    void removeFrontByCondition(const ConditionFunc& cond)
+    {
+        QMutexLocker mutex(&m_cs);
+        while (!m_queue.isEmpty() && cond(m_queue.front()))
+            m_queue.dequeue();
     }
 
     int size() const

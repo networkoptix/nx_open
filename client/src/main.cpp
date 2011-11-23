@@ -229,8 +229,9 @@ int main(int argc, char *argv[])
     QnResourceDiscoveryManager::instance().addResourceProcessor(&serverCameraProcessor);
 
     //============================
+#ifdef STANDALONE_MODE
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
-    QnResourceDiscoveryManager::instance().start();
+#endif
 
     //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
@@ -239,7 +240,11 @@ int main(int argc, char *argv[])
     QnResourceDiscoveryManager::instance().addDeviceServer(&DesktopDeviceServer::instance());
 #endif // Q_OS_WIN
 
+#ifndef STANDALONE_MODE
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnAppServerResourceSearcher::instance());
+#endif
+
+    QnResourceDiscoveryManager::instance().start();
 
     CLDeviceSettingsDlgFactory::registerDlgManufacture(&AreconVisionDlgManufacture::instance());
     //============================
