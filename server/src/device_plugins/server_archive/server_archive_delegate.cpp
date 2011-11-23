@@ -70,7 +70,10 @@ qint64 QnServerArchiveDelegate::seek(qint64 time)
     }
 
     qint64 chunkOffset = qBound(0ll, time - m_currentChunk.startTime, m_currentChunk.duration - BACKWARD_SEEK_STEP);
-    qint64 rez = m_currentChunk.startTime + m_aviDelegate->seek(chunkOffset);
+    qint64 seekRez = m_aviDelegate->seek(chunkOffset);
+    if (seekRez == -1)
+        return seekRez;
+    qint64 rez = m_currentChunk.startTime + seekRez;
     //cl_log.log("jump time ", t.elapsed(), cl_logALWAYS);
     return rez;
 }
