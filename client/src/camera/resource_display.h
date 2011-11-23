@@ -12,6 +12,7 @@ class QnVideoResourceLayout;
 class CLCamDisplay;
 class CLLongRunnable;
 class CLAbstractRenderer;
+class CLVideoCamera;
 
 namespace detail {
     class QnRendererGuard: public QObject {
@@ -32,14 +33,15 @@ namespace detail {
     };
 } // namespace detail
 
+
 class QnResourceDisplay: public QObject, protected QnResourceConsumer {
     Q_OBJECT;
 public:
     /**
      * Constructor.
      * 
-     * \param resource                  Resource that this item is associated with. Must not be NULL.
-     * \param parent                    Parent of this object.                
+     * \param resource                  Resource that this display is associated with. Must not be NULL.
+     * \param parent                    Parent of this display.                
      */
     QnResourceDisplay(const QnResourcePtr &resource, QObject *parent = NULL);
 
@@ -49,27 +51,34 @@ public:
     virtual ~QnResourceDisplay();
 
     /**
-     * \returns                         Resource associated with this item.
+     * \returns                         Resource associated with this display.
      */
     QnResource *resource() const;
 
     /**
-     * \returns                         Media resource associated with this item, if any.
+     * \returns                         Media resource associated with this display, if any.
      */
     QnMediaResource *mediaResource() const;
 
     /**
-     * \returns                         Data provider associated with this item.
+     * \returns                         Data provider associated with this display.
      */
     QnAbstractStreamDataProvider *dataProvider() const {
         return m_dataProvider;
     }
 
     /**
-     * \returns                         Media data provider associated with this item, if any.
+     * \returns                         Media data provider associated with this display, if any.
      */
     QnAbstractMediaStreamDataProvider *mediaProvider() const {
         return m_mediaProvider;
+    }
+
+    /**
+     * \returns                         Video camera associated with this display, if any.
+     */
+    CLVideoCamera *camera() {
+        return m_camera;
     }
 
     /**
@@ -78,17 +87,17 @@ public:
     const QnVideoResourceLayout *videoLayout() const;
 
     /**
-     * \returns                         Length of this item, in microseconds. If the length is not defined, returns -1.
+     * \returns                         Length of this display, in microseconds. If the length is not defined, returns -1.
      */
     qint64 lengthUSec() const;
 
     /**
-     * \returns                         Current time of this item, in microseconds. If the time is not defined, returns -1.
+     * \returns                         Current time of this display, in microseconds. If the time is not defined, returns -1.
      */
     qint64 currentTimeUSec() const;
 
     /**
-     * \param usec                      New current time for this item, in microseconds.
+     * \param usec                      New current time for this display, in microseconds.
      */
     void setCurrentTimeUSec(qint64 usec) const;
 
@@ -112,20 +121,23 @@ private:
     void cleanUp(CLLongRunnable *runnable) const;
 
 private:
-    /** Media resource, if any. */
+    /** Media resource. */
     QnMediaResource *m_mediaResource;
 
     /** Data provider for the associated resource. */
     QnAbstractStreamDataProvider *m_dataProvider;
 
-    /** Media data provider, if any. */
+    /** Media data provider. */
     QnAbstractMediaStreamDataProvider *m_mediaProvider;
 
-    /** Archive data provider, if any. */
+    /** Archive data provider. */
     QnAbstractArchiveReader *m_archiveProvider;
 
-    /** Camera display, if any. */
-    CLCamDisplay *m_camDisplay;
+    /** Camera display. */
+    //CLCamDisplay *m_camDisplay;
+
+    /** Video camera. */
+    CLVideoCamera *m_camera; // TODO: Compatibility layer. Remove.
 
     /** Whether this display was started. */
     bool m_started;

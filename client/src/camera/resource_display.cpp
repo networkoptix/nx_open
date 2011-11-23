@@ -5,6 +5,7 @@
 #include <core/resource/media_resource.h>
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
 #include <camera/camdisplay.h>
+#include <camera/camera.h>
 #include <camera/abstractrenderer.h>
 #include <utils/common/warnings.h>
 
@@ -18,12 +19,13 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
     m_dataProvider(NULL),
     m_mediaProvider(NULL),
     m_archiveProvider(NULL),
-    m_camDisplay(NULL),
+    m_camera(NULL),
     m_started(false)
 {
     assert(!resource.isNull());
 
-    m_mediaResource = dynamic_cast<QnMediaResource *>(resource.data());
+    QnMediaResourcePtr mediaResourcePtr = resource.dynamicCast<QnMediaResource>();
+    m_mediaResource = mediaResourcePtr.data();
 
     m_dataProvider = resource->createDataProvider(QnResource::Role_Default);
     if(m_dataProvider != NULL) {
@@ -33,10 +35,9 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
 
         m_mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider *>(m_dataProvider);
         if(m_mediaProvider != NULL) {
-            m_camDisplay = new CLCamDisplay(false);
-            connect(m_camDisplay, SIGNAL(finished()), m_camDisplay, SLOT(deleteLater()));
-
-            m_mediaProvider->addDataProcessor(m_camDisplay);
+            m_camera = new CLVideoCamera(mediaResourcePtr, NULL, false, m_mediaProvider);
+            
+            connect(m_camera->getCamCamDisplay(), SIGNAL(finished()), m_camera, SLOT(deleteLater()));
         }
     }
 }
@@ -79,10 +80,11 @@ void QnResourceDisplay::disconnectFromResource() {
     static_cast<QnResourceConsumer *>(m_dataProvider)->disconnectFromResource();
 
     if(m_mediaProvider != NULL)
-        m_mediaProvider->removeDataProcessor(m_camDisplay);
+        m_mediaProvider->removeDataProcessor(m_camera->getCamCamDisplay());
 
     cleanUp(m_dataProvider);
-    cleanUp(m_camDisplay);
+    //cleanUp(m_camDisplay);
+    m_camera->beforeStopDisplay();
 
     foreach(detail::QnRendererGuard *guard, m_guards)
         guard->renderer()->beforeDestroy();
@@ -97,7 +99,7 @@ void QnResourceDisplay::disconnectFromResource() {
     m_mediaProvider = NULL;
     m_archiveProvider = NULL;
 
-    m_camDisplay = NULL;
+    m_camera = NULL;
 
     QnResourceConsumer::disconnectFromResource();
 }
@@ -115,11 +117,7 @@ const QnVideoResourceLayout *QnResourceDisplay::videoLayout() const {
 void QnResourceDisplay::start() {
     m_started = true;
 
-    if(m_dataProvider != NULL)
-        m_dataProvider->start();
-
-    if(m_camDisplay != NULL)
-        m_camDisplay->start();
+    m_camera->startDisplay();
 }
 
 qint64 QnResourceDisplay::lengthUSec() const {
@@ -161,16 +159,16 @@ void QnResourceDisplay::pause() {
 }
 
 void QnResourceDisplay::addRenderer(CLAbstractRenderer *renderer) {
-    if(m_camDisplay == NULL) {
+    if(m_camera == NULL) {
         delete renderer;
         return;
     }
 
     int channelCount = videoLayout()->numberOfChannels();
     for(int i = 0; i < channelCount; i++)
-        m_camDisplay->addVideoChannel(i, renderer, true);
+        m_camera->getCamCamDisplay()->addVideoChannel(i, renderer, true);
 
     m_guards.push_back(new detail::QnRendererGuard(renderer));
-    connect(m_camDisplay, SIGNAL(finished()), m_guards.back(), SLOT(deleteLater()));
+    connect(m_camera->getCamCamDisplay(), SIGNAL(finished()), m_guards.back(), SLOT(deleteLater()));
 }
 

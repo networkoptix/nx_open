@@ -5,10 +5,10 @@
 
 CLVideoCamera::CLVideoCamera(QnMediaResourcePtr device, CLVideoWindowItem* videovindow, bool generateEndOfStreamSignal, QnAbstractMediaStreamDataProvider* reader) :
     m_device(device),
-    m_videovindow(videovindow),
+    m_videoWindow(videovindow),
     m_camdispay(generateEndOfStreamSignal),
     m_recorder(0),
-    mGenerateEndOfStreamSignal(generateEndOfStreamSignal),
+    m_GenerateEndOfStreamSignal(generateEndOfStreamSignal),
     m_reader(reader),
     m_extTimeSrc(0)
 {
@@ -18,12 +18,12 @@ CLVideoCamera::CLVideoCamera(QnMediaResourcePtr device, CLVideoWindowItem* video
 
     //m_stat = new QnStatistics[videonum]; // array of statistics
 
-	for (int i = 0; i < videonum; ++i)
-	{
-		m_camdispay.addVideoChannel(i, m_videovindow, !m_device->checkFlag(QnResource::SINGLE_SHOT));
-		//m_videovindow->setStatistics(&m_stat[i], i);
+    if(m_videoWindow != NULL) {
+	    for (int i = 0; i < videonum; ++i) {
+		    m_camdispay.addVideoChannel(i, m_videoWindow, !m_device->checkFlag(QnResource::SINGLE_SHOT));
+		    //m_videoWindow->setStatistics(&m_stat[i], i);
+        }
 	}
-
 
 	m_reader->addDataProcessor(&m_camdispay);
     connect(m_reader, SIGNAL(jumpOccured(qint64, bool)), &m_camdispay, SLOT(jump(qint64)), Qt::DirectConnection);
@@ -32,10 +32,12 @@ CLVideoCamera::CLVideoCamera(QnMediaResourcePtr device, CLVideoWindowItem* video
     connect(m_reader, SIGNAL(prevFrameOccured()), &m_camdispay, SLOT(onPrevFrameOccured()), Qt::DirectConnection);
 	//m_reader->setStatistics(m_stat);
 
-	m_videovindow->setComplicatedItem(this);
-	m_videovindow->setInfoText(m_device->toString());
+    if(m_videoWindow != NULL) {
+	    m_videoWindow->setComplicatedItem(this);
+	    m_videoWindow->setInfoText(m_device->toString());
+    }
 
-    if (mGenerateEndOfStreamSignal)
+    if (m_GenerateEndOfStreamSignal)
         connect(&m_camdispay, SIGNAL( reachedTheEnd() ), this, SLOT( onReachedTheEnd() ));
 }
 
@@ -43,7 +45,7 @@ CLVideoCamera::~CLVideoCamera()
 {
 	cl_log.log(QLatin1String("Destroy camera for "), m_device->toString(), cl_logDEBUG1);
 
-	stopDispay();
+	stopDisplay();
 	delete m_reader;
 	//delete[] m_stat;
 }
@@ -69,19 +71,19 @@ void CLVideoCamera::streamJump(qint64 time)
 }
 */
 
-void CLVideoCamera::startDispay()
+void CLVideoCamera::startDisplay()
 {
-	CL_LOG(cl_logDEBUG1) cl_log.log(QLatin1String("CLVideoCamera::startDispay "), m_device->getUniqueId(), cl_logDEBUG1);
+	CL_LOG(cl_logDEBUG1) cl_log.log(QLatin1String("CLVideoCamera::startDisplay "), m_device->getUniqueId(), cl_logDEBUG1);
 
 	m_camdispay.start();
 	//m_reader->start(QThread::HighestPriority);
 	m_reader->start(QThread::HighPriority);
 }
 
-void CLVideoCamera::stopDispay()
+void CLVideoCamera::stopDisplay()
 {
-	CL_LOG(cl_logDEBUG1) cl_log.log(QLatin1String("CLVideoCamera::stopDispay"), m_device->getUniqueId(), cl_logDEBUG1);
-	CL_LOG(cl_logDEBUG1) cl_log.log(QLatin1String("CLVideoCamera::stopDispay reader is about to pleases stop "), QString::number((long)m_reader,16), cl_logDEBUG1);
+	CL_LOG(cl_logDEBUG1) cl_log.log(QLatin1String("CLVideoCamera::stopDisplay"), m_device->getUniqueId(), cl_logDEBUG1);
+	CL_LOG(cl_logDEBUG1) cl_log.log(QLatin1String("CLVideoCamera::stopDisplay reader is about to pleases stop "), QString::number((long)m_reader,16), cl_logDEBUG1);
 
 	stopRecording();
 
@@ -90,13 +92,15 @@ void CLVideoCamera::stopDispay()
 	m_camdispay.clearUnprocessedData();
 }
 
-void CLVideoCamera::beforestopDispay()
+void CLVideoCamera::beforeStopDisplay()
 {
 	m_reader->pleaseStop();
 	m_camdispay.pleaseStop();
     if (m_recorder)
 	    m_recorder->pleaseStop();
-	m_videovindow->beforeDestroy();
+
+    if(m_videoWindow != NULL)
+	    m_videoWindow->beforeDestroy();
 }
 
 void CLVideoCamera::startRecording()
@@ -112,7 +116,9 @@ void CLVideoCamera::startRecording()
 	m_reader->addDataProcessor(m_recorder);
 	m_reader->setNeedKeyData();
 	m_recorder->start();
-	m_videovindow->addSubItem(RecordingSubItem);
+
+    if(m_videoWindow != NULL)
+	    m_videoWindow->addSubItem(RecordingSubItem);
 }
 
 void CLVideoCamera::stopRecording()
@@ -123,7 +129,9 @@ void CLVideoCamera::stopRecording()
 	    m_reader->removeDataProcessor(m_recorder);
     }
 	m_reader->setQuality(QnQualityNormal);
-	m_videovindow->removeSubItem(RecordingSubItem);
+
+    if(m_videoWindow != NULL)
+	    m_videoWindow->removeSubItem(RecordingSubItem);
 }
 
 bool CLVideoCamera::isRecording()
@@ -148,17 +156,17 @@ CLCamDisplay* CLVideoCamera::getCamCamDisplay()
 
 CLVideoWindowItem* CLVideoCamera::getVideoWindow()
 {
-	return m_videovindow;
+	return m_videoWindow;
 }
 
 CLAbstractSceneItem* CLVideoCamera::getSceneItem() const
 {
-	return m_videovindow;
+	return m_videoWindow;
 }
 
 const CLVideoWindowItem* CLVideoCamera::getVideoWindow() const
 {
-	return m_videovindow;
+	return m_videoWindow;
 }
 
 const QnStatistics* CLVideoCamera::getStatistics(int channel)
@@ -188,6 +196,6 @@ void CLVideoCamera::setQuality(QnStreamQuality q, bool increase)
 
 void CLVideoCamera::onReachedTheEnd()
 {
-    if (mGenerateEndOfStreamSignal)
+    if (m_GenerateEndOfStreamSignal)
         emit reachedTheEnd();
 }
