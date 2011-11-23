@@ -191,25 +191,33 @@ void QnArchiveSyncPlayWrapper::onJumpOccured(qint64 mksec)
 qint64 QnArchiveSyncPlayWrapper::minTime() const
 {
     Q_D(const QnArchiveSyncPlayWrapper);
-    qint64 result = 0x7fffffffffffffffULL;
+    
+    qint64 result = INT64_MAX;
+    bool found = false;
     foreach(ReaderInfo info, d->readers) {
         qint64 startTime = info.oldDelegate->startTime();
-        if(startTime != AV_NOPTS_VALUE)
+        if(startTime != AV_NOPTS_VALUE) {
             result = qMin(result, startTime);
+            found = true;
+        }
     }
-    return result;
+    return found ? result : AV_NOPTS_VALUE;
 }
 
 qint64 QnArchiveSyncPlayWrapper::endTime() const
 {
     Q_D(const QnArchiveSyncPlayWrapper);
+
     qint64 result = 0;
+    bool found = false;
     foreach(ReaderInfo info, d->readers) {
         qint64 endTime = info.oldDelegate->endTime();
-        if(endTime != AV_NOPTS_VALUE)
+        if(endTime != AV_NOPTS_VALUE) {
             result = qMax(result, endTime);
+            found = true;
+        }
     }
-    return result;
+    return found ? result : AV_NOPTS_VALUE;
 }
 
 /*
@@ -301,7 +309,7 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
     {
         if (!info.enabled) 
             continue;
-        qint64 camTime = info.cam->selfCurrentTime();
+        qint64 camTime = info.cam->getCurrentTime();
         if (camTime != AV_NOPTS_VALUE)
             val = qMax(camTime, val);
     }

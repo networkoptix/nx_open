@@ -8,6 +8,7 @@
 #include "core/dataconsumer/dataconsumer.h"
 #include "core/resource/resource_media_layout.h"
 #include "utils/common/adaptivesleep.h"
+#include "utils/media/externaltimesource.h"
 
 class CLAbstractRenderer;
 class CLVideoStreamDisplay;
@@ -17,7 +18,7 @@ struct QnCompressedVideoData;
 /**
   * Stores CLVideoStreamDisplay for each channel/sensor
   */
-class CLCamDisplay : public QnAbstractDataConsumer
+class CLCamDisplay : public QnAbstractDataConsumer, public QnlTimeSource
 {
     Q_OBJECT
 public:
@@ -44,7 +45,7 @@ public:
 	/**
 	 * \returns                         Current time in microseconds.
 	 */
-    virtual qint64 currentTime() const;
+    virtual qint64 getCurrentTime() const;
 
     void setMTDecoding(bool value);
 
