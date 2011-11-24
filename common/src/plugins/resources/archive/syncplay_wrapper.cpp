@@ -377,13 +377,13 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
 
 
     qint64 nextTime = getNextTime();
-    if (d->speed >= 0 && nextTime > expectedTime + MAX_FRAME_DURATION*1000)
+    if (d->speed >= 0 && nextTime != AV_NOPTS_VALUE && nextTime > expectedTime + MAX_FRAME_DURATION*1000)
     {
         QnArchiveSyncPlayWrapper* nonConstThis = const_cast<QnArchiveSyncPlayWrapper*>(this);
         nonConstThis->reinitTime(nextTime);
         expectedTime = d->lastJumpTime + d->timer.elapsed()*1000 * d->speed;
     }
-    else if (d->speed < 0 && nextTime < expectedTime - MAX_FRAME_DURATION*1000)
+    else if (d->speed < 0 && nextTime != AV_NOPTS_VALUE && nextTime < expectedTime - MAX_FRAME_DURATION*1000)
     {
         QnArchiveSyncPlayWrapper* nonConstThis = const_cast<QnArchiveSyncPlayWrapper*>(this);
         nonConstThis->reinitTime(nextTime);
