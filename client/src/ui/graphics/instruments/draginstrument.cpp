@@ -7,7 +7,7 @@
 namespace {
     struct ItemIsMovable: public std::unary_function<QGraphicsItem *, bool> {
         bool operator()(QGraphicsItem *item) const {
-            return item->flags() & QGraphicsItem::ItemIsMovable;
+            return (item->flags() & QGraphicsItem::ItemIsMovable) && (item->acceptedMouseButtons() & Qt::LeftButton);
         }
     };
 

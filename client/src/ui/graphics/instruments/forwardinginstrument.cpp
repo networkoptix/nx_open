@@ -50,7 +50,11 @@ bool ForwardingInstrument::event(QWidget *viewport, QEvent *event) {
 }
 
 bool ForwardingInstrument::sceneEvent(QGraphicsItem *item, QEvent *event) {
-    open(item)->processSceneEvent(event);
+    QGraphicsObject *object = item->toGraphicsObject();
+    if(object != NULL)
+        if(open(static_cast<QObject *>(object))->processEvent(event))
+            return false;
 
+    open(item)->processSceneEvent(event);
     return false;
 }

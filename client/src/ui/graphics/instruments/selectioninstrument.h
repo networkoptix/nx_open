@@ -4,12 +4,12 @@
 #include "instrument.h"
 
 /**
- * When clicking on item's frame, the item does not get selected.
+ * Selection of graphics widgets works differently than selection of normal items.
  * 
  * This instrument fixes this problem.
  * 
- * It is to be installed after a forwarding instrument, but before an instrument
- * that stops accepted event processing.
+ * It is to be installed at item level after a forwarding instrument, 
+ * but before an instrument that stops accepted event processing.
  */
 class SelectionInstrument: public Instrument {
     Q_OBJECT;
@@ -17,8 +17,8 @@ public:
     SelectionInstrument(QObject *parent = NULL);
 
 protected:
-    virtual bool mousePressEvent(QGraphicsScene *, QGraphicsSceneMouseEvent *) override;
-    virtual bool mouseReleaseEvent(QGraphicsScene *, QGraphicsSceneMouseEvent *) override;
+    virtual bool mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override;
+    virtual bool mouseReleaseEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override;
 };
 
 

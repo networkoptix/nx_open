@@ -65,6 +65,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchManager *synchronizer, Q
 
     /* Item instruments. */
     m_manager->installInstrument(new StopInstrument(Instrument::ITEM, mouseEventTypes, this));
+    m_manager->installInstrument(new SelectionInstrument(this));
     m_manager->installInstrument(new ForwardingInstrument(Instrument::ITEM, mouseEventTypes, this));
     m_manager->installInstrument(itemClickInstrument);
 
@@ -72,14 +73,12 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchManager *synchronizer, Q
     m_manager->installInstrument(new StopInstrument(Instrument::SCENE, mouseEventTypes, this));
     m_manager->installInstrument(sceneClickInstrument);
     m_manager->installInstrument(new StopAcceptedInstrument(Instrument::SCENE, mouseEventTypes, this));
-    m_manager->installInstrument(new SelectionInstrument(this));
     m_manager->installInstrument(new ForwardingInstrument(Instrument::SCENE, mouseEventTypes, this));
 
     /* View/viewport instruments. */
     m_manager->installInstrument(m_uiElementsInstrument, InstallationMode::INSTALL_FIRST);
     m_manager->installInstrument(new StopInstrument(Instrument::VIEWPORT, Instrument::makeSet(QEvent::Wheel), this));
     m_manager->installInstrument(m_resizingInstrument);
-    m_manager->installInstrument(new TransformListenerInstrument(this));
     m_manager->installInstrument(m_wheelZoomInstrument);
     m_manager->installInstrument(m_dragInstrument);
     m_manager->installInstrument(m_rubberBandInstrument);

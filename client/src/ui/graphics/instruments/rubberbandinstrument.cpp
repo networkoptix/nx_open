@@ -13,9 +13,9 @@
 #include "instrumentmanager.h"
 
 namespace {
-    struct ItemIsFocusable: public std::unary_function<QGraphicsItem *, bool> {
+    struct ItemIsMouseInteractive: public std::unary_function<QGraphicsItem *, bool> {
         bool operator()(QGraphicsItem *item) const {
-            return item->flags() & QGraphicsItem::ItemIsFocusable;
+            return item->acceptedMouseButtons() & Qt::LeftButton;
         }
     };
 
@@ -247,7 +247,7 @@ bool RubberBandInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event
         return false;
 
     /* Check if there is a focusable item under cursor. */
-    QGraphicsItem *focusableItem = item(view, event->pos(), ItemIsFocusable());
+    QGraphicsItem *focusableItem = item(view, event->pos(), ItemIsMouseInteractive());
     if (focusableItem != NULL)
         return false; /* Let default implementation handle it. */
 

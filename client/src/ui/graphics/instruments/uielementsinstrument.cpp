@@ -43,6 +43,7 @@ UiElementsInstrument::UiElementsInstrument(QObject *parent):
     QGraphicsWidget *widget = new QGraphicsWidget();
     widget->setParent(this);
     widget->setFlag(QGraphicsItem::ItemIgnoresTransformations);
+    widget->setAcceptedMouseButtons(0);
     m_widget = widget;
 
     connect(widget, SIGNAL(zChanged()), this, SLOT(at_widget_zValueChanged()));

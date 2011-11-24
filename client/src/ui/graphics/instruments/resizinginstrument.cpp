@@ -2,9 +2,9 @@
 #include <ui/common/constrained_resizable.h>
 
 namespace {
-    struct ItemIsWidget: public std::unary_function<QGraphicsItem *, bool> {
+    struct ItemIsResizableWidget: public std::unary_function<QGraphicsItem *, bool> {
         bool operator()(QGraphicsItem *item) const {
-            return item->isWidget();
+            return item->isWidget() && (item->acceptedMouseButtons() & Qt::LeftButton);
         }
     };
 
@@ -51,7 +51,7 @@ bool ResizingInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
         return false;
 
     /* Find the item to resize. */
-    QGraphicsWidget *widget = static_cast<QGraphicsWidget *>(item(view, event->pos(), ItemIsWidget()));
+    QGraphicsWidget *widget = static_cast<QGraphicsWidget *>(item(view, event->pos(), ItemIsResizableWidget()));
     if (widget == NULL)
         return false;
 
