@@ -12,6 +12,7 @@
 #include "core/resource/resource.h"
 #include "core/resourcemanagment/resource_pool.h"
 #include "ui/context_menu_helper.h"
+#include "ui/device_settings/dlg_factory.h"
 #include "ui/models/resourcemodel.h"
 #include "ui/skin.h"
 
@@ -130,16 +131,53 @@ void NavigationTreeWidget::contextMenuEvent(QContextMenuEvent *event)
 
     QMenu menu;
 
-    if (resources.isEmpty())
+    if (resources.size() == 1)
+    {
+        const QnResourcePtr resource = resources.first();
+        if (resource->checkFlag(QnResource::video) || resource->checkFlag(QnResource::SINGLE_SHOT))
+        {
+            menu.addAction(&cm_editTags);
+
+            if (resource->associatedWithFile())
+                menu.addAction(&cm_remove_from_disk);
+
+            if (resource->checkFlag(QnResource::ARCHIVE))
+                menu.addAction(&cm_upload_youtube);
+
+            if (resource->checkFlag(QnResource::ARCHIVE) || resource->checkFlag(QnResource::SINGLE_SHOT))
+                menu.addAction(&cm_open_containing_folder);
+        }
+        else if (resource->checkFlag(QnResource::live_cam))
+        {
+            // ### Start/Stop recording (Ctrl+R)
+            // ### Delete(if no connection)(Shift+Del)
+            menu.addAction(&cm_editTags);
+            // ### Export selected... (Ctrl+E)
+        }
+        else if (resource->checkFlag(QnResource::server))
+        {
+            // ### New camera
+        }
+        // ### handle layouts
+
+        if (CLDeviceSettingsDlgFactory::canCreateDlg(resource))
+            menu.addAction(&cm_settings);
+    }
+    else if (resources.size() > 1)
+    {
+        // ###
+    }
+    else
     {
         menu.addAction(&cm_open_file);
         menu.addAction(&cm_new_item);
-        menu.addAction(&cm_screen_recording);
-        menu.addAction(&cm_toggle_fullscreen);
-        menu.addAction(&cm_preferences);
-        menu.addSeparator();
-        menu.addAction(&cm_exit);
     }
+    menu.addSeparator();
+    menu.addAction(&cm_toggle_fullscreen);
+    menu.addAction(&cm_screen_recording);
+    menu.addAction(&cm_preferences);
+    menu.addSeparator();
+    menu.addAction(&cm_exit);
 
     /*QAction *action = */menu.exec(event->globalPos());
 }

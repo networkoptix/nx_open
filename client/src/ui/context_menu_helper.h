@@ -14,8 +14,8 @@ extern QAction cm_recording_settings;
 extern QAction cm_toggle_fullscreen;
 extern QAction cm_fitinview;
 extern QAction cm_arrange;
-extern QAction cm_add_layout;
 
+extern QAction cm_add_layout;
 extern QAction cm_restore_layout;
 extern QAction cm_save_layout;
 extern QAction cm_save_layout_as;
