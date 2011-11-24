@@ -74,10 +74,6 @@ public:
 
     static const int DEFAULT_HEIGHT = 60;
 
-    void controlAudio(bool control = true) {
-        m_controlAudio = control;
-    }
-
 public Q_SLOTS:
     void setPlaying(bool playing);
 
@@ -143,7 +139,6 @@ private:
     qint64 m_currentTime;
     bool m_playing;
     bool m_mouseOver;
-    bool m_controlAudio;
 
     QnTimePeriod m_timePeriod;
 

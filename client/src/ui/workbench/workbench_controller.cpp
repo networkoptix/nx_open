@@ -116,7 +116,6 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchManager *synchronizer, Q
     controlsWidget->setLayout(verticalLayout);
 
     m_navigationItem = new NavigationItem();
-    m_navigationItem->controlAudio(false);
     m_navigationItem->setParentItem(controlsWidget);
 
     verticalLayout->addStretch(100);
