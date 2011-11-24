@@ -24,7 +24,7 @@ public:
     virtual void setSingleShotMode(bool /*single*/) {}
 
     virtual void setSpeed(float /*value*/) {}
-    virtual qint64 currentTime() const { return 0; }
+    virtual qint64 getCurrentTime() const { return 0; }
 protected:
 	void run();
     virtual bool processData(QnAbstractDataPacketPtr /*data*/)=0;

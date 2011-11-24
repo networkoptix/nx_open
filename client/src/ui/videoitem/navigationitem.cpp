@@ -589,7 +589,7 @@ void NavigationItem::play()
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     if (reader->onPause() && reader->isRealTimeSource()) {
         reader->resumeMedia();
-        reader->jumpToPreviousFrame(m_camera->getCamCamDisplay()->currentTime(), true);
+        reader->jumpToPreviousFrame(m_camera->getCamCamDisplay()->getCurrentTime(), true);
     }
     else {
         reader->resumeMedia();

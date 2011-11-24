@@ -26,8 +26,7 @@ struct ReaderInfo
 class QnArchiveSyncPlayWrapper::QnArchiveSyncPlayWrapperPrivate
 {
 public:
-    QnArchiveSyncPlayWrapperPrivate():
-      timeMutex(QMutex::Recursive)
+    void initValues()
     {
         blockSingleShotSignal = false;
         blockJumpSignal = false;
@@ -36,6 +35,13 @@ public:
         maxAllowedDate.clear();
         minAllowedDate.clear();
         speed = 1.0;
+    }
+
+
+    QnArchiveSyncPlayWrapperPrivate():
+      timeMutex(QMutex::Recursive)
+    {
+        initValues();
     }
 
     QList<ReaderInfo> readers;
@@ -361,6 +367,8 @@ void QnArchiveSyncPlayWrapper::erase(QnAbstractArchiveDelegate* value)
         if (i->reader->getArchiveDelegate() == value)
         {
             d->readers.erase(i);
+            if (d->readers.isEmpty())
+                d->initValues();
             break;
         }
     }

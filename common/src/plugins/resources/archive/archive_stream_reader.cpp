@@ -138,7 +138,7 @@ bool QnArchiveStreamReader::init()
      for (int i = 0; i < m_dataprocessors.size(); ++i)
      {
          QnAbstractDataConsumer* dp = m_dataprocessors.at(i);
-         rez = qMax(rez, dp->currentTime());
+         rez = qMax(rez, dp->getCurrentTime());
      }
      return rez;
  }

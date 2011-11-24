@@ -42,7 +42,6 @@ private:
     //void waitIfNeed(QnAbstractArchiveReader* reader, qint64 timestamp);
     void onNewDataReaded();
     void erase(QnAbstractArchiveDelegate* value);
-
     void reinitTime();
 private:
     friend class QnSyncPlayArchiveDelegate;

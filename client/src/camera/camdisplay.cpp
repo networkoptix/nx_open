@@ -235,10 +235,24 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         if (useSync(vd)) 
         {
             qint64 displayedTime = getCurrentTime();
-            if (displayedTime != AV_NOPTS_VALUE)
-                realSleepTime = displayedTime - m_extTimeSrc->getCurrentTime();
+            if (displayedTime != AV_NOPTS_VALUE) {
+                if (m_speed >= 0)
+                    realSleepTime = displayedTime - m_extTimeSrc->getCurrentTime();
+                else
+                    realSleepTime = m_extTimeSrc->getCurrentTime() - displayedTime;
+            }
 
-            cl_log.log("sleepTime=", realSleepTime/1000, cl_logALWAYS);
+            /*
+            if (m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed)
+            {
+                QString s;
+                QTextStream str(&s);
+                str << "sleepTime=" << realSleepTime/1000 << " displayedTime=" << QDateTime::fromMSecsSinceEpoch(displayedTime/1000).toString("hh:mm:ss.zzz");
+                str.flush();
+                cl_log.log(s, cl_logALWAYS);
+            } 
+            */
+            
             if (realSleepTime > 0 && m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed)
             {
                 safeSleep(realSleepTime/1000);
@@ -440,7 +454,7 @@ bool CLCamDisplay::useSync(QnCompressedVideoDataPtr vd)
 
 bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
 {
-    cl_log.log("m_dataQueueSize=", m_dataQueue.size(), cl_logALWAYS);
+    //cl_log.log("m_dataQueueSize=", m_dataQueue.size(), cl_logALWAYS);
 
     QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
     if (!media)
@@ -849,7 +863,7 @@ qint64 CLCamDisplay::getNextTime() const
 void CLCamDisplay::setExternalTimeSource(QnlTimeSource* value) 
 { 
     m_extTimeSrc = value; 
-    for (int i = 1; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
+    for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
         m_display[i]->canUseBufferedFrameDisplayer(m_extTimeSrc == 0);
     }
 }
