@@ -178,6 +178,9 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
     }
     else 
     */
+    if (vd->flags & QnAbstractMediaData::MediaFlags_BOF)
+        m_lastSleepInterval = needToSleep = 0;
+    
     if (vd->flags & AV_REVERSE_BLOCK_START)
         needToSleep = m_lastSleepInterval;
     else {
@@ -467,7 +470,8 @@ void CLCamDisplay::putData(QnAbstractDataPacketPtr data)
 
 bool CLCamDisplay::useSync(QnCompressedVideoDataPtr vd)
 {
-    return m_extTimeSrc && !(vd->flags & (QnAbstractMediaData::MediaFlags_LIVE | QnAbstractMediaData::MediaFlags_BOF)) && !m_singleShotMode;
+    //return m_extTimeSrc && !(vd->flags & (QnAbstractMediaData::MediaFlags_LIVE | QnAbstractMediaData::MediaFlags_BOF)) && !m_singleShotMode;
+    return m_extTimeSrc && !(vd->flags & QnAbstractMediaData::MediaFlags_LIVE) && !m_singleShotMode;
 }
 
 bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)

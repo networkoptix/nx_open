@@ -44,6 +44,7 @@ private:
     void onNewDataReaded();
     void erase(QnAbstractArchiveDelegate* value);
     void reinitTime(qint64 newTime);
+    qint64 getDisplayedTimeInternal() const;
 private:
     friend class QnSyncPlayArchiveDelegate;
     QN_DECLARE_PRIVATE(QnArchiveSyncPlayWrapper);

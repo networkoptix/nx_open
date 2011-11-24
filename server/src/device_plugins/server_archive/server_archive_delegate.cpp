@@ -86,14 +86,19 @@ QnAbstractMediaDataPtr QnServerArchiveDelegate::getNextData()
         DeviceFileCatalog::Chunk chunk;
         do {
             chunk = m_chunkSequence->getNextChunk(m_resource);
-            if (chunk.startTime == -1)
-                return QnAbstractMediaDataPtr(); // EOF
+            if (chunk.startTime == -1) 
+            {
+                if (m_reverseMode) {
+                    data = QnAbstractMediaDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, 0));
+                    data->timestamp = INT64_MAX; // EOF reached
+                }
+                return data;
+            }
         } while (!switchToChunk(chunk));
         data = m_aviDelegate->getNextData();
     }
     if (data) {
         data->timestamp +=m_currentChunk.startTime;
-
         //cl_log.log("serverArchiveDelegate. dataTime= ",QDateTime::fromMSecsSinceEpoch(data->timestamp/1000).toString(), cl_logALWAYS);
     }
     return data;
