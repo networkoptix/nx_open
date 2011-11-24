@@ -53,8 +53,9 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchManager *synchronizer, Q
     m_archiveDropInstrument = new ArchiveDropInstrument(this, this);
     m_uiElementsInstrument = new UiElementsInstrument(this);
     BoundingInstrument *boundingInstrument = m_synchronizer->boundingInstrument();
-
     m_dragInstrument = new DragInstrument(this);
+
+    m_rubberBandInstrument->setRubberBandZValue(m_synchronizer->layerZValue(QnWorkbenchManager::EFFECTS_LAYER));
 
     QSet<QEvent::Type> mouseEventTypes = Instrument::makeSet(
         QEvent::GraphicsSceneMousePress,

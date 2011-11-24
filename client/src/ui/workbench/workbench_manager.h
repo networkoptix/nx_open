@@ -48,6 +48,7 @@ public:
         CURTAIN_LAYER,              /**< Layer for curtain that blacks out the background when an item is zoomed. */
         ZOOMED_LAYER,               /**< Layer for zoomed items. */
         FRONT_LAYER,                /**< Topmost layer for items. Items that are being dragged, resized or manipulated in any other way are to be placed here. */
+        EFFECTS_LAYER,              /**< Layer for top-level effects. */
         UI_ELEMENTS_LAYER,          /**< Layer for ui elements, i.e. close button, navigation bar, etc... */
     };
 
@@ -197,6 +198,8 @@ public:
 
     void setLayer(const QList<QGraphicsItem *> &items, Layer layer);
 
+    qreal layerZValue(Layer layer) const;
+
     void synchronize(QnWorkbenchItem *item, bool animate = true);
     
     void synchronize(QnDisplayWidget *widget, bool animate = true);
@@ -217,7 +220,7 @@ protected:
     void synchronizeLayer(QnDisplayWidget *widget);
     void synchronizeSceneBounds();
 
-    qreal layerFront(Layer layer) const;
+    qreal layerFrontZValue(Layer layer) const;
     Layer synchronizedLayer(QnWorkbenchItem *item) const;
 
     void addItemInternal(QnWorkbenchItem *item);

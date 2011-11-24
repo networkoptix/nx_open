@@ -17,6 +17,12 @@ public:
     RubberBandInstrument(QObject *parent);
     virtual ~RubberBandInstrument();
 
+    qreal rubberBandZValue() const {
+        return m_rubberBandZValue;
+    }
+
+    void setRubberBandZValue(qreal rubberBandZValue);
+
 protected:
     virtual void installedNotify() override;
     virtual void aboutToBeUninstalledNotify() override;
@@ -32,12 +38,16 @@ protected:
 
     static QSet<QGraphicsItem *> toSet(QList<QGraphicsItem *> items);
 
+    RubberBandItem *rubberBand() const {
+        return m_rubberBand.data();
+    }
+
 private slots:
     void at_scene_selectionChanged();
 
 private:
     /* Rubber band item. */
-    QScopedPointer<RubberBandItem> m_rubberBand;
+    QWeakPointer<RubberBandItem> m_rubberBand;
 
     /** Set of items that were selected when rubber banding has started. */
     QSet<QGraphicsItem *> m_originallySelected;
@@ -47,6 +57,9 @@ private:
 
     /** Whether the control is currently inside selection change handler. */
     bool m_inSelectionChanged;
+
+    /** Z value of the rubber band item. */
+    qreal m_rubberBandZValue;
 };
 
 #endif // QN_RUBBER_BAND_INSTRUMENT_H

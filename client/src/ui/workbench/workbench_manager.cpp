@@ -424,7 +424,7 @@ void QnWorkbenchManager::bringToFront(QGraphicsItem *item) {
     }
 
     m_frontZ += zStep;
-    item->setZValue(layerFront(layer(item)));
+    item->setZValue(layerFrontZValue(layer(item)));
 }
 
 void QnWorkbenchManager::bringToFront(QnWorkbenchItem *item) {
@@ -489,8 +489,12 @@ void QnWorkbenchManager::removeItemInternal(QnWorkbenchItem *item) {
 // -------------------------------------------------------------------------- //
 // QnWorkbenchManager :: calculators
 // -------------------------------------------------------------------------- //
-qreal QnWorkbenchManager::layerFront(Layer layer) const {
-    return m_frontZ + layer * layerZSize;
+qreal QnWorkbenchManager::layerFrontZValue(Layer layer) const {
+    return layerZValue(layer) + m_frontZ;
+}
+
+qreal QnWorkbenchManager::layerZValue(Layer layer) const {
+    return layer * layerZSize;
 }
 
 QnWorkbenchManager::Layer QnWorkbenchManager::synchronizedLayer(QnWorkbenchItem *item) const {

@@ -28,16 +28,15 @@ namespace {
  * Unfortunately, it is impossible to hook into QGraphicsView's rendering
  * pipeline except by subclassing it, so this is probably the best non-intrusive solution.
  */
-class RubberBandItem: public QGraphicsItem {
+class RubberBandItem: public QGraphicsObject {
 public:
     RubberBandItem(): 
-        QGraphicsItem(NULL),
+        QGraphicsObject(NULL),
         m_viewport(NULL),
         m_cacheDirty(true)
     {
         setAcceptedMouseButtons(0);
         setEnabled(false);
-        setZValue(std::numeric_limits<qreal>::max());
     }
 
     virtual QRectF boundingRect() const override {
@@ -186,16 +185,29 @@ private:
 };
 
 RubberBandInstrument::RubberBandInstrument(QObject *parent):
-    DragProcessingInstrument(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent)
+    DragProcessingInstrument(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
+    m_rubberBandZValue(std::numeric_limits<qreal>::max())
 {}
 
 RubberBandInstrument::~RubberBandInstrument() {
     ensureUninstalled();
 }
 
+void RubberBandInstrument::setRubberBandZValue(qreal rubberBandZValue) {
+    m_rubberBandZValue = rubberBandZValue;
+    
+    if(rubberBand() != NULL)
+        rubberBand()->setZValue(m_rubberBandZValue);
+}
+
 void RubberBandInstrument::installedNotify() {
-    m_rubberBand.reset(new RubberBandItem());
-    scene()->addItem(m_rubberBand.data());
+    if(rubberBand() != NULL)
+        delete rubberBand();
+
+    m_rubberBand = new RubberBandItem();
+    rubberBand()->setParent(this); /* Just to feel totally safe. */
+    rubberBand()->setZValue(m_rubberBandZValue);
+    scene()->addItem(rubberBand());
 
     connect(scene(), SIGNAL(selectionChanged()), this, SLOT(at_scene_selectionChanged()));
 
@@ -208,26 +220,23 @@ void RubberBandInstrument::installedNotify() {
 void RubberBandInstrument::aboutToBeUninstalledNotify() {
     DragProcessingInstrument::aboutToBeUninstalledNotify();
 
-    if (scene() == NULL) {
-        /* Rubber band item will be deleted by scene, just zero the pointer. */
-        m_rubberBand.take();
-    } else {
+    if (scene() != NULL) 
         disconnect(scene(), NULL, this, NULL);
 
-        m_rubberBand.reset();
-    }
+    if(rubberBand() != NULL)
+        delete rubberBand();
 }
 
 bool RubberBandInstrument::paintEvent(QWidget *viewport, QPaintEvent *event) {
-    if(viewport != m_rubberBand->viewport())
+    if(viewport != rubberBand()->viewport())
         return false; /* We are interested only in transformations for the current viewport. */
 
     QGraphicsView *view = this->view(viewport);
     QTransform sceneToViewport = view->viewportTransform();
-    if(qFuzzyCompare(sceneToViewport, m_rubberBand->viewportTransform()))
+    if(qFuzzyCompare(sceneToViewport, rubberBand()->viewportTransform()))
         return false;
 
-    m_rubberBand->setViewportTransform(sceneToViewport);
+    rubberBand()->setViewportTransform(sceneToViewport);
 
     /* Scene mouse position may have changed as a result of transform change. */
     processor()->paintEvent(viewport, event);
@@ -296,20 +305,20 @@ bool RubberBandInstrument::mouseReleaseEvent(QWidget *viewport, QMouseEvent *eve
 }
 
 void RubberBandInstrument::startDrag() {
-    m_rubberBand->setViewport(processor()->view()->viewport());
-    m_rubberBand->setViewportTransform(processor()->view()->viewportTransform());
-    m_rubberBand->setOrigin(processor()->mousePressScenePos());
+    rubberBand()->setViewport(processor()->view()->viewport());
+    rubberBand()->setViewportTransform(processor()->view()->viewportTransform());
+    rubberBand()->setOrigin(processor()->mousePressScenePos());
 }
 
 void RubberBandInstrument::drag() {
     QGraphicsView *view = processor()->view();
 
     /* Update rubber band corner. */
-    m_rubberBand->setCorner(processor()->mouseScenePos());
+    rubberBand()->setCorner(processor()->mouseScenePos());
 
     /* Update selection. */
     QPainterPath selectionArea;
-    selectionArea.addPolygon(view->mapToScene(m_rubberBand->rubberBandRect()));
+    selectionArea.addPolygon(view->mapToScene(rubberBand()->rubberBandRect()));
     selectionArea.closeSubpath();
 
     if (processor()->modifiers() & Qt::ShiftModifier) {
@@ -330,7 +339,7 @@ void RubberBandInstrument::drag() {
 }
 
 void RubberBandInstrument::finishDrag() {
-    m_rubberBand->setViewport(NULL);
+    rubberBand()->setViewport(NULL);
 }
 
 QSet<QGraphicsItem *> RubberBandInstrument::toSet(QList<QGraphicsItem *> items) {
