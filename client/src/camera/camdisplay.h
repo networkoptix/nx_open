@@ -46,7 +46,7 @@ public:
 	 * \returns                         Current time in microseconds.
 	 */
     virtual qint64 getCurrentTime() const;
-    virtual qint64 getNextTime() const;
+    virtual qint64 getDisplayedTime() const;
 
     void setMTDecoding(bool value);
 

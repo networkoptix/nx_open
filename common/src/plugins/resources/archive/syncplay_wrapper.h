@@ -20,7 +20,6 @@ public:
     void removeArchiveReader(QnAbstractArchiveReader* reader);
 
     virtual qint64 getCurrentTime() const;
-    virtual qint64 getNextTime() const;
     virtual qint64 getDisplayedTime() const;
 
     virtual void onAvailableTime(QnlTimeSource* source, qint64 time);

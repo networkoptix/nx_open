@@ -853,11 +853,9 @@ qint64 CLCamDisplay::getCurrentTime() const
     return result;
 }
 
-qint64 CLCamDisplay::getNextTime() const 
+qint64 CLCamDisplay::getDisplayedTime() const
 {
-    //QMutexLocker lock(&m_timeMutex);
-    //return m_nextTime;
-    return 0;
+    return getCurrentTime();
 }
 
 void CLCamDisplay::setExternalTimeSource(QnlTimeSource* value) 

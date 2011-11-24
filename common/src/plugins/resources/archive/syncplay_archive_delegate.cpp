@@ -109,11 +109,6 @@ qint64 QnSyncPlayArchiveDelegate::secondTime() const
 }
 */
 
-qint64 QnSyncPlayArchiveDelegate::secondTime() const
-{
-    return m_display->getNextTime();
-}
-
 QnAbstractMediaDataPtr QnSyncPlayArchiveDelegate::getNextData()
 {
     return m_ownerDelegate->getNextData();
