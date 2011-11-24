@@ -1,6 +1,8 @@
 #ifndef QnExternalTimeSource_h_1919
 #define QnExternalTimeSource_h_1919
 
+#include <QtGlobal> /* For Q_UNUSED. */
+
 class QnlTimeSource
 {
 public:
@@ -8,7 +10,7 @@ public:
     virtual qint64 getDisplayedTime() const = 0;
     virtual qint64 getNextTime() const = 0;
 
-    virtual void onAvailableTime(QnlTimeSource* src, qint64 time) {}
+    virtual void onAvailableTime(QnlTimeSource* src, qint64 time) { Q_UNUSED(src); Q_UNUSED(time); }
 };
 
 #endif //QnExternalTimeSource_h_1919
