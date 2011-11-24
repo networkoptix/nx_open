@@ -31,7 +31,6 @@ public:
     qint64 jumpToPreviousFrame (qint64 time, bool makeshot);
 
     virtual AVCodecContext* setAudioChannel(int num);
-    void enableSync(bool value);
 
 private:
     QnArchiveSyncPlayWrapper* m_syncWrapper;
@@ -43,7 +42,6 @@ private:
     qint64 m_startDelay;
     QTime m_initTime;
     QnAbstractArchiveReader* m_reader;
-    bool m_enableSync;
     QnlTimeSource* m_display;
 };
 

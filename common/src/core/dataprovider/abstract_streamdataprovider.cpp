@@ -41,6 +41,9 @@ void QnAbstractStreamDataProvider::addDataProcessor(QnAbstractDataConsumer* dp)
 
         connect(this, SIGNAL(beforeJump(qint64, bool)), dp, SLOT(onBeforeJump(qint64, bool)), Qt::DirectConnection);
         connect(this, SIGNAL(jumpOccured(qint64)), dp, SLOT(onJumpOccured(qint64)), Qt::DirectConnection);
+        connect(this, SIGNAL(prevFrameOccured()), dp, SLOT(onPrevFrameOccured()), Qt::DirectConnection);
+        connect(this, SIGNAL(nextFrameOccured()), dp, SLOT(onNextFrameOccured()), Qt::DirectConnection);
+
     }
 }
 

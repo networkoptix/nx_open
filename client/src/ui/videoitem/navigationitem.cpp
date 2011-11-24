@@ -668,7 +668,7 @@ void NavigationItem::stepForward()
 
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     reader->nextFrame();
-    m_camera->getCamCamDisplay()->setSingleShotMode(true);
+    //m_camera->getCamCamDisplay()->setSingleShotMode(true);
 }
 
 

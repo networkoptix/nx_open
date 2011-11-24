@@ -384,6 +384,11 @@ void CLCamDisplay::onPrevFrameOccured()
     setSingleShotMode(false);
 }
 
+void CLCamDisplay::onNextFrameOccured()
+{
+    setSingleShotMode(true);
+}
+
 void CLCamDisplay::setSingleShotMode(bool single)
 {
     m_singleShotMode = single;
@@ -449,7 +454,7 @@ void CLCamDisplay::putData(QnAbstractDataPacketPtr data)
 
 bool CLCamDisplay::useSync(QnCompressedVideoDataPtr vd)
 {
-    return m_extTimeSrc && !(vd->flags & (QnAbstractMediaData::MediaFlags_LIVE | QnAbstractMediaData::MediaFlags_BOF));
+    return m_extTimeSrc && !(vd->flags & (QnAbstractMediaData::MediaFlags_LIVE | QnAbstractMediaData::MediaFlags_BOF)) && !m_singleShotMode;
 }
 
 bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)

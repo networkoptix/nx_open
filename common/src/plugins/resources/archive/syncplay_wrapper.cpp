@@ -28,6 +28,7 @@ class QnArchiveSyncPlayWrapper::QnArchiveSyncPlayWrapperPrivate
 public:
     void initValues()
     {
+        blockPrevFrameSignal = blockNextFrameSignal = false;
         blockSingleShotSignal = false;
         blockJumpSignal = false;
         blockPausePlaySignal = false;
@@ -47,12 +48,13 @@ public:
     QList<ReaderInfo> readers;
     mutable QMutex timeMutex;
 
-    QWaitCondition syncCond;
     mutable QMutex syncMutex;
 
     bool blockSingleShotSignal;
     bool blockJumpSignal;
     bool blockPausePlaySignal;
+    bool blockPrevFrameSignal;
+    bool blockNextFrameSignal;
     qint64 lastJumpTime;
     QTime timer;
     double speed;
@@ -90,20 +92,44 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveReader* reader,
 
     connect(reader, SIGNAL(streamPaused()), this, SLOT(onStreamPaused()), Qt::DirectConnection);
     connect(reader, SIGNAL(streamResumed()), this, SLOT(onStreamResumed()), Qt::DirectConnection);
-    connect(reader, SIGNAL(nextFrameOccured()), this, SLOT(onNextPrevFrameOccured()), Qt::DirectConnection);
-    connect(reader, SIGNAL(prevFrameOccured()), this, SLOT(onNextPrevFrameOccured()), Qt::DirectConnection);
+    connect(reader, SIGNAL(nextFrameOccured()), this, SLOT(onNextFrameOccured()), Qt::DirectConnection);
+    connect(reader, SIGNAL(prevFrameOccured()), this, SLOT(onPrevFrameOccured()), Qt::DirectConnection);
 
     connect(reader, SIGNAL(speedChanged(double)), this, SLOT(onSpeedChanged(double)), Qt::DirectConnection);
 }
 
-void QnArchiveSyncPlayWrapper::onNextPrevFrameOccured()
+void QnArchiveSyncPlayWrapper::onNextFrameOccured()
 {
     Q_D(QnArchiveSyncPlayWrapper);
+    if (d->blockNextFrameSignal)
+        return;
+    d->blockNextFrameSignal = true;
+
     foreach(const ReaderInfo& info, d->readers)
     {
         QnSyncPlayArchiveDelegate* syncDelegate = static_cast<QnSyncPlayArchiveDelegate*> (info.reader->getArchiveDelegate());
-        syncDelegate->enableSync(info.enabled);
+        if (info.reader != sender()) 
+            info.reader->nextFrame();
     }
+
+    d->blockNextFrameSignal = false;
+}
+
+void QnArchiveSyncPlayWrapper::onPrevFrameOccured()
+{
+    Q_D(QnArchiveSyncPlayWrapper);
+    if (d->blockPrevFrameSignal)
+        return;
+    d->blockPrevFrameSignal = true;
+
+    foreach(const ReaderInfo& info, d->readers)
+    {
+        QnSyncPlayArchiveDelegate* syncDelegate = static_cast<QnSyncPlayArchiveDelegate*> (info.reader->getArchiveDelegate());
+        if (info.reader != sender()) 
+            info.reader->nextFrame();
+    }
+
+    d->blockPrevFrameSignal = false;
 }
 
 void QnArchiveSyncPlayWrapper::onStreamResumed()
@@ -192,13 +218,11 @@ void QnArchiveSyncPlayWrapper::onSingleShotModeChanged(bool value)
     foreach(const ReaderInfo& info, d->readers)
     {
         QnSyncPlayArchiveDelegate* syncDelegate = static_cast<QnSyncPlayArchiveDelegate*> (info.reader->getArchiveDelegate());
-        syncDelegate->enableSync(!value && info.enabled);
 
         if (info.reader != sender())
             info.reader->setSingleShotMode(value);
     }
     d->blockSingleShotSignal = false;
-    d->syncCond.wakeAll();
 }
 
 void QnArchiveSyncPlayWrapper::onBeforeJump(qint64 mksec, bool makeshot)
@@ -219,30 +243,16 @@ void QnArchiveSyncPlayWrapper::onBeforeJump(qint64 mksec, bool makeshot)
     foreach(ReaderInfo info, d->readers)
     {
         QnSyncPlayArchiveDelegate* syncDelegate = static_cast<QnSyncPlayArchiveDelegate*> (info.reader->getArchiveDelegate());
-        syncDelegate->enableSync(false);
         if (info.reader != sender() && info.enabled)
         {
             syncDelegate->jumpToPreviousFrame(mksec, makeshot);
         }
     }
-    d->syncCond.wakeAll();
     d->blockJumpSignal = false;
 }
 
 void QnArchiveSyncPlayWrapper::onJumpOccured(qint64 mksec)
 {
-    Q_D(QnArchiveSyncPlayWrapper);
-    if (d->blockJumpSignal)
-        return;
-    d->blockJumpSignal = true;
-
-    foreach(ReaderInfo info, d->readers)
-    {
-        QnSyncPlayArchiveDelegate* syncDelegate = static_cast<QnSyncPlayArchiveDelegate*> (info.reader->getArchiveDelegate());
-        syncDelegate->enableSync(info.enabled && !info.reader->isSingleShotMode());
-    }
-    d->blockJumpSignal = false;
-    d->syncCond.wakeAll();
 }
 
 qint64 QnArchiveSyncPlayWrapper::minTime() const
@@ -279,8 +289,6 @@ qint64 QnArchiveSyncPlayWrapper::endTime() const
 
 void QnArchiveSyncPlayWrapper::onNewDataReaded()
 {
-    Q_D(QnArchiveSyncPlayWrapper);
-    d->syncCond.wakeAll();
 }
 
 void QnArchiveSyncPlayWrapper::removeArchiveReader(QnAbstractArchiveReader* reader)
@@ -373,9 +381,6 @@ void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvid
                 // resume display
             }
             d->readers[i].enabled = !value;
-            if (!d->readers[i].enabled)
-                syncDelegate->enableSync(false);
-            d->syncCond.wakeAll();
         }
     }
 }

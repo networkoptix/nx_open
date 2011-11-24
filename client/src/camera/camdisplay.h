@@ -67,6 +67,7 @@ public slots:
     void onReaderPaused();
     void onReaderResumed();
     void onPrevFrameOccured();
+    void onNextFrameOccured();
 signals:
     void reachedTheEnd();
     void liveMode(bool value);

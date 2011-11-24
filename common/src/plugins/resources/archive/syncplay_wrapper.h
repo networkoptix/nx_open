@@ -31,7 +31,8 @@ private slots:
     void onJumpOccured(qint64 mksec);
     void onStreamPaused();
     void onStreamResumed();
-    void onNextPrevFrameOccured();
+    void onNextFrameOccured();
+    void onPrevFrameOccured();
     void onSpeedChanged(double value);
 private:
     qint64 minTime() const;
