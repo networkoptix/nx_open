@@ -62,19 +62,16 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
 
     /* Set up model & control machinery. */
-    QnWorkbenchLayout *model = new QnWorkbenchLayout(this);
    
     const QSizeF defaultCellSize = QSizeF(150.0, 100.0);
     const QSizeF defaultSpacing = QSizeF(25.0, 25.0);
-    QnWorkbench *state = new QnWorkbench(this);
-    state->setLayout(model);
-    state->mapper()->setCellSize(defaultCellSize);
-    state->mapper()->setSpacing(defaultSpacing);
+    QnWorkbench *workbench = new QnWorkbench(this);
+    workbench->mapper()->setCellSize(defaultCellSize);
+    workbench->mapper()->setSpacing(defaultSpacing);
 
-    QnWorkbenchManager *display = new QnWorkbenchManager(this);
+    QnWorkbenchManager *display = new QnWorkbenchManager(workbench, this);
     display->setScene(scene);
     display->setView(view);
-    display->setWorkbench(state);
 
     QnWorkbenchController *controller = new QnWorkbenchController(display, this);
 

@@ -40,7 +40,7 @@
 QnWorkbenchController::QnWorkbenchController(QnWorkbenchManager *synchronizer, QObject *parent):
     QObject(parent),
     m_synchronizer(synchronizer),
-    m_manager(synchronizer->manager()),
+    m_manager(synchronizer->instrumentManager()),
     m_focusedItem(NULL)
 {
     /* Install and configure instruments. */

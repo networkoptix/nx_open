@@ -66,9 +66,9 @@ namespace {
 
 } // anonymous namespace
 
-QnWorkbenchManager::QnWorkbenchManager(QObject *parent):
+QnWorkbenchManager::QnWorkbenchManager(QnWorkbench *workbench, QObject *parent):
     QObject(parent),
-    m_manager(new InstrumentManager(this)),
+    m_instrumentManager(new InstrumentManager(this)),
     m_workbench(NULL),
     m_scene(NULL),
     m_view(NULL),
@@ -79,15 +79,15 @@ QnWorkbenchManager::QnWorkbenchManager(QObject *parent):
     m_mode(QnWorkbench::VIEWING),
     m_frontZ(0.0),
     m_dummyScene(new QGraphicsScene(this)),
-    m_dummyWorkbench(new QnWorkbench(this))
+    m_dummyWorkbench(NULL)
 {
     /* Create and configure instruments. */
     m_boundingInstrument = new BoundingInstrument(this);
     m_transformListenerInstrument = new TransformListenerInstrument(this);
     m_activityListenerInstrument = new ActivityListenerInstrument(1000, this);
-    m_manager->installInstrument(m_transformListenerInstrument);
-    m_manager->installInstrument(m_boundingInstrument);
-    m_manager->installInstrument(m_activityListenerInstrument);
+    m_instrumentManager->installInstrument(m_transformListenerInstrument);
+    m_instrumentManager->installInstrument(m_boundingInstrument);
+    m_instrumentManager->installInstrument(m_activityListenerInstrument);
 
     m_activityListenerInstrument->recursiveDisable();
 
@@ -115,31 +115,26 @@ QnWorkbenchManager::QnWorkbenchManager(QObject *parent):
     connect(m_viewportAnimator, SIGNAL(animationFinished()),                                            this,                   SLOT(at_viewport_animationFinished()));
 
     /* Set up defaults. */
-    setWorkbench(m_dummyWorkbench);
+    initWorkbench(workbench);
     setScene(m_dummyScene);
 }
 
 QnWorkbenchManager::~QnWorkbenchManager() {
-    setWorkbench(NULL);
-    setScene(NULL);
-
     m_dummyWorkbench = NULL;
     m_dummyScene = NULL;
+
+    initWorkbench(NULL);
+    setScene(NULL);
 }
 
-void QnWorkbenchManager::setWorkbench(QnWorkbench *workbench) {
+void QnWorkbenchManager::initWorkbench(QnWorkbench *workbench) {
     if(m_workbench == workbench)
         return;
 
     if(m_workbench != NULL && m_scene != NULL)
         deinitSceneWorkbench();
 
-    /* Prepare new workbench. */
     m_workbench = workbench;
-    if(m_workbench == NULL && m_dummyWorkbench != NULL) {
-        m_dummyWorkbench->clear();
-        m_workbench = m_dummyWorkbench;
-    }
 
     if(m_workbench != NULL && m_scene != NULL)
         initSceneWorkbench();
@@ -169,7 +164,7 @@ void QnWorkbenchManager::deinitSceneWorkbench() {
     assert(m_scene != NULL && m_workbench != NULL);
 
     /* Deinit scene. */
-    m_manager->unregisterScene(m_scene);
+    m_instrumentManager->unregisterScene(m_scene);
 
     disconnect(m_scene, NULL, this, NULL);
     m_propertiesByItem.clear();
@@ -199,10 +194,10 @@ void QnWorkbenchManager::initSceneWorkbench() {
     assert(m_scene != NULL && m_workbench != NULL);
 
     /* Init scene. */
-    m_manager->registerScene(m_scene);
+    m_instrumentManager->registerScene(m_scene);
     if(m_view != NULL) {
         m_view->setScene(m_scene);
-        m_manager->registerView(m_view);
+        m_instrumentManager->registerView(m_view);
 
         initBoundingInstrument();
     }
@@ -245,7 +240,7 @@ void QnWorkbenchManager::setView(QGraphicsView *view) {
         return;
 
     if(m_view != NULL) {
-        m_manager->unregisterView(m_view);
+        m_instrumentManager->unregisterView(m_view);
         
         disconnect(m_view, NULL, this, NULL);
 
@@ -260,7 +255,7 @@ void QnWorkbenchManager::setView(QGraphicsView *view) {
     if(m_view != NULL) {
         m_view->setScene(m_scene);
 
-        m_manager->registerView(m_view);
+        m_instrumentManager->registerView(m_view);
 
         connect(m_view, SIGNAL(destroyed()), this, SLOT(at_view_destroyed()));
 
@@ -684,7 +679,8 @@ void QnWorkbenchManager::at_workbench_itemAboutToBeRemoved(QnWorkbenchItem *item
 }
 
 void QnWorkbenchManager::at_workbench_aboutToBeDestroyed() {
-    setWorkbench(NULL);
+    m_dummyWorkbench = new QnWorkbench(this);
+    initWorkbench(m_dummyWorkbench);
 }
 
 void QnWorkbenchManager::at_workbench_modeChanged() {

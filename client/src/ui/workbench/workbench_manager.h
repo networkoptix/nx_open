@@ -55,9 +55,10 @@ public:
     /**
      * Constructor.
      * 
+     * \param workbench                 Workbench to manage.
      * \param parent                    Parent object for this workbench manager.
      */
-    QnWorkbenchManager(QObject *parent = NULL);
+    QnWorkbenchManager(QnWorkbench *workbench, QObject *parent = NULL);
 
     /**
      * Virtual destructor.
@@ -67,8 +68,8 @@ public:
     /**
      * \returns                         Instrument manager owned by this workbench manager. 
      */
-    InstrumentManager *manager() const {
-        return m_manager;
+    InstrumentManager *instrumentManager() const {
+        return m_instrumentManager;
     }
 
     /**
@@ -100,15 +101,6 @@ public:
     QnWorkbench *workbench() const {
         return m_workbench;
     }
-
-    /**
-     * Note that workbench manager does not take ownership of the supplied workbench.
-     *
-     * \param workbench                 New workbench for this workbench manager.
-     *                                  If NULL is supplied, an empty workbench
-     *                                  owned by this workbench manager is used.
-     */
-    void setWorkbench(QnWorkbench *workbench);
 
     /**
      * Note that this function never returns NULL.
@@ -228,7 +220,7 @@ protected:
 
     void deinitSceneWorkbench();
     void initSceneWorkbench();
-
+    void initWorkbench(QnWorkbench *workbench);
     void initBoundingInstrument();
 
 protected slots:
@@ -304,7 +296,7 @@ private:
     /* Instruments. */
 
     /** Instrument manager owned by this workbench manager. */
-    InstrumentManager *m_manager;
+    InstrumentManager *m_instrumentManager;
 
     /** Transformation listener instrument. */
     TransformListenerInstrument *m_transformListenerInstrument;
