@@ -725,7 +725,7 @@ void CLGLRenderer::updateTexture()
         glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
         OGL_CHECK_ERROR("glPixelStorei");
 
-        if (m_videowindow->getVideoCam()->getDevice()->checkFlag(QnResource::SINGLE_SHOT))
+        if (m_videowindow && m_videowindow->getVideoCam()->getDevice()->checkFlag(QnResource::SINGLE_SHOT))
         {
             // free memory immediately for still images
             yuv2rgbBuffer.clear();

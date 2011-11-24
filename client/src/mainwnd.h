@@ -4,10 +4,11 @@
 #include <QScopedPointer>
 #include <QtGui/QMainWindow>
 
-class QnBlueBackgroundPainter;
-
 class CLLayoutNavigator;
 class LayoutContent;
+
+class QnBlueBackgroundPainter;
+class QnWorkbenchController;
 
 class MainWnd : public QMainWindow
 {
@@ -34,6 +35,7 @@ private:
 
 private:
     QScopedPointer<QnBlueBackgroundPainter> m_backgroundPainter;
+    QnWorkbenchController *m_controller;
     CLLayoutNavigator* m_normalView;
     static MainWnd *s_instance;
 };

@@ -33,7 +33,8 @@ MainWnd *MainWnd::s_instance = 0;
 
 MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     : QMainWindow(parent, flags),
-      m_normalView(NULL)
+      m_normalView(NULL),
+      m_controller(NULL)
 {
     if(s_instance != NULL)
         qnWarning("Several instances of main window created, expect problems.");
@@ -73,12 +74,12 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     display->setScene(scene);
     display->setView(view);
 
-    QnWorkbenchController *controller = new QnWorkbenchController(display, this);
+    m_controller = new QnWorkbenchController(display, this);
 
     /* Process input files. */
     QStringList files;
     for (int i = 1; i < argc; ++i)
-        controller->drop(fromNativePath(QString::fromLocal8Bit(argv[i])), QPoint(0, 0));
+        m_controller->drop(fromNativePath(QString::fromLocal8Bit(argv[i])), QPoint(0, 0));
 
     /* Prepare UI. */
     QTabWidget *tabWidget = new QTabWidget(this);
@@ -124,15 +125,10 @@ void MainWnd::itemActivated(uint resourceId)
 {
     // ### rewrite from scratch ;)
     QnResourcePtr resource = qnResPool->getResourceById(QnId(QString::number(resourceId)));
-    if (resource && resource->checkFlag(QnResource::url))
-    {
-        const QString file = resource->getUrl();
-
-        /*
-        m_normalView->getView().getCamLayOut().addDevice(file, true);
-        m_normalView->getView().getCamLayOut().getContent()->addDevice(file);
-        m_normalView->getView().fitInView(600, 100, SLOW_START_SLOW_END);
-        */
+    
+    QnMediaResourcePtr mediaResource = resource.dynamicCast<QnMediaResource>();
+    if (!mediaResource.isNull() && m_controller->layout()->items(mediaResource->getUniqueId()).empty()) {
+        m_controller->drop(resource, QPoint(0, 0));
     }
 }
 

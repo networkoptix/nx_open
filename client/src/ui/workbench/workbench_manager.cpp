@@ -211,7 +211,6 @@ void QnWorkbenchManager::initSceneWorkbench() {
     setLayer(m_curtainItem.data(), CURTAIN_LAYER);
     m_curtainAnimator->setCurtainItem(m_curtainItem.data());
 
-
     /* Init workbench. */
     connect(m_workbench,            SIGNAL(aboutToBeDestroyed()),                   this,                   SLOT(at_workbench_aboutToBeDestroyed()));
     connect(m_workbench,            SIGNAL(modeChanged()),                          this,                   SLOT(at_workbench_modeChanged()));
