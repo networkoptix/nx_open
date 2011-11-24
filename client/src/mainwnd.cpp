@@ -107,6 +107,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
 
     // toolbars
     QToolBar *toolBar = new QToolBar(this);
+    //toolBar->addActions(m_normalView->getView().actions());
     toolBar->addAction(&cm_exit);
     toolBar->addAction(&cm_toggle_fullscreen);
     toolBar->addAction(&cm_preferences);

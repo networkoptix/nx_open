@@ -22,7 +22,7 @@ public:
 
     void setLastSendTime(qint64 time);
     void setWaitBOF(qint64 newTime, bool value);
-    virtual qint64 currentTime() const;
+    virtual qint64 getCurrentTime() const;
     virtual void putData(QnAbstractDataPacketPtr data);
     virtual bool canAcceptData() const;
     void setLiveMode(bool value);

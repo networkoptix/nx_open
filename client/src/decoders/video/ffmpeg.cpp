@@ -8,7 +8,7 @@
 
 extern QMutex global_ffmpeg_mutex;
 
-static const int  LIGHT_CPU_MODE_FRAME_PERIOD = 15;
+static const int  LIGHT_CPU_MODE_FRAME_PERIOD = 2;
 bool CLFFmpegVideoDecoder::m_first_instance = true;
 int CLFFmpegVideoDecoder::hwcounter = 0;
 static const quint32 LONG_NAL_PREFIX = htonl(1);
@@ -254,7 +254,7 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, CLVideoDe
 
 		if (data->compressionType == CODEC_ID_MJPEG)
 		{
-            int period = DecodeMode_Fast ? LIGHT_CPU_MODE_FRAME_PERIOD : LIGHT_CPU_MODE_FRAME_PERIOD*2;
+            int period = m_decodeMode == DecodeMode_Fast ? LIGHT_CPU_MODE_FRAME_PERIOD : LIGHT_CPU_MODE_FRAME_PERIOD*2;
 			if (m_lightModeFrameCounter < period)
 			{
 				++m_lightModeFrameCounter;

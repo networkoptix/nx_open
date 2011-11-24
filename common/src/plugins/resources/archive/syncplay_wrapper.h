@@ -20,6 +20,9 @@ public:
     void removeArchiveReader(QnAbstractArchiveReader* reader);
 
     virtual qint64 getCurrentTime() const;
+    virtual qint64 getDisplayedTime() const;
+
+    virtual void onAvailableTime(QnlTimeSource* source, qint64 time);
 public slots:
     void onConsumerBlocksReader(QnAbstractStreamDataProvider* reader, bool value);
 private slots:
@@ -28,18 +31,18 @@ private slots:
     void onJumpOccured(qint64 mksec);
     void onStreamPaused();
     void onStreamResumed();
-    void onNextPrevFrameOccured();
+    void onNextFrameOccured();
+    void onPrevFrameOccured();
     void onSpeedChanged(double value);
 private:
     qint64 minTime() const;
     qint64 endTime() const;
     //qint64 seek (qint64 time);
-    qint64 secondTime(QnAbstractArchiveReader* reader) const;
-    void waitIfNeed(QnAbstractArchiveReader* reader, qint64 timestamp);
+    qint64 secondTime() const;
+    //void waitIfNeed(QnAbstractArchiveReader* reader, qint64 timestamp);
     void onNewDataReaded();
     void erase(QnAbstractArchiveDelegate* value);
-
-    qint64 selfCurrentTime(void) const;
+    void reinitTime();
 private:
     friend class QnSyncPlayArchiveDelegate;
     QN_DECLARE_PRIVATE(QnArchiveSyncPlayWrapper);

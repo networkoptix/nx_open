@@ -197,7 +197,8 @@ CLVideoStreamDisplay::CLVideoStreamDisplay(bool canDownscale) :
     m_timeChangeEnabled(true),
     m_bufferedFrameDisplayer(0),
     m_speed(1.0),
-    m_queueWasFilled(false)
+    m_queueWasFilled(false),
+    m_canUseBufferedFrameDisplayer(true)
 {
     for (int i = 0; i < MAX_FRAME_QUEUE_SIZE; ++i)
         m_frameQueue[i] = new CLVideoDecoderOutput();
@@ -396,7 +397,7 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
     bool reverseMode = m_reverseMode;
 
     bool enableFrameQueue = reverseMode ? true : m_enableFrameQueue;
-    if (enableFrameQueue && qAbs(m_speed - 1.0) < FPS_EPS && !(data->flags & QnAbstractMediaData::MediaFlags_LIVE))
+    if (enableFrameQueue && qAbs(m_speed - 1.0) < FPS_EPS && !(data->flags & QnAbstractMediaData::MediaFlags_LIVE) && m_canUseBufferedFrameDisplayer)
     {
         if (!m_bufferedFrameDisplayer) {
             QMutexLocker lock(&m_timeMutex);
@@ -695,6 +696,8 @@ void CLVideoStreamDisplay::setSpeed(float value)
     m_reverseMode = value < 0;
     if (m_reverseMode)
         m_enableFrameQueue = true;
+    //if (qAbs(m_speed) > 1.0+FPS_EPS)
+    //    m_enableFrameQueue = true;
 }
 
 qint64 CLVideoStreamDisplay::getLastDisplayedTime() const 
@@ -738,6 +741,11 @@ void CLVideoStreamDisplay::afterJump()
     //for (QMap<CodecID, CLAbstractVideoDecoder*>::iterator itr = m_decoder.begin(); itr != m_decoder.end(); ++itr)
     //    (*itr)->resetDecoder();
     m_queueWasFilled = false;
+}
+
+void CLVideoStreamDisplay::onNoVideo()
+{
+    m_drawer->onNoVideo();
 }
 
 void CLVideoStreamDisplay::clearReverseQueue()
@@ -800,4 +808,9 @@ void CLVideoStreamDisplay::setCurrentTime(qint64 time)
 {
     if (m_bufferedFrameDisplayer)
         m_bufferedFrameDisplayer->setCurrentTime(time);
+}
+
+void CLVideoStreamDisplay::canUseBufferedFrameDisplayer(bool value)
+{
+    m_canUseBufferedFrameDisplayer = value;
 }

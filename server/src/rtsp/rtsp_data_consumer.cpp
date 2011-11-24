@@ -50,7 +50,7 @@ void QnRtspDataConsumer::setWaitBOF(qint64 newTime, bool value)
     m_gotLivePacket = false;
 }
 
-qint64 QnRtspDataConsumer::currentTime() const 
+qint64 QnRtspDataConsumer::getCurrentTime() const 
 { 
     return m_lastSendTime; 
 }
@@ -228,7 +228,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         curData += sendLen;
 
     }
-    Q_ASSERT(!(m_waitBOF && (media->flags & QnAbstractMediaData::MediaFlags_BOF)));
+    //Q_ASSERT(!(m_waitBOF && (media->flags & QnAbstractMediaData::MediaFlags_BOF)));
 
     return true;
 }

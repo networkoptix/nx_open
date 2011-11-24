@@ -160,6 +160,7 @@ void CLGLRenderer::construct() {
     m_curImg = 0;
     m_videoWidth = 0;
     m_videoHeight = 0;
+    m_noVideo = false;
 
     applyMixerSettings(m_brightness, m_contrast, m_hue, m_saturation);
 
@@ -403,10 +404,13 @@ void CLGLRenderer::draw(CLVideoDecoderOutput* img)
     //m_abort_drawing = false;
 
     //m_imageList.enqueue(img);
-    if (m_curImg)
+    if (m_curImg) 
         m_curImg->setDisplaying(false);
     m_curImg = img;
     m_format = m_curImg->format;
+    if (m_curImg)
+        m_noVideo = false;
+
 
     m_curImg->setDisplaying(true);
     if (m_curImg->linesize[0] != m_stride_old || m_curImg->height != m_height_old || m_curImg->format != m_color_old)
@@ -866,7 +870,7 @@ bool CLGLRenderer::paintEvent(const QRectF &r)
             m_timeText.clear();
             if (curImg->pkt_dts > 1000000ll * 3600*24)
             {
-                m_timeText = QDateTime::fromMSecsSinceEpoch(curImg->pkt_dts/1000).toString("hh.mm.ss.zzz");
+                m_timeText = QDateTime::fromMSecsSinceEpoch(curImg->pkt_dts/1000).toString("hh:mm:ss.zzz");
             }
         }
     }
@@ -916,3 +920,14 @@ QString CLGLRenderer::getTimeText() const
     return m_timeText;
 }
 
+bool CLGLRenderer::isNoVideo() const
+{
+    QMutexLocker locker(&m_displaySync);
+    return m_noVideo;
+}
+
+void CLGLRenderer::onNoVideo()
+{
+    QMutexLocker locker(&m_displaySync);
+    m_noVideo = true;
+}

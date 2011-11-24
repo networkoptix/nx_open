@@ -72,5 +72,6 @@ static const int MAX_RTSP_DATA_LEN = 65535 - 16;
 
 static const qint64 BACKWARD_SEEK_STEP =  2000 * 1000; 
 
+static const qint64 MAX_FRAME_DURATION = 10 * 1000;
 
 #endif // _UNIVERSAL_CLIENT_UTIL_H

@@ -524,6 +524,7 @@ bool SceneLayout::addDevice(QnResourcePtr device, bool update_scene_rect, CLBasi
             if (archiveReader) {
                 m_syncPlay->addArchiveReader(archiveReader, cam->getCamCamDisplay());
                 cam->setExternalTimeSource(m_syncPlay);
+                cam->getCamCamDisplay()->setExternalTimeSource(m_syncPlay);
             }
         }
 

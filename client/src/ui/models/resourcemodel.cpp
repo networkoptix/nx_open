@@ -14,6 +14,7 @@ ResourceModel::ResourceModel(QObject *parent)
         root->setData(serverId, Qt::UserRole + 1);
         root->setData(server->toSearchString(), Qt::UserRole + 2);
         root->setEditable(false);
+        root->setSelectable(false);
         foreach (QnResourcePtr resource, qnResPool->getResources())
         {
             if (resource->getParentId().hash() == serverId && !resource->checkFlag(QnResource::server))
@@ -56,6 +57,7 @@ void ResourceModel::addResource(QnResourcePtr resource)
         root->setData(resource->getId().hash(), Qt::UserRole + 1);
         root->setData(resource->toSearchString(), Qt::UserRole + 2);
         root->setEditable(false);
+        root->setSelectable(false);
         appendRow(root);
     }
     else if (QStandardItem *root = itemFromResourceId(parentId))

@@ -148,10 +148,8 @@ GraphicsView::GraphicsView(QGraphicsScene *scene, QWidget* mainWnd) :
 
     QGLFormat glFormat(QGL::SampleBuffers);
     glFormat.setSwapInterval(1); // vsync
-
-
     setViewport(new QGLWidget(glFormat)); //Antialiasing
-    //setViewport(new QGLWidget());
+
     setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform    | QPainter::TextAntialiasing); //Antialiasing
 
     //viewport()->setAutoFillBackground(false);
@@ -213,31 +211,28 @@ GraphicsView::GraphicsView(QGraphicsScene *scene, QWidget* mainWnd) :
 
     setFrameShape(QFrame::NoFrame);
 
-    connect(&cm_start_video_recording, SIGNAL(triggered()), SLOT(toggleRecording()));
-    cm_start_video_recording.setShortcuts(QList<QKeySequence>() << tr("Alt+R") << Qt::Key_MediaRecord);
-    cm_start_video_recording.setShortcutContext(Qt::ApplicationShortcut);
-    addAction(&cm_start_video_recording);
 
-    connect(&cm_open_file, SIGNAL(triggered()), SLOT(onOpenFile()));
-    cm_open_file.setShortcuts(QList<QKeySequence>() << tr("Ctrl+O"));
-    cm_open_file.setShortcutContext(Qt::ApplicationShortcut);
+    connect(&cm_open_file, SIGNAL(triggered()), this, SLOT(onOpenFile()));
     addAction(&cm_open_file);
 
+    // ### connect(&cm_new_item, SIGNAL(triggered()), this, SLOT());
+    addAction(&cm_new_item);
 
-    connect(&cm_recording_settings, SIGNAL(triggered()), SLOT(recordingSettings()));
+    connect(&cm_start_video_recording, SIGNAL(triggered()), this, SLOT(toggleRecording()));
+    connect(&cm_recording_settings, SIGNAL(triggered()), this, SLOT(recordingSettings()));
+    addAction(&cm_screen_recording);
 
-#ifdef Q_OS_MAC
-    cm_toggle_fullscreen.setShortcut(tr("Ctrl+F"));
-#else
-    QList<QKeySequence> shortcuts;
-    shortcuts << tr("Alt+Return") << tr("Esc");
-
-    //cm_toggle_fullscreen.setShortcut(tr("Alt+Return"));
-    cm_toggle_fullscreen.setShortcuts(shortcuts);
-#endif
-    cm_toggle_fullscreen.setShortcutContext(Qt::ApplicationShortcut);
+    connect(&cm_toggle_fullscreen, SIGNAL(triggered()), this, SLOT(toggleFullScreen()));
     addAction(&cm_toggle_fullscreen);
-    connect(&cm_toggle_fullscreen, SIGNAL(triggered()), SLOT(toggleFullScreen()));
+
+    connect(&cm_preferences, SIGNAL(triggered()), this, SLOT(onPreferences_helper()));
+    addAction(&cm_preferences);
+
+    connect(&cm_exit, SIGNAL(triggered()), mMainWnd, SLOT(close()));
+    addAction(&cm_exit);
+
+    connect(&cm_add_layout, SIGNAL(triggered()), this, SLOT(contextMenuHelper_addNewLayout()));
+    connect(&cm_restore_layout, SIGNAL(triggered()), this, SLOT(contextMenuHelper_restoreLayout()));
 }
 
 void GraphicsView::removeFileDeviceItem(CLAbstractSceneItem* aitem)
@@ -1386,7 +1381,7 @@ void GraphicsView::mouseReleaseEvent(QMouseEvent * event)
     QGraphicsView::mouseReleaseEvent(event);
 }
 
-void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
+void GraphicsView::contextMenuEvent(QContextMenuEvent *event)
 {
     if (!mViewStarted)
         return;
@@ -1405,39 +1400,15 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
     if (aitem)
         aitem->drawRotationHelper(false);
 
-    // distance menu
-    QMenu distance_menu;
-
-    //distance_menu.setWindowOpacity(global_menu_opacity);
-    distance_menu.setTitle(tr("Item distance"));
-
-    distance_menu.addAction(&dis_0);
-    distance_menu.addAction(&dis_5);
-    distance_menu.addAction(&dis_10);
-    distance_menu.addAction(&dis_15);
-    distance_menu.addAction(&dis_20);
-    distance_menu.addAction(&dis_25);
-    distance_menu.addAction(&dis_30);
-    distance_menu.addAction(&dis_35);
-
-
-    QMenu rotation_manu;
-    rotation_manu.setTitle(tr("Rotation"));
-    rotation_manu.addAction(&cm_rotate_0);
-    rotation_manu.addAction(&cm_rotate_90);
-    rotation_manu.addAction(&cm_rotate_minus90);
-    rotation_manu.addAction(&cm_rotate_180);
-
 
     QMenu audioMenu;
     audioMenu.setTitle(tr("Audio tracks"));
-    QVector<QAction*> AudioTracks;
 
     //===== final menu=====
     QMenu menu;
     //menu.setWindowOpacity(global_menu_opacity);
 
-    if (aitem && scene()->selectedItems().count()==0) // video wnd and single selection
+    if (aitem && scene()->selectedItems().isEmpty()) // single selection
     {
         if (aitem->getType() == CLAbstractSceneItem::VIDEO)
         {
@@ -1453,10 +1424,8 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
             dev = cam->getDevice();
 
             if (dev->associatedWithFile())
-            {
                 menu.addAction(&cm_remove_from_disk);
-            }
-            menu.addMenu(&rotation_manu);
+            menu.addAction(&cm_rotate);
 
             //if (dev->checkFlag(QnResource::live))
             {
@@ -1476,17 +1445,12 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
             }
 
             if (dev->checkFlag(QnResource::video))
-            {
                 menu.addAction(&cm_take_screenshot);
-            }
 
             if (dev->checkFlag(QnResource::ARCHIVE))
             {
                 menu.addAction(&cm_upload_youtube);
-            }
 
-            if (dev->checkFlag(QnResource::ARCHIVE))
-            {
                 QnAbstractArchiveReader* reader = static_cast<QnAbstractArchiveReader*>(cam->getStreamreader());
                 QStringList tracks = reader->getAudioTracksInfo();
                 if (tracks.size() > 1 ) // if we've got more than one channel
@@ -1494,42 +1458,35 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
                     for (int i = 0; i < qMin(tracks.size(), MAX_AUDIO_TRACKS); ++i)
                     {
                         QAction *audioTrackAction = new QAction(QLatin1String("  ") + tracks.at(i), &audioMenu);
+                        audioTrackAction->setData(i);
                         audioTrackAction->setCheckable(true);
                         audioTrackAction->setChecked(i == reader->getCurrentAudioChannel());
-                        AudioTracks.append(audioTrackAction);
                         audioMenu.addAction(audioTrackAction);
                     }
-
                     menu.addMenu(&audioMenu);
                 }
             }
 
             if (dev->checkFlag(QnResource::ARCHIVE) || dev->checkFlag(QnResource::SINGLE_SHOT))
-            {
                 menu.addAction(&cm_open_containing_folder);
-            }
 
             if (dev->getUniqueId().contains(getTempRecordingDir()))
-            {
                 menu.addAction(&cm_save_recorded_as);
-            }
 
             if (CLDeviceSettingsDlgFactory::canCreateDlg(dev))
                 menu.addAction(&cm_settings);
         }
-
-        if (aitem->getType()==CLAbstractSceneItem::LAYOUT )
+        else if (aitem->getType() == CLAbstractSceneItem::LAYOUT )
         {
             menu.addAction(&cm_layout_editor_change_t);
             menu.addAction(&cm_remove_from_layout);
         }
-
-        if (aitem->getType()==CLAbstractSceneItem::RECORDER)
+        else if (aitem->getType() == CLAbstractSceneItem::RECORDER)
         {
-
+            // ###
         }
     }
-    else if (aitem && scene()->selectedItems().count()>0)
+    else if (aitem && !scene()->selectedItems().isEmpty()) // multiple selection
     {
         // multiple selection
         bool haveAtLeastOneNonrecordingCam = false;
@@ -1632,7 +1589,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
                 menu.addAction(&cm_save_layout_as);
             }
 
-            menu.addMenu(&distance_menu);
+            menu.addAction(&cm_distance);
         }
 
         menu.addAction(&cm_toggle_fullscreen);
@@ -1646,41 +1603,25 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
     m_menuIsHere = false;
     m_ignoreMouse.ignoreNextMs(500);
 
+    if (act == 0)
+        return;
+
     //=========results===============================
 
-    if (act == &cm_exit)
+    if (aitem == 0) // on void menu
     {
-        mMainWnd->close();
-        return;
-    }
-
-    if (aitem==0) // on void menu
-    {
-        if (act == &cm_preferences)
-        {
-            PreferencesWindow preferencesDialog(this);
-            preferencesDialog.exec();
-        }
-        else if (act== &cm_fitinview)
+        if (act == &cm_fitinview)
         {
             fitInView(700, 0, SLOW_START_SLOW_END);
         }
-        else if (act== &cm_arrange)
+        else if (act == &cm_arrange)
         {
             onArrange_helper();
         }
-        else if (act== &dis_0 || act== &dis_5 || act == &dis_10 || act== &dis_15 || act== &dis_20 || act== &dis_25 || act== &dis_30 || act== &dis_35)
+        else if (act->parent() == &cm_distance)
         {
-            m_camLayout.setItemDistance(0.01 + (act->data()).toDouble() );
+            m_camLayout.setItemDistance(0.01 + act->data().toFloat());
             onArrange_helper();
-        }
-        else if (act == &cm_add_layout)
-        {
-            contextMenuHelper_addNewLayout();
-        }
-        else if (act == &cm_restore_layout)
-        {
-            contextMenuHelper_restoreLayout();
         }
         else if (act == &cm_save_layout_as)
         {
@@ -1691,25 +1632,19 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
             contextMenuHelper_saveLayout(false);
         }
     }
-    else if (aitem && scene()->selectedItems().count()==0 )// video item single selection
+    else if (aitem && scene()->selectedItems().isEmpty()) // single selection
     {
         if (!m_camLayout.hasSuchItem(aitem))
             return;
 
         if (aitem->getType() == CLAbstractSceneItem::VIDEO)
         {
-
             if (dev->checkFlag(QnResource::ARCHIVE))
             {
-                QnAbstractArchiveReader* reader = static_cast<QnAbstractArchiveReader*>(cam->getStreamreader());
-
-                for (int i = 0; i < AudioTracks.size(); ++i)
+                if (act->parent() == &audioMenu)
                 {
-                    if (act == AudioTracks.at(i))
-                    {
-                        reader->setAudioChannel(i);
-                        break;
-                    }
+                    QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader *>(cam->getStreamreader());
+                    reader->setAudioChannel(act->data().toInt());
                 }
             }
 
@@ -1742,10 +1677,11 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
                 }
             }
 
-            if (act==&cm_fullscreen)
+            if (act == &cm_fullscreen)
+            {
                 toggleFullScreen_helper(aitem);
-
-            if (act == &cm_editTags)
+            }
+            else if (act == &cm_editTags)
             {
                 TagsEditDialog dialog(QStringList() << dev->getUniqueId(), this);
                 dialog.setWindowModality(Qt::ApplicationModal);
@@ -1754,62 +1690,45 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
 
                 dialog.exec();
             }
-
-            if (act==&cm_settings && dev)
+            else if (act == &cm_settings && dev)
+            {
                 show_device_settings_helper(dev);
-
-            if (act == &cm_start_recording && cam)
+            }
+            else if (act == &cm_start_recording && cam)
             {
                 disconnect(cam, SIGNAL(recordingFailed(QString)), this, SLOT(onRecordingFailed(QString)));
                 connect(cam, SIGNAL(recordingFailed(QString)), this, SLOT(onRecordingFailed(QString)));
                 cam->startRecording();
             }
-
-            if (act == &cm_stop_recording && cam) {
+            else if (act == &cm_stop_recording && cam)
+            {
                 cam->stopRecording();
             }
-
-            if (act == &cm_view_recorded&& cam)
+            else if (act == &cm_view_recorded && cam)
+            {
                 contextMenuHelper_viewRecordedVideo(cam);
-
-            if (act == &cm_save_recorded_as && cam)
+            }
+            else if (act == &cm_save_recorded_as && cam)
+            {
                 contextMenuHelper_saveRecordedAs(cam);
-
-            if (act == &cm_take_screenshot && video_wnd)
+            }
+            else if (act == &cm_take_screenshot && video_wnd)
+            {
                 contextMenuHelper_takeScreenshot(video_wnd);
-
-            if (act == &cm_upload_youtube && dev)
+            }
+            else if (act == &cm_upload_youtube && dev)
             {
                 YouTubeUploadDialog dialog(dev, this);
                 dialog.setWindowModality(Qt::ApplicationModal);
                 dialog.exec();
             }
-
-            if (act == &cm_open_web_page&& cam)
+            else if (act == &cm_open_web_page && cam)
+            {
                 contextMenuHelper_openInWebBroser(cam);
-
-            if (act == &cm_rotate_90)
-            {
-                if (m_camLayout.hasSuchItem(aitem))
-                    contextMenuHelper_Rotation(aitem, 90);
             }
-
-            if (act == &cm_rotate_minus90)
+            else if (act->parent() == &cm_rotate)
             {
-                if (m_camLayout.hasSuchItem(aitem))
-                    contextMenuHelper_Rotation(aitem, -90);
-            }
-
-            if (act == &cm_rotate_0)
-            {
-                if (m_camLayout.hasSuchItem(aitem))
-                    contextMenuHelper_Rotation(aitem, 0);
-            }
-
-            if (act == &cm_rotate_180)
-            {
-                if (m_camLayout.hasSuchItem(aitem))
-                    contextMenuHelper_Rotation(aitem, -180);
+                contextMenuHelper_Rotation(aitem, act->data().toInt());
             }
         }
 
@@ -1817,8 +1736,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
         {
             if (act == &cm_layout_editor_change_t)
                 contextMenuHelper_chngeLayoutTitle(aitem);
-
-            if (act == &cm_layout_editor_editlayout)
+            else if (act == &cm_layout_editor_editlayout)
                 contextMenuHelper_editLayout(aitem);
         }
 
@@ -1832,14 +1750,11 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
         {
             QnResourcePtr device = aitem->getComplicatedItem()->getDevice();
 
-            QMessageBox::StandardButton result = YesNoCancel(this, tr("Delete file confirmation"), QString("Are you sure you want to delete file ") + device->getUniqueId() + "?");
-            if (result == QMessageBox::Yes)
-            {
+            if (YesNoCancel(this, tr("Delete file confirmation"), tr("Are you sure you want to delete file %1?").arg(device->getUniqueId())) == QMessageBox::Yes)
                 removeFileDeviceItem(aitem);
-            }
         }
     }
-    else if (aitem && scene()->selectedItems().count()>0 )// video item multiple selection
+    else if (aitem && !scene()->selectedItems().isEmpty()) // multiple selection
     {
         QList<CLAbstractSubItemContainer *> selectedItems;
         foreach (QGraphicsItem *item, scene()->selectedItems())
@@ -1866,8 +1781,7 @@ void GraphicsView::contextMenuEvent ( QContextMenuEvent * event )
         }
         else if (act == &cm_remove_from_disk)
         {
-            QString message = tr("Are you sure you want to delete %1 files?").arg(selectedItems.size());
-            if (YesNoCancel(this, tr("Delete file confirmation"), message) == QMessageBox::Yes)
+            if (YesNoCancel(this, tr("Delete file confirmation"), tr("Are you sure you want to delete %1 files?").arg(selectedItems.size())) == QMessageBox::Yes)
             {
                 foreach (CLAbstractSubItemContainer *item, selectedItems)
                     removeFileDeviceItem(static_cast<CLAbstractSceneItem*>(item));
@@ -2907,6 +2821,12 @@ static inline QRegion createRoundRegion(int rSmall, int rLarge, const QRect& rec
         region += QRect(x,y, rect.width()-x*2,1);
     }
     return region;
+}
+
+void GraphicsView::onPreferences_helper()
+{
+    PreferencesWindow dialog(this);
+    dialog.exec();
 }
 
 void GraphicsView::toggleRecording()

@@ -12,6 +12,7 @@
 #elif defined(Q_OS_WIN)
 #include <qt_windows.h>
 #endif
+#include "utils/common/util.h"
 
 Q_GLOBAL_STATIC(QMutex, activityMutex)
 static qint64 activityTime = 0;
@@ -87,7 +88,11 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_tooSlowCounter(0),
       m_lightCpuMode(QnAbstractVideoDecoder::DecodeMode_Full),
       m_lastFrameDisplayed(CLVideoStreamDisplay::Status_Displayed),
-      m_realTimeHurryUp(0)
+      m_realTimeHurryUp(0),
+      m_extTimeSrc(0),
+      m_useMtDecoding(false)
+      //m_nextTime(AV_NOPTS_VALUE),
+      //m_firstDelayCycle(true)
 {
     m_storedMaxQueueSize = m_dataQueue.maxSize();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
@@ -135,6 +140,17 @@ QImage CLCamDisplay::getScreenshot(int channel)
 {
     return m_display[channel]->getScreenshot();
 }
+
+void CLCamDisplay::safeSleep(qint64 value)
+{
+    while (value > 0 && !m_afterJump && !m_needStop)
+    {
+        int toSleep = qMin(10, (int) value);
+        QnSleep::msleep(toSleep);
+        value -= toSleep;
+    }
+}
+
 
 void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 {
@@ -206,9 +222,47 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         needToSleep = 0;
     //=========
 
+    /*
+    if (useSync(vd)) 
+    {
+        needToSleep = vd->timestamp - m_extTimeSrc->getCurrentTime();
+    }
+    */
+
     if (sleep && m_lastFrameDisplayed != CLVideoStreamDisplay::Status_Buffered)
     {
-        int realSleepTime = m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed ? m_delay.sleep(needToSleep, needToSleep*qAbs(speed)*2) : m_delay.addQuant(needToSleep);
+        qint64 realSleepTime = 0;
+        if (useSync(vd)) 
+        {
+            qint64 displayedTime = getCurrentTime();
+            if (displayedTime != AV_NOPTS_VALUE) {
+                if (m_speed >= 0)
+                    realSleepTime = displayedTime - m_extTimeSrc->getCurrentTime();
+                else
+                    realSleepTime = m_extTimeSrc->getCurrentTime() - displayedTime;
+            }
+
+            /*
+            if (m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed)
+            {
+                QString s;
+                QTextStream str(&s);
+                str << "sleepTime=" << realSleepTime/1000 << " displayedTime=" << QDateTime::fromMSecsSinceEpoch(displayedTime/1000).toString("hh:mm:ss.zzz");
+                str.flush();
+                cl_log.log(s, cl_logALWAYS);
+            } 
+            */
+            
+            if (realSleepTime > 0 && m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed)
+            {
+                safeSleep(realSleepTime/1000);
+                
+            }
+        }
+        else {
+            realSleepTime = m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed ? m_delay.sleep(needToSleep, needToSleep*qAbs(speed)*2) : m_delay.addQuant(needToSleep);
+        }
+
         //cl_log.log("real sleepTime=", realSleepTime, cl_logALWAYS);
         //str << "sleep time: " << needToSleep << "  real:" << realSleepTime;
         if (qAbs(speed) > 1.0 + FPS_EPS)
@@ -297,6 +351,10 @@ void CLCamDisplay::onBeforeJump(qint64 time, bool makeshot)
     else
         cl_log.log("before jump to ", QDateTime::fromMSecsSinceEpoch(time/1000).toString(), cl_logWARNING);
     m_display[0]->blockTimeValue(time);
+    m_afterJump = true;
+    QMutexLocker lock(&m_timeMutex);
+    //m_nextTime = AV_NOPTS_VALUE;
+    //m_firstDelayCycle = true;
 }
 
 void CLCamDisplay::onJumpOccured(qint64 time)
@@ -307,7 +365,6 @@ void CLCamDisplay::onJumpOccured(qint64 time)
         cl_log.log("jump to ", QDateTime::fromMSecsSinceEpoch(time/1000).toString(), cl_logWARNING);
     m_display[0]->blockTimeValue(time);
     m_jumpTime = time;
-    m_afterJump = true;
     //clearUnprocessedData();
     m_singleShotMode = false;
 }
@@ -327,6 +384,11 @@ void CLCamDisplay::onPrevFrameOccured()
     setSingleShotMode(false);
 }
 
+void CLCamDisplay::onNextFrameOccured()
+{
+    setSingleShotMode(true);
+}
+
 void CLCamDisplay::setSingleShotMode(bool single)
 {
     m_singleShotMode = single;
@@ -341,7 +403,19 @@ void CLCamDisplay::setSpeed(float speed)
 void CLCamDisplay::processNewSpeed(float speed)
 {
     if (qAbs(speed - 1.0) > FPS_EPS && qAbs(speed) > FPS_EPS)
+    {
         m_audioDisplay->clearAudioBuffer();
+    }
+
+    if (qAbs(speed) > 1.0 + FPS_EPS || speed < 0)
+    {
+        for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; i++)
+            m_display[i]->setMTDecoding(true);
+    }
+    else {
+        setMTDecoding(m_useMtDecoding);
+    }
+
     if (speed >= 0 && m_prevSpeed < 0 || speed < 0 && m_prevSpeed >= 0)
     {
         m_dataQueue.clear();
@@ -365,8 +439,30 @@ void CLCamDisplay::processNewSpeed(float speed)
     setLightCPUMode(QnAbstractVideoDecoder::DecodeMode_Full);
 }
 
+void CLCamDisplay::putData(QnAbstractDataPacketPtr data)
+{
+    /*
+    QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
+    if (!media)
+        return;
+    if(m_afterJump && !(media->flags & QnAbstractMediaData::MediaFlags_BOF))
+        return; // skip data
+
+    if (m_extTimeSrc)
+        m_extTimeSrc->onAvailableTime(this, media->timestamp);
+    */
+    QnAbstractDataConsumer::putData(data);
+}
+
+bool CLCamDisplay::useSync(QnCompressedVideoDataPtr vd)
+{
+    return m_extTimeSrc && !(vd->flags & (QnAbstractMediaData::MediaFlags_LIVE | QnAbstractMediaData::MediaFlags_BOF)) && !m_singleShotMode;
+}
+
 bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
 {
+    //cl_log.log("m_dataQueueSize=", m_dataQueue.size(), cl_logALWAYS);
+
     QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
     if (!media)
         return true;
@@ -385,6 +481,12 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         m_prevSpeed = speed;
     }
 
+    bool speedIsNegative = speed < 0;
+    bool dataIsNegative = media->flags & AV_REVERSE_PACKET;
+    if (speedIsNegative != dataIsNegative)
+        return true; // skip data
+
+
     QnCompressedVideoDataPtr vd = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
     QnCompressedAudioDataPtr ad = qSharedPointerDynamicCast<QnCompressedAudioData>(data);
     if (vd)
@@ -400,6 +502,35 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
     }
     else
         return true;
+
+
+    // ---------------------- check for external sync
+    /*
+    m_timeMutex.lock();
+
+    if (vd->flags & (QnAbstractMediaData::MediaFlags_BOF | QnAbstractMediaData::MediaFlags_LIVE))
+    {
+        m_nextTime = AV_NOPTS_VALUE;
+    }
+    else {
+        m_nextTime = vd->timestamp;
+    }
+    m_timeMutex.unlock();
+    */
+
+    /*
+    if (useSync(vd))
+    {
+        static const int EPS = 100*1000;
+        if (vd->timestamp+EPS > m_extTimeSrc->getCurrentTime())
+            return false; // wait for sync with other cameras. waiting
+    
+    }
+    */
+
+    //m_firstDelayCycle = true;
+    // ----------------------
+
 
     bool isReversePacket = media->flags & AV_REVERSE_PACKET;
     bool isReverseMode = speed < 0.0;
@@ -705,6 +836,7 @@ void CLCamDisplay::afterJump(qint64 newTime)
 
 void CLCamDisplay::setMTDecoding(bool value)
 {
+    m_useMtDecoding = value;
     for (int i = 0; i < CL_MAX_CHANNELS; i++)
     {
         if (m_display[i])
@@ -738,4 +870,17 @@ qint64 CLCamDisplay::getCurrentTime() const
             result = qMax(result, m_display[i]->getLastDisplayedTime());
     }
     return result;
+}
+
+qint64 CLCamDisplay::getDisplayedTime() const
+{
+    return getCurrentTime();
+}
+
+void CLCamDisplay::setExternalTimeSource(QnlTimeSource* value) 
+{ 
+    m_extTimeSrc = value; 
+    for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
+        m_display[i]->canUseBufferedFrameDisplayer(m_extTimeSrc == 0);
+    }
 }

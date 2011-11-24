@@ -243,7 +243,8 @@ void CLVideoWindowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
         m_gldraw[i]->setOpacity(drawSelection ? 0.7 : 1.0);
         if (!m_gldraw[i]->paintEvent(getSubChannelRect(i)))
             drawGLfailaure(painter);
-        else {
+        else 
+        {
             QString timeText = m_gldraw[i]->getTimeText();
             if (!timeText.isEmpty())
             {
@@ -254,7 +255,19 @@ void CLVideoWindowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
                 painter->setFont(font);
                 painter->drawText(width() - size.width() - 8, height() - size.height() - 8, timeText);
             }
-
+            if (m_gldraw[i]->isNoVideo())
+            {
+                QString text = "No video";
+                QFont font;
+                font.setPixelSize(192);
+                //QFontMetrics metric(font);
+                //QSize size = metric.size(Qt::TextSingleLine, text);
+                painter->setFont(font);
+                QPen pen;
+                pen.setColor(QColor(255,0,0));
+                painter->setPen(pen);
+                painter->drawText( QRect(0,0,width(),height()), Qt::AlignHCenter | Qt::AlignCenter, text);
+            }
         }
     }
 

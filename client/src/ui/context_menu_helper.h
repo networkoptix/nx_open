@@ -5,15 +5,17 @@
 
 void initContextMenu();
 
+extern QAction cm_new_item;
 extern QAction cm_exit;
-extern QAction cm_start_video_recording;
 extern QAction cm_open_file;
+extern QAction cm_screen_recording;
+extern QAction cm_start_video_recording;
 extern QAction cm_recording_settings;
 extern QAction cm_toggle_fullscreen;
 extern QAction cm_fitinview;
 extern QAction cm_arrange;
-extern QAction cm_add_layout;
 
+extern QAction cm_add_layout;
 extern QAction cm_restore_layout;
 extern QAction cm_save_layout;
 extern QAction cm_save_layout_as;
@@ -34,25 +36,14 @@ extern QAction cm_take_screenshot;
 extern QAction cm_upload_youtube;
 extern QAction cm_open_web_page;
 
-extern QMenu distance_menu;
-extern QAction dis_0;
-extern QAction dis_5;
-extern QAction dis_10;
-extern QAction dis_15;
-extern QAction dis_20;
-extern QAction dis_25;
-extern QAction dis_30;
-extern QAction dis_35;
+extern QAction cm_distance;
 
 extern QAction cm_layout_editor_editlayout;
 extern QAction cm_layout_editor_bgp;
 extern QAction cm_layout_editor_bgp_sz;
 extern QAction cm_layout_editor_change_t;
 
-extern QAction cm_rotate_90;
-extern QAction cm_rotate_0;
-extern QAction cm_rotate_minus90;
-extern QAction cm_rotate_180;
+extern QAction cm_rotate;
 
 extern QAction cm_open_containing_folder;
 
