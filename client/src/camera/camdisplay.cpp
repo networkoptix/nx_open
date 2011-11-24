@@ -441,6 +441,7 @@ void CLCamDisplay::processNewSpeed(float speed)
 
 void CLCamDisplay::putData(QnAbstractDataPacketPtr data)
 {
+    /*
     QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
     if (!media)
         return;
@@ -449,6 +450,7 @@ void CLCamDisplay::putData(QnAbstractDataPacketPtr data)
 
     if (m_extTimeSrc)
         m_extTimeSrc->onAvailableTime(this, media->timestamp);
+    */
     QnAbstractDataConsumer::putData(data);
 }
 
@@ -478,6 +480,12 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         processNewSpeed(speed);
         m_prevSpeed = speed;
     }
+
+    bool speedIsNegative = speed < 0;
+    bool dataIsNegative = media->flags & AV_REVERSE_PACKET;
+    if (speedIsNegative != dataIsNegative)
+        return true; // skip data
+
 
     QnCompressedVideoDataPtr vd = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
     QnCompressedAudioDataPtr ad = qSharedPointerDynamicCast<QnCompressedAudioData>(data);

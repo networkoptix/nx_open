@@ -50,7 +50,7 @@ void QnRtspDataConsumer::setWaitBOF(qint64 newTime, bool value)
     m_gotLivePacket = false;
 }
 
-qint64 QnRtspDataConsumer::currentTime() const 
+qint64 QnRtspDataConsumer::getCurrentTime() const 
 { 
     return m_lastSendTime; 
 }

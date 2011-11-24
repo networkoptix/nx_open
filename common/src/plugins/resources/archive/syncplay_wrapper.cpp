@@ -6,7 +6,7 @@
 #include "utils/media/externaltimesource.h"
 #include "utils/common/util.h"
 
-static const qint64 SYNC_EPS = 1000 * 1000;
+static const qint64 SYNC_EPS = 1000 * 500;
 
 struct ReaderInfo
 {
@@ -33,8 +33,8 @@ public:
         blockJumpSignal = false;
         blockPausePlaySignal = false;
         lastJumpTime = DATETIME_NOW;
-        maxAllowedDate.clear();
-        minAllowedDate.clear();
+        //maxAllowedDate.clear();
+        //minAllowedDate.clear();
         speed = 1.0;
     }
 
@@ -58,8 +58,8 @@ public:
     qint64 lastJumpTime;
     QTime timer;
     double speed;
-    QMap<QnlTimeSource*,qint64> maxAllowedDate;
-    QMap<QnlTimeSource*,qint64> minAllowedDate;
+    //QMap<QnlTimeSource*,qint64> maxAllowedDate;
+    //QMap<QnlTimeSource*,qint64> minAllowedDate;
 };
 
 // ------------------- QnArchiveSyncPlayWrapper ----------------------------
@@ -236,8 +236,8 @@ void QnArchiveSyncPlayWrapper::onBeforeJump(qint64 mksec, bool makeshot)
         QMutexLocker lock(&d->timeMutex);
         d->lastJumpTime = mksec;
         cl_log.log("delegateJump=", QDateTime::fromMSecsSinceEpoch(mksec/1000).toString("hh:mm:ss.zzz"), cl_logALWAYS);
-        d->maxAllowedDate.clear();
-        d->minAllowedDate.clear();
+        //d->maxAllowedDate.clear();
+        //d->minAllowedDate.clear();
         d->timer.restart();
     }    
     foreach(ReaderInfo info, d->readers)
@@ -315,6 +315,7 @@ void QnArchiveSyncPlayWrapper::erase(QnAbstractArchiveDelegate* value)
 
 void QnArchiveSyncPlayWrapper::onAvailableTime(QnlTimeSource* source, qint64 time)
 {
+    /*
     Q_D(QnArchiveSyncPlayWrapper);
 
     if (time != AV_NOPTS_VALUE)
@@ -336,6 +337,7 @@ void QnArchiveSyncPlayWrapper::onAvailableTime(QnlTimeSource* source, qint64 tim
                 *itr = qMin(*itr, time);
         }
     }
+    */
 }
 
 qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
@@ -347,18 +349,24 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
     qint64 expectedTime = d->lastJumpTime + d->timer.elapsed()*1000 * d->speed;
     if (d->speed >= 0) 
     {
+        /*
         qint64 maxAllowedDate = INT64_MAX;
         foreach(qint64 val, d->maxAllowedDate.values()) 
             maxAllowedDate = qMin(maxAllowedDate, val);
         
         return qMin(expectedTime, maxAllowedDate);
+        */
+        return qMin(expectedTime, getDisplayedTime() + SYNC_EPS);
     }
     else {
+        /*
         qint64 minAllowedDate = 0;
         foreach(qint64 val, d->minAllowedDate.values()) 
             minAllowedDate = qMax(minAllowedDate, val);
 
         return qMax(expectedTime, minAllowedDate);
+        */
+        return qMax(expectedTime, getDisplayedTime() - SYNC_EPS);
     }
 }
 
