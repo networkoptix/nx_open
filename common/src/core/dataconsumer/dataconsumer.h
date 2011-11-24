@@ -25,6 +25,7 @@ public:
 
     virtual void setSpeed(float /*value*/) {}
     virtual qint64 getCurrentTime() const { return 0; }
+    virtual bool isRealTimeSource() const { return false; }
 protected:
 	void run();
     virtual bool processData(QnAbstractDataPacketPtr /*data*/)=0;

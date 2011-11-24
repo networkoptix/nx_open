@@ -69,7 +69,10 @@ qint64 QnServerArchiveDelegate::seek(qint64 time)
             return -1;
     }
 
-    qint64 chunkOffset = qBound(0ll, time - m_currentChunk.startTime, m_currentChunk.duration - BACKWARD_SEEK_STEP);
+    int duration = m_currentChunk.duration;
+    if (duration == -1) // last live chunk
+        duration = QDateTime::currentDateTime().toMSecsSinceEpoch()*1000 - m_currentChunk.startTime;
+    qint64 chunkOffset = qBound(0ll, time - m_currentChunk.startTime, duration - BACKWARD_SEEK_STEP);
     qint64 seekRez = m_aviDelegate->seek(chunkOffset);
     if (seekRez == -1)
         return seekRez;

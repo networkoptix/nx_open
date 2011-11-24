@@ -236,19 +236,25 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 QTime t;
                 t.start();
                 int sign = speed >= 0 ? 1 : -1;
-                while (!m_afterJump && !m_needStop && m_speed == speed && sign *(displayedTime - m_extTimeSrc->getCurrentTime()) > 0)
+
+                while (!m_afterJump && !m_needStop && m_speed == speed)
                 {
-                    /*
                     qint64 ct = m_extTimeSrc->getCurrentTime();
-                    bool ggg1 = sign *(displayedTime - m_extTimeSrc->getCurrentTime());
-                    QString s;
-                    QTextStream str(&s);
-                    str << "displayedTime=" << QDateTime::fromMSecsSinceEpoch(displayedTime/1000).toString("hh:mm:ss.zzz") <<
-                        " currentTime=" << QDateTime::fromMSecsSinceEpoch(ct/1000).toString("hh:mm:ss.zzz");
-                    str.flush();
-                    cl_log.log(s, cl_logALWAYS);
-                    */
-                    QnSleep::msleep(1);
+                    if (ct != DATETIME_NOW && sign *(displayedTime - ct) > 0)
+                    {
+					/*
+                        QString s;
+                        QTextStream str(&s);
+                        str << "displayedTime=" << QDateTime::fromMSecsSinceEpoch(displayedTime/1000).toString("hh:mm:ss.zzz") <<
+                            " currentTime=" << QDateTime::fromMSecsSinceEpoch(ct/1000).toString("hh:mm:ss.zzz");
+                        str.flush();
+                        cl_log.log(s, cl_logALWAYS);
+					*/
+                        QnSleep::msleep(1);
+                    }
+                    else {
+                        break;
+                    }
                 }
                 realSleepTime = t.elapsed();
 

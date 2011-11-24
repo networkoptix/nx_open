@@ -140,7 +140,7 @@ void QnArchiveSyncPlayWrapper::onStreamResumed()
     if (d->blockPausePlaySignal)
         return;
     d->blockPausePlaySignal = true;
-    reinitTime(getDisplayedTimeInternal());
+    reinitTime(getDisplayedTime());
     foreach(ReaderInfo info, d->readers)
     {
         if (info.reader != sender())

@@ -82,6 +82,7 @@ private:
     qint64 m_lastFrameDuration;
     QString m_onDestroyFileName;
     bool m_BOF;
+    qint64 m_BOFTime;
 private:
     QMutex m_jumpMtx;
     QnAbstractMediaDataPtr m_currentData;

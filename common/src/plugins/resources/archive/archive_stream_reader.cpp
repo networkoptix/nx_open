@@ -33,7 +33,8 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_lastFrameDuration(0),
     m_selectedAudioChannel(0),
     m_BOF(false),
-    m_tmpSkipFramesToTime(AV_NOPTS_VALUE)
+    m_tmpSkipFramesToTime(AV_NOPTS_VALUE),
+    m_BOFTime(AV_NOPTS_VALUE)
 
 {
     // Should init packets here as some times destroy (av_free_packet) could be called before init
@@ -138,7 +139,10 @@ bool QnArchiveStreamReader::init()
      for (int i = 0; i < m_dataprocessors.size(); ++i)
      {
          QnAbstractDataConsumer* dp = m_dataprocessors.at(i);
-         rez = qMax(rez, dp->getCurrentTime());
+         if (dp->isRealTimeSource())
+             return DATETIME_NOW;
+         else
+            rez = qMax(rez, dp->getCurrentTime());
      }
      return rez;
  }
@@ -202,6 +206,7 @@ begin_label:
                 m_topIFrameTime = displayTime;
             else
                 setSkipFramesToTime(displayTime);
+            m_BOF = true;
         }
     }
 
@@ -284,6 +289,13 @@ begin_label:
                 // seek from EOF to BOF occured
                 setCurrentTime(m_topIFrameTime);
                 m_eof = false;
+            }
+
+            //if (m_topIFrameTime == DATETIME_NOW)
+            if (m_BOFTime != AV_NOPTS_VALUE && m_topIFrameTime > m_BOFTime + MAX_FIRST_GOP_DURATION)
+            {
+                m_topIFrameTime = m_currentTime + MAX_FIRST_GOP_DURATION;
+                m_BOFTime = AV_NOPTS_VALUE;
             }
 
             if (isKeyFrame || m_currentTime >= m_topIFrameTime)
@@ -438,7 +450,7 @@ begin_label:
     if (m_BOF) {
         m_currentData->flags |= QnAbstractMediaData::MediaFlags_BOF;        
         m_BOF = false;
-
+        m_BOFTime = m_currentData->timestamp;
         cl_log.log("set BOF flag", cl_logALWAYS);
     }
 

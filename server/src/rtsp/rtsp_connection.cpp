@@ -105,6 +105,8 @@ void QnRtspConnectionProcessor::parseRequest()
     Q_D(QnRtspConnectionProcessor);
     QnTCPConnectionProcessor::parseRequest();
 
+    if (!d->requestHeaders.value("Scale").isNull())
+        d->rtspScale = d->requestHeaders.value("Scale").toDouble();
     processRangeHeader();
 
     if (d->mediaRes == 0)
@@ -283,8 +285,8 @@ qint64 QnRtspConnectionProcessor::getRtspTime()
 void QnRtspConnectionProcessor::extractNptTime(const QString& strValue, qint64* dst)
 {
     Q_D(QnRtspConnectionProcessor);
-    d->liveMode = strValue == "now";
-    if (d->liveMode)
+    d->liveMode = d->rtspScale >= 0 && strValue == "now";
+    if (strValue == "now")
     {
         //*dst = getRtspTime();
         *dst = DATETIME_NOW;
@@ -362,10 +364,6 @@ int QnRtspConnectionProcessor::composePlay()
         return CODE_NOT_FOUND;
 
 
-    if (!d->requestHeaders.value("Scale").isNull())
-        d->rtspScale = d->requestHeaders.value("Scale").toDouble();
-
-
     d->dataProcessor->setLiveMode(d->liveMode);
     if (d->liveMode)
         d->dataProcessor->lockDataQueue();
@@ -384,8 +382,9 @@ int QnRtspConnectionProcessor::composePlay()
         
         {
             //d->dataProcessor->clearUnprocessedData();
-            if (d->archiveDP->jumpTo(d->startTime, true))
-                d->dataProcessor->setWaitBOF(d->startTime, true); // ignore rest packets before new position
+            d->dataProcessor->setWaitBOF(d->startTime, true); // ignore rest packets before new position
+            if (!d->archiveDP->jumpTo(d->startTime, true))
+                d->dataProcessor->setWaitBOF(d->startTime, false); // ignore rest packets before new position
         }
     }
     currentDP->start();
