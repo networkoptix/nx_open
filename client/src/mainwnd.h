@@ -30,11 +30,6 @@ private:
     void closeEvent(QCloseEvent *event);
     void destroyNavigator(CLLayoutNavigator*& nav);
 
-#if 0
-    void dragEnterEvent(QDragEnterEvent *event);
-    void dropEvent(QDropEvent *event);
-#endif
-
     void activate();
 
 private:

@@ -33,7 +33,7 @@ MainWnd *MainWnd::s_instance = 0;
 
 MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     : QMainWindow(parent, flags),
-      m_normalView(0)
+      m_normalView(NULL)
 {
     if(s_instance != NULL)
         qnWarning("Several instances of main window created, expect problems.");
@@ -84,9 +84,6 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     QTabWidget *tabWidget = new QTabWidget(this);
     tabWidget->addTab(view, QIcon(), tr("Scene"));
     tabWidget->addTab(new QWidget(tabWidget), QIcon(), tr("Grid/Properies"));
-    // Can't set 0,0,0,0 on Windows as in fullScreen mode context menu becomes invisible
-    // QT bug: http://bugreports.qt.nokia.com/browse/QTBUG-7556
-    tabWidget->setContentsMargins(0, 1, 0, 0);
     tabWidget->setContentsMargins(0, 0, 0, 0);
     setCentralWidget(tabWidget);
 
@@ -131,9 +128,11 @@ void MainWnd::itemActivated(uint resourceId)
     {
         const QString file = resource->getUrl();
 
+        /*
         m_normalView->getView().getCamLayOut().addDevice(file, true);
         m_normalView->getView().getCamLayOut().getContent()->addDevice(file);
         m_normalView->getView().fitInView(600, 100, SLOW_START_SLOW_END);
+        */
     }
 }
 
@@ -203,23 +202,6 @@ void MainWnd::destroyNavigator(CLLayoutNavigator*& nav)
         nav = 0;
     }
 }
-
-#if 0
-void MainWnd::dragEnterEvent(QDragEnterEvent *event)
-{
-    event->acceptProposedAction();
-}
-
-void MainWnd::dropEvent(QDropEvent *event)
-{
-    QStringList files;
-    foreach (const QUrl &url, event->mimeData()->urls())
-        findAcceptedFiles(files, url.toLocalFile());
-
-    addFilesToCurrentOrNewLayout(files, event->keyboardModifiers() & Qt::AltModifier);
-    activate();
-}
-#endif
 
 void MainWnd::activate()
 {

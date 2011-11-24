@@ -1,4 +1,8 @@
 #include "archivedropinstrument.h"
+#include <QDragEnterEvent>
+#include <QDragMoveEvent>
+#include <QDragLeaveEvent>
+#include <QDropEvent>
 #include <ui/workbench/workbench_controller.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_grid_mapper.h>
