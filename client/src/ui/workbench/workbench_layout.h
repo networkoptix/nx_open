@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QSet>
+#include <QHash>
 #include <utils/common/matrix_map.h>
 #include <utils/common/rect_set.h>
 
@@ -95,6 +96,12 @@ public:
     QSet<QnWorkbenchItem *> items(const QList<QRect> &regions) const;
 
     /**
+     * \param resourceUniqueId          Resource unique id.
+     * \returns                         Set of items that have the given resource unique id.
+     */
+    const QSet<QnWorkbenchItem *> &items(const QString &resourceUniqueId) const;
+
+    /**
      * \returns                         All items of this model.
      */
     const QSet<QnWorkbenchItem *> &items() const {
@@ -130,9 +137,20 @@ private:
     void moveItemInternal(QnWorkbenchItem *item, const QRect &geometry);
 
 private:
-    QSet<QnWorkbenchItem *> m_items;
+    /** Matrix map from coordinate to item. */
     QnMatrixMap<QnWorkbenchItem *> m_itemMap;
+
+    /** Set of all items on this layout. */
+    QSet<QnWorkbenchItem *> m_items;
+
+    /** Set of item borders for fast bounding rect calculation. */
     QnRectSet m_rectSet;
+
+    /** Map from resource unique id to a set of items. */
+    QHash<QString, QSet<QnWorkbenchItem *> > m_itemsByUid;
+
+    /** Empty item list, to return a reference to. */
+    const QSet<QnWorkbenchItem *> m_noItems;
 };
 
 #endif // QN_WORKBENCH_LAYOUT_H

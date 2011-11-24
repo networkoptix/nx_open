@@ -6,7 +6,6 @@ QnWorkbenchLayout::QnWorkbenchLayout(QObject *parent):
     QObject(parent)
 {}
 
-
 QnWorkbenchLayout::~QnWorkbenchLayout() {
     clear();
 
@@ -38,9 +37,11 @@ void QnWorkbenchLayout::addItem(QnWorkbenchItem *item) {
 
     item->m_layout = this;
     m_items.insert(item);
+    
     if(item->isPinned())
         m_itemMap.fill(item->geometry(), item);
     m_rectSet.insert(item->geometry());
+    m_itemsByUid[item->resourceUniqueId()].insert(item);
 
     emit itemAdded(item);
 }
@@ -61,6 +62,8 @@ void QnWorkbenchLayout::removeItem(QnWorkbenchItem *item) {
     if(item->isPinned())
         m_itemMap.clear(item->geometry());
     m_rectSet.remove(item->geometry());
+    m_itemsByUid[item->resourceUniqueId()].remove(item);
+    
     item->m_layout = NULL;
     m_items.remove(item);
 }
@@ -198,6 +201,12 @@ QSet<QnWorkbenchItem *> QnWorkbenchLayout::items(const QList<QRect> &regions) co
     return m_itemMap.values(regions);
 }
 
+const QSet<QnWorkbenchItem *> &QnWorkbenchLayout::items(const QString &resourceUniqueId) const {
+    QHash<QString, QSet<QnWorkbenchItem *> >::const_iterator pos = m_itemsByUid.find(resourceUniqueId);
+
+    return pos == m_itemsByUid.end() ? m_noItems : pos.value();
+}
+
 namespace {
     bool isFree(const QnMatrixMap<QnWorkbenchItem *> &map, const QPoint &pos, const QSize &size, int dr, int dc, QRect *result) {
         QRect rect = QRect(pos + QPoint(dc, dr), size);
@@ -248,3 +257,4 @@ QRect QnWorkbenchLayout::closestFreeSlot(const QPoint &pos, const QSize &size) c
                 return result;
     }
 }
+
