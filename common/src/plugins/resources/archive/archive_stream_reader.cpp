@@ -524,10 +524,8 @@ QStringList QnArchiveStreamReader::getAudioTracksInfo() const
 bool QnArchiveStreamReader::setAudioChannel(unsigned int num)
 {
     AVCodecContext* audioContext = m_delegate->setAudioChannel(num);
-    if (audioContext) {
+    if (audioContext)
         m_selectedAudioChannel = num;
-        emit audioParamsChanged(audioContext);
-    }
     return audioContext != 0;
 }
 
