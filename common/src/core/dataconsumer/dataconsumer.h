@@ -26,7 +26,7 @@ public:
 
     virtual void setSpeed(float /*value*/) {}
     virtual qint64 getCurrentTime() const { return 0; }
-
+    virtual bool isRealTimeSource() const { return false; }
 
 public slots:
 

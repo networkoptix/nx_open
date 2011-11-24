@@ -267,7 +267,7 @@ int main(int argc, char *argv[])
         cl_log.log(errorMessage, cl_logERROR);
         QnStoragePtr storage(new QnStorage());
         storage->setUrl("c:/records");
-        storage->setIndex(0);
+        storage->setIndex(65535);
         //storage0->setSpaceLimit(238500ll * 1000 * 1024);
         storage->setSpaceLimit(100ll * 1000 * 1024);
 

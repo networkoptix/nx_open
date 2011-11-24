@@ -32,6 +32,7 @@ public:
         blockSingleShotSignal = false;
         blockJumpSignal = false;
         blockPausePlaySignal = false;
+        blockSetSpeedSignal = false;
         lastJumpTime = DATETIME_NOW;
         //maxAllowedDate.clear();
         //minAllowedDate.clear();
@@ -53,6 +54,7 @@ public:
     bool blockSingleShotSignal;
     bool blockJumpSignal;
     bool blockPausePlaySignal;
+    bool blockSetSpeedSignal;
     bool blockPrevFrameSignal;
     bool blockNextFrameSignal;
     qint64 lastJumpTime;
@@ -138,7 +140,7 @@ void QnArchiveSyncPlayWrapper::onStreamResumed()
     if (d->blockPausePlaySignal)
         return;
     d->blockPausePlaySignal = true;
-    reinitTime();
+    reinitTime(getDisplayedTime());
     foreach(ReaderInfo info, d->readers)
     {
         if (info.reader != sender())
@@ -150,26 +152,54 @@ void QnArchiveSyncPlayWrapper::onStreamResumed()
 void QnArchiveSyncPlayWrapper::onSpeedChanged(double value)
 {
     Q_D(QnArchiveSyncPlayWrapper);
-    if (d->blockPausePlaySignal)
+    if (d->blockSetSpeedSignal)
         return;
-    d->blockPausePlaySignal = true;
+    d->blockSetSpeedSignal = true;
     foreach(ReaderInfo info, d->readers)
     {
         if (info.reader != sender())
             info.reader->setSpeed(value);
     }
+    reinitTime(getDisplayedTimeInternal());
     d->speed = value;
 
-    reinitTime();
-
-    d->blockPausePlaySignal = false;
+    d->blockSetSpeedSignal = false;
 }
 
-qint64 QnArchiveSyncPlayWrapper::getDisplayedTime() const
+qint64 QnArchiveSyncPlayWrapper::getNextTime() const
 {
     Q_D(const QnArchiveSyncPlayWrapper);
 
     QMutexLocker lock(&d->timeMutex);
+    qint64 displayTime = AV_NOPTS_VALUE;
+    foreach(ReaderInfo info, d->readers)
+    {
+        qint64 time = info.cam->getNextTime();
+        if (displayTime == AV_NOPTS_VALUE)
+            displayTime = time;
+        else if (time != AV_NOPTS_VALUE)
+            displayTime = d->speed >= 0 ? qMin(time, displayTime) : qMax(time, displayTime);
+    }
+    return displayTime;
+}
+
+
+qint64 QnArchiveSyncPlayWrapper::getDisplayedTime() const
+{
+    Q_D(const QnArchiveSyncPlayWrapper);
+    QMutexLocker lock(&d->timeMutex);
+
+    if (d->lastJumpTime == DATETIME_NOW)
+        return DATETIME_NOW;
+
+    return getDisplayedTimeInternal();
+}
+
+qint64 QnArchiveSyncPlayWrapper::getDisplayedTimeInternal() const
+{
+    Q_D(const QnArchiveSyncPlayWrapper);
+    QMutexLocker lock(&d->timeMutex);
+
     qint64 displayTime = AV_NOPTS_VALUE;
     foreach(ReaderInfo info, d->readers)
     {
@@ -182,14 +212,13 @@ qint64 QnArchiveSyncPlayWrapper::getDisplayedTime() const
     return displayTime;
 }
 
-void QnArchiveSyncPlayWrapper::reinitTime()
+void QnArchiveSyncPlayWrapper::reinitTime(qint64 newTime)
 {
     Q_D(QnArchiveSyncPlayWrapper);
 
     // todo: add negative speed support here
-    qint64 displayTime = getDisplayedTime();
-    if (displayTime != AV_NOPTS_VALUE)
-        d->lastJumpTime = displayTime;
+    if (newTime != AV_NOPTS_VALUE)
+        d->lastJumpTime = newTime;
     else
         d->lastJumpTime = getCurrentTime();
     d->timer.restart();
@@ -345,28 +374,50 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
     Q_D(const QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
     if (d->lastJumpTime == DATETIME_NOW)
-        return d->lastJumpTime;
+        return DATETIME_NOW;
+
     qint64 expectedTime = d->lastJumpTime + d->timer.elapsed()*1000 * d->speed;
+
+    /*
+    QString s;
+    QTextStream str(&s);
+    str << "expectedTime=" << QDateTime::fromMSecsSinceEpoch(expectedTime/1000).toString("hh:mm:ss.zzz");
+    str.flush();
+    cl_log.log(s, cl_logALWAYS);
+    */
+
+
+    qint64 nextTime = getNextTime();
+    if (d->speed >= 0 && nextTime != AV_NOPTS_VALUE && nextTime > expectedTime + MAX_FRAME_DURATION*1000)
+    {
+        QnArchiveSyncPlayWrapper* nonConstThis = const_cast<QnArchiveSyncPlayWrapper*>(this);
+        nonConstThis->reinitTime(nextTime);
+        expectedTime = d->lastJumpTime + d->timer.elapsed()*1000 * d->speed;
+    }
+    else if (d->speed < 0 && nextTime != AV_NOPTS_VALUE && nextTime < expectedTime - MAX_FRAME_DURATION*1000)
+    {
+        QnArchiveSyncPlayWrapper* nonConstThis = const_cast<QnArchiveSyncPlayWrapper*>(this);
+        nonConstThis->reinitTime(nextTime);
+        expectedTime = d->lastJumpTime + d->timer.elapsed()*1000 * d->speed;
+        /*
+        QString s;
+        QTextStream str(&s);
+        str << "reinitTimeTo=" << QDateTime::fromMSecsSinceEpoch(nextTime/1000).toString("hh:mm:ss.zzz") << "correctExpectedTime to=" << QDateTime::fromMSecsSinceEpoch(expectedTime/1000).toString("hh:mm:ss.zzz");
+        str.flush();
+        cl_log.log(s, cl_logALWAYS);
+        */
+    }
+
+
+    qint64 displayedTime =  getDisplayedTimeInternal();
+    if (displayedTime == AV_NOPTS_VALUE)
+        return displayedTime;
     if (d->speed >= 0) 
     {
-        /*
-        qint64 maxAllowedDate = INT64_MAX;
-        foreach(qint64 val, d->maxAllowedDate.values()) 
-            maxAllowedDate = qMin(maxAllowedDate, val);
-        
-        return qMin(expectedTime, maxAllowedDate);
-        */
-        return qMin(expectedTime, getDisplayedTime() + SYNC_EPS);
+        return qMin(expectedTime, displayedTime + SYNC_EPS);
     }
     else {
-        /*
-        qint64 minAllowedDate = 0;
-        foreach(qint64 val, d->minAllowedDate.values()) 
-            minAllowedDate = qMax(minAllowedDate, val);
-
-        return qMax(expectedTime, minAllowedDate);
-        */
-        return qMax(expectedTime, getDisplayedTime() - SYNC_EPS);
+        return qMax(expectedTime, displayedTime - SYNC_EPS);
     }
 }
 

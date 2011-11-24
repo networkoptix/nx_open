@@ -127,7 +127,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
 
         int rtpChannelNum = 0;
         int blockSize  = m_rtpData->read((char*)m_rtpDataBuffer, MAX_RTP_BUFFER_SIZE);
-        if (blockSize < 0) {
+        if (blockSize < 0 && !m_closing) {
             //m_rtspSession.stop(); // reconnect
             reopen();
             return result; 

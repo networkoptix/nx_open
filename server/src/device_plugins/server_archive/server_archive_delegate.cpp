@@ -69,7 +69,10 @@ qint64 QnServerArchiveDelegate::seek(qint64 time)
             return -1;
     }
 
-    qint64 chunkOffset = qBound(0ll, time - m_currentChunk.startTime, m_currentChunk.duration - BACKWARD_SEEK_STEP);
+    int duration = m_currentChunk.duration;
+    if (duration == -1) // last live chunk
+        duration = QDateTime::currentDateTime().toMSecsSinceEpoch()*1000 - m_currentChunk.startTime;
+    qint64 chunkOffset = qBound(0ll, time - m_currentChunk.startTime, duration - BACKWARD_SEEK_STEP);
     qint64 seekRez = m_aviDelegate->seek(chunkOffset);
     if (seekRez == -1)
         return seekRez;
@@ -86,14 +89,19 @@ QnAbstractMediaDataPtr QnServerArchiveDelegate::getNextData()
         DeviceFileCatalog::Chunk chunk;
         do {
             chunk = m_chunkSequence->getNextChunk(m_resource);
-            if (chunk.startTime == -1)
-                return QnAbstractMediaDataPtr(); // EOF
+            if (chunk.startTime == -1) 
+            {
+                if (m_reverseMode) {
+                    data = QnAbstractMediaDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, 0));
+                    data->timestamp = INT64_MAX; // EOF reached
+                }
+                return data;
+            }
         } while (!switchToChunk(chunk));
         data = m_aviDelegate->getNextData();
     }
     if (data) {
         data->timestamp +=m_currentChunk.startTime;
-
         //cl_log.log("serverArchiveDelegate. dataTime= ",QDateTime::fromMSecsSinceEpoch(data->timestamp/1000).toString(), cl_logALWAYS);
     }
     return data;

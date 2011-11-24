@@ -230,6 +230,9 @@ void QnPlAreconVisionResource::beforeUse()
     if (!getDescription())
         return;
 
+    setRegister(3, 21, 20);
+    setRegister(7, 21, 20);
+
 }
 
 QString QnPlAreconVisionResource::manufacture() const
