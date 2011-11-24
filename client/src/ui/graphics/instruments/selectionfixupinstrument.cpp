@@ -1,4 +1,4 @@
-#include "selectioninstrument.h"
+#include "selectionfixupinstrument.h"
 
 namespace {
     struct ItemIsSelectable: public std::unary_function<QGraphicsItem *, bool> {
@@ -9,11 +9,11 @@ namespace {
 
 } // anonymous namespace
 
-SelectionInstrument::SelectionInstrument(QObject *parent):
+SelectionFixupInstrument::SelectionFixupInstrument(QObject *parent):
     Instrument(ITEM, makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseRelease), parent)
 {}
 
-bool SelectionInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
+bool SelectionFixupInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
     if(!(item->flags() & QGraphicsItem::ItemIsSelectable))
         return false;
 
@@ -34,7 +34,7 @@ bool SelectionInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMou
     return false;
 }
 
-bool SelectionInstrument::mouseReleaseEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
+bool SelectionFixupInstrument::mouseReleaseEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
     if(!(item->flags() & QGraphicsItem::ItemIsSelectable))
         return false;
     

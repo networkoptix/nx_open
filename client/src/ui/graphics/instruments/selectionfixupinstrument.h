@@ -1,5 +1,5 @@
-#ifndef QN_SELECTION_INSTRUMENT_H
-#define QN_SELECTION_INSTRUMENT_H
+#ifndef QN_SELECTION_FIXUP_INSTRUMENT_H
+#define QN_SELECTION_FIXUP_INSTRUMENT_H
 
 #include "instrument.h"
 
@@ -9,12 +9,12 @@
  * This instrument fixes this problem.
  * 
  * It is to be installed at item level after a forwarding instrument, 
- * but before an instrument that stops accepted event processing.
+ * but before an instrument that stops event processing.
  */
-class SelectionInstrument: public Instrument {
+class SelectionFixupInstrument: public Instrument {
     Q_OBJECT;
 public:
-    SelectionInstrument(QObject *parent = NULL);
+    SelectionFixupInstrument(QObject *parent = NULL);
 
 protected:
     virtual bool mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override;
@@ -22,4 +22,4 @@ protected:
 };
 
 
-#endif QN_SELECTION_INSTRUMENT_H
+#endif QN_SELECTION_FIXUP_INSTRUMENT_H

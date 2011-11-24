@@ -17,7 +17,7 @@
 #include <ui/graphics/instruments/stopacceptedinstrument.h>
 #include <ui/graphics/instruments/forwardinginstrument.h>
 #include <ui/graphics/instruments/transformlistenerinstrument.h>
-#include <ui/graphics/instruments/selectioninstrument.h>
+#include <ui/graphics/instruments/selectionfixupinstrument.h>
 #include <ui/graphics/instruments/archivedropinstrument.h>
 #include <ui/graphics/instruments/resizinginstrument.h>
 #include <ui/graphics/instruments/uielementsinstrument.h>
@@ -65,7 +65,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchManager *synchronizer, Q
 
     /* Item instruments. */
     m_manager->installInstrument(new StopInstrument(Instrument::ITEM, mouseEventTypes, this));
-    m_manager->installInstrument(new SelectionInstrument(this));
+    m_manager->installInstrument(new SelectionFixupInstrument(this));
     m_manager->installInstrument(new ForwardingInstrument(Instrument::ITEM, mouseEventTypes, this));
     m_manager->installInstrument(itemClickInstrument);
 

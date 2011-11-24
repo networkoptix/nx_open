@@ -4,7 +4,7 @@
 #include <limits>
 #include <QList>
 #include <QDateTime>
-#include "animationtimer.h"
+#include <ui/animation/animation_timer.h>
 
 class QPointF;
 
@@ -386,7 +386,7 @@ class QPointF;
       return speed * (newMagnitude / oldMagnitude);
     }
 
-    virtual void tick(int currentTimeMSec) OVERRIDE {
+    virtual void tick(int currentTimeMSec) override {
       /* Update current speed. */
       T speedGain = calculateSpeed();
       qreal dt = (currentTimeMSec - mLastTickTimeMSec) / 1000.0;
