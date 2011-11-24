@@ -120,7 +120,10 @@ MySlider::MySlider(TimeSlider *parent)
 
 bool MySlider::isAtEnd() const 
 {
-    return value() > maximum() - m_endSize;
+    if (m_endSize == 0)
+        return true;
+    else
+        return value() > maximum() - m_endSize;
 }
 
 void MySlider::setEndSize(int size)
