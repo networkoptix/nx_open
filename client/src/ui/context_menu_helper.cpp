@@ -48,10 +48,27 @@ QAction cm_open_containing_folder(QObject::tr("Open in containing folder..."), 0
 void initContextMenu()
 {
     cm_exit.setIcon(Skin::icon(QLatin1String("decorations/exit-application.png")));
+    cm_exit.setShortcut(QObject::tr("Alt+F4"));
+    cm_exit.setShortcutContext(Qt::ApplicationShortcut);
+
     cm_preferences.setIcon(Skin::icon(QLatin1String("decorations/settings.png")));
+    cm_preferences.setShortcut(QObject::tr("Ctrl+P"));
+    cm_preferences.setShortcutContext(Qt::ApplicationShortcut);
 
     cm_open_file.setShortcut(QObject::tr("Ctrl+O"));
     cm_open_file.setShortcutContext(Qt::ApplicationShortcut);
+
+    cm_remove_from_disk.setShortcut(QObject::tr("Shift+Del"));
+    cm_remove_from_disk.setShortcutContext(Qt::ApplicationShortcut);
+
+    cm_open_containing_folder.setShortcut(QObject::tr("Ctrl+Return"));
+    cm_open_containing_folder.setShortcutContext(Qt::ApplicationShortcut);
+
+    cm_upload_youtube.setShortcut(QObject::tr("Ctrl+Y"));
+    cm_upload_youtube.setShortcutContext(Qt::ApplicationShortcut);
+
+    cm_editTags.setShortcut(QObject::tr("Alt+T"));
+    cm_editTags.setShortcutContext(Qt::ApplicationShortcut);
 
     QMenu *newItemMenu = new QMenu(QObject::tr("New Item"));
     newItemMenu->addAction(new QAction(QObject::tr("Camera"), &cm_new_item));
@@ -74,7 +91,7 @@ void initContextMenu()
 #ifdef Q_OS_MAC
     shortcuts << QObject::tr("Ctrl+F");
 #else
-    shortcuts << QObject::tr("Alt+Return") << QObject::tr("Esc")/* << QObject::tr("Alt+Return")*/;
+    shortcuts << QObject::tr("Alt+Return") << QObject::tr("Esc");
 #endif
     cm_toggle_fullscreen.setShortcuts(shortcuts);
     cm_toggle_fullscreen.setShortcutContext(Qt::ApplicationShortcut);

@@ -1407,7 +1407,7 @@ void GraphicsView::contextMenuEvent(QContextMenuEvent *event)
     QMenu menu;
     //menu.setWindowOpacity(global_menu_opacity);
 
-    if (aitem && scene()->selectedItems().count()==0) // video wnd and single selection
+    if (aitem && scene()->selectedItems().isEmpty()) // single selection
     {
         if (aitem->getType() == CLAbstractSceneItem::VIDEO)
         {
@@ -1423,9 +1423,7 @@ void GraphicsView::contextMenuEvent(QContextMenuEvent *event)
             dev = cam->getDevice();
 
             if (dev->associatedWithFile())
-            {
                 menu.addAction(&cm_remove_from_disk);
-            }
             menu.addAction(&cm_rotate);
 
             //if (dev->checkFlag(QnResource::live))
@@ -1446,17 +1444,12 @@ void GraphicsView::contextMenuEvent(QContextMenuEvent *event)
             }
 
             if (dev->checkFlag(QnResource::video))
-            {
                 menu.addAction(&cm_take_screenshot);
-            }
 
             if (dev->checkFlag(QnResource::ARCHIVE))
             {
                 menu.addAction(&cm_upload_youtube);
-            }
 
-            if (dev->checkFlag(QnResource::ARCHIVE))
-            {
                 QnAbstractArchiveReader* reader = static_cast<QnAbstractArchiveReader*>(cam->getStreamreader());
                 QStringList tracks = reader->getAudioTracksInfo();
                 if (tracks.size() > 1 ) // if we've got more than one channel
@@ -1474,31 +1467,25 @@ void GraphicsView::contextMenuEvent(QContextMenuEvent *event)
             }
 
             if (dev->checkFlag(QnResource::ARCHIVE) || dev->checkFlag(QnResource::SINGLE_SHOT))
-            {
                 menu.addAction(&cm_open_containing_folder);
-            }
 
             if (dev->getUniqueId().contains(getTempRecordingDir()))
-            {
                 menu.addAction(&cm_save_recorded_as);
-            }
 
             if (CLDeviceSettingsDlgFactory::canCreateDlg(dev))
                 menu.addAction(&cm_settings);
         }
-
-        if (aitem->getType()==CLAbstractSceneItem::LAYOUT )
+        else if (aitem->getType() == CLAbstractSceneItem::LAYOUT )
         {
             menu.addAction(&cm_layout_editor_change_t);
             menu.addAction(&cm_remove_from_layout);
         }
-
-        if (aitem->getType()==CLAbstractSceneItem::RECORDER)
+        else if (aitem->getType() == CLAbstractSceneItem::RECORDER)
         {
-
+            // ###
         }
     }
-    else if (aitem && scene()->selectedItems().count()>0)
+    else if (aitem && !scene()->selectedItems().isEmpty()) // multiple selection
     {
         // multiple selection
         bool haveAtLeastOneNonrecordingCam = false;
