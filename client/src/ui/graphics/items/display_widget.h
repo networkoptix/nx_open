@@ -164,6 +164,8 @@ private:
      */
     QRectF channelRect(int channel) const;
 
+    void drawLoadingProgress(const QRectF &rect) const;
+
 private:
     /** Layout item. */
     QnWorkbenchItem *m_item;

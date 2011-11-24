@@ -1,5 +1,6 @@
 #include "display_widget.h"
 #include <cassert>
+#include <cmath> /* For std::fmod, std::sin and std::cos. */
 #include <QPainter>
 #include <core/resource/resource_media_layout.h>
 #include <ui/workbench/workbench_item.h>
@@ -28,6 +29,82 @@ namespace {
 
     /** Default shadow displacement, in scene coordinates. */
     QPointF defaultShadowDisplacement = QPointF(5.0, 5.0);
+
+
+    template<class T> 
+    T interpolate(const T &f, const T &t, qreal progress) {
+        return T(f + (t - f) * progress);
+    }
+
+    QColor interpolate(const QColor &f,const QColor &t, qreal progress) {
+        return QColor(
+            qBound(0, interpolate(f.red(),   t.red(),   progress), 255),
+            qBound(0, interpolate(f.green(), t.green(), progress), 255),
+            qBound(0, interpolate(f.blue(),  t.blue(),  progress), 255),
+            qBound(0, interpolate(f.alpha(), t.alpha(), progress), 255)
+        );
+    }
+
+    class QnLoadingProgressPainter {
+    public:
+        /**
+         * \param innerRadius           Number in [0, 1] defining the inner radius of the progress sign.
+         * \param sectorCount           Number of sectors to use.
+         * \param sectorFill            Number in [0, 1] defining the relative size of the part of the sector that will be filled.
+         * \param startColor            Start fill color.
+         * \param endColor              End fill color.
+         */
+        QnLoadingProgressPainter(qreal innerRadius, int sectorCount, qreal sectorFill, const QColor &startColor, const QColor &endColor):
+          m_sectorCount(sectorCount)
+        {
+            /* Create display list. */
+            m_list = glGenLists(1);
+
+            /* Compile the display list. */
+            glNewList(m_list, GL_COMPILE);
+            glBegin(GL_QUADS);
+            for(int i = 0; i < sectorCount; i++) {
+                qreal a0 = 2 * M_PI / sectorCount * i;
+                qreal a1 = 2 * M_PI / sectorCount * (i + sectorFill);
+                qreal r0 = innerRadius;
+                qreal r1 = 1;
+
+                glColor(interpolate(startColor, endColor, static_cast<qreal>(i) / (sectorCount - 1)));
+                glVertexCircular(a0, r0);
+                glVertexCircular(a1, r0);
+                glVertexCircular(a1, r1);
+                glVertexCircular(a0, r1);
+            }
+            glEnd();
+            glEndList();
+        }
+
+        ~QnLoadingProgressPainter() {
+            glDeleteLists(m_list, 1);
+        }
+
+        void paint() {
+            glCallList(m_list);
+        }
+
+        void paint(qreal progress) {
+            glPushMatrix();
+            glRotate(360.0 * static_cast<int>(std::fmod(progress, 1.0) * m_sectorCount) / m_sectorCount, 0.0, 0.0, 1.0);
+            paint();
+            glPopMatrix();
+        }
+
+    private:
+        static void glVertexCircular(qreal alpha, qreal r) {
+            ::glVertex(r * std::cos(alpha), r * std::sin(alpha));
+        }
+
+    private:
+        int m_sectorCount;
+        GLuint m_list;
+    };
+
+    Q_GLOBAL_STATIC_WITH_ARGS(QnLoadingProgressPainter, progressPainter, (0.5, 12, 0.5, QColor(255, 255, 255, 0), QColor(255, 255, 255, 255)));
 }
 
 QnDisplayWidget::QnDisplayWidget(QnWorkbenchItem *item, QGraphicsItem *parent):
@@ -268,9 +345,42 @@ void QnDisplayWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * 
     
     /* Draw content. */
     painter->beginNativePainting();
-    for(int i = 0; i < m_channelCount; i++)
-        m_renderer->paint(i, channelRect(i));
+    for(int i = 0; i < m_channelCount; i++) {
+        QRectF rect = channelRect(i);
+        if(m_renderer->paint(i, rect))
+            continue;
+
+        drawLoadingProgress(rect);
+    }
     painter->endNativePainting();
+}
+
+void QnDisplayWidget::drawLoadingProgress(const QRectF &rect) const {
+    glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
+    glEnable(GL_BLEND); 
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
+
+    glColor3f(0.0, 0.0, 0.0);
+    glBegin(GL_QUADS);
+    glVertices(rect);
+    glEnd();
+
+    QRectF progressRect = expanded(
+        1.0, 
+        QRectF(
+            rect.center() - toPoint(rect.size()) / 8,
+            rect.size() / 4
+        ),
+        Qt::KeepAspectRatio
+    );
+    
+    glPushMatrix();
+    glTranslatef(progressRect.center().x(), progressRect.center().y(), 1.0);
+    glScalef(progressRect.width() / 2, progressRect.height() / 2, 1.0);
+    progressPainter()->paint(QDateTime::currentMSecsSinceEpoch() / 1000.0);
+    glPopMatrix();
+
+    glPopAttrib();
 }
 
 void QnDisplayWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override {
