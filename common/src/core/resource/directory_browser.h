@@ -20,7 +20,7 @@ public:
 
     // creates an instance of proper resource from file
     virtual QnResourcePtr checkFile(const QString &filename);
-    virtual QnResourceList checkFiles(const QStringList files);
+    virtual QnResourceList checkFiles(const QList<QString> &files);
 
 protected:
     static QnResourcePtr createArchiveResource(const QString& xfile);

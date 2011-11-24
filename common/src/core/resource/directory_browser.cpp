@@ -101,7 +101,7 @@ QnResourcePtr QnResourceDirectoryBrowser::checkFile(const QString& filename)
     return createArchiveResource(filename);
 }
 
-QnResourceList QnResourceDirectoryBrowser::checkFiles(const QStringList files)
+QnResourceList QnResourceDirectoryBrowser::checkFiles(const QList<QString> &files)
 {
     QnResourceList result;
     foreach(QString file, files)

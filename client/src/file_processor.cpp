@@ -9,7 +9,7 @@
 #include <plugins/resources/archive/filetypesupport.h>
 #include <utils/common/warnings.h>
 
-void QnFileProcessor::findAcceptedFiles(const QString &path, QStringList *list) {
+void QnFileProcessor::findAcceptedFiles(const QString &path, QList<QString> *list) {
     if(list == NULL) {
         qnNullWarning(list);
         return;
@@ -51,7 +51,7 @@ QStringList QnFileProcessor::findAcceptedFiles(const QString &path) {
     return result;
 }
 
-void QnFileProcessor::findAcceptedFiles(const QList<QUrl> &urls, QStringList *list) {
+void QnFileProcessor::findAcceptedFiles(const QList<QUrl> &urls, QList<QString> *list) {
     foreach (const QUrl &url, urls)
         QnFileProcessor::findAcceptedFiles(url.toLocalFile(), list);
 }
@@ -62,7 +62,15 @@ QStringList QnFileProcessor::findAcceptedFiles(const QList<QUrl> &urls) {
     return result;
 }
 
-QnResourceList QnFileProcessor::creareResourcesForFiles(const QStringList &files) {
+QnResourcePtr QnFileProcessor::createResourcesForFile(const QString &file) {
+    QnResourcePtr result = QnResourceDirectoryBrowser::instance().checkFile(file);
+
+    qnResPool->addResource(result);
+
+    return result;
+}
+
+QnResourceList QnFileProcessor::createResourcesForFiles(const QList<QString> &files) {
     QnResourceList result = QnResourceDirectoryBrowser::instance().checkFiles(files);
 
     qnResPool->addResources(result);

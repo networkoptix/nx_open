@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QScopedPointer>
 #include <utils/common/scene_utility.h>
+#include <core/resource/resource.h>
 
 class QGraphicsScene;
 class QGraphicsView;
@@ -46,10 +47,12 @@ public:
 
     QnWorkbenchGridMapper *mapper() const;
 
-    void drop(const QUrl &url, const QPoint &gridPos, bool checkUrls = true);
-    void drop(const QList<QUrl> &urls, const QPoint &gridPos, bool checkUrls = true);
-    void drop(const QString &file, const QPoint &gridPos, bool checkFiles = true);
-    void drop(const QList<QString> &files, const QPoint &gridPos, bool checkFiles = true);
+    void drop(const QUrl &url, const QPoint &gridPos, bool findAccepted = true);
+    void drop(const QList<QUrl> &urls, const QPoint &gridPos, bool findAccepted = true);
+    void drop(const QString &file, const QPoint &gridPos, bool findAccepted = true);
+    void drop(const QList<QString> &files, const QPoint &gridPos, bool findAccepted = true);
+    void drop(const QnResourcePtr &resource, const QPoint &gridPos);
+    void drop(const QnResourceList &resources, const QPoint &gridPos);
 
 protected:
     void updateGeometryDelta(QnDisplayWidget *widget);
@@ -71,9 +74,6 @@ protected slots:
     void at_viewportUngrabbed();
 
     void at_workbench_focusedItemChanged();
-
-private:
-    void dropInternal(const QList<QString> &files, const QPoint &gridPos);
 
 private:
     /** Display synchronizer. */

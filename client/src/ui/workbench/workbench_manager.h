@@ -28,6 +28,8 @@ class QnCurtainItem;
 class CLVideoCamera;
 class CLCamDisplay;
 
+// TODO: rename to QnWorkbenchDisplay?
+
 /**
  * This class ties a workbench, a scene and a view together.
  * 
@@ -327,9 +329,6 @@ private:
 
     /** Stored dummy scene. */
     QGraphicsScene *m_dummyScene;
-
-    /** Stored dummy workbench. */
-    QnWorkbench *m_dummyWorkbench;
 };
 
 #endif // QN_WORKBENCH_MANAGER_H

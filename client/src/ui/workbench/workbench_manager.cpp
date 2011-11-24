@@ -78,8 +78,7 @@ QnWorkbenchManager::QnWorkbenchManager(QnWorkbench *workbench, QObject *parent):
     m_raisedItem(NULL),
     m_mode(QnWorkbench::VIEWING),
     m_frontZ(0.0),
-    m_dummyScene(new QGraphicsScene(this)),
-    m_dummyWorkbench(NULL)
+    m_dummyScene(new QGraphicsScene(this))
 {
     /* Create and configure instruments. */
     m_boundingInstrument = new BoundingInstrument(this);
@@ -120,7 +119,6 @@ QnWorkbenchManager::QnWorkbenchManager(QnWorkbench *workbench, QObject *parent):
 }
 
 QnWorkbenchManager::~QnWorkbenchManager() {
-    m_dummyWorkbench = NULL;
     m_dummyScene = NULL;
 
     initWorkbench(NULL);
@@ -679,8 +677,7 @@ void QnWorkbenchManager::at_workbench_itemAboutToBeRemoved(QnWorkbenchItem *item
 }
 
 void QnWorkbenchManager::at_workbench_aboutToBeDestroyed() {
-    m_dummyWorkbench = new QnWorkbench(this);
-    initWorkbench(m_dummyWorkbench);
+    initWorkbench(new QnWorkbench(this));
 }
 
 void QnWorkbenchManager::at_workbench_modeChanged() {

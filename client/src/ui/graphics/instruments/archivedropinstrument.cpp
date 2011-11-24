@@ -53,4 +53,5 @@ bool ArchiveDropInstrument::dropEvent(QWidget *viewport, QDropEvent *event) {
         return false;
 
     m_controller->drop(m_files, m_controller->workbench()->mapper()->mapToGrid(view(viewport)->mapToScene(event->pos())), false);
+    return true;
 }

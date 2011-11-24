@@ -144,55 +144,53 @@ QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
     return m_synchronizer->workbench()->mapper();
 }
 
-void QnWorkbenchController::drop(const QUrl &url, const QPoint &gridPos, bool checkUrls) {
-    drop(url.toLocalFile(), gridPos, checkUrls);
+void QnWorkbenchController::drop(const QUrl &url, const QPoint &gridPos, bool findAccepted) {
+    drop(url.toLocalFile(), gridPos, findAccepted);
 }
 
-void QnWorkbenchController::drop(const QList<QUrl> &urls, const QPoint &gridPos, bool checkUrls) {
+void QnWorkbenchController::drop(const QList<QUrl> &urls, const QPoint &gridPos, bool findAccepted) {
     QList<QString> files;
     foreach(const QUrl &url, urls)
         files.push_back(url.toLocalFile());
-    drop(files, gridPos, checkUrls);
+    drop(files, gridPos, findAccepted);
 }
 
-void QnWorkbenchController::drop(const QString &file, const QPoint &gridPos, bool checkFiles) {
+void QnWorkbenchController::drop(const QString &file, const QPoint &gridPos, bool findAccepted) {
     QList<QString> files;
     files.push_back(file);
-    drop(files, gridPos, checkFiles);
+    drop(files, gridPos, findAccepted);
 }
 
-void QnWorkbenchController::drop(const QList<QString> &files, const QPoint &gridPos, bool checkFiles) {
-    if(!checkFiles) {
-        dropInternal(files, gridPos);
+void QnWorkbenchController::drop(const QList<QString> &files, const QPoint &gridPos, bool findAccepted) {
+    QList<QString> validFiles;
+    if(!findAccepted) {
+        validFiles = files;
     } else {
-        QStringList checkedFiles;
         foreach(const QString &file, files)
-            QnFileProcessor::findAcceptedFiles(file, &checkedFiles);
-        if(files.empty())
-            return;
-
-        dropInternal(checkedFiles, gridPos);
+            QnFileProcessor::findAcceptedFiles(file, &validFiles);
     }
-}
 
-void QnWorkbenchController::dropInternal(const QList<QString> &files, const QPoint &gridPos) {
-    QnWorkbenchLayout *layout = this->layout();
-    if(layout == NULL)
+    if(validFiles.empty())
         return;
 
-    QnResourceList resources = QnFileProcessor::creareResourcesForFiles(files);
+    drop(QnFileProcessor::createResourcesForFiles(validFiles), gridPos);
+}
 
+void QnWorkbenchController::drop(const QnResourceList &resources, const QPoint &gridPos) {
+    foreach(const QnResourcePtr &resource, resources)
+        drop(resource, gridPos);
+}
+
+void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPoint &gridPos) {
     QRect geometry(gridPos, QSize(1, 1));
-    foreach(QnResourcePtr resource, resources) {
-        QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId());
-        item->setGeometry(geometry);
+    QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId());
+    item->setGeometry(geometry);
 
-        layout->addItem(item);
-        if(!item->isPinned()) {
-            /* Place already taken, pick closest one. */
-            QRect newGeometry = layout->closestFreeSlot(geometry.topLeft(), geometry.size());
-            layout->pinItem(item, newGeometry);
-        }
+    layout()->addItem(item);
+    if(!item->isPinned()) {
+        /* Place already taken, pick closest one. */
+        QRect newGeometry = layout()->closestFreeSlot(geometry.topLeft(), geometry.size());
+        layout()->pinItem(item, newGeometry);
     }
 }
 
