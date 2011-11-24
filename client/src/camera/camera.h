@@ -50,7 +50,7 @@ public:
     CLCamDisplay* getCamCamDisplay();
 
     void setQuality(QnStreamQuality q, bool increase);
-    virtual qint64 getCurrentTime() const override;
+    qint64 getCurrentTime() const;
 
     void setExternalTimeSource(QnlTimeSource* value) { m_extTimeSrc = value; }
 
