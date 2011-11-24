@@ -160,9 +160,8 @@ void QnArchiveSyncPlayWrapper::onSpeedChanged(double value)
         if (info.reader != sender())
             info.reader->setSpeed(value);
     }
-    d->speed = value;
-
     reinitTime(getDisplayedTime());
+    d->speed = value;
 
     d->blockSetSpeedSignal = false;
 }
