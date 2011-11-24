@@ -21,6 +21,7 @@ public:
 
     virtual qint64 getCurrentTime() const;
     virtual qint64 getDisplayedTime() const;
+    virtual qint64 getNextTime() const;
 
     virtual void onAvailableTime(QnlTimeSource* source, qint64 time);
 public slots:
@@ -42,7 +43,7 @@ private:
     //void waitIfNeed(QnAbstractArchiveReader* reader, qint64 timestamp);
     void onNewDataReaded();
     void erase(QnAbstractArchiveDelegate* value);
-    void reinitTime();
+    void reinitTime(qint64 newTime);
 private:
     friend class QnSyncPlayArchiveDelegate;
     QN_DECLARE_PRIVATE(QnArchiveSyncPlayWrapper);
