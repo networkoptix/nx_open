@@ -85,7 +85,7 @@ public:
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-    const QRect &handleRect() const;
+    const QRectF &handleRect() const;
 
     bool isAtEnd() const;
 
@@ -103,8 +103,7 @@ private:
 private:
     TimeSlider *m_parent;
     ToolTipItem *m_toolTip;
-    mutable QRect m_handleRect;
-    mutable bool m_handleRectValid;
+    mutable QRectF m_handleRect;
     int m_endSize;
 };
 
@@ -112,18 +111,14 @@ MySlider::MySlider(TimeSlider *parent)
     : GraphicsSlider(parent),
       m_parent(parent),
       m_toolTip(0),
-      m_handleRectValid(false),
       m_endSize(0)
 {
     setToolTipItem(new StyledToolTipItem);
 }
 
-bool MySlider::isAtEnd() const 
+bool MySlider::isAtEnd() const
 {
-    if (m_endSize == 0)
-        return true;
-    else
-        return value() > maximum() - m_endSize;
+    return m_endSize == 0 || value() > maximum() - m_endSize;
 }
 
 void MySlider::setEndSize(int size)
@@ -173,8 +168,8 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     linearGrad.setColorAt(1, QColor(186, 239, 255));
     painter->fillRect(r, linearGrad);
 
-    /* Draw time periods. */
-    if(!m_parent->timePeriodList().empty())
+    // Draw time periods
+    if (!m_parent->timePeriodList().empty())
     {
         const qint64 range = m_parent->sliderRange();
         const qint64 pos = m_parent->viewPortPos() /*+ timezoneOffset*/;
@@ -207,7 +202,7 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     r = contentsRect();
     qreal l = r.left() + QStyle::sliderPositionFromValue(minimum(), maximum(), maximum() - m_endSize, r.width());
     r = QRectF(l, r.top(), r.right() - l, r.height());
-    
+
     linearGrad = QLinearGradient(r.topLeft(), r.topRight());
     linearGrad.setColorAt(0, QColor(0, 255, 0, 0));
     linearGrad.setColorAt(1, QColor(0, 255, 0, 128));
@@ -237,20 +232,19 @@ QVariant MySlider::itemChange(GraphicsItemChange change, const QVariant &value)
 
 void MySlider::invalidateHandleRect()
 {
-    m_handleRectValid = false;
+    m_handleRect = QRectF();
 }
 
 void MySlider::ensureHandleRect() const
 {
-    if(m_handleRectValid)
-        return;
-
-    QStyleOptionSlider opt;
-    initStyleOption(&opt);
-    m_handleRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle);
+    if (!m_handleRect.isValid()) {
+        QStyleOptionSlider opt;
+        initStyleOption(&opt);
+        m_handleRect = QRectF(style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle));
+    }
 }
 
-const QRect &MySlider::handleRect() const
+const QRectF &MySlider::handleRect() const
 {
     ensureHandleRect();
 
@@ -555,7 +549,7 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
                 painter->drawText(textRect, Qt::AlignHCenter, text);
             }
         }
-        
+
         xpos += intervals[level].interval * pixelPerTime;
     }
 
@@ -837,7 +831,7 @@ void TimeSlider::setMoving(bool b)
     m_slider->setSliderDown(b);
 }
 
-bool TimeSlider::isAtEnd() 
+bool TimeSlider::isAtEnd()
 {
     return m_slider->isAtEnd();
 }
@@ -980,12 +974,9 @@ bool TimeSlider::eventFilter(QObject *target, QEvent *event)
     return GraphicsWidget::eventFilter(target, event);
 }
 
-void TimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) 
+void TimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     m_slider->setEndSize(m_endSize * (m_slider->maximum() - m_slider->minimum()) / (m_slider->size().width())); // Hack hack hack
 
     GraphicsWidget::paint(painter, option, widget);
 }
-
-
-
