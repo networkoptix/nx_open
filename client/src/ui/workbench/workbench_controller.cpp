@@ -125,10 +125,11 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_navigationItem = new NavigationItem();
     m_navigationItem->setParentItem(controlsWidget);
 
-    verticalLayout->addStretch(100);
+    verticalLayout->addStretch(0x1000);
 
     m_navigationItem->graphicsWidget()->setParentItem(NULL);
     verticalLayout->addItem(m_navigationItem->graphicsWidget());
+    m_navigationItem->setPos(0, -1000.0); /* Temporary hack to not let it intercept mouse events. */
 
     /* Connect to workbench. */
     connect(workbench(),                SIGNAL(focusedItemChanged()),                                           this,                   SLOT(at_workbench_focusedItemChanged()));
