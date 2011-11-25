@@ -24,6 +24,7 @@
 #include <ui/skin.h>
 
 #include <utils/common/warnings.h>
+#include <utils/common/checked_cast.h>
 
 #include "workbench_layout.h"
 #include "workbench_item.h"
@@ -186,7 +187,7 @@ void QnWorkbenchDisplay::deinitSceneWorkbench() {
     disconnect(m_workbench, NULL, this, NULL);
 
     foreach(QnWorkbenchItem *item, m_workbench->layout()->items())
-        removeItemInternal(item);
+        removeItemInternal(item, true);
 
     m_raisedItem = m_zoomedItem = NULL;
 
@@ -473,21 +474,28 @@ void QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
     synchronize(widget, false);
     bringToFront(widget);
 
-    connect(widget, SIGNAL(destroyed()), this, SLOT(at_widget_destroyed()));
+    connect(widget, SIGNAL(aboutToBeDestroyed()), this, SLOT(at_widget_aboutToBeDestroyed()));
+
+    emit widgetAdded(widget);
 }
 
-void QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item) {
+void QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyWidget) {
     disconnect(item, NULL, this, NULL);
 
     QnResourceWidget *widget = m_widgetByItem[item];
-    if(widget == NULL)
+    if(widget == NULL) {
+        qnCritical("No widget exists for the item being removed, which means that something went terribly wrong.");
         return;
+    }
+
+    emit widgetAboutToBeRemoved(widget);
 
     m_widgetByItem.remove(item);
 
     disconnect(widget, NULL, this, NULL);
 
-    delete widget;
+    if(destroyWidget)
+        delete widget;
 }
 
 
@@ -698,7 +706,7 @@ void QnWorkbenchDisplay::at_workbench_itemAdded(QnWorkbenchItem *item) {
 }
 
 void QnWorkbenchDisplay::at_workbench_itemAboutToBeRemoved(QnWorkbenchItem *item) {
-    removeItemInternal(item);
+    removeItemInternal(item, true);
     synchronizeSceneBounds();
 }
 
@@ -808,14 +816,17 @@ void QnWorkbenchDisplay::at_uncurtained() {
         m_view->viewport()->setCursor(QCursor(Qt::ArrowCursor));
 }
 
-void QnWorkbenchDisplay::at_widget_destroyed() {
+void QnWorkbenchDisplay::at_widget_aboutToBeDestroyed() {
     /* Holy crap! Somebody's destroying our widgets. Disconnect from the scene. */
-    m_widgetByItem.clear();
+    qnWarning("Resource widget was destroyed directly. This is not the right way to do it. It will be destroyed automatically when its associated item is removed from layout.");
+
+    QnResourceWidget *widget = checked_cast<QnResourceWidget *>(sender());
+    removeItemInternal(widget->item(), false);
+
     setScene(NULL);
 }
 
 void QnWorkbenchDisplay::at_scene_destroyed() {
-    m_widgetByItem.clear();
     setScene(NULL);
 }
 

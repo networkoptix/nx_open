@@ -160,6 +160,7 @@ public:
 
 signals:
     void aspectRatioChanged(qreal oldAspectRatio, qreal newAspectRatio);
+    void aboutToBeDestroyed();
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -177,6 +178,8 @@ protected:
     void updateShadowZ();
     void updateShadowPos();
     void invalidateShadowShape();
+
+    void ensureAboutToBeDestroyedEmitted();
 
 private slots:
     void at_sourceSizeChanged(const QSize &size);
@@ -229,6 +232,9 @@ private:
 
     /** Layout for buttons. */
     QGraphicsLinearLayout *m_buttonsLayout;
+
+    /** Whether aboutToBeDestroyed signal has already been emitted. */
+    bool m_aboutToBeDestroyedEmitted;
 };
 
 #endif // QN_DISPLAY_WIDGET_H

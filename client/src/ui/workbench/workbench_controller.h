@@ -77,6 +77,9 @@ protected slots:
 
     void at_workbench_focusedItemChanged();
 
+    void at_display_widgetAdded(QnResourceWidget *widget);
+    void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
+
 private:
     /** Display synchronizer. */
     QnWorkbenchDisplay *m_display;

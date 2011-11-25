@@ -207,6 +207,9 @@ signals:
     void viewportGrabbed();
     void viewportUngrabbed();
 
+    void widgetAdded(QnResourceWidget *widget);
+    void widgetAboutToBeRemoved(QnResourceWidget *widget);
+
 protected:
     virtual void tick(int currentTime) override;
     
@@ -222,7 +225,7 @@ protected:
     Layer synchronizedLayer(QnWorkbenchItem *item) const;
 
     void addItemInternal(QnWorkbenchItem *item);
-    void removeItemInternal(QnWorkbenchItem *item);
+    void removeItemInternal(QnWorkbenchItem *item, bool destroyWidget);
 
     void deinitSceneWorkbench();
     void initSceneWorkbench();
@@ -253,7 +256,7 @@ protected slots:
     void at_curtained();
     void at_uncurtained();
 
-    void at_widget_destroyed();
+    void at_widget_aboutToBeDestroyed();
     void at_scene_destroyed();
     void at_view_destroyed();
 

@@ -42,7 +42,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     m_renderer(NULL),
     m_aspectRatio(-1.0),
     m_enclosingAspectRatio(1.0),
-    m_frameWidth(0.0)
+    m_frameWidth(0.0),
+    m_aboutToBeDestroyedEmitted(false)
 {
     /* Set up shadow. */
     m_shadow = new QnPolygonalShadowItem();
@@ -81,6 +82,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
 }
 
 QnResourceWidget::~QnResourceWidget() {
+    ensureAboutToBeDestroyedEmitted();
+
     delete m_display;
     
     if(!m_shadow.isNull()) {
@@ -448,4 +451,12 @@ void QnResourceWidget::addButton(QGraphicsLayoutItem *button) {
 
 void QnResourceWidget::removeButton(QGraphicsLayoutItem *button) {
     m_buttonsLayout->removeItem(button);
+}
+
+void QnResourceWidget::ensureAboutToBeDestroyedEmitted() {
+    if(!m_aboutToBeDestroyedEmitted)
+        return;
+
+    m_aboutToBeDestroyedEmitted = true;
+    emit aboutToBeDestroyed();
 }

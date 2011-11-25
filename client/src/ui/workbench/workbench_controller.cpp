@@ -5,6 +5,11 @@
 #include <QGLWidget>
 #include <QGraphicsLinearLayout>
 
+#include <core/resourcemanagment/security_cam_resource.h>
+
+#include <camera/resource_display.h>
+#include <camera/camdisplay.h>
+
 #include <ui/animation/viewport_animator.h>
 
 #include <ui/graphics/instruments/instrumentmanager.h>
@@ -25,6 +30,8 @@
 
 #include <ui/graphics/items/resource_widget.h>
 
+#include <ui/videoitem/navigationitem.h>
+
 #include <file_processor.h>
 
 #include "workbench_layout.h"
@@ -33,9 +40,6 @@
 #include "workbench.h"
 #include "workbench_display.h"
 
-
-#include <ui/videoitem/navigationitem.h>
-#include <camera/camdisplay.h>
 
 
 QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObject *parent):
@@ -111,9 +115,6 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *)),     m_rubberBandInstrument, SLOT(recursiveDisable()));
     connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *)),    m_rubberBandInstrument, SLOT(recursiveEnable()));
 
-    connect(m_display,                  SIGNAL(viewportGrabbed()),                                              this,                   SLOT(at_viewportGrabbed()));
-    connect(m_display,                  SIGNAL(viewportUngrabbed()),                                            this,                   SLOT(at_viewportUngrabbed()));
-
     /* Create controls. */
     QGraphicsWidget *controlsWidget = m_uiElementsInstrument->widget();
     m_display->setLayer(controlsWidget, QnWorkbenchDisplay::UI_ELEMENTS_LAYER);
@@ -132,6 +133,12 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
 
     /* Connect to workbench. */
     connect(workbench(),                SIGNAL(focusedItemChanged()),                                           this,                   SLOT(at_workbench_focusedItemChanged()));
+    
+    /* Connect to display. */
+    connect(m_display,                  SIGNAL(viewportGrabbed()),                                              this,                   SLOT(at_viewportGrabbed()));
+    connect(m_display,                  SIGNAL(viewportUngrabbed()),                                            this,                   SLOT(at_viewportUngrabbed()));
+    connect(m_display,                  SIGNAL(widgetAdded(QnResourceWidget *)),                                this,                   SLOT(at_display_widgetAdded(QnResourceWidget *)));
+    connect(m_display,                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                     this,                   SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
 }
 
 QnWorkbenchController::~QnWorkbenchController() {
@@ -413,4 +420,22 @@ void QnWorkbenchController::at_workbench_focusedItemChanged() {
     CLCamDisplay *newCamDisplay = m_display->camDisplay(m_focusedItem);
     if(newCamDisplay != NULL)
         newCamDisplay->playAudio(true);
+}
+
+void QnWorkbenchController::at_display_widgetAdded(QnResourceWidget *widget) {
+    if(widget->display() == NULL || widget->display()->camera() == NULL)
+        return;
+
+    QnSequrityCamResource *cameraResource = dynamic_cast<QnSequrityCamResource *>(widget->display()->resource());
+    if(cameraResource != NULL)
+        m_navigationItem->addReserveCamera(widget->display()->camera());
+}
+
+void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
+    if(widget->display() == NULL || widget->display()->camera() == NULL)
+        return;
+
+    QnSequrityCamResource *cameraResource = dynamic_cast<QnSequrityCamResource *>(widget->display()->resource());
+    if(cameraResource != NULL)
+        m_navigationItem->removeReserveCamera(widget->display()->camera());
 }
