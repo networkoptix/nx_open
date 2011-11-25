@@ -2,21 +2,17 @@
 #include "abstractgraphicsslider_p.h"
 
 #ifndef QT_NO_ACCESSIBILITY
-#include <QtGui/QAccessible>
+#  include <QtGui/QAccessible>
 #endif
 #include <QtGui/QApplication>
 #include <QtGui/QGraphicsSceneEvent>
 #include <QtGui/QStyleOption>
 
-#include <limits.h>
-#include "utils/common/util.h"
-
 /*!
     \class AbstractGraphicsSlider
     \brief The AbstractGraphicsSlider class provides an integer value within a range.
 
-    The class is designed as a common super class for widgets like
-    QScrollBar, QSlider and QDial.
+    The class is designed as a common super class for widgets like GraphicsSlider.
 
     Here are the main properties of the class:
 
@@ -28,18 +24,16 @@
 
     \i \l maximum: The highest possible value.
 
-    \i \l singleStep: The smaller of two natural steps that an
-    abstract sliders provides and typically corresponds to the user
-    pressing an arrow key.
+    \i \l singleStep: The smaller of two natural steps that an abstract sliders
+          provides and typically corresponds to the user pressing an arrow key.
 
-    \i \l pageStep: The larger of two natural steps that an abstract
-    slider provides and typically corresponds to the user pressing
-    PageUp or PageDown.
+    \i \l pageStep: The larger of two natural steps that an abstract slider
+          provides and typically corresponds to the user pressing PageUp or PageDown.
 
     \i \l tracking: Whether slider tracking is enabled.
 
-    \i \l sliderPosition: The current position of the slider. If \l
-    tracking is enabled (the default), this is identical to \l value.
+    \i \l sliderPosition: The current position of the slider. If \l tracking
+          is enabled (the default), this is identical to \l value.
 
     \endlist
 
@@ -262,8 +256,7 @@ void AbstractGraphicsSlider::setMinimum(int min)
 int AbstractGraphicsSlider::maximum() const
 {
     Q_D(const AbstractGraphicsSlider);
-    
-    return d->maximum == DATETIME_NOW ? QDateTime::currentDateTime().toMSecsSinceEpoch() : d->maximum;
+    return d->maximum;
 }
 
 void AbstractGraphicsSlider::setMaximum(int max)
@@ -275,8 +268,7 @@ void AbstractGraphicsSlider::setMaximum(int max)
 /*!
     Sets the slider's minimum to \a min and its maximum to \a max.
 
-    If \a max is smaller than \a min, \a min becomes the only legal
-    value.
+    If \a max is smaller than \a min, \a min becomes the only legal value.
 
     \sa minimum, maximum
 */
@@ -796,6 +788,9 @@ void AbstractGraphicsSlider::keyPressEvent(QKeyEvent *ev)
         triggerAction(action);
 }
 
+/*!
+    \reimp
+*/
 void AbstractGraphicsSlider::initStyleOption(QStyleOption *option) const
 {
     Q_D(const AbstractGraphicsSlider);

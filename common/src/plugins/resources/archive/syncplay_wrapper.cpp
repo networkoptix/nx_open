@@ -14,13 +14,15 @@ struct ReaderInfo
         reader(_reader),
         oldDelegate(_oldDelegate),
         cam(_cam),
-        enabled(true)
+        enabled(true),
+        buffering(false)
     {
     }
     QnAbstractArchiveReader* reader;
     QnAbstractArchiveDelegate* oldDelegate;
     QnlTimeSource* cam;
     bool enabled;
+    bool buffering;
 };
 
 class QnArchiveSyncPlayWrapper::QnArchiveSyncPlayWrapperPrivate
@@ -34,6 +36,7 @@ public:
         blockPausePlaySignal = false;
         blockSetSpeedSignal = false;
         lastJumpTime = DATETIME_NOW;
+        inJumpCount = 0;
         //maxAllowedDate.clear();
         //minAllowedDate.clear();
         speed = 1.0;
@@ -49,8 +52,6 @@ public:
     QList<ReaderInfo> readers;
     mutable QMutex timeMutex;
 
-    mutable QMutex syncMutex;
-
     bool blockSingleShotSignal;
     bool blockJumpSignal;
     bool blockPausePlaySignal;
@@ -58,6 +59,7 @@ public:
     bool blockPrevFrameSignal;
     bool blockNextFrameSignal;
     qint64 lastJumpTime;
+    int inJumpCount;
     QTime timer;
     double speed;
     //QMap<QnlTimeSource*,qint64> maxAllowedDate;
@@ -261,20 +263,22 @@ void QnArchiveSyncPlayWrapper::onBeforeJump(qint64 mksec, bool makeshot)
         return;
     d->blockJumpSignal = true;
 
-    {
-        QMutexLocker lock(&d->timeMutex);
-        d->lastJumpTime = mksec;
-        cl_log.log("delegateJump=", QDateTime::fromMSecsSinceEpoch(mksec/1000).toString("hh:mm:ss.zzz"), cl_logALWAYS);
-        //d->maxAllowedDate.clear();
-        //d->minAllowedDate.clear();
-        d->timer.restart();
-    }    
+    QMutexLocker lock(&d->timeMutex);
+    d->lastJumpTime = mksec;
+    //if (d->lastJumpTime == DATETIME_NOW && d->speed < 0)
+    //    d->lastJumpTime = QDateTime::currentDateTime().toMSecsSinceEpoch()*1000; // leave live mode
+    d->inJumpCount = 1;
+    cl_log.log("delegateJump=", QDateTime::fromMSecsSinceEpoch(mksec/1000).toString("hh:mm:ss.zzz"), cl_logALWAYS);
+    //d->maxAllowedDate.clear();
+    //d->minAllowedDate.clear();
+    d->timer.restart();
     foreach(ReaderInfo info, d->readers)
     {
         QnSyncPlayArchiveDelegate* syncDelegate = static_cast<QnSyncPlayArchiveDelegate*> (info.reader->getArchiveDelegate());
         if (info.reader != sender() && info.enabled)
         {
             syncDelegate->jumpToPreviousFrame(mksec, makeshot);
+            d->inJumpCount++;
         }
     }
     d->blockJumpSignal = false;
@@ -282,6 +286,11 @@ void QnArchiveSyncPlayWrapper::onBeforeJump(qint64 mksec, bool makeshot)
 
 void QnArchiveSyncPlayWrapper::onJumpOccured(qint64 mksec)
 {
+    Q_D(QnArchiveSyncPlayWrapper);
+    QMutexLocker lock(&d->timeMutex);
+    d->inJumpCount--;
+    if (d->inJumpCount < 1)
+        d->timer.restart();
 }
 
 qint64 QnArchiveSyncPlayWrapper::minTime() const
@@ -329,7 +338,7 @@ void QnArchiveSyncPlayWrapper::removeArchiveReader(QnAbstractArchiveReader* read
 void QnArchiveSyncPlayWrapper::erase(QnAbstractArchiveDelegate* value)
 {
     Q_D(QnArchiveSyncPlayWrapper);
-    QMutexLocker lock(&d->syncMutex);
+    QMutexLocker lock(&d->timeMutex);
     for (QList<ReaderInfo>::iterator i = d->readers.begin(); i < d->readers.end(); ++i)
     {
         if (i->reader->getArchiveDelegate() == value)
@@ -342,9 +351,40 @@ void QnArchiveSyncPlayWrapper::erase(QnAbstractArchiveDelegate* value)
     }
 }
 
+void QnArchiveSyncPlayWrapper::onBufferingStarted(QnlTimeSource* source)
+{
+    Q_D(QnArchiveSyncPlayWrapper);
+
+    QMutexLocker lock(&d->timeMutex);
+    for (QList<ReaderInfo>::iterator i = d->readers.begin(); i < d->readers.end(); ++i)
+    {
+        if (i->cam == source)
+        {
+            i->buffering = true;
+            break;
+        }
+    }
+}
+
+void QnArchiveSyncPlayWrapper::onBufferingFinished(QnlTimeSource* source)
+{
+    Q_D(QnArchiveSyncPlayWrapper);
+
+    QMutexLocker lock(&d->timeMutex);
+    for (QList<ReaderInfo>::iterator i = d->readers.begin(); i < d->readers.end(); ++i)
+    {
+        if (i->cam == source)
+        {
+            i->buffering = false;
+            d->timer.restart();
+            break;
+        }
+    }
+}
+
+/*
 void QnArchiveSyncPlayWrapper::onAvailableTime(QnlTimeSource* source, qint64 time)
 {
-    /*
     Q_D(QnArchiveSyncPlayWrapper);
 
     if (time != AV_NOPTS_VALUE)
@@ -366,8 +406,8 @@ void QnArchiveSyncPlayWrapper::onAvailableTime(QnlTimeSource* source, qint64 tim
                 *itr = qMin(*itr, time);
         }
     }
-    */
 }
+*/
 
 qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
 {
@@ -375,6 +415,14 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
     QMutexLocker lock(&d->timeMutex);
     if (d->lastJumpTime == DATETIME_NOW)
         return DATETIME_NOW;
+
+    if (d->inJumpCount > 0)
+        return d->lastJumpTime;
+
+    foreach(const ReaderInfo& info, d->readers) {
+        if (info.enabled && info.buffering) 
+            return d->lastJumpTime;
+    }
 
     qint64 expectedTime = d->lastJumpTime + d->timer.elapsed()*1000 * d->speed;
 

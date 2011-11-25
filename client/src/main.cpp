@@ -237,7 +237,7 @@ int main(int argc, char *argv[])
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
     
 #ifdef Q_OS_WIN
-    QnResourceDiscoveryManager::instance().addDeviceServer(&DesktopDeviceServer::instance());
+//    QnResourceDiscoveryManager::instance().addDeviceServer(&DesktopDeviceServer::instance());
 #endif // Q_OS_WIN
 
 #ifndef STANDALONE_MODE

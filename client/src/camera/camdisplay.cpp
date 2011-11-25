@@ -90,7 +90,8 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_lastFrameDisplayed(CLVideoStreamDisplay::Status_Displayed),
       m_realTimeHurryUp(0),
       m_extTimeSrc(0),
-      m_useMtDecoding(false)
+      m_useMtDecoding(false),
+      m_buffering(false)
       //m_nextTime(AV_NOPTS_VALUE),
       //m_firstDelayCycle(true)
 {
@@ -231,7 +232,7 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         if (useSync(vd)) 
         {
             qint64 displayedTime = getCurrentTime();
-            if (displayedTime != AV_NOPTS_VALUE && m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed)
+            if (!m_buffering && displayedTime != AV_NOPTS_VALUE && m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed)
             {
                 QTime t;
                 t.start();
@@ -355,6 +356,10 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         }
 
         m_lastFrameDisplayed = m_display[channel]->dispay(vd, draw, scaleFactor);
+        if (m_buffering && m_extTimeSrc && m_lastFrameDisplayed != CLVideoStreamDisplay::Status_Buffered) {
+            m_buffering = false;
+            m_extTimeSrc->onBufferingFinished(this);
+        }
 
         if (!sleep)
             m_displayLasts = displayTime.elapsed(); // this is how long would i take to draw frame.
@@ -374,6 +379,9 @@ void CLCamDisplay::onBeforeJump(qint64 time, bool makeshot)
     QMutexLocker lock(&m_timeMutex);
     m_display[0]->blockTimeValue(time);
     m_afterJump = true;
+    m_buffering = true;
+    if (m_extTimeSrc)
+        m_extTimeSrc->onBufferingStarted(this);
     m_lastDisplayedVideoTime = AV_NOPTS_VALUE;
 }
 

@@ -868,10 +868,11 @@ CLGLRenderer::RenderStatus CLGLRenderer::paintEvent(const QRectF &r)
             m_videoWidth = curImg->width;
             m_videoHeight = curImg->height;
             updateTexture();
-            m_timeText.clear();
-            if (curImg->pkt_dts > 1000000ll * 3600*24)
+            if (curImg->pkt_dts != AV_NOPTS_VALUE)
             {
-                m_timeText = QDateTime::fromMSecsSinceEpoch(curImg->pkt_dts/1000).toString("hh:mm:ss.zzz");
+                m_timeText.clear();
+                if (curImg->pkt_dts > 1000000ll * 3600*24)
+                    m_timeText = QDateTime::fromMSecsSinceEpoch(curImg->pkt_dts/1000).toString("hh:mm:ss.zzz");
             }
 
             result = RENDERED_NEW_FRAME;
