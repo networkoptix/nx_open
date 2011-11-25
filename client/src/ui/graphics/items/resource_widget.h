@@ -172,6 +172,7 @@ protected:
     virtual QPolygonF provideShape() override;
 
     virtual QSizeF constrainedSize(const QSizeF constraint) const override;
+    virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint) const override;
 
     void updateShadowZ();
     void updateShadowPos();

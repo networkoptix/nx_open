@@ -25,6 +25,9 @@ public:
      * Given a size constraint, it returns a preferred size that satisfies it. 
      * The result of this function must not exceed \a constraint, but it need 
      * not be equal to it.
+     * 
+     * Note that it is user's responsibility to make sure that minimal size hint
+     * satisfies the constraint.
      *
      * \param constraint                Constraint for the result. Must be a valid size.
      * \returns                         Preferred size for the given constraint.

@@ -60,14 +60,15 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
 
     /* Set up buttons layout. */
     m_buttonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    m_buttonsLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
     m_buttonsLayout->insertStretch(0, 0x1000); /* Set large enough stretch for the item to be placed in right end of the layout. */
     QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
+    layout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
     layout->addItem(m_buttonsLayout);
     layout->addStretch(0x1000);
     setLayout(layout);
 
     /* Set up video rendering. */
-#if 1
     m_display = item->createDisplay(this);
     m_videoLayout = m_display->videoLayout();
     m_channelCount = m_videoLayout->numberOfChannels();
@@ -77,13 +78,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     m_display->addRenderer(m_renderer);
 
     m_display->start();
-#else
-    m_channelCount = 1;
-    m_display = NULL;
-    m_videoLayout = NULL;
-    m_renderer = NULL;
-    m_display = NULL;
-#endif
 }
 
 QnResourceWidget::~QnResourceWidget() {
@@ -164,7 +158,7 @@ void QnResourceWidget::setGeometry(const QRectF &geometry) {
     /* Unfortunately, widgets with constant aspect ratio cannot be implemented
      * using size hints. So here is one of the workarounds. */
     
-#if 1
+#if 0
     if(!hasAspectRatio()) {
         base_type::setGeometry(geometry);
         return;
@@ -209,8 +203,19 @@ QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint) const {
     return expanded(m_aspectRatio, constraint, Qt::KeepAspectRatio);
 }
 
+QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const {
+    QSizeF result = base_type::sizeHint(which, constraint);
+
+    if(!hasAspectRatio())
+        return result;
+
+    if(which == Qt::MinimumSize)
+        return expanded(m_aspectRatio, result, Qt::KeepAspectRatioByExpanding);
+
+    return result;
+}
+
 void QnResourceWidget::at_sourceSizeChanged(const QSize &size) {
-#if 1
     qreal oldAspectRatio = m_aspectRatio;
     qreal newAspectRatio = static_cast<qreal>(size.width() * m_videoLayout->width()) / (size.height() * m_videoLayout->height());
     if(qFuzzyCompare(oldAspectRatio, newAspectRatio))
@@ -218,10 +223,11 @@ void QnResourceWidget::at_sourceSizeChanged(const QSize &size) {
 
     QRectF enclosingGeometry = this->enclosingGeometry();
     m_aspectRatio = newAspectRatio;
+
+    updateGeometry(); /* Discard cached size hints. */
     setGeometry(expanded(m_aspectRatio, enclosingGeometry, Qt::KeepAspectRatio));
 
     emit aspectRatioChanged(oldAspectRatio, newAspectRatio);
-#endif
 }
 
 QVariant QnResourceWidget::itemChange(GraphicsItemChange change, const QVariant &value) {
@@ -259,7 +265,6 @@ void QnResourceWidget::resizeEvent(QGraphicsSceneResizeEvent *event) override {
 }
 
 QRectF QnResourceWidget::channelRect(int channel) const {
-#if 1
     if (m_channelCount == 1) 
         return QRectF(QPointF(0.0, 0.0), size());
 
@@ -273,9 +278,6 @@ QRectF QnResourceWidget::channelRect(int channel) const {
         w, 
         h
     );
-#else
-    return QRectF(QPointF(0.0, 0.0), size());
-#endif
 }
 
 void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/) {
@@ -285,7 +287,6 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     }
 
     /* Update screen size of a single channel. */
-#if 1
     QSizeF itemScreenSize = painter->combinedTransform().mapRect(boundingRect()).size();
     QSize channelScreenSize = QSizeF(itemScreenSize.width() / m_videoLayout->width(), itemScreenSize.height() / m_videoLayout->height()).toSize();
     if(channelScreenSize != m_channelScreenSize) {
@@ -301,11 +302,6 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         drawLoadingProgress(status, rect);
     }
     painter->endNativePainting();
-#else 
-    painter->beginNativePainting();
-    drawLoadingProgress(QnRenderStatus::CANNOT_RENDER, rect());
-    painter->endNativePainting();
-#endif
 }
 
 void QnResourceWidget::drawLoadingProgress(QnRenderStatus::RenderStatus status, const QRectF &rect) const {
