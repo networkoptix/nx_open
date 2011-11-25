@@ -30,17 +30,17 @@
 #include "workbench_item.h"
 #include "workbench_grid_mapper.h"
 #include "workbench.h"
-#include "workbench_manager.h"
+#include "workbench_display.h"
 
 
 #include <ui/videoitem/navigationitem.h>
 #include <camera/camdisplay.h>
 
 
-QnWorkbenchController::QnWorkbenchController(QnWorkbenchManager *synchronizer, QObject *parent):
+QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObject *parent):
     QObject(parent),
-    m_synchronizer(synchronizer),
-    m_manager(synchronizer->instrumentManager()),
+    m_display(display),
+    m_manager(display->instrumentManager()),
     m_focusedItem(NULL)
 {
     /* Install and configure instruments. */
@@ -52,10 +52,10 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchManager *synchronizer, Q
     m_resizingInstrument = new ResizingInstrument(this);
     m_archiveDropInstrument = new ArchiveDropInstrument(this, this);
     m_uiElementsInstrument = new UiElementsInstrument(this);
-    BoundingInstrument *boundingInstrument = m_synchronizer->boundingInstrument();
+    BoundingInstrument *boundingInstrument = m_display->boundingInstrument();
     m_dragInstrument = new DragInstrument(this);
 
-    m_rubberBandInstrument->setRubberBandZValue(m_synchronizer->layerZValue(QnWorkbenchManager::EFFECTS_LAYER));
+    m_rubberBandInstrument->setRubberBandZValue(m_display->layerZValue(QnWorkbenchDisplay::EFFECTS_LAYER));
 
     QSet<QEvent::Type> mouseEventTypes = Instrument::makeSet(
         QEvent::GraphicsSceneMousePress,
@@ -96,21 +96,21 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchManager *synchronizer, Q
     connect(m_resizingInstrument,       SIGNAL(resizingFinished(QGraphicsView *, QGraphicsWidget *)),           this,                   SLOT(at_resizingFinished(QGraphicsView *, QGraphicsWidget *)));
     connect(m_handScrollInstrument,     SIGNAL(scrollingStarted(QGraphicsView *)),                              boundingInstrument,     SLOT(dontEnforcePosition(QGraphicsView *)));
     connect(m_handScrollInstrument,     SIGNAL(scrollingFinished(QGraphicsView *)),                             boundingInstrument,     SLOT(enforcePosition(QGraphicsView *)));
-    connect(m_synchronizer,             SIGNAL(viewportGrabbed()),                                              m_handScrollInstrument, SLOT(recursiveDisable()));
-    connect(m_synchronizer,             SIGNAL(viewportUngrabbed()),                                            m_handScrollInstrument, SLOT(recursiveEnable()));
-    connect(m_synchronizer,             SIGNAL(viewportGrabbed()),                                              m_wheelZoomInstrument,  SLOT(recursiveDisable()));
-    connect(m_synchronizer,             SIGNAL(viewportUngrabbed()),                                            m_wheelZoomInstrument,  SLOT(recursiveEnable()));
+    connect(m_display,             SIGNAL(viewportGrabbed()),                                              m_handScrollInstrument, SLOT(recursiveDisable()));
+    connect(m_display,             SIGNAL(viewportUngrabbed()),                                            m_handScrollInstrument, SLOT(recursiveEnable()));
+    connect(m_display,             SIGNAL(viewportGrabbed()),                                              m_wheelZoomInstrument,  SLOT(recursiveDisable()));
+    connect(m_display,             SIGNAL(viewportUngrabbed()),                                            m_wheelZoomInstrument,  SLOT(recursiveEnable()));
     connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *)),     m_dragInstrument,       SLOT(recursiveDisable()));
     connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *)),    m_dragInstrument,       SLOT(recursiveEnable()));
     connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *)),     m_rubberBandInstrument, SLOT(recursiveDisable()));
     connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *)),    m_rubberBandInstrument, SLOT(recursiveEnable()));
 
-    connect(m_synchronizer,             SIGNAL(viewportGrabbed()),                                              this,                   SLOT(at_viewportGrabbed()));
-    connect(m_synchronizer,             SIGNAL(viewportUngrabbed()),                                            this,                   SLOT(at_viewportUngrabbed()));
+    connect(m_display,             SIGNAL(viewportGrabbed()),                                              this,                   SLOT(at_viewportGrabbed()));
+    connect(m_display,             SIGNAL(viewportUngrabbed()),                                            this,                   SLOT(at_viewportUngrabbed()));
 
     /* Create controls. */
     QGraphicsWidget *controlsWidget = m_uiElementsInstrument->widget();
-    m_synchronizer->setLayer(controlsWidget, QnWorkbenchManager::UI_ELEMENTS_LAYER);
+    m_display->setLayer(controlsWidget, QnWorkbenchDisplay::UI_ELEMENTS_LAYER);
 
     QGraphicsLinearLayout *verticalLayout = new QGraphicsLinearLayout(Qt::Vertical);
     verticalLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
@@ -132,16 +132,20 @@ QnWorkbenchController::~QnWorkbenchController() {
     return;
 }
 
+QnWorkbenchDisplay *QnWorkbenchController::display() const {
+    return m_display;
+}
+
 QnWorkbench *QnWorkbenchController::workbench() const {
-    return m_synchronizer->workbench();
+    return m_display->workbench();
 }
 
 QnWorkbenchLayout *QnWorkbenchController::layout() const {
-    return m_synchronizer->workbench()->layout();
+    return m_display->workbench()->layout();
 }
 
 QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
-    return m_synchronizer->workbench()->mapper();
+    return m_display->workbench()->mapper();
 }
 
 void QnWorkbenchController::drop(const QUrl &url, const QPoint &gridPos, bool findAccepted) {
@@ -216,7 +220,7 @@ void QnWorkbenchController::updateGeometryDelta(QnResourceWidget *widget) {
 void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget *item) {
     qDebug("RESIZING STARTED");
 
-    m_synchronizer->bringToFront(item);
+    m_display->bringToFront(item);
 }
 
 void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget *item) {
@@ -234,15 +238,15 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget
         updateGeometryDelta(widget);
     }
 
-    m_synchronizer->synchronize(widget->item());
+    m_display->synchronize(widget->item());
 }
 
 void QnWorkbenchController::at_draggingStarted(QGraphicsView *, QList<QGraphicsItem *> items) {
     qDebug("DRAGGING STARTED");
 
     /* Bring to front preserving relative order. */
-    m_synchronizer->bringToFront(items);
-    m_synchronizer->setLayer(items, QnWorkbenchManager::FRONT_LAYER);
+    m_display->bringToFront(items);
+    m_display->setLayer(items, QnWorkbenchDisplay::FRONT_LAYER);
 }
 
 void QnWorkbenchController::at_draggingFinished(QGraphicsView *view, QList<QGraphicsItem *> items) {
@@ -324,7 +328,7 @@ void QnWorkbenchController::at_draggingFinished(QGraphicsView *view, QList<QGrap
 
     /* Re-sync everything. */
     foreach(QnWorkbenchItem *model, models)
-        m_synchronizer->synchronize(model);
+        m_display->synchronize(model);
 }
 
 void QnWorkbenchController::at_item_clicked(QGraphicsView *, QGraphicsItem *item) {
@@ -348,8 +352,8 @@ void QnWorkbenchController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem
 
     QnWorkbenchItem *model = widget->item();
     if(workbench()->zoomedItem() == model) {
-        QRectF viewportGeometry = m_synchronizer->viewportGeometry();
-        QRectF zoomedItemGeometry = m_synchronizer->itemGeometry(workbench()->zoomedItem());
+        QRectF viewportGeometry = m_display->viewportGeometry();
+        QRectF zoomedItemGeometry = m_display->itemGeometry(workbench()->zoomedItem());
 
         if(contains(zoomedItemGeometry.size(), viewportGeometry.size()) && !qFuzzyCompare(viewportGeometry, zoomedItemGeometry)) {
             workbench()->setZoomedItem(NULL);
@@ -375,7 +379,7 @@ void QnWorkbenchController::at_scene_doubleClicked(QGraphicsView *) {
         return;
 
     workbench()->setZoomedItem(NULL);
-    m_synchronizer->fitInView();
+    m_display->fitInView();
 }
 
 void QnWorkbenchController::at_viewportGrabbed() {
@@ -391,15 +395,15 @@ void QnWorkbenchController::at_workbench_focusedItemChanged() {
     m_focusedItem = workbench()->focusedItem();
 
     /* Stop audio on previously focused item. */
-    CLCamDisplay *oldCamDisplay = m_synchronizer->camDisplay(oldFocusedItem);
+    CLCamDisplay *oldCamDisplay = m_display->camDisplay(oldFocusedItem);
     if(oldCamDisplay != NULL)
         oldCamDisplay->playAudio(false);
 
     /* Update navigation item's target. */
-    m_navigationItem->setVideoCamera(m_synchronizer->camera(m_focusedItem));
+    m_navigationItem->setVideoCamera(m_display->camera(m_focusedItem));
 
     /* Play audio on newly focused item. */
-    CLCamDisplay *newCamDisplay = m_synchronizer->camDisplay(m_focusedItem);
+    CLCamDisplay *newCamDisplay = m_display->camDisplay(m_focusedItem);
     if(newCamDisplay != NULL)
         newCamDisplay->playAudio(true);
 }

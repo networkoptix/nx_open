@@ -21,7 +21,7 @@
 #include <ui/workbench/workbench_controller.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_layout.h>
-#include <ui/workbench/workbench_manager.h>
+#include <ui/workbench/workbench_display.h>
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
 #include "file_processor.h"
@@ -70,7 +70,7 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     workbench->mapper()->setCellSize(defaultCellSize);
     workbench->mapper()->setSpacing(defaultSpacing);
 
-    QnWorkbenchManager *display = new QnWorkbenchManager(workbench, this);
+    QnWorkbenchDisplay *display = new QnWorkbenchDisplay(workbench, this);
     display->setScene(scene);
     display->setView(view);
 

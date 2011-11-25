@@ -21,7 +21,7 @@ class UiElementsInstrument;
 
 class NavigationItem;
 
-class QnWorkbenchManager;
+class QnWorkbenchDisplay;
 class QnWorkbenchLayout;
 class QnWorkbench;
 class QnResourceWidget;
@@ -37,9 +37,11 @@ class QnWorkbenchGridMapper;
 class QnWorkbenchController: public QObject, protected QnSceneUtility {
     Q_OBJECT;
 public:
-    QnWorkbenchController(QnWorkbenchManager *synchronizer, QObject *parent = NULL);
+    QnWorkbenchController(QnWorkbenchDisplay *display, QObject *parent = NULL);
 
     virtual ~QnWorkbenchController();
+
+    QnWorkbenchDisplay *display() const;
 
     QnWorkbench *workbench() const;
 
@@ -77,7 +79,7 @@ protected slots:
 
 private:
     /** Display synchronizer. */
-    QnWorkbenchManager *m_synchronizer;
+    QnWorkbenchDisplay *m_display;
 
     /** Instrument manager for the scene. */ 
     InstrumentManager *m_manager;

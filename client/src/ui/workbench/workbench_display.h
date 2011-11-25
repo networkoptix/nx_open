@@ -33,7 +33,7 @@ class CLCamDisplay;
  * 
  * It presents some low-level functions for viewport and item manipulation.
  */
-class QnWorkbenchManager: public QObject, protected AnimationTimerListener, protected QnSceneUtility {
+class QnWorkbenchDisplay: public QObject, protected AnimationTimerListener, protected QnSceneUtility {
     Q_OBJECT;
 public:
     /**
@@ -58,12 +58,12 @@ public:
      * \param workbench                 Workbench to manage.
      * \param parent                    Parent object for this workbench manager.
      */
-    QnWorkbenchManager(QnWorkbench *workbench, QObject *parent = NULL);
+    QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent = NULL);
 
     /**
      * Virtual destructor.
      */
-    virtual ~QnWorkbenchManager();
+    virtual ~QnWorkbenchDisplay();
 
     /**
      * \returns                         Instrument manager owned by this workbench manager. 
