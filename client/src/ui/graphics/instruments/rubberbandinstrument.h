@@ -32,9 +32,9 @@ protected:
     virtual bool mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) override;
     virtual bool paintEvent(QWidget *viewport, QPaintEvent *event) override;
 
-    virtual void startDrag() override;
-    virtual void drag() override;
-    virtual void finishDrag() override;
+    virtual void startDrag(DragInfo *info) override;
+    virtual void dragMove(DragInfo *info) override;
+    virtual void finishDrag(DragInfo *info) override;
 
     static QSet<QGraphicsItem *> toSet(QList<QGraphicsItem *> items);
 

@@ -239,13 +239,13 @@ bool RubberBandInstrument::paintEvent(QWidget *viewport, QPaintEvent *event) {
     rubberBand()->setViewportTransform(sceneToViewport);
 
     /* Scene mouse position may have changed as a result of transform change. */
-    processor()->paintEvent(viewport, event);
+    dragProcessor()->paintEvent(viewport, event);
 
     return false;
 }
 
 bool RubberBandInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
-    if(!processor()->isWaiting())
+    if(!dragProcessor()->isWaiting())
         return false;
     
     QGraphicsView *view = this->view(viewport);
@@ -268,7 +268,7 @@ bool RubberBandInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event
     m_originallySelected = toSet(scene()->selectedItems());
     m_protectSelection = !m_originallySelected.empty();
 
-    processor()->mousePressEvent(viewport, event);
+    dragProcessor()->mousePressEvent(viewport, event);
         
     event->accept();
     return false;
@@ -291,37 +291,37 @@ void RubberBandInstrument::at_scene_selectionChanged() {
 }
 
 bool RubberBandInstrument::mouseMoveEvent(QWidget *viewport, QMouseEvent *event) {
-    processor()->mouseMoveEvent(viewport, event);
+    dragProcessor()->mouseMoveEvent(viewport, event);
 
     event->accept();
     return false;
 }
 
 bool RubberBandInstrument::mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) {
-    processor()->mouseReleaseEvent(viewport, event);
+    dragProcessor()->mouseReleaseEvent(viewport, event);
 
     event->accept();
     return false;
 }
 
-void RubberBandInstrument::startDrag() {
-    rubberBand()->setViewport(processor()->view()->viewport());
-    rubberBand()->setViewportTransform(processor()->view()->viewportTransform());
-    rubberBand()->setOrigin(processor()->mousePressScenePos());
+void RubberBandInstrument::startDrag(DragInfo *info) {
+    rubberBand()->setViewport(info->view()->viewport());
+    rubberBand()->setViewportTransform(info->view()->viewportTransform());
+    rubberBand()->setOrigin(info->mousePressScenePos());
 }
 
-void RubberBandInstrument::drag() {
-    QGraphicsView *view = processor()->view();
+void RubberBandInstrument::dragMove(DragInfo *info) {
+    QGraphicsView *view = info->view();
 
     /* Update rubber band corner. */
-    rubberBand()->setCorner(processor()->mouseScenePos());
+    rubberBand()->setCorner(info->mouseScenePos());
 
     /* Update selection. */
     QPainterPath selectionArea;
     selectionArea.addPolygon(view->mapToScene(rubberBand()->rubberBandRect()));
     selectionArea.closeSubpath();
 
-    if (processor()->modifiers() & Qt::ShiftModifier) {
+    if (info->modifiers() & Qt::ShiftModifier) {
         /* TODO: this can be implemented more efficiently using intersection of several regions. */
         QSet<QGraphicsItem *> newlySelected = toSet(scene()->items(selectionArea, view->rubberBandSelectionMode(), Qt::DescendingOrder, view->viewportTransform()));
 
@@ -338,7 +338,7 @@ void RubberBandInstrument::drag() {
     }
 }
 
-void RubberBandInstrument::finishDrag() {
+void RubberBandInstrument::finishDrag(DragInfo *) {
     rubberBand()->setViewport(NULL);
 }
 

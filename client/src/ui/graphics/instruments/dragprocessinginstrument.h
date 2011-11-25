@@ -21,7 +21,7 @@ public:
 
 protected:
     virtual void aboutToBeDisabledNotify() override {
-        processor()->reset();
+        dragProcessor()->reset();
     }
 
 private:

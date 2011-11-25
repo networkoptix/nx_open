@@ -1,4 +1,5 @@
 #include "resizinginstrument.h"
+#include <QGraphicsWidget>
 #include <ui/common/constrained_resizable.h>
 
 namespace {
@@ -40,7 +41,7 @@ ResizingInstrument::~ResizingInstrument() {
 }
 
 bool ResizingInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
-    if(!processor()->isWaiting())
+    if(!dragProcessor()->isWaiting())
         return false;
     
     QGraphicsView *view = this->view(viewport);
@@ -68,53 +69,53 @@ bool ResizingInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
     m_widget = widget;
     m_resizable = dynamic_cast<ConstrainedResizable *>(widget);
 
-    processor()->mousePressEvent(viewport, event);
+    dragProcessor()->mousePressEvent(viewport, event);
 
     event->accept();
     return true; /* We don't want default event handlers to kick in. */
 }
 
 bool ResizingInstrument::mouseMoveEvent(QWidget *viewport, QMouseEvent *event) {
-    processor()->mouseMoveEvent(viewport, event);
+    dragProcessor()->mouseMoveEvent(viewport, event);
     
     event->accept();
     return false;
 }
 
 bool ResizingInstrument::mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) {
-    processor()->mouseReleaseEvent(viewport, event);
+    dragProcessor()->mouseReleaseEvent(viewport, event);
 
     event->accept();
     return false;
 }
 
 bool ResizingInstrument::paintEvent(QWidget *viewport, QPaintEvent *event) {
-    processor()->paintEvent(viewport, event);
+    dragProcessor()->paintEvent(viewport, event);
 
     return false;
 }
 
-void ResizingInstrument::startDragProcess() {
-    emit resizingProcessStarted(processor()->view(), m_widget.data());
+void ResizingInstrument::startDragProcess(DragInfo *info) {
+    emit resizingProcessStarted(info->view(), m_widget.data());
 }
 
-void ResizingInstrument::startDrag() {
+void ResizingInstrument::startDrag(DragInfo *info) {
     m_resizingStartedEmitted = false;
 
     if(m_widget.isNull()) {
         /** Whoops, already destroyed. */
-        processor()->reset();
+        dragProcessor()->reset();
         return;
     }
 
-    emit resizingStarted(processor()->view(), m_widget.data());
+    emit resizingStarted(info->view(), m_widget.data());
     m_resizingStartedEmitted = true;
 }
 
-void ResizingInstrument::drag() {
+void ResizingInstrument::dragMove(DragInfo *info) {
     /* Stop resizing if widget was destroyed. */
     if(m_widget.isNull()) {
-        processor()->reset();
+        dragProcessor()->reset();
         return;
     }
 
@@ -123,7 +124,7 @@ void ResizingInstrument::drag() {
     const QRectF &startGeometry = m_startGeometry;
 
     /* Calculate new geometry. */
-    QLineF delta(widget->mapFromScene(processor()->mousePressScenePos()), widget->mapFromScene(processor()->mouseScenePos()));
+    QLineF delta(widget->mapFromScene(info->mousePressScenePos()), widget->mapFromScene(info->mouseScenePos()));
     QLineF parentDelta(widget->mapToParent(delta.p1()), widget->mapToParent(delta.p2()));
     QLineF parentXDelta(widget->mapToParent(QPointF(delta.p1().x(), 0)), widget->mapToParent(QPointF(delta.p2().x(), 0)));
     QLineF parentYDelta(widget->mapToParent(QPointF(0, delta.p1().y())), widget->mapToParent(QPointF(0, delta.p2().y())));
@@ -248,14 +249,14 @@ void ResizingInstrument::drag() {
     widget->setGeometry(newGeometry);
 }
 
-void ResizingInstrument::finishDrag() {
+void ResizingInstrument::finishDrag(DragInfo *info) {
     if(m_resizingStartedEmitted)
-        emit resizingFinished(processor()->view(), m_widget.data());
+        emit resizingFinished(info->view(), m_widget.data());
 
     m_widget.clear();
     m_resizable = NULL;
 }
 
-void ResizingInstrument::finishDragProcess() {
-    emit resizingProcessFinished(processor()->view(), m_widget.data());
+void ResizingInstrument::finishDragProcess(DragInfo *info) {
+    emit resizingProcessFinished(info->view(), m_widget.data());
 }

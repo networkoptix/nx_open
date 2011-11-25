@@ -8,10 +8,10 @@ ClickInstrument::ClickInstrument(Qt::MouseButton button, WatchedType watchedType
         makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease, QEvent::GraphicsSceneMouseDoubleClick),
         parent
     ),
-    m_button(button)
-{
-    finishDragProcess();
-}
+    m_button(button),
+    m_isClick(false),
+    m_isDoubleClick(false)
+{}
 
 ClickInstrument::~ClickInstrument() {
     ensureUninstalled();
@@ -25,7 +25,7 @@ bool ClickInstrument::mousePressEventInternal(T *object, QGraphicsSceneMouseEven
     m_isClick = true;
     m_isDoubleClick = false;
 
-    processor()->mousePressEvent(object, event);
+    dragProcessor()->mousePressEvent(object, event);
     return false;
 }
 
@@ -37,7 +37,7 @@ bool ClickInstrument::mouseDoubleClickEventInternal(T *object, QGraphicsSceneMou
     m_isClick = true;
     m_isDoubleClick = true;
 
-    processor()->mousePressEvent(object, event);
+    dragProcessor()->mousePressEvent(object, event);
     return false;
 }
 
@@ -46,7 +46,7 @@ bool ClickInstrument::mouseMoveEventInternal(T *object, QGraphicsSceneMouseEvent
     if (!m_isClick)
         return false;
 
-    processor()->mouseMoveEvent(object, event);
+    dragProcessor()->mouseMoveEvent(object, event);
     return false;
 }
 
@@ -68,7 +68,7 @@ bool ClickInstrument::mouseReleaseEventInternal(T *object, QGraphicsSceneMouseEv
     m_isClick = false;
     m_isDoubleClick = false;
 
-    processor()->mouseReleaseEvent(object, event);
+    dragProcessor()->mouseReleaseEvent(object, event);
     return false;
 }
 
@@ -88,11 +88,11 @@ void ClickInstrument::emitSignals(QGraphicsView *view, QGraphicsScene *, QGraphi
     }
 }
 
-void ClickInstrument::startDrag() {
-    processor()->reset();
+void ClickInstrument::startDrag(DragInfo *) {
+    dragProcessor()->reset();
 }
 
-void ClickInstrument::finishDragProcess() {
+void ClickInstrument::finishDragProcess(DragInfo *) {
     m_isClick = false;
     m_isDoubleClick = false;
 }

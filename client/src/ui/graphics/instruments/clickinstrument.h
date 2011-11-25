@@ -41,8 +41,8 @@ protected:
 
     virtual bool registeredNotify(QGraphicsItem *) override { return true; }
 
-    virtual void startDrag() override;
-    virtual void finishDragProcess() override;
+    virtual void startDrag(DragInfo *info) override;
+    virtual void finishDragProcess(DragInfo *info) override;
 
 private:
     template<class T>

@@ -44,11 +44,11 @@ protected:
     virtual bool mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) override;
     virtual bool paintEvent(QWidget *viewport, QPaintEvent *event) override;
 
-    virtual void startDragProcess() override;
-    virtual void startDrag() override;
-    virtual void drag() override;
-    virtual void finishDrag() override;
-    virtual void finishDragProcess() override;
+    virtual void startDragProcess(DragInfo *info) override;
+    virtual void startDrag(DragInfo *info) override;
+    virtual void dragMove(DragInfo *info) override;
+    virtual void finishDrag(DragInfo *info) override;
+    virtual void finishDragProcess(DragInfo *info) override;
 
 private:
     QRectF m_startGeometry;
