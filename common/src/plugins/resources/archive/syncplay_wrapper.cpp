@@ -265,6 +265,8 @@ void QnArchiveSyncPlayWrapper::onBeforeJump(qint64 mksec, bool makeshot)
 
     QMutexLocker lock(&d->timeMutex);
     d->lastJumpTime = mksec;
+    //if (d->lastJumpTime == DATETIME_NOW && d->speed < 0)
+    //    d->lastJumpTime = QDateTime::currentDateTime().toMSecsSinceEpoch()*1000; // leave live mode
     d->inJumpCount = 1;
     cl_log.log("delegateJump=", QDateTime::fromMSecsSinceEpoch(mksec/1000).toString("hh:mm:ss.zzz"), cl_logALWAYS);
     //d->maxAllowedDate.clear();
