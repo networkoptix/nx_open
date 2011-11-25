@@ -27,7 +27,7 @@ QnDisplayWidgetRenderer::~QnDisplayWidgetRenderer() {
     m_channelRenderers.clear();
 }
 
-bool QnDisplayWidgetRenderer::paint(int channel, const QRectF &rect) {
+QnDisplayWidgetRenderer::RenderStatus QnDisplayWidgetRenderer::paint(int channel, const QRectF &rect) {
     checkThread(false);
 
     return m_channelRenderers[channel]->paintEvent(rect);

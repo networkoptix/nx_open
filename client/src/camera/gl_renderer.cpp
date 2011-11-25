@@ -843,7 +843,7 @@ static inline QRect getTextureRect(float textureWidth, float textureHeight,
 }
 #endif
 
-bool CLGLRenderer::paintEvent(const QRectF &r)
+CLGLRenderer::RenderStatus CLGLRenderer::paintEvent(const QRectF &r)
 {
     glPushAttrib(GL_ALL_ATTRIB_BITS);
 
@@ -858,6 +858,7 @@ bool CLGLRenderer::paintEvent(const QRectF &r)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
+    RenderStatus result;
 
     CLVideoDecoderOutput* curImg;
     {
@@ -872,14 +873,29 @@ bool CLGLRenderer::paintEvent(const QRectF &r)
             {
                 m_timeText = QDateTime::fromMSecsSinceEpoch(curImg->pkt_dts/1000).toString("hh:mm:ss.zzz");
             }
+
+            result = RENDERED_NEW_FRAME;
+        } 
+        else 
+        {
+            result = RENDERED_OLD_FRAME;
         }
     }
+
     bool draw = m_videoWidth <= getMaxTextureSize() && m_videoHeight <= getMaxTextureSize();
-    if (draw && m_videoWidth > 0 && m_videoHeight > 0)
+    if(!draw) 
+    {
+        result = CANNOT_RENDER;
+    } 
+    else if(m_videoWidth > 0 && m_videoHeight > 0)
     {
         QRectF temp(r);
         const float v_array[] = { temp.left(), temp.top(), temp.right(), temp.top(), temp.right(), temp.bottom(), temp.left(), temp.bottom() };
         drawVideoTexture(m_texture[0], m_texture[1], m_texture[2], v_array);
+    }
+    else
+    {
+        result = NOTHING_RENDERED;
     }
 
     QMutexLocker locker(&m_displaySync);
@@ -891,7 +907,7 @@ bool CLGLRenderer::paintEvent(const QRectF &r)
     glPopAttrib();
     frameDisplayed();
 
-    return draw;
+    return result;
 }
 
 QSize CLGLRenderer::sizeOnScreen(unsigned int channel) const

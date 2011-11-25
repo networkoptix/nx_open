@@ -12,7 +12,7 @@ inline void glColor(double r, double g, double b, double a) {
 }
 
 inline void glColor(const QColor &color) {
-    glColor4b(color.red(), color.green(), color.blue(), color.alpha());
+    glColor(color.redF(), color.greenF(), color.blueF(), color.alphaF());
 }
 
 inline void glVertex(float x, float y) {

@@ -241,7 +241,7 @@ void CLVideoWindowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
     for (unsigned i = 0; i  < m_videonum; ++i)
     {
         m_gldraw[i]->setOpacity(drawSelection ? 0.7 : 1.0);
-        if (!m_gldraw[i]->paintEvent(getSubChannelRect(i)))
+        if (m_gldraw[i]->paintEvent(getSubChannelRect(i)) == CLGLRenderer::CANNOT_RENDER)
             drawGLfailaure(painter);
         else 
         {

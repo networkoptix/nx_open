@@ -4,6 +4,7 @@
 #include <QWeakPointer>
 #include <ui/widgets2/graphicswidget.h>
 #include <ui/common/constrained_resizable.h>
+#include <camera/render_status.h>
 #include <utils/common/scene_utility.h>
 #include "polygonal_shadow_item.h"
 
@@ -164,7 +165,7 @@ private:
      */
     QRectF channelRect(int channel) const;
 
-    void drawLoadingProgress(const QRectF &rect) const;
+    void drawLoadingProgress(QnRenderStatus::RenderStatus status, const QRectF &rect) const;
 
 private:
     /** Layout item. */

@@ -3,13 +3,14 @@
 
 #include <QMutex>
 #include <camera/abstractrenderer.h>
+#include <camera/render_status.h>
 
 class QThread;
 
 class CLGLRenderer;
 class QnResourceDisplay;
 
-class QnDisplayWidgetRenderer: public QObject, public CLAbstractRenderer {
+class QnDisplayWidgetRenderer: public QObject, public CLAbstractRenderer, public QnRenderStatus {
     Q_OBJECT;
 public:
     QnDisplayWidgetRenderer(int channelCount, QObject *parent = NULL);
@@ -28,7 +29,7 @@ public:
 
     void setChannelScreenSize(const QSize &screenSize);
 
-    bool paint(int channel, const QRectF &rect);
+    RenderStatus paint(int channel, const QRectF &rect);
 
 signals:
     /**

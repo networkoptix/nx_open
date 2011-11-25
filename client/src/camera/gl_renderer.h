@@ -7,10 +7,11 @@
 #include <QtOpenGL/qgl.h>
 
 #include "abstractrenderer.h"
+#include "render_status.h"
 
 class CLVideoWindowItem;
 
-class CLGLRenderer : public CLAbstractRenderer
+class CLGLRenderer : public CLAbstractRenderer, public QnRenderStatus
 {
 public:
     enum CLGLDrawHardwareStatus
@@ -31,7 +32,7 @@ public:
     virtual void draw(CLVideoDecoderOutput* image) override;
     virtual void waitForFrameDisplayed(int channel) override;
 
-    bool paintEvent(const QRectF &r);
+    RenderStatus paintEvent(const QRectF &r);
 
     virtual void beforeDestroy();
 
