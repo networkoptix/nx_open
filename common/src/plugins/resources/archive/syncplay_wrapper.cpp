@@ -34,6 +34,7 @@ public:
         blockPausePlaySignal = false;
         blockSetSpeedSignal = false;
         lastJumpTime = DATETIME_NOW;
+        inJumpCount = 0;
         //maxAllowedDate.clear();
         //minAllowedDate.clear();
         speed = 1.0;
@@ -58,6 +59,7 @@ public:
     bool blockPrevFrameSignal;
     bool blockNextFrameSignal;
     qint64 lastJumpTime;
+    int inJumpCount;
     QTime timer;
     double speed;
     //QMap<QnlTimeSource*,qint64> maxAllowedDate;
@@ -261,20 +263,20 @@ void QnArchiveSyncPlayWrapper::onBeforeJump(qint64 mksec, bool makeshot)
         return;
     d->blockJumpSignal = true;
 
-    {
-        QMutexLocker lock(&d->timeMutex);
-        d->lastJumpTime = mksec;
-        cl_log.log("delegateJump=", QDateTime::fromMSecsSinceEpoch(mksec/1000).toString("hh:mm:ss.zzz"), cl_logALWAYS);
-        //d->maxAllowedDate.clear();
-        //d->minAllowedDate.clear();
-        d->timer.restart();
-    }    
+    QMutexLocker lock(&d->timeMutex);
+    d->lastJumpTime = mksec;
+    d->inJumpCount = 1;
+    cl_log.log("delegateJump=", QDateTime::fromMSecsSinceEpoch(mksec/1000).toString("hh:mm:ss.zzz"), cl_logALWAYS);
+    //d->maxAllowedDate.clear();
+    //d->minAllowedDate.clear();
+    d->timer.restart();
     foreach(ReaderInfo info, d->readers)
     {
         QnSyncPlayArchiveDelegate* syncDelegate = static_cast<QnSyncPlayArchiveDelegate*> (info.reader->getArchiveDelegate());
         if (info.reader != sender() && info.enabled)
         {
             syncDelegate->jumpToPreviousFrame(mksec, makeshot);
+            d->inJumpCount++;
         }
     }
     d->blockJumpSignal = false;
@@ -282,6 +284,11 @@ void QnArchiveSyncPlayWrapper::onBeforeJump(qint64 mksec, bool makeshot)
 
 void QnArchiveSyncPlayWrapper::onJumpOccured(qint64 mksec)
 {
+    Q_D(QnArchiveSyncPlayWrapper);
+    QMutexLocker lock(&d->timeMutex);
+    d->inJumpCount--;
+    if (d->inJumpCount < 1)
+        d->timer.restart();
 }
 
 qint64 QnArchiveSyncPlayWrapper::minTime() const
@@ -375,6 +382,9 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
     QMutexLocker lock(&d->timeMutex);
     if (d->lastJumpTime == DATETIME_NOW)
         return DATETIME_NOW;
+
+    if (d->inJumpCount > 0)
+        return d->lastJumpTime;
 
     qint64 expectedTime = d->lastJumpTime + d->timer.elapsed()*1000 * d->speed;
 
