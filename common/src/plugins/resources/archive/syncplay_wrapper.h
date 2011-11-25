@@ -23,7 +23,9 @@ public:
     virtual qint64 getDisplayedTime() const;
     virtual qint64 getNextTime() const;
 
-    virtual void onAvailableTime(QnlTimeSource* source, qint64 time);
+    //virtual void onAvailableTime(QnlTimeSource* source, qint64 time);
+    void onBufferingStarted(QnlTimeSource* source);
+    void onBufferingFinished(QnlTimeSource* source);
 public slots:
     void onConsumerBlocksReader(QnAbstractStreamDataProvider* reader, bool value);
 private slots:

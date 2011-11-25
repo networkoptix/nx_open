@@ -149,6 +149,7 @@ private:
     //qint64 m_nextTime;
     mutable QMutex m_timeMutex;
     bool m_useMtDecoding;
+    bool m_buffering;
     //bool m_firstDelayCycle;
 };
 
