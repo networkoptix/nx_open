@@ -57,7 +57,7 @@ namespace {
     const qreal maxExpandedSize = 0.8;
 
     /** Viewport lower size boundary, in scene coordinates. */
-    const QSizeF viewportLowerSizeBound = QSizeF(1.0, 1.0);
+    const QSizeF viewportLowerSizeBound = QSizeF(8.0, 8.0);
 
     const int widgetAnimationDurationMsec = 250;
     const int zoomAnimationDurationMsec = 250;
