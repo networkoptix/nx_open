@@ -34,7 +34,9 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_selectedAudioChannel(0),
     m_BOF(false),
     m_tmpSkipFramesToTime(AV_NOPTS_VALUE),
-    m_BOFTime(AV_NOPTS_VALUE)
+    m_BOFTime(AV_NOPTS_VALUE),
+    m_singleShot(false),
+    m_singleQuantProcessed(false)
 
 {
     // Should init packets here as some times destroy (av_free_packet) could be called before init
@@ -164,6 +166,17 @@ bool QnArchiveStreamReader::getNextVideoPacket()
 
 QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
 {
+    //=================
+    if (isSingleShotMode() && skipFramesToTime() == 0 /*&& !m_delegate->selfProcesingSingleShot()*/)
+    {
+        QMutexLocker mutex(&m_jumpMtx);
+        while (m_singleShot && m_singleQuantProcessed && m_requiredJumpTime == AV_NOPTS_VALUE && !m_needStop)
+            m_singleShowWaitCond.wait(&m_jumpMtx);
+        //CLLongRunnable::pause();
+    }
+
+    bool singleShotMode = m_singleShot;
+
 begin_label:
 	if (mFirstTime)
 	{
@@ -183,11 +196,17 @@ begin_label:
     {
         qint64 jumpTime = m_requiredJumpTime;
         m_lastGopSeekTime = -1;
-        intChanneljumpTo(m_requiredJumpTime, 0);
         setSkipFramesToTime(m_tmpSkipFramesToTime);
-        m_lastUIJumpTime = m_requiredJumpTime;
-        m_requiredJumpTime = AV_NOPTS_VALUE;
         m_jumpMtx.unlock();
+
+        intChanneljumpTo(jumpTime, 0);
+        m_lastUIJumpTime = jumpTime;
+
+        m_jumpMtx.lock();
+        if (m_requiredJumpTime == jumpTime)
+            m_requiredJumpTime = AV_NOPTS_VALUE;
+        m_jumpMtx.unlock();
+
         emit jumpOccured(jumpTime);
         m_BOF = true;
     }
@@ -440,9 +459,6 @@ begin_label:
 			}
 		}
 
-		//=================
-		if (isSingleShotMode() && skipFramesToTime() == 0)
-			CLLongRunnable::pause();
 	}
 
 	if (m_currentData && m_eof)
@@ -457,14 +473,26 @@ begin_label:
         cl_log.log("set BOF flag", cl_logALWAYS);
     }
 
+    if (m_currentData && singleShotMode && skipFramesToTime() == 0) {
+        m_singleQuantProcessed = true;
+        m_currentData->flags |= QnAbstractMediaData::MediaFlags_SingleShot;
+    }
+
+    //if (m_currentData)
+    //    cl_log.log("timestamp=", QDateTime::fromMSecsSinceEpoch(m_currentData->timestamp/1000).toString("hh:mm:ss.zzz"), cl_logALWAYS);
+
 	return m_currentData;
 }
 
 void QnArchiveStreamReader::channeljumpTo(qint64 mksec, int channel, qint64 skipTime)
 {
     QMutexLocker mutex(&m_jumpMtx);
+
+    cl_log.log("jumpTime=", QDateTime::fromMSecsSinceEpoch(mksec/1000).toString("hh:mm:ss.zzz"), cl_logALWAYS);
+    m_singleQuantProcessed = false;
     m_requiredJumpTime = mksec;
     m_tmpSkipFramesToTime = skipTime;
+    m_singleShowWaitCond.wakeAll();
 }
 
 void QnArchiveStreamReader::intChanneljumpTo(qint64 mksec, int /*channel*/)
@@ -555,3 +583,32 @@ bool QnArchiveStreamReader::isNegativeSpeedSupported() const
 {
     return !m_delegate->getVideoLayout() || m_delegate->getVideoLayout()->numberOfChannels() == 1;
 }
+
+void QnArchiveStreamReader::setSingleShotMode(bool single)
+{
+    if (single == m_singleShot)
+        return;
+    m_delegate->setSingleshotMode(single);
+    {
+        QMutexLocker lock(&m_jumpMtx);
+        m_singleShot = single;
+        m_singleQuantProcessed = false;
+        if (!m_singleShot)
+            m_singleShowWaitCond.wakeAll();
+    }
+    emit singleShotModeChanged(single);
+}
+
+bool QnArchiveStreamReader::isSingleShotMode() const
+{
+    return m_singleShot;
+}
+
+void QnArchiveStreamReader::pleaseStop()
+{
+    QnAbstractArchiveReader::pleaseStop();
+    if (m_delegate)
+        m_delegate->beforeClose();
+    m_singleShowWaitCond.wakeAll();
+}
+

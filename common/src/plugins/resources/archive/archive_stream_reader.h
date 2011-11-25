@@ -1,6 +1,7 @@
 #ifndef avi_stream_reader_h1901
 #define avi_stream_reader_h1901
 
+#include <QWaitCondition>
 #include "abstract_archive_stream_reader.h"
 #include "core/resource/resource_media_layout.h"
 #include "utils/media/ffmpeg_helper.h"
@@ -24,6 +25,9 @@ public:
     virtual void setReverseMode(bool value);
     virtual bool isReverseMode() const { return m_reverseMode;}
     virtual bool isNegativeSpeedSupported() const;
+    virtual void setSingleShotMode(bool single);
+    virtual bool isSingleShotMode() const;
+
 
     virtual const QnVideoResourceLayout* getDPVideoLayout() const;
     virtual const QnResourceAudioLayout* getDPAudioLayout() const;
@@ -44,6 +48,7 @@ protected:
     bool initCodecs();
     bool openFormatContext();
     void setCurrentTime(qint64 value);
+    virtual void pleaseStop();
 protected:
     qint64 m_currentTime;
     qint64 m_previousTime;
@@ -84,7 +89,10 @@ private:
     bool m_BOF;
     qint64 m_BOFTime;
 private:
+    bool m_singleShot;
+    bool m_singleQuantProcessed;
     QMutex m_jumpMtx;
+    QWaitCondition m_singleShowWaitCond;
     QnAbstractMediaDataPtr m_currentData;
     QnAbstractMediaDataPtr m_nextData;
 

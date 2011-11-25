@@ -4,8 +4,6 @@
 QnAbstractArchiveReader::QnAbstractArchiveReader(QnResourcePtr dev ) :
     QnClientPullMediaStreamProvider(dev),
     m_lengthMksec(0),
-    m_singleShot(false),
-    m_adaptiveSleep(20 * 1000),
     m_needToSleep(0),
     m_cs(QMutex::Recursive),
     m_skipFramesToTime(0),
@@ -19,22 +17,6 @@ QnAbstractArchiveReader::~QnAbstractArchiveReader()
 {
     stop();
     delete m_delegate;
-}
-
-void QnAbstractArchiveReader::setSingleShotMode(bool single)
-{
-    m_singleShot = single;
-    if (!m_singleShot)
-    {
-        m_adaptiveSleep.afterdelay();
-        CLLongRunnable::resume();
-    }
-    emit singleShotModeChanged(single);
-}
-
-bool QnAbstractArchiveReader::isSingleShotMode() const
-{
-    return m_singleShot;
 }
 
 // returns len of archive in mksec
@@ -164,13 +146,6 @@ qint64 QnAbstractArchiveReader::endTime() const
 { 
     //m_delegate->open(m_resource);
     return m_delegate->endTime(); 
-}
-
-void QnAbstractArchiveReader::pleaseStop()
-{
-    QnClientPullMediaStreamProvider::pleaseStop();
-    if (m_delegate)
-        m_delegate->beforeClose();
 }
 
 bool QnAbstractArchiveReader::open()

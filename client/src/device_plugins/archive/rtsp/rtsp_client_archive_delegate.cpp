@@ -18,7 +18,8 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate():
     m_opened(false),
     m_waitBOF(false),
     m_lastPacketFlags(-1),
-    m_closing(false)
+    m_closing(false),
+    m_singleShotMode(false)
 {
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
     m_flags |= Flag_SlowSource;
@@ -194,9 +195,26 @@ qint64 QnRtspClientArchiveDelegate::seek(qint64 time)
 {
     deleteContexts(); // context is going to create again on first data after SEEK, so ignore rest of data before seek
     m_position = time;
-    m_rtspSession.sendPlay(time, m_rtspSession.getScale());
+    //if (m_singleShotMode)
+    //    m_needResume = true;
+    //m_rtspSession.sendPlay(time, m_singleShotMode ? time : AV_NOPTS_VALUE, m_rtspSession.getScale());
+    m_rtspSession.sendPlay(time, AV_NOPTS_VALUE, m_rtspSession.getScale());
     m_waitBOF = true;
     return time;
+}
+
+void QnRtspClientArchiveDelegate::setSingleshotMode(bool value)
+{
+    if (value == m_singleShotMode)
+        return;
+
+    m_singleShotMode = value;
+    /*
+    if (value)
+        m_rtspSession.sendPause();
+    else
+        m_rtspSession.sendPlay(AV_NOPTS_VALUE, AV_NOPTS_VALUE, m_rtspSession.getScale());
+    */
 }
 
 QnVideoResourceLayout* QnRtspClientArchiveDelegate::getVideoLayout()
@@ -321,7 +339,7 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
 void QnRtspClientArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
 {
     int sign = value ? -1 : 1;
-    m_rtspSession.sendPlay(displayTime, /*RTPSession::RTSP_NOW*/ qAbs(m_rtspSession.getScale()) * sign);
+    m_rtspSession.sendPlay(displayTime, AV_NOPTS_VALUE, qAbs(m_rtspSession.getScale()) * sign);
 }
 
 bool QnRtspClientArchiveDelegate::isRealTimeSource() const 
@@ -331,3 +349,4 @@ bool QnRtspClientArchiveDelegate::isRealTimeSource() const
     else
         return m_lastPacketFlags & QnAbstractMediaData::MediaFlags_LIVE;
 }
+

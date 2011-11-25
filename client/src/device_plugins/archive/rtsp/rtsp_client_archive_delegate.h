@@ -31,6 +31,8 @@ public:
 
     virtual bool isRealTimeSource() const;
     virtual void beforeClose();
+    virtual void setSingleshotMode(bool value);
+    virtual bool selfProcesingSingleShot() const { return true; } // do not pause reader
 protected:
 private:
     QnAbstractDataPacketPtr processFFmpegRtpPayload(const quint8* data, int dataSize);
@@ -53,6 +55,7 @@ private:
     bool m_waitBOF;
     int m_lastPacketFlags;
     bool m_closing;
+    bool m_singleShotMode;
 };
 
 #endif

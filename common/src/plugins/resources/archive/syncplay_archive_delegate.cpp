@@ -50,19 +50,28 @@ bool QnSyncPlayArchiveDelegate::isRealTimeSource() const
     return m_ownerDelegate->isRealTimeSource();
 }
 
+void QnSyncPlayArchiveDelegate::setSingleshotMode(bool value)
+{
+    m_ownerDelegate->setSingleshotMode(value);
+}
+
 void QnSyncPlayArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
 {
     m_ownerDelegate->onReverseMode(displayTime, value);
 }
 
-qint64 QnSyncPlayArchiveDelegate::jumpToPreviousFrame (qint64 time, bool makeshot)
+void QnSyncPlayArchiveDelegate::jumpToPreviousFrame (qint64 time, bool makeshot)
 {
     QMutexLocker lock(&m_genericMutex);
-    //m_seekTime = time;
-    //m_tmpData.clear();
     m_reader->jumpToPreviousFrame(time, makeshot);
-    return time;
 }
+
+void QnSyncPlayArchiveDelegate::jumpTo (qint64 time, bool makeshot)
+{
+    QMutexLocker lock(&m_genericMutex);
+    m_reader->jumpTo(time, makeshot);
+}
+
 
 qint64 QnSyncPlayArchiveDelegate::seek (qint64 time)
 {
@@ -96,4 +105,9 @@ AVCodecContext* QnSyncPlayArchiveDelegate::setAudioChannel(int num)
 QnAbstractMediaDataPtr QnSyncPlayArchiveDelegate::getNextData()
 {
     return m_ownerDelegate->getNextData();
+}
+
+bool QnSyncPlayArchiveDelegate::selfProcesingSingleShot() const
+{
+    return m_ownerDelegate->selfProcesingSingleShot();
 }

@@ -277,7 +277,10 @@ void QnArchiveSyncPlayWrapper::onBeforeJump(qint64 mksec, bool makeshot)
         QnSyncPlayArchiveDelegate* syncDelegate = static_cast<QnSyncPlayArchiveDelegate*> (info.reader->getArchiveDelegate());
         if (info.reader != sender() && info.enabled)
         {
-            syncDelegate->jumpToPreviousFrame(mksec, makeshot);
+            if (info.reader->isSingleShotMode())
+                syncDelegate->jumpTo(mksec, true);
+            else
+                syncDelegate->jumpToPreviousFrame(mksec, makeshot);
             d->inJumpCount++;
         }
     }

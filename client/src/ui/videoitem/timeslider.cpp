@@ -144,6 +144,9 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     Q_UNUSED(option)
     Q_UNUSED(widget)
 
+    bool b = hasTracking();
+
+
     ensureHandleRect();
 
     static const QPixmap pix = Skin::pixmap(QLatin1String("slider-handle.png")).scaled(m_handleRect.width(), m_handleRect.height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
@@ -784,10 +787,13 @@ void TimeSlider::setCurrentValue(qint64 value)
 /*    if (value == DATETIME_NOW)
         return; // ###*/
 
+    //cl_log.log(Q_FUNC_INFO, cl_logALWAYS);
+
     value = qBound(m_minimumValue, value, maximumValue());
     if (m_currentValue == value)
         return;
 
+    
     m_currentValue = value;
 
     updateSlider();
@@ -850,7 +856,7 @@ void TimeSlider::setEndSize(qreal size)
 
 void TimeSlider::onSliderValueChanged(int value)
 {
-    if (!m_isUserInput && !isMoving()) {
+    if (!m_isUserInput /*&& !isMoving()*/) {
         m_isUserInput = true;
         setCurrentValue(fromSlider(value));
         m_isUserInput = false;
@@ -914,7 +920,15 @@ void TimeSlider::setMinimumRange(qint64 r)
 
 void TimeSlider::updateSlider()
 {
+
+    if (m_isUserInput && isMoving())
+    {
+        int gg = 4;
+    }
+
     if (!m_isUserInput) {
+
+
         m_isUserInput = true;
         m_slider->setValue(toSlider(m_currentValue));
         m_isUserInput = false;

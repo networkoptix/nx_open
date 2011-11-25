@@ -199,7 +199,7 @@ RTPIODevice* RTPSession::play(qint64 position, double scale)
         return 0;
 
 
-    if (!sendPlay(position, scale))
+    if (!sendPlay(position, AV_NOPTS_VALUE, scale))
         return 0;
 
 
@@ -359,7 +359,7 @@ RTPIODevice*  RTPSession::sendSetup()
     return &m_rtpIo;
 }
 
-bool RTPSession::sendPlay(qint64 position, double scale)
+bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
 {
 
     QByteArray request;
@@ -374,11 +374,22 @@ bool RTPSession::sendPlay(qint64 position, double scale)
     request += "Session: ";
     request += m_SessionId;
     request += "\r\n";
-    if (position != DATETIME_NOW)
-        request += "Range: npt=" + QString::number(position);
-    else
-        request += "Range: npt=now";
-    request += "-\r\n";
+    if (startPos != AV_NOPTS_VALUE)
+    {
+        if (startPos != DATETIME_NOW)
+            request += "Range: npt=" + QString::number(startPos);
+        else
+            request += "Range: npt=now";
+        request += "-";
+        if (endPos != AV_NOPTS_VALUE)
+        {
+            if (endPos != DATETIME_NOW)
+                request += QString::number(endPos);
+            else
+                request += "now";
+        }
+        request += "\r\n";
+    }
 
     request += "Scale: " + QString::number(scale) + QString("\r\n");
     
@@ -402,6 +413,41 @@ bool RTPSession::sendPlay(qint64 position, double scale)
 
     return false;
 
+}
+
+bool RTPSession::sendPause()
+{
+
+    QByteArray request;
+    QByteArray responce;
+
+    request += "PAUSE ";
+    request += mUrl.toString();
+    request += " RTSP/1.0\r\n";
+    request += "CSeq: ";
+    request += QByteArray::number(m_csec++);
+    request += "\r\n";
+    request += "Session: ";
+    request += m_SessionId;
+    request += "\r\n";
+
+    request += "\r\n";
+
+    if (!m_tcpSock.send(request.data(), request.size()))
+        return false;
+
+
+    if (!readTextResponce(responce))
+        return false;
+
+
+    if (responce.startsWith("RTSP/1.0 200"))
+    {
+        m_keepAliveTime.restart();
+        return true;
+    }
+
+    return false;
 }
 
 bool RTPSession::sendTeardown()

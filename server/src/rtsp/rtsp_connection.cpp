@@ -260,10 +260,10 @@ int QnRtspConnectionProcessor::composePause()
     //if (!d->dataProvider)
     //    return CODE_NOT_FOUND;
     if (d->archiveDP)
-        d->archiveDP->pause();
+        d->archiveDP->setSingleShotMode(true);
 
     //d->playTime += d->rtspScale * d->playTimer.elapsed()*1000;
-    d->rtspScale = 0;
+    //d->rtspScale = 0;
 
     //d->state = QnRtspConnectionProcessorPrivate::State_Paused;
     return CODE_OK;
@@ -378,13 +378,17 @@ int QnRtspConnectionProcessor::composePlay()
     else if (d->archiveDP) 
     {
         d->archiveDP->setReverseMode(d->rtspScale < 0);
-        if (qAbs(d->startTime - getRtspTime()) >= RTSP_MIN_SEEK_INTERVAL)
-        
+        if (!d->requestHeaders.value("Range").isNull())
         {
-            //d->dataProcessor->clearUnprocessedData();
-            d->dataProcessor->setWaitBOF(d->startTime, true); // ignore rest packets before new position
-            if (!d->archiveDP->jumpTo(d->startTime, true))
-                d->dataProcessor->setWaitBOF(d->startTime, false); // ignore rest packets before new position
+            d->archiveDP->setSingleShotMode(d->startTime != DATETIME_NOW && d->startTime == d->endTime);
+
+            if (qAbs(d->startTime - getRtspTime()) >= RTSP_MIN_SEEK_INTERVAL)
+            
+            {
+                d->dataProcessor->setWaitBOF(d->startTime, true); // ignore rest packets before new position
+                if (!d->archiveDP->jumpTo(d->startTime, true))
+                    d->dataProcessor->setWaitBOF(d->startTime, false); // ignore rest packets before new position
+            }
         }
     }
     currentDP->start();

@@ -16,8 +16,8 @@ public:
     void setArchiveDelegate(QnAbstractArchiveDelegate* contextDelegate);
     QnAbstractArchiveDelegate* getArchiveDelegate() const;
 
-	        void setSingleShotMode(bool single);
-	        bool isSingleShotMode() const;
+    virtual void setSingleShotMode(bool single) = 0;
+    virtual bool isSingleShotMode() const = 0;
 
 
     // Manual open. Open will be called automatically on first data access
@@ -70,13 +70,10 @@ protected:
 
     virtual void setSkipFramesToTime(qint64 skipFramesToTime);
 	virtual void channeljumpTo(qint64 mksec, int channel, qint64 borderTime) = 0;
-    virtual void pleaseStop();
 protected:
     bool m_cycleMode;
 	quint64 m_lengthMksec;
 
-	bool m_singleShot;
-	CLAdaptiveSleep m_adaptiveSleep;
 	qint64 m_needToSleep;
 
 	mutable QMutex m_cs;

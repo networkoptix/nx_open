@@ -75,7 +75,8 @@ public:
     qint64 endTime() const;
     float getScale() const;
 
-    bool sendPlay(qint64 position, double scale);
+    bool sendPlay(qint64 startPos, qint64 endPos, double scale);
+    bool sendPause();
 private:
     qint64 m_startTime;
     qint64 m_endTime;
