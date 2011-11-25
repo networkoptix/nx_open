@@ -32,7 +32,11 @@ void detail::QnTimePeriodUpdater::update(const QnVideoServerConnectionPtr &conne
         return;
     }
 
-    sendRequest();
+    if(m_networkResources.empty()) {
+        at_replyReceived(QnTimePeriodList());
+    } else {
+        sendRequest();
+    }
 }
 
 void detail::QnTimePeriodUpdater::at_replyReceived(const QnTimePeriodList &timePeriods) 
@@ -521,9 +525,11 @@ void NavigationItem::updatePeriodList(bool force) {
     m_timePeriod.startTimeUSec = t - w;
     m_timePeriod.durationUSec = w * 3;
 
-    QnTimePeriodList timePeriods;
-    if(!connection.isNull())
+    if(!connection.isNull()) {
         m_timePeriodUpdater->update(connection, resources, m_timePeriod);
+    } else if(resources.empty()) {
+        onTimePeriodUpdaterReady(QnTimePeriodList());
+    }
 }
 
 void NavigationItem::onTimePeriodUpdaterReady(const QnTimePeriodList &timePeriods) 
