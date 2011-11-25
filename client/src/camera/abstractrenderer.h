@@ -15,9 +15,7 @@ struct CLVideoDecoderOutput;
 class CLAbstractRenderer
 {
 public:
-    
     CLAbstractRenderer(): m_displayCounter(0) {}
-
 
     /**
      * This function is supposed to be called from <i>decoding</i> thread.
