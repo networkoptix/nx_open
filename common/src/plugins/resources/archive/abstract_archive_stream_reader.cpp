@@ -1,4 +1,5 @@
 #include "abstract_archive_stream_reader.h"
+
 #include "utils/common/util.h"
 
 QnAbstractArchiveReader::QnAbstractArchiveReader(QnResourcePtr dev ) :
@@ -28,7 +29,7 @@ quint64 QnAbstractArchiveReader::lengthMksec() const
 bool QnAbstractArchiveReader::jumpTo(qint64 mksec, bool makeshot, qint64 skipTime)
 {
     bool needJump = mksec != m_lastJumpTime;
-    if (needJump) 
+    if (needJump)
     {
         emit beforeJump(mksec, makeshot);
         channeljumpTo(mksec, 0, skipTime);
@@ -42,7 +43,7 @@ bool QnAbstractArchiveReader::jumpTo(qint64 mksec, bool makeshot, qint64 skipTim
 
 void QnAbstractArchiveReader::jumpToPreviousFrame(qint64 mksec, bool makeshot)
 {
-    if (mksec != DATETIME_NOW) 
+    if (mksec != DATETIME_NOW)
     {
         //setSkipFramesToTime(mksec);
         //jumpTo(qMax(0ll, (qint64)mksec - 200 * 1000), makeshot);
@@ -66,7 +67,7 @@ void QnAbstractArchiveReader::setSkipFramesToTime(qint64 skipFramesToTime)
 }
 
 bool QnAbstractArchiveReader::isSkippingFrames() const
-{ 
+{
     QMutexLocker mutex(&m_framesMutex);
 
     return m_skipFramesToTime != 0;
@@ -105,25 +106,26 @@ void QnAbstractArchiveReader::setCycleMode(bool value)
     m_cycleMode = value;
 }
 
-qint64 QnAbstractArchiveReader::startTime() const 
-{ 
+qint64 QnAbstractArchiveReader::startTime() const
+{
+    Q_ASSERT(m_delegate);
     //m_delegate->open(m_resource);
-    return m_delegate->startTime(); 
+    return m_delegate->startTime();
 }
 
-qint64 QnAbstractArchiveReader::endTime() const 
-{ 
+qint64 QnAbstractArchiveReader::endTime() const
+{
+    Q_ASSERT(m_delegate);
     //m_delegate->open(m_resource);
-    return m_delegate->endTime(); 
+    return m_delegate->endTime();
 }
 
 bool QnAbstractArchiveReader::open()
 {
-    return m_delegate ? m_delegate->open(m_resource) : false;
+    return m_delegate && m_delegate->open(m_resource);
 }
 
 bool QnAbstractArchiveReader::isRealTimeSource() const
 {
-    return m_delegate->isRealTimeSource();
+    return m_delegate && m_delegate->isRealTimeSource();
 }
-
