@@ -16,9 +16,6 @@ signals:
 
 protected:
     virtual bool mousePressEvent(QWidget *viewport, QMouseEvent *event) override;
-    virtual bool mouseMoveEvent(QWidget *viewport, QMouseEvent *event) override;
-    virtual bool mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) override;
-    virtual bool paintEvent(QWidget *viewport, QPaintEvent *event) override;
 
     virtual void startDrag(DragInfo *info) override;
     virtual void dragMove(DragInfo *info) override;

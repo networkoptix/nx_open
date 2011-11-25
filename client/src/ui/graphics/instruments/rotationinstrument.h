@@ -3,10 +3,10 @@
 
 #include "dragprocessinginstrument.h"
 
-class QnRotationInstrument: public Instrument {
+class RotationInstrument: public DragProcessingInstrument {
 public:
-    QnRotationInstrument(QObject *parent = NULL);
-    virtual ~QnRotationInstrument();
+    RotationInstrument(QObject *parent = NULL);
+    virtual ~RotationInstrument();
 
 protected:
     virtual bool mousePressEvent(QWidget *viewport, QMouseEvent *event) override;
@@ -14,9 +14,9 @@ protected:
     virtual bool mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) override;
     virtual bool paintEvent(QWidget *viewport, QPaintEvent *event) override;
 
-    /*virtual void startDrag() override;
-    virtual void drag() override;
-    virtual void finishDrag() override;*/
+    virtual void startDrag(DragInfo *info) override;
+    virtual void dragMove(DragInfo *info) override;
+    virtual void finishDrag(DragInfo *info) override;
 };
 
 #endif // QN_ROTATION_INSTRUMENT_H

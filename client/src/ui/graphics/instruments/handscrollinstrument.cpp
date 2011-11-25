@@ -26,20 +26,6 @@ bool HandScrollInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event
     return false;
 }
 
-bool HandScrollInstrument::mouseMoveEvent(QWidget *viewport, QMouseEvent *event) {
-    dragProcessor()->mouseMoveEvent(viewport, event);
-
-    event->accept();
-    return false; 
-}
-
-bool HandScrollInstrument::mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) {
-    dragProcessor()->mouseReleaseEvent(viewport, event);
-
-    event->accept();
-    return false;
-}
-
 void HandScrollInstrument::startDrag(DragInfo *info) {
     m_originalCursor = info->view()->viewport()->cursor();
     info->view()->viewport()->setCursor(Qt::ClosedHandCursor);

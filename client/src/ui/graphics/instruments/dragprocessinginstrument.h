@@ -4,6 +4,11 @@
 #include "instrument.h"
 #include <ui/processors/dragprocessor.h>
 
+/**
+ * This instrument sets up drag processor on construction and implements default
+ * event forwarding. In case non-default event forwarding is desired, appropriate
+ * event handlers can be overridden.
+ */
 class DragProcessingInstrument: public Instrument, public DragProcessHandler {
     Q_OBJECT;
 public:
@@ -20,16 +25,21 @@ public:
     }
 
 protected:
-    virtual void aboutToBeDisabledNotify() override {
-        dragProcessor()->reset();
-    }
+    virtual void aboutToBeDisabledNotify() override;
+
+    virtual bool mousePressEvent(QWidget *viewport, QMouseEvent *event) override;
+    virtual bool mouseMoveEvent(QWidget *viewport, QMouseEvent *event) override;
+    virtual bool mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) override;
+    virtual bool paintEvent(QWidget *viewport, QPaintEvent *event) override;
+    virtual bool mousePressEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) override;
+    virtual bool mouseMoveEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) override;
+    virtual bool mouseReleaseEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) override;
+    virtual bool mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override;
+    virtual bool mouseMoveEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override;
+    virtual bool mouseReleaseEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override;
 
 private:
-    void initialize() {
-        DragProcessor *processor = new DragProcessor(this);
-        processor->setHandler(this);
-    }
+    void initialize();
 };
-
 
 #endif // QN_DRAG_PROCESSING_INSTRUMENT_H

@@ -57,7 +57,7 @@ public:
      * \param distance                  Distance that was covered by kinetic 
      *                                  motion since the last call to this function.
      */
-    virtual void moveKinetic(const T &distance) { unused(distance); };
+    virtual void kineticMove(const T &distance) { unused(distance); };
 
     /**
      * This function is called whenever kinetic motion stops.
@@ -410,7 +410,7 @@ protected:
             reset();
         } else {
             if(!qFuzzyIsNull(dt) && mHandler != NULL)
-                mHandler->moveKinetic(mCurrentSpeed * dt);
+                mHandler->kineticMove(mCurrentSpeed * dt);
         }
     }
 

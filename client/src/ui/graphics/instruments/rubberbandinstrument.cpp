@@ -227,23 +227,6 @@ void RubberBandInstrument::aboutToBeUninstalledNotify() {
         delete rubberBand();
 }
 
-bool RubberBandInstrument::paintEvent(QWidget *viewport, QPaintEvent *event) {
-    if(viewport != rubberBand()->viewport())
-        return false; /* We are interested only in transformations for the current viewport. */
-
-    QGraphicsView *view = this->view(viewport);
-    QTransform sceneToViewport = view->viewportTransform();
-    if(qFuzzyCompare(sceneToViewport, rubberBand()->viewportTransform()))
-        return false;
-
-    rubberBand()->setViewportTransform(sceneToViewport);
-
-    /* Scene mouse position may have changed as a result of transform change. */
-    dragProcessor()->paintEvent(viewport, event);
-
-    return false;
-}
-
 bool RubberBandInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
     if(!dragProcessor()->isWaiting())
         return false;
@@ -274,6 +257,23 @@ bool RubberBandInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event
     return false;
 }
 
+bool RubberBandInstrument::paintEvent(QWidget *viewport, QPaintEvent *event) {
+    if(viewport != rubberBand()->viewport())
+        return false; /* We are interested only in transformations for the current viewport. */
+
+    QGraphicsView *view = this->view(viewport);
+    QTransform sceneToViewport = view->viewportTransform();
+    if(qFuzzyCompare(sceneToViewport, rubberBand()->viewportTransform()))
+        return false;
+
+    rubberBand()->setViewportTransform(sceneToViewport);
+
+    /* Scene mouse position may have changed as a result of transform change. */
+    dragProcessor()->paintEvent(viewport, event);
+
+    return false;
+}
+
 void RubberBandInstrument::at_scene_selectionChanged() {
     if(!m_protectSelection)
         return;
@@ -288,20 +288,6 @@ void RubberBandInstrument::at_scene_selectionChanged() {
 
     m_inSelectionChanged = false;
     m_protectSelection = false;
-}
-
-bool RubberBandInstrument::mouseMoveEvent(QWidget *viewport, QMouseEvent *event) {
-    dragProcessor()->mouseMoveEvent(viewport, event);
-
-    event->accept();
-    return false;
-}
-
-bool RubberBandInstrument::mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) {
-    dragProcessor()->mouseReleaseEvent(viewport, event);
-
-    event->accept();
-    return false;
 }
 
 void RubberBandInstrument::startDrag(DragInfo *info) {

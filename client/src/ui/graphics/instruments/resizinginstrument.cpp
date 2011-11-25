@@ -75,26 +75,6 @@ bool ResizingInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
     return true; /* We don't want default event handlers to kick in. */
 }
 
-bool ResizingInstrument::mouseMoveEvent(QWidget *viewport, QMouseEvent *event) {
-    dragProcessor()->mouseMoveEvent(viewport, event);
-    
-    event->accept();
-    return false;
-}
-
-bool ResizingInstrument::mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) {
-    dragProcessor()->mouseReleaseEvent(viewport, event);
-
-    event->accept();
-    return false;
-}
-
-bool ResizingInstrument::paintEvent(QWidget *viewport, QPaintEvent *event) {
-    dragProcessor()->paintEvent(viewport, event);
-
-    return false;
-}
-
 void ResizingInstrument::startDragProcess(DragInfo *info) {
     emit resizingProcessStarted(info->view(), m_widget.data());
 }

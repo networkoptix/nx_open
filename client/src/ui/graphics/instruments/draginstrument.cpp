@@ -50,26 +50,6 @@ bool DragInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
     return false;
 }
 
-bool DragInstrument::mouseMoveEvent(QWidget *viewport, QMouseEvent *event) {
-    dragProcessor()->mouseMoveEvent(viewport, event);
-
-    event->accept();
-    return false;
-}
-
-bool DragInstrument::mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) {
-    dragProcessor()->mouseReleaseEvent(viewport, event);
-
-    event->accept();
-    return false;
-}
-
-bool DragInstrument::paintEvent(QWidget *viewport, QPaintEvent *event) {
-    dragProcessor()->paintEvent(viewport, event);
-
-    return false;
-}
-
 void DragInstrument::startDrag(DragInfo *info) {
     if(m_itemToSelect != NULL) {
         m_itemToSelect->setSelected(true);
