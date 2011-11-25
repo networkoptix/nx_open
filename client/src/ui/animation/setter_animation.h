@@ -3,59 +3,7 @@
 
 #include <QVariantAnimation>
 #include <QScopedPointer>
-
-
-class QnAbstractSetter {
-public:
-    virtual void operator()(QObject *object, const QVariant &value) const = 0;
-
-    virtual ~QnAbstractSetter() {}
-};
-
-
-class QnAbstractGetter {
-    virtual QVariant operator()(QObject *object) const = 0;
-
-    virtual ~QnAbstractGetter() {};
-};
-
-
-template<class Setter>
-class QnSetterAdaptor: public QnAbstractSetter {
-public:
-    QnSetterAdaptor(const Setter &setter): m_setter(setter) {}
-
-    virtual void operator()(QObject *object, const QVariant &value) const override {
-        m_setter(object, value);
-    }
-
-private:
-    Setter m_setter;
-};
-
-template<class Setter>
-QnAbstractSetter *newSetter(const Setter &setter) {
-    return new QnSetterAdaptor<Setter>(setter);
-}
-
-template<class Getter>
-class QnGetterAdaptor: public QnAbstractGetter {
-public:
-    QnGetterAdaptor(const Getter &getter): m_getter(getter) {}
-
-    virtual QVariant operator()(QObject *object) const override {
-        return m_getter(object);
-    }
-
-private:
-    Getter m_getter;
-};
-
-template<class Getter>
-QnAbstractGetter *newGetter(const Getter &setter) {
-    return new QnGetterAdaptor<Getter>(setter);
-}
-
+#include "setter.h"
 
 class SetterAnimation: public QVariantAnimation {
 public:

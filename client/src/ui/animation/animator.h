@@ -2,26 +2,26 @@
 #define QN_ANIMATOR_H
 
 #include <QObject>
+#include "setter_animation.h"
 
-#if 0
+
+
 class QnAnimator: public QObject {
     Q_OBJECT;
 public:
-    QnAnimator(QObject *parent = NULL) {
-        
-    }
+    QnAnimator(QObject *parent = NULL);
 
 protected:
     
 
 private:
-    QObject *m_target;
+    /*QObject *m_target;
     QnAbstractSetter *m_setter;
     QnAbstractGetter *m_getter;
     qreal m_speed;
-    int m_defaultTimeoutMSec;
+    int m_defaultTimeoutMSec;*/
 };
-#endif
+
 
 
 #endif // QN_ANIMATOR_H
