@@ -197,6 +197,12 @@ public:
     void synchronize(QnResourceWidget *widget, bool animate = true);
 
 
+    QPoint mapViewportToGrid(const QPoint &viewportPoint) const;
+    
+    QPoint mapGlobalToGrid(const QPoint &globalPoint) const;
+
+
+
 signals:
     void viewportGrabbed();
     void viewportUngrabbed();

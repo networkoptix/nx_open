@@ -128,7 +128,9 @@ void MainWnd::itemActivated(uint resourceId)
     
     QnMediaResourcePtr mediaResource = resource.dynamicCast<QnMediaResource>();
     if (!mediaResource.isNull() && m_controller->layout()->items(mediaResource->getUniqueId()).empty()) {
-        m_controller->drop(resource, QPoint(0, 0));
+        QPoint gridPos = m_controller->display()->mapViewportToGrid(m_controller->display()->view()->viewport()->geometry().center());
+        
+        m_controller->drop(resource, gridPos);
     }
 }
 

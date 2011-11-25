@@ -558,6 +558,20 @@ QRectF QnWorkbenchDisplay::viewportGeometry() const {
     }
 }
 
+QPoint QnWorkbenchDisplay::mapViewportToGrid(const QPoint &viewportPoint) const {
+    if(m_view == NULL)
+        return QPoint();
+
+    return m_workbench->mapper()->mapToGrid(m_view->mapToScene(viewportPoint));
+}
+    
+QPoint QnWorkbenchDisplay::mapGlobalToGrid(const QPoint &globalPoint) const {
+    if(m_view == NULL)
+        return QPoint();
+
+    return mapViewportToGrid(m_view->mapFromGlobal(globalPoint));
+}
+
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: synchronizers
