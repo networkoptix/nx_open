@@ -1,6 +1,7 @@
 #ifndef QN_DISPLAY_WIDGET_RENDERER_H
 #define QN_DISPLAY_WIDGET_RENDERER_H
 
+#include <QObject>
 #include <QMutex>
 #include <camera/abstractrenderer.h>
 #include <camera/render_status.h>
@@ -8,7 +9,6 @@
 class QThread;
 
 class CLGLRenderer;
-class QnResourceDisplay;
 
 class QnResourceWidgetRenderer: public QObject, public CLAbstractRenderer, public QnRenderStatus {
     Q_OBJECT;

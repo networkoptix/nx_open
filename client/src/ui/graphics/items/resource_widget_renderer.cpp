@@ -34,7 +34,7 @@ QnResourceWidgetRenderer::RenderStatus QnResourceWidgetRenderer::paint(int chann
 }
 
 void QnResourceWidgetRenderer::checkThread(bool inDecodingThread) const {
-#ifdef _DEBUG________________
+#if 0
     if(inDecodingThread) {
         if(m_decodingThread == NULL) {
             m_decodingThread = QThread::currentThread();
