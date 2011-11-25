@@ -416,7 +416,7 @@ void QnWorkbenchController::at_display_widgetAdded(QnResourceWidget *widget) {
     if(widget->display() == NULL || widget->display()->camera() == NULL)
         return;
 
-    QnSequrityCamResource *cameraResource = dynamic_cast<QnSequrityCamResource *>(widget->display()->resource());
+    QnSequrityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSequrityCamResource>();
     if(cameraResource != NULL)
         m_navigationItem->addReserveCamera(widget->display()->camera());
 }
@@ -428,7 +428,7 @@ void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *
     if(widget->display() == NULL || widget->display()->camera() == NULL)
         return;
 
-    QnSequrityCamResource *cameraResource = dynamic_cast<QnSequrityCamResource *>(widget->display()->resource());
+    QnSequrityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSequrityCamResource>();
     if(cameraResource != NULL)
         m_navigationItem->removeReserveCamera(widget->display()->camera());
 }

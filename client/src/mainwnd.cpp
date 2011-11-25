@@ -10,8 +10,10 @@
 #include <QtGui/QTabWidget>
 #include <QtGui/QToolBar>
 
-#include "ui/context_menu_helper.h"
-#include "ui/navigationtreewidget.h"
+#include <ui/context_menu_helper.h>
+#include <ui/navigationtreewidget.h>
+
+#include <ui/mixins/sync_play_mixin.h>
 
 #include <ui/graphics/view/graphics_view.h>
 #include <ui/graphics/view/blue_background_painter.h>
@@ -75,6 +77,8 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
     display->setView(view);
 
     m_controller = new QnWorkbenchController(display, this);
+
+    new QnSyncPlayMixin(display, this);
 
     /* Process input files. */
     QStringList files;

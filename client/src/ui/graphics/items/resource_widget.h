@@ -6,6 +6,7 @@
 #include <ui/common/constrained_resizable.h>
 #include <camera/render_status.h>
 #include <utils/common/scene_utility.h>
+#include <core/resource/resource_consumer.h>
 #include "polygonal_shadow_item.h"
 
 class QGraphicsLinearLayout;
@@ -32,7 +33,12 @@ public:
     virtual ~QnResourceWidget();
 
     /**
-     * \returns                         Entity associated with this widget.
+     * \returns                         Resource associated with this widget.
+     */
+    const QnResourcePtr &resource() const;
+
+    /**
+     * \returns                         Workbench item associated with this widget. Never returns NULL.
      */
     QnWorkbenchItem *item() const {
         return m_item;

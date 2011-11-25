@@ -92,6 +92,10 @@ QnResourceWidget::~QnResourceWidget() {
     }
 }
 
+const QnResourcePtr &QnResourceWidget::resource() const {
+    return m_display->resource();
+}
+
 void QnResourceWidget::setFrameWidth(qreal frameWidth) {
     prepareGeometryChange();
     

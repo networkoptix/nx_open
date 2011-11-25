@@ -3,8 +3,8 @@
 
 #include <QObject>
 #include <core/resource/resource_consumer.h>
+#include <core/resource/media_resource.h>
 
-class QnMediaResource;
 class QnAbstractArchiveReader;
 class QnAbstractMediaStreamDataProvider;
 class QnAbstractStreamDataProvider;
@@ -53,12 +53,16 @@ public:
     /**
      * \returns                         Resource associated with this display.
      */
-    QnResource *resource() const;
+    const QnResourcePtr &resource() const {
+        return getResource();
+    }
 
     /**
      * \returns                         Media resource associated with this display, if any.
      */
-    QnMediaResource *mediaResource() const;
+    const QnMediaResourcePtr &mediaResource() const {
+        return m_mediaResource;
+    }
 
     /**
      * \returns                         Data provider associated with this display.
@@ -75,11 +79,23 @@ public:
     }
 
     /**
+     * \returns                         Archive reader associated with this display, if any.
+     */
+    QnAbstractArchiveReader *archiveReader() const {
+        return m_archiveReader;
+    }
+
+    /**
      * \returns                         Video camera associated with this display, if any.
      */
-    CLVideoCamera *camera() {
+    CLVideoCamera *camera() const {
         return m_camera;
     }
+
+    /**
+     * \returns                         Camdisplay for this display, if any.
+     */
+    CLCamDisplay *camDisplay() const;
 
     /**
      * \returns                         Video resource layout, if any, 
@@ -122,7 +138,7 @@ private:
 
 private:
     /** Media resource. */
-    QnMediaResource *m_mediaResource;
+    QnMediaResourcePtr m_mediaResource;
 
     /** Data provider for the associated resource. */
     QnAbstractStreamDataProvider *m_dataProvider;
@@ -131,10 +147,7 @@ private:
     QnAbstractMediaStreamDataProvider *m_mediaProvider;
 
     /** Archive data provider. */
-    QnAbstractArchiveReader *m_archiveProvider;
-
-    /** Camera display. */
-    //CLCamDisplay *m_camDisplay;
+    QnAbstractArchiveReader *m_archiveReader;
 
     /** Video camera. */
     CLVideoCamera *m_camera; // TODO: Compatibility layer. Remove.
