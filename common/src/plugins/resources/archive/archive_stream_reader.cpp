@@ -178,18 +178,21 @@ begin_label:
         }
 	}
 
+    m_jumpMtx.lock();
+    if (m_requiredJumpTime != AV_NOPTS_VALUE)
     {
-        QMutexLocker mutex(&m_jumpMtx);
-        if (m_requiredJumpTime != AV_NOPTS_VALUE)
-        {
-            m_lastGopSeekTime = -1;
-            intChanneljumpTo(m_requiredJumpTime, 0);
-            emit jumpOccured(m_requiredJumpTime);
-            setSkipFramesToTime(m_tmpSkipFramesToTime);
-            m_lastUIJumpTime = m_requiredJumpTime;
-            m_requiredJumpTime = AV_NOPTS_VALUE;
-            m_BOF = true;
-        }
+        qint64 jumpTime = m_requiredJumpTime;
+        m_lastGopSeekTime = -1;
+        intChanneljumpTo(m_requiredJumpTime, 0);
+        setSkipFramesToTime(m_tmpSkipFramesToTime);
+        m_lastUIJumpTime = m_requiredJumpTime;
+        m_requiredJumpTime = AV_NOPTS_VALUE;
+        m_jumpMtx.unlock();
+        emit jumpOccured(jumpTime);
+        m_BOF = true;
+    }
+    else {
+        m_jumpMtx.unlock();
     }
 
     bool reverseMode = m_reverseMode;
