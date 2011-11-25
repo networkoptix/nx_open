@@ -68,15 +68,14 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
 
     /* Set up video rendering. */
 #if 1
-    //m_display = item->createDisplay(this);
-    //m_videoLayout = m_display->videoLayout();
-    //m_channelCount = m_videoLayout->numberOfChannels();
+    m_display = item->createDisplay(this);
+    m_videoLayout = m_display->videoLayout();
+    m_channelCount = m_videoLayout->numberOfChannels();
     
-    //m_renderer = new QnResourceWidgetRenderer(m_channelCount);
-    //connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_sourceSizeChanged(const QSize &)));
-    //m_display->addRenderer(m_renderer);
+    m_renderer = new QnResourceWidgetRenderer(m_channelCount);
+    connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_sourceSizeChanged(const QSize &)));
+    m_display->addRenderer(m_renderer);
 
-    m_display = NULL;
     m_display->start();
 #else
     m_channelCount = 1;
@@ -88,7 +87,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
 }
 
 QnResourceWidget::~QnResourceWidget() {
-    //delete m_display;
+    delete m_display;
     
     if(!m_shadow.isNull()) {
         m_shadow.data()->setShapeProvider(NULL);
@@ -165,7 +164,7 @@ void QnResourceWidget::setGeometry(const QRectF &geometry) {
     /* Unfortunately, widgets with constant aspect ratio cannot be implemented
      * using size hints. So here is one of the workarounds. */
     
-#if 0
+#if 1
     if(!hasAspectRatio()) {
         base_type::setGeometry(geometry);
         return;
@@ -211,7 +210,7 @@ QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint) const {
 }
 
 void QnResourceWidget::at_sourceSizeChanged(const QSize &size) {
-#if 0
+#if 1
     qreal oldAspectRatio = m_aspectRatio;
     qreal newAspectRatio = static_cast<qreal>(size.width() * m_videoLayout->width()) / (size.height() * m_videoLayout->height());
     if(qFuzzyCompare(oldAspectRatio, newAspectRatio))
@@ -260,7 +259,7 @@ void QnResourceWidget::resizeEvent(QGraphicsSceneResizeEvent *event) override {
 }
 
 QRectF QnResourceWidget::channelRect(int channel) const {
-#if 0
+#if 1
     if (m_channelCount == 1) 
         return QRectF(QPointF(0.0, 0.0), size());
 
@@ -286,7 +285,7 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     }
 
     /* Update screen size of a single channel. */
-#if 0
+#if 1
     QSizeF itemScreenSize = painter->combinedTransform().mapRect(boundingRect()).size();
     QSize channelScreenSize = QSizeF(itemScreenSize.width() / m_videoLayout->width(), itemScreenSize.height() / m_videoLayout->height()).toSize();
     if(channelScreenSize != m_channelScreenSize) {
