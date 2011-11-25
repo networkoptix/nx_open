@@ -14,23 +14,30 @@
 
 namespace {
     /** Default frame width. */
-    qreal defaultFrameWidth = 1.0;
+    const qreal defaultFrameWidth = 1.0;
 
     /** Default frame color. */
-    QColor defaultFrameColor = QColor(128, 128, 128, 196);
+    const QColor defaultFrameColor = QColor(128, 128, 128, 196);
 
-    QColor selectedFrameColorMixIn = QColor(255, 255, 255, 0);
+    const QColor selectedFrameColorMixIn = QColor(255, 255, 255, 0);
 
     /** Frame extension multiplier determines the width of frame extension relative
      * to frame width.
      * 
      * Frame events are processed not only when hovering over the frame itself, 
      * but also over its extension. */
-    qreal frameExtensionMultiplier = 1.0;
+    const qreal frameExtensionMultiplier = 1.0;
 
     /** Default shadow displacement, in scene coordinates. */
-    QPointF defaultShadowDisplacement = QPointF(5.0, 5.0);
+    const QPointF defaultShadowDisplacement = QPointF(5.0, 5.0);
 
+    /** Default timeout before the video is displayed as "loading", in milliseconds. */
+    const qint64 defaultLoadingTimeoutMSec = 2000;
+
+    /** Default period of progress circle. */
+    const qint64 defaultProgressPeriodMSec = 1000;
+
+    /** Default progress painter. */
     Q_GLOBAL_STATIC_WITH_ARGS(QnLoadingProgressPainter, progressPainter, (0.5, 12, 0.5, QColor(255, 255, 255, 0), QColor(255, 255, 255, 255)));
 }
 
@@ -43,7 +50,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     m_aspectRatio(-1.0),
     m_enclosingAspectRatio(1.0),
     m_frameWidth(0.0),
-    m_aboutToBeDestroyedEmitted(false)
+    m_aboutToBeDestroyedEmitted(false),
+    m_lastNewFrameTimeMSec(QDateTime::currentMSecsSinceEpoch())
 {
     /* Set up shadow. */
     m_shadow = new QnPolygonalShadowItem();
@@ -311,15 +319,26 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     painter->endNativePainting();
 }
 
-void QnResourceWidget::drawLoadingProgress(QnRenderStatus::RenderStatus status, const QRectF &rect) const {
-    if(status == QnRenderStatus::RENDERED_NEW_FRAME || status == QnRenderStatus::RENDERED_OLD_FRAME)
+void QnResourceWidget::drawLoadingProgress(QnRenderStatus::RenderStatus status, const QRectF &rect) {
+    qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
+
+    if(status == QnRenderStatus::RENDERED_NEW_FRAME) {
+        m_lastNewFrameTimeMSec = currentTimeMSec;
+        return;
+    }
+        
+    if(status == QnRenderStatus::RENDERED_OLD_FRAME && currentTimeMSec - m_lastNewFrameTimeMSec < defaultLoadingTimeoutMSec)
         return;
 
     glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
     glEnable(GL_BLEND); 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
 
-    glColor3f(0.0, 0.0, 0.0);
+    if(status == QnRenderStatus::RENDERED_OLD_FRAME) {
+        glColor4f(0.0, 0.0, 0.0, 0.5);
+    } else {
+        glColor4f(0.0, 0.0, 0.0, 1.0);
+    }
     glBegin(GL_QUADS);
     glVertices(rect);
     glEnd();
@@ -336,7 +355,7 @@ void QnResourceWidget::drawLoadingProgress(QnRenderStatus::RenderStatus status, 
     glPushMatrix();
     glTranslatef(progressRect.center().x(), progressRect.center().y(), 1.0);
     glScalef(progressRect.width() / 2, progressRect.height() / 2, 1.0);
-    progressPainter()->paint(QDateTime::currentMSecsSinceEpoch() / 1000.0);
+    progressPainter()->paint(static_cast<qreal>(currentTimeMSec % defaultProgressPeriodMSec) / defaultProgressPeriodMSec);
     glPopMatrix();
 
     glPopAttrib();

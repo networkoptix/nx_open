@@ -197,7 +197,7 @@ private:
      */
     QRectF channelRect(int channel) const;
 
-    void drawLoadingProgress(QnRenderStatus::RenderStatus status, const QRectF &rect) const;
+    void drawLoadingProgress(QnRenderStatus::RenderStatus status, const QRectF &rect);
 
 private:
     /** Layout item. */
@@ -241,6 +241,9 @@ private:
 
     /** Whether aboutToBeDestroyed signal has already been emitted. */
     bool m_aboutToBeDestroyedEmitted;
+
+    /** Time when the last new frame was rendered, in milliseconds. */
+    qint64 m_lastNewFrameTimeMSec;
 };
 
 #endif // QN_DISPLAY_WIDGET_H
