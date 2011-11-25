@@ -2,7 +2,7 @@
 #define QN_DRAG_PROCESSING_INSTRUMENT_H
 
 #include "instrument.h"
-#include "dragprocessor.h"
+#include <ui/processors/dragprocessor.h>
 
 class DragProcessingInstrument: public Instrument, public DragProcessHandler {
     Q_OBJECT;

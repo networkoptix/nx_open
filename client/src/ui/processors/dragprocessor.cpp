@@ -8,15 +8,7 @@
 #include <QGraphicsItem>
 #include <QGraphicsObject>
 #include <utils/common/warnings.h>
-
-DragProcessHandler::DragProcessHandler():
-    m_processor(NULL) 
-{}
-
-DragProcessHandler::~DragProcessHandler() {
-    if(m_processor != NULL)
-        m_processor->setHandler(NULL);
-}
+#include "dragprocesshandler.h"
 
 DragProcessor::DragProcessor(QObject *parent):
     QObject(parent),
@@ -392,6 +384,8 @@ void DragProcessor::mouseMoveEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent
 void DragProcessor::mouseReleaseEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
     mouseReleaseEventInternal(item, event);
 }
+
+
 
 QPoint DragInfo::mouseViewportPos() const {
     return view()->viewport()->mapFromGlobal(mouseScreenPos());

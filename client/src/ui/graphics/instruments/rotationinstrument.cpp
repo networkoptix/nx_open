@@ -14,20 +14,25 @@ bool QnRotationInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event
         return false;
 
     if(!(event->modifiers() & Qt::AltModifier))
-        return;
+        return false;
 
     //dragProcessor()
+
+    return false;
 }
 
 bool QnRotationInstrument::mouseMoveEvent(QWidget *viewport, QMouseEvent *event) {
+    return false;
 
 }
 
 bool QnRotationInstrument::mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) {
+    return false;
 
 }
 
 bool QnRotationInstrument::paintEvent(QWidget *viewport, QPaintEvent *event) {
+    return false;
 
 }
 
