@@ -22,7 +22,7 @@
 #include <ui/graphics/instruments/resizinginstrument.h>
 #include <ui/graphics/instruments/uielementsinstrument.h>
 
-#include <ui/graphics/items/display_widget.h>
+#include <ui/graphics/items/resource_widget.h>
 
 #include <file_processor.h>
 
@@ -194,7 +194,7 @@ void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPoint &gr
     }
 }
 
-void QnWorkbenchController::updateGeometryDelta(QnDisplayWidget *widget) {
+void QnWorkbenchController::updateGeometryDelta(QnResourceWidget *widget) {
     if(widget->item()->isPinned())
         return;
 
@@ -222,7 +222,7 @@ void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget 
 void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget *item) {
     qDebug("RESIZING FINISHED");
 
-    QnDisplayWidget *widget = dynamic_cast<QnDisplayWidget *>(item);
+    QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
     if(widget == NULL)
         return;
 
@@ -249,11 +249,11 @@ void QnWorkbenchController::at_draggingFinished(QGraphicsView *view, QList<QGrap
     qDebug("DRAGGING FINISHED");
 
     /* Get models and drag delta. */
-    QList<QnDisplayWidget *> widgets;
+    QList<QnResourceWidget *> widgets;
     QList<QnWorkbenchItem *> models;
     QPoint delta;
     foreach (QGraphicsItem *item, items) {
-        QnDisplayWidget *widget = dynamic_cast<QnDisplayWidget *>(item);
+        QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
         if(widget == NULL)
             continue;
 
@@ -319,7 +319,7 @@ void QnWorkbenchController::at_draggingFinished(QGraphicsView *view, QList<QGrap
 
     /* Adjust geometry deltas if everything went fine. */
     if(success)
-        foreach(QnDisplayWidget *widget, widgets)
+        foreach(QnResourceWidget *widget, widgets)
             updateGeometryDelta(widget);
 
     /* Re-sync everything. */
@@ -330,7 +330,7 @@ void QnWorkbenchController::at_draggingFinished(QGraphicsView *view, QList<QGrap
 void QnWorkbenchController::at_item_clicked(QGraphicsView *, QGraphicsItem *item) {
     qDebug("CLICKED");
 
-    QnDisplayWidget *widget = dynamic_cast<QnDisplayWidget *>(item);
+    QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
     if(widget == NULL)
         return;
 
@@ -342,7 +342,7 @@ void QnWorkbenchController::at_item_clicked(QGraphicsView *, QGraphicsItem *item
 void QnWorkbenchController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem *item) {
     qDebug("DOUBLE CLICKED");
 
-    QnDisplayWidget *widget = dynamic_cast<QnDisplayWidget *>(item);
+    QnResourceWidget *widget = dynamic_cast<QnResourceWidget *>(item);
     if(widget == NULL)
         return;
 

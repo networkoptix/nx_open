@@ -1,4 +1,4 @@
-#include "display_widget.h"
+#include "resource_widget.h"
 #include <cassert>
 #include <QPainter>
 #include <core/resource/resource_media_layout.h>
@@ -8,7 +8,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/qt_opengl.h>
 #include <settings.h>
-#include "display_widget_renderer.h"
+#include "resource_widget_renderer.h"
 #include "polygonal_shadow_item.h"
 
 namespace {
@@ -33,7 +33,7 @@ namespace {
     Q_GLOBAL_STATIC_WITH_ARGS(QnLoadingProgressPainter, progressPainter, (0.5, 12, 0.5, QColor(255, 255, 255, 0), QColor(255, 255, 255, 255)));
 }
 
-QnDisplayWidget::QnDisplayWidget(QnWorkbenchItem *item, QGraphicsItem *parent):
+QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent):
     base_type(parent),
     m_item(item),
     m_videoLayout(NULL),
@@ -62,14 +62,14 @@ QnDisplayWidget::QnDisplayWidget(QnWorkbenchItem *item, QGraphicsItem *parent):
     m_videoLayout = m_display->videoLayout();
     m_channelCount = m_videoLayout->numberOfChannels();
     
-    m_renderer = new QnDisplayWidgetRenderer(m_channelCount);
+    m_renderer = new QnResourceWidgetRenderer(m_channelCount);
     connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_sourceSizeChanged(const QSize &)));
     m_display->addRenderer(m_renderer);
 
     m_display->start();
 }
 
-QnDisplayWidget::~QnDisplayWidget() {
+QnResourceWidget::~QnResourceWidget() {
     delete m_display;
     
     if(!m_shadow.isNull()) {
@@ -78,7 +78,7 @@ QnDisplayWidget::~QnDisplayWidget() {
     }
 }
 
-void QnDisplayWidget::setFrameWidth(qreal frameWidth) {
+void QnResourceWidget::setFrameWidth(qreal frameWidth) {
     prepareGeometryChange();
     
     m_frameWidth = frameWidth;
@@ -90,21 +90,21 @@ void QnDisplayWidget::setFrameWidth(qreal frameWidth) {
         m_shadow.data()->setSoftWidth(m_frameWidth);
 }
 
-void QnDisplayWidget::setShadowDisplacement(const QPointF &displacement) {
+void QnResourceWidget::setShadowDisplacement(const QPointF &displacement) {
     m_shadowDisplacement = displacement;
 
     updateShadowPos();
 }
 
-void QnDisplayWidget::setEnclosingAspectRatio(qreal enclosingAspectRatio) {
+void QnResourceWidget::setEnclosingAspectRatio(qreal enclosingAspectRatio) {
     m_enclosingAspectRatio = enclosingAspectRatio;
 }
 
-QRectF QnDisplayWidget::enclosingGeometry() const {
+QRectF QnResourceWidget::enclosingGeometry() const {
     return expanded(m_enclosingAspectRatio, geometry(), Qt::KeepAspectRatioByExpanding);
 }
 
-void QnDisplayWidget::setEnclosingGeometry(const QRectF &enclosingGeometry) {
+void QnResourceWidget::setEnclosingGeometry(const QRectF &enclosingGeometry) {
     m_enclosingAspectRatio = enclosingGeometry.width() / enclosingGeometry.height();
 
     if(hasAspectRatio()) {
@@ -114,7 +114,7 @@ void QnDisplayWidget::setEnclosingGeometry(const QRectF &enclosingGeometry) {
     }
 }
 
-QPolygonF QnDisplayWidget::provideShape() {
+QPolygonF QnResourceWidget::provideShape() {
     QTransform transform;
     QPointF zero = mapToScene(0.0, 0.0);
     transform.translate(-zero.x(), -zero.y());
@@ -124,26 +124,26 @@ QPolygonF QnDisplayWidget::provideShape() {
     return transform.map(QPolygonF(QRectF(QPointF(0, 0), size()).adjusted(-fw2, -fw2, fw2, fw2)));
 }
 
-void QnDisplayWidget::invalidateShadowShape() {
+void QnResourceWidget::invalidateShadowShape() {
     if(m_shadow.isNull())
         return;
 
     m_shadow.data()->invalidateShape();
 }
 
-void QnDisplayWidget::updateShadowZ() {
+void QnResourceWidget::updateShadowZ() {
     if(!m_shadow.isNull()) {
         m_shadow.data()->setZValue(zValue());
         m_shadow.data()->stackBefore(this);
     }
 }
 
-void QnDisplayWidget::updateShadowPos() {
+void QnResourceWidget::updateShadowPos() {
     if(!m_shadow.isNull())
         m_shadow.data()->setPos(mapToScene(0.0, 0.0) + m_shadowDisplacement);
 }
 
-void QnDisplayWidget::setGeometry(const QRectF &geometry) {
+void QnResourceWidget::setGeometry(const QRectF &geometry) {
     /* Unfortunately, widgets with constant aspect ratio cannot be implemented
      * using size hints. So here is one of the workarounds. */
     
@@ -185,14 +185,14 @@ void QnDisplayWidget::setGeometry(const QRectF &geometry) {
     return base_type::setGeometry(geometry);
 }
 
-QSizeF QnDisplayWidget::constrainedSize(const QSizeF constraint) const {
+QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint) const {
     if(!hasAspectRatio())
         return constraint;
 
     return expanded(m_aspectRatio, constraint, Qt::KeepAspectRatio);
 }
 
-void QnDisplayWidget::at_sourceSizeChanged(const QSize &size) {
+void QnResourceWidget::at_sourceSizeChanged(const QSize &size) {
     qreal oldAspectRatio = m_aspectRatio;
     qreal newAspectRatio = static_cast<qreal>(size.width() * m_videoLayout->width()) / (size.height() * m_videoLayout->height());
     if(qFuzzyCompare(oldAspectRatio, newAspectRatio))
@@ -205,7 +205,7 @@ void QnDisplayWidget::at_sourceSizeChanged(const QSize &size) {
     emit aspectRatioChanged(oldAspectRatio, newAspectRatio);
 }
 
-QVariant QnDisplayWidget::itemChange(GraphicsItemChange change, const QVariant &value) {
+QVariant QnResourceWidget::itemChange(GraphicsItemChange change, const QVariant &value) {
     switch(change) {
     case ItemPositionHasChanged:
         updateShadowPos();
@@ -233,13 +233,13 @@ QVariant QnDisplayWidget::itemChange(GraphicsItemChange change, const QVariant &
     return base_type::itemChange(change, value);
 }
 
-void QnDisplayWidget::resizeEvent(QGraphicsSceneResizeEvent *event) override {
+void QnResourceWidget::resizeEvent(QGraphicsSceneResizeEvent *event) override {
     invalidateShadowShape();
 
     base_type::resizeEvent(event);
 }
 
-QRectF QnDisplayWidget::channelRect(int channel) const {
+QRectF QnResourceWidget::channelRect(int channel) const {
     if (m_channelCount == 1) 
         return QRectF(QPointF(0.0, 0.0), size());
 
@@ -255,7 +255,7 @@ QRectF QnDisplayWidget::channelRect(int channel) const {
     );
 }
 
-void QnDisplayWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/) {
+void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/) {
     if (painter->paintEngine()->type() != QPaintEngine::OpenGL && painter->paintEngine()->type() != QPaintEngine::OpenGL2) {
         qnWarning("Painting with the paint engine of type %1 is not supported", static_cast<int>(painter->paintEngine()->type()));
         return;
@@ -279,7 +279,7 @@ void QnDisplayWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * 
     painter->endNativePainting();
 }
 
-void QnDisplayWidget::drawLoadingProgress(QnRenderStatus::RenderStatus status, const QRectF &rect) const {
+void QnResourceWidget::drawLoadingProgress(QnRenderStatus::RenderStatus status, const QRectF &rect) const {
     if(status == QnRenderStatus::RENDERED_NEW_FRAME || status == QnRenderStatus::RENDERED_OLD_FRAME)
         return;
 
@@ -310,7 +310,7 @@ void QnDisplayWidget::drawLoadingProgress(QnRenderStatus::RenderStatus status, c
     glPopAttrib();
 }
 
-void QnDisplayWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override {
+void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override {
     QSizeF size = this->size();
     qreal w = size.width();
     qreal h = size.height();
@@ -378,7 +378,7 @@ namespace {
     }
 }
 
-Qt::WindowFrameSection QnDisplayWidget::windowFrameSectionAt(const QPointF &pos) const override {
+Qt::WindowFrameSection QnResourceWidget::windowFrameSectionAt(const QPointF &pos) const override {
     qreal fe = m_frameWidth * frameExtensionMultiplier;
     Qt::WindowFrameSection result = sweep(rect().adjusted(fe, fe, -fe, -fe), pos);
     
@@ -399,7 +399,7 @@ Qt::WindowFrameSection QnDisplayWidget::windowFrameSectionAt(const QPointF &pos)
     return result;
 }
 
-bool QnDisplayWidget::windowFrameEvent(QEvent *event) {
+bool QnResourceWidget::windowFrameEvent(QEvent *event) {
     bool result = base_type::windowFrameEvent(event);
 
     if(event->type() == QEvent::GraphicsSceneHoverMove) {

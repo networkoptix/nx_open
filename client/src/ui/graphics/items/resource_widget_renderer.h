@@ -10,12 +10,12 @@ class QThread;
 class CLGLRenderer;
 class QnResourceDisplay;
 
-class QnDisplayWidgetRenderer: public QObject, public CLAbstractRenderer, public QnRenderStatus {
+class QnResourceWidgetRenderer: public QObject, public CLAbstractRenderer, public QnRenderStatus {
     Q_OBJECT;
 public:
-    QnDisplayWidgetRenderer(int channelCount, QObject *parent = NULL);
+    QnResourceWidgetRenderer(int channelCount, QObject *parent = NULL);
 
-    virtual ~QnDisplayWidgetRenderer();
+    virtual ~QnResourceWidgetRenderer();
 
 	virtual void draw(CLVideoDecoderOutput *image) override;
 

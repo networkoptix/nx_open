@@ -1,9 +1,9 @@
-#include "display_widget_renderer.h"
+#include "resource_widget_renderer.h"
 #include <QMutexLocker>
 #include <camera/gl_renderer.h>
 #include <utils/common/warnings.h>
 
-QnDisplayWidgetRenderer::QnDisplayWidgetRenderer(int channelCount, QObject *parent):
+QnResourceWidgetRenderer::QnResourceWidgetRenderer(int channelCount, QObject *parent):
     QObject(parent),
     m_decodingThread(NULL)
 {
@@ -11,14 +11,14 @@ QnDisplayWidgetRenderer::QnDisplayWidgetRenderer(int channelCount, QObject *pare
         m_channelRenderers.push_back(new CLGLRenderer());
 }
 
-void QnDisplayWidgetRenderer::beforeDestroy() {
+void QnResourceWidgetRenderer::beforeDestroy() {
     checkThread(false);
 
     foreach(CLGLRenderer *renderer, m_channelRenderers)
         renderer->beforeDestroy();
 }
 
-QnDisplayWidgetRenderer::~QnDisplayWidgetRenderer() {
+QnResourceWidgetRenderer::~QnResourceWidgetRenderer() {
     checkThread(false);
 
     foreach(CLGLRenderer *renderer, m_channelRenderers)
@@ -27,13 +27,13 @@ QnDisplayWidgetRenderer::~QnDisplayWidgetRenderer() {
     m_channelRenderers.clear();
 }
 
-QnDisplayWidgetRenderer::RenderStatus QnDisplayWidgetRenderer::paint(int channel, const QRectF &rect) {
+QnResourceWidgetRenderer::RenderStatus QnResourceWidgetRenderer::paint(int channel, const QRectF &rect) {
     checkThread(false);
 
     return m_channelRenderers[channel]->paintEvent(rect);
 }
 
-void QnDisplayWidgetRenderer::checkThread(bool inDecodingThread) const {
+void QnResourceWidgetRenderer::checkThread(bool inDecodingThread) const {
 #ifdef _DEBUG________________
     if(inDecodingThread) {
         if(m_decodingThread == NULL) {
@@ -50,7 +50,7 @@ void QnDisplayWidgetRenderer::checkThread(bool inDecodingThread) const {
 #endif
 }
 
-void QnDisplayWidgetRenderer::draw(CLVideoDecoderOutput *image) {
+void QnResourceWidgetRenderer::draw(CLVideoDecoderOutput *image) {
     checkThread(true);
 
     m_channelRenderers[image->channel]->draw(image);
@@ -63,13 +63,13 @@ void QnDisplayWidgetRenderer::draw(CLVideoDecoderOutput *image) {
     }
 }
 
-void QnDisplayWidgetRenderer::waitForFrameDisplayed(int channel) {
+void QnResourceWidgetRenderer::waitForFrameDisplayed(int channel) {
     checkThread(true);
 
     m_channelRenderers[channel]->waitForFrameDisplayed(channel);
 }
 
-QSize QnDisplayWidgetRenderer::sizeOnScreen(unsigned int /*channel*/) const {
+QSize QnResourceWidgetRenderer::sizeOnScreen(unsigned int /*channel*/) const {
     checkThread(true);
 
     QMutexLocker locker(&m_mutex);
@@ -77,13 +77,13 @@ QSize QnDisplayWidgetRenderer::sizeOnScreen(unsigned int /*channel*/) const {
     return m_channelScreenSize;
 }
 
-void QnDisplayWidgetRenderer::setChannelScreenSize(const QSize &screenSize) {
+void QnResourceWidgetRenderer::setChannelScreenSize(const QSize &screenSize) {
     QMutexLocker locker(&m_mutex);
 
     m_channelScreenSize = screenSize;
 }
 
-bool QnDisplayWidgetRenderer::constantDownscaleFactor() const {
+bool QnResourceWidgetRenderer::constantDownscaleFactor() const {
     checkThread(true);
 
     return false;

@@ -8,13 +8,13 @@
 #include <utils/common/scene_utility.h>
 #include "polygonal_shadow_item.h"
 
-class QnDisplayWidgetRenderer;
+class QnResourceWidgetRenderer;
 class QnVideoResourceLayout;
 class QnWorkbenchItem;
 class QnResourceDisplay;
 class QnPolygonalShadowItem;
 
-class QnDisplayWidget: public GraphicsWidget, public QnPolygonalShapeProvider, public ConstrainedResizable, protected QnSceneUtility {
+class QnResourceWidget: public GraphicsWidget, public QnPolygonalShapeProvider, public ConstrainedResizable, protected QnSceneUtility {
     Q_OBJECT;
     Q_PROPERTY(QColor frameColor READ frameColor WRITE setFrameColor);
     Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth);
@@ -25,9 +25,9 @@ class QnDisplayWidget: public GraphicsWidget, public QnPolygonalShapeProvider, p
     typedef GraphicsWidget base_type;
 
 public:
-    QnDisplayWidget(QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
+    QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
 
-    virtual ~QnDisplayWidget();
+    virtual ~QnResourceWidget();
 
     /**
      * \returns                         Entity associated with this widget.
@@ -181,7 +181,7 @@ private:
     int m_channelCount;
 
     /** Associated renderer. */
-    QnDisplayWidgetRenderer *m_renderer;
+    QnResourceWidgetRenderer *m_renderer;
 
     /** Aspect ratio. Negative value means that aspect ratio is not enforced. */
     qreal m_aspectRatio;

@@ -24,7 +24,7 @@ class NavigationItem;
 class QnWorkbenchManager;
 class QnWorkbenchLayout;
 class QnWorkbench;
-class QnDisplayWidget;
+class QnResourceWidget;
 class QnWorkbenchItem;
 class QnWorkbenchGridMapper;
 
@@ -55,7 +55,7 @@ public:
     void drop(const QnResourceList &resources, const QPoint &gridPos);
 
 protected:
-    void updateGeometryDelta(QnDisplayWidget *widget);
+    void updateGeometryDelta(QnResourceWidget *widget);
 
 protected slots:
     void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget);

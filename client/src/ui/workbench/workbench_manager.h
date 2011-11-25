@@ -18,7 +18,7 @@ class ActivityListenerInstrument;
 class QnWorkbench;
 class QnWorkbenchItem;
 class QnWorkbenchLayout;
-class QnDisplayWidget;
+class QnResourceWidget;
 class QnResourceDisplay;
 class QnViewportAnimator;
 class QnWidgetAnimator;
@@ -138,7 +138,7 @@ public:
     /**
      * \param item                      Item to get widget for.
      */
-    QnDisplayWidget *widget(QnWorkbenchItem *item) const;
+    QnResourceWidget *widget(QnWorkbenchItem *item) const;
 
     QnResourceDisplay *display(QnWorkbenchItem *item) const;
 
@@ -196,7 +196,7 @@ public:
 
     void synchronize(QnWorkbenchItem *item, bool animate = true);
     
-    void synchronize(QnDisplayWidget *widget, bool animate = true);
+    void synchronize(QnResourceWidget *widget, bool animate = true);
 
 
 signals:
@@ -206,12 +206,12 @@ signals:
 protected:
     virtual void tick(int currentTime) override;
     
-    QnWidgetAnimator *animator(QnDisplayWidget *widget);
+    QnWidgetAnimator *animator(QnResourceWidget *widget);
 
     void synchronizeGeometry(QnWorkbenchItem *item, bool animate);
-    void synchronizeGeometry(QnDisplayWidget *widget, bool animate);
+    void synchronizeGeometry(QnResourceWidget *widget, bool animate);
     void synchronizeLayer(QnWorkbenchItem *item);
-    void synchronizeLayer(QnDisplayWidget *widget);
+    void synchronizeLayer(QnResourceWidget *widget);
     void synchronizeSceneBounds();
 
     qreal layerFrontZValue(Layer layer) const;
@@ -277,7 +277,7 @@ private:
     /* Internal state. */
 
     /** Item to widget mapping. */
-    QHash<QnWorkbenchItem *, QnDisplayWidget *> m_widgetByItem;
+    QHash<QnWorkbenchItem *, QnResourceWidget *> m_widgetByItem;
 
     /** Item to item properties mapping. */
     QHash<QGraphicsItem *, ItemProperties> m_propertiesByItem;

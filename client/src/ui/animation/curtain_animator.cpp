@@ -3,7 +3,7 @@
 #include <QPropertyAnimation>
 #include <QParallelAnimationGroup>
 #include <ui/graphics/items/curtain_item.h>
-#include <ui/graphics/items/display_widget.h>
+#include <ui/graphics/items/resource_widget.h>
 #include <utils/common/warnings.h>
 
 QnCurtainAnimator::QnCurtainAnimator(int durationMSec, QObject *parent):
@@ -68,7 +68,7 @@ void QnCurtainAnimator::at_animation_finished() {
     emit curtained();
 }
 
-void QnCurtainAnimator::curtain(QnDisplayWidget *frontWidget) {
+void QnCurtainAnimator::curtain(QnResourceWidget *frontWidget) {
     if(m_curtain == NULL)
         return; 
 

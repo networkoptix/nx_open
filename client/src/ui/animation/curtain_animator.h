@@ -8,7 +8,7 @@ class QParallelAnimationGroup;
 class QPropertyAnimation;
 
 class QnCurtainItem;
-class QnDisplayWidget;
+class QnResourceWidget;
 
 class QnCurtainAnimator: public QObject {
     Q_OBJECT;
@@ -22,7 +22,7 @@ public:
 
     void setCurtainItem(QnCurtainItem *curtain);
 
-    void curtain(QnDisplayWidget *frontWidget = NULL);
+    void curtain(QnResourceWidget *frontWidget = NULL);
 
     void uncurtain();
 
