@@ -28,8 +28,6 @@ class QnCurtainItem;
 class CLVideoCamera;
 class CLCamDisplay;
 
-// TODO: rename to QnWorkbenchDisplay?
-
 /**
  * This class ties a workbench, a scene and a view together.
  * 
