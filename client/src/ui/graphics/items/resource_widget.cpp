@@ -67,15 +67,16 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     setLayout(layout);
 
     /* Set up video rendering. */
-#if 0
-    m_display = item->createDisplay(this);
-    m_videoLayout = m_display->videoLayout();
-    m_channelCount = m_videoLayout->numberOfChannels();
+#if 1
+    //m_display = item->createDisplay(this);
+    //m_videoLayout = m_display->videoLayout();
+    //m_channelCount = m_videoLayout->numberOfChannels();
     
-    m_renderer = new QnResourceWidgetRenderer(m_channelCount);
-    connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_sourceSizeChanged(const QSize &)));
-    m_display->addRenderer(m_renderer);
+    //m_renderer = new QnResourceWidgetRenderer(m_channelCount);
+    //connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_sourceSizeChanged(const QSize &)));
+    //m_display->addRenderer(m_renderer);
 
+    m_display = NULL;
     m_display->start();
 #else
     m_channelCount = 1;
