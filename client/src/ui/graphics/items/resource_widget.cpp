@@ -454,7 +454,7 @@ void QnResourceWidget::removeButton(QGraphicsLayoutItem *button) {
 }
 
 void QnResourceWidget::ensureAboutToBeDestroyedEmitted() {
-    if(!m_aboutToBeDestroyedEmitted)
+    if(m_aboutToBeDestroyedEmitted)
         return;
 
     m_aboutToBeDestroyedEmitted = true;

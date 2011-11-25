@@ -818,8 +818,6 @@ void QnWorkbenchDisplay::at_uncurtained() {
 
 void QnWorkbenchDisplay::at_widget_aboutToBeDestroyed() {
     /* Holy crap! Somebody's destroying our widgets. Disconnect from the scene. */
-    qnWarning("Resource widget was destroyed directly. This is not the right way to do it. It will be destroyed automatically when its associated item is removed from layout.");
-
     QnResourceWidget *widget = checked_cast<QnResourceWidget *>(sender());
     removeItemInternal(widget->item(), false);
 

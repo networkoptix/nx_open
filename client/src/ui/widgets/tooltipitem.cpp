@@ -5,6 +5,7 @@ ToolTipItem::ToolTipItem(QGraphicsItem *parent):
     m_parametersValid(false)
 {
     setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
+    setFlag(QGraphicsItem::ItemIsSelectable, false);
 }
 
 const QString &ToolTipItem::text() const

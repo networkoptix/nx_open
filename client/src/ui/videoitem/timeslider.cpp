@@ -853,7 +853,7 @@ void TimeSlider::setEndSize(qreal size)
 
 void TimeSlider::onSliderValueChanged(int value)
 {
-    if (!m_isUserInput && !isMoving()) {
+    if (!m_isUserInput /*&& !isMoving()*/) {
         m_isUserInput = true;
         setCurrentValue(fromSlider(value));
         m_isUserInput = false;
