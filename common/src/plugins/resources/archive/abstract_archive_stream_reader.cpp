@@ -105,37 +105,6 @@ void QnAbstractArchiveReader::setCycleMode(bool value)
     m_cycleMode = value;
 }
 
-void QnAbstractArchiveReader::pause()
-{
-    QnClientPullMediaStreamProvider::pause();
-    emit streamPaused();
-}
-
-void QnAbstractArchiveReader::resume()
-{
-    QnClientPullMediaStreamProvider::resume();
-}
-
-void QnAbstractArchiveReader::resumeMedia()
-{
-    setSingleShotMode(false);
-    resume();
-    resumeDataProcessors();
-    emit streamResumed();
-}
-
-void QnAbstractArchiveReader::nextFrame()
-{
-    emit nextFrameOccured();
-    resume();
-}
-
-void QnAbstractArchiveReader::previousFrame(qint64 mksec)
-{
-    emit prevFrameOccured();
-}
-
-
 qint64 QnAbstractArchiveReader::startTime() const 
 { 
     //m_delegate->open(m_resource);

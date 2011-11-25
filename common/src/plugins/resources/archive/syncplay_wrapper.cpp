@@ -235,7 +235,7 @@ void QnArchiveSyncPlayWrapper::onStreamPaused()
     foreach(ReaderInfo info, d->readers)
     {
         if (info.reader != sender())
-            info.reader->pause();
+            info.reader->pauseMedia();
     }
     d->blockPausePlaySignal = false;
 }

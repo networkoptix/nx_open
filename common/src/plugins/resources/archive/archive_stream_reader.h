@@ -17,8 +17,6 @@ public:
 
     virtual qint64 currentTime() const;
 
-    void previousFrame(qint64 mksec);
-
     virtual QStringList getAudioTracksInfo() const;
     virtual unsigned int getCurrentAudioChannel() const;
     virtual bool setAudioChannel(unsigned int num);
@@ -35,6 +33,12 @@ public:
     static QString serializeLayout(const QnVideoResourceLayout* layout);
     void renameFileOnDestroy(const QString& newFileName);
     void jumpWithMarker(qint64 mksec, int marker);
+
+    virtual void nextFrame();
+    virtual void previousFrame(qint64 mksec);
+    virtual void pauseMedia();
+    virtual void resumeMedia();
+
 protected:
     virtual QnAbstractMediaDataPtr getNextData();
     virtual void channeljumpTo(qint64 mksec, int channel, qint64 skipTime);

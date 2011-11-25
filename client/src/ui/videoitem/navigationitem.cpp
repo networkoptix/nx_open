@@ -574,7 +574,7 @@ void NavigationItem::pause()
 
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
 
-    reader->pause();
+    reader->pauseMedia();
     m_camera->getCamCamDisplay()->pauseAudio();
     m_liveButton->hide();
 

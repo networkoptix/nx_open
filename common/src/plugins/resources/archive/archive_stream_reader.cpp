@@ -59,12 +59,39 @@ QnArchiveStreamReader::~QnArchiveStreamReader()
     m_frameTypeExtractor = 0;
 }
 
+void QnArchiveStreamReader::nextFrame()
+{
+	{
+ 	   QMutexLocker lock(&m_jumpMtx);
+    	m_singleQuantProcessed = false;
+    	m_singleShowWaitCond.wakeAll();
+	}
+    emit nextFrameOccured();
+}
+
 void QnArchiveStreamReader::previousFrame(qint64 mksec)
 {
     jumpToPreviousFrame(mksec, true);
-    QnAbstractArchiveReader::previousFrame(mksec);
+    emit prevFrameOccured();
 }
 
+void QnArchiveStreamReader::resumeMedia()
+{
+    setSingleShotMode(false);
+    //resume();
+    resumeDataProcessors();
+    emit streamResumed();
+}
+
+void QnArchiveStreamReader::pauseMedia()
+{
+	{
+    	QMutexLocker lock(&m_jumpMtx);
+    	m_singleShot = true;
+    	m_singleQuantProcessed = true;
+	}
+    emit streamPaused();
+}
 
 void QnArchiveStreamReader::setCurrentTime(qint64 value)
 {

@@ -34,8 +34,8 @@ public:
     virtual bool jumpTo(qint64 mksec, bool makeshot, qint64 skipTime = 0);
 	void jumpToPreviousFrame(qint64 mksec, bool makeshot);
 
-    virtual void previousFrame(qint64 /*mksec*/);
-    virtual void nextFrame();
+    virtual void previousFrame(qint64 /*mksec*/) = 0;
+    virtual void nextFrame() = 0;
 
 
     // gives a list of audio tracks 
@@ -50,8 +50,8 @@ public:
 
     void setCycleMode(bool value);
 
-    virtual void pause();
-    void resumeMedia();
+    virtual void pauseMedia() = 0;
+    virtual void resumeMedia() = 0;
 
     qint64 skipFramesToTime() const;
     qint64 startTime() const;
@@ -66,7 +66,6 @@ signals:
     void nextFrameOccured();
     void prevFrameOccured();
 protected:
-    virtual void resume();
 
     virtual void setSkipFramesToTime(qint64 skipFramesToTime);
 	virtual void channeljumpTo(qint64 mksec, int channel, qint64 borderTime) = 0;
