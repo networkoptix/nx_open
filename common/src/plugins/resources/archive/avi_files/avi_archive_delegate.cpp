@@ -1,32 +1,27 @@
 #include "avi_archive_delegate.h"
+
+#include <QtCore/QSemaphore>
+
 #include "stdint.h"
 #include <libavformat/avformat.h>
 #include "core/resource/resource_media_layout.h"
 #include "utils/media/ffmpeg_helper.h"
 
-
 extern QMutex global_ffmpeg_mutex;
 
-QSemaphore QnAviArchiveDelegate::aviSemaphore(4);
-class QnAviSemaphoreHelpr
+Q_GLOBAL_STATIC_WITH_ARGS(QSemaphore, aviSemaphore, (4))
+
+class QnSemaphoreLocker
 {
 public:
-    QnAviSemaphoreHelpr(QSemaphore& sem):
-      m_sem(sem)
-      {
-          m_sem.tryAcquire();
-      }
-
-      ~QnAviSemaphoreHelpr()
-      {
-          m_sem.release();
-      }
+    inline QnSemaphoreLocker(QSemaphore *sem) : m_sem(sem)
+    { m_sem->tryAcquire(); }
+    inline ~QnSemaphoreLocker()
+    { m_sem->release(); }
 
 private:
-    QSemaphore& m_sem;
-
+    QSemaphore *m_sem;
 };
-
 
 
 class QnAviAudioLayout: public QnResourceAudioLayout
@@ -39,7 +34,7 @@ public:
 
     }
 
-    unsigned int numberOfChannels() const 
+    unsigned int numberOfChannels() const
     {
         int audioNum = 0;
         int lastStreamID = -1;
@@ -126,6 +121,7 @@ private:
     QnAviArchiveDelegate* m_owner;
 };
 
+
 QnAviArchiveDelegate::QnAviArchiveDelegate():
     m_formatContext(0),
     m_videoLayout(0),
@@ -151,7 +147,7 @@ qint64 QnAviArchiveDelegate::startTime()
 
 qint64 QnAviArchiveDelegate::endTime()
 {
-    if (!m_streamsFound && !findStreams()) 
+    if (!m_streamsFound && !findStreams())
         return 0;
     return contentLength();
 }
@@ -169,7 +165,7 @@ QnMediaContextPtr QnAviArchiveDelegate::getCodecContext(AVStream* stream)
 
 QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
 {
-    QnAviSemaphoreHelpr sem(aviSemaphore);
+    QnSemaphoreLocker locker(aviSemaphore());
 
     if (!findStreams())
         return QnAbstractMediaDataPtr();
@@ -185,9 +181,9 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
 
         if (av_read_frame(m_formatContext, &packet) < 0)
             return QnAbstractMediaDataPtr();
-        
+
         stream= m_formatContext->streams[packet.stream_index];
-        switch(stream->codec->codec_type) 
+        switch(stream->codec->codec_type)
         {
             case AVMEDIA_TYPE_VIDEO:
                 if (m_indexToChannel[packet.stream_index] == -1) {
@@ -224,7 +220,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
     data->timestamp = packetTimestamp(packet);
 
     av_free_packet(&packet);
-    
+
     return data;
 }
 
@@ -239,11 +235,11 @@ qint64 QnAviArchiveDelegate::seek(qint64 time)
 bool QnAviArchiveDelegate::open(QnResourcePtr resource)
 {
     m_resource = resource;
-    if (m_formatContext == 0) 
+    if (m_formatContext == 0)
     {
         QString url = QLatin1String("ufile:") + m_resource->getUrl();
         m_initialized = av_open_input_file(&m_formatContext, url.toUtf8().constData(), NULL, 0, NULL) >= 0;
-        if (!m_initialized ) 
+        if (!m_initialized )
             close();
     }
     return m_initialized;
@@ -263,7 +259,7 @@ static QnDefaultDeviceVideoLayout defaultVideoLayout;
 
 QnVideoResourceLayout* QnAviArchiveDelegate::getVideoLayout()
 {
-    if (!m_initialized) 
+    if (!m_initialized)
     {
         return &defaultVideoLayout;
     }
@@ -286,7 +282,7 @@ bool QnAviArchiveDelegate::findStreams()
 {
     if (!m_initialized)
         return 0;
-    if (!m_streamsFound) 
+    if (!m_streamsFound)
     {
         QMutexLocker global_ffmpeg_locker(&global_ffmpeg_mutex);
         if (!m_streamsFound)
@@ -361,9 +357,9 @@ void QnAviArchiveDelegate::initLayoutStreams()
     }
 }
 
-qint64 QnAviArchiveDelegate::contentLength() const 
-{ 
-    return m_formatContext->duration; 
+qint64 QnAviArchiveDelegate::contentLength() const
+{
+    return m_formatContext->duration;
 }
 
 qint64 QnAviArchiveDelegate::packetTimestamp(const AVPacket& packet)
@@ -404,7 +400,7 @@ AVCodecContext* QnAviArchiveDelegate::setAudioChannel(int num)
 {
     if (!m_formatContext)
         return 0;
-    if (!m_streamsFound && !findStreams()) 
+    if (!m_streamsFound && !findStreams())
         return 0;
     // convert num to absolute track number
     m_audioStreamIndex = -1;
@@ -436,9 +432,9 @@ AVCodecContext* QnAviArchiveDelegate::setAudioChannel(int num)
     return 0;
 }
 
-AVFormatContext* QnAviArchiveDelegate::getFormatContext() 
-{ 
-    if (!m_streamsFound && !findStreams()) 
+AVFormatContext* QnAviArchiveDelegate::getFormatContext()
+{
+    if (!m_streamsFound && !findStreams())
         return 0;
-    return m_formatContext; 
+    return m_formatContext;
 }
