@@ -242,6 +242,7 @@ protected slots:
     void at_workbench_modeChanged();
     void at_workbench_raisedItemChanged();
     void at_workbench_zoomedItemChanged();
+    void at_workbench_focusedItemChanged();
 
     void at_item_geometryChanged();
     void at_item_geometryDeltaChanged();
@@ -286,6 +287,9 @@ private:
 
     /** Currently zoomed item. */
     QnWorkbenchItem *m_zoomedItem;
+
+    /** Currently focused item. */
+    QnWorkbenchItem *m_focusedItem;
 
     /** Current workbench mode. */
     QnWorkbench::Mode m_mode;

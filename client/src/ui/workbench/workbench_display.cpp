@@ -86,6 +86,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     m_curtainAnimator(NULL),
     m_zoomedItem(NULL),
     m_raisedItem(NULL),
+    m_focusedItem(NULL),
     m_mode(QnWorkbench::VIEWING),
     m_frontZ(0.0),
     m_dummyScene(new QGraphicsScene(this))
@@ -189,11 +190,8 @@ void QnWorkbenchDisplay::deinitSceneWorkbench() {
     foreach(QnWorkbenchItem *item, m_workbench->layout()->items())
         removeItemInternal(item, true);
 
-    m_raisedItem = m_zoomedItem = NULL;
-
-    assert(m_raisedItem == NULL);
-    assert(m_zoomedItem == NULL);
-    assert(m_mode == QnWorkbench::VIEWING);
+    m_raisedItem = m_zoomedItem = m_focusedItem = NULL;
+    m_mode = QnWorkbench::VIEWING;
 }
 
 void QnWorkbenchDisplay::initSceneWorkbench() {
@@ -222,8 +220,9 @@ void QnWorkbenchDisplay::initSceneWorkbench() {
     /* Init workbench. */
     connect(m_workbench,            SIGNAL(aboutToBeDestroyed()),                   this,                   SLOT(at_workbench_aboutToBeDestroyed()));
     connect(m_workbench,            SIGNAL(modeChanged()),                          this,                   SLOT(at_workbench_modeChanged()));
-    connect(m_workbench,            SIGNAL(raisedItemChanged()),                  this,                   SLOT(at_workbench_raisedItemChanged()));
+    connect(m_workbench,            SIGNAL(raisedItemChanged()),                    this,                   SLOT(at_workbench_raisedItemChanged()));
     connect(m_workbench,            SIGNAL(zoomedItemChanged()),                    this,                   SLOT(at_workbench_zoomedItemChanged()));
+    connect(m_workbench,            SIGNAL(focusedItemChanged()),                   this,                   SLOT(at_workbench_focusedItemChanged()));
     connect(m_workbench,            SIGNAL(itemAdded(QnWorkbenchItem *)),           this,                   SLOT(at_workbench_itemAdded(QnWorkbenchItem *)));
     connect(m_workbench,            SIGNAL(itemAboutToBeRemoved(QnWorkbenchItem *)),this,                   SLOT(at_workbench_itemAboutToBeRemoved(QnWorkbenchItem *)));
 
@@ -234,8 +233,12 @@ void QnWorkbenchDisplay::initSceneWorkbench() {
     /* Fire signals if needed. */
     if(m_workbench->mode() != m_mode)
         at_workbench_modeChanged();
-    at_workbench_raisedItemChanged();
-    at_workbench_zoomedItemChanged();
+    if(m_workbench->raisedItem() != m_raisedItem)
+        at_workbench_raisedItemChanged();
+    if(m_workbench->zoomedItem() != m_zoomedItem)
+        at_workbench_zoomedItemChanged();
+    if(m_workbench->focusedItem() != m_focusedItem)
+        at_workbench_focusedItemChanged();
 
     synchronizeSceneBounds();
 }
@@ -765,6 +768,20 @@ void QnWorkbenchDisplay::at_workbench_zoomedItemChanged() {
     synchronizeSceneBounds();
 }
 
+void QnWorkbenchDisplay::at_workbench_focusedItemChanged() {
+    QnWorkbenchItem *oldFocusedItem = m_focusedItem;
+    m_focusedItem = workbench()->focusedItem();
+
+    /* Stop audio on previously focused item. */
+    CLCamDisplay *oldCamDisplay = camDisplay(oldFocusedItem);
+    if(oldCamDisplay != NULL)
+        oldCamDisplay->playAudio(false);
+
+    /* Play audio on newly focused item. */
+    CLCamDisplay *newCamDisplay = camDisplay(m_focusedItem);
+    if(newCamDisplay != NULL)
+        newCamDisplay->playAudio(true);
+}
 
 void QnWorkbenchDisplay::at_viewport_transformationChanged() {
     if(m_raisedItem == NULL)

@@ -45,8 +45,7 @@
 QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObject *parent):
     QObject(parent),
     m_display(display),
-    m_manager(display->instrumentManager()),
-    m_focusedItem(NULL)
+    m_manager(display->instrumentManager())
 {
     /* Install and configure instruments. */
     ClickInstrument *itemClickInstrument = new ClickInstrument(Qt::LeftButton, Instrument::ITEM, this);
@@ -405,21 +404,12 @@ void QnWorkbenchController::at_viewportUngrabbed() {
 }
 
 void QnWorkbenchController::at_workbench_focusedItemChanged() {
-    QnWorkbenchItem *oldFocusedItem = m_focusedItem;
-    m_focusedItem = workbench()->focusedItem();
+    at_workbench_focusedItemChanged(workbench()->focusedItem());
+}
 
-    /* Stop audio on previously focused item. */
-    CLCamDisplay *oldCamDisplay = m_display->camDisplay(oldFocusedItem);
-    if(oldCamDisplay != NULL)
-        oldCamDisplay->playAudio(false);
-
+void QnWorkbenchController::at_workbench_focusedItemChanged(QnWorkbenchItem *focusedItem) {
     /* Update navigation item's target. */
-    m_navigationItem->setVideoCamera(m_display->camera(m_focusedItem));
-
-    /* Play audio on newly focused item. */
-    CLCamDisplay *newCamDisplay = m_display->camDisplay(m_focusedItem);
-    if(newCamDisplay != NULL)
-        newCamDisplay->playAudio(true);
+    m_navigationItem->setVideoCamera(m_display->camera(focusedItem));
 }
 
 void QnWorkbenchController::at_display_widgetAdded(QnResourceWidget *widget) {
@@ -432,6 +422,9 @@ void QnWorkbenchController::at_display_widgetAdded(QnResourceWidget *widget) {
 }
 
 void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
+    if(widget->item() == workbench()->focusedItem())
+        at_workbench_focusedItemChanged(NULL);
+
     if(widget->display() == NULL || widget->display()->camera() == NULL)
         return;
 

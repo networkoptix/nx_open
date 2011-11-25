@@ -76,6 +76,7 @@ protected slots:
     void at_viewportUngrabbed();
 
     void at_workbench_focusedItemChanged();
+    void at_workbench_focusedItemChanged(QnWorkbenchItem *focusedItem);
 
     void at_display_widgetAdded(QnResourceWidget *widget);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
@@ -107,9 +108,6 @@ private:
 
     /** Ui elements instrument. */
     UiElementsInstrument *m_uiElementsInstrument;
-
-    /** Focused item. */
-    QnWorkbenchItem *m_focusedItem;
 
     /** Navigation item. */
     NavigationItem *m_navigationItem;
