@@ -271,7 +271,8 @@ public:
         m_dragging(false),
         m_scaleSpeed(1.0),
         m_prevWheelDelta(INT_MAX),
-        m_cachedXPos(-INT64_MAX)
+        m_cachedXPos(INT64_MIN),
+        m_cachedOutsideCnt(INT64_MIN)
     {
         setFlag(QGraphicsItem::ItemClipsToShape); // ### paints out of shape, bitch
 
@@ -310,6 +311,7 @@ private:
     double m_scaleSpeed;
     int m_prevWheelDelta;
     double m_cachedXPos;
+    double m_cachedOutsideCnt;
 };
 
 void TimeLine::wheelEvent(QGraphicsSceneWheelEvent *event)
@@ -461,6 +463,11 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
     double xpos = r.left() - qRound64(pixelPerTime * pos);
     int outsideCnt = -xpos / (intervals[level].interval * pixelPerTime);
+    if (outsideCnt - m_cachedOutsideCnt == 1)
+        outsideCnt = m_cachedOutsideCnt;
+    else
+        m_cachedOutsideCnt = outsideCnt;
+
     xpos += outsideCnt * intervals[level].interval * pixelPerTime;
     if ((pos+range - intervals[level].interval*outsideCnt) / r.width() <= 1) // abnormally long range
         return;

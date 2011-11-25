@@ -62,6 +62,7 @@ QN_EXPORT qint64 getDiskFreeSpace(const QString& root);
 
 #ifndef INT64_MAX
 static const qint64 INT64_MAX = 0x7fffffffffffffffll;
+static const qint64 INT64_MIN = 0x8000000000000000ll;
 #endif
 
 static const qint64 DATETIME_NOW = INT64_MAX;
