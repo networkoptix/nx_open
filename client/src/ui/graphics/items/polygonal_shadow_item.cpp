@@ -9,7 +9,9 @@ QnPolygonalShadowItem::QnPolygonalShadowItem(QGraphicsItem *parent):
     m_parametersValid(false)
 {
     setAcceptedMouseButtons(0);
-    setEnabled(false);
+    
+    /* Don't disable this item here. When disabled, it starts accepting wheel events 
+     * (and probably other events too). Looks like a Qt bug. */
 }
 
 QRectF QnPolygonalShadowItem::boundingRect() const {

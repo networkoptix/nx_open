@@ -3,6 +3,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QGLWidget>
+#include <QGraphicsLinearLayout>
 
 #include <ui/animation/viewport_animator.h>
 
@@ -64,6 +65,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
         QEvent::GraphicsSceneMouseDoubleClick
     );
 
+    QSet<QEvent::Type> wheelEventTypes = Instrument::makeSet(QEvent::GraphicsSceneWheel);
+
     /* Item instruments. */
     m_manager->installInstrument(new StopInstrument(Instrument::ITEM, mouseEventTypes, this));
     m_manager->installInstrument(new SelectionFixupInstrument(this));
@@ -71,6 +74,11 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_manager->installInstrument(itemClickInstrument);
 
     /* Scene instruments. */
+    m_manager->installInstrument(new StopInstrument(Instrument::SCENE, wheelEventTypes, this));
+    m_manager->installInstrument(m_wheelZoomInstrument);
+    m_manager->installInstrument(new StopAcceptedInstrument(Instrument::SCENE, wheelEventTypes, this));
+    m_manager->installInstrument(new ForwardingInstrument(Instrument::SCENE, wheelEventTypes, this));
+
     m_manager->installInstrument(new StopInstrument(Instrument::SCENE, mouseEventTypes, this));
     m_manager->installInstrument(sceneClickInstrument);
     m_manager->installInstrument(new StopAcceptedInstrument(Instrument::SCENE, mouseEventTypes, this));
@@ -78,9 +86,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
 
     /* View/viewport instruments. */
     m_manager->installInstrument(m_uiElementsInstrument, InstallationMode::INSTALL_FIRST);
-    m_manager->installInstrument(new StopInstrument(Instrument::VIEWPORT, Instrument::makeSet(QEvent::Wheel), this));
     m_manager->installInstrument(m_resizingInstrument);
-    m_manager->installInstrument(m_wheelZoomInstrument);
     m_manager->installInstrument(m_dragInstrument);
     m_manager->installInstrument(m_rubberBandInstrument);
     m_manager->installInstrument(m_handScrollInstrument);
@@ -96,17 +102,17 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_resizingInstrument,       SIGNAL(resizingFinished(QGraphicsView *, QGraphicsWidget *)),           this,                   SLOT(at_resizingFinished(QGraphicsView *, QGraphicsWidget *)));
     connect(m_handScrollInstrument,     SIGNAL(scrollingStarted(QGraphicsView *)),                              boundingInstrument,     SLOT(dontEnforcePosition(QGraphicsView *)));
     connect(m_handScrollInstrument,     SIGNAL(scrollingFinished(QGraphicsView *)),                             boundingInstrument,     SLOT(enforcePosition(QGraphicsView *)));
-    connect(m_display,             SIGNAL(viewportGrabbed()),                                              m_handScrollInstrument, SLOT(recursiveDisable()));
-    connect(m_display,             SIGNAL(viewportUngrabbed()),                                            m_handScrollInstrument, SLOT(recursiveEnable()));
-    connect(m_display,             SIGNAL(viewportGrabbed()),                                              m_wheelZoomInstrument,  SLOT(recursiveDisable()));
-    connect(m_display,             SIGNAL(viewportUngrabbed()),                                            m_wheelZoomInstrument,  SLOT(recursiveEnable()));
+    connect(m_display,                  SIGNAL(viewportGrabbed()),                                              m_handScrollInstrument, SLOT(recursiveDisable()));
+    connect(m_display,                  SIGNAL(viewportUngrabbed()),                                            m_handScrollInstrument, SLOT(recursiveEnable()));
+    connect(m_display,                  SIGNAL(viewportGrabbed()),                                              m_wheelZoomInstrument,  SLOT(recursiveDisable()));
+    connect(m_display,                  SIGNAL(viewportUngrabbed()),                                            m_wheelZoomInstrument,  SLOT(recursiveEnable()));
     connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *)),     m_dragInstrument,       SLOT(recursiveDisable()));
     connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *)),    m_dragInstrument,       SLOT(recursiveEnable()));
     connect(m_resizingInstrument,       SIGNAL(resizingProcessStarted(QGraphicsView *, QGraphicsWidget *)),     m_rubberBandInstrument, SLOT(recursiveDisable()));
     connect(m_resizingInstrument,       SIGNAL(resizingProcessFinished(QGraphicsView *, QGraphicsWidget *)),    m_rubberBandInstrument, SLOT(recursiveEnable()));
 
-    connect(m_display,             SIGNAL(viewportGrabbed()),                                              this,                   SLOT(at_viewportGrabbed()));
-    connect(m_display,             SIGNAL(viewportUngrabbed()),                                            this,                   SLOT(at_viewportUngrabbed()));
+    connect(m_display,                  SIGNAL(viewportGrabbed()),                                              this,                   SLOT(at_viewportGrabbed()));
+    connect(m_display,                  SIGNAL(viewportUngrabbed()),                                            this,                   SLOT(at_viewportUngrabbed()));
 
     /* Create controls. */
     QGraphicsWidget *controlsWidget = m_uiElementsInstrument->widget();
