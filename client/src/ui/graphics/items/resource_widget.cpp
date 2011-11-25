@@ -57,6 +57,10 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     setFrameColor(defaultFrameColor);
     setFrameWidth(defaultFrameWidth);
 
+    /* Set up buttons. */
+    CLImgSubItem *closeButton = new CLImgSubItem(this, Skin::path(QLatin1String("close3.png")), type, global_decoration_opacity, global_decoration_max_opacity, 300, 300);
+
+
     /* Set up video rendering. */
     m_display = item->createDisplay(this);
     m_videoLayout = m_display->videoLayout();
