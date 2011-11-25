@@ -41,7 +41,8 @@ public:
         endTime(0),
         rtspScale(1.0),
         liveMode(false),
-        gotLivePacket(false)
+        gotLivePacket(false),
+        lastPlayCSeq(0)
     {
     }
     void deleteDP()
@@ -67,7 +68,7 @@ public:
     }
 
     QnAbstractMediaStreamDataProvider* liveDP;
-    QnAbstractArchiveReader* archiveDP;
+    QnArchiveStreamReader* archiveDP;
     bool liveMode;
 
     QnRtspDataConsumer* dataProcessor;
@@ -81,6 +82,7 @@ public:
     double rtspScale; // RTSP playing speed (1 - normal speed, 0 - pause, >1 fast forward, <-1 fast back e. t.c.)
     QMutex mutex;
     bool gotLivePacket;
+    int lastPlayCSeq;
 };
 
 // ----------------------------- QnRtspConnectionProcessor ----------------------------
@@ -259,8 +261,9 @@ int QnRtspConnectionProcessor::composePause()
     Q_D(QnRtspConnectionProcessor);
     //if (!d->dataProvider)
     //    return CODE_NOT_FOUND;
-    if (d->archiveDP)
-        d->archiveDP->setSingleShotMode(true);
+    
+    //if (d->archiveDP)
+    //    d->archiveDP->setSingleShotMode(true);
 
     //d->playTime += d->rtspScale * d->playTimer.elapsed()*1000;
     //d->rtspScale = 0;
@@ -333,7 +336,7 @@ void QnRtspConnectionProcessor::createDataProvider()
             d->liveDP = camera->getLiveReader();
     }
     if (!d->archiveDP) {
-        d->archiveDP = dynamic_cast<QnAbstractArchiveReader*> (d->mediaRes->createDataProvider(QnResource::Role_Archive));
+        d->archiveDP = dynamic_cast<QnArchiveStreamReader*> (d->mediaRes->createDataProvider(QnResource::Role_Archive));
     }
 }
 
@@ -344,6 +347,8 @@ int QnRtspConnectionProcessor::composePlay()
     if (d->mediaRes == 0)
         return CODE_NOT_FOUND;
     createDataProvider();
+
+    d->lastPlayCSeq = d->requestHeaders.value("CSeq").toInt();
 
     if (!d->dataProcessor) {
         d->dataProcessor = new QnRtspDataConsumer(this);
@@ -373,23 +378,25 @@ int QnRtspConnectionProcessor::composePlay()
     if (d->liveMode) {
         d->dataProcessor->copyLastGopFromCamera();
         d->dataProcessor->unlockDataQueue();
-        d->dataProcessor->setWaitBOF(d->startTime, false); // ignore rest packets before new position
+        d->dataProcessor->setWaitCSeq(d->startTime, 0); // ignore rest packets before new position
     }
     else if (d->archiveDP) 
     {
         d->archiveDP->setReverseMode(d->rtspScale < 0);
         if (!d->requestHeaders.value("Range").isNull())
         {
-            d->archiveDP->setSingleShotMode(d->startTime != DATETIME_NOW && d->startTime == d->endTime);
+            //d->archiveDP->setSingleShotMode(d->startTime != DATETIME_NOW && d->startTime == d->endTime);
+            d->dataProcessor->setSingleShotMode(d->startTime != DATETIME_NOW && d->startTime == d->endTime);
 
-            if (qAbs(d->startTime - getRtspTime()) >= RTSP_MIN_SEEK_INTERVAL)
+            //if (qAbs(d->startTime - getRtspTime()) >= RTSP_MIN_SEEK_INTERVAL)
             
             {
-                d->dataProcessor->setWaitBOF(d->startTime, true); // ignore rest packets before new position
-                if (!d->archiveDP->jumpTo(d->startTime, true))
-                    d->dataProcessor->setWaitBOF(d->startTime, false); // ignore rest packets before new position
+                d->dataProcessor->setWaitCSeq(d->startTime, d->lastPlayCSeq); // ignore rest packets before new position
+                d->archiveDP->jumpWithMarker(d->startTime, d->lastPlayCSeq);
             }
         }
+        //else
+        //    d->archiveDP->setSingleShotMode(false);
     }
     currentDP->start();
     d->dataProcessor->start();

@@ -7,6 +7,7 @@
 #include "camera/video_camera.h"
 #include "camera/camera_pool.h"
 #include "utils/common/sleep.h"
+#include "utils/network/rtpsession.h"
 
 static const int MAX_QUEUE_SIZE = 15;
 //static const QString RTP_FFMPEG_GENERIC_STR("mpeg4-generic"); // this line for debugging purpose with VLC player
@@ -18,10 +19,11 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
   QnAbstractDataConsumer(MAX_QUEUE_SIZE),
   m_owner(owner),
   m_lastSendTime(0),
-  m_waitBOF(false),
+  m_waitSCeq(0),
   m_liveMode(false),
   m_pauseNetwork(false),
-  m_gotLivePacket(false)
+  m_gotLivePacket(false),
+  m_singleShotMode(false)
 {
     memset(m_sequence, 0, sizeof(m_sequence));
     m_timer.start();
@@ -41,10 +43,10 @@ void QnRtspDataConsumer::setLastSendTime(qint64 time)
 { 
     m_lastSendTime = time; 
 }
-void QnRtspDataConsumer::setWaitBOF(qint64 newTime, bool value) 
+void QnRtspDataConsumer::setWaitCSeq(qint64 newTime, int sceq)
 { 
     QMutexLocker lock(&m_mutex);
-    m_waitBOF = value; 
+    m_waitSCeq = sceq; 
     m_lastSendTime = newTime;
     m_ctxSended.clear();
     m_gotLivePacket = false;
@@ -81,7 +83,9 @@ bool QnRtspDataConsumer::canAcceptData() const
 {
     if (m_liveMode)
         return true;
-    else
+    else if (m_singleShotMode)
+        return m_dataQueue.size() == 0;
+    else 
         return QnAbstractDataConsumer::canAcceptData();
 }
 
@@ -152,12 +156,13 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     if (media->flags & QnAbstractMediaData::MediaFlags_AfterEOF)
         m_ctxSended.clear();
 
-    if (m_waitBOF && !(media->flags & QnAbstractMediaData::MediaFlags_BOF))
+    //if (m_waitBOF && !(media->flags & QnAbstractMediaData::MediaFlags_BOF))
+    if (m_waitSCeq && media->opaque != m_waitSCeq)
     {
         m_mutex.unlock();
         return true; // ignore data
     }
-    m_waitBOF = false;
+    m_waitSCeq = 0;
 
 
     //if (!ctx)
@@ -194,7 +199,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     QnCompressedVideoData *video = media.dynamicCast<QnCompressedVideoData>().data();
     const char* curData = media->data.data();
     int sendLen = 0;
-    int headerSize = 4 + (video ? 4 : 0);
+    int headerSize = 4 + (video ? RTSP_FFMPEG_VIDEO_HEADER_SIZE : 0);
 
     if (m_lastSendTime != DATETIME_NOW)
         m_lastSendTime = media->timestamp;
@@ -220,6 +225,8 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
             {
                 quint32 videoHeader = htonl((video->flags << 24) + (video->data.size() & 0x00ffffff));
                 m_owner->sendData((const char*) &videoHeader, 4);
+                quint8 cseq = media->opaque;
+                m_owner->sendData((const char*) &cseq, 1);
             }
             headerSize = 0;
         }
@@ -253,3 +260,7 @@ void QnRtspDataConsumer::copyLastGopFromCamera()
     }
 }
 
+void QnRtspDataConsumer::setSingleShotMode(bool value)
+{
+    m_singleShotMode = value;
+}

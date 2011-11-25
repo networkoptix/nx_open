@@ -33,9 +33,8 @@ public:
     virtual const QnResourceAudioLayout* getDPAudioLayout() const;
     static bool deserializeLayout(CLCustomDeviceVideoLayout* layout, const QString& layoutStr);
     static QString serializeLayout(const QnVideoResourceLayout* layout);
-
     void renameFileOnDestroy(const QString& newFileName);
-
+    void jumpWithMarker(qint64 mksec, int marker);
 protected:
     virtual QnAbstractMediaDataPtr getNextData();
     virtual void channeljumpTo(qint64 mksec, int channel, qint64 skipTime);
@@ -88,6 +87,8 @@ private:
     QString m_onDestroyFileName;
     bool m_BOF;
     qint64 m_BOFTime;
+    int m_dataMarker;
+    int m_newDataMarker;
 private:
     bool m_singleShot;
     bool m_singleQuantProcessed;
@@ -101,6 +102,7 @@ private:
     bool getNextVideoPacket();
     void addAudioChannel(QnCompressedAudioDataPtr audio);
     QnAbstractMediaDataPtr getNextPacket();
+    void channeljumpToUnsync(qint64 mksec, int channel, qint64 skipTime);
 };
 
 #endif //avi_stream_reader_h1901

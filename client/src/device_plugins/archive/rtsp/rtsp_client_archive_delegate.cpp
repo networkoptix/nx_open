@@ -64,6 +64,7 @@ bool QnRtspClientArchiveDelegate::open(QnResourcePtr resource)
         for (int i = 0; i < 50 && !m_closing; ++i)
             QnSleep::msleep(10);
     }
+    m_sendedCSec = m_rtspSession.lastSendedCSeq();
     return m_opened;
 }
 
@@ -178,8 +179,11 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
 
         if (result && m_waitBOF)
         {
-            if (result->flags & QnAbstractMediaData::MediaFlags_BOF)
+            if (result->flags & QnAbstractMediaData::MediaFlags_BOF &&
+                ((result->flags & QnAbstractMediaData::MediaFlags_LIVE) ||  m_sendedCSec == result->opaque))
+            {
                 m_waitBOF = false;
+            }
             else
                 result.clear();
         }
@@ -195,10 +199,8 @@ qint64 QnRtspClientArchiveDelegate::seek(qint64 time)
 {
     deleteContexts(); // context is going to create again on first data after SEEK, so ignore rest of data before seek
     m_position = time;
-    //if (m_singleShotMode)
-    //    m_needResume = true;
-    //m_rtspSession.sendPlay(time, m_singleShotMode ? time : AV_NOPTS_VALUE, m_rtspSession.getScale());
-    m_rtspSession.sendPlay(time, AV_NOPTS_VALUE, m_rtspSession.getScale());
+    m_rtspSession.sendPlay(time, m_singleShotMode ? time : AV_NOPTS_VALUE, m_rtspSession.getScale());
+    m_sendedCSec = m_rtspSession.lastSendedCSeq();
     m_waitBOF = true;
     return time;
 }
@@ -279,17 +281,21 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
             payload+=4; // deserialize timeStamp high part
             if (context->ctx()->codec_type == AVMEDIA_TYPE_VIDEO)
             {
-                if (dataSize < 1)
+                if (dataSize < RTSP_FFMPEG_VIDEO_HEADER_SIZE)
                     return result;
 
                 quint32 videoHeader = ntohl(*(quint32*)payload);
                 quint8 flags = videoHeader >> 24;
                 quint32 fullPayloadLen = videoHeader & 0x00ffffff;
-                dataSize-=4;
-                payload+=4; // deserialize video flags
+                quint8 cseq = payload[4];
+
+                dataSize -= RTSP_FFMPEG_VIDEO_HEADER_SIZE;
+                payload += RTSP_FFMPEG_VIDEO_HEADER_SIZE; // deserialize video flags
+
                 QnCompressedVideoData *video = new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, fullPayloadLen, context);
                 nextPacket = QnCompressedVideoDataPtr(video);
                 video->flags = flags;
+                video->opaque = cseq;
                 if (context) 
                 {
                     video->width = context->ctx()->coded_width;

@@ -56,6 +56,7 @@ private:
     int m_lastPacketFlags;
     bool m_closing;
     bool m_singleShotMode;
+    quint8 m_sendedCSec;
 };
 
 #endif

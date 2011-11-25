@@ -21,7 +21,7 @@ public:
     void resumeNetwork();
 
     void setLastSendTime(qint64 time);
-    void setWaitBOF(qint64 newTime, bool value);
+    void setWaitCSeq(qint64 newTime, int sceq);
     virtual qint64 getCurrentTime() const;
     virtual void putData(QnAbstractDataPacketPtr data);
     virtual bool canAcceptData() const;
@@ -29,6 +29,7 @@ public:
     void copyLastGopFromCamera();
     void lockDataQueue();
     void unlockDataQueue();
+    void setSingleShotMode(bool value);
 protected:
     void buildRtspTcpHeader(quint8 channelNum, quint32 ssrc, quint16 len, int markerBit, quint32 timestamp);
     QnMediaContextPtr getGeneratedContext(CodecID compressionType);
@@ -46,10 +47,11 @@ private:
     char m_rtspTcpHeader[4 + RtpHeader::RTP_HEADER_SIZE];
     quint8* tcpReadBuffer;
     QMutex m_mutex;
-    bool m_waitBOF;
+    int m_waitSCeq;
     bool m_liveMode;
     bool m_pauseNetwork;
     QMutex m_dataQueueMtx;
+    bool m_singleShotMode;
 };
 
 #endif // __RTSP_DATA_CONSUMER_H__
