@@ -3,11 +3,12 @@
 
 #include <QGraphicsWidget>
 #include <QPixmap>
+#include "clickable.h"
 
-class QnImageButtonWidget: public QGraphicsWidget {
+class QnImageButtonWidget: public Clickable<QGraphicsWidget> {
     Q_OBJECT;
 
-    typedef QGraphicsWidget base_type;
+    typedef Clickable<QGraphicsWidget> base_type;
 
 public:
     QnImageButtonWidget(QGraphicsItem *parent = NULL);
@@ -19,6 +20,12 @@ public:
     }
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+
+signals:
+    void clicked();
+
+protected:
+    virtual void clickedNotify(QGraphicsSceneMouseEvent *event) override;
 
 private:
     QPixmap m_pixmap;

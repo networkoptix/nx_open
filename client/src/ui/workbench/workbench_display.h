@@ -258,14 +258,6 @@ protected slots:
     void at_view_destroyed();
 
 private:
-    struct ItemProperties {
-        ItemProperties(): animator(NULL), layer(BACK_LAYER) {}
-
-        QnWidgetAnimator *animator;
-        Layer layer;
-    };
-
-private:
     /* Directly visible state */
 
     /** Current workbench. */
@@ -282,9 +274,6 @@ private:
 
     /** Item to widget mapping. */
     QHash<QnWorkbenchItem *, QnResourceWidget *> m_widgetByItem;
-
-    /** Item to item properties mapping. */
-    QHash<QGraphicsItem *, ItemProperties> m_propertiesByItem;
 
     /** Current front z displacement value. */
     qreal m_frontZ;

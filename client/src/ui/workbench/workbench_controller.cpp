@@ -345,6 +345,10 @@ void QnWorkbenchController::at_item_clicked(QGraphicsView *, QGraphicsItem *item
         return;
 
     QnWorkbenchItem *workbenchItem = widget->item();
+
+    workbenchItem->deleteLater();
+    return;
+
     workbench()->setRaisedItem(workbench()->raisedItem() == workbenchItem ? NULL : workbenchItem);
     workbench()->setFocusedItem(workbenchItem);
 }

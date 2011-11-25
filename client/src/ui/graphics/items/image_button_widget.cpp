@@ -2,9 +2,11 @@
 #include <QPainter>
 
 QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent):
-    QGraphicsWidget(parent)
-{}
-    
+    base_type(parent)
+{
+    setAcceptedMouseButtons(Qt::LeftButton);
+    setClickableButtons(Qt::LeftButton);
+}
 
 void QnImageButtonWidget::setPixmap(const QPixmap &pixmap) {
     m_pixmap = pixmap;
@@ -17,4 +19,8 @@ void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsIte
     }
 
     painter->drawPixmap(rect(), m_pixmap, m_pixmap.rect());
+}
+
+void QnImageButtonWidget::clickedNotify(QGraphicsSceneMouseEvent *) {
+    emit clicked();
 }

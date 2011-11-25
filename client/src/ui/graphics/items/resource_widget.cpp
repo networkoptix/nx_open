@@ -1,6 +1,7 @@
 #include "resource_widget.h"
 #include <cassert>
 #include <QPainter>
+#include <QGraphicsLinearLayout>
 #include <core/resource/resource_media_layout.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/graphics/painters/loading_progress_painter.h>
@@ -57,11 +58,16 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     setFrameColor(defaultFrameColor);
     setFrameWidth(defaultFrameWidth);
 
-    /* Set up buttons. */
-    CLImgSubItem *closeButton = new CLImgSubItem(this, Skin::path(QLatin1String("close3.png")), type, global_decoration_opacity, global_decoration_max_opacity, 300, 300);
-
+    /* Set up buttons layout. */
+    m_buttonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    m_buttonsLayout->insertStretch(0, 0x1000); /* Set large enough stretch for the item to be placed in right end of the layout. */
+    QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
+    layout->addItem(m_buttonsLayout);
+    layout->addStretch(0x1000);
+    setLayout(layout);
 
     /* Set up video rendering. */
+#if 0
     m_display = item->createDisplay(this);
     m_videoLayout = m_display->videoLayout();
     m_channelCount = m_videoLayout->numberOfChannels();
@@ -71,10 +77,17 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     m_display->addRenderer(m_renderer);
 
     m_display->start();
+#else
+    m_channelCount = 1;
+    m_display = NULL;
+    m_videoLayout = NULL;
+    m_renderer = NULL;
+    m_display = NULL;
+#endif
 }
 
 QnResourceWidget::~QnResourceWidget() {
-    delete m_display;
+    //delete m_display;
     
     if(!m_shadow.isNull()) {
         m_shadow.data()->setShapeProvider(NULL);
@@ -197,6 +210,7 @@ QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint) const {
 }
 
 void QnResourceWidget::at_sourceSizeChanged(const QSize &size) {
+#if 0
     qreal oldAspectRatio = m_aspectRatio;
     qreal newAspectRatio = static_cast<qreal>(size.width() * m_videoLayout->width()) / (size.height() * m_videoLayout->height());
     if(qFuzzyCompare(oldAspectRatio, newAspectRatio))
@@ -207,6 +221,7 @@ void QnResourceWidget::at_sourceSizeChanged(const QSize &size) {
     setGeometry(expanded(m_aspectRatio, enclosingGeometry, Qt::KeepAspectRatio));
 
     emit aspectRatioChanged(oldAspectRatio, newAspectRatio);
+#endif
 }
 
 QVariant QnResourceWidget::itemChange(GraphicsItemChange change, const QVariant &value) {
@@ -244,6 +259,7 @@ void QnResourceWidget::resizeEvent(QGraphicsSceneResizeEvent *event) override {
 }
 
 QRectF QnResourceWidget::channelRect(int channel) const {
+#if 0
     if (m_channelCount == 1) 
         return QRectF(QPointF(0.0, 0.0), size());
 
@@ -257,6 +273,9 @@ QRectF QnResourceWidget::channelRect(int channel) const {
         w, 
         h
     );
+#else
+    return QRectF(QPointF(0.0, 0.0), size());
+#endif
 }
 
 void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/) {
@@ -266,6 +285,7 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     }
 
     /* Update screen size of a single channel. */
+#if 0
     QSizeF itemScreenSize = painter->combinedTransform().mapRect(boundingRect()).size();
     QSize channelScreenSize = QSizeF(itemScreenSize.width() / m_videoLayout->width(), itemScreenSize.height() / m_videoLayout->height()).toSize();
     if(channelScreenSize != m_channelScreenSize) {
@@ -281,6 +301,11 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         drawLoadingProgress(status, rect);
     }
     painter->endNativePainting();
+#else 
+    painter->beginNativePainting();
+    drawLoadingProgress(QnRenderStatus::CANNOT_RENDER, rect());
+    painter->endNativePainting();
+#endif
 }
 
 void QnResourceWidget::drawLoadingProgress(QnRenderStatus::RenderStatus status, const QRectF &rect) const {
@@ -419,4 +444,12 @@ bool QnResourceWidget::windowFrameEvent(QEvent *event) {
     }
 
     return result;
+}
+
+void QnResourceWidget::addButton(QGraphicsLayoutItem *button) {
+    m_buttonsLayout->insertItem(1, button);
+}
+
+void QnResourceWidget::removeButton(QGraphicsLayoutItem *button) {
+    m_buttonsLayout->removeItem(button);
 }

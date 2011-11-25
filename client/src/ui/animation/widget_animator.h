@@ -2,6 +2,7 @@
 #define QN_WIDGET_ANIMATOR_H
 
 #include <QObject>
+#include <QMetaType>
 #include <utils/common/scene_utility.h>
 
 class QGraphicsWidget;
@@ -124,5 +125,6 @@ private:
     QPropertyAnimation *m_rotationAnimation;
 };
 
+Q_DECLARE_METATYPE(QnWidgetAnimator *);
 
 #endif // QN_WIDGET_ANIMATOR_H

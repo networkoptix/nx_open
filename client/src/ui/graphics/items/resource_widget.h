@@ -8,6 +8,8 @@
 #include <utils/common/scene_utility.h>
 #include "polygonal_shadow_item.h"
 
+class QGraphicsLinearLayout;
+
 class QnResourceWidgetRenderer;
 class QnVideoResourceLayout;
 class QnWorkbenchItem;
@@ -136,6 +138,26 @@ public:
      */
     void setEnclosingGeometry(const QRectF &enclosingGeometry);
 
+    /**
+     * Adds a button to this widget.
+     *
+     * Widget decides where to place buttons and creates an appropriate layout for them.
+     * Deciding which buttons to add, assigning actions to them, and actually adding them is
+     * up to the user.
+     *
+     * \param button                    Button to add. Ownership of the button is
+     *                                  transferred to this widget.
+     */
+    void addButton(QGraphicsLayoutItem *button);
+
+    /**
+     * Removes a button from this widget.
+     * 
+     * \param button                    Button to add. Ownership of the button is
+     *                                  transferred to the caller.
+     */
+    void removeButton(QGraphicsLayoutItem *button);
+
 signals:
     void aspectRatioChanged(qreal oldAspectRatio, qreal newAspectRatio);
 
@@ -204,6 +226,8 @@ private:
     /** Frame width. */
     qreal m_frameWidth;
 
+    /** Layout for buttons. */
+    QGraphicsLinearLayout *m_buttonsLayout;
 };
 
 #endif // QN_DISPLAY_WIDGET_H

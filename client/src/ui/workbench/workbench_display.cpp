@@ -18,6 +18,10 @@
 
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/curtain_item.h>
+#include <ui/graphics/items/image_button_widget.h>
+
+#include <ui/ui_common.h>
+#include <ui/skin.h>
 
 #include <utils/common/warnings.h>
 
@@ -63,6 +67,11 @@ namespace {
     /** The amount that is added to maximal Z value each time a move to front
      * operation is performed. */
     const qreal zStep = 1.0;
+
+    enum {
+        ITEM_LAYER = 0x93A7FA71,    /**< Key for item layer. */
+        ITEM_ANIMATOR = 0x81AFD591  /**< Key for item animator. */
+    };
 
 } // anonymous namespace
 
@@ -165,7 +174,6 @@ void QnWorkbenchDisplay::deinitSceneWorkbench() {
     m_instrumentManager->unregisterScene(m_scene);
 
     disconnect(m_scene, NULL, this, NULL);
-    m_propertiesByItem.clear();
 
     /* Clear curtain. */
     if(!m_curtainItem.isNull()) {
@@ -173,7 +181,6 @@ void QnWorkbenchDisplay::deinitSceneWorkbench() {
         m_curtainItem.clear();
     }
     m_curtainAnimator->setCurtainItem(NULL);
-
 
     /* Deinit workbench. */
     disconnect(m_workbench, NULL, this, NULL);
@@ -314,11 +321,9 @@ void QnWorkbenchDisplay::initBoundingInstrument() {
 // QnWorkbenchDisplay :: item properties
 // -------------------------------------------------------------------------- //
 QnWorkbenchDisplay::Layer QnWorkbenchDisplay::layer(QGraphicsItem *item) const {
-     QHash<QGraphicsItem *, ItemProperties>::const_iterator pos = m_propertiesByItem.find(item);
-     if(pos == m_propertiesByItem.end())
-         return BACK_LAYER;
-
-    return pos->layer;
+    bool ok;
+    Layer layer = static_cast<Layer>(item->data(ITEM_LAYER).toInt(&ok));
+    return ok ? layer : BACK_LAYER;
 }
 
 void QnWorkbenchDisplay::setLayer(QGraphicsItem *item, Layer layer) {
@@ -327,11 +332,9 @@ void QnWorkbenchDisplay::setLayer(QGraphicsItem *item, Layer layer) {
         return;
     }
 
-    ItemProperties &properties = m_propertiesByItem[item];
-
     /* Moving items back and forth between layers should preserve their relative
      * z order. Hence the fmod.*/
-    properties.layer = layer;
+    item->setData(ITEM_LAYER, static_cast<int>(layer));
     item->setZValue(layer * layerZSize + fmod(item->zValue(), layerZSize));
 }
 
@@ -341,16 +344,19 @@ void QnWorkbenchDisplay::setLayer(const QList<QGraphicsItem *> &items, Layer lay
 }
 
 QnWidgetAnimator *QnWorkbenchDisplay::animator(QnResourceWidget *widget) {
-    ItemProperties &properties = m_propertiesByItem[widget];
-    if(properties.animator != NULL)
-        return properties.animator;
+    QnWidgetAnimator *animator = widget->data(ITEM_ANIMATOR).value<QnWidgetAnimator *>();
+    if(animator != NULL)
+        return animator;
 
-    /* Create if it's not there. */
-    properties.animator = new QnWidgetAnimator(widget, "enclosingGeometry", "rotation", widget);
-    properties.animator->setMovementSpeed(4.0);
-    properties.animator->setScalingSpeed(32.0);
-    properties.animator->setRotationSpeed(720.0);
-    return properties.animator;
+    /* Create if it's not there. 
+     * 
+     * Note that widget is set as animator's parent. */
+    animator = new QnWidgetAnimator(widget, "enclosingGeometry", "rotation", widget);
+    animator->setMovementSpeed(4.0);
+    animator->setScalingSpeed(32.0);
+    animator->setRotationSpeed(720.0);
+    widget->setData(ITEM_ANIMATOR, QVariant::fromValue<QnWidgetAnimator *>(animator));
+    return animator;
 }
 
 QnResourceWidget *QnWorkbenchDisplay::widget(QnWorkbenchItem *item) const {
@@ -429,9 +435,18 @@ void QnWorkbenchDisplay::bringToFront(QnWorkbenchItem *item) {
 }
 
 void QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
+    qDebug("addItemInternal {");
+
     QnResourceWidget *widget = new QnResourceWidget(item);
     widget->setParent(this); /* Just to feel totally safe and not to leak memory no matter what happens. */
 
+    QnImageButtonWidget *closeButton = new QnImageButtonWidget();
+    closeButton->setPixmap(cached(Skin::path(QLatin1String("close3.png"))));
+    closeButton->setMinimumSize(QSizeF(10.0, 10.0));
+    closeButton->setMaximumSize(QSizeF(10.0, 10.0));
+    connect(closeButton, SIGNAL(clicked()), item, SLOT(deleteLater()));
+    widget->addButton(closeButton);
+    
     m_scene->addItem(widget);
 
     widget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true); /* Optimization. */
@@ -456,14 +471,16 @@ void QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
     connect(item, SIGNAL(flagsChanged()),           this, SLOT(at_item_flagsChanged()));
 
     m_widgetByItem.insert(item, widget);
-
+    
     synchronize(widget, false);
     bringToFront(widget);
 
     connect(widget, SIGNAL(destroyed()), this, SLOT(at_widget_destroyed()));
+    qDebug("} //addItemInternal");
 }
 
 void QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item) {
+    qDebug("removeItemInternal {");
     disconnect(item, NULL, this, NULL);
 
     QnResourceWidget *widget = m_widgetByItem[item];
@@ -475,6 +492,7 @@ void QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item) {
     disconnect(widget, NULL, this, NULL);
 
     delete widget;
+    qDebug("} //removeItemInternal");
 }
 
 
@@ -600,6 +618,8 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnWorkbenchItem *item, bool animate
 }
 
 void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool animate) {
+    qDebug("synchronizeGeometry {");
+
     assert(widget != NULL);
     assert(m_workbench != NULL);
 
@@ -645,10 +665,15 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
     if(animate) {
         animator->moveTo(enclosingGeometry, item->rotation(), widgetAnimationDurationMsec);
     } else {
+        qDebug() << "synchronizeGeometry:1" << "animator = " << (void *)animator << " widget=" << (void*)widget;
+        qDebug() << "INFO:" << animator << widget;
         animator->stopAnimation();
+        qDebug("synchronizeGeometry:2");
         widget->setEnclosingGeometry(enclosingGeometry);
         widget->setRotation(item->rotation());
     }
+
+    qDebug("} // synchronizeGeometry");
 }
 
 void QnWorkbenchDisplay::synchronizeLayer(QnWorkbenchItem *item) {
