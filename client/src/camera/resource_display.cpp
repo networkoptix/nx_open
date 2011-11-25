@@ -29,15 +29,19 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
 
     m_dataProvider = resource->createDataProvider(QnResource::Role_Default);
     if(m_dataProvider != NULL) {
-        connect(m_dataProvider, SIGNAL(finished()), m_dataProvider, SLOT(deleteLater()));
-
         m_archiveProvider = dynamic_cast<QnAbstractArchiveReader *>(m_dataProvider);
 
         m_mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider *>(m_dataProvider);
         if(m_mediaProvider != NULL) {
             m_camera = new CLVideoCamera(mediaResourcePtr, NULL, false, m_mediaProvider);
             
-            connect(m_camera->getCamCamDisplay(), SIGNAL(finished()), m_camera, SLOT(deleteLater()));
+            connect(m_camera->getCamCamDisplay(), SIGNAL(finished()), m_camera,       SLOT(deleteLater()));
+            connect(m_camera->getCamCamDisplay(), SIGNAL(finished()), m_dataProvider, SLOT(deleteLater()));
+        } else {
+            m_camera = NULL;
+
+            connect(this, SIGNAL(destroyed()), m_dataProvider, SLOT(stop()));
+            connect(m_dataProvider, SIGNAL(finished()), m_dataProvider, SLOT(deleteLater()));
         }
     }
 }
@@ -83,8 +87,8 @@ void QnResourceDisplay::disconnectFromResource() {
         m_mediaProvider->removeDataProcessor(m_camera->getCamCamDisplay());
 
     cleanUp(m_dataProvider);
-    //cleanUp(m_camDisplay);
-    m_camera->beforeStopDisplay();
+    if(m_camera != NULL)
+        m_camera->beforeStopDisplay();
 
     foreach(detail::QnRendererGuard *guard, m_guards)
         guard->renderer()->beforeDestroy();
@@ -98,7 +102,6 @@ void QnResourceDisplay::disconnectFromResource() {
     m_dataProvider = NULL;
     m_mediaProvider = NULL;
     m_archiveProvider = NULL;
-
     m_camera = NULL;
 
     QnResourceConsumer::disconnectFromResource();
@@ -117,7 +120,8 @@ const QnVideoResourceLayout *QnResourceDisplay::videoLayout() const {
 void QnResourceDisplay::start() {
     m_started = true;
 
-    m_camera->startDisplay();
+    if(m_camera != NULL)
+        m_camera->startDisplay();
 }
 
 qint64 QnResourceDisplay::lengthUSec() const {

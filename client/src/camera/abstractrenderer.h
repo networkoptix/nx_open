@@ -17,6 +17,8 @@ class CLAbstractRenderer
 public:
     CLAbstractRenderer(): m_displayCounter(0) {}
 
+    virtual ~CLAbstractRenderer() {}
+
     /**
      * This function is supposed to be called from <i>decoding</i> thread.
      * It waits until given channel of the current frame (supplied via <tt>draw</tt>) is rendered.

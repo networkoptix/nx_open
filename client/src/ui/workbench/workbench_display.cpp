@@ -435,8 +435,6 @@ void QnWorkbenchDisplay::bringToFront(QnWorkbenchItem *item) {
 }
 
 void QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
-    qDebug("addItemInternal {");
-
     QnResourceWidget *widget = new QnResourceWidget(item);
     widget->setParent(this); /* Just to feel totally safe and not to leak memory no matter what happens. */
 
@@ -476,11 +474,9 @@ void QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
     bringToFront(widget);
 
     connect(widget, SIGNAL(destroyed()), this, SLOT(at_widget_destroyed()));
-    qDebug("} //addItemInternal");
 }
 
 void QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item) {
-    qDebug("removeItemInternal {");
     disconnect(item, NULL, this, NULL);
 
     QnResourceWidget *widget = m_widgetByItem[item];
@@ -492,7 +488,6 @@ void QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item) {
     disconnect(widget, NULL, this, NULL);
 
     delete widget;
-    qDebug("} //removeItemInternal");
 }
 
 
@@ -618,8 +613,6 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnWorkbenchItem *item, bool animate
 }
 
 void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool animate) {
-    qDebug("synchronizeGeometry {");
-
     assert(widget != NULL);
     assert(m_workbench != NULL);
 
@@ -665,15 +658,10 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
     if(animate) {
         animator->moveTo(enclosingGeometry, item->rotation(), widgetAnimationDurationMsec);
     } else {
-        qDebug() << "synchronizeGeometry:1" << "animator = " << (void *)animator << " widget=" << (void*)widget;
-        qDebug() << "INFO:" << animator << widget;
         animator->stopAnimation();
-        qDebug("synchronizeGeometry:2");
         widget->setEnclosingGeometry(enclosingGeometry);
         widget->setRotation(item->rotation());
     }
-
-    qDebug("} // synchronizeGeometry");
 }
 
 void QnWorkbenchDisplay::synchronizeLayer(QnWorkbenchItem *item) {
