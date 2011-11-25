@@ -90,11 +90,12 @@ public:
 
     NavigationItem *getNavigationItem();
 
-signals:
+Q_SIGNALS:
     void scneZoomFinished();
     void onDecorationPressed(LayoutContent*, QString);
     void onIntroScreenEscape();
     void onNewLayoutSelected(LayoutContent*, LayoutContent*);
+
 protected:
     virtual void wheelEvent ( QWheelEvent * e );
     void mouseReleaseEvent ( QMouseEvent * e);
@@ -165,9 +166,10 @@ protected:
 
     void navigation_grid_items_drop_helper();
 
-public slots:
+public Q_SLOTS:
     void fitInView(int duration = 700 , int delay = 0, CLAnimationCurve curve =  SLOW_END_POW_40);
-private slots:
+
+private Q_SLOTS:
 #if 0
     void adjustSearchItemPopup();
 #endif
@@ -185,6 +187,9 @@ private slots:
     void on_grid_drop_animation_finished();
     void onOpenFile();
     void onRecordingFailed(QString errMessage);
+
+    void onExportRange(qint64 begin, qint64 end);
+
 protected:
     QFileDialog m_openMediaDialog;
     SceneLayout m_camLayout;
