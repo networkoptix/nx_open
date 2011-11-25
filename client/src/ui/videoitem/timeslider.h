@@ -81,8 +81,8 @@ private Q_SLOTS:
 private:
     double delta() const;
 
-    qint64 fromSlider(int value);
-    int toSlider(qint64 value);
+    qint64 fromSlider(int value) const;
+    int toSlider(qint64 value) const;
 
     void setViewPortPos(qint64 value);
 

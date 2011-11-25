@@ -144,9 +144,6 @@ void MySlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     Q_UNUSED(option)
     Q_UNUSED(widget)
 
-    bool b = hasTracking();
-
-
     ensureHandleRect();
 
     static const QPixmap pix = Skin::pixmap(QLatin1String("slider-handle.png")).scaled(m_handleRect.width(), m_handleRect.height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
@@ -297,6 +294,10 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
     void wheelEvent(QGraphicsSceneWheelEvent *event);
+
+private:
+    qint64 posToValue(qreal pos) const;
+    qreal valueToPos(qint64 value) const;
 
 private:
     TimeSlider *m_parent;
@@ -569,13 +570,23 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     painter->drawLine(QLineF(xpos, 0, xpos, rect().height()));
 }
 
+qint64 TimeLine::posToValue(qreal pos) const
+{
+    return m_parent->viewPortPos() + qRound64((double(m_parent->sliderRange()) / rect().width()) * pos);
+}
+
+qreal TimeLine::valueToPos(qint64 value) const
+{
+    return (double(value - m_parent->viewPortPos()) / m_parent->sliderRange()) * rect().width();
+}
+
 void TimeLine::mousePressEvent(QGraphicsSceneMouseEvent *me)
 {
     if (me->button() == Qt::LeftButton) {
         me->accept();
         m_lineAnimation->stop();
         if (qFuzzyIsNull(m_parent->scalingFactor()))
-            m_parent->setCurrentValue(m_parent->viewPortPos() + qRound64((double(m_parent->sliderRange()) / rect().width()) * me->pos().x()));
+            m_parent->setCurrentValue(posToValue(me->pos().x()));
         m_parent->setMoving(true);
         m_previousPos = me->pos();
         m_length = 0;
@@ -627,7 +638,7 @@ void TimeLine::mouseReleaseEvent(QGraphicsSceneMouseEvent *me)
                 //m_lineAnimation->start();
             }
         } else {
-            m_parent->setCurrentValue(m_parent->viewPortPos() + qRound64((double(m_parent->sliderRange()) / rect().width()) * me->pos().x()));
+            m_parent->setCurrentValue(posToValue(me->pos().x()));
         }
         m_parent->setMoving(false);
     }
@@ -787,13 +798,10 @@ void TimeSlider::setCurrentValue(qint64 value)
 /*    if (value == DATETIME_NOW)
         return; // ###*/
 
-    //cl_log.log(Q_FUNC_INFO, cl_logALWAYS);
-
     value = qBound(m_minimumValue, value, maximumValue());
     if (m_currentValue == value)
         return;
 
-    
     m_currentValue = value;
 
     updateSlider();
@@ -856,7 +864,7 @@ void TimeSlider::setEndSize(qreal size)
 
 void TimeSlider::onSliderValueChanged(int value)
 {
-    if (!m_isUserInput /*&& !isMoving()*/) {
+    if (!m_isUserInput) {
         m_isUserInput = true;
         setCurrentValue(fromSlider(value));
         m_isUserInput = false;
@@ -890,12 +898,12 @@ double TimeSlider::delta() const
     return ((1.0f/(m_slider->maximum() - m_slider->minimum()))*length())/qExp(scalingFactor()/2);
 }
 
-qint64 TimeSlider::fromSlider(int value)
+qint64 TimeSlider::fromSlider(int value) const
 {
     return m_viewPortPos + value * delta();
 }
 
-int TimeSlider::toSlider(qint64 value)
+int TimeSlider::toSlider(qint64 value) const
 {
     return (value - m_viewPortPos) / delta();
 }
@@ -920,21 +928,13 @@ void TimeSlider::setMinimumRange(qint64 r)
 
 void TimeSlider::updateSlider()
 {
-
-    if (m_isUserInput && isMoving())
-    {
-        int gg = 4;
-    }
-
     if (!m_isUserInput) {
-
-
         m_isUserInput = true;
         m_slider->setValue(toSlider(m_currentValue));
         m_isUserInput = false;
     }
 
-    if(isAtEnd()) {
+    if (isAtEnd()) {
         m_slider->setToolTip("Live");
     } else {
         if (m_minimumValue == 0)
