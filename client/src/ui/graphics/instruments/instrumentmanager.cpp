@@ -47,16 +47,16 @@ void InstrumentManagerPrivate::destroyed(SceneEventFilterItem *item) {
     sceneIsBeingDestroyed = false;
 }
 
-void InstrumentManagerPrivate::installInstrumentInternal(Instrument *instrument, InstallationMode::Mode mode) {
+void InstrumentManagerPrivate::installInstrumentInternal(Instrument *instrument, InstallationMode::Mode mode, Instrument *reference) {
     /* Initialize instrument. */
     instrument->m_scene = scene;
     instrument->m_manager = q_func();
 
     /* Install instrument. */
-    sceneDispatcher->installInstrument(instrument, mode);
-    viewDispatcher->installInstrument(instrument, mode);
-    viewportDispatcher->installInstrument(instrument, mode);
-    itemDispatcher->installInstrument(instrument, mode);
+    sceneDispatcher->installInstrument(instrument, mode, reference);
+    viewDispatcher->installInstrument(instrument, mode, reference);
+    viewportDispatcher->installInstrument(instrument, mode, reference);
+    itemDispatcher->installInstrument(instrument, mode, reference);
 
     /* Notify. */
     instrument->sendInstalledNotifications(true);
@@ -95,7 +95,7 @@ void InstrumentManagerPrivate::registerSceneInternal(QGraphicsScene *newScene) {
 
     /* Install instruments. */
     foreach (Instrument *instrument, instruments)
-        installInstrumentInternal(instrument, InstallationMode::INSTALL_LAST);
+        installInstrumentInternal(instrument, InstallationMode::INSTALL_LAST, NULL);
 
     /* Store self in scene's list of instrument managers. */
     QList<InstrumentManager *> managers = q->managersOf(scene);
@@ -258,7 +258,7 @@ const QList<Instrument *> &InstrumentManager::instruments() const {
     return d_func()->instruments;
 }
 
-bool InstrumentManager::installInstrument(Instrument *instrument, InstallationMode::Mode mode) {
+bool InstrumentManager::installInstrument(Instrument *instrument, InstallationMode::Mode mode, Instrument *reference) {
     Q_D(InstrumentManager);
 
     if (instrument == NULL) {
@@ -282,12 +282,12 @@ bool InstrumentManager::installInstrument(Instrument *instrument, InstallationMo
     }
 
     /* Update local records. */
-    insertInstrument(instrument, mode, &d->instruments);
+    insertInstrument(instrument, mode, reference, &d->instruments);
 
     if (d->scene == NULL)
         return true; /* We'll register it for real once we have the scene. */
 
-    d->installInstrumentInternal(instrument, mode);
+    d->installInstrumentInternal(instrument, mode, reference);
     return true;
 }
 

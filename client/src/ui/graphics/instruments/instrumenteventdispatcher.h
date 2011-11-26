@@ -59,7 +59,7 @@ public:
     /**
      * \param instrument               Instrument to install. Must not be NULL.
      */
-    void installInstrument(Instrument *instrument, InstallationMode::Mode mode);
+    void installInstrument(Instrument *instrument, InstallationMode::Mode mode, Instrument *reference);
 
     /**
      * \param instrument               Instrument to uninstall. Must not be NULL.
@@ -84,7 +84,7 @@ protected:
     bool dispatch(T *target, QEvent *event);
 
 private:
-    void installInstrumentInternal(Instrument *instrument, T *target, InstallationMode::Mode mode);
+    void installInstrumentInternal(Instrument *instrument, T *target, InstallationMode::Mode mode, Instrument *reference);
 
     void uninstallInstrumentInternal(Instrument *instrument, T *target);
 

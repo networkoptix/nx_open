@@ -18,7 +18,7 @@ private:
 
     void init();
 
-    void installInstrumentInternal(Instrument *instrument, InstallationMode::Mode mode);
+    void installInstrumentInternal(Instrument *instrument, InstallationMode::Mode mode, Instrument *reference);
 
     void uninstallInstrumentInternal(Instrument *instrument);
 

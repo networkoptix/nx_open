@@ -24,14 +24,14 @@ InstrumentEventDispatcher<T>::InstrumentEventDispatcher(QObject *parent):
 {}
 
 template<class T>
-void InstrumentEventDispatcher<T>::installInstrumentInternal(Instrument *instrument, T *target, InstallationMode::Mode mode) {
+void InstrumentEventDispatcher<T>::installInstrumentInternal(Instrument *instrument, T *target, InstallationMode::Mode mode, Instrument *reference) {
     if(!registeredNotify(instrument, target))
         return;
 
     m_instrumentTargets.insert(qMakePair(instrument, target));
 
     foreach(QEvent::Type eventType, instrument->watchedEventTypes(TARGET_TYPE))
-        insertInstrument(instrument, mode, &m_instrumentsByTarget[qMakePair(target, eventType)]);
+        insertInstrument(instrument, mode, reference, &m_instrumentsByTarget[qMakePair(target, eventType)]);
 }
 
 template<class T>
@@ -59,7 +59,7 @@ void InstrumentEventDispatcher<T>::uninstallInstrumentInternal(Instrument *instr
 }
 
 template<class T>
-void InstrumentEventDispatcher<T>::installInstrument(Instrument *instrument, InstallationMode::Mode mode) {
+void InstrumentEventDispatcher<T>::installInstrument(Instrument *instrument, InstallationMode::Mode mode, Instrument *reference) {
     assert(instrument != NULL);
 
     if (m_instruments.contains(instrument)) {
@@ -72,11 +72,11 @@ void InstrumentEventDispatcher<T>::installInstrument(Instrument *instrument, Ins
         return;
     }
 
-    insertInstrument(instrument, mode, &m_instruments);
+    insertInstrument(instrument, mode, reference, &m_instruments);
 
     if(instrument->watches(TARGET_TYPE))
         foreach(T *target, m_targets)
-            installInstrumentInternal(instrument, target, mode);
+            installInstrumentInternal(instrument, target, mode, reference);
 }
 
 template<class T>
@@ -107,7 +107,7 @@ void InstrumentEventDispatcher<T>::registerTarget(T *target) {
     m_targets.insert(target);
 
     foreach(Instrument *instrument, m_instruments)
-        installInstrumentInternal(instrument, target, INSTALL_LAST);
+        installInstrumentInternal(instrument, target, INSTALL_LAST, NULL);
 }
 
 template<class T>

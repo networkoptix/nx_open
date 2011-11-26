@@ -40,9 +40,10 @@ public:
      * 
      * \param instrument               Instrument to install.
      * \param mode                     Where to install the given instrument.
+     * \param reference                Reference instrument for the given installation mode.
      * \returns                        Whether the instrument was successfully installed.
      */
-    bool installInstrument(Instrument *instrument, InstallationMode::Mode mode = INSTALL_LAST);
+    bool installInstrument(Instrument *instrument, InstallationMode::Mode mode = INSTALL_LAST, Instrument *reference = NULL);
 
     /**
      * Uninstalls the given instrument from the associated graphics view.
