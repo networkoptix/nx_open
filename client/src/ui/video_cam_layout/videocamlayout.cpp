@@ -46,7 +46,7 @@ m_firstTime(true),
 m_isRunning(false),
 m_editable(false),
 m_syncPlay(0),
-m_renderWatcher(new QnRenderWatcher(this))
+m_renderWatcher(new QnRenderWatchMixin(this))
 {
 	connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimer()));
 

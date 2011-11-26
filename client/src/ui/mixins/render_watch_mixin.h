@@ -5,10 +5,10 @@
 #include <QHash>
 #include "abstractrenderer.h"
 
-class QnRenderWatcher: public QObject {
+class QnRenderWatchMixin: public QObject {
     Q_OBJECT;
 public:
-    QnRenderWatcher(QObject *parent = NULL);
+    QnRenderWatchMixin(QObject *parent = NULL);
 
     void registerRenderer(CLAbstractRenderer *renderer, QObject *lifetime);
 
