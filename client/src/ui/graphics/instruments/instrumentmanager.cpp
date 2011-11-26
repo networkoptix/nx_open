@@ -446,9 +446,10 @@ QList<InstrumentManager *> InstrumentManager::managersOf(QGraphicsScene *scene) 
 }
 
 
-void InstallationMode::insertInstrument(Instrument *instrument, InstallationMode::Mode mode, QList<Instrument *> *target) {
+void InstallationMode::insertInstrument(Instrument *instrument, InstallationMode::Mode mode, Instrument *reference, QList<Instrument *> *target) {
     assert(instrument != NULL && target != NULL);
 
+    int index;
     switch(mode) {
     case InstrumentManager::INSTALL_FIRST:
         target->push_front(instrument);
@@ -456,9 +457,25 @@ void InstallationMode::insertInstrument(Instrument *instrument, InstallationMode
     case InstrumentManager::INSTALL_LAST:
         target->push_back(instrument);
         return;
+    case InstrumentManager::INSTALL_BEFORE:
+        index = target->indexOf(reference);
+        if(index == -1) {
+            insertInstrument(instrument, InstallationMode::INSTALL_LAST, reference, target);
+        } else {
+            target->insert(index, instrument);
+        }
+        return;
+    case InstrumentManager::INSTALL_AFTER:
+        index = target->indexOf(reference);
+        if(index == -1) {
+            insertInstrument(instrument, InstallationMode::INSTALL_FIRST, reference, target);
+        } else {
+            target->insert(index + 1, instrument);
+        }
+        return;
     default:
         qnWarning("Unknown instrument installation mode '%1', using INSTALL_LAST instead.", static_cast<int>(mode));
-        insertInstrument(instrument, InstrumentManager::INSTALL_LAST, target);
+        insertInstrument(instrument, InstrumentManager::INSTALL_LAST, reference, target);
         return;
     }
 }
