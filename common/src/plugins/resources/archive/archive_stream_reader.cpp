@@ -468,6 +468,7 @@ begin_label:
                 else if (reverseMode && m_nextData->timestamp > m_skipFramesToTime)
                     videoData->ignore = true;
                 else {
+                    /*
                     if (m_skipFramesToTime != 0) 
                     {
                         QString msg;
@@ -478,6 +479,7 @@ begin_label:
                         cl_log.log(msg, cl_logWARNING);
                         str.flush();
                     }
+                    */
 					setSkipFramesToTime(0);
                 }
 			}
@@ -494,7 +496,7 @@ begin_label:
         m_currentData->flags |= QnAbstractMediaData::MediaFlags_BOF;        
         m_BOF = false;
         m_BOFTime = m_currentData->timestamp;
-        cl_log.log("set BOF ", QDateTime::fromMSecsSinceEpoch(m_currentData->timestamp/1000).toString("hh:mm:ss.zzz"), cl_logALWAYS);
+        //cl_log.log("set BOF ", QDateTime::fromMSecsSinceEpoch(m_currentData->timestamp/1000).toString("hh:mm:ss.zzz"), cl_logALWAYS);
     }
 
     if (m_currentData && singleShotMode && m_skipFramesToTime == 0) {
@@ -513,8 +515,8 @@ begin_label:
 void QnArchiveStreamReader::channeljumpToUnsync(qint64 mksec, int channel, qint64 skipTime)
 
 {
-    cl_log.log("jumpTime=", QDateTime::fromMSecsSinceEpoch(mksec/1000).toString("hh:mm:ss.zzz"), cl_logALWAYS);
-    cl_log.log("skipTime=", skipTime, cl_logALWAYS);
+    //cl_log.log("jumpTime=", QDateTime::fromMSecsSinceEpoch(mksec/1000).toString("hh:mm:ss.zzz"), cl_logALWAYS);
+    //cl_log.log("skipTime=", skipTime, cl_logALWAYS);
     m_singleQuantProcessed = false;
     m_requiredJumpTime = mksec;
     m_tmpSkipFramesToTime = skipTime;

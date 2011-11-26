@@ -56,7 +56,6 @@ void QnServerArchiveDelegate::close()
 
 qint64 QnServerArchiveDelegate::seek(qint64 time)
 {
-    cl_log.log("serverArchiveDelegate. jump to ",QDateTime::fromMSecsSinceEpoch(time/1000).toString("hh.mm.ss.zzz"), cl_logALWAYS);
     QTime t;
     t.start();
 
@@ -67,8 +66,11 @@ qint64 QnServerArchiveDelegate::seek(qint64 time)
 
     if (newChunk.startTime != m_currentChunk.startTime)
     {
+        bool isStreamsFound = m_aviDelegate->isStreamsFound();
         if (!switchToChunk(newChunk))
             return -1;
+        if (isStreamsFound)
+            m_aviDelegate->doNotFindStreamInfo(); // optimization
     }
 
     int duration = m_currentChunk.duration;
@@ -80,6 +82,12 @@ qint64 QnServerArchiveDelegate::seek(qint64 time)
         return seekRez;
     qint64 rez = m_currentChunk.startTime + seekRez;
     //cl_log.log("jump time ", t.elapsed(), cl_logALWAYS);
+    QString s;
+    QTextStream str(&s);
+    str << "server seek:" << QDateTime::fromMSecsSinceEpoch(time/1000).toString("hh:mm:ss.zzz") << " time=" << t.elapsed();
+    str.flush();
+    cl_log.log(s, cl_logALWAYS);
+
     return rez;
 }
 
@@ -140,7 +148,7 @@ bool QnServerArchiveDelegate::switchToChunk(const DeviceFileCatalog::Chunk newCh
     m_fileRes = QnAviResourcePtr(new QnAviResource(url));
     m_aviDelegate->close();
     bool rez = m_aviDelegate->open(m_fileRes);
-    if (rez)
-        m_aviDelegate->setAudioChannel(m_selectedAudioChannel);
+    //if (rez)
+    //    m_aviDelegate->setAudioChannel(m_selectedAudioChannel);
     return rez;
 }

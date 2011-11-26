@@ -24,6 +24,10 @@ public:
     virtual QnResourceAudioLayout* getAudioLayout();
     
     virtual AVCodecContext* setAudioChannel(int num);
+
+    // for optimization       
+    void doNotFindStreamInfo();
+    bool isStreamsFound() const;
 protected:
     virtual qint64 contentLength() const;
     virtual qint64 packetTimestamp(const AVPacket& packet);

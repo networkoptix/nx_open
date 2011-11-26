@@ -249,6 +249,11 @@ bool QnAviArchiveDelegate::open(QnResourcePtr resource)
     return m_initialized;
 }
 
+void QnAviArchiveDelegate::doNotFindStreamInfo()
+{
+    m_streamsFound=true;
+}
+
 void QnAviArchiveDelegate::close()
 {
     if (m_formatContext)
@@ -441,4 +446,9 @@ AVFormatContext* QnAviArchiveDelegate::getFormatContext()
     if (!m_streamsFound && !findStreams()) 
         return 0;
     return m_formatContext; 
+}
+
+bool QnAviArchiveDelegate::isStreamsFound() const
+{
+    return m_streamsFound;
 }

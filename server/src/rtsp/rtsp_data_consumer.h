@@ -52,6 +52,7 @@ private:
     bool m_pauseNetwork;
     QMutex m_dataQueueMtx;
     bool m_singleShotMode;
+    int m_packetSended;
 };
 
 #endif // __RTSP_DATA_CONSUMER_H__

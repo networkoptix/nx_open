@@ -13,6 +13,7 @@ static const int MAX_QUEUE_SIZE = 15;
 //static const QString RTP_FFMPEG_GENERIC_STR("mpeg4-generic"); // this line for debugging purpose with VLC player
 
 static const int MAX_RTSP_WRITE_BUFFER = 1024*1024;
+static const int MAX_PACKETS_AT_SINGLE_SHOT = 3;
 
 
 QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
@@ -23,7 +24,8 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
   m_liveMode(false),
   m_pauseNetwork(false),
   m_gotLivePacket(false),
-  m_singleShotMode(false)
+  m_singleShotMode(false),
+  m_packetSended(false)
 {
     memset(m_sequence, 0, sizeof(m_sequence));
     m_timer.start();
@@ -235,8 +237,8 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         curData += sendLen;
 
     }
-    //Q_ASSERT(!(m_waitBOF && (media->flags & QnAbstractMediaData::MediaFlags_BOF)));
-
+    if (m_packetSended++ == MAX_PACKETS_AT_SINGLE_SHOT)
+        m_singleShotMode = false;
     return true;
 }
 
@@ -263,4 +265,5 @@ void QnRtspDataConsumer::copyLastGopFromCamera()
 void QnRtspDataConsumer::setSingleShotMode(bool value)
 {
     m_singleShotMode = value;
+    m_packetSended = 0;
 }
