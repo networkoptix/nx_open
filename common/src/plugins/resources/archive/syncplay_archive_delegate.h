@@ -26,8 +26,6 @@ public:
     virtual bool isRealTimeSource() const;
     virtual void onReverseMode(qint64 /*displayTime*/, bool /*value*/);
     virtual void setSingleshotMode(bool value);
-    virtual bool selfProcesingSingleShot() const;
-
 
     void setStartDelay(qint64 startDelay);
     void jumpToPreviousFrame (qint64 time, bool makeshot);

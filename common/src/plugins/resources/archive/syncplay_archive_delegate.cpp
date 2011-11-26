@@ -106,8 +106,3 @@ QnAbstractMediaDataPtr QnSyncPlayArchiveDelegate::getNextData()
 {
     return m_ownerDelegate->getNextData();
 }
-
-bool QnSyncPlayArchiveDelegate::selfProcesingSingleShot() const
-{
-    return m_ownerDelegate->selfProcesingSingleShot();
-}
