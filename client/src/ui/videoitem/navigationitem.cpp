@@ -713,7 +713,8 @@ void NavigationItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *e)
 
 void NavigationItem::onSliderPressed()
 {
-    Q_ASSERT(m_camera);
+    if(m_camera == NULL)
+        return;
 
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     reader->setSingleShotMode(true);
@@ -723,7 +724,8 @@ void NavigationItem::onSliderPressed()
 
 void NavigationItem::onSliderReleased()
 {
-    Q_ASSERT(m_camera);
+    if(m_camera == NULL)
+        return;
 
     setActive(true);
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
