@@ -1391,6 +1391,13 @@ void GraphicsView::contextMenuEvent(QContextMenuEvent *event)
         return;
     }
 
+    // hack hack hack buuue
+    if (event->pos().y() >= viewport()->height() - NavigationItem::DEFAULT_HEIGHT && event->pos().y() <= viewport()->height())
+    {
+        QGraphicsView::contextMenuEvent(event);
+        return;
+    }
+
     CLVideoWindowItem* video_wnd = 0;
     CLVideoCamera* cam = 0;
     QnResourcePtr dev;
@@ -2411,6 +2418,8 @@ NavigationItem *GraphicsView::getNavigationItem()
         m_navigationItem->setZValue(INT_MAX);
         scene()->addItem(m_navigationItem);
 
+        connect(m_navigationItem.data(), SIGNAL(exportRange(qint64,qint64)), this, SIGNAL(onExportRange(qint64,qint64)));
+
         addStaticItem(m_navigationItem, false);
     }
     return m_navigationItem;
@@ -2820,6 +2829,12 @@ static inline QRegion createRoundRegion(int rSmall, int rLarge, const QRect& rec
         region += QRect(x,y, rect.width()-x*2,1);
     }
     return region;
+}
+
+void GraphicsView::onExportRange(qint64 begin, qint64 end)
+{
+    // ### implement
+    qWarning() << "GraphicsView::onExportRange:" << begin << end;
 }
 
 void GraphicsView::onPreferences_helper()
