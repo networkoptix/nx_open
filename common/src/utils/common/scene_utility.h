@@ -33,6 +33,10 @@ public:
 
     static qreal length(const QSizeF &size);
 
+    static QPointF normalized(const QPointF &point);
+
+    static QPointF normal(const QPointF &point);
+
     /**
      * \param view                      Graphics view. Must not be NULL.
      * \param rect                      Rectangle to map to scene.

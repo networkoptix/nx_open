@@ -14,6 +14,14 @@ qreal QnSceneUtility::length(const QSizeF &size) {
     return std::sqrt(size.width() * size.width() + size.height() * size.height());
 }
 
+QPointF QnSceneUtility::normalized(const QPointF &point) {
+    return point / length(point);
+}
+
+QPointF QnSceneUtility::normal(const QPointF &point) {
+    return QPointF(point.y(), -point.x());
+}
+
 QRectF QnSceneUtility::mapRectToScene(QGraphicsView *view, const QRect &rect) {
     return view->viewportTransform().inverted().mapRect(QRectF(rect));
 }

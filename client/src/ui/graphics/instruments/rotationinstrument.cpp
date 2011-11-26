@@ -1,23 +1,46 @@
 #include "rotationinstrument.h"
 #include <cassert>
 #include <cmath>
+#include <limits>
 #include <QMouseEvent>
 #include <QGraphicsObject>
 #include <ui/graphics/items/resource_widget.h>
 
-class RotationItem: public QGraphicsObject {
+namespace {
+    const QColor defaultRotationItemColor(255, 0, 0, 128);
+
+    const qreal defaultRotationItemPenWidth = 2;
+
+    const qreal defaultRotationHeadLength = 50;
+
+    const QSizeF defaultRotationArrowSize = QSizeF(3, 5); /* (Side, Front) */
+
+    inline void paintArrowHead(QPainter *painter, const QPointF &arrowTip, const QPointF &frontDelta, const QPointF &sideDelta) {
+        QPointF points[3] = {
+            arrowTip - frontDelta - sideDelta,
+            arrowTip,
+            arrowTip - frontDelta + sideDelta
+        };
+        
+        painter->drawPolyline(points, 3);
+    }
+
+} // anonymous namespace
+
+class RotationItem: public QGraphicsObject, protected QnSceneUtility {
 public:
     RotationItem(QGraphicsItem *parent = NULL): 
-        QGraphicsObject(parent)
+        QGraphicsObject(parent),
+        m_viewport(NULL)
     {
-
+        /* We cheat with the bounding rect, but properly calculating it is not worth it. */
+        qreal d = std::numeric_limits<qreal>::max() / 4;
+        m_boundingRect = QRectF(QPointF(-d, -d), QPoint(d, d));
     }
 
     virtual QRectF boundingRect() const override {
         if (m_viewport == NULL)
             return QRectF();
-
-        ensureRect();
 
         return m_boundingRect;
     }
@@ -30,71 +53,56 @@ public:
 
         assert(target() != NULL);
 
-#if 0
         QPointF sceneOrigin = target()->mapToScene(m_origin);
-        if(!qFuzzyCompare(sceneOrigin, m_sceneOrigin)) {
-            m_sceneOrigin = sceneOrigin;
-            updateRect();
-        }
 
-        static QColor color1(255, 0, 0, 250);
-        static QColor color2(255, 0, 0, 100);
+        /* Accessing viewport is safe here as it equals the passed widget. */
+        QGraphicsView *view = QnSceneUtility::view(m_viewport);
+        QTransform sceneToViewport = view->viewportTransform();
 
-        static const int r = 30;
-        static const int penWidth = 6;
-        static const int p_line_len = 220;
-        static const int arrowSize = 30;
+        /* Map head & origin to viewport. */
+        QPointF viewportHead = sceneToViewport.map(m_sceneHead);
+        QPointF viewportOrigin = sceneToViewport.map(sceneOrigin);
 
+        /* Calculate "hammer" head delta. */
+        QPointF unit = normalized(normal(viewportHead - viewportOrigin));
+        QPointF headDelta = unit * defaultRotationHeadLength / 2;
+
+        /* Calculate arrowhead deltas. */
+        QPointF arrowFrontDelta = unit * defaultRotationArrowSize.height();
+        QPointF arrowSideDelta = normal(unit) * defaultRotationArrowSize.width() / 2;
+
+        /* Paint it all. */
         painter->save();
+        painter->resetTransform();
+        painter->setPen(QPen(defaultRotationItemColor, defaultRotationItemPenWidth));
 
-        painter->setPen(QPen(color2, penWidth, Qt::SolidLine));
-        painter->drawLine(m_sceneOrigin, m_sceneHead);
-
-        // building new line
-        QLineF line(m_sceneOrigin, m_sceneHead);
-        QLineF line_p = line.unitVector().normalVector();
-        line_p.setLength(p_line_len/2);
-
-        line_p = QLineF(line_p.p2(),line_p.p1());
-        line_p.setLength(p_line_len);
-
-        painter->drawLine(line_p);
-
-        double angle = ::acos(line_p.dx() / line_p.length());
-        if (line_p.dy() >= 0)
-            angle = 2 * M_PI - angle;
-
-        qreal s = 2.5;
-
-        QPointF sourceArrowP1 = line_p.p1() + QPointF(sin(angle + M_PI / s) * arrowSize, cos(angle + M_PI / s) * arrowSize);
-        QPointF sourceArrowP2 = line_p.p1() + QPointF(sin(angle + M_PI - M_PI / s) * arrowSize, cos(angle + M_PI - M_PI / s) * arrowSize);
-        QPointF destArrowP1 = line_p.p2() + QPointF(sin(angle - M_PI / s) * arrowSize, cos(angle - M_PI / s) * arrowSize);
-        QPointF destArrowP2 = line_p.p2() + QPointF(sin(angle - M_PI + M_PI / s) * arrowSize, cos(angle - M_PI + M_PI / s) * arrowSize);
-
-        painter->setBrush(color2);
-        painter->drawPolygon(QPolygonF() << line_p.p1() << sourceArrowP1 << sourceArrowP2);
-        painter->drawPolygon(QPolygonF() << line_p.p2() << destArrowP1 << destArrowP2);
+        painter->drawLine(viewportHead, viewportOrigin);
+        painter->drawLine(viewportHead - headDelta, viewportHead + headDelta);
+        paintArrowHead(painter, viewportHead - headDelta, -arrowFrontDelta, arrowSideDelta);
+        paintArrowHead(painter, viewportHead + headDelta,  arrowFrontDelta, arrowSideDelta);
 
         painter->restore();
-#endif
     }
 
-    void start(QWidget *viewport, QnResourceWidget *target, const QPointF &origin, qreal originAngle) {
+    /**
+     * This item will be drawn only on the given viewport. 
+     * This item won't access the given viewport in any way, so it is
+     * safe to delete the viewport without notifying the item.
+     * 
+     * \param viewport                  Viewport to draw this item on.
+     */
+    void start(QWidget *viewport, QnResourceWidget *target, const QPointF &origin) {
+        m_target = target;
         m_origin = origin;
-        updateRect();
     }
 
     void stop() {
         m_viewport = NULL;
         m_target.clear();
-
-        updateRect();
     }
 
     void setHead(const QPointF &head) {
         m_sceneHead = head;
-
-        updateRect();
     }
 
     const QPointF &origin() const {
@@ -106,19 +114,7 @@ public:
     }
 
     /**
-     * Sets this item's viewport. This item will be drawn only on the given
-     * viewport. This item won't access the given viewport in any way, so it is
-     * safe to delete the viewport without notifying the item.
-     * 
-     * \param viewport                  Viewport to draw this item on.
-     */
-    void setViewport(QWidget *viewport) {
-        prepareGeometryChange();
-        m_viewport = viewport;
-    }
-
-    /**
-     * \returns                         This rubber band item's viewport.
+     * \returns                         This item's viewport.
      */
     QWidget *viewport() const {
         return m_viewport;
@@ -126,26 +122,6 @@ public:
 
     QnResourceWidget *target() const {
         return m_target.data();
-    }
-
-protected:
-    void updateRect() {
-        prepareGeometryChange();
-
-        m_cacheDirty = true;
-    }
-
-    void ensureRect() const {
-        if (!m_cacheDirty)
-            return;
-
-        if(m_viewport == NULL || m_target.isNull()) {
-            m_boundingRect = QRectF();
-            m_cacheDirty = false;
-            return;
-        }
-
-        
     }
 
 private:
@@ -158,21 +134,11 @@ private:
     /** Rotation origin point, in widget coordinates. */
     QPointF m_origin;
 
-    /** Rotation origin point, in scene coordinates. */
-    QPointF m_sceneOrigin;
-
-    /** Rotation reference angle, in widget coordinates. */
-    qreal m_originAngle;
-
     /** Head of the rotation item, in scene coordinates. */
     QPointF m_sceneHead;
 
-    /** Whether stored rectangles need recalculating. */
-    mutable bool m_cacheDirty;
-
-    /** Item's bounding rect, in scene coordinates. */
-    mutable QRectF m_boundingRect;
-
+    /** Bounding rect of this item. */
+    QRectF m_boundingRect;
 };
 
 

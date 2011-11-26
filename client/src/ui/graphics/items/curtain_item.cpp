@@ -9,7 +9,7 @@ QnCurtainItem::QnCurtainItem(QGraphicsItem *parent):
     m_boundingRect = QRectF(QPointF(-d, -d), QPoint(d, d));
 
     setAcceptedMouseButtons(0);
-    setEnabled(false);
+    /* Don't disable this item here or it will swallow mouse wheel events. */
 }
 
 QRectF QnCurtainItem::boundingRect() const {

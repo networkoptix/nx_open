@@ -36,7 +36,8 @@ public:
         m_cacheDirty(true)
     {
         setAcceptedMouseButtons(0);
-        setEnabled(false);
+
+        /* Don't disable this item here or it will swallow mouse wheel events. */
     }
 
     virtual QRectF boundingRect() const override {
