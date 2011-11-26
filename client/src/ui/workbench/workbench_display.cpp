@@ -101,11 +101,11 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     m_transformListenerInstrument = new TransformListenerInstrument(this);
     m_activityListenerInstrument = new ActivityListenerInstrument(1000, this);
     m_paintForwardingInstrument = new ForwardingInstrument(Instrument::VIEWPORT, paintEventTypes, this);
+    m_instrumentManager->installInstrument(new StopInstrument(Instrument::VIEWPORT, paintEventTypes, this));
+    m_instrumentManager->installInstrument(m_paintForwardingInstrument);
     m_instrumentManager->installInstrument(m_transformListenerInstrument);
     m_instrumentManager->installInstrument(m_boundingInstrument);
     m_instrumentManager->installInstrument(m_activityListenerInstrument);
-    m_instrumentManager->installInstrument(new StopInstrument(Instrument::VIEWPORT, paintEventTypes, this));
-    m_instrumentManager->installInstrument(m_paintForwardingInstrument);
 
     m_activityListenerInstrument->recursiveDisable();
 
