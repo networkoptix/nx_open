@@ -1,6 +1,6 @@
 #include "scene_utility.h"
 #include <cassert>
-#include <cmath> /* For std::sqrt. */
+#include <cmath> /* For std::sqrt, std::atan2. */
 #include <QGraphicsView>
 #include <QScrollBar>
 #include <QCursor>
@@ -20,6 +20,10 @@ QPointF QnSceneUtility::normalized(const QPointF &point) {
 
 QPointF QnSceneUtility::normal(const QPointF &point) {
     return QPointF(point.y(), -point.x());
+}
+
+qreal QnSceneUtility::atan2(const QPointF &point) {
+    return std::atan2(point.y(), point.x());
 }
 
 QRectF QnSceneUtility::mapRectToScene(QGraphicsView *view, const QRect &rect) {

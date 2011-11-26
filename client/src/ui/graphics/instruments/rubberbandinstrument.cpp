@@ -242,7 +242,7 @@ bool RubberBandInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event
     /* Check if there is a focusable item under cursor. */
     QGraphicsItem *focusableItem = item(view, event->pos(), ItemIsMouseInteractive());
     if (focusableItem != NULL)
-        return false; /* Let default implementation handle it. */
+        return false; 
 
     /* Ok to go. */
     if (!(event->modifiers() & Qt::ShiftModifier))

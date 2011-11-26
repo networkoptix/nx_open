@@ -11,6 +11,10 @@ class QRectF;
 class QSizeF;
 class QTransform;
 
+#ifndef M_PI
+#  define M_PI 3.1415926535897932384626433832795
+#endif
+
 class QnSceneUtility {
 public:
     /**
@@ -29,13 +33,35 @@ public:
         return QPoint(size.width(), size.height());
     }
 
+    /**
+     * \param point                     Point, treated as a vector.
+     * \returns                         Length of the given vector.
+     */
     static qreal length(const QPointF &point);
 
+    /**
+     * \param size                      Size, treated as a vector.
+     * \returns                         Length of the given vector.
+     */
     static qreal length(const QSizeF &size);
 
+    /**
+     * \param point                     Point, treated as a vector.
+     * \param                           Unit vector pointing in the same direction as the given vector.
+     */
     static QPointF normalized(const QPointF &point);
 
+    /**
+     * \param point                     Point, treated as a vector.
+     * \returns                         Normal of the same length for the given vector. 
+     */
     static QPointF normal(const QPointF &point);
+
+    /**
+     * \param point                     Point, treated as a vector.
+     * \returns                         Counter-clockwise angle between Y axis and the given vector, in radians.
+     */
+    static qreal atan2(const QPointF &point);
 
     /**
      * \param view                      Graphics view. Must not be NULL.

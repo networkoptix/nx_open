@@ -143,11 +143,40 @@ private:
 
 
 RotationInstrument::RotationInstrument(QObject *parent):
-    DragProcessingInstrument(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease), parent)
+    DragProcessingInstrument(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent)
 {}
 
 RotationInstrument::~RotationInstrument() {
     ensureUninstalled();
+}
+
+void RotationInstrument::setRotationItemZValue(qreal rotationItemZValue) {
+    m_rotationItemZValue = rotationItemZValue;
+
+    if(rotationItem() != NULL)
+        rotationItem()->setZValue(m_rotationItemZValue);
+}
+
+void RotationInstrument::installedNotify() {
+    if(rotationItem() != NULL)
+        delete rotationItem();
+
+    m_rotationItem = new RotationItem();
+    rotationItem()->setParent(this); /* Just to feel totally safe. */
+    rotationItem()->setZValue(m_rotationItemZValue);
+    scene()->addItem(rotationItem());
+
+    DragProcessingInstrument::installedNotify();
+}
+
+void RotationInstrument::aboutToBeUninstalledNotify() {
+    DragProcessingInstrument::aboutToBeUninstalledNotify();
+
+    if (scene() != NULL) 
+        disconnect(scene(), NULL, this, NULL);
+
+    if(rotationItem() != NULL)
+        delete rotationItem();
 }
 
 bool RotationInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
@@ -157,22 +186,44 @@ bool RotationInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
     if(!(event->modifiers() & Qt::AltModifier))
         return false;
 
-    //QnResourceWidget *widget = 
+    QGraphicsView *view = this->view(viewport);
+    QnResourceWidget *target = this->item<QnResourceWidget>(view, event->pos());
+    if(target == NULL)
+        return false;
 
+    m_target = target;
+    m_origin = target->rect().center();
+    m_lastAngle = atan2(target->mapFromScene(view->mapToScene(event->pos())) - m_origin);
+    
     dragProcessor()->mousePressEvent(viewport, event);
-
+    
+    event->accept();
     return false;
 }
 
 void RotationInstrument::startDrag(DragInfo *info) {
+    if(m_target.isNull()) {
+        dragProcessor()->reset();
+        return;
+    }
 
+    rotationItem()->start(info->view()->viewport(), m_target.data(), m_origin);
 }
 
 void RotationInstrument::dragMove(DragInfo *info) {
+    QnResourceWidget *target = m_target.data();
+    if(target == NULL) {
+        dragProcessor()->reset();
+        return;
+    }
 
+    qreal currentAngle = atan2(target->mapFromScene(info->mouseScenePos()) - m_origin);
+
+    target->setRotation(target->rotation() + (currentAngle - m_lastAngle) / M_PI * 180.0);
+
+    m_lastAngle = currentAngle;
 }
 
 void RotationInstrument::finishDrag(DragInfo *info) {
-
+    return;
 }
-
