@@ -3,14 +3,24 @@
 
 #include <QVariantAnimation>
 #include <QScopedPointer>
+#include <QWeakPointer>
 #include "setter.h"
 
-class SetterAnimation: public QVariantAnimation {
+class QnSetterAnimation: public QVariantAnimation {
+    Q_OBJECT;
 public:
-    SetterAnimation(QObject *parent = NULL): QVariantAnimation(parent) {}
+    QnSetterAnimation(QObject *parent = NULL): QVariantAnimation(parent) {}
+
+    QnAbstractSetter *setter() const {
+        return m_setter.data();
+    }
 
     void setSetter(QnAbstractSetter *setter) {
         m_setter.reset(setter);
+    }
+
+    QObject *targetObject() const {
+        return m_target.data();
     }
 
     void setTargetObject(QObject *target) {
@@ -20,6 +30,7 @@ public:
 public slots:
     void clear() {
         m_setter.reset();
+        m_target.clear();
     }
 
 protected:

@@ -7,7 +7,7 @@
 class QParallelAnimationGroup;
 class QGraphicsView;
 
-class SetterAnimation;
+class QnSetterAnimation;
 
 class QnViewportAnimator: public QObject, protected QnSceneUtility {
     Q_OBJECT;
@@ -89,10 +89,10 @@ private:
     QParallelAnimationGroup *m_animationGroup;
 
     /** Viewport scale animation. */
-    SetterAnimation *m_scaleAnimation;
+    QnSetterAnimation *m_scaleAnimation;
 
     /** Viewport position animation. */
-    SetterAnimation *m_positionAnimation;
+    QnSetterAnimation *m_positionAnimation;
 };
 
 #endif // QN_VIEWPORT_ANIMATOR_H

@@ -63,11 +63,11 @@ void QnViewportAnimator::setView(QGraphicsView *view) {
 
         connect(m_view, SIGNAL(destroyed()), this, SLOT(at_view_destroyed()));
 
-        m_scaleAnimation = new SetterAnimation(this);
+        m_scaleAnimation = new QnSetterAnimation(this);
         m_scaleAnimation->setSetter(newSetter(ViewportScaleSetter(Qt::KeepAspectRatioByExpanding)));
         m_scaleAnimation->setTargetObject(view);
 
-        m_positionAnimation = new SetterAnimation(this);
+        m_positionAnimation = new QnSetterAnimation(this);
         m_positionAnimation->setSetter(newSetter(ViewportPositionSetter()));
         m_positionAnimation->setTargetObject(view);
 
