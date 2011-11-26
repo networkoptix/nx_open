@@ -5,8 +5,6 @@ QnAbstractArchiveReader::QnAbstractArchiveReader(QnResourcePtr dev ) :
     QnClientPullMediaStreamProvider(dev),
     m_lengthMksec(0),
     m_needToSleep(0),
-    m_cs(QMutex::Recursive),
-    m_skipFramesToTime(0),
     m_delegate(0),
     m_cycleMode(true),
     m_lastJumpTime(AV_NOPTS_VALUE)
@@ -50,26 +48,6 @@ void QnAbstractArchiveReader::jumpToPreviousFrame(qint64 mksec, bool makeshot)
     }
     else
         jumpTo(mksec, makeshot);
-}
-
-qint64 QnAbstractArchiveReader::skipFramesToTime() const
-{
-    QMutexLocker mutex(&m_framesMutex);
-
-    return m_skipFramesToTime;
-}
-
-void QnAbstractArchiveReader::setSkipFramesToTime(qint64 skipFramesToTime)
-{
-    QMutexLocker mutex(&m_framesMutex);
-    m_skipFramesToTime = skipFramesToTime;
-}
-
-bool QnAbstractArchiveReader::isSkippingFrames() const
-{ 
-    QMutexLocker mutex(&m_framesMutex);
-
-    return m_skipFramesToTime != 0;
 }
 
 

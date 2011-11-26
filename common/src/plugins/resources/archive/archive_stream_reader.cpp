@@ -38,8 +38,8 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_singleShot(false),
     m_singleQuantProcessed(false),
     m_dataMarker(0),
-    m_newDataMarker(0)
-
+    m_newDataMarker(0),
+    m_skipFramesToTime(0)
 {
     // Should init packets here as some times destroy (av_free_packet) could be called before init
     //connect(dev.data(), SIGNAL(onStatusChanged(QnResource::Status, QnResource::Status)), this, SLOT(onStatusChanged(QnResource::Status, QnResource::Status)));
@@ -95,13 +95,13 @@ void QnArchiveStreamReader::pauseMedia()
 
 void QnArchiveStreamReader::setCurrentTime(qint64 value)
 {
-    QMutexLocker mutex(&m_framesMutex);
+    QMutexLocker mutex(&m_jumpMtx);
     m_currentTime = value;
 }
 
 qint64 QnArchiveStreamReader::currentTime() const
 {
-    QMutexLocker mutex(&m_framesMutex);
+    QMutexLocker mutex(&m_jumpMtx);
 	if (m_skipFramesToTime)
 		return m_skipFramesToTime;
     else
@@ -140,7 +140,6 @@ const QnResourceAudioLayout* QnArchiveStreamReader::getDPAudioLayout() const
 bool QnArchiveStreamReader::init()
 {
     setCurrentTime(0);
-	QMutexLocker mutex(&m_cs);
 
 	m_previousTime = -1;
 
@@ -196,10 +195,9 @@ bool QnArchiveStreamReader::getNextVideoPacket()
 QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
 {
     //=================
-    if (isSingleShotMode() && skipFramesToTime() == 0 /*&& !m_delegate->selfProcesingSingleShot()*/)
     {
         QMutexLocker mutex(&m_jumpMtx);
-        while (m_singleShot && m_singleQuantProcessed && m_requiredJumpTime == AV_NOPTS_VALUE && !m_needStop)
+        while (m_singleShot && m_skipFramesToTime == 0 && m_singleQuantProcessed && m_requiredJumpTime == AV_NOPTS_VALUE && !m_needStop)
             m_singleShowWaitCond.wait(&m_jumpMtx);
         //CLLongRunnable::pause();
     }
@@ -226,7 +224,7 @@ begin_label:
     {
         qint64 jumpTime = m_requiredJumpTime;
         m_lastGopSeekTime = -1;
-        setSkipFramesToTime(m_tmpSkipFramesToTime);
+        m_skipFramesToTime = m_tmpSkipFramesToTime;
         m_jumpMtx.unlock();
 
         intChanneljumpTo(jumpTime, 0);
@@ -263,49 +261,47 @@ begin_label:
     }
 
     QnCompressedVideoDataPtr videoData;
-	{
-		QMutexLocker mutex(&m_cs);
-        if (skipFramesToTime() != 0)
-            m_lastGopSeekTime = -1; // after user seek
+	
+    if (m_skipFramesToTime != 0)
+        m_lastGopSeekTime = -1; // after user seek
 
-        if (m_nextData && m_previousTime == -1)
-        {
-            m_nextData = QnAbstractMediaDataPtr();
-        }
+    if (m_nextData && m_previousTime == -1)
+    {
+        m_nextData = QnAbstractMediaDataPtr();
+    }
 
-		// If there is no nextPacket - read it from file, otherwise use saved packet
-        if (m_nextData) {
-            m_currentData = m_nextData;
-            m_nextData = QnAbstractMediaDataPtr();
-        }
-        else {
-            m_currentData = getNextPacket();
-        }
+	// If there is no nextPacket - read it from file, otherwise use saved packet
+    if (m_nextData) {
+        m_currentData = m_nextData;
+        m_nextData = QnAbstractMediaDataPtr();
+    }
+    else {
+        m_currentData = getNextPacket();
+    }
 
-        if (m_currentData == 0)
-            return m_currentData;
+    if (m_currentData == 0)
+        return m_currentData;
 
-        videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(m_currentData);
-        m_previousTime = m_currentTime;
+    videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(m_currentData);
+    m_previousTime = m_currentTime;
 
-        if (m_currentData->timestamp != AV_NOPTS_VALUE) {
-            setCurrentTime(m_currentData->timestamp);
-        }
+    if (m_currentData->timestamp != AV_NOPTS_VALUE) {
+        setCurrentTime(m_currentData->timestamp);
+    }
 
-        /*
-        while (m_currentData->stream_index >= m_lastPacketTimes.size())
-            m_lastPacketTimes << 0;
-        if (m_currentData->timestamp == AV_NOPTS_VALUE) {
-            m_lastPacketTimes[m_currentData->stream_index] += m_lastFrameDuration;
-            m_currentTime = m_lastPacketTimes[m_currentData->stream_index];
-        }
-        else {
-		    m_currentTime =  m_currentData->timestamp;
-            if (m_previousTime != -1 && m_currentTime != -1 && m_currentTime > m_previousTime && m_currentTime - m_previousTime < 100*1000)
-                m_lastFrameDuration = m_currentTime - m_previousTime;
-        }
-        */
-	}
+    /*
+    while (m_currentData->stream_index >= m_lastPacketTimes.size())
+        m_lastPacketTimes << 0;
+    if (m_currentData->timestamp == AV_NOPTS_VALUE) {
+        m_lastPacketTimes[m_currentData->stream_index] += m_lastFrameDuration;
+        m_currentTime = m_lastPacketTimes[m_currentData->stream_index];
+    }
+    else {
+	    m_currentTime =  m_currentData->timestamp;
+        if (m_previousTime != -1 && m_currentTime != -1 && m_currentTime > m_previousTime && m_currentTime - m_previousTime < 100*1000)
+            m_lastFrameDuration = m_currentTime - m_previousTime;
+    }
+    */
 
 	if (videoData) // in case of video packet
 	{
@@ -409,7 +405,7 @@ begin_label:
         {
             if (m_lastUIJumpTime != AV_NOPTS_VALUE)
             {
-                QMutexLocker mutex(&m_cs);
+                //QMutexLocker mutex(&m_cs);
                 if (m_lastUIJumpTime - m_currentTime > MAX_KEY_FIND_INTERVAL) 
                 {
                     // can't find I-frame after jump. jump again and disable I-frame searcher
@@ -441,12 +437,10 @@ begin_label:
 
         // -------------------------------------------
 
-		if (skipFramesToTime())
+		if (m_skipFramesToTime)
 		{
 			if (!m_nextData)
 			{
-				QMutexLocker mutex(&m_cs);
-
                 if (!getNextVideoPacket())
                 {
                     // Some error or end of file. Stop reading frames.
@@ -458,7 +452,7 @@ begin_label:
 
 			if (m_nextData)
 			{
-				if (!reverseMode && m_nextData->timestamp < skipFramesToTime())
+				if (!reverseMode && m_nextData->timestamp < m_skipFramesToTime)
                 {
 				/*
                     QString msg;
@@ -471,15 +465,15 @@ begin_label:
 				*/
 					videoData->ignore = true;
                 }
-                else if (reverseMode && m_nextData->timestamp > skipFramesToTime())
+                else if (reverseMode && m_nextData->timestamp > m_skipFramesToTime)
                     videoData->ignore = true;
                 else {
-                    if (skipFramesToTime() != 0) 
+                    if (m_skipFramesToTime != 0) 
                     {
                         QString msg;
                         QTextStream str(&msg);
                         str << "no more ignore. curTime=" << QDateTime::fromMSecsSinceEpoch(m_nextData->timestamp/1000).toString() 
-                            << " borderTime=" << QDateTime::fromMSecsSinceEpoch(skipFramesToTime()/1000).toString();
+                            << " borderTime=" << QDateTime::fromMSecsSinceEpoch(m_skipFramesToTime/1000).toString();
                         str.flush();
                         cl_log.log(msg, cl_logWARNING);
                         str.flush();
@@ -503,7 +497,7 @@ begin_label:
         cl_log.log("set BOF ", QDateTime::fromMSecsSinceEpoch(m_currentData->timestamp/1000).toString("hh:mm:ss.zzz"), cl_logALWAYS);
     }
 
-    if (m_currentData && singleShotMode && skipFramesToTime() == 0) {
+    if (m_currentData && singleShotMode && m_skipFramesToTime == 0) {
         m_singleQuantProcessed = true;
         m_currentData->flags |= QnAbstractMediaData::MediaFlags_SingleShot;
     }
@@ -542,7 +536,6 @@ void QnArchiveStreamReader::jumpWithMarker(qint64 mksec, int marker)
 
 void QnArchiveStreamReader::intChanneljumpTo(qint64 mksec, int /*channel*/)
 {
-    QMutexLocker mutex(&m_cs);
     if (mksec > 0) {
         m_delegate->seek(mksec);
     }
@@ -657,3 +650,15 @@ void QnArchiveStreamReader::pleaseStop()
     m_singleShowWaitCond.wakeAll();
 }
 
+
+void QnArchiveStreamReader::setSkipFramesToTime(qint64 skipFramesToTime)
+{
+    QMutexLocker mutex(&m_jumpMtx);
+    m_skipFramesToTime = skipFramesToTime;
+}
+
+bool QnArchiveStreamReader::isSkippingFrames() const
+{ 
+    QMutexLocker mutex(&m_jumpMtx);
+    return m_skipFramesToTime != 0;
+}

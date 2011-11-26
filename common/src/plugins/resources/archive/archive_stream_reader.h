@@ -15,6 +15,7 @@ public:
     QnArchiveStreamReader(QnResourcePtr dev);
     virtual ~QnArchiveStreamReader();
 
+    virtual bool isSkippingFrames() const;
     virtual qint64 currentTime() const;
 
     virtual QStringList getAudioTracksInfo() const;
@@ -94,9 +95,10 @@ private:
     int m_dataMarker;
     int m_newDataMarker;
 private:
+    qint64 m_skipFramesToTime;
     bool m_singleShot;
     bool m_singleQuantProcessed;
-    QMutex m_jumpMtx;
+    mutable QMutex m_jumpMtx;
     QWaitCondition m_singleShowWaitCond;
     QnAbstractMediaDataPtr m_currentData;
     QnAbstractMediaDataPtr m_nextData;
@@ -107,6 +109,7 @@ private:
     void addAudioChannel(QnCompressedAudioDataPtr audio);
     QnAbstractMediaDataPtr getNextPacket();
     void channeljumpToUnsync(qint64 mksec, int channel, qint64 skipTime);
+    virtual void setSkipFramesToTime(qint64 skipFramesToTime);
 };
 
 #endif //avi_stream_reader_h1901

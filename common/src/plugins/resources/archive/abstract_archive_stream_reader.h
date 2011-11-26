@@ -24,7 +24,7 @@ public:
     bool open();
 
 	virtual qint64 currentTime() const = 0;
-	bool isSkippingFrames() const;
+	virtual bool isSkippingFrames() const = 0;
 
 	/**
       * @return length of archive in mksec
@@ -53,10 +53,10 @@ public:
     virtual void pauseMedia() = 0;
     virtual void resumeMedia() = 0;
 
-    qint64 skipFramesToTime() const;
     qint64 startTime() const;
     qint64 endTime() const;
     bool isRealTimeSource() const;
+
 signals:
     void singleShotModeChanged(bool value);
     void beforeJump(qint64 mksec, bool makeshot);
@@ -67,7 +67,6 @@ signals:
     void prevFrameOccured();
 protected:
 
-    virtual void setSkipFramesToTime(qint64 skipFramesToTime);
 	virtual void channeljumpTo(qint64 mksec, int channel, qint64 borderTime) = 0;
 protected:
     bool m_cycleMode;
@@ -75,11 +74,7 @@ protected:
 
 	qint64 m_needToSleep;
 
-	mutable QMutex m_cs;
-    mutable QMutex m_framesMutex;
-
     QnAbstractArchiveDelegate* m_delegate;
-    qint64 m_skipFramesToTime;
 private:
     qint64 m_lastJumpTime;
 };
