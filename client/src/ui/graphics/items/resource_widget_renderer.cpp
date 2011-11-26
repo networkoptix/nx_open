@@ -30,6 +30,8 @@ QnResourceWidgetRenderer::~QnResourceWidgetRenderer() {
 QnResourceWidgetRenderer::RenderStatus QnResourceWidgetRenderer::paint(int channel, const QRectF &rect) {
     checkThread(false);
 
+    frameDisplayed();
+
     return m_channelRenderers[channel]->paintEvent(rect);
 }
 

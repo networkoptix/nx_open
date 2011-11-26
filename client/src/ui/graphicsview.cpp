@@ -3,7 +3,7 @@
 
 #include "video_cam_layout/videocamlayout.h"
 #include "camera/camera.h"
-#include "camera/render_watcher.h"
+#include "ui/mixins/render_watch_mixin.h"
 #include "mainwnd.h"
 #include "graphics/view/blue_background_painter.h"
 #include "settings.h"

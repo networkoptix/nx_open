@@ -6,21 +6,29 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/graphics/items/resource_widget.h>
 #include <plugins/resources/archive/syncplay_wrapper.h>
+#include "render_watch_mixin.h"
 
 QnSyncPlayMixin::QnSyncPlayMixin(QnWorkbenchDisplay *display, QObject *parent):
     QObject(parent),
-    m_syncPlay(NULL)
+    m_syncPlay(NULL),
+    m_display(display)
 {
     if(display == NULL) {
         qnNullWarning(display);
         return;
     }
 
+    /* Prepare syncplay. */
     m_syncPlay = new QnArchiveSyncPlayWrapper();
     m_syncPlay->setParent(this);
 
+    /* Connect to display. */
     connect(display,    SIGNAL(widgetAdded(QnResourceWidget *)),            this,   SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(display,    SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)), this,   SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
+
+    /* Prepare render watcher. */
+    QnRenderWatchMixin *renderWatcher = new QnRenderWatchMixin(display, this);
+    connect(renderWatcher, SIGNAL(displayingStateChanged(CLAbstractRenderer *, bool)), this, SLOT(at_renderWatcher_displayingStateChanged(CLAbstractRenderer *, bool)));
 }
 
 void QnSyncPlayMixin::at_display_widgetAdded(QnResourceWidget *widget) {
@@ -46,3 +54,17 @@ void QnSyncPlayMixin::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget
     m_syncPlay->removeArchiveReader(widget->display()->archiveReader());
 }
 
+void QnSyncPlayMixin::at_renderWatcher_displayingStateChanged(CLAbstractRenderer *renderer, bool displaying) {
+    if(m_display.isNull())
+        return;
+
+    QnResourceWidget *widget = m_display.data()->widget(renderer);
+    if(widget == NULL)
+        return;
+
+    CLVideoCamera* camera = widget->display()->camera();
+    if(camera == NULL)
+        return;
+
+    m_syncPlay->onConsumerBlocksReader(widget->display()->dataProvider(), !displaying);
+}

@@ -14,6 +14,7 @@
 #include <ui/navigationtreewidget.h>
 
 #include <ui/mixins/sync_play_mixin.h>
+#include <ui/mixins/render_watch_mixin.h>
 
 #include <ui/graphics/view/graphics_view.h>
 #include <ui/graphics/view/blue_background_painter.h>

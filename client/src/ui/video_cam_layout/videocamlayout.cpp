@@ -22,7 +22,7 @@
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
-#include "camera/render_watcher.h"
+#include "ui/mixins/render_watch_mixin.h"
 #include "core/resourcemanagment/security_cam_resource.h"
 
 int  SLOT_WIDTH = 640*10;

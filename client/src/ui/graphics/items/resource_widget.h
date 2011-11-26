@@ -38,6 +38,13 @@ public:
     const QnResourcePtr &resource() const;
 
     /**
+     * \returns                         Associated renderer, if any. 
+     */
+    QnResourceWidgetRenderer *renderer() const {
+        return m_renderer;
+    }
+
+    /**
      * \returns                         Workbench item associated with this widget. Never returns NULL.
      */
     QnWorkbenchItem *item() const {

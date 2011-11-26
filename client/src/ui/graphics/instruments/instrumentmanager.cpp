@@ -95,7 +95,7 @@ void InstrumentManagerPrivate::registerSceneInternal(QGraphicsScene *newScene) {
 
     /* Install instruments. */
     foreach (Instrument *instrument, instruments)
-        installInstrumentInternal(instrument, InstallationMode::INSTALL_LAST, NULL);
+        installInstrumentInternal(instrument, InstallationMode::INSTALL_FIRST, NULL);
 
     /* Store self in scene's list of instrument managers. */
     QList<InstrumentManager *> managers = q->managersOf(scene);
@@ -276,7 +276,7 @@ bool InstrumentManager::installInstrument(Instrument *instrument, InstallationMo
         return false;
     }
 
-    if (mode != INSTALL_FIRST && mode != INSTALL_LAST) {
+    if (mode < 0 && mode >= INSTALL_MODE_COUNT) {
         qnWarning("Unknown installation mode '%1'.", static_cast<int>(mode));
         return false;
     }
@@ -449,23 +449,18 @@ QList<InstrumentManager *> InstrumentManager::managersOf(QGraphicsScene *scene) 
 void InstallationMode::insertInstrument(Instrument *instrument, InstallationMode::Mode mode, Instrument *reference, QList<Instrument *> *target) {
     assert(instrument != NULL && target != NULL);
 
+    /* Note that event processing goes from the last element in the list to the first.
+     * This is why we do push_front on INSTALL_LAST. Don't be surprised. */
+
     int index;
     switch(mode) {
-    case InstrumentManager::INSTALL_FIRST:
+    case InstrumentManager::INSTALL_LAST:
         target->push_front(instrument);
         return;
-    case InstrumentManager::INSTALL_LAST:
+    case InstrumentManager::INSTALL_FIRST:
         target->push_back(instrument);
         return;
     case InstrumentManager::INSTALL_BEFORE:
-        index = target->indexOf(reference);
-        if(index == -1) {
-            insertInstrument(instrument, InstallationMode::INSTALL_LAST, reference, target);
-        } else {
-            target->insert(index, instrument);
-        }
-        return;
-    case InstrumentManager::INSTALL_AFTER:
         index = target->indexOf(reference);
         if(index == -1) {
             insertInstrument(instrument, InstallationMode::INSTALL_FIRST, reference, target);
@@ -473,9 +468,17 @@ void InstallationMode::insertInstrument(Instrument *instrument, InstallationMode
             target->insert(index + 1, instrument);
         }
         return;
+    case InstrumentManager::INSTALL_AFTER:
+        index = target->indexOf(reference);
+        if(index == -1) {
+            insertInstrument(instrument, InstallationMode::INSTALL_LAST, reference, target);
+        } else {
+            target->insert(index, instrument);
+        }
+        return;
     default:
-        qnWarning("Unknown instrument installation mode '%1', using INSTALL_LAST instead.", static_cast<int>(mode));
-        insertInstrument(instrument, InstrumentManager::INSTALL_LAST, reference, target);
+        qnWarning("Unknown instrument installation mode '%1', using INSTALL_FIRST instead.", static_cast<int>(mode));
+        insertInstrument(instrument, InstrumentManager::INSTALL_FIRST, reference, target);
         return;
     }
 }

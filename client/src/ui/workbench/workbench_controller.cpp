@@ -61,14 +61,14 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
 
     m_rubberBandInstrument->setRubberBandZValue(m_display->layerZValue(QnWorkbenchDisplay::EFFECTS_LAYER));
 
-    QSet<QEvent::Type> mouseEventTypes = Instrument::makeSet(
+    Instrument::EventTypeSet mouseEventTypes = Instrument::makeSet(
         QEvent::GraphicsSceneMousePress,
         QEvent::GraphicsSceneMouseMove,
         QEvent::GraphicsSceneMouseRelease,
         QEvent::GraphicsSceneMouseDoubleClick
     );
 
-    QSet<QEvent::Type> wheelEventTypes = Instrument::makeSet(QEvent::GraphicsSceneWheel);
+    Instrument::EventTypeSet wheelEventTypes = Instrument::makeSet(QEvent::GraphicsSceneWheel);
 
     /* Item instruments. */
     m_manager->installInstrument(new StopInstrument(Instrument::ITEM, mouseEventTypes, this));
@@ -88,7 +88,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_manager->installInstrument(new ForwardingInstrument(Instrument::SCENE, mouseEventTypes, this));
 
     /* View/viewport instruments. */
-    m_manager->installInstrument(m_uiElementsInstrument, InstallationMode::INSTALL_FIRST);
+    m_manager->installInstrument(m_uiElementsInstrument, InstallationMode::INSTALL_BEFORE, m_display->paintForwardingInstrument());
     m_manager->installInstrument(m_resizingInstrument);
     m_manager->installInstrument(m_dragInstrument);
     m_manager->installInstrument(m_rubberBandInstrument);

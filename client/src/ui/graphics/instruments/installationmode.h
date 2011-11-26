@@ -8,10 +8,21 @@ class Instrument;
 class InstallationMode {
 public:
     enum Mode {
-        INSTALL_LAST,   /**< Install after all present instruments. */
-        INSTALL_FIRST,  /**< Install before all present instruments. */
-        INSTALL_BEFORE, /**< Install before the given instrument. If NULL is given or given instrument not found, inserts at the end. */
-        INSTALL_AFTER   /**< Install after the given instrument. If NULL is given or given instrument not found, inserts at the beginning. */
+        /** Installed instrument will be the first in event processing queue. */
+        INSTALL_FIRST,  
+
+        /** Installed instrument will be the last in event processing queue. */
+        INSTALL_LAST,   
+
+        /** Installed instrument will be placed before the given instrument in event processing queue. 
+         * If NULL is given or given reference not found, it will be placed first in the queue. */
+        INSTALL_BEFORE, 
+
+        /** Installed instrument will be placed after the given instrument in event processing queue. 
+         * If NULL is given or given reference not found, it will be placed last in the queue. */
+        INSTALL_AFTER,  
+
+        INSTALL_MODE_COUNT
     };
 
 protected:

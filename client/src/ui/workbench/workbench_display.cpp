@@ -15,8 +15,11 @@
 #include <ui/graphics/instruments/boundinginstrument.h>
 #include <ui/graphics/instruments/transformlistenerinstrument.h>
 #include <ui/graphics/instruments/activitylistenerinstrument.h>
+#include <ui/graphics/instruments/forwardinginstrument.h>
+#include <ui/graphics/instruments/stopinstrument.h>
 
 #include <ui/graphics/items/resource_widget.h>
+#include <ui/graphics/items/resource_widget_renderer.h>
 #include <ui/graphics/items/curtain_item.h>
 #include <ui/graphics/items/image_button_widget.h>
 
@@ -92,12 +95,17 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     m_dummyScene(new QGraphicsScene(this))
 {
     /* Create and configure instruments. */
+    Instrument::EventTypeSet paintEventTypes = Instrument::makeSet(QEvent::Paint);
+    
     m_boundingInstrument = new BoundingInstrument(this);
     m_transformListenerInstrument = new TransformListenerInstrument(this);
     m_activityListenerInstrument = new ActivityListenerInstrument(1000, this);
+    m_paintForwardingInstrument = new ForwardingInstrument(Instrument::VIEWPORT, paintEventTypes, this);
     m_instrumentManager->installInstrument(m_transformListenerInstrument);
     m_instrumentManager->installInstrument(m_boundingInstrument);
     m_instrumentManager->installInstrument(m_activityListenerInstrument);
+    m_instrumentManager->installInstrument(new StopInstrument(Instrument::VIEWPORT, paintEventTypes, this));
+    m_instrumentManager->installInstrument(m_paintForwardingInstrument);
 
     m_activityListenerInstrument->recursiveDisable();
 
@@ -367,6 +375,10 @@ QnResourceWidget *QnWorkbenchDisplay::widget(QnWorkbenchItem *item) const {
     return m_widgetByItem[item];
 }
 
+QnResourceWidget *QnWorkbenchDisplay::widget(CLAbstractRenderer *renderer) const {
+    return m_widgetByRenderer[renderer];
+}
+
 QnResourceDisplay *QnWorkbenchDisplay::display(QnWorkbenchItem *item) const {
     QnResourceWidget *widget = this->widget(item);
     if(widget == NULL)
@@ -473,6 +485,8 @@ void QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item) {
     connect(item, SIGNAL(flagsChanged()),           this, SLOT(at_item_flagsChanged()));
 
     m_widgetByItem.insert(item, widget);
+    if(widget->renderer() != NULL)
+        m_widgetByRenderer.insert(widget->renderer(), widget);
     
     synchronize(widget, false);
     bringToFront(widget);
@@ -494,6 +508,8 @@ void QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
     emit widgetAboutToBeRemoved(widget);
 
     m_widgetByItem.remove(item);
+    if(widget->renderer() != NULL)
+        m_widgetByRenderer.remove(widget->renderer());
 
     disconnect(widget, NULL, this, NULL);
 

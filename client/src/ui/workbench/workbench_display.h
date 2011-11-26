@@ -14,6 +14,9 @@ class InstrumentManager;
 class BoundingInstrument;
 class TransformListenerInstrument;
 class ActivityListenerInstrument;
+class ForwardingInstrument;
+
+class CLAbstractRenderer;
 
 class QnWorkbench;
 class QnWorkbenchItem;
@@ -94,6 +97,13 @@ public:
     }
 
     /**
+     * \returns                         Paint forwarding instrument used by this workbench manager.
+     */
+    ForwardingInstrument *paintForwardingInstrument() const {
+        return m_paintForwardingInstrument;
+    }
+
+    /**
      * Note that this function never returns NULL.
      * 
      * \returns                         Current workbench of this workbench manager. 
@@ -135,8 +145,15 @@ public:
 
     /**
      * \param item                      Item to get widget for.
+     * \returns                         Widget for the given item.
      */
     QnResourceWidget *widget(QnWorkbenchItem *item) const;
+
+    /**
+     * \param renderer                  Renderer to get widget for.
+     * \returns                         Widget for the given renderer.
+     */
+    QnResourceWidget *widget(CLAbstractRenderer *renderer) const;
 
     QnResourceDisplay *display(QnWorkbenchItem *item) const;
 
@@ -279,6 +296,9 @@ private:
     /** Item to widget mapping. */
     QHash<QnWorkbenchItem *, QnResourceWidget *> m_widgetByItem;
 
+    /** Renderer to widget mapping. */
+    QHash<CLAbstractRenderer *, QnResourceWidget *> m_widgetByRenderer;
+
     /** Current front z displacement value. */
     qreal m_frontZ;
 
@@ -308,6 +328,9 @@ private:
 
     /** Bounding instrument. */
     BoundingInstrument *m_boundingInstrument;
+
+    /** Paint forwarding instrument. */
+    ForwardingInstrument *m_paintForwardingInstrument;
 
 
     /* Animation-related stuff. */

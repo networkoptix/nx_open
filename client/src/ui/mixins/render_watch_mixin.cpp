@@ -1,6 +1,37 @@
-#include "render_watcher.h"
+#include "render_watch_mixin.h"
+#include <ui/workbench/workbench_display.h>
+#include <ui/graphics/items/resource_widget_renderer.h>
+#include <ui/graphics/items/resource_widget.h>
+#include <ui/graphics/instruments/signalinginstrument.h>
+#include <ui/graphics/instruments/instrumentmanager.h>
+#include <ui/graphics/instruments/forwardinginstrument.h>
+#include <camera/abstractrenderer.h>
 #include <utils/common/warnings.h>
 
+QnRenderWatchMixin::QnRenderWatchMixin(QnWorkbenchDisplay *display, QObject *parent):
+    QObject(parent) 
+{
+    if(display == NULL) {
+        qnNullWarning(display);
+        return;
+    }
+
+    /* Connect to display. */
+    connect(display,    SIGNAL(widgetAdded(QnResourceWidget *)),            this,   SLOT(at_display_widgetAdded(QnResourceWidget *)));
+    connect(display,    SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)), this,   SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
+
+    /* Set up instruments. */
+    Instrument::EventTypeSet paintEventTypes = Instrument::makeSet(QEvent::Paint);
+    SignalingInstrument *beforeDisplayInstrument = new SignalingInstrument(Instrument::VIEWPORT, paintEventTypes, this);
+    SignalingInstrument *afterDisplayInstrument = new SignalingInstrument(Instrument::VIEWPORT, paintEventTypes, this);
+
+    InstrumentManager *manager = display->instrumentManager();
+    manager->installInstrument(beforeDisplayInstrument, InstrumentManager::INSTALL_BEFORE, display->paintForwardingInstrument());
+    manager->installInstrument(afterDisplayInstrument,  InstrumentManager::INSTALL_AFTER, display->paintForwardingInstrument());
+
+    connect(beforeDisplayInstrument, SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(startDisplay()));
+    connect(afterDisplayInstrument,  SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(finishDisplay()));
+}
 
 QnRenderWatchMixin::QnRenderWatchMixin(QObject *parent): 
     QObject(parent)
@@ -68,3 +99,18 @@ void QnRenderWatchMixin::finishDisplay() {
         }
     }
 }
+
+void QnRenderWatchMixin::at_display_widgetAdded(QnResourceWidget *widget) {
+    if(widget->renderer() == NULL) 
+        return;
+
+    registerRenderer(widget->renderer(), widget->renderer());
+}
+
+void QnRenderWatchMixin::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
+    if(widget->renderer() == NULL) 
+        return;
+
+    unregisterRenderer(widget->renderer());
+}
+
