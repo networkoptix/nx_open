@@ -528,7 +528,7 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
             return Status_Buffered;
         }
         else
-		return Status_Skipped;
+		    return Status_Skipped;
 	}
     m_mtx.unlock();
 

@@ -357,7 +357,8 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         }
 
         m_lastFrameDisplayed = m_display[channel]->dispay(vd, draw, scaleFactor);
-        if (m_buffering && m_extTimeSrc && m_lastFrameDisplayed != CLVideoStreamDisplay::Status_Buffered) {
+
+        if (m_buffering && m_extTimeSrc && m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed) {
             m_buffering = false;
             m_extTimeSrc->onBufferingFinished(this);
         }
