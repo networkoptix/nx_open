@@ -72,7 +72,7 @@ bool ResizingInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
     dragProcessor()->mousePressEvent(viewport, event);
 
     event->accept();
-    return true; /* We don't want default event handlers to kick in. */
+    return false;
 }
 
 void ResizingInstrument::startDragProcess(DragInfo *info) {
@@ -83,7 +83,7 @@ void ResizingInstrument::startDrag(DragInfo *info) {
     m_resizingStartedEmitted = false;
 
     if(m_widget.isNull()) {
-        /** Whoops, already destroyed. */
+        /* Whoops, already destroyed. */
         dragProcessor()->reset();
         return;
     }

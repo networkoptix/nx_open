@@ -207,7 +207,8 @@ void QnResourceWidget::setGeometry(const QRectF &geometry) {
     base_type::setGeometry(QRectF(QPointF(newLeft, newTop), newSize));
 #endif
 
-    return base_type::setGeometry(geometry);
+    base_type::setGeometry(geometry);
+    setTransformOriginPoint(rect().center());
 }
 
 QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint) const {

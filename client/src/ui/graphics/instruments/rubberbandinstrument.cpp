@@ -208,6 +208,7 @@ void RubberBandInstrument::installedNotify() {
     m_rubberBand = new RubberBandItem();
     rubberBand()->setParent(this); /* Just to feel totally safe. */
     rubberBand()->setZValue(m_rubberBandZValue);
+    rubberBand()->setVisible(false);
     scene()->addItem(rubberBand());
 
     connect(scene(), SIGNAL(selectionChanged()), this, SLOT(at_scene_selectionChanged()));
@@ -295,6 +296,7 @@ void RubberBandInstrument::startDrag(DragInfo *info) {
     rubberBand()->setViewport(info->view()->viewport());
     rubberBand()->setViewportTransform(info->view()->viewportTransform());
     rubberBand()->setOrigin(info->mousePressScenePos());
+    rubberBand()->setVisible(true);
 }
 
 void RubberBandInstrument::dragMove(DragInfo *info) {
@@ -327,6 +329,7 @@ void RubberBandInstrument::dragMove(DragInfo *info) {
 
 void RubberBandInstrument::finishDrag(DragInfo *) {
     rubberBand()->setViewport(NULL);
+    rubberBand()->setVisible(false);
 }
 
 QSet<QGraphicsItem *> RubberBandInstrument::toSet(QList<QGraphicsItem *> items) {

@@ -50,13 +50,17 @@ bool DragInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
     return false;
 }
 
+void DragInstrument::startDragProcess(DragInfo *info) {
+    emit dragProcessStarted(info->view());
+}
+
 void DragInstrument::startDrag(DragInfo *info) {
     if(m_itemToSelect != NULL) {
         m_itemToSelect->setSelected(true);
         m_itemToSelect = NULL;
     }
 
-    emit draggingStarted(info->view(), scene()->selectedItems());
+    emit dragStarted(info->view(), scene()->selectedItems());
 }
 
 void DragInstrument::dragMove(DragInfo *info) {
@@ -68,6 +72,9 @@ void DragInstrument::dragMove(DragInfo *info) {
 }
 
 void DragInstrument::finishDrag(DragInfo *info) {
-    emit draggingFinished(info->view(), scene() == NULL ? QList<QGraphicsItem *>() : scene()->selectedItems());
+    emit dragFinished(info->view(), scene() == NULL ? QList<QGraphicsItem *>() : scene()->selectedItems());
 }
 
+void DragInstrument::finishDragProcess(DragInfo *info) {
+    emit dragProcessFinished(info->view());
+}

@@ -11,15 +11,19 @@ public:
     virtual ~DragInstrument();
 
 signals:
-    void draggingStarted(QGraphicsView *view, QList<QGraphicsItem *> items);
-    void draggingFinished(QGraphicsView *view, QList<QGraphicsItem *> items);
+    void dragProcessStarted(QGraphicsView *view);
+    void dragStarted(QGraphicsView *view, const QList<QGraphicsItem *> &items);
+    void dragFinished(QGraphicsView *view, const QList<QGraphicsItem *> &items);
+    void dragProcessFinished(QGraphicsView *view);
 
 protected:
     virtual bool mousePressEvent(QWidget *viewport, QMouseEvent *event) override;
 
+    virtual void startDragProcess(DragInfo *info) override;
     virtual void startDrag(DragInfo *info) override;
     virtual void dragMove(DragInfo *info) override;
     virtual void finishDrag(DragInfo *info) override;
+    virtual void finishDragProcess(DragInfo *info) override;
 
 private:
     QGraphicsItem *m_itemToSelect;

@@ -51,7 +51,8 @@ public:
         if (widget != m_viewport)
             return; /* Draw it on source viewport only. */
 
-        assert(target() != NULL);
+        if(target() == NULL)
+            return; /* Target may get suddenly deleted. */
 
         QPointF sceneOrigin = target()->mapToScene(m_origin);
 
@@ -92,13 +93,18 @@ public:
      * \param viewport                  Viewport to draw this item on.
      */
     void start(QWidget *viewport, QnResourceWidget *target, const QPointF &origin) {
+        m_viewport = viewport;
         m_target = target;
         m_origin = origin;
+
+        prepareGeometryChange();
     }
 
     void stop() {
         m_viewport = NULL;
         m_target.clear();
+
+        prepareGeometryChange();
     }
 
     void setHead(const QPointF &head) {
@@ -164,6 +170,7 @@ void RotationInstrument::installedNotify() {
     m_rotationItem = new RotationItem();
     rotationItem()->setParent(this); /* Just to feel totally safe. */
     rotationItem()->setZValue(m_rotationItemZValue);
+    rotationItem()->setVisible(false);
     scene()->addItem(rotationItem());
 
     DragProcessingInstrument::installedNotify();
@@ -201,29 +208,53 @@ bool RotationInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
     return false;
 }
 
+bool RotationInstrument::paintEvent(QWidget *viewport, QPaintEvent *event) {
+    if(target() == NULL)
+        dragProcessor()->reset();
+
+    return DragProcessingInstrument::paintEvent(viewport, event);
+}
+
+void RotationInstrument::startDragProcess(DragInfo *info) {
+    emit rotationProcessStarted(info->view(), target());
+}
+
 void RotationInstrument::startDrag(DragInfo *info) {
-    if(m_target.isNull()) {
+    m_rotationStartedEmitted = false;
+
+    if(target() == NULL) {
+        /* Whoops, already destroyed. */
         dragProcessor()->reset();
         return;
     }
 
-    rotationItem()->start(info->view()->viewport(), m_target.data(), m_origin);
+    rotationItem()->start(info->view()->viewport(), target(), m_origin);
+    rotationItem()->setVisible(true);
+
+    emit rotationStarted(info->view(), target());
+    m_rotationStartedEmitted = true;
 }
 
 void RotationInstrument::dragMove(DragInfo *info) {
-    QnResourceWidget *target = m_target.data();
-    if(target == NULL) {
+    if(target() == NULL) {
         dragProcessor()->reset();
         return;
     }
 
-    qreal currentAngle = atan2(target->mapFromScene(info->mouseScenePos()) - m_origin);
+    rotationItem()->setHead(info->mouseScenePos());
 
-    target->setRotation(target->rotation() + (currentAngle - m_lastAngle) / M_PI * 180.0);
-
+    qreal currentAngle = atan2(target()->mapFromScene(info->mouseScenePos()) - m_origin);
+    target()->setRotation(target()->rotation() + (currentAngle - m_lastAngle) / M_PI * 180.0);
     m_lastAngle = currentAngle;
 }
 
 void RotationInstrument::finishDrag(DragInfo *info) {
-    return;
+    if(m_rotationStartedEmitted)
+        emit rotationFinished(info->view(), target());
+
+    rotationItem()->setVisible(false);
+}
+
+void RotationInstrument::finishDragProcess(DragInfo *info) {
+    emit rotationProcessFinished(info->view(), target());
 }
