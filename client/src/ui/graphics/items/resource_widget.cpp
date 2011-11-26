@@ -141,10 +141,9 @@ void QnResourceWidget::setEnclosingGeometry(const QRectF &enclosingGeometry) {
 }
 
 QPolygonF QnResourceWidget::provideShape() {
-    QTransform transform;
-    QPointF zero = mapToScene(0.0, 0.0);
-    transform.translate(-zero.x(), -zero.y());
-    transform *= sceneTransform();
+    QTransform transform = sceneTransform();
+    QPointF zero = transform.map(QPointF());
+    transform = transform * QTransform::fromTranslate(-zero.x(), -zero.y());
 
     qreal fw2 = m_frameWidth / 2;
     return transform.map(QPolygonF(QRectF(QPointF(0, 0), size()).adjusted(-fw2, -fw2, fw2, fw2)));

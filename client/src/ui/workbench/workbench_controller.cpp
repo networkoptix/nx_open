@@ -17,6 +17,7 @@
 #include <ui/graphics/instruments/wheelzoominstrument.h>
 #include <ui/graphics/instruments/rubberbandinstrument.h>
 #include <ui/graphics/instruments/draginstrument.h>
+#include <ui/graphics/instruments/rotationinstrument.h>
 #include <ui/graphics/instruments/clickinstrument.h>
 #include <ui/graphics/instruments/boundinginstrument.h>
 #include <ui/graphics/instruments/stopinstrument.h>
@@ -53,6 +54,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_handScrollInstrument = new HandScrollInstrument(this);
     m_wheelZoomInstrument = new WheelZoomInstrument(this);
     m_rubberBandInstrument = new RubberBandInstrument(this);
+    m_rotationInstrument = new RotationInstrument(this);
     m_resizingInstrument = new ResizingInstrument(this);
     m_archiveDropInstrument = new ArchiveDropInstrument(this, this);
     m_uiElementsInstrument = new UiElementsInstrument(this);
@@ -93,6 +95,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_manager->installInstrument(m_dragInstrument);
     m_manager->installInstrument(m_rubberBandInstrument);
     m_manager->installInstrument(m_handScrollInstrument);
+    m_manager->installInstrument(m_rotationInstrument);
     m_manager->installInstrument(m_archiveDropInstrument);
 
     connect(itemClickInstrument,        SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const QPoint &)),      this,                   SLOT(at_item_clicked(QGraphicsView *, QGraphicsItem *)));

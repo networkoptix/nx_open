@@ -19,7 +19,6 @@ public:
 
     void setRotationItemZValue(qreal rotationItemZValue);
 
-
 protected:
     virtual void installedNotify() override;
     virtual void aboutToBeUninstalledNotify() override;

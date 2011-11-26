@@ -18,6 +18,7 @@ class RubberBandInstrument;
 class ResizingInstrument;
 class ArchiveDropInstrument;
 class UiElementsInstrument;
+class RotationInstrument;
 
 class NavigationItem;
 
@@ -96,6 +97,9 @@ private:
 
     /** Dragging instrument. */
     DragInstrument *m_dragInstrument;
+
+    /** Rotation instrument. */
+    RotationInstrument *m_rotationInstrument;
 
     /** Rubber band instrument. */
     RubberBandInstrument *m_rubberBandInstrument;
