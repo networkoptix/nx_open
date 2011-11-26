@@ -18,7 +18,8 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate():
     m_opened(false),
     m_waitBOF(false),
     m_lastPacketFlags(-1),
-    m_closing(false)
+    m_closing(false),
+    m_singleShotMode(false)
 {
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
     m_flags |= Flag_SlowSource;
@@ -63,6 +64,7 @@ bool QnRtspClientArchiveDelegate::open(QnResourcePtr resource)
         for (int i = 0; i < 50 && !m_closing; ++i)
             QnSleep::msleep(10);
     }
+    m_sendedCSec = m_rtspSession.lastSendedCSeq();
     return m_opened;
 }
 
@@ -177,8 +179,11 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
 
         if (result && m_waitBOF)
         {
-            if (result->flags & QnAbstractMediaData::MediaFlags_BOF)
+            if (result->flags & QnAbstractMediaData::MediaFlags_BOF &&
+                ((result->flags & QnAbstractMediaData::MediaFlags_LIVE) ||  m_sendedCSec == result->opaque))
+            {
                 m_waitBOF = false;
+            }
             else
                 result.clear();
         }
@@ -194,9 +199,24 @@ qint64 QnRtspClientArchiveDelegate::seek(qint64 time)
 {
     deleteContexts(); // context is going to create again on first data after SEEK, so ignore rest of data before seek
     m_position = time;
-    m_rtspSession.sendPlay(time, m_rtspSession.getScale());
+    m_rtspSession.sendPlay(time, m_singleShotMode ? time : AV_NOPTS_VALUE, m_rtspSession.getScale());
+    m_sendedCSec = m_rtspSession.lastSendedCSeq();
     m_waitBOF = true;
     return time;
+}
+
+void QnRtspClientArchiveDelegate::setSingleshotMode(bool value)
+{
+    if (value == m_singleShotMode)
+        return;
+
+    m_singleShotMode = value;
+    /*
+    if (value)
+        m_rtspSession.sendPause();
+    else
+        m_rtspSession.sendPlay(AV_NOPTS_VALUE, AV_NOPTS_VALUE, m_rtspSession.getScale());
+    */
 }
 
 QnVideoResourceLayout* QnRtspClientArchiveDelegate::getVideoLayout()
@@ -261,17 +281,21 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
             payload+=4; // deserialize timeStamp high part
             if (context->ctx()->codec_type == AVMEDIA_TYPE_VIDEO)
             {
-                if (dataSize < 1)
+                if (dataSize < RTSP_FFMPEG_VIDEO_HEADER_SIZE)
                     return result;
 
                 quint32 videoHeader = ntohl(*(quint32*)payload);
                 quint8 flags = videoHeader >> 24;
                 quint32 fullPayloadLen = videoHeader & 0x00ffffff;
-                dataSize-=4;
-                payload+=4; // deserialize video flags
+                quint8 cseq = payload[4];
+
+                dataSize -= RTSP_FFMPEG_VIDEO_HEADER_SIZE;
+                payload += RTSP_FFMPEG_VIDEO_HEADER_SIZE; // deserialize video flags
+
                 QnCompressedVideoData *video = new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, fullPayloadLen, context);
                 nextPacket = QnCompressedVideoDataPtr(video);
                 video->flags = flags;
+                video->opaque = cseq;
                 if (context) 
                 {
                     video->width = context->ctx()->coded_width;
@@ -321,7 +345,7 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
 void QnRtspClientArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
 {
     int sign = value ? -1 : 1;
-    m_rtspSession.sendPlay(displayTime, /*RTPSession::RTSP_NOW*/ qAbs(m_rtspSession.getScale()) * sign);
+    m_rtspSession.sendPlay(displayTime, AV_NOPTS_VALUE, qAbs(m_rtspSession.getScale()) * sign);
 }
 
 bool QnRtspClientArchiveDelegate::isRealTimeSource() const 
@@ -331,3 +355,4 @@ bool QnRtspClientArchiveDelegate::isRealTimeSource() const
     else
         return m_lastPacketFlags & QnAbstractMediaData::MediaFlags_LIVE;
 }
+

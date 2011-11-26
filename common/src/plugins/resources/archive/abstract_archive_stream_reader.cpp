@@ -1,14 +1,11 @@
 #include "abstract_archive_stream_reader.h"
+
 #include "utils/common/util.h"
 
 QnAbstractArchiveReader::QnAbstractArchiveReader(QnResourcePtr dev ) :
     QnClientPullMediaStreamProvider(dev),
     m_lengthMksec(0),
-    m_singleShot(false),
-    m_adaptiveSleep(20 * 1000),
     m_needToSleep(0),
-    m_cs(QMutex::Recursive),
-    m_skipFramesToTime(0),
     m_delegate(0),
     m_cycleMode(true),
     m_lastJumpTime(AV_NOPTS_VALUE)
@@ -21,22 +18,6 @@ QnAbstractArchiveReader::~QnAbstractArchiveReader()
     delete m_delegate;
 }
 
-void QnAbstractArchiveReader::setSingleShotMode(bool single)
-{
-    m_singleShot = single;
-    if (!m_singleShot)
-    {
-        m_adaptiveSleep.afterdelay();
-        CLLongRunnable::resume();
-    }
-    emit singleShotModeChanged(single);
-}
-
-bool QnAbstractArchiveReader::isSingleShotMode() const
-{
-    return m_singleShot;
-}
-
 // returns len of archive in mksec
 quint64 QnAbstractArchiveReader::lengthMksec() const
 {
@@ -46,7 +27,7 @@ quint64 QnAbstractArchiveReader::lengthMksec() const
 bool QnAbstractArchiveReader::jumpTo(qint64 mksec, bool makeshot, qint64 skipTime)
 {
     bool needJump = mksec != m_lastJumpTime;
-    if (needJump) 
+    if (needJump)
     {
         emit beforeJump(mksec, makeshot);
         channeljumpTo(mksec, 0, skipTime);
@@ -60,7 +41,7 @@ bool QnAbstractArchiveReader::jumpTo(qint64 mksec, bool makeshot, qint64 skipTim
 
 void QnAbstractArchiveReader::jumpToPreviousFrame(qint64 mksec, bool makeshot)
 {
-    if (mksec != DATETIME_NOW) 
+    if (mksec != DATETIME_NOW)
     {
         //setSkipFramesToTime(mksec);
         //jumpTo(qMax(0ll, (qint64)mksec - 200 * 1000), makeshot);
@@ -68,26 +49,6 @@ void QnAbstractArchiveReader::jumpToPreviousFrame(qint64 mksec, bool makeshot)
     }
     else
         jumpTo(mksec, makeshot);
-}
-
-qint64 QnAbstractArchiveReader::skipFramesToTime() const
-{
-    QMutexLocker mutex(&m_framesMutex);
-
-    return m_skipFramesToTime;
-}
-
-void QnAbstractArchiveReader::setSkipFramesToTime(qint64 skipFramesToTime)
-{
-    QMutexLocker mutex(&m_framesMutex);
-    m_skipFramesToTime = skipFramesToTime;
-}
-
-bool QnAbstractArchiveReader::isSkippingFrames() const
-{ 
-    QMutexLocker mutex(&m_framesMutex);
-
-    return m_skipFramesToTime != 0;
 }
 
 
@@ -123,63 +84,26 @@ void QnAbstractArchiveReader::setCycleMode(bool value)
     m_cycleMode = value;
 }
 
-void QnAbstractArchiveReader::pause()
+qint64 QnAbstractArchiveReader::startTime() const
 {
-    QnClientPullMediaStreamProvider::pause();
-    emit streamPaused();
-}
-
-void QnAbstractArchiveReader::resume()
-{
-    QnClientPullMediaStreamProvider::resume();
-}
-
-void QnAbstractArchiveReader::resumeMedia()
-{
-    setSingleShotMode(false);
-    resume();
-    resumeDataProcessors();
-    emit streamResumed();
-}
-
-void QnAbstractArchiveReader::nextFrame()
-{
-    emit nextFrameOccured();
-    resume();
-}
-
-void QnAbstractArchiveReader::previousFrame(qint64 mksec)
-{
-    emit prevFrameOccured();
-}
-
-
-qint64 QnAbstractArchiveReader::startTime() const 
-{ 
+    Q_ASSERT(m_delegate);
     //m_delegate->open(m_resource);
-    return m_delegate->startTime(); 
+    return m_delegate->startTime();
 }
 
-qint64 QnAbstractArchiveReader::endTime() const 
-{ 
-    //m_delegate->open(m_resource);
-    return m_delegate->endTime(); 
-}
-
-void QnAbstractArchiveReader::pleaseStop()
+qint64 QnAbstractArchiveReader::endTime() const
 {
-    QnClientPullMediaStreamProvider::pleaseStop();
-    if (m_delegate)
-        m_delegate->beforeClose();
+    Q_ASSERT(m_delegate);
+    //m_delegate->open(m_resource);
+    return m_delegate->endTime();
 }
 
 bool QnAbstractArchiveReader::open()
 {
-    return m_delegate ? m_delegate->open(m_resource) : false;
+    return m_delegate && m_delegate->open(m_resource);
 }
 
 bool QnAbstractArchiveReader::isRealTimeSource() const
 {
-    return m_delegate->isRealTimeSource();
+    return m_delegate && m_delegate->isRealTimeSource();
 }
-

@@ -77,6 +77,9 @@ public:
 public Q_SLOTS:
     void setPlaying(bool playing);
 
+Q_SIGNALS:
+    void exportRange(qint64 begin, qint64 end);
+
 protected:
     void timerEvent(QTimerEvent* event);
     void updateSlider();
@@ -109,9 +112,9 @@ private Q_SLOTS:
     void onVolumeLevelChanged(int);
 
     void restoreInfoText();
-    
+
     void onTimePeriodUpdaterReady(const QnTimePeriodList &timePeriods);
-    
+
 
 protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent *);

@@ -25,10 +25,11 @@ public:
     virtual QnResourceAudioLayout* getAudioLayout();
     virtual bool isRealTimeSource() const;
     virtual void onReverseMode(qint64 /*displayTime*/, bool /*value*/);
-
+    virtual void setSingleshotMode(bool value);
 
     void setStartDelay(qint64 startDelay);
-    qint64 jumpToPreviousFrame (qint64 time, bool makeshot);
+    void jumpToPreviousFrame (qint64 time, bool makeshot);
+    void jumpTo (qint64 time, bool makeshot);
 
     virtual AVCodecContext* setAudioChannel(int num);
 

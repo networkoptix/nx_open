@@ -42,6 +42,13 @@ public:
     qint64 minimumRange() const;
     void setMinimumRange(qint64);
 
+    QPair<qint64, qint64> selectionRange() const;
+    void setSelectionRange(const QPair<qint64, qint64> &range);
+    inline void setSelectionRange(qint64 begin, qint64 end)
+    { setSelectionRange(QPair<qint64, qint64>(begin, end)); }
+    inline void resetSelectionRange()
+    { setSelectionRange(0, 0); }
+
     const QnTimePeriodList &timePeriodList() const { return m_timePeriodList; }
     void setTimePeriodList(const QnTimePeriodList &timePeriodList) { m_timePeriodList = timePeriodList; }
 
@@ -67,6 +74,8 @@ Q_SIGNALS:
     void sliderPressed();
     void sliderReleased();
 
+    void exportRange(qint64 begin, qint64 end);
+
 protected:
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
 
@@ -81,8 +90,8 @@ private Q_SLOTS:
 private:
     double delta() const;
 
-    qint64 fromSlider(int value);
-    int toSlider(qint64 value);
+    qint64 fromSlider(int value) const;
+    int toSlider(qint64 value) const;
 
     void setViewPortPos(qint64 value);
 

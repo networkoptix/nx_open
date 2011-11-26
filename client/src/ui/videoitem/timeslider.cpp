@@ -1,10 +1,13 @@
 #include "timeslider.h"
 
 #include <QtCore/QDateTime>
+#include <QtCore/QPair>
 #include <QtCore/QPropertyAnimation>
 
+#include <QtGui/QAction>
 #include <QtGui/QApplication>
 #include <QtGui/QGraphicsLinearLayout>
+#include <QtGui/QMenu>
 #include <QtGui/QPainter>
 #include <QtGui/QProxyStyle>
 #include <QtGui/QStyle>
@@ -278,6 +281,13 @@ public:
         connect(m_wheelAnimation, SIGNAL(finished()), m_parent, SLOT(onWheelAnimationFinished()));
     }
 
+    QPair<qint64, qint64> selectionRange() const;
+    void setSelectionRange(const QPair<qint64, qint64> &range);
+    inline void setSelectionRange(qint64 begin, qint64 end)
+    { setSelectionRange(QPair<qint64, qint64>(begin, end)); }
+    inline void resetSelectionRange()
+    { setSelectionRange(0, 0); }
+
     inline bool isDragging() const { return m_dragging; }
     void setDragging(bool dragging) { m_dragging = dragging; }
 
@@ -289,11 +299,16 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
 protected:
+    void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
     void wheelEvent(QGraphicsSceneWheelEvent *event);
+
+private:
+    qint64 posToValue(qreal pos) const;
+    qreal valueToPos(qint64 value) const;
 
 private:
     TimeSlider *m_parent;
@@ -306,6 +321,8 @@ private:
     int m_prevWheelDelta;
     double m_cachedXPos;
     double m_cachedOutsideCnt;
+
+    QPair<qint64, qint64> m_selectedRange;
 };
 
 void TimeLine::wheelEvent(QGraphicsSceneWheelEvent *event)
@@ -563,10 +580,73 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         xpos += intervals[level].interval * pixelPerTime;
     }
 
+    // draw selection range
+    if (m_selectedRange.first != m_selectedRange.second)
+    {
+        const qreal rangeBegin = m_selectedRange.first != 0 ? valueToPos(m_selectedRange.first) : 0;
+        const qreal rangeEnd = m_selectedRange.second != 0 ? valueToPos(m_selectedRange.second) : 0;
+
+        if (m_selectedRange.first != 0 && m_selectedRange.second != 0)
+            painter->fillRect(QRectF(QPointF(rangeBegin, 0), QPointF(rangeEnd, rect().height())), QColor(200, 200, 220, 50));
+        painter->setPen(QPen(Qt::red, 0));
+        if (m_selectedRange.first != 0)
+            painter->drawLine(QLineF(rangeBegin, 0, rangeBegin, rect().height()));
+        if (m_selectedRange.second != 0)
+            painter->drawLine(QLineF(rangeEnd, 0, rangeEnd, rect().height()));
+    }
+
     // draw cursor vertical line
     painter->setPen(QPen(Qt::red, 3));
     xpos = r.left() + m_parent->m_slider->value() * r.width() / (m_parent->m_slider->maximum() - m_parent->m_slider->minimum());
     painter->drawLine(QLineF(xpos, 0, xpos, rect().height()));
+}
+
+qint64 TimeLine::posToValue(qreal pos) const
+{
+    return m_parent->viewPortPos() + qRound64((double(m_parent->sliderRange()) / rect().width()) * pos);
+}
+
+qreal TimeLine::valueToPos(qint64 value) const
+{
+    return (double(value - m_parent->viewPortPos()) / m_parent->sliderRange()) * rect().width();
+}
+
+QPair<qint64, qint64> TimeLine::selectionRange() const
+{
+    return m_selectedRange;
+}
+
+void TimeLine::setSelectionRange(const QPair<qint64, qint64> &range)
+{
+    if (range.first <= range.second) {
+        m_selectedRange.first = range.first;
+        m_selectedRange.second = range.second;
+    } else {
+        m_selectedRange.first = range.second;
+        m_selectedRange.second = range.first;
+    }
+
+    update();
+}
+
+void TimeLine::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
+{
+    QMenu menu;
+    QAction *rangeBeginAction = menu.addAction(tr("Select Range Begin"));
+    QAction *rangeEndAction = menu.addAction(tr("Select Range End"));
+    menu.addSeparator();
+    QAction *clearRangeAction = menu.addAction(tr("Clear Range"));
+    QAction *exportRangeAction = menu.addAction(tr("Export Selected Range..."));
+    exportRangeAction->setEnabled(m_selectedRange.first != m_selectedRange.second);
+
+    QAction *selectedAction = menu.exec(event->screenPos());
+
+    if (selectedAction == rangeBeginAction || selectedAction == rangeEndAction)
+        setSelectionRange(posToValue(event->pos().x()), qMax(m_selectedRange.first, m_selectedRange.second));
+    else if (selectedAction == clearRangeAction)
+        resetSelectionRange();
+    else if (selectedAction == exportRangeAction)
+        Q_EMIT m_parent->exportRange(m_selectedRange.first, m_selectedRange.second);
 }
 
 void TimeLine::mousePressEvent(QGraphicsSceneMouseEvent *me)
@@ -575,7 +655,7 @@ void TimeLine::mousePressEvent(QGraphicsSceneMouseEvent *me)
         me->accept();
         m_lineAnimation->stop();
         if (qFuzzyIsNull(m_parent->scalingFactor()))
-            m_parent->setCurrentValue(m_parent->viewPortPos() + qRound64((double(m_parent->sliderRange()) / rect().width()) * me->pos().x()));
+            m_parent->setCurrentValue(posToValue(me->pos().x()));
         m_parent->setMoving(true);
         m_previousPos = me->pos();
         m_length = 0;
@@ -627,7 +707,7 @@ void TimeLine::mouseReleaseEvent(QGraphicsSceneMouseEvent *me)
                 //m_lineAnimation->start();
             }
         } else {
-            m_parent->setCurrentValue(m_parent->viewPortPos() + qRound64((double(m_parent->sliderRange()) / rect().width()) * me->pos().x()));
+            m_parent->setCurrentValue(posToValue(me->pos().x()));
         }
         m_parent->setMoving(false);
     }
@@ -853,7 +933,7 @@ void TimeSlider::setEndSize(qreal size)
 
 void TimeSlider::onSliderValueChanged(int value)
 {
-    if (!m_isUserInput /*&& !isMoving()*/) {
+    if (!m_isUserInput) {
         m_isUserInput = true;
         setCurrentValue(fromSlider(value));
         m_isUserInput = false;
@@ -887,12 +967,12 @@ double TimeSlider::delta() const
     return ((1.0f/(m_slider->maximum() - m_slider->minimum()))*length())/qExp(scalingFactor()/2);
 }
 
-qint64 TimeSlider::fromSlider(int value)
+qint64 TimeSlider::fromSlider(int value) const
 {
     return m_viewPortPos + value * delta();
 }
 
-int TimeSlider::toSlider(qint64 value)
+int TimeSlider::toSlider(qint64 value) const
 {
     return (value - m_viewPortPos) / delta();
 }
@@ -915,6 +995,16 @@ void TimeSlider::setMinimumRange(qint64 r)
     m_minimumRange = r;
 }
 
+QPair<qint64, qint64> TimeSlider::selectionRange() const
+{
+    return m_timeLine->selectionRange();
+}
+
+void TimeSlider::setSelectionRange(const QPair<qint64, qint64> &range)
+{
+    m_timeLine->setSelectionRange(range);
+}
+
 void TimeSlider::updateSlider()
 {
     if (!m_isUserInput) {
@@ -923,7 +1013,7 @@ void TimeSlider::updateSlider()
         m_isUserInput = false;
     }
 
-    if(isAtEnd()) {
+    if (isAtEnd()) {
         m_slider->setToolTip("Live");
     } else {
         if (m_minimumValue == 0)

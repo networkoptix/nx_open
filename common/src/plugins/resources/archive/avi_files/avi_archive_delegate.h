@@ -22,8 +22,12 @@ public:
     virtual qint64 seek (qint64 time);
     virtual QnVideoResourceLayout* getVideoLayout();
     virtual QnResourceAudioLayout* getAudioLayout();
-    
+
     virtual AVCodecContext* setAudioChannel(int num);
+
+    // for optimization       
+    void doNotFindStreamInfo();
+    bool isStreamsFound() const;
 protected:
     virtual qint64 contentLength() const;
     virtual qint64 packetTimestamp(const AVPacket& packet);
@@ -50,7 +54,6 @@ private:
     QList<QnMediaContextPtr> m_contexts;
 
     friend class QnAviAudioLayout;
-    static QSemaphore aviSemaphore;
 };
 
 #endif

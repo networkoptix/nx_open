@@ -8,6 +8,8 @@
 
 class RTPSession;
 
+static const int RTSP_FFMPEG_VIDEO_HEADER_SIZE = 5;
+
 struct RtspStatistic {
     quint32 timestamp;
     double nptTime;
@@ -75,7 +77,10 @@ public:
     qint64 endTime() const;
     float getScale() const;
 
-    bool sendPlay(qint64 position, double scale);
+    bool sendPlay(qint64 startPos, qint64 endPos, double scale);
+    bool sendPause();
+
+    int lastSendedCSeq() const { return m_csec-1; }
 private:
     qint64 m_startTime;
     qint64 m_endTime;

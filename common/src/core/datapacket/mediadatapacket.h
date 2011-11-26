@@ -30,6 +30,7 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
                      MediaFlags_AfterEOF = 2,
                      MediaFlags_BOF = 4,
                      MediaFlags_LIVE = 8,
+                     MediaFlags_SingleShot = 16,
                     };
 
 	QnAbstractMediaData(unsigned int alignment, unsigned int capacity)
@@ -37,7 +38,8 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
         flags(MediaFlags_None),
         channelNumber(0),
         subChannelNumber(0),
-        context(0)
+        context(0),
+        opaque(0)
 	{
 	}
 
@@ -57,6 +59,7 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
     quint32 subChannelNumber; // video camera can provide combination of different context at single channel (H.264 hi-res and low-res for example)
     //void* context;
     QnMediaContextPtr context;
+    int opaque;
 private:
 	QnAbstractMediaData() : 
        data(0,1){};
@@ -77,7 +80,7 @@ struct QnCompressedVideoData : public QnAbstractMediaData
         : QnAbstractMediaData(alignment, qMin(capacity, (unsigned int)10 * 1024 * 1024))
 	{
 		dataType = VIDEO;
-		useTwice = false;
+		//useTwice = false;
 		context = ctx;
 		ignore = false;
         flags = 0;
@@ -88,7 +91,6 @@ struct QnCompressedVideoData : public QnAbstractMediaData
 	int height;
 	//bool keyFrame;
     //int flags;
-	bool useTwice; // some decoders delay video frame by one;
 	bool ignore;
 };
 
