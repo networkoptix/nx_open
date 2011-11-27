@@ -3,7 +3,7 @@
 #include <utils/common/qt_opengl.h>
 
 namespace {
-    void glVertexCircular(qreal alpha, qreal r) {
+    void glVertexPolar(qreal alpha, qreal r) {
         glVertex(r * std::cos(alpha), r * std::sin(alpha));
     }
 
@@ -40,10 +40,10 @@ QnLoadingProgressPainter::QnLoadingProgressPainter(qreal innerRadius, int sector
         qreal r1 = 1;
 
         glColor(interpolate(startColor, endColor, static_cast<qreal>(i) / (sectorCount - 1)));
-        glVertexCircular(a0, r0);
-        glVertexCircular(a1, r0);
-        glVertexCircular(a1, r1);
-        glVertexCircular(a0, r1);
+        glVertexPolar(a0, r0);
+        glVertexPolar(a1, r0);
+        glVertexPolar(a1, r1);
+        glVertexPolar(a0, r1);
     }
     glEnd();
     glEndList();

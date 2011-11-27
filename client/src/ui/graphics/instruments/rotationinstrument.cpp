@@ -1,28 +1,28 @@
 #include "rotationinstrument.h"
 #include <cassert>
-#include <cmath> /* For std::fmod, std::floor. */
+#include <cmath> /* For std::fmod, std::floor, std::sin and std::cos. */
 #include <limits>
 #include <QMouseEvent>
 #include <QGraphicsObject>
 #include <ui/graphics/items/resource_widget.h>
 
 namespace {
-    const QColor defaultRotationItemColor(255, 0, 0, 128);
+    const QColor defaultColor(255, 0, 0, 96);
 
-    const qreal defaultRotationItemPenWidth = 2;
+    const qreal defaultPenWidth = 10;
 
-    const qreal defaultRotationHeadLength = 60;
+    const qreal defaultHeadLength = 120;
 
-    const QSizeF defaultRotationArrowSize = QSizeF(5, 7); /* (Side, Front) */
+    const qreal defaultMinRadius = defaultHeadLength / M_PI;
 
-    inline void paintArrowHead(QPainter *painter, const QPointF &arrowTip, const QPointF &frontDelta, const QPointF &sideDelta) {
-        QPointF points[3] = {
-            arrowTip - frontDelta - sideDelta,
-            arrowTip,
-            arrowTip - frontDelta + sideDelta
-        };
-        
-        painter->drawPolyline(points, 3);
+    const QSizeF defaultArrowSize = QSizeF(20, 35); /* (Side, Front) */
+    
+    const qreal defaultArrowOverlap = 5;
+
+    inline void addArrowHead(QPainterPath *shape, const QPointF &base, const QPointF &frontUnit, const QPointF &sideUnit) {
+        shape->lineTo(base - defaultArrowSize.width() / 2 * sideUnit - defaultArrowOverlap * frontUnit);
+        shape->lineTo(base + defaultArrowSize.height() * frontUnit);
+        shape->lineTo(base + defaultArrowSize.width() / 2 * sideUnit - defaultArrowOverlap * frontUnit);
     }
 
     QPointF mapFromRelative(QnResourceWidget *widget, const QPointF &point) {
@@ -32,6 +32,10 @@ namespace {
             size.width()  * point.x(),
             size.height() * point.y()
         );
+    }
+
+    QPointF polar(qreal alpha, qreal r) {
+        return QPointF(r * std::cos(alpha), r * std::sin(alpha));
     }
 
 } // anonymous namespace
@@ -73,24 +77,34 @@ public:
         QPointF viewportHead = sceneToViewport.map(m_sceneHead);
         QPointF viewportOrigin = sceneToViewport.map(sceneOrigin);
 
-        /* Calculate "hammer" head delta. */
-        QPointF unit = normalized(normal(viewportHead - viewportOrigin));
-        QPointF headDelta = unit * defaultRotationHeadLength / 2;
+        /* Precalculate shape parameters. */
+        qreal radius = qMax(defaultMinRadius, this->length(viewportOrigin - viewportHead));
 
-        /* Calculate arrowhead deltas. */
-        QPointF arrowFrontDelta = unit * defaultRotationArrowSize.height();
-        QPointF arrowSideDelta = normal(unit) * defaultRotationArrowSize.width() / 2;
+        qreal width = defaultPenWidth;
+        qreal halfWidth = defaultPenWidth / 2;
 
-        /* Paint it all. */
+        qreal headAngle = (defaultHeadLength / 2.0) / radius;
+        qreal lineAngle = halfWidth / radius;
+        qreal headAngleDegrees = headAngle / M_PI * 180.0;
+        qreal lineAngleDegrees = lineAngle / M_PI * 180.0;
+
+        /* Prepare shape. */
+        QPainterPath shape;
+        shape.moveTo(0, halfWidth);
+        shape.arcTo(QRectF(-halfWidth, -halfWidth, width, width), -90.0, -180.0);
+        shape.arcTo(QRectF(-radius + halfWidth, -radius + halfWidth, 2 * radius - width, 2 * radius - width), lineAngleDegrees, headAngleDegrees - lineAngleDegrees);
+        addArrowHead(&shape, polar(-headAngle, radius), polar(-headAngle - M_PI / 2, 1), polar(-headAngle, 1));
+        shape.arcTo(QRectF(-radius - halfWidth, -radius - halfWidth, 2 * radius + width, 2 * radius + width), headAngleDegrees, -2.0 * headAngleDegrees);
+        addArrowHead(&shape, polar(headAngle, radius), polar(headAngle + M_PI / 2, 1), -polar(headAngle, 1));
+        shape.arcTo(QRectF(-radius + halfWidth, -radius + halfWidth, 2 * radius - width, 2 * radius - width), -headAngleDegrees, headAngleDegrees - lineAngleDegrees);
+        shape.closeSubpath();
+
+        /* Draw! */
         painter->save();
         painter->resetTransform();
-        painter->setPen(QPen(defaultRotationItemColor, defaultRotationItemPenWidth));
-
-        painter->drawLine(viewportHead, viewportOrigin);
-        painter->drawLine(viewportHead - headDelta, viewportHead + headDelta);
-        paintArrowHead(painter, viewportHead - headDelta, -arrowFrontDelta, arrowSideDelta);
-        paintArrowHead(painter, viewportHead + headDelta,  arrowFrontDelta, arrowSideDelta);
-
+        painter->translate(viewportOrigin);
+        painter->rotate(atan2(viewportHead - viewportOrigin) / M_PI * 180.0);
+        painter->fillPath(shape, defaultColor);
         painter->restore();
     }
 
