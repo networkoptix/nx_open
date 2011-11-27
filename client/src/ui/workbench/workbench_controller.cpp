@@ -108,7 +108,9 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     connect(m_dragInstrument,           SIGNAL(dragFinished(QGraphicsView *, QList<QGraphicsItem *>)),          this,                           SLOT(at_dragFinished(QGraphicsView *, QList<QGraphicsItem *>)));
     connect(m_resizingInstrument,       SIGNAL(resizingStarted(QGraphicsView *, QGraphicsWidget *)),            this,                           SLOT(at_resizingStarted(QGraphicsView *, QGraphicsWidget *)));
     connect(m_resizingInstrument,       SIGNAL(resizingFinished(QGraphicsView *, QGraphicsWidget *)),           this,                           SLOT(at_resizingFinished(QGraphicsView *, QGraphicsWidget *)));
-    
+    connect(m_rotationInstrument,       SIGNAL(rotationStarted(QGraphicsView *, QnResourceWidget *)),           this,                           SLOT(at_rotationStarted(QGraphicsView *, QnResourceWidget *)));
+    connect(m_rotationInstrument,       SIGNAL(rotationFinished(QGraphicsView *, QnResourceWidget *)),          this,                           SLOT(at_rotationFinished(QGraphicsView *, QnResourceWidget *)));
+
     connect(m_handScrollInstrument,     SIGNAL(scrollingStarted(QGraphicsView *)),                              boundingInstrument,             SLOT(dontEnforcePosition(QGraphicsView *)));
     connect(m_handScrollInstrument,     SIGNAL(scrollingFinished(QGraphicsView *)),                             boundingInstrument,             SLOT(enforcePosition(QGraphicsView *)));
     
@@ -276,7 +278,7 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget
     m_display->synchronize(widget->item());
 }
 
-void QnWorkbenchController::at_dragStarted(QGraphicsView *, QList<QGraphicsItem *> items) {
+void QnWorkbenchController::at_dragStarted(QGraphicsView *, const QList<QGraphicsItem *> &items) {
     qDebug("DRAGGING STARTED");
 
     /* Bring to front preserving relative order. */
@@ -284,7 +286,7 @@ void QnWorkbenchController::at_dragStarted(QGraphicsView *, QList<QGraphicsItem 
     m_display->setLayer(items, QnWorkbenchDisplay::FRONT_LAYER);
 }
 
-void QnWorkbenchController::at_dragFinished(QGraphicsView *view, QList<QGraphicsItem *> items) {
+void QnWorkbenchController::at_dragFinished(QGraphicsView *view, const QList<QGraphicsItem *> &items) {
     qDebug("DRAGGING FINISHED");
 
     /* Get models and drag delta. */
@@ -364,6 +366,21 @@ void QnWorkbenchController::at_dragFinished(QGraphicsView *view, QList<QGraphics
     /* Re-sync everything. */
     foreach(QnWorkbenchItem *model, models)
         m_display->synchronize(model);
+}
+
+void QnWorkbenchController::at_rotationStarted(QGraphicsView *view, QnResourceWidget *widget) {
+    qDebug("ROTATION STARTED");
+
+    m_display->bringToFront(widget);
+}
+
+void QnWorkbenchController::at_rotationFinished(QGraphicsView *view, QnResourceWidget *widget) {
+    qDebug("ROTATION FINISHED");
+
+    if(widget == NULL)
+        return; /* We may get NULL if the widget being rotated gets deleted. */
+
+    widget->item()->setRotation(widget->rotation());
 }
 
 void QnWorkbenchController::at_item_clicked(QGraphicsView *, QGraphicsItem *item) {

@@ -64,8 +64,11 @@ protected slots:
     void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget);
     void at_resizingFinished(QGraphicsView *view, QGraphicsWidget *widget);
 
-    void at_dragStarted(QGraphicsView *view, QList<QGraphicsItem *> items);
-    void at_dragFinished(QGraphicsView *view, QList<QGraphicsItem *> items);
+    void at_dragStarted(QGraphicsView *view, const QList<QGraphicsItem *> &items);
+    void at_dragFinished(QGraphicsView *view, const QList<QGraphicsItem *> &items);
+
+    void at_rotationStarted(QGraphicsView *view, QnResourceWidget *widget);
+    void at_rotationFinished(QGraphicsView *view, QnResourceWidget *widget);
 
     void at_item_clicked(QGraphicsView *view, QGraphicsItem *item);
     void at_item_doubleClicked(QGraphicsView *view, QGraphicsItem *item);

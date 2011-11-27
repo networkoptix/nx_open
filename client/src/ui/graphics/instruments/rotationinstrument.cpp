@@ -11,9 +11,9 @@ namespace {
 
     const qreal defaultRotationItemPenWidth = 2;
 
-    const qreal defaultRotationHeadLength = 50;
+    const qreal defaultRotationHeadLength = 60;
 
-    const QSizeF defaultRotationArrowSize = QSizeF(3, 5); /* (Side, Front) */
+    const QSizeF defaultRotationArrowSize = QSizeF(5, 7); /* (Side, Front) */
 
     inline void paintArrowHead(QPainter *painter, const QPointF &arrowTip, const QPointF &frontDelta, const QPointF &sideDelta) {
         QPointF points[3] = {
