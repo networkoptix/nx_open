@@ -1,6 +1,6 @@
 #include "rotationinstrument.h"
 #include <cassert>
-#include <cmath> /* For std::fmod. */
+#include <cmath> /* For std::fmod, std::floor. */
 #include <limits>
 #include <QMouseEvent>
 #include <QGraphicsObject>
@@ -265,6 +265,11 @@ void RotationInstrument::dragMove(DragInfo *info) {
 
     /* Clamp to [-180.0, 180.0]. */
     newRotation = std::fmod(newRotation + 180.0, 360.0) - 180.0;
+
+    /* Round to 15 degrees if ctrl is pressed. */
+    if(info->modifiers() & Qt::ControlModifier)
+        newRotation = std::floor(newRotation / 15.0 + 0.5) * 15.0;
+
     if(qFuzzyCompare(currentRotation, newRotation))
         return;
 

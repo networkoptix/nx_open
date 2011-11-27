@@ -12,7 +12,7 @@ class QGraphicsScene;
  */
 class DragInfo {
 public:
-    DragInfo(): m_modifiers(0) {}
+    DragInfo(): m_event(NULL) {}
 
     /**
      * \returns                         Position of the mouse pointer at the moment the 
@@ -74,9 +74,7 @@ public:
     /**
      * \returns                         Current keyboard modifiers. 
      */
-    Qt::KeyboardModifiers modifiers() const {
-        return m_modifiers;
-    }
+    Qt::KeyboardModifiers modifiers() const;
 
     /**
      * Note that this function returns NULL if current graphics view is 
@@ -111,11 +109,11 @@ public:
 private:
     friend class DragProcessor;
 
+    /** Current event. */
+    QEvent *m_event;
+
     /** Button that triggered the current drag operation. Releasing this button will finish current drag operation. */
     Qt::MouseButton m_triggerButton;
-
-    /** Current keyboard modifiers. */
-    Qt::KeyboardModifiers m_modifiers;
 
     /** Current graphics view. */
     QGraphicsView *m_view;

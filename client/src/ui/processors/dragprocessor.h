@@ -129,25 +129,19 @@ private:
     void checkThread(QObject *object);
     void checkThread(QGraphicsItem *item);
 
-    void preprocessEvent(QGraphicsSceneMouseEvent *event);
-    void preprocessEvent(QMouseEvent *event);
+    void transitionInternalHelper(State newState);
 
-    template<class Event>
-    void transitionInternal(Event *event, State newState);
+    void transitionInternal(QEvent *event, State newState);
 
-    template<class Event>
-    void transition(Event *event, State state);
+    void transition(QEvent *event, State state);
 
-    template<class Event>
-    void transition(Event *event, QGraphicsView *view, State state);
+    void transition(QEvent *event, QGraphicsView *view, State state);
 
-    template<class Event>
-    void transition(Event *event, QGraphicsScene *scene, State state);
+    void transition(QEvent *event, QGraphicsScene *scene, State state);
 
-    template<class Event>
-    void transition(Event *event, QGraphicsItem *item, State state);
+    void transition(QEvent *event, QGraphicsItem *item, State state);
     
-    void drag(const QPoint &screenPos, const QPointF &scenePos);
+    void drag(QEvent *event, const QPoint &screenPos, const QPointF &scenePos);
 
     QPoint screenPos(QGraphicsView *view, QMouseEvent *event);
     template<class T>

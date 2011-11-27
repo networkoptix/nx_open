@@ -84,22 +84,10 @@ void DragProcessor::checkThread(QGraphicsItem *item) {
 #endif
 }
 
-void DragProcessor::preprocessEvent(QGraphicsSceneMouseEvent *event) {
-    m_info.m_modifiers = event->modifiers();
-}
-
-void DragProcessor::preprocessEvent(QMouseEvent *event) {
-    m_info.m_modifiers = event->modifiers();
-}
-
-template<class Event>
-void DragProcessor::transitionInternal(Event *event, State newState) {
+void DragProcessor::transitionInternalHelper(State newState) {
     /* This code lets us detect nested transitions. */
     m_transitionCounter++;
     int transitionCounter = m_transitionCounter;
-
-    if(event != NULL)
-        preprocessEvent(event);
 
     /* Note that handler may trigger another transition. */
     switch(newState) {
@@ -184,8 +172,15 @@ void DragProcessor::transitionInternal(Event *event, State newState) {
     }
 }
 
-template<class Event>
-void DragProcessor::transition(Event *event, State state) {
+void DragProcessor::transitionInternal(QEvent *event, State newState) {
+    m_info.m_event = event;
+
+    transitionInternalHelper(newState);
+
+    m_info.m_event = NULL;
+}
+
+void DragProcessor::transition(QEvent *event, State state) {
     if(m_object.isNull()) {
         m_viewport = NULL;
         m_info.m_view = NULL;
@@ -198,8 +193,7 @@ void DragProcessor::transition(Event *event, State state) {
     transitionInternal(event, state);
 }
 
-template<class Event>
-void DragProcessor::transition(Event *event, QGraphicsView *view, State state) {
+void DragProcessor::transition(QEvent *event, QGraphicsView *view, State state) {
     m_object = view;
     m_info.m_view = view;
     m_info.m_scene = NULL;
@@ -208,8 +202,7 @@ void DragProcessor::transition(Event *event, QGraphicsView *view, State state) {
     transitionInternal(event, state);
 }
 
-template<class Event>
-void DragProcessor::transition(Event *event, QGraphicsScene *scene, State state) {
+void DragProcessor::transition(QEvent *event, QGraphicsScene *scene, State state) {
     m_object = scene;
     m_info.m_view = NULL;
     m_info.m_scene = scene;
@@ -218,8 +211,7 @@ void DragProcessor::transition(Event *event, QGraphicsScene *scene, State state)
     transitionInternal(event, state);
 }
 
-template<class Event>
-void DragProcessor::transition(Event *event, QGraphicsItem *item, State state) {
+void DragProcessor::transition(QEvent *event, QGraphicsItem *item, State state) {
     QGraphicsObject *object = item->toGraphicsObject();
     if(object != NULL)
         m_object = object;
@@ -262,7 +254,7 @@ void DragProcessor::mousePressEventInternal(T *object, Event *event) {
         transition(event, object, PREPAIRING);
     } else {
         if(m_state == DRAGGING)
-            drag(screenPos(object, event), scenePos(object, event));
+            drag(event, screenPos(object, event), scenePos(object, event));
 
         /* Stop scrolling if the user has let go of the trigger button (even if we didn't get the release event). */
         if(!(event->buttons() & m_info.m_triggerButton))
@@ -298,14 +290,15 @@ void DragProcessor::mouseMoveEventInternal(T *object, Event *event) {
 
     /* Perform drag operation. */
     if(m_state == DRAGGING)
-        drag(screenPos(object, event), scenePos(object, event));
+        drag(event, screenPos(object, event), scenePos(object, event));
 }
 
-void DragProcessor::drag(const QPoint &screenPos, const QPointF &scenePos) {
+void DragProcessor::drag(QEvent *event, const QPoint &screenPos, const QPointF &scenePos) {
     assert(m_state == DRAGGING);
 
     m_info.m_mouseScreenPos = screenPos;
     m_info.m_mouseScenePos = scenePos;
+    m_info.m_event = event;
 
     if(!(m_flags & DONT_COMPRESS))
         if(m_info.m_mouseScreenPos == m_info.m_lastMouseScreenPos && qFuzzyCompare(m_info.m_mouseScenePos, m_info.m_lastMouseScenePos))
@@ -316,6 +309,7 @@ void DragProcessor::drag(const QPoint &screenPos, const QPointF &scenePos) {
 
     m_info.m_lastMouseScreenPos = m_info.m_mouseScreenPos;
     m_info.m_lastMouseScenePos = m_info.m_mouseScenePos;
+    m_info.m_event = NULL;
 }
 
 template<class T, class Event>
@@ -326,7 +320,7 @@ void DragProcessor::mouseReleaseEventInternal(T *object, Event *event) {
         return;
 
     if(m_state == DRAGGING)
-        drag(screenPos(object, event), scenePos(object, event));
+        drag(event, screenPos(object, event), scenePos(object, event));
 
     if(event->button() == m_info.m_triggerButton) {
         transition(event, object, WAITING);
@@ -348,12 +342,12 @@ void DragProcessor::mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) {
     mouseReleaseEventInternal(this->view(viewport), event);
 }
 
-void DragProcessor::paintEvent(QWidget *viewport, QPaintEvent *) {
+void DragProcessor::paintEvent(QWidget *viewport, QPaintEvent *event) {
     checkThread(viewport);
 
     if(m_state == DRAGGING && viewport == m_viewport) {
         QPoint screenPos = QCursor::pos();
-        drag(screenPos, this->view(viewport)->mapToScene(viewport->mapFromGlobal(screenPos)));
+        drag(event, screenPos, this->view(viewport)->mapToScene(viewport->mapFromGlobal(screenPos)));
     }
 }
 
@@ -386,6 +380,30 @@ void DragProcessor::mouseReleaseEvent(QGraphicsItem *item, QGraphicsSceneMouseEv
 }
 
 
+
+Qt::KeyboardModifiers DragInfo::modifiers() const {
+    QEvent::Type type;
+    if(m_event == NULL) {
+        type = QEvent::None;
+    } else {
+        type = m_event->type();
+    }
+
+    switch(type) {
+    case QEvent::GraphicsSceneMouseDoubleClick:
+    case QEvent::GraphicsSceneMouseMove:
+    case QEvent::GraphicsSceneMousePress:
+    case QEvent::GraphicsSceneMouseRelease:
+        return static_cast<QGraphicsSceneMouseEvent *>(m_event)->modifiers();
+    case QEvent::MouseButtonDblClick:
+    case QEvent::MouseButtonPress:
+    case QEvent::MouseButtonRelease:
+    case QEvent::MouseMove:
+        return static_cast<QMouseEvent *>(m_event)->modifiers();
+    default:
+        return QApplication::keyboardModifiers();
+    }
+}
 
 QPoint DragInfo::mouseViewportPos() const {
     return view()->viewport()->mapFromGlobal(mouseScreenPos());
