@@ -52,6 +52,7 @@ private:
     QWeakPointer<QnResourceWidget> m_target;
     bool m_rotationStartedEmitted;
     qreal m_originAngle;
+    qreal m_lastRotation;
     qreal m_rotationItemZValue;
 };
 

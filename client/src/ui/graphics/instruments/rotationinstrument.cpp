@@ -297,6 +297,7 @@ void RotationInstrument::startDrag(DragInfo *info) {
 
     rotationItem()->start(info->view()->viewport(), target());
     rotationItem()->setVisible(true);
+    m_lastRotation = target()->rotation();
 
     emit rotationStarted(info->view(), target());
     m_rotationStartedEmitted = true;
@@ -307,6 +308,10 @@ void RotationInstrument::dragMove(DragInfo *info) {
         dragProcessor()->reset();
         return;
     }
+
+    /* Make sure that rotation didn't change since the last call. 
+     * We may get some nasty effects if we don't do this. */
+    target()->setRotation(m_lastRotation);
 
     QPointF sceneOrigin = calculateOrigin(info->view(), target());
     QPoint viewportOrigin = info->view()->mapFromScene(sceneOrigin);
@@ -345,6 +350,8 @@ void RotationInstrument::dragMove(DragInfo *info) {
     /* Update rotation item. */
     rotationItem()->setHead(sceneHead);
     rotationItem()->setOrigin(sceneOrigin);
+    
+    m_lastRotation = target()->rotation();
 }
 
 void RotationInstrument::finishDrag(DragInfo *info) {

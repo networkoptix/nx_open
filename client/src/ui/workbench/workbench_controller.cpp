@@ -53,7 +53,7 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
         QEvent::GraphicsSceneMouseMove,
         QEvent::GraphicsSceneMouseRelease,
         QEvent::GraphicsSceneMouseDoubleClick
-        );
+    );
 
     Instrument::EventTypeSet wheelEventTypes = Instrument::makeSet(QEvent::GraphicsSceneWheel);
 
