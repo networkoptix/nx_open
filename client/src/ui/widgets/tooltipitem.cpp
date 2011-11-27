@@ -1,5 +1,7 @@
 #include "tooltipitem.h"
 
+#include <QtGui/QFontMetrics>
+
 ToolTipItem::ToolTipItem(QGraphicsItem *parent):
     QGraphicsItem(parent),
     m_parametersValid(false)
@@ -110,8 +112,9 @@ void ToolTipItem::wheelEvent(QGraphicsSceneWheelEvent *event)
     QGraphicsItem::wheelEvent(event);
 }
 
-void ToolTipItem::updateTextSize() {
-    QSize textSize = QFontMetrics(font()).boundingRect(text()).size();
+void ToolTipItem::updateTextSize()
+{
+    QSize textSize = QFontMetrics(font()).size(Qt::AlignCenter, text());
     if(textSize == m_textSize)
         return;
 
@@ -180,4 +183,3 @@ void ToolTipItem::invalidateParameters()
 {
     m_parametersValid = false;
 }
-

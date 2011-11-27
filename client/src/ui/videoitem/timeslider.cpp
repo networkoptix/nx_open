@@ -1016,7 +1016,7 @@ void TimeSlider::updateSlider()
         if (m_minimumValue == 0)
             m_slider->setToolTip(formatDuration(m_currentValue / 1000));
         else
-            m_slider->setToolTip(QDateTime::fromMSecsSinceEpoch(m_currentValue).toString(Qt::SystemLocaleShortDate));
+            m_slider->setToolTip(QDateTime::fromMSecsSinceEpoch(m_currentValue).toString(QLatin1String("yyyy MMM dd\nhh:mm:ss")));
     }
 }
 
