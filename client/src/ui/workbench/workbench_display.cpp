@@ -17,6 +17,7 @@
 #include <ui/graphics/instruments/activitylistenerinstrument.h>
 #include <ui/graphics/instruments/forwardinginstrument.h>
 #include <ui/graphics/instruments/stopinstrument.h>
+#include <ui/graphics/instruments/signalinginstrument.h>
 
 #include <ui/graphics/items/resource_widget.h>
 #include <ui/graphics/items/resource_widget_renderer.h>
@@ -97,10 +98,13 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     /* Create and configure instruments. */
     Instrument::EventTypeSet paintEventTypes = Instrument::makeSet(QEvent::Paint);
     
+    SignalingInstrument *resizeSignalingInstrument = new SignalingInstrument(Instrument::VIEWPORT, Instrument::makeSet(QEvent::Resize), this);
     m_boundingInstrument = new BoundingInstrument(this);
     m_transformListenerInstrument = new TransformListenerInstrument(this);
     m_activityListenerInstrument = new ActivityListenerInstrument(1000, this);
     m_paintForwardingInstrument = new ForwardingInstrument(Instrument::VIEWPORT, paintEventTypes, this);
+    
+    m_instrumentManager->installInstrument(resizeSignalingInstrument);
     m_instrumentManager->installInstrument(new StopInstrument(Instrument::VIEWPORT, paintEventTypes, this));
     m_instrumentManager->installInstrument(m_paintForwardingInstrument);
     m_instrumentManager->installInstrument(m_transformListenerInstrument);
@@ -110,6 +114,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     m_activityListenerInstrument->recursiveDisable();
 
     connect(m_transformListenerInstrument, SIGNAL(transformChanged(QGraphicsView *)),                   this,                   SLOT(at_viewport_transformationChanged()));
+    connect(resizeSignalingInstrument,     SIGNAL(activated(QWidget *, QEvent *)),                      this,                   SLOT(at_viewport_transformationChanged()));
     connect(m_activityListenerInstrument,  SIGNAL(activityStopped()),                                   this,                   SLOT(at_activityStopped()));
     connect(m_activityListenerInstrument,  SIGNAL(activityResumed()),                                   this,                   SLOT(at_activityStarted()));
 
@@ -119,18 +124,18 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
 
     /* Create curtain animator. */
     m_curtainAnimator = new QnCurtainAnimator(1000, this);
-    connect(m_curtainAnimator,  SIGNAL(curtained()),                                                    this,                   SLOT(at_curtained()));
-    connect(m_curtainAnimator,  SIGNAL(uncurtained()),                                                  this,                   SLOT(at_uncurtained()));
+    connect(m_curtainAnimator,              SIGNAL(curtained()),                                        this,                   SLOT(at_curtained()));
+    connect(m_curtainAnimator,              SIGNAL(uncurtained()),                                      this,                   SLOT(at_uncurtained()));
 
     /* Create viewport animator. */
     m_viewportAnimator = new QnViewportAnimator(this);
     m_viewportAnimator->setMovementSpeed(4.0);
     m_viewportAnimator->setScalingSpeed(32.0);
-    connect(m_viewportAnimator, SIGNAL(animationStarted()),                                             this,                   SIGNAL(viewportGrabbed()));
-    connect(m_viewportAnimator, SIGNAL(animationStarted()),                                             m_boundingInstrument,   SLOT(recursiveDisable()));
-    connect(m_viewportAnimator, SIGNAL(animationFinished()),                                            this,                   SIGNAL(viewportUngrabbed()));
-    connect(m_viewportAnimator, SIGNAL(animationFinished()),                                            m_boundingInstrument,   SLOT(recursiveEnable()));
-    connect(m_viewportAnimator, SIGNAL(animationFinished()),                                            this,                   SLOT(at_viewport_animationFinished()));
+    connect(m_viewportAnimator,             SIGNAL(animationStarted()),                                 this,                   SIGNAL(viewportGrabbed()));
+    connect(m_viewportAnimator,             SIGNAL(animationStarted()),                                 m_boundingInstrument,   SLOT(recursiveDisable()));
+    connect(m_viewportAnimator,             SIGNAL(animationFinished()),                                this,                   SIGNAL(viewportUngrabbed()));
+    connect(m_viewportAnimator,             SIGNAL(animationFinished()),                                m_boundingInstrument,   SLOT(recursiveEnable()));
+    connect(m_viewportAnimator,             SIGNAL(animationFinished()),                                this,                   SLOT(at_viewport_animationFinished()));
 
     /* Set up defaults. */
     initWorkbench(workbench);

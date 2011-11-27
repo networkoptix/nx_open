@@ -255,6 +255,7 @@ QVariant QnResourceWidget::itemChange(GraphicsItemChange change, const QVariant 
     case ItemScaleHasChanged:
     case ItemTransformOriginPointHasChanged: 
         invalidateShadowShape();
+        updateShadowPos();
         break;
     case ItemSceneHasChanged:
         if(scene() != NULL && !m_shadow.isNull()) {

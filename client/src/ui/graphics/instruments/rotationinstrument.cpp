@@ -1,6 +1,6 @@
 #include "rotationinstrument.h"
 #include <cassert>
-#include <cmath>
+#include <cmath> /* For std::fmod. */
 #include <limits>
 #include <QMouseEvent>
 #include <QGraphicsObject>
@@ -23,6 +23,15 @@ namespace {
         };
         
         painter->drawPolyline(points, 3);
+    }
+
+    QPointF mapFromRelative(QnResourceWidget *widget, const QPointF &point) {
+        QSizeF size = widget->size();
+
+        return QPointF(
+            size.width()  * point.x(),
+            size.height() * point.y()
+        );
     }
 
 } // anonymous namespace
@@ -54,7 +63,7 @@ public:
         if(target() == NULL)
             return; /* Target may get suddenly deleted. */
 
-        QPointF sceneOrigin = target()->mapToScene(m_origin);
+        QPointF sceneOrigin = target()->mapToScene(mapFromRelative(target(), m_origin));
 
         /* Accessing viewport is safe here as it equals the passed widget. */
         QGraphicsView *view = QnSceneUtility::view(m_viewport);
@@ -137,7 +146,7 @@ private:
     /** Widget being rotated. */
     QWeakPointer<QnResourceWidget> m_target;
 
-    /** Rotation origin point, in widget coordinates. */
+    /** Rotation origin point, in size-relative widget coordinates. */
     QPointF m_origin;
 
     /** Head of the rotation item, in scene coordinates. */
@@ -150,7 +159,10 @@ private:
 
 RotationInstrument::RotationInstrument(QObject *parent):
     DragProcessingInstrument(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent)
-{}
+{
+    /* We want to get drags on all paint events. */
+    dragProcessor()->setFlags(DragProcessor::DONT_COMPRESS);
+}
 
 RotationInstrument::~RotationInstrument() {
     ensureUninstalled();
@@ -199,8 +211,8 @@ bool RotationInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
         return false;
 
     m_target = target;
-    m_origin = target->rect().center();
-    m_lastAngle = atan2(target->mapFromScene(view->mapToScene(event->pos())) - m_origin);
+    m_origin = QPointF(0.5, 0.5);
+    m_originAngle = atan2(target->mapFromScene(view->mapToScene(event->pos())) - mapFromRelative(target, m_origin));
     
     dragProcessor()->mousePressEvent(viewport, event);
     
@@ -209,8 +221,10 @@ bool RotationInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
 }
 
 bool RotationInstrument::paintEvent(QWidget *viewport, QPaintEvent *event) {
-    if(target() == NULL)
+    if(target() == NULL) {
         dragProcessor()->reset();
+        return false;
+    }
 
     return DragProcessingInstrument::paintEvent(viewport, event);
 }
@@ -243,9 +257,18 @@ void RotationInstrument::dragMove(DragInfo *info) {
 
     rotationItem()->setHead(info->mouseScenePos());
 
-    qreal currentAngle = atan2(target()->mapFromScene(info->mouseScenePos()) - m_origin);
-    target()->setRotation(target()->rotation() + (currentAngle - m_lastAngle) / M_PI * 180.0);
-    m_lastAngle = currentAngle;
+    qreal currentAngle = atan2(target()->mapFromScene(info->mouseScenePos()) - mapFromRelative(target(), m_origin));
+    qreal currentRotation = target()->rotation();
+
+    /* Graphics item rotation is clockwise, calculated angles are counter-clockwise, hence the "-". */
+    qreal newRotation = currentRotation - (m_originAngle - currentAngle) / M_PI * 180.0;
+
+    /* Clamp to [-180.0, 180.0]. */
+    newRotation = std::fmod(newRotation + 180.0, 360.0) - 180.0;
+    if(qFuzzyCompare(currentRotation, newRotation))
+        return;
+
+    target()->setRotation(newRotation);
 }
 
 void RotationInstrument::finishDrag(DragInfo *info) {
@@ -258,3 +281,4 @@ void RotationInstrument::finishDrag(DragInfo *info) {
 void RotationInstrument::finishDragProcess(DragInfo *info) {
     emit rotationProcessFinished(info->view(), target());
 }
+

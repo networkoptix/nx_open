@@ -59,7 +59,9 @@ public:
 
     /**
      * \param point                     Point, treated as a vector.
-     * \returns                         Counter-clockwise angle between Y axis and the given vector, in radians.
+     * \returns                         Angle between the positive x-axis and the given vector, in radians. 
+     *                                  The angle is positive for counter-clockwise angles (upper half-plane, y > 0), 
+     *                                  and negative for clockwise angles (lower half-plane, y < 0).
      */
     static qreal atan2(const QPointF &point);
 
