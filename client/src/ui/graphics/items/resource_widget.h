@@ -171,6 +171,8 @@ public:
      */
     void removeButton(QGraphicsLayoutItem *button);
 
+    using base_type::mapRectToScene;
+
 signals:
     void aspectRatioChanged(qreal oldAspectRatio, qreal newAspectRatio);
     void aboutToBeDestroyed();

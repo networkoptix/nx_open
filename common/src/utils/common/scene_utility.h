@@ -66,6 +66,13 @@ public:
     static qreal atan2(const QPointF &point);
 
     /**
+     * \param polygon                   Polygon.
+     * \returns                         Centroid of the set of vertices of the given polygon. 
+     *                                  Note that this NOT centroid of the polygon itself.
+     */
+    static QPointF pointCentroid(const QPolygonF &polygon);
+
+    /**
      * \param view                      Graphics view. Must not be NULL.
      * \param rect                      Rectangle to map to scene.
      * \returns                         Bounding rectangle of the mapped polygon.

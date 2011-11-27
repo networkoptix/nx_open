@@ -15,6 +15,8 @@ namespace {
 
     const qreal defaultMinRadius = defaultHeadLength / M_PI;
 
+    const qreal defaultIgnoredRadius = defaultPenWidth;
+
     const QSizeF defaultArrowSize = QSizeF(20, 35); /* (Side, Front) */
     
     const qreal defaultArrowOverlap = 5;
@@ -25,18 +27,55 @@ namespace {
         shape->lineTo(base + defaultArrowSize.width() / 2 * sideUnit - defaultArrowOverlap * frontUnit);
     }
 
-    QPointF mapFromRelative(QnResourceWidget *widget, const QPointF &point) {
-        QSizeF size = widget->size();
-
-        return QPointF(
-            size.width()  * point.x(),
-            size.height() * point.y()
-        );
-    }
-
-    QPointF polar(qreal alpha, qreal r) {
+    inline QPointF polar(qreal alpha, qreal r) {
         return QPointF(r * std::cos(alpha), r * std::sin(alpha));
     }
+
+    const qreal centroidBorder = 0.5;
+
+    QPointF calculateOrigin(QGraphicsView *view, QnResourceWidget *widget) {
+        QRect viewportRect = view->viewport()->rect();
+        qreal viewportDiameter = QnSceneUtility::length(view->mapToScene(viewportRect.bottomRight()) - view->mapToScene(viewportRect.topLeft()));
+
+        QRectF widgetRect = widget->rect();
+        qreal widgetDiameter = QnSceneUtility::length(widget->mapToScene(widgetRect.bottomRight()) - widget->mapToScene(widgetRect.topLeft()));
+
+        QPointF widgetCenter = widget->mapToScene(widget->transformOriginPoint());
+
+        qreal k = viewportDiameter / widgetDiameter;
+        if(k >= 1.0) {
+            return widgetCenter;
+        } else {
+            QPointF viewportCenter = view->mapToScene(viewportRect.center());
+
+            /* Perform calculations in the dimension of the line connecting viewport and widget centers,
+             * zero at viewport center. */
+            qreal distance = QnSceneUtility::length(viewportCenter - widgetCenter);
+            qreal lo = qMax(-viewportDiameter / 2, distance - widgetDiameter / 2);
+            qreal hi = qMin(viewportDiameter / 2, distance + widgetDiameter / 2);
+            qreal pos = (lo + hi) / 2;
+
+            /* Go back to 2D. */
+            QPointF center = ((distance - pos) * viewportCenter + pos * widgetCenter) / distance;
+
+            if(k <= centroidBorder) {
+                return center;
+            } else {
+                qreal alpha = (k - centroidBorder) / (1.0 - centroidBorder);
+
+                return alpha * widgetCenter + (1.0 - alpha) * center;
+            }
+        }
+    }
+
+    qreal calculateItemAngle(QnResourceWidget *, const QPointF &itemPoint, const QPointF &itemOrigin) {
+        return QnSceneUtility::atan2(itemPoint - itemOrigin);
+    }
+
+    qreal calculateSceneAngle(QnResourceWidget *widget, const QPointF &scenePoint, const QPointF &sceneOrigin) {
+        return calculateItemAngle(widget, widget->mapFromScene(scenePoint), widget->mapFromScene(sceneOrigin));
+    }
+
 
 } // anonymous namespace
 
@@ -67,15 +106,13 @@ public:
         if(target() == NULL)
             return; /* Target may get suddenly deleted. */
 
-        QPointF sceneOrigin = target()->mapToScene(mapFromRelative(target(), m_origin));
-
         /* Accessing viewport is safe here as it equals the passed widget. */
         QGraphicsView *view = QnSceneUtility::view(m_viewport);
         QTransform sceneToViewport = view->viewportTransform();
 
         /* Map head & origin to viewport. */
         QPointF viewportHead = sceneToViewport.map(m_sceneHead);
-        QPointF viewportOrigin = sceneToViewport.map(sceneOrigin);
+        QPointF viewportOrigin = sceneToViewport.map(m_sceneOrigin);
 
         /* Precalculate shape parameters. */
         qreal radius = qMax(defaultMinRadius, this->length(viewportOrigin - viewportHead));
@@ -115,10 +152,9 @@ public:
      * 
      * \param viewport                  Viewport to draw this item on.
      */
-    void start(QWidget *viewport, QnResourceWidget *target, const QPointF &origin) {
+    void start(QWidget *viewport, QnResourceWidget *target) {
         m_viewport = viewport;
         m_target = target;
-        m_origin = origin;
 
         prepareGeometryChange();
     }
@@ -130,12 +166,16 @@ public:
         prepareGeometryChange();
     }
 
+    void setOrigin(const QPointF &origin) {
+        m_sceneOrigin = origin;
+    }
+
     void setHead(const QPointF &head) {
         m_sceneHead = head;
     }
 
     const QPointF &origin() const {
-        return m_origin;
+        return m_sceneOrigin;
     }
 
     const QPointF &head() const {
@@ -160,11 +200,11 @@ private:
     /** Widget being rotated. */
     QWeakPointer<QnResourceWidget> m_target;
 
-    /** Rotation origin point, in size-relative widget coordinates. */
-    QPointF m_origin;
-
     /** Head of the rotation item, in scene coordinates. */
     QPointF m_sceneHead;
+
+    /** Origin of the rotation item, in scene coordinates. */
+    QPointF m_sceneOrigin;
 
     /** Bounding rect of this item. */
     QRectF m_boundingRect;
@@ -225,8 +265,7 @@ bool RotationInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
         return false;
 
     m_target = target;
-    m_origin = QPointF(0.5, 0.5);
-    m_originAngle = atan2(target->mapFromScene(view->mapToScene(event->pos())) - mapFromRelative(target, m_origin));
+    m_originAngle = calculateSceneAngle(target, view->mapToScene(event->pos()), calculateOrigin(view, target));
     
     dragProcessor()->mousePressEvent(viewport, event);
     
@@ -256,7 +295,7 @@ void RotationInstrument::startDrag(DragInfo *info) {
         return;
     }
 
-    rotationItem()->start(info->view()->viewport(), target(), m_origin);
+    rotationItem()->start(info->view()->viewport(), target());
     rotationItem()->setVisible(true);
 
     emit rotationStarted(info->view(), target());
@@ -269,9 +308,14 @@ void RotationInstrument::dragMove(DragInfo *info) {
         return;
     }
 
-    rotationItem()->setHead(info->mouseScenePos());
+    QPointF sceneOrigin = calculateOrigin(info->view(), target());
+    QPoint viewportOrigin = info->view()->mapFromScene(sceneOrigin);
+    if(length(viewportOrigin - info->mouseViewportPos()) < defaultIgnoredRadius)
+        return;
 
-    qreal currentAngle = atan2(target()->mapFromScene(info->mouseScenePos()) - mapFromRelative(target(), m_origin));
+    QPointF itemOrigin = target()->mapFromScene(sceneOrigin);
+
+    qreal currentAngle = calculateItemAngle(target(), target()->mapFromScene(info->mouseScenePos()), itemOrigin);
     qreal currentRotation = target()->rotation();
 
     /* Graphics item rotation is clockwise, calculated angles are counter-clockwise, hence the "-". */
@@ -284,10 +328,23 @@ void RotationInstrument::dragMove(DragInfo *info) {
     if(info->modifiers() & Qt::ControlModifier)
         newRotation = std::floor(newRotation / 15.0 + 0.5) * 15.0;
 
-    if(qFuzzyCompare(currentRotation, newRotation))
-        return;
+    QPointF sceneHead = info->mouseScenePos();
 
-    target()->setRotation(newRotation);
+    /* Rotate item if needed. */
+    if(!qFuzzyCompare(currentRotation, newRotation)) {
+        target()->setRotation(newRotation);
+
+        if(!qFuzzyCompare(target()->transformOriginPoint(), itemOrigin)) {
+            QPointF newSceneOrigin = target()->mapToScene(itemOrigin);
+            moveViewport(info->view(), newSceneOrigin - sceneOrigin);
+            sceneOrigin = newSceneOrigin;
+            sceneHead = info->view()->mapToScene(info->mouseViewportPos());
+        }
+    }
+
+    /* Update rotation item. */
+    rotationItem()->setHead(sceneHead);
+    rotationItem()->setOrigin(sceneOrigin);
 }
 
 void RotationInstrument::finishDrag(DragInfo *info) {

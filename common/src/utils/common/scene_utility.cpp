@@ -26,6 +26,23 @@ qreal QnSceneUtility::atan2(const QPointF &point) {
     return std::atan2(point.y(), point.x());
 }
 
+QPointF QnSceneUtility::pointCentroid(const QPolygonF &polygon) {
+    QPointF result;
+    
+    int size = polygon.size() - 1;
+    for(int i = 0; i < size; i++)
+        result += polygon[i];
+
+    /* Add last point only if it's not equal to the first. 
+     * This way both open and closed support polygons are supported. */
+    if(!qFuzzyCompare(polygon[0], polygon[size])) {
+        result += polygon[size];
+        size++;
+    }
+
+    return result / size;
+}
+
 QRectF QnSceneUtility::mapRectToScene(QGraphicsView *view, const QRect &rect) {
     return view->viewportTransform().inverted().mapRect(QRectF(rect));
 }
