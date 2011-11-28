@@ -111,6 +111,8 @@ void QnViewportAnimator::moveTo(const QRectF &rect, int timeLimitMsecs) {
         return;
     }
 
+    m_targetRect = rect;
+
     bool alreadyAnimating = isAnimating();
     bool signalsBlocked = blockSignals(true); /* Don't emit animationFinished() now. */
 
@@ -160,3 +162,6 @@ void QnViewportAnimator::setScalingSpeed(qreal multiplier) {
     m_logScalingSpeed = std::log(multiplier);
 }
 
+const QRectF &QnViewportAnimator::targetRect() const {
+    return m_targetRect;
+}

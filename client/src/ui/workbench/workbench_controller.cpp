@@ -233,6 +233,8 @@ void QnWorkbenchController::drop(const QnResourcePtr &resource, const QPoint &gr
         QRect newGeometry = layout()->closestFreeSlot(geometry.topLeft(), geometry.size());
         layout()->pinItem(item, newGeometry);
     }
+
+    display()->ensureVisible(item);
 }
 
 void QnWorkbenchController::updateGeometryDelta(QnResourceWidget *widget) {

@@ -41,6 +41,8 @@ public:
      */
     void moveTo(const QRectF &rect, int timeLimitMsecs = -1);
 
+    const QRectF &targetRect() const;
+
     /**
      * \param multiplier                Viewport movement speed, in viewports per second.
      */
@@ -84,6 +86,9 @@ private:
 
     /** Logarithmic viewport scaling speed. */
     qreal m_logScalingSpeed;
+
+    /** Target rect of current animation. */
+    QRectF m_targetRect;
 
     /** Viewport animation group. */
     QParallelAnimationGroup *m_animationGroup;

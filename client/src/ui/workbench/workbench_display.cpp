@@ -420,6 +420,13 @@ void QnWorkbenchDisplay::fitInView() {
     }
 }
 
+void QnWorkbenchDisplay::ensureVisible(QnWorkbenchItem *item) {
+    QRectF targetGeometry = m_viewportAnimator->isAnimating() ? m_viewportAnimator->targetRect() : viewportGeometry();
+    targetGeometry = targetGeometry.united(itemGeometry(item));
+
+    m_viewportAnimator->moveTo(targetGeometry, zoomAnimationDurationMsec);
+}
+
 void QnWorkbenchDisplay::bringToFront(const QList<QGraphicsItem *> &items) {
     QList<QGraphicsItem *> localItems = items;
 

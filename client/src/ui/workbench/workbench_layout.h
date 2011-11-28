@@ -114,6 +114,11 @@ public:
     void clear();
 
     /**
+     * \returns                         Whether there are no items on this layout. 
+     */
+    bool empty() const;
+
+    /**
      * \returns                         Bounding rectangle of all pinned items in this layout.
      */
     QRect boundingRect() const {

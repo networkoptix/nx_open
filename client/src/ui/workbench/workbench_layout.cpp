@@ -23,6 +23,10 @@ void QnWorkbenchLayout::clear() {
     }
 }
 
+bool QnWorkbenchLayout::empty() const {
+    return m_items.empty();
+}
+
 void QnWorkbenchLayout::addItem(QnWorkbenchItem *item) {
     if(item == NULL) {
         qnNullWarning(item);

@@ -193,6 +193,8 @@ public:
 
     void fitInView();
 
+    void ensureVisible(QnWorkbenchItem *item);
+
 
     void bringToFront(const QList<QGraphicsItem *> &items);
 
