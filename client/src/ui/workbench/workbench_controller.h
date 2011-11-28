@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QScopedPointer>
-#include <utils/common/scene_utility.h>
+#include <ui/common/scene_utility.h>
 #include <core/resource/resource.h>
 
 class QGraphicsScene;

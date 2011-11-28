@@ -1,7 +1,7 @@
 #include "viewport_animator.h"
 #include <cmath> /* For std::log, std::exp. */
 #include <limits>
-#include <utils/common/scene_utility.h>
+#include <ui/common/scene_utility.h>
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 #include "setter_animation.h"

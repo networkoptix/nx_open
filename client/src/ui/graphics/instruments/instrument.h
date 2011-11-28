@@ -6,7 +6,7 @@
 #include <QEvent> /* For QEvent::Type. */
 #include <QSet>
 #include <QList>
-#include <utils/common/scene_utility.h>
+#include <ui/common/scene_utility.h>
 
 class QKeyEvent;
 class QMouseEvent;

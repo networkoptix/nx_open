@@ -5,7 +5,7 @@
 #include <ui/widgets2/graphicswidget.h>
 #include <ui/common/constrained_resizable.h>
 #include <camera/render_status.h>
-#include <utils/common/scene_utility.h>
+#include <ui/common/scene_utility.h>
 #include <core/resource/resource_consumer.h>
 #include "polygonal_shadow_item.h"
 

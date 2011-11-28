@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <ui/animation/animation_timer.h>
-#include <utils/common/scene_utility.h>
+#include <ui/common/scene_utility.h>
 #include <utils/common/rect_set.h>
 #include "workbench.h"
 

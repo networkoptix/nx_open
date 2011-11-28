@@ -5,7 +5,7 @@
 #include <QSize>
 #include <QRect>
 #include <QPoint>
-#include <utils/common/scene_utility.h>
+#include <ui/common/scene_utility.h>
 
 class QnWorkbenchGridMapper: public QObject, protected QnSceneUtility {
     Q_OBJECT;

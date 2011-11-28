@@ -1,6 +1,6 @@
 #include "workbench_item.h"
 #include <cassert>
-#include <utils/common/scene_utility.h>
+#include <ui/common/scene_utility.h>
 #include <core/resource/resource.h>
 #include <core/resourcemanagment/resource_pool.h>
 #include <camera/resource_display.h>

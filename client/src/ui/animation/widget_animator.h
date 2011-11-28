@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QMetaType>
-#include <utils/common/scene_utility.h>
+#include <ui/common/scene_utility.h>
 
 class QGraphicsWidget;
 class QPropertyAnimation;

@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QWeakPointer>
-#include <utils/common/scene_utility.h>
+#include <ui/common/scene_utility.h>
 #include "draginfo.h"
 #include "dragprocesshandler.h"
 

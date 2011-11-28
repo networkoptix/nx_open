@@ -2,7 +2,7 @@
 #define QN_VIEWPORT_ANIMATOR_H
 
 #include <QObject>
-#include <utils/common/scene_utility.h>
+#include <ui/common/scene_utility.h>
 
 class QParallelAnimationGroup;
 class QGraphicsView;
