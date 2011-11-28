@@ -122,54 +122,9 @@ MainWnd::MainWnd(int argc, char* argv[], QWidget *parent, Qt::WindowFlags flags)
 
 MainWnd::~MainWnd()
 {
-    m_instance = 0;
+    s_instance = 0;
 
     destroyNavigator(m_normalView);
-}
-
-void MainWnd::findAcceptedFiles(QStringList& files, const QString& path)
-{
-    if (CLAviDvdDevice::isAcceptedUrl(path))
-    {
-        if (path.indexOf(QLatin1Char('?')) == -1)
-        {
-            // open all titles on DVD
-            QStringList titles = QnAVIDvdArchiveDelegate::getTitleList(path);
-            foreach (const QString &title, titles)
-                files << path + QLatin1String("?title=") + title;
-        }
-        else
-        {
-            files.append(path);
-        }
-    }
-    else if (CLAviBluRayDevice::isAcceptedUrl(path))
-    {
-        files.append(path);
-    }
-    else
-    {
-        FileTypeSupport fileTypeSupport;
-        QFileInfo fileInfo(path);
-        if (fileInfo.isDir())
-        {
-            QDirIterator iter(path, QDirIterator::Subdirectories);
-            while (iter.hasNext())
-            {
-                QString nextFilename = iter.next();
-                if (QFileInfo(nextFilename).isFile())
-                {
-                    if (fileTypeSupport.isFileSupported(nextFilename))
-                        files.append(nextFilename);
-                }
-            }
-        }
-        else if (fileInfo.isFile())
-        {
-            if (fileTypeSupport.isFileSupported(path))
-                files.append(path);
-        }
-    }
 }
 
 void MainWnd::itemActivated(uint resourceId)
@@ -247,8 +202,6 @@ void MainWnd::closeEvent(QCloseEvent *event)
     }
 }
 
-}
-
 void MainWnd::destroyNavigator(CLLayoutNavigator *&nav)
 {
     if (nav)
@@ -257,6 +210,8 @@ void MainWnd::destroyNavigator(CLLayoutNavigator *&nav)
         delete nav;
         nav = 0;
     }
+}
+
 void MainWnd::activate()
 {
     if (isFullScreen())
