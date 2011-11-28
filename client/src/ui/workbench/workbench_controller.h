@@ -19,6 +19,7 @@ class ResizingInstrument;
 class ArchiveDropInstrument;
 class UiElementsInstrument;
 class RotationInstrument;
+class ClickInfo;
 
 class NavigationItem;
 
@@ -70,8 +71,8 @@ protected slots:
     void at_rotationStarted(QGraphicsView *view, QnResourceWidget *widget);
     void at_rotationFinished(QGraphicsView *view, QnResourceWidget *widget);
 
-    void at_item_clicked(QGraphicsView *view, QGraphicsItem *item);
-    void at_item_doubleClicked(QGraphicsView *view, QGraphicsItem *item);
+    void at_item_clicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
+    void at_item_doubleClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
 
     void at_scene_clicked(QGraphicsView *view);
     void at_scene_doubleClicked(QGraphicsView *view);

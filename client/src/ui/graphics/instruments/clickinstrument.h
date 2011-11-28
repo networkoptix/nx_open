@@ -4,6 +4,26 @@
 #include <QPoint>
 #include "dragprocessinginstrument.h"
 
+class ClickInfoPrivate;
+
+class ClickInfo {
+public:
+    Qt::MouseButton button() const;
+    Qt::MouseButtons buttons() const;
+    QPointF scenePos() const;
+    QPoint screenPos() const;
+    Qt::KeyboardModifiers modifiers() const;
+
+protected:
+    friend class ClickInstrument;
+
+    ClickInfo(ClickInfoPrivate *dd): d(dd) {}
+
+private:
+    ClickInfoPrivate *d;
+};
+
+
 /**
  * This instrument listens to click events and emits corresponding signals
  * when the mouse button is released. Note that it uses application's 
@@ -13,20 +33,20 @@ class ClickInstrument: public DragProcessingInstrument {
     Q_OBJECT;
 public:
     /**
-     * \param button                    Mouse button to handle.
+     * \param buttons                   Mouse buttons to handle.
      * \param watchedType               Type of click events that this instrument will watch.
      *                                  Note that only SCENE and ITEM types are supported.
      * \param parent                    Parent object for this instrument.
      */
-    ClickInstrument(Qt::MouseButton button, WatchedType watchedType, QObject *parent = NULL);
+    ClickInstrument(Qt::MouseButtons buttons, WatchedType watchedType, QObject *parent = NULL);
     virtual ~ClickInstrument();
 
 signals:
-    void clicked(QGraphicsView *view, QGraphicsItem *item, const QPoint &screenPos);
-    void doubleClicked(QGraphicsView *view, QGraphicsItem *item, const QPoint &screenPos);
+    void clicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
+    void doubleClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
 
-    void clicked(QGraphicsView *view, const QPoint &screenPos);
-    void doubleClicked(QGraphicsView *view, const QPoint &screenPos);
+    void clicked(QGraphicsView *view, const ClickInfo &info);
+    void doubleClicked(QGraphicsView *view, const ClickInfo &info);
 
 protected:
     virtual bool mousePressEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) override;
@@ -61,7 +81,7 @@ private:
     void emitSignals(QGraphicsView *view, QGraphicsScene *scene, QGraphicsSceneMouseEvent *event);
 
 private:
-    Qt::MouseButton m_button;
+    Qt::MouseButtons m_buttons;
     bool m_isClick;
     bool m_isDoubleClick;
 };

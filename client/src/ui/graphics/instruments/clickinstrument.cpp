@@ -2,13 +2,15 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QApplication>
 
-ClickInstrument::ClickInstrument(Qt::MouseButton button, WatchedType watchedType, QObject *parent): 
+class ClickInfoPrivate: public QGraphicsSceneMouseEvent {};
+
+ClickInstrument::ClickInstrument(Qt::MouseButtons buttons, WatchedType watchedType, QObject *parent): 
     DragProcessingInstrument(
         watchedType,
         makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease, QEvent::GraphicsSceneMouseDoubleClick),
         parent
     ),
-    m_button(button),
+    m_buttons(buttons),
     m_isClick(false),
     m_isDoubleClick(false)
 {}
@@ -19,7 +21,7 @@ ClickInstrument::~ClickInstrument() {
 
 template<class T>
 bool ClickInstrument::mousePressEventInternal(T *object, QGraphicsSceneMouseEvent *event) {
-    if (event->button() != m_button)
+    if (!(event->button() & m_buttons))
         return false;
 
     m_isClick = true;
@@ -31,7 +33,7 @@ bool ClickInstrument::mousePressEventInternal(T *object, QGraphicsSceneMouseEven
 
 template<class T>
 bool ClickInstrument::mouseDoubleClickEventInternal(T *object, QGraphicsSceneMouseEvent *event) {
-    if(event->button() != m_button)
+    if(!(event->button() & m_buttons))
         return false;
 
     m_isClick = true;
@@ -52,7 +54,7 @@ bool ClickInstrument::mouseMoveEventInternal(T *object, QGraphicsSceneMouseEvent
 
 template<class T>
 bool ClickInstrument::mouseReleaseEventInternal(T *object, QGraphicsSceneMouseEvent *event) {
-    if(event->button() != m_button)
+    if(!(event->button() & m_buttons))
         return false;
 
     if(!m_isClick)
@@ -73,18 +75,22 @@ bool ClickInstrument::mouseReleaseEventInternal(T *object, QGraphicsSceneMouseEv
 }
 
 void ClickInstrument::emitSignals(QGraphicsView *view, QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
+    ClickInfo info(static_cast<ClickInfoPrivate *>(event));
+
     if(m_isDoubleClick) {
-        emit doubleClicked(view, item, event->screenPos());
+        emit doubleClicked(view, item, info);
     } else {
-        emit clicked(view, item, event->screenPos());
+        emit clicked(view, item, info);
     }
 }
 
 void ClickInstrument::emitSignals(QGraphicsView *view, QGraphicsScene *, QGraphicsSceneMouseEvent *event) {
+    ClickInfo info(static_cast<ClickInfoPrivate *>(event));
+
     if(m_isDoubleClick) {
-        emit doubleClicked(view, event->screenPos());
+        emit doubleClicked(view, info);
     } else {
-        emit clicked(view, event->screenPos());
+        emit clicked(view, info);
     }
 }
 
@@ -127,5 +133,26 @@ bool ClickInstrument::mouseMoveEvent(QGraphicsScene *scene, QGraphicsSceneMouseE
 
 bool ClickInstrument::mouseReleaseEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) {
     return mouseReleaseEventInternal(scene, event);
+}
+
+
+Qt::MouseButton ClickInfo::button() const {
+    return d->button();
+}
+
+Qt::MouseButtons ClickInfo::buttons() const {
+    return d->buttons();
+}
+
+QPointF ClickInfo::scenePos() const {
+    return d->scenePos();
+}
+
+QPoint ClickInfo::screenPos() const {
+    return d->screenPos();
+}
+
+Qt::KeyboardModifiers ClickInfo::modifiers() const {
+    return d->modifiers();
 }
 
