@@ -1,4 +1,6 @@
 #include "selectionfixupinstrument.h"
+#include <QGraphicsItem>
+#include <QGraphicsSceneMouseEvent>
 
 namespace {
     struct ItemIsSelectable: public std::unary_function<QGraphicsItem *, bool> {
@@ -10,7 +12,7 @@ namespace {
 } // anonymous namespace
 
 SelectionFixupInstrument::SelectionFixupInstrument(QObject *parent):
-    Instrument(ITEM, makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseRelease), parent)
+    DragProcessingInstrument(ITEM, makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease), parent)
 {}
 
 bool SelectionFixupInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
@@ -23,6 +25,9 @@ bool SelectionFixupInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSce
     if(event->button() != Qt::LeftButton)
         return false;
 
+    m_isClick = true;
+    dragProcessor()->mousePressEvent(item, event);
+
     if(event->modifiers() & Qt::ControlModifier)
         return false; /* Ctrl-selection is processed when mouse button is released. */
    
@@ -34,7 +39,19 @@ bool SelectionFixupInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSce
     return false;
 }
 
+bool SelectionFixupInstrument::mouseMoveEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
+    if (!m_isClick)
+        return false;
+
+    dragProcessor()->mouseMoveEvent(item, event);
+    return false;
+
+}
+
 bool SelectionFixupInstrument::mouseReleaseEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
+    if(!m_isClick)
+        return false; 
+
     if(!(item->flags() & QGraphicsItem::ItemIsSelectable))
         return false;
     
@@ -48,5 +65,14 @@ bool SelectionFixupInstrument::mouseReleaseEvent(QGraphicsItem *item, QGraphicsS
         item->setSelected(true);
     }
 
+    dragProcessor()->mouseReleaseEvent(item, event);
     return false;
+}
+
+void SelectionFixupInstrument::startDrag(DragInfo *) {
+    dragProcessor()->reset();
+}
+
+void SelectionFixupInstrument::finishDragProcess(DragInfo *info) {
+    m_isClick = false;
 }
