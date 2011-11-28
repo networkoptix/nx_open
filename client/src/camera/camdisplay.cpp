@@ -91,7 +91,8 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_realTimeHurryUp(0),
       m_extTimeSrc(0),
       m_useMtDecoding(false),
-      m_buffering(false)
+      m_buffering(false),
+      m_executingJump(0)
       //m_nextTime(AV_NOPTS_VALUE),
       //m_firstDelayCycle(true)
 {
@@ -140,16 +141,6 @@ void CLCamDisplay::addVideoChannel(int index, CLAbstractRenderer* vw, bool canDo
 QImage CLCamDisplay::getScreenshot(int channel)
 {
     return m_display[channel]->getScreenshot();
-}
-
-void CLCamDisplay::safeSleep(qint64 value)
-{
-    while (value > 0 && !m_afterJump && !m_needStop)
-    {
-        int toSleep = qMin(10, (int) value);
-        QnSleep::msleep(toSleep);
-        value -= toSleep;
-    }
 }
 
 
@@ -260,27 +251,7 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 }
                 realSleepTime = t.elapsed();
 
-                //if (m_speed >= 0)
-                //    realSleepTime = displayedTime - m_extTimeSrc->getCurrentTime();
-                //else
-                //    realSleepTime = m_extTimeSrc->getCurrentTime() - displayedTime;
             }
-            /*
-            if (realSleepTime > 0)
-            {
-                if (realSleepTime > 1000000)
-                {
-                    QString s;
-                    QTextStream str(&s);
-                    str << "sleepTime=" << realSleepTime/1000 << " displayedTime=" << QDateTime::fromMSecsSinceEpoch(displayedTime/1000).toString("hh:mm:ss.zzz") <<
-                        "currentTime=" << QDateTime::fromMSecsSinceEpoch(m_extTimeSrc->getCurrentTime()/1000).toString("hh:mm:ss.zzz");
-                    str.flush();
-                    cl_log.log(s, cl_logALWAYS);
-                }
-                safeSleep(realSleepTime/1000);
-                
-            }
-            */
         }
         else {
             realSleepTime = m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed ? m_delay.sleep(needToSleep, needToSleep*qAbs(speed)*2) : m_delay.addQuant(needToSleep);
@@ -359,8 +330,10 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         m_lastFrameDisplayed = m_display[channel]->dispay(vd, draw, scaleFactor);
 
         if (m_buffering && m_extTimeSrc && m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed) {
-            m_buffering = false;
-            m_extTimeSrc->onBufferingFinished(this);
+            if (m_executingJump == 0) {
+                m_extTimeSrc->onBufferingFinished(this);
+                m_buffering = false;
+            }
         }
 
         if (!sleep)
@@ -384,16 +357,26 @@ void CLCamDisplay::onBeforeJump(qint64 time)
     if (!m_display[0]->isTimeBlocked())
         m_display[0]->blockTimeValue(time);
     setSingleShotMode(false);
+    m_executingJump++;
+    m_buffering = true;
+    if (m_executingJump > 1)
+        clearUnprocessedData();
+
+    /*
+    clearUnprocessedData();
+    m_buffering = true;
+    m_afterJump = true;
+    */
 }
 
 void CLCamDisplay::onJumpOccured(qint64 time)
 {
-    
+    /*
     if (time < 1000000ll * 100000)
         cl_log.log("after jump to ", time, cl_logWARNING);
     else
         cl_log.log("after jump to ", QDateTime::fromMSecsSinceEpoch(time/1000).toString(), cl_logWARNING);
-
+    */
     if (m_extTimeSrc)
         m_extTimeSrc->onBufferingStarted(this);
 
@@ -405,6 +388,8 @@ void CLCamDisplay::onJumpOccured(qint64 time)
     m_display[0]->blockTimeValue(time);
     m_singleShotMode = false;
     m_jumpTime = time;
+
+    m_executingJump--;
 }
 
 void CLCamDisplay::afterJump(qint64 newTime)

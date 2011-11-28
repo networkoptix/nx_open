@@ -88,7 +88,6 @@ private:
     void afterJump(qint64 new_time);
     void processNewSpeed(float speed);
     bool useSync(QnCompressedVideoDataPtr vd);
-    void safeSleep(qint64 value);
 private:
 	QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];
 
@@ -150,6 +149,7 @@ private:
     mutable QMutex m_timeMutex;
     bool m_useMtDecoding;
     bool m_buffering;
+    int m_executingJump;
     //bool m_firstDelayCycle;
 };
 
