@@ -387,6 +387,7 @@ void CLCamDisplay::onBeforeJump(qint64 time)
     if (m_extTimeSrc)
         m_extTimeSrc->onBufferingStarted(this);
     m_lastDisplayedVideoTime = AV_NOPTS_VALUE;
+    setSingleShotMode(false);
 }
 
 void CLCamDisplay::onJumpOccured(qint64 time)
