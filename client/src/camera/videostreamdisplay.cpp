@@ -528,7 +528,7 @@ CLVideoStreamDisplay::FrameDisplayStatus CLVideoStreamDisplay::dispay(QnCompress
             return Status_Buffered;
         }
         else
-		return Status_Skipped;
+		    return Status_Skipped;
 	}
     m_mtx.unlock();
 
@@ -723,6 +723,11 @@ void CLVideoStreamDisplay::blockTimeValue(qint64 time)
     if (m_bufferedFrameDisplayer)
         m_bufferedFrameDisplayer->setLastDisplayedTime(time);
     m_timeChangeEnabled = false;
+}
+
+bool CLVideoStreamDisplay::isTimeBlocked() const
+{
+    return m_timeChangeEnabled;
 }
 
 void CLVideoStreamDisplay::unblockTimeValue()

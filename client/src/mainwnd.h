@@ -23,20 +23,28 @@ public:
 
     void goToNewLayoutContent(LayoutContent* newl);
 
-private slots:
+Q_SIGNALS:
+    void mainWindowClosed();
+
+protected:
+    void closeEvent(QCloseEvent *event);
+    void dragEnterEvent(QDragEnterEvent *event);
+    void dropEvent(QDropEvent *event);
+
+private Q_SLOTS:
     void itemActivated(uint resourceId);
-    void handleMessage(const QString& message);
+    void handleMessage(const QString &message);
 
 private:
     void closeEvent(QCloseEvent *event);
-    void destroyNavigator(CLLayoutNavigator*& nav);
+    void destroyNavigator(CLLayoutNavigator *&nav);
 
     void activate();
 
 private:
     QScopedPointer<QnBlueBackgroundPainter> m_backgroundPainter;
     QnWorkbenchController *m_controller;
-    CLLayoutNavigator* m_normalView;
+    CLLayoutNavigator *m_normalView;
     static MainWnd *s_instance;
 };
 

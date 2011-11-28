@@ -522,6 +522,7 @@ bool SceneLayout::addDevice(QnResourcePtr device, bool update_scene_rect, CLBasi
         {
             QnAbstractArchiveReader* archiveReader = dynamic_cast<QnAbstractArchiveReader*>(mediaReader);
             if (archiveReader) {
+                archiveReader->setNavDelegate(m_syncPlay);
                 m_syncPlay->addArchiveReader(archiveReader, cam->getCamCamDisplay());
                 cam->setExternalTimeSource(m_syncPlay);
                 cam->getCamCamDisplay()->setExternalTimeSource(m_syncPlay);

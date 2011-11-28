@@ -7,8 +7,8 @@ QnAbstractArchiveReader::QnAbstractArchiveReader(QnResourcePtr dev ) :
     m_lengthMksec(0),
     m_needToSleep(0),
     m_delegate(0),
-    m_cycleMode(true),
-    m_lastJumpTime(AV_NOPTS_VALUE)
+    m_navDelegate(0),
+    m_cycleMode(true)
 {
 }
 
@@ -23,34 +23,6 @@ quint64 QnAbstractArchiveReader::lengthMksec() const
 {
     return m_lengthMksec;
 }
-
-bool QnAbstractArchiveReader::jumpTo(qint64 mksec, bool makeshot, qint64 skipTime)
-{
-    bool needJump = mksec != m_lastJumpTime;
-    if (needJump)
-    {
-        emit beforeJump(mksec, makeshot);
-        channeljumpTo(mksec, 0, skipTime);
-    }
-    m_lastJumpTime = mksec;
-
-    if (makeshot && isSingleShotMode())
-        CLLongRunnable::resume();
-    return needJump;
-}
-
-void QnAbstractArchiveReader::jumpToPreviousFrame(qint64 mksec, bool makeshot)
-{
-    if (mksec != DATETIME_NOW)
-    {
-        //setSkipFramesToTime(mksec);
-        //jumpTo(qMax(0ll, (qint64)mksec - 200 * 1000), makeshot);
-        jumpTo(qMax(0ll, mksec - 200 * 1000), makeshot, mksec);
-    }
-    else
-        jumpTo(mksec, makeshot);
-}
-
 
 // ------------------- Audio tracks -------------------------
 
@@ -72,6 +44,11 @@ bool QnAbstractArchiveReader::setAudioChannel(unsigned int /*num*/)
 void QnAbstractArchiveReader::setArchiveDelegate(QnAbstractArchiveDelegate* contextDelegate)
 {
     m_delegate = contextDelegate;
+}
+
+void QnAbstractArchiveReader::setNavDelegate(QnAbstractNavigator* navDelegate)
+{
+    m_navDelegate = navDelegate;
 }
 
 QnAbstractArchiveDelegate* QnAbstractArchiveReader::getArchiveDelegate() const
@@ -106,4 +83,12 @@ bool QnAbstractArchiveReader::open()
 bool QnAbstractArchiveReader::isRealTimeSource() const
 {
     return m_delegate && m_delegate->isRealTimeSource();
+}
+
+void QnAbstractArchiveReader::jumpToPreviousFrame(qint64 mksec)
+{
+    if (mksec != DATETIME_NOW)
+        jumpTo(qMax(0ll, mksec - 200 * 1000), mksec);
+    else
+        jumpTo(mksec, 0);
 }

@@ -39,7 +39,8 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_singleQuantProcessed(false),
     m_dataMarker(0),
     m_newDataMarker(0),
-    m_skipFramesToTime(0)
+    m_skipFramesToTime(0),
+    m_lastJumpTime(AV_NOPTS_VALUE)
 {
     // Should init packets here as some times destroy (av_free_packet) could be called before init
     //connect(dev.data(), SIGNAL(onStatusChanged(QnResource::Status, QnResource::Status)), this, SLOT(onStatusChanged(QnResource::Status, QnResource::Status)));
@@ -61,36 +62,48 @@ QnArchiveStreamReader::~QnArchiveStreamReader()
 
 void QnArchiveStreamReader::nextFrame()
 {
-	{
- 	   QMutexLocker lock(&m_jumpMtx);
-    	m_singleQuantProcessed = false;
-    	m_singleShowWaitCond.wakeAll();
-	}
+    if (m_navDelegate) {
+        m_navDelegate->nextFrame();
+        return;
+    }
     emit nextFrameOccured();
+   QMutexLocker lock(&m_jumpMtx);
+	m_singleQuantProcessed = false;
+	m_singleShowWaitCond.wakeAll();
 }
 
 void QnArchiveStreamReader::previousFrame(qint64 mksec)
 {
-    jumpToPreviousFrame(mksec, true);
+    if (m_navDelegate) {
+        m_navDelegate->previousFrame(mksec);
+        return;
+    }
     emit prevFrameOccured();
+    jumpToPreviousFrame(mksec);
 }
 
 void QnArchiveStreamReader::resumeMedia()
 {
-    setSingleShotMode(false);
-    //resume();
-    resumeDataProcessors();
+
+    if (m_navDelegate) {
+        m_navDelegate->resumeMedia();
+        return;
+    }
     emit streamResumed();
+    setSingleShotMode(false);
+    resumeDataProcessors();
 }
 
 void QnArchiveStreamReader::pauseMedia()
 {
-	{
-    	QMutexLocker lock(&m_jumpMtx);
-    	m_singleShot = true;
-    	m_singleQuantProcessed = true;
-	}
+    if (m_navDelegate) {
+        m_navDelegate->pauseMedia();
+        return;
+    }
     emit streamPaused();
+	QMutexLocker lock(&m_jumpMtx);
+	m_singleShot = true;
+	m_singleQuantProcessed = true;
 }
 
 void QnArchiveStreamReader::setCurrentTime(qint64 value)
@@ -225,6 +238,7 @@ begin_label:
         qint64 jumpTime = m_requiredJumpTime;
         m_lastGopSeekTime = -1;
         m_skipFramesToTime = m_tmpSkipFramesToTime;
+        m_tmpSkipFramesToTime = 0;
         m_jumpMtx.unlock();
 
         intChanneljumpTo(jumpTime, 0);
@@ -624,6 +638,11 @@ bool QnArchiveStreamReader::isNegativeSpeedSupported() const
 
 void QnArchiveStreamReader::setSingleShotMode(bool single)
 {
+    if (m_navDelegate) {
+        m_navDelegate->setSingleShotMode(single);
+        return;
+    }
+
     if (single == m_singleShot)
         return;
     m_delegate->setSingleshotMode(single);
@@ -634,7 +653,6 @@ void QnArchiveStreamReader::setSingleShotMode(bool single)
         if (!m_singleShot)
             m_singleShowWaitCond.wakeAll();
     }
-    emit singleShotModeChanged(single);
 }
 
 bool QnArchiveStreamReader::isSingleShotMode() const
@@ -660,5 +678,24 @@ void QnArchiveStreamReader::setSkipFramesToTime(qint64 skipFramesToTime)
 bool QnArchiveStreamReader::isSkippingFrames() const
 { 
     QMutexLocker mutex(&m_jumpMtx);
-    return m_skipFramesToTime != 0;
+    return m_skipFramesToTime != 0 || m_tmpSkipFramesToTime != 0;
+}
+
+bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
+{
+    if (m_navDelegate) {
+        return m_navDelegate->jumpTo(mksec, skipTime);
+    }
+
+    bool needJump = mksec != m_lastJumpTime;
+    if (needJump)
+    {
+        emit beforeJump(mksec);
+        channeljumpTo(mksec, 0, skipTime);
+    }
+    m_lastJumpTime = mksec;
+
+    if (isSingleShotMode())
+        CLLongRunnable::resume();
+    return needJump;
 }

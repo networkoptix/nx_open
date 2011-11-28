@@ -197,6 +197,8 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
 
 qint64 QnRtspClientArchiveDelegate::seek(qint64 time)
 {
+    if (time == m_position)
+        return time;
     deleteContexts(); // context is going to create again on first data after SEEK, so ignore rest of data before seek
     m_position = time;
     m_rtspSession.sendPlay(time, m_singleShotMode ? time : AV_NOPTS_VALUE, m_rtspSession.getScale());

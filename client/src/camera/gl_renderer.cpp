@@ -868,7 +868,6 @@ CLGLRenderer::RenderStatus CLGLRenderer::paintEvent(const QRectF &r)
             m_videoWidth = curImg->width;
             m_videoHeight = curImg->height;
             updateTexture();
-            m_timeText.clear();
             if (curImg->pkt_dts != AV_NOPTS_VALUE)
             {
                 if (curImg->pkt_dts > 1000000ll * 3600*24)
