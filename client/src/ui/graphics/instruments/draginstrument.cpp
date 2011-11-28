@@ -5,9 +5,9 @@
 #include <QApplication>
 
 namespace {
-    struct ItemIsMovable: public std::unary_function<QGraphicsItem *, bool> {
+    struct ItemAcceptsLeftMouseButton: public std::unary_function<QGraphicsItem *, bool> {
         bool operator()(QGraphicsItem *item) const {
-            return (item->flags() & QGraphicsItem::ItemIsMovable) && (item->acceptedMouseButtons() & Qt::LeftButton);
+            return item->acceptedMouseButtons() & Qt::LeftButton;
         }
     };
 
@@ -33,8 +33,8 @@ bool DragInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
         return false;
 
     /* Find the item to drag. */
-    QGraphicsItem *draggedItem = item(view, event->pos(), ItemIsMovable());
-    if (draggedItem == NULL)
+    QGraphicsItem *draggedItem = item(view, event->pos(), ItemAcceptsLeftMouseButton());
+    if (draggedItem == NULL || !(draggedItem->flags() & QGraphicsItem::ItemIsMovable))
         return false;
 
     /* If a user tries to ctrl-drag an item, we should select it when dragging starts. */
