@@ -394,59 +394,73 @@ void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGra
 }
 
 namespace {
-    inline Qt::WindowFrameSection sweep(qreal v, qreal v0, qreal v1, Qt::WindowFrameSection fs0, Qt::WindowFrameSection fs1, Qt::WindowFrameSection fs2) {
-        if(v < v0) {
-            return fs0;
-        } else {
-            if(v < v1) {
-                return fs1;
+    static const Qn::WindowFrameSection frameSectionTable[5][5] = {
+        {Qn::NoSection, Qn::NoSection,          Qn::NoSection,      Qn::NoSection,          Qn::NoSection},
+        {Qn::NoSection, Qn::TopLeftSection,     Qn::TopSection,     Qn::TopRightSection,    Qn::NoSection},
+        {Qn::NoSection, Qn::LeftSection,        Qn::NoSection,      Qn::RightSection,       Qn::NoSection},
+        {Qn::NoSection, Qn::BottomLeftSection,  Qn::BottomSection,  Qn::BottomRightSection, Qn::NoSection},
+        {Qn::NoSection, Qn::NoSection,          Qn::NoSection,      Qn::NoSection,          Qn::NoSection}
+    };
+
+    inline int sweepIndex(qreal v, qreal v0, qreal v1, qreal v2, qreal v3) {
+        if(v < v1) {
+            if(v < v0) {
+                return 0;
             } else {
-                return fs2;
+                return 1;
+            }
+        } else {
+            if(v < v2) {
+                return 2;
+            } else if(v < v3) {
+                return 3;
+            } else {
+                return 4;
             }
         }
     }
 
-    inline Qt::WindowFrameSection sweep(const QRectF &geometry, const QPointF &pos) {
+    inline Qn::WindowFrameSections sweep(const QRectF &frameRect, const QRectF &rect, const QRectF &query) {
         /* Shortcuts for position. */
-        qreal x = pos.x();
-        qreal y = pos.y();
+        qreal qx0 = query.left();
+        qreal qx1 = query.right();
+        qreal qy0 = query.top();
+        qreal qy1 = query.bottom();
 
         /* Border shortcuts. */
-        qreal x0 = geometry.left();
-        qreal x1 = geometry.right();
-        qreal y0 = geometry.top();
-        qreal y1 = geometry.bottom();
+        qreal x0 = frameRect.left();
+        qreal x1 = rect.left();
+        qreal x2 = rect.right();
+        qreal x3 = frameRect.right();
+        qreal y0 = frameRect.top();
+        qreal y1 = rect.top();
+        qreal y2 = rect.bottom();
+        qreal y3 = frameRect.bottom();
 
-        /* Sweep. */
-        if(x < x0) {
-            return sweep(y, y0, y1, Qt::TopLeftSection, Qt::LeftSection, Qt::BottomLeftSection);
-        } else {
-            if(x < x1) {
-                return sweep(y, y0, y1, Qt::TopSection, Qt::NoSection, Qt::BottomSection);
-            } else {
-                return sweep(y, y0, y1, Qt::TopRightSection, Qt::RightSection, Qt::BottomRightSection);
-            }
-        }
+        int cl = qMax(1, sweepIndex(qx0, x0, x1, x2, x3));
+        int ch = qMin(3, sweepIndex(qx1, x0, x1, x2, x3));
+        int rl = qMax(1, sweepIndex(qy0, y0, y1, y2, y3));
+        int rh = qMin(3, sweepIndex(qy1, y0, y1, y2, y3));
+
+        Qn::WindowFrameSections result = Qn::NoSection;
+        for(int r = rl; r <= rh; r++)
+            for(int c = cl; c <= ch; c++)
+                result |= frameSectionTable[r][c];
+        return result;
     }
-}
+
+} // anonymous namespace
 
 Qt::WindowFrameSection QnResourceWidget::windowFrameSectionAt(const QPointF &pos) const override {
-    qreal fe = m_frameWidth * frameExtensionMultiplier;
-    Qt::WindowFrameSection result = sweep(rect().adjusted(fe, fe, -fe, -fe), pos);
-    
+    return Qn::toQtFrameSection(static_cast<Qn::WindowFrameSection>(static_cast<int>(windowFrameSectionsAt(QRectF(pos, QSizeF(0.0, 0.0))))));
+}
+
+Qn::WindowFrameSections QnResourceWidget::windowFrameSectionsAt(const QRectF &region) const {
+    Qn::WindowFrameSections result = sweep(windowFrameRect(), rect(), region);
+
     /* This widget has no side frame sections in case aspect ratio is set. */
-    if(hasAspectRatio()) {
-        switch(result) {
-        case Qt::LeftSection:
-        case Qt::RightSection:
-        case Qt::TopSection:
-        case Qt::BottomSection:
-            result = Qt::NoSection;
-            break;
-        default:
-            break;
-        }
-    }
+    if(hasAspectRatio())
+        result = result & ~(Qn::LeftSection | Qn::RightSection | Qn::TopSection | Qn::BottomSection);
 
     return result;
 }

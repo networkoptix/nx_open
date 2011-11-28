@@ -1,11 +1,12 @@
-#ifndef QN_DISPLAY_WIDGET_H
-#define QN_DISPLAY_WIDGET_H
+#ifndef QN_RESOURCE_WIDGET_H
+#define QN_RESOURCE_WIDGET_H
 
 #include <QWeakPointer>
+#include <camera/render_status.h>
 #include <ui/widgets2/graphicswidget.h>
 #include <ui/common/constrained_resizable.h>
-#include <camera/render_status.h>
 #include <ui/common/scene_utility.h>
+#include <ui/common/frame_section_queryable.h>
 #include <core/resource/resource_consumer.h>
 #include "polygonal_shadow_item.h"
 
@@ -17,7 +18,7 @@ class QnWorkbenchItem;
 class QnResourceDisplay;
 class QnPolygonalShadowItem;
 
-class QnResourceWidget: public GraphicsWidget, public QnPolygonalShapeProvider, public ConstrainedResizable, protected QnSceneUtility {
+class QnResourceWidget: public GraphicsWidget, public QnPolygonalShapeProvider, public ConstrainedResizable, public FrameSectionQuearyable, protected QnSceneUtility {
     Q_OBJECT;
     Q_PROPERTY(QColor frameColor READ frameColor WRITE setFrameColor);
     Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth);
@@ -181,6 +182,7 @@ protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual Qt::WindowFrameSection windowFrameSectionAt(const QPointF &pos) const override;
+    virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
     virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
     virtual bool windowFrameEvent(QEvent *event) override;
@@ -255,4 +257,4 @@ private:
     qint64 m_lastNewFrameTimeMSec;
 };
 
-#endif // QN_DISPLAY_WIDGET_H
+#endif // QN_RESOURCE_WIDGET_H
