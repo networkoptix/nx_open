@@ -92,9 +92,8 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_extTimeSrc(0),
       m_useMtDecoding(false),
       m_buffering(false),
-      m_executingJump(0)
-      //m_nextTime(AV_NOPTS_VALUE),
-      //m_firstDelayCycle(true)
+      m_executingJump(0),
+      skipPrevJumpSignal(0)
 {
     m_storedMaxQueueSize = m_dataQueue.maxSize();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
@@ -224,13 +223,14 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         {
             qint64 displayedTime = getCurrentTime();
             //bool isSingleShot = vd->flags & QnAbstractMediaData::MediaFlags_SingleShot;
-            if (speed != 0 && !m_buffering && displayedTime != AV_NOPTS_VALUE && m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed)
+            if (speed != 0  && displayedTime != AV_NOPTS_VALUE && m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed &&
+                !(vd->flags & QnAbstractMediaData::MediaFlags_BOF))
             {
                 QTime t;
                 t.start();
                 int sign = speed >= 0 ? 1 : -1;
 
-                while (!m_afterJump && !m_needStop && m_speed == speed)
+                while (!m_afterJump && !m_buffering && !m_needStop && m_speed == speed)
                 {
                     qint64 ct = m_extTimeSrc->getCurrentTime();
                     if (ct != DATETIME_NOW && sign *(displayedTime - ct) > 0)
@@ -329,8 +329,11 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
         m_lastFrameDisplayed = m_display[channel]->dispay(vd, draw, scaleFactor);
 
-        if (m_buffering && m_extTimeSrc && m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed) {
-            if (m_executingJump == 0) {
+        if (m_extTimeSrc && m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed)
+        {
+            QMutexLocker lock(&m_timeMutex);
+            if (m_buffering && m_executingJump == 0) 
+            {
                 m_extTimeSrc->onBufferingFinished(this);
                 m_buffering = false;
             }
@@ -354,19 +357,21 @@ void CLCamDisplay::onBeforeJump(qint64 time)
         cl_log.log("before jump to ", QDateTime::fromMSecsSinceEpoch(time/1000).toString(), cl_logWARNING);
     */
     QMutexLocker lock(&m_timeMutex);
-    if (!m_display[0]->isTimeBlocked())
+    if (!m_display[0]->isTimeBlocked()) {
         m_display[0]->blockTimeValue(time);
+        clearUnprocessedData();
+    }
+    if (skipPrevJumpSignal > 0) {
+        skipPrevJumpSignal--;
+        return;
+    }
     setSingleShotMode(false);
+
+    
     m_executingJump++;
     m_buffering = true;
     if (m_executingJump > 1)
         clearUnprocessedData();
-
-    /*
-    clearUnprocessedData();
-    m_buffering = true;
-    m_afterJump = true;
-    */
 }
 
 void CLCamDisplay::onJumpOccured(qint64 time)
@@ -384,12 +389,17 @@ void CLCamDisplay::onJumpOccured(qint64 time)
     m_afterJump = true;
     m_buffering = true;
     m_lastDisplayedVideoTime = AV_NOPTS_VALUE;
-    clearUnprocessedData();
+    //clearUnprocessedData();
     m_display[0]->blockTimeValue(time);
     m_singleShotMode = false;
     m_jumpTime = time;
 
     m_executingJump--;
+}
+
+void CLCamDisplay::onJumpCanceled(qint64 time)
+{
+    skipPrevJumpSignal++;
 }
 
 void CLCamDisplay::afterJump(qint64 newTime)
@@ -487,21 +497,6 @@ void CLCamDisplay::processNewSpeed(float speed)
     setLightCPUMode(QnAbstractVideoDecoder::DecodeMode_Full);
 }
 
-void CLCamDisplay::putData(QnAbstractDataPacketPtr data)
-{
-    /*
-    QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
-    if (!media)
-        return;
-    if(m_afterJump && !(media->flags & QnAbstractMediaData::MediaFlags_BOF))
-        return; // skip data
-
-    if (m_extTimeSrc)
-        m_extTimeSrc->onAvailableTime(this, media->timestamp);
-    */
-    QnAbstractDataConsumer::putData(data);
-}
-
 bool CLCamDisplay::useSync(QnCompressedVideoDataPtr vd)
 {
     //return m_extTimeSrc && !(vd->flags & (QnAbstractMediaData::MediaFlags_LIVE | QnAbstractMediaData::MediaFlags_BOF)) && !m_singleShotMode;
@@ -514,17 +509,6 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
     QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
     if (!media)
         return true;
-
-    {
-        QMutexLocker lock(&m_timeMutex);
-        if( m_afterJump && !(media->flags & QnAbstractMediaData::MediaFlags_BOF)) // jump finished, but old data received
-        {
-            return true; // skip data
-        }
-    }
-
-    //cl_log.log("ProcessData 2", cl_logALWAYS);
-
 
     bool mediaIsLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
     if (mediaIsLive != m_isRealTimeSource)
@@ -558,11 +542,33 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
     else
         return true;
 
-
     bool isReversePacket = media->flags & AV_REVERSE_PACKET;
     bool isReverseMode = speed < 0.0;
     if (isReverseMode != isReversePacket)
         return true;
+
+    if (m_needChangePriority)
+    {
+        setPriority(m_playAudio ? QThread::HighestPriority : QThread::NormalPriority);
+        m_needChangePriority = false;
+    }
+
+    if( m_afterJump)
+    {
+        QMutexLocker lock(&m_timeMutex);
+        if (!(media->flags & QnAbstractMediaData::MediaFlags_BOF)) // jump finished, but old data received)
+            return true; // jump finished, but old data received
+
+        qint64 ts = vd? vd->timestamp : ad->timestamp;
+        // Some clips has very low key frame rate. This condition protect audio buffer overflowing and improve seeking for such clips
+        if (ad && ts < m_jumpTime - AUDIO_BUFF_SIZE/2*1000)
+            return true; // skip packet
+        if (m_executingJump == 0)
+            m_afterJump = false;
+        // clear everything we can
+        afterJump(ts);
+        //cl_log.log("ProcessData 2", QDateTime::fromMSecsSinceEpoch(vd->timestamp/1000).toString("hh:mm:ss.zzz"), cl_logALWAYS);
+    }
 
     bool flushCurrentBuffer = false;
     bool audioParamsChanged = ad && m_playingFormat != ad->format;
@@ -574,24 +580,6 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
     }
     else if ((media->flags & QnAbstractMediaData::MediaFlags_AfterEOF) && vd) {
         m_display[vd->channelNumber]->waitForFramesDisplaed();
-    }
-
-    if (m_needChangePriority)
-    {
-        setPriority(m_playAudio ? QThread::HighestPriority : QThread::NormalPriority);
-        m_needChangePriority = false;
-    }
-
-    if (m_afterJump)
-    {
-        qint64 ts = vd? vd->timestamp : ad->timestamp;
-        // Some clips has very low key frame rate. This condition protect audio buffer overflowing and improve seeking for such clips
-        if (ad && ts < m_jumpTime - AUDIO_BUFF_SIZE/2*1000)
-            return true; // skip packet
-
-        m_afterJump = false;
-        // clear everything we can
-        afterJump(ts);
     }
 
     if (ad && !flushCurrentBuffer)

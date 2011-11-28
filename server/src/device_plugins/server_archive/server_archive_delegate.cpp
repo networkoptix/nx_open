@@ -109,6 +109,8 @@ QnAbstractMediaDataPtr QnServerArchiveDelegate::getNextData()
             }
         } while (!switchToChunk(chunk));
         data = m_aviDelegate->getNextData();
+        if (data)
+            data->flags &= ~QnAbstractMediaData::MediaFlags_BOF;
     }
     if (data) {
         data->timestamp +=m_currentChunk.startTime;

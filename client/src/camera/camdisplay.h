@@ -58,11 +58,10 @@ public:
 
     void setExternalTimeSource(QnlTimeSource* value);
 
-    virtual void putData(QnAbstractDataPacketPtr data);
-
 public slots:
     void onBeforeJump(qint64 time);
-    void onJumpOccured(qint64 time); 
+    void onJumpOccured(qint64 time);
+    void onJumpCanceled(qint64 time);
     void onRealTimeStreamHint(bool value);
     void onSlowSourceHint();
     void onReaderPaused();
@@ -150,7 +149,7 @@ private:
     bool m_useMtDecoding;
     bool m_buffering;
     int m_executingJump;
-    //bool m_firstDelayCycle;
+    int skipPrevJumpSignal;
 };
 
 #endif //clcam_display_h_1211
