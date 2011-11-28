@@ -238,6 +238,7 @@ begin_label:
         qint64 jumpTime = m_requiredJumpTime;
         m_lastGopSeekTime = -1;
         m_skipFramesToTime = m_tmpSkipFramesToTime;
+        m_tmpSkipFramesToTime = 0;
         m_jumpMtx.unlock();
 
         intChanneljumpTo(jumpTime, 0);
@@ -679,7 +680,7 @@ void QnArchiveStreamReader::setSkipFramesToTime(qint64 skipFramesToTime)
 bool QnArchiveStreamReader::isSkippingFrames() const
 { 
     QMutexLocker mutex(&m_jumpMtx);
-    return m_skipFramesToTime != 0;
+    return m_skipFramesToTime != 0 || m_tmpSkipFramesToTime != 0;
 }
 
 bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)

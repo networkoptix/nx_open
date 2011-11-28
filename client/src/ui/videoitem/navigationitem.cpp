@@ -543,8 +543,8 @@ void NavigationItem::onValueChanged(qint64 time)
         return;
 
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
-    if (reader->isSkippingFrames())
-        return;
+    //if (reader->isSkippingFrames())
+    //    return;
 
     if (reader->isRealTimeSource() && m_timeSlider->isAtEnd())
         return;

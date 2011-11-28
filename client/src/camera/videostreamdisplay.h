@@ -38,6 +38,7 @@ public:
     QImage getScreenshot();
     void blockTimeValue(qint64 time);
     void unblockTimeValue();
+    bool isTimeBlocked() const;
     void setCurrentTime(qint64 time);
     void waitForFramesDisplaed();
     void onNoVideo();
