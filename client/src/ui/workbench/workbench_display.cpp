@@ -654,13 +654,7 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
 
     /* Adjust for raise. */
     if(item == m_raisedItem && item != m_zoomedItem && m_view != NULL) {
-        QPointF geometryCenter = enclosingGeometry.center();
-        QTransform transform;
-        transform.translate(geometryCenter.x(), geometryCenter.y());
-        transform.rotate(-item->rotation());
-        transform.translate(-geometryCenter.x(), -geometryCenter.y());
-
-        QRectF viewportGeometry = transform.mapRect(mapRectToScene(m_view, m_view->viewport()->rect()));
+        QRectF viewportGeometry = mapRectToScene(m_view, m_view->viewport()->rect());
 
         QSizeF newWidgetSize = enclosingGeometry.size() * focusExpansion;
         QSizeF maxWidgetSize = viewportGeometry.size() * maxExpandedSize;
