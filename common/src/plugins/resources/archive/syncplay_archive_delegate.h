@@ -11,7 +11,7 @@ class QnAbstractArchiveDelegate;
 class QnSyncPlayArchiveDelegate: public QnAbstractArchiveDelegate
 {
 public:
-    QnSyncPlayArchiveDelegate(QnAbstractArchiveReader* reader, QnArchiveSyncPlayWrapper* syncWrapper, QnAbstractArchiveDelegate* ownerDelegate, QnlTimeSource* display);
+    QnSyncPlayArchiveDelegate(QnAbstractArchiveReader* reader, QnArchiveSyncPlayWrapper* syncWrapper, QnAbstractArchiveDelegate* ownerDelegate);
     virtual ~QnSyncPlayArchiveDelegate();
 
     virtual bool open(QnResourcePtr resource);
@@ -27,23 +27,22 @@ public:
     virtual void onReverseMode(qint64 /*displayTime*/, bool /*value*/);
     virtual void setSingleshotMode(bool value);
 
-    void setStartDelay(qint64 startDelay);
-    void jumpToPreviousFrame (qint64 time, bool makeshot);
-    void jumpTo (qint64 time, bool makeshot);
-
+    //qint64 getNextTime() const;
     virtual AVCodecContext* setAudioChannel(int num);
 
+    //void jumpToPreviousFrame (qint64 time);
+    //void jumpTo (qint64 time);
+
+protected:
+    friend class QnArchiveSyncPlayWrapper;
+    //void setPrebuffering(bool value);
 private:
+    //QMutex m_mutex;
+    //bool m_usePrebuffer;
+    //QnAbstractMediaDataPtr m_nextData;
     QnArchiveSyncPlayWrapper* m_syncWrapper;
     QnAbstractArchiveDelegate* m_ownerDelegate;
-    //QnAbstractMediaDataPtr m_tmpData;
-    //qint64 m_seekTime;
-
-    mutable QMutex m_genericMutex;
-    qint64 m_startDelay;
-    QTime m_initTime;
     QnAbstractArchiveReader* m_reader;
-    QnlTimeSource* m_display;
 };
 
 #endif // _SYNC_PLAY_ARCHIVE_DELEGATE_H__

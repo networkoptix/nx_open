@@ -406,7 +406,7 @@ void CLArchiveNavigatorItem::onSliderMoved(int val)
     if (m_sliderIsmoving)
         m_reader->jumpTo(time, true);
     else
-        m_reader->jumpToPreviousFrame(time, true);
+        m_reader->jumpToPreviousFrame(time);
 
     //m_videoCamera->streamJump(time);
 }

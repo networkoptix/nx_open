@@ -61,7 +61,7 @@ public:
     virtual void putData(QnAbstractDataPacketPtr data);
 
 public slots:
-    void onBeforeJump(qint64 time, bool makeshot);
+    void onBeforeJump(qint64 time);
     void onJumpOccured(qint64 time); 
     void onRealTimeStreamHint(bool value);
     void onSlowSourceHint();

@@ -5,18 +5,29 @@
 #include "utils/common/adaptivesleep.h"
 #include "core/dataprovider/cpull_media_stream_provider.h"
 
-class QnAbstractArchiveReader : public QnClientPullMediaStreamProvider
+class QnAbstractNavigator
+{
+public:
+    virtual bool jumpTo(qint64 mksec,  qint64 skipTime) = 0;
+    virtual void previousFrame(qint64 mksec) = 0;
+    virtual void nextFrame() = 0;
+    virtual void pauseMedia() = 0;
+    virtual void resumeMedia() = 0;
+    virtual void setSingleShotMode(bool single) = 0;
+};
+
+class QnAbstractArchiveReader : public QnClientPullMediaStreamProvider, public QnAbstractNavigator
 {
     Q_OBJECT
-
 public:
     QnAbstractArchiveReader(QnResourcePtr dev);
     virtual ~QnAbstractArchiveReader();
 
     void setArchiveDelegate(QnAbstractArchiveDelegate* contextDelegate);
+    void setNavDelegate(QnAbstractNavigator* navDelegate);
+
     QnAbstractArchiveDelegate* getArchiveDelegate() const;
 
-    virtual void setSingleShotMode(bool single) = 0;
     virtual bool isSingleShotMode() const = 0;
 
 
@@ -31,11 +42,7 @@ public:
       */
     quint64 lengthMksec() const;
 
-    virtual bool jumpTo(qint64 mksec, bool makeshot, qint64 skipTime = 0);
-    void jumpToPreviousFrame(qint64 mksec, bool makeshot);
-
-    virtual void previousFrame(qint64 /*mksec*/) = 0;
-    virtual void nextFrame() = 0;
+    void jumpToPreviousFrame(qint64 mksec);
 
 
     // gives a list of audio tracks
@@ -50,36 +57,25 @@ public:
 
     void setCycleMode(bool value);
 
-    virtual void pauseMedia() = 0;
-    virtual void resumeMedia() = 0;
-
     qint64 startTime() const;
     qint64 endTime() const;
     bool isRealTimeSource() const;
 
 
 Q_SIGNALS:
-    void singleShotModeChanged(bool value);
-    void beforeJump(qint64 mksec, bool makeshot);
+    void beforeJump(qint64 mksec);
     void jumpOccured(qint64 mksec);
     void streamPaused();
     void streamResumed();
     void nextFrameOccured();
     void prevFrameOccured();
-
-protected:
-    virtual void channeljumpTo(qint64 mksec, int channel, qint64 borderTime) = 0;
-
 protected:
     bool m_cycleMode;
     quint64 m_lengthMksec;
-
     qint64 m_needToSleep;
-
     QnAbstractArchiveDelegate* m_delegate;
+    QnAbstractNavigator* m_navDelegate;
 
-private:
-    qint64 m_lastJumpTime;
 };
 
 #endif //abstract_archive_stream_reader_h1907

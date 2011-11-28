@@ -557,15 +557,15 @@ void NavigationItem::smartSeek(qint64 timeMSec)
 
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     if(m_timeSlider->isAtEnd()) {
-        reader->jumpToPreviousFrame(DATETIME_NOW, true);
+        reader->jumpToPreviousFrame(DATETIME_NOW);
 
         m_liveButton->show();
     } else {
         timeMSec *= 1000;
         if (m_timeSlider->isMoving())
-            reader->jumpTo(timeMSec, true);
+            reader->jumpTo(timeMSec, 0);
         else
-            reader->jumpToPreviousFrame(timeMSec, true);
+            reader->jumpToPreviousFrame(timeMSec);
 
         m_liveButton->hide();
     }
@@ -592,7 +592,7 @@ void NavigationItem::play()
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     if (reader->onPause() && reader->isRealTimeSource()) {
         reader->resumeMedia();
-        reader->jumpToPreviousFrame(m_camera->getCurrentTime(), true);
+        reader->jumpToPreviousFrame(m_camera->getCurrentTime());
     }
     else {
         reader->resumeMedia();

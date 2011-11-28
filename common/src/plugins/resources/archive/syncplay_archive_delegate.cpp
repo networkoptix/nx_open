@@ -5,11 +5,11 @@
 #include "utils/common/util.h"
 
 QnSyncPlayArchiveDelegate::QnSyncPlayArchiveDelegate(QnAbstractArchiveReader* reader, QnArchiveSyncPlayWrapper* syncWrapper, 
-                                                     QnAbstractArchiveDelegate* ownerDelegate, QnlTimeSource* display):
+                                                     QnAbstractArchiveDelegate* ownerDelegate):
     m_reader(reader),
     m_syncWrapper(syncWrapper), 
-    m_ownerDelegate(ownerDelegate),
-    m_display(display)
+    m_ownerDelegate(ownerDelegate)
+    //m_usePrebuffer(false)
 {
     m_flags = ownerDelegate->getFlags();
 }
@@ -60,24 +60,22 @@ void QnSyncPlayArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
     m_ownerDelegate->onReverseMode(displayTime, value);
 }
 
-void QnSyncPlayArchiveDelegate::jumpToPreviousFrame (qint64 time, bool makeshot)
+/*
+void QnSyncPlayArchiveDelegate::jumpToPreviousFrame (qint64 time)
 {
-    QMutexLocker lock(&m_genericMutex);
-    m_reader->jumpToPreviousFrame(time, makeshot);
+    m_reader->jumpToPreviousFrame(time);
 }
 
-void QnSyncPlayArchiveDelegate::jumpTo (qint64 time, bool makeshot)
+void QnSyncPlayArchiveDelegate::jumpTo (qint64 time)
 {
-    QMutexLocker lock(&m_genericMutex);
-    m_reader->jumpTo(time, makeshot);
+    m_reader->jumpTo(time);
 }
-
+*/
 
 qint64 QnSyncPlayArchiveDelegate::seek (qint64 time)
 {
-    //return m_syncWrapper->seek(time);
-    //m_seekTime = AV_NOPTS_VALUE;
-    //m_tmpData.clear();
+    //QMutexLocker lock(&m_mutex);
+    //m_nextData.clear();
     return m_ownerDelegate->seek(time);
 }
 
@@ -91,11 +89,6 @@ QnResourceAudioLayout* QnSyncPlayArchiveDelegate::getAudioLayout()
     return m_ownerDelegate->getAudioLayout();
 }
 
-void QnSyncPlayArchiveDelegate::setStartDelay(qint64 startDelay)
-{
-    m_startDelay = startDelay;
-}
-
 AVCodecContext* QnSyncPlayArchiveDelegate::setAudioChannel(int num)
 {
     // play synchronized movies without audio
@@ -105,4 +98,36 @@ AVCodecContext* QnSyncPlayArchiveDelegate::setAudioChannel(int num)
 QnAbstractMediaDataPtr QnSyncPlayArchiveDelegate::getNextData()
 {
     return m_ownerDelegate->getNextData();
+    /*
+    QMutexLocker lock(&m_mutex);
+    QnAbstractMediaDataPtr rez;
+    if (m_usePrebuffer)
+    {
+        rez = m_nextData ? m_nextData : m_ownerDelegate->getNextData();
+        m_nextData = m_ownerDelegate->getNextData();
+    }
+    else 
+    {
+        rez = m_nextData ? m_nextData : m_ownerDelegate->getNextData();
+        m_nextData.clear();
+    }
+    return rez;
+    */
 }
+
+/*
+void QnSyncPlayArchiveDelegate::setPrebuffering(bool value)
+{
+    QMutexLocker lock(&m_mutex);
+    m_usePrebuffer = value;
+    if (value && !m_nextData) 
+        m_nextData = m_ownerDelegate->getNextData();
+}
+*/
+
+/*
+qint64 QnSyncPlayArchiveDelegate::getNextTime() const
+{
+    return m_nextData ? m_nextData->timestamp : AV_NOPTS_VALUE;
+}
+*/

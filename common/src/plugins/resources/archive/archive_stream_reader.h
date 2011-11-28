@@ -35,6 +35,7 @@ public:
     void renameFileOnDestroy(const QString& newFileName);
     void jumpWithMarker(qint64 mksec, int marker);
 
+    virtual bool jumpTo(qint64 mksec, qint64 skipTime);
     virtual void nextFrame();
     virtual void previousFrame(qint64 mksec);
     virtual void pauseMedia();
@@ -95,6 +96,7 @@ private:
     int m_dataMarker;
     int m_newDataMarker;
 private:
+    qint64 m_lastJumpTime;
     qint64 m_skipFramesToTime;
     bool m_singleShot;
     bool m_singleQuantProcessed;

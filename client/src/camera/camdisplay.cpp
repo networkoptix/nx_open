@@ -232,8 +232,8 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         if (useSync(vd)) 
         {
             qint64 displayedTime = getCurrentTime();
-            bool isSingleShot = vd->flags & QnAbstractMediaData::MediaFlags_SingleShot;
-            if (!isSingleShot && !m_buffering && displayedTime != AV_NOPTS_VALUE && m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed)
+            //bool isSingleShot = vd->flags & QnAbstractMediaData::MediaFlags_SingleShot;
+            if (speed != 0 && !m_buffering && displayedTime != AV_NOPTS_VALUE && m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed)
             {
                 QTime t;
                 t.start();
@@ -372,7 +372,7 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
 }
 
-void CLCamDisplay::onBeforeJump(qint64 time, bool makeshot)
+void CLCamDisplay::onBeforeJump(qint64 time)
 {
     /*
     if (time < 1000000ll * 100000)

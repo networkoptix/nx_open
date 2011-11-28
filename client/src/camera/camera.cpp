@@ -30,6 +30,7 @@ CLVideoCamera::CLVideoCamera(QnMediaResourcePtr device, CLVideoWindowItem* video
     connect(m_reader, SIGNAL(streamPaused()), &m_camdispay, SLOT(onReaderPaused()), Qt::DirectConnection);
     connect(m_reader, SIGNAL(streamResumed()), &m_camdispay, SLOT(onReaderResumed()), Qt::DirectConnection);
     connect(m_reader, SIGNAL(prevFrameOccured()), &m_camdispay, SLOT(onPrevFrameOccured()), Qt::DirectConnection);
+    connect(m_reader, SIGNAL(nextFrameOccured()), &m_camdispay, SLOT(onNextFrameOccured()), Qt::DirectConnection);
 	//m_reader->setStatistics(m_stat);
 
 	m_videovindow->setComplicatedItem(this);
