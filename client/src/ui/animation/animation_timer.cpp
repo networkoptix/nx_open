@@ -71,7 +71,6 @@ void AbstractAnimationTimer::addListener(AnimationTimerListener *listener) {
     if(listener->m_timer != NULL)
         listener->m_timer->removeListener(listener);
 
-
     listener->m_timer = this;
     m_listeners.push_back(listener);
 }

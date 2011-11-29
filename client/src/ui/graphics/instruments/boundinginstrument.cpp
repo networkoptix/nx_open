@@ -5,6 +5,7 @@
 #include <QGraphicsView>
 #include <QDateTime>
 #include <utils/common/warnings.h>
+#include <ui/animation/animation_event.h>
 #include "instrumentmanager.h"
 
 namespace {
@@ -392,10 +393,9 @@ public:
 
 
 BoundingInstrument::BoundingInstrument(QObject *parent):
-    Instrument(VIEWPORT, makeSet(QEvent::Paint), parent),
-    m_timer(new AnimationTimer(this))
+    Instrument(VIEWPORT, makeSet(QEvent::Paint, AnimationEvent::Animation), parent)
 {
-    m_timer->addListener(this);
+    animationTimer()->addListener(this);
 
     m_data[NULL] = new ViewData(NULL);
 }
@@ -417,11 +417,11 @@ void BoundingInstrument::enabledNotify() {
         }
     }
 
-    m_timer->activate();
+    animationTimer()->activate();
 }
 
 void BoundingInstrument::aboutToBeDisabledNotify() {
-    m_timer->deactivate();    
+    animationTimer()->deactivate();    
 }
 
 bool BoundingInstrument::registeredNotify(QGraphicsView *view) {

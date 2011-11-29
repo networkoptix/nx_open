@@ -86,9 +86,6 @@ private:
 private:
     /** View to data mapping. */
     QHash<QGraphicsView *, ViewData *> m_data;
-
-    /** Animation timer. */
-    AnimationTimer *m_timer;
 };
 
 #endif // QN_BOUNDING_INSTRUMENT_H

@@ -119,8 +119,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     connect(m_activityListenerInstrument,  SIGNAL(activityResumed()),                                   this,                   SLOT(at_activityStarted()));
 
     /* Configure viewport updates. */
-    m_updateTimer = new AnimationTimer(this);
-    m_updateTimer->addListener(this);
+    (new AnimationTimer(this))->addListener(this);
 
     /* Create curtain animator. */
     m_curtainAnimator = new QnCurtainAnimator(1000, this);
@@ -268,7 +267,7 @@ void QnWorkbenchDisplay::setView(QGraphicsView *view) {
         m_viewportAnimator->setView(NULL);
 
         /* Stop viewport updates. */
-        m_updateTimer->deactivate();
+        timer()->deactivate();
     }
 
     m_view = view;
@@ -320,7 +319,7 @@ void QnWorkbenchDisplay::setView(QGraphicsView *view) {
         m_viewportAnimator->setView(m_view);
 
         /* Start viewport updates. */
-        m_updateTimer->activate();
+        timer()->activate();
     }
 }
 

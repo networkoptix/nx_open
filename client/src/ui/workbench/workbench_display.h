@@ -337,9 +337,6 @@ private:
 
     /* Animation-related stuff. */
 
-    /** Timer that is used to update the viewport. */
-    AnimationTimer *m_updateTimer;
-
     /** Viewport animator. */
     QnViewportAnimator *m_viewportAnimator;
 

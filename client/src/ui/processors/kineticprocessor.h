@@ -127,7 +127,6 @@ public:
     KineticProcessor(QObject *parent = NULL):
         QObject(parent),
         mState(MEASURING),
-        mTimer(new AnimationTimer(this)),
         mHandler(NULL),
         mMaxShiftCount(DEFAULT_MAX_SHIFT_COUNT),
         mMaxShiftInterval(DEFAULT_MAX_SHIFT_INTERVAL_MSEC / 1000.0),
@@ -135,7 +134,7 @@ public:
         mMaxSpeedMagnitude(std::numeric_limits<qreal>::max()),
         mFriction(1.0)
     {
-        mTimer->addListener(this);
+        (new AnimationTimer(this))->addListener(this);
       
         reset();
     }
@@ -420,14 +419,14 @@ protected:
 
         switch(state) {
         case MEASURING: /* KINETIC -> MEASURING. */
-            mTimer->deactivate();
+            timer()->deactivate();
             if(mHandler != NULL)
                 mHandler->finishKinetic();
             return;
         case KINETIC: /* MEASURING -> KINETIC. */
             mInitialSpeed = mCurrentSpeed = calculateSpeed();
             if(mState == state) { /* State may get changed in a callback. */
-                mTimer->activate();
+                timer()->activate();
                 if(mState == state && mHandler != NULL) /* And again, state may have changed. */
                     mHandler->startKinetic();
             }
@@ -457,9 +456,6 @@ protected:
 
 
     /* 'Stable' state. */
-
-    /** Timer that is synced with other animations. */
-    AnimationTimer *mTimer;
 
     /** Kinetic handler. */
     KineticProcessHandler<T> *mHandler;
