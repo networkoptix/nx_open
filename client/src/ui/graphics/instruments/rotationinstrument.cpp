@@ -21,6 +21,8 @@ namespace {
     
     const qreal defaultArrowOverlap = 5;
 
+    const qreal snapTo90IntervalSize = 20.0;
+
     inline void addArrowHead(QPainterPath *shape, const QPointF &base, const QPointF &frontUnit, const QPointF &sideUnit) {
         shape->lineTo(base - defaultArrowSize.width() / 2 * sideUnit - defaultArrowOverlap * frontUnit);
         shape->lineTo(base + defaultArrowSize.height() * frontUnit);
@@ -329,11 +331,14 @@ void RotationInstrument::dragMove(DragInfo *info) {
     /* Clamp to [-180.0, 180.0]. */
     newRotation = std::fmod(newRotation + 180.0, 360.0) - 180.0;
 
+    /* Always snap to 90 degrees. */
+    qreal closest90 = std::floor(newRotation / 90.0 + 0.5) * 90.0;
+    if(std::abs(newRotation - closest90) < snapTo90IntervalSize / 2)
+        newRotation = closest90;
+
     /* Round to 15 degrees if ctrl is pressed. */
     if(info->modifiers() & Qt::ControlModifier)
         newRotation = std::floor(newRotation / 15.0 + 0.5) * 15.0;
-
-    QPointF sceneHead = info->mouseScenePos();
 
     /* Rotate item if needed. */
     if(!qFuzzyCompare(currentRotation, newRotation)) {
@@ -343,9 +348,14 @@ void RotationInstrument::dragMove(DragInfo *info) {
             QPointF newSceneOrigin = target()->mapToScene(itemOrigin);
             moveViewport(info->view(), newSceneOrigin - sceneOrigin);
             sceneOrigin = newSceneOrigin;
-            sceneHead = info->view()->mapToScene(info->mouseViewportPos());
+            //sceneHead = info->view()->mapToScene(info->mouseViewportPos());
         }
     }
+
+    /* Calculate rotation head position in scene coordinates. */
+    qreal sceneAngle = m_originAngle + newRotation / 180.0 * M_PI;
+    qreal headDistance = length(sceneOrigin - info->mouseScenePos());
+    QPointF sceneHead = sceneOrigin + polar(sceneAngle, headDistance);
 
     /* Update rotation item. */
     rotationItem()->setHead(sceneHead);
