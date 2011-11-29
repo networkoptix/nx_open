@@ -251,7 +251,7 @@ void SpeedSlider::onSpeedChanged(float newSpeed)
         QStyleOptionSlider opt;
         initStyleOption(&opt);
         const QRect sliderRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle);
-        m_toolTip->setPos(sliderRect.center().x(), sliderRect.top() - m_toolTip->boundingRect().height());
+        m_toolTip->setPos(sliderRect.center().x(), sliderRect.top());
         m_toolTip->setText(!qFuzzyIsNull(newSpeed) ? tr("%1x").arg(newSpeed) : tr("Paused"));
         m_toolTip->setVisible(true);
     }
