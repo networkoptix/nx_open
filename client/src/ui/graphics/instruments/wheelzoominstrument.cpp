@@ -2,6 +2,7 @@
 #include <cmath> /* For std::pow. */
 #include <QGraphicsSceneWheelEvent>
 #include <QGraphicsView>
+#include <QCursor>
 #include <ui/processors/kineticcuttingprocessor.h>
 #include <ui/animation/animation_event.h>
 
@@ -41,6 +42,7 @@ bool WheelZoomInstrument::wheelEvent(QGraphicsScene *, QGraphicsSceneWheelEvent 
      * in eighths (1/8s) of a degree. */
     qreal degrees = event->delta() / 8.0;
 
+    m_viewportAnchor = viewport->mapFromGlobal(QCursor::pos());
     kineticProcessor()->shift(degrees);
     kineticProcessor()->start();
 
@@ -55,7 +57,7 @@ void WheelZoomInstrument::kineticMove(const qreal &degrees) {
 
     /* 180 degree turn makes a 2x scale. */
     qreal factor = std::pow(2.0, -degrees / degreesFor2x);
-    scaleViewport(this->view(viewport), factor, QGraphicsView::AnchorUnderMouse);
+    scaleViewport(this->view(viewport), factor, m_viewportAnchor);
 }
 
 void WheelZoomInstrument::finishKinetic() {

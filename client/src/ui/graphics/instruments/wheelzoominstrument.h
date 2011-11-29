@@ -24,6 +24,7 @@ protected:
 
 private:
     QWeakPointer<QWidget> m_currentViewport;
+    QPoint m_viewportAnchor;
 };
 
 #endif // QN_WHEEL_ZOOM_INSTRUMENT_H

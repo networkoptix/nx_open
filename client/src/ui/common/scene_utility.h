@@ -198,6 +198,15 @@ public:
     static void scaleViewport(QGraphicsView *view, qreal factor, QGraphicsView::ViewportAnchor anchor = QGraphicsView::AnchorViewCenter);
 
     /**
+     * Scales the given viewport.
+     * 
+     * \param view                      Graphics view to scale viewport of.
+     * \param factor                    Viewport scale factor.
+     * \param sceneAnchor               Transformation anchor, in viewport coordinates.
+     */
+    static void scaleViewport(QGraphicsView *view, qreal factor, const QPoint &viewportAnchor);
+
+    /**
      * Scales the given viewport to the given size.
      * 
      * \param view                      Graphics view to scale viewport of.

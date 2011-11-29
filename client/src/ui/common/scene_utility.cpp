@@ -166,36 +166,40 @@ void QnSceneUtility::moveViewportTo(QGraphicsView *view, const QPointF &centerPo
 }
 
 namespace {
-    QPointF anchorScenePosition(QGraphicsView *view, QGraphicsView::ViewportAnchor anchor) {
+    QPoint anchorViewportPosition(QGraphicsView *view, QGraphicsView::ViewportAnchor anchor) {
         switch(anchor) {
             case QGraphicsView::AnchorViewCenter:
-                return view->mapToScene(view->viewport()->rect().center());
+                return view->viewport()->rect().center();
             case QGraphicsView::AnchorUnderMouse:
-                return view->mapToScene(view->mapFromGlobal(QCursor::pos()));
+                return view->mapFromGlobal(QCursor::pos());
             default:
-                return QPointF();
+                return QPoint(0, 0);
         }
     }
 }
 
-void QnSceneUtility::scaleViewport(QGraphicsView *view, qreal factor, QGraphicsView::ViewportAnchor anchor) {
+void QnSceneUtility::scaleViewport(QGraphicsView *view, qreal factor, const QPoint &viewportAnchor) {
     assert(view != NULL);
 
     qreal sceneFactor = 1 / factor;
 
-    QPointF oldAnchorPosition = anchorScenePosition(view, anchor);
-    
+    QPointF oldAnchorPosition = view->mapToScene(viewportAnchor);
+
     QGraphicsView::ViewportAnchor oldAnchor = view->transformationAnchor();
     bool oldInteractive = view->isInteractive();
     view->setInteractive(false); /* View will re-fire stored mouse event if we don't do this. */
     view->setTransformationAnchor(QGraphicsView::NoAnchor);
 
     view->scale(sceneFactor, sceneFactor);
-    QPointF delta = anchorScenePosition(view, anchor) - oldAnchorPosition;
+    QPointF delta = view->mapToScene(viewportAnchor) - oldAnchorPosition;
     view->translate(delta.x(), delta.y());
 
     view->setTransformationAnchor(oldAnchor);
     view->setInteractive(oldInteractive);
+}
+
+void QnSceneUtility::scaleViewport(QGraphicsView *view, qreal factor, QGraphicsView::ViewportAnchor anchor) {
+    return scaleViewport(view, factor, anchorViewportPosition(view, anchor));
 }
 
 void QnSceneUtility::scaleViewportTo(QGraphicsView *view, const QSizeF &size, Qt::AspectRatioMode mode, QGraphicsView::ViewportAnchor anchor) {
