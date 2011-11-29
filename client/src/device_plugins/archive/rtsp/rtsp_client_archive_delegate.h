@@ -56,6 +56,7 @@ private:
     bool m_closing;
     bool m_singleShotMode;
     quint8 m_sendedCSec;
+    qint64 m_lastSeekTime;
 };
 
 #endif

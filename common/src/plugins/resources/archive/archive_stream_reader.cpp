@@ -232,9 +232,17 @@ begin_label:
 	}
 
     m_jumpMtx.lock();
-    m_dataMarker = m_newDataMarker;
     if (m_requiredJumpTime != AV_NOPTS_VALUE)
-    {
+        {
+        if (m_newDataMarker) {
+            QString s;
+            QTextStream str(&s);
+            str << "setMarker=" << m_newDataMarker 
+                << " for Time=" << QDateTime::fromMSecsSinceEpoch(m_requiredJumpTime/1000).toString("hh:mm:ss.zzz");
+            str.flush();
+            cl_log.log(s, cl_logALWAYS);
+        }
+        m_dataMarker = m_newDataMarker;
         qint64 jumpTime = m_requiredJumpTime;
         m_lastGopSeekTime = -1;
         m_skipFramesToTime = m_tmpSkipFramesToTime;
