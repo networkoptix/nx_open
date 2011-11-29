@@ -76,7 +76,7 @@ public:
      * 
      * \param time                      Current time, in milliseconds.
      */
-    void tick(qint64 time);
+    void updateCurrentTime(qint64 time);
 
     /**
      * Resets the stored last tick time of this animation timer.

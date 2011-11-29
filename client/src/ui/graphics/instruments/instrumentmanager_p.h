@@ -3,18 +3,22 @@
 
 #include "sceneeventfilter.h" /* For SceneDestructionListener and SceneEventFilterItem. */
 #include "installationmode.h"
+#include <ui/animation/animation_timer.h>
 
 template<class T>
 class InstrumentEventDispatcher;
 
 class Instrument;
+class InstrumentPaintSyncer;
 
-class InstrumentManagerPrivate: protected SceneDestructionListener {
+class InstrumentManagerPrivate: protected SceneDestructionListener, protected AnimationTimerListener {
 public:
     InstrumentManagerPrivate();
 
 private:
     virtual void destroyed(SceneEventFilterItem *item) override;
+
+    virtual void tick(int deltaTime) override;
 
     void init();
 
@@ -42,6 +46,14 @@ private:
 
     void at_viewport_destroyed(QObject *viewport);
 
+    void addSyncedViewport(QWidget *viewport);
+
+    QWidget *syncedViewport() const;
+
+    void removeSyncedViewport(QWidget *viewport);
+
+    void reinstallPaintSyncer(QWidget *oldViewport, QWidget *newViewport);
+
 private:
     InstrumentManager *const q_ptr;
     QGraphicsScene *scene;
@@ -51,6 +63,10 @@ private:
     QSet<QGraphicsItem *> items;
     QList<Instrument *> instruments;
     
+    InstrumentPaintSyncer *paintSyncer;
+    qint64 totalTickTime;
+    QList<QWidget *> syncedViewports;
+
     InstrumentEventDispatcher<QGraphicsScene> *sceneDispatcher;
     InstrumentEventDispatcher<QGraphicsView> *viewDispatcher;
     InstrumentEventDispatcher<QWidget> *viewportDispatcher;

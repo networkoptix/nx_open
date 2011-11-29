@@ -199,7 +199,7 @@ public:
                 if(std::abs(delta.y()) > std::abs(direction.y()))
                     delta.ry() = direction.y();
 
-                qDebug() << "ENFORCE" << QDateTime::currentMSecsSinceEpoch() << delta;
+                //qDebug() << "ENFORCE" << QDateTime::currentMSecsSinceEpoch() << delta;
 
                 QnSceneUtility::moveViewport(m_view, delta);
             }

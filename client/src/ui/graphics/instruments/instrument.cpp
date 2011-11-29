@@ -28,6 +28,7 @@
 #include <QGraphicsSceneWheelEvent>
 #include <QGraphicsSceneHelpEvent>
 #include <QGraphicsSceneHoverEvent>
+#include <ui/animation/animation_event.h>
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 #include "instrumentmanager.h"
@@ -330,6 +331,8 @@ bool Instrument::dispatchEvent(T *watched, QEvent *event) {
         return wheelEvent(watched, static_cast<QGraphicsSceneWheelEvent *>(event));
     case QEvent::GraphicsSceneHelp:
         return helpEvent(watched, static_cast<QGraphicsSceneHelpEvent *>(event));
+    case AnimationEvent::Animation:
+        return animationEvent(static_cast<AnimationEvent *>(event));
     default:
         return false;
     }

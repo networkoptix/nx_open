@@ -62,7 +62,7 @@ void HandScrollInstrument::kineticMove(const QPointF &distance) {
     if(view == NULL)
         return;
 
-    qDebug() << "KINETIC" << QDateTime::currentMSecsSinceEpoch() << distance;
+    //qDebug() << "KINETIC" << QDateTime::currentMSecsSinceEpoch() << distance;
 
     moveViewportF(view, distance);
 }

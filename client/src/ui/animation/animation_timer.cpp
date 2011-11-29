@@ -43,14 +43,15 @@ void AbstractAnimationTimer::reset() {
     m_lastTickTime = -1;
 }
 
-void AbstractAnimationTimer::tick(qint64 time) {
+void AbstractAnimationTimer::updateCurrentTime(qint64 time) {
     if(m_lastTickTime == -1)
         m_lastTickTime = time;
 
     if(m_active) {
         int deltaTime = static_cast<int>(time - m_lastTickTime);
-        foreach(AnimationTimerListener *listener, m_listeners)
-            listener->tick(deltaTime);
+        if(deltaTime > 0)
+            foreach(AnimationTimerListener *listener, m_listeners)
+                listener->tick(deltaTime);
     }
 
     m_lastTickTime = time;
@@ -108,5 +109,5 @@ int AnimationTimer::duration() const {
 }
 
 void AnimationTimer::updateCurrentTime(int currentTime) {
-    tick(currentTime);
+    AbstractAnimationTimer::updateCurrentTime(currentTime);
 }

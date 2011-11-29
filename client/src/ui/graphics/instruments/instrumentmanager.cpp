@@ -4,8 +4,10 @@
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include <utils/common/warnings.h>
+#include <ui/animation/animation_event.h>
 #include "instrument.h"
 #include "instrumenteventdispatcher.h"
+#include "instrumentpaintsyncer.h"
 
 namespace {
     /** Name of the property to store a list of scene's instrument managers. */
@@ -23,7 +25,8 @@ InstrumentManagerPrivate::InstrumentManagerPrivate():
     sceneDispatcher(NULL),
     viewDispatcher(NULL),
     viewportDispatcher(NULL),
-    itemDispatcher(NULL)
+    itemDispatcher(NULL),
+    totalTickTime(0)
 {}
 
 void InstrumentManagerPrivate::init() {
@@ -33,6 +36,45 @@ void InstrumentManagerPrivate::init() {
     viewDispatcher     = new InstrumentEventDispatcher<QGraphicsView>(q);
     viewportDispatcher = new InstrumentEventDispatcher<QWidget>(q);
     itemDispatcher     = new InstrumentEventDispatcher<QGraphicsItem>(q);
+    
+    paintSyncer        = new InstrumentPaintSyncer(q);
+    paintSyncer->addListener(this);
+    paintSyncer->activate();
+}
+
+void InstrumentManagerPrivate::reinstallPaintSyncer(QWidget *oldViewport, QWidget *newViewport) {
+    if(oldViewport == newViewport)
+        return;
+
+    if(oldViewport != NULL)
+        oldViewport->removeEventFilter(paintSyncer);
+
+    if(newViewport != NULL)
+        newViewport->installEventFilter(paintSyncer);
+}
+
+void InstrumentManagerPrivate::addSyncedViewport(QWidget *viewport) {
+    QWidget *oldSyncedViewport = syncedViewport();
+
+    syncedViewports.push_back(viewport);
+
+    reinstallPaintSyncer(oldSyncedViewport, syncedViewport());
+}
+
+QWidget *InstrumentManagerPrivate::syncedViewport() const {
+    if(syncedViewports.empty()) {
+        return NULL;
+    } else {
+        return syncedViewports.back();
+    }
+}
+
+void InstrumentManagerPrivate::removeSyncedViewport(QWidget *viewport) {
+    QWidget *oldSyncedViewport = syncedViewport();
+
+    syncedViewports.removeAll(viewport);
+
+    reinstallPaintSyncer(oldSyncedViewport, syncedViewport());
 }
 
 void InstrumentManagerPrivate::destroyed(SceneEventFilterItem *item) {
@@ -45,6 +87,17 @@ void InstrumentManagerPrivate::destroyed(SceneEventFilterItem *item) {
     sceneIsBeingDestroyed = true;
     unregisterSceneInternal();
     sceneIsBeingDestroyed = false;
+}
+
+void InstrumentManagerPrivate::tick(int deltaTime) {
+    totalTickTime += deltaTime;
+
+    QWidget *syncedViewport = this->syncedViewport();
+    if(syncedViewport == NULL)
+        return;
+
+    AnimationEvent event(totalTickTime, deltaTime);
+    viewportDispatcher->eventFilter(syncedViewport, &event);
 }
 
 void InstrumentManagerPrivate::installInstrumentInternal(Instrument *instrument, InstallationMode::Mode mode, Instrument *reference) {
@@ -174,7 +227,9 @@ void InstrumentManagerPrivate::registerViewportInternal(QGraphicsView *view) {
     
     QObject::connect(view->viewport(), SIGNAL(destroyed(QObject *)), q_func(), SLOT(at_viewport_destroyed(QObject *)));
 
-    viewportDispatcher->registerTarget(view->viewport());
+    QWidget *viewport = view->viewport();
+    addSyncedViewport(viewport);
+    viewportDispatcher->registerTarget(viewport);
 }
 
 void InstrumentManagerPrivate::unregisterViewportInternal(QObject *viewport) {
@@ -182,7 +237,9 @@ void InstrumentManagerPrivate::unregisterViewportInternal(QObject *viewport) {
 
     QObject::disconnect(viewport, NULL, q_func(), NULL);
 
-    viewportDispatcher->unregisterTarget(static_cast<QWidget *>(viewport));
+    QWidget *viewportWidget = static_cast<QWidget *>(viewport);
+    removeSyncedViewport(viewportWidget);
+    viewportDispatcher->unregisterTarget(viewportWidget);
 }
 
 void InstrumentManagerPrivate::registerItemInternal(QGraphicsItem *item) {

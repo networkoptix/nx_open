@@ -5,13 +5,14 @@
 
 class AnimationEvent: public QEvent {
 public:
+    /** Event type for animation events. */
+    static const QEvent::Type Animation = static_cast<QEvent::Type>(QEvent::User + 0x6427);
+
     AnimationEvent(qint64 time, qint64 deltaTime):
+        QEvent(Animation),
         m_time(time),
         m_deltaTime(deltaTime)
     {}
-
-    /** Event type for animation events. */
-    static const QEvent::Type Animation = static_cast<QEvent::Type>(QEvent::User + 0x6427);
 
     qint64 time() const {
         return m_time;

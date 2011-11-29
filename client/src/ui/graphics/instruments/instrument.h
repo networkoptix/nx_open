@@ -39,6 +39,7 @@ class QGraphicsItem;
 class QGraphicsScene;
 class QPoint;
 
+class AnimationEvent;
 class InstrumentManager;
 class InstrumentItemEventDispatcher;
 template<class T>
@@ -543,7 +544,7 @@ protected:
     virtual bool helpEvent(QWidget *, QGraphicsSceneHelpEvent *) { return false; }
 
     /* Global animation event. Considered a viewport event. */
-    virtual bool animationEvent(qint64 /*t*/, qint64 /*dt*/) { return false; };
+    virtual bool animationEvent(AnimationEvent *) { return false; };
 
     /* Graphics view event filtering functions. */
     virtual bool event(QGraphicsView *, QEvent *);
