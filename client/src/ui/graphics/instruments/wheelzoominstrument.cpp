@@ -2,7 +2,7 @@
 #include <cmath> /* For std::pow. */
 #include <QGraphicsSceneWheelEvent>
 #include <QGraphicsView>
-#include <ui/processors/kineticzoomprocessor.h>
+#include <ui/processors/kineticcuttingprocessor.h>
 
 namespace {
     const qreal degreesFor2x = 180.0;
@@ -17,7 +17,7 @@ WheelZoomInstrument::WheelZoomInstrument(QObject *parent):
         parent
     ) 
 {
-    KineticZoomProcessor *processor = new KineticZoomProcessor(this);
+    KineticCuttingProcessor<qreal> *processor = new KineticCuttingProcessor<qreal>(this);
     processor->setHandler(this);
     processor->setMaxShiftInterval(0.5);
     processor->setFriction(degreesFor2x / 2);
@@ -42,14 +42,7 @@ bool WheelZoomInstrument::wheelEvent(QGraphicsScene *scene, QGraphicsSceneWheelE
     kineticProcessor()->shift(degrees);
     kineticProcessor()->start();
 
-    /* Use 2x scale for 180 degree turn. */
-    //qreal scaleFactor = std::pow(2.0, -degrees / 180.0);
-
-    /* Scale! */
-    //scaleViewport(this->view(viewport), scaleFactor, QGraphicsView::AnchorUnderMouse);
-
     event->accept();
-    //m_currentViewport.clear();
     return false;
 }
 

@@ -138,6 +138,13 @@ void QnSceneUtility::moveViewport(QGraphicsView *view, const QPoint &viewportPos
     moveViewport(view, view->mapToScene(viewportPositionDelta) - view->mapToScene(QPoint(0, 0)));
 }
 
+void QnSceneUtility::moveViewportF(QGraphicsView *view, const QPointF &viewportPositionDelta) {
+    assert(view != NULL);
+
+    QTransform viewportToScene = view->viewportTransform().inverted();
+    moveViewport(view, viewportToScene.map(viewportPositionDelta) - viewportToScene.map(QPointF(0.0, 0.0)));
+}
+
 void QnSceneUtility::moveViewport(QGraphicsView *view, const QPointF &scenePositionDelta) {
     assert(view != NULL);
 

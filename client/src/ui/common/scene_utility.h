@@ -168,6 +168,14 @@ public:
      * Moves the given viewport.
      * 
      * \param view                      Graphics view to move viewport of.
+     * \param viewportPositionDelta     Move delta, in viewport coordinates.
+     */
+    static void moveViewportF(QGraphicsView *view, const QPointF &viewportPositionDelta);
+
+    /**
+     * Moves the given viewport.
+     * 
+     * \param view                      Graphics view to move viewport of.
      * \param scenePositionDelta        Move delta, in scene coordinates.
      */
     static void moveViewport(QGraphicsView *view, const QPointF &scenePositionDelta);
