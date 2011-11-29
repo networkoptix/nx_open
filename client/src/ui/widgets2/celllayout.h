@@ -5,7 +5,7 @@
 #include <QScopedPointer>
 #include <QPoint>
 #include <QRect>
-#include <utils/common/scene_utility.h>
+#include <ui/common/scene_utility.h>
 
 // ### A quick workaround. Remove this once we have a better solution.
 #undef override

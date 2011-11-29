@@ -3,7 +3,7 @@
 
 
 QnResourceConsumer::QnResourceConsumer(QnResourcePtr resource):
-m_resource(resource)
+    m_resource(resource)
 {
     m_resource->addConsumer(this);
 }
@@ -13,7 +13,7 @@ QnResourceConsumer::~QnResourceConsumer()
     disconnectFromResource();
 }
 
-QnResourcePtr QnResourceConsumer::getResource() const
+const QnResourcePtr &QnResourceConsumer::getResource() const
 {
     return m_resource;
 }

@@ -10,6 +10,7 @@ struct QnAbstractDataPacket;
 
 class QN_EXPORT QnAbstractDataConsumer : public CLLongRunnable
 {
+    Q_OBJECT;
 public:
 	QnAbstractDataConsumer(int maxQueueSize);
 	virtual ~QnAbstractDataConsumer(){}
@@ -26,6 +27,10 @@ public:
     virtual void setSpeed(float /*value*/) {}
     virtual qint64 getCurrentTime() const { return 0; }
     virtual bool isRealTimeSource() const { return false; }
+
+public slots:
+
+
 protected:
 	void run();
     virtual bool processData(QnAbstractDataPacketPtr /*data*/)=0;

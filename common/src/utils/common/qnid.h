@@ -4,7 +4,6 @@
 #include <QMutex>
 #include <QVariant>
 
-
 // This class is going to be exported from our common DLL. So 'QN_EXPORT' MUST be specified after 'class' identifier
 class QN_EXPORT QnId
 {
@@ -28,7 +27,16 @@ public:
 	bool operator>  (const QnId& other)    const { return m_id > other.m_id; }
 	bool operator== (const QVariant& other) const { return m_id == other.toInt(); }
 	bool operator!= (const QVariant& other) const { return m_id != other.toInt(); }
-	static QnId generateSpecialId() {
+	
+    /**
+     * Generates a new unassigned id.
+     * 
+     * This function is thread-safe.
+     * 
+     * \returns                         Newly generated id.
+     */
+    static QnId generateSpecialId() 
+    {
         QMutexLocker lock(&m_mutex);
 		return m_lastCustomId < INT_MAX ? ++m_lastCustomId : 0;
 	}
@@ -40,13 +48,16 @@ public:
 	}
 
 private:
+    QnId(const int value): m_id(value) {}
+
+private:
 	static const int FIRST_CUSTOM_ID = INT_MAX / 2;
 	static int m_lastCustomId;
     static QMutex m_mutex;
 
 	int m_id;
-
-	QnId(const int value): m_id(value) {}
 };
- 
+
+
+
 #endif

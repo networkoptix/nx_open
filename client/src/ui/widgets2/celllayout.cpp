@@ -3,15 +3,15 @@
 #include <cassert>
 #include <cmath> /* For std::floor, std::ceil. */
 
-uint qHash(const QPoint &value)
-{
-    using ::qHash;
-
-    /* 1021 is a prime. */
-    return qHash(value.x() * 1021) + qHash(value.y());
-}
-
 namespace {
+    uint qHash(const QPoint &value)
+    {
+        using ::qHash;
+
+        /* 1021 is a prime. */
+        return qHash(value.x() * 1021) + qHash(value.y());
+    }
+
     QSizeF operator*(const QSizeF &l, const QSizeF &r)
     {
         return QSizeF(l.width() * r.width(), l.height() * r.height());

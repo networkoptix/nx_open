@@ -49,7 +49,9 @@ class VolumeSlider;
 
 class NavigationItem : public CLUnMovedInteractiveOpacityItem
 {
-    Q_OBJECT
+    Q_OBJECT;
+
+    typedef CLUnMovedInteractiveOpacityItem base_type;
 
 public:
     explicit NavigationItem(QGraphicsItem *parent = 0);

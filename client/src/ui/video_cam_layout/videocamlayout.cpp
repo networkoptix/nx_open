@@ -22,7 +22,7 @@
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
-#include "camera/render_watcher.h"
+#include "ui/mixins/render_watch_mixin.h"
 #include "core/resourcemanagment/security_cam_resource.h"
 
 int  SLOT_WIDTH = 640*10;
@@ -46,7 +46,7 @@ m_firstTime(true),
 m_isRunning(false),
 m_editable(false),
 m_syncPlay(0),
-m_renderWatcher(new QnRenderWatcher(this))
+m_renderWatcher(new QnRenderWatchMixin(this))
 {
 	connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimer()));
 
@@ -171,7 +171,7 @@ void SceneLayout::stop_helper(bool emt)
 	{
 		// firs of all lets ask all threads to stop;
 		// we do not need to do it sequentially
-		devitem->beforestopDispay();
+		devitem->beforeStopDisplay();
 	}
 
 	//===============
@@ -180,7 +180,7 @@ void SceneLayout::stop_helper(bool emt)
 	{
 		// after we can wait for each thread to stop
 		cl_log.log(QLatin1String("About to shutdown device "), (int)(long)devitem, QLatin1String("\r\n"), cl_logDEBUG1);
-		devitem->stopDispay();
+		devitem->stopDisplay();
 
         disconnectFromSyncPlay(devitem);
 
@@ -540,7 +540,7 @@ bool SceneLayout::addDevice(QnResourcePtr device, bool update_scene_rect, CLBasi
 
 		m_deviceitems.push_back(cam);
 		cam->setQuality(QnQualityLow, true);
-		cam->startDispay();
+		cam->startDisplay();
 
         addDeviceNavigation(video_wnd);
 		return true;
@@ -784,8 +784,8 @@ void SceneLayout::onItemClose(CLAbstractSubItemContainer* itm, bool addToremoved
 	{
 		CLAbstractComplicatedItem* devitem = item->getComplicatedItem();
 
-		devitem->beforestopDispay();
-		devitem->stopDispay();
+		devitem->beforeStopDisplay();
+		devitem->stopDisplay();
         disconnectFromSyncPlay(devitem);
 
 		QnResourcePtr dev =  devitem->getDevice();
@@ -826,7 +826,7 @@ void SceneLayout::removeItems(QList<CLAbstractSubItemContainer*> itemlst, bool r
         foreach(CLAbstractComplicatedItem* citem, m_deviceitems)
         {
             if (citem->getSceneItem() == aitem)
-                citem->beforestopDispay();
+                citem->beforeStopDisplay();
         }
 
     }
@@ -850,7 +850,7 @@ bool SceneLayout::removeDevices(QList<CLAbstractComplicatedItem*> lst, bool remo
 	{
 		// firs of all lets ask all threads to stop;
 		// we do not need to do it sequentially
-		devitem->beforestopDispay();
+		devitem->beforeStopDisplay();
 	}
 
 	foreach(CLAbstractComplicatedItem* devitem, lst)

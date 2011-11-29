@@ -30,7 +30,6 @@
 
 #define TEST_RTSP_SERVER
 
-#include "ui/scene/scenecontroller.h"
 #include "core/resource/video_server.h"
 #include "core/resource/qnstorage.h"
 
@@ -314,18 +313,6 @@ int main(int argc, char *argv[])
 
     initContextMenu();
     
-#if 0
-    QWidget *widget = new QWidget();
-    QHBoxLayout *layout = new QHBoxLayout(widget);
-    layout->setContentsMargins(0, 0, 0, 0);
-    QGraphicsScene *scene = new QGraphicsScene(widget);
-    QGraphicsView *view = new QGraphicsView(scene);
-    SceneController *controller = new SceneController(view, scene, widget);
-    layout->addWidget(view);
-    widget->resize(800, 600);
-    widget->show();
-
-#else
     MainWnd mainWindow(argc, argv);
     mainWindow.show();
 
@@ -335,7 +322,6 @@ int main(int argc, char *argv[])
 
     QObject::connect(&application, SIGNAL(messageReceived(const QString&)),
         &mainWindow, SLOT(handleMessage(const QString&)));
-#endif
 
     int result = application.exec();
 

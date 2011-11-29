@@ -287,7 +287,7 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
     int channel = vd->channelNumber;
 
     CLVideoDecoderOutput::downscale_factor scaleFactor = CLVideoDecoderOutput::factor_any;
-    if (channel > 0) // if device has more than one channel
+    if (channel > 0 && m_display[0]) // if device has more than one channel
     {
         // this here to avoid situation where different channels have different down scale factor; it might lead to diffrent size
         scaleFactor = m_display[0]->getCurrentDownscaleFactor(); // [0] - master channel
@@ -675,7 +675,10 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
             if (!vd)
                 return result; // impossible? incoming vd!=0
             m_lastDisplayedVideoTime = vd->timestamp;
-            m_display[channel]->setCurrentTime(AV_NOPTS_VALUE);
+
+            if(m_display[channel] != NULL)
+                m_display[channel]->setCurrentTime(AV_NOPTS_VALUE);
+
             display(vd, !vd->ignore, speed);
             m_singleShotQuantProcessed = true;
             return result;
@@ -709,9 +712,11 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
                 m_lastDisplayedVideoTime = vd->timestamp;
                 if (m_lastAudioPacketTime != m_syncAudioTime) {
                     qint64 currentAudioTime = m_lastAudioPacketTime - (quint64)m_audioDisplay->msInBuffer()*1000;
-                    m_display[channel]->setCurrentTime(currentAudioTime);
+                    if(m_display[channel])
+                        m_display[channel]->setCurrentTime(currentAudioTime);
                     m_syncAudioTime = m_lastAudioPacketTime; // sync audio time prevent stopping video, if audio track is disapearred
-                }                display(vd, !vd->ignore, speed);
+                }                
+                display(vd, !vd->ignore, speed);
                 m_singleShotQuantProcessed = true;
             }
 

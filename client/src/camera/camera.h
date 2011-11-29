@@ -24,27 +24,27 @@ public:
     CLVideoCamera(QnMediaResourcePtr device, CLVideoWindowItem* videovindow, bool generateEndOfStreamSignal, QnAbstractMediaStreamDataProvider* reader);
     virtual ~CLVideoCamera();
 
-    virtual void startDispay();
-    virtual void stopDispay();
+    virtual void startDisplay() override;
+    virtual void beforeStopDisplay() override;
+    virtual void stopDisplay() override;
 
     void startRecording();
     void stopRecording();
     bool isRecording();
 
-    virtual void beforestopDispay();
 
     // this function must be called if stream was interupted or so; to synch audio and video again 
     //void streamJump(qint64 time);
 
     void setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val);
 
-    virtual QnResourcePtr getDevice() const;
+    virtual QnResourcePtr getDevice() const override;
 
     QnAbstractStreamDataProvider* getStreamreader();
     CLVideoWindowItem* getVideoWindow();
     const CLVideoWindowItem* getVideoWindow() const;
 
-    virtual CLAbstractSceneItem* getSceneItem() const;
+    virtual CLAbstractSceneItem* getSceneItem() const override;
 
     const QnStatistics* getStatistics(int channel = 0);
     CLCamDisplay* getCamCamDisplay();
@@ -63,14 +63,14 @@ protected slots:
 
 private:
     QnMediaResourcePtr m_device;
-    CLVideoWindowItem* m_videovindow;
+    CLVideoWindowItem* m_videoWindow;
     CLCamDisplay m_camdispay;
     QnStreamRecorder* m_recorder;
 
     QnAbstractMediaStreamDataProvider* m_reader;
 
     //QnStatistics* m_stat;
-    bool mGenerateEndOfStreamSignal;
+    bool m_GenerateEndOfStreamSignal;
     QnlTimeSource* m_extTimeSrc;
 
 };

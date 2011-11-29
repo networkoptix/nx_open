@@ -7,10 +7,11 @@
 #include <QtOpenGL/qgl.h>
 
 #include "abstractrenderer.h"
+#include "render_status.h"
 
 class CLVideoWindowItem;
 
-class CLGLRenderer : public CLAbstractRenderer
+class CLGLRenderer : public CLAbstractRenderer, public QnRenderStatus
 {
 public:
     enum CLGLDrawHardwareStatus
@@ -23,6 +24,7 @@ public:
     static void clearGarbage();
 
     CLGLRenderer(CLVideoWindowItem *vw);
+    CLGLRenderer();
     ~CLGLRenderer();
 
     static int getMaxTextureSize();
@@ -30,7 +32,7 @@ public:
     virtual void draw(CLVideoDecoderOutput* image) override;
     virtual void waitForFrameDisplayed(int channel) override;
 
-    bool paintEvent(const QRect &r);
+    RenderStatus paintEvent(const QRectF &r);
 
     virtual void beforeDestroy();
 
@@ -49,6 +51,7 @@ public:
 
     void onNoVideo();
 private:
+    void construct();
     void init(bool msgbox);
     static int gl_status;
 
@@ -89,6 +92,9 @@ private:
     int glRGBFormat() const;
 
 private:
+    mutable QMutex m_displaySync; // to avoid call paintEvent() more than once at the same time
+    QWaitCondition m_waitCon;
+
     GLint clampConstant;
     bool isNonPower2;
     bool isSoftYuv2Rgb;

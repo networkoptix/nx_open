@@ -17,7 +17,7 @@ class LayoutContent;
 class CLAbstractComplicatedItem;
 class CLAbstractSubItemContainer;
 class QnArchiveSyncPlayWrapper;
-class QnRenderWatcher;
+class QnRenderWatchMixin;
 
 class SceneLayout : public QObject
 {
@@ -83,7 +83,7 @@ public:
     void removeItems(QList<CLAbstractSubItemContainer*> itemlst, bool removeFromLayoutcontent);
 
 
-    QnRenderWatcher *renderWatcher() const {
+    QnRenderWatchMixin *renderWatcher() const {
         return m_renderWatcher;
     }
 
@@ -160,7 +160,7 @@ private:
 
     QnArchiveSyncPlayWrapper* m_syncPlay;
 
-    QnRenderWatcher *m_renderWatcher;
+    QnRenderWatchMixin *m_renderWatcher;
 };
 
 //===================================================================

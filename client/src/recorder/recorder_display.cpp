@@ -21,17 +21,17 @@ QnResourcePtr CLRecorderDisplay::getDevice() const
 	return mDev;
 }
 
-void CLRecorderDisplay::startDispay()
+void CLRecorderDisplay::startDisplay()
 {
 	start();
 }
 
-void CLRecorderDisplay::beforestopDispay()
+void CLRecorderDisplay::beforeStopDisplay()
 {
 	pleaseStop();
 }
 
-void CLRecorderDisplay::stopDispay()
+void CLRecorderDisplay::stopDisplay()
 {
 	stop();
 }

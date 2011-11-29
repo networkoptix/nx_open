@@ -5,8 +5,6 @@
 #include "settings.h"
 #include "preferences_wnd.h"
 
-#include "scene/scenecontroller.h"
-
 extern QString start_screen;
 
 // ### make these static non-relocatable

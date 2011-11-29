@@ -9,8 +9,16 @@
 class BoundingInstrument: public Instrument, protected AnimationTimerListener {
     Q_OBJECT;
 public:
+    /**
+     * Constructor.
+     * 
+     * \param parent                    Parent object.
+     */
     BoundingInstrument(QObject *parent = NULL);
 
+    /**
+     * Virtual destructor.
+     */
     virtual ~BoundingInstrument();
 
     /**

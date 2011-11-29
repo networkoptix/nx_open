@@ -3,43 +3,34 @@
 
 #include <QVariantAnimation>
 #include <QScopedPointer>
+#include <QWeakPointer>
+#include "setter.h"
 
-namespace detail {
-    class Setter {
-    public:
-        virtual void operator()(const QVariant &value) const = 0;
-
-        virtual ~Setter() {}
-    };
-
-    template<class T>
-    class AnySetter: public Setter {
-    public:
-        AnySetter(const T &setter): m_setter(setter) {}
-
-        virtual void operator()(const QVariant &value) const override {
-            m_setter(value);
-        }
-
-    private:
-        T m_setter;
-    };
-
-} // namespace detail
-
-
-class SetterAnimation: public QVariantAnimation {
+class QnSetterAnimation: public QVariantAnimation {
+    Q_OBJECT;
 public:
-    SetterAnimation(QObject *parent = NULL): QVariantAnimation(parent) {}
+    QnSetterAnimation(QObject *parent = NULL): QVariantAnimation(parent) {}
 
-    template<class Setter>
-    void setSetter(const Setter &setter) {
-        m_setter.reset(new detail::AnySetter<Setter>(setter));
+    QnAbstractSetter *setter() const {
+        return m_setter.data();
+    }
+
+    void setSetter(QnAbstractSetter *setter) {
+        m_setter.reset(setter);
+    }
+
+    QObject *targetObject() const {
+        return m_target.data();
+    }
+
+    void setTargetObject(QObject *target) {
+        m_target = target;
     }
 
 public slots:
     void clear() {
         m_setter.reset();
+        m_target.clear();
     }
 
 protected:
@@ -47,11 +38,15 @@ protected:
         if(m_setter.isNull())
             return;
 
-        m_setter->operator()(value);
+        if(m_target.isNull())
+            return;
+
+        m_setter->operator()(m_target.data(), value);
     }
 
 private:
-    QScopedPointer<detail::Setter> m_setter;
+    QScopedPointer<QnAbstractSetter> m_setter;
+    QWeakPointer<QObject> m_target;
 };
 
 #endif // QN_SETTER_ANIMATION_H

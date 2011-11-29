@@ -3,9 +3,9 @@
 
 #include "video_cam_layout/videocamlayout.h"
 #include "camera/camera.h"
-#include "camera/render_watcher.h"
+#include "ui/mixins/render_watch_mixin.h"
 #include "mainwnd.h"
-#include "view/blue_background_painter.h"
+#include "graphics/view/blue_background_painter.h"
 #include "settings.h"
 #include "device_settings/dlg_factory.h"
 #include "device_settings/device_settings_dlg.h"
@@ -47,6 +47,7 @@
 #include "core/resource/directory_browser.h"
 #include "core/resource/network_resource.h"
 
+#include <file_processor.h>
 
 #include <QtCore/QPropertyAnimation>
 #include <QtCore/QSettings>
@@ -3342,7 +3343,8 @@ void GraphicsView::contextMenuHelper_viewRecordedVideo(CLVideoCamera* cam)
     foreach(QFileInfo info, records)
     {
         QString id = info.absoluteFilePath();
-        MainWnd::findAcceptedFiles(dstFiles, id);
+        QnFileProcessor::findAcceptedFiles(id, &dstFiles);
+        //MainWnd::findAcceptedFiles(dstFiles, id);
         m_camLayout.addDevice(id, true);
         QnResourcePtr dev = qnResPool->getResourceByUniqId(id);
         // XXXMERGE dev->addDeviceTypeFlag(QnResource::RECORDED);
@@ -3632,7 +3634,7 @@ void GraphicsView::onOpenFile()
         QStringList srcFiles = m_openMediaDialog.selectedFiles();
         QStringList dstFiles;
         foreach (QString file, srcFiles)
-            MainWnd::findAcceptedFiles(dstFiles, file);
+            QnFileProcessor::findAcceptedFiles(file, &dstFiles);
         MainWnd::instance()->addFilesToCurrentOrNewLayout(dstFiles);
     }
 }

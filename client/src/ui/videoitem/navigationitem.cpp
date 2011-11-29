@@ -32,7 +32,11 @@ void detail::QnTimePeriodUpdater::update(const QnVideoServerConnectionPtr &conne
         return;
     }
 
-    sendRequest();
+    if(m_networkResources.empty()) {
+        at_replyReceived(QnTimePeriodList());
+    } else {
+        sendRequest();
+    }
 }
 
 void detail::QnTimePeriodUpdater::at_replyReceived(const QnTimePeriodList &timePeriods)
@@ -143,7 +147,7 @@ private:
 
 
 NavigationItem::NavigationItem(QGraphicsItem * /*parent*/) :
-    CLUnMovedInteractiveOpacityItem(QString("name:)"), 0, 0.5, 0.95),
+    base_type(QString("name:)"), 0, 0.5, 0.95),
     m_camera(0), m_forcedCamera(0), m_currentTime(0),
     m_playing(false),
     m_mouseOver(false),
@@ -445,7 +449,7 @@ void NavigationItem::timerEvent(QTimerEvent *event)
     if (event->timerId() == m_timerId)
         updateSlider();
 
-    CLUnMovedInteractiveOpacityItem::timerEvent(event);
+    base_type::timerEvent(event);
 }
 
 void NavigationItem::updateSlider()
@@ -524,9 +528,11 @@ void NavigationItem::updatePeriodList(bool force)
     m_timePeriod.startTimeUSec = t - w;
     m_timePeriod.durationUSec = w * 3;
 
-    QnTimePeriodList timePeriods;
-    if(!connection.isNull())
+    if(!connection.isNull()) {
         m_timePeriodUpdater->update(connection, resources, m_timePeriod);
+    } else if(resources.empty()) {
+        onTimePeriodUpdaterReady(QnTimePeriodList());
+    }
 }
 
 void NavigationItem::onTimePeriodUpdaterReady(const QnTimePeriodList &timePeriods)
@@ -556,7 +562,8 @@ void NavigationItem::onValueChanged(qint64 time)
 
 void NavigationItem::smartSeek(qint64 timeMSec)
 {
-    //qDebug() << timeMSec;
+    if(m_camera == NULL)
+        return;
 
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     if(m_timeSlider->isAtEnd()) {
@@ -576,6 +583,9 @@ void NavigationItem::smartSeek(qint64 timeMSec)
 
 void NavigationItem::pause()
 {
+    if(m_camera == NULL)
+        return;
+
     setActive(true);
 
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
@@ -590,6 +600,9 @@ void NavigationItem::pause()
 
 void NavigationItem::play()
 {
+    if(m_camera == NULL)
+        return;
+
     setActive(true);
 
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
@@ -607,6 +620,9 @@ void NavigationItem::play()
 
 void NavigationItem::rewindBackward()
 {
+    if(m_camera == NULL)
+        return;
+
     setActive(true);
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
 
@@ -617,6 +633,9 @@ void NavigationItem::rewindBackward()
 
 void NavigationItem::rewindForward()
 {
+    if(m_camera == NULL)
+        return;
+
     setActive(true);
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
 
@@ -636,6 +655,9 @@ void NavigationItem::rewindForward()
 
 void NavigationItem::stepBackward()
 {
+    if(m_camera == NULL)
+        return;
+
     setActive(true);
 
     if (m_playing)
@@ -662,6 +684,9 @@ void NavigationItem::stepBackward()
 
 void NavigationItem::stepForward()
 {
+    if(m_camera == NULL)
+        return;
+
     setActive(true);
 
     if (m_playing)
@@ -680,18 +705,19 @@ void NavigationItem::stepForward()
 void NavigationItem::hoverEnterEvent(QGraphicsSceneHoverEvent *e)
 {
     m_mouseOver = true;
-    CLUnMovedInteractiveOpacityItem::hoverEnterEvent(e);
+    base_type::hoverEnterEvent(e);
 }
 
 void NavigationItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *e)
 {
     m_mouseOver = false;
-    CLUnMovedInteractiveOpacityItem::hoverLeaveEvent(e);
+    base_type::hoverLeaveEvent(e);
 }
 
 void NavigationItem::onSliderPressed()
 {
-    Q_ASSERT(m_camera);
+    if(m_camera == NULL)
+        return;
 
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
     reader->setSingleShotMode(true);
@@ -701,7 +727,8 @@ void NavigationItem::onSliderPressed()
 
 void NavigationItem::onSliderReleased()
 {
-    Q_ASSERT(m_camera);
+    if(m_camera == NULL)
+        return;
 
     setActive(true);
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());

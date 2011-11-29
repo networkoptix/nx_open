@@ -448,6 +448,9 @@ void TimeLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     drawGradient(painter, QRectF(0, 0, rect().width(), rect().height() - 2*frameWidth()), rect().height());
     painter->setPen(pal.color(QPalette::Text));
 
+    if(qFuzzyIsNull(r.width()))
+        return;
+
     qint64 timezoneOffset = 0;
     if (m_parent->minimumValue() != 0) {
         QDateTime dt1 = QDateTime::currentDateTime();

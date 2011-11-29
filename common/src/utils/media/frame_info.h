@@ -9,6 +9,7 @@
 
 struct CLVideoDecoderOutput: public AVFrame
 {
+public:
     CLVideoDecoderOutput();
     ~CLVideoDecoderOutput();
 
@@ -25,10 +26,16 @@ struct CLVideoDecoderOutput: public AVFrame
     bool isDisplaying() const { return m_displaying; }
     void reallocate(int newWidth, int newHeight, int format);
     void reallocate(int newWidth, int newHeight, int newFormat, int lineSizeHint);
+
 public:
     int flags;
+
+    /** Pixel width to pixel height ratio. Some videos have non-square pixels, we support that. */
     double sample_aspect_ratio; 
+
+    /** Number of the video channel in video layout. */
     int channel;
+
 private:
     static void downscalePlate_factor2(unsigned char* dst, int dstStride, const unsigned char* src, int src_width, int src_stride, int src_height);
     static void downscalePlate_factor4(unsigned char* dst, int dstStride, const unsigned char* src, int src_width, int src_stride, int src_height);
@@ -37,10 +44,10 @@ private:
     static void copyPlane(unsigned char* dst, const unsigned char* src, int width, int dst_stride, int src_stride, int height);
     static bool equalPlanes(const unsigned char* plane1, const unsigned char* plane2, int width, int stride1, int stride2, int height, int max_diff);
     void fillRightEdge();
+
 private:
     bool m_useExternalData; // pointers only copied to this frame
     bool m_displaying;
-    
 };
 
 /*

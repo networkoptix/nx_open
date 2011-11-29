@@ -3,6 +3,7 @@
 
 #include <QThread>
 #include <QSemaphore>
+#include "warnings.h"
 
 class QN_EXPORT CLLongRunnable : public QThread
 {
@@ -20,10 +21,13 @@ public slots:
     }
 
 public:
-
     CLLongRunnable() : m_runing(false), m_onPause(false) {}
-
-    virtual ~CLLongRunnable() {}
+    
+    virtual ~CLLongRunnable() 
+    {
+        if(m_runing)
+            qnWarning("Runnable instance was destroyed without a call to stop().");
+    }
 
     virtual void pleaseStop()
     {

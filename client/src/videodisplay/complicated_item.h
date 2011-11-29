@@ -14,9 +14,9 @@ public:
 
 	virtual QnResourcePtr getDevice() const = 0;
 
-	virtual void startDispay() = 0;
-	virtual void beforestopDispay() = 0;
-	virtual void stopDispay() = 0;
+	virtual void startDisplay() = 0;
+	virtual void beforeStopDisplay() = 0;
+	virtual void stopDisplay() = 0;
 
 	virtual CLAbstractSceneItem* getSceneItem() const = 0;
 

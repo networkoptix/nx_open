@@ -4,6 +4,7 @@
 //#include <QtCore/QTime>
 
 #include <QtGui/QMessageBox>
+#include <utils/common/warnings.h>
 #include "ui/videoitem/video_wnd_item.h"
 #include "yuvconvert.h"
 #include "camera.h"
@@ -127,30 +128,40 @@ int CLGLRenderer::gl_status = CLGLRenderer::CL_GL_NOT_TESTED;
 
 static QList<GLuint *> mGarbage;
 
-CLGLRenderer::CLGLRenderer(CLVideoWindowItem *vw) :
-    clampConstant(GL_CLAMP),
-    isNonPower2(false),
-    isSoftYuv2Rgb(false),
-    m_forceSoftYUV(false),
-    m_textureUploaded(false),
-    m_stride_old(0),
-    m_height_old(0),
-    m_videoTextureReady(false),
-    m_brightness(0),
-    m_contrast(0),
-    m_hue(0),
-    m_saturation(0),
-    m_painterOpacity(1.0),
-    m_gotnewimage(false),
-    m_needwait(true),
-    m_videowindow(vw),
-    m_inited(false),
-    m_curImg(0),
-    m_videoWidth(0),
-    m_videoHeight(0),
-    m_noVideo(false)
-
+CLGLRenderer::CLGLRenderer(CLVideoWindowItem *vw):
+    m_videowindow(vw)
 {
+    construct();
+}
+
+CLGLRenderer::CLGLRenderer():
+    m_videowindow(NULL)
+{
+    construct();
+}
+
+void CLGLRenderer::construct() {
+    clampConstant = GL_CLAMP;
+    isNonPower2 = false;
+    isSoftYuv2Rgb = false;
+    m_forceSoftYUV = false;
+    m_textureUploaded = false;
+    m_stride_old = 0;
+    m_height_old = 0;
+    m_videoTextureReady = false;
+    m_brightness = 0;
+    m_contrast = 0;
+    m_hue = 0;
+    m_saturation = 0;
+    m_painterOpacity = 1.0;
+    m_gotnewimage = false;
+    m_needwait = true;
+    m_inited = false;
+    m_curImg = 0;
+    m_videoWidth = 0;
+    m_videoHeight = 0;
+    m_noVideo = false;
+
     applyMixerSettings(m_brightness, m_contrast, m_hue, m_saturation);
 
     (void)CLGLRenderer::getMaxTextureSize();
@@ -411,10 +422,13 @@ void CLGLRenderer::draw(CLVideoDecoderOutput* img)
     }
 
     m_gotnewimage = true;
-    if (!m_videowindow->isVisible())
-        return;
 
-    m_videowindow->needUpdate(true); // sending paint event
+    if(m_videowindow != NULL) {
+        if (!m_videowindow->isVisible())
+            return;
+
+        m_videowindow->needUpdate(true); // sending paint event
+    }
 }
 
 void CLGLRenderer::waitForFrameDisplayed(int channel)
@@ -711,7 +725,7 @@ void CLGLRenderer::updateTexture()
         glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
         OGL_CHECK_ERROR("glPixelStorei");
 
-        if (m_videowindow->getVideoCam()->getDevice()->checkFlag(QnResource::SINGLE_SHOT))
+        if (m_videowindow && m_videowindow->getVideoCam()->getDevice()->checkFlag(QnResource::SINGLE_SHOT))
         {
             // free memory immediately for still images
             yuv2rgbBuffer.clear();
@@ -829,8 +843,10 @@ static inline QRect getTextureRect(float textureWidth, float textureHeight,
 }
 #endif
 
-bool CLGLRenderer::paintEvent(const QRect &r)
+CLGLRenderer::RenderStatus CLGLRenderer::paintEvent(const QRectF &r)
 {
+    glPushAttrib(GL_ALL_ATTRIB_BITS);
+
     if (!m_inited)
     {
         init(gl_status == CL_GL_NOT_TESTED);
@@ -842,6 +858,7 @@ bool CLGLRenderer::paintEvent(const QRect &r)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
+    RenderStatus result;
 
     CLVideoDecoderOutput* curImg;
     {
@@ -856,14 +873,29 @@ bool CLGLRenderer::paintEvent(const QRect &r)
                 if (curImg->pkt_dts > 1000000ll * 3600*24)
                     m_timeText = QDateTime::fromMSecsSinceEpoch(curImg->pkt_dts/1000).toString("hh:mm:ss.zzz");
             }
+
+            result = RENDERED_NEW_FRAME;
+        } 
+        else 
+        {
+            result = RENDERED_OLD_FRAME;
         }
     }
+
     bool draw = m_videoWidth <= getMaxTextureSize() && m_videoHeight <= getMaxTextureSize();
-    if (draw && m_videoWidth > 0 && m_videoHeight > 0)
+    if(!draw) 
     {
-        QRect temp(r);
-        const float v_array[] = { temp.left(), temp.top(), temp.right() + 1, temp.top(), temp.right() + 1, temp.bottom() + 1, temp.left(), temp.bottom() + 1 };
+        result = CANNOT_RENDER;
+    } 
+    else if(m_videoWidth > 0 && m_videoHeight > 0)
+    {
+        QRectF temp(r);
+        const float v_array[] = { temp.left(), temp.top(), temp.right(), temp.top(), temp.right(), temp.bottom(), temp.left(), temp.bottom() };
         drawVideoTexture(m_texture[0], m_texture[1], m_texture[2], v_array);
+    }
+    else
+    {
+        result = NOTHING_RENDERED;
     }
 
     QMutexLocker locker(&m_displaySync);
@@ -872,19 +904,30 @@ bool CLGLRenderer::paintEvent(const QRect &r)
         m_waitCon.wakeAll();
     }
 
+    glPopAttrib();
     frameDisplayed();
 
-    return draw;
+    return result;
 }
 
 QSize CLGLRenderer::sizeOnScreen(unsigned int channel) const
 {
-    return m_videowindow->sizeOnScreen(channel);
+    qnWarning("Unreachable code executed.");
+
+    if(m_videowindow != NULL)
+        return m_videowindow->sizeOnScreen(channel);
+    else
+        return QSize();
 }
 
 bool CLGLRenderer::constantDownscaleFactor() const
 {
-    return m_videowindow->constantDownscaleFactor();
+    qnWarning("Unreachable code executed.");
+
+    if(m_videowindow != NULL)
+        return m_videowindow->constantDownscaleFactor();
+    else
+        return false;
 }
 
 QString CLGLRenderer::getTimeText() const
