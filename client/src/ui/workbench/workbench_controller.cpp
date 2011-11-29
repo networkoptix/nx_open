@@ -297,6 +297,11 @@ void QnWorkbenchController::at_dragStarted(QGraphicsView *, const QList<QGraphic
     /* Bring to front preserving relative order. */
     m_display->bringToFront(items);
     m_display->setLayer(items, QnWorkbenchDisplay::FRONT_LAYER);
+
+    /* Un-raise if raised is among the dragged. */
+    //QnResourceWidget *raisedWidget = display()->widget(workbench()->raisedItem());
+    //if(raisedWidget != NULL && items.contains(raisedWidget))
+    //    workbench()->setRaisedItem(NULL);
 }
 
 void QnWorkbenchController::at_dragFinished(QGraphicsView *view, const QList<QGraphicsItem *> &items) {

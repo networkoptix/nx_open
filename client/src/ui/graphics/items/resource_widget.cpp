@@ -376,21 +376,11 @@ void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGra
         color.setBlue ((color.blue()  + selectedFrameColorMixIn.blue())  / 2);
     }
 
-    /* Note that we use OpenGL drawing functions here for a reason.
-     * If drawing with QPainter, off-by-one pixel errors may occur as video is drawn via OpenGL. */
-    painter->beginNativePainting();
-    glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
-    glEnable(GL_BLEND); 
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
-    glColor(color);
-    glBegin(GL_QUADS);
-    glVertices(QRectF(-fw,     -fw,     w + fw * 2,  fw));
-    glVertices(QRectF(-fw,     h,       w + fw * 2,  fw));
-    glVertices(QRectF(-fw,     0,       fw,          h));
-    glVertices(QRectF(w,       0,       fw,          h));
-    glEnd();
-    glPopAttrib();
-    painter->endNativePainting();
+    painter->setRenderHint(QPainter::Antialiasing, true); /* Antialiasing is here for a reason. Without it border looks crappy. */
+    painter->fillRect(QRectF(-fw,     -fw,     w + fw * 2,  fw), color);
+    painter->fillRect(QRectF(-fw,     h,       w + fw * 2,  fw), color);
+    painter->fillRect(QRectF(-fw,     0,       fw,          h),  color);
+    painter->fillRect(QRectF(w,       0,       fw,          h),  color);
 }
 
 namespace {
