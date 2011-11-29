@@ -1,6 +1,8 @@
 #include "resizinginstrument.h"
 #include <QGraphicsWidget>
 #include <ui/common/constrained_resizable.h>
+#include <ui/common/frame_section_queryable.h>
+#include "resizehoverinstrument.h"
 
 namespace {
     struct ItemIsResizableWidget: public std::unary_function<QGraphicsItem *, bool> {
@@ -33,7 +35,9 @@ namespace {
 } // anonymous namespace
 
 ResizingInstrument::ResizingInstrument(QObject *parent):
-    DragProcessingInstrument(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent)
+    DragProcessingInstrument(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
+    m_resizeHoverInstrument(new ResizeHoverInstrument(this)),
+    m_effectiveDistance(0)
 {}
 
 ResizingInstrument::~ResizingInstrument() {
@@ -57,9 +61,16 @@ bool ResizingInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
         return false;
 
     /* Check frame section. */
-    QPointF scenePos = view->mapToScene(event->pos());
-    QPointF itemPos = widget->mapFromScene(scenePos);
-    Qt::WindowFrameSection section = open(widget)->getWindowFrameSectionAt(itemPos);
+    FrameSectionQuearyable *queryable = dynamic_cast<FrameSectionQuearyable *>(widget);
+    QPointF itemPos = widget->mapFromScene(view->mapToScene(event->pos()));
+    Qt::WindowFrameSection section;
+    if(queryable == NULL) {
+        section = open(widget)->getWindowFrameSectionAt(itemPos);
+    } else {
+        QRectF effectiveRect = widget->mapRectFromScene(mapRectToScene(view, QRect(0, 0, m_effectiveDistance, m_effectiveDistance)));
+        qreal effectiveDistance = qMax(effectiveRect.width(), effectiveRect.height());
+        section = queryable->windowFrameSectionAt(QRectF(itemPos - QPointF(effectiveDistance, effectiveDistance), QSizeF(2 * effectiveDistance, 2 * effectiveDistance)));
+    }
     if(!isResizeGrip(section))
         return false;
 
@@ -73,6 +84,16 @@ bool ResizingInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) 
 
     event->accept();
     return false;
+}
+
+bool ResizingInstrument::paintEvent(QWidget *viewport, QPaintEvent *event) {
+    QGraphicsView *view = this->view(viewport);
+
+    QRectF effectiveRect = mapRectToScene(view, QRect(0, 0, m_effectiveDistance, m_effectiveDistance));
+    qreal effectiveDistance = qMax(effectiveRect.width(), effectiveRect.height());
+    m_resizeHoverInstrument->setEffectiveDistance(effectiveDistance);
+
+    return DragProcessingInstrument::paintEvent(viewport, event);
 }
 
 void ResizingInstrument::startDragProcess(DragInfo *info) {

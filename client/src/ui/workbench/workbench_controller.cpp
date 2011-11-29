@@ -28,6 +28,7 @@
 #include <ui/graphics/instruments/archivedropinstrument.h>
 #include <ui/graphics/instruments/resizinginstrument.h>
 #include <ui/graphics/instruments/uielementsinstrument.h>
+#include <ui/graphics/instruments/resizehoverinstrument.h>
 
 #include <ui/graphics/items/resource_widget.h>
 
@@ -48,13 +49,17 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_display(display),
     m_manager(display->instrumentManager())
 {
-    Instrument::EventTypeSet mouseEventTypes = Instrument::makeSet(
+    QEvent::Type mouseEventTypeArray[] = {
         QEvent::GraphicsSceneMousePress,
         QEvent::GraphicsSceneMouseMove,
         QEvent::GraphicsSceneMouseRelease,
-        QEvent::GraphicsSceneMouseDoubleClick
-    );
+        QEvent::GraphicsSceneMouseDoubleClick,
+        QEvent::GraphicsSceneHoverEnter,
+        QEvent::GraphicsSceneHoverMove,
+        QEvent::GraphicsSceneHoverLeave
+    };
 
+    Instrument::EventTypeSet mouseEventTypes = Instrument::makeSet(mouseEventTypeArray);
     Instrument::EventTypeSet wheelEventTypes = Instrument::makeSet(QEvent::GraphicsSceneWheel);
 
     /* Install and configure instruments. */
@@ -73,9 +78,11 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
 
     m_rubberBandInstrument->setRubberBandZValue(m_display->layerZValue(QnWorkbenchDisplay::EFFECTS_LAYER));
     m_rotationInstrument->setRotationItemZValue(m_display->layerZValue(QnWorkbenchDisplay::EFFECTS_LAYER));
+    m_resizingInstrument->setEffectiveDistance(5);
 
     /* Item instruments. */
     m_manager->installInstrument(new StopInstrument(Instrument::ITEM, mouseEventTypes, this));
+    m_manager->installInstrument(m_resizingInstrument->resizeHoverInstrument());
     m_manager->installInstrument(new SelectionFixupInstrument(this));
     m_manager->installInstrument(itemMouseForwardingInstrument);
     m_manager->installInstrument(itemClickInstrument);

@@ -5,6 +5,7 @@
 #include "dragprocessinginstrument.h"
 
 class ConstrainedResizable;
+class ResizeHoverInstrument;
 
 /**
  * This instrument implements resizing of QGraphicsWidget. 
@@ -32,6 +33,18 @@ public:
     ResizingInstrument(QObject *parent = NULL);
     virtual ~ResizingInstrument();
 
+    ResizeHoverInstrument *resizeHoverInstrument() const {
+        return m_resizeHoverInstrument;
+    }
+
+    int effectiveDistance() const {
+        return m_effectiveDistance;
+    }
+
+    void setEffectiveDistance(int effectiveDistance) {
+        m_effectiveDistance = effectiveDistance;
+    }
+
 signals:
     void resizingProcessStarted(QGraphicsView *view, QGraphicsWidget *widget);
     void resizingStarted(QGraphicsView *view, QGraphicsWidget *widget);
@@ -40,6 +53,7 @@ signals:
 
 protected:
     virtual bool mousePressEvent(QWidget *viewport, QMouseEvent *event) override;
+    virtual bool paintEvent(QWidget *viewport, QPaintEvent *event) override;
 
     virtual void startDragProcess(DragInfo *info) override;
     virtual void startDrag(DragInfo *info) override;
@@ -48,6 +62,8 @@ protected:
     virtual void finishDragProcess(DragInfo *info) override;
 
 private:
+    ResizeHoverInstrument *m_resizeHoverInstrument;
+    int m_effectiveDistance;
     QRectF m_startGeometry;
     bool m_resizingStartedEmitted;
     Qt::WindowFrameSection m_section;

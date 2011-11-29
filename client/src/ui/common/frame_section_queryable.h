@@ -70,6 +70,55 @@ public:
      * \returns                         Window frame sections that intersect the given region. 
      */
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const = 0;
+
+    /**
+     * This function calculates frame section with the highest priority that
+     * intersects the given region. Section are prioritized in "natural" order,
+     * e.g. corner sections are prioritized over side ones.
+     *
+     * \param region                    Region to get prioritized section for.
+     * \returns                         Window frame section with highest priority that intersects the given region.
+     */
+    Qt::WindowFrameSection windowFrameSectionAt(const QRectF &region) const {
+        Qn::WindowFrameSections sections = windowFrameSectionsAt(region);
+
+        if(sections == 0) { /* Filter out the most common case first. */
+            return Qt::NoSection;
+        } else if(sections & (Qn::TopLeftSection | Qn::BottomRightSection | Qn::TopRightSection | Qn::BottomLeftSection)) {
+            if(sections & (Qn::TopLeftSection | Qn::BottomRightSection)) {
+                if(sections & Qn::BottomRightSection) {
+                    return Qt::BottomRightSection;
+                } else {
+                    return Qt::TopLeftSection;
+                }
+            } else if(sections & Qn::TopRightSection | Qn::BottomLeftSection) {
+                if(sections & Qn::TopRightSection) {
+                    return Qt::TopRightSection;
+                } else {
+                    return Qt::BottomLeftSection;
+                }
+            }
+        } else if(sections & (Qn::LeftSection | Qn::RightSection | Qn::TopSection | Qn::BottomSection)) {
+            if(sections & (Qn::LeftSection | Qn::RightSection)) {
+                if(sections & Qn::RightSection) {
+                    return Qt::RightSection;
+                } else {
+                    return Qt::LeftSection;
+                }
+            } else if(sections & Qn::TopSection | Qn::BottomSection) {
+                if(sections & Qn::BottomSection) {
+                    return Qt::BottomSection;
+                } else {
+                    return Qt::TopSection;
+                }
+            }
+        } else if(sections & Qn::TitleBarArea) {
+            return Qt::TitleBarArea;
+        } else {
+            qnWarning("Invalid Qn::WindowFrameSections '%1'.", static_cast<int>(sections));
+            return Qt::NoSection;
+        }
+    }
 };
 
 #endif // QN_FRAME_SECTION_QUERYABLE_H
