@@ -6,8 +6,6 @@ namespace {
     template<class Base>
     class Object: public Base {
     public:
-        friend class ForwardingInstrument;
-
         bool processEvent(QEvent *event) {
             return this->event(event);
         }
@@ -24,8 +22,6 @@ namespace {
 
     class GraphicsItem: public QGraphicsItem {
     public:
-        friend class ForwardingInstrument;
-
         bool processSceneEvent(QEvent *event) {
             return this->sceneEvent(event);
         }
