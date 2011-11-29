@@ -2,6 +2,7 @@
 #define QN_INSTRUMENT_H
 
 #include <functional> /* For std::unary_function. */
+#include <QScopedPointer>
 #include <QObject>
 #include <QEvent> /* For QEvent::Type. */
 #include <QSet>
@@ -39,6 +40,7 @@ class QGraphicsItem;
 class QGraphicsScene;
 class QPoint;
 
+class AbstractAnimationTimer;
 class AnimationEvent;
 class InstrumentManager;
 class InstrumentItemEventDispatcher;
@@ -439,6 +441,14 @@ protected:
     }
     
     /**
+     * \returns                         Animation timer for this instrument that is
+     *                                  synced with paint events. For it to be functional,
+     *                                  this instrument must be subscribed to <tt>Animation</tt>
+     *                                  viewport event.
+     */
+    AbstractAnimationTimer *animationTimer();
+
+    /**
      * Extension point for instrument enabling.
      */
     virtual void enabledNotify() {}
@@ -544,7 +554,7 @@ protected:
     virtual bool helpEvent(QWidget *, QGraphicsSceneHelpEvent *) { return false; }
 
     /* Global animation event. Considered a viewport event. */
-    virtual bool animationEvent(AnimationEvent *) { return false; };
+    virtual bool animationEvent(AnimationEvent *event);
 
     /* Graphics view event filtering functions. */
     virtual bool event(QGraphicsView *, QEvent *);
@@ -675,6 +685,7 @@ private:
 private:
     InstrumentManager *m_manager;
     QGraphicsScene *m_scene;
+    QScopedPointer<AbstractAnimationTimer> m_animationTimer;
     EventTypeSet m_watchedEventTypes[WATCHED_TYPE_COUNT];
     int m_disabledCounter;
 };

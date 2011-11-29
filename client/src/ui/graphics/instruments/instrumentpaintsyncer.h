@@ -4,7 +4,7 @@
 #include <QObject>
 #include <ui/animation/animation_timer.h>
 
-class InstrumentPaintSyncer: public QObject, public AbstractAnimationTimer, protected AnimationTimerListener {
+class InstrumentPaintSyncer: public QObject, public AbstractAnimationTimer, public AnimationTimerListener {
 public:
     InstrumentPaintSyncer(QObject *parent = NULL);
 

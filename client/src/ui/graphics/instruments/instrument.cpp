@@ -29,13 +29,15 @@
 #include <QGraphicsSceneHelpEvent>
 #include <QGraphicsSceneHoverEvent>
 #include <ui/animation/animation_event.h>
+#include <ui/animation/animation_timer.h>
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 #include "instrumentmanager.h"
 
 
 Instrument::Instrument(const EventTypeSet &viewportEventTypes, const EventTypeSet &viewEventTypes, const EventTypeSet &sceneEventTypes, const EventTypeSet &itemEventTypes, QObject *parent):
-    QObject(parent)
+    QObject(parent),
+    m_animationTimer(NULL)
 {
     initialize();
 
@@ -379,4 +381,21 @@ bool Instrument::dispatchEvent(QGraphicsItem *watched, QEvent *event) {
     default:
         return false;
     }
+}
+
+bool Instrument::animationEvent(AnimationEvent *event) {
+    /* Automagic support for paint-synced animations. */
+    if(m_animationTimer.isNull())
+        return false;
+
+    m_animationTimer->updateCurrentTime(event->time());
+}
+
+AbstractAnimationTimer *Instrument::animationTimer() {
+    if(m_animationTimer.isNull()) {
+        m_animationTimer.reset(new AbstractAnimationTimer());
+        m_animationTimer->activate();
+    }
+        
+    return m_animationTimer.data();
 }

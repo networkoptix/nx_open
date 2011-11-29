@@ -104,7 +104,7 @@ private:
  * processor is destroyed.
  */
 template<class T>
-class KineticProcessor : public QObject, protected AnimationTimerListener {
+class KineticProcessor : public QObject, public AnimationTimerListener {
 public:
     /**
      * Kinetic state.

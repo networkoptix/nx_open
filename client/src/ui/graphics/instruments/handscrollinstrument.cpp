@@ -5,15 +5,17 @@
 #include <QGraphicsView>
 #include <QApplication>
 #include <ui/processors/kineticcuttingprocessor.h>
+#include <ui/animation/animation_event.h>
 
 HandScrollInstrument::HandScrollInstrument(QObject *parent):
-    DragProcessingInstrument(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease), parent)
+    DragProcessingInstrument(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, AnimationEvent::Animation), parent)
 {
     KineticCuttingProcessor<QPointF> *processor = new KineticCuttingProcessor<QPointF>(this);
     processor->setHandler(this);
     processor->setMaxShiftInterval(0.01);
     processor->setSpeedCuttingThreshold(128); /* In pixels per second. */
-    kineticProcessor()->setFriction(128);
+    processor->setFriction(128);
+    animationTimer()->addListener(processor);
 }
 
 HandScrollInstrument::~HandScrollInstrument() {
@@ -61,8 +63,6 @@ void HandScrollInstrument::kineticMove(const QPointF &distance) {
     QGraphicsView *view = m_currentView.data();
     if(view == NULL)
         return;
-
-    //qDebug() << "KINETIC" << QDateTime::currentMSecsSinceEpoch() << distance;
 
     moveViewportF(view, distance);
 }

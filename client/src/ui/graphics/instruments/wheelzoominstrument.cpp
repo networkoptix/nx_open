@@ -3,6 +3,7 @@
 #include <QGraphicsSceneWheelEvent>
 #include <QGraphicsView>
 #include <ui/processors/kineticcuttingprocessor.h>
+#include <ui/animation/animation_event.h>
 
 namespace {
     const qreal degreesFor2x = 180.0;
@@ -10,7 +11,7 @@ namespace {
 
 WheelZoomInstrument::WheelZoomInstrument(QObject *parent): 
     Instrument(
-        makeSet(QEvent::Wheel), 
+        makeSet(QEvent::Wheel, AnimationEvent::Animation), 
         makeSet(),
         makeSet(QEvent::GraphicsSceneWheel),
         makeSet(),
@@ -23,6 +24,7 @@ WheelZoomInstrument::WheelZoomInstrument(QObject *parent):
     processor->setFriction(degreesFor2x / 2);
     processor->setMaxSpeedMagnitude(degreesFor2x * 8);
     processor->setSpeedCuttingThreshold(degreesFor2x / 4);
+    animationTimer()->addListener(processor);
 }
 
 bool WheelZoomInstrument::wheelEvent(QWidget *viewport, QWheelEvent *) {
