@@ -15,7 +15,6 @@ static const int FFMPEG_PROBE_BUFFER_SIZE = 1024 * 512;
 QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     QnAbstractArchiveReader(dev),
     m_currentTime(0),
-    m_previousTime(-1),
     m_primaryVideoIdx(-1),
     m_audioStreamIndex(-1),
     mFirstTime(true),
@@ -154,8 +153,6 @@ bool QnArchiveStreamReader::init()
 {
     setCurrentTime(0);
 
-	m_previousTime = -1;
-
     if (!m_delegate->open(m_resource))
         return false;
     m_delegate->setAudioChannel(m_selectedAudioChannel);
@@ -248,6 +245,7 @@ begin_label:
         m_skipFramesToTime = m_tmpSkipFramesToTime;
         m_tmpSkipFramesToTime = 0;
         m_requiredJumpTime = AV_NOPTS_VALUE;
+        m_nextData.clear();
         m_jumpMtx.unlock();
 
         intChanneljumpTo(jumpTime, 0);
@@ -270,6 +268,7 @@ begin_label:
         if (!delegateForNegativeSpeed) {
             m_lastGopSeekTime = -1;
             intChanneljumpTo(displayTime, 0);
+            m_nextData.clear();
             if (reverseMode)
                 m_topIFrameTime = displayTime;
             else
@@ -282,11 +281,6 @@ begin_label:
 	
     if (m_skipFramesToTime != 0)
         m_lastGopSeekTime = -1; // after user seek
-
-    if (m_nextData && m_previousTime == -1)
-    {
-        m_nextData = QnAbstractMediaDataPtr();
-    }
 
 	// If there is no nextPacket - read it from file, otherwise use saved packet
     if (m_nextData) {
@@ -301,7 +295,6 @@ begin_label:
         return m_currentData;
 
     videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(m_currentData);
-    m_previousTime = m_currentTime;
 
     if (m_currentData->timestamp != AV_NOPTS_VALUE) {
         setCurrentTime(m_currentData->timestamp);
@@ -542,7 +535,6 @@ void QnArchiveStreamReader::intChanneljumpTo(qint64 mksec, int /*channel*/)
         m_delegate->open(m_resource);
     }
 
-	m_previousTime = -1;
 	m_wakeup = true;
     m_bottomIFrameTime = -1;
     m_topIFrameTime = mksec;
