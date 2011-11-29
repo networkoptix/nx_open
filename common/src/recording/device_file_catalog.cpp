@@ -37,7 +37,10 @@ bool DeviceFileCatalog::lastFileDuplicateName() const
 
 bool DeviceFileCatalog::fileExists(const Chunk& chunk)
 {
-    QString prefix = closeDirPath(qnStorageMan->storageRoot(chunk.storageIndex)->getUrl()) + m_macAddress + QString('/');
+    QnResourcePtr storage = qnStorageMan->storageRoot(chunk.storageIndex);
+    if (!storage)
+        return false;
+    QString prefix = closeDirPath(storage->getUrl()) + m_macAddress + QString('/');
 
 
     QDateTime fileDate = QDateTime::fromMSecsSinceEpoch(chunk.startTime/1000);
@@ -239,7 +242,10 @@ int DeviceFileCatalog::findFileIndex(qint64 startTime, FindMethod method) const
 QString DeviceFileCatalog::fullFileName(const Chunk& chunk) const
 {
     QMutexLocker lock(&m_mutex);
-    return closeDirPath(qnStorageMan->storageRoot(chunk.storageIndex)->getUrl()) + 
+    QnResourcePtr storage = qnStorageMan->storageRoot(chunk.storageIndex);
+    if (!storage)
+        return QString();
+    return closeDirPath(storage->getUrl()) + 
                 m_macAddress + QString('/') +
                 QnStorageManager::dateTimeStr(chunk.startTime) + 
                 strPadLeft(QString::number(chunk.fileIndex), 3, '0') + 

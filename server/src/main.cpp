@@ -54,11 +54,24 @@ void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args
     cl_log.log(QLatin1String("FFMPEG "), QString::fromLocal8Bit(szMsg), cl_logERROR);
 }
 
-QString localAddress(const QString& target)
+QString defaultLocalAddress(const QString& target)
 {
-    QUdpSocket socket;
-    socket.connectToHost(target, 53);
-    return socket.localAddress().toString();
+    {
+        QUdpSocket socket;
+        socket.connectToHost(target, 53);
+
+        if (socket.localAddress() != QHostAddress::LocalHost)
+            return socket.localAddress().toString();
+    }
+
+    {
+        // try select default interface
+
+        QUdpSocket socket;
+        socket.connectToHost("8.8.8.8", 53);
+
+        return socket.localAddress().toString();
+    }
 }
 
 QString localMac(const QString& myAddress)
@@ -88,14 +101,16 @@ QString serverId()
     return QSettings().value("serverId").toString();
 }
 
-void registerServer(QnAppServerConnection& appServerConnection, const QString& myAddress)
+QnVideoServerPtr registerServer(QnAppServerConnection& appServerConnection, const QString& myAddress)
 {
     QSettings settings;
 
     QnVideoServer server;
-    server.setId(serverId());
-    server.setName(QString("Server ") + myAddress);
 
+    // If there is already stored server with this id, other parameters will be ignored
+    server.setId(serverId());
+
+    server.setName(QString("Server ") + myAddress);
     server.setUrl(QString("rtsp://") + myAddress + QString(':') + QString::number(DEFAUT_RTSP_PORT));
     server.setApiUrl(QString("http://") + myAddress + QString(':') + QString::number(DEFAULT_REST_PORT));
 
@@ -105,6 +120,8 @@ void registerServer(QnAppServerConnection& appServerConnection, const QString& m
     Q_ASSERT(!servers.isEmpty());
 
     settings.setValue("serverId", servers.at(0)->getId().toString());
+
+    return servers.at(0);
 }
 
 void stopServer(int signal)
@@ -216,6 +233,7 @@ int main(int argc, char *argv[])
 //    settings.setValue("appserverAddress", "127.0.0.1");
 
     QUrl appserverUrl = QUrl(QSettings().value("appserverUrl", QLatin1String(DEFAULT_APPSERVER_URL)).toString());
+    cl_log.log("Connection to application server ", appserverUrl.toString(), cl_logALWAYS);
 
     QHostAddress host(appserverUrl.host());
     int port = appserverUrl.port();
@@ -233,14 +251,17 @@ int main(int argc, char *argv[])
 
     qnResTypePool->addResourceTypeList(resourceTypeList);
 
-    registerServer(appServerConnection, localAddress(appserverUrl.host()));
+    QnVideoServerPtr videoServer = registerServer(appServerConnection, defaultLocalAddress(appserverUrl.host()));
 
     QnAppserverResourceProcessor processor(QnId(serverId()), host, port, auth, QnResourceDiscoveryManager::instance());
 
-    QnRtspListener rtspListener(QHostAddress::Any, DEFAUT_RTSP_PORT);
+    QUrl rtspUrl(videoServer->getUrl());
+    QUrl apiUrl(videoServer->getApiUrl());
+
+    QnRtspListener rtspListener(QHostAddress::Any, rtspUrl.port());
     rtspListener.start();
 
-    QnRestServer restServer(QHostAddress::Any, DEFAULT_REST_PORT);
+    QnRestServer restServer(QHostAddress::Any, apiUrl.port());
     restServer.registerHandler("api/RecordedTimePeriods", new QnRecordedChunkListHandler());
     restServer.registerHandler("xsd/*", new QnXsdHelperHandler());
 

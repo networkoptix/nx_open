@@ -58,11 +58,10 @@ public:
 
     void setExternalTimeSource(QnlTimeSource* value);
 
-    virtual void putData(QnAbstractDataPacketPtr data);
-
 public slots:
     void onBeforeJump(qint64 time);
-    void onJumpOccured(qint64 time); 
+    void onJumpOccured(qint64 time);
+    void onJumpCanceled(qint64 time);
     void onRealTimeStreamHint(bool value);
     void onSlowSourceHint();
     void onReaderPaused();
@@ -88,7 +87,6 @@ private:
     void afterJump(qint64 new_time);
     void processNewSpeed(float speed);
     bool useSync(QnCompressedVideoDataPtr vd);
-    void safeSleep(qint64 value);
 private:
 	QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];
 
@@ -150,7 +148,8 @@ private:
     mutable QMutex m_timeMutex;
     bool m_useMtDecoding;
     bool m_buffering;
-    //bool m_firstDelayCycle;
+    int m_executingJump;
+    int skipPrevJumpSignal;
 };
 
 #endif //clcam_display_h_1211

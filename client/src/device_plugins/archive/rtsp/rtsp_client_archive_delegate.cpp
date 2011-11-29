@@ -182,6 +182,16 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
             if (result->flags & QnAbstractMediaData::MediaFlags_BOF &&
                 ((result->flags & QnAbstractMediaData::MediaFlags_LIVE) ||  m_sendedCSec == result->opaque))
             {
+                if (qAbs(result->timestamp - m_lastSeekTime) > 1000ll*1000*10)
+                {
+                    QString s;
+                    QTextStream str(&s);
+                    str << "recvSsrc=" << m_sendedCSec 
+                        << " expectedTime=" << QDateTime::fromMSecsSinceEpoch(m_lastSeekTime/1000).toString("hh:mm:ss.zzz")
+                        << " packetTime=" << QDateTime::fromMSecsSinceEpoch(result->timestamp/1000).toString("hh:mm:ss.zzz");
+                    str.flush();
+                    cl_log.log(s, cl_logALWAYS);
+                }
                 m_waitBOF = false;
             }
             else
@@ -204,6 +214,16 @@ qint64 QnRtspClientArchiveDelegate::seek(qint64 time)
     m_rtspSession.sendPlay(time, m_singleShotMode ? time : AV_NOPTS_VALUE, m_rtspSession.getScale());
     m_sendedCSec = m_rtspSession.lastSendedCSeq();
     m_waitBOF = true;
+	/*
+    QString s;
+    QTextStream str(&s);
+    m_lastSeekTime = time/1000;
+    str << "seek to " << QDateTime::fromMSecsSinceEpoch(time/1000).toString("hh:mm:ss.zzz") << " ssrc= " << m_sendedCSec;
+    str.flush();
+  	cl_log.log(s, cl_logALWAYS);
+	*/
+    m_lastSeekTime = time;
+	
     return time;
 }
 
