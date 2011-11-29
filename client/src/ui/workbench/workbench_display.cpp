@@ -54,11 +54,11 @@ namespace {
         *deltaEnd = newEnd - end;
     }
 
-    /** Size multiplier for focused widgets. */
-    const qreal focusExpansion = 1.5;
+    /** Size multiplier for raised widgets. */
+    const qreal focusExpansion = 100.0;
 
-    /** Maximal expanded size of a focused widget, relative to viewport size. */
-    const qreal maxExpandedSize = 0.8;
+    /** Maximal expanded size of a raised widget, relative to viewport size. */
+    const qreal maxExpandedSize = 0.5;
 
     /** Viewport lower size boundary, in scene coordinates. */
     const QSizeF viewportLowerSizeBound = QSizeF(8.0, 8.0);
