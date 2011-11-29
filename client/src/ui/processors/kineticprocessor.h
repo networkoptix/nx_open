@@ -135,7 +135,7 @@ public:
         mMaxSpeedMagnitude(std::numeric_limits<qreal>::max()),
         mFriction(1.0)
     {
-        mTimer->setListener(this);
+        mTimer->addListener(this);
       
         reset();
     }
@@ -392,20 +392,16 @@ protected:
         return speed * (newMagnitude / oldMagnitude);
     }
 
-    virtual void tick(int currentTimeMSec) override {
+    virtual void tick(int deltaTimeMSec) override {
         /* Update current speed. */
         T speedGain = calculateSpeed();
-        qreal dt = (currentTimeMSec - mLastTickTimeMSec) / 1000.0;
+        qreal dt = deltaTimeMSec / 1000.0;
         mCurrentSpeed = updateSpeed(mInitialSpeed, mCurrentSpeed, speedGain, dt);
 
         /* Adjust for max magnitude. */
         qreal currentSpeedMagnitude = magnitude(mCurrentSpeed);
         if(currentSpeedMagnitude > mMaxSpeedMagnitude)
             mCurrentSpeed = mCurrentSpeed * (mMaxSpeedMagnitude / currentSpeedMagnitude);
-
-        qDebug() << mCurrentSpeed;
-
-        mLastTickTimeMSec = currentTimeMSec;
 
         if(magnitude(mCurrentSpeed) <= mMinSpeedMagnitude) {
             reset();
@@ -424,16 +420,14 @@ protected:
 
         switch(state) {
         case MEASURING: /* KINETIC -> MEASURING. */
-            mTimer->stop();
+            mTimer->deactivate();
             if(mHandler != NULL)
                 mHandler->finishKinetic();
             return;
         case KINETIC: /* MEASURING -> KINETIC. */
             mInitialSpeed = mCurrentSpeed = calculateSpeed();
-            mLastTickTimeMSec = 0;
-            mTimer->setCurrentTime(0);
             if(mState == state) { /* State may get changed in a callback. */
-                mTimer->start();
+                mTimer->activate();
                 if(mState == state && mHandler != NULL) /* And again, state may have changed. */
                     mHandler->startKinetic();
             }
@@ -454,9 +448,6 @@ protected:
 
     /** Last time a shift was recorded. */
     qint64 mLastShiftTimeMSec;
-
-    /** Last time that was passed to tick(). */
-    int mLastTickTimeMSec;
 
     /** Speed at the beginning of kinetic motion. */
     T mInitialSpeed;

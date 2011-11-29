@@ -97,6 +97,13 @@ private:
         return instrument->sceneEvent(target, event);
     }
 
+    /**
+     * Dispatch function for animation events.
+     */
+    /*bool dispatch(Instrument *instrument, QWidget *viewport, AnimationEvent *event) const {
+        return instrument->animationEvent(event);
+    }*/
+
     bool registeredNotify(Instrument *, QGraphicsScene *) const {
         return true;
     }

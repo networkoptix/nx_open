@@ -3,7 +3,7 @@
 #include <cmath> /* For std::log, std::exp, std::abs. */
 #include <limits>
 #include <QGraphicsView>
-#include <QScrollBar>
+#include <QDateTime>
 #include <utils/common/warnings.h>
 #include "instrumentmanager.h"
 
@@ -55,10 +55,6 @@ namespace {
         }
 
         return result;
-    }
-
-    QPointF toPoint(const QSizeF &size) {
-        return QPointF(size.width(), size.height());
     }
 
     qreal speedMultiplier(qreal t, qreal oneAt) {
@@ -139,10 +135,33 @@ public:
         }
     }
 
+    bool enforceNeeded() const {
+        assert(m_view != NULL);
+
+        if(!m_isPositionEnforced && !m_isSizeEnforced)
+            return false;
+
+        ensureParameters();
+
+        if(m_isSizeEnforced && (m_upperScale > 1.0 || m_lowerScale < 1.0))
+            return true;
+
+        if(m_isPositionEnforced && !m_centerPositionBounds.contains(m_center)) {
+            QPointF direction = -calculateDistance(m_centerPositionBounds, m_center);
+            if(!qFuzzyIsNull(direction))
+                return true;
+        }
+
+        return false;
+    }
+
     void enforce(qreal dt) {
         assert(m_view != NULL);
 
         if(!m_isPositionEnforced && !m_isSizeEnforced)
+            return;
+
+        if(qFuzzyIsNull(dt))
             return;
 
         ensureParameters();
@@ -168,7 +187,7 @@ public:
         if(m_isPositionEnforced && !m_centerPositionBounds.contains(m_center)) {
             QPointF direction = -calculateDistance(m_centerPositionBounds, m_center);
             if(!qFuzzyIsNull(direction)) {
-                QPointF speed = m_movementSpeed * toPoint(m_sceneViewportRect.size());
+                QPointF speed = m_movementSpeed * QnSceneUtility::toPoint(m_sceneViewportRect.size());
                 QPointF delta = QPointF(
                     dt * speed.x() * speedMultiplier(direction.x(), m_sceneViewportRect.width()),
                     dt * speed.y() * speedMultiplier(direction.y(), m_sceneViewportRect.height())
@@ -179,6 +198,8 @@ public:
 
                 if(std::abs(delta.y()) > std::abs(direction.y()))
                     delta.ry() = direction.y();
+
+                qDebug() << "ENFORCE" << QDateTime::currentMSecsSinceEpoch() << delta;
 
                 QnSceneUtility::moveViewport(m_view, delta);
             }
@@ -241,6 +262,14 @@ public:
             updateParameters();
             updateSceneRect();
         }
+    }
+
+    qint64 lastTickTime() const {
+        return m_lastTickTime;
+    }
+
+    void setLastTickTime(qint64 lastTickTime) {
+        m_lastTickTime = lastTickTime;
     }
 
 protected:
@@ -339,6 +368,9 @@ public:
     /** Viewport rectangle, in viewport coordinates. */
     QRect m_viewportRect;
 
+    /** Last time the timer ticked. */
+    qint64 m_lastTickTime;
+
     /** Whether stored parameter values are valid. */
     mutable bool m_parametersValid;
 
@@ -361,10 +393,9 @@ public:
 
 BoundingInstrument::BoundingInstrument(QObject *parent):
     Instrument(VIEWPORT, makeSet(QEvent::Paint), parent),
-    m_timer(new AnimationTimer(this)),
-    m_lastTickTime(0)
+    m_timer(new AnimationTimer(this))
 {
-    m_timer->setListener(this);
+    m_timer->addListener(this);
 
     m_data[NULL] = new ViewData(NULL);
 }
@@ -377,17 +408,20 @@ BoundingInstrument::~BoundingInstrument() {
 }
 
 void BoundingInstrument::enabledNotify() {
-    foreach(ViewData *d, m_data)
-        if(d->view() != NULL)
-            d->update();
+    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
 
-    m_lastTickTime = 0;
-    m_timer->setCurrentTime(0); /* This call will invoke tick(), so we must set m_lastTickTime beforehand. */
-    m_timer->start();
+    foreach(ViewData *d, m_data) {
+        if(d->view() != NULL) {
+            d->update();
+            d->setLastTickTime(currentTime);
+        }
+    }
+
+    m_timer->activate();
 }
 
 void BoundingInstrument::aboutToBeDisabledNotify() {
-    m_timer->stop();    
+    m_timer->deactivate();    
 }
 
 bool BoundingInstrument::registeredNotify(QGraphicsView *view) {
@@ -409,18 +443,14 @@ void BoundingInstrument::unregisteredNotify(QGraphicsView *view) {
     delete d;
 }
 
-void BoundingInstrument::tick(int currentTime) {
-    qreal dt = (currentTime - m_lastTickTime) / 1000.0;
-
+void BoundingInstrument::tick(int /*deltaTime*/) {
     foreach(ViewData *d, m_data) {
         if(d->view() == NULL)
             continue;
 
-        d->correct();
-        d->enforce(dt);
+        if(d->enforceNeeded())
+            d->view()->update();
     }
-
-    m_lastTickTime = currentTime;
 }
 
 bool BoundingInstrument::paintEvent(QWidget *viewport, QPaintEvent *) {
@@ -430,7 +460,12 @@ bool BoundingInstrument::paintEvent(QWidget *viewport, QPaintEvent *) {
     if(d == NULL)
         return false;
 
+    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+    qreal dt = (currentTime - d->lastTickTime()) / 1000.0;
+    d->setLastTickTime(currentTime);
+
     d->correct();
+    d->enforce(dt);
 
     return false;
 }

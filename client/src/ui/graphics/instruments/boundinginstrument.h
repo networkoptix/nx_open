@@ -76,7 +76,7 @@ protected:
 
     virtual bool paintEvent(QWidget *viewport, QPaintEvent *event) override;
 
-    virtual void tick(int currentTime) override;
+    virtual void tick(int deltaTime) override;
 
 private:
     class ViewData;
@@ -89,9 +89,6 @@ private:
 
     /** Animation timer. */
     AnimationTimer *m_timer;
-
-    /** Last animation tick time. */
-    int m_lastTickTime;
 };
 
 #endif // QN_BOUNDING_INSTRUMENT_H

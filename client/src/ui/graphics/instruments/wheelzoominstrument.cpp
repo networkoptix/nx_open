@@ -30,7 +30,7 @@ bool WheelZoomInstrument::wheelEvent(QWidget *viewport, QWheelEvent *) {
     return false;
 }
 
-bool WheelZoomInstrument::wheelEvent(QGraphicsScene *scene, QGraphicsSceneWheelEvent *event) {
+bool WheelZoomInstrument::wheelEvent(QGraphicsScene *, QGraphicsSceneWheelEvent *event) {
     QWidget *viewport = m_currentViewport.data();
     if(viewport == NULL)
         return false;

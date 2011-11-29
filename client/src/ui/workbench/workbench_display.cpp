@@ -120,7 +120,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
 
     /* Configure viewport updates. */
     m_updateTimer = new AnimationTimer(this);
-    m_updateTimer->setListener(this);
+    m_updateTimer->addListener(this);
 
     /* Create curtain animator. */
     m_curtainAnimator = new QnCurtainAnimator(1000, this);
@@ -268,7 +268,7 @@ void QnWorkbenchDisplay::setView(QGraphicsView *view) {
         m_viewportAnimator->setView(NULL);
 
         /* Stop viewport updates. */
-        m_updateTimer->stop();
+        m_updateTimer->deactivate();
     }
 
     m_view = view;
@@ -320,7 +320,7 @@ void QnWorkbenchDisplay::setView(QGraphicsView *view) {
         m_viewportAnimator->setView(m_view);
 
         /* Start viewport updates. */
-        m_updateTimer->start();
+        m_updateTimer->activate();
     }
 }
 
@@ -715,7 +715,7 @@ void QnWorkbenchDisplay::synchronizeSceneBounds() {
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: handlers
 // -------------------------------------------------------------------------- //
-void QnWorkbenchDisplay::tick(int /*currentTime*/) {
+void QnWorkbenchDisplay::tick(int /*deltaTime*/) {
     assert(m_view != NULL);
 
     m_view->viewport()->update();

@@ -502,45 +502,48 @@ protected:
      */
     virtual void unregisteredNotify(QGraphicsItem *item) { Q_UNUSED(item); }
 
-    /* Graphics scene event filtering functions. */
-    virtual bool event(QGraphicsScene *, QEvent *);
-    virtual bool mouseMoveEvent(QGraphicsScene *, QMouseEvent *) { return false; }
-    virtual bool mousePressEvent(QGraphicsScene *, QMouseEvent *) { return false; }
-    virtual bool mouseReleaseEvent(QGraphicsScene *, QMouseEvent *) { return false; }
-    virtual bool mouseDoubleClickEvent(QGraphicsScene *, QMouseEvent *) { return false; }
-    virtual bool wheelEvent(QGraphicsScene *, QWheelEvent *) { return false; }
-    virtual bool tabletEvent(QGraphicsScene *, QTabletEvent *) { return false; }
-    virtual bool keyPressEvent(QGraphicsScene *, QKeyEvent *) { return false; }
-    virtual bool keyReleaseEvent(QGraphicsScene *, QKeyEvent *) { return false; }
-    virtual bool inputMethodEvent(QGraphicsScene *, QInputMethodEvent *) { return false; }
-    virtual bool focusInEvent(QGraphicsScene *, QFocusEvent *) { return false; }
-    virtual bool focusOutEvent(QGraphicsScene *, QFocusEvent *) { return false; }
-    virtual bool enterEvent(QGraphicsScene *, QEvent *) { return false; }
-    virtual bool leaveEvent(QGraphicsScene *, QEvent *) { return false; }
-    virtual bool paintEvent(QGraphicsScene *, QPaintEvent *) { return false; }
-    virtual bool moveEvent(QGraphicsScene *, QMoveEvent *) { return false; }
-    virtual bool resizeEvent(QGraphicsScene *, QResizeEvent *) { return false; }
-    virtual bool closeEvent(QGraphicsScene *, QCloseEvent *) { return false; }
-    virtual bool contextMenuEvent(QGraphicsScene *, QContextMenuEvent *) { return false; }
-    virtual bool dropEvent(QGraphicsScene *, QDropEvent *) { return false; }
-    virtual bool dragEnterEvent(QGraphicsScene *, QDragEnterEvent *) { return false; }
-    virtual bool dragMoveEvent(QGraphicsScene *, QDragMoveEvent *) { return false; }
-    virtual bool dragLeaveEvent(QGraphicsScene *, QDragLeaveEvent *) { return false; }
-    virtual bool showEvent(QGraphicsScene *, QShowEvent *) { return false; }
-    virtual bool hideEvent(QGraphicsScene *, QHideEvent *) { return false; }
-    virtual bool changeEvent(QGraphicsScene *, QEvent *) { return false; }
-    virtual bool actionEvent(QGraphicsScene *, QActionEvent *) { return false; }
-    virtual bool dragEnterEvent(QGraphicsScene *, QGraphicsSceneDragDropEvent *) { return false; }
-    virtual bool dragMoveEvent(QGraphicsScene *, QGraphicsSceneDragDropEvent *) { return false; }
-    virtual bool dragLeaveEvent(QGraphicsScene *, QGraphicsSceneDragDropEvent *) { return false; }
-    virtual bool dropEvent(QGraphicsScene *, QGraphicsSceneDragDropEvent *) { return false; }
-    virtual bool contextMenuEvent(QGraphicsScene *, QGraphicsSceneContextMenuEvent *) { return false; }
-    virtual bool mouseMoveEvent(QGraphicsScene *, QGraphicsSceneMouseEvent *) { return false; }
-    virtual bool mousePressEvent(QGraphicsScene *, QGraphicsSceneMouseEvent *) { return false; }
-    virtual bool mouseReleaseEvent(QGraphicsScene *, QGraphicsSceneMouseEvent *) { return false; }
-    virtual bool mouseDoubleClickEvent(QGraphicsScene *, QGraphicsSceneMouseEvent *) { return false; }
-    virtual bool wheelEvent(QGraphicsScene *, QGraphicsSceneWheelEvent *) { return false; }
-    virtual bool helpEvent(QGraphicsScene *, QGraphicsSceneHelpEvent *) { return false; }
+    /* Graphics view's viewport event filtering functions. */
+    virtual bool event(QWidget *, QEvent *);
+    virtual bool mouseMoveEvent(QWidget *, QMouseEvent *) { return false; }
+    virtual bool mousePressEvent(QWidget *, QMouseEvent *) { return false; }
+    virtual bool mouseReleaseEvent(QWidget *, QMouseEvent *) { return false; }
+    virtual bool mouseDoubleClickEvent(QWidget *, QMouseEvent *) { return false; }
+    virtual bool wheelEvent(QWidget *, QWheelEvent *) { return false; }
+    virtual bool tabletEvent(QWidget *, QTabletEvent *) { return false; }
+    virtual bool keyPressEvent(QWidget *, QKeyEvent *) { return false; }
+    virtual bool keyReleaseEvent(QWidget *, QKeyEvent *) { return false; }
+    virtual bool inputMethodEvent(QWidget *, QInputMethodEvent *) { return false; }
+    virtual bool focusInEvent(QWidget *, QFocusEvent *) { return false; }
+    virtual bool focusOutEvent(QWidget *, QFocusEvent *) { return false; }
+    virtual bool enterEvent(QWidget *, QEvent *) { return false; }
+    virtual bool leaveEvent(QWidget *, QEvent *) { return false; }
+    virtual bool paintEvent(QWidget *, QPaintEvent *) { return false; }
+    virtual bool moveEvent(QWidget *, QMoveEvent *) { return false; }
+    virtual bool resizeEvent(QWidget *, QResizeEvent *) { return false; }
+    virtual bool closeEvent(QWidget *, QCloseEvent *) { return false; }
+    virtual bool contextMenuEvent(QWidget *, QContextMenuEvent *) { return false; }
+    virtual bool dropEvent(QWidget *, QDropEvent *) { return false; }
+    virtual bool dragEnterEvent(QWidget *, QDragEnterEvent *) { return false; }
+    virtual bool dragMoveEvent(QWidget *, QDragMoveEvent *) { return false; }
+    virtual bool dragLeaveEvent(QWidget *, QDragLeaveEvent *) { return false; }
+    virtual bool showEvent(QWidget *, QShowEvent *) { return false; }
+    virtual bool hideEvent(QWidget *, QHideEvent *) { return false; }
+    virtual bool changeEvent(QWidget *, QEvent *) { return false; }
+    virtual bool actionEvent(QWidget *, QActionEvent *) { return false; }
+    virtual bool dragEnterEvent(QWidget *, QGraphicsSceneDragDropEvent *) { return false; }
+    virtual bool dragMoveEvent(QWidget *, QGraphicsSceneDragDropEvent *) { return false; }
+    virtual bool dragLeaveEvent(QWidget *, QGraphicsSceneDragDropEvent *) { return false; }
+    virtual bool dropEvent(QWidget *, QGraphicsSceneDragDropEvent *) { return false; }
+    virtual bool contextMenuEvent(QWidget *, QGraphicsSceneContextMenuEvent *) { return false; }
+    virtual bool mouseMoveEvent(QWidget *, QGraphicsSceneMouseEvent *) { return false; }
+    virtual bool mousePressEvent(QWidget *, QGraphicsSceneMouseEvent *) { return false; }
+    virtual bool mouseReleaseEvent(QWidget *, QGraphicsSceneMouseEvent *) { return false; }
+    virtual bool mouseDoubleClickEvent(QWidget *, QGraphicsSceneMouseEvent *) { return false; }
+    virtual bool wheelEvent(QWidget *, QGraphicsSceneWheelEvent *) { return false; }
+    virtual bool helpEvent(QWidget *, QGraphicsSceneHelpEvent *) { return false; }
+
+    /* Global animation event. Considered a viewport event. */
+    virtual bool animationEvent(qint64 /*t*/, qint64 /*dt*/) { return false; };
 
     /* Graphics view event filtering functions. */
     virtual bool event(QGraphicsView *, QEvent *);
@@ -582,45 +585,45 @@ protected:
     virtual bool wheelEvent(QGraphicsView *, QGraphicsSceneWheelEvent *) { return false; }
     virtual bool helpEvent(QGraphicsView *, QGraphicsSceneHelpEvent *) { return false; }
 
-    /* Graphics view's viewport event filtering functions. */
-    virtual bool event(QWidget *, QEvent *);
-    virtual bool mouseMoveEvent(QWidget *, QMouseEvent *) { return false; }
-    virtual bool mousePressEvent(QWidget *, QMouseEvent *) { return false; }
-    virtual bool mouseReleaseEvent(QWidget *, QMouseEvent *) { return false; }
-    virtual bool mouseDoubleClickEvent(QWidget *, QMouseEvent *) { return false; }
-    virtual bool wheelEvent(QWidget *, QWheelEvent *) { return false; }
-    virtual bool tabletEvent(QWidget *, QTabletEvent *) { return false; }
-    virtual bool keyPressEvent(QWidget *, QKeyEvent *) { return false; }
-    virtual bool keyReleaseEvent(QWidget *, QKeyEvent *) { return false; }
-    virtual bool inputMethodEvent(QWidget *, QInputMethodEvent *) { return false; }
-    virtual bool focusInEvent(QWidget *, QFocusEvent *) { return false; }
-    virtual bool focusOutEvent(QWidget *, QFocusEvent *) { return false; }
-    virtual bool enterEvent(QWidget *, QEvent *) { return false; }
-    virtual bool leaveEvent(QWidget *, QEvent *) { return false; }
-    virtual bool paintEvent(QWidget *, QPaintEvent *) { return false; }
-    virtual bool moveEvent(QWidget *, QMoveEvent *) { return false; }
-    virtual bool resizeEvent(QWidget *, QResizeEvent *) { return false; }
-    virtual bool closeEvent(QWidget *, QCloseEvent *) { return false; }
-    virtual bool contextMenuEvent(QWidget *, QContextMenuEvent *) { return false; }
-    virtual bool dropEvent(QWidget *, QDropEvent *) { return false; }
-    virtual bool dragEnterEvent(QWidget *, QDragEnterEvent *) { return false; }
-    virtual bool dragMoveEvent(QWidget *, QDragMoveEvent *) { return false; }
-    virtual bool dragLeaveEvent(QWidget *, QDragLeaveEvent *) { return false; }
-    virtual bool showEvent(QWidget *, QShowEvent *) { return false; }
-    virtual bool hideEvent(QWidget *, QHideEvent *) { return false; }
-    virtual bool changeEvent(QWidget *, QEvent *) { return false; }
-    virtual bool actionEvent(QWidget *, QActionEvent *) { return false; }
-    virtual bool dragEnterEvent(QWidget *, QGraphicsSceneDragDropEvent *) { return false; }
-    virtual bool dragMoveEvent(QWidget *, QGraphicsSceneDragDropEvent *) { return false; }
-    virtual bool dragLeaveEvent(QWidget *, QGraphicsSceneDragDropEvent *) { return false; }
-    virtual bool dropEvent(QWidget *, QGraphicsSceneDragDropEvent *) { return false; }
-    virtual bool contextMenuEvent(QWidget *, QGraphicsSceneContextMenuEvent *) { return false; }
-    virtual bool mouseMoveEvent(QWidget *, QGraphicsSceneMouseEvent *) { return false; }
-    virtual bool mousePressEvent(QWidget *, QGraphicsSceneMouseEvent *) { return false; }
-    virtual bool mouseReleaseEvent(QWidget *, QGraphicsSceneMouseEvent *) { return false; }
-    virtual bool mouseDoubleClickEvent(QWidget *, QGraphicsSceneMouseEvent *) { return false; }
-    virtual bool wheelEvent(QWidget *, QGraphicsSceneWheelEvent *) { return false; }
-    virtual bool helpEvent(QWidget *, QGraphicsSceneHelpEvent *) { return false; }
+    /* Graphics scene event filtering functions. */
+    virtual bool event(QGraphicsScene *, QEvent *);
+    virtual bool mouseMoveEvent(QGraphicsScene *, QMouseEvent *) { return false; }
+    virtual bool mousePressEvent(QGraphicsScene *, QMouseEvent *) { return false; }
+    virtual bool mouseReleaseEvent(QGraphicsScene *, QMouseEvent *) { return false; }
+    virtual bool mouseDoubleClickEvent(QGraphicsScene *, QMouseEvent *) { return false; }
+    virtual bool wheelEvent(QGraphicsScene *, QWheelEvent *) { return false; }
+    virtual bool tabletEvent(QGraphicsScene *, QTabletEvent *) { return false; }
+    virtual bool keyPressEvent(QGraphicsScene *, QKeyEvent *) { return false; }
+    virtual bool keyReleaseEvent(QGraphicsScene *, QKeyEvent *) { return false; }
+    virtual bool inputMethodEvent(QGraphicsScene *, QInputMethodEvent *) { return false; }
+    virtual bool focusInEvent(QGraphicsScene *, QFocusEvent *) { return false; }
+    virtual bool focusOutEvent(QGraphicsScene *, QFocusEvent *) { return false; }
+    virtual bool enterEvent(QGraphicsScene *, QEvent *) { return false; }
+    virtual bool leaveEvent(QGraphicsScene *, QEvent *) { return false; }
+    virtual bool paintEvent(QGraphicsScene *, QPaintEvent *) { return false; }
+    virtual bool moveEvent(QGraphicsScene *, QMoveEvent *) { return false; }
+    virtual bool resizeEvent(QGraphicsScene *, QResizeEvent *) { return false; }
+    virtual bool closeEvent(QGraphicsScene *, QCloseEvent *) { return false; }
+    virtual bool contextMenuEvent(QGraphicsScene *, QContextMenuEvent *) { return false; }
+    virtual bool dropEvent(QGraphicsScene *, QDropEvent *) { return false; }
+    virtual bool dragEnterEvent(QGraphicsScene *, QDragEnterEvent *) { return false; }
+    virtual bool dragMoveEvent(QGraphicsScene *, QDragMoveEvent *) { return false; }
+    virtual bool dragLeaveEvent(QGraphicsScene *, QDragLeaveEvent *) { return false; }
+    virtual bool showEvent(QGraphicsScene *, QShowEvent *) { return false; }
+    virtual bool hideEvent(QGraphicsScene *, QHideEvent *) { return false; }
+    virtual bool changeEvent(QGraphicsScene *, QEvent *) { return false; }
+    virtual bool actionEvent(QGraphicsScene *, QActionEvent *) { return false; }
+    virtual bool dragEnterEvent(QGraphicsScene *, QGraphicsSceneDragDropEvent *) { return false; }
+    virtual bool dragMoveEvent(QGraphicsScene *, QGraphicsSceneDragDropEvent *) { return false; }
+    virtual bool dragLeaveEvent(QGraphicsScene *, QGraphicsSceneDragDropEvent *) { return false; }
+    virtual bool dropEvent(QGraphicsScene *, QGraphicsSceneDragDropEvent *) { return false; }
+    virtual bool contextMenuEvent(QGraphicsScene *, QGraphicsSceneContextMenuEvent *) { return false; }
+    virtual bool mouseMoveEvent(QGraphicsScene *, QGraphicsSceneMouseEvent *) { return false; }
+    virtual bool mousePressEvent(QGraphicsScene *, QGraphicsSceneMouseEvent *) { return false; }
+    virtual bool mouseReleaseEvent(QGraphicsScene *, QGraphicsSceneMouseEvent *) { return false; }
+    virtual bool mouseDoubleClickEvent(QGraphicsScene *, QGraphicsSceneMouseEvent *) { return false; }
+    virtual bool wheelEvent(QGraphicsScene *, QGraphicsSceneWheelEvent *) { return false; }
+    virtual bool helpEvent(QGraphicsScene *, QGraphicsSceneHelpEvent *) { return false; }
 
     /* Graphics item event filtering functions. */
     virtual bool sceneEvent(QGraphicsItem *, QEvent *);

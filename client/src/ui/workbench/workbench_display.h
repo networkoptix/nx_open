@@ -230,7 +230,7 @@ signals:
     void widgetAboutToBeRemoved(QnResourceWidget *widget);
 
 protected:
-    virtual void tick(int currentTime) override;
+    virtual void tick(int deltaTime) override;
     
     QnWidgetAnimator *animator(QnResourceWidget *widget);
 
