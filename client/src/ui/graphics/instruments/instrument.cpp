@@ -389,6 +389,7 @@ bool Instrument::animationEvent(AnimationEvent *event) {
         return false;
 
     m_animationTimer->updateCurrentTime(event->time());
+    return false;
 }
 
 AbstractAnimationTimer *Instrument::animationTimer() {
