@@ -5,6 +5,7 @@
 #include <QList>
 #include <QDateTime>
 #include <ui/animation/animation_timer.h>
+#include <utils/common/warnings.h>
 
 class QPointF;
 
@@ -57,7 +58,7 @@ public:
      * \param distance                  Distance that was covered by kinetic 
      *                                  motion since the last call to this function.
      */
-    virtual void kineticMove(const T &distance) { unused(distance); };
+    virtual void kineticMove(const T &distance) { Q_UNUSED(distance); };
 
     /**
      * This function is called whenever kinetic motion stops.
@@ -379,7 +380,7 @@ protected:
      * \returns                         New speed.
      */
     virtual T updateSpeed(const T &initialSpeed, const T &currentSpeed, const T &speedGain, qreal dt) const {
-        unused(initialSpeed);
+        Q_UNUSED(initialSpeed);
 
         T speed = currentSpeed + speedGain;
 
