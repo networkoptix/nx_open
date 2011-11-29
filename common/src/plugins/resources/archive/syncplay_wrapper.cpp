@@ -107,6 +107,8 @@ void QnArchiveSyncPlayWrapper::setSingleShotMode(bool value)
         info.reader->setSingleShotMode(value);
         info.reader->setNavDelegate(this);
     }
+    if (!value)
+        reinitTime(getDisplayedTime());
 }
 
 bool QnArchiveSyncPlayWrapper::jumpTo(qint64 mksec,  qint64 skipTime)

@@ -65,6 +65,7 @@ public:
 Q_SIGNALS:
     void beforeJump(qint64 mksec);
     void jumpOccured(qint64 mksec);
+    void jumpCanceled(qint64 mksec);
     void streamPaused();
     void streamResumed();
     void nextFrameOccured();

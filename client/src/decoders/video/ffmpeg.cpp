@@ -220,6 +220,10 @@ void CLFFmpegVideoDecoder::resetDecoder(QnCompressedVideoDataPtr data)
 
     // I have improved resetDecoder speed (I have left only minimum operations) because of REW. REW calls reset decoder on each GOP.
     avcodec_close(m_context);
+
+    av_free(m_context);
+    m_context = avcodec_alloc_context();
+
     if (m_passedContext) {
         avcodec_copy_context(m_context, m_passedContext);
     }

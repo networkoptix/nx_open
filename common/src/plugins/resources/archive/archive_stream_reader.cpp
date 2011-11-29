@@ -15,7 +15,6 @@ static const int FFMPEG_PROBE_BUFFER_SIZE = 1024 * 512;
 QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     QnAbstractArchiveReader(dev),
     m_currentTime(0),
-    m_previousTime(-1),
     m_primaryVideoIdx(-1),
     m_audioStreamIndex(-1),
     mFirstTime(true),
@@ -154,8 +153,6 @@ bool QnArchiveStreamReader::init()
 {
     setCurrentTime(0);
 
-	m_previousTime = -1;
-
     if (!m_delegate->open(m_resource))
         return false;
     m_delegate->setAudioChannel(m_selectedAudioChannel);
@@ -232,21 +229,27 @@ begin_label:
 	}
 
     m_jumpMtx.lock();
-    m_dataMarker = m_newDataMarker;
     if (m_requiredJumpTime != AV_NOPTS_VALUE)
-    {
+        {
+        if (m_newDataMarker) {
+            QString s;
+            QTextStream str(&s);
+            str << "setMarker=" << m_newDataMarker 
+                << " for Time=" << QDateTime::fromMSecsSinceEpoch(m_requiredJumpTime/1000).toString("hh:mm:ss.zzz");
+            str.flush();
+            cl_log.log(s, cl_logALWAYS);
+        }
+        m_dataMarker = m_newDataMarker;
         qint64 jumpTime = m_requiredJumpTime;
         m_lastGopSeekTime = -1;
         m_skipFramesToTime = m_tmpSkipFramesToTime;
+        m_tmpSkipFramesToTime = 0;
+        m_requiredJumpTime = AV_NOPTS_VALUE;
+        m_nextData.clear();
         m_jumpMtx.unlock();
 
         intChanneljumpTo(jumpTime, 0);
         m_lastUIJumpTime = jumpTime;
-
-        m_jumpMtx.lock();
-        if (m_requiredJumpTime == jumpTime)
-            m_requiredJumpTime = AV_NOPTS_VALUE;
-        m_jumpMtx.unlock();
 
         emit jumpOccured(jumpTime);
         m_BOF = true;
@@ -265,6 +268,7 @@ begin_label:
         if (!delegateForNegativeSpeed) {
             m_lastGopSeekTime = -1;
             intChanneljumpTo(displayTime, 0);
+            m_nextData.clear();
             if (reverseMode)
                 m_topIFrameTime = displayTime;
             else
@@ -277,11 +281,6 @@ begin_label:
 	
     if (m_skipFramesToTime != 0)
         m_lastGopSeekTime = -1; // after user seek
-
-    if (m_nextData && m_previousTime == -1)
-    {
-        m_nextData = QnAbstractMediaDataPtr();
-    }
 
 	// If there is no nextPacket - read it from file, otherwise use saved packet
     if (m_nextData) {
@@ -296,7 +295,6 @@ begin_label:
         return m_currentData;
 
     videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(m_currentData);
-    m_previousTime = m_currentTime;
 
     if (m_currentData->timestamp != AV_NOPTS_VALUE) {
         setCurrentTime(m_currentData->timestamp);
@@ -525,30 +523,6 @@ begin_label:
 	return m_currentData;
 }
 
-void QnArchiveStreamReader::channeljumpToUnsync(qint64 mksec, int channel, qint64 skipTime)
-
-{
-    //cl_log.log("jumpTime=", QDateTime::fromMSecsSinceEpoch(mksec/1000).toString("hh:mm:ss.zzz"), cl_logALWAYS);
-    //cl_log.log("skipTime=", skipTime, cl_logALWAYS);
-    m_singleQuantProcessed = false;
-    m_requiredJumpTime = mksec;
-    m_tmpSkipFramesToTime = skipTime;
-    m_singleShowWaitCond.wakeAll();
-}
-
-void QnArchiveStreamReader::channeljumpTo(qint64 mksec, int channel, qint64 skipTime)
-{
-    QMutexLocker mutex(&m_jumpMtx);
-    channeljumpToUnsync(mksec, channel, skipTime);
-}
-
-void QnArchiveStreamReader::jumpWithMarker(qint64 mksec, int marker)
-{
-    QMutexLocker mutex(&m_jumpMtx);
-    m_newDataMarker = marker;
-    channeljumpToUnsync(mksec, 0, 0);
-}
-
 void QnArchiveStreamReader::intChanneljumpTo(qint64 mksec, int /*channel*/)
 {
     if (mksec > 0) {
@@ -561,7 +535,6 @@ void QnArchiveStreamReader::intChanneljumpTo(qint64 mksec, int /*channel*/)
         m_delegate->open(m_resource);
     }
 
-	m_previousTime = -1;
 	m_wakeup = true;
     m_bottomIFrameTime = -1;
     m_topIFrameTime = mksec;
@@ -679,7 +652,33 @@ void QnArchiveStreamReader::setSkipFramesToTime(qint64 skipFramesToTime)
 bool QnArchiveStreamReader::isSkippingFrames() const
 { 
     QMutexLocker mutex(&m_jumpMtx);
-    return m_skipFramesToTime != 0;
+    return m_skipFramesToTime != 0 || m_tmpSkipFramesToTime != 0;
+}
+
+void QnArchiveStreamReader::channeljumpToUnsync(qint64 mksec, int channel, qint64 skipTime)
+
+{
+    //cl_log.log("jumpTime=", QDateTime::fromMSecsSinceEpoch(mksec/1000).toString("hh:mm:ss.zzz"), cl_logALWAYS);
+    //cl_log.log("skipTime=", skipTime, cl_logALWAYS);
+    m_singleQuantProcessed=false;
+    //if (m_requiredJumpTime != AV_NOPTS_VALUE)
+    //    emit jumpCanceled(m_requiredJumpTime);
+    m_requiredJumpTime = mksec;
+    m_tmpSkipFramesToTime = skipTime;
+    m_singleShowWaitCond.wakeAll();
+}
+
+void QnArchiveStreamReader::jumpWithMarker(qint64 mksec, int marker)
+{
+    QMutexLocker mutex(&m_jumpMtx);
+    m_newDataMarker = marker;
+    channeljumpToUnsync(mksec, 0, 0);
+}
+
+void QnArchiveStreamReader::channeljumpTo(qint64 mksec, int channel, qint64 skipTime)
+{
+    QMutexLocker mutex(&m_jumpMtx);
+    channeljumpToUnsync(mksec, channel, skipTime);
 }
 
 bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
@@ -691,8 +690,11 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
     bool needJump = mksec != m_lastJumpTime;
     if (needJump)
     {
+        QMutexLocker mutex(&m_jumpMtx);
+        if (m_requiredJumpTime != AV_NOPTS_VALUE)
+            emit jumpCanceled(m_requiredJumpTime);
         emit beforeJump(mksec);
-        channeljumpTo(mksec, 0, skipTime);
+        channeljumpToUnsync(mksec, 0, skipTime);
     }
     m_lastJumpTime = mksec;
 

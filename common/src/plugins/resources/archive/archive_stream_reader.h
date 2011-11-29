@@ -56,7 +56,6 @@ protected:
     virtual void pleaseStop();
 protected:
     qint64 m_currentTime;
-    qint64 m_previousTime;
     qint64 m_topIFrameTime;
     qint64 m_bottomIFrameTime;
     

@@ -1,4 +1,4 @@
-QT = core gui network xml xmlpatterns opengl multimedia webkit 
+QT = core gui network xml xmlpatterns opengl multimedia webkit
 CONFIG += x86 console
 TEMPLATE = app
 VERSION = 0.0.1
@@ -45,15 +45,12 @@ PRECOMPILED_SOURCE = StdAfx.cpp
 
 DEFINES += __STDC_CONSTANT_MACROS
 
-RESOURCES += ../src/mainwnd.qrc ../build/skin.qrc
-FORMS += ../src/mainwnd.ui ../src/preferences.ui ../src/licensekey.ui
-
 win32 {
   LIBS += ws2_32.lib Iphlpapi.lib
   QMAKE_LFLAGS += avcodec-53.lib avdevice-53.lib avfilter-2.lib avformat-53.lib avutil-51.lib swscale-0.lib
   QMAKE_LFLAGS_DEBUG += /libpath:../contrib/$$FFMPEG/bin/debug
   QMAKE_LFLAGS_RELEASE += /libpath:../contrib/$$FFMPEG/bin/release
-}  
+}
 
 mac {
   LIBS += -framework SystemConfiguration

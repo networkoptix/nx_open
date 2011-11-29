@@ -725,6 +725,11 @@ void CLVideoStreamDisplay::blockTimeValue(qint64 time)
     m_timeChangeEnabled = false;
 }
 
+bool CLVideoStreamDisplay::isTimeBlocked() const
+{
+    return m_timeChangeEnabled;
+}
+
 void CLVideoStreamDisplay::unblockTimeValue()
 {
     QMutexLocker lock(&m_timeMutex);

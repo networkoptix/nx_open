@@ -471,7 +471,7 @@ void NavigationItem::updateSlider()
         quint64 time = m_camera->getCurrentTime();
         if (time != AV_NOPTS_VALUE)
         {
-            m_currentTime = time/1000;
+            m_currentTime = time != DATETIME_NOW ? time/1000 : time;
             m_timeSlider->setCurrentValue(m_currentTime);
         }
         m_liveButton->setVisible(!reader->onPause() && m_camera->getCamCamDisplay()->isRealTimeSource());
@@ -543,7 +543,10 @@ void NavigationItem::onValueChanged(qint64 time)
         return;
 
     QnAbstractArchiveReader *reader = static_cast<QnAbstractArchiveReader*>(m_camera->getStreamreader());
-    if (reader->isSkippingFrames())
+    //if (reader->isSkippingFrames())
+    //    return;
+
+    if (reader->isRealTimeSource() && m_timeSlider->isAtEnd())
         return;
 
     smartSeek(time);
