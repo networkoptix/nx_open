@@ -36,11 +36,15 @@ bool HandScrollInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event
     return false;
 }
 
+void HandScrollInstrument::startDragProcess(DragInfo *info) {
+    emit scrollProcessStarted(info->view());
+}
+
 void HandScrollInstrument::startDrag(DragInfo *info) {
     m_originalCursor = info->view()->viewport()->cursor();
     info->view()->viewport()->setCursor(Qt::ClosedHandCursor);
 
-    emit scrollingStarted(info->view());
+    emit scrollStarted(info->view());
 }
 
 void HandScrollInstrument::dragMove(DragInfo *info) {
@@ -51,12 +55,16 @@ void HandScrollInstrument::dragMove(DragInfo *info) {
 }
 
 void HandScrollInstrument::finishDrag(DragInfo *info) {
-    emit scrollingFinished(info->view());
+    emit scrollFinished(info->view());
 
     info->view()->viewport()->setCursor(m_originalCursor);
 
     m_currentView = info->view();
     kineticProcessor()->start();
+}
+
+void HandScrollInstrument::finishDragProcess(DragInfo *info) {
+    emit scrollProcessFinished(info->view());
 }
 
 void HandScrollInstrument::kineticMove(const QPointF &distance) {

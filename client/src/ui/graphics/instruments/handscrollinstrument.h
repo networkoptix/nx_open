@@ -12,15 +12,19 @@ public:
     virtual ~HandScrollInstrument();
 
 signals:
-    void scrollingStarted(QGraphicsView *view);
-    void scrollingFinished(QGraphicsView *view);
+    void scrollProcessStarted(QGraphicsView *view);
+    void scrollStarted(QGraphicsView *view);
+    void scrollFinished(QGraphicsView *view);
+    void scrollProcessFinished(QGraphicsView *view);
 
 protected:
     virtual bool mousePressEvent(QWidget *viewport, QMouseEvent *event) override;
 
+    virtual void startDragProcess(DragInfo *info) override;
     virtual void startDrag(DragInfo *info) override;
     virtual void dragMove(DragInfo *info) override;
     virtual void finishDrag(DragInfo *info) override;
+    virtual void finishDragProcess(DragInfo *info) override;
 
     virtual void kineticMove(const QPointF &distance) override;
     virtual void finishKinetic() override;

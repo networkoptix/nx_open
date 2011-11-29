@@ -23,6 +23,12 @@ public:
 
     void setRubberBandZValue(qreal rubberBandZValue);
 
+signals:
+    void rubberBandProcessStarted(QGraphicsView *view);
+    void rubberBandStarted(QGraphicsView *view);
+    void rubberBandFinished(QGraphicsView *view);
+    void rubberBandProcessFinished(QGraphicsView *view);
+
 protected:
     virtual void installedNotify() override;
     virtual void aboutToBeUninstalledNotify() override;
@@ -30,9 +36,11 @@ protected:
     virtual bool mousePressEvent(QWidget *viewport, QMouseEvent *event) override;
     virtual bool paintEvent(QWidget *viewport, QPaintEvent *event) override;
 
+    virtual void startDragProcess(DragInfo *info) override;
     virtual void startDrag(DragInfo *info) override;
     virtual void dragMove(DragInfo *info) override;
     virtual void finishDrag(DragInfo *info) override;
+    virtual void finishDragProcess(DragInfo *info) override;
 
     static QSet<QGraphicsItem *> toSet(QList<QGraphicsItem *> items);
 

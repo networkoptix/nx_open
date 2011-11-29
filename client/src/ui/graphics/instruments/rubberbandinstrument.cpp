@@ -292,11 +292,17 @@ void RubberBandInstrument::at_scene_selectionChanged() {
     m_protectSelection = false;
 }
 
+void RubberBandInstrument::startDragProcess(DragInfo *info) {
+    emit rubberBandProcessStarted(info->view());
+}
+
 void RubberBandInstrument::startDrag(DragInfo *info) {
     rubberBand()->setViewport(info->view()->viewport());
     rubberBand()->setViewportTransform(info->view()->viewportTransform());
     rubberBand()->setOrigin(info->mousePressScenePos());
     rubberBand()->setVisible(true);
+
+    emit rubberBandStarted(info->view());
 }
 
 void RubberBandInstrument::dragMove(DragInfo *info) {
@@ -327,9 +333,15 @@ void RubberBandInstrument::dragMove(DragInfo *info) {
     }
 }
 
-void RubberBandInstrument::finishDrag(DragInfo *) {
+void RubberBandInstrument::finishDrag(DragInfo *info) {
+    emit rubberBandFinished(info->view());
+
     rubberBand()->setViewport(NULL);
     rubberBand()->setVisible(false);
+}
+
+void RubberBandInstrument::finishDragProcess(DragInfo *info) {
+    emit rubberBandProcessFinished(info->view());
 }
 
 QSet<QGraphicsItem *> RubberBandInstrument::toSet(QList<QGraphicsItem *> items) {
