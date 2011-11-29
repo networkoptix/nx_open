@@ -185,6 +185,9 @@ int main(int argc, char *argv[])
         return 0;
     }
 
+    QUrl appserverUrl = QUrl(QSettings().value("appserverUrl", QLatin1String(DEFAULT_APPSERVER_URL)).toString());
+    cl_log.log("Connection to application server ", appserverUrl.toString(), cl_logALWAYS);
+
 #ifdef _DEBUG
      //cl_log.setLogLevel(cl_logDEBUG1);
     cl_log.setLogLevel(cl_logWARNING);
