@@ -47,7 +47,7 @@ public:
      * \returns                         Value at the given position.
      */
     T value(const QPoint &position, const T &defaultValue = T()) const {
-        QHash<QPoint, T>::const_iterator pos = m_itemByPosition.find(position);
+        typename QHash<QPoint, T>::const_iterator pos = m_itemByPosition.find(position);
         
         return pos != m_itemByPosition.end() ? *pos : defaultValue;
     }
@@ -61,7 +61,7 @@ public:
 
         for (int r = region.top(); r <= region.bottom(); ++r) {
             for (int c = region.left(); c <= region.right(); ++c) {
-                QHash<QPoint, T>::const_iterator pos = m_itemByPosition.find(QPoint(c, r));
+                typename QHash<QPoint, T>::const_iterator pos = m_itemByPosition.find(QPoint(c, r));
                 if (pos != m_itemByPosition.end())
                     items->insert(*pos);
             }
@@ -119,7 +119,7 @@ public:
     bool isOccupiedBy(const QRect &region, const T &value, bool emptyAllowed) const {
         for (int r = region.top(); r <= region.bottom(); r++) {
             for (int c = region.left(); c <= region.right(); c++) {
-                QHash<QPoint, T>::const_iterator pos = m_itemByPosition.find(QPoint(c, r));
+                typename QHash<QPoint, T>::const_iterator pos = m_itemByPosition.find(QPoint(c, r));
                 if(pos == m_itemByPosition.end()) {
                     if(!emptyAllowed)
                         return false;
