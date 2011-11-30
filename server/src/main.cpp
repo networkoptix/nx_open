@@ -10,6 +10,7 @@
 #include "plugins/resources/archive/avi_files/avi_device.h"
 #include "core/resourcemanagment/asynch_seacher.h"
 #include "core/resourcemanagment/resource_pool.h"
+#include "utils/common/sleep.h"
 #include "rtsp/rtsp_listener.h"
 #include "plugins/resources/arecontvision/resource/av_resource_searcher.h"
 #include "recorder/recording_manager.h"
@@ -252,9 +253,14 @@ int main(int argc, char *argv[])
     QnAppServerConnection appServerConnection(host, port, auth, QnResourceDiscoveryManager::instance());
 
     QList<QnResourceTypePtr> resourceTypeList;
-    if (appServerConnection.getResourceTypes(resourceTypeList) != 0)
+
+    for(;;)
     {
+        if (appServerConnection.getResourceTypes(resourceTypeList) == 0)
+            break;
+
         qDebug() << "Can't get resource types: " << appServerConnection.getLastError();
+        QnSleep::msleep(1000);
     }
 
     qnResTypePool->addResourceTypeList(resourceTypeList);
