@@ -294,7 +294,7 @@ void QnArchiveSyncPlayWrapper::onBeforeJump(qint64 mksec)
     d->inJumpCount++;
 }
 
-void CLCamDisplay::onJumpCanceled(qint64 time)
+void QnArchiveSyncPlayWrapper::onJumpCanceled(qint64 time)
 {
     Q_D(QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
