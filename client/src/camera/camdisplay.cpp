@@ -357,10 +357,10 @@ void CLCamDisplay::onBeforeJump(qint64 time)
         cl_log.log("before jump to ", QDateTime::fromMSecsSinceEpoch(time/1000).toString(), cl_logWARNING);
     */
     QMutexLocker lock(&m_timeMutex);
-    if (!m_display[0]->isTimeBlocked()) {
-        m_display[0]->blockTimeValue(time);
-        clearUnprocessedData();
-    }
+
+    m_display[0]->blockTimeValue(time);
+    clearUnprocessedData();
+
     if (skipPrevJumpSignal > 0) {
         skipPrevJumpSignal--;
         return;
@@ -404,7 +404,7 @@ void CLCamDisplay::onJumpCanceled(qint64 time)
 
 void CLCamDisplay::afterJump(qint64 newTime)
 {
-    //cl_log.log(QLatin1String("after jump"), cl_logWARNING);
+    //cl_log.log("after jump.time=", QDateTime::fromMSecsSinceEpoch(newTime/1000).toString(), cl_logWARNING);
 
     m_lastAudioPacketTime = newTime;
     m_lastVideoPacketTime = newTime;

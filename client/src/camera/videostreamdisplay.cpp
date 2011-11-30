@@ -727,7 +727,7 @@ void CLVideoStreamDisplay::blockTimeValue(qint64 time)
 
 bool CLVideoStreamDisplay::isTimeBlocked() const
 {
-    return m_timeChangeEnabled;
+    return !m_timeChangeEnabled;
 }
 
 void CLVideoStreamDisplay::unblockTimeValue()

@@ -116,7 +116,6 @@ bool QnArchiveSyncPlayWrapper::jumpTo(qint64 mksec,  qint64 skipTime)
     Q_D(QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
     d->lastJumpTime = skipTime ? skipTime : mksec;
-    d->inJumpCount = 0;
     d->timer.restart();
     bool rez = false;
     foreach(ReaderInfo info, d->readers)
@@ -280,7 +279,6 @@ void QnArchiveSyncPlayWrapper::reinitTime(qint64 newTime)
 {
     Q_D(QnArchiveSyncPlayWrapper);
 
-    // todo: add negative speed support here
     if (newTime != AV_NOPTS_VALUE)
         d->lastJumpTime = newTime;
     else
