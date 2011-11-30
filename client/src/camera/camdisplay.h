@@ -58,6 +58,7 @@ public:
 
     void setExternalTimeSource(QnlTimeSource* value);
 
+    bool canAcceptData() const;
 public slots:
     void onBeforeJump(qint64 time);
     void onJumpOccured(qint64 time);
@@ -150,6 +151,7 @@ private:
     bool m_buffering;
     int m_executingJump;
     int skipPrevJumpSignal;
+    int m_processedPackets;
 };
 
 #endif //clcam_display_h_1211

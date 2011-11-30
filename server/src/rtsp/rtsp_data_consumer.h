@@ -5,6 +5,7 @@
 #include "core/dataconsumer/dataconsumer.h"
 #include "utils/network/rtp_stream_parser.h"
 #include "core/datapacket/datapacket.h"
+#include "utils/network/rtpsession.h"
 
 class QnRtspConnectionProcessor;
 
@@ -45,7 +46,7 @@ private:
     quint16 m_sequence[256];
     QnRtspConnectionProcessor* m_owner;
     qint64 m_lastSendTime;
-    char m_rtspTcpHeader[4 + RtpHeader::RTP_HEADER_SIZE];
+    char m_rtspTcpHeader[4 + RtpHeader::RTP_HEADER_SIZE + 4 + RTSP_FFMPEG_VIDEO_HEADER_SIZE];
     quint8* tcpReadBuffer;
     QMutex m_mutex;
     int m_waitSCeq;

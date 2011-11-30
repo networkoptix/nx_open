@@ -185,6 +185,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     QnMediaContextPtr currentContext = media->context;
     if (currentContext == 0)
         currentContext = getGeneratedContext(media->compressionType);
+    int rtpHeaderSize = 4 + RtpHeader::RTP_HEADER_SIZE;
     if (ctxData[subChannelNumber] == 0 || !ctxData[subChannelNumber]->equalTo(currentContext.data()))
     {
         ctxData[subChannelNumber] = currentContext;
@@ -192,7 +193,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         QnFfmpegHelper::serializeCodecContext(currentContext->ctx(), &codecCtxData);
         buildRtspTcpHeader(rtspChannelNum, ssrc + 1, codecCtxData.size(), true, 0); // ssrc+1 - switch data subchannel to context subchannel
         QMutexLocker lock(&m_owner->getSockMutex());
-        m_owner->sendData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
+        m_owner->sendData(m_rtspTcpHeader, rtpHeaderSize);
         Q_ASSERT(!codecCtxData.isEmpty());
         m_owner->sendData(codecCtxData);
     }
@@ -201,7 +202,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     QnCompressedVideoData *video = media.dynamicCast<QnCompressedVideoData>().data();
     const char* curData = media->data.data();
     int sendLen = 0;
-    int headerSize = 4 + (video ? RTSP_FFMPEG_VIDEO_HEADER_SIZE : 0);
+    int ffHeaderSize = 4 + (video ? RTSP_FFMPEG_VIDEO_HEADER_SIZE : 0);
 
     if (m_lastSendTime != DATETIME_NOW)
         m_lastSendTime = media->timestamp;
@@ -215,23 +216,33 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
             QnSleep::msleep(1);
         }
 
-        sendLen = qMin(MAX_RTSP_DATA_LEN-headerSize, dataRest);
-        buildRtspTcpHeader(rtspChannelNum, ssrc, sendLen + headerSize, sendLen >= dataRest ? 1 : 0, media->timestamp);
+        sendLen = qMin(MAX_RTSP_DATA_LEN - ffHeaderSize, dataRest);
+        buildRtspTcpHeader(rtspChannelNum, ssrc, sendLen + ffHeaderSize, sendLen >= dataRest ? 1 : 0, media->timestamp);
         QMutexLocker lock(&m_owner->getSockMutex());
-        m_owner->sendData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
-        if (headerSize) 
+        //m_owner->sendData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
+        if (ffHeaderSize) 
         {
+            quint8* hdrPointer = (quint8*) m_rtspTcpHeader + rtpHeaderSize;
             quint32 timestampHigh = htonl(media->timestamp >> 32);
-            m_owner->sendData((const char*) &timestampHigh, 4);
+            //m_owner->sendData((const char*) &timestampHigh, 4);
+            memcpy(hdrPointer, &timestampHigh, 4);
+            hdrPointer += 4;
             if (video) 
             {
                 quint32 videoHeader = htonl((video->flags << 24) + (video->data.size() & 0x00ffffff));
-                m_owner->sendData((const char*) &videoHeader, 4);
+                //m_owner->sendData((const char*) &videoHeader, 4);
+                memcpy(hdrPointer, &videoHeader, 4);
+                hdrPointer += 4;
+
                 quint8 cseq = media->opaque;
-                m_owner->sendData((const char*) &cseq, 1);
+                //m_owner->sendData((const char*) &cseq, 1);
+                memcpy(hdrPointer, &cseq, 1);
             }
-            headerSize = 0;
         }
+        m_owner->sendData(m_rtspTcpHeader, rtpHeaderSize + ffHeaderSize);
+        ffHeaderSize = 0;
+
+
         Q_ASSERT(sendLen > 0);
         m_owner->sendData(curData, sendLen);
         curData += sendLen;

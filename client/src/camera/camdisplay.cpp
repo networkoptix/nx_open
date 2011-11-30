@@ -44,7 +44,7 @@ static void updateActivity()
 
 // a lot of small audio packets in bluray HD audio codecs. So, previous size 7 is not enought
 #define CL_MAX_DISPLAY_QUEUE_SIZE 15
-#define CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE 120
+#define CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE 20
 #define AUDIO_BUFF_SIZE (4000) // ms
 
 static const qint64 MIN_VIDEO_DETECT_JUMP_INTERVAL = 100 * 1000; // 100ms
@@ -93,7 +93,8 @@ CLCamDisplay::CLCamDisplay(bool generateEndOfStreamSignal)
       m_useMtDecoding(false),
       m_buffering(false),
       m_executingJump(0),
-      skipPrevJumpSignal(0)
+      skipPrevJumpSignal(0),
+      m_processedPackets(0)
 {
     m_storedMaxQueueSize = m_dataQueue.maxSize();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
@@ -373,6 +374,7 @@ void CLCamDisplay::onBeforeJump(qint64 time)
     m_buffering = true;
     if (m_executingJump > 1)
         clearUnprocessedData();
+    m_processedPackets = 0;
 }
 
 void CLCamDisplay::onJumpOccured(qint64 time)
@@ -396,6 +398,7 @@ void CLCamDisplay::onJumpOccured(qint64 time)
     m_jumpTime = time;
 
     m_executingJump--;
+    m_processedPackets = 0;
 }
 
 void CLCamDisplay::onJumpCanceled(qint64 time)
@@ -417,6 +420,7 @@ void CLCamDisplay::afterJump(qint64 newTime)
     clearVideoQueue();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
         if (m_display[i]) {
+            m_display[i]->blockTimeValue(newTime);
             m_display[i]->afterJump();
             m_display[i]->unblockTimeValue();
         }
@@ -504,12 +508,22 @@ bool CLCamDisplay::useSync(QnCompressedVideoDataPtr vd)
     return m_extTimeSrc && !(vd->flags & QnAbstractMediaData::MediaFlags_LIVE);
 }
 
+bool CLCamDisplay::canAcceptData() const
+{
+    if (m_processedPackets < m_dataQueue.maxSize())
+        return m_dataQueue.size() <= m_processedPackets;
+    else
+        return QnAbstractDataConsumer::canAcceptData();
+}
+
 bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
 {
     //cl_log.log("ProcessData 1", cl_logALWAYS);
     QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
     if (!media)
         return true;
+
+    m_processedPackets++;
 
     bool mediaIsLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
     if (mediaIsLive != m_isRealTimeSource)

@@ -507,7 +507,14 @@ begin_label:
         m_currentData->flags |= QnAbstractMediaData::MediaFlags_BOF;        
         m_BOF = false;
         m_BOFTime = m_currentData->timestamp;
-        //cl_log.log("set BOF ", QDateTime::fromMSecsSinceEpoch(m_currentData->timestamp/1000).toString("hh:mm:ss.zzz"), cl_logALWAYS);
+		/*
+        QString msg;
+        QTextStream str(&msg);
+        str << "set BOF " << QDateTime::fromMSecsSinceEpoch(m_currentData->timestamp/1000).toString("hh:mm:ss.zzz") << " for marker " << m_dataMarker;
+        str.flush();
+        cl_log.log(msg, cl_logWARNING);
+		*/
+
     }
 
     if (m_currentData && singleShotMode && m_skipFramesToTime == 0) {

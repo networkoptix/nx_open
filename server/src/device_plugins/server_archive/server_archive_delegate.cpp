@@ -61,8 +61,13 @@ qint64 QnServerArchiveDelegate::seek(qint64 time)
 
     DeviceFileCatalog::Chunk newChunk = m_chunkSequence->findChunk(m_resource, time, 
         m_reverseMode ? DeviceFileCatalog::OnRecordHole_PrevChunk : DeviceFileCatalog::OnRecordHole_NextChunk);
-
-//    cl_log.log("chunk startTime= ",QDateTime::fromMSecsSinceEpoch(newChunk.startTime/1000).toString("hh.mm.ss.zzz"), cl_logALWAYS);
+	/*
+    QString s;
+    QTextStream str(&s);
+    str << "chunk startTime= " << QDateTime::fromMSecsSinceEpoch(newChunk.startTime/1000).toString("hh.mm.ss.zzz") << " duration=" << newChunk.duration/1000000.0;
+    str.flush();
+    cl_log.log(s, cl_logALWAYS);
+	*/
 
     if (newChunk.startTime != m_currentChunk.startTime)
     {
