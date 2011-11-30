@@ -186,6 +186,9 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveReader* reader,
     Q_D(QnArchiveSyncPlayWrapper);
     if (reader == 0)
         return;
+
+    reader->setNavDelegate(this);
+
     d->readers << ReaderInfo(reader, reader->getArchiveDelegate(), cam);
     
 
