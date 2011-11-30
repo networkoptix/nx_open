@@ -85,7 +85,7 @@ private:
 
 	void clearVideoQueue();
     void enqueueVideo(QnCompressedVideoDataPtr vd);
-    void afterJump(qint64 new_time);
+    void afterJump(QnAbstractMediaDataPtr media);
     void processNewSpeed(float speed);
     bool useSync(QnCompressedVideoDataPtr vd);
 private:

@@ -406,13 +406,14 @@ void CLCamDisplay::onJumpCanceled(qint64 time)
     skipPrevJumpSignal++;
 }
 
-void CLCamDisplay::afterJump(qint64 newTime)
+void CLCamDisplay::afterJump(QnAbstractMediaDataPtr media)
 {
+    QnCompressedVideoDataPtr vd = qSharedPointerDynamicCast<QnCompressedVideoData>(media);
     //cl_log.log("after jump.time=", QDateTime::fromMSecsSinceEpoch(newTime/1000).toString(), cl_logWARNING);
 
-    m_lastAudioPacketTime = newTime;
-    m_lastVideoPacketTime = newTime;
-    m_previousVideoTime = newTime;
+    m_lastAudioPacketTime = media->timestamp;
+    m_lastVideoPacketTime = media->timestamp;
+    m_previousVideoTime = media->timestamp;
     //m_previousVideoDisplayedTime = 0;
 
     m_totalFrames = 0;
@@ -420,7 +421,8 @@ void CLCamDisplay::afterJump(qint64 newTime)
     clearVideoQueue();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
         if (m_display[i]) {
-            m_display[i]->blockTimeValue(newTime);
+            if (vd && !vd->ignore)
+                m_display[i]->blockTimeValue(media->timestamp);
             m_display[i]->afterJump();
             m_display[i]->unblockTimeValue();
         }
@@ -581,7 +583,7 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         if (m_executingJump == 0)
             m_afterJump = false;
         // clear everything we can
-        afterJump(ts);
+        afterJump(media);
         //cl_log.log("ProcessData 2", QDateTime::fromMSecsSinceEpoch(vd->timestamp/1000).toString("hh:mm:ss.zzz"), cl_logALWAYS);
     }
 
@@ -611,7 +613,7 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
 
         if (ad->timestamp && ad->timestamp - m_lastAudioPacketTime < -MIN_AUDIO_DETECT_JUMP_INTERVAL)
         {
-            afterJump(ad->timestamp);
+            afterJump(ad);
         }
 
         m_lastAudioPacketTime = ad->timestamp;
@@ -653,11 +655,11 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
                     if (!(vd->flags & AV_REVERSE_BLOCK_START) && vd->timestamp - m_lastVideoPacketTime < -MIN_VIDEO_DETECT_JUMP_INTERVAL*3)
                     {
                         // I have found avi file where sometimes 290 ms between frames. At reverse mode, bad afterJump affect file very strong
-                        afterJump(vd->timestamp);
+                        afterJump(vd);
                     }
                 }
                 else
-                    afterJump(vd->timestamp);
+                    afterJump(vd);
             }
             m_lastVideoPacketTime = vd->timestamp;
 
