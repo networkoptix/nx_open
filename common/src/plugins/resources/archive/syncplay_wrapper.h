@@ -40,6 +40,7 @@ public slots:
 private slots:
     void onBeforeJump(qint64 mksec);
     void onJumpOccured(qint64 mksec);
+    void onJumpCanceled(qint64 time);
     void onSpeedChanged(double value);
 private:
     qint64 minTime() const;

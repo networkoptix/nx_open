@@ -358,6 +358,7 @@ void CLCamDisplay::onBeforeJump(qint64 time)
     */
     QMutexLocker lock(&m_timeMutex);
 
+    m_lastDisplayedVideoTime = AV_NOPTS_VALUE;
     m_display[0]->blockTimeValue(time);
     clearUnprocessedData();
 

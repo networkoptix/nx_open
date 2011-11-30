@@ -196,6 +196,7 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveReader* reader,
 
     connect(reader, SIGNAL(beforeJump(qint64)), this, SLOT(onBeforeJump(qint64)), Qt::DirectConnection);
     connect(reader, SIGNAL(jumpOccured(qint64)), this, SLOT(onJumpOccured(qint64)), Qt::DirectConnection);
+    connect(reader, SIGNAL(jumpCanceled(qint64)), this, SLOT(onJumpCanceled(qint64)), Qt::DirectConnection);
 
     connect(reader, SIGNAL(speedChanged(double)), this, SLOT(onSpeedChanged(double)), Qt::DirectConnection);
 
@@ -293,6 +294,12 @@ void QnArchiveSyncPlayWrapper::onBeforeJump(qint64 mksec)
     d->inJumpCount++;
 }
 
+void CLCamDisplay::onJumpCanceled(qint64 time)
+{
+    Q_D(QnArchiveSyncPlayWrapper);
+    QMutexLocker lock(&d->timeMutex);
+    d->inJumpCount--;
+}
 
 void QnArchiveSyncPlayWrapper::onJumpOccured(qint64 mksec)
 {
