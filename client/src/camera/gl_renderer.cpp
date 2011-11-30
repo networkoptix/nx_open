@@ -869,10 +869,7 @@ CLGLRenderer::RenderStatus CLGLRenderer::paintEvent(const QRectF &r)
             m_videoHeight = curImg->height;
             updateTexture();
             if (curImg->pkt_dts != AV_NOPTS_VALUE)
-            {
-                if (curImg->pkt_dts > 1000000ll * 3600*24)
-                    m_timeText = QDateTime::fromMSecsSinceEpoch(curImg->pkt_dts/1000).toString("hh:mm:ss.zzz");
-            }
+                m_lastDisplayedTime = curImg->pkt_dts;
 
             result = RENDERED_NEW_FRAME;
         } 
@@ -930,10 +927,10 @@ bool CLGLRenderer::constantDownscaleFactor() const
         return false;
 }
 
-QString CLGLRenderer::getTimeText() const
+qint64 CLGLRenderer::lastDisplayedTime() const
 {
     QMutexLocker locker(&m_displaySync);
-    return m_timeText;
+    return m_lastDisplayedTime;
 }
 
 bool CLGLRenderer::isNoVideo() const

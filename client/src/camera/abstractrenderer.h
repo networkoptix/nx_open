@@ -83,6 +83,12 @@ public:
      */
     virtual void onNoVideo() {}
 
+    /**
+     * Returns last displayed time
+     */
+    virtual qint64 lastDisplayedTime() const { return AV_NOPTS_VALUE; }
+
+
 protected:
     virtual void doFrameDisplayed() {} // Not used for now.
 

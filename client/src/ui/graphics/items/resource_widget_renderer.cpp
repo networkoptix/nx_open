@@ -27,6 +27,11 @@ QnResourceWidgetRenderer::~QnResourceWidgetRenderer() {
     m_channelRenderers.clear();
 }
 
+qint64 QnResourceWidgetRenderer::lastDisplayedTime(int channel) const 
+{ 
+    return m_channelRenderers[channel]->lastDisplayedTime();
+}
+
 QnResourceWidgetRenderer::RenderStatus QnResourceWidgetRenderer::paint(int channel, const QRectF &rect) {
     checkThread(false);
 

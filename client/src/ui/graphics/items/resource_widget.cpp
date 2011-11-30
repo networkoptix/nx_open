@@ -296,6 +296,20 @@ QRectF QnResourceWidget::channelRect(int channel) const {
     );
 }
 
+void QnResourceWidget::drawCurrentTime(QPainter *painter, const QRectF& rect, qint64 time)
+{
+    QString text = QDateTime::fromMSecsSinceEpoch(time/1000).toString("hh:mm:ss.zzz");
+    if (!text.isEmpty())
+    {
+        QFont font;
+        font.setPixelSize(6);
+        QFontMetrics metric(font);
+        QSize size = metric.size(Qt::TextSingleLine, text);
+        painter->setFont(font);
+        painter->drawText(rect.width() - size.width()-4, rect.height() - size.height()+2, text);
+    }
+}
+
 void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/) {
     if (painter->paintEngine()->type() != QPaintEngine::OpenGL && painter->paintEngine()->type() != QPaintEngine::OpenGL2) {
         qnWarning("Painting with the paint engine of type %1 is not supported", static_cast<int>(painter->paintEngine()->type()));
@@ -318,6 +332,8 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
         drawLoadingProgress(status, rect);
     }
     painter->endNativePainting();
+    for(int i = 0; i < m_channelCount; i++) 
+        drawCurrentTime(painter, channelRect(i), m_renderer->lastDisplayedTime(i));
 }
 
 void QnResourceWidget::drawLoadingProgress(QnRenderStatus::RenderStatus status, const QRectF &rect) {

@@ -46,7 +46,7 @@ public:
 
     static bool isPixelFormatSupported(PixelFormat pixfmt);
 
-    QString getTimeText() const;
+    virtual qint64 lastDisplayedTime() const;
     bool isNoVideo() const;
 
     void onNoVideo();
@@ -157,7 +157,7 @@ private:
     bool m_inited;
     int m_videoWidth;
     int m_videoHeight;
-    QString m_timeText;
+    qint64 m_lastDisplayedTime;
 
     static QVector<uchar> m_staticYFiller;
     static QVector<uchar> m_staticUVFiller;

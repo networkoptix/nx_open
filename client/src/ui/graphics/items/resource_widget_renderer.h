@@ -31,6 +31,7 @@ public:
 
     RenderStatus paint(int channel, const QRectF &rect);
 
+    qint64 lastDisplayedTime(int channel) const;
 signals:
     /**
      * This signal is emitted whenever the source geometry is changed.

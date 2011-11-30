@@ -247,7 +247,7 @@ void CLVideoWindowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
         } 
         else 
         {
-            QString timeText = m_gldraw[i]->getTimeText();
+            QString timeText = QDateTime::fromMSecsSinceEpoch(m_gldraw[i]->lastDisplayedTime()/1000).toString("hh:mm:ss.zzz");
             if (!timeText.isEmpty())
             {
                 QFont font;

@@ -210,6 +210,7 @@ private:
 
     void drawLoadingProgress(QnRenderStatus::RenderStatus status, const QRectF &rect);
 
+    void drawCurrentTime(QPainter *painter, const QRectF& rect, qint64 time);
 private:
     /** Layout item. */
     QnWorkbenchItem *m_item;
