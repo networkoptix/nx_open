@@ -21,6 +21,7 @@ class QnVideoServer : public QnResource
 public:
     QnVideoServer();
     virtual ~QnVideoServer();
+
     virtual QString getUniqueId() const;
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 
@@ -29,9 +30,13 @@ public:
 
     QnVideoServerConnectionPtr apiConnection();
 
+    void setGuid(const QString& guid);
+    QString getGuid() const;
+
 private:
     QnVideoServerConnectionPtr m_restConnection;
     QString m_apiUrl;
+    QString m_guid;
 };
 
 class QnVideoServerFactory : public QnResourceFactory

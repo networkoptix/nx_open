@@ -73,6 +73,16 @@ QnVideoServerConnectionPtr QnVideoServer::apiConnection()
     return m_restConnection;
 }
 
+void QnVideoServer::setGuid(const QString& guid)
+{
+    m_guid = guid;
+}
+
+QString QnVideoServer::getGuid() const
+{
+    return m_guid;
+}
+
 QnResourcePtr QnVideoServerFactory::createResource(const QnId &resourceTypeId, const QnResourceParameters &parameters)
 {
     QnResourcePtr result(new QnVideoServer());

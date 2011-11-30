@@ -3,6 +3,7 @@
 #include <QSettings>
 #include <QUdpSocket>
 #include <QUrl>
+#include <QUuid>
 
 #include "version.h"
 #include "utils/common/util.h"
@@ -96,9 +97,18 @@ void ffmpegInit()
     av_register_protocol2(&ufile_protocol, sizeof(ufile_protocol));
 }
 
-QString serverId()
+QString serverGuid()
 {
-    return QSettings().value("serverId").toString();
+    QSettings settings;
+    QString guid = settings.value("serverGuid").toString();
+
+    if (guid.isEmpty())
+    {
+        guid = QUuid::createUuid().toString();
+        settings.setValue("serverGuid", guid);
+    }
+
+    return guid;
 }
 
 QnVideoServerPtr registerServer(QnAppServerConnection& appServerConnection, const QString& myAddress)
@@ -107,8 +117,8 @@ QnVideoServerPtr registerServer(QnAppServerConnection& appServerConnection, cons
 
     QnVideoServer server;
 
-    // If there is already stored server with this id, other parameters will be ignored
-    server.setId(serverId());
+    // If there is already stored server with this guid, other parameters will be ignored
+    server.setGuid(serverGuid());
 
     server.setName(QString("Server ") + myAddress);
     server.setUrl(QString("rtsp://") + myAddress + QString(':') + QString::number(DEFAUT_RTSP_PORT));
@@ -118,8 +128,6 @@ QnVideoServerPtr registerServer(QnAppServerConnection& appServerConnection, cons
     appServerConnection.addServer(server, servers);
 
     Q_ASSERT(!servers.isEmpty());
-
-    settings.setValue("serverId", servers.at(0)->getId().toString());
 
     return servers.at(0);
 }
@@ -253,7 +261,7 @@ int main(int argc, char *argv[])
 
     QnVideoServerPtr videoServer = registerServer(appServerConnection, defaultLocalAddress(appserverUrl.host()));
 
-    QnAppserverResourceProcessor processor(QnId(serverId()), host, port, auth, QnResourceDiscoveryManager::instance());
+    QnAppserverResourceProcessor processor(videoServer->getId(), host, port, auth, QnResourceDiscoveryManager::instance());
 
     QUrl rtspUrl(videoServer->getUrl());
     QUrl apiUrl(videoServer->getApiUrl());
@@ -273,7 +281,7 @@ int main(int argc, char *argv[])
     foreach (QnResourcePtr resource, storages)
     {
         QnStoragePtr storage = resource.dynamicCast<QnStorage>();
-        if (storage->getParentId().toString() == serverId())
+        if (storage->getParentId() == videoServer->getId())
         {
             storageAdded = true;
             qnResPool->addResource(storage);
@@ -283,7 +291,7 @@ int main(int argc, char *argv[])
 
     if (!storageAdded)
     {
-        QString errorMessage = QString("AppServer has no storages defined. Go to http://%1:%2/admin and add storage for server ID=%3").arg(host.toString()).arg(port).arg(serverId());
+        QString errorMessage = QString("AppServer has no storages defined. Go to http://%1:%2/admin and add storage for server ID=%3").arg(host.toString()).arg(port).arg(videoServer->getId().toString());
         qDebug() << errorMessage;
         cl_log.log(errorMessage, cl_logERROR);
         QnStoragePtr storage(new QnStorage());

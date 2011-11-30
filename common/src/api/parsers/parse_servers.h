@@ -19,6 +19,7 @@ void parseServers(QList<ResourcePtr>& servers, const QnApiServers& xsdServers, Q
         server->setName(i->name().c_str());
         server->setId(i->id().c_str());
         server->setUrl(i->url().c_str());
+        server->setGuid(i->guid().c_str());
         server->setApiUrl(i->apiUrl().c_str());
 
         servers.append(server);

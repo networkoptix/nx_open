@@ -13,6 +13,7 @@
 			<xs:element name="name" type="xs:string"/>
 			<xs:element name="typeId" type="xs:string"/>
 			<xs:element name="url" type="xs:string"/>
+			<xs:element name="guid" type="xs:string"/>
 			<xs:element name="apiUrl" type="xs:string"/>
 		</xs:all>
 	</xs:complexType>
