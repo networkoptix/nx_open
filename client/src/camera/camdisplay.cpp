@@ -227,8 +227,8 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             if (speed != 0  && displayedTime != AV_NOPTS_VALUE && m_lastFrameDisplayed == CLVideoStreamDisplay::Status_Displayed &&
                 !(vd->flags & QnAbstractMediaData::MediaFlags_BOF))
             {
-                QTime t;
-                t.start();
+                //QTime t;
+                //t.start();
                 int sign = speed >= 0 ? 1 : -1;
 
                 while (!m_afterJump && !m_buffering && !m_needStop && m_speed == speed)
@@ -250,7 +250,7 @@ void CLCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                         break;
                     }
                 }
-                realSleepTime = t.elapsed();
+                realSleepTime = displayedTime - m_extTimeSrc->expectedTime();
 
             }
         }

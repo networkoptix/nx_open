@@ -23,6 +23,7 @@ public:
     virtual qint64 getCurrentTime() const;
     virtual qint64 getDisplayedTime() const;
     virtual qint64 getNextTime() const;
+    virtual qint64 expectedTime() const;
 
     // nav delegate
     virtual bool jumpTo(qint64 mksec,  qint64 skipTime);

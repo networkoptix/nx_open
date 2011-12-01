@@ -414,6 +414,13 @@ void QnArchiveSyncPlayWrapper::onBufferingFinished(QnlTimeSource* source)
     }
 }
 
+qint64 QnArchiveSyncPlayWrapper::expectedTime() const
+{
+    Q_D(const QnArchiveSyncPlayWrapper);
+    QMutexLocker lock(&d->timeMutex);
+    return d->lastJumpTime + d->timer.elapsed()*1000 * d->speed;
+}
+
 qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
 {
     Q_D(const QnArchiveSyncPlayWrapper);
@@ -429,42 +436,42 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
             return d->lastJumpTime;
     }
 
-    qint64 expectedTime = d->lastJumpTime + d->timer.elapsed()*1000 * d->speed;
+    qint64 expectTime = expectedTime();
 
     /*
     QString s;
     QTextStream str(&s);
-    str << "expectedTime=" << QDateTime::fromMSecsSinceEpoch(expectedTime/1000).toString("hh:mm:ss.zzz");
+    str << "expectTime=" << QDateTime::fromMSecsSinceEpoch(expectTime/1000).toString("hh:mm:ss.zzz");
     str.flush();
     cl_log.log(s, cl_logALWAYS);
     */
 
 
     qint64 nextTime = getNextTime();
-    if (d->speed >= 0 && nextTime != AV_NOPTS_VALUE && nextTime > expectedTime + MAX_FRAME_DURATION*1000)
+    if (d->speed >= 0 && nextTime != AV_NOPTS_VALUE && nextTime > expectTime + MAX_FRAME_DURATION*1000)
     {
         QnArchiveSyncPlayWrapper* nonConstThis = const_cast<QnArchiveSyncPlayWrapper*>(this);
 		/*
         QString s;
         QTextStream str(&s);
         str << "reinitTimeTo=" << QDateTime::fromMSecsSinceEpoch(nextTime/1000).toString("hh:mm:ss.zzz") << 
-               "expected time=" << QDateTime::fromMSecsSinceEpoch(expectedTime/1000).toString("hh:mm:ss.zzz");
+               "expected time=" << QDateTime::fromMSecsSinceEpoch(expectTime/1000).toString("hh:mm:ss.zzz");
         str.flush();
         cl_log.log(s, cl_logALWAYS);
 		*/
 
         nonConstThis->reinitTime(nextTime);
-        expectedTime = d->lastJumpTime + d->timer.elapsed()*1000 * d->speed;
+        expectTime = expectedTime();
     }
-    else if (d->speed < 0 && nextTime != AV_NOPTS_VALUE && nextTime < expectedTime - MAX_FRAME_DURATION*1000)
+    else if (d->speed < 0 && nextTime != AV_NOPTS_VALUE && nextTime < expectTime - MAX_FRAME_DURATION*1000)
     {
         QnArchiveSyncPlayWrapper* nonConstThis = const_cast<QnArchiveSyncPlayWrapper*>(this);
         nonConstThis->reinitTime(nextTime);
-        expectedTime = d->lastJumpTime + d->timer.elapsed()*1000 * d->speed;
+        expectTime = expectedTime();
         /*
         QString s;
         QTextStream str(&s);
-        str << "reinitTimeTo=" << QDateTime::fromMSecsSinceEpoch(nextTime/1000).toString("hh:mm:ss.zzz") << "correctExpectedTime to=" << QDateTime::fromMSecsSinceEpoch(expectedTime/1000).toString("hh:mm:ss.zzz");
+        str << "reinitTimeTo=" << QDateTime::fromMSecsSinceEpoch(nextTime/1000).toString("hh:mm:ss.zzz") << "correctExpectTime to=" << QDateTime::fromMSecsSinceEpoch(expectTime/1000).toString("hh:mm:ss.zzz");
         str.flush();
         cl_log.log(s, cl_logALWAYS);
         */
@@ -474,9 +481,9 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
     if (displayedTime == AV_NOPTS_VALUE)
         return displayedTime;
     if (d->speed >= 0) 
-        return qMin(expectedTime, displayedTime + SYNC_EPS);
+        return qMin(expectTime, displayedTime + SYNC_EPS);
     else 
-        return qMax(expectedTime, displayedTime - SYNC_EPS);
+        return qMax(expectTime, displayedTime - SYNC_EPS);
 }
 
 void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvider* reader, bool value)

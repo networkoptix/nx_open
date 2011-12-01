@@ -302,7 +302,9 @@ void QnResourceWidget::drawCurrentTime(QPainter *painter, const QRectF& rect, qi
     if (!text.isEmpty())
     {
         QFont font;
-        font.setPixelSize(6);
+        //font.setPixelSize(6);
+        font.setPointSizeF(5.5);
+        font.setStyleHint(QFont::SansSerif, QFont::ForceOutline);
         QFontMetrics metric(font);
         QSize size = metric.size(Qt::TextSingleLine, text);
         painter->setFont(font);
