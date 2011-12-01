@@ -15,7 +15,7 @@
 	<name>VMS</name>
 	<properties>
 		<msbuild.exe>C:\WINDOWS\Microsoft.NET\Framework\v3.5\msbuild.exe</msbuild.exe>
-		<msbuild.configuration>debug</msbuild.configuration>
+		<msbuild.configuration>release</msbuild.configuration>
 	</properties>
     <modules>
         <module>common</module>
