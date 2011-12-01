@@ -411,19 +411,21 @@ void CLCamDisplay::afterJump(QnAbstractMediaDataPtr media)
     QnCompressedVideoDataPtr vd = qSharedPointerDynamicCast<QnCompressedVideoData>(media);
     //cl_log.log("after jump.time=", QDateTime::fromMSecsSinceEpoch(newTime/1000).toString(), cl_logWARNING);
 
+    clearVideoQueue();
+    for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) 
+        m_display[i]->afterJump();
+
+    QMutexLocker lock(&m_timeMutex);
     m_lastAudioPacketTime = media->timestamp;
     m_lastVideoPacketTime = media->timestamp;
     m_previousVideoTime = media->timestamp;
     //m_previousVideoDisplayedTime = 0;
-
     m_totalFrames = 0;
     m_iFrames = 0;
-    clearVideoQueue();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
         if (m_display[i]) {
             if (vd && !vd->ignore)
                 m_display[i]->blockTimeValue(media->timestamp);
-            m_display[i]->afterJump();
             m_display[i]->unblockTimeValue();
         }
     }
@@ -572,7 +574,6 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
 
     if( m_afterJump)
     {
-        QMutexLocker lock(&m_timeMutex);
         if (!(media->flags & QnAbstractMediaData::MediaFlags_BOF)) // jump finished, but old data received)
             return true; // jump finished, but old data received
 
@@ -580,10 +581,11 @@ bool CLCamDisplay::processData(QnAbstractDataPacketPtr data)
         // Some clips has very low key frame rate. This condition protect audio buffer overflowing and improve seeking for such clips
         if (ad && ts < m_jumpTime - AUDIO_BUFF_SIZE/2*1000)
             return true; // skip packet
-        if (m_executingJump == 0)
-            m_afterJump = false;
         // clear everything we can
         afterJump(media);
+        QMutexLocker lock(&m_timeMutex);
+        if (m_executingJump == 0)
+            m_afterJump = false;
         //cl_log.log("ProcessData 2", QDateTime::fromMSecsSinceEpoch(vd->timestamp/1000).toString("hh:mm:ss.zzz"), cl_logALWAYS);
     }
 
