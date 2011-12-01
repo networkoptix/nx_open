@@ -880,7 +880,10 @@ qint64 CLCamDisplay::getCurrentTime() const
 
 qint64 CLCamDisplay::getNextTime() const
 {
-    return m_lastDisplayedVideoTime;
+    if (m_display[0]->isTimeBlocked())
+        return m_display[0]->getLastDisplayedTime();
+    else
+        return m_lastDisplayedVideoTime;
 }
 
 qint64 CLCamDisplay::getDisplayedTime() const
