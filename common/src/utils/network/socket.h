@@ -117,6 +117,8 @@ public:
    */
   static unsigned short resolveService(const QString &service,
                                        const QString &protocol = "tcp");
+
+  int handle() const { return sockDesc; }
 protected:
     void createSocket(int type, int protocol);
 private:

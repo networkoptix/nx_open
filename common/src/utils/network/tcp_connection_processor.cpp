@@ -15,6 +15,7 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(QnTCPConnectionProcessorPriva
 {
     Q_D(QnTCPConnectionProcessor);
     d->socket = socket;
+    setNoDelay();
     d->owner = _owner;
 }
 
@@ -111,6 +112,36 @@ void QnTCPConnectionProcessor::parseRequest()
     int bodyStart = d->clientRequest.indexOf(dblDelim);
     if (bodyStart >= 0 && d->requestHeaders.value("content-length").toInt() > 0)
         d->requestBody = d->clientRequest.mid(bodyStart + dblDelim.length());
+}
+
+void QnTCPConnectionProcessor::bufferData(const char* data, int size)
+{
+    Q_D(QnTCPConnectionProcessor);
+    d->sendBuffer.write(data, size);
+}
+
+void QnTCPConnectionProcessor::sendBuffer()
+{
+    Q_D(QnTCPConnectionProcessor);
+    sendData(d->sendBuffer.data(), d->sendBuffer.size());
+}
+
+void QnTCPConnectionProcessor::clearBuffer()
+{
+    Q_D(QnTCPConnectionProcessor);
+    d->sendBuffer.clear();
+}
+
+void QnTCPConnectionProcessor::setNoDelay()
+{
+    Q_D(QnTCPConnectionProcessor);
+    int flag = 1;
+    int result = setsockopt(d->socket->handle(),            /* socket affected */
+        IPPROTO_TCP,     /* set option at TCP level */
+        TCP_NODELAY,     /* name of option */
+        (char *) &flag,  /* the cast is historical
+                             cruft */
+        sizeof(int));    /* length of option value */
 }
 
 void QnTCPConnectionProcessor::sendData(const char* data, int size)

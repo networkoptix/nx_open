@@ -186,6 +186,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     if (currentContext == 0)
         currentContext = getGeneratedContext(media->compressionType);
     int rtpHeaderSize = 4 + RtpHeader::RTP_HEADER_SIZE;
+    m_owner->clearBuffer();
     if (ctxData[subChannelNumber] == 0 || !ctxData[subChannelNumber]->equalTo(currentContext.data()))
     {
         ctxData[subChannelNumber] = currentContext;
@@ -193,9 +194,9 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         QnFfmpegHelper::serializeCodecContext(currentContext->ctx(), &codecCtxData);
         buildRtspTcpHeader(rtspChannelNum, ssrc + 1, codecCtxData.size(), true, 0); // ssrc+1 - switch data subchannel to context subchannel
         QMutexLocker lock(&m_owner->getSockMutex());
-        m_owner->sendData(m_rtspTcpHeader, rtpHeaderSize);
+        m_owner->bufferData(m_rtspTcpHeader, rtpHeaderSize);
         Q_ASSERT(!codecCtxData.isEmpty());
-        m_owner->sendData(codecCtxData);
+        m_owner->bufferData(codecCtxData);
     }
 
     // send data with RTP headers
@@ -219,35 +220,28 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         sendLen = qMin(MAX_RTSP_DATA_LEN - ffHeaderSize, dataRest);
         buildRtspTcpHeader(rtspChannelNum, ssrc, sendLen + ffHeaderSize, sendLen >= dataRest ? 1 : 0, media->timestamp);
         QMutexLocker lock(&m_owner->getSockMutex());
-        //m_owner->sendData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
+        m_owner->bufferData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
         if (ffHeaderSize) 
         {
-            quint8* hdrPointer = (quint8*) m_rtspTcpHeader + rtpHeaderSize;
             quint32 timestampHigh = htonl(media->timestamp >> 32);
-            //m_owner->sendData((const char*) &timestampHigh, 4);
-            memcpy(hdrPointer, &timestampHigh, 4);
-            hdrPointer += 4;
+            m_owner->bufferData((const char*) &timestampHigh, 4);
             if (video) 
             {
                 quint32 videoHeader = htonl((video->flags << 24) + (video->data.size() & 0x00ffffff));
-                //m_owner->sendData((const char*) &videoHeader, 4);
-                memcpy(hdrPointer, &videoHeader, 4);
-                hdrPointer += 4;
+                m_owner->bufferData((const char*) &videoHeader, 4);
 
                 quint8 cseq = media->opaque;
-                //m_owner->sendData((const char*) &cseq, 1);
-                memcpy(hdrPointer, &cseq, 1);
+                m_owner->bufferData((const char*) &cseq, 1);
             }
+            ffHeaderSize = 0;
         }
-        m_owner->sendData(m_rtspTcpHeader, rtpHeaderSize + ffHeaderSize);
-        ffHeaderSize = 0;
-
 
         Q_ASSERT(sendLen > 0);
-        m_owner->sendData(curData, sendLen);
+        m_owner->bufferData(curData, sendLen);
         curData += sendLen;
 
     }
+    m_owner->sendBuffer();
     if (m_packetSended++ == MAX_PACKETS_AT_SINGLE_SHOT)
         m_singleShotMode = false;
     return true;

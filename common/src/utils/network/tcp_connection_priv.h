@@ -3,6 +3,7 @@ static const QString ENDL("\r\n");
 
 #include <QHttpRequestHeader>
 #include "tcp_connection_processor.h"
+#include "utils/common/bytearray.h"
 
 static const QByteArray STATIC_UNAUTHORIZED_HTML("\
         <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd\">\
@@ -28,7 +29,8 @@ public:
     //enum State {State_Stopped, State_Paused, State_Playing, State_Rewind};
 
     QnTCPConnectionProcessorPrivate():
-          socket(0)
+          socket(0),
+          sendBuffer(CL_MEDIA_ALIGNMENT, 1024*256)
       {
           tcpReadBuffer = new quint8[TCP_READ_BUFFER_SIZE];
       }
@@ -51,4 +53,5 @@ public:
       QMutex sockMutex;
       quint8* tcpReadBuffer;
       QnTcpListener* owner;
+      CLByteArray sendBuffer;
 };
