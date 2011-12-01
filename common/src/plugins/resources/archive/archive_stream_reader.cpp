@@ -11,6 +11,7 @@
 static const int MAX_KEY_FIND_INTERVAL = 10 * 1000 * 1000;
 
 static const int FFMPEG_PROBE_BUFFER_SIZE = 1024 * 512;
+static const qint64 LIVE_SEEK_OFFSET = 1000000ll * 10;
 
 QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     QnAbstractArchiveReader(dev),
@@ -377,7 +378,7 @@ begin_label:
                             if (m_delegate->endTime() != DATETIME_NOW)
                                 seekTime = m_delegate->endTime() - BACKWARD_SEEK_STEP;
                             else
-                                seekTime = QDateTime::currentDateTime().toMSecsSinceEpoch()*1000 - BACKWARD_SEEK_STEP;
+                                seekTime = QDateTime::currentDateTime().toMSecsSinceEpoch()*1000 - LIVE_SEEK_OFFSET;
                             tmpVal = m_lengthMksec;
                         }
                         intChanneljumpTo(seekTime, 0);
