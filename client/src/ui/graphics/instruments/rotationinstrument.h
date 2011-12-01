@@ -10,6 +10,8 @@ class RotationItem;
 
 class RotationInstrument: public DragProcessingInstrument {
     Q_OBJECT;
+
+    typedef DragProcessingInstrument base_type;
 public:
     RotationInstrument(QObject *parent = NULL);
     virtual ~RotationInstrument();

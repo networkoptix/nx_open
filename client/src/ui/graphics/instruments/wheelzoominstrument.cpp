@@ -28,6 +28,10 @@ WheelZoomInstrument::WheelZoomInstrument(QObject *parent):
     animationTimer()->addListener(processor);
 }
 
+void WheelZoomInstrument::aboutToBeDisabledNotify() {
+    kineticProcessor()->reset();
+}
+
 bool WheelZoomInstrument::wheelEvent(QWidget *viewport, QWheelEvent *) {
     m_currentViewport = viewport;
     return false;

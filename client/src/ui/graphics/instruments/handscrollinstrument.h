@@ -7,6 +7,9 @@
 
 class HandScrollInstrument: public DragProcessingInstrument, protected KineticProcessHandler<QPointF> {
     Q_OBJECT;
+
+    typedef DragProcessingInstrument base_type;
+
 public:
     HandScrollInstrument(QObject *parent);
     virtual ~HandScrollInstrument();
@@ -18,6 +21,8 @@ signals:
     void scrollProcessFinished(QGraphicsView *view);
 
 protected:
+    virtual void aboutToBeDisabledNotify() override;
+
     virtual bool mousePressEvent(QWidget *viewport, QMouseEvent *event) override;
 
     virtual void startDragProcess(DragInfo *info) override;

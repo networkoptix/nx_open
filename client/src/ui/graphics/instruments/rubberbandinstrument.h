@@ -13,6 +13,8 @@ class RubberBandItem;
 
 class RubberBandInstrument: public DragProcessingInstrument {
     Q_OBJECT;
+
+    typedef DragProcessingInstrument base_type;
 public:
     RubberBandInstrument(QObject *parent);
     virtual ~RubberBandInstrument();

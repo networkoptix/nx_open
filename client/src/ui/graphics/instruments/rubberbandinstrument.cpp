@@ -186,7 +186,7 @@ private:
 };
 
 RubberBandInstrument::RubberBandInstrument(QObject *parent):
-    DragProcessingInstrument(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
+    base_type(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
     m_rubberBandZValue(std::numeric_limits<qreal>::max())
 {}
 
@@ -216,11 +216,11 @@ void RubberBandInstrument::installedNotify() {
     m_inSelectionChanged = false;
     m_protectSelection = false;
 
-    DragProcessingInstrument::installedNotify();
+    base_type::installedNotify();
 }
 
 void RubberBandInstrument::aboutToBeUninstalledNotify() {
-    DragProcessingInstrument::aboutToBeUninstalledNotify();
+    base_type::aboutToBeUninstalledNotify();
 
     if (scene() != NULL) 
         disconnect(scene(), NULL, this, NULL);

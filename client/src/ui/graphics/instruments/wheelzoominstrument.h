@@ -16,6 +16,8 @@ public:
     WheelZoomInstrument(QObject *parent);
 
 protected:
+    virtual void aboutToBeDisabledNotify() override;
+
     virtual bool wheelEvent(QWidget *viewport, QWheelEvent *event) override;
     virtual bool wheelEvent(QGraphicsScene *scene, QGraphicsSceneWheelEvent *event) override;
 

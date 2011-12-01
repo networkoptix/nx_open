@@ -35,7 +35,7 @@ namespace {
 } // anonymous namespace
 
 ResizingInstrument::ResizingInstrument(QObject *parent):
-    DragProcessingInstrument(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
+    base_type(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
     m_resizeHoverInstrument(new ResizeHoverInstrument(this)),
     m_effectiveDistance(0)
 {}
@@ -93,7 +93,7 @@ bool ResizingInstrument::paintEvent(QWidget *viewport, QPaintEvent *event) {
     qreal effectiveDistance = qMax(effectiveRect.width(), effectiveRect.height());
     m_resizeHoverInstrument->setEffectiveDistance(effectiveDistance);
 
-    return DragProcessingInstrument::paintEvent(viewport, event);
+    return base_type::paintEvent(viewport, event);
 }
 
 void ResizingInstrument::startDragProcess(DragInfo *info) {

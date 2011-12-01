@@ -8,7 +8,7 @@
 #include <ui/animation/animation_event.h>
 
 HandScrollInstrument::HandScrollInstrument(QObject *parent):
-    DragProcessingInstrument(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, AnimationEvent::Animation), parent)
+    base_type(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, AnimationEvent::Animation), parent)
 {
     KineticCuttingProcessor<QPointF> *processor = new KineticCuttingProcessor<QPointF>(this);
     processor->setHandler(this);
@@ -20,6 +20,12 @@ HandScrollInstrument::HandScrollInstrument(QObject *parent):
 
 HandScrollInstrument::~HandScrollInstrument() {
     ensureUninstalled();
+}
+
+void HandScrollInstrument::aboutToBeDisabledNotify() {
+    base_type::aboutToBeDisabledNotify();
+
+    kineticProcessor()->reset();
 }
 
 bool HandScrollInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {

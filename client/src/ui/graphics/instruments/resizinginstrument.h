@@ -29,6 +29,8 @@ class ResizeHoverInstrument;
  */
 class ResizingInstrument: public DragProcessingInstrument {
     Q_OBJECT;
+
+    typedef DragProcessingInstrument base_type;
 public:
     ResizingInstrument(QObject *parent = NULL);
     virtual ~ResizingInstrument();
