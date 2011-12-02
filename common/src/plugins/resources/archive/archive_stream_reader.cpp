@@ -371,7 +371,10 @@ begin_label:
                     // sometime av_file_ssek doesn't seek to key frame (seek direct to specified position)
                     // So, no KEY frame may be found after seek. At this case (m_bottomIFrameTime == -1) we increase seek interval
                     qint64 seekTime = m_bottomIFrameTime != -1 ? m_bottomIFrameTime : (m_lastGopSeekTime != -1 ? m_lastGopSeekTime : m_currentTime-BACKWARD_SEEK_STEP);
-                    seekTime = qMax(m_delegate->startTime(), seekTime - BACKWARD_SEEK_STEP);
+                    if (seekTime != DATETIME_NOW)
+                        seekTime = qMax(m_delegate->startTime(), seekTime - BACKWARD_SEEK_STEP);
+                    else
+                        seekTime = QDateTime::currentDateTime().toMSecsSinceEpoch()*1000 - BACKWARD_SEEK_STEP;
                     if (m_currentTime != seekTime) {
                         m_currentData = QnAbstractMediaDataPtr();
                         qint64 tmpVal = m_bottomIFrameTime != -1 ? m_bottomIFrameTime : m_topIFrameTime;
