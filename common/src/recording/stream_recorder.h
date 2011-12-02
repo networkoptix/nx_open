@@ -17,13 +17,14 @@ public:
     void setTruncateInterval(int seconds);
 
     void setFileName(const QString& fileName);
+    void close();
+    qint64 duration() const { return m_lastPacketTime; }
+    virtual bool processData(QnAbstractDataPacketPtr data);
 signals:
     void recordingFailed(QString errMessage);
     void recordingStarted();
 protected:
-	virtual bool processData(QnAbstractDataPacketPtr data);
 	virtual void endOfRun();
-	void cleanup();
     bool initFfmpegContainer(QnCompressedVideoDataPtr mediaData);
 protected:
 	QnResourcePtr m_device;
@@ -43,6 +44,7 @@ private:
     qint64 m_prevDateTime;
     QString m_fileName;
     QString m_fixedFileName;
+    qint64 m_lastPacketTime;
 };
 
 #endif //_STREAM_RECORDER_H__

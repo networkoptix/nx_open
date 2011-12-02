@@ -2,6 +2,10 @@
 #include "storage_manager.h"
 #include "utils/common/util.h"
 #include "file_deletor.h"
+#include "plugins/resources/archive/avi_files/avi_archive_delegate.h"
+#include "stream_recorder.h"
+#include "plugins/resources/archive/avi_files/avi_device.h"
+#include "plugins/resources/archive/archive_stream_reader.h"
 
 DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress):
     m_firstDeleteCount(0),
@@ -93,17 +97,31 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
     return true;
 }
 
-qint64 DeviceFileCatalog::getFileDuration(const QString& fileName)
+qint64 DeviceFileCatalog::recreateFile(const QString& fileName)
 {
-    qint64 rez = 0;
-    AVFormatContext* formatContext;
-    QString url = QLatin1String("ufile:") + fileName;
-    if (av_open_input_file(&formatContext, url.toUtf8().constData(), NULL, 0, NULL) >= 0)
+    cl_log.log("recreate broken file", fileName, cl_logWARNING);
+    QnAviResourcePtr res(new QnAviResource(fileName));
+    QnAviArchiveDelegate* avi = new QnAviArchiveDelegate();
+    if (!avi->open(res)) {
+        delete avi;
+        return 0;
+    }
+    QnArchiveStreamReader* reader = new QnArchiveStreamReader(res);
+    reader->setArchiveDelegate(avi);
+    QnStreamRecorder recorder(res);
+    recorder.setFileName(fileName + ".new");
+    QnAbstractMediaDataPtr packet;
+    while (packet = avi->getNextData())
     {
-        if (formatContext->duration != AV_NOPTS_VALUE)
-            rez = formatContext->duration;
-        av_close_input_file(formatContext);
-        return rez;
+        packet->dataProvider = reader;
+        recorder.processData(packet);
+    }
+    qint64 rez = recorder.duration();
+    recorder.close();
+    delete reader;
+
+    if (QFile::remove(fileName)) {
+        QFile::rename(fileName+".new.mkv", fileName);
     }
     return rez;
 }
@@ -128,7 +146,7 @@ void DeviceFileCatalog::deserializeTitleFile()
         {
             // duration unknown. server restart occured. Duration for chunk is unknown
             needRewriteFile = true;
-            chunk.duration = getFileDuration(fullFileName(chunk));
+            chunk.duration = recreateFile(fullFileName(chunk));
         }
         if (fileExists(chunk)) 
         {

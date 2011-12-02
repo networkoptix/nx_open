@@ -4,6 +4,7 @@
 #include "utils/network/tcp_connection_priv.h"
 #include "rest/server/rest_server.h"
 #include "core/resourcemanagment/resource_pool.h"
+#include "utils/common/util.h"
 
 QString QnRestXsdHelpHandler::getXsdUrl(TCPSocket* tcpSocket) const
 {
@@ -37,6 +38,7 @@ int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestP
     QByteArray errStr;
     QByteArray errStrMac;
     bool urlFound = false;
+    bool useBinary = false;
     for (int i = 0; i < params.size(); ++i)
     {
         if (params[i].first == "mac")
@@ -58,6 +60,8 @@ int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestP
         }
         else if (params[i].first == "detail")
             detailLevel = params[i].second.toLongLong();
+        else if (params[i].first == "format")
+            useBinary = params[i].second == "bin";
     }
     if (!urlFound)
         errStr += "Parameter mac must be provided. \n";
@@ -80,12 +84,21 @@ int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestP
     }
 
     QnTimePeriodList periods = qnStorageMan->getRecordedPeriods(resList, startTime, endTime, detailLevel);
-
-    result.append("<recordedTimePeriods xmlns=\"http://www.networkoptix.com/xsd/api/recordedTimePeriods\">\n");
-
-    foreach(QnTimePeriod period, periods)
-        result.append(QString("<timePeriod startTime=\"%1\" duration=\"%2\" />\n").arg(period.startTimeUSec).arg(period.durationUSec));
-    result.append("</recordedTimePeriods>\n");
+    if (useBinary) {
+        foreach(QnTimePeriod period, periods)
+        {
+            qint64 start = htonll(period.startTimeUSec/1000);
+            qint64 duration = htonll(period.durationUSec/1000);
+            result.append((const char*) &start, 6);
+            result.append((const char*) &duration, 5);
+        }
+    }
+    else {
+        result.append("<recordedTimePeriods xmlns=\"http://www.networkoptix.com/xsd/api/recordedTimePeriods\">\n");
+        foreach(QnTimePeriod period, periods)
+            result.append(QString("<timePeriod startTime=\"%1\" duration=\"%2\" />\n").arg(period.startTimeUSec).arg(period.durationUSec));
+        result.append("</recordedTimePeriods>\n");
+    }
 
     return CODE_OK;
 }

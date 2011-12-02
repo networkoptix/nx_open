@@ -23,17 +23,18 @@ m_formatCtx(0),
 m_truncateInterval(0),
 m_currentChunkLen(0),
 m_prevDateTime(-1),
-m_currentDateTime(-1)
+m_currentDateTime(-1),
+m_lastPacketTime(0)
 {
 	memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
 }
 
 QnStreamRecorder::~QnStreamRecorder()
 {
-	cleanup();
+	close();
 }
 
-void QnStreamRecorder::cleanup()
+void QnStreamRecorder::close()
 {
     if (m_formatCtx) 
     {
@@ -104,7 +105,7 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
             //cl_log.log("chunkLen=" , m_currentChunkLen/1000000.0, cl_logALWAYS);
             m_prevDateTime = m_currentDateTime;
             m_currentDateTime = md->timestamp;
-            cleanup();
+            close();
             return processData(data);
         }
     }
@@ -116,7 +117,8 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
     AVStream* stream = m_formatCtx->streams[channel];
     AVRational srcRate = {1, 1000000};
     Q_ASSERT(stream->time_base.num && stream->time_base.den);
-    avPkt.pts = av_rescale_q(md->timestamp-m_firstTimestamp, srcRate, stream->time_base);
+    m_lastPacketTime = md->timestamp-m_firstTimestamp;
+    avPkt.pts = av_rescale_q(m_lastPacketTime, srcRate, stream->time_base);
     if(md->flags & AV_PKT_FLAG_KEY)
         avPkt.flags |= AV_PKT_FLAG_KEY;
     avPkt.stream_index= channel;
@@ -133,14 +135,14 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
 
 void QnStreamRecorder::endOfRun()
 {
-	cleanup();
+	close();
 }
 
 bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
 {
     if (m_currentDateTime == -1)
         m_currentDateTime = mediaData->timestamp;
-    QnResourcePtr resource = mediaData->dataProvider->getResource();
+    //QnResourcePtr resource = mediaData->dataProvider->getResource();
     // allocate container
     AVOutputFormat * outputCtx = av_guess_format("matroska",NULL,NULL);
     if (outputCtx == 0)
@@ -181,7 +183,6 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     outputCtx->video_codec = mediaData->compressionType;
     
     QnAbstractMediaStreamDataProvider* mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider*> (mediaData->dataProvider);
-
     Q_ASSERT(mediaProvider);
 
     
@@ -190,7 +191,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         cl_log.log(m_lastErrMessage, cl_logERROR);
         return false;
     }
-    QnMediaResourcePtr mediaDev = qSharedPointerDynamicCast<QnMediaResource>(resource);
+    QnMediaResourcePtr mediaDev = qSharedPointerDynamicCast<QnMediaResource>(m_device);
     QString layoutStr = QnArchiveStreamReader::serializeLayout(mediaDev->getVideoLayout(mediaProvider));
     av_metadata_set2(&m_formatCtx->metadata, "video_layout", layoutStr.toAscii().data(), 0);
     const QnResourceAudioLayout* audioLayout = mediaDev->getAudioLayout(mediaProvider);
@@ -209,22 +210,29 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         }
 
         AVCodecContext* videoCodecCtx = videoStream->codec;
-        videoCodecCtx->codec_id = outputCtx->video_codec;
-        videoCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
-        AVRational defaultFrameRate = {1, 30};
-        videoCodecCtx->time_base = defaultFrameRate;
-        videoCodecCtx->width = mediaData->width;
-        videoCodecCtx->height = mediaData->height;
-        
-        if (mediaData->compressionType == CODEC_ID_MJPEG)
-            videoCodecCtx->pix_fmt = PIX_FMT_YUVJ420P;
-        else
-            videoCodecCtx->pix_fmt = PIX_FMT_YUV420P;
-        videoCodecCtx->bit_rate = 1000000 * 6;
+        if (mediaData->context) {
+            avcodec_copy_context(videoCodecCtx, mediaData->context->ctx());
+        }
+        else {
+            videoCodecCtx->codec_id = outputCtx->video_codec;
+            videoCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
+            AVRational defaultFrameRate = {1, 30};
+            videoCodecCtx->time_base = defaultFrameRate;
+            videoCodecCtx->width = qMax(8,mediaData->width);
+            videoCodecCtx->height = qMax(8,mediaData->height);
+            
+            if (mediaData->compressionType == CODEC_ID_MJPEG)
+                videoCodecCtx->pix_fmt = PIX_FMT_YUVJ420P;
+            else
+                videoCodecCtx->pix_fmt = PIX_FMT_YUV420P;
+            videoCodecCtx->bit_rate = 1000000 * 6;
 
-        videoCodecCtx->sample_aspect_ratio.num = 1;
-        videoCodecCtx->sample_aspect_ratio.den = 1;
+            videoCodecCtx->sample_aspect_ratio.num = 1;
+            videoCodecCtx->sample_aspect_ratio.den = 1;
+        }
+        videoCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
         videoStream->sample_aspect_ratio = videoCodecCtx->sample_aspect_ratio;
+        videoStream->first_dts = 0;
 
         //AVRational srcRate = {1, 1000000};
         //videoStream->first_dts = av_rescale_q(mediaData->timestamp, srcRate, stream->time_base);

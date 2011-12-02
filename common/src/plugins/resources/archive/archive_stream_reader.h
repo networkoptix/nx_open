@@ -40,9 +40,8 @@ public:
     virtual void previousFrame(qint64 mksec);
     virtual void pauseMedia();
     virtual void resumeMedia();
-
-protected:
     virtual QnAbstractMediaDataPtr getNextData();
+protected:
     virtual void channeljumpTo(qint64 mksec, int channel, qint64 skipTime);
 
     virtual bool init();
