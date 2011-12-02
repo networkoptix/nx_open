@@ -54,6 +54,9 @@ signals:
     void resizingProcessFinished(QGraphicsView *view, QGraphicsWidget *widget);
 
 protected:
+    virtual void enabledNotify() override;
+    virtual void aboutToBeDisabledNotify() override;
+
     virtual bool mousePressEvent(QWidget *viewport, QMouseEvent *event) override;
     virtual bool paintEvent(QWidget *viewport, QPaintEvent *event) override;
 

@@ -172,6 +172,20 @@ public:
      */
     void removeButton(QGraphicsLayoutItem *button);
 
+    /**
+     * \returns                         Whether this widget is resizable.
+     */
+    bool isResizable() const {
+        return m_resizable;
+    }
+
+    /**
+     * \param resizable                 New resizable state for this widget.
+     */
+    void setResizable(bool resizable) {
+        m_resizable = resizable;
+    }
+
     using base_type::mapRectToScene;
 
 signals:
@@ -256,6 +270,9 @@ private:
 
     /** Time when the last new frame was rendered, in milliseconds. */
     qint64 m_lastNewFrameTimeMSec;
+
+    /** Whether this widget is resizable. */
+    bool m_resizable;
 };
 
 #endif // QN_RESOURCE_WIDGET_H

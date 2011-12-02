@@ -51,7 +51,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchItem *item, QGraphicsItem *parent)
     m_enclosingAspectRatio(1.0),
     m_frameWidth(0.0),
     m_aboutToBeDestroyedEmitted(false),
-    m_lastNewFrameTimeMSec(QDateTime::currentMSecsSinceEpoch())
+    m_lastNewFrameTimeMSec(QDateTime::currentMSecsSinceEpoch()),
+    m_resizable(true)
 {
     /* Set up shadow. */
     m_shadow = new QnPolygonalShadowItem();
@@ -469,6 +470,9 @@ Qn::WindowFrameSections QnResourceWidget::windowFrameSectionsAt(const QRectF &re
     /* This widget has no side frame sections in case aspect ratio is set. */
     if(hasAspectRatio())
         result = result & ~(Qn::LeftSection | Qn::RightSection | Qn::TopSection | Qn::BottomSection);
+
+    if(!m_resizable)
+        result = result & Qn::TitleBarArea;
 
     return result;
 }

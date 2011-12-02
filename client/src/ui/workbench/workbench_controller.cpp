@@ -49,6 +49,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_display(display),
     m_manager(display->instrumentManager())
 {
+    std::memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
+
     QEvent::Type mouseEventTypeArray[] = {
         QEvent::GraphicsSceneMousePress,
         QEvent::GraphicsSceneMouseMove,
@@ -467,10 +469,31 @@ void QnWorkbenchController::at_viewportUngrabbed() {
 
 void QnWorkbenchController::at_display_widgetChanged(QnWorkbench::ItemRole role) {
     QnResourceWidget *widget = m_display->widget(role);
+    QnResourceWidget *oldWidget = m_widgetByRole[role];
+    if(widget == oldWidget)
+        return;
+
+    m_widgetByRole[role] = widget;
     
-    /* Update navigation item's target. */
-    if(role == QnWorkbench::FOCUSED)
+    switch(role) {
+    case QnWorkbench::FOCUSED:
+        /* Update navigation item's target. */
         m_navigationItem->setVideoCamera(widget == NULL ? NULL : widget->display()->camera());
+        break;
+    case QnWorkbench::ZOOMED:
+        if(oldWidget != NULL) {
+            oldWidget->setFlag(QGraphicsItem::ItemIsMovable, true);
+            oldWidget->setResizable(true);
+        }
+
+        if(widget != NULL) {
+            widget->setFlag(QGraphicsItem::ItemIsMovable, false);
+            widget->setResizable(false);
+        }
+        break;
+    default:
+        break;
+    }
 }
 
 void QnWorkbenchController::at_display_widgetAdded(QnResourceWidget *widget) {

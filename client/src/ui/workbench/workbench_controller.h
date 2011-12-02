@@ -118,6 +118,9 @@ private:
 
     /** Navigation item. */
     NavigationItem *m_navigationItem;
+
+    /** Widgets by role. */
+    QnResourceWidget *m_widgetByRole[QnWorkbench::ITEM_ROLE_COUNT];
 };
 
 #endif // QN_WORKBENCH_CONTROLLER_H

@@ -44,6 +44,18 @@ ResizingInstrument::~ResizingInstrument() {
     ensureUninstalled();
 }
 
+void ResizingInstrument::enabledNotify() {
+    m_resizeHoverInstrument->recursiveEnable();
+
+    base_type::enabledNotify();
+}
+
+void ResizingInstrument::aboutToBeDisabledNotify() {
+    base_type::aboutToBeDisabledNotify();
+
+    m_resizeHoverInstrument->recursiveDisable();
+}
+
 bool ResizingInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
     if(!dragProcessor()->isWaiting())
         return false;
