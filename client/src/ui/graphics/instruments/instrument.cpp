@@ -393,10 +393,8 @@ bool Instrument::animationEvent(AnimationEvent *event) {
 }
 
 AnimationTimer *Instrument::animationTimer() {
-    if(m_animationTimer.isNull()) {
+    if(m_animationTimer.isNull())
         m_animationTimer.reset(new AnimationTimer());
-        m_animationTimer->activate();
-    }
         
     return m_animationTimer.data();
 }

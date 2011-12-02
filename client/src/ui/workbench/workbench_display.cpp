@@ -263,7 +263,7 @@ void QnWorkbenchDisplay::setView(QGraphicsView *view) {
         m_viewportAnimator->setView(NULL);
 
         /* Stop viewport updates. */
-        timer()->deactivate();
+        stopListening();
     }
 
     m_view = view;
@@ -315,7 +315,7 @@ void QnWorkbenchDisplay::setView(QGraphicsView *view) {
         m_viewportAnimator->setView(m_view);
 
         /* Start viewport updates. */
-        timer()->activate();
+        startListening();
     }
 }
 

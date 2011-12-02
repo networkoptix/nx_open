@@ -10,6 +10,7 @@ InstrumentPaintSyncer::InstrumentPaintSyncer(QObject *parent):
     m_currentWidget(NULL)
 {
     m_animationTimer->addListener(this);
+    startListening();
 }
 
 bool InstrumentPaintSyncer::eventFilter(QObject *watched, QEvent *event) {
