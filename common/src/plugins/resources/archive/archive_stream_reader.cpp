@@ -270,8 +270,10 @@ begin_label:
             m_lastGopSeekTime = -1;
             intChanneljumpTo(displayTime, 0);
             m_nextData.clear();
-            if (reverseMode)
-                m_topIFrameTime = displayTime;
+            if (reverseMode) {
+                if (displayTime != DATETIME_NOW)
+                    m_topIFrameTime = displayTime;
+            }
             else
                 setSkipFramesToTime(displayTime);
             m_BOF = true;
@@ -533,8 +535,9 @@ begin_label:
 
 void QnArchiveStreamReader::intChanneljumpTo(qint64 mksec, int /*channel*/)
 {
+    qint64 seekRez = 0;
     if (mksec > 0) {
-        m_delegate->seek(mksec);
+        seekRez = m_delegate->seek(mksec);
     }
     else {
         // some files can't correctly jump to 0
@@ -545,7 +548,7 @@ void QnArchiveStreamReader::intChanneljumpTo(qint64 mksec, int /*channel*/)
 
 	m_wakeup = true;
     m_bottomIFrameTime = -1;
-    m_topIFrameTime = mksec;
+    m_topIFrameTime = seekRez != -1 ? seekRez : mksec;
     m_IFrameAfterJumpFound = false;
     m_eof = false;
 }

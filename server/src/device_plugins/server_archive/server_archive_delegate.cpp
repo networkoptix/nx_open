@@ -78,10 +78,16 @@ qint64 QnServerArchiveDelegate::seek(qint64 time)
             m_aviDelegate->doNotFindStreamInfo(); // optimization
     }
 
-    int duration = m_currentChunk.duration;
-    if (duration == -1) // last live chunk
-        duration = QDateTime::currentDateTime().toMSecsSinceEpoch()*1000 - m_currentChunk.startTime;
-    qint64 chunkOffset = qBound(0ll, time - m_currentChunk.startTime, duration - BACKWARD_SEEK_STEP);
+    //int duration = m_currentChunk.duration;
+    qint64 chunkOffset = 0;
+    if (m_currentChunk.duration == -1) // last live chunk
+    {
+        // do not seek over live chunk because it's very slow (seek always going to begin of file because mkv seek catalog is't ready)
+        chunkOffset = qBound(0ll, time - m_currentChunk.startTime, BACKWARD_SEEK_STEP);
+    }
+    else {
+        chunkOffset = qBound(0ll, time - m_currentChunk.startTime, m_currentChunk.duration - BACKWARD_SEEK_STEP);
+    }
     qint64 seekRez = m_aviDelegate->seek(chunkOffset);
     if (seekRez == -1)
         return seekRez;
