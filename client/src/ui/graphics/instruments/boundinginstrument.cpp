@@ -232,6 +232,9 @@ public:
         m_sizeUpperBounds = sizeUpperBound;
         m_upperMode = upperMode;
 
+        if(!contains(m_sizeUpperBounds, m_sizeLowerBounds))
+            m_sizeUpperBounds = m_sizeLowerBounds;
+
         if(m_view != NULL) {
             updateSceneRect();
             invalidateParameters();
