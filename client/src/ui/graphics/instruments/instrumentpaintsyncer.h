@@ -4,7 +4,7 @@
 #include <QObject>
 #include <ui/animation/animation_timer.h>
 
-class InstrumentPaintSyncer: public QObject, public AbstractAnimationTimer, public AnimationTimerListener {
+class InstrumentPaintSyncer: public QObject, public AnimationTimer, public AnimationTimerListener {
 public:
     InstrumentPaintSyncer(QObject *parent = NULL);
 
@@ -21,7 +21,7 @@ protected:
     }
 
 private:
-    AnimationTimer *m_animationTimer;
+    QAnimationTimer *m_animationTimer;
     int m_ticksSinceLastPaint;
     QWeakPointer<QObject> m_currentWatched;
     QWidget *m_currentWidget;

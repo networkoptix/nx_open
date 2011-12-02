@@ -12,8 +12,6 @@ KineticProcessor::KineticProcessor(int type, QObject *parent):
     mMaxSpeedMagnitude(std::numeric_limits<qreal>::max()),
     mFriction(1.0)
 {
-    (new AnimationTimer(this))->addListener(this);
-
     mMagnitudeCalculator = MagnitudeCalculator::forType(type);
     if(mMagnitudeCalculator == NULL) {
         qnWarning("No magnitude calculator is registered for the given type '%1'.", type);
@@ -181,14 +179,19 @@ void KineticProcessor::transition(State state) {
 
     switch(state) {
     case MEASURING: /* KINETIC -> MEASURING. */
-        timer()->deactivate();
+        stopListening();
         if(mHandler != NULL)
             mHandler->finishKinetic();
         return;
     case KINETIC: /* MEASURING -> KINETIC. */
         mInitialSpeed = mCurrentSpeed = calculateSpeed();
         if(mState == state) { /* State may get changed in a callback. */
-            timer()->activate();
+            if(timer() == NULL) {
+                AnimationTimer *timer = new QAnimationTimer(this);
+                timer->addListener(this);
+            }
+
+            startListening();
             if(mState == state && mHandler != NULL) /* And again, state may have changed. */
                 mHandler->startKinetic();
         }

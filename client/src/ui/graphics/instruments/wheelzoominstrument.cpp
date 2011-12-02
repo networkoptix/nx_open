@@ -28,7 +28,6 @@ WheelZoomInstrument::WheelZoomInstrument(QObject *parent):
     processor->setSpeedCuttingThreshold(degreesFor2x / 3);
     processor->setFlags(KineticProcessor::IGNORE_DELTA_TIME);
     animationTimer()->addListener(processor);
-    animationTimer()->deactivate();
 }
 
 void WheelZoomInstrument::aboutToBeDisabledNotify() {

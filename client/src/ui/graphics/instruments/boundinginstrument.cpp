@@ -417,12 +417,6 @@ void BoundingInstrument::enabledNotify() {
             d->setLastTickTime(currentTime);
         }
     }
-
-    animationTimer()->activate();
-}
-
-void BoundingInstrument::aboutToBeDisabledNotify() {
-    animationTimer()->deactivate();    
 }
 
 bool BoundingInstrument::registeredNotify(QGraphicsView *view) {

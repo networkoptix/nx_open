@@ -119,7 +119,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QnWorkbench *workbench, QObject *parent):
     connect(m_activityListenerInstrument,  SIGNAL(activityResumed()),                                   this,                   SLOT(at_activityStarted()));
 
     /* Configure viewport updates. */
-    (new AnimationTimer(this))->addListener(this);
+    (new QAnimationTimer(this))->addListener(this);
 
     /* Create curtain animator. */
     m_curtainAnimator = new QnCurtainAnimator(1000, this);
