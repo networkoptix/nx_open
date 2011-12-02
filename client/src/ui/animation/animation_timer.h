@@ -2,52 +2,16 @@
 #define QN_ANIMATION_TIMER_H
 
 #include <QAbstractAnimation>
-
-class AbstractAnimationTimer;
-
-/**
- * Interface for detached animation processing. 
- * 
- * It is to be used in conjunction with <tt>AbstractAnimationTimer</tt>.
- */
-class AnimationTimerListener {
-public:
-    AnimationTimerListener();
-
-    virtual ~AnimationTimerListener();
-
-protected:
-    /**
-     * Note that there is a reason for passing delta time instead of absolute time.
-     * Animation timers do not necessarily stop when blocked, and animations 
-     * shouldn't generally depend on absolute time. In case absolute time is 
-     * needed, in can be computed as a sum of delta values.
-     *
-     * \param deltaTime                 Time that has passed since the last tick,
-     *                                  in milliseconds.
-     */
-    virtual void tick(int deltaTime) = 0;
-
-    AbstractAnimationTimer *timer() const {
-        return m_timer;
-    }
-
-private:
-    friend class AbstractAnimationTimer;
-
-    AbstractAnimationTimer *m_timer;
-};
-
+#include "animation_timer_listener.h"
 
 /**
- * Abstract animation timer class that can be linked to animation 
- * timer listeners. 
+ * Animation timer class that can be linked to animation timer listeners. 
  */
-class AbstractAnimationTimer {
+class AnimationTimer {
 public:
-    AbstractAnimationTimer();
+    AnimationTimer();
 
-    virtual ~AbstractAnimationTimer();
+    virtual ~AnimationTimer();
 
     const QList<AnimationTimerListener *> &listeners() const {
         return m_listeners;
@@ -60,16 +24,19 @@ public:
     void clearListeners();
 
     /**
-     * Activates the link between this animation timer and its listeners so 
-     * that is starts sending tick notifications.
+     * Forcibly deactivates this timer so that it stops sending tick notifications.
+     */
+    void deactivate();
+
+    /**
+     * Re-activates this timer so that it resumes sending tick notifications.
      */
     void activate();
 
     /**
-     * Deactivates the link between this animation timer and its listeners so 
-     * that it stops sending tick notifications.
+     * \returns                         Whether this timer is active. 
      */
-    void deactivate();
+    bool isActive() const;
 
     /**
      * This function is to be called by external time source at regular intervals.
@@ -87,29 +54,34 @@ public:
     void reset();
 
 protected:
+    friend class AnimationTimerListener;
+
     virtual void activatedNotify() {}
     virtual void deactivatedNotify() {}
+
+    void listenerStartedListening(AnimationTimerListener *listener);
+    void listenerStoppedListening(AnimationTimerListener *listener);
 
 private:
     QList<AnimationTimerListener *> m_listeners;
     qint64 m_lastTickTime;
-    bool m_active;
+    bool m_deactivated;
+    int m_activeListeners;
 };
 
 
 /**
- * Animation class that can be used as a timer that ticks in sync with 
- * Qt animations.
+ * Animation timer that ticks in sync with Qt animations.
  */
-class AnimationTimer: public AbstractAnimationTimer, protected QAbstractAnimation {
+class QAnimationTimer: public AnimationTimer, protected QAbstractAnimation {
 public:
-    AnimationTimer(QObject *parent = NULL);
+    QAnimationTimer(QObject *parent = NULL);
 
-    virtual ~AnimationTimer();
+    virtual ~QAnimationTimer();
 
 protected:
-    virtual void deactivatedNotify() override;
     virtual void activatedNotify() override;
+    virtual void deactivatedNotify() override;
 
     virtual int duration() const override;
     virtual void updateCurrentTime(int currentTime) override;

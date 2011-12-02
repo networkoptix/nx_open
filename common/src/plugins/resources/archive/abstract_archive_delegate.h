@@ -37,7 +37,7 @@ public:
     virtual void onReverseMode(qint64 /*displayTime*/, bool /*value*/) {}
 
     // for optimization. Inform delegate to pause after sending 1 frame
-    virtual void setSingleshotMode(bool value) {}
+    virtual void setSingleshotMode(bool /*value*/) {}
 
     Flags getFlags() const { return m_flags; }
     virtual bool isRealTimeSource() const { return false; }

@@ -10,6 +10,14 @@ public:
     DragInstrument(QObject *parent);
     virtual ~DragInstrument();
 
+    bool isEffective() const {
+        return m_effective;
+    }
+
+    void setEffective(bool effective) {
+        m_effective = effective;
+    }
+
 signals:
     void dragProcessStarted(QGraphicsView *view);
     void dragStarted(QGraphicsView *view, const QList<QGraphicsItem *> &items);
@@ -26,6 +34,7 @@ protected:
     virtual void finishDragProcess(DragInfo *info) override;
 
 private:
+    bool m_effective;
     QGraphicsItem *m_itemToSelect;
 };
 

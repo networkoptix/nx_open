@@ -40,7 +40,7 @@ class QGraphicsItem;
 class QGraphicsScene;
 class QPoint;
 
-class AbstractAnimationTimer;
+class AnimationTimer;
 class AnimationEvent;
 class InstrumentManager;
 class InstrumentItemEventDispatcher;
@@ -441,12 +441,16 @@ protected:
     }
     
     /**
+     * For the returned timer to be functional, the instrument must be 
+     * subscribed to <tt>Animation</tt> viewport event. 
+     * 
+     * Note that if the instrument is disabled, it won't receive the <tt>Animation</tt>
+     * events, and thus the timer won't work.
+     * 
      * \returns                         Animation timer for this instrument that is
-     *                                  synced with paint events. For it to be functional,
-     *                                  this instrument must be subscribed to <tt>Animation</tt>
-     *                                  viewport event.
+     *                                  synced with paint events. 
      */
-    AbstractAnimationTimer *animationTimer();
+    AnimationTimer *animationTimer();
 
     /**
      * Extension point for instrument enabling.
@@ -685,7 +689,7 @@ private:
 private:
     InstrumentManager *m_manager;
     QGraphicsScene *m_scene;
-    QScopedPointer<AbstractAnimationTimer> m_animationTimer;
+    QScopedPointer<AnimationTimer> m_animationTimer;
     EventTypeSet m_watchedEventTypes[WATCHED_TYPE_COUNT];
     int m_disabledCounter;
 };

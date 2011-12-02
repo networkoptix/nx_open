@@ -3,6 +3,7 @@
 #include <QGraphicsSceneWheelEvent>
 #include <QGraphicsView>
 #include <QCursor>
+#include <QDateTime>
 #include <ui/processors/kineticcuttingprocessor.h>
 #include <ui/animation/animation_event.h>
 
@@ -17,15 +18,20 @@ WheelZoomInstrument::WheelZoomInstrument(QObject *parent):
         makeSet(QEvent::GraphicsSceneWheel),
         makeSet(),
         parent
-    ) 
+    )
 {
-    KineticCuttingProcessor<qreal> *processor = new KineticCuttingProcessor<qreal>(this);
+    KineticCuttingProcessor *processor = new KineticCuttingProcessor(QMetaType::QReal, this);
     processor->setHandler(this);
-    processor->setMaxShiftInterval(0.5);
+    processor->setMaxShiftInterval(0.4);
     processor->setFriction(degreesFor2x / 2);
     processor->setMaxSpeedMagnitude(degreesFor2x * 8);
-    processor->setSpeedCuttingThreshold(degreesFor2x / 4);
+    processor->setSpeedCuttingThreshold(degreesFor2x / 3);
+    processor->setFlags(KineticProcessor::IGNORE_DELTA_TIME);
     animationTimer()->addListener(processor);
+}
+
+void WheelZoomInstrument::aboutToBeDisabledNotify() {
+    kineticProcessor()->reset();
 }
 
 bool WheelZoomInstrument::wheelEvent(QWidget *viewport, QWheelEvent *) {
@@ -50,13 +56,13 @@ bool WheelZoomInstrument::wheelEvent(QGraphicsScene *, QGraphicsSceneWheelEvent 
     return false;
 }
 
-void WheelZoomInstrument::kineticMove(const qreal &degrees) {
+void WheelZoomInstrument::kineticMove(const QVariant &degrees) {
     QWidget *viewport = m_currentViewport.data();
     if(viewport == NULL)
         return;
 
     /* 180 degree turn makes a 2x scale. */
-    qreal factor = std::pow(2.0, -degrees / degreesFor2x);
+    qreal factor = std::pow(2.0, -degrees.toReal() / degreesFor2x);
     scaleViewport(this->view(viewport), factor, m_viewportAnchor);
 }
 

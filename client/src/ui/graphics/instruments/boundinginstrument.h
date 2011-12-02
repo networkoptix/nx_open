@@ -69,7 +69,6 @@ public slots:
 
 protected:
     virtual void enabledNotify() override;
-    virtual void aboutToBeDisabledNotify() override;
 
     virtual bool registeredNotify(QGraphicsView *view) override;
     virtual void unregisteredNotify(QGraphicsView *view) override;

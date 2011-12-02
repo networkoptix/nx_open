@@ -1,14 +1,16 @@
 #include "instrumentpaintsyncer.h"
 #include <QEvent>
+#include <QDateTime>
 #include <QGLWidget>
 
 InstrumentPaintSyncer::InstrumentPaintSyncer(QObject *parent):
     QObject(parent),
-    m_animationTimer(new AnimationTimer(this)),
+    m_animationTimer(new QAnimationTimer(this)),
     m_ticksSinceLastPaint(0),
     m_currentWidget(NULL)
 {
     m_animationTimer->addListener(this);
+    startListening();
 }
 
 bool InstrumentPaintSyncer::eventFilter(QObject *watched, QEvent *event) {

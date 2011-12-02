@@ -29,6 +29,8 @@ class ResizeHoverInstrument;
  */
 class ResizingInstrument: public DragProcessingInstrument {
     Q_OBJECT;
+
+    typedef DragProcessingInstrument base_type;
 public:
     ResizingInstrument(QObject *parent = NULL);
     virtual ~ResizingInstrument();
@@ -45,6 +47,14 @@ public:
         m_effectiveDistance = effectiveDistance;
     }
 
+    bool isEffective() const {
+        return m_effective;
+    }
+
+    void setEffective(bool effective) {
+        m_effective = effective;
+    }
+
 signals:
     void resizingProcessStarted(QGraphicsView *view, QGraphicsWidget *widget);
     void resizingStarted(QGraphicsView *view, QGraphicsWidget *widget);
@@ -52,6 +62,9 @@ signals:
     void resizingProcessFinished(QGraphicsView *view, QGraphicsWidget *widget);
 
 protected:
+    virtual void enabledNotify() override;
+    virtual void aboutToBeDisabledNotify() override;
+
     virtual bool mousePressEvent(QWidget *viewport, QMouseEvent *event) override;
     virtual bool paintEvent(QWidget *viewport, QPaintEvent *event) override;
 
@@ -64,6 +77,7 @@ protected:
 private:
     ResizeHoverInstrument *m_resizeHoverInstrument;
     int m_effectiveDistance;
+    bool m_effective;
     QRectF m_startGeometry;
     bool m_resizingStartedEmitted;
     Qt::WindowFrameSection m_section;

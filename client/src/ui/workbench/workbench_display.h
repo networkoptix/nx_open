@@ -2,6 +2,7 @@
 #define QN_WORKBENCH_MANAGER_H
 
 #include <QObject>
+#include <QHash>
 #include <ui/animation/animation_timer.h>
 #include <ui/common/scene_utility.h>
 #include <utils/common/rect_set.h>
@@ -155,6 +156,8 @@ public:
      */
     QnResourceWidget *widget(CLAbstractRenderer *renderer) const;
 
+    QnResourceWidget *widget(QnWorkbench::ItemRole role) const;
+
     QnResourceDisplay *display(QnWorkbenchItem *item) const;
 
     CLVideoCamera *camera(QnWorkbenchItem *item) const;
@@ -228,6 +231,7 @@ signals:
 
     void widgetAdded(QnResourceWidget *widget);
     void widgetAboutToBeRemoved(QnResourceWidget *widget);
+    void widgetChanged(QnWorkbench::ItemRole role);
 
 protected:
     virtual void tick(int deltaTime) override;
@@ -251,6 +255,8 @@ protected:
     void initWorkbench(QnWorkbench *workbench);
     void initBoundingInstrument();
 
+    void changeItem(QnWorkbench::ItemRole role, QnWorkbenchItem *item);
+
 protected slots:
     void at_viewport_animationFinished();
 
@@ -259,9 +265,7 @@ protected slots:
     
     void at_workbench_aboutToBeDestroyed();
     void at_workbench_modeChanged();
-    void at_workbench_raisedItemChanged();
-    void at_workbench_zoomedItemChanged();
-    void at_workbench_focusedItemChanged();
+    void at_workbench_itemChanged(QnWorkbench::ItemRole role);
 
     void at_item_geometryChanged();
     void at_item_geometryDeltaChanged();
@@ -304,14 +308,8 @@ private:
     /** Current front z displacement value. */
     qreal m_frontZ;
 
-    /** Currently raised item. */
-    QnWorkbenchItem *m_raisedItem;
-
-    /** Currently zoomed item. */
-    QnWorkbenchItem *m_zoomedItem;
-
-    /** Currently focused item. */
-    QnWorkbenchItem *m_focusedItem;
+    /** Current items by role. */
+    QnWorkbenchItem *m_itemByRole[QnWorkbench::ITEM_ROLE_COUNT];
 
     /** Current workbench mode. */
     QnWorkbench::Mode m_mode;

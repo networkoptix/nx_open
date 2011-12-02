@@ -5,6 +5,7 @@
 #include <QScopedPointer>
 #include <ui/common/scene_utility.h>
 #include <core/resource/resource.h>
+#include "workbench.h"
 
 class QGraphicsScene;
 class QGraphicsView;
@@ -80,11 +81,9 @@ protected slots:
     void at_viewportGrabbed();
     void at_viewportUngrabbed();
 
-    void at_workbench_focusedItemChanged();
-    void at_workbench_focusedItemChanged(QnWorkbenchItem *focusedItem);
-
     void at_display_widgetAdded(QnResourceWidget *widget);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
+    void at_display_widgetChanged(QnWorkbench::ItemRole role);
 
 private:
     /** Display synchronizer. */
@@ -119,6 +118,9 @@ private:
 
     /** Navigation item. */
     NavigationItem *m_navigationItem;
+
+    /** Widgets by role. */
+    QnResourceWidget *m_widgetByRole[QnWorkbench::ITEM_ROLE_COUNT];
 };
 
 #endif // QN_WORKBENCH_CONTROLLER_H

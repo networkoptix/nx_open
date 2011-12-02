@@ -35,13 +35,26 @@ namespace {
 } // anonymous namespace
 
 ResizingInstrument::ResizingInstrument(QObject *parent):
-    DragProcessingInstrument(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
+    base_type(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
     m_resizeHoverInstrument(new ResizeHoverInstrument(this)),
-    m_effectiveDistance(0)
+    m_effectiveDistance(0),
+    m_effective(true)
 {}
 
 ResizingInstrument::~ResizingInstrument() {
     ensureUninstalled();
+}
+
+void ResizingInstrument::enabledNotify() {
+    m_resizeHoverInstrument->recursiveEnable();
+
+    base_type::enabledNotify();
+}
+
+void ResizingInstrument::aboutToBeDisabledNotify() {
+    base_type::aboutToBeDisabledNotify();
+
+    m_resizeHoverInstrument->recursiveDisable();
 }
 
 bool ResizingInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event) {
@@ -93,7 +106,7 @@ bool ResizingInstrument::paintEvent(QWidget *viewport, QPaintEvent *event) {
     qreal effectiveDistance = qMax(effectiveRect.width(), effectiveRect.height());
     m_resizeHoverInstrument->setEffectiveDistance(effectiveDistance);
 
-    return DragProcessingInstrument::paintEvent(viewport, event);
+    return base_type::paintEvent(viewport, event);
 }
 
 void ResizingInstrument::startDragProcess(DragInfo *info) {
@@ -119,6 +132,9 @@ void ResizingInstrument::dragMove(DragInfo *info) {
         dragProcessor()->reset();
         return;
     }
+
+    if(!m_effective)
+        return;
 
     /* Prepare shortcuts. */
     QGraphicsWidget *widget = m_widget.data();

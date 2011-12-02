@@ -214,7 +214,7 @@ private:
 
 
 RotationInstrument::RotationInstrument(QObject *parent):
-    DragProcessingInstrument(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent)
+    base_type(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent)
 {
     /* We want to get drags on all paint events. */
     dragProcessor()->setFlags(DragProcessor::DONT_COMPRESS);
@@ -241,11 +241,11 @@ void RotationInstrument::installedNotify() {
     rotationItem()->setVisible(false);
     scene()->addItem(rotationItem());
 
-    DragProcessingInstrument::installedNotify();
+    base_type::installedNotify();
 }
 
 void RotationInstrument::aboutToBeUninstalledNotify() {
-    DragProcessingInstrument::aboutToBeUninstalledNotify();
+    base_type::aboutToBeUninstalledNotify();
 
     if (scene() != NULL) 
         disconnect(scene(), NULL, this, NULL);
@@ -281,7 +281,7 @@ bool RotationInstrument::paintEvent(QWidget *viewport, QPaintEvent *event) {
         return false;
     }
 
-    return DragProcessingInstrument::paintEvent(viewport, event);
+    return base_type::paintEvent(viewport, event);
 }
 
 void RotationInstrument::startDragProcess(DragInfo *info) {
@@ -348,7 +348,6 @@ void RotationInstrument::dragMove(DragInfo *info) {
             QPointF newSceneOrigin = target()->mapToScene(itemOrigin);
             moveViewport(info->view(), newSceneOrigin - sceneOrigin);
             sceneOrigin = newSceneOrigin;
-            //sceneHead = info->view()->mapToScene(info->mouseViewportPos());
         }
     }
 

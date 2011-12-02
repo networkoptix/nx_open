@@ -49,6 +49,8 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_display(display),
     m_manager(display->instrumentManager())
 {
+    std::memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
+
     QEvent::Type mouseEventTypeArray[] = {
         QEvent::GraphicsSceneMousePress,
         QEvent::GraphicsSceneMouseMove,
@@ -167,9 +169,9 @@ QnWorkbenchController::QnWorkbenchController(QnWorkbenchDisplay *display, QObjec
     m_navigationItem->setPos(0, -1000.0); /* Temporary hack to not let it intercept mouse events. */
 
     /* Connect to workbench. */
-    connect(workbench(),                SIGNAL(focusedItemChanged()),                                           this,                   SLOT(at_workbench_focusedItemChanged()));
     
     /* Connect to display. */
+    connect(m_display,                  SIGNAL(widgetChanged(QnWorkbench::ItemRole)),                           this,                   SLOT(at_display_widgetChanged(QnWorkbench::ItemRole)));
     connect(m_display,                  SIGNAL(viewportGrabbed()),                                              this,                   SLOT(at_viewportGrabbed()));
     connect(m_display,                  SIGNAL(viewportUngrabbed()),                                            this,                   SLOT(at_viewportUngrabbed()));
     connect(m_display,                  SIGNAL(widgetAdded(QnResourceWidget *)),                                this,                   SLOT(at_display_widgetAdded(QnResourceWidget *)));
@@ -413,8 +415,8 @@ void QnWorkbenchController::at_item_clicked(QGraphicsView *, QGraphicsItem *item
 
     QnWorkbenchItem *workbenchItem = widget->item();
 
-    workbench()->setRaisedItem(workbench()->raisedItem() == workbenchItem ? NULL : workbenchItem);
-    workbench()->setFocusedItem(workbenchItem);
+    workbench()->setItem(QnWorkbench::RAISED, workbench()->item(QnWorkbench::RAISED) == workbenchItem ? NULL : workbenchItem);
+    workbench()->setItem(QnWorkbench::FOCUSED, workbenchItem);
 }
 
 void QnWorkbenchController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &) {
@@ -424,20 +426,21 @@ void QnWorkbenchController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem
     if(widget == NULL)
         return;
 
-    QnWorkbenchItem *model = widget->item();
-    if(workbench()->zoomedItem() == model) {
+    QnWorkbenchItem *workbenchItem = widget->item();
+    QnWorkbenchItem *zoomedItem = workbench()->item(QnWorkbench::ZOOMED);
+    if(zoomedItem == workbenchItem) {
         QRectF viewportGeometry = m_display->viewportGeometry();
-        QRectF zoomedItemGeometry = m_display->itemGeometry(workbench()->zoomedItem());
+        QRectF zoomedItemGeometry = m_display->itemGeometry(zoomedItem);
 
         if(contains(zoomedItemGeometry.size(), viewportGeometry.size()) && !qFuzzyCompare(viewportGeometry, zoomedItemGeometry)) {
-            workbench()->setZoomedItem(NULL);
-            workbench()->setZoomedItem(model);
+            workbench()->setItem(QnWorkbench::ZOOMED, NULL);
+            workbench()->setItem(QnWorkbench::ZOOMED, workbenchItem);
         } else {
-            workbench()->setZoomedItem(NULL);
-            workbench()->setRaisedItem(NULL);
+            workbench()->setItem(QnWorkbench::ZOOMED, NULL);
+            workbench()->setItem(QnWorkbench::RAISED, NULL);
         }
     } else {
-        workbench()->setZoomedItem(model);
+        workbench()->setItem(QnWorkbench::ZOOMED, workbenchItem);
     }
 }
 
@@ -445,14 +448,14 @@ void QnWorkbenchController::at_scene_clicked(QGraphicsView *) {
     if(workbench() == NULL)
         return;
 
-    workbench()->setRaisedItem(NULL);
+    workbench()->setItem(QnWorkbench::RAISED, NULL);
 }
 
 void QnWorkbenchController::at_scene_doubleClicked(QGraphicsView *) {
     if(workbench() == NULL)
         return;
 
-    workbench()->setZoomedItem(NULL);
+    workbench()->setItem(QnWorkbench::ZOOMED, NULL);
     m_display->fitInView();
 }
 
@@ -464,13 +467,29 @@ void QnWorkbenchController::at_viewportUngrabbed() {
     qDebug("VIEWPORT UNGRABBED");
 }
 
-void QnWorkbenchController::at_workbench_focusedItemChanged() {
-    at_workbench_focusedItemChanged(workbench()->focusedItem());
-}
+void QnWorkbenchController::at_display_widgetChanged(QnWorkbench::ItemRole role) {
+    QnResourceWidget *widget = m_display->widget(role);
+    QnResourceWidget *oldWidget = m_widgetByRole[role];
+    if(widget == oldWidget)
+        return;
 
-void QnWorkbenchController::at_workbench_focusedItemChanged(QnWorkbenchItem *focusedItem) {
-    /* Update navigation item's target. */
-    m_navigationItem->setVideoCamera(m_display->camera(focusedItem));
+    m_widgetByRole[role] = widget;
+    
+    switch(role) {
+    case QnWorkbench::FOCUSED:
+        /* Update navigation item's target. */
+        m_navigationItem->setVideoCamera(widget == NULL ? NULL : widget->display()->camera());
+        break;
+    case QnWorkbench::ZOOMED: {
+        bool effective = widget == NULL;
+        m_resizingInstrument->setEffective(effective);
+        m_resizingInstrument->resizeHoverInstrument()->setEffective(effective);
+        m_dragInstrument->setEffective(effective);
+        break;
+    }
+    default:
+        break;
+    }
 }
 
 void QnWorkbenchController::at_display_widgetAdded(QnResourceWidget *widget) {
@@ -483,9 +502,6 @@ void QnWorkbenchController::at_display_widgetAdded(QnResourceWidget *widget) {
 }
 
 void QnWorkbenchController::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
-    if(widget->item() == workbench()->focusedItem())
-        at_workbench_focusedItemChanged(NULL);
-
     if(widget->display() == NULL || widget->display()->camera() == NULL)
         return;
 

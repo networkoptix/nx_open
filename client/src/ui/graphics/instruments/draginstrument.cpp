@@ -14,7 +14,8 @@ namespace {
 } // anonymous namespace
 
 DragInstrument::DragInstrument(QObject *parent): 
-    DragProcessingInstrument(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent)
+    DragProcessingInstrument(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
+    m_effective(true)
 {}
 
 DragInstrument::~DragInstrument() {
@@ -64,6 +65,9 @@ void DragInstrument::startDrag(DragInfo *info) {
 }
 
 void DragInstrument::dragMove(DragInfo *info) {
+    if(!m_effective)
+        return;
+
     QPointF delta = info->mouseScenePos() - info->lastMouseScenePos();
 
     /* Drag selected items. */

@@ -39,7 +39,7 @@ void InstrumentManagerPrivate::init() {
     
     paintSyncer        = new InstrumentPaintSyncer(q);
     paintSyncer->addListener(this);
-    paintSyncer->activate();
+    startListening();
 }
 
 void InstrumentManagerPrivate::reinstallPaintSyncer(QWidget *oldViewport, QWidget *newViewport) {

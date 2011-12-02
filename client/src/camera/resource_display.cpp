@@ -35,7 +35,7 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
             m_camera = new CLVideoCamera(m_mediaResource, NULL, false, m_mediaProvider);
             
             connect(m_camera->getCamCamDisplay(), SIGNAL(finished()), m_camera,       SLOT(deleteLater()));
-            connect(m_camera->getCamCamDisplay(), SIGNAL(finished()), m_dataProvider, SLOT(deleteLater()));
+            /* Data provider will be destroyed by the camDisplay. */
         } else {
             m_camera = NULL;
 
