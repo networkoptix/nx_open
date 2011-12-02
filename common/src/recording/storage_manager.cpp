@@ -9,7 +9,8 @@ Q_GLOBAL_STATIC(QnStorageManager, inst)
 // -------------------- QnStorageManager --------------------
 
 QnStorageManager::QnStorageManager():
-    m_mutex(QMutex::Recursive)
+    m_mutex(QMutex::Recursive),
+    m_storageFileReaded(false)
 {
 }
 
@@ -23,8 +24,69 @@ void QnStorageManager::loadFullFileCatalog()
     }
 }
 
+bool QnStorageManager::deserializeStorageFile()
+{
+    QFile storageFile(closeDirPath(getDataDirectory()) + QString("record_catalog/storage_index.csv"));
+    if (!storageFile.exists())
+        return true;
+    if (!storageFile.open(QFile::ReadOnly))
+        return false;
+    // deserialize storage file
+    QString line = storageFile.readLine(); // skip csv header
+    do {
+        line = storageFile.readLine();
+        QStringList params = line.split(';');
+        if (params.size() >= 2)
+            m_storageIndexes.insert(params[0], params[1].toInt());
+    } while (!line.isEmpty());
+    storageFile.close();
+    return true;
+}
+
+bool QnStorageManager::serializeStorageFile()
+{
+    QString baseName = closeDirPath(getDataDirectory()) + QString("record_catalog/storage_index.csv");
+    QFile storageFile(baseName + ".new");
+    if (!storageFile.open(QFile::WriteOnly | QFile::Truncate))
+        return false;
+    storageFile.write("path; index\n");
+    for (QMap<QString, int>::const_iterator itr = m_storageIndexes.begin(); itr != m_storageIndexes.end(); ++itr)
+    {
+        storageFile.write(itr.key().toUtf8());
+        storageFile.write(";");
+        storageFile.write(QByteArray::number(itr.value()));
+        storageFile.write("\n");
+    }
+    storageFile.close();
+    if (QFile::exists(baseName))
+        QFile::remove(baseName);
+    return storageFile.rename(baseName);
+}
+
+// determine storage index (aka 16 bit hash)
+int QnStorageManager::detectStorageIndex(const QString& path)
+{
+    if (!m_storageFileReaded)
+        m_storageFileReaded = deserializeStorageFile();
+
+    if (m_storageIndexes.contains(path))
+    {
+        return m_storageIndexes.value(path);
+    }
+    else {
+        int index = -1;
+        foreach (int value, m_storageIndexes.values())
+            index = qMax(index, value);
+        index++;
+        m_storageIndexes.insert(path, index);
+        serializeStorageFile();
+        return index;
+    }
+}
+
 void QnStorageManager::addStorage(QnStoragePtr storage)
 {
+    storage->setIndex(detectStorageIndex(storage->getUrl()));
     QMutexLocker lock(&m_mutex);
     m_storageRoots.insert(storage->getIndex(), storage);
 }

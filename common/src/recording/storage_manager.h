@@ -55,12 +55,18 @@ public:
 private:
     QnStoragePtr getOptimalStorageRoot();
     void clearSpace(QnStoragePtr storage);
+    int detectStorageIndex(const QString& path);
+    bool deserializeStorageFile();
+    bool serializeStorageFile();
 private:
     typedef QMap<int, QnStoragePtr> StorageMap;
     StorageMap m_storageRoots;
     typedef QMap<QString, DeviceFileCatalogPtr> FileCatalogMap;
     FileCatalogMap m_devFileCatalog;
     mutable QMutex m_mutex;
+
+    QMap<QString, int> m_storageIndexes;
+    bool m_storageFileReaded;
 };
 
 #define qnStorageMan QnStorageManager::instance()
