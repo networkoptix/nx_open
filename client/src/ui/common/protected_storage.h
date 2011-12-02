@@ -1,6 +1,7 @@
 #ifndef QN_PROTECTED_STORAGE_H
 #define QN_PROTECTED_STORAGE_H
 
+#include <QSet>
 #include <QVector>
 #include <QReadWriteLock>
 #include <QReadLocker>
@@ -17,10 +18,11 @@ public:
     ProtectedStorage() {}
 
     virtual ~ProtectedStorage() {
-        foreach(T *value, m_storage)
+        foreach(T *value, m_owned)
             if(value != NULL)
                 delete value;
         m_storage.clear();
+        m_owned.clear();
     }
 
     T *get(int index) {
@@ -43,11 +45,8 @@ public:
         if(index >= m_storage.size())
             m_storage.resize(index + 1);
 
-        T *oldValue = m_storage[index];
-        if(oldValue != NULL)
-            delete oldValue;
-
         m_storage[index] = value;
+        m_owned.insert(value);
     }
 
 private:
@@ -56,6 +55,7 @@ private:
 private:
     QReadWriteLock m_lock;
     QVector<T *> m_storage;
+    QSet<T *> m_owned;
 };
 
 #endif // QN_PROTECTED_STORAGE_H
