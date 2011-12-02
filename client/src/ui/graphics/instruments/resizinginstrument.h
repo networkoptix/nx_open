@@ -47,6 +47,14 @@ public:
         m_effectiveDistance = effectiveDistance;
     }
 
+    bool isEffective() const {
+        return m_effective;
+    }
+
+    void setEffective(bool effective) {
+        m_effective = effective;
+    }
+
 signals:
     void resizingProcessStarted(QGraphicsView *view, QGraphicsWidget *widget);
     void resizingStarted(QGraphicsView *view, QGraphicsWidget *widget);
@@ -69,6 +77,7 @@ protected:
 private:
     ResizeHoverInstrument *m_resizeHoverInstrument;
     int m_effectiveDistance;
+    bool m_effective;
     QRectF m_startGeometry;
     bool m_resizingStartedEmitted;
     Qt::WindowFrameSection m_section;

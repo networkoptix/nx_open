@@ -6,6 +6,19 @@
 #include <ui/common/frame_section_queryable.h>
 
 namespace {
+    class GraphicsWidget: public QGraphicsWidget {
+    public:
+        friend class ResizingInstrument;
+
+        Qt::WindowFrameSection getWindowFrameSectionAt(const QPointF &pos) const {
+            return this->windowFrameSectionAt(pos);
+        }
+    };
+
+    GraphicsWidget *open(QGraphicsWidget *widget) {
+        return static_cast<GraphicsWidget *>(widget);
+    }
+
     bool hasDecoration(QGraphicsWidget *widget) {
         return (widget->windowFlags() & Qt::Window) && (widget->windowFlags() & Qt::WindowTitleHint);
     }
@@ -14,7 +27,8 @@ namespace {
 
 ResizeHoverInstrument::ResizeHoverInstrument(QObject *parent):
     Instrument(ITEM, makeSet(QEvent::GraphicsSceneHoverMove, QEvent::GraphicsSceneHoverLeave), parent),
-    m_effectiveDistance(0.0)
+    m_effectiveDistance(0.0),
+    m_effective(true)
 {}
 
 bool ResizeHoverInstrument::registeredNotify(QGraphicsItem *item) {
@@ -22,10 +36,9 @@ bool ResizeHoverInstrument::registeredNotify(QGraphicsItem *item) {
         return false;
 
     FrameSectionQuearyable *queryable = dynamic_cast<FrameSectionQuearyable *>(item);
-    if(queryable == NULL)
-        return false;
+    if(queryable != NULL)
+        m_queryableByItem.insert(item, queryable);
 
-    m_queryableByItem.insert(item, queryable);
     return true;
 }
 
@@ -38,11 +51,19 @@ bool ResizeHoverInstrument::hoverMoveEvent(QGraphicsItem *item, QGraphicsSceneHo
     if (!hasDecoration(widget))
         return false;
 
-    FrameSectionQuearyable *queryable = m_queryableByItem.value(item);
-
-    QRectF effectiveRect = item->mapRectFromScene(0, 0, m_effectiveDistance, m_effectiveDistance);
-    qreal effectiveDistance = qMax(effectiveRect.width(), effectiveRect.height());
-    Qt::WindowFrameSection section = queryable->windowFrameSectionAt(QRectF(event->pos() - QPointF(effectiveDistance, effectiveDistance), QSizeF(2 * effectiveDistance, 2 * effectiveDistance)));
+    Qt::WindowFrameSection section;
+    if(!m_effective) {
+        section = Qt::NoSection;
+    } else {
+        FrameSectionQuearyable *queryable = m_queryableByItem.value(item);
+        if(queryable == NULL) {
+            section = open(widget)->getWindowFrameSectionAt(event->pos());
+        } else {
+            QRectF effectiveRect = item->mapRectFromScene(0, 0, m_effectiveDistance, m_effectiveDistance);
+            qreal effectiveDistance = qMax(effectiveRect.width(), effectiveRect.height());
+            section = queryable->windowFrameSectionAt(QRectF(event->pos() - QPointF(effectiveDistance, effectiveDistance), QSizeF(2 * effectiveDistance, 2 * effectiveDistance)));
+        }
+    }
 
     Qt::CursorShape cursorShape;
     switch (section) {

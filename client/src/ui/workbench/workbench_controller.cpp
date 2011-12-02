@@ -480,17 +480,13 @@ void QnWorkbenchController::at_display_widgetChanged(QnWorkbench::ItemRole role)
         /* Update navigation item's target. */
         m_navigationItem->setVideoCamera(widget == NULL ? NULL : widget->display()->camera());
         break;
-    case QnWorkbench::ZOOMED:
-        if(oldWidget != NULL) {
-            oldWidget->setFlag(QGraphicsItem::ItemIsMovable, true);
-            oldWidget->setResizable(true);
-        }
-
-        if(widget != NULL) {
-            widget->setFlag(QGraphicsItem::ItemIsMovable, false);
-            widget->setResizable(false);
-        }
+    case QnWorkbench::ZOOMED: {
+        bool effective = widget == NULL;
+        m_resizingInstrument->setEffective(effective);
+        m_resizingInstrument->resizeHoverInstrument()->setEffective(effective);
+        m_dragInstrument->setEffective(effective);
         break;
+    }
     default:
         break;
     }

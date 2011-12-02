@@ -37,7 +37,8 @@ namespace {
 ResizingInstrument::ResizingInstrument(QObject *parent):
     base_type(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
     m_resizeHoverInstrument(new ResizeHoverInstrument(this)),
-    m_effectiveDistance(0)
+    m_effectiveDistance(0),
+    m_effective(true)
 {}
 
 ResizingInstrument::~ResizingInstrument() {
@@ -131,6 +132,9 @@ void ResizingInstrument::dragMove(DragInfo *info) {
         dragProcessor()->reset();
         return;
     }
+
+    if(!m_effective)
+        return;
 
     /* Prepare shortcuts. */
     QGraphicsWidget *widget = m_widget.data();
