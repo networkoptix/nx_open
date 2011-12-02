@@ -26,7 +26,6 @@ void parseStorages(QList<ResourcePtr>& storages, const QnApiStorages& xsdStorage
 
         storage->setSpaceLimit(i->spaceLimit());
         storage->setMaxStoreTime(i->time());
-        storage->setIndex(i->index());
 
         storages.append(storage);
     }
