@@ -6,22 +6,7 @@
 #include <QDateTime>
 #include <ui/animation/animation_timer.h>
 #include <utils/common/warnings.h>
-
-class QPointF;
-
-namespace detail {
-    qreal calculateMagnitude(float value);
-    qreal calculateMagnitude(double value);
-    qreal calculateMagnitude(const QPointF &point);
-
-    template<class T>
-    qreal calculateMagnitude(const T &value, ...) {
-        qnWarning("calculateMagnitude function is not implemented for type '%1'.", typeid(T).name());
-        return 0.0;
-    }
-
-} // namespace detail
-
+#include <ui/common/magnitude.h>
 
 template<class T>
 class KineticProcessor;
@@ -387,8 +372,6 @@ protected:
      * \returns                         Magnitude of the given value.
      */
     virtual qreal magnitude(const T &value) const {
-        using detail::calculateMagnitude;
-
         return calculateMagnitude(value);
     }   
 
