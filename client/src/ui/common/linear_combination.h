@@ -37,10 +37,9 @@ public:
     /**
      * This function is thread-safe.
      *
-     * \param type                      <tt>QMetaType::Type</tt> to register linear combinator for.
-     * \param combinator                New linear combinator for the given type.
+     * \param combinator                Linear combinator to register.
      */
-    static void registerForType(int type, LinearCombinator *combinator);
+    static void registerCombinator(LinearCombinator *combinator);
 
     /**
      * Constructor.
@@ -64,7 +63,9 @@ public:
 
     void combine(qreal a, const void *x, void *result) const;
 
-    QVariant zero() const;
+    QVariant zero() const {
+        return m_zero;
+    }
 
 protected:
     /**
@@ -73,10 +74,11 @@ protected:
      */
     virtual void calculateInternal(qreal a, const void *x, qreal b, const void *y, void *result) const = 0;
 
+    void initZero();
+
 private:
     int m_type;
-    mutable QVariant m_zero;
-    mutable bool m_zeroInitialized;
+    QVariant m_zero;
 };
 
 #endif // QN_LINEAR_COMBINATION_H

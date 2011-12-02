@@ -36,10 +36,9 @@ public:
     /**
      * This function is thread-safe.
      *
-     * \param type                      <tt>QMetaType::Type</tt> to register magnitude calculator for.
-     * \param calculator                New magnitude calculator for the given type.
+     * \param calculator                New magnitude calculator to register.
      */
-    static void registerForType(int type, MagnitudeCalculator *calculator);
+    static void registerCalculator(MagnitudeCalculator *calculator);
 
     /**
      * Constructor.

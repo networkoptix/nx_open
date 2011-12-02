@@ -17,7 +17,7 @@ namespace {
     template<class T>
     class StandardLinearCombinator: public LinearCombinator {
     public:
-        StandardLinearCombinator(): LinearCombinator(qRegisterMetaType<T>()) {}
+        StandardLinearCombinator(): LinearCombinator(qRegisterMetaType<T>()) { initZero(); }
 
     protected:
         virtual void calculateInternal(qreal a, const void *x, qreal b, const void *y, void *result) const override {
@@ -27,7 +27,7 @@ namespace {
 
     class NoopLinearCombinator: public LinearCombinator {
     public:
-        NoopLinearCombinator(): LinearCombinator(0) {}
+        NoopLinearCombinator(): LinearCombinator(0) { initZero(); }
 
     protected:
         virtual void calculateInternal(qreal, const void *, qreal, const void *, void *) const override {}
@@ -56,16 +56,16 @@ namespace {
 
 
 LinearCombinator::LinearCombinator(int type): 
-    m_type(type),
-    m_zeroInitialized(false)
+    m_type(type)
 {}
 
 LinearCombinator *LinearCombinator::forType(int type) {
     return storage()->get(type);
 }
 
-void LinearCombinator::registerForType(int type, LinearCombinator *combinator) {
-    storage()->set(type, combinator);
+void LinearCombinator::registerCombinator(LinearCombinator *combinator) {
+    combinator->initZero();
+    storage()->set(combinator->type(), combinator);
 }
 
 QVariant LinearCombinator::combine(qreal a, const QVariant &x, qreal b, const QVariant &y) const {
@@ -90,14 +90,9 @@ void LinearCombinator::combine(qreal a, const void *x, void *result) const {
     combine(a, x, 0.0, m_zero.data(), result);
 }
 
-QVariant LinearCombinator::zero() const {
-    if(!m_zeroInitialized) {
-        QVariant tmp(m_type, static_cast<const void *>(NULL));
-        m_zero = combine(0.0, tmp, 0.0, tmp);
-        m_zeroInitialized = true;
-    }
-
-    return m_zero;
+void LinearCombinator::initZero() {
+    QVariant tmp(m_type, static_cast<const void *>(NULL));
+    m_zero = combine(0.0, tmp, 0.0, tmp);
 }
 
 float linearCombine(qreal a, float x, qreal b, float y) {

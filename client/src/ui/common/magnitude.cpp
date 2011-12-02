@@ -56,8 +56,8 @@ MagnitudeCalculator *MagnitudeCalculator::forType(int type) {
     return storage()->get(type);
 }
 
-void MagnitudeCalculator::registerForType(int type, MagnitudeCalculator *calculator) {
-    storage()->set(type, calculator);
+void MagnitudeCalculator::registerCalculator(MagnitudeCalculator *calculator) {
+    storage()->set(calculator->type(), calculator);
 }
 
 qreal MagnitudeCalculator::calculate(const QVariant &value) const {
