@@ -4,7 +4,6 @@
 #include <utils/common/warnings.h>
 
 class QPointF;
-class ColorF;
 class QVector2D;
 class QVector3D;
 class QVector4D;
@@ -28,7 +27,8 @@ public:
     /**
      * This function is thread-safe.
      *
-     * \param type                      <tt>QMetaType::Type</tt> to get magnitude calculator for.
+     * \param type                      <tt>QMetaType::Type</tt> to get magnitude calculator for. 
+     *                                  Pass zero to get no-op calculator.
      * \returns                         Magnitude calculator for the given type, or NULL if none.
      */
     static MagnitudeCalculator *forType(int type);
@@ -62,16 +62,16 @@ public:
      * \param value                     Value to calculate magnitude for.
      * \returns                         Magnitude of the given value.
      */
-    qreal calculate(const QVariant &value);
+    qreal calculate(const QVariant &value) const;
 
-    qreal calculate(const void *value);
+    qreal calculate(const void *value) const;
 
 protected:
     /**
      * \param value                     Value to calculate magnitude for.
      * \returns                         Magnitude of the given value.
      */
-    virtual qreal calculateInternal(const void *value) = 0;
+    virtual qreal calculateInternal(const void *value) const = 0;
 
 private:
     int m_type;

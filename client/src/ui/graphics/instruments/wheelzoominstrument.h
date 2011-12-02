@@ -10,7 +10,7 @@
  * 
  * It is to be installed after a scene forwarding instrument.
  */
-class WheelZoomInstrument: public Instrument, protected KineticProcessHandler<qreal> {
+class WheelZoomInstrument: public Instrument, protected KineticProcessHandler {
     Q_OBJECT;
 public:
     WheelZoomInstrument(QObject *parent);
@@ -21,7 +21,7 @@ protected:
     virtual bool wheelEvent(QWidget *viewport, QWheelEvent *event) override;
     virtual bool wheelEvent(QGraphicsScene *scene, QGraphicsSceneWheelEvent *event) override;
 
-    virtual void kineticMove(const qreal &distance) override;
+    virtual void kineticMove(const QVariant &degrees) override;
     virtual void finishKinetic() override;
 
 private:

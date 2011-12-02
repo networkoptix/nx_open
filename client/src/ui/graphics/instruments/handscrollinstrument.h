@@ -2,10 +2,10 @@
 #define QN_HAND_SCROLL_INSTRUMENT_H
 
 #include <QCursor>
-#include <ui\processors\kineticprocessor.h>
+#include <ui\processors\kineticprocesshandler.h>
 #include "dragprocessinginstrument.h"
 
-class HandScrollInstrument: public DragProcessingInstrument, protected KineticProcessHandler<QPointF> {
+class HandScrollInstrument: public DragProcessingInstrument, protected KineticProcessHandler {
     Q_OBJECT;
 
     typedef DragProcessingInstrument base_type;
@@ -31,7 +31,7 @@ protected:
     virtual void finishDrag(DragInfo *info) override;
     virtual void finishDragProcess(DragInfo *info) override;
 
-    virtual void kineticMove(const QPointF &distance) override;
+    virtual void kineticMove(const QVariant &distance) override;
     virtual void finishKinetic() override;
 
 private:

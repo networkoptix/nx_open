@@ -94,7 +94,7 @@ bool ResizeHoverInstrument::hoverMoveEvent(QGraphicsItem *item, QGraphicsSceneHo
     return false;
 }
 
-bool ResizeHoverInstrument::hoverLeaveEvent(QGraphicsItem *item, QGraphicsSceneHoverEvent *event) {
+bool ResizeHoverInstrument::hoverLeaveEvent(QGraphicsItem *item, QGraphicsSceneHoverEvent *) {
     QGraphicsWidget *widget = static_cast<QGraphicsWidget *>(item);
     if(!hasDecoration(widget))
         return false;

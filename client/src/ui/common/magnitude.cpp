@@ -16,14 +16,25 @@ namespace {
         StandardMagnitudeCalculator(): MagnitudeCalculator(qRegisterMetaType<T>()) {}
 
     protected:
-        virtual qreal calculateInternal(const void *value) override {
+        virtual qreal calculateInternal(const void *value) const override {
             return calculateMagnitude(*static_cast<const T *>(value));
         }
     };
 
-    class ProtectedMagnitudeStorage: public ProtectedStorage<MagnitudeCalculator> {
+    class NoopMagnitudeCalculator: public MagnitudeCalculator {
     public:
-        ProtectedMagnitudeStorage() {
+        NoopMagnitudeCalculator(): MagnitudeCalculator(0) {}
+
+    private:
+        virtual qreal calculateInternal(const void *) const override {
+            return 0.0;
+        }
+    };
+
+    class Storage: public ProtectedStorage<MagnitudeCalculator> {
+    public:
+        Storage() {
+            add(new NoopMagnitudeCalculator());
             add(new StandardMagnitudeCalculator<float>());
             add(new StandardMagnitudeCalculator<double>());
             add(new StandardMagnitudeCalculator<QPointF>());
@@ -37,25 +48,25 @@ namespace {
         }
     };
 
-    Q_GLOBAL_STATIC(ProtectedMagnitudeStorage, magnitudeStorage);
+    Q_GLOBAL_STATIC(Storage, storage);
 
 } // anonymous namespace
 
 MagnitudeCalculator *MagnitudeCalculator::forType(int type) {
-    return magnitudeStorage()->get(type);
+    return storage()->get(type);
 }
 
 void MagnitudeCalculator::registerForType(int type, MagnitudeCalculator *calculator) {
-    magnitudeStorage()->set(type, calculator);
+    storage()->set(type, calculator);
 }
 
-qreal MagnitudeCalculator::calculate(const QVariant &value) {
-    assert(value.type() == m_type);
+qreal MagnitudeCalculator::calculate(const QVariant &value) const {
+    assert(value.userType() == m_type);
 
     return calculate(value.data());
 }
 
-qreal MagnitudeCalculator::calculate(const void *value) {
+qreal MagnitudeCalculator::calculate(const void *value) const {
     assert(value != NULL);
 
     return calculateInternal(value);

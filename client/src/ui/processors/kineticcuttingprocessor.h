@@ -8,13 +8,12 @@
  * Kinetic processor that introduces speed cutting threshold 
  * after which speed is cut much more aggressively.
  */
-template<class T>
-class KineticCuttingProcessor: public KineticProcessor<T> {
-    typedef KineticProcessor<T> base_type;
+class KineticCuttingProcessor: public KineticProcessor {
+    typedef KineticProcessor base_type;
 
 public:
-    KineticCuttingProcessor(QObject *parent = NULL):
-        base_type(parent),
+    KineticCuttingProcessor(int type, QObject *parent = NULL):
+        base_type(type, parent),
         m_speedCuttingThreshold(std::numeric_limits<qreal>::max())
     {}
 
@@ -32,13 +31,13 @@ public:
     }
 
 protected:
-    virtual T updateSpeed(const T &initialSpeed, const T &currentSpeed, const T &speedGain, qreal dt) const override {
-        T speed = base_type::updateSpeed(initialSpeed, currentSpeed, speedGain, dt);
+    virtual QVariant updateSpeed(const QVariant &initialSpeed, const QVariant &currentSpeed, const QVariant &speedGain, qreal dt) const override {
+        QVariant speed = base_type::updateSpeed(initialSpeed, currentSpeed, speedGain, dt);
 
-        qreal oldMagnitude = magnitude(speed);
+        qreal oldMagnitude = magnitudeCalculator()->calculate(speed);
         if(oldMagnitude > m_speedCuttingThreshold) {
             qreal newMagnitude = m_speedCuttingThreshold * std::pow(oldMagnitude / m_speedCuttingThreshold, 1 / (1 + friction() / m_speedCuttingThreshold * dt));
-            speed = speed * (newMagnitude / oldMagnitude);
+            speed = linearCombinator()->combine(newMagnitude / oldMagnitude, speed);
         }
 
         return speed;

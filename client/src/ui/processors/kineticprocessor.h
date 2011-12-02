@@ -3,69 +3,13 @@
 
 #include <limits>
 #include <QList>
+#include <QVariant>
 #include <QDateTime>
 #include <ui/animation/animation_timer.h>
 #include <utils/common/warnings.h>
 #include <ui/common/magnitude.h>
-
-template<class T>
-class KineticProcessor;
-
-/**
- * This interface is to be implemented by the receiver of kinetic events.
- * 
- * It is to be used in conjunction with <tt>KineticProcessor</tt>.
- */
-template<class T>
-class KineticProcessHandler {
-public:
-    /**
-     * Default constructor.
-     */
-    KineticProcessHandler(): mProcessor(NULL) {}
-    
-    /**
-     * Virtual destructor.
-     */
-    virtual ~KineticProcessHandler();
-
-    /**
-     * This function is called whenever kinetic motion starts.
-     * 
-     * It is guaranteed that <tt>finishKinetic()</tt> will also be called.
-     */
-    virtual void startKinetic() {}
-
-    /**
-     * This function is called at regular time intervals throughout the kinetic
-     * motion process.
-     * 
-     * \param distance                  Distance that was covered by kinetic 
-     *                                  motion since the last call to this function.
-     */
-    virtual void kineticMove(const T &distance) { Q_UNUSED(distance); };
-
-    /**
-     * This function is called whenever kinetic motion stops.
-     * 
-     * If <tt>startKinetic()</tt> was called, then it is guaranteed that
-     * this function will also be called.
-     */
-    virtual void finishKinetic() {};
-
-    /**
-     * \returns                         Kinetic processor associated with this handler. 
-     */
-    KineticProcessor<T> *kineticProcessor() const {
-        return mProcessor;
-    }
-
-private:
-    friend class KineticProcessor<T>;
-
-    KineticProcessor<T> *mProcessor;
-};
-
+#include <ui/common/linear_combination.h>
+#include "kineticprocesshandler.h"
 
 /**
  * Kinetic processor implements logic that is common to components that make
@@ -88,7 +32,6 @@ private:
  * then <tt>finishKinetic()</tt> will also be called even if this kinetic 
  * processor is destroyed.
  */
-template<class T>
 class KineticProcessor : public QObject, public AnimationTimerListener {
 public:
     enum Flag {
@@ -116,74 +59,38 @@ public:
     /**
      * Constructor.
      * 
+     * \param type                      <tt>QMetaType::Type</tt> for spatial type of this processor.
      * \param parent                    Parent for this object.
      */
-    KineticProcessor(QObject *parent = NULL):
-        QObject(parent),
-        mFlags(0),
-        mState(MEASURING),
-        mHandler(NULL),
-        mMaxShiftCount(DEFAULT_MAX_SHIFT_COUNT),
-        mMaxShiftInterval(DEFAULT_MAX_SHIFT_INTERVAL_MSEC / 1000.0),
-        mMinSpeedMagnitude(0.0),
-        mMaxSpeedMagnitude(std::numeric_limits<qreal>::max()),
-        mFriction(1.0)
-    {
-        (new AnimationTimer(this))->addListener(this);
-      
-        reset();
-    }
+    KineticProcessor(int type, QObject *parent = NULL);
 
     /**
      * Virtual destructor.
      */
-    virtual ~KineticProcessor() {
-        setHandler(NULL);
-    }
+    virtual ~KineticProcessor();
 
     /**
      * Resets this kinetic processor into its initial state.
      */
-    void reset() {
-        transition(MEASURING);
-
-        mShifts.clear();
-        mLastShiftTimeMSec = QDateTime::currentMSecsSinceEpoch();
-    }
+    void reset();
 
     /**
-     * \param shift                     Spatial displacement since the last call
-     *                                  to this function.
+     * \param dv                        Spatial displacement since the last call to this function.
      */
-    void shift(const T &dv) {
-        /* QDateTime::currentMSecsSinceEpoch gives the most accurate timestamp on
-         * Windows, even more accurate than QElapsedTimer. Not monotonic, so we
-         * may want to create a monotonic wrapper one day. */
-        qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
-
-        Shift shift;
-        shift.dv = dv;
-        shift.dt = (currentTimeMSec - mLastShiftTimeMSec) / 1000.0;
-        if(shift.dt > mMaxShiftInterval) {
-            /* New motion has started. */
-            mShifts.clear();
-            shift.dt = mMaxShiftInterval;
-        } else if(mFlags & IGNORE_DELTA_TIME) {
-            shift.dt = mMaxShiftInterval;
-        }
-        mShifts.append(shift);
-
-        mLastShiftTimeMSec = currentTimeMSec;
-
-        if (mShifts.size() > mMaxShiftCount)
-            mShifts.takeFirst();
-    }
+    void shift(const QVariant &dv);
 
     /**
      * Starts kinetic process.
      */
     void start() {
         transition(KINETIC);
+    }
+
+    /**
+     * \returns                         <tt>QMetaType::Type</tt> for spatial type of this processor.
+     */
+    int type() const {
+        return mType;
     }
 
     /**
@@ -210,43 +117,21 @@ public:
     /**
      * \returns                         Handler for this kinetic processor.
      */
-    KineticProcessHandler<T> *handler() const {
+    KineticProcessHandler *handler() const {
         return mHandler;
     }
 
     /**
      * \param handler                   New handler for this kinetic processor.
      */
-    void setHandler(KineticProcessHandler<T> *handler) {
-        if(handler != NULL && handler->mProcessor != NULL) {
-            qnWarning("Given handler is already assigned to a processor.");
-            return;
-        }
-
-        if(mHandler != NULL) {
-            reset();
-            mHandler->mProcessor = NULL;
-        }
-
-        mHandler = handler;
-
-        if(mHandler != NULL)
-            mHandler->mProcessor = this;
-    }
+    void setHandler(KineticProcessHandler *handler);
     
     /**
      * \param count                     Maximal number of latest shifts that will
      *                                  be considered when computing initial
      *                                  kinetic speed. Good values are in range [5, 15].
      */
-    void setMaxShiftCount(int count) {
-        if(count < 1) {
-            qnWarning("Invalid maximal shift count '%1'.", count);
-            return;
-        }
-
-        mMaxShiftCount = count;
-    }
+    void setMaxShiftCount(int count);
 
     int maxShiftCount() const {
         return mMaxShiftCount;
@@ -257,14 +142,7 @@ public:
      *                                  magnitude becomes less or equal to this value,
      *                                  kinetic motion stops.
      */
-    void setMinSpeedMagnitude(qreal minSpeedMagnitude) {
-        if(minSpeedMagnitude < 0.0) {
-            qnWarning("Invalid minimal speed magnitude %1", minSpeedMagnitude);
-            return;
-        }
-
-        mMinSpeedMagnitude = minSpeedMagnitude;
-    }
+    void setMinSpeedMagnitude(qreal minSpeedMagnitude);
 
     qreal minSpeedMagnitude() const {
         return mMinSpeedMagnitude;
@@ -298,14 +176,7 @@ public:
     /**
      * \param friction                  Friction coefficient. Set to +inf to disable kinetic motion, set to 0.0 to make it never stop.
      */
-    void setFriction(qreal friction) {
-        if(friction < 0.0) {
-            qnWarning("Invalid friction value '%1'", friction);
-            return;
-        }
-
-        mFriction = friction;
-    }
+    void setFriction(qreal friction);
 
     qreal friction() const {
         return mFriction;
@@ -313,11 +184,19 @@ public:
 
 protected:
     struct Shift {
-        T dv;       /**< Spatial displacement. */
-        qreal dt;   /**< Time delta, in seconds. */
+        QVariant dv; /**< Spatial displacement. */
+        qreal dt;    /**< Time delta, in seconds. */
     };
 
     typedef QList<Shift> ShiftList;
+
+    MagnitudeCalculator *magnitudeCalculator() const {
+        return mMagnitudeCalculator;
+    }
+
+    LinearCombinator *linearCombinator() const {
+        return mLinearCombinator;
+    }
 
     /**
      * Given a valid list of shifts, this function calculates speed.
@@ -328,52 +207,12 @@ protected:
      * \param shifts                    List of shifts.
      * \returns                         Estimated speed, in T per second.
      */
-    virtual T calculateSpeed(const ShiftList &shifts) const {
-        if (shifts.size() == 0)
-            return T();
-
-        T sumValue = T();
-        qreal sumTime = 0;
-        foreach(const Shift &shift, shifts) {
-            sumValue += shift.dv;
-            sumTime += shift.dt;
-        }
-
-        if (sumTime == 0)
-            sumTime = mMaxShiftInterval; /* Technically speaking, we should never get here, but we want to feel safe. */
-
-        return sumValue / sumTime;
-    }
+    virtual QVariant calculateSpeed(const ShiftList &shifts) const;
 
     /**
      * Calculates speed based on currently recorded shifts and clears them.
      */
-    T calculateSpeed() {
-        /* Check if the motion has expired. */
-        if(!mShifts.empty() && (QDateTime::currentMSecsSinceEpoch() - mLastShiftTimeMSec) / 1000.0 > mMaxShiftInterval)
-            mShifts.clear();
-
-        T result = calculateSpeed(mShifts);
-        mShifts.clear();
-
-        return result;
-    }
-
-    /**
-     * This function calculates the magnitude of the given value.
-     * 
-     * By default, it uses the appropriate free-standing 
-     * <tt>calculateMagnitude</tt> function picked by ADL.
-     * 
-     * It can be reimplemented in derived class if non-standard magnitude
-     * calculation is desired.
-     * 
-     * \param value                     Value to calculated magnitude of.
-     * \returns                         Magnitude of the given value.
-     */
-    virtual qreal magnitude(const T &value) const {
-        return calculateMagnitude(value);
-    }   
+    QVariant calculateSpeed();
 
     /**
      * This functions implements deceleration of the kinetic movement over time.
@@ -387,63 +226,12 @@ protected:
      * \param dt                        Time since the last call to this function, in seconds.
      * \returns                         New speed.
      */
-    virtual T updateSpeed(const T &initialSpeed, const T &currentSpeed, const T &speedGain, qreal dt) const {
-        Q_UNUSED(initialSpeed);
+    virtual QVariant updateSpeed(const QVariant &initialSpeed, const QVariant &currentSpeed, const QVariant &speedGain, qreal dt) const;
 
-        T speed = currentSpeed + speedGain;
-
-        qreal oldMagnitude = magnitude(speed);
-        qreal newMagnitude = oldMagnitude - mFriction * dt;
-        if(newMagnitude <= 0.0)
-            return T();
-
-        return speed * (newMagnitude / oldMagnitude);
-    }
-
-    virtual void tick(int deltaTimeMSec) override {
-        /* Update current speed. */
-        T speedGain = calculateSpeed();
-        qreal dt = deltaTimeMSec / 1000.0;
-        mCurrentSpeed = updateSpeed(mInitialSpeed, mCurrentSpeed, speedGain, dt);
-
-        /* Adjust for max magnitude. */
-        qreal currentSpeedMagnitude = magnitude(mCurrentSpeed);
-        if(currentSpeedMagnitude > mMaxSpeedMagnitude)
-            mCurrentSpeed = mCurrentSpeed * (mMaxSpeedMagnitude / currentSpeedMagnitude);
-
-        if(magnitude(mCurrentSpeed) <= mMinSpeedMagnitude) {
-            reset();
-        } else {
-            if(!qFuzzyIsNull(dt) && mHandler != NULL)
-                mHandler->kineticMove(mCurrentSpeed * dt);
-        }
-    }
+    virtual void tick(int deltaTimeMSec) override;
 
   private:
-    void transition(State state) {
-        if(mState == state)
-            return;
-
-        mState = state;
-
-        switch(state) {
-        case MEASURING: /* KINETIC -> MEASURING. */
-            timer()->deactivate();
-            if(mHandler != NULL)
-                mHandler->finishKinetic();
-            return;
-        case KINETIC: /* MEASURING -> KINETIC. */
-            mInitialSpeed = mCurrentSpeed = calculateSpeed();
-            if(mState == state) { /* State may get changed in a callback. */
-                timer()->activate();
-                if(mState == state && mHandler != NULL) /* And again, state may have changed. */
-                    mHandler->startKinetic();
-            }
-            return;
-        default:
-            return;
-        }
-    }
+    void transition(State state);
 
   private:
     /* 'Working' state. */
@@ -458,19 +246,28 @@ protected:
     qint64 mLastShiftTimeMSec;
 
     /** Speed at the beginning of kinetic motion. */
-    T mInitialSpeed;
+    QVariant mInitialSpeed;
 
     /** Current kinetic speed. */
-    T mCurrentSpeed;
+    QVariant mCurrentSpeed;
 
 
     /* 'Stable' state. */
+
+    /** <tt>QMetaType::Type</tt> for the spatial type of this processor. */
+    int mType;
+
+    /** Magnitude calculator. */
+    MagnitudeCalculator *mMagnitudeCalculator;
+
+    /** Linear combinator. */
+    LinearCombinator *mLinearCombinator;
 
     /** Flags */
     Flags mFlags;
 
     /** Kinetic handler. */
-    KineticProcessHandler<T> *mHandler;
+    KineticProcessHandler *mHandler;
 
     /** Maximal size of the shift queue. */
     int mMaxShiftCount;
@@ -487,13 +284,5 @@ protected:
     /** Friction coefficient. */
     qreal mFriction;
 };
-
-
-template<class T>
-KineticProcessHandler<T>::~KineticProcessHandler() {
-    if(mProcessor != NULL)
-        mProcessor->setHandler(NULL);
-}
-
 
 #endif // QN_KINETIC_PROCESSOR_H

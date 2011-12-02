@@ -91,7 +91,7 @@ public:
                 } else {
                     return Qt::TopLeftSection;
                 }
-            } else if(sections & Qn::TopRightSection | Qn::BottomLeftSection) {
+            } else {
                 if(sections & Qn::TopRightSection) {
                     return Qt::TopRightSection;
                 } else {
@@ -105,7 +105,7 @@ public:
                 } else {
                     return Qt::LeftSection;
                 }
-            } else if(sections & Qn::TopSection | Qn::BottomSection) {
+            } else {
                 if(sections & Qn::BottomSection) {
                     return Qt::BottomSection;
                 } else {

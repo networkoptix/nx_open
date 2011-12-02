@@ -10,7 +10,7 @@
 HandScrollInstrument::HandScrollInstrument(QObject *parent):
     base_type(VIEWPORT, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, AnimationEvent::Animation), parent)
 {
-    KineticCuttingProcessor<QPointF> *processor = new KineticCuttingProcessor<QPointF>(this);
+    KineticCuttingProcessor *processor = new KineticCuttingProcessor(QMetaType::QPointF, this);
     processor->setHandler(this);
     processor->setMaxShiftInterval(0.01);
     processor->setSpeedCuttingThreshold(128); /* In pixels per second. */
@@ -55,10 +55,10 @@ void HandScrollInstrument::startDrag(DragInfo *info) {
 }
 
 void HandScrollInstrument::dragMove(DragInfo *info) {
-    QPoint delta = -(info->mouseScreenPos() - info->lastMouseScreenPos());
+    QPointF delta = -(info->mouseScreenPos() - info->lastMouseScreenPos());
 
     kineticProcessor()->shift(delta);
-    moveViewport(info->view(), delta);
+    moveViewportF(info->view(), delta);
 }
 
 void HandScrollInstrument::finishDrag(DragInfo *info) {
@@ -74,12 +74,12 @@ void HandScrollInstrument::finishDragProcess(DragInfo *info) {
     emit scrollProcessFinished(info->view());
 }
 
-void HandScrollInstrument::kineticMove(const QPointF &distance) {
+void HandScrollInstrument::kineticMove(const QVariant &distance) {
     QGraphicsView *view = m_currentView.data();
     if(view == NULL)
         return;
 
-    moveViewportF(view, distance);
+    moveViewportF(view, distance.toPointF());
 }
 
 void HandScrollInstrument::finishKinetic() {
