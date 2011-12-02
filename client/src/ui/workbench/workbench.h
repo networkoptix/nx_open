@@ -36,6 +36,13 @@ public:
         EDITING  /**< Layout editing. */
     };
 
+    enum ItemRole {
+        RAISED,  /**< The item is raised. */
+        ZOOMED,  /**< The item is zoomed. */
+        FOCUSED, /**< The item is focused. */
+        ITEM_ROLE_COUNT
+    };
+
     /**
      * Constructor.
      * 
@@ -94,40 +101,16 @@ public:
     void setMode(Mode mode);
 
     /**
-     * \returns                         Currently raised item.
+     * \param role                      Role to get item for.
+     * \returns                         Item for the given item role.
      */
-    QnWorkbenchItem *raisedItem() const {
-        return m_raisedItem;
-    }
+    QnWorkbenchItem *item(ItemRole role);
 
     /**
-     * \param item                      New raised item for this workbench.
+     * \param role                      Role to set an item for.
+     * \param item                      New item for the given role.
      */
-    void setRaisedItem(QnWorkbenchItem *item);
-
-    /**
-     * \returns                         Currently zoomed item.
-     */
-    QnWorkbenchItem *zoomedItem() const {
-        return m_zoomedItem;
-    }
-
-    /**
-     * \param item                      New zoomed item for this workbench.
-     */
-    void setZoomedItem(QnWorkbenchItem *item);
-
-    /**
-     * \returns                         Item that has focus. 
-     */
-    QnWorkbenchItem *focusedItem() const {
-        return m_focusedItem;
-    }
-
-    /**
-     * \param item                      New focused item for this workbench.
-     */
-    void setFocusedItem(QnWorkbenchItem *item);
+    void setItem(ItemRole role, QnWorkbenchItem *item);
 
 signals:
     /**
@@ -142,19 +125,11 @@ signals:
     void modeChanged();
 
     /**
-     * This signal is emitted whenever the raised item of this workbench changes. 
+     * This signal is emitted whenever a new item is assigned to the role. 
+     * 
+     * \param role                      Item role.
      */
-    void raisedItemChanged();
-
-    /**
-     * This signal is emitted whenever the zoomed item of this workbench changes.
-     */
-    void zoomedItemChanged();
-
-    /**
-     * This signal is emitted whenever the focused item of this workbench changes. 
-     */
-    void focusedItemChanged();
+    void itemChanged(QnWorkbench::ItemRole role);
 
     /**
      * This signal is emitted whenever the layout of this workbench changes.
@@ -197,14 +172,8 @@ private:
     /** Current mode. */
     Mode m_mode;
 
-    /** Currently raised item. NULL if none. */
-    QnWorkbenchItem *m_raisedItem;
-
-    /** Currently zoomed item. NULL if none. */
-    QnWorkbenchItem *m_zoomedItem;
-
-    /** Item that currently has focus. NULL if none. */
-    QnWorkbenchItem *m_focusedItem;
+    /** Items by role. */
+    QnWorkbenchItem *m_itemByRole[ITEM_ROLE_COUNT];
 
     /** Stored dummy layout. It is used to ensure that current layout is never NULL. */
     QnWorkbenchLayout *m_dummyLayout;

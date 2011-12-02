@@ -1,5 +1,6 @@
 #include "workbench.h"
 #include <cassert>
+#include <cstring> /* For std::memset. */
 #include <utils/common/warnings.h>
 #include "workbench_layout.h"
 #include "workbench_grid_mapper.h"
@@ -10,11 +11,10 @@ QnWorkbench::QnWorkbench(QObject *parent):
     m_mode(VIEWING),
     m_layout(NULL),
     m_dummyLayout(new QnWorkbenchLayout(this)),
-    m_mapper(new QnWorkbenchGridMapper(this)),
-    m_raisedItem(NULL),
-    m_zoomedItem(NULL),
-    m_focusedItem(NULL)
+    m_mapper(new QnWorkbenchGridMapper(this))
 {
+    std::memset(m_itemByRole, 0, sizeof(m_itemByRole));
+
     setLayout(m_dummyLayout);
 }    
 
@@ -75,46 +75,26 @@ void QnWorkbench::setMode(Mode mode) {
     emit modeChanged();
 }
 
-void QnWorkbench::setRaisedItem(QnWorkbenchItem *item) {
-    if(m_raisedItem == item)
-        return;
+QnWorkbenchItem *QnWorkbench::item(ItemRole role) {
+    assert(role >= 0 && role < ITEM_ROLE_COUNT);
 
-    if(item != NULL && item->layout() != m_layout) {
-        qnWarning("Cannot raise an item from another layout.");
-        return;
-    }
-
-    m_raisedItem = item;
-    
-    emit raisedItemChanged();
+    return m_itemByRole[role];
 }
 
-void QnWorkbench::setZoomedItem(QnWorkbenchItem *item) {
-    if(m_zoomedItem == item)
+void QnWorkbench::setItem(ItemRole role, QnWorkbenchItem *item) {
+    assert(role >= 0 && role < ITEM_ROLE_COUNT);
+
+    if(m_itemByRole[role] == item)
         return;
 
     if(item != NULL && item->layout() != m_layout) {
-        qnWarning("Cannot zoom to an item from another layout.");
+        qnWarning("Cannot set a role for an item from another layout.");
         return;
     }
 
-    m_zoomedItem = item;
+    m_itemByRole[role] = item;
 
-    emit zoomedItemChanged();
-}
-
-void QnWorkbench::setFocusedItem(QnWorkbenchItem *item) {
-    if(m_focusedItem == item)
-        return;
-
-    if(item != NULL && item->layout() != m_layout) {
-        qnWarning("Cannot focus an item from another layout.");
-        return;
-    }
-
-    m_focusedItem = item;
-
-    emit focusedItemChanged();
+    emit itemChanged(role);
 }
 
 void QnWorkbench::at_layout_itemAdded(QnWorkbenchItem *item) {
@@ -122,14 +102,9 @@ void QnWorkbench::at_layout_itemAdded(QnWorkbenchItem *item) {
 }
 
 void QnWorkbench::at_layout_itemAboutToBeRemoved(QnWorkbenchItem *item) {
-    if(item == m_raisedItem)
-        setRaisedItem(NULL);
-
-    if(item == m_zoomedItem)
-        setZoomedItem(NULL);
-
-    if(item == m_focusedItem)
-        setFocusedItem(NULL);
+    for(int i = 0; i < ITEM_ROLE_COUNT; i++)
+        if(item == m_itemByRole[i])
+            setItem(static_cast<ItemRole>(i), NULL);
 
     emit itemAboutToBeRemoved(item);
 }
