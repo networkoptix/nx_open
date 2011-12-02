@@ -3,6 +3,7 @@
 #include <QGraphicsSceneWheelEvent>
 #include <QGraphicsView>
 #include <QCursor>
+#include <QDateTime>
 #include <ui/processors/kineticcuttingprocessor.h>
 #include <ui/animation/animation_event.h>
 
@@ -17,15 +18,17 @@ WheelZoomInstrument::WheelZoomInstrument(QObject *parent):
         makeSet(QEvent::GraphicsSceneWheel),
         makeSet(),
         parent
-    ) 
+    )
 {
     KineticCuttingProcessor<qreal> *processor = new KineticCuttingProcessor<qreal>(this);
     processor->setHandler(this);
-    processor->setMaxShiftInterval(0.5);
+    processor->setMaxShiftInterval(0.4);
     processor->setFriction(degreesFor2x / 2);
     processor->setMaxSpeedMagnitude(degreesFor2x * 8);
-    processor->setSpeedCuttingThreshold(degreesFor2x / 4);
+    processor->setSpeedCuttingThreshold(degreesFor2x / 3);
+    processor->setFlags(KineticProcessor<qreal>::IGNORE_DELTA_TIME);
     animationTimer()->addListener(processor);
+    animationTimer()->deactivate();
 }
 
 void WheelZoomInstrument::aboutToBeDisabledNotify() {

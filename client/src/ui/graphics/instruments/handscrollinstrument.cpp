@@ -16,6 +16,7 @@ HandScrollInstrument::HandScrollInstrument(QObject *parent):
     processor->setSpeedCuttingThreshold(128); /* In pixels per second. */
     processor->setFriction(128);
     animationTimer()->addListener(processor);
+    animationTimer()->deactivate();
 }
 
 HandScrollInstrument::~HandScrollInstrument() {

@@ -106,6 +106,15 @@ private:
 template<class T>
 class KineticProcessor : public QObject, public AnimationTimerListener {
 public:
+    enum Flag {
+        /** When this flag is set, delta time between events is ignored and
+         * all events are treated as being separated by a constant amount of 
+         * time determined by <tt>maxShiftInterval</tt>. */
+        IGNORE_DELTA_TIME = 0x1
+    };
+
+    Q_DECLARE_FLAGS(Flags, Flag);
+
     /**
      * Kinetic state.
      */
@@ -126,6 +135,7 @@ public:
      */
     KineticProcessor(QObject *parent = NULL):
         QObject(parent),
+        mFlags(0),
         mState(MEASURING),
         mHandler(NULL),
         mMaxShiftCount(DEFAULT_MAX_SHIFT_COUNT),
@@ -173,6 +183,8 @@ public:
             /* New motion has started. */
             mShifts.clear();
             shift.dt = mMaxShiftInterval;
+        } else if(mFlags & IGNORE_DELTA_TIME) {
+            shift.dt = mMaxShiftInterval;
         }
         mShifts.append(shift);
 
@@ -187,6 +199,20 @@ public:
      */
     void start() {
         transition(KINETIC);
+    }
+
+    /**
+     * \returns                         Flags of this kinetic processor. 
+     */
+    Flags flags() const {
+        return mFlags;
+    }
+
+    /**
+     * \param flags                     New flags for this kinetic processor. 
+     */
+    void setFlags(Flags flags) {
+        mFlags = flags;
     }
 
     /**
@@ -456,6 +482,9 @@ protected:
 
 
     /* 'Stable' state. */
+
+    /** Flags */
+    Flags mFlags;
 
     /** Kinetic handler. */
     KineticProcessHandler<T> *mHandler;
