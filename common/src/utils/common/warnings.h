@@ -77,13 +77,13 @@ namespace detail {
 
 
 #define qnWarning(MSG, ...)                                                     \
-    ::detail::operators::invokeInternal(&detail::warningInternal,  Q_FUNC_INFO, QLatin1String(MSG), ##__VA_ARGS__)
+    ::detail::operators::invokeInternal(&::detail::warningInternal,  Q_FUNC_INFO, QLatin1String(MSG), ##__VA_ARGS__)
 
 #define qnCritical(MSG, ...)                                                    \
-    ::detail::operators::invokeInternal(&detail::criticalInternal, Q_FUNC_INFO, QLatin1String(MSG), ##__VA_ARGS__)
+    ::detail::operators::invokeInternal(&::detail::criticalInternal, Q_FUNC_INFO, QLatin1String(MSG), ##__VA_ARGS__)
 
 #define qnFatal(MSG, ...)                                                       \
-    ::detail::operators::invokeInternal(&detail::fatalInternal,    Q_FUNC_INFO, QLatin1String(MSG), ##__VA_ARGS__)
+    ::detail::operators::invokeInternal(&::detail::fatalInternal,    Q_FUNC_INFO, QLatin1String(MSG), ##__VA_ARGS__)
 
 
 

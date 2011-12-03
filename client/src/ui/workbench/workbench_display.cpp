@@ -286,8 +286,7 @@ void QnWorkbenchDisplay::setView(QGraphicsView *view) {
         }
 
         /* Turn on antialiasing at QPainter level. */
-        m_view->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing); 
-        m_view->setRenderHints(QPainter::SmoothPixmapTransform);
+        m_view->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
 
         /* In OpenGL mode this one seems to be ignored, but it will help in software mode. */
         m_view->setViewportUpdateMode(QGraphicsView::MinimalViewportUpdate);
