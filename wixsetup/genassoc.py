@@ -1,6 +1,7 @@
 import os, sys
 
 sys.path.append('..')
+sys.path.append('../../common')
 
 from string import Template, join
 from filetypes import all_filetypes, video_filetypes, image_filetypes
